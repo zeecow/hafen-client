@@ -121,6 +121,15 @@ public abstract class Listbox<T> extends ListWidget<T> {
 	}
     }
 
+    public boolean mouseclick(Coord c, int button, int count) {
+        if(super.mouseclick(c, button, count))
+            return(true);
+        T item = itemat(c);
+        if(item != null && button == 1 && count >= 2)
+            itemactivate(item);
+        return(true);
+    }
+
     // ensures that selected element is visible
     public void showsel() {
 	if (sb.val + h - 1 < selindex)
