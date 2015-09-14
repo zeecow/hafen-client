@@ -144,11 +144,13 @@ public class LocalMiniMap extends Widget {
 	synchronized(oc) {
 	    for(Gob gob : oc) {
 		try {
-		    GobIcon icon = gob.getattr(GobIcon.class);
+		    Radar.Marker icon = gob.getattr(Radar.Marker.class);
 		    if(icon != null) {
 			Coord gc = p2c(gob.rc);
 			Tex tex = icon.tex();
-			g.image(tex, gc.sub(tex.sz().div(2)));
+			if(tex != null){
+			    g.image(tex, gc.sub(tex.sz().div(2)));
+			}
 		    }
 		} catch(Loading l) {}
 	    }
@@ -160,12 +162,15 @@ public class LocalMiniMap extends Widget {
 	synchronized(oc) {
 	    for(Gob gob : oc) {
 		try {
-		    GobIcon icon = gob.getattr(GobIcon.class);
+		    Radar.Marker icon = gob.getattr(Radar.Marker.class);
 		    if(icon != null) {
-			Coord gc = p2c(gob.rc);
-			Coord sz = icon.tex().sz();
-			if(c.isect(gc.sub(sz.div(2)), sz))
-			    return(gob);
+			Tex tex = icon.tex();
+			if(tex != null) {
+			    Coord gc = p2c(gob.rc);
+			    Coord sz = tex.sz();
+			    if(c.isect(gc.sub(sz.div(2)), sz))
+				return (gob);
+			}
 		    }
 		} catch(Loading l) {}
 	    }
