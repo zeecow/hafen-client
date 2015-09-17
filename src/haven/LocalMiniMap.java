@@ -28,10 +28,8 @@ package haven;
 
 import static haven.MCache.cmaps;
 import static haven.MCache.tilesz;
-import static haven.MiniMap.bg;
 
 import java.awt.Color;
-import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.util.*;
 import haven.resutil.Ridges;
@@ -140,36 +138,41 @@ public class LocalMiniMap extends Widget {
     }
 
     public void drawicons(GOut g) {
+
 	synchronized (Radar.markers) {
 	    for (Radar.Marker marker : Radar.markers) {
+		if(marker.gob.id == mv.plgob){
+		    continue;
+		}
 		try {
 		    Coord gc = p2c(marker.gob.rc);
 		    Tex tex = marker.tex();
 		    if(tex != null) {
+			g.chcolor(marker.color());
 			g.image(tex, gc.sub(tex.sz().div(2)));
 		    }
 		} catch (Loading ignored) {
 		}
 	    }
 	}
+	g.chcolor();
     }
 
     public Gob findicongob(Coord c) {
-	OCache oc = ui.sess.glob.oc;
-	synchronized(oc) {
-	    for(Gob gob : oc) {
+	synchronized (Radar.markers) {
+	    ListIterator<Radar.Marker> li = Radar.markers.listIterator(Radar.markers.size());
+	    while(li.hasPrevious()) {
+		Radar.Marker icon = li.previous();
 		try {
-		    Radar.Marker icon = gob.getattr(Radar.Marker.class);
-		    if(icon != null) {
-			Tex tex = icon.tex();
-			if(tex != null) {
-			    Coord gc = p2c(gob.rc);
-			    Coord sz = tex.sz();
-			    if(c.isect(gc.sub(sz.div(2)), sz))
-				return (gob);
-			}
+		    Gob gob = icon.gob;
+		    Tex tex = icon.tex();
+		    if(tex != null) {
+			Coord gc = p2c(gob.rc);
+			Coord sz = tex.sz();
+			if(c.isect(gc.sub(sz.div(2)), sz))
+			    return (gob);
 		    }
-		} catch(Loading l) {}
+		} catch (Loading ignored) {}
 	    }
 	}
 	return(null);
@@ -222,6 +225,7 @@ public class LocalMiniMap extends Widget {
 		}
 	    }
 	}
+	drawicons(g);
 	try {
 	    synchronized (ui.sess.glob.party.memb) {
 		for (Party.Member m : ui.sess.glob.party.memb.values()) {
@@ -241,7 +245,6 @@ public class LocalMiniMap extends Widget {
 	    }
 	} catch (Loading ignored) {
 	}
-	drawicons(g);
     }
 
     public boolean mousedown(Coord c, int button) {

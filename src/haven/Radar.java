@@ -1,11 +1,47 @@
 package haven;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
+
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.lang.reflect.Type;
+import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 
 public class Radar {
-    public static final List<Marker> markers =  new LinkedList<>();
-    private static boolean dirty = false;
+    public static final List<Marker> markers = new LinkedList<>();
+    private static final List<MarkerCFG> MARKER_CFGS;
+    private static final MarkerCFG DEFAULT;
+    public static final Comparator<Marker> MARKER_COMPARATOR = new Comparator<Marker>() {
+	@Override
+	public int compare(Marker o1, Marker o2) {
+	    return o1.prio() - o2.prio();
+	}
+    };
+    private static long lastsort = 0;
+
+    static {
+	Gson gson = (new GsonBuilder()).setPrettyPrinting().create();
+	DEFAULT = new DefMarker();
+
+	LinkedList<MarkerCFG> tmp = null;
+	try {
+	    Type type = new TypeToken<LinkedList<MarkerCFG>>() {
+	    }.getType();
+	    tmp = gson.fromJson(Config.loadFile("radar.json"), type);
+	} catch (Exception ignored) {
+	}
+
+	if(tmp == null) {
+	    tmp = new LinkedList<>();
+	}
+	MARKER_CFGS = tmp;
+
+	MARKER_CFGS.add(new MarkerCFG());
+    }
 
     public static void add(Gob gob, Indir<Resource> res) {
 	if(gob.getattr(Marker.class) == null) {
@@ -13,29 +49,28 @@ public class Radar {
 	    gob.setattr(marker);
 	    synchronized (markers) {
 		markers.add(marker);
-		dirty = true;
 	    }
 	}
     }
 
-    private static Tex tex(String resname) {
-	if(resname == null){return null;}
-	try {
-	    if(resname.equals("gfx/terobjs/items/arrow")) {
-		System.out.println(resname);
-		try {
-		    return loadres("gfx/invobjs/arrow-bone").layer(Resource.imgc).tex();
-		}catch(Loading ignored){}
-		//return Resource.loadtex("gfx/invobjs/arrow-bone");
+    private static MarkerCFG cfg(String resname) {
+	if(resname == null) {
+	    return null;
+	}
+	for (MarkerCFG cfg : MARKER_CFGS) {
+	    if(cfg.match(resname)) {
+		return cfg;
 	    }
-	}catch(Loading ignored){}
-	return null;
+	}
+	return DEFAULT;
     }
 
     public static void tick() {
-	synchronized (markers){
-	    if(dirty){
-		//markers.sort();
+	long now = System.currentTimeMillis();
+	if(now - lastsort > 100) {
+	    synchronized (markers) {
+		markers.sort(MARKER_COMPARATOR);
+		lastsort = now;
 	    }
 	}
     }
@@ -55,6 +90,7 @@ public class Radar {
 
     public static class Marker extends GAttrib {
 	private final Indir<Resource> res;
+	private MarkerCFG cfg = null;
 	private Tex tex;
 
 	public Marker(Gob gob, Indir<Resource> res) {
@@ -63,14 +99,36 @@ public class Radar {
 	}
 
 	public Tex tex() {
-	    GobIcon gi = gob.getattr(GobIcon.class);
-	    if(gi != null) {
-		return gi.tex();
-	    }
-	    if(tex == null) {
-		tex = Radar.tex(resname());
+	    if(tex == null && cfg() != null) {
+		if(cfg == DEFAULT) {
+		    GobIcon gi = gob.getattr(GobIcon.class);
+		    if(gi != null) {
+			tex = gi.tex();
+		    }
+		} else {
+		    tex = cfg.tex();
+		}
 	    }
 	    return tex;
+	}
+
+	public Color color() {
+	    KinInfo ki = gob.getattr(KinInfo.class);
+	    if(ki != null) {
+		return BuddyWnd.gc[ki.group % BuddyWnd.gc.length];
+	    }
+	    return Color.WHITE;
+	}
+
+	public int prio() {
+	    return (cfg == null || tex == null) ? Integer.MAX_VALUE : cfg.priority;
+	}
+
+	private MarkerCFG cfg() {
+	    if(cfg == null) {
+		cfg = Radar.cfg(resname());
+	    }
+	    return cfg;
 	}
 
 	private String resname() {
@@ -80,11 +138,50 @@ public class Radar {
 	    } else {
 		try {
 		    name = res.get().name;
-		} catch (Resource.Loading ignored) {
+		} catch (Loading ignored) {
 		}
 	    }
 	    return name;
 	}
+    }
+
+    public static class MarkerCFG {
+	transient private Tex tex;
+	public int priority = 0;
+	private String pattern = "", icon = "gfx/hud/mmap/o";
+
+	public Tex tex() {
+	    if(tex == null) {
+		try {
+		    Resource.Image img = loadres(icon).layer(Resource.imgc);
+
+		    Tex tex = img.tex();
+		    if((tex.sz().x <= 20) && (tex.sz().y <= 20)) {
+			this.tex = tex;
+		    } else {
+			BufferedImage buf = img.img;
+			buf = PUtils.rasterimg(PUtils.blurmask2(buf.getRaster(), 1, 1, Color.BLACK));
+			buf = PUtils.convolvedown(buf, new Coord(20, 20), GobIcon.filter);
+			this.tex = new TexI(buf);
+		    }
+
+		} catch (Loading ignored) {
+		}
+	    }
+	    return tex;
+	}
+
+	public boolean match(String resname) {
+	    return resname.equals(pattern);
+	}
+    }
+
+    public static class DefMarker extends MarkerCFG {
+	@Override
+	public Tex tex() {
+	    return null;
+	}
+
     }
 
 }

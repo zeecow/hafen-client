@@ -1,0 +1,12 @@
+[
+  {
+    "priority": 1,
+    "pattern": "gfx/terobjs/items/arrow",
+    "icon": "gfx/invobjs/arrow-bone"
+  },
+  {
+    "priority": 1000,
+    "pattern": "gfx/borka/body",
+    "icon": "gfx/hud/mmap/o"
+  }
+]
