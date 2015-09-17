@@ -165,8 +165,10 @@ public class Radar {
 	public int priority = 0;
 	private String pattern = null, icon = "gfx/hud/mmap/o", name = null;
 	public Color color = null;
+	public boolean show = true;
 
 	public Tex tex() {
+	    if(!show){return null;}
 	    if(tex == null) {
 		try {
 		    Resource.Image img = loadres(icon).layer(Resource.imgc);
