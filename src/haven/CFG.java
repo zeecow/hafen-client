@@ -17,6 +17,7 @@ public enum CFG {
     STORE_CHAT_LOGS("ui.chat.logs", false),
     LOCK_STUDY("ui.lock_study", false),
     MMAP_FLOAT("ui.mmapfloat", false),
+    MENU_SINGLE_CTRL_CLICK("ui.menu_single_ctrl_click", true),
 
     CAMERA_BRIGHT("camera.bright", 0f),
 

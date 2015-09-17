@@ -74,7 +74,7 @@ public class Window extends Widget implements DTarget {
 	    public Coord bisz() {return(super.bisz().sub(bo.mul(2)));}
 	    public Coord cisz() {return(super.cisz().sub(co.mul(2)));}
 	};
-    private static final BufferedImage[] cbtni = new BufferedImage[] {
+    public static final BufferedImage[] cbtni = new BufferedImage[] {
 	Resource.loadimg("gfx/hud/wnd/lg/cbtnu"),
 	Resource.loadimg("gfx/hud/wnd/lg/cbtnd"),
 	Resource.loadimg("gfx/hud/wnd/lg/cbtnh")};
