@@ -266,11 +266,15 @@ public class OptWnd extends Window {
     private void initGeneralPanel() {
 	addPanelButton("General settings", 'g', general, 1, 0);
 
-	int y = 0;
-	general.add(new CFGBox("Store minimap tiles", CFG.STORE_MAP), new Coord(0, y));
+	int x = 0;
+	int y = 0, my = 0;
+	general.add(new CFGBox("Store minimap tiles", CFG.STORE_MAP), x, y);
+
+	y += 25;
+	general.add(new CFGBox("Single item CTRL choose", CFG.MENU_SINGLE_CTRL_CLICK, "If checked, will automatically select single item menus if CTRL is pressed when menu is opened."), x, y);
 
 	y += 35;
-	general.add(new Label("Brighten view"), new Coord(0, y));
+	general.add(new Label("Brighten view"), x, y);
 	y += 15;
 	general.add(new HSlider(200, 0, 500, 0) {
 	    public void changed() {
@@ -279,9 +283,36 @@ public class OptWnd extends Window {
 		    ui.sess.glob.brighten();
 		}
 	    }
-	}, new Coord(0, y)).val = (int) (1000 * CFG.CAMERA_BRIGHT.valf());
+	}, x, y).val = (int) (1000 * CFG.CAMERA_BRIGHT.valf());
 
-	general.add(new PButton(200, "Back", 27, main), new Coord(0, y + 35));
+	my = Math.max(my, y);
+	x += 250;
+	y = 0;
+
+	general.add(new Label("Choose menu items to select automatically:"), x, y);
+	y += 15;
+	final FlowerList list = general.add(new FlowerList(), x, y);
+
+	final TextEntry value = general.add(new TextEntry(150, "") {
+	    @Override
+	    public void activate(String text) {
+		list.add(text);
+		settext("");
+	    }
+	}, x, y + 255);
+
+	general.add(new Button(45, "Add") {
+	    @Override
+	    public void click() {
+		list.add(value.text);
+		value.settext("");
+	    }
+	}, x + 155, y + 253);
+
+	y+=255;
+	my = Math.max(my, y);
+
+	general.add(new PButton(200, "Back", 27, main), 0, my + 35);
 	general.pack();
     }
 

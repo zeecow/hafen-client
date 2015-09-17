@@ -236,7 +236,7 @@ public class LoginScreen extends Widget {
 	    return;
 	} else if(sender == optbtn) {
 	    if(opts == null) {
-		opts = adda(new OptWnd(false) {
+		opts = ui.root.adda(new OptWnd(false) {
 			public void hide() {
 			    /* XXX */
 			    reqdestroy();
