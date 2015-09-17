@@ -1,6 +1,11 @@
 [
   {"priority": 100, "pattern": "gfx/terobjs/items/arrow", "icon": "gfx/invobjs/arrow-bone"},
   {"priority": 1000, "pattern": "gfx/borka/body", "icon": "gfx/hud/mmap/o"},
+
+  {"priority": 502, "pattern": "gfx/kritter/bear", "icon": "gfx/kritter/bear/icon"},
+  {"priority": 501, "pattern": "gfx/kritter/boar", "icon": "gfx/kritter/boar/icon"},
+  {"priority": 500, "pattern": "gfx/kritter/badger", "icon": "gfx/kritter/badger/icon"},
+
   {"priority":10, "pattern":"gfx/terobjs/bumlings/argentite", "icon":"gfx/invobjs/argentite"},
   {"priority":10, "pattern":"gfx/terobjs/bumlings/basalt", "icon":"gfx/invobjs/basalt"},
   {"priority":10, "pattern":"gfx/terobjs/bumlings/blackcoal", "icon":"gfx/invobjs/coal"},
