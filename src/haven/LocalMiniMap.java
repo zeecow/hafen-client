@@ -140,19 +140,16 @@ public class LocalMiniMap extends Widget {
     }
 
     public void drawicons(GOut g) {
-	OCache oc = ui.sess.glob.oc;
-	synchronized(oc) {
-	    for(Gob gob : oc) {
+	synchronized (Radar.markers) {
+	    for (Radar.Marker marker : Radar.markers) {
 		try {
-		    Radar.Marker icon = gob.getattr(Radar.Marker.class);
-		    if(icon != null) {
-			Coord gc = p2c(gob.rc);
-			Tex tex = icon.tex();
-			if(tex != null){
-			    g.image(tex, gc.sub(tex.sz().div(2)));
-			}
+		    Coord gc = p2c(marker.gob.rc);
+		    Tex tex = marker.tex();
+		    if(tex != null) {
+			g.image(tex, gc.sub(tex.sz().div(2)));
 		    }
-		} catch(Loading l) {}
+		} catch (Loading ignored) {
+		}
 	    }
 	}
     }

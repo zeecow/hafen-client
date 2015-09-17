@@ -1,9 +1,20 @@
 package haven;
 
+import java.util.LinkedList;
+import java.util.List;
+
 public class Radar {
+    public static final List<Marker> markers =  new LinkedList<>();
+    private static boolean dirty = false;
+
     public static void add(Gob gob, Indir<Resource> res) {
 	if(gob.getattr(Marker.class) == null) {
-	    gob.setattr(new Marker(gob, res));
+	    Marker marker = new Marker(gob, res);
+	    gob.setattr(marker);
+	    synchronized (markers) {
+		markers.add(marker);
+		dirty = true;
+	    }
 	}
     }
 
@@ -19,6 +30,23 @@ public class Radar {
 	    }
 	}catch(Loading ignored){}
 	return null;
+    }
+
+    public static void tick() {
+	synchronized (markers){
+	    if(dirty){
+		//markers.sort();
+	    }
+	}
+    }
+
+    public static void remove(Gob gob) {
+	if(gob != null) {
+	    synchronized (markers) {
+		markers.remove(gob.getattr(Marker.class));
+		gob.delattr(Marker.class);
+	    }
+	}
     }
 
     private static Resource loadres(String name) {
