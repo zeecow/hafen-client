@@ -1,3 +1,6 @@
+$size[14]{$u{Update for 18.09.15:}
+  * added autochoose menu options (Options->General)
+ 
 $size[14]{$u{Update for 12.09.15:}
   * added option (Options->Display->Undock minimap) to put minimap on floating resizable window
  
