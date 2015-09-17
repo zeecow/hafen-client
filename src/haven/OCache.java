@@ -140,7 +140,7 @@ public class OCache implements Iterable<Gob> {
 	    d.sdt = sdt;
 	} else if((d == null) || (d.res != res) || !d.sdt.equals(sdt)) {
 	    g.setattr(new ResDrawable(g, res, sdt));
-	    Radar.add(g);
+	    Radar.add(g, res);
 	}
     }
 	
@@ -180,7 +180,7 @@ public class OCache implements Iterable<Gob> {
 	if((cmp == null) || !cmp.base.equals(base)) {
 	    cmp = new Composite(g, base);
 	    g.setattr(cmp);
-	    Radar.add(g);
+	    Radar.add(g, cmp.base);
 	}
     }
     
