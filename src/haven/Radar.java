@@ -148,7 +148,7 @@ public class Radar {
     public static class MarkerCFG {
 	transient private Tex tex;
 	public int priority = 0;
-	private String pattern = "", icon = "gfx/hud/mmap/o";
+	private String pattern = null, icon = "gfx/hud/mmap/o";
 
 	public Tex tex() {
 	    if(tex == null) {
@@ -172,7 +172,7 @@ public class Radar {
 	}
 
 	public boolean match(String resname) {
-	    return resname.equals(pattern);
+	    return pattern != null && resname.contains(pattern);
 	}
     }
 
