@@ -158,6 +158,18 @@ public class LocalMiniMap extends Widget {
 	g.chcolor();
     }
 
+    @Override
+    public Object tooltip(Coord c, Widget prev) {
+	Gob gob = findicongob(c);
+	if(gob != null) {
+	    Radar.Marker icon = gob.getattr(Radar.Marker.class);
+	    if(icon != null) {
+		return icon.tooltip();
+	    }
+	}
+	return super.tooltip(c, prev);
+    }
+
     public Gob findicongob(Coord c) {
 	synchronized (Radar.markers) {
 	    ListIterator<Radar.Marker> li = Radar.markers.listIterator(Radar.markers.size());

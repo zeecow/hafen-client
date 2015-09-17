@@ -112,10 +112,25 @@ public class Radar {
 	    return tex;
 	}
 
+	public String tooltip(){
+	    if(cfg != null){
+		if(cfg.name != null){
+		    return cfg.name;
+		} else if(cfg != DEFAULT){
+		    return cfg.pattern;
+		} else {
+		    return resname();
+		}
+	    }
+	    return null;
+	}
+
 	public Color color() {
 	    KinInfo ki = gob.getattr(KinInfo.class);
 	    if(ki != null) {
 		return BuddyWnd.gc[ki.group % BuddyWnd.gc.length];
+	    } else if(cfg != null && cfg.color != null){
+		return cfg.color;
 	    }
 	    return Color.WHITE;
 	}
@@ -148,7 +163,8 @@ public class Radar {
     public static class MarkerCFG {
 	transient private Tex tex;
 	public int priority = 0;
-	private String pattern = null, icon = "gfx/hud/mmap/o";
+	private String pattern = null, icon = "gfx/hud/mmap/o", name = null;
+	public Color color = null;
 
 	public Tex tex() {
 	    if(tex == null) {
