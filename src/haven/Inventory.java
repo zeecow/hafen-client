@@ -127,9 +127,9 @@ public class Inventory extends Widget implements DTarget {
     @Override
     public void wdgmsg(Widget sender, String msg, Object... args) {
 	if(msg.equals("transfer-same")){
-	    process(getSame((String) args[0],(Boolean)args[1]), "transfer");
+	    process(getSame((GItem) args[0],(Boolean)args[1]), "transfer");
 	} else if(msg.equals("drop-same")){
-	    process(getSame((String) args[0], (Boolean) args[1]), "drop");
+	    process(getSame((GItem) args[0], (Boolean) args[1]), "drop");
 	} else {
 	    super.wdgmsg(sender, msg, args);
 	}
@@ -141,13 +141,17 @@ public class Inventory extends Widget implements DTarget {
 	}
     }
 
-    @SuppressWarnings("UnusedParameters")
-    private List<WItem> getSame(String name, Boolean ascending) {
-	List<WItem> items = new ArrayList<WItem>();
-	for (Widget wdg = lchild; wdg != null; wdg = wdg.prev) {
-	    if (wdg.visible && wdg instanceof WItem) {
-		if (((WItem) wdg).item.resname().equals(name))
-		    items.add((WItem) wdg);
+    private List<WItem> getSame(GItem item, Boolean ascending) {
+	String name = item.resname();
+	GSprite spr = item.spr();
+	List<WItem> items = new ArrayList<>();
+	for(Widget wdg = lchild; wdg != null; wdg = wdg.prev) {
+	    if(wdg.visible && wdg instanceof WItem) {
+		WItem wItem = (WItem) wdg;
+		GItem child = wItem.item;
+		if(child.resname().equals(name) && ((spr == child.spr()) || (spr != null && spr.same(child.spr())))) {
+		    items.add(wItem);
+		}
 	    }
 	}
 	Collections.sort(items, ascending ? ITEM_COMPARATOR_ASC : ITEM_COMPARATOR_DESC);
