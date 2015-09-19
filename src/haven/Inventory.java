@@ -43,7 +43,13 @@ public class Inventory extends Widget implements DTarget {
 	    return (q1 > q2) ? 1 : ((q1 < q2) ? -1 : 0);
 	}
     };
-    public static final Comparator<WItem> ITEM_COMPARATOR_DESC = ITEM_COMPARATOR_ASC.reversed();
+    public static final Comparator<WItem> ITEM_COMPARATOR_DESC = new Comparator<WItem>() {
+	@Override
+	public int compare(WItem o1, WItem o2) {
+	    return ITEM_COMPARATOR_ASC.compare(o2, o1);
+	}
+    };
+
     public boolean locked = false;
     Coord isz;
     Map<GItem, WItem> wmap = new HashMap<GItem, WItem>();
