@@ -1,3 +1,8 @@
+$size[14]{$u{Update for 19.09.15:}
+  * mass transfer only identical items (fixes meat transferring)
+  * Mass transfer with left click transfers with descending quality, with right click - ascending quality
+  * fixed scrollbar dragging in listboxes
+ 
 $size[14]{$u{Update for 18.09.15:}
   * added autochoose menu options (Options->General)
  
