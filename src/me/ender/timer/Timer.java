@@ -11,7 +11,7 @@ public class Timer {
 	void complete(Timer timer);
     }
 
-    private static final int SERVER_RATIO = 3;
+    private static final float SERVER_RATIO = 3.29f;
     
     public static long server;
     public static long local;
@@ -40,13 +40,13 @@ public class Timer {
     }
     
     public void start() {
-	start = server + SERVER_RATIO * (System.currentTimeMillis() - local);
+	start = (long) (server + SERVER_RATIO * (System.currentTimeMillis() - local));
 	controller.save();
     }
     
     public synchronized boolean update() {
 	long now = System.currentTimeMillis();
-	remaining = (duration - now + local - (server - start) / SERVER_RATIO);
+	remaining = (long) (duration - now + local - (server - start) / SERVER_RATIO);
 	if(remaining <= 0) {
 	    if(listener != null) {
 		listener.complete(this);
@@ -76,7 +76,7 @@ public class Timer {
     }
 
     public synchronized long getFinishDate() {
-	return (duration + local - (server - start) / SERVER_RATIO);
+	return (long) (duration + local - (server - start) / SERVER_RATIO);
     }
 
     @Override
