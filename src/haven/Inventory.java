@@ -31,6 +31,25 @@ import java.util.*;
 public class Inventory extends Widget implements DTarget {
     public static final Tex invsq = Resource.loadtex("gfx/hud/invsq");
     public static final Coord sqsz = new Coord(33, 33);
+    public static final Comparator<WItem> ITEM_COMPARATOR_ASC = new Comparator<WItem>() {
+	@Override
+	public int compare(WItem o1, WItem o2) {
+	    QualityList ql1 = o1.itemq.get();
+	    float q1 = (ql1 != null && !ql1.isEmpty()) ? ql1.single().value : 0;
+
+	    QualityList ql2 = o2.itemq.get();
+	    float q2 = (ql2 != null && !ql2.isEmpty()) ? ql2.single().value : 0;
+
+	    return (q1 > q2) ? 1 : ((q1 < q2) ? -1 : 0);
+	}
+    };
+    public static final Comparator<WItem> ITEM_COMPARATOR_DESC = new Comparator<WItem>() {
+	@Override
+	public int compare(WItem o1, WItem o2) {
+	    return ITEM_COMPARATOR_ASC.compare(o2, o1);
+	}
+    };
+
     public boolean locked = false;
     Coord isz;
     Map<GItem, WItem> wmap = new HashMap<GItem, WItem>();
@@ -114,9 +133,9 @@ public class Inventory extends Widget implements DTarget {
     @Override
     public void wdgmsg(Widget sender, String msg, Object... args) {
 	if(msg.equals("transfer-same")){
-	    process(getSame((String) args[0],(Boolean)args[1]), "transfer");
+	    process(getSame((GItem) args[0],(Boolean)args[1]), "transfer");
 	} else if(msg.equals("drop-same")){
-	    process(getSame((String) args[0], (Boolean) args[1]), "drop");
+	    process(getSame((GItem) args[0], (Boolean) args[1]), "drop");
 	} else {
 	    super.wdgmsg(sender, msg, args);
 	}
@@ -128,15 +147,20 @@ public class Inventory extends Widget implements DTarget {
 	}
     }
 
-    @SuppressWarnings("UnusedParameters")
-    private List<WItem> getSame(String name, Boolean ascending) {
-	List<WItem> items = new ArrayList<WItem>();
-	for (Widget wdg = lchild; wdg != null; wdg = wdg.prev) {
-	    if (wdg.visible && wdg instanceof WItem) {
-		if (((WItem) wdg).item.resname().equals(name))
-		    items.add((WItem) wdg);
+    private List<WItem> getSame(GItem item, Boolean ascending) {
+	String name = item.resname();
+	GSprite spr = item.spr();
+	List<WItem> items = new ArrayList<>();
+	for(Widget wdg = lchild; wdg != null; wdg = wdg.prev) {
+	    if(wdg.visible && wdg instanceof WItem) {
+		WItem wItem = (WItem) wdg;
+		GItem child = wItem.item;
+		if(child.resname().equals(name) && ((spr == child.spr()) || (spr != null && spr.same(child.spr())))) {
+		    items.add(wItem);
+		}
 	    }
 	}
+	Collections.sort(items, ascending ? ITEM_COMPARATOR_ASC : ITEM_COMPARATOR_DESC);
 	return items;
     }
 
