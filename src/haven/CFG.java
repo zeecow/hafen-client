@@ -12,6 +12,7 @@ public enum CFG {
     VERSION("version",""),
     DISPLAY_KINNAMES("display.kinnames", Utils.getprefb("showkinnames", true)),
     DISPLAY_FLAVOR("display.flavor", Utils.getprefb("showflavor", true)),
+    DISPLAY_GOB_HEALTH("display.gob_health", false),
     STORE_MAP("general.storemap", Utils.getprefb("storemap", false)),
     SHOW_CHAT_TIMESTAMP("ui.chat.timestamp", true),
     STORE_CHAT_LOGS("ui.chat.logs", false),

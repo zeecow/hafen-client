@@ -26,11 +26,18 @@
 
 package haven;
 
-import java.awt.Color;
+import java.awt.*;
 
 public class GobHealth extends GAttrib {
     int hp;
     Material.Colors fx;
+    Rendered text;
+    private static final Text.Foundry gobhpf = new Text.Foundry(Text.sans.deriveFont(Font.BOLD), 14);
+    private static final Tex[] gobhp = new Tex[]{
+	Text.renderstroked("25%", new Color(255, 100, 100), Color.BLACK, gobhpf).tex(),
+	Text.renderstroked("50%", new Color(235, 130, 130), Color.BLACK, gobhpf).tex(),
+	Text.renderstroked("75%", new Color(230, 185, 185), Color.BLACK, gobhpf).tex()
+    };
     
     public GobHealth(Gob g, int hp) {
 	super(g);
@@ -40,11 +47,27 @@ public class GobHealth extends GAttrib {
     
     public GLState getfx() {
 	if(hp >= 4)
-	    return(GLState.nullstate);
-	return(fx);
+	    return (GLState.nullstate);
+	return (fx);
+    }
+
+    public Rendered text() {
+	if(!CFG.DISPLAY_GOB_HEALTH.valb()) {
+	    return null;
+	}
+	if(text == null && hp < 4) {
+	    text = new PView.Draw2D() {
+		public void draw2d(GOut g) {
+		    if(gob.sc != null && hp <= gobhp.length && hp > 0) {
+			g.aimage(gobhp[hp - 1], gob.sc.sub(0, 10), 0.5, 0.5);
+		    }
+		}
+	    };
+	}
+	return text;
     }
 
     public double asfloat() {
-	return(((double)hp) / 4.0);
+	return (((double) hp) / 4.0);
     }
 }
