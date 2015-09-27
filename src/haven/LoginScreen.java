@@ -57,7 +57,7 @@ public class LoginScreen extends Widget {
     private void showChangeLog() {
 	log = ui.root.add(new Window(new Coord(50, 50), "Changelog"), new Coord(100, 50));
 	log.justclose = true;
-	Textlog txt= log.add(new Textlog(new Coord(450,500)));
+	Textlog txt = log.add(new Textlog(new Coord(450, 500)));
 	txt.quote = false;
 	int maxlines = txt.maxLines = 200;
 	log.pack();
@@ -68,20 +68,17 @@ public class LoginScreen extends Widget {
 	    FileOutputStream out = new FileOutputStream(f);
 	    String strLine;
 	    int count = 0;
-	    while ((count<maxlines)&&(strLine = br.readLine()) != null)   {
+	    while((count < maxlines) && (strLine = br.readLine()) != null) {
 		txt.append(strLine);
-		out.write((strLine+"\n").getBytes());
+		out.write((strLine + Config.LINE_SEPARATOR).getBytes());
 		count++;
 	    }
 	    br.close();
 	    out.close();
 	    in.close();
-	} catch (FileNotFoundException ignored) {
-	} catch (IOException ignored) {
+	} catch(IOException ignored) {
 	}
 	txt.setprog(0);
-
-	//WikiBrowser.toggle();
     }
 
     private static abstract class Login extends Widget {

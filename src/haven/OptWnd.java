@@ -327,6 +327,9 @@ public class OptWnd extends Window {
 	y += 25;
 	display.add(new CFGBox("Show flavor objects", CFG.DISPLAY_FLAVOR), new Coord(x, y));
 
+	y+=25;
+	display.add(new CFGBox("Show gob health", CFG.DISPLAY_GOB_HEALTH), x, y);
+
 	y += 25;
 	display.add(new CFGBox("Show timestamps in chat messages", CFG.SHOW_CHAT_TIMESTAMP), new Coord(x, y));
 
