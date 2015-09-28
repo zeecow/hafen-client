@@ -13,7 +13,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class MapDumper implements Defer.Callable<Object> {
-    private static Coord start;
+    private static Coord start, lastplg;
     private static File sess;
 
     private final File file;
@@ -49,9 +49,15 @@ public class MapDumper implements Defer.Callable<Object> {
 	}
     }
 
-    public static void newsession() {
+    public static void plgrid(Coord plg) {
 	synchronized(sync) {
-	    start = null;
+	    if(lastplg != null) {
+		if(plg.manhattan2(lastplg) > 3) {
+		    //new session
+		    start = null;
+		}
+	    }
+	    lastplg = plg;
 	}
     }
 

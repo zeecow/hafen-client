@@ -203,6 +203,7 @@ public class LocalMiniMap extends Widget {
 	if(cc == null)
 	    return;
 	Coord plg = cc.div(cmaps);
+	MapDumper.plgrid(plg);
 
 	Coord center = cc.add(off);
 	Coord hsz = sz.div(2);
