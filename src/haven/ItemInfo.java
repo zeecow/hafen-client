@@ -261,6 +261,15 @@ public abstract class ItemInfo {
 	return(null);
     }
 
+    public static <T> List<T> findall(Class<T> cl, List<ItemInfo> il) {
+	List<T> ret = new LinkedList<>();
+	for(ItemInfo inf : il) {
+	    if(cl.isInstance(inf))
+		ret.add(cl.cast(inf));
+	}
+	return ret;
+    }
+
     public static List<ItemInfo> findall(String cl, List<ItemInfo> il){
 	List<ItemInfo> ret = new LinkedList<ItemInfo>();
 	for(ItemInfo inf : il) {

@@ -165,7 +165,21 @@ public class WItem extends Widget implements DTarget {
     public final AttrCache<QualityList> itemq = new AttrCache<QualityList>() {
 	@Override
 	protected QualityList find(List<ItemInfo> info) {
-	    QualityList qualityList = new QualityList(ItemInfo.findall(QualityList.classname, info));
+	    List<ItemInfo.Contents> contents = ItemInfo.findall(ItemInfo.Contents.class, info);
+	    List<ItemInfo> qualities = null;
+	    if(!contents.isEmpty()){
+		for(ItemInfo.Contents content : contents){
+		    List<ItemInfo> tmp = ItemInfo.findall(QualityList.classname, content.sub);
+		    if(!tmp.isEmpty()){
+			qualities = tmp;
+		    }
+		}
+	    }
+	    if(qualities == null || qualities.isEmpty()) {
+		qualities = ItemInfo.findall(QualityList.classname, info);
+	    }
+
+	    QualityList qualityList = new QualityList(qualities);
 	    return !qualityList.isEmpty() ? qualityList : null;
 	}
     };
