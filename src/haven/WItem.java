@@ -165,8 +165,30 @@ public class WItem extends Widget implements DTarget {
     public final AttrCache<QualityList> itemq = new AttrCache<QualityList>() {
 	@Override
 	protected QualityList find(List<ItemInfo> info) {
-	    QualityList qualityList = new QualityList(ItemInfo.findall(QualityList.classname, info));
+	    List<ItemInfo.Contents> contents = ItemInfo.findall(ItemInfo.Contents.class, info);
+	    List<ItemInfo> qualities = null;
+	    if(!contents.isEmpty()){
+		for(ItemInfo.Contents content : contents){
+		    List<ItemInfo> tmp = ItemInfo.findall(QualityList.classname, content.sub);
+		    if(!tmp.isEmpty()){
+			qualities = tmp;
+		    }
+		}
+	    }
+	    if(qualities == null || qualities.isEmpty()) {
+		qualities = ItemInfo.findall(QualityList.classname, info);
+	    }
+
+	    QualityList qualityList = new QualityList(qualities);
 	    return !qualityList.isEmpty() ? qualityList : null;
+	}
+    };
+
+    public final AttrCache<Tex> heurnum = new AttrCache<Tex>() {
+	protected Tex find(List<ItemInfo> info) {
+	    String num = ItemInfo.getCount(info);
+	    if(num == null) return (null);
+	    return Text.renderstroked(num, Color.WHITE).tex();
 	}
     };
 
@@ -200,6 +222,8 @@ public class WItem extends Widget implements DTarget {
 		g.atext(Integer.toString(item.num), sz, 1, 1);
 	    } else if(itemnum.get() != null) {
 		g.aimage(itemnum.get(), sz, 1, 1);
+	    } else if(heurnum.get() != null) {
+		g.aimage(heurnum.get(), sz, 1, 1);
 	    }
 	    if(item.meter > 0) {
 		double a = ((double)item.meter) / 100.0;

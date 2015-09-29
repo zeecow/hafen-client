@@ -29,8 +29,11 @@ package haven;
 import java.util.*;
 import java.awt.image.BufferedImage;
 import java.awt.Graphics;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public abstract class ItemInfo {
+    static final Pattern count_patt = Pattern.compile("(?:^|[\\s])([0-9]*\\.?[0-9]+\\s*%?)");
     public final Owner owner;
     
     public interface Owner {
@@ -258,6 +261,15 @@ public abstract class ItemInfo {
 	return(null);
     }
 
+    public static <T> List<T> findall(Class<T> cl, List<ItemInfo> il) {
+	List<T> ret = new LinkedList<>();
+	for(ItemInfo inf : il) {
+	    if(cl.isInstance(inf))
+		ret.add(cl.cast(inf));
+	}
+	return ret;
+    }
+
     public static List<ItemInfo> findall(String cl, List<ItemInfo> il){
 	List<ItemInfo> ret = new LinkedList<ItemInfo>();
 	for(ItemInfo inf : il) {
@@ -285,6 +297,38 @@ public abstract class ItemInfo {
 	    }
 	}
 	return(ret);
+    }
+
+    public static String getCount(List<ItemInfo> infos) {
+	String res = null;
+	for (ItemInfo info : infos) {
+	    if(info instanceof Contents) {
+		Contents cnt = (Contents) info;
+		res = getCount(cnt.sub);
+	    } else if(info instanceof AdHoc) {
+		AdHoc ah = (AdHoc) info;
+		try {
+		    Matcher m = count_patt.matcher(ah.str.text);
+		    if(m.find()) {
+			res = m.group(1);
+		    }
+		} catch (Exception ignored) {
+		}
+	    } else if(info instanceof Name) {
+		Name name = (Name) info;
+		try {
+		    Matcher m = count_patt.matcher(name.str.text);
+		    if(m.find()) {
+			res = m.group(1);
+		    }
+		} catch (Exception ignored) {
+		}
+	    }
+	    if(res != null) {
+		return res;
+	    }
+	}
+	return null;
     }
     
     private static String dump(Object arg) {
