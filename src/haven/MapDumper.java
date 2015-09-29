@@ -16,13 +16,28 @@ public class MapDumper implements Defer.Callable<Object> {
     private static Coord start;
     private static File sess;
 
+    private static Type type;
+
     private final File file;
     private final MCache mCache;
     private final MCache.Grid grid;
     public static final Object sync = new Object();
 
 
+    enum Type {
+	NORMAL("map"), CAVE("cave"), HOUSE(null);
+
+	public final String folder;
+	Type(String folder){
+	    this.folder = folder;
+	}
+    }
+
     public static void dump(MCache mCache, MCache.Grid grid) {
+	type = gettype(mCache, grid);
+	if(type == Type.HOUSE){
+	    return;
+	}
 	checksession(grid);
 	Coord offset;
 	synchronized(sync) {
@@ -31,12 +46,35 @@ public class MapDumper implements Defer.Callable<Object> {
 	Defer.later(new MapDumper(new File(sess, String.format("tile_%d_%d.png", offset.x, offset.y)), mCache, grid));
     }
 
+    private static Type gettype(MCache mCache, MCache.Grid grid) {
+	Coord c = new Coord(), sz = MCache.cmaps;
+	for (c.y = 0; c.y < sz.y; c.y++) {
+	    for (c.x = 0; c.x < sz.x; c.x++) {
+		int t = grid.gettile(c);
+		try {
+		    Resource rq = mCache.tilesetr(t);
+		    if(rq != null) {
+			switch (rq.name) {
+			    case "gfx/tiles/nil":
+				return Type.HOUSE;
+			    case "gfx/tiles/mine":
+			    case "gfx/tiles/cave":
+				return Type.CAVE;
+			}
+		    }
+		} catch (Loading ignored) {
+		}
+	    }
+	}
+	return Type.NORMAL;
+    }
+
     private static void checksession(MCache.Grid grid) {
 	synchronized(sync) {
 	    if(start == null) {
 		start = grid.gc;
 		String date = new SimpleDateFormat("yyyy-MM-dd HH.mm.ss").format(new Date(System.currentTimeMillis()));
-		sess = new File(String.format("map/%s", date));
+		sess = new File(String.format("%s/%s", type.folder, date));
 		//noinspection ResultOfMethodCallIgnored
 		sess.mkdirs();
 		try {
