@@ -136,7 +136,7 @@ public class Radar {
 	}
 
 	public int prio() {
-	    return (cfg == null || tex == null) ? Integer.MAX_VALUE : cfg.priority;
+	    return (cfg == null || tex == null) ? 0 : cfg.priority;
 	}
 
 	private MarkerCFG cfg() {
