@@ -170,6 +170,14 @@ public class WItem extends Widget implements DTarget {
 	}
     };
 
+    public final AttrCache<Tex> heurnum = new AttrCache<Tex>() {
+	protected Tex find(List<ItemInfo> info) {
+	    String num = ItemInfo.getCount(info);
+	    if(num == null) return (null);
+	    return Text.renderstroked(num, Color.WHITE).tex();
+	}
+    };
+
     private GSprite lspr = null;
     public void tick(double dt) {
 	/* XXX: This is ugly and there should be a better way to
@@ -200,6 +208,8 @@ public class WItem extends Widget implements DTarget {
 		g.atext(Integer.toString(item.num), sz, 1, 1);
 	    } else if(itemnum.get() != null) {
 		g.aimage(itemnum.get(), sz, 1, 1);
+	    } else if(heurnum.get() != null) {
+		g.aimage(heurnum.get(), sz, 1, 1);
 	    }
 	    if(item.meter > 0) {
 		double a = ((double)item.meter) / 100.0;
