@@ -1,3 +1,10 @@
+$size[14]{$u{Update for 01.10.15:}
+  * added options to show item durability/wear bar/armor (Options->Display)
+  * use quadratic mean to calculate average quality
+  * WIP on separating folders for caves and overworld
+  * display quality of item's contents, if it has any
+  * display heuristically obtained item quantity if no explicit count is given, like amount of water in a bucket
+ 
 $size[14]{$u{Update for 22.09.15:}
   * added option to show object health as text (Options->Display->Show gob health)
   * fixed line endings in changelog
