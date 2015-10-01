@@ -202,6 +202,12 @@ public class WItem extends Widget implements DTarget {
 	}
     };
 
+    public final AttrCache<ItemInfo.Wear> wear = new AttrCache<ItemInfo.Wear>() {
+	protected ItemInfo.Wear find(List<ItemInfo> info) {
+	    return ItemInfo.getWear(info);
+	}
+    };
+
     public final AttrCache<Tex> armor = new AttrCache<Tex>() {
 	protected Tex find(List<ItemInfo> info) {
 	    ItemInfo.Wear wear = ItemInfo.getArmor(info);
@@ -234,6 +240,7 @@ public class WItem extends Widget implements DTarget {
 	    g.defstate();
 	    if(olcol.get() != null)
 		g.usestate(new ColorMask(olcol.get()));
+	    drawbars(g, sz);
 	    drawmain(g, spr);
 	    g.defstate();
 	    drawnum(g, sz);
@@ -248,6 +255,25 @@ public class WItem extends Widget implements DTarget {
 	} else {
 	    g.image(missing.layer(Resource.imgc).tex(), Coord.z, sz);
 	}
+    }
+
+    private void drawbars(GOut g, Coord sz) {
+	float bar = 0f;
+
+	if(this.wear.get() != null) {
+	    ItemInfo.Wear wear = this.wear.get();
+	    if(wear.a > 0) {
+		bar = (float) (wear.b - wear.a) / wear.b;
+	    }
+	}
+
+	if(bar > 0) {
+	    g.chcolor(Utils.blendcol(Color.RED, Color.GREEN, bar));
+	    int h = (int) (sz.y * bar);
+	    g.frect(new Coord(0, sz.y - h), new Coord(4, h));
+	    g.chcolor();
+	}
+
     }
 
     private void drawnum(GOut g, Coord sz) {
