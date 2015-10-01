@@ -260,7 +260,7 @@ public class WItem extends Widget implements DTarget {
     private void drawbars(GOut g, Coord sz) {
 	float bar = 0f;
 
-	if(this.wear.get() != null) {
+	if(CFG.SHOW_ITEM_WEAR_BAR.valb() && this.wear.get() != null) {
 	    ItemInfo.Wear wear = this.wear.get();
 	    if(wear.a > 0) {
 		bar = (float) (wear.b - wear.a) / wear.b;
@@ -283,9 +283,9 @@ public class WItem extends Widget implements DTarget {
 	    g.aimage(itemnum.get(), sz, 1, 1);
 	} else if(heurnum.get() != null) {
 	    g.aimage(heurnum.get(), sz, 1, 1);
-	} else if(armor.get() != null) {
+	} else if(CFG.SHOW_ITEM_ARMOR.valb() && armor.get() != null) {
 	    g.aimage(armor.get(), sz, 1, 1);
-	} else if(durability.get() != null) {
+	} else if(CFG.SHOW_ITEM_DURABILITY.valb() && durability.get() != null) {
 	    g.aimage(durability.get(), sz, 1, 1);
 	}
     }

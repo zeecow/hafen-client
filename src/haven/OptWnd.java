@@ -271,6 +271,9 @@ public class OptWnd extends Window {
 	general.add(new CFGBox("Store minimap tiles", CFG.STORE_MAP), x, y);
 
 	y += 25;
+	general.add(new CFGBox("Store chat logs", CFG.STORE_CHAT_LOGS, "Logs are stored in 'chats' folder"), new Coord(x, y));
+
+	y += 25;
 	general.add(new CFGBox("Single item CTRL choose", CFG.MENU_SINGLE_CTRL_CLICK, "If checked, will automatically select single item menus if CTRL is pressed when menu is opened."), x, y);
 
 	y += 35;
@@ -332,9 +335,6 @@ public class OptWnd extends Window {
 
 	y += 25;
 	display.add(new CFGBox("Show timestamps in chat messages", CFG.SHOW_CHAT_TIMESTAMP), new Coord(x, y));
-
-	y += 25;
-	display.add(new CFGBox("Store chat logs", CFG.STORE_CHAT_LOGS, "Logs are stored in 'chats' folder"), new Coord(x, y));
 
 	y += 25;
 	display.add(new CFGBox("Undock minimap", CFG.MMAP_FLOAT) {
@@ -422,6 +422,16 @@ public class OptWnd extends Window {
 
 	    }
 	}, new Coord(x, y));
+
+	y += 35;
+	display.add(new CFGBox("Show item durability", CFG.SHOW_ITEM_DURABILITY), new Coord(x, y));
+
+	y += 25;
+	display.add(new CFGBox("Show item wear bar", CFG.SHOW_ITEM_WEAR_BAR), new Coord(x, y));
+
+	y += 25;
+	display.add(new CFGBox("Show item armor", CFG.SHOW_ITEM_ARMOR), new Coord(x, y));
+
 	my = Math.max(my, y);
 
 	display.add(new PButton(200, "Back", 27, main), new Coord(0, my + 35));

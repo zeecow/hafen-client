@@ -20,6 +20,10 @@ public enum CFG {
     MMAP_FLOAT("ui.mmapfloat", false),
     MENU_SINGLE_CTRL_CLICK("ui.menu_single_ctrl_click", true),
 
+    SHOW_ITEM_DURABILITY("ui.item_durability", true),
+    SHOW_ITEM_WEAR_BAR("ui.item_wear_bar", true),
+    SHOW_ITEM_ARMOR("ui.item_armor", true),
+
     CAMERA_BRIGHT("camera.bright", 0f),
 
     Q_SHOW_ALL_MODS("ui.q.allmods", 7),
