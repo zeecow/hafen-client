@@ -7,6 +7,7 @@ import com.google.gson.reflect.TypeToken;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.lang.reflect.Type;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
@@ -69,7 +70,7 @@ public class Radar {
 	long now = System.currentTimeMillis();
 	if(now - lastsort > 100) {
 	    synchronized (markers) {
-		markers.sort(MARKER_COMPARATOR);
+		Collections.sort(markers, MARKER_COMPARATOR);
 		lastsort = now;
 	    }
 	}
