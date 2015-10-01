@@ -343,6 +343,18 @@ public abstract class ItemInfo {
 	return null;
     }
 
+    public static Wear getArmor(List<ItemInfo> infos) {
+	//loftar is wonderful sunshine and has same class name for wear and armor tooltips even though
+	//they are different classes with different fields :)
+	infos = findall("Wear", infos);
+	for (ItemInfo info : infos) {
+	    if(Reflect.hasField(info, "hard") && Reflect.hasField(info, "soft")){
+		return new Wear(Reflect.getFieldValueInt(info, "hard"), Reflect.getFieldValueInt(info, "soft"));
+	    }
+	}
+	return null;
+    }
+
     public static class Wear {
 	public final int a, b;
 	public Wear(int a, int b){

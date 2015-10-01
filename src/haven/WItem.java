@@ -36,6 +36,7 @@ public class WItem extends Widget implements DTarget {
     public static final Resource missing = Resource.local().loadwait("gfx/invobjs/missing");
     public static final Coord Q_POS = new Coord(0, -3);
     public static final Color DURABILITY_COLOR = new Color(214, 253, 255);
+    public static final Color ARMOR_COLOR = new Color(255, 227, 191);
     public final GItem item;
     private Resource cspr = null;
     private Message csdt = Message.nil;
@@ -201,6 +202,14 @@ public class WItem extends Widget implements DTarget {
 	}
     };
 
+    public final AttrCache<Tex> armor = new AttrCache<Tex>() {
+	protected Tex find(List<ItemInfo> info) {
+	    ItemInfo.Wear wear = ItemInfo.getArmor(info);
+	    if(wear == null) return (null);
+	    return Text.renderstroked(String.format("%d/%d", wear.a, wear.b), ARMOR_COLOR).tex();
+	}
+    };
+
     private GSprite lspr = null;
     public void tick(double dt) {
 	/* XXX: This is ugly and there should be a better way to
@@ -248,6 +257,8 @@ public class WItem extends Widget implements DTarget {
 	    g.aimage(itemnum.get(), sz, 1, 1);
 	} else if(heurnum.get() != null) {
 	    g.aimage(heurnum.get(), sz, 1, 1);
+	} else if(armor.get() != null) {
+	    g.aimage(armor.get(), sz, 1, 1);
 	} else if(durability.get() != null) {
 	    g.aimage(durability.get(), sz, 1, 1);
 	}
