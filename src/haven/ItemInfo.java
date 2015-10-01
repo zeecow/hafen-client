@@ -26,6 +26,8 @@
 
 package haven;
 
+import me.ender.Reflect;
+
 import java.util.*;
 import java.awt.image.BufferedImage;
 import java.awt.Graphics;
@@ -329,6 +331,24 @@ public abstract class ItemInfo {
 	    }
 	}
 	return null;
+    }
+
+    public static Wear getWear(List<ItemInfo> infos) {
+	infos = findall("Wear", infos);
+	for (ItemInfo info : infos) {
+	    if(Reflect.hasField(info, "m") && Reflect.hasField(info, "d")){
+		return new Wear(Reflect.getFieldValueInt(info, "d"), Reflect.getFieldValueInt(info, "m"));
+	    }
+	}
+	return null;
+    }
+
+    public static class Wear {
+	public final int a, b;
+	public Wear(int a, int b){
+	    this.a = a;
+	    this.b = b;
+	}
     }
     
     private static String dump(Object arg) {
