@@ -299,11 +299,11 @@ public class Text {
     }
 
     public static Line renderstroked(String text) {
-	return renderstroked(text, Color.WHITE);
+	return renderstroked(text, Color.WHITE, Color.BLACK);
     }
 
     public static Line renderstroked(String text, Text.Foundry fnd) {
-	return renderstroked(text, Color.WHITE, fnd);
+	return renderstroked(text, Color.WHITE, Color.BLACK, fnd);
     }
 	
     public static Line render(String text) {

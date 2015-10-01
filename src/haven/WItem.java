@@ -160,7 +160,7 @@ public class WItem extends Widget implements DTarget {
 	protected Tex find(List<ItemInfo> info) {
 	    GItem.NumberInfo ninf = ItemInfo.find(GItem.NumberInfo.class, info);
 	    if(ninf == null) return(null);
-	    return(new TexI(Utils.outline2(Text.render(Integer.toString(ninf.itemnum()), Color.WHITE).img, Utils.contrast(Color.WHITE))));
+	    return(new TexI(Utils.outline2(Text.render(Integer.toString(ninf.itemnum()), Color.WHITE).img, Color.BLACK)));
 	}
     };
 
@@ -190,7 +190,7 @@ public class WItem extends Widget implements DTarget {
 	protected Tex find(List<ItemInfo> info) {
 	    String num = ItemInfo.getCount(info);
 	    if(num == null) return (null);
-	    return Text.renderstroked(num, Color.WHITE).tex();
+	    return Text.renderstroked(num, Color.WHITE, Color.BLACK).tex();
 	}
     };
 
@@ -198,7 +198,7 @@ public class WItem extends Widget implements DTarget {
 	protected Tex find(List<ItemInfo> info) {
 	    ItemInfo.Wear wear = ItemInfo.getWear(info);
 	    if(wear == null) return (null);
-	    return Text.renderstroked(String.valueOf(wear.b - wear.a), DURABILITY_COLOR).tex();
+	    return Text.renderstroked(String.valueOf(wear.b - wear.a), DURABILITY_COLOR, Color.BLACK).tex();
 	}
     };
 
@@ -212,7 +212,7 @@ public class WItem extends Widget implements DTarget {
 	protected Tex find(List<ItemInfo> info) {
 	    ItemInfo.Wear wear = ItemInfo.getArmor(info);
 	    if(wear == null) return (null);
-	    return Text.renderstroked(String.format("%d/%d", wear.a, wear.b), ARMOR_COLOR).tex();
+	    return Text.renderstroked(String.format("%d/%d", wear.a, wear.b), ARMOR_COLOR, Color.BLACK).tex();
 	}
     };
 
