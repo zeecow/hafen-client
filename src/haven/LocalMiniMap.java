@@ -205,7 +205,11 @@ public class LocalMiniMap extends Widget {
 	if(cc == null)
 	    return;
 	Coord plg = cc.div(cmaps);
-	MapDumper.plgrid(plg);
+	if(MapDumper.plgrid(plg)) {
+	    synchronized(cache) {
+		cache.clear();
+	    }
+	}
 
 	Coord center = cc.add(off);
 	Coord hsz = sz.div(2);
