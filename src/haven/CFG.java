@@ -18,6 +18,8 @@ public enum CFG {
     STORE_CHAT_LOGS("ui.chat.logs", false),
     LOCK_STUDY("ui.lock_study", false),
     MMAP_FLOAT("ui.mmapfloat", false),
+    MMAP_VIEW("ui.mmap_view", false),
+    MMAP_GRID("ui.mmap_grid", false),
     MENU_SINGLE_CTRL_CLICK("ui.menu_single_ctrl_click", true),
 
     SHOW_ITEM_DURABILITY("ui.item_durability", false),
