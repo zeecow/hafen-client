@@ -8,13 +8,15 @@ import org.xml.sax.SAXException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
 public class RadarCFG {
-    private static final List<Group> groups = new LinkedList<>();
+    public static final List<Group> groups = new LinkedList<>();
 
     static {
 	String xml = Config.loadFile("radar.xml");
@@ -25,19 +27,22 @@ public class RadarCFG {
 		Document doc = builder.parse(new ByteArrayInputStream(xml.getBytes()));
 		groups.clear();
 		NodeList groupNodes = doc.getElementsByTagName("group");
-		for (int i = 0; i < groupNodes.getLength(); i++) {
+		for(int i = 0; i < groupNodes.getLength(); i++) {
 		    groups.add(new Group((Element) groupNodes.item(i)));
 		}
-	    } catch (ParserConfigurationException | IOException | SAXException ignored) {
+	    } catch(ParserConfigurationException | IOException | SAXException ignored) {
 		ignored.printStackTrace();
 	    }
 	}
     }
 
-    public static void init(){
+    public static void init() {
 
     }
 
+    private static Resource loadres(String name) {
+	return Resource.remote().load(name).get();
+    }
 
     public static class Group {
 	public String name;
@@ -53,32 +58,35 @@ public class RadarCFG {
 	    if(config.hasAttribute("priority")) {
 		try {
 		    priority = Integer.parseInt(config.getAttribute("priority"));
-		} catch (NumberFormatException ignored) {
+		} catch(NumberFormatException ignored) {
 		}
 	    }
 	    NodeList children = config.getElementsByTagName("match");
 	    markerCFGs = new LinkedList<>();
-	    for (int i = 0; i < children.getLength(); i++) {
-		markerCFGs.add(new MarkerCFG((Element) children.item(i), this));
+	    for(int i = 0; i < children.getLength(); i++) {
+		markerCFGs.add(MarkerCFG.parse((Element) children.item(i), this));
 	    }
 
 	}
     }
 
     public static class MarkerCFG {
-	private final Group parent;
+	private Group parent;
 	private Match type;
 	private String pattern;
 	private Boolean visible = null;
 	private Integer priority = null;
 	public String icon = "gfx/hud/mmap/o";
 	public String name = null;
+	private Tex tex;
 
-	public MarkerCFG(Element config, Group parent) {
-	    this.parent = parent;
+	public static MarkerCFG parse(Element config, Group parent) {
+	    MarkerCFG cfg = new MarkerCFG();
+
+	    cfg.parent = parent;
 	    Match[] types = Match.values();
 	    String name = null;
-	    for (Match type : types) {
+	    for(Match type : types) {
 		name = type.name();
 		if(config.hasAttribute(name)) {
 		    break;
@@ -87,21 +95,48 @@ public class RadarCFG {
 	    if(name == null) {
 		throw new RuntimeException();
 	    }
-	    type = Match.valueOf(name);
-	    pattern = config.getAttribute(name);
+	    cfg.type = Match.valueOf(name);
+	    cfg.pattern = config.getAttribute(name);
 	    if(config.hasAttribute("show")) {
-		visible = config.getAttribute("show").toLowerCase().equals("true");
+		cfg.visible = config.getAttribute("show").toLowerCase().equals("true");
 	    }
 	    if(config.hasAttribute("image")) {
-		icon = config.getAttribute("image");
+		cfg.icon = config.getAttribute("image");
 	    }
 	    if(config.hasAttribute("priority")) {
 		try {
-		    priority = Integer.parseInt(config.getAttribute("priority"));
-		} catch (NumberFormatException ignored) {
+		    cfg.priority = Integer.parseInt(config.getAttribute("priority"));
+		} catch(NumberFormatException ignored) {
 		}
 	    }
+
+	    return cfg;
 	}
+
+	public Tex tex() {
+	    if(!visible()) {
+		return null;
+	    }
+	    if(tex == null) {
+		try {
+		    Resource.Image img = loadres(icon).layer(Resource.imgc);
+
+		    Tex tex = img.tex();
+		    if((tex.sz().x <= 20) && (tex.sz().y <= 20)) {
+			this.tex = tex;
+		    } else {
+			BufferedImage buf = img.img;
+			buf = PUtils.rasterimg(PUtils.blurmask2(buf.getRaster(), 1, 1, Color.BLACK));
+			buf = PUtils.convolvedown(buf, new Coord(20, 20), GobIcon.filter);
+			this.tex = new TexI(buf);
+		    }
+
+		} catch(Loading ignored) {
+		}
+	    }
+	    return tex;
+	}
+
 
 	public boolean match(String target) {
 	    return type.match(pattern, target);
@@ -118,7 +153,7 @@ public class RadarCFG {
 	}
 
 	public int priority() {
-	    return (priority != null) ? priority : ((parent.priority != null) ? parent.priority : 0);
+	    return (priority != null) ? priority : ((parent != null && parent.priority != null) ? parent.priority : 0);
 	}
     }
 
