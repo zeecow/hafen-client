@@ -35,6 +35,8 @@ import java.util.*;
 import haven.resutil.Ridges;
 
 public class LocalMiniMap extends Widget {
+    private static final Tex viewbox = Resource.loadtex("gfx/hud/mmap/viewbox");
+    private static final Tex mapgrid = Resource.loadtex("gfx/hud/mmap/mapgrid");
     public final MapView mv;
     private Coord cc = null;
     private final Map<Coord, Defer.Future<MapTile>> cache = new LinkedHashMap<Coord, Defer.Future<MapTile>>(5, 0.75f, true) {
@@ -203,7 +205,11 @@ public class LocalMiniMap extends Widget {
 	if(cc == null)
 	    return;
 	Coord plg = cc.div(cmaps);
-	MapDumper.plgrid(plg);
+	if(MapDumper.plgrid(plg)) {
+	    synchronized(cache) {
+		cache.clear();
+	    }
+	}
 
 	Coord center = cc.add(off);
 	Coord hsz = sz.div(2);
@@ -234,8 +240,17 @@ public class LocalMiniMap extends Widget {
 		    Coord tc = map.ul.sub(center).add(hsz);
 		    //g.image(MiniMap.bg, tc);
 		    g.image(map.img, tc);
+		    if(CFG.MMAP_GRID.valb()) {
+			g.image(mapgrid, tc);
+		    }
 
 		}
+	    }
+	}
+	if(CFG.MMAP_VIEW.valb()) {
+	    Gob pl = ui.sess.glob.oc.getgob(mv.plgob);
+	    if(pl != null) {
+		g.aimage(viewbox, p2c(pl.rc), 0.5, 0.5);
 	    }
 	}
 	drawicons(g);

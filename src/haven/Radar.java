@@ -7,6 +7,7 @@ import com.google.gson.reflect.TypeToken;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.lang.reflect.Type;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
@@ -69,7 +70,7 @@ public class Radar {
 	long now = System.currentTimeMillis();
 	if(now - lastsort > 100) {
 	    synchronized (markers) {
-		markers.sort(MARKER_COMPARATOR);
+		Collections.sort(markers, MARKER_COMPARATOR);
 		lastsort = now;
 	    }
 	}
@@ -112,11 +113,14 @@ public class Radar {
 	    return tex;
 	}
 
-	public String tooltip(){
-	    if(cfg != null){
-		if(cfg.name != null){
+	public String tooltip() {
+	    KinInfo ki = gob.getattr(KinInfo.class);
+	    if(ki != null) {
+		return ki.name;
+	    } else if(cfg != null) {
+		if(cfg.name != null) {
 		    return cfg.name;
-		} else if(cfg != DEFAULT){
+		} else if(cfg != DEFAULT) {
 		    return cfg.pattern;
 		} else {
 		    return resname();
@@ -129,7 +133,7 @@ public class Radar {
 	    KinInfo ki = gob.getattr(KinInfo.class);
 	    if(ki != null) {
 		return BuddyWnd.gc[ki.group % BuddyWnd.gc.length];
-	    } else if(cfg != null && cfg.color != null){
+	    } else if(cfg != null && cfg.color != null) {
 		return cfg.color;
 	    }
 	    return Color.WHITE;
@@ -168,7 +172,9 @@ public class Radar {
 	public boolean show = true;
 
 	public Tex tex() {
-	    if(!show){return null;}
+	    if(!show) {
+		return null;
+	    }
 	    if(tex == null) {
 		try {
 		    Resource.Image img = loadres(icon).layer(Resource.imgc);

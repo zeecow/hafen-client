@@ -1,3 +1,6 @@
+$size[14]{$u{Update for 03.10.15:}
+  * added buttons for showing minimap grid and view distance
+ 
 $size[14]{$u{Update for 01.10.15:}
   * added options to show item durability/wear bar/armor (Options->Display)
   * use quadratic mean to calculate average quality

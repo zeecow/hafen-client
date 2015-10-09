@@ -87,16 +87,18 @@ public class MapDumper implements Defer.Callable<Object> {
 	}
     }
 
-    public static void plgrid(Coord plg) {
+    public static boolean plgrid(Coord plg) {
+	boolean newsession = false;
 	synchronized(sync) {
 	    if(lastplg != null) {
 		if(plg.manhattan2(lastplg) > 3) {
-		    //new session
+		    newsession = true;
 		    start = null;
 		}
 	    }
 	    lastplg = plg;
 	}
+	return newsession;
     }
 
     private MapDumper(File file, MCache mCache, MCache.Grid grid) {
