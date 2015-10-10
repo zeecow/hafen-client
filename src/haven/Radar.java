@@ -9,6 +9,7 @@ import java.util.List;
 public class Radar {
     public static final List<Marker> markers = new LinkedList<>();
     public static final List<Queued> queue = new LinkedList<>();
+    public static final Map<String, MarkerCFG> cfg_cache = new HashMap<>();
     private static final MarkerCFG DEFAULT = new DefMarker();
     public static final Comparator<Marker> MARKER_COMPARATOR = new Comparator<Marker>() {
 	@Override
@@ -17,6 +18,7 @@ public class Radar {
 	}
     };
     private static long lastsort = 0;
+    private static boolean needSorting = false;
 
     public static void add(Gob gob, Indir<Resource> res) {
 	if(gob.getattr(Marker.class) == null) {
@@ -42,17 +44,20 @@ public class Radar {
     }
 
     private static MarkerCFG cfg(String resname) {
-	if(resname == null) {
-	    return null;
-	}
-	for(RadarCFG.Group group : RadarCFG.groups) {
-	    for(MarkerCFG cfg : group.markerCFGs) {
-		if(cfg.match(resname)) {
-		    return cfg;
+	MarkerCFG result = cfg_cache.get(resname);
+	if(result == null) {
+	    result = DEFAULT;
+	    for(RadarCFG.Group group : RadarCFG.groups) {
+		for(MarkerCFG cfg : group.markerCFGs) {
+		    if(cfg.match(resname)) {
+			result = cfg;
+			break;
+		    }
 		}
 	    }
+	    cfg_cache.put(resname, result);
 	}
-	return DEFAULT;
+	return result;
     }
 
     public static void tick() {
@@ -61,13 +66,16 @@ public class Radar {
 	    while(iterator.hasNext()) {
 		Queued queued = iterator.next();
 		if(queued.ready()) {
-		    MarkerCFG cfg = cfg(queued.resname());
-		    if(cfg != null || queued.gob.getattr(GobIcon.class) != null) {
-			Marker marker = new Marker(queued.gob, queued.resname());
+		    String resname = queued.resname();
+		    MarkerCFG cfg = cfg(resname);
+		    Gob gob = queued.gob;
+		    if(cfg != DEFAULT || gob.getattr(GobIcon.class) != null) {
+			Marker marker = new Marker(gob, resname);
 			synchronized(markers) {
 			    markers.add(marker);
 			}
-			queued.gob.setattr(marker);
+			gob.setattr(marker);
+			needSorting = true;
 		    }
 		    iterator.remove();
 		}
@@ -75,10 +83,11 @@ public class Radar {
 	}
 
 	long now = System.currentTimeMillis();
-	if(now - lastsort > 100) {
+	if(needSorting && now - lastsort > 100) {
 	    synchronized(markers) {
 		Collections.sort(markers, MARKER_COMPARATOR);
 		lastsort = now;
+		needSorting = false;
 	    }
 	}
     }
@@ -121,7 +130,7 @@ public class Radar {
 
 	public Tex tex() {
 	    if(tex == null) {
-		if(cfg == DEFAULT) {
+		if(cfg == DEFAULT || cfg.icon == null) {
 		    GobIcon gi = gob.getattr(GobIcon.class);
 		    if(gi != null) {
 			tex = gi.tex();

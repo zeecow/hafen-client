@@ -76,7 +76,7 @@ public class RadarCFG {
 	private String pattern;
 	private Boolean visible = null;
 	private Integer priority = null;
-	public String icon = "gfx/hud/mmap/o";
+	public String icon = null;
 	public String name = null;
 	private Tex tex;
 
@@ -114,10 +114,7 @@ public class RadarCFG {
 	}
 
 	public Tex tex() {
-	    if(!visible()) {
-		return null;
-	    }
-	    if(tex == null) {
+	    if(tex == null && icon != null) {
 		try {
 		    Resource.Image img = loadres(icon).layer(Resource.imgc);
 
