@@ -13,6 +13,7 @@ public class WidgetList<T extends Widget> extends ListWidget<T> {
     protected final int h;
     private Color bgcolor = new Color(0, 0, 0, 96);
     protected T over;
+    public boolean canselect = true;
 
     public WidgetList(Coord itemsz, int h) {
 	super(itemsz, itemsz.y);
@@ -124,13 +125,22 @@ public class WidgetList<T extends Widget> extends ListWidget<T> {
     }
 
     @Override
-    public boolean mousedown(Coord c, int button) {
-	if(c.x < sb.c.x) {
-	    c.y += sb.val * itemh;
+    public void change(T item) {
+	if(canselect) {
+	    super.change(item);
+	    selected(item);
 	}
+    }
+
+    public void selected(T item) {
+    }
+
+    @Override
+    public boolean mousedown(Coord c0, int button) {
+	Coord c = (c0.x < sb.c.x) ? c0.add(0, sb.val * itemh) : c0;
 	if(super.mousedown(c, button))
 	    return (true);
-	T item = itemat(c);
+	T item = itemat(c0);
 	if((item == null) && (button == 1))
 	    change(null);
 	else if(item != null)

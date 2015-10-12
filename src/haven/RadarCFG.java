@@ -32,23 +32,23 @@ public class RadarCFG {
 		Document doc = builder.parse(new ByteArrayInputStream(xml.getBytes()));
 		groups.clear();
 		NodeList groupNodes = doc.getElementsByTagName("group");
-		for (int i = 0; i < groupNodes.getLength(); i++) {
+		for(int i = 0; i < groupNodes.getLength(); i++) {
 		    groups.add(new Group((Element) groupNodes.item(i)));
 		}
-	    } catch (ParserConfigurationException | IOException | SAXException ignored) {
+	    } catch(ParserConfigurationException | IOException | SAXException ignored) {
 		ignored.printStackTrace();
 	    }
 	}
     }
 
-    public static void save() {
+    public static synchronized void save() {
 	try {
 	    Document doc = builder.newDocument();
 
 	    // construct XML
 	    Element root = doc.createElement("icons");
 	    doc.appendChild(root);
-	    for (Group group : groups) {
+	    for(Group group : groups) {
 		Element el = doc.createElement("group");
 		group.write(el);
 		root.appendChild(el);
@@ -59,13 +59,12 @@ public class RadarCFG {
 	    Transformer transformer = TransformerFactory.newInstance().newTransformer();
 	    transformer.setOutputProperty(OutputKeys.INDENT, "yes");
 	    transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
-	    //transformer.setParameter();
 	    DOMSource source = new DOMSource(doc);
 	    StreamResult console = new StreamResult(out);
 	    transformer.transform(source, console);
-	    Config.saveFile("radar_saved.xml", out.toString());
+	    Config.saveFile("radar.xml", out.toString());
 
-	} catch (Exception e) {
+	} catch(Exception e) {
 	    e.printStackTrace();
 	}
     }
@@ -74,26 +73,49 @@ public class RadarCFG {
 	return Resource.remote().load(name).get();
     }
 
+    private static Tex makeicon(String icon) {
+	Tex tex = null;
+	try {
+	    Resource.Image img = loadres(icon).layer(Resource.imgc);
+
+	    tex = img.tex();
+	    if((tex.sz().x > 20) || (tex.sz().y > 20)) {
+		BufferedImage buf = img.img;
+		buf = PUtils.rasterimg(PUtils.blurmask2(buf.getRaster(), 1, 1, Color.BLACK));
+		buf = PUtils.convolvedown(buf, new Coord(20, 20), GobIcon.filter);
+		tex = new TexI(buf);
+	    }
+
+	} catch(Loading ignored) {
+	}
+	return tex;
+    }
+
     public static class Group {
-	public String name;
+	public static final Tex DEF_TEX = Resource.loadtex("gfx/hud/mmap/o");
+	public String name, icon;
 	public Boolean show = null;
 	public Integer priority = null;
 	public List<MarkerCFG> markerCFGs;
+	private Tex tex = null;
 
 	public Group(Element config) {
 	    name = config.getAttribute("name");
+	    if(config.hasAttribute("icon")) {
+		icon = config.getAttribute("icon");
+	    }
 	    if(config.hasAttribute("show")) {
 		show = config.getAttribute("show").toLowerCase().equals("true");
 	    }
 	    if(config.hasAttribute("priority")) {
 		try {
 		    priority = Integer.parseInt(config.getAttribute("priority"));
-		} catch (NumberFormatException ignored) {
+		} catch(NumberFormatException ignored) {
 		}
 	    }
-	    NodeList children = config.getElementsByTagName("match");
+	    NodeList children = config.getElementsByTagName("marker");
 	    markerCFGs = new LinkedList<>();
-	    for (int i = 0; i < children.getLength(); i++) {
+	    for(int i = 0; i < children.getLength(); i++) {
 		markerCFGs.add(MarkerCFG.parse((Element) children.item(i), this));
 	    }
 
@@ -102,22 +124,36 @@ public class RadarCFG {
 	public void write(Element el) {
 	    Document doc = el.getOwnerDocument();
 	    el.setAttribute("name", name);
+	    if(icon != null) {
+		el.setAttribute("icon", icon);
+	    }
 	    if(show != null) {
 		el.setAttribute("show", show.toString());
 	    }
 	    if(priority != null) {
 		el.setAttribute("priority", priority.toString());
 	    }
-	    for (MarkerCFG marker : markerCFGs) {
-		Element mel = doc.createElement("match");
+	    for(MarkerCFG marker : markerCFGs) {
+		Element mel = doc.createElement("marker");
 		marker.write(mel);
 		el.appendChild(mel);
 	    }
 	}
+
+	public Tex tex() {
+	    if(tex == null) {
+		if(icon != null) {
+		    tex = makeicon(icon);
+		} else {
+		    tex = DEF_TEX;
+		}
+	    }
+	    return tex;
+	}
     }
 
     public static class MarkerCFG {
-	private Group parent;
+	public Group parent;
 	private Match type;
 	private String pattern;
 	private Boolean show = null;
@@ -132,7 +168,7 @@ public class RadarCFG {
 	    cfg.parent = parent;
 	    Match[] types = Match.values();
 	    String name = null;
-	    for (Match type : types) {
+	    for(Match type : types) {
 		name = type.name();
 		if(config.hasAttribute(name)) {
 		    break;
@@ -147,13 +183,13 @@ public class RadarCFG {
 	    if(config.hasAttribute("show")) {
 		cfg.show = config.getAttribute("show").toLowerCase().equals("true");
 	    }
-	    if(config.hasAttribute("image")) {
-		cfg.icon = config.getAttribute("image");
+	    if(config.hasAttribute("icon")) {
+		cfg.icon = config.getAttribute("icon");
 	    }
 	    if(config.hasAttribute("priority")) {
 		try {
 		    cfg.priority = Integer.parseInt(config.getAttribute("priority"));
-		} catch (NumberFormatException ignored) {
+		} catch(NumberFormatException ignored) {
 		}
 	    }
 
@@ -162,21 +198,7 @@ public class RadarCFG {
 
 	public Tex tex() {
 	    if(tex == null && icon != null) {
-		try {
-		    Resource.Image img = loadres(icon).layer(Resource.imgc);
-
-		    Tex tex = img.tex();
-		    if((tex.sz().x <= 20) && (tex.sz().y <= 20)) {
-			this.tex = tex;
-		    } else {
-			BufferedImage buf = img.img;
-			buf = PUtils.rasterimg(PUtils.blurmask2(buf.getRaster(), 1, 1, Color.BLACK));
-			buf = PUtils.convolvedown(buf, new Coord(20, 20), GobIcon.filter);
-			this.tex = new TexI(buf);
-		    }
-
-		} catch (Loading ignored) {
-		}
+		tex = makeicon(icon);
 	    }
 	    return tex;
 	}
@@ -203,7 +225,7 @@ public class RadarCFG {
 	public void write(Element el) {
 	    el.setAttribute(type.name(), pattern);
 	    if(icon != null) {
-		el.setAttribute("image", icon);
+		el.setAttribute("icon", icon);
 	    }
 	    if(name != null) {
 		el.setAttribute("name", name);
@@ -214,6 +236,37 @@ public class RadarCFG {
 	    if(priority != null) {
 		el.setAttribute("priority", priority.toString());
 	    }
+	}
+    }
+
+    public static class GroupCheck extends CheckBox {
+	public final Group group;
+
+	public GroupCheck(Group group) {
+	    super(group.name);
+	    this.group = group;
+	    this.hitbox = true;
+	    this.a = group.show == null || group.show;
+	}
+
+	@Override
+	public void changed(boolean val) {
+	    group.show = val;
+	}
+    }
+
+    public static class MarkerCheck extends CheckBox {
+	public final MarkerCFG marker;
+
+	public MarkerCheck(MarkerCFG marker) {
+	    super(marker.name != null ? marker.name : marker.pattern);
+	    this.marker = marker;
+	    this.a = marker.show == null || marker.show;
+	}
+
+	@Override
+	public void changed(boolean val) {
+	    marker.show = val;
 	}
     }
 

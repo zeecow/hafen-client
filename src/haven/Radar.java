@@ -129,11 +129,16 @@ public class Radar {
 	}
 
 	public Tex tex() {
+	    if(!cfg.visible()){
+		return null;
+	    }
 	    if(tex == null) {
 		if(cfg == DEFAULT || cfg.icon == null) {
 		    GobIcon gi = gob.getattr(GobIcon.class);
 		    if(gi != null) {
 			tex = gi.tex();
+		    } else if(cfg.parent != null){
+			tex = cfg.parent.tex();
 		    }
 		} else {
 		    tex = cfg.tex();
@@ -142,14 +147,14 @@ public class Radar {
 	    return tex;
 	}
 
-	public String tooltip() {
+	public String tooltip(boolean full) {
 	    KinInfo ki = gob.getattr(KinInfo.class);
 	    if(ki != null) {
 		return ki.name;
 	    } else if(cfg != null) {
 		if(cfg.name != null) {
 		    return cfg.name;
-		} else {
+		} else if(full){
 		    return resname;
 		}
 	    }
@@ -184,6 +189,11 @@ public class Radar {
 	@Override
 	public int priority() {
 	    return 0;
+	}
+
+	@Override
+	public boolean visible() {
+	    return true;
 	}
     }
 

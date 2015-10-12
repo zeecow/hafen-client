@@ -29,7 +29,7 @@ package haven;
 public class OptWnd extends Window {
     public static final Coord PANEL_POS = new Coord(220, 30);
     public final Panel main, video, audio;
-    private final Panel display, general, camera;
+    private final Panel display, general, camera, radar;
     public Panel current;
 
     public void chpanel(Panel p) {
@@ -56,9 +56,9 @@ public class OptWnd extends Window {
 	public boolean type(char key, java.awt.event.KeyEvent ev) {
 	    if((this.key != -1) && (key == this.key)) {
 		click();
-		return(true);
+		return (true);
 	    }
-	    return(false);
+	    return (false);
 	}
     }
 
@@ -83,99 +83,108 @@ public class OptWnd extends Window {
 		this.cf = gcf;
 		int y = 0;
 		add(new CheckBox("Per-fragment lighting") {
-			{a = cf.flight.val;}
+		    {
+			a = cf.flight.val;
+		    }
 
-			public void set(boolean val) {
-			    if(val) {
-				try {
-				    cf.flight.set(true);
-				} catch(GLSettings.SettingException e) {
-				    getparent(GameUI.class).error(e.getMessage());
-				    return;
-				}
-			    } else {
-				cf.flight.set(false);
-			    }
-			    a = val;
-			    cf.dirty = true;
-			}
-		    }, new Coord(0, y));
-		y += 25;
-		add(new CheckBox("Render shadows") {
-			{a = cf.lshadow.val;}
-
-			public void set(boolean val) {
-			    if(val) {
-				try {
-				    cf.lshadow.set(true);
-				} catch(GLSettings.SettingException e) {
-				    getparent(GameUI.class).error(e.getMessage());
-				    return;
-				}
-			    } else {
-				cf.lshadow.set(false);
-			    }
-			    a = val;
-			    cf.dirty = true;
-			}
-		    }, new Coord(0, y));
-		y += 25;
-		add(new CheckBox("Antialiasing") {
-			{a = cf.fsaa.val;}
-
-			public void set(boolean val) {
+		    public void set(boolean val) {
+			if(val) {
 			    try {
-				cf.fsaa.set(val);
+				cf.flight.set(true);
 			    } catch(GLSettings.SettingException e) {
 				getparent(GameUI.class).error(e.getMessage());
 				return;
 			    }
-			    a = val;
-			    cf.dirty = true;
+			} else {
+			    cf.flight.set(false);
 			}
-		    }, new Coord(0, y));
+			a = val;
+			cf.dirty = true;
+		    }
+		}, new Coord(0, y));
+		y += 25;
+		add(new CheckBox("Render shadows") {
+		    {
+			a = cf.lshadow.val;
+		    }
+
+		    public void set(boolean val) {
+			if(val) {
+			    try {
+				cf.lshadow.set(true);
+			    } catch(GLSettings.SettingException e) {
+				getparent(GameUI.class).error(e.getMessage());
+				return;
+			    }
+			} else {
+			    cf.lshadow.set(false);
+			}
+			a = val;
+			cf.dirty = true;
+		    }
+		}, new Coord(0, y));
+		y += 25;
+		add(new CheckBox("Antialiasing") {
+		    {
+			a = cf.fsaa.val;
+		    }
+
+		    public void set(boolean val) {
+			try {
+			    cf.fsaa.set(val);
+			} catch(GLSettings.SettingException e) {
+			    getparent(GameUI.class).error(e.getMessage());
+			    return;
+			}
+			a = val;
+			cf.dirty = true;
+		    }
+		}, new Coord(0, y));
 		y += 25;
 		add(new Label("Anisotropic filtering"), new Coord(0, y));
 		if(cf.anisotex.max() <= 1) {
 		    add(new Label("(Not supported)"), new Coord(15, y + 15));
 		} else {
 		    final Label dpy = add(new Label(""), new Coord(165, y + 15));
-		    add(new HSlider(160, (int)(cf.anisotex.min() * 2), (int)(cf.anisotex.max() * 2), (int)(cf.anisotex.val * 2)) {
-			    protected void added() {
-				dpy();
-				this.c.y = dpy.c.y + ((dpy.sz.y - this.sz.y) / 2);
+		    add(new HSlider(160, (int) (cf.anisotex.min() * 2), (int) (cf.anisotex.max() * 2), (int) (cf.anisotex.val * 2)) {
+			protected void added() {
+			    dpy();
+			    this.c.y = dpy.c.y + ((dpy.sz.y - this.sz.y) / 2);
+			}
+
+			void dpy() {
+			    if(val < 2)
+				dpy.settext("Off");
+			    else
+				dpy.settext(String.format("%.1f\u00d7", (val / 2.0)));
+			}
+
+			public void changed() {
+			    try {
+				cf.anisotex.set(val / 2.0f);
+			    } catch(GLSettings.SettingException e) {
+				getparent(GameUI.class).error(e.getMessage());
+				return;
 			    }
-			    void dpy() {
-				if(val < 2)
-				    dpy.settext("Off");
-				else
-				    dpy.settext(String.format("%.1f\u00d7", (val / 2.0)));
-			    }
-			    public void changed() {
-				try {
-				    cf.anisotex.set(val / 2.0f);
-				} catch(GLSettings.SettingException e) {
-				    getparent(GameUI.class).error(e.getMessage());
-				    return;
-				}
-				dpy();
-				cf.dirty = true;
-			    }
-			}, new Coord(0, y + 15));
+			    dpy();
+			    cf.dirty = true;
+			}
+		    }, new Coord(0, y + 15));
 		}
 		y += 35;
 		add(new Button(200, "Reset to defaults") {
-			public void click() {
-			    cf.cfg.resetprefs();
-			    curcf.destroy();
-			    curcf = null;
-			}
-		    }, new Coord(0, 150));
+		    public void click() {
+			cf.cfg.resetprefs();
+			curcf.destroy();
+			curcf = null;
+		    }
+		}, new Coord(0, 150));
 		pack();
 	    }
 	}
 
 	private CPanel curcf = null;
+
 	public void draw(GOut g) {
 	    if((curcf == null) || (g.gc.pref != curcf.cf)) {
 		if(curcf != null)
@@ -194,22 +203,27 @@ public class OptWnd extends Window {
 	display = add(new Panel());
 	general = add(new Panel());
 	camera = add(new Panel());
+	radar = add(new Panel());
 	int y;
 
 	addPanelButton("Video settings", 'v', video, 0, 0);
 	addPanelButton("Audio settings", 'a', audio, 0, 1);
 
+	addPanelButton("General settings", 'g', general, 1, 0);
+	addPanelButton("Display settings", 'd', display, 1, 1);
+	addPanelButton("Radar settings", 'r', radar, 1, 2);
+
 	if(gopts) {
 	    main.add(new Button(200, "Switch character") {
-		    public void click() {
-			getparent(GameUI.class).act("lo", "cs");
-		    }
-		}, new Coord(0, 120));
+		public void click() {
+		    getparent(GameUI.class).act("lo", "cs");
+		}
+	    }, new Coord(0, 120));
 	    main.add(new Button(200, "Log out") {
-		    public void click() {
-			getparent(GameUI.class).act("lo");
-		    }
-		}, new Coord(0, 150));
+		public void click() {
+		    getparent(GameUI.class).act("lo");
+		}
+	    }, new Coord(0, 150));
 	}
 	main.add(new Button(200, "Close") {
 	    public void click() {
@@ -220,52 +234,53 @@ public class OptWnd extends Window {
 	y = 0;
 	audio.add(new Label("Master audio volume"), new Coord(0, y));
 	y += 15;
-	audio.add(new HSlider(200, 0, 1000, (int)(Audio.volume * 1000)) {
-		public void changed() {
-		    Audio.setvolume(val / 1000.0);
-		}
-	    }, new Coord(0, y));
+	audio.add(new HSlider(200, 0, 1000, (int) (Audio.volume * 1000)) {
+	    public void changed() {
+		Audio.setvolume(val / 1000.0);
+	    }
+	}, new Coord(0, y));
 	y += 30;
 	audio.add(new Label("In-game event volume"), new Coord(0, y));
 	y += 15;
 	audio.add(new HSlider(200, 0, 1000, 0) {
-		protected void attach(UI ui) {
-		    super.attach(ui);
-		    val = (int)(ui.audio.pos.volume * 1000);
-		}
-		public void changed() {
-		    ui.audio.pos.setvolume(val / 1000.0);
-		}
-	    }, new Coord(0, y));
+	    protected void attach(UI ui) {
+		super.attach(ui);
+		val = (int) (ui.audio.pos.volume * 1000);
+	    }
+
+	    public void changed() {
+		ui.audio.pos.setvolume(val / 1000.0);
+	    }
+	}, new Coord(0, y));
 	y += 20;
 	audio.add(new Label("Ambient volume"), new Coord(0, y));
 	y += 15;
 	audio.add(new HSlider(200, 0, 1000, 0) {
-		protected void attach(UI ui) {
-		    super.attach(ui);
-		    val = (int)(ui.audio.amb.volume * 1000);
-		}
-		public void changed() {
-		    ui.audio.amb.setvolume(val / 1000.0);
-		}
-	    }, new Coord(0, y));
+	    protected void attach(UI ui) {
+		super.attach(ui);
+		val = (int) (ui.audio.amb.volume * 1000);
+	    }
+
+	    public void changed() {
+		ui.audio.amb.setvolume(val / 1000.0);
+	    }
+	}, new Coord(0, y));
 	y += 35;
 	audio.add(new PButton(200, "Back", 27, main), new Coord(0, y));
 	audio.pack();
 
 	initDisplayPanel();
 	initGeneralPanel();
+	initRadarPanel();
 	main.pack();
 	chpanel(main);
     }
 
-    private void addPanelButton(String name, char key, Panel panel, int x, int y){
+    private void addPanelButton(String name, char key, Panel panel, int x, int y) {
 	main.add(new PButton(200, name, key, panel), PANEL_POS.mul(x, y));
     }
 
     private void initGeneralPanel() {
-	addPanelButton("General settings", 'g', general, 1, 0);
-
 	int x = 0;
 	int y = 0, my = 0;
 	general.add(new CFGBox("Store minimap tiles", CFG.STORE_MAP), x, y);
@@ -312,7 +327,7 @@ public class OptWnd extends Window {
 	    }
 	}, x + 155, y + 253);
 
-	y+=255;
+	y += 255;
 	my = Math.max(my, y);
 
 	general.add(new PButton(200, "Back", 27, main), 0, my + 35);
@@ -320,8 +335,6 @@ public class OptWnd extends Window {
     }
 
     private void initDisplayPanel() {
-	addPanelButton("Display settings", 'd', display, 1, 1);
-
 	int x = 0;
 	int y = 0;
 	int my = 0;
@@ -330,7 +343,7 @@ public class OptWnd extends Window {
 	y += 25;
 	display.add(new CFGBox("Show flavor objects", CFG.DISPLAY_FLAVOR), new Coord(x, y));
 
-	y+=25;
+	y += 25;
 	display.add(new CFGBox("Show gob health", CFG.DISPLAY_GOB_HEALTH), x, y);
 
 	y += 25;
@@ -436,6 +449,43 @@ public class OptWnd extends Window {
 
 	display.add(new PButton(200, "Back", 27, main), new Coord(0, my + 35));
 	display.pack();
+    }
+
+    private void initRadarPanel() {
+	final WidgetList<RadarCFG.MarkerCheck> markers = new WidgetList<RadarCFG.MarkerCheck>(new Coord(200, 16), 20) {
+	    @Override
+	    protected void itemclick(RadarCFG.MarkerCheck item, int button) {
+		if(button == 1) {
+		    item.set(!item.a);
+		}
+	    }
+	};
+	markers.canselect = false;
+	radar.add(markers, 225, 0);
+
+	WidgetList<RadarCFG.GroupCheck> groups = radar.add(new WidgetList<RadarCFG.GroupCheck>(new Coord(200, 16), 20) {
+	    @Override
+	    public void selected(RadarCFG.GroupCheck item) {
+		markers.clear(true);
+		for(RadarCFG.MarkerCFG marker : item.group.markerCFGs) {
+		    markers.additem(new RadarCFG.MarkerCheck(marker));
+		}
+	    }
+	});
+	for(RadarCFG.Group group : RadarCFG.groups) {
+	    groups.additem(new RadarCFG.GroupCheck(group)).hitbox = true;
+	}
+
+	radar.add(new Button(60, "Save"){
+	    @Override
+	    public void click() {
+		RadarCFG.save();
+	    }
+	}, 183, groups.sz.y + 10);
+
+	radar.pack();
+	radar.add(new PButton(200, "Back", 27, main), radar.sz.x / 2 - 100, radar.sz.y + 35);
+	radar.pack();
     }
 
     public OptWnd() {

@@ -166,7 +166,7 @@ public class LocalMiniMap extends Widget {
 	if(gob != null) {
 	    Radar.Marker icon = gob.getattr(Radar.Marker.class);
 	    if(icon != null) {
-		return icon.tooltip();
+		return icon.tooltip(ui.modshift);
 	    }
 	}
 	return super.tooltip(c, prev);
