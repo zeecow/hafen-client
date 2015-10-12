@@ -42,8 +42,7 @@ public class FlowerList extends WidgetList<FlowerList.Item> {
 		    AUTOCHOOSE.remove(name);
 		}
 		FlowerMenu.saveAutochoose();
-		removeitem((Item) sender);
-		ui.destroy(sender);
+		removeitem((Item) sender, true);
 		update();
 		break;
 	    }

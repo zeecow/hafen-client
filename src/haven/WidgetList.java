@@ -9,7 +9,7 @@ public class WidgetList<T extends Widget> extends ListWidget<T> {
     public static final Coord BTLOFF = BOX.btloff();
     protected final List<T> list = new LinkedList<>();
     protected final Scrollbar sb;
-    protected final Coord itemsz;
+    protected final Coord itemsz, widesz;
     protected final int h;
     private Color bgcolor = new Color(0, 0, 0, 96);
     protected T over;
@@ -20,6 +20,7 @@ public class WidgetList<T extends Widget> extends ListWidget<T> {
 	this.h = h;
 	sz = BOX.bisz().add(itemsz.x, h * itemsz.y);
 	sb = add(new Scrollbar(sz.y, 0, 20), sz.x, 0);
+	this.widesz = itemsz.add(sb.sz.x, 0);
 	pack();
     }
 
@@ -29,8 +30,27 @@ public class WidgetList<T extends Widget> extends ListWidget<T> {
 	return item;
     }
 
-    public boolean removeitem(T item){
-	return list.remove(item);
+    public boolean removeitem(T item, boolean destroy) {
+	boolean removed = list.remove(item);
+	if(removed) {
+	    if(destroy) {
+		ui.destroy(item);
+	    } else {
+		item.unlink();
+	    }
+	}
+	return removed;
+    }
+
+    public void clear(boolean destroy) {
+	for(T item : list) {
+	    if(destroy) {
+		ui.destroy(item);
+	    } else {
+		item.unlink();
+	    }
+	}
+	list.clear();
     }
 
     public Coord itempos(int idx) {
@@ -57,12 +77,14 @@ public class WidgetList<T extends Widget> extends ListWidget<T> {
 	drawbg(g);
 
 	int n = listitems();
+	sb.max = n - h;
+	Coord isz = sb.vis() ? itemsz : widesz;
 	for(int i = 0; i < h; i++) {
 	    int idx = i + sb.val;
 	    if(idx >= n)
 		break;
 	    T item = listitem(idx);
-	    GOut ig = g.reclip(itempos(i), itemsz);
+	    GOut ig = g.reclip(itempos(i), isz);
 	    if(item == sel) {
 		drawsel(ig, Listbox.selc);
 	    } else if(item == over) {
@@ -71,7 +93,6 @@ public class WidgetList<T extends Widget> extends ListWidget<T> {
 	    drawitem(ig, item, idx);
 	}
 
-	sb.max = n - h;
 	sb.draw(g.reclip(xlate(sb.c, true), sb.sz));
     }
 
