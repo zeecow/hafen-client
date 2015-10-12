@@ -7,12 +7,12 @@ import java.util.List;
 public class WidgetList<T extends Widget> extends ListWidget<T> {
     public static final IBox BOX = new IBox("gfx/hud/box", "tl", "tr", "bl", "br", "extvl", "extvr", "extht", "exthb");
     public static final Coord BTLOFF = BOX.btloff();
-    private final List<T> list = new LinkedList<>();
-    private final Scrollbar sb;
-    private final Coord itemsz;
-    private final int h;
+    protected final List<T> list = new LinkedList<>();
+    protected final Scrollbar sb;
+    protected final Coord itemsz;
+    protected final int h;
     private Color bgcolor = new Color(0, 0, 0, 96);
-    private T over;
+    protected T over;
 
     public WidgetList(Coord itemsz, int h) {
 	super(itemsz, itemsz.y);
@@ -25,8 +25,16 @@ public class WidgetList<T extends Widget> extends ListWidget<T> {
 
     public T additem(T item) {
 	list.add(item);
-	add(item, BTLOFF.add(0, (listitems() - 1) * itemsz.y));
+	add(item, itempos(listitems() - 1));
 	return item;
+    }
+
+    public boolean removeitem(T item){
+	return list.remove(item);
+    }
+
+    public Coord itempos(int idx) {
+	return BTLOFF.add(0, idx * itemsz.y);
     }
 
     protected void drawbg(GOut g) {
@@ -54,7 +62,7 @@ public class WidgetList<T extends Widget> extends ListWidget<T> {
 	    if(idx >= n)
 		break;
 	    T item = listitem(idx);
-	    GOut ig = g.reclip(BTLOFF.add(0, itemsz.y * i), itemsz);
+	    GOut ig = g.reclip(itempos(i), itemsz);
 	    if(item == sel) {
 		drawsel(ig, Listbox.selc);
 	    } else if(item == over) {

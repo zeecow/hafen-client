@@ -1,22 +1,23 @@
 package haven;
 
-import java.awt.*;
 import java.util.*;
 
 import static haven.FlowerMenu.AUTOCHOOSE;
 
-public class FlowerList extends Scrollport {
+public class FlowerList extends WidgetList<FlowerList.Item> {
 
-    public static final Color BGCOLOR = new Color(0, 0, 0, 64);
-    private final IBox box;
+    public static final Comparator<Item> ITEM_COMPARATOR = new Comparator<Item>() {
+	@Override
+	public int compare(Item o1, Item o2) {
+	    return o1.name.compareTo(o2.name);
+	}
+    };
 
     public FlowerList() {
-	super(new Coord(200, 250));
-	box = new IBox("gfx/hud/box", "tl", "tr", "bl", "br", "extvl", "extvr", "extht", "exthb");
+	super(new Coord(200, 25), 10);
 
-	int i = 0;
 	for(Map.Entry<String, Boolean> entry : AUTOCHOOSE.entrySet()) {
-	    cont.add(new Item(entry.getKey()), 0, 25 * i++);
+	    additem(new Item(entry.getKey()));
 	}
 
 	update();
@@ -41,6 +42,7 @@ public class FlowerList extends Scrollport {
 		    AUTOCHOOSE.remove(name);
 		}
 		FlowerMenu.saveAutochoose();
+		removeitem((Item) sender);
 		ui.destroy(sender);
 		update();
 		break;
@@ -58,35 +60,23 @@ public class FlowerList extends Scrollport {
 		AUTOCHOOSE.put(name, true);
 	    }
 	    FlowerMenu.saveAutochoose();
-	    cont.add(new Item(name), new Coord());
+	    additem(new Item(name));
 	    update();
 	}
     }
 
     private void update() {
-	LinkedList<String> order = new LinkedList<>(AUTOCHOOSE.keySet());
-	Collections.sort(order);
-	for(Widget wdg = cont.lchild; wdg != null; wdg = wdg.prev) {
-	    int i = order.indexOf(((Item) wdg).name);
-	    wdg.c.y = 25 * i;
+	Collections.sort(list, ITEM_COMPARATOR);
+	int n = listitems();
+	for(int i = 0; i < n; i++) {
+	    listitem(i).c = itempos(i);
 	}
-	cont.update();
     }
 
-    @Override
-    public void draw(GOut g) {
-	g.chcolor(BGCOLOR);
-	g.frect(Coord.z, sz);
-	g.chcolor();
-	super.draw(g);
-	box.draw(g, Coord.z, sz);
-    }
-
-    private static class Item extends Widget {
+    protected static class Item extends Widget {
 
 	public final String name;
 	private final CheckBox cb;
-	private boolean highlight = false;
 	private boolean a = false;
 	private UI.Grab grab;
 
@@ -98,23 +88,7 @@ public class FlowerList extends Scrollport {
 	    cb.a = AUTOCHOOSE.get(name);
 	    cb.canactivate = true;
 
-	    add(new Button(24, "X"), 165, 0);
-	}
-
-	@Override
-	public void draw(GOut g) {
-	    if(highlight) {
-		g.chcolor(Listbox.overc);
-		g.frect(Coord.z, sz);
-		g.chcolor();
-	    }
-	    super.draw(g);
-	}
-
-	@Override
-	public void mousemove(Coord c) {
-	    highlight = c.isect(Coord.z, sz);
-	    super.mousemove(c);
+	    add(new Button(24, "X"), 175, 0);
 	}
 
 	@Override
