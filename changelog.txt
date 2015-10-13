@@ -1,3 +1,7 @@
+$size[14]{$u{Update for 14.10.15:}
+  * added more options how to display single quality (average, max, min, E/S/V)
+  * reworked radar and added ui to configure it
+ 
 $size[14]{$u{Update for 03.10.15:}
   * added buttons for showing minimap grid and view distance
  
