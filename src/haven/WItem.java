@@ -297,7 +297,10 @@ public class WItem extends Widget implements DTarget {
 	    if((ui.modflags() & CFG.Q_SHOW_ALL_MODS.vali()) != 0) {
 		tex = quality.tex();
 	    } else if(!quality.isEmpty() && CFG.Q_SHOW_SINGLE.valb()) {
-		tex = quality.single().tex();
+		QualityList.Quality single = quality.single();
+		if(single != null) {
+		    tex = single.tex();
+		}
 	    }
 
 	    if(tex != null) {

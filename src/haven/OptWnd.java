@@ -26,6 +26,8 @@
 
 package haven;
 
+import java.awt.*;
+
 public class OptWnd extends Window {
     public static final Coord PANEL_POS = new Coord(220, 30);
     public final Panel main, video, audio;
@@ -384,12 +386,33 @@ public class OptWnd extends Window {
 	x += 250;
 	y = 0;
 	my = Math.max(my, y);
-	display.add(new CFGBox("Show single quality", CFG.Q_SHOW_SINGLE), new Coord(x, y));
+	int tx = x + display.add(new CFGBox("Show single quality as:", CFG.Q_SHOW_SINGLE), x, y).sz.x;
 
-	y += 25;
-	display.add(new CFGBox("Show single quality as max", CFG.Q_MAX_SINGLE
-		, "If checked will show single value quality as maximum of all qualities, instead of average")
-		, new Coord(x, y));
+	Dropbox<QualityList.SingleType> dropbox = display.add(new Dropbox<QualityList.SingleType>(100, 6, 16) {
+	    @Override
+	    protected QualityList.SingleType listitem(int i) {
+		return QualityList.SingleType.values()[i];
+	    }
+
+	    @Override
+	    protected int listitems() {
+		return QualityList.SingleType.values().length;
+	    }
+
+	    @Override
+	    protected void drawitem(GOut g, QualityList.SingleType item, int i) {
+		g.text(item.name(), Coord.z);
+	    }
+
+	    @Override
+	    public void change(QualityList.SingleType item) {
+		super.change(item);
+		if(item != null) {
+		    CFG.Q_SINGLE_TYPE.set(item);
+		}
+	    }
+	}, tx + 5, y);
+	dropbox.sel = CFG.Q_SINGLE_TYPE.val(QualityList.SingleType.class);
 
 	y += 30;
 	display.add(new CFGBox("Show all qualities on SHIFT", CFG.Q_SHOW_ALL_MODS) {

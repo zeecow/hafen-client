@@ -30,7 +30,7 @@ public enum CFG {
 
     Q_SHOW_ALL_MODS("ui.q.allmods", 7),
     Q_SHOW_SINGLE("ui.q.showsingle", true),
-    Q_MAX_SINGLE("ui.q.maxsingle", false);
+    Q_SINGLE_TYPE("ui.q.singletype", QualityList.SingleType.Average);
 
     private static final String CONFIG_JSON = "config.json";
     private static final Map<Object, Object> cfg;
@@ -55,7 +55,7 @@ public enum CFG {
 	cfg = tmp;
     }
 
-    public static interface Observer {
+    public interface Observer {
 	void updated(CFG cfg);
     }
 
@@ -66,6 +66,10 @@ public enum CFG {
 
     public Object val(){
 	return CFG.get(this);
+    }
+
+    public <T> T val(Class<T> type){
+	return CFG.get(this, type);
     }
 
     public boolean valb(){
@@ -108,6 +112,19 @@ public enum CFG {
 	}
     }
 
+    @SuppressWarnings({"unchecked", "UnusedParameters"})
+    public static synchronized <T> T get(CFG name, Class<T> type) {
+	Object val = get(name);
+	if(type.isAssignableFrom(val.getClass())) {
+	    return (T) val;
+	}
+	if(type.isEnum()){
+	    String ename = val.toString();
+	    return (T) Enum.valueOf((Class<Enum>) type, ename);
+	}
+	return (T) val;
+    }
+
     public static boolean getb(CFG name) {
 	return (Boolean) get(name);
     }
@@ -139,7 +156,7 @@ public enum CFG {
 	    }
 	}
 	if(cur instanceof Map) {
-	    Map<Object, Object> map = (Map) cur;
+	    Map<Object, Object> map = (Map<Object, Object>) cur;
 	    map.put(parts[parts.length - 1], value);
 	}
 	store();
