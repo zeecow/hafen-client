@@ -171,7 +171,16 @@ public class QualityList {
 	    }
 	};
 
+	private Tex tex;
+
 	public abstract Quality get(List<Quality> qualities);
+
+	public Tex tex(){
+	    if(tex == null){
+		tex = Text.render(name()).tex();
+	    }
+	    return tex;
+	}
 
 	private static boolean equal(List<Quality> qualities) {
 	    if(qualities.isEmpty()) {

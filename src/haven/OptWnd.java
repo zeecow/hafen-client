@@ -28,6 +28,7 @@ package haven;
 
 public class OptWnd extends Window {
     public static final Coord PANEL_POS = new Coord(220, 30);
+    public static final Coord Q_TYPE_PADDING = new Coord(3, 0);
     public final Panel main, video, audio;
     private final Panel display, general, camera, radar;
     public Panel current;
@@ -399,7 +400,7 @@ public class OptWnd extends Window {
 
 	    @Override
 	    protected void drawitem(GOut g, QualityList.SingleType item, int i) {
-		g.text(item.name(), Coord.z);
+		g.image(item.tex(), Q_TYPE_PADDING);
 	    }
 
 	    @Override
