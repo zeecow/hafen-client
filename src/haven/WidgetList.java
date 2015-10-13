@@ -128,7 +128,9 @@ public class WidgetList<T extends Widget> extends ListWidget<T> {
     public void change(T item) {
 	if(canselect) {
 	    super.change(item);
-	    selected(item);
+	    if(item != null){
+		selected(item);
+	    }
 	}
     }
 
