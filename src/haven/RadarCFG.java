@@ -177,7 +177,9 @@ public class RadarCFG {
 	    if(name == null) {
 		throw new RuntimeException();
 	    }
-	    cfg.name = config.getAttribute("name");
+	    if(config.hasAttribute("name")) {
+		cfg.name = config.getAttribute("name");
+	    }
 	    cfg.type = Match.valueOf(name);
 	    cfg.pattern = config.getAttribute(name);
 	    if(config.hasAttribute("show")) {
