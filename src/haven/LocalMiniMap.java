@@ -266,8 +266,8 @@ public class LocalMiniMap extends Widget {
 		    if(ptc == null)
 			continue;
 		    ptc = p2c(ptc);
-		    g.chcolor(m.col.getRed(), m.col.getGreen(), m.col.getBlue(), 255);
-		    g.image(MiniMap.plx.layer(Resource.imgc).tex(), ptc.add(MiniMap.plx.layer(Resource.negc).cc.inv()));
+		    g.chcolor(m.col);
+		    g.aimage(MiniMap.plx.layer(Resource.imgc).tex(), ptc, 0.5, 0.5);
 		    g.chcolor();
 		}
 	    }

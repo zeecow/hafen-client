@@ -121,6 +121,7 @@ public class Radar {
 	private final String resname;
 	private MarkerCFG cfg;
 	private Tex tex;
+	private boolean colored = false;
 
 	public Marker(Gob gob, String res) {
 	    super(gob);
@@ -129,7 +130,7 @@ public class Radar {
 	}
 
 	public Tex tex() {
-	    if(!cfg.visible()){
+	    if(!cfg.visible()) {
 		return null;
 	    }
 	    if(tex == null) {
@@ -137,11 +138,13 @@ public class Radar {
 		    GobIcon gi = gob.getattr(GobIcon.class);
 		    if(gi != null) {
 			tex = gi.tex();
-		    } else if(cfg.parent != null){
+		    } else if(cfg.parent != null) {
 			tex = cfg.parent.tex();
+			colored = true;
 		    }
 		} else {
 		    tex = cfg.tex();
+		    colored = cfg.icon.charAt(0) == '$';
 		}
 	    }
 	    return tex;
@@ -154,7 +157,7 @@ public class Radar {
 	    } else if(cfg != null) {
 		if(cfg.name != null) {
 		    return cfg.name;
-		} else if(full){
+		} else if(full) {
 		    return resname;
 		}
 	    }
@@ -165,8 +168,8 @@ public class Radar {
 	    KinInfo ki = gob.getattr(KinInfo.class);
 	    if(ki != null) {
 		return BuddyWnd.gc[ki.group % BuddyWnd.gc.length];
-//	    } else if(cfg != null && cfg.color != null) {
-//		return cfg.color;
+	    } else if(colored) {
+		return cfg.color();
 	    }
 	    return Color.WHITE;
 	}

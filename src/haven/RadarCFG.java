@@ -75,6 +75,13 @@ public class RadarCFG {
 
     private static Tex makeicon(String icon) {
 	Tex tex = null;
+	if(icon.charAt(0) == '$') {
+	    try {
+		tex = Symbols.valueOf(icon).tex;
+	    } catch(IllegalArgumentException e) {
+		tex = Symbols.DEFAULT.tex;
+	    }
+	}
 	try {
 	    Resource.Image img = loadres(icon).layer(Resource.imgc);
 
@@ -92,7 +99,7 @@ public class RadarCFG {
     }
 
     public static class Group {
-	public static final Tex DEF_TEX = Resource.loadtex("gfx/hud/mmap/o");
+	private final Color color;
 	public String name, icon;
 	public Boolean show = null;
 	public Integer priority = null;
@@ -101,6 +108,7 @@ public class RadarCFG {
 
 	public Group(Element config) {
 	    name = config.getAttribute("name");
+	    color = Utils.hex2color(config.getAttribute("color"), null);
 	    if(config.hasAttribute("icon")) {
 		icon = config.getAttribute("icon");
 	    }
@@ -127,6 +135,9 @@ public class RadarCFG {
 	    if(icon != null) {
 		el.setAttribute("icon", icon);
 	    }
+	    if(color != null) {
+		el.setAttribute("color", Utils.color2hex(color));
+	    }
 	    if(show != null) {
 		el.setAttribute("show", show.toString());
 	    }
@@ -145,10 +156,14 @@ public class RadarCFG {
 		if(icon != null) {
 		    tex = makeicon(icon);
 		} else {
-		    tex = DEF_TEX;
+		    tex = Symbols.DEFAULT.tex;
 		}
 	    }
 	    return tex;
+	}
+
+	public Color color() {
+	    return color != null ? color : Color.WHITE;
 	}
     }
 
@@ -161,6 +176,7 @@ public class RadarCFG {
 	public String icon = null;
 	public String name = null;
 	private Tex tex;
+	private Color color;
 
 	public static MarkerCFG parse(Element config, Group parent) {
 	    MarkerCFG cfg = new MarkerCFG();
@@ -180,6 +196,7 @@ public class RadarCFG {
 	    if(config.hasAttribute("name")) {
 		cfg.name = config.getAttribute("name");
 	    }
+	    cfg.color = Utils.hex2color(config.getAttribute("color"), null);
 	    cfg.type = Match.valueOf(name);
 	    cfg.pattern = config.getAttribute(name);
 	    if(config.hasAttribute("show")) {
@@ -229,6 +246,9 @@ public class RadarCFG {
 	    if(icon != null) {
 		el.setAttribute("icon", icon);
 	    }
+	    if(color != null) {
+		el.setAttribute("color", Utils.color2hex(color));
+	    }
 	    if(name != null) {
 		el.setAttribute("name", name);
 	    }
@@ -238,6 +258,10 @@ public class RadarCFG {
 	    if(priority != null) {
 		el.setAttribute("priority", priority.toString());
 	    }
+	}
+
+	public Color color() {
+	    return color != null ? color : parent.color();
 	}
     }
 
@@ -299,5 +323,22 @@ public class RadarCFG {
 	};
 
 	public abstract boolean match(String pattern, String target);
+    }
+
+    enum Symbols {
+	$circle("gfx/hud/mmap/symbols/circle"),
+	$diamond("gfx/hud/mmap/symbols/diamond"),
+	$dot("gfx/hud/mmap/symbols/dot"),
+	$down("gfx/hud/mmap/symbols/down"),
+	$pentagon("gfx/hud/mmap/symbols/pentagon"),
+	$square("gfx/hud/mmap/symbols/square"),
+	$up("gfx/hud/mmap/symbols/up");
+
+	public final Tex tex;
+	public static final Symbols DEFAULT = $circle;
+
+	Symbols(String res) {
+	    tex = Resource.loadtex(res);
+	}
     }
 }
