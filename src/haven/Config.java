@@ -64,7 +64,7 @@ public class Config {
 	    authck = Utils.hex2byte(p);
 
 	loadBuildVersion();
-	isUpdate = !CFG.VERSION.val().equals(version) || !getFile("changelog.txt").exists();
+	isUpdate = !CFG.VERSION.get().equals(version) || !getFile("changelog.txt").exists();
 	if(isUpdate){
 	    CFG.VERSION.set(version);
 	}

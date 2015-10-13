@@ -606,7 +606,7 @@ public class CharWnd extends Window {
 	private StudyInfo(Coord sz, final Inventory study) {
 	    super(sz);
 	    this.study = study;
-	    study.locked = CFG.LOCK_STUDY.valb();
+	    study.locked = CFG.LOCK_STUDY.get();
 	    add(new Label("Attention:"), 2, 2);
 	    add(new Label("Experience cost:"), 2, 32);
 	    add(new Button(82, study.locked ? "Unlock study" : "Lock study") {

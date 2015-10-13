@@ -155,7 +155,7 @@ public class ChatUI extends Widget {
 	    private final Text t;
 	    
 	    public SimpleMessage(String text, Color col, int w) {
-		if(CFG.SHOW_CHAT_TIMESTAMP.valb()){
+		if(CFG.SHOW_CHAT_TIMESTAMP.get()){
 		    text = Utils.timestamp(text);
 		}
 		if(col == null)
@@ -242,7 +242,7 @@ public class ChatUI extends Widget {
 		if(b)
 		    sb.val = sb.max;
 	    }
-	    if(CFG.STORE_CHAT_LOGS.valb()) {
+	    if(CFG.STORE_CHAT_LOGS.get()) {
 		log(msg);
 	    }
 	}
@@ -749,7 +749,7 @@ public class ChatUI extends Widget {
 		String nm = (b == null)?"???":(b.name);
 		if((r == null) || !nm.equals(cn)) {
 		    String line = RichText.Parser.quote(String.format("%s: %s", nm, text));
-		    if(CFG.SHOW_CHAT_TIMESTAMP.valb()) {
+		    if(CFG.SHOW_CHAT_TIMESTAMP.get()) {
 			line = Utils.timestamp(line);
 		    }
 		    r = fnd.render(line, w, TextAttribute.FOREGROUND, col);

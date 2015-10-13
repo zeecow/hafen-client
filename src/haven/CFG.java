@@ -3,42 +3,45 @@ package haven;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
+import haven.QualityList.SingleType;
 
 import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Map;
 
-public enum CFG {
-    VERSION("version",""),
-    DISPLAY_KINNAMES("display.kinnames", Utils.getprefb("showkinnames", true)),
-    DISPLAY_FLAVOR("display.flavor", Utils.getprefb("showflavor", true)),
-    DISPLAY_GOB_HEALTH("display.gob_health", false),
-    STORE_MAP("general.storemap", Utils.getprefb("storemap", false)),
-    SHOW_CHAT_TIMESTAMP("ui.chat.timestamp", true),
-    STORE_CHAT_LOGS("ui.chat.logs", false),
-    LOCK_STUDY("ui.lock_study", false),
-    MMAP_FLOAT("ui.mmapfloat", false),
-    MMAP_VIEW("ui.mmap_view", false),
-    MMAP_GRID("ui.mmap_grid", false),
-    MENU_SINGLE_CTRL_CLICK("ui.menu_single_ctrl_click", true),
+public class CFG<T> {
+    public static final CFG<String> VERSION = new CFG<>("version", "");
+    public static final CFG<Boolean> DISPLAY_KINNAMES = new CFG<Boolean>("display.kinnames", true);
+    public static final CFG<Boolean> DISPLAY_FLAVOR = new CFG<Boolean>("display.flavor", true);
+    public static final CFG<Boolean> DISPLAY_GOB_HEALTH = new CFG<Boolean>("display.gob_health", false);
+    public static final CFG<Boolean> STORE_MAP = new CFG<Boolean>("general.storemap", false);
+    public static final CFG<Boolean> SHOW_CHAT_TIMESTAMP = new CFG<Boolean>("ui.chat.timestamp", true);
+    public static final CFG<Boolean> STORE_CHAT_LOGS = new CFG<Boolean>("ui.chat.logs", false);
+    public static final CFG<Boolean> LOCK_STUDY = new CFG<Boolean>("ui.lock_study", false);
+    public static final CFG<Boolean> MMAP_FLOAT = new CFG<Boolean>("ui.mmapfloat", false);
+    public static final CFG<Boolean> MMAP_VIEW = new CFG<Boolean>("ui.mmap_view", false);
+    public static final CFG<Boolean> MMAP_GRID = new CFG<Boolean>("ui.mmap_grid", false);
+    public static final CFG<Boolean> MENU_SINGLE_CTRL_CLICK = new CFG<Boolean>("ui.menu_single_ctrl_click", true);
 
-    SHOW_ITEM_DURABILITY("ui.item_durability", false),
-    SHOW_ITEM_WEAR_BAR("ui.item_wear_bar", true),
-    SHOW_ITEM_ARMOR("ui.item_armor", false),
+    public static final CFG<Boolean> SHOW_ITEM_DURABILITY = new CFG<Boolean>("ui.item_durability", false);
+    public static final CFG<Boolean> SHOW_ITEM_WEAR_BAR = new CFG<Boolean>("ui.item_wear_bar", true);
+    public static final CFG<Boolean> SHOW_ITEM_ARMOR = new CFG<Boolean>("ui.item_armor", false);
 
-    CAMERA_BRIGHT("camera.bright", 0f),
+    public static final CFG<Float> CAMERA_BRIGHT = new CFG<Float>("camera.bright", 0f);
 
-    Q_SHOW_ALL_MODS("ui.q.allmods", 7),
-    Q_SHOW_SINGLE("ui.q.showsingle", true),
-    Q_SINGLE_TYPE("ui.q.singletype", QualityList.SingleType.Average);
+    public static final CFG<Boolean> Q_SHOW_ALL_SHIFT = new CFG<Boolean>("ui.q.allmods_shift", true);
+    public static final CFG<Boolean> Q_SHOW_ALL_ALT = new CFG<Boolean>("ui.q.allmods_alt", true);
+    public static final CFG<Boolean> Q_SHOW_ALL_CTRL = new CFG<Boolean>("ui.q.allmods_ctrl", true);
+    public static final CFG<Boolean> Q_SHOW_SINGLE = new CFG<Boolean>("ui.q.showsingle", true);
+    public static final CFG<SingleType> Q_SINGLE_TYPE = new CFG<SingleType>("ui.q.singletype", SingleType.Average);
 
     private static final String CONFIG_JSON = "config.json";
     private static final Map<Object, Object> cfg;
     private static final Map<String, Object> cache = new HashMap<String, Object>();
     private static final Gson gson;
     private final String path;
-    public final Object def;
-    private Observer observer;
+    public final T def;
+    private Observer<T> observer;
 
     static {
 	gson = (new GsonBuilder()).setPrettyPrinting().create();
@@ -47,103 +50,72 @@ public enum CFG {
 	    Type type = new TypeToken<Map<Object, Object>>() {
 	    }.getType();
 	    tmp = gson.fromJson(Config.loadFile(CONFIG_JSON), type);
-	} catch(Exception ignored) {
+	} catch (Exception ignored) {
 	}
-	if(tmp == null){
+	if(tmp == null) {
 	    tmp = new HashMap<Object, Object>();
 	}
 	cfg = tmp;
     }
 
-    public interface Observer {
-	void updated(CFG cfg);
+    public interface Observer<T> {
+	void updated(CFG<T> cfg);
     }
 
-    CFG(String path, Object def) {
+    CFG(String path, T def) {
 	this.path = path;
 	this.def = def;
     }
 
-    public Object val(){
+    public T get() {
 	return CFG.get(this);
     }
 
-    public <T> T val(Class<T> type){
-	return CFG.get(this, type);
-    }
-
-    public boolean valb(){
-	return CFG.getb(this);
-    }
-
-    public int vali() {
-	return CFG.geti(this);
-    }
-
-    public float valf() {
-	return CFG.getf(this);
-    }
-
-    public void set(Object value){
+    public void set(T value) {
 	CFG.set(this, value);
-	if(observer != null){
+	if(observer != null) {
 	    observer.updated(this);
 	}
     }
 
-    public void set(Object value, boolean observe){
+    public void set(T value, boolean observe) {
 	set(value);
-	if(observe && observer != null){
+	if(observe && observer != null) {
 	    observer.updated(this);
 	}
     }
 
-    public void setObserver(Observer observer){
+    public void setObserver(Observer<T> observer) {
 	this.observer = observer;
     }
 
-    public static synchronized Object get(CFG name) {
-	if(cache.containsKey(name.path)) {
-	    return cache.get(name.path);
-	} else {
-	    Object value = retrieve(name);
-	    cache.put(name.path, value);
-	    return value;
+    @SuppressWarnings("unchecked")
+    public static synchronized <E> E get(CFG<E> name) {
+	E value = name.def;
+	try {
+	    if(cache.containsKey(name.path)) {
+		return (E) cache.get(name.path);
+	    } else {
+		Object data = retrieve(name);
+		if(name.def.getClass().isAssignableFrom(data.getClass())) {
+		    value = (E) data;
+		} else if(name.def.getClass().isEnum()) {
+		    value = (E) Enum.valueOf((Class<Enum>) name.def.getClass(), data.toString());
+		}
+		cache.put(name.path, value);
+	    }
+	} catch (Exception ignored) {
 	}
-    }
-
-    @SuppressWarnings({"unchecked", "UnusedParameters"})
-    public static synchronized <T> T get(CFG name, Class<T> type) {
-	Object val = get(name);
-	if(type.isAssignableFrom(val.getClass())) {
-	    return (T) val;
-	}
-	if(type.isEnum()){
-	    String ename = val.toString();
-	    return (T) Enum.valueOf((Class<Enum>) type, ename);
-	}
-	return (T) val;
-    }
-
-    public static boolean getb(CFG name) {
-	return (Boolean) get(name);
-    }
-
-    public static int geti(CFG name) {
-	return  ((Number)get(name)).intValue();
-    }
-
-    public static float getf(CFG name) {
-	return  ((Number)get(name)).floatValue();
+	return value;
     }
 
     @SuppressWarnings("unchecked")
-    public static synchronized void set(CFG name, Object value) {
+    public static synchronized <E> void set(CFG<E> name, E value) {
 	cache.put(name.path, value);
 	String[] parts = name.path.split("\\.");
 	int i;
 	Object cur = cfg;
-	for(i = 0; i < parts.length - 1; i++) {
+	for (i = 0; i < parts.length - 1; i++) {
 	    String part = parts[i];
 	    if(cur instanceof Map) {
 		Map<Object, Object> map = (Map<Object, Object>) cur;
@@ -169,7 +141,7 @@ public enum CFG {
     private static Object retrieve(CFG name) {
 	String[] parts = name.path.split("\\.");
 	Object cur = cfg;
-	for(String part : parts) {
+	for (String part : parts) {
 	    if(cur instanceof Map) {
 		Map map = (Map) cur;
 		if(map.containsKey(part)) {

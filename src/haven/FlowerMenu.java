@@ -230,7 +230,7 @@ public class FlowerMenu extends Widget {
 	    Petal p = add(new Petal(name));
 	    p.num = i;
 	    boolean auto = AUTOCHOOSE.containsKey(name) && AUTOCHOOSE.get(name);
-	    boolean single = ui.modctrl && options.length == 1 && CFG.MENU_SINGLE_CTRL_CLICK.valb();
+	    boolean single = ui.modctrl && options.length == 1 && CFG.MENU_SINGLE_CTRL_CLICK.get();
 	    if(!ui.modshift && (auto || single)){
 		autochoose = p;
 	    }

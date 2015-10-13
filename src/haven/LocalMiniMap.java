@@ -240,14 +240,14 @@ public class LocalMiniMap extends Widget {
 		    Coord tc = map.ul.sub(center).add(hsz);
 		    //g.image(MiniMap.bg, tc);
 		    g.image(map.img, tc);
-		    if(CFG.MMAP_GRID.valb()) {
+		    if(CFG.MMAP_GRID.get()) {
 			g.image(mapgrid, tc);
 		    }
 
 		}
 	    }
 	}
-	if(CFG.MMAP_VIEW.valb()) {
+	if(CFG.MMAP_VIEW.get()) {
 	    Gob pl = ui.sess.glob.oc.getgob(mv.plgob);
 	    if(pl != null) {
 		g.aimage(viewbox, p2c(pl.rc), 0.5, 0.5);

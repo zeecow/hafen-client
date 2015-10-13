@@ -26,8 +26,6 @@
 
 package haven;
 
-import java.awt.*;
-
 public class OptWnd extends Window {
     public static final Coord PANEL_POS = new Coord(220, 30);
     public final Panel main, video, audio;
@@ -303,7 +301,7 @@ public class OptWnd extends Window {
 		    ui.sess.glob.brighten();
 		}
 	    }
-	}, x, y).val = (int) (1000 * CFG.CAMERA_BRIGHT.valf());
+	}, x, y).val = (int) (1000 * CFG.CAMERA_BRIGHT.get());
 
 	my = Math.max(my, y);
 	x += 250;
@@ -354,9 +352,9 @@ public class OptWnd extends Window {
 	y += 25;
 	display.add(new CFGBox("Undock minimap", CFG.MMAP_FLOAT) {
 	    {
-		CFG.MMAP_FLOAT.setObserver(new CFG.Observer() {
+		CFG.MMAP_FLOAT.setObserver(new CFG.Observer<Boolean>() {
 		    @Override
-		    public void updated(CFG cfg) {
+		    public void updated(CFG<Boolean> cfg) {
 			update(cfg);
 		    }
 		});
@@ -376,8 +374,8 @@ public class OptWnd extends Window {
 		super.destroy();
 	    }
 
-	    private void update(CFG cfg) {
-		a = cfg.valb();
+	    private void update(CFG<Boolean> cfg) {
+		a = cfg.get();
 	    }
 
 	}, new Coord(x, y));
@@ -412,52 +410,16 @@ public class OptWnd extends Window {
 		}
 	    }
 	}, tx + 5, y);
-	dropbox.sel = CFG.Q_SINGLE_TYPE.val(QualityList.SingleType.class);
+	dropbox.sel = CFG.Q_SINGLE_TYPE.get();
 
 	y += 30;
-	display.add(new CFGBox("Show all qualities on SHIFT", CFG.Q_SHOW_ALL_MODS) {
-	    @Override
-	    protected void defval() {
-		a = Utils.checkbit(cfg.vali(), 0);
-	    }
-
-	    @Override
-	    public void set(boolean a) {
-		this.a = a;
-		cfg.set(Utils.setbit(cfg.vali(), 0, a));
-
-	    }
-	}, new Coord(x, y));
+	display.add(new CFGBox("Show all qualities on SHIFT", CFG.Q_SHOW_ALL_SHIFT), x, y);
 
 	y += 25;
-	display.add(new CFGBox("Show all qualities on CTRL", CFG.Q_SHOW_ALL_MODS) {
-	    @Override
-	    protected void defval() {
-		a = Utils.checkbit(cfg.vali(), 1);
-	    }
-
-	    @Override
-	    public void set(boolean a) {
-		this.a = a;
-		cfg.set(Utils.setbit(cfg.vali(), 1, a));
-
-	    }
-	}, new Coord(x, y));
+	display.add(new CFGBox("Show all qualities on CTRL", CFG.Q_SHOW_ALL_CTRL), x, y);
 
 	y += 25;
-	display.add(new CFGBox("Show all qualities on ALT", CFG.Q_SHOW_ALL_MODS) {
-	    @Override
-	    protected void defval() {
-		a = Utils.checkbit(cfg.vali(), 2);
-	    }
-
-	    @Override
-	    public void set(boolean a) {
-		this.a = a;
-		cfg.set(Utils.setbit(cfg.vali(), 2, a));
-
-	    }
-	}, new Coord(x, y));
+	display.add(new CFGBox("Show all qualities on ALT", CFG.Q_SHOW_ALL_ALT), x, y);
 
 	y += 35;
 	display.add(new CFGBox("Show item durability", CFG.SHOW_ITEM_DURABILITY), new Coord(x, y));
@@ -530,13 +492,13 @@ public class OptWnd extends Window {
 
     private static class CFGBox extends CheckBox {
 
-	protected final CFG cfg;
+	protected final CFG<Boolean> cfg;
 
-	public CFGBox(String lbl, CFG cfg) {
+	public CFGBox(String lbl, CFG<Boolean> cfg) {
 	    this(lbl, cfg, null);
 	}
 
-	public CFGBox(String lbl, CFG cfg, String tip) {
+	public CFGBox(String lbl, CFG<Boolean> cfg, String tip) {
 	    super(lbl);
 
 	    this.cfg = cfg;
@@ -547,7 +509,7 @@ public class OptWnd extends Window {
 	}
 
 	protected void defval() {
-	    a = cfg.valb();
+	    a = cfg.get();
 	}
 
 	@Override

@@ -456,7 +456,7 @@ public class MCache {
 		}
 	    }
 	}
-	if(CFG.STORE_MAP.valb() && g != null) {
+	if(CFG.STORE_MAP.get() && g != null) {
 	    MapDumper.dump(this, g);
 	}
     }

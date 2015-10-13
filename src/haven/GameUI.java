@@ -150,7 +150,7 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 	opts.hide();
 	zerg = add(new Zergwnd(), 187, 50);
 	zerg.hide();
-	showmmappanel(CFG.MMAP_FLOAT.valb());
+	showmmappanel(CFG.MMAP_FLOAT.get());
     }
 
     private void mapbuttons() {

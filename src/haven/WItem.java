@@ -260,7 +260,7 @@ public class WItem extends Widget implements DTarget {
     private void drawbars(GOut g, Coord sz) {
 	float bar = 0f;
 
-	if(CFG.SHOW_ITEM_WEAR_BAR.valb() && this.wear.get() != null) {
+	if(CFG.SHOW_ITEM_WEAR_BAR.get() && this.wear.get() != null) {
 	    ItemInfo.Wear wear = this.wear.get();
 	    if(wear.a > 0) {
 		bar = (float) (wear.b - wear.a) / wear.b;
@@ -283,9 +283,9 @@ public class WItem extends Widget implements DTarget {
 	    g.aimage(itemnum.get(), sz, 1, 1);
 	} else if(heurnum.get() != null) {
 	    g.aimage(heurnum.get(), sz, 1, 1);
-	} else if(CFG.SHOW_ITEM_ARMOR.valb() && armor.get() != null) {
+	} else if(CFG.SHOW_ITEM_ARMOR.get() && armor.get() != null) {
 	    g.aimage(armor.get(), sz, 1, 1);
-	} else if(CFG.SHOW_ITEM_DURABILITY.valb() && durability.get() != null) {
+	} else if(CFG.SHOW_ITEM_DURABILITY.get() && durability.get() != null) {
 	    g.aimage(durability.get(), sz, 1, 1);
 	}
     }
@@ -294,9 +294,9 @@ public class WItem extends Widget implements DTarget {
 	QualityList quality = itemq.get();
 	if(quality != null) {
 	    Tex tex = null;
-	    if((ui.modflags() & CFG.Q_SHOW_ALL_MODS.vali()) != 0) {
+	    if(showAllQ()) {
 		tex = quality.tex();
-	    } else if(!quality.isEmpty() && CFG.Q_SHOW_SINGLE.valb()) {
+	    } else if(!quality.isEmpty() && CFG.Q_SHOW_SINGLE.get()) {
 		QualityList.Quality single = quality.single();
 		if(single != null) {
 		    tex = single.tex();
@@ -307,6 +307,12 @@ public class WItem extends Widget implements DTarget {
 		g.aimage(tex, Q_POS.add(sz.x, 0), 1, 0);
 	    }
 	}
+    }
+
+    private boolean showAllQ(){
+	return (CFG.Q_SHOW_ALL_SHIFT.get() && ui.modshift) ||
+	    (CFG.Q_SHOW_ALL_CTRL.get() && ui.modctrl) ||
+	    (CFG.Q_SHOW_ALL_ALT.get() && ui.modmeta);
     }
     
     public boolean mousedown(Coord c, int btn) {

@@ -450,7 +450,7 @@ public class MapView extends PView implements DTarget, Console.Directory {
 			Coord pc = cc.add(o).mul(MCache.cutsz).mul(tilesz);
 			MapMesh cut = glob.map.getcut(cc.add(o));
 			rl.add(cut, Location.xlate(new Coord3f(pc.x, -pc.y, 0)));
-			if(CFG.DISPLAY_FLAVOR.valb()) {
+			if(CFG.DISPLAY_FLAVOR.get()) {
 			    Collection<Gob> fol;
 			    try {
 				fol = glob.map.getfo(cc.add(o));

@@ -49,7 +49,7 @@ public class QualityList {
     }
 
     public Quality single() {
-	return singles.get(CFG.Q_SINGLE_TYPE.val(SingleType.class));
+	return singles.get(CFG.Q_SINGLE_TYPE.get());
     }
 
     public Tex tex() {
