@@ -33,6 +33,7 @@ public abstract class Dropbox<T> extends ListWidget<T> {
     public final int listh;
     private final Coord dropc;
     private Droplist dl;
+    public Color bgcolor = new Color(20, 20, 20, 214);
 
     public Dropbox(int w, int listh, int itemh) {
 	super(new Coord(w, itemh), itemh);
@@ -42,12 +43,21 @@ public abstract class Dropbox<T> extends ListWidget<T> {
 
     private class Droplist extends Listbox<T> {
 	private UI.Grab grab = null;
+	private boolean risen = false;
 
 	private Droplist() {
 	    super(Dropbox.this.sz.x, Math.min(listh, Dropbox.this.listitems()), Dropbox.this.itemh);
 	    sel = Dropbox.this.sel;
 	    Dropbox.this.ui.root.add(this, Dropbox.this.rootpos().add(0, Dropbox.this.sz.y));
 	    grab = ui.grabmouse(this);
+	}
+
+	@Override
+	public void tick(double dt) {
+	    if(!risen){
+		risen = true;
+		raise();
+	    }
 	}
 
 	protected T listitem(int i) {return(Dropbox.this.listitem(i));}
@@ -75,9 +85,11 @@ public abstract class Dropbox<T> extends ListWidget<T> {
     }
 
     public void draw(GOut g) {
-	g.chcolor(Color.BLACK);
-	g.frect(Coord.z, sz);
-	g.chcolor();
+	if(bgcolor != null){
+	    g.chcolor(bgcolor);
+	    g.frect(Coord.z, sz);
+	    g.chcolor();
+	}
 	if(sel != null)
 	    drawitem(g.reclip(Coord.z, new Coord(sz.x - drop.sz().x, itemh)), sel, 0);
 	g.image(drop, dropc);
@@ -89,6 +101,7 @@ public abstract class Dropbox<T> extends ListWidget<T> {
 	    return(true);
 	if((dl == null) && (btn == 1)) {
 	    dl = new Droplist();
+	    dl.bgcolor = bgcolor;
 	    return(true);
 	}
 	return(true);
