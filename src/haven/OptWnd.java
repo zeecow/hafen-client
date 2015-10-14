@@ -381,6 +381,9 @@ public class OptWnd extends Window {
 
 	}, new Coord(x, y));
 
+	y += 25;
+	display.add(new CFGBox("Swap item quality and number", CFG.SWAP_NUM_AND_Q), x, y);
+
 	my = Math.max(my, y);
 	x += 250;
 	y = 0;

@@ -34,7 +34,7 @@ import static haven.Inventory.sqsz;
 
 public class WItem extends Widget implements DTarget {
     public static final Resource missing = Resource.local().loadwait("gfx/invobjs/missing");
-    public static final Coord Q_POS = new Coord(0, -3);
+    public static final Coord TEXT_PADD_TOP = new Coord(0, -3), TEXT_PADD_BOT = new Coord(0, 2);
     public static final Color DURABILITY_COLOR = new Color(214, 253, 255);
     public static final Color ARMOR_COLOR = new Color(255, 227, 191);
     public final GItem item;
@@ -195,6 +195,11 @@ public class WItem extends Widget implements DTarget {
     };
 
     public final AttrCache<Tex> durability = new AttrCache<Tex>() {
+	@Override
+	public Tex get() {
+	    return CFG.SHOW_ITEM_DURABILITY.get() ? super.get() : null;
+	}
+
 	protected Tex find(List<ItemInfo> info) {
 	    ItemInfo.Wear wear = ItemInfo.getWear(info);
 	    if(wear == null) return (null);
@@ -209,6 +214,11 @@ public class WItem extends Widget implements DTarget {
     };
 
     public final AttrCache<Tex> armor = new AttrCache<Tex>() {
+	@Override
+	public Tex get() {
+	    return CFG.SHOW_ITEM_ARMOR.get() ? super.get() : null;
+	}
+
 	protected Tex find(List<ItemInfo> info) {
 	    ItemInfo.Wear wear = ItemInfo.getArmor(info);
 	    if(wear == null) return (null);
@@ -277,17 +287,30 @@ public class WItem extends Widget implements DTarget {
     }
 
     private void drawnum(GOut g, Coord sz) {
+	Tex tex;
 	if(item.num >= 0) {
-	    g.atext(Integer.toString(item.num), sz, 1, 1);
-	} else if(itemnum.get() != null) {
-	    g.aimage(itemnum.get(), sz, 1, 1);
-	} else if(heurnum.get() != null) {
-	    g.aimage(heurnum.get(), sz, 1, 1);
-	} else if(CFG.SHOW_ITEM_ARMOR.get() && armor.get() != null) {
-	    g.aimage(armor.get(), sz, 1, 1);
-	} else if(CFG.SHOW_ITEM_DURABILITY.get() && durability.get() != null) {
-	    g.aimage(durability.get(), sz, 1, 1);
+	    tex = Text.render(Integer.toString(item.num)).tex();
+	} else {
+	    tex = chainattr(itemnum, heurnum, armor, durability);
 	}
+	if(tex != null) {
+	    if(CFG.SWAP_NUM_AND_Q.get()) {
+		g.aimage(tex, TEXT_PADD_TOP.add(sz.x, 0), 1, 0);
+	    } else {
+		g.aimage(tex, TEXT_PADD_BOT.add(sz), 1, 1);
+	    }
+	}
+    }
+
+    @SafeVarargs //actually, method just assumes you'll feed it correctly typed var args
+    private static Tex chainattr(AttrCache<Tex> ...attrs){
+	for(AttrCache<Tex> attr : attrs){
+	    Tex tex = attr.get();
+	    if(tex != null){
+		return tex;
+	    }
+	}
+	return null;
     }
 
     private void drawq(GOut g) {
@@ -304,7 +327,11 @@ public class WItem extends Widget implements DTarget {
 	    }
 
 	    if(tex != null) {
-		g.aimage(tex, Q_POS.add(sz.x, 0), 1, 0);
+		if(CFG.SWAP_NUM_AND_Q.get()) {
+		    g.aimage(tex, TEXT_PADD_BOT.add(sz), 1, 1);
+		} else {
+		    g.aimage(tex, TEXT_PADD_TOP.add(sz.x, 0), 1, 0);
+		}
 	    }
 	}
     }
