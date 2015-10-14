@@ -254,16 +254,26 @@ public class WItem extends Widget implements DTarget {
 	    drawmain(g, spr);
 	    g.defstate();
 	    drawnum(g, sz);
-	    if(item.meter > 0) {
-		double a = ((double)item.meter) / 100.0;
+	    drawmeter(g, sz);
+	    drawq(g);
+	} else {
+	    g.image(missing.layer(Resource.imgc).tex(), Coord.z, sz);
+	}
+    }
+
+    private void drawmeter(GOut g, Coord sz) {
+	if(item.meter > 0) {
+	    if(CFG.PROGRESS_NUMBER.get()) {
+		Tex tex = Text.renderstroked(String.format("%d%%", item.meter)).tex();
+		g.aimage(tex, sz.div(2), 0.5, 0.5);
+		tex.dispose();
+	    } else {
+		double a = ((double) item.meter) / 100.0;
 		g.chcolor(255, 255, 255, 64);
 		Coord half = sz.div(2);
 		g.prect(half, half.inv(), half, a * Math.PI * 2);
 		g.chcolor();
 	    }
-	    drawq(g);
-	} else {
-	    g.image(missing.layer(Resource.imgc).tex(), Coord.z, sz);
 	}
     }
 

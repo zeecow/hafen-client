@@ -27,6 +27,7 @@ public class CFG<T> {
     public static final CFG<Boolean> SHOW_ITEM_WEAR_BAR = new CFG<Boolean>("ui.item_wear_bar", true);
     public static final CFG<Boolean> SHOW_ITEM_ARMOR = new CFG<Boolean>("ui.item_armor", false);
     public static final CFG<Boolean> SWAP_NUM_AND_Q = new CFG<Boolean>("ui.swap_num_and_q", false);
+    public static final CFG<Boolean> PROGRESS_NUMBER = new CFG<Boolean>("ui.progress_number", false);
 
     public static final CFG<Float> CAMERA_BRIGHT = new CFG<Float>("camera.bright", 0f);
 
