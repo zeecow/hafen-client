@@ -1,3 +1,13 @@
+$size[14]{$u{Update for 15.10.15:}
+  * added option to show biome name on minimap. If mouse is over minimap it shows name of biome it is over, otherwise it shows biome player is in.
+  * sort wounds by size if names are equal
+  * stop gap fix IndexOutOfBoundsException: Required 1 remaining elements in buffer, only had 0
+  * fixed options for brightness and quality type not reading properly
+  * don't show tooltips or react to clicks on player gob on minimap
+  * added option to show item progress as number
+  * added option to swap item quality and number
+  * by default take all items from a stockpile
+ 
 $size[14]{$u{Update for 14.10.15:}
   * added more options how to display single quality (average, max, min, E/S/V)
   * reworked radar and added ui to configure it
