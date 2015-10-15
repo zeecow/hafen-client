@@ -76,6 +76,8 @@ public class BGL {
 	for(int i = 0; i < n; i++) {
 	    try {
 		list[i].run(gl);
+	    } catch (IndexOutOfBoundsException e){
+		e.printStackTrace();
 	    } catch(Exception exc) {
 		throw(new BGLException(this, list[i], exc));
 	    }
