@@ -38,6 +38,7 @@ public class LocalMiniMap extends Widget {
     private static final Tex viewbox = Resource.loadtex("gfx/hud/mmap/viewbox");
     private static final Tex mapgrid = Resource.loadtex("gfx/hud/mmap/mapgrid");
     public final MapView mv;
+    private final Label biome;
     private Coord cc = null;
     private final Map<Coord, Defer.Future<MapTile>> cache = new LinkedHashMap<Coord, Defer.Future<MapTile>>(5, 0.75f, true) {
 	protected boolean removeEldestEntry(Map.Entry<Coord, Defer.Future<MapTile>> eldest) {
@@ -129,6 +130,7 @@ public class LocalMiniMap extends Widget {
     public LocalMiniMap(Coord sz, MapView mv) {
 	super(sz);
 	this.mv = mv;
+	this.biome = add(new Label("Biome:",100));
     }
     
     public Coord p2c(Coord pc) {
@@ -202,6 +204,25 @@ public class LocalMiniMap extends Widget {
 	    return;
 	}
 	this.cc = pl.rc.div(tilesz);
+
+	Coord mc = rootxlate(ui.mc);
+	if(mc.isect(Coord.z, sz)) {
+	    setBiome(c2p(mc).div(tilesz));
+	} else {
+	    setBiome(cc);
+	}
+    }
+
+    private void setBiome(Coord c) {
+	try {
+	    int t = mv.ui.sess.glob.map.gettile(c);
+	    Resource r = ui.sess.glob.map.tilesetr(t);
+	    if(r != null) {
+		biome.settext(r.name);
+	    } else {
+		biome.settext("nil");
+	    }
+	}catch (Loading ignored){}
     }
 
     public void draw(GOut g) {
@@ -276,6 +297,7 @@ public class LocalMiniMap extends Widget {
 	    }
 	} catch (Loading ignored) {
 	}
+	biome.draw(g);
     }
 
     public boolean mousedown(Coord c, int button) {
