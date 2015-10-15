@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import haven.QualityList.SingleType;
+import me.ender.Reflect;
 
 import java.lang.reflect.Type;
 import java.util.HashMap;
@@ -99,15 +100,21 @@ public class CFG<T> {
 		return (E) cache.get(name.path);
 	    } else {
 		Object data = retrieve(name);
-		if(name.def.getClass().isAssignableFrom(data.getClass())) {
+		Class<?> defClass = name.def.getClass();
+		if(defClass.isAssignableFrom(data.getClass())) {
 		    value = (E) data;
-		} else if(name.def.getClass().isEnum()) {
-		    value = (E) Enum.valueOf((Class<Enum>) name.def.getClass(), data.toString());
+		} else if(Number.class.isAssignableFrom(defClass)) {
+		    Number n = (Number) data;
+		    value = (E) defClass.getConstructor(String.class).newInstance(n.toString());
+		} else if(Enum.class.isAssignableFrom(defClass)) {
+		    Class<? extends Enum> enumType = Reflect.getEnumSuperclass(defClass);
+		    if(enumType != null) {
+			value = (E) Enum.valueOf(enumType, data.toString());
+		    }
 		}
 		cache.put(name.path, value);
 	    }
-	} catch (Exception ignored) {
-	}
+	} catch (Exception ignored) {}
 	return value;
     }
 

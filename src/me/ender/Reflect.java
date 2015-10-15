@@ -51,4 +51,11 @@ public class Reflect {
 	}
 	return false;
     }
+
+    public static Class getEnumSuperclass(Class c){
+	while(c != null && !c.isEnum()){
+	    c = c.getSuperclass();
+	}
+	return c;
+    }
 }
