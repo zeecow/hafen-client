@@ -12,36 +12,36 @@ import java.util.Map;
 
 public class CFG<T> {
     public static final CFG<String> VERSION = new CFG<>("version", "");
-    public static final CFG<Boolean> DISPLAY_KINNAMES = new CFG<Boolean>("display.kinnames", true);
-    public static final CFG<Boolean> DISPLAY_FLAVOR = new CFG<Boolean>("display.flavor", true);
-    public static final CFG<Boolean> DISPLAY_GOB_HEALTH = new CFG<Boolean>("display.gob_health", false);
-    public static final CFG<Boolean> STORE_MAP = new CFG<Boolean>("general.storemap", false);
-    public static final CFG<Boolean> SHOW_CHAT_TIMESTAMP = new CFG<Boolean>("ui.chat.timestamp", true);
-    public static final CFG<Boolean> STORE_CHAT_LOGS = new CFG<Boolean>("ui.chat.logs", false);
-    public static final CFG<Boolean> LOCK_STUDY = new CFG<Boolean>("ui.lock_study", false);
-    public static final CFG<Boolean> MMAP_FLOAT = new CFG<Boolean>("ui.mmapfloat", false);
-    public static final CFG<Boolean> MMAP_VIEW = new CFG<Boolean>("ui.mmap_view", false);
-    public static final CFG<Boolean> MMAP_GRID = new CFG<Boolean>("ui.mmap_grid", false);
-    public static final CFG<Boolean> MMAP_SHOW_BIOMES = new CFG<Boolean>("ui.mmap_biomes", true);
-    public static final CFG<Boolean> MENU_SINGLE_CTRL_CLICK = new CFG<Boolean>("ui.menu_single_ctrl_click", true);
+    public static final CFG<Boolean> DISPLAY_KINNAMES = new CFG<>("display.kinnames", true);
+    public static final CFG<Boolean> DISPLAY_FLAVOR = new CFG<>("display.flavor", true);
+    public static final CFG<Boolean> DISPLAY_GOB_HEALTH = new CFG<>("display.gob_health", false);
+    public static final CFG<Boolean> STORE_MAP = new CFG<>("general.storemap", false);
+    public static final CFG<Boolean> SHOW_CHAT_TIMESTAMP = new CFG<>("ui.chat.timestamp", true);
+    public static final CFG<Boolean> STORE_CHAT_LOGS = new CFG<>("ui.chat.logs", false);
+    public static final CFG<Boolean> LOCK_STUDY = new CFG<>("ui.lock_study", false);
+    public static final CFG<Boolean> MMAP_FLOAT = new CFG<>("ui.mmapfloat", false);
+    public static final CFG<Boolean> MMAP_VIEW = new CFG<>("ui.mmap_view", false);
+    public static final CFG<Boolean> MMAP_GRID = new CFG<>("ui.mmap_grid", false);
+    public static final CFG<Boolean> MMAP_SHOW_BIOMES = new CFG<>("ui.mmap_biomes", true);
+    public static final CFG<Boolean> MENU_SINGLE_CTRL_CLICK = new CFG<>("ui.menu_single_ctrl_click", true);
 
-    public static final CFG<Boolean> SHOW_ITEM_DURABILITY = new CFG<Boolean>("ui.item_durability", false);
-    public static final CFG<Boolean> SHOW_ITEM_WEAR_BAR = new CFG<Boolean>("ui.item_wear_bar", true);
-    public static final CFG<Boolean> SHOW_ITEM_ARMOR = new CFG<Boolean>("ui.item_armor", false);
-    public static final CFG<Boolean> SWAP_NUM_AND_Q = new CFG<Boolean>("ui.swap_num_and_q", false);
-    public static final CFG<Boolean> PROGRESS_NUMBER = new CFG<Boolean>("ui.progress_number", false);
+    public static final CFG<Boolean> SHOW_ITEM_DURABILITY = new CFG<>("ui.item_durability", false);
+    public static final CFG<Boolean> SHOW_ITEM_WEAR_BAR = new CFG<>("ui.item_wear_bar", true);
+    public static final CFG<Boolean> SHOW_ITEM_ARMOR = new CFG<>("ui.item_armor", false);
+    public static final CFG<Boolean> SWAP_NUM_AND_Q = new CFG<>("ui.swap_num_and_q", false);
+    public static final CFG<Boolean> PROGRESS_NUMBER = new CFG<>("ui.progress_number", false);
 
-    public static final CFG<Float> CAMERA_BRIGHT = new CFG<Float>("camera.bright", 0f);
+    public static final CFG<Float> CAMERA_BRIGHT = new CFG<>("camera.bright", 0f);
 
-    public static final CFG<Boolean> Q_SHOW_ALL_SHIFT = new CFG<Boolean>("ui.q.allmods_shift", true);
-    public static final CFG<Boolean> Q_SHOW_ALL_ALT = new CFG<Boolean>("ui.q.allmods_alt", true);
-    public static final CFG<Boolean> Q_SHOW_ALL_CTRL = new CFG<Boolean>("ui.q.allmods_ctrl", true);
-    public static final CFG<Boolean> Q_SHOW_SINGLE = new CFG<Boolean>("ui.q.showsingle", true);
-    public static final CFG<SingleType> Q_SINGLE_TYPE = new CFG<SingleType>("ui.q.singletype", SingleType.Average);
+    public static final CFG<Boolean> Q_SHOW_ALL_SHIFT = new CFG<>("ui.q.allmods_shift", true);
+    public static final CFG<Boolean> Q_SHOW_ALL_ALT = new CFG<>("ui.q.allmods_alt", true);
+    public static final CFG<Boolean> Q_SHOW_ALL_CTRL = new CFG<>("ui.q.allmods_ctrl", true);
+    public static final CFG<Boolean> Q_SHOW_SINGLE = new CFG<>("ui.q.showsingle", true);
+    public static final CFG<SingleType> Q_SINGLE_TYPE = new CFG<>("ui.q.singletype", SingleType.Average);
 
     private static final String CONFIG_JSON = "config.json";
     private static final Map<Object, Object> cfg;
-    private static final Map<String, Object> cache = new HashMap<String, Object>();
+    private static final Map<String, Object> cache = new HashMap<>();
     private static final Gson gson;
     private final String path;
     public final T def;
@@ -57,7 +57,7 @@ public class CFG<T> {
 	} catch (Exception ignored) {
 	}
 	if(tmp == null) {
-	    tmp = new HashMap<Object, Object>();
+	    tmp = new HashMap<>();
 	}
 	cfg = tmp;
     }
