@@ -22,6 +22,7 @@ public class CFG<T> {
     public static final CFG<Boolean> MMAP_FLOAT = new CFG<Boolean>("ui.mmapfloat", false);
     public static final CFG<Boolean> MMAP_VIEW = new CFG<Boolean>("ui.mmap_view", false);
     public static final CFG<Boolean> MMAP_GRID = new CFG<Boolean>("ui.mmap_grid", false);
+    public static final CFG<Boolean> MMAP_SHOW_BIOMES = new CFG<Boolean>("ui.mmap_biomes", true);
     public static final CFG<Boolean> MENU_SINGLE_CTRL_CLICK = new CFG<Boolean>("ui.menu_single_ctrl_click", true);
 
     public static final CFG<Boolean> SHOW_ITEM_DURABILITY = new CFG<Boolean>("ui.item_durability", false);

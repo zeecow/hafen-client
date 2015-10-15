@@ -387,6 +387,9 @@ public class OptWnd extends Window {
 	y += 25;
 	display.add(new CFGBox("Show item progress as number", CFG.PROGRESS_NUMBER), x, y);
 
+	y += 25;
+	display.add(new CFGBox("Show biomes on minimap", CFG.MMAP_SHOW_BIOMES), x, y);
+
 	my = Math.max(my, y);
 	x += 250;
 	y = 0;
