@@ -100,17 +100,19 @@ public class CFG<T> {
 	    if(cache.containsKey(name.path)) {
 		return (E) cache.get(name.path);
 	    } else {
-		Object data = retrieve(name);
-		Class<?> defClass = name.def.getClass();
-		if(defClass.isAssignableFrom(data.getClass())) {
-		    value = (E) data;
-		} else if(Number.class.isAssignableFrom(defClass)) {
-		    Number n = (Number) data;
-		    value = (E) defClass.getConstructor(String.class).newInstance(n.toString());
-		} else if(Enum.class.isAssignableFrom(defClass)) {
-		    Class<? extends Enum> enumType = Reflect.getEnumSuperclass(defClass);
-		    if(enumType != null) {
-			value = (E) Enum.valueOf(enumType, data.toString());
+		if(name.path != null) {
+		    Object data = retrieve(name);
+		    Class<?> defClass = name.def.getClass();
+		    if(defClass.isAssignableFrom(data.getClass())) {
+			value = (E) data;
+		    } else if(Number.class.isAssignableFrom(defClass)) {
+			Number n = (Number) data;
+			value = (E) defClass.getConstructor(String.class).newInstance(n.toString());
+		    } else if(Enum.class.isAssignableFrom(defClass)) {
+			Class<? extends Enum> enumType = Reflect.getEnumSuperclass(defClass);
+			if(enumType != null) {
+			    value = (E) Enum.valueOf(enumType, data.toString());
+			}
 		    }
 		}
 		cache.put(name.path, value);
@@ -122,6 +124,7 @@ public class CFG<T> {
     @SuppressWarnings("unchecked")
     public static synchronized <E> void set(CFG<E> name, E value) {
 	cache.put(name.path, value);
+	if(name.path == null) {return;}
 	String[] parts = name.path.split("\\.");
 	int i;
 	Object cur = cfg;
