@@ -57,6 +57,7 @@ public class Config {
 
     public static String version;
     public static final boolean isUpdate;
+    public static boolean center_tile = false;
 
     static {
 	String p;

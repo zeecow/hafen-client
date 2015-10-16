@@ -71,6 +71,9 @@ public class RootWidget extends ConsoleHost {
 		if(ui.gui!=null){
 		    ui.gui.map.togglegrid();
 		}
+	    } else if(CTRL && code == KeyEvent.VK_Z) {
+		Config.center_tile = !Config.center_tile;
+		ui.message(String.format("Tile centering turned %s", Config.center_tile ? "ON" : "OFF"), GameUI.MsgType.INFO);
 	    } else if(key == ':') {
 		entercmd();
 	    } else if(key != 0) {
