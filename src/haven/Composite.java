@@ -131,6 +131,11 @@ public class Composite extends Drawable {
     public Resource getres() {
 	return(base.get());
     }
+
+    @Override
+    public Indir<Resource> getires() {
+	return base;
+    }
     
     public Pose getpose() {
 	init();

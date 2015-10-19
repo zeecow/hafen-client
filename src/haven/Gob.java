@@ -223,6 +223,13 @@ public class Gob implements Sprite.Owner, Skeleton.ModOwner, Rendered {
 	return(null);
     }
 
+    public Indir<Resource> getires(){
+	Drawable d = getattr(Drawable.class);
+	if(d != null)
+	    return(d.getires());
+	return(null);
+    }
+
     public Glob glob() {
 	return(glob);
     }

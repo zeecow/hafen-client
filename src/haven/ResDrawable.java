@@ -79,6 +79,11 @@ public class ResDrawable extends Drawable {
     public Resource getres() {
 	return(res.get());
     }
+
+    @Override
+    public Indir<Resource> getires() {
+	return res;
+    }
     
     public Skeleton.Pose getpose() {
 	init();
