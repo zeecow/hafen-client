@@ -1,0 +1,111 @@
+{
+  "gfx/borka/body"                 : {
+    "show": true,
+    "name": "players"
+  },
+  "gfx/kritter/ants/ants"          : {
+    "show" : false,
+    "color": "ffffffee",
+    "name" : "ants"
+  },
+  "gfx/kritter/badger/badger"      : {
+    "show" : true,
+    "color": "ff6091ea",
+    "name" : "badger"
+  },
+  "gfx/kritter/bat/bat"            : {
+    "show" : true,
+    "color": "ffff8888",
+    "name" : "bat"
+  },
+  "gfx/kritter/bear/bear"          : {
+    "show" : true,
+    "color": "ffe34444",
+    "name" : "bear"
+  },
+  "gfx/kritter/boar/boar"          : {
+    "show" : true,
+    "color": "ffff8888",
+    "name" : "boar"
+  },
+  "gfx/kritter/cattle/aurochs"     : {
+    "show": false,
+    "name": "aurochs"
+  },
+  "gfx/kritter/cattle/bull"        : {
+    "show": false,
+    "name": "bull"
+  },
+  "gfx/kritter/cattle/calf"        : {
+    "show": false,
+    "name": "calf"
+  },
+  "gfx/kritter/cattle/cattle"      : {
+    "show": false,
+    "name": "cattle"
+  },
+  "gfx/kritter/cattle/cow"         : {
+    "show": false,
+    "name": "cow"
+  },
+  "gfx/kritter/chicken/chicken"    : {
+    "show" : false,
+    "color": "ffffffee",
+    "name" : "chicken"
+  },
+  "gfx/kritter/chicken/chick"      : {
+    "show" : false,
+    "color": "ffffffee",
+    "name" : "chick"
+  },
+  "gfx/kritter/chicken/rooster"    : {
+    "show" : false,
+    "color": "ffffffee",
+    "name" : "rooster"
+  },
+  "gfx/kritter/dragonfly/dragonfly": {
+    "show": false,
+    "name": "dragonfly"
+  },
+  "gfx/kritter/fox/fox"            : {
+    "show" : false,
+    "color": "fffaac58",
+    "name" : "fox"
+  },
+  "gfx/kritter/horse/horse"        : {
+    "show" : false,
+    "color": "ffdfb460",
+    "name" : "horse"
+  },
+  "gfx/kritter/ladybug/ladybug"    : {
+    "show": false,
+    "name": "ladybug"
+  },
+  "gfx/kritter/pig/hog"            : {
+    "show": false,
+    "name": "ladybug"
+  },
+  "gfx/kritter/pig/piglet"         : {
+    "show": false,
+    "name": "ladybug"
+  },
+  "gfx/kritter/pig/sow"            : {
+    "show": false,
+    "name": "ladybug"
+  },
+  "gfx/kritter/rabbit/rabbit"      : {
+    "show" : false,
+    "color": "ffffffee",
+    "name" : "rabbit"
+  },
+  "gfx/kritter/reddeer/reddeer"    : {
+    "show" : true,
+    "color": "ffe59363",
+    "name" : "deer"
+  },
+  "gfx/kritter/lynx/lynx"          : {
+    "show" : true,
+    "color": "ffbfb938",
+    "name" : "lynx"
+  }
+}

@@ -39,7 +39,8 @@ public class Gob implements Sprite.Owner, Skeleton.ModOwner, Rendered {
     public final Glob glob;
     Map<Class<? extends GAttrib>, GAttrib> attr = new HashMap<Class<? extends GAttrib>, GAttrib>();
     public Collection<Overlay> ols = new LinkedList<Overlay>();
-	
+    private GobPath path;
+
     public static class Overlay implements Rendered {
 	public Indir<Resource> res;
 	public MessageBuf sdt;
@@ -167,6 +168,15 @@ public class Gob implements Sprite.Owner, Skeleton.ModOwner, Rendered {
 
     public void setattr(GAttrib a) {
 	Class<? extends GAttrib> ac = attrclass(a.getClass());
+	if (CFG.SHOW_GOB_PATH.get()) {
+	    if (ac == Moving.class) {
+		if (path == null) {
+		    path = new GobPath(this);
+		    ols.add(new Overlay(path));
+		}
+		path.move((Moving) a);
+	    }
+	}
 	attr.put(ac, a);
     }
 	
@@ -178,7 +188,11 @@ public class Gob implements Sprite.Owner, Skeleton.ModOwner, Rendered {
     }
 	
     public void delattr(Class<? extends GAttrib> c) {
-	attr.remove(attrclass(c));
+	Class<? extends GAttrib> aClass = attrclass(c);
+	attr.remove(aClass);
+	if(aClass == Moving.class && path != null) {
+	    path.stop();
+	}
     }
 	
     public void draw(GOut g) {}
@@ -273,7 +287,7 @@ public class Gob implements Sprite.Owner, Skeleton.ModOwner, Rendered {
     
     public final Save save = new Save();
     public class GobLocation extends GLState.Abstract {
-	private Coord3f c = null;
+	public Coord3f c = null;
 	private double a = 0.0;
 	private Matrix4f update = null;
 	private final Location xl = new Location(Matrix4f.id, "gobx"), rot = new Location(Matrix4f.id, "gob");

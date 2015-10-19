@@ -390,6 +390,19 @@ public class OptWnd extends Window {
 	y += 25;
 	display.add(new CFGBox("Show biomes on minimap", CFG.MMAP_SHOW_BIOMES), x, y);
 
+	y += 35;
+	int w = display.add(new CFGBox("Show gob path", CFG.SHOW_GOB_PATH), x, y).sz.x;
+	display.add(new Button(25, "*") {
+	    @Override
+	    public void click() {
+		if(ui.gui != null) {
+		    GobPathOptWnd.toggle(ui.gui);
+		} else {
+		    GobPathOptWnd.toggle(ui.root);
+		}
+	    }
+	}, x + w + 5, y);
+
 	my = Math.max(my, y);
 	x += 250;
 	y = 0;
@@ -526,6 +539,12 @@ public class OptWnd extends Window {
 	public void set(boolean a) {
 	    this.a = a;
 	    cfg.set(a);
+	}
+
+	@Override
+	public void destroy() {
+	    GobPathOptWnd.remove();
+	    super.destroy();
 	}
     }
 }
