@@ -513,7 +513,7 @@ public class OptWnd extends Window {
 	super.show();
     }
 
-    private static class CFGBox extends CheckBox {
+    public static class CFGBox extends CheckBox {
 
 	protected final CFG<Boolean> cfg;
 

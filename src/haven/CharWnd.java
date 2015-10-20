@@ -609,14 +609,7 @@ public class CharWnd extends Window {
 	    study.locked = CFG.LOCK_STUDY.get();
 	    add(new Label("Attention:"), 2, 2);
 	    add(new Label("Experience cost:"), 2, 32);
-	    add(new Button(82, study.locked ? "Unlock study" : "Lock study") {
-		@Override
-		public void click() {
-		    study.locked = !study.locked;
-		    change(study.locked ? "Unlock study" : "Lock study");
-		    CFG.LOCK_STUDY.set(study.locked);
-		}
-	    }, 2, 70);
+	    add(new OptWnd.CFGBox("Lock study", CFG.LOCK_STUDY), 5, 70);
 	    add(new Label("Learning points:"), 2, sz.y - 32);
 	}
 
