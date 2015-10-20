@@ -392,7 +392,7 @@ public class OptWnd extends Window {
 
 	y += 35;
 	int w = display.add(new CFGBox("Show gob path", CFG.SHOW_GOB_PATH), x, y).sz.x;
-	display.add(new Button(25, "*") {
+	display.add(new IButton("gfx/hud/opt", "", "-d", "-h") {
 	    @Override
 	    public void click() {
 		if(ui.gui != null) {
