@@ -421,7 +421,7 @@ public class MapView extends PView implements DTarget, Console.Directory {
 	this.glob = glob;
 	this.cc = cc;
 	this.plgob = plgob;
-    this.gridol = new GridOutline(glob.map, MCache.cutsz.mul(2 * (view + 1)));
+	this.gridol = new GridOutline(glob.map, MCache.cutsz.mul(2 * (view + 1)));
 	setcanfocus(true);
     }
     
@@ -607,8 +607,7 @@ public class MapView extends PView implements DTarget, Console.Directory {
 	if(rl.cfg.pref.outline.val)
 	    rl.add(outlines, null);
 	rl.add(map, null);
-    if (showgrid)
-        rl.add(gridol, null);
+	if(showgrid) {rl.add(gridol, null);}
 	rl.add(mapol, null);
 	rl.add(gobs, null);
 	if(placing != null)
