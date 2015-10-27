@@ -1,3 +1,7 @@
+$size[14]{$u{Update for 27.10.15:}
+  * added CTRL+Z to toggle tile centering
+  * added option to display gob paths
+ 
 $size[14]{$u{Update for 15.10.15:}
   * added option to show biome name on minimap. If mouse is over minimap it shows name of biome it is over, otherwise it shows biome player is in.
   * sort wounds by size if names are equal
