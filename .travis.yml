@@ -13,5 +13,4 @@ deploy:
     - "build/custom-res.jar"
   on:
     branch: release
-    tags: true
     jdk: oraclejdk7
