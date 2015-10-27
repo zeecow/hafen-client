@@ -13,8 +13,10 @@ import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 public class GobPath extends Sprite {
+    private static final String UNKNOWN = "<unknown>";
     private Moving move = null;
     private Gob gob;
 
@@ -29,8 +31,8 @@ public class GobPath extends Sprite {
 	    if(res != null) {
 		return res.name;
 	    }
-	} catch(Resource.Loading ignored) { }
-	return "<unknown>";
+	} catch (Resource.Loading ignored) { }
+	return UNKNOWN;
     }
 
     public void draw(GOut g) {
@@ -44,7 +46,7 @@ public class GobPath extends Sprite {
 	    td = ss.rotate(-gob.a);
 	    tz = (int) (gob.glob.map.getcz(t) - gob.glob.map.getcz(gob.rc)) + 1;
 	    good = true;
-	} catch(Exception ignored) { }
+	} catch (Exception ignored) { }
 	if(!good) { return; }
 
 	g.apply();
@@ -115,6 +117,7 @@ public class GobPath extends Sprite {
     public static class Cfg {
 	private static final Cfg DEFAULT = new Cfg(Color.WHITE, false);
 	public static final Map<String, Cfg> gobPathCfg;
+	private static final Map<String, Cfg> cache = new HashMap<>();
 	public Color color;
 	public boolean show;
 	public String name;
@@ -128,7 +131,7 @@ public class GobPath extends Sprite {
 		    Type collectionType = new TypeToken<HashMap<String, Cfg>>() {
 		    }.getType();
 		    tmp = gson.fromJson(json, collectionType);
-		} catch(Exception e) {
+		} catch (Exception e) {
 		    tmp = new HashMap<>();
 		}
 	    }
@@ -147,10 +150,25 @@ public class GobPath extends Sprite {
 	}
 
 	public static GobPath.Cfg get(String resname) {
-	    if(gobPathCfg.containsKey(resname)) {
-		return gobPathCfg.get(resname);
+	    if(cache.containsKey(resname)) {
+		return cache.get(resname);
+	    } else if(UNKNOWN.equals(resname)) {
+		return DEFAULT;
 	    }
-	    return GobPath.Cfg.DEFAULT;
+	    Cfg cfg = DEFAULT;
+	    if(gobPathCfg.containsKey(resname)) {
+		cfg = gobPathCfg.get(resname);
+	    } else {
+		Set<String> keys = gobPathCfg.keySet();
+		for (String pattern : keys) {
+		    if(resname.contains(pattern)) {
+			cfg = gobPathCfg.get(pattern);
+			break;
+		    }
+		}
+	    }
+	    cache.put(resname, cfg);
+	    return cfg;
 	}
 
 	public static Gson getGson() {
@@ -181,9 +199,9 @@ public class GobPath extends Sprite {
 	    public Cfg read(JsonReader reader) throws IOException {
 		Cfg cfg = new Cfg(null, true);
 		reader.beginObject();
-		while(reader.hasNext()) {
+		while (reader.hasNext()) {
 		    String name = reader.nextName();
-		    switch(name) {
+		    switch (name) {
 			case "show":
 			    cfg.show = reader.nextBoolean();
 			    break;

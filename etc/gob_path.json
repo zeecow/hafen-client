@@ -32,32 +32,14 @@
     "show": false,
     "name": "aurochs"
   },
-  "gfx/kritter/cattle/calf"        : {
+  "gfx/kritter/cattle/"          : {
     "show": false,
-    "name": "calf"
+    "name": "cattle"
   },
-  "gfx/kritter/cattle/cattle"      : {
-    "show": false,
-    "name": "bull"
-  },
-  "gfx/kritter/cattle/cow"         : {
-    "show": false,
-    "name": "cow"
-  },
-  "gfx/kritter/chicken/chicken"    : {
+  "gfx/kritter/chicken/"         : {
     "show" : false,
     "color": "ffffffee",
     "name" : "chicken"
-  },
-  "gfx/kritter/chicken/chick"      : {
-    "show" : false,
-    "color": "ffffffee",
-    "name" : "chick"
-  },
-  "gfx/kritter/chicken/rooster"    : {
-    "show" : false,
-    "color": "ffffffee",
-    "name" : "rooster"
   },
   "gfx/kritter/dragonfly/dragonfly": {
     "show": false,
@@ -87,17 +69,9 @@
     "color": "ffbfb938",
     "name" : "lynx"
   },
-  "gfx/kritter/pig/hog"            : {
+  "gfx/kritter/pig/"             : {
     "show": false,
-    "name": "ladybug"
-  },
-  "gfx/kritter/pig/piglet"         : {
-    "show": false,
-    "name": "ladybug"
-  },
-  "gfx/kritter/pig/sow"            : {
-    "show": false,
-    "name": "ladybug"
+    "name": "pig"
   },
   "gfx/kritter/rabbit/rabbit"      : {
     "show" : false,
@@ -113,19 +87,11 @@
     "color": "ffe59363",
     "name" : "deer"
   },
-  "gfx/kritter/sheep/ewe"          : {
-    "show": false,
-    "name": "ewe"
-  },
   "gfx/kritter/sheep/mouflon"      : {
     "show": false,
     "name": "mouflon"
   },
-  "gfx/kritter/sheep/ram"          : {
-    "show": false,
-    "name": "ram"
-  },
-  "gfx/kritter/sheep/sheep"        : {
+  "gfx/kritter/sheep/"           : {
     "show": false,
     "name": "sheep"
   },
@@ -136,5 +102,9 @@
   "gfx/kritter/toad/toad"          : {
     "show": false,
     "name": "toad"
+  },
+  "gfx/terobjs/vehicle/rowboat"    : {
+    "show": false,
+    "name": "boat"
   }
 }
