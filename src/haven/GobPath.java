@@ -146,7 +146,7 @@ public class GobPath extends Sprite {
 
 	public static void save() {
 	    Gson gson = GobPath.Cfg.getGson();
-	    //Config.saveFile("gob_path.json", gson.toJson(gobPathCfg));
+	    Config.saveFile("gob_path.json", gson.toJson(gobPathCfg));
 	}
 
 	public static GobPath.Cfg get(String resname) {
