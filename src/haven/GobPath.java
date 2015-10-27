@@ -182,7 +182,10 @@ public class GobPath extends Sprite {
 
 	    @Override
 	    public void write(JsonWriter writer, Cfg cfg) throws IOException {
-		if(cfg == DEFAULT) {return;}
+		if(cfg == DEFAULT) {
+		    writer.nullValue();
+		    return;
+		}
 		writer.beginObject();
 		writer.name("show").value(cfg.show);
 		String color = Utils.color2hex(cfg.color);
