@@ -102,7 +102,7 @@
     <fail unless="lib-builtin-jar" message="builtin-res.jar not available" />
   </target>
   
-  <target name="jars" depends="build-env, jar, res-jar">
+  <target name="jars" depends="build-env, jar">
     <copy todir="build">
       <fileset dir="lib">
 	<include name="jogl.jar" />
@@ -113,7 +113,8 @@
     </copy>
   </target>
   
-  <target name="deftgt" depends="jars, appletview" />
+  <target name="deftgt" depends="jars, res-jar" />
+  <target name="buildprocess" depends="jars"/>
 
   <target name="run" depends="jars">
     <java jar="build/hafen.jar" fork="true" />
