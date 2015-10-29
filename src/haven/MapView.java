@@ -1215,7 +1215,7 @@ public class MapView extends PView implements DTarget, Console.Directory {
 	
 	protected void hit(Coord pc, Coord mc, ClickInfo inf) {
 	    if(inf == null) {
-		mc = mc.div(11).mul(11).add(5, 5);
+		if(Config.center_tile) {mc = mc.div(11).mul(11).add(5, 5);}
 		wdgmsg("click", pc, mc, clickb, ui.modflags());
 	    } else {
 		if(inf.ol == null) {
