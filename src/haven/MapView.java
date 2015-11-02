@@ -1486,7 +1486,7 @@ public class MapView extends PView implements DTarget, Console.Directory {
 	throw(new RuntimeException("No valid constructor found for camera " + ct.getName()));
     }
 
-    private Camera restorecam() {
+    public Camera restorecam() {
 	Class<? extends Camera> ct = camtypes.get(Utils.getpref("defcam", null));
 	if(ct == null)
 	    return(new SOrthoCam(true));
@@ -1499,20 +1499,35 @@ public class MapView extends PView implements DTarget, Console.Directory {
 	}
     }
 
+    public void setcam(String name, String... opts) throws Exception {
+	Class<? extends Camera> ct = camtypes.get(name);
+	if(ct != null) {
+		camera = makecam(ct, opts);
+		Utils.setpref("defcam", name);
+		Utils.setprefb("camargs", Utils.serialize(opts));
+	} else {
+	    throw(new Exception("no such camera: " + name));
+	}
+    }
+
+    public static String defcam(){
+	return Utils.getpref("defcam", "ortho");
+    }
+
+    public static void defcam(String name) {
+	Utils.setpref("defcam", name);
+    }
+
+    public static Collection<String> camlist(){
+	return camtypes.keySet();
+    }
+
     private Map<String, Console.Command> cmdmap = new TreeMap<String, Console.Command>();
     {
 	cmdmap.put("cam", new Console.Command() {
 		public void run(Console cons, String[] args) throws Exception {
 		    if(args.length >= 2) {
-			Class<? extends Camera> ct = camtypes.get(args[1]);
-			String[] cargs = Utils.splice(args, 2);
-			if(ct != null) {
-				camera = makecam(ct, cargs);
-				Utils.setpref("defcam", args[1]);
-				Utils.setprefb("camargs", Utils.serialize(cargs));
-			} else {
-			    throw(new Exception("no such camera: " + args[1]));
-			}
+			setcam(args[1], Utils.splice(args, 2));
 		    }
 		}
 	    });
@@ -1525,6 +1540,7 @@ public class MapView extends PView implements DTarget, Console.Directory {
 		}
 	    });
     }
+
     public Map<String, Console.Command> findcmds() {
 	return(cmdmap);
     }

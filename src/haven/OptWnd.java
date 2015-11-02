@@ -26,6 +26,9 @@
 
 package haven;
 
+
+import java.util.LinkedList;
+
 public class OptWnd extends Window {
     public static final Coord PANEL_POS = new Coord(220, 30);
     public static final Coord Q_TYPE_PADDING = new Coord(3, 0);
@@ -209,6 +212,7 @@ public class OptWnd extends Window {
 
 	addPanelButton("Video settings", 'v', video, 0, 0);
 	addPanelButton("Audio settings", 'a', audio, 0, 1);
+	addPanelButton("Camera settings", 'c', camera, 0, 2);
 
 	addPanelButton("General settings", 'g', general, 1, 0);
 	addPanelButton("Display settings", 'd', display, 1, 1);
@@ -273,13 +277,66 @@ public class OptWnd extends Window {
 	initDisplayPanel();
 	initGeneralPanel();
 	initRadarPanel();
+	initCameraPanel();
 	main.pack();
 	chpanel(main);
     }
 
+
     private void addPanelButton(String name, char key, Panel panel, int x, int y) {
 	main.add(new PButton(200, name, key, panel), PANEL_POS.mul(x, y));
     }
+
+    private void initCameraPanel() {
+	int x = 0, y = 0, my = 0;
+
+	int tx = x + camera.add(new Label("Camera:"), x, y).sz.x + 5;
+	camera.add(new Dropbox<String>(100, 5, 16) {
+	    @Override
+	    protected String listitem(int i) {
+		return new LinkedList<>(MapView.camlist()).get(i);
+	    }
+
+	    @Override
+	    protected int listitems() {
+		return MapView.camlist().size();
+	    }
+
+	    @Override
+	    protected void drawitem(GOut g, String item, int i) {
+		g.text(item, Coord.z);
+	    }
+
+	    @Override
+	    public void change(String item) {
+		super.change(item);
+		MapView.defcam(item);
+		if(ui.gui != null && ui.gui.map != null) {
+		    ui.gui.map.camera = ui.gui.map.restorecam();
+		}
+	    }
+	}, tx, y).sel = MapView.defcam();
+
+	y += 35;
+	camera.add(new Label("Brighten view"), x, y);
+	y += 15;
+	camera.add(new HSlider(200, 0, 500, 0) {
+	    public void changed() {
+		CFG.CAMERA_BRIGHT.set(val / 1000.0f);
+		if(ui.sess != null && ui.sess.glob != null) {
+		    ui.sess.glob.brighten();
+		}
+	    }
+	}, x, y).val = (int) (1000 * CFG.CAMERA_BRIGHT.get());
+
+
+	y += 25;
+	my = Math.max(my, y);
+
+	camera.add(new PButton(200, "Back", 27, main), 0, my + 35);
+	camera.pack();
+    }
+
 
     private void initGeneralPanel() {
 	int x = 0;
@@ -292,18 +349,6 @@ public class OptWnd extends Window {
 	y += 25;
 	general.add(new CFGBox("Single item CTRL choose", CFG.MENU_SINGLE_CTRL_CLICK, "If checked, will automatically select single item menus if CTRL is pressed when menu is opened."), x, y);
 
-	y += 35;
-	general.add(new Label("Brighten view"), x, y);
-	y += 15;
-	general.add(new HSlider(200, 0, 500, 0) {
-	    public void changed() {
-		CFG.CAMERA_BRIGHT.set(val / 1000.0f);
-		if(ui.sess != null && ui.sess.glob != null) {
-		    ui.sess.glob.brighten();
-		}
-	    }
-	}, x, y).val = (int) (1000 * CFG.CAMERA_BRIGHT.get());
-
 	my = Math.max(my, y);
 	x += 250;
 	y = 0;
@@ -312,13 +357,14 @@ public class OptWnd extends Window {
 	y += 15;
 	final FlowerList list = general.add(new FlowerList(), x, y);
 
+	y += list.sz.y + 5;
 	final TextEntry value = general.add(new TextEntry(150, "") {
 	    @Override
 	    public void activate(String text) {
 		list.add(text);
 		settext("");
 	    }
-	}, x, y + 255);
+	}, x, y);
 
 	general.add(new Button(45, "Add") {
 	    @Override
@@ -326,9 +372,8 @@ public class OptWnd extends Window {
 		list.add(value.text);
 		value.settext("");
 	    }
-	}, x + 155, y + 253);
+	}, x + 155, y - 2);
 
-	y += 255;
 	my = Math.max(my, y);
 
 	general.add(new PButton(200, "Back", 27, main), 0, my + 35);
