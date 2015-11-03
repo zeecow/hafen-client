@@ -35,12 +35,12 @@ public class Inventory extends Widget implements DTarget {
 	@Override
 	public int compare(WItem o1, WItem o2) {
 	    QualityList ql1 = o1.itemq.get();
-	    float q1 = (ql1 != null && !ql1.isEmpty()) ? ql1.single().value : 0;
+	    double q1 = (ql1 != null && !ql1.isEmpty()) ? ql1.single().value : 0;
 
 	    QualityList ql2 = o2.itemq.get();
-	    float q2 = (ql2 != null && !ql2.isEmpty()) ? ql2.single().value : 0;
+	    double q2 = (ql2 != null && !ql2.isEmpty()) ? ql2.single().value : 0;
 
-	    return (q1 > q2) ? 1 : ((q1 < q2) ? -1 : 0);
+	    return Double.compare(q1, q2);
 	}
     };
     public static final Comparator<WItem> ITEM_COMPARATOR_DESC = new Comparator<WItem>() {
