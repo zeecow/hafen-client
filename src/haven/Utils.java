@@ -1170,6 +1170,15 @@ public class Utils {
 	}
     }
 
+    public static <C> C hascause(Throwable t, Class<C> c) {
+	while(t != null) {
+	    if(c.isInstance(t))
+		return(c.cast(t));
+	    t = t.getCause();
+	}
+	return(null);
+    }
+
     public static String timestamp() {
 	return new SimpleDateFormat("HH:mm").format(new Date());
     }
