@@ -35,8 +35,10 @@ import java.util.*;
 import haven.resutil.Ridges;
 
 public class LocalMiniMap extends Widget {
-    private static final Tex viewbox = Resource.loadtex("gfx/hud/mmap/viewbox");
     private static final Tex mapgrid = Resource.loadtex("gfx/hud/mmap/mapgrid");
+    public static final Coord VIEW_SZ = MCache.sgridsz.mul(9).div(tilesz);// view radius is 9x9 "server" grids
+    public static final Color VIEW_BG_COLOR = new Color(255, 255, 255, 60);
+    public static final Color VIEW_BORDER_COLOR = new Color(0, 0, 0, 128);
     public final MapView mv;
     private String biome;
     private Tex biometex = null;
@@ -280,7 +282,12 @@ public class LocalMiniMap extends Widget {
 	if(CFG.MMAP_VIEW.get()) {
 	    Gob pl = ui.sess.glob.oc.getgob(mv.plgob);
 	    if(pl != null) {
-		g.aimage(viewbox, p2c(pl.rc), 0.5, 0.5);
+		Coord rc = p2c(pl.rc.div(MCache.sgridsz).sub(4, 4).mul(MCache.sgridsz));
+		g.chcolor(VIEW_BG_COLOR);
+		g.frect(rc, VIEW_SZ);
+		g.chcolor(VIEW_BORDER_COLOR);
+		g.rect(rc, VIEW_SZ);
+		g.chcolor();
 	    }
 	}
 	drawicons(g);
