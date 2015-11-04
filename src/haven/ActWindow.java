@@ -1,5 +1,6 @@
 package haven;
 
+import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.util.Comparator;
 import java.util.LinkedList;
@@ -49,6 +50,7 @@ public class ActWindow extends GameUI.Hidewnd {
 	});
 	setfocus(filter);
 	filtered = add(new ActList(WIDTH, 10), new Coord(0, filter.sz.y + 5));
+	filtered.bgcolor = new Color(0, 0, 0, 128);
 	pack();
     }
 

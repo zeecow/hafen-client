@@ -48,13 +48,6 @@ public class ActList extends Listbox<ActList.ActItem> {
     }
 
     @Override
-    protected void drawbg(GOut g) {
-	g.chcolor(0, 0, 0, 128);
-	g.frect(Coord.z, sz);
-	g.chcolor();
-    }
-
-    @Override
     protected void drawitem(GOut g, ActItem item, int i) {
 	g.image(item.icon, Coord.z);
 	g.aimage(item.name.tex(), new Coord(itemh + 5, itemh / 2), 0, 0.5);
