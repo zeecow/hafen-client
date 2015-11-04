@@ -43,7 +43,7 @@ public class Glob {
     public MCache map;
     public Session sess;
     public Party party;
-    public Set<Pagina> paginae = new HashSet<Pagina>();
+    public final Set<Pagina> paginae = new HashSet<Pagina>();
     public int pagseq = 0;
     public Map<Resource.Named, Pagina> pmap = new WeakHashMap<Resource.Named, Pagina>();
     public Map<String, CAttr> cattr = new HashMap<String, CAttr>();
@@ -161,6 +161,18 @@ public class Glob {
 	public void state(State st) {
 	    this.st = st;
 	    this.img = st.img(this);
+	}
+
+	public static String name(Pagina p) {
+	    String name = "";
+	    if(p.res instanceof Resource.Named) {
+	        name = ((Resource.Named) p.res).name;
+	    } else {
+		try {
+		    name = p.res.get().name;
+	 	} catch (Loading ignored) {}
+	    }
+	    return name;
 	}
     }
 	

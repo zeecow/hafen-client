@@ -119,8 +119,10 @@ public class MenuGrid extends Widget {
     protected void attach(UI ui) {
 	super.attach(ui);
 	Glob glob = ui.sess.glob;
-	Collection<Pagina> p = glob.paginae;
-	p.add(glob.paginafor(Resource.local().load("paginae/add/timer")));
+	synchronized (glob.paginae) {
+	    Collection<Pagina> p = glob.paginae;
+	    p.add(glob.paginafor(Resource.local().load("paginae/add/timer")));
+	}
     }
 
     public static Comparator<Pagina> sorter = new Comparator<Pagina>() {

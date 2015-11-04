@@ -68,7 +68,8 @@ public class GameUI extends ConsoleHost implements Console.Directory {
     public Belt beltwdg;
     public String polowner;
     public Bufflist buffs;
-    public CraftWnd craftwnd;
+    public CraftWnd craftwnd = null;
+    public ActWindow craftlist, buildlist;
     public TimerPanel timers;
 
     public abstract class Belt extends Widget {
@@ -306,17 +307,23 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 	opts.c = sz.sub(opts.sz).div(2);
     }
 
-    public void showCraftWnd() {
-	if(craftwnd == null ){
-	    craftwnd = add(new CraftWnd());
+    public void toggleCraftList() {
+	if(craftlist == null){
+	    add(new ActWindow("Craft...", "paginae/craft/"));
+	} else if(craftlist.visible) {
+	    craftlist.hide();
+	} else {
+	    craftlist.show();
 	}
     }
 
-    public void toggleCraftWnd() {
-	if(craftwnd == null) {
-	    showCraftWnd();
+    public void toggleBuildList() {
+	if(buildlist == null){
+	    add(new ActWindow("Build...", "paginae/bld/"));
+	} else if(buildlist.visible) {
+	    buildlist.hide();
 	} else {
-	    craftwnd.wdgmsg(craftwnd, "close");
+	    buildlist.show();
 	}
     }
     

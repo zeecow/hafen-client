@@ -65,8 +65,12 @@ public class RootWidget extends ConsoleHost {
 		}
 	    } else if(ALT && code == KeyEvent.VK_C) {
 		if(ui.gui!=null){
-		    ui.gui.toggleCraftWnd();
+		    ui.gui.toggleCraftList();
 		}
+	    } else if(ALT && code == KeyEvent.VK_B) {
+	        if(ui.gui!=null){
+		    ui.gui.toggleBuildList();
+	        }
 	    } else if(CTRL && code == KeyEvent.VK_G) {
 		if(ui.gui!=null){
 		    ui.gui.map.togglegrid();
