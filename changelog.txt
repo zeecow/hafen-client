@@ -1,3 +1,11 @@
+$size[14]{$u{Update for 05.11.15:}
+  * use precise view range display (ported from k-t client, based on XCom's research)
+  * ported quick craft (ALT+C) and build (ALT+B) windows from k-t client
+  * ported ALT+H to hide item on cursor from k-t client
+  * ported study window (ALT+S) from k-t client
+  * ported hunger and fep meters from k-t client (can be toggled in Options->Display)
+  * added camera options
+ 
 $size[14]{$u{Update for 27.10.15:}
   * added CTRL+Z to toggle tile centering
   * added option to display gob paths
