@@ -72,6 +72,7 @@ public class GameUI extends ConsoleHost implements Console.Directory {
     public CraftWnd craftwnd = null;
     public ActWindow craftlist, buildlist;
     public TimerPanel timers;
+    public StudyWnd studywnd;
 
 	public abstract class Belt extends Widget {
 	public Belt(Coord sz) {
@@ -526,6 +527,10 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 	}
     }
 
+    public void toggleStudy() {
+	studywnd.show(!studywnd.visible);
+    }
+
     public void addchild(Widget child, Object... args) {
 	String place = ((String)args[0]).intern();
 	if(place == "mapview") {
@@ -562,6 +567,8 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 	    hand.add(new DraggedItem(g, lc));
 	    updhand();
 	} else if(place == "chr") {
+	    studywnd = add(new StudyWnd());
+	    studywnd.hide();
 	    chrwdg = add((CharWnd)child, new Coord(300, 50));
 	    chrwdg.hide();
 	} else if(place == "craft") {

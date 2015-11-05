@@ -1321,6 +1321,7 @@ public class CharWnd extends Window {
 	    Frame.around(sattr, Collections.singletonList(child));
 	    Widget inf = sattr.add(new StudyInfo(new Coord(attrw - 150, child.sz.y), (Inventory) child), new Coord(260 + 150, child.c.y).add(wbox.btloff().x, 0));
 	    Frame.around(sattr, Collections.singletonList(inf));
+	    getparent(GameUI.class).studywnd.setStudy((Inventory)child);
 	} else if(place == "fmg") {
 	    fgt.add(child, 0, 0);
 	} else if(place == "wound") {
