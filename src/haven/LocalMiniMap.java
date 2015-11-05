@@ -28,7 +28,7 @@ package haven;
 
 import static haven.MCache.cmaps;
 import static haven.MCache.tilesz;
-
+import haven.MCache.Grid;
 import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.util.*;
@@ -44,14 +44,13 @@ public class LocalMiniMap extends Widget {
     private Tex biometex = null;
 
     private Coord cc = null;
-    private final Map<Coord, Defer.Future<MapTile>> cache = new LinkedHashMap<Coord, Defer.Future<MapTile>>(5, 0.75f, true) {
-	protected boolean removeEldestEntry(Map.Entry<Coord, Defer.Future<MapTile>> eldest) {
+    private final Map<Pair<Grid, Integer>, Defer.Future<MapTile>> cache = new LinkedHashMap<Pair<Grid, Integer>, Defer.Future<MapTile>>(5, 0.75f, true) {
+	protected boolean removeEldestEntry(Map.Entry<Pair<Grid, Integer>, Defer.Future<MapTile>> eldest) {
 	    if(size() > 100) {
 		try {
 		    MapTile t = eldest.getValue().get();
 		    t.img.dispose();
-		} catch(RuntimeException e) {
-		}
+		} catch(RuntimeException ignored) {}
 		return(true);
 	    }
 	    return(false);
@@ -63,11 +62,15 @@ public class LocalMiniMap extends Widget {
     public static class MapTile {
 	public final Tex img;
 	public final Coord ul, c;
+	public final Grid grid;
+	public final int seq;
 	
-	public MapTile(Tex img, Coord ul, Coord c) {
+	public MapTile(Tex img, Coord ul, Coord c, Grid grid, int seq) {
 	    this.img = img;
 	    this.ul = ul;
 	    this.c = c;
+	    this.grid = grid;
+	    this.seq = seq;
 	}
     }
 
@@ -254,17 +257,22 @@ public class LocalMiniMap extends Widget {
 	    for(cur.y = ulg.y; cur.y <= brg.y; cur.y++) {
 		Defer.Future<MapTile> f;
 		synchronized(cache) {
-		    f = cache.get(cur);
+		    final Grid grid;
+		    try {
+			grid = ui.sess.glob.map.getgrid(cur);
+		    } catch (Loading e) { continue; }
+		    final int seq = grid.seq;
+		    f = cache.get(new Pair<Grid, Integer>(grid, seq));
 		    if(f == null && cur.manhattan2(plg) <= 1) {
 			final Coord tmp = new Coord(cur);
 			f = Defer.later(new Defer.Callable<MapTile>() {
 			    public MapTile call() {
 				Coord ul = tmp.mul(cmaps);
 				BufferedImage drawmap = drawmap(ul, cmaps);
-				return (new MapTile(new TexI(drawmap), ul, tmp));
+				return (new MapTile(new TexI(drawmap), ul, tmp, grid, seq));
 			    }
 			});
-			cache.put(new Coord(cur), f);
+			cache.put(new Pair<Grid, Integer>(grid, seq), f);
 		    }
 		}
 		if(f != null && f.done()){
