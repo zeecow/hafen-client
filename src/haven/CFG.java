@@ -32,6 +32,8 @@ public class CFG<T> {
     public static final CFG<Boolean> SHOW_ITEM_ARMOR = new CFG<>("ui.item_armor", false);
     public static final CFG<Boolean> SWAP_NUM_AND_Q = new CFG<>("ui.swap_num_and_q", false);
     public static final CFG<Boolean> PROGRESS_NUMBER = new CFG<>("ui.progress_number", false);
+    public static final CFG<Boolean> FEP_METER = new CFG<>("ui.fep_meter", false);
+    public static final CFG<Boolean> HUNGER_METER = new CFG<>("ui.hunger_meter", false);
 
     public static final CFG<Float> CAMERA_BRIGHT = new CFG<>("camera.bright", 0f);
 

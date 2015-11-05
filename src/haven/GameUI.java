@@ -46,6 +46,7 @@ public class GameUI extends ConsoleHost implements Console.Directory {
     public MiniMapPanel mmappanel;
     public Fightview fv;
     private List<Widget> meters = new LinkedList<Widget>();
+    private List<Widget> cmeters = new LinkedList<Widget>();
     private Text lastmsg;
     private long msgtime;
     private Window invwnd, equwnd, makewnd;
@@ -531,6 +532,37 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 	studywnd.show(!studywnd.visible);
     }
 
+    public void addcmeter(Widget meter) {
+	ulpanel.add(meter);
+	cmeters.add(meter);
+	updcmeters();
+    }
+
+    public <T extends Widget> void delcmeter(Class<T> cl) {
+	Widget widget = null;
+	for (Widget meter : cmeters) {
+	    if (cl.isAssignableFrom(meter.getClass())) {
+		widget = meter;
+		break;
+	    }
+	}
+	if (widget != null) {
+	    cmeters.remove(widget);
+	    widget.destroy();
+	    updcmeters();
+	}
+    }
+
+    private void updcmeters() {
+	int i = meters.size();
+	for (Widget meter : cmeters) {
+	    int x = ( i % 3) * (IMeter.fsz.x + 5);
+	    int y = (i / 3) * (IMeter.fsz.y + 2);
+	    meter.c = new Coord(portrait.c.x + portrait.sz.x + 10 + x, portrait.c.y + y);
+	    i++;
+	}
+    }
+
     public void addchild(Widget child, Object... args) {
 	String place = ((String)args[0]).intern();
 	if(place == "mapview") {
@@ -571,6 +603,12 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 	    studywnd.hide();
 	    chrwdg = add((CharWnd)child, new Coord(300, 50));
 	    chrwdg.hide();
+	    if(CFG.HUNGER_METER.get()) {
+		addcmeter(new HungerMeter(chrwdg.glut));
+	    }
+	    if(CFG.FEP_METER.get()) {
+		addcmeter(new FEPMeter(chrwdg.feps));
+	    }
 	} else if(place == "craft") {
 	    final Widget mkwdg = child;
 	    if(craftwnd != null){
@@ -610,6 +648,7 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 	    int y = (meters.size() / 3) * (IMeter.fsz.y + 2);
 	    ulpanel.add(child, portrait.c.x + portrait.sz.x + 10 + x, portrait.c.y + y);
 	    meters.add(child);
+	    updcmeters();
 	} else if(place == "buff") {
 	    buffs.addchild(child);
 	} else if(place == "misc") {
@@ -639,6 +678,8 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 	    CFG.MMAP_FLOAT.set(false, true);
 	}
 	meters.remove(w);
+	cmeters.remove(w);
+	updcmeters();
     }
 
     public void placemmap() {

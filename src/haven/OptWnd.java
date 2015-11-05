@@ -498,6 +498,36 @@ public class OptWnd extends Window {
 	y += 25;
 	display.add(new CFGBox("Show item armor", CFG.SHOW_ITEM_ARMOR), new Coord(x, y));
 
+	y += 25;
+	display.add(new CFGBox("Show hunger meter", CFG.HUNGER_METER) {
+	    @Override
+	    public void set(boolean a) {
+		super.set(a);
+		if(ui.gui != null && ui.gui.chrwdg != null) {
+		    if(a) {
+			ui.gui.addcmeter(new HungerMeter(ui.gui.chrwdg.glut));
+		    } else {
+			ui.gui.delcmeter(HungerMeter.class);
+		    }
+		}
+	    }
+	}, x, y);
+
+	y += 25;
+	display.add(new CFGBox("Show FEP meter", CFG.FEP_METER) {
+	    @Override
+	    public void set(boolean a) {
+		super.set(a);
+		if(ui.gui != null && ui.gui.chrwdg != null) {
+		    if(a) {
+			ui.gui.addcmeter(new FEPMeter(ui.gui.chrwdg.feps));
+		    } else {
+			ui.gui.delcmeter(FEPMeter.class);
+		    }
+		}
+	    }
+	}, x, y);
+
 	my = Math.max(my, y);
 
 	display.add(new PButton(200, "Back", 27, main), new Coord(0, my + 35));
