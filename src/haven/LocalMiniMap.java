@@ -44,8 +44,8 @@ public class LocalMiniMap extends Widget {
     private Tex biometex = null;
 
     private Coord cc = null;
-    private final Map<Pair<Grid, Integer>, Defer.Future<MapTile>> cache = new LinkedHashMap<Pair<Grid, Integer>, Defer.Future<MapTile>>(5, 0.75f, true) {
-	protected boolean removeEldestEntry(Map.Entry<Pair<Grid, Integer>, Defer.Future<MapTile>> eldest) {
+    private final Map<Coord, Defer.Future<MapTile>> cache = new LinkedHashMap<Coord, Defer.Future<MapTile>>(5, 0.75f, true) {
+	protected boolean removeEldestEntry(Map.Entry<Coord, Defer.Future<MapTile>> eldest) {
 	    if(size() > 100) {
 		try {
 		    MapTile t = eldest.getValue().get();
@@ -221,6 +221,7 @@ public class LocalMiniMap extends Widget {
 
     private void setBiome(Coord c) {
 	try {
+	    if (c.div(cmaps).manhattan2(cc.div(cmaps)) > 1) {return;}
 	    int t = mv.ui.sess.glob.map.gettile(c);
 	    Resource r = ui.sess.glob.map.tilesetr(t);
 	    String newbiome;
@@ -258,23 +259,25 @@ public class LocalMiniMap extends Widget {
 	for(cur.x = ulg.x; cur.x <= brg.x; cur.x++) {
 	    for(cur.y = ulg.y; cur.y <= brg.y; cur.y++) {
 		Defer.Future<MapTile> f;
-		synchronized(cache) {
-		    final Grid grid;
-		    try {
-			grid = ui.sess.glob.map.getgrid(cur);
-		    } catch (Loading e) { continue; }
-		    final int seq = grid.seq;
-		    f = cache.get(new Pair<Grid, Integer>(grid, seq));
-		    if(f == null && cur.manhattan2(plg) <= 1) {
-			final Coord tmp = new Coord(cur);
-			f = Defer.later(new Defer.Callable<MapTile>() {
-			    public MapTile call() {
-				Coord ul = tmp.mul(cmaps);
-				BufferedImage drawmap = drawmap(ul, cmaps);
-				return (new MapTile(new TexI(drawmap), ul, tmp, grid, seq));
-			    }
-			});
-			cache.put(new Pair<Grid, Integer>(grid, seq), f);
+		synchronized (cache) {
+		    f = cache.get(cur);
+		    if (cur.manhattan2(plg) <= 1) {
+			final Grid grid;
+			try {
+			    grid = ui.sess.glob.map.getgrid(new Coord(cur));
+			} catch (Loading e) { continue; }
+			final int seq = grid.seq;
+			if (f == null || (f.done() && (f.get().grid.id != grid.id || f.get().seq != seq))) {
+			    final Coord tmp = new Coord(cur);
+			    f = Defer.later(new Defer.Callable<MapTile>() {
+				public MapTile call() {
+				    Coord ul = tmp.mul(cmaps);
+				    BufferedImage drawmap = drawmap(ul, cmaps);
+				    return (new MapTile(new TexI(drawmap), ul, tmp, grid, seq));
+				}
+			    });
+			    cache.put(tmp, f);
+			}
 		    }
 		}
 		if(f != null && f.done()){
