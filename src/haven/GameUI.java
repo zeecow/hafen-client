@@ -58,6 +58,7 @@ public class GameUI extends ConsoleHost implements Console.Directory {
     public HelpWnd help;
     public OptWnd opts;
     public Collection<DraggedItem> hand = new LinkedList<DraggedItem>();
+    private Collection<DraggedItem> handSave = new LinkedList<DraggedItem>();
     private WItem vhand;
     public ChatUI chat;
     public ChatUI.Channel syslog;
@@ -72,7 +73,7 @@ public class GameUI extends ConsoleHost implements Console.Directory {
     public ActWindow craftlist, buildlist;
     public TimerPanel timers;
 
-    public abstract class Belt extends Widget {
+	public abstract class Belt extends Widget {
 	public Belt(Coord sz) {
 	    super(sz);
 	}
@@ -510,6 +511,18 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 	if(!hand.isEmpty() && (vhand == null)) {
 	    DraggedItem fi = hand.iterator().next();
 	    vhand = add(new ItemDrag(fi.dc, fi.item));
+	}
+    }
+
+    public void toggleHand(){
+	if (hand.isEmpty()) {
+	    hand.addAll(handSave);
+	    handSave.clear();
+	    updhand();
+	} else {
+	    handSave.addAll(hand);
+	    hand.clear();
+	    updhand();
 	}
     }
 
