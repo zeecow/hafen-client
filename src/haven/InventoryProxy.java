@@ -45,7 +45,17 @@ public class InventoryProxy extends Widget implements DTarget {
 
     @Override
     public Object tooltip(Coord c, Widget prev) {
-	return target.tooltip(c, prev);
+	WItem item = itemat(c);
+	return (item != null) ? item.tooltip(c.sub(item.c), (prev == this) ? item : prev) : null;
+    }
+
+    private WItem itemat(Coord c) {
+	for (WItem item : target.children(WItem.class)) {
+	    if (c.isect(xlate(item.c, true), item.sz)) {
+		return item;
+	    }
+	}
+	return null;
     }
 
     @Override
