@@ -13,7 +13,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class MapDumper implements Defer.Callable<Object> {
-    private static Coord start, lastplg;
+    private static MCache.Grid start;
     private static File sess;
 
     private static Type type;
@@ -35,13 +35,13 @@ public class MapDumper implements Defer.Callable<Object> {
 
     public static void dump(MCache mCache, MCache.Grid grid) {
 	type = gettype(mCache, grid);
-	if(type == Type.HOUSE){
+	if(type == Type.HOUSE) {
 	    return;
 	}
 	checksession(grid);
 	Coord offset;
-	synchronized(sync) {
-	    offset = grid.gc.sub(start);
+	synchronized (sync) {
+	    offset = grid.gc.sub(start.gc);
 	}
 	Defer.later(new MapDumper(new File(sess, String.format("tile_%d_%d.png", offset.x, offset.y)), mCache, grid));
     }
@@ -70,9 +70,9 @@ public class MapDumper implements Defer.Callable<Object> {
     }
 
     private static void checksession(MCache.Grid grid) {
-	synchronized(sync) {
+	synchronized (sync) {
 	    if(start == null) {
-		start = grid.gc;
+		start = grid;
 		String date = new SimpleDateFormat("yyyy-MM-dd HH.mm.ss").format(new Date(System.currentTimeMillis()));
 		sess = new File(String.format("%s/%s", type.folder, date));
 		//noinspection ResultOfMethodCallIgnored
@@ -81,22 +81,19 @@ public class MapDumper implements Defer.Callable<Object> {
 		    Writer writer = new FileWriter(new File(sess.getParentFile(), "currentsession.js"));
 		    writer.write(String.format("var currentSession = '%s';\n", date));
 		    writer.close();
-		} catch(IOException ignored) {
-		}
+		} catch (IOException ignored) {}
 	    }
 	}
     }
 
-    public static boolean plgrid(Coord plg) {
+    public static boolean plgrid(MCache.Grid plg) {
 	boolean newsession = false;
-	synchronized(sync) {
-	    if(lastplg != null) {
-		if(plg.manhattan2(lastplg) > 3) {
-		    newsession = true;
-		    start = null;
-		}
+	synchronized (sync) {
+	    if(plg.gc.x == 0 && plg.gc.y == 0 && (start != null && plg.id != start.id)) {
+		newsession = true;
+		start = null;
+    		checksession(plg);
 	    }
-	    lastplg = plg;
 	}
 	return newsession;
     }
@@ -112,7 +109,7 @@ public class MapDumper implements Defer.Callable<Object> {
 	try {
 	    BufferedImage img = drawmap();
 	    store(img);
-	} catch(Loading e) {
+	} catch (Loading e) {
 	    Defer.later(this);
 	}
 	return null;
@@ -124,7 +121,7 @@ public class MapDumper implements Defer.Callable<Object> {
 	}
 	try {
 	    ImageIO.write(img, "png", file);
-	} catch(IOException ignored) {
+	} catch (IOException ignored) {
 	}
     }
 
@@ -149,25 +146,25 @@ public class MapDumper implements Defer.Callable<Object> {
 	BufferedImage[] texes = new BufferedImage[256];
 	BufferedImage buf = TexI.mkbuf(sz);
 	Coord c = new Coord();
-	for(c.y = 0; c.y < sz.y; c.y++) {
-	    for(c.x = 0; c.x < sz.x; c.x++) {
+	for (c.y = 0; c.y < sz.y; c.y++) {
+	    for (c.x = 0; c.x < sz.x; c.x++) {
 		int t = grid.gettile(c);
 		BufferedImage tex = tileimg(t, texes);
 		int rgb = 0;
 		if(tex != null)
 		    rgb = tex.getRGB(Utils.floormod(c.x, tex.getWidth()),
-			    Utils.floormod(c.y, tex.getHeight()));
+			Utils.floormod(c.y, tex.getHeight()));
 		buf.setRGB(c.x, c.y, rgb);
 	    }
 	}
-	for(c.y = 1; c.y < sz.y - 1; c.y++) {
-	    for(c.x = 1; c.x < sz.x - 1; c.x++) {
+	for (c.y = 1; c.y < sz.y - 1; c.y++) {
+	    for (c.x = 1; c.x < sz.x - 1; c.x++) {
 		int t = grid.gettile(c);
 		Tiler tl = mCache.tiler(t);
 		if(tl instanceof Ridges.RidgeTile) {
 		    if(Ridges.brokenp(mCache, grid, c)) {
-			for(int y = c.y - 1; y <= c.y + 1; y++) {
-			    for(int x = c.x - 1; x <= c.x + 1; x++) {
+			for (int y = c.y - 1; y <= c.y + 1; y++) {
+			    for (int x = c.x - 1; x <= c.x + 1; x++) {
 				Color cc = new Color(buf.getRGB(x, y));
 				buf.setRGB(x, y, Utils.blendcol(cc, Color.BLACK, ((x == c.x) && (y == c.y)) ? 1 : 0.1).getRGB());
 			    }
@@ -176,20 +173,18 @@ public class MapDumper implements Defer.Callable<Object> {
 		}
 	    }
 	}
-	for(c.y = 1; c.y < sz.y - 1; c.y++) {
-	    for(c.x = 1; c.x < sz.x - 1; c.x++) {
+	for (c.y = 1; c.y < sz.y - 1; c.y++) {
+	    for (c.x = 1; c.x < sz.x - 1; c.x++) {
 		try {
 		    int t = grid.gettile(c);
 		    Coord c0 = c.add(grid.ul);
 		    if((mCache.gettile(c0.add(-1, 0)) > t) ||
-			    (mCache.gettile(c0.add(1, 0)) > t) ||
-			    (mCache.gettile(c0.add(0, -1)) > t) ||
-			    (mCache.gettile(c0.add(0, 1)) > t)) {
+			(mCache.gettile(c0.add(1, 0)) > t) ||
+			(mCache.gettile(c0.add(0, -1)) > t) ||
+			(mCache.gettile(c0.add(0, 1)) > t)) {
 			buf.setRGB(c.x, c.y, Color.BLACK.getRGB());
 		    }
-		} catch(IndexOutOfBoundsException ignored) {
-		} catch(Loading ignored) {
-		}
+		} catch (IndexOutOfBoundsException | Loading ignored) {}
 	    }
 	}
 	return (buf);

@@ -240,11 +240,13 @@ public class LocalMiniMap extends Widget {
 	if(cc == null)
 	    return;
 	Coord plg = cc.div(cmaps);
-	if(MapDumper.plgrid(plg)) {
-	    synchronized(cache) {
-		cache.clear();
+	try {
+	    if(MapDumper.plgrid(ui.sess.glob.map.getgrid(plg))) {
+		synchronized (cache) {
+		    cache.clear();
+		}
 	    }
-	}
+	} catch (Loading ignored) {}
 
 	Coord center = cc.add(off);
 	Coord hsz = sz.div(2);
