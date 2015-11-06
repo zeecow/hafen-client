@@ -12,9 +12,7 @@ public class ActList extends Listbox<ActList.ActItem> {
     }
 
     @Override
-    protected void itemactivate(ActItem item) {
-	ui.gui.menu.use(item.pagina, false);
-    }
+    protected void itemactivate(ActItem item) {}
 
     public void add(Glob.Pagina pagina) {
 	ActItem item = new ActItem(pagina);

@@ -24,7 +24,6 @@ public class ActWindow extends GameUI.Hidewnd {
 	    @Override
 	    public void activate(String text) {
 		act(filtered.sel.pagina);
-		ActWindow.this.hide();
 	    }
 
 	    @Override
@@ -49,13 +48,19 @@ public class ActWindow extends GameUI.Hidewnd {
 	    }
 	});
 	setfocus(filter);
-	filtered = add(new ActList(WIDTH, 10), new Coord(0, filter.sz.y + 5));
+	filtered = add(new ActList(WIDTH, 10) {
+	    @Override
+	    protected void itemactivate(ActItem item) {
+		act(item.pagina);
+	    }
+	}, 0, filter.sz.y + 5);
 	filtered.bgcolor = new Color(0, 0, 0, 128);
 	pack();
     }
 
     private void act(Pagina pagina) {
 	ui.gui.menu.use(pagina, false);
+	ActWindow.this.hide();
     }
 
     @Override
