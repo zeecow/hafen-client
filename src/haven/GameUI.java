@@ -49,7 +49,8 @@ public class GameUI extends ConsoleHost implements Console.Directory {
     private List<Widget> cmeters = new LinkedList<Widget>();
     private Text lastmsg;
     private long msgtime;
-    private Window invwnd, equwnd, makewnd;
+    private Window invwnd, equwnd;
+    private CraftWindow makewnd;
     public Inventory maininv;
     public CharWnd chrwdg;
     public BuddyWnd buddies;
@@ -614,25 +615,13 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 	    if(craftwnd != null){
 		craftwnd.setMakewindow(mkwdg);
 	    } else {
-		makewnd = new Window(Coord.z, "Crafting", true) {
-		    public void wdgmsg(Widget sender, String msg, Object... args) {
-			if((sender == this) && msg.equals("close")) {
-			    mkwdg.wdgmsg("close");
-			    return;
-			}
-			super.wdgmsg(sender, msg, args);
-		    }
-
-		    public void cdestroy(Widget w) {
-			if(w == mkwdg) {
-			    ui.destroy(this);
-			    makewnd = null;
-			}
-		    }
-		};
-		makewnd.add(mkwdg, Coord.z);
+		if(makewnd == null) {
+		    makewnd = add(new CraftWindow(), new Coord(400, 200));
+		}
+		makewnd.add(child);
 		makewnd.pack();
-		add(makewnd, new Coord(400, 200));
+		makewnd.raise();
+		makewnd.show();
 	    }
 	} else if(place == "buddy") {
 	    zerg.ntab(buddies = (BuddyWnd)child, zerg.kin);

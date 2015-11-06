@@ -49,8 +49,9 @@ public class MenuGrid extends Widget {
     private int pagseq = 0;
     private boolean loading = true;
     private Map<Character, Pagina> hotmap = new TreeMap<Character, Pagina>();
+    public Pagina lastCraft = null;
 
-    @RName("scm")
+	@RName("scm")
     public static class $_ implements Factory {
 	public Widget create(Widget parent, Object[] args) {
 	    return(new MenuGrid());
@@ -322,6 +323,9 @@ public class MenuGrid extends Widget {
 		curoff += 14;
 	} else {
 	    r.newp = 0;
+	    if(isCrafting(r)){
+		lastCraft = r;
+	    }
 	    senduse(r);
 	    if(reset)
 		this.cur = null;
