@@ -70,7 +70,7 @@ public class GameUI extends ConsoleHost implements Console.Directory {
     public Belt beltwdg;
     public String polowner;
     public Bufflist buffs;
-    public CraftWnd craftwnd = null;
+    public CraftDBWnd craftwnd = null;
     public ActWindow craftlist, buildlist;
     public TimerPanel timers;
     public StudyWnd studywnd;
