@@ -551,6 +551,7 @@ public class MCache {
 		    g.dispose();
 		grids.clear();
 		req.clear();
+		MapDumper.newSession();
 	    }
 	}
     }

@@ -42,16 +42,14 @@ public class LocalMiniMap extends Widget {
     public final MapView mv;
     private String biome;
     private Tex biometex = null;
+    private long session = 0;
 
     private Coord cc = null;
     private final Map<Coord, Defer.Future<MapTile>> cache = new LinkedHashMap<Coord, Defer.Future<MapTile>>(5, 0.75f, true) {
 	protected boolean removeEldestEntry(Map.Entry<Coord, Defer.Future<MapTile>> eldest) {
 	    if(size() > 100) {
-		try {
-		    MapTile t = eldest.getValue().get();
-		    t.img.dispose();
-		} catch(RuntimeException ignored) {}
-		return(true);
+		    clearCacheTile(eldest.getValue());
+		    return(true);
 	    }
 	    return(false);
 	}
@@ -242,10 +240,9 @@ public class LocalMiniMap extends Widget {
 	    return;
 	Coord plg = cc.div(cmaps);
 	try {
-	    if(MapDumper.plgrid(ui.sess.glob.map.getgrid(plg))) {
-		synchronized (cache) {
-		    cache.clear();
-		}
+	    if(MapDumper.session() != session) {
+		session = MapDumper.session();
+		clearCache();
 	    }
 	} catch (Loading ignored) {}
 
@@ -333,7 +330,28 @@ public class LocalMiniMap extends Widget {
 	}
     }
 
-    public boolean mousedown(Coord c, int button) {
+    private void clearCache() {
+	synchronized (cache){
+	    Collection<Defer.Future<MapTile>> tiles = cache.values();
+	    for(Defer.Future<MapTile> tile : tiles){
+		clearCacheTile(tile);
+	    }
+	    cache.clear();
+	}
+    }
+
+    private void clearCacheTile(Defer.Future<MapTile> tile) {
+	try {
+	    if(tile.done()){
+		MapTile t = tile.get();
+		t.img.dispose();
+	    } else {
+		tile.cancel();
+	    }
+	} catch (RuntimeException ignored) {}
+    }
+
+	public boolean mousedown(Coord c, int button) {
 	if(cc == null)
 	    return(false);
 	Gob gob = findicongob(c);

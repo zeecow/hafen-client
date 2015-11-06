@@ -13,7 +13,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class MapDumper implements Defer.Callable<Object> {
-    private static MCache.Grid start;
+    private static long start = 0;
     private static File sess;
 
     private static Type type;
@@ -28,23 +28,28 @@ public class MapDumper implements Defer.Callable<Object> {
 	NORMAL("map"), CAVE("cave"), HOUSE(null);
 
 	public final String folder;
-	Type(String folder){
+
+	Type(String folder) {
 	    this.folder = folder;
 	}
     }
 
     public static void dump(MCache mCache, MCache.Grid grid) {
-	type = gettype(mCache, grid);
-	if(type == Type.HOUSE) {
-	    return;
-	}
-	checksession(grid);
-	Coord offset;
 	synchronized (sync) {
-	    offset = grid.gc.sub(start.gc);
+	    Type newType = gettype(mCache, grid);
+	    if(newType != type) {
+		newSession();
+	    }
+	    type = newType;
+	    if(type.folder == null) {
+		return;
+	    }
+	    checkSession();
+	    Defer.later(new MapDumper(new File(sess, tileName(grid.gc)), mCache, grid));
 	}
-	Defer.later(new MapDumper(new File(sess, String.format("tile_%d_%d.png", offset.x, offset.y)), mCache, grid));
     }
+
+    public static String tileName(Coord c) {return String.format("tile_%d_%d.png", c.x, c.y);}
 
     private static Type gettype(MCache mCache, MCache.Grid grid) {
 	Coord c = new Coord(), sz = MCache.cmaps;
@@ -69,11 +74,17 @@ public class MapDumper implements Defer.Callable<Object> {
 	return Type.NORMAL;
     }
 
-    private static void checksession(MCache.Grid grid) {
+    public static void newSession() {
 	synchronized (sync) {
-	    if(start == null) {
-		start = grid;
-		String date = new SimpleDateFormat("yyyy-MM-dd HH.mm.ss").format(new Date(System.currentTimeMillis()));
+	    start = System.currentTimeMillis();
+	    sess = null;
+	}
+    }
+
+    private static void checkSession() {
+	synchronized (sync) {
+	    if(sess == null) {
+		String date = new SimpleDateFormat("yyyy-MM-dd HH.mm.ss").format(new Date(start));
 		sess = new File(String.format("%s/%s", type.folder, date));
 		//noinspection ResultOfMethodCallIgnored
 		sess.mkdirs();
@@ -86,16 +97,8 @@ public class MapDumper implements Defer.Callable<Object> {
 	}
     }
 
-    public static boolean plgrid(MCache.Grid plg) {
-	boolean newsession = false;
-	synchronized (sync) {
-	    if(plg.gc.x == 0 && plg.gc.y == 0 && (start != null && plg.id != start.id)) {
-		newsession = true;
-		start = null;
-    		checksession(plg);
-	    }
-	}
-	return newsession;
+    public static long session() {
+	return start;
     }
 
     private MapDumper(File file, MCache mCache, MCache.Grid grid) {
