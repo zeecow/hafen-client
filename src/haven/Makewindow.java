@@ -26,6 +26,8 @@
 
 package haven;
 
+import me.ender.Reflect;
+
 import java.util.*;
 import java.awt.Font;
 import java.awt.Color;
@@ -176,6 +178,7 @@ public class Makewindow extends Widget {
     private Object stip, ltip;
     public Object tooltip(Coord mc, Widget prev) {
 	Resource tres = null;
+	String name = null;
 	Coord c;
 	if(qmod != null) {
 	    c = new Coord(xoff, qmy);
@@ -200,7 +203,10 @@ public class Makewindow extends Widget {
 	    c = new Coord(xoff, 0);
 	    for(Spec s : inputs) {
 		if(mc.isect(c, Inventory.invsq.sz())) {
-		    tres = s.res.get();
+		    name = getDynamicName(s.spr);
+		    if(name == null){
+			tres = s.res.get();
+		    }
 		    break find;
 		}
 		c = c.add(31, 0);
@@ -216,7 +222,7 @@ public class Makewindow extends Widget {
 	}
 	Resource.Tooltip tt;
 	if((tres == null) || ((tt = tres.layer(Resource.tooltip)) == null))
-	    return(null);
+	    return(name);
 	if(lasttip != tres) {
 	    lasttip = tres;
 	    stip = ltip = null;
@@ -241,6 +247,14 @@ public class Makewindow extends Widget {
 	    }
 	    return(ltip);
 	}
+    }
+
+    private static String getDynamicName(GSprite spr) {
+	Class<? extends GSprite> aSsprClass = spr.getClass();
+	if(Reflect.hasInterface("haven.res.ui.tt.defn.DynName", aSsprClass)) {
+	    return (String) Reflect.invoke(spr, "name");
+	}
+	return null;
     }
 
     public void wdgmsg(Widget sender, String msg, Object... args) {
