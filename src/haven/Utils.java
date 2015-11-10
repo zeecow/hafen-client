@@ -880,6 +880,24 @@ public class Utils {
 			 ((x.getBlue()  * f2) + (y.getBlue()  * f1)) / 255,
 			 ((x.getAlpha() * f2) + (y.getAlpha() * f1)) / 255));
     }
+
+    public static Color blendcol(double a, Color... cols) {
+	if(cols.length > 2) {
+	    int n = cols.length - 1;
+	    double d = 1.0 / n;
+	    int section = (int) (a / d);
+	    if(section >= n){
+		return cols[n];
+	    } else {
+		return blendcol(cols[section], cols[section + 1], (a - section * d) / d);
+	    }
+	} else if(cols.length == 2) {
+	    return blendcol(cols[0], cols[1], a);
+	} else if(cols.length == 1) {
+	    return cols[0];
+	}
+	return null;
+    }
     
     public static void serialize(Object obj, OutputStream out) throws IOException {
 	ObjectOutputStream oout = new ObjectOutputStream(out);
