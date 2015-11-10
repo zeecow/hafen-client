@@ -435,6 +435,9 @@ public class OptWnd extends Window {
 	y += 25;
 	display.add(new CFGBox("Show biomes on minimap", CFG.MMAP_SHOW_BIOMES), x, y);
 
+	y += 25;
+	display.add(new CFGBox("Simple crops", CFG.SIMPLE_CROPS, "Requires area reload"), x, y);
+
 	y += 35;
 	int w = display.add(new CFGBox("Show gob path", CFG.SHOW_GOB_PATH), x, y).sz.x;
 	display.add(new IButton("gfx/hud/opt", "", "-d", "-h") {
