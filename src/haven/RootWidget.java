@@ -79,6 +79,8 @@ public class RootWidget extends ConsoleHost {
     		if(ui.gui!=null){
 		    ui.gui.toggleStudy();
 		}
+	    } else if(ALT && code == KeyEvent.VK_I) {
+		CFG.DISPLAY_GOB_INFO.set(!CFG.DISPLAY_GOB_INFO.get(), true);
 	    } else if(CTRL && code == KeyEvent.VK_G) {
 		if(ui.gui!=null){
 		    ui.gui.map.togglegrid();

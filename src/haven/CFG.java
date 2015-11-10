@@ -14,7 +14,7 @@ public class CFG<T> {
     public static final CFG<String> VERSION = new CFG<>("version", "");
     public static final CFG<Boolean> DISPLAY_KINNAMES = new CFG<>("display.kinnames", true);
     public static final CFG<Boolean> DISPLAY_FLAVOR = new CFG<>("display.flavor", true);
-    public static final CFG<Boolean> DISPLAY_GOB_HEALTH = new CFG<>("display.gob_health", false);
+    public static final CFG<Boolean> DISPLAY_GOB_INFO = new CFG<>("display.gob_info", false);
     public static final CFG<Boolean> SHOW_GOB_PATH = new CFG<>("display.show_gob_path", false);
     public static final CFG<Boolean> SIMPLE_CROPS = new CFG<>("display.simple_crops", false);
     public static final CFG<Boolean> STORE_MAP = new CFG<>("general.storemap", false);

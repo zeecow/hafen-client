@@ -52,7 +52,7 @@ public class GobHealth extends GAttrib {
     }
 
     public Rendered text() {
-	if(!CFG.DISPLAY_GOB_HEALTH.get()) {
+	if(!CFG.DISPLAY_GOB_INFO.get()) {
 	    return null;
 	}
 	if(text == null && hp < 4) {

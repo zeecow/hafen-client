@@ -390,7 +390,26 @@ public class OptWnd extends Window {
 	display.add(new CFGBox("Show flavor objects", CFG.DISPLAY_FLAVOR), new Coord(x, y));
 
 	y += 25;
-	display.add(new CFGBox("Show gob health", CFG.DISPLAY_GOB_HEALTH), x, y);
+	display.add(new CFGBox("Show gob info", CFG.DISPLAY_GOB_INFO, "Enables damage and crop/tree growth stage displaying") {
+	    {
+		CFG.DISPLAY_GOB_INFO.setObserver(new CFG.Observer<Boolean>() {
+		    @Override
+		    public void updated(CFG<Boolean> cfg) {
+			update(cfg);
+		    }
+		});
+	    }
+
+	    @Override
+	    public void destroy() {
+		CFG.DISPLAY_GOB_INFO.setObserver(null);
+		super.destroy();
+	    }
+
+	    public void update(CFG<Boolean> cfg) {
+		a = cfg.get();
+	    }
+	}, x, y);
 
 	y += 25;
 	display.add(new CFGBox("Show timestamps in chat messages", CFG.SHOW_CHAT_TIMESTAMP), new Coord(x, y));
