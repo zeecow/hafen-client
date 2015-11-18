@@ -16,6 +16,7 @@ public class ActWindow extends GameUI.Hidewnd {
     private final List<Pagina> all = new LinkedList<>();
     private final String category;
     private int pagseq = 0;
+    private boolean needfilter = false;
 
     public ActWindow(String cap, String category) {
 	super(Coord.z, cap);
@@ -29,7 +30,7 @@ public class ActWindow extends GameUI.Hidewnd {
 	    @Override
 	    protected void changed() {
 		super.changed();
-		filter();
+		needfilter();
 	    }
 
 	    @Override
@@ -78,15 +79,24 @@ public class ActWindow extends GameUI.Hidewnd {
 	hide();
     }
 
+    private void needfilter() {
+	needfilter = true;
+    }
+
     private void filter() {
+	needfilter = false;
 	String filter = this.filter.text.toLowerCase();
 	synchronized (all) {
 	    filtered.clear();
 	    for (Pagina p : all) {
-		Resource res = p.res.get();
-		String name = res.layer(Resource.action).name.toLowerCase();
-		if(name.contains(filter)) {
-		    filtered.add(p);
+		try {
+		    Resource res = p.res.get();
+		    String name = res.layer(Resource.action).name.toLowerCase();
+		    if(name.contains(filter)) {
+			filtered.add(p);
+		    }
+		} catch (Loading e) {
+		    needfilter = true;
 		}
 	    }
 	}
@@ -113,15 +123,26 @@ public class ActWindow extends GameUI.Hidewnd {
 		    }
 
 		    pagseq = ui.sess.glob.pagseq;
-		    filter();
+		    needfilter();
 		}
 	    }
 	}
+	if(needfilter) {
+	    filter();
+	}
     }
 
-    private static class ItemComparator implements Comparator<ActList.ActItem> {
+    private class ItemComparator implements Comparator<ActList.ActItem> {
 	@Override
 	public int compare(ActList.ActItem a, ActList.ActItem b) {
+	    String filter = ActWindow.this.filter.text.toLowerCase();
+	    if(!filter.isEmpty()) {
+		int ai = a.name.text.toLowerCase().indexOf(filter);
+		int bi = b.name.text.toLowerCase().indexOf(filter);
+		if(ai < 0) {ai = Integer.MAX_VALUE;}
+		if(bi < 0) {bi = Integer.MAX_VALUE;}
+		if(ai != bi) {return Integer.compare(ai, bi);}
+	    }
 	    return a.name.text.compareTo(b.name.text);
 	}
     }
