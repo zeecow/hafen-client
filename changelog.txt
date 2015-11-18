@@ -1,3 +1,13 @@
+$size[14]{$u{Update for 11.11.15:}
+  * added option to turn simple crops on
+  * added option to display crop growth (ALT+I, or Options->Display), gob health is tied to it too
+ 
+$size[14]{$u{Update for 06.11.15:}
+  * display dynamic name for input resource, if available (fixes tooltips for meat)
+  * ported recent recipes from k-t client
+  * fixed some errors in minimap caching and map saving
+  * fixed long tooltips on study window
+ 
 $size[14]{$u{Update for 05.11.15:}
   * use precise view range display (ported from k-t client, based on XCom's research)
   * ported quick craft (ALT+C) and build (ALT+B) windows from k-t client
