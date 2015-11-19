@@ -137,11 +137,10 @@ public class ActWindow extends GameUI.Hidewnd {
 	public int compare(ActList.ActItem a, ActList.ActItem b) {
 	    String filter = ActWindow.this.filter.text.toLowerCase();
 	    if(!filter.isEmpty()) {
-		int ai = a.name.text.toLowerCase().indexOf(filter);
-		int bi = b.name.text.toLowerCase().indexOf(filter);
-		if(ai < 0) {ai = Integer.MAX_VALUE;}
-		if(bi < 0) {bi = Integer.MAX_VALUE;}
-		if(ai != bi) {return Integer.compare(ai, bi);}
+		boolean ai = a.name.text.toLowerCase().startsWith(filter);
+		boolean bi = b.name.text.toLowerCase().startsWith(filter);
+		if(ai && !bi) {return -1;}
+		if(!ai && bi) {return 1;}
 	    }
 	    return a.name.text.compareTo(b.name.text);
 	}
