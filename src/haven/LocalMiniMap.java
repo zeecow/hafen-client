@@ -185,7 +185,7 @@ public class LocalMiniMap extends Widget {
 		Radar.Marker icon = li.previous();
 		try {
 		    Gob gob = icon.gob;
-		    if(gob.id == mv.plgob){
+		    if(gob.id == mv.plgob || gob.rc == null){
 			continue;
 		    }
 		    Tex tex = icon.tex();
