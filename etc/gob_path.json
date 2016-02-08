@@ -32,11 +32,11 @@
     "show": false,
     "name": "aurochs"
   },
-  "gfx/kritter/cattle/"          : {
+  "gfx/kritter/cattle/"            : {
     "show": false,
     "name": "cattle"
   },
-  "gfx/kritter/chicken/"         : {
+  "gfx/kritter/chicken/"           : {
     "show" : false,
     "color": "ffffffee",
     "name" : "chicken"
@@ -56,7 +56,7 @@
     "name" : "frog"
   },
   "gfx/kritter/horse/horse"        : {
-    "show" : false,
+    "show" : true,
     "color": "ffdfb460",
     "name" : "horse"
   },
@@ -69,7 +69,7 @@
     "color": "ffbfb938",
     "name" : "lynx"
   },
-  "gfx/kritter/pig/"             : {
+  "gfx/kritter/pig/"               : {
     "show": false,
     "name": "pig"
   },
@@ -87,11 +87,16 @@
     "color": "ffe59363",
     "name" : "deer"
   },
+  "gfx/kritter/moose/moose"        : {
+    "show" : true,
+    "color": "ffe59363",
+    "name" : "moose"
+  },
   "gfx/kritter/sheep/mouflon"      : {
     "show": false,
     "name": "mouflon"
   },
-  "gfx/kritter/sheep/"           : {
+  "gfx/kritter/sheep/"             : {
     "show": false,
     "name": "sheep"
   },
@@ -103,8 +108,28 @@
     "show": false,
     "name": "toad"
   },
+  "gfx/terobjs/vehicle/bram"       : {
+    "show": false,
+    "name": "battering ram"
+  },
+  "gfx/terobjs/vehicle/cart"       : {
+    "show": false,
+    "name": "cart"
+  },
+  "gfx/terobjs/vehicle/plow"       : {
+    "show": false,
+    "name": "plow"
+  },
   "gfx/terobjs/vehicle/rowboat"    : {
     "show": false,
     "name": "boat"
+  },
+  "gfx/terobjs/vehicle/wagon"      : {
+    "show": false,
+    "name": "wagon"
+  },
+  "gfx/terobjs/vehicle/wheelbarrow": {
+    "show": false,
+    "name": "wheelbarrow"
   }
 }
