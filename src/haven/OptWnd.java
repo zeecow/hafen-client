@@ -390,41 +390,13 @@ public class OptWnd extends Window {
 	display.add(new CFGBox("Show flavor objects", CFG.DISPLAY_FLAVOR), new Coord(x, y));
 
 	y += 25;
-	display.add(new CFGBox("Show gob info", CFG.DISPLAY_GOB_INFO, "Enables damage and crop/tree growth stage displaying") {
-	    {
-		CFG.DISPLAY_GOB_INFO.setObserver(new CFG.Observer<Boolean>() {
-		    @Override
-		    public void updated(CFG<Boolean> cfg) {
-			update(cfg);
-		    }
-		});
-	    }
-
-	    @Override
-	    public void destroy() {
-		CFG.DISPLAY_GOB_INFO.setObserver(null);
-		super.destroy();
-	    }
-
-	    public void update(CFG<Boolean> cfg) {
-		a = cfg.get();
-	    }
-	}, x, y);
+	display.add(new CFGBox("Show gob info", CFG.DISPLAY_GOB_INFO, "Enables damage and crop/tree growth stage displaying", true), x, y);
 
 	y += 25;
 	display.add(new CFGBox("Show timestamps in chat messages", CFG.SHOW_CHAT_TIMESTAMP), new Coord(x, y));
 
 	y += 25;
-	display.add(new CFGBox("Undock minimap", CFG.MMAP_FLOAT) {
-	    {
-		CFG.MMAP_FLOAT.setObserver(new CFG.Observer<Boolean>() {
-		    @Override
-		    public void updated(CFG<Boolean> cfg) {
-			update(cfg);
-		    }
-		});
-	    }
-
+	display.add(new CFGBox("Undock minimap", CFG.MMAP_FLOAT, null, true) {
 	    @Override
 	    public void set(boolean a) {
 		super.set(a);
@@ -432,18 +404,7 @@ public class OptWnd extends Window {
 		    ui.gui.showmmappanel(a);
 		}
 	    }
-
-	    @Override
-	    public void destroy() {
-		CFG.MMAP_FLOAT.setObserver(null);
-		super.destroy();
-	    }
-
-	    private void update(CFG<Boolean> cfg) {
-		a = cfg.get();
-	    }
-
-	}, new Coord(x, y));
+	}, x, y);
 
 	y += 25;
 	display.add(new CFGBox("Swap item quality and number", CFG.SWAP_NUM_AND_Q), x, y);
@@ -458,18 +419,7 @@ public class OptWnd extends Window {
 	display.add(new CFGBox("Simple crops", CFG.SIMPLE_CROPS, "Requires area reload"), x, y);
 
 	y += 35;
-	display.add(new CFGBox("Show object radius", CFG.SHOW_GOB_RADIUS, "Shows radius of mine supports, beehives etc.") {
-	    {
-		CFG.SHOW_GOB_RADIUS.setObserver(new CFG.Observer<Boolean>() {
-		    @Override
-		    public void updated(CFG<Boolean> cfg) {
-			update(cfg);
-		    }
-		});
-	    }
-
-	    private void update(CFG<Boolean> cfg) { a = cfg.get(); }
-	}, x, y);
+	display.add(new CFGBox("Show object radius", CFG.SHOW_GOB_RADIUS, "Shows radius of mine supports, beehives etc.", true), x, y);
 
 	y += 25;
 	int w = display.add(new CFGBox("Show gob path", CFG.SHOW_GOB_PATH), x, y).sz.x;
@@ -624,21 +574,30 @@ public class OptWnd extends Window {
 	super.show();
     }
 
-    public static class CFGBox extends CheckBox {
+    public static class CFGBox extends CheckBox implements CFG.Observer<Boolean> {
 
 	protected final CFG<Boolean> cfg;
+	private final boolean observe;
 
 	public CFGBox(String lbl, CFG<Boolean> cfg) {
-	    this(lbl, cfg, null);
+	    this(lbl, cfg, null, false);
 	}
 
 	public CFGBox(String lbl, CFG<Boolean> cfg, String tip) {
+	    this(lbl, cfg, tip, false);
+	}
+
+	public CFGBox(String lbl, CFG<Boolean> cfg, String tip, boolean observe) {
 	    super(lbl);
 
 	    this.cfg = cfg;
+	    this.observe = observe;
 	    defval();
 	    if(tip != null) {
 		tooltip = Text.render(tip).tex();
+	    }
+	    if(this.observe){
+		cfg.setObserver(this);
 	    }
 	}
 
@@ -655,7 +614,13 @@ public class OptWnd extends Window {
 	@Override
 	public void destroy() {
 	    GobPathOptWnd.remove();
+	    if(observe){cfg.setObserver(null);}
 	    super.destroy();
+	}
+
+	@Override
+	public void updated(CFG<Boolean> cfg) {
+	    a = cfg.get();
 	}
     }
 }
