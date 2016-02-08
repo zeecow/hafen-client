@@ -92,7 +92,23 @@ public class Config {
 	return new File(HOMEDIR, name);
     }
 
-    public static String loadFile(String name){
+    public static String loadFile(String name) {
+	InputStream inputStream = getFSStream(name);
+	if(inputStream == null) {
+	    inputStream = getJarStream(name);
+	}
+	return getString(inputStream);
+    }
+
+    public static String loadJarFile(String name) {
+	return getString(getJarStream(name));
+    }
+
+    public static String loadFSFile(String name) {
+	return getString(getFSStream(name));
+    }
+
+    private static InputStream getFSStream(String name) {
 	InputStream inputStream = null;
 	File file = Config.getFile(name);
 	if(file.exists() && file.canRead()) {
@@ -100,13 +116,17 @@ public class Config {
 		inputStream = new FileInputStream(file);
 	    } catch (FileNotFoundException ignored) {
 	    }
-	} else {
-	    inputStream = Config.class.getResourceAsStream("/"+name);
 	}
+	return inputStream;
+    }
+
+    private static InputStream getJarStream(String name) {return Config.class.getResourceAsStream("/" + name);}
+
+    private static String getString(InputStream inputStream) {
 	if(inputStream != null) {
 	    try {
 		return Utils.stream2str(inputStream);
-	    } catch (Exception ignore){
+	    } catch (Exception ignore) {
 	    } finally {
 		try {inputStream.close();} catch (IOException ignored) {}
 	    }
