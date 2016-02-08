@@ -90,7 +90,7 @@ public class CFG<T> {
 
     public void set(T value, boolean observe) {
 	set(value);
-	observe();
+	if(observe) {observe();}
     }
 
     public void observe(Observer<T> observer) {
@@ -102,7 +102,7 @@ public class CFG<T> {
     }
 
     private void observe() {
-	for(Observer<T> observer : observers){
+	for (Observer<T> observer : observers) {
 	    observer.updated(this);
 	}
     }
