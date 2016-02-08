@@ -1,3 +1,7 @@
+$size[14]{$u{Update for 08.02.16:}
+  * updated gob path config with entries for moose and some vehicles (cart, plow, ram, wagon, wheelbarrow)
+  * added ability to display radius of mine supports, beehives and troughs toggle in options (Display->Show object radius) or with ALT+R
+ 
 $size[14]{$u{Update for 11.11.15:}
   * added option to turn simple crops on
   * added option to display crop growth (ALT+I, or Options->Display), gob health is tied to it too
