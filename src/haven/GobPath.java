@@ -115,6 +115,7 @@ public class GobPath extends Sprite {
     }
 
     public static class Cfg {
+	public static final String GOB_PATH_JSON = "gob_path.json";
 	private static final Cfg DEFAULT = new Cfg(Color.WHITE, false);
 	public static final Map<String, Cfg> gobPathCfg;
 	private static final Map<String, Cfg> cache = new HashMap<>();
@@ -123,20 +124,26 @@ public class GobPath extends Sprite {
 	public String name;
 
 	static {
-	    String json = Config.loadFile("gob_path.json");
-	    Map<String, Cfg> tmp = new HashMap<>();
+	    Map<String, Cfg> merge = new HashMap<>();
+	    merge.putAll(parseJson(Config.loadJarFile(GOB_PATH_JSON)));
+	    merge.putAll(parseJson(Config.loadFSFile(GOB_PATH_JSON)));
+	    gobPathCfg = merge;
+	    gobPathCfg.put("unknown", DEFAULT);
+	}
+
+	private static Map<String, Cfg> parseJson(String json) {
+	    Map<String, Cfg> result = new HashMap<>();
 	    if(json != null) {
 		try {
-		    Gson gson = GobPath.Cfg.getGson();
+		    Gson gson = Cfg.getGson();
 		    Type collectionType = new TypeToken<HashMap<String, Cfg>>() {
 		    }.getType();
-		    tmp = gson.fromJson(json, collectionType);
+		    result = gson.fromJson(json, collectionType);
 		} catch (Exception e) {
-		    tmp = new HashMap<>();
+		    result = new HashMap<>();
 		}
 	    }
-	    gobPathCfg = tmp;
-	    gobPathCfg.put("unknown", DEFAULT);
+	    return result;
 	}
 
 	public Cfg(Color color, boolean show) {
@@ -146,7 +153,7 @@ public class GobPath extends Sprite {
 
 	public static void save() {
 	    Gson gson = GobPath.Cfg.getGson();
-	    Config.saveFile("gob_path.json", gson.toJson(gobPathCfg));
+	    Config.saveFile(GOB_PATH_JSON, gson.toJson(gobPathCfg));
 	}
 
 	public static GobPath.Cfg get(String resname) {
