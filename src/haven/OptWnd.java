@@ -574,10 +574,15 @@ public class OptWnd extends Window {
 	super.show();
     }
 
+    @Override
+    public void destroy() {
+	GobPathOptWnd.remove();
+	super.destroy();
+    }
+
     public static class CFGBox extends CheckBox implements CFG.Observer<Boolean> {
 
 	protected final CFG<Boolean> cfg;
-	private final boolean observe;
 
 	public CFGBox(String lbl, CFG<Boolean> cfg) {
 	    this(lbl, cfg, null, false);
@@ -591,14 +596,11 @@ public class OptWnd extends Window {
 	    super(lbl);
 
 	    this.cfg = cfg;
-	    this.observe = observe;
 	    defval();
 	    if(tip != null) {
 		tooltip = Text.render(tip).tex();
 	    }
-	    if(this.observe){
-		cfg.setObserver(this);
-	    }
+	    if(observe){ cfg.observe(this); }
 	}
 
 	protected void defval() {
@@ -613,8 +615,7 @@ public class OptWnd extends Window {
 
 	@Override
 	public void destroy() {
-	    GobPathOptWnd.remove();
-	    if(observe){cfg.setObserver(null);}
+	    cfg.unobserve(this);
 	    super.destroy();
 	}
 

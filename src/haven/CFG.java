@@ -8,6 +8,8 @@ import me.ender.Reflect;
 
 import java.lang.reflect.Type;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 public class CFG<T> {
@@ -51,7 +53,7 @@ public class CFG<T> {
     private static final Gson gson;
     private final String path;
     public final T def;
-    private Observer<T> observer;
+    private List<Observer<T>> observers = new LinkedList<>();
 
     static {
 	gson = (new GsonBuilder()).setPrettyPrinting().create();
@@ -83,20 +85,26 @@ public class CFG<T> {
 
     public void set(T value) {
 	CFG.set(this, value);
-	if(observer != null) {
-	    observer.updated(this);
-	}
+	observe();
     }
 
     public void set(T value, boolean observe) {
 	set(value);
-	if(observe && observer != null) {
-	    observer.updated(this);
-	}
+	observe();
     }
 
-    public void setObserver(Observer<T> observer) {
-	this.observer = observer;
+    public void observe(Observer<T> observer) {
+	this.observers.add(observer);
+    }
+
+    public void unobserve(Observer<T> observer) {
+	this.observers.remove(observer);
+    }
+
+    private void observe() {
+	for(Observer<T> observer : observers){
+	    observer.updated(this);
+	}
     }
 
     @SuppressWarnings("unchecked")
