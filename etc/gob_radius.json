@@ -1,0 +1,18 @@
+{
+  "gfx/terobjs/minesupport": {
+    "radius": 100,
+    "color" : "8866BB66"
+  },
+  "gfx/terobjs/column"     : {
+    "radius": 125,
+    "color" : "8866BB66"
+  },
+  "gfx/terobjs/beehive"    : {
+    "radius": 150,
+    "color" : "883322ff"
+  },
+  "gfx/terobjs/trough"     : {
+    "radius": 200,
+    "color" : "883388bb"
+  }
+}

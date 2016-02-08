@@ -458,6 +458,20 @@ public class OptWnd extends Window {
 	display.add(new CFGBox("Simple crops", CFG.SIMPLE_CROPS, "Requires area reload"), x, y);
 
 	y += 35;
+	display.add(new CFGBox("Show object radius", CFG.SHOW_GOB_RADIUS, "Shows radius of mine supports, beehives etc.") {
+	    {
+		CFG.SHOW_GOB_RADIUS.setObserver(new CFG.Observer<Boolean>() {
+		    @Override
+		    public void updated(CFG<Boolean> cfg) {
+			update(cfg);
+		    }
+		});
+	    }
+
+	    private void update(CFG<Boolean> cfg) { a = cfg.get(); }
+	}, x, y);
+
+	y += 25;
 	int w = display.add(new CFGBox("Show gob path", CFG.SHOW_GOB_PATH), x, y).sz.x;
 	display.add(new IButton("gfx/hud/opt", "", "-d", "-h") {
 	    @Override

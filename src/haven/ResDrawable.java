@@ -26,14 +26,14 @@
 
 package haven;
 
-import java.awt.Color;
-
 public class ResDrawable extends Drawable {
     public final Indir<Resource> res;
     public Sprite spr = null;
     MessageBuf sdt;
     private int delay = 0;
-	
+    private Gob.Overlay radius;
+    private Boolean show_radius = false;
+
     public ResDrawable(Gob gob, Indir<Resource> res, Message sdt) {
 	super(gob);
 	this.res = res;
@@ -51,6 +51,11 @@ public class ResDrawable extends Drawable {
 	if(spr != null)
 	    return;
 	spr = Sprite.create(gob, res.get(), sdt.clone());
+	String name = res.get().name;
+	GobRadius cfg = GobRadius.get(name);
+	if(cfg != null) {
+	    radius = new Gob.Overlay(new ColoredRadius(gob, cfg.radius, cfg.color()));
+	}
     }
 	
     public void setup(RenderList rl) {
@@ -59,7 +64,18 @@ public class ResDrawable extends Drawable {
 	} catch(Loading e) {
 	    return;
 	}
+	checkRadius();
 	spr.setup(rl);
+    }
+
+    private void checkRadius() {
+	if(radius != null && show_radius != CFG.SHOW_GOB_RADIUS.get()) {
+	    show_radius = CFG.SHOW_GOB_RADIUS.get();
+	    gob.ols.remove(radius);
+	    if(show_radius) {
+		gob.ols.add(radius);
+	    }
+	}
     }
 	
     public void ctick(int dt) {

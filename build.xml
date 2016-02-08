@@ -68,6 +68,7 @@
       <fileset dir="resources/compiled" />
       <file file="etc/radar.xml"/>
       <file file="etc/gob_path.json"/>
+      <file file="etc/gob_radius.json"/>
     </jar>
   </target>
 
