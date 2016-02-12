@@ -52,6 +52,10 @@ public class QualityList {
 	return singles.get(CFG.Q_SINGLE_TYPE.get());
     }
 
+    public Quality single(SingleType type) {
+	return singles.get(type);
+    }
+
     public Tex tex() {
 	if(tex == null) {
 	    BufferedImage[] imgs = new BufferedImage[qualities.size()];
