@@ -1,5 +1,7 @@
 package haven;
 
+import haven.QualityList.SingleType;
+
 import java.util.LinkedList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -19,9 +21,8 @@ public class ItemFilter {
 		if(match((Curiosity) item)) {return true;}
 	    }
 	}
-	if(match(new QualityList(info))) {return true;}
+	return match(new QualityList(info));
 
-	return false;
     }
 
     protected boolean match(Curiosity item) { return false; }
@@ -46,7 +47,7 @@ public class ItemFilter {
 	    String value = m.group(4);
 	    String opt = m.group(5);
 
-	    if(text == null){
+	    if(text == null) {
 		text = "";
 	    } else {
 		text = text.toLowerCase();
@@ -59,6 +60,10 @@ public class ItemFilter {
 		    case "lp":
 		    case "mw":
 			tag = text;
+			break;
+		    case "q":
+			tag = "q";
+			text = "single";
 			break;
 		}
 	    }
@@ -77,6 +82,9 @@ public class ItemFilter {
 			break;
 		    case "has":
 			filter = new Has(text, sign, value, opt);
+			break;
+		    case "q":
+			filter = new Q(text, sign, value, opt);
 			break;
 		}
 	    }
@@ -257,8 +265,45 @@ public class ItemFilter {
 	@Override
 	protected boolean match(QualityList quality) {
 	    if(quality.isEmpty()) {return false;}
-	    //quality.
-	    return super.match(quality);
+
+	    SingleType type = null;
+	    if(text != null && !text.isEmpty()) {
+		type = getTextType(text);
+	    }
+
+	    if(type == null) {
+		type = getGenericType();
+	    }
+
+	    if(type == null) {
+		return test(quality.single().value, value);
+	    } else {
+		return test(quality.single(type).value, value);
+	    }
+	}
+
+	private SingleType getTextType(String text) {
+	    SingleType[] types = SingleType.values();
+	    for (SingleType type : types) {
+		if(type.name().toLowerCase().startsWith(text)) {
+		    return type;
+		}
+	    }
+	    return null;
+	}
+
+	private SingleType getGenericType() {
+	    switch (opts) {
+		case GREATER:
+		    return SingleType.Max;
+		case LESS:
+		    return SingleType.Min;
+		case EQUAL:
+		case WAVE:
+		    return SingleType.Average;
+		default:
+		    return null;
+	    }
 	}
     }
 }
