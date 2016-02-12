@@ -122,10 +122,12 @@ public class GItem extends AWidget implements ItemInfo.SpriteOwner, GSprite.Owne
     }
 
     public void testMatch() {
-	if(filtered < lastFilter && spr != null){
-	    matches = filter != null && filter.matches(info());
-	    filtered = lastFilter;
-	}
+	try {
+	    if(filtered < lastFilter && spr != null) {
+		matches = filter != null && filter.matches(info());
+		filtered = lastFilter;
+	    }
+	} catch (Loading ignored) {}
     }
 
     public List<ItemInfo> info() {
