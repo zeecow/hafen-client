@@ -6,7 +6,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class ItemFilter {
-    private static final Pattern q = Pattern.compile("(?:(\\w+):)?([\\w\\*]+)(?:([<>=+~])(\\d+(?:\\.\\d+)?)?([<>=+~])?)?");
+    private static final Pattern q = Pattern.compile("(?:(\\w+))?(?:^|:)([\\w\\*]+)?(?:([<>=+~])(\\d+(?:\\.\\d+)?)?([<>=+~])?)?");
     private static final Pattern float_p = Pattern.compile("(\\d+(?:\\.\\d+)?)");
 
     public boolean matches(List<ItemInfo> info) {
@@ -15,12 +15,16 @@ public class ItemFilter {
 		if(match((ItemInfo.Name) item)) { return true;}
 	    } else if(item instanceof ItemInfo.Contents) {
 		if(match((ItemInfo.Contents) item)) {return true;}
+	    } else if(item instanceof Curiosity) {
+		if(match((Curiosity) item)) {return true;}
 	    }
 	}
 	if(match(new QualityList(info))) {return true;}
 
 	return false;
     }
+
+    protected boolean match(Curiosity item) { return false; }
 
     protected boolean match(QualityList quality) {return false;}
 
@@ -37,18 +41,29 @@ public class ItemFilter {
 	Matcher m = q.matcher(query);
 	while (m.find()) {
 	    String tag = m.group(1);
-	    String text = m.group(2).toLowerCase();
+	    String text = m.group(2);
 	    String sign = m.group(3);
 	    String value = m.group(4);
 	    String opt = m.group(5);
 
+	    if(text == null){
+		text = "";
+	    } else {
+		text = text.toLowerCase();
+	    }
+
 	    ItemFilter filter = null;
-	    if(tag == null) {
-		if(sign != null && text.equals("q")) {
-		    //filter = new Alch(Alchemy.names[0], sign, value, opt);
-		} else {
-		    filter = new Text(text, false);
+	    if(sign != null && tag == null) {
+		switch (text) {
+		    case "xp":
+		    case "lp":
+		    case "mw":
+			tag = text;
+			break;
 		}
+	    }
+	    if(tag == null) {
+		filter = new Text(text, false);
 	    } else {
 		tag = tag.toLowerCase();
 		switch (tag) {
@@ -56,7 +71,9 @@ public class ItemFilter {
 			filter = new Text(text, true);
 			break;
 		    case "xp":
-			filter = new XP(text, sign, value, opt);
+		    case "lp":
+		    case "mw":
+			filter = new XP(tag, sign, value, opt);
 			break;
 		    case "has":
 			filter = new Has(text, sign, value, opt);
@@ -128,18 +145,19 @@ public class ItemFilter {
 	    if(sign == null) {
 		return getDefaultSign();
 	    }
-	    if(sign.equals(">")) {
-		return Sign.GREATER;
-	    } else if(sign.equals("<")) {
-		return Sign.LESS;
-	    } else if(sign.equals("=")) {
-		return Sign.EQUAL;
-	    } else if(sign.equals("+")) {
-		return Sign.GREQUAL;
-	    } else if(sign.equals("~")) {
-		return Sign.WAVE;
-	    } else {
-		return getDefaultSign();
+	    switch (sign) {
+		case ">":
+		    return Sign.GREATER;
+		case "<":
+		    return Sign.LESS;
+		case "=":
+		    return Sign.EQUAL;
+		case "+":
+		    return Sign.GREQUAL;
+		case "~":
+		    return Sign.WAVE;
+		default:
+		    return getDefaultSign();
 	    }
 	}
 
@@ -213,6 +231,24 @@ public class ItemFilter {
 
     private static class XP extends Complex {
 	public XP(String text, String sign, String value, String opt) {super(text, sign, value, opt);}
+
+	@Override
+	protected boolean match(Curiosity item) {
+	    if("lp".equals(text)) {
+		return test(item.exp, value);
+	    } else if("xp".equals(text)) {
+		return test(item.enc, value);
+	    } else if("mw".equals(text)) {
+		return test(item.mw, value);
+	    }
+	    return false;
+	}
+
+
+	@Override
+	protected Sign getDefaultSign() {
+	    return Sign.GREQUAL;
+	}
     }
 
     private static class Q extends Complex {
@@ -220,7 +256,7 @@ public class ItemFilter {
 
 	@Override
 	protected boolean match(QualityList quality) {
-	    if(quality.isEmpty()){return false;}
+	    if(quality.isEmpty()) {return false;}
 	    //quality.
 	    return super.match(quality);
 	}
