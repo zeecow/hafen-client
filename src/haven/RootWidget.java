@@ -79,6 +79,11 @@ public class RootWidget extends ConsoleHost {
     		if(ui.gui!=null){
 		    ui.gui.toggleStudy();
 		}
+	    } else if(ALT && code == KeyEvent.VK_F) {
+		if(ui.gui!=null){
+		    FilterWnd filter = ui.gui.filter;
+		    filter.show(!filter.visible);
+		}
 	    } else if(ALT && code == KeyEvent.VK_I) {
 		CFG.DISPLAY_GOB_INFO.set(!CFG.DISPLAY_GOB_INFO.get(), true);
 	    } else if(ALT && code == KeyEvent.VK_R) {

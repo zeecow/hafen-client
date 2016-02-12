@@ -27,11 +27,11 @@
 package haven;
 
 import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.image.BufferedImage;
 import java.util.*;
 
 public class GItem extends AWidget implements ItemInfo.SpriteOwner, GSprite.Owner {
+    private static ItemFilter filter;
+    private static long lastFilter = 0;
     public Indir<Resource> res;
     public MessageBuf sdt;
     public int meter = 0;
@@ -39,6 +39,13 @@ public class GItem extends AWidget implements ItemInfo.SpriteOwner, GSprite.Owne
     private GSprite spr;
     private Object[] rawinfo;
     private List<ItemInfo> info = Collections.emptyList();
+    public boolean matches = false;
+    private long filtered = 0;
+
+    public static void setFilter(ItemFilter filter) {
+	GItem.filter = filter;
+	lastFilter = System.currentTimeMillis();
+    }
     
     @RName("item")
     public static class $_ implements Factory {
@@ -111,6 +118,14 @@ public class GItem extends AWidget implements ItemInfo.SpriteOwner, GSprite.Owne
 	GSprite spr = spr();
 	if(spr != null)
 	    spr.tick(dt);
+	testMatch();
+    }
+
+    public void testMatch() {
+	if(filtered < lastFilter && spr != null){
+	    matches = filter != null && filter.matches(info());
+	    filtered = lastFilter;
+	}
     }
 
     public List<ItemInfo> info() {
@@ -141,6 +156,7 @@ public class GItem extends AWidget implements ItemInfo.SpriteOwner, GSprite.Owne
 	} else if(name == "tt") {
 	    info = null;
 	    rawinfo = args;
+	    filtered = 0;
 	} else if(name == "meter") {
 	    meter = (Integer)args[0];
 	}

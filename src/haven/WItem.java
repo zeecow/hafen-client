@@ -40,7 +40,8 @@ public class WItem extends Widget implements DTarget {
     public final GItem item;
     private Resource cspr = null;
     private Message csdt = Message.nil;
-    
+    private static final GLState MATCHES = new ColorMask(new Color(255, 32, 255, 128));
+
     public WItem(GItem item) {
 	super(sqsz);
 	this.item = item;
@@ -258,9 +259,10 @@ public class WItem extends Widget implements DTarget {
 	if(spr != null) {
 	    Coord sz = spr.sz();
 	    g.defstate();
+	    drawbars(g, sz);
 	    if(olcol.get() != null)
 		g.usestate(new ColorMask(olcol.get()));
-	    drawbars(g, sz);
+	    if(item.matches) {g.usestate(MATCHES);}
 	    drawmain(g, spr);
 	    g.defstate();
 	    drawnum(g, sz);
@@ -404,7 +406,7 @@ public class WItem extends Widget implements DTarget {
     public boolean drop(Coord cc, Coord ul) {
 	return(false);
     }
-	
+
     public boolean iteminteract(Coord cc, Coord ul) {
 	item.wdgmsg("itemact", ui.modflags());
 	return(true);
