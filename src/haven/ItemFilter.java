@@ -2,6 +2,7 @@ package haven;
 
 import haven.QualityList.SingleType;
 import haven.resutil.FoodInfo;
+import me.ender.Reflect;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -220,7 +221,20 @@ public class ItemFilter {
 
 	@Override
 	protected boolean match(ItemInfo item) {
-	    return item instanceof ItemInfo.Name && ((ItemInfo.Name) item).str.text.toLowerCase().contains(text);
+	    if(text != null && !text.isEmpty()) {
+		if(item instanceof ItemInfo.Name) {
+		    return ((ItemInfo.Name) item).str.text.toLowerCase().contains(text);
+		} else if(full) {
+		    if(item instanceof ItemInfo.AdHoc) {
+			return ((ItemInfo.AdHoc) item).str.text.toLowerCase().contains(text);
+		    } else if(Reflect.is(item, "Coinage")) {
+			String coinage = Reflect.getFieldValueString(item, "nm");
+			return coinage != null && coinage.toLowerCase().contains(text);
+		    }
+		}
+	    }
+
+	    return false;
 	}
     }
 
@@ -306,11 +320,11 @@ public class ItemFilter {
 
 	@Override
 	protected boolean match(ItemInfo item) {
-	    if(item instanceof FoodInfo){
+	    if(item instanceof FoodInfo) {
 		FoodInfo fep = (FoodInfo) item;
-		if(text != null && text.length() >= 3){
-		    for(FoodInfo.Event event : fep.evs){
-			if(event.ev.nm.toLowerCase().startsWith(text)){
+		if(text != null && text.length() >= 3) {
+		    for (FoodInfo.Event event : fep.evs) {
+			if(event.ev.nm.toLowerCase().startsWith(text)) {
 			    return test(event.a, value);
 			}
 		    }
