@@ -13,29 +13,13 @@ public class ItemFilter {
 
     public boolean matches(List<ItemInfo> info) {
 	for (ItemInfo item : info) {
-	    if(item instanceof ItemInfo.Name) {
-		if(match((ItemInfo.Name) item)) { return true;}
-	    } else if(item instanceof ItemInfo.Contents) {
-		if(match((ItemInfo.Contents) item)) {return true;}
-	    } else if(item instanceof Curiosity) {
-		if(match((Curiosity) item)) {return true;}
-	    }
+	    if(match(item)) {return true;}
 	}
 	return match(new QualityList(info));
 
     }
 
-    protected boolean match(Curiosity item) { return false; }
-
-    protected boolean match(QualityList quality) {return false;}
-
-    protected boolean match(ItemInfo.Contents item) {
-	return false;
-    }
-
-    protected boolean match(ItemInfo.Name item) {
-	return false;
-    }
+    protected boolean match(ItemInfo item) { return false; }
 
     public static ItemFilter create(String query) {
 	Compound result = new Compound();
@@ -182,8 +166,8 @@ public class ItemFilter {
 	}
 
 	@Override
-	protected boolean match(ItemInfo.Contents item) {
-	    String name = this.name(item.sub).toLowerCase();
+	protected boolean match(ItemInfo item) {
+	    String name = this.name(((ItemInfo.Contents) item).sub).toLowerCase();
 	    float num = count(name);
 	    return name.contains(text) && test(num, value);
 	}
@@ -232,8 +216,8 @@ public class ItemFilter {
 	}
 
 	@Override
-	protected boolean match(ItemInfo.Name item) {
-	    return item.str.text.toLowerCase().contains(text);
+	protected boolean match(ItemInfo item) {
+	    return item instanceof ItemInfo.Name && ((ItemInfo.Name) item).str.text.toLowerCase().contains(text);
 	}
     }
 
@@ -241,13 +225,16 @@ public class ItemFilter {
 	public XP(String text, String sign, String value, String opt) {super(text, sign, value, opt);}
 
 	@Override
-	protected boolean match(Curiosity item) {
-	    if("lp".equals(text)) {
-		return test(item.exp, value);
-	    } else if("xp".equals(text)) {
-		return test(item.enc, value);
-	    } else if("mw".equals(text)) {
-		return test(item.mw, value);
+	protected boolean match(ItemInfo item) {
+	    if(item instanceof Curiosity) {
+		Curiosity curio = (Curiosity) item;
+		if("lp".equals(text)) {
+		    return test(curio.exp, value);
+		} else if("xp".equals(text)) {
+		    return test(curio.enc, value);
+		} else if("mw".equals(text)) {
+		    return test(curio.mw, value);
+		}
 	    }
 	    return false;
 	}
@@ -263,7 +250,9 @@ public class ItemFilter {
 	public Q(String text, String sign, String value, String opts) { super(text, sign, value, opts); }
 
 	@Override
-	protected boolean match(QualityList quality) {
+	protected boolean match(ItemInfo item) {
+	    if(!(item instanceof QualityList)){return false;}
+	    QualityList quality = (QualityList) item;
 	    if(quality.isEmpty()) {return false;}
 
 	    SingleType type = null;
