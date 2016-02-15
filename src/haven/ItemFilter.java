@@ -1,6 +1,7 @@
 package haven;
 
 import haven.QualityList.SingleType;
+import haven.resutil.FoodInfo;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -70,6 +71,8 @@ public class ItemFilter {
 		    case "q":
 			filter = new Q(text, sign, value, opt);
 			break;
+		    case "fep":
+			filter = new FEP(text, sign, value, opt);
 		}
 	    }
 	    if(filter != null) {
@@ -251,7 +254,7 @@ public class ItemFilter {
 
 	@Override
 	protected boolean match(ItemInfo item) {
-	    if(!(item instanceof QualityList)){return false;}
+	    if(!(item instanceof QualityList)) {return false;}
 	    QualityList quality = (QualityList) item;
 	    if(quality.isEmpty()) {return false;}
 
@@ -293,6 +296,30 @@ public class ItemFilter {
 		default:
 		    return null;
 	    }
+	}
+    }
+
+    private static class FEP extends Complex {
+	public FEP(String text, String sign, String value, String opts) {
+	    super(text, sign, value, opts);
+	}
+
+	@Override
+	protected boolean match(ItemInfo item) {
+	    if(item instanceof FoodInfo){
+		FoodInfo fep = (FoodInfo) item;
+		if(text != null && text.length() >= 3){
+		    for(FoodInfo.Event event : fep.evs){
+			if(event.ev.nm.toLowerCase().startsWith(text)){
+			    return test(event.a, value);
+			}
+		    }
+		} else {
+		    return true;
+		}
+	    }
+
+	    return false;
 	}
     }
 }
