@@ -74,6 +74,10 @@ public class Reflect {
 	return false;
     }
 
+    public static boolean is(Object obj, String clazz){
+	return obj != null && obj.getClass().getName().equals(clazz);
+    }
+
     public static Object invoke(Object o, String method, Object... args) {
 	Class[] types = new Class[args.length];
 	for (int i = 0; i < args.length; i++) {

@@ -275,8 +275,7 @@ public abstract class ItemInfo {
     public static List<ItemInfo> findall(String cl, List<ItemInfo> il){
 	List<ItemInfo> ret = new LinkedList<ItemInfo>();
 	for(ItemInfo inf : il) {
-	    String name = inf.getClass().getName();
-	    if(cl.equals(name))
+	    if(Reflect.is(inf, cl))
 		ret.add(inf);
 	}
 	return ret;
