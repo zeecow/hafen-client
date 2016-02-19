@@ -5,7 +5,6 @@ public class FilterWnd extends GameUI.Hidewnd {
 
     FilterWnd() {
 	super(new Coord(120, 200), "Filter");
-	cbtn.visible = false;
 	//cap = null;
 
 	input = add(new TextEntry(200, "") {
