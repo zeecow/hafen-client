@@ -1,4 +1,11 @@
 $size[14]{$u{Update for 08.02.16:}
+  * merged loftar's code
+  * radar icons now always show resource name in tooltip if shift is pressed
+  * fixed radar icons for ores showing as rocks
+  * added stalagmites to radar rocks category. Delete radar.xml in client folder and restart client to see it.
+  * added item filtering. Use ALT+F to open filter window and type queries in it. More details on client GitHub WIKI (https://github.com/EnderWiggin/hafen-client/wiki/Item-Highlight-Query)
+ 
+$size[14]{$u{Update for 08.02.16:}
   * updated gob path config with entries for moose and some vehicles (cart, plow, ram, wagon, wheelbarrow)
   * added ability to display radius of mine supports, beehives and troughs toggle in options (Display->Show object radius) or with ALT+R
  
