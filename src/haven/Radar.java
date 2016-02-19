@@ -39,11 +39,11 @@ public class Radar {
 	MarkerCFG result = cfg_cache.get(resname);
 	if(result == null) {
 	    result = DEFAULT;
-	    for(RadarCFG.Group group : RadarCFG.groups) {
+	    outer:for(RadarCFG.Group group : RadarCFG.groups) {
 		for(MarkerCFG cfg : group.markerCFGs) {
 		    if(cfg.match(resname)) {
 			result = cfg;
-			break;
+			break outer;
 		    }
 		}
 	    }
@@ -144,14 +144,12 @@ public class Radar {
 
 	public String tooltip(boolean full) {
 	    KinInfo ki = gob.getattr(KinInfo.class);
-	    if(ki != null) {
+	    if(full) {
+		return resname;
+	    } else if(ki != null) {
 		return ki.name;
-	    } else if(cfg != null) {
-		if(cfg.name != null) {
-		    return cfg.name;
-		} else if(full) {
-		    return resname;
-		}
+	    } else if(cfg != null && cfg.name != null) {
+		return cfg.name;
 	    }
 	    return null;
 	}
