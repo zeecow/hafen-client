@@ -86,6 +86,8 @@ public class RootWidget extends ConsoleHost {
 		}
 	    } else if(ALT && code == KeyEvent.VK_I) {
 		CFG.DISPLAY_GOB_INFO.set(!CFG.DISPLAY_GOB_INFO.get(), true);
+	    } else if(CTRL && code == KeyEvent.VK_H) {
+		CFG.DISPLAY_GOB_HITBOX.set(!CFG.DISPLAY_GOB_HITBOX.get(), true);
 	    } else if(ALT && code == KeyEvent.VK_R) {
 		CFG.SHOW_GOB_RADIUS.set(!CFG.SHOW_GOB_RADIUS.get(), true);
 	    } else if(CTRL && code == KeyEvent.VK_G) {

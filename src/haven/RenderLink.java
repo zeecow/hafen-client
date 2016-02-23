@@ -35,6 +35,7 @@ public interface RenderLink {
     public class Res extends Resource.Layer implements Resource.IDLayer<Integer> {
 	public transient final RenderLink l;
 	public final int id;
+	public Indir<Resource> mesh;
 	
 	public Res(Resource res, Message buf) {
 	    res.super();
@@ -58,6 +59,7 @@ public interface RenderLink {
 		final int matid = buf.int16();
 		final Indir<Resource> mesh = meshnm.equals("")?res.indir():res.pool.load(meshnm, meshver);
 		final Indir<Resource> mat = matnm.equals("")?res.indir():res.pool.load(matnm, matver);
+		this.mesh = mesh;
 		l = new RenderLink() {
 			Rendered res = null;
 			public Rendered make() {

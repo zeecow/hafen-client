@@ -40,6 +40,7 @@ public class Gob implements Sprite.Owner, Skeleton.ModOwner, Rendered {
     Map<Class<? extends GAttrib>, GAttrib> attr = new HashMap<Class<? extends GAttrib>, GAttrib>();
     public Collection<Overlay> ols = new LinkedList<Overlay>();
     private GobPath path;
+    private Overlay hitbox = null;
 
     public static class Overlay implements Rendered {
 	public Indir<Resource> res;
@@ -231,6 +232,15 @@ public class Gob implements Sprite.Owner, Skeleton.ModOwner, Rendered {
 		if(gi != null) { setattr(gi);}
 	    }
 	    if(gi != null) { rl.add(gi.draw(), null);}
+	}
+
+	if(CFG.DISPLAY_GOB_HITBOX.get()) {
+	    if(hitbox == null) {
+		try {
+		    hitbox = new Overlay(new Hitbox(this));
+		} catch (Loading ignored) {}
+	    }
+	    if(hitbox != null) { rl.add(hitbox, null);}
 	}
 
 	return(false);
