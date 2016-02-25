@@ -1,3 +1,8 @@
+$size[14]{$u{Update for 25.02.16:}
+  * merged loftar's code
+  * added displaying of object hitboxes, toggled by CTRL+H
+  * added tooltip to calendar widget
+ 
 $size[14]{$u{Update for 08.02.16:}
   * merged loftar's code
   * radar icons now always show resource name in tooltip if shift is pressed
