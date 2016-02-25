@@ -32,12 +32,26 @@ public class Astronomy {
     public final double dt, mp, yt;
     public final boolean night;
     public final Color mc;
-	
+    int hh, mm, day;
+    public static final String[] phase = {
+	"New Moon",
+	"Waxing Crescent",
+	"First Quarter",
+	"Waxing Gibbous",
+	"Full Moon",
+	"Waning Gibbous",
+	"Last Quarter",
+	"Waning Crescent"
+    };
+
     public Astronomy(double dt, double mp, double yt, boolean night, Color mc) {
 	this.dt = dt;
 	this.mp = mp;
 	this.yt = yt;
 	this.night = night;
 	this.mc = mc;
+	this.hh = (int) (24 * dt);
+	this.mm = (int) (60 * (24 * dt - hh));
+	this.day = (int) (365 * yt);
     }
 }

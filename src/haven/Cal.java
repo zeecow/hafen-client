@@ -39,6 +39,7 @@ public class Cal extends Widget {
     static Tex nsky = Resource.loadtex("gfx/hud/calendar/nightsky");
     static Resource.Anim sun = Resource.local().loadwait("gfx/hud/calendar/sun").layer(Resource.animc);
     static Resource.Anim moon = Resource.local().loadwait("gfx/hud/calendar/moon").layer(Resource.animc);
+    private String tip = null;
 
     public Cal() {
 	super(bg.sz());
@@ -59,5 +60,11 @@ public class Cal extends Widget {
 	g.image(sun, sc);
 	g.image(a.night?nlnd:dlnd, Coord.z);
 	g.image(bg, Coord.z);
+
+	String tt = String.format("Day %d,   %02d:%02d\nMoon: %s", a.day, a.hh, a.mm, Astronomy.phase[mp]);
+	if(!tt.equals(tip)) {
+	    tip = tt;
+	    tooltip = RichText.render(tt, 200);
+	}
     }
 }
