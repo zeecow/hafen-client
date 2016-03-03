@@ -203,11 +203,10 @@ public class LocalMiniMap extends Widget {
 
     public void tick(double dt) {
 	Gob pl = ui.sess.glob.oc.getgob(mv.plgob);
-	if(pl == null) {
-	    this.cc = null;
-	    return;
-	}
-	this.cc = pl.rc.div(tilesz);
+	if(pl == null)
+	    this.cc = mv.cc.div(tilesz);
+	else
+	    this.cc = pl.rc.div(tilesz);
 
 	Coord mc = rootxlate(ui.mc);
 	if(mc.isect(Coord.z, sz)) {
