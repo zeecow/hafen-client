@@ -321,4 +321,11 @@ public class OCache implements Iterable<Gob> {
 	    Radar.add(g);
 	}
     }
+
+    public synchronized void resattr(Gob g, Indir<Resource> resid, Message dat) {
+	if(dat != null)
+	    g.setrattr(resid, dat);
+	else
+	    g.delrattr(resid);
+    }
 }
