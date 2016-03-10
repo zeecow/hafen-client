@@ -1,3 +1,6 @@
+$size[14]{$u{Update for 03.03.16:}
+  * merged loftar's code
+ 
 $size[14]{$u{Update for 25.02.16:}
   * merged loftar's code
   * added displaying of object hitboxes, toggled by CTRL+H
