@@ -934,7 +934,7 @@ public class MapView extends PView implements DTarget, Console.Directory {
 	    if(mc == null)
 		continue;
 	    double a = screenangle(mc, true);
-	    if(a == Double.NaN)
+	    if(Double.isNaN(a))
 		continue;
 	    g.chcolor(m.col);
 	    drawarrow(g, a);
@@ -1096,6 +1096,11 @@ public class MapView extends PView implements DTarget, Console.Directory {
 	    placing = null;
 	} else if(msg == "move") {
 	    cc = (Coord)args[0];
+	} else if(msg == "plob") {
+	    if(args[0] == null)
+		plgob = -1;
+	    else
+		plgob = (Integer)args[0];
 	} else if(msg == "flashol") {
 	    unflashol();
 	    olflash = (Integer)args[0];
