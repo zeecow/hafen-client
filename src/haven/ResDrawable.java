@@ -64,8 +64,8 @@ public class ResDrawable extends Drawable {
 	} catch(Loading e) {
 	    return;
 	}
+	rl.add(spr, null);
 	checkRadius();
-	spr.setup(rl);
     }
 
     private void checkRadius() {
@@ -104,5 +104,9 @@ public class ResDrawable extends Drawable {
     public Skeleton.Pose getpose() {
 	init();
 	return(Skeleton.getpose(spr));
+    }
+
+    public Object staticp() {
+	return((spr != null)?spr.staticp():null);
     }
 }
