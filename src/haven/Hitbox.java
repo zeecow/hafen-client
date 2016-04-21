@@ -22,10 +22,10 @@ public class Hitbox extends Sprite {
 	    Coord b = hitbox.b;
 
 	    buff = Utils.mkfbuf(3 * 4);
-	    buff.put(a.x).put(a.y).put(1);
-	    buff.put(a.x).put(b.y).put(1);
-	    buff.put(b.x).put(b.y).put(1);
-	    buff.put(b.x).put(a.y).put(1);
+	    buff.put(a.x).put(-a.y).put(1);
+	    buff.put(a.x).put(-b.y).put(1);
+	    buff.put(b.x).put(-b.y).put(1);
+	    buff.put(b.x).put(-a.y).put(1);
 	}
     }
 
