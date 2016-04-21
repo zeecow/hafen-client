@@ -170,6 +170,7 @@ public class Gob implements Sprite.Owner, Skeleton.ModOwner, Rendered {
 	this.id = id;
 	this.frame = frame;
 	loc.tick();
+	addol(new GobInfo(this));
     }
 	
     public Gob(Glob glob, Coord c) {
@@ -403,15 +404,6 @@ public class Gob implements Sprite.Owner, Skeleton.ModOwner, Rendered {
 	KinInfo ki = getattr(KinInfo.class);
 	if(ki != null)
 	    rl.add(ki.fx, null);
-
-	if(CFG.DISPLAY_GOB_INFO.get()) {
-	    GobInfo gi = getattr(GobInfo.class);
-	    if(gi == null) {
-		gi = GobInfo.get(this);
-		if(gi != null) { setattr(gi);}
-	    }
-	    if(gi != null) { rl.add(gi.draw(), null);}
-	}
 
 	if(CFG.DISPLAY_GOB_HITBOX.get()) {
 	    if(hitbox == null) {
