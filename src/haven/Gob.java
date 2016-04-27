@@ -50,6 +50,7 @@ public class Gob implements Sprite.Owner, Skeleton.ModOwner, Rendered {
     private final Collection<ResAttr.Load> lrdata = new LinkedList<ResAttr.Load>();
     private GobPath path;
     private Overlay hitbox = null;
+    private GobInfo gobInfo = null;
 
     public static class Overlay implements Rendered {
 	public Indir<Resource> res;
@@ -170,7 +171,6 @@ public class Gob implements Sprite.Owner, Skeleton.ModOwner, Rendered {
 	this.id = id;
 	this.frame = frame;
 	loc.tick();
-	addol(new GobInfo(this));
     }
 	
     public Gob(Glob glob, Coord c) {
@@ -389,10 +389,10 @@ public class Gob implements Sprite.Owner, Skeleton.ModOwner, Rendered {
 	GobHealth hlt = getattr(GobHealth.class);
 	if(hlt != null) {
 	    rl.prepc(hlt.getfx());
-	    Rendered txt = hlt.text();
-	    if(txt != null){
-		rl.add(txt, null);
-	    }
+//	    Rendered txt = hlt.text();
+//	    if(txt != null){
+//		rl.add(txt, null);
+//	    }
 
 	}
 	Drawable d = getattr(Drawable.class);
@@ -414,7 +414,16 @@ public class Gob implements Sprite.Owner, Skeleton.ModOwner, Rendered {
 	    if(hitbox != null) { rl.add(hitbox, null);}
 	}
 
-	return(false);
+	if(CFG.DISPLAY_GOB_INFO.get()) {
+	    if(gobInfo == null) {
+		gobInfo = new GobInfo(this);
+	    }
+	    //if(gobInfo.ready) {
+		rl.add(gobInfo, null);
+	    //}
+	}
+
+	return (false);
     }
 
     private static final Object DYNAMIC = new Object();

@@ -2,36 +2,67 @@ package haven;
 
 import java.awt.*;
 
-public class GobInfo extends Sprite {
-    private boolean ready = false;
-    private Rendered rendered;
+public class GobInfo extends PView.Draw2D {
+    public boolean ready = false;
+    private Tex tex;
+    private final Gob gob;
+    private GLState.Buffer state;
 
     protected GobInfo(Gob owner) {
-	super(owner, null);
+	this.gob = owner;
+    }
+
+    @Override
+    public void draw2d(GOut g) {
+	if(tex != null) {
+	    Coord sc = null;
+	    if(state != null) {sc = getSC();}
+	    if(sc != null && sc.isect(Coord.z, g.sz)) {
+		g.aimage(tex, sc, 0.5, 0.5);
+	    }
+	}
+    }
+
+    private Coord getSC() {
+	Matrix4f cam = new Matrix4f(),
+	    wxf = new Matrix4f(),
+	    mv = new Matrix4f();
+
+	Camera camera = state.get(PView.cam);
+	///Location.Chain loc = state.get(PView.loc);
+	Coord3f cc = gob.getc();
+	Coord3f pc = new Coord3f(cc.x, -cc.y, cc.z);
+	Location loc = new Location(Transform.makexlate(new Matrix4f(), pc));
+	Projection proj = state.get(PView.proj);
+	PView.RenderState wnd = state.get(PView.wnd);
+	if(camera == null || loc == null || proj == null || wnd == null) {
+	    return null;
+	}
+	try {
+	    mv.load(cam.load(camera.fin(Matrix4f.id))).mul1(wxf.load(loc.fin(Matrix4f.id)));
+	    Coord3f s = proj.toscreen(mv.mul4(Coord3f.o), wnd.sz());
+	    Coord3f sczu = proj.toscreen(mv.mul4(Coord3f.zu), wnd.sz()).sub(s);
+	    return new Coord(s).add(new Coord(sczu));
+	} catch (RuntimeException ignored) {}
+	return null;
     }
 
     @Override
     public boolean setup(RenderList d) {
-	if(CFG.DISPLAY_GOB_INFO.get()) {
-	    if(!ready) {
-		try {
-		    rendered = render();
-		    ready = true;
-		} catch (Loading ignored) { } catch (Exception e) {
-		    rendered = null;
-		    ready = true;
-		}
-	    }
-	    if(ready && rendered != null) {
-		d.add(rendered, null);
-		return true;
+	state = d.state();
+	if(!ready) {
+	    try {
+		tex = render();
+		ready = true;
+	    } catch (Loading ignored) { } catch (Exception e) {
+		tex = null;
+		ready = true;
 	    }
 	}
-	return false;
+	return ready && tex != null;
     }
 
-    private GobInfoTex render() {
-	Gob gob = (Gob) owner;
+    private Tex render() {
 	if(gob == null || gob.getres() == null) { return null;}
 	Text.Line line = null;
 
@@ -61,7 +92,7 @@ public class GobInfo extends Sprite {
 	}
 
 	if(line != null) {
-	    return new GobInfoTex(gob, line.tex());
+	    return line.tex();
 	}
 
 	return null;
@@ -83,26 +114,6 @@ public class GobInfo extends Sprite {
 	    return spc != null && (spc.getSimpleName().equals(kind) || spc.getSuperclass().getSimpleName().equals(kind));
 	} else {
 	    return false;
-	}
-    }
-
-    private static class GobInfoTex extends PView.Draw2D {
-	private Tex tex;
-	private Gob gob;
-
-	public GobInfoTex(Gob gob, Tex tex) {
-	    this.gob = gob;
-	    this.tex = tex;
-	}
-
-	@Override
-	public void draw2d(GOut g) {
-	    if(tex != null && gob.sc != null) {
-		Coord sc = gob.sc.add(new Coord(gob.sczu.mul(1)));
-		if(sc.isect(Coord.z, g.sz)) {
-		    g.aimage(tex, sc, 0.5, 0.5);
-		}
-	    }
 	}
     }
 }
