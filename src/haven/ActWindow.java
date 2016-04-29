@@ -5,6 +5,8 @@ import java.awt.event.KeyEvent;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import static haven.Glob.*;
 
@@ -14,13 +16,13 @@ public class ActWindow extends GameUI.Hidewnd {
     private final ActList filtered;
     private final TextEntry filter;
     private final List<Pagina> all = new LinkedList<>();
-    private final String category;
+    private final Pattern category;
     private int pagseq = 0;
     private boolean needfilter = false;
 
     public ActWindow(String cap, String category) {
 	super(Coord.z, cap);
-	this.category = category;
+	this.category = Pattern.compile(category);
 	filter = add(new TextEntry(WIDTH, "") {
 	    @Override
 	    public void activate(String text) {
@@ -116,11 +118,11 @@ public class ActWindow extends GameUI.Hidewnd {
 	    synchronized (ui.sess.glob.paginae) {
 		synchronized (all) {
 		    all.clear();
-		    for (Pagina p : ui.sess.glob.paginae) {
-			if(Pagina.name(p).contains(category)) {
-			    all.add(p);
-			}
-		    }
+		    all.addAll(
+			ui.sess.glob.paginae.stream()
+			    .filter(p -> category.matcher(Pagina.name(p)).matches())
+			    .collect(Collectors.toList())
+		    );
 
 		    pagseq = ui.sess.glob.pagseq;
 		    needfilter();

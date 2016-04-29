@@ -318,7 +318,7 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 
     public void toggleCraftList() {
 	if(craftlist == null){
-	    add(new ActWindow("Craft...", "paginae/craft/"));
+	    add(new ActWindow("Craft...", "paginae/craft/.+"));
 	} else if(craftlist.visible) {
 	    craftlist.hide();
 	} else {
@@ -328,7 +328,7 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 
     public void toggleBuildList() {
 	if(buildlist == null){
-	    add(new ActWindow("Build...", "paginae/bld/"));
+	    add(new ActWindow("Build...", "paginae/bld/.+"));
 	} else if(buildlist.visible) {
 	    buildlist.hide();
 	} else {
