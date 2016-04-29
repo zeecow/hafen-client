@@ -389,10 +389,10 @@ public class Gob implements Sprite.Owner, Skeleton.ModOwner, Rendered {
 	GobHealth hlt = getattr(GobHealth.class);
 	if(hlt != null) {
 	    rl.prepc(hlt.getfx());
-//	    Rendered txt = hlt.text();
-//	    if(txt != null){
-//		rl.add(txt, null);
-//	    }
+	    Rendered txt = hlt.text();
+	    if(txt != null){
+		rl.add(txt, null);
+	    }
 
 	}
 	Drawable d = getattr(Drawable.class);
@@ -418,9 +418,7 @@ public class Gob implements Sprite.Owner, Skeleton.ModOwner, Rendered {
 	    if(gobInfo == null) {
 		gobInfo = new GobInfo(this);
 	    }
-	    //if(gobInfo.ready) {
-		rl.add(gobInfo, null);
-	    //}
+	    rl.add(gobInfo, null);
 	}
 
 	return (false);
