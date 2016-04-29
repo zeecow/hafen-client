@@ -49,7 +49,7 @@ public class Gob implements Sprite.Owner, Skeleton.ModOwner, Rendered {
     private final Collection<ResAttr.Cell<?>> rdata = new LinkedList<ResAttr.Cell<?>>();
     private final Collection<ResAttr.Load> lrdata = new LinkedList<ResAttr.Load>();
     private GobPath path;
-    private Overlay hitbox = null;
+    private Hitbox hitbox = null;
     private GobInfo gobInfo = null;
 
     public static class Overlay implements Rendered {
@@ -228,7 +228,19 @@ public class Gob implements Sprite.Owner, Skeleton.ModOwner, Rendered {
 	for(ResAttr.Cell rd : rdata) {
 	    if(rd.attr != null)
 		rd.attr.dispose();
-    }
+    	}
+	if(path != null){
+	    path.dispose();
+	    path = null;
+	}
+	if(hitbox != null){
+	    hitbox.dispose();
+	    hitbox = null;
+	}
+	if(gobInfo != null){
+	    gobInfo.dispose();
+	    gobInfo = null;
+	}
     }
 	
     public void move(Coord c, double a) {
@@ -267,7 +279,6 @@ public class Gob implements Sprite.Owner, Skeleton.ModOwner, Rendered {
 	    if (ac == Moving.class) {
 		if (path == null) {
 		    path = new GobPath(this);
-		    ols.add(new Overlay(path));
 		}
 		path.move((Moving) a);
 	    }
@@ -389,11 +400,6 @@ public class Gob implements Sprite.Owner, Skeleton.ModOwner, Rendered {
 	GobHealth hlt = getattr(GobHealth.class);
 	if(hlt != null) {
 	    rl.prepc(hlt.getfx());
-	    Rendered txt = hlt.text();
-	    if(txt != null){
-		rl.add(txt, null);
-	    }
-
 	}
 	Drawable d = getattr(Drawable.class);
 	if(d != null)
@@ -408,7 +414,7 @@ public class Gob implements Sprite.Owner, Skeleton.ModOwner, Rendered {
 	if(CFG.DISPLAY_GOB_HITBOX.get()) {
 	    if(hitbox == null) {
 		try {
-		    hitbox = new Overlay(new Hitbox(this));
+		    hitbox = new Hitbox(this);
 		} catch (Loading ignored) {}
 	    }
 	    if(hitbox != null) { rl.add(hitbox, null);}
@@ -419,6 +425,10 @@ public class Gob implements Sprite.Owner, Skeleton.ModOwner, Rendered {
 		gobInfo = new GobInfo(this);
 	    }
 	    rl.add(gobInfo, null);
+	}
+
+	if(path != null && CFG.SHOW_GOB_PATH.get()) {
+	    rl.add(path, null);
 	}
 
 	return (false);
