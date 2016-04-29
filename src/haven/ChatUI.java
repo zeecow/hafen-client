@@ -670,7 +670,9 @@ public class ChatUI extends Widget {
 			    }
 			    return(true);
 			} else {
-			    return(super.keydown(ev));
+			    String tmp = text;
+			    boolean result = super.keydown(ev);
+			    return text.equals(tmp) ? false : result;
 			}
 		    }
 		};
