@@ -15,7 +15,10 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -32,10 +35,10 @@ public class RadarCFG {
 		Document doc = builder.parse(new ByteArrayInputStream(xml.getBytes()));
 		groups.clear();
 		NodeList groupNodes = doc.getElementsByTagName("group");
-		for(int i = 0; i < groupNodes.getLength(); i++) {
+		for (int i = 0; i < groupNodes.getLength(); i++) {
 		    groups.add(new Group((Element) groupNodes.item(i)));
 		}
-	    } catch(ParserConfigurationException | IOException | SAXException ignored) {
+	    } catch (ParserConfigurationException | IOException | SAXException ignored) {
 		ignored.printStackTrace();
 	    }
 	}
@@ -48,7 +51,7 @@ public class RadarCFG {
 	    // construct XML
 	    Element root = doc.createElement("icons");
 	    doc.appendChild(root);
-	    for(Group group : groups) {
+	    for (Group group : groups) {
 		Element el = doc.createElement("group");
 		group.write(el);
 		root.appendChild(el);
@@ -64,7 +67,7 @@ public class RadarCFG {
 	    transformer.transform(source, console);
 	    Config.saveFile("radar.xml", out.toString());
 
-	} catch(Exception e) {
+	} catch (Exception e) {
 	    e.printStackTrace();
 	}
     }
@@ -78,22 +81,22 @@ public class RadarCFG {
 	if(icon.charAt(0) == '$') {
 	    try {
 		tex = Symbols.valueOf(icon).tex;
-	    } catch(IllegalArgumentException e) {
+	    } catch (IllegalArgumentException e) {
 		tex = Symbols.DEFAULT.tex;
 	    }
-	}
-	try {
-	    Resource.Image img = loadres(icon).layer(Resource.imgc);
+	} else {
+	    try {
+		Resource.Image img = loadres(icon).layer(Resource.imgc);
 
-	    tex = img.tex();
-	    if((tex.sz().x > 20) || (tex.sz().y > 20)) {
-		BufferedImage buf = img.img;
-		buf = PUtils.rasterimg(PUtils.blurmask2(buf.getRaster(), 1, 1, Color.BLACK));
-		buf = PUtils.convolvedown(buf, new Coord(20, 20), GobIcon.filter);
-		tex = new TexI(buf);
-	    }
+		tex = img.tex();
+		if((tex.sz().x > 20) || (tex.sz().y > 20)) {
+		    BufferedImage buf = img.img;
+		    buf = PUtils.rasterimg(PUtils.blurmask2(buf.getRaster(), 1, 1, Color.BLACK));
+		    buf = PUtils.convolvedown(buf, new Coord(20, 20), GobIcon.filter);
+		    tex = new TexI(buf);
+		}
 
-	} catch(Loading ignored) {
+	    } catch (Loading ignored) { }
 	}
 	return tex;
     }
@@ -118,12 +121,12 @@ public class RadarCFG {
 	    if(config.hasAttribute("priority")) {
 		try {
 		    priority = Integer.parseInt(config.getAttribute("priority"));
-		} catch(NumberFormatException ignored) {
+		} catch (NumberFormatException ignored) {
 		}
 	    }
 	    NodeList children = config.getElementsByTagName("marker");
 	    markerCFGs = new LinkedList<>();
-	    for(int i = 0; i < children.getLength(); i++) {
+	    for (int i = 0; i < children.getLength(); i++) {
 		markerCFGs.add(MarkerCFG.parse((Element) children.item(i), this));
 	    }
 
@@ -144,7 +147,7 @@ public class RadarCFG {
 	    if(priority != null) {
 		el.setAttribute("priority", priority.toString());
 	    }
-	    for(MarkerCFG marker : markerCFGs) {
+	    for (MarkerCFG marker : markerCFGs) {
 		Element mel = doc.createElement("marker");
 		marker.write(mel);
 		el.appendChild(mel);
@@ -184,7 +187,7 @@ public class RadarCFG {
 	    cfg.parent = parent;
 	    Match[] types = Match.values();
 	    String name = null;
-	    for(Match type : types) {
+	    for (Match type : types) {
 		name = type.name();
 		if(config.hasAttribute(name)) {
 		    break;
@@ -208,7 +211,7 @@ public class RadarCFG {
 	    if(config.hasAttribute("priority")) {
 		try {
 		    cfg.priority = Integer.parseInt(config.getAttribute("priority"));
-		} catch(NumberFormatException ignored) {
+		} catch (NumberFormatException ignored) {
 		}
 	    }
 
