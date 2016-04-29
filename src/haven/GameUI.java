@@ -74,7 +74,7 @@ public class GameUI extends ConsoleHost implements Console.Directory {
     public String polowner;
     public Bufflist buffs;
     public CraftDBWnd craftwnd = null;
-    public ActWindow craftlist, buildlist;
+    public ActWindow craftlist, buildlist, actlist;
     public TimerPanel timers;
     public StudyWnd studywnd;
 
@@ -333,6 +333,16 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 	    buildlist.hide();
 	} else {
 	    buildlist.show();
+	}
+    }
+
+    public void toggleActList() {
+	if(actlist == null){
+	    add(new ActWindow("Act...", "paginae/act/.+|paginae/pose/.+|paginae/gov/.+|paginae/add/.+"));
+	} else if(actlist.visible) {
+	    actlist.hide();
+	} else {
+	    actlist.show();
 	}
     }
     

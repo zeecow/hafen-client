@@ -71,6 +71,10 @@ public class RootWidget extends ConsoleHost {
 	        if(ui.gui!=null){
 		    ui.gui.toggleBuildList();
 	        }
+	    } else if(ALT && code == KeyEvent.VK_A) {
+		if(ui.gui!=null){
+		    ui.gui.toggleActList();
+		}
 	    } else if(ALT && code == KeyEvent.VK_H) {
 		if(ui.gui!=null){
 		    ui.gui.toggleHand();
