@@ -25,6 +25,11 @@ public class GobPath extends Sprite {
 	this.gob = gob;
     }
 
+    @Override
+    public Object staticp() {
+	return Rendered.CONSTANS;
+    }
+
     private String resname() {
 	try {
 	    Resource res = gob.getres();

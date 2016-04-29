@@ -8,6 +8,11 @@ public class GobInfo extends PView.Draw2D {
     private final Gob gob;
     private GLState.Buffer state;
 
+    @Override
+    public Object staticp() {
+	return Rendered.CONSTANS;
+    }
+
     protected GobInfo(Gob owner) {
 	this.gob = owner;
     }
