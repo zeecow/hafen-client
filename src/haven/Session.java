@@ -132,7 +132,7 @@ public class Session {
 	}
 	
 	private class Ref implements Indir<Resource> {
-	    private Resource res;
+	    protected Resource res;
 		    
 	    public Resource get() {
 		if(resnm == null)
@@ -155,6 +155,12 @@ public class Session {
 	    }
 	}
 
+	private class SRef extends Ref {
+	    public SRef(Resource res) {
+		this.res = res;
+	    }
+	}
+
 	private Ref get() {
 	    Ref ind = (this.ind == null)?null:(this.ind.get());
 	    if(ind == null)
@@ -168,6 +174,15 @@ public class Session {
 		this.resnm = nm;
 		this.resver = ver;
 		get().reset();
+		notifyAll();
+	    }
+	}
+
+	public void set(Resource res){
+	    synchronized(this) {
+		this.resnm = res.name;
+		this.resver = res.ver;
+		ind = new WeakReference<Ref>(new SRef(res));
 		notifyAll();
 	    }
 	}
