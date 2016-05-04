@@ -110,13 +110,12 @@ public class AttrBonusesWdg extends Widget implements ItemInfo.Owner {
     private void build() {
 	try {
 	    if(bonuses != null) {
-		info = Collections.singletonList(
-		    make(bonuses.entrySet()
+		ItemInfo compiled = make(bonuses.entrySet()
 			.stream()
 			.sorted(this::BY_PRIORITY)
 			.collect(Collectors.toList())
-		    )
 		);
+		info = compiled != null ? Collections.singletonList(compiled) : null;
 	    }
 
 	    needBuild = false;
@@ -125,6 +124,9 @@ public class AttrBonusesWdg extends Widget implements ItemInfo.Owner {
     }
 
     private ItemInfo make(Collection<Entry<Resource, Integer>> mods) {
+	if(mods.isEmpty()) {
+	    return null;
+	}
 	Resource res = Resource.remote().load("ui/tt/attrmod").get();
 	ItemInfo.InfoFactory f = res.layer(Resource.CodeEntry.class).get(ItemInfo.InfoFactory.class);
 	Object[] args = new Object[mods.size() * 2 + 1];
