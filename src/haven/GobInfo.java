@@ -137,4 +137,10 @@ public class GobInfo extends PView.Draw2D {
 	state = null;
 	health = null;
     }
+
+    @Override
+    public String toString() {
+	Resource res = gob.getres();
+	return String.format("GobInfo<%s>", res != null ? res.name : "<loading>");
+    }
 }
