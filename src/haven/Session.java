@@ -856,6 +856,9 @@ public class Session {
 	sworker.start();
 	ticker = new Ticker();
 	ticker.start();
+
+	cachedres(-2).set(WItem.armor_hard);
+	cachedres(-3).set(WItem.armor_soft);
     }
 
     private void sendack(int seq) {

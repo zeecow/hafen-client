@@ -39,6 +39,8 @@ public class WItem extends Widget implements DTarget {
     public static final Coord TEXT_PADD_TOP = new Coord(0, -3), TEXT_PADD_BOT = new Coord(0, 2);
     public static final Color DURABILITY_COLOR = new Color(214, 253, 255);
     public static final Color ARMOR_COLOR = new Color(255, 227, 191);
+    public static final Resource armor_hard = Resource.local().loadwait("gfx/hud/chr/custom/ahard");
+    public static final Resource armor_soft = Resource.local().loadwait("gfx/hud/chr/custom/asoft");
     public final GItem item;
     private Resource cspr = null;
     private Message csdt = Message.nil;
@@ -422,22 +424,32 @@ public class WItem extends Widget implements DTarget {
 	    for (ItemInfo islots : info) {
 		List<Object> slots = (List<Object>) Reflect.getFieldValue(islots, "s");
 		for (Object slot : slots) {
-		    List<Object> infos = (List<Object>) Reflect.getFieldValue(slot, "info");
-		    for (Object inf : infos) {
-			List<Object> mods = (List<Object>) Reflect.getFieldValue(inf, "mods");
-			for (Object mod : mods) {
-			    Resource attr = (Resource) Reflect.getFieldValue(mod, "attr");
-			    int value = Reflect.getFieldValueInt(mod, "mod");
-			    if(bonuses.containsKey(attr)) {
-				bonuses.put(attr, bonuses.get(attr) + value);
-			    } else {
-				bonuses.put(attr, value);
-			    }
-			}
-		    }
+		    parseAttrMods(bonuses, (List) Reflect.getFieldValue(slot, "info"));
 		}
 	    }
+	    parseAttrMods(bonuses, ItemInfo.findall("AttrMod", item.info()));
 	} catch (Exception ignored) {}
+	ItemInfo.Wear wear = ItemInfo.getArmor(item.info());
+	if (wear != null) {
+	    bonuses.put(armor_hard, wear.a);
+	    bonuses.put(armor_soft, wear.b);
+	}
 	return bonuses;
+    }
+
+    @SuppressWarnings("unchecked")
+    private static void parseAttrMods(Map<Resource, Integer> bonuses, List infos) {
+	for (Object inf : infos) {
+	    List<Object> mods = (List<Object>) Reflect.getFieldValue(inf, "mods");
+	    for (Object mod : mods) {
+		Resource attr = (Resource) Reflect.getFieldValue(mod, "attr");
+		int value = Reflect.getFieldValueInt(mod, "mod");
+		if (bonuses.containsKey(attr)) {
+		    bonuses.put(attr, bonuses.get(attr) + value);
+		} else {
+		    bonuses.put(attr, value);
+		}
+	    }
+	}
     }
 }
