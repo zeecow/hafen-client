@@ -7,6 +7,9 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public class AttrBonusesWdg extends Widget implements ItemInfo.Owner {
+    private static final Coord bonusc = new Coord(0, 20);
+    private final Scrollbar bar;
+
     private boolean needUpdate = false;
     private boolean needBuild = false;
     private boolean needRedraw = false;
@@ -20,6 +23,14 @@ public class AttrBonusesWdg extends Widget implements ItemInfo.Owner {
 
     public AttrBonusesWdg(int y) {
 	super(new Coord(175, y));
+	add(new Label("Equipment bonuses:"));
+	bar = adda(new Scrollbar(y - bonusc.y, 0, 0), sz.x, bonusc.y, 1, 0);
+    }
+
+    @Override
+    public boolean mousewheel(Coord c, int amount) {
+	bar.ch(15 * amount);
+	return true;
     }
 
     public void update(WItem[] items) {
@@ -35,8 +46,13 @@ public class AttrBonusesWdg extends Widget implements ItemInfo.Owner {
 	}
 
 	if(tip != null) {
-	    g.image(tip, Coord.z);
+	    Coord c = Coord.z;
+	    if(bar.visible) {
+		c = c.sub(0, bar.val);
+	    }
+	    g.reclip(bonusc, sz).image(tip, c);
 	}
+	super.draw(g);
     }
 
     private void render() {
@@ -46,6 +62,11 @@ public class AttrBonusesWdg extends Widget implements ItemInfo.Owner {
 	    } else {
 		tip = null;
 	    }
+
+	    int delta = tip != null ? tip.getHeight() : 0;
+	    bar.visible = delta > bar.sz.y;
+	    bar.max = delta - bar.sz.y;
+	    bar.ch(0);
 
 	    needRedraw = false;
 	} catch (Loading ignored) {}
