@@ -40,6 +40,7 @@ public class GItem extends AWidget implements ItemInfo.SpriteOwner, GSprite.Owne
     private Object[] rawinfo;
     private List<ItemInfo> info = Collections.emptyList();
     public boolean matches = false;
+    public boolean sendttupdate = false;
     private long filtered = 0;
 
     public static void setFilter(ItemFilter filter) {
@@ -159,6 +160,7 @@ public class GItem extends AWidget implements ItemInfo.SpriteOwner, GSprite.Owne
 	    info = null;
 	    rawinfo = args;
 	    filtered = 0;
+	    if(sendttupdate){wdgmsg("ttupdate");}
 	} else if(name == "meter") {
 	    meter = (Integer)args[0];
 	}

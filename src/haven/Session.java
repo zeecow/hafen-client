@@ -188,6 +188,19 @@ public class Session {
 	return(cachedres(id).get());
     }
 
+    public int getresid(Resource res) {
+	synchronized (rescache) {
+	    for (Map.Entry<Integer, CachedRes> entry : rescache.entrySet()) {
+		try {
+		    if(entry.getValue().get().get() == res) {
+			return entry.getKey();
+		    }
+		} catch (Loading ignored) {}
+	    }
+	}
+	return -1;
+    }
+
     private class ObjAck {
 	long id;
 	int frame;

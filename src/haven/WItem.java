@@ -26,6 +26,8 @@
 
 package haven;
 
+import me.ender.Reflect;
+
 import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.util.*;
@@ -410,5 +412,32 @@ public class WItem extends Widget implements DTarget {
     public boolean iteminteract(Coord cc, Coord ul) {
 	item.wdgmsg("itemact", ui.modflags());
 	return(true);
+    }
+
+    @SuppressWarnings("unchecked")
+    public Map<Resource, Integer> bonuses() {
+	List<ItemInfo> info = ItemInfo.findall("ISlots", item.info());
+	Map<Resource, Integer> bonuses = new HashMap<>();
+	try {
+	    for (ItemInfo islots : info) {
+		List<Object> slots = (List<Object>) Reflect.getFieldValue(islots, "s");
+		for (Object slot : slots) {
+		    List<Object> infos = (List<Object>) Reflect.getFieldValue(slot, "info");
+		    for (Object inf : infos) {
+			List<Object> mods = (List<Object>) Reflect.getFieldValue(inf, "mods");
+			for (Object mod : mods) {
+			    Resource attr = (Resource) Reflect.getFieldValue(mod, "attr");
+			    int value = Reflect.getFieldValueInt(mod, "mod");
+			    if(bonuses.containsKey(attr)) {
+				bonuses.put(attr, bonuses.get(attr) + value);
+			    } else {
+				bonuses.put(attr, value);
+			    }
+			}
+		    }
+		}
+	    }
+	} catch (Exception ignored) {}
+	return bonuses;
     }
 }

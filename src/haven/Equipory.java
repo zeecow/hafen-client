@@ -64,6 +64,7 @@ public class Equipory extends Widget implements DTarget {
 
     WItem[] slots = new WItem[ecoords.length];
     Map<GItem, WItem[]> wmap = new HashMap<GItem, WItem[]>();
+    AttrBonusesWdg bonuses;
 	
     @RName("epry")
     public static class $_ implements Factory {
@@ -98,6 +99,9 @@ public class Equipory extends Widget implements DTarget {
 		protected java.awt.Color clearcolor() {return(null);}
 	    }, new Coord(34, 0));
 	ava.color = null;
+
+	bonuses = add(new AttrBonusesWdg(isz.y), isz.x + 5, 0);
+	pack();
     }
 	
     public void addchild(Widget child, Object... args) {
@@ -110,12 +114,22 @@ public class Equipory extends Widget implements DTarget {
 		v[i] = add(new WItem(g), ecoords[ep].add(1, 1));
 	    	slots[ep] = v[i];
 	    }
+	    g.sendttupdate = true;
 	    wmap.put(g, v);
 	} else {
 	    super.addchild(child, args);
 	}
     }
-    
+
+    @Override
+    public void wdgmsg(Widget sender, String msg, Object... args) {
+	if (sender  instanceof GItem && wmap.containsKey(sender) && msg.equals("ttupdate")) {
+	    bonuses.update(slots);
+	} else {
+	    super.wdgmsg(sender, msg, args);
+	}
+    }
+
     public void cdestroy(Widget w) {
 	super.cdestroy(w);
 	if(w instanceof GItem) {
@@ -127,6 +141,7 @@ public class Equipory extends Widget implements DTarget {
 			slots[s] = null;
 		}
 	    }
+	    bonuses.update(slots);
 	}
     }
     

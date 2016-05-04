@@ -43,8 +43,8 @@ public class CharWnd extends Window {
     public static final Color buff = new Color(128, 255, 128);
     public static final Color tbuff = new Color(128, 128, 255);
     public static final Color every = new Color(255, 255, 255, 16), other = new Color(255, 255, 255, 32);
-    public final Collection<Attr> base;
-    public final Collection<SAttr> skill;
+    public final List<Attr> base;
+    public final List<SAttr> skill;
     public final FoodMeter feps;
     public final GlutMeter glut;
     public final Constipations cons;
@@ -411,13 +411,14 @@ public class CharWnd extends Window {
 	public final Glob.CAttr attr;
 	public final Tex img;
 	public final Color bg;
+	public final Resource res;
 	private double lvlt = 0.0;
 	private Text ct;
 	private int cbv, ccv;
 
 	private Attr(Glob glob, String attr, Color bg) {
 	    super(new Coord(attrw, attrf.height() + 2));
-	    Resource res = Resource.local().loadwait("gfx/hud/chr/" + attr);
+	    res = Resource.local().loadwait("gfx/hud/chr/" + attr);
 	    this.nm = attr;
 	    this.img = res.layer(Resource.imgc).tex();
 	    this.rnm = attrf.render(res.layer(Resource.tooltip).t);
@@ -471,13 +472,14 @@ public class CharWnd extends Window {
 	public final Glob.CAttr attr;
 	public final Tex img;
 	public final Color bg;
+	public final Resource res;
 	public int tbv, tcv, cost;
 	private Text ct;
 	private int cbv, ccv;
 
 	private SAttr(Glob glob, String attr, Color bg) {
 	    super(new Coord(attrw, attrf.height() + 2));
-	    Resource res = Resource.local().loadwait("gfx/hud/chr/" + attr);
+	    res = Resource.local().loadwait("gfx/hud/chr/" + attr);
 	    this.nm = attr;
 	    this.img = res.layer(Resource.imgc).tex();
 	    this.rnm = attrf.render(res.layer(Resource.tooltip).t);
