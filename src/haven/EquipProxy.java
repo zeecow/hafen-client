@@ -42,8 +42,8 @@ public class EquipProxy extends Widget implements DTarget{
     @Override
     public void draw(GOut g) {
 	super.draw(g);
-	Equipory e = ui.gui.getEquipory();
-	if(e != null){
+	Equipory equipory = ui.gui.equipory;
+	if(equipory != null){
 	    int k = 0;
 	    g.chcolor(BG_COLOR);
 	    g.frect(Coord.z, sz);
@@ -53,7 +53,7 @@ public class EquipProxy extends Widget implements DTarget{
 		c0.x = k;
 		Coord c1 = sqoff(c0);
 		g.image(invsq, c1);
-		WItem w = e.slots[slot];
+		WItem w = equipory.slots[slot];
 		if(w != null){
 		    w.draw(g.reclipl(c1, g.sz));
 		}

@@ -32,6 +32,7 @@ import java.awt.Color;
 import java.awt.event.KeyEvent;
 import java.awt.image.WritableRaster;
 import static haven.Inventory.invsq;
+import static javafx.scene.input.KeyCode.T;
 
 public class GameUI extends ConsoleHost implements Console.Directory {
     public static final Text.Foundry msgfoundry = new Text.Foundry(Text.dfont, 14);
@@ -52,6 +53,7 @@ public class GameUI extends ConsoleHost implements Console.Directory {
     private Window invwnd, equwnd;
     private CraftWindow makewnd;
     public Inventory maininv;
+    public Equipory equipory;
     public CharWnd chrwdg;
     private Widget qqview;
     public BuddyWnd buddies;
@@ -605,7 +607,7 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 	    add(invwnd, new Coord(100, 100));
 	} else if(place == "equ") {
 	    equwnd = new Hidewnd(Coord.z, "Equipment");
-	    equwnd.add(child, Coord.z);
+	    equipory = equwnd.add((Equipory) child, Coord.z);
 	    equwnd.pack();
 	    equwnd.hide();
 	    add(equwnd, new Coord(400, 10));
