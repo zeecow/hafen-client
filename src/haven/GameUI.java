@@ -199,16 +199,6 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 	ui.gui = null;
     }
 
-    public Equipory getEquipory(){
-	if(equwnd != null){
-	    Iterator<Equipory> iterator = equwnd.children(Equipory.class).iterator();
-	    if(iterator.hasNext()) {
-		return iterator.next();
-	    }
-	}
-	return null;
-    }
-
     /* Ice cream */
     private final IButton[] fold_br = new IButton[4];
     private final IButton[] fold_bl = new IButton[2];

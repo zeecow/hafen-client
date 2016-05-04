@@ -28,7 +28,7 @@ public class EquipProxy extends Widget implements DTarget{
 
     @Override
     public boolean mousedown(Coord c, int button) {
-	Equipory e = ui.gui.getEquipory();
+	Equipory e = ui.gui.equipory;
 	if(e != null){
 	    WItem w = e.slots[slot(c)];
 	    if(w != null){
@@ -64,7 +64,7 @@ public class EquipProxy extends Widget implements DTarget{
 
     @Override
     public Object tooltip(Coord c, Widget prev) {
-	Equipory e = ui.gui.getEquipory();
+	Equipory e = ui.gui.equipory;
 	if(e != null){
 	    WItem w = e.slots[slot(c)];
 	    if(w != null){
@@ -76,7 +76,7 @@ public class EquipProxy extends Widget implements DTarget{
 
     @Override
     public boolean drop(Coord cc, Coord ul) {
-	Equipory e = ui.gui.getEquipory();
+	Equipory e = ui.gui.equipory;
 	if(e != null){
 	    e.wdgmsg("drop", slot(cc));
 	    return true;
@@ -86,7 +86,7 @@ public class EquipProxy extends Widget implements DTarget{
 
     @Override
     public boolean iteminteract(Coord cc, Coord ul) {
-	Equipory e = ui.gui.getEquipory();
+	Equipory e = ui.gui.equipory;
 	if(e != null){
 	    WItem w = e.slots[slot(cc)];
 	    if(w != null){
