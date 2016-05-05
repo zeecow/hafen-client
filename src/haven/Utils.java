@@ -1314,6 +1314,8 @@ public class Utils {
 	Matrix4f wxf = new Matrix4f();
 	Matrix4f mv = new Matrix4f();
 
+	if(state == null) {return null;}
+
 	Camera camera = state.get(PView.cam);
 	Location loc = new Location(Transform.makexlate(new Matrix4f(), new Coord3f(c.x, -c.y, c.z)));
 	Projection proj = state.get(PView.proj);
