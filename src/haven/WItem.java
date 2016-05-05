@@ -26,8 +26,6 @@
 
 package haven;
 
-import me.ender.Reflect;
-
 import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.util.*;
@@ -416,40 +414,4 @@ public class WItem extends Widget implements DTarget {
 	return(true);
     }
 
-    @SuppressWarnings("unchecked")
-    public Map<Resource, Integer> bonuses() {
-	List<ItemInfo> info = ItemInfo.findall("ISlots", item.info());
-	Map<Resource, Integer> bonuses = new HashMap<>();
-	try {
-	    for (ItemInfo islots : info) {
-		List<Object> slots = (List<Object>) Reflect.getFieldValue(islots, "s");
-		for (Object slot : slots) {
-		    parseAttrMods(bonuses, (List) Reflect.getFieldValue(slot, "info"));
-		}
-	    }
-	    parseAttrMods(bonuses, ItemInfo.findall("AttrMod", item.info()));
-	} catch (Exception ignored) {}
-	Pair<Integer, Integer> wear = ItemInfo.getArmor(item.info());
-	if (wear != null) {
-	    bonuses.put(armor_hard, wear.a);
-	    bonuses.put(armor_soft, wear.b);
-	}
-	return bonuses;
-    }
-
-    @SuppressWarnings("unchecked")
-    private static void parseAttrMods(Map<Resource, Integer> bonuses, List infos) {
-	for (Object inf : infos) {
-	    List<Object> mods = (List<Object>) Reflect.getFieldValue(inf, "mods");
-	    for (Object mod : mods) {
-		Resource attr = (Resource) Reflect.getFieldValue(mod, "attr");
-		int value = Reflect.getFieldValueInt(mod, "mod");
-		if (bonuses.containsKey(attr)) {
-		    bonuses.put(attr, bonuses.get(attr) + value);
-		} else {
-		    bonuses.put(attr, value);
-		}
-	    }
-	}
-    }
 }

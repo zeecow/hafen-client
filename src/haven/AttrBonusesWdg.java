@@ -3,9 +3,6 @@ package haven;
 import java.awt.image.BufferedImage;
 import java.util.*;
 import java.util.Map.Entry;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Function;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -94,8 +91,10 @@ public class AttrBonusesWdg extends Widget implements ItemInfo.Owner {
 	try {
 	    bonuses = Arrays.stream(items)
 		.filter(wItem -> wItem != null)
-		.filter(distinctByKey(wItem -> wItem.item))
-		.map(WItem::bonuses)
+		.map(wItem -> wItem.item)
+		.distinct()
+		.map(GItem::info)
+		.map(ItemInfo::getBonuses)
 		.map(Map::entrySet)
 		.flatMap(Collection::stream)
 		.collect(
@@ -115,9 +114,9 @@ public class AttrBonusesWdg extends Widget implements ItemInfo.Owner {
 	try {
 	    if(bonuses != null) {
 		ItemInfo compiled = make(bonuses.entrySet()
-			.stream()
-			.sorted(this::BY_PRIORITY)
-			.collect(Collectors.toList())
+		    .stream()
+		    .sorted(this::BY_PRIORITY)
+		    .collect(Collectors.toList())
 		);
 		info = compiled != null ? Collections.singletonList(compiled) : null;
 	    }
@@ -181,11 +180,6 @@ public class AttrBonusesWdg extends Widget implements ItemInfo.Owner {
 	} else {
 	    return Integer.compare(b1, b2);
 	}
-    }
-
-    public static <T> Predicate<T> distinctByKey(Function<? super T,Object> keyExtractor) {
-	Map<Object,Boolean> seen = new ConcurrentHashMap<>();
-	return t -> seen.putIfAbsent(keyExtractor.apply(t), Boolean.TRUE) == null;
     }
 
     @Override

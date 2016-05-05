@@ -36,6 +36,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import static haven.WItem.*;
+
 public abstract class ItemInfo {
     static final Pattern count_pattern = Pattern.compile("(?:^|[\\s])([0-9]*\\.?[0-9]+\\s*%?)");
     public final Owner owner;
@@ -356,6 +358,62 @@ public abstract class ItemInfo {
 	    }
 	}
 	return null;
+    }
+
+    @SuppressWarnings("unchecked")
+    public static Map<Resource, Integer> getBonuses(List<ItemInfo> infos) {
+	List<ItemInfo> slotInfos = ItemInfo.findall("ISlots", infos);
+	Map<Resource, Integer> bonuses = new HashMap<>();
+	try {
+	    for (ItemInfo islots : slotInfos) {
+		List<Object> slots = (List<Object>) Reflect.getFieldValue(islots, "s");
+		for (Object slot : slots) {
+		    parseAttrMods(bonuses, (List) Reflect.getFieldValue(slot, "info"));
+		}
+	    }
+	    parseAttrMods(bonuses, ItemInfo.findall("AttrMod", infos));
+	} catch (Exception ignored) {}
+	Pair<Integer, Integer> wear = ItemInfo.getArmor(infos);
+	if (wear != null) {
+	    bonuses.put(armor_hard, wear.a);
+	    bonuses.put(armor_soft, wear.b);
+	}
+	return bonuses;
+    }
+
+
+    @SuppressWarnings("unchecked")
+    private static void parseAttrMods(Map<Resource, Integer> bonuses, List infos) {
+	for (Object inf : infos) {
+	    List<Object> mods = (List<Object>) Reflect.getFieldValue(inf, "mods");
+	    for (Object mod : mods) {
+		Resource attr = (Resource) Reflect.getFieldValue(mod, "attr");
+		int value = Reflect.getFieldValueInt(mod, "mod");
+		if (bonuses.containsKey(attr)) {
+		    bonuses.put(attr, bonuses.get(attr) + value);
+		} else {
+		    bonuses.put(attr, value);
+		}
+	    }
+	}
+    }
+
+    @SuppressWarnings("unchecked")
+    private static Map<Resource, Integer> parseAttrMods2(List infos) {
+	Map<Resource, Integer> bonuses = new HashMap<>();
+	for (Object inf : infos) {
+	    List<Object> mods = (List<Object>) Reflect.getFieldValue(inf, "mods");
+	    for (Object mod : mods) {
+		Resource attr = (Resource) Reflect.getFieldValue(mod, "attr");
+		int value = Reflect.getFieldValueInt(mod, "mod");
+		if (bonuses.containsKey(attr)) {
+		    bonuses.put(attr, bonuses.get(attr) + value);
+		} else {
+		    bonuses.put(attr, value);
+		}
+	    }
+	}
+	return bonuses;
     }
 
     private static String dump(Object arg) {
