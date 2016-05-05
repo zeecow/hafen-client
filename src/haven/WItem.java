@@ -216,14 +216,14 @@ public class WItem extends Widget implements DTarget {
 	}
 
 	protected Tex find(List<ItemInfo> info) {
-	    ItemInfo.Wear wear = ItemInfo.getWear(info);
+	    Pair<Integer, Integer> wear = ItemInfo.getWear(info);
 	    if(wear == null) return (null);
 	    return Text.renderstroked(String.valueOf(wear.b - wear.a), DURABILITY_COLOR, Color.BLACK).tex();
 	}
     };
 
-    public final AttrCache<ItemInfo.Wear> wear = new AttrCache<ItemInfo.Wear>() {
-	protected ItemInfo.Wear find(List<ItemInfo> info) {
+    public final AttrCache<Pair<Integer, Integer>> wear = new AttrCache<Pair<Integer, Integer>>() {
+	protected Pair<Integer, Integer> find(List<ItemInfo> info) {
 	    return ItemInfo.getWear(info);
 	}
     };
@@ -235,9 +235,9 @@ public class WItem extends Widget implements DTarget {
 	}
 
 	protected Tex find(List<ItemInfo> info) {
-	    ItemInfo.Wear wear = ItemInfo.getArmor(info);
-	    if(wear == null) return (null);
-	    return Text.renderstroked(String.format("%d/%d", wear.a, wear.b), ARMOR_COLOR, Color.BLACK).tex();
+	    Pair<Integer, Integer> armor = ItemInfo.getArmor(info);
+	    if(armor == null) return (null);
+	    return Text.renderstroked(String.format("%d/%d", armor.a, armor.b), ARMOR_COLOR, Color.BLACK).tex();
 	}
     };
 
@@ -297,7 +297,7 @@ public class WItem extends Widget implements DTarget {
 	float bar = 0f;
 
 	if(CFG.SHOW_ITEM_WEAR_BAR.get() && this.wear.get() != null) {
-	    ItemInfo.Wear wear = this.wear.get();
+	    Pair<Integer, Integer> wear = this.wear.get();
 	    if(wear.a > 0) {
 		bar = (float) (wear.b - wear.a) / wear.b;
 	    }
@@ -429,7 +429,7 @@ public class WItem extends Widget implements DTarget {
 	    }
 	    parseAttrMods(bonuses, ItemInfo.findall("AttrMod", item.info()));
 	} catch (Exception ignored) {}
-	ItemInfo.Wear wear = ItemInfo.getArmor(item.info());
+	Pair<Integer, Integer> wear = ItemInfo.getArmor(item.info());
 	if (wear != null) {
 	    bonuses.put(armor_hard, wear.a);
 	    bonuses.put(armor_soft, wear.b);

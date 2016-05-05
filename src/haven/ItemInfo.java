@@ -341,36 +341,28 @@ public abstract class ItemInfo {
 	return null;
     }
 
-    public static Wear getWear(List<ItemInfo> infos) {
+    public static Pair<Integer, Integer> getWear(List<ItemInfo> infos) {
 	infos = findall("Wear", infos);
 	for (ItemInfo info : infos) {
 	    if(Reflect.hasField(info, "m") && Reflect.hasField(info, "d")){
-		return new Wear(Reflect.getFieldValueInt(info, "d"), Reflect.getFieldValueInt(info, "m"));
+		return new Pair<>(Reflect.getFieldValueInt(info, "d"), Reflect.getFieldValueInt(info, "m"));
 	    }
 	}
 	return null;
     }
 
-    public static Wear getArmor(List<ItemInfo> infos) {
+    public static Pair<Integer, Integer> getArmor(List<ItemInfo> infos) {
 	//loftar is wonderful sunshine and has same class name for wear and armor tooltips even though
 	//they are different classes with different fields :)
 	infos = findall("Wear", infos);
 	for (ItemInfo info : infos) {
 	    if(Reflect.hasField(info, "hard") && Reflect.hasField(info, "soft")){
-		return new Wear(Reflect.getFieldValueInt(info, "hard"), Reflect.getFieldValueInt(info, "soft"));
+		return new Pair<>(Reflect.getFieldValueInt(info, "hard"), Reflect.getFieldValueInt(info, "soft"));
 	    }
 	}
 	return null;
     }
 
-    public static class Wear {
-	public final int a, b;
-	public Wear(int a, int b){
-	    this.a = a;
-	    this.b = b;
-	}
-    }
-    
     private static String dump(Object arg) {
 	if(arg instanceof Object[]) {
 	    StringBuilder buf = new StringBuilder();
