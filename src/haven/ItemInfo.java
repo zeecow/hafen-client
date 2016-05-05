@@ -36,9 +36,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import static haven.WItem.*;
-
 public abstract class ItemInfo {
+    public static final Resource armor_hard = Resource.local().loadwait("gfx/hud/chr/custom/ahard");
+    public static final Resource armor_soft = Resource.local().loadwait("gfx/hud/chr/custom/asoft");
     static final Pattern count_pattern = Pattern.compile("(?:^|[\\s])([0-9]*\\.?[0-9]+\\s*%?)");
     public final Owner owner;
     

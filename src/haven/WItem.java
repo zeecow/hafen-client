@@ -37,8 +37,6 @@ public class WItem extends Widget implements DTarget {
     public static final Coord TEXT_PADD_TOP = new Coord(0, -3), TEXT_PADD_BOT = new Coord(0, 2);
     public static final Color DURABILITY_COLOR = new Color(214, 253, 255);
     public static final Color ARMOR_COLOR = new Color(255, 227, 191);
-    public static final Resource armor_hard = Resource.local().loadwait("gfx/hud/chr/custom/ahard");
-    public static final Resource armor_soft = Resource.local().loadwait("gfx/hud/chr/custom/asoft");
     public final GItem item;
     private Resource cspr = null;
     private Message csdt = Message.nil;
