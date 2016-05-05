@@ -73,6 +73,11 @@ public class Session {
 
     static final int ackthresh = 30;
 
+    private static final String[] LOCAL_CACHED = new String[]{
+	"gfx/hud/chr/custom/ahard",
+	"gfx/hud/chr/custom/asoft"
+    };
+
     DatagramSocket sk;
     SocketAddress server;
     Thread rworker, sworker, ticker;
@@ -91,6 +96,7 @@ public class Session {
     final Map<Integer, CachedRes> rescache = new TreeMap<Integer, CachedRes>();
     public final Glob glob;
     public byte[] sesskey;
+    private int localCacheId = -1;
 
     @SuppressWarnings("serial")
 	public class MessageException extends RuntimeException {
@@ -197,6 +203,10 @@ public class Session {
 	    rescache.put(id, ret);
 	    return(ret);
 	}
+    }
+
+    private void cacheres(String resname){
+	cachedres(--localCacheId).set(Resource.local().loadwait(resname));
     }
 
     public Indir<Resource> getres(int id) {
@@ -857,8 +867,7 @@ public class Session {
 	ticker = new Ticker();
 	ticker.start();
 
-	cachedres(-2).set(WItem.armor_hard);
-	cachedres(-3).set(WItem.armor_soft);
+	Arrays.stream(LOCAL_CACHED).forEach(this::cacheres);
     }
 
     private void sendack(int seq) {
