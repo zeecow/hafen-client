@@ -1,3 +1,7 @@
+$size[14]{$u{Update for 05.05.16:}
+  * Added ALT+A to toggle list of actions character can perform (from adventure, government, emotes and extra menus)
+  * Display equipment bonuses on equipment window
+ 
 $size[14]{$u{Update for 21.04.16:}
   * fixed object info not updating position properly
   * fixed hitboxes for smelters and house walls
