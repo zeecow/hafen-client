@@ -28,32 +28,34 @@ package haven;
 
 import me.ender.Reflect;
 
-import java.util.*;
+import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.awt.Graphics;
+import java.util.*;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 public abstract class ItemInfo {
-    static final Pattern count_patt = Pattern.compile("(?:^|[\\s])([0-9]*\\.?[0-9]+\\s*%?)");
+    static final Pattern count_pattern = Pattern.compile("(?:^|[\\s])([0-9]*\\.?[0-9]+\\s*%?)");
     public final Owner owner;
     
     public interface Owner {
-	public Glob glob();
-	public List<ItemInfo> info();
+	Glob glob();
+	List<ItemInfo> info();
     }
     
     public interface ResOwner extends Owner {
-	public Resource resource();
+	Resource resource();
     }
 
     public interface SpriteOwner extends ResOwner {
-	public GSprite sprite();
+	GSprite sprite();
     }
     
     @Resource.PublishedCode(name = "tt")
-    public static interface InfoFactory {
-	public ItemInfo build(Owner owner, Object... args);
+    public interface InfoFactory {
+	ItemInfo build(Owner owner, Object... args);
     }
     
     public ItemInfo(Owner owner) {
@@ -66,7 +68,7 @@ public abstract class ItemInfo {
 	public final CompImage cmp = new CompImage();
 
 	public interface ID<T extends Tip> {
-	    public T make();
+	    T make();
 	}
 
 	@SuppressWarnings("unchecked")
@@ -85,11 +87,7 @@ public abstract class ItemInfo {
 	}
 
 	public BufferedImage render() {
-	    Collections.sort(tips, new Comparator<Tip>() {
-		    public int compare(Tip a, Tip b) {
-			return(a.order() - b.order());
-		    }
-		});
+	    Collections.sort(tips, (a, b) -> (a.order() - b.order()));
 	    for(Tip tip : tips)
 		tip.layout(this);
 	    return(cmp.compose());
@@ -272,13 +270,10 @@ public abstract class ItemInfo {
 	return ret;
     }
 
-    public static List<ItemInfo> findall(String cl, List<ItemInfo> il){
-	List<ItemInfo> ret = new LinkedList<ItemInfo>();
-	for(ItemInfo inf : il) {
-	    if(Reflect.is(inf, cl))
-		ret.add(inf);
-	}
-	return ret;
+    public static List<ItemInfo> findall(String cl, List<ItemInfo> infos){
+	return infos.stream()
+	    .filter(inf -> Reflect.is(inf, cl))
+	    .collect(Collectors.toCollection(LinkedList::new));
     }
 
     public static List<ItemInfo> buildinfo(Owner owner, Object[] rawinfo) {
@@ -318,7 +313,7 @@ public abstract class ItemInfo {
 	    } else if(info instanceof AdHoc) {
 		AdHoc ah = (AdHoc) info;
 		try {
-		    Matcher m = count_patt.matcher(ah.str.text);
+		    Matcher m = count_pattern.matcher(ah.str.text);
 		    if(m.find()) {
 			res = m.group(1);
 		    }
@@ -327,7 +322,7 @@ public abstract class ItemInfo {
 	    } else if(info instanceof Name) {
 		Name name = (Name) info;
 		try {
-		    Matcher m = count_patt.matcher(name.str.text);
+		    Matcher m = count_pattern.matcher(name.str.text);
 		    if(m.find()) {
 			res = m.group(1);
 		    }
