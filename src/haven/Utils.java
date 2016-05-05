@@ -1326,6 +1326,7 @@ public class Utils {
 	try {
 	    mv.load(cam.load(camera.fin(Matrix4f.id))).mul1(wxf.load(loc.fin(Matrix4f.id)));
 	    Coord3f s = proj.toscreen(mv.mul4(Coord3f.o), wnd.sz());
+	    if(s.z > 1) {return null;} //Skip if point is behind the camera
 	    Coord3f sczu = proj.toscreen(mv.mul4(Coord3f.zu), wnd.sz()).sub(s);
 	    return new Coord(s).add(new Coord(sczu.mul(up)));
 	} catch (RuntimeException ignored) {}
