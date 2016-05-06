@@ -45,7 +45,7 @@ public class FlowerMenu extends Widget {
     public static final Tex pbg = Window.bg;
     public static final int ph = 30, ppl = 8;
     public static Map<String, Boolean> AUTOCHOOSE = null;
-    private final String[] options;
+    public final String[] options;
     private Petal autochoose;
     public Petal[] opts;
     private UI.Grab mg, kg;
@@ -302,9 +302,13 @@ public class FlowerMenu extends Widget {
 
     public void choose(Petal option) {
 	if(option == null) {
-	    wdgmsg("cl", -1);
+	    choose(-1);
 	} else {
-	    wdgmsg("cl", option.num, ui.modflags());
+	    choose(option.num);
 	}
+    }
+
+    public void choose(int num) {
+	wdgmsg("cl", num, ui.modflags());
     }
 }

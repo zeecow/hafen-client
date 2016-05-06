@@ -26,13 +26,15 @@
 
 package haven;
 
-import java.awt.Color;
+import me.ender.Reflect;
+
+import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.util.*;
+import java.util.List;
 
-import static haven.Inventory.sqsz;
+import static haven.Inventory.*;
 
-public class WItem extends Widget implements DTarget {
+public class WItem extends Widget implements DTarget2 {
     public static final Resource missing = Resource.local().loadwait("gfx/invobjs/missing");
     public static final Coord TEXT_PADD_TOP = new Coord(0, -3), TEXT_PADD_BOT = new Coord(0, 2);
     public static final Color DURABILITY_COLOR = new Color(214, 253, 255);
@@ -237,6 +239,26 @@ public class WItem extends Widget implements DTarget {
 	}
     };
 
+    public final AttrCache<List<ItemInfo>> gilding = new AttrCache<List<ItemInfo>>() {
+	@Override
+	protected List<ItemInfo> find(List<ItemInfo> info) {
+	    return ItemInfo.findall("Slotted", info);
+	}
+    };
+
+    public final AttrCache<Boolean> gildable = new AttrCache<Boolean>() {
+	@Override
+	protected Boolean find(List<ItemInfo> info) {
+	    List<ItemInfo> slots = ItemInfo.findall("ISlots", info);
+	    for (ItemInfo slot : slots) {
+		if(!Reflect.getFieldValueBool(slot, "done")) {
+		    return true;
+		}
+	    }
+	    return false;
+	}
+    };
+
     private GSprite lspr = null;
     public void tick(double dt) {
 	/* XXX: This is ugly and there should be a better way to
@@ -403,12 +425,16 @@ public class WItem extends Widget implements DTarget {
 	return false;
     }
 
-    public boolean drop(Coord cc, Coord ul) {
+    public boolean drop(WItem target, Coord cc, Coord ul) {
 	return(false);
     }
 
-    public boolean iteminteract(Coord cc, Coord ul) {
-	item.wdgmsg("itemact", ui.modflags());
+    public boolean iteminteract(WItem target, Coord cc, Coord ul) {
+	if(!target.gilding.get().isEmpty() && gildable.get()) {
+	    GildingWnd.create(ui, this, target);
+	} else {
+	    item.wdgmsg("itemact", ui.modflags());
+	}
 	return(true);
     }
 
