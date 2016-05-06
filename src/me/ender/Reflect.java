@@ -37,6 +37,10 @@ public class Reflect {
 	return (String) getFieldValue(obj, name);
     }
 
+    public static boolean getFieldValueBool(Object obj, String name) {
+	return Boolean.TRUE.equals(getFieldValue(obj, name));
+    }
+
     private static Field getField(Object obj, String name) throws NoSuchFieldException {
 	Field f = obj.getClass().getDeclaredField(name);
 	f.setAccessible(true);
