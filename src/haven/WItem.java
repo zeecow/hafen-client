@@ -246,6 +246,13 @@ public class WItem extends Widget implements DTarget2 {
 	}
     };
 
+    public final AttrCache<List<ItemInfo>> slots = new AttrCache<List<ItemInfo>>() {
+	@Override
+	protected List<ItemInfo> find(List<ItemInfo> info) {
+	    return ItemInfo.findall("ISlots", info);
+	}
+    };
+
     public final AttrCache<Boolean> gildable = new AttrCache<Boolean>() {
 	@Override
 	protected Boolean find(List<ItemInfo> info) {

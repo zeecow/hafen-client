@@ -5,7 +5,7 @@ import java.awt.*;
 import static haven.Inventory.*;
 import static haven.Inventory.sqoff;
 
-public class EquipProxy extends Widget implements DTarget{
+public class EquipProxy extends Widget implements DTarget2{
     public static final Color BG_COLOR = new Color(91, 128, 51, 202);
     private int[] slots;
 
@@ -75,7 +75,7 @@ public class EquipProxy extends Widget implements DTarget{
     }
 
     @Override
-    public boolean drop(Coord cc, Coord ul) {
+    public boolean drop(WItem target, Coord cc, Coord ul) {
 	Equipory e = ui.gui.equipory;
 	if(e != null){
 	    e.wdgmsg("drop", slot(cc));
@@ -85,12 +85,12 @@ public class EquipProxy extends Widget implements DTarget{
     }
 
     @Override
-    public boolean iteminteract(Coord cc, Coord ul) {
+    public boolean iteminteract(WItem target, Coord cc, Coord ul) {
 	Equipory e = ui.gui.equipory;
 	if(e != null){
 	    WItem w = e.slots[slot(cc)];
 	    if(w != null){
-		return w.iteminteract(cc, ul);
+		return w.iteminteract(target, cc, ul);
 	    }
 	}
 	return false;

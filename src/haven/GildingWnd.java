@@ -1,8 +1,13 @@
 package haven;
 
-public class GildingWnd extends Window implements DTarget2, DropTarget{
+import java.awt.image.BufferedImage;
+
+public class GildingWnd extends Window {
     private final WItem target;
     private final WItem gild;
+    private final BufferedImage igild;
+    private final BufferedImage islots;
+    private UI.Grab mg;
 
     public GildingWnd(WItem target, WItem gild) {
 	super(new Coord(200, 100), "Gilding");
@@ -11,15 +16,31 @@ public class GildingWnd extends Window implements DTarget2, DropTarget{
 	this.target = target;
 	this.gild = gild;
 
-	add(new FWItem(target.item), 10, 10);
-	add(new FWItem(gild.item), 60, 10);
+	gild.hide();
+
+	igild = ItemInfo.longtip(gild.gilding.get());
+	islots = ItemInfo.longtip(target.slots.get());
+
+	int h = Math.max(igild.getHeight(), islots.getHeight());
+	int w = igild.getWidth()+islots.getWidth();
+
+	resize(new Coord(w+20, h+70));
+
+	add(new FWItem(target.item), 10, 5);
+	add(new FWItem(gild.item), asz.x-5-gild.sz.x, 5);
 
 	add(new Button(120, "Gild") {
 	    @Override
 	    public void click() {
 		gild();
 	    }
-	}, 35, 80);
+	}, asz.x/2-60, h+50);
+    }
+
+    @Override
+    protected void added() {
+	super.added();
+	mg = ui.grabmouse(this);
     }
 
     private void gild() {
@@ -28,26 +49,28 @@ public class GildingWnd extends Window implements DTarget2, DropTarget{
 
     @Override
     public void cdraw(GOut g) {
+	g.image(islots, new Coord(5, 40));
+	g.image(igild, new Coord(asz.x-5-igild.getWidth(), 40));
+    }
+
+    @Override
+    public boolean mousedown(Coord c, int button) {
+	if(c.isect(Coord.z, sz)){
+	    super.mousedown(c, button);
+	} else {
+	    close();
+	}
+	return true;
     }
 
     @Override
     public void close() {
+	gild.show();
+	if(mg != null) {
+	    mg.remove();
+	}
+	mg = null;
 	super.close();
-    }
-
-    @Override
-    public boolean drop(WItem target, Coord cc, Coord ul) {
-	return mousedown(cc, 0);
-    }
-
-    @Override
-    public boolean iteminteract(WItem target, Coord cc, Coord ul) {
-	return mousedown(cc, 1);
-    }
-
-    @Override
-    public boolean dropthing(Coord cc, Object thing) {
-	return mousedown(cc, 0);
     }
 
     public static void create(UI ui, WItem target, WItem gild) {
