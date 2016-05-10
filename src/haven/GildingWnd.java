@@ -57,12 +57,18 @@ public class GildingWnd extends Window {
 	add(new FWItem(target.item), 10, 5);
 	add(new FWItem(gild.item), asz.x - 5 - gild.sz.x, 5);
 
-	add(new Button(120, "Gild") {
-	    @Override
-	    public void click() {
-		gild();
-	    }
-	}, asz.x / 2 - 60, asz.y - 20);
+	if(target.gildable.get()) {
+	    add(new Button(120, "Gild") {
+		@Override
+		public void click() {
+		    gild();
+		}
+	    }, asz.x / 2 - 60, asz.y - 20);
+	} else {
+	    Label label = new Label("Can't gild: there are no more slots left!");
+	    label.setcolor(Color.RED);
+	    add(label, (asz.x - label.sz.x) / 2, asz.y - 15);
+	}
     }
 
     private Pair<Double, BufferedImage> findMatches() {
