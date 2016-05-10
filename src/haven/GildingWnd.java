@@ -5,6 +5,7 @@ import me.ender.Reflect;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -57,7 +58,19 @@ public class GildingWnd extends Window {
 	add(new FWItem(target.item), 10, 5);
 	add(new FWItem(gild.item), asz.x - 5 - gild.sz.x, 5);
 
-	if(target.gildable.get()) {
+	boolean canSlot = true;
+	try {
+	    canSlot = target_infos.stream()
+		.map(itemInfo -> (List<?>) Reflect.getFieldValue(itemInfo, "s"))
+		.flatMap(Collection::stream)
+		.map(o -> (Resource) Reflect.getFieldValue(o, "res"))
+		.noneMatch(o -> {
+		    Resource resource = gild.item.resource();
+		    return resource == o;
+		});
+	} catch (Loading ignored) {}
+
+	if(target.gildable.get() && canSlot) {
 	    add(new Button(120, "Gild") {
 		@Override
 		public void click() {
@@ -65,7 +78,8 @@ public class GildingWnd extends Window {
 		}
 	    }, asz.x / 2 - 60, asz.y - 20);
 	} else {
-	    Label label = new Label("Can't gild: there are no more slots left!");
+	    String msg = "Can't gild: " + (canSlot ? "there are no more slots left!" : "item of this type already slotted!");
+	    Label label = new Label(msg);
 	    label.setcolor(Color.RED);
 	    add(label, (asz.x - label.sz.x) / 2, asz.y - 15);
 	}
