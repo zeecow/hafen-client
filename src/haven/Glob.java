@@ -28,8 +28,8 @@ package haven;
 
 import me.ender.timer.Timer;
 
+import java.awt.*;
 import java.util.*;
-import java.awt.Color;
 
 public class Glob {
     public long time, epoch = System.currentTimeMillis();
@@ -92,8 +92,14 @@ public class Glob {
 	}
 
 	public Text.Line compline() {
-	    if(compLine == null){
-		compLine = Text.renderstroked(Integer.toString(comp), Color.WHITE, Color.BLACK, fnd);
+	    if(compLine == null) {
+		Color c = Color.WHITE;
+		if(comp > base) {
+		    c = CharWnd.buff;
+		} else if(comp < base) {
+		    c = CharWnd.debuff;
+		}
+		compLine = Text.renderstroked(Integer.toString(comp), c, Color.BLACK, fnd);
 	    }
 	    return compLine;
 	}
