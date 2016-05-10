@@ -29,7 +29,6 @@ package haven;
 import me.ender.Reflect;
 
 import java.util.*;
-import java.awt.Font;
 import java.awt.Color;
 
 public class Makewindow extends Widget {
@@ -153,7 +152,7 @@ public class Makewindow extends Widget {
 		    try {
 			Glob.CAttr attr = ui.gui.chrwdg.findattr(qm.get().basename());
 			if(attr != null) {
-			    Tex txt = attr.comptex();
+			    Tex txt = attr.compline().tex();
 			    g.image(txt, c);
 			    c = c.add(txt.sz().x + 8, 0);
 			}
@@ -189,7 +188,7 @@ public class Makewindow extends Widget {
 		    try {
 			Glob.CAttr attr = ui.gui.chrwdg.findattr(qm.get().basename());
 			if(attr != null) {
-			    sz = sz.add(attr.comptex().sz().x + 8, 0);
+			    sz = sz.add(attr.compline().sz().x + 8, 0);
 			}
 		    }catch (Exception ignored){}
 		    if(mc.isect(c, sz))
