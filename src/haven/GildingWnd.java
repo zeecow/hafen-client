@@ -52,7 +52,7 @@ public class GildingWnd extends Window {
 	int h = Math.max(igild.getHeight(), islots.getHeight());
 	int w = igild.getWidth() + islots.getWidth();
 
-	resize(new Coord(w + 45, h + 95 + (matches != null ? matches.getHeight() : 0)));
+	resize(new Coord(w + 45, h + 125 + (matches != null ? matches.getHeight() : 0)));
 
 	add(new FWItem(target.item), 10, 5);
 	add(new FWItem(gild.item), asz.x - 5 - gild.sz.x, 5);
@@ -117,7 +117,9 @@ public class GildingWnd extends Window {
 	g.image(islots, new Coord(5, 40));
 	g.image(igild, new Coord(asz.x - 5 - igild.getWidth(), 40));
 	if(matches != null) {
-	    g.image(matches, new Coord((asz.x - matches.getWidth()) / 2, asz.y - matches.getHeight() - 45));
+	    Coord c1 = new Coord(asz.x / 2, asz.y - matches.getHeight() - 70);
+	    g.atext("Matching skills:", c1, 0.5, 0.5);
+	    g.image(matches, c1.sub(matches.getWidth() / 2, matches.getHeight() / 2).add(0, 18));
 	}
 	Coord ul = new Coord(0, asz.y - 34);
 	Coord sz = new Coord(asz.x, 14);
@@ -126,8 +128,11 @@ public class GildingWnd extends Window {
 	g.chcolor(new Color(35, 111, 33, 255));
 	g.frect(ul, new Coord((int) (asz.x * koeff), 14));
 	g.chcolor();
-	g.atext(String.format("Chance %.2f%%", 100 * koeff), ul.add(sz.div(2)), 0.5, 0.5);
+	g.atext("Chance for a new slot:", ul.add(sz.div(2)).sub(0, 16), 0.5, 0.5);
+	g.atext(String.format("%.2f%%", 100 * koeff), ul.add(sz.div(2)), 0.5, 0.5);
+	g.atext("Min:", ul.add(2, sz.y / 2 - 16), 0, 0.5);
 	g.atext(String.format("%.2f%%", 100 * min), ul.add(2, sz.y / 2), 0, 0.5);
+	g.atext("Max:", ul.add(sz.x - 2, sz.y / 2 - 16), 1, 0.5);
 	g.atext(String.format("%.2f%%", 100 * max), ul.add(sz.x - 2, sz.y / 2), 1, 0.5);
     }
 
