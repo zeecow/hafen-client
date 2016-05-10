@@ -2,6 +2,7 @@ package haven;
 
 import me.ender.Reflect;
 
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.Arrays;
 import java.util.List;
@@ -14,6 +15,8 @@ public class GildingWnd extends Window {
     private BufferedImage islots;
     private BufferedImage matches;
     private UI.Grab mg;
+    private double min, max, koeff;
+
 
     public GildingWnd(WItem target, WItem gild) {
 	super(new Coord(200, 100), "Gilding");
@@ -26,15 +29,30 @@ public class GildingWnd extends Window {
     private void init() {
 	gild.hide();
 
-	matches = findMatches();
+	Pair<Double, BufferedImage> result = findMatches();
+	if(result != null) {
+	    koeff = result.a;
+	    matches = result.b;
+	}
 
-	igild = ItemInfo.longtip(gild.gilding.get());
-	islots = ItemInfo.longtip(target.slots.get());
+	List<ItemInfo> gild_infos = gild.gilding.get();
+	List<ItemInfo> target_infos = target.slots.get();
+
+	ItemInfo gild_info = gild_infos.get(0);
+	ItemInfo target_info = target_infos.get(0);
+
+	min = Reflect.getFieldValueDouble(gild_info, "pmin") * Reflect.getFieldValueDouble(target_info, "pmin");
+	max = Reflect.getFieldValueDouble(gild_info, "pmax") * Reflect.getFieldValueDouble(target_info, "pmax");
+
+	koeff = min + koeff * (max - min);
+
+	igild = ItemInfo.longtip(gild_infos);
+	islots = ItemInfo.longtip(target_infos);
 
 	int h = Math.max(igild.getHeight(), islots.getHeight());
 	int w = igild.getWidth() + islots.getWidth();
 
-	resize(new Coord(w + 20, h + 70 + (matches != null ? matches.getHeight() : 0)));
+	resize(new Coord(w + 45, h + 95 + (matches != null ? matches.getHeight() : 0)));
 
 	add(new FWItem(target.item), 10, 5);
 	add(new FWItem(gild.item), asz.x - 5 - gild.sz.x, 5);
@@ -47,8 +65,10 @@ public class GildingWnd extends Window {
 	}, asz.x / 2 - 60, asz.y - 20);
     }
 
-    private BufferedImage findMatches() {
+    private Pair<Double, BufferedImage> findMatches() {
 	try {
+	    CharWnd charWnd = ui.gui.chrwdg;
+
 	    List<Resource> slot_attrs = target.slots.get().stream()
 		.map(itemInfo -> (Resource[]) Reflect.getFieldValue(itemInfo, "attrs"))
 		.flatMap(Arrays::stream)
@@ -58,17 +78,22 @@ public class GildingWnd extends Window {
 		.map(itemInfo -> (Resource[]) Reflect.getFieldValue(itemInfo, "attrs"))
 		.flatMap(Arrays::stream)
 		.filter(slot_attrs::contains)
-		.sorted(ui.gui.chrwdg::BY_PRIORITY)
+		.sorted(charWnd::BY_PRIORITY)
 		.collect(Collectors.toList());
 
 	    if(!matches.isEmpty()) {
-		return ItemInfo.catimgsh(8, matches.stream()
+		double k = 1 - Math.pow(2, -Math.sqrt(matches.stream()
+		    .map(charWnd::findattr)
+		    .map(cAttr -> cAttr.comp * cAttr.comp)
+		    .reduce(0, Integer::sum)) / 100f);
+
+		return new Pair<>(k, ItemInfo.catimgsh(8, matches.stream()
 		    .map(res -> ItemInfo.catimgsh(1,
 			res.layer(Resource.imgc).img,
-			ui.gui.chrwdg.findattr(res).compline().img)
+			charWnd.findattr(res).compline().img)
 		    )
 		    .toArray(BufferedImage[]::new)
-		);
+		));
 	    }
 	} catch (Exception ignored) {
 	    ignored.printStackTrace();
@@ -92,8 +117,18 @@ public class GildingWnd extends Window {
 	g.image(islots, new Coord(5, 40));
 	g.image(igild, new Coord(asz.x - 5 - igild.getWidth(), 40));
 	if(matches != null) {
-	    g.image(matches, new Coord((asz.x - matches.getWidth()) / 2, asz.y - matches.getHeight() - 20));
+	    g.image(matches, new Coord((asz.x - matches.getWidth()) / 2, asz.y - matches.getHeight() - 45));
 	}
+	Coord ul = new Coord(0, asz.y - 34);
+	Coord sz = new Coord(asz.x, 14);
+	g.chcolor(new Color(122, 61, 61, 255));
+	g.frect(ul, sz);
+	g.chcolor(new Color(35, 111, 33, 255));
+	g.frect(ul, new Coord((int) (asz.x * koeff), 14));
+	g.chcolor();
+	g.atext(String.format("Chance %.2f%%", 100 * koeff), ul.add(sz.div(2)), 0.5, 0.5);
+	g.atext(String.format("%.2f%%", 100 * min), ul.add(2, sz.y / 2), 0, 0.5);
+	g.atext(String.format("%.2f%%", 100 * max), ul.add(sz.x - 2, sz.y / 2), 1, 0.5);
     }
 
     @Override
