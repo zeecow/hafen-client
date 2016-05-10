@@ -26,14 +26,15 @@
 
 package haven;
 
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.image.BufferedImage;
-import java.awt.font.TextAttribute;
-import java.util.*;
-import static haven.Window.wbox;
-import static haven.PUtils.*;
 import haven.resutil.FoodInfo;
+
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.util.*;
+import java.util.List;
+import java.util.stream.IntStream;
+
+import static haven.PUtils.*;
 
 public class CharWnd extends Window {
     public static final RichText.Foundry ifnd = new RichText.Foundry(Resource.remote(), java.awt.font.TextAttribute.FAMILY, "SansSerif", java.awt.font.TextAttribute.SIZE, 9).aa(true);
@@ -1752,6 +1753,55 @@ public class CharWnd extends Window {
 	    }
 	}
 	return null;
+    }
+
+    public Glob.CAttr findattr(Resource res) {
+	for (SAttr skill : this.skill) {
+	    if(res == skill.res) {
+		return skill.attr;
+	    }
+	}
+	for (Attr stat : base) {
+	    if(res == stat.res) {
+		return stat.attr;
+	    }
+	}
+	return null;
+    }
+
+    public int statIndex(Resource res) {
+	if(base != null) {
+	    return IntStream.range(0, base.size())
+		.filter(i -> base.get(i).res == res)
+		.findFirst().orElse(Integer.MAX_VALUE);
+	}
+	return Integer.MAX_VALUE;
+    }
+
+    public int skillIndex(Resource res) {
+	if(skill != null) {
+	    return IntStream.range(0, skill.size())
+		.filter(i -> skill.get(i).res == res)
+		.findFirst().orElse(Integer.MAX_VALUE);
+	}
+	return Integer.MAX_VALUE;
+    }
+
+    public int BY_PRIORITY(Resource r1, Resource r2 ) {
+	int b1 = statIndex(r1);
+	int b2 = statIndex(r2);
+
+	if(b1 == b2) {
+	    b1 = skillIndex(r1);
+	    b2 = skillIndex(r2);
+	    if(b1 == b2) {
+		return r1.name.compareTo(r2.name);
+	    } else {
+		return Integer.compare(b1, b2);
+	    }
+	} else {
+	    return Integer.compare(b1, b2);
+	}
     }
 
     public void addchild(Widget child, Object... args) {

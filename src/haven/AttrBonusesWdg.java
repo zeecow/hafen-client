@@ -4,7 +4,6 @@ import java.awt.image.BufferedImage;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 public class AttrBonusesWdg extends Widget implements ItemInfo.Owner {
     private static final Coord bonusc = new Coord(0, 20);
@@ -142,44 +141,14 @@ public class AttrBonusesWdg extends Widget implements ItemInfo.Owner {
 	return f.build(this, args);
     }
 
-    private int statIndex(Resource res) {
-	if(charWnd != null) {
-	    List<CharWnd.Attr> base = charWnd.base;
-	    return IntStream.range(0, base.size())
-		.filter(i -> base.get(i).res == res)
-		.findFirst().orElse(Integer.MAX_VALUE);
-	}
-	return Integer.MAX_VALUE;
-    }
-
-    private int skillIndex(Resource res) {
-	if(charWnd != null) {
-	    List<CharWnd.SAttr> skill = charWnd.skill;
-	    return IntStream.range(0, skill.size())
-		.filter(i -> skill.get(i).res == res)
-		.findFirst().orElse(Integer.MAX_VALUE);
-	}
-	return Integer.MAX_VALUE;
-    }
-
     private int BY_PRIORITY(Entry<Resource, Integer> o1, Entry<Resource, Integer> o2) {
 	Resource r1 = o1.getKey();
 	Resource r2 = o2.getKey();
 
-	int b1 = statIndex(r1);
-	int b2 = statIndex(r2);
-
-	if(b1 == b2) {
-	    b1 = skillIndex(r1);
-	    b2 = skillIndex(r2);
-	    if(b1 == b2) {
-		return r1.name.compareTo(r2.name);
-	    } else {
-		return Integer.compare(b1, b2);
-	    }
-	} else {
-	    return Integer.compare(b1, b2);
+	if(charWnd != null) {
+	    return charWnd.BY_PRIORITY(r1, r2);
 	}
+	return r1.name.compareTo(r2.name);
     }
 
     @Override
