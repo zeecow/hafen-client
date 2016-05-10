@@ -1,3 +1,6 @@
+$size[14]{$u{Update for 10.05.16:}
+  * Added gilding window that shows when you try to gild something and displays relevant info.
+ 
 $size[14]{$u{Update for 05.05.16:}
   * Added ALT+A to toggle list of actions character can perform (from adventure, government, emotes and extra menus)
   * Display equipment bonuses on equipment window
