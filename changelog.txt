@@ -1,3 +1,6 @@
+$size[14]{$u{Update for 11.05.16:}
+  * Added options to show toggles for swim/tracking/criminal as buffs and also to toggle them at login.
+ 
 $size[14]{$u{Update for 10.05.16:}
   * Added gilding window that shows when you try to gild something and displays relevant info.
  
