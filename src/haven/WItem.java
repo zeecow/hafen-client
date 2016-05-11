@@ -258,7 +258,7 @@ public class WItem extends Widget implements DTarget2 {
 	protected Boolean find(List<ItemInfo> info) {
 	    List<ItemInfo> slots = ItemInfo.findall("ISlots", info);
 	    for (ItemInfo slot : slots) {
-		if(!Reflect.getFieldValueBool(slot, "done")) {
+		if(Reflect.getFieldValueInt(slot, "left") > 0) {
 		    return true;
 		}
 	    }
