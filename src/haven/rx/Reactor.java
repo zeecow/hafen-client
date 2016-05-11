@@ -1,4 +1,4 @@
-package haven;
+package haven.rx;
 
 import rx.subjects.PublishSubject;
 

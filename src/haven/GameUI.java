@@ -26,13 +26,14 @@
 
 package haven;
 
+import haven.rx.Reactor;
+
 import java.awt.image.BufferedImage;
 import java.util.*;
 import java.awt.Color;
 import java.awt.event.KeyEvent;
 import java.awt.image.WritableRaster;
 import static haven.Inventory.invsq;
-import static javafx.scene.input.KeyCode.T;
 
 public class GameUI extends ConsoleHost implements Console.Directory {
     public static final Text.Foundry msgfoundry = new Text.Foundry(Text.dfont, 14);
