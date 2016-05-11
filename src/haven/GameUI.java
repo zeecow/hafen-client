@@ -785,9 +785,11 @@ public class GameUI extends ConsoleHost implements Console.Directory {
     public void uimsg(String msg, Object... args) {
 	if(msg == "err") {
 	    String err = (String)args[0];
+	    Reactor.EMSG.onNext(err);
 	    error(err);
 	} else if(msg == "msg") {
 	    String text = (String)args[0];
+	    Reactor.IMSG.onNext(text);
 	    msg(text);
 	} else if(msg == "prog") {
 	    if(args.length > 0)
