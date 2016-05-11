@@ -27,12 +27,11 @@
 package haven;
 
 import haven.rx.BuffToggles;
-
-import java.awt.*;
 import haven.rx.Reactor;
 
 import java.awt.Color;
 import java.awt.event.KeyEvent;
+import java.awt.image.BufferedImage;
 import java.awt.image.WritableRaster;
 import java.util.*;
 import java.util.List;
