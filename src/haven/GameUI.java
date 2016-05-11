@@ -26,13 +26,17 @@
 
 package haven;
 
-import java.awt.image.BufferedImage;
-import java.util.*;
+import haven.rx.BuffToggles;
+import haven.rx.Reactor;
+
 import java.awt.Color;
 import java.awt.event.KeyEvent;
+import java.awt.image.BufferedImage;
 import java.awt.image.WritableRaster;
-import static haven.Inventory.invsq;
-import static javafx.scene.input.KeyCode.T;
+import java.util.*;
+import java.util.List;
+
+import static haven.Inventory.*;
 
 public class GameUI extends ConsoleHost implements Console.Directory {
     public static final Text.Foundry msgfoundry = new Text.Foundry(Text.dfont, 14);
@@ -285,6 +289,11 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 	fold_bl[1].lower();
 
 	updfold(false);
+    }
+
+    @Override
+    public void bound() {
+	BuffToggles.init(this);
     }
 
     protected void added() {
@@ -785,9 +794,11 @@ public class GameUI extends ConsoleHost implements Console.Directory {
     public void uimsg(String msg, Object... args) {
 	if(msg == "err") {
 	    String err = (String)args[0];
+	    Reactor.EMSG.onNext(err);
 	    error(err);
 	} else if(msg == "msg") {
 	    String text = (String)args[0];
+	    Reactor.IMSG.onNext(text);
 	    msg(text);
 	} else if(msg == "prog") {
 	    if(args.length > 0)

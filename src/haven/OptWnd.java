@@ -349,6 +349,18 @@ public class OptWnd extends Window {
 	y += 25;
 	general.add(new CFGBox("Single item CTRL choose", CFG.MENU_SINGLE_CTRL_CLICK, "If checked, will automatically select single item menus if CTRL is pressed when menu is opened."), x, y);
 
+	y += 35;
+	general.add(new Button(120, "Toggle at login") {
+	    @Override
+	    public void click() {
+		if(ui.gui != null) {
+		    LoginTogglesCfgWnd.toggle(ui.gui);
+		} else {
+		    LoginTogglesCfgWnd.toggle(ui.root);
+		}
+	    }
+	}, x, y);
+
 	my = Math.max(my, y);
 	x += 250;
 	y = 0;
@@ -433,6 +445,18 @@ public class OptWnd extends Window {
 		}
 	    }
 	}, x + w + 5, y);
+
+	y += 25;
+	display.add(new Button(120, "Show as buffs") {
+	    @Override
+	    public void click() {
+		if(ui.gui != null) {
+		    ShowBuffsCfgWnd.toggle(ui.gui);
+		} else {
+		    ShowBuffsCfgWnd.toggle(ui.root);
+		}
+	    }
+	}, x, y);
 
 	my = Math.max(my, y);
 	x += 250;

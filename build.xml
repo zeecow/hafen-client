@@ -30,6 +30,7 @@
 	<pathelement path="lib/jnlp.jar" />
 	<pathelement path="lib/jglob.jar" />
 	<pathelement path="lib/gson-2.3.1.jar" />
+        <pathelement path="lib/rxjava-1.1.5.jar" />
       </classpath>
       <compilerarg value="-Xlint:unchecked" />
       <compilerarg value="-Xlint:-options" />
@@ -56,6 +57,9 @@
       <patternset excludes="META-INF/**" />
     </unjar>
     <unjar src="lib/gson-2.3.1.jar" dest="build/classes-lib">
+      <patternset excludes="META-INF/**" />
+    </unjar>
+    <unjar src="lib/rxjava-1.1.5.jar" dest="build/classes-lib">
       <patternset excludes="META-INF/**" />
     </unjar>
   </target>

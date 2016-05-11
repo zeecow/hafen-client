@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import haven.QualityList.SingleType;
+import haven.rx.BuffToggles;
 import me.ender.Reflect;
 
 import java.lang.reflect.Type;
@@ -69,6 +70,11 @@ public class CFG<T> {
 	    tmp = new HashMap<>();
 	}
 	cfg = tmp;
+
+	BuffToggles.toggles.forEach(toggle -> toggle.cfg(
+	    new CFG<Boolean>("display.buffs."+toggle.action, true),
+	    new CFG<Boolean>("general.start_toggle."+toggle.action, false)
+	));
     }
 
     public interface Observer<T> {

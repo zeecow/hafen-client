@@ -347,6 +347,10 @@ public class MenuGrid extends Widget {
 	return true;
     }
 
+    public void senduse(String... ad) {
+	wdgmsg("act", (Object[]) ad);
+    }
+
     private void usecustom(String[] ad) {
 	if(ad[1].equals("timers")) {
 	    if(ui != null && ui.gui != null) {

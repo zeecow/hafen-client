@@ -26,11 +26,13 @@
 
 package haven;
 
-import java.awt.Color;
-
 public class Bufflist extends Widget {
     static final int margin = 2;
     static final int num = 5;
+
+    public Bufflist() {
+	super(Buff.cframe.sz());
+    }
 
     private void arrange(Widget imm) {
 	int i = 0;
