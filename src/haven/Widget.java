@@ -1063,6 +1063,9 @@ public class Widget {
 	return(true);
     }
 
+    //called when this widget bound to id
+    public void bound() {}
+
     public final Collection<Anim> anims = new LinkedList<Anim>();
     public final Collection<Anim> nanims = new LinkedList<Anim>();
     public <T extends Anim> void clearanims(Class<T> type) {
