@@ -26,14 +26,18 @@
 
 package haven;
 
+import haven.rx.BuffToggles;
+
+import java.awt.*;
 import haven.rx.Reactor;
 
-import java.awt.image.BufferedImage;
-import java.util.*;
 import java.awt.Color;
 import java.awt.event.KeyEvent;
 import java.awt.image.WritableRaster;
-import static haven.Inventory.invsq;
+import java.util.*;
+import java.util.List;
+
+import static haven.Inventory.*;
 
 public class GameUI extends ConsoleHost implements Console.Directory {
     public static final Text.Foundry msgfoundry = new Text.Foundry(Text.dfont, 14);
@@ -286,6 +290,11 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 	fold_bl[1].lower();
 
 	updfold(false);
+    }
+
+    @Override
+    public void bound() {
+	BuffToggles.init(this);
     }
 
     protected void added() {
