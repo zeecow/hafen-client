@@ -31,8 +31,6 @@ public class ResDrawable extends Drawable {
     public Sprite spr = null;
     MessageBuf sdt;
     private int delay = 0;
-    private Gob.Overlay radius;
-    private Boolean show_radius = false;
 
     public ResDrawable(Gob gob, Indir<Resource> res, Message sdt) {
 	super(gob);
@@ -54,7 +52,12 @@ public class ResDrawable extends Drawable {
 	String name = res.get().name;
 	GobRadius cfg = GobRadius.get(name);
 	if(cfg != null) {
-	    radius = new Gob.Overlay(new ColoredRadius(gob, cfg.radius, cfg.color()));
+	    gob.addol(new ColoredRadius(gob, cfg.radius, cfg.color()){
+		@Override
+		public boolean setup(RenderList d) {
+		    return CFG.SHOW_GOB_RADIUS.get() && super.setup(d);
+		}
+	    });
 	}
     }
 	
@@ -65,19 +68,8 @@ public class ResDrawable extends Drawable {
 	    return;
 	}
 	rl.add(spr, null);
-	checkRadius();
     }
 
-    private void checkRadius() {
-	if(radius != null && show_radius != CFG.SHOW_GOB_RADIUS.get()) {
-	    show_radius = CFG.SHOW_GOB_RADIUS.get();
-	    gob.ols.remove(radius);
-	    if(show_radius) {
-		gob.ols.add(radius);
-	    }
-	}
-    }
-	
     public void ctick(int dt) {
 	if(spr == null) {
 	    delay += dt;
