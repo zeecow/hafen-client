@@ -3,7 +3,7 @@ package haven;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 
-public class GobInfo extends PView.Draw2D {
+public class GeneralGobInfo extends PView.Draw2D {
     public boolean ready = false;
     private Tex tex;
     private final Gob gob;
@@ -15,7 +15,7 @@ public class GobInfo extends PView.Draw2D {
 	return Rendered.CONSTANS;
     }
 
-    protected GobInfo(Gob owner) {
+    protected GeneralGobInfo(Gob owner) {
 	this.gob = owner;
     }
 

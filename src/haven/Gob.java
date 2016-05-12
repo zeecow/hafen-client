@@ -50,7 +50,7 @@ public class Gob implements Sprite.Owner, Skeleton.ModOwner, Rendered {
     private final Collection<ResAttr.Load> lrdata = new LinkedList<ResAttr.Load>();
     private GobPath path;
     private Hitbox hitbox = null;
-    private GobInfo gobInfo = null;
+    private GeneralGobInfo gobInfo = null;
 
     public static class Overlay implements Rendered {
 	public Indir<Resource> res;
@@ -422,7 +422,7 @@ public class Gob implements Sprite.Owner, Skeleton.ModOwner, Rendered {
 
 	if(CFG.DISPLAY_GOB_INFO.get()) {
 	    if(gobInfo == null) {
-		gobInfo = new GobInfo(this);
+		gobInfo = new GeneralGobInfo(this);
 	    }
 	    rl.add(gobInfo, null);
 	}
