@@ -3,54 +3,15 @@ package haven;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 
-public class GeneralGobInfo extends PView.Draw2D {
-    public boolean ready = false;
-    private Tex tex;
-    private final Gob gob;
+public class GeneralGobInfo extends GobInfo {
     private GobHealth health;
-    private GLState.Buffer state;
-
-    @Override
-    public Object staticp() {
-	return Rendered.CONSTANS;
-    }
 
     protected GeneralGobInfo(Gob owner) {
-	this.gob = owner;
+	super(owner);
     }
 
     @Override
-    public void draw2d(GOut g) {
-	if(tex != null) {
-	    Coord sc = null;
-	    if(state != null) {sc = Utils.world2screen(gob.getc(), state, 1);}
-	    if(sc != null && sc.isect(Coord.z, g.sz)) {
-		g.aimage(tex, sc, 0.5, 0.5);
-	    }
-	}
-    }
-
-    @Override
-    public boolean setup(RenderList d) {
-	if(this.health != gob.getattr(GobHealth.class)) {
-	    clean();
-	    ready = false;
-	}
-	state = d.state();
-	if(!ready) {
-	    try {
-		tex = render();
-		ready = true;
-	    } catch (Loading ignored) {
-	    } catch (Exception e) {
-		tex = null;
-		ready = true;
-	    }
-	}
-	return ready && tex != null;
-    }
-
-    private Tex render() {
+    protected Tex render() {
 	if(gob == null || gob.getres() == null) { return null;}
 
 	BufferedImage growth = growth();
@@ -61,6 +22,21 @@ public class GeneralGobInfo extends PView.Draw2D {
 	}
 
 	return new TexI(ItemInfo.catimgsh(3, health, growth));
+    }
+
+    @Override
+    public boolean setup(RenderList d) {
+	if(this.health != gob.getattr(GobHealth.class)) {
+	    clean();
+	    ready = false;
+	}
+	return super.setup(d);
+    }
+
+    @Override
+    public void dispose() {
+	health = null;
+	super.dispose();
     }
 
     private BufferedImage health() {
@@ -123,19 +99,6 @@ public class GeneralGobInfo extends PView.Draw2D {
 	} else {
 	    return false;
 	}
-    }
-
-    private void clean() {
-	if(tex != null) {
-	    tex.dispose();
-	    tex = null;
-	}
-    }
-
-    public void dispose() {
-	clean();
-	state = null;
-	health = null;
     }
 
     @Override
