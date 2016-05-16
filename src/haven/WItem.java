@@ -437,7 +437,9 @@ public class WItem extends Widget implements DTarget2 {
     }
 
     public boolean iteminteract(WItem target, Coord cc, Coord ul) {
-	if(!target.gilding.get().isEmpty()) {
+	List<ItemInfo> gilding = target.gilding.get();
+	List<ItemInfo> slots = this.slots.get();
+	if(gilding != null && !gilding.isEmpty() && slots != null && !slots.isEmpty()) {
 	    GildingWnd.create(ui, this, target);
 	} else {
 	    item.wdgmsg("itemact", ui.modflags());
