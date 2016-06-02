@@ -109,6 +109,12 @@ public class QualityList extends ItemInfo {
     }
 
     enum SingleType {
+	All {
+	    public Quality get(List<Quality> qualities) {
+            // Placeholder
+            return new Quality(QualityType.Quality, 0);
+	    }
+    },
 	Average {
 	    @Override
 	    public Quality get(List<Quality> qualities) {
