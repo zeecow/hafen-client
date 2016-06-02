@@ -43,9 +43,6 @@ public class CFG<T> {
 
     public static final CFG<Float> CAMERA_BRIGHT = new CFG<>("camera.bright", 0f);
 
-    public static final CFG<Boolean> Q_SHOW_ALL_SHIFT = new CFG<>("ui.q.allmods_shift", true);
-    public static final CFG<Boolean> Q_SHOW_ALL_ALT = new CFG<>("ui.q.allmods_alt", true);
-    public static final CFG<Boolean> Q_SHOW_ALL_CTRL = new CFG<>("ui.q.allmods_ctrl", true);
     public static final CFG<Boolean> Q_SHOW_SINGLE = new CFG<>("ui.q.showsingle", true);
     public static final CFG<SingleType> Q_SINGLE_TYPE = new CFG<>("ui.q.singletype", SingleType.Average);
     public static final CFG<Boolean> Q_SHOW_SHIFT = new CFG<>("ui.q.showshift", true);
