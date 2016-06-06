@@ -366,54 +366,39 @@ public class WItem extends Widget implements DTarget2 {
     }
 
     private void drawq(GOut g) {
-        QualityList quality = itemq.get();
-        if(quality != null) {
-            Tex tex = null;
-            SingleType qtype = getQualityType();
-            if(qtype == SingleType.All) {
-                tex = quality.tex();
-            } else if(qtype != null) {
-                QualityList.Quality single = quality.single(qtype);
-                if(single != null) {
-                    tex = single.tex();
-                }
-            }
-            /*
-            if(showAllQ()) {
-                tex = quality.tex();
-            } else if(showSingleQ()) {
-                QualityList.Quality single = quality.single(getSingleQ());
-                if(single != null) {
-                    tex = single.tex();
-                }
-            //} else if(!quality.isEmpty() && CFG.Q_SHOW_SINGLE.get()) {
-                //QualityList.Quality single = quality.single();
-                //if(single != null) {
-                    //tex = single.tex();
-                //}
-            }
-            */
+	QualityList quality = itemq.get();
+	if(quality != null) {
+	    Tex tex = null;
+	    SingleType qtype = getQualityType();
+	    if(qtype == SingleType.All) {
+		tex = quality.tex();
+	    } else if(qtype != null) {
+		QualityList.Quality single = quality.single(qtype);
+		if(single != null) {
+		    tex = single.tex();
+		}
+	    }
 
-            if(tex != null) {
-                if(CFG.SWAP_NUM_AND_Q.get()) {
-                    g.aimage(tex, TEXT_PADD_BOT.add(sz), 1, 1);
-                } else {
-                    g.aimage(tex, TEXT_PADD_TOP.add(sz.x, 0), 1, 0);
-                }
-            }
-        }
+	    if(tex != null) {
+		if(CFG.SWAP_NUM_AND_Q.get()) {
+		    g.aimage(tex, TEXT_PADD_BOT.add(sz), 1, 1);
+		} else {
+		    g.aimage(tex, TEXT_PADD_TOP.add(sz.x, 0), 1, 0);
+		}
+	    }
+	}
     }
 
     private SingleType getQualityType(){
-        if (ui.modshift) {
-            return CFG.Q_SHOW_SHIFT.get() ? CFG.Q_SHIFT_TYPE.get() : null;
-        } else if (ui.modctrl) {
-            return CFG.Q_SHOW_CTRL.get() ? CFG.Q_CTRL_TYPE.get() : null;
-        } else if (ui.modmeta) {
-            return CFG.Q_SHOW_ALT.get() ? CFG.Q_ALT_TYPE.get() : null;
-        } else {
-           return CFG.Q_SHOW_SINGLE.get() ? CFG.Q_SINGLE_TYPE.get() : null;
-        }
+	if (ui.modshift) {
+	    return CFG.Q_SHOW_SHIFT.get() ? CFG.Q_SHIFT_TYPE.get() : null;
+	} else if (ui.modctrl) {
+	    return CFG.Q_SHOW_CTRL.get() ? CFG.Q_CTRL_TYPE.get() : null;
+	} else if (ui.modmeta) {
+	    return CFG.Q_SHOW_ALT.get() ? CFG.Q_ALT_TYPE.get() : null;
+	} else {
+	   return CFG.Q_SHOW_SINGLE.get() ? CFG.Q_SINGLE_TYPE.get() : null;
+	}
     }
 
     public boolean mousedown(Coord c, int btn) {

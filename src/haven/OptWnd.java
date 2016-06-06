@@ -627,37 +627,36 @@ public class OptWnd extends Window {
 	}
     }
 
-    // TODO add "All" option
     public class QualityBox extends Dropbox<QualityList.SingleType> {
-        protected final CFG<QualityList.SingleType> cfg;
+	protected final CFG<QualityList.SingleType> cfg;
 
-        public QualityBox(int w, int listh, int itemh, CFG<QualityList.SingleType> cfg) {
-            super(w, listh, itemh);
-            this.cfg = cfg;
-            this.sel = cfg.get();
-        }
+	public QualityBox(int w, int listh, int itemh, CFG<QualityList.SingleType> cfg) {
+	    super(w, listh, itemh);
+	    this.cfg = cfg;
+	    this.sel = cfg.get();
+	}
 
-        @Override
-        protected QualityList.SingleType listitem(int i) {
-            return QualityList.SingleType.values()[i];
-        }
+	@Override
+	protected QualityList.SingleType listitem(int i) {
+	    return QualityList.SingleType.values()[i];
+	}
 
-        @Override
-        protected int listitems() {
-            return QualityList.SingleType.values().length;
-        }
+	@Override
+	protected int listitems() {
+	    return QualityList.SingleType.values().length;
+	}
 
-        @Override
-        protected void drawitem(GOut g, QualityList.SingleType item, int i) {
-            g.image(item.tex(), Q_TYPE_PADDING);
-        }
+	@Override
+	protected void drawitem(GOut g, QualityList.SingleType item, int i) {
+	    g.image(item.tex(), Q_TYPE_PADDING);
+	}
 
-        @Override
-        public void change(QualityList.SingleType item) {
-            super.change(item);
-            if(item != null) {
-                cfg.set(item);
-            }
-        }
+	@Override
+	public void change(QualityList.SingleType item) {
+	    super.change(item);
+	    if(item != null) {
+		cfg.set(item);
+	    }
+	}
     };
 }
