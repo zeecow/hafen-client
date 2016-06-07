@@ -33,6 +33,7 @@ import java.awt.image.BufferedImage;
 import java.util.List;
 
 import static haven.Inventory.*;
+import haven.QualityList.SingleType;
 
 public class WItem extends Widget implements DTarget2 {
     public static final Resource missing = Resource.local().loadwait("gfx/invobjs/missing");
@@ -368,10 +369,11 @@ public class WItem extends Widget implements DTarget2 {
 	QualityList quality = itemq.get();
 	if(quality != null) {
 	    Tex tex = null;
-	    if(showAllQ()) {
+	    SingleType qtype = getQualityType();
+	    if(qtype == SingleType.All) {
 		tex = quality.tex();
-	    } else if(!quality.isEmpty() && CFG.Q_SHOW_SINGLE.get()) {
-		QualityList.Quality single = quality.single();
+	    } else if(qtype != null) {
+		QualityList.Quality single = quality.single(qtype);
 		if(single != null) {
 		    tex = single.tex();
 		}
@@ -387,12 +389,18 @@ public class WItem extends Widget implements DTarget2 {
 	}
     }
 
-    private boolean showAllQ(){
-	return (CFG.Q_SHOW_ALL_SHIFT.get() && ui.modshift) ||
-	    (CFG.Q_SHOW_ALL_CTRL.get() && ui.modctrl) ||
-	    (CFG.Q_SHOW_ALL_ALT.get() && ui.modmeta);
+    private SingleType getQualityType(){
+	if (ui.modshift) {
+	    return CFG.Q_SHOW_SHIFT.get() ? CFG.Q_SHIFT_TYPE.get() : null;
+	} else if (ui.modctrl) {
+	    return CFG.Q_SHOW_CTRL.get() ? CFG.Q_CTRL_TYPE.get() : null;
+	} else if (ui.modmeta) {
+	    return CFG.Q_SHOW_ALT.get() ? CFG.Q_ALT_TYPE.get() : null;
+	} else {
+	   return CFG.Q_SHOW_SINGLE.get() ? CFG.Q_SINGLE_TYPE.get() : null;
+	}
     }
-    
+
     public boolean mousedown(Coord c, int btn) {
 	if(checkXfer(btn)) {
 	    return true;

@@ -462,42 +462,20 @@ public class OptWnd extends Window {
 	x += 250;
 	y = 0;
 	my = Math.max(my, y);
-	int tx = x + display.add(new CFGBox("Show single quality as:", CFG.Q_SHOW_SINGLE), x, y).sz.x;
-
-	Dropbox<QualityList.SingleType> dropbox = display.add(new Dropbox<QualityList.SingleType>(100, 6, 16) {
-	    @Override
-	    protected QualityList.SingleType listitem(int i) {
-		return QualityList.SingleType.values()[i];
-	    }
-
-	    @Override
-	    protected int listitems() {
-		return QualityList.SingleType.values().length;
-	    }
-
-	    @Override
-	    protected void drawitem(GOut g, QualityList.SingleType item, int i) {
-		g.image(item.tex(), Q_TYPE_PADDING);
-	    }
-
-	    @Override
-	    public void change(QualityList.SingleType item) {
-		super.change(item);
-		if(item != null) {
-		    CFG.Q_SINGLE_TYPE.set(item);
-		}
-	    }
-	}, tx + 5, y);
-	dropbox.sel = CFG.Q_SINGLE_TYPE.get();
-
-	y += 30;
-	display.add(new CFGBox("Show all qualities on SHIFT", CFG.Q_SHOW_ALL_SHIFT), x, y);
+	int tx = x + display.add(new CFGBox("Show quality as:", CFG.Q_SHOW_SINGLE), x, y).sz.x;
+	display.add(new QualityBox(100, 6, 16, CFG.Q_SINGLE_TYPE), tx + 5, y);
 
 	y += 25;
-	display.add(new CFGBox("Show all qualities on CTRL", CFG.Q_SHOW_ALL_CTRL), x, y);
+	display.add(new CFGBox("Show on SHIFT:", CFG.Q_SHOW_SHIFT), x, y);
+	display.add(new QualityBox(100, 6, 16, CFG.Q_SHIFT_TYPE), tx + 5, y);
 
 	y += 25;
-	display.add(new CFGBox("Show all qualities on ALT", CFG.Q_SHOW_ALL_ALT), x, y);
+	display.add(new CFGBox("Show on CTRL:", CFG.Q_SHOW_CTRL), x, y);
+	display.add(new QualityBox(100, 6, 16, CFG.Q_CTRL_TYPE), tx + 5, y);
+
+	y += 25;
+	display.add(new CFGBox("Show on ALT:", CFG.Q_SHOW_ALT), x, y);
+	display.add(new QualityBox(100, 6, 16, CFG.Q_ALT_TYPE), tx + 5, y);
 
 	y += 35;
 	display.add(new CFGBox("Show item durability", CFG.SHOW_ITEM_DURABILITY), new Coord(x, y));
@@ -648,4 +626,37 @@ public class OptWnd extends Window {
 	    a = cfg.get();
 	}
     }
+
+    public class QualityBox extends Dropbox<QualityList.SingleType> {
+	protected final CFG<QualityList.SingleType> cfg;
+
+	public QualityBox(int w, int listh, int itemh, CFG<QualityList.SingleType> cfg) {
+	    super(w, listh, itemh);
+	    this.cfg = cfg;
+	    this.sel = cfg.get();
+	}
+
+	@Override
+	protected QualityList.SingleType listitem(int i) {
+	    return QualityList.SingleType.values()[i];
+	}
+
+	@Override
+	protected int listitems() {
+	    return QualityList.SingleType.values().length;
+	}
+
+	@Override
+	protected void drawitem(GOut g, QualityList.SingleType item, int i) {
+	    g.image(item.tex(), Q_TYPE_PADDING);
+	}
+
+	@Override
+	public void change(QualityList.SingleType item) {
+	    super.change(item);
+	    if(item != null) {
+		cfg.set(item);
+	    }
+	}
+    };
 }
