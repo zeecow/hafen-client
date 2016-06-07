@@ -10,15 +10,10 @@ import java.util.List;
 
 public class QualityList extends ItemInfo {
     public static final String classname = "haven.res.ui.tt.q.qbuff.QBuff";
-    public static final Comparator<Quality> QSORTER = new Comparator<Quality>() {
-	@Override
-	public int compare(Quality o1, Quality o2) {
-	    return o1.type.name().compareTo(o2.type.name());
-	}
-    };
+    public static final Comparator<Quality> QSORTER = (o1, o2) -> o1.type.name().compareTo(o2.type.name());
 
     private final List<Quality> qualities;
-    private Tex tex;
+    private TexI tex;
     private final Map<SingleType, Quality> singles = new HashMap<>();
     private final boolean isEmpty;
 
@@ -57,22 +52,26 @@ public class QualityList extends ItemInfo {
 	return singles.get(type);
     }
 
-    public Tex tex() {
+    public TexI tex() {
 	if(tex == null) {
-	    BufferedImage[] imgs = new BufferedImage[qualities.size()];
-	    for (int i = 0; i < qualities.size(); i++) {
-		imgs[i] = qualities.get(i).tex().back;
-	    }
-	    tex = new TexI(ItemInfo.catimgs(-6, true, imgs));
+	    tex = render(qualities);
 	}
 	return tex;
+    }
+
+    private static TexI render(List<Quality> qualities) {
+	BufferedImage[] imgs = new BufferedImage[qualities.size()];
+	for (int i = 0; i < qualities.size(); i++) {
+	    imgs[i] = qualities.get(i).tex().back;
+	}
+	return new TexI(ItemInfo.catimgs(-6, true, imgs));
     }
 
     public static class Quality implements Comparable<Quality> {
 	public static final DecimalFormat format = new DecimalFormat("#.#");
 	private final QualityType type;
 	public final double value;
-	private TexI tex;
+	protected TexI tex;
 
 	public Quality(QualityType type, double value) {
 	    this.type = type;
@@ -111,10 +110,9 @@ public class QualityList extends ItemInfo {
     enum SingleType {
 	All {
 	    public Quality get(List<Quality> qualities) {
-	    // Placeholder
-	    return new Quality(QualityType.Quality, 0);
+		return new AllQualities(QualityType.Quality, qualities);
 	    }
-    },
+	},
 	Average {
 	    @Override
 	    public Quality get(List<Quality> qualities) {
@@ -186,8 +184,8 @@ public class QualityList extends ItemInfo {
 
 	public abstract Quality get(List<Quality> qualities);
 
-	public Tex tex(){
-	    if(tex == null){
+	public Tex tex() {
+	    if(tex == null) {
 		tex = Text.render(name()).tex();
 	    }
 	    return tex;
@@ -204,6 +202,23 @@ public class QualityList extends ItemInfo {
 		}
 	    }
 	    return true;
+	}
+    }
+
+    private static class AllQualities extends Quality {
+	private final List<Quality> qualities;
+
+	@Override
+	public TexI tex() {
+	    if(tex == null) {
+		tex = QualityList.render(qualities);
+	    }
+	    return tex;
+	}
+
+	public AllQualities(QualityType type, List<Quality> qualities) {
+	    super(type, SingleType.Average.get(qualities).value);
+	    this.qualities = qualities;
 	}
     }
 }
