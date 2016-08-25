@@ -9,6 +9,17 @@ public class MiniMapPanel extends ResizingWindow {
 	minsz = new Coord(133, 0);
 	justclose = true;
 
+	addtwdg(add(new IButton("gfx/hud/mmap/realms", "", "-d", "-h"){
+	    {tooltip = Text.render("Display realms");}
+	    public void click() {
+		if(ui != null && ui.gui != null && ui.gui.map != null) {
+		    if(!ui.gui.map.visol(4))
+			ui.gui.map.enol(4, 5);
+		    else
+			ui.gui.map.disol(4, 5);
+		}
+	    }
+	}));
 	addtwdg(add(new IButton("gfx/hud/mmap/claim", "", "-d", "-h"){
 	    {tooltip = Text.render("Display village claims");}
 	    public void click() {
