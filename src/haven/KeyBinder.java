@@ -53,6 +53,14 @@ public class KeyBinder {
 	binds.add(new KeyBind(code, mods, action));
     }
     
+    public List<ShortcutWidget> makeWidgets() {
+	List<ShortcutWidget> list = new ArrayList<>(binds.size());
+	for (KeyBind bind : binds) {
+	    list.add(new ShortcutWidget(bind));
+	}
+	return list;
+    }
+    
     public static class KeyBind {
 	private final int code;
 	private final int mods;
@@ -71,9 +79,35 @@ public class KeyBinder {
 	    }
 	    return match;
 	}
+	
+	public String shortcut() {
+	    String key = KeyEvent.getKeyText(code);
+	    if ((mods & SHIFT) != 0) {
+		key = "SHIT+" + key;
+	    }
+	    if ((mods & ALT) != 0) {
+		key = "ALT+" + key;
+	    }
+	    if ((mods & CTRL) != 0) {
+		key = "CTRL+" + key;
+	    }
+	    return key;
+	}
     }
     
     public interface Action {
 	void run(GameUI gui);
+    }
+    
+    public static class ShortcutWidget extends Widget {
+	
+	public ShortcutWidget(KeyBind bind) {
+	    Button button = add(new Button(75, bind.shortcut()) {
+		@Override
+		public void click() {
+		    System.out.println(bind.shortcut() + " clicked!");
+		}
+	    });
+	}
     }
 }

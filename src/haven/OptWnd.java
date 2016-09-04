@@ -33,7 +33,7 @@ public class OptWnd extends Window {
     public static final Coord PANEL_POS = new Coord(220, 30);
     public static final Coord Q_TYPE_PADDING = new Coord(3, 0);
     public final Panel main, video, audio;
-    private final Panel display, general, camera, radar;
+    private final Panel display, general, camera, radar, shortcuts;
     public Panel current;
 
     public void chpanel(Panel p) {
@@ -208,6 +208,7 @@ public class OptWnd extends Window {
 	general = add(new Panel());
 	camera = add(new Panel());
 	radar = add(new Panel());
+	shortcuts = add(new Panel());
 	int y;
 
 	addPanelButton("Video settings", 'v', video, 0, 0);
@@ -217,6 +218,7 @@ public class OptWnd extends Window {
 	addPanelButton("General settings", 'g', general, 1, 0);
 	addPanelButton("Display settings", 'd', display, 1, 1);
 	addPanelButton("Radar settings", 'r', radar, 1, 2);
+	addPanelButton("Shortcut settings", 's', shortcuts, 1, 3);
 
 	if(gopts) {
 	    main.add(new Button(200, "Switch character") {
@@ -281,8 +283,13 @@ public class OptWnd extends Window {
 	main.pack();
 	chpanel(main);
     }
-
-
+    
+    @Override
+    protected void attach(UI ui) {
+	super.attach(ui);
+	initShortcutsPanel();
+    }
+    
     private void addPanelButton(String name, char key, Panel panel, int x, int y) {
 	main.add(new PButton(200, name, key, panel), PANEL_POS.mul(x, y));
     }
@@ -559,6 +566,25 @@ public class OptWnd extends Window {
 	radar.pack();
     }
 
+    private void initShortcutsPanel(){
+	WidgetList<KeyBinder.ShortcutWidget> list = shortcuts.add(new WidgetList<KeyBinder.ShortcutWidget>(new Coord(300, 24), 16){
+	    @Override
+	    public boolean mousedown(Coord c0, int button) {
+		boolean result = super.mousedown(c0, button);
+		KeyBinder.ShortcutWidget item = itemat(c0);
+		if(item != null){
+		    item.mousedown(c0.sub(item.parentpos(this)), button);
+		}
+		return result;
+	    }
+	});
+	list.canselect = false;
+	ui.root.keybinds.makeWidgets().forEach(list::additem);
+	shortcuts.pack();
+	shortcuts.add(new PButton(200, "Back", 27, main), shortcuts.sz.x / 2 - 100, shortcuts.sz.y + 35);
+	shortcuts.pack();
+    }
+    
     public OptWnd() {
 	this(true);
     }

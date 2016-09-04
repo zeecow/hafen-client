@@ -31,7 +31,7 @@ import java.awt.event.KeyEvent;
 public class RootWidget extends ConsoleHost {
     public static final Resource defcurs = Resource.local().loadwait("gfx/hud/curs/arw");
     Profile guprof, grprof, ggprof;
-    private KeyBinder keybinds = new KeyBinder();
+    public KeyBinder keybinds = new KeyBinder();
 
     public RootWidget(UI ui, Coord sz) {
 	super(ui, new Coord(0, 0), sz);
