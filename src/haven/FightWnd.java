@@ -412,7 +412,7 @@ public class FightWnd extends Widget {
 	    saves[i] = unused;
 
 	Widget p;
-	info = add(new CharWnd.LoadingTextBox(new Coord(223, 152), "", CharWnd.ifnd), new Coord(5, 35).add(wbox.btloff()));
+	info = add(new CharWnd.LoadingTextBox(new Coord(223, 177), "", CharWnd.ifnd), new Coord(5, 35).add(wbox.btloff()));
 	info.bg = new Color(0, 0, 0, 128);
 	Frame.around(this, Collections.singletonList(info));
 
@@ -420,23 +420,24 @@ public class FightWnd extends Widget {
 	actlist = add(new Actions(250, 8), new Coord(245, 35).add(wbox.btloff()));
 	Frame.around(this, Collections.singletonList(actlist));
 
-	p = add(new BView(), 5, 200);
+	p = add(new BView(), 5, 223);
 	count = add(new Label(""), p.c.add(p.sz.x + 10, 0));
 
-	savelist = add(new Savelist(370, 3), new Coord(5, 238).add(wbox.btloff()));
+	int y = 260;
+	savelist = add(new Savelist(370, 3), new Coord(5, y).add(wbox.btloff()));
 	Frame.around(this, Collections.singletonList(savelist));
 	add(new Button(110, "Load", false) {
 		public void click() {
 		    load(savelist.sel);
 		    use(savelist.sel);
 		}
-	    }, 395, 238);
+	    }, 395, y);
 	add(new Button(110, "Save", false) {
 		public void click() {
 		    save(savelist.sel);
 		    use(savelist.sel);
 		}
-	    }, 395, 265);
+	    }, 395, y+27);
 	pack();
     }
 
