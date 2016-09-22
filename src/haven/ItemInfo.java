@@ -371,7 +371,7 @@ public abstract class ItemInfo {
 		    parseAttrMods(bonuses, (List) Reflect.getFieldValue(slot, "info"));
 		}
 	    }
-	    parseAttrMods(bonuses, ItemInfo.findall("AttrMod", infos));
+	    parseAttrMods(bonuses, ItemInfo.findall("haven.res.ui.tt.attrmod.AttrMod", infos));
 	} catch (Exception ignored) {}
 	Pair<Integer, Integer> wear = ItemInfo.getArmor(infos);
 	if (wear != null) {
