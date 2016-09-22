@@ -1270,7 +1270,7 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 	public boolean globtype(char key, KeyEvent ev) {
 	    if(key != 0 || ui.modctrl)
 		return(false);
-	    int c = ev.getKeyChar();
+	    int c = ev.getKeyCode();
 	    if((c < KeyEvent.VK_0) || (c > KeyEvent.VK_9))
 		return(false);
 	    int i = Utils.floormod(c - KeyEvent.VK_0 - 1, 10);
