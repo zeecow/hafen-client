@@ -3,6 +3,7 @@ package haven;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
+import haven.resutil.FoodInfo;
 
 import java.awt.image.BufferedImage;
 import java.io.*;
@@ -23,8 +24,9 @@ public class ItemData {
 
     };
     private Curiosity.Data curiosity;
-
-
+    private FoodInfo.Data food;
+    
+    
     private ItemData(GItem item) {
 	this(item.info());
     }
@@ -42,6 +44,8 @@ public class ItemData {
 
 	    if(ii instanceof Curiosity) {
 		curiosity = new Curiosity.Data((Curiosity) ii, q);
+	    } else if(ii instanceof FoodInfo){
+		food = new FoodInfo.Data((FoodInfo) ii, q);
 	    }
 	}
     }
@@ -62,7 +66,7 @@ public class ItemData {
     }
     
     public List<ItemInfo> iteminfo() {
-	ITipData[] data = new ITipData[]{curiosity};
+	ITipData[] data = new ITipData[]{curiosity, food};
 	List<ItemInfo> infos = new ArrayList<>(data.length);
 	for (ITipData tip : data) {
 	    if(tip != null) {

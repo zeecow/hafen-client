@@ -109,7 +109,7 @@ public class QualityList extends ItemInfo {
 	}
     }
 
-    enum SingleType {
+    public enum SingleType {
 	All {
 	    public Quality get(List<Quality> qualities) {
 		return new AllQualities(QualityType.Quality, qualities);

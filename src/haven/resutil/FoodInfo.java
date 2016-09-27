@@ -31,6 +31,8 @@ import java.util.*;
 import java.awt.Color;
 import java.awt.image.*;
 
+import static haven.QualityList.SingleType.*;
+
 public class FoodInfo extends ItemInfo.Tip {
     public final double end, glut;
     public final Event[] evs;
@@ -50,11 +52,13 @@ public class FoodInfo extends ItemInfo.Tip {
 	public final CharWnd.FoodMeter.Event ev;
 	public final BufferedImage img;
 	public final double a;
-
+	private final String res;
+    
 	public Event(Resource res, double a) {
 	    this.ev = res.layer(CharWnd.FoodMeter.Event.class);
 	    this.img = res.layer(Resource.imgc).img;
 	    this.a = a;
+	    this.res = res.name;
 	}
     }
 
@@ -80,5 +84,45 @@ public class FoodInfo extends ItemInfo.Tip {
 	    imgs.add(efi);
 	}
 	return(catimgs(0, imgs.toArray(new BufferedImage[0])));
+    }
+    
+    public static class Data implements ItemData.ITipData {
+	private final double end;
+	private final double glut;
+	private final List<Pair<String, Double>> fep;
+	private final int[] types;
+    
+	public Data(FoodInfo info, QualityList q) {
+	    end = info.end;
+	    glut = Utils.round(info.glut * q.single(Substance).multiplier, 4);
+	    fep = new ArrayList<>(info.evs.length);
+	    double m = q.single(Vitality).multiplier;
+	    for (int i = 0; i < info.evs.length; i++) {
+		fep.add(new Pair<>(info.evs[i].res, Utils.round(info.evs[i].a / m, 2)));
+	    }
+	    types  = info.types;
+	}
+	
+	@Override
+	public Tip create() {
+	    Event[] evs;
+	    if (fep == null) {
+		evs = new Event[0];
+	    } else {
+		evs = new Event[fep.size()];
+		for (int i = 0; i < fep.size(); i++) {
+		    Pair<String, Double> tmp = fep.get(i);
+		    evs[i] = new Event(Resource.local().loadwait(tmp.a), tmp.b);
+		}
+	    }
+	    int[] t;
+	    if (types == null) {
+		t = new int[0];
+	    } else {
+		t = types;
+	    }
+	    
+	    return new FoodInfo(null, end, glut, evs, new Effect[0], t);
+	}
     }
 }
