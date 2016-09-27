@@ -40,10 +40,10 @@ public class WItem extends Widget implements DTarget2 {
     public static final Coord TEXT_PADD_TOP = new Coord(0, -3), TEXT_PADD_BOT = new Coord(0, 2);
     public static final Color DURABILITY_COLOR = new Color(214, 253, 255);
     public static final Color ARMOR_COLOR = new Color(255, 227, 191);
+    public static final Color MATCH_COLOR = new Color(255, 32, 255, 255);
     public final GItem item;
     private Resource cspr = null;
     private Message csdt = Message.nil;
-    private static final GLState MATCHES = new ColorMask(new Color(255, 32, 255, 128));
 
     public WItem(GItem item) {
 	super(sqsz);
@@ -292,7 +292,11 @@ public class WItem extends Widget implements DTarget2 {
 	    drawbars(g, sz);
 	    if(olcol.get() != null)
 		g.usestate(new ColorMask(olcol.get()));
-	    if(item.matches) {g.usestate(MATCHES);}
+	    if(item.matches) {
+		g.chcolor(MATCH_COLOR);
+		g.rect(Coord.z, sz);
+		g.chcolor();
+	    }
 	    drawmain(g, spr);
 	    g.defstate();
 	    drawnum(g, sz);
