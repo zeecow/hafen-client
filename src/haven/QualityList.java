@@ -71,11 +71,13 @@ public class QualityList extends ItemInfo {
 	public static final DecimalFormat format = new DecimalFormat("#.#");
 	private final QualityType type;
 	public final double value;
+	public final double multiplier;
 	protected TexI tex;
 
 	public Quality(QualityType type, double value) {
 	    this.type = type;
 	    this.value = value;
+	    this.multiplier = Math.sqrt(value / 10);
 	}
 
 	public TexI tex() {
