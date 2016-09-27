@@ -6,6 +6,7 @@ import com.google.gson.JsonSyntaxException;
 
 import java.awt.image.BufferedImage;
 import java.io.*;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -48,17 +49,21 @@ public class ItemData {
     public Tex longtip(Resource res) {
 	Resource.AButton ad = res.layer(Resource.action);
 	Resource.Pagina pg = res.layer(Resource.pagina);
-	String tt = "$b{$size[20]{" + ad.name + "}}\n\n";
-	if(pg != null) {tt += pg.text + "\n\n";}
+	String tt = "$b{$size[20]{" + ad.name + "}}";
+	if(pg != null) {tt += "\n\n" + pg.text;}
 
 	BufferedImage img = MenuGrid.ttfnd.render(tt, 300).img;
 	ITipData[] data = new ITipData[]{curiosity};
+	List<ItemInfo> infos = new ArrayList<>(data.length);
 	for (ITipData tip : data) {
 	    if(tip != null) {
-		img = ItemInfo.catimgs(3, img, tip.create().tipimg());
+		infos.add(tip.create());
 	    }
 	}
 
+	if(!infos.isEmpty()) {
+	    img = ItemInfo.catimgs(20, img, ItemInfo.longtip(infos));
+	}
 	return new TexI(img);
     }
 
