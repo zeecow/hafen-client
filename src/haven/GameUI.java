@@ -29,7 +29,7 @@ package haven;
 import haven.rx.BuffToggles;
 import haven.rx.Reactor;
 
-import java.awt.Color;
+import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 import java.awt.image.WritableRaster;
@@ -355,7 +355,15 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 	    actlist.show();
 	}
     }
-    
+
+    public void toggleCraftDB() {
+	if(craftwnd == null) {
+	    craftwnd = add(new CraftDBWnd());
+	} else {
+	    craftwnd.close();
+	}
+    }
+
     public class Hidepanel extends Widget {
 	public final String id;
 	public final Coord g;

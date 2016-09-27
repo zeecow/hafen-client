@@ -88,15 +88,19 @@ public class CraftDBWnd extends Window {
     @Override
     public void wdgmsg(Widget sender, String msg, Object... args) {
 	if((sender == this) && msg.equals("close")) {
-	    if(makewnd != null) {
-		makewnd.wdgmsg("close");
-		makewnd = null;
-	    }
-	    ui.destroy(this);
-	    ui.gui.craftwnd = null;
+	    close();
 	    return;
 	}
 	super.wdgmsg(sender, msg, args);
+    }
+
+    public void close() {
+	if(makewnd != null) {
+	    makewnd.wdgmsg("close");
+	    makewnd = null;
+	}
+	ui.destroy(this);
+	ui.gui.craftwnd = null;
     }
 
     private List<Pagina> getPaginaChildren(Pagina parent, List<Pagina> buf) {
