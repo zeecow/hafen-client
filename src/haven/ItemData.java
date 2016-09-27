@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 public class ItemData {
-    public static final ItemData EMPTY = new ItemData();
+    private static final ItemData EMPTY = new ItemData();
     private static Gson gson;
     private static Map<String, ItemData> item_data = new LinkedHashMap<String, ItemData>(9, 0.75f, true) {
 	private static final long serialVersionUID = 1L;
@@ -25,11 +25,11 @@ public class ItemData {
     private Curiosity.Data curiosity;
 
 
-    public ItemData(GItem item) {
+    private ItemData(GItem item) {
 	this(item.info());
     }
 
-    public ItemData(List<ItemInfo> info) {
+    private ItemData(List<ItemInfo> info) {
 	init(info);
     }
 
@@ -53,6 +53,15 @@ public class ItemData {
 	if(pg != null) {tt += "\n\n" + pg.text;}
 
 	BufferedImage img = MenuGrid.ttfnd.render(tt, 300).img;
+	List<ItemInfo> infos = iteminfo();
+
+	if(!infos.isEmpty()) {
+	    img = ItemInfo.catimgs(20, img, ItemInfo.longtip(infos));
+	}
+	return new TexI(img);
+    }
+    
+    public List<ItemInfo> iteminfo() {
 	ITipData[] data = new ITipData[]{curiosity};
 	List<ItemInfo> infos = new ArrayList<>(data.length);
 	for (ITipData tip : data) {
@@ -60,13 +69,9 @@ public class ItemData {
 		infos.add(tip.create());
 	    }
 	}
-
-	if(!infos.isEmpty()) {
-	    img = ItemInfo.catimgs(20, img, ItemInfo.longtip(infos));
-	}
-	return new TexI(img);
+	return infos;
     }
-
+    
     public static ItemData get(String name) {
 	if(item_data.containsKey(name)) {
 	    return item_data.get(name);

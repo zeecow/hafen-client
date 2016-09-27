@@ -105,7 +105,7 @@ public class CraftDBWnd extends Window implements DTarget2 {
 
     private List<Pagina> getPaginaChildren(Pagina parent, List<Pagina> buf) {
 	if(buf == null) {
-	    buf = new LinkedList<Pagina>();
+	    buf = new LinkedList<>();
 	}
 	menu.cons(parent, buf);
 	return buf;
@@ -154,7 +154,7 @@ public class CraftDBWnd extends Window implements DTarget2 {
 	drawDescription(g);
     }
 
-    public void drawDescription(GOut g) {
+    private void drawDescription(GOut g) {
 	if(resd == null) {
 	    return;
 	}
@@ -180,7 +180,7 @@ public class CraftDBWnd extends Window implements DTarget2 {
     }
 
     private void updateBreadcrumbs(Pagina p) {
-	List<Breadcrumbs.Crumb<Pagina>> crumbs = new LinkedList<Breadcrumbs.Crumb<Pagina>>();
+	List<Breadcrumbs.Crumb<Pagina>> crumbs = new LinkedList<>();
 	List<Pagina> parents = getParents(p);
 	Collections.reverse(parents);
 	for (Pagina item : parents) {
@@ -190,13 +190,13 @@ public class CraftDBWnd extends Window implements DTarget2 {
 	    if(act != null) {
 		name = act.name;
 	    }
-	    crumbs.add(new Breadcrumbs.Crumb<Pagina>(img, name, item));
+	    crumbs.add(new Breadcrumbs.Crumb<>(img, name, item));
 	}
 	breadcrumbs.setCrumbs(crumbs);
     }
 
     private List<Pagina> getParents(Pagina p) {
-	List<Pagina> list = new LinkedList<Pagina>();
+	List<Pagina> list = new LinkedList<>();
 	if(getPaginaChildren(p, null).size() > 0) {
 	    list.add(p);
 	}
@@ -302,7 +302,7 @@ public class CraftDBWnd extends Window implements DTarget2 {
 		return;
 	    }
 	    this.list = list;
-	    recipes = new LinkedList<Recipe>();
+	    recipes = new LinkedList<>();
 	    for (Pagina p : list) {
 		recipes.add(new Recipe(p));
 	    }
