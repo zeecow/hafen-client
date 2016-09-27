@@ -8,7 +8,7 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
-public class CraftDBWnd extends Window {
+public class CraftDBWnd extends Window implements DTarget2 {
     private static final int SZ = 20;
     private static final int PANEL_H = 24;
     private static final Coord WND_SZ = new Coord(635, 360 + PANEL_H);
@@ -229,6 +229,23 @@ public class CraftDBWnd extends Window {
 
     private Pagina paginafor(Resource.Named res) {
 	return ui.sess.glob.paginafor(res);
+    }
+
+    private void updateInfo(WItem item){
+	ItemData.actualize(item.item, current);
+	updateDescription(current);
+    }
+
+    @Override
+    public boolean drop(WItem target, Coord cc, Coord ul) {
+	updateInfo(target);
+	return true;
+    }
+
+    @Override
+    public boolean iteminteract(WItem target, Coord cc, Coord ul) {
+	updateInfo(target);
+	return true;
     }
 
     private static class Recipe {
