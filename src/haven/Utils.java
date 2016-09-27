@@ -1344,6 +1344,11 @@ public class Utils {
 	    return target & ~(1 << index);
 	}
     }
+    
+    public static double round(double a, int order){
+	double o = Math.pow(10, order);
+	return Math.round(o * a) / o;
+    }
 
     static {
 	Console.setscmd("die", new Console.Command() {
