@@ -47,7 +47,8 @@ public class GobPath extends Sprite {
 	Coord td = Coord.z;
 	int tz = 0;
 	try {
-	    Coord ss = new Coord((int) (t.x - gob.loc.c.x), (int) (t.y + gob.loc.c.y));
+	    Coord3f gobc = gob.getc();
+	    Coord ss = new Coord((int) (t.x - gobc.x), (int) (t.y - gobc.y));
 	    td = ss.rotate(-gob.a);
 	    tz = (int) (gob.glob.map.getcz(t) - gob.glob.map.getcz(gob.rc)) + 1;
 	    good = true;
@@ -81,13 +82,8 @@ public class GobPath extends Sprite {
 
     private Coord getGobCoords(Gob gob) {
 	if(gob != null) {
-	    Gob.GobLocation loc = gob.loc;
-	    if(loc != null) {
-		Coord3f c = loc.c;
-		if(c != null) {
-		    return new Coord((int) c.x, -(int) c.y);
-		}
-	    }
+	    Coord3f c = gob.getc();
+	    return new Coord((int) c.x, (int) c.y);
 	}
 	return null;
     }
