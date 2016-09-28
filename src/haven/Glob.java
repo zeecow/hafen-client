@@ -40,7 +40,7 @@ public class Glob {
     public Party party;
     public final Set<Pagina> paginae = new HashSet<Pagina>();
     public int pagseq = 0;
-    public Map<Resource.Named, Pagina> pmap = new WeakHashMap<Resource.Named, Pagina>();
+    public final Map<Resource.Named, Pagina> pmap = new WeakHashMap<Resource.Named, Pagina>();
     public Map<String, CAttr> cattr = new HashMap<String, CAttr>();
     public Color lightamb = null, lightdif = null, lightspc = null;
     public Color olightamb = null, olightdif = null, olightspc = null;
@@ -162,6 +162,11 @@ public class Glob {
 	public void state(State st) {
 	    this.st = st;
 	    this.img = st.img(this);
+	}
+    
+	public boolean isAction() {
+	    String[] ad = act().ad;
+	    return ad != null && ad.length > 0;
 	}
 
 	public static String name(Pagina p) {

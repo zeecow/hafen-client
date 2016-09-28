@@ -5,9 +5,7 @@ import haven.Glob.Pagina;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedList;
+import java.util.*;
 import java.util.List;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -214,7 +212,8 @@ public class CraftDBWnd extends Window implements DTarget2 {
 		name = act.name;
 	    }
 	    crumbs.add(new Breadcrumbs.Crumb<>(img, name, CRAFT));
-	    crumbs.add(new Breadcrumbs.Crumb<>(null, filter.line, CRAFT));
+	    img = Resource.remote().loadwait("paginae/act/inspect").layer(Resource.imgc).img;
+	    crumbs.add(new Breadcrumbs.Crumb<>(img, filter.line, CRAFT));
 	}
 	breadcrumbs.setCrumbs(crumbs);
     }
@@ -278,11 +277,11 @@ public class CraftDBWnd extends Window implements DTarget2 {
 	super.tick(dt);
 	
 	if(pagseq != ui.sess.glob.pagseq) {
-	    synchronized (ui.sess.glob.paginae) {
+	    synchronized (ui.sess.glob.pmap) {
 		synchronized (all) {
 		    all.clear();
 		    all.addAll(
-			    ui.sess.glob.paginae.stream()
+			    ui.sess.glob.pmap.values().stream()
 				    .filter(p -> category.matcher(Pagina.name(p)).matches())
 				    .collect(Collectors.toList())
 		    );
@@ -303,7 +302,7 @@ public class CraftDBWnd extends Window implements DTarget2 {
     
     private void filter() {
 	needfilter = false;
-	String filter = this.filter.line;
+	String filter = this.filter.line.toLowerCase();
 	if (filter.isEmpty()) {
 	    return;
 	}
@@ -321,7 +320,7 @@ public class CraftDBWnd extends Window implements DTarget2 {
 		}
 	    }
 	}
-	//filtered.sort(new ActWindow.ItemComparator(filter));
+	filtered.sort(new ItemComparator(filter));
 	box.setitems(filtered);
 	box.change((Recipe) null);
 	setCurrent(null);
@@ -346,6 +345,9 @@ public class CraftDBWnd extends Window implements DTarget2 {
 	}
 	if (filter.key(ev)) {
 	    needfilter();
+	    if(filter.line.isEmpty()) {
+		select(CRAFT, false);
+	    }
 	    return true;
 	}
 	return false;
@@ -405,10 +407,7 @@ public class CraftDBWnd extends Window implements DTarget2 {
 		return;
 	    }
 	    this.list = list;
-	    recipes = new LinkedList<>();
-	    for (Pagina p : list) {
-		recipes.add(new Recipe(p));
-	    }
+	    recipes = list.stream().map(Recipe::new).collect(Collectors.toList());
 	    sb.max = listitems() - h;
 	    sb.val = 0;
 	}
@@ -453,6 +452,31 @@ public class CraftDBWnd extends Window implements DTarget2 {
 	    if(tex != null) {
 		g.image(tex, Coord.z);
 	    }
+	}
+    }
+    
+    private static class ItemComparator implements Comparator<Pagina> {
+	private final String filter;
+	
+	public ItemComparator(String filter) {
+	    this.filter = filter;
+	}
+	
+	@Override
+	public int compare(Pagina a, Pagina b) {
+	    String an = a.act().name.toLowerCase();
+	    String bn = b.act().name.toLowerCase();
+	    if(filter != null && !filter.isEmpty()) {
+		boolean ai = an.startsWith(filter);
+		boolean bi = bn.startsWith(filter);
+		if(ai && !bi) {return -1;}
+		if(!ai && bi) {return 1;}
+	    }
+	    boolean ac = !a.isAction();
+	    boolean bc = !b.isAction();
+	    if(ac && !bc) {return -1;}
+	    if(!ac && bc) {return 1;}
+	    return an.compareTo(bn);
 	}
     }
 }
