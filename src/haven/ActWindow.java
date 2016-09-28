@@ -102,7 +102,7 @@ public class ActWindow extends GameUI.Hidewnd {
 		}
 	    }
 	}
-	filtered.sort(new ItemComparator());
+	filtered.sort(new ItemComparator(filter));
 	if(filtered.listitems() > 0) {
 	    filtered.change(Math.min(filtered.selindex, filtered.listitems() - 1));
 	    filtered.sb.val = 0;
@@ -134,10 +134,15 @@ public class ActWindow extends GameUI.Hidewnd {
 	}
     }
 
-    private class ItemComparator implements Comparator<ActList.ActItem> {
+    public static class ItemComparator implements Comparator<ActList.ActItem> {
+	private final String filter;
+    
+	public ItemComparator(String filter){
+	    this.filter = filter;
+	}
+	
 	@Override
 	public int compare(ActList.ActItem a, ActList.ActItem b) {
-	    String filter = ActWindow.this.filter.text.toLowerCase();
 	    if(!filter.isEmpty()) {
 		boolean ai = a.name.text.toLowerCase().startsWith(filter);
 		boolean bi = b.name.text.toLowerCase().startsWith(filter);
