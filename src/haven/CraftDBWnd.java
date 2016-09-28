@@ -3,10 +3,14 @@ package haven;
 import haven.Glob.Pagina;
 
 import java.awt.*;
+import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 public class CraftDBWnd extends Window implements DTarget2 {
     private static final int SZ = 20;
@@ -23,6 +27,12 @@ public class CraftDBWnd extends Window implements DTarget2 {
     private ItemData data;
     private Resource resd;
     private Pagina senduse = null;
+    
+    private final List<Pagina> all = new LinkedList<>();
+    private final Pattern category = Pattern.compile("paginae/craft/.+");
+    private int pagseq = 0;
+    private boolean needfilter = false;
+    private final LineEdit filter = new LineEdit();
 
     public CraftDBWnd() {
 	super(WND_SZ.add(0, 5), "Craft window");
@@ -107,7 +117,9 @@ public class CraftDBWnd extends Window implements DTarget2 {
 	if(buf == null) {
 	    buf = new LinkedList<>();
 	}
-	menu.cons(parent, buf);
+	if (parent != null) {
+	    menu.cons(parent, buf);
+	}
 	return buf;
     }
 
@@ -126,6 +138,7 @@ public class CraftDBWnd extends Window implements DTarget2 {
 	    if(p != CRAFT) {
 		children.add(0, MenuGrid.bk);
 	    }
+	    filter.setline("");
 	    box.setitems(children);
 	    box.change(p);
 	    setCurrent(p);
@@ -181,16 +194,27 @@ public class CraftDBWnd extends Window implements DTarget2 {
 
     private void updateBreadcrumbs(Pagina p) {
 	List<Breadcrumbs.Crumb<Pagina>> crumbs = new LinkedList<>();
-	List<Pagina> parents = getParents(p);
-	Collections.reverse(parents);
-	for (Pagina item : parents) {
-	    BufferedImage img = item.res().layer(Resource.imgc).img;
-	    Resource.AButton act = item.act();
+	if (filter.line.isEmpty()) {
+	    List<Pagina> parents = getParents(p);
+	    Collections.reverse(parents);
+	    for (Pagina item : parents) {
+		BufferedImage img = item.res().layer(Resource.imgc).img;
+		Resource.AButton act = item.act();
+		String name = "...";
+		if (act != null) {
+		    name = act.name;
+		}
+		crumbs.add(new Breadcrumbs.Crumb<>(img, name, item));
+	    }
+	} else {
+	    BufferedImage img = CRAFT.res().layer(Resource.imgc).img;
+	    Resource.AButton act = CRAFT.act();
 	    String name = "...";
-	    if(act != null) {
+	    if (act != null) {
 		name = act.name;
 	    }
-	    crumbs.add(new Breadcrumbs.Crumb<>(img, name, item));
+	    crumbs.add(new Breadcrumbs.Crumb<>(img, name, CRAFT));
+	    crumbs.add(new Breadcrumbs.Crumb<>(null, filter.line, CRAFT));
 	}
 	breadcrumbs.setCrumbs(crumbs);
     }
@@ -213,9 +237,10 @@ public class CraftDBWnd extends Window implements DTarget2 {
 	    description.dispose();
 	    description = null;
 	}
-
-	resd = p.res();
-	data = ItemData.get(resd.name);
+	if(p != null) {
+	    resd = p.res();
+	    data = ItemData.get(resd.name);
+	}
     }
 
     public void setMakewindow(Widget widget) {
@@ -247,7 +272,85 @@ public class CraftDBWnd extends Window implements DTarget2 {
 	updateInfo(target);
 	return true;
     }
-
+    
+    @Override
+    public void tick(double dt) {
+	super.tick(dt);
+	
+	if(pagseq != ui.sess.glob.pagseq) {
+	    synchronized (ui.sess.glob.paginae) {
+		synchronized (all) {
+		    all.clear();
+		    all.addAll(
+			    ui.sess.glob.paginae.stream()
+				    .filter(p -> category.matcher(Pagina.name(p)).matches())
+				    .collect(Collectors.toList())
+		    );
+		    
+		    pagseq = ui.sess.glob.pagseq;
+		    needfilter();
+		}
+	    }
+	}
+	if(needfilter) {
+	    filter();
+	}
+    }
+    
+    private void needfilter() {
+	needfilter = true;
+    }
+    
+    private void filter() {
+	needfilter = false;
+	String filter = this.filter.line;
+	if (filter.isEmpty()) {
+	    return;
+	}
+	List<Pagina> filtered = new ArrayList<>();
+	synchronized (all) {
+	    for (Pagina p : all) {
+		try {
+		    Resource res = p.res.get();
+		    String name = res.layer(Resource.action).name.toLowerCase();
+		    if (name.contains(filter)) {
+			filtered.add(p);
+		    }
+		} catch (Loading e) {
+		    needfilter = true;
+		}
+	    }
+	}
+	//filtered.sort(new ActWindow.ItemComparator(filter));
+	box.setitems(filtered);
+	box.change((Recipe) null);
+	setCurrent(null);
+    }
+    
+    @Override
+    public boolean keydown(KeyEvent ev) {
+	if (filter.key(ev)) {
+	    needfilter();
+	}
+	return true;
+    }
+    
+    @Override
+    public boolean type(char key, KeyEvent ev) {
+	if (key == 27 && !filter.line.isEmpty()) {
+	    select(CRAFT, false);
+	    return true;
+	}
+	if (super.type(key, ev)) {
+	    return true;
+	}
+	if (filter.key(ev)) {
+	    needfilter();
+	    return true;
+	}
+	return false;
+    }
+    
     private static class Recipe {
 	public final Pagina p;
 	private Tex tex = null;
