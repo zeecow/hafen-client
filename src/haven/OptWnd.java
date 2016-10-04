@@ -572,6 +572,7 @@ public class OptWnd extends Window {
 	    public boolean mousedown(Coord c0, int button) {
 		boolean result = super.mousedown(c0, button);
 		KeyBinder.ShortcutWidget item = itemat(c0);
+		c0 = c0.add(0, sb.val * itemsz.y);
 		if(item != null){
 		    item.mousedown(c0.sub(item.parentpos(this)), button);
 		}

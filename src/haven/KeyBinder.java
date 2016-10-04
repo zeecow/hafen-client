@@ -19,6 +19,7 @@ import static haven.WidgetList.*;
 public class KeyBinder {
     private static final String CONFIG_JSON = "keybindings.json";
     
+    public static final int NONE = 0;
     public static final int ALT = 1;
     public static final int CTRL = 2;
     public static final int SHIFT = 4;
@@ -45,6 +46,13 @@ public class KeyBinder {
     }
     
     private static void defaults() {
+        order.add(TOGGLE_INVENTORY);
+	order.add(TOGGLE_EQUIPMENT);
+	order.add(TOGGLE_CHARACTER);
+	order.add(TOGGLE_KIN_LIST);
+	order.add(TOGGLE_OPTIONS);
+	
+        
 	add(KeyEvent.VK_1, CTRL, ACT_HAND_0);
 	add(KeyEvent.VK_2, CTRL, ACT_HAND_1);
 	add(KeyEvent.VK_C, ALT, OPEN_QUICK_CRAFT);
@@ -90,6 +98,10 @@ public class KeyBinder {
 	    binds.put(action, new KeyBind(code, mods, action));
 	}
 	order.add(action);
+    }
+    
+    public static KeyBind get(Action action) {
+	return binds.get(action);
     }
     
     public static KeyBind make(KeyEvent e, Action action) {
@@ -151,12 +163,18 @@ public class KeyBinder {
 	private final Button btn;
     
 	public ShortcutWidget(KeyBind bind) {
-	    btn = add(new Button(75, bind.shortcut()){
-		@Override
-		public void click() {
-		    ui.root.add(new ShortcutSelectorWdg(bind, ShortcutWidget.this), ui.mc.sub(75, 20));
-		}
-	    },
+	    btn = add(new Button(75, bind.shortcut()) {
+		  @Override
+		  public void click() {
+		      ui.root.add(new ShortcutSelectorWdg(bind, ShortcutWidget.this), ui.mc.sub(75, 20));
+		  }
+    
+		  @Override
+		  public boolean mouseup(Coord c, int button) {
+		      //FIXME:a little hack, because WidgetList does not pass correct click coordinates if scrolled
+		      return super.mouseup(Coord.z, button);
+		  }
+	      },
 	    225, 0);
 	    btn.autosize(true);
 	    btn.c.x = 300 - btn.sz.x;
@@ -182,7 +200,7 @@ public class KeyBinder {
 	public ShortcutSelectorWdg(KeyBind bind, Result listener) {
 	    this.bind = bind;
 	    this.listener = listener;
-	    sz = new Coord(150, 45);
+	    sz = new Coord(100, 25);
 	    add(new Label("Press any key..."));
 	}
     

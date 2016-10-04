@@ -1,6 +1,12 @@
 package haven;
 
 public enum Action {
+    TOGGLE_INVENTORY(GameUI::toggleInventory, "Inventory"),
+    TOGGLE_EQUIPMENT(GameUI::toggleEquipment, "Equipment"),
+    TOGGLE_CHARACTER(GameUI::toggleCharacter, "Character Sheet"),
+    TOGGLE_KIN_LIST(GameUI::toggleCharacter, "Kith & Kin"),
+    TOGGLE_OPTIONS(GameUI::toggleOptions, "Options"),
+    
     ACT_HAND_0(gui -> gui.eqproxy.activate(0), "left hand"),
     ACT_HAND_1(gui -> gui.eqproxy.activate(1), "right hand"),
     OPEN_QUICK_CRAFT(GameUI::toggleCraftList, "open craft list"),
