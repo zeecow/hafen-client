@@ -6,6 +6,7 @@ import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.List;
 
+import static haven.Action.*;
 import static haven.WidgetList.*;
 
 public class KeyBinder {
@@ -15,24 +16,19 @@ public class KeyBinder {
     private List<KeyBind> binds = new ArrayList<>();
     
     public KeyBinder() {
-	add(KeyEvent.VK_1, CTRL, gui -> gui.eqproxy.activate(0), "left hand");
-	add(KeyEvent.VK_2, CTRL, gui -> gui.eqproxy.activate(1), "right hand");
-	add(KeyEvent.VK_C, ALT, GameUI::toggleCraftList, "open craft list");
-	add(KeyEvent.VK_B, ALT, GameUI::toggleBuildList, "open building list");
-	add(KeyEvent.VK_A, ALT, GameUI::toggleActList, "open actions list");
-	add(KeyEvent.VK_H, ALT, GameUI::toggleHand, "toggle cursor item");
-	add(KeyEvent.VK_S, ALT, GameUI::toggleStudy, "toggle study window");
-	add(KeyEvent.VK_F, ALT, gui -> gui.filter.toggle(), "show filter");
-	add(KeyEvent.VK_I, ALT, gui -> CFG.DISPLAY_GOB_INFO.set(!CFG.DISPLAY_GOB_INFO.get(), true), "display info");
-	add(KeyEvent.VK_H, CTRL, gui -> CFG.DISPLAY_GOB_HITBOX.set(!CFG.DISPLAY_GOB_HITBOX.get(), true), "display hitboxes");
-	add(KeyEvent.VK_R, ALT, gui -> CFG.SHOW_GOB_RADIUS.set(!CFG.SHOW_GOB_RADIUS.get(), true), "display radius");
-	add(KeyEvent.VK_G, CTRL, gui -> gui.map.togglegrid(), "show tile grid");
-	add(KeyEvent.VK_Z, CTRL, gui ->
-		{
-		    Config.center_tile = !Config.center_tile;
-		    gui.ui.message(String.format("Tile centering turned %s", Config.center_tile ? "ON" : "OFF"), GameUI.MsgType.INFO);
-		}, "toggle tile centering"
-	);
+	add(KeyEvent.VK_1, CTRL, ACT_HAND_0);
+	add(KeyEvent.VK_2, CTRL, ACT_HAND_1);
+	add(KeyEvent.VK_C, ALT, OPEN_QUICK_CRAFT);
+	add(KeyEvent.VK_B, ALT, OPEN_QUICK_BUILD);
+	add(KeyEvent.VK_A, ALT, OPEN_QUICK_ACTION);
+	add(KeyEvent.VK_H, ALT, TOGGLE_CURSOR);
+	add(KeyEvent.VK_S, ALT, TOGGLE_STUDY);
+	add(KeyEvent.VK_F, ALT, FILTER);
+	add(KeyEvent.VK_I, ALT, TOGGLE_GOB_INFO);
+	add(KeyEvent.VK_H, CTRL, TOGGLE_GOB_HITBOX);
+	add(KeyEvent.VK_R, ALT, TOGGLE_GOB_RADIUS);
+	add(KeyEvent.VK_G, CTRL, TOGGLE_TILE_GRID);
+	add(KeyEvent.VK_Z, CTRL, TOGGLE_TILE_CENTERING);
     }
     
     public boolean handle(UI ui, KeyEvent e) {
@@ -56,12 +52,12 @@ public class KeyBinder {
 	return modflags;
     }
     
-    public void add(int code, int mods, Action action, String name) {
-	binds.add(new KeyBind(code, mods, action, name));
+    public void add(int code, int mods, Action action) {
+	binds.add(new KeyBind(code, mods, action));
     }
     
-    public static KeyBind make(KeyEvent e, Action action, String name) {
-	return new KeyBind(e.getKeyCode(), getModFlags(e.getModifiersEx()), action, name);
+    public static KeyBind make(KeyEvent e, Action action) {
+	return new KeyBind(e.getKeyCode(), getModFlags(e.getModifiersEx()), action);
     }
     
     private void change(KeyBind from, KeyBind to) {
@@ -80,14 +76,12 @@ public class KeyBinder {
     public static class KeyBind {
 	private final int code;
 	private final int mods;
-	private final Action action;
-	public final String name;
+	transient private final Action action;
 	
-	public KeyBind(int code, int mods, Action action, String name) {
+	public KeyBind(int code, int mods, Action action) {
 	    this.code = code;
 	    this.mods = mods;
 	    this.action = action;
-	    this.name = name;
 	}
 	
 	public boolean match(UI ui, int code, int mods) {
@@ -99,7 +93,7 @@ public class KeyBinder {
 	}
 	
 	public String shortcut() {
-	    if(code == 0 && mods == 0) {return "Unbound";}
+	    if(code == 0 && mods == 0) {return "<UNBOUND>";}
 	    String key = KeyEvent.getKeyText(code);
 	    if ((mods & SHIFT) != 0) {
 		key = "SHIT+" + key;
@@ -112,10 +106,6 @@ public class KeyBinder {
 	    }
 	    return key;
 	}
-    }
-    
-    public interface Action {
-	void run(GameUI gui);
     }
     
     public static class ShortcutWidget extends Widget implements ShortcutSelectorWdg.Result {
@@ -132,7 +122,7 @@ public class KeyBinder {
 	    225, 0);
 	    btn.autosize(true);
 	    btn.c.x = 300 - btn.sz.x;
-	    add(new Label(bind.name), 5, 5);
+	    add(new Label(bind.action.name), 5, 5);
 	}
     
 	@Override
@@ -167,7 +157,7 @@ public class KeyBinder {
 		&& code != KeyEvent.VK_ALT
 		&& code != KeyEvent.VK_META) {
 		if(code != KeyEvent.VK_ESCAPE) {
-		    listener.keyBindChanged(bind, make(ev, bind.action, bind.name));
+		    listener.keyBindChanged(bind, make(ev, bind.action));
 		}
 		remove();
 	    }
