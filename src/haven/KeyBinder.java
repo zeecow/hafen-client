@@ -3,6 +3,7 @@ package haven;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
+import rx.functions.Func0;
 
 import java.awt.*;
 import java.awt.event.InputEvent;
@@ -108,16 +109,28 @@ public class KeyBinder {
 	return new KeyBind(e.getKeyCode(), getModFlags(e.getModifiersEx()), action);
     }
     
-    private static void change(KeyBind to) {
-        binds.put(to.action, to);
+    private static boolean change(KeyBind to) {
+	boolean conflicts = false;
+	if(!to.isEmpty()) {
+	    for(Map.Entry<Action, KeyBind> entry : binds.entrySet()) {
+		KeyBind bind = entry.getValue();
+		Action action = entry.getKey();
+		if(to.action != action && to.code == bind.code && to.mods == bind.mods) {
+		    binds.put(action, new KeyBind(0, 0, action));
+		    conflicts = true;
+		}
+	    }
+	}
+	binds.put(to.action, to);
         store();
+	return conflicts;
     }
     
-    public static List<ShortcutWidget> makeWidgets() {
+    public static List<ShortcutWidget> makeWidgets(Func0 invalidate) {
 	List<ShortcutWidget> list = new ArrayList<>(binds.size());
 	for (Action action : order) {
 	    if(binds.containsKey(action)) {
-		list.add(new ShortcutWidget(binds.get(action)));
+		list.add(new ShortcutWidget(binds.get(action), invalidate));
 	    }
 	}
 	return list;
@@ -143,7 +156,7 @@ public class KeyBinder {
 	}
 	
 	public String shortcut() {
-	    if(code == 0 && mods == 0) {return "<UNBOUND>";}
+	    if(isEmpty()) {return "<UNBOUND>";}
 	    String key = KeyEvent.getKeyText(code);
 	    if ((mods & SHIFT) != 0) {
 		key = "SHIT+" + key;
@@ -156,17 +169,23 @@ public class KeyBinder {
 	    }
 	    return key;
 	}
+    
+	public boolean isEmpty() {
+	    return code == 0 && mods == 0;
+	}
     }
     
     public static class ShortcutWidget extends Widget implements ShortcutSelectorWdg.Result {
     
 	private final Button btn;
+	private KeyBind keyBind;
+	private final Func0 invalidate;
     
-	public ShortcutWidget(KeyBind bind) {
+	public ShortcutWidget(KeyBind bind, Func0 invalidate) {
 	    btn = add(new Button(75, bind.shortcut()) {
 		  @Override
 		  public void click() {
-		      ui.root.add(new ShortcutSelectorWdg(bind, ShortcutWidget.this));
+		      ui.root.add(new ShortcutSelectorWdg(keyBind, ShortcutWidget.this), ui.mc.sub(50, 20));
 		  }
     
 		  @Override
@@ -176,6 +195,8 @@ public class KeyBinder {
 		  }
 	      },
 	    225, 0);
+	    this.keyBind = bind;
+	    this.invalidate = invalidate;
 	    if(bind.action.description != null) {
 		tooltip = RichText.render(bind.action.description, 200);
 	    }
@@ -186,9 +207,17 @@ public class KeyBinder {
     
 	@Override
 	public void keyBindChanged(KeyBind from, KeyBind to) {
-	    btn.change(to.shortcut());
+	    if(change(to)) {
+		invalidate.call();
+	    } else {
+		update();
+	    }
+	}
+    
+	public void update() {
+	    keyBind = KeyBinder.get(keyBind.action);
+	    btn.change(keyBind.shortcut());
 	    btn.c.x = 300 - btn.sz.x;
-	    change(to);
 	}
     }
     
