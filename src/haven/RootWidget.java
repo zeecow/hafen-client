@@ -31,7 +31,6 @@ import java.awt.event.KeyEvent;
 public class RootWidget extends ConsoleHost {
     public static final Resource defcurs = Resource.local().loadwait("gfx/hud/curs/arw");
     Profile guprof, grprof, ggprof;
-    public KeyBinder keybinds = new KeyBinder();
 
     public RootWidget(UI ui, Coord sz) {
 	super(ui, new Coord(0, 0), sz);
@@ -53,7 +52,7 @@ public class RootWidget extends ConsoleHost {
 		if(Config.profilegpu) {
 		    add(new Profwnd(ggprof, "GPU profile"), new Coord(450, 250));
 		}
-	    } else if(keybinds.handle(ui, ev)) {
+	    } else if(KeyBinder.handle(ui, ev)) {
 		return true;
 	    } else if(key == ':') {
 		entercmd();

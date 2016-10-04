@@ -1,21 +1,50 @@
 package haven;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
+
 import java.awt.*;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static haven.Action.*;
 import static haven.WidgetList.*;
 
 public class KeyBinder {
+    private static final String CONFIG_JSON = "keybindings.json";
+    
     public static final int ALT = 1;
     public static final int CTRL = 2;
     public static final int SHIFT = 4;
-    private List<KeyBind> binds = new ArrayList<>();
     
-    public KeyBinder() {
+    private static final Gson gson;
+    private static final Map<Action, KeyBind> binds;
+    private static final List<Action> order = new ArrayList<>();
+    
+    static {
+	gson = (new GsonBuilder()).setPrettyPrinting().create();
+	Map<Action, KeyBind> tmp = null;
+	try {
+	    Type type = new TypeToken<Map<Action, KeyBind>>() {
+	    }.getType();
+	    tmp = gson.fromJson(Config.loadFile(CONFIG_JSON), type);
+	} catch (Exception ignored) {
+	}
+	if(tmp == null) {
+	    tmp = new HashMap<>();
+	}
+	binds = tmp;
+	binds.forEach((action, keyBind) -> keyBind.action = action);
+	defaults();
+    }
+    
+    private static void defaults() {
 	add(KeyEvent.VK_1, CTRL, ACT_HAND_0);
 	add(KeyEvent.VK_2, CTRL, ACT_HAND_1);
 	add(KeyEvent.VK_C, ALT, OPEN_QUICK_CRAFT);
@@ -31,11 +60,15 @@ public class KeyBinder {
 	add(KeyEvent.VK_Z, CTRL, TOGGLE_TILE_CENTERING);
     }
     
-    public boolean handle(UI ui, KeyEvent e) {
+    private static synchronized void store() {
+	Config.saveFile(CONFIG_JSON, gson.toJson(binds));
+    }
+    
+    public static boolean handle(UI ui, KeyEvent e) {
 	int code = e.getKeyCode();
 	int modflags = getModFlags(e.getModifiersEx());
     
-	for (KeyBind bind : binds) {
+	for (KeyBind bind : binds.values()) {
 	    if (bind.match(ui, code, modflags)) {
 		return true;
 	    }
@@ -52,23 +85,28 @@ public class KeyBinder {
 	return modflags;
     }
     
-    public void add(int code, int mods, Action action) {
-	binds.add(new KeyBind(code, mods, action));
+    public static void add(int code, int mods, Action action) {
+        if(!binds.containsKey(action)) {
+	    binds.put(action, new KeyBind(code, mods, action));
+	}
+	order.add(action);
     }
     
     public static KeyBind make(KeyEvent e, Action action) {
 	return new KeyBind(e.getKeyCode(), getModFlags(e.getModifiersEx()), action);
     }
     
-    private void change(KeyBind from, KeyBind to) {
-	binds.remove(from);
-        binds.add(to);
+    private static void change(KeyBind to) {
+        binds.put(to.action, to);
+        store();
     }
     
-    public List<ShortcutWidget> makeWidgets() {
+    public static List<ShortcutWidget> makeWidgets() {
 	List<ShortcutWidget> list = new ArrayList<>(binds.size());
-	for (KeyBind bind : binds) {
-	    list.add(new ShortcutWidget(bind));
+	for (Action action : order) {
+	    if(binds.containsKey(action)) {
+		list.add(new ShortcutWidget(binds.get(action)));
+	    }
 	}
 	return list;
     }
@@ -76,7 +114,7 @@ public class KeyBinder {
     public static class KeyBind {
 	private final int code;
 	private final int mods;
-	transient private final Action action;
+	transient private Action action;
 	
 	public KeyBind(int code, int mods, Action action) {
 	    this.code = code;
@@ -129,7 +167,7 @@ public class KeyBinder {
 	public void keyBindChanged(KeyBind from, KeyBind to) {
 	    btn.change(to.shortcut());
 	    btn.c.x = 300 - btn.sz.x;
-	    ui.root.keybinds.change(from, to);
+	    change(to);
 	}
     }
     

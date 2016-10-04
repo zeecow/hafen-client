@@ -579,7 +579,7 @@ public class OptWnd extends Window {
 	    }
 	});
 	list.canselect = false;
-	ui.root.keybinds.makeWidgets().forEach(list::additem);
+	KeyBinder.makeWidgets().forEach(list::additem);
 	shortcuts.pack();
 	shortcuts.add(new PButton(200, "Back", 27, main), shortcuts.sz.x / 2 - 100, shortcuts.sz.y + 35);
 	shortcuts.pack();
