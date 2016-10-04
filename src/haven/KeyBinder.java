@@ -166,7 +166,7 @@ public class KeyBinder {
 	    btn = add(new Button(75, bind.shortcut()) {
 		  @Override
 		  public void click() {
-		      ui.root.add(new ShortcutSelectorWdg(bind, ShortcutWidget.this), ui.mc.sub(75, 20));
+		      ui.root.add(new ShortcutSelectorWdg(bind, ShortcutWidget.this));
 		  }
     
 		  @Override
@@ -176,6 +176,9 @@ public class KeyBinder {
 		  }
 	      },
 	    225, 0);
+	    if(bind.action.description != null) {
+		tooltip = RichText.render(bind.action.description, 200);
+	    }
 	    btn.autosize(true);
 	    btn.c.x = 300 - btn.sz.x;
 	    add(new Label(bind.action.name), 5, 5);

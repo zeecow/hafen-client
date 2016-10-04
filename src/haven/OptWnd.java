@@ -572,11 +572,21 @@ public class OptWnd extends Window {
 	    public boolean mousedown(Coord c0, int button) {
 		boolean result = super.mousedown(c0, button);
 		KeyBinder.ShortcutWidget item = itemat(c0);
-		c0 = c0.add(0, sb.val * itemsz.y);
-		if(item != null){
+		if(item != null) {
+		    c0 = c0.add(0, sb.val * itemsz.y);
 		    item.mousedown(c0.sub(item.parentpos(this)), button);
 		}
 		return result;
+	    }
+	    
+	    @Override
+	    public Object tooltip(Coord c0, Widget prev) {
+		KeyBinder.ShortcutWidget item = itemat(c0);
+		if(item != null) {
+		    c0 = c0.add(0, sb.val * itemsz.y);
+		    return item.tooltip(c0, prev);
+		}
+		return super.tooltip(c, prev);
 	    }
 	});
 	list.canselect = false;

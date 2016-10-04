@@ -960,6 +960,9 @@ public class GameUI extends ConsoleHost implements Console.Directory {
     
 	@Override
 	public Object tooltip(Coord c, Widget prev) {
+	    if(!checkhit(c)) {
+		return null;
+	    }
 	    KeyBinder.KeyBind bind = KeyBinder.get(action);
 	    String tt = tip;
 	    if(bind != null) {
