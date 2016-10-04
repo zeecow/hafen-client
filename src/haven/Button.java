@@ -26,9 +26,7 @@
 
 package haven;
 
-import java.awt.Graphics;
-import java.awt.Color;
-import java.awt.Font;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 
 public class Button extends SIWidget {
@@ -43,6 +41,8 @@ public class Button extends SIWidget {
     public static final Resource click = Loading.waitfor(Resource.local().load("sfx/hud/btn"));
     public static final Resource.Audio lbtdown = Loading.waitfor(Resource.local().load("sfx/hud/lbtn")).layer(Resource.audio, "down");
     public static final Resource.Audio lbtup   = Loading.waitfor(Resource.local().load("sfx/hud/lbtn")).layer(Resource.audio, "up");
+    private final int w;
+    private boolean autosized = false;
     public boolean lg;
     public Text text;
     public BufferedImage cont;
@@ -50,7 +50,7 @@ public class Button extends SIWidget {
     static Text.Furnace nf = new PUtils.BlurFurn(new PUtils.TexFurn(tf, Window.ctex), 1, 1, new Color(80, 40, 0));
     boolean a = false;
     UI.Grab d = null;
-	
+    
     @RName("btn")
     public static class $Btn implements Factory {
 	public Widget create(Widget parent, Object[] args) {
@@ -71,6 +71,7 @@ public class Button extends SIWidget {
         
     private Button(int w, boolean lg) {
 	super(new Coord(w, lg?hl:hs));
+	this.w = w;
 	this.lg = lg;
     }
 
@@ -99,6 +100,19 @@ public class Button extends SIWidget {
     public Button(int w, BufferedImage cont) {
 	this(w);
 	this.cont = cont;
+    }
+    
+    public void autosize(boolean on){
+        if(autosized != on){
+            autosized = on;
+            redraw();
+	}
+    }
+    
+    @Override
+    public void redraw() {
+	if(autosized && cont != null) {sz.x = Math.max(w, cont.getWidth() + 10);}
+	super.redraw();
     }
 	
     public void draw(BufferedImage img) {
@@ -130,6 +144,7 @@ public class Button extends SIWidget {
     public void change(String text) {
 	this.text = nf.render(text);
 	this.cont = this.text.img;
+	redraw();
     }
 
     public void click() {
