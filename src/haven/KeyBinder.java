@@ -6,7 +6,7 @@ import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.List;
 
-import static haven.WidgetList.BOX;
+import static haven.WidgetList.*;
 
 public class KeyBinder {
     public static final int ALT = 1;
@@ -37,12 +37,8 @@ public class KeyBinder {
     
     public boolean handle(UI ui, KeyEvent e) {
 	int code = e.getKeyCode();
-	int modflags = e.getModifiersEx();
-	modflags = ((modflags & InputEvent.ALT_DOWN_MASK) != 0 ? ALT : 0)
-		| ((modflags & InputEvent.META_DOWN_MASK) != 0 ? ALT : 0)
-		| ((modflags & InputEvent.CTRL_DOWN_MASK) != 0 ? CTRL : 0)
-		| ((modflags & InputEvent.SHIFT_DOWN_MASK) != 0 ? SHIFT : 0);
-	
+	int modflags = getModFlags(e.getModifiersEx());
+    
 	for (KeyBind bind : binds) {
 	    if (bind.match(ui, code, modflags)) {
 		return true;
@@ -52,8 +48,25 @@ public class KeyBinder {
 	return false;
     }
     
+    public static int getModFlags(int modflags) {
+	modflags = ((modflags & InputEvent.ALT_DOWN_MASK) != 0 ? ALT : 0)
+	    | ((modflags & InputEvent.META_DOWN_MASK) != 0 ? ALT : 0)
+	    | ((modflags & InputEvent.CTRL_DOWN_MASK) != 0 ? CTRL : 0)
+	    | ((modflags & InputEvent.SHIFT_DOWN_MASK) != 0 ? SHIFT : 0);
+	return modflags;
+    }
+    
     public void add(int code, int mods, Action action, String name) {
 	binds.add(new KeyBind(code, mods, action, name));
+    }
+    
+    public static KeyBind make(KeyEvent e, Action action, String name) {
+	return new KeyBind(e.getKeyCode(), getModFlags(e.getModifiersEx()), action, name);
+    }
+    
+    private void change(KeyBind from, KeyBind to) {
+	binds.remove(from);
+        binds.add(to);
     }
     
     public List<ShortcutWidget> makeWidgets() {
@@ -86,6 +99,7 @@ public class KeyBinder {
 	}
 	
 	public String shortcut() {
+	    if(code == 0 && mods == 0) {return "Unbound";}
 	    String key = KeyEvent.getKeyText(code);
 	    if ((mods & SHIFT) != 0) {
 		key = "SHIT+" + key;
@@ -104,29 +118,66 @@ public class KeyBinder {
 	void run(GameUI gui);
     }
     
-    public static class ShortcutWidget extends Widget {
-	
+    public static class ShortcutWidget extends Widget implements ShortcutSelectorWdg.Result {
+    
+	private final Button btn;
+    
 	public ShortcutWidget(KeyBind bind) {
-	    add(new Button(75, bind.shortcut()) {
+	    btn = add(new Button(75, bind.shortcut()){
 		@Override
 		public void click() {
-		    ui.root.add(new ShortcutSelectorWdg(), ui.mc.sub(75, 20));
-		    System.out.println(bind.shortcut() + " clicked!");
+		    ui.root.add(new ShortcutSelectorWdg(bind, ShortcutWidget.this), ui.mc.sub(75, 20));
 		}
-	    }, 225, 0);
+	    },
+	    225, 0);
+	    btn.autosize(true);
+	    btn.c.x = 300 - btn.sz.x;
 	    add(new Label(bind.name), 5, 5);
+	}
+    
+	@Override
+	public void keyBindChanged(KeyBind from, KeyBind to) {
+	    btn.change(to.shortcut());
+	    btn.c.x = 300 - btn.sz.x;
+	    ui.root.keybinds.change(from, to);
 	}
     }
     
     private static class ShortcutSelectorWdg extends Widget {
 	private static final Color BGCOLOR = new Color(32, 64, 32, 196);
-	
+	private final KeyBind bind;
+	private final Result listener;
+    
 	private UI.Grab keygrab;
 	private UI.Grab mousegrab;
-    
-	public ShortcutSelectorWdg() {
+	
+	public ShortcutSelectorWdg(KeyBind bind, Result listener) {
+	    this.bind = bind;
+	    this.listener = listener;
 	    sz = new Coord(150, 45);
 	    add(new Label("Press any key..."));
+	}
+    
+	@Override
+	public boolean keydown(KeyEvent ev) {
+	    int code = ev.getKeyCode();
+	    if(    code != 0
+		&& code != KeyEvent.VK_CONTROL
+		&& code != KeyEvent.VK_SHIFT
+		&& code != KeyEvent.VK_ALT
+		&& code != KeyEvent.VK_META) {
+		if(code != KeyEvent.VK_ESCAPE) {
+		    listener.keyBindChanged(bind, make(ev, bind.action, bind.name));
+		}
+		remove();
+	    }
+	    return true;
+	}
+    
+	@Override
+	public boolean type(char key, KeyEvent ev) {
+	    
+	    return true;
 	}
 	
 	@Override
@@ -135,15 +186,19 @@ public class KeyBinder {
 	    keygrab = ui.grabkeys(this);
 	    mousegrab = ui.grabmouse(this);
 	}
-    
+	
 	@Override
 	public boolean mousedown(Coord c, int button) {
+	    remove();
+	    return true;
+	}
+	
+	public void remove() {
 	    mousegrab.remove();
 	    keygrab.remove();
 	    reqdestroy();
-	    return true;
 	}
-    
+	
 	@Override
 	public void draw(GOut g) {
 	    g.chcolor(BGCOLOR);
@@ -151,6 +206,10 @@ public class KeyBinder {
 	    g.chcolor();
 	    BOX.draw(g, Coord.z, sz);
 	    super.draw(g);
+	}
+	
+	public interface Result {
+	    void keyBindChanged(KeyBind from, KeyBind to);
 	}
     }
 }
