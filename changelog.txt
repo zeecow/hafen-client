@@ -1,4 +1,4 @@
-$size[14]{$u{Update for 05.09.16:}
+$size[14]{$u{Update for 05.10.16:}
   * added key binding options
  
 $size[14]{$u{Update for 08.06.16:}
