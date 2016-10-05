@@ -4,7 +4,7 @@ public enum Action {
     TOGGLE_INVENTORY(GameUI::toggleInventory, "Inventory"),
     TOGGLE_EQUIPMENT(GameUI::toggleEquipment, "Equipment"),
     TOGGLE_CHARACTER(GameUI::toggleCharacter, "Character Sheet"),
-    TOGGLE_KIN_LIST(GameUI::toggleCharacter, "Kith & Kin"),
+    TOGGLE_KIN_LIST(GameUI::toggleKinList, "Kith & Kin"),
     TOGGLE_OPTIONS(GameUI::toggleOptions, "Options"),
     
     ACT_HAND_0(gui -> gui.eqproxy.activate(0), "Left hand", "Left click on left hand slot."),
