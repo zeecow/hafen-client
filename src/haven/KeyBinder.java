@@ -52,6 +52,7 @@ public class KeyBinder {
 	order.add(TOGGLE_CHARACTER);
 	order.add(TOGGLE_KIN_LIST);
 	order.add(TOGGLE_OPTIONS);
+	order.add(TOGGLE_CHAT);
 	
         
 	add(KeyEvent.VK_1, CTRL, ACT_HAND_0);
@@ -98,7 +99,9 @@ public class KeyBinder {
         if(!binds.containsKey(action)) {
 	    binds.put(action, new KeyBind(code, mods, action));
 	}
-	order.add(action);
+	if(!order.contains(action)) {
+	    order.add(action);
+	}
     }
     
     public static KeyBind get(Action action) {
