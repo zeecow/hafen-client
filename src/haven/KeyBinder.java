@@ -9,10 +9,8 @@ import java.awt.*;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
 
 import static haven.Action.*;
 import static haven.WidgetList.*;
@@ -27,7 +25,7 @@ public class KeyBinder {
     
     private static final Gson gson;
     private static final Map<Action, KeyBind> binds;
-    private static final List<Action> order = new ArrayList<>();
+    private static final List<Action> order;
     
     static {
 	gson = (new GsonBuilder()).setPrettyPrinting().create();
@@ -43,17 +41,11 @@ public class KeyBinder {
 	}
 	binds = tmp;
 	binds.forEach((action, keyBind) -> keyBind.action = action);
+	order = Arrays.asList(Action.values());
 	defaults();
     }
     
     private static void defaults() {
-        order.add(TOGGLE_INVENTORY);
-	order.add(TOGGLE_EQUIPMENT);
-	order.add(TOGGLE_CHARACTER);
-	order.add(TOGGLE_KIN_LIST);
-	order.add(TOGGLE_OPTIONS);
-	order.add(TOGGLE_CHAT);
-	
         
 	add(KeyEvent.VK_1, CTRL, ACT_HAND_0);
 	add(KeyEvent.VK_2, CTRL, ACT_HAND_1);
@@ -98,9 +90,6 @@ public class KeyBinder {
     public static void add(int code, int mods, Action action) {
         if(!binds.containsKey(action)) {
 	    binds.put(action, new KeyBind(code, mods, action));
-	}
-	if(!order.contains(action)) {
-	    order.add(action);
 	}
     }
     
