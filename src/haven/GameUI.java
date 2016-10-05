@@ -974,7 +974,7 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 	    }
 	    KeyBinder.KeyBind bind = KeyBinder.get(action);
 	    String tt = tip;
-	    if(bind != null) {
+	    if(bind != null && !bind.isEmpty()) {
 		tt = String.format("%s ($col[255,255,0]{%s})", tip, bind.shortcut());
 	    }
 	    return RichText.render(tt, 0);
@@ -1263,7 +1263,7 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 		    }
 		    KeyBinder.KeyBind bind = KeyBinder.get(TOGGLE_CHAT);
 		    String tt = "Chat";
-		    if(bind != null) {
+		    if(bind != null && !bind.isEmpty()) {
 			tt = String.format("%s ($col[255,255,0]{%s})", tt, bind.shortcut());
 		    }
 		    return RichText.render(tt, 0);
