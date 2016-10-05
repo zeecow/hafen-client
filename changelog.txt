@@ -1,3 +1,6 @@
+$size[14]{$u{Update for 05.09.16:}
+  * added key binding options
+ 
 $size[14]{$u{Update for 08.06.16:}
   * tile centering now works on all clicks and item interactions - will plant trees centered
   * you can now configure what qualities are shown for each modifier key (SHIFT, CTRL, ALT)
