@@ -387,13 +387,22 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 	}
     }
     
-    
     public void toggleOptions() {
 	if(opts.show(!opts.visible)) {
 	    opts.raise();
 	    fitwdg(opts);
 	    setfocus(opts);
 	}
+    }
+    
+    public void toggleChat() {
+	if(chat.targeth == 0) {
+	    chat.sresize(chat.savedh);
+	    setfocus(chat);
+	} else {
+	    chat.sresize(0);
+	}
+	Utils.setprefb("chatvis", chat.targeth != 0);
     }
     
     public class Hidepanel extends Widget {
@@ -1240,19 +1249,27 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 		    {
 			this.tooltip = RichText.render("Chat ($col[255,255,0]{Ctrl+C})", 0);
 			glow = new TexI(PUtils.rasterimg(PUtils.blurmask(up.getRaster(), 2, 2, Color.WHITE)));
+			KeyBinder.add(KeyEvent.VK_C, CTRL, TOGGLE_CHAT);
 		    }
 
 		    public void click() {
-			if(chat.targeth == 0) {
-			    chat.sresize(chat.savedh);
-			    setfocus(chat);
-			} else {
-			    chat.sresize(0);
-			}
-			Utils.setprefb("chatvis", chat.targeth != 0);
+			toggleChat();
 		    }
-
-		    public void draw(GOut g) {
+	    
+		@Override
+		public Object tooltip(Coord c, Widget prev) {
+		    if(!checkhit(c)) {
+			return null;
+		    }
+		    KeyBinder.KeyBind bind = KeyBinder.get(TOGGLE_CHAT);
+		    String tt = "Chat";
+		    if(bind != null) {
+			tt = String.format("%s ($col[255,255,0]{%s})", tt, bind.shortcut());
+		    }
+		    return RichText.render(tt, 0);
+		}
+	    
+		public void draw(GOut g) {
 			super.draw(g);
 			Color urg = chat.urgcols[chat.urgency];
 			if(urg != null) {
