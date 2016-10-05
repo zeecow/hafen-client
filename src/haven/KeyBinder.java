@@ -223,8 +223,10 @@ public class KeyBinder {
     
     private static class ShortcutSelectorWdg extends Widget {
 	private static final Color BGCOLOR = new Color(32, 64, 32, 196);
+	private static final Coord PAD = new Coord(5, 5);
 	private final KeyBind bind;
 	private final Result listener;
+	private final Tex label;
     
 	private UI.Grab keygrab;
 	private UI.Grab mousegrab;
@@ -232,8 +234,8 @@ public class KeyBinder {
 	public ShortcutSelectorWdg(KeyBind bind, Result listener) {
 	    this.bind = bind;
 	    this.listener = listener;
-	    sz = new Coord(100, 25);
-	    add(new Label("Press any key..."));
+	    label = RichText.render("Press any key...\nOr DELETE to unbind", 0).tex();
+	    sz = label.sz().add(PAD.mul(2));
 	}
     
 	@Override
@@ -244,7 +246,9 @@ public class KeyBinder {
 		&& code != KeyEvent.VK_SHIFT
 		&& code != KeyEvent.VK_ALT
 		&& code != KeyEvent.VK_META) {
-		if(code != KeyEvent.VK_ESCAPE) {
+		if(code == KeyEvent.VK_DELETE) {
+		    listener.keyBindChanged(bind, new KeyBind(0, 0, bind.action));
+		} else if(code != KeyEvent.VK_ESCAPE) {
 		    listener.keyBindChanged(bind, make(ev, bind.action));
 		}
 		remove();
@@ -283,6 +287,7 @@ public class KeyBinder {
 	    g.frect(Coord.z, sz);
 	    g.chcolor();
 	    BOX.draw(g, Coord.z, sz);
+	    g.image(label, PAD);
 	    super.draw(g);
 	}
 	
