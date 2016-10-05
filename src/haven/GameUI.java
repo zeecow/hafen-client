@@ -29,14 +29,16 @@ package haven;
 import haven.rx.BuffToggles;
 import haven.rx.Reactor;
 
-import java.awt.*;
+import java.awt.Color;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 import java.awt.image.WritableRaster;
 import java.util.*;
 import java.util.List;
 
+import static haven.Action.*;
 import static haven.Inventory.*;
+import static haven.KeyBinder.*;
 
 public class GameUI extends ConsoleHost implements Console.Directory {
     public static final Text.Foundry msgfoundry = new Text.Foundry(Text.dfont, 14);
@@ -354,6 +356,53 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 	} else {
 	    actlist.show();
 	}
+    }
+    
+    public void toggleInventory() {
+	if((invwnd != null) && invwnd.show(!invwnd.visible)) {
+	    invwnd.raise();
+	    fitwdg(invwnd);
+	}
+    }
+    
+    public void toggleEquipment() {
+	if((equwnd != null) && equwnd.show(!equwnd.visible)) {
+	    equwnd.raise();
+	    fitwdg(equwnd);
+	}
+    }
+    
+    public void toggleCharacter() {
+	if((chrwdg != null) && chrwdg.show(!chrwdg.visible)) {
+	    chrwdg.raise();
+	    fitwdg(chrwdg);
+	}
+    }
+    
+    public void toggleKinList() {
+	if(zerg.show(!zerg.visible)) {
+	    zerg.raise();
+	    fitwdg(zerg);
+	    setfocus(zerg);
+	}
+    }
+    
+    public void toggleOptions() {
+	if(opts.show(!opts.visible)) {
+	    opts.raise();
+	    fitwdg(opts);
+	    setfocus(opts);
+	}
+    }
+    
+    public void toggleChat() {
+	if(chat.targeth == 0) {
+	    chat.sresize(chat.savedh);
+	    setfocus(chat);
+	} else {
+	    chat.sresize(0);
+	}
+	Utils.setprefb("chatvis", chat.targeth != 0);
     }
 
     public void toggleCraftDB() {
@@ -898,7 +947,12 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 	    this.gkey = (char)gkey;
 	    this.tooltip = RichText.render(tooltip, 0);
 	}
-
+    
+	@Override
+	public Object tooltip(Coord c, Widget prev) {
+	    return super.tooltip(c, prev);
+	}
+    
 	public void click() {}
 
 	public boolean globtype(char key, KeyEvent ev) {
@@ -909,53 +963,46 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 	    return(super.globtype(key, ev));
 	}
     }
+    
+    public static class MenuButton2 extends IButton {
+	private final Action action;
+	private final String tip;
+    
+	MenuButton2(String base, String tooltip, Action action, int code, int mods) {
+	    super("gfx/hud/" + base, "", "-d", "-h");
+	    this.action = action;
+	    this.tip = tooltip;
+	    KeyBinder.add(code, mods, action);
+	}
+    
+	@Override
+	public Object tooltip(Coord c, Widget prev) {
+	    if(!checkhit(c)) {
+		return null;
+	    }
+	    KeyBinder.KeyBind bind = KeyBinder.get(action);
+	    String tt = tip;
+	    if(bind != null && !bind.isEmpty()) {
+		tt = String.format("%s ($col[255,255,0]{%s})", tip, bind.shortcut());
+	    }
+	    return RichText.render(tt, 0);
+	}
+    
+	@Override
+	public void click() {
+	    action.run(ui.gui);
+	}
+    }
 
     private static final Tex menubg = Resource.loadtex("gfx/hud/rbtn-bg");
     public class MainMenu extends Widget {
 	public MainMenu() {
 	    super(menubg.sz());
-	    add(new MenuButton("rbtn-inv", 9, "Inventory ($col[255,255,0]{Tab})") {
-		    public void click() {
-			if((invwnd != null) && invwnd.show(!invwnd.visible)) {
-			    invwnd.raise();
-			    fitwdg(invwnd);
-			}
-		    }
-		}, 0, 0);
-	    add(new MenuButton("rbtn-equ", 5, "Equipment ($col[255,255,0]{Ctrl+E})") {
-		    public void click() {
-			if((equwnd != null) && equwnd.show(!equwnd.visible)) {
-			    equwnd.raise();
-			    fitwdg(equwnd);
-			}
-		    }
-		}, 0, 0);
-	    add(new MenuButton("rbtn-chr", 20, "Character Sheet ($col[255,255,0]{Ctrl+T})") {
-		    public void click() {
-			if((chrwdg != null) && chrwdg.show(!chrwdg.visible)) {
-			    chrwdg.raise();
-			    fitwdg(chrwdg);
-			}
-		    }
-		}, 0, 0);
-	    add(new MenuButton("rbtn-bud", 2, "Kith & Kin ($col[255,255,0]{Ctrl+B})") {
-		    public void click() {
-			if(zerg.show(!zerg.visible)) {
-			    zerg.raise();
-			    fitwdg(zerg);
-			    setfocus(zerg);
-			}
-		    }
-		}, 0, 0);
-	    add(new MenuButton("rbtn-opt", 15, "Options ($col[255,255,0]{Ctrl+O})") {
-		    public void click() {
-			if(opts.show(!opts.visible)) {
-			    opts.raise();
-			    fitwdg(opts);
-			    setfocus(opts);
-			}
-		    }
-		}, 0, 0);
+	    add(new MenuButton2("rbtn-inv", "Inventory", TOGGLE_INVENTORY, KeyEvent.VK_TAB, NONE) , 0, 0);
+	    add(new MenuButton2("rbtn-equ", "Equipment", TOGGLE_EQUIPMENT, KeyEvent.VK_E, CTRL), 0, 0);
+	    add(new MenuButton2("rbtn-chr", "Character Sheet", TOGGLE_CHARACTER, KeyEvent.VK_T, CTRL), 0, 0);
+	    add(new MenuButton2("rbtn-bud", "Kith & Kin", TOGGLE_KIN_LIST, KeyEvent.VK_B, CTRL), 0, 0);
+	    add(new MenuButton2("rbtn-opt", "Options", TOGGLE_OPTIONS, KeyEvent.VK_O, CTRL), 0, 0);
 	}
 
 	public void draw(GOut g) {
@@ -1210,19 +1257,27 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 		    {
 			this.tooltip = RichText.render("Chat ($col[255,255,0]{Ctrl+C})", 0);
 			glow = new TexI(PUtils.rasterimg(PUtils.blurmask(up.getRaster(), 2, 2, Color.WHITE)));
+			KeyBinder.add(KeyEvent.VK_C, CTRL, TOGGLE_CHAT);
 		    }
 
 		    public void click() {
-			if(chat.targeth == 0) {
-			    chat.sresize(chat.savedh);
-			    setfocus(chat);
-			} else {
-			    chat.sresize(0);
-			}
-			Utils.setprefb("chatvis", chat.targeth != 0);
+			toggleChat();
 		    }
-
-		    public void draw(GOut g) {
+	    
+		@Override
+		public Object tooltip(Coord c, Widget prev) {
+		    if(!checkhit(c)) {
+			return null;
+		    }
+		    KeyBinder.KeyBind bind = KeyBinder.get(TOGGLE_CHAT);
+		    String tt = "Chat";
+		    if(bind != null && !bind.isEmpty()) {
+			tt = String.format("%s ($col[255,255,0]{%s})", tt, bind.shortcut());
+		    }
+		    return RichText.render(tt, 0);
+		}
+	    
+		public void draw(GOut g) {
 			super.draw(g);
 			Color urg = chat.urgcols[chat.urgency];
 			if(urg != null) {
