@@ -25,6 +25,8 @@ public class ItemData {
     };
     private Curiosity.Data curiosity;
     private FoodInfo.Data food;
+    private Integer wear;
+    private ArmorData armor;
     
     
     private ItemData(GItem item) {
@@ -47,6 +49,17 @@ public class ItemData {
 	    } else if(ii instanceof FoodInfo){
 		food = new FoodInfo.Data((FoodInfo) ii, q);
 	    }
+	    
+	    Pair<Integer, Integer> w = ItemInfo.getWear(info);
+	    if(w != null) {
+		wear = (int) Math.round(w.b / q.single(QualityList.SingleType.Vitality).multiplier);
+	    }
+	    
+	    Pair<Integer, Integer> a = ItemInfo.getArmor(info);
+	    if(a != null) {
+		armor = new ArmorData(a, q);
+	    }
+	    
 	}
     }
 
@@ -66,7 +79,7 @@ public class ItemData {
     }
     
     public List<ItemInfo> iteminfo() {
-	ITipData[] data = new ITipData[]{curiosity, food};
+	ITipData[] data = new ITipData[]{curiosity, food, WearData.make(wear), armor};
 	List<ItemInfo> infos = new ArrayList<>(data.length);
 	for (ITipData tip : data) {
 	    if(tip != null) {
@@ -164,6 +177,48 @@ public class ItemData {
     }
 
     public interface ITipData {
-	ItemInfo.Tip create();
+	ItemInfo create();
+    }
+    
+    private static class WearData implements ITipData {
+	public final int max;
+	
+	private WearData(int wear) {
+	    max = wear;
+	}
+	
+	@Override
+	public ItemInfo create() {
+	    return ItemData.make("ui/tt/wear", new Object[]{null, Integer.valueOf(0), Integer.valueOf(max)});
+	}
+	
+	public static WearData make(Integer wear) {
+	    if(wear != null) {
+		return new WearData(wear);
+	    } else {
+		return null;
+	    }
+	}
+    }
+    
+    private static class ArmorData implements ITipData {
+	private final Integer hard;
+	private final Integer soft;
+    
+	public ArmorData(Pair<Integer, Integer> armor, QualityList q) {
+	    hard = (int) Math.round(armor.a / q.single(QualityList.SingleType.Essence).multiplier);
+	    soft = (int) Math.round(armor.b / q.single(QualityList.SingleType.Substance).multiplier);
+	}
+	
+	@Override
+	public ItemInfo create() {
+	    return ItemData.make("ui/tt/armor", new Object[]{null, hard, soft});
+	}
+    }
+    
+    public static ItemInfo make(String resname, Object[] args) {
+	Resource res = Resource.remote().load(resname).get();
+	ItemInfo.InfoFactory f = res.layer(Resource.CodeEntry.class).get(ItemInfo.InfoFactory.class);
+	return f.build(null, args);
     }
 }
