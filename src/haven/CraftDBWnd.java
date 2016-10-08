@@ -328,6 +328,9 @@ public class CraftDBWnd extends Window implements DTarget2 {
     
     @Override
     public boolean keydown(KeyEvent ev) {
+	if(ignored(ev)) {
+	    return false;
+	}
 	if (filter.key(ev)) {
 	    needfilter();
 	}
@@ -343,11 +346,29 @@ public class CraftDBWnd extends Window implements DTarget2 {
 	if (super.type(key, ev)) {
 	    return true;
 	}
+	if(ignored(ev)) {
+	    return false;
+	}
 	if (filter.key(ev)) {
 	    needfilter();
 	    if(filter.line.isEmpty()) {
 		select(CRAFT, false);
 	    }
+	    return true;
+	}
+	return false;
+    }
+    
+    private static boolean ignored(KeyEvent ev){
+	int code = ev.getKeyCode();
+	int mods = ev.getModifiersEx();
+	if(mods != 0
+	    || code == 0
+	    || code == KeyEvent.VK_CONTROL
+	    || code == KeyEvent.VK_SHIFT
+	    || code == KeyEvent.VK_ALT
+	    || code == KeyEvent.VK_META
+	    || code == KeyEvent.VK_TAB) {
 	    return true;
 	}
 	return false;
