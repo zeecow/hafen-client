@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
 import haven.resutil.FoodInfo;
+import me.ender.Reflect;
 
 import java.awt.image.BufferedImage;
 import java.io.*;
@@ -27,6 +28,7 @@ public class ItemData {
     private FoodInfo.Data food;
     private Integer wear;
     private ArmorData armor;
+    private GastronomyData gast;
     
     
     private ItemData(GItem item) {
@@ -48,6 +50,8 @@ public class ItemData {
 		curiosity = new Curiosity.Data((Curiosity) ii, q);
 	    } else if(ii instanceof FoodInfo){
 		food = new FoodInfo.Data((FoodInfo) ii, q);
+	    } else if("Gast".equals(className)){
+	        gast = new GastronomyData(ii, q);
 	    }
 	    
 	    Pair<Integer, Integer> w = ItemInfo.getWear(info);
@@ -79,7 +83,7 @@ public class ItemData {
     }
     
     public List<ItemInfo> iteminfo() {
-	ITipData[] data = new ITipData[]{curiosity, food, WearData.make(wear), armor};
+	ITipData[] data = new ITipData[]{curiosity, food, WearData.make(wear), armor, gast};
 	List<ItemInfo> infos = new ArrayList<>(data.length);
 	for (ITipData tip : data) {
 	    if(tip != null) {
@@ -189,7 +193,7 @@ public class ItemData {
 	
 	@Override
 	public ItemInfo create() {
-	    return ItemData.make("ui/tt/wear", new Object[]{null, Integer.valueOf(0), Integer.valueOf(max)});
+	    return ItemInfo.make("ui/tt/wear", new Object[]{null, Integer.valueOf(0), Integer.valueOf(max)});
 	}
 	
 	public static WearData make(Integer wear) {
@@ -212,13 +216,23 @@ public class ItemData {
 	
 	@Override
 	public ItemInfo create() {
-	    return ItemData.make("ui/tt/armor", new Object[]{null, hard, soft});
+	    return ItemInfo.make("ui/tt/armor", new Object[]{null, hard, soft});
 	}
     }
     
-    public static ItemInfo make(String resname, Object[] args) {
-	Resource res = Resource.remote().load(resname).get();
-	ItemInfo.InfoFactory f = res.layer(Resource.CodeEntry.class).get(ItemInfo.InfoFactory.class);
-	return f.build(null, args);
+    private static class GastronomyData implements ITipData {
+	private final double glut;
+	private final double fev;
+    
+	public GastronomyData(ItemInfo data, QualityList q) {
+	    glut = Reflect.getFieldValueDouble(data, "glut") / q.single(QualityList.SingleType.Substance).multiplier;
+	    fev = Reflect.getFieldValueDouble(data, "fev") / q.single(QualityList.SingleType.Essence).multiplier;
+	}
+    
+	@Override
+	public ItemInfo create() {
+	    return ItemInfo.make("ui/tt/gast", new Object[]{null, glut, fev});
+	}
     }
+    
 }

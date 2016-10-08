@@ -42,6 +42,12 @@ public abstract class ItemInfo {
     static final Pattern count_pattern = Pattern.compile("(?:^|[\\s])([0-9]*\\.?[0-9]+\\s*%?)");
     public final Owner owner;
     
+    public static ItemInfo make(String resname, Object[] args) {
+	Resource res = Resource.remote().load(resname).get();
+	InfoFactory f = res.layer(Resource.CodeEntry.class).get(InfoFactory.class);
+	return f.build(null, args);
+    }
+    
     public interface Owner {
 	Glob glob();
 	List<ItemInfo> info();
