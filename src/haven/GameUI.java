@@ -330,7 +330,7 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 
     public void toggleCraftList() {
 	if(craftlist == null){
-	    add(new ActWindow("Craft...", "paginae/craft/.+"));
+	    craftlist = add(new ActWindow("Craft...", "paginae/craft/.+"));
 	} else if(craftlist.visible) {
 	    craftlist.hide();
 	} else {
@@ -340,7 +340,7 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 
     public void toggleBuildList() {
 	if(buildlist == null){
-	    add(new ActWindow("Build...", "paginae/bld/.+"));
+	    buildlist = add(new ActWindow("Build...", "paginae/bld/.+"));
 	} else if(buildlist.visible) {
 	    buildlist.hide();
 	} else {
@@ -350,7 +350,7 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 
     public void toggleActList() {
 	if(actlist == null){
-	    add(new ActWindow("Act...", "paginae/act/.+|paginae/pose/.+|paginae/gov/.+|paginae/add/.+"));
+	    actlist = add(new ActWindow("Act...", "paginae/act/.+|paginae/pose/.+|paginae/gov/.+|paginae/add/.+"));
 	} else if(actlist.visible) {
 	    actlist.hide();
 	} else {

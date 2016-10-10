@@ -328,7 +328,7 @@ public class CraftDBWnd extends Window implements DTarget2 {
     
     @Override
     public boolean keydown(KeyEvent ev) {
-	if(ignored(ev)) {
+	if(ignoredKey(ev)) {
 	    return false;
 	}
 	if (filter.key(ev)) {
@@ -346,7 +346,7 @@ public class CraftDBWnd extends Window implements DTarget2 {
 	if (super.type(key, ev)) {
 	    return true;
 	}
-	if(ignored(ev)) {
+	if(ignoredKey(ev)) {
 	    return false;
 	}
 	if (filter.key(ev)) {
@@ -359,19 +359,15 @@ public class CraftDBWnd extends Window implements DTarget2 {
 	return false;
     }
     
-    private static boolean ignored(KeyEvent ev){
+    private static boolean ignoredKey(KeyEvent ev){
 	int code = ev.getKeyCode();
 	int mods = ev.getModifiersEx();
-	if(mods != 0
-	    || code == 0
+	return mods != 0
 	    || code == KeyEvent.VK_CONTROL
 	    || code == KeyEvent.VK_SHIFT
 	    || code == KeyEvent.VK_ALT
 	    || code == KeyEvent.VK_META
-	    || code == KeyEvent.VK_TAB) {
-	    return true;
-	}
-	return false;
+	    || code == KeyEvent.VK_TAB;
     }
     
     private static class Recipe {

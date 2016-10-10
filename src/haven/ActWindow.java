@@ -80,7 +80,28 @@ public class ActWindow extends GameUI.Hidewnd {
 	super.lostfocus();
 	hide();
     }
-
+    
+    @Override
+    public boolean type(char key, KeyEvent ev) {
+	return !ignoredKey(ev) && super.type(key, ev);
+    }
+    
+    @Override
+    public boolean keydown(KeyEvent ev) {
+	return !ignoredKey(ev) && super.keydown(ev);
+    }
+    
+    private static boolean ignoredKey(KeyEvent ev){
+	int code = ev.getKeyCode();
+	int mods = ev.getModifiersEx();
+	return mods != 0
+	    || code == KeyEvent.VK_CONTROL
+	    || code == KeyEvent.VK_SHIFT
+	    || code == KeyEvent.VK_ALT
+	    || code == KeyEvent.VK_META
+	    || code == KeyEvent.VK_TAB;
+    }
+    
     private void needfilter() {
 	needfilter = true;
     }
