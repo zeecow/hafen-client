@@ -56,12 +56,18 @@ public class CraftDBWnd extends Window implements DTarget2 {
 		if(button == 1) {
 		    if(item == MenuGrid.bk) {
 			item = current;
-			if(getPaginaChildren(current, null).size() == 0) {
+			if(getPaginaChildren(current).size() == 0) {
 			    item = menu.getParent(item);
 			}
 			item = menu.getParent(item);
 		    }
-		    menu.use(item, false);
+		    if(filter.line.isEmpty() || !item.isAction()) {
+			menu.use(item, false);
+		    } else {
+		        change(item);
+		        setCurrent(item);
+		        menu.senduse(item);
+		    }
 		}
 	    }
 	};
@@ -111,10 +117,8 @@ public class CraftDBWnd extends Window implements DTarget2 {
 	ui.gui.craftwnd = null;
     }
 
-    private List<Pagina> getPaginaChildren(Pagina parent, List<Pagina> buf) {
-	if(buf == null) {
-	    buf = new LinkedList<>();
-	}
+    private List<Pagina> getPaginaChildren(Pagina parent) {
+	List<Pagina> buf = new LinkedList<>();
 	if (parent != null) {
 	    menu.cons(parent, buf);
 	}
@@ -126,13 +130,13 @@ public class CraftDBWnd extends Window implements DTarget2 {
 	    return;
 	}
 	if(box != null) {
-	    List<Pagina> children = getPaginaChildren(p, null);
+	    List<Pagina> children = getPaginaChildren(p);
 	    if(children.size() == 0) {
-		children = getPaginaChildren(menu.getParent(p), null);
+		children = getPaginaChildren(menu.getParent(p));
 	    } else {
 		closemake();
 	    }
-	    Collections.sort(children, MenuGrid.sorter);
+	    children.sort(MenuGrid.sorter);
 	    if(p != CRAFT) {
 		children.add(0, MenuGrid.bk);
 	    }
@@ -220,7 +224,7 @@ public class CraftDBWnd extends Window implements DTarget2 {
 
     private List<Pagina> getParents(Pagina p) {
 	List<Pagina> list = new LinkedList<>();
-	if(getPaginaChildren(p, null).size() > 0) {
+	if(getPaginaChildren(p).size() > 0) {
 	    list.add(p);
 	}
 	Pagina parent;
@@ -334,6 +338,7 @@ public class CraftDBWnd extends Window implements DTarget2 {
 	} else {
 	    box.change(box.listitem(0));
 	    setCurrent(filtered.get(0));
+	    menu.senduse(filtered.get(0));
 	}
     }
     
