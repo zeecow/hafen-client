@@ -20,6 +20,10 @@ public class ItemFilter {
 	return match(new QualityList(info));
 
     }
+    
+    public boolean matches(ItemData data) {
+	return data != null && matches(data.iteminfo());
+    }
 
     protected boolean match(ItemInfo item) { return false; }
 
