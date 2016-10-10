@@ -64,15 +64,13 @@ public class CraftDBWnd extends Window implements DTarget2 {
 		    if(filter.line.isEmpty() || !item.isAction()) {
 			menu.use(item, false);
 		    } else {
-		        change(item);
-		        setCurrent(item);
-		        menu.senduse(item);
+		        select(item, true, true);
 		    }
 		}
 	    }
 	};
 	add(box, new Coord(0, PANEL_H + 5));
-	CRAFT = paginafor("paginae/act/craft");
+	CRAFT = paginafor(Resource.local().load("paginae/act/craft"));
 	menu = ui.gui.menu;
 	breadcrumbs = add(new Breadcrumbs<Pagina>(new Coord(WND_SZ.x, SZ)) {
 	    @Override
@@ -125,27 +123,34 @@ public class CraftDBWnd extends Window implements DTarget2 {
 	return buf;
     }
 
-    public void select(Pagina p, boolean senduse) {
+    public void select(Pagina p, boolean use) {
+        select(p, use, false);
+    }
+    
+    public void select(Pagina p, boolean use, boolean skipReparent) {
 	if(!menu.isCrafting(p)) {
 	    return;
 	}
 	if(box != null) {
-	    List<Pagina> children = getPaginaChildren(p);
-	    if(children.size() == 0) {
-		children = getPaginaChildren(menu.getParent(p));
-	    } else {
-		closemake();
+	    if(!p.isAction()){
+	        closemake();
 	    }
-	    children.sort(MenuGrid.sorter);
-	    if(p != CRAFT) {
-		children.add(0, MenuGrid.bk);
+	    if(!skipReparent) {
+		List<Pagina> children = getPaginaChildren(p);
+		if(children.size() == 0) {
+		    children = getPaginaChildren(menu.getParent(p));
+		}
+		children.sort(MenuGrid.sorter);
+		if(p != CRAFT) {
+		    children.add(0, MenuGrid.bk);
+		}
+	    	filter.setline("");
+		box.setitems(children);
 	    }
-	    filter.setline("");
-	    box.setitems(children);
 	    box.change(p);
 	    setCurrent(p);
 	}
-	if(senduse) {
+	if(use) {
 	    this.senduse = p;
 	}
     }
@@ -252,12 +257,7 @@ public class CraftDBWnd extends Window implements DTarget2 {
     public void setMakewindow(Widget widget) {
 	makewnd = add(widget, new Coord(box.c.x + box.sz.x + 10, box.c.y + box.sz.y - widget.sz.y));
     }
-
-    private Pagina paginafor(String name) {
-	Resource.Named res = Resource.local().load(name);
-	return paginafor(res);
-    }
-
+    
     private Pagina paginafor(Resource.Named res) {
 	return ui.sess.glob.paginafor(res);
     }
@@ -336,9 +336,7 @@ public class CraftDBWnd extends Window implements DTarget2 {
 	    box.change((Recipe) null);
 	    setCurrent(null);
 	} else {
-	    box.change(box.listitem(0));
-	    setCurrent(filtered.get(0));
-	    menu.senduse(filtered.get(0));
+	    select(filtered.get(0), true, true);
 	}
     }
     
