@@ -309,13 +309,15 @@ public class CraftDBWnd extends Window implements DTarget2 {
 	if (filter.isEmpty()) {
 	    return;
 	}
+	ItemFilter itemFilter = ItemFilter.create(filter);
 	List<Pagina> filtered = new ArrayList<>();
 	synchronized (all) {
 	    for (Pagina p : all) {
 		try {
 		    Resource res = p.res.get();
 		    String name = res.layer(Resource.action).name.toLowerCase();
-		    if (name.contains(filter)) {
+		    ItemData data = ItemData.get(res.name);
+		    if(name.contains(filter) || itemFilter.matches(data)) {
 			filtered.add(p);
 		    }
 		} catch (Loading e) {
