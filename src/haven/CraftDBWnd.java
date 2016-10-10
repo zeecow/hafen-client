@@ -239,6 +239,9 @@ public class CraftDBWnd extends Window implements DTarget2 {
 	if(p != null) {
 	    resd = p.res();
 	    data = ItemData.get(resd.name);
+	} else {
+	    resd = null;
+	    data = null;
 	}
     }
 
@@ -322,8 +325,14 @@ public class CraftDBWnd extends Window implements DTarget2 {
 	}
 	filtered.sort(new ItemComparator(filter));
 	box.setitems(filtered);
-	box.change((Recipe) null);
-	setCurrent(null);
+	
+	if(filtered.isEmpty()) {
+	    box.change((Recipe) null);
+	    setCurrent(null);
+	} else {
+	    box.change(box.listitem(0));
+	    setCurrent(filtered.get(0));
+	}
     }
     
     @Override
