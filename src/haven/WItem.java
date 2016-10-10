@@ -32,6 +32,7 @@ import me.ender.Reflect;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.List;
+import java.util.function.Function;
 
 import static haven.Inventory.*;
 
@@ -134,16 +135,19 @@ public class WItem extends Widget implements DTarget2 {
     }
 
     public volatile static int cacheseq = 0;
-    public abstract class AttrCache<T> {
+    public class AttrCache<T> {
+	private final Function<List<ItemInfo>, T> data;
 	private List<ItemInfo> forinfo = null;
 	private T save = null;
 	private int forseq = -1;
-	
+
+	public AttrCache(Function<List<ItemInfo>, T> data) {this.data = data;}
+
 	public T get() {
 	    try {
 		List<ItemInfo> info = item.info();
 		if((cacheseq != forseq) || (info != forinfo)) {
-		    save = find(info);
+		    save = data.apply(info);
 		    forinfo = info;
 		    forseq = cacheseq;
 		}
@@ -152,12 +156,9 @@ public class WItem extends Widget implements DTarget2 {
 	    }
 	    return(save);
 	}
-	
-	protected abstract T find(List<ItemInfo> info);
     }
     
-    public final AttrCache<Color> olcol = new AttrCache<Color>() {
-	protected Color find(List<ItemInfo> info) {
+    public final AttrCache<Color> olcol = new AttrCache<Color>(info -> {
 	    Color ret = null;
 	    for(ItemInfo inf : info) {
 		if(inf instanceof GItem.ColorInfo) {
@@ -167,105 +168,81 @@ public class WItem extends Widget implements DTarget2 {
 		}
 	    }
 	    return(ret);
-	}
-    };
+	});
     
-    public final AttrCache<Tex> itemnum = new AttrCache<Tex>() {
-	protected Tex find(List<ItemInfo> info) {
-	    GItem.NumberInfo ninf = ItemInfo.find(GItem.NumberInfo.class, info);
-	    if(ninf == null) return(null);
-	    return(new TexI(Utils.outline2(Text.render(Integer.toString(ninf.itemnum()), Color.WHITE).img, Color.BLACK)));
-	}
-    };
+    public final AttrCache<Tex> itemnum = new AttrCache<Tex>(info -> {
+	GItem.NumberInfo ninf = ItemInfo.find(GItem.NumberInfo.class, info);
+	if(ninf == null) return(null);
+	return(new TexI(Utils.outline2(Text.render(Integer.toString(ninf.itemnum()), Color.WHITE).img, Color.BLACK)));
+    });
 
-    public final AttrCache<QualityList> itemq = new AttrCache<QualityList>() {
-	@Override
-	protected QualityList find(List<ItemInfo> info) {
-	    List<ItemInfo.Contents> contents = ItemInfo.findall(ItemInfo.Contents.class, info);
-	    List<ItemInfo> qualities = null;
-	    if(!contents.isEmpty()){
-		for(ItemInfo.Contents content : contents){
-		    List<ItemInfo> tmp = ItemInfo.findall(QualityList.classname, content.sub);
-		    if(!tmp.isEmpty()){
-			qualities = tmp;
-		    }
+    public final AttrCache<Double> itemmeter = new AttrCache<Double>(info -> {
+	GItem.MeterInfo minf = ItemInfo.find(GItem.MeterInfo.class, info);
+	return((minf == null)?null:minf.meter());
+    });
+	    
+    public final AttrCache<QualityList> itemq = new AttrCache<QualityList>(info -> {
+	List<ItemInfo.Contents> contents = ItemInfo.findall(ItemInfo.Contents.class, info);
+	List<ItemInfo> qualities = null;
+	if(!contents.isEmpty()){
+	    for(ItemInfo.Contents content : contents){
+		List<ItemInfo> tmp = ItemInfo.findall(QualityList.classname, content.sub);
+		if(!tmp.isEmpty()){
+		    qualities = tmp;
 		}
 	    }
-	    if(qualities == null || qualities.isEmpty()) {
-		qualities = ItemInfo.findall(QualityList.classname, info);
-	    }
-
-	    QualityList qualityList = new QualityList(qualities);
-	    return !qualityList.isEmpty() ? qualityList : null;
 	}
-    };
-
-    public final AttrCache<Tex> heurnum = new AttrCache<Tex>() {
-	protected Tex find(List<ItemInfo> info) {
-	    String num = ItemInfo.getCount(info);
-	    if(num == null) return (null);
-	    return Text.renderstroked(num, Color.WHITE, Color.BLACK).tex();
+	if(qualities == null || qualities.isEmpty()) {
+	    qualities = ItemInfo.findall(QualityList.classname, info);
 	}
-    };
+    
+	QualityList qualityList = new QualityList(qualities);
+	return !qualityList.isEmpty() ? qualityList : null;
+    });
 
-    public final AttrCache<Tex> durability = new AttrCache<Tex>() {
+    public final AttrCache<Tex> heurnum = new AttrCache<Tex>(info -> {
+	String num = ItemInfo.getCount(info);
+	if(num == null) return (null);
+	return Text.renderstroked(num, Color.WHITE, Color.BLACK).tex();
+    });
+    
+    public final AttrCache<Tex> durability = new AttrCache<Tex>(info -> {
+	Pair<Integer, Integer> wear = ItemInfo.getWear(info);
+	if(wear == null) return (null);
+	return Text.renderstroked(String.valueOf(wear.b - wear.a), DURABILITY_COLOR, Color.BLACK).tex();
+    }) {
 	@Override
 	public Tex get() {
 	    return CFG.SHOW_ITEM_DURABILITY.get() ? super.get() : null;
 	}
-
-	protected Tex find(List<ItemInfo> info) {
-	    Pair<Integer, Integer> wear = ItemInfo.getWear(info);
-	    if(wear == null) return (null);
-	    return Text.renderstroked(String.valueOf(wear.b - wear.a), DURABILITY_COLOR, Color.BLACK).tex();
-	}
     };
 
-    public final AttrCache<Pair<Integer, Integer>> wear = new AttrCache<Pair<Integer, Integer>>() {
-	protected Pair<Integer, Integer> find(List<ItemInfo> info) {
-	    return ItemInfo.getWear(info);
-	}
-    };
-
-    public final AttrCache<Tex> armor = new AttrCache<Tex>() {
+    public final AttrCache<Pair<Integer, Integer>> wear = new AttrCache<Pair<Integer, Integer>>(ItemInfo::getWear);
+    
+    public final AttrCache<Tex> armor = new AttrCache<Tex>(info -> {
+	Pair<Integer, Integer> armor = ItemInfo.getArmor(info);
+	if(armor == null) return (null);
+	return Text.renderstroked(String.format("%d/%d", armor.a, armor.b), ARMOR_COLOR, Color.BLACK).tex();
+    }) {
 	@Override
 	public Tex get() {
 	    return CFG.SHOW_ITEM_ARMOR.get() ? super.get() : null;
 	}
-
-	protected Tex find(List<ItemInfo> info) {
-	    Pair<Integer, Integer> armor = ItemInfo.getArmor(info);
-	    if(armor == null) return (null);
-	    return Text.renderstroked(String.format("%d/%d", armor.a, armor.b), ARMOR_COLOR, Color.BLACK).tex();
-	}
     };
 
-    public final AttrCache<List<ItemInfo>> gilding = new AttrCache<List<ItemInfo>>() {
-	@Override
-	protected List<ItemInfo> find(List<ItemInfo> info) {
-	    return ItemInfo.findall("Slotted", info);
-	}
-    };
+    public final AttrCache<List<ItemInfo>> gilding = new AttrCache<List<ItemInfo>>(info-> ItemInfo.findall("Slotted", info));
 
-    public final AttrCache<List<ItemInfo>> slots = new AttrCache<List<ItemInfo>>() {
-	@Override
-	protected List<ItemInfo> find(List<ItemInfo> info) {
-	    return ItemInfo.findall("ISlots", info);
-	}
-    };
+    public final AttrCache<List<ItemInfo>> slots = new AttrCache<List<ItemInfo>>(info->ItemInfo.findall("ISlots", info));
 
-    public final AttrCache<Boolean> gildable = new AttrCache<Boolean>() {
-	@Override
-	protected Boolean find(List<ItemInfo> info) {
-	    List<ItemInfo> slots = ItemInfo.findall("ISlots", info);
-	    for (ItemInfo slot : slots) {
-		if(Reflect.getFieldValueInt(slot, "left") > 0) {
-		    return true;
-		}
+    public final AttrCache<Boolean> gildable = new AttrCache<Boolean>(info -> {
+	List<ItemInfo> slots = ItemInfo.findall("ISlots", info);
+	for (ItemInfo slot : slots) {
+	    if(Reflect.getFieldValueInt(slot, "left") > 0) {
+		return true;
 	    }
-	    return false;
 	}
-    };
+	return false;
+    });
 
     private GSprite lspr = null;
     public void tick(double dt) {
@@ -309,15 +286,15 @@ public class WItem extends Widget implements DTarget2 {
 
     private void drawmeter(GOut g, Coord sz) {
 	if(item.meter > 0) {
+	    double meter = (item.meter > 0)?(item.meter / 100.0):itemmeter.get();
 	    if(CFG.PROGRESS_NUMBER.get()) {
-		Tex tex = Text.renderstroked(String.format("%d%%", item.meter)).tex();
+		Tex tex = Text.renderstroked(String.format("%d%%", Math.round(100*meter))).tex();
 		g.aimage(tex, sz.div(2), 0.5, 0.5);
 		tex.dispose();
 	    } else {
-		double a = ((double) item.meter) / 100.0;
 		g.chcolor(255, 255, 255, 64);
 		Coord half = sz.div(2);
-		g.prect(half, half.inv(), half, a * Math.PI * 2);
+		g.prect(half, half.inv(), half, meter * Math.PI * 2);
 		g.chcolor();
 	    }
 	}
