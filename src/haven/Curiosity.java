@@ -58,7 +58,7 @@ public class Curiosity extends ItemInfo.Tip {
 	}
 
 	@Override
-	public Tip create() {
+	public ItemInfo create() {
 	    return new Curiosity(null, lp, weight, xp);
 	}
     }
