@@ -371,9 +371,9 @@ public class CraftDBWnd extends Window implements DTarget2 {
     private static boolean ignoredKey(KeyEvent ev){
 	int code = ev.getKeyCode();
 	int mods = ev.getModifiersEx();
-	return mods != 0
+	//any modifier except SHIFT pressed alone is ignored, TAB is also ignored
+	return (mods != 0 && mods != KeyEvent.SHIFT_DOWN_MASK)
 	    || code == KeyEvent.VK_CONTROL
-	    || code == KeyEvent.VK_SHIFT
 	    || code == KeyEvent.VK_ALT
 	    || code == KeyEvent.VK_META
 	    || code == KeyEvent.VK_TAB;
