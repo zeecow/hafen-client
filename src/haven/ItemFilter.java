@@ -12,7 +12,55 @@ import java.util.regex.Pattern;
 public class ItemFilter {
     private static final Pattern q = Pattern.compile("(?:(\\w+))?(?:^|:)([\\w\\*]+)?(?:([<>=+~])(\\d+(?:\\.\\d+)?)?([<>=+~])?)?");
     private static final Pattern float_p = Pattern.compile("(\\d+(?:\\.\\d+)?)");
-
+    
+    public static final String HELP_SIMPLE = "$size[20]{$b{Simple search}}\n" +
+	"Just enter text and items with matching names will get highlighted\n";
+    
+    public static final String HELP_FULL_TEXT = "$size[20]{$b{Full text search}}\n" +
+	"$font[monospaced,16]{txt:[text]}\n" +
+	"Will search for $font[monospaced,13]{[text]} in any text field in item tooltip (currently only Name and Coinage)\n";
+    
+    public static final String HELP_CONTENT = "$size[20]{$b{Contents search}}\n" +
+	"$font[monospaced,16]{has:[txt][sign][value]}\n" +
+	"Will highlight all items that have $font[monospaced,13]{[txt]} in their contents in quantity specified by $font[monospaced,13]{[sign]} and $font[monospaced,13]{[value]}.\n" +
+	"$size[16]{\nExamples:}\n" +
+	"$font[monospaced,13]{  has:water    }will find items that have water in their Contents.\n" +
+	"$font[monospaced,13]{  has:water>2  }will find items that contain more than 2L of water.\n" +
+	"$font[monospaced,13]{  has:water+3  }will find items that contain at least 3L of water.\n" +
+	"$font[monospaced,13]{  has:water<10 }will find items that contain less than 10L of water.\n" +
+	"$font[monospaced,13]{  has:water=2  }will find items that contain exactly 2L of water.\n";
+    
+    public static final String HELP_QUALITY = "$size[20]{$b{Quality search}}\n" +
+	"$font[monospaced,16]{q:[type][sign][value][opt]}\n" +
+	"Will highlight items with quality type defined by $font[monospaced,13]{[type]} or $font[monospaced,13]{[opt]} with quality value specified by $font[monospaced,13]{[sign]} and $font[monospaced,13]{[value]}.\n" +
+	"$font[monospaced,13]{[type]} is type of quality ($font[monospaced,13]{min, max, average, essence, vitality, substance}). You can write type not fully ($font[monospaced,13]{ess} will match essence, for example). If you omit type, it will be detected by $font[monospaced,13]{[opt]} (> means max, < means min, = and ~ means average). If $font[monospaced,13]{[opt]} not present too - then type selected to display on item ($font[monospaced,13]{Options->Display->Show single quality as}) will be used.\n" +
+	"$font[monospaced,13]{[sign]} can be $font[monospaced,13]{>} (more), $font[monospaced,13]{+} (at least), $font[monospaced,13]{<} (less), $font[monospaced,13]{=} (exactly).\n" +
+	"$size[16]{\nExamples:}\n" +
+	"$font[monospaced,13]{  q:>5     }will find items with default quality higher than 5\n" +
+	"$font[monospaced,13]{  q:min<12 }will find items with minimum quality less than 12\n" +
+	"$font[monospaced,13]{  q:<15>   }will find items with maximum quality less than 15\n" +
+	"$font[monospaced,13]{  q:ess+21 }will find items with essence of at least 21\n";
+    
+    public static final String HELP_CURIO = "$size[20]{$b{Curiosity search}}\n" +
+	"Supports $font[monospaced,13]{xp} $font[monospaced,13]{lp} (learning point gained), (experience required) and $font[monospaced,13]{mw} (mental weight required) tags. They all interchangeable in the examples below.\n" +
+	"$size[16]{\nExamples:}\n" +
+	"$font[monospaced,13]{  lp:    }will find items that grant LP.\n" +
+	"$font[monospaced,13]{  lp>100 }will find items that grant more than 100 LP.\n" +
+	"$font[monospaced,13]{  lp+200 }will find items that grant at least 200 LP.\n" +
+	"$font[monospaced,13]{  lp<300 }will find items that grant less than 300 LP.\n" +
+	"$font[monospaced,13]{  lp=400 }will find items that grant exactly 400 LP.\n";
+    
+    public static final String HELP_FEP = "$size[20]{$b{FEP search}}\n" +
+	"$font[monospaced,16]{fep:[type][sign][value]}\n" +
+	"Will highlight items that grant FEPs of type $font[monospaced,13]{[type]} in quantity described by $font[monospaced,13]{[sign]} and $font[monospaced,13]{[value]}.\n" +
+	"$size[16]{\nExamples:}\n" +
+	"$font[monospaced,13]{  fep:str>1 }will find food giving more than 1 Strength FEPs.\n" +
+	"$font[monospaced,13]{  fep:agi+2 }will find food giving at least than 2 Agility FEPs.\n" +
+	"$font[monospaced,13]{  fep:cha<3 }will find food giving less than 3 Charisma FEPs.\n" +
+	"$font[monospaced,13]{  fep:dex=4 }will find food giving exactly 4 Dexterity FEPs.\n";
+    
+    public static final String[] FILTER_HELP = new String[]{HELP_SIMPLE, HELP_FULL_TEXT, HELP_CONTENT, HELP_QUALITY, HELP_CURIO, HELP_FEP};
+    
     public boolean matches(List<ItemInfo> info) {
 	for (ItemInfo item : info) {
 	    if(match(item)) {return true;}
@@ -86,7 +134,19 @@ public class ItemFilter {
 	}
 	return result;
     }
-
+    
+    public static void showHelp(UI ui, String ...blocks) {
+	Window log = ui.root.add(new Window(new Coord(50, 50), "Filter Help"), new Coord(100, 50));
+	log.justclose = true;
+	Textlog txt = log.add(new Textlog(new Coord(450, 500)));
+	txt.quote = false;
+	txt.maxLines = -1;
+	log.pack();
+	txt.append(String.join("\n", blocks));
+	txt.append(" ");
+	txt.setprog(0);
+    }
+    
     public static class Compound extends ItemFilter {
 	List<ItemFilter> filters = new LinkedList<ItemFilter>();
 

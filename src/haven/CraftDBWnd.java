@@ -10,6 +10,8 @@ import java.util.List;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import static haven.ItemFilter.*;
+
 public class CraftDBWnd extends Window implements DTarget2 {
     private static final int SZ = 20;
     private static final int PANEL_H = 24;
@@ -70,6 +72,12 @@ public class CraftDBWnd extends Window implements DTarget2 {
 	    }
 	};
 	add(box, new Coord(0, PANEL_H + 5));
+	addtwdg(add(new IButton("gfx/hud/btn-help", "","-d","-h"){
+	    @Override
+	    public void click() {
+		ItemFilter.showHelp(ui, HELP_SIMPLE, HELP_CURIO, HELP_FEP);
+	    }
+	}));
 	CRAFT = paginafor(Resource.local().load("paginae/act/craft"));
 	menu = ui.gui.menu;
 	breadcrumbs = add(new Breadcrumbs<Pagina>(new Coord(WND_SZ.x, SZ)) {

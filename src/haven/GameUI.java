@@ -38,6 +38,7 @@ import java.util.List;
 
 import static haven.Action.*;
 import static haven.Inventory.*;
+import static haven.ItemFilter.*;
 import static haven.KeyBinder.*;
 
 public class GameUI extends ConsoleHost implements Console.Directory {
@@ -331,6 +332,12 @@ public class GameUI extends ConsoleHost implements Console.Directory {
     public void toggleCraftList() {
 	if(craftlist == null){
 	    craftlist = add(new ActWindow("Craft...", "paginae/craft/.+"));
+	    craftlist.addtwdg(craftlist.add(new IButton("gfx/hud/btn-help", "","-d","-h"){
+		@Override
+		public void click() {
+		    ItemFilter.showHelp(ui, HELP_SIMPLE, HELP_CURIO, HELP_FEP);
+		}
+	    }));
 	} else if(craftlist.visible) {
 	    craftlist.hide();
 	} else {
