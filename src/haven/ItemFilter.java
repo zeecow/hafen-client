@@ -10,7 +10,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class ItemFilter {
-    private static final Pattern q = Pattern.compile("(?:(\\w+))?(?:^|:)([\\w\\*]+)?(?:([<>=+~])(\\d+(?:\\.\\d+)?)?([<>=+~])?)?");
+    private static final Pattern q = Pattern.compile("(?:(\\w+))?(?:^|:)([\\w*]+)?(?:([<>=+~])(\\d+(?:\\.\\d+)?)?([<>=+~])?)?");
     private static final Pattern float_p = Pattern.compile("(\\d+(?:\\.\\d+)?)");
     
     public static final String HELP_SIMPLE = "$size[20]{$b{Simple search}}\n" +
@@ -59,7 +59,7 @@ public class ItemFilter {
 	"$font[monospaced,13]{  fep:cha<3 }will find food giving less than 3 Charisma FEPs.\n" +
 	"$font[monospaced,13]{  fep:dex=4 }will find food giving exactly 4 Dexterity FEPs.\n";
     
-    public static final String[] FILTER_HELP = new String[]{HELP_SIMPLE, HELP_FULL_TEXT, HELP_CONTENT, HELP_QUALITY, HELP_CURIO, HELP_FEP};
+    public static final String[] FILTER_HELP = {HELP_SIMPLE, HELP_FULL_TEXT, HELP_CONTENT, HELP_QUALITY, HELP_CURIO, HELP_FEP};
     
     public boolean matches(List<ItemInfo> info) {
 	for (ItemInfo item : info) {
@@ -148,7 +148,7 @@ public class ItemFilter {
     }
     
     public static class Compound extends ItemFilter {
-	List<ItemFilter> filters = new LinkedList<ItemFilter>();
+	List<ItemFilter> filters = new LinkedList<>();
 
 	@Override
 	public boolean matches(List<ItemInfo> info) {

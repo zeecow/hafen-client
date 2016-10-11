@@ -193,7 +193,7 @@ public class ItemData {
 	
 	@Override
 	public ItemInfo create() {
-	    return ItemInfo.make("ui/tt/wear", new Object[]{null, Integer.valueOf(0), Integer.valueOf(max)});
+	    return ItemInfo.make("ui/tt/wear", null, 0, max);
 	}
 	
 	public static WearData make(Integer wear) {
@@ -216,7 +216,7 @@ public class ItemData {
 	
 	@Override
 	public ItemInfo create() {
-	    return ItemInfo.make("ui/tt/armor", new Object[]{null, hard, soft});
+	    return ItemInfo.make("ui/tt/armor", null, hard, soft);
 	}
     }
     
@@ -231,7 +231,7 @@ public class ItemData {
     
 	@Override
 	public ItemInfo create() {
-	    return ItemInfo.make("ui/tt/gast", new Object[]{null, glut, fev});
+	    return ItemInfo.make("ui/tt/gast", null, glut, fev);
 	}
     }
     
