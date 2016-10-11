@@ -30,7 +30,7 @@ import java.io.*;
 import java.net.URL;
 import java.util.Properties;
 
-import static haven.Utils.getprop;
+import static haven.Utils.*;
 
 public class Config {
     public static final File HOMEDIR = new File("").getAbsoluteFile();
@@ -120,7 +120,12 @@ public class Config {
 	return inputStream;
     }
 
-    private static InputStream getJarStream(String name) {return Config.class.getResourceAsStream("/" + name);}
+    private static InputStream getJarStream(String name) {
+	if(name.charAt(0) != '/') {
+	    name = '/' + name;
+	}
+	return Config.class.getResourceAsStream(name);
+    }
 
     private static String getString(InputStream inputStream) {
 	if(inputStream != null) {
