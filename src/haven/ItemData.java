@@ -7,7 +7,6 @@ import haven.resutil.FoodInfo;
 import me.ender.Reflect;
 
 import java.awt.image.BufferedImage;
-import java.io.*;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -112,61 +111,26 @@ public class ItemData {
     }
 
     private static ItemData load(String name) {
-	ItemData data = null;
-	String filename = getFilename(name);
-	InputStream inputStream = null;
-	File file = Config.getFile(filename);
-	if(file.exists() && file.canRead()) {
-	    try {
-		inputStream = new FileInputStream(file);
-	    } catch (FileNotFoundException ignored) {
-	    }
-	} else {
-	    inputStream = ItemData.class.getResourceAsStream(filename);
-	}
-	if(inputStream != null) {
-	    data = parseStream(inputStream);
+	ItemData data = parse(Config.loadFile(getFilename(name)));
+	if(data != null) {
 	    item_data.put(name, data);
 	}
 	return data;
     }
 
     private static void store(String name, ItemData data) {
-	File file = Config.getFile(getFilename(name));
-	boolean exists = file.exists();
-	if(!exists) {
-	    try {
-		//noinspection ResultOfMethodCallIgnored
-		new File(file.getParent()).mkdirs();
-		exists = file.createNewFile();
-	    } catch (IOException ignored) {}
-	}
-	if(exists && file.canWrite()) {
-	    PrintWriter out = null;
-	    try {
-		out = new PrintWriter(file);
-		out.print(getGson().toJson(data));
-	    } catch (FileNotFoundException ignored) {
-	    } finally {
-		if(out != null) {
-		    out.close();
-		}
-	    }
-	}
+        Config.saveFile(getFilename(name), getGson().toJson(data));
     }
 
     private static String getFilename(String name) {
 	return "/item_data/" + name + ".json";
     }
 
-    private static ItemData parseStream(InputStream inputStream) {
+    private static ItemData parse(String json) {
 	ItemData data = null;
 	try {
-	    String json = Utils.stream2str(inputStream);
 	    data = getGson().fromJson(json, ItemData.class);
 	} catch (JsonSyntaxException ignore) {
-	} finally {
-	    try {inputStream.close();} catch (IOException ignored) {}
 	}
 	return data;
     }
