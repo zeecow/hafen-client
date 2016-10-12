@@ -73,7 +73,19 @@ public class ItemFilter {
 	"$font[monospaced,13]{  armor:>4     }will find items providing exactly 4 total armor.\n" +
 	"$font[monospaced,13]{  armor:h>5    }will find items providing more than 5 hard armor.\n";
     
-    public static final String[] FILTER_HELP = {HELP_SIMPLE, HELP_FULL_TEXT, HELP_CONTENT, HELP_QUALITY, HELP_CURIO, HELP_FEP, HELP_ARMOR};
+    public static final String HELP_SYMBEL = "$size[20]{$b{Symbel search}}\n" +
+	    "$font[monospaced,16]{symb:[type][sign][value]}\n" +
+	    "Will highlight items that have symbel values defined by $font[monospaced,13]{[type]} in quantity described by $font[monospaced,13]{[sign]} and $font[monospaced,13]{[value]}.\n" +
+	    "Use $font[monospaced,13]{fep} type to denote fep bonus.\n" +
+	    "Use $font[monospaced,13]{hunger} type to denote hunger modifier.\n" +
+	    "$font[monospaced,13]{[type]} can be entered partially.\n" +
+	    "$size[16]{\nExamples:}\n" +
+	    "$font[monospaced,13]{  symb:          }will find all symbel items.\n" +
+	    "$font[monospaced,13]{  symb:fep>2     }will find items with more than 2% fep bonus.\n" +
+	    "$font[monospaced,13]{  symb:hunger<3  }will find items with less than 3% hunger reduction.\n" +
+	    "$font[monospaced,13]{  symb:h=5       }will find items with exactly 5% hunger reduction.\n";
+    
+    public static final String[] FILTER_HELP = {HELP_SIMPLE, HELP_FULL_TEXT, HELP_CONTENT, HELP_QUALITY, HELP_CURIO, HELP_FEP, HELP_ARMOR, HELP_SYMBEL};
     
     public boolean matches(List<ItemInfo> info) {
 	for (ItemInfo item : info) {
@@ -147,6 +159,10 @@ public class ItemFilter {
 			break;
 		    case "armor":
 			filter = new Armor(text, sign, value, opt);
+			break;
+		    case "gast":
+		    case "symb":
+			filter = new Gastronomy(text, sign, value, opt);
 			break;
 		}
 	    }
@@ -476,6 +492,29 @@ public class ItemFilter {
 			return test(armor.b);
 		    default:
 			return false;
+		}
+	    }
+	    return false;
+	}
+    }
+    
+    private static class Gastronomy extends Complex {
+	
+	public Gastronomy(String text, String sign, String value, String opts) {
+	    super(text, sign, value, opts);
+	}
+	
+	@Override
+	protected boolean match(ItemInfo item) {
+	    if(Reflect.is(item, "Gast")) {
+		if(text.isEmpty()) {
+		    return true;
+		}
+		if("fep".startsWith(text)) {
+		    return test(Utils.round(100D * Reflect.getFieldValueDouble(item, "fev"), 1));
+		}
+		if("hunger".startsWith(text)) {
+		    return test(Utils.round(100D * Reflect.getFieldValueDouble(item, "glut"), 1));
 		}
 	    }
 	    return false;
