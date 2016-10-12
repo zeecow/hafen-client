@@ -59,7 +59,21 @@ public class ItemFilter {
 	"$font[monospaced,13]{  fep:cha<3 }will find food giving less than 3 Charisma FEPs.\n" +
 	"$font[monospaced,13]{  fep:dex=4 }will find food giving exactly 4 Dexterity FEPs.\n";
     
-    public static final String[] FILTER_HELP = {HELP_SIMPLE, HELP_FULL_TEXT, HELP_CONTENT, HELP_QUALITY, HELP_CURIO, HELP_FEP};
+    public static final String HELP_ARMOR = "$size[20]{$b{Armor search}}\n" +
+	"$font[monospaced,16]{armor:[type][sign][value]}\n" +
+	"Will highlight items that grant armor of type $font[monospaced,13]{[type]} in quantity described by $font[monospaced,13]{[sign]} and $font[monospaced,13]{[value]}.\n" +
+	"Use $font[monospaced,13]{hard} or $font[monospaced,13]{deflect} type to denote hard (deflecting) armor.\n" +
+	"Use $font[monospaced,13]{soft} or $font[monospaced,13]{soak} type to denote soft (soaking) armor.\n" +
+	"Use $font[monospaced,13]{all}, $font[monospaced,13]{any}, $font[monospaced,13]{total}, $font[monospaced,13]{*} or leave empty to denote sum of soak and deflect.\n" +
+	"$font[monospaced,13]{[type]} can be entered partially.\n" +
+	"$size[16]{\nExamples:}\n" +
+	"$font[monospaced,13]{  armor:hard>1 }will find items providing more than 1 hard armor.\n" +
+	"$font[monospaced,13]{  armor:soft<2 }will find items providing less than 2 soft armor.\n" +
+	"$font[monospaced,13]{  armor:all=3  }will find items providing exactly 3 total armor.\n" +
+	"$font[monospaced,13]{  armor:>4     }will find items providing exactly 4 total armor.\n" +
+	"$font[monospaced,13]{  armor:h>5    }will find items providing more than 5 hard armor.\n";
+    
+    public static final String[] FILTER_HELP = {HELP_SIMPLE, HELP_FULL_TEXT, HELP_CONTENT, HELP_QUALITY, HELP_CURIO, HELP_FEP, HELP_ARMOR};
     
     public boolean matches(List<ItemInfo> info) {
 	for (ItemInfo item : info) {
@@ -69,7 +83,7 @@ public class ItemFilter {
 
     }
     
-    public boolean matches(ItemData data) {
+    final public boolean matches(ItemData data) {
 	return data != null && matches(data.iteminfo());
     }
 
@@ -103,6 +117,10 @@ public class ItemFilter {
 			tag = "q";
 			text = "single";
 			break;
+		    case "armor":
+		        tag = text;
+		        text = "all";
+		        break;
 		}
 	    }
 	    if(tag == null) {
@@ -126,6 +144,10 @@ public class ItemFilter {
 			break;
 		    case "fep":
 			filter = new FEP(text, sign, value, opt);
+			break;
+		    case "armor":
+			filter = new Armor(text, sign, value, opt);
+			break;
 		}
 	    }
 	    if(filter != null) {
@@ -185,7 +207,11 @@ public class ItemFilter {
 	    all = text.equals("*") || text.equals("all");
 	    any = text.equals("any");
 	}
-
+    
+	protected boolean test(double actual) {
+	    return test(actual, value);
+	}
+	
 	protected boolean test(double actual, double target) {
 	    switch (sign) {
 		case GREATER:
@@ -237,7 +263,7 @@ public class ItemFilter {
 	protected boolean match(ItemInfo item) {
 	    String name = this.name(((ItemInfo.Contents) item).sub).toLowerCase();
 	    float num = count(name);
-	    return name.contains(text) && test(num, value);
+	    return name.contains(text) && test(num);
 	}
 
 	@Override
@@ -310,11 +336,11 @@ public class ItemFilter {
 	    if(item instanceof Curiosity) {
 		Curiosity curio = (Curiosity) item;
 		if("lp".equals(text)) {
-		    return test(curio.exp, value);
+		    return test(curio.exp);
 		} else if("xp".equals(text)) {
-		    return test(curio.enc, value);
+		    return test(curio.enc);
 		} else if("mw".equals(text)) {
-		    return test(curio.mw, value);
+		    return test(curio.mw);
 		}
 	    }
 	    return false;
@@ -346,9 +372,9 @@ public class ItemFilter {
 	    }
 
 	    if(type == null) {
-		return test(quality.single().value, value);
+		return test(quality.single().value);
 	    } else {
-		return test(quality.single(type).value, value);
+		return test(quality.single(type).value);
 	    }
 	}
 
@@ -389,7 +415,7 @@ public class ItemFilter {
 		if(text != null && text.length() >= 3) {
 		    for (FoodInfo.Event event : fep.evs) {
 			if(event.ev.nm.toLowerCase().startsWith(text)) {
-			    return test(event.a, value);
+			    return test(event.a);
 			}
 		    }
 		} else {
@@ -397,6 +423,61 @@ public class ItemFilter {
 		}
 	    }
 
+	    return false;
+	}
+    }
+    
+    private static class Armor extends Complex {
+	private static String[] hard = {"hard", "deflect"};
+	private static String[] soft = {"soft", "soak"};
+	private static String[] all = {"all", "any", "total", "*"};
+	
+	private Armor(String text, String sign, String value, String opts) {
+	    super(text, sign, value, opts);
+	}
+	
+	@Override
+	public boolean matches(List<ItemInfo> info) {
+	    Pair<Integer, Integer> armor = ItemInfo.getArmor(info);
+	    if(armor != null) {
+		int type = -1;//no match
+		if(text.isEmpty()) {
+		    type = 0;//all
+		} else {
+		    for (String tmp : all) {
+			if(tmp.startsWith(text)) {
+			    type = 0;//all
+			    break;
+			}
+		    }
+		    if(type == -1) {
+			for (String tmp : hard) {
+			    if(tmp.startsWith(text)) {
+				type = 1;//hard
+				break;
+			    }
+			}
+		    }
+		    if(type == -1) {
+			for (String tmp : soft) {
+			    if(tmp.startsWith(text)) {
+				type = 2;//soft
+				break;
+			    }
+			}
+		    }
+		}
+		switch (type) {
+		    case 0://all
+			return test(armor.a + armor.b);
+		    case 1://hard
+			return test(armor.a);
+		    case 2://soft
+			return test(armor.b);
+		    default:
+			return false;
+		}
+	    }
 	    return false;
 	}
     }

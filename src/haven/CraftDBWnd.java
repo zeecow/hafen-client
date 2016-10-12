@@ -75,7 +75,7 @@ public class CraftDBWnd extends Window implements DTarget2 {
 	addtwdg(add(new IButton("gfx/hud/btn-help", "","-d","-h"){
 	    @Override
 	    public void click() {
-		ItemFilter.showHelp(ui, HELP_SIMPLE, HELP_CURIO, HELP_FEP);
+		ItemFilter.showHelp(ui, HELP_SIMPLE, HELP_CURIO, HELP_FEP, HELP_ARMOR);
 	    }
 	}));
 	CRAFT = paginafor(Resource.local().load("paginae/act/craft"));

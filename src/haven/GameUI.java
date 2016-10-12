@@ -335,7 +335,7 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 	    craftlist.addtwdg(craftlist.add(new IButton("gfx/hud/btn-help", "","-d","-h"){
 		@Override
 		public void click() {
-		    ItemFilter.showHelp(ui, HELP_SIMPLE, HELP_CURIO, HELP_FEP);
+		    ItemFilter.showHelp(ui, HELP_SIMPLE, HELP_CURIO, HELP_FEP, HELP_ARMOR);
 		}
 	    }));
 	} else if(craftlist.visible) {
