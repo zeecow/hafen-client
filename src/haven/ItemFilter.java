@@ -277,9 +277,14 @@ public class ItemFilter {
 
 	@Override
 	protected boolean match(ItemInfo item) {
-	    String name = this.name(((ItemInfo.Contents) item).sub).toLowerCase();
-	    float num = count(name);
-	    return name.contains(text) && test(num);
+	    if(item instanceof ItemInfo.Contents) {
+		String name = this.name(((ItemInfo.Contents) item).sub);
+		if(name != null) {
+		    name = name.toLowerCase();
+		    return name.contains(text) && test(count(name));
+		}
+	    }
+	    return false;
 	}
 
 	@Override
@@ -301,14 +306,8 @@ public class ItemFilter {
 	}
 
 	private String name(List<ItemInfo> sub) {
-	    String txt = null;
-	    for (ItemInfo subInfo : sub) {
-		if(subInfo instanceof ItemInfo.Name) {
-		    ItemInfo.Name name = (ItemInfo.Name) subInfo;
-		    txt = name.str.text;
-		}
-	    }
-	    return txt;
+	    ItemInfo.Name name = ItemInfo.find(ItemInfo.Name.class, sub);
+	    return name != null ? name.str.text : null;
 	}
     }
 
