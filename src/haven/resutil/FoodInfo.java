@@ -112,7 +112,7 @@ public class FoodInfo extends ItemInfo.Tip {
 		evs = new Event[fep.size()];
 		for (int i = 0; i < fep.size(); i++) {
 		    Pair<String, Double> tmp = fep.get(i);
-		    evs[i] = new Event(Resource.local().loadwait(tmp.a), tmp.b);
+		    evs[i] = new Event(Resource.remote().loadwait(tmp.a), tmp.b);
 		}
 	    }
 	    int[] t;
