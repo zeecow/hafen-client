@@ -353,14 +353,20 @@ public class CraftDBWnd extends Window implements DTarget2 {
 	if(ignoredKey(ev)) {
 	    return false;
 	}
-	if(ev.getKeyCode() == KeyEvent.VK_DOWN) {
-	    select(box.listitem((box.selindex + 1) % box.listitems()).p, true, true);
-	    return true;
+	switch (ev.getKeyCode()) {
+	    case KeyEvent.VK_DOWN:
+		select(box.listitem((box.selindex + 1) % box.listitems()).p, true, true);
+		return true;
+	    case KeyEvent.VK_UP:
+		select(box.listitem((box.selindex - 1 + box.listitems()) % box.listitems()).p, true, true);
+		return true;
+	    case KeyEvent.VK_ENTER:
+		if(box.sel != null && !box.sel.p.isAction()) {
+		    box.itemclick(box.sel, 1);
+		}
+		return true;
 	}
-	if(ev.getKeyCode() == KeyEvent.VK_UP) {
-	    select(box.listitem((box.selindex - 1 + box.listitems()) % box.listitems()).p, true, true);
-	    return true;
-	}
+	
 	if (filter.key(ev)) {
 	    needfilter();
 	}
