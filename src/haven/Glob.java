@@ -165,7 +165,9 @@ public class Glob {
 	}
     
 	public boolean isAction() {
-	    String[] ad = act().ad;
+	    Resource.AButton act = act();
+	    if(act == null) {return false;}
+	    String[] ad = act.ad;
 	    return ad != null && ad.length > 0;
 	}
 

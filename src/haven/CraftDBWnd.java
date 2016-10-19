@@ -136,7 +136,8 @@ public class CraftDBWnd extends Window implements DTarget2 {
     }
     
     public void select(Pagina p, boolean use, boolean skipReparent) {
-	if(!menu.isCrafting(p)) {
+	boolean isBack = p == MenuGrid.bk;
+	if(!menu.isCrafting(p) && !isBack) {
 	    return;
 	}
 	if(box != null) {
@@ -156,9 +157,17 @@ public class CraftDBWnd extends Window implements DTarget2 {
 		box.setitems(children);
 	    }
 	    box.change(p);
-	    setCurrent(p);
+	    if(isBack) {
+		p = null;
+		if(box.listitems() > 1) {
+		    p = menu.getParent(box.listitem(1).p);
+		}
+		setCurrent(p != null ? p : CRAFT);
+	    } else {
+		setCurrent(p);
+	    }
 	}
-	if(use) {
+	if(use && !isBack) {
 	    this.senduse = p;
 	}
     }
@@ -358,7 +367,7 @@ public class CraftDBWnd extends Window implements DTarget2 {
 		select(box.listitem((box.selindex + 1) % box.listitems()).p, true, true);
 		return true;
 	    case KeyEvent.VK_UP:
-		select(box.listitem((box.selindex - 1 + box.listitems()) % box.listitems()).p, true, true);
+		select(box.listitem((Math.max(box.selindex, 0) - 1 + box.listitems()) % box.listitems()).p, true, true);
 		return true;
 	    case KeyEvent.VK_ENTER:
 		if(box.sel != null && !box.sel.p.isAction()) {
@@ -375,24 +384,29 @@ public class CraftDBWnd extends Window implements DTarget2 {
     
     @Override
     public boolean type(char key, KeyEvent ev) {
-	if (key == 27 && !filter.line.isEmpty()) {
-	    select(CRAFT, false);
+	if(key == 27) {
+	    if(!filter.line.isEmpty()) {
+		select(CRAFT, false);
+	    } else {
+		close();
+	    }
 	    return true;
 	}
-	if (super.type(key, ev)) {
-	    return true;
-	}
+	
 	if(ignoredKey(ev)) {
 	    return false;
 	}
-	if (filter.key(ev)) {
+	String before = filter.line;
+	if(filter.key(ev) && !before.equals(filter.line)) {
 	    needfilter();
 	    if(filter.line.isEmpty()) {
 		select(CRAFT, false);
 	    }
 	    return true;
 	}
-	return false;
+    
+	//return super.type(key, ev);
+	return true;
     }
     
     private static boolean ignoredKey(KeyEvent ev){
@@ -463,6 +477,9 @@ public class CraftDBWnd extends Window implements DTarget2 {
 	    recipes = list.stream().map(Recipe::new).collect(Collectors.toList());
 	    sb.max = listitems() - h;
 	    sb.val = 0;
+	    if(!recipes.contains(sel)){
+	        selindex = -1;
+	    }
 	}
 
 	public void change(Pagina p) {
