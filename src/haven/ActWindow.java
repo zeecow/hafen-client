@@ -127,7 +127,10 @@ public class ActWindow extends GameUI.Hidewnd {
 	}
 	filtered.sort(new ItemComparator(filter));
 	if(filtered.listitems() > 0) {
-	    filtered.change(Math.min(filtered.selindex, filtered.listitems() - 1));
+	    filtered.change(filtered.sel);
+	    if(filtered.selindex == -1) {
+		filtered.change(0);
+	    }
 	    filtered.sb.val = 0;
 	    filtered.showsel();
 	}
