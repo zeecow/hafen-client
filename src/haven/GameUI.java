@@ -403,11 +403,15 @@ public class GameUI extends ConsoleHost implements Console.Directory {
     }
     
     public void toggleChat() {
-	if(chat.targeth == 0) {
-	    chat.sresize(chat.savedh);
+	if(chat.visible && !chat.hasfocus) {
 	    setfocus(chat);
 	} else {
-	    chat.sresize(0);
+	    if(chat.targeth == 0) {
+		chat.sresize(chat.savedh);
+		setfocus(chat);
+	    } else {
+		chat.sresize(0);
+	    }
 	}
 	Utils.setprefb("chatvis", chat.targeth != 0);
     }
@@ -1025,18 +1029,6 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 	} else if(key == ' ') {
 	    toggleui();
 	    return(true);
-	} else if(key == 3) {
-	    if(chat.visible && !chat.hasfocus) {
-		setfocus(chat);
-	    } else {
-		if(chat.targeth == 0) {
-		    chat.sresize(chat.savedh);
-		    setfocus(chat);
-		} else {
-		    chat.sresize(0);
-		}
-	    }
-	    Utils.setprefb("chatvis", chat.targeth != 0);
 	} else if((key == 27) && (map != null) && !map.hasfocus) {
 	    setfocus(map);
 	    return(true);

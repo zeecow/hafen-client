@@ -31,6 +31,7 @@ import java.awt.event.KeyEvent;
 public class RootWidget extends ConsoleHost {
     public static final Resource defcurs = Resource.local().loadwait("gfx/hud/curs/arw");
     Profile guprof, grprof, ggprof;
+    int lastCode = 0;
 
     public RootWidget(UI ui, Coord sz) {
 	super(ui, new Coord(0, 0), sz);
@@ -41,6 +42,9 @@ public class RootWidget extends ConsoleHost {
 	
     public boolean globtype(char key, KeyEvent ev) {
 	if(!super.globtype(key, ev)) {
+	    if(ev.getKeyCode() == 0) {
+		ev.setKeyCode(lastCode);
+	    }
 	    if(key == '`') {
 		GameUI gi = findchild(GameUI.class);
 		if(Config.profile) {
@@ -63,6 +67,12 @@ public class RootWidget extends ConsoleHost {
 	return(true);
     }
 
+    @Override
+    public boolean keydown(KeyEvent ev) {
+	lastCode = ev.getKeyCode();
+	return super.keydown(ev);
+    }
+    
     @Override
     public boolean mousedown(Coord c, int button) {
 	return super.mousedown(c, button);
