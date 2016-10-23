@@ -468,6 +468,7 @@ public class MapView extends PView implements DTarget, Console.Directory {
 		    this.cc = cc;
 		    this.mseq = mseq;
 		    this.fol = fol;
+		    gridol.update();
 		}
 		return(fol);
 	    }

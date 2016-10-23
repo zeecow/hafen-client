@@ -471,6 +471,7 @@ public class MCache {
 	if(CFG.STORE_MAP.get() && g != null) {
 	    MapDumper.dump(this, g);
 	}
+	
     }
 
     public void mapdata(Message msg) {
