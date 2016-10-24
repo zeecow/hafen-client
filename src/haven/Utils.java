@@ -1237,7 +1237,7 @@ public class Utils {
 	return(new MapBuilder<K, V>(new HashMap<K, V>()));
     }
 
-    public static final Comparator<Object> idcmd = new Comparator<Object>() {
+    public static final Comparator idcmd = new Comparator() {
 	int eid = 0;
 	final Map<Ref, Long> emerg = new HashMap<Ref, Long>();
 	final ReferenceQueue<Object> cleanq = new ReferenceQueue<Object>();
