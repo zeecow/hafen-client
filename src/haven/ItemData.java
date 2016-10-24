@@ -30,7 +30,7 @@ public class ItemData {
     private Integer wear;
     private ArmorData armor;
     private GastronomyData gast;
-    private Map<String, Integer> attributes;
+    private Map<Resource, Integer> attributes;
     private SlotsData slots;
     
     
@@ -78,7 +78,7 @@ public class ItemData {
 		attributes = parsed.entrySet()
 		    .stream()
 		    .collect(Collectors.toMap(
-		        e -> e.getKey().name,
+			Map.Entry::getKey,
 			e -> {
 			    double v = e.getValue() / single.multiplier;
 			    if(v > 0) {
@@ -175,6 +175,7 @@ public class ItemData {
 	    GsonBuilder builder = new GsonBuilder();
 	    builder.setPrettyPrinting();
 	    builder.registerTypeAdapter(Resource.class, new ResourceAdapter().nullSafe());
+	    builder.enableComplexMapKeySerialization();
 	    gson = builder.create();
 	}
 	return gson;
@@ -237,9 +238,9 @@ public class ItemData {
     
     
     private static class AttrData implements ITipData {
-	private final Map<String, Integer> attrs;
+	private final Map<Resource, Integer> attrs;
     
-	public AttrData(Map<String, Integer> attrs) {
+	public AttrData(Map<Resource, Integer> attrs) {
 	    this.attrs = attrs;
 	}
     
@@ -248,16 +249,15 @@ public class ItemData {
 	    Object[] params = new Object[2 * attrs.size() + 1];
 	    params[0] = null;
 	    int i = 1;
-	    for (Map.Entry<String, Integer> a : attrs.entrySet()) {
-		Resource res = Resource.remote().loadwait(a.getKey());
-		params[i] = sess.getresid(res);
+	    for (Map.Entry<Resource, Integer> a : attrs.entrySet()) {
+		params[i] = sess.getresid(a.getKey());
 		params[i + 1] = a.getValue();
 		i += 2;
 	    }
 	    return ItemInfo.make(sess, "ui/tt/attrmod", params);
 	}
     
-	public static ITipData make(Map<String, Integer> attrs) {
+	public static ITipData make(Map<Resource, Integer> attrs) {
 	    if(attrs != null) {
 		return new AttrData(attrs);
 	    }
