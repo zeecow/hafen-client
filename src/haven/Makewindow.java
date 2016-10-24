@@ -28,8 +28,10 @@ package haven;
 
 import me.ender.Reflect;
 
+import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.util.*;
-import java.awt.Color;
+import java.util.List;
 
 public class Makewindow extends Widget {
     Widget obtn, cbtn;
@@ -39,6 +41,8 @@ public class Makewindow extends Widget {
     static final Text qmodl = Text.render("Quality:");
     static Coord boff = new Coord(7, 9);
     final int xoff = 45, qmy = 38, outy = 65;
+    private Tex qtex;
+    private boolean rebuild = false;
     public static final Text.Foundry nmf = new Text.Foundry(Text.serif, 20).aa(true);
 
     @RName("make")
@@ -127,6 +131,7 @@ public class Makewindow extends Widget {
 	    for(Object arg : args)
 		qmod.add(ui.sess.getres((Integer)arg));
 	    this.qmod = qmod;
+	    this.rebuild = true;
 	} else {
 	    super.uimsg(msg, args);
 	}
@@ -142,24 +147,11 @@ public class Makewindow extends Widget {
 	}
 	if(qmod != null) {
 	    g.image(qmodl.tex(), new Coord(0, qmy + 4));
-	    c = new Coord(xoff, qmy);
-	    for(Indir<Resource> qm : qmod) {
-		try {
-		    Tex t = qm.get().layer(Resource.imgc).tex();
-		    g.image(t, c);
-		    c = c.add(t.sz().x + 1, 0);
-
-		    try {
-			Glob.CAttr attr = ui.gui.chrwdg.findattr(qm.get().basename());
-			if(attr != null) {
-			    Tex txt = attr.compline().tex();
-			    g.image(txt, c);
-			    c = c.add(txt.sz().x + 8, 0);
-			}
-		    }catch (Exception ignored){}
-
-		} catch(Loading l) {
-		}
+	    if(rebuild) {
+		buildQTex();
+	    }
+	    if(qtex != null) {
+		g.image(qtex, new Coord(xoff, qmy));
 	    }
 	}
 	c = new Coord(xoff, outy);
@@ -170,6 +162,43 @@ public class Makewindow extends Widget {
 	    c = c.add(Inventory.sqsz.x, 0);
 	}
 	super.draw(g);
+    }
+    
+    private void buildQTex(){
+	rebuild = false;
+	double product = 1.0d;
+	int count = 0;
+	BufferedImage result = null;
+	for (Indir<Resource> qm : qmod) {
+	    try {
+		result = ItemInfo.catimgsh(8, result, qm.get().layer(Resource.imgc).img);
+		try {
+		    Glob.CAttr attr = ui.gui.chrwdg.findattr(qm.get().basename());
+		    if(attr != null) {
+			result = ItemInfo.catimgsh(1, result, attr.compline().img);
+			product = product * attr.comp;
+			count++;
+		    }
+		} catch (Exception ignored) {
+		    rebuild = true;
+		}
+	    } catch (Loading l) {
+		rebuild = true;
+	    }
+	}
+    
+	if(count > 0) {
+	    double softcap = Math.pow(product, 1.0d / count);
+	    String format = String.format("Softcap: %.1f", softcap);
+	    Text txt = Text.renderstroked(format, Color.WHITE, Color.BLACK, Glob.CAttr.fnd);
+	    result = ItemInfo.catimgsh(16, result, txt.img);
+	}
+    
+	if(result != null) {
+	    qtex = new TexI(result);
+	} else {
+	    qtex = null;
+	}
     }
     
     private long hoverstart;
