@@ -3,10 +3,14 @@ package haven;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
+import com.google.gson.TypeAdapter;
+import com.google.gson.stream.JsonReader;
+import com.google.gson.stream.JsonWriter;
 import haven.resutil.FoodInfo;
 import me.ender.Reflect;
 
 import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -27,6 +31,7 @@ public class ItemData {
     private ArmorData armor;
     private GastronomyData gast;
     private Map<String, Integer> attributes;
+    private SlotsData slots;
     
     
     private ItemData(GItem item) {
@@ -50,6 +55,8 @@ public class ItemData {
 		food = new FoodInfo.Data((FoodInfo) ii, q);
 	    } else if("Gast".equals(className)){
 	        gast = new GastronomyData(ii, q);
+	    } else if("ISlots".equals(className)){
+	        slots = SlotsData.make(ii);
 	    }
 	    
 	    Pair<Integer, Integer> a = ItemInfo.getArmor(info);
@@ -107,7 +114,9 @@ public class ItemData {
 	    WearData.make(wear),
 	    armor,
 	    gast,
-	    AttrData.make(attributes)
+	    AttrData.make(attributes),
+	    slots
+	    
 	};
 	List<ItemInfo> infos = new ArrayList<>(data.length);
 	for (ITipData tip : data) {
@@ -165,6 +174,7 @@ public class ItemData {
 	if(gson == null) {
 	    GsonBuilder builder = new GsonBuilder();
 	    builder.setPrettyPrinting();
+	    builder.registerTypeAdapter(Resource.class, new ResourceAdapter().nullSafe());
 	    gson = builder.create();
 	}
 	return gson;
@@ -252,6 +262,62 @@ public class ItemData {
 		return new AttrData(attrs);
 	    }
 	    return null;
+	}
+    }
+    
+    private static class SlotsData implements ITipData {
+    
+	private final int left;
+	private final double pmin;
+	private final double pmax;
+	private final Resource[] attrs;
+    
+	public SlotsData(int left, double pmin, double pmax, Resource[] attrs) {
+	    this.left = left;
+	    this.pmin = pmin;
+	    this.pmax = pmax;
+	    this.attrs = attrs;
+	}
+    
+	public static SlotsData make(ItemInfo info){
+            if(info!=null){
+		int left = Reflect.getFieldValueInt(info, "left");
+		double pmin = Reflect.getFieldValueDouble(info, "pmin");
+		double pmax = Reflect.getFieldValueDouble(info, "pmax");
+		Resource[] attrres = (Resource[]) Reflect.getFieldValue(info, "attrs");
+		return new SlotsData(left, pmin, pmax, attrres);
+	    }
+            return null;
+	}
+        
+	@Override
+	public ItemInfo create(Session sess) {
+	    List<Object> params = new ArrayList<>();
+	    params.add(null);
+	    params.add(pmin);
+	    params.add(pmax);
+	    if(attrs != null) {
+		params.addAll(Arrays.stream(attrs)
+		    .map(sess::getresid)
+		    .collect(Collectors.toList())
+		);
+	    }
+	    params.add(null);
+	    params.add(left);
+	    return ItemInfo.make(sess, "ui/tt/slots", params.toArray());
+	}
+    }
+    
+    private static class ResourceAdapter extends TypeAdapter<Resource> {
+	
+	@Override
+	public void write(JsonWriter writer, Resource resource) throws IOException {
+	    writer.value(resource.name);
+	}
+	
+	@Override
+	public Resource read(JsonReader reader) throws IOException {
+	    return Resource.remote().loadwait(reader.nextString());
 	}
     }
 }
