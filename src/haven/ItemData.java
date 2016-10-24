@@ -53,14 +53,15 @@ public class ItemData {
 	        gast = new GastronomyData(ii, q);
 	    }
 	    
-	    Pair<Integer, Integer> w = ItemInfo.getWear(info);
-	    if(w != null) {
-		wear = (int) Math.round(w.b / q.single(QualityList.SingleType.Vitality).multiplier);
-	    }
-	    
 	    Pair<Integer, Integer> a = ItemInfo.getArmor(info);
 	    if(a != null) {
 		armor = new ArmorData(a, q);
+	    }
+	    
+	    Pair<Integer, Integer> w = ItemInfo.getWear(info);
+	    if(w != null) {
+		QualityList.Quality single = q.single(QualityList.SingleType.Vitality);
+		wear = (int) Math.round(w.b / (a != null ? single.value / 10.0 : single.multiplier));
 	    }
 	    
 	}
