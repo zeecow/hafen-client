@@ -7,10 +7,8 @@ import haven.resutil.FoodInfo;
 import me.ender.Reflect;
 
 import java.awt.image.BufferedImage;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class ItemData {
     private static final ItemData EMPTY = new ItemData();
@@ -28,6 +26,7 @@ public class ItemData {
     private Integer wear;
     private ArmorData armor;
     private GastronomyData gast;
+    private Map<String, Integer> attributes;
     
     
     private ItemData(GItem item) {
@@ -64,17 +63,36 @@ public class ItemData {
 		wear = (int) Math.round(w.b / (a != null ? single.value / 10.0 : single.multiplier));
 	    }
 	    
+	    List<ItemInfo> attrs = ItemInfo.findall("haven.res.ui.tt.attrmod.AttrMod", info);
+	    if(!attrs.isEmpty()){
+		Map<Resource, Integer> parsed = new HashMap<>(attrs.size());
+		ItemInfo.parseAttrMods(parsed, attrs);
+		QualityList.Quality single = q.single(QualityList.SingleType.Average);
+		attributes = parsed.entrySet()
+		    .stream()
+		    .collect(Collectors.toMap(
+		        e -> e.getKey().name,
+			e -> {
+			    double v = e.getValue() / single.multiplier;
+			    if(v > 0) {
+				return (int) Math.round(v);
+			    } else {
+				return (int) v;
+			    }
+			}
+		    ));
+	    }
 	}
     }
 
-    public Tex longtip(Resource res) {
+    public Tex longtip(Resource res, Session sess) {
 	Resource.AButton ad = res.layer(Resource.action);
 	Resource.Pagina pg = res.layer(Resource.pagina);
 	String tt = "$b{$size[20]{" + ad.name + "}}";
 	if(pg != null) {tt += "\n\n" + pg.text;}
 
 	BufferedImage img = MenuGrid.ttfnd.render(tt, 300).img;
-	List<ItemInfo> infos = iteminfo();
+	List<ItemInfo> infos = iteminfo(sess);
 
 	if(!infos.isEmpty()) {
 	    img = ItemInfo.catimgs(20, img, ItemInfo.longtip(infos));
@@ -82,12 +100,19 @@ public class ItemData {
 	return new TexI(img);
     }
     
-    public List<ItemInfo> iteminfo() {
-	ITipData[] data = new ITipData[]{curiosity, food, WearData.make(wear), armor, gast};
+    public List<ItemInfo> iteminfo(Session sess) {
+	ITipData[] data = new ITipData[]{
+	    curiosity,
+	    food,
+	    WearData.make(wear),
+	    armor,
+	    gast,
+	    AttrData.make(attributes)
+	};
 	List<ItemInfo> infos = new ArrayList<>(data.length);
 	for (ITipData tip : data) {
 	    if(tip != null) {
-		infos.add(tip.create());
+		infos.add(tip.create(sess));
 	    }
 	}
 	return infos;
@@ -146,7 +171,7 @@ public class ItemData {
     }
 
     public interface ITipData {
-	ItemInfo create();
+	ItemInfo create(Session sess);
     }
     
     private static class WearData implements ITipData {
@@ -157,8 +182,8 @@ public class ItemData {
 	}
 	
 	@Override
-	public ItemInfo create() {
-	    return ItemInfo.make("ui/tt/wear", null, 0, max);
+	public ItemInfo create(Session sess) {
+	    return ItemInfo.make(sess, "ui/tt/wear", null, 0, max);
 	}
 	
 	public static WearData make(Integer wear) {
@@ -180,8 +205,8 @@ public class ItemData {
 	}
 	
 	@Override
-	public ItemInfo create() {
-	    return ItemInfo.make("ui/tt/armor", null, hard, soft);
+	public ItemInfo create(Session sess) {
+	    return ItemInfo.make(sess, "ui/tt/armor", null, hard, soft);
 	}
     }
     
@@ -195,9 +220,38 @@ public class ItemData {
 	}
     
 	@Override
-	public ItemInfo create() {
-	    return ItemInfo.make("ui/tt/gast", null, glut, fev);
+	public ItemInfo create(Session sess) {
+	    return ItemInfo.make(sess, "ui/tt/gast", null, glut, fev);
 	}
     }
     
+    
+    private static class AttrData implements ITipData {
+	private final Map<String, Integer> attrs;
+    
+	public AttrData(Map<String, Integer> attrs) {
+	    this.attrs = attrs;
+	}
+    
+	@Override
+	public ItemInfo create(Session sess) {
+	    Object[] params = new Object[2 * attrs.size() + 1];
+	    params[0] = null;
+	    int i = 1;
+	    for (Map.Entry<String, Integer> a : attrs.entrySet()) {
+		Resource res = Resource.remote().loadwait(a.getKey());
+		params[i] = sess.getresid(res);
+		params[i + 1] = a.getValue();
+		i += 2;
+	    }
+	    return ItemInfo.make(sess, "ui/tt/attrmod", params);
+	}
+    
+	public static ITipData make(Map<String, Integer> attrs) {
+	    if(attrs != null) {
+		return new AttrData(attrs);
+	    }
+	    return null;
+	}
+    }
 }

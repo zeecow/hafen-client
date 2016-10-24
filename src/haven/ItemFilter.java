@@ -95,8 +95,8 @@ public class ItemFilter {
 
     }
     
-    final public boolean matches(ItemData data) {
-	return data != null && matches(data.iteminfo());
+    final public boolean matches(ItemData data, Session sess) {
+	return data != null && matches(data.iteminfo(sess));
     }
 
     protected boolean match(ItemInfo item) { return false; }

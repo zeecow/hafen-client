@@ -198,7 +198,7 @@ public class CraftDBWnd extends Window implements DTarget2 {
 	if(description == null) {
 	    if(data != null) {
 		try {
-		    description = data.longtip(resd);
+		    description = data.longtip(resd, ui.sess);
 		} catch (Resource.Loading ignored) {
 		}
 	    } else {
@@ -338,7 +338,7 @@ public class CraftDBWnd extends Window implements DTarget2 {
 		    Resource res = p.res.get();
 		    String name = res.layer(Resource.action).name.toLowerCase();
 		    ItemData data = ItemData.get(res.name);
-		    if(name.contains(filter) || itemFilter.matches(data)) {
+		    if(name.contains(filter) || itemFilter.matches(data, ui.sess)) {
 			filtered.add(p);
 		    }
 		} catch (Loading e) {

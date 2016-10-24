@@ -104,7 +104,7 @@ public class FoodInfo extends ItemInfo.Tip {
 	}
 	
 	@Override
-	public ItemInfo create() {
+	public ItemInfo create(Session sess) {
 	    Event[] evs;
 	    if (fep == null) {
 		evs = new Event[0];

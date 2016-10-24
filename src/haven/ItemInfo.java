@@ -42,15 +42,33 @@ public abstract class ItemInfo {
     static final Pattern count_pattern = Pattern.compile("(?:^|[\\s])([0-9]*\\.?[0-9]+\\s*%?)");
     public final Owner owner;
     
-    public static ItemInfo make(String resname, Object ...args) {
+    public static ItemInfo make(Session sess, String resname, Object ...args) {
 	Resource res = Resource.remote().load(resname).get();
 	InfoFactory f = res.layer(Resource.CodeEntry.class).get(InfoFactory.class);
-	return f.build(null, args);
+	return f.build(new SessOwner(sess), args);
     }
     
     public interface Owner {
 	Glob glob();
 	List<ItemInfo> info();
+    }
+    
+    private static class SessOwner implements ItemInfo.Owner{
+	private final Glob glob;
+	
+	public SessOwner(Session sess){
+	    glob = sess.glob;
+	}
+	
+	@Override
+	public Glob glob() {
+	    return glob;
+	}
+	
+	@Override
+	public List<ItemInfo> info() {
+	    return null;
+	}
     }
     
     public interface ResOwner extends Owner {
@@ -389,7 +407,7 @@ public abstract class ItemInfo {
 
 
     @SuppressWarnings("unchecked")
-    private static void parseAttrMods(Map<Resource, Integer> bonuses, List infos) {
+    public static void parseAttrMods(Map<Resource, Integer> bonuses, List infos) {
 	for (Object inf : infos) {
 	    List<Object> mods = (List<Object>) Reflect.getFieldValue(inf, "mods");
 	    for (Object mod : mods) {
