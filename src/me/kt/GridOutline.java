@@ -61,12 +61,6 @@ public class GridOutline implements Rendered {
 	} catch (Loading ignored) {}
     }
     
-    public void update() {
-	if(ul != null) {
-	    update(ul);
-	}
-    }
-
     private Coord3f mapToScreen(Coord c) {
 	return new Coord3f((c.x - ul.x) * MCache.tilesz.x, -(c.y - ul.y) * MCache.tilesz.y, map.getz(c) + 0.1f);
     }
