@@ -32,6 +32,7 @@ public class ItemData {
     private GastronomyData gast;
     private Map<Resource, Integer> attributes;
     private SlotsData slots;
+    private SlottedData gilding;
     
     
     private ItemData(GItem item) {
@@ -57,6 +58,8 @@ public class ItemData {
 	        gast = new GastronomyData(ii, q);
 	    } else if("ISlots".equals(className)){
 	        slots = SlotsData.make(ii);
+	    } else if("Slotted".equals(className)){
+	        gilding = SlottedData.make(ii, q);
 	    }
 	    
 	    Pair<Integer, Integer> a = ItemInfo.getArmor(info);
@@ -72,22 +75,7 @@ public class ItemData {
 	    
 	    List<ItemInfo> attrs = ItemInfo.findall("haven.res.ui.tt.attrmod.AttrMod", info);
 	    if(!attrs.isEmpty()){
-		Map<Resource, Integer> parsed = new HashMap<>(attrs.size());
-		ItemInfo.parseAttrMods(parsed, attrs);
-		QualityList.Quality single = q.single(QualityList.SingleType.Average);
-		attributes = parsed.entrySet()
-		    .stream()
-		    .collect(Collectors.toMap(
-			Map.Entry::getKey,
-			e -> {
-			    double v = e.getValue() / single.multiplier;
-			    if(v > 0) {
-				return (int) Math.round(v);
-			    } else {
-				return (int) v;
-			    }
-			}
-		    ));
+		attributes = AttrData.parse(attrs, q);
 	    }
 	}
     }
@@ -115,7 +103,8 @@ public class ItemData {
 	    armor,
 	    gast,
 	    AttrData.make(attributes),
-	    slots
+	    slots,
+	    gilding
 	    
 	};
 	List<ItemInfo> infos = new ArrayList<>(data.length);
@@ -246,18 +235,42 @@ public class ItemData {
     
 	@Override
 	public ItemInfo create(Session sess) {
+	    Object[] params = params(sess);
+	    return ItemInfo.make(sess, "ui/tt/attrmod", params);
+	}
+    
+	public Object[] params(Session sess) {
 	    Object[] params = new Object[2 * attrs.size() + 1];
-	    params[0] = null;
+	    params[0] = sess.getresid(Resource.remote().loadwait("ui/tt/attrmod"));
 	    int i = 1;
 	    for (Map.Entry<Resource, Integer> a : attrs.entrySet()) {
 		params[i] = sess.getresid(a.getKey());
 		params[i + 1] = a.getValue();
 		i += 2;
 	    }
-	    return ItemInfo.make(sess, "ui/tt/attrmod", params);
+	    return params;
+	}
+	
+	public static Map<Resource, Integer> parse(List<ItemInfo> attrs, QualityList q){
+	    Map<Resource, Integer> parsed = new HashMap<>(attrs.size());
+	    ItemInfo.parseAttrMods(parsed, attrs);
+	    QualityList.Quality single = q.single(QualityList.SingleType.Average);
+	    return parsed.entrySet()
+		.stream()
+		.collect(Collectors.toMap(
+		    Map.Entry::getKey,
+		    e -> {
+			double v = e.getValue() / single.multiplier;
+			if(v > 0) {
+			    return (int) Math.round(v);
+			} else {
+			    return (int) v;
+			}
+		    }
+		));
 	}
     
-	public static ITipData make(Map<Resource, Integer> attrs) {
+	public static AttrData make(Map<Resource, Integer> attrs) {
 	    if(attrs != null) {
 		return new AttrData(attrs);
 	    }
@@ -305,6 +318,61 @@ public class ItemData {
 	    params.add(null);
 	    params.add(left);
 	    return ItemInfo.make(sess, "ui/tt/slots", params.toArray());
+	}
+    }
+    
+    private static class SlottedData implements ITipData {
+	public final double pmin;
+	public final double pmax;
+	public final Resource[] attrs;
+	private Map<Resource, Integer> bonuses;
+	
+	private SlottedData(double pmin, double pmax, Resource[] attrs, Map<Resource, Integer> bonuses) {
+	    this.pmin = pmin;
+	    this.pmax = pmax;
+	    this.attrs = attrs;
+	    this.bonuses = bonuses;
+	}
+	
+	@Override
+	public ItemInfo create(Session sess) {
+	    List<Object> params = new ArrayList<>();
+	    params.add(null);
+	    params.add(pmin);
+	    params.add(pmax);
+	    if(attrs != null) {
+		params.addAll(Arrays.stream(attrs)
+		    .map(sess::getresid)
+		    .collect(Collectors.toList())
+		);
+	    }
+	    AttrData make = AttrData.make(bonuses);
+	    if(make != null) {
+		params.add(new Object[]{make.params(sess)});
+	    } else {
+		params.add(new Object[0]);
+	    }
+	    return ItemInfo.make(sess, "ui/tt/slot/", params.toArray());
+	}
+	
+	
+	public static SlottedData make(ItemInfo info, QualityList q) {
+	    if(info != null) {
+		double pmin = Reflect.getFieldValueDouble(info, "pmin");
+		double pmax = Reflect.getFieldValueDouble(info, "pmax");
+		Resource[] attrres = (Resource[]) Reflect.getFieldValue(info, "attrs");
+		Object sub = Reflect.getFieldValue(info, "sub");
+		List<ItemInfo> bonusInfos;
+		if(sub instanceof List){
+		    //noinspection unchecked
+		    bonusInfos = (List<ItemInfo>) sub;
+		} else{
+		    bonusInfos = new ArrayList<>();
+		}
+		Map<Resource, Integer> bonuses = AttrData.parse(bonusInfos, q);
+		return new SlottedData(pmin, pmax, attrres, bonuses);
+	    }
+	    return null;
 	}
     }
     
