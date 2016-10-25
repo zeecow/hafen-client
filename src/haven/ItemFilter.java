@@ -6,6 +6,7 @@ import me.ender.Reflect;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -85,7 +86,16 @@ public class ItemFilter {
 	    "$font[monospaced,13]{  symb:hunger<3  }will find items with less than 3% hunger reduction.\n" +
 	    "$font[monospaced,13]{  symb:h=5       }will find items with exactly 5% hunger reduction.\n";
     
-    public static final String[] FILTER_HELP = {HELP_SIMPLE, HELP_FULL_TEXT, HELP_CONTENT, HELP_QUALITY, HELP_CURIO, HELP_FEP, HELP_ARMOR, HELP_SYMBEL};
+    public static final String HELP_ATTR = "$size[20]{$b{Attribute search}}\n" +
+	"$font[monospaced,16]{attr:[type][sign][value]}\n" +
+	"Will highlight items (equipment or gilding items) that grant attribute or skill bonuses defined by $font[monospaced,13]{[type]} in amount described by $font[monospaced,13]{[sign]} and $font[monospaced,13]{[value]}.\n" +
+	"$font[monospaced,13]{[type]} can be any attribute/skill name from character sheet and can be entered partially.\n" +
+	"$size[16]{\nExamples:}\n" +
+	"$font[monospaced,13]{  attr:survival }will find all items that grant survival.\n" +
+	"$font[monospaced,13]{  attr:str>2    }will find items granting more than 2 str bonus.\n" +
+	"$font[monospaced,13]{  attr:agi<0    }will find items giving agility penalty.\n";
+    
+    public static final String[] FILTER_HELP = {HELP_SIMPLE, HELP_FULL_TEXT, HELP_CONTENT, HELP_QUALITY, HELP_CURIO, HELP_FEP, HELP_ARMOR, HELP_SYMBEL, HELP_ATTR};
     
     public boolean matches(List<ItemInfo> info) {
 	for (ItemInfo item : info) {
@@ -164,6 +174,9 @@ public class ItemFilter {
 		    case "symb":
 			filter = new Gastronomy(text, sign, value, opt);
 			break;
+		    case "attr":
+			filter = new Attribute(text, sign, value, opt);
+			break;
 		}
 	    }
 	    if(filter != null) {
@@ -239,7 +252,7 @@ public class ItemFilter {
 		case GREQUAL:
 		    return actual >= target;
 		default:
-		    return actual > 0;
+		    return actual != 0;
 	    }
 	}
 
@@ -514,6 +527,26 @@ public class ItemFilter {
 		}
 		if("hunger".startsWith(text)) {
 		    return test(Utils.round(100D * Reflect.getFieldValueDouble(item, "glut"), 1));
+		}
+	    }
+	    return false;
+	}
+    }
+    
+    private static class Attribute extends Complex {
+	
+	public Attribute(String text, String sign, String value, String opts) {
+	    super(text, sign, value, opts);
+	}
+	
+	@Override
+	public boolean matches(List<ItemInfo> info) {
+	    Map<Resource, Integer> bonuses = ItemInfo.getBonuses(info);
+	    if(text != null && text.length() >= 3) {
+		for (Resource res : bonuses.keySet()) {
+		    if(res.layer(Resource.tooltip).t.toLowerCase().startsWith(text)) {
+			return test(bonuses.get(res));
+		    }
 		}
 	    }
 	    return false;

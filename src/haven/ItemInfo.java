@@ -387,6 +387,7 @@ public abstract class ItemInfo {
     @SuppressWarnings("unchecked")
     public static Map<Resource, Integer> getBonuses(List<ItemInfo> infos) {
 	List<ItemInfo> slotInfos = ItemInfo.findall("ISlots", infos);
+	List<ItemInfo> gilding = ItemInfo.findall("Slotted", infos);
 	Map<Resource, Integer> bonuses = new HashMap<>();
 	try {
 	    for (ItemInfo islots : slotInfos) {
@@ -394,6 +395,10 @@ public abstract class ItemInfo {
 		for (Object slot : slots) {
 		    parseAttrMods(bonuses, (List) Reflect.getFieldValue(slot, "info"));
 		}
+	    }
+	    for (ItemInfo info : gilding) {
+		List<Object> slots = (List<Object>) Reflect.getFieldValue(info, "sub");
+		parseAttrMods(bonuses, slots);
 	    }
 	    parseAttrMods(bonuses, ItemInfo.findall("haven.res.ui.tt.attrmod.AttrMod", infos));
 	} catch (Exception ignored) {}
