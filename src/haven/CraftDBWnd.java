@@ -349,6 +349,7 @@ public class CraftDBWnd extends Window implements DTarget2 {
 	box.setitems(filtered);
 	
 	if(filtered.isEmpty()) {
+	    if(!needfilter) {closemake();}
 	    box.change((Recipe) null);
 	    setCurrent(null);
 	} else {
