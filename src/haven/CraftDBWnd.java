@@ -199,8 +199,7 @@ public class CraftDBWnd extends Window implements DTarget2 {
 	    if(data != null) {
 		try {
 		    description = data.longtip(resd, ui.sess);
-		} catch (Resource.Loading ignored) {
-		}
+		} catch (Loading ignored) {}
 	    } else {
 		description = MenuGrid.rendertt(resd, true, false, true).tex();
 	    }

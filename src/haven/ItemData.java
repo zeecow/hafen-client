@@ -241,10 +241,10 @@ public class ItemData {
     
 	public Object[] params(Session sess) {
 	    Object[] params = new Object[2 * attrs.size() + 1];
-	    params[0] = sess.getresid(Resource.remote().loadwait("ui/tt/attrmod"));
+	    params[0] = sess.getresidf(Resource.remote().loadwait("ui/tt/attrmod"));
 	    int i = 1;
 	    for (Map.Entry<Resource, Integer> a : attrs.entrySet()) {
-		params[i] = sess.getresid(a.getKey());
+		params[i] = sess.getresidf(a.getKey());
 		params[i + 1] = a.getValue();
 		i += 2;
 	    }
@@ -311,7 +311,7 @@ public class ItemData {
 	    params.add(pmax);
 	    if(attrs != null) {
 		params.addAll(Arrays.stream(attrs)
-		    .map(sess::getresid)
+		    .map(sess::getresidf)
 		    .collect(Collectors.toList())
 		);
 	    }
@@ -342,7 +342,7 @@ public class ItemData {
 	    params.add(pmax);
 	    if(attrs != null) {
 		params.addAll(Arrays.stream(attrs)
-		    .map(sess::getresid)
+		    .map(sess::getresidf)
 		    .collect(Collectors.toList())
 		);
 	    }
