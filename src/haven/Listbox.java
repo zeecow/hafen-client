@@ -32,7 +32,7 @@ public abstract class Listbox<T> extends ListWidget<T> {
     public static final Color selc = new Color(114, 179, 82, 128);
     public static final Color overc = new Color(189, 239, 137, 53);
     public Color bgcolor = Color.BLACK;
-    public final int h;
+    public int h;
     public final Scrollbar sb;
     private T over;
 
@@ -154,5 +154,12 @@ public abstract class Listbox<T> extends ListWidget<T> {
 
     public void display() {
 	display(sel);
+    }
+
+    public void resize(Coord sz) {
+	super.resize(sz);
+	this.h = (sz.y + itemh - 1) / itemh;
+	sb.resize(sz.y);
+	sb.c = new Coord(sz.x - sb.sz.x, 0);
     }
 }

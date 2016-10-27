@@ -35,6 +35,7 @@ import java.lang.reflect.*;
 import java.text.SimpleDateFormat;
 import java.util.prefs.*;
 import java.util.*;
+import java.util.function.*;
 import java.awt.Graphics;
 import java.awt.Color;
 import java.awt.image.*;
@@ -1147,7 +1148,35 @@ public class Utils {
 	if(!i.hasNext()) return(null);
 	return(i.next());
     }
-    
+
+    public static <T> T take(Iterable<T> c) {
+	Iterator<T> i = c.iterator();
+	if(!i.hasNext()) return(null);
+	T ret = i.next();
+	i.remove();
+	return(ret);
+    }
+
+    public static <T> int index(T[] arr, T el) {
+	for(int i = 0; i < arr.length; i++) {
+	    if(Objects.equals(arr[i], el))
+		return(i);
+	}
+	return(-1);
+    }
+
+    public static boolean strcheck(String str, IntPredicate p) {
+	for(int i = 0; i < str.length(); i++) {
+	    if(!p.test(str.charAt(i)))
+		return(false);
+	}
+	return(true);
+    }
+
+    public static <T> T or(T val, Supplier<T> els) {
+	return((val != null)?val:els.get());
+    }
+
     public static <T> T construct(Constructor<T> cons, Object... args) {
 	try {
 	    return(cons.newInstance(args));
