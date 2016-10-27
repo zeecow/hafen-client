@@ -67,7 +67,7 @@ public class LocalMiniMap extends Widget {
 	    this.seq = seq;
 	}
     }
-
+    
     private BufferedImage tileimg(int t, BufferedImage[] texes) {
 	BufferedImage img = texes[t];
 	if(img == null) {
@@ -95,7 +95,7 @@ public class LocalMiniMap extends Widget {
 		int rgb = 0;
 		if(tex != null)
 		    rgb = tex.getRGB(Utils.floormod(c.x + ul.x, tex.getWidth()),
-				     Utils.floormod(c.y + ul.y, tex.getHeight()));
+			Utils.floormod(c.y + ul.y, tex.getHeight()));
 		buf.setRGB(c.x, c.y, rgb);
 	    }
 	}
@@ -119,15 +119,15 @@ public class LocalMiniMap extends Widget {
 	    for(c.x = 0; c.x < sz.x; c.x++) {
 		int t = m.gettile(ul.add(c));
 		if((m.gettile(ul.add(c).add(-1, 0)) > t) ||
-		   (m.gettile(ul.add(c).add( 1, 0)) > t) ||
-		   (m.gettile(ul.add(c).add(0, -1)) > t) ||
-		   (m.gettile(ul.add(c).add(0,  1)) > t))
+		    (m.gettile(ul.add(c).add( 1, 0)) > t) ||
+		    (m.gettile(ul.add(c).add(0, -1)) > t) ||
+		    (m.gettile(ul.add(c).add(0,  1)) > t))
 		    buf.setRGB(c.x, c.y, Color.BLACK.getRGB());
 	    }
 	}
 	return(buf);
     }
-
+    
     public LocalMiniMap(Coord sz, MapView mv) {
 	super(sz);
 	this.mv = mv;
@@ -141,11 +141,11 @@ public class LocalMiniMap extends Widget {
     public Coord p2c(Coord pc) {
 	return(pc.div(tilesz).sub(cc).add(sz.div(2)));
     }
-
+    
     public Coord c2p(Coord c) {
 	return(c.sub(sz.div(2)).add(cc).mul(tilesz).add(tilesz.div(2)));
     }
-
+    
     public void drawicons(GOut g) {
 	OCache oc = ui.sess.glob.oc;
 	synchronized(oc) {
@@ -161,7 +161,7 @@ public class LocalMiniMap extends Widget {
 	    }
 	}
     }
-
+    
     public Gob findicongob(Coord c) {
 	OCache oc = ui.sess.glob.oc;
 	synchronized(oc) {
@@ -179,7 +179,7 @@ public class LocalMiniMap extends Widget {
 	}
 	return(null);
     }
-
+    
     public void tick(double dt) {
 	Gob pl = ui.sess.glob.oc.getgob(mv.plgob);
 	if(pl == null)
@@ -187,7 +187,7 @@ public class LocalMiniMap extends Widget {
 	else
 	    this.cc = pl.rc.div(tilesz);
     }
-
+    
     public void draw(GOut g) {
 	if(cc == null)
 	    return;
@@ -205,11 +205,11 @@ public class LocalMiniMap extends Widget {
 		    f = cache.get(new Pair<Grid, Integer>(plg, seq));
 		    if(f == null) {
 			f = Defer.later(new Defer.Callable<MapTile> () {
-				public MapTile call() {
-				    Coord ul = plg.ul.sub(cmaps).add(1, 1);
-				    return(new MapTile(new TexI(drawmap(ul, cmaps.mul(3).sub(2, 2))), ul, plg, seq));
-				}
-			    });
+			    public MapTile call() {
+				Coord ul = plg.ul.sub(cmaps).add(1, 1);
+				return(new MapTile(new TexI(drawmap(ul, cmaps.mul(3).sub(2, 2))), ul, plg, seq));
+			    }
+			});
 			cache.put(new Pair<Grid, Integer>(plg, seq), f);
 		    }
 		}
@@ -235,7 +235,7 @@ public class LocalMiniMap extends Widget {
 			if(ptc == null)
 			    continue;
 			ptc = p2c(ptc);
-			g.chcolor(m.col.getRed(), m.col.getGreen(), m.col.getBlue(), 128);
+			g.chcolor(m.col.getRed(), m.col.getGreen(), m.col.getBlue(), 255);
 			g.image(MiniMap.plx.layer(Resource.imgc).tex(), ptc.add(MiniMap.plx.layer(Resource.negc).cc.inv()));
 			g.chcolor();
 		    }
@@ -246,7 +246,7 @@ public class LocalMiniMap extends Widget {
 	}
 	drawicons(g);
     }
-
+    
     public boolean mousedown(Coord c, int button) {
 	if(cc == null)
 	    return(false);

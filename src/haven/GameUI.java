@@ -203,15 +203,7 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 			map.disol(4, 5);
 		}
 	    }, 0, 0);
-	blpanel.add(new MenuButton("lbtn-map", 1, "Map ($col[255,255,0]{Ctrl+A})") {
-		public void click() {
-		    if((mapfile != null) && mapfile.show(!mapfile.visible)) {
-			mapfile.raise();
-			fitwdg(mapfile);
-			setfocus(mapfile);
-		    }
-		}
-	    });
+	blpanel.add(new MenuButton2("lbtn-map", "Map", TOGGLE_MAP, KeyEvent.VK_A, CTRL));
     }
 
     @Override
@@ -421,6 +413,14 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 	    chat.sresize(0);
 	}
 	Utils.setprefb("chatvis", chat.targeth != 0);
+    }
+    
+    public void toggleMap() {
+	if((mapfile != null) && mapfile.show(!mapfile.visible)) {
+	    mapfile.raise();
+	    fitwdg(mapfile);
+	    setfocus(mapfile);
+	}
     }
     
     public class Hidepanel extends Widget {
@@ -809,7 +809,7 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 	    blpanel.hide();
 	} else {
 	    mmap.sz = new Coord(133, 133);
-	    blpanel.add(mmap, 4, 34 + 9);
+	    blpanel.add(mmap, minimapc);
 	    blpanel.show();
 	}
 	mmap.lower();
