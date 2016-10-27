@@ -36,7 +36,7 @@ public class HashDirCache implements ResCache {
     public final URI id;
     private final long idhash;
 
-    public static File findbase() {
+    public static File findbase(String data) {
 	try {
 	    windows: {
 		String path = System.getenv("APPDATA");
@@ -45,7 +45,7 @@ public class HashDirCache implements ResCache {
 		File appdata = new File(path);
 		if(!appdata.exists() || !appdata.isDirectory() || !appdata.canRead() || !appdata.canWrite())
 		    break windows;
-		File base = new File(new File(appdata, "Haven and Hearth"), "data");
+		File base = new File(new File(appdata, "Haven and Hearth"), data);
 		if(!base.exists() && !base.mkdirs())
 		    break windows;
 		return(base);
@@ -57,7 +57,7 @@ public class HashDirCache implements ResCache {
 		File home = new File(path);
 		if(!home.exists() || !home.isDirectory() || !home.canRead() || !home.canWrite())
 		    break fallback;
-		File base = new File(new File(home, ".haven"), "data");
+		File base = new File(new File(home, ".haven"), data);
 		if(!base.exists() && !base.mkdirs())
 		    break fallback;
 		return(base);
@@ -68,7 +68,11 @@ public class HashDirCache implements ResCache {
     }
 
     public HashDirCache(URI id) {
-	this.base = findbase();
+        this(id, "data");
+    }
+    
+    public HashDirCache(URI id, String data) {
+	this.base = findbase(data);
 	this.id = id;
 	this.idhash = namehash(0, id.toString());
     }
@@ -81,8 +85,12 @@ public class HashDirCache implements ResCache {
 	}
     }
 
+    public HashDirCache(String id, String data) {
+	this(mkurn(id), data);
+    }
+    
     public HashDirCache(String id) {
-	this(mkurn(id));
+	this(mkurn(id), "data");
     }
 
     private long namehash(long h, String name) {
