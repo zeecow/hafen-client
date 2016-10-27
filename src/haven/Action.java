@@ -7,6 +7,7 @@ public enum Action {
     TOGGLE_KIN_LIST(GameUI::toggleKinList, "Kith & Kin"),
     TOGGLE_OPTIONS(GameUI::toggleOptions, "Options"),
     TOGGLE_CHAT(GameUI::toggleChat, "Toggle Chat"),
+    TOGGLE_MAP(GameUI::toggleMap, "Toggle Map"),
     
     ACT_HAND_0(gui -> gui.eqproxy.activate(0), "Left hand", "Left click on left hand slot."),
     ACT_HAND_1(gui -> gui.eqproxy.activate(1), "Right hand", "Left click on right hand slot."),

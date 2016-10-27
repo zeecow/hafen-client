@@ -62,6 +62,7 @@ public class GameUI extends ConsoleHost implements Console.Directory {
     public Inventory maininv;
     public Equipory equipory;
     public CharWnd chrwdg;
+    public MapWnd mapfile;
     private Widget qqview;
     public BuddyWnd buddies;
     public EquipProxy eqproxy;
@@ -122,6 +123,7 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 	}
     }
     
+    private final Coord minimapc;
     public GameUI(String chrid, long plid) {
 	this.chrid = chrid;
 	this.plid = plid;
@@ -148,8 +150,10 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 			return(new Coord(GameUI.this.sz.x, Math.min(brpanel.c.y - 79, GameUI.this.sz.y - menupanel.sz.y)));
 		    }
 		}, new Coord(1, 0)));
-	blpanel.add(new Img(Resource.loadtex("gfx/hud/blframe")), 0, 9);
-	blpanel.add(new Img(Resource.loadtex("gfx/hud/lbtn-bg")), 0, 0);
+	Tex lbtnbg = Resource.loadtex("gfx/hud/lbtn-bg");
+	blpanel.add(new Img(Resource.loadtex("gfx/hud/blframe")), 0, lbtnbg.sz().y - 33);
+	blpanel.add(new Img(lbtnbg), 0, 0);
+	minimapc = new Coord(4, 34 + (lbtnbg.sz().y - 33));
 	menu = brpanel.add(new MenuGrid(), 20, 34);
 	brpanel.add(new Img(Resource.loadtex("gfx/hud/brframe")), 0, 0);
 	menupanel.add(new MainMenu(), 0, 0);
@@ -200,6 +204,7 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 			map.disol(4, 5);
 		}
 	    }, 0, 0);
+	blpanel.add(new MenuButton2("lbtn-map", "Map", TOGGLE_MAP, KeyEvent.VK_A, CTRL));
     }
 
     @Override
@@ -314,12 +319,17 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 		StringBuilder buf = new StringBuilder();
 		
 		public void write(char[] src, int off, int len) {
-		    buf.append(src, off, len);
-		    int p;
-		    while((p = buf.indexOf("\n")) >= 0) {
-			syslog.append(buf.substring(0, p), Color.WHITE);
-			buf.delete(0, p + 1);
+		    List<String> lines = new ArrayList<String>();
+		    synchronized(this) {
+			buf.append(src, off, len);
+			int p;
+			while((p = buf.indexOf("\n")) >= 0) {
+			    lines.add(buf.substring(0, p));
+			    buf.delete(0, p + 1);
+			}
 		    }
+		    for(String ln : lines)
+			syslog.append(ln, Color.WHITE);
 		}
 		
 		public void close() {}
@@ -421,6 +431,14 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 	    craftwnd = add(new CraftDBWnd());
 	} else {
 	    craftwnd.close();
+	}
+    }
+    
+    public void toggleMap() {
+	if((mapfile != null) && mapfile.show(!mapfile.visible)) {
+	    mapfile.raise();
+	    fitwdg(mapfile);
+	    setfocus(mapfile);
 	}
     }
 
@@ -674,7 +692,17 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 	    map.lower();
 	    if(mmap != null)
 		ui.destroy(mmap);
-	    mmap = new LocalMiniMap(new Coord(133, 133), map);
+	    if(mapfile != null) {
+		ui.destroy(mapfile);
+		mapfile = null;
+	    }
+	    mmap = blpanel.add(new LocalMiniMap(new Coord(133, 133), map), minimapc);
+	    mmap.lower();
+	    if(mmap.save != null) {
+		mapfile = new MapWnd(mmap.save, map, new Coord(700, 500), "Map");
+		mapfile.hide();
+		add(mapfile, 50, 50);
+	    }
 	    placemmap();
 	} else if(place == "fight") {
 	    fv = urpanel.add((Fightview)child, 0, 0);
@@ -800,7 +828,7 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 	    blpanel.hide();
 	} else {
 	    mmap.sz = new Coord(133, 133);
-	    blpanel.add(mmap, 4, 34 + 9);
+	    blpanel.add(mmap, minimapc);
 	    blpanel.show();
 	}
 	mmap.lower();
@@ -920,6 +948,13 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 		help = adda(new HelpWnd(res), 0.5, 0.5);
 	    else
 		help.res = res;
+	} else if(msg == "map-mark") {
+	    long gobid = ((Integer)args[0]) & 0xffffffff;
+	    long oid = (Long)args[1];
+	    Indir<Resource> res = ui.sess.getres((Integer)args[2]);
+	    String nm = (String)args[3];
+	    if(mapfile != null)
+		mapfile.markobj(gobid, oid, res, nm);
 	} else {
 	    super.uimsg(msg, args);
 	}
@@ -931,6 +966,10 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 	    return;
 	} else if((sender == chrwdg) && (msg == "close")) {
 	    chrwdg.hide();
+	    return;
+	} else if((sender == mapfile) && (msg == "close")) {
+	    mapfile.hide();
+	    return;
 	} else if((sender == help) && (msg == "close")) {
 	    ui.destroy(help);
 	    help = null;
@@ -1095,14 +1134,20 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 	Audio.play(msgsfx);
     }
 
+    private static final Resource errsfx = Resource.local().loadwait("sfx/error");
     public void error(String msg) {
 	msg(msg, MsgType.ERROR);
     }
 
     private static final Resource msgsfx = Resource.local().loadwait("sfx/msg");
+    private long lastmsgsfx = 0;
     public void msg(String msg) {
 	msg(msg, MsgType.INFO);
-	Audio.play(msgsfx);
+	long now = System.currentTimeMillis();
+	if(now - lastmsgsfx > 100) {
+	    Audio.play(msgsfx);
+	    lastmsgsfx = now;
+	}
     }
     
     public void msg(String msg, MsgType type) {

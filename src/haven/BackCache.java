@@ -26,53 +26,58 @@
 
 package haven;
 
-public class Frame extends Widget {
-    private final IBox box;
+import java.util.*;
+import java.util.function.*;
 
-    public Frame(Coord sz, boolean inner, IBox box) {
-	super(inner?sz.add(box.bisz()):sz);
-	this.box = box;
+public class BackCache<K, V> {
+    public final Function<K, V> load;
+    public final BiConsumer<K, V> store;
+    public final BiConsumer<K, V> dispose;
+    private final Map<K, V> cache;
+
+    public BackCache(int size, Function<K, V> load, BiConsumer<K, V> store, BiConsumer<K, V> dispose) {
+	this.load = load;
+	this.store = store;
+	this.dispose = dispose;
+	this.cache = new Cache(size);
     }
 
-    public Frame(Coord sz, boolean inner) {
-	this(sz, inner, Window.wbox);
+    public BackCache(int size, Function<K, V> load, BiConsumer<K, V> store) {
+	this(size, load, store, null);
     }
 
-    public static Frame around(Widget parent, Area area, IBox box) {
-	return(parent.add(new Frame(area.sz(), true, box),
-			  area.ul.sub(box.btloff())));
-    }
+    private class Cache extends LinkedHashMap<K, V> {
+	private final int size;
 
-    public static Frame around(Widget parent, Area area) {
-	return(around(parent, area, Window.wbox));
-    }
-
-    public static Frame around(Widget parent, Iterable<? extends Widget> wl) {
-	Widget f = Utils.el(wl);
-	Coord tl = new Coord(f.c), br = new Coord(f.c);
-	for(Widget wdg : wl) {
-	    Coord wbr = wdg.c.add(wdg.sz);
-	    if(wdg.c.x < tl.x) tl.x = wdg.c.x;
-	    if(wdg.c.y < tl.y) tl.y = wdg.c.y;
-	    if(wbr.x > br.x) br.x = wbr.x;
-	    if(wbr.y > br.y) br.y = wbr.y;
+	private Cache(int size) {
+	    super(size, 0.75f, true);
+	    this.size = size;
 	}
-	return(around(parent, new Area(tl, br)));
+
+	protected boolean removeEldestEntry(Map.Entry<K, V> eldest) {
+	    if(size() > size) {
+		if(dispose != null)
+		    dispose.accept(eldest.getKey(), eldest.getValue());
+		return(true);
+	    }
+	    return(false);
+	}
     }
 
-    public Coord inner() {
-	return(sz.sub(box.bisz()));
+    public boolean cached(K key) {
+	return(cache.containsKey(key));
     }
 
-    public Coord xlate(Coord c, boolean in) {
-	if(in)
-	    return(c.add(box.btloff()));
-	else
-	    return(c.sub(box.btloff()));
+    public V get(K key) {
+	if(cache.containsKey(key))
+	    return(cache.get(key));
+	V ret = load.apply(key);
+	cache.put(key, ret);
+	return(ret);
     }
 
-    public void draw(GOut g) {
-	super.draw(g);
-	box.draw(g, Coord.z, sz);
+    public void put(K key, V val) {
+	store.accept(key, val);
+	cache.put(key, val);
     }
 }

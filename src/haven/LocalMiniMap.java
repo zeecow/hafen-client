@@ -30,48 +30,44 @@ import static haven.MCache.cmaps;
 import static haven.MCache.tilesz;
 import haven.MCache.Grid;
 import java.awt.Color;
+import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.util.*;
 import haven.resutil.Ridges;
 
 public class LocalMiniMap extends Widget {
-    private static final Tex mapgrid = Resource.loadtex("gfx/hud/mmap/mapgrid");
-    public static final Coord VIEW_SZ = MCache.sgridsz.mul(9).div(tilesz);// view radius is 9x9 "server" grids
-    public static final Color VIEW_BG_COLOR = new Color(255, 255, 255, 60);
-    public static final Color VIEW_BORDER_COLOR = new Color(0, 0, 0, 128);
     public final MapView mv;
-    private String biome;
-    private Tex biometex = null;
-    private long session = 0;
-
+    public final MapFile save;
     private Coord cc = null;
-    private final Map<Coord, Defer.Future<MapTile>> cache = new LinkedHashMap<Coord, Defer.Future<MapTile>>(5, 0.75f, true) {
-	protected boolean removeEldestEntry(Map.Entry<Coord, Defer.Future<MapTile>> eldest) {
-	    if(size() > 100) {
-		    clearCacheTile(eldest.getValue());
-		    return(true);
+    private MapTile cur = null;
+    private final Map<Pair<Grid, Integer>, Defer.Future<MapTile>> cache = new LinkedHashMap<Pair<Grid, Integer>, Defer.Future<MapTile>>(5, 0.75f, true) {
+	protected boolean removeEldestEntry(Map.Entry<Pair<Grid, Integer>, Defer.Future<MapTile>> eldest) {
+	    if(size() > 5) {
+		try {
+		    MapTile t = eldest.getValue().get();
+		    t.img.dispose();
+		} catch(RuntimeException e) {
+		}
+		return(true);
 	    }
 	    return(false);
 	}
     };
-    private Coord off = new Coord (0,0);
-    private Coord doff = null;
     
     public static class MapTile {
 	public final Tex img;
-	public final Coord ul, c;
+	public final Coord ul;
 	public final Grid grid;
 	public final int seq;
 	
-	public MapTile(Tex img, Coord ul, Coord c, Grid grid, int seq) {
+	public MapTile(Tex img, Coord ul, Grid grid, int seq) {
 	    this.img = img;
 	    this.ul = ul;
-	    this.c = c;
 	    this.grid = grid;
 	    this.seq = seq;
 	}
     }
-
+    
     private BufferedImage tileimg(int t, BufferedImage[] texes) {
 	BufferedImage img = texes[t];
 	if(img == null) {
@@ -96,10 +92,10 @@ public class LocalMiniMap extends Widget {
 	    for(c.x = 0; c.x < sz.x; c.x++) {
 		int t = m.gettile(ul.add(c));
 		BufferedImage tex = tileimg(t, texes);
-		int rgb = 0xffffffff;
+		int rgb = 0;
 		if(tex != null)
 		    rgb = tex.getRGB(Utils.floormod(c.x + ul.x, tex.getWidth()),
-				     Utils.floormod(c.y + ul.y, tex.getHeight()));
+			Utils.floormod(c.y + ul.y, tex.getHeight()));
 		buf.setRGB(c.x, c.y, rgb);
 	    }
 	}
@@ -119,238 +115,139 @@ public class LocalMiniMap extends Widget {
 		}
 	    }
 	}
-	for(c.y = 1; c.y < sz.y-1; c.y++) {
-	    for(c.x = 1; c.x < sz.x-1; c.x++) {
+	for(c.y = 0; c.y < sz.y; c.y++) {
+	    for(c.x = 0; c.x < sz.x; c.x++) {
 		int t = m.gettile(ul.add(c));
 		if((m.gettile(ul.add(c).add(-1, 0)) > t) ||
-		   (m.gettile(ul.add(c).add( 1, 0)) > t) ||
-		   (m.gettile(ul.add(c).add(0, -1)) > t) ||
-		   (m.gettile(ul.add(c).add(0,  1)) > t))
+		    (m.gettile(ul.add(c).add( 1, 0)) > t) ||
+		    (m.gettile(ul.add(c).add(0, -1)) > t) ||
+		    (m.gettile(ul.add(c).add(0,  1)) > t))
 		    buf.setRGB(c.x, c.y, Color.BLACK.getRGB());
 	    }
 	}
 	return(buf);
     }
-
+    
     public LocalMiniMap(Coord sz, MapView mv) {
 	super(sz);
 	this.mv = mv;
+	if(ResCache.global != null) {
+	    save = MapFile.load(ResCache.global);
+	} else {
+	    save = null;
+	}
     }
     
     public Coord p2c(Coord pc) {
-	return(pc.div(tilesz).sub(cc.add(off)).add(sz.div(2)));
+	return(pc.div(tilesz).sub(cc).add(sz.div(2)));
     }
-
+    
     public Coord c2p(Coord c) {
-	return(c.sub(sz.div(2)).add(cc.add(off)).mul(tilesz).add(tilesz.div(2)));
+	return(c.sub(sz.div(2)).add(cc).mul(tilesz).add(tilesz.div(2)));
     }
-
+    
     public void drawicons(GOut g) {
-
-	synchronized (Radar.markers) {
-	    for (Radar.Marker marker : Radar.markers) {
-		if(marker.gob.id == mv.plgob){
-		    continue;
-		}
+	OCache oc = ui.sess.glob.oc;
+	synchronized(oc) {
+	    for(Gob gob : oc) {
 		try {
-		    Coord gc = p2c(marker.gob.rc);
-		    Tex tex = marker.tex();
-		    if(tex != null) {
-			g.chcolor(marker.color());
-			g.aimage(tex, gc, 0.5, 0.5);
-		    }
-		} catch (Loading ignored) {
-		}
-	    }
-	}
-	g.chcolor();
-    }
-
-    @Override
-    public Object tooltip(Coord c, Widget prev) {
-	Gob gob = findicongob(c);
-	if(gob != null) {
-	    Radar.Marker icon = gob.getattr(Radar.Marker.class);
-	    if(icon != null) {
-		return icon.tooltip(ui.modshift);
-	    }
-	}
-	return super.tooltip(c, prev);
-    }
-
-    public Gob findicongob(Coord c) {
-	synchronized (Radar.markers) {
-	    ListIterator<Radar.Marker> li = Radar.markers.listIterator(Radar.markers.size());
-	    while(li.hasPrevious()) {
-		Radar.Marker icon = li.previous();
-		try {
-		    Gob gob = icon.gob;
-		    if(gob.id == mv.plgob || gob.rc == null){
-			continue;
-		    }
-		    Tex tex = icon.tex();
-		    if(tex != null) {
+		    GobIcon icon = gob.getattr(GobIcon.class);
+		    if(icon != null) {
 			Coord gc = p2c(gob.rc);
-			Coord sz = tex.sz();
-			if(c.isect(gc.sub(sz.div(2)), sz))
-			    return (gob);
+			Tex tex = icon.tex();
+			g.image(tex, gc.sub(tex.sz().div(2)));
 		    }
-		} catch (Loading ignored) {}
+		} catch(Loading l) {}
+	    }
+	}
+    }
+    
+    public Gob findicongob(Coord c) {
+	OCache oc = ui.sess.glob.oc;
+	synchronized(oc) {
+	    for(Gob gob : oc) {
+		try {
+		    GobIcon icon = gob.getattr(GobIcon.class);
+		    if(icon != null) {
+			Coord gc = p2c(gob.rc);
+			Coord sz = icon.tex().sz();
+			if(c.isect(gc.sub(sz.div(2)), sz))
+			    return(gob);
+		    }
+		} catch(Loading l) {}
 	    }
 	}
 	return(null);
     }
-
+    
     public void tick(double dt) {
 	Gob pl = ui.sess.glob.oc.getgob(mv.plgob);
 	if(pl == null)
 	    this.cc = mv.cc.div(tilesz);
 	else
 	    this.cc = pl.rc.div(tilesz);
-
-	Coord mc = rootxlate(ui.mc);
-	if(mc.isect(Coord.z, sz)) {
-	    setBiome(c2p(mc).div(tilesz));
-	} else {
-	    setBiome(cc);
-	}
     }
-
-    private void setBiome(Coord c) {
-	try {
-	    if (c.div(cmaps).manhattan2(cc.div(cmaps)) > 1) {return;}
-	    int t = mv.ui.sess.glob.map.gettile(c);
-	    Resource r = ui.sess.glob.map.tilesetr(t);
-	    String newbiome;
-	    if(r != null) {
-		newbiome = (r.name);
-	    } else {
-		newbiome = "Void";
-	    }
-	    if(!newbiome.equals(biome)){
-		biome = newbiome;
-		biometex = Text.renderstroked(prettybiome(biome)).tex();
-	    }
-	}catch (Loading ignored){}
-    }
-
+    
     public void draw(GOut g) {
 	if(cc == null)
 	    return;
-	Coord plg = cc.div(cmaps);
-	try {
-	    if(MapDumper.session() != session) {
-		session = MapDumper.session();
-		clearCache();
+	map: {
+	    final Grid plg;
+	    try {
+		plg = ui.sess.glob.map.getgrid(cc.div(cmaps));
+	    } catch(Loading l) {
+		break map;
 	    }
-	} catch (Loading ignored) {}
-
-	Coord center = cc.add(off);
-	Coord hsz = sz.div(2);
-
-	Coord ulg = center.sub(hsz).div(cmaps);
-	Coord brg = center.add(hsz).div(cmaps);
-
-	Coord cur = new Coord();
-	for(cur.x = ulg.x; cur.x <= brg.x; cur.x++) {
-	    for(cur.y = ulg.y; cur.y <= brg.y; cur.y++) {
+	    final int seq = plg.seq;
+	    if((cur == null) || (plg != cur.grid) || (seq != cur.seq)) {
 		Defer.Future<MapTile> f;
-		synchronized (cache) {
-		    f = cache.get(cur);
-		    if (cur.manhattan2(plg) <= 1) {
-			final Grid grid;
-			try {
-			    grid = ui.sess.glob.map.getgrid(new Coord(cur));
-			} catch (Loading e) { continue; }
-			final int seq = grid.seq;
-			if (f == null || (f.done() && (f.get().grid.id != grid.id || f.get().seq != seq))) {
-			    final Coord tmp = new Coord(cur);
-			    f = Defer.later(new Defer.Callable<MapTile>() {
-				public MapTile call() {
-				    Coord ul = tmp.mul(cmaps);
-				    BufferedImage drawmap = drawmap(ul, cmaps);
-				    return (new MapTile(new TexI(drawmap), ul, tmp, grid, seq));
-				}
-			    });
-			    cache.put(tmp, f);
-			}
+		synchronized(cache) {
+		    f = cache.get(new Pair<Grid, Integer>(plg, seq));
+		    if(f == null) {
+			f = Defer.later(new Defer.Callable<MapTile> () {
+			    public MapTile call() {
+				Coord ul = plg.ul.sub(cmaps).add(1, 1);
+				return(new MapTile(new TexI(drawmap(ul, cmaps.mul(3).sub(2, 2))), ul, plg, seq));
+			    }
+			});
+			cache.put(new Pair<Grid, Integer>(plg, seq), f);
 		    }
 		}
-		if(f != null && f.done()){
-		    MapTile map = f.get();
-		    Coord tc = map.ul.sub(center).add(hsz);
-		    //g.image(MiniMap.bg, tc);
-		    g.image(map.img, tc);
-		    if(CFG.MMAP_GRID.get()) {
-			g.image(mapgrid, tc);
-		    }
-
+		if(f.done()) {
+		    cur = f.get();
+		    if(save != null)
+			save.update(ui.sess.glob.map, cur.grid.gc);
 		}
 	    }
 	}
-	if(CFG.MMAP_VIEW.get()) {
-	    Gob pl = ui.sess.glob.oc.getgob(mv.plgob);
-	    if(pl != null) {
-		Coord rc = p2c(pl.rc.div(MCache.sgridsz).sub(4, 4).mul(MCache.sgridsz));
-		g.chcolor(VIEW_BG_COLOR);
-		g.frect(rc, VIEW_SZ);
-		g.chcolor(VIEW_BORDER_COLOR);
-		g.rect(rc, VIEW_SZ);
-		g.chcolor();
-	    }
+	if(cur != null) {
+	    g.image(MiniMap.bg, Coord.z);
+	    g.image(cur.img, cur.ul.sub(cc).add(sz.div(2)));
+	    try {
+		synchronized(ui.sess.glob.party.memb) {
+		    for(Party.Member m : ui.sess.glob.party.memb.values()) {
+			Coord ptc;
+			try {
+			    ptc = m.getc();
+			} catch(MCache.LoadingMap e) {
+			    ptc = null;
+			}
+			if(ptc == null)
+			    continue;
+			ptc = p2c(ptc);
+			g.chcolor(m.col.getRed(), m.col.getGreen(), m.col.getBlue(), 255);
+			g.image(MiniMap.plx.layer(Resource.imgc).tex(), ptc.add(MiniMap.plx.layer(Resource.negc).cc.inv()));
+			g.chcolor();
+		    }
+		}
+	    } catch(Loading l) {}
+	} else {
+	    g.image(MiniMap.nomap, Coord.z);
 	}
 	drawicons(g);
-	try {
-	    synchronized (ui.sess.glob.party.memb) {
-		for (Party.Member m : ui.sess.glob.party.memb.values()) {
-		    Coord ptc;
-		    try {
-			ptc = m.getc();
-		    } catch (MCache.LoadingMap e) {
-			ptc = null;
-		    }
-		    if(ptc == null)
-			continue;
-		    ptc = p2c(ptc);
-		    g.chcolor(m.col);
-		    g.aimage(MiniMap.plx.layer(Resource.imgc).tex(), ptc, 0.5, 0.5);
-		    g.chcolor();
-		}
-	    }
-	} catch(Loading ignored) {}
-	if(CFG.MMAP_SHOW_BIOMES.get()) {
-	    Coord mc = rootxlate(ui.mc);
-	    if(mc.isect(Coord.z, sz)) {
-		setBiome(c2p(mc).div(tilesz));
-	    } else {
-		setBiome(cc);
-	    }
-	    if(biometex != null) {g.image(biometex, Coord.z);}
-	}
     }
-
-    private void clearCache() {
-	synchronized (cache){
-	    Collection<Defer.Future<MapTile>> tiles = cache.values();
-	    for(Defer.Future<MapTile> tile : tiles){
-		clearCacheTile(tile);
-	    }
-	    cache.clear();
-	}
-    }
-
-    private void clearCacheTile(Defer.Future<MapTile> tile) {
-	try {
-	    if(tile.done()){
-		MapTile t = tile.get();
-		t.img.dispose();
-	    } else {
-		tile.cancel();
-	    }
-	} catch (RuntimeException ignored) {}
-    }
-
-	public boolean mousedown(Coord c, int button) {
+    
+    public boolean mousedown(Coord c, int button) {
 	if(cc == null)
 	    return(false);
 	Gob gob = findicongob(c);
@@ -358,36 +255,6 @@ public class LocalMiniMap extends Widget {
 	    mv.wdgmsg("click", rootpos().add(c), c2p(c), button, ui.modflags());
 	else
 	    mv.wdgmsg("click", rootpos().add(c), c2p(c), button, ui.modflags(), 0, (int)gob.id, gob.rc, 0, -1);
-	if(button == 3){
-	    doff = c;
-	} else if(button == 2){
-	    off = new Coord();
-	}
 	return(true);
-    }
-
-
-    @Override
-    public void mousemove(Coord c) {
-	if(doff != null){
-	    off = off.add(doff.sub(c));
-	    doff = c;
-	}
-	super.mousemove(c);
-    }
-
-    @Override
-    public boolean mouseup(Coord c, int button) {
-	if(button == 3){
-	    doff = null;
-	}
-	return super.mouseup(c, button);
-    }
-
-    private static String prettybiome(String biome){
-	int k = biome.lastIndexOf("/");
-	biome = biome.substring(k+1);
-	biome = biome.substring(0,1).toUpperCase() + biome.substring(1);
-	return biome;
     }
 }
