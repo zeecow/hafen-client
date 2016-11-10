@@ -52,6 +52,7 @@ public class KeyBinder {
 	add(KeyEvent.VK_C, ALT, OPEN_QUICK_CRAFT);
 	add(KeyEvent.VK_B, ALT, OPEN_QUICK_BUILD);
 	add(KeyEvent.VK_A, ALT, OPEN_QUICK_ACTION);
+	add(KeyEvent.VK_X, ALT, OPEN_CRAFT_DB);
 	add(KeyEvent.VK_H, ALT, TOGGLE_CURSOR);
 	add(KeyEvent.VK_S, ALT, TOGGLE_STUDY);
 	add(KeyEvent.VK_F, ALT, FILTER);

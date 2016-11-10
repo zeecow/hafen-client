@@ -3,12 +3,16 @@ package haven;
 import haven.Glob.Pagina;
 
 import java.awt.*;
+import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
-import java.util.Collections;
-import java.util.LinkedList;
+import java.util.*;
 import java.util.List;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
-public class CraftDBWnd extends Window {
+import static haven.ItemFilter.*;
+
+public class CraftDBWnd extends Window implements DTarget2 {
     private static final int SZ = 20;
     private static final int PANEL_H = 24;
     private static final Coord WND_SZ = new Coord(635, 360 + PANEL_H);
@@ -23,6 +27,12 @@ public class CraftDBWnd extends Window {
     private ItemData data;
     private Resource resd;
     private Pagina senduse = null;
+    
+    private final List<Pagina> all = new LinkedList<>();
+    private final Pattern category = Pattern.compile("paginae/craft/.+");
+    private int pagseq = 0;
+    private boolean needfilter = false;
+    private final LineEdit filter = new LineEdit();
 
     public CraftDBWnd() {
 	super(WND_SZ.add(0, 5), "Craft window");
@@ -48,17 +58,27 @@ public class CraftDBWnd extends Window {
 		if(button == 1) {
 		    if(item == MenuGrid.bk) {
 			item = current;
-			if(getPaginaChildren(current, null).size() == 0) {
+			if(getPaginaChildren(current).size() == 0) {
 			    item = menu.getParent(item);
 			}
 			item = menu.getParent(item);
 		    }
-		    menu.use(item, false);
+		    if(filter.line.isEmpty() || !item.isAction()) {
+			menu.use(item, false);
+		    } else {
+		        select(item, true, true);
+		    }
 		}
 	    }
 	};
 	add(box, new Coord(0, PANEL_H + 5));
-	CRAFT = paginafor("paginae/act/craft");
+	addtwdg(add(new IButton("gfx/hud/btn-help", "","-d","-h"){
+	    @Override
+	    public void click() {
+		ItemFilter.showHelp(ui, HELP_SIMPLE, HELP_CURIO, HELP_FEP, HELP_ARMOR, HELP_SYMBEL, HELP_ATTR);
+	    }
+	}));
+	CRAFT = paginafor(Resource.local().load("paginae/act/craft"));
 	menu = ui.gui.menu;
 	breadcrumbs = add(new Breadcrumbs<Pagina>(new Coord(WND_SZ.x, SZ)) {
 	    @Override
@@ -88,45 +108,66 @@ public class CraftDBWnd extends Window {
     @Override
     public void wdgmsg(Widget sender, String msg, Object... args) {
 	if((sender == this) && msg.equals("close")) {
-	    if(makewnd != null) {
-		makewnd.wdgmsg("close");
-		makewnd = null;
-	    }
-	    ui.destroy(this);
-	    ui.gui.craftwnd = null;
+	    close();
 	    return;
 	}
 	super.wdgmsg(sender, msg, args);
     }
 
-    private List<Pagina> getPaginaChildren(Pagina parent, List<Pagina> buf) {
-	if(buf == null) {
-	    buf = new LinkedList<Pagina>();
+    public void close() {
+	if(makewnd != null) {
+	    makewnd.wdgmsg("close");
+	    makewnd = null;
 	}
-	menu.cons(parent, buf);
+	ui.destroy(this);
+	ui.gui.craftwnd = null;
+    }
+
+    private List<Pagina> getPaginaChildren(Pagina parent) {
+	List<Pagina> buf = new LinkedList<>();
+	if (parent != null) {
+	    menu.cons(parent, buf);
+	}
 	return buf;
     }
 
-    public void select(Pagina p, boolean senduse) {
-	if(!menu.isCrafting(p)) {
+    public void select(Pagina p, boolean use) {
+        select(p, use, false);
+    }
+    
+    public void select(Pagina p, boolean use, boolean skipReparent) {
+	boolean isBack = p == MenuGrid.bk;
+	if(!menu.isCrafting(p) && !isBack) {
 	    return;
 	}
 	if(box != null) {
-	    List<Pagina> children = getPaginaChildren(p, null);
-	    if(children.size() == 0) {
-		children = getPaginaChildren(menu.getParent(p), null);
-	    } else {
-		closemake();
+	    if(!p.isAction()){
+	        closemake();
 	    }
-	    Collections.sort(children, MenuGrid.sorter);
-	    if(p != CRAFT) {
-		children.add(0, MenuGrid.bk);
+	    if(!skipReparent) {
+		List<Pagina> children = getPaginaChildren(p);
+		if(children.size() == 0) {
+		    children = getPaginaChildren(menu.getParent(p));
+		}
+		children.sort(MenuGrid.sorter);
+		if(p != CRAFT) {
+		    children.add(0, MenuGrid.bk);
+		}
+	    	filter.setline("");
+		box.setitems(children);
 	    }
-	    box.setitems(children);
 	    box.change(p);
-	    setCurrent(p);
+	    if(isBack) {
+		p = null;
+		if(box.listitems() > 1) {
+		    p = menu.getParent(box.listitem(1).p);
+		}
+		setCurrent(p != null ? p : CRAFT);
+	    } else {
+		setCurrent(p);
+	    }
 	}
-	if(senduse) {
+	if(use && !isBack) {
 	    this.senduse = p;
 	}
     }
@@ -150,16 +191,15 @@ public class CraftDBWnd extends Window {
 	drawDescription(g);
     }
 
-    public void drawDescription(GOut g) {
+    private void drawDescription(GOut g) {
 	if(resd == null) {
 	    return;
 	}
 	if(description == null) {
 	    if(data != null) {
 		try {
-		    description = data.longtip(resd);
-		} catch (Resource.Loading ignored) {
-		}
+		    description = data.longtip(resd, ui.sess);
+		} catch (Loading ignored) {}
 	    } else {
 		description = MenuGrid.rendertt(resd, true, false, true).tex();
 	    }
@@ -176,24 +216,36 @@ public class CraftDBWnd extends Window {
     }
 
     private void updateBreadcrumbs(Pagina p) {
-	List<Breadcrumbs.Crumb<Pagina>> crumbs = new LinkedList<Breadcrumbs.Crumb<Pagina>>();
-	List<Pagina> parents = getParents(p);
-	Collections.reverse(parents);
-	for (Pagina item : parents) {
-	    BufferedImage img = item.res().layer(Resource.imgc).img;
-	    Resource.AButton act = item.act();
+	List<Breadcrumbs.Crumb<Pagina>> crumbs = new LinkedList<>();
+	if (filter.line.isEmpty()) {
+	    List<Pagina> parents = getParents(p);
+	    Collections.reverse(parents);
+	    for (Pagina item : parents) {
+		BufferedImage img = item.res().layer(Resource.imgc).img;
+		Resource.AButton act = item.act();
+		String name = "...";
+		if (act != null) {
+		    name = act.name;
+		}
+		crumbs.add(new Breadcrumbs.Crumb<>(img, name, item));
+	    }
+	} else {
+	    BufferedImage img = CRAFT.res().layer(Resource.imgc).img;
+	    Resource.AButton act = CRAFT.act();
 	    String name = "...";
-	    if(act != null) {
+	    if (act != null) {
 		name = act.name;
 	    }
-	    crumbs.add(new Breadcrumbs.Crumb<Pagina>(img, name, item));
+	    crumbs.add(new Breadcrumbs.Crumb<>(img, name, CRAFT));
+	    img = Resource.remote().loadwait("paginae/act/inspect").layer(Resource.imgc).img;
+	    crumbs.add(new Breadcrumbs.Crumb<>(img, filter.line, CRAFT));
 	}
 	breadcrumbs.setCrumbs(crumbs);
     }
 
     private List<Pagina> getParents(Pagina p) {
-	List<Pagina> list = new LinkedList<Pagina>();
-	if(getPaginaChildren(p, null).size() > 0) {
+	List<Pagina> list = new LinkedList<>();
+	if(getPaginaChildren(p).size() > 0) {
 	    list.add(p);
 	}
 	Pagina parent;
@@ -209,24 +261,165 @@ public class CraftDBWnd extends Window {
 	    description.dispose();
 	    description = null;
 	}
-
-	resd = p.res();
-	data = ItemData.get(resd.name);
+	if(p != null) {
+	    resd = p.res();
+	    data = ItemData.get(resd.name);
+	} else {
+	    resd = null;
+	    data = null;
+	}
     }
 
     public void setMakewindow(Widget widget) {
 	makewnd = add(widget, new Coord(box.c.x + box.sz.x + 10, box.c.y + box.sz.y - widget.sz.y));
     }
-
-    private Pagina paginafor(String name) {
-	Resource.Named res = Resource.local().load(name);
-	return paginafor(res);
-    }
-
+    
     private Pagina paginafor(Resource.Named res) {
 	return ui.sess.glob.paginafor(res);
     }
 
+    private void updateInfo(WItem item){
+	ItemData.actualize(item.item, current);
+	updateDescription(current);
+    }
+
+    @Override
+    public boolean drop(WItem target, Coord cc, Coord ul) {
+	updateInfo(target);
+	return true;
+    }
+
+    @Override
+    public boolean iteminteract(WItem target, Coord cc, Coord ul) {
+	updateInfo(target);
+	return true;
+    }
+    
+    @Override
+    public void tick(double dt) {
+	super.tick(dt);
+	
+	if(pagseq != ui.sess.glob.pagseq) {
+	    synchronized (ui.sess.glob.pmap) {
+		synchronized (all) {
+		    all.clear();
+		    all.addAll(
+			    ui.sess.glob.pmap.values().stream()
+				    .filter(p -> category.matcher(Pagina.name(p)).matches())
+				    .collect(Collectors.toList())
+		    );
+		    
+		    pagseq = ui.sess.glob.pagseq;
+		    needfilter();
+		}
+	    }
+	}
+	if(needfilter) {
+	    filter();
+	}
+    }
+    
+    private void needfilter() {
+	needfilter = true;
+    }
+    
+    private void filter() {
+	needfilter = false;
+	String filter = this.filter.line.toLowerCase();
+	if (filter.isEmpty()) {
+	    return;
+	}
+	ItemFilter itemFilter = ItemFilter.create(filter);
+	List<Pagina> filtered = new ArrayList<>();
+	synchronized (all) {
+	    for (Pagina p : all) {
+		try {
+		    Resource res = p.res.get();
+		    String name = res.layer(Resource.action).name.toLowerCase();
+		    ItemData data = ItemData.get(res.name);
+		    if(name.contains(filter) || itemFilter.matches(data, ui.sess)) {
+			filtered.add(p);
+		    }
+		} catch (Loading e) {
+		    needfilter = true;
+		}
+	    }
+	}
+	filtered.sort(new ItemComparator(filter));
+	box.setitems(filtered);
+	
+	if(filtered.isEmpty()) {
+	    if(!needfilter) {closemake();}
+	    box.change((Recipe) null);
+	    setCurrent(null);
+	} else {
+	    select(filtered.get(0), true, true);
+	}
+    }
+    
+    @Override
+    public boolean keydown(KeyEvent ev) {
+	if(ignoredKey(ev)) {
+	    return false;
+	}
+	switch (ev.getKeyCode()) {
+	    case KeyEvent.VK_DOWN:
+		select(box.listitem((box.selindex + 1) % box.listitems()).p, true, true);
+		return true;
+	    case KeyEvent.VK_UP:
+		select(box.listitem((Math.max(box.selindex, 0) - 1 + box.listitems()) % box.listitems()).p, true, true);
+		return true;
+	    case KeyEvent.VK_ENTER:
+		if(box.sel != null && !box.sel.p.isAction()) {
+		    box.itemclick(box.sel, 1);
+		}
+		return true;
+	}
+	
+	if (filter.key(ev)) {
+	    needfilter();
+	}
+	return true;
+    }
+    
+    @Override
+    public boolean type(char key, KeyEvent ev) {
+	if(key == 27) {
+	    if(!filter.line.isEmpty()) {
+		select(CRAFT, false);
+	    } else {
+		close();
+	    }
+	    return true;
+	}
+	
+	if(ignoredKey(ev)) {
+	    return false;
+	}
+	String before = filter.line;
+	if(filter.key(ev) && !before.equals(filter.line)) {
+	    needfilter();
+	    if(filter.line.isEmpty()) {
+		select(CRAFT, false);
+	    }
+	    return true;
+	}
+    
+	//return super.type(key, ev);
+	return true;
+    }
+    
+    private static boolean ignoredKey(KeyEvent ev){
+	int code = ev.getKeyCode();
+	int mods = ev.getModifiersEx();
+	//any modifier except SHIFT pressed alone is ignored, TAB is also ignored
+	return (mods != 0 && mods != KeyEvent.SHIFT_DOWN_MASK)
+	    || code == KeyEvent.VK_CONTROL
+	    || code == KeyEvent.VK_ALT
+	    || code == KeyEvent.VK_META
+	    || code == KeyEvent.VK_TAB;
+    }
+    
     private static class Recipe {
 	public final Pagina p;
 	private Tex tex = null;
@@ -281,12 +474,12 @@ public class CraftDBWnd extends Window {
 		return;
 	    }
 	    this.list = list;
-	    recipes = new LinkedList<Recipe>();
-	    for (Pagina p : list) {
-		recipes.add(new Recipe(p));
-	    }
+	    recipes = list.stream().map(Recipe::new).collect(Collectors.toList());
 	    sb.max = listitems() - h;
 	    sb.val = 0;
+	    if(!recipes.contains(sel)){
+	        selindex = -1;
+	    }
 	}
 
 	public void change(Pagina p) {
@@ -329,6 +522,31 @@ public class CraftDBWnd extends Window {
 	    if(tex != null) {
 		g.image(tex, Coord.z);
 	    }
+	}
+    }
+    
+    private static class ItemComparator implements Comparator<Pagina> {
+	private final String filter;
+	
+	public ItemComparator(String filter) {
+	    this.filter = filter;
+	}
+	
+	@Override
+	public int compare(Pagina a, Pagina b) {
+	    String an = a.act().name.toLowerCase();
+	    String bn = b.act().name.toLowerCase();
+	    if(filter != null && !filter.isEmpty()) {
+		boolean ai = an.startsWith(filter);
+		boolean bi = bn.startsWith(filter);
+		if(ai && !bi) {return -1;}
+		if(!ai && bi) {return 1;}
+	    }
+	    boolean ac = !a.isAction();
+	    boolean bc = !b.isAction();
+	    if(ac && !bc) {return -1;}
+	    if(!ac && bc) {return 1;}
+	    return an.compareTo(bn);
 	}
     }
 }

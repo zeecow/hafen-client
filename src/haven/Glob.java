@@ -40,7 +40,7 @@ public class Glob {
     public Party party;
     public final Set<Pagina> paginae = new HashSet<Pagina>();
     public int pagseq = 0;
-    public Map<Resource.Named, Pagina> pmap = new WeakHashMap<Resource.Named, Pagina>();
+    public final Map<Resource.Named, Pagina> pmap = new WeakHashMap<Resource.Named, Pagina>();
     public Map<String, CAttr> cattr = new HashMap<String, CAttr>();
     public Color lightamb = null, lightdif = null, lightspc = null;
     public Color olightamb = null, olightdif = null, olightspc = null;
@@ -69,7 +69,7 @@ public class Glob {
     }
 
     public static class CAttr extends Observable {
-	private static final Text.Foundry fnd = new Text.Foundry(Text.sans, 12);
+	public static final Text.Foundry fnd = new Text.Foundry(Text.sans, 12);
 	String nm;
 	int base, comp;
 	private Text.Line compLine = null;
@@ -162,6 +162,13 @@ public class Glob {
 	public void state(State st) {
 	    this.st = st;
 	    this.img = st.img(this);
+	}
+    
+	public boolean isAction() {
+	    Resource.AButton act = act();
+	    if(act == null) {return false;}
+	    String[] ad = act.ad;
+	    return ad != null && ad.length > 0;
 	}
 
 	public static String name(Pagina p) {

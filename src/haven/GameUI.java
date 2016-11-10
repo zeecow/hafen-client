@@ -29,7 +29,7 @@ package haven;
 import haven.rx.BuffToggles;
 import haven.rx.Reactor;
 
-import java.awt.*;
+import java.awt.Color;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 import java.awt.image.WritableRaster;
@@ -38,6 +38,7 @@ import java.util.List;
 
 import static haven.Action.*;
 import static haven.Inventory.*;
+import static haven.ItemFilter.*;
 import static haven.KeyBinder.*;
 
 public class GameUI extends ConsoleHost implements Console.Directory {
@@ -340,7 +341,13 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 
     public void toggleCraftList() {
 	if(craftlist == null){
-	    add(new ActWindow("Craft...", "paginae/craft/.+"));
+	    craftlist = add(new ActWindow("Craft...", "paginae/craft/.+"));
+	    craftlist.addtwdg(craftlist.add(new IButton("gfx/hud/btn-help", "","-d","-h"){
+		@Override
+		public void click() {
+		    ItemFilter.showHelp(ui, HELP_SIMPLE, HELP_CURIO, HELP_FEP, HELP_ARMOR, HELP_SYMBEL, HELP_ATTR);
+		}
+	    }));
 	} else if(craftlist.visible) {
 	    craftlist.hide();
 	} else {
@@ -350,7 +357,7 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 
     public void toggleBuildList() {
 	if(buildlist == null){
-	    add(new ActWindow("Build...", "paginae/bld/.+"));
+	    buildlist = add(new ActWindow("Build...", "paginae/bld/.+"));
 	} else if(buildlist.visible) {
 	    buildlist.hide();
 	} else {
@@ -360,7 +367,7 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 
     public void toggleActList() {
 	if(actlist == null){
-	    add(new ActWindow("Act...", "paginae/act/.+|paginae/pose/.+|paginae/gov/.+|paginae/add/.+"));
+	    actlist = add(new ActWindow("Act...", "paginae/act/.+|paginae/pose/.+|paginae/gov/.+|paginae/add/.+"));
 	} else if(actlist.visible) {
 	    actlist.hide();
 	} else {
@@ -406,13 +413,25 @@ public class GameUI extends ConsoleHost implements Console.Directory {
     }
     
     public void toggleChat() {
-	if(chat.targeth == 0) {
-	    chat.sresize(chat.savedh);
+	if(chat.visible && !chat.hasfocus) {
 	    setfocus(chat);
 	} else {
-	    chat.sresize(0);
+	    if(chat.targeth == 0) {
+		chat.sresize(chat.savedh);
+		setfocus(chat);
+	    } else {
+		chat.sresize(0);
+	    }
 	}
 	Utils.setprefb("chatvis", chat.targeth != 0);
+    }
+
+    public void toggleCraftDB() {
+	if(craftwnd == null) {
+	    craftwnd = add(new CraftDBWnd());
+	} else {
+	    craftwnd.close();
+	}
     }
     
     public void toggleMap() {
@@ -422,7 +441,7 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 	    setfocus(mapfile);
 	}
     }
-    
+
     public class Hidepanel extends Widget {
 	public final String id;
 	public final Coord g;
@@ -1049,18 +1068,6 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 	} else if(key == ' ') {
 	    toggleui();
 	    return(true);
-	} else if(key == 3) {
-	    if(chat.visible && !chat.hasfocus) {
-		setfocus(chat);
-	    } else {
-		if(chat.targeth == 0) {
-		    chat.sresize(chat.savedh);
-		    setfocus(chat);
-		} else {
-		    chat.sresize(0);
-		}
-	    }
-	    Utils.setprefb("chatvis", chat.targeth != 0);
 	} else if((key == 27) && (map != null) && !map.hasfocus) {
 	    setfocus(map);
 	    return(true);

@@ -6,19 +6,107 @@ import me.ender.Reflect;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class ItemFilter {
-    private static final Pattern q = Pattern.compile("(?:(\\w+))?(?:^|:)([\\w\\*]+)?(?:([<>=+~])(\\d+(?:\\.\\d+)?)?([<>=+~])?)?");
+    private static final Pattern q = Pattern.compile("(?:(\\w+))?(?:^|:)([\\w*]+)?(?:([<>=+~])(\\d+(?:\\.\\d+)?)?([<>=+~])?)?");
     private static final Pattern float_p = Pattern.compile("(\\d+(?:\\.\\d+)?)");
-
+    
+    public static final String HELP_SIMPLE = "$size[20]{$b{Simple search}}\n" +
+	"Just enter text and items with matching names will get highlighted\n";
+    
+    public static final String HELP_FULL_TEXT = "$size[20]{$b{Full text search}}\n" +
+	"$font[monospaced,16]{txt:[text]}\n" +
+	"Will search for $font[monospaced,13]{[text]} in any text field in item tooltip (currently only Name and Coinage)\n";
+    
+    public static final String HELP_CONTENT = "$size[20]{$b{Contents search}}\n" +
+	"$font[monospaced,16]{has:[txt][sign][value]}\n" +
+	"Will highlight all items that have $font[monospaced,13]{[txt]} in their contents in quantity specified by $font[monospaced,13]{[sign]} and $font[monospaced,13]{[value]}.\n" +
+	"$size[16]{\nExamples:}\n" +
+	"$font[monospaced,13]{  has:water    }will find items that have water in their Contents.\n" +
+	"$font[monospaced,13]{  has:water>2  }will find items that contain more than 2L of water.\n" +
+	"$font[monospaced,13]{  has:water+3  }will find items that contain at least 3L of water.\n" +
+	"$font[monospaced,13]{  has:water<10 }will find items that contain less than 10L of water.\n" +
+	"$font[monospaced,13]{  has:water=2  }will find items that contain exactly 2L of water.\n";
+    
+    public static final String HELP_QUALITY = "$size[20]{$b{Quality search}}\n" +
+	"$font[monospaced,16]{q:[type][sign][value][opt]}\n" +
+	"Will highlight items with quality type defined by $font[monospaced,13]{[type]} or $font[monospaced,13]{[opt]} with quality value specified by $font[monospaced,13]{[sign]} and $font[monospaced,13]{[value]}.\n" +
+	"$font[monospaced,13]{[type]} is type of quality ($font[monospaced,13]{min, max, average, essence, vitality, substance}). You can write type not fully ($font[monospaced,13]{ess} will match essence, for example). If you omit type, it will be detected by $font[monospaced,13]{[opt]} (> means max, < means min, = and ~ means average). If $font[monospaced,13]{[opt]} not present too - then type selected to display on item ($font[monospaced,13]{Options->Display->Show single quality as}) will be used.\n" +
+	"$font[monospaced,13]{[sign]} can be $font[monospaced,13]{>} (more), $font[monospaced,13]{+} (at least), $font[monospaced,13]{<} (less), $font[monospaced,13]{=} (exactly).\n" +
+	"$size[16]{\nExamples:}\n" +
+	"$font[monospaced,13]{  q:>5     }will find items with default quality higher than 5\n" +
+	"$font[monospaced,13]{  q:min<12 }will find items with minimum quality less than 12\n" +
+	"$font[monospaced,13]{  q:<15>   }will find items with maximum quality less than 15\n" +
+	"$font[monospaced,13]{  q:ess+21 }will find items with essence of at least 21\n";
+    
+    public static final String HELP_CURIO = "$size[20]{$b{Curiosity search}}\n" +
+	"Supports $font[monospaced,13]{xp} $font[monospaced,13]{lp} (learning point gained), (experience required) and $font[monospaced,13]{mw} (mental weight required) tags. They all interchangeable in the examples below.\n" +
+	"$size[16]{\nExamples:}\n" +
+	"$font[monospaced,13]{  lp:    }will find items that grant LP.\n" +
+	"$font[monospaced,13]{  lp>100 }will find items that grant more than 100 LP.\n" +
+	"$font[monospaced,13]{  lp+200 }will find items that grant at least 200 LP.\n" +
+	"$font[monospaced,13]{  lp<300 }will find items that grant less than 300 LP.\n" +
+	"$font[monospaced,13]{  lp=400 }will find items that grant exactly 400 LP.\n";
+    
+    public static final String HELP_FEP = "$size[20]{$b{FEP search}}\n" +
+	"$font[monospaced,16]{fep:[type][sign][value]}\n" +
+	"Will highlight items that grant FEPs of type $font[monospaced,13]{[type]} in quantity described by $font[monospaced,13]{[sign]} and $font[monospaced,13]{[value]}.\n" +
+	"$size[16]{\nExamples:}\n" +
+	"$font[monospaced,13]{  fep:str>1 }will find food giving more than 1 Strength FEPs.\n" +
+	"$font[monospaced,13]{  fep:agi+2 }will find food giving at least than 2 Agility FEPs.\n" +
+	"$font[monospaced,13]{  fep:cha<3 }will find food giving less than 3 Charisma FEPs.\n" +
+	"$font[monospaced,13]{  fep:dex=4 }will find food giving exactly 4 Dexterity FEPs.\n";
+    
+    public static final String HELP_ARMOR = "$size[20]{$b{Armor search}}\n" +
+	"$font[monospaced,16]{armor:[type][sign][value]}\n" +
+	"Will highlight items that grant armor of type $font[monospaced,13]{[type]} in quantity described by $font[monospaced,13]{[sign]} and $font[monospaced,13]{[value]}.\n" +
+	"Use $font[monospaced,13]{hard} or $font[monospaced,13]{deflect} type to denote hard (deflecting) armor.\n" +
+	"Use $font[monospaced,13]{soft} or $font[monospaced,13]{soak} type to denote soft (soaking) armor.\n" +
+	"Use $font[monospaced,13]{all}, $font[monospaced,13]{any}, $font[monospaced,13]{total}, $font[monospaced,13]{*} or leave empty to denote sum of soak and deflect.\n" +
+	"$font[monospaced,13]{[type]} can be entered partially.\n" +
+	"$size[16]{\nExamples:}\n" +
+	"$font[monospaced,13]{  armor:hard>1 }will find items providing more than 1 hard armor.\n" +
+	"$font[monospaced,13]{  armor:soft<2 }will find items providing less than 2 soft armor.\n" +
+	"$font[monospaced,13]{  armor:all=3  }will find items providing exactly 3 total armor.\n" +
+	"$font[monospaced,13]{  armor:>4     }will find items providing exactly 4 total armor.\n" +
+	"$font[monospaced,13]{  armor:h>5    }will find items providing more than 5 hard armor.\n";
+    
+    public static final String HELP_SYMBEL = "$size[20]{$b{Symbel search}}\n" +
+	    "$font[monospaced,16]{symb:[type][sign][value]}\n" +
+	    "Will highlight items that have symbel values defined by $font[monospaced,13]{[type]} in quantity described by $font[monospaced,13]{[sign]} and $font[monospaced,13]{[value]}.\n" +
+	    "Use $font[monospaced,13]{fep} type to denote fep bonus.\n" +
+	    "Use $font[monospaced,13]{hunger} type to denote hunger modifier.\n" +
+	    "$font[monospaced,13]{[type]} can be entered partially.\n" +
+	    "$size[16]{\nExamples:}\n" +
+	    "$font[monospaced,13]{  symb:          }will find all symbel items.\n" +
+	    "$font[monospaced,13]{  symb:fep>2     }will find items with more than 2% fep bonus.\n" +
+	    "$font[monospaced,13]{  symb:hunger<3  }will find items with less than 3% hunger reduction.\n" +
+	    "$font[monospaced,13]{  symb:h=5       }will find items with exactly 5% hunger reduction.\n";
+    
+    public static final String HELP_ATTR = "$size[20]{$b{Attribute search}}\n" +
+	"$font[monospaced,16]{attr:[type][sign][value]}\n" +
+	"Will highlight items (equipment or gilding items) that grant attribute or skill bonuses defined by $font[monospaced,13]{[type]} in amount described by $font[monospaced,13]{[sign]} and $font[monospaced,13]{[value]}.\n" +
+	"$font[monospaced,13]{[type]} can be any attribute/skill name from character sheet and can be entered partially.\n" +
+	"$size[16]{\nExamples:}\n" +
+	"$font[monospaced,13]{  attr:survival }will find all items that grant survival.\n" +
+	"$font[monospaced,13]{  attr:str>2    }will find items granting more than 2 str bonus.\n" +
+	"$font[monospaced,13]{  attr:agi<0    }will find items giving agility penalty.\n";
+    
+    public static final String[] FILTER_HELP = {HELP_SIMPLE, HELP_FULL_TEXT, HELP_CONTENT, HELP_QUALITY, HELP_CURIO, HELP_FEP, HELP_ARMOR, HELP_SYMBEL, HELP_ATTR};
+    
     public boolean matches(List<ItemInfo> info) {
 	for (ItemInfo item : info) {
 	    if(match(item)) {return true;}
 	}
 	return match(new QualityList(info));
 
+    }
+    
+    final public boolean matches(ItemData data, Session sess) {
+	return data != null && matches(data.iteminfo(sess));
     }
 
     protected boolean match(ItemInfo item) { return false; }
@@ -51,6 +139,10 @@ public class ItemFilter {
 			tag = "q";
 			text = "single";
 			break;
+		    case "armor":
+		        tag = text;
+		        text = "all";
+		        break;
 		}
 	    }
 	    if(tag == null) {
@@ -74,6 +166,17 @@ public class ItemFilter {
 			break;
 		    case "fep":
 			filter = new FEP(text, sign, value, opt);
+			break;
+		    case "armor":
+			filter = new Armor(text, sign, value, opt);
+			break;
+		    case "gast":
+		    case "symb":
+			filter = new Gastronomy(text, sign, value, opt);
+			break;
+		    case "attr":
+			filter = new Attribute(text, sign, value, opt);
+			break;
 		}
 	    }
 	    if(filter != null) {
@@ -82,9 +185,21 @@ public class ItemFilter {
 	}
 	return result;
     }
-
+    
+    public static void showHelp(UI ui, String ...blocks) {
+	Window log = ui.root.add(new Window(new Coord(50, 50), "Filter Help"), new Coord(100, 50));
+	log.justclose = true;
+	Textlog txt = log.add(new Textlog(new Coord(450, 500)));
+	txt.quote = false;
+	txt.maxLines = -1;
+	log.pack();
+	txt.append(String.join("\n", blocks));
+	txt.append(" ");
+	txt.setprog(0);
+    }
+    
     public static class Compound extends ItemFilter {
-	List<ItemFilter> filters = new LinkedList<ItemFilter>();
+	List<ItemFilter> filters = new LinkedList<>();
 
 	@Override
 	public boolean matches(List<ItemInfo> info) {
@@ -121,7 +236,11 @@ public class ItemFilter {
 	    all = text.equals("*") || text.equals("all");
 	    any = text.equals("any");
 	}
-
+    
+	protected boolean test(double actual) {
+	    return test(actual, value);
+	}
+	
 	protected boolean test(double actual, double target) {
 	    switch (sign) {
 		case GREATER:
@@ -133,7 +252,7 @@ public class ItemFilter {
 		case GREQUAL:
 		    return actual >= target;
 		default:
-		    return actual > 0;
+		    return actual != 0;
 	    }
 	}
 
@@ -171,9 +290,14 @@ public class ItemFilter {
 
 	@Override
 	protected boolean match(ItemInfo item) {
-	    String name = this.name(((ItemInfo.Contents) item).sub).toLowerCase();
-	    float num = count(name);
-	    return name.contains(text) && test(num, value);
+	    if(item instanceof ItemInfo.Contents) {
+		String name = this.name(((ItemInfo.Contents) item).sub);
+		if(name != null) {
+		    name = name.toLowerCase();
+		    return name.contains(text) && test(count(name));
+		}
+	    }
+	    return false;
 	}
 
 	@Override
@@ -195,14 +319,8 @@ public class ItemFilter {
 	}
 
 	private String name(List<ItemInfo> sub) {
-	    String txt = null;
-	    for (ItemInfo subInfo : sub) {
-		if(subInfo instanceof ItemInfo.Name) {
-		    ItemInfo.Name name = (ItemInfo.Name) subInfo;
-		    txt = name.str.text;
-		}
-	    }
-	    return txt;
+	    ItemInfo.Name name = ItemInfo.find(ItemInfo.Name.class, sub);
+	    return name != null ? name.str.text : null;
 	}
     }
 
@@ -246,11 +364,11 @@ public class ItemFilter {
 	    if(item instanceof Curiosity) {
 		Curiosity curio = (Curiosity) item;
 		if("lp".equals(text)) {
-		    return test(curio.exp, value);
+		    return test(curio.exp);
 		} else if("xp".equals(text)) {
-		    return test(curio.enc, value);
+		    return test(curio.enc);
 		} else if("mw".equals(text)) {
-		    return test(curio.mw, value);
+		    return test(curio.mw);
 		}
 	    }
 	    return false;
@@ -282,9 +400,9 @@ public class ItemFilter {
 	    }
 
 	    if(type == null) {
-		return test(quality.single().value, value);
+		return test(quality.single().value);
 	    } else {
-		return test(quality.single(type).value, value);
+		return test(quality.single(type).value);
 	    }
 	}
 
@@ -325,7 +443,7 @@ public class ItemFilter {
 		if(text != null && text.length() >= 3) {
 		    for (FoodInfo.Event event : fep.evs) {
 			if(event.ev.nm.toLowerCase().startsWith(text)) {
-			    return test(event.a, value);
+			    return test(event.a);
 			}
 		    }
 		} else {
@@ -333,6 +451,104 @@ public class ItemFilter {
 		}
 	    }
 
+	    return false;
+	}
+    }
+    
+    private static class Armor extends Complex {
+	private static String[] hard = {"hard", "deflect"};
+	private static String[] soft = {"soft", "soak"};
+	private static String[] all = {"all", "any", "total", "*"};
+	
+	private Armor(String text, String sign, String value, String opts) {
+	    super(text, sign, value, opts);
+	}
+	
+	@Override
+	public boolean matches(List<ItemInfo> info) {
+	    Pair<Integer, Integer> armor = ItemInfo.getArmor(info);
+	    if(armor != null) {
+		int type = -1;//no match
+		if(text.isEmpty()) {
+		    type = 0;//all
+		} else {
+		    for (String tmp : all) {
+			if(tmp.startsWith(text)) {
+			    type = 0;//all
+			    break;
+			}
+		    }
+		    if(type == -1) {
+			for (String tmp : hard) {
+			    if(tmp.startsWith(text)) {
+				type = 1;//hard
+				break;
+			    }
+			}
+		    }
+		    if(type == -1) {
+			for (String tmp : soft) {
+			    if(tmp.startsWith(text)) {
+				type = 2;//soft
+				break;
+			    }
+			}
+		    }
+		}
+		switch (type) {
+		    case 0://all
+			return test(armor.a + armor.b);
+		    case 1://hard
+			return test(armor.a);
+		    case 2://soft
+			return test(armor.b);
+		    default:
+			return false;
+		}
+	    }
+	    return false;
+	}
+    }
+    
+    private static class Gastronomy extends Complex {
+	
+	public Gastronomy(String text, String sign, String value, String opts) {
+	    super(text, sign, value, opts);
+	}
+	
+	@Override
+	protected boolean match(ItemInfo item) {
+	    if(Reflect.is(item, "Gast")) {
+		if(text.isEmpty()) {
+		    return true;
+		}
+		if("fep".startsWith(text)) {
+		    return test(Utils.round(100D * Reflect.getFieldValueDouble(item, "fev"), 1));
+		}
+		if("hunger".startsWith(text)) {
+		    return test(Utils.round(100D * Reflect.getFieldValueDouble(item, "glut"), 1));
+		}
+	    }
+	    return false;
+	}
+    }
+    
+    private static class Attribute extends Complex {
+	
+	public Attribute(String text, String sign, String value, String opts) {
+	    super(text, sign, value, opts);
+	}
+	
+	@Override
+	public boolean matches(List<ItemInfo> info) {
+	    Map<Resource, Integer> bonuses = ItemInfo.getBonuses(info);
+	    if(text != null && text.length() >= 3) {
+		for (Resource res : bonuses.keySet()) {
+		    if(res.layer(Resource.tooltip).t.toLowerCase().startsWith(text)) {
+			return test(bonuses.get(res));
+		    }
+		}
+	    }
 	    return false;
 	}
     }

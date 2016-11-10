@@ -205,8 +205,13 @@ public class Session {
 	}
     }
 
-    private void cacheres(String resname){
-	cachedres(--localCacheId).set(Resource.local().loadwait(resname));
+    private int cacheres(String resname){
+	return cacheres(Resource.local().loadwait(resname));
+    }
+    
+    private int cacheres(Resource res){
+	cachedres(--localCacheId).set(res);
+	return localCacheId;
     }
 
     public Indir<Resource> getres(int id) {
@@ -224,6 +229,14 @@ public class Session {
 	    }
 	}
 	return -1;
+    }
+    
+    public int getresidf(Resource res) {
+	int id = getresid(res);
+	if(id == -1) {
+	    id = cacheres(res);
+	}
+	return id;
     }
 
     private class ObjAck {

@@ -1266,7 +1266,7 @@ public class Utils {
 	return(new MapBuilder<K, V>(new HashMap<K, V>()));
     }
 
-    public static final Comparator<Object> idcmd = new Comparator<Object>() {
+    public static final Comparator idcmd = new Comparator() {
 	int eid = 0;
 	final Map<Ref, Long> emerg = new HashMap<Ref, Long>();
 	final ReferenceQueue<Object> cleanq = new ReferenceQueue<Object>();
@@ -1399,6 +1399,11 @@ public class Utils {
 	} else {
 	    return target & ~(1 << index);
 	}
+    }
+    
+    public static double round(double a, int order){
+	double o = Math.pow(10, order);
+	return Math.round(o * a) / o;
     }
 
     static {

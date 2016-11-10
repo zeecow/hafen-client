@@ -42,9 +42,33 @@ public abstract class ItemInfo {
     static final Pattern count_pattern = Pattern.compile("(?:^|[\\s])([0-9]*\\.?[0-9]+\\s*%?)");
     public final Owner owner;
     
+    public static ItemInfo make(Session sess, String resname, Object ...args) {
+	Resource res = Resource.remote().load(resname).get();
+	InfoFactory f = res.layer(Resource.CodeEntry.class).get(InfoFactory.class);
+	return f.build(new SessOwner(sess), args);
+    }
+    
     public interface Owner {
 	Glob glob();
 	List<ItemInfo> info();
+    }
+    
+    private static class SessOwner implements ItemInfo.Owner{
+	private final Glob glob;
+	
+	public SessOwner(Session sess){
+	    glob = sess.glob;
+	}
+	
+	@Override
+	public Glob glob() {
+	    return glob;
+	}
+	
+	@Override
+	public List<ItemInfo> info() {
+	    return null;
+	}
     }
     
     public interface ResOwner extends Owner {
@@ -363,6 +387,7 @@ public abstract class ItemInfo {
     @SuppressWarnings("unchecked")
     public static Map<Resource, Integer> getBonuses(List<ItemInfo> infos) {
 	List<ItemInfo> slotInfos = ItemInfo.findall("ISlots", infos);
+	List<ItemInfo> gilding = ItemInfo.findall("Slotted", infos);
 	Map<Resource, Integer> bonuses = new HashMap<>();
 	try {
 	    for (ItemInfo islots : slotInfos) {
@@ -370,6 +395,10 @@ public abstract class ItemInfo {
 		for (Object slot : slots) {
 		    parseAttrMods(bonuses, (List) Reflect.getFieldValue(slot, "info"));
 		}
+	    }
+	    for (ItemInfo info : gilding) {
+		List<Object> slots = (List<Object>) Reflect.getFieldValue(info, "sub");
+		parseAttrMods(bonuses, slots);
 	    }
 	    parseAttrMods(bonuses, ItemInfo.findall("haven.res.ui.tt.attrmod.AttrMod", infos));
 	} catch (Exception ignored) {}
@@ -383,7 +412,7 @@ public abstract class ItemInfo {
 
 
     @SuppressWarnings("unchecked")
-    private static void parseAttrMods(Map<Resource, Integer> bonuses, List infos) {
+    public static void parseAttrMods(Map<Resource, Integer> bonuses, List infos) {
 	for (Object inf : infos) {
 	    List<Object> mods = (List<Object>) Reflect.getFieldValue(inf, "mods");
 	    for (Object mod : mods) {

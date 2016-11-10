@@ -26,16 +26,19 @@
 
 package haven;
 
-import static haven.MCache.tilesz;
 import haven.GLProgram.VarID;
 import me.kt.GridOutline;
 
-import java.awt.Color;
+import javax.media.opengl.GL;
+import java.awt.*;
 import java.awt.event.KeyEvent;
+import java.lang.ref.Reference;
+import java.lang.ref.WeakReference;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.*;
-import java.lang.ref.*;
-import java.lang.reflect.*;
-import javax.media.opengl.*;
+
+import static haven.MCache.*;
 
 public class MapView extends PView implements DTarget, Console.Directory {
     public static boolean clickdb = false;
@@ -54,10 +57,10 @@ public class MapView extends PView implements DTarget, Console.Directory {
     private Coord3f camoff = new Coord3f(Coord3f.o);
     public double shake = 0.0;
     private static final Map<String, Class<? extends Camera>> camtypes = new HashMap<String, Class<? extends Camera>>();
+    private long mapupdate = 0;
 
     private boolean showgrid;
     private GridOutline gridol;
-    private Coord lasttc = Coord.z;
 
     public interface Delayed {
 	public void run(GOut g);
@@ -1268,14 +1271,12 @@ public class MapView extends PView implements DTarget, Console.Directory {
 	    partydraw(g);
 	    glob.map.reqarea(cc.div(tilesz).sub(MCache.cutsz.mul(view + 1)),
 			     cc.div(tilesz).add(MCache.cutsz.mul(view + 1)));
-        // change grid overlay position when player moves by 20 tiles
-        if (showgrid) {
-            Coord tc = cc.div(MCache.tilesz);
-            if (tc.manhattan2(lasttc) > 20) {
-                lasttc = tc;
-                gridol.update(tc.sub(MCache.cutsz.mul(view + 1)));
-            }
-        }
+	    
+	    if(mapupdate != glob.map.lastupdate) {
+		mapupdate = glob.map.lastupdate;
+		updategrid();
+	    }
+	    
 	} catch(Loading e) {
 	    lastload = e;
 	    String text = e.getMessage();
@@ -1868,11 +1869,14 @@ public class MapView extends PView implements DTarget, Console.Directory {
 
     public void togglegrid() {
         showgrid = !showgrid;
-        if (showgrid) {
-            Coord tc = cc.div(tilesz);
-            lasttc = tc.div(MCache.cmaps);
-            gridol.update(tc.sub(MCache.cutsz.mul(view + 1)));
-        }
+        updategrid();
+    }
+    
+    public void updategrid(){
+        if(showgrid) {
+	    Coord tc = cc.div(tilesz);
+	    gridol.update(tc.sub(cutsz.mul(view + 1)));
+	}
     }
 
 }

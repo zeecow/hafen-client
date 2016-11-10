@@ -49,6 +49,7 @@ public class MCache {
     Session sess;
     Set<Overlay> ols = new HashSet<Overlay>();
     public int olseq = 0;
+    public long lastupdate = 0;
     Map<Integer, Defrag> fragbufs = new TreeMap<Integer, Defrag>();
 
     public static class LoadingMap extends Loading {
@@ -471,10 +472,12 @@ public class MCache {
 	if(CFG.STORE_MAP.get() && g != null) {
 	    MapDumper.dump(this, g);
 	}
+	lastupdate = System.currentTimeMillis();
     }
 
     public void mapdata(Message msg) {
 	long now = System.currentTimeMillis();
+	lastupdate = now;
 	int pktid = msg.int32();
 	int off = msg.uint16();
 	int len = msg.uint16();

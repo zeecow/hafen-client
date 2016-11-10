@@ -89,7 +89,7 @@ public class AttrBonusesWdg extends Widget implements ItemInfo.Owner {
     private void doUpdate() {
 	try {
 	    bonuses = Arrays.stream(items)
-		.filter(wItem -> wItem != null)
+		.filter(Objects::nonNull)
 		.map(wItem -> wItem.item)
 		.distinct()
 		.map(GItem::info)

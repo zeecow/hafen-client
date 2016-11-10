@@ -80,7 +80,28 @@ public class ActWindow extends GameUI.Hidewnd {
 	super.lostfocus();
 	hide();
     }
-
+    
+    @Override
+    public boolean type(char key, KeyEvent ev) {
+	return !ignoredKey(ev) && super.type(key, ev);
+    }
+    
+    @Override
+    public boolean keydown(KeyEvent ev) {
+	return !ignoredKey(ev) && super.keydown(ev);
+    }
+    
+    private static boolean ignoredKey(KeyEvent ev){
+	int code = ev.getKeyCode();
+	int mods = ev.getModifiersEx();
+	//any modifier except SHIFT pressed alone is ignored, TAB is also ignored
+	return (mods != 0 && mods != KeyEvent.SHIFT_DOWN_MASK)
+	    || code == KeyEvent.VK_CONTROL
+	    || code == KeyEvent.VK_ALT
+	    || code == KeyEvent.VK_META
+	    || code == KeyEvent.VK_TAB;
+    }
+    
     private void needfilter() {
 	needfilter = true;
     }
@@ -90,11 +111,13 @@ public class ActWindow extends GameUI.Hidewnd {
 	String filter = this.filter.text.toLowerCase();
 	synchronized (all) {
 	    filtered.clear();
+	    ItemFilter itemFilter = ItemFilter.create(filter);
 	    for (Pagina p : all) {
 		try {
 		    Resource res = p.res.get();
 		    String name = res.layer(Resource.action).name.toLowerCase();
-		    if(name.contains(filter)) {
+		    ItemData data = ItemData.get(res.name);
+		    if(name.contains(filter) || itemFilter.matches(data, ui.sess)) {
 			filtered.add(p);
 		    }
 		} catch (Loading e) {
@@ -102,9 +125,12 @@ public class ActWindow extends GameUI.Hidewnd {
 		}
 	    }
 	}
-	filtered.sort(new ItemComparator());
+	filtered.sort(new ItemComparator(filter));
 	if(filtered.listitems() > 0) {
-	    filtered.change(Math.min(filtered.selindex, filtered.listitems() - 1));
+	    filtered.change(filtered.sel);
+	    if(filtered.selindex == -1) {
+		filtered.change(0);
+	    }
 	    filtered.sb.val = 0;
 	    filtered.showsel();
 	}
@@ -134,10 +160,15 @@ public class ActWindow extends GameUI.Hidewnd {
 	}
     }
 
-    private class ItemComparator implements Comparator<ActList.ActItem> {
+    public static class ItemComparator implements Comparator<ActList.ActItem> {
+	private final String filter;
+    
+	public ItemComparator(String filter){
+	    this.filter = filter;
+	}
+	
 	@Override
 	public int compare(ActList.ActItem a, ActList.ActItem b) {
-	    String filter = ActWindow.this.filter.text.toLowerCase();
 	    if(!filter.isEmpty()) {
 		boolean ai = a.name.text.toLowerCase().startsWith(filter);
 		boolean bi = b.name.text.toLowerCase().startsWith(filter);

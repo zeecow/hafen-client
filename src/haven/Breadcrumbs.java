@@ -58,8 +58,10 @@ public abstract class Breadcrumbs<T> extends Widget {
 
 	    BufferedImage up = TexI.mkbuf(isz);
 	    Graphics g = up.getGraphics();
-	    item.img = PUtils.convolvedown(item.img, SZ, CharWnd.iconfilter);
-	    g.drawImage(item.img, border.x, border.y, SZ.x, SZ.y,null);
+	    if(item.img != null) {
+		item.img = PUtils.convolvedown(item.img, SZ, CharWnd.iconfilter);
+		g.drawImage(item.img, border.x, border.y, SZ.x, SZ.y, null);
+	    }
 	    g.drawImage(txt, SZ.x+border.x*2, ty, null);
 
 	    BufferedImage down = highlight(up, new Color(0x44EFE40A, true));

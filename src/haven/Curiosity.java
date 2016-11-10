@@ -26,8 +26,9 @@
 
 package haven;
 
-import java.awt.Graphics;
 import java.awt.image.BufferedImage;
+
+import static haven.QualityList.SingleType.*;
 
 public class Curiosity extends ItemInfo.Tip {
     public final int exp, mw, enc;
@@ -45,5 +46,20 @@ public class Curiosity extends ItemInfo.Tip {
 	if(enc > 0)
 	    buf.append(String.format("Experience cost: $col[255,255,192]{%d}\n", enc));
 	return(RichText.render(buf.toString(), 0).img);
+    }
+
+    public static class Data implements ItemData.ITipData {
+	public final int lp, weight, xp;
+
+	public Data(Curiosity ii, QualityList q) {
+	    lp = (int) Math.round(ii.exp / q.single(Average).multiplier);
+	    weight = ii.mw;
+	    xp = ii.enc;
+	}
+
+	@Override
+	public ItemInfo create(Session sess) {
+	    return new Curiosity(null, lp, weight, xp);
+	}
     }
 }
