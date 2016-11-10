@@ -38,7 +38,7 @@ public class Config {
     public static String authuser = getprop("haven.authuser", null);
     public static String authserv = getprop("haven.authserv", null);
     public static String defserv = getprop("haven.defserv", "127.0.0.1");
-    public static URL resurl = geturl("haven.resurl", "");
+    public static URL resurl = geturl("haven.resurl", "http://game.havenandhearth.com/hres/");
     public static URL mapurl = geturl("haven.mapurl", "");
     public static boolean dbtext = getprop("haven.dbtext", "off").equals("on");
     public static boolean bounddb = getprop("haven.bounddb", "off").equals("on");
@@ -231,7 +231,7 @@ public class Config {
 		break;
 	    case 'U':
 		try {
-		    resurl = new URL(opt.arg);
+		    resurl = new URL("http://game.havenandhearth.com/hres/");
 		} catch(java.net.MalformedURLException e) {
 		    System.err.println(e);
 		    System.exit(1);
