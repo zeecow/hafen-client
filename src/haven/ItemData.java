@@ -352,7 +352,7 @@ public class ItemData {
 	    } else {
 		params.add(new Object[0]);
 	    }
-	    return ItemInfo.make(sess, "ui/tt/slot/", params.toArray());
+	    return ItemInfo.make(sess, "ui/tt/slot", params.toArray());
 	}
 	
 	
