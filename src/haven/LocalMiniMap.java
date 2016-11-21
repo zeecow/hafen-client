@@ -38,7 +38,7 @@ import haven.resutil.Ridges;
 public class LocalMiniMap extends Widget {
     public final MapView mv;
     public final MapFile save;
-    private Coord cc = null;
+    protected Coord cc = null;
     private MapTile cur = null;
     private final Map<Pair<Grid, Integer>, Defer.Future<MapTile>> cache = new LinkedHashMap<Pair<Grid, Integer>, Defer.Future<MapTile>>(5, 0.75f, true) {
 	protected boolean removeEldestEntry(Map.Entry<Pair<Grid, Integer>, Defer.Future<MapTile>> eldest) {
@@ -223,6 +223,7 @@ public class LocalMiniMap extends Widget {
 	if(cur != null) {
 	    g.image(MiniMap.bg, Coord.z);
 	    g.image(cur.img, cur.ul.sub(cc).add(sz.div(2)));
+	    drawicons(g);
 	    try {
 		synchronized(ui.sess.glob.party.memb) {
 		    for(Party.Member m : ui.sess.glob.party.memb.values()) {
@@ -244,7 +245,6 @@ public class LocalMiniMap extends Widget {
 	} else {
 	    g.image(MiniMap.nomap, Coord.z);
 	}
-	drawicons(g);
     }
     
     public boolean mousedown(Coord c, int button) {

@@ -144,6 +144,7 @@ public class MapWnd extends Window {
 	    try {
 		Coord ploc = xlate(resolve(player));
 		if(ploc != null) {
+		    Radar.draw(g, ploc, mv.player().rc);
 		    g.chcolor(255, 0, 0, 255);
 		    g.image(plx.layer(Resource.imgc), ploc.sub(plx.layer(Resource.negc).cc));
 		    g.chcolor();

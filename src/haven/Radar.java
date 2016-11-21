@@ -6,6 +6,8 @@ import java.awt.*;
 import java.util.*;
 import java.util.List;
 
+import static haven.MCache.*;
+
 public class Radar {
     public static final List<Marker> markers = new LinkedList<>();
     public static final List<Queued> queue = new LinkedList<>();
@@ -19,28 +21,29 @@ public class Radar {
     };
     private static long lastsort = 0;
     private static boolean needSorting = false;
-
+    
     public static void add(Gob gob, Indir<Resource> res) {
 	if(gob.getattr(Marker.class) == null) {
-	    synchronized(queue) {
+	    synchronized (queue) {
 		queue.add(new Queued(gob, res));
 	    }
 	}
     }
-
+    
     public static void add(Gob gob) {
 	Indir<Resource> res = gob.getires();
 	if(res != null) {
 	    add(gob, res);
 	}
     }
-
+    
     private static MarkerCFG cfg(String resname) {
 	MarkerCFG result = cfg_cache.get(resname);
 	if(result == null) {
 	    result = DEFAULT;
-	    outer:for(RadarCFG.Group group : RadarCFG.groups) {
-		for(MarkerCFG cfg : group.markerCFGs) {
+	    outer:
+	    for (RadarCFG.Group group : RadarCFG.groups) {
+		for (MarkerCFG cfg : group.markerCFGs) {
 		    if(cfg.match(resname)) {
 			result = cfg;
 			break outer;
@@ -51,11 +54,11 @@ public class Radar {
 	}
 	return result;
     }
-
+    
     public static void tick() {
-	synchronized(queue) {
+	synchronized (queue) {
 	    Iterator<Queued> iterator = queue.iterator();
-	    while(iterator.hasNext()) {
+	    while (iterator.hasNext()) {
 		Queued queued = iterator.next();
 		if(queued.ready()) {
 		    String resname = queued.resname();
@@ -63,7 +66,7 @@ public class Radar {
 		    Gob gob = queued.gob;
 		    if(cfg != DEFAULT || gob.getattr(GobIcon.class) != null) {
 			Marker marker = new Marker(gob, resname);
-			synchronized(markers) {
+			synchronized (markers) {
 			    markers.add(marker);
 			}
 			gob.setattr(marker);
@@ -73,32 +76,32 @@ public class Radar {
 		}
 	    }
 	}
-
+	
 	long now = System.currentTimeMillis();
 	if(needSorting && now - lastsort > 100) {
-	    synchronized(markers) {
-		Collections.sort(markers, MARKER_COMPARATOR);
+	    synchronized (markers) {
+		markers.sort(MARKER_COMPARATOR);
 		lastsort = now;
 		needSorting = false;
 	    }
 	}
     }
-
+    
     public static void remove(Gob gob, boolean onlyDef) {
 	if(gob != null) {
 	    Marker marker = gob.getattr(Marker.class);
 	    if(marker != null) {
 		if(!onlyDef || marker.isDefault()) {
-		    synchronized(markers) {
+		    synchronized (markers) {
 			markers.remove(marker);
 		    }
-
+		    
 		    gob.delattr(Marker.class);
 		}
 	    }
 	    if(!onlyDef) {
-		synchronized(queue) {
-		    for(int i = 0; i < queue.size(); i++) {
+		synchronized (queue) {
+		    for (int i = 0; i < queue.size(); i++) {
 			if(queue.get(i).gob == gob) {
 			    queue.remove(i);
 			    break;
@@ -108,19 +111,31 @@ public class Radar {
 	    }
 	}
     }
-
+    
+    public static void draw(GOut g, Coord screen, Coord world) {
+	synchronized (markers) {
+	    for (Marker marker : markers) {
+		Tex tex = marker.tex();
+		if(tex != null) {
+		    Coord d = marker.gob.rc.sub(world).div(tilesz);
+		    g.image(tex, screen.add(d).sub(tex.sz().div(2)));
+		}
+	    }
+	}
+    }
+    
     public static class Marker extends GAttrib {
 	private final String resname;
 	private MarkerCFG cfg;
 	private Tex tex;
 	private boolean colored = false;
-
+	
 	public Marker(Gob gob, String res) {
 	    super(gob);
 	    this.resname = res;
 	    cfg = cfg(resname);
 	}
-
+	
 	public Tex tex() {
 	    if(!cfg.visible()) {
 		return null;
@@ -141,7 +156,7 @@ public class Radar {
 	    }
 	    return tex;
 	}
-
+	
 	public String tooltip(boolean full) {
 	    KinInfo ki = gob.getattr(KinInfo.class);
 	    if(full) {
@@ -153,7 +168,7 @@ public class Radar {
 	    }
 	    return null;
 	}
-
+	
 	public Color color() {
 	    KinInfo ki = gob.getattr(KinInfo.class);
 	    if(ki != null) {
@@ -163,52 +178,52 @@ public class Radar {
 	    }
 	    return Color.WHITE;
 	}
-
+	
 	public boolean isDefault() {
 	    return cfg == DEFAULT;
 	}
-
+	
 	public int prio() {
 	    return (tex == null) ? 0 : cfg.priority();
 	}
     }
-
+    
     public static class DefMarker extends RadarCFG.MarkerCFG {
 	@Override
 	public Tex tex() {
 	    return null;
 	}
-
+	
 	@Override
 	public int priority() {
 	    return 0;
 	}
-
+	
 	@Override
 	public boolean visible() {
 	    return true;
 	}
     }
-
+    
     private static class Queued {
 	public final Gob gob;
 	public final Indir<Resource> res;
-
+	
 	public Queued(Gob gob, Indir<Resource> res) {
 	    this.gob = gob;
 	    this.res = res;
 	}
-
+	
 	public boolean ready() {
 	    boolean ready = true;
 	    try {
 		resname();
-	    } catch(Loading e) {
+	    } catch (Loading e) {
 		ready = false;
 	    }
 	    return ready;
 	}
-
+	
 	public String resname() {
 	    String name;
 	    if(res instanceof Resource.Named) {
@@ -219,5 +234,5 @@ public class Radar {
 	    return name;
 	}
     }
-
+    
 }
