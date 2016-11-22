@@ -7,7 +7,7 @@ public class MapWnd2 extends MapWnd {
     public MapWnd2(MapFile file, MapView mv, Coord sz, String title) {
 	super(file, mv, sz, title);
 	
-	addtwdg(add(new IButton("gfx/hud/mmap/grid", "", "-d", "-h") {
+	addtwdg(add(new IButton("gfx/hud/mmap/list", "", "-d", "-h") {
 	    {tooltip = Text.render("toggle list");}
 	    
 	    public void click() {
