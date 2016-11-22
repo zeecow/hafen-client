@@ -415,17 +415,6 @@ public class OptWnd extends Window {
 	display.add(new CFGBox("Show timestamps in chat messages", CFG.SHOW_CHAT_TIMESTAMP), new Coord(x, y));
 
 	y += 25;
-	display.add(new CFGBox("Undock minimap", CFG.MMAP_FLOAT, null, true) {
-	    @Override
-	    public void set(boolean a) {
-		super.set(a);
-		if(ui != null && ui.gui != null) {
-		    ui.gui.showmmappanel(a);
-		}
-	    }
-	}, x, y);
-
-	y += 25;
 	display.add(new CFGBox("Swap item quality and number", CFG.SWAP_NUM_AND_Q), x, y);
 
 	y += 25;

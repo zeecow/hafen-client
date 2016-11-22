@@ -27,7 +27,6 @@ public class CFG<T> {
     public static final CFG<Boolean> SHOW_CHAT_TIMESTAMP = new CFG<>("ui.chat.timestamp", true);
     public static final CFG<Boolean> STORE_CHAT_LOGS = new CFG<>("ui.chat.logs", false);
     public static final CFG<Boolean> LOCK_STUDY = new CFG<>("ui.lock_study", false);
-    public static final CFG<Boolean> MMAP_FLOAT = new CFG<>("ui.mmapfloat", false);
     public static final CFG<Boolean> MMAP_VIEW = new CFG<>("ui.mmap_view", false);
     public static final CFG<Boolean> MMAP_GRID = new CFG<>("ui.mmap_grid", false);
     public static final CFG<Boolean> MMAP_SHOW_BIOMES = new CFG<>("ui.mmap_biomes", true);

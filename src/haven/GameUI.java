@@ -29,7 +29,7 @@ package haven;
 import haven.rx.BuffToggles;
 import haven.rx.Reactor;
 
-import java.awt.Color;
+import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 import java.awt.image.WritableRaster;
@@ -51,7 +51,6 @@ public class GameUI extends ConsoleHost implements Console.Directory {
     public MenuGrid menu;
     public MapView map;
     public LocalMiniMap mmap;
-    public MiniMapPanel mmappanel;
     public Fightview fv;
     private List<Widget> meters = new LinkedList<Widget>();
     private List<Widget> cmeters = new LinkedList<Widget>();
@@ -173,7 +172,7 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 	opts.hide();
 	zerg = add(new Zergwnd(), 187, 50);
 	zerg.hide();
-	showmmappanel(CFG.MMAP_FLOAT.get());
+	placemmap();
     }
 
     private void mapbuttons() {
@@ -808,45 +807,23 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 	    zerg.dtab(zerg.pol);
 	} else if(w == chrwdg) {
 	    chrwdg = null;
-	} else if(w == mmappanel){
-	    mmappanel = null;
-	    placemmap();
-	    CFG.MMAP_FLOAT.set(false, true);
 	}
 	meters.remove(w);
 	cmeters.remove(w);
 	updcmeters();
     }
-
+    
     public void placemmap() {
-	if(mmap == null){return;}
+	if(mmap == null) {return;}
 	if(mmap.parent != null) {
 	    mmap.unlink();
 	}
-	if(mmappanel != null) {
-	    mmappanel.setmap(mmap);
-	    blpanel.hide();
-	} else {
-	    mmap.sz = new Coord(133, 133);
-	    blpanel.add(mmap, minimapc);
-	    blpanel.show();
-	}
+	mmap.sz = new Coord(133, 133);
+	blpanel.add(mmap, minimapc);
+	blpanel.show();
 	mmap.lower();
     }
 
-    public void showmmappanel(boolean show) {
-	if(show) {
-	    if(mmappanel == null) {
-		mmappanel = add(new MiniMapPanel());
-	    }
-	} else {
-	    if(mmappanel != null) {
-		ui.destroy(mmappanel);
-	    }
-	}
-	placemmap();
-    }
-    
     private static final Resource.Anim progt = Resource.local().loadwait("gfx/hud/prog").layer(Resource.animc);
     private Tex curprog = null;
     private int curprogf, curprogb;
