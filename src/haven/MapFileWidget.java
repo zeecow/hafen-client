@@ -281,6 +281,7 @@ public class MapFileWidget extends Widget {
 	    Coord ul = hsz.add(c.mul(cmaps)).sub(loc.tc);
 	    g.image(img, ul);
 	}
+	drawaftermap(g);
 	if((markers == null) || (file.markerseq != markerseq))
 	    remark(loc, dext);
 	if(markers != null) {
@@ -288,7 +289,9 @@ public class MapFileWidget extends Widget {
 		mark.draw(g, hsz.sub(loc.tc).add(mark.m.tc));
 	}
     }
-
+    
+    protected void drawaftermap(GOut g) {}
+    
     public void center(Locator loc) {
 	setloc = loc;
 	follow = false;
