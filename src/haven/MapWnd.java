@@ -358,6 +358,7 @@ public class MapWnd extends Window {
 	if((button == 1) && (drag != null)) {
 	    drag.remove();
 	    drag = null;
+	    updateCfg();
 	    return(true);
 	}
 	return(super.mouseup(c, button));

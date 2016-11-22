@@ -46,4 +46,19 @@ public class MapWnd2 extends MapWnd {
 	view.resize(sz);
     }
     
+    @Override
+    protected void initCfg() {
+	if(cfg != null && cfg.sz != null){
+	    asz = cfg.sz;
+	    resize(asz);
+	}
+	super.initCfg();
+    }
+    
+    @Override
+    protected void setCfg() {
+	super.setCfg();
+	cfg.sz = asz;
+    }
+    
 }
