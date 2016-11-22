@@ -12,6 +12,7 @@ public class MapWnd2 extends MapWnd {
 	    
 	    public void click() {
 		container.show(!container.visible);
+		CFG.MMAP_LIST.set(container.visible);
 	    }
 	}));
 	
@@ -35,6 +36,7 @@ public class MapWnd2 extends MapWnd {
 	add(view);
 	view.lower();
 	viewf.hide();
+	container.show(CFG.MMAP_LIST.get());
     }
     
     @Override
