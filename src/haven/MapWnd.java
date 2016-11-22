@@ -45,10 +45,12 @@ public class MapWnd extends Window {
     public final MapFileWidget view;
     public final MapView mv;
     public final MarkerList list;
-    private final Locator player;
-    private final Widget toolbar;
-    private final Frame viewf, listf;
+    protected final Locator player;
+    protected final Widget toolbar;
+    protected final Frame viewf;
+    private final Frame listf;
     private final Button pmbtn, smbtn;
+    protected final Widget container;
     private TextEntry namesel;
     private GroupSelector colsel;
     private Button mremove;
@@ -56,7 +58,7 @@ public class MapWnd extends Window {
     private Comparator<Marker> mcmp = namecmp;
     private List<Marker> markers = Collections.emptyList();
     private int markerseq = -1;
-    private boolean domark = false;
+    protected boolean domark = false;
     private final Collection<Runnable> deferred = new LinkedList<>();
 
     private final static Predicate<Marker> pmarkers = (m -> m instanceof PMarker);
@@ -64,10 +66,10 @@ public class MapWnd extends Window {
     private final static Comparator<Marker> namecmp = ((a, b) -> a.nm.compareTo(b.nm));
 
     public MapWnd(MapFile file, MapView mv, Coord sz, String title) {
-	super(sz, title, true);
+	super(sz, title, false);
 	this.mv = mv;
 	this.player = new MapLocator(mv);
-	viewf = add(new Frame(Coord.z, true));
+	viewf = add(new Frame(Coord.z, false));
 	view = viewf.add(new View(file));
 	recenter();
 	toolbar = add(new Widget(Coord.z));
@@ -85,20 +87,22 @@ public class MapWnd extends Window {
 		}
 	    }, Coord.z);
 	toolbar.pack();
-	listf = add(new Frame(new Coord(200, 200), false));
+	container = add(new Widget(Coord.z));
+	listf = container.add(new Frame(new Coord(200, 200), false));
 	list = listf.add(new MarkerList(listf.inner().x, 0));
-	pmbtn = add(new Button(95, "Placed", false) {
+	pmbtn = container.add(new Button(95, "Placed", false) {
 		public void click() {
 		    mflt = pmarkers;
 		    markerseq = -1;
 		}
 	    });
-	smbtn = add(new Button(95, "Natural", false) {
+	smbtn = container.add(new Button(95, "Natural", false) {
 		public void click() {
 		    mflt = smarkers;
 		    markerseq = -1;
 		}
 	    });
+	container.pack();
 	resize(sz);
     }
 
@@ -117,11 +121,13 @@ public class MapWnd extends Window {
 	}
 
 	public boolean clickloc(Location loc, int button) {
+	    MapWnd.this.clickloc(loc);
 	    if(domark && (button == 1)) {
 		Marker nm = new PMarker(loc.seg.id, loc.tc, "New marker", BuddyWnd.gc[new Random().nextInt(BuddyWnd.gc.length)]);
 		file.add(nm);
 		list.change2(nm);
 		list.display(nm);
+		container.show();
 		domark = false;
 		return(true);
 	    }
@@ -173,7 +179,9 @@ public class MapWnd extends Window {
 	    return(super.getcurs(c));
 	}
     }
-
+    
+    protected void clickloc(Location loc) {}
+    
     public void tick(double dt) {
 	super.tick(dt);
 	synchronized(deferred) {
@@ -209,10 +217,10 @@ public class MapWnd extends Window {
 
 	public MarkerList(int w, int n) {
 	    super(w, n, 20);
+	    bgcolor = new Color(0,0,0,128);
 	}
 
 	private Function<String, Text> names = new CachedFunction<>(500, nm -> fnd.render(nm));
-	protected void drawbg(GOut g) {}
 	public void drawitem(GOut g, Marker mark, int idx) {
 	    g.chcolor(((idx % 2) == 0)?every:other);
 	    g.frect(Coord.z, g.sz);
@@ -245,7 +253,7 @@ public class MapWnd extends Window {
 
 	    if(mark != null) {
 		if(namesel == null) {
-		    namesel = MapWnd.this.add(new TextEntry(200, "") {
+		    namesel = container.add(new TextEntry(200, "") {
 			    {dshow = true;}
 			    public void activate(String text) {
 				mark.nm = text;
@@ -259,7 +267,7 @@ public class MapWnd extends Window {
 		namesel.commit();
 		if(mark instanceof PMarker) {
 		    PMarker pm = (PMarker)mark;
-		    colsel = MapWnd.this.add(new GroupSelector(0) {
+		    colsel = container.add(new GroupSelector(0) {
 			    public void changed(int group) {
 				this.group = group;
 				pm.color = BuddyWnd.gc[group];
@@ -268,7 +276,7 @@ public class MapWnd extends Window {
 			});
 		    if((colsel.group = Utils.index(BuddyWnd.gc, pm.color)) < 0)
 			colsel.group = 0;
-		    mremove = MapWnd.this.add(new Button(200, "Remove", false) {
+		    mremove = container.add(new Button(200, "Remove", false) {
 			    public void click() {
 				view.file.remove(mark);
 				change2(null);
@@ -296,6 +304,7 @@ public class MapWnd extends Window {
 	}
 	viewf.resize(new Coord(sz.x - listf.sz.x - 10, sz.y));
 	view.resize(viewf.inner());
+	container.resize(asz);
 	toolbar.c = viewf.c.add(0, viewf.sz.y - toolbar.sz.y).add(2, -2);
     }
 

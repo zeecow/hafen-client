@@ -126,20 +126,21 @@ public class Radar {
 	    g.rect(rc, VIEW_SZ);
 	    g.chcolor();
 	}
-	
-	synchronized (markers) {
-	    for (Marker marker : markers) {
-		try {
-		    Tex tex = marker.tex();
-		    if(tex != null) {
-			Coord coord = transform.apply(marker.gob.rc);
-			if(coord != null) {
-			    g.image(tex, coord.sub(tex.sz().div(2)));
+	try {
+	    synchronized (markers) {
+		for (Marker marker : markers) {
+		    try {
+			Tex tex = marker.tex();
+			if(tex != null) {
+			    Coord coord = transform.apply(marker.gob.rc);
+			    if(coord != null) {
+				g.image(tex, coord.sub(tex.sz().div(2)));
+			    }
 			}
-		    }
-		} catch (Loading ignored) {}
+		    } catch (Loading ignored) {}
+		}
 	    }
-	}
+	} catch (Exception ignored) {}
     }
     
     public static class Marker extends GAttrib {
