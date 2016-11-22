@@ -127,18 +127,20 @@ public class Radar {
 	    g.chcolor();
 	}
 	try {
+	    List<Marker> marks;
 	    synchronized (markers) {
-		for (Marker marker : markers) {
-		    try {
-			Tex tex = marker.tex();
-			if(tex != null) {
-			    Coord coord = transform.apply(marker.gob.rc);
-			    if(coord != null) {
-				g.image(tex, coord.sub(tex.sz().div(2)));
-			    }
+		marks = new ArrayList<>(markers);
+	    }
+	    for (Marker marker : marks) {
+		try {
+		    Tex tex = marker.tex();
+		    if(tex != null) {
+			Coord coord = transform.apply(marker.gob.rc);
+			if(coord != null) {
+			    g.image(tex, coord.sub(tex.sz().div(2)));
 			}
-		    } catch (Loading ignored) {}
-		}
+		    }
+		} catch (Loading ignored) {}
 	    }
 	} catch (Exception ignored) {}
     }
