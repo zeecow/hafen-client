@@ -20,19 +20,7 @@ public class LocalMiniMap2 extends LocalMiniMap {
     }
     
     public void drawicons(GOut g) {
-	synchronized (markers) {
-	    for (Radar.Marker icon : markers) {
-		try {
-		    Coord gc = p2c(icon.gob.rc);
-		    Tex tex = icon.tex();
-		    if(tex != null) {
-			g.image(tex, gc.sub(tex.sz().div(2)));
-		    }
-		} catch (Loading ignored) {}
-	    }
-	}
-	//Gob player = mv.player();
-	//if(player != null) {Radar.draw(g, p2c(player.rc), player.rc);}
+	Radar.draw(g, this::p2c);
     }
     
     public Gob findicongob(Coord c) {

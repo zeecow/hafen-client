@@ -5,8 +5,7 @@ import haven.RadarCFG.MarkerCFG;
 import java.awt.*;
 import java.util.*;
 import java.util.List;
-
-import static haven.MCache.*;
+import java.util.function.Function;
 
 public class Radar {
     public static final List<Marker> markers = new LinkedList<>();
@@ -112,14 +111,18 @@ public class Radar {
 	}
     }
     
-    public static void draw(GOut g, Coord screen, Coord world) {
+    public static void draw(GOut g, Function<Coord, Coord> transform) {
 	synchronized (markers) {
 	    for (Marker marker : markers) {
-		Tex tex = marker.tex();
-		if(tex != null) {
-		    Coord d = marker.gob.rc.sub(world).div(tilesz);
-		    g.image(tex, screen.add(d).sub(tex.sz().div(2)));
-		}
+		try {
+		    Tex tex = marker.tex();
+		    if(tex != null) {
+			Coord coord = transform.apply(marker.gob.rc);
+			if(coord != null) {
+			    g.image(tex, coord.sub(tex.sz().div(2)));
+			}
+		    }
+		} catch (Loading ignored) {}
 	    }
 	}
     }

@@ -144,13 +144,27 @@ public class MapWnd extends Window {
 	    try {
 		Coord ploc = xlate(resolve(player));
 		if(ploc != null) {
-		    Radar.draw(g, ploc, mv.player().rc);
+		    Radar.draw(g, this::xlate);
 		    g.chcolor(255, 0, 0, 255);
 		    g.image(plx.layer(Resource.imgc), ploc.sub(plx.layer(Resource.negc).cc));
 		    g.chcolor();
 		}
 	    } catch(Loading l) {
 	    }
+	}
+    
+	public Coord xlate(Coord loc) {
+	    Coord mc = loc.div(MCache.tilesz);
+	    if(mc == null)
+		throw (new Loading("Waiting for initial location"));
+	    MCache.Grid plg = ui.sess.glob.map.getgrid(mc.div(cmaps));
+	    MapFile.GridInfo info = file.gridinfo.get(plg.id);
+	    if(info == null)
+		throw (new Loading("No grid info, probably coming soon"));
+	    if(curloc == null || curloc.seg != resolve(player).seg) {
+		return null;
+	    }
+	    return info.sc.mul(cmaps).add(mc.sub(plg.ul)).add(sz.div(2)).sub(curloc.tc);
 	}
 
 	public Resource getcurs(Coord c) {
