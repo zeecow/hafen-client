@@ -1,7 +1,8 @@
 package haven;
 
+import java.util.List;
+
 import static haven.MCache.*;
-import static haven.Radar.*;
 
 public class LocalMiniMap2 extends LocalMiniMap {
     private String biome;
@@ -25,19 +26,18 @@ public class LocalMiniMap2 extends LocalMiniMap {
     }
     
     public Gob findicongob(Coord c) {
-	synchronized (markers) {
-	    for (int i = markers.size() - 1; i >= 0; i--) {
-		try {
-		    Radar.Marker icon = markers.get(i);
-		    Coord gc = p2c(icon.gob.rc);
-		    Tex tex = icon.tex();
-		    if(tex != null) {
-			Coord sz = tex.sz();
-			if(c.isect(gc.sub(sz.div(2)), sz))
-			    return icon.gob;
-		    }
-		} catch (Loading ignored) {}
-	    }
+	List<Radar.Marker> marks = Radar.safeMarkers();
+	for (int i = marks.size() - 1; i >= 0; i--) {
+	    try {
+		Radar.Marker icon = marks.get(i);
+		Coord gc = p2c(icon.gob.rc);
+		Tex tex = icon.tex();
+		if(tex != null) {
+		    Coord sz = tex.sz();
+		    if(c.isect(gc.sub(sz.div(2)), sz))
+			return icon.gob;
+		}
+	    } catch (Loading ignored) {}
 	}
 	return (null);
     }

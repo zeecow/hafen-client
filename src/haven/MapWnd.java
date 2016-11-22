@@ -26,23 +26,28 @@
 
 package haven;
 
-import java.util.*;
-import java.util.function.*;
-import java.awt.Color;
-import java.awt.event.KeyEvent;
+import haven.BuddyWnd.GroupSelector;
 import haven.MapFile.Marker;
 import haven.MapFile.PMarker;
 import haven.MapFile.SMarker;
-import haven.MapFileWidget.*;
 import haven.MapFileWidget.Location;
-import haven.BuddyWnd.GroupSelector;
-import static haven.MiniMap.plx;
-import static haven.MCache.tilesz;
-import static haven.MCache.cmaps;
+import haven.MapFileWidget.Locator;
+import haven.MapFileWidget.MapLocator;
+import haven.MapFileWidget.SpecLocator;
+
+import java.awt.*;
+import java.awt.event.KeyEvent;
+import java.util.*;
+import java.util.List;
+import java.util.function.Function;
+import java.util.function.Predicate;
+
+import static haven.MCache.*;
+import static haven.MiniMap.*;
 
 public class MapWnd extends Window {
     public static final Resource markcurs = Resource.local().loadwait("gfx/hud/curs/flag");
-    public final MapFileWidget view;
+    public final View view;
     public final MapView mv;
     public final MarkerList list;
     protected final Locator player;
@@ -70,7 +75,7 @@ public class MapWnd extends Window {
 	this.mv = mv;
 	this.player = new MapLocator(mv);
 	viewf = add(new Frame(Coord.z, false));
-	view = viewf.add(new View(file));
+	view = viewf.add(new MapWnd2.View2(file));
 	recenter();
 	toolbar = add(new Widget(Coord.z));
 	toolbar.add(new Img(Resource.loadtex("gfx/hud/mmap/fgwdg")), Coord.z);
@@ -106,7 +111,7 @@ public class MapWnd extends Window {
 	resize(sz);
     }
 
-    private class View extends MapFileWidget {
+    protected class View extends MapFileWidget {
 	View(MapFile file) {
 	    super(file, Coord.z);
 	}
@@ -121,7 +126,6 @@ public class MapWnd extends Window {
 	}
 
 	public boolean clickloc(Location loc, int button) {
-	    MapWnd.this.clickloc(loc);
 	    if(domark && (button == 1)) {
 		Marker nm = new PMarker(loc.seg.id, loc.tc, "New marker", BuddyWnd.gc[new Random().nextInt(BuddyWnd.gc.length)]);
 		file.add(nm);
@@ -150,7 +154,7 @@ public class MapWnd extends Window {
 	    try {
 		Coord ploc = xlate(resolve(player));
 		if(ploc != null) {
-		    Radar.draw(g, this::xlate, new Coord(mv.getcc()));
+		    Radar.draw(g, this::map2screen, new Coord(mv.getcc()));
 		    g.chcolor(255, 0, 0, 255);
 		    g.image(plx.layer(Resource.imgc), ploc.sub(plx.layer(Resource.negc).cc));
 		    g.chcolor();
@@ -159,18 +163,21 @@ public class MapWnd extends Window {
 	    }
 	}
     
-	public Coord xlate(Coord loc) {
-	    Coord mc = loc.div(MCache.tilesz);
-	    if(mc == null)
-		throw (new Loading("Waiting for initial location"));
-	    MCache.Grid plg = ui.sess.glob.map.getgrid(mc.div(cmaps));
-	    MapFile.GridInfo info = file.gridinfo.get(plg.id);
-	    if(info == null)
-		throw (new Loading("No grid info, probably coming soon"));
-	    if(curloc == null || curloc.seg != resolve(player).seg) {
-		return null;
-	    }
-	    return info.sc.mul(cmaps).add(mc.sub(plg.ul)).add(sz.div(2)).sub(curloc.tc);
+	public Coord map2screen(Coord loc) {
+	    try {
+		Coord mc = loc.div(MCache.tilesz);
+		if(mc == null)
+		    throw (new Loading("Waiting for initial location"));
+		MCache.Grid plg = ui.sess.glob.map.getgrid(mc.div(cmaps));
+		MapFile.GridInfo info = file.gridinfo.get(plg.id);
+		if(info == null)
+		    throw (new Loading("No grid info, probably coming soon"));
+		if(curloc == null || curloc.seg != resolve(player).seg) {
+		    return null;
+		}
+		return info.sc.mul(cmaps).add(mc.sub(plg.ul)).add(sz.div(2)).sub(curloc.tc);
+	    } catch (Exception ignored) {}
+	    return null;
 	}
 
 	public Resource getcurs(Coord c) {
@@ -179,8 +186,6 @@ public class MapWnd extends Window {
 	    return(super.getcurs(c));
 	}
     }
-    
-    protected void clickloc(Location loc) {}
     
     public void tick(double dt) {
 	super.tick(dt);
@@ -405,6 +410,104 @@ public class MapWnd extends Window {
 			}
 		    }
 		});
+	}
+    }
+    
+    protected class View2 extends View {
+	private boolean moved = false;
+	private MapFileWidget.Location clickloc = null;
+	
+	View2(MapFile file) {
+	    super(file);
+	}
+	
+	@Override
+	public boolean mousedown(Coord c, int button) {
+	    moved = false;
+	    return super.mousedown(c, button);
+	}
+	
+	
+	@Override
+	public void mousemove(Coord c) {
+	    super.mousemove(c);
+	    moved = true;
+	}
+	
+	@Override
+	public boolean mouseup(Coord c, int button) {
+	    if(!domark && !moved) {
+		try {
+		    MapFileWidget.Location curloc = view.curloc;
+		    if(curloc != null && clickloc != null) {
+			Gob gob = findgob(c);
+			Coord pos = mappos(clickloc, player);
+			if(pos != null) {
+			    if(gob != null) {
+				mv.wdgmsg("click", rootpos().add(c), pos, button, ui.modflags(), 0, (int) gob.id, gob.rc, 0, -1);
+			    } else {
+				mv.wdgmsg("click", rootpos().add(c), pos, button, ui.modflags());
+			    }
+			}
+		    }
+		} catch (Exception e) {e.printStackTrace();}
+	    }
+	    clickloc = null;
+	    return super.mouseup(c, button);
+	}
+    
+	public Coord mappos(Location loc, Locator player) {
+	    if(!file.lock.readLock().tryLock())
+		throw (new Loading("Map file is busy"));
+	    try {
+		Location ploc = resolve(player);
+		if(loc.seg != ploc.seg) {return null;}
+		MapFile.GridInfo pgi = file.gridinfo.get(loc.seg.grid(ploc.tc.div(cmaps)).get().id);
+		Coord mc = new Coord(ui.gui.map.getcc()).div(MCache.tilesz);
+		MCache.Grid plg = ui.sess.glob.map.getgrid(mc.div(cmaps));
+	    
+		return loc.tc.sub(pgi.sc.mul(cmaps)).add(plg.ul).mul(tilesz).add(tilesz.div(2));
+	    } catch (Exception e) {
+		e.printStackTrace();
+	    } finally {
+		file.lock.readLock().unlock();
+	    }
+	    return null;
+	}
+	
+	@Override
+	public boolean clickloc(Location loc, int button) {
+	    clickloc = loc;
+	    return super.clickloc(loc, button);
+	}
+	
+	public Gob findgob(Coord c) {
+	    List<Radar.Marker> marks = Radar.safeMarkers();
+	    for (int i = marks.size() - 1; i >= 0; i--) {
+		try {
+		    Radar.Marker icon = marks.get(i);
+		    Coord gc = map2screen(icon.gob.rc);
+		    Tex tex = icon.tex();
+		    if(tex != null && gc != null) {
+			Coord sz = tex.sz();
+			if(c.isect(gc.sub(sz.div(2)), sz))
+			    return icon.gob;
+		    }
+		} catch (Loading ignored) {}
+	    }
+	    return null;
+	}
+	
+	@Override
+	public Object tooltip(Coord c, Widget prev) {
+	    Gob gob = findgob(c);
+	    if(gob != null) {
+		Radar.Marker icon = gob.getattr(Radar.Marker.class);
+		if(icon != null) {
+		    return icon.tooltip(false);
+		}
+	    }
+	    return super.tooltip(c, prev);
 	}
     }
 }

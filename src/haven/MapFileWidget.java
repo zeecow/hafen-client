@@ -122,25 +122,6 @@ public class MapFileWidget extends Widget {
 	}
     }
     
-    public Coord mappos(Location loc, Locator player) {
-	if(!file.lock.readLock().tryLock())
-	    throw (new Loading("Map file is busy"));
-	try {
-	    Location ploc = resolve(player);
-	    if(loc.seg != ploc.seg) {return null;}
-	    GridInfo pgi = file.gridinfo.get(loc.seg.grid(ploc.tc.div(cmaps)).get().id);
-	    Coord mc = new Coord(ui.gui.map.getcc()).div(MCache.tilesz);
-	    MCache.Grid plg = ui.sess.glob.map.getgrid(mc.div(cmaps));
-	    
-	    return loc.tc.sub(pgi.sc.mul(cmaps)).add(plg.ul).mul(tilesz).add(tilesz.div(2));
-	} catch (Exception e) {
-	    e.printStackTrace();
-	} finally {
-	    file.lock.readLock().unlock();
-	}
-	return null;
-    }
-
     public void tick(double dt) {
 	if(setloc != null) {
 	    try {

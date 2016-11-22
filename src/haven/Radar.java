@@ -127,10 +127,7 @@ public class Radar {
 	    g.chcolor();
 	}
 	try {
-	    List<Marker> marks;
-	    synchronized (markers) {
-		marks = new ArrayList<>(markers);
-	    }
+	    List<Marker> marks = safeMarkers();
 	    for (Marker marker : marks) {
 		try {
 		    Tex tex = marker.tex();
@@ -143,6 +140,14 @@ public class Radar {
 		} catch (Loading ignored) {}
 	    }
 	} catch (Exception ignored) {}
+    }
+    
+    public static List<Marker> safeMarkers(){
+	List<Marker> marks;
+	synchronized (markers) {
+	    marks = new ArrayList<>(markers);
+	}
+	return marks;
     }
     
     public static class Marker extends GAttrib {
@@ -187,7 +192,14 @@ public class Radar {
 	    } else if(cfg != null && cfg.name != null) {
 		return cfg.name;
 	    }
-	    return null;
+	    return pretty(resname);
+	}
+    
+	private static String pretty(String name) {
+	    int k = name.lastIndexOf("/");
+	    name = name.substring(k + 1);
+	    name = name.substring(0, 1).toUpperCase() + name.substring(1);
+	    return name;
 	}
 	
 	public Color color() {
