@@ -81,7 +81,6 @@ public class OCache implements Iterable<Gob> {
 	for(Gob g : objs.values()) {
 	    g.tick();
 	}
-	Radar.tick();
     }
 	
     public void ctick(int dt) {
