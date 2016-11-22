@@ -14,12 +14,7 @@ public class Radar {
     public static final List<Queued> queue = new LinkedList<>();
     public static final Map<String, MarkerCFG> cfg_cache = new HashMap<>();
     private static final MarkerCFG DEFAULT = new DefMarker();
-    public static final Comparator<Marker> MARKER_COMPARATOR = new Comparator<Marker>() {
-	@Override
-	public int compare(Marker o1, Marker o2) {
-	    return o1.prio() - o2.prio();
-	}
-    };
+    public static final Comparator<Marker> MARKER_COMPARATOR = Comparator.comparingInt(Marker::prio);
     private static long lastsort = 0;
     private static boolean needSorting = false;
     
@@ -120,11 +115,13 @@ public class Radar {
     public static void draw(GOut g, Function<Coord, Coord> transform, Coord player) {
 	if(CFG.MMAP_VIEW.get() && player != null) {
 	    Coord rc = transform.apply(player.div(MCache.sgridsz).sub(4, 4).mul(MCache.sgridsz));
-	    g.chcolor(VIEW_BG_COLOR);
-	    g.frect(rc, VIEW_SZ);
-	    g.chcolor(VIEW_BORDER_COLOR);
-	    g.rect(rc, VIEW_SZ);
-	    g.chcolor();
+	    if(rc != null) {
+		g.chcolor(VIEW_BG_COLOR);
+		g.frect(rc, VIEW_SZ);
+		g.chcolor(VIEW_BORDER_COLOR);
+		g.rect(rc, VIEW_SZ);
+		g.chcolor();
+	    }
 	}
 	try {
 	    List<Marker> marks = safeMarkers();
@@ -148,6 +145,12 @@ public class Radar {
 	    marks = new ArrayList<>(markers);
 	}
 	return marks;
+    }
+    
+    public static void clean() {
+	synchronized (markers){
+	    markers.clear();
+	}
     }
     
     public static class Marker extends GAttrib {

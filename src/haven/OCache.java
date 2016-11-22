@@ -43,6 +43,7 @@ public class OCache implements Iterable<Gob> {
 
     public OCache(Glob glob) {
 	this.glob = glob;
+	Radar.clean();
     }
 
     public synchronized void callback(ChangeCallback cb) {
