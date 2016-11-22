@@ -513,7 +513,7 @@ public class MapWnd extends Window {
 	protected void drawaftermap(GOut g) {
 	    super.drawaftermap(g);
 	    if(curloc != null && CFG.MMAP_GRID.get()) {
-		Coord off = curloc.tc.mod(cmaps);
+		Coord off = curloc.tc.sub(sz.div(2)).mod(cmaps);
 		Coord lines = sz.div(cmaps).add(1, 1);
 		Coord s = new Coord();
 		Coord f = new Coord();
@@ -523,7 +523,7 @@ public class MapWnd extends Window {
 		s.y = 0;
 		f.y = sz.y;
 		for (int i = 0; i < lines.x; i++) {
-		    f.x = s.x = (int) ((i + 0.5) * cmaps.x - off.x);
+		    f.x = s.x = (i + 1) * cmaps.x - off.x;
 		    if(s.x >= 0 && s.x <= sz.x) {
 			g.line(s, f, 1);
 		    }
@@ -533,7 +533,7 @@ public class MapWnd extends Window {
 		s.x = 0;
 		f.x = sz.x;
 		for (int i = 0; i < lines.y; i++) {
-		    f.y = s.y = (int) ((i + 0.5) * cmaps.y - off.y);
+		    f.y = s.y = (i + 1) * cmaps.y - off.y;
 		    if(s.y >= 0 && s.y <= sz.y) {
 			g.line(s, f, 1);
 		    }
