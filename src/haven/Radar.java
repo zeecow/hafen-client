@@ -7,6 +7,8 @@ import java.util.*;
 import java.util.List;
 import java.util.function.Function;
 
+import static haven.MCache.*;
+
 public class Radar {
     public static final List<Marker> markers = new LinkedList<>();
     public static final List<Queued> queue = new LinkedList<>();
@@ -111,7 +113,20 @@ public class Radar {
 	}
     }
     
-    public static void draw(GOut g, Function<Coord, Coord> transform) {
+    public static final Coord VIEW_SZ = MCache.sgridsz.mul(9).div(tilesz);// view radius is 9x9 "server" grids
+    public static final Color VIEW_BG_COLOR = new Color(255, 255, 255, 60);
+    public static final Color VIEW_BORDER_COLOR = new Color(0, 0, 0, 128);
+    
+    public static void draw(GOut g, Function<Coord, Coord> transform, Coord player) {
+	if(CFG.MMAP_VIEW.get() && player != null) {
+	    Coord rc = transform.apply(player.div(MCache.sgridsz).sub(4, 4).mul(MCache.sgridsz));
+	    g.chcolor(VIEW_BG_COLOR);
+	    g.frect(rc, VIEW_SZ);
+	    g.chcolor(VIEW_BORDER_COLOR);
+	    g.rect(rc, VIEW_SZ);
+	    g.chcolor();
+	}
+	
 	synchronized (markers) {
 	    for (Marker marker : markers) {
 		try {
