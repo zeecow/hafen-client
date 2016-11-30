@@ -386,7 +386,7 @@ public class MapWnd extends Window {
 				throw(new Loading());
 			    return;
 			}
-			Coord tc = gob.rc.div(tilesz);
+			Coord tc = gob.rc.floor(tilesz);
 			MCache.Grid obg = ui.sess.glob.map.getgrid(tc.div(cmaps));
 			if(!view.file.lock.writeLock().tryLock())
 			    throw(new Loading());

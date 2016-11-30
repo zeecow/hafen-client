@@ -29,7 +29,8 @@ package haven;
 import java.util.*;
 
 public class Gob implements Sprite.Owner, Skeleton.ModOwner, Rendered {
-    public Coord rc, sc;
+    public Coord2d rc;
+    public Coord sc;
     public Coord3f sczu;
     public double a;
     public boolean virtual = false;
@@ -166,15 +167,15 @@ public class Gob implements Sprite.Owner, Skeleton.ModOwner, Rendered {
     public static class Static {}
     public static class SemiStatic {}
 
-    public Gob(Glob glob, Coord c, long id, int frame) {
+    public Gob(Glob glob, Coord2d c, long id, int frame) {
 	this.glob = glob;
 	this.rc = c;
 	this.id = id;
 	this.frame = frame;
 	loc.tick();
     }
-	
-    public Gob(Glob glob, Coord c) {
+
+    public Gob(Glob glob, Coord2d c) {
 	this(glob, c, -1, 0);
     }
 	
@@ -243,8 +244,8 @@ public class Gob implements Sprite.Owner, Skeleton.ModOwner, Rendered {
 	    gobInfo = null;
 	}
     }
-	
-    public void move(Coord c, double a) {
+
+    public void move(Coord2d c, double a) {
 	Moving m = getattr(Moving.class);
 	if(m != null)
 	    m.move(c);
@@ -262,7 +263,7 @@ public class Gob implements Sprite.Owner, Skeleton.ModOwner, Rendered {
     }
     
     public Coord3f getrc() {
-	return(new Coord3f(rc.x, rc.y, glob.map.getcz(rc)));
+	return(glob.map.getzp(rc));
     }
 	
     private Class<? extends GAttrib> attrclass(Class<? extends GAttrib> cl) {
