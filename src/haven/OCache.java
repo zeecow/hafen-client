@@ -61,7 +61,6 @@ public class OCache implements Iterable<Gob> {
 	if(objs.containsKey(id)) {
 	    if(!deleted.containsKey(id) || deleted.get(id) < frame) {
 		Gob old = objs.remove(id);
-		Radar.remove(old, false);
 		deleted.put(id, frame);
 		old.dispose();
 		for(ChangeCallback cb : cbs)
@@ -76,7 +75,6 @@ public class OCache implements Iterable<Gob> {
 	    for(ChangeCallback cb : cbs)
 		cb.removed(old);
 	}
-	Radar.remove(old, false);
     }
 	
     public synchronized void tick() {
@@ -358,7 +356,6 @@ public class OCache implements Iterable<Gob> {
     public synchronized void icon(Gob g, Indir<Resource> res) {
 	if(res == null) {
 	    g.delattr(GobIcon.class);
-	    Radar.remove(g, true);
 	} else {
 	    g.setattr(new GobIcon(g, res));
 	    Radar.add(g);

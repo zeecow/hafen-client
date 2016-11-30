@@ -76,7 +76,7 @@ public class RadarCFG {
 	return Resource.remote().load(name).get();
     }
 
-    private static Tex makeicon(String icon) {
+    public static Tex makeicon(String icon) {
 	Tex tex = null;
 	if(icon.charAt(0) == '$') {
 	    try {

@@ -83,26 +83,22 @@ public class Radar {
 	}
     }
     
-    public static void remove(Gob gob, boolean onlyDef) {
+    public static void remove(Gob gob) {
 	if(gob != null) {
 	    Marker marker = gob.getattr(Marker.class);
-	    if(marker != null) {
-		if(!onlyDef || marker.isDefault()) {
-		    synchronized (markers) {
-			markers.remove(marker);
-		    }
-		    
-		    gob.delattr(Marker.class);
+	    synchronized (markers) {
+		if(marker != null) {
+		    markers.remove(marker);
+		} else {
+		    markers.removeIf(m -> m.gob == gob);
 		}
 	    }
-	    if(!onlyDef) {
-		synchronized (queue) {
-		    for (int i = 0; i < queue.size(); i++) {
-			if(queue.get(i).gob == gob) {
-			    queue.remove(i);
-			    break;
-			}
-		    }
+	}
+	synchronized (queue) {
+	    for (int i = 0; i < queue.size(); i++) {
+		if(queue.get(i).gob == gob) {
+		    queue.remove(i);
+		    break;
 		}
 	    }
 	}
@@ -115,7 +111,7 @@ public class Radar {
     public static void draw(GOut g, Function<Coord2d, Coord> transform, Coord2d player) {
 	if(CFG.MMAP_VIEW.get() && player != null) {
 	    Coord2d sgridsz = new Coord2d(MCache.sgridsz);
-	    Coord rc = transform.apply(player.div(sgridsz).sub(4, 4).mul(sgridsz));
+	    Coord rc = transform.apply(player.div(sgridsz).floor().sub(4, 4).mul(sgridsz));
 	    if(rc != null) {
 		g.chcolor(VIEW_BG_COLOR);
 		g.frect(rc, VIEW_SZ);
@@ -140,7 +136,7 @@ public class Radar {
 	} catch (Exception ignored) {}
     }
     
-    public static List<Marker> safeMarkers(){
+    public static List<Marker> safeMarkers() {
 	List<Marker> marks;
 	synchronized (markers) {
 	    marks = new ArrayList<>(markers);
@@ -149,7 +145,7 @@ public class Radar {
     }
     
     public static void clean() {
-	synchronized (markers){
+	synchronized (markers) {
 	    markers.clear();
 	}
     }
@@ -159,6 +155,12 @@ public class Radar {
 	private MarkerCFG cfg;
 	private Tex tex;
 	private boolean colored = false;
+	
+	@Override
+	public void dispose() {
+	    tex = RadarCFG.makeicon("$pentagon");
+	    Radar.remove(gob);
+	}
 	
 	public Marker(Gob gob, String res) {
 	    super(gob);
@@ -198,7 +200,7 @@ public class Radar {
 	    }
 	    return pretty(resname);
 	}
-    
+	
 	private static String pretty(String name) {
 	    int k = name.lastIndexOf("/");
 	    name = name.substring(k + 1);
