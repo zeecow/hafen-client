@@ -58,7 +58,7 @@ public class LocalMiniMap2 extends LocalMiniMap {
 	super.tick(dt);
 	Coord mc = rootxlate(ui.mc);
 	if(mc.isect(Coord.z, sz)) {
-	    setBiome(c2p(mc).div(tilesz));
+	    setBiome(c2p(mc).div(tilesz).floor());
 	} else {
 	    setBiome(cc);
 	}

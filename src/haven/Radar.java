@@ -108,13 +108,14 @@ public class Radar {
 	}
     }
     
-    public static final Coord VIEW_SZ = MCache.sgridsz.mul(9).div(tilesz);// view radius is 9x9 "server" grids
+    public static final Coord VIEW_SZ = MCache.sgridsz.mul(9).div(tilesz.floor());// view radius is 9x9 "server" grids
     public static final Color VIEW_BG_COLOR = new Color(255, 255, 255, 60);
     public static final Color VIEW_BORDER_COLOR = new Color(0, 0, 0, 128);
     
-    public static void draw(GOut g, Function<Coord, Coord> transform, Coord player) {
+    public static void draw(GOut g, Function<Coord2d, Coord> transform, Coord2d player) {
 	if(CFG.MMAP_VIEW.get() && player != null) {
-	    Coord rc = transform.apply(player.div(MCache.sgridsz).sub(4, 4).mul(MCache.sgridsz));
+	    Coord2d sgridsz = new Coord2d(MCache.sgridsz);
+	    Coord rc = transform.apply(player.div(sgridsz).sub(4, 4).mul(sgridsz));
 	    if(rc != null) {
 		g.chcolor(VIEW_BG_COLOR);
 		g.frect(rc, VIEW_SZ);

@@ -142,7 +142,7 @@ public class LocalMiniMap extends Widget {
     public Coord p2c(Coord2d pc) {
 	return(pc.floor(tilesz).sub(cc).add(sz.div(2)));
     }
-
+    
     public Coord2d c2p(Coord c) {
 	return(c.sub(sz.div(2)).add(cc).mul(tilesz).add(tilesz.div(2)));
     }
@@ -236,7 +236,7 @@ public class LocalMiniMap extends Widget {
 			}
 			if(ppc == null)
 			    continue;
-			ptc = p2c(ptc);
+			Coord ptc = p2c(ppc);
 			g.chcolor(m.col.getRed(), m.col.getGreen(), m.col.getBlue(), 128);
 			g.image(MiniMap.plx.layer(Resource.imgc).tex(), ptc.add(MiniMap.plx.layer(Resource.negc).cc.inv()));
 			g.chcolor();

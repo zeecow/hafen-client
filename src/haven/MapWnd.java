@@ -153,7 +153,7 @@ public class MapWnd extends Window {
 	    try {
 		Coord ploc = xlate(resolve(player));
 		if(ploc != null) {
-		    Radar.draw(g, this::map2screen, new Coord(mv.getcc()));
+		    Radar.draw(g, this::map2screen, new Coord2d(mv.getcc()));
 		    g.chcolor(255, 0, 0, 255);
 		    g.image(plx.layer(Resource.imgc), ploc.sub(plx.layer(Resource.negc).cc));
 		    g.chcolor();
@@ -162,9 +162,9 @@ public class MapWnd extends Window {
 	    }
 	}
     
-	public Coord map2screen(Coord loc) {
+	public Coord map2screen(Coord2d loc) {
 	    try {
-		Coord mc = loc.div(MCache.tilesz);
+		Coord mc = loc.div(MCache.tilesz).floor();
 		if(mc == null)
 		    throw (new Loading("Waiting for initial location"));
 		MCache.Grid plg = ui.sess.glob.map.getgrid(mc.div(cmaps));
@@ -463,10 +463,10 @@ public class MapWnd extends Window {
 		Location ploc = resolve(player);
 		if(loc.seg != ploc.seg) {return null;}
 		MapFile.GridInfo pgi = file.gridinfo.get(loc.seg.grid(ploc.tc.div(cmaps)).get().id);
-		Coord mc = new Coord(ui.gui.map.getcc()).div(MCache.tilesz);
-		MCache.Grid plg = ui.sess.glob.map.getgrid(mc.div(cmaps));
+		Coord2d mc = new Coord2d(ui.gui.map.getcc()).div(MCache.tilesz);
+		MCache.Grid plg = ui.sess.glob.map.getgrid(mc.floor().div(cmaps));
 	    
-		return loc.tc.sub(pgi.sc.mul(cmaps)).add(plg.ul).mul(tilesz).add(tilesz.div(2));
+		return loc.tc.sub(pgi.sc.mul(cmaps)).add(plg.ul).mul(tilesz).add(tilesz.div(2)).floor();
 	    } catch (Exception e) {
 		e.printStackTrace();
 	    } finally {

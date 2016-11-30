@@ -67,7 +67,7 @@ public class ColoredRadius extends Sprite {
 
     @Override
     public boolean tick(int dt) {
-	Coord c = ((Gob) this.owner).rc;
+	Coord c = ((Gob) this.owner).rc.floor();
 	if((this.lc == null) || (!this.lc.equals(c))) {
 	    setz(this.owner.glob(), c);
 	    this.lc = c;

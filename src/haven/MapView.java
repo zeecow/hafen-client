@@ -1277,8 +1277,6 @@ public class MapView extends PView implements DTarget, Console.Directory {
 	    partydraw(g);
 	    glob.map.reqarea(cc.floor(tilesz).sub(MCache.cutsz.mul(view + 1)),
 			     cc.floor(tilesz).add(MCache.cutsz.mul(view + 1)));
-	    glob.map.reqarea(cc.div(tilesz).sub(MCache.cutsz.mul(view + 1)),
-			     cc.div(tilesz).add(MCache.cutsz.mul(view + 1)));
 	    
 	    if(mapupdate != glob.map.lastupdate) {
 		mapupdate = glob.map.lastupdate;
@@ -1892,7 +1890,7 @@ public class MapView extends PView implements DTarget, Console.Directory {
     
     public void updategrid(){
         if(showgrid) {
-	    Coord tc = cc.div(tilesz);
+	    Coord tc = cc.div(tilesz).floor();
 	    gridol.update(tc.sub(cutsz.mul(view + 1)));
 	}
     }
