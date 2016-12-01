@@ -43,6 +43,7 @@ import java.util.function.Predicate;
 
 import static haven.MCache.*;
 import static haven.MiniMap.*;
+import static haven.OCache.posres;
 
 public class MapWnd extends Window {
     public static final Resource markcurs = Resource.local().loadwait("gfx/hud/curs/flag");
@@ -444,13 +445,13 @@ public class MapWnd extends Window {
 			Coord pos = mappos(clickloc, player);
 			if(pos != null) {
 			    if(gob != null) {
-				mv.wdgmsg("click", rootpos().add(c), pos, button, ui.modflags(), 0, (int) gob.id, gob.rc, 0, -1);
+				mv.wdgmsg("click", rootpos().add(c), pos, button, ui.modflags(), 0, (int) gob.id, gob.rc.floor(posres), 0, -1);
 			    } else {
 				mv.wdgmsg("click", rootpos().add(c), pos, button, ui.modflags());
 			    }
 			}
 		    }
-		} catch (Exception e) {e.printStackTrace();}
+		} catch (Exception ignored) {}
 	    }
 	    clickloc = null;
 	    return super.mouseup(c, button);
@@ -466,7 +467,7 @@ public class MapWnd extends Window {
 		Coord2d mc = new Coord2d(ui.gui.map.getcc()).div(MCache.tilesz);
 		MCache.Grid plg = ui.sess.glob.map.getgrid(mc.floor().div(cmaps));
 	    
-		return loc.tc.sub(pgi.sc.mul(cmaps)).add(plg.ul).mul(tilesz).add(tilesz.div(2)).floor();
+		return loc.tc.sub(pgi.sc.mul(cmaps)).add(plg.ul).mul(tilesz).add(tilesz.div(2)).floor(posres);
 	    } catch (Exception e) {
 		e.printStackTrace();
 	    } finally {
