@@ -21,7 +21,9 @@ public class Radar {
     public static void add(Gob gob, Indir<Resource> res) {
 	if(gob.getattr(Marker.class) == null) {
 	    synchronized (queue) {
-		queue.add(new Queued(gob, res));
+		if(queue.stream().noneMatch(q -> q.gob.id == gob.id)) {
+		    queue.add(new Queued(gob, res));
+		}
 	    }
 	}
     }
@@ -83,24 +85,12 @@ public class Radar {
 	}
     }
     
-    public static void remove(Gob gob) {
-	if(gob != null) {
-	    Marker marker = gob.getattr(Marker.class);
-	    synchronized (markers) {
-		if(marker != null) {
-		    markers.remove(marker);
-		} else {
-		    markers.removeIf(m -> m.gob == gob);
-		}
-	    }
+    public static void remove(long id) {
+	synchronized (markers) {
+	    markers.removeIf(m -> m.gob.id == id);
 	}
 	synchronized (queue) {
-	    for (int i = 0; i < queue.size(); i++) {
-		if(queue.get(i).gob == gob) {
-		    queue.remove(i);
-		    break;
-		}
-	    }
+	    queue.removeIf(q -> q.gob.id == id);
 	}
     }
     
@@ -155,12 +145,6 @@ public class Radar {
 	private MarkerCFG cfg;
 	private Tex tex;
 	private boolean colored = false;
-	
-	@Override
-	public void dispose() {
-	    tex = RadarCFG.makeicon("$pentagon");
-	    Radar.remove(gob);
-	}
 	
 	public Marker(Gob gob, String res) {
 	    super(gob);

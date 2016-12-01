@@ -58,6 +58,7 @@ public class OCache implements Iterable<Gob> {
     }
 
     public synchronized void remove(long id, int frame) {
+	Radar.remove(id);
 	if(objs.containsKey(id)) {
 	    if(!deleted.containsKey(id) || deleted.get(id) < frame) {
 		Gob old = objs.remove(id);
@@ -70,6 +71,7 @@ public class OCache implements Iterable<Gob> {
     }
     
     public synchronized void remove(long id) {
+    	Radar.remove(id);
 	Gob old = objs.remove(id);
 	if(old != null) {
 	    for(ChangeCallback cb : cbs)
