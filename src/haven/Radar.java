@@ -118,7 +118,9 @@ public class Radar {
 		    if(tex != null) {
 			Coord coord = transform.apply(marker.gob.rc);
 			if(coord != null) {
+			    if(marker.colored) {g.chcolor(marker.color());}
 			    g.image(tex, coord.sub(tex.sz().div(2)));
+			    if(marker.colored) {g.chcolor();}
 			}
 		    }
 		} catch (Loading ignored) {}

@@ -118,6 +118,6 @@
         <marker startsWith="gfx/terobjs/road/milestone" name="Milestone" icon="paginae/bld/woodendstone" show="false" />
         <marker exact="gfx/terobjs/vehicle/rowboat" name="Boat" icon="gfx/invobjs/barkboat" show="true" priority="10" />
         <marker exact="gfx/terobjs/vehicle/bram" name="Battering Ram" icon="paginae/bld/bram" show="true"  priority="400"/>
-        <marker contains="gfx/borka/body" name="Player" icon="gfx/hud/mmap/symbols/circle" show="true" priority="1000" />
+        <marker contains="gfx/borka/body" name="Player" icon="$circle" show="true" priority="1000" />
     </group>
 </icons>
