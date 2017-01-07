@@ -97,9 +97,6 @@ public class QualityList extends ItemInfo {
     }
 
     enum QualityType {
-	Essence(new Color(240, 140, 255)),
-	Substance(new Color(255, 236, 115)),
-	Vitality(new Color(152, 255, 140)),
 	Quality(new Color(235, 255, 255));
 	public final Color color, outline;
 
@@ -148,33 +145,11 @@ public class QualityList extends ItemInfo {
 		return max;
 	    }
 	},
-	Essence {
+	Quality {
 	    @Override
 	    public Quality get(List<Quality> qualities) {
 		for (Quality q : qualities) {
-		    if(q.type == QualityType.Essence) {
-			return q;
-		    }
-		}
-		return null;
-	    }
-	},
-	Substance {
-	    @Override
-	    public Quality get(List<Quality> qualities) {
-		for (Quality q : qualities) {
-		    if(q.type == QualityType.Substance) {
-			return q;
-		    }
-		}
-		return null;
-	    }
-	},
-	Vitality {
-	    @Override
-	    public Quality get(List<Quality> qualities) {
-		for (Quality q : qualities) {
-		    if(q.type == QualityType.Vitality) {
+		    if(q.type == QualityType.Quality) {
 			return q;
 		    }
 		}

@@ -52,7 +52,7 @@ public class Curiosity extends ItemInfo.Tip {
 	public final int lp, weight, xp;
 
 	public Data(Curiosity ii, QualityList q) {
-	    lp = (int) Math.round(ii.exp / q.single(Average).multiplier);
+	    lp = (int) Math.round(ii.exp / q.single(Quality).multiplier);
 	    weight = ii.mw;
 	    xp = ii.enc;
 	}

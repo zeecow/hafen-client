@@ -94,11 +94,11 @@ public class FoodInfo extends ItemInfo.Tip {
     
 	public Data(FoodInfo info, QualityList q) {
 	    end = info.end;
-	    glut = Utils.round(info.glut * q.single(Substance).multiplier, 4);
+	    double multiplier = q.single(Quality).multiplier;
+	    glut = Utils.round(info.glut * multiplier, 4);
 	    fep = new ArrayList<>(info.evs.length);
-	    double m = q.single(Vitality).multiplier;
 	    for (int i = 0; i < info.evs.length; i++) {
-		fep.add(new Pair<>(info.evs[i].res, Utils.round(info.evs[i].a / m, 2)));
+		fep.add(new Pair<>(info.evs[i].res, Utils.round(info.evs[i].a / multiplier, 2)));
 	    }
 	    types  = info.types;
 	}

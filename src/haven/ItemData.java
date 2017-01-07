@@ -14,6 +14,8 @@ import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static haven.QualityList.SingleType.*;
+
 public class ItemData {
     private static final ItemData EMPTY = new ItemData();
     private static Gson gson;
@@ -69,7 +71,7 @@ public class ItemData {
 	    
 	    Pair<Integer, Integer> w = ItemInfo.getWear(info);
 	    if(w != null) {
-		QualityList.Quality single = q.single(QualityList.SingleType.Vitality);
+		QualityList.Quality single = q.single(Quality);
 		wear = (int) Math.round(w.b / (a != null ? single.value / 10.0 : single.multiplier));
 	    }
 	    
@@ -200,8 +202,9 @@ public class ItemData {
 	private final Integer soft;
     
 	public ArmorData(Pair<Integer, Integer> armor, QualityList q) {
-	    hard = (int) Math.round(armor.a / q.single(QualityList.SingleType.Essence).multiplier);
-	    soft = (int) Math.round(armor.b / q.single(QualityList.SingleType.Substance).multiplier);
+	    double multiplier = q.single(Quality).multiplier;
+	    hard = (int) Math.round(armor.a / multiplier);
+	    soft = (int) Math.round(armor.b / multiplier);
 	}
 	
 	@Override
@@ -215,8 +218,9 @@ public class ItemData {
 	private final double fev;
     
 	public GastronomyData(ItemInfo data, QualityList q) {
-	    glut = Reflect.getFieldValueDouble(data, "glut") / q.single(QualityList.SingleType.Substance).multiplier;
-	    fev = Reflect.getFieldValueDouble(data, "fev") / q.single(QualityList.SingleType.Essence).multiplier;
+	    double multiplier = q.single(Quality).multiplier;
+	    glut = Reflect.getFieldValueDouble(data, "glut") / multiplier;
+	    fev = Reflect.getFieldValueDouble(data, "fev") / multiplier;
 	}
     
 	@Override
@@ -254,7 +258,7 @@ public class ItemData {
 	public static Map<Resource, Integer> parse(List<ItemInfo> attrs, QualityList q){
 	    Map<Resource, Integer> parsed = new HashMap<>(attrs.size());
 	    ItemInfo.parseAttrMods(parsed, attrs);
-	    QualityList.Quality single = q.single(QualityList.SingleType.Average);
+	    QualityList.Quality single = q.single(Quality);
 	    return parsed.entrySet()
 		.stream()
 		.collect(Collectors.toMap(
