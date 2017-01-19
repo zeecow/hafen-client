@@ -212,6 +212,26 @@ public class GOut {
 	tex.crender(this, c.add(this.tx), ul, br.sub(ul));
 	checkerr();
     }
+    
+    /* Draw texture at c, clipping everything outside ul to ul + sz. */
+    public void simage(Tex tex, Coord c, float scale) {
+	if(tex == null)
+	    return;
+	st.set(cur2d);
+	Coord ul = c.add(this.tx);
+	Coord sz = tex.sz().mul(scale);
+	Coord br = ul.add(sz);
+	if(ul.x < this.ul.x)
+	    ul.x = this.ul.x;
+	if(ul.y < this.ul.y)
+	    ul.y = this.ul.y;
+	if(br.x > this.ul.x + this.sz.x)
+	    br.x = this.ul.x + this.sz.x;
+	if(br.y > this.ul.y + this.sz.y)
+	    br.y = this.ul.y + this.sz.y;
+	tex.crender(this, c.add(this.tx), ul, br.sub(ul), sz);
+	checkerr();
+    }
 
     public void rimagev(Tex tex, Coord c, int h) {
 	Coord cc = new Coord(c);

@@ -154,7 +154,7 @@ public class MapWnd extends Window {
 	    try {
 		Coord ploc = xlate(resolve(player));
 		if(ploc != null) {
-		    Radar.draw(g, this::map2screen, new Coord2d(mv.getcc()));
+		    Radar.draw(g, this::map2screen, new Coord2d(mv.getcc()), scale);
 		    g.chcolor(255, 0, 0, 255);
 		    g.image(plx.layer(Resource.imgc), ploc.sub(plx.layer(Resource.negc).cc));
 		    g.chcolor();
@@ -175,7 +175,8 @@ public class MapWnd extends Window {
 		if(curloc == null || curloc.seg != resolve(player).seg) {
 		    return null;
 		}
-		return info.sc.mul(cmaps).add(mc.sub(plg.ul)).add(sz.div(2)).sub(curloc.tc);
+		//return info.sc.mul(cmaps).add(mc.sub(plg.ul)).add(sz.div(2)).sub(curloc.tc);
+		return info.sc.mul(cmaps).add(mc.sub(plg.ul).mul(scale)).add(sz.div(2)).sub(curloc.tc);
 	    } catch (Exception ignored) {}
 	    return null;
 	}
@@ -515,6 +516,8 @@ public class MapWnd extends Window {
 	protected void drawaftermap(GOut g) {
 	    super.drawaftermap(g);
 	    if(curloc != null && CFG.MMAP_GRID.get()) {
+	        Coord sz = this.sz.div(scale);
+	        Coord step = cmaps.mul(scale);
 		Coord off = curloc.tc.sub(sz.div(2)).mod(cmaps);
 		Coord lines = sz.div(cmaps).add(1, 1);
 		Coord s = new Coord();
@@ -523,9 +526,9 @@ public class MapWnd extends Window {
 		
 		//vertical
 		s.y = 0;
-		f.y = sz.y;
+		f.y = this.sz.y;
 		for (int i = 0; i < lines.x; i++) {
-		    f.x = s.x = (i + 1) * cmaps.x - off.x;
+		    f.x = s.x = (i + 1) * step.x - off.x;
 		    if(s.x >= 0 && s.x <= sz.x) {
 			g.line(s, f, 1);
 		    }
@@ -533,9 +536,9 @@ public class MapWnd extends Window {
 		
 		//horizontal
 		s.x = 0;
-		f.x = sz.x;
+		f.x = this.sz.x;
 		for (int i = 0; i < lines.y; i++) {
-		    f.y = s.y = (i + 1) * cmaps.y - off.y;
+		    f.y = s.y = (i + 1) * step.y - off.y;
 		    if(s.y >= 0 && s.y <= sz.y) {
 			g.line(s, f, 1);
 		    }

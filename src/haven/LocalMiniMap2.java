@@ -22,7 +22,7 @@ public class LocalMiniMap2 extends LocalMiniMap {
     
     public void drawicons(GOut g) {
 	Gob pl = ui.sess.glob.oc.getgob(mv.plgob);
-	Radar.draw(g, this::p2c, pl != null ? pl.rc : null);
+	Radar.draw(g, this::p2c, pl != null ? pl.rc : null, 1);
     }
     
     public Gob findicongob(Coord c) {

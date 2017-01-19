@@ -53,6 +53,7 @@ public class MapFileWidget extends Widget {
     private UI.Grab drag;
     private boolean dragging;
     private Coord dsc, dmc;
+    protected float scale = 0.5f;
 
     public MapFileWidget(MapFile file, Coord sz) {
 	super();
@@ -228,6 +229,7 @@ public class MapFileWidget extends Widget {
     }
 
     private void redisplay(Location loc) {
+        Coord sz = this.sz.div(scale);
 	Coord hsz = sz.div(2);
 	Area next = Area.sized(loc.tc.sub(hsz).div(cmaps),
 			       sz.add(cmaps).sub(1, 1).div(cmaps).add(1, 1));
@@ -250,13 +252,14 @@ public class MapFileWidget extends Widget {
 	Location curloc = this.curloc;
 	if((curloc == null) || (curloc.seg != loc.seg))
 	    return(null);
-	return(loc.tc.add(sz.div(2)).sub(curloc.tc));
+	return(loc.tc.mul(scale).add(sz.div(2)).sub(curloc.tc));
     }
 
     public void draw(GOut g) {
 	Location loc = this.curloc;
 	if(loc == null)
 	    return;
+	//Coord sz = this.sz.div(scale);
 	Coord hsz = sz.div(2);
 	redisplay(loc);
 	if(file.lock.readLock().tryLock()) {
@@ -278,15 +281,16 @@ public class MapFileWidget extends Widget {
 	    } catch(Loading l) {
 		continue;
 	    }
-	    Coord ul = hsz.add(c.mul(cmaps)).sub(loc.tc);
-	    g.image(img, ul);
+	    Coord ul = hsz.add(c.mul(cmaps).mul(scale)).sub(loc.tc);
+	    //g.image(img, ul);
+	    g.simage(img, ul, scale);
 	}
 	drawaftermap(g);
 	if((markers == null) || (file.markerseq != markerseq))
 	    remark(loc, dext);
 	if(markers != null) {
 	    for(DisplayMarker mark : markers)
-		mark.draw(g, hsz.sub(loc.tc).add(mark.m.tc));
+		mark.draw(g, hsz.sub(loc.tc).add(mark.m.tc.mul(scale)));
 	}
     }
     
