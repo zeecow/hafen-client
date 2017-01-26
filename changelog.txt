@@ -1,3 +1,6 @@
+$size[14]{$u{Update for 26.01.17:}
+  * added map zooming with mouse wheel
+ 
 $size[14]{$u{Update for 05.10.16:}
   * added key binding options
  
