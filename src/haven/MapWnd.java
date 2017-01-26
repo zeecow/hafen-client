@@ -43,7 +43,7 @@ import java.util.function.Predicate;
 
 import static haven.MCache.*;
 import static haven.MiniMap.*;
-import static haven.OCache.posres;
+import static haven.OCache.*;
 
 public class MapWnd extends Window {
     public static final Resource markcurs = Resource.local().loadwait("gfx/hud/curs/flag");
@@ -176,7 +176,7 @@ public class MapWnd extends Window {
 		    return null;
 		}
 		//return info.sc.mul(cmaps).add(mc.sub(plg.ul)).add(sz.div(2)).sub(curloc.tc);
-		return info.sc.mul(cmaps).add(mc.sub(plg.ul).mul(scale)).add(sz.div(2)).sub(curloc.tc);
+		return info.sc.mul(cmaps).add(mc.sub(plg.ul).sub(curloc.tc)).mul(scale).add(sz.div(2));
 	    } catch (Exception ignored) {}
 	    return null;
 	}
@@ -516,10 +516,9 @@ public class MapWnd extends Window {
 	protected void drawaftermap(GOut g) {
 	    super.drawaftermap(g);
 	    if(curloc != null && CFG.MMAP_GRID.get()) {
-	        Coord sz = this.sz.div(scale);
-	        Coord step = cmaps.mul(scale);
-		Coord off = curloc.tc.sub(sz.div(2)).mod(cmaps);
-		Coord lines = sz.div(cmaps).add(1, 1);
+		Coord step = cmaps.mul(scale);
+		Coord off = curloc.tc.mul(scale).sub(sz.div(2)).mod(step);
+		Coord lines = sz.div(step).add(1, 1);
 		Coord s = new Coord();
 		Coord f = new Coord();
 		g.chcolor(Color.RED);

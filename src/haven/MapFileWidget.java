@@ -26,19 +26,14 @@
 
 package haven;
 
-import java.util.*;
-import java.util.function.*;
-import java.awt.Color;
-import java.awt.event.KeyEvent;
-import haven.MapFile.Segment;
 import haven.MapFile.Grid;
-import haven.MapFile.GridInfo;
-import haven.MapFile.Marker;
-import haven.MapFile.PMarker;
-import haven.MapFile.SMarker;
-import static haven.MCache.cmaps;
-import static haven.MCache.tilesz;
-import static haven.Utils.or;
+import haven.MapFile.*;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Objects;
+
+import static haven.MCache.*;
 
 public class MapFileWidget extends Widget {
     public final MapFile file;
@@ -53,7 +48,9 @@ public class MapFileWidget extends Widget {
     private UI.Grab drag;
     private boolean dragging;
     private Coord dsc, dmc;
-    protected float scale = 0.5f;
+    private static final float SCALES[] = new float[]{2, 1.0f, 0.5f, 0.33f, 0.25f, 0.2f};
+    protected int scaleIndex = 1;
+    protected float scale = SCALES[scaleIndex];
 
     public MapFileWidget(MapFile file, Coord sz) {
 	super();
@@ -252,7 +249,7 @@ public class MapFileWidget extends Widget {
 	Location curloc = this.curloc;
 	if((curloc == null) || (curloc.seg != loc.seg))
 	    return(null);
-	return(loc.tc.mul(scale).add(sz.div(2)).sub(curloc.tc));
+	return(loc.tc.sub(curloc.tc).mul(scale).add(sz.div(2)));
     }
 
     public void draw(GOut g) {
@@ -281,7 +278,7 @@ public class MapFileWidget extends Widget {
 	    } catch(Loading l) {
 		continue;
 	    }
-	    Coord ul = hsz.add(c.mul(cmaps).mul(scale)).sub(loc.tc);
+	    Coord ul = hsz.add(c.mul(cmaps).sub(loc.tc).mul(scale));
 	    //g.image(img, ul);
 	    g.simage(img, ul, scale);
 	}
@@ -290,7 +287,7 @@ public class MapFileWidget extends Widget {
 	    remark(loc, dext);
 	if(markers != null) {
 	    for(DisplayMarker mark : markers)
-		mark.draw(g, hsz.sub(loc.tc).add(mark.m.tc.mul(scale)));
+		mark.draw(g, hsz.add(mark.m.tc.sub(loc.tc).mul(scale)));
 	}
     }
     
@@ -353,7 +350,7 @@ public class MapFileWidget extends Widget {
 	    if(dragging) {
 		setloc = null;
 		follow = false;
-		curloc = new Location(curloc.seg, dmc.add(dsc.sub(c)));
+		curloc = new Location(curloc.seg, dmc.add(dsc.sub(c).mul(1/scale)));
 	    } else if(c.dist(dsc) > 5) {
 		dragging = true;
 	    }
@@ -368,7 +365,16 @@ public class MapFileWidget extends Widget {
 	}
 	return(super.mouseup(c, button));
     }
-
+    
+    @Override
+    public boolean mousewheel(Coord c, int amount) {
+	scaleIndex += amount > 0 ? 1 : -1;
+	if(scaleIndex < 0) {scaleIndex = 0;}
+	if(scaleIndex >= SCALES.length) {scaleIndex = SCALES.length - 1;}
+	scale = SCALES[scaleIndex];
+	return true;
+    }
+    
     public Object tooltip(Coord c, Widget prev) {
 	if(curloc != null) {
 	    Coord tc = c.sub(sz.div(2)).add(curloc.tc);
