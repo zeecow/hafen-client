@@ -80,7 +80,11 @@ public class Curiosity extends ItemInfo.Tip {
 	public final int lp, weight, xp, time;
 
 	public Data(Curiosity ii, QualityList q) {
-	    lp = (int) Math.round(ii.exp / q.single(Quality).multiplier);
+	    QualityList.Quality single = q.single(Quality);
+	    if(single == null) {
+		single = QualityList.DEFAULT;
+	    }
+	    lp = (int) Math.round(ii.exp / single.multiplier);
 	    weight = ii.mw;
 	    xp = ii.enc;
 	    time = ii.time;

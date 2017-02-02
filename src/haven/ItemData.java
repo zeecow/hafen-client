@@ -74,6 +74,9 @@ public class ItemData {
 	    Pair<Integer, Integer> w = ItemInfo.getWear(info);
 	    if(w != null) {
 		QualityList.Quality single = q.single(Quality);
+		if(single == null) {
+		    single = QualityList.DEFAULT;
+		}
 		wear = (int) Math.round(w.b / (a != null ? single.value / 10.0 : single.multiplier));
 	    }
 	    
@@ -84,19 +87,30 @@ public class ItemData {
 	}
     }
 
-    public Tex longtip(Resource res, Session sess) {
+    public static Tex longtip(Pagina pagina, Session sess) {
+	List<ItemInfo> infos = pagina.info();
+	if(infos == null || infos.isEmpty()) {
+	    return ItemData.get(pagina).longtip(pagina.res(), sess);
+	}
+	return longtip(pagina.res(), infos);
+    }
+
+    public static Tex longtip(Resource res, List<ItemInfo> infos) {
 	Resource.AButton ad = res.layer(Resource.action);
 	Resource.Pagina pg = res.layer(Resource.pagina);
 	String tt = "$b{$size[20]{" + ad.name + "}}";
 	if(pg != null) {tt += "\n\n" + pg.text;}
 
 	BufferedImage img = MenuGrid.ttfnd.render(tt, 300).img;
-	List<ItemInfo> infos = iteminfo(sess);
 
 	if(!infos.isEmpty()) {
 	    img = ItemInfo.catimgs(20, img, ItemInfo.longtip(infos));
 	}
 	return new TexI(img);
+    }
+
+    public Tex longtip(Resource res, Session sess) {
+	return longtip(res, iteminfo(sess));
     }
     
     public List<ItemInfo> iteminfo(Session sess) {
@@ -127,6 +141,14 @@ public class ItemData {
 	ItemData data = load(name);
 	if(data == null) {data = EMPTY;}
 	return data;
+    }
+
+    public static ItemData get(Pagina p){
+	List<ItemInfo> infos = p.info();
+	if(infos == null || infos.isEmpty()){
+	    return ItemData.get(p.res().name);
+	}
+        return new ItemData(infos);
     }
 
     public static void actualize(GItem item, Pagina pagina) {
@@ -204,9 +226,12 @@ public class ItemData {
 	private final Integer soft;
     
 	public ArmorData(Pair<Integer, Integer> armor, QualityList q) {
-	    double multiplier = q.single(Quality).multiplier;
-	    hard = (int) Math.round(armor.a / multiplier);
-	    soft = (int) Math.round(armor.b / multiplier);
+	    QualityList.Quality single = q.single(Quality);
+	    if(single == null) {
+		single = QualityList.DEFAULT;
+	    }
+	    hard = (int) Math.round(armor.a / single.multiplier);
+	    soft = (int) Math.round(armor.b / single.multiplier);
 	}
 	
 	@Override
@@ -220,9 +245,12 @@ public class ItemData {
 	private final double fev;
     
 	public GastronomyData(ItemInfo data, QualityList q) {
-	    double multiplier = q.single(Quality).multiplier;
-	    glut = Reflect.getFieldValueDouble(data, "glut") / multiplier;
-	    fev = Reflect.getFieldValueDouble(data, "fev") / multiplier;
+	    QualityList.Quality single = q.single(Quality);
+	    if(single == null) {
+		single = QualityList.DEFAULT;
+	    }
+	    glut = Reflect.getFieldValueDouble(data, "glut") / single.multiplier;
+	    fev = Reflect.getFieldValueDouble(data, "fev") / single.multiplier;
 	}
     
 	@Override
@@ -261,12 +289,16 @@ public class ItemData {
 	    Map<Resource, Integer> parsed = new HashMap<>(attrs.size());
 	    ItemInfo.parseAttrMods(parsed, attrs);
 	    QualityList.Quality single = q.single(Quality);
+	    if(single == null) {
+		single = QualityList.DEFAULT;
+	    }
+	    double multiplier = single.multiplier;
 	    return parsed.entrySet()
 		.stream()
 		.collect(Collectors.toMap(
 		    Map.Entry::getKey,
 		    e -> {
-			double v = e.getValue() / single.multiplier;
+			double v = e.getValue() / multiplier;
 			if(v > 0) {
 			    return (int) Math.round(v);
 			} else {

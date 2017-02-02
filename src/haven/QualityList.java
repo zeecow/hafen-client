@@ -16,6 +16,7 @@ public class QualityList extends ItemInfo {
     private TexI tex;
     private final Map<SingleType, Quality> singles = new HashMap<>();
     private final boolean isEmpty;
+    public static final Quality DEFAULT = new Quality(QualityType.Quality, 10); 
 
     public QualityList(List<ItemInfo> list) {
 	super(null);

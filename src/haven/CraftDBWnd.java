@@ -24,7 +24,7 @@ public class CraftDBWnd extends Window implements DTarget2 {
     private MenuGrid.Pagina CRAFT;
     private Breadcrumbs<Pagina> breadcrumbs;
     private static Pagina current = null;
-    private Pagina resd;
+    private Pagina descriptionPagina;
     private Pagina senduse = null;
     
     private final List<Pagina> all = new LinkedList<>();
@@ -191,13 +191,14 @@ public class CraftDBWnd extends Window implements DTarget2 {
     }
 
     private void drawDescription(GOut g) {
-	if(resd == null) {
+	if(descriptionPagina == null) {
 	    return;
 	}
 	if(description == null) {
-		try {
-		    description = new TexI(MenuGrid.rendertt(resd, true, false, true));
-		} catch (Loading ignored) {}
+	    try {
+		//description = new TexI(MenuGrid.rendertt(descriptionPagina, true, false, true));
+		description = ItemData.longtip(descriptionPagina, ui.sess);
+	    } catch (Loading ignored) {}
 	}
 	if(description != null) {
 	    g.image(description, new Coord(box.c.x + box.sz.x + 10, PANEL_H + 5));
@@ -257,9 +258,9 @@ public class CraftDBWnd extends Window implements DTarget2 {
 	    description = null;
 	}
 	if(p != null) {
-	    resd = p;
+	    descriptionPagina = p;
 	} else {
-	    resd = null;
+	    descriptionPagina = null;
 	}
     }
 
@@ -330,8 +331,7 @@ public class CraftDBWnd extends Window implements DTarget2 {
 		try {
 		    Resource res = p.res.get();
 		    String name = res.layer(Resource.action).name.toLowerCase();
-		    ItemData data = ItemData.get(res.name);
-		    if(name.contains(filter) || itemFilter.matches(data, ui.sess)) {
+		    if(name.contains(filter) || itemFilter.matches(p, ui.sess)) {
 			filtered.add(p);
 		    }
 		} catch (Loading e) {

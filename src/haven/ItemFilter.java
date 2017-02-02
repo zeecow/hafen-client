@@ -110,6 +110,14 @@ public class ItemFilter {
 	return data != null && matches(data.iteminfo(sess));
     }
 
+    final public boolean matches(MenuGrid.Pagina pagina, Session sess) {
+	List<ItemInfo> infos = pagina.info();
+	if(infos == null || infos.isEmpty()){
+	    return matches(ItemData.get(pagina), sess);
+	}
+	return matches(infos);
+    }
+
     protected boolean match(ItemInfo item) { return false; }
 
     public static ItemFilter create(String query) {
