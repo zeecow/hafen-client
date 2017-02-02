@@ -35,6 +35,7 @@ public class CraftDBWnd extends Window implements DTarget2 {
 
     public CraftDBWnd() {
 	super(WND_SZ.add(0, 5), "Craft window");
+	CFG.REAL_TIME_CURIO.observe(cfg -> updateDescription(descriptionPagina));
     }
 
     @Override
@@ -196,7 +197,6 @@ public class CraftDBWnd extends Window implements DTarget2 {
 	}
 	if(description == null) {
 	    try {
-		//description = new TexI(MenuGrid.rendertt(descriptionPagina, true, false, true));
 		description = ItemData.longtip(descriptionPagina, ui.sess);
 	    } catch (Loading ignored) {}
 	}

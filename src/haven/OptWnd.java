@@ -480,6 +480,9 @@ public class OptWnd extends Window {
 	display.add(new QualityBox(100, 6, 16, CFG.Q_ALT_TYPE), tx + 5, y);
 
 	y += 35;
+	display.add(new CFGBox("Real time curios", CFG.REAL_TIME_CURIO, "Show curiosity study time in real life hours, instead of server hours"), new Coord(x, y));
+
+	y += 25;
 	display.add(new CFGBox("Show item durability", CFG.SHOW_ITEM_DURABILITY), new Coord(x, y));
 
 	y += 25;

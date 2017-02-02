@@ -27,6 +27,8 @@
 package haven.resutil;
 
 import haven.*;
+import me.ender.timer.Timer;
+
 import java.awt.image.BufferedImage;
 
 import static haven.QualityList.SingleType.*;
@@ -45,6 +47,9 @@ public class Curiosity extends ItemInfo.Tip {
     static String[] units = {"s", "m", "h", "d"};
     static int[] div = {60, 60, 24};
     static String timefmt(int time) {
+	if(CFG.REAL_TIME_CURIO.get()) {
+	    time = (int) (time / Timer.SERVER_RATIO);
+	}
 	int[] vals = new int[units.length];
 	vals[0] = time;
 	for(int i = 0; i < div.length; i++) {

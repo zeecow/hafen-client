@@ -11,7 +11,7 @@ public class Timer {
 	void complete(Timer timer);
     }
 
-    private static final float SERVER_RATIO = 3.29f;
+    public static final float SERVER_RATIO = 3.29f;
     
     public static long server;
     public static long local;
