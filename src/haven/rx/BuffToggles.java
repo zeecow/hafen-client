@@ -101,7 +101,7 @@ public class BuffToggles {
 	public void setup(GameUI gameUI) {
 	    gui = gameUI;
 	    if(startup.get()) {
-		act();
+		//act();
 	    }
 	}
     }

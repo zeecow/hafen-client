@@ -2,6 +2,7 @@ package haven;
 
 import haven.QualityList.SingleType;
 import haven.resutil.FoodInfo;
+import haven.resutil.Curiosity;
 import me.ender.Reflect;
 
 import java.util.LinkedList;

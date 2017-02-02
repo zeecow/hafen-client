@@ -5,7 +5,7 @@ import java.util.*;
 public class ActList extends Listbox<ActList.ActItem> {
     private static final Text.Foundry font = new Text.Foundry(Text.sans, 15).aa(true);
     private final List<ActItem> items = new ArrayList<ActItem>();
-    private final Map<Glob.Pagina, ActItem> map = new HashMap<Glob.Pagina, ActItem>();
+    private final Map<MenuGrid.Pagina, ActItem> map = new HashMap<MenuGrid.Pagina, ActItem>();
 
     public ActList(int w, int h) {
 	super(w, h, font.height() + 2);
@@ -14,13 +14,13 @@ public class ActList extends Listbox<ActList.ActItem> {
     @Override
     protected void itemactivate(ActItem item) {}
 
-    public void add(Glob.Pagina pagina) {
+    public void add(MenuGrid.Pagina pagina) {
 	ActItem item = new ActItem(pagina);
 	map.put(pagina, item);
 	items.add(item);
     }
 
-    public void remove(Glob.Pagina pagina) {
+    public void remove(MenuGrid.Pagina pagina) {
 	ActItem item = map.remove(pagina);
 	if(item != null)
 	    items.remove(item);
@@ -52,11 +52,11 @@ public class ActList extends Listbox<ActList.ActItem> {
     }
 
     public class ActItem {
-	public final Glob.Pagina pagina;
+	public final MenuGrid.Pagina pagina;
 	public final Text name;
 	public final Tex icon;
 
-	public ActItem(Glob.Pagina pagina) {
+	public ActItem(MenuGrid.Pagina pagina) {
 	    this.pagina = pagina;
 	    this.name = font.render(this.pagina.act().name);
 	    this.icon = new TexI(PUtils.convolvedown(pagina.res.get().layer(Resource.imgc).img, new Coord(itemh, itemh), CharWnd.iconfilter));

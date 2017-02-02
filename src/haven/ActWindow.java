@@ -7,8 +7,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-
-import static haven.Glob.*;
+import haven.MenuGrid.Pagina;
 
 public class ActWindow extends GameUI.Hidewnd {
     private static final int WIDTH = 200;
@@ -139,18 +138,19 @@ public class ActWindow extends GameUI.Hidewnd {
     @Override
     public void tick(double dt) {
 	super.tick(dt);
-
-	if(pagseq != ui.sess.glob.pagseq) {
-	    synchronized (ui.sess.glob.paginae) {
+    
+	MenuGrid menu = ui.gui.menu;
+	synchronized (menu.paginae) {
+	    if(pagseq != menu.pagseq) {
 		synchronized (all) {
 		    all.clear();
 		    all.addAll(
-			ui.sess.glob.paginae.stream()
+			menu.paginae.stream()
 			    .filter(p -> category.matcher(Pagina.name(p)).matches())
 			    .collect(Collectors.toList())
 		    );
 
-		    pagseq = ui.sess.glob.pagseq;
+		    pagseq = menu.pagseq;
 		    needfilter();
 		}
 	    }

@@ -1,5 +1,7 @@
 package haven;
 
+import haven.resutil.Curiosity;
+
 public class StudyWnd extends GameUI.Hidewnd {
     InventoryProxy study;
     StudyInfo info;

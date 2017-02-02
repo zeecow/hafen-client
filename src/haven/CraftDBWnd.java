@@ -1,6 +1,6 @@
 package haven;
 
-import haven.Glob.Pagina;
+import haven.MenuGrid.Pagina;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
@@ -21,11 +21,10 @@ public class CraftDBWnd extends Window implements DTarget2 {
     private Tex description;
     private Widget makewnd;
     private MenuGrid menu;
-    private Pagina CRAFT;
+    private MenuGrid.Pagina CRAFT;
     private Breadcrumbs<Pagina> breadcrumbs;
     private static Pagina current = null;
-    private ItemData data;
-    private Resource resd;
+    private Pagina resd;
     private Pagina senduse = null;
     
     private final List<Pagina> all = new LinkedList<>();
@@ -196,13 +195,9 @@ public class CraftDBWnd extends Window implements DTarget2 {
 	    return;
 	}
 	if(description == null) {
-	    if(data != null) {
 		try {
-		    description = data.longtip(resd, ui.sess);
+		    description = new TexI(MenuGrid.rendertt(resd, true, false, true));
 		} catch (Loading ignored) {}
-	    } else {
-		description = MenuGrid.rendertt(resd, true, false, true).tex();
-	    }
 	}
 	if(description != null) {
 	    g.image(description, new Coord(box.c.x + box.sz.x + 10, PANEL_H + 5));
@@ -262,11 +257,9 @@ public class CraftDBWnd extends Window implements DTarget2 {
 	    description = null;
 	}
 	if(p != null) {
-	    resd = p.res();
-	    data = ItemData.get(resd.name);
+	    resd = p;
 	} else {
 	    resd = null;
-	    data = null;
 	}
     }
 
@@ -275,7 +268,7 @@ public class CraftDBWnd extends Window implements DTarget2 {
     }
     
     private Pagina paginafor(Resource.Named res) {
-	return ui.sess.glob.paginafor(res);
+	return ui.gui.menu.paginafor(res);
     }
 
     private void updateInfo(WItem item){
@@ -298,18 +291,19 @@ public class CraftDBWnd extends Window implements DTarget2 {
     @Override
     public void tick(double dt) {
 	super.tick(dt);
-	
-	if(pagseq != ui.sess.glob.pagseq) {
-	    synchronized (ui.sess.glob.pmap) {
+    
+	MenuGrid menu = ui.gui.menu;
+	synchronized (menu.paginae) {
+	    if(pagseq != menu.pagseq) {
 		synchronized (all) {
 		    all.clear();
 		    all.addAll(
-			    ui.sess.glob.pmap.values().stream()
-				    .filter(p -> category.matcher(Pagina.name(p)).matches())
-				    .collect(Collectors.toList())
+			menu.paginae.stream()
+			    .filter(p -> category.matcher(Pagina.name(p)).matches())
+			    .collect(Collectors.toList())
 		    );
 		    
-		    pagseq = ui.sess.glob.pagseq;
+		    pagseq = menu.pagseq;
 		    needfilter();
 		}
 	    }

@@ -1,6 +1,6 @@
 package haven;
 
-import haven.Glob.Pagina;
+import haven.MenuGrid.Pagina;
 
 import java.util.HashMap;
 import java.util.Map;

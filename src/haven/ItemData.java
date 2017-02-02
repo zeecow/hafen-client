@@ -6,6 +6,8 @@ import com.google.gson.JsonSyntaxException;
 import com.google.gson.TypeAdapter;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
+import haven.MenuGrid.Pagina;
+import haven.resutil.Curiosity;
 import haven.resutil.FoodInfo;
 import me.ender.Reflect;
 
@@ -127,7 +129,7 @@ public class ItemData {
 	return data;
     }
 
-    public static void actualize(GItem item, Glob.Pagina pagina) {
+    public static void actualize(GItem item, Pagina pagina) {
 	if(item.resname() == null) { return; }
 
 	ItemData data = new ItemData(item);
