@@ -2,9 +2,7 @@ package haven.rx;
 
 import haven.*;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -36,7 +34,7 @@ public class BuffToggles {
 	}
     }
 
-    public static class Toggle implements CFG.Observer<Boolean> {
+    public static class Toggle implements CFG.Observer<Boolean>, Observer {
 
 	public final String name;
 	private final String resname;
@@ -48,6 +46,7 @@ public class BuffToggles {
 	public CFG<Boolean> show;
 	public CFG<Boolean> startup;
 	private GameUI gui;
+	private boolean toggled = false;
 
 	public Toggle(String name, String resname, String action, String msgOn, String msgOff) {
 	    this.name = name;
@@ -83,7 +82,11 @@ public class BuffToggles {
 	}
 
 	public void act() {
-	    gui.menu.senduse(action);
+	    if(gui.menu != null) {
+		gui.menu.senduse(action);
+	    } else {
+		toggled = !toggled;
+	    }
 	}
 
 	public void cfg(CFG<Boolean> show, CFG<Boolean> startup) {
@@ -100,8 +103,19 @@ public class BuffToggles {
 
 	public void setup(GameUI gameUI) {
 	    gui = gameUI;
+	    if(gui.menu == null) {
+		gui.menuObservable.addObserver(this);
+	    }
 	    if(startup.get()) {
-		//act();
+		act();
+	    }
+	}
+
+	@Override
+	public void update(Observable o, Object arg) {
+	    gui.menuObservable.deleteObserver(this);
+	    if(toggled) {
+		act();
 	    }
 	}
     }

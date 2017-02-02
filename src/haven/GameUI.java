@@ -86,6 +86,14 @@ public class GameUI extends ConsoleHost implements Console.Directory {
     public ActWindow craftlist, buildlist, actlist;
     public TimerPanel timers;
     public StudyWnd studywnd;
+    public Observable menuObservable = new Observable(){
+	@Override
+	public void notifyObservers(Object arg) {
+	    setChanged();
+	    super.notifyObservers(arg);
+	    clearChanged();
+	}
+    };
 
 	public abstract class Belt extends Widget {
 	public Belt(Coord sz) {

@@ -158,6 +158,12 @@ public class MenuGrid extends Widget {
 	}
     }
 
+    @Override
+    public void bound() {
+	super.bound();
+	ui.gui.menuObservable.notifyObservers();
+    }
+
     public final Map<Indir<Resource>, Pagina> pmap = new WeakHashMap<Indir<Resource>, Pagina>();
     public Pagina paginafor(Indir<Resource> res) {
 	if(res == null)
