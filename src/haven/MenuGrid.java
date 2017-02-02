@@ -161,6 +161,9 @@ public class MenuGrid extends Widget {
     @Override
     public void bound() {
 	super.bound();
+	synchronized (paginae) {
+	    paginae.add(new Pagina(ui.sess.glob, Resource.local().load("paginae/add/timer")));
+	}
 	ui.gui.menuObservable.notifyObservers();
     }
 
