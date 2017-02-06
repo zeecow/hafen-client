@@ -32,9 +32,6 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.*;
 import java.util.List;
-import java.awt.Font;
-import java.awt.Color;
-import java.awt.image.BufferedImage;
 
 public class Makewindow extends Widget {
     Widget obtn, cbtn;
@@ -320,9 +317,11 @@ public class Makewindow extends Widget {
     }
 
     private static String getDynamicName(GSprite spr) {
-	Class<? extends GSprite> aSsprClass = spr.getClass();
-	if(Reflect.hasInterface("haven.res.ui.tt.defn.DynName", aSsprClass)) {
-	    return (String) Reflect.invoke(spr, "name");
+	if(spr != null) {
+	    Class<? extends GSprite> sprClass = spr.getClass();
+	    if(Reflect.hasInterface("haven.res.ui.tt.defn.DynName", sprClass)) {
+		return (String) Reflect.invoke(spr, "name");
+	    }
 	}
 	return null;
     }
