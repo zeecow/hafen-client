@@ -36,6 +36,7 @@ public class CraftDBWnd extends Window implements DTarget2 {
     public CraftDBWnd() {
 	super(WND_SZ.add(0, 5), "Craft window");
 	CFG.REAL_TIME_CURIO.observe(cfg -> updateDescription(descriptionPagina));
+	CFG.SHOW_CURIO_LPH.observe(cfg -> updateDescription(descriptionPagina));
     }
 
     @Override

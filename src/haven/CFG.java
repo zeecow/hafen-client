@@ -34,6 +34,7 @@ public class CFG<T> {
     public static final CFG<Boolean> MENU_SINGLE_CTRL_CLICK = new CFG<>("ui.menu_single_ctrl_click", true);
 
     public static final CFG<Boolean> REAL_TIME_CURIO = new CFG<>("ui.real_time_curio", false);
+    public static final CFG<Boolean> SHOW_CURIO_LPH = new CFG<>("ui.show_curio_lph", false);
     public static final CFG<Boolean> SHOW_ITEM_DURABILITY = new CFG<>("ui.item_durability", false);
     public static final CFG<Boolean> SHOW_ITEM_WEAR_BAR = new CFG<>("ui.item_wear_bar", true);
     public static final CFG<Boolean> SHOW_ITEM_ARMOR = new CFG<>("ui.item_armor", false);

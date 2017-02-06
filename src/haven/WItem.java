@@ -50,6 +50,7 @@ public class WItem extends Widget implements DTarget2 {
 	super(sqsz);
 	this.item = item;
 	CFG.REAL_TIME_CURIO.observe(cfg -> longtip = null);
+	CFG.SHOW_CURIO_LPH.observe(cfg -> longtip = null);
     }
     
     public void drawmain(GOut g, GSprite spr) {
