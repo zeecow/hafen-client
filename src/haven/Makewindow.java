@@ -292,7 +292,6 @@ public class Makewindow extends Widget {
 		c = c.add(31, 0);
 	    }
 	}
-	Resource.Tooltip tt;
 	if(lasttip != tspec) {
 	    lasttip = tspec;
 	    stip = ltip = null;
