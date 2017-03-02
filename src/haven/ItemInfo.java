@@ -30,6 +30,7 @@ import me.ender.Reflect;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.lang.reflect.*;
 import java.util.*;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -79,9 +80,34 @@ public abstract class ItemInfo {
 	GSprite sprite();
     }
     
-    @Resource.PublishedCode(name = "tt")
+    @Resource.PublishedCode(name = "tt", instancer = FactMaker.class)
     public interface InfoFactory {
 	ItemInfo build(Owner owner, Object... args);
+    }
+
+    public static class FactMaker implements Resource.PublishedCode.Instancer {
+	public InfoFactory make(Class<?> cl) throws InstantiationException, IllegalAccessException {
+	    if(InfoFactory.class.isAssignableFrom(cl))
+		return(cl.asSubclass(InfoFactory.class).newInstance());
+	    try {
+		final Method mkm = cl.getDeclaredMethod("mkinfo", Owner.class, Object[].class);
+		int mod = mkm.getModifiers();
+		if(ItemInfo.class.isAssignableFrom(mkm.getReturnType()) && ((mod & Modifier.STATIC) != 0) && ((mod & Modifier.PUBLIC) != 0)) {
+		    return(new InfoFactory() {
+			    public ItemInfo build(Owner owner, Object... args) {
+				try {
+				    return((ItemInfo)mkm.invoke(null, owner, args));
+				} catch(Exception e) {
+				    if(e instanceof RuntimeException) throw((RuntimeException)e);
+				    throw(new RuntimeException(e));
+				}
+			    }
+			});
+		}
+	    } catch(NoSuchMethodException e) {
+	    }
+	    return(null);
+	}
     }
     
     public ItemInfo(Owner owner) {
