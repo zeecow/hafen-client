@@ -1499,7 +1499,7 @@ public class MapView extends PView implements DTarget, Console.Directory {
 		g.apply();
 		gl.glClear(GL.GL_DEPTH_BUFFER_BIT | GL.GL_COLOR_BUFFER_BIT);
 		checkmapclick(g, clickc, mc -> {
-		    if(Config.center_tile) {mc = mc.div(11).mul(11).add(5, 5);}
+		    if(Config.center_tile) { mc = new Coord2d(mc.div(11).floor().mul(11).add(5, 5)); }
 		    mapcl = mc; ckdone(1);
 		});
 		g.st.set(bk);
