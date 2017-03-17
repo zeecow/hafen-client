@@ -1,3 +1,6 @@
+$size[14]{$u{Update for 18.03.17:}
+  * fixed tile centering
+ 
 $size[14]{$u{Update for 06.02.17:}
   * added option to show curio LP/H value (Option->Display->Show LP/H for curios)
  
