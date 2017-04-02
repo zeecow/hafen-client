@@ -26,12 +26,13 @@
 
 package haven;
 
+import java.awt.*;
 import java.util.*;
-import java.awt.Color;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 
 public class Fightsess extends Widget {
+    public static final Text.Foundry fnd = new Text.Foundry(Text.sans.deriveFont(Font.BOLD), 14);
     public static final Tex cdframe = Resource.loadtex("gfx/hud/combat/cool");
     public static final Tex actframe = Buff.frame;
     public static final Coord actframeo = Buff.imgoff;
@@ -136,7 +137,7 @@ public class Fightsess extends Widget {
         boolean altui = CFG.ALT_COMBAT_UI.get();
 	int x0 = ui.gui.calendar.rootpos().x + ui.gui.calendar.sz.x / 2;
 	int y0 = ui.gui.calendar.rootpos().y + ui.gui.calendar.sz.y / 2;
-	int bottom = ui.gui.beltwdg.c.y;
+	int bottom = ui.gui.beltwdg.c.y - 40;
 	double now = System.currentTimeMillis() / 1000.0;
 
 	for(Buff buff : fv.buffs.children(Buff.class))
@@ -216,6 +217,7 @@ public class Fightsess extends Widget {
 		    Tex img = act.get().layer(Resource.imgc).tex();
 		    ca = ca.sub(img.sz().div(2));
 		    g.image(img, ca);
+		    if(CFG.SHOW_COMBAT_KEYS.get()) {g.aimage(keytex(i), ca.add(16, 16), 0.5, 0.5);}
 		    if(i == use) {
 			g.image(indframe, ca.sub(indframeo));
 		    } else {
@@ -226,14 +228,23 @@ public class Fightsess extends Widget {
 	    ca.x += actpitch;
 	}
     }
-
+    
+    private Tex keytex(int i) {
+	if(keytex[i] == null) {
+	    keytex[i] = Text.renderstroked(keytips[i], fnd).tex();
+	}
+	return keytex[i];
+    }
+    
     private Widget prevtt = null;
     private Text acttip = null;
-    public static final String[] keytips = {"1", "2", "3", "4", "5", "Shift+1", "Shift+2", "Shift+3", "Shift+4", "Shift+5"};
+    public static final String[] keytips = {"1", "2", "3", "4", "5", "\u21e71", "\u21e72", "\u21e73", "\u21e74", "\u21e75"};
+    public static final Tex[] keytex = new Tex[keytips.length];
     public Object tooltip(Coord c, Widget prev) {
 	boolean altui = CFG.ALT_COMBAT_UI.get();
 	int x0 =  ui.gui.calendar.rootpos().x + ui.gui.calendar.sz.x / 2;
 	int y0 =  ui.gui.calendar.rootpos().y + ui.gui.calendar.sz.y / 2;
+	int bottom = ui.gui.beltwdg.c.y - 40;
 	for(Buff buff : fv.buffs.children(Buff.class)) {
 	    Coord dc = altui ? new Coord(x0 - buff.c.x - Buff.cframe.sz().x - 80, y0) : pcc.add(-buff.c.x - Buff.cframe.sz().x - 20, buff.c.y + pho - Buff.cframe.sz().y);
 	    if(c.isect(dc, buff.sz)) {
@@ -258,7 +269,7 @@ public class Fightsess extends Widget {
 	}
 	final int rl = 5;
 	for(int i = 0; i < actions.length; i++) {
-	    Coord ca = altui ? new Coord(x0 - 18, ui.gui.beltwdg.c.y - 150).add(actc(i)).add(16, 16) : pcc.add(actc(i));
+	    Coord ca = altui ? new Coord(x0 - 18, bottom - 150).add(actc(i)).add(16, 16) : pcc.add(actc(i));
 	    Indir<Resource> act = actions[i];
 	    try {
 		if(act != null) {
