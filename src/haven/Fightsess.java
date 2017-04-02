@@ -233,8 +233,9 @@ public class Fightsess extends Widget {
     public Object tooltip(Coord c, Widget prev) {
 	boolean altui = CFG.ALT_COMBAT_UI.get();
 	int x0 =  ui.gui.calendar.rootpos().x + ui.gui.calendar.sz.x / 2;
+	int y0 =  ui.gui.calendar.rootpos().y + ui.gui.calendar.sz.y / 2;
 	for(Buff buff : fv.buffs.children(Buff.class)) {
-	    Coord dc = altui ? new Coord(x0 - buff.c.x - Buff.cframe.sz().x - 80, 180) : pcc.add(-buff.c.x - Buff.cframe.sz().x - 20, buff.c.y + pho - Buff.cframe.sz().y);
+	    Coord dc = altui ? new Coord(x0 - buff.c.x - Buff.cframe.sz().x - 80, y0) : pcc.add(-buff.c.x - Buff.cframe.sz().x - 20, buff.c.y + pho - Buff.cframe.sz().y);
 	    if(c.isect(dc, buff.sz)) {
 		Object ret = buff.tooltip(c.sub(dc), prevtt);
 		if(ret != null) {
@@ -245,7 +246,7 @@ public class Fightsess extends Widget {
 	}
 	if(fv.current != null) {
 	    for(Buff buff : fv.current.buffs.children(Buff.class)) {
-		Coord dc = altui ? new Coord(x0 + buff.c.x + 80, 180) : pcc.add(buff.c.x + 20, buff.c.y + pho - Buff.cframe.sz().y);
+		Coord dc = altui ? new Coord(x0 + buff.c.x + 80, y0) : pcc.add(buff.c.x + 20, buff.c.y + pho - Buff.cframe.sz().y);
 		if(c.isect(dc, buff.sz)) {
 		    Object ret = buff.tooltip(c.sub(dc), prevtt);
 		    if(ret != null) {
@@ -279,7 +280,7 @@ public class Fightsess extends Widget {
 	    Indir<Resource> lastact = this.lastact1;
 	    if(lastact != null) {
 		Coord usesz = lastact.get().layer(Resource.imgc).sz;
-		Coord lac = altui ? new Coord(x0 - 69, 120).add(usesz.div(2)) : pcc.add(usec1);
+		Coord lac = altui ? new Coord(x0 - 69, y0).add(usesz.div(2)) : pcc.add(usec1);
 		if(c.isect(lac.sub(usesz.div(2)), usesz)) {
 		    if(lastacttip1 == null)
 			lastacttip1 = Text.render(lastact.get().layer(Resource.tooltip).t);
@@ -291,7 +292,7 @@ public class Fightsess extends Widget {
 	    Indir<Resource> lastact = this.lastact2;
 	    if(lastact != null) {
 		Coord usesz = lastact.get().layer(Resource.imgc).sz;
-		Coord lac = altui ? new Coord(x0 + 69 - usesz.x, 120).add(usesz.div(2)) : pcc.add(usec2);
+		Coord lac = altui ? new Coord(x0 + 69 - usesz.x, y0).add(usesz.div(2)) : pcc.add(usec2);
 		if(c.isect(lac.sub(usesz.div(2)), usesz)) {
 		    if(lastacttip2 == null)
 			lastacttip2 = Text.render(lastact.get().layer(Resource.tooltip).t);
