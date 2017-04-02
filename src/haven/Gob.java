@@ -52,6 +52,7 @@ public class Gob implements Sprite.Owner, Skeleton.ModOwner, Rendered {
     private GobPath path;
     private Hitbox hitbox = null;
     private GeneralGobInfo gobInfo = null;
+    private GobDamageInfo damage;
 
     public static class Overlay implements Rendered {
 	public Indir<Resource> res;
@@ -173,6 +174,9 @@ public class Gob implements Sprite.Owner, Skeleton.ModOwner, Rendered {
 	this.id = id;
 	this.frame = frame;
 	loc.tick();
+	if(GobDamageInfo.has(this)) {
+	    damage = new GobDamageInfo(this);
+	}
     }
 
     public Gob(Glob glob, Coord2d c) {
@@ -191,6 +195,7 @@ public class Gob implements Sprite.Owner, Skeleton.ModOwner, Rendered {
 	    if(ol.spr == null) {
 		try {
 		    ol.spr = Sprite.create(this, ol.res.get(), ol.sdt.clone());
+		    overlayAdded(ol);
 		} catch(Loading e) {}
 	    } else {
 		boolean done = ol.spr.tick(dt);
@@ -217,7 +222,29 @@ public class Gob implements Sprite.Owner, Skeleton.ModOwner, Rendered {
 	}
 	return(null);
     }
-
+    
+    private void overlayAdded(Overlay item) {
+	try {
+	    Resource res = item.res.get();
+	    if(res.name.equals("gfx/fx/floatimg")){
+		processDmg(new MessageBuf(item.sdt));
+	    }
+	} catch (Loading ignored) {}
+    }
+    
+    private void processDmg(MessageBuf msg) {
+	try {
+	    int v = msg.int32();
+	    msg.uint8();
+	    int c = msg.uint16();
+	    
+	    if(damage == null) {
+		damage = new GobDamageInfo(this);
+	    }
+	    damage.update(c, v);
+	} catch (Exception ignored) {}
+    }
+    
     public void tick() {
 	for(GAttrib a : attr.values())
 	    a.tick();
@@ -413,6 +440,9 @@ public class Gob implements Sprite.Owner, Skeleton.ModOwner, Rendered {
 	if(d != null)
 	    d.setup(rl);
 	Speaking sp = getattr(Speaking.class);
+	if(damage != null && CFG.SHOW_COMBAT_DMG.get()) {
+	    rl.add(damage, null);
+	}
 	if(sp != null)
 	    rl.add(sp.fx, null);
 	KinInfo ki = getattr(KinInfo.class);

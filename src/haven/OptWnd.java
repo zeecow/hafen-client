@@ -523,7 +523,15 @@ public class OptWnd extends Window {
 		}
 	    }
 	}, x, y);
-
+ 
+	my = Math.max(my, y);
+	x += 250;
+	y = 0;
+	display.add(new CFGBox("Use new combat UI", CFG.ALT_COMBAT_UI), x, y);
+	
+	y += 25;
+	display.add(new CFGBox("Show combat damage", CFG.SHOW_COMBAT_DMG), x, y);
+	
 	my = Math.max(my, y);
 
 	display.add(new PButton(200, "Back", 27, main), new Coord(0, my + 35));

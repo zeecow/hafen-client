@@ -66,6 +66,7 @@ public class GameUI extends ConsoleHost implements Console.Directory {
     public BuddyWnd buddies;
     public EquipProxy eqproxy;
     public FilterWnd filter;
+    public Cal calendar;
     private final Zergwnd zerg;
     public final Collection<Polity> polities = new ArrayList<Polity>();
     public HelpWnd help;
@@ -171,7 +172,7 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 		}
 	    }, new Coord(10, 10));
 	buffs = ulpanel.add(new Bufflist(), new Coord(95, 65));
-	umpanel.add(new Cal(), new Coord(0, 10));
+	umpanel.add(calendar = new Cal(), new Coord(0, 10));
 	eqproxy = ulpanel.add(new EquipProxy(new int[]{6, 7, 11}), new Coord(420, 5));
 	filter = add(new FilterWnd());
 	syslog = chat.add(new ChatUI.Log("System"));

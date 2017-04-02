@@ -24,6 +24,8 @@ public class CFG<T> {
     public static final CFG<Boolean> SIMPLE_CROPS = new CFG<>("display.simple_crops", false);
     public static final CFG<Boolean> STORE_MAP = new CFG<>("general.storemap", false);
 
+    public static final CFG<Boolean> ALT_COMBAT_UI = new CFG<>("ui.combat.alt_ui", true);
+    public static final CFG<Boolean> SHOW_COMBAT_DMG = new CFG<>("ui.combat.show_dmg", true);
     public static final CFG<Boolean> SHOW_CHAT_TIMESTAMP = new CFG<>("ui.chat.timestamp", true);
     public static final CFG<Boolean> STORE_CHAT_LOGS = new CFG<>("ui.chat.logs", false);
     public static final CFG<Boolean> LOCK_STUDY = new CFG<>("ui.lock_study", false);

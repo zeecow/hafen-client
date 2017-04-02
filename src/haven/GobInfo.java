@@ -3,7 +3,7 @@ package haven;
 public abstract class GobInfo extends PView.Draw2D {
     protected final Gob gob;
     public boolean ready = false;
-    private Tex tex;
+    protected Tex tex;
     private GLState.Buffer state;
     protected int up = 1;
     protected Pair<Double, Double> center = new Pair<>(0.5, 0.5);
