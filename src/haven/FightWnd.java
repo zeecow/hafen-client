@@ -622,13 +622,17 @@ public class FightWnd extends Widget {
 	Frame.around(this, Collections.singletonList(savelist));
 	add(new Button(110, "Load", false) {
 		public void click() {
-		    load(savelist.sel);
-		    use(savelist.sel);
+		    if(savelist.sel == null || savelist.sel < 0) {
+			getparent(GameUI.class).error("No load entry selected.");
+		    } else {
+			load(savelist.sel);
+			use(savelist.sel);
+		    }
 		}
 	    }, 395, y);
 	add(new Button(110, "Save", false) {
 		public void click() {
-		    if(savelist.sel < 0) {
+		    if(savelist.sel == null || savelist.sel < 0) {
 			getparent(GameUI.class).error("No save entry selected.");
 		    } else {
 			save(savelist.sel);
