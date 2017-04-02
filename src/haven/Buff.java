@@ -26,10 +26,19 @@
 
 package haven;
 
-import java.awt.Color;
+import java.awt.*;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Buff extends Widget {
-    public static final Text.Foundry nfnd = new Text.Foundry(Text.dfont, 10);
+    private static final Map<String, Color> OPENINGS = new HashMap<String, Color>(4) {{
+	put("paginae/atk/offbalance", new Color(81, 165, 56));
+	put("paginae/atk/reeling", new Color(210, 210, 64));
+	put("paginae/atk/dizzy", new Color(39, 82, 191));
+	put("paginae/atk/cornered", new Color(192, 28, 28));
+    }};
+    
+    public static final Text.Foundry nfnd = new Text.Foundry(Text.dfont.deriveFont(Font.BOLD), 12);
     public static final Tex frame = Resource.loadtex("gfx/hud/buffs/frame");
     public static final Tex cframe = Resource.loadtex("gfx/hud/buffs/cframe");
     static final Coord imgoff = new Coord(3, 3);
@@ -37,7 +46,7 @@ public class Buff extends Widget {
     Indir<Resource> res;
     String tt = null;
     int ameter = -1;
-    int nmeter = -1;
+    int nmeter = -1, rnmeter = -1;
     int cmeter = -1;
     int cticks = -1;
     long gettime;
@@ -77,9 +86,26 @@ public class Buff extends Widget {
 	}
 	try {
 	    Tex img = res.get().layer(Resource.imgc).tex();
-	    g.image(img, imgoff);
+	    Coord isz = img.sz();
+	    String name = res.get().name;
+	    if(CFG.SIMPLE_COMBAT_OPENINGS.get() && OPENINGS.containsKey(name)) {
+		g.chcolor(OPENINGS.get(name));
+		g.frect(imgoff, isz);
+		g.chcolor(Color.WHITE);
+		if(ameter != nmeter) {
+		    ntext = null;
+		    nmeter = ameter;
+		}
+	    } else {
+		g.image(img, imgoff);
+		if(rnmeter != nmeter) {
+		    nmeter = rnmeter;
+		    ntext = null;
+		}
+	    }
 	    if(nmeter >= 0)
-		g.aimage(nmeter(), imgoff.add(img.sz()).sub(1, 1), 1, 1);
+		g.aimage(nmeter(), imgoff.add(isz).sub(1, 1), 1, 1);
+	    
 	    if(cmeter >= 0) {
 		double m = cmeter / 100.0;
 		if(cticks >= 0) {
@@ -89,8 +115,8 @@ public class Buff extends Widget {
 		}
 		m = Utils.clip(m, 0.0, 1.0);
 		g.chcolor(255, 255, 255, a / 2);
-		Coord ccc = img.sz().div(2);
-		g.prect(imgoff.add(ccc), ccc.inv(), img.sz().sub(ccc), Math.PI * 2 * m);
+		Coord ccc = isz.div(2);
+		g.prect(imgoff.add(ccc), ccc.inv(), isz.sub(ccc), Math.PI * 2 * m);
 		g.chcolor(255, 255, 255, a);
 	    }
 	} catch(Loading e) {}
@@ -168,7 +194,7 @@ public class Buff extends Widget {
 	    this.ameter = (Integer)args[0];
 	    shorttip = longtip = null;
 	} else if(msg == "nm") {
-	    this.nmeter = (Integer)args[0];
+	    this.rnmeter = (Integer)args[0];
 	} else if(msg == "cm") {
 	    this.cmeter = (Integer)args[0];
 	    this.cticks = (args.length > 1)?((Integer)args[1]):-1;

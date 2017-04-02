@@ -532,6 +532,9 @@ public class OptWnd extends Window {
 	y += 25;
 	display.add(new CFGBox("Show combat damage", CFG.SHOW_COMBAT_DMG), x, y);
 	
+	y += 25;
+	display.add(new CFGBox("Simplified combat openings", CFG.SIMPLE_COMBAT_OPENINGS, "Show openings as solid colors with numbers"), x, y);
+	
 	my = Math.max(my, y);
 
 	display.add(new PButton(200, "Back", 27, main), new Coord(0, my + 35));
