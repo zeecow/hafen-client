@@ -43,7 +43,8 @@ public class GobDamageInfo extends GobInfo {
     
     public void update(int c, int v) {
 	System.out.println(String.format("Number %d, c: %d", v, c));
-	int qwe = Color.RED.hashCode();
+	//64527 - SHP
+	//61455 - HHP
 	if(c == 61455) {//health
 	    damage += v;
 	    gobDamage.put(gob.id, damage);
