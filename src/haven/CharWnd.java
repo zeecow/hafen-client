@@ -403,8 +403,7 @@ public class CharWnd extends Window {
 	    order();
 	}
 
-	public boolean mousedown(Coord c, int button) {
-	    return(false);
+	protected void itemclick(El item, int button) {
 	}
     }
 
@@ -477,7 +476,7 @@ public class CharWnd extends Window {
 	public final Tex img;
 	public final Color bg;
 	public final Resource res;
-	public int tbv, tcv, cost;
+	public int tbv, cost;
 	private Text ct;
 	private int cbv, ccv;
 
@@ -494,17 +493,12 @@ public class CharWnd extends Window {
 		}, sz.x - 5, sz.y / 2, 1, 0.5);
 	    adda(new IButton("gfx/hud/buttons/sub", "u", "d", null) {
 		    public void click() {adj(-1);}
-		    public boolean mousewheel(Coord c, int a) {adj(-a); return(true);}
 		}, sz.x - 20, sz.y / 2, 1, 0.5);
 	}
 
 	public void tick(double dt) {
 	    if((attr.base != cbv) || (attr.comp != ccv)) {
 		cbv = attr.base; ccv = attr.comp;
-		if(tbv <= cbv) {
-		    tbv = cbv; tcv = ccv;
-		    updcost();
-		}
 		Color c = Color.WHITE;
 		if(ccv > cbv) {
 		    c = buff;
@@ -515,9 +509,10 @@ public class CharWnd extends Window {
 		} else {
 		    tooltip = null;
 		}
-		if(tcv > ccv)
+		if(tbv > 0)
 		    c = tbuff;
-		ct = attrf.render(Integer.toString(tcv), c);
+		ct = attrf.render(Integer.toString(ccv + tbv), c);
+		updcost();
 	    }
 	}
 
@@ -533,20 +528,21 @@ public class CharWnd extends Window {
 	}
 
 	private void updcost() {
-	    int cost = 100 * ((tbv + (tbv * tbv)) - (attr.base + (attr.base * attr.base))) / 2;
+	    int cv = attr.base, nv = cv + tbv;
+	    int cost = 100 * ((nv + (nv * nv)) - (cv + (cv * cv))) / 2;
 	    scost += cost - this.cost;
 	    this.cost = cost;
 	}
 
 	public void adj(int a) {
-	    if(tbv + a < attr.base) a = attr.base - tbv;
-	    tbv += a; tcv += a;
+	    if(tbv + a < 0) a = -tbv;
+	    tbv += a;
 	    cbv = ccv = 0;
 	    updcost();
 	}
 
 	public void reset() {
-	    tbv = attr.base; tcv = attr.comp;
+	    tbv = 0;
 	    cbv = ccv = 0;
 	    updcost();
 	}
@@ -1688,9 +1684,9 @@ public class CharWnd extends Window {
 		    public void click() {
 			ArrayList<Object> args = new ArrayList<Object>();
 			for(SAttr attr : skill) {
-			    if(attr.tbv > attr.attr.base) {
+			    if(attr.tbv > 0) {
 				args.add(attr.attr.nm);
-				args.add(attr.tbv);
+				args.add(attr.attr.base + attr.tbv);
 			    }
 			}
 			CharWnd.this.wdgmsg("sattr", args.toArray(new Object[0]));
