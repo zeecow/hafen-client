@@ -10,6 +10,7 @@ public class TabStrip<T> extends Widget {
     private Button<T> selected;
     private Orientation orientation = Orientation.Horizontal;
     private int minWidth;
+    private Color selectedColor = null;
 
     protected void selected(Button<T> button) {}
 
@@ -28,9 +29,19 @@ public class TabStrip<T> extends Widget {
 	    }
 	});
 	button.tooltip = tooltip;
+	if(selectedColor != null) {
+	    button.bg = selectedColor;
+	}
 	buttons.add(index, button);
 	updateLayout();
 	return button;
+    }
+
+    void setSelectedColor(Color c) {
+	selectedColor = c;
+	for (Button b : buttons) {
+	    b.bg = selectedColor;
+	}
     }
 
     public void select(int buttonIndex) {
@@ -100,7 +111,7 @@ public class TabStrip<T> extends Widget {
     public abstract static class Button<T> extends Widget {
 	public static final Coord padding = new Coord(5, 2);
 	public static final Text.Foundry font = new Text.Foundry(Text.fraktur, 14).aa(true);
-	private static final Color bg = new Color(0, 0, 0, 128);
+	private Color bg = new Color(0, 0, 0, 128);
 	private Tex image;
 	private Text text;
 	private boolean active;
