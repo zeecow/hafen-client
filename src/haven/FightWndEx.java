@@ -100,7 +100,7 @@ public class FightWndEx extends Widget {
 
     private void recount() {
 	int u = 0;
-	for (Action act : acts)
+	for (Action act : ALL)
 	    u += act.u;
 	count.settext(String.format("Used: %d/%d", u, maxact));
 	count.setcolor((u > maxact) ? Color.RED : Color.WHITE);
