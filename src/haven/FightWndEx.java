@@ -477,16 +477,11 @@ public class FightWndEx extends Widget {
 	}
     }
 
-    public class Savelist extends Listbox<Integer> {
-	private int edit = -1;
-	private Text.Line redit = null;
-	private LineEdit nmed;
-	private long focusstart;
-
+    public class Savelist extends Dropbox<Integer> {
 	public Savelist(int w, int h) {
 	    super(w, h, attrf.height() + 2);
 	    setcanfocus(true);
-	    sel = Integer.valueOf(0);
+	    sel = 0;
 	}
 
 	protected Integer listitem(int idx) {return (idx);}
@@ -496,92 +491,17 @@ public class FightWndEx extends Widget {
 	protected void drawbg(GOut g) {}
 
 	protected void drawitem(GOut g, Integer save, int n) {
-	    g.chcolor((n % 2 == 0) ? CharWnd.every : CharWnd.other);
-	    g.frect(Coord.z, g.sz);
-	    g.chcolor();
-	    if(n == edit) {
-		if(redit == null)
-		    redit = attrf.render(nmed.line);
-		g.aimage(redit.tex(), new Coord(20, itemh / 2), 0.0, 0.5);
-		if(hasfocus && (((System.currentTimeMillis() - focusstart) % 1000) < 500)) {
-		    int cx = redit.advance(nmed.point);
-		    g.chcolor(255, 255, 255, 255);
-		    Coord co = new Coord(20 + cx + 1, (g.sz.y - redit.sz().y) / 2);
-		    g.line(co, co.add(0, redit.sz().y), 1);
-		    g.chcolor();
-		}
-	    } else {
-		g.aimage(saves[n].tex(), new Coord(20, itemh / 2), 0.0, 0.5);
-	    }
-	    if(n == usesave)
-		g.aimage(CheckBox.smark, new Coord(itemh / 2, itemh / 2), 0.5, 0.5);
-	}
-
-	private Coord lc = null;
-	private long lt = 0;
-
-	public boolean mousedown(Coord c, int button) {
-	    boolean ret = super.mousedown(c, button);
-	    if(ret && (button == 1)) {
-		long now = System.currentTimeMillis();
-		if(((now - lt) < 500) && (c.dist(lc) < 10) && (sel != null) && (saves[sel] != unused)) {
-		    if(sel == usesave) {
-			edit = sel;
-			nmed = new LineEdit(saves[sel].text) {
-			    protected void done(String line) {
-				saves[edit] = attrf.render(line);
-				edit = -1;
-				nmed = null;
-			    }
-
-			    protected void changed() {
-				redit = null;
-			    }
-			};
-			redit = null;
-			parent.setfocus(this);
-			focusstart = now;
-		    } else {
-			load(sel);
-			use(sel);
-		    }
-		} else {
-		    lt = now;
-		    lc = c;
-		}
-	    }
-	    return (ret);
+	    g.aimage(saves[save].tex(), new Coord(3, itemh / 2), 0.0, 0.5);
 	}
 
 	public void change(Integer sel) {
 	    super.change(sel);
-	    if((edit != -1) && (edit != sel)) {
-		edit = -1;
-		redit = null;
-		nmed = null;
-	    }
+	    load(sel);
+	    use(sel);
 	}
 
-	public boolean type(char c, KeyEvent ev) {
-	    if(edit != -1) {
-		if(c == 27) {
-		    edit = -1;
-		    redit = null;
-		    nmed = null;
-		    return (true);
-		} else {
-		    return (nmed.key(ev));
-		}
-	    }
-	    return (super.type(c, ev));
-	}
-
-	public boolean keydown(KeyEvent ev) {
-	    if(edit != -1) {
-		nmed.key(ev);
-		return (true);
-	    }
-	    return (super.keydown(ev));
+	public void change2(Integer sel) {
+	    super.change(sel);
 	}
     }
 
@@ -637,18 +557,7 @@ public class FightWndEx extends Widget {
 	count = add(new Label(""), p.c.add(p.sz.x + 10, 0));
 
 	int y = 260;
-	savelist = add(new Savelist(370, 3), new Coord(5, y).add(wbox.btloff()));
-	Frame.around(this, Collections.singletonList(savelist));
-	add(new Button(110, "Load", false) {
-	    public void click() {
-		if(savelist.sel == null || savelist.sel < 0) {
-		    getparent(GameUI.class).error("No load entry selected.");
-		} else {
-		    load(savelist.sel);
-		    use(savelist.sel);
-		}
-	    }
-	}, 395, y);
+	savelist = add(new Savelist(370, 5), new Coord(5, y).add(wbox.btloff()));
 	add(new Button(110, "Save", false) {
 	    public void click() {
 		if(savelist.sel == null || savelist.sel < 0) {
@@ -658,7 +567,7 @@ public class FightWndEx extends Widget {
 		    use(savelist.sel);
 		}
 	    }
-	}, 395, y + 27);
+	}, 395, y);
 	pack();
     }
 
@@ -698,7 +607,7 @@ public class FightWndEx extends Widget {
     }
 
     public void uimsg(String nm, Object... args) {
-	if(nm == "avail") {
+	if(Objects.equals(nm, "avail")) {
 	    List<Action> acts = new ArrayList<Action>();
 	    int a = 0;
 	    while (true) {
@@ -717,7 +626,7 @@ public class FightWndEx extends Widget {
 	    this.ALL = acts;
 	    actlist.loading = true;
 	    needFilter = true;
-	} else if(nm == "used") {
+	} else if(Objects.equals(nm, "used")) {
 	    int a = 0;
 	    for (Action act : acts)
 		act.u(0);
@@ -730,7 +639,7 @@ public class FightWndEx extends Widget {
 		int us = (Integer) args[a++];
 		(order[i] = findact(resid)).u(us);
 	    }
-	} else if(nm == "saved") {
+	} else if(Objects.equals(nm, "saved")) {
 	    int fl = (Integer) args[0];
 	    for (int i = 0; i < nsave; i++) {
 		if((fl & (1 << i)) != 0) {
@@ -742,10 +651,10 @@ public class FightWndEx extends Widget {
 		    saves[i] = unused;
 		}
 	    }
-	} else if(nm == "use") {
+	} else if(Objects.equals(nm, "use")) {
 	    usesave = (Integer) args[0];
-	    savelist.change(Integer.valueOf(usesave));
-	} else if(nm == "max") {
+	    savelist.change2(Integer.valueOf(usesave));
+	} else if(Objects.equals(nm, "max")) {
 	    maxact = (Integer) args[0];
 	    recount();
 	} else {
