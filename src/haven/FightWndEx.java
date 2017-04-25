@@ -38,6 +38,7 @@ import static haven.Inventory.*;
 import static haven.Window.wbox;
 
 public class FightWndEx extends Widget {
+    public static final Text.Foundry fnd = new Text.Foundry(Text.sans.deriveFont(Font.BOLD), 14);
     public final int nsave;
     public int maxact;
     public final Actions actlist;
@@ -58,8 +59,8 @@ public class FightWndEx extends Widget {
 	public final Indir<Resource> res;
 	private final int id;
 	public int a, u;
-	private Text rnm, ru;
-	private Tex ri;
+	private Text rnm;
+	private Tex ri, ru, rc;
 
 	public Action(Indir<Resource> res, int id, int a, int u) {
 	    this.res = res;
@@ -86,16 +87,41 @@ public class FightWndEx extends Widget {
 	private void a(int a) {
 	    if(this.a != a) {
 		this.a = a;
-		this.ru = null;
+		if(this.ru != null) {
+		    this.ru.dispose();
+		    this.ru = null;
+		}
+		if(this.rc != null) {
+		    this.rc.dispose();
+		    this.rc = null;
+		}
 	    }
 	}
 
 	private void u(int u) {
 	    if(this.u != u) {
 		this.u = u;
-		this.ru = null;
+		if(this.ru != null) {
+		    this.ru.dispose();
+		    this.ru = null;
+		}
 		recount();
 	    }
+	}
+
+	private Tex usage() {
+	    if(ru == null) {
+		ru = attrf.render(String.format("%d/%d", u, a)).tex();
+	    }
+	    return ru;
+	}
+
+
+	private Tex count() {
+	    if(rc == null) {
+		rc = attrf.render(String.format("%d", a)).tex();
+	    }
+	    return rc;
 	}
     }
 
@@ -133,7 +159,6 @@ public class FightWndEx extends Widget {
 	    g.chcolor((idx % 2 == 0) ? CharWnd.every : CharWnd.other);
 	    g.frect(Coord.z, g.sz);
 	    g.chcolor();
-	    if(act.ru == null) act.ru = attrf.render(String.format("%d/%d", act.u, act.a));
 	    try {
 		if(act.ri == null)
 		    act.ri = new TexI(PUtils.convolvedown(act.res.get().layer(Resource.imgc).img, new Coord(itemh, itemh), CharWnd.iconfilter));
@@ -143,7 +168,7 @@ public class FightWndEx extends Widget {
 	    }
 	    int ty = (itemh - act.rnm.sz().y) / 2;
 	    g.image(act.rnm.tex(), new Coord(itemh + 2, ty));
-	    g.aimage(act.ru.tex(), new Coord(sz.x - 45, ty), 1.0, 0.0);
+	    g.aimage(act.count(), new Coord(sz.x - 45, ty), 1.0, 0.0);
 	    g.aimage(add[da == idx ? 1 : 0], new Coord(sz.x - 10, itemh / 2), 1.0, 0.5);
 	    g.aimage(sub[ds == idx ? 1 : 0], new Coord(sz.x - 25, itemh / 2), 1.0, 0.5);
 	}
@@ -329,7 +354,7 @@ public class FightWndEx extends Widget {
 	private boolean anim = false;
 
 	private BView() {
-	    super(new Coord(((invsq.sz().x + 2) * (order.length - 1)) + (10 * ((order.length - 1) / 5)), 0).add(invsq.sz()));
+	    super(new Coord(((invsq.sz().x + 2) * (order.length - 1)) + (10 * ((order.length - 1) / 5)), 16).add(invsq.sz()));
 	}
 
 	private Coord itemc(int i) {
@@ -348,7 +373,7 @@ public class FightWndEx extends Widget {
 
 	{
 	    for (int i = 0; i < 10; i++)
-		this.keys[i] = Text.render(FightWndEx.keys[i]).tex();
+		this.keys[i] = Text.renderstroked(FightWndEx.keys[i], fnd).tex();
 	}
 
 	public void draw(GOut g) {
@@ -374,9 +399,10 @@ public class FightWndEx extends Widget {
 			    ic = ic.add(animoff[i].mul(Math.pow(1.0 - animpr[i], 3)));
 			}
 			g.image(act.res.get().layer(Resource.imgc).tex(), ic);
+			g.aimage(act.usage(), c.add(invsq.sz().sub(invsq.sz().x / 2, 0)), 0.5, 0);
 		    }
 		} catch (Loading l) {}
-		g.chcolor(156, 180, 158, 255);
+		//g.chcolor(156, 180, 158, 255);
 		g.aimage(keys[i], c.add(invsq.sz().sub(2, 0)), 1, 1);
 		g.chcolor();
 	    }
@@ -638,7 +664,7 @@ public class FightWndEx extends Widget {
 	p = add(new BView(), 5, 223);
 	count = add(new Label(""), p.c.add(p.sz.x + 10, 0));
 
-	int y = 260;
+	int y = 295;
 	add(new Button(65, "Save", false) {
 	    public void click() {
 		if(savelist.sel == null || savelist.sel < 0) {
@@ -652,7 +678,7 @@ public class FightWndEx extends Widget {
 		    }
 		}
 	    }
-	}, 437, y);
+	}, 437, y + 5);
 	edit = add(new IButton("gfx/hud/btn-edit", "", "-d", "-h") {
 	    {
 		tooltip = "Rename";
