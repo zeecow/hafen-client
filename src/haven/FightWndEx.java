@@ -43,6 +43,7 @@ public class FightWndEx extends Widget {
     public final Actions actlist;
     public final ActionTypes acttypes;
     public final Savelist savelist;
+    public final IButton accept, cancel, edit;
     public List<Action> ALL = new ArrayList<Action>();
     private List<Action> acts = ALL;
     private ActionType selectedType = ActionType.All;
@@ -478,10 +479,57 @@ public class FightWndEx extends Widget {
     }
 
     public class Savelist extends Dropbox<Integer> {
+	private int edit = -1;
+	private Text.Line redit = null;
+	private LineEdit nmed;
+	private long focusstart;
+
 	public Savelist(int w, int h) {
 	    super(w, h, attrf.height() + 2);
 	    setcanfocus(true);
 	    sel = 0;
+	}
+
+	public void edit() {
+	    FightWndEx.this.edit.hide();
+	    FightWndEx.this.accept.show();
+	    FightWndEx.this.cancel.show();
+	    edit = sel;
+	    nmed = new LineEdit(saves[sel].text) {
+		protected void done(String line) {
+		    saveName();
+		}
+
+		protected void changed() {
+		    redit = null;
+		}
+	    };
+	    redit = null;
+	    parent.setfocus(this);
+	    focusstart = System.currentTimeMillis();
+	}
+
+	public boolean isEditing() {
+	    return nmed != null && edit != -1;
+	}
+
+	public void saveName() {
+	    if(nmed != null && edit != -1) {
+		saves[edit] = attrf.render(nmed.line);
+		int tmp = edit;
+		cancel();
+		save(tmp);
+		use(tmp);
+	    }
+	}
+
+	public void cancel() {
+	    FightWndEx.this.edit.show();
+	    FightWndEx.this.accept.hide();
+	    FightWndEx.this.cancel.hide();
+	    edit = -1;
+	    redit = null;
+	    nmed = null;
 	}
 
 	protected Integer listitem(int idx) {return (idx);}
@@ -491,13 +539,47 @@ public class FightWndEx extends Widget {
 	protected void drawbg(GOut g) {}
 
 	protected void drawitem(GOut g, Integer save, int n) {
-	    g.aimage(saves[save].tex(), new Coord(3, itemh / 2), 0.0, 0.5);
+	    if(edit == save) {
+		if(redit == null)
+		    redit = attrf.render(nmed.line);
+		g.aimage(redit.tex(), new Coord(3, itemh / 2), 0.0, 0.5);
+		if(hasfocus && (((System.currentTimeMillis() - focusstart) % 1000) < 500)) {
+		    int cx = redit.advance(nmed.point);
+		    g.chcolor(255, 255, 255, 255);
+		    Coord co = new Coord(3 + cx + 1, (g.sz.y - redit.sz().y) / 2);
+		    g.line(co, co.add(0, redit.sz().y), 1);
+		    g.chcolor();
+		}
+	    } else {
+		g.aimage(saves[save].tex(), new Coord(3, itemh / 2), 0.0, 0.5);
+	    }
 	}
 
 	public void change(Integer sel) {
 	    super.change(sel);
+	    cancel();
 	    load(sel);
 	    use(sel);
+	}
+
+	public boolean type(char c, KeyEvent ev) {
+	    if(edit != -1) {
+		if(c == 27) {
+		    cancel();
+		    return (true);
+		} else {
+		    return (nmed.key(ev));
+		}
+	    }
+	    return (super.type(c, ev));
+	}
+
+	public boolean keydown(KeyEvent ev) {
+	    if(edit != -1) {
+		nmed.key(ev);
+		return (true);
+	    }
+	    return (super.keydown(ev));
 	}
 
 	public void change2(Integer sel) {
@@ -557,17 +639,65 @@ public class FightWndEx extends Widget {
 	count = add(new Label(""), p.c.add(p.sz.x + 10, 0));
 
 	int y = 260;
-	savelist = add(new Savelist(370, 5), new Coord(5, y).add(wbox.btloff()));
-	add(new Button(110, "Save", false) {
+	add(new Button(65, "Save", false) {
 	    public void click() {
 		if(savelist.sel == null || savelist.sel < 0) {
 		    getparent(GameUI.class).error("No save entry selected.");
 		} else {
-		    save(savelist.sel);
-		    use(savelist.sel);
+		    if(savelist.isEditing()) {
+			savelist.saveName();
+		    } else {
+			save(savelist.sel);
+			use(savelist.sel);
+		    }
 		}
 	    }
-	}, 395, y);
+	}, 437, y);
+	edit = add(new IButton("gfx/hud/btn-edit", "", "-d", "-h") {
+	    {
+		tooltip = "Rename";
+		recthit = true;
+	    }
+
+	    public void click() {
+		if(savelist.sel == null || savelist.sel < 0) {
+		    getparent(GameUI.class).error("No save entry selected.");
+		} else {
+		    savelist.edit();
+		}
+	    }
+	}, 380, y + 5);
+	accept = add(new IButton("gfx/hud/btn-check", "", "-d", "-h") {
+	    {
+		tooltip = "Accept";
+		recthit = true;
+		hide();
+	    }
+
+	    public void click() {
+		if(savelist.sel == null || savelist.sel < 0) {
+		    getparent(GameUI.class).error("No save entry selected.");
+		} else {
+		    savelist.saveName();
+		}
+	    }
+	}, 380, y + 5);
+	cancel = add(new IButton("gfx/hud/btn-x", "", "-d", "-h") {
+	    {
+		tooltip = "Cancel";
+		recthit = true;
+		hide();
+	    }
+
+	    public void click() {
+		if(savelist.sel == null || savelist.sel < 0) {
+		    getparent(GameUI.class).error("No save entry selected.");
+		} else {
+		    savelist.cancel();
+		}
+	    }
+	}, 400, y + 5);
+	savelist = add(new Savelist(370, 5), wbox.btloff().add(0, y));
 	pack();
     }
 
