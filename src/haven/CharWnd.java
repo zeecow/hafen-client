@@ -497,8 +497,13 @@ public class CharWnd extends Window {
 	}
 
 	public void tick(double dt) {
-	    if((attr.base != cbv) || (attr.comp != ccv)) {
-		cbv = attr.base; ccv = attr.comp;
+	    if(attr.base != cbv) {
+		tbv = 0;
+		ccv = 0;
+		cbv = attr.base;
+	    }
+	    if(attr.comp != ccv) {
+		ccv = attr.comp;
 		Color c = Color.WHITE;
 		if(ccv > cbv) {
 		    c = buff;
@@ -537,13 +542,13 @@ public class CharWnd extends Window {
 	public void adj(int a) {
 	    if(tbv + a < 0) a = -tbv;
 	    tbv += a;
-	    cbv = ccv = 0;
+	    ccv = 0;
 	    updcost();
 	}
 
 	public void reset() {
 	    tbv = 0;
-	    cbv = ccv = 0;
+	    ccv = 0;
 	    updcost();
 	}
 
