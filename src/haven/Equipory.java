@@ -32,7 +32,7 @@ import static haven.Inventory.invsq;
 public class Equipory extends Widget implements DTarget {
     private static final Tex bg = Resource.loadtex("gfx/hud/equip/bg");
     private static final int rx = 34 + bg.sz().x;
-    static Coord ecoords[] = {
+    public static final Coord ecoords[] = {
 	new Coord(0, 0),
 	new Coord(rx, 0),
 	new Coord(0, 33),
@@ -64,6 +64,8 @@ public class Equipory extends Widget implements DTarget {
 
     WItem[] slots = new WItem[ecoords.length];
     Map<GItem, WItem[]> wmap = new HashMap<GItem, WItem[]>();
+    private final Avaview ava;
+
     AttrBonusesWdg bonuses;
 	
     @RName("epry")
@@ -72,15 +74,17 @@ public class Equipory extends Widget implements DTarget {
 	    long gobid;
 	    if(args.length < 1)
 		gobid = parent.getparent(GameUI.class).plid;
+	    else if(args[0] == null)
+		gobid = -1;
 	    else
-		gobid = (Integer)args[0];
+		gobid = Utils.uint32((Integer)args[0]);
 	    return(new Equipory(gobid));
 	}
     }
-	
+
     public Equipory(long gobid) {
 	super(isz);
-	Avaview ava = add(new Avaview(bg.sz(), gobid, "equcam") {
+	ava = add(new Avaview(bg.sz(), gobid, "equcam") {
 		public boolean mousedown(Coord c, int button) {
 		    return(false);
 		}
@@ -103,7 +107,7 @@ public class Equipory extends Widget implements DTarget {
 	bonuses = add(new AttrBonusesWdg(isz.y), isz.x + 5, 0);
 	pack();
     }
-	
+
     public void addchild(Widget child, Object... args) {
 	if(child instanceof GItem) {
 	    add(child);
@@ -120,7 +124,6 @@ public class Equipory extends Widget implements DTarget {
 	    super.addchild(child, args);
 	}
     }
-
     @Override
     public void wdgmsg(Widget sender, String msg, Object... args) {
 	if (sender  instanceof GItem && wmap.containsKey(sender) && msg.equals("ttupdate")) {
@@ -129,7 +132,6 @@ public class Equipory extends Widget implements DTarget {
 	    super.wdgmsg(sender, msg, args);
 	}
     }
-
     public void cdestroy(Widget w) {
 	super.cdestroy(w);
 	if(w instanceof GItem) {
@@ -144,24 +146,38 @@ public class Equipory extends Widget implements DTarget {
 	    bonuses.update(slots);
 	}
     }
-    
-    public boolean drop(Coord cc, Coord ul) {
-	for(int i = 0; i < ecoords.length; i++) {
-	    if(cc.isect(ecoords[i], invsq.sz())) {
-		wdgmsg("drop", i);
-		return(true);
-	    }
+
+    public void uimsg(String msg, Object... args) {
+	if(msg == "pop") {
+	    ava.avadesc = Composited.Desc.decode(ui.sess, args);
+	} else {
+	    super.uimsg(msg, args);
 	}
-	wdgmsg("drop", -1);
+    }
+
+    public int epat(Coord c) {
+	for(int i = 0; i < ecoords.length; i++) {
+	    if(c.isect(ecoords[i], invsq.sz()))
+		return(i);
+	}
+	return(-1);
+    }
+
+    public boolean drop(Coord cc, Coord ul) {
+	wdgmsg("drop", epat(cc));
 	return(true);
     }
-    
-    public void draw(GOut g) {
+
+    public void drawslots(GOut g) {
 	for(int i = 0; i < 16; i++)
 	    g.image(invsq, ecoords[i]);
+    }
+
+    public void draw(GOut g) {
+	drawslots(g);
 	super.draw(g);
     }
-	
+
     public boolean iteminteract(Coord cc, Coord ul) {
 	return(false);
     }
