@@ -1,3 +1,6 @@
+$size[14]{$u{Update for 06.07.17:}
+  * merged loftar's changes
+ 
 $size[14]{$u{Update for 18.03.17:}
   * fixed tile centering
  
