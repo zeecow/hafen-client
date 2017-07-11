@@ -76,7 +76,7 @@ public class MapFile {
 			file.smarkers.put(((SMarker)mark).oid, (SMarker)mark);
 		}
 	    } else {
-		Debug.log.printf("mapfile warning: unknown mapfile index version: %i\n", ver);
+		Debug.log.printf("mapfile warning: unknown mapfile index version: %d\n", ver);
 		return(null);
 	    }
 	} catch(Message.BinError e) {
@@ -447,7 +447,7 @@ public class MapFile {
 		    byte[] tiles = z.bytes(cmaps.x * cmaps.y);
 		    return(new Grid(id, tilesets.toArray(new TileInfo[0]), tiles));
 		} else {
-		    throw(new Message.FormatError(String.format("Unknown grid data version for %x: %i", id, ver)));
+		    throw(new Message.FormatError(String.format("Unknown grid data version for %x: %d", id, ver)));
 		}
 	    } catch(Message.BinError e) {
 		Debug.log.printf("mapfile warning: error when loading grid %x: %s\n", id, e);
