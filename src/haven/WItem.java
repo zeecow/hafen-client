@@ -287,8 +287,8 @@ public class WItem extends Widget implements DTarget2 {
     }
 
     private void drawmeter(GOut g, Coord sz) {
-	if(item.meter > 0) {
-	    double meter = (item.meter > 0)?(item.meter / 100.0):itemmeter.get();
+	Double meter = (item.meter > 0) ? (item.meter / 100.0) : itemmeter.get();
+	if(meter != null && meter > 0) {
 	    if(CFG.PROGRESS_NUMBER.get()) {
 		Tex tex = Text.renderstroked(String.format("%d%%", Math.round(100*meter))).tex();
 		g.aimage(tex, sz.div(2), 0.5, 0.5);
