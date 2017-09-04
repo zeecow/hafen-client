@@ -1,3 +1,6 @@
+$size[14]{$u{Update for 03.08.17:}
+  * merged loftar's changes
+ 
 $size[14]{$u{Update for 11.07.17:}
   * fixed loftar's bug - client crashes because of wrong string format if incorrect map index/grid version encountered
  
