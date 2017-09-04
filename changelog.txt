@@ -1,3 +1,7 @@
+$size[14]{$u{Update for 25.08.17:}
+  * merged loftar's changes
+  * fixed progress meters
+ 
 $size[14]{$u{Update for 03.08.17:}
   * merged loftar's changes
  
