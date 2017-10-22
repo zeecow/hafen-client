@@ -47,8 +47,8 @@ public class Buff extends Widget {
 
     @RName("buff")
     public static class $_ implements Factory {
-	public Widget create(Widget parent, Object[] args) {
-	    Indir<Resource> res = parent.ui.sess.getres((Integer)args[0]);
+	public Widget create(UI ui, Object[] args) {
+	    Indir<Resource> res = ui.sess.getres((Integer)args[0]);
 	    return(new Buff(res));
 	}
     }
@@ -169,6 +169,7 @@ public class Buff extends Widget {
 	    shorttip = longtip = null;
 	} else if(msg == "nm") {
 	    this.nmeter = (Integer)args[0];
+	    ntext = null;
 	} else if(msg == "cm") {
 	    this.cmeter = (Integer)args[0];
 	    this.cticks = (args.length > 1)?((Integer)args[1]):-1;
