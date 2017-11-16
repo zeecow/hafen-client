@@ -49,9 +49,10 @@ public abstract class ItemInfo {
 	return f.build(new SessOwner(sess), args);
     }
     
-    public interface Owner {
-	Glob glob();
-	List<ItemInfo> info();
+    public interface Owner extends OwnerContext {
+	@Deprecated
+	public default Glob glob() {return(context(Glob.class));}
+	public List<ItemInfo> info();
     }
     
     private static class SessOwner implements ItemInfo.Owner{

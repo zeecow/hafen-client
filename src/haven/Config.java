@@ -54,7 +54,8 @@ public class Config {
     public static boolean softres = getprop("haven.softres", "on").equals("on");
     public static byte[] authck = null;
     public static String prefspec = "hafen";
-
+    public static final String confid = "";
+    
     public static String version;
     public static final boolean isUpdate;
     public static boolean center_tile = false;
