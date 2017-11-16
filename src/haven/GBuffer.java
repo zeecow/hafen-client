@@ -26,34 +26,45 @@
 
 package haven;
 
-import java.awt.image.BufferedImage;
+import java.awt.Color;
+import javax.media.opengl.*;
 
-public class StaticGSprite extends GSprite implements GSprite.ImageSprite {
-    public final Resource.Image img;
+public class GBuffer {
+    public final Coord sz;
+    public final TexGL buf;
+    public final GLFrameBuffer fbo;
+    private final GLState ostate;
 
-    public static final Factory fact = new Factory() {
-	    public GSprite create(Owner owner, Resource res, Message sdt) {
-		Resource.Image img = res.layer(Resource.imgc);
-		if(img != null)
-		    return(new StaticGSprite(owner, img));
-		return(null);
-	    }
-	};
-
-    public StaticGSprite(Owner owner, Resource.Image img) {
-	super(owner);
-	this.img = img;
+    public GBuffer(Coord sz) {
+	this.sz = sz;
+	buf = new TexE(sz, GL.GL_RGBA, GL.GL_RGBA, GL.GL_UNSIGNED_BYTE);
+	fbo = new GLFrameBuffer(buf, null);
+	ostate = HavenPanel.OrthoState.fixed(sz);
     }
 
-    public void draw(GOut g) {
-	g.image(img, Coord.z);
+    public void clear(GOut g, Color col) {
+	g.state2d();
+	g.apply();
+	g.gl.glClearColor(col.getRed() / 255f, col.getGreen() / 255f,
+			  col.getBlue() / 255f, col.getAlpha() / 255f);
+	g.gl.glClear(GL.GL_COLOR_BUFFER_BIT);
     }
 
-    public Coord sz() {
-	return(img.sz);
+    public GOut graphics(GOut from, GLState extra) {
+	GLState.Buffer basic = from.basicstate();
+	if(extra != null)
+	    extra.prep(basic);
+	ostate.prep(basic);
+	fbo.prep(basic);
+	return(new GOut(from.gl, from.curgl, from.gc, from.st, basic, sz));
     }
 
-    public BufferedImage image() {
-	return(img.img);
+    public GOut graphics(GOut from) {
+	return(graphics(from, null));
+    }
+
+    public void dispose() {
+	fbo.dispose();
+	buf.dispose();
     }
 }
