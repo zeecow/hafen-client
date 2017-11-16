@@ -30,7 +30,8 @@ import me.ender.Reflect;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.lang.reflect.*;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.*;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -54,22 +55,24 @@ public abstract class ItemInfo {
 	public default Glob glob() {return(context(Glob.class));}
 	public List<ItemInfo> info();
     }
-    
-    private static class SessOwner implements ItemInfo.Owner{
-	private final Glob glob;
-	
-	public SessOwner(Session sess){
-	    glob = sess.glob;
+
+    private static class SessOwner implements ItemInfo.Owner {
+	private final OwnerContext.ClassResolver<SessOwner> ctxr;
+
+	public SessOwner(Session sess) {
+	    ctxr = new OwnerContext.ClassResolver<SessOwner>()
+		.add(Glob.class, x -> sess.glob)
+		.add(Session.class, x -> sess);
 	}
-	
-	@Override
-	public Glob glob() {
-	    return glob;
-	}
-	
+
 	@Override
 	public List<ItemInfo> info() {
 	    return null;
+	}
+
+	@Override
+	public <T> T context(Class<T> cl) {
+	    return (ctxr.context(cl, this));
 	}
     }
     

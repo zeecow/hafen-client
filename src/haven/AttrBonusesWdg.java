@@ -7,6 +7,9 @@ import java.util.stream.Collectors;
 
 public class AttrBonusesWdg extends Widget implements ItemInfo.Owner {
     private static final Coord bonusc = new Coord(0, 20);
+    private static final OwnerContext.ClassResolver<AttrBonusesWdg> ctxr = new ClassResolver<AttrBonusesWdg>()
+	.add(Glob.class, wdg -> wdg.ui.sess.glob)
+	.add(Session.class, wdg -> wdg.ui.sess);
     private final Scrollbar bar;
 
     private boolean needUpdate = false;
@@ -152,12 +155,12 @@ public class AttrBonusesWdg extends Widget implements ItemInfo.Owner {
     }
 
     @Override
-    public Glob glob() {
-	return ui.sess.glob;
+    public List<ItemInfo> info() {
+	return info;
     }
 
     @Override
-    public List<ItemInfo> info() {
-	return info;
+    public <T> T context(Class<T> cl) {
+	return (ctxr.context(cl, this));
     }
 }
