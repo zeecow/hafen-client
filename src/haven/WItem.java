@@ -30,11 +30,10 @@ import haven.QualityList.SingleType;
 import me.ender.Reflect;
 
 import java.awt.*;
-import java.awt.image.BufferedImage;
 import java.util.List;
-import java.util.function.Function;
-
-import static haven.Inventory.*;
+import java.awt.image.BufferedImage;
+import haven.ItemInfo.AttrCache;
+import static haven.Inventory.sqsz;
 
 public class WItem extends Widget implements DTarget2 {
     public static final Resource missing = Resource.local().loadwait("gfx/invobjs/missing");
@@ -99,15 +98,15 @@ public class WItem extends Widget implements DTarget2 {
 	public LongTip(List<ItemInfo> info) {super(longtip(info));}
     }
 
-    private long hoverstart;
+    private double hoverstart;
     private ItemTip shorttip = null, longtip = null;
     private List<ItemInfo> ttinfo = null;
     public Object tooltip(Coord c, Widget prev) {
-	long now = System.currentTimeMillis();
+	double now = Utils.rtime();
 	if(prev == this) {
 	} else if(prev instanceof WItem) {
-	    long ps = ((WItem)prev).hoverstart;
-	    if(now - ps < 1000)
+	    double ps = ((WItem)prev).hoverstart;
+	    if(now - ps < 1.0)
 		hoverstart = now;
 	    else
 		hoverstart = ps;
@@ -122,7 +121,7 @@ public class WItem extends Widget implements DTarget2 {
 		shorttip = longtip = null;
 		ttinfo = info;
 	    }
-	    if(now - hoverstart < 1000) {
+	    if(now - hoverstart < 1.0) {
 		if(shorttip == null)
 		    shorttip = new ShortTip(info);
 		return(shorttip);
@@ -136,60 +135,28 @@ public class WItem extends Widget implements DTarget2 {
 	}
     }
 
-    public volatile static int cacheseq = 0;
-    public class AttrCache<T> {
-	private final Function<List<ItemInfo>, T> data;
-	private List<ItemInfo> forinfo = null;
-	private T save = null;
-	private int forseq = -1;
-
-	public AttrCache(Function<List<ItemInfo>, T> data) {this.data = data;}
-
-	public T get() {
-	    try {
-		List<ItemInfo> info = item.info();
-		if((cacheseq != forseq) || (info != forinfo)) {
-		    save = data.apply(info);
-		    forinfo = info;
-		    forseq = cacheseq;
-		}
-	    } catch(Loading e) {
-		return(null);
+    private List<ItemInfo> info() {return(item.info());}
+    public final AttrCache<Color> olcol = new AttrCache<>(this::info, AttrCache.cache(info -> {
+	Color ret = null;
+	for(ItemInfo inf : info) {
+	    if(inf instanceof GItem.ColorInfo) {
+		Color c = ((GItem.ColorInfo) inf).olcol();
+		if(c != null)
+		    ret = (ret == null) ? c : Utils.preblend(ret, c);
 	    }
-	    return(save);
 	}
-    }
+	return ret;
+    }));
+    public final AttrCache<Tex> itemnum = new AttrCache<>(this::info, AttrCache.map1s(GItem.NumberInfo.class, ninf -> new TexI(GItem.NumberInfo.numrender(ninf.itemnum(), ninf.numcolor()))));
+    public final AttrCache<Double> itemmeter = new AttrCache<>(this::info, AttrCache.map1(GItem.MeterInfo.class, minf -> minf::meter));
     
-    public final AttrCache<Color> olcol = new AttrCache<Color>(info -> {
-	    Color ret = null;
-	    for(ItemInfo inf : info) {
-		if(inf instanceof GItem.ColorInfo) {
-		    Color c = ((GItem.ColorInfo)inf).olcol();
-		    if(c != null)
-			ret = (ret == null)?c:Utils.preblend(ret, c);
-		}
-	    }
-	    return(ret);
-	});
-    
-    public final AttrCache<Tex> itemnum = new AttrCache<Tex>(info -> {
-	    GItem.NumberInfo ninf = ItemInfo.find(GItem.NumberInfo.class, info);
-	    if(ninf == null) return(null);
-	    return(new TexI(Utils.outline2(Text.render(Integer.toString(ninf.itemnum()), ninf.numcolor()).img, Utils.contrast(ninf.numcolor()))));
-	});
-
-    public final AttrCache<Double> itemmeter = new AttrCache<Double>(info -> {
-	GItem.MeterInfo minf = ItemInfo.find(GItem.MeterInfo.class, info);
-	return((minf == null)?null:minf.meter());
-    });
-	    
-    public final AttrCache<QualityList> itemq = new AttrCache<QualityList>(info -> {
+    public final AttrCache<QualityList> itemq = new AttrCache<QualityList>(this::info, AttrCache.cache(info -> {
 	List<ItemInfo.Contents> contents = ItemInfo.findall(ItemInfo.Contents.class, info);
 	List<ItemInfo> qualities = null;
-	if(!contents.isEmpty()){
-	    for(ItemInfo.Contents content : contents){
+	if(!contents.isEmpty()) {
+	    for(ItemInfo.Contents content : contents) {
 		List<ItemInfo> tmp = ItemInfo.findall(QualityList.classname, content.sub);
-		if(!tmp.isEmpty()){
+		if(!tmp.isEmpty()) {
 		    qualities = tmp;
 		}
 	    }
@@ -197,54 +164,54 @@ public class WItem extends Widget implements DTarget2 {
 	if(qualities == null || qualities.isEmpty()) {
 	    qualities = ItemInfo.findall(QualityList.classname, info);
 	}
-    
+	
 	QualityList qualityList = new QualityList(qualities);
 	return !qualityList.isEmpty() ? qualityList : null;
-    });
+    }));
 
-    public final AttrCache<Tex> heurnum = new AttrCache<Tex>(info -> {
+    public final AttrCache<Tex> heurnum = new AttrCache<Tex>(this::info, AttrCache.cache(info -> {
 	String num = ItemInfo.getCount(info);
-	if(num == null) return (null);
+	if(num == null) return null;
 	return Text.renderstroked(num, Color.WHITE, Color.BLACK).tex();
-    });
+    }));
     
-    public final AttrCache<Tex> durability = new AttrCache<Tex>(info -> {
+    public final AttrCache<Tex> durability = new AttrCache<Tex>(this::info, AttrCache.cache(info -> {
 	Pair<Integer, Integer> wear = ItemInfo.getWear(info);
 	if(wear == null) return (null);
 	return Text.renderstroked(String.valueOf(wear.b - wear.a), DURABILITY_COLOR, Color.BLACK).tex();
-    }) {
+    })) {
 	@Override
 	public Tex get() {
 	    return CFG.SHOW_ITEM_DURABILITY.get() ? super.get() : null;
 	}
     };
-
-    public final AttrCache<Pair<Integer, Integer>> wear = new AttrCache<Pair<Integer, Integer>>(ItemInfo::getWear);
     
-    public final AttrCache<Tex> armor = new AttrCache<Tex>(info -> {
+    public final AttrCache<Pair<Integer, Integer>> wear = new AttrCache<Pair<Integer, Integer>>(this::info, AttrCache.cache(ItemInfo::getWear));
+    
+    public final AttrCache<Tex> armor = new AttrCache<Tex>(this::info, AttrCache.cache(info -> {
 	Pair<Integer, Integer> armor = ItemInfo.getArmor(info);
 	if(armor == null) return (null);
 	return Text.renderstroked(String.format("%d/%d", armor.a, armor.b), ARMOR_COLOR, Color.BLACK).tex();
-    }) {
+    })) {
 	@Override
 	public Tex get() {
 	    return CFG.SHOW_ITEM_ARMOR.get() ? super.get() : null;
 	}
     };
+    
+    public final AttrCache<List<ItemInfo>> gilding = new AttrCache<List<ItemInfo>>(this::info, AttrCache.cache(info -> ItemInfo.findall("Slotted", info)));
+    
+    public final AttrCache<List<ItemInfo>> slots = new AttrCache<List<ItemInfo>>(this::info, AttrCache.cache(info -> ItemInfo.findall("ISlots", info)));
 
-    public final AttrCache<List<ItemInfo>> gilding = new AttrCache<List<ItemInfo>>(info-> ItemInfo.findall("Slotted", info));
-
-    public final AttrCache<List<ItemInfo>> slots = new AttrCache<List<ItemInfo>>(info->ItemInfo.findall("ISlots", info));
-
-    public final AttrCache<Boolean> gildable = new AttrCache<Boolean>(info -> {
+    public final AttrCache<Boolean> gildable = new AttrCache<Boolean>(this::info, AttrCache.cache(info -> {
 	List<ItemInfo> slots = ItemInfo.findall("ISlots", info);
-	for (ItemInfo slot : slots) {
+	for(ItemInfo slot : slots) {
 	    if(Reflect.getFieldValueInt(slot, "left") > 0) {
 		return true;
 	    }
 	}
 	return false;
-    });
+    }));
 
     private GSprite lspr = null;
     public void tick(double dt) {

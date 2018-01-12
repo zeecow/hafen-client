@@ -44,7 +44,7 @@ import static haven.KeyBinder.*;
 public class GameUI extends ConsoleHost implements Console.Directory {
     public static final Text.Foundry msgfoundry = new Text.Foundry(Text.dfont, 14);
     private static final int blpw = 142, brpw = 142;
-    public final String chrid;
+    public final String chrid, genus;
     public final long plid;
     private final Hidepanel ulpanel, umpanel, urpanel, blpanel, brpanel, menupanel;
     public Avaview portrait;
@@ -55,7 +55,7 @@ public class GameUI extends ConsoleHost implements Console.Directory {
     private List<Widget> meters = new LinkedList<Widget>();
     private List<Widget> cmeters = new LinkedList<Widget>();
     private Text lastmsg;
-    private long msgtime;
+    private double msgtime;
     private Window invwnd, equwnd;
     private CraftWindow makewnd;
     public Inventory maininv;
@@ -126,14 +126,18 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 	public Widget create(UI ui, Object[] args) {
 	    String chrid = (String)args[0];
 	    int plid = (Integer)args[1];
-	    return(new GameUI(chrid, plid));
+	    String genus = "";
+	    if(args.length > 2)
+		genus = (String)args[2];
+	    return(new GameUI(chrid, plid, genus));
 	}
     }
     
     private final Coord minimapc;
-    public GameUI(String chrid, long plid) {
+    public GameUI(String chrid, long plid, String genus) {
 	this.chrid = chrid;
 	this.plid = plid;
+	this.genus = genus;
 	setcanfocus(true);
 	setfocusctl(true);
 	chat = add(new ChatUI(0, 0));
@@ -690,6 +694,83 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 	}
     }
 
+    private String mapfilename() {
+	StringBuilder buf = new StringBuilder();
+	buf.append(genus);
+	String chrid = Utils.getpref("mapfile/" + this.chrid, "");
+	if(!chrid.equals("")) {
+	    if(buf.length() > 0) buf.append('/');
+	    buf.append(chrid);
+	}
+	return(buf.toString());
+    }
+
+    public Coord optplacement(Widget child, Coord org) {
+	Set<Window> closed = new HashSet<>();
+	Set<Coord> open = new HashSet<>();
+	open.add(org);
+	Coord opt = null;
+	double optscore = Double.NEGATIVE_INFINITY;
+	Coord plc = null;
+	{
+	    Gob pl = map.player();
+	    if(pl != null)
+		plc = pl.sc;
+	}
+	Area parea = Area.sized(Coord.z, sz);
+	while(!open.isEmpty()) {
+	    Coord cur = Utils.take(open);
+	    double score = 0;
+	    Area tarea = Area.sized(cur, child.sz);
+	    if(parea.isects(tarea)) {
+		double outside = 1.0 - (((double)parea.overlap(tarea).area()) / ((double)tarea.area()));
+		if((outside > 0.75) && !cur.equals(org))
+		    continue;
+		score -= Math.pow(outside, 2) * 100;
+	    } else {
+		if(!cur.equals(org))
+		    continue;
+		score -= 100;
+	    }
+	    {
+		boolean any = false;
+		for(Widget wdg = this.child; wdg != null; wdg = wdg.next) {
+		    if(!(wdg instanceof Window))
+			continue;
+		    Window wnd = (Window)wdg;
+		    if(!wnd.visible)
+			continue;
+		    Area warea = wnd.parentarea(this);
+		    if(warea.isects(tarea)) {
+			any = true;
+			score -= ((double)warea.overlap(tarea).area()) / ((double)tarea.area());
+			if(!closed.contains(wnd)) {
+			    open.add(new Coord(wnd.c.x - child.sz.x, cur.y));
+			    open.add(new Coord(cur.x, wnd.c.y - child.sz.y));
+			    open.add(new Coord(wnd.c.x + wnd.sz.x, cur.y));
+			    open.add(new Coord(cur.x, wnd.c.y + wnd.sz.y));
+			    closed.add(wnd);
+			}
+		    }
+		}
+		if(!any)
+		    score += 10;
+	    }
+	    if(plc != null) {
+		if(tarea.contains(plc))
+		    score -= 100;
+		else
+		    score -= (1 - Math.pow(tarea.closest(plc).dist(plc) / sz.dist(Coord.z), 2)) * 1.5;
+	    }
+	    score -= (cur.dist(org) / sz.dist(Coord.z)) * 0.75;
+	    if(score > optscore) {
+		optscore = score;
+		opt = cur;
+	    }
+	}
+	return(opt);
+    }
+
     public void addchild(Widget child, Object... args) {
 	String place = ((String)args[0]).intern();
 	if(place == "mapview") {
@@ -704,7 +785,9 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 	    }
 	    mmap = blpanel.add(new LocalMiniMap2(new Coord(133, 133), map), minimapc);
 	    mmap.lower();
-	    if(mmap.save != null) {
+	    if(ResCache.global != null) {
+		MapFile file = MapFile.load(ResCache.global, mapfilename());
+		mmap.save(file);
 		mapfile = new MapWnd2(mmap.save, map, new Coord(700, 500), "Map");
 		mapfile.hide();
 		add(mapfile, 50, 50);
@@ -801,10 +884,15 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 		c = (Coord)args[1];
 	    } else if(args[1] instanceof Coord2d) {
 		c = ((Coord2d)args[1]).mul(new Coord2d(this.sz.sub(child.sz))).round();
+		c = optplacement(child, c);
+	    } else if(args[1] instanceof String) {
+		c = relpos((String)args[1], child, (args.length > 2) ? ((Object[])args[2]) : new Object[] {}, 0);
 	    } else {
 		throw(new UI.UIException("Illegal gameui child", place, args));
 	    }
 	    add(child, c);
+	} else if(place == "abt") {
+	    add(child, Coord.z);
 	} else {
 	    throw(new UI.UIException("Illegal gameui child", place, args));
 	}
@@ -876,7 +964,7 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 	if(cmdline != null) {
 	    drawcmd(g, new Coord(blpw + 10, by -= 20));
 	} else if(lastmsg != null) {
-	    if((System.currentTimeMillis() - msgtime) > 3000) {
+	    if((Utils.rtime() - msgtime) > 3.0) {
 		lastmsg = null;
 	    } else {
 		g.chcolor(0, 0, 0, 192);
@@ -892,10 +980,11 @@ public class GameUI extends ConsoleHost implements Console.Directory {
     
     public void tick(double dt) {
 	super.tick(dt);
-	if(!afk && (System.currentTimeMillis() - ui.lastevent > 300000)) {
+	double idle = Utils.rtime() - ui.lastevent;
+	if(!afk && (idle > 300)) {
 	    afk = true;
 	    wdgmsg("afk");
-	} else if(afk && (System.currentTimeMillis() - ui.lastevent < 300000)) {
+	} else if(afk && (idle <= 300)) {
 	    afk = false;
 	}
     }
@@ -988,12 +1077,12 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 	    this.gkey = (char)gkey;
 	    this.tooltip = RichText.render(tooltip, 0);
 	}
-    
+ 
 	@Override
 	public Object tooltip(Coord c, Widget prev) {
 	    return super.tooltip(c, prev);
 	}
-    
+ 
 	public void click() {}
 
 	public boolean globtype(char key, KeyEvent ev) {
@@ -1008,14 +1097,14 @@ public class GameUI extends ConsoleHost implements Console.Directory {
     public static class MenuButton2 extends IButton {
 	private final Action action;
 	private final String tip;
-    
+ 
 	MenuButton2(String base, String tooltip, Action action, int code, int mods) {
 	    super("gfx/hud/" + base, "", "-d", "-h");
 	    this.action = action;
 	    this.tip = tooltip;
 	    KeyBinder.add(code, mods, action);
 	}
-    
+ 
 	@Override
 	public Object tooltip(Coord c, Widget prev) {
 	    if(!checkhit(c)) {
@@ -1028,7 +1117,7 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 	    }
 	    return RichText.render(tt, 0);
 	}
-    
+ 
 	@Override
 	public void click() {
 	    action.run(ui.gui);
@@ -1115,7 +1204,7 @@ public class GameUI extends ConsoleHost implements Console.Directory {
     }
     
     public void msg(String msg, Color color, Color logcol) {
-	msgtime = System.currentTimeMillis();
+	msgtime = Utils.rtime();
 	lastmsg = msgfoundry.render(msg, color);
 	syslog.append(msg, logcol);
     }
@@ -1131,11 +1220,11 @@ public class GameUI extends ConsoleHost implements Console.Directory {
     }
 
     private static final Resource msgsfx = Resource.local().loadwait("sfx/msg");
-    private long lastmsgsfx = 0;
+    private double lastmsgsfx = 0;
     public void msg(String msg) {
 	msg(msg, MsgType.INFO);
-	long now = System.currentTimeMillis();
-	if(now - lastmsgsfx > 100) {
+	double now = Utils.rtime();
+	if(now - lastmsgsfx > 0.1) {
 	    Audio.play(msgsfx);
 	    lastmsgsfx = now;
 	}
@@ -1311,7 +1400,7 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 		    }
 		    return RichText.render(tt, 0);
 		}
-	    
+	 
 		public void draw(GOut g) {
 			super.draw(g);
 			Color urg = chat.urgcols[chat.urgency];
@@ -1446,6 +1535,11 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 			Utils.setpref("belttype", "n");
 			resize(sz);
 		    }
+		}
+	    });
+	cmdmap.put("chrmap", new Console.Command() {
+		public void run(Console cons, String[] args) {
+		    Utils.setpref("mapfile/" + chrid, args[1]);
 		}
 	    });
 	cmdmap.put("tool", new Console.Command() {
