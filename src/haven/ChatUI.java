@@ -144,7 +144,7 @@ public class ChatUI extends Widget {
 	private PrintWriter log;
 	
 	public static abstract class Message {
-	    public final long time = System.currentTimeMillis();
+	    public final double time = Utils.ntime();
 	    
 	    public abstract Text text();
 	    public abstract Tex tex();
@@ -1103,7 +1103,7 @@ public class ChatUI extends Widget {
 	public final Channel chan;
 	public final Text chnm;
 	public final Channel.Message msg;
-	public final long time = System.currentTimeMillis();
+	public final double time = Utils.ntime();
 	
 	private Notification(Channel chan, Channel.Message msg) {
 	    this.chan = chan;
@@ -1129,11 +1129,11 @@ public class ChatUI extends Widget {
 	} else {
 	    c = br.sub(0, 5);
 	}
-	long now = System.currentTimeMillis();
+	double now = Utils.ntime();
 	synchronized(notifs) {
 	    for(Iterator<Notification> i = notifs.iterator(); i.hasNext();) {
 		Notification n = i.next();
-		if(now - n.time > 5000) {
+		if(now - n.time > 5.0) {
 		    i.remove();
 		    continue;
 		}

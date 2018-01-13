@@ -32,7 +32,7 @@ import java.awt.*;
 import java.util.*;
 
 public class Glob {
-    public long time, epoch = System.currentTimeMillis();
+    public double time, epoch = Utils.rtime();
     public Astronomy ast;
     public OCache oc = new OCache(this);
     public MCache map;
@@ -171,22 +171,18 @@ public class Glob {
 	lastctick = now;
     }
 
-    private static double defix(int i) {
-	return(((double)i) / 1e9);
-    }
-	
-    private long lastrep = 0;
-    private long rgtime = 0;
-    public long globtime() {
-	long now = System.currentTimeMillis();
-	long raw = ((now - epoch) * 3) + (time * 1000);
+    private final double timefac = 3.0;
+    private double lastrep = 0, rgtime = 0;
+    public double globtime() {
+	double now = Utils.rtime();
+	double raw = ((now - epoch) * timefac) + time;
 	if(lastrep == 0) {
 	    rgtime = raw;
 	} else {
-	    long gd = (now - lastrep) * 3;
+	    double gd = (now - lastrep) * timefac;
 	    rgtime += gd;
-	    if(Math.abs(rgtime + gd - raw) > 1000)
-		rgtime = rgtime + (long)((raw - rgtime) * (1.0 - Math.pow(10.0, -(now - lastrep) / 1000.0)));
+	    if(Math.abs(rgtime + gd - raw) > 1.0)
+		rgtime = rgtime + ((raw - rgtime) * (1.0 - Math.pow(10.0, -(now - lastrep))));
 	}
 	lastrep = now;
 	return(rgtime);
@@ -199,10 +195,10 @@ public class Glob {
 	    Object[] a = msg.list();
 	    int n = 0;
 	    if(t == "tm") {
-		time = ((Number)a[n++]).intValue();
-		epoch = System.currentTimeMillis();
-		Timer.server = 1000*time;
-		Timer.local = epoch;
+		time = ((Number)a[n++]).doubleValue();
+		epoch = Utils.rtime();
+		Timer.server = (long)(1000*time);
+		Timer.local = (long) epoch;
 		if(!inc)
 		    lastrep = 0;
 	    } else if(t == "astro") {

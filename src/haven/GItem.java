@@ -27,6 +27,7 @@
 package haven;
 
 import java.awt.Color;
+import java.awt.image.BufferedImage;
 import java.util.*;
 
 public class GItem extends AWidget implements ItemInfo.SpriteOwner, GSprite.Owner {
@@ -65,6 +66,9 @@ public class GItem extends AWidget implements ItemInfo.SpriteOwner, GSprite.Owne
 	public int itemnum();
 	public default Color numcolor() {
 	    return(Color.WHITE);
+	}
+	public static BufferedImage numrender(int num, Color col) {
+	    return(Utils.outline2(Text.render(Integer.toString(num), col).img, Utils.contrast(col)));
 	}
     }
 
