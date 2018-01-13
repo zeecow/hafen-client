@@ -42,9 +42,10 @@ public class GobDamageInfo extends GobInfo {
     }
     
     public void update(int c, int v) {
-	System.out.println(String.format("Number %d, c: %d", v, c));
+	//System.out.println(String.format("Number %d, c: %d", v, c));
 	//64527 - SHP
 	//61455 - HHP
+	//35071 - Initiative
 	if(c == 61455) {//health
 	    damage += v;
 	    gobDamage.put(gob.id, damage);
