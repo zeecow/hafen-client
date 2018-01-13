@@ -831,8 +831,8 @@ public class FightWndEx extends Widget {
     }
 
     enum ActionType {
-	All("paginae/act/pow", null),
-	Attacks("paginae/act/atk", new HashSet<>(Arrays.asList(
+	All("gfx/hud/tab/combat/all", null),
+	Attacks("gfx/hud/tab/combat/attack", new HashSet<>(Arrays.asList(
 	    "paginae/atk/pow",
 	    "paginae/atk/lefthook",
 	    "paginae/atk/lowblow",
@@ -855,7 +855,7 @@ public class FightWndEx extends Widget {
 	    "paginae/atk/ravenbite",
 	    "paginae/atk/takedown"
 	))),
-	Restorations("paginae/craft/food", new HashSet<>(Arrays.asList(
+	Defences("gfx/hud/tab/combat/restore", new HashSet<>(Arrays.asList(
 	    "paginae/atk/regain",
 	    "paginae/atk/dash",
 	    "paginae/atk/zigzag",
@@ -868,7 +868,7 @@ public class FightWndEx extends Widget {
 	    "paginae/atk/artevade",
 	    "paginae/atk/flex"
 	))),
-	Maneuvers("paginae/craft/curios", new HashSet<>(Arrays.asList(
+	Maneuvers("gfx/hud/tab/combat/maneuver", new HashSet<>(Arrays.asList(
 	    "paginae/atk/toarms",
 	    "paginae/atk/shield",
 	    "paginae/atk/parry",
@@ -878,7 +878,7 @@ public class FightWndEx extends Widget {
 	    "paginae/atk/bloodlust",
 	    "paginae/atk/combmed"
 	))),
-	Moves("paginae/craft/stoneaxe", new HashSet<>(Arrays.asList(
+	Moves("gfx/hud/tab/combat/move", new HashSet<>(Arrays.asList(
 	    "paginae/atk/think",
 	    "paginae/atk/takeaim"
 	)));
