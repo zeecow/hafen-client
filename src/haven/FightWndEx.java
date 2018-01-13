@@ -175,9 +175,7 @@ public class FightWndEx extends Widget {
 
 	public void change(final Action act) {
 	    if(act != null)
-		info.settext(new Indir<String>() {
-		    public String get() {return (act.rendertext());}
-		});
+		info.settext(() -> (act.rendertext()));
 	    else if(sel != null)
 		info.settext("");
 	    super.change(act);
@@ -209,12 +207,8 @@ public class FightWndEx extends Widget {
 	    if((drag != null) && (dp == null)) {
 		try {
 		    final Tex dt = drag.res.get().layer(Resource.imgc).tex();
-		    ui.drawafter(new UI.AfterDraw() {
-			public void draw(GOut g) {
-			    g.image(dt, ui.mc.add(dt.sz().div(2).inv()));
-			}
-		    });
-		} catch (Loading l) {}
+		    ui.drawafter(g1 -> g1.image(dt, ui.mc.add(dt.sz().div(2).inv())));
+		} catch (Loading ignored) {}
 	    }
 	    super.draw(g);
 	}
@@ -401,8 +395,7 @@ public class FightWndEx extends Widget {
 			g.image(act.res.get().layer(Resource.imgc).tex(), ic);
 			g.aimage(act.usage(), c.add(invsq.sz().sub(invsq.sz().x / 2, 0)), 0.5, 0);
 		    }
-		} catch (Loading l) {}
-		//g.chcolor(156, 180, 158, 255);
+		} catch (Loading ignored) {}
 		g.aimage(keys[i], c.add(invsq.sz().sub(2, 0)), 1, 1);
 		g.chcolor();
 	    }
@@ -562,8 +555,6 @@ public class FightWndEx extends Widget {
 
 	protected int listitems() {return (nsave);}
 
-	protected void drawbg(GOut g) {}
-
 	protected void drawitem(GOut g, Integer save, int n) {
 	    if(edit == save) {
 		if(redit == null)
@@ -622,12 +613,12 @@ public class FightWndEx extends Widget {
 	args.add(n);
 	if(saves[n] != unused)
 	    args.add(saves[n].text);
-	for (int i = 0; i < order.length; i++) {
-	    if(order[i] == null) {
+	for(Action action : order) {
+	    if(action == null) {
 		args.add(null);
 	    } else {
-		args.add(order[i].id);
-		args.add(order[i].u);
+		args.add(action.id);
+		args.add(action.u);
 	    }
 	}
 	wdgmsg("save", args.toArray(new Object[0]));
@@ -810,7 +801,7 @@ public class FightWndEx extends Widget {
 	    }
 	} else if(Objects.equals(nm, "use")) {
 	    usesave = (Integer) args[0];
-	    savelist.change2(Integer.valueOf(usesave));
+	    savelist.change2(usesave);
 	} else if(Objects.equals(nm, "max")) {
 	    maxact = (Integer) args[0];
 	    recount();
