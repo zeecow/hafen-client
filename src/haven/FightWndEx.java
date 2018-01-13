@@ -748,6 +748,7 @@ public class FightWndEx extends Widget {
 		acts = ALL.stream().filter(selectedType::matches).collect(Collectors.toList());
 		acts.sort((a, b) -> (a.res.get().layer(Resource.tooltip).t.compareTo(b.res.get().layer(Resource.tooltip).t)));
 		actlist.change(actlist.listitems() > 0 ? actlist.listitem(0) : null);
+		actlist.showsel();
 		needFilter = false;
 	    }
 	} catch (Resource.Loading ignored) {
