@@ -26,30 +26,30 @@
 
 package haven;
 
-import java.awt.Color;
+import haven.Resource.AButton;
+
+import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.font.TextAttribute;
 import java.awt.image.BufferedImage;
-import haven.Resource.AButton;
 import java.util.*;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class MenuGrid extends Widget {
     public final static Tex bg = Resource.loadtex("gfx/hud/invsq");
     public final static Coord bgsz = bg.sz().add(-1, -1);
-    public final static Pagina next = new Pagina(null, Resource.local().loadwait("gfx/hud/sc-next").indir());
-    public final static Pagina bk = new Pagina(null, Resource.local().loadwait("gfx/hud/sc-back").indir());
     public final static RichText.Foundry ttfnd = new RichText.Foundry(TextAttribute.FAMILY, "SansSerif", TextAttribute.SIZE, 10);
     public final Set<Pagina> paginae = new HashSet<Pagina>();
     public int pagseq = 0;
     private static Coord gsz = new Coord(4, 4);
-    public Pagina cur;
-    private Pagina pressed;
-    private Pagina dragging;
-    private Pagina layout[][] = new Pagina[gsz.x][gsz.y];
+    public Pagina cur, dragging;
+    private Collection<PagButton> curbtns = null;
+    private PagButton pressed, layout[][] = new PagButton[gsz.x][gsz.y];
     private UI.Grab grab;
     private int curoff = 0;
     private boolean recons = true;
-    private Map<Character, Pagina> hotmap = new TreeMap<Character, Pagina>();
+    private Map<Character, PagButton> hotmap = new HashMap<>();
     public Pagina lastCraft = null;
 
 	@RName("scm")
@@ -59,50 +59,133 @@ public class MenuGrid extends Widget {
 	}
     }
 
-    public static class Pagina implements java.io.Serializable, ItemInfo.Owner {
-	public final Glob glob;
+    public static class PagButton implements ItemInfo.Owner {
+	public final Pagina pag;
+	public final Resource res;
+
+	public PagButton(Pagina pag) {
+	    this.pag = pag;
+	    this.res = pag.res();
+	}
+
+	public BufferedImage img() {return(res.layer(Resource.imgc).img);}
+	public String name() {return(res.layer(Resource.action).name);}
+	public char hotkey() {return(res.layer(Resource.action).hk);}
+	public void use() {
+	    pag.scm.wdgmsg("act", (Object[])res.layer(Resource.action).ad);
+	}
+
+	public String sortkey() {
+	    AButton ai = pag.act();
+	    if(ai.ad.length == 0)
+		return("\0" + name());
+	    return(name());
+	}
+
+	private List<ItemInfo> info = null;
+	public List<ItemInfo> info() {
+	    if(info == null)
+		info = ItemInfo.buildinfo(this, pag.rawinfo);
+	    return(info);
+	}
+	private static final OwnerContext.ClassResolver<PagButton> ctxr = new OwnerContext.ClassResolver<PagButton>()
+	    .add(Glob.class, p -> p.pag.scm.ui.sess.glob)
+	    .add(Session.class, p -> p.pag.scm.ui.sess);
+	public <T> T context(Class<T> cl) {return(ctxr.context(cl, this));}
+
+	public BufferedImage rendertt(boolean withpg) {
+	    Resource.AButton ad = res.layer(Resource.action);
+	    Resource.Pagina pg = res.layer(Resource.pagina);
+	    String tt = ad.name;
+	    int pos = tt.toUpperCase().indexOf(Character.toUpperCase(ad.hk));
+	    if(pos >= 0)
+		tt = tt.substring(0, pos) + "$b{$col[255,128,0]{" + tt.charAt(pos) + "}}" + tt.substring(pos + 1);
+	    else if(ad.hk != 0)
+		tt += " [" + ad.hk + "]";
+	    BufferedImage ret = ttfnd.render(tt, 300).img;
+	    if(withpg) {
+		List<ItemInfo> info = info();
+		info.removeIf(el -> el instanceof ItemInfo.Name);
+		if(!info.isEmpty())
+		    ret = ItemInfo.catimgs(0, ret, ItemInfo.longtip(info));
+		if(pg != null)
+		    ret = ItemInfo.catimgs(0, ret, ttfnd.render("\n" + pg.text, 200).img);
+	    }
+	    return(ret);
+	}
+
+	@Resource.PublishedCode(name = "pagina")
+	public interface Factory {
+	    public PagButton make(Pagina info);
+	}
+    }
+
+    public static interface CustomPaginaAction {
+	void perform(OwnerContext ctx);
+    }
+    
+    public class CustomPagButton extends PagButton {
+
+	private final CustomPaginaAction action;
+
+	public CustomPagButton(Pagina pag, CustomPaginaAction action) {
+	    super(pag);
+	    this.action = action;
+	}
+
+	@Override
+	public void use() {
+	    action.perform(pag);
+	}
+    }
+    
+    public final PagButton next = new PagButton(new Pagina(this, Resource.local().loadwait("gfx/hud/sc-next").indir())) {
+	    public void use() {
+		if((curoff + 14) >= curbtns.size())
+		    curoff = 0;
+		else
+		    curoff += 14;
+	    }
+
+	    public BufferedImage rendertt(boolean withpg) {
+		return(RichText.render("More... ($b{$col[255,128,0]{\u21e7N}})", 0).img);
+	    }
+	};
+
+    public final PagButton bk = new PagButton(new Pagina(this, Resource.local().loadwait("gfx/hud/sc-back").indir())) {
+	    public void use() {
+		pag.scm.cur = paginafor(pag.scm.cur.act().parent);
+		curoff = 0;
+	    }
+
+	    public BufferedImage rendertt(boolean withpg) {
+		return(RichText.render("Back ($b{$col[255,128,0]{Backspace}})", 0).img);
+	    }
+	};
+    
+    public static class Pagina implements ItemInfo.Owner {
+	public final MenuGrid scm;
 	public final Indir<Resource> res;
 	public State st;
-	public int meter;
-	public double gettime, dtime, fstart;
-	public Image img;
+	public double meter, gettime, dtime, fstart;
+	public Indir<Tex> img;
 	public int newp;
 	public Object[] rawinfo = {};
 
-	public interface Image {
-	    public Tex tex();
-	}
-
 	public static enum State {
 	    ENABLED, DISABLED {
-		public Image img(final Pagina pag) {
-		    return(new Image() {
-			    private Tex c = null;
-
-			    public Tex tex() {
-				if(pag.res() == null)
-				    return(null);
-				if(c == null)
-				    c = new TexI(PUtils.monochromize(pag.res().layer(Resource.imgc).img, Color.LIGHT_GRAY));
-				return(c);
-			    }
-			});
+		public Indir<Tex> img(Pagina pag) {
+		    return(Utils.cache(() -> new TexI(PUtils.monochromize(pag.button().img(), Color.LIGHT_GRAY))));
 		}
 	    };
 
-	    public Image img(final Pagina pag) {
-		return(new Image() {
-			public Tex tex() {
-			    if(pag.res() == null)
-				return(null);
-			    return(pag.res().layer(Resource.imgc).tex());
-			}
-		    });
+	    public Indir<Tex> img(Pagina pag) {
+		return(Utils.cache(() -> new TexI(pag.button().img())));
 	    }
 	}
 
-	public Pagina(Glob glob, Indir<Resource> res) {
-	    this.glob = glob;
+	public Pagina(MenuGrid scm, Indir<Resource> res) {
+	    this.scm = scm;
 	    this.res = res;
 	    state(State.ENABLED);
 	}
@@ -114,6 +197,21 @@ public class MenuGrid extends Widget {
 	public Resource.AButton act() {
 	    return(res().layer(Resource.action));
 	}
+
+	private PagButton button = null;
+	public PagButton button() {
+	    if(button == null) {
+		Resource res = res();
+		PagButton.Factory f = res.getcode(PagButton.Factory.class, false);
+		if(f == null)
+		    button = new PagButton(this);
+		else
+		    button = f.make(this);
+	    }
+	    return(button);
+	}
+
+	public void button(PagButton btn) {button = btn;}
 
 	public void state(State st) {
 	    this.st = st;
@@ -127,8 +225,9 @@ public class MenuGrid extends Widget {
 	    return(info);
 	}
 	private static final OwnerContext.ClassResolver<Pagina> ctxr = new OwnerContext.ClassResolver<Pagina>()
-	    .add(Glob.class, p -> p.glob)
-	    .add(Session.class, p -> p.glob.sess);
+	    .add(Glob.class, p -> p.scm.ui.sess.glob)
+	    .add(Session.class, p -> p.scm.ui.sess)
+	    .add(UI.class, p -> p.scm.ui);
 	public <T> T context(Class<T> cl) {return(ctxr.context(cl, this));}
     
 	public boolean isAction() {
@@ -151,22 +250,20 @@ public class MenuGrid extends Widget {
 	}
     }
 
-    public class PaginaException extends RuntimeException {
-	public Pagina pag;
-	
-	public PaginaException(Pagina p) {
-	    super("Invalid pagina: " + p.res);
-	    pag = p;
-	}
-    }
-
     @Override
     public void bound() {
 	super.bound();
 	synchronized (paginae) {
-	    paginae.add(new Pagina(ui.sess.glob, Resource.local().load("paginae/add/timer")));
+	    paginae.add(makeLocal("paginae/add/timer", ctx -> ctx.context(UI.class).gui.timers.toggle()));
 	}
 	ui.gui.menuObservable.notifyObservers();
+    }
+    
+    @SuppressWarnings("SameParameterValue")
+    private Pagina makeLocal(String path, CustomPaginaAction action) {
+	Pagina p = new Pagina(this, Resource.local().loadwait(path).indir());
+	p.button(new CustomPagButton(p, action));
+	return p;
     }
 
     public final Map<Indir<Resource>, Pagina> pmap = new WeakHashMap<Indir<Resource>, Pagina>();
@@ -176,9 +273,17 @@ public class MenuGrid extends Widget {
 	synchronized(pmap) {
 	    Pagina p = pmap.get(res);
 	    if(p == null)
-		pmap.put(res, p = new Pagina(ui.sess.glob, res));
+		pmap.put(res, p = new Pagina(this, res));
 	    return(p);
 	}
+    }
+    
+    public boolean consb(Pagina p, Collection<PagButton> buf) {
+        List<Pagina> pags = buf.stream().map(btn -> btn.pag).collect(Collectors.toList());
+        boolean result = cons(p, pags);
+        buf.clear();
+        for(Pagina pag : pags) { buf.add(pag.button());	}
+        return result;
     }
     
     public boolean cons(Pagina p, Collection<Pagina> buf) {
@@ -208,7 +313,7 @@ public class MenuGrid extends Widget {
 	    try {
 		AButton ad = pag.act();
 		if(ad == null)
-		    throw(new PaginaException(pag));
+		    throw(new RuntimeException("Pagina in " + pag.res + " lacks action"));
 		Pagina parent = paginafor(ad.parent);
 		if((pag.newp != 0) && (parent != null) && (parent.newp == 0)) {
 		    parent.newp = 2;
@@ -243,22 +348,25 @@ public class MenuGrid extends Widget {
 
     private void updlayout() {
 	synchronized(paginae) {
-	    List<Pagina> cur = new ArrayList<Pagina>();
-	    recons = !cons(this.cur, cur);
-	    Collections.sort(cur, sorter);
+	    List<PagButton> cur = new ArrayList<>();
+	    recons = !consb(this.cur, cur);
+	    Collections.sort(cur, Comparator.comparing(PagButton::sortkey));
+	    this.curbtns = cur;
 	    int i = curoff;
 	    hotmap.clear();
+	    for(PagButton btn : cur) {
+		char hk = btn.hotkey();
+		if(hk != 0)
+		    hotmap.put(Character.toUpperCase(hk), btn);
+	    }
 	    for(int y = 0; y < gsz.y; y++) {
 		for(int x = 0; x < gsz.x; x++) {
-		    Pagina btn = null;
+		    PagButton btn = null;
 		    if((this.cur != null) && (x == gsz.x - 1) && (y == gsz.y - 1)) {
 			btn = bk;
 		    } else if((cur.size() > ((gsz.x * gsz.y) - 1)) && (x == gsz.x - 2) && (y == gsz.y - 1)) {
 			btn = next;
 		    } else if(i < cur.size()) {
-			Resource.AButton ad = cur.get(i).act();
-			if(ad.hk != 0)
-			    hotmap.put(Character.toUpperCase(ad.hk), cur.get(i));
 			btn = cur.get(i++);
 		    }
 		    layout[x][y] = btn;
@@ -297,11 +405,11 @@ public class MenuGrid extends Widget {
 	return(ret);
     }
 
-    private static Map<Pagina, Tex> glowmasks = new WeakHashMap<Pagina, Tex>();
-    private Tex glowmask(Pagina pag) {
+    private static Map<PagButton, Tex> glowmasks = new WeakHashMap<>();
+    private Tex glowmask(PagButton pag) {
 	Tex ret = glowmasks.get(pag);
 	if(ret == null) {
-	    ret = new TexI(PUtils.glowmask(PUtils.glowmask(pag.res().layer(Resource.imgc).img.getRaster()), 4, new Color(32, 255, 32)));
+	    ret = new TexI(PUtils.glowmask(PUtils.glowmask(pag.img().getRaster()), 4, new Color(32, 255, 32)));
 	    glowmasks.put(pag, ret);
 	}
 	return(ret);
@@ -312,24 +420,25 @@ public class MenuGrid extends Widget {
 	    for(int x = 0; x < gsz.x; x++) {
 		Coord p = bgsz.mul(new Coord(x, y));
 		g.image(bg, p);
-		Pagina btn = layout[x][y];
+		PagButton btn = layout[x][y];
 		if(btn != null) {
-		    Tex btex = btn.img.tex();
+		    Pagina info = btn.pag;
+		    Tex btex = info.img.get();
 		    g.image(btex, p.add(1, 1));
-		    if(btn.meter > 0) {
-			double m = btn.meter / 1000.0;
-			if(btn.dtime > 0)
-			    m += (1 - m) * (now - btn.gettime) / btn.dtime;
+		    if(info.meter > 0) {
+			double m = info.meter;
+			if(info.dtime > 0)
+			    m += (1 - m) * (now - info.gettime) / info.dtime;
 			m = Utils.clip(m, 0, 1);
 			g.chcolor(255, 255, 255, 128);
 			g.fellipse(p.add(bgsz.div(2)), bgsz.div(2), Math.PI / 2, ((Math.PI / 2) + (Math.PI * 2 * m)));
 			g.chcolor();
 		    }
-		    if(btn.newp != 0) {
-			if(btn.fstart == 0) {
-			    btn.fstart = now;
+		    if(info.newp != 0) {
+			if(info.fstart == 0) {
+			    info.fstart = now;
 			} else {
-			    double ph = (now - btn.fstart) - (((x + (y * gsz.x)) * 0.15) % 1.0);
+			    double ph = (now - info.fstart) - (((x + (y * gsz.x)) * 0.15) % 1.0);
 			    if(ph < 1.25) {
 				g.chcolor(255, 255, 255, (int)(255 * ((Math.cos(ph * Math.PI * 2) * -0.5) + 0.5)));
 				g.image(glowmask(btn), p.sub(4, 4));
@@ -351,7 +460,7 @@ public class MenuGrid extends Widget {
 	}
 	super.draw(g);
 	if(dragging != null) {
-	    final Tex dt = dragging.img.tex();
+	    Tex dt = dragging.img.get();
 	    ui.drawafter(new UI.AfterDraw() {
 		    public void draw(GOut g) {
 			g.image(dt, ui.mc.add(dt.sz().div(2).inv()));
@@ -360,20 +469,21 @@ public class MenuGrid extends Widget {
 	}
     }
 
-    private Pagina curttp = null;
+    private PagButton curttp = null;
     private boolean curttl = false;
     private Tex curtt = null;
     private double hoverstart;
     public Object tooltip(Coord c, Widget prev) {
-	Pagina pag = bhit(c);
+	PagButton pag = bhit(c);
 	double now = Utils.rtime();
-	if((pag != null) && (pag.act() != null)) {
+	if(pag != null) {
 	    if(prev != this)
 		hoverstart = now;
 	    boolean ttl = (now - hoverstart) > 0.5;
 	    if((pag != curttp) || (ttl != curttl)) {
 		try {
-		    curtt = new TexI(rendertt(pag, ttl));
+		    BufferedImage ti = pag.rendertt(ttl);
+		    curtt = (ti == null) ? null : new TexI(ti);
 		} catch(Loading l) {
 		    return(null);
 		}
@@ -387,7 +497,7 @@ public class MenuGrid extends Widget {
 	}
     }
 
-    private Pagina bhit(Coord c) {
+    private PagButton bhit(Coord c) {
 	Coord bc = c.div(bgsz);
 	if((bc.x >= 0) && (bc.y >= 0) && (bc.x < gsz.x) && (bc.y < gsz.y))
 	    return(layout[bc.x][bc.y]);
@@ -396,7 +506,7 @@ public class MenuGrid extends Widget {
     }
 
     public boolean mousedown(Coord c, int button) {
-	Pagina h = bhit(c);
+	PagButton h = bhit(c);
 	if((button == 1) && (h != null)) {
 	    pressed = h;
 	    grab = ui.grabmouse(this);
@@ -406,13 +516,18 @@ public class MenuGrid extends Widget {
 
     public void mousemove(Coord c) {
 	if((dragging == null) && (pressed != null)) {
-	    Pagina h = bhit(c);
+	    PagButton h = bhit(c);
 	    if(h != pressed)
-		dragging = pressed;
+		dragging = pressed.pag;
 	}
     }
 
-    public void use(Pagina r, boolean reset) {
+    public void use(Pagina p, boolean reset) {
+        use(p.button(), reset);
+    }
+    
+    public void use(PagButton pbtn, boolean reset) {
+        Pagina r = pbtn.pag;
 	Collection<Pagina> sub = new LinkedList<Pagina>(),
 	    cur = new LinkedList<Pagina>();
 	cons(r, sub);
@@ -421,11 +536,11 @@ public class MenuGrid extends Widget {
 	if(sub.size() > 0) {
 	    this.cur = r;
 	    curoff = 0;
-	} else if(r == bk) {
+	} else if(r == bk.pag) {
 	    this.cur = paginafor(this.cur.act().parent);
 	    curoff = 0;
 	    selectCraft(this.cur);
-	} else if(r == next) {
+	} else if(r == next.pag) {
 	    if((curoff + 14) >= cur.size())
 		curoff = 0;
 	    else
@@ -435,37 +550,17 @@ public class MenuGrid extends Widget {
 	    if(isCrafting(r)){
 		lastCraft = r;
 	    }
-	    senduse(r);
-	    if(reset)
+	    pbtn.use();
+	    if(reset) {
 		this.cur = null;
-	    curoff = 0;
+		curoff = 0;
+	    }
 	}
 	updlayout();
     }
 
-    public boolean senduse(Pagina r) {
-	String [] ad = r.act().ad;
-	if((ad == null) || (ad.length < 1)){
-	    return false;
-	}
-	if(ad[0].equals("@")) {
-	    usecustom(ad);
-	} else {
-	    wdgmsg("act", (Object[])ad);
-	}
-	return true;
-    }
-
     public void senduse(String... ad) {
 	wdgmsg("act", (Object[]) ad);
-    }
-
-    private void usecustom(String[] ad) {
-	if(ad[1].equals("timers")) {
-	    if(ui != null && ui.gui != null) {
-		ui.gui.timers.toggle();
-	    }
-	}
     }
 
     public void tick(double dt) {
@@ -474,11 +569,12 @@ public class MenuGrid extends Widget {
     }
 
     public boolean mouseup(Coord c, int button) {
-	Pagina h = bhit(c);
+	PagButton h = bhit(c);
 	if((button == 1) && (grab != null)) {
 	    if(dragging != null) {
 		ui.dropthing(ui.root, ui.mc, dragging.res());
-		dragging = pressed = null;
+		pressed = null;
+		dragging = null;
 	    } else if(pressed != null) {
 		if(pressed == h)
 		    use(h, false);
@@ -510,9 +606,9 @@ public class MenuGrid extends Widget {
 			if((fl & 2) != 0)
 			    pag.state(Pagina.State.DISABLED);
 			if((fl & 4) != 0) {
-			    pag.meter = ((Number)args[a++]).intValue();
+			    pag.meter = ((Number)args[a++]).doubleValue() / 1000.0;
 			    pag.gettime = Utils.rtime();
-			    pag.dtime = (((Number)args[a++]).doubleValue()) / 1000.0;
+			    pag.dtime = ((Number)args[a++]).doubleValue() / 1000.0;
 			}
 			if((fl & 8) != 0)
 			    pag.newp = 1;
@@ -549,7 +645,7 @@ public class MenuGrid extends Widget {
 	    use(next, false);
 	    return(true);
 	}
-	Pagina r = hotmap.get(Character.toUpperCase(k));
+	PagButton r = hotmap.get(Character.toUpperCase(k));
 	if(r != null) {
 	    use(r, true);
 	    return(true);

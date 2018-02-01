@@ -42,9 +42,20 @@ public class Reflect {
     }
 
     private static Field getField(Object obj, String name) throws NoSuchFieldException {
-	Field f = obj.getClass().getDeclaredField(name);
-	f.setAccessible(true);
-	return f;
+        Class cls = obj.getClass();
+	while (true) {
+	    try {
+		Field f = cls.getDeclaredField(name);
+		f.setAccessible(true);
+		return f;
+	    } catch (NoSuchFieldException e) {
+		cls = cls.getSuperclass();
+		if(cls == null){
+		    throw e;
+		}
+	    }
+	    
+	}
     }
 
     public static boolean hasField(Object obj, String name) {

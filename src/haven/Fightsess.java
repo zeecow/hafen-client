@@ -27,6 +27,8 @@
 package haven;
 
 import java.awt.*;
+import java.io.File;
+import java.nio.file.Files;
 import java.util.*;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
@@ -38,11 +40,13 @@ public class Fightsess extends Widget {
     public static final Coord actframeo = Buff.imgoff;
     public static final Tex indframe = Resource.loadtex("gfx/hud/combat/indframe");
     public static final Coord indframeo = (indframe.sz().sub(32, 32)).div(2);
+    public static final Tex indbframe = Resource.loadtex("gfx/hud/combat/indbframe");
+    public static final Coord indbframeo = (indframe.sz().sub(32, 32)).div(2);
     public static final Tex useframe = Resource.loadtex("gfx/hud/combat/lastframe");
     public static final Coord useframeo = (useframe.sz().sub(32, 32)).div(2);
     public static final int actpitch = 50;
     public final Action[] actions;
-    public int use = -1;
+    public int use = -1, useb = -1;
     public Coord pcc;
     public int pho;
     private Fightview fv;
@@ -227,6 +231,8 @@ public class Fightsess extends Widget {
 		    if(CFG.SHOW_COMBAT_KEYS.get()) {g.aimage(keytex(i), ca.add(16, 16), 0.5, 0.5);}
 		    if(i == use) {
 			g.image(indframe, ca.sub(indframeo));
+		    } else if(i == useb) {
+			g.image(indbframe, ca.sub(indbframeo));
 		    } else {
 			g.image(actframe, ca.sub(actframeo));
 		    }
@@ -333,6 +339,7 @@ public class Fightsess extends Widget {
 	    actions[n].ct = now + (((Number)args[1]).doubleValue() * 0.06);
 	} else if(msg == "use") {
 	    this.use = (Integer)args[0];
+	    this.useb = (args.length > 1) ? ((Integer)args[1]) : -1;
 	} else if(msg == "used") {
 	} else {
 	    super.uimsg(msg, args);

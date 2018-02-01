@@ -57,7 +57,7 @@ public class CraftDBWnd extends Window implements DTarget2 {
 	    protected void itemclick(Recipe recipe, int button) {
 		Pagina item = recipe.p;
 		if(button == 1) {
-		    if(item == MenuGrid.bk) {
+		    if(item == ui.gui.menu.bk.pag) {
 			item = current;
 			if(getPaginaChildren(current).size() == 0) {
 			    item = menu.getParent(item);
@@ -137,7 +137,8 @@ public class CraftDBWnd extends Window implements DTarget2 {
     }
     
     public void select(Pagina p, boolean use, boolean skipReparent) {
-	boolean isBack = p == MenuGrid.bk;
+	Pagina BACK = ui.gui.menu.bk.pag;
+	boolean isBack = p == BACK;
 	if(!menu.isCrafting(p) && !isBack) {
 	    return;
 	}
@@ -152,7 +153,7 @@ public class CraftDBWnd extends Window implements DTarget2 {
 		}
 		children.sort(MenuGrid.sorter);
 		if(p != CRAFT) {
-		    children.add(0, MenuGrid.bk);
+		    children.add(0, BACK);
 		}
 	    	filter.setline("");
 		box.setitems(children);
@@ -187,7 +188,7 @@ public class CraftDBWnd extends Window implements DTarget2 {
 	if(senduse != null) {
 	    Pagina p = senduse;
 	    closemake();
-	    menu.senduse(p);
+	    p.button().use();
 	}
 	drawDescription(g);
     }
@@ -433,8 +434,6 @@ public class CraftDBWnd extends Window implements DTarget2 {
 		    String name = "...";
 		    if(act != null) {
 			name = act.name;
-		    } else if(p == MenuGrid.bk) {
-			name = "Back";
 		    }
 		    BufferedImage text = Text.render(name).img;
 
