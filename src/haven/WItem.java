@@ -30,6 +30,7 @@ import haven.QualityList.SingleType;
 import me.ender.Reflect;
 
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.List;
 import java.awt.image.BufferedImage;
 import haven.ItemInfo.AttrCache;
@@ -51,7 +52,7 @@ public class WItem extends Widget implements DTarget2 {
 	CFG.REAL_TIME_CURIO.observe(cfg -> longtip = null);
 	CFG.SHOW_CURIO_LPH.observe(cfg -> longtip = null);
     }
-    
+
     public void drawmain(GOut g, GSprite spr) {
 	spr.draw(g);
     }
@@ -59,7 +60,7 @@ public class WItem extends Widget implements DTarget2 {
     public static BufferedImage shorttip(List<ItemInfo> info) {
 	return(ItemInfo.shorttip(info));
     }
-    
+
     public static BufferedImage longtip(GItem item, List<ItemInfo> info) {
 	BufferedImage img = ItemInfo.longtip(info);
 	Resource.Pagina pg = item.res.get().layer(Resource.pagina);
@@ -67,33 +68,33 @@ public class WItem extends Widget implements DTarget2 {
 	    img = ItemInfo.catimgs(0, img, RichText.render("\n" + pg.text, 200).img);
 	return(img);
     }
-    
+
     public BufferedImage longtip(List<ItemInfo> info) {
 	return(longtip(item, info));
     }
-    
+
     public class ItemTip implements Indir<Tex> {
 	private final TexI tex;
-	
+
 	public ItemTip(BufferedImage img) {
 	    if(img == null)
 		throw(new Loading());
 	    tex = new TexI(img);
 	}
-	
+
 	public GItem item() {
 	    return(item);
 	}
-	
+
 	public Tex get() {
 	    return(tex);
 	}
     }
-    
+
     public class ShortTip extends ItemTip {
 	public ShortTip(List<ItemInfo> info) {super(shorttip(info));}
     }
-    
+
     public class LongTip extends ItemTip {
 	public LongTip(List<ItemInfo> info) {super(longtip(info));}
     }
@@ -147,7 +148,15 @@ public class WItem extends Widget implements DTarget2 {
 	}
 	return ret;
     }));
-    public final AttrCache<Tex> itemnum = new AttrCache<>(this::info, AttrCache.map1s(GItem.NumberInfo.class, ninf -> new TexI(GItem.NumberInfo.numrender(ninf.itemnum(), ninf.numcolor()))));
+    public final AttrCache<GItem.InfoOverlay<?>[]> itemols = new AttrCache<>(this::info, info -> {
+	    ArrayList<GItem.InfoOverlay<?>> buf = new ArrayList<>();
+	    for(ItemInfo inf : info) {
+		if(inf instanceof GItem.OverlayInfo)
+		    buf.add(GItem.InfoOverlay.create((GItem.OverlayInfo<?>)inf));
+	    }
+	    GItem.InfoOverlay<?>[] ret = buf.toArray(new GItem.InfoOverlay<?>[0]);
+	    return(() -> ret);
+	});
     public final AttrCache<Double> itemmeter = new AttrCache<>(this::info, AttrCache.map1(GItem.MeterInfo.class, minf -> minf::meter));
     
     public final AttrCache<QualityList> itemq = new AttrCache<QualityList>(this::info, AttrCache.cache(info -> {
@@ -245,6 +254,11 @@ public class WItem extends Widget implements DTarget2 {
 	    }
 	    drawmain(g, spr);
 	    g.defstate();
+	    GItem.InfoOverlay<?>[] ols = itemols.get();
+	    if(ols != null) {
+		for(GItem.InfoOverlay<?> ol : ols)
+		    ol.draw(g);
+	    }
 	    drawnum(g, sz);
 	    drawmeter(g, sz);
 	    drawq(g);
@@ -293,11 +307,12 @@ public class WItem extends Widget implements DTarget2 {
 	if(item.num >= 0) {
 	    tex = Text.render(Integer.toString(item.num)).tex();
 	} else {
-	    tex = chainattr(itemnum, heurnum, armor, durability);
+	    tex = chainattr(/*itemnum, */heurnum, armor, durability);
 	}
+    
 	if(tex != null) {
 	    if(CFG.SWAP_NUM_AND_Q.get()) {
-		g.aimage(tex, TEXT_PADD_TOP.add(sz.x, 0), 1, 0);
+		g.aimage(tex, TEXT_PADD_TOP.add(sz.x, 0),1 , 0);
 	    } else {
 		g.aimage(tex, TEXT_PADD_BOT.add(sz), 1, 1);
 	    }

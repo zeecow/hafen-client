@@ -9,7 +9,7 @@ import java.util.*;
 import java.util.List;
 
 public class QualityList extends ItemInfo {
-    public static final String classname = "haven.res.ui.tt.q.qbuff.QBuff";
+    public static final String classname = "Quality";
     public static final Comparator<Quality> QSORTER = (o1, o2) -> o1.type.name().compareTo(o2.type.name());
 
     private final List<Quality> qualities;
