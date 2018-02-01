@@ -261,7 +261,7 @@ public class MenuGrid extends Widget {
     
     @SuppressWarnings("SameParameterValue")
     private Pagina makeLocal(String path, CustomPaginaAction action) {
-	Pagina p = new Pagina(this, Resource.local().load(path));
+	Pagina p = new Pagina(this, Resource.local().loadwait(path).indir());
 	p.button(new CustomPagButton(p, action));
 	return p;
     }
