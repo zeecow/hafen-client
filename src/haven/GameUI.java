@@ -377,7 +377,7 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 
     public void toggleActList() {
 	if(actlist == null){
-	    actlist = add(new ActWindow("Act...", "paginae/act/.+|paginae/pose/.+|paginae/gov/.+|paginae/add/.+"));
+	    actlist = add(new ActWindow("Act...", "paginae/act/.+|paginae/pose/.+|paginae/gov/.+|paginae/add/.+|gfx/fx/msrad|ui/tt/q/quality"));
 	} else if(actlist.visible) {
 	    actlist.hide();
 	} else {
