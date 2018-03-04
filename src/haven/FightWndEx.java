@@ -166,9 +166,11 @@ public class FightWndEx extends Widget {
 	    } catch (Loading l) {
 		g.image(WItem.missing.layer(Resource.imgc).tex(), Coord.z, new Coord(itemh, itemh));
 	    }
-	    int ty = (itemh - act.rnm.sz().y) / 2;
-	    g.image(act.rnm.tex(), new Coord(itemh + 2, ty));
-	    g.aimage(act.count(), new Coord(sz.x - 45, ty), 1.0, 0.0);
+	    if(act.rnm != null) {
+		int ty = (itemh - act.rnm.sz().y) / 2;
+		g.image(act.rnm.tex(), new Coord(itemh + 2, ty));
+		g.aimage(act.count(), new Coord(sz.x - 45, ty), 1.0, 0.0);
+	    }
 	    g.aimage(add[da == idx ? 1 : 0], new Coord(sz.x - 10, itemh / 2), 1.0, 0.5);
 	    g.aimage(sub[ds == idx ? 1 : 0], new Coord(sz.x - 25, itemh / 2), 1.0, 0.5);
 	}
