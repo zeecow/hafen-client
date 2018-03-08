@@ -98,15 +98,15 @@ public class Radar {
     public static final Color VIEW_BG_COLOR = new Color(255, 255, 255, 60);
     public static final Color VIEW_BORDER_COLOR = new Color(0, 0, 0, 128);
     
-    public static void draw(GOut g, Function<Coord2d, Coord> transform, Coord2d player, float scale) {
+    public static void draw(GOut g, Function<Coord2d, Coord> transform, Coord2d player, int scale) {
 	if(CFG.MMAP_VIEW.get() && player != null) {
 	    Coord2d sgridsz = new Coord2d(MCache.sgridsz);
 	    Coord rc = transform.apply(player.div(sgridsz).floor().sub(4, 4).mul(sgridsz));
 	    if(rc != null) {
 		g.chcolor(VIEW_BG_COLOR);
-		g.frect(rc, VIEW_SZ.mul(scale));
+		g.frect(rc, VIEW_SZ.div(scale));
 		g.chcolor(VIEW_BORDER_COLOR);
-		g.rect(rc, VIEW_SZ.mul(scale));
+		g.rect(rc, VIEW_SZ.div(scale));
 		g.chcolor();
 	    }
 	}

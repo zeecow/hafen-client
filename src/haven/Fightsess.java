@@ -221,14 +221,22 @@ public class Fightsess extends Widget {
 	    }
 	}
 	for(int i = 0; i < actions.length; i++) {
-	    Coord ca = altui ? new Coord(x0 - 18, bottom - 150).add(actc(i)).add(16, 16) : pcc.add(actc(i));
+	    Coord ca = altui ? new Coord(x0 - 18, bottom - 150).add(actc(i)) : pcc.add(actc(i));
 	    Action act = actions[i];
 	    try {
 		if(act != null) {
 		    Tex img = act.res.get().layer(Resource.imgc).tex();
-		    ca = ca.sub(img.sz().div(2));
+		    Coord hsz = img.sz().div(2);
 		    g.image(img, ca);
-		    if(CFG.SHOW_COMBAT_KEYS.get()) {g.aimage(keytex(i), ca.add(16, 16), 0.5, 0.5);}
+		    if(now < act.ct) {
+			double a = (now - act.cs) / (act.ct - act.cs);
+			g.chcolor(0, 0, 0, 132);
+			g.prect(ca.add(hsz), hsz.inv(), hsz, (1.0 - a) * Math.PI * 2);
+			g.chcolor();
+			g.aimage(Text.renderstroked(String.format("%.1f", act.ct - now)).tex(), ca.add(hsz.x, 0), 0.5, 0);
+		    }
+		    if(CFG.SHOW_COMBAT_KEYS.get()) {g.aimage(keytex(i), ca.add(img.sz()), 1, 1);}
+		    
 		    if(i == use) {
 			g.image(indframe, ca.sub(indframeo));
 		    } else if(i == useb) {

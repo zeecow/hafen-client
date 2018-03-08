@@ -35,10 +35,11 @@ import haven.ItemInfo.AttrCache;
 
 public class Buff extends Widget implements ItemInfo.ResOwner {
     private static final Map<String, Color> OPENINGS = new HashMap<String, Color>(4) {{
-	put("paginae/atk/offbalance", new Color(81, 165, 56));
-	put("paginae/atk/reeling", new Color(210, 210, 64));
-	put("paginae/atk/dizzy", new Color(39, 82, 191));
-	put("paginae/atk/cornered", new Color(192, 28, 28));
+//	put("paginae/atk/offbalance", new Color(81, 165, 56));
+//	put("paginae/atk/reeling", new Color(210, 210, 64));
+//	put("paginae/atk/dizzy", new Color(39, 82, 191));
+//	put("paginae/atk/cornered", new Color(192, 28, 28));
+	put("paginae/atk/guard", new Color(64, 64, 64));
     }};
     
     public static final Text.Foundry nfnd = new Text.Foundry(Text.dfont.deriveFont(Font.BOLD), 12);

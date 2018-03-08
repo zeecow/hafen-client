@@ -309,7 +309,7 @@ public class WItem extends Widget implements DTarget2 {
 	} else {
 	    tex = chainattr(/*itemnum, */heurnum, armor, durability);
 	}
-    
+ 
 	if(tex != null) {
 	    if(CFG.SWAP_NUM_AND_Q.get()) {
 		g.aimage(tex, TEXT_PADD_TOP.add(sz.x, 0),1 , 0);

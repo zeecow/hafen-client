@@ -154,7 +154,7 @@ public class MapWnd extends Window {
 	    try {
 		Coord ploc = xlate(resolve(player));
 		if(ploc != null) {
-		    Radar.draw(g, this::map2screen, new Coord2d(mv.getcc()), scale);
+		    Radar.draw(g, this::map2screen, new Coord2d(mv.getcc()), 1 << dlvl);
 		    g.chcolor(255, 0, 0, 255);
 		    g.image(plx.layer(Resource.imgc), ploc.sub(plx.layer(Resource.negc).cc));
 		    g.chcolor();
@@ -176,7 +176,7 @@ public class MapWnd extends Window {
 		    return null;
 		}
 		//return info.sc.mul(cmaps).add(mc.sub(plg.ul)).add(sz.div(2)).sub(curloc.tc);
-		return info.sc.mul(cmaps).add(mc.sub(plg.ul).sub(curloc.tc)).mul(scale).add(sz.div(2));
+		return info.sc.mul(cmaps).add(mc.sub(plg.ul).sub(curloc.tc)).div(1 << dlvl).add(sz.div(2));
 	    } catch (Exception ignored) {}
 	    return null;
 	}
@@ -519,8 +519,8 @@ public class MapWnd extends Window {
 	protected void drawaftermap(GOut g) {
 	    super.drawaftermap(g);
 	    if(curloc != null && CFG.MMAP_GRID.get()) {
-		Coord step = cmaps.mul(scale);
-		Coord off = curloc.tc.mul(scale).sub(sz.div(2)).mod(step);
+		Coord step = cmaps.div(1 << dlvl);
+		Coord off = curloc.tc.div(1 << dlvl).sub(sz.div(2)).mod(step);
 		Coord lines = sz.div(step).add(1, 1);
 		Coord s = new Coord();
 		Coord f = new Coord();
