@@ -46,7 +46,7 @@ public class CraftWindow extends GameUI.Hidewnd {
 	    if(lastCraft != null) {
 		addTab(lastCraft);
 	    } else {
-		tabStrip.select(null);
+		tabStrip.select((TabStrip.Button<Pagina>) null);
 	    }
 	    makeWidget = child;
 	    makeWidget.c = new Coord(5, tabStrip.sz.y + 5);
