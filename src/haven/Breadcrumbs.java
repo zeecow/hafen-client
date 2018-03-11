@@ -101,5 +101,25 @@ public abstract class Breadcrumbs<T> extends Widget {
 	    this.text = text;
 	    this.data = data;
 	}
+ 
+	public static Crumb<MenuGrid.Pagina> fromPagina(MenuGrid.Pagina pagina) {
+	    BufferedImage img = pagina.res().layer(Resource.imgc).img;
+	    Resource.AButton act = pagina.act();
+	    String name = "...";
+	    if(act != null) {
+		name = act.name;
+	    }
+	    return new Breadcrumbs.Crumb<>(img, name, pagina);
+	}
+ 
+	public Crumb(MenuGrid.Pagina pagina, T data) {
+	    this.img = pagina.res().layer(Resource.imgc).img;
+	    Resource.AButton act = pagina.act();
+	    this.text = "...";
+	    if(act != null) {
+		this.text = act.name;
+	    }
+	    this.data = data;
+	}
     }
 }
