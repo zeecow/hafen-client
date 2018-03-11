@@ -10,11 +10,12 @@ import java.util.List;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import static haven.CraftDBWnd.Mode.*;
 import static haven.ItemFilter.*;
 
 public class CraftDBWnd extends Window implements DTarget2 {
     private static final int SZ = 20;
-    private static final int PANEL_H = 24;
+    private static final int PANEL_H = 52;
     private static final Coord WND_SZ = new Coord(635, 360 + PANEL_H);
     private static final Coord ICON_SZ = new Coord(SZ, SZ);
     private RecipeListBox box;
@@ -22,17 +23,34 @@ public class CraftDBWnd extends Window implements DTarget2 {
     private Widget makewnd;
     private MenuGrid menu;
     private MenuGrid.Pagina CRAFT;
+    private MenuGrid.Pagina HISTORY;
     private Breadcrumbs<Pagina> breadcrumbs;
     private static Pagina current = null;
     private Pagina descriptionPagina;
     private Pagina senduse = null;
     
-    private final List<Pagina> all = new LinkedList<>();
+    TabStrip<Mode> tabStrip;
     private final Pattern category = Pattern.compile("paginae/craft/.+");
     private int pagseq = 0;
     private boolean needfilter = false;
     private final LineEdit filter = new LineEdit();
-
+    private Mode mode = All;
+    
+    enum Mode {
+        All(Resource.local().load("paginae/act/craft"), true),
+	History(Resource.local().load("paginae/act/history"), false);
+	
+        public final LinkedList<Pagina> items;
+	public final boolean reparent;
+	private final Resource.Named res;
+ 
+	Mode(Resource.Named res, boolean reparent) {
+	    this.res = res;
+	    this.reparent = reparent;
+	    this.items = new LinkedList<>();
+	}
+    }
+    
     public CraftDBWnd() {
 	super(WND_SZ.add(0, 5), "Craft window");
 	CFG.REAL_TIME_CURIO.observe(cfg -> updateDescription(descriptionPagina));
@@ -52,6 +70,24 @@ public class CraftDBWnd extends Window implements DTarget2 {
     }
 
     private void init() {
+	CRAFT = paginafor(Resource.local().load("paginae/act/craft"));
+	HISTORY = paginafor(Resource.local().load("paginae/act/history"));
+ 
+	tabStrip = add(new TabStrip<Mode>() {
+	    @Override
+	    protected void selected(Button<Mode> button) {
+		changeMode(button.tag);
+	    }
+	}, 0, 2);
+	Coord icon_sz = new Coord(20, 20);
+	Mode[] modes = Mode.values();
+	for(int i = 0; i< modes.length; i++) {
+	    Resource res = modes[i].res.get();
+	    tabStrip.insert(i,
+		new TexI(PUtils.convolvedown(res.layer(Resource.imgc).img, icon_sz, CharWnd.iconfilter)),
+		paginafor(modes[i].res).act().name, null).tag = modes[i];
+	}
+ 
 	box = new RecipeListBox(200, (WND_SZ.y - PANEL_H) / SZ) {
 	    @Override
 	    protected void itemclick(Recipe recipe, int button) {
@@ -64,7 +100,7 @@ public class CraftDBWnd extends Window implements DTarget2 {
 			}
 			item = menu.getParent(item);
 		    }
-		    if(filter.line.isEmpty() || !item.isAction()) {
+		    if((mode.reparent && filter.line.isEmpty()) || !item.isAction()) {
 			menu.use(item, false);
 		    } else {
 		        select(item, true, true);
@@ -79,15 +115,19 @@ public class CraftDBWnd extends Window implements DTarget2 {
 		ItemFilter.showHelp(ui, HELP_SIMPLE, HELP_CURIO, HELP_FEP, HELP_ARMOR, HELP_SYMBEL, HELP_ATTR);
 	    }
 	}));
-	CRAFT = paginafor(Resource.local().load("paginae/act/craft"));
+	
 	menu = ui.gui.menu;
 	breadcrumbs = add(new Breadcrumbs<Pagina>(new Coord(WND_SZ.x, SZ)) {
 	    @Override
 	    public void selected(Pagina data) {
-		select(data, false);
+	        if(data == HISTORY) {
+	            showHistory();
+	            return;
+		}
+		select(data, false, false);
 		ui.gui.menu.use(data, false);
 	    }
-	}, new Coord(0, -2));
+	}, new Coord(0, 28));
 	Pagina selected = current;
 	if(selected == null) {
 	    selected = menu.cur;
@@ -95,7 +135,8 @@ public class CraftDBWnd extends Window implements DTarget2 {
 		selected = CRAFT;
 	    }
 	}
-	select(selected, true);
+	tabStrip.select(0);
+	select(selected, true, false);
     }
 
     @Override
@@ -111,10 +152,44 @@ public class CraftDBWnd extends Window implements DTarget2 {
 	if((sender == this) && msg.equals("close")) {
 	    close();
 	    return;
+	} else if((sender == makewnd) && msg.equals("make")) {
+	    addToHistory(current);
 	}
 	super.wdgmsg(sender, msg, args);
     }
-
+    
+    private void changeMode(Mode mode) {
+        this.mode = mode;
+        tabStrip.select(mode, true);
+        switch (mode) {
+	    case All:
+	        select(CRAFT, false, false);
+		break;
+	    case History:
+	        showHistory();
+		break;
+	}
+    }
+    
+    private void showHistory() {
+	filter.setline("");
+	updateBreadcrumbs(HISTORY);
+	box.setitems(History.items);
+    }
+    
+    private void addToHistory(Pagina action) {
+	if(History.items.contains(action)) {
+	    History.items.remove(action);
+	}
+	History.items.addFirst(action);
+	if(History.items.size() > 20) {
+	    History.items.removeLast();
+	}
+	if(mode == History) {
+	    box.sort();
+	}
+    }
+    
     public void close() {
 	if(makewnd != null) {
 	    makewnd.wdgmsg("close");
@@ -133,10 +208,11 @@ public class CraftDBWnd extends Window implements DTarget2 {
     }
 
     public void select(Pagina p, boolean use) {
-        select(p, use, false);
+	if(mode != All) {changeMode(All);}
+	select(p, use, false);
     }
     
-    public void select(Pagina p, boolean use, boolean skipReparent) {
+    private void select(Pagina p, boolean use, boolean skipReparent) {
 	Pagina BACK = ui.gui.menu.bk.pag;
 	boolean isBack = p == BACK;
 	if(!menu.isCrafting(p) && !isBack) {
@@ -216,26 +292,24 @@ public class CraftDBWnd extends Window implements DTarget2 {
     private void updateBreadcrumbs(Pagina p) {
 	List<Breadcrumbs.Crumb<Pagina>> crumbs = new LinkedList<>();
 	if (filter.line.isEmpty()) {
-	    List<Pagina> parents = getParents(p);
-	    Collections.reverse(parents);
-	    for (Pagina item : parents) {
-		BufferedImage img = item.res().layer(Resource.imgc).img;
-		Resource.AButton act = item.act();
-		String name = "...";
-		if (act != null) {
-		    name = act.name;
+	    if(mode == All) {
+		List<Pagina> parents = getParents(p);
+		Collections.reverse(parents);
+		for(Pagina item : parents) {
+		    BufferedImage img = item.res().layer(Resource.imgc).img;
+		    Resource.AButton act = item.act();
+		    String name = "...";
+		    if(act != null) {
+			name = act.name;
+		    }
+		    crumbs.add(new Breadcrumbs.Crumb<>(img, name, item));
 		}
-		crumbs.add(new Breadcrumbs.Crumb<>(img, name, item));
+	    } else {
+		crumbs.add(Breadcrumbs.Crumb.fromPagina(paginafor(mode.res)));
 	    }
 	} else {
-	    BufferedImage img = CRAFT.res().layer(Resource.imgc).img;
-	    Resource.AButton act = CRAFT.act();
-	    String name = "...";
-	    if (act != null) {
-		name = act.name;
-	    }
-	    crumbs.add(new Breadcrumbs.Crumb<>(img, name, CRAFT));
-	    img = Resource.remote().loadwait("paginae/act/inspect").layer(Resource.imgc).img;
+	    crumbs.add(Breadcrumbs.Crumb.fromPagina(paginafor(mode.res)));
+	    BufferedImage img = Resource.remote().loadwait("paginae/act/inspect").layer(Resource.imgc).img;
 	    crumbs.add(new Breadcrumbs.Crumb<>(img, filter.line, CRAFT));
 	}
 	breadcrumbs.setCrumbs(crumbs);
@@ -298,9 +372,9 @@ public class CraftDBWnd extends Window implements DTarget2 {
 	MenuGrid menu = ui.gui.menu;
 	synchronized (menu.paginae) {
 	    if(pagseq != menu.pagseq) {
-		synchronized (all) {
-		    all.clear();
-		    all.addAll(
+		synchronized (All.items) {
+		    All.items.clear();
+		    All.items.addAll(
 			menu.paginae.stream()
 			    .filter(p -> category.matcher(Pagina.name(p)).matches())
 			    .collect(Collectors.toList())
@@ -327,29 +401,25 @@ public class CraftDBWnd extends Window implements DTarget2 {
 	    return;
 	}
 	ItemFilter itemFilter = ItemFilter.create(filter);
-	List<Pagina> filtered = new ArrayList<>();
-	synchronized (all) {
-	    for (Pagina p : all) {
+	synchronized (mode.items) {
+	    List<Pagina> filtered = mode.items.stream().filter(p -> {
 		try {
 		    Resource res = p.res.get();
 		    String name = res.layer(Resource.action).name.toLowerCase();
-		    if(name.contains(filter) || itemFilter.matches(p, ui.sess)) {
-			filtered.add(p);
-		    }
+		    return (name.contains(filter) || itemFilter.matches(p, ui.sess));
 		} catch (Loading e) {
 		    needfilter = true;
 		}
+		return false;
+	    }).sorted(new ItemComparator(filter)).collect(Collectors.toList());
+	    box.setitems(filtered);
+	    if(filtered.isEmpty()) {
+		if(!needfilter) {closemake();}
+		box.change((Recipe) null);
+		setCurrent(null);
+	    } else {
+		select(filtered.get(0), true, true);
 	    }
-	}
-	filtered.sort(new ItemComparator(filter));
-	box.setitems(filtered);
-	
-	if(filtered.isEmpty()) {
-	    if(!needfilter) {closemake();}
-	    box.change((Recipe) null);
-	    setCurrent(null);
-	} else {
-	    select(filtered.get(0), true, true);
 	}
     }
     
@@ -366,8 +436,12 @@ public class CraftDBWnd extends Window implements DTarget2 {
 		select(box.listitem((Math.max(box.selindex, 0) - 1 + box.listitems()) % box.listitems()).p, true, true);
 		return true;
 	    case KeyEvent.VK_ENTER:
-		if(box.sel != null && !box.sel.p.isAction()) {
-		    box.itemclick(box.sel, 1);
+		if(box.sel != null) {
+		    if(!box.sel.p.isAction()) {
+			box.itemclick(box.sel, 1);
+		    } else if(makewnd != null) {
+		        makewnd.wdgmsg("make", ui.modctrl?1:0);
+		    }
 		}
 		return true;
 	}
@@ -382,7 +456,7 @@ public class CraftDBWnd extends Window implements DTarget2 {
     public boolean type(char key, KeyEvent ev) {
 	if(key == 27) {
 	    if(!filter.line.isEmpty()) {
-		select(CRAFT, false);
+		changeMode(mode);
 	    } else {
 		close();
 	    }
@@ -396,7 +470,7 @@ public class CraftDBWnd extends Window implements DTarget2 {
 	if(filter.key(ev) && !before.equals(filter.line)) {
 	    needfilter();
 	    if(filter.line.isEmpty()) {
-		select(CRAFT, false);
+		changeMode(mode);
 	    }
 	    return true;
 	}
@@ -474,6 +548,10 @@ public class CraftDBWnd extends Window implements DTarget2 {
 	    if(!recipes.contains(sel)){
 	        selindex = -1;
 	    }
+	}
+	
+	public void sort() {
+	    recipes.sort(Comparator.comparingInt(o -> this.list.indexOf(o.p)));
 	}
 
 	public void change(Pagina p) {

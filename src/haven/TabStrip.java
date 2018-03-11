@@ -3,6 +3,7 @@ package haven;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class TabStrip<T> extends Widget {
     public static final IBox frame = new IBox("gfx/hud/tab", "tl", "tr", "bl", "br", "extvl", "extvr", "extht", "exthb");
@@ -44,17 +45,38 @@ public class TabStrip<T> extends Widget {
 	}
     }
 
+    public void select(T tag) {
+        select(tag, false);
+    }
+    
+    public void select(T tag, boolean skipSelected) {
+        for(Button<T> btn : buttons) {
+            if(Objects.equals(btn.tag, tag)) {
+                select(btn, skipSelected);
+                return;
+	    }
+	}
+    }
+    
     public void select(int buttonIndex) {
 	select(buttons.get(buttonIndex));
     }
+    
+    public void select(int buttonIndex, boolean skipSelected) {
+	select(buttons.get(buttonIndex), skipSelected);
+    }
 
     public void select(Button<T> button) {
+	select(button, false);
+    }
+    
+    public void select(Button<T> button, boolean skipSelected) {
 	if(selected != button) {
 	    for (Button<T> b : buttons) {
 		b.setActive(b == button);
 	    }
 	    selected = button;
-	    selected(button);
+	    if(!skipSelected) {selected(button);}
 	}
     }
 
