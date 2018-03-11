@@ -436,8 +436,12 @@ public class CraftDBWnd extends Window implements DTarget2 {
 		select(box.listitem((Math.max(box.selindex, 0) - 1 + box.listitems()) % box.listitems()).p, true, true);
 		return true;
 	    case KeyEvent.VK_ENTER:
-		if(box.sel != null && !box.sel.p.isAction()) {
-		    box.itemclick(box.sel, 1);
+		if(box.sel != null) {
+		    if(!box.sel.p.isAction()) {
+			box.itemclick(box.sel, 1);
+		    } else if(makewnd != null) {
+		        makewnd.wdgmsg("make", ui.modctrl?1:0);
+		    }
 		}
 		return true;
 	}
