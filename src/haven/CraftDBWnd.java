@@ -37,15 +37,16 @@ public class CraftDBWnd extends Window implements DTarget2 {
     private Mode mode = All;
     
     enum Mode {
-        All(Resource.local().load("paginae/act/craft"), true),
-	History(Resource.local().load("paginae/act/history"), false);
+        All("paginae/act/craft", true),
+	History("paginae/act/history", false);
 	
         public final LinkedList<Pagina> items;
 	public final boolean reparent;
 	private final Resource.Named res;
  
-	Mode(Resource.Named res, boolean reparent) {
-	    this.res = res;
+	Mode(String name, boolean reparent) {
+	    Resource.local().loadwait(name);
+	    this.res = Resource.local().load(name);
 	    this.reparent = reparent;
 	    this.items = new LinkedList<>();
 	}
