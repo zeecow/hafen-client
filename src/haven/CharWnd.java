@@ -493,10 +493,10 @@ public class CharWnd extends Window {
 	    this.attr = glob.cattr.get(attr);
 	    this.bg = bg;
 	    adda(new IButton("gfx/hud/buttons/add", "u", "d", null) {
-		    public void click() {adj(1);}
+		    public void click() {if(ui.modshift){adj(5);}else if(ui.modctrl){adj(10);}else{adj(1);}}
 		}, sz.x - 5, sz.y / 2, 1, 0.5);
 	    adda(new IButton("gfx/hud/buttons/sub", "u", "d", null) {
-		    public void click() {adj(-1);}
+		    public void click() {if(ui.modshift){adj(-5);}else if(ui.modctrl){adj(-10);}else{adj(-1);}}
 		}, sz.x - 20, sz.y / 2, 1, 0.5);
 	}
 
