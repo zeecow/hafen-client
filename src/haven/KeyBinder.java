@@ -26,6 +26,7 @@ public class KeyBinder {
     private static final Gson gson;
     private static final Map<Action, KeyBind> binds;
     private static final List<Action> order;
+    private static final KeyBind EMPTY = new KeyBind(0, 0, null);
     
     static {
 	gson = (new GsonBuilder()).setPrettyPrinting().create();
@@ -69,16 +70,7 @@ public class KeyBinder {
     }
     
     public static boolean handle(UI ui, KeyEvent e) {
-	int code = e.getKeyCode();
-	int modflags = getModFlags(e.getModifiersEx());
-    
-	for (KeyBind bind : binds.values()) {
-	    if (bind.match(ui, code, modflags)) {
-		return true;
-	    }
-	}
-	
-	return false;
+	return get(e).execute(ui);
     }
     
     public static int getModFlags(int modflags) {
@@ -97,6 +89,10 @@ public class KeyBinder {
     
     public static KeyBind get(Action action) {
 	return binds.get(action);
+    }
+
+    public static KeyBind get(final KeyEvent e) {
+	return binds.values().stream().filter(b -> b.match(e.getKeyCode(), getModFlags(e.getModifiersEx()))).findFirst().orElse(EMPTY);
     }
     
     public static KeyBind make(KeyEvent e, Action action) {
@@ -141,12 +137,14 @@ public class KeyBinder {
 	    this.action = action;
 	}
 	
-	public boolean match(UI ui, int code, int mods) {
-	    boolean match = code == this.code && ((mods & this.mods) == this.mods);
-	    if (match && ui.gui != null) {
-		action.run(ui.gui);
-	    }
-	    return match;
+	public boolean match(int code, int mods) {
+	    return code == this.code && ((mods & this.mods) == this.mods);
+	}
+
+	public boolean execute(UI ui) {
+	    boolean canRun = ui.gui != null && action != null;
+	    if(canRun) { action.run(ui.gui); }
+	    return canRun;
 	}
 	
 	public String shortcut() {
