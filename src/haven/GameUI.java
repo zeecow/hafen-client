@@ -663,6 +663,12 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 	studywnd.show(!studywnd.visible);
     }
 
+    public void takeScreenshot() {
+	if(Config.screenurl != null) {
+	    Screenshooter.take(this, Config.screenurl);
+	}
+    }
+
     public void addcmeter(Widget meter) {
 	ulpanel.add(meter);
 	cmeters.add(meter);
@@ -1165,9 +1171,6 @@ public class GameUI extends ConsoleHost implements Console.Directory {
     public boolean globtype(char key, KeyEvent ev) {
 	if(key == ':') {
 	    entercmd();
-	    return(true);
-	} else if((Config.screenurl != null) && (Character.toUpperCase(key) == 'S') && ((ev.getModifiersEx() & (KeyEvent.META_DOWN_MASK | KeyEvent.ALT_DOWN_MASK)) != 0)) {
-	    Screenshooter.take(this, Config.screenurl);
 	    return(true);
 	} else if(key == ' ') {
 	    toggleui();

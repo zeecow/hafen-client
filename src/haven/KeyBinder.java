@@ -61,6 +61,7 @@ public class KeyBinder {
 	add(KeyEvent.VK_R, ALT, TOGGLE_GOB_RADIUS);
 	add(KeyEvent.VK_G, CTRL, TOGGLE_TILE_GRID);
 	add(KeyEvent.VK_Z, CTRL, TOGGLE_TILE_CENTERING);
+	add(KeyEvent.VK_S, CTRL, TAKE_SCREENSHOT);
     }
     
     private static synchronized void store() {
