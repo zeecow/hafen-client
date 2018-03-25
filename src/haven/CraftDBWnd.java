@@ -14,10 +14,10 @@ import static haven.CraftDBWnd.Mode.*;
 import static haven.ItemFilter.*;
 
 public class CraftDBWnd extends Window implements DTarget2 {
-    private static final int SZ = 20;
     private static final int PANEL_H = 52;
     private static final Coord WND_SZ = new Coord(635, 360 + PANEL_H);
-    private static final Coord ICON_SZ = new Coord(SZ, SZ);
+    private static final Coord ICON_SZ = new Coord(20, 20);
+    private static final int LIST_SIZE = (WND_SZ.y - PANEL_H) / ICON_SZ.y;
     private RecipeListBox box;
     private Tex description;
     private Widget makewnd;
@@ -89,7 +89,7 @@ public class CraftDBWnd extends Window implements DTarget2 {
 		paginafor(modes[i].res).act().name, null).tag = modes[i];
 	}
  
-	box = new RecipeListBox(200, (WND_SZ.y - PANEL_H) / SZ) {
+	box = new RecipeListBox(200, LIST_SIZE) {
 	    @Override
 	    protected void itemclick(Recipe recipe, int button) {
 		Pagina item = recipe.p;
@@ -118,7 +118,7 @@ public class CraftDBWnd extends Window implements DTarget2 {
 	}));
 	
 	menu = ui.gui.menu;
-	breadcrumbs = add(new Breadcrumbs<Pagina>(new Coord(WND_SZ.x, SZ)) {
+	breadcrumbs = add(new Breadcrumbs<Pagina>(new Coord(WND_SZ.x, ICON_SZ.y)) {
 	    @Override
 	    public void selected(Pagina data) {
 	        if(data == HISTORY) {
@@ -183,7 +183,7 @@ public class CraftDBWnd extends Window implements DTarget2 {
 	    History.items.remove(action);
 	}
 	History.items.addFirst(action);
-	if(History.items.size() > 20) {
+	if(History.items.size() > LIST_SIZE) {
 	    History.items.removeLast();
 	}
 	if(mode == History) {
@@ -526,7 +526,7 @@ public class CraftDBWnd extends Window implements DTarget2 {
 	private List<Recipe> recipes;
 
 	public RecipeListBox(int w, int h) {
-	    super(w, h, SZ);
+	    super(w, h, ICON_SZ.y);
 	    bgcolor = BGCOLOR;
 	}
 
