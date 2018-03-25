@@ -664,6 +664,12 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 	studywnd.show(!studywnd.visible);
     }
 
+    public void takeScreenshot() {
+	if(Config.screenurl != null) {
+	    Screenshooter.take(this, Config.screenurl);
+	}
+    }
+
     public void addcmeter(Widget meter) {
 	ulpanel.add(meter);
 	cmeters.add(meter);
