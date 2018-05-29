@@ -72,7 +72,7 @@ public class GameUI extends ConsoleHost implements Console.Directory {
     public OptWnd opts;
     public Collection<DraggedItem> hand = new LinkedList<DraggedItem>();
     private Collection<DraggedItem> handSave = new LinkedList<DraggedItem>();
-    private WItem vhand;
+    public WItem vhand;
     public ChatUI chat;
     public ChatUI.Channel syslog;
     public double prog = -1;
