@@ -73,7 +73,7 @@ public class GameUI extends ConsoleHost implements Console.Directory {
     public OptWnd opts;
     public Collection<DraggedItem> hand = new LinkedList<DraggedItem>();
     private Collection<DraggedItem> handSave = new LinkedList<DraggedItem>();
-    private WItem vhand;
+    public WItem vhand;
     public ChatUI chat;
     public ChatUI.Channel syslog;
     public double prog = -1;
@@ -1580,7 +1580,11 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 	    });
 	cmdmap.put("tool", new Console.Command() {
 		public void run(Console cons, String[] args) {
-		    add(gettype(args[1]).create(ui, new Object[0]), 200, 200);
+		    try {
+			add(gettype(args[1]).create(ui, new Object[0]), 200, 200);
+		    } catch(RuntimeException e) {
+			e.printStackTrace(Debug.log);
+		    }
 		}
 	    });
     }
