@@ -1,3 +1,7 @@
+$size[14]{$u{Update for 27.06.18:}
+  * Added alternate combat UI (Options->Display)
+  * Added history to the extended craft menu (ALT+X)
+ 
 $size[14]{$u{Update for 01.02.18:}
   * merged loftar's changes
  
