@@ -94,12 +94,12 @@ public class FoodInfo extends ItemInfo.Tip {
     
 	public Data(FoodInfo info, QualityList q) {
 	    end = info.end;
+	    glut = info.glut;
 	    QualityList.Quality single = q.single(Quality);
 	    if(single == null) {
 		single = QualityList.DEFAULT;
 	    }
 	    double multiplier = single.multiplier;
-	    glut = Utils.round(info.glut * multiplier, 4);
 	    fep = new ArrayList<>(info.evs.length);
 	    for (int i = 0; i < info.evs.length; i++) {
 		fep.add(new Pair<>(info.evs[i].res, Utils.round(info.evs[i].a / multiplier, 2)));
