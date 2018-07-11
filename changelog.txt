@@ -1,3 +1,6 @@
+$size[14]{$u{Update for 11.07.18:}
+  * Added ability to filter items by Hunger and Energy values. Look for details in help button (?) of filter window.
+ 
 $size[14]{$u{Update for 27.06.18:}
   * Added alternate combat UI (Options->Display)
   * Added history to the extended craft menu (ALT+X)
