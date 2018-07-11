@@ -10,7 +10,7 @@ import java.util.List;
 
 public class QualityList extends ItemInfo {
     public static final String classname = "Quality";
-    public static final Comparator<Quality> QSORTER = (o1, o2) -> o1.type.name().compareTo(o2.type.name());
+    public static final Comparator<Quality> QSORTER = Comparator.comparing(o -> o.type.name());
 
     private final List<Quality> qualities;
     private TexI tex;
@@ -31,7 +31,7 @@ public class QualityList extends ItemInfo {
 		}
 	    }
 	}
-	Collections.sort(qualities, QSORTER);
+	qualities.sort(QSORTER);
 	isEmpty = qualities.isEmpty();
 	if(!isEmpty) {
 	    SingleType[] types = SingleType.values();
