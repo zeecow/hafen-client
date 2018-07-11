@@ -1,8 +1,8 @@
 package haven;
 
 import haven.QualityList.SingleType;
-import haven.resutil.FoodInfo;
 import haven.resutil.Curiosity;
+import haven.resutil.FoodInfo;
 import me.ender.Reflect;
 
 import java.util.LinkedList;
@@ -44,12 +44,12 @@ public class ItemFilter {
 	"$font[monospaced,13]{  q:ess+21 }will find items with essence of at least 21\n";
     
     public static final String HELP_CURIO = "$size[20]{$b{Curiosity search}}\n" +
-	"Supports $font[monospaced,13]{xp} $font[monospaced,13]{lp} (learning point gained), (experience required) and $font[monospaced,13]{mw} (mental weight required) tags. They all interchangeable in the examples below.\n" +
+	"Supports $font[monospaced,13]{lp} (learning point gained), $font[monospaced,13]{xp} (experience required) and $font[monospaced,13]{mw} (mental weight required) tags. They all interchangeable in the examples below.\n" +
 	"$size[16]{\nExamples:}\n" +
 	"$font[monospaced,13]{  lp:    }will find items that grant LP.\n" +
 	"$font[monospaced,13]{  lp>100 }will find items that grant more than 100 LP.\n" +
 	"$font[monospaced,13]{  lp+200 }will find items that grant at least 200 LP.\n" +
-	"$font[monospaced,13]{  lp<300 }will find items that grant less than 300 LP.\n" +
+	"$font[monospaced,13]{  lp<300 }will find items that grant no more than 300 LP.\n" +
 	"$font[monospaced,13]{  lp=400 }will find items that grant exactly 400 LP.\n";
     
     public static final String HELP_FEP = "$size[20]{$b{FEP search}}\n" +
@@ -59,7 +59,14 @@ public class ItemFilter {
 	"$font[monospaced,13]{  fep:str>1 }will find food giving more than 1 Strength FEPs.\n" +
 	"$font[monospaced,13]{  fep:agi+2 }will find food giving at least than 2 Agility FEPs.\n" +
 	"$font[monospaced,13]{  fep:cha<3 }will find food giving less than 3 Charisma FEPs.\n" +
-	"$font[monospaced,13]{  fep:dex=4 }will find food giving exactly 4 Dexterity FEPs.\n";
+	"$font[monospaced,13]{  fep:dex=4 }will find food giving exactly 4 Dexterity FEPs.\n"+
+	"\n" +
+	"$size[20]{$b{Food values search}}\n" +
+	"Supports $font[monospaced,13]{hunger} or $font[monospaced,13]{hng}, (Hunger satiated) and $font[monospaced,13]{energy} or $font[monospaced,13]{nrg} (Energy restored) tags. They all interchangeable in the examples below.\n" +
+	"$size[16]{\nExamples:}\n" +
+	"$font[monospaced,13]{  nrg:>50  }will find food which restores more than 50 energy\n" +
+	"$font[monospaced,13]{  nrg<120  }will find food which restores no more than 120 energy\n" +
+	"$font[monospaced,13]{  nrg:+200 }will find food which restores at least 200 energy\n";
     
     public static final String HELP_ARMOR = "$size[20]{$b{Armor search}}\n" +
 	"$font[monospaced,16]{armor:[type][sign][value]}\n" +
@@ -139,6 +146,14 @@ public class ItemFilter {
 	    ItemFilter filter = null;
 	    if(sign != null && tag == null) {
 		switch (text) {
+		    case "energy":
+		    case "nrg":
+		        tag = text = "energy";
+		        break;
+		    case "hunger":
+		    case "hng":
+			tag = text = "hunger";
+			break;
 		    case "xp":
 		    case "lp":
 		    case "mw":
@@ -166,6 +181,10 @@ public class ItemFilter {
 		    case "lp":
 		    case "mw":
 			filter = new XP(tag, sign, value, opt);
+			break;
+		    case "nrg":
+		    case "fill":
+			filter = new Food(tag, sign, value, opt);
 			break;
 		    case "has":
 			filter = new Has(text, sign, value, opt);
@@ -463,6 +482,25 @@ public class ItemFilter {
 	    return false;
 	}
     }
+
+    private static class Food extends Complex {
+	public Food(String text, String sign, String value, String opts) {
+	    super(text, sign, value, opts);
+	}
+
+	@Override
+	protected boolean match(ItemInfo item) {
+	    if(item instanceof FoodInfo) {
+		FoodInfo food = (FoodInfo) item;
+		if("energy".equals(text)) {
+		    return test(Utils.round(100 * food.end, 2));
+		} else if("hunger".equals(text)) {
+		    return test(Utils.round(100 * food.glut, 2));
+		}
+	    }
+	    return false;
+	}
+    } 
     
     private static class Armor extends Complex {
 	private static String[] hard = {"hard", "deflect"};
