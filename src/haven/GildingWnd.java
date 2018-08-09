@@ -7,6 +7,7 @@ import java.awt.image.BufferedImage;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class GildingWnd extends Window {
@@ -63,10 +64,10 @@ public class GildingWnd extends Window {
 	    canSlot = target_infos.stream()
 		.map(itemInfo -> (List<?>) Reflect.getFieldValue(itemInfo, "s"))
 		.flatMap(Collection::stream)
-		.map(o -> (Resource) Reflect.getFieldValue(o, "res"))
+		.map(o -> (String) Reflect.getFieldValue(o, "name"))
 		.noneMatch(o -> {
-		    Resource resource = gild.item.resource();
-		    return resource == o;
+		    String name = gild.name.get();
+		    return Objects.equals(name, o);
 		});
 	} catch (Loading ignored) {}
 
