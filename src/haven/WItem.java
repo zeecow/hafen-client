@@ -221,6 +221,11 @@ public class WItem extends Widget implements DTarget2 {
 	}
 	return false;
     }));
+    
+    public final AttrCache<String> name = new AttrCache<>(this::info, AttrCache.cache(info -> {
+	ItemInfo.Name name = ItemInfo.find(ItemInfo.Name.class, info);
+	return (name != null && name.str != null && name.str.text != null) ? name.str.text : "";
+    }));
 
     private GSprite lspr = null;
     public void tick(double dt) {
