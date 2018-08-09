@@ -30,6 +30,8 @@ import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.util.*;
 
+import static haven.WItem.*;
+
 public class GItem extends AWidget implements ItemInfo.SpriteOwner, GSprite.Owner {
     private static ItemFilter filter;
     private static long lastFilter = 0;
@@ -95,7 +97,11 @@ public class GItem extends AWidget implements ItemInfo.SpriteOwner, GSprite.Owne
 	}
 
 	public default void drawoverlay(GOut g, Tex tex) {
-	    g.aimage(tex, g.sz, 1, 1);
+	    if(CFG.SWAP_NUM_AND_Q.get()) {
+		g.aimage(tex, TEXT_PADD_TOP.add(g.sz.x, 0), 1, 0);
+	    } else {
+		g.aimage(tex, TEXT_PADD_BOT.add(g.sz), 1, 1);
+	    }
 	}
 
 	public static BufferedImage numrender(int num, Color col) {
