@@ -177,8 +177,24 @@ public class GildingWnd extends Window {
 	super.close();
     }
 
-    public static void create(UI ui, WItem target, WItem gild) {
-	ui.gui.add(new GildingWnd(target, gild));
+    public static boolean processGilding(UI ui, WItem target, WItem gild) {
+	boolean result = false;
+	List<ItemInfo> gilding = gild.gilding.get();
+	List<ItemInfo> slots = target.slots.get();
+	if(gilding != null && !gilding.isEmpty() && slots != null && !slots.isEmpty()) {
+	    boolean isRing = target.name.get().contains("Ring");
+	    boolean isGem = gild.item.resname().contains("gems/gemstone");
+	    if(isRing && !isGem) {
+		ui.message("Only gems can be gilded onto rings!", GameUI.MsgType.ERROR);
+		result = false;
+	    } else {
+		result = true;
+	    }
+	}
+	if(result) {
+	    ui.gui.add(new GildingWnd(target, gild));
+	}
+	return result;
     }
 
     private static class FWItem extends WItem {
