@@ -34,6 +34,7 @@ import java.awt.image.*;
 import static haven.QualityList.SingleType.*;
 
 public class FoodInfo extends ItemInfo.Tip {
+    public static List<CharWnd.Constipations.El> TYPES = new ArrayList<>();
     public final double end, glut;
     public final Event[] evs;
     public final Effect[] efs;
@@ -82,6 +83,18 @@ public class FoodInfo extends ItemInfo.Tip {
 	    if(efs[i].p != 1)
 		efi = catimgsh(5, efi, RichText.render(String.format("$i{($col[192,192,255]{%d%%} chance)}", (int)Math.round(efs[i].p * 100)), 0).img);
 	    imgs.add(efi);
+	}
+	if(types.length > 0) {
+	    imgs.add(Text.render("Categories:").img);
+	    double total = 1;
+	    for (int type : types) {
+		if(TYPES.size() > type) {
+		    CharWnd.Constipations.El c = TYPES.get(type);
+		    imgs.add(c.tip());
+		    total *= c.a;
+		}
+	    }
+	    imgs.add(Text.render(String.format("Total: %s%%", Utils.odformat2(100 * total, 2))).img);
 	}
 	return(catimgs(0, imgs.toArray(new BufferedImage[0])));
     }

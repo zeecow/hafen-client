@@ -290,10 +290,11 @@ public class CharWnd extends Window {
 	    public final Indir<Resource> t;
 	    public double a;
 	    private Tex tt, at;
+	    private BufferedImage tip;
 	    private boolean hl;
 
 	    public El(Indir<Resource> t, double a) {this.t = t; this.a = a;}
-	    public void update(double a) {this.a = a; at = null;}
+	    public void update(double a) {this.a = a; at = null; tip = null;}
 
 	    public Tex tt() {
 		if(tt == null) {
@@ -316,6 +317,22 @@ public class CharWnd extends Window {
 		    at = elf.render(String.format("%d%%", (int)Math.floor(a * 100)), c).tex();
 		}
 		return(at);
+	    }
+
+	    public BufferedImage tip() {
+	        if(tip == null) {
+	            int h = 14;
+		    BufferedImage img = t.get().layer(Resource.imgc).img;
+		    String nm = t.get().layer(Resource.tooltip).t;
+		    Color col = (a > 1.0)?buffed:Utils.blendcol(none, full, a);
+		    Text rnm = RichText.render(String.format("%s: $col[%d,%d,%d]{%d%%}", nm, col.getRed(), col.getGreen(), col.getBlue(), (int)(100*a)), 0);
+		    tip = TexI.mkbuf(new Coord(h + 5 + rnm.sz().x, h));
+		    Graphics g = tip.getGraphics();
+		    g.drawImage(convolvedown(img, new Coord(h, h), tflt), 0, 0, null);
+		    g.drawImage(rnm.img, h + 5, ((h - rnm.sz().y) / 2) + 1, null);
+		    g.dispose();
+		}
+	        return tip;
 	    }
 	}
 
@@ -361,6 +378,7 @@ public class CharWnd extends Window {
 
 	public Constipations(int w, int h) {
 	    super(w, h, El.h);
+	    FoodInfo.TYPES = els;
 	}
 
 	protected void drawbg(GOut g) {}
