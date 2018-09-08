@@ -26,8 +26,6 @@
 
 package haven;
 
-import haven.resutil.FoodInfo;
-
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.*;
@@ -285,6 +283,10 @@ public class CharWnd extends Window {
 	public final List<El> els = new ArrayList<El>();
 	private Integer[] order = {};
 
+	public static Color color(double a) {
+	    return (a > 1.0)?buffed:Utils.blendcol(none, full, a);
+	}
+	
 	public static class El {
 	    public static final int h = elf.height() + 2;
 	    public final Indir<Resource> t;
@@ -313,26 +315,10 @@ public class CharWnd extends Window {
 
 	    public Tex at() {
 		if(at == null) {
-		    Color c= (a > 1.0)?buffed:Utils.blendcol(none, full, a);
+		    Color c= color(a);
 		    at = elf.render(String.format("%d%%", (int)Math.floor(a * 100)), c).tex();
 		}
 		return(at);
-	    }
-
-	    public BufferedImage tip() {
-	        if(tip == null) {
-	            int h = 14;
-		    BufferedImage img = t.get().layer(Resource.imgc).img;
-		    String nm = t.get().layer(Resource.tooltip).t;
-		    Color col = (a > 1.0)?buffed:Utils.blendcol(none, full, a);
-		    Text rnm = RichText.render(String.format("%s: $col[%d,%d,%d]{%d%%}", nm, col.getRed(), col.getGreen(), col.getBlue(), (int)(100*a)), 0);
-		    tip = TexI.mkbuf(new Coord(h + 5 + rnm.sz().x, h));
-		    Graphics g = tip.getGraphics();
-		    g.drawImage(convolvedown(img, new Coord(h, h), tflt), 0, 0, null);
-		    g.drawImage(rnm.img, h + 5, ((h - rnm.sz().y) / 2) + 1, null);
-		    g.dispose();
-		}
-	        return tip;
 	    }
 	}
 
@@ -378,7 +364,6 @@ public class CharWnd extends Window {
 
 	public Constipations(int w, int h) {
 	    super(w, h, El.h);
-	    FoodInfo.TYPES = els;
 	}
 
 	protected void drawbg(GOut g) {}
@@ -2281,6 +2266,7 @@ public class CharWnd extends Window {
 	    while(a < args.length) {
 		Indir<Resource> t = ui.sess.getres((Integer)args[a++]);
 		double m = ((Number)args[a++]).doubleValue();
+		ui.sess.character.constipation.update(t, m);
 		cons.update(t, m);
 	    }
 	} else if(nm == "csk") {

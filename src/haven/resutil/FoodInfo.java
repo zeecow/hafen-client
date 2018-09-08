@@ -27,18 +27,22 @@
 package haven.resutil;
 
 import haven.*;
-import java.util.*;
-import java.awt.Color;
-import java.awt.image.*;
 
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.util.*;
+import java.util.List;
+
+import static haven.CharWnd.Constipations.*;
+import static haven.PUtils.*;
 import static haven.QualityList.SingleType.*;
 
 public class FoodInfo extends ItemInfo.Tip {
-    public static List<CharWnd.Constipations.El> TYPES = new ArrayList<>();
     public final double end, glut;
     public final Event[] evs;
     public final Effect[] efs;
     public final int[] types;
+    private final CharacterInfo.Constipation constipation;
 
     public FoodInfo(Owner owner, double end, double glut, Event[] evs, Effect[] efs, int[] types) {
 	super(owner);
@@ -47,7 +51,17 @@ public class FoodInfo extends ItemInfo.Tip {
 	this.evs = evs;
 	this.efs = efs;
 	this.types = types;
+
+	CharacterInfo.Constipation constipation = null;
+	try {
+	    constipation = owner.context(Session.class).character.constipation;
+	    if(!constipation.hasRenderer(FoodInfo.class)) {
+		constipation.addRenderer(FoodInfo.class, FoodInfo::renderConstipation);
+	    }
+	} catch (NullPointerException | OwnerContext.NoContext ignore) {}
+	this.constipation = constipation;
     }
+
 
     public static class Event {
 	public final CharWnd.FoodMeter.Event ev;
@@ -84,19 +98,35 @@ public class FoodInfo extends ItemInfo.Tip {
 		efi = catimgsh(5, efi, RichText.render(String.format("$i{($col[192,192,255]{%d%%} chance)}", (int)Math.round(efs[i].p * 100)), 0).img);
 	    imgs.add(efi);
 	}
-	if(types.length > 0) {
+	if(types.length > 0 && constipation != null) {
 	    imgs.add(Text.render("Categories:").img);
 	    double total = 1;
 	    for (int type : types) {
-		if(TYPES.size() > type) {
-		    CharWnd.Constipations.El c = TYPES.get(type);
-		    imgs.add(c.tip());
-		    total *= c.a;
+		CharacterInfo.Constipation.Data c = constipation.get(type);
+		if(c!=null) {
+		    imgs.add(constipation.render(FoodInfo.class, c));
+		    total *= c.value;
 		}
 	    }
-	    imgs.add(Text.render(String.format("Total: %s%%", Utils.odformat2(100 * total, 2))).img);
+	    Color col = color(total);
+	    imgs.add(RichText.render(String.format("Total: $col[%d,%d,%d]{%s%%}", col.getRed(), col.getGreen(), col.getBlue(), Utils.odformat2(100 * total, 2)), 0).img);
 	}
 	return(catimgs(0, imgs.toArray(new BufferedImage[0])));
+    }
+
+    private static BufferedImage renderConstipation(CharacterInfo.Constipation.Data data) {
+	int h = 14;
+	BufferedImage img = data.res.get().layer(Resource.imgc).img;
+	String nm = data.res.get().layer(Resource.tooltip).t;
+	Color col = color(data.value);
+	Text rnm = RichText.render(String.format("%s: $col[%d,%d,%d]{%d%%}", nm, col.getRed(), col.getGreen(), col.getBlue(), (int) (100 * data.value)), 0);
+	BufferedImage tip = TexI.mkbuf(new Coord(h + 5 + rnm.sz().x, h));
+	Graphics g = tip.getGraphics();
+	g.drawImage(convolvedown(img, new Coord(h, h), tflt), 0, 0, null);
+	g.drawImage(rnm.img, h + 5, ((h - rnm.sz().y) / 2) + 1, null);
+	g.dispose();
+
+	return tip;
     }
     
     public static class Data implements ItemData.ITipData {

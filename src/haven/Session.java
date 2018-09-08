@@ -73,6 +73,7 @@ public class Session implements Resource.Resolver {
     byte[] cookie;
     final Map<Integer, CachedRes> rescache = new TreeMap<Integer, CachedRes>();
     public final Glob glob;
+    public final CharacterInfo character;
     public byte[] sesskey;
     private int localCacheId = -1;
 
@@ -649,6 +650,7 @@ public class Session implements Resource.Resolver {
 	this.cookie = cookie;
 	this.args = args;
 	glob = new Glob(this);
+	character = new CharacterInfo();
 	try {
 	    sk = new DatagramSocket();
 	} catch(SocketException e) {
