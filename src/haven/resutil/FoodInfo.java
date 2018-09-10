@@ -98,7 +98,7 @@ public class FoodInfo extends ItemInfo.Tip {
 		efi = catimgsh(5, efi, RichText.render(String.format("$i{($col[192,192,255]{%d%%} chance)}", (int)Math.round(efs[i].p * 100)), 0).img);
 	    imgs.add(efi);
 	}
-	if(types.length > 0 && constipation != null) {
+	if(CFG.DISPLAY_FOD_CATEGORIES.get() && types.length > 0 && constipation != null) {
 	    imgs.add(Text.render("Categories:").img);
 	    double total = 1;
 	    for (int type : types) {

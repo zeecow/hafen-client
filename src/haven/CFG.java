@@ -19,6 +19,7 @@ public class CFG<T> {
     public static final CFG<Boolean> DISPLAY_FLAVOR = new CFG<>("display.flavor", true);
     public static final CFG<Boolean> DISPLAY_GOB_INFO = new CFG<>("display.gob_info", false);
     public static final CFG<Boolean> DISPLAY_GOB_HITBOX = new CFG<>("display.gob_hitbox", false);
+    public static final CFG<Boolean> DISPLAY_FOD_CATEGORIES = new CFG<>("display.food_category", true);
     public static final CFG<Boolean> SHOW_GOB_PATH = new CFG<>("display.show_gob_path", false);
     public static final CFG<Boolean> SHOW_GOB_RADIUS = new CFG<>("display.show_gob_radius", false);
     public static final CFG<Boolean> SIMPLE_CROPS = new CFG<>("display.simple_crops", false);
