@@ -182,7 +182,7 @@ public class ItemFilter {
 		    case "mw":
 			filter = new XP(tag, sign, value, opt);
 			break;
-		    case "nrg":
+		    case "energy":
 		    case "fill":
 			filter = new Food(tag, sign, value, opt);
 			break;
