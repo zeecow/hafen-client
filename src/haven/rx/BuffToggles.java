@@ -21,17 +21,14 @@ public class BuffToggles {
     }
 
     public static void init(GameUI gameUI) {
-	Reactor.EMSG.filter(filters::contains)
+	Reactor.IMSG.filter(filters::contains)
 	    .subscribe(BuffToggles::toggle);
 
 	toggles.forEach(toggle -> toggle.setup(gameUI));
     }
 
     private static void toggle(String msg) {
-	Toggle toggle = toggles.stream().filter(t -> t.matches(msg)).findFirst().orElse(null);
-	if(toggle != null) {
-	    toggle.update(msg);
-	}
+	toggles.stream().filter(t -> t.matches(msg)).findFirst().ifPresent(toggle -> toggle.update(msg));
     }
 
     public static class Toggle implements CFG.Observer<Boolean>, Observer {
