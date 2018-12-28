@@ -36,7 +36,9 @@ public class CharterBook extends Window {
 	player = String.format("%s/%s", username, player);
 	names = new ArrayList<>(config.getOrDefault(player, Collections.emptyList()));
 	names.sort(String::compareTo);
+	boolean newUser = !config.containsKey(player);
 	config.put(player, names);
+	if(newUser) {save();}
     }
 
     private static void init() {
