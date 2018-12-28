@@ -26,6 +26,8 @@
 
 package haven;
 
+import haven.rx.CharterBook;
+
 import java.util.*;
 
 public class Charlist extends Widget {
@@ -126,8 +128,10 @@ public class Charlist extends Widget {
 	if(sender instanceof Button) {
 	    synchronized(chars) {
 		for(Char c : chars) {
-		    if(sender == c.plb)
+		    if(sender == c.plb) {
 			wdgmsg("play", c.name);
+			CharterBook.loadConfig(c.name);
+		    }
 		}
 	    }
 	} else if(sender instanceof Avaview) {

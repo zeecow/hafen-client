@@ -29,6 +29,7 @@ package haven;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
+import haven.rx.CharterBook;
 
 import java.awt.Color;
 import java.awt.Font;
@@ -96,6 +97,9 @@ public class Window extends Widget implements DTarget {
 	    Coord sz = (Coord)args[0];
 	    String cap = (args.length > 1)?(String)args[1]:null;
 	    boolean lg = (args.length > 2)?((Integer)args[2] != 0):false;
+	    if("Sublime Portico".equals(cap) || "Charter Stone".equals(cap)) {
+		return new CharterBook(sz, cap, lg, Coord.z, Coord.z);
+	    }
 	    return(new Window(sz, cap, lg, Coord.z, Coord.z));
 	}
     }

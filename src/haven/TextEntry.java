@@ -157,6 +157,10 @@ public class TextEntry extends SIWidget {
 	    wdgmsg("activate", text);
     }
 
+    public void activate() {
+	activate(text);
+    }
+
     public boolean type(char c, KeyEvent ev) {
 	return(buf.key(ev));
     }

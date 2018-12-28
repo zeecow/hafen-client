@@ -26,6 +26,8 @@
 
 package haven;
 
+import haven.rx.CharterBook;
+
 import java.net.*;
 import java.util.*;
 import java.io.*;
@@ -664,6 +666,7 @@ public class Session implements Resource.Resolver {
 	ticker.start();
 
 	Arrays.stream(LOCAL_CACHED).forEach(this::cacheres);
+	CharterBook.setUserName(username);
     }
 
     private void sendack(int seq) {
