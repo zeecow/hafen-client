@@ -31,7 +31,7 @@ import java.awt.Color;
 public abstract class Dropbox<T> extends ListWidget<T> {
     public static final Tex drop = Resource.loadtex("gfx/hud/drop");
     public final int listh;
-    private final Coord dropc;
+    protected final Coord dropc;
     private Droplist dl;
     public Color bgcolor = new Color(20, 20, 20, 214);
 
