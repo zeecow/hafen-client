@@ -41,6 +41,7 @@
         <marker startsWith="gfx/terobjs/bumlings/cassiterite" name="Cassiterite" icon="gfx/invobjs/cassiterite" priority="10" />
         <marker startsWith="gfx/terobjs/bumlings/chalcopyrite" name="Chalcopyrite" icon="gfx/invobjs/chalcopyrite" show="true" priority="10" />
         <marker startsWith="gfx/terobjs/bumlings/hematite" name="Hematite" icon="gfx/invobjs/hematite" show="true" priority="10" />
+        <marker startsWith="gfx/terobjs/bumlings/hornblende" name="Hornblende" icon="gfx/invobjs/hornblende" show="true" priority="10" />
         <marker startsWith="gfx/terobjs/bumlings/hornsilver" name="Hornsilver" icon="gfx/invobjs/hornsilver" show="true" priority="10" />
         <marker startsWith="gfx/terobjs/bumlings/ilmenite" name="Ilmenite" icon="gfx/invobjs/ilmenite" show="true" priority="10" />
         <marker startsWith="gfx/terobjs/bumlings/limonite" name="Limonite" icon="gfx/invobjs/limonite" show="true" priority="10" />
@@ -66,6 +67,7 @@
     </group>
     <group name="Trees" show="false" icon="$down">
         <marker exact="gfx/terobjs/trees/alder" name="Alder" show="false" icon="gfx/invobjs/seed-alder" />
+        <marker exact="gfx/terobjs/trees/almondtree" name="Almond" show="false" icon="gfx/invobjs/almond" />
         <marker exact="gfx/terobjs/trees/appletree" name="Apple" show="false" icon="gfx/invobjs/apple" />
         <marker exact="gfx/terobjs/trees/ash" name="Ash" show="false" icon="gfx/invobjs/seed-ash" />
         <marker exact="gfx/terobjs/trees/aspen" name="Aspen" show="false" icon="gfx/invobjs/seed-aspen" />
@@ -101,6 +103,7 @@
         <marker exact="gfx/terobjs/trees/poplar" name="Poplar" show="false" />
         <marker exact="gfx/terobjs/trees/planetree" name="Plane" show="false" />
         <marker exact="gfx/terobjs/trees/plumtree" name="Plum" show="false" icon="gfx/invobjs/plum" />
+        <marker exact="gfx/terobjs/trees/quincetree" name="Quince" show="false" icon="gfx/invobjs/quince"/>
         <marker exact="gfx/terobjs/trees/rowan" name="Rowan" show="false" />
         <marker exact="gfx/terobjs/trees/sallow" name="Sallow" show="false" />
         <marker exact="gfx/terobjs/trees/spruce" name="Spruce" show="false" />
