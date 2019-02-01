@@ -27,21 +27,37 @@ public class RadarCFG {
     private static DocumentBuilder builder;
 
     static {
-	String xml = Config.loadFile("radar.xml");
+	try {
+	    builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+	} catch (ParserConfigurationException e) {
+	    e.printStackTrace();
+	}
+	readConfig(Config.loadJarFile("radar.xml"));
+	readConfig(Config.loadFSFile("radar.xml"));
+    }
+
+    private static void readConfig(String xml) {
 	if(xml != null) {
 	    try {
-		DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
-		builder = documentBuilderFactory.newDocumentBuilder();
 		Document doc = builder.parse(new ByteArrayInputStream(xml.getBytes()));
-		groups.clear();
 		NodeList groupNodes = doc.getElementsByTagName("group");
 		for (int i = 0; i < groupNodes.getLength(); i++) {
-		    groups.add(new Group((Element) groupNodes.item(i)));
+		    Element node = (Element) groupNodes.item(i);
+		    Group group = findGroup(node);
+		    if(group == null) {
+			groups.add(new Group(node));
+		    } else {
+			group.update(node);
+		    }
 		}
-	    } catch (ParserConfigurationException | IOException | SAXException ignored) {
-		ignored.printStackTrace();
+	    } catch (IOException | SAXException e) {
+		e.printStackTrace();
 	    }
 	}
+    }
+
+    private static Group findGroup(Element node) {
+	return groups.stream().filter(group -> group.equals(node)).findFirst().orElse(null);
     }
 
     public static synchronized void save() {
@@ -102,7 +118,7 @@ public class RadarCFG {
     }
 
     public static class Group {
-	private final Color color;
+	private Color color;
 	public String name, icon;
 	public Boolean show = null;
 	public Integer priority = null;
@@ -110,6 +126,11 @@ public class RadarCFG {
 	private Tex tex = null;
 
 	public Group(Element config) {
+	    markerCFGs = new LinkedList<>();
+	    update(config);
+	}
+
+	public void update(Element config) {
 	    name = config.getAttribute("name");
 	    color = Utils.hex2color(config.getAttribute("color"), null);
 	    if(config.hasAttribute("icon")) {
@@ -125,11 +146,19 @@ public class RadarCFG {
 		}
 	    }
 	    NodeList children = config.getElementsByTagName("marker");
-	    markerCFGs = new LinkedList<>();
 	    for (int i = 0; i < children.getLength(); i++) {
-		markerCFGs.add(MarkerCFG.parse((Element) children.item(i), this));
+		Element item = (Element) children.item(i);
+		MarkerCFG marker = findMarker(item);
+		if(marker == null) {
+		    markerCFGs.add(MarkerCFG.parse(item, this));
+		} else {
+		    marker.update(item);
+		}
 	    }
+	}
 
+	private MarkerCFG findMarker(Element node) {
+	    return markerCFGs.stream().filter(markerCFG -> markerCFG.equals(node)).findFirst().orElse(null);
 	}
 
 	public void write(Element el) {
@@ -168,6 +197,10 @@ public class RadarCFG {
 	public Color color() {
 	    return color != null ? color : Color.WHITE;
 	}
+
+	public boolean equals(Element node) {
+	    return name != null && name.equals(node.getAttribute("name"));
+	}
     }
 
     public static class MarkerCFG {
@@ -183,39 +216,43 @@ public class RadarCFG {
 
 	public static MarkerCFG parse(Element config, Group parent) {
 	    MarkerCFG cfg = new MarkerCFG();
-
 	    cfg.parent = parent;
+	    cfg.update(config);
+	    return cfg;
+	}
+
+	private static Match getType(Element node) {
 	    Match[] types = Match.values();
-	    String name = null;
+	    Match result = null;
 	    for (Match type : types) {
-		name = type.name();
-		if(config.hasAttribute(name)) {
+		result = type;
+		if(node.hasAttribute(result.name())) {
 		    break;
 		}
 	    }
-	    if(name == null) {
-		throw new RuntimeException();
-	    }
+	    return result;
+	}
+
+	public void update(Element config) {
 	    if(config.hasAttribute("name")) {
-		cfg.name = config.getAttribute("name");
+		name = config.getAttribute("name");
 	    }
-	    cfg.color = Utils.hex2color(config.getAttribute("color"), null);
-	    cfg.type = Match.valueOf(name);
-	    cfg.pattern = config.getAttribute(name);
+	    color = Utils.hex2color(config.getAttribute("color"), null);
+	    type = getType(config);
+	    assert type != null;
+	    pattern = config.getAttribute(type.name());
 	    if(config.hasAttribute("show")) {
-		cfg.show = config.getAttribute("show").toLowerCase().equals("true");
+		show = config.getAttribute("show").toLowerCase().equals("true");
 	    }
 	    if(config.hasAttribute("icon")) {
-		cfg.icon = config.getAttribute("icon");
+		icon = config.getAttribute("icon");
 	    }
 	    if(config.hasAttribute("priority")) {
 		try {
-		    cfg.priority = Integer.parseInt(config.getAttribute("priority"));
+		    priority = Integer.parseInt(config.getAttribute("priority"));
 		} catch (NumberFormatException ignored) {
 		}
 	    }
-
-	    return cfg;
 	}
 
 	public Tex tex() {
@@ -265,6 +302,12 @@ public class RadarCFG {
 
 	public Color color() {
 	    return color != null ? color : parent.color();
+	}
+
+	public boolean equals(Element node) {
+	    Match type = getType(node);
+	    String pattern = type != null ? node.getAttribute(type.name()) : null;
+	    return this.type == type && this.pattern.equals(pattern);
 	}
     }
 
