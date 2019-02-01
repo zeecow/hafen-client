@@ -8,6 +8,10 @@
       <option name="NAMES_COUNT_TO_USE_IMPORT_ON_DEMAND" value="1" />
     </JavaCodeStyleSettings>
     <XML>
+      <option name="XML_KEEP_WHITESPACES" value="true" />
+      <option name="XML_ATTRIBUTE_WRAP" value="0" />
+      <option name="XML_TEXT_WRAP" value="0" />
+      <option name="XML_ALIGN_ATTRIBUTES" value="false" />
       <option name="XML_LEGACY_SETTINGS_IMPORTED" value="true" />
     </XML>
     <codeStyleSettings language="JAVA">
@@ -21,10 +25,11 @@
       </indentOptions>
     </codeStyleSettings>
     <codeStyleSettings language="XML">
+      <option name="WRAP_ON_TYPING" value="0" />
       <indentOptions>
-        <option name="INDENT_SIZE" value="2" />
         <option name="CONTINUATION_INDENT_SIZE" value="4" />
-        <option name="TAB_SIZE" value="8" />
+        <option name="SMART_TABS" value="true" />
+        <option name="KEEP_INDENTS_ON_EMPTY_LINES" value="true" />
       </indentOptions>
     </codeStyleSettings>
   </code_scheme>
