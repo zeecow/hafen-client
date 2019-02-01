@@ -342,6 +342,25 @@ public class RadarCFG {
 	}
     }
 
+    public static class MarkerCheckAll extends CheckBox {
+	private final WidgetList<CheckBox> group;
+
+	public MarkerCheckAll(WidgetList<CheckBox> group) {
+	    super("Toggle all");
+	    this.group = group;
+	}
+
+	@Override
+	public void changed(boolean val) {
+	    for (int i = 0; i < group.listitems(); i++) {
+		CheckBox item = group.listitem(i);
+		if(item != this) {
+		    item.set(a);
+		}
+	    }
+	}
+    }
+
     enum Match {
 	exact {
 	    @Override

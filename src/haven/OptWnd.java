@@ -548,9 +548,9 @@ public class OptWnd extends Window {
     }
 
     private void initRadarPanel() {
-	final WidgetList<RadarCFG.MarkerCheck> markers = new WidgetList<RadarCFG.MarkerCheck>(new Coord(200, 16), 20) {
+	final WidgetList<CheckBox> markers = new WidgetList<CheckBox>(new Coord(200, 16), 20) {
 	    @Override
-	    protected void itemclick(RadarCFG.MarkerCheck item, int button) {
+	    protected void itemclick(CheckBox item, int button) {
 		if(button == 1) {
 		    item.set(!item.a);
 		}
@@ -563,6 +563,7 @@ public class OptWnd extends Window {
 	    @Override
 	    public void selected(RadarCFG.GroupCheck item) {
 		markers.clear(true);
+		markers.additem(new RadarCFG.MarkerCheckAll(markers));
 		for(RadarCFG.MarkerCFG marker : item.group.markerCFGs) {
 		    markers.additem(new RadarCFG.MarkerCheck(marker));
 		}
