@@ -52,6 +52,7 @@ public class WidgetList<T extends Widget> extends ListWidget<T> {
 	    }
 	}
 	list.clear();
+	sb.ch(-sb.val);
     }
 
     public Coord itempos(int idx) {
