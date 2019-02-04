@@ -1,3 +1,7 @@
+$size[14]{$u{Update for 05.02.19:}
+  * Added bunch of new trees/bushes/rocks to radar config.
+  * Unknown rocks/trees/bushes in radar will show resource name.
+ 
 $size[14]{$u{Update for 01.02.19:}
   * Added "Toggle all" checkbox to radar options panel.
   * Added quince, almond and hornblende to radar.
