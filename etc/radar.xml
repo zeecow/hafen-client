@@ -42,7 +42,6 @@
         <marker startsWith="gfx/terobjs/bumlings/chalcopyrite" name="Chalcopyrite" icon="gfx/invobjs/chalcopyrite" show="true" priority="10" />
         <marker startsWith="gfx/terobjs/bumlings/hematite" name="Hematite" icon="gfx/invobjs/hematite" show="true" priority="10" />
         <marker startsWith="gfx/terobjs/bumlings/hornblende" name="Hornblende" icon="gfx/invobjs/hornblende" show="true" priority="10" />
-        <marker startsWith="gfx/terobjs/bumlings/hornsilver" name="Hornsilver" icon="gfx/invobjs/hornsilver" show="true" priority="10" />
         <marker startsWith="gfx/terobjs/bumlings/ilmenite" name="Ilmenite" icon="gfx/invobjs/ilmenite" show="true" priority="10" />
         <marker startsWith="gfx/terobjs/bumlings/limonite" name="Limonite" icon="gfx/invobjs/limonite" show="true" priority="10" />
         <marker startsWith="gfx/terobjs/bumlings/magnetite" name="Magnetite" icon="gfx/invobjs/magnetite" show="true" priority="10" />
@@ -56,6 +55,7 @@
         <marker startsWith="gfx/terobjs/bumlings/flint" name="Flint" icon="gfx/invobjs/flint" show="false" priority="-10" />
         <marker startsWith="gfx/terobjs/bumlings/gneiss" name="Gneiss" icon="gfx/invobjs/gneiss" show="false" priority="-10" />
         <marker startsWith="gfx/terobjs/bumlings/granite" name="Granite" icon="gfx/invobjs/granite" show="false" priority="-10" />
+        <marker startsWith="gfx/terobjs/bumlings/hornsilver" name="Hornsilver" icon="gfx/invobjs/hornsilver" show="true" priority="10" />
         <marker startsWith="gfx/terobjs/bumlings/limestone" name="Limestone" icon="gfx/invobjs/limestone" show="false" priority="-10" />
         <marker startsWith="gfx/terobjs/bumlings/marble" name="Marble" icon="gfx/invobjs/marble" show="false" priority="-10" />
         <marker startsWith="gfx/terobjs/bumlings/porphyry" name="Porphyry" icon="gfx/invobjs/porphyry" show="false" priority="-10" />
