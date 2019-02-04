@@ -12,7 +12,8 @@
         <marker startsWith="gfx/kritter/rat" name="Rat" show="true" priority="-5" />
         <marker startsWith="gfx/kritter/waterstrider/waterstrider" name="Waterstrider" show="true" priority="-5" />
     </group>
-    <group name="Herbs" icon="$dot" show="true">
+    <group name="Stuff" icon="$dot" show="true">
+        <marker exact="gfx/terobjs/trees/oldtrunk" name="Mirkwood" icon="gfx/invobjs/wblock-mirkwood" show="false" />
         <marker exact="gfx/terobjs/herbs/mistletoe" name="Mistletoe" />
         <marker exact="gfx/kritter/wildbees/wildbeehive" name="Wild Beehive" />
     </group>
@@ -91,40 +92,39 @@
         <marker exact="gfx/terobjs/trees/corkoak" name="Cork" show="false" />
         <marker exact="gfx/terobjs/trees/crabappletree" name="Crabapple" show="false" />
         <marker exact="gfx/terobjs/trees/cypress" name="Cypress" show="false" />
+        <marker exact="gfx/terobjs/trees/elm" name="Elm" show="false" />
         <marker exact="gfx/terobjs/trees/fir" name="Fir" show="false" />
         <marker exact="gfx/terobjs/trees/goldenchain" name="Goldenchain" show="false" />
         <marker exact="gfx/terobjs/trees/hazel" name="Hazel" show="false" icon="gfx/invobjs/hazelnut" />
         <marker exact="gfx/terobjs/trees/hornbeam" name="Hornbeam" show="false" />
         <marker exact="gfx/terobjs/trees/juniper" name="Juniper" show="false" />
-        <marker exact="gfx/terobjs/trees/elm" name="Elm" show="false" />
         <marker exact="gfx/terobjs/trees/kingsoak" name="King's Oak" show="false" icon="gfx/invobjs/seed-kingsoak" />
         <marker exact="gfx/terobjs/trees/larch" name="Larch" show="false" />
         <marker exact="gfx/terobjs/trees/laurel" name="Laurel" show="false" icon="gfx/invobjs/leaf-laurel" />
         <marker exact="gfx/terobjs/trees/linden" name="Linden" show="false" />
+        <marker exact="gfx/terobjs/trees/lotetree" name="Lote Tree" icon="gfx/invobjs/seed-lotetree" show="false" />
         <marker exact="gfx/terobjs/trees/maple" name="Maple" show="false" />
         <marker exact="gfx/terobjs/trees/mayflower" name="Mayflower" icon="gfx/invobjs/seed-mayflower" show="false" />
         <marker exact="gfx/terobjs/trees/medlartree" name="Medlar" icon="gfx/invobjs/medlar" show="false" />
-        <marker exact="gfx/terobjs/trees/lotetree" name="Lote Tree" icon="gfx/invobjs/seed-lotetree" show="false" />
         <marker exact="gfx/terobjs/trees/mulberry" name="Mulberry" icon="gfx/invobjs/leaf-mulberrytree" show="true" />
         <marker exact="gfx/terobjs/trees/oak" name="Oak" show="false" />
         <marker exact="gfx/terobjs/trees/olivetree" name="Olive" icon="gfx/invobjs/olive" show="false" />
-        <marker exact="gfx/terobjs/trees/oldtrunk" name="Mirkwood" icon="gfx/invobjs/wblock-mirkwood" show="false" />
         <marker exact="gfx/terobjs/trees/peartree" name="Pear" show="false" icon="gfx/invobjs/pear" />
         <marker exact="gfx/terobjs/trees/pine" name="Pine" show="false" />
-        <marker exact="gfx/terobjs/trees/poplar" name="Poplar" show="false" />
         <marker exact="gfx/terobjs/trees/planetree" name="Plane" show="false" />
         <marker exact="gfx/terobjs/trees/plumtree" name="Plum" show="false" icon="gfx/invobjs/plum" />
+        <marker exact="gfx/terobjs/trees/poplar" name="Poplar" show="false" />
         <marker exact="gfx/terobjs/trees/quincetree" name="Quince" show="false" icon="gfx/invobjs/quince"/>
         <marker exact="gfx/terobjs/trees/rowan" name="Rowan" show="false" />
         <marker exact="gfx/terobjs/trees/sallow" name="Sallow" show="false" />
-        <marker exact="gfx/terobjs/trees/spruce" name="Spruce" show="false" />
+        <marker exact="gfx/terobjs/trees/silverfir" name="Silver Fir" show="false" icon="gfx/invobjs/seed-silverfir"/>
         <marker exact="gfx/terobjs/trees/sorbtree" name="Sorb Apple" show="false" icon="gfx/invobjs/sorbapple" />
+        <marker exact="gfx/terobjs/trees/spruce" name="Spruce" show="false" />
         <marker exact="gfx/terobjs/trees/sweetgum" name="Sweetgum" show="false" />
         <marker exact="gfx/terobjs/trees/treeheath" name="Heath Tree" show="false" icon="gfx/invobjs/seed-treeheath"/>
-        <marker exact="gfx/terobjs/trees/silverfir" name="Silver Fir" show="false" icon="gfx/invobjs/seed-silverfir"/>
         <marker exact="gfx/terobjs/trees/walnuttree" name="Walnut" show="false" icon="gfx/invobjs/walnut" />
-        <marker exact="gfx/terobjs/trees/willow" name="Willow" show="false" />
         <marker exact="gfx/terobjs/trees/whitebeam" name="Whitebeam" show="false" />
+        <marker exact="gfx/terobjs/trees/willow" name="Willow" show="false" />
         <marker exact="gfx/terobjs/trees/yew" name="Yew" show="false" />
         <marker regex="gfx/terobjs/trees/.+log" name="Log" text="Log" show="false" icon="$dot" color="8A2908"/>
         <marker regex="gfx/terobjs/trees/.+stump" name="Stump" show="false" icon="$dot" color="9A5834"/>
