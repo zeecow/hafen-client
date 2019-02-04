@@ -181,9 +181,12 @@ public class Radar {
 		return resname;
 	    } else if(ki != null) {
 		return ki.name;
-	    } else if(cfg != null && cfg.name != null) {
-		return cfg.name;
-	    }
+	    } else if(cfg != null)
+		if(Boolean.TRUE.equals(cfg.resname)) {
+		    return cfg.name != null ? String.format("%s (%s)", cfg.name, pretty(resname)) : resname;
+		} else if(cfg.name != null) {
+		    return cfg.name;
+		}
 	    return pretty(resname);
 	}
 	

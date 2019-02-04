@@ -208,6 +208,7 @@ public class RadarCFG {
 	private Match type;
 	private String pattern;
 	private Boolean show = null;
+	public Boolean resname = null;
 	private Integer priority = null;
 	public String icon = null;
 	public String name = null;
@@ -243,6 +244,9 @@ public class RadarCFG {
 	    pattern = config.getAttribute(type.name());
 	    if(config.hasAttribute("show")) {
 		show = config.getAttribute("show").toLowerCase().equals("true");
+	    }
+	    if(config.hasAttribute("resname")) {
+		resname = config.getAttribute("resname").toLowerCase().equals("true");
 	    }
 	    if(config.hasAttribute("icon")) {
 		icon = config.getAttribute("icon");
@@ -294,6 +298,9 @@ public class RadarCFG {
 	    }
 	    if(show != null) {
 		el.setAttribute("show", show.toString());
+	    }
+	    if(resname != null) {
+		el.setAttribute("resname", resname.toString());
 	    }
 	    if(priority != null) {
 		el.setAttribute("priority", priority.toString());
