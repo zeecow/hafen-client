@@ -26,7 +26,6 @@
 
 package haven;
 
-import static haven.MCache.cmaps;
 import static haven.MCache.tilesz;
 import static haven.OCache.posres;
 import haven.GLProgram.VarID;
@@ -40,6 +39,7 @@ import java.lang.ref.WeakReference;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
+import java.util.List;
 
 import static haven.MCache.*;
 
@@ -47,7 +47,7 @@ public class MapView extends PView implements DTarget, Console.Directory {
     public static boolean clickdb = false;
     public long plgob = -1;
     public Coord2d cc;
-    private final Glob glob;
+    public final Glob glob;
     private int view = 2;
     private Collection<Delayed> delayed = new LinkedList<Delayed>();
     private Collection<Delayed> delayed2 = new LinkedList<Delayed>();
@@ -1061,6 +1061,23 @@ public class MapView extends PView implements DTarget, Console.Directory {
 	    ClickInfo o = (ClickInfo)obj;
 	    return(Utils.eq(from, o.from) && (r == o.r));
 	}
+ 
+	public Gob gob() {
+	    Rendered[] list = array();
+	    for (Rendered r : list) {
+		if(r instanceof Gob) {return (Gob) r;}
+	    }
+	    return null;
+	}
+	
+	public List<Gob> gobs() {
+	    List<Gob> gobs = new ArrayList<>();
+	    Rendered[] list = array();
+	    for (Rendered r : list) {
+		if(r instanceof Gob) {gobs.add((Gob) r);}
+	    }
+	    return gobs;
+	}
 
 	public int hashCode() {
 	    return(((from != null) ? (from.hashCode() * 31) : 0) + System.identityHashCode(r));
@@ -1567,6 +1584,19 @@ public class MapView extends PView implements DTarget, Console.Directory {
 	protected void hit(Coord pc, Coord2d mc, ClickInfo inf) {
 	    Object[] args = {pc, mc.floor(posres), clickb, ui.modflags()};
 	    args = Utils.extend(args, gobclickargs(inf));
+	    
+	    if(inf != null) {
+		Gob gob = inf.gob();
+		if(gob != null) {
+		    if(ui.modmeta && clickb == 1) {
+			ChatUI.Channel chat = ui.gui.chat.sel;
+			if(chat instanceof ChatUI.EntryChannel) {
+			    ((ChatUI.EntryChannel) chat).send(String.format("@%d", gob.id));
+			}
+			return;
+		    }
+		}
+	    }
 	    wdgmsg("click", args);
 	}
     }

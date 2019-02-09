@@ -436,6 +436,12 @@ public class Gob implements Sprite.Owner, Skeleton.ModOwner, Rendered {
 	if(hlt != null) {
 	    rl.prepc(hlt.getfx());
 	}
+ 
+	GobHighlight highlight = getattr(GobHighlight.class);
+	if(highlight != null) {
+	    rl.prepc(highlight.getfx());
+	}
+	
 	Drawable d = getattr(Drawable.class);
 	if(d != null)
 	    d.setup(rl);
@@ -599,6 +605,12 @@ public class Gob implements Sprite.Owner, Skeleton.ModOwner, Rendered {
 	    xl.prep(buf);
 	    rot.prep(buf);
 	}
+    }
+    
+    public void highlight() {
+	delattr(GobHighlight.class);
+	setattr(new GobHighlight(this));
+	glob.oc.changed(this);
     }
     public final GobLocation loc = new GobLocation();
 }

@@ -143,6 +143,21 @@ public class ChatUI extends Widget {
 	public int urgency = 0;
 	private PrintWriter log;
 	
+	public boolean process(String msg) {
+	    Pattern highlight = Pattern.compile("^@(-?\\d+)$");
+	    Matcher matcher = highlight.matcher(msg);
+	    if(matcher.matches()){
+	        try {
+		    Gob gob = ui.gui.map.glob.oc.getgob(Long.parseLong(matcher.group(1)));
+		    if (gob != null) {
+		        gob.highlight();
+		    	return false;
+		    }
+		} catch (Exception ignored){}
+	    }
+	    return true;
+	}
+	
 	public static abstract class Message {
 	    public final double time = Utils.ntime();
 	    
@@ -705,15 +720,17 @@ public class ChatUI extends Widget {
 
 	public void uimsg(String msg, Object... args) {
 	    if((msg == "msg") || (msg == "log")) {
-		String line = (String)args[0];
-		Color col = null;
-		if(args.length > 1) col = (Color)args[1];
-		if(col == null) col = Color.WHITE;
-		int urgency = (args.length > 2)?(Integer)args[2]:0;
-		Message cmsg = new SimpleMessage(line, col, iw());
-		append(cmsg);
-		if(urgency > 0)
-		    notify(cmsg, urgency);
+		String line = (String) args[0];
+		if(process(line)) {
+		    Color col = null;
+		    if(args.length > 1) col = (Color) args[1];
+		    if(col == null) col = Color.WHITE;
+		    int urgency = (args.length > 2) ? (Integer) args[2] : 0;
+		    Message cmsg = new SimpleMessage(line, col, iw());
+		    append(cmsg);
+		    if(urgency > 0)
+			notify(cmsg, urgency);
+		}
 	    } else {
 		super.uimsg(msg, args);
 	    }
@@ -800,13 +817,15 @@ public class ChatUI extends Widget {
 	    if(msg == "msg") {
 		Integer from = (Integer)args[0];
 		String line = (String)args[1];
-		if(from == null) {
-		    append(new MyMessage(line, iw()));
-		} else {
-		    Message cmsg = new NamedMessage(from, line, fromcolor(from), iw());
-		    append(cmsg);
-		    if(urgency > 0)
-			notify(cmsg, urgency);
+		if(process(line)) {
+		    if(from == null) {
+			append(new MyMessage(line, iw()));
+		    } else {
+			Message cmsg = new NamedMessage(from, line, fromcolor(from), iw());
+			append(cmsg);
+			if(urgency > 0)
+			    notify(cmsg, urgency);
+		    }
 		}
 	    } else {
 		super.uimsg(msg, args);
@@ -828,19 +847,21 @@ public class ChatUI extends Widget {
 		Integer from = (Integer)args[0];
 		int gobid = (Integer)args[1];
 		String line = (String)args[2];
-		Color col = Color.WHITE;
-		synchronized(ui.sess.glob.party.memb) {
-		    Party.Member pm = ui.sess.glob.party.memb.get((long)gobid);
-		    if(pm != null)
-			col = pm.col;
-		}
-		if(from == null) {
-		    append(new MyMessage(line, iw()));
-		} else {
-		    Message cmsg = new NamedMessage(from, line, Utils.blendcol(col, Color.WHITE, 0.5), iw());
-		    append(cmsg);
-		    if(urgency > 0)
-			notify(cmsg, urgency);
+		if(process(line)) {
+		    Color col = Color.WHITE;
+		    synchronized (ui.sess.glob.party.memb) {
+			Party.Member pm = ui.sess.glob.party.memb.get((long) gobid);
+			if(pm != null)
+			    col = pm.col;
+		    }
+		    if(from == null) {
+			append(new MyMessage(line, iw()));
+		    } else {
+			Message cmsg = new NamedMessage(from, line, Utils.blendcol(col, Color.WHITE, 0.5), iw());
+			append(cmsg);
+			if(urgency > 0)
+			    notify(cmsg, urgency);
+		    }
 		}
 	    } else {
 		super.uimsg(msg, args);
@@ -872,12 +893,14 @@ public class ChatUI extends Widget {
 	    if(msg == "msg") {
 		String t = (String)args[0];
 		String line = (String)args[1];
-		if(t.equals("in")) {
-		    Message cmsg = new InMessage(line, iw());
-		    append(cmsg);
-		    notify(cmsg, 3);
-		} else if(t.equals("out")) {
-		    append(new OutMessage(line, iw()));
+		if(process(line)) {
+		    if(t.equals("in")) {
+			Message cmsg = new InMessage(line, iw());
+			append(cmsg);
+			notify(cmsg, 3);
+		    } else if(t.equals("out")) {
+			append(new OutMessage(line, iw()));
+		    }
 		}
 	    } else if(msg == "err") {
 		String err = (String)args[0];
