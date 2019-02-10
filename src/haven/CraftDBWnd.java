@@ -210,6 +210,13 @@ public class CraftDBWnd extends Window implements DTarget2 {
 
     public void select(Pagina p, boolean use) {
 	if(mode != All) {changeMode(All);}
+	if(!filter.line.isEmpty()) {
+	    filter.setline("");
+	    changeMode(All);
+	    if(p == ui.gui.menu.bk.pag) {
+	        p = CRAFT;
+	    }
+	}
 	select(p, use, false);
     }
     
