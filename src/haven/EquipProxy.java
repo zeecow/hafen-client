@@ -2,6 +2,7 @@ package haven;
 
 import java.awt.*;
 
+import static haven.Equipory.*;
 import static haven.Inventory.*;
 import static haven.Inventory.sqoff;
 
@@ -56,6 +57,8 @@ public class EquipProxy extends Widget implements DTarget2{
 		WItem w = equipory.slots[slot];
 		if(w != null){
 		    w.draw(g.reclipl(c1, g.sz));
+		} else if(ebgs[slot] != null) {
+		    g.image(ebgs[slot], c1);
 		}
 		k++;
 	    }
@@ -65,10 +68,13 @@ public class EquipProxy extends Widget implements DTarget2{
     @Override
     public Object tooltip(Coord c, Widget prev) {
 	Equipory e = ui.gui.equipory;
-	if(e != null){
-	    WItem w = e.slots[slot(c)];
-	    if(w != null){
-		return w.tooltip(c, (prev == this)?w:prev);
+	if(e != null) {
+	    int slot = slot(c);
+	    WItem w = e.slots[slot];
+	    if(w != null) {
+		return w.tooltip(c, (prev == this) ? w : prev);
+	    } else {
+		return etts[slot];
 	    }
 	}
 	return super.tooltip(c, prev);
