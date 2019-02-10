@@ -95,7 +95,7 @@ public abstract class Listbox<T> extends ListWidget<T> {
 
     public T itemat(Coord c) {
 	int idx = (c.y / itemh) + sb.val;
-	if(idx >= listitems())
+	if(idx >= listitems() || idx < 0)
 	    return(null);
 	return(listitem(idx));
     }
