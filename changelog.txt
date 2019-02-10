@@ -1,3 +1,8 @@
+$size[14]{$u{Update for 10.02.19:}
+  * Made quick equipment access slots draggable and added icons/tooltips to empty slots
+  * Added ability to highlight objects by ALT+Click - highlights them to everyone in same chat using this client. If used in Area Chat will highlight for Amber client users too.
+  * Changed food efficiency tooltip to use minimum group efficiency, instead of multiplication
+ 
 $size[14]{$u{Update for 05.02.19:}
   * Added bunch of new trees/bushes/rocks to radar config.
   * Unknown rocks/trees/bushes in radar will show resource name.
