@@ -179,9 +179,7 @@ public class CraftDBWnd extends Window implements DTarget2 {
     }
     
     private void addToHistory(Pagina action) {
-	if(History.items.contains(action)) {
-	    History.items.remove(action);
-	}
+	History.items.remove(action);
 	History.items.addFirst(action);
 	if(History.items.size() > LIST_SIZE) {
 	    History.items.removeLast();
