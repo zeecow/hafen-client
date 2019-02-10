@@ -6,12 +6,12 @@ import static haven.Equipory.*;
 import static haven.Inventory.*;
 import static haven.Inventory.sqoff;
 
-public class EquipProxy extends Widget implements DTarget2 {
+public class EquipProxy extends Window implements DTarget2 {
     public static final Color BG_COLOR = new Color(91, 128, 51, 202);
     private int[] slots;
     
     public EquipProxy(int[] slots) {
-	super();
+	super(Coord.z, "EquipProxy");
 	setSlots(slots);
     }
     
@@ -37,12 +37,11 @@ public class EquipProxy extends Widget implements DTarget2 {
 		return true;
 	    }
 	}
-	return false;
+	return super.mousedown(c, button);
     }
     
     @Override
     public void draw(GOut g) {
-	super.draw(g);
 	Equipory equipory = ui.gui.equipory;
 	if(equipory != null) {
 	    int k = 0;
