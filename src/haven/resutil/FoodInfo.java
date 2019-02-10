@@ -100,16 +100,16 @@ public class FoodInfo extends ItemInfo.Tip {
 	}
 	if(CFG.DISPLAY_FOD_CATEGORIES.get() && types.length > 0 && constipation != null) {
 	    imgs.add(Text.render("Categories:").img);
-	    double total = 1;
+	    double effective = 1;
 	    for (int type : types) {
 		CharacterInfo.Constipation.Data c = constipation.get(type);
 		if(c!=null) {
 		    imgs.add(constipation.render(FoodInfo.class, c));
-		    total *= c.value;
+		    effective = Math.min(effective, c.value);
 		}
 	    }
-	    Color col = color(total);
-	    imgs.add(RichText.render(String.format("Total: $col[%d,%d,%d]{%s%%}", col.getRed(), col.getGreen(), col.getBlue(), Utils.odformat2(100 * total, 2)), 0).img);
+	    Color col = color(effective);
+	    imgs.add(RichText.render(String.format("Effective: $col[%d,%d,%d]{%s%%}", col.getRed(), col.getGreen(), col.getBlue(), Utils.odformat2(100 * effective, 2)), 0).img);
 	}
 	return(catimgs(0, imgs.toArray(new BufferedImage[0])));
     }
@@ -119,7 +119,7 @@ public class FoodInfo extends ItemInfo.Tip {
 	BufferedImage img = data.res.get().layer(Resource.imgc).img;
 	String nm = data.res.get().layer(Resource.tooltip).t;
 	Color col = color(data.value);
-	Text rnm = RichText.render(String.format("%s: $col[%d,%d,%d]{%d%%}", nm, col.getRed(), col.getGreen(), col.getBlue(), (int) (100 * data.value)), 0);
+	Text rnm = RichText.render(String.format("%s: $col[%d,%d,%d]{%s%%}", nm, col.getRed(), col.getGreen(), col.getBlue(), Utils.odformat2(100 * data.value, 2)), 0);
 	BufferedImage tip = TexI.mkbuf(new Coord(h + 5 + rnm.sz().x, h));
 	Graphics g = tip.getGraphics();
 	g.drawImage(convolvedown(img, new Coord(h, h), tflt), 0, 0, null);
