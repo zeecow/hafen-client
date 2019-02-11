@@ -4,14 +4,13 @@ import java.awt.*;
 
 import static haven.Equipory.*;
 import static haven.Inventory.*;
-import static haven.Inventory.sqoff;
 
-public class EquipProxy extends Window implements DTarget2 {
+public class EquipProxy extends DraggableWidget implements DTarget2 {
     public static final Color BG_COLOR = new Color(91, 128, 51, 202);
     private int[] slots;
     
     public EquipProxy(int[] slots) {
-	super(Coord.z, "EquipProxy");
+	super("EquipProxy");
 	setSlots(slots);
     }
     
