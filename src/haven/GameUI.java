@@ -1541,6 +1541,7 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 	} else {
 	    beltwdg = add(new NKeyBelt());
 	}
+	add(new ToolBelt("Belt0"), 50, 300);
     }
     
     private Map<String, Console.Command> cmdmap = new TreeMap<String, Console.Command>();
