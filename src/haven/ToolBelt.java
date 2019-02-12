@@ -38,8 +38,9 @@ public class ToolBelt extends DraggableWidget implements DTarget, DropTarget {
     
     @Override
     protected void initCfg() {
-        //TODO: Add saving of locked/flipped status
 	super.initCfg();
+	locked = (boolean) cfg.getValue("locked", locked);
+	vertical = (boolean) cfg.getValue("vertical", vertical);
 	resize();
 	update_buttons();
     }
@@ -65,12 +66,16 @@ public class ToolBelt extends DraggableWidget implements DTarget, DropTarget {
 	locked = !locked;
         draggable(!locked);
 	update_buttons();
+	cfg.setValue("locked", locked);
+	storeCfg();
     }
     
     private void flip() {
 	vertical = !vertical;
 	resize();
 	update_buttons();
+	cfg.setValue("vertical", vertical);
+	storeCfg();
     }
     
     private Indir<Resource> belt(int i) {
