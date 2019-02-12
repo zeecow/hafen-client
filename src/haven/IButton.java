@@ -26,7 +26,7 @@
 
 package haven;
 
-import java.awt.Graphics;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 
 public class IButton extends SIWidget {
@@ -35,7 +35,8 @@ public class IButton extends SIWidget {
     boolean a = false;
     UI.Grab d = null;
     public boolean recthit = false;
-
+    private Runnable action;
+    
     @RName("ibtn")
     public static class $_ implements Factory {
 	public Widget create(UI ui, Object[] args) {
@@ -77,9 +78,11 @@ public class IButton extends SIWidget {
 	    return(true);
 	return(up.getRaster().getSample(c.x, c.y, 3) >= 128);
     }
-
+    
+    public void action(Runnable action) {this.action = action;}
+    
     public void click() {
-	wdgmsg("activate");
+	if(action != null) {action.run();} else {wdgmsg("activate");}
     }
 
     protected void depress() {
