@@ -87,6 +87,7 @@ public class GameUI extends ConsoleHost implements Console.Directory {
     public ActWindow craftlist, buildlist, actlist;
     public TimerPanel timers;
     public StudyWnd studywnd;
+    private final ToolBelt toolbelt0;
     public Observable menuObservable = new Observable(){
 	@Override
 	public void notifyObservers(Object arg) {
@@ -918,6 +919,9 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 	} else {
 	    throw(new UI.UIException("Illegal gameui child", place, args));
 	}
+	if(toolbelt0 != null) {
+	    toolbelt0.raise();
+	}
     }
 
     public void cdestroy(Widget w) {
@@ -1541,7 +1545,7 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 	} else {
 	    beltwdg = add(new NKeyBelt());
 	}
-	add(new ToolBelt("Belt0"), 50, 300);
+	toolbelt0 = add(new ToolBelt("Belt0"), 50, 300);
     }
     
     private Map<String, Console.Command> cmdmap = new TreeMap<String, Console.Command>();
