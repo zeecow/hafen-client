@@ -21,6 +21,7 @@ public class ToolBelt extends DraggableWidget implements DTarget, DropTarget {
     private boolean vertical = false, over = false, locked = false;
     
     public ToolBelt(String name) {
+        //TODO: Add way to customize key binds, size, grouping, start index etc.
 	super(name);
 	btnULock = add(new IButton("gfx/hud/btn-ulock", "", "-d", "-h"));
 	btnULock.action(this::toggle);
@@ -37,6 +38,7 @@ public class ToolBelt extends DraggableWidget implements DTarget, DropTarget {
     
     @Override
     protected void initCfg() {
+        //TODO: Add saving of locked/flipped status
 	super.initCfg();
 	resize();
 	update_buttons();
@@ -60,6 +62,7 @@ public class ToolBelt extends DraggableWidget implements DTarget, DropTarget {
     }
     
     private void toggle() {
+        //TODO: Lock dragging when locked
 	locked = !locked;
 	update_buttons();
     }
@@ -71,6 +74,7 @@ public class ToolBelt extends DraggableWidget implements DTarget, DropTarget {
     }
     
     private Indir<Resource> belt(int i) {
+        //TODO: Add ability to save and use custom MenuGrid actions on this belt
 	return (ui != null && ui.gui != null) ? ui.gui.belt[i] : null;
     }
     
@@ -154,6 +158,7 @@ public class ToolBelt extends DraggableWidget implements DTarget, DropTarget {
     
     @Override
     public boolean mousedown(Coord c, int button) {
+        //TODO: Make actions draggable if not locked
 	int slot = beltslot(c);
 	if(slot != -1) {
 	    if(button == 1) {
