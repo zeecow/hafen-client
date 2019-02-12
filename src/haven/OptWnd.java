@@ -362,6 +362,12 @@ public class OptWnd extends Window {
 	y += 25;
 	general.add(new CFGBox("Single item CTRL choose", CFG.MENU_SINGLE_CTRL_CLICK, "If checked, will automatically select single item menus if CTRL is pressed when menu is opened."), x, y);
 
+	y += 25;
+	general.add(new CFGBox("Show F-key tool bar", CFG.SHOW_TOOLBELT_0), x, y);
+
+	y += 25;
+	general.add(new CFGBox("Show extra tool bar", CFG.SHOW_TOOLBELT_1), x, y);
+
 	y += 35;
 	general.add(new Button(120, "Toggle at login") {
 	    @Override

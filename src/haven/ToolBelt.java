@@ -6,23 +6,36 @@ import java.awt.event.KeyEvent;
 import static haven.Inventory.*;
 
 public class ToolBelt extends DraggableWidget implements DTarget, DropTarget {
+    private static final Text.Foundry fnd = new Text.Foundry(Text.sans, 12);
     public static final int GAP = 10;
     public static final int PAD = 2;
     public static final int BTNSZ = 17;
     public static final Coord INVSZ = invsq.sz();
     public static final Color BG_COLOR = new Color(43, 54, 35, 202);
-    public final int[] beltkeys = {KeyEvent.VK_F1, KeyEvent.VK_F2, KeyEvent.VK_F3, KeyEvent.VK_F4,
+    public static final int[] FKEYS = {KeyEvent.VK_F1, KeyEvent.VK_F2, KeyEvent.VK_F3, KeyEvent.VK_F4,
 	KeyEvent.VK_F5, KeyEvent.VK_F6, KeyEvent.VK_F7, KeyEvent.VK_F8,
 	KeyEvent.VK_F9, KeyEvent.VK_F10, KeyEvent.VK_F11, KeyEvent.VK_F12};
-    private final int group = 4;
-    private final int start = 132;
-    private final int size = beltkeys.length;
+    public final int[] beltkeys;
+    private final int group;
+    private final int start;
+    private final int size;
     private final IButton btnLock, btnULock, btnFlip;
     private boolean vertical = false, over = false, locked = false;
+    final Tex[] keys;
     
-    public ToolBelt(String name) {
-        //TODO: Add way to customize key binds, size, grouping, start index etc.
+    public ToolBelt(String name, int start, int group, int[] beltkeys) {
 	super(name);
+	this.start = start;
+	this.group = group;
+	this.beltkeys = beltkeys;
+	size = beltkeys.length;
+	keys = new Tex[size];
+	for (int i = 0; i < size; i++) {
+	    if(beltkeys[i] != 0) {
+		keys[i] = Text.renderstroked(KeyEvent.getKeyText(beltkeys[i]), fnd).tex();
+	    }
+	}
+	
 	btnULock = add(new IButton("gfx/hud/btn-ulock", "", "-d", "-h"));
 	btnULock.action(this::toggle);
 	btnULock.recthit = true;
@@ -64,7 +77,7 @@ public class ToolBelt extends DraggableWidget implements DTarget, DropTarget {
     
     private void toggle() {
 	locked = !locked;
-        draggable(!locked);
+	draggable(!locked);
 	update_buttons();
 	cfg.setValue("locked", locked);
 	storeCfg();
@@ -121,9 +134,9 @@ public class ToolBelt extends DraggableWidget implements DTarget, DropTarget {
 		    g.image(img.tex(), c.add(1, 1));
 		}
 	    } catch (Loading ignored) {}
-	    g.chcolor(156, 180, 158, 255);
-	    FastText.aprintf(g, c.add(INVSZ.sub(2, 0)), 1, 1, "F%d", i + 1);
-	    g.chcolor();
+	    if(keys[i] != null) {
+		g.aimage(keys[i], c.add(INVSZ.sub(2, 0)), 1, 1);
+	    }
 	}
     }
     
@@ -131,7 +144,7 @@ public class ToolBelt extends DraggableWidget implements DTarget, DropTarget {
     
     @Override
     public boolean globtype(char key, KeyEvent ev) {
-	if(key != 0 || ui.modflags() != 0) { return false;}
+	if(!visible || key != 0 || ui.modflags() != 0) { return false;}
 	for (int i = 0; i < beltkeys.length; i++) {
 	    if(ev.getKeyCode() == beltkeys[i]) {
 		keyact(slot(i));
