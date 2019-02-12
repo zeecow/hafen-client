@@ -1,3 +1,6 @@
+$size[14]{$u{Update for 12.02.19:}
+  * added 2 new custom tool bars that can be rotated. Enable/disable in Options->General.
+ 
 $size[14]{$u{Update for 10.02.19:}
   * Made quick equipment access slots draggable and added icons/tooltips to empty slots
   * Added ability to highlight objects by ALT+Click - highlights them to everyone in same chat using this client. If used in Area Chat will highlight for Amber client users too.
