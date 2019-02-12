@@ -5,7 +5,7 @@ public class DraggableWidget extends Widget {
     private final String name;
     private UI.Grab dm;
     private Coord doff;
-    private WidgetCfg cfg;
+    protected WidgetCfg cfg;
     private boolean draggable = true;
     
     public DraggableWidget(String name) {
