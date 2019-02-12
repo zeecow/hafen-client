@@ -1,5 +1,6 @@
 package haven;
 
+import java.awt.*;
 import java.awt.event.KeyEvent;
 
 import static haven.Inventory.*;
@@ -7,22 +8,66 @@ import static haven.Inventory.*;
 public class ToolBelt extends DraggableWidget implements DTarget, DropTarget {
     public static final int GAP = 10;
     public static final int PAD = 2;
+    public static final int BTNSZ = 17;
     public static final Coord INVSZ = invsq.sz();
+    public static final Color BG_COLOR = new Color(43, 54, 35, 202);
     public final int[] beltkeys = {KeyEvent.VK_F1, KeyEvent.VK_F2, KeyEvent.VK_F3, KeyEvent.VK_F4,
 	KeyEvent.VK_F5, KeyEvent.VK_F6, KeyEvent.VK_F7, KeyEvent.VK_F8,
 	KeyEvent.VK_F9, KeyEvent.VK_F10, KeyEvent.VK_F11, KeyEvent.VK_F12};
     private final int group = 4;
     private final int start = 132;
     private final int size = beltkeys.length;
-    private boolean vertical = false;
+    private final IButton btnLock, btnULock, btnFlip;
+    private boolean vertical = false, over = false, locked = false;
     
     public ToolBelt(String name) {
 	super(name);
+	btnULock = add(new IButton("gfx/hud/btn-ulock", "", "-d", "-h"));
+	btnULock.action(this::toggle);
+	btnULock.recthit = true;
+	
+	btnLock = add(new IButton("gfx/hud/btn-lock", "", "-d", "-h"));
+	btnLock.action(this::toggle);
+	btnLock.recthit = true;
+	
+	btnFlip = add(new IButton("gfx/hud/btn-flip", "", "-d", "-h"));
+	btnFlip.action(this::flip);
+	btnFlip.recthit = true;
+    }
+    
+    @Override
+    protected void initCfg() {
+	super.initCfg();
 	resize();
+	update_buttons();
+    }
+    
+    private void update_buttons() {
+	btnLock.visible = locked;
+	btnULock.visible = !locked;
+	btnFlip.visible = !locked;
+	if(vertical) {
+	    btnLock.c = btnULock.c = new Coord(BTNSZ, 0);
+	    btnFlip.c = Coord.z;
+	} else {
+	    btnLock.c = btnULock.c = new Coord(0, BTNSZ);
+	    btnFlip.c = Coord.z;
+	}
     }
     
     private void resize() {
 	sz = beltc(size - 1).add(INVSZ);
+    }
+    
+    private void toggle() {
+	locked = !locked;
+	update_buttons();
+    }
+    
+    private void flip() {
+	vertical = !vertical;
+	resize();
+	update_buttons();
     }
     
     private Indir<Resource> belt(int i) {
@@ -31,8 +76,8 @@ public class ToolBelt extends DraggableWidget implements DTarget, DropTarget {
     
     private Coord beltc(int i) {
 	return vertical ?
-	    new Coord(0, ((INVSZ.y + PAD) * i) + (GAP * (i / group))) :
-	    new Coord(((INVSZ.x + PAD) * i) + (GAP * (i / group)), 0);
+	    new Coord(0, BTNSZ + ((INVSZ.y + PAD) * i) + (GAP * (i / group))) :
+	    new Coord(BTNSZ + ((INVSZ.x + PAD) * i) + (GAP * (i / group)), 0);
     }
     
     private int beltslot(Coord c) {
@@ -46,6 +91,14 @@ public class ToolBelt extends DraggableWidget implements DTarget, DropTarget {
     
     @Override
     public void draw(GOut g) {
+	if(over) {
+	    if(!locked) {
+		g.chcolor(BG_COLOR);
+		g.frect(Coord.z, sz);
+		g.chcolor();
+	    }
+	    super.draw(g);
+	}
 	for (int i = 0; i < size; i++) {
 	    Coord c = beltc(i);
 	    int slot = slot(i);
@@ -101,10 +154,6 @@ public class ToolBelt extends DraggableWidget implements DTarget, DropTarget {
     
     @Override
     public boolean mousedown(Coord c, int button) {
-	if(button == 3 && ui.modshift) {
-	    reorient();
-	    return true;
-	}
 	int slot = beltslot(c);
 	if(slot != -1) {
 	    if(button == 1) {
@@ -117,9 +166,10 @@ public class ToolBelt extends DraggableWidget implements DTarget, DropTarget {
 	return super.mousedown(c, button);
     }
     
-    private void reorient() {
-	vertical = !vertical;
-	resize();
+    @Override
+    public void mousemove(Coord c) {
+	over = c.isect(Coord.z, sz);
+	super.mousemove(c);
     }
     
     public boolean drop(Coord c, Coord ul) {
