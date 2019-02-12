@@ -5,7 +5,7 @@ public class DraggableWidget extends Widget {
     private final String name;
     private UI.Grab dm;
     private Coord doff;
-    private Window.WndCfg cfg;
+    private WidgetCfg cfg;
     private boolean draggable = true;
     
     public DraggableWidget(String name) {
@@ -66,7 +66,7 @@ public class DraggableWidget extends Widget {
     }
     
     protected void initCfg() {
-	cfg = Window.WndCfg.get(name);
+	cfg = WidgetCfg.get(name);
 	if(cfg != null) {
 	    c = cfg.c;
 	} else {
@@ -81,12 +81,12 @@ public class DraggableWidget extends Widget {
     
     protected void setCfg() {
 	if(cfg == null) {
-	    cfg = new Window.WndCfg();
+	    cfg = new WidgetCfg();
 	}
 	cfg.c = c;
     }
     
     protected void storeCfg() {
-	Window.WndCfg.set(name, cfg);
+	WidgetCfg.set(name, cfg);
     }
 }
