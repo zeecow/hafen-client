@@ -62,8 +62,8 @@ public class ToolBelt extends DraggableWidget implements DTarget, DropTarget {
     }
     
     private void toggle() {
-        //TODO: Lock dragging when locked
 	locked = !locked;
+        draggable(!locked);
 	update_buttons();
     }
     
