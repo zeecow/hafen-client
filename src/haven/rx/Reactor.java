@@ -8,4 +8,7 @@ public class Reactor {
 
     /** Publishes all 'info' messages from server*/
     public static final PublishSubject<String> IMSG = PublishSubject.create();
+    
+    /** Publishes changes to player name */
+    public static final PublishSubject<String> PLAYER = PublishSubject.create();
 }

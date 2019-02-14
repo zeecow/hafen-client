@@ -4,7 +4,6 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import haven.*;
-import rx.Subscription;
 
 import java.awt.event.KeyEvent;
 import java.util.*;
@@ -14,42 +13,33 @@ import java.util.regex.Pattern;
 public class CharterBook extends Window {
     private static final String PREFIX = "The name of this charterstone is";
     public static final String CONFIG_JSON = "charterbook.json";
-    private static Subscription subscription;
     private static Pattern filter = Pattern.compile(String.format("%s \"(.*)\".", PREFIX));
     private static Map<String, List<String>> config;
     private static List<String> names;
     private static Gson gson;
-    private static String username;
     private TextEntry text;
-
+    
     public CharterBook(Coord sz, String cap, boolean lg, Coord tlo, Coord rbo) {
 	super(sz, cap, lg, tlo, rbo);
 	pack();
     }
-
-    public static void setUserName(String username) {
-	CharterBook.username = username;
-    }
-
-    public static void loadConfig(String player) {
-	init();
-	player = String.format("%s/%s", username, player);
+    
+    public static void loadPlayer(String player) {
 	names = new ArrayList<>(config.getOrDefault(player, Collections.emptyList()));
 	names.sort(String::compareTo);
 	boolean newUser = !config.containsKey(player);
 	config.put(player, names);
 	if(newUser) {save();}
     }
-
-    private static void init() {
-	if(subscription == null) {
-	    subscription = Reactor.IMSG.filter(s -> s.startsWith(PREFIX)).subscribe(CharterBook::addCharter);
-	}
-
+    
+    public static void init() {
 	gson = (new GsonBuilder()).setPrettyPrinting().create();
 	load();
+	
+	Reactor.PLAYER.subscribe(CharterBook::loadPlayer);
+	Reactor.IMSG.filter(s -> s.startsWith(PREFIX)).subscribe(CharterBook::addCharter);
     }
-
+    
     private static void load() {
 	if(config == null) {
 	    try {
@@ -61,11 +51,11 @@ public class CharterBook extends Window {
 	    }
 	}
     }
-
+    
     private static void save() {
 	Config.saveFile(CONFIG_JSON, gson.toJson(config));
     }
-
+    
     private static void addCharter(String message) {
 	Matcher m = filter.matcher(message);
 	if(m.find()) {
@@ -76,13 +66,13 @@ public class CharterBook extends Window {
 	    }
 	}
     }
-
+    
     private void onCharterSelected(@SuppressWarnings("unused") int index, String charter) {
 	text.settext(charter);
 	text.buf.key('\0', KeyEvent.VK_END, 0); //move caret to the end
 	setfocus(text);
     }
-
+    
     @Override
     public <T extends Widget> T add(T child) {
 	if(child instanceof TextEntry) {

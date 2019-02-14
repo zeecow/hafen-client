@@ -26,6 +26,9 @@
 
 package haven;
 
+import haven.rx.CharterBook;
+import haven.rx.Reactor;
+
 import java.io.*;
 import java.net.URL;
 import java.util.Properties;
@@ -60,7 +63,8 @@ public class Config {
     public static String version;
     public static final boolean isUpdate;
     public static boolean center_tile = false;
-
+    private static String username, playername;
+    
     static {
 	String p;
 	if((p = getprop("haven.authck", null)) != null)
@@ -71,6 +75,8 @@ public class Config {
 	if(isUpdate){
 	    CFG.VERSION.set(version);
 	}
+    
+	CharterBook.init();
     }
 
     private static void loadBuildVersion() {
@@ -256,6 +262,20 @@ public class Config {
 		defserv = opt.rest[0];
 	    }
 	}
+    }
+    
+    public static void setUserName(String username) {
+	Config.username = username;
+	Config.playername = null;
+    }
+    
+    public static void setPlayerName(String playername) {
+	Config.playername = playername;
+	Reactor.PLAYER.onNext(userpath());
+    }
+    
+    public static String userpath() {
+	return String.format("%s/%s", username, playername);
     }
 
     static {

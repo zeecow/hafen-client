@@ -666,7 +666,7 @@ public class Session implements Resource.Resolver {
 	ticker.start();
 
 	Arrays.stream(LOCAL_CACHED).forEach(this::cacheres);
-	CharterBook.setUserName(username);
+	Config.setUserName(username);
     }
 
     private void sendack(int seq) {

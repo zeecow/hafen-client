@@ -130,7 +130,7 @@ public class Charlist extends Widget {
 		for(Char c : chars) {
 		    if(sender == c.plb) {
 			wdgmsg("play", c.name);
-			CharterBook.loadConfig(c.name);
+			Config.setPlayerName(c.name);
 		    }
 		}
 	    }
