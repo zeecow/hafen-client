@@ -15,7 +15,8 @@ public class ToolBelt extends DraggableWidget implements DTarget, DropTarget {
     public static final int[] FKEYS = {KeyEvent.VK_F1, KeyEvent.VK_F2, KeyEvent.VK_F3, KeyEvent.VK_F4,
 	KeyEvent.VK_F5, KeyEvent.VK_F6, KeyEvent.VK_F7, KeyEvent.VK_F8,
 	KeyEvent.VK_F9, KeyEvent.VK_F10, KeyEvent.VK_F11, KeyEvent.VK_F12};
-    public final int[] beltkeys;
+    private final int[] beltkeys;
+    private final MenuGrid.Pagina[] custom;
     private final int group;
     private final int start;
     private final int size;
@@ -30,6 +31,7 @@ public class ToolBelt extends DraggableWidget implements DTarget, DropTarget {
 	this.beltkeys = beltkeys;
 	size = beltkeys.length;
 	keys = new Tex[size];
+	custom = new MenuGrid.Pagina[size];
 	for (int i = 0; i < size; i++) {
 	    if(beltkeys[i] != 0) {
 		keys[i] = Text.renderstroked(KeyEvent.getKeyText(beltkeys[i]), fnd).tex();
@@ -91,9 +93,12 @@ public class ToolBelt extends DraggableWidget implements DTarget, DropTarget {
 	storeCfg();
     }
     
-    private Indir<Resource> belt(int i) {
-        //TODO: Add ability to save and use custom MenuGrid actions on this belt
-	return (ui != null && ui.gui != null) ? ui.gui.belt[i] : null;
+    private Indir<Resource> belt(int slot) {
+	Indir<Resource> res = custom[slot - start] != null ? custom[slot - start].res : null;
+	if(ui != null && ui.gui != null && ui.gui.belt[slot] != null) {
+	    res = ui.gui.belt[slot];
+	}
+	return res;
     }
     
     private Coord beltc(int i) {
@@ -109,6 +114,23 @@ public class ToolBelt extends DraggableWidget implements DTarget, DropTarget {
 	    }
 	}
 	return (-1);
+    }
+    
+    //TODO: Add save/load of custom actions
+    private void setcustom(int slot, MenuGrid.Pagina p) {
+	custom[slot - start] = p;
+    }
+    
+    private MenuGrid.Pagina getcustom(Resource res) {
+	MenuGrid.Pagina p = ui.gui.menu.paginafor(res);
+	return (p != null && p.button() instanceof MenuGrid.CustomPagButton) ? p : null;
+    }
+    
+    private MenuGrid.Pagina getcustom(Indir<Resource> res) {
+	try {
+	    return res != null ? getcustom(res.get()) : null;
+	} catch (Loading ignored) {}
+	return null;
     }
     
     @Override
@@ -155,6 +177,11 @@ public class ToolBelt extends DraggableWidget implements DTarget, DropTarget {
     }
     
     public void keyact(final int slot) {
+	MenuGrid.Pagina pagina = getcustom(belt(slot));
+	if(pagina != null) {
+	    pagina.button().use();
+	    return;
+	}
 	MapView map = ui.gui.map;
 	if(map != null) {
 	    Coord mvc = map.rootxlate(ui.mc);
@@ -176,13 +203,19 @@ public class ToolBelt extends DraggableWidget implements DTarget, DropTarget {
     
     @Override
     public boolean mousedown(Coord c, int button) {
-        //TODO: Make actions draggable if not locked
+	//TODO: Make actions draggable if not locked
 	int slot = beltslot(c);
 	if(slot != -1) {
 	    if(button == 1) {
-		ui.gui.wdgmsg("belt", slot, 1, ui.modflags());
+		MenuGrid.Pagina pagina = getcustom(belt(slot));
+		if(pagina != null) {
+		    pagina.button().use();
+		} else {
+		    ui.gui.wdgmsg("belt", slot, 1, ui.modflags());
+		}
 	    } else if(button == 3) {
 		ui.gui.wdgmsg("setbelt", slot, 1);
+		setcustom(slot, null);
 	    }
 	    if(belt(slot) != null) {return true;}
 	}
@@ -212,7 +245,13 @@ public class ToolBelt extends DraggableWidget implements DTarget, DropTarget {
 	    if(thing instanceof Resource) {
 		Resource res = (Resource) thing;
 		if(res.layer(Resource.action) != null) {
-		    ui.gui.wdgmsg("setbelt", slot, res.name);
+		    MenuGrid.Pagina pagina = getcustom(res);
+		    if(pagina != null) {
+			setcustom(slot, pagina);
+			ui.gui.wdgmsg("setbelt", slot, 1); //clear default action in this slot
+		    } else {
+			ui.gui.wdgmsg("setbelt", slot, res.name);
+		    }
 		    return true;
 		}
 	    }

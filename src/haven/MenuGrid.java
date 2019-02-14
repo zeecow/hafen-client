@@ -32,8 +32,8 @@ import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.font.TextAttribute;
 import java.awt.image.BufferedImage;
-import java.util.*;
 import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class MenuGrid extends Widget {
@@ -120,7 +120,7 @@ public class MenuGrid extends Widget {
 	}
     }
 
-    public static interface CustomPaginaAction {
+    public interface CustomPaginaAction {
 	void perform(OwnerContext ctx);
     }
     
@@ -276,6 +276,17 @@ public class MenuGrid extends Widget {
 		pmap.put(res, p = new Pagina(this, res));
 	    return(p);
 	}
+    }
+    
+    public Pagina paginafor(Resource res) {
+	if(res != null) {
+	    synchronized (paginae) {
+		for (Pagina pagina : paginae) {
+		    if(pagina.res() == res) { return pagina; }
+		}
+	    }
+	}
+	return null;
     }
     
     public boolean consb(Pagina p, Collection<PagButton> buf) {
