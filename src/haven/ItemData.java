@@ -88,17 +88,25 @@ public class ItemData {
     }
 
     public static Tex longtip(Pagina pagina, Session sess) {
+        return longtip(pagina, sess, 0);
+    }
+    
+    public static Tex longtip(Pagina pagina, Session sess, int titleSize) {
 	List<ItemInfo> infos = pagina.info();
 	if(infos == null || infos.isEmpty()) {
-	    return ItemData.get(pagina).longtip(pagina.res(), sess);
+	    return ItemData.get(pagina).longtip(pagina.res(), sess, titleSize);
 	}
-	return longtip(pagina.res(), infos);
+	return longtip(pagina.res(), infos, titleSize);
     }
 
-    public static Tex longtip(Resource res, List<ItemInfo> infos) {
+    private static Tex longtip(Resource res, List<ItemInfo> infos, int titleSize) {
 	Resource.AButton ad = res.layer(Resource.action);
 	Resource.Pagina pg = res.layer(Resource.pagina);
-	String tt = "$b{$size[20]{" + ad.name + "}}";
+	String tt = "$b{" + ad.name + "}";
+	if(titleSize > 0) {
+	    tt = String.format("$size[%d]{%s}", titleSize, tt);
+	}
+	
 	if(pg != null) {tt += "\n\n" + pg.text;}
 
 	BufferedImage img = MenuGrid.ttfnd.render(tt, 300).img;
@@ -109,8 +117,8 @@ public class ItemData {
 	return new TexI(img);
     }
 
-    public Tex longtip(Resource res, Session sess) {
-	return longtip(res, iteminfo(sess));
+    private Tex longtip(Resource res, Session sess, int titleSize) {
+	return longtip(res, iteminfo(sess), titleSize);
     }
     
     public List<ItemInfo> iteminfo(Session sess) {

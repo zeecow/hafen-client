@@ -281,7 +281,7 @@ public class CraftDBWnd extends Window implements DTarget2 {
 	}
 	if(description == null) {
 	    try {
-		description = ItemData.longtip(descriptionPagina, ui.sess);
+		description = ItemData.longtip(descriptionPagina, ui.sess, 20);
 	    } catch (Loading ignored) {}
 	}
 	if(description != null) {
