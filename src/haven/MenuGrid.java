@@ -285,9 +285,9 @@ public class MenuGrid extends Widget {
     
     public Pagina paginafor(Resource res) {
 	if(res != null) {
-	    synchronized (paginae) {
-		for (Pagina pagina : paginae) {
-		    if(pagina.res() == res) { return pagina; }
+	    synchronized (pmap) {
+		for (Indir<Resource> key : pmap.keySet()) {
+		    if(Objects.equals(key.get().name, res.name)) { return pmap.get(key); }
 		}
 	    }
 	}
