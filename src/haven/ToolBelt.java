@@ -35,6 +35,8 @@ public class ToolBelt extends DraggableWidget implements DTarget, DropTarget {
     private final IButton btnLock, btnULock, btnFlip;
     private boolean vertical = false, over = false, locked = false;
     final Tex[] keys;
+    private Indir<Resource> last = null;
+    private Tex ttip = null;
     
     
     static {
@@ -154,6 +156,7 @@ public class ToolBelt extends DraggableWidget implements DTarget, DropTarget {
     }
     
     private Indir<Resource> belt(int slot) {
+	if(slot < 0) {return null;}
 	Indir<Resource> res = custom[slot - start] != null ? custom[slot - start].res : null;
 	if(ui != null && ui.gui != null && ui.gui.belt[slot] != null) {
 	    res = ui.gui.belt[slot];
@@ -288,6 +291,26 @@ public class ToolBelt extends DraggableWidget implements DTarget, DropTarget {
     public void mousemove(Coord c) {
 	over = c.isect(Coord.z, sz);
 	super.mousemove(c);
+    }
+    
+    @Override
+    public Object tooltip(Coord c, Widget prev) {
+	int slot = beltslot(c);
+	if(slot < 0) {return super.tooltip(c, prev);}
+	Indir<Resource> res = belt(slot);
+	if(res == null) {return super.tooltip(c, prev);}
+	if(last != res) {
+	    if(ttip != null) {ttip.dispose();}
+	    ttip = null;
+	    try {
+		MenuGrid.Pagina p = ui.gui.menu.paginafor(res.get());
+		if(p != null) {
+		    ttip = ItemData.longtip(p, ui.sess);
+		}
+		last = res;
+	    } catch (Loading ignored) {}
+	}
+	return ttip;
     }
     
     public boolean drop(Coord c, Coord ul) {
