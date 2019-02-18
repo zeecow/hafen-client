@@ -27,7 +27,9 @@ public enum Action {
     {
 	Config.center_tile = !Config.center_tile;
 	gui.ui.message(String.format("Tile centering turned %s", Config.center_tile ? "ON" : "OFF"), GameUI.MsgType.INFO);
-    }, "Toggle tile centering");
+    }, "Toggle tile centering"),
+    CLEAR_PLAYER_DAMAGE(GobDamageInfo::clearPlayerDamage, "Clear damage from player"),
+    CLEAR_ALL_DAMAGE(GobDamageInfo::clearAllDamage, "Clear damage from everyone");
     
     public final String name;
     private final Do action;

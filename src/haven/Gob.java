@@ -245,6 +245,13 @@ public class Gob implements Sprite.Owner, Skeleton.ModOwner, Rendered {
 	} catch (Exception ignored) {}
     }
     
+    public void clearDmg() {
+	if(damage != null) {
+	    damage.dispose();
+	    damage = null;
+	}
+    }
+    
     public void tick() {
 	for(GAttrib a : attr.values())
 	    a.tick();

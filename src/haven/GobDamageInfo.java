@@ -59,4 +59,21 @@ public class GobDamageInfo extends GobInfo {
     public static boolean has(Gob gob) {
 	return gobDamage.containsKey(gob.id);
     }
+    
+    private static void clearDamage(Gob gob, long id) {
+	if(gob != null) {
+	    gob.clearDmg();
+	}
+	gobDamage.remove(id);
+    }
+    
+    public static void clearPlayerDamage(GameUI gui) {
+	clearDamage(gui.ui.sess.glob.oc.getgob(gui.plid), gui.plid);
+    }
+    
+    public static void clearAllDamage(GameUI gui) {
+	for (long id : gobDamage.keySet()) {
+	    clearDamage(gui.ui.sess.glob.oc.getgob(id), id);
+	}
+    }
 }

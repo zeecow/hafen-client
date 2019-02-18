@@ -27,11 +27,11 @@
 package haven;
 
 import java.awt.*;
-import java.io.File;
-import java.nio.file.Files;
-import java.util.*;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Map;
 
 public class Fightsess extends Widget {
     public static final Text.Foundry fnd = new Text.Foundry(Text.sans.deriveFont(Font.BOLD), 14);
@@ -88,6 +88,12 @@ public class Fightsess extends Widget {
     @Override
     public void destroy() {
         ui.gui.calendar.show();
+	if(CFG.CLEAR_PLAYER_DMG_AFTER_COMBAT.get()) {
+	    haven.Action.CLEAR_PLAYER_DAMAGE.run(ui.gui);
+	}
+	if(CFG.CLEAR_ALL_DMG_AFTER_COMBAT.get()) {
+	    haven.Action.CLEAR_ALL_DAMAGE.run(ui.gui);
+	}
 	super.destroy();
     }
     

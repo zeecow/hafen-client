@@ -255,15 +255,20 @@ public class MenuGrid extends Widget {
 	super.bound();
 	synchronized (paginae) {
 	    paginae.add(makeLocal("paginae/add/timer", ctx -> ctx.context(UI.class).gui.timers.toggle()));
+	    paginae.add(makeLocal("paginae/add/clear_player_dmg", Action.CLEAR_PLAYER_DAMAGE));
+	    paginae.add(makeLocal("paginae/add/clear_all_dmg", Action.CLEAR_ALL_DAMAGE));
 	}
 	ui.gui.menuObservable.notifyObservers();
     }
     
-    @SuppressWarnings("SameParameterValue")
     private Pagina makeLocal(String path, CustomPaginaAction action) {
 	Pagina p = new Pagina(this, Resource.local().loadwait(path).indir());
 	p.button(new CustomPagButton(p, action));
 	return p;
+    }
+    
+    private Pagina makeLocal(String path, Action action) {
+	return makeLocal(path, ctx -> action.run(ctx.context(UI.class).gui));
     }
 
     public final Map<Indir<Resource>, Pagina> pmap = new WeakHashMap<Indir<Resource>, Pagina>();
