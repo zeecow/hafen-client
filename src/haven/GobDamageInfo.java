@@ -1,6 +1,7 @@
 package haven;
 
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -72,7 +73,8 @@ public class GobDamageInfo extends GobInfo {
     }
     
     public static void clearAllDamage(GameUI gui) {
-	for (long id : gobDamage.keySet()) {
+	ArrayList<Long> gobIds = new ArrayList<>(gobDamage.keySet());
+	for (long id : gobIds) {
 	    clearDamage(gui.ui.sess.glob.oc.getgob(id), id);
 	}
     }
