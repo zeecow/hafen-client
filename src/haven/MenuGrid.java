@@ -253,22 +253,22 @@ public class MenuGrid extends Widget {
     @Override
     public void bound() {
 	super.bound();
-	synchronized (paginae) {
-	    paginae.add(makeLocal("paginae/add/timer", ctx -> ctx.context(UI.class).gui.timers.toggle()));
-	    paginae.add(makeLocal("paginae/add/clear_player_dmg", Action.CLEAR_PLAYER_DAMAGE));
-	    paginae.add(makeLocal("paginae/add/clear_all_dmg", Action.CLEAR_ALL_DAMAGE));
-	}
+	makeLocal("paginae/add/timer", ctx -> ctx.context(UI.class).gui.timers.toggle());
+	makeLocal("paginae/add/clear_player_dmg", Action.CLEAR_PLAYER_DAMAGE);
+	makeLocal("paginae/add/clear_all_dmg", Action.CLEAR_ALL_DAMAGE);
 	ui.gui.menuObservable.notifyObservers();
     }
     
-    private Pagina makeLocal(String path, CustomPaginaAction action) {
-	Pagina p = new Pagina(this, Resource.local().loadwait(path).indir());
-	p.button(new CustomPagButton(p, action));
-	return p;
+    private void makeLocal(String path, CustomPaginaAction action) {
+	Resource.Named res = Resource.local().loadwait(path).indir();
+	Pagina pagina = new Pagina(this, res);
+	pagina.button(new CustomPagButton(pagina, action));
+	synchronized (pmap) { pmap.put(res, pagina); }
+	synchronized (paginae) { paginae.add(pagina); }
     }
     
-    private Pagina makeLocal(String path, Action action) {
-	return makeLocal(path, ctx -> action.run(ctx.context(UI.class).gui));
+    private void makeLocal(String path, Action action) {
+	makeLocal(path, ctx -> action.run(ctx.context(UI.class).gui));
     }
 
     public final Map<Indir<Resource>, Pagina> pmap = new WeakHashMap<Indir<Resource>, Pagina>();
