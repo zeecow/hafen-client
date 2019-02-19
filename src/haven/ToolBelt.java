@@ -6,9 +6,8 @@ import com.google.gson.reflect.TypeToken;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
-import java.util.Arrays;
+import java.lang.reflect.Type;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import static haven.Inventory.*;
@@ -25,9 +24,9 @@ public class ToolBelt extends DraggableWidget implements DTarget, DropTarget {
 	KeyEvent.VK_F9, KeyEvent.VK_F10, KeyEvent.VK_F11, KeyEvent.VK_F12};
     private static final String CONFIG_JSON = "belts.json";
     private static final Gson gson;
-    private static Map<String, Map<String, List<String>>> config;
+    private static Map<String, Map<Integer, String>> config;
     private final int[] beltkeys;
-    private List<String> beltcfg;
+    private Map<Integer, String> usercfg;
     private final MenuGrid.Pagina[] custom;
     private final int group;
     private final int start;
@@ -45,14 +44,13 @@ public class ToolBelt extends DraggableWidget implements DTarget, DropTarget {
     }
     
     private static void load() {
+	try {
+	    Type type = new TypeToken<Map<String, Map<Integer, String>>>() {
+	    }.getType();
+	    config = gson.fromJson(Config.loadFile(CONFIG_JSON), type);
+	} catch (Exception ignore) {}
 	if(config == null) {
-	    try {
-		config = gson.fromJson(Config.loadFile(CONFIG_JSON), new TypeToken<Map<String, Map<String, List<String>>>>() {
-		}.getType());
-	    } catch (Exception ignore) {}
-	    if(config == null) {
-		config = new HashMap<>();
-	    }
+	    config = new HashMap<>();
 	}
     }
     
@@ -68,7 +66,7 @@ public class ToolBelt extends DraggableWidget implements DTarget, DropTarget {
 	size = beltkeys.length;
 	keys = new Tex[size];
 	custom = new MenuGrid.Pagina[size];
-	loadBelt(name);
+	loadBelt();
 	for (int i = 0; i < size; i++) {
 	    if(beltkeys[i] != 0) {
 		keys[i] = Text.renderstroked(KeyEvent.getKeyText(beltkeys[i]), fnd).tex();
@@ -88,27 +86,21 @@ public class ToolBelt extends DraggableWidget implements DTarget, DropTarget {
 	btnFlip.recthit = true;
     }
     
-    private void loadBelt(String name) {
+    private void loadBelt() {
 	String path = Config.userpath();
 	if(!config.containsKey(path)) {
 	    config.put(path, new HashMap<>());
 	}
-	Map<String, List<String>> usercfg = config.get(path);
-	if(!usercfg.containsKey(name)) {
-	    usercfg.put(name, Arrays.asList(new String[size]));
-	}
-	beltcfg = usercfg.get(name);
+	usercfg = config.get(path);
     }
     
     @Override
     protected void attached() {
 	super.attached();
 	for (int i = 0; i < size; i++) {
-	    if(beltcfg.size() > i) {
-		String res = beltcfg.get(i);
-		if(res != null) {
-		    custom[i] = ui.gui.menu.paginafor(Resource.local().load(res));
-		}
+	    String res = usercfg.get(slot(i));
+	    if(res != null) {
+		custom[i] = ui.gui.menu.paginafor(Resource.local().load(res));
 	    }
 	}
     }
@@ -180,10 +172,11 @@ public class ToolBelt extends DraggableWidget implements DTarget, DropTarget {
     }
     
     private void setcustom(int slot, MenuGrid.Pagina p) {
-	int index = slot - start;
-	custom[index] = p;
-	beltcfg.set(index, p != null ? p.res().name : null);
-	save();
+	if(p != custom[slot - start]) {
+	    custom[slot - start] = p;
+	    usercfg.put(slot, p != null ? p.res().name : null);
+	    save();
+	}
     }
     
     private MenuGrid.Pagina getcustom(Resource res) {
@@ -335,6 +328,7 @@ public class ToolBelt extends DraggableWidget implements DTarget, DropTarget {
 			setcustom(slot, pagina);
 			ui.gui.wdgmsg("setbelt", slot, 1); //clear default action in this slot
 		    } else {
+			setcustom(slot, null);
 			ui.gui.wdgmsg("setbelt", slot, res.name);
 		    }
 		    return true;
