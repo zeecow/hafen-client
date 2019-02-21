@@ -87,7 +87,6 @@ public class GameUI extends ConsoleHost implements Console.Directory {
     public ActWindow craftlist, buildlist, actlist;
     public TimerPanel timers;
     public StudyWnd studywnd;
-    private final List<Widget> top = new LinkedList<>();
     public Observable menuObservable = new Observable(){
 	@Override
 	public void notifyObservers(Object arg) {
@@ -920,7 +919,6 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 	} else {
 	    throw(new UI.UIException("Illegal gameui child", place, args));
 	}
-	top.forEach(Widget::raise);
     }
 
     public void cdestroy(Widget w) {
@@ -1548,12 +1546,10 @@ public class GameUI extends ConsoleHost implements Console.Directory {
     
     private void createToolBelts() {
 	ToolBelt toolbelt0 = add(new ToolBelt("Belt0", 132, 4, ToolBelt.FKEYS), 50, 200);
-	top.add(toolbelt0);
 	toolbelt0.visible = CFG.SHOW_TOOLBELT_0.get();
 	CFG.SHOW_TOOLBELT_0.observe(cfg -> toolbelt0.visible = cfg.get());
 	
 	ToolBelt toolbelt1 = add(new ToolBelt("Belt1", 120, 4, new int[12]), 50, 250);
-	top.add(toolbelt1);
 	toolbelt1.visible = CFG.SHOW_TOOLBELT_1.get();
 	CFG.SHOW_TOOLBELT_1.observe(cfg -> toolbelt1.visible = cfg.get());
     }
