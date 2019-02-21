@@ -257,6 +257,9 @@ public class MenuGrid extends Widget {
 	makeLocal("paginae/add/clear_player_dmg", Action.CLEAR_PLAYER_DAMAGE);
 	makeLocal("paginae/add/clear_all_dmg", Action.CLEAR_ALL_DAMAGE);
 	makeLocal("paginae/add/craftdb", Action.OPEN_CRAFT_DB);
+	makeLocal("paginae/add/actlist", Action.OPEN_QUICK_ACTION);
+	makeLocal("paginae/add/buildlist", Action.OPEN_QUICK_BUILD);
+	makeLocal("paginae/add/craftlist", Action.OPEN_QUICK_CRAFT);
 	ui.gui.menuObservable.notifyObservers();
     }
     
