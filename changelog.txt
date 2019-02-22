@@ -1,3 +1,16 @@
+$size[14]{$u{Update for 22.02.19:}
+  * Added ability to set favourites in Extended Craft Window (ALT+X).
+  * Added tooltps to actions on custom tool belt
+  * Added more actions to Menu Grid:
+      - Clear player damage
+      - Clear all Damage
+      - Open Extended Craft Window
+      - Open quick actions list
+      - Open quick build list
+      - Open quick craft list
+  * Added option (on by default) to clear player damage after combat (Options->Display)
+  * Added option (off by default) to clear all damage after combat (Options->Display)
+ 
 $size[14]{$u{Update for 12.02.19:}
   * added 2 new custom tool bars that can be rotated. Enable/disable in Options->General.
  
