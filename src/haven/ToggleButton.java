@@ -1,12 +1,13 @@
 package haven;
 
+import rx.functions.Action1;
+
 import java.awt.image.BufferedImage;
-import java.util.function.Function;
 
 public class ToggleButton extends IButton {
     private final BufferedImage upf, downf, hoverf, upt, downt, hovert;
     private boolean state = false;
-    private Function<Boolean, Void> action;
+    private Action1<Boolean> action;
     
     public ToggleButton(String basef, String upf, String downf, String hoverf,
 			String baset, String upt, String downt, String hovert) {
@@ -20,7 +21,7 @@ public class ToggleButton extends IButton {
 	this.hovert = Resource.loadimg(baset + (hovert == null ? upt : hovert));
     }
     
-    public void action(Function<Boolean, Void> action) {
+    public void action(Action1<Boolean> action) {
 	this.action = action;
     }
     
@@ -28,18 +29,20 @@ public class ToggleButton extends IButton {
     public void click() {
 	state(!state);
 	if(action != null) {
-	    action.apply(state);
+	    action.call(state);
 	} else {
 	    super.click();
 	}
     }
     
     public void state(boolean state) {
-	this.state = state;
-	up = state ? upt : upf;
-	down = state ? downt : downf;
-	hover = state ? hovert : hoverf;
-	redraw();
+	if(this.state != state) {
+	    this.state = state;
+	    up = state ? upt : upf;
+	    down = state ? downt : downf;
+	    hover = state ? hovert : hoverf;
+	    redraw();
+	}
     }
     
     public boolean state() {return state;}

@@ -31,7 +31,8 @@ public class ToolBelt extends DraggableWidget implements DTarget, DropTarget {
     private final int group;
     private final int start;
     private final int size;
-    private final IButton btnLock, btnULock, btnFlip;
+    private final ToggleButton btnLock;
+    private final IButton btnFlip;
     private boolean vertical = false, over = false, locked = false;
     final Tex[] keys;
     private Indir<Resource> last = null;
@@ -72,12 +73,8 @@ public class ToolBelt extends DraggableWidget implements DTarget, DropTarget {
 		keys[i] = Text.renderstroked(KeyEvent.getKeyText(beltkeys[i]), fnd).tex();
 	    }
 	}
-	
-	btnULock = add(new IButton("gfx/hud/btn-ulock", "", "-d", "-h"));
-	btnULock.action(this::toggle);
-	btnULock.recthit = true;
-	
-	btnLock = add(new IButton("gfx/hud/btn-lock", "", "-d", "-h"));
+    
+	btnLock = add(new ToggleButton("gfx/hud/btn-ulock", "", "-d", "-h", "gfx/hud/btn-lock", "", "-d", "-h"));
 	btnLock.action(this::toggle);
 	btnLock.recthit = true;
 	
@@ -110,19 +107,19 @@ public class ToolBelt extends DraggableWidget implements DTarget, DropTarget {
 	super.initCfg();
 	locked = (boolean) cfg.getValue("locked", locked);
 	vertical = (boolean) cfg.getValue("vertical", vertical);
+	btnLock.state(locked);
+	draggable(!locked);
 	resize();
 	update_buttons();
     }
     
     private void update_buttons() {
-	btnLock.visible = locked;
-	btnULock.visible = !locked;
 	btnFlip.visible = !locked;
 	if(vertical) {
-	    btnLock.c = btnULock.c = new Coord(BTNSZ, 0);
+	    btnLock.c = new Coord(BTNSZ, 0);
 	    btnFlip.c = Coord.z;
 	} else {
-	    btnLock.c = btnULock.c = new Coord(0, BTNSZ);
+	    btnLock.c = new Coord(0, BTNSZ);
 	    btnFlip.c = Coord.z;
 	}
     }
@@ -131,8 +128,8 @@ public class ToolBelt extends DraggableWidget implements DTarget, DropTarget {
 	sz = beltc(size - 1).add(INVSZ);
     }
     
-    private void toggle() {
-	locked = !locked;
+    private void toggle(Boolean state) {
+	locked = state != null ? state : false;
 	draggable(!locked);
 	update_buttons();
 	cfg.setValue("locked", locked);
