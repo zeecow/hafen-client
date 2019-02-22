@@ -1,12 +1,18 @@
 package haven;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
 import haven.MenuGrid.Pagina;
+import haven.rx.Reactor;
+import rx.Subscription;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
-import java.util.*;
+import java.lang.reflect.Type;
 import java.util.List;
+import java.util.*;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -18,16 +24,25 @@ public class CraftDBWnd extends Window implements DTarget2 {
     private static final Coord WND_SZ = new Coord(635, 360 + PANEL_H);
     private static final Coord ICON_SZ = new Coord(20, 20);
     private static final int LIST_SIZE = (WND_SZ.y - PANEL_H) / ICON_SZ.y;
+    
+    private static final String CONFIG_JSON = "favourites.json";
+    private static final Gson gson;
+    private static Map<String, List<String>> config;
+    private Subscription subscription;
+    
     private RecipeListBox box;
     private Tex description;
     private Widget makewnd;
     private MenuGrid menu;
     private MenuGrid.Pagina CRAFT;
     private MenuGrid.Pagina HISTORY;
+    private MenuGrid.Pagina FAVOURITES;
     private Breadcrumbs<Pagina> breadcrumbs;
     private static Pagina current = null;
     private Pagina descriptionPagina;
     private Pagina senduse = null;
+    private ToggleButton btnFavourite;
+    private List<String> favourites;
     
     TabStrip<Mode> tabStrip;
     private final Pattern category = Pattern.compile("paginae/craft/.+");
@@ -36,8 +51,25 @@ public class CraftDBWnd extends Window implements DTarget2 {
     private final LineEdit filter = new LineEdit();
     private Mode mode = All;
     
+    static {
+	gson = (new GsonBuilder()).setPrettyPrinting().create();
+	try {
+	    Type type = new TypeToken<Map<String, List<String>>>() {
+	    }.getType();
+	    config = gson.fromJson(Config.loadFile(CONFIG_JSON), type);
+	} catch (Exception ignore) {}
+	if(config == null) {
+	    config = new HashMap<>();
+	}
+    }
+    
+    private static void save() {
+	Config.saveFile(CONFIG_JSON, gson.toJson(config));
+    }
+    
     enum Mode {
         All("paginae/act/craft", true),
+	Favourites("paginae/act/favourites", false),
 	History("paginae/act/history", false);
 	
         public final LinkedList<Pagina> items;
@@ -57,6 +89,18 @@ public class CraftDBWnd extends Window implements DTarget2 {
 	CFG.REAL_TIME_CURIO.observe(cfg -> updateDescription(descriptionPagina));
 	CFG.SHOW_CURIO_LPH.observe(cfg -> updateDescription(descriptionPagina));
     }
+    
+    private void loadFavourites(String player) {
+	Favourites.items.clear();
+	if(!config.containsKey(player)) {
+	    config.put(player, new LinkedList<>());
+	}
+	favourites = config.get(player);
+	favourites.stream()
+	    .map(ui.gui.menu::paginafor)
+	    .filter(Objects::nonNull)
+	    .collect(Collectors.toCollection(() -> Favourites.items));
+    }
 
     @Override
     protected void attach(UI ui) {
@@ -66,6 +110,7 @@ public class CraftDBWnd extends Window implements DTarget2 {
 
     @Override
     public void destroy() {
+	subscription.unsubscribe();
 	box.destroy();
 	super.destroy();
     }
@@ -73,7 +118,11 @@ public class CraftDBWnd extends Window implements DTarget2 {
     private void init() {
 	CRAFT = paginafor(Resource.local().load("paginae/act/craft"));
 	HISTORY = paginafor(Resource.local().load("paginae/act/history"));
- 
+	FAVOURITES = paginafor(Resource.local().load("paginae/act/favourites"));
+    
+	loadFavourites(Config.userpath());
+	subscription = Reactor.PLAYER.subscribe(this::loadFavourites);
+	
 	tabStrip = add(new TabStrip<Mode>() {
 	    @Override
 	    protected void selected(Button<Mode> button) {
@@ -88,8 +137,8 @@ public class CraftDBWnd extends Window implements DTarget2 {
 		new TexI(PUtils.convolvedown(res.layer(Resource.imgc).img, icon_sz, CharWnd.iconfilter)),
 		paginafor(modes[i].res).act().name, null).tag = modes[i];
 	}
- 
-	box = new RecipeListBox(200, LIST_SIZE) {
+    
+	box = add(new RecipeListBox(200, LIST_SIZE) {
 	    @Override
 	    protected void itemclick(Recipe recipe, int button) {
 		Pagina item = recipe.p;
@@ -108,14 +157,19 @@ public class CraftDBWnd extends Window implements DTarget2 {
 		    }
 		}
 	    }
-	};
-	add(box, new Coord(0, PANEL_H + 5));
+	}, 0, PANEL_H + 5);
 	addtwdg(add(new IButton("gfx/hud/btn-help", "","-d","-h"){
 	    @Override
 	    public void click() {
 		ItemFilter.showHelp(ui, HELP_SIMPLE, HELP_CURIO, HELP_FEP, HELP_ARMOR, HELP_SYMBEL, HELP_ATTR);
 	    }
 	}));
+	btnFavourite = add(new ToggleButton(
+	    "gfx/hud/btn-star-e", "", "-d", "-h",
+	    "gfx/hud/btn-star-f", "", "-d", "-h"
+	), box.c.x + box.sz.x + 10, box.c.y + 3);
+	btnFavourite.recthit = true;
+	btnFavourite.action(this::toggleFavourite);
 	
 	menu = ui.gui.menu;
 	breadcrumbs = add(new Breadcrumbs<Pagina>(new Coord(WND_SZ.x, ICON_SZ.y)) {
@@ -169,6 +223,9 @@ public class CraftDBWnd extends Window implements DTarget2 {
 	    case History:
 	        showHistory();
 		break;
+	    case Favourites:
+		showFavourites();
+		break;
 	}
     }
     
@@ -176,6 +233,12 @@ public class CraftDBWnd extends Window implements DTarget2 {
 	filter.setline("");
 	updateBreadcrumbs(HISTORY);
 	box.setitems(History.items);
+    }
+    
+    private void showFavourites() {
+	filter.setline("");
+	updateBreadcrumbs(FAVOURITES);
+	box.setitems(Favourites.items);
     }
     
     private void addToHistory(Pagina action) {
@@ -186,6 +249,31 @@ public class CraftDBWnd extends Window implements DTarget2 {
 	}
 	if(mode == History) {
 	    box.sort();
+	}
+    }
+    
+    private void toggleFavourite() {
+	if(Favourites.items.contains(current)) {
+	    removeFromFavourites(current);
+	} else {
+	    addToFavourites(current);
+	}
+    }
+    
+    private void removeFromFavourites(Pagina action) {
+	if(Favourites.items.contains(action)) {
+	    Favourites.items.remove(action);
+	    if(favourites.remove(action.res().name)) {
+		save();
+	    }
+	}
+    }
+    
+    private void addToFavourites(Pagina action) {
+	if(!Favourites.items.contains(action)) {
+	    Favourites.items.add(action);
+	    favourites.add(action.res().name);
+	    save();
 	}
     }
     
@@ -281,7 +369,7 @@ public class CraftDBWnd extends Window implements DTarget2 {
 	}
 	if(description == null) {
 	    try {
-		description = ItemData.longtip(descriptionPagina, ui.sess, 20);
+		description = ItemData.longtip(descriptionPagina, ui.sess, 20, 5);
 	    } catch (Loading ignored) {}
 	}
 	if(description != null) {
@@ -293,6 +381,7 @@ public class CraftDBWnd extends Window implements DTarget2 {
 	CraftDBWnd.current = current;
 	updateBreadcrumbs(current);
 	updateDescription(current);
+	btnFavourite.state(Favourites.items.contains(current));
     }
 
     private void updateBreadcrumbs(Pagina p) {

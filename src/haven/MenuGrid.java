@@ -298,6 +298,10 @@ public class MenuGrid extends Widget {
 	return null;
     }
     
+    public Pagina paginafor(String name) {
+	return paginafor(Resource.remote().load(name));
+    }
+    
     public boolean consb(Pagina p, Collection<PagButton> buf) {
         List<Pagina> pags = buf.stream().map(btn -> btn.pag).collect(Collectors.toList());
         boolean result = cons(p, pags);

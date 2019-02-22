@@ -88,21 +88,22 @@ public class ItemData {
     }
 
     public static Tex longtip(Pagina pagina, Session sess) {
-        return longtip(pagina, sess, 0);
+        return longtip(pagina, sess, 0, 0);
     }
     
-    public static Tex longtip(Pagina pagina, Session sess, int titleSize) {
+    public static Tex longtip(Pagina pagina, Session sess, int titleSize, int titleSpace) {
 	List<ItemInfo> infos = pagina.info();
 	if(infos == null || infos.isEmpty()) {
-	    return ItemData.get(pagina).longtip(pagina.res(), sess, titleSize);
+	    return ItemData.get(pagina).longtip(pagina.res(), sess, titleSize, titleSpace);
 	}
-	return longtip(pagina.res(), infos, titleSize);
+	return longtip(pagina.res(), infos, titleSize, titleSpace);
     }
 
-    private static Tex longtip(Resource res, List<ItemInfo> infos, int titleSize) {
+    private static Tex longtip(Resource res, List<ItemInfo> infos, int titleSize, int titleSpace) {
 	Resource.AButton ad = res.layer(Resource.action);
 	Resource.Pagina pg = res.layer(Resource.pagina);
-	String tt = "$b{" + ad.name + "}";
+	String spacing = new String(new char[titleSpace]).replace("\0", " ");
+	String tt = String.format("$b{%s%s}", spacing, ad.name);
 	if(titleSize > 0) {
 	    tt = String.format("$size[%d]{%s}", titleSize, tt);
 	}
@@ -117,8 +118,8 @@ public class ItemData {
 	return new TexI(img);
     }
 
-    private Tex longtip(Resource res, Session sess, int titleSize) {
-	return longtip(res, iteminfo(sess), titleSize);
+    private Tex longtip(Resource res, Session sess, int titleSize, int titleSpace) {
+	return longtip(res, iteminfo(sess), titleSize, titleSpace);
     }
     
     public List<ItemInfo> iteminfo(Session sess) {
