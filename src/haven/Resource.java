@@ -66,8 +66,11 @@ public class Resource implements Serializable {
 	}
 
 	public boolean equals(Object other) {
-	    if(!(other instanceof Named))
-		return(false);
+	    if(other instanceof Session.CachedRes.Ref) {
+		return other.equals(this);
+	    } else if(!(other instanceof Named)) {
+		return (false);
+	    }
 	    Named o = (Named)other;
 	    return(o.name.equals(this.name) && (o.ver == this.ver));
 	}

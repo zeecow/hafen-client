@@ -26,12 +26,11 @@
 
 package haven;
 
-import haven.rx.CharterBook;
-
+import java.io.IOException;
+import java.lang.ref.Reference;
+import java.lang.ref.WeakReference;
 import java.net.*;
 import java.util.*;
-import java.io.*;
-import java.lang.ref.*;
 
 public class Session implements Resource.Resolver {
     public static final int PVER = 17;
@@ -108,7 +107,7 @@ public class Session implements Resource.Resolver {
 	public boolean canwait() {return(true);}
     }
 
-    private static class CachedRes {
+    public static class CachedRes {
 	private final int resid;
 	private String resnm = null;
 	private int resver;
@@ -117,8 +116,8 @@ public class Session implements Resource.Resolver {
 	private CachedRes(int id) {
 	    resid = id;
 	}
-	
-	private class Ref implements Indir<Resource> {
+    
+	public class Ref implements Indir<Resource> {
 	    protected Resource res;
 		    
 	    public Resource get() {
@@ -136,7 +135,22 @@ public class Session implements Resource.Resolver {
 		    return("<" + res + ">");
 		}
 	    }
-
+	    
+	    @Override
+	    public boolean equals(Object obj) {
+		if(obj instanceof Resource.Named) {
+		    return Objects.equals(((Resource.Named) obj).name, resnm);
+		}
+		return super.equals(obj);
+	    }
+	    
+	    @Override
+	    public int hashCode() {
+		int ret = resnm != null ? resnm.hashCode() : 0;
+		ret = (ret * 31) + resver;
+		return (ret);
+	    }
+	    
 	    private void reset() {
 		res = null;
 	    }
