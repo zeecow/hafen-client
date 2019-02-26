@@ -27,10 +27,10 @@
 package haven;
 
 import java.awt.*;
-import java.util.*;
+import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
-import java.awt.event.InputEvent;
+import java.util.*;
 
 public class UI {
     private final HavenPanel panel;
@@ -117,6 +117,7 @@ public class UI {
 	widgets.put(0, root);
 	rwidgets.put(root, 0);
 	this.sess = sess;
+	if(sess != null) {sess.ui = this;}
     }
 	
     public void setreceiver(Receiver rcvr) {

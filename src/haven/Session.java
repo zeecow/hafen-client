@@ -75,6 +75,7 @@ public class Session implements Resource.Resolver {
     final Map<Integer, CachedRes> rescache = new TreeMap<Integer, CachedRes>();
     public final Glob glob;
     public final CharacterInfo character;
+    public UI ui;
     public byte[] sesskey;
     private int localCacheId = -1;
 
