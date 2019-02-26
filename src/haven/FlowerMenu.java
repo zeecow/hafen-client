@@ -31,12 +31,12 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import haven.rx.Reactor;
 
-import java.awt.Color;
+import java.awt.*;
 import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Map;
 
-import static java.lang.Math.PI;
+import static java.lang.Math.*;
 
 public class FlowerMenu extends Widget {
     public static final Color pink = new Color(255, 0, 128);
@@ -48,13 +48,15 @@ public class FlowerMenu extends Widget {
     public static Map<String, Boolean> AUTOCHOOSE = null;
     public final String[] options;
     private Petal autochoose;
+    private String forceChoose;
     public Petal[] opts;
     private UI.Grab mg, kg;
 
     static {
 	loadAutochoose();
     }
-
+    
+    
     private static void loadAutochoose() {
 	String json = Config.loadFile("autochoose.json");
 	if(json != null){
@@ -252,13 +254,35 @@ public class FlowerMenu extends Widget {
 	    String name = options[i];
 	    Petal p = add(new Petal(name));
 	    p.num = i;
-	    boolean auto = AUTOCHOOSE.containsKey(name) && AUTOCHOOSE.get(name);
-	    boolean single = ui.modctrl && options.length == 1 && CFG.MENU_SINGLE_CTRL_CLICK.get();
-	    if(!ui.modshift && (auto || single)){
-		autochoose = p;
-	    }
 	    opts[i] = p;
 	}
+    
+	if(!forceChoose()) {autochoose();}
+    }
+    
+    private void autochoose() {
+	for (int i = 0; i < options.length; i++) {
+	    String name = options[i];
+	    boolean auto = AUTOCHOOSE.containsKey(name) && AUTOCHOOSE.get(name);
+	    boolean single = ui.modctrl && options.length == 1 && CFG.MENU_SINGLE_CTRL_CLICK.get();
+	    if(!ui.modshift && (auto || single)) {
+		autochoose = opts[i];
+	    }
+	}
+    }
+    
+    public void forceChoose(String opt) {
+	forceChoose = opt;
+    }
+    
+    private boolean forceChoose() {
+	for (int i = 0; i < options.length; i++) {
+	    if(forceChoose != null && forceChoose.equals(options[i])) {
+		autochoose = opts[i];
+		return true;
+	    }
+	}
+	return false;
     }
 
     @Override
