@@ -27,6 +27,7 @@
 package haven;
 
 import java.util.*;
+import java.util.stream.Stream;
 
 public class OCache implements Iterable<Gob> {
     public static final int OD_REM = 0;
@@ -68,6 +69,8 @@ public class OCache implements Iterable<Gob> {
 	this.glob = glob;
 	Radar.clean();
     }
+    
+    public Stream<Gob> stream() {return objs.values().stream();}
 
     public synchronized void callback(ChangeCallback cb) {
 	cbs.add(cb);
