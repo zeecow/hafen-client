@@ -47,7 +47,6 @@ public class KeyBinder {
     }
     
     private static void defaults() {
-        
 	add(KeyEvent.VK_1, CTRL, ACT_HAND_0);
 	add(KeyEvent.VK_2, CTRL, ACT_HAND_1);
 	add(KeyEvent.VK_C, ALT, OPEN_QUICK_CRAFT);
@@ -63,6 +62,7 @@ public class KeyBinder {
 	add(KeyEvent.VK_G, CTRL, TOGGLE_TILE_GRID);
 	add(KeyEvent.VK_Z, CTRL, TOGGLE_TILE_CENTERING);
 	add(KeyEvent.VK_S, CTRL, TAKE_SCREENSHOT);
+	add(KeyEvent.VK_Q, ALT, TEST);
     }
     
     private static synchronized void store() {
