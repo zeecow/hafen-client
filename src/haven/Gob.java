@@ -28,6 +28,8 @@ package haven;
 
 import java.util.*;
 
+import static haven.OCache.*;
+
 public class Gob implements Sprite.Owner, Skeleton.ModOwner, Rendered {
     public Coord2d rc;
     public Coord sc;
@@ -250,6 +252,13 @@ public class Gob implements Sprite.Owner, Skeleton.ModOwner, Rendered {
 	    damage.dispose();
 	    damage = null;
 	}
+    }
+    
+    public void rclick() {
+	try {
+	    MapView map = glob.sess.ui.gui.map;
+	    map.wdgmsg("click", Coord.z, Coord.z, 3, 0, 0, (int) id, rc.floor(posres), 0, -1);
+	} catch (Exception ignored) {}
     }
     
     public void tick() {
