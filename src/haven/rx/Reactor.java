@@ -1,5 +1,6 @@
 package haven.rx;
 
+import haven.FlowerMenu;
 import rx.subjects.PublishSubject;
 
 public class Reactor {
@@ -11,4 +12,6 @@ public class Reactor {
     
     /** Publishes changes to player name */
     public static final PublishSubject<String> PLAYER = PublishSubject.create();
+ 
+    public static final PublishSubject<FlowerMenu> FLOWER = PublishSubject.create();
 }

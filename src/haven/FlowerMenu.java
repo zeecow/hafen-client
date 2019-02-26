@@ -29,6 +29,7 @@ package haven;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
+import haven.rx.Reactor;
 
 import java.awt.Color;
 import java.lang.reflect.Type;
@@ -240,6 +241,7 @@ public class FlowerMenu extends Widget {
     public FlowerMenu(String... options) {
 	super(Coord.z);
 	this.options = options;
+	Reactor.FLOWER.onNext(this);
     }
 
     @Override
