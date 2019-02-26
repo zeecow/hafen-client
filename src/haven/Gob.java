@@ -51,6 +51,7 @@ public class Gob implements Sprite.Owner, Skeleton.ModOwner, Rendered {
     };
     private final Collection<ResAttr.Cell<?>> rdata = new LinkedList<ResAttr.Cell<?>>();
     private final Collection<ResAttr.Load> lrdata = new LinkedList<ResAttr.Load>();
+    private final Object removalLock = new Object();
     private GobPath path;
     private Hitbox hitbox = null;
     private GeneralGobInfo gobInfo = null;
@@ -267,7 +268,14 @@ public class Gob implements Sprite.Owner, Skeleton.ModOwner, Rendered {
 	loadrattr();
     }
     
+    public void waitRemoval() {
+	synchronized (removalLock) {
+	    try { removalLock.wait(); } catch (InterruptedException ignored) {}
+	}
+    }
+    
     public void dispose() {
+	synchronized (removalLock) {removalLock.notifyAll();}
 	for(GAttrib a : attr.values())
 	    a.dispose();
 	for(ResAttr.Cell rd : rdata) {
