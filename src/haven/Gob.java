@@ -40,6 +40,7 @@ public class Gob implements Sprite.Owner, Skeleton.ModOwner, Rendered {
     public long id;
     public int frame;
     public final Glob glob;
+    private boolean disposed = false;
     Map<Class<? extends GAttrib>, GAttrib> attr = new HashMap<Class<? extends GAttrib>, GAttrib>();
     public Collection<Overlay> ols = new LinkedList<Overlay>() {
 	public boolean add(Overlay item) {
@@ -268,14 +269,20 @@ public class Gob implements Sprite.Owner, Skeleton.ModOwner, Rendered {
 	loadrattr();
     }
     
-    public void waitRemoval() {
+    public void waitRemoval() throws InterruptedException {
 	synchronized (removalLock) {
-	    try { removalLock.wait(); } catch (InterruptedException ignored) {}
+	    removalLock.wait(5000);
+	    if(!disposed) {
+		throw new InterruptedException();
+	    }
 	}
     }
     
     public void dispose() {
-	synchronized (removalLock) {removalLock.notifyAll();}
+	synchronized (removalLock) {
+	    disposed = true;
+	    removalLock.notifyAll();
+	}
 	for(GAttrib a : attr.values())
 	    a.dispose();
 	for(ResAttr.Cell rd : rdata) {
