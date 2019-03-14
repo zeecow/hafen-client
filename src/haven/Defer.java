@@ -26,8 +26,8 @@
 
 package haven;
 
-import java.util.*;
 import java.security.*;
+import java.util.*;
 
 public class Defer extends ThreadGroup {
     private static final Map<ThreadGroup, Defer> groups = new WeakHashMap<ThreadGroup, Defer>();
@@ -96,6 +96,7 @@ public class Defer extends ThreadGroup {
 
     public class Future<T> implements Runnable, Prioritized {
 	public final Callable<T> task;
+	private Runnable callback;
 	private final AccessControlContext secctx;
 	private int prio = 0;
 	private T val;
@@ -108,6 +109,8 @@ public class Defer extends ThreadGroup {
 	    this.task = task;
 	    this.secctx = AccessController.getContext();
 	}
+    
+	public void callback(Runnable callback) {this.callback = callback;}
 
 	public void cancel() {
 	    synchronized(this) {
@@ -118,6 +121,10 @@ public class Defer extends ThreadGroup {
 		    chstate("done");
 		}
 	    }
+	}
+	
+	public boolean cancelled() {
+	    return exc != null;
 	}
 
 	private void chstate(String nst) {
@@ -156,6 +163,7 @@ public class Defer extends ThreadGroup {
 	    } finally {
 		if(state != "done")
 		    chstate("resched");
+		else if(callback != null) {callback.run();}
 		running = null;
 		/* XXX: This is a race; a cancelling thread could have
 		 * gotten the thread reference via running and then
