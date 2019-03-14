@@ -28,6 +28,8 @@ package haven;
 
 import static haven.MCache.tilesz;
 import static haven.OCache.posres;
+
+import auto.Bot;
 import haven.GLProgram.VarID;
 import me.kt.GridOutline;
 
@@ -1597,6 +1599,7 @@ public class MapView extends PView implements DTarget, Console.Directory {
 		    }
 		}
 	    }
+	    Bot.cancel();
 	    wdgmsg("click", args);
 	}
     }
