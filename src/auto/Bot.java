@@ -28,6 +28,7 @@ public class Bot implements Defer.Callable<Void> {
     
     @Override
     public Void call() throws InterruptedException {
+        targets.forEach(Gob::highlight);
 	for (Gob gob : targets) {
 	    for (BotAction action : actions) {
 		if(gob.disposed()) {break;}
