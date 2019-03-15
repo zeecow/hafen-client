@@ -278,6 +278,8 @@ public class Gob implements Sprite.Owner, Skeleton.ModOwner, Rendered {
 	}
     }
     
+    public boolean disposed() {return disposed;}
+    
     public void dispose() {
 	synchronized (removalLock) {
 	    disposed = true;

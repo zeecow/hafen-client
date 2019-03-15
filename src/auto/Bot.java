@@ -30,6 +30,7 @@ public class Bot implements Defer.Callable<Void> {
     public Void call() throws InterruptedException {
 	for (Gob gob : targets) {
 	    for (BotAction action : actions) {
+		if(gob.disposed()) {break;}
 		action.call(gob);
 		checkCancelled();
 	    }
