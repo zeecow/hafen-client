@@ -76,14 +76,16 @@ public class Bot implements Defer.Callable<Void> {
     public static void pickup(GameUI gui) {
 	List<Gob> targets = gui.ui.sess.glob.oc.stream()
 	    //.filter(startsWith("gfx/terobjs/items/branch"))
-	    .filter(startsWith("gfx/terobjs/trees/"))
+	    //.filter(startsWith("gfx/terobjs/trees/"))
+	    .filter(startsWith("gfx/terobjs/herbs/"))
 	    .sorted(distance)
 	    //.limit(1)
 	    .collect(Collectors.toList());
     
 	start(new Bot(targets,
 	    RClick,
-	    selectFlower("Take branch"),
+	    //selectFlower("Take branch"),
+	    selectFlower("Pick"),
 	    Gob::waitRemoval
 	), gui.ui);
     }
