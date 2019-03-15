@@ -271,7 +271,7 @@ public class Gob implements Sprite.Owner, Skeleton.ModOwner, Rendered {
     
     public void waitRemoval() throws InterruptedException {
 	synchronized (removalLock) {
-	    removalLock.wait(5000);
+	    removalLock.wait(15000);
 	    if(!disposed) {
 		throw new InterruptedException();
 	    }
