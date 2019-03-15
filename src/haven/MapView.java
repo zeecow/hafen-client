@@ -1599,7 +1599,7 @@ public class MapView extends PView implements DTarget, Console.Directory {
 		    }
 		}
 	    }
-	    Bot.cancel();
+	    if(clickb == 1) {Bot.cancel();}
 	    wdgmsg("click", args);
 	}
     }
