@@ -73,13 +73,12 @@ public class Bot implements Defer.Callable<Void> {
 	bot.run((result) -> ui.message(String.format("Task is %s.", result), GameUI.MsgType.INFO));
     }
     
-    public static void pickup(GameUI gui) {
+    public static void pickup(GameUI gui, String filter, int limit) {
 	List<Gob> targets = gui.ui.sess.glob.oc.stream()
-	    //.filter(startsWith("gfx/terobjs/items/branch"))
-	    //.filter(startsWith("gfx/terobjs/trees/"))
-	    .filter(startsWith("gfx/terobjs/herbs/"))
-	    .sorted(distance)
-	    //.limit(1)
+	    .filter(startsWith(filter))
+	    .filter(gob -> distanceToPlayer(gob) <= 55)
+	    .sorted(byDistance)
+	    .limit(limit)
 	    .collect(Collectors.toList());
     
 	start(new Bot(targets,
@@ -90,7 +89,21 @@ public class Bot implements Defer.Callable<Void> {
 	), gui.ui);
     }
     
-    public static Comparator<Gob> distance = (o1, o2) -> {
+    public static void pickup_herbs(GameUI gui) {
+	pickup(gui,
+	    //"gfx/terobjs/items/branch",
+	    //"gfx/terobjs/trees/",
+	    "gfx/terobjs/herbs/",
+	    Integer.MAX_VALUE
+	);
+    }
+    
+    private static double distanceToPlayer(Gob gob) {
+	Gob p = gob.glob.oc.getgob(gob.glob.sess.ui.gui.plid);
+	return p.rc.dist(gob.rc);
+    }
+    
+    public static Comparator<Gob> byDistance = (o1, o2) -> {
 	try {
 	    Gob p = o1.glob.oc.getgob(o1.glob.sess.ui.gui.plid);
 	    return Double.compare(p.rc.dist(o1.rc), p.rc.dist(o2.rc));
