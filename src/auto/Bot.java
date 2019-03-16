@@ -73,6 +73,10 @@ public class Bot implements Defer.Callable<Void> {
 	bot.run((result) -> ui.message(String.format("Task is %s.", result), GameUI.MsgType.INFO));
     }
     
+    public static void pickup(GameUI gui, String filter) {
+	pickup(gui, filter, Integer.MAX_VALUE);
+    }
+    
     public static void pickup(GameUI gui, String filter, int limit) {
 	List<Gob> targets = gui.ui.sess.glob.oc.stream()
 	    .filter(startsWith(filter))
@@ -93,8 +97,7 @@ public class Bot implements Defer.Callable<Void> {
 	pickup(gui,
 	    //"gfx/terobjs/items/branch",
 	    //"gfx/terobjs/trees/",
-	    "gfx/terobjs/herbs/",
-	    Integer.MAX_VALUE
+	    "gfx/terobjs/herbs/"
 	);
     }
     

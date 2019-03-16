@@ -26,6 +26,7 @@
 
 package haven;
 
+import auto.Bot;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
@@ -33,6 +34,7 @@ import haven.rx.Reactor;
 
 import java.awt.*;
 import java.lang.reflect.Type;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -45,7 +47,9 @@ public class FlowerMenu extends Widget {
     public static final IBox pbox = Window.wbox;
     public static final Tex pbg = Window.bg;
     public static final int ph = 30, ppl = 8;
+    public static final String PICK_ALL = "#Pick All";
     public static Map<String, Boolean> AUTOCHOOSE = null;
+    private static Gob target;
     public final String[] options;
     private Petal autochoose;
     private String forceChoose;
@@ -56,6 +60,15 @@ public class FlowerMenu extends Widget {
 	loadAutochoose();
     }
     
+    public static void lastGob(Gob gob) {
+	target = gob;
+    }
+    
+    @Override
+    public void destroy() {
+	target = null;
+	super.destroy();
+    }
     
     private static void loadAutochoose() {
 	String json = Config.loadFile("autochoose.json");
@@ -242,6 +255,9 @@ public class FlowerMenu extends Widget {
 
     public FlowerMenu(String... options) {
 	super(Coord.z);
+	if(CFG.MENU_ADD_PICK_ALL.get() && Arrays.asList(options).contains("Pick")) {
+	    options = Utils.extend(options, PICK_ALL);
+	}
 	this.options = options;
 	Reactor.FLOWER.onNext(this);
     }
@@ -356,6 +372,14 @@ public class FlowerMenu extends Widget {
     }
 
     public void choose(int num) {
+	if(num != -1 && PICK_ALL.equals(options[num])) {
+	    if(target != null) {
+		try {
+		    Bot.pickup(ui.gui, target.getres().name);
+		} catch (Exception ignored) {}
+	    }
+	    num = -1;
+	}
 	wdgmsg("cl", num, ui.modflags());
     }
 }
