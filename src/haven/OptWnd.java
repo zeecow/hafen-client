@@ -702,6 +702,20 @@ public class OptWnd extends Window {
 	    a = cfg.get();
 	}
     }
+    
+    public static class CFGHSlider extends HSlider {
+	private final CFG<Integer> cfg;
+	
+	public CFGHSlider(int w, CFG<Integer> cfg, int min, int max) {
+	    super(w, min, max, cfg.get());
+	    this.cfg = cfg;
+	}
+	
+	@Override
+	public void released() {
+	    cfg.set(val);
+	}
+    }
 
     public class QualityBox extends Dropbox<QualityList.SingleType> {
 	protected final CFG<QualityList.SingleType> cfg;

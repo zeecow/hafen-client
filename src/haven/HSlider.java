@@ -86,10 +86,13 @@ public class HSlider extends Widget {
 	    return(false);
 	drag.remove();
 	drag = null;
+	released();
 	return(true);
     }
 
     public void changed() {}
+    
+    public void released() {}
     
     public void resize(int w) {
 	super.resize(new Coord(w, sflarp.sz().y));
