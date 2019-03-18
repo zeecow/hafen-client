@@ -370,6 +370,16 @@ public class OptWnd extends Window {
 
 	y += 25;
 	general.add(new CFGBox("Show extra tool bar", CFG.SHOW_TOOLBELT_1), x, y);
+    
+	y += 25;
+	Label label = general.add(new Label(String.format("Auto pickup radius: %.2f", CFG.AUTO_PICK_RADIUS.get() / 11.0)), x, y);
+	y += 15;
+	general.add(new CFGHSlider(120, CFG.AUTO_PICK_RADIUS, 33, 88) {
+	    @Override
+	    public void changed() {
+		label.settext(String.format("Auto pickup radius: %.02f", val / 11.0));
+	    }
+	}, x, y);
 
 	y += 35;
 	general.add(new Button(120, "Toggle at login") {

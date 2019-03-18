@@ -1,9 +1,6 @@
 package auto;
 
-import haven.Defer;
-import haven.GameUI;
-import haven.Gob;
-import haven.UI;
+import haven.*;
 import haven.rx.Reactor;
 import rx.functions.Action1;
 
@@ -80,7 +77,7 @@ public class Bot implements Defer.Callable<Void> {
     public static void pickup(GameUI gui, String filter, int limit) {
 	List<Gob> targets = gui.ui.sess.glob.oc.stream()
 	    .filter(startsWith(filter))
-	    .filter(gob -> distanceToPlayer(gob) <= 55)
+	    .filter(gob -> distanceToPlayer(gob) <= CFG.AUTO_PICK_RADIUS.get())
 	    .sorted(byDistance)
 	    .limit(limit)
 	    .collect(Collectors.toList());
