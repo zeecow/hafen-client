@@ -143,7 +143,7 @@ public class CFG<T> {
 			value = (E) data;
 		    } else if(Number.class.isAssignableFrom(defClass)) {
 			Number n = (Number) data;
-			value = (E) defClass.getConstructor(String.class).newInstance(n.toString());
+			value = (E) Utils.num2value(n, (Class<? extends Number>)defClass);
 		    } else if(Enum.class.isAssignableFrom(defClass)) {
 			Class<? extends Enum> enumType = Reflect.getEnumSuperclass(defClass);
 			if(enumType != null) {

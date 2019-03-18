@@ -1616,6 +1616,16 @@ public class Utils {
 	double o = Math.pow(10, order);
 	return Math.round(o * a) / o;
     }
+    
+    @SuppressWarnings("unchecked")
+    public static <T extends Number> T num2value(Number n, Class<T> type) {
+	if(Integer.class.equals(type)) {
+	    return (T) new Integer(n.intValue());
+	} else if(Long.class.equals(type)) {
+	    return (T) new Long(n.longValue());
+	}
+	return (T) new Float(n.floatValue());
+    }
 
     static {
 	Console.setscmd("die", new Console.Command() {
