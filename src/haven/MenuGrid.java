@@ -547,7 +547,7 @@ public class MenuGrid extends Widget {
     }
 
     public void use(Pagina p, boolean reset) {
-        use(p.button(), reset);
+	if(p != null) { use(p.button(), reset); }
     }
     
     public void use(PagButton pbtn, boolean reset) {
