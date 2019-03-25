@@ -264,7 +264,9 @@ public class Gob implements Sprite.Owner, Skeleton.ModOwner, Rendered {
     }
     
     public void tick() {
-	for(GAttrib a : attr.values())
+        //Store attributes before iterating over them to fix ConcurrentModificationException
+	GAttrib[] attributes = attr.values().toArray(new GAttrib[0]);
+	for(GAttrib a : attributes)
 	    a.tick();
 	loadrattr();
     }
