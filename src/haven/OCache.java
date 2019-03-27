@@ -70,7 +70,7 @@ public class OCache implements Iterable<Gob> {
 	Radar.clean();
     }
     
-    public Stream<Gob> stream() {return objs.values().stream();}
+    public synchronized Stream<Gob> stream() {return Stream.of(objs.values().toArray(new Gob[0]));}
 
     public synchronized void callback(ChangeCallback cb) {
 	cbs.add(cb);
