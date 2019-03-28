@@ -33,9 +33,10 @@ import java.awt.image.BufferedImage;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.util.*;
-import java.util.function.*;
 import java.util.List;
+import java.util.*;
+import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -375,7 +376,7 @@ public abstract class ItemInfo {
 		    throw(new ClassCastException("Unexpected info specification " + a[0].getClass()));
 		}
 		InfoFactory f = ttres.getcode(InfoFactory.class, true);
-		ItemInfo inf = f.build(owner, a);
+		ItemInfo inf = "ui/tt/slots".equals(ttres.name) ? null : f.build(owner, a);
 		if(inf != null)
 		    ret.add(inf);
 	    } else if(o instanceof String) {

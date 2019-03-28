@@ -61,7 +61,8 @@ public class ItemData {
 	    } else if("Gast".equals(className)){
 	        gast = new GastronomyData(ii, q);
 	    } else if("ISlots".equals(className)){
-	        slots = SlotsData.make(ii);
+		//FIXME: disabled while AbstractMethodError is not fixed for ui/tt/slots
+		slots = null;//SlotsData.make(ii);
 	    } else if("Slotted".equals(className)){
 	        gilding = SlottedData.make(ii, q);
 	    }
@@ -136,7 +137,9 @@ public class ItemData {
 	};
 	List<ItemInfo> infos = new ArrayList<>(data.length);
 	for (ITipData tip : data) {
-	    if(tip != null) {
+	    //FIXME: disabled while AbstractMethodError is not fixed for ui/tt/slots
+	    //if(tip != null) {
+	    if(tip != null && !(tip instanceof SlotsData)) {
 		infos.add(tip.create(sess));
 	    }
 	}
