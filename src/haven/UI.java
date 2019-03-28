@@ -336,6 +336,10 @@ public class UI {
 	}
 	root.mousedown(c, button);
     }
+    
+    public void mouseup(Coord c, int button) {
+	mousedown(new MouseEvent(panel, 0, 0, 0, c.x, c.y, 1, false, button), c, button);
+    }
 	
     public void mouseup(MouseEvent ev, Coord c, int button) {
 	setmods(ev);
