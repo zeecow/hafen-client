@@ -1,6 +1,11 @@
+$size[14]{$u{Update for 28.03.19:}
+  * Added ability to auto pick all herbs/clay/mussels etc. in radius. Radius can be changed in the Options->General. Default shortcut is ALT+Q, can be customized in Options->Shortcut settings.
+  * Added auto pick as action in the Menu Grid.
+  * Added option (Options->General) to show "Pick All" on menus where appropriate - it will auto pick all similar objects.
+ 
 $size[14]{$u{Update for 22.02.19:}
   * Added ability to set favourites in Extended Craft Window (ALT+X).
-  * Added tooltps to actions on custom tool belt
+  * Added tooltips to actions on custom tool belt
   * Added more actions to Menu Grid:
       - Clear player damage
       - Clear all Damage
