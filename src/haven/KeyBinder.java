@@ -62,7 +62,7 @@ public class KeyBinder {
 	add(KeyEvent.VK_G, CTRL, TOGGLE_TILE_GRID);
 	add(KeyEvent.VK_Z, CTRL, TOGGLE_TILE_CENTERING);
 	add(KeyEvent.VK_S, CTRL, TAKE_SCREENSHOT);
-	add(KeyEvent.VK_Q, ALT, TEST);
+	add(KeyEvent.VK_Q, ALT, BOT_PICK_ALL_HERBS);
     }
     
     private static synchronized void store() {
