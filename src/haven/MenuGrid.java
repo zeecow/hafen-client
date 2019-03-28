@@ -260,6 +260,7 @@ public class MenuGrid extends Widget {
 	makeLocal("paginae/add/actlist", Action.OPEN_QUICK_ACTION);
 	makeLocal("paginae/add/buildlist", Action.OPEN_QUICK_BUILD);
 	makeLocal("paginae/add/craftlist", Action.OPEN_QUICK_CRAFT);
+	makeLocal("paginae/add/autobot", Action.BOT_PICK_ALL_HERBS);
 	ui.gui.menuObservable.notifyObservers();
     }
     
