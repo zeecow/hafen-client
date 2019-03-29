@@ -105,7 +105,7 @@ public class EquipProxy extends DraggableWidget implements DTarget2 {
 	ui.modctrl = false;
 	Coord c = sqoff(new Coord(i, 0)).add(rootpos());
 	ui.mousedown(c, 1);
-	ui.modctrl = modctrl;
 	ui.mouseup(c, 1);
+	ui.modctrl = modctrl;
     }
 }
