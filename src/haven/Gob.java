@@ -41,7 +41,7 @@ public class Gob implements Sprite.Owner, Skeleton.ModOwner, Rendered {
     public int frame;
     public final Glob glob;
     private boolean disposed = false;
-    Map<Class<? extends GAttrib>, GAttrib> attr = new HashMap<Class<? extends GAttrib>, GAttrib>();
+    private final Map<Class<? extends GAttrib>, GAttrib> attr = new HashMap<>();
     public Collection<Overlay> ols = new LinkedList<Overlay>() {
 	public boolean add(Overlay item) {
 	    /* XXX: Remove me once local code is changed to use addol(). */
@@ -192,8 +192,10 @@ public class Gob implements Sprite.Owner, Skeleton.ModOwner, Rendered {
     }
 	
     public void ctick(int dt) {
-	for(GAttrib a : attr.values())
-	    a.ctick(dt);
+	synchronized (attr) {
+	    for (GAttrib a : attr.values())
+		a.ctick(dt);
+	}
 	for(Iterator<Overlay> i = ols.iterator(); i.hasNext();) {
 	    Overlay ol = i.next();
 	    if(ol.spr == null) {
@@ -264,10 +266,10 @@ public class Gob implements Sprite.Owner, Skeleton.ModOwner, Rendered {
     }
     
     public void tick() {
-        //Store attributes before iterating over them to fix ConcurrentModificationException
-	GAttrib[] attributes = attr.values().toArray(new GAttrib[0]);
-	for(GAttrib a : attributes)
-	    a.tick();
+	synchronized (attr) {
+	    for (GAttrib a : attr.values())
+		a.tick();
+	}
 	loadrattr();
     }
     
@@ -347,19 +349,21 @@ public class Gob implements Sprite.Owner, Skeleton.ModOwner, Rendered {
 		path.move((Moving) a);
 	    }
 	}
-	attr.put(ac, a);
+	synchronized (attr) { attr.put(ac, a); }
     }
 	
     public <C extends GAttrib> C getattr(Class<C> c) {
-	GAttrib attr = this.attr.get(attrclass(c));
-	if(!c.isInstance(attr))
-	    return(null);
-	return(c.cast(attr));
+	synchronized (attr) {
+	    GAttrib attr = this.attr.get(attrclass(c));
+	    if(!c.isInstance(attr))
+		return (null);
+	    return (c.cast(attr));
+	}
     }
 	
     public void delattr(Class<? extends GAttrib> c) {
 	Class<? extends GAttrib> aClass = attrclass(c);
-	attr.remove(aClass);
+	synchronized (attr) {attr.remove(aClass);}
 	if(aClass == Moving.class && path != null) {
 	    path.stop();
 	}
