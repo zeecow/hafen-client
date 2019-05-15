@@ -27,11 +27,10 @@
 package haven;
 
 import haven.rx.CharterBook;
+import haven.rx.Reactor;
 
-import java.awt.Color;
-import java.awt.Font;
+import java.awt.*;
 import java.awt.image.BufferedImage;
-
 import java.util.Collection;
 import java.util.LinkedList;
 
@@ -73,6 +72,10 @@ public class Window extends Widget implements DTarget {
 	Resource.loadimg("gfx/hud/wnd/lg/cbtnu"),
 	Resource.loadimg("gfx/hud/wnd/lg/cbtnd"),
 	Resource.loadimg("gfx/hud/wnd/lg/cbtnh")};
+    
+    public static final String ON_DESTROY = "destroy";
+    public static final String ON_PACK = "pack";
+    
     public final Coord tlo, rbo, mrgn;
     public final IButton cbtn;
     public boolean dt = false;
@@ -285,6 +288,7 @@ public class Window extends Widget implements DTarget {
     public void uimsg(String msg, Object... args) {
 	if(msg == "pack") {
 	    pack();
+	    report(ON_PACK);
 	} else if(msg == "dt") {
 	    dt = (Integer)args[0] != 0;
 	} else if(msg == "cap") {
@@ -386,6 +390,16 @@ public class Window extends Widget implements DTarget {
 	    return(ret);
 	else
 	    return("");
+    }
+    
+    @Override
+    public void destroy() {
+	report(ON_DESTROY);
+	super.destroy();
+    }
+    
+    private void report(String event) {
+	Reactor.WINDOW.onNext(new Pair<>(this, event));
     }
     
 }

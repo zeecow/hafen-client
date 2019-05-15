@@ -1,6 +1,8 @@
 package haven.rx;
 
 import haven.FlowerMenu;
+import haven.Pair;
+import haven.Window;
 import rx.subjects.PublishSubject;
 
 public class Reactor {
@@ -14,4 +16,7 @@ public class Reactor {
     public static final PublishSubject<String> PLAYER = PublishSubject.create();
  
     public static final PublishSubject<FlowerMenu> FLOWER = PublishSubject.create();
+    
+    /** Publishes window events */
+    public static final PublishSubject<Pair<Window, String>> WINDOW = PublishSubject.create();
 }
