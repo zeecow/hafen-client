@@ -98,6 +98,14 @@ public class Bot implements Defer.Callable<Void> {
 	);
     }
     
+    public static void selectFlower(GameUI gui, long gobid, String option) {
+	List<Gob> targets = gui.ui.sess.glob.oc.stream()
+	    .filter(gob -> gob.id == gobid)
+	    .collect(Collectors.toList());
+	
+	start(new Bot(targets, RClick, selectFlower(option)), gui.ui);
+    }
+    
     private static double distanceToPlayer(Gob gob) {
 	Gob p = gob.glob.oc.getgob(gob.glob.sess.ui.gui.plid);
 	return p.rc.dist(gob.rc);
