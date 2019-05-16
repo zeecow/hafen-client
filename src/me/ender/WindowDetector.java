@@ -1,8 +1,5 @@
 package me.ender;
 
-import auto.Bot;
-import haven.Avaview;
-import haven.Button;
 import haven.Pair;
 import haven.Window;
 import haven.rx.Reactor;
@@ -11,7 +8,9 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class WindowDetector {
+    private static final Object lock = new Object();
     private static final Set<Window> toDetect = new HashSet<>();
+    private static final Set<Window> detected = new HashSet<>();
     
     static {
 	Reactor.WINDOW.subscribe(WindowDetector::onWindowEvent);
@@ -24,14 +23,19 @@ public class WindowDetector {
     }
     
     private static void onWindowEvent(Pair<Window, String> event) {
-	synchronized (toDetect) {
+	synchronized (lock) {
 	    if(toDetect.contains(event.a)) {
 		switch (event.b) {
 		    case Window.ON_DESTROY:
 			toDetect.remove(event.a);
+			detected.remove(event.a);
 			break;
+		    //Detect window on 'pack' message - this is last message server sends after constructing a window
 		    case Window.ON_PACK:
-			recognize(event.a);
+			if(!detected.contains(event.a)) {
+			    detected.add(event.a);
+			    recognize(event.a);
+			}
 			break;
 		}
 	    }
@@ -39,11 +43,6 @@ public class WindowDetector {
     }
     
     private static void recognize(Window window) {
-	Set<Avaview> avas = window.children(Avaview.class);
-	if(avas.size() == 1) {
-	    Avaview ava = avas.iterator().next();
-	    Button button = new Button(75, "Shoo", () -> Bot.selectFlower(window.ui.gui, ava.avagob, "Shoo"));
-	    window.add(button, 0, 0);
-	}
+	AnimalFarm.processCattleInfo(window);
     }
 }
