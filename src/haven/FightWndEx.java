@@ -388,8 +388,6 @@ public class FightWndEx extends Widget {
 	return (-1);
     }
 
-    public static final String[] keys = {"1", "2", "3", "4", "5", "\u21e71", "\u21e72", "\u21e73", "\u21e74", "\u21e75"};
-
     public class BView extends Widget implements DropTarget {
 	private UI.Grab grab;
 	private Action drag;
@@ -418,7 +416,7 @@ public class FightWndEx extends Widget {
 
 	{
 	    for (int i = 0; i < 10; i++)
-		this.keys[i] = Text.renderstroked(FightWndEx.keys[i], fnd).tex();
+		this.keys[i] = Text.renderstroked(Fightsess.keybinds[i].shortcut(true), fnd).tex();
 	}
 
 	public void draw(GOut g) {

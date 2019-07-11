@@ -33,6 +33,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
 
+import static haven.KeyBinder.*;
+
 public class Fightsess extends Widget {
     public static final Text.Foundry fnd = new Text.Foundry(Text.sans.deriveFont(Font.BOLD), 14);
     public static final Tex cdframe = Resource.loadtex("gfx/hud/combat/cool");
@@ -45,6 +47,18 @@ public class Fightsess extends Widget {
     public static final Tex useframe = Resource.loadtex("gfx/hud/combat/lastframe");
     public static final Coord useframeo = (useframe.sz().sub(32, 32)).div(2);
     public static final int actpitch = 50;
+    public static final KeyBinder.KeyBind[] keybinds = new KeyBinder.KeyBind[]{
+	new KeyBinder.KeyBind(KeyEvent.VK_1, 0),
+	new KeyBinder.KeyBind(KeyEvent.VK_2, 0),
+	new KeyBinder.KeyBind(KeyEvent.VK_3, 0),
+	new KeyBinder.KeyBind(KeyEvent.VK_4, 0),
+	new KeyBinder.KeyBind(KeyEvent.VK_5, 0),
+	new KeyBinder.KeyBind(KeyEvent.VK_1, SHIFT),
+	new KeyBinder.KeyBind(KeyEvent.VK_2, SHIFT),
+	new KeyBinder.KeyBind(KeyEvent.VK_3, SHIFT),
+	new KeyBinder.KeyBind(KeyEvent.VK_4, SHIFT),
+	new KeyBinder.KeyBind(KeyEvent.VK_5, SHIFT),
+    };
     public final Action[] actions;
     public int use = -1, useb = -1;
     public Coord pcc;
@@ -257,15 +271,14 @@ public class Fightsess extends Widget {
     
     private Tex keytex(int i) {
 	if(keytex[i] == null) {
-	    keytex[i] = Text.renderstroked(keytips[i], fnd).tex();
+	    keytex[i] = Text.renderstroked(keybinds[i].shortcut(true), fnd).tex();
 	}
 	return keytex[i];
     }
     
     private Widget prevtt = null;
     private Text acttip = null;
-    public static final String[] keytips = {"1", "2", "3", "4", "5", "\u21e71", "\u21e72", "\u21e73", "\u21e74", "\u21e75"};
-    public static final Tex[] keytex = new Tex[keytips.length];
+    public static final Tex[] keytex = new Tex[keybinds.length];
     public Object tooltip(Coord c, Widget prev) {
 	boolean altui = CFG.ALT_COMBAT_UI.get();
 	int x0 =  ui.gui.calendar.rootpos().x + ui.gui.calendar.sz.x / 2;
@@ -302,7 +315,7 @@ public class Fightsess extends Widget {
 		    Tex img = act.get().layer(Resource.imgc).tex();
 		    ca = ca.sub(img.sz().div(2));
 		    if(c.isect(ca, img.sz())) {
-			String tip = act.get().layer(Resource.tooltip).t + " ($b{$col[255,128,0]{" + keytips[i] + "}})";
+			String tip = act.get().layer(Resource.tooltip).t + " ($b{$col[255,128,0]{" + keybinds[i].shortcut(true) + "}})";
 			if((acttip == null) || !acttip.text.equals(tip))
 			    acttip = RichText.render(tip, -1);
 			return(acttip);
@@ -362,18 +375,8 @@ public class Fightsess extends Widget {
 
     public boolean globtype(char key, KeyEvent ev) {
 	if((key == 0) && (ev.getModifiersEx() & (InputEvent.CTRL_DOWN_MASK | KeyEvent.META_DOWN_MASK | KeyEvent.ALT_DOWN_MASK)) == 0) {
-	    int n = -1;
-	    switch(ev.getKeyCode()) {
-	    case KeyEvent.VK_1: n = 0; break;
-	    case KeyEvent.VK_2: n = 1; break;
-	    case KeyEvent.VK_3: n = 2; break;
-	    case KeyEvent.VK_4: n = 3; break;
-	    case KeyEvent.VK_5: n = 4; break;
-	    }
-	    if((n >= 0) && ((ev.getModifiersEx() & InputEvent.SHIFT_DOWN_MASK) != 0))
-		n += 5;
-	    int fn = n;
-	    if((n >= 0) && (n < actions.length)) {
+	    int fn = getAction(ev);
+	    if((fn >= 0) && (fn < actions.length)) {
 		MapView map = getparent(GameUI.class).map;
 		Coord mvc = map.rootxlate(ui.mc);
 		if(mvc.isect(Coord.z, map.sz)) {
@@ -399,5 +402,14 @@ public class Fightsess extends Widget {
 	    return(true);
 	}
 	return(super.globtype(key, ev));
+    }
+    
+    private int getAction(KeyEvent ev) {
+	for (int i = 0; i < actions.length && i < keybinds.length; i++) {
+	    if(keybinds[i].match(ev)) {
+		return i;
+	    }
+	}
+	return -1;
     }
 }

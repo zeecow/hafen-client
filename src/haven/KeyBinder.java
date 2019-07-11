@@ -9,8 +9,8 @@ import java.awt.*;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.lang.reflect.Type;
-import java.util.*;
 import java.util.List;
+import java.util.*;
 
 import static haven.Action.*;
 import static haven.WidgetList.*;
@@ -92,7 +92,7 @@ public class KeyBinder {
     }
 
     public static KeyBind get(final KeyEvent e) {
-	return binds.values().stream().filter(b -> b.match(e.getKeyCode(), getModFlags(e.getModifiersEx()))).findFirst().orElse(EMPTY);
+	return binds.values().stream().filter(b -> b.match(e)).findFirst().orElse(EMPTY);
     }
     
     public static KeyBind make(KeyEvent e, Action action) {
@@ -130,11 +130,19 @@ public class KeyBinder {
 	private final int code;
 	private final int mods;
 	transient private Action action;
+    
+	public KeyBind(int code, int mods) {
+	    this(code, mods, null);
+	}
 	
 	public KeyBind(int code, int mods, Action action) {
 	    this.code = code;
 	    this.mods = mods;
 	    this.action = action;
+	}
+    
+	public boolean match(KeyEvent e) {
+	    return match(e.getKeyCode(), getModFlags(e.getModifiersEx()));
 	}
 	
 	public boolean match(int code, int mods) {
@@ -148,22 +156,31 @@ public class KeyBinder {
 	}
 	
 	public String shortcut() {
+	    return shortcut(false);
+	}
+    
+	public String shortcut(boolean shortened) {
 	    if(isEmpty()) {return "<UNBOUND>";}
 	    String key = KeyEvent.getKeyText(code);
 	    if ((mods & SHIFT) != 0) {
-		key = "SHIT+" + key;
+		key = (shortened ? "⇧" : "SHIT+") + key;
 	    }
 	    if ((mods & ALT) != 0) {
-		key = "ALT+" + key;
+		key = (shortened ? "A" : "ALT+") + key;
 	    }
 	    if ((mods & CTRL) != 0) {
-		key = "CTRL+" + key;
+		key = (shortened ? "C" : "CTRL+") + key;
 	    }
 	    return key;
 	}
     
 	public boolean isEmpty() {
 	    return code == 0 && mods == 0;
+	}
+    
+	@Override
+	public String toString() {
+	    return shortcut();
 	}
     }
     
