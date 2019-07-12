@@ -28,6 +28,8 @@ public class KeyBinder {
     private static final List<Action> order;
     private static final KeyBind EMPTY = new KeyBind(0, 0, null);
     
+    enum KeyBindType {GENERAL, COMBAT}
+    
     static {
 	gson = (new GsonBuilder()).setPrettyPrinting().create();
 	String json = Config.loadFile(CONFIG_JSON);

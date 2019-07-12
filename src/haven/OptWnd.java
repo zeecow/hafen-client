@@ -35,7 +35,8 @@ public class OptWnd extends Window {
     public final Panel main, video, audio;
     private final Panel display, general, camera, radar, shortcuts;
     public Panel current;
-
+    private WidgetList<KeyBinder.ShortcutWidget> shortcutList;
+    
     public void chpanel(Panel p) {
 	if(current != null)
 	    current.hide();
@@ -609,9 +610,26 @@ public class OptWnd extends Window {
 	radar.add(new PButton(200, "Back", 27, main), radar.sz.x / 2 - 100, radar.sz.y + 35);
 	radar.pack();
     }
-
-    private void initShortcutsPanel(){
-	WidgetList<KeyBinder.ShortcutWidget> list = shortcuts.add(new WidgetList<KeyBinder.ShortcutWidget>(new Coord(300, 24), 16){
+    
+    private void populateShortcutsPanel(KeyBinder.KeyBindType type) {
+        shortcutList.clear(true);
+	KeyBinder.makeWidgets(this::updateShortcutList).forEach(shortcutList::additem);
+    }
+    
+    private void updateShortcutList() {
+	for (int i = 0; i < shortcutList.listitems(); i++) {
+	    shortcutList.listitem(i).update();
+	}
+    }
+    
+    private void initShortcutsPanel() {
+	TabStrip<KeyBinder.KeyBindType> tabs = new TabStrip<>(this::populateShortcutsPanel);
+	tabs.insert(0, null, "General", null).tag = KeyBinder.KeyBindType.GENERAL;
+	tabs.insert(1, null, "Combat", null).tag = KeyBinder.KeyBindType.COMBAT;
+	shortcuts.add(tabs);
+	int y = tabs.sz.y;
+	
+	shortcutList = shortcuts.add(new WidgetList<KeyBinder.ShortcutWidget>(new Coord(300, 24), 16) {
 	    @Override
 	    public boolean mousedown(Coord c0, int button) {
 		boolean result = super.mousedown(c0, button);
@@ -632,14 +650,10 @@ public class OptWnd extends Window {
 		}
 		return super.tooltip(c, prev);
 	    }
-	});
-	list.canselect = false;
-	KeyBinder.makeWidgets(()->{
-	    for(int i = 0; i< list.listitems();i++){
-		list.listitem(i).update();
-	    }
-	    return null;
-	}).forEach(list::additem);
+	}, 0, y);
+	shortcutList.canselect = false;
+	tabs.select(KeyBinder.KeyBindType.GENERAL, false);
+    
 	shortcuts.pack();
 	shortcuts.add(new PButton(200, "Back", 27, main), shortcuts.sz.x / 2 - 100, shortcuts.sz.y + 35);
 	shortcuts.pack();
