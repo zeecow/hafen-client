@@ -142,14 +142,16 @@ public class TabStrip<T> extends Widget {
 	Button(Tex image, String text) {
 	    this.image = image;
 	    this.text = font.render(text);
-	    int w = this.text.sz().x + this.image.sz().x + padding.x * 2;
+	    int w = this.text.sz().x + imgsz().y + padding.x * 2;
 	    if(text != null && !text.isEmpty()) {
 		w += 10; // space between image and text
 	    }
-	    int h = Math.max(this.text.sz().y, this.image.sz().y) + padding.y * 2;
+	    int h = Math.max(this.text.sz().y, imgsz().y) + padding.y * 2;
 	    resize(w, h);
 	}
-
+    
+	private Coord imgsz() { return image != null ? image.sz() : Coord.z; }
+	
 	public abstract void click();
 
 	@Override
@@ -160,8 +162,8 @@ public class TabStrip<T> extends Widget {
 		g.chcolor();
 	    }
 	    frame.draw(g, Coord.z, sz);
-	    g.image(image, padding);
-	    g.image(text.tex(), new Coord(image.sz().x + 10, padding.y));
+	    if(image != null) {g.image(image, padding);}
+	    g.image(text.tex(), new Coord(imgsz().x + 10, padding.y));
 	}
 
 	@Override
