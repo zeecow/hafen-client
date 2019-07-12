@@ -412,4 +412,12 @@ public class Fightsess extends Widget {
 	}
 	return -1;
     }
+    
+    public static void updateKeybinds(KeyBind[] combat) {
+	if(combat != null) {
+	    for (int i = 0; i < combat.length && i < keybinds.length; i++) {
+		keybinds[i] = combat[i];
+	    }
+	}
+    }
 }

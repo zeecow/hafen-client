@@ -30,20 +30,40 @@ public class KeyBinder {
     
     static {
 	gson = (new GsonBuilder()).setPrettyPrinting().create();
-	Map<Action, KeyBind> tmp = null;
+	String json = Config.loadFile(CONFIG_JSON);
+	Map<Action, KeyBind> tmpGeneralCFG = null;
+    
 	try {
-	    Type type = new TypeToken<Map<Action, KeyBind>>() {
-	    }.getType();
-	    tmp = gson.fromJson(Config.loadFile(CONFIG_JSON), type);
-	} catch (Exception ignored) {
+	    ConfigBean configBean = gson.fromJson(json, ConfigBean.class);
+	    tmpGeneralCFG = configBean.general;
+	    Fightsess.updateKeybinds(configBean.combat);
+	} catch (Exception ignore) {}
+    
+	if(tmpGeneralCFG == null) {
+	    try {
+		Type type = new TypeToken<Map<Action, KeyBind>>() {
+		}.getType();
+		tmpGeneralCFG = gson.fromJson(json, type);
+	    } catch (Exception ignored) {}
 	}
-	if(tmp == null) {
-	    tmp = new HashMap<>();
+    
+	if(tmpGeneralCFG == null) {
+	    tmpGeneralCFG = new HashMap<>();
 	}
-	binds = tmp;
+	binds = tmpGeneralCFG;
 	binds.forEach((action, keyBind) -> keyBind.action = action);
 	order = Arrays.asList(Action.values());
 	defaults();
+    }
+    
+    private static class ConfigBean {
+	ConfigBean(Map<Action, KeyBind> general, KeyBind[] combat) {
+	    this.general = general;
+	    this.combat = combat;
+	}
+	
+	final Map<Action, KeyBind> general;
+	final KeyBind[] combat;
     }
     
     private static void defaults() {
@@ -66,7 +86,7 @@ public class KeyBinder {
     }
     
     private static synchronized void store() {
-	Config.saveFile(CONFIG_JSON, gson.toJson(binds));
+	Config.saveFile(CONFIG_JSON, gson.toJson(new ConfigBean(binds, Fightsess.keybinds)));
     }
     
     public static boolean handle(UI ui, KeyEvent e) {
