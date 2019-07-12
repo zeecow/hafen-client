@@ -48,11 +48,11 @@ public class Fightsess extends Widget {
     public static final Coord useframeo = (useframe.sz().sub(32, 32)).div(2);
     public static final int actpitch = 50;
     public static final KeyBinder.KeyBind[] keybinds = new KeyBinder.KeyBind[]{
-	new KeyBinder.KeyBind(KeyEvent.VK_1, 0),
-	new KeyBinder.KeyBind(KeyEvent.VK_2, 0),
-	new KeyBinder.KeyBind(KeyEvent.VK_3, 0),
-	new KeyBinder.KeyBind(KeyEvent.VK_4, 0),
-	new KeyBinder.KeyBind(KeyEvent.VK_5, 0),
+	new KeyBinder.KeyBind(KeyEvent.VK_1, NONE),
+	new KeyBinder.KeyBind(KeyEvent.VK_2, NONE),
+	new KeyBinder.KeyBind(KeyEvent.VK_3, NONE),
+	new KeyBinder.KeyBind(KeyEvent.VK_4, NONE),
+	new KeyBinder.KeyBind(KeyEvent.VK_5, NONE),
 	new KeyBinder.KeyBind(KeyEvent.VK_1, SHIFT),
 	new KeyBinder.KeyBind(KeyEvent.VK_2, SHIFT),
 	new KeyBinder.KeyBind(KeyEvent.VK_3, SHIFT),

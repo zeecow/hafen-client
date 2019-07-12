@@ -67,22 +67,22 @@ public class KeyBinder {
     }
     
     private static void defaults() {
-	add(KeyEvent.VK_1, CTRL, ACT_HAND_0);
-	add(KeyEvent.VK_2, CTRL, ACT_HAND_1);
-	add(KeyEvent.VK_C, ALT, OPEN_QUICK_CRAFT);
-	add(KeyEvent.VK_B, ALT, OPEN_QUICK_BUILD);
-	add(KeyEvent.VK_A, ALT, OPEN_QUICK_ACTION);
-	add(KeyEvent.VK_X, ALT, OPEN_CRAFT_DB);
-	add(KeyEvent.VK_H, ALT, TOGGLE_CURSOR);
-	add(KeyEvent.VK_S, ALT, TOGGLE_STUDY);
-	add(KeyEvent.VK_F, ALT, FILTER);
-	add(KeyEvent.VK_I, ALT, TOGGLE_GOB_INFO);
-	add(KeyEvent.VK_H, CTRL, TOGGLE_GOB_HITBOX);
-	add(KeyEvent.VK_R, ALT, TOGGLE_GOB_RADIUS);
-	add(KeyEvent.VK_G, CTRL, TOGGLE_TILE_GRID);
-	add(KeyEvent.VK_Z, CTRL, TOGGLE_TILE_CENTERING);
-	add(KeyEvent.VK_S, CTRL, TAKE_SCREENSHOT);
-	add(KeyEvent.VK_Q, ALT, BOT_PICK_ALL_HERBS);
+	add(KeyEvent.VK_1, CTRL,  ACT_HAND_0);
+	add(KeyEvent.VK_2, CTRL,  ACT_HAND_1);
+	add(KeyEvent.VK_C, ALT,   OPEN_QUICK_CRAFT);
+	add(KeyEvent.VK_B, ALT,   OPEN_QUICK_BUILD);
+	add(KeyEvent.VK_A, ALT,   OPEN_QUICK_ACTION);
+	add(KeyEvent.VK_X, ALT,   OPEN_CRAFT_DB);
+	add(KeyEvent.VK_H, ALT,   TOGGLE_CURSOR);
+	add(KeyEvent.VK_S, ALT,   TOGGLE_STUDY);
+	add(KeyEvent.VK_F, ALT,   FILTER);
+	add(KeyEvent.VK_I, ALT,   TOGGLE_GOB_INFO);
+	add(KeyEvent.VK_H, CTRL,  TOGGLE_GOB_HITBOX);
+	add(KeyEvent.VK_R, ALT,   TOGGLE_GOB_RADIUS);
+	add(KeyEvent.VK_G, CTRL,  TOGGLE_TILE_GRID);
+	add(KeyEvent.VK_Z, CTRL,  TOGGLE_TILE_CENTERING);
+	add(KeyEvent.VK_S, CTRL,  TAKE_SCREENSHOT);
+	add(KeyEvent.VK_Q, ALT,   BOT_PICK_ALL_HERBS);
     }
     
     private static synchronized void store() {
@@ -102,7 +102,7 @@ public class KeyBinder {
     }
     
     public static void add(int code, int mods, Action action) {
-        if(!binds.containsKey(action)) {
+	if(!binds.containsKey(action)) {
 	    binds.put(action, new KeyBind(code, mods, action));
 	}
     }
@@ -219,7 +219,7 @@ public class KeyBinder {
     
 		  @Override
 		  public boolean mouseup(Coord c, int button) {
-		      //FIXME:a little hack, because WidgetList does not pass correct click coordinates if scrolled
+		      //FIXME: a little hack, because WidgetList does not pass correct click coordinates if scrolled
 		      return super.mouseup(Coord.z, button);
 		  }
 	      },
@@ -287,7 +287,6 @@ public class KeyBinder {
     
 	@Override
 	public boolean type(char key, KeyEvent ev) {
-	    
 	    return true;
 	}
 	
