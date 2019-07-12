@@ -3,7 +3,7 @@ package haven;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
-import rx.functions.Func0;
+import rx.functions.Action0;
 
 import java.awt.*;
 import java.awt.event.InputEvent;
@@ -136,7 +136,7 @@ public class KeyBinder {
 	return conflicts;
     }
     
-    public static List<ShortcutWidget> makeWidgets(Func0 invalidate) {
+    public static List<ShortcutWidget> makeWidgets(rx.functions.Action0 invalidate) {
 	List<ShortcutWidget> list = new ArrayList<>(binds.size());
 	for (Action action : order) {
 	    if(binds.containsKey(action)) {
@@ -208,9 +208,9 @@ public class KeyBinder {
     
 	private final Button btn;
 	private KeyBind keyBind;
-	private final Func0 invalidate;
+	private final Action0 invalidate;
     
-	public ShortcutWidget(KeyBind bind, Func0 invalidate) {
+	public ShortcutWidget(KeyBind bind, Action0 invalidate) {
 	    btn = add(new Button(75, bind.shortcut()) {
 		  @Override
 		  public void click() {
