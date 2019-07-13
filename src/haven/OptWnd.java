@@ -613,13 +613,7 @@ public class OptWnd extends Window {
     
     private void populateShortcutsPanel(KeyBinder.KeyBindType type) {
         shortcutList.clear(true);
-	KeyBinder.makeWidgets(this::updateShortcutList).forEach(shortcutList::additem);
-    }
-    
-    private void updateShortcutList() {
-	for (int i = 0; i < shortcutList.listitems(); i++) {
-	    shortcutList.listitem(i).update();
-	}
+	KeyBinder.makeWidgets(type).forEach(shortcutList::additem);
     }
     
     private void initShortcutsPanel() {

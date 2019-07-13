@@ -3,7 +3,7 @@ package haven;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
-import rx.functions.Action0;
+import rx.functions.Action2;
 
 import java.awt.*;
 import java.awt.event.InputEvent;
@@ -138,12 +138,45 @@ public class KeyBinder {
 	return conflicts;
     }
     
-    public static List<ShortcutWidget> makeWidgets(rx.functions.Action0 invalidate) {
-	List<ShortcutWidget> list = new ArrayList<>(binds.size());
+    public static List<ShortcutWidget> makeWidgets(KeyBindType type) {
+	switch (type) {
+	    case GENERAL:
+		return makeGeneralWidgets();
+	    case COMBAT:
+		return makeCombatWidgets();
+	}
+	return null;
+    }
+    
+    private static List<ShortcutWidget> makeGeneralWidgets() {
+	final List<ShortcutWidget> list = new ArrayList<>(binds.size());
 	for (Action action : order) {
 	    if(binds.containsKey(action)) {
-		list.add(new ShortcutWidget(binds.get(action), invalidate));
+		list.add(new ShortcutWidget(binds.get(action), (from, to) -> {
+		    if(change(to)) {
+			list.forEach(wdg -> wdg.update(get(wdg.keyBind.action)));
+		    }
+		}));
 	    }
+	}
+	return list;
+    }
+    
+    private static List<ShortcutWidget> makeCombatWidgets() {
+	final List<ShortcutWidget> list = new ArrayList<>(Fightsess.keybinds.length);
+	for (int k = 0; k < Fightsess.keybinds.length; k++) {
+	    list.add(new ShortcutWidget(Fightsess.keybinds[k], (from, to) -> {
+		if(to.equals(from)) {return;}
+		for (int i = 0; i < Fightsess.keybinds.length; i++) {
+		    if(Fightsess.keybinds[i].equals(from)) {
+			Fightsess.keybinds[i] = to;
+		    } else if(Fightsess.keybinds[i].equals(to)) {
+			Fightsess.keybinds[i] = new KeyBind(0, 0);
+			list.get(i).update(Fightsess.keybinds[i]);
+		    }
+		}
+		store();
+	    }, String.format("Action %02d", k + 1)));
 	}
 	return list;
     }
@@ -182,7 +215,7 @@ public class KeyBinder {
 	}
     
 	public String shortcut(boolean shortened) {
-	    if(isEmpty()) {return "<UNBOUND>";}
+	    if(isEmpty()) {return shortened ? "" : "<UNBOUND>";}
 	    String key = KeyEvent.getKeyText(code);
 	    if ((mods & SHIFT) != 0) {
 		key = (shortened ? "⇧" : "SHIT+") + key;
@@ -201,6 +234,15 @@ public class KeyBinder {
 	}
     
 	@Override
+	public boolean equals(Object obj) {
+	    if(obj instanceof KeyBind) {
+		KeyBind other = (KeyBind) obj;
+		return action == other.action && code == other.code && mods == other.mods;
+	    }
+	    return super.equals(obj);
+	}
+ 
+	@Override
 	public String toString() {
 	    return shortcut();
 	}
@@ -210,9 +252,13 @@ public class KeyBinder {
     
 	private final Button btn;
 	private KeyBind keyBind;
-	private final Action0 invalidate;
+	private final Action2<KeyBind, KeyBind> update;
     
-	public ShortcutWidget(KeyBind bind, Action0 invalidate) {
+	public ShortcutWidget(KeyBind bind, Action2<KeyBind, KeyBind> update) {
+	    this(bind, update, bind.action != null ? bind.action.name : "<EMPTY ACTION>");
+	}
+ 
+	public ShortcutWidget(KeyBind bind, Action2<KeyBind, KeyBind> update, String label) {
 	    btn = add(new Button(75, bind.shortcut()) {
 		  @Override
 		  public void click() {
@@ -227,26 +273,23 @@ public class KeyBinder {
 	      },
 	    225, 0);
 	    this.keyBind = bind;
-	    this.invalidate = invalidate;
-	    if(bind.action.description != null) {
+	    this.update = update;
+	    if(bind.action != null && bind.action.description != null) {
 		tooltip = RichText.render(bind.action.description, 200);
 	    }
 	    btn.autosize(true);
 	    btn.c.x = 300 - btn.sz.x;
-	    add(new Label(bind.action.name), 5, 5);
+	    add(new Label(label), 5, 5);
 	}
     
 	@Override
 	public void keyBindChanged(KeyBind from, KeyBind to) {
-	    if(change(to)) {
-		invalidate.call();
-	    } else {
-		update();
-	    }
+	    update.call(from, to);
+	    update(to);
 	}
     
-	public void update() {
-	    keyBind = KeyBinder.get(keyBind.action);
+	public void update(KeyBind to) {
+	    keyBind = to;
 	    btn.change(keyBind.shortcut());
 	    btn.c.x = 300 - btn.sz.x;
 	}
