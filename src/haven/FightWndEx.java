@@ -46,7 +46,7 @@ public class FightWndEx extends Widget {
     public final ActionTypes acttypes;
     public final Savelist savelist;
     public final IButton accept, cancel, edit;
-    public List<Action> ALL = new ArrayList<Action>();
+    public List<Action> ALL = new ArrayList<>();
     private List<Action> acts = ALL;
     private ActionType selectedType = ActionType.All;
     public final Action[] order;
@@ -415,8 +415,15 @@ public class FightWndEx extends Widget {
 	final Tex[] keys = new Tex[10];
 
 	{
-	    for (int i = 0; i < 10; i++)
+	    listen(KeyBinder.COMBAT_KEYS_UPDATED, this::updateKeybinds);
+	    updateKeybinds();
+	}
+ 
+	private void updateKeybinds() {
+	    for (int i = 0; i < 10; i++) {
+		if(this.keys[i] != null) {this.keys[i].dispose();}
 		this.keys[i] = Text.renderstroked(Fightsess.keybinds[i].shortcut(true), fnd).tex();
+	    }
 	}
 
 	public void draw(GOut g) {
