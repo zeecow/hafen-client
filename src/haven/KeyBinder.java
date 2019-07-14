@@ -3,6 +3,7 @@ package haven;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
+import haven.rx.Reactor;
 import rx.functions.Action2;
 
 import java.awt.*;
@@ -22,6 +23,7 @@ public class KeyBinder {
     public static final int ALT = 1;
     public static final int CTRL = 2;
     public static final int SHIFT = 4;
+    public static final String COMBAT_KEYS_UPDATED = "KeyBinder.COMBAT_KEYS_UPDATED";
     
     private static final Gson gson;
     private static final Map<Action, KeyBind> binds;
@@ -175,6 +177,7 @@ public class KeyBinder {
 			list.get(i).update(Fightsess.keybinds[i]);
 		    }
 		}
+		Reactor.event(COMBAT_KEYS_UPDATED);
 		store();
 	    }, String.format("Action %02d", k + 1)));
 	}
