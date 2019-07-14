@@ -26,6 +26,8 @@
 
 package haven;
 
+import haven.rx.Reactor;
+
 import java.awt.*;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
@@ -269,6 +271,18 @@ public class Fightsess extends Widget {
 	}
     }
     
+    public static final Tex[] keytex = new Tex[keybinds.length];
+    
+    static {
+	Reactor.listen(COMBAT_KEYS_UPDATED, () ->
+	{
+	    for (int i = 0; i < keytex.length; i++) {
+		if(keytex[i] != null) { keytex[i].dispose(); }
+		keytex[i] = null;
+	    }
+	});
+    }
+    
     private Tex keytex(int i) {
 	if(keytex[i] == null) {
 	    keytex[i] = Text.renderstroked(keybinds[i].shortcut(true), fnd).tex();
@@ -278,7 +292,7 @@ public class Fightsess extends Widget {
     
     private Widget prevtt = null;
     private Text acttip = null;
-    public static final Tex[] keytex = new Tex[keybinds.length];
+    
     public Object tooltip(Coord c, Widget prev) {
 	boolean altui = CFG.ALT_COMBAT_UI.get();
 	int x0 =  ui.gui.calendar.rootpos().x + ui.gui.calendar.sz.x / 2;
