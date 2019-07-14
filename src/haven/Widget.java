@@ -26,6 +26,11 @@
 
 package haven;
 
+import haven.rx.Reactor;
+import rx.Subscription;
+import rx.functions.Action0;
+import rx.functions.Action1;
+
 import java.util.*;
 import java.lang.annotation.*;
 import java.lang.reflect.*;
@@ -46,6 +51,7 @@ public class Widget {
     public int gkey;
     private Widget prevtt;
     static Map<String, Factory> types = new TreeMap<String, Factory>();
+    private final List<Subscription> subscriptions = new ArrayList<>();
 
     @dolda.jglob.Discoverable
     @Target(ElementType.TYPE)
@@ -489,6 +495,8 @@ public class Widget {
     }
 
     public void destroy() {
+	subscriptions.forEach(Subscription::unsubscribe);
+	subscriptions.clear();
 	if(canfocus)
 	    setcanfocus(false);
 	unlink();
@@ -1188,5 +1196,17 @@ public class Widget {
 	}
 
 	public abstract void ntick(double a);
+    }
+    
+    public void listen(String event, Action1<Reactor.Event> callback) {
+	subscriptions.add(Reactor.listen(event, callback));
+    }
+    
+    public void listen(String event, Action0 callback) {
+	subscriptions.add(Reactor.listen(event, callback));
+    }
+    
+    public <T> void listen(String event, Action1<T> callback, Class<T> clazz) {
+	subscriptions.add(Reactor.listen(event, callback, clazz));
     }
 }
