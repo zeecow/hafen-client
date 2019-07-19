@@ -67,10 +67,10 @@ public class AnimalFarm {
     }
     
     enum AnimalActions {
-	Shoo("Shoo", (gui, id) -> () -> Bot.selectFlower(gui, id, "Shoo")),
-	Slaughter("Kill", (gui, id) -> () -> Bot.selectFlower(gui, id, "Slaughter")),
-	Shear("Shear", (gui, id) -> () -> Bot.selectFlower(gui, id, "Shear wool")),
-	Ride("Ride", (gui, id) -> () -> Bot.selectFlower(gui, id, "Giddyup!"));
+	Shoo("Shoo", flower("Shoo")),
+	Slaughter("Kill", flower("Slaughter")),
+	Shear("Shear", flower("Shear wool")),
+	Ride("Ride", flower("Giddyup!"));
 	
 	public final String name;
 	private final Func2<GameUI, Long, Runnable> action;
@@ -82,6 +82,10 @@ public class AnimalFarm {
 	
 	public Runnable make(GameUI gui, long gob) {
 	    return action.call(gui, gob);
+	}
+    
+	private static Func2<GameUI, Long, Runnable> flower(final String option) {
+	    return (gui, id) -> () -> Bot.selectFlower(gui, id, option);
 	}
     }
     
