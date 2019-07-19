@@ -4,6 +4,7 @@ import auto.Bot;
 import haven.*;
 import rx.functions.Func2;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -26,6 +27,18 @@ public class AnimalFarm {
 	    
 	    for (AnimalActions action : type.buttons) {
 		c.x += wnd.add(new Button(50, action.name, action.make(wnd.ui.gui, ava.avagob)), c.x, c.y).sz.x + 3;
+	    }
+	    
+	    List<Label> labels = new ArrayList<>(wnd.children(Label.class));
+	    int i = 0;
+	    while (i < labels.size()) {
+		AnimalStatType statType = AnimalStatType.parse(labels.get(i).gettext());
+		if(statType != null && i + 1 < labels.size()) {
+		    AnimalStat stat = statType.make(labels.get(i + 1).gettext());
+		    System.out.println(stat.toString());
+		    i++;
+		}
+		i++;
 	    }
 	}
     }
@@ -51,7 +64,6 @@ public class AnimalFarm {
 	    }
 	    return null;
 	}
-	
     }
     
     enum AnimalActions {
@@ -70,6 +82,50 @@ public class AnimalFarm {
 	
 	public Runnable make(GameUI gui, long gob) {
 	    return action.call(gui, gob);
+	}
+    }
+    
+    enum AnimalStatType {
+	QUALITY("Quality:", false),
+	MEAT_QUALITY("Meat quality:", true);
+	
+	private final String name;
+	private final boolean percent;
+	
+	AnimalStatType(String name, boolean percent) {
+	    this.name = name;
+	    this.percent = percent;
+	}
+	
+	AnimalStat make(String str) {
+	    if(percent) {str = str.replaceAll("%", "");}
+	    int value = 0;
+	    try {value = Integer.parseInt(str);} catch (NumberFormatException ignored) {}
+	    return new AnimalStat(this, value);
+	}
+	
+	public static AnimalStatType parse(String name) {
+	    for (AnimalStatType type : AnimalStatType.values()) {
+		if(type.name.equals(name)) {
+		    return type;
+		}
+	    }
+	    return null;
+	}
+    }
+    
+    public static class AnimalStat {
+	final AnimalStatType type;
+	public final int value;
+	
+	AnimalStat(AnimalStatType type, int value) {
+	    this.type = type;
+	    this.value = value;
+	}
+	
+	@Override
+	public String toString() {
+	    return String.format("%s\t%d%s", type.name, value, type.percent ? "%" : "");
 	}
     }
 }
