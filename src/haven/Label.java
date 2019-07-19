@@ -26,7 +26,7 @@
 
 package haven;
 
-import java.awt.Color;
+import java.awt.*;
 
 public class Label extends Widget {
     Text.Foundry f;
@@ -74,6 +74,8 @@ public class Label extends Widget {
 	this.text = f.render(texts = text, col);
 	sz = this.text.sz();
     }
+    
+    public String gettext() {return texts;}
 	
     public void setcolor(Color color) {
 	col = color;
