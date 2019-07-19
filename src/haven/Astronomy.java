@@ -29,9 +29,11 @@ package haven;
 import java.awt.Color;
 
 public class Astronomy {
-    public final double dt, mp, yt;
+    public final double dt, mp, yt, sp, sd;
     public final boolean night;
     public final Color mc;
+    public final int is;
+    
     int hh, mm, day;
     public static final String[] phase = {
 	"New Moon",
@@ -43,13 +45,16 @@ public class Astronomy {
 	"Last Quarter",
 	"Waning Crescent"
     };
-
-    public Astronomy(double dt, double mp, double yt, boolean night, Color mc) {
+    
+    public Astronomy(double dt, double mp, double yt, boolean night, Color mc, int is, double sp, double sd) {
 	this.dt = dt;
 	this.mp = mp;
 	this.yt = yt;
 	this.night = night;
 	this.mc = mc;
+	this.is = is;
+	this.sp = sp;
+	this.sd = sd;
 	this.hh = (int) (24 * dt);
 	this.mm = (int) (60 * (24 * dt - hh));
 	this.day = (int) (365 * yt);
