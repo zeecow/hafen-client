@@ -86,8 +86,16 @@ public class AnimalFarm {
     }
     
     enum AnimalStatType {
-	QUALITY("Quality:", false),
-	MEAT_QUALITY("Meat quality:", true);
+	QUALITY("Quality:"),
+	ENDURANCE("Endurance:", true),
+	STAMINA("Stamina:"),
+	METABOLISM("Metabolism:"),
+	MEAT_QUANTITY("Meat quantity:"),
+	MEAT_QUALITY("Meat quality:", true),
+	MILK_QUANTITY("Milk quantity:"),
+	MILK_QUALITY("Milk quality:", true),
+	HIDE_QUALITY("Hide quality:", true),
+	BREED_QUALITY("Breeding quality:");
 	
 	private final String name;
 	private final boolean percent;
@@ -97,6 +105,10 @@ public class AnimalFarm {
 	    this.percent = percent;
 	}
 	
+	AnimalStatType(String name) {
+	    this(name, false);
+	}
+    	
 	AnimalStat make(String str) {
 	    if(percent) {str = str.replaceAll("%", "");}
 	    int value = 0;
