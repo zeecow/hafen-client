@@ -204,7 +204,7 @@ public class KeyBinder {
 	}
 	
 	public boolean match(int code, int mods) {
-	    return code == this.code && ((mods & this.mods) == this.mods);
+	    return code == this.code && mods == this.mods;
 	}
 
 	public boolean execute(UI ui) {
