@@ -5,6 +5,7 @@ import haven.*;
 import rx.functions.Func2;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -13,6 +14,9 @@ import java.util.stream.Stream;
 import static me.ender.AnimalFarm.AnimalActions.*;
 
 public class AnimalFarm {
+    
+    public static final Comparator<Widget> POSITIONAL_COMPARATOR = Comparator.comparingInt((Widget o) -> o.c.y).thenComparingInt(o -> o.c.x);
+    
     public static void processCattleInfo(Window wnd) {
 	Set<Avaview> avatars = wnd.children(Avaview.class);
 	AnimalType type = AnimalType.getType(wnd.caption());
@@ -30,9 +34,17 @@ public class AnimalFarm {
 	    }
 	    
 	    List<Label> labels = new ArrayList<>(wnd.children(Label.class));
+	    labels.sort(POSITIONAL_COMPARATOR);
 	    int i = 0;
 	    while (i < labels.size()) {
-		AnimalStatType statType = AnimalStatType.parse(labels.get(i).gettext());
+		Label label = labels.get(i);
+		String labelText = label.gettext();
+//		System.out.println(String.format("%s %s", labelText, label.c));
+		if(labelText.matches("-- With \\w+")) {
+		    label.c.x = 0;
+		    label.c.y = (i + 1 < labels.size()) ? labels.get(i + 1).c.y - 16 : label.c.y;
+		}
+		AnimalStatType statType = AnimalStatType.parse(labelText);
 		if(statType != null && i + 1 < labels.size()) {
 		    AnimalStat stat = statType.make(labels.get(i + 1).gettext());
 		    System.out.println(stat.toString());
