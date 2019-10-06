@@ -147,9 +147,6 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 	    chat.show();
 	}
 	beltwdg.raise();
-	ulpanel = add(new Hidepanel("gui-ul", null, new Coord(-1, -1)));
-	umpanel = add(new Hidepanel("gui-um", null, new Coord( 0, -1)));
-	urpanel = add(new Hidepanel("gui-ur", null, new Coord( 1, -1)));
 	blpanel = add(new Hidepanel("gui-bl", null, new Coord(-1,  1)));
 	brpanel = add(new Hidepanel("gui-br", null, new Coord( 1,  1)) {
 		public void move(double a) {
@@ -162,6 +159,9 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 			return(new Coord(GameUI.this.sz.x, Math.min(brpanel.c.y - 79, GameUI.this.sz.y - menupanel.sz.y)));
 		    }
 		}, new Coord(1, 0)));
+	ulpanel = add(new Hidepanel("gui-ul", null, new Coord(-1, -1)));
+	umpanel = add(new Hidepanel("gui-um", null, new Coord( 0, -1)));
+	urpanel = add(new Hidepanel("gui-ur", null, new Coord( 1, -1)));
 	Tex lbtnbg = Resource.loadtex("gfx/hud/lbtn-bg");
 	blpanel.add(new Img(Resource.loadtex("gfx/hud/blframe")), 0, lbtnbg.sz().y - 33);
 	blpanel.add(new Img(lbtnbg), 0, 0);
@@ -187,9 +187,12 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 	placemmap();
     }
 
+    public static final KeyBinding kb_map = KeyBinding.get("map", KeyMatch.forchar('A', KeyMatch.C));
+    public static final KeyBinding kb_claim = KeyBinding.get("ol-claim", KeyMatch.nil);
+    public static final KeyBinding kb_vil = KeyBinding.get("ol-vil", KeyMatch.nil);
+    public static final KeyBinding kb_rlm = KeyBinding.get("ol-rlm", KeyMatch.nil);
     private void mapbuttons() {
-	blpanel.add(new IButton("gfx/hud/lbtn-claim", "", "-d", "-h") {
-		{tooltip = Text.render("Display personal claims");}
+	blpanel.add(new MenuButton("lbtn-claim", kb_claim, "Display personal claims") {
 		public void click() {
 		    if((map != null) && !map.visol(0))
 			map.enol(0, 1);
@@ -197,8 +200,7 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 			map.disol(0, 1);
 		}
 	    }, 0, 0);
-	blpanel.add(new IButton("gfx/hud/lbtn-vil", "", "-d", "-h") {
-		{tooltip = Text.render("Display village claims");}
+	blpanel.add(new MenuButton("lbtn-vil", kb_vil, "Display village claims") {
 		public void click() {
 		    if((map != null) && !map.visol(2))
 			map.enol(2, 3);
@@ -206,8 +208,7 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 			map.disol(2, 3);
 		}
 	    }, 0, 0);
-	blpanel.add(new IButton("gfx/hud/lbtn-rlm", "", "-d", "-h") {
-		{tooltip = Text.render("Display realms");}
+	blpanel.add(new MenuButton("lbtn-rlm", kb_rlm, "Display realms") {
 		public void click() {
 		    if((map != null) && !map.visol(4))
 			map.enol(4, 5);
@@ -1099,12 +1100,13 @@ public class GameUI extends ConsoleHost implements Console.Directory {
     }
 
     public static class MenuButton extends IButton {
-	private final int gkey;
+	private final KeyBinding gkey;
+	private final String tt;
 
-	MenuButton(String base, int gkey, String tooltip) {
+	MenuButton(String base, KeyBinding gkey, String tooltip) {
 	    super("gfx/hud/" + base, "", "-d", "-h");
-	    this.gkey = (char)gkey;
-	    this.tooltip = RichText.render(tooltip, 0);
+	    this.gkey = gkey;
+	    this.tt = tooltip;
 	}
  
 	@Override
@@ -1115,7 +1117,7 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 	public void click() {}
 
 	public boolean globtype(char key, KeyEvent ev) {
-	    if((gkey != -1) && (key == gkey)) {
+	    if(gkey.key().match(ev)) {
 		click();
 		return(true);
 	    }
@@ -1153,6 +1155,11 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 	}
     }
 
+    public static final KeyBinding kb_inv = KeyBinding.get("inv", KeyMatch.forcode(KeyEvent.VK_TAB, 0));
+    public static final KeyBinding kb_equ = KeyBinding.get("equ", KeyMatch.forchar('E', KeyMatch.C));
+    public static final KeyBinding kb_chr = KeyBinding.get("chr", KeyMatch.forchar('T', KeyMatch.C));
+    public static final KeyBinding kb_bud = KeyBinding.get("bud", KeyMatch.forchar('B', KeyMatch.C));
+    public static final KeyBinding kb_opt = KeyBinding.get("opt", KeyMatch.forchar('O', KeyMatch.C));
     private static final Tex menubg = Resource.loadtex("gfx/hud/rbtn-bg");
     public class MainMenu extends Widget {
 	public MainMenu() {
@@ -1170,6 +1177,9 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 	}
     }
 
+    public static final KeyBinding kb_shoot = KeyBinding.get("screenshot", KeyMatch.forchar('S', KeyMatch.M));
+    public static final KeyBinding kb_chat = KeyBinding.get("chat-toggle", KeyMatch.forchar('C', KeyMatch.C));
+    public static final KeyBinding kb_hide = KeyBinding.get("ui-toggle", KeyMatch.nil);
     public boolean globtype(char key, KeyEvent ev) {
 	if(key == ':') {
 	    entercmd();

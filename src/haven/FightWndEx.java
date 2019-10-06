@@ -635,22 +635,14 @@ public class FightWndEx extends Widget {
 	    use(sel);
 	}
 
-	public boolean type(char c, KeyEvent ev) {
+	public boolean keydown(KeyEvent ev) {
 	    if(edit != -1) {
-		if(c == 27) {
+		if(ev.getKeyChar() == 27) {
 		    cancel();
 		    return (true);
 		} else {
 		    return (nmed.key(ev));
 		}
-	    }
-	    return (super.type(c, ev));
-	}
-
-	public boolean keydown(KeyEvent ev) {
-	    if(edit != -1) {
-		nmed.key(ev);
-		return (true);
 	    }
 	    return (super.keydown(ev));
 	}

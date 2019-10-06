@@ -387,6 +387,20 @@ public class Fightsess extends Widget {
 	}
     }
 
+    public static final KeyBinding[] kb_acts = {
+	KeyBinding.get("fgt/0", KeyMatch.forcode(KeyEvent.VK_1, 0)),
+	KeyBinding.get("fgt/1", KeyMatch.forcode(KeyEvent.VK_2, 0)),
+	KeyBinding.get("fgt/2", KeyMatch.forcode(KeyEvent.VK_3, 0)),
+	KeyBinding.get("fgt/3", KeyMatch.forcode(KeyEvent.VK_4, 0)),
+	KeyBinding.get("fgt/4", KeyMatch.forcode(KeyEvent.VK_5, 0)),
+	KeyBinding.get("fgt/5", KeyMatch.forcode(KeyEvent.VK_1, KeyMatch.S)),
+	KeyBinding.get("fgt/6", KeyMatch.forcode(KeyEvent.VK_2, KeyMatch.S)),
+	KeyBinding.get("fgt/7", KeyMatch.forcode(KeyEvent.VK_3, KeyMatch.S)),
+	KeyBinding.get("fgt/8", KeyMatch.forcode(KeyEvent.VK_4, KeyMatch.S)),
+	KeyBinding.get("fgt/9", KeyMatch.forcode(KeyEvent.VK_5, KeyMatch.S)),
+    };
+    public static final KeyBinding kb_relcycle =  KeyBinding.get("fgt-cycle", KeyMatch.forcode(KeyEvent.VK_TAB, KeyMatch.C), KeyMatch.S);
+
     public boolean globtype(char key, KeyEvent ev) {
 	if((key == 0) && (ev.getModifiersEx() & (InputEvent.CTRL_DOWN_MASK | KeyEvent.META_DOWN_MASK | KeyEvent.ALT_DOWN_MASK)) == 0) {
 	    int fn = getAction(ev);
@@ -406,11 +420,20 @@ public class Fightsess extends Widget {
 		}
 		return(true);
 	    }
-	} else if((key == 9) && ((ev.getModifiersEx() & InputEvent.CTRL_DOWN_MASK) != 0)) {
-	    Fightview.Relation cur = fv.current;
-	    if(cur != null) {
-		fv.lsrel.remove(cur);
-		fv.lsrel.addLast(cur);
+	}
+	if(kb_relcycle.key().match(ev, KeyMatch.S)) {
+	    if((ev.getModifiersEx() & KeyEvent.SHIFT_DOWN_MASK) == 0) {
+		Fightview.Relation cur = fv.current;
+		if(cur != null) {
+		    fv.lsrel.remove(cur);
+		    fv.lsrel.addLast(cur);
+		}
+	    } else {
+		Fightview.Relation last = fv.lsrel.getLast();
+		if(last != null) {
+		    fv.lsrel.remove(last);
+		    fv.lsrel.addFirst(last);
+		}
 	    }
 	    fv.wdgmsg("bump", (int)fv.lsrel.get(0).gobid);
 	    return(true);

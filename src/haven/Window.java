@@ -358,15 +358,15 @@ public class Window extends Widget implements DTarget {
     public void close() {
 	ui.destroy(this);
     }
-
-    public boolean type(char key, java.awt.event.KeyEvent ev) {
-	if(super.type(key, ev))
+    
+    public boolean keydown(java.awt.event.KeyEvent ev) {
+	if(super.keydown(ev))
 	    return(true);
-	if(key == 27) {
+	if(ev.getKeyChar() == 27) {
 	    if(justclose)
 		close();
 	    else
-	    	wdgmsg("close");
+		wdgmsg("close");
 	    return(true);
 	}
 	return(false);

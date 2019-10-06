@@ -68,8 +68,9 @@ public class GeneralGobInfo extends GobInfo {
 	} else if(isSpriteKind("Tree", gob)) {
 	    Message data = getDrawableData(gob);
 	    if(data != null && !data.eom()) {
-		int growth = data.uint8();
-		if(growth < 100) {
+		data.skip(1);
+		int growth = data.eom() ? -1 : data.uint8();
+		if(growth < 100 && growth >= 0) {
 		    Color c = Utils.blendcol(growth / 100.0, Color.RED, Color.ORANGE, Color.YELLOW, Color.GREEN);
 		    line = Text.std.renderstroked(String.format("%d%%", growth), c, Color.BLACK);
 		}

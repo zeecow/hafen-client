@@ -81,11 +81,6 @@ public class ActWindow extends GameUI.Hidewnd {
     }
     
     @Override
-    public boolean type(char key, KeyEvent ev) {
-	return !ignoredKey(ev) && super.type(key, ev);
-    }
-    
-    @Override
     public boolean keydown(KeyEvent ev) {
 	return !ignoredKey(ev) && super.keydown(ev);
     }

@@ -549,8 +549,7 @@ public class CraftDBWnd extends Window implements DTarget2 {
 	return true;
     }
     
-    @Override
-    public boolean type(char key, KeyEvent ev) {
+    public boolean keydown(char key, KeyEvent ev) {
 	if(key == 27) {
 	    if(!filter.line.isEmpty()) {
 		changeMode(mode);
