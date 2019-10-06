@@ -334,11 +334,6 @@ public class KeyBinder {
 	}
     
 	@Override
-	public boolean type(char key, KeyEvent ev) {
-	    return true;
-	}
-	
-	@Override
 	protected void attach(UI ui) {
 	    super.attach(ui);
 	    keygrab = ui.grabkeys(this);
