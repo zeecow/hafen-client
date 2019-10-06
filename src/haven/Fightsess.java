@@ -402,7 +402,7 @@ public class Fightsess extends Widget {
     public static final KeyBinding kb_relcycle =  KeyBinding.get("fgt-cycle", KeyMatch.forcode(KeyEvent.VK_TAB, KeyMatch.C), KeyMatch.S);
 
     public boolean globtype(char key, KeyEvent ev) {
-	if((key == 0) && (ev.getModifiersEx() & (InputEvent.CTRL_DOWN_MASK | KeyEvent.META_DOWN_MASK | KeyEvent.ALT_DOWN_MASK)) == 0) {
+	if((ev.getModifiersEx() & (InputEvent.CTRL_DOWN_MASK | KeyEvent.META_DOWN_MASK | KeyEvent.ALT_DOWN_MASK)) == 0) {
 	    int fn = getAction(ev);
 	    if((fn >= 0) && (fn < actions.length)) {
 		MapView map = getparent(GameUI.class).map;

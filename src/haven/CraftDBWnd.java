@@ -526,6 +526,13 @@ public class CraftDBWnd extends Window implements DTarget2 {
 	    return false;
 	}
 	switch (ev.getKeyCode()) {
+	    case KeyEvent.VK_ESCAPE:
+		if(!filter.line.isEmpty()) {
+		    changeMode(mode);
+		} else {
+		    close();
+		}
+		return true;
 	    case KeyEvent.VK_DOWN:
 		select(box.listitem((box.selindex + 1) % box.listitems()).p, true, true);
 		return true;
@@ -542,36 +549,14 @@ public class CraftDBWnd extends Window implements DTarget2 {
 		}
 		return true;
 	}
-	
-	if (filter.key(ev)) {
-	    needfilter();
-	}
-	return true;
-    }
-    
-    public boolean keydown(char key, KeyEvent ev) {
-	if(key == 27) {
-	    if(!filter.line.isEmpty()) {
-		changeMode(mode);
-	    } else {
-		close();
-	    }
-	    return true;
-	}
-	
-	if(ignoredKey(ev)) {
-	    return false;
-	}
+ 
 	String before = filter.line;
 	if(filter.key(ev) && !before.equals(filter.line)) {
 	    needfilter();
 	    if(filter.line.isEmpty()) {
 		changeMode(mode);
 	    }
-	    return true;
 	}
-    
-	//return super.type(key, ev);
 	return true;
     }
     
