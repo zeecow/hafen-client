@@ -93,15 +93,21 @@ public class GeneralGobInfo extends GobInfo {
     }
 
     private static boolean isSpriteKind(String kind, Gob gob) {
-	Class spc = null;
+	boolean result = false;
+	Class spc;
 	Drawable d = gob.getattr(Drawable.class);
 	if(d instanceof ResDrawable) {
 	    spc = ((ResDrawable) d).spr.getClass();
-	} else {
-	    Resource.CodeEntry ce = gob.getres().layer(Resource.CodeEntry.class);
-	    if(ce != null) { spc = ce.get("spr"); }
+	    result = spc.getSimpleName().equals(kind) || spc.getSuperclass().getSimpleName().equals(kind);
 	}
-	return spc != null && (spc.getSimpleName().equals(kind) || spc.getSuperclass().getSimpleName().equals(kind));
+	if(!result) {
+	    Resource.CodeEntry ce = gob.getres().layer(Resource.CodeEntry.class);
+	    if(ce != null) {
+		spc = ce.get("spr");
+		result = spc.getSimpleName().equals(kind) || spc.getSuperclass().getSimpleName().equals(kind);
+	    }
+	}
+	return result;
     }
 
     @Override
