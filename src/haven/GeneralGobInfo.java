@@ -2,6 +2,8 @@ package haven;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.util.Arrays;
+import java.util.List;
 
 public class GeneralGobInfo extends GobInfo {
     private GobHealth health;
@@ -50,8 +52,8 @@ public class GeneralGobInfo extends GobInfo {
 
     private BufferedImage growth() {
 	Text.Line line = null;
-
-	if(isSpriteKind("GrowingPlant", gob) || isSpriteKind("TrellisPlant", gob)) {
+ 
+	if(isSpriteKind(gob, "GrowingPlant", "TrellisPlant")) {
 	    int maxStage = 0;
 	    for (FastMesh.MeshRes layer : gob.getres().layers(FastMesh.MeshRes.class)) {
 		if(layer.id / 10 > maxStage) {
@@ -65,7 +67,7 @@ public class GeneralGobInfo extends GobInfo {
 		Color c = Utils.blendcol((double) stage / maxStage, Color.RED, Color.ORANGE, Color.YELLOW, Color.GREEN);
 		line = Text.std.renderstroked(String.format("%d/%d", stage, maxStage), c, Color.BLACK);
 	    }
-	} else if(isSpriteKind("Tree", gob)) {
+	} else if(isSpriteKind(gob, "Tree")) {
 	    Message data = getDrawableData(gob);
 	    if(data != null && !data.eom()) {
 		data.skip(1);
@@ -91,20 +93,23 @@ public class GeneralGobInfo extends GobInfo {
 	else
 	    return null;
     }
-
-    private static boolean isSpriteKind(String kind, Gob gob) {
+    
+    private static boolean isSpriteKind(Gob gob, String... kind) {
+	List<String> kinds = Arrays.asList(kind);
 	boolean result = false;
 	Class spc;
 	Drawable d = gob.getattr(Drawable.class);
-	if(d instanceof ResDrawable) {
-	    spc = ((ResDrawable) d).spr.getClass();
-	    result = spc.getSimpleName().equals(kind) || spc.getSuperclass().getSimpleName().equals(kind);
+	Resource.CodeEntry ce = gob.getres().layer(Resource.CodeEntry.class);
+	if(ce != null) {
+	    spc = ce.get("spr");
+	    result = spc != null && (kinds.contains(spc.getSimpleName()) || kinds.contains(spc.getSuperclass().getSimpleName()));
 	}
 	if(!result) {
-	    Resource.CodeEntry ce = gob.getres().layer(Resource.CodeEntry.class);
-	    if(ce != null) {
-		spc = ce.get("spr");
-		result = spc.getSimpleName().equals(kind) || spc.getSuperclass().getSimpleName().equals(kind);
+	    if(d instanceof ResDrawable) {
+		Sprite spr = ((ResDrawable) d).spr;
+		if(spr == null) {throw new Loading();}
+		spc = spr.getClass();
+		result = kinds.contains(spc.getSimpleName()) || kinds.contains(spc.getSuperclass().getSimpleName());
 	    }
 	}
 	return result;
