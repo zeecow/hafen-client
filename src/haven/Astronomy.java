@@ -46,6 +46,8 @@ public class Astronomy {
 	"Waning Crescent"
     };
     
+    private static final String[] seasons = {"Spring", "Summer", "Autumn", "Winter"};
+    
     public Astronomy(double dt, double mp, double yt, boolean night, Color mc, int is, double sp, double sd) {
 	this.dt = dt;
 	this.mp = mp;
@@ -59,4 +61,6 @@ public class Astronomy {
 	this.mm = (int) (60 * (24 * dt - hh));
 	this.day = (int) (365 * yt);
     }
+    
+    public String season() { return seasons[is]; }
 }
