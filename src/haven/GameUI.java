@@ -227,8 +227,20 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 
     @Override
     public void destroy() {
+	closeWindows();
 	super.destroy();
 	ui.gui = null;
+    }
+    
+    private static void closeWindow(Window wnd) { if(wnd != null) {wnd.close();} }
+    
+    private void closeWindows() {
+	closeWindow(craftwnd); //craftwnd = null;
+	closeWindow(timers); //craftwnd = null;
+	closeWindow(actlist); actlist = null;
+	closeWindow(craftlist); craftlist = null;
+	closeWindow(buildlist); buildlist = null;
+	closeWindow(studywnd); studywnd = null;
     }
 
     /* Ice cream */
