@@ -223,13 +223,24 @@ public class GameUI extends ConsoleHost implements Console.Directory {
     protected void attach(UI ui) {
 	ui.gui = this;
 	super.attach(ui);
-	timers = add(new TimerPanel(), 250, 100);
     }
 
     @Override
     public void destroy() {
+	closeWindows();
 	super.destroy();
 	ui.gui = null;
+    }
+    
+    private static void closeWindow(Window wnd) { if(wnd != null) {wnd.close();} }
+    
+    private void closeWindows() {
+	closeWindow(craftwnd); //craftwnd = null;
+	closeWindow(timers); //craftwnd = null;
+	closeWindow(actlist); actlist = null;
+	closeWindow(craftlist); craftlist = null;
+	closeWindow(buildlist); buildlist = null;
+	closeWindow(studywnd); studywnd = null;
     }
 
     /* Ice cream */
@@ -443,6 +454,14 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 	    craftwnd = add(new CraftDBWnd());
 	} else {
 	    craftwnd.close();
+	}
+    }
+    
+    public void toggleTimers() {
+	if(timers == null) {
+	    timers = add(new TimerPanel(), 250, 100);
+	} else {
+	    timers.toggle();
 	}
     }
     

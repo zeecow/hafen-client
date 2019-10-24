@@ -272,7 +272,7 @@ public class MenuGrid extends Widget implements KeyBinding.Bindable {
     @Override
     public void bound() {
 	super.bound();
-	makeLocal("paginae/add/timer", ctx -> ctx.context(UI.class).gui.timers.toggle());
+	makeLocal("paginae/add/timer", Action.TOGGLE_TIMERS);
 	makeLocal("paginae/add/clear_player_dmg", Action.CLEAR_PLAYER_DAMAGE);
 	makeLocal("paginae/add/clear_all_dmg", Action.CLEAR_ALL_DAMAGE);
 	makeLocal("paginae/add/craftdb", Action.OPEN_CRAFT_DB);

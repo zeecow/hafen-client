@@ -430,11 +430,7 @@ public class CraftDBWnd extends Window implements DTarget2 {
 	    description.dispose();
 	    description = null;
 	}
-	if(p != null) {
-	    descriptionPagina = p;
-	} else {
-	    descriptionPagina = null;
-	}
+	descriptionPagina = p;
     }
 
     public void setMakewindow(Widget widget) {

@@ -10,6 +10,7 @@ public enum Action {
     TOGGLE_OPTIONS(GameUI::toggleOptions, "Options"),
     TOGGLE_CHAT(GameUI::toggleChat, "Toggle Chat"),
     TOGGLE_MAP(GameUI::toggleMap, "Toggle Map"),
+    TOGGLE_TIMERS(GameUI::toggleTimers, "Toggle Timers"),
     TAKE_SCREENSHOT(GameUI::takeScreenshot, "Take Screenshot"),
     
     ACT_HAND_0(gui -> gui.eqproxy.activate(0), "Left hand", "Left click on left hand slot."),

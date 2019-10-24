@@ -21,7 +21,6 @@ public class TimerPanel extends Window {
 	    }
 	}
 	pack();
-	visible = false;
     }
 
     public void toggle() {
@@ -64,7 +63,8 @@ public class TimerPanel extends Window {
     
     @Override
     public void close() {
-	visible = false;
+	ui.gui.timers = null;
+	super.close();
     }
 
     class TimerAddWdg extends Window {
