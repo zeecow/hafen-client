@@ -223,7 +223,6 @@ public class GameUI extends ConsoleHost implements Console.Directory {
     protected void attach(UI ui) {
 	ui.gui = this;
 	super.attach(ui);
-	timers = add(new TimerPanel(), 250, 100);
     }
 
     @Override
@@ -443,6 +442,14 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 	    craftwnd = add(new CraftDBWnd());
 	} else {
 	    craftwnd.close();
+	}
+    }
+    
+    public void toggleTimers() {
+	if(timers == null) {
+	    timers = add(new TimerPanel(), 250, 100);
+	} else {
+	    timers.toggle();
 	}
     }
     
