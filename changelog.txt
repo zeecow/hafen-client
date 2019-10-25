@@ -1,3 +1,7 @@
+$size[14]{$u{Update for 25.10.19:}
+  * Added display of current season and how long it will last to Calendar (top-middle of the screen where sun and moon are) tooltip
+  * Fixed crashes when logging in after logout and crafting window was open.
+  
 $size[14]{$u{Update for 28.03.19:}
   * Added ability to auto pick all herbs/clay/mussels etc. in radius. Radius can be changed in the Options->General. Default shortcut is ALT+Q, can be customized in Options->Shortcut settings.
   * Added auto pick as action in the Menu Grid.
