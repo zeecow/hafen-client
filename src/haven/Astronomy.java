@@ -27,6 +27,7 @@
 package haven;
 
 import java.awt.Color;
+import java.util.Arrays;
 
 public class Astronomy {
     public final double dt, mp, yt, sp, sd;
@@ -48,7 +49,7 @@ public class Astronomy {
     private static final int MINUTE = 60;
     private static final int HOUR = 60 * MINUTE;
     private static final int DAY = 24 * HOUR;
-    private static final int YEAR_DAYS = 180;
+    private static final int YEAR_DAYS = Season.yearLength();
     
     public Astronomy(double dt, double mp, double yt, boolean night, Color mc, int is, double sp, double sd) {
 	this.dt = dt;
@@ -82,5 +83,7 @@ public class Astronomy {
 	Season(int length) {
 	    this.length = length;
 	}
+    
+	public static int yearLength() { return Arrays.stream(values()).mapToInt(season -> season.length).sum(); }
     }
 }
