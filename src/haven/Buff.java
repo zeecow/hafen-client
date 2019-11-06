@@ -33,7 +33,7 @@ import java.util.List;
 
 import haven.ItemInfo.AttrCache;
 
-public class Buff extends Widget implements ItemInfo.ResOwner {
+public class Buff extends Widget implements ItemInfo.ResOwner, Bufflist.Managed {
     private static final Map<String, Color> OPENINGS = new HashMap<String, Color>(4) {{
 	put("paginae/atk/offbalance", new Color(81, 165, 56));
 	put("paginae/atk/reeling", new Color(210, 210, 64));
