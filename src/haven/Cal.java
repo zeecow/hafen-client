@@ -67,7 +67,8 @@ public class Cal extends Widget {
 	g.image((a.night ? nlnd : dlnd)[a.is], Coord.z);
 	g.image(bg, Coord.z);
     
-	String tt = String.format("Day %d,   %02d:%02d\nSeason: %s, %d days remaining\nMoon: %s", a.day, a.hh, a.mm, a.season(), a.sday, Astronomy.phase[mp]);
+	String season = String.format("Season: %s, day %d of %d", a.season(), a.scday + 1, a.season().length);
+	String tt = String.format("Day %d,   %02d:%02d\n%s\nMoon: %s", a.day + 1, a.hh, a.mm, season, Astronomy.phase[mp]);
 	if(!tt.equals(tip)) {
 	    tip = tt;
 	    tooltip = RichText.render(tt, 250);

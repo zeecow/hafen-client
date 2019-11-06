@@ -34,7 +34,7 @@ public class Astronomy {
     public final Color mc;
     public final int is;
     
-    public final int hh, mm, day, sday, shh, smm;
+    public final int hh, mm, day, srday, srhh, srmm, scday;
     public static final String[] phase = {
 	"New Moon",
 	"Waxing Crescent",
@@ -63,10 +63,13 @@ public class Astronomy {
 	this.mm = (int) (60 * (24 * dt - hh));
 	this.day = (int) (YEAR_DAYS * yt);
     
+	int seasonProgressSeconds = (int) (season().length * DAY * (sp)); //seconds since season started
+	scday = seasonProgressSeconds / DAY;
+	
 	int seasonTs = (int) (season().length * DAY * (1 - sp)); //seconds remaining in season
-	sday = seasonTs / DAY;
-	shh = (seasonTs - sday * DAY) / HOUR;
-	smm = (seasonTs - sday * DAY - shh * HOUR) / MINUTE;
+	srday = seasonTs / DAY;
+	srhh = (seasonTs - srday * DAY) / HOUR;
+	srmm = (seasonTs - srday * DAY - srhh * HOUR) / MINUTE;
     }
     
     public Season season() { return Season.values()[is]; }
@@ -74,7 +77,7 @@ public class Astronomy {
     enum Season {
 	Spring(30), Summer(90), Autumn(30), Winter(30);
 	
-	private final int length;
+	public final int length;
 	
 	Season(int length) {
 	    this.length = length;
