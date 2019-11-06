@@ -1,3 +1,8 @@
+$size[14]{$u{Update for 06.11.19:}
+  * merged loftar's changes
+  * made year day in calendar to start from 1
+  * changed season progress display in calendar from remaining days to current day out of total days
+ 
 $size[14]{$u{Update for 25.10.19:}
   * Added display of current season and how long it will last to Calendar (top-middle of the screen where sun and moon are) tooltip
   * Fixed crashes when logging in after logout and crafting window was open.
