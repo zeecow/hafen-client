@@ -401,12 +401,34 @@ public class Fightsess extends Widget {
     };
     public static final KeyBinding kb_relcycle =  KeyBinding.get("fgt-cycle", KeyMatch.forcode(KeyEvent.VK_TAB, KeyMatch.C), KeyMatch.S);
 
+    /* XXX: This is a bit ugly, but release message do need to be
+     * properly sequenced with use messages in some way. */
+    private class Release implements MapView.Delayed, BGL.Request {
+	final int n;
+
+	Release(int n) {this.n = n;}
+
+	public void run(GOut g) {
+	    g.gl.bglSubmit(this);
+	}
+
+	public void run(javax.media.opengl.GL2 gl) {
+	    wdgmsg("rel", n);
+	}
+    }
+
+    private UI.Grab holdgrab = null;
+    private int held = -1;
     public boolean globtype(char key, KeyEvent ev) {
 	if((ev.getModifiersEx() & (InputEvent.CTRL_DOWN_MASK | KeyEvent.META_DOWN_MASK | KeyEvent.ALT_DOWN_MASK)) == 0) {
 	    int fn = getAction(ev);
 	    if((fn >= 0) && (fn < actions.length)) {
 		MapView map = getparent(GameUI.class).map;
 		Coord mvc = map.rootxlate(ui.mc);
+		if(held >= 0) {
+		    map.delay(new Release(held));
+		    held = -1;
+		}
 		if(mvc.isect(Coord.z, map.sz)) {
 		    map.delay(map.new Maptest(mvc) {
 			    protected void hit(Coord pc, Coord2d mc) {
@@ -418,6 +440,9 @@ public class Fightsess extends Widget {
 			    }
 			});
 		}
+		if(holdgrab == null)
+		    holdgrab = ui.grabkeys(this);
+		held = fn;
 		return(true);
 	    }
 	}
@@ -439,6 +464,22 @@ public class Fightsess extends Widget {
 	    return(true);
 	}
 	return(super.globtype(key, ev));
+    }
+
+    public boolean keydown(KeyEvent ev) {
+	return(false);
+    }
+
+    public boolean keyup(KeyEvent ev) {
+	if((holdgrab != null) && (kb_acts[held].key().match(ev, KeyMatch.MODS))) {
+	    MapView map = getparent(GameUI.class).map;
+	    map.delay(new Release(held));
+	    holdgrab.remove();
+	    holdgrab = null;
+	    held = -1;
+	    return(true);
+	}
+	return(false);
     }
     
     private int getAction(KeyEvent ev) {
