@@ -123,6 +123,15 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 	private GameUI wdg() {return(GameUI.this);}
     }
 
+    public class PaginaBeltSlot extends BeltSlot {
+	public final MenuGrid.Pagina pagina;
+ 
+	public PaginaBeltSlot(int idx, MenuGrid.Pagina p) {
+	    super(idx, p.res, Message.nil);
+	    pagina = p;
+	}
+    }
+    
     public abstract class Belt extends Widget {
 	public Belt(Coord sz) {
 	    super(sz);
