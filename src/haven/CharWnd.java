@@ -288,9 +288,6 @@ public class CharWnd extends Window {
 	    return (a > 1.0)?buffed:Utils.blendcol(none, full, a);
 	}
 	
-	public static class El {
-	    public static final int h = elf.height() + 2;
-	    public final Indir<Resource> t;
 	public class El {
 	    public final ResData t;
 	    public double a;
@@ -2309,7 +2306,6 @@ public class CharWnd extends Window {
 	    feps.update(args);
 	} else if(nm == "glut") {
 	    glut.update(args);
-	} else if(nm == "glut") {
 	} else if(nm == "ftrig") {
 	    feps.trig(ui.sess.getres((Integer)args[0]));
 	} else if(nm == "lvl") {
@@ -2324,7 +2320,7 @@ public class CharWnd extends Window {
 		if(args[a] instanceof byte[])
 		    t.sdt = new MessageBuf((byte[])args[a++]);
 		double m = ((Number)args[a++]).doubleValue();
-		ui.sess.character.constipation.update(t, m);
+		ui.sess.character.constipation.update(t.res, m);
 		cons.update(t, m);
 	    }
 	} else if(nm == "csk") {
