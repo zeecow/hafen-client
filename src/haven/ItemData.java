@@ -102,8 +102,9 @@ public class ItemData {
     private static Tex longtip(Resource res, List<ItemInfo> infos, int titleSize, int titleSpace) {
 	Resource.AButton ad = res.layer(Resource.action);
 	Resource.Pagina pg = res.layer(Resource.pagina);
+	Resource.Tooltip tip = res.layer(Resource.tooltip);
 	String spacing = new String(new char[titleSpace]).replace("\0", " ");
-	String tt = String.format("$b{%s%s}", spacing, ad.name);
+	String tt = String.format("$b{%s%s}", spacing, ad != null ? ad.name : (tip != null) ? tip.t : res.name);
 	if(titleSize > 0) {
 	    tt = String.format("$size[%d]{%s}", titleSize, tt);
 	}
