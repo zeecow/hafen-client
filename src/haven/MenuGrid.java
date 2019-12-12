@@ -28,6 +28,7 @@ package haven;
 
 import haven.Resource.AButton;
 
+import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.font.TextAttribute;
@@ -76,7 +77,7 @@ public class MenuGrid extends Widget implements KeyBinding.Bindable {
 	    char hk = res.layer(Resource.action).hk;
 	    if(hk == 0)
 		return(KeyMatch.nil);
-	    return(KeyMatch.forchar(Character.toUpperCase(hk), 0));
+	    return KeyMatch.forcode(KeyStroke.getKeyStroke(hk, 0).getKeyCode(), 0);
 	}
 	public KeyBinding binding() {
 	    return(KeyBinding.get("scm/" + res.name, hotkey()));
@@ -676,7 +677,7 @@ public class MenuGrid extends Widget implements KeyBinding.Bindable {
 
     public static final KeyBinding kb_root = KeyBinding.get("scm-root", KeyMatch.forcode(KeyEvent.VK_ESCAPE, 0));
     public static final KeyBinding kb_back = KeyBinding.get("scm-back", KeyMatch.forcode(KeyEvent.VK_BACK_SPACE, 0));
-    public static final KeyBinding kb_next = KeyBinding.get("scm-next", new KeyMatch('N', false, KeyEvent.VK_UNDEFINED, "N", KeyMatch.S | KeyMatch.C | KeyMatch.M, KeyMatch.S));
+    public static final KeyBinding kb_next = KeyBinding.get("scm-next", KeyMatch.forchar('N', KeyMatch.S | KeyMatch.C | KeyMatch.M, KeyMatch.S));
     public boolean globtype(char k, KeyEvent ev) {
 	if(ui.modflags() != 0){return false;}
 	if((k == 27) && (this.cur != null)) {

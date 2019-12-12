@@ -27,7 +27,7 @@ public class ToolBelt extends DraggableWidget implements DTarget, DropTarget {
     private static Map<String, Map<Integer, String>> config;
     private final int[] beltkeys;
     private Map<Integer, String> usercfg;
-    private final MenuGrid.Pagina[] custom;
+    private final GameUI.PaginaBeltSlot[] custom;
     private final int group;
     private final int start;
     private final int size;
@@ -35,7 +35,7 @@ public class ToolBelt extends DraggableWidget implements DTarget, DropTarget {
     private final IButton btnFlip;
     private boolean vertical = false, over = false, locked = false;
     final Tex[] keys;
-    private Indir<Resource> last = null;
+    private GameUI.BeltSlot last = null;
     private Tex ttip = null;
     
     
@@ -66,7 +66,7 @@ public class ToolBelt extends DraggableWidget implements DTarget, DropTarget {
 	this.beltkeys = beltkeys;
 	size = beltkeys.length;
 	keys = new Tex[size];
-	custom = new MenuGrid.Pagina[size];
+	custom = new GameUI.PaginaBeltSlot[size];
 	loadBelt();
 	for (int i = 0; i < size; i++) {
 	    if(beltkeys[i] != 0) {
@@ -97,7 +97,8 @@ public class ToolBelt extends DraggableWidget implements DTarget, DropTarget {
 	for (int i = 0; i < size; i++) {
 	    String res = usercfg.get(slot(i));
 	    if(res != null) {
-		custom[i] = ui.gui.menu.paginafor(Resource.local().load(res));
+		MenuGrid.Pagina p = ui.gui.menu.paginafor(Resource.local().load(res));
+		custom[i] = ui.gui.new PaginaBeltSlot(i, p);
 	    }
 	}
     }
@@ -144,9 +145,9 @@ public class ToolBelt extends DraggableWidget implements DTarget, DropTarget {
 	storeCfg();
     }
     
-    private Indir<Resource> belt(int slot) {
+    private GameUI.BeltSlot belt(int slot) {
 	if(slot < 0) {return null;}
-	Indir<Resource> res = custom[slot - start] != null ? custom[slot - start].res : null;
+	GameUI.BeltSlot res = custom[slot - start];
 	if(ui != null && ui.gui != null && ui.gui.belt[slot] != null) {
 	    res = ui.gui.belt[slot];
 	}
@@ -169,23 +170,25 @@ public class ToolBelt extends DraggableWidget implements DTarget, DropTarget {
     }
     
     private void setcustom(int slot, MenuGrid.Pagina p) {
-	if(p != custom[slot - start]) {
-	    custom[slot - start] = p;
+	GameUI.PaginaBeltSlot pslot = custom[slot - start];
+	if((pslot == null && p != null) || (pslot != null && pslot.pagina != p)) {
+	    custom[slot - start] = p != null ? ui.gui.new PaginaBeltSlot(slot, p) : null;
 	    usercfg.put(slot, p != null ? p.res().name : null);
 	    save();
+	}
+    }
+    
+    private MenuGrid.Pagina getcustom(GameUI.BeltSlot slot) {
+	if(slot instanceof GameUI.PaginaBeltSlot) {
+	    return ((GameUI.PaginaBeltSlot) slot).pagina;
+	} else {
+	    return null;
 	}
     }
     
     private MenuGrid.Pagina getcustom(Resource res) {
 	MenuGrid.Pagina p = ui.gui.menu.paginafor(res);
 	return (p != null && p.button() instanceof MenuGrid.CustomPagButton) ? p : null;
-    }
-    
-    private MenuGrid.Pagina getcustom(Indir<Resource> res) {
-	try {
-	    return res != null ? getcustom(res.get()) : null;
-	} catch (Loading ignored) {}
-	return null;
     }
     
     @Override
@@ -203,12 +206,9 @@ public class ToolBelt extends DraggableWidget implements DTarget, DropTarget {
 	    int slot = slot(i);
 	    g.image(invsq, c);
 	    try {
-		Indir<Resource> item = belt(slot);
+		GameUI.BeltSlot item = belt(slot);
 		if(item != null) {
-		    Resource.Image img = item.get().layer(Resource.imgc);
-		    if(img == null)
-			throw (new NullPointerException("No image in " + item.get().name));
-		    g.image(img.tex(), c.add(1, 1));
+		    item.spr().draw(g.reclip(c.add(1, 1), invsq.sz().sub(2, 2)));
 		}
 	    } catch (Loading ignored) {}
 	    if(keys[i] != null) {
@@ -262,7 +262,7 @@ public class ToolBelt extends DraggableWidget implements DTarget, DropTarget {
 	int slot = beltslot(c);
 	if(slot != -1) {
 	    if(button == 1) {
-		MenuGrid.Pagina pagina = getcustom(belt(slot));
+		MenuGrid.Pagina pagina = getcustom(belt(slot)); //FIXME: re-implement custom actions
 		if(pagina != null) {
 		    pagina.button().use();
 		} else {
@@ -287,17 +287,17 @@ public class ToolBelt extends DraggableWidget implements DTarget, DropTarget {
     public Object tooltip(Coord c, Widget prev) {
 	int slot = beltslot(c);
 	if(slot < 0) {return super.tooltip(c, prev);}
-	Indir<Resource> res = belt(slot);
-	if(res == null) {return super.tooltip(c, prev);}
-	if(last != res) {
+	GameUI.BeltSlot item = belt(slot);
+	if(item == null) {return super.tooltip(c, prev);}
+	if(last != item) {
 	    if(ttip != null) {ttip.dispose();}
 	    ttip = null;
 	    try {
-		MenuGrid.Pagina p = ui.gui.menu.paginafor(res.get());
+		MenuGrid.Pagina p = ui.gui.menu.paginafor(item.res);
 		if(p != null) {
 		    ttip = ItemData.longtip(p, ui.sess);
 		}
-		last = res;
+		last = item;
 	    } catch (Loading ignored) {}
 	}
 	return ttip;
