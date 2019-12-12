@@ -28,6 +28,7 @@ package haven;
 
 import haven.Resource.AButton;
 
+import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.font.TextAttribute;
@@ -76,7 +77,7 @@ public class MenuGrid extends Widget implements KeyBinding.Bindable {
 	    char hk = res.layer(Resource.action).hk;
 	    if(hk == 0)
 		return(KeyMatch.nil);
-	    return(KeyMatch.forchar(Character.toUpperCase(hk), 0));
+	    return KeyMatch.forcode(KeyStroke.getKeyStroke(hk, 0).getKeyCode(), 0);
 	}
 	public KeyBinding binding() {
 	    return(KeyBinding.get("scm/" + res.name, hotkey()));
