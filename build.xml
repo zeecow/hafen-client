@@ -47,6 +47,17 @@
     <copy todir="build/classes/haven" file="etc/font.ttf" />
   </target>
   
+  <target name="client-res-java" depends="hafen-client">
+    <mkdir dir="resources/classes" />
+    <javac srcdir="resources/java" destdir="resources/classes" debug="on" source="1.8" target="1.8" includeantruntime="no">
+      <classpath>
+        <pathelement path="build/hafen.jar" />
+      </classpath>
+      <compilerarg value="-Xlint:unchecked" />
+      <compilerarg value="-Xlint:-options" />
+    </javac>
+  </target>
+  
   <target name="appletview" depends="build-env">
     <copy file="etc/applet.html" todir="build" />
   </target>
@@ -64,7 +75,7 @@
     </unjar>
   </target>
 
-  <target name="resources">
+  <target name="resources" depends="client-res-java">
     <exec executable="java" failifexecutionfails="false">
       <arg line="-jar resources/LayerUtil.jar -re resources/src resources/compiled/res" />
     </exec>
