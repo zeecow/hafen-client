@@ -153,22 +153,16 @@ public class Config {
 	boolean exists = file.exists();
 	if(!exists){
 	    try {
-		//noinspection ResultOfMethodCallIgnored
 		String parent = file.getParent();
+		//noinspection ResultOfMethodCallIgnored
 		new File(parent).mkdirs();
 		exists = file.createNewFile();
 	    } catch (IOException ignored) {}
 	}
 	if(exists && file.canWrite()){
-	    PrintWriter out = null;
-	    try {
-		out = new PrintWriter(file);
+	    try (PrintWriter out = new PrintWriter(file)) {
 		out.print(data);
 	    } catch (FileNotFoundException ignored) {
-	    } finally {
-		if (out != null) {
-		    out.close();
-		}
 	    }
 	}
     }

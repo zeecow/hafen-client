@@ -17,7 +17,6 @@ public class CharterBook extends Window {
     private static Map<String, List<String>> config;
     private static List<String> names;
     private static Gson gson;
-    private TextEntry text;
     
     public CharterBook(Coord sz, String cap, boolean lg, Coord tlo, Coord rbo) {
 	super(sz, cap, lg, tlo, rbo);
@@ -67,19 +66,17 @@ public class CharterBook extends Window {
 	}
     }
     
-    private void onCharterSelected(@SuppressWarnings("unused") int index, String charter) {
-	text.settext(charter);
-	text.buf.key('\0', KeyEvent.VK_END, 0); //move caret to the end
-	setfocus(text);
-    }
-    
     @Override
     public <T extends Widget> T add(T child) {
 	if(child instanceof TextEntry) {
-	    text = (TextEntry) child;
+	    final TextEntry text = (TextEntry) child;
 	    add(new DropboxOfStrings(child.sz.x + 15, 5, child.sz.y), child.c)
 		.setData(names)
-		.setChangedCallback(this::onCharterSelected);
+		.setChangedCallback((index, charter) -> {
+		    text.settext(charter);
+		    text.buf.key('\0', KeyEvent.VK_END, 0); //move caret to the end
+		    setfocus(text);
+		});
 	    add(new Button(50, "GO", false, text::activate), child.c.add(child.sz.x + 20, 0));
 	}
 	return super.add(child);
