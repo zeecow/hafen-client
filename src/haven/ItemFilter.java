@@ -470,8 +470,8 @@ public class ItemFilter {
 		FoodInfo fep = (FoodInfo) item;
 		if(text != null && text.length() >= 3) {
 		    for (FoodInfo.Event event : fep.evs) {
-			if(event.ev.nm.toLowerCase().startsWith(text)) {
-			    return test(event.a);
+			if(event.ev.nm.toLowerCase().startsWith(text) && test(event.a)) {
+			    return true;
 			}
 		    }
 		} else {
