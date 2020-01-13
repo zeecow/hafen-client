@@ -441,7 +441,7 @@ public abstract class ItemInfo {
     }
 
     public static Pair<Integer, Integer> getWear(List<ItemInfo> infos) {
-	infos = findall("Wear", infos);
+	infos = findall("haven.res.ui.tt.wear.Wear", infos);
 	for (ItemInfo info : infos) {
 	    if(Reflect.hasField(info, "m") && Reflect.hasField(info, "d")){
 		return new Pair<>(Reflect.getFieldValueInt(info, "d"), Reflect.getFieldValueInt(info, "m"));
@@ -451,9 +451,7 @@ public abstract class ItemInfo {
     }
 
     public static Pair<Integer, Integer> getArmor(List<ItemInfo> infos) {
-	//loftar is wonderful sunshine and has same class name for wear and armor tooltips even though
-	//they are different classes with different fields :)
-	infos = findall("Wear", infos);
+	infos = findall("Armor", infos);
 	for (ItemInfo info : infos) {
 	    if(Reflect.hasField(info, "hard") && Reflect.hasField(info, "soft")){
 		return new Pair<>(Reflect.getFieldValueInt(info, "hard"), Reflect.getFieldValueInt(info, "soft"));
