@@ -1,3 +1,7 @@
+$size[14]{$u{Update for 26.02.20:}
+  * fixed actions in menuGrid having wrong keybinds if it is set to a lowercase character in resource file
+  * merged loftar's latest changes
+ 
 $size[14]{$u{Update for 10.02.20:}
   * fixed two console input fields showing after pressing :
  
