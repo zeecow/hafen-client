@@ -56,11 +56,11 @@ public class AnimalFarm {
     }
     
     enum AnimalType {
-	CATTLE(new String[]{"Bull", "Cow"}, Shoo, Slaughter),
-	HORSE(new String[]{"Stallion", "Mare"}, Shoo, Slaughter, Ride),
-	SHEEP(new String[]{"Ram", "Ewe"}, Shoo, Slaughter, Shear),
-	PIG(new String[]{"Hog", "Sow"}, Shoo, Slaughter),
-	GOAT(new String[]{"Billy", "Nanny"}, Shoo, Slaughter);
+	CATTLE(new String[]{"Bull", "Cow"}, Highlight, Shoo, Slaughter),
+	HORSE(new String[]{"Stallion", "Mare"}, Highlight, Shoo, Slaughter, Ride),
+	SHEEP(new String[]{"Ram", "Ewe"}, Highlight, Shoo, Slaughter, Shear),
+	PIG(new String[]{"Hog", "Sow"}, Highlight, Shoo, Slaughter),
+	GOAT(new String[]{"Billy", "Nanny"}, Highlight, Shoo, Slaughter);
 	
 	private final Set<String> names;
 	private final List<AnimalActions> buttons;
@@ -79,6 +79,11 @@ public class AnimalFarm {
     }
     
     enum AnimalActions {
+	Highlight("Show", (gui, id) -> () -> {
+	    gui.ui.sess.glob.oc.stream()
+		.filter(gob -> gob.id == id)
+		.forEach(Gob::highlight);
+	}),
 	Shoo("Shoo", flower("Shoo")),
 	Slaughter("Kill", flower("Slaughter")),
 	Shear("Shear", flower("Shear wool")),
