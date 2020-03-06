@@ -14,6 +14,9 @@ import java.util.stream.Stream;
 import static me.ender.AnimalFarm.AnimalActions.*;
 
 public class AnimalFarm {
+    private static final int BTN_W = 50;
+    private static final int PAD = 3;
+    public static final int BUTTONS_ON_LINE = 4;
     
     public static final Comparator<Widget> POSITIONAL_COMPARATOR = Comparator.comparingInt((Widget o) -> o.c.y).thenComparingInt(o -> o.c.x);
     
@@ -23,18 +26,26 @@ public class AnimalFarm {
 	if(type != null && avatars.size() == 1) {
 	    Avaview ava = avatars.iterator().next();
 	    TextEntry edit = wnd.children(TextEntry.class).stream().findFirst().orElse(null);
-	    Coord c = new Coord(0, 0);
-	    if(edit != null) {
-		c.x = edit.c.x;
-		c.y = edit.c.y + edit.sz.y + 3;
-	    }
-	    
-	    for (AnimalActions action : type.buttons) {
-		c.x += wnd.add(new Button(50, action.name, action.make(wnd.ui.gui, ava.avagob)), c.x, c.y).sz.x + 3;
-	    }
-	    
 	    List<Label> labels = new ArrayList<>(wnd.children(Label.class));
 	    labels.sort(POSITIONAL_COMPARATOR);
+	    
+	    if(edit != null) {
+		labels.get(0).c.y -= 10;
+		edit.c.y -= 12;
+		edit.sz.x = BUTTONS_ON_LINE * BTN_W + (BUTTONS_ON_LINE - 1) * PAD;
+		Coord c = new Coord(edit.c.x, edit.c.y + edit.sz.y + PAD);
+		
+		for (AnimalActions action : type.buttons) {
+		    Button btn = wnd.add(new Button(BTN_W, action.name, action.make(wnd.ui.gui, ava.avagob)), c.x, c.y);
+		    c.x += btn.sz.x + PAD;
+		    if(c.x > edit.c.x + edit.sz.x) {
+			c.x = edit.c.x;
+			c.y += btn.sz.y + PAD;
+		    }
+		}
+		wnd.pack();
+	    }
+	    
 	    int i = 0;
 	    while (i < labels.size()) {
 		Label label = labels.get(i);
