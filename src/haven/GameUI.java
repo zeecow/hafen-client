@@ -56,7 +56,7 @@ public class GameUI extends ConsoleHost implements Console.Directory {
     private List<Widget> cmeters = new LinkedList<Widget>();
     private Text lastmsg;
     private double msgtime;
-    private Window invwnd, equwnd;
+    private Window invwnd, equwnd, srchwnd;
     private CraftWindow makewnd;
     public Inventory maininv;
     public Equipory equipory;
@@ -171,6 +171,7 @@ public class GameUI extends ConsoleHost implements Console.Directory {
     }
     
     private final Coord minimapc;
+    private final Coord menugridc;
     public GameUI(String chrid, long plid, String genus) {
 	this.chrid = chrid;
 	this.plid = plid;
@@ -202,9 +203,13 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 	blpanel.add(new Img(Resource.loadtex("gfx/hud/blframe")), 0, lbtnbg.sz().y - 33);
 	blpanel.add(new Img(lbtnbg), 0, 0);
 	minimapc = new Coord(4, 34 + (lbtnbg.sz().y - 33));
-	brpanel.add(new Img(Resource.loadtex("gfx/hud/brframe")), 0, 0);
+	Tex rbtnbg = Resource.loadtex("gfx/hud/csearch-bg");
+	Img brframe = brpanel.add(new Img(Resource.loadtex("gfx/hud/brframe")), rbtnbg.sz().x - 22, 0);
+	menugridc = brframe.c.add(20, 34);
+	Img rbtnimg = brpanel.add(new Img(rbtnbg), 0, brpanel.sz.y - rbtnbg.sz().y);
 	menupanel.add(new MainMenu(), 0, 0);
 	mapbuttons();
+	menubuttons(rbtnimg);
 	foldbuttons();
 	portrait = ulpanel.add(new Avaview(Avaview.dasz, plid, "avacam") {
 		public boolean mousedown(Coord c, int button) {
@@ -277,6 +282,25 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 	closeWindow(craftlist); craftlist = null;
 	closeWindow(buildlist); buildlist = null;
 	closeWindow(studywnd); studywnd = null;
+    }
+
+    public static final KeyBinding kb_srch = KeyBinding.get("scm-srch", KeyMatch.forchar('Z', KeyMatch.C));
+    private void menubuttons(Widget bg) {
+	brpanel.add(new MenuButton("csearch", kb_srch, "Search actions...") {
+		public void click() {
+		    if(srchwnd == null) {
+			srchwnd = new MenuSearch(menu);
+			fitwdg(GameUI.this.add(srchwnd, Utils.getprefc("wndc-srch", new Coord(200, 200))));
+		    } else {
+			if(!srchwnd.hasfocus) {
+			    this.setfocus(srchwnd);
+			} else {
+			    ui.destroy(srchwnd);
+			    srchwnd = null;
+			}
+		    }
+		}
+	    }, bg.c);
     }
 
     /* Ice cream */
@@ -874,7 +898,7 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 	    }
 	    placemmap();
 	} else if(place == "menu") {
-	    menu = (MenuGrid)brpanel.add(child, 20, 34);
+	    menu = (MenuGrid)brpanel.add(child, menugridc);
 	    createToolBelts();
 	} else if(place == "fight") {
 	    fv = urpanel.add((Fightview)child, 0, 0);
@@ -1172,6 +1196,10 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 	} else if((sender == help) && (msg == "close")) {
 	    ui.destroy(help);
 	    help = null;
+	    return;
+	} else if((sender == srchwnd) && (msg == "close")) {
+	    ui.destroy(srchwnd);
+	    srchwnd = null;
 	    return;
 	}
 	super.wdgmsg(sender, msg, args);
