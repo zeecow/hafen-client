@@ -1,3 +1,6 @@
+$size[14]{$u{Update for 12.03.20:}
+  * merged latest changes from loftar
+ 
 $size[14]{$u{Update for 06.03.20:}
   * added 'Show' option to inspect animal window
  
