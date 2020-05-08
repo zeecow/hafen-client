@@ -428,7 +428,7 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 	    craftlist.addtwdg(craftlist.add(new IButton("gfx/hud/btn-help", "","-d","-h"){
 		@Override
 		public void click() {
-		    ItemFilter.showHelp(ui, HELP_SIMPLE, HELP_CURIO, HELP_FEP, HELP_ARMOR, HELP_SYMBEL, HELP_ATTR);
+		    ItemFilter.showHelp(ui, HELP_SIMPLE, HELP_CURIO, HELP_FEP, HELP_ARMOR, HELP_SYMBEL, HELP_ATTR, HELP_INPUTS);
 		}
 	    }));
 	} else if(craftlist.visible) {
@@ -441,6 +441,12 @@ public class GameUI extends ConsoleHost implements Console.Directory {
     public void toggleBuildList() {
 	if(buildlist == null){
 	    buildlist = add(new ActWindow("Build...", "paginae/bld/.+"));
+	    buildlist.addtwdg(buildlist.add(new IButton("gfx/hud/btn-help", "","-d","-h"){
+		@Override
+		public void click() {
+		    ItemFilter.showHelp(ui, HELP_SIMPLE, HELP_INPUTS);
+		}
+	    }));
 	} else if(buildlist.visible) {
 	    buildlist.hide();
 	} else {
@@ -889,8 +895,15 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 	    }
 	    mmap = blpanel.add(new LocalMiniMap2(new Coord(133, 133), map), minimapc);
 	    mmap.lower();
-	    if(ResCache.global != null) {
-		MapFile file = MapFile.load(ResCache.global, mapfilename());
+	    ResCache mapstore = ResCache.global;
+	    if(Config.mapbase != null) {
+		try {
+		    mapstore = HashDirCache.get(Config.mapbase.toURI());
+		} catch(java.net.URISyntaxException e) {
+		}
+	    }
+	    if(mapstore != null) {
+		MapFile file = MapFile.load(mapstore, mapfilename());
 		mmap.save(file);
 		mapfile = new MapWnd2(mmap.save, map, Utils.getprefc("wndsz-map", new Coord(700, 500)), "Map");
 		mapfile.hide();

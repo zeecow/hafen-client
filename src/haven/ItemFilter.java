@@ -103,7 +103,15 @@ public class ItemFilter {
 	"$font[monospaced,13]{  attr:str>2    }will find items granting more than 2 str bonus.\n" +
 	"$font[monospaced,13]{  attr:agi<0    }will find items giving agility penalty.\n";
     
-    public static final String[] FILTER_HELP = {HELP_SIMPLE, HELP_FULL_TEXT, HELP_CONTENT, HELP_QUALITY, HELP_CURIO, HELP_FEP, HELP_ARMOR, HELP_SYMBEL, HELP_ATTR};
+    public static final String HELP_INPUTS = "$size[20]{$b{Crafting inputs search}}\n" +
+	"$font[monospaced,16]{use:[what][sign][value]}\n" +
+	"Will highlight items that have $font[monospaced,13]{[what]} items in its crafting inputs in amount described by $font[monospaced,13]{[sign]} and $font[monospaced,13]{[value]}.\n" +
+	"$font[monospaced,13]{[what]} can be entered partially, but note that all meat has name Meat, regardless of type - limitation of data from server.\n" +
+	"$size[16]{\nExamples:}\n" +
+	"$font[monospaced,13]{  use:snow   }will find all items that require snow to craft.\n" +
+	"$font[monospaced,13]{  use:iron>2 }will find items that require more that 2 iron bars/ingots to craft.\n";
+    
+    public static final String[] FILTER_HELP = {HELP_SIMPLE, HELP_FULL_TEXT, HELP_CONTENT, HELP_QUALITY, HELP_CURIO, HELP_FEP, HELP_ARMOR, HELP_SYMBEL, HELP_ATTR, HELP_INPUTS};
     
     public boolean matches(List<ItemInfo> info) {
 	for (ItemInfo item : info) {
@@ -204,6 +212,10 @@ public class ItemFilter {
 			break;
 		    case "attr":
 			filter = new Attribute(text, sign, value, opt);
+			break;
+		    case "use":
+		    case "uses":
+			filter = new Inputs(text, sign, value, opt);
 			break;
 		}
 	    }
@@ -593,6 +605,27 @@ public class ItemFilter {
 		for (Resource res : bonuses.keySet()) {
 		    if(res.layer(Resource.tooltip).t.toLowerCase().startsWith(text)) {
 			return test(bonuses.get(res));
+		    }
+		}
+	    }
+	    return false;
+	}
+    }
+    
+    private static class Inputs extends Complex {
+	
+	public Inputs(String text, String sign, String value, String opts) {
+	    super(text, sign, value, opts);
+	}
+	
+	@Override
+	public boolean matches(List<ItemInfo> info) {
+	    List<Pair<Resource, Integer>> inputs = ItemInfo.getInputs(info);
+	    if(text != null && text.length() >= 3) {
+		for (Pair<Resource, Integer> input : inputs) {
+		    Resource res = input.a;
+		    if(res.layer(Resource.tooltip).t.toLowerCase().contains(text)) {
+			return test(input.b);
 		    }
 		}
 	    }
