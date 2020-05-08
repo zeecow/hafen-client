@@ -77,6 +77,16 @@ public class HashDirCache implements ResCache {
 	this.idhash = namehash(0, id.toString());
     }
 
+    private static final Map<URI, HashDirCache> current = new CacheMap<>();
+    public static HashDirCache get(URI id) {
+	synchronized(current) {
+	    HashDirCache ret = current.get(id);
+	    if(ret == null)
+		current.put(id, ret = new HashDirCache(id));
+	    return(ret);
+	}
+    }
+
     private static URI mkurn(String id) {
 	try {
 	    return(new URI("urn:haven-cache:" + id));
@@ -91,6 +101,10 @@ public class HashDirCache implements ResCache {
     
     public HashDirCache(String id) {
 	this(mkurn(id), "data");
+    }
+    
+    public static HashDirCache get(String id) {
+	return(get(mkurn(id)));
     }
 
     private long namehash(long h, String name) {
@@ -318,7 +332,7 @@ public class HashDirCache implements ResCache {
 	    javax.jnlp.BasicService basic = (javax.jnlp.BasicService)javax.jnlp.ServiceManager.lookup("javax.jnlp.BasicService");
 	    if(basic == null)
 		return(null);
-	    return(new HashDirCache(basic.getCodeBase().toURI()));
+	    return(get(basic.getCodeBase().toURI()));
 	} catch(NoClassDefFoundError e) {
 	    return(null);
 	} catch(Exception e) {
@@ -332,10 +346,10 @@ public class HashDirCache implements ResCache {
 	    if((ret = forjnlp()) != null)
 		return(ret);
 	    if(Config.cachebase != null)
-		return(new HashDirCache(Config.cachebase.toURI()));
+		return(get(Config.cachebase.toURI()));
 	    if(Config.resurl != null)
-		return(new HashDirCache(Config.resurl.toURI()));
-	    return(new HashDirCache("default"));
+		return(get(Config.resurl.toURI()));
+	    return(get("default"));
 	} catch(Exception e) {
 	    return(null);
 	}
@@ -348,9 +362,9 @@ public class HashDirCache implements ResCache {
 	}
 	HashDirCache cache;
 	if(args[0].indexOf(':') >= 0)
-	    cache = new HashDirCache(URI.create(args[0]));
+	    cache = get(URI.create(args[0]));
 	else
-	    cache = new HashDirCache(args[0]);
+	    cache = get(args[0]);
 	switch(args[1]) {
 	case "ls":
 	    for(Iterator<String> i = cache.list(); i.hasNext();) {
