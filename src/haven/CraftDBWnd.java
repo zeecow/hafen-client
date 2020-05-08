@@ -163,7 +163,7 @@ public class CraftDBWnd extends Window implements DTarget2 {
 	addtwdg(add(new IButton("gfx/hud/btn-help", "","-d","-h"){
 	    @Override
 	    public void click() {
-		ItemFilter.showHelp(ui, HELP_SIMPLE, HELP_CURIO, HELP_FEP, HELP_ARMOR, HELP_SYMBEL, HELP_ATTR);
+		ItemFilter.showHelp(ui, HELP_SIMPLE, HELP_CURIO, HELP_FEP, HELP_ARMOR, HELP_SYMBEL, HELP_ATTR, HELP_INPUTS);
 	    }
 	}));
 	btnFavourite = add(new ToggleButton(

@@ -485,6 +485,26 @@ public abstract class ItemInfo {
 	}
 	return bonuses;
     }
+    
+    public static List<Pair<Resource, Integer>> getInputs(List<ItemInfo> infos) {
+	List<ItemInfo> inputInfos = ItemInfo.findall("Inputs", infos);
+	List<Pair<Resource, Integer>> result = new LinkedList<>();
+	try {
+	    for (ItemInfo info : inputInfos) {
+		Object[] inputs = (Object[]) Reflect.getFieldValue(info, "inputs");
+		for (Object input : inputs) {
+		    int num = Reflect.getFieldValueInt(input, "num");
+		    Object spec = Reflect.getFieldValue(input, "spec");
+		    ResData resd = (ResData) Reflect.getFieldValue(spec, "res");
+		    Resource r = resd.res.get();
+		    Resource.Tooltip tt = r.layer(Resource.tooltip);
+		    System.out.println(String.format("%s x %d", (tt != null) ? tt.t : r.name, num));
+		    result.add(new Pair<>(r, num));
+		}
+	    }
+	} catch (Exception ignored) {}
+	return result;
+    }
 
 
     @SuppressWarnings("unchecked")
