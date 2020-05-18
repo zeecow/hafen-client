@@ -25,7 +25,7 @@ public enum Action {
     TOGGLE_GOB_INFO(gui -> CFG.DISPLAY_GOB_INFO.set(!CFG.DISPLAY_GOB_INFO.get(), true), "Display info", "Display crop/tree growth and object health overlay."),
     TOGGLE_GOB_HITBOX(gui -> CFG.DISPLAY_GOB_HITBOX.set(!CFG.DISPLAY_GOB_HITBOX.get(), true), "Display hitboxes"),
     TOGGLE_GOB_RADIUS(gui -> CFG.SHOW_GOB_RADIUS.set(!CFG.SHOW_GOB_RADIUS.get(), true), "Display radius", "Displays effective radius of beehives/mine supports etc."),
-    TOGGLE_TILE_GRID(gui -> gui.map.togglegrid(), "Show tile grid"),
+//    TOGGLE_TILE_GRID(gui -> gui.map.togglegrid(), "Show tile grid"),
     TOGGLE_TILE_CENTERING(gui ->
     {
 	Config.center_tile = !Config.center_tile;

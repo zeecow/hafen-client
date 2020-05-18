@@ -2,7 +2,7 @@
   <configuration default="false" name="hafen" type="JarApplication">
     <option name="JAR_PATH" value="$PROJECT_DIR$/build/hafen.jar" />
     <option name="VM_PARAMETERS" value="-Xms512m -Xmx1024m" />
-    <option name="PROGRAM_PARAMETERS" value="-U http://game.havenandhearth.com/hres/ game.havenandhearth.com" />
+    <option name="PROGRAM_PARAMETERS" value="-U https://game.havenandhearth.com/res/ game.havenandhearth.com" />
     <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/build" />
     <option name="ALTERNATIVE_JRE_PATH" />
     <RunnerSettings RunnerId="Basic" />

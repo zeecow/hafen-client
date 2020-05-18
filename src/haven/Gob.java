@@ -46,7 +46,6 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner {
     private final Collection<ResAttr.Cell<?>> rdata = new LinkedList<ResAttr.Cell<?>>();
     private final Collection<ResAttr.Load> lrdata = new LinkedList<ResAttr.Load>();
     private final Object removalLock = new Object();
-    private GobPath path;
     private Hitbox hitbox = null;
     private GeneralGobInfo gobInfo = null;
     private GobDamageInfo damage;
@@ -208,6 +207,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner {
 	if(GobDamageInfo.has(this)) {
 	    damage = new GobDamageInfo(this);
 	}
+	setattr(new GeneralGobInfo(this));
     }
 
     public Gob(Glob glob, Coord2d c) {
@@ -223,7 +223,6 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner {
 	    if(ol.slots == null) {
 		try {
 		    ol.init();
-		    overlayAdded(ol);
 		} catch(Loading e) {}
 	    } else {
 		boolean done = ol.spr.tick(dt);
@@ -253,6 +252,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner {
 	    ol.init();
 	ol.add0();
 	ols.add(ol);
+	overlayAdded(ol);
     }
     public void addol(Overlay ol) {
 	addol(ol, true);
@@ -272,27 +272,36 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner {
 	return(null);
     }
 
-    
     private void overlayAdded(Overlay item) {
 	try {
-	    Resource res = item.res.get();
-	    if(res.name.equals("gfx/fx/floatimg")){
-		processDmg(new MessageBuf(item.sdt));
+	    Indir<Resource> indir = item.res;
+	    if(indir != null) {
+		Resource res = indir.get();
+		System.out.println(String.format("overlayAdded res: %s", res != null ? res.name : "<null>"));
+		if(res != null && res.name.equals("gfx/fx/floatimg")) {
+		    processDmg(item.sdt.clone());
+		}
+	    } else {
+		System.out.println(String.format("overlayAdded no resource?? %s", item.getClass().getName()));
 	    }
 	} catch (Loading ignored) {}
     }
     
     private void processDmg(MessageBuf msg) {
 	try {
+	    msg.rewind();
 	    int v = msg.int32();
 	    msg.uint8();
 	    int c = msg.uint16();
+	    System.out.println(String.format("processDmg v: %d, c: %d", v, c));
 	    
 	    if(damage == null) {
 		damage = new GobDamageInfo(this);
 	    }
 	    damage.update(c, v);
-	} catch (Exception ignored) {}
+	} catch (Exception ignored) {
+	    ignored.printStackTrace();
+	}
     }
     
     public void clearDmg() {
@@ -339,10 +348,6 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner {
 	    if(rd.attr != null)
 		rd.attr.dispose();
     	}
-	if(path != null){
-	    path.dispose();
-	    path = null;
-	}
 	if(hitbox != null){
 	    hitbox.dispose();
 	    hitbox = null;
@@ -665,10 +670,6 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner {
 	    rl.add(gobInfo, null);
 	}
 
-	if(path != null && CFG.SHOW_GOB_PATH.get()) {
-	    rl.add(path, null);
-	}
-
 	return (false);
     }
 
@@ -966,7 +967,6 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner {
     public void highlight() {
 	delattr(GobHighlight.class);
 	setattr(new GobHighlight(this));
-	glob.oc.changed(this);
     }
     public final Placed placed = new Placed();
 }

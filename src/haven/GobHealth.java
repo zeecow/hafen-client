@@ -26,7 +26,9 @@
 
 package haven;
 
-import java.awt.Color;
+import java.awt.*;
+import java.awt.image.BufferedImage;
+
 import haven.render.*;
 
 public class GobHealth extends GAttrib implements Gob.SetupMod {

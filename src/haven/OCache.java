@@ -88,8 +88,9 @@ public class OCache implements Iterable<Gob> {
 		cbs = new ArrayList<>(this.cbs);
 		objs.put(ob.id, ob);
 	    }
-	    for(ChangeCallback cb : cbs)
+	    for(ChangeCallback cb : cbs) {
 		cb.added(ob);
+	    }
 	}
     }
 

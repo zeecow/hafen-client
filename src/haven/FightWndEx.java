@@ -206,7 +206,7 @@ public class FightWndEx extends Widget {
 
 	protected void drawitem(GOut g, Action act, int idx) {
 	    g.chcolor((idx % 2 == 0) ? CharWnd.every : CharWnd.other);
-	    g.frect(Coord.z, g.sz);
+	    g.frect(Coord.z, g.sz());
 	    g.chcolor();
 	    try {
 		if(act.ri == null)
@@ -619,7 +619,7 @@ public class FightWndEx extends Widget {
 		if(hasfocus && (((System.currentTimeMillis() - focusstart) % 1000) < 500)) {
 		    int cx = redit.advance(nmed.point);
 		    g.chcolor(255, 255, 255, 255);
-		    Coord co = new Coord(3 + cx + 1, (g.sz.y - redit.sz().y) / 2);
+		    Coord co = new Coord(3 + cx + 1, (g.sz().y - redit.sz().y) / 2);
 		    g.line(co, co.add(0, redit.sz().y), 1);
 		    g.chcolor();
 		}

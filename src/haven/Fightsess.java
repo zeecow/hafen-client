@@ -29,8 +29,9 @@ package haven;
 import haven.rx.Reactor;
 
 import haven.render.*;
+
+import java.awt.*;
 import java.util.*;
-import java.awt.Color;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;

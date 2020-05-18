@@ -1,21 +1,25 @@
 package haven;
 
-import javax.media.opengl.GL2;
+import haven.render.BaseColor;
+import haven.render.RenderTree;
+import haven.render.State;
+
 import java.awt.*;
 import java.nio.FloatBuffer;
 import java.util.Collection;
 
-public class Hitbox extends Sprite {
+import static haven.Sprite.*;
+
+public class Hitbox extends GAttrib implements RenderTree.Node {
     FloatBuffer buff;
     Pair<Coord, Coord> hitbox;
-    private GLState SOLID = new States.ColState(new Color(180, 134, 255, 200));
-    private GLState PASSABLE = new States.ColState(new Color(105, 207, 124, 200));
+    private final State SOLID = new BaseColor(new Color(180, 134, 255, 200));
+    private final State PASSABLE = new BaseColor(new Color(105, 207, 124, 200));
     private boolean passable = false;
-
+    
     protected Hitbox(Gob gob) {
-	super(gob, null);
-
-
+	super(gob);
+	
 	hitbox = getBounds(gob);
 	if(hitbox != null) {
 	    Coord a = hitbox.a;
@@ -29,31 +33,29 @@ public class Hitbox extends Sprite {
 	}
     }
 
-    @Override
-    public boolean setup(RenderList rl) {
-	if(hitbox == null) {
-	    return false;
-	}
-	passable = passable();
-	rl.prepo(passable ? PASSABLE : SOLID);
-	rl.prepo(States.xray);
-	return true;
-    }
+//    public boolean setup(RenderList rl) {
+//	if(hitbox == null) {
+//	    return false;
+//	}
+//	passable = passable();
+//	rl.prepo(passable ? PASSABLE : SOLID);
+//	rl.prepo(States.xray);
+//	return true;
+//    }
 
-    public void draw(GOut g) {
-	buff.rewind();
-	g.apply();
-	BGL gl = g.gl;
-	gl.glLineWidth(passable ? 1 : 2);
-	gl.glEnableClientState(GL2.GL_VERTEX_ARRAY);
-	gl.glVertexPointer(3, GL2.GL_FLOAT, 0, buff);
-	gl.glDrawArrays(GL2.GL_LINE_LOOP, 0, 4);
-	gl.glDisableClientState(GL2.GL_VERTEX_ARRAY);
-    }
+//    public void draw(GOut g) {
+//	buff.rewind();
+//	g.apply();
+//	BGL gl = g.gl;
+//	gl.glLineWidth(passable ? 1 : 2);
+//	gl.glEnableClientState(GL2.GL_VERTEX_ARRAY);
+//	gl.glVertexPointer(3, GL2.GL_FLOAT, 0, buff);
+//	gl.glDrawArrays(GL2.GL_LINE_LOOP, 0, 4);
+//	gl.glDisableClientState(GL2.GL_VERTEX_ARRAY);
+//    }
 
     private boolean passable() {
 	try {
-	    Gob gob = (Gob) owner;
 	    Resource res = gob.getres();
 	    String name = res.name;
 

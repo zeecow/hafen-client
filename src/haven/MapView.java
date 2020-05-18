@@ -30,27 +30,17 @@ import static haven.MCache.tilesz;
 import static haven.OCache.posres;
 
 import auto.Bot;
-import haven.GLProgram.VarID;
-import me.kt.GridOutline;
 
-import javax.media.opengl.GL;
-import java.awt.*;
 import java.awt.Color;
 import java.awt.event.KeyEvent;
-import java.lang.ref.Reference;
-import java.lang.ref.WeakReference;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.function.*;
-import java.lang.ref.*;
-import java.lang.reflect.*;
+
 import haven.render.*;
 import haven.render.sl.Uniform;
 import haven.render.sl.Type;
-import java.util.List;
-
-import static haven.MCache.*;
 
 public class MapView extends PView implements DTarget, Console.Directory {
     public static boolean clickdb = false;
@@ -72,7 +62,6 @@ public class MapView extends PView implements DTarget, Console.Directory {
     private long mapupdate = 0;
 
     private boolean showgrid;
-    private GridOutline gridol;
 
     public interface Delayed {
 	public void run(GOut g);
@@ -1485,7 +1474,6 @@ public class MapView extends PView implements DTarget, Console.Directory {
 	    
 	    if(mapupdate != glob.map.lastupdate) {
 		mapupdate = glob.map.lastupdate;
-		updategrid();
 	    }
 	    
 	} catch(Loading e) {
@@ -1811,7 +1799,8 @@ public class MapView extends PView implements DTarget, Console.Directory {
 	    
 	    if(inf != null) {
 		args = Utils.extend(args, inf.clickargs());
-		Gob gob = inf.gob();
+		//TODO: gob click detection
+		Gob gob = null;//inf.gob();
 		if(gob != null) {
 		    if(clickb == 3) {FlowerMenu.lastGob(gob);}
 		    if(ui.modmeta && clickb == 1) {

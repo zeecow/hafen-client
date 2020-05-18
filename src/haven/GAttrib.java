@@ -31,11 +31,14 @@ import haven.render.*;
 
 public abstract class GAttrib {
     public final Gob gob;
-	
+    
     public GAttrib(Gob gob) {
 	this.gob = gob;
     }
-	
+    
+    public void tick() {
+    }
+    
     public void ctick(double dt) {
     }
     

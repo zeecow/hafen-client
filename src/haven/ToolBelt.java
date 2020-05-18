@@ -241,17 +241,17 @@ public class ToolBelt extends DraggableWidget implements DTarget, DropTarget {
 	if(map != null) {
 	    Coord mvc = map.rootxlate(ui.mc);
 	    if(mvc.isect(Coord.z, map.sz)) {
-		map.delay(map.new Hittest(mvc) {
-		    protected void hit(Coord pc, Coord2d mc, MapView.ClickInfo inf) {
+		map.new Hittest(mvc) {
+		    protected void hit(Coord pc, Coord2d mc, ClickData inf) {
 			Object[] args = {slot, 1, ui.modflags(), mc.floor(OCache.posres)};
-			if(inf != null) { args = Utils.extend(args, MapView.gobclickargs(inf));}
+			if(inf != null) { args = Utils.extend(args, inf.clickargs());}
 			ui.gui.wdgmsg("belt", args);
 		    }
 		    
 		    protected void nohit(Coord pc) {
 			ui.gui.wdgmsg("belt", slot, 1, ui.modflags());
 		    }
-		});
+		}.run();
 	    }
 	}
     }

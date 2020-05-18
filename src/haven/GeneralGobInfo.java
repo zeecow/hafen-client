@@ -11,6 +11,11 @@ public class GeneralGobInfo extends GobInfo {
     protected GeneralGobInfo(Gob owner) {
 	super(owner);
     }
+    
+    @Override
+    protected boolean enabled() {
+	return CFG.DISPLAY_GOB_INFO.get();
+    }
 
     @Override
     protected Tex render() {
@@ -25,14 +30,13 @@ public class GeneralGobInfo extends GobInfo {
 
 	return new TexI(ItemInfo.catimgsh(3, health, growth));
     }
-
+    
     @Override
-    public boolean setup(RenderList d) {
+    public void tick() {
 	if(this.health != gob.getattr(GobHealth.class)) {
 	    clean();
-	    ready = false;
 	}
-	return super.setup(d);
+	super.tick();
     }
 
     @Override

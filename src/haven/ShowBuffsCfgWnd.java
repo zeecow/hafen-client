@@ -9,11 +9,11 @@ public class ShowBuffsCfgWnd extends Window {
 	if(instance == null) {
 	    instance = parent.add(new ShowBuffsCfgWnd());
 	} else {
-	    remove();
+	    doClose();
 	}
     }
 
-    public static void remove() {
+    private static void doClose() {
 	if(instance != null) {
 	    instance.reqdestroy();
 	    instance = null;

@@ -1,32 +1,28 @@
 package haven;
 
+import haven.render.MixColor;
+import haven.render.Pipe;
+
 import java.awt.*;
 
-public class GobHighlight extends GAttrib {
+public class GobHighlight extends GAttrib implements Gob.SetupMod {
     private static final Color COLOR = new Color(64, 255, 64, 255);
     private static final long cycle = 1200;
     private static final long duration = 7500;
-    private long start = System.currentTimeMillis();
+    private final long start = System.currentTimeMillis();
     
     public GobHighlight(Gob g) {
 	super(g);
     }
     
-    @Override
-    public Object staticp() {
-	return null;
-    }
-    
-    public GLState getfx() {
+    public Pipe.Op gobstate() {
 	long active = System.currentTimeMillis() - start;
 	if(active > duration) {
 	    gob.delattr(GobHighlight.class);
-	    return Material.nullstate;
+	    return null;
 	} else {
 	    float k = (float) Math.abs(Math.sin(Math.PI * active / cycle));
-	    Material.Colors colors = new Material.Colors(COLOR);
-	    colors.spc = colors.emi = Utils.c2fa(Utils.blendcol(Color.DARK_GRAY, COLOR, k));
-	    return colors;
+	    return new MixColor(COLOR.getRed(), COLOR.getGreen(), COLOR.getBlue(), 255 * k);
 	}
     }
 }

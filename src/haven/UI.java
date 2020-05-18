@@ -33,11 +33,12 @@ import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.InputEvent;
+import java.util.*;
+
 import static haven.Utils.el;
 import haven.render.Environment;
 
 public class UI {
-    private final HavenPanel panel;
     public static int MOD_SHIFT = 1, MOD_CTRL = 2, MOD_META = 4, MOD_SUPER = 8;
     public RootWidget root;
     private final LinkedList<Grab> keygrab = new LinkedList<Grab>(), mousegrab = new LinkedList<Grab>();
@@ -146,8 +147,7 @@ public class UI {
 	}
     }
 	
-    public UI(Context uictx, Coord sz, Session sess, HavenPanel panel) {
-	this.panel = panel;
+    public UI(Context uictx, Coord sz, Session sess) {
 	this.uictx = uictx;
 	root = new RootWidget(this, sz);
 	widgets.put(0, root);
@@ -377,7 +377,8 @@ public class UI {
     }
 
     public void mousedown(Coord c, int button){
-	mousedown(new MouseEvent(panel, 0, 0, 0, c.x, c.y, 1, false, button), c, button);
+        //TODO: re-implement mouse event simulation or find another way to implement equip proxy
+	//mousedown(new MouseEvent(panel, 0, 0, 0, c.x, c.y, 1, false, button), c, button);
     }
 
     public void mousedown(MouseEvent ev, Coord c, int button) {
@@ -391,7 +392,8 @@ public class UI {
     }
     
     public void mouseup(Coord c, int button) {
-	mouseup(new MouseEvent(panel, 0, 0, 0, c.x, c.y, 1, false, button), c, button);
+	//TODO: re-implement mouse event simulation or find another way to implement equip proxy
+//	mouseup(new MouseEvent(panel, 0, 0, 0, c.x, c.y, 1, false, button), c, button);
     }
 	
     public void mouseup(MouseEvent ev, Coord c, int button) {

@@ -47,6 +47,8 @@ public class ClickData {
 	    ret[--n] = slot.obj();
 	return(ret);
     }
+    
+    
 
     public Object[] clickargs() {
 	return(ci.clickargs(this));

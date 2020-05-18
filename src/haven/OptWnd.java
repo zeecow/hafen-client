@@ -755,19 +755,6 @@ public class OptWnd extends Window {
 	display.add(new CFGBox("Show object radius", CFG.SHOW_GOB_RADIUS, "Shows radius of mine supports, beehives etc.", true), x, y);
 
 	y += 25;
-	int w = display.add(new CFGBox("Show gob path", CFG.SHOW_GOB_PATH), x, y).sz.x;
-	display.add(new IButton("gfx/hud/opt", "", "-d", "-h") {
-	    @Override
-	    public void click() {
-		if(ui.gui != null) {
-		    GobPathOptWnd.toggle(ui.gui);
-		} else {
-		    GobPathOptWnd.toggle(ui.root);
-		}
-	    }
-	}, x + w + 5, y);
-
-	y += 25;
 	display.add(new Button(120, "Show as buffs") {
 	    @Override
 	    public void click() {
@@ -964,12 +951,6 @@ public class OptWnd extends Window {
     public void show() {
 	chpanel(main);
 	super.show();
-    }
-
-    @Override
-    public void destroy() {
-	GobPathOptWnd.remove();
-	super.destroy();
     }
 
     public static class CFGBox extends CheckBox implements CFG.Observer<Boolean> {

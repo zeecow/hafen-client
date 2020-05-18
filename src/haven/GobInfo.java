@@ -1,50 +1,42 @@
 package haven;
 
-public abstract class GobInfo extends PView.Draw2D {
-    protected final Gob gob;
-    public boolean ready = false;
+import haven.render.Homo3D;
+import haven.render.Pipe;
+import haven.render.RenderTree;
+
+public abstract class GobInfo extends GAttrib implements RenderTree.Node, PView.Render2D {
     protected Tex tex;
-    private GLState.Buffer state;
     protected int up = 1;
     protected final Object texLock = new Object();
     protected Pair<Double, Double> center = new Pair<>(0.5, 0.5);
-
-    public GobInfo(Gob owner) {this.gob = owner;}
-
-    @Override
-    public Object staticp() {
-	return Rendered.CONSTANS;
+    
+    public GobInfo(Gob owner) {
+	super(owner);
     }
-
+    
+    protected abstract boolean enabled();
+    
     @Override
-    public void draw2d(GOut g) {
-	synchronized(texLock) {
-	    if(tex != null) {
-		Coord sc = null;
-		if(state != null) {sc = Utils.world2screen(gob.getc(), state, up);}
-		if(sc != null && sc.isect(Coord.z, g.sz)) {
+    public void ctick(double dt) {
+	synchronized (texLock) {
+	    if(enabled() && tex == null) {
+		tex = render();
+	    }
+	}
+    }
+    
+    @Override
+    public void draw(GOut g, Pipe state) {
+	synchronized (texLock) {
+	    if(enabled() && tex != null) {
+		Coord sc = Homo3D.obj2view(new Coord3f(0, 0, up), state).round2();
+		if(sc.isect(Coord.z, g.sz())) {
 		    g.aimage(tex, sc, center.a, center.b);
 		}
 	    }
 	}
     }
-
-    @Override
-    public boolean setup(RenderList d) {
-	state = d.state();
-	if(!ready) {
-	    try {
-		tex = render();
-		ready = true;
-	    } catch (Loading ignored) {
-	    } catch (Exception e) {
-		tex = null;
-		ready = true;
-	    }
-	}
-	return ready && tex != null;
-    }
-
+    
     protected abstract Tex render();
 
     protected void clean() {
@@ -58,6 +50,5 @@ public abstract class GobInfo extends PView.Draw2D {
 
     public void dispose() {
 	clean();
-	state = null;
     }
 }

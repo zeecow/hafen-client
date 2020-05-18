@@ -6,7 +6,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class GobDamageInfo extends GobInfo {
-    private static Map<Long, Integer> gobDamage = new LinkedHashMap<Long, Integer>() {
+    private static final Map<Long, Integer> gobDamage = new LinkedHashMap<Long, Integer>() {
 	@Override
 	protected boolean removeEldestEntry(Map.Entry eldest) {
 	    return size() > 50;
@@ -25,13 +25,8 @@ public class GobDamageInfo extends GobInfo {
     }
     
     @Override
-    public boolean setup(RenderList d) {
-	return super.setup(d);
-    }
-    
-    @Override
-    public Object staticp() {
-	return null;
+    protected boolean enabled() {
+	return CFG.SHOW_COMBAT_DMG.get();
     }
     
     @Override
@@ -53,7 +48,7 @@ public class GobDamageInfo extends GobInfo {
 	    if(tex != null) {
 		tex.dispose();
 	    }
-	    tex = render();
+	    clean();
 	}
     }
     
