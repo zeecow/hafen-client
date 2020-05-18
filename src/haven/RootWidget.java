@@ -38,18 +38,23 @@ public class RootWidget extends ConsoleHost {
 	hasfocus = true;
 	cursor = defcurs.indir();
     }
-    
+	
     public boolean globtype(char key, KeyEvent ev) {
+	if(super.globtype(key, ev)) {
+	    return false;
+	}
 	if(key == '`') {
 	    GameUI gi = findchild(GameUI.class);
 	    if(Config.profile) {
 		add(new Profwnd(guprof, "UI profile"), new Coord(100, 100));
-		add(new Profwnd(grprof, "GL profile"), new Coord(450, 100));
-		if((gi != null) && (gi.map != null))
-		    add(new Profwnd(gi.map.prof, "Map profile"), new Coord(100, 250));
+		add(new Profwnd(grprof, "GL profile"), new Coord(500, 100));
+		    /* XXXRENDER
+		    if((gi != null) && (gi.map != null))
+			add(new Profwnd(gi.map.prof, "Map profile"), new Coord(100, 250));
+		    */
 	    }
 	    if(Config.profilegpu) {
-		add(new Profwnd(ggprof, "GPU profile"), new Coord(450, 250));
+		add(new Profwnd(ggprof, "GPU profile"), new Coord(500, 250));
 	    }
 	} else if(key == ':') {
 	    if(super.globtype(key, ev)) {
@@ -61,7 +66,7 @@ public class RootWidget extends ConsoleHost {
 	} else if(key != 0) {
 	    wdgmsg("gk", (int) key);
 	}
-	return (!super.globtype(key, ev));
+	return true;
     }
 
     @Override

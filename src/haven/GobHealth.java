@@ -26,12 +26,12 @@
 
 package haven;
 
-import java.awt.*;
-import java.awt.image.BufferedImage;
+import java.awt.Color;
+import haven.render.*;
 
-public class GobHealth extends GAttrib {
-    int hp;
-    Material.Colors fx;
+public class GobHealth extends GAttrib implements Gob.SetupMod {
+    public final int hp;
+    public final MixColor fx;
     private static final Text.Foundry gobhpf = new Text.Foundry(Text.sans.deriveFont(Font.BOLD), 14);
     private static final BufferedImage[] gobhp = new BufferedImage[]{
 	Text.renderstroked("25%", new Color(255, 100, 100), Color.BLACK, gobhpf).img,
@@ -42,13 +42,13 @@ public class GobHealth extends GAttrib {
     public GobHealth(Gob g, int hp) {
 	super(g);
 	this.hp = hp;
-	this.fx = new Material.Colors(new Color(255, 0, 0, 128 - ((hp * 128) / 4)));
+	this.fx = new MixColor(255, 0, 0, 128 - ((hp * 128) / 4));
     }
     
-    public GLState getfx() {
+    public Pipe.Op gobstate() {
 	if(hp >= 4)
-	    return (GLState.nullstate);
-	return (fx);
+	    return(null);
+	return(fx);
     }
 
     public BufferedImage text() {
@@ -59,6 +59,6 @@ public class GobHealth extends GAttrib {
     }
 
     public double asfloat() {
-	return (((double) hp) / 4.0);
+	return(((double)hp) / 4.0);
     }
 }

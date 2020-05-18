@@ -48,7 +48,7 @@ public abstract class Listbox<T> extends ListWidget<T> {
 
     protected void drawsel(GOut g, Color color) {
 	g.chcolor(color);
-	g.frect(Coord.z, g.sz);
+	g.frect(Coord.z, g.sz());
 	g.chcolor();
     }
 

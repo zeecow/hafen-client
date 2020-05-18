@@ -26,15 +26,20 @@
 
 package haven;
 
-public abstract class Drawable extends GAttrib implements Skeleton.HasPose {
+import haven.render.*;
+
+public abstract class Drawable extends GAttrib implements Skeleton.HasPose, RenderTree.Node {
     public Drawable(Gob gob) {
 	super(gob);
     }
 	
-    public abstract void setup(RenderList rl);
+    // public abstract void setup(RenderList rl); XXXRENDER
     public abstract Resource getres();
     public abstract Indir<Resource> getires();
     
+    public void gtick(Render g) {
+    }
+
     public Skeleton.Pose getpose() {
 	return(null);
     }

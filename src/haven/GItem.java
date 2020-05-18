@@ -27,6 +27,7 @@
 package haven;
 
 import java.awt.Color;
+import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.util.*;
 
@@ -98,9 +99,9 @@ public class GItem extends AWidget implements ItemInfo.SpriteOwner, GSprite.Owne
 
 	public default void drawoverlay(GOut g, Tex tex) {
 	    if(CFG.SWAP_NUM_AND_Q.get()) {
-		g.aimage(tex, TEXT_PADD_TOP.add(g.sz.x, 0), 1, 0);
+		g.aimage(tex, TEXT_PADD_TOP.add(g.sz().x, 0), 1, 0);
 	    } else {
-		g.aimage(tex, TEXT_PADD_BOT.add(g.sz), 1, 1);
+		g.aimage(tex, TEXT_PADD_BOT.add(g.sz()), 1, 1);
 	    }
 	}
 

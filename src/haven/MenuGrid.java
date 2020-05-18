@@ -41,11 +41,12 @@ public class MenuGrid extends Widget implements KeyBinding.Bindable {
     public final static Tex bg = Resource.loadtex("gfx/hud/invsq");
     public final static Coord bgsz = bg.sz().add(-1, -1);
     public final static RichText.Foundry ttfnd = new RichText.Foundry(TextAttribute.FAMILY, "SansSerif", TextAttribute.SIZE, 10);
-    public final Set<Pagina> paginae = new HashSet<Pagina>();
-    public int pagseq = 0;
     private static Coord gsz = new Coord(4, 4);
-    public Pagina cur, dragging;
-    private Collection<PagButton> curbtns = null;
+    public final Set<Pagina> paginae = new HashSet<Pagina>();
+    public Pagina cur;
+    public int pagseq = 0;
+    private Pagina dragging;
+    private Collection<PagButton> curbtns = Collections.emptyList();
     private PagButton pressed, layout[][] = new PagButton[gsz.x][gsz.y];
     private UI.Grab grab;
     private int curoff = 0;

@@ -34,8 +34,8 @@ import java.util.*;
 import java.lang.reflect.*;
 
 public class MainFrame extends java.awt.Frame implements Runnable, Console.Directory {
+    UIPanel p;
     private static final String TITLE = String.format("Hafen (modified by Ender v%s)", Config.version);
-    HavenPanel p;
     private final ThreadGroup g;
     public final Thread mt;
     DisplayMode fsmode = null, prefs = null;
@@ -182,7 +182,8 @@ public class MainFrame extends java.awt.Frame implements Runnable, Console.Direc
 	}
 	this.g = new ThreadGroup(HackThread.tg(), "Haven client");
 	this.mt = new HackThread(this.g, this, "Haven main thread");
-	p = new HavenPanel(sz.x, sz.y);
+	JOGLPanel p = new JOGLPanel(sz);
+	this.p = p;
 	if(fsmode == null) {
 	    Coord pfm = Utils.getprefc("fsmode", null);
 	    if(pfm != null)
@@ -200,18 +201,17 @@ public class MainFrame extends java.awt.Frame implements Runnable, Console.Direc
 	p.requestFocus();
 	seticon();
 	setVisible(true);
-	p.init();
 	addWindowListener(new WindowAdapter() {
 		public void windowClosing(WindowEvent e) {
 		    g.interrupt();
 		}
 
 		public void windowActivated(WindowEvent e) {
-		    p.bgmode = false;
+		    p.background(false);
 		}
 
 		public void windowDeactivated(WindowEvent e) {
-		    p.bgmode = true;
+		    p.background(true);
 		}
 	    });
 	if((isz == null) && Utils.getprefb("wndmax", false))
@@ -251,7 +251,7 @@ public class MainFrame extends java.awt.Frame implements Runnable, Console.Direc
 			    Config.authck = null;
 			}
 			fun = bill;
-			setTitle(TITLE);
+			setTitle("Haven and Hearth");
 		    } else {
 			fun = new RemoteUI(sess);
 			setTitle(TITLE + " \u2013 " + sess.username);

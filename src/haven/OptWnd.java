@@ -93,11 +93,12 @@ public class OptWnd extends Window {
 	}
 
 	public class CPanel extends Widget {
-	    public final GLSettings cf;
+	    public GSettings prefs;
 
-	    public CPanel(GLSettings gcf) {
-		this.cf = gcf;
+	    public CPanel(GSettings gprefs) {
+		this.prefs = gprefs;
 		int y = 0;
+		/* XXXRENDER
 		add(new CheckBox("Per-fragment lighting") {
 		    {
 			a = cf.flight.val;
@@ -119,27 +120,123 @@ public class OptWnd extends Window {
 		    }
 		}, new Coord(0, y));
 		y += 25;
-		add(new CheckBox("Render shadows") {
-		    {
-			a = cf.lshadow.val;
-		    }
+		*/
+		add(new CheckBox("Vertical sync") {
+			{a = prefs.vsync.val;}
 
-		    public void set(boolean val) {
-			if(val) {
+			public void set(boolean val) {
 			    try {
-				cf.lshadow.set(true);
+				GSettings np = prefs.update(null, prefs.vsync, val);
+				ui.setgprefs(prefs = np);
 			    } catch(GLSettings.SettingException e) {
 				error(e.getMessage());
 				return;
 			    }
-			} else {
-			    cf.lshadow.set(false);
+			    a = val;
 			}
-			a = val;
-			cf.dirty = true;
-		    }
-		}, new Coord(0, y));
+		    }, new Coord(0, y));
 		y += 25;
+		add(new Label("Framerate limit (active window)"), new Coord(0, y));
+		{
+		    Label dpy = add(new Label(""), new Coord(165, y + 15));
+		    final int max = 250;
+		    add(new HSlider(160, 1, max, (prefs.hz.val == Float.POSITIVE_INFINITY) ? max : prefs.hz.val.intValue()) {
+			    protected void added() {
+				dpy();
+				this.c.y = dpy.c.y + ((dpy.sz.y - this.sz.y) / 2);
+			    }
+			    void dpy() {
+				if(this.val == max)
+				    dpy.settext("None");
+				else
+				    dpy.settext(Integer.toString(this.val));
+			    }
+			    public void changed() {
+				try {
+				    if(this.val > 10)
+					this.val = (this.val / 2) * 2;
+				    float val = (this.val == max) ? Float.POSITIVE_INFINITY : this.val;
+				    ui.setgprefs(prefs = prefs.update(null, prefs.hz, val));
+				} catch(GLSettings.SettingException e) {
+				    error(e.getMessage());
+				    return;
+				}
+				dpy();
+			    }
+			}, new Coord(0, y + 15));
+		}
+		y += 35;
+		add(new Label("Framerate limit (background window)"), new Coord(0, y));
+		{
+		    Label dpy = add(new Label(""), new Coord(165, y + 15));
+		    final int max = 250;
+		    add(new HSlider(160, 1, max, (prefs.bghz.val == Float.POSITIVE_INFINITY) ? max : prefs.bghz.val.intValue()) {
+			    protected void added() {
+				dpy();
+				this.c.y = dpy.c.y + ((dpy.sz.y - this.sz.y) / 2);
+			    }
+			    void dpy() {
+				if(this.val == max)
+				    dpy.settext("None");
+				else
+				    dpy.settext(Integer.toString(this.val));
+			    }
+			    public void changed() {
+				try {
+				    if(this.val > 10)
+					this.val = (this.val / 2) * 2;
+				    float val = (this.val == max) ? Float.POSITIVE_INFINITY : this.val;
+				    ui.setgprefs(prefs = prefs.update(null, prefs.bghz, val));
+				} catch(GLSettings.SettingException e) {
+				    error(e.getMessage());
+				    return;
+				}
+				dpy();
+			    }
+			}, new Coord(0, y + 15));
+		}
+		y += 35;
+		add(new CheckBox("Render shadows") {
+			{a = prefs.lshadow.val;}
+
+			public void set(boolean val) {
+			    try {
+				GSettings np = prefs.update(null, prefs.lshadow, val);
+				ui.setgprefs(prefs = np);
+			    } catch(GLSettings.SettingException e) {
+				error(e.getMessage());
+				return;
+			    }
+			    a = val;
+			}
+		    }, new Coord(0, y));
+		y += 25;
+		add(new Label("Render scale"), new Coord(0, y));
+		{
+		    Label dpy = add(new Label(""), new Coord(165, y + 15));
+		    final int steps = 4;
+		    add(new HSlider(160, -2 * steps, 2 * steps, (int)Math.round(steps * Math.log(prefs.rscale.val) / Math.log(2.0f))) {
+			    protected void added() {
+				dpy();
+				this.c.y = dpy.c.y + ((dpy.sz.y - this.sz.y) / 2);
+			    }
+			    void dpy() {
+				dpy.settext(String.format("%.2f\u00d7", Math.pow(2, this.val / (double)steps)));
+			    }
+			    public void changed() {
+				try {
+				    float val = (float)Math.pow(2, this.val / (double)steps);
+				    ui.setgprefs(prefs = prefs.update(null, prefs.rscale, val));
+				} catch(GLSettings.SettingException e) {
+				    error(e.getMessage());
+				    return;
+				}
+				dpy();
+			    }
+			}, new Coord(0, y + 15));
+		}
+		y += 35;
+		/* XXXRENDER
 		add(new CheckBox("Antialiasing") {
 		    {
 			a = cf.fsaa.val;
@@ -187,14 +284,15 @@ public class OptWnd extends Window {
 			}
 		    }, new Coord(0, y + 15));
 		}
+		*/
 		y += 35;
 		add(new Button(200, "Reset to defaults") {
-		    public void click() {
-			cf.cfg.resetprefs();
-			curcf.destroy();
-			curcf = null;
-		    }
-		}, new Coord(0, 150));
+			public void click() {
+			    ui.setgprefs(GSettings.defaults());
+			    curcf.destroy();
+			    curcf = null;
+			}
+		    }, new Coord(0, 150));
 		pack();
 	    }
 	}
@@ -202,10 +300,10 @@ public class OptWnd extends Window {
 	private CPanel curcf = null;
 
 	public void draw(GOut g) {
-	    if((curcf == null) || (g.gc.pref != curcf.cf)) {
+	    if((curcf == null) || (ui.gprefs != curcf.prefs)) {
 		if(curcf != null)
 		    curcf.destroy();
-		curcf = add(new CPanel(g.gc.pref), Coord.z);
+		curcf = add(new CPanel(ui.gprefs), Coord.z);
 	    }
 	    super.draw(g);
 	}

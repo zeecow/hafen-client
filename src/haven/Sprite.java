@@ -31,8 +31,9 @@ import java.awt.Graphics;
 import java.util.*;
 import java.util.function.*;
 import java.lang.reflect.Constructor;
+import haven.render.*;
 
-public abstract class Sprite implements Rendered {
+public abstract class Sprite implements RenderTree.Node {
     public final Resource res;
     public final Owner owner;
     public static List<Factory> factories = new LinkedList<Factory>();
@@ -43,14 +44,22 @@ public abstract class Sprite implements Rendered {
 	factories.add(StaticSprite.fact);
 	factories.add(AudioSprite.fact);
     }
-    
+
     public interface Owner extends OwnerContext {
 	public Random mkrandoom();
 	public Resource getres();
 	@Deprecated
 	public default Glob glob() {return(context(Glob.class));}
     }
-    
+
+    public static interface CDel {
+	public void delete();
+    }
+
+    public static interface CUpd {
+	public void update(Message sdt);
+    }
+
     public static class FactMaker implements Resource.PublishedCode.Instancer {
 	public Factory make(Class<?> cl) throws InstantiationException, IllegalAccessException {
 	    if(Factory.class.isAssignableFrom(cl))
@@ -135,15 +144,23 @@ public abstract class Sprite implements Rendered {
 	    if(ret != null)
 		return(ret);
 	}
+	/* XXXRENDER
 	throw(new ResourceException("Does not know how to draw resource " + res.name, res));
+	*/
+	return(new Sprite(owner, res) {});
     }
 
     public void draw(GOut g) {}
 
+    /* XXXRENDER
     public abstract boolean setup(RenderList d);
+    */
 
-    public boolean tick(int dt) {
+    public boolean tick(double dt) {
 	return(false);
+    }
+
+    public void gtick(Render g) {
     }
     
     public void dispose() {

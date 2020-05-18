@@ -27,29 +27,22 @@
 package haven;
 
 import java.util.*;
-
+import java.util.function.*;
+import haven.render.*;
 import static haven.OCache.*;
 
-public class Gob implements Sprite.Owner, Skeleton.ModOwner, Rendered {
+public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner {
     public Coord2d rc;
-    public Coord sc;
-    public Coord3f sczu;
     public double a;
     public boolean virtual = false;
     int clprio = 0;
     public long id;
-    public int frame;
     public final Glob glob;
     private boolean disposed = false;
-    private final Map<Class<? extends GAttrib>, GAttrib> attr = new HashMap<>();
-    public Collection<Overlay> ols = new LinkedList<Overlay>() {
-	public boolean add(Overlay item) {
-	    /* XXX: Remove me once local code is changed to use addol(). */
-	    if(glob.oc.getgob(id) != null)
-		glob.oc.changed(Gob.this);
-	    return(super.add(item));
-	}
-    };
+    Map<Class<? extends GAttrib>, GAttrib> attr = new HashMap<Class<? extends GAttrib>, GAttrib>();
+    public final Collection<Overlay> ols = new ArrayList<Overlay>();
+    public final Collection<RenderTree.Slot> slots = new ArrayList<>(1);
+    private final Collection<SetupMod> setupmods = new ArrayList<>();
     private final Collection<ResAttr.Cell<?>> rdata = new LinkedList<ResAttr.Cell<?>>();
     private final Collection<ResAttr.Load> lrdata = new LinkedList<ResAttr.Load>();
     private final Object removalLock = new Object();
@@ -58,52 +51,85 @@ public class Gob implements Sprite.Owner, Skeleton.ModOwner, Rendered {
     private GeneralGobInfo gobInfo = null;
     private GobDamageInfo damage;
 
-    public static class Overlay implements Rendered {
-	public Indir<Resource> res;
+    public static class Overlay implements RenderTree.Node {
+	public final int id;
+	public final Gob gob;
+	public final Indir<Resource> res;
 	public MessageBuf sdt;
 	public Sprite spr;
-	public int id;
 	public boolean delign = false;
-	
-	public Overlay(int id, Indir<Resource> res, Message sdt) {
+	private Collection<RenderTree.Slot> slots = null;
+	private boolean added = false;
+
+	public Overlay(Gob gob, int id, Indir<Resource> res, Message sdt) {
+	    this.gob = gob;
 	    this.id = id;
 	    this.res = res;
 	    this.sdt = new MessageBuf(sdt);
-	    spr = null;
+	    this.spr = null;
 	}
-	
-	public Overlay(Sprite spr) {
+
+	public Overlay(Gob gob, Sprite spr) {
+	    this.gob = gob;
 	    this.id = -1;
 	    this.res = null;
 	    this.sdt = null;
 	    this.spr = spr;
 	}
-	
-	public static interface CDel {
-	    public void delete();
-	}
-	
-	public static interface CUpd {
-	    public void update(Message sdt);
-	}
-	
-	public static interface SetupMod {
-	    public void setupgob(GLState.Buffer buf);
-	    public void setupmain(RenderList rl);
+
+	private void init() {
+	    if(spr == null) {
+		spr = Sprite.create(gob, res.get(), sdt);
+		if(added && (spr instanceof SetupMod))
+		    gob.setupmods.add((SetupMod)spr);
+	    }
+	    if(slots == null)
+		RUtils.multiadd(gob.slots, this);
 	}
 
-	public void draw(GOut g) {}
-	public boolean setup(RenderList rl) {
-	    if(spr != null)
-		rl.add(spr, null);
-	    return(false);
+	private void add0() {
+	    if(added)
+		throw(new IllegalStateException());
+	    if(spr instanceof SetupMod)
+		gob.setupmods.add((SetupMod)spr);
+	    added = true;
 	}
 
-	public Object staticp() {
-	    return((spr == null)?null:spr.staticp());
+	private void remove0() {
+	    if(!added)
+		throw(new IllegalStateException());
+	    if(slots != null) {
+		RUtils.multirem(new ArrayList<>(slots));
+		slots = null;
+	    }
+	    if(spr instanceof SetupMod)
+		gob.setupmods.remove(spr);
+	    added = false;
+	}
+
+	public void remove() {
+	    remove0();
+	    gob.ols.remove(this);
+	}
+
+	public void added(RenderTree.Slot slot) {
+	    slot.add(spr);
+	    if(slots == null)
+		slots = new ArrayList<>(1);
+	    slots.add(slot);
+	}
+
+	public void removed(RenderTree.Slot slot) {
+	    if(slots != null)
+		slots.remove(slot);
 	}
     }
-    
+
+    public static interface SetupMod {
+	public default Pipe.Op gobstate() {return(null);}
+	public default Pipe.Op placestate() {return(null);}
+    }
+
     /* XXX: This whole thing didn't turn out quite as nice as I had
      * hoped, but hopefully it can at least serve as a source of
      * inspiration to redo attributes properly in the future. There
@@ -169,56 +195,73 @@ public class Gob implements Sprite.Owner, Skeleton.ModOwner, Rendered {
 	}
     }
 
+    /* XXXRENDER: Remove */
     public static class Static {}
     public static class SemiStatic {}
 
-    public Gob(Glob glob, Coord2d c, long id, int frame) {
+    public Gob(Glob glob, Coord2d c, long id) {
 	this.glob = glob;
 	this.rc = c;
 	this.id = id;
-	this.frame = frame;
-	loc.tick();
+	if(id < 0)
+	    virtual = true;
 	if(GobDamageInfo.has(this)) {
 	    damage = new GobDamageInfo(this);
 	}
     }
 
     public Gob(Glob glob, Coord2d c) {
-	this(glob, c, -1, 0);
+	this(glob, c, -1);
     }
-	
-    public static interface ANotif<T extends GAttrib> {
-	public void ch(T n);
-    }
-	
-    public void ctick(int dt) {
-	synchronized (attr) {
-	    for (GAttrib a : attr.values())
-		a.ctick(dt);
-	}
+
+    public void ctick(double dt) {
+	for(GAttrib a : attr.values())
+	    a.ctick(dt);
+	loadrattr();
 	for(Iterator<Overlay> i = ols.iterator(); i.hasNext();) {
 	    Overlay ol = i.next();
-	    if(ol.spr == null) {
+	    if(ol.slots == null) {
 		try {
-		    ol.spr = Sprite.create(this, ol.res.get(), ol.sdt.clone());
+		    ol.init();
 		    overlayAdded(ol);
 		} catch(Loading e) {}
 	    } else {
 		boolean done = ol.spr.tick(dt);
-		if((!ol.delign || (ol.spr instanceof Overlay.CDel)) && done)
+		if((!ol.delign || (ol.spr instanceof Sprite.CDel)) && done) {
+		    ol.remove0();
 		    i.remove();
+		}
 	    }
 	}
-	if(virtual && ols.isEmpty())
+	updstate();
+	if(virtual && ols.isEmpty() && (getattr(Drawable.class) == null))
 	    glob.oc.remove(id);
     }
-	
-    /* Intended for local code. Server changes are handled via OCache. */
-    public void addol(Overlay ol) {
+
+    public void gtick(Render g) {
+	Drawable d = getattr(Drawable.class);
+	if(d != null)
+	    d.gtick(g);
+	for(Overlay ol : ols) {
+	    if(ol.spr != null)
+		ol.spr.gtick(g);
+	}
+    }
+
+    public void addol(Overlay ol, boolean async) {
+	if(!async)
+	    ol.init();
+	ol.add0();
 	ols.add(ol);
     }
+    public void addol(Overlay ol) {
+	addol(ol, true);
+    }
     public void addol(Sprite ol) {
-	addol(new Overlay(ol));
+	addol(new Overlay(this, ol));
+    }
+    public void addol(Indir<Resource> res, Message sdt) {
+	addol(new Overlay(this, -1, res, sdt));
     }
 
     public Overlay findol(int id) {
@@ -228,6 +271,7 @@ public class Gob implements Sprite.Owner, Skeleton.ModOwner, Rendered {
 	}
 	return(null);
     }
+
     
     private void overlayAdded(Overlay item) {
 	try {
@@ -316,7 +360,7 @@ public class Gob implements Sprite.Owner, Skeleton.ModOwner, Rendered {
 	this.rc = c;
 	this.a = a;
     }
-	
+
     public Coord3f getc() {
 	Moving m = getattr(Moving.class);
 	Coord3f ret = (m != null)?m.getc():getrc();
@@ -325,11 +369,16 @@ public class Gob implements Sprite.Owner, Skeleton.ModOwner, Rendered {
 	    ret = ret.add(df.off);
 	return(ret);
     }
-    
+
     public Coord3f getrc() {
 	return(glob.map.getzp(rc));
     }
-	
+
+    protected Pipe.Op getmapstate(Coord3f pc) {
+	Tiler tile = glob.map.tiler(glob.map.gettile(new Coord2d(pc).floor(MCache.tilesz)));
+	return(tile.drawstate(glob, pc));
+    }
+
     private Class<? extends GAttrib> attrclass(Class<? extends GAttrib> cl) {
 	while(true) {
 	    Class<?> p = cl.getSuperclass();
@@ -339,19 +388,6 @@ public class Gob implements Sprite.Owner, Skeleton.ModOwner, Rendered {
 	}
     }
 
-    public void setattr(GAttrib a) {
-	Class<? extends GAttrib> ac = attrclass(a.getClass());
-	if (CFG.SHOW_GOB_PATH.get()) {
-	    if (ac == Moving.class) {
-		if (path == null) {
-		    path = new GobPath(this);
-		}
-		path.move((Moving) a);
-	    }
-	}
-	synchronized (attr) { attr.put(ac, a); }
-    }
-	
     public <C extends GAttrib> C getattr(Class<C> c) {
 	synchronized (attr) {
 	    GAttrib attr = this.attr.get(attrclass(c));
@@ -360,15 +396,45 @@ public class Gob implements Sprite.Owner, Skeleton.ModOwner, Rendered {
 	    return (c.cast(attr));
 	}
     }
-	
-    public void delattr(Class<? extends GAttrib> c) {
-	Class<? extends GAttrib> aClass = attrclass(c);
-	synchronized (attr) {attr.remove(aClass);}
-	if(aClass == Moving.class && path != null) {
-	    path.stop();
+
+    private void setattr(Class<? extends GAttrib> ac, GAttrib a) {
+	GAttrib prev = attr.remove(ac);
+	if(prev != null) {
+	    if((prev instanceof RenderTree.Node) && (prev.slots != null))
+		RUtils.multirem(new ArrayList<>(prev.slots));
+	    if(prev instanceof SetupMod)
+		setupmods.remove(prev);
 	}
+	if(a != null) {
+	    if(a instanceof RenderTree.Node) {
+		try {
+		    RUtils.multiadd(this.slots, (RenderTree.Node)a);
+		} catch(Loading l) {
+		    if(prev instanceof RenderTree.Node) {
+			RUtils.multiadd(this.slots, (RenderTree.Node)prev);
+			attr.put(ac, prev);
+		    }
+		    if(prev instanceof SetupMod)
+			setupmods.add((SetupMod)prev);
+		    throw(l);
+		}
+	    }
+	    if(a instanceof SetupMod)
+		setupmods.add((SetupMod)a);
+	    attr.put(ac, a);
+	}
+	if(prev != null)
+	    prev.dispose();
     }
-	
+
+    public void setattr(GAttrib a) {
+	setattr(attrclass(a.getClass()), a);
+    }
+
+    public void delattr(Class<? extends GAttrib> c) {
+	setattr(attrclass(c), null);
+    }
+
     private Class<? extends ResAttr> rattrclass(Class<? extends ResAttr> cl) {
 	while(true) {
 	    Class<?> p = cl.getSuperclass();
@@ -415,10 +481,6 @@ public class Gob implements Sprite.Owner, Skeleton.ModOwner, Rendered {
 	    i.remove();
 	    upd = true;
 	}
-	if(upd) {
-	    if(glob.oc.getgob(id) != null)
-		glob.oc.changed(this);
-	}
     }
 
     public void setrattr(Indir<Resource> resid, Message dat) {
@@ -463,6 +525,99 @@ public class Gob implements Sprite.Owner, Skeleton.ModOwner, Rendered {
 
     public void draw(GOut g) {}
 
+    public static class GobClick extends Clickable {
+	public final Gob gob;
+
+	public GobClick(Gob gob) {
+	    this.gob = gob;
+	}
+
+	public Object[] clickargs(ClickData cd) {
+	    Object[] ret = {0, (int)gob.id, gob.rc.floor(OCache.posres), 0, -1};
+	    for(Object node : cd.array()) {
+		if(node instanceof Gob.Overlay) {
+		    ret[0] = 1;
+		    ret[3] = ((Gob.Overlay)node).id;
+		}
+		if(node instanceof FastMesh.ResourceMesh)
+		    ret[4] = ((FastMesh.ResourceMesh)node).id;
+	    }
+	    return(ret);
+	}
+    }
+
+    private class GobState implements Pipe.Op {
+	final Pipe.Op mods;
+
+	private GobState() {
+	    if(setupmods.isEmpty()) {
+		this.mods = null;
+	    } else {
+		Pipe.Op[] mods = new Pipe.Op[setupmods.size()];
+		int n = 0;
+		for(SetupMod mod : setupmods) {
+		    if((mods[n] = mod.gobstate()) != null)
+			n++;
+		}
+		this.mods = (n > 0) ? Pipe.Op.compose(mods) : null;
+	    }
+	}
+
+	public void apply(Pipe buf) {
+	    if(!virtual)
+		buf.prep(new GobClick(Gob.this));
+	    buf.prep(new TickList.Monitor(Gob.this));
+	    if(mods != null)
+		buf.prep(mods);
+	}
+
+	public boolean equals(GobState that) {
+	    return(Utils.eq(this.mods, that.mods));
+	}
+	public boolean equals(Object o) {
+	    return((o instanceof GobState) && equals((GobState)o));
+	}
+    }
+    private GobState curstate = null;
+    private GobState curstate() {
+	if(curstate == null)
+	    curstate = new GobState();
+	return(curstate);
+    }
+
+    private void updstate() {
+	GobState nst;
+	try {
+	    nst = new GobState();
+	} catch(Loading l) {
+	    return;
+	}
+	if(!Utils.eq(nst, curstate)) {
+	    for(RenderTree.Slot slot : slots)
+		slot.ostate(nst);
+	    this.curstate = nst;
+	}
+    }
+
+    public void added(RenderTree.Slot slot) {
+	if(!virtual)
+	    slot.ostate(curstate());
+	for(Overlay ol : ols) {
+	    if(ol.slots != null)
+		slot.add(ol);
+	}
+	for(GAttrib a : attr.values()) {
+	    if(a instanceof RenderTree.Node)
+		slot.add((RenderTree.Node)a);
+	}
+	slots.add(slot);
+    }
+
+    public void removed(RenderTree.Slot slot) {
+	slots.remove(slot);
+    }
+
+    /* XXXRENDER
     public boolean setup(RenderList rl) {
 	loc.tick();
 	for(Overlay ol : ols)
@@ -472,7 +627,7 @@ public class Gob implements Sprite.Owner, Skeleton.ModOwner, Rendered {
 		((Overlay.SetupMod)ol.spr).setupmain(rl);
 	}
 	GobHealth hlt = getattr(GobHealth.class);
-	if(hlt != null) {
+	if(hlt != null)
 	    rl.prepc(hlt.getfx());
 	}
  
@@ -524,7 +679,7 @@ public class Gob implements Sprite.Owner, Skeleton.ModOwner, Rendered {
 	    Object fs = new Static();
 	    Collection<GAttrib> attrs = attr.values();
 	    int rs = 0;
-	    for(GAttrib attr : attrs) {
+	    for(GAttrib attr : attr.values()) {
 		Object as = attr.staticp();
 		if(as == Rendered.CONSTANS) {
 		} else if(as instanceof Static) {
@@ -554,15 +709,60 @@ public class Gob implements Sprite.Owner, Skeleton.ModOwner, Rendered {
 	}
 	return((seq == DYNAMIC)?null:seq);
     }
+    */
 
     void changed() {
-	seq = null;
+	// seq = null; XXXRENDER
+    }
+
+    private Waitable.Queue updwait = null;
+    private int updateseq = 0;
+    void updated() {
+	synchronized(this) {
+	    updateseq++;
+	    if(updwait != null)
+		updwait.wnotify();
+	}
+    }
+
+    public void updwait(Runnable callback, Consumer<Waitable.Waiting> reg) {
+	/* Caller should probably synchronize on this already for a
+	 * call like this to even be meaningful, but just in case. */
+	synchronized(this) {
+	    if(updwait == null)
+		updwait = new Waitable.Queue();
+	    reg.accept(updwait.add(callback));
+	}
+    }
+
+    public static class DataLoading extends Loading {
+	public final transient Gob gob;
+	public final int updseq;
+
+	/* It would be assumed that the caller has synchronized on gob
+	 * while creating this exception. */
+	public DataLoading(Gob gob, String message) {
+	    super(message);
+	    this.gob = gob;
+	    this.updseq = gob.updateseq;
+	}
+
+	public void waitfor(Runnable callback, Consumer<Waitable.Waiting> reg) {
+	    synchronized(gob) {
+		if(gob.updateseq != this.updseq) {
+		    reg.accept(Waitable.Waiting.dummy);
+		    callback.run();
+		} else {
+		    gob.updwait(callback, reg);
+		}
+	    }
+	}
     }
 
     public Random mkrandoom() {
 	return(Utils.mkrandoom(id));
     }
-    
+
     public Resource getres() {
 	Drawable d = getattr(Drawable.class);
 	if(d != null)
@@ -592,7 +792,8 @@ public class Gob implements Sprite.Owner, Skeleton.ModOwner, Rendered {
 	    return(0);
 	return(m.getv());
     }
-    
+
+    /* XXXRENDER
     public final GLState olmod = new GLState() {
 	    public void apply(GOut g) {}
 	    public void unapply(GOut g) {}
@@ -604,13 +805,15 @@ public class Gob implements Sprite.Owner, Skeleton.ModOwner, Rendered {
 		}
 	    }
 	};
+    */
 
+    /*
     public class Save extends GLState.Abstract {
 	public Matrix4f cam = new Matrix4f(), wxf = new Matrix4f(),
 	    mv = new Matrix4f();
 	public Projection proj = null;
 	boolean debug = false;
-	
+
 	public void prep(Buffer buf) {
 	    mv.load(cam.load(buf.get(PView.cam).fin(Matrix4f.id))).mul1(wxf.load(buf.get(PView.loc).fin(Matrix4f.id)));
 	    Projection proj = buf.get(PView.proj);
@@ -621,29 +824,143 @@ public class Gob implements Sprite.Owner, Skeleton.ModOwner, Rendered {
 	    this.proj = proj;
 	}
     }
-    
+
     public final Save save = new Save();
-    public class GobLocation extends GLState.Abstract {
-	public Coord3f c = null;
-	private double a = 0.0;
-	private Matrix4f update = null;
-	private final Location xl = new Location(Matrix4f.id, "gobx"), rot = new Location(Matrix4f.id, "gob");
+    */
 
-	public void tick() {
-	    try {
-		Coord3f c = getc();
-		c.y = -c.y;
-		if((this.c == null) || !c.equals(this.c))
-		    xl.update(Transform.makexlate(new Matrix4f(), this.c = c));
-		if(this.a != Gob.this.a)
-		    rot.update(Transform.makerot(new Matrix4f(), Coord3f.zu, (float)-(this.a = Gob.this.a)));
-	    } catch(Loading l) {}
+    public class Placed implements RenderTree.Node, TickList.Ticking, TickList.TickNode {
+	private final Collection<RenderTree.Slot> slots = new ArrayList<>(1);
+	private Placement cur;
+
+	private Placed() {}
+
+	private class Placement implements Pipe.Op {
+	    final Pipe.Op flw, tilestate, mods;
+	    final Coord3f oc, rc;
+	    final double a;
+
+	    Placement() {
+		try {
+		    Following flw = Gob.this.getattr(Following.class);
+		    Pipe.Op flwxf = (flw == null) ? null : flw.xf();
+		    Pipe.Op tilestate = null;
+		    if(flwxf == null) {
+			Coord3f oc = Gob.this.getc();
+			Coord3f rc = new Coord3f(oc);
+			rc.y = -rc.y;
+			this.flw = null;
+			this.oc = oc;
+			this.rc = rc;
+			this.a = Gob.this.a;
+			tilestate = Gob.this.getmapstate(oc);
+		    } else {
+			this.flw = flwxf;
+			this.oc = this.rc = null;
+			this.a = Double.NaN;
+		    }
+		    this.tilestate = tilestate;
+		    if(setupmods.isEmpty()) {
+			this.mods = null;
+		    } else {
+			Pipe.Op[] mods = new Pipe.Op[setupmods.size()];
+			int n = 0;
+			for(SetupMod mod : setupmods) {
+			    if((mods[n] = mod.placestate()) != null)
+				n++;
+			}
+			this.mods = (n > 0) ? Pipe.Op.compose(mods) : null;
+		    }
+		} catch(MCache.LoadingMap ml) {
+		    throw(new Loading(ml) {
+			    public String getMessage() {return(ml.getMessage());}
+
+			    public void waitfor(Runnable callback, Consumer<Waitable.Waiting> reg) {
+				Waitable.or(callback, reg, ml, Gob.this::updwait);
+			    }
+			});
+		}
+	    }
+
+	    public boolean equals(Placement that) {
+		if(this.flw != null) {
+		    if(!Utils.eq(this.flw, that.flw))
+			return(false);
+		} else {
+		    if(!(Utils.eq(this.oc, that.oc) && (this.a == that.a)))
+			return(false);
+		}
+		if(!Utils.eq(this.tilestate, that.tilestate))
+		    return(false);
+		if(!Utils.eq(this.mods, that.mods))
+		    return(false);
+		return(true);
+	    }
+
+	    public boolean equals(Object o) {
+		return((o instanceof Placement) && equals((Placement)o));
+	    }
+
+	    Pipe.Op gndst = null;
+	    public void apply(Pipe buf) {
+		if(this.flw != null) {
+		    this.flw.apply(buf);
+		} else {
+		    if(gndst == null)
+			gndst = Pipe.Op.compose(new Location(Transform.makexlate(new Matrix4f(), this.rc), "gobx"),
+						new Location(Transform.makerot(new Matrix4f(), Coord3f.zu, (float)-this.a), "gob"));
+		    gndst.apply(buf);
+		}
+		if(tilestate != null)
+		    tilestate.apply(buf);
+		if(mods != null)
+		    mods.apply(buf);
+	    }
 	}
 
-	public void prep(Buffer buf) {
-	    xl.prep(buf);
-	    rot.prep(buf);
+	public Pipe.Op placement() {
+	    return(new Placement());
 	}
+
+	public void autotick(double dt) {
+	    synchronized(Gob.this) {
+		Placement np;
+		try {
+		    np = new Placement();
+		} catch(Loading l) {
+		    return;
+		}
+		if(!Utils.eq(this.cur, np))
+		    update(np);
+	    }
+	}
+
+	private void update(Placement np) {
+	    for(RenderTree.Slot slot : slots)
+		slot.ostate(np);
+	    this.cur = np;
+	}
+
+	public void added(RenderTree.Slot slot) {
+	    slot.ostate(curplace());
+	    slot.add(Gob.this);
+	    slots.add(slot);
+	}
+
+	public void removed(RenderTree.Slot slot) {
+	    slots.remove(slot);
+	}
+
+	public Pipe.Op curplace() {
+	    if(cur == null)
+		cur = new Placement();
+	    return(cur);
+	}
+
+	public Coord3f getc() {
+	    return((this.cur != null) ? this.cur.oc : null);
+	}
+
+	public TickList.Ticking ticker() {return(this);}
     }
     
     public void highlight() {
@@ -651,5 +968,5 @@ public class Gob implements Sprite.Owner, Skeleton.ModOwner, Rendered {
 	setattr(new GobHighlight(this));
 	glob.oc.changed(this);
     }
-    public final GobLocation loc = new GobLocation();
+    public final Placed placed = new Placed();
 }

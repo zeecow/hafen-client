@@ -31,6 +31,7 @@ import java.io.*;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import javax.imageio.ImageIO;
+import haven.render.*;
 
 @Resource.LayerName("tileset2")
 public class Tileset extends Resource.Layer {
@@ -39,7 +40,7 @@ public class Tileset extends Resource.Layer {
     public Object[] ta = new Object[0];
     private transient Tiler.Factory tfac;
     public WeightList<Indir<Resource>> flavobjs = new WeightList<Indir<Resource>>();
-    public GLState flavobjmat = null;
+    public NodeWrap flavobjmat = null;
     public WeightList<Tile> ground;
     public WeightList<Tile>[] ctrans, btrans;
     public int flavprob;
@@ -156,12 +157,13 @@ public class Tileset extends Resource.Layer {
 	Tex packbuf = new TexL(new Coord(minw, minh)) {
 		{
 		    mipmap(Mipmapper.avg);
-		    minfilter(javax.media.opengl.GL2.GL_NEAREST_MIPMAP_LINEAR);
+		    img.minfilter(Texture.Filter.NEAREST).mipfilter(Texture.Filter.LINEAR);
+		    img.magfilter(Texture.Filter.NEAREST);
 		    centroid = true;
 		}
 
 		public BufferedImage fill() {
-		    BufferedImage buf = TexI.mkbuf(dim);
+		    BufferedImage buf = TexI.mkbuf(sz());
 		    Graphics g = buf.createGraphics();
 		    for(int i = 0; i < nt; i++)
 			g.drawImage(order[i].img, place[i].x, place[i].y, null);
@@ -183,7 +185,7 @@ public class Tileset extends Resource.Layer {
 		throw(new Resource.LoadException("Could not pack tiles into calculated minimum texture", getres()));
 	    order[n] = t;
 	    place[n] = new Coord(x, y);
-	    t.tex = new TexSI(packbuf, place[n], tsz);
+	    t.tex = new TexSI(packbuf, place[n], place[n].add(tsz));
 	    n++;
 	    if((x += tsz.x) > (minw - tsz.x)) {
 		x = 0;

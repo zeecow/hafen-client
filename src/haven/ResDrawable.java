@@ -26,64 +26,44 @@
 
 package haven;
 
+import java.util.*;
+import haven.render.*;
+
 public class ResDrawable extends Drawable {
     public final Indir<Resource> res;
-    public Sprite spr = null;
+    public final Sprite spr;
     MessageBuf sdt;
-    private int delay = 0;
+    // private double delay = 0; XXXRENDER
 
     public ResDrawable(Gob gob, Indir<Resource> res, Message sdt) {
 	super(gob);
 	this.res = res;
 	this.sdt = new MessageBuf(sdt);
-	try {
-	    init();
-	} catch(Loading e) {}
+	spr = Sprite.create(gob, res.get(), this.sdt.clone());
     }
-	
+
     public ResDrawable(Gob gob, Resource res) {
 	this(gob, res.indir(), MessageBuf.nil);
     }
-	
-    public void init() {
-	if(spr != null)
-	    return;
-	spr = Sprite.create(gob, res.get(), sdt.clone());
-	String name = res.get().name;
-	GobRadius cfg = GobRadius.get(name);
-	if(cfg != null) {
-	    gob.addol(new ColoredRadius(gob, cfg.radius, cfg.color()){
-		@Override
-		public boolean setup(RenderList d) {
-		    return CFG.SHOW_GOB_RADIUS.get() && super.setup(d);
-		}
-	    });
-	}
-    }
-	
-    public void setup(RenderList rl) {
-	try {
-	    init();
-	} catch(Loading e) {
-	    return;
-	}
-	rl.add(spr, null);
+
+    public void ctick(double dt) {
+	spr.tick(dt);
     }
 
-    public void ctick(int dt) {
-	if(spr == null) {
-	    delay += dt;
-	} else {
-	    spr.tick(delay + dt);
-	    delay = 0;
-	}
+    public void gtick(Render g) {
+	spr.gtick(g);
     }
-    
+
+    public void added(RenderTree.Slot slot) {
+	slot.add(spr);
+	super.added(slot);
+    }
+
     public void dispose() {
 	if(spr != null)
 	    spr.dispose();
     }
-    
+
     public Resource getres() {
 	return(res.get());
     }
@@ -94,11 +74,6 @@ public class ResDrawable extends Drawable {
     }
     
     public Skeleton.Pose getpose() {
-	init();
 	return(Skeleton.getpose(spr));
-    }
-
-    public Object staticp() {
-	return((spr != null)?spr.staticp():null);
     }
 }

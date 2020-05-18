@@ -118,7 +118,7 @@ public class Buff extends Widget implements ItemInfo.ResOwner, Bufflist.Managed 
 
     public void draw(GOut g) {
 	g.chcolor(255, 255, 255, a);
-	Double ameter = (this.ameter >= 0) ? (this.ameter / 100.0) : ameteri.get();
+	Double ameter = (this.ameter >= 0) ? Double.valueOf(this.ameter / 100.0) : ameteri.get();
 	int ameteri = 0;
 	if(ameter != null) {
 	    ameteri = (int) (100*ameter);

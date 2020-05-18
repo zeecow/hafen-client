@@ -30,6 +30,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.annotation.*;
 import java.util.*;
+import java.util.function.*;
 import java.net.*;
 import java.io.*;
 import java.security.*;
@@ -322,11 +323,13 @@ public class Resource implements Serializable {
 	    return("#<Resource " + res.name + ">");
 	}
 
-	public boolean canwait() {return(true);}
-	public void waitfor() throws InterruptedException {
+	public void waitfor(Runnable callback, Consumer<Waitable.Waiting> reg) {
 	    synchronized(res) {
-		while(!res.done) {
-		    res.wait();
+		if(res.done) {
+		    reg.accept(Waitable.Waiting.dummy);
+		    callback.run();
+		} else {
+		    reg.accept(res.wq.add(callback));
 		}
 	    }
 	}
@@ -360,8 +363,9 @@ public class Resource implements Serializable {
 	}
 
 	private class Queued extends Named implements Prioritized, Serializable {
-	    volatile int prio;
 	    transient final Collection<Queued> rdep = new LinkedList<Queued>();
+	    final Waitable.Queue wq = new Waitable.Queue();
+	    volatile int prio;
 	    Queued awaiting;
 	    volatile boolean done = false;
 	    Resource res;
@@ -402,7 +406,7 @@ public class Resource implements Serializable {
 			i.remove();
 			dq.prior(this);
 		    }
-		    this.notifyAll();
+		    wq.wnotify();
 		}
 		if(res != null) {
 		    synchronized(cache) {
