@@ -234,7 +234,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner {
 	}
 	updstate();
 	if(virtual && ols.isEmpty() && (getattr(Drawable.class) == null))
-	    glob.oc.remove(id);
+	    glob.oc.remove(this);
     }
 
     public void gtick(Render g) {

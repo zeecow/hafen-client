@@ -37,6 +37,7 @@ import java.util.*;
 
 import static haven.Utils.el;
 import haven.render.Environment;
+import haven.render.Render;
 
 public class UI {
     public static int MOD_SHIFT = 1, MOD_CTRL = 2, MOD_META = 4, MOD_SUPER = 8;
@@ -199,6 +200,10 @@ public class UI {
 	}
     }
 
+    public void gtick(Render out) {
+	root.gtick(out);
+    }
+
     public void draw(GOut g) {
 	root.draw(g);
 	synchronized(afterdraws) {
@@ -324,11 +329,11 @@ public class UI {
 	
     private void setmods(InputEvent ev) {
 	int mod = ev.getModifiersEx();
-	Debug.kf1 = modshift = (mod & InputEvent.SHIFT_DOWN_MASK) != 0;
-	Debug.kf2 = modctrl = (mod & InputEvent.CTRL_DOWN_MASK) != 0;
-	Debug.kf3 = modmeta = (mod & (InputEvent.META_DOWN_MASK | InputEvent.ALT_DOWN_MASK)) != 0;
+	modshift = (mod & InputEvent.SHIFT_DOWN_MASK) != 0;
+	modctrl = (mod & InputEvent.CTRL_DOWN_MASK) != 0;
+	modmeta = (mod & (InputEvent.META_DOWN_MASK | InputEvent.ALT_DOWN_MASK)) != 0;
 	/*
-	Debug.kf4 = modsuper = (mod & InputEvent.SUPER_DOWN_MASK) != 0;
+	modsuper = (mod & InputEvent.SUPER_DOWN_MASK) != 0;
 	*/
     }
 

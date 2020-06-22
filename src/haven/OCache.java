@@ -57,7 +57,7 @@ public class OCache implements Iterable<Gob> {
     public static final Coord2d posres = new Coord2d(0x1.0p-10, 0x1.0p-10).mul(11, 11);
     /* XXX: Use weak refs */
     private Collection<Collection<Gob>> local = new LinkedList<Collection<Gob>>();
-    private Map<Long, Gob> objs = new TreeMap<Long, Gob>();
+    private HashMultiMap<Long, Gob> objs = new HashMultiMap<Long, Gob>();
     private Glob glob;
     private final Collection<ChangeCallback> cbs = new WeakList<ChangeCallback>();
 
@@ -94,11 +94,13 @@ public class OCache implements Iterable<Gob> {
 	}
     }
 
-    public void remove(long id) {
+    public void remove(Gob ob) {
 	Gob old;
 	Collection<ChangeCallback> cbs;
 	synchronized(this) {
-	    old = objs.remove(id);
+	    old = objs.remove(ob.id, ob);
+	    if((old != null) && (old != ob))
+		throw(new RuntimeException(String.format("object %d removed wrong object", ob.id)));
 	    cbs = new ArrayList<>(this.cbs);
 	}
 	if(old != null) {
@@ -167,24 +169,32 @@ public class OCache implements Iterable<Gob> {
 	return(new I2<Gob>(objs.values().iterator(), new I2<Gob>(is)));
     }
 
-    public synchronized void ladd(Collection<Gob> gob) {
-	local.add(gob);
-	/* XXXRENDER
-	for(Gob g : gob) {
-	    for(ChangeCallback cb : cbs)
-		cb.changed(g);
+    public void ladd(Collection<Gob> gob) {
+	Collection<ChangeCallback> cbs;
+	synchronized(this) {
+	    cbs = new ArrayList<>(this.cbs);
+	    local.add(gob);
 	}
-	*/
+	for(Gob g : gob) {
+	    synchronized(g) {
+		for(ChangeCallback cb : cbs)
+		    cb.added(g);
+	    }
+	}
     }
 
-    public synchronized void lrem(Collection<Gob> gob) {
-	local.remove(gob);
-	/* XXXRENDER
-	for(Gob g : gob) {
-	    for(ChangeCallback cb : cbs)
-		cb.removed(g);
+    public void lrem(Collection<Gob> gob) {
+	Collection<ChangeCallback> cbs;
+	synchronized(this) {
+	    cbs = new ArrayList<>(this.cbs);
+	    local.remove(gob);
 	}
-	*/
+	for(Gob g : gob) {
+	    synchronized(g) {
+		for(ChangeCallback cb : cbs)
+		    cb.removed(g);
+	    }
+	}
     }
 
     public synchronized Gob getgob(long id) {
@@ -696,7 +706,7 @@ public class OCache implements Iterable<Gob> {
 		    if(nremoved && (!added || gremoved))
 			break main;
 		    if(nremoved && added && !gremoved) {
-			remove(id);
+			remove(gob);
 			gremoved = true;
 			gob = null;
 			break main;

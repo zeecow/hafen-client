@@ -56,8 +56,9 @@ public class GLEnvironment implements Environment {
 	}
     }
 
-    public static class Caps implements java.io.Serializable {
+    public static class Caps implements java.io.Serializable, Environment.Caps {
 	private static final java.util.regex.Pattern slvp = java.util.regex.Pattern.compile("^(\\d+)\\.(\\d+)");
+	public final String vendor, version, renderer;
 	public final int major, minor, glslver;
 	public final Collection<String> exts;
 	public final int maxtargets;
@@ -107,6 +108,9 @@ public class GLEnvironment implements Environment {
 		}
 		this.major = major; this.minor = minor;
 	    }
+	    this.vendor = gl.glGetString(GL.GL_VENDOR);
+	    this.version = gl.glGetString(GL.GL_VERSION);
+	    this.renderer = gl.glGetString(GL.GL_RENDERER);
 	    this.exts = Arrays.asList(gl.glGetString(GL.GL_EXTENSIONS).split(" "));
 	    this.maxtargets = glcondi(gl, GL3.GL_MAX_COLOR_ATTACHMENTS, 1);
 	    {
@@ -143,6 +147,10 @@ public class GLEnvironment implements Environment {
 	    if(major < 3)
 		throw(new HardwareException("Graphics context does not support OpenGL 3.0."));
 	}
+
+	public String vendor() {return(vendor);}
+	public String driver() {return("OpenGL (" + version + ")");}
+	public String device() {return(renderer);}
     }
 
     static enum MemStats {
@@ -529,6 +537,25 @@ public class GLEnvironment implements Environment {
 	    return(ret);
 	}
     }
+    GLTexture.Tex3D prepare(Texture3D tex) {
+	synchronized(tex) {
+	    GLTexture.Tex3D ret;
+	    if(!(tex.ro instanceof GLTexture.Tex3D) || ((ret = (GLTexture.Tex3D)tex.ro).env != this)) {
+		if(tex.ro != null)
+		    tex.ro.dispose();
+		tex.ro = ret = GLTexture.Tex3D.create(this, tex);
+	    }
+	    return(ret);
+	}
+    }
+    GLTexture.Tex3D prepare(Texture3D.Sampler3D smp) {
+	Texture3D tex = smp.tex;
+	synchronized(tex) {
+	    GLTexture.Tex3D ret = prepare(tex);
+	    ret.setsampler(smp);
+	    return(ret);
+	}
+    }
     GLTexture.TexCube prepare(TextureCube tex) {
 	synchronized(tex) {
 	    GLTexture.TexCube ret;
@@ -553,6 +580,8 @@ public class GLEnvironment implements Environment {
 	if(val instanceof Texture.Sampler) {
 	    if(val instanceof Texture2D.Sampler2D)
 		return(prepare((Texture2D.Sampler2D)val));
+	    if(val instanceof Texture3D.Sampler3D)
+		return(prepare((Texture3D.Sampler3D)val));
 	    else if(val instanceof TextureCube.SamplerCube)
 		return(prepare((TextureCube.SamplerCube)val));
 	}
@@ -764,6 +793,7 @@ public class GLEnvironment implements Environment {
     }
 
     public int numprogs() {return(nprog);}
+    public Caps caps() {return(caps);}
 
     public String memstats() {
 	StringBuilder buf = new StringBuilder();

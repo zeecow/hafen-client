@@ -84,4 +84,14 @@ public abstract class MiscLib {
 	Expression p = code.local(VEC3, abs(sub(mul(fract(add(pick(c, "xxx"), vec3(1.0, 2.0 / 3.0, 1.0 / 3.0))), l(6.0)), l(3.0)))).ref();
 	code.add(new Return(mul(pick(c, "z"), mix(vec3(l(1.0)), clamp(sub(p, l(1.0)), l(0.0), l(1.0)), pick(c, "y")))));
     }};
+
+    public static final Function lin2srgb = new Function.Def(VEC4, "lin2srgb") {{
+	Expression c = param(IN, VEC4).ref();
+	code.add(new Return(vec4(pow(pick(c, "rgb"), vec3(l(1.0 / 2.2))), pick(c, "a"))));
+    }};
+
+    public static final Function srgb2lin = new Function.Def(VEC4, "srgb2lin") {{
+	Expression c = param(IN, VEC4).ref();
+	code.add(new Return(vec4(pow(pick(c, "rgb"), vec3(l(2.2))), pick(c, "a"))));
+    }};
 }
