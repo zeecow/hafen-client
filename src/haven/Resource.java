@@ -30,7 +30,6 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.annotation.*;
 import java.util.*;
-import java.util.function.*;
 import java.net.*;
 import java.io.*;
 import java.security.*;
@@ -278,21 +277,25 @@ public class Resource implements Serializable {
 
 	public InputStream get(String name) throws IOException {
 	    URL resurl = encodeurl(new URL(baseurl, name + ".res"));
-	    return(new RetryingInputStream() {
-		    protected InputStream create() throws IOException {
-			URLConnection c;
-			if(resurl.getProtocol().equals("https"))
-			    c = ssl.connect(resurl);
-			else
-			    c = resurl.openConnection();
-			/* Apparently, some versions of Java Web Start has
-			 * a bug in its internal cache where it refuses to
-			 * reload a URL even when it has changed. */
-			c.setUseCaches(false);
-			c.addRequestProperty("User-Agent", "Haven/1.0");
-			return(c.getInputStream());
-		    }
-		});
+	    URLConnection c;
+	    int tries = 0;
+	    while(true) {
+		try {
+		    if(resurl.getProtocol().equals("https"))
+			c = ssl.connect(resurl);
+		    else
+			c = resurl.openConnection();
+		    /* Apparently, some versions of Java Web Start has
+		     * a bug in its internal cache where it refuses to
+		     * reload a URL even when it has changed. */
+		    c.setUseCaches(false);
+		    c.addRequestProperty("User-Agent", "Haven/1.0");
+		    return(c.getInputStream());
+		} catch(ConnectException e) {
+		    if(++tries >= 5)
+			throw(new IOException("Connection failed five times", e));
+		}
+	    }
 	}
 
 	public String toString() {
@@ -312,13 +315,11 @@ public class Resource implements Serializable {
 	    return("#<Resource " + res.name + ">");
 	}
 
-	public void waitfor(Runnable callback, Consumer<Waitable.Waiting> reg) {
+	public boolean canwait() {return(true);}
+	public void waitfor() throws InterruptedException {
 	    synchronized(res) {
-		if(res.done) {
-		    reg.accept(Waitable.Waiting.dummy);
-		    callback.run();
-		} else {
-		    reg.accept(res.wq.add(callback));
+		while(!res.done) {
+		    res.wait();
 		}
 	    }
 	}
@@ -352,9 +353,8 @@ public class Resource implements Serializable {
 	}
 
 	private class Queued extends Named implements Prioritized, Serializable {
-	    transient final Collection<Queued> rdep = new LinkedList<Queued>();
-	    final Waitable.Queue wq = new Waitable.Queue();
 	    volatile int prio;
+	    transient final Collection<Queued> rdep = new LinkedList<Queued>();
 	    Queued awaiting;
 	    volatile boolean done = false;
 	    Resource res;
@@ -395,7 +395,7 @@ public class Resource implements Serializable {
 			i.remove();
 			dq.prior(this);
 		    }
-		    wq.wnotify();
+		    this.notifyAll();
 		}
 		if(res != null) {
 		    synchronized(cache) {
@@ -748,19 +748,6 @@ public class Resource implements Serializable {
 	    this.res = res;
 	}
     }
-
-    public static class LoadWarning extends Warning {
-	public final Resource res;
-
-	public LoadWarning(Resource res, String msg) {
-	    super(msg);
-	    this.res = res;
-	}
-
-	public LoadWarning(Resource res, String msg, Object... args) {
-	    this(res, String.format(msg, args));
-	}
-    }
     
     public static Coord cdec(Message buf) {
 	return(new Coord(buf.int16(), buf.int16()));
@@ -846,37 +833,6 @@ public class Resource implements Serializable {
 	public T layerid();
     }
 
-    public static class ImageReadException extends IOException {
-	public final String[] supported = ImageIO.getReaderMIMETypes();
-
-	public ImageReadException() {
-	    super("Could not decode image data");
-	}
-    }
-
-    public static BufferedImage readimage(InputStream fp) throws IOException {
-	try {
-	    /* This can crash if not privileged due to ImageIO
-	     * creating tempfiles without doing that privileged
-	     * itself. It can very much be argued that this is a bug
-	     * in ImageIO. */
-	    return(AccessController.doPrivileged(new PrivilegedExceptionAction<BufferedImage>() {
-		    public BufferedImage run() throws IOException {
-			BufferedImage ret;
-			ret = ImageIO.read(fp);
-			if(ret == null)
-			    throw(new ImageReadException());
-			return(ret);
-		    }
-		}));
-	} catch(PrivilegedActionException e) {
-	    Throwable c = e.getCause();
-	    if(c instanceof IOException)
-		throw((IOException)c);
-	    throw(new AssertionError(c));
-	}
-    }
-
     @LayerName("image")
     public class Image extends Layer implements Comparable<Image>, IDLayer<Integer> {
 	public transient BufferedImage img;
@@ -897,10 +853,12 @@ public class Resource implements Serializable {
 	    id = buf.int16();
 	    o = cdec(buf);
 	    try {
-		img = readimage(new MessageInputStream(buf));
+		img = ImageIO.read(new MessageInputStream(buf));
 	    } catch(IOException e) {
 		throw(new LoadException(e, Resource.this));
 	    }
+	    if(img == null)
+		throw(new LoadException("Invalid image data in " + name, Resource.this));
 	    sz = Utils.imgsz(img);
 	}
 		

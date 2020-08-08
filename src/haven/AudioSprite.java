@@ -27,7 +27,6 @@
 package haven;
 
 import java.util.*;
-import haven.render.*;
 import haven.Audio.CS;
 
 public class AudioSprite {
@@ -82,24 +81,29 @@ public class AudioSprite {
 		});
 	}
 
-	public void added(RenderTree.Slot slot) {
-	    slot.add(clip);
+	public boolean setup(RenderList r) {
+	    r.add(clip, null);
+	    return(false);
 	}
 
-	public boolean tick(double dt) {
+	public boolean tick(int dt) {
 	    /* XXX: This is slightly bad, because virtual sprites that
 	     * are stuck as loading (by getting outside the map, for
 	     * instance), never play and therefore never get done,
 	     * effectively leaking. For now, this is seldom a problem
-	     * because in practice most (all?) virtual audio-sprites
+	     * because in practive most (all?) virtual audio-sprites
 	     * come from Skeleton.FxTrack which memoizes its origin
 	     * instead of asking the map for it, but also see comment
 	     * in glsl.MiscLib.maploc. Solve pl0x. */
 	    return(done);
 	}
+
+	public Object staticp() {
+	    return(CONSTANS);
+	}
     }
 
-    public static class RepeatSprite extends Sprite implements Sprite.CDel {
+    public static class RepeatSprite extends Sprite implements Gob.Overlay.CDel {
 	private ActAudio.PosClip clip;
 	private final Resource.Audio end;
 
@@ -120,31 +124,35 @@ public class AudioSprite {
 	    this.clip = new ActAudio.PosClip(rep);
 	}
 
-	public void added(RenderTree.Slot slot) {
+	public boolean setup(RenderList r) {
 	    if(clip != null)
-		slot.add(clip);
+		r.add(clip, null);
+	    return(false);
 	}
 
-	public boolean tick(double dt) {
+	public boolean tick(int dt) {
 	    return(clip == null);
 	}
 
 	public void delete() {
-	    if(end != null) {
+	    if(end != null)
 		clip = new ActAudio.PosClip(new Audio.Monitor(end.stream()) {
 			protected void eof() {
 			    super.eof();
 			    RepeatSprite.this.clip = null;
 			}
 		    });
-	    } else {
+	    else
 		clip = null;
-	    }
+	}
+
+	public Object staticp() {
+	    return(CONSTANS);
 	}
     }
 
     public static class Ambience extends Sprite {
-	public final RenderTree.Node amb;
+	public final Rendered amb;
 
 	public Ambience(Owner owner, Resource res) {
 	    super(owner, res);
@@ -155,9 +163,13 @@ public class AudioSprite {
 		this.amb = new ActAudio.Ambience(res);
 	}
 
-	public void added(RenderTree.Slot slot) {
-	    if(amb != null)
-		slot.add(amb);
+	public boolean setup(RenderList r) {
+	    r.add(amb, null);
+	    return(false);
+	}
+
+	public Object staticp() {
+	    return(CONSTANS);
 	}
     }
 }

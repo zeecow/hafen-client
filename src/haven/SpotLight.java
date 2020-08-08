@@ -27,6 +27,7 @@
 package haven;
 
 import java.awt.Color;
+import javax.media.opengl.*;
 
 public class SpotLight extends PosLight {
     public float[] dir;
@@ -62,7 +63,6 @@ public class SpotLight extends PosLight {
 	this.cut = 90.0f;
     }
 
-    /* XXXRENDER
     public void enable(GOut g, int idx) {
 	super.enable(g, idx);
 	BGL gl = g.gl;
@@ -78,5 +78,4 @@ public class SpotLight extends PosLight {
 	gl.glLightf(GL2.GL_LIGHT0 + idx, GL2.GL_SPOT_CUTOFF, 180.0f);
 	super.disable(g, idx);
     }
-    */
 }

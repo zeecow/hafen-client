@@ -26,11 +26,11 @@
 
 package haven;
 
-import haven.render.*;
+import javax.media.opengl.*;
 
 public class PointedCam extends Camera {
-    public Coord3f base = Coord3f.o;
-    public float dist = 5.0f, e, a;
+    Coord3f base = Coord3f.o;
+    float dist = 5.0f, e, a;
 
     public PointedCam() {
 	super(Matrix4f.identity());

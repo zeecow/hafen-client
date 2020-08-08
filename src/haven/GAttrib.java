@@ -26,9 +26,6 @@
 
 package haven;
 
-import java.util.*;
-import haven.render.*;
-
 public abstract class GAttrib {
     public final Gob gob;
 	
@@ -36,21 +33,16 @@ public abstract class GAttrib {
 	this.gob = gob;
     }
 	
-    public void ctick(double dt) {
+    public void tick() {
+    }
+	
+    public void ctick(int dt) {
     }
     
     public void dispose() {
     }
 
-    /* Private to Gob.java */
-    Collection<RenderTree.Slot> slots;
-    public void added(RenderTree.Slot slot) {
-	if(slots == null)
-	    slots = new ArrayList<>(1);
-	slots.add(slot);
-    }
-    public void removed(RenderTree.Slot slot) {
-	if(slots != null)
-	    slots.remove(slot);
+    public Object staticp() {
+	return(Rendered.CONSTANS);
     }
 }

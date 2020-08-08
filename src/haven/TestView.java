@@ -27,87 +27,124 @@
 package haven;
 
 import java.util.*;
-import haven.render.*;
-import haven.render.Rendered;
+import javax.media.opengl.*;
 
 public class TestView extends PView {
-    static final FastMesh borkamesh = Resource.remote().loadwait("gfx/test/borka").layer(FastMesh.MeshRes.class).m;
-    static final Material borkamat = Resource.remote().loadwait("gfx/test/borka").layer(Material.Res.class).get();
-    float dist = 15, e = (float)Math.PI * 3 / 2, a = (float)Math.PI / 2, rot = 0;
-    final RenderTree.Slot[] borka = {null, null};
-    final Light.PhongLight light = new Light.PhongLight(true, FColor.BLACK, FColor.WHITE, FColor.BLACK, FColor.BLACK, 0);
-
+    static final FastMesh[] tmesh;
+    static {
+	Resource res = Resource.local().loadwait("gfx/borka/male");
+	List<FastMesh> l = new ArrayList<FastMesh>();
+	for(FastMesh.MeshRes m : res.layers(FastMesh.MeshRes.class))
+	    l.add(m.m);
+	tmesh = l.toArray(new FastMesh[0]);
+    }
+    final PointedCam camera;
+    int sel = -1;
+    
     public TestView(Coord sz) {
 	super(sz);
-	setcam();
-	borka[0] = basic.add(null);
-	borka[0].add(borkamat.apply(borkamesh));
-	borka[1] = basic.add(null);
-	borka[1].add(borkamat.apply(borkamesh));
-	basic.add(new DirLight(FColor.BLACK, FColor.WHITE, FColor.BLACK, Coord3f.xu));
+	PointedCam cam;
+	camera = new PointedCam();
+	camera.a = (float)Math.PI * 3 / 2;
+	camera.e = (float)Math.PI / 2;
+	setcanfocus(true);
+    }
+    
+    protected Camera camera() {
+	return(camera);
     }
 
-    public static class Quad implements Rendered, RenderTree.Node {
-	public static final Model data;
+    public static class Cube implements Rendered {
+	public void draw(GOut g) {
+	    g.apply();
+	    BGL gl = g.gl;
+	    
+	    gl.glBegin(GL2.GL_QUADS);
+	    gl.glNormal3f(0.0f, 0.0f, 1.0f);
+	    gl.glColor3f(1.0f, 0.0f, 0.0f);
+	    gl.glVertex3f(-1.0f, 1.0f, 1.0f);
+	    gl.glVertex3f(-1.0f, -1.0f, 1.0f);
+	    gl.glVertex3f(1.0f, -1.0f, 1.0f);
+	    gl.glVertex3f(1.0f, 1.0f, 1.0f);
 
-	static {
-	    float[] vert = {
-		75, 25, 1, 0, 0, 1,
-		75, 75, 0, 1, 0, 1,
-		25, 25, 0, 0, 1, 1,
-		25, 75, 1, 0, 0.5f, 1,
-	    };
-	    VertexArray.Layout fmt = new VertexArray.Layout(new VertexArray.Layout.Input(Ortho2D.pos, new VectorFormat(2, NumberFormat.FLOAT32), 0, 0, 24),
-							    new VertexArray.Layout.Input(VertexColor.color, new VectorFormat(4, NumberFormat.FLOAT32), 0, 8, 24));
-	    VertexArray vao = new VertexArray(fmt, new VertexArray.Buffer(vert.length * 4, DataBuffer.Usage.STATIC, DataBuffer.Filler.of(vert)));
-	    data = new Model(Model.Mode.TRIANGLE_STRIP, vao, null, 0, 4);
+	    gl.glNormal3f(1.0f, 0.0f, 0.0f);
+	    gl.glColor3f(0.0f, 1.0f, 0.0f);
+	    gl.glVertex3f(1.0f, 1.0f, 1.0f);
+	    gl.glVertex3f(1.0f, -1.0f, 1.0f);
+	    gl.glVertex3f(1.0f, -1.0f, -1.0f);
+	    gl.glVertex3f(1.0f, 1.0f, -1.0f);
+
+	    gl.glNormal3f(-1.0f, 0.0f, 0.0f);
+	    gl.glColor3f(0.0f, 0.0f, 1.0f);
+	    gl.glVertex3f(-1.0f, 1.0f, 1.0f);
+	    gl.glVertex3f(-1.0f, 1.0f, -1.0f);
+	    gl.glVertex3f(-1.0f, -1.0f, -1.0f);
+	    gl.glVertex3f(-1.0f, -1.0f, 1.0f);
+
+	    gl.glNormal3f(0.0f, 1.0f, 0.0f);
+	    gl.glColor3f(0.0f, 1.0f, 1.0f);
+	    gl.glVertex3f(-1.0f, 1.0f, 1.0f);
+	    gl.glVertex3f(1.0f, 1.0f, 1.0f);
+	    gl.glVertex3f(1.0f, 1.0f, -1.0f);
+	    gl.glVertex3f(-1.0f, 1.0f, -1.0f);
+
+	    gl.glNormal3f(0.0f, -1.0f, 0.0f);
+	    gl.glColor3f(1.0f, 0.0f, 1.0f);
+	    gl.glVertex3f(-1.0f, -1.0f, 1.0f);
+	    gl.glVertex3f(-1.0f, -1.0f, -1.0f);
+	    gl.glVertex3f(1.0f, -1.0f, -1.0f);
+	    gl.glVertex3f(1.0f, -1.0f, 1.0f);
+
+	    gl.glNormal3f(0.0f, 0.0f, -1.0f);
+	    gl.glColor3f(1.0f, 1.0f, 0.0f);
+	    gl.glVertex3f(-1.0f, 1.0f, -1.0f);
+	    gl.glVertex3f(1.0f, 1.0f, -1.0f);
+	    gl.glVertex3f(1.0f, -1.0f, -1.0f);
+	    gl.glVertex3f(-1.0f, -1.0f, -1.0f);
+	    gl.glEnd();
 	}
-
-	public void draw(Pipe state, Render out) {
-	    out.draw(state, data);
-	}
-
-	public void added(RenderTree.Slot slot) {
-	    slot.ostate(new VertexColor());
+	
+	public boolean setup(RenderList rls) {
+	    rls.state().put(States.color, States.vertexcolor);
+	    return(true);
 	}
     }
 
-    private void setcam() {
-	Coord3f base = Coord3f.o;
-	Matrix4f cam = Transform.makexlate(new Matrix4f(), new Coord3f(0.0f, 0.0f, -dist))
-	    .mul1(Transform.makerot(new Matrix4f(), new Coord3f(-1.0f, 0.0f, 0.0f), ((float)Math.PI / 2.0f) - e))
-	    .mul1(Transform.makerot(new Matrix4f(), new Coord3f(0.0f, 0.0f, -1.0f), ((float)Math.PI / 2.0f) + a))
-	    .mul1(Transform.makexlate(new Matrix4f(), base.inv()));
-	float field = 0.5f;
-	float aspect = ((float)sz.y) / ((float)sz.x);
-	basic(Camera.class, Pipe.Op.compose(new Camera(cam),
-					    Projection.frustum(-field, field, -aspect * field, aspect * field, 1, 5000)));
+    protected void setup(RenderList rls) {
+	int i = 0;
+	for(FastMesh m : tmesh) {
+	    if((sel == -1) || (i == sel))
+		rls.add(m, null);
+	    i++;
+	}
+	rls.add(new Cube(), Location.xlate(new Coord3f(-1.5f, 0, 0)));
+	rls.add(new Cube(), Location.xlate(new Coord3f(1.5f, 0, 0)));
     }
 
     public void mousemove(Coord c) {
 	if(c.x < 0 || c.x >= sz.x || c.y < 0 || c.y >= sz.y)
 	    return;
-	this.e = (float)Math.PI * 2 * ((float)c.y / (float)sz.y);
-	this.a = (float)Math.PI * 2 * ((float)c.x / (float)sz.x);
-	setcam();
+	camera.e = (float)Math.PI / 2 * ((float)c.y / (float)sz.y);
+	camera.a = (float)Math.PI * 2 * ((float)c.x / (float)sz.x);
     }
-
+    
     public boolean mousewheel(Coord c, int amount) {
-	float d = this.dist + (amount * 5);
+	float d = camera.dist + (amount * 5);
 	if(d < 5)
 	    d = 5;
-	this.dist = d;
-	setcam();
+	camera.dist = d;
 	return(true);
     }
-
-    public void tick(double dt) {
-	rot += (float)dt;
-	borka[0].ostate(new Location(Transform.makexlate(new Matrix4f(), new Coord3f(0, 10, 0))
-				     .mul1(Transform.makerot(new Matrix4f(), Coord3f.zu, rot))));
-	borka[1].ostate(new Location(Transform.makexlate(new Matrix4f(), new Coord3f(0, -10, 0))
-				     .mul1(Transform.makerot(new Matrix4f(), Coord3f.zu, -rot))));
+    
+    public boolean keydown(java.awt.event.KeyEvent ev) {
+	char key = ev.getKeyChar();
+	if(key == ' ') {
+	    sel = -1;
+	    return(true);
+	} else if((key >= '0') && (key < '0' + tmesh.length)) {
+	    sel = key - '0';
+	    return(true);
+	}
+	return(false);
     }
-
-    protected FColor clearcolor() {return(FColor.RED);}
 }

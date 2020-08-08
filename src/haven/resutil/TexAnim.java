@@ -28,15 +28,14 @@ package haven.resutil;
 
 import java.util.*;
 import haven.*;
-import haven.render.*;
-import haven.render.sl.*;
-import haven.render.sl.ValBlock.Value;
-import static haven.render.sl.Cons.*;
-import static haven.render.sl.Function.PDir.*;
-import static haven.render.sl.Type.*;
+import haven.glsl.*;
+import static haven.glsl.Cons.*;
+import static haven.glsl.Function.PDir.*;
+import static haven.glsl.Type.*;
+import haven.glsl.ValBlock.Value;
 
 @Material.ResName("texrot")
-public class TexAnim extends State {
+public class TexAnim extends GLState {
     public static final Slot<TexAnim> slot = new Slot<TexAnim>(Slot.Type.DRAW, TexAnim.class);
     public final Coord3f ax;
 
@@ -48,13 +47,23 @@ public class TexAnim extends State {
 	this(new Coord3f(((Number)args[0]).floatValue(), ((Number)args[1]).floatValue(), 0));
     }
 
-    private static final Uniform cax = new Uniform(VEC2, p -> p.get(slot).ax, slot);
+    private static final Uniform cax = new Uniform(VEC2);
     private static final ShaderMacro shader = prog -> {
-	Tex2D.rtexcoord.value(prog.vctx).mod(in -> add(in, mul(cax.ref(), FrameInfo.time())), 0);
+	Tex2D.rtexcoord.value(prog.vctx).mod(in -> add(in, mul(cax.ref(), MiscLib.time.ref())), 0);
     };
     public ShaderMacro shader() {return(shader);}
 
-    public void apply(Pipe buf) {
+    public void reapply(GOut g) {
+	g.gl.glUniform2f(g.st.prog.uniform(cax), ax.x, ax.y);
+    }
+
+    public void apply(GOut g) {
+	reapply(g);
+    }
+
+    public void unapply(GOut g) {}
+
+    public void prep(Buffer buf) {
 	buf.put(slot, this);
     }
 }

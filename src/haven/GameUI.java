@@ -105,18 +105,18 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 	    if(map != null) {
 		Coord mvc = map.rootxlate(ui.mc);
 		if(mvc.isect(Coord.z, map.sz)) {
-		    map.new Hittest(mvc) {
-			    protected void hit(Coord pc, Coord2d mc, ClickData inf) {
+		    map.delay(map.new Hittest(mvc) {
+			    protected void hit(Coord pc, Coord2d mc, MapView.ClickInfo inf) {
 				Object[] args = {slot, 1, ui.modflags(), mc.floor(OCache.posres)};
 				if(inf != null)
-				    args = Utils.extend(args, inf.clickargs());
+				    args = Utils.extend(args, MapView.gobclickargs(inf));
 				GameUI.this.wdgmsg("belt", args);
 			    }
 			    
 			    protected void nohit(Coord pc) {
 				GameUI.this.wdgmsg("belt", slot, 1, ui.modflags());
 			    }
-			}.run();
+			});
 		}
 	    }
 	}
@@ -196,29 +196,26 @@ public class GameUI extends ConsoleHost implements Console.Directory {
     private void mapbuttons() {
 	blpanel.add(new MenuButton("lbtn-claim", kb_claim, "Display personal claims") {
 		public void click() {
-		    if((map != null) && !map.visol(0)) {
-			map.enol(0); map.enol(1);
-		    } else {
-			map.disol(0); map.disol(1);
-		    }
+		    if((map != null) && !map.visol(0))
+			map.enol(0, 1);
+		    else
+			map.disol(0, 1);
 		}
 	    }, 0, 0);
 	blpanel.add(new MenuButton("lbtn-vil", kb_vil, "Display village claims") {
 		public void click() {
-		    if((map != null) && !map.visol(2)) {
-			map.enol(2); map.enol(3);
-		    } else {
-			map.disol(2); map.disol(3);
-		    }
+		    if((map != null) && !map.visol(2))
+			map.enol(2, 3);
+		    else
+			map.disol(2, 3);
 		}
 	    }, 0, 0);
 	blpanel.add(new MenuButton("lbtn-rlm", kb_rlm, "Display realms") {
 		public void click() {
-		    if((map != null) && !map.visol(4)) {
-			map.enol(4); map.enol(5);
-		    } else {
-			map.disol(4); map.disol(5);
-		    }
+		    if((map != null) && !map.visol(4))
+			map.enol(4, 5);
+		    else
+			map.disol(4, 5);
 		}
 	    }, 0, 0);
 	blpanel.add(new MenuButton("lbtn-map", kb_map, "Map") {
@@ -363,12 +360,6 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 	    });
 	Debug.log = ui.cons.out;
 	opts.c = sz.sub(opts.sz).div(2);
-    }
-
-    public void dispose() {
-	Debug.log = new java.io.PrintWriter(System.err);
-	ui.cons.clearout();
-	super.dispose();
     }
     
     public class Hidepanel extends Widget {
@@ -586,11 +577,8 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 	Coord plc = null;
 	{
 	    Gob pl = map.player();
-	    if(pl != null) {
-		Coord3f raw = pl.placed.getc();
-		if(raw != null)
-		    plc = map.screenxf(raw).round2();
-	    }
+	    if(pl != null)
+		plc = pl.sc;
 	}
 	Area parea = Area.sized(Coord.z, sz);
 	while(!open.isEmpty()) {
@@ -1344,7 +1332,7 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 			super.draw(g);
 			Color urg = chat.urgcols[chat.urgency];
 			if(urg != null) {
-			    GOut g2 = g.reclipl(new Coord(-2, -2), g.sz().add(4, 4));
+			    GOut g2 = g.reclipl(new Coord(-2, -2), g.sz.add(4, 4));
 			    g2.chcolor(urg.getRed(), urg.getGreen(), urg.getBlue(), 128);
 			    g2.image(glow, Coord.z);
 			}

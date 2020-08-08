@@ -105,12 +105,13 @@ public class Equipory extends Widget implements DTarget {
 		    super.draw(g);
 		}
 
-		{
-		    basic.add(new Outlines(true));
+		Outlines outlines = new Outlines(true);
+		protected void setup(RenderList rl) {
+		    super.setup(rl);
+		    rl.add(outlines, null);
 		}
 
-		final FColor cc = new FColor(0, 0, 0, 0);
-		protected FColor clearcolor() {return(cc);}
+		protected java.awt.Color clearcolor() {return(null);}
 	    }, new Coord(34, 0));
 	ava.color = null;
     }

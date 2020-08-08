@@ -48,9 +48,9 @@ public class LinMove extends Moving {
 	return(v.abs());
     }
 
-    public void ctick(double dt) {
+    public void ctick(int dt) {
 	if(!ts) {
-	    t += dt * 0.9;
+	    t += (dt / 1000.0) * 0.9;
 	    if(!Double.isNaN(e) && (t > e)) {
 		t = e;
 	    } else if(t > lt + MAXOVER) {

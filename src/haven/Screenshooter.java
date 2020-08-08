@@ -337,11 +337,11 @@ public class Screenshooter extends Window {
 	new Object() {
 	    BufferedImage map = null, ui = null;
 	    {
-		gameui.map.delay2(g -> g.getimage(Coord.z, g.sz(), img -> {
+		gameui.map.delay2(g -> g.getimage(Coord.z, g.sz, img -> {
 			    map = img;
 			    checkcomplete(g);
 			}));
-		gameui.ui.drawafter(g -> g.getimage(Coord.z, g.sz(), img -> {
+		gameui.ui.drawafter(g -> g.getimage(Coord.z, g.sz, img -> {
 			    ui = img;
 			    checkcomplete(g);
 			}));
@@ -349,12 +349,13 @@ public class Screenshooter extends Window {
 
 	    private void checkcomplete(GOut g) {
 		if((map != null) && (ui != null)) {
-		    GSettings pref = gameui.ui.gprefs;
+		    GLSettings pref = g.gc.pref;
 		    String camera = gameui.map.camera.getClass().getName();
 		    Utils.defer(() -> {
 			    Shot shot = new Shot(map, ui);
+			    shot.fl = pref.flight.val;
 			    shot.sdw = pref.lshadow.val;
-			    // shot.fsaa = pref.fsaa.val; XXXRENDER
+			    shot.fsaa = pref.fsaa.val;
 			    shot.camera = camera;
 			    gameui.addchild(new Screenshooter(tgt, shot), "misc", new Coord2d(0.1, 0.1));
 			});

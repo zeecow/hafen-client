@@ -64,9 +64,7 @@ public class StreamMessage extends Message implements Closeable, Flushable {
 	rh = 0;
 	int rv;
 	try {
-	    do {
-		rv = bkin.read(rbuf, rt, rbuf.length - rt);
-	    } while(rv == 0);
+	    rv = bkin.read(rbuf, rt, rbuf.length - rt);
 	} catch(IOException e) {
 	    throw(new IOError(e));
 	}

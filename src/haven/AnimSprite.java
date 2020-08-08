@@ -27,21 +27,16 @@
 package haven;
 
 import java.util.*;
-import haven.render.*;
 
 public class AnimSprite extends Sprite {
-    private final RenderTree.Node[] parts;
-    private final MeshAnim.Anim[] anims;
+    private Rendered[] parts;
+    private MeshAnim.Anim[] anims;
 
     public static final Factory fact = new Factory() {
 	    public Sprite create(Owner owner, Resource res, Message sdt) {
 		if(res.layer(MeshAnim.Res.class) == null)
 		    return(null);
-		return(new AnimSprite(owner, res, sdt) {
-			public String toString() {
-			    return(String.format("#<anim-sprite %s>", res.name));
-			}
-		    });
+		return(new AnimSprite(owner, res, sdt));
 	    }
 	};
 
@@ -55,7 +50,7 @@ public class AnimSprite extends Sprite {
 	}
 	this.anims = anims.toArray(new MeshAnim.Anim[0]);
 	MorphedMesh.Morpher.Factory morph = MorphedMesh.combine(this.anims);
-	Collection<RenderTree.Node> rl = new LinkedList<>();
+	Collection<Rendered> rl = new LinkedList<Rendered>();
 	for(FastMesh.MeshRes mr : res.layers(FastMesh.MeshRes.class)) {
 	    if((mr.mat != null) && ((mr.id < 0) || (((1 << mr.id) & mask) != 0))) {
 		boolean stat = true;
@@ -65,26 +60,30 @@ public class AnimSprite extends Sprite {
 			break;
 		    }
 		}
-		if(stat) {
+		if(stat)
 		    rl.add(mr.mat.get().apply(mr.m));
-		} else {
+		else
 		    rl.add(mr.mat.get().apply(new MorphedMesh(mr.m, morph)));
-		}
 	    }
 	}
-	parts = rl.toArray(new RenderTree.Node[0]);
+	parts = rl.toArray(new Rendered[0]);
     }
 
-    public void added(RenderTree.Slot slot) {
-	for(RenderTree.Node p : parts)
-	    slot.add(p);
+    public boolean setup(RenderList rl) {
+	for(Rendered p : parts)
+	    rl.add(p, null);
+	return(false);
     }
 
-    public boolean tick(double ddt) {
-	float dt = (float)ddt;
+    public boolean tick(int idt) {
 	boolean ret = false;
+	float dt = idt / 1000.0f;
 	for(MeshAnim.Anim anim : anims)
 	    ret = ret | anim.tick(dt);
 	return(ret);
+    }
+
+    public Object staticp() {
+	return((anims.length == 0)?CONSTANS:null);
     }
 }

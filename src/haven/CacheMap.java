@@ -174,7 +174,7 @@ public class CacheMap<K, V> extends AbstractMap<K, V> {
 	Reference<? extends V> ref;
 	while((ref = cleanq.poll()) != null) {
 	    Ref rr = (Ref)ref;
-	    remove0(rr.key());
+	    remove(rr.key());
 	}
     }
 
@@ -190,13 +190,9 @@ public class CacheMap<K, V> extends AbstractMap<K, V> {
 	return((old == null)?null:(old.get()));
     }
 
-    private V remove0(Object k) {
-	Reference<V> ref = back.remove(k);
-	return((ref == null)?null:(ref.get()));
-    }
-
     public V remove(Object k) {
 	clean();
-	return(remove0(k));
+	Reference<V> ref = back.remove(k);
+	return((ref == null)?null:(ref.get()));
     }
 }

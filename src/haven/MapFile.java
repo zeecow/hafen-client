@@ -193,7 +193,6 @@ public class MapFile {
     private class Processor extends HackThread {
 	Processor() {
 	    super("Mapfile processor");
-	    setDaemon(true);
 	}
 
 	public void run() {

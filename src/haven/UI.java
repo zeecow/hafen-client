@@ -31,16 +31,13 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.InputEvent;
 import static haven.Utils.el;
-import haven.render.Environment;
-import haven.render.Render;
 
 public class UI {
     public static int MOD_SHIFT = 1, MOD_CTRL = 2, MOD_META = 4, MOD_SUPER = 8;
     public RootWidget root;
-    private final LinkedList<Grab> keygrab = new LinkedList<Grab>(), mousegrab = new LinkedList<Grab>();
-    private final Map<Integer, Widget> widgets = new TreeMap<Integer, Widget>();
-    private final Map<Widget, Integer> rwidgets = new HashMap<Widget, Integer>();
-    Environment env;
+    final private LinkedList<Grab> keygrab = new LinkedList<Grab>(), mousegrab = new LinkedList<Grab>();
+    public Map<Integer, Widget> widgets = new TreeMap<Integer, Widget>();
+    public Map<Widget, Integer> rwidgets = new HashMap<Widget, Integer>();
     Receiver rcvr;
     public Coord mc = Coord.z, lcc = Coord.z;
     public Session sess;
@@ -51,9 +48,7 @@ public class UI {
     public Console cons = new WidgetConsole();
     private Collection<AfterDraw> afterdraws = new LinkedList<AfterDraw>();
     private final Context uictx;
-    public GSettings gprefs = GSettings.load(true);
-    private boolean gprefsdirty = false;
-    public final ActAudio.Root audio = new ActAudio.Root();
+    public final ActAudio audio = new ActAudio();
     
     {
 	lastevent = lasttick = Utils.rtime();
@@ -75,15 +70,6 @@ public class UI {
 	public void draw(GOut g);
     }
 
-    public void setgprefs(GSettings prefs) {
-	synchronized(this) {
-	    if(!Utils.eq(prefs, this.gprefs)) {
-		this.gprefs = prefs;
-		gprefsdirty = true;
-	    }
-	}
-    }
-
     private class WidgetConsole extends Console {
 	{
 	    setcmd("q", new Command() {
@@ -94,20 +80,6 @@ public class UI {
 	    setcmd("lo", new Command() {
 		    public void run(Console cons, String[] args) {
 			sess.close();
-		    }
-		});
-	    setcmd("gl", new Command() {
-		    <T> void merd(GSettings.Setting<T> var, String val) {
-			setgprefs(gprefs.update(null, var, var.parse(val)));
-		    }
-
-		    public void run(Console cons, String[] args) throws Exception {
-			if(args.length < 3)
-			    throw(new Exception("usage: gl SETTING VALUE"));
-			GSettings.Setting<?> var = gprefs.find(args[1]);
-			if(var == null)
-			    throw(new Exception("No such setting: " + var));
-			merd(var, args[2]);
 		    }
 		});
 	}
@@ -155,27 +127,10 @@ public class UI {
     }
 	
     public void bind(Widget w, int id) {
-	synchronized(widgets) {
-	    widgets.put(id, w);
-	    rwidgets.put(w, id);
-	}
+	widgets.put(id, w);
+	rwidgets.put(w, id);
     }
-
-    public Widget getwidget(int id) {
-	synchronized(widgets) {
-	    return(widgets.get(id));
-	}
-    }
-
-    public int widgetid(Widget wdg) {
-	synchronized(widgets) {
-	    Integer id = rwidgets.get(wdg);
-	    if(id == null)
-		return(-1);
-	    return(id);
-	}
-    }
-
+    
     public void drawafter(AfterDraw ad) {
 	synchronized(afterdraws) {
 	    afterdraws.add(ad);
@@ -186,14 +141,6 @@ public class UI {
 	double now = Utils.rtime();
 	root.tick(now - lasttick);
 	lasttick = now;
-	if(gprefsdirty) {
-	    gprefs.save();
-	    gprefsdirty = false;
-	}
-    }
-
-    public void gtick(Render out) {
-	root.gtick(out);
     }
 
     public void draw(GOut g) {
@@ -211,7 +158,7 @@ public class UI {
 	    Widget wdg = f.create(this, cargs);
 	    wdg.attach(this);
 	    if(parent != 65535) {
-		Widget pwdg = getwidget(parent);
+		Widget pwdg = widgets.get(parent);
 		if(pwdg == null)
 		    throw(new UIException("Null parent widget " + parent + " for " + id, type, cargs));
 		pwdg.addchild(wdg, pargs);
@@ -222,10 +169,10 @@ public class UI {
 
     public void addwidget(int id, int parent, Object[] pargs) {
 	synchronized(this) {
-	    Widget wdg = getwidget(id);
+	    Widget wdg = widgets.get(id);
 	    if(wdg == null)
 		throw(new UIException("Null child widget " + id + " added to " + parent, null, pargs));
-	    Widget pwdg = getwidget(parent);
+	    Widget pwdg = widgets.get(parent);
 	    if(pwdg == null)
 		throw(new UIException("Null parent widget " + parent + " for " + id, null, pargs));
 	    pwdg.addchild(wdg, pargs);
@@ -261,18 +208,16 @@ public class UI {
     }
 
     private void removeid(Widget wdg) {
-	synchronized(widgets) {
-	    Integer id = rwidgets.get(wdg);
-	    if(id != null) {
-		widgets.remove(id);
-		rwidgets.remove(wdg);
-	    }
+	if(rwidgets.containsKey(wdg)) {
+	    int id = rwidgets.get(wdg);
+	    widgets.remove(id);
+	    rwidgets.remove(wdg);
 	}
 	for(Widget child = wdg.child; child != null; child = child.next)
 	    removeid(child);
     }
 	
-    public void removed(Widget wdg) {
+    public void destroy(Widget wdg) {
 	for(Iterator<Grab> i = mousegrab.iterator(); i.hasNext();) {
 	    Grab g = i.next();
 	    if(g.wdg.hasparent(wdg))
@@ -283,46 +228,49 @@ public class UI {
 	    if(g.wdg.hasparent(wdg))
 		i.remove();
 	}
-    }
-
-    public void destroy(Widget wdg) {
 	removeid(wdg);
 	wdg.reqdestroy();
     }
     
     public void destroy(int id) {
 	synchronized(this) {
-	    Widget wdg = getwidget(id);
-	    if(wdg != null)
+	    if(widgets.containsKey(id)) {
+		Widget wdg = widgets.get(id);
 		destroy(wdg);
+	    }
 	}
     }
 	
     public void wdgmsg(Widget sender, String msg, Object... args) {
-	int id = widgetid(sender);
-	if(id < 0) {
-	    new Warning("wdgmsg sender (%s) is not in rwidgets, message is %s", sender.getClass().getName(), msg).issue();
-	    return;
+	int id;
+	synchronized(this) {
+	    if(!rwidgets.containsKey(sender)) {
+		System.err.printf("Wdgmsg sender (%s) is not in rwidgets, message is %s\n", sender.getClass().getName(), msg);
+		return;
+	    }
+	    id = rwidgets.get(sender);
 	}
 	if(rcvr != null)
 	    rcvr.rcvmsg(id, msg, args);
     }
 	
     public void uimsg(int id, String msg, Object... args) {
-	Widget wdg = getwidget(id);
-	if(wdg != null)
-	    wdg.uimsg(msg.intern(), args);
-	else
-	    throw(new UIException("Uimsg to non-existent widget " + id, msg, args));
+	synchronized(this) {
+	    Widget wdg = widgets.get(id);
+	    if(wdg != null)
+		wdg.uimsg(msg.intern(), args);
+	    else
+		throw(new UIException("Uimsg to non-existent widget " + id, msg, args));
+	}
     }
 	
     private void setmods(InputEvent ev) {
 	int mod = ev.getModifiersEx();
-	modshift = (mod & InputEvent.SHIFT_DOWN_MASK) != 0;
-	modctrl = (mod & InputEvent.CTRL_DOWN_MASK) != 0;
-	modmeta = (mod & (InputEvent.META_DOWN_MASK | InputEvent.ALT_DOWN_MASK)) != 0;
+	Debug.kf1 = modshift = (mod & InputEvent.SHIFT_DOWN_MASK) != 0;
+	Debug.kf2 = modctrl = (mod & InputEvent.CTRL_DOWN_MASK) != 0;
+	Debug.kf3 = modmeta = (mod & (InputEvent.META_DOWN_MASK | InputEvent.ALT_DOWN_MASK)) != 0;
 	/*
-	modsuper = (mod & InputEvent.SUPER_DOWN_MASK) != 0;
+	Debug.kf4 = modsuper = (mod & InputEvent.SUPER_DOWN_MASK) != 0;
 	*/
     }
 
@@ -434,12 +382,7 @@ public class UI {
 	       (modsuper ? MOD_SUPER : 0));
     }
 
-    public Environment getenv() {
-	return(env);
-    }
-
     public void destroy() {
-	root.destroy();
 	audio.clear();
     }
 }

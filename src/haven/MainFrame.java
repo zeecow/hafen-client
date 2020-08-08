@@ -33,7 +33,7 @@ import java.util.*;
 import java.lang.reflect.*;
 
 public class MainFrame extends java.awt.Frame implements Runnable, Console.Directory {
-    UIPanel p;
+    HavenPanel p;
     private final ThreadGroup g;
     public final Thread mt;
     DisplayMode fsmode = null, prefs = null;
@@ -180,8 +180,7 @@ public class MainFrame extends java.awt.Frame implements Runnable, Console.Direc
 	}
 	this.g = new ThreadGroup(HackThread.tg(), "Haven client");
 	this.mt = new HackThread(this.g, this, "Haven main thread");
-	JOGLPanel p = new JOGLPanel(sz);
-	this.p = p;
+	p = new HavenPanel(sz.x, sz.y);
 	if(fsmode == null) {
 	    Coord pfm = Utils.getprefc("fsmode", null);
 	    if(pfm != null)
@@ -199,17 +198,18 @@ public class MainFrame extends java.awt.Frame implements Runnable, Console.Direc
 	p.requestFocus();
 	seticon();
 	setVisible(true);
+	p.init();
 	addWindowListener(new WindowAdapter() {
 		public void windowClosing(WindowEvent e) {
-		    mt.interrupt();
+		    g.interrupt();
 		}
 
 		public void windowActivated(WindowEvent e) {
-		    p.background(false);
+		    p.bgmode = false;
 		}
 
 		public void windowDeactivated(WindowEvent e) {
-		    p.background(true);
+		    p.bgmode = true;
 		}
 	    });
 	if((isz == null) && Utils.getprefb("wndmax", false))
@@ -238,8 +238,8 @@ public class MainFrame extends java.awt.Frame implements Runnable, Console.Direc
 	Thread ui = new HackThread(p, "Haven UI thread");
 	ui.start();
 	try {
-	    Session sess = null;
 	    try {
+		Session sess = null;
 		while(true) {
 		    UI.Runner fun;
 		    if(sess == null) {
@@ -256,20 +256,10 @@ public class MainFrame extends java.awt.Frame implements Runnable, Console.Direc
 		    }
 		    sess = fun.run(p.newui(sess));
 		}
-	    } catch(InterruptedException e) {
-	    } finally {
-		p.newui(null);
-		if(sess != null)
-		    sess.close();
-	    }
+	    } catch(InterruptedException e) {}
 	    savewndstate();
 	} finally {
 	    ui.interrupt();
-	    try {
-		ui.join(5000);
-	    } catch(InterruptedException e) {}
-	    if(ui.isAlive())
-		Warning.warn("ui thread failed to terminate");
 	    dispose();
 	}
     }
@@ -395,7 +385,7 @@ public class MainFrame extends java.awt.Frame implements Runnable, Console.Direc
 	try {
 	    f.mt.join();
 	} catch(InterruptedException e) {
-	    f.mt.interrupt();
+	    f.g.interrupt();
 	    return;
 	}
 	dumplist(Resource.remote().loadwaited(), Config.loadwaited);
@@ -426,7 +416,6 @@ public class MainFrame extends java.awt.Frame implements Runnable, Console.Direc
 			}
 		    });
 		g = hg;
-		new DeadlockWatchdog(hg).start();
 	    } catch(java.net.MalformedURLException e) {
 	    }
 	}

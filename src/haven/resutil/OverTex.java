@@ -27,22 +27,22 @@
 package haven.resutil;
 
 import haven.*;
-import haven.render.*;
-import haven.render.sl.*;
+import haven.glsl.*;
 import java.util.*;
 import java.nio.*;
-import haven.render.Texture2D.Sampler2D;
-import static haven.render.sl.Cons.*;
-import static haven.render.sl.Type.*;
+import javax.media.opengl.*;
+import static haven.glsl.Cons.*;
+import static haven.glsl.Type.*;
 
-public class OverTex extends State {
+public class OverTex extends GLState {
     public static final Slot<OverTex> slot = new Slot<OverTex>(Slot.Type.DRAW, OverTex.class);
-    public static final Attribute otexc = new Attribute(VEC2, "otexc");
+    public static final Attribute otexc = new Attribute(VEC2);
     public static boolean otexdb = false;
-    private static final Uniform ctex = new Uniform(SAMPLER2D, p -> p.get(slot).tex, slot);
+    private static final Uniform ctex = new Uniform(SAMPLER2D);
     private static final Map<Function, ShaderMacro> shcache = new HashMap<Function, ShaderMacro>();
     private final ShaderMacro shader;
-    public final Sampler2D tex;
+    public final TexGL tex;
+    private TexUnit sampler;
 
     private static ShaderMacro shfor(final Function blend) {
 	return(new ShaderMacro() {
@@ -58,12 +58,12 @@ public class OverTex extends State {
 			    }
 			};
 		    color.force();
-		    FragColor.fragcol(prog.fctx).mod(in -> blend.call(in, color.ref()), 10);
+		    prog.fctx.fragcol.mod(in -> blend.call(in, color.ref()), 10);
 		}
 	    });
     }
 
-    public OverTex(Sampler2D tex, Function blend) {
+    public OverTex(TexGL tex, Function blend) {
 	this.tex = tex;
 	ShaderMacro sh;
 	synchronized(shcache) {
@@ -74,14 +74,30 @@ public class OverTex extends State {
 	shader = sh;
     }
 
-    public OverTex(Sampler2D tex) {
+    public OverTex(TexGL tex) {
 	this(tex, MiscLib.cpblend);
     }
 
     public ShaderMacro shader() {return(shader);}
 
-    public void apply(Pipe buf) {
-	if(!(otexdb /* && Debug.kf3 XXXRENDER */))
+    public void reapply(GOut g) {
+	g.gl.glUniform1i(g.st.prog.uniform(ctex), sampler.id);
+    }
+
+    public void apply(GOut g) {
+	sampler = TexGL.lbind(g, tex);
+	reapply(g);
+    }
+
+    public void unapply(GOut g) {
+	BGL gl = g.gl;
+	sampler.act(g);
+	gl.glBindTexture(GL.GL_TEXTURE_2D, null);
+	sampler.free(); sampler = null;
+    }
+
+    public void prep(Buffer buf) {
+	if(!(otexdb && Debug.kf3))
 	    buf.put(slot, this);
     }
 
@@ -116,24 +132,24 @@ public class OverTex extends State {
 		blend = MiscLib.cpblend;
 	    }
 	    return(new Material.Res.Resolver() {
-		    public void resolve(Collection<Pipe.Op> buf, Collection<Pipe.Op> dynbuf) {
+		    public void resolve(Collection<GLState> buf) {
 			TexR rt = tres.get().layer(TexR.class, tid);
 			if(rt == null)
 			    throw(new RuntimeException(String.format("Specified texture %d for %s not found in %s", tid, res, tres)));
-			buf.add(new OverTex(rt.tex().img, blend));
+			buf.add(new OverTex(rt.tex(), blend));
 		    }
 		});
 	}
     }
 
     @VertexBuf.ResName("otex2")
-    public static class OTexC extends VertexBuf.FloatData {
-	public OTexC(FloatBuffer data) {super(otexc, 2, data);}
+    public static class OTexC extends VertexBuf.Vec2Array {
+	public OTexC(FloatBuffer data) {super(data, otexc);}
 	public OTexC(Resource res, Message buf, int nv) {this(VertexBuf.loadbuf2(Utils.wfbuf(nv * 2), buf));}
     }
     @VertexBuf.ResName("otex")
-    public static class CDecode implements VertexBuf.DataCons {
-	public void cons(Collection<VertexBuf.AttribData> dst, Resource res, Message buf, int nv) {
+    public static class CDecode implements VertexBuf.ArrayCons {
+	public void cons(Collection<VertexBuf.AttribArray> dst, Resource res, Message buf, int nv) {
 	    dst.add(new OTexC(VertexBuf.loadbuf(Utils.wfbuf(nv * 2), buf)));
 	}
     }

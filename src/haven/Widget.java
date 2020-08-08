@@ -348,7 +348,7 @@ public class Widget {
 		    st.push(((Widget)st.pop()).sz);
 		} else if(op == 'w') {
 		    synchronized(ui) {
-			st.push(ui.getwidget((Integer)st.pop()));
+			st.push(ui.widgets.get((Integer)st.pop()));
 		    }
 		} else if(op == 'x') {
 		    st.push(((Coord)st.pop()).x);
@@ -477,48 +477,33 @@ public class Widget {
 	}
 	return(false);
     }
-
+	
     public void gotfocus() {
 	if(focusctl && (focused != null)) {
 	    focused.hasfocus = true;
 	    focused.gotfocus();
 	}
     }
-
-    public void dispose() {
-    }
-
-    public void rdispose() {
-	for(Widget ch = child; ch != null; ch = ch.next)
-	    ch.rdispose();
-	dispose();
-    }
-
-    public void remove() {
-	if(canfocus)
-	    setcanfocus(false);
-	if(parent != null) {
-	    unlink();
-	    parent.cdestroy(this);
-	}
-	ui.removed(this);
-    }
-
+	
     public void reqdestroy() {
 	destroy();
     }
 
     public void destroy() {
-	remove();
-	rdispose();
+	if(canfocus)
+	    setcanfocus(false);
+	unlink();
+	parent.cdestroy(this);
     }
-
-    /* XXX: Should be renamed to cremove at this point. */
+    
     public void cdestroy(Widget w) {
     }
-
+	
     public int wdgid() {
-	return(ui.widgetid(this));
+	Integer id = ui.rwidgets.get(this);
+	if(id == null)
+	    return(-1);
+	return(id);
     }
 
     public void lostfocus() {
@@ -527,7 +512,7 @@ public class Widget {
 	    focused.lostfocus();
 	}
     }
-
+	
     public void setfocus(Widget w) {
 	if(focusctl) {
 	    if(w != focused) {
@@ -545,11 +530,8 @@ public class Widget {
 		    last.hasfocus = false;
 		    last.lostfocus();
 		}
-		if((ui != null) && (w != null) && (wdgid() >= 0)) {
-		    int id = w.wdgid();
-		    if(id >= 0)
-			wdgmsg("focus", id);
-		}
+		if((ui != null) && ui.rwidgets.containsKey(w) && ui.rwidgets.containsKey(this))
+		    wdgmsg("focus", ui.rwidgets.get(w));
 	    }
 	    if((parent != null) && visible && canfocus)
 		parent.setfocus(this);
@@ -557,7 +539,7 @@ public class Widget {
 	    parent.setfocus(w);
 	}
     }
-
+	
     public void setcanfocus(boolean canfocus) {
 	this.autofocus = this.canfocus = canfocus;
 	if(parent != null) {
@@ -568,7 +550,7 @@ public class Widget {
 	    }
 	}
     }
-
+	
     public void newfocusable(Widget w) {
 	if(focusctl) {
 	    if(focused == null)
@@ -578,7 +560,7 @@ public class Widget {
 		parent.newfocusable(w);
 	}
     }
-
+	
     public void delfocusable(Widget w) {
 	if(focusctl) {
 	    if((focused != null) && focused.hasparent(w)) {
@@ -589,7 +571,7 @@ public class Widget {
 		parent.delfocusable(w);
 	}
     }
-
+	
     private void findfocus() {
 	/* XXX: Might need to check subwidgets recursively */
 	focused = null;
@@ -632,7 +614,7 @@ public class Widget {
 	    if(tid < 0) {
 		setfocus(null);
 	    } else {
-		Widget w = ui.getwidget(tid);
+		Widget w = ui.widgets.get(tid);
 		if(w != null) {
 		    if(w.canfocus)
 			setfocus(w);
@@ -679,7 +661,7 @@ public class Widget {
 		}
 	    }
 	} else {
-	    new Warning("unhandled widget message: " + msg).issue();
+	    System.err.println("Unhandled widget message: " + msg);
 	}
     }
 	
@@ -709,12 +691,6 @@ public class Widget {
 	    Anim anim = i.next();
 	    if(anim.tick(dt))
 		i.remove();
-	}
-    }
-
-    public void gtick(haven.render.Render out) {
-	for(Widget wdg = child; wdg != null; wdg = wdg.next) {
-	    wdg.gtick(out);
 	}
     }
 

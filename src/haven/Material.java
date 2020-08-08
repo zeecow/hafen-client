@@ -30,87 +30,138 @@ import java.awt.Color;
 import java.util.*;
 import java.lang.annotation.*;
 import java.lang.reflect.*;
-import haven.render.*;
+import javax.media.opengl.*;
+import static haven.Utils.c2fa;
 
-public class Material implements Pipe.Op {
-    public final Pipe.Op states, dynstates;
-
-    public static final Pipe.Op nofacecull = (p -> p.put(States.facecull, null));
+public class Material extends GLState {
+    public final GLState[] states;
+    
+    public static final GLState nofacecull = new GLState.StandAlone(Slot.Type.GEOM, PView.proj) {
+	    public void apply(GOut g) {
+		g.gl.glDisable(GL.GL_CULL_FACE);
+	    }
+	    
+	    public void unapply(GOut g) {
+		g.gl.glEnable(GL.GL_CULL_FACE);
+	    }
+	};
     @ResName("nofacecull")
     public static class $nofacecull implements ResCons {
-	public Pipe.Op cons(Resource res, Object... args) {return(nofacecull);}
+	public GLState cons(Resource res, Object... args) {return(nofacecull);}
     }
+    
+    public static final float[] defamb = {0.2f, 0.2f, 0.2f, 1.0f};
+    public static final float[] defdif = {0.8f, 0.8f, 0.8f, 1.0f};
+    public static final float[] defspc = {0.0f, 0.0f, 0.0f, 1.0f};
+    public static final float[] defemi = {0.0f, 0.0f, 0.0f, 1.0f};
+    
+    public static final GLState.Slot<Colors> colors = new GLState.Slot<Colors>(Slot.Type.DRAW, Colors.class);
+    @ResName("col")
+    public static class Colors extends GLState {
+	public float[] amb, dif, spc, emi;
+	public float shine;
+    
+	public Colors() {
+	    amb = defamb;
+	    dif = defdif;
+	    spc = defspc;
+	    emi = defemi;
+	}
 
-    @ResName("maskcol")
-    public static class $maskcol implements ResCons {
-	final Pipe.Op mask = p -> p.put(FragColor.slot, null);
-	public Pipe.Op cons(Resource res, Object... args) {
-	    return(mask);
+	public Colors(float[] amb, float[] dif, float[] spc, float[] emi, float shine) {
+	    this.amb = amb;
+	    this.dif = dif;
+	    this.spc = spc;
+	    this.emi = emi;
+	    this.shine = shine;
+	}
+
+	private static float[] colmul(float[] c1, float[] c2) {
+	    return(new float[] {c1[0] * c2[0], c1[1] * c2[1], c1[2] * c2[2], c1[3] * c2[3]});
+	}
+	
+	private static float[] colblend(float[] in, float[] bl) {
+	    float f1 = bl[3], f2 = 1.0f - f1;
+	    return(new float[] {(in[0] * f2) + (bl[0] * f1),
+				(in[1] * f2) + (bl[1] * f1),
+				(in[2] * f2) + (bl[2] * f1),
+				in[3]});
+	}
+
+	public Colors(Color amb, Color dif, Color spc, Color emi, float shine) {
+	    this(c2fa(amb), c2fa(dif), c2fa(spc), c2fa(emi), shine);
+	}
+	
+	public Colors(Color amb, Color dif, Color spc, Color emi) {
+	    this(amb, dif, spc, emi, 0);
+	}
+	
+	public Colors(Color col) {
+	    this(new Color((int)(col.getRed() * defamb[0]), (int)(col.getGreen() * defamb[1]), (int)(col.getBlue() * defamb[2]), col.getAlpha()),
+		 new Color((int)(col.getRed() * defdif[0]), (int)(col.getGreen() * defdif[1]), (int)(col.getBlue() * defdif[2]), col.getAlpha()),
+		 new Color(0, 0, 0, 0),
+		 new Color(0, 0, 0, 0),
+		 0);
+	}
+    
+	public Colors(Resource res, Object... args) {
+	    this((Color)args[0], (Color)args[1], (Color)args[2], (Color)args[3], (Float)args[4]);
+	}
+
+	public void apply(GOut g) {
+	    BGL gl = g.gl;
+	    gl.glMaterialfv(GL.GL_FRONT_AND_BACK, GL2.GL_AMBIENT, amb, 0);
+	    gl.glMaterialfv(GL.GL_FRONT_AND_BACK, GL2.GL_DIFFUSE, dif, 0);
+	    gl.glMaterialfv(GL.GL_FRONT_AND_BACK, GL2.GL_SPECULAR, spc, 0);
+	    gl.glMaterialfv(GL.GL_FRONT_AND_BACK, GL2.GL_EMISSION, emi, 0);
+	    gl.glMaterialf(GL.GL_FRONT_AND_BACK, GL2.GL_SHININESS, shine);
+	}
+
+	public void unapply(GOut g) {
+	    BGL gl = g.gl;
+	    gl.glMaterialfv(GL.GL_FRONT_AND_BACK, GL2.GL_AMBIENT, defamb, 0);
+	    gl.glMaterialfv(GL.GL_FRONT_AND_BACK, GL2.GL_DIFFUSE, defdif, 0);
+	    gl.glMaterialfv(GL.GL_FRONT_AND_BACK, GL2.GL_SPECULAR, defspc, 0);
+	    gl.glMaterialfv(GL.GL_FRONT_AND_BACK, GL2.GL_EMISSION, defemi, 0);
+	    gl.glMaterialf(GL.GL_FRONT_AND_BACK, GL2.GL_SHININESS, 0.0f);
+	}
+    
+	public int capplyfrom(GLState from) {
+	    if(from instanceof Colors)
+		return(5);
+	    return(-1);
+	}
+
+	public void applyfrom(GOut g, GLState from) {
+	    if(from instanceof Colors)
+		apply(g);
+	}
+	
+	public void prep(Buffer buf) {
+	    Colors p = buf.get(colors);
+	    if(p != null)
+		buf.put(colors, p.combine(this));
+	    else
+		buf.put(colors, this);
+	}
+	
+	public Colors combine(Colors other) {
+	    return(new Colors(colblend(other.amb, this.amb),
+			      colblend(other.dif, this.dif),
+			      colblend(other.spc, this.spc),
+			      colblend(other.emi, this.emi),
+			      other.shine));
+	}
+    
+	public String toString() {
+	    return(String.format("(%.1f, %.1f, %.1f), (%.1f, %.1f, %.1f), (%.1f, %.1f, %.1f @ %.1f)",
+				 amb[0], amb[1], amb[2], dif[0], dif[1], dif[2], spc[0], spc[1], spc[2], shine));
 	}
     }
-
-    @ResName("maskdepth")
-    public static class $maskdepth implements ResCons {
-	public Pipe.Op cons(Resource res, Object... args) {
-	    return(States.maskdepth);
-	}
-    }
-
-    @Material.ResName("vcol")
-    public static class $vcol implements Material.ResCons {
-	public Pipe.Op cons(Resource res, Object... args) {
-	    return(new BaseColor((Color)args[0]));
-	}
-    }
-
-    @ResName("blend")
-    public static class $blend implements ResCons {
-	private static States.Blending.Function fn(Resource res, char desc) {
-	    switch(desc) {
-	    case '+': return States.Blending.Function.ADD;
-	    case '-': return States.Blending.Function.SUB;
-	    case '_': return States.Blending.Function.RSUB;
-	    case '>': return States.Blending.Function.MAX;
-	    case '<': return States.Blending.Function.MIN;
-	    default: throw(new Resource.LoadException("Unknown blend function: " + desc, res));
-	    }
-	}
-
-	private static States.Blending.Factor fac(Resource res, char desc) {
-	    switch(desc) {
-	    case '0': return States.Blending.Factor.ZERO;
-	    case '1': return States.Blending.Factor.ONE;
-	    case 'a': return States.Blending.Factor.SRC_ALPHA;
-	    case 'A': return States.Blending.Factor.INV_SRC_ALPHA;
-	    case 'c': return States.Blending.Factor.SRC_COLOR;
-	    case 'C': return States.Blending.Factor.INV_SRC_COLOR;
-	    default: throw(new Resource.LoadException("Unknown blend factor: " + desc, res));
-	    }
-	}
-
-	public Pipe.Op cons(Resource res, Object... args) {
-	    States.Blending.Function cfn, afn;
-	    States.Blending.Factor csrc, cdst, asrc, adst;
-	    String desc = (String)args[0];
-	    if(desc.length() < 3)
-		throw(new Resource.LoadException("Bad blend description: " + desc, res));
-	    cfn = fn(res, desc.charAt(0));
-	    csrc = fac(res, desc.charAt(1));
-	    cdst = fac(res, desc.charAt(2));
-	    if(desc.length() < 6) {
-		afn = cfn; asrc = csrc; adst = cdst;
-	    } else {
-		afn = fn(res, desc.charAt(3));
-		asrc = fac(res, desc.charAt(4));
-		adst = fac(res, desc.charAt(5));
-	    }
-	    return(new States.Blending(cfn, csrc, cdst, afn, asrc, adst));
-	}
-    }
-
+    
     @ResName("order")
     public static class $order implements ResCons {
-	public Pipe.Op cons(Resource res, Object... args) {
+	public GLState cons(Resource res, Object... args) {
 	    String nm = (String)args[0];
 	    if(nm.equals("first")) {
 		return(Rendered.first);
@@ -131,43 +182,40 @@ public class Material implements Pipe.Op {
 	    }
 	}
     }
-
-    public Material(Pipe.Op[] states, Pipe.Op[] dynstates) {
-	this.states = Pipe.Op.compose(states);
-	this.dynstates = Pipe.Op.compose(dynstates);
+    
+    public void apply(GOut g) {}
+    
+    public void unapply(GOut g) {}
+    
+    public Material(GLState... states) {
+	this.states = states;
     }
 
-    public Material(Pipe.Op... states) {
-	this(states, new Pipe.Op[0]);
+    public Material() {
+	this(Light.deflight, new Colors());
     }
-
+    
+    public Material(Color amb, Color dif, Color spc, Color emi, float shine) {
+	this(Light.deflight, new Colors(amb, dif, spc, emi, shine));
+    }
+    
+    public Material(Color col) {
+	this(Light.deflight, new Colors(col));
+    }
+    
+    public Material(Tex tex) {
+	this(Light.deflight, new Colors(), tex.draw(), tex.clip());
+    }
+    
     public String toString() {
-	return(Arrays.asList(states, dynstates).toString());
+	return(Arrays.asList(states).toString());
     }
-
-    public void apply(Pipe p) {
-	states.apply(p);
-	dynstates.apply(p);
+    
+    public void prep(Buffer buf) {
+	for(GLState st : states)
+	    st.prep(buf);
     }
-
-    /* This is actually an interesting inflection point. Right now,
-     * Material overriding apply() seems more like an ugly hack to
-     * support dynamic vs. static states. However, allowing materials
-     * to more truly own their own wrapping slots opens up such
-     * possibilities as them adding their children multiple times for
-     * more complex rendering techniques, which might be quite useful,
-     * and is well worth considering converting more fully to. In that
-     * case, materials probably shouldn't even be pipe-ops at all, but
-     * rather having apply() as their main and only interface. */
-    public Wrapping apply(RenderTree.Node r) {
-	if(dynstates != Pipe.Op.nil) {
-	    if(states == Pipe.Op.nil)
-		return(dynstates.apply(r, false));
-	    r = dynstates.apply(r, false);
-	}
-	return(states.apply(r, true));
-    }
-
+    
     public interface Owner extends OwnerContext {
     }
 
@@ -213,28 +261,29 @@ public class Material implements Pipe.Op {
 
     public static class Res extends Resource.Layer implements Resource.IDLayer<Integer> {
 	public final int id;
-	private transient List<Pipe.Op> states = new LinkedList<>(), dynstates = new LinkedList<>();
-	private transient List<Resolver> left = new LinkedList<>();
+	private transient List<GLState> states = new LinkedList<GLState>();
+	private transient List<Resolver> left = new LinkedList<Resolver>();
 	private transient Material m;
-
+	private boolean mipmap = false, linear = false;
+	
 	public interface Resolver {
-	    public void resolve(Collection<Pipe.Op> buf, Collection<Pipe.Op> dynbuf);
+	    public void resolve(Collection<GLState> buf);
 	}
-
+	
 	public Res(Resource res, int id) {
 	    res.super();
 	    this.id = id;
 	}
-
+	
 	public Material get() {
 	    synchronized(this) {
 		if(m == null) {
 		    for(Iterator<Resolver> i = left.iterator(); i.hasNext();) {
 			Resolver r = i.next();
-			r.resolve(states, dynstates);
+			r.resolve(states);
 			i.remove();
 		    }
-		    m = new Material(states.toArray(new Pipe.Op[0]), dynstates.toArray(new Pipe.Op[0])) {
+		    m = new Material(states.toArray(new GLState[0])) {
 			    public String toString() {
 				return(super.toString() + "@" + getres().name);
 			    }
@@ -244,10 +293,98 @@ public class Material implements Pipe.Op {
 	    }
 	}
 
-	public void init() {}
-
+	public void init() {
+	    for(Resource.Image img : getres().layers(Resource.imgc)) {
+		TexGL tex = (TexGL)img.tex();
+		if(mipmap)
+		    tex.mipmap();
+		if(linear)
+		    tex.magfilter(GL.GL_LINEAR);
+	    }
+	}
+	
 	public Integer layerid() {
 	    return(id);
+	}
+    }
+
+    @Resource.LayerName("mat")
+    public static class OldMat implements Resource.LayerFactory<Res> {
+	private static Color col(Message buf) {
+	    return(new Color((int)(buf.cpfloat() * 255.0),
+			     (int)(buf.cpfloat() * 255.0),
+			     (int)(buf.cpfloat() * 255.0),
+			     (int)(buf.cpfloat() * 255.0)));
+	}
+
+	public Res cons(final Resource res, Message buf) {
+	    int id = buf.uint16();
+	    Res ret = new Res(res, id);
+	    GLState light = Light.deflight;
+	    while(!buf.eom()) {
+		String thing = buf.string().intern();
+		if(thing == "col") {
+		    Color amb = col(buf);
+		    Color dif = col(buf);
+		    Color spc = col(buf);
+		    double shine = buf.cpfloat();
+		    Color emi = col(buf);
+		    ret.states.add(new Colors(amb, dif, spc, emi, (float)shine));
+		} else if(thing == "linear") {
+		    ret.linear = true;
+		} else if(thing == "mipmap") {
+		    ret.mipmap = true;
+		} else if(thing == "nofacecull") {
+		    ret.states.add(nofacecull);
+		} else if(thing == "tex") {
+		    final int tid = buf.uint16();
+		    ret.left.add(new Res.Resolver() {
+			    public void resolve(Collection<GLState> buf) {
+				for(Resource.Image img : res.layers(Resource.imgc)) {
+				    if(img.id == tid) {
+					buf.add(img.tex().draw());
+					buf.add(img.tex().clip());
+					return;
+				    }
+				}
+				throw(new RuntimeException(String.format("Specified texture %d not found in %s", tid, res)));
+			    }
+			});
+		} else if(thing == "texlink") {
+		    final String nm = buf.string();
+		    final int ver = buf.uint16();
+		    final int tid = buf.uint16();
+		    ret.left.add(new Res.Resolver() {
+			    public void resolve(Collection<GLState> buf) {
+				Indir<Resource> tres = res.pool.load(nm, ver);
+				for(Resource.Image img : tres.get().layers(Resource.imgc)) {
+				    if(img.id == tid) {
+					buf.add(img.tex().draw());
+					buf.add(img.tex().clip());
+					return;
+				    }
+				}
+				throw(new RuntimeException(String.format("Specified texture %d for %s not found in %s", tid, res, tres)));
+			    }
+			});
+		} else if(thing == "light") {
+		    String l = buf.string();
+		    if(l.equals("pv")) {
+			light = Light.vlights;
+		    } else if(l.equals("pp")) {
+			light = Light.plights;
+		    } else if(l.equals("n")) {
+			light = null;
+		    } else {
+			throw(new Resource.LoadException("Unknown lighting type: " + thing, res));
+		    }
+		} else {
+		    throw(new Resource.LoadException("Unknown material part: " + thing, res));
+		}
+	    }
+	    if(light != null)
+		ret.states.add(light);
+	    return(ret);
 	}
     }
 
@@ -264,24 +401,17 @@ public class Material implements Pipe.Op {
 		id = (Integer)args[0];
 	    }
 	    return(new Res.Resolver() {
-		    public void resolve(Collection<Pipe.Op> buf, Collection<Pipe.Op> dynbuf) {
+		    public void resolve(Collection<GLState> buf) {
 			if(id >= 0) {
 			    Res mat = lres.get().layer(Res.class, id);
 			    if(mat == null)
 				throw(new Resource.LoadException("No such material in " + lres.get() + ": " + id, res));
-			    Material m = mat.get();
-			    if(m.states != Pipe.Op.nil)
-				buf.add(m.states);
-			    if(m.dynstates != Pipe.Op.nil)
-				dynbuf.add(m.dynstates);
+			    buf.add(mat.get());
 			} else {
 			    Material mat = fromres((Owner)null, lres.get(), Message.nil);
 			    if(mat == null)
 				throw(new Resource.LoadException("No material in " + lres.get(), res));
-			    if(mat.states != Pipe.Op.nil)
-				buf.add(mat.states);
-			    if(mat.dynstates != Pipe.Op.nil)
-				dynbuf.add(mat.dynstates);
+			    buf.add(mat);
 			}
 		    }
 		});
@@ -296,7 +426,7 @@ public class Material implements Pipe.Op {
     }
 
     public interface ResCons {
-	public Pipe.Op cons(Resource res, Object... args);
+	public GLState cons(Resource res, Object... args);
     }
 
     public interface ResCons2 {
@@ -319,9 +449,9 @@ public class Material implements Pipe.Op {
 		}
 		rnames.put(nm, new ResCons2() {
 			public Res.Resolver cons(Resource res, Object... args) {
-			    final Pipe.Op ret = scons.cons(res, args);
+			    final GLState ret = scons.cons(res, args);
 			    return(new Res.Resolver() {
-				    public void resolve(Collection<Pipe.Op> buf, Collection<Pipe.Op> dynbuf) {
+				    public void resolve(Collection<GLState> buf) {
 					if(ret != null)
 					    buf.add(ret);
 				    }
@@ -336,17 +466,17 @@ public class Material implements Pipe.Op {
 		} catch(IllegalAccessException e) {
 		    throw(new Error(e));
 		}
-	    } else if(Pipe.Op.class.isAssignableFrom(cl)) {
-		Constructor<? extends Pipe.Op> cons;
+	    } else if(GLState.class.isAssignableFrom(cl)) {
+		final Constructor<? extends GLState> cons;
 		try {
-		    cons = cl.asSubclass(Pipe.Op.class).getConstructor(Resource.class, Object[].class);
+		    cons = cl.asSubclass(GLState.class).getConstructor(Resource.class, Object[].class);
 		} catch(NoSuchMethodException e) {
 		    throw(new Error("No proper constructor for res-consable GL state " + cl.getName(), e));
 		}
 		rnames.put(nm, new ResCons2() {
-			public Res.Resolver cons(Resource res, Object... args) {
+			public Res.Resolver cons(final Resource res, final Object... args) {
 			    return(new Res.Resolver() {
-				    public void resolve(Collection<Pipe.Op> buf, Collection<Pipe.Op> dynbuf) {
+				    public void resolve(Collection<GLState> buf) {
 					buf.add(Utils.construct(cons, res, args));
 				    }
 				});
@@ -366,15 +496,19 @@ public class Material implements Pipe.Op {
 	    while(!buf.eom()) {
 		String nm = buf.string();
 		Object[] args = buf.list();
-		ResCons2 cons = rnames.get(nm);
-		/* XXXRENDER
-		if(cons == null)
-		    throw(new Resource.LoadException("Unknown material part name: " + nm, res));
-		*/
-		if(cons != null)
+		if(nm.equals("linear")) {
+		    /* XXX: These should very much be removed and
+		     * specified directly in the texture layer
+		     * instead. */
+		    ret.linear = true;
+		} else if(nm.equals("mipmap")) {
+		    ret.mipmap = true;
+		} else {
+		    ResCons2 cons = rnames.get(nm);
+		    if(cons == null)
+			throw(new Resource.LoadException("Unknown material part name: " + nm, res));
 		    ret.left.add(cons.cons(res, args));
-		else
-		    new Resource.LoadWarning(res, "unknown material part name in %s: %s", res.name, nm).issue();
+		}
 	    }
 	    return(ret);
 	}

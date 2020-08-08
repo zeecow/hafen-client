@@ -36,7 +36,7 @@ public class CPUProfile extends Profile {
     public class Frame extends Profile.Frame {
 	private List<Long> pw = new LinkedList<Long>();
 	private List<String> nw = new LinkedList<String>();
-	private long then, last, sub;
+	private long then, last;
 
 	public Frame() {
 	    last = then = System.nanoTime();
@@ -44,16 +44,21 @@ public class CPUProfile extends Profile {
 
 	public void tick(String nm) {
 	    long now = System.nanoTime();
-	    pw.add(now - last - sub);
+	    pw.add(now - last);
 	    nw.add(nm);
-	    sub = 0;
 	    last = now;
 	}
 
 	public void add(String nm, long tm) {
 	    pw.add(tm);
 	    nw.add(nm);
-	    sub += tm;
+	}
+
+	public void tick(String nm, long subtm) {
+	    long now = System.nanoTime();
+	    pw.add(now - last - subtm);
+	    nw.add(nm);
+	    last = now;
 	}
 
 	public void fin() {

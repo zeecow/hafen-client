@@ -27,15 +27,16 @@
 package haven.resutil;
 
 import haven.*;
-import haven.render.*;
-import haven.render.sl.ShaderMacro;
+import haven.glsl.*;
+import static haven.glsl.Cons.*;
+import static haven.glsl.Type.*;
 
-public class LatentMat extends State {
+public class LatentMat extends GLState.Abstract {
     public static final Slot<LatentMat> slot = new Slot<>(Slot.Type.DRAW, LatentMat.class);
-    public final Pipe.Op mat;
+    public final GLState mat;
     public final String id, act;
 
-    public LatentMat(Pipe.Op mat, String id) {
+    public LatentMat(GLState mat, String id) {
 	this.mat = mat;
 	this.id = id;
 	this.act = null;
@@ -47,22 +48,20 @@ public class LatentMat extends State {
 	this.act = act;
     }
 
-    public ShaderMacro shader() {return(null);}
-
-    public void apply(Pipe buf) {
+    public void prep(Buffer buf) {
 	if((mat != null) && (id != null))
 	    buf.put(slot, this);
 	if(act != null) {
 	    LatentMat cur = buf.get(slot);
 	    if((cur != null) && (cur.id == act))
-		cur.mat.apply(buf);
+		cur.mat.prep(buf);
 	}
     }
 
     @Material.ResName("latent")
-    public static class $latent implements Material.ResCons2 {
-	public Material.Res.Resolver cons(Resource res, Object... args) {
-	    return((buf, dynbuf) -> dynbuf.add(new LatentMat(((String)args[0]).intern())));
+    public static class $latent implements Material.ResCons {
+	public GLState cons(Resource res, Object... args) {
+	    return(new LatentMat(((String)args[0]).intern()));
 	}
     }
 }

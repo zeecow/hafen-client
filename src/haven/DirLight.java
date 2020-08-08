@@ -27,7 +27,7 @@
 package haven;
 
 import java.awt.Color;
-import haven.render.*;
+import javax.media.opengl.*;
 
 public class DirLight extends Light {
     public float[] dir;
@@ -52,8 +52,9 @@ public class DirLight extends Light {
 	this.dir = dir.norm().to4a(0.0f);
     }
 
-    public Object[] params(GroupPipe state) {
-	float[] dir = Homo3D.camxf(state).mul(Homo3D.locxf(state)).mul4(this.dir);
-	return(new Object[] {amb, dif, spc, dir, 0f, 0f, 0f});
+    public void enable(GOut g, int idx) {
+	super.enable(g, idx);
+	BGL gl = g.gl;
+	gl.glLightfv(GL2.GL_LIGHT0 + idx, GL2.GL_POSITION, dir, 0);
     }
 }
