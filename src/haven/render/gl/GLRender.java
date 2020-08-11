@@ -174,7 +174,7 @@ public class GLRender implements Render, Disposable {
 		    ne++;
 	    }
 
-	    GLProgram.VarID[] enable = new GLProgram.VarID[data.va.fmt.inputs.length];
+	    BGL.ID[] enable = new BGL.ID[data.va.fmt.inputs.length];
 	    boolean[] instanced = new boolean[enable.length];
 	    for(int i = 0; i < enable.length; i++) {
 		/* XXX: Properly handle input attributes not present in the program. */
@@ -435,7 +435,7 @@ public class GLRender implements Render, Disposable {
 		    cgl.glGetBufferSubData(GL3.GL_PIXEL_PACK_BUFFER, 0, fmt.size() * area.area(), data);
 		    cgl.glBindBuffer(GL3.GL_PIXEL_PACK_BUFFER, 0);
 		    pbo.dispose();
-		    GLException.checkfor(cgl);
+		    GLException.checkfor(cgl, env);
 		    data.rewind();
 		    /* XXX: It's not particularly nice to do the
 		     * flipping on the dispatch thread, but OpenGL
@@ -485,7 +485,7 @@ public class GLRender implements Render, Disposable {
 		    cgl.glGetBufferSubData(GL3.GL_PIXEL_PACK_BUFFER, 0, dsz, data);
 		    cgl.glBindBuffer(GL3.GL_PIXEL_PACK_BUFFER, 0);
 		    pbo.dispose();
-		    GLException.checkfor(cgl);
+		    GLException.checkfor(cgl, env);
 		    data.rewind();
 		    /* XXX: It's not particularly nice to do the
 		     * flipping on the dispatch thread, but OpenGL
@@ -525,7 +525,7 @@ public class GLRender implements Render, Disposable {
 
     protected void finalize() {
 	if(dispseq != 0) {
-	    System.err.println("warning: gl-render was leaked without being disposed");
+	    Warning.warn("warning: gl-render was leaked without being disposed");
 	    dispose();
 	}
     }

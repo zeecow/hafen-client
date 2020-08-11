@@ -31,6 +31,7 @@ import javax.media.opengl.*;
 import haven.Disposable;
 import haven.render.*;
 import haven.render.sl.Type;
+import haven.render.sl.Attribute;
 import static haven.render.DataBuffer.Usage.*;
 
 public class GLVertexArray extends GLObject implements BGL.ID {
@@ -54,6 +55,7 @@ public class GLVertexArray extends GLObject implements BGL.ID {
 	ckstate(state, 1);
 	gl.glDeleteVertexArrays(1, new int[] {id}, 0);
 	state = 2;
+	setmem(null, 0);
     }
 
     public int glid() {
@@ -80,7 +82,9 @@ public class GLVertexArray extends GLObject implements BGL.ID {
 	return(false);
     }
 
-    public static GLVertexArray create(GLProgram prog, Model mod) {
+    public void init(GLProgram prog, Model mod) {
+	if(prog.env != this.env)
+	    throw(new AssertionError());
 	if(ephemeralp(mod))
 	    throw(new RuntimeException("got ephemeral model for VAO"));
 	GLEnvironment env = prog.env;
@@ -102,10 +106,9 @@ public class GLVertexArray extends GLObject implements BGL.ID {
 	    else
 		ebo = (GLBuffer)ro;
 	}
-	GLVertexArray vao = new GLVertexArray(env);
 	env.prepare((GLRender g) -> {
 		BGL gl = g.gl();
-		VaoBindState.apply(gl, g.state, vao, ebo);
+		VaoBindState.apply(gl, g.state, this, ebo);
 		if(ebo != null) {
 		    // Rendundant with BindBuffer in VaoBindState, but
 		    // only so long as DO_GL_EBO_FIXUP is true.
@@ -113,7 +116,7 @@ public class GLVertexArray extends GLObject implements BGL.ID {
 		}
 		for(int i = 0; i < mod.va.fmt.inputs.length; i++) {
 		    VertexArray.Layout.Input attr = mod.va.fmt.inputs[i];
-		    GLProgram.VarID var = prog.cattrib(attr.tgt);
+		    BGL.ID var = prog.cattrib(attr.tgt);
 		    if(var != null) {
 			VboState.apply(gl, g.state, bufs[attr.buf]);
 			int na = 1, vo = 0;
@@ -147,14 +150,12 @@ public class GLVertexArray extends GLObject implements BGL.ID {
 		    }
 		}
 	    });
-	return(vao);
     }
 
     static class ProgIndex implements Disposable {
 	final Model mod;
 	final GLEnvironment env;
-	GLVertexArray[] vaos = new GLVertexArray[2];
-	GLProgram[] progs = new GLProgram[2];
+	Indexed[] vaos = new Indexed[2];
 	int n = 0;
 
 	ProgIndex(Model mod, GLEnvironment env) {
@@ -162,25 +163,68 @@ public class GLVertexArray extends GLObject implements BGL.ID {
 	    this.env = env;
 	}
 
-	void add(GLProgram prog, GLVertexArray vao) {
-	    if(vaos.length <= n) {
-		vaos = Arrays.copyOf(vaos, vaos.length * 2);
-		progs = Arrays.copyOf(progs, progs.length * 2);
+	class Indexed extends GLVertexArray {
+	    final Collection<GLProgram> progs = new HashSet<>();
+	    final Attribute[] attribs;
+
+	    Indexed(GLEnvironment env, Attribute[] attribs) {
+		super(env);
+		this.attribs = attribs;
 	    }
+
+	    boolean cleanprogs() {
+		for(Iterator<GLProgram> i = progs.iterator(); i.hasNext();) {
+		    GLProgram prog = i.next();
+		    if(prog.disposed)
+			i.remove();
+		}
+		return(progs.isEmpty());
+	    }
+
+	    void useprog(GLProgram prog) {
+		progs.add(prog);
+	    }
+	}
+
+	void clean() {
+	    int o = 0;
+	    for(int i = 0; i < n; i++) {
+		if(!vaos[i].cleanprogs()) {
+		    vaos[o] = vaos[i];
+		    o++;
+		} else {
+		    vaos[i].dispose();
+		}
+	    }
+	    for(int i = o; i < n; i++)
+		vaos[i] = null;
+	    n = o;
+	}
+
+	void add(Indexed vao) {
+	    if(vaos.length <= n)
+		vaos = Arrays.copyOf(vaos, vaos.length * 2);
 	    vaos[n] = vao;
-	    progs[n] = prog;
 	    n++;
-	    /* XXX: This does not clean up after forgotten
-	     * programs. Use weak refs for programs? */
+
+	    /* XXX? It would be nice if VAOs could be cleaned out when
+	     * programs actually go away rather than when being
+	     * re-requested. */
+	    clean();
 	}
 
 	GLVertexArray get(GLProgram prog) {
-	    for(int i = 0; (i < progs.length) && (progs[i] != null); i++) {
-		if(progs[i] == prog)
+	    Attribute[] attr = prog.attribs;
+	    for(int i = 0; i < n; i++) {
+		if(Arrays.equals(attr, vaos[i].attribs)) {
+		    vaos[i].useprog(prog);
 		    return(vaos[i]);
+		}
 	    }
-	    GLVertexArray ret = create(prog, mod);
-	    add(prog, ret);
+	    Indexed ret = new Indexed(prog.env, attr);
+	    ret.init(prog, mod);
+	    ret.useprog(prog);
+	    add(ret);
 	    return(ret);
 	}
 

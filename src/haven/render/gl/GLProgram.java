@@ -31,6 +31,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.io.*;
 import javax.media.opengl.*;
 import haven.Disposable;
+import haven.Utils;
 import haven.render.*;
 import haven.render.sl.*;
 
@@ -47,9 +48,10 @@ public class GLProgram implements Disposable {
     public final Uniform[] samplers;
     public final AtomicInteger locked = new AtomicInteger(0);
     private final Map<Uniform, String> unifnms;
-    private final Map<Attribute, String> attrnms;
+    private final Map<Attribute, AttrID> amap;
     private final String[] fragnms;
     private ProgOb glp;
+    boolean disposed = false;
 
     public GLProgram(GLEnvironment env, ProgramContext ctx) {
 	this.env = env;
@@ -112,12 +114,24 @@ public class GLProgram implements Disposable {
 	    this.samplers = Arrays.copyOf(samplers, sn);
 	}
 	{
-	    Map<Attribute, String> attribs = new IdentityHashMap<>();
-	    for(Attribute attr : ctx.attribs)
-		attribs.put(attr, ctx.symtab.get(attr.name));
-	    this.attrnms = attribs;
-	    this.attribs = attribs.keySet().toArray(new Attribute[0]);
+	    this.attribs = ctx.attribs.toArray(new Attribute[0]);
+	    Arrays.sort(this.attribs, Utils.idcmp);
+	    Map<Attribute, AttrID> amap = new IdentityHashMap<>();
+	    for(int i = 0, loc = 0; i < this.attribs.length; i++) {
+		Attribute attr = this.attribs[i];
+		amap.put(attr, new AttrID(ctx.symtab.get(attr.name), loc));
+		loc += attrsize(attr);
+	    }
+	    this.amap = amap;
 	}
+    }
+
+    public static int attrsize(Attribute attr) {
+	if(attr.type == Type.MAT3)
+	    return(3);
+	if(attr.type == Type.MAT4)
+	    return(4);
+	return(1);
     }
 
     public static GLProgram build(GLEnvironment env, Collection<ShaderMacro> mods) {
@@ -176,7 +190,7 @@ public class GLProgram implements Disposable {
 	     * programs will be ASCII, of course, but it would be
 	     * interesting to know, so to speak. */
 	    this.id = gl.glCreateShader(type);
-	    GLException.checkfor(gl);
+	    GLException.checkfor(gl, env);
 	    gl.glShaderSource(this.id, 1, new String[] {text}, new int[] {text.length()}, 0);
 	    gl.glCompileShader(this.id);
 	    int[] buf = {0};
@@ -237,6 +251,20 @@ public class GLProgram implements Disposable {
 	}
     }
 
+    public static class AttrID implements BGL.ID {
+	public final String name;
+	public final int id;
+
+	private AttrID(String name, int id) {
+	    this.name = name;
+	    this.id = id;
+	}
+
+	public int glid() {
+	    return(id);
+	}
+    }
+
     public abstract static class VarID implements BGL.ID, BGL.Request {
 	public final String name;
 	protected int id = -1;
@@ -266,11 +294,6 @@ public class GLProgram implements Disposable {
 		    id.sampler = samplerids.get(uni.getKey());
 		umap.put(uni.getKey(), id);
 	    }
-	    for(Map.Entry<Attribute, String> attr : GLProgram.this.attrnms.entrySet()) {
-		AttrID id = new AttrID(attr.getValue());
-		amap.put(attr.getKey(), id);
-		env.prepare(id);
-	    }
 	}
 
 	private UniformID uniresolve(Type type, String name) {
@@ -299,6 +322,8 @@ public class GLProgram implements Disposable {
 	    this.id = gl.glCreateProgram();
 	    for(ShaderOb sh : shaders)
 		gl.glAttachShader(this.id, sh.glid());
+	    for(AttrID attr : amap.values())
+		gl.glBindAttribLocation(this.id, attr.id, attr.name);
 	    for(int i = 0; i < fragdata.length; i++)
 		gl.glBindFragDataLocation(this.id, i, fragnms[i]);
 	    gl.glLinkProgram(this.id);
@@ -324,20 +349,6 @@ public class GLProgram implements Disposable {
 	    return(this.id);
 	}
 
-	public class AttrID extends VarID {
-	    private AttrID(String name) {super(name);}
-
-	    public void run(GL3 gl) {
-		this.id = gl.glGetAttribLocation(ProgOb.this.id, name);
-	    }
-
-	    public int glid() {
-		if(id < 0)
-		    throw(new UnknownExternException("Attribute not resolvable in program: " + name, GLProgram.this, "attribute", name));
-		return(id);
-	    }
-	}
-
 	public class UniformID extends VarID {
 	    public UniformID[] sub = null;
 	    public int sampler = -1;
@@ -355,10 +366,6 @@ public class GLProgram implements Disposable {
 	    }
 	}
 
-	private final transient Map<Attribute, AttrID> amap = new IdentityHashMap<>();
-	public AttrID cattrib(Attribute var) {
-	    return(amap.get(var));
-	}
 	private final transient Map<Uniform, UniformID> umap = new IdentityHashMap<>();
 	public UniformID cuniform(Uniform var) {
 	    return(umap.get(var));
@@ -366,12 +373,17 @@ public class GLProgram implements Disposable {
     }
 
     public ProgOb glid() {
-	if(glp == null) {
+	ProgOb glp;
+	if((glp = this.glp) == null) {
 	    synchronized(this) {
-		if(glp == null)
+		if(disposed)
+		    throw(new RuntimeException("reusing disposed program"));
+		if((glp = this.glp) == null) {
 		    glp = new ProgOb(env,
 				     new ShaderOb(env, GL3.GL_VERTEX_SHADER, vsrc),
 				     new ShaderOb(env, GL3.GL_FRAGMENT_SHADER, fsrc));
+		    this.glp = glp;
+		}
 	    }
 	}
 	return(glp);
@@ -407,11 +419,11 @@ public class GLProgram implements Disposable {
 	}
     }
 
-    public ProgOb.AttrID cattrib(Attribute var) {
-	return(glid().cattrib(var));
+    public AttrID cattrib(Attribute var) {
+	return(amap.get(var));
     }
-    public ProgOb.AttrID attrib(Attribute var) {
-	ProgOb.AttrID r = cattrib(var);
+    public AttrID attrib(Attribute var) {
+	AttrID r = cattrib(var);
 	if(r == null)
 	    throw(new UnknownExternException("Attribute not found in symtab: " + var, this, "attrib", var.toString()));
 	return(r);
@@ -433,6 +445,7 @@ public class GLProgram implements Disposable {
 		ProgOb cur = glp;
 		glp = null;
 		cur.dispose();
+		disposed = true;
 	    }
 	}
     }
@@ -443,5 +456,20 @@ public class GLProgram implements Disposable {
 
     public void unlock() {
 	locked.decrementAndGet();
+    }
+
+    public static class Dump implements Serializable {
+	public final String vsrc, fsrc;
+	public final int id;
+
+	public Dump(GLProgram prog) {
+	    this.vsrc = prog.vsrc;
+	    this.fsrc = prog.fsrc;
+	    this.id = System.identityHashCode(prog);
+	}
+    }
+
+    public Dump dump() {
+	return(new Dump(this));
     }
 }

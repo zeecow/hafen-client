@@ -1415,6 +1415,11 @@ public class Utils {
 	}
     }
 
+    public static <R> Function<Object[], R> consfun(Class<R> cl, Class<?>... args) throws NoSuchMethodException {
+	Constructor<R> cons = cl.getConstructor(args);
+	return(iargs -> construct(cons, iargs));
+    }
+
     public static <R> Function<Object[], R> smthfun(Class<?> cl, String name, Class<R> rtype, Class<?>...args) throws NoSuchMethodException {
 	Method mth = cl.getDeclaredMethod(name, args);
 	if(!rtype.isAssignableFrom(mth.getReturnType()))
@@ -1683,7 +1688,7 @@ public class Utils {
 
 	    synchronized(emerg) {
 		if(eid == 0)
-		    System.err.println("could not impose ordering in idcmd, using slow-path");
+		    Warning.warn("could not impose ordering in idcmp, using slow-path");
 		clean();
 		Ref ar = new Ref(a, cleanq), br = new Ref(b, cleanq);
 		Long ai, bi;
@@ -1763,6 +1768,46 @@ public class Utils {
 	Console.setscmd("die", new Console.Command() {
 		public void run(Console cons, String[] args) {
 		    throw(new Error("Triggered death"));
+		}
+	    });
+	Console.setscmd("lockdie", new Console.Command() {
+		public void run(Console cons, String[] args) {
+		    Object m1 = new Object(), m2 = new Object();
+		    int[] sync = {0};
+		    new HackThread(() -> {
+			    try {
+				synchronized(m2) {
+				    synchronized(sync) {
+					while(sync[0] != 1)
+					    sync.wait();
+					sync[0] = 2;
+					sync.notifyAll();
+				    }
+				    synchronized(m1) {
+					synchronized(sync) {
+					    sync[0] = 3;
+					    sync.notifyAll();
+					}
+				    }
+				}
+			    } catch(InterruptedException e) {}
+		    }, "Deadlocker").start();
+		    try {
+			synchronized(m1) {
+			    synchronized(sync) {
+				sync[0] = 1;
+				sync.notifyAll();
+				while(sync[0] != 2)
+				    sync.wait();
+			    }
+			    synchronized(m2) {
+				synchronized(sync) {
+				    sync[0] = 3;
+				    sync.notifyAll();
+				}
+			    }
+			}
+		    } catch(InterruptedException e) {}
 		}
 	    });
 	Console.setscmd("threads", new Console.Command() {

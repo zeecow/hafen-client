@@ -260,7 +260,7 @@ public class Resource implements Serializable {
 	{
 	    ssl = new SslHelper();
 	    try {
-		ssl.trust(ssl.loadX509(Resource.class.getResourceAsStream("ressrv.crt")));
+		ssl.trust(Resource.class.getResourceAsStream("ressrv.crt"));
 	    } catch(java.security.cert.CertificateException e) {
 		throw(new Error("Invalid built-in certificate", e));
 	    } catch(IOException e) {
@@ -285,25 +285,21 @@ public class Resource implements Serializable {
 
 	public InputStream get(String name) throws IOException {
 	    URL resurl = encodeurl(new URL(baseurl, name + ".res"));
-	    URLConnection c;
-	    int tries = 0;
-	    while(true) {
-		try {
-		    if(resurl.getProtocol().equals("https"))
-			c = ssl.connect(resurl);
-		    else
-			c = resurl.openConnection();
-		    /* Apparently, some versions of Java Web Start has
-		     * a bug in its internal cache where it refuses to
-		     * reload a URL even when it has changed. */
-		    c.setUseCaches(false);
-		    c.addRequestProperty("User-Agent", "Haven/1.0");
-		    return(c.getInputStream());
-		} catch(ConnectException e) {
-		    if(++tries >= 5)
-			throw(new IOException("Connection failed five times", e));
-		}
-	    }
+	    return(new RetryingInputStream() {
+		    protected InputStream create() throws IOException {
+			URLConnection c;
+			if(resurl.getProtocol().equals("https"))
+			    c = ssl.connect(resurl);
+			else
+			    c = resurl.openConnection();
+			/* Apparently, some versions of Java Web Start has
+			 * a bug in its internal cache where it refuses to
+			 * reload a URL even when it has changed. */
+			c.setUseCaches(false);
+			c.addRequestProperty("User-Agent", "Haven/1.0");
+			return(c.getInputStream());
+		    }
+		});
 	}
 
 	public String toString() {
@@ -760,6 +756,19 @@ public class Resource implements Serializable {
 	    this.res = res;
 	}
     }
+
+    public static class LoadWarning extends Warning {
+	public final Resource res;
+
+	public LoadWarning(Resource res, String msg) {
+	    super(msg);
+	    this.res = res;
+	}
+
+	public LoadWarning(Resource res, String msg, Object... args) {
+	    this(res, String.format(msg, args));
+	}
+    }
     
     public static Coord cdec(Message buf) {
 	return(new Coord(buf.int16(), buf.int16()));
@@ -845,6 +854,37 @@ public class Resource implements Serializable {
 	public T layerid();
     }
 
+    public static class ImageReadException extends IOException {
+	public final String[] supported = ImageIO.getReaderMIMETypes();
+
+	public ImageReadException() {
+	    super("Could not decode image data");
+	}
+    }
+
+    public static BufferedImage readimage(InputStream fp) throws IOException {
+	try {
+	    /* This can crash if not privileged due to ImageIO
+	     * creating tempfiles without doing that privileged
+	     * itself. It can very much be argued that this is a bug
+	     * in ImageIO. */
+	    return(AccessController.doPrivileged(new PrivilegedExceptionAction<BufferedImage>() {
+		    public BufferedImage run() throws IOException {
+			BufferedImage ret;
+			ret = ImageIO.read(fp);
+			if(ret == null)
+			    throw(new ImageReadException());
+			return(ret);
+		    }
+		}));
+	} catch(PrivilegedActionException e) {
+	    Throwable c = e.getCause();
+	    if(c instanceof IOException)
+		throw((IOException)c);
+	    throw(new AssertionError(c));
+	}
+    }
+
     @LayerName("image")
     public class Image extends Layer implements Comparable<Image>, IDLayer<Integer> {
 	public transient BufferedImage img;
@@ -865,12 +905,10 @@ public class Resource implements Serializable {
 	    id = buf.int16();
 	    o = cdec(buf);
 	    try {
-		img = ImageIO.read(new MessageInputStream(buf));
+		img = readimage(new MessageInputStream(buf));
 	    } catch(IOException e) {
 		throw(new LoadException(e, Resource.this));
 	    }
-	    if(img == null)
-		throw(new LoadException("Invalid image data in " + name, Resource.this));
 	    sz = Utils.imgsz(img);
 	}
 		

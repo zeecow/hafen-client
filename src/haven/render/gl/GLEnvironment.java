@@ -50,9 +50,12 @@ public class GLEnvironment implements Environment {
     private Applier curstate = new Applier(this);
     private boolean invalid = false;
 
-    public static class HardwareException extends RuntimeException {
-	public HardwareException(String msg) {
+    public static class HardwareException extends UnavailableException {
+	public final Caps caps;
+
+	public HardwareException(String msg, Caps caps) {
 	    super(msg);
+	    this.caps = caps;
 	}
     }
 
@@ -60,6 +63,7 @@ public class GLEnvironment implements Environment {
 	private static final java.util.regex.Pattern slvp = java.util.regex.Pattern.compile("^(\\d+)\\.(\\d+)");
 	public final String vendor, version, renderer;
 	public final int major, minor, glslver;
+	public final boolean coreprof;
 	public final Collection<String> exts;
 	public final int maxtargets;
 	public final float anisotropy;
@@ -68,12 +72,12 @@ public class GLEnvironment implements Environment {
 	private static int glgeti(GL gl, int param) {
 	    int[] buf = {0};
 	    gl.glGetIntegerv(param, buf, 0);
-	    GLException.checkfor(gl);
+	    GLException.checkfor(gl, null);
 	    return(buf[0]);
 	}
 
 	private static int glcondi(GL gl, int param, int def) {
-	    GLException.checkfor(gl);
+	    GLException.checkfor(gl, null);
 	    int[] buf = {0};
 	    gl.glGetIntegerv(param, buf, 0);
 	    if(gl.glGetError() != 0)
@@ -84,12 +88,12 @@ public class GLEnvironment implements Environment {
 	private static float glgetf(GL gl, int param) {
 	    float[] buf = {0};
 	    gl.glGetFloatv(param, buf, 0);
-	    GLException.checkfor(gl);
+	    GLException.checkfor(gl, null);
 	    return(buf[0]);
 	}
 
 	public static String glconds(GL gl, int param) {
-	    GLException.checkfor(gl);
+	    GLException.checkfor(gl, null);
 	    String ret = gl.glGetString(param);
 	    if(gl.glGetError() != 0)
 		return(null);
@@ -108,6 +112,7 @@ public class GLEnvironment implements Environment {
 		}
 		this.major = major; this.minor = minor;
 	    }
+	    this.coreprof = gl.getContext().isGLCoreProfile();
 	    this.vendor = gl.glGetString(GL.GL_VENDOR);
 	    this.version = gl.glGetString(GL.GL_VERSION);
 	    this.renderer = gl.glGetString(GL.GL_RENDERER);
@@ -137,15 +142,20 @@ public class GLEnvironment implements Environment {
 	    {
 		float[] buf = {0, 0};
 		gl.glGetFloatv(GL3.GL_ALIASED_LINE_WIDTH_RANGE, buf, 0);
-		this.linemin = buf[0];
-		this.linemax = buf[1];
+		if(gl.glGetError() == 0) {
+		    this.linemin = buf[0];
+		    this.linemax = buf[1];
+		} else {
+		    this.linemin = this.linemax = 1;
+		}
 	    }
-	    GLException.checkfor(gl);
 	}
 
 	public void checkreq() {
 	    if(major < 3)
-		throw(new HardwareException("Graphics context does not support OpenGL 3.0."));
+		throw(new HardwareException("Graphics context does not support OpenGL 3.0.", this));
+	    if(!coreprof)
+		throw(new HardwareException("Graphics context is not a core OpenGL profile.", this));
 	}
 
 	public String vendor() {return(vendor);}
@@ -159,14 +169,14 @@ public class GLEnvironment implements Environment {
     final int[] stats_obj = new int[MemStats.values().length];
     final long[] stats_mem = new long[MemStats.values().length];
 
-    public GLEnvironment(GL3 initgl, GLContext ctx, Area wnd) {
+    public GLEnvironment(GL initgl, GLContext ctx, Area wnd) {
 	if(debuglog)
 	    ctx.enableGLDebugMessage(true);
 	this.ctx = ctx;
 	this.wnd = wnd;
 	this.caps = new Caps(initgl);
 	this.caps.checkreq();
-	initialize(initgl);
+	initialize(initgl.getGL3());
 	this.nilfbo_id = ctx.getDefaultDrawFramebuffer();
 	this.nilfbo_db = ctx.getDefaultReadBuffer();
     }
@@ -261,39 +271,47 @@ public class GLEnvironment implements Environment {
 	    prep = this.prep;
 	    this.prep = null;
 	}
-	synchronized(drawmon) {
-	    checkqueries(gl);
-	    if((prep != null) && (prep.gl != null)) {
-		BufferBGL xf = new BufferBGL(16);
-		this.curstate.apply(xf, prep.init);
-		xf.run(gl);
-		prep.gl.run(gl);
-		this.curstate = prep.state;
-		try {
-		    GLException.checkfor(gl);
-		} catch(Exception exc) {
-		    throw(new BGL.BGLException(prep.gl, null, exc));
+	try {
+	    synchronized(drawmon) {
+		checkqueries(gl);
+		if((prep != null) && (prep.gl != null)) {
+		    BufferBGL xf = new BufferBGL(16);
+		    this.curstate.apply(xf, prep.init);
+		    xf.run(gl);
+		    prep.gl.run(gl);
+		    this.curstate = prep.state;
+		    try {
+			GLException.checkfor(gl, this);
+		    } catch(Exception exc) {
+			throw(new BGL.BGLException(prep.gl, null, exc));
+		    }
+		    sequnreg(prep);
 		}
-		sequnreg(prep);
-	    }
-	    for(GLRender cmd : copy) {
-		BufferBGL xf = new BufferBGL(16);
-		this.curstate.apply(xf, cmd.init);
-		xf.run(gl);
-		cmd.gl.run(gl);
-		this.curstate = cmd.state;
-		try {
-		    GLException.checkfor(gl);
-		} catch(Exception exc) {
-		    throw(new BGL.BGLException(cmd.gl, null, exc));
+		for(GLRender cmd : copy) {
+		    BufferBGL xf = new BufferBGL(16);
+		    this.curstate.apply(xf, cmd.init);
+		    xf.run(gl);
+		    cmd.gl.run(gl);
+		    this.curstate = cmd.state;
+		    try {
+			GLException.checkfor(gl, this);
+		    } catch(Exception exc) {
+			throw(new BGL.BGLException(cmd.gl, null, exc));
+		    }
+		    sequnreg(cmd);
 		}
-		sequnreg(cmd);
+		checkqueries(gl);
+		disposeall().run(gl);
+		clean();
+		if(debuglog)
+		    checkdebuglog(gl);
 	    }
-	    checkqueries(gl);
-	    disposeall().run(gl);
-	    clean();
-	    if(debuglog)
-		checkdebuglog(gl);
+	} catch(Exception e) {
+	    for(Throwable c = e; c != null; c = c.getCause()) {
+		if(c instanceof GLException)
+		    ((GLException)c).initenv(this);
+	    }
+	    throw(e);
 	}
     }
 
@@ -733,6 +751,31 @@ public class GLEnvironment implements Environment {
 	}
     }
 
+    public Object progdump() {
+	HashMap<String, Object> ret = new HashMap<>();
+	synchronized(pmon) {
+	    int seq = 0;
+	    for(int i = 0; i < ptab.length; i++) {
+		for(SavedProg p = ptab[i]; p != null; p = p.next) {
+		    ret.put(String.format("p%d-idx", seq), i);
+		    ret.put(String.format("p%d-hash", seq), p.hash);
+		    ret.put(String.format("p%d-rc", seq), p.prog.locked.get());
+		    ret.put(String.format("p%d-id", seq), System.identityHashCode(p.prog));
+		    List<String> macros = new ArrayList<>();
+		    List<Integer> macroi = new ArrayList<>();
+		    for(int o = 0; o < p.shaders.length; o++) {
+			macros.add(String.valueOf(p.shaders[o]));
+			macroi.add(System.identityHashCode(p.shaders[o]));
+		    }
+		    ret.put(String.format("p%d-mac", seq), macros);
+		    ret.put(String.format("p%d-macid", seq), macroi);
+		    seq++;
+		}
+	    }
+	}
+	return(ret);
+    }
+
     private double lastpclean = Utils.rtime();
     public void clean() {
 	double now = Utils.rtime();
@@ -753,7 +796,7 @@ public class GLEnvironment implements Environment {
 	    nseq[(seqtail + i) & (nsz - 1)] = cseq[(seqtail + i) & (csz - 1)];
 	sequse = nseq;
 	if(nsz >= 0x4000)
-	    System.err.println("warning: dispose queue size increased to " + nsz);
+	    Warning.warn("warning: dispose queue size increased to " + nsz);
     }
 
     void seqreg(GLRender r) {

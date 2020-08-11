@@ -203,7 +203,7 @@ public class MainFrame extends java.awt.Frame implements Runnable, Console.Direc
 	setVisible(true);
 	addWindowListener(new WindowAdapter() {
 		public void windowClosing(WindowEvent e) {
-		    g.interrupt();
+		    mt.interrupt();
 		}
 
 		public void windowActivated(WindowEvent e) {
@@ -240,8 +240,8 @@ public class MainFrame extends java.awt.Frame implements Runnable, Console.Direc
 	Thread ui = new HackThread(p, "Haven UI thread");
 	ui.start();
 	try {
+	    Session sess = null;
 	    try {
-		Session sess = null;
 		while(true) {
 		    UI.Runner fun;
 		    if(sess == null) {
@@ -258,10 +258,20 @@ public class MainFrame extends java.awt.Frame implements Runnable, Console.Direc
 		    }
 		    sess = fun.run(p.newui(sess));
 		}
-	    } catch(InterruptedException e) {}
+	    } catch(InterruptedException e) {
+	    } finally {
+		p.newui(null);
+		if(sess != null)
+		    sess.close();
+	    }
 	    savewndstate();
 	} finally {
 	    ui.interrupt();
+	    try {
+		ui.join(5000);
+	    } catch(InterruptedException e) {}
+	    if(ui.isAlive())
+		Warning.warn("ui thread failed to terminate");
 	    dispose();
 	}
     }
@@ -387,7 +397,7 @@ public class MainFrame extends java.awt.Frame implements Runnable, Console.Direc
 	try {
 	    f.mt.join();
 	} catch(InterruptedException e) {
-	    f.g.interrupt();
+	    f.mt.interrupt();
 	    return;
 	}
 	dumplist(Resource.remote().loadwaited(), Config.loadwaited);
@@ -409,21 +419,19 @@ public class MainFrame extends java.awt.Frame implements Runnable, Console.Direc
 	/* Set up the error handler as early as humanly possible. */
 	ThreadGroup g = new ThreadGroup("Haven main group");
 	String ed;
-
-	URL url = null;
-	try {
-	    if(!(ed = Utils.getprop("haven.errorurl", "")).equals("")) {
-		url = new URL(ed);
+	if(!(ed = Utils.getprop("haven.errorurl", "")).equals("")) {
+	    try {
+		final haven.error.ErrorHandler hg = new haven.error.ErrorHandler(new java.net.URL(ed));
+		hg.sethandler(new haven.error.ErrorGui(null) {
+			public void errorsent() {
+			    hg.interrupt();
+			}
+		    });
+		g = hg;
+		new DeadlockWatchdog(hg).start();
+	    } catch(java.net.MalformedURLException e) {
 	    }
-	} catch(java.net.MalformedURLException e) {
 	}
-	final haven.error.ErrorHandler hg = new haven.error.ErrorHandler(url);
-	hg.sethandler(new haven.error.ErrorGui(null) {
-	    public void errorsent() {
-		hg.interrupt();
-	    }
-	});
-	g = hg;
 	Thread main = new HackThread(g, new Runnable() {
 	    public void run() {
 		main2(args);

@@ -52,9 +52,34 @@ public class JOGLPanel extends GLCanvas implements Runnable, UIPanel, Console.Di
     private Area shape;
     private Pipe base, wnd;
 
+    public static class ProfileException extends Environment.UnavailableException {
+	public final String availability;
+
+	public ProfileException(Throwable cause) {
+	    super("No OpenGL suitable profile is available", cause);
+	    String a;
+	    try {
+		a = GLProfile.glAvailabilityToString();
+	    } catch(Throwable t) {
+		a = String.valueOf(t);
+	    }
+	    this.availability = a;
+	}
+    }
+
     private static GLCapabilities mkcaps() {
-	GLProfile prof = GLProfile.getMaxProgrammableCore(true);
-	// GLProfile prof = GLProfile.getDefault();
+	GLProfile prof;
+	try {
+	    prof = GLProfile.getMaxProgrammableCore(true);
+	} catch(javax.media.opengl.GLException e) {
+	    try {
+		/* If not core, let GLEnvironment handle that. */
+		prof = GLProfile.getDefault();
+	    } catch(javax.media.opengl.GLException e2) {
+		e2.addSuppressed(e);
+		throw(new ProfileException(e2));
+	    }
+	}
 	GLCapabilities caps = new GLCapabilities(prof);
 	caps.setDoubleBuffered(true);
 	caps.setAlphaBits(8);
@@ -73,7 +98,7 @@ public class JOGLPanel extends GLCanvas implements Runnable, UIPanel, Console.Di
 	setAutoSwapBufferMode(false);
 	addGLEventListener(new GLEventListener() {
 		public void display(GLAutoDrawable d) {
-		    redraw(d.getGL().getGL3());
+		    redraw(d.getGL());
 		}
 
 		public void init(GLAutoDrawable d) {
@@ -113,7 +138,7 @@ public class JOGLPanel extends GLCanvas implements Runnable, UIPanel, Console.Di
 	return(1.0 / hz);
     }
 
-    private void initgl(GL3 gl) {
+    private void initgl(GL gl) {
 	Collection<String> exts = Arrays.asList(gl.glGetString(GL.GL_EXTENSIONS).split(" "));
 	GLCapabilitiesImmutable caps = getChosenGLCapabilities();
 	gl.setSwapInterval((aswap = iswap()) ? 1 : 0);
@@ -141,8 +166,9 @@ public class JOGLPanel extends GLCanvas implements Runnable, UIPanel, Console.Di
 	}
     }
 
+    private boolean debuggl = false;
     private long lastrcycle = 0, ridletime = 0;
-    private void redraw(GL3 gl) {
+    private void redraw(GL gl) {
 	GLContext ctx = gl.getContext();
 	GLEnvironment env;
 	synchronized(this) {
@@ -154,15 +180,16 @@ public class JOGLPanel extends GLCanvas implements Runnable, UIPanel, Console.Di
 	    if(!env.shape().equals(shape))
 		env.reshape(shape);
 	}
+	GL3 gl3 = gl.getGL3();
 	try {
 	    if(false) {
 		System.err.println("\n-----\n\n");
-		gl = new TraceGL3(gl, System.err);
+		gl3 = new TraceGL3(gl3, System.err);
 	    }
-	    if(false) {
-		gl = new DebugGL3(gl);
+	    if(debuggl) {
+		gl3 = new DebugGL3(gl3);
 	    }
-	    env.process(gl);
+	    env.process(gl3);
 	    long end = System.nanoTime();
 	} catch(BGL.BGLException e) {
 	    if(dumpbgl)
@@ -415,6 +442,7 @@ public class JOGLPanel extends GLCanvas implements Runnable, UIPanel, Console.Di
 	Thread drawthread = new HackThread(this::renderloop, "Render thread");
 	drawthread.start();
 	try {
+	    GLRender buf = null;
 	    try {
 		synchronized(this) {
 		    while(this.env == null)
@@ -428,7 +456,7 @@ public class JOGLPanel extends GLCanvas implements Runnable, UIPanel, Console.Di
 		while(true) {
 		    double fwaited = 0;
 		    GLEnvironment env = this.env;
-		    GLRender buf = env.render();
+		    buf = env.render();
 		    UI ui = this.ui;
 		    Debug.cycle(ui.modflags());
 		    GSettings prefs = ui.gprefs;
@@ -500,16 +528,15 @@ public class JOGLPanel extends GLCanvas implements Runnable, UIPanel, Console.Di
 			rprofc = null;
 		    buf.submit(new FrameCycle());
 		    env.submit(buf);
+		    buf = null;
 		    if(curf != null) curf.tick("aux");
 
 		    double now = Utils.rtime();
 		    double fd = framedur();
 		    if(then + fd > now) {
 			then += fd;
-			synchronized(ed) {
-			    long nanos = (long)((then - now) * 1e9);
-			    ed.wait(nanos / 1000000, (int)(nanos % 1000000));
-			}
+			long nanos = (long)((then - now) * 1e9);
+			Thread.sleep(nanos / 1000000, (int)(nanos % 1000000));
 		    } else {
 			then = now;
 		    }
@@ -537,6 +564,8 @@ public class JOGLPanel extends GLCanvas implements Runnable, UIPanel, Console.Di
 		    prevframe = curframe;
 		}
 	    } finally {
+		if(buf != null)
+		    buf.dispose();
 		drawthread.interrupt();
 		drawthread.join();
 	    }
@@ -582,6 +611,9 @@ public class JOGLPanel extends GLCanvas implements Runnable, UIPanel, Console.Di
 
     private Map<String, Console.Command> cmdmap = new TreeMap<String, Console.Command>();
     {
+	cmdmap.put("gldebug", (cons, args) -> {
+		debuggl = Utils.parsebool(args[1]);
+	    });
     }
     public Map<String, Console.Command> findcmds() {
 	return(cmdmap);

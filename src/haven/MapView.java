@@ -819,6 +819,8 @@ public class MapView extends PView implements DTarget, Console.Directory {
     private double lsmch = 0;
     private void updsmap(DirLight light) {
 	boolean usesdw = ui.gprefs.lshadow.val;
+	int sdwres = ui.gprefs.shadowres.val;
+	sdwres = (sdwres < 0) ? (2048 >> -sdwres) : (2048 << sdwres);
 	if(usesdw) {
 	    Coord3f dir, cc;
 	    try {
@@ -831,7 +833,12 @@ public class MapView extends PView implements DTarget, Console.Directory {
 		if(instancer == null)
 		    return;
 		slist = new ShadowMap.ShadowList(instancer);
-		smap = new ShadowMap(new Coord(2048, 2048), 750, 5000, 1);
+		smap = new ShadowMap(new Coord(sdwres, sdwres), 750, 5000, 1);
+	    } else if(smap.lbuf.w != sdwres) {
+		smap.dispose();
+		smap = new ShadowMap(new Coord(sdwres, sdwres), 750, 5000, 1);
+		smapcc = null;
+		basic(ShadowMap.class, null);
 	    }
 	    smap = smap.light(light);
 	    cc.y = -cc.y;
@@ -914,62 +921,6 @@ public class MapView extends PView implements DTarget, Console.Directory {
 	    return(orig);
 	}, Homo3D.loc, RenderContext.slot);
 
-    /* XXXRENDER
-    private Outlines outlines = new Outlines(false);
-    public void setup(RenderList rl) {
-	Gob pl = player();
-	if(pl != null)
-	    this.cc = new Coord2d(pl.getc());
-	synchronized(glob) {
-	    if(glob.lightamb != null) {
-		DirLight light = new DirLight(glob.blightamb, glob.blightdif, glob.blightspc, Coord3f.o.sadd((float)glob.lightelev, (float)glob.lightang, 1f));
-		rl.add(light, null);
-		updsmap(rl, light);
-		amb = light;
-	    } else {
-		amb = null;
-	    }
-	    for(Glob.Weather w : glob.weather)
-		w.gsetup(rl);
-	    for(Glob.Weather w : glob.weather) {
-		if(w instanceof Rendered)
-		    rl.add((Rendered)w, null);
-	    }
-	}
-	-* XXX: MSAA level should be configurable. *-
-	if(rl.cfg.pref.fsaa.val) {
-	    FBConfig cfg = ((PView.ConfContext)rl.state().get(PView.ctx)).cfg;
-	    cfg.ms = 4;
-	}
-	if(rl.cfg.pref.outline.val)
-	    rl.add(outlines, null);
-	rl.add(map, null);
-	if(showgrid) {rl.add(gridol, null);}
-	rl.add(mapol, null);
-	rl.add(gobs, null);
-	if(placing != null)
-	    addgob(rl, placing);
-	synchronized(extradraw) {
-	    for(Rendered extra : extradraw)
-		rl.add(extra, null);
-	    extradraw.clear();
-	}
-    }
-
-    public static final haven.glsl.Uniform amblight = new haven.glsl.Uniform.AutoApply(haven.glsl.Type.INT) {
-	    public void apply(GOut g, VarID loc) {
-		int idx = -1;
-		RenderContext ctx = g.st.get(PView.ctx);
-		if(ctx instanceof WidgetContext) {
-		    Widget wdg = ((WidgetContext)ctx).widget();
-		    if(wdg instanceof MapView)
-			idx = g.st.get(Light.lights).index(((MapView)wdg).amb);
-		}
-		g.gl.glUniform1i(loc, idx);
-	    }
-	};
-    */
-
     private final Map<RenderTree.Node, RenderTree.Slot> rweather = new HashMap<>();
     private void updweather() {
 	Glob.Weather[] wls = glob.weather().toArray(new Glob.Weather[0]);
@@ -1000,14 +951,6 @@ public class MapView extends PView implements DTarget, Console.Directory {
     public RenderTree.Slot drawadd(RenderTree.Node extra) {
 	return(basic.add(extra));
     }
-
-    /* XXXRENDER
-    public void drawadd(Rendered extra) {
-	synchronized(extradraw) {
-	    extradraw.add(extra);
-	}
-    }
-    */
 
     public Gob player() {
 	return((plgob < 0) ? null : glob.oc.getgob(plgob));
@@ -1419,8 +1362,6 @@ public class MapView extends PView implements DTarget, Console.Directory {
 	    return(Double.NaN);
 	}
 	Coord3f mloc = new Coord3f((float)mc.x, -(float)mc.y, cc.z);
-	return(0);
-	/* XXXRENDER
 	float[] sloc = camera.proj.toclip(camera.view.fin(Matrix4f.id).mul4(mloc));
 	if(clip) {
 	    float w = sloc[3];
@@ -1429,7 +1370,6 @@ public class MapView extends PView implements DTarget, Console.Directory {
 	}
 	float a = ((float)sz.y) / ((float)sz.x);
 	return(Math.atan2(sloc[1] * a, sloc[0]));
-	*/
     }
 
     private void partydraw(GOut g) {
@@ -1508,12 +1448,14 @@ public class MapView extends PView implements DTarget, Console.Directory {
 	amblight();
 	updsmap(amblight);
 	updweather();
-	terrain.tick();
-	for(int i = 0; i < ols.length; i++) {
-	    if(ols[i] != null)
-		ols[i].tick();
+	synchronized(glob.map) {
+	    terrain.tick();
+	    for(int i = 0; i < ols.length; i++) {
+		if(ols[i] != null)
+		    ols[i].tick();
+	    }
+	    clickmap.tick();
 	}
-	clickmap.tick();
 	Loader.Future<Plob> placing = this.placing;
 	if((placing != null) && placing.done())
 	    placing.get().ctick(dt);

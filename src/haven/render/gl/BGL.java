@@ -90,7 +90,7 @@ public abstract class BGL {
 	final Throwable place = null;
 	add(new Command() {
 		public void run(GL3 gl) {
-		    GLException.checkfor(gl, place);
+		    GLException.checkfor(gl, place, null);
 		}
 	    });
     }
@@ -151,6 +151,12 @@ public abstract class BGL {
     public void glAttachShader(final ID program, final ID shader) {
 	add(new Command() {
 		public void run(GL3 gl) {gl.glAttachShader(program.glid(), shader.glid());}
+	    });
+    }
+
+    public void glBindAttribLocation(final ID program, final ID index, final String name) {
+	add(new Command() {
+		public void run(GL3 gl) {gl.glBindAttribLocation(program.glid(), index.glid(), name);}
 	    });
     }
 

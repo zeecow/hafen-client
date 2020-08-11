@@ -26,20 +26,45 @@
 
 package haven;
 
-import haven.render.*;
+import java.util.*;
+import haven.error.ErrorHandler;
 
-public abstract class Drawable extends GAttrib implements Skeleton.HasPose, RenderTree.Node {
-    public Drawable(Gob gob) {
-	super(gob);
-    }
-	
-    public abstract Resource getres();
-    public abstract Indir<Resource> getires();
-    
-    public void gtick(Render g) {
+public class Warning extends Throwable {
+    public Warning(Throwable cause, String message) {
+	super(message, cause);
     }
 
-    public Skeleton.Pose getpose() {
-	return(null);
+    public Warning(String message) {
+	super(message);
+    }
+
+    public Warning(String message, Object... args) {
+	this(String.format(message, args));
+    }
+
+    public Warning(Throwable cause) {
+	super(cause);
+    }
+
+    private static final int LOGSIZE = 10;
+    private static LinkedList<Warning> log = null;
+    public void issue() {
+	System.err.printf("hafen: warning: %s\n", this);
+	synchronized(Warning.class) {
+	    if(log == null) {
+		ErrorHandler errh = ErrorHandler.find();
+		if(errh != null)
+		    errh.lsetprop("warnings", log = new LinkedList<>());
+	    }
+	    if(log != null) {
+		log.add(this);
+		while(log.size() > LOGSIZE)
+		    log.removeFirst();
+	    }
+	}
+    }
+
+    public static void warn(String fmt, Object... args) {
+	new Warning(fmt, args).issue();
     }
 }

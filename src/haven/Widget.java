@@ -687,7 +687,7 @@ public class Widget {
 		}
 	    }
 	} else {
-	    System.err.println("Unhandled widget message: " + msg);
+	    new Warning("unhandled widget message: " + msg).issue();
 	}
     }
 	

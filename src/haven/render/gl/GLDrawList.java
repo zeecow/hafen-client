@@ -901,6 +901,18 @@ public class GLDrawList implements DrawList {
 	this.env = env;
     }
 
+    public static class ProgramMismatchException extends RuntimeException {
+	public final GLProgram.Dump got, expected;
+	public final Object pdump;
+
+	public ProgramMismatchException(GLProgram got, GLProgram expected) {
+	    super("unexpected program after immediate application");
+	    this.got = got.dump();
+	    this.expected = expected.dump();
+	    this.pdump = expected.env.progdump();
+	}
+    }
+
     public void draw(Render r) {
 	if(!(r instanceof GLRender))
 	    throw(new IllegalArgumentException());
@@ -912,16 +924,20 @@ public class GLDrawList implements DrawList {
 	    if(first == null)
 		return;
 	    try {
-		settingbuf.get();
+		settingbuf.get(0);
 	    } catch(InterruptedException e) {
-		/* XXX? Not sure what to do, honestly.
-		 * InterruptedExceptions shouldn't be checked. */
-		throw(new RuntimeException(e));
+		boolean got = false;
+		try {
+		    got = settingbuf.get(5000);
+		} catch(InterruptedException e2) {}
+		Thread.currentThread().interrupt();
+		if(!got)
+		    throw(new RuntimeException("settingbuf wait timed out, dispatch thread stuck?", e));
 	    }
 	    g.state.apply(g.gl, first.bk.state());
 	    g.state.apply(g.gl, VaoState.slot, ((VaoSetting)first.settings[idx_vao]).st);
 	    if(g.state.prog() != first.prog)
-		throw(new AssertionError());
+		throw(new ProgramMismatchException(g.state.prog(), first.prog));
 	    BGL gl = g.gl();
 	    for(DrawSlot cur = first; cur != null; last = cur, cur = cur.next())
 		gl.bglCallList(cur.compiled);
@@ -945,7 +961,7 @@ public class GLDrawList implements DrawList {
 	synchronized(this) {
 	    DrawSlot dslot = slotmap.remove(slot);
 	    if(dslot == null)
-		throw(new IllegalStateException("removing non-present slot"));
+		throw(new IllegalStateException(String.format("removing non-present slot (%s)", slot.obj())));
 	    dslot.remove();
 	    dslot.dispose();
 	}
