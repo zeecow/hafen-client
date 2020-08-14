@@ -851,6 +851,18 @@ public abstract class BGL {
 	    });
     }
 
+    public void glVertexAttribIPointer(final ID location, final int size, final int type, final int stride, final long pointer) {
+	add(new Command() {
+		public void run(GL2 gl) {gl.glVertexAttribIPointer(location.glid(), size, type, stride, pointer);}
+	    });
+    }
+
+    public void glVertexAttribIPointer(final ID location, final int offset, final int size, final int type, final int stride, final long pointer) {
+	add(new Command() {
+		public void run(GL2 gl) {gl.glVertexAttribIPointer(location.glid() + offset, size, type, stride, pointer);}
+	    });
+    }
+
     public void glViewport(final int x, final int y, final int w, final int h) {
 	add(new Command() {
 		public void run(GL2 gl) {gl.glViewport(x, y, w, h);}
