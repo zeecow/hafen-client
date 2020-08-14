@@ -18,6 +18,18 @@ public class Radar {
     private static long lastsort = 0;
     private static boolean needSorting = false;
     
+    public static final OCache.ChangeCallback CHANGED = new OCache.ChangeCallback() {
+	@Override
+	public void added(Gob ob) {
+	    
+	}
+	
+	@Override
+	public void removed(Gob ob) {
+	    Radar.remove(ob.id);
+	}
+    };
+    
     public static void add(Gob gob, Indir<Resource> res) {
 	if(gob.getattr(Marker.class) == null) {
 	    synchronized (queue) {

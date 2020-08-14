@@ -69,6 +69,8 @@ public class OCache implements Iterable<Gob> {
     public OCache(Glob glob) {
 	this.glob = glob;
 	Radar.clean();
+	callback(Radar.CHANGED);
+	callback(Gob.CHANGED);
     }
     
     public synchronized Stream<Gob> stream() {return Stream.of(objs.values().toArray(new Gob[0]));}

@@ -49,6 +49,17 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner {
     private Hitbox hitbox = null;
     private GeneralGobInfo gobInfo = null;
     private GobDamageInfo damage;
+    public static final ChangeCallback CHANGED = new ChangeCallback() {
+	@Override
+	public void added(Gob ob) {
+	
+	}
+    
+	@Override
+	public void removed(Gob ob) {
+	    ob.dispose();
+	}
+    };
 
     public static class Overlay implements RenderTree.Node {
 	public final int id;
