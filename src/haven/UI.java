@@ -328,7 +328,10 @@ public class UI {
     }
 	
     private void setmods(InputEvent ev) {
-	int mod = ev.getModifiersEx();
+	setmods(ev.getModifiersEx());
+    }
+    
+    private void setmods(int mod) {
 	modshift = (mod & InputEvent.SHIFT_DOWN_MASK) != 0;
 	modctrl = (mod & InputEvent.CTRL_DOWN_MASK) != 0;
 	modmeta = (mod & (InputEvent.META_DOWN_MASK | InputEvent.ALT_DOWN_MASK)) != 0;
@@ -381,13 +384,17 @@ public class UI {
 	return(false);
     }
 
-    public void mousedown(Coord c, int button){
-        //TODO: re-implement mouse event simulation or find another way to implement equip proxy
-	//mousedown(new MouseEvent(panel, 0, 0, 0, c.x, c.y, 1, false, button), c, button);
+    public void mousedown(Coord c, int button) {
+        setmods(0);
+	processMouseDown(c, button);
     }
 
     public void mousedown(MouseEvent ev, Coord c, int button) {
 	setmods(ev);
+	processMouseDown(c, button);
+    }
+    
+    public void processMouseDown(Coord c, int button) {
 	lcc = mc = c;
 	for(Grab g : c(mousegrab)) {
 	    if(g.wdg.mousedown(wdgxlate(c, g.wdg), button))
@@ -397,12 +404,16 @@ public class UI {
     }
     
     public void mouseup(Coord c, int button) {
-	//TODO: re-implement mouse event simulation or find another way to implement equip proxy
-//	mouseup(new MouseEvent(panel, 0, 0, 0, c.x, c.y, 1, false, button), c, button);
+        setmods(0);
+	processMouseUp(c, button);
     }
 	
     public void mouseup(MouseEvent ev, Coord c, int button) {
 	setmods(ev);
+	processMouseUp(c, button);
+    }
+    
+    public void processMouseUp(Coord c, int button) {
 	mc = c;
 	for(Grab g : c(mousegrab)) {
 	    if(g.wdg.mouseup(wdgxlate(c, g.wdg), button))
@@ -410,9 +421,17 @@ public class UI {
 	}
 	root.mouseup(c, button);
     }
-	
+    
+    public void mousemove(Coord c) {
+	processMouseMove(c);
+    }
+    
     public void mousemove(MouseEvent ev, Coord c) {
 	setmods(ev);
+	processMouseMove(c);
+    }
+    
+    public void processMouseMove(Coord c) {
 	mc = c;
 	root.mousemove(c);
     }
