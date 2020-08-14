@@ -100,11 +100,11 @@ public class EquipProxy extends DraggableWidget implements DTarget2 {
 	return false;
     }
     
-    public void activate(int i) {
+    public void activate(int i, int button) {
         Coord mc = ui.mc;
 	Coord c = sqoff(new Coord(i, 0)).add(rootpos());
-	ui.mousedown(c, 1);
-	ui.mouseup(c, 1);
+	ui.mousedown(c, button);
+	ui.mouseup(c, button);
 	ui.mousemove(mc);
     }
 }
