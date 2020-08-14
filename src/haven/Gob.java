@@ -832,8 +832,12 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner {
     }
     
     public void highlight() {
-	delattr(GobHighlight.class);
-	setattr(new GobHighlight(this));
+	GobHighlight h = getattr(GobHighlight.class);
+	if(h == null) {
+	    h = new GobHighlight(this);
+	    setattr(h);
+	}
+	h.start();
     }
     public final Placed placed = new Placed();
 }
