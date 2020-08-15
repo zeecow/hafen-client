@@ -1,6 +1,7 @@
 package me.ender;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 
 public class Reflect {
     public static Object getFieldValue(Object obj, String name) {
@@ -93,15 +94,40 @@ public class Reflect {
 	return obj != null && obj.getClass().getName().equals(clazz);
     }
 
+    //Note that version with types should be used if arguments contain primitive types
     public static Object invoke(Object o, String method, Object... args) {
 	Class[] types = new Class[args.length];
 	for (int i = 0; i < args.length; i++) {
 	    Object arg = args[i];
 	    types[i] = arg.getClass();
 	}
+	return invoke(o, method, types, args);
+    }
+    
+    public static Object invoke(Object o, String method, Class[] types, Object... args) {
 	try {
 	    return o.getClass().getDeclaredMethod(method, types).invoke(o, args);
 	} catch (Exception ignored) {}
+	return null;
+    }
+    
+    //Note that version with types should be used if arguments contain primitive types
+    public static Object invokeStatic(Class c, String method, Object... args) {
+	Class[] types = new Class[args.length];
+	for (int i = 0; i < args.length; i++) {
+	    Object arg = args[i];
+	    types[i] = arg.getClass();
+	}
+	return invokeStatic(c, method, types, args);
+    }
+    
+    public static Object invokeStatic(Class c, String method, Class[] types, Object... args) {
+	try {
+	    Method declaredMethod = c.getDeclaredMethod(method, types);
+	    return declaredMethod.invoke(null, args);
+	} catch (Exception ignored) {
+	    ignored.printStackTrace();
+	}
 	return null;
     }
 }
