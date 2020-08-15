@@ -29,7 +29,7 @@ public abstract class GobInfo extends GAttrib implements RenderTree.Node, PView.
     public void draw(GOut g, Pipe state) {
 	synchronized (texLock) {
 	    if(enabled() && tex != null) {
-		Coord sc = Homo3D.obj2view(new Coord3f(0, 0, up), state).round2();
+		Coord sc = Homo3D.obj2view(new Coord3f(0, 0, up), state, Area.sized(g.sz())).round2();
 		if(sc.isect(Coord.z, g.sz())) {
 		    g.aimage(tex, sc, center.a, center.b);
 		}
