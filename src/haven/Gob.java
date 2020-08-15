@@ -284,12 +284,14 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner {
 	    Indir<Resource> indir = item.res;
 	    if(indir != null) {
 		Resource res = indir.get();
-		System.out.println(String.format("overlayAdded res: %s", res != null ? res.name : "<null>"));
-		if(res != null && res.name.equals("gfx/fx/floatimg")) {
-		    processDmg(item.sdt.clone());
+		if(res != null) {
+		    if(res.name.equals("gfx/fx/floatimg")) {
+			processDmg(item.sdt.clone());
+		    } else if(res.name.equals("gfx/fx/msrad")) {
+			GobRadius.init();
+		    }
+//		    System.out.printf("overlayAdded: '%s'%n", res.name);
 		}
-	    } else {
-		System.out.println(String.format("overlayAdded no resource?? %s", item.getClass().getName()));
 	    }
 	} catch (Loading ignored) {}
     }
