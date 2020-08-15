@@ -37,7 +37,7 @@ public class Bufflist extends Widget {
     }
 
     public Bufflist() {
-	super(Buff.cframe.sz());
+        super(Buff.cframe.sz());
     }
 
     private void arrange(Widget imm) {
