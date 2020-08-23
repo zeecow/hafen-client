@@ -27,6 +27,7 @@
 package haven;
 
 import java.awt.Color;
+import java.awt.color.ColorSpace;
 import java.awt.image.*;
 import javax.media.opengl.*;
 import java.nio.*;
