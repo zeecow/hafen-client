@@ -107,12 +107,12 @@ public class MapWnd extends Window {
 		    markerseq = -1;
 		}
 	    });
-	mebtn = add(new Button(95, "Export...", false) {
+	mebtn = container.add(new Button(95, "Export...", false) {
 		public void click() {
 		    view.exportmap();
 		}
 	    });
-	mibtn = add(new Button(95, "Import...", false) {
+	mibtn = container.add(new Button(95, "Import...", false) {
 		public void click() {
 		    view.importmap();
 		}
