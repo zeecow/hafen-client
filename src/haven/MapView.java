@@ -1154,7 +1154,7 @@ public class MapView extends PView implements DTarget, Console.Directory {
 
 	public void dispose() {
 	    if(instancer != null) {
-		instancer = null;
+		instancer.dispose();
 		instancer = null;
 	    }
 	    if(draw != null) {
@@ -1167,9 +1167,7 @@ public class MapView extends PView implements DTarget, Console.Directory {
 	public String stats() {
 	    if(back == null)
 		return("");
-	    if(instancer != null)
-	    return(String.format("Tree %s, Inst %s, Draw %s", master.stats(), instancer.stats(), draw.stats()));
-	    return(String.format("Tree %s, Draw %s", master.stats(), draw.stats()));
+	    return(String.format("Tree %s, Inst %s, Draw %s, Map %d", master.stats(), (instancer == null) ? null : instancer.stats(), draw.stats(), idmap.size()));
 	}
     }
 
@@ -1206,8 +1204,8 @@ public class MapView extends PView implements DTarget, Console.Directory {
 		if(clickdb) {
 		    GOut.debugimage(out, clobjlist.basic, FragID.fragid, Area.sized(Coord.z, clobjlist.sz()), new VectorFormat(1, NumberFormat.SINT32),
 				    img -> Debug.dumpimage(img, Debug.somedir("click1.png")));
-		    GOut.getimage(out, clmaplist.basic, ClickLocation.fragloc, Area.sized(Coord.z, clmaplist.sz()),
-				  img -> Debug.dumpimage(img, Debug.somedir("click2.png")));
+		    GOut.debugimage(out, clmaplist.basic, ClickLocation.fragloc, Area.sized(Coord.z, clmaplist.sz()), new VectorFormat(3, NumberFormat.UNORM16),
+				    img -> Debug.dumpimage(img, Debug.somedir("click2.png")));
 		}
 		clmaplist.get(out, c, cd -> {
 			if(cd != null)
