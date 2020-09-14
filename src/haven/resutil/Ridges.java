@@ -724,7 +724,7 @@ public class Ridges extends MapMesh.Hooks {
 	Tiler t = map.tiler(grid.gettile(tc));
 	if(!(t instanceof RidgeTile))
 	    return(false);
-	int bz = ((RidgeTile)t).breakz();
+	double bz = ((RidgeTile)t).breakz();
 	for(Coord ec : tecs) {
 	    t = map.tiler(grid.gettile(tc.add(ec)));
 	    if(t instanceof RidgeTile)
