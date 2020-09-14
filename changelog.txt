@@ -1,3 +1,7 @@
+$size[14]{$u{Update for 14.09.20:}
+  * merged latest changes from loftar
+  * fixed custom brightness
+ 
 $size[14]{$u{Update for 08.05.20:}
   * merged latest changes from loftar
   * added support for filtering items by their required materials (in extended craft window, craft and build quick lists) - click ? button on those windows to see details.
