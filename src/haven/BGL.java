@@ -385,6 +385,12 @@ public abstract class BGL {
 	    });
     }
 
+    public void glColorMaski(final int buf, final boolean r, final boolean g, final boolean b, final boolean a) {
+	add(new Command() {
+		public void run(GL2 gl) {gl.glColorMaski(buf, r, g, b, a);}
+	    });
+    }
+
     public void glDeleteBuffers(final int count, final ID[] buffers, final int n) {
 	add(new Command() {
 		public void run(GL2 gl) {
@@ -470,6 +476,12 @@ public abstract class BGL {
 	    });
     }
 
+    public void glDisablei(final int cap, final int index) {
+	add(new Command() {
+		public void run(GL2 gl) {gl.glDisablei(cap, index);}
+	    });
+    }
+
     public void glDisableClientState(final int cap) {
 	add(new Command() {
 		public void run(GL2 gl) {gl.glDisableClientState(cap);}
@@ -535,6 +547,12 @@ public abstract class BGL {
     public void glEnable(final int cap) {
 	add(new Command() {
 		public void run(GL2 gl) {gl.glEnable(cap);}
+	    });
+    }
+
+    public void glEnablei(final int cap, final int index) {
+	add(new Command() {
+		public void run(GL2 gl) {gl.glEnablei(cap, index);}
 	    });
     }
 
