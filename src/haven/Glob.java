@@ -61,7 +61,7 @@ public class Glob {
 	public boolean tick(int dt);
     }
 
-    public static class CAttr extends Observable {
+    public static class CAttr {
 	String nm;
 	int base, comp;
 	
@@ -76,8 +76,6 @@ public class Glob {
 		return;
 	    this.base = base;
 	    this.comp = comp;
-	    setChanged();
-	    notifyObservers(null);
 	}
     }
     

@@ -440,13 +440,7 @@ public class Material extends GLState {
 	    String nm = cl.getAnnotation(ResName.class).value();
 	    if(ResCons.class.isAssignableFrom(cl)) {
 		final ResCons scons;
-		try {
-		    scons = cl.asSubclass(ResCons.class).newInstance();
-		} catch(InstantiationException e) {
-		    throw(new Error(e));
-		} catch(IllegalAccessException e) {
-		    throw(new Error(e));
-		}
+		scons = Utils.construct(cl.asSubclass(ResCons.class));
 		rnames.put(nm, new ResCons2() {
 			public Res.Resolver cons(Resource res, Object... args) {
 			    final GLState ret = scons.cons(res, args);
@@ -459,13 +453,7 @@ public class Material extends GLState {
 			}
 		    });
 	    } else if(ResCons2.class.isAssignableFrom(cl)) {
-		try {
-		    rnames.put(nm, cl.asSubclass(ResCons2.class).newInstance());
-		} catch(InstantiationException e) {
-		    throw(new Error(e));
-		} catch(IllegalAccessException e) {
-		    throw(new Error(e));
-		}
+		rnames.put(nm, Utils.construct(cl.asSubclass(ResCons2.class)));
 	    } else if(GLState.class.isAssignableFrom(cl)) {
 		final Constructor<? extends GLState> cons;
 		try {
