@@ -31,8 +31,6 @@ import java.awt.Color;
 import java.awt.image.*;
 
 public class GobIcon extends GAttrib {
-    private static final int size = UI.scale(20);
-    private static final Coord sz = new Coord(size, size);
     public static final PUtils.Convolution filter = new PUtils.Hanning(1);
     private static final Map<Indir<Resource>, Tex> cache = new WeakHashMap<Indir<Resource>, Tex>();
     public final Indir<Resource> res;
@@ -49,12 +47,12 @@ public class GobIcon extends GAttrib {
 		if(!cache.containsKey(res)) {
 		    Resource.Image img = res.get().layer(Resource.imgc);
 		    Tex tex = img.tex();
-		    if ((tex.sz().x <= size) && (tex.sz().y <= size)) {
+		    if((tex.sz().x <= 20) && (tex.sz().y <= 20)) {
 			cache.put(res, tex);
 		    } else {
 			BufferedImage buf = img.img;
 			buf = PUtils.rasterimg(PUtils.blurmask2(buf.getRaster(), 1, 1, Color.BLACK));
-			buf = PUtils.convolvedown(buf, sz, filter);
+			buf = PUtils.convolvedown(buf, new Coord(20, 20), filter);
 			cache.put(res, new TexI(buf));
 		    }
 		}
@@ -62,9 +60,5 @@ public class GobIcon extends GAttrib {
 	    }
 	}
 	return(this.tex);
-    }
-
-    public static Coord sz(Coord sz) {
-	return sz.mul((double) size / Math.max(sz.x, sz.y));
     }
 }

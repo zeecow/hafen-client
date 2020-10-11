@@ -50,7 +50,7 @@ public class StaticGSprite extends GSprite implements GSprite.ImageSprite {
     }
 
     public Coord sz() {
-	return(img.ssz);
+	return(img.sz);
     }
 
     public BufferedImage image() {

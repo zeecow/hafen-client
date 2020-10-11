@@ -38,7 +38,7 @@ public class IButton extends SIWidget {
     @RName("ibtn")
     public static class $_ implements Factory {
 	public Widget create(UI ui, Object[] args) {
-	    return(new IButton(Resource.loadsimg((String)args[0]), Resource.loadsimg((String)args[1])));
+	    return(new IButton(Resource.loadimg((String)args[0]), Resource.loadimg((String)args[1])));
 	}
     }
 
@@ -54,19 +54,17 @@ public class IButton extends SIWidget {
     }
 
     public IButton(String base, String up, String down, String hover) {
-	this(Resource.loadsimg(base + up), Resource.loadsimg(base + down), Resource.loadsimg(base + (hover == null?up:hover)));
+	this(Resource.loadimg(base + up), Resource.loadimg(base + down), Resource.loadimg(base + (hover == null?up:hover)));
     }
 
     public void draw(BufferedImage buf) {
 	Graphics g = buf.getGraphics();
-	BufferedImage img;
 	if(a)
-	    img = down;
+	    g.drawImage(down, 0, 0, null);
 	else if(h)
-	    img = hover;
+	    g.drawImage(hover, 0, 0, null);
 	else
-	    img = up;
-	g.drawImage(img, 0, 0, null);
+	    g.drawImage(up, 0, 0, null);
 	g.dispose();
     }
 

@@ -27,7 +27,6 @@
 package haven;
 
 import java.awt.*;
-import java.awt.Graphics;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.util.*;
@@ -113,7 +112,7 @@ public class Text {
 	    font = f;
 	    this.defcol = defcol;
 	    BufferedImage junk = TexI.mkbuf(new Coord(10, 10));
-	    java.awt.Graphics tmpl = junk.getGraphics();
+	    Graphics tmpl = junk.getGraphics();
 	    tmpl.setFont(f);
 	    m = tmpl.getFontMetrics();
 	}
@@ -123,11 +122,11 @@ public class Text {
 	}
 	
 	public Foundry(Font font, int psz, Color defcol) {
-	    this(font.deriveFont(UI.scale((float)psz)), defcol);
+	    this(font.deriveFont((float)psz), defcol);
 	}
 
 	public Foundry(Font font, int psz) {
-	    this(font.deriveFont(UI.scale((float)psz)));
+	    this(font.deriveFont((float)psz));
 	}
 
 	@Deprecated
