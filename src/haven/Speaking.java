@@ -33,7 +33,7 @@ public class Speaking extends GAttrib {
     Text text;
     static IBox sb = null;
     Tex svans;
-    static final int sx = 3;
+    static final int sx = UI.scale(5);
 	
     public Speaking(Gob gob, float zo, String text) {
 	super(gob);
@@ -50,9 +50,8 @@ public class Speaking extends GAttrib {
 	
     public void draw(GOut g, Coord c) {
 	Coord sz = text.sz();
-	if(sz.x < 10)
-	    sz.x = 10;
-	Coord tl = c.add(new Coord(sx, sb.cisz().y + sz.y + svans.sz().y - 1).inv());
+	sz.x = Math.max(sz.x, UI.scale(15));
+	Coord tl = c.sub(sx, sb.cisz().y + sz.y + svans.sz().y - sb.bb.sz().y);
 	Coord ftl = tl.add(sb.btloff());
 	g.chcolor(Color.WHITE);
 	g.frect(ftl, sz);
@@ -66,7 +65,7 @@ public class Speaking extends GAttrib {
     final PView.Draw2D fx = new PView.Draw2D() {
 	    public void draw2d(GOut g) {
 		if(gob.sc != null)
-		    Speaking.this.draw(g, gob.sc.add(new Coord(gob.sczu.mul(zo))).add(3, 0));
+		    Speaking.this.draw(g, gob.sc.add(new Coord(gob.sczu.mul(zo))).add(sx, 0));
 	    }
 	};
 }
