@@ -1,3 +1,6 @@
+$size[14]{$u{Update for 12.10.20:}
+  * merged UI-scaling from loftar. Most likely has lots of issues when UI scale is not 1.
+ 
 $size[14]{$u{Update for 14.09.20:}
   * merged latest changes from loftar
   * fixed custom brightness
