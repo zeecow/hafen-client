@@ -34,7 +34,7 @@ public class OptWnd extends Window {
     public static final Coord PANEL_POS = new Coord(220, 30);
     public static final Coord Q_TYPE_PADDING = new Coord(3, 0);
     private final Panel display, general, camera, radar, shortcuts;
-    public final Panel main, video, audio, keybind = null;
+    public final Panel main, video, audio, keybind;
     public Panel current;
     private WidgetList<KeyBinder.ShortcutWidget> shortcutList;
     
