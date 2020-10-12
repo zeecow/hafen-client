@@ -30,8 +30,8 @@ import java.util.*;
 import java.awt.Toolkit;
 import java.awt.Robot;
 import java.awt.Point;
-import javax.media.opengl.*;
-import javax.media.opengl.awt.*;
+import com.jogamp.opengl.*;
+import com.jogamp.opengl.awt.*;
 import haven.render.*;
 import haven.render.States;
 import haven.render.gl.*;
@@ -71,11 +71,11 @@ public class JOGLPanel extends GLCanvas implements Runnable, UIPanel, Console.Di
 	GLProfile prof;
 	try {
 	    prof = GLProfile.getMaxProgrammableCore(true);
-	} catch(javax.media.opengl.GLException e) {
+	} catch(com.jogamp.opengl.GLException e) {
 	    try {
 		/* If not core, let GLEnvironment handle that. */
 		prof = GLProfile.getDefault();
-	    } catch(javax.media.opengl.GLException e2) {
+	    } catch(com.jogamp.opengl.GLException e2) {
 		e2.addSuppressed(e);
 		throw(new ProfileException(e2));
 	    }
@@ -93,7 +93,7 @@ public class JOGLPanel extends GLCanvas implements Runnable, UIPanel, Console.Di
 	super(mkcaps(), null, null);
 	base = new BufPipe();
 	base.prep(new FragColor<>(FragColor.defcolor)).prep(new DepthBuffer<>(DepthBuffer.defdepth));
-	base.prep(new States.Blending());
+	base.prep(FragColor.blend(new BlendMode()));
 	setSize(sz.x, sz.y);
 	setAutoSwapBufferMode(false);
 	addGLEventListener(new GLEventListener() {
@@ -409,30 +409,30 @@ public class JOGLPanel extends GLCanvas implements Runnable, UIPanel, Console.Di
     private long prevfree = 0, framealloc = 0;
     @SuppressWarnings("deprecation")
     private void drawstats(UI ui, GOut g, GLRender buf) {
-	int y = g.sz().y - 190;
-	FastText.aprintf(g, new Coord(10, y -= 15), 0, 1, "FPS: %d (%d%%, %d%% idle, latency %d)", fps, (int)(uidle * 100.0), (int)(ridle * 100.0), framelag);
+	int y = g.sz().y - UI.scale(190), dy = FastText.h;
+	FastText.aprintf(g, new Coord(10, y -= dy), 0, 1, "FPS: %d (%d%%, %d%% idle, latency %d)", fps, (int)(uidle * 100.0), (int)(ridle * 100.0), framelag);
 	Runtime rt = Runtime.getRuntime();
 	long free = rt.freeMemory(), total = rt.totalMemory();
 	if(free < prevfree)
 	    framealloc = ((prevfree - free) + (framealloc * 19)) / 20;
 	prevfree = free;
-	FastText.aprintf(g, new Coord(10, y -= 15), 0, 1, "Mem: %,011d/%,011d/%,011d/%,011d (%,d)", free, total - free, total, rt.maxMemory(), framealloc);
-	FastText.aprintf(g, new Coord(10, y -= 15), 0, 1, "State slots: %d", State.Slot.numslots());
-	FastText.aprintf(g, new Coord(10, y -= 15), 0, 1, "GL progs: %d", buf.env.numprogs());
-	FastText.aprintf(g, new Coord(10, y -= 15), 0, 1, "V-Mem: %s", buf.env.memstats());
+	FastText.aprintf(g, new Coord(10, y -= dy), 0, 1, "Mem: %,011d/%,011d/%,011d/%,011d (%,d)", free, total - free, total, rt.maxMemory(), framealloc);
+	FastText.aprintf(g, new Coord(10, y -= dy), 0, 1, "State slots: %d", State.Slot.numslots());
+	FastText.aprintf(g, new Coord(10, y -= dy), 0, 1, "GL progs: %d", buf.env.numprogs());
+	FastText.aprintf(g, new Coord(10, y -= dy), 0, 1, "V-Mem: %s", buf.env.memstats());
 	MapView map = ui.root.findchild(MapView.class);
 	if((map != null) && (map.back != null)) {
-	    FastText.aprintf(g, new Coord(10, y -= 15), 0, 1, "Camera: %s", map.camstats());
-	    FastText.aprintf(g, new Coord(10, y -= 15), 0, 1, "Mapview: %s", map.stats());
-	    // FastText.aprintf(g, new Coord(10, y -= 15), 0, 1, "Click: Map: %s, Obj: %s", map.clmaplist.stats(), map.clobjlist.stats());
+	    FastText.aprintf(g, new Coord(10, y -= dy), 0, 1, "Camera: %s", map.camstats());
+	    FastText.aprintf(g, new Coord(10, y -= dy), 0, 1, "Mapview: %s", map.stats());
+	    // FastText.aprintf(g, new Coord(10, y -= dy), 0, 1, "Click: Map: %s, Obj: %s", map.clmaplist.stats(), map.clobjlist.stats());
 	}
 	if(ui.sess != null)
-	    FastText.aprintf(g, new Coord(10, y -= 15), 0, 1, "Async: L %s, D %s", ui.sess.glob.loader.stats(), Defer.gstats());
+	    FastText.aprintf(g, new Coord(10, y -= dy), 0, 1, "Async: L %s, D %s", ui.sess.glob.loader.stats(), Defer.gstats());
 	else
-	    FastText.aprintf(g, new Coord(10, y -= 15), 0, 1, "Async: D %s", Defer.gstats());
+	    FastText.aprintf(g, new Coord(10, y -= dy), 0, 1, "Async: D %s", Defer.gstats());
 	int rqd = Resource.local().qdepth() + Resource.remote().qdepth();
 	if(rqd > 0)
-	    FastText.aprintf(g, new Coord(10, y -= 15), 0, 1, "RQ depth: %d (%d)", rqd, Resource.local().numloaded() + Resource.remote().numloaded());
+	    FastText.aprintf(g, new Coord(10, y -= dy), 0, 1, "RQ depth: %d (%d)", rqd, Resource.local().numloaded() + Resource.remote().numloaded());
     }
 
     private void display(UI ui, GLRender buf) {

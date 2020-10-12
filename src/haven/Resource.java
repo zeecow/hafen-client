@@ -35,7 +35,6 @@ import java.net.*;
 import java.io.*;
 import java.security.*;
 import javax.imageio.*;
-import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 
 public class Resource implements Serializable {
@@ -835,13 +834,7 @@ public class Resource implements Serializable {
 	for(Class<?> cl : dolda.jglob.Loader.get(LayerName.class).classes()) {
 	    String nm = cl.getAnnotation(LayerName.class).value();
 	    if(LayerFactory.class.isAssignableFrom(cl)) {
-		try {
-		    addltype(nm, cl.asSubclass(LayerFactory.class).newInstance());
-		} catch(InstantiationException e) {
-		    throw(new Error(e));
-		} catch(IllegalAccessException e) {
-		    throw(new Error(e));
-		}
+		addltype(nm, Utils.construct(cl.asSubclass(LayerFactory.class)));
 	    } else if(Layer.class.isAssignableFrom(cl)) {
 		addltype(nm, cl.asSubclass(Layer.class));
 	    } else {
@@ -888,14 +881,15 @@ public class Resource implements Serializable {
     @LayerName("image")
     public class Image extends Layer implements Comparable<Image>, IDLayer<Integer> {
 	public transient BufferedImage img;
-	transient private Tex tex;
+	private transient BufferedImage scaled;
+	private transient Tex tex;
 	public final int z, subz;
 	public final boolean nooff;
 	public final int id;
+	private float scale = 1;
 	private int gay = -1;
-	public Coord sz;
-	public Coord o;
-		
+	public Coord sz, o, tsz, ssz;
+
 	public Image(Message buf) {
 	    z = buf.int16();
 	    subz = buf.int16();
@@ -904,25 +898,58 @@ public class Resource implements Serializable {
 	    nooff = (fl & 2) != 0;
 	    id = buf.int16();
 	    o = cdec(buf);
+	    if((fl & 4) != 0) {
+		while(true) {
+		    String key = buf.string();
+		    if(key.equals(""))
+			break;
+		    int len = buf.uint8();
+		    if((len & 0x80) != 0)
+			len = buf.int32();
+		    Message val = new MessageBuf(buf.bytes(len));
+		    if(key.equals("tsz")) {
+			tsz = val.coord();
+		    } else if(key.equals("scale")) {
+			scale = val.float32();
+		    }
+		}
+	    }
 	    try {
 		img = readimage(new MessageInputStream(buf));
 	    } catch(IOException e) {
 		throw(new LoadException(e, Resource.this));
 	    }
 	    sz = Utils.imgsz(img);
+	    if(tsz == null)
+		tsz = sz;
+	    ssz = new Coord(Math.round(UI.scale(sz.x / scale)), Math.round(UI.scale(sz.y / scale)));
 	}
-		
-	public synchronized Tex tex() {
-	    if(tex != null)
-		return(tex);
-	    tex = new TexI(img) {
-		    public String toString() {
-			return("TexI(" + Resource.this.name + ", " + id + ")");
+
+	public BufferedImage scaled() {
+	    if(scaled == null) {
+		synchronized(this) {
+		    if(scaled == null)
+			scaled = PUtils.uiscale(img, ssz);
+		}
+	    }
+	    return(scaled);
+	}
+
+	public Tex tex() {
+	    if(tex == null) {
+		synchronized(this) {
+		    if(tex == null) {
+			tex = new TexI(scaled()) {
+				public String toString() {
+				    return("TexI(" + Resource.this.name + ", " + id + ")");
+				}
+			    };
 		    }
-		};
+		}
+	    }
 	    return(tex);
 	}
-		
+
 	private boolean detectgay() {
 	    for(int y = 0; y < sz.y; y++) {
 		for(int x = 0; x < sz.x; x++) {
@@ -1061,7 +1088,7 @@ public class Resource implements Serializable {
 	String name();
 	Class<? extends Instancer> instancer() default Instancer.class;
 	public interface Instancer {
-	    public Object make(Class<?> cl) throws InstantiationException, IllegalAccessException;
+	    public Object make(Class<?> cl);
 	}
     }
 
@@ -1272,16 +1299,10 @@ public class Resource implements Serializable {
 		} else {
 		    T inst;
 		    Object rinst = AccessController.doPrivileged((PrivilegedAction<Object>)() -> {
-			    try {
-				if(entry.instancer() != PublishedCode.Instancer.class)
-				    return(entry.instancer().newInstance().make(acl));
-				else
-				    return(acl.newInstance());
-			    } catch(IllegalAccessException e) {
-				throw(new RuntimeException(e));
-			    } catch(InstantiationException e) {
-				throw(new RuntimeException(e));
-			    }
+			    if(entry.instancer() != PublishedCode.Instancer.class)
+				return(Utils.construct(entry.instancer()).make(acl));
+			    else
+				return(Utils.construct(acl));
 			});
 		    try {
 			inst = cl.cast(rinst);
@@ -1494,6 +1515,10 @@ public class Resource implements Serializable {
 
     public static BufferedImage loadimg(String name) {
 	return(local().loadwait(name).layer(imgc).img);
+    }
+
+    public static BufferedImage loadsimg(String name) {
+	return(local().loadwait(name).layer(imgc).scaled());
     }
 
     public static Tex loadtex(String name) {

@@ -61,7 +61,7 @@ public class Img extends Widget {
 	if(img != null)
 	    g.image(img, Coord.z);
     }
-	
+
     public Img(Tex img) {
 	super(img.sz());
 	this.res = null;
@@ -83,6 +83,8 @@ public class Img extends Widget {
 	    } else {
 		this.res = ui.sess.getres((Integer)args[0]);
 	    }
+	} else if(name == "cl") {
+	    hit = ((Integer)args[0]) != 0;
 	} else {
 	    super.uimsg(name, args);
 	}
@@ -94,5 +96,10 @@ public class Img extends Widget {
 	    return(true);
 	}
 	return(false);
+    }
+
+    public void init(Tex img) {
+	sz = img.sz();
+	this.img = img;
     }
 }

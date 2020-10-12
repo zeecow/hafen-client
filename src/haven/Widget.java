@@ -50,6 +50,7 @@ public class Widget {
     public Object tooltip = null;
     public KeyMatch gkey;
     public KeyBinding kb_gkey;
+    public boolean temp = false;
     private Widget prevtt;
     static Map<String, Factory> types = new TreeMap<String, Factory>();
     private final List<Subscription> subscriptions = new ArrayList<>();
@@ -64,13 +65,13 @@ public class Widget {
     @RName("cnt")
     public static class $Cont implements Factory {
 	public Widget create(UI ui, Object[] args) {
-	    return(new Widget((Coord)args[0]));
+	    return(new Widget(UI.scale((Coord)args[0])));
 	}
     }
     @RName("ccnt")
     public static class $CCont implements Factory {
 	public Widget create(UI ui, Object[] args) {
-	    Widget ret = new Widget((Coord)args[0]) {
+	    Widget ret = new Widget(UI.scale((Coord)args[0])) {
 		    public void presize() {
 			c = parent.sz.div(2).sub(sz.div(2));
 		    }
@@ -148,9 +149,9 @@ public class Widget {
     }
 
     public static class FactMaker implements Resource.PublishedCode.Instancer {
-	public Factory make(Class<?> cl) throws InstantiationException, IllegalAccessException {
+	public Factory make(Class<?> cl) {
 	    if(Factory.class.isAssignableFrom(cl))
-		return(cl.asSubclass(Factory.class).newInstance());
+		return(Utils.construct(cl.asSubclass(Factory.class)));
 	    try {
 		final Method mkm = cl.getDeclaredMethod("mkwidget", UI.class, Object[].class);
 		int mod = mkm.getModifiers();
@@ -219,6 +220,12 @@ public class Widget {
 	if(f == null)
 	    throw(new RuntimeException("No such widget type: " + name));
 	return(f);
+    }
+
+    public static Widget temporary() {
+        Widget result = new Widget();
+        result.temp = true;
+        return result;
     }
 
     public Widget(Coord sz) {
@@ -321,7 +328,8 @@ public class Widget {
 		if(Character.isDigit(op)) {
 		    int e;
 		    for(e = i; (e < spec.length()) && Character.isDigit(spec.charAt(e)); e++);
-		    st.push(Integer.parseInt(spec.substring(i - 1, e)));
+		    int v = Integer.parseInt(spec.substring(i - 1, e));
+		    st.push(v);
 		    i = e;
 		} else if(op == '!') {
 		    st.push(args[off++]);
@@ -404,6 +412,15 @@ public class Widget {
 		    } else {
 			throw(new RuntimeException("Invalid division operands: " + a + " - " + b));
 		    }
+		} else if(op == 'S') {
+		    Object a = st.pop();
+		    if(a instanceof Integer) {
+			st.push(UI.scale((Integer)a));
+		    } else if(a instanceof Coord) {
+			st.push(UI.scale((Coord)a));
+		    } else {
+			throw(new RuntimeException("Invalid scaling operand: " + a));
+		    }
 		} else if(Character.isWhitespace(op)) {
 		} else {
 		    throw(new RuntimeException("Unknown position operation: " + op));
@@ -417,7 +434,11 @@ public class Widget {
 
     public void addchild(Widget child, Object... args) {
 	if(args[0] instanceof Coord) {
-	    add(child, (Coord)args[0]);
+	    Coord c = (Coord)args[0];
+	    String opt = (args.length > 1) ? (String)args[1] : "";
+	    if(opt.indexOf('u') < 0)
+		c = UI.scale(c);
+	    add(child, c);
 	} else if(args[0] instanceof Coord2d) {
 	    add(child, ((Coord2d)args[0]).mul(new Coord2d(this.sz.sub(child.sz))).round());
 	} else if(args[0] instanceof String) {
@@ -509,7 +530,8 @@ public class Widget {
 	    unlink();
 	    parent.cdestroy(this);
 	}
-	ui.removed(this);
+	if(ui != null)
+	    ui.removed(this);
     }
 
     public void reqdestroy() {
@@ -857,7 +879,7 @@ public class Widget {
 		    if(key == '\t') {
 			Widget f = focused;
 			while(true) {
-			    if((ev.getModifiers() & InputEvent.SHIFT_MASK) == 0) {
+			    if((ev.getModifiersEx() & InputEvent.SHIFT_DOWN_MASK) == 0) {
 				Widget n = f.rnext();
 				f = ((n == null) || !n.hasparent(this))?child:n;
 			    } else {
@@ -1229,6 +1251,30 @@ public class Widget {
 	}
 
 	public abstract void ntick(double a);
+    }
+
+    public void optimize() {
+	for(Widget w = child; w != null; w = w.next) {
+	    if (w.temp) {
+		w.give(this);
+		w.destroy();
+	    } else {
+		w.optimize();
+	    }
+	}
+    }
+
+    public void give(Widget parent) {
+	Widget last = parent.lchild;
+	last.next = child;
+	child.prev = last;
+	for(Widget w = child; w != null; w = w.next) {
+	    w.parent = parent;
+	    w.c = w.c.add(c);
+	}
+	parent.lchild = lchild;
+	child = null;
+	lchild = null;
     }
     
     public void listen(String event, Action1<Reactor.Event> callback) {

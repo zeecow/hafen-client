@@ -186,9 +186,9 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner {
 	}
 
 	public static class FactMaker implements Resource.PublishedCode.Instancer {
-	    public Factory make(Class<?> cl) throws InstantiationException, IllegalAccessException {
+	    public Factory make(Class<?> cl) {
 		if(Factory.class.isAssignableFrom(cl))
-		    return(cl.asSubclass(Factory.class).newInstance());
+		    return(Utils.construct(cl.asSubclass(Factory.class)));
 		if(ResAttr.class.isAssignableFrom(cl)) {
 		    try {
 			final java.lang.reflect.Constructor<? extends ResAttr> cons = cl.asSubclass(ResAttr.class).getConstructor(Gob.class, Message.class);
@@ -614,8 +614,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner {
     }
 
     public void added(RenderTree.Slot slot) {
-	if(!virtual)
-	    slot.ostate(curstate());
+	slot.ostate(curstate());
 	for(Overlay ol : ols) {
 	    if(ol.slots != null)
 		slot.add(ol);

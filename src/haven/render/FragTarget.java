@@ -26,61 +26,49 @@
 
 package haven.render;
 
-import haven.*;
-import java.util.Arrays;
+import java.util.*;
 
-public class Swizzle implements java.io.Serializable {
-    public static final Swizzle ID3 = id(3);
-    public static final Swizzle ID4 = id(4);
-    public static final Swizzle BGR = new Swizzle(2, 1, 0);
-    public static final Swizzle BGRA = new Swizzle(2, 1, 0, 3);
-    public final int[] perm;
+public class FragTarget {
+    public Object buf;
+    public final boolean mask[] = {false, false, false, false};
+    public BlendMode blend = null;
 
-    public Swizzle(int... perm) {
-	this.perm = perm;
+    public FragTarget(Object buf) {
+	this.buf = buf;
     }
 
-    public boolean idp() {
-	for(int i = 0; i < perm.length; i++) {
-	    if(perm[i] != i)
-		return(false);
-	}
-	return(true);
+    public FragTarget blend(BlendMode blend) {
+	this.blend = blend;
+	return(this);
     }
 
-    public String toString() {
-	StringBuilder buf = new StringBuilder();
-	buf.append("#<swizzle ");
-	for(int i = 0; i < perm.length; i++) {
-	    if(i > 0)
-		buf.append(',');
-	    buf.append(perm[i]);
-	}
-	buf.append(">");
-	return(buf.toString());
+    public FragTarget mask(boolean r, boolean g, boolean b, boolean a) {
+	mask[0] = r; mask[1] = g; mask[2] = b; mask[3] = a;
+	return(this);
     }
 
-    public boolean equals(Object o) {
-	if(!(o instanceof Swizzle))
-	    return(false);
-	Swizzle that = (Swizzle)o;
-	if(this.perm.length != that.perm.length)
-	    return(false);
-	for(int i = 0; i < perm.length; i++) {
-	    if(this.perm[i] != that.perm[i])
-		return(false);
-	}
-	return(true);
+    public FragTarget mask(boolean[] mask) {
+	if(mask.length != 4)
+	    throw(new IllegalArgumentException());
+	for(int i = 0; i < 4; i++)
+	    this.mask[i] = mask[i];
+	return(this);
     }
 
     public int hashCode() {
-	return(Arrays.hashCode(perm));
+	int ret = buf.hashCode();
+	ret = (ret * 31) + (mask[0] ? 8 : 0) + (mask[1] ? 4 : 0) + (mask[2] ? 2 : 0) + (mask[3] ? 1 : 0);
+	ret = (ret * 31) + ((blend == null) ? 0 : blend.hashCode());
+	return(ret);
     }
 
-    public static Swizzle id(int nc) {
-	int[] perm = new int[nc];
-	for(int i = 0; i < nc; i++)
-	    perm[i] = i;
-	return(new Swizzle(perm));
+    public boolean equals(FragTarget that) {
+	return((this.buf == that.buf) && Arrays.equals(this.mask, that.mask) && Objects.equals(this.blend, that.blend));
     }
+
+    public boolean equals(Object o) {
+	return((o instanceof FragTarget) && this.equals((FragTarget)o));
+    }
+
+    public String toString() {return(String.format("#<frag-target %s, %s>", buf, blend));}
 }

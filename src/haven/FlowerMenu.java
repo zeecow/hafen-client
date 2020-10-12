@@ -46,7 +46,7 @@ public class FlowerMenu extends Widget {
     public static final Text.Foundry ptf = new Text.Foundry(Text.dfont, 12);
     public static final IBox pbox = Window.wbox;
     public static final Tex pbg = Window.bg;
-    public static final int ph = 30, ppl = 8;
+    public static final int ph = UI.scale(30), ppl = 8;
     public static final String PICK_ALL = "#Pick All";
     public static Map<String, Boolean> AUTOCHOOSE = null;
     private static Gob target;
@@ -114,7 +114,7 @@ public class FlowerMenu extends Widget {
 	    super(Coord.z);
 	    this.name = name;
 	    text = ptf.render(name, ptc);
-	    resize(text.sz().x + 25, ph);
+	    resize(text.sz().x + UI.scale(25), ph);
 	}
 
 	public void move(Coord c) {
@@ -127,7 +127,7 @@ public class FlowerMenu extends Widget {
 
 	public void draw(GOut g) {
 	    g.chcolor(new Color(255, 255, 255, (int)(255 * a)));
-	    g.image(pbg, new Coord(3, 3), new Coord(3, 3), sz.add(new Coord(-6, -6)));
+	    g.image(pbg, new Coord(3, 3), new Coord(3, 3), sz.add(new Coord(-6, -6)), UI.scale(pbg.sz()));
 	    pbox.draw(g, Coord.z, sz);
 	    g.image(text.tex(), sz.div(2).sub(text.sz().div(2)));
 	}
@@ -226,7 +226,7 @@ public class FlowerMenu extends Widget {
 	while(i < opts.length) {
 	    place: {
 		double ta = (PI / 2) - (p * (2 * PI / (l * ppl)));
-		double tr = 75 + (50 * (l - 1));
+		double tr = UI.scale(75) + (UI.scale(50) * (l - 1));
 		if(!muri && !bounds.contains(opts[i].ta(ta, tr))) {
 		    if(tt < 0) {
 			tt = ppl * l;

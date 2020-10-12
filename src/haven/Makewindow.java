@@ -33,14 +33,16 @@ import java.awt.image.BufferedImage;
 import java.util.*;
 import java.util.List;
 
+import static haven.Inventory.invsq;
+
 public class Makewindow extends Widget {
     Widget obtn, cbtn;
     List<Spec> inputs = Collections.emptyList();
     List<Spec> outputs = Collections.emptyList();
     List<Indir<Resource>> qmod = null;
     static final Text qmodl = Text.render("Quality:");
-    static Coord boff = new Coord(7, 9);
-    final int xoff = 45, qmy = 38, outy = 65;
+    static Coord boff = UI.scale(new Coord(7, 9));
+    final int xoff = UI.scale(45), qmy = UI.scale(38), outy = UI.scale(65);
     private Tex qtex;
     private boolean rebuild = false;
     public static final Text.Foundry nmf = new Text.Foundry(Text.serif, 20).aa(true);
@@ -154,10 +156,10 @@ public class Makewindow extends Widget {
     }
 
     public Makewindow(String rcpnm) {
-	add(new Label("Input:"), new Coord(0, 8));
-	add(new Label("Result:"), new Coord(0, outy + 8));
-	obtn = add(new Button(85, "Craft"), new Coord(230, 75));
-	cbtn = add(new Button(85, "Craft All"), new Coord(325, 75));
+	add(new Label("Input:"), new Coord(0, UI.scale(8)));
+	add(new Label("Result:"), new Coord(0, outy + UI.scale(8)));
+	obtn = add(new Button(UI.scale(85), "Craft"), UI.scale(new Coord(230, 75)));
+	cbtn = add(new Button(UI.scale(85), "Craft All"), UI.scale(new Coord(325, 75)));
 	pack();
 	adda(new Label(rcpnm, nmf), sz.x, 0, 1, 0);
     }
@@ -205,13 +207,13 @@ public class Makewindow extends Widget {
 	    boolean opt = s.opt();
 	    if(opt != popt)
 		c = c.add(10, 0);
-	    GOut sg = g.reclip(c, Inventory.invsq.sz());
+	    GOut sg = g.reclip(c, invsq.sz());
 	    if(opt) {
 		sg.chcolor(0, 255, 0, 255);
-		sg.image(Inventory.invsq, Coord.z);
+		sg.image(invsq, Coord.z);
 		sg.chcolor();
 	    } else {
-		sg.image(Inventory.invsq, Coord.z);
+		sg.image(invsq, Coord.z);
 	    }
 	    s.draw(sg);
 	    c = c.add(Inventory.sqsz.x, 0);
@@ -228,8 +230,8 @@ public class Makewindow extends Widget {
 	}
 	c = new Coord(xoff, outy);
 	for(Spec s : outputs) {
-	    GOut sg = g.reclip(c, Inventory.invsq.sz());
-	    sg.image(Inventory.invsq, Coord.z);
+	    GOut sg = g.reclip(c, invsq.sz());
+	    sg.image(invsq, Coord.z);
 	    s.draw(sg);
 	    c = c.add(Inventory.sqsz.x, 0);
 	}
@@ -289,12 +291,12 @@ public class Makewindow extends Widget {
 		    try {
 			Glob.CAttr attr = ui.gui.chrwdg.findattr(qm.get().basename());
 			if(attr != null) {
-			    sz = sz.add(attr.compline().sz().x + 8, 0);
+			    sz = sz.add(attr.compline().sz().x + UI.scale(8), 0);
 			}
 		    }catch (Exception ignored){}
 		    if(mc.isect(c, sz))
 			return(qm.get().layer(Resource.tooltip).t);
-		    c = c.add(sz.x + 1, 0);
+		    c = c.add(sz.x + UI.scale(1), 0);
 		}
 	    } catch(Loading l) {
 	    }
@@ -305,7 +307,7 @@ public class Makewindow extends Widget {
 	    for(Spec s : inputs) {
 		boolean opt = s.opt();
 		if(opt != popt)
-		    c = c.add(10, 0);
+		    c = c.add(UI.scale(10), 0);
 		if(mc.isect(c, Inventory.invsq.sz())) {
 		    name = getDynamicName(s.spr);
 		    if(name == null){
@@ -318,7 +320,7 @@ public class Makewindow extends Widget {
 	    }
 	    c = new Coord(xoff, outy);
 	    for(Spec s : outputs) {
-		if(mc.isect(c, Inventory.invsq.sz())) {
+		if(mc.isect(c, invsq.sz())) {
 		    tspec = s;
 		    break find;
 		}

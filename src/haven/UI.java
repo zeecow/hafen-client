@@ -30,11 +30,12 @@ import me.ender.WindowDetector;
 
 import java.awt.*;
 import java.awt.event.InputEvent;
+import java.awt.Font;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.InputEvent;
+import java.awt.image.BufferedImage;
 import java.util.*;
-
 import static haven.Utils.el;
 import haven.render.Environment;
 import haven.render.Render;
@@ -59,6 +60,7 @@ public class UI {
     public GSettings gprefs = GSettings.load(true);
     private boolean gprefsdirty = false;
     public final ActAudio.Root audio = new ActAudio.Root();
+    private static final double scalef = Config.uiscale == null ? Utils.getprefd("uiscale", 1.0) : Config.uiscale;
     public GameUI gui = null;
     
     {
@@ -321,10 +323,13 @@ public class UI {
 	
     public void uimsg(int id, String msg, Object... args) {
 	Widget wdg = getwidget(id);
-	if(wdg != null)
-	    wdg.uimsg(msg.intern(), args);
-	else
+	if(wdg != null) {
+	    synchronized(this) {
+		wdg.uimsg(msg.intern(), args);
+	    }
+	} else {
 	    throw(new UIException("Uimsg to non-existent widget " + id, msg, args));
+	}
     }
 	
     private void setmods(InputEvent ev) {
@@ -504,5 +509,57 @@ public class UI {
     public void destroy() {
 	root.destroy();
 	audio.clear();
+    }
+
+    public static double scale(double v) {
+	return(v * scalef);
+    }
+
+    public static float scale(float v) {
+	return(v * (float)scalef);
+    }
+
+    public static int scale(int v) {
+	return(Math.round(scale((float)v)));
+    }
+
+    public static Coord scale(Coord v) {
+	return(v.mul(scalef));
+    }
+
+    public static Coord scale(int x, int y) {
+	return(scale(new Coord(x, y)));
+    }
+
+    public static Coord2d scale(Coord2d v) {
+	return(v.mul(scalef));
+    }
+
+    static public Font scale(Font f, float size) {
+	return(f.deriveFont(scale(size)));
+    }
+
+    public static <T extends Tex> ScaledTex<T> scale(T tex) {
+	return(new ScaledTex<T>(tex, UI.scale(tex.sz())));
+    }
+
+    public static <T extends Tex> ScaledTex<T> scale(ScaledTex<T> tex) {
+	return(tex);
+    }
+
+    public static double unscale(double v) {
+	return(v / scalef);
+    }
+
+    public static float unscale(float v) {
+	return(v / (float)scalef);
+    }
+
+    public static int unscale(int v) {
+	return(Math.round(unscale((float)v)));
+    }
+
+    public static Coord unscale(Coord v) {
+	return(v.div(scalef));
     }
 }

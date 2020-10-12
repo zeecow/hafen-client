@@ -69,7 +69,7 @@ public class Glob {
 	public boolean tick(double dt);
     }
 
-    public static class CAttr extends Observable {
+    public static class CAttr {
 	public static final Text.Foundry fnd = new Text.Foundry(Text.sans, 12);
 	String nm;
 	int base, comp;
@@ -88,8 +88,6 @@ public class Glob {
 	    this.base = base;
 	    this.comp = comp;
 	    compLine = null;
-	    setChanged();
-	    notifyObservers(null);
 	}
 
 	public Text.Line compline() {

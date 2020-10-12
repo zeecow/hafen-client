@@ -28,8 +28,9 @@ package haven.render.gl;
 
 import haven.Utils;
 import java.util.*;
+import java.util.regex.*;
 import java.io.*;
-import javax.media.opengl.*;
+import com.jogamp.opengl.*;
 
 public class BufferBGL extends BGL {
     public static final BufferBGL empty = new BufferBGL(0) {
@@ -51,10 +52,45 @@ public class BufferBGL extends BGL {
 	    if(curprof != null)
 		curprof.register(list[i]);
 	    try {
-		list[i].run(gl);
+		try {
+		    list[i].run(gl);
+		} catch(com.jogamp.opengl.GLException exc) {
+		    /* How nice wouldn't it be if DebugGL could be
+		     * subclasseed to customize the errors. */
+		    checkdebuggl(exc);
+		    throw(exc);
+		}
 	    } catch(Exception exc) {
 		throw(new BGLException(this, list[i], exc));
 	    }
+	}
+    }
+
+    private static final Pattern joglerrp = Pattern.compile("GL-Error 0x([0-9a-fA-F]+)\\s");
+    private void checkdebuggl(Exception exc) {
+	String msg = exc.getMessage();
+	GLException wrap = null;
+	if(msg.indexOf("GL_INVALID_ENUM") >= 0) {
+	    wrap = new GLException.GLInvalidEnumException();
+	} else if(msg.indexOf("GL_INVALID_VALUE") >= 0) {
+	    wrap = new GLException.GLInvalidValueException();
+	} else if(msg.indexOf("GL_INVALID_OPERATION") >= 0) {
+	    wrap = new GLException.GLInvalidOperationException();
+	} else if(msg.indexOf("GL_OUT_OF_MEMORY") >= 0) {
+	    wrap = new GLException.GLOutOfMemoryException();
+	} else {
+	    Matcher m = joglerrp.matcher(msg);
+	    if(m.find()) {
+		try {
+		    wrap = GLException.glexcfor(Integer.parseInt(m.group(1), 16));
+		} catch(NumberFormatException e) {
+		    exc.addSuppressed(e);
+		}
+	    }
+	}
+	if(wrap != null) {
+	    wrap.initCause(exc);
+	    throw(wrap);
 	}
     }
 

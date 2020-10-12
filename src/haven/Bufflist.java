@@ -29,7 +29,7 @@ package haven;
 import java.util.*;
 
 public class Bufflist extends Widget {
-    public static final int margin = 2;
+    public static final int margin = UI.scale(2);
     public static final int num = 5;
 
     public interface Managed {

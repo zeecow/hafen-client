@@ -113,9 +113,9 @@ public abstract class ItemInfo {
     }
 
     public static class FactMaker implements Resource.PublishedCode.Instancer {
-	public InfoFactory make(Class<?> cl) throws InstantiationException, IllegalAccessException {
+	public InfoFactory make(Class<?> cl) {
 	    if(InfoFactory.class.isAssignableFrom(cl))
-		return(cl.asSubclass(InfoFactory.class).newInstance());
+		return(Utils.construct(cl.asSubclass(InfoFactory.class)));
 	    try {
 		Function<Object[], ItemInfo> make = Utils.smthfun(cl, "mkinfo", ItemInfo.class, Owner.class, Object[].class);
 		return(new InfoFactory() {
@@ -242,7 +242,7 @@ public abstract class ItemInfo {
 	}
 
 	public void layout(Layout l) {
-	    BufferedImage t = tipimg((l.width == 0) ? 200 : l.width);
+	    BufferedImage t = tipimg((l.width == 0) ? UI.scale(200) : l.width);
 	    if(t != null)
 		l.cmp.add(t, new Coord(0, l.cmp.sz.y + 10));
 	}

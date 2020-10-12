@@ -30,6 +30,7 @@ import haven.rx.CharterBook;
 import haven.rx.Reactor;
 
 import java.awt.*;
+import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.util.Collection;
 import java.util.LinkedList;
@@ -41,7 +42,7 @@ public class Window extends Widget implements DTarget {
     public static final Tex bgl = Resource.loadtex("gfx/hud/wnd/lg/bgl");
     public static final Tex bgr = Resource.loadtex("gfx/hud/wnd/lg/bgr");
     public static final Tex cl = Resource.loadtex("gfx/hud/wnd/lg/cl");
-    public static final TexI cm = new TexI(Resource.loadimg("gfx/hud/wnd/lg/cm"));
+    public static final TexI cm = new TexI(Resource.loadsimg("gfx/hud/wnd/lg/cm"));
     public static final Tex cr = Resource.loadtex("gfx/hud/wnd/lg/cr");
     public static final Tex tm = Resource.loadtex("gfx/hud/wnd/lg/tm");
     public static final Tex tr = Resource.loadtex("gfx/hud/wnd/lg/tr");
@@ -51,9 +52,12 @@ public class Window extends Widget implements DTarget {
     public static final Tex bl = Resource.loadtex("gfx/hud/wnd/lg/bl");
     public static final Tex bm = Resource.loadtex("gfx/hud/wnd/lg/bm");
     public static final Tex br = Resource.loadtex("gfx/hud/wnd/lg/br");
-    public static final Coord tlm = new Coord(18, 30), brm = new Coord(13, 22), cpo = new Coord(36, 14);
+    public static final Coord tlm = UI.scale(new Coord(18, 30));
+    public static final Coord brm = UI.scale(new Coord(13, 22));
+    public static final Coord cpo = UI.scale(new Coord(36, 14));
     public static final int capo = 7, capio = 2;
-    public static final Coord dlmrgn = new Coord(23, 14), dsmrgn = new Coord(9, 9);
+    public static final Coord dlmrgn = UI.scale(new Coord(23, 14));
+    public static final Coord dsmrgn = UI.scale(new Coord(9, 9));
     public static final BufferedImage ctex = Resource.loadimg("gfx/hud/fonttex");
     public static final Text.Furnace cf = new Text.Imager(new PUtils.TexFurn(new Text.Foundry(Text.serif.deriveFont(Font.BOLD, 16)).aa(true), ctex)) {
 	    protected BufferedImage proc(Text text) {
@@ -61,17 +65,17 @@ public class Window extends Widget implements DTarget {
 	    }
 	};
     public static final IBox wbox = new IBox("gfx/hud/wnd", "tl", "tr", "bl", "br", "extvl", "extvr", "extht", "exthb") {
-	    final Coord co = new Coord(3, 3), bo = new Coord(2, 2);
+	    final Coord co = UI.scale(3, 3), bo = UI.scale(2, 2);
 
 	    public Coord btloff() {return(super.btloff().sub(bo));}
 	    public Coord ctloff() {return(super.ctloff().sub(co));}
 	    public Coord bisz() {return(super.bisz().sub(bo.mul(2)));}
 	    public Coord cisz() {return(super.cisz().sub(co.mul(2)));}
 	};
-    public static final BufferedImage[] cbtni = new BufferedImage[] {
-	Resource.loadimg("gfx/hud/wnd/lg/cbtnu"),
-	Resource.loadimg("gfx/hud/wnd/lg/cbtnd"),
-	Resource.loadimg("gfx/hud/wnd/lg/cbtnh")};
+    private static final BufferedImage[] cbtni = new BufferedImage[] {
+	Resource.loadsimg("gfx/hud/wnd/lg/cbtnu"),
+	Resource.loadsimg("gfx/hud/wnd/lg/cbtnd"),
+	Resource.loadsimg("gfx/hud/wnd/lg/cbtnh")};
     
     public static final String ON_DESTROY = "destroy";
     public static final String ON_PACK = "pack";
@@ -91,7 +95,7 @@ public class Window extends Widget implements DTarget {
     @RName("wnd")
     public static class $_ implements Factory {
 	public Widget create(UI ui, Object[] args) {
-	    Coord sz = (Coord)args[0];
+	    Coord sz = UI.scale((Coord)args[0]);
 	    String cap = (args.length > 1)?(String)args[1]:null;
 	    boolean lg = (args.length > 2)?((Integer)args[2] != 0):false;
 	    if("Sublime Portico".equals(cap) || "Charter Stone".equals(cap)) {
@@ -275,7 +279,7 @@ public class Window extends Widget implements DTarget {
 	cmw = Math.max(cmw, wsz.x / 4);
 	cptl = new Coord(ctl.x, tlo.y);
 	cpsz = tlo.add(cpo.x + cmw, cm.sz().y).sub(cptl);
-	cmw = cmw - (cl.sz().x - cpo.x) - 5;
+	cmw = cmw - (cl.sz().x - cpo.x) - UI.scale(5);
 	cbtn.c = xlate(tlo.add(wsz.x - cbtn.sz.x, 0), false);
 	placetwdgs();
 	for(Widget ch = child; ch != null; ch = ch.next)

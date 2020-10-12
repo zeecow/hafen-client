@@ -272,7 +272,7 @@ public class MapView extends PView implements DTarget, Console.Directory {
 	    this.exact = exact;
 	}
 
-	public OrthoCam() {this(false);}
+	public OrthoCam() {this(true);}
 
 	public void tick2(double dt) {
 	    Coord3f cc = getcc();
@@ -335,11 +335,14 @@ public class MapView extends PView implements DTarget, Console.Directory {
 	}
 
 	public SOrthoCam(String... args) {
-	    PosixArgs opt = PosixArgs.getopt(args, "e");
+	    PosixArgs opt = PosixArgs.getopt(args, "en");
 	    for(char c : opt.parsed()) {
 		switch(c) {
 		case 'e':
 		    exact = true;
+		    break;
+		case 'n':
+		    exact = false;
 		    break;
 		}
 	    }
@@ -420,7 +423,7 @@ public class MapView extends PView implements DTarget, Console.Directory {
     @RName("mapview")
     public static class $_ implements Factory {
 	public Widget create(UI ui, Object[] args) {
-	    Coord sz = (Coord)args[0];
+	    Coord sz = UI.scale((Coord)args[0]);
 	    Coord2d mc = ((Coord)args[1]).mul(posres);
 	    int pgob = -1;
 	    if(args.length > 2)
@@ -851,7 +854,7 @@ public class MapView extends PView implements DTarget, Console.Directory {
 		if(now - lsmch > 0.1)
 		    ch = true;
 	    }
-	    if(ch) {
+	    if(ch || !smap.haspos()) {
 		smap = smap.setpos(smapcc.add(dir.neg().mul(1000f)), dir);
 		lsmch = now;
 	    }
@@ -1551,8 +1554,12 @@ public class MapView extends PView implements DTarget, Console.Directory {
 	if(msg == "place") {
 	    Loader.Future<Plob> placing = this.placing;
 	    if(placing != null) {
-		if(!placing.cancel())
-		    placing.get().slot.remove();
+		if(!placing.cancel()) {
+		    Plob ob = placing.get();
+		    synchronized(ob) {
+			ob.slot.remove();
+		    }
+		}
 		this.placing = null;
 	    }
 	    int a = 0;
@@ -1587,8 +1594,12 @@ public class MapView extends PView implements DTarget, Console.Directory {
 	} else if(msg == "unplace") {
 	    Loader.Future<Plob> placing = this.placing;
 	    if(placing != null) {
-		if(!placing.cancel())
-		    placing.get().slot.remove();
+		if(!placing.cancel()) {
+		    Plob ob = placing.get();
+		    synchronized(ob) {
+			ob.slot.remove();
+		    }
+		}
 		this.placing = null;
 	    }
 	} else if(msg == "move") {
