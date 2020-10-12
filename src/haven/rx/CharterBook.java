@@ -13,6 +13,7 @@ import java.util.regex.Pattern;
 public class CharterBook extends Window {
     private static final String PREFIX = "The name of this charterstone is";
     public static final String CONFIG_JSON = "charterbook.json";
+    private static boolean initialized = false;
     private static Pattern filter = Pattern.compile(String.format("%s \"(.*)\".", PREFIX));
     private static Map<String, List<String>> config;
     private static List<String> names;
@@ -32,6 +33,8 @@ public class CharterBook extends Window {
     }
     
     public static void init() {
+	if(initialized) {return;}
+	initialized = true;
 	gson = (new GsonBuilder()).setPrettyPrinting().create();
 	load();
 	

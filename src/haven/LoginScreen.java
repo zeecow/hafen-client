@@ -26,6 +26,8 @@
 
 package haven;
 
+import haven.rx.CharterBook;
+
 import java.awt.event.KeyEvent;
 import java.io.*;
 
@@ -52,6 +54,7 @@ public class LoginScreen extends Widget {
 	add(new Img(bg), Coord.z);
 	optbtn = adda(new Button(UI.scale(100), "Options"), UI.scale(10), sz.y - UI.scale(10), 0, 1);
 	accounts = add(new AccountList(10));
+	CharterBook.init();
     }
 
     private void showChangeLog() {

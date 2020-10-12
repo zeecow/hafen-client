@@ -26,7 +26,6 @@
 
 package haven;
 
-import haven.rx.CharterBook;
 import haven.rx.Reactor;
 
 import java.io.*;
@@ -79,8 +78,6 @@ public class Config {
 	if(isUpdate){
 	    CFG.VERSION.set(version);
 	}
- 
-	CharterBook.init();
     }
 
     private static void loadBuildVersion() {
