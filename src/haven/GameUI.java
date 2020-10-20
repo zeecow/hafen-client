@@ -975,6 +975,7 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 		    cset.show = cset.defshow = ((Integer)args[3]) != 0;
 		    conf.receive(tag, new Resource.Spec[] {res}, new GobIcon.Setting[] {cset});
 		    mmap.saveconf();
+		    /*
 		    if(!has && conf.notify) {
 			ui.sess.glob.loader.defer(() -> {
 				Resource lres = Resource.remote().load(res.name, res.ver).get();
@@ -983,6 +984,7 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 				    msg(String.format("%s added to list of seen icons.", tip.t));
 			    }, (Supplier<Object>)() -> null);
 		    }
+		    */
 		} else if(args[1] instanceof Object[]) {
 		    Object[] sub = (Object[])args[1];
 		    int a = 0;
