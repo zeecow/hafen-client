@@ -254,16 +254,6 @@ public class MapFile {
 	}
     }
 
-    public static Resource loadsaved(Resource.Pool pool, Resource.Spec spec) {
-	try {
-	    return(spec.get());
-	} catch(Loading l) {
-	    throw(l);
-	} catch(Exception e) {
-	    return(pool.load(spec.name).get());
-	}
-    }
-
     public abstract static class Marker {
 	public long seg;
 	public Coord tc;
@@ -406,7 +396,7 @@ public class MapFile {
 	    if(!cached[t]) {
 		Resource r = null;
 		try {
-		    r = loadsaved(Resource.remote(), tilesets[t].res);
+		    r = tilesets[t].res.loadsaved(Resource.remote());
 		} catch(Loading l) {
 		    throw(l);
 		} catch(Exception e) {

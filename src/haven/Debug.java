@@ -31,12 +31,15 @@ import java.awt.image.*;
 import javax.media.opengl.*;
 
 public class Debug {
+    public static final int FRAME_DEBUG_KEY = java.awt.event.KeyEvent.VK_PAUSE;
     public static boolean kf1, kf2, kf3, kf4;
     public static boolean pk1, pk2, pk3, pk4;
+    public static boolean fdk, pfdk, ff;
     public static PrintWriter log = new PrintWriter(System.err);
 
     public static void cycle() {
 	pk1 = kf1; pk2 = kf2; pk3 = kf3; pk4 = kf4;
+	ff = fdk && !pfdk; pfdk = fdk;
     }
 
     public static void dumpimage(BufferedImage img, File path) {
