@@ -68,7 +68,17 @@ public class GobIcon extends GAttrib {
 	}
 	return(this.tex);
     }
-
+    
+    public String tooltip() {
+	String tt = null;
+	try {
+	    Resource resource = res.get();
+	    Resource.Tooltip name = resource.layer(Resource.tooltip);
+	    tt = (name == null) ? resource.name : name.t;
+	} catch (Resource.Loading ignored) {}
+	return tt;
+    }
+    
     public static class Setting implements Serializable {
 	public boolean show, defshow;
     }

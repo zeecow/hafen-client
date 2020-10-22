@@ -24,9 +24,9 @@ public class LocalMiniMap2 extends LocalMiniMap {
     public Object tooltip(Coord c, Widget prev) {
 	Gob gob = findicongob(c);
 	if(gob != null) {
-	    Radar.Marker icon = gob.getattr(Radar.Marker.class);
+	    GobIcon icon = gob.getattr(GobIcon.class);
 	    if(icon != null) {
-		return icon.tooltip(false);
+		return icon.tooltip();
 	    }
 	}
 	return super.tooltip(c, prev);
