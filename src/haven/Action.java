@@ -23,9 +23,9 @@ public enum Action {
     TOGGLE_CURSOR(GameUI::toggleHand, "Toggle cursor item", "Hide/show item on a cursor. Allows you to walk with item on cursor when hidden."),
     TOGGLE_STUDY(GameUI::toggleStudy, "Toggle study window"),
     FILTER(gui -> gui.filter.toggle(), "Show item filter"),
-    TOGGLE_GOB_INFO(gui -> CFG.DISPLAY_GOB_INFO.set(!CFG.DISPLAY_GOB_INFO.get(), true), "Display info", "Display crop/tree growth and object health overlay."),
-    TOGGLE_GOB_HITBOX(gui -> CFG.DISPLAY_GOB_HITBOX.set(!CFG.DISPLAY_GOB_HITBOX.get(), true), "Display hitboxes"),
-    TOGGLE_GOB_RADIUS(gui -> GobRadius.toggle(), "Display radius", "Displays effective radius of beehives/mine supports etc."),
+    TOGGLE_GOB_INFO(CFG.DISPLAY_GOB_INFO, "Display info", "Display crop/tree growth and object health overlay."),
+    TOGGLE_GOB_HITBOX(CFG.DISPLAY_GOB_HITBOX, "Display hitboxes"),
+    TOGGLE_GOB_RADIUS(CFG.SHOW_GOB_RADIUS, "Display radius", "Displays effective radius of beehives/mine supports etc."),
 //    TOGGLE_TILE_GRID(gui -> gui.map.togglegrid(), "Show tile grid"),
     TOGGLE_TILE_CENTERING(gui ->
     {
@@ -49,6 +49,14 @@ public enum Action {
     
     Action(Do action, String name) {
 	this(action, name, null);
+    }
+    
+    Action(CFG<Boolean> toggle, String name, String description) {
+        this(gui -> toggle.set(!toggle.get(), true), name, description);
+    }
+    
+    Action(CFG<Boolean> toggle, String name) {
+        this(toggle, name, null);
     }
     
     public void run(GameUI gui) {

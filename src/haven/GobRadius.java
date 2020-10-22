@@ -28,6 +28,7 @@ public class GobRadius {
 	if(!init) {
 	    init = true;
 	    showDefaultRadii(CFG.SHOW_GOB_RADIUS.get());
+	    CFG.SHOW_GOB_RADIUS.observe(GobRadius::showDefaultRadii);
 	}
     }
     
@@ -54,10 +55,8 @@ public class GobRadius {
 	return gobRadiusCfg.get(resname);
     }
     
-    public static void toggle() {
-	boolean show = !CFG.SHOW_GOB_RADIUS.get();
-	CFG.SHOW_GOB_RADIUS.set(show, true);
-	showDefaultRadii(show);
+    public static void showDefaultRadii(CFG<Boolean> show) {
+	showDefaultRadii(show.get());
     }
     
     public static void showDefaultRadii(boolean show) {
