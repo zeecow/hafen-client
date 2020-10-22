@@ -20,28 +20,6 @@ public class LocalMiniMap2 extends LocalMiniMap {
 	}
     }
     
-    public void drawicons(GOut g) {
-	Gob pl = ui.sess.glob.oc.getgob(mv.plgob);
-	Radar.draw(g, this::p2c, pl != null ? pl.rc : null, 1);
-    }
-    
-    public Gob findicongob(Coord c) {
-	List<Radar.Marker> marks = Radar.safeMarkers();
-	for (int i = marks.size() - 1; i >= 0; i--) {
-	    try {
-		Radar.Marker icon = marks.get(i);
-		Coord gc = p2c(icon.gob.rc);
-		Tex tex = icon.tex();
-		if(tex != null) {
-		    Coord sz = tex.sz();
-		    if(c.isect(gc.sub(sz.div(2)), sz))
-			return icon.gob;
-		}
-	    } catch (Loading ignored) {}
-	}
-	return (null);
-    }
-    
     @Override
     public Object tooltip(Coord c, Widget prev) {
 	Gob gob = findicongob(c);
