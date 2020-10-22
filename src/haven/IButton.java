@@ -87,6 +87,11 @@ public class IButton extends SIWidget {
 	if(action != null) {action.run();} else {wdgmsg("activate");}
     }
 
+    public boolean gkeytype(java.awt.event.KeyEvent ev) {
+	click();
+	return(true);
+    }
+    
     protected void depress() {
     }
 

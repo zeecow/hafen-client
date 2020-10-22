@@ -72,6 +72,11 @@ public class CheckBox extends Widget {
 	return(true);
     }
 
+    public boolean gkeytype(java.awt.event.KeyEvent ev) {
+	set(!a);
+	return(true);
+    }
+
     public void set(boolean a) {
 	this.a = a;
 	changed(a);

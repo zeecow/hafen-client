@@ -1907,7 +1907,7 @@ public class CharWnd extends Window {
 	final Tabs tabs = new Tabs(new Coord(15, 10), Coord.z, this);
         Tabs.Tab battr = tabs.add();
         {
-            Widget left = Widget.temporary();
+            Widget left = new Widget.Temporary();
             {
                 base = new ArrayList<>();
                 base.add(new Attr(glob, "str", every));
@@ -1935,7 +1935,7 @@ public class CharWnd extends Window {
             }
             left.pack();
 
-            Widget right = Widget.temporary();
+            Widget right = new Widget.Temporary();
             {
                 Composer composer = new Composer(right);
                 right.add(new Img(catf.render("Food Satiations").tex()));
@@ -1954,12 +1954,12 @@ public class CharWnd extends Window {
 
             battr.add(left);
             battr.add(right, new Coord(width, 0));
-            battr.optimize();
+            Widget.Temporary.optimize(battr);
         }
 
         sattr = tabs.add();
 	{
-            Widget left = Widget.temporary();
+            Widget left = new Widget.Temporary();
             int bottom;
             {
                 skill = new ArrayList<>();
@@ -1988,7 +1988,7 @@ public class CharWnd extends Window {
             }
             left.pack();
 
-            Widget right = Widget.temporary();
+            Widget right = new Widget.Temporary();
             {
                 Composer composer = new Composer(right);
                 right.add(new Img(catf.render("Study Report").tex()));
@@ -2042,12 +2042,12 @@ public class CharWnd extends Window {
 
             sattr.add(left);
             sattr.add(right, new Coord(width, 0));
-            sattr.optimize();
+            Widget.Temporary.optimize(sattr);
 	}
 
 	Tabs.Tab skills = tabs.add();
         {
-            Widget left = Widget.temporary();
+            Widget left = new Widget.Temporary();
             LoadingTextBox info;
             {
                 left.add(new Img(catf.render("Lore & Skills").tex()));
@@ -2058,7 +2058,7 @@ public class CharWnd extends Window {
             }
             left.pack();
 
-            Widget right = Widget.temporary();
+            Widget right = new Widget.Temporary();
             {
                 Composer composer = new Composer(right);
                 right.add(new Img(catf.render("Entries").tex()));
@@ -2161,7 +2161,7 @@ public class CharWnd extends Window {
 
             skills.add(left);
             skills.add(right, new Coord(width, 0));
-            skills.optimize();
+            Widget.Temporary.optimize(skills);
         }
 
 	Tabs.Tab wounds;

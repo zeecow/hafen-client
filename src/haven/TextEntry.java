@@ -165,6 +165,11 @@ public class TextEntry extends SIWidget {
 	return(buf.key(ev));
     }
 
+    public boolean gkeytype(KeyEvent ev) {
+	activate(buf.line);
+	return(true);
+    }
+
     public boolean keydown(KeyEvent e) {
 	return(buf.key(e));
     }
