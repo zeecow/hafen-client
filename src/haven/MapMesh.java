@@ -603,4 +603,8 @@ public class MapMesh implements Rendered, Disposable {
 	    rl.add(e, null);
 	return(true);
     }
+
+    public String toString() {
+	return(String.format("#<map-mesh %s+%s>", ul, sz));
+    }
 }
