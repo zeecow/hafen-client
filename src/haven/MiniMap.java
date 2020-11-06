@@ -491,6 +491,7 @@ public class MiniMap extends Widget {
 	drawmap(g);
 	drawmarkers(g);
 	if(CFG.MMAP_GRID.get()) {drawgrid(g);}
+	if(CFG.MMAP_VIEW.get()) {drawview(g);}
 	if(dlvl == 0)
 	    drawicons(g);
 	drawparty(g);
@@ -705,5 +706,23 @@ public class MiniMap extends Widget {
 	    }
 	}
 	g.chcolor(col);
+    }
+    
+    public static final Coord VIEW_SZ = MCache.sgridsz.mul(9).div(tilesz.floor());// view radius is 9x9 "server" grids
+    public static final Color VIEW_BG_COLOR = new Color(255, 255, 255, 60);
+    public static final Color VIEW_BORDER_COLOR = new Color(0, 0, 0, 128);
+    
+    void drawview(GOut g) {
+	int zmult = 1 << zoomlevel;
+	Coord2d sgridsz = new Coord2d(MCache.sgridsz);
+	Gob player = ui.gui.map.player();
+	if(player != null) {
+	    Coord rc = p2c(player.rc.floor(sgridsz).sub(4, 4).mul(sgridsz));
+	    g.chcolor(VIEW_BG_COLOR);
+	    g.frect(rc, VIEW_SZ.div(zmult));
+	    g.chcolor(VIEW_BORDER_COLOR);
+	    g.rect(rc, VIEW_SZ.div(zmult));
+	    g.chcolor();
+	}
     }
 }
