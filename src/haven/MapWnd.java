@@ -50,6 +50,7 @@ public class MapWnd extends Window implements Console.Directory {
     public boolean hmarkers = false;
     private final Locator player;
     private final Widget toolbar;
+    private final Widget topbar;
     private final Frame viewf;
     private GroupSelector colsel;
     private Button mremove;
@@ -112,6 +113,32 @@ public class MapWnd extends Window implements Console.Directory {
 		}
 	    });
 	toolbar.pack();
+	topbar = add(new Widget(Coord.z), Coord.z);
+	topbar.add(new Img(Resource.loadtex("gfx/hud/mmap/tfgwdg")) {
+	    public boolean mousedown(Coord c, int button) {
+		if((button == 1) && checkhit(c)) {
+		    MapWnd.this.drag(parentpos(MapWnd.this, c));
+		    return(true);
+		}
+		return(super.mousedown(c, button));
+	    }
+	}, Coord.z);
+	topbar.add(new IButton("gfx/hud/mmap/view", "", "-d", "-h") {
+	    {tooltip = Text.render("Display view distance");}
+	
+	    public void click() {
+		CFG.MMAP_VIEW.set(!CFG.MMAP_VIEW.get());
+	    }
+	});
+    
+	topbar.add(new IButton("gfx/hud/mmap/grid", "", "-d", "-h") {
+	    {tooltip = Text.render("Display grid");}
+	
+	    public void click() {
+		CFG.MMAP_GRID.set(!CFG.MMAP_GRID.get());
+	    }
+	});
+	topbar.pack();
 	tool = add(new Toolbox());;
 	resize(sz);
 	compact(Utils.getprefb("compact-map", false));
