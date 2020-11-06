@@ -30,8 +30,8 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 
 public class IButton extends SIWidget {
-    BufferedImage up, down, hover;
-    boolean h = false;
+    public BufferedImage up, down, hover;
+    public boolean h = false;
     boolean a = false;
     UI.Grab d = null;
     public boolean recthit = false;
@@ -44,19 +44,35 @@ public class IButton extends SIWidget {
 	}
     }
 
-    public IButton(BufferedImage up, BufferedImage down, BufferedImage hover) {
+    public IButton(BufferedImage up, BufferedImage down, BufferedImage hover, Runnable action) {
 	super(Utils.imgsz(up));
 	this.up = up;
 	this.down = down;
 	this.hover = hover;
+	this.action = action;
+    }
+
+    public IButton(BufferedImage up, BufferedImage down, BufferedImage hover) {
+	this(up, down, hover, null);
+	this.action = () -> wdgmsg("activate");
     }
 
     public IButton(BufferedImage up, BufferedImage down) {
 	this(up, down, up);
     }
 
+    public IButton(String base, String up, String down, String hover, Runnable action) {
+	this(Resource.loadsimg(base + up), Resource.loadsimg(base + down), Resource.loadsimg(base + (hover == null?up:hover)), action);
+    }
+
     public IButton(String base, String up, String down, String hover) {
-	this(Resource.loadsimg(base + up), Resource.loadsimg(base + down), Resource.loadsimg(base + (hover == null?up:hover)));
+	this(base, up, down, hover, null);
+	this.action = () -> wdgmsg("activate");
+    }
+
+    public IButton action(Runnable action) {
+	this.action = action;
+	return(this);
     }
 
     public void draw(BufferedImage buf) {
@@ -81,10 +97,9 @@ public class IButton extends SIWidget {
 	return(up.getRaster().getSample(c.x, c.y, 3) >= 128);
     }
     
-    public void action(Runnable action) {this.action = action;}
-    
     public void click() {
-	if(action != null) {action.run();} else {wdgmsg("activate");}
+	if(action != null)
+	    action.run();
     }
 
     public boolean gkeytype(java.awt.event.KeyEvent ev) {

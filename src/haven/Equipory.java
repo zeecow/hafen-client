@@ -76,7 +76,7 @@ public class Equipory extends Widget implements DTarget {
     }
 
     WItem[] slots = new WItem[ecoords.length];
-    Map<GItem, WItem[]> wmap = new HashMap<GItem, WItem[]>();
+    Map<GItem, Collection<WItem>> wmap = new HashMap<>();
     private final Avaview ava;
 
     AttrBonusesWdg bonuses;
@@ -133,12 +133,16 @@ public class Equipory extends Widget implements DTarget {
 	if(child instanceof GItem) {
 	    add(child);
 	    GItem g = (GItem)child;
-	    WItem[] v = new WItem[args.length];
+	    ArrayList<WItem> v = new ArrayList<>();
 	    for(int i = 0; i < args.length; i++) {
 		int ep = (Integer)args[i];
-		v[i] = add(new WItem(g), ecoords[ep].add(1, 1));
-	    	slots[ep] = v[i];
+		if(ep < ecoords.length) {
+		    WItem wdg = add(new WItem(g), ecoords[ep].add(1, 1));
+		    v.add(wdg);
+		    slots[ep] = wdg;
+		}
 	    }
+	    v.trimToSize();
 	    g.sendttupdate = true;
 	    wmap.put(g, v);
 	} else {

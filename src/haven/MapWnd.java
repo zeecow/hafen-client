@@ -26,129 +26,243 @@
 
 package haven;
 
-import haven.BuddyWnd.GroupSelector;
+import java.util.*;
+import java.util.function.*;
+import java.io.*;
+import java.awt.Color;
+import java.awt.event.KeyEvent;
 import haven.MapFile.Marker;
 import haven.MapFile.PMarker;
 import haven.MapFile.SMarker;
-import haven.MapFileWidget.*;
-import haven.MapFileWidget.Location;
+import haven.MiniMap.*;
 import haven.BuddyWnd.GroupSelector;
 import static haven.MCache.tilesz;
 import static haven.MCache.cmaps;
-import haven.MapFileWidget.Locator;
-import haven.MapFileWidget.MapLocator;
-import haven.MapFileWidget.SpecLocator;
+import javax.swing.JFileChooser;
+import javax.swing.filechooser.*;
 
-import java.awt.*;
-import java.awt.event.KeyEvent;
-import java.util.*;
-import java.util.List;
-import java.util.function.Function;
-import java.util.function.Predicate;
-
-import static haven.MCache.*;
-import static haven.MiniMap.*;
-import static haven.OCache.*;
-
-public class MapWnd extends Window {
+public class MapWnd extends Window implements Console.Directory {
     public static final Resource markcurs = Resource.local().loadwait("gfx/hud/curs/flag");
-    public final View view;
+    public final MapFile file;
+    public final MiniMap view;
     public final MapView mv;
-    public final MarkerList list;
-    protected final Locator player;
-    protected final Widget toolbar;
-    protected final Frame viewf;
-    private final Frame listf;
-    private final Button pmbtn, smbtn, mebtn, mibtn;
-    protected final Widget container;
-    private TextEntry namesel;
+    public final Toolbox tool;
+    public boolean hmarkers = false;
+    private final Locator player;
+    private final Widget toolbar;
+    private final Frame viewf;
     private GroupSelector colsel;
     private Button mremove;
     private Predicate<Marker> mflt = pmarkers;
     private Comparator<Marker> mcmp = namecmp;
     private List<Marker> markers = Collections.emptyList();
     private int markerseq = -1;
-    protected boolean domark = false;
+    private boolean domark = false;
     private final Collection<Runnable> deferred = new LinkedList<>();
 
     private final static Predicate<Marker> pmarkers = (m -> m instanceof PMarker);
     private final static Predicate<Marker> smarkers = (m -> m instanceof SMarker);
     private final static Comparator<Marker> namecmp = ((a, b) -> a.nm.compareTo(b.nm));
-    private final static int btnw = UI.scale(95);
 
+    public static final KeyBinding kb_home = KeyBinding.get("mapwnd/home", KeyMatch.forcode(KeyEvent.VK_HOME, 0));
+    public static final KeyBinding kb_mark = KeyBinding.get("mapwnd/mark", KeyMatch.nil);
+    public static final KeyBinding kb_hmark = KeyBinding.get("mapwnd/hmark", KeyMatch.forchar('M', KeyMatch.C));
+    public static final KeyBinding kb_compact = KeyBinding.get("mapwnd/compact", KeyMatch.forchar('A', KeyMatch.M));
     public MapWnd(MapFile file, MapView mv, Coord sz, String title) {
-	super(sz, title, false);
+	super(sz, title, true);
+	this.file = file;
 	this.mv = mv;
 	this.player = new MapLocator(mv);
-	viewf = add(new Frame(Coord.z, false));
-	view = viewf.add(new MapWnd2.View2(file));
+	viewf = add(new ViewFrame());
+	view = viewf.add(new View(file));
 	recenter();
 	toolbar = add(new Widget(Coord.z));
-	toolbar.add(new Img(Resource.loadtex("gfx/hud/mmap/fgwdg")), Coord.z);
+	toolbar.add(new Img(Resource.loadtex("gfx/hud/mmap/fgwdg")) {
+		public boolean mousedown(Coord c, int button) {
+		    if((button == 1) && checkhit(c)) {
+			MapWnd.this.drag(parentpos(MapWnd.this, c));
+			return(true);
+		    }
+		    return(super.mousedown(c, button));
+		}
+	    }, Coord.z);
 	toolbar.add(new IButton("gfx/hud/mmap/home", "", "-d", "-h") {
-		{tooltip = RichText.render("Follow ($col[255,255,0]{Home})", 0);}
+		{settip("Follow"); setgkey(kb_home);}
 		public void click() {
 		    recenter();
 		}
 	    }, Coord.z);
 	toolbar.add(new IButton("gfx/hud/mmap/mark", "", "-d", "-h") {
-		{tooltip = RichText.render("Add marker", 0);}
+		{settip("Add marker"); setgkey(kb_mark);}
 		public void click() {
 		    domark = true;
 		}
 	    }, Coord.z);
+	toolbar.add(new IButton("gfx/hud/mmap/hmark", "", "-d", "-h") {
+		{settip("Toggle marker display"); setgkey(kb_hmark);}
+		public void click() {
+		    hmarkers = !hmarkers;
+		}
+	    });
+	toolbar.add(new IButton("gfx/hud/mmap/wnd", "", "-d", "-h") {
+		{settip("Toggle compact mode"); setgkey(kb_compact);}
+		public void click() {
+		    compact(!decohide());
+		    Utils.setprefb("compact-map", decohide());
+		}
+	    });
 	toolbar.pack();
-	container = add(new Widget(Coord.z));
-	listf = container.add(new Frame(UI.scale(new Coord(200, 200)), false));
-	list = listf.add(new MarkerList(listf.inner().x, 0));
-	pmbtn = container.add(new Button(btnw, "Placed", false) {
-		public void click() {
-		    mflt = pmarkers;
-		    markerseq = -1;
-		}
-	    });
-	smbtn = container.add(new Button(btnw, "Natural", false) {
-		public void click() {
-		    mflt = smarkers;
-		    markerseq = -1;
-		}
-	    });
-	mebtn = container.add(new Button(btnw, "Export...", false) {
-		public void click() {
-		    view.exportmap();
-		}
-	    });
-	mibtn = container.add(new Button(btnw, "Import...", false) {
-		public void click() {
-		    view.importmap();
-		}
-	    });
-	container.pack();
+	tool = add(new Toolbox());;
 	resize(sz);
+	compact(Utils.getprefb("compact-map", false));
     }
 
-    protected class View extends MapFileWidget {
+    private class ViewFrame extends Frame {
+	Coord sc = Coord.z;
+
+	ViewFrame() {
+	    super(Coord.z, true);
+	}
+
+	public void resize(Coord sz) {
+	    super.resize(sz);
+	    sc = sz.sub(box.bisz()).add(box.btloff()).sub(sizer.sz());
+	}
+
+	public void draw(GOut g) {
+	    super.draw(g);
+	    if(decohide())
+		g.image(sizer, sc);
+	}
+
+	private UI.Grab drag;
+	private Coord dragc;
+	public boolean mousedown(Coord c, int button) {
+	    Coord cc = c.sub(sc);
+	    if((button == 1) && decohide() && (cc.x < sizer.sz().x) && (cc.y < sizer.sz().y) && (cc.y >= sizer.sz().y - UI.scale(25) + (sizer.sz().x - cc.x))) {
+		if(drag == null) {
+		    drag = ui.grabmouse(this);
+		    dragc = asz.sub(parentpos(MapWnd.this, c));
+		    return(true);
+		}
+	    }
+	    if((button == 1) && (checkhit(c) || ui.modshift)) {
+		MapWnd.this.drag(parentpos(MapWnd.this, c));
+		return(true);
+	    }
+	    return(super.mousedown(c, button));
+	}
+
+	public void mousemove(Coord c) {
+	    if(drag != null) {
+		Coord nsz = parentpos(MapWnd.this, c).add(dragc);
+		nsz.x = Math.max(nsz.x, UI.scale(350));
+		nsz.y = Math.max(nsz.y, UI.scale(150));
+		MapWnd.this.resize(nsz);
+	    }
+	    super.mousemove(c);
+	}
+
+	public boolean mouseup(Coord c, int button) {
+	    if((button == 1) && (drag != null)) {
+		drag.remove();
+		drag = null;
+		return(true);
+	    }
+	    return(super.mouseup(c, button));
+	}
+    }
+
+    private static final int btnw = UI.scale(95);
+    public class Toolbox extends Widget {
+	public final MarkerList list;
+	private final Frame listf;
+	private final Button pmbtn, smbtn, mebtn, mibtn;
+	private TextEntry namesel;
+
+	private Toolbox() {
+	    super(UI.scale(200, 200));
+	    listf = add(new Frame(UI.scale(new Coord(200, 200)), false), 0, 0);
+	    list = listf.add(new MarkerList(listf.inner().x, 0), 0, 0);
+	    pmbtn = add(new Button(btnw, "Placed", false) {
+		    public void click() {
+			mflt = pmarkers;
+			markerseq = -1;
+		    }
+		});
+	    smbtn = add(new Button(btnw, "Natural", false) {
+		    public void click() {
+			mflt = smarkers;
+			markerseq = -1;
+		    }
+		});
+	    mebtn = add(new Button(btnw, "Export...", false) {
+		    public void click() {
+			exportmap();
+		    }
+		});
+	    mibtn = add(new Button(btnw, "Import...", false) {
+		    public void click() {
+			importmap();
+		    }
+		});
+	}
+
+	public void resize(int h) {
+	    super.resize(new Coord(sz.x, h));
+	    listf.resize(listf.sz.x, sz.y - UI.scale(180));
+	    listf.c = new Coord(sz.x - listf.sz.x, 0);
+	    list.resize(listf.inner());
+	    mebtn.c = new Coord(0, sz.y - mebtn.sz.y);
+	    mibtn.c = new Coord(sz.x - btnw, sz.y - mibtn.sz.y);
+	    pmbtn.c = new Coord(0, mebtn.c.y - UI.scale(30) - pmbtn.sz.y);
+	    smbtn.c = new Coord(sz.x - btnw, mibtn.c.y - UI.scale(30) - smbtn.sz.y);
+	    if(namesel != null) {
+		namesel.c = listf.c.add(0, listf.sz.y + UI.scale(10));
+		if(colsel != null) {
+		    colsel.c = namesel.c.add(0, namesel.sz.y + UI.scale(10));
+		    mremove.c = colsel.c.add(0, colsel.sz.y + UI.scale(10));
+		}
+	    }
+	}
+    }
+
+    private class View extends MiniMap {
 	View(MapFile file) {
 	    super(file);
 	}
 
-	public boolean clickmarker(DisplayMarker mark, int button) {
-	    if(button == 1) {
-		list.change2(mark.m);
-		list.display(mark.m);
+	public void drawmarkers(GOut g) {
+	    if(!hmarkers)
+		super.drawmarkers(g);
+	}
+
+	public boolean clickmarker(DisplayMarker mark, Location loc, int button, boolean press) {
+	    if((button == 1) && !press) {
+		focus(mark.m);
 		return(true);
 	    }
 	    return(false);
 	}
 
-	public boolean clickloc(Location loc, int button) {
-	    if(domark && (button == 1)) {
+	public boolean clickicon(DisplayIcon icon, Location loc, int button, boolean press) {
+	    if(!press) {
+		mvclick(mv, null, loc, icon.gob, button);
+		return(true);
+	    }
+	    return(false);
+	}
+
+	public boolean clickloc(Location loc, int button, boolean press) {
+	    if(domark && (button == 1) && !press) {
 		Marker nm = new PMarker(loc.seg.id, loc.tc, "New marker", BuddyWnd.gc[new Random().nextInt(BuddyWnd.gc.length)]);
 		file.add(nm);
-		list.change2(nm);
-		list.display(nm);
-		container.show();
+		focus(nm);
 		domark = false;
+		return(true);
+	    }
+	    if(!press && (sessloc != null) && (loc.seg == sessloc.seg)) {
+		mvclick(mv, null, loc, null, button);
 		return(true);
 	    }
 	    return(false);
@@ -159,7 +273,8 @@ public class MapWnd extends Window {
 		domark = false;
 		return(true);
 	    }
-	    return(super.mousedown(c, button));
+	    super.mousedown(c, button);
+	    return(true);
 	}
 
 	public void draw(GOut g) {
@@ -167,34 +282,6 @@ public class MapWnd extends Window {
 	    g.frect(Coord.z, sz);
 	    g.chcolor();
 	    super.draw(g);
-	    try {
-		Coord ploc = xlate(resolve(player));
-		if(ploc != null) {
-		    Radar.draw(g, this::map2screen, new Coord2d(mv.getcc()), 1 << dlvl);
-		    g.chcolor(255, 0, 0, 255);
-		    MiniMap.drawplx(g, ploc);
-		    g.chcolor();
-		}
-	    } catch(Loading l) {
-	    }
-	}
-    
-	public Coord map2screen(Coord2d loc) {
-	    try {
-		Coord mc = loc.div(MCache.tilesz).floor();
-		if(mc == null)
-		    throw (new Loading("Waiting for initial location"));
-		MCache.Grid plg = ui.sess.glob.map.getgrid(mc.div(cmaps));
-		MapFile.GridInfo info = file.gridinfo.get(plg.id);
-		if(info == null)
-		    throw (new Loading("No grid info, probably coming soon"));
-		if(curloc == null || curloc.seg != resolve(player).seg) {
-		    return null;
-		}
-		//return info.sc.mul(cmaps).add(mc.sub(plg.ul)).add(sz.div(2)).sub(curloc.tc);
-		return info.sc.mul(cmaps).add(mc.sub(plg.ul).sub(curloc.tc)).div(1 << dlvl).add(sz.div(2));
-	    } catch (Exception ignored) {}
-	    return null;
 	}
 
 	public Resource getcurs(Coord c) {
@@ -203,7 +290,7 @@ public class MapWnd extends Window {
 	    return(super.getcurs(c));
 	}
     }
-    
+
     public void tick(double dt) {
 	super.tick(dt);
 	synchronized(deferred) {
@@ -240,10 +327,10 @@ public class MapWnd extends Window {
 
 	public MarkerList(int w, int n) {
 	    super(w, n, UI.scale(20));
-	    bgcolor = new Color(0,0,0,128);
 	}
 
 	private Function<String, Text> names = new CachedFunction<>(500, nm -> fnd.render(nm));
+	protected void drawbg(GOut g) {}
 	public void drawitem(GOut g, Marker mark, int idx) {
 	    if(soughtitem(idx)) {
 		g.chcolor(found);
@@ -267,9 +354,9 @@ public class MapWnd extends Window {
 	public void change2(Marker mark) {
 	    this.sel = mark;
 
-	    if(namesel != null) {
-		ui.destroy(namesel);
-		namesel = null;
+	    if(tool.namesel != null) {
+		ui.destroy(tool.namesel);
+		tool.namesel = null;
 		if(colsel != null) {
 		    ui.destroy(colsel);
 		    colsel = null;
@@ -279,8 +366,8 @@ public class MapWnd extends Window {
 	    }
 
 	    if(mark != null) {
-		if(namesel == null) {
-		    namesel = container.add(new TextEntry(UI.scale(200), "") {
+		if(tool.namesel == null) {
+		    tool.namesel = tool.add(new TextEntry(UI.scale(200), "") {
 			    {dshow = true;}
 			    public void activate(String text) {
 				mark.nm = text;
@@ -290,20 +377,18 @@ public class MapWnd extends Window {
 			    }
 			});
 		}
-		namesel.settext(mark.nm);
-		namesel.buf.point = mark.nm.length();
-		namesel.commit();
+		tool.namesel.settext(mark.nm);
+		tool.namesel.buf.point = mark.nm.length();
+		tool.namesel.commit();
 		if(mark instanceof PMarker) {
 		    PMarker pm = (PMarker)mark;
-		    colsel = container.add(new GroupSelector(Math.max(0, Utils.index(BuddyWnd.gc, pm.color))) {
+		    colsel = tool.add(new GroupSelector(Math.max(0, Utils.index(BuddyWnd.gc, pm.color))) {
 			    public void changed(int group) {
 				pm.color = BuddyWnd.gc[group];
 				view.file.update(mark);
 			    }
 			});
-		    if((colsel.group = Utils.index(BuddyWnd.gc, pm.color)) < 0)
-			colsel.group = 0;
-		    mremove = container.add(new Button(UI.scale(200), "Remove", false) {
+		    mremove = tool.add(new Button(UI.scale(200), "Remove", false) {
 			    public void click() {
 				view.file.remove(mark);
 				change2(null);
@@ -317,44 +402,34 @@ public class MapWnd extends Window {
 
     public void resize(Coord sz) {
 	super.resize(sz);
-	listf.resize(listf.sz.x, sz.y - UI.scale(180));
-	listf.c = new Coord(sz.x - listf.sz.x, 0);
-	list.resize(listf.inner());
-	mebtn.c = new Coord(sz.x - UI.scale(200), sz.y - mebtn.sz.y);
-	mibtn.c = new Coord(sz.x - btnw, sz.y - mibtn.sz.y);
-	pmbtn.c = new Coord(sz.x - UI.scale(200), mebtn.c.y - UI.scale(30) - pmbtn.sz.y);
-	smbtn.c = new Coord(sz.x - btnw, mibtn.c.y - UI.scale(30) - smbtn.sz.y);
-	if(namesel != null) {
-	    namesel.c = listf.c.add(0, listf.sz.y + UI.scale(10));
-	    if(colsel != null) {
-		colsel.c = namesel.c.add(0, namesel.sz.y + UI.scale(10));
-		mremove.c = colsel.c.add(0, colsel.sz.y + UI.scale(10));
-	    }
-	}
-	viewf.resize(new Coord(sz.x - listf.sz.x - UI.scale(10), sz.y));
+	tool.resize(sz.y);
+	tool.c = new Coord(sz.x - tool.sz.x, 0);
+	viewf.resize(new Coord(sz.x - tool.sz.x - UI.scale(10), sz.y));
 	view.resize(viewf.inner());
-	container.resize(asz);
 	toolbar.c = viewf.c.add(0, viewf.sz.y - toolbar.sz.y).add(UI.scale(2), UI.scale(-2));
+    }
+
+    public void compact(boolean a) {
+	tool.show(!a);
+	if(a)
+	    delfocusable(tool);
+	else
+	    newfocusable(tool);
+	decohide(a);
     }
 
     public void recenter() {
 	view.follow(player);
     }
 
-    private static final Tex sizer = Resource.loadtex("gfx/hud/wnd/sizer");
+    public void focus(Marker m) {
+	tool.list.change2(m);
+	tool.list.display(m);
+    }
+
     protected void drawframe(GOut g) {
 	g.image(sizer, ctl.add(csz).sub(sizer.sz()));
 	super.drawframe(g);
-    }
-
-    public boolean keydown(KeyEvent ev) {
-	if(super.keydown(ev))
-	    return(true);
-	if(ev.getKeyCode() == KeyEvent.VK_HOME) {
-	    recenter();
-	    return(true);
-	}
-	return(false);
     }
 
     private UI.Grab drag;
@@ -374,8 +449,8 @@ public class MapWnd extends Window {
     public void mousemove(Coord c) {
 	if(drag != null) {
 	    Coord nsz = c.add(dragc);
-	    nsz.x = Math.max(nsz.x, 300);
-	    nsz.y = Math.max(nsz.y, 150);
+	    nsz.x = Math.max(nsz.x, UI.scale(350));
+	    nsz.y = Math.max(nsz.y, UI.scale(150));
 	    resize(nsz);
 	}
 	super.mousemove(c);
@@ -385,7 +460,6 @@ public class MapWnd extends Window {
 	if((button == 1) && (drag != null)) {
 	    drag.remove();
 	    drag = null;
-	    updateCfg();
 	    return(true);
 	}
 	return(super.mouseup(c, button));
@@ -439,136 +513,177 @@ public class MapWnd extends Window {
 		});
 	}
     }
-    
-    protected class View2 extends View {
-	private boolean moved = false;
-	private MapFileWidget.Location clickloc = null;
-	
-	View2(MapFile file) {
-	    super(file);
+
+    public static class ExportWindow extends Window implements MapFile.ExportStatus {
+	private Thread th;
+	private volatile String prog = "Exporting map...";
+
+	public ExportWindow() {
+	    super(UI.scale(new Coord(300, 65)), "Exporting map...", true);
+	    adda(new Button(UI.scale(100), "Cancel", false, this::cancel), asz.x / 2, UI.scale(40), 0.5, 0.0);
 	}
-	
-	@Override
-	public boolean mousedown(Coord c, int button) {
-	    moved = false;
-	    return super.mousedown(c, button);
+
+	public void run(Thread th) {
+	    (this.th = th).start();
 	}
-	
-	
-	@Override
-	public void mousemove(Coord c) {
-	    super.mousemove(c);
-	    moved = true;
+
+	public void cdraw(GOut g) {
+	    g.text(prog, UI.scale(new Coord(10, 10)));
 	}
-	
-	@Override
-	public boolean mouseup(Coord c, int button) {
-	    if(!domark && !moved) {
+
+	public void cancel() {
+	    th.interrupt();
+	}
+
+	public void tick(double dt) {
+	    if(!th.isAlive())
+		destroy();
+	}
+
+	public void grid(int cs, int ns, int cg, int ng) {
+	    this.prog = String.format("Exporting map cut %,d/%,d in segment %,d/%,d", cg, ng, cs, ns);
+	}
+
+	public void mark(int cm, int nm) {
+	    this.prog = String.format("Exporting marker", cm, nm);
+	}
+    }
+
+    public static class ImportWindow extends Window {
+	private Thread th;
+	private volatile String prog = "Initializing";
+	private double sprog = -1;
+
+	public ImportWindow() {
+	    super(UI.scale(new Coord(300, 65)), "Importing map...", true);
+	    adda(new Button(UI.scale(100), "Cancel", false, this::cancel), asz.x / 2, UI.scale(40), 0.5, 0.0);
+	}
+
+	public void run(Thread th) {
+	    (this.th = th).start();
+	}
+
+	public void cdraw(GOut g) {
+	    String prog = this.prog;
+	    if(sprog >= 0)
+		prog = String.format("%s: %d%%", prog, (int)Math.floor(sprog * 100));
+	    else
+		prog = prog + "...";
+	    g.text(prog, UI.scale(new Coord(10, 10)));
+	}
+
+	public void cancel() {
+	    th.interrupt();
+	}
+
+	public void tick(double dt) {
+	    if(!th.isAlive())
+		destroy();
+	}
+
+	public void prog(String prog) {
+	    this.prog = prog;
+	    this.sprog = -1;
+	}
+
+	public void sprog(double sprog) {
+	    this.sprog = sprog;
+	}
+    }
+
+    public void exportmap(File path) {
+	GameUI gui = getparent(GameUI.class);
+	ExportWindow prog = new ExportWindow();
+	Thread th = new HackThread(() -> {
 		try {
-		    MapFileWidget.Location curloc = view.curloc;
-		    if(curloc != null && clickloc != null) {
-			Gob gob = findgob(c);
-			Coord pos = mappos(clickloc, player);
-			if(pos != null) {
-			    if(gob != null) {
-				mv.wdgmsg("click", rootpos().add(c), pos, button, ui.modflags(), 0, (int) gob.id, gob.rc.floor(posres), 0, -1);
-			    } else {
-				mv.wdgmsg("click", rootpos().add(c), pos, button, ui.modflags());
-			    }
-			}
+		    try(OutputStream out = new BufferedOutputStream(new FileOutputStream(path))) {
+			file.export(out, MapFile.ExportFilter.all, prog);
 		    }
-		} catch (Exception ignored) {}
-	    }
-	    clickloc = null;
-	    return super.mouseup(c, button);
-	}
-    
-	public Coord mappos(Location loc, Locator player) {
-	    if(!file.lock.readLock().tryLock())
-		throw (new Loading("Map file is busy"));
-	    try {
-		Location ploc = resolve(player);
-		if(loc.seg != ploc.seg) {return null;}
-		MapFile.GridInfo pgi = file.gridinfo.get(loc.seg.grid(ploc.tc.div(cmaps)).get().id);
-		Coord2d mc = new Coord2d(ui.gui.map.getcc()).div(MCache.tilesz);
-		MCache.Grid plg = ui.sess.glob.map.getgrid(mc.floor().div(cmaps));
-	    
-		return loc.tc.sub(pgi.sc.mul(cmaps)).add(plg.ul).mul(tilesz).add(tilesz.div(2)).floor(posres);
-	    } catch (Exception e) {
-		e.printStackTrace();
-	    } finally {
-		file.lock.readLock().unlock();
-	    }
-	    return null;
-	}
-	
-	@Override
-	public boolean clickloc(Location loc, int button) {
-	    clickloc = loc;
-	    return super.clickloc(loc, button);
-	}
-	
-	public Gob findgob(Coord c) {
-	    List<Radar.Marker> marks = Radar.safeMarkers();
-	    for (int i = marks.size() - 1; i >= 0; i--) {
+		} catch(IOException e) {
+		    e.printStackTrace(Debug.log);
+		    gui.error("Unexpected error occurred when exporting map.");
+		} catch(InterruptedException e) {
+		}
+	}, "Mapfile exporter");
+	prog.run(th);
+	gui.adda(prog, gui.sz.div(2), 0.5, 1.0);
+    }
+
+    public void importmap(File path) {
+	GameUI gui = getparent(GameUI.class);
+	ImportWindow prog = new ImportWindow();
+	Thread th = new HackThread(() -> {
+		long size = path.length();
+		class Updater extends CountingInputStream {
+		    Updater(InputStream bk) {super(bk);}
+
+		    protected void update(long val) {
+			super.update(val);
+			prog.sprog((double)pos / (double)size);
+		    }
+		}
 		try {
-		    Radar.Marker icon = marks.get(i);
-		    Coord gc = map2screen(icon.gob.rc);
-		    Tex tex = icon.tex();
-		    if(tex != null && gc != null) {
-			Coord sz = tex.sz();
-			if(c.isect(gc.sub(sz.div(2)), sz))
-			    return icon.gob;
+		    prog.prog("Validating map data");
+		    try(InputStream in = new Updater(new FileInputStream(path))) {
+			file.reimport(in, MapFile.ImportFilter.readonly);
 		    }
-		} catch (Loading ignored) {}
-	    }
-	    return null;
-	}
-	
-	@Override
-	public Object tooltip(Coord c, Widget prev) {
-	    Gob gob = findgob(c);
-	    if(gob != null) {
-		Radar.Marker icon = gob.getattr(Radar.Marker.class);
-		if(icon != null) {
-		    return icon.tooltip(false);
-		}
-	    }
-	    return super.tooltip(c, prev);
-	}
-    
-	@Override
-	protected void drawaftermap(GOut g) {
-	    super.drawaftermap(g);
-	    if(curloc != null && CFG.MMAP_GRID.get()) {
-		Coord step = cmaps.div(1 << dlvl);
-		Coord off = curloc.tc.div(1 << dlvl).sub(sz.div(2)).mod(step);
-		Coord lines = sz.div(step).add(1, 1);
-		Coord s = new Coord();
-		Coord f = new Coord();
-		g.chcolor(Color.RED);
-		
-		//vertical
-		s.y = 0;
-		f.y = this.sz.y;
-		for (int i = 0; i < lines.x; i++) {
-		    f.x = s.x = (i + 1) * step.x - off.x;
-		    if(s.x >= 0 && s.x <= sz.x) {
-			g.line(s, f, 1);
+		    prog.prog("Importing map data");
+		    try(InputStream in = new Updater(new FileInputStream(path))) {
+			file.reimport(in, MapFile.ImportFilter.all);
 		    }
+		} catch(InterruptedException e) {
+		} catch(Exception e) {
+		    e.printStackTrace(Debug.log);
+		    gui.error("Could not import map: " + e.getMessage());
 		}
-		
-		//horizontal
-		s.x = 0;
-		f.x = this.sz.x;
-		for (int i = 0; i < lines.y; i++) {
-		    f.y = s.y = (i + 1) * step.y - off.y;
-		    if(s.y >= 0 && s.y <= sz.y) {
-			g.line(s, f, 1);
-		    }
+	}, "Mapfile importer");
+	prog.run(th);
+	gui.adda(prog, gui.sz.div(2), 0.5, 1.0);
+    }
+
+    public void exportmap() {
+	java.awt.EventQueue.invokeLater(() -> {
+		JFileChooser fc = new JFileChooser();
+		fc.setFileFilter(new FileNameExtensionFilter("Exported Haven map data", "hmap"));
+		if(fc.showSaveDialog(null) != JFileChooser.APPROVE_OPTION)
+		    return;
+		File path = fc.getSelectedFile();
+		if(path.getName().indexOf('.') < 0)
+		    path = new File(path.toString() + ".hmap");
+		exportmap(path);
+	    });
+    }
+
+    public void importmap() {
+	java.awt.EventQueue.invokeLater(() -> {
+		JFileChooser fc = new JFileChooser();
+		fc.setFileFilter(new FileNameExtensionFilter("Exported Haven map data", "hmap"));
+		if(fc.showOpenDialog(null) != JFileChooser.APPROVE_OPTION)
+		    return;
+		importmap(fc.getSelectedFile());
+	    });
+    }
+
+    private Map<String, Console.Command> cmdmap = new TreeMap<String, Console.Command>();
+    {
+	cmdmap.put("exportmap", new Console.Command() {
+		public void run(Console cons, String[] args) {
+		    if(args.length > 1)
+			exportmap(new File(args[1]));
+		    else
+			exportmap();
 		}
-		g.chcolor();
-	    }
-	}
+	    });
+	cmdmap.put("importmap", new Console.Command() {
+		public void run(Console cons, String[] args) {
+		    if(args.length > 1)
+			importmap(new File(args[1]));
+		    else
+			importmap();
+		}
+	    });
+    }
+    public Map<String, Console.Command> findcmds() {
+	return(cmdmap);
     }
 }

@@ -846,12 +846,12 @@ public class ChatUI extends Widget {
 	public void uimsg(String msg, Object... args) {
 	    if(msg == "msg") {
 		Integer from = (Integer)args[0];
-		int gobid = (Integer)args[1];
+		long gobid = Utils.uint32((Integer)args[1]);
 		String line = (String)args[2];
 		if(process(line)) {
 		    Color col = Color.WHITE;
 		    synchronized (ui.sess.glob.party.memb) {
-			Party.Member pm = ui.sess.glob.party.memb.get((long) gobid);
+			Party.Member pm = ui.sess.glob.party.memb.get(gobid);
 			if(pm != null)
 			    col = pm.col;
 		    }

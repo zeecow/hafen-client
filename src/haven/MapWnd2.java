@@ -11,8 +11,8 @@ public class MapWnd2 extends MapWnd {
 	    {tooltip = Text.render("toggle list");}
 	    
 	    public void click() {
-		container.show(!container.visible);
-		CFG.MMAP_LIST.set(container.visible);
+//		container.show(!container.visible);
+//		CFG.MMAP_LIST.set(container.visible);
 	    }
 	}));
 	
@@ -35,8 +35,8 @@ public class MapWnd2 extends MapWnd {
 	view.unlink();
 	add(view);
 	view.lower();
-	viewf.hide();
-	container.show(CFG.MMAP_LIST.get());
+//	viewf.hide();
+//	container.show(CFG.MMAP_LIST.get());
     }
     
     @Override
