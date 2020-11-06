@@ -26,7 +26,10 @@
 
 package haven;
 
+import java.awt.*;
 import java.util.*;
+import java.util.List;
+
 import haven.MapFile.Segment;
 import haven.MapFile.DataGrid;
 import haven.MapFile.Grid;
@@ -487,6 +490,7 @@ public class MiniMap extends Widget {
     public void drawparts(GOut g){
 	drawmap(g);
 	drawmarkers(g);
+	if(CFG.MMAP_GRID.get()) {drawgrid(g);}
 	if(dlvl == 0)
 	    drawicons(g);
 	drawparty(g);
@@ -672,5 +676,34 @@ public class MiniMap extends Widget {
 			  gob.rc.floor(posres),
 			  0, -1);
 	}
+    }
+    
+    void drawgrid(GOut g) {
+	int zmult = 1 << zoomlevel;
+	Coord offset = sz.div(2).sub(dloc.tc.div(scalef()));
+	Coord zmaps = cmaps.div(UI.unscale((float) zmult));
+    
+	double width = UI.scale(1f);
+	Color col = g.getcolor();
+	g.chcolor(Color.RED);
+	for (int x = dgext.ul.x * zmult; x < dgext.br.x * zmult; x++) {
+	    Coord a = UI.scale(zmaps.mul(x, dgext.ul.y * zmult)).add(offset);
+	    Coord b = UI.scale(zmaps.mul(x, dgext.br.y * zmult)).add(offset);
+	    if(a.x >= 0 && a.x <= sz.x) {
+		a.y = Utils.clip(a.y, 0, sz.y);
+		b.y = Utils.clip(b.y, 0, sz.y);
+		g.line(a, b, width);
+	    }
+	}
+	for (int y = dgext.ul.y * zmult; y < dgext.br.y * zmult; y++) {
+	    Coord a = UI.scale(zmaps.mul(dgext.ul.x * zmult, y)).add(offset);
+	    Coord b = UI.scale(zmaps.mul(dgext.br.x * zmult, y)).add(offset);
+	    if(a.y >= 0 && a.y <= sz.y) {
+		a.x = Utils.clip(a.x, 0, sz.x);
+		b.x = Utils.clip(b.x, 0, sz.x);
+		g.line(a, b, width);
+	    }
+	}
+	g.chcolor(col);
     }
 }
