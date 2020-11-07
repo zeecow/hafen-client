@@ -71,7 +71,7 @@ public class Equipory extends Widget implements DTarget {
 	    }
 	}
     }
-    Map<GItem, WItem[]> wmap = new HashMap<GItem, WItem[]>();
+    Map<GItem, Collection<WItem>> wmap = new HashMap<>();
     private final Avaview ava;
 
     @RName("epry")
@@ -124,11 +124,13 @@ public class Equipory extends Widget implements DTarget {
 	if(child instanceof GItem) {
 	    add(child);
 	    GItem g = (GItem)child;
-	    WItem[] v = new WItem[args.length];
+	    ArrayList<WItem> v = new ArrayList<>();
 	    for(int i = 0; i < args.length; i++) {
 		int ep = (Integer)args[i];
-		v[i] = add(new WItem(g), ecoords[ep].add(1, 1));
+		if(ep < ecoords.length)
+		    v.add(add(new WItem(g), ecoords[ep].add(1, 1)));
 	    }
+	    v.trimToSize();
 	    wmap.put(g, v);
 	} else {
 	    super.addchild(child, args);
@@ -176,7 +178,7 @@ public class Equipory extends Widget implements DTarget {
 	    } catch(Loading l) {
 	    }
 	}
-	for(int i = 0; i < 16; i++) {
+	for(int i = 0; i < ecoords.length; i++) {
 	    if((slots & (1 << i)) != 0) {
 		g.chcolor(255, 255, 0, 64);
 		g.frect(ecoords[i].add(1, 1), invsq.sz().sub(2, 2));
