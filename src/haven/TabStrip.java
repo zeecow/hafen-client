@@ -1,5 +1,7 @@
 package haven;
 
+import rx.functions.Action1;
+
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -8,7 +10,7 @@ import java.util.Objects;
 public class TabStrip<T> extends Widget {
     public static final IBox frame = new IBox("gfx/hud/tab", "tl", "tr", "bl", "br", "extvl", "extvr", "extht", "exthb");
     private final List<Button<T>> buttons = new ArrayList<Button<T>>();
-    private final Callback<T> callback;
+    private final Action1<T> callback;
     private Button<T> selected;
     private Orientation orientation = Orientation.Horizontal;
     private int minWidth;
@@ -16,10 +18,10 @@ public class TabStrip<T> extends Widget {
     
     TabStrip() {callback = null;}
     
-    TabStrip(Callback<T> selected) { callback = selected; }
+    TabStrip(Action1<T> selected) { callback = selected; }
     
     protected void selected(Button<T> button) {
-	if(callback != null) {callback.done(button.tag);}
+	if(callback != null) {callback.call(button.tag);}
     }
 
     public int getSelectedButtonIndex() {

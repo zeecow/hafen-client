@@ -174,7 +174,7 @@ public class Radar {
 		if(cfg == DEFAULT || cfg.icon == null) {
 		    GobIcon gi = gob.getattr(GobIcon.class);
 		    if(gi != null) {
-			tex = gi.tex();
+			tex = gi.img().tex;
 		    } else if(cfg.parent != null) {
 			tex = cfg.parent.tex();
 			colored = true;
