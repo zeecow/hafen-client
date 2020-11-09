@@ -1964,10 +1964,12 @@ public class MapView extends PView implements DTarget, Console.Directory {
 
     public static final KeyBinding kb_grid = KeyBinding.get("grid", KeyMatch.forchar('G', KeyMatch.C));
     public boolean globtype(char c, KeyEvent ev) {
+        /* Actually set in haven.Actions.TOGGLE_TILE_GRID
 	if(kb_grid.key().match(ev)) {
 	    showgrid(gridlines == null);
 	    return(true);
 	}
+	*/
 	int code = ev.getKeyCode();
 	if(code == KeyEvent.VK_ADD) {
 	    return camera.wheel(Coord.z, 1);
@@ -2213,5 +2215,9 @@ public class MapView extends PView implements DTarget, Console.Directory {
 		    clickdb = Utils.parsebool(args[1], false);
 		}
 	    });
+    }
+    
+    public void togglegrid() {
+	showgrid(gridlines == null);
     }
 }
