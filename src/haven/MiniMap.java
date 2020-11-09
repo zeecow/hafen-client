@@ -493,6 +493,11 @@ public class MiniMap extends Widget {
     public void drawicons(GOut g) {
 	for(DisplayIcon disp : icons) {
 	    GobIcon.Image img = disp.img;
+	    if(disp.isPlayer()) {
+		g.chcolor(disp.kin() != null ? Color.WHITE : Color.RED);
+		g.aimage(RadarCFG.Symbols.$circle.tex, disp.cc, 0.5, 0.5);
+	    }
+	    
 	    if(disp.col != null)
 		g.chcolor(disp.col);
 	    else
@@ -528,6 +533,8 @@ public class MiniMap extends Widget {
 		    Coord2d ppc = m.getc();
 		    if(ppc == null)
 			continue;
+		    g.chcolor(Color.WHITE);
+		    g.aimage(RadarCFG.Symbols.$circle.tex, p2c(ppc), 0.5, 0.5);
 		    g.chcolor(m.col.getRed(), m.col.getGreen(), m.col.getBlue(), 255);
 		    g.rotimage(plp, p2c(ppc), plp.sz().div(2), -m.geta() - (Math.PI / 2));
 		    g.chcolor();
