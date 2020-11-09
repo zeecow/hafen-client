@@ -1,3 +1,8 @@
+$size[14]{$u{Update for 09.11.20:}
+  * merged changes from loftar.
+  * added tooltips to gobs on minimap
+  * added circles below player markers - white for party, kins and villagers, red for others.
+ 
 $size[14]{$u{Update for 06.11.20:}
   * merged map changes from loftar.
  
