@@ -329,7 +329,7 @@ public class KeyBinder {
 		} else if(code != KeyEvent.VK_ESCAPE) {
 		    listener.keyBindChanged(bind, make(ev, bind.action));
 		}
-		remove();
+		reqdestroy();
 	    }
 	    return true;
 	}
@@ -343,14 +343,14 @@ public class KeyBinder {
 	
 	@Override
 	public boolean mousedown(Coord c, int button) {
-	    remove();
+	    reqdestroy();
 	    return true;
 	}
 	
-	public void remove() {
+	public void reqdestroy() {
 	    mousegrab.remove();
 	    keygrab.remove();
-	    reqdestroy();
+	    super.reqdestroy();
 	}
 	
 	@Override
