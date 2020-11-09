@@ -123,4 +123,6 @@ public class KinInfo extends GAttrib implements RenderTree.Node, PView.Render2D 
 	    seen = 0;
 	}
     }
+    
+    public boolean isVillager() {return (type & 2) != 0;}
 }

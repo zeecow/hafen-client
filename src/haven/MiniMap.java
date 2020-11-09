@@ -240,6 +240,26 @@ public class MiniMap extends Widget {
 	    this.ang = ang;
 	    this.z = this.img.z;
 	}
+    
+	public Object tooltip() {
+	    KinInfo kin = kin();
+	    if(kin != null) {
+		if(kin.isVillager() && kin.name.trim().isEmpty()) {
+		    return "Villager";
+		} else {
+		    return kin.rendered();
+		}
+	    }
+	    return icon.tooltip();
+	}
+    
+	public KinInfo kin() {
+	    return icon.gob.getattr(KinInfo.class);
+	}
+    
+	public boolean isPlayer() {
+	    return "gfx/hud/mmap/plo".equals(icon.res.get().name);
+	}
     }
 
     public static class DisplayMarker {
@@ -685,6 +705,11 @@ public class MiniMap extends Widget {
 	    DisplayMarker mark = markerat(tc);
 	    if(mark != null) {
 		return(mark.tip);
+	    }
+	    
+	    DisplayIcon icon = iconat(c);
+	    if(icon != null) {
+		return icon.tooltip();
 	    }
 	}
 	return(super.tooltip(c, prev));
