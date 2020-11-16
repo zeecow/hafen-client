@@ -1506,7 +1506,8 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 		    if(iconconf == null)
 			return;
 		    if(iconwnd == null) {
-			iconwnd = new GobIcon.SettingsWindow(iconconf, () -> Utils.defer(GameUI.this::saveiconconf));
+//			iconwnd = new GobIcon.SettingsWindow(iconconf, () -> Utils.defer(GameUI.this::saveiconconf));
+			iconwnd = new GobIconSettings(iconconf, () -> Utils.defer(GameUI.this::saveiconconf));
 			fitwdg(GameUI.this.add(iconwnd, Utils.getprefc("wndc-icon", new Coord(200, 200))));
 		    } else {
 			ui.destroy(iconwnd);

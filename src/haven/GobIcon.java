@@ -207,6 +207,7 @@ public class GobIcon extends GAttrib {
 	public static class Icon {
 	    public final Setting conf;
 	    public Text name = null;
+	    public Text resnm = null;
 
 	    public Icon(Setting conf) {
 		this.conf = conf;

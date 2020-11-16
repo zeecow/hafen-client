@@ -472,7 +472,7 @@ public class MiniMap extends Widget {
 		    GobIcon icon = gob.getattr(GobIcon.class);
 		    if(icon != null) {
 			GobIcon.Setting conf = iconconf.get(icon.res.get());
-			if((conf != null) && conf.show) {
+			if((conf != null) && conf.show && GobIconSettings.GobCategory.categorize(conf).enabled()) {
 			    Coord gc = p2c(gob.rc);
 			    DisplayIcon disp = new DisplayIcon(icon, gc, gob.a);
 			    KinInfo kin = gob.getattr(KinInfo.class);
