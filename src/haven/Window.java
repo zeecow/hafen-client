@@ -257,10 +257,10 @@ public class Window extends Widget implements DTarget {
     }
 
     protected void placetwdgs() {
-	int x = sz.x - 20;
+	int x = sz.x - UI.scale(20);
 	for(Widget ch : twdgs) {
 	    if(ch.visible){
-		ch.c = xlate(new Coord(x -= ch.sz.x + 5, ctl.y - ch.sz.y/2), false);
+		ch.c = xlate(new Coord(x -= ch.sz.x + UI.scale(5), ctl.y - ch.sz.y/2), false);
 	    }
 	}
     }
