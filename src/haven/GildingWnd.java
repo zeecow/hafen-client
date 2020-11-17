@@ -21,9 +21,9 @@ public class GildingWnd extends Window {
 
 
     public GildingWnd(WItem target, WItem gild) {
-	super(new Coord(200, 100), "Gilding");
+	super(UI.scale(200, 100), "Gilding");
 	justclose = true;
-
+    
 	this.target = target;
 	this.gild = gild;
     }
@@ -39,26 +39,27 @@ public class GildingWnd extends Window {
 
 	List<ItemInfo> gild_infos = gild.gilding.get();
 	List<ItemInfo> target_infos = target.slots.get();
-
+    
 	ItemInfo gild_info = gild_infos.get(0);
 	ItemInfo target_info = target_infos.get(0);
-
+    
 	min = Reflect.getFieldValueDouble(gild_info, "pmin") * Reflect.getFieldValueDouble(target_info, "pmin");
 	max = Reflect.getFieldValueDouble(gild_info, "pmax") * Reflect.getFieldValueDouble(target_info, "pmax");
-
+    
 	koeff = min + koeff * (max - min);
-
+    
 	igild = ItemInfo.longtip(gild_infos);
 	islots = ItemInfo.longtip(target_infos);
-
-	int h = Math.max(igild.getHeight(), islots.getHeight());
+    
+	int itemH = Math.max(target.sz.y, gild.sz.y);
+	int h = Math.max(igild.getHeight(), islots.getHeight()) + itemH;
 	int w = igild.getWidth() + islots.getWidth();
-
-	resize(new Coord(w + 45, h + 125 + (matches != null ? matches.getHeight() : 0)));
-
-	add(new FWItem(target.item), 10, 5);
-	add(new FWItem(gild.item), asz.x - 5 - gild.sz.x, 5);
-
+    
+	resize(new Coord(w + UI.scale(45), h + UI.scale(100) + (matches != null ? matches.getHeight() : 0)));
+    
+	add(new FWItem(target.item), UI.scale(10, 5));
+	add(new FWItem(gild.item), asz.x - UI.scale(5) - gild.sz.x, UI.scale(5));
+    
 	boolean canSlot = true;
 	try {
 	    canSlot = target_infos.stream()
@@ -72,17 +73,17 @@ public class GildingWnd extends Window {
 	} catch (Loading ignored) {}
 
 	if(target.gildable.get() && canSlot) {
-	    add(new Button(120, "Gild") {
+	    add(new Button(UI.scale(120), "Gild") {
 		@Override
 		public void click() {
 		    gild();
 		}
-	    }, asz.x / 2 - 60, asz.y - 20);
+	    }, asz.x / 2 - UI.scale(60), asz.y - UI.scale(20));
 	} else {
 	    String msg = "Can't gild: " + (canSlot ? "there are no more slots left!" : "item of this type already slotted!");
 	    Label label = new Label(msg);
 	    label.setcolor(Color.RED);
-	    add(label, (asz.x - label.sz.x) / 2, asz.y - 15);
+	    add(label, (asz.x - label.sz.x) / 2, asz.y - UI.scale(15));
 	}
     }
 
@@ -135,25 +136,26 @@ public class GildingWnd extends Window {
 
     @Override
     public void cdraw(GOut g) {
-	g.image(islots, new Coord(5, 40));
-	g.image(igild, new Coord(asz.x - 5 - igild.getWidth(), 40));
+	int itemH = Math.max(target.sz.y, gild.sz.y);
+	g.image(islots, UI.scale(5, 10).addy(itemH));
+	g.image(igild, new Coord(asz.x - UI.scale(5) - igild.getWidth(), UI.scale(10) + itemH));
 	if(matches != null) {
-	    Coord c1 = new Coord(asz.x / 2, asz.y - matches.getHeight() - 70);
+	    Coord c1 = new Coord(asz.x / 2, asz.y - matches.getHeight() - UI.scale(70));
 	    g.atext("Matching skills:", c1, 0.5, 0.5);
-	    g.image(matches, c1.sub(matches.getWidth() / 2, matches.getHeight() / 2).add(0, 18));
+	    g.image(matches, c1.sub(matches.getWidth() / 2, matches.getHeight() / 2).add(UI.scale(0, 18)));
 	}
-	Coord ul = new Coord(0, asz.y - 34);
-	Coord sz = new Coord(asz.x, 14);
+	Coord ul = new Coord(0, asz.y - UI.scale(34));
+	Coord sz = new Coord(asz.x, UI.scale(14));
 	g.chcolor(new Color(122, 61, 61, 255));
 	g.frect(ul, sz);
 	g.chcolor(new Color(35, 111, 33, 255));
-	g.frect(ul, new Coord((int) (asz.x * koeff), 14));
+	g.frect(ul, new Coord((int) (asz.x * koeff), UI.scale(14)));
 	g.chcolor();
-	g.atext("Chance for a new slot:", ul.add(sz.div(2)).sub(0, 16), 0.5, 0.5);
+	g.atext("Chance for a new slot:", ul.add(sz.div(2)).sub(UI.scale(0, 16)), 0.5, 0.5);
 	g.atext(String.format("%.2f%%", 100 * koeff), ul.add(sz.div(2)), 0.5, 0.5);
 	g.atext("Min:", ul.add(2, sz.y / 2 - 16), 0, 0.5);
 	g.atext(String.format("%.2f%%", 100 * min), ul.add(2, sz.y / 2), 0, 0.5);
-	g.atext("Max:", ul.add(sz.x - 2, sz.y / 2 - 16), 1, 0.5);
+	g.atext("Max:", ul.add(sz.x - UI.scale(2), sz.y / 2 - UI.scale(16)), 1, 0.5);
 	g.atext(String.format("%.2f%%", 100 * max), ul.add(sz.x - 2, sz.y / 2), 1, 0.5);
     }
 
