@@ -1,3 +1,6 @@
+$size[14]{$u{Update for 17.11.20:}
+  * merged changes from loftar
+ 
 $size[14]{$u{Update for 09.11.20:}
   * merged changes from loftar.
   * added tooltips to gobs on minimap
