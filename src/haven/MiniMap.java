@@ -571,7 +571,7 @@ public class MiniMap extends Widget {
 	drawmarkers(g);
 	if(CFG.MMAP_GRID.get()) {drawgrid(g);}
 	if(CFG.MMAP_VIEW.get()) {drawview(g);}
-	if(dlvl == 0)
+	if(dlvl <= 1)
 	    drawicons(g);
 	drawparty(g);
     }
