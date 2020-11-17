@@ -770,8 +770,8 @@ public class MiniMap extends Widget {
 	Color col = g.getcolor();
 	g.chcolor(Color.RED);
 	for (int x = dgext.ul.x * zmult; x < dgext.br.x * zmult; x++) {
-	    Coord a = UI.scale(zmaps.mul(x, dgext.ul.y * zmult)).add(offset);
-	    Coord b = UI.scale(zmaps.mul(x, dgext.br.y * zmult)).add(offset);
+	    Coord a = UI.scale(zmaps.mul(x, dgext.ul.y * zmult).add(offset));
+	    Coord b = UI.scale(zmaps.mul(x, dgext.br.y * zmult).add(offset));
 	    if(a.x >= 0 && a.x <= sz.x) {
 		a.y = Utils.clip(a.y, 0, sz.y);
 		b.y = Utils.clip(b.y, 0, sz.y);
@@ -779,8 +779,8 @@ public class MiniMap extends Widget {
 	    }
 	}
 	for (int y = dgext.ul.y * zmult; y < dgext.br.y * zmult; y++) {
-	    Coord a = UI.scale(zmaps.mul(dgext.ul.x * zmult, y)).add(offset);
-	    Coord b = UI.scale(zmaps.mul(dgext.br.x * zmult, y)).add(offset);
+	    Coord a = UI.scale(zmaps.mul(dgext.ul.x * zmult, y).add(offset));
+	    Coord b = UI.scale(zmaps.mul(dgext.br.x * zmult, y).add(offset));
 	    if(a.y >= 0 && a.y <= sz.y) {
 		a.x = Utils.clip(a.x, 0, sz.x);
 		b.x = Utils.clip(b.x, 0, sz.x);
@@ -790,7 +790,7 @@ public class MiniMap extends Widget {
 	g.chcolor(col);
     }
     
-    public static final Coord VIEW_SZ = MCache.sgridsz.mul(9).div(tilesz.floor());// view radius is 9x9 "server" grids
+    public static final Coord VIEW_SZ = UI.scale(MCache.sgridsz.mul(9).div(tilesz.floor()));// view radius is 9x9 "server" grids
     public static final Color VIEW_BG_COLOR = new Color(255, 255, 255, 60);
     public static final Color VIEW_BORDER_COLOR = new Color(0, 0, 0, 128);
     

@@ -1092,7 +1092,7 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 	if(mmap.parent != null) {
 	    mmap.unlink();
 	}
-	mmap.sz = new Coord(133, 133);
+	mmap.sz = UI.scale(133, 133);
 	blpanel.add(mmap, minimapc);
 	blpanel.show();
 	mmap.lower();
