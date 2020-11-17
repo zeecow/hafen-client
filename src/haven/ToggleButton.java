@@ -16,9 +16,9 @@ public class ToggleButton extends IButton {
 	this.downf = down;
 	this.hoverf = hover;
 	
-	this.upt = Resource.loadimg(baset + upt);
-	this.downt = Resource.loadimg(baset + downt);
-	this.hovert = Resource.loadimg(baset + (hovert == null ? upt : hovert));
+	this.upt = Resource.loadsimg(baset + upt);
+	this.downt = Resource.loadsimg(baset + downt);
+	this.hovert = Resource.loadsimg(baset + (hovert == null ? upt : hovert));
     }
     
     public void action(Action1<Boolean> action) {
