@@ -1,7 +1,6 @@
 package haven;
 
 import java.awt.*;
-import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Map;
@@ -15,9 +14,9 @@ public class GobIconSettings extends Window {
     private static final Text.Foundry elf = CharWnd.attrf;
     private static final Text.Foundry elf2 = new Text.Foundry(Text.fraktur, 12).aa(true);
     private static final int elh = elf.height() + (DBG ? elf2.height() : 0) + UI.scale(2);
-    private static final Color every = new Color(255, 255, 255, 16), other = new Color(255, 255, 255, 32), found = new Color(255, 255, 0, 32);
+    private static final Color every = new Color(255, 255, 255, 16), other = new Color(255, 255, 255, 32);
     private final IconList list;
-    private final CategoryList categories;
+    private final CheckBox checkAll;
     private GobCategory category = GobCategory.ALL;
     
     
@@ -78,8 +77,13 @@ public class GobIconSettings extends Window {
 	protected void filter() {
 	    super.filter();
 	    reorder = true;
+	    updateAllCheckbox();
 	}
-	
+    
+	private void updateAllCheckbox() {
+	    checkAll.a = filtered.stream().allMatch(icon -> icon.conf.show);
+	}
+    
 	@Override
 	protected boolean match(GobIcon.SettingsWindow.Icon item, String filter) {
 	    if(category != GobCategory.ALL && category != GobCategory.categorize(item)) {
@@ -126,6 +130,7 @@ public class GobIconSettings extends Window {
 		icon.conf.show = !icon.conf.show;
 		if(save != null)
 		    save.run();
+		updateAllCheckbox();
 		return (true);
 	    }
 	    return (super.mousedown(c, button));
@@ -137,6 +142,7 @@ public class GobIconSettings extends Window {
 		    sel.conf.show = !sel.conf.show;
 		    if(save != null)
 			save.run();
+		    updateAllCheckbox();
 		}
 		return (true);
 	    }
@@ -148,11 +154,23 @@ public class GobIconSettings extends Window {
 	super(Coord.z, "Icon settings");
 	this.conf = conf;
 	this.save = save;
-	categories = add(new CategoryList(UI.scale(200), 24, elh), Coord.z);
-	list = add(new IconList(UI.scale(250), 25), UI.scale(210), 0);
+    
+	int h = add(new Label("Categories: "), Coord.z).sz.y;
+	checkAll = add(new CheckBox("Select All") {
+	    @Override
+	    public void changed(boolean val) {
+		list.filtered.forEach(icon -> icon.conf.show = val);
+		if(save != null)
+		    save.run();
+	    }
+	}, UI.scale(210, 0));
+	h += UI.scale(5);
+    
+	CategoryList categories = add(new CategoryList(UI.scale(200), 24, elh), 0, h);
+	list = add(new IconList(UI.scale(250), 25), UI.scale(210), h);
 	add(new CheckBox("Notification on newly seen icons") {
 	    {this.a = conf.notify;}
-	    
+	
 	    public void changed(boolean val) {
 		conf.notify = val;
 		if(save != null)
@@ -163,18 +181,6 @@ public class GobIconSettings extends Window {
 	categories.change(0);
 	pack();
 	setfocus(list);
-    }
-    
-    @Override
-    public boolean keydown(KeyEvent ev) {
-//        if(list.keydown(ev)){
-//            return true;
-//	}
-//	if(super.keydown(ev)) {
-//	    return true;
-//	}
-	//return false;
-	return super.keydown(ev);
     }
     
     private class CategoryList extends Listbox<GobCategory> {
@@ -347,7 +353,7 @@ public class GobIconSettings extends Window {
 	
 	GobCategory(String category) {
 	    resname = "gfx/hud/mmap/categories/" + category;
-	    cfg = new CFG<Boolean>("mmap.categories." + category, true);
+	    cfg = new CFG<>("mmap.categories." + category, true);
 	}
 	
 	public GobIcon.SettingsWindow.Icon icon() {
