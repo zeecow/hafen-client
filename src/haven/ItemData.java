@@ -111,10 +111,10 @@ public class ItemData {
 	
 	if(pg != null) {tt += "\n\n" + pg.text;}
 
-	BufferedImage img = MenuGrid.ttfnd.render(tt, 300).img;
+	BufferedImage img = MenuGrid.ttfnd.render(tt, UI.scale(300)).img;
 
 	if(!infos.isEmpty()) {
-	    img = ItemInfo.catimgs(20, img, ItemInfo.longtip(infos));
+	    img = ItemInfo.catimgs(UI.scale(20), img, ItemInfo.longtip(infos));
 	}
 	return new TexI(img);
     }

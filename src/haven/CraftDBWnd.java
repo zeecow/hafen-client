@@ -20,9 +20,9 @@ import static haven.CraftDBWnd.Mode.*;
 import static haven.ItemFilter.*;
 
 public class CraftDBWnd extends Window implements DTarget2 {
-    private static final int PANEL_H = 52;
-    private static final Coord WND_SZ = new Coord(635, 360 + PANEL_H);
-    private static final Coord ICON_SZ = new Coord(20, 20);
+    private static final int PANEL_H = UI.scale(52);
+    private static final Coord WND_SZ = UI.scale(635, 360).addy(PANEL_H);
+    private static final Coord ICON_SZ = UI.scale(20, 20);
     private static final int LIST_SIZE = (WND_SZ.y - PANEL_H) / ICON_SZ.y;
     
     private static final String CONFIG_JSON = "favourites.json";
@@ -87,7 +87,7 @@ public class CraftDBWnd extends Window implements DTarget2 {
     }
     
     public CraftDBWnd() {
-	super(WND_SZ.add(0, 5), "Craft window");
+	super(WND_SZ.add(UI.scale(0, 5)), "Craft window");
 	CFG.REAL_TIME_CURIO.observe(cfg -> updateDescription(descriptionPagina));
 	CFG.SHOW_CURIO_LPH.observe(cfg -> updateDescription(descriptionPagina));
     }
@@ -124,23 +124,22 @@ public class CraftDBWnd extends Window implements DTarget2 {
     
 	loadFavourites(Config.userpath());
 	subscription = Reactor.PLAYER.subscribe(this::loadFavourites);
-	
+    
 	tabStrip = add(new TabStrip<Mode>() {
 	    @Override
 	    protected void selected(Button<Mode> button) {
 		changeMode(button.tag);
 	    }
-	}, 0, 2);
-	Coord icon_sz = new Coord(20, 20);
+	}, 0, UI.scale(2));
 	Mode[] modes = Mode.values();
-	for(int i = 0; i< modes.length; i++) {
+	for (int i = 0; i < modes.length; i++) {
 	    Resource res = modes[i].res.get();
 	    tabStrip.insert(i,
-		new TexI(PUtils.convolvedown(res.layer(Resource.imgc).img, icon_sz, CharWnd.iconfilter)),
+		new TexI(PUtils.convolvedown(res.layer(Resource.imgc).img, ICON_SZ, CharWnd.iconfilter)),
 		paginafor(modes[i].res).act().name, null).tag = modes[i];
 	}
     
-	box = add(new RecipeListBox(200, LIST_SIZE) {
+	box = add(new RecipeListBox(UI.scale(200), LIST_SIZE) {
 	    @Override
 	    protected void itemclick(Recipe recipe, int button) {
 		Pagina item = recipe.p;
@@ -155,12 +154,12 @@ public class CraftDBWnd extends Window implements DTarget2 {
 		    if((mode.reparent && filter.line.isEmpty()) || !item.isAction()) {
 			menu.use(item, false);
 		    } else {
-		        select(item, true, true);
+			select(item, true, true);
 		    }
 		}
 	    }
-	}, 0, PANEL_H + 5);
-	addtwdg(add(new IButton("gfx/hud/btn-help", "","-d","-h"){
+	}, 0, PANEL_H + UI.scale(5));
+	addtwdg(add(new IButton("gfx/hud/btn-help", "", "-d", "-h") {
 	    @Override
 	    public void click() {
 		ItemFilter.showHelp(ui, HELP_SIMPLE, HELP_CURIO, HELP_FEP, HELP_ARMOR, HELP_SYMBEL, HELP_ATTR, HELP_INPUTS);
@@ -169,7 +168,7 @@ public class CraftDBWnd extends Window implements DTarget2 {
 	btnFavourite = add(new ToggleButton(
 	    "gfx/hud/btn-star-e", "", "-d", "-h",
 	    "gfx/hud/btn-star-f", "", "-d", "-h"
-	), box.c.x + box.sz.x + 10, box.c.y + 3);
+	), box.c.x + box.sz.x + UI.scale(10), box.c.y + UI.scale(3));
 	btnFavourite.recthit = true;
 	btnFavourite.action(this::toggleFavourite);
 	
@@ -184,7 +183,7 @@ public class CraftDBWnd extends Window implements DTarget2 {
 		select(data, false, false);
 		ui.gui.menu.use(data, false);
 	    }
-	}, new Coord(0, 28));
+	}, UI.scale(0, 28));
 	Pagina selected = current;
 	if(selected == null) {
 	    selected = menu.cur;
@@ -375,7 +374,7 @@ public class CraftDBWnd extends Window implements DTarget2 {
 	    } catch (Loading ignored) {}
 	}
 	if(description != null) {
-	    g.image(description, new Coord(box.c.x + box.sz.x + 10, PANEL_H + 5));
+	    g.image(description, new Coord(box.c.x + box.sz.x + UI.scale(10), PANEL_H + UI.scale(5)));
 	}
     }
 
@@ -434,7 +433,7 @@ public class CraftDBWnd extends Window implements DTarget2 {
     }
 
     public void setMakewindow(Widget widget) {
-	makewnd = add(widget, new Coord(box.c.x + box.sz.x + 10, box.c.y + box.sz.y - widget.sz.y));
+	makewnd = add(widget, new Coord(box.c.x + box.sz.x + UI.scale(10), box.c.y + box.sz.y - widget.sz.y));
     }
     
     private Pagina paginafor(Resource.Named res) {
