@@ -346,7 +346,7 @@ public class MapWnd extends Window implements Console.Directory {
 
     public static final Color every = new Color(255, 255, 255, 16), other = new Color(255, 255, 255, 32), found = new Color(255, 255, 0, 32);
     public class MarkerList extends Searchbox<Marker> {
-	private final Text.Foundry fnd = CharWnd.attrf;
+	private final Text.Foundry fnd = new Text.Foundry(Text.sans, 18).aa(true);;
 
 	public Marker listitem(int idx) {return(markers.get(idx));}
 	public int listitems() {return(markers.size());}
