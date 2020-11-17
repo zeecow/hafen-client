@@ -660,7 +660,7 @@ public class OptWnd extends Window {
     }
     
     private void addPanelButton(String name, char key, Panel panel, int x, int y) {
-	main.add(new PButton(UI.scale(200), name, key, panel), PANEL_POS.mul(x, y));
+	main.add(new PButton(UI.scale(200), name, key, panel), UI.scale(PANEL_POS.mul(x, y)));
     }
 
     private void initCameraPanel() {
