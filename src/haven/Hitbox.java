@@ -82,14 +82,14 @@ public class Hitbox extends GAttrib implements RenderTree.Node {
 	if(res == null) {throw new Loading();}
 
 	Collection<RenderLink.Res> links = res.layers(RenderLink.Res.class);
-	for (RenderLink.Res link : links) {
-	    if(link.mesh != null) {
-		Resource.Neg neg = link.mesh.get().layer(Resource.Neg.class);
-		if(neg != null) {
-		    return new Pair<>(neg.ac, neg.bc);
-		}
-	    }
-	}
+//	for (RenderLink.Res link : links) {
+//	    if(link.mesh != null) {
+//		Resource.Neg neg = link.mesh.get().layer(Resource.Neg.class);
+//		if(neg != null) {
+//		    return new Pair<>(neg.ac, neg.bc);
+//		}
+//	    }
+//	}
 
 	Resource.Neg neg = res.layer(Resource.Neg.class);
 	if(neg == null) {
