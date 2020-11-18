@@ -1,3 +1,7 @@
+$size[14]{$u{Update for 18.11.20:}
+  * fixed crash when trying to do action with progress (like harvesting) with UI scaled up
+  * fixed minimap grid UI scaling
+ 
 $size[14]{$u{Update for 17.11.20:}
   * merged changes from loftar
   * fixed many UI-scaling issues
