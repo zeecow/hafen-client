@@ -46,7 +46,6 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Sk
     private final Collection<ResAttr.Cell<?>> rdata = new LinkedList<ResAttr.Cell<?>>();
     private final Collection<ResAttr.Load> lrdata = new LinkedList<ResAttr.Load>();
     private final Object removalLock = new Object();
-    private Hitbox hitbox = null;
     private GeneralGobInfo gobInfo = null;
     private GobDamageInfo damage;
     public static final ChangeCallback CHANGED = new ChangeCallback() {
@@ -215,6 +214,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Sk
 	    damage = new GobDamageInfo(this);
 	}
 	setattr(new GeneralGobInfo(this));
+	setattr(new Hitbox(this));
     }
 
     public Gob(Glob glob, Coord2d c) {
@@ -357,10 +357,6 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Sk
 	    if(rd.attr != null)
 		rd.attr.dispose();
     	}
-	if(hitbox != null){
-	    hitbox.dispose();
-	    hitbox = null;
-	}
 	if(gobInfo != null){
 	    gobInfo.dispose();
 	    gobInfo = null;
