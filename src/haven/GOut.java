@@ -261,6 +261,13 @@ public class GOut {
 			c2.x + tx.x + 0.5f, c2.y + tx.y + 0.5f};
 	drawp(Model.Mode.LINES, data);
     }
+    
+    public void line(Coord3f c1, Coord3f c2, double w) {
+	usestate(new States.LineWidth(w));
+	float[] data = {c1.x + tx.x + 0.5f, c1.y + tx.y + 0.5f,
+    			c2.x + tx.x + 0.5f, c2.y + tx.y + 0.5f};
+	drawp(Model.Mode.LINES, data);
+    }
 
     public void frect2(Coord ul, Coord br) {
 	ul = new Coord(Math.max(ul.x + tx.x, this.ul.x), Math.max(ul.y + tx.y, this.ul.y));

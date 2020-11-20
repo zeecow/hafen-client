@@ -179,6 +179,10 @@ public class Coord3f {
     public Coord round2() {
 	return(new Coord((int)Math.round(x), (int)Math.round(y)));
     }
+    
+    public boolean isect(Coord c, Coord s) {
+	return((x >= c.x) && (y >= c.y) && (x < c.x + s.x) && (y < c.y + s.y));
+    }
 
     public String toString() {
 	return(String.format("(%f, %f, %f)", x, y, z));
