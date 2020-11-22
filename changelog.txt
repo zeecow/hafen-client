@@ -1,3 +1,6 @@
+$size[14]{$u{Update for 22.11.20:}
+  * fixed couple UI-scaling issues
+ 
 $size[14]{$u{Update for 20.11.20:}
   * re-implemented object Hitbox display (CTRL+H)
  

@@ -14,8 +14,8 @@ import java.util.stream.Stream;
 import static me.ender.AnimalFarm.AnimalActions.*;
 
 public class AnimalFarm {
-    private static final int BTN_W = 50;
-    private static final int PAD = 3;
+    private static final int BTN_W = UI.scale(50);
+    private static final int PAD = UI.scale(3);
     public static final int BUTTONS_ON_LINE = 4;
     
     public static final Comparator<Widget> POSITIONAL_COMPARATOR = Comparator.comparingInt((Widget o) -> o.c.y).thenComparingInt(o -> o.c.x);
@@ -30,8 +30,8 @@ public class AnimalFarm {
 	    labels.sort(POSITIONAL_COMPARATOR);
 	    
 	    if(edit != null) {
-		labels.get(0).c.y -= 10;
-		edit.c.y -= 12;
+		labels.get(0).c.y -= UI.scale(10);
+		edit.c.y -= UI.scale(12);
 		edit.sz.x = BUTTONS_ON_LINE * BTN_W + (BUTTONS_ON_LINE - 1) * PAD;
 		Coord c = new Coord(edit.c.x, edit.c.y + edit.sz.y + PAD);
 		
@@ -53,7 +53,7 @@ public class AnimalFarm {
 //		System.out.println(String.format("%s %s", labelText, label.c));
 		if(labelText.matches("-- With \\w+")) {
 		    label.c.x = 0;
-		    label.c.y = (i + 1 < labels.size()) ? labels.get(i + 1).c.y - 16 : label.c.y;
+		    label.c.y = (i + 1 < labels.size()) ? labels.get(i + 1).c.y - UI.scale(16) : label.c.y;
 		}
 		AnimalStatType statType = AnimalStatType.parse(labelText);
 		if(statType != null && i + 1 < labels.size()) {
