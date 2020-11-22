@@ -1,3 +1,6 @@
+$size[14]{$u{Update for 22.11.20:}
+  * fixed couple UI-scaling issues
+ 
 $size[14]{$u{Update for 18.11.20:}
   * fixed crash when trying to do action with progress (like harvesting) with UI scaled up
   * fixed minimap grid UI scaling
