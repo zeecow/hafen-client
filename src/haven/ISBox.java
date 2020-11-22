@@ -72,15 +72,15 @@ public class ISBox extends Widget implements DTarget {
 	if(parent instanceof Window) {
 	    boolean isStockpile = "Stockpile".equals(((Window) parent).caption());
 	    if(isStockpile) {
-		value = new Value(40, "");
-		add(value).c = new Coord(70, 46);
+		value = new Value(UI.scale(40), "");
+		add(value, UI.scale(60, 46));
 		value.canactivate = true;
 
-		take = new Button(35, "Take");
-		add(take).c = new Coord(110, 44);
+		take = new Button(UI.scale(40), "Take");
+		add(take, UI.scale(105, 44));
 		take.canactivate = true;
 
-		sz = sz.add(0, 25);
+		sz = sz.add(0, UI.scale(25));
 	    }
 	}
     }
