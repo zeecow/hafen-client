@@ -1,3 +1,8 @@
+$size[14]{$u{Update for 23.11.20:}
+  * fixed being able to enter non-numeric values into stockpile input
+  * Minimap Icon Settings: fixed scrollbar not detecting mouse clicks
+  * Minimap Icon Settings: added filter prompt near Select All checkbox 
+ 
 $size[14]{$u{Update for 22.11.20:}
   * fixed couple UI-scaling issues
  

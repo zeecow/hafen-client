@@ -8,9 +8,10 @@ import java.util.stream.Collectors;
 public abstract class FilteredListBox<T> extends Listbox<T> {
     
     private boolean needfilter = false;
-    private final LineEdit filter = new LineEdit();
+    protected final LineEdit filter = new LineEdit();
     protected List<T> items = new LinkedList<>();
     protected List<T> filtered = new LinkedList<>();
+    protected boolean showFilterText = true;
     
     public FilteredListBox(int w, int h, int itemh) {
 	super(w, h, itemh);
@@ -78,7 +79,7 @@ public abstract class FilteredListBox<T> extends Listbox<T> {
     @Override
     public void draw(GOut g) {
 	super.draw(g);
-	if(!filter.line.isEmpty()) {
+	if(showFilterText && !filter.line.isEmpty()) {
 	    g.atext(filter.line, g.sz(), 1, 1);
 	}
     }
