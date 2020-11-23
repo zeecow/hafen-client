@@ -119,6 +119,12 @@ public class ISBox extends Widget implements DTarget {
 		return take.mousedown(c.sub(cc), button);
 	    }
 	}
+	if(value != null) {
+	    Coord cc = xlate(value.c, true);
+	    if(c.isect(cc, value.sz)) {
+		return value.mousedown(c.sub(cc), button);
+	    }
+	}
 	if (button == 1) {
 	    if (ui.modshift ^ ui.modctrl) {           //SHIFT or CTRL means pull
 		int dir = ui.modctrl ? -1 : 1;        //CTRL means pull out, SHIFT pull in
@@ -199,18 +205,15 @@ public class ISBox extends Widget implements DTarget {
 	}
 
 	@Override
-	public boolean type(char c, KeyEvent ev) {
+	public boolean keydown(KeyEvent ev) {
 	    int keyCode = ev.getKeyCode();
 	    if(keyCode == 0){
 		keyCode = ev.getKeyChar();
 	    }
 	    if (ALLOWED_KEYS.contains(keyCode)) {
-		return super.type(c, ev);
-	    } else {
-		ui.root.globtype(c, ev);
-		return false;
+		return super.keydown(ev);
 	    }
+	    return false;
 	}
-
     }
 }
