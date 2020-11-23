@@ -6,17 +6,20 @@ import java.util.Arrays;
 import java.util.Map;
 
 public class GobIconSettings extends Window {
-    public static final PUtils.Convolution filter = new PUtils.Hanning(1);
+    public static final PUtils.Convolution ICON_FILTER = new PUtils.Hanning(1);
+    public static final String FILTER_DEFAULT = "Start typing to filter";
+    public static final Coord FILTER_C = UI.scale(445, 0);
     public final GobIcon.Settings conf;
     private final Runnable save;
     
-    private static boolean DBG = false;
+    private static final boolean DBG = false;
     private static final Text.Foundry elf = CharWnd.attrf;
     private static final Text.Foundry elf2 = new Text.Foundry(Text.fraktur, 12).aa(true);
     private static final int elh = elf.height() + (DBG ? elf2.height() : 0) + UI.scale(2);
     private static final Color every = new Color(255, 255, 255, 16), other = new Color(255, 255, 255, 32);
     private final IconList list;
     private final CheckBox checkAll;
+    private final Label filter;
     private GobCategory category = GobCategory.ALL;
     
     
@@ -29,6 +32,7 @@ public class GobIconSettings extends Window {
 	    super(w, h, elh);
 	    this.showc = showc();
 	    bgcolor = new Color(0, 0, 0, 84);
+	    showFilterText = false;
 	}
 	
 	private Coord showc() {
@@ -77,11 +81,12 @@ public class GobIconSettings extends Window {
 	protected void filter() {
 	    super.filter();
 	    reorder = true;
+	    updateFilter(filter.line);
 	    updateAllCheckbox();
 	}
     
 	private void updateAllCheckbox() {
-	    checkAll.a = filtered.stream().allMatch(icon -> icon.conf.show);
+	    checkAll.a = !filtered.isEmpty() && filtered.stream().allMatch(icon -> icon.conf.show);
 	}
     
 	@Override
@@ -126,12 +131,15 @@ public class GobIconSettings extends Window {
 	public boolean mousedown(Coord c, int button) {
 	    int idx = idxat(c);
 	    if((idx >= 0) && (idx < listitems())) {
+		Coord ic = c.sub(idxc(idx));
 		GobIcon.SettingsWindow.Icon icon = listitem(idx);
-		icon.conf.show = !icon.conf.show;
-		if(save != null)
-		    save.run();
-		updateAllCheckbox();
-		return (true);
+		if(ic.x < showc.x + CheckBox.sbox.sz().x) {
+		    icon.conf.show = !icon.conf.show;
+		    if(save != null)
+			save.run();
+		    updateAllCheckbox();
+		    return (true);
+		}
 	    }
 	    return (super.mousedown(c, button));
 	}
@@ -164,6 +172,7 @@ public class GobIconSettings extends Window {
 		    save.run();
 	    }
 	}, UI.scale(210, 0));
+	filter = adda(new Label(FILTER_DEFAULT), FILTER_C, 1, 0);
 	h += UI.scale(5);
     
 	CategoryList categories = add(new CategoryList(UI.scale(200), 24, elh), 0, h);
@@ -181,6 +190,11 @@ public class GobIconSettings extends Window {
 	categories.change(0);
 	pack();
 	setfocus(list);
+    }
+    
+    private void updateFilter(String text) {
+	filter.settext((text == null || text.isEmpty()) ? FILTER_DEFAULT : text);
+	filter.c = FILTER_C.sub( filter.sz.x, 0);
     }
     
     private class CategoryList extends Listbox<GobCategory> {
