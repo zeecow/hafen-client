@@ -441,6 +441,14 @@ public class MapView extends PView implements DTarget, Console.Directory {
 	this.clickmap = new ClickMap();
 	clmaptree.add(clickmap);
 	setcanfocus(true);
+	CFG.DISPLAY_GOB_HITBOX.observe(cfg -> updatePlobDrawable());
+	CFG.DISPLAY_GOB_HITBOX_TOP.observe(cfg -> updatePlobDrawable());
+    }
+    
+    private void updatePlobDrawable() {
+	if(placing != null && placing.done()) {
+	    placing.get().drawableUpdated();
+	}
     }
     
     protected void envdispose() {

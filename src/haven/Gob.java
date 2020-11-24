@@ -48,6 +48,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Sk
     private final Object removalLock = new Object();
     private GeneralGobInfo gobInfo = null;
     private GobDamageInfo damage;
+    private Hitbox hitbox;
     public static final ChangeCallback CHANGED = new ChangeCallback() {
 	@Override
 	public void added(Gob ob) {
@@ -214,7 +215,6 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Sk
 	    damage = new GobDamageInfo(this);
 	}
 	setattr(new GeneralGobInfo(this));
-	setattr(new Hitbox(this));
     }
 
     public Gob(Glob glob, Coord2d c) {
@@ -435,6 +435,9 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Sk
 	}
 	if(prev != null)
 	    prev.dispose();
+	if(ac == Drawable.class) {
+	    drawableUpdated();
+	}
     }
 
     public void setattr(GAttrib a) {
@@ -858,5 +861,21 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Sk
 	}
 	h.start();
     }
+    
+    public void drawableUpdated() {
+	Boolean hitboxEnabled = CFG.DISPLAY_GOB_HITBOX.get();
+	if(hitboxEnabled) {
+	    if(hitbox != null) {
+		hitbox.updateState();
+	    } else if(!virtual || this instanceof MapView.Plob) {
+		hitbox = Hitbox.forGob(this);
+		if(hitbox != null) setattr(hitbox);
+	    }
+	} else if(hitbox != null) {
+	    hitbox = null;
+	    delattr(Hitbox.class);
+	}
+    }
+    
     public final Placed placed = new Placed();
 }

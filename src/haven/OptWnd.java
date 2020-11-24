@@ -798,6 +798,12 @@ public class OptWnd extends Window {
 
 	y += 25;
 	display.add(new CFGBox("Show gob info", CFG.DISPLAY_GOB_INFO, "Enables damage and crop/tree growth stage displaying", true), x, y);
+    
+	y += 25;
+	display.add(new CFGBox("Show gob hitboxes", CFG.DISPLAY_GOB_HITBOX, "Enables hitboxes around all objects", true), x, y);
+	
+	y += 25;
+	display.add(new CFGBox("Draw hitboxes on top", CFG.DISPLAY_GOB_HITBOX_TOP, "Draws hitboxes on top of everything", true), x, y);
 
 	y += 25;
 	display.add(new CFGBox("Show food categories", CFG.DISPLAY_FOD_CATEGORIES, "Shows list of food categories in the tooltip", true), x, y);
@@ -851,7 +857,7 @@ public class OptWnd extends Window {
 	display.add(new CFGBox("Show on ALT:", CFG.Q_SHOW_ALT), x, y);
 	display.add(new QualityBox(100, 6, 16, CFG.Q_ALT_TYPE), tx + 5, y);
 
-	y += 35;
+	y += 50;
 	display.add(new CFGBox("Real time curios", CFG.REAL_TIME_CURIO, "Show curiosity study time in real life hours, instead of server hours"), new Coord(x, y));
 
 	y += 25;

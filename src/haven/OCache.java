@@ -71,6 +71,17 @@ public class OCache implements Iterable<Gob> {
 	Radar.clean();
 	callback(Radar.CHANGED);
 	callback(Gob.CHANGED);
+	CFG.DISPLAY_GOB_HITBOX.observe(cfg -> updateGobDrawables());
+	CFG.DISPLAY_GOB_HITBOX_TOP.observe(cfg -> updateGobDrawables());
+    }
+    
+    public void updateGobDrawables() {
+	synchronized (this) {
+	    for (Gob g : this) {
+		g.drawableUpdated();
+	    }
+	    local.forEach(gobs -> gobs.forEach(Gob::drawableUpdated));
+	}
     }
     
     public synchronized Stream<Gob> stream() {return Stream.of(objs.values().toArray(new Gob[0]));}
@@ -240,6 +251,7 @@ public class OCache implements Iterable<Gob> {
 	    g.setattr(new ResDrawable(g, res, sdt));
 	    Radar.add(g, res);
 	}
+	g.drawableUpdated();
     }
     public Delta cres(Message msg) {
 	int resid = msg.uint16();

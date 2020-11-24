@@ -1,8 +1,6 @@
 package haven;
 
-import haven.render.Homo3D;
-import haven.render.Pipe;
-import haven.render.RenderTree;
+import haven.render.*;
 
 import java.awt.*;
 import java.util.*;
@@ -11,42 +9,58 @@ import java.util.stream.Collectors;
 
 import static haven.Sprite.*;
 
-public class Hitbox extends GAttrib implements RenderTree.Node, PView.Render2D {
-    private List<List<Coord3f>> polygons;
-    private static final Color SOLID = new Color(180, 134, 255, 200);
-    private static final Color PASSABLE = new Color(105, 207, 124, 200);
-    private static final int PASSABLE_WIDTH = UI.scale(1);
-    private static final int SOLID_WIDTH = UI.scale(2);
-    private boolean ready = false;
+public class Hitbox extends GAttrib implements RenderTree.Node, Rendered {
+    private static final VertexArray.Layout LAYOUT = new VertexArray.Layout(new VertexArray.Layout.Input(Homo3D.vertex, new VectorFormat(3, NumberFormat.FLOAT32), 0, 0, 12));
+    private final Model model;
+    private static final Map<Resource, Model> MODEL_CACHE = new HashMap<>();
+    private static final float Z = 0.1f;
+    private static final Color SOLID_COLOR = new Color(180, 134, 255, 255);
+    private static final Color PASSABLE_COLOR = new Color(105, 207, 124, 255);
+    private static final float PASSABLE_WIDTH = UI.scale(1f);
+    private static final float SOLID_WIDTH = UI.scale(2f);
+    private static final Pipe.Op TOP = Pipe.Op.compose(Rendered.last, States.Depthtest.none, States.maskdepth);
+    private static final Pipe.Op SOLID = Pipe.Op.compose(new BaseColor(SOLID_COLOR), new States.LineWidth(SOLID_WIDTH));
+    private static final Pipe.Op PASSABLE = Pipe.Op.compose(new BaseColor(PASSABLE_COLOR), new States.LineWidth(PASSABLE_WIDTH));
+    private static final Pipe.Op SOLID_TOP = Pipe.Op.compose(SOLID, TOP);
+    private static final Pipe.Op PASSABLE_TOP = Pipe.Op.compose(PASSABLE, TOP);
+    private Pipe.Op state;
     
-    protected Hitbox(Gob gob) {
+    private Hitbox(Gob gob) {
 	super(gob);
+	model = getModel(gob);
+	updateState();
+    }
+    
+    public static Hitbox forGob(Gob gob) {
+	try {
+	    return new Hitbox(gob);
+	} catch (Loading ignored) { }
+	return null;
     }
     
     @Override
-    public void draw(GOut g, Pipe state) {
-	if(CFG.DISPLAY_GOB_HITBOX.get()) {
-	    if(!ready) {
-		try {
-		    polygons = getPolygons(gob);
-		    ready = true;
-		} catch (Loading ignored) {}
-	    }
-	    if(polygons != null) {
-		boolean passable = passable();
-		g.chcolor(passable ? PASSABLE : SOLID);
-		Area area = Area.sized(g.sz());
-		for (List<Coord3f> polygon : polygons) {
-		    int points = polygon.size();
-		    for (int i = 0; i < points; i++) {
-			Coord3f a = Homo3D.obj2view(polygon.get(i % points), state, area);
-			Coord3f b = Homo3D.obj2view(polygon.get((i + 1) % points), state, area);
-			if(a.isect(Coord.z, g.sz()) || b.isect(Coord.z, g.sz())) {
-			    g.line(a, b, passable ? PASSABLE_WIDTH : SOLID_WIDTH);
-			}
-		    }
+    public void added(RenderTree.Slot slot) {
+	super.added(slot);
+	slot.ostate(state);
+	updateState();
+    }
+    
+    @Override
+    public void draw(Pipe context, Render out) {
+	if(model != null) {
+	    out.draw(context, model);
+	}
+    }
+    
+    public void updateState() {
+	if(model != null && slots != null) {
+	    boolean top = CFG.DISPLAY_GOB_HITBOX_TOP.get();
+	    Pipe.Op newState = passable() ? (top ? PASSABLE_TOP : PASSABLE) : (top ? SOLID_TOP : SOLID);
+	    if(newState != state) {
+		state = newState;
+		for (RenderTree.Slot slot : slots) {
+		    slot.ostate(state);
 		}
-		
 	    }
 	}
     }
@@ -74,22 +88,20 @@ public class Hitbox extends GAttrib implements RenderTree.Node, PView.Render2D {
 	return false;
     }
     
-    private static final Map<Resource, List<List<Coord3f>>> cache = new HashMap<>();
-    
-    private static List<List<Coord3f>> getPolygons(Gob gob) {
+    private static Model getModel(Gob gob) {
 	Resource res = getResource(gob);
-	List<List<Coord3f>> polygons = cache.get(res);
-	if(polygons == null) {
-	    polygons = new LinkedList<>();
+	Model model = MODEL_CACHE.get(res);
+	if(model == null) {
+	    List<List<Coord3f>> polygons = new LinkedList<>();
 	    
 	    Collection<Resource.Neg> negs = res.layers(Resource.Neg.class);
 	    if(negs != null) {
 		for (Resource.Neg neg : negs) {
 		    List<Coord3f> box = new LinkedList<>();
-		    box.add(new Coord3f(neg.ac.x, neg.ac.y, 0));
-		    box.add(new Coord3f(neg.bc.x, neg.ac.y, 0));
-		    box.add(new Coord3f(neg.bc.x, neg.bc.y, 0));
-		    box.add(new Coord3f(neg.ac.x, neg.bc.y, 0));
+		    box.add(new Coord3f(neg.ac.x, neg.ac.y, Z));
+		    box.add(new Coord3f(neg.bc.x, neg.ac.y, Z));
+		    box.add(new Coord3f(neg.bc.x, neg.bc.y, Z));
+		    box.add(new Coord3f(neg.ac.x, neg.bc.y, Z));
 		    
 		    polygons.add(box);
 		}
@@ -102,18 +114,49 @@ public class Hitbox extends GAttrib implements RenderTree.Node, PView.Render2D {
 		    if(!"build".equals(obstacle.id)) {
 			for (Coord2d[] polygon : obstacle.polygons) {
 			    polygons.add(Arrays.stream(polygon)
-				.map(coord2d -> new Coord3f(11 * (float) coord2d.x, 11 * (float) coord2d.y, 0))
+				.map(coord2d -> new Coord3f(11 * (float) coord2d.x, 11 * (float) coord2d.y, Z))
 				.collect(Collectors.toList()));
 			}
 		    }
 		}
-		
 	    }
 	    
-	    cache.put(res, polygons);
+	    if(!polygons.isEmpty()) {
+		List<Float> vertices = new LinkedList<>();
+		
+		for (List<Coord3f> polygon : polygons) {
+		    addLoopedVertices(vertices, polygon);
+		}
+		
+		float[] data = convert(vertices);
+		VertexArray.Buffer vbo = new VertexArray.Buffer(data.length * 4, DataBuffer.Usage.STATIC, DataBuffer.Filler.of(data));
+		VertexArray va = new VertexArray(LAYOUT, vbo);
+		
+		model = new Model(Model.Mode.LINES, va, null);
+		
+		MODEL_CACHE.put(res, model);
+	    }
 	}
-	
-	return polygons.isEmpty() ? null : polygons;
+	return model;
+    }
+    
+    private static float[] convert(List<Float> list) {
+	float[] ret = new float[list.size()];
+	int i = 0;
+	for (Float value : list) {
+	    ret[i++] = value;
+	}
+	return ret;
+    }
+    
+    private static void addLoopedVertices(List<Float> target, List<Coord3f> vertices) {
+	int n = vertices.size();
+	for (int i = 0; i < n; i++) {
+	    Coord3f a = vertices.get(i);
+	    Coord3f b = vertices.get((i + 1) % n);
+	    Collections.addAll(target, a.x, a.y, a.z);
+	    Collections.addAll(target, b.x, b.y, b.z);
+	}
     }
     
     private static Resource getResource(Gob gob) {
