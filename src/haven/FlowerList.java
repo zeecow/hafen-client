@@ -6,15 +6,15 @@ import static haven.FlowerMenu.AUTOCHOOSE;
 
 public class FlowerList extends WidgetList<FlowerList.Item> {
 
-    public static final Comparator<Item> ITEM_COMPARATOR = new Comparator<Item>() {
-	@Override
-	public int compare(Item o1, Item o2) {
-	    return o1.name.compareTo(o2.name);
-	}
-    };
-
+    public static final Comparator<Item> ITEM_COMPARATOR = Comparator.comparing(o -> o.name);
+    
+    @Override
+    protected void drawbg(GOut g) {
+	super.drawbg(g);
+    }
+    
     public FlowerList() {
-	super(new Coord(200, 25), 10);
+	super(UI.scale(200, 25), 10);
 
 	for(Map.Entry<String, Boolean> entry : AUTOCHOOSE.entrySet()) {
 	    additem(new Item(entry.getKey()));
@@ -65,7 +65,7 @@ public class FlowerList extends WidgetList<FlowerList.Item> {
     }
 
     private void update() {
-	Collections.sort(list, ITEM_COMPARATOR);
+	list.sort(ITEM_COMPARATOR);
 	int n = listitems();
 	for(int i = 0; i < n; i++) {
 	    listitem(i).c = itempos(i);
@@ -80,14 +80,14 @@ public class FlowerList extends WidgetList<FlowerList.Item> {
 	private UI.Grab grab;
 
 	public Item(String name) {
-	    super(new Coord(200, 25));
+	    super(UI.scale(200, 25));
 	    this.name = name;
 
-	    cb = add(new CheckBox(name), 3, 3);
+	    cb = adda(new CheckBox(name), UI.scale(3, 12), 0, 0.5);
 	    cb.a = AUTOCHOOSE.get(name);
 	    cb.canactivate = true;
 
-	    add(new Button(24, "X"), 175, 0);
+	    add(new Button(UI.scale(24), "X"), UI.scale(175, 0));
 	}
 
 	@Override
