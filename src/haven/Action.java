@@ -10,6 +10,7 @@ public enum Action {
     TOGGLE_OPTIONS(GameUI::toggleOptions, "Options"),
     TOGGLE_CHAT(GameUI::toggleChat, "Toggle Chat"),
     TOGGLE_MAP(GameUI::toggleMap, "Toggle Map"),
+    TOGGLE_MINIMAP_ICONS_SETTINGS(GameUI::toggleIconSettings, "Show minimap icon settings"),
     TOGGLE_TIMERS(GameUI::toggleTimers, "Toggle Timers"),
     TAKE_SCREENSHOT(GameUI::takeScreenshot, "Take Screenshot"),
     

@@ -33,7 +33,7 @@ import java.awt.event.KeyEvent;
 public class OptWnd extends Window {
     public static final Coord PANEL_POS = new Coord(220, 30);
     public static final Coord Q_TYPE_PADDING = new Coord(3, 0);
-    private final Panel display, general, camera, radar, shortcuts;
+    private final Panel display, general, camera, shortcuts;
     public final Panel main, video, audio, keybind;
     public Panel current;
     private WidgetList<KeyBinder.ShortcutWidget> shortcutList;
@@ -61,6 +61,29 @@ public class OptWnd extends Window {
 	    chpanel(tgt);
 	}
 
+	public boolean keydown(java.awt.event.KeyEvent ev) {
+	    if((this.key != -1) && (ev.getKeyChar() == this.key)) {
+		click();
+		return (true);
+	    }
+	    return (false);
+	}
+    }
+    
+    private static class AButton extends Button {
+	public final Action act;
+	public final int key;
+	
+	public AButton(int w, String title, int key, Action act) {
+	    super(w, title);
+	    this.act = act;
+	    this.key = key;
+	}
+	
+	public void click() {
+	    act.run(ui.gui);
+	}
+	
 	public boolean keydown(java.awt.event.KeyEvent ev) {
 	    if((this.key != -1) && (ev.getKeyChar() == this.key)) {
 		click();
@@ -575,7 +598,6 @@ public class OptWnd extends Window {
 	display = add(new Panel());
 	general = add(new Panel());
 	camera = add(new Panel());
-	radar = add(new Panel());
 	shortcuts = add(new Panel());
 	int y;
 
@@ -585,7 +607,7 @@ public class OptWnd extends Window {
 
 	addPanelButton("General settings", 'g', general, 1, 0);
 	addPanelButton("Display settings", 'd', display, 1, 1);
-	addPanelButton("Radar settings", 'r', radar, 1, 2);
+	addPanelButton("Radar settings", 'r', Action.TOGGLE_MINIMAP_ICONS_SETTINGS, 1, 2);
 	addPanelButton("Shortcut settings", 's', shortcuts, 1, 3);
 
 	if(gopts) {
@@ -647,7 +669,6 @@ public class OptWnd extends Window {
 	chpanel(this.main);
 	initDisplayPanel();
 	initGeneralPanel();
-	initRadarPanel();
 	initCameraPanel();
 	main.pack();
 	chpanel(main);
@@ -661,6 +682,10 @@ public class OptWnd extends Window {
     
     private void addPanelButton(String name, char key, Panel panel, int x, int y) {
 	main.add(new PButton(UI.scale(200), name, key, panel), UI.scale(PANEL_POS.mul(x, y)));
+    }
+    
+    private void addPanelButton(String name, char key, Action action, int x, int y) {
+	main.add(new AButton(UI.scale(200), name, key, action), UI.scale(PANEL_POS.mul(x, y)));
     }
 
     private void initCameraPanel() {
@@ -922,44 +947,6 @@ public class OptWnd extends Window {
 	display.pack();
     }
 
-    private void initRadarPanel() {
-	final WidgetList<CheckBox> markers = new WidgetList<CheckBox>(new Coord(UI.scale(200), 16), 20) {
-	    @Override
-	    protected void itemclick(CheckBox item, int button) {
-		if(button == 1) {
-		    item.set(!item.a);
-		}
-	    }
-	};
-	markers.canselect = false;
-	radar.add(markers, 225, 0);
-
-	WidgetList<RadarCFG.GroupCheck> groups = radar.add(new WidgetList<RadarCFG.GroupCheck>(new Coord(UI.scale(200), 16), 20) {
-	    @Override
-	    public void selected(RadarCFG.GroupCheck item) {
-		markers.clear(true);
-		markers.additem(new RadarCFG.MarkerCheckAll(markers));
-		for(RadarCFG.MarkerCFG marker : item.group.markerCFGs) {
-		    markers.additem(new RadarCFG.MarkerCheck(marker));
-		}
-	    }
-	});
-	for(RadarCFG.Group group : RadarCFG.groups) {
-	    groups.additem(new RadarCFG.GroupCheck(group)).hitbox = true;
-	}
-
-	radar.add(new Button(60, "Save"){
-	    @Override
-	    public void click() {
-		RadarCFG.save();
-	    }
-	}, 183, groups.sz.y + 10);
-
-	radar.pack();
-	radar.add(new PButton(UI.scale(200), "Back", 27, main), radar.sz.x / 2 - 100, radar.sz.y + 35);
-	radar.pack();
-    }
-    
     private void populateShortcutsPanel(KeyBinder.KeyBindType type) {
         shortcutList.clear(true);
 	KeyBinder.makeWidgets(type).forEach(shortcutList::additem);

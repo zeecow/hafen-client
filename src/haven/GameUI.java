@@ -60,7 +60,7 @@ public class GameUI extends ConsoleHost implements Console.Directory {
     private List<Widget> cmeters = new LinkedList<Widget>();
     private Text lastmsg;
     private double msgtime;
-    private Window invwnd, equwnd, srchwnd, iconwnd;
+    public Window invwnd, equwnd, srchwnd, iconwnd;
     private CraftWindow makewnd;
     public Inventory maininv;
     public Equipory equipory;
@@ -1448,11 +1448,15 @@ public class GameUI extends ConsoleHost implements Console.Directory {
     public static class MenuButton2 extends IButton {
 	private final Action action;
 	private final String tip;
-	
-	MenuButton2(String base, String tooltip, Action action, int code, int mods) {
+    
+	MenuButton2(String base, String tooltip, Action action) {
 	    super("gfx/hud/" + base, "", "-d", "-h");
 	    this.action = action;
 	    this.tip = tooltip;
+	}
+    
+	MenuButton2(String base, String tooltip, Action action, int code, int mods) {
+	    this(base, tooltip, action);
 	    KeyBinder.add(code, mods, action);
 	}
 	
@@ -1502,23 +1506,25 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 		    if(mapfile != null)
 			Utils.setprefb("wndvis-map", mapfile.visible);
 		});
-	    add(new MenuButton("lbtn-ico", kb_ico, "Icon settings"), 0, 0).action(() -> {
-		    if(iconconf == null)
-			return;
-		    if(iconwnd == null) {
-//			iconwnd = new GobIcon.SettingsWindow(iconconf, () -> Utils.defer(GameUI.this::saveiconconf));
-			iconwnd = new GobIconSettings(iconconf, () -> Utils.defer(GameUI.this::saveiconconf));
-			fitwdg(GameUI.this.add(iconwnd, Utils.getprefc("wndc-icon", new Coord(200, 200))));
-		    } else {
-			ui.destroy(iconwnd);
-			iconwnd = null;
-		    }
-		});
+	    add(new MenuButton2("lbtn-ico",  "Icon settings", TOGGLE_MINIMAP_ICONS_SETTINGS), 0, 0);
 	}
 
 	public void draw(GOut g) {
 	    g.image(mapmenubg, Coord.z);
 	    super.draw(g);
+	}
+    }
+    
+    public void toggleIconSettings(){
+	if(iconconf == null)
+	    return;
+	if(iconwnd == null) {
+//	    iconwnd = new GobIcon.SettingsWindow(iconconf, () -> Utils.defer(GameUI.this::saveiconconf));
+	    iconwnd = new GobIconSettings(iconconf, () -> Utils.defer(GameUI.this::saveiconconf));
+	    fitwdg(GameUI.this.add(iconwnd, Utils.getprefc("wndc-icon", new Coord(200, 200))));
+	} else {
+	    ui.destroy(iconwnd);
+	    iconwnd = null;
 	}
     }
 
