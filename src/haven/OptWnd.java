@@ -759,6 +759,10 @@ public class OptWnd extends Window {
     
 	y += STEP;
 	general.add(new CFGBox("Show extra tool bar", CFG.SHOW_TOOLBELT_1), x, y);
+	
+	y += STEP;
+	Coord tsz = general.add(new Label("Default speed:"), x, y).sz;
+	general.adda(new Speedget.SpeedSelector(UI.scale(100)), new Coord(x + tsz.x + UI.scale(5), y + tsz.y / 2), 0, 0.5);
     
 	y += STEP;
 	Label label = general.add(new Label(String.format("Auto pickup radius: %.2f", CFG.AUTO_PICK_RADIUS.get() / 11.0)), x, y);

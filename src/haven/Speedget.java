@@ -29,6 +29,7 @@ package haven;
 import java.awt.event.KeyEvent;
 
 public class Speedget extends Widget {
+    private static final CFG<Integer> SPEED = new CFG<>("general.speed", 1);
     public static final Tex imgs[][];
     public static final String tips[];
     public static final Coord tsz;
@@ -65,7 +66,12 @@ public class Speedget extends Widget {
 	this.cur = cur;
 	this.max = max;
     }
-
+    
+    @Override
+    public void bound() {
+	set(SPEED.get());
+    }
+    
     public void draw(GOut g) {
 	int x = 0;
 	for(int i = 0; i < 4; i++) {
@@ -143,5 +149,37 @@ public class Speedget extends Widget {
 	    }
 	}
 	return(super.globtype(key, ev));
+    }
+    
+    public static class SpeedSelector extends Dropbox<Integer> {
+	private static final int H = UI.scale(16);
+	private static final Coord C = UI.scale(3, 8);
+    
+	public SpeedSelector(int w) {
+	    super(w, tips.length, H);
+	    sel = selindex = SPEED.get();
+	}
+	
+	@Override
+	public void change(Integer item) {
+	    super.change(item);
+	    SPEED.set(item);
+	    
+	}
+	
+	@Override
+	protected Integer listitem(int i) {
+	    return i;
+	}
+	
+	@Override
+	protected int listitems() {
+	    return tips.length;
+	}
+	
+	@Override
+	protected void drawitem(GOut g, Integer item, int i) {
+	    g.atext(tips[item], C, 0, 0.5);
+	}
     }
 }
