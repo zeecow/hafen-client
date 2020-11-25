@@ -81,7 +81,7 @@ public class OptWnd extends Window {
 	}
 	
 	public void click() {
-	    act.run(ui.gui);
+	    if(ui.gui != null) {act.run(ui.gui);}
 	}
 	
 	public boolean keydown(java.awt.event.KeyEvent ev) {
