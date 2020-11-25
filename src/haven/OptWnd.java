@@ -959,7 +959,7 @@ public class OptWnd extends Window {
 	shortcuts.add(tabs);
 	int y = tabs.sz.y;
 	
-	shortcutList = shortcuts.add(new WidgetList<KeyBinder.ShortcutWidget>(new Coord(300, 24), 16) {
+	shortcutList = shortcuts.add(new WidgetList<KeyBinder.ShortcutWidget>(UI.scale(300, 24), 16) {
 	    @Override
 	    public boolean mousedown(Coord c0, int button) {
 		boolean result = super.mousedown(c0, button);

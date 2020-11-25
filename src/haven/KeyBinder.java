@@ -263,7 +263,7 @@ public class KeyBinder {
 	}
  
 	public ShortcutWidget(KeyBind bind, Action2<KeyBind, KeyBind> update, String label) {
-	    btn = add(new Button(75, bind.shortcut()) {
+	    btn = add(new Button(UI.scale(75), bind.shortcut()) {
 		  @Override
 		  public void click() {
 		      ui.root.add(new ShortcutSelectorWdg(keyBind, ShortcutWidget.this), ui.mc.sub(50, 20));
@@ -275,15 +275,15 @@ public class KeyBinder {
 		      return super.mouseup(Coord.z, button);
 		  }
 	      },
-	    225, 0);
+	    UI.scale(225), 0);
 	    this.keyBind = bind;
 	    this.update = update;
 	    if(bind.action != null && bind.action.description != null) {
-		tooltip = RichText.render(bind.action.description, 200);
+		tooltip = RichText.render(bind.action.description, UI.scale(200));
 	    }
 	    btn.autosize(true);
-	    btn.c.x = 300 - btn.sz.x;
-	    add(new Label(label), 5, 5);
+	    btn.c.x = UI.scale(300) - btn.sz.x;
+	    add(new Label(label), UI.scale(5, 5));
 	}
     
 	@Override
