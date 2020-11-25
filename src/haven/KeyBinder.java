@@ -295,7 +295,7 @@ public class KeyBinder {
 	public void update(KeyBind to) {
 	    keyBind = to;
 	    btn.change(keyBind.shortcut());
-	    btn.c.x = 300 - btn.sz.x;
+	    btn.c.x = UI.scale(300) - btn.sz.x;
 	}
     }
     
