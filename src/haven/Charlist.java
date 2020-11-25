@@ -41,7 +41,7 @@ public class Charlist extends Widget {
     Avaview avalink;
     
     public static class Char {
-	public static final Text.Furnace tf = new PUtils.BlurFurn(new PUtils.TexFurn(new Text.Foundry(Text.fraktur, 20).aa(true), Window.ctex), UI.scale(2), UI.scale(2), Color.BLACK);
+	public static final Text.Furnace tf = new PUtils.BlurFurn(new PUtils.TexFurn(new Text.Foundry(Text.serif, 20).aa(true), Window.ctex), UI.scale(2), UI.scale(2), Color.BLACK);
 	public final String name;
 	public Composited.Desc avadesc;
 	public Resource.Resolver avamap;

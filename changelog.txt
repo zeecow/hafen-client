@@ -2,6 +2,12 @@ $size[14]{$u{Update for 24.11.20:}
   * improved hitbox performance
   * added option to show hitboxes on top or below of objects
  
+$size[14]{$u{Update for 25.11.20:}
+  * made radar button in Options toggle actual minimap icon settings
+  * fixed UI-scaling in Options window
+  * added option to set default speed (Options->General->Default speed)
+  * changed character name font in character selector to the one that has not just latin characters
+ 
 $size[14]{$u{Update for 23.11.20:}
   * fixed being able to enter non-numeric values into stockpile input
   * Minimap Icon Settings: fixed scrollbar not detecting mouse clicks

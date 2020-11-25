@@ -33,7 +33,7 @@ import java.awt.event.KeyEvent;
 public class OptWnd extends Window {
     public static final Coord PANEL_POS = new Coord(220, 30);
     public static final Coord Q_TYPE_PADDING = new Coord(3, 0);
-    private final Panel display, general, camera, radar, shortcuts;
+    private final Panel display, general, camera, shortcuts;
     public final Panel main, video, audio, keybind;
     public Panel current;
     private WidgetList<KeyBinder.ShortcutWidget> shortcutList;
@@ -61,6 +61,29 @@ public class OptWnd extends Window {
 	    chpanel(tgt);
 	}
 
+	public boolean keydown(java.awt.event.KeyEvent ev) {
+	    if((this.key != -1) && (ev.getKeyChar() == this.key)) {
+		click();
+		return (true);
+	    }
+	    return (false);
+	}
+    }
+    
+    private static class AButton extends Button {
+	public final Action act;
+	public final int key;
+	
+	public AButton(int w, String title, int key, Action act) {
+	    super(w, title);
+	    this.act = act;
+	    this.key = key;
+	}
+	
+	public void click() {
+	    if(ui.gui != null) {act.run(ui.gui);}
+	}
+	
 	public boolean keydown(java.awt.event.KeyEvent ev) {
 	    if((this.key != -1) && (ev.getKeyChar() == this.key)) {
 		click();
@@ -575,7 +598,6 @@ public class OptWnd extends Window {
 	display = add(new Panel());
 	general = add(new Panel());
 	camera = add(new Panel());
-	radar = add(new Panel());
 	shortcuts = add(new Panel());
 	int y;
 
@@ -585,7 +607,7 @@ public class OptWnd extends Window {
 
 	addPanelButton("General settings", 'g', general, 1, 0);
 	addPanelButton("Display settings", 'd', display, 1, 1);
-	addPanelButton("Radar settings", 'r', radar, 1, 2);
+	addPanelButton("Radar settings", 'r', Action.TOGGLE_MINIMAP_ICONS_SETTINGS, 1, 2);
 	addPanelButton("Shortcut settings", 's', shortcuts, 1, 3);
 
 	if(gopts) {
@@ -593,18 +615,18 @@ public class OptWnd extends Window {
 		public void click() {
 		    getparent(GameUI.class).act("lo", "cs");
 		}
-	    }, new Coord(0, 120));
+	    }, UI.scale(0, 120));
 	    main.add(new Button(UI.scale(200), "Log out") {
 		public void click() {
 		    getparent(GameUI.class).act("lo");
 		}
-	    }, new Coord(0, 150));
+	    }, UI.scale(0, 150));
 	}
 	main.add(new Button(UI.scale(200), "Close") {
 	    public void click() {
 		OptWnd.this.hide();
 	    }
-	}, new Coord(0, 180));
+	}, UI.scale(0, 180));
 
 	y = 0;
 	audio.add(new Label("Master audio volume"), new Coord(0, y));
@@ -647,7 +669,6 @@ public class OptWnd extends Window {
 	chpanel(this.main);
 	initDisplayPanel();
 	initGeneralPanel();
-	initRadarPanel();
 	initCameraPanel();
 	main.pack();
 	chpanel(main);
@@ -661,6 +682,10 @@ public class OptWnd extends Window {
     
     private void addPanelButton(String name, char key, Panel panel, int x, int y) {
 	main.add(new PButton(UI.scale(200), name, key, panel), UI.scale(PANEL_POS.mul(x, y)));
+    }
+    
+    private void addPanelButton(String name, char key, Action action, int x, int y) {
+	main.add(new AButton(UI.scale(200), name, key, action), UI.scale(PANEL_POS.mul(x, y)));
     }
 
     private void initCameraPanel() {
@@ -718,34 +743,39 @@ public class OptWnd extends Window {
 	int x = 0;
 	int y = 0, my = 0;
 	general.add(new CFGBox("Store minimap tiles", CFG.STORE_MAP), x, y);
-
-	y += 25;
+    
+	int STEP = UI.scale(25);
+	y += STEP;
 	general.add(new CFGBox("Store chat logs", CFG.STORE_CHAT_LOGS, "Logs are stored in 'chats' folder"), new Coord(x, y));
-
-	y += 25;
+    
+	y += STEP;
 	general.add(new CFGBox("Single item CTRL choose", CFG.MENU_SINGLE_CTRL_CLICK, "If checked, will automatically select single item menus if CTRL is pressed when menu is opened."), x, y);
-	
-	y += 25;
+    
+	y += STEP;
 	general.add(new CFGBox("Add \"Pick All\" option", CFG.MENU_ADD_PICK_ALL, "If checked, will add new option that will allow to pick all same objects."), x, y);
-
-	y += 25;
+    
+	y += STEP;
 	general.add(new CFGBox("Show F-key tool bar", CFG.SHOW_TOOLBELT_0), x, y);
-
-	y += 25;
+    
+	y += STEP;
 	general.add(new CFGBox("Show extra tool bar", CFG.SHOW_TOOLBELT_1), x, y);
- 
-	y += 25;
+	
+	y += STEP;
+	Coord tsz = general.add(new Label("Default speed:"), x, y).sz;
+	general.adda(new Speedget.SpeedSelector(UI.scale(100)), new Coord(x + tsz.x + UI.scale(5), y + tsz.y / 2), 0, 0.5);
+    
+	y += STEP;
 	Label label = general.add(new Label(String.format("Auto pickup radius: %.2f", CFG.AUTO_PICK_RADIUS.get() / 11.0)), x, y);
-	y += 15;
-	general.add(new CFGHSlider(120, CFG.AUTO_PICK_RADIUS, 33, 88) {
+	y += UI.scale(15);
+	general.add(new CFGHSlider(UI.scale(120), CFG.AUTO_PICK_RADIUS, 33, 88) {
 	    @Override
 	    public void changed() {
 		label.settext(String.format("Auto pickup radius: %.02f", val / 11.0));
 	    }
 	}, x, y);
-
-	y += 35;
-	general.add(new Button(120, "Toggle at login") {
+    
+	y += UI.scale(35);
+	general.add(new Button(UI.scale(120), "Toggle at login") {
 	    @Override
 	    public void click() {
 		if(ui.gui != null) {
@@ -755,35 +785,35 @@ public class OptWnd extends Window {
 		}
 	    }
 	}, x, y);
-
+    
 	my = Math.max(my, y);
-	x += 250;
+	x += UI.scale(250);
 	y = 0;
-
+    
 	general.add(new Label("Choose menu items to select automatically:"), x, y);
-	y += 15;
+	y += UI.scale(15);
 	final FlowerList list = general.add(new FlowerList(), x, y);
-
-	y += list.sz.y + 5;
-	final TextEntry value = general.add(new TextEntry(150, "") {
+    
+	y += list.sz.y + UI.scale(5);
+	final TextEntry value = general.add(new TextEntry(UI.scale(155), "") {
 	    @Override
 	    public void activate(String text) {
 		list.add(text);
 		settext("");
 	    }
 	}, x, y);
-
-	general.add(new Button(45, "Add") {
+    
+	general.add(new Button(UI.scale(45), "Add") {
 	    @Override
 	    public void click() {
 		list.add(value.text);
 		value.settext("");
 	    }
-	}, x + 155, y - 2);
-
+	}, x + UI.scale(160), y - UI.scale(2));
+    
 	my = Math.max(my, y);
-
-	general.add(new PButton(UI.scale(200), "Back", 27, main), 0, my + 35);
+    
+	general.add(new PButton(UI.scale(200), "Back", 27, main), 0, my + UI.scale(35));
 	general.pack();
     }
 
@@ -792,11 +822,12 @@ public class OptWnd extends Window {
 	int y = 0;
 	int my = 0;
 	display.add(new CFGBox("Always show kin names", CFG.DISPLAY_KINNAMES), new Coord(x, y));
-
-	y += 25;
+    
+	int STEP = UI.scale(25);
+	y += STEP;
 	display.add(new CFGBox("Show flavor objects", CFG.DISPLAY_FLAVOR), new Coord(x, y));
 
-	y += 25;
+	y += STEP;
 	display.add(new CFGBox("Show gob info", CFG.DISPLAY_GOB_INFO, "Enables damage and crop/tree growth stage displaying", true), x, y);
     
 	y += 25;
@@ -805,29 +836,29 @@ public class OptWnd extends Window {
 	y += 25;
 	display.add(new CFGBox("Draw hitboxes on top", CFG.DISPLAY_GOB_HITBOX_TOP, "Draws hitboxes on top of everything", true), x, y);
 
-	y += 25;
+	y += STEP;
 	display.add(new CFGBox("Show food categories", CFG.DISPLAY_FOD_CATEGORIES, "Shows list of food categories in the tooltip", true), x, y);
 
-	y += 25;
+	y += STEP;
 	display.add(new CFGBox("Show timestamps in chat messages", CFG.SHOW_CHAT_TIMESTAMP), new Coord(x, y));
 
-	y += 25;
+	y += STEP;
 	display.add(new CFGBox("Swap item quality and number", CFG.SWAP_NUM_AND_Q), x, y);
 
-	y += 25;
+	y += STEP;
 	display.add(new CFGBox("Show item progress as number", CFG.PROGRESS_NUMBER), x, y);
 
-	y += 25;
+	y += STEP;
 	display.add(new CFGBox("Show biomes on minimap", CFG.MMAP_SHOW_BIOMES), x, y);
 
-	y += 25;
+	y += STEP;
 	display.add(new CFGBox("Simple crops", CFG.SIMPLE_CROPS, "Requires area reload"), x, y);
 
 	y += 35;
 	display.add(new CFGBox("Show object radius", CFG.SHOW_GOB_RADIUS, "Shows radius of mine supports, beehives etc.", true), x, y);
 
-	y += 25;
-	display.add(new Button(120, "Show as buffs") {
+	y += STEP;
+	display.add(new Button(UI.scale(120), "Show as buffs") {
 	    @Override
 	    public void click() {
 		if(ui.gui != null) {
@@ -839,40 +870,40 @@ public class OptWnd extends Window {
 	}, x, y);
 
 	my = Math.max(my, y);
-	x += 250;
+	x += UI.scale(250);
 	y = 0;
 	my = Math.max(my, y);
 	int tx = x + display.add(new CFGBox("Show quality as:", CFG.Q_SHOW_SINGLE), x, y).sz.x;
-	display.add(new QualityBox(100, 6, 16, CFG.Q_SINGLE_TYPE), tx + 5, y);
+	display.add(new QualityBox(UI.scale(100), 6, UI.scale(16), CFG.Q_SINGLE_TYPE), tx + UI.scale(5), y);
 
-	y += 25;
+	y += STEP;
 	display.add(new CFGBox("Show on SHIFT:", CFG.Q_SHOW_SHIFT), x, y);
-	display.add(new QualityBox(100, 6, 16, CFG.Q_SHIFT_TYPE), tx + 5, y);
+	display.add(new QualityBox(UI.scale(100), 6, UI.scale(16), CFG.Q_SHIFT_TYPE), tx + UI.scale(5), y);
 
-	y += 25;
+	y += STEP;
 	display.add(new CFGBox("Show on CTRL:", CFG.Q_SHOW_CTRL), x, y);
-	display.add(new QualityBox(100, 6, 16, CFG.Q_CTRL_TYPE), tx + 5, y);
+	display.add(new QualityBox(UI.scale(100), 6, UI.scale(16), CFG.Q_CTRL_TYPE), tx + UI.scale(5), y);
 
-	y += 25;
+	y += STEP;
 	display.add(new CFGBox("Show on ALT:", CFG.Q_SHOW_ALT), x, y);
-	display.add(new QualityBox(100, 6, 16, CFG.Q_ALT_TYPE), tx + 5, y);
+	display.add(new QualityBox(UI.scale(100), 6, UI.scale(16), CFG.Q_ALT_TYPE), tx + UI.scale(5), y);
 
 	y += 50;
 	display.add(new CFGBox("Real time curios", CFG.REAL_TIME_CURIO, "Show curiosity study time in real life hours, instead of server hours"), new Coord(x, y));
 
-	y += 25;
+	y += STEP;
 	display.add(new CFGBox("Show LP/H for curios", CFG.SHOW_CURIO_LPH, "Show how much learning point curio gives per hour"), new Coord(x, y));
 
-	y += 25;
+	y += STEP;
 	display.add(new CFGBox("Show item durability", CFG.SHOW_ITEM_DURABILITY), new Coord(x, y));
 
-	y += 25;
+	y += STEP;
 	display.add(new CFGBox("Show item wear bar", CFG.SHOW_ITEM_WEAR_BAR), new Coord(x, y));
 
-	y += 25;
+	y += STEP;
 	display.add(new CFGBox("Show item armor", CFG.SHOW_ITEM_ARMOR), new Coord(x, y));
 
-	y += 25;
+	y += STEP;
 	display.add(new CFGBox("Show hunger meter", CFG.HUNGER_METER) {
 	    @Override
 	    public void set(boolean a) {
@@ -887,7 +918,7 @@ public class OptWnd extends Window {
 	    }
 	}, x, y);
 
-	y += 25;
+	y += STEP;
 	display.add(new CFGBox("Show FEP meter", CFG.FEP_METER) {
 	    @Override
 	    public void set(boolean a) {
@@ -903,69 +934,31 @@ public class OptWnd extends Window {
 	}, x, y);
  
 	my = Math.max(my, y);
-	x += 250;
+	x += UI.scale(250);
 	y = 0;
 	display.add(new CFGBox("Use new combat UI", CFG.ALT_COMBAT_UI), x, y);
 	
-	y += 25;
+	y += STEP;
 	display.add(new CFGBox("Show combat damage", CFG.SHOW_COMBAT_DMG), x, y);
 	
-	y += 25;
+	y += STEP;
 	display.add(new CFGBox("Clear player damage after combat", CFG.CLEAR_PLAYER_DMG_AFTER_COMBAT), x, y);
 	
-	y += 25;
+	y += STEP;
 	display.add(new CFGBox("Clear all damage after combat", CFG.CLEAR_ALL_DMG_AFTER_COMBAT), x, y);
 	
-	y += 25;
+	y += STEP;
 	display.add(new CFGBox("Simplified combat openings", CFG.SIMPLE_COMBAT_OPENINGS, "Show openings as solid colors with numbers"), x, y);
 	
-	y += 25;
+	y += STEP;
 	display.add(new CFGBox("Display combat keys", CFG.SHOW_COMBAT_KEYS), x, y);
 	
 	my = Math.max(my, y);
 
-	display.add(new PButton(UI.scale(200), "Back", 27, main), new Coord(0, my + 35));
+	display.add(new PButton(UI.scale(200), "Back", 27, main), new Coord(0, my + UI.scale(35)));
 	display.pack();
     }
 
-    private void initRadarPanel() {
-	final WidgetList<CheckBox> markers = new WidgetList<CheckBox>(new Coord(UI.scale(200), 16), 20) {
-	    @Override
-	    protected void itemclick(CheckBox item, int button) {
-		if(button == 1) {
-		    item.set(!item.a);
-		}
-	    }
-	};
-	markers.canselect = false;
-	radar.add(markers, 225, 0);
-
-	WidgetList<RadarCFG.GroupCheck> groups = radar.add(new WidgetList<RadarCFG.GroupCheck>(new Coord(UI.scale(200), 16), 20) {
-	    @Override
-	    public void selected(RadarCFG.GroupCheck item) {
-		markers.clear(true);
-		markers.additem(new RadarCFG.MarkerCheckAll(markers));
-		for(RadarCFG.MarkerCFG marker : item.group.markerCFGs) {
-		    markers.additem(new RadarCFG.MarkerCheck(marker));
-		}
-	    }
-	});
-	for(RadarCFG.Group group : RadarCFG.groups) {
-	    groups.additem(new RadarCFG.GroupCheck(group)).hitbox = true;
-	}
-
-	radar.add(new Button(60, "Save"){
-	    @Override
-	    public void click() {
-		RadarCFG.save();
-	    }
-	}, 183, groups.sz.y + 10);
-
-	radar.pack();
-	radar.add(new PButton(UI.scale(200), "Back", 27, main), radar.sz.x / 2 - 100, radar.sz.y + 35);
-	radar.pack();
-    }
-    
     private void populateShortcutsPanel(KeyBinder.KeyBindType type) {
         shortcutList.clear(true);
 	KeyBinder.makeWidgets(type).forEach(shortcutList::additem);
@@ -978,7 +971,7 @@ public class OptWnd extends Window {
 	shortcuts.add(tabs);
 	int y = tabs.sz.y;
 	
-	shortcutList = shortcuts.add(new WidgetList<KeyBinder.ShortcutWidget>(new Coord(300, 24), 16) {
+	shortcutList = shortcuts.add(new WidgetList<KeyBinder.ShortcutWidget>(UI.scale(300, 24), 16) {
 	    @Override
 	    public boolean mousedown(Coord c0, int button) {
 		boolean result = super.mousedown(c0, button);
