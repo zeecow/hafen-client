@@ -73,8 +73,8 @@ public class FightWndEx extends Widget {
 	public String rendertext() {
 	    StringBuilder buf = new StringBuilder();
 	    Resource res = this.res.get();
-	    buf.append("$img[" + res.name + "]\n\n");
-	    buf.append("$b{$font[serif,16]{" + res.layer(Resource.tooltip).t + "}}\n\n");
+	    buf.append("$img[").append(res.name).append("]\n\n");
+	    buf.append("$b{$font[serif,16]{").append(res.layer(Resource.tooltip).t).append("}}\n\n");
 	    Resource.Pagina pag = res.layer(Resource.pagina);
 	    if(pag != null)
 		buf.append(pag.text);
@@ -107,7 +107,7 @@ public class FightWndEx extends Widget {
 		if(rawinfo != null)
 		    info = ItemInfo.buildinfo(this, rawinfo);
 		else
-		    info = Arrays.asList(new ItemInfo.Name(this, res.get().layer(Resource.tooltip).t));
+		    info = Collections.singletonList(new ItemInfo.Name(this, res.get().layer(Resource.tooltip).t));
 	    }
 	    return(info);
 	}
@@ -144,6 +144,7 @@ public class FightWndEx extends Widget {
 	    List<ItemInfo> info = info();
 	    l.cmp.add(rendericon(), Coord.z);
 	    ItemInfo.Name nm = ItemInfo.find(ItemInfo.Name.class, info);
+	    assert nm != null;
 	    l.cmp.add(namef.render(nm.str.text).img, new Coord(0, l.cmp.sz.y + UI.scale(10)));
 	    l.cmp.sz = l.cmp.sz.addy(UI.scale(10));
 	    for (ItemInfo inf : info) {
@@ -253,7 +254,7 @@ public class FightWndEx extends Widget {
 			loading = true;
 		    }
 		}
-		acts.sort((a, b) -> (a.rnm.text.compareTo(b.rnm.text)));
+		acts.sort(Comparator.comparing(a -> a.rnm.text));
 	    }
 	    if((drag != null) && (dp == null)) {
 		try {
@@ -657,7 +658,7 @@ public class FightWndEx extends Widget {
     }
 
     public void save(int n) {
-	List<Object> args = new LinkedList<Object>();
+	List<Object> args = new LinkedList<>();
 	args.add(n);
 	if(saves[n] != unused)
 	    args.add(saves[n].text);
@@ -676,7 +677,7 @@ public class FightWndEx extends Widget {
 	wdgmsg("use", n);
     }
 
-    private Text unused = new Text.Foundry(attrf.font.deriveFont(java.awt.Font.ITALIC)).aa(true).render("Unused save");
+    private final Text unused = new Text.Foundry(attrf.font.deriveFont(java.awt.Font.ITALIC)).aa(true).render("Unused save");
 
     public FightWndEx(int nsave, int nact, int max) {
 	super(Coord.z);
@@ -787,7 +788,7 @@ public class FightWndEx extends Widget {
 	try {
 	    if(ALL != null) {
 		acts = ALL.stream().filter(selectedType::matches).collect(Collectors.toList());
-		acts.sort((a, b) -> (a.res.get().layer(Resource.tooltip).t.compareTo(b.res.get().layer(Resource.tooltip).t)));
+		acts.sort(Comparator.comparing(a -> a.res.get().layer(Resource.tooltip).t));
 		actlist.change(actlist.listitems() > 0 ? actlist.listitem(0) : null);
 		actlist.showsel();
 		needFilter = false;
@@ -806,7 +807,7 @@ public class FightWndEx extends Widget {
 
     public void uimsg(String nm, Object... args) {
 	if(Objects.equals(nm, "avail")) {
-	    List<Action> acts = new ArrayList<Action>();
+	    List<Action> acts = new ArrayList<>();
 	    int a = 0;
 	    while (true) {
 		int resid = (Integer) args[a++];
@@ -864,7 +865,7 @@ public class FightWndEx extends Widget {
 	}
     }
 
-    class ActionTypes extends TabStrip<ActionType> {
+    static class ActionTypes extends TabStrip<ActionType> {
 	private final Function<Button<ActionType>, Void> selected;
 
 	ActionTypes(Function<Button<ActionType>, Void> selected) {
