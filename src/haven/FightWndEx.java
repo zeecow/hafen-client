@@ -398,7 +398,9 @@ public class FightWndEx extends Widget {
 	private boolean anim = false;
 
 	private BView() {
-	    super(new Coord(((invsq.sz().x + 2) * (order.length - 1)) + UI.scale(10 * ((order.length - 1) / 5)), UI.scale(16)).add(invsq.sz()));
+	    super(invsq.sz().mul(order.length, 1).add(UI.scale(
+		2 * (order.length - 1) + 10 * ((order.length - 1) / 5),
+		16)));
 	}
 
 	private Coord itemc(int i) {

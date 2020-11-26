@@ -692,7 +692,7 @@ public class CharWnd extends Window {
 		    super.set(a);
 		    study.locked = a;
 		}
-	    }, 5, 70);
+	    }, UI.scale(5, 105));
 	}
 
 	private void upd() {
