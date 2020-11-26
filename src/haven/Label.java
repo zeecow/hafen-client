@@ -32,6 +32,7 @@ public class Label extends Widget {
     Text.Foundry f;
     Text text;
     String texts;
+    public String original;
     Color col = Color.WHITE;
 	
     @RName("lbl")
@@ -50,6 +51,7 @@ public class Label extends Widget {
 	
     public Label(String text, int w, Text.Foundry f) {
 	super(Coord.z);
+	text = i10n(text);
 	this.f = f;
 	this.text = f.renderwrap(texts = text, this.col, w);
 	sz = this.text.sz();
@@ -58,6 +60,7 @@ public class Label extends Widget {
     public Label(String text, Text.Foundry f) {
 	super(Coord.z);
 	this.f = f;
+	text = i10n(text);
 	this.text = f.render(texts = text, this.col);
 	sz = this.text.sz();
     }
@@ -71,6 +74,7 @@ public class Label extends Widget {
     }
 	
     public void settext(String text) {
+	text = i10n(text);
 	this.text = f.render(texts = text, col);
 	sz = this.text.sz();
     }
@@ -91,5 +95,33 @@ public class Label extends Widget {
 	} else {
 	    super.uimsg(msg, args);
 	}
+    }
+    
+    
+    private String i10n(String text) {
+	original = text;
+	return i10n ? L10N.label(text) : text;
+    }
+    
+    public static class Untranslated extends Label {
+    
+	public Untranslated(String text, int w, Text.Foundry f) {
+	    super(text, w, f);
+	}
+    
+	public Untranslated(String text, Text.Foundry f) {
+	    super(text, f);
+	}
+    
+	public Untranslated(String text, int w) {
+	    super(text, w, Text.std);
+	}
+    
+	public Untranslated(String text) {
+	    super(text, Text.std);
+	}
+	
+	@Override
+	protected boolean i10n() {return false;}
     }
 }

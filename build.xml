@@ -86,6 +86,7 @@
       <file file="etc/radar.xml"/>
       <file file="etc/gob_path.json"/>
       <file file="etc/gob_radius.json"/>
+      <fileset dir="." includes="i10n/*.json"/>
     </jar>
     <copy file="lib/builtin-res.jar" todir="build"/>
     <copy file="lib/hafen-res.jar" todir="build"/>

@@ -606,6 +606,9 @@ public class CharWnd extends Window {
                 c = oc.add(-sz.x, 0);
             }
 	}
+    
+	@Override
+	protected boolean i10n() {return false;}
     }
 
     public class ExpLabel extends RLabel {

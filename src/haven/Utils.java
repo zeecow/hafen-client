@@ -32,6 +32,7 @@ import java.nio.*;
 import java.net.URL;
 import java.lang.ref.*;
 import java.lang.reflect.*;
+import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.prefs.*;
 import java.util.*;
@@ -1828,8 +1829,17 @@ public class Utils {
     }
 
     public static String stream2str(InputStream is) {
-	Scanner s = new Scanner(is).useDelimiter("\\A");
-	return s.hasNext() ? s.next() : "";
+	StringBuilder buffer = new StringBuilder();
+	BufferedReader in = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8));
+	String line;
+    
+	try {
+	    while ((line = in.readLine()) != null) {
+		buffer.append(line);
+	    }
+	} catch (IOException ignored) {
+	}
+	return buffer.toString();
     }
 
     public static Color hex2color(String hex, Color def){

@@ -265,6 +265,9 @@ public class KeyBinder {
 	public ShortcutWidget(KeyBind bind, Action2<KeyBind, KeyBind> update, String label) {
 	    btn = add(new Button(UI.scale(75), bind.shortcut()) {
 		  @Override
+		  protected boolean i10n() { return false; }
+	    
+		  @Override
 		  public void click() {
 		      ui.root.add(new ShortcutSelectorWdg(keyBind, ShortcutWidget.this), ui.mc.sub(50, 20));
 		  }

@@ -138,7 +138,7 @@ public class OptWnd extends Window {
 		    });
 		composer.add(new Label("Render scale"));
 		{
-		    Label dpy = new Label("");
+		    Label dpy = new Label.Untranslated("");
 		    final int steps = 4;
 		    composer.addr(
 			new HSlider(UI.scale(160), -2 * steps, 2 * steps, (int)Math.round(steps * Math.log(prefs.rscale.val) / Math.log(2.0f))) {
@@ -178,7 +178,7 @@ public class OptWnd extends Window {
 		    });
 		composer.add(new Label("Framerate limit (active window)"));
 		{
-		    Label dpy = new Label("");
+		    Label dpy = new Label.Untranslated("");
 		    final int max = 250;
 		    composer.addr(
 			    new HSlider(UI.scale(160), 1, max, (prefs.hz.val == Float.POSITIVE_INFINITY) ? max : prefs.hz.val.intValue()) {
@@ -187,7 +187,7 @@ public class OptWnd extends Window {
 			    }
 			    void dpy() {
 				if(this.val == max)
-				    dpy.settext("None");
+				    dpy.settext("∞");
 				else
 				    dpy.settext(Integer.toString(this.val));
 			    }
@@ -209,7 +209,7 @@ public class OptWnd extends Window {
 		}
 		composer.add(new Label("Framerate limit (background window)"));
 		{
-		    Label dpy = new Label("");
+		    Label dpy = new Label.Untranslated("");
 		    final int max = 250;
 		    composer.addr(
 			    new HSlider(UI.scale(160), 1, max, (prefs.bghz.val == Float.POSITIVE_INFINITY) ? max : prefs.bghz.val.intValue()) {
@@ -218,7 +218,7 @@ public class OptWnd extends Window {
 			    }
 			    void dpy() {
 				if(this.val == max)
-				    dpy.settext("None");
+				    dpy.settext("∞");
 				else
 				    dpy.settext(Integer.toString(this.val));
 			    }
@@ -311,7 +311,7 @@ public class OptWnd extends Window {
 		*/
 		composer.add(new Label("UI scale (requires restart)"));
 		{
-		    Label dpy = new Label("");
+		    Label dpy = new Label.Untranslated("");
 		    final double smin = 1, smax = Math.floor(UI.maxscale() / 0.25) * 0.25;
 		    final int steps = (int)Math.round((smax - smin) / 0.25);
 		    composer.addr(
@@ -475,7 +475,10 @@ public class OptWnd extends Window {
 		}
 		return(super.handle(ev));
 	    }
-
+	    
+	    @Override
+	    protected boolean i10n() { return false; }
+	    
 	    public Object tooltip(Coord c, Widget prev) {
 		return(kbtt.tex());
 	    }
@@ -767,7 +770,7 @@ public class OptWnd extends Window {
 	y += STEP;
 	Label label = general.add(new Label(String.format("Auto pickup radius: %.2f", CFG.AUTO_PICK_RADIUS.get() / 11.0)), x, y);
 	y += UI.scale(15);
-	general.add(new CFGHSlider(UI.scale(120), CFG.AUTO_PICK_RADIUS, 33, 88) {
+	general.add(new CFGHSlider(UI.scale(150), CFG.AUTO_PICK_RADIUS, 33, 88) {
 	    @Override
 	    public void changed() {
 		label.settext(String.format("Auto pickup radius: %.02f", val / 11.0));
@@ -775,7 +778,7 @@ public class OptWnd extends Window {
 	}, x, y);
     
 	y += UI.scale(35);
-	general.add(new Button(UI.scale(120), "Toggle at login") {
+	general.add(new Button(UI.scale(150), "Toggle at login") {
 	    @Override
 	    public void click() {
 		if(ui.gui != null) {
@@ -858,7 +861,7 @@ public class OptWnd extends Window {
 	display.add(new CFGBox("Show object radius", CFG.SHOW_GOB_RADIUS, "Shows radius of mine supports, beehives etc.", true), x, y);
 
 	y += STEP;
-	display.add(new Button(UI.scale(120), "Show as buffs") {
+	display.add(new Button(UI.scale(150), "Show as buffs") {
 	    @Override
 	    public void click() {
 		if(ui.gui != null) {

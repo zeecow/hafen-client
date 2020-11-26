@@ -53,6 +53,7 @@ public class Widget {
     private Widget prevtt;
     static Map<String, Factory> types = new TreeMap<String, Factory>();
     private final List<Subscription> subscriptions = new ArrayList<>();
+    protected final boolean i10n = i10n();
 
     @dolda.jglob.Discoverable
     @Target(ElementType.TYPE)
@@ -1481,6 +1482,8 @@ public class Widget {
 	    }
 	}
     }
+    
+    protected boolean i10n() {return true;}
     
     public void listen(String event, Action1<Reactor.Event> callback) {
 	subscriptions.add(Reactor.listen(event, callback));
