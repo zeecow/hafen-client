@@ -1128,6 +1128,7 @@ public class Resource implements Serializable {
     @LayerName("action")
     public class AButton extends Layer {
 	public final String name;
+	public final String original;
 	public final Named parent;
 	public final char hk;
 	public final String[] ad;
@@ -1144,7 +1145,8 @@ public class Resource implements Serializable {
 		    throw(new LoadException("Illegal resource dependency", e, Resource.this));
 		}
 	    }
-	    name = buf.string();
+	    original = buf.string();
+	    name = L10N.action(getres(), original);
 	    buf.string(); /* Prerequisite skill */
 	    hk = (char)buf.uint16();
 	    ad = new String[buf.uint16()];
