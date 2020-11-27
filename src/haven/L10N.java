@@ -24,7 +24,8 @@ public class L10N {
     
     enum Bundle {
 	BUTTON("button"),
-	LABEL("label", true);
+	LABEL("label", true),
+	FLOWER("flower", true);
 	
 	public final String name;
 	public final boolean useMatch;
@@ -63,12 +64,8 @@ public class L10N {
 	return process(Bundle.LABEL, text);
     }
     
-    public static String process(Bundle bundle, Resource key, String def) {
-	Map<String, String> map = simple.get(bundle);
-	if(map == null || key == null)
-	    return def;
-	String ll = map.get(key.name);
-	return ll != null ? ll : def;
+    public static String flower(String text) {
+	return process(Bundle.FLOWER, text);
     }
     
     private static final Pattern tmp = Pattern.compile("^\\d+$");
