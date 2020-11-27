@@ -121,9 +121,11 @@ public class L10N {
 	    result = map.get(key);
 	}
 	if(DBG && result == null) {
-	    String tmp = key.replaceAll("[()\\[\\]]", "\\\\$0");
-	    MISSING.get(bundle).put(tmp, def);
-	    Config.saveFile("MISSING_TRANSLATIONS.json", GSON_OUT.toJson(MISSING));
+	    synchronized (MISSING){
+	    	String tmp = key.replaceAll("[()\\[\\]]", "\\\\$0");
+	    	MISSING.get(bundle).put(tmp, def);
+	    	Config.saveFile("MISSING_TRANSLATIONS.json", GSON_OUT.toJson(MISSING));
+	    }
 	}
 	return result != null ? result : def;
     }
