@@ -24,6 +24,7 @@ public class L10N {
     
     enum Bundle {
 	BUTTON("button"),
+	PAGINA("pagina"),
 	LABEL("label", true),
 	FLOWER("flower", true);
 
@@ -68,6 +69,10 @@ public class L10N {
 	return process(Bundle.FLOWER, text);
     }
 
+    public static String pagina(Resource res, String def) {
+	return process(Bundle.PAGINA, res.name, def);
+    }
+    
     public static String process(Bundle bundle, String key) {
 	return process(bundle, key, key);
     }
