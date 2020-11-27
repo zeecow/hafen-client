@@ -52,7 +52,7 @@
     <mkdir dir="resources/classes" />
     <javac srcdir="resources/java" destdir="resources/classes" debug="on" source="1.8" target="1.8" includeantruntime="no">
       <classpath>
-        <pathelement path="build/hafen.jar" />
+        <pathelement path="build/classes" />
       </classpath>
       <compilerarg value="-Xlint:unchecked" />
       <compilerarg value="-Xlint:-options" />
