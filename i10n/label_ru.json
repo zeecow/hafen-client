@@ -37,7 +37,7 @@
 	"Framerate limit \\(active window\\)": "Ограничение частоты кадров (активное окно)",
 	"Framerate limit \\(background window\\)": "Ограничение частоты кадров (фоновое окно)",
 	"Groups:": "Группы:",
-	"Identity is saved for (.*)": "Войти как %s",
+	"Identity is saved for ": "Войти как ",
 	"In-game event volume": "Звук игровыз событий",
 	"Increase speed": "Увеличить скорость",
 	"Input:": "Ингридиенты:",

@@ -145,7 +145,7 @@ public class LoginScreen extends Widget {
 		
 	private Tokenbox(String username, String token) {
 	    super(UI.scale(250, 100));
-	    adda(new Label("Identity is saved for " + username, textfs), pos("cmid").y(0), 0.5, 0.0);
+	    adda(new Label.Untranslated(L10N.label("Identity is saved for ") + username, textfs), pos("cmid").y(0), 0.5, 0.0);
 	    adda(btn = new Button(UI.scale(100), "Forget me"), pos("cmid"), 0.5, 0.5);
 	    LoginScreen.this.adda(this, bgc.adds(0, 30), 0.5, 0.0);
 	    this.name = username;
