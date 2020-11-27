@@ -23,7 +23,7 @@ public class Ingredient extends ItemInfo.Tip {
 	    int a = 1;
 	    String name;
 	    if(args[a] instanceof String) {
-		name = (String)args[a++];
+		name = L10N.ingredient((String)args[a++]);
 	    } else if(args[1] instanceof Integer) {
 		Indir<Resource> res = owner.context(Resource.Resolver.class).getres((Integer)args[a++]);
 		Message sdt = Message.nil;
@@ -73,6 +73,6 @@ public class Ingredient extends ItemInfo.Tip {
     public String descr() {
 	if(val == null)
 	    return L10N.ingredient(name);
-	return(String.format("%s (%d%%)", L10N.ingredient(name), (int)Math.floor(val * 100.0)));
+	return(String.format("%s (%d%%)", name, (int)Math.floor(val * 100.0)));
     }
 }
