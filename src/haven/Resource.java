@@ -1023,7 +1023,7 @@ public class Resource implements Serializable {
 	public final String t;
                 
 	public Tooltip(Message buf) {
-	    t = new String(buf.bytes(), Utils.utf8);
+	    t = L10N.tooltip(getres(), new String(buf.bytes(), Utils.utf8));
 	}
                 
 	public void init() {}

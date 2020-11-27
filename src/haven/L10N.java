@@ -75,6 +75,10 @@ public class L10N {
     public static String tooltip(String text) {
 	return process(Bundle.TOOLTIP, text);
     }
+
+    public static String tooltip(Resource res, String def) {
+	return process(Bundle.TOOLTIP, res.name, def);
+    }
     
     public static String ingredient(String text) {
 	return process(Bundle.INGREDIENT, text);
