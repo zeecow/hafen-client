@@ -26,10 +26,10 @@ public class L10N {
 	BUTTON("button"),
 	LABEL("label", true),
 	FLOWER("flower", true);
-	
+
 	public final String name;
 	public final boolean useMatch;
-	
+
 	Bundle(String name, boolean useMatch) {
 	    this.name = name;
 	    this.useMatch = useMatch;
@@ -59,21 +59,23 @@ public class L10N {
     public static String button(String text) {
 	return process(Bundle.BUTTON, text);
     }
-    
+
     public static String label(String text) {
 	return process(Bundle.LABEL, text);
     }
-    
+
     public static String flower(String text) {
 	return process(Bundle.FLOWER, text);
     }
-    
-    private static final Pattern tmp = Pattern.compile("^\\d+$");
-    
+
     public static String process(Bundle bundle, String key) {
+	return process(bundle, key, key);
+    }
+
+    public static String process(Bundle bundle, String key, String def) {
 	String result = null;
 	if(key == null || key.isEmpty() || language == Language.EN) {
-	    return key;
+	    return def;
 	}
 	if(bundle.useMatch) {
 	    Map<Pattern, String> patterns = match.get(bundle);
@@ -86,20 +88,20 @@ public class L10N {
 		    values[i] = m.group(i + 1);
 		}
 		result = String.format(format, values);
-		if(DBG) System.out.printf("[%s] '%s' => '%s'%n", bundle, key, result);
 	    }
 	} else {
 	    Map<String, String> map = simple.get(bundle);
 	    if(map == null) {
-		return key;
+		return def;
 	    }
 	    result = map.get(key);
 	}
 	if(DBG && result == null) {
 	    MISSING.get(bundle).put(key, key);
+	    if(DBG) System.out.printf("Missing [%s]\t'%s'%n", bundle, key);
 	    Config.saveFile("MISSING_TRANSLATIONS.json", GSON_OUT.toJson(MISSING));
 	}
-	return result != null ? result : key;
+	return result != null ? result : def;
     }
     
     private static Map<String, String> loadSimple(Bundle bundle) {
