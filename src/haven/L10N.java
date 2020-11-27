@@ -107,8 +107,8 @@ public class L10N {
 	    result = map.get(key);
 	}
 	if(DBG && result == null) {
-	    MISSING.get(bundle).put(key, def);
-	    if(DBG) System.out.printf("Missing [%s]\t'%s'%n", bundle, key);
+	    String tmp = key.replaceAll("[()\\[\\]]", "\\\\$0");
+	    MISSING.get(bundle).put(tmp, def);
 	    Config.saveFile("MISSING_TRANSLATIONS.json", GSON_OUT.toJson(MISSING));
 	}
 	return result != null ? result : def;
