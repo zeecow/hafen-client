@@ -26,6 +26,7 @@ public class L10N {
 	BUTTON("button"),
 	PAGINA("pagina"),
 	ACTION("action"),
+	TOOLTIP("tooltip"),
 	INGREDIENT("ingredient"),
 	LABEL("label", true),
 	FLOWER("flower", true);
@@ -71,6 +72,14 @@ public class L10N {
 	return process(Bundle.FLOWER, text);
     }
 
+    public static String tooltip(String text) {
+	return process(Bundle.TOOLTIP, text);
+    }
+    
+    public static String ingredient(String text) {
+	return process(Bundle.INGREDIENT, text);
+    }
+    
     public static String pagina(Resource res, String def) {
 	return process(Bundle.PAGINA, res.name, def);
     }
@@ -78,12 +87,12 @@ public class L10N {
     public static String action(Resource res, String def) {
 	return process(Bundle.ACTION, res.name, def);
     }
-    
-    public static String process(Bundle bundle, String key) {
+
+    private static String process(Bundle bundle, String key) {
 	return process(bundle, key, key);
     }
 
-    public static String process(Bundle bundle, String key, String def) {
+    private static String process(Bundle bundle, String key, String def) {
 	String result = null;
 	if(key == null || key.isEmpty() || language == Language.EN) {
 	    return def;
@@ -98,7 +107,7 @@ public class L10N {
 		for (int i = 0; i < k; i++) {
 		    String value = m.group(i + 1);
 		    if(value.matches("[\\w\\s]+") && !value.matches("[\\d]+")) {
-			value = process(Bundle.INGREDIENT, value);
+			value = ingredient(value);
 		    }
 		    values[i] = value;
 		}

@@ -49,7 +49,7 @@ public class Ingredient extends ItemInfo.Tip {
 	public BufferedImage tipimg() {
 	    StringBuilder buf = new StringBuilder();
 	    all.sort(Comparator.comparing(a -> a.name));
-	    buf.append("Made from ");
+	    buf.append(L10N.tooltip("Made from "));
 	    buf.append(all.get(0).descr());
 	    if(all.size() > 2) {
 		for(int i = 1; i < all.size() - 1; i++) {
@@ -58,7 +58,7 @@ public class Ingredient extends ItemInfo.Tip {
 		}
 	    }
 	    if(all.size() > 1) {
-		buf.append(" and ");
+		buf.append(L10N.tooltip(" and "));
 		buf.append(all.get(all.size() - 1).descr());
 	    }
 	    return(RichText.render(buf.toString(), 250).img);
@@ -72,7 +72,7 @@ public class Ingredient extends ItemInfo.Tip {
 
     public String descr() {
 	if(val == null)
-	    return(name);
-	return(String.format("%s (%d%%)", name, (int)Math.floor(val * 100.0)));
+	    return L10N.ingredient(name);
+	return(String.format("%s (%d%%)", L10N.ingredient(name), (int)Math.floor(val * 100.0)));
     }
 }
