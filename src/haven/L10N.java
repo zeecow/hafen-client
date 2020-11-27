@@ -26,6 +26,7 @@ public class L10N {
 	BUTTON("button"),
 	PAGINA("pagina"),
 	ACTION("action"),
+	INGREDIENT("ingredient"),
 	LABEL("label", true),
 	FLOWER("flower", true);
 
@@ -95,7 +96,11 @@ public class L10N {
 		int k = m.groupCount();
 		Object[] values = new Object[k];
 		for (int i = 0; i < k; i++) {
-		    values[i] = m.group(i + 1);
+		    String value = m.group(i + 1);
+		    if(value.matches("[\\w\\s]+") && !value.matches("[\\d]+")) {
+			value = process(Bundle.INGREDIENT, value);
+		    }
+		    values[i] = value;
 		}
 		result = String.format(format, values);
 	    }
