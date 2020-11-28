@@ -2121,6 +2121,9 @@ public class CharWnd extends Window {
                                 cexp = exp;
                             }
                         }
+			
+                        @Override
+			protected boolean i10n() { return true; }
                     });
                 }
 
