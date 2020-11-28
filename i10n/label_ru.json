@@ -11,6 +11,7 @@
 	"Auto pickup radius: (.*)": "Радиус автоподбора: $1",
 	"Base Attributes": "Базовые Атрибуты",
 	"Belt": "Пояс",
+	"Born to (.*) and (.*)": "Родители: @1 и @2",
 	"Brighten view": "Сделать ярче",
 	"CPU-sequential": "CPU-последовательно",
 	"Camera control": "Управление камерой",

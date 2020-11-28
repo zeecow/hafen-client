@@ -12,6 +12,8 @@ import java.util.regex.Pattern;
 
 public class L10N {
     public static final Language language = Language.RU;
+    private static final String SUBSTITUTE_TRANSLATED = "(?<!\\\\)\\$(%d)";
+    private static final String SUBSTITUTE_DIRECT = "(?<!\\\\)\\@(%d)";
     
     enum Language {
 	EN("en"),
@@ -126,7 +128,11 @@ public class L10N {
 		int k = m.groupCount();
 		result = format;
 		for (int i = 1; i <= k; i++) {
-		    result = result.replaceAll(String.format("(?<!\\\\)\\$(%d)", i), ingredient(m, i));
+		    result = result.replaceAll(String.format(SUBSTITUTE_DIRECT, i), m.group(i));
+		    String regex = String.format(SUBSTITUTE_TRANSLATED, i);
+		    if(result.matches(regex)) {
+			result = result.replaceAll(regex, ingredient(m, i));
+		    }
 		}
 	    }
 	} else {
