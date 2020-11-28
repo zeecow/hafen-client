@@ -109,6 +109,10 @@ public class Text {
         
     public static abstract class Furnace {
 	public abstract Text render(String text);
+    
+	public Text i10n_label(String text) {
+	    return render(L10N.label(text));
+	}
 
 	public Text renderf(String fmt, Object... args) {
 	    return(render(String.format(fmt, args)));
@@ -310,6 +314,10 @@ public class Text {
 	
     public static Line render(String text) {
 	return(render(text, Color.WHITE));
+    }
+    
+    public static Text i10n_label(String text) {
+	return render(L10N.label(text));
     }
 	
     public Tex tex() {

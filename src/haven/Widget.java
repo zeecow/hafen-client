@@ -27,6 +27,7 @@
 package haven;
 
 import haven.rx.Reactor;
+import me.ender.Reflect;
 import rx.Subscription;
 import rx.functions.Action0;
 import rx.functions.Action1;
@@ -1302,7 +1303,11 @@ public class Widget {
 	private KeyMatch rkey = null;
 
 	public KeyboundTip(String base) {
-	    this.base = base;
+	    this(base, true);
+	}
+    
+	public KeyboundTip(String base, boolean i10n) {
+	    this.base = i10n ? L10N.label(base) : base;
 	}
 
 	public KeyboundTip() {
@@ -1360,7 +1365,7 @@ public class Widget {
     }
 
     public Widget settip(String text) {
-	tooltip = new KeyboundTip(text);
+	tooltip = new KeyboundTip(text, !Reflect.is(this, "Pointer"));
 	return(this);
     }
     

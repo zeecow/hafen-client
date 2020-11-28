@@ -134,9 +134,13 @@ public class L10N {
 	    if(map == null) {
 		return def;
 	    }
-	    result = map.get(key);
+	    if(map.containsKey(key)) {
+		result = map.get(key);
+	    } else if(bundle == Bundle.TOOLTIP) {
+		result = process(Bundle.ACTION, key, null);
+	    }
 	}
-	if(DBG && result == null) {
+	if(DBG && result == null && def != null) {
 	    synchronized (MISSING) {
 		String tmp = key.replaceAll("[()\\[\\]]", "\\\\$0");
 		MISSING.get(bundle).put(tmp, def);
