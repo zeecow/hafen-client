@@ -184,13 +184,19 @@ public class L10N {
 	    }
 	}
 	if(DBG && result == null && def != null) {
-	    synchronized (MISSING) {
-		String tmp = key.replaceAll("[()\\[\\]]", "\\\\$0");
-		MISSING.get(bundle).put(tmp, def);
-		Config.saveFile("MISSING_TRANSLATIONS.json", GSON_OUT.toJson(MISSING));
-	    }
+	    reportMissing(bundle, key, def);
 	}
 	return result != null ? result : def;
+    }
+    
+    private static void reportMissing(Bundle bundle, String key, String def) {
+	synchronized (MISSING) {
+	    key = key.replaceAll("[()\\[\\]]", "\\\\$0");
+	    Map<String, String> missingBundle = MISSING.get(bundle);
+	    missingBundle.put(key, def);
+	    String file = String.format("i10n/%s/missing/%s.json", language, bundle.name);
+	    Config.saveFile(file, GSON_OUT.toJson(missingBundle));
+	}
     }
     
     private static Map<String, String> loadSimple(Bundle bundle) {
