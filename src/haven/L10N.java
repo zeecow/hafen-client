@@ -83,7 +83,15 @@ public class L10N {
     public static String ingredient(String text) {
 	return process(Bundle.INGREDIENT, text);
     }
-    
+
+    private static String ingredient(Matcher m, int g) {
+	String value = m.group(g);
+	if(value.matches("[\\w\\s]+") && !value.matches("[\\d]+")) {
+	    return ingredient(value);
+	}
+	return value;
+    }
+
     public static String pagina(Resource res, String def) {
 	return process(Bundle.PAGINA, res.name, def);
     }
@@ -107,15 +115,10 @@ public class L10N {
 	    if(m != null) {
 		String format = patterns.get(m.pattern());
 		int k = m.groupCount();
-		Object[] values = new Object[k];
-		for (int i = 0; i < k; i++) {
-		    String value = m.group(i + 1);
-		    if(value.matches("[\\w\\s]+") && !value.matches("[\\d]+")) {
-			value = ingredient(value);
-		    }
-		    values[i] = value;
+		result = format;
+		for (int i = 1; i <= k; i++) {
+		    result = result.replaceAll(String.format("(?<!\\\\)\\$(%d)", i), ingredient(m, i));
 		}
-		result = String.format(format, values);
 	    }
 	} else {
 	    Map<String, String> map = simple.get(bundle);
