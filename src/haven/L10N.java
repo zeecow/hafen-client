@@ -207,7 +207,11 @@ public class L10N {
 	Map<String, String> tmp = loadSimple(bundle);
 	HashMap<Pattern, String> map = new HashMap<>();
 	for (Map.Entry<String, String> e : tmp.entrySet()) {
-	    map.put(Pattern.compile(String.format("^%s$", e.getKey())), e.getValue());
+	    try {
+		map.put(Pattern.compile(String.format("^%s$", e.getKey())), e.getValue());
+	    } catch (Exception error) {
+		error.printStackTrace();
+	    }
 	}
 	return map;
     }
