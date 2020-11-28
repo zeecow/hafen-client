@@ -15,8 +15,8 @@ import java.util.stream.Collectors;
 
 public class L10N {
     private static final String DEFAULT_LANGUAGE = "en";
-    private static final String SUBSTITUTE_TRANSLATED = "(?<!\\\\)\\$(%d)";
-    private static final String SUBSTITUTE_DIRECT = "(?<!\\\\)\\@(%d)";
+    private static final String SUBSTITUTE_TRANSLATED = "(?<!\\\\)\\$%d";
+    private static final String SUBSTITUTE_DIRECT = "(?<!\\\\)@(%d)";
     
     public static final List<String> LANGUAGES;
     public static final CFG<String> LANGUAGE = new CFG<>("i10n.language", DEFAULT_LANGUAGE);
@@ -167,7 +167,7 @@ public class L10N {
 		for (int i = 1; i <= k; i++) {
 		    result = result.replaceAll(String.format(SUBSTITUTE_DIRECT, i), m.group(i));
 		    String regex = String.format(SUBSTITUTE_TRANSLATED, i);
-		    if(result.matches(regex)) {
+		    if(result.matches(".*" + regex + ".*")) {//crude way to say 'any match'
 			result = result.replaceAll(regex, ingredient(m, i));
 		    }
 		}
