@@ -937,7 +937,7 @@ public class OptWnd extends Window {
 	}, x, y);
  
 	my = Math.max(my, y);
-	x += UI.scale(250);
+	x += UI.scale(265);
 	y = 0;
 	display.add(new CFGBox("Use new combat UI", CFG.ALT_COMBAT_UI), x, y);
 	

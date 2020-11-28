@@ -26,7 +26,12 @@ public class LoginTogglesCfgWnd extends Window {
 
 	int y = 0;
 	for (BuffToggles.Toggle toggle : BuffToggles.toggles) {
-	    add(new OptWnd.CFGBox(toggle.name, toggle.startup), 0, y);
+	    add(new OptWnd.CFGBox(toggle.name, toggle.startup) {
+		@Override
+		protected boolean i10n() {
+		    return false;
+		}
+	    }, 0, y);
 	    y += 25;
 	}
 

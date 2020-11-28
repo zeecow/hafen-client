@@ -47,7 +47,7 @@ public class CheckBox extends Widget {
     }
 
     public CheckBox(String lbl, boolean lg) {
-	this.lbl = Text.std.render(lbl, java.awt.Color.WHITE);
+	this.lbl = Text.std.render(i10n(lbl), java.awt.Color.WHITE);
 	if(lg) {
 	    box = lbox; mark = lmark;
 	    loff = new Coord(0, this.lbl.sz().y / 2);
@@ -103,5 +103,27 @@ public class CheckBox extends Widget {
 	} else {
 	    super.uimsg(msg, args);
 	}
+    }
+    
+    private String i10n(String text) {
+	return i10n ? L10N.label(text) : text;
+    }
+    
+    public static class Untranslated extends CheckBox {
+	
+	public static class $_ implements Factory {
+	    public Widget create(UI ui, Object[] args) {
+		CheckBox ret = new Untranslated((String)args[0]);
+		ret.canactivate = true;
+		return(ret);
+	    }
+	}
+    
+	public Untranslated(String lbl, boolean lg) {super(lbl, lg);}
+    
+	public Untranslated(String text) { super(text); }
+	
+	@Override
+	protected boolean i10n() {return false;}
     }
 }

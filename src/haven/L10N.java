@@ -77,6 +77,10 @@ public class L10N {
 	return process(Bundle.TOOLTIP, text);
     }
     
+    public static String tooltip(String text, String def) {
+	return process(Bundle.TOOLTIP, text, def);
+    }
+    
     public static String tooltip(Resource res, String def) {
 	return process(Bundle.TOOLTIP, res.name, def);
     }
