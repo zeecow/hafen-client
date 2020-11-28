@@ -431,7 +431,7 @@ public class BuddyWnd extends Widget implements Iterable<BuddyWnd.Buddy> {
 	super(new Coord(width, height));
 	setfocustab(true);
 	Composer composer = new Composer(this).vmrgn(margin1).hmrgn(margin1);
-        composer.add(new Img(CharWnd.catf.render("Kin").tex()));
+        composer.add(new Img(CharWnd.catf.render(L10N.label("Kin")).tex()));
 
 	bl = new BuddyList(sz.x - Window.wbox.bisz().x, 7);
         composer.add(bl, Window.wbox.btloff().x);
