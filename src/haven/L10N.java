@@ -194,21 +194,13 @@ public class L10N {
     }
     
     private static Map<String, String> loadSimple(Bundle bundle) {
-	if(isDefaultLanguage()) { return new HashMap<>(); }
-    
-	String json = Config.loadFile(String.format("i10n/%s/%s.json", language, bundle.name));
-    
-	Map<String, String> map = null;
-	if(json != null) {
-	    try {
-		Gson gson = new GsonBuilder().create();
-		map = gson.fromJson(json, new TypeToken<Map<String, String>>() {
-		}.getType());
-		
-	    } catch (JsonSyntaxException ignored) {}
+	Map<String, String> map = new HashMap<>();
+	if(!isDefaultLanguage()) {
+	    String name = String.format("i10n/%s/%s.json", language, bundle.name);
+	    map.putAll(parseJSON(Config.loadJarFile(name)));
+	    map.putAll(parseJSON(Config.loadFSFile(name)));
 	}
-	
-	return map == null ? new HashMap<>() : map;
+	return map;
     }
     
     private static Map<Pattern, String> loadMatch(Bundle bundle) {
@@ -218,5 +210,19 @@ public class L10N {
 	    map.put(Pattern.compile(String.format("^%s$", e.getKey())), e.getValue());
 	}
 	return map;
+    }
+    
+    private static Map<String, String> parseJSON(String json) {
+	Map<String, String> map = null;
+	if(json != null) {
+	    try {
+		Gson gson = new GsonBuilder().create();
+		map = gson.fromJson(json, new TypeToken<Map<String, String>>() {
+		}.getType());
+		
+	    } catch (JsonSyntaxException ignored) {
+	    }
+	}
+	return map == null ? new HashMap<>() : map;
     }
 }
