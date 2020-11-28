@@ -105,6 +105,15 @@ public class Label extends Widget {
     
     public static class Untranslated extends Label {
     
+	public static class $_ implements Factory {
+	    public Widget create(UI ui, Object[] args) {
+		if(args.length > 1)
+		    return(new Untranslated((String)args[0], UI.scale((Integer)args[1])));
+		else
+		    return(new Untranslated((String)args[0]));
+	    }
+	}
+        
 	public Untranslated(String text, int w, Text.Foundry f) {
 	    super(text, w, f);
 	}

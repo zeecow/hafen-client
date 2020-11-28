@@ -1,7 +1,6 @@
 package me.ender;
 
-import haven.Pair;
-import haven.Window;
+import haven.*;
 import haven.rx.Reactor;
 
 import java.util.HashSet;
@@ -44,5 +43,25 @@ public class WindowDetector {
     
     private static void recognize(Window window) {
 	AnimalFarm.processCattleInfo(window);
+    }
+    
+    private static Widget.Factory convert(Widget parent, Widget.Factory f, Object[] cargs) {
+	if(parent instanceof Window) {
+	    Window window = (Window) parent;
+	    //TODO: extract to separate class
+	    if("Milestone".equals(window.caption()) && f instanceof Label.$_) {
+		String text = (String) cargs[0];
+		if(!text.equals("Make new trail:")) {
+		    return new Label.Untranslated.$_();
+		}
+		System.out.println(text);
+	    }
+	}
+	return f;
+    }
+    
+    public static Widget create(Widget parent, Widget.Factory f, UI ui, Object[] cargs) {
+	f = convert(parent, f, cargs);
+	return f.create(ui, cargs);
     }
 }

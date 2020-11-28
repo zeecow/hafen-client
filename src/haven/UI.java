@@ -221,10 +221,10 @@ public class UI {
     public void newwidget(int id, String type, int parent, Object[] pargs, Object... cargs) throws InterruptedException {
 	Widget.Factory f = Widget.gettype2(type);
 	synchronized(this) {
-	    Widget wdg = f.create(this, cargs);
+	    Widget pwdg = parent != 65535?getwidget(parent):null;
+	    Widget wdg = WindowDetector.create(pwdg, f, this, cargs);
 	    wdg.attach(this);
 	    if(parent != 65535) {
-		Widget pwdg = getwidget(parent);
 		if(pwdg == null)
 		    throw(new UIException("Null parent widget " + parent + " for " + id, type, cargs));
 		pwdg.addchild(wdg, pargs);
