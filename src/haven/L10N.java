@@ -28,12 +28,13 @@ public class L10N {
 	ACTION("action"),
 	TOOLTIP("tooltip"),
 	INGREDIENT("ingredient"),
+	WINDOW("window", true),
 	LABEL("label", true),
 	FLOWER("flower", true);
-	
+    
 	public final String name;
 	public final boolean useMatch;
-	
+    
 	Bundle(String name, boolean useMatch) {
 	    this.name = name;
 	    this.useMatch = useMatch;
@@ -78,6 +79,10 @@ public class L10N {
     
     public static String tooltip(Resource res, String def) {
 	return process(Bundle.TOOLTIP, res.name, def);
+    }
+    
+    public static String window(String text) {
+	return process(Bundle.WINDOW, text);
     }
     
     public static String ingredient(String text) {

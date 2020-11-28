@@ -93,6 +93,7 @@ public class Window extends Widget implements DTarget {
     protected WidgetCfg cfg = null;
     public boolean justclose = false;;
     private final Collection<Widget> twdgs = new LinkedList<Widget>();
+    private String title;
 
     @RName("wnd")
     public static class $_ implements Factory {
@@ -156,15 +157,17 @@ public class Window extends Widget implements DTarget {
     }
 
     public void chcap(String cap) {
-	if(cap == null)
+	title = cap;
+	if(cap == null) {
 	    this.cap = null;
-	else
-	    this.cap = cf.render(cap);
-	cfg = WidgetCfg.get(cap);
+	} else {
+	    this.cap = cf.render(L10N.window(cap));
+	    cfg = WidgetCfg.get(cap);
+	}
     }
 
     public String caption() {
-	return (cap != null) ? cap.text : null;
+	return title;
     }
 
     public void cdraw(GOut g) {
