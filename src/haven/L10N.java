@@ -5,24 +5,22 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.io.File;
+import java.net.URI;
+import java.nio.file.*;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 public class L10N {
-    public static final Language language = Language.RU;
+    private static final String DEFAULT_LANGUAGE = "en";
     private static final String SUBSTITUTE_TRANSLATED = "(?<!\\\\)\\$(%d)";
     private static final String SUBSTITUTE_DIRECT = "(?<!\\\\)\\@(%d)";
     
-    enum Language {
-	EN("en"),
-	RU("ru");
-	
-	public final String name;
-	
-	Language(String name) {this.name = name;}
-    }
+    public static final List<String> LANGUAGES;
+    public static final CFG<String> LANGUAGE = new CFG<>("language", DEFAULT_LANGUAGE);
+    private static final String language = LANGUAGE.get();
     
     enum Bundle {
 	BUTTON("button"),
@@ -53,6 +51,14 @@ public class L10N {
     private final static Map<Bundle, Map<String, String>> MISSING = new HashMap<>();
     
     static {
+	Set<String> set = new LinkedHashSet<>();
+	set.add(DEFAULT_LANGUAGE);
+	List<String> tmp = getJARLanguages();
+	tmp.addAll(getFSLanguages());
+	tmp.sort(String::compareTo);
+	set.addAll(tmp);
+	LANGUAGES = new LinkedList<>(set);
+    
 	for (Bundle bundle : Bundle.values()) {
 	    if(bundle.useMatch) {
 		match.put(bundle, loadMatch(bundle));
@@ -61,6 +67,37 @@ public class L10N {
 	    }
 	    MISSING.put(bundle, new HashMap<>());
 	}
+    }
+    
+    public static boolean isDefaultLanguage() {
+	return DEFAULT_LANGUAGE.equals(language);
+    }
+    
+    private static List<String> getJARLanguages() {
+	try {
+	    URI uri = L10N.class.getResource("/i10n").toURI();
+	    FileSystem fs = FileSystems.newFileSystem(uri, Collections.emptyMap());
+	    return Files.list(fs.getPath("/i10n"))
+		.map(Path::getFileName)
+		.map(Path::toString)
+		.filter(s -> s.endsWith("/"))
+		.map(s -> s.substring(0, s.length() - 1))
+		.collect(Collectors.toList());
+	} catch (Exception ignored) {
+	}
+	return Collections.emptyList();
+    }
+    
+    private static List<String> getFSLanguages() {
+	try {
+	    return Files.list(Paths.get("./i10n/"))
+		.map(Path::toFile)
+		.filter(File::isDirectory)
+		.map(File::getName)
+		.collect(Collectors.toList());
+	} catch (Exception ignored) {
+	}
+	return Collections.emptyList();
     }
     
     public static String button(String text) {
@@ -117,7 +154,7 @@ public class L10N {
     
     private static String process(Bundle bundle, String key, String def) {
 	String result = null;
-	if(key == null || key.isEmpty() || language == Language.EN) {
+	if(key == null || key.isEmpty() || isDefaultLanguage()) {
 	    return def;
 	}
 	if(bundle.useMatch) {
@@ -157,10 +194,10 @@ public class L10N {
     }
     
     private static Map<String, String> loadSimple(Bundle bundle) {
-	if(language == Language.EN) { return new HashMap<>(); }
-	
-	String json = Config.loadFile(String.format("i10n/%s/%s.json", language.name, bundle.name));
-	
+	if(isDefaultLanguage()) { return new HashMap<>(); }
+    
+	String json = Config.loadFile(String.format("i10n/%s/%s.json", language, bundle.name));
+    
 	Map<String, String> map = null;
 	if(json != null) {
 	    try {

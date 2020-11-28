@@ -745,9 +745,36 @@ public class OptWnd extends Window {
     private void initGeneralPanel() {
 	int x = 0;
 	int y = 0, my = 0;
+	int STEP = UI.scale(25);
+    
+	int tx = x + general.add(new Label("Language (requires restart):"), x, y).sz.x + UI.scale(5);
+	general.add(new Dropbox<String>(UI.scale(80), 5, UI.scale(16)) {
+	    @Override
+	    protected String listitem(int i) {
+		return L10N.LANGUAGES.get(i);
+	    }
+	
+	    @Override
+	    protected int listitems() {
+		return L10N.LANGUAGES.size();
+	    }
+	
+	    @Override
+	    protected void drawitem(GOut g, String item, int i) {
+		g.atext(item, UI.scale(3, 8), 0, 0.5);
+	    }
+	
+	    @Override
+	    public void change(String item) {
+		super.change(item);
+		if(!item.equals(L10N.LANGUAGE.get())) L10N.LANGUAGE.set(item);
+	    }
+	}, tx, y).change(L10N.LANGUAGE.get());
+	y += UI.scale(5);
+    
+	y += STEP;
 	general.add(new CFGBox("Store minimap tiles", CFG.STORE_MAP), x, y);
     
-	int STEP = UI.scale(25);
 	y += STEP;
 	general.add(new CFGBox("Store chat logs", CFG.STORE_CHAT_LOGS, "Logs are stored in 'chats' folder"), new Coord(x, y));
     
