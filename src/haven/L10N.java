@@ -159,7 +159,7 @@ public class L10N {
     private static Map<String, String> loadSimple(Bundle bundle) {
 	if(language == Language.EN) { return new HashMap<>(); }
 	
-	String json = Config.loadFile(String.format("i10n/%s_%s.json", bundle.name, language.name));
+	String json = Config.loadFile(String.format("i10n/%s/%s.json", language.name, bundle.name));
 	
 	Map<String, String> map = null;
 	if(json != null) {
