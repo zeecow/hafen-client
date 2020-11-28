@@ -1,64 +1,75 @@
 package haven;
 
-import haven.render.BaseColor;
-import haven.render.RenderTree;
-import haven.render.State;
+import haven.render.*;
 
 import java.awt.*;
-import java.nio.FloatBuffer;
-import java.util.Collection;
+import java.util.*;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static haven.Sprite.*;
 
-public class Hitbox extends GAttrib implements RenderTree.Node {
-    FloatBuffer buff;
-    Pair<Coord, Coord> hitbox;
-    private final State SOLID = new BaseColor(new Color(180, 134, 255, 200));
-    private final State PASSABLE = new BaseColor(new Color(105, 207, 124, 200));
-    private boolean passable = false;
+public class Hitbox extends GAttrib implements RenderTree.Node, Rendered {
+    private static final VertexArray.Layout LAYOUT = new VertexArray.Layout(new VertexArray.Layout.Input(Homo3D.vertex, new VectorFormat(3, NumberFormat.FLOAT32), 0, 0, 12));
+    private final Model model;
+    private static final Map<Resource, Model> MODEL_CACHE = new HashMap<>();
+    private static final float Z = 0.1f;
+    private static final Color SOLID_COLOR = new Color(180, 134, 255, 255);
+    private static final Color PASSABLE_COLOR = new Color(105, 207, 124, 255);
+    private static final float PASSABLE_WIDTH = UI.scale(1f);
+    private static final float SOLID_WIDTH = UI.scale(2f);
+    private static final Pipe.Op TOP = Pipe.Op.compose(Rendered.last, States.Depthtest.none, States.maskdepth);
+    private static final Pipe.Op SOLID = Pipe.Op.compose(new BaseColor(SOLID_COLOR), new States.LineWidth(SOLID_WIDTH));
+    private static final Pipe.Op PASSABLE = Pipe.Op.compose(new BaseColor(PASSABLE_COLOR), new States.LineWidth(PASSABLE_WIDTH));
+    private static final Pipe.Op SOLID_TOP = Pipe.Op.compose(SOLID, TOP);
+    private static final Pipe.Op PASSABLE_TOP = Pipe.Op.compose(PASSABLE, TOP);
+    private Pipe.Op state;
     
-    protected Hitbox(Gob gob) {
+    private Hitbox(Gob gob) {
 	super(gob);
-	
-	hitbox = getBounds(gob);
-	if(hitbox != null) {
-	    Coord a = hitbox.a;
-	    Coord b = hitbox.b;
-
-	    buff = Utils.mkfbuf(3 * 4);
-	    buff.put(a.x).put(-a.y).put(1);
-	    buff.put(a.x).put(-b.y).put(1);
-	    buff.put(b.x).put(-b.y).put(1);
-	    buff.put(b.x).put(-a.y).put(1);
+	model = getModel(gob);
+	updateState();
+    }
+    
+    public static Hitbox forGob(Gob gob) {
+	try {
+	    return new Hitbox(gob);
+	} catch (Loading ignored) { }
+	return null;
+    }
+    
+    @Override
+    public void added(RenderTree.Slot slot) {
+	super.added(slot);
+	slot.ostate(state);
+	updateState();
+    }
+    
+    @Override
+    public void draw(Pipe context, Render out) {
+	if(model != null) {
+	    out.draw(context, model);
 	}
     }
-
-//    public boolean setup(RenderList rl) {
-//	if(hitbox == null) {
-//	    return false;
-//	}
-//	passable = passable();
-//	rl.prepo(passable ? PASSABLE : SOLID);
-//	rl.prepo(States.xray);
-//	return true;
-//    }
-
-//    public void draw(GOut g) {
-//	buff.rewind();
-//	g.apply();
-//	BGL gl = g.gl;
-//	gl.glLineWidth(passable ? 1 : 2);
-//	gl.glEnableClientState(GL2.GL_VERTEX_ARRAY);
-//	gl.glVertexPointer(3, GL2.GL_FLOAT, 0, buff);
-//	gl.glDrawArrays(GL2.GL_LINE_LOOP, 0, 4);
-//	gl.glDisableClientState(GL2.GL_VERTEX_ARRAY);
-//    }
-
+    
+    public void updateState() {
+	if(model != null && slots != null) {
+	    boolean top = CFG.DISPLAY_GOB_HITBOX_TOP.get();
+	    Pipe.Op newState = passable() ? (top ? PASSABLE_TOP : PASSABLE) : (top ? SOLID_TOP : SOLID);
+	    if(newState != state) {
+		state = newState;
+		for (RenderTree.Slot slot : slots) {
+		    slot.ostate(state);
+		}
+	    }
+	}
+    }
+    
     private boolean passable() {
 	try {
 	    Resource res = gob.getres();
 	    String name = res.name;
-
+	    
 	    ResDrawable rd = gob.getattr(ResDrawable.class);
 	    if(rd != null) {
 		MessageBuf sdt = rd.sdt.clone();
@@ -76,27 +87,89 @@ public class Hitbox extends GAttrib implements RenderTree.Node {
 	} catch (Loading ignored) {}
 	return false;
     }
-
-    public static Pair<Coord, Coord> getBounds(Gob gob) {
+    
+    private static Model getModel(Gob gob) {
+	Resource res = getResource(gob);
+	Model model = MODEL_CACHE.get(res);
+	if(model == null) {
+	    List<List<Coord3f>> polygons = new LinkedList<>();
+	    
+	    Collection<Resource.Neg> negs = res.layers(Resource.Neg.class);
+	    if(negs != null) {
+		for (Resource.Neg neg : negs) {
+		    List<Coord3f> box = new LinkedList<>();
+		    box.add(new Coord3f(neg.ac.x, neg.ac.y, Z));
+		    box.add(new Coord3f(neg.bc.x, neg.ac.y, Z));
+		    box.add(new Coord3f(neg.bc.x, neg.bc.y, Z));
+		    box.add(new Coord3f(neg.ac.x, neg.bc.y, Z));
+		    
+		    polygons.add(box);
+		}
+		
+	    }
+	    
+	    Collection<Resource.Obst> obstacles = res.layers(Resource.Obst.class);
+	    if(obstacles != null) {
+		for (Resource.Obst obstacle : obstacles) {
+		    if(!"build".equals(obstacle.id)) {
+			for (Coord2d[] polygon : obstacle.polygons) {
+			    polygons.add(Arrays.stream(polygon)
+				.map(coord2d -> new Coord3f(11 * (float) coord2d.x, 11 * (float) coord2d.y, Z))
+				.collect(Collectors.toList()));
+			}
+		    }
+		}
+	    }
+	    
+	    if(!polygons.isEmpty()) {
+		List<Float> vertices = new LinkedList<>();
+		
+		for (List<Coord3f> polygon : polygons) {
+		    addLoopedVertices(vertices, polygon);
+		}
+		
+		float[] data = convert(vertices);
+		VertexArray.Buffer vbo = new VertexArray.Buffer(data.length * 4, DataBuffer.Usage.STATIC, DataBuffer.Filler.of(data));
+		VertexArray va = new VertexArray(LAYOUT, vbo);
+		
+		model = new Model(Model.Mode.LINES, va, null);
+		
+		MODEL_CACHE.put(res, model);
+	    }
+	}
+	return model;
+    }
+    
+    private static float[] convert(List<Float> list) {
+	float[] ret = new float[list.size()];
+	int i = 0;
+	for (Float value : list) {
+	    ret[i++] = value;
+	}
+	return ret;
+    }
+    
+    private static void addLoopedVertices(List<Float> target, List<Coord3f> vertices) {
+	int n = vertices.size();
+	for (int i = 0; i < n; i++) {
+	    Coord3f a = vertices.get(i);
+	    Coord3f b = vertices.get((i + 1) % n);
+	    Collections.addAll(target, a.x, a.y, a.z);
+	    Collections.addAll(target, b.x, b.y, b.z);
+	}
+    }
+    
+    private static Resource getResource(Gob gob) {
 	Resource res = gob.getres();
 	if(res == null) {throw new Loading();}
-
 	Collection<RenderLink.Res> links = res.layers(RenderLink.Res.class);
-//	for (RenderLink.Res link : links) {
-//	    if(link.mesh != null) {
-//		Resource.Neg neg = link.mesh.get().layer(Resource.Neg.class);
-//		if(neg != null) {
-//		    return new Pair<>(neg.ac, neg.bc);
-//		}
-//	    }
-//	}
-
-	Resource.Neg neg = res.layer(Resource.Neg.class);
-	if(neg == null) {
-	    return null;
+	for (RenderLink.Res link : links) {
+	    if(link.l instanceof RenderLink.MeshMat) {
+		RenderLink.MeshMat mesh = (RenderLink.MeshMat) link.l;
+		return mesh.mesh.get();
+	    }
+	    System.out.println(link);
 	}
-
-	return new Pair<>(neg.ac, neg.bc);
+	return res;
     }
-
 }
