@@ -19,7 +19,8 @@ public class L10N {
     private static final String SUBSTITUTE_DIRECT = "(?<!\\\\)\\@(%d)";
     
     public static final List<String> LANGUAGES;
-    public static final CFG<String> LANGUAGE = new CFG<>("language", DEFAULT_LANGUAGE);
+    public static final CFG<String> LANGUAGE = new CFG<>("i10n.language", DEFAULT_LANGUAGE);
+    public static final CFG<Boolean> DBG = new CFG<>("i10n.debug", false);
     private static final String language = LANGUAGE.get();
     
     enum Bundle {
@@ -46,7 +47,6 @@ public class L10N {
     private final static Map<Bundle, Map<String, String>> simple = new HashMap<>();
     private final static Map<Bundle, Map<Pattern, String>> match = new HashMap<>();
     
-    private static final boolean DBG = true;
     private final static Gson GSON_OUT = new GsonBuilder().setPrettyPrinting().create();
     private final static Map<Bundle, Map<String, String>> MISSING = new HashMap<>();
     
@@ -183,7 +183,7 @@ public class L10N {
 		result = process(Bundle.ACTION, key, null);
 	    }
 	}
-	if(DBG && result == null && def != null) {
+	if(DBG.get() && result == null && def != null) {
 	    reportMissing(bundle, key, def);
 	}
 	return result != null ? result : def;

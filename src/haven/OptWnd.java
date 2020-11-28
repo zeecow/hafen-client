@@ -770,7 +770,9 @@ public class OptWnd extends Window {
 		if(!item.equals(L10N.LANGUAGE.get())) L10N.LANGUAGE.set(item);
 	    }
 	}, tx, y).change(L10N.LANGUAGE.get());
-	y += UI.scale(5);
+    
+	y += STEP;
+	general.add(new CFGBox("Output missing translation lines", L10N.DBG), x, y);
     
 	y += STEP;
 	general.add(new CFGBox("Store minimap tiles", CFG.STORE_MAP), x, y);
