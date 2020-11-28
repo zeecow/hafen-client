@@ -40,7 +40,7 @@ public class Text {
     public static final Font sans  = new Font("Sans", Font.PLAIN, 10);
     public static final Font mono  = new Font("Monospaced", Font.PLAIN, 10);
     //public static final Font fraktur = Resource.local().loadwait("ui/fraktur").layer(Resource.Font.class).font;
-    public static final Font fraktur;
+    public static final Font fraktur = serif;
     public static final Font dfont = sans;
     public static final Foundry std;
     public final BufferedImage img;
@@ -52,14 +52,14 @@ public class Text {
     static {
 	std = new Foundry(sans, 10);
 
-	Font fnt = serif;
-	try {
-	    InputStream stream = Text.class.getResourceAsStream("font.ttf");
-	    fnt = Font.createFont(Font.TRUETYPE_FONT, stream);
-	} catch(FontFormatException ignored) {
-	} catch(IOException ignored) {
-	}
-	fraktur = fnt;
+//	Font fnt = serif;
+//	try {
+//	    InputStream stream = Text.class.getResourceAsStream("font.ttf");
+//	    fnt = Font.createFont(Font.TRUETYPE_FONT, stream);
+//	} catch(FontFormatException ignored) {
+//	} catch(IOException ignored) {
+//	}
+//	fraktur = fnt;
     }
 	
     public static class Line extends Text {
