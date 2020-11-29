@@ -42,7 +42,7 @@ public class Ingredient extends ItemInfo.Tip {
     }
 
     public static class Line extends Tip {
-	final List<Ingredient> all = new ArrayList<Ingredient>();
+	final List<Ingredient> all = new ArrayList<>();
 
 	Line() {super(null);}
 
@@ -61,7 +61,7 @@ public class Ingredient extends ItemInfo.Tip {
 		buf.append(L10N.tooltip(" and "));
 		buf.append(all.get(all.size() - 1).descr());
 	    }
-	    return(RichText.render(buf.toString(), 250).img);
+	    return(RichText.render(buf.toString(), UI.scale(250)).img);
 	}
     }
     public static final Layout.ID<Line> id = Line::new;

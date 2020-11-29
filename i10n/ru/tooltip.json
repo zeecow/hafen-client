@@ -1,6 +1,7 @@
 {
 	" and ": " и ",
 	"Made from ": "Ингредиенты: ",
+	"Smoked with ": "Копчено с: ",
 	"gfx/hud/buffs/boostspeed": "Ускорение",
 	"gfx/hud/buffs/brain": "Есть свободное место в окне обучения.",
 	"gfx/hud/buffs/chasingthedragon": "В погоне за драконом",
@@ -1727,6 +1728,7 @@
 	"gfx/invobjs/wurst-moodog": "Муртаделла",
 	"gfx/invobjs/wurst-piglet": "Свиная колбаска",
 	"gfx/invobjs/wurst-runningrabbit": "Сосиски бегущего кролика",
+	"gfx/invobjs/wurst-s-moodog": "Копченая муртаделла",
 	"gfx/invobjs/wurst-swanneck": "Лебединая шея",
 	"gfx/invobjs/wurst-tamegame": "Приручательный ливер",
 	"gfx/invobjs/wurst-woodking": "Сосиска ",
