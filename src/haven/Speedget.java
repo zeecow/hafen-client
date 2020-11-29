@@ -69,6 +69,7 @@ public class Speedget extends Widget {
     
     @Override
     public void bound() {
+        super.bound();
 	set(SPEED.get());
     }
     
