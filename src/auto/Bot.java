@@ -109,7 +109,7 @@ public class Bot implements Defer.Callable<Void> {
     }
     
     public static void drink(GameUI gui) {
-	findFirstThatContains("Water", HANDS(gui), INVENTORY(gui)).ifPresent(Bot::drink);
+	findFirstThatContains("Water", BELT(gui), HANDS(gui), INVENTORY(gui)).ifPresent(Bot::drink);
     }
     
     public static void drink(WItem item) {
@@ -143,6 +143,10 @@ public class Bot implements Defer.Callable<Void> {
     
     private static Supplier<List<WItem>> INVENTORY(GameUI gui) {
 	return () -> items(gui.maininv);
+    }
+    
+    private static Supplier<List<WItem>> BELT(GameUI gui) {
+	return () -> items(gui.beltinv);
     }
     
     private static Supplier<List<WItem>> HANDS(GameUI gui) {
