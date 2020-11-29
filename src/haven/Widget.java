@@ -55,7 +55,9 @@ public class Widget {
     static Map<String, Factory> types = new TreeMap<String, Factory>();
     private final List<Subscription> subscriptions = new ArrayList<>();
     protected final boolean i10n = i10n();
-    private boolean disposed;
+    private boolean disposed = false;
+    private boolean bound = false;
+    private final List<Action1<Widget>> boundListeners = new LinkedList<>();
     
     @dolda.jglob.Discoverable
     @Target(ElementType.TYPE)
@@ -519,6 +521,7 @@ public class Widget {
     }
 
     public void dispose() {
+	synchronized (boundListeners) {boundListeners.clear();}
         disposed = true;
     }
     
@@ -1414,7 +1417,13 @@ public class Widget {
     }
 
     //called when this widget bound to id
-    public void bound() {}
+    public void bound() {
+	bound = true;
+	synchronized (boundListeners) {
+	    boundListeners.forEach(action -> action.call(this));
+	    boundListeners.clear();
+	}
+    }
 
     public final Collection<Anim> anims = new LinkedList<Anim>();
     public final Collection<Anim> nanims = new LinkedList<Anim>();
@@ -1492,6 +1501,16 @@ public class Widget {
 		    ((Temporary)w).lower();
 		else
 		    optimize(w);
+	    }
+	}
+    }
+    
+    public void  onBound(Action1<Widget> action) {
+	synchronized (boundListeners) {
+	    if(bound) {
+		action.call(this);
+	    } else {
+		boundListeners.add(action);
 	    }
 	}
     }
