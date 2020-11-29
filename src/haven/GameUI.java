@@ -26,6 +26,7 @@
 
 package haven;
 
+import haven.Equipory.SLOTS;
 import haven.rx.BuffToggles;
 import haven.rx.Reactor;
 
@@ -232,7 +233,7 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 	    }, UI.scale(new Coord(10, 10)));
 	buffs = ulpanel.add(new Bufflist(), UI.scale(new Coord(95, 65)));
 	umpanel.add(calendar = new Cal(), Coord.z);
-	eqproxy = add(new EquipProxy(new int[]{6, 7, 11, 5}), new Coord(420, 5));
+	eqproxy = add(new EquipProxy(SLOTS.HAND_LEFT, SLOTS.HAND_RIGHT, SLOTS.BACK, SLOTS.BELT), new Coord(420, 5));
 	filter = add(new FilterWnd());
 	syslog = chat.add(new ChatUI.Log("System"));
 	opts = add(new OptWnd());

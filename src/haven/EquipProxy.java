@@ -7,19 +7,19 @@ import static haven.Inventory.*;
 
 public class EquipProxy extends DraggableWidget implements DTarget2 {
     public static final Color BG_COLOR = new Color(91, 128, 51, 202);
-    private int[] slots;
+    private Equipory.SLOTS[] slots;
     
-    public EquipProxy(int[] slots) {
+    public EquipProxy(Equipory.SLOTS ...slots) {
 	super("EquipProxy");
 	setSlots(slots);
     }
     
-    public void setSlots(int[] slots) {
+    public void setSlots(Equipory.SLOTS ...slots) {
 	this.slots = slots;
 	sz = invsz(new Coord(slots.length, 1));
     }
     
-    private int slot(Coord c) {
+    private Equipory.SLOTS slot(Coord c) {
 	int slot = sqroff(c).x;
 	if(slot < 0) {slot = 0;}
 	if(slot >= slots.length) {slot = slots.length - 1;}
@@ -30,7 +30,7 @@ public class EquipProxy extends DraggableWidget implements DTarget2 {
     public boolean mousedown(Coord c, int button) {
 	Equipory e = ui.gui.equipory;
 	if(e != null) {
-	    WItem w = e.slots[slot(c)];
+	    WItem w = e.slots[slot(c).idx];
 	    if(w != null) {
 		w.mousedown(Coord.z, button);
 		return true;
@@ -48,15 +48,15 @@ public class EquipProxy extends DraggableWidget implements DTarget2 {
 	    g.frect(Coord.z, sz);
 	    g.chcolor();
 	    Coord c0 = new Coord(0, 0);
-	    for (int slot : slots) {
+	    for (Equipory.SLOTS slot : slots) {
 		c0.x = k;
 		Coord c1 = sqoff(c0);
 		g.image(invsq, c1);
-		WItem w = equipory.slots[slot];
+		WItem w = equipory.slots[slot.idx];
 		if(w != null) {
 		    w.draw(g.reclipl(c1, g.sz()));
-		} else if(ebgs[slot] != null) {
-		    g.image(ebgs[slot], c1);
+		} else if(ebgs[slot.idx] != null) {
+		    g.image(ebgs[slot.idx], c1);
 		}
 		k++;
 	    }
@@ -67,12 +67,12 @@ public class EquipProxy extends DraggableWidget implements DTarget2 {
     public Object tooltip(Coord c, Widget prev) {
 	Equipory e = ui.gui.equipory;
 	if(e != null) {
-	    int slot = slot(c);
-	    WItem w = e.slots[slot];
+	    Equipory.SLOTS slot = slot(c);
+	    WItem w = e.slots[slot.idx];
 	    if(w != null) {
 		return w.tooltip(c, (prev == this) ? w : prev);
 	    } else {
-		return etts[slot];
+		return etts[slot.idx];
 	    }
 	}
 	return super.tooltip(c, prev);
@@ -82,7 +82,7 @@ public class EquipProxy extends DraggableWidget implements DTarget2 {
     public boolean drop(WItem target, Coord cc, Coord ul) {
 	Equipory e = ui.gui.equipory;
 	if(e != null) {
-	    e.wdgmsg("drop", slot(cc));
+	    e.wdgmsg("drop", slot(cc).idx);
 	    return true;
 	}
 	return false;
@@ -92,7 +92,7 @@ public class EquipProxy extends DraggableWidget implements DTarget2 {
     public boolean iteminteract(WItem target, Coord cc, Coord ul) {
 	Equipory e = ui.gui.equipory;
 	if(e != null) {
-	    WItem w = e.slots[slot(cc)];
+	    WItem w = e.slots[slot(cc).idx];
 	    if(w != null) {
 		return w.iteminteract(target, cc, ul);
 	    }
@@ -100,7 +100,16 @@ public class EquipProxy extends DraggableWidget implements DTarget2 {
 	return false;
     }
     
-    public void activate(int i, int button) {
+    public void activate(Equipory.SLOTS slot, int button) {
+	for (int i = 0; i < slots.length; i++) {
+	    if(slots[i] == slot) {
+		activate(i, button);
+		return;
+	    }
+	}
+    }
+    
+    private void activate(int i, int button) {
         Coord mc = ui.mc;
 	Coord c = sqoff(new Coord(i, 0)).add(rootpos());
 	ui.mousedown(c, button);
