@@ -1,6 +1,9 @@
 $size[14]{$u{Update for 30.11.20:}
   * merged loftar's changes
 
+$size[14]{$u{Update for 29.11.20:}
+  * added action to drink tea or water in belt, hands or inventory. Default key bind is ALT+D, can be changed in Options.
+ 
 $size[14]{$u{Update for 28.11.20:}
   * added client localization support
  
