@@ -174,6 +174,8 @@ public class Equipory extends Widget implements DTarget {
 			    GameUI.Hidewnd belt = item.ui.gui.beltwnd;
 			    if(belt != null) {
 				belt.toggle();
+			    } else {
+			        item.rclick(c, flags);
 			    }
 			});
 			wdg.onBound(widget -> ((WItem) widget).rclick());

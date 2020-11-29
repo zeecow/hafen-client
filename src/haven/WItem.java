@@ -403,7 +403,12 @@ public class WItem extends Widget implements DTarget2 {
     }
     
     public void rclick() {
-	item.wdgmsg("iact", Coord.z, 0);
+	rclick(Coord.z, 0);
+    }
+    
+    
+    public void rclick(Coord c, int flags) {
+	item.wdgmsg("iact", c, flags);
     }
 
     private boolean checkXfer(int button) {
