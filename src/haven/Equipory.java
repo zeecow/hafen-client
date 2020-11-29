@@ -169,6 +169,15 @@ public class Equipory extends Widget implements DTarget {
 		    WItem wdg = add(new WItem(g), ecoords[ep].add(1, 1));
 		    v.add(wdg);
 		    slots[ep] = wdg;
+		    if(ep == SLOTS.BELT.idx) {
+			wdg.onRClick(item -> {
+			    GameUI.Hidewnd belt = item.ui.gui.beltwnd;
+			    if(belt != null) {
+				belt.toggle();
+			    }
+			});
+			wdg.onBound(widget -> ((WItem) widget).rclick());
+		    }
 		}
 	    }
 	    v.trimToSize();

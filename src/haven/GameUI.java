@@ -663,6 +663,10 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 	    }
 	    super.wdgmsg(sender, msg, args);
 	}
+    
+	public void toggle() {
+	    show(!visible);
+	}
     }
 
     static class Zergwnd extends Hidewnd {
