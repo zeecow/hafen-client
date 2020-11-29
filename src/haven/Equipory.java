@@ -170,7 +170,7 @@ public class Equipory extends Widget implements DTarget {
 		    v.add(wdg);
 		    slots[ep] = wdg;
 		    if(ep == SLOTS.BELT.idx) {
-			wdg.onRClick(item -> {
+			wdg.onRClick((item, c, flags) -> {
 			    GameUI.Hidewnd belt = item.ui.gui.beltwnd;
 			    if(belt != null) {
 				belt.toggle();

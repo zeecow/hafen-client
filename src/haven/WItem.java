@@ -36,6 +36,7 @@ import java.util.List;
 import java.awt.image.BufferedImage;
 import haven.ItemInfo.AttrCache;
 import rx.functions.Action1;
+import rx.functions.Action3;
 
 import static haven.Inventory.sqsz;
 
@@ -48,7 +49,7 @@ public class WItem extends Widget implements DTarget2 {
     public final GItem item;
     private Resource cspr = null;
     private Message csdt = Message.nil;
-    private final List<Action1<WItem>> rClickListeners = new LinkedList<>();
+    private final List<Action3<WItem, Coord, Integer>> rClickListeners = new LinkedList<>();
 
     public WItem(GItem item) {
 	super(sqsz);
@@ -387,7 +388,7 @@ public class WItem extends Widget implements DTarget2 {
 		if(rClickListeners.isEmpty()) {
 		    item.wdgmsg("iact", c, ui.modflags());
 		} else {
-		    rClickListeners.forEach(action -> action.call(this));
+		    rClickListeners.forEach(action -> action.call(this, c, ui.modflags()));
 		}
 	    }
 	    return(true);
@@ -395,7 +396,7 @@ public class WItem extends Widget implements DTarget2 {
 	return(false);
     }
     
-    public void onRClick(Action1<WItem> action) {
+    public void onRClick(Action3<WItem, Coord, Integer> action) {
 	synchronized (rClickListeners) {
 	    rClickListeners.add(action);
 	}
