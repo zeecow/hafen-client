@@ -30,9 +30,6 @@ import me.ender.Reflect;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 import java.util.List;
 import java.util.*;
 import java.util.function.Function;
@@ -205,14 +202,20 @@ public abstract class ItemInfo {
 
     public static class Name extends Tip {
 	public final Text str;
+	public final String original;
 	
-	public Name(Owner owner, Text str) {
+	public Name(Owner owner, Text str, String orig) {
 	    super(owner);
+	    original = orig;
 	    this.str = str;
 	}
 	
 	public Name(Owner owner, String str) {
-	    this(owner, Text.render(str));
+	    this(owner, Text.render(str), str);
+	}
+    
+	public Name(Owner owner, String str, String orig) {
+	    this(owner, Text.render(str), orig);
 	}
 	
 	public BufferedImage tipimg() {
@@ -426,7 +429,7 @@ public abstract class ItemInfo {
 	    } else if(info instanceof Name) {
 		Name name = (Name) info;
 		try {
-		    Matcher m = count_pattern.matcher(name.str.text);
+		    Matcher m = count_pattern.matcher(name.original);
 		    if(m.find()) {
 			res = m.group(1);
 		    }
