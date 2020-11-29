@@ -109,7 +109,11 @@ public class Bot implements Defer.Callable<Void> {
     }
     
     public static void drink(GameUI gui) {
-	findFirstThatContains("Water", BELT(gui), HANDS(gui), INVENTORY(gui)).ifPresent(Bot::drink);
+	Collection<Supplier<List<WItem>>> everywhere = Arrays.asList(BELT(gui), HANDS(gui), INVENTORY(gui));
+	Utils.chainOptionals(
+	    () -> findFirstThatContains("Tea", everywhere),
+	    () -> findFirstThatContains("Water", everywhere)
+	).ifPresent(Bot::drink);
     }
     
     public static void drink(WItem item) {
@@ -123,8 +127,7 @@ public class Bot implements Defer.Callable<Void> {
 	    .collect(Collectors.toList()) : new LinkedList<>();
     }
     
-    @SafeVarargs
-    private static Optional<WItem> findFirstThatContains(String what, Supplier<List<WItem>>... where) {
+    private static Optional<WItem> findFirstThatContains(String what, Collection<Supplier<List<WItem>>> where) {
 	for (Supplier<List<WItem>> place : where) {
 	    Optional<WItem> w = place.get().stream()
 		.filter(contains(what))
