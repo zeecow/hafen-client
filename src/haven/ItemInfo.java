@@ -254,6 +254,7 @@ public abstract class ItemInfo {
     }
 
     public static class Contents extends Tip {
+        private static final Pattern PARSE = Pattern.compile("([\\d.]*) ([\\w]+) of ([\\w\\s]+)\\.?");
 	public final List<ItemInfo> sub;
 	private static final Text.Line ch = Text.render("Contents:");
 	
@@ -277,6 +278,43 @@ public abstract class ItemInfo {
 		    public BufferedImage tipimg() {return(shorttip(sub));}
 		    public int order() {return(100);}
 		});
+	}
+    
+	public Content content() {
+	    for (ItemInfo i : sub) {
+		if(i instanceof Name) {
+		    Matcher m = PARSE.matcher(((Name) i).original);
+		    if(m.find()) {
+			float count = 0;
+			try {
+			    count = Float.parseFloat(m.group(1));
+			} catch (Exception ignored) {}
+			return new Content(m.group(3), m.group(2), count);
+		    }
+		}
+	    }
+	    return Content.EMPTY;
+	}
+    
+	public static class Content {
+	    public final String name;
+	    public final String unit;
+	    public final float count;
+	
+	    public Content(String name, String unit, float count) {
+		this.name = name;
+		this.unit = unit;
+		this.count = count;
+	    }
+	
+	    public boolean is(String what) {
+		if(name == null || what == null) {
+		    return false;
+		}
+		return name.contains(what);
+	    }
+	
+	    public static final Content EMPTY = new Content(null, null, 0);
 	}
     }
 
@@ -442,7 +480,16 @@ public abstract class ItemInfo {
 	}
 	return null;
     }
-
+    
+    public static Contents.Content getContent(List<ItemInfo> infos) {
+	for (ItemInfo info : infos) {
+	    if(info instanceof Contents) {
+		return ((Contents) info).content();
+	    }
+	}
+	return Contents.Content.EMPTY;
+    }
+    
     public static Pair<Integer, Integer> getWear(List<ItemInfo> infos) {
 	infos = findall("haven.res.ui.tt.wear.Wear", infos);
 	for (ItemInfo info : infos) {
