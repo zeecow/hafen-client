@@ -55,7 +55,8 @@ public class Widget {
     static Map<String, Factory> types = new TreeMap<String, Factory>();
     private final List<Subscription> subscriptions = new ArrayList<>();
     protected final boolean i10n = i10n();
-
+    private boolean disposed;
+    
     @dolda.jglob.Discoverable
     @Target(ElementType.TYPE)
     @Retention(RetentionPolicy.RUNTIME)
@@ -518,6 +519,11 @@ public class Widget {
     }
 
     public void dispose() {
+        disposed = true;
+    }
+    
+    public boolean disposed() {
+	return disposed;
     }
 
     public void rdispose() {
