@@ -29,6 +29,10 @@ public class WindowDetector {
 		String eventName = event.b;
 		switch (eventName) {
 		    case Window.ON_DESTROY:
+			if(isBelt(window.caption())) {
+			    window.ui.gui.beltwnd = null;
+			    window.ui.gui.beltinv = null;
+			}
 			toDetect.remove(window);
 			detected.remove(window);
 			break;
@@ -46,7 +50,8 @@ public class WindowDetector {
     
     private static void recognize(Window window) {
 	AnimalFarm.processCattleInfo(window);
-	if("Belt".equals(window.caption())) {
+	if(isBelt(window.caption())) {
+	    window.ui.gui.beltwnd = (GameUI.Hidewnd) window;
 	    window.ui.gui.beltinv = window.getchild(Inventory.class);
 	}
     }
@@ -74,12 +79,19 @@ public class WindowDetector {
     public static Widget newWindow(Coord sz, String title, boolean lg) {
 	if(isPortal(title)) {
 	    return new CharterBook(sz, title, lg, Coord.z, Coord.z);
+	} else if(isBelt(title)) {
+	    GameUI.Hidewnd belt = new GameUI.Hidewnd(sz, title, lg);
+	    belt.hide();
+	    return belt;
 	}
-	return(new Window(sz, title, lg, Coord.z, Coord.z));
+	return (new Window(sz, title, lg));
     }
     
     public static boolean isPortal(String title) {
 	return "Sublime Portico".equals(title) || "Charter Stone".equals(title);
     }
     
+    public static boolean isBelt(String title) {
+	return "Belt".equals(title);
+    }
 }

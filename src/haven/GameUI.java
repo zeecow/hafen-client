@@ -64,6 +64,7 @@ public class GameUI extends ConsoleHost implements Console.Directory {
     private CraftWindow makewnd;
     public Inventory maininv;
     public Inventory beltinv;
+    public Hidewnd beltwnd;
     public Equipory equipory;
     public CharWnd chrwdg;
     public MapWnd mapfile;
@@ -407,6 +408,7 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 
     @Override
     public void bound() {
+        super.bound();
 	BuffToggles.init(this);
     }
 
@@ -646,11 +648,11 @@ public class GameUI extends ConsoleHost implements Console.Directory {
     }
 
     public static class Hidewnd extends Window {
-	Hidewnd(Coord sz, String cap, boolean lg) {
+	public Hidewnd(Coord sz, String cap, boolean lg) {
 	    super(sz, cap, lg);
 	}
-
-	Hidewnd(Coord sz, String cap) {
+    
+	public Hidewnd(Coord sz, String cap) {
 	    super(sz, cap);
 	}
 
