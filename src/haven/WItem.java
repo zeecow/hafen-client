@@ -31,9 +31,12 @@ import me.ender.Reflect;
 
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.awt.image.BufferedImage;
 import haven.ItemInfo.AttrCache;
+import rx.functions.Action1;
+
 import static haven.Inventory.sqsz;
 
 public class WItem extends Widget implements DTarget2 {
@@ -45,6 +48,7 @@ public class WItem extends Widget implements DTarget2 {
     public final GItem item;
     private Resource cspr = null;
     private Message csdt = Message.nil;
+    private final List<Action1<WItem>> rClickListeners = new LinkedList<>();
 
     public WItem(GItem item) {
 	super(sqsz);
@@ -379,10 +383,22 @@ public class WItem extends Widget implements DTarget2 {
 	    item.wdgmsg("take", c);
 	    return true;
 	} else if(btn == 3) {
-	    item.wdgmsg("iact", c, ui.modflags());
+	    synchronized (rClickListeners) {
+		if(rClickListeners.isEmpty()) {
+		    item.wdgmsg("iact", c, ui.modflags());
+		} else {
+		    rClickListeners.forEach(action -> action.call(this));
+		}
+	    }
 	    return(true);
 	}
 	return(false);
+    }
+    
+    public void onRClick(Action1<WItem> action) {
+	synchronized (rClickListeners) {
+	    rClickListeners.add(action);
+	}
     }
     
     public void rclick() {
@@ -414,7 +430,13 @@ public class WItem extends Widget implements DTarget2 {
 	}
 	return false;
     }
-
+    
+    @Override
+    public void dispose() {
+	synchronized (rClickListeners) {rClickListeners.clear();}
+	super.dispose();
+    }
+    
     public boolean drop(WItem target, Coord cc, Coord ul) {
 	return(false);
     }
