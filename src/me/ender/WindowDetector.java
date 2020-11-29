@@ -44,6 +44,9 @@ public class WindowDetector {
     
     private static void recognize(Window window) {
 	AnimalFarm.processCattleInfo(window);
+	if("Belt".equals(window.caption())) {
+	    window.ui.gui.beltinv = window.getchild(Inventory.class);
+	}
     }
     
     private static Widget.Factory convert(Widget parent, Widget.Factory f, Object[] cargs) {
