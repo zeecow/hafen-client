@@ -1887,6 +1887,14 @@ public class Utils {
 	}
 	return (T) new Float(n.floatValue());
     }
+    
+    @SafeVarargs
+    public static <T> Optional<T> chainOptionals(Supplier<Optional<T>>... items) {
+	return Arrays.stream(items).map(Supplier::get)
+	    .filter(Optional::isPresent)
+	    .map(Optional::get)
+	    .findFirst();
+    }
 
     static {
 	Console.setscmd("die", new Console.Command() {
