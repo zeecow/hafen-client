@@ -24,17 +24,19 @@ public class WindowDetector {
     
     private static void onWindowEvent(Pair<Window, String> event) {
 	synchronized (lock) {
-	    if(toDetect.contains(event.a)) {
-		switch (event.b) {
+	    Window window = event.a;
+	    if(toDetect.contains(window)) {
+		String eventName = event.b;
+		switch (eventName) {
 		    case Window.ON_DESTROY:
-			toDetect.remove(event.a);
-			detected.remove(event.a);
+			toDetect.remove(window);
+			detected.remove(window);
 			break;
 		    //Detect window on 'pack' message - this is last message server sends after constructing a window
 		    case Window.ON_PACK:
-			if(!detected.contains(event.a)) {
-			    detected.add(event.a);
-			    recognize(event.a);
+			if(!detected.contains(window)) {
+			    detected.add(window);
+			    recognize(window);
 			}
 			break;
 		}
