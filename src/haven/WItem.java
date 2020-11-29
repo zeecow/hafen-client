@@ -49,6 +49,7 @@ public class WItem extends Widget implements DTarget2 {
     public WItem(GItem item) {
 	super(sqsz);
 	this.item = item;
+	this.item.onBound(widget -> this.bound());
 	CFG.REAL_TIME_CURIO.observe(cfg -> longtip = null);
 	CFG.SHOW_CURIO_LPH.observe(cfg -> longtip = null);
     }
