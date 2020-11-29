@@ -1,6 +1,7 @@
 package me.ender;
 
 import haven.*;
+import haven.rx.CharterBook;
 import haven.rx.Reactor;
 
 import java.util.HashSet;
@@ -63,5 +64,12 @@ public class WindowDetector {
     public static Widget create(Widget parent, Widget.Factory f, UI ui, Object[] cargs) {
 	f = convert(parent, f, cargs);
 	return f.create(ui, cargs);
+    }
+    
+    public static Widget newWindow(Coord sz, String title, boolean lg) {
+	if("Sublime Portico".equals(title) || "Charter Stone".equals(title)) {
+	    return new CharterBook(sz, title, lg, Coord.z, Coord.z);
+	}
+	return(new Window(sz, title, lg, Coord.z, Coord.z));
     }
 }

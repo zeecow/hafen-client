@@ -28,6 +28,7 @@ package haven;
 
 import haven.rx.CharterBook;
 import haven.rx.Reactor;
+import me.ender.WindowDetector;
 
 import java.awt.*;
 import java.awt.Color;
@@ -101,10 +102,7 @@ public class Window extends Widget implements DTarget {
 	    Coord sz = UI.scale((Coord)args[0]);
 	    String cap = (args.length > 1)?(String)args[1]:null;
 	    boolean lg = (args.length > 2)?((Integer)args[2] != 0):false;
-	    if("Sublime Portico".equals(cap) || "Charter Stone".equals(cap)) {
-		return new CharterBook(sz, cap, lg, Coord.z, Coord.z);
-	    }
-	    return(new Window(sz, cap, lg, Coord.z, Coord.z));
+	    return WindowDetector.newWindow(sz, cap, lg);
 	}
     }
 
