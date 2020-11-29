@@ -72,9 +72,14 @@ public class WindowDetector {
     }
     
     public static Widget newWindow(Coord sz, String title, boolean lg) {
-	if("Sublime Portico".equals(title) || "Charter Stone".equals(title)) {
+	if(isPortal(title)) {
 	    return new CharterBook(sz, title, lg, Coord.z, Coord.z);
 	}
 	return(new Window(sz, title, lg, Coord.z, Coord.z));
     }
+    
+    public static boolean isPortal(String title) {
+	return "Sublime Portico".equals(title) || "Charter Stone".equals(title);
+    }
+    
 }
