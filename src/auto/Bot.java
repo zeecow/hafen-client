@@ -6,6 +6,7 @@ import rx.functions.Action1;
 
 import java.util.*;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 
@@ -105,6 +106,60 @@ public class Bot implements Defer.Callable<Void> {
 	    .collect(Collectors.toList());
 	
 	start(new Bot(targets, Target::rclick, selectFlower(option)), gui.ui);
+    }
+    
+    public static void drink(GameUI gui) {
+	findFirstThatContains("Water", HANDS(gui), INVENTORY(gui)).ifPresent(Bot::drink);
+    }
+    
+    public static void drink(WItem item) {
+	start(new Bot(Collections.singletonList(new Target(item)), Target::rclick, selectFlower("Drink")), item.ui);
+    }
+    
+    private static List<WItem> items(Inventory inv) {
+	return inv != null ? inv.children().stream()
+	    .filter(widget -> widget instanceof WItem)
+	    .map(widget -> (WItem) widget)
+	    .collect(Collectors.toList()) : new LinkedList<>();
+    }
+    
+    @SafeVarargs
+    private static Optional<WItem> findFirstThatContains(String what, Supplier<List<WItem>>... where) {
+	for (Supplier<List<WItem>> place : where) {
+	    Optional<WItem> w = place.get().stream()
+		.filter(contains(what))
+		.findFirst();
+	    if(w.isPresent()) {
+		return w;
+	    }
+	}
+	return Optional.empty();
+    }
+    
+    private static Predicate<WItem> contains(String what) {
+	return w -> w.contains.get().is(what);
+    }
+    
+    
+    private static Supplier<List<WItem>> INVENTORY(GameUI gui) {
+	return () -> items(gui.maininv);
+    }
+    
+    private static Supplier<List<WItem>> HANDS(GameUI gui) {
+	return () -> {
+	    List<WItem> items = new LinkedList<>();
+	    if(gui.equipory != null) {
+		WItem slot = gui.equipory.slots[Equipory.SLOTS.HAND_LEFT.idx];
+		if(slot != null) {
+		    items.add(slot);
+		}
+		slot = gui.equipory.slots[Equipory.SLOTS.HAND_RIGHT.idx];
+		if(slot != null) {
+		    items.add(slot);
+		}
+	    }
+	    return items;
+	};
     }
     
     private static double distanceToPlayer(Gob gob) {
