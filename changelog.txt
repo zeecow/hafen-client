@@ -1,3 +1,6 @@
+$size[14]{$u{Update for 30.11.20:}
+  * merged loftar's changes
+
 $size[14]{$u{Update for 25.11.20:}
   * made radar button in Options toggle actual minimap icon settings
   * fixed UI-scaling in Options window
