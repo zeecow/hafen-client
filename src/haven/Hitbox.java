@@ -82,6 +82,8 @@ public class Hitbox extends GAttrib implements RenderTree.Node, Rendered {
 		    if(state == 17 || state == 33) { // this fire is actually hearth fire
 			return true;
 		    }
+		} else if(name.equals("gfx/terobjs/arch/cellardoor")) {
+		    return true;
 		}
 	    }
 	} catch (Loading ignored) {}

@@ -1,6 +1,7 @@
 $size[14]{$u{Update for 30.11.20:}
   * merged loftar's changes
-
+  * marked cellar door as passable
+ 
 $size[14]{$u{Update for 29.11.20:}
   * added action to drink tea or water in belt, hands or inventory. Default key bind is ALT+D, can be changed in Options.
  
@@ -12,7 +13,7 @@ $size[14]{$u{Update for 25.11.20:}
   * fixed UI-scaling in Options window
   * added option to set default speed (Options->General->Default speed)
   * changed character name font in character selector to the one that has not just latin characters
-
+ 
 $size[14]{$u{Update for 24.11.20:}
   * improved hitbox performance
   * added option to show hitboxes on top or below of objects

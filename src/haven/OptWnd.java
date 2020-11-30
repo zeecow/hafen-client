@@ -862,10 +862,10 @@ public class OptWnd extends Window {
 	y += STEP;
 	display.add(new CFGBox("Show gob info", CFG.DISPLAY_GOB_INFO, "Enables damage and crop/tree growth stage displaying", true), x, y);
     
-	y += 25;
+	y += STEP;
 	display.add(new CFGBox("Show gob hitboxes", CFG.DISPLAY_GOB_HITBOX, "Enables hitboxes around all objects", true), x, y);
 	
-	y += 25;
+	y += STEP;
 	display.add(new CFGBox("Draw hitboxes on top", CFG.DISPLAY_GOB_HITBOX_TOP, "Draws hitboxes on top of everything", true), x, y);
 
 	y += STEP;
