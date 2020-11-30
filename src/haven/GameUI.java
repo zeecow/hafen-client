@@ -229,7 +229,7 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 		}
 	    }, UI.scale(new Coord(10, 10)));
 	buffs = ulpanel.add(new Bufflist(), UI.scale(new Coord(95, 65)));
-	umpanel.add(calendar = new Cal(), UI.scale(new Coord(0, 10)));
+	umpanel.add(calendar = new Cal(), Coord.z);
 	eqproxy = add(new EquipProxy(new int[]{6, 7, 11, 5}), new Coord(420, 5));
 	filter = add(new FilterWnd());
 	syslog = chat.add(new ChatUI.Log("System"));
@@ -644,7 +644,7 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 	}
     }
 
-    static class Hidewnd extends Window {
+    public static class Hidewnd extends Window {
 	Hidewnd(Coord sz, String cap, boolean lg) {
 	    super(sz, cap, lg);
 	}
