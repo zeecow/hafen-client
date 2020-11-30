@@ -36,6 +36,8 @@ import java.io.*;
 import java.security.*;
 import javax.imageio.*;
 import java.awt.image.BufferedImage;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
 
 public class Resource implements Serializable {
     private static ResCache prscache;
@@ -269,6 +271,28 @@ public class Resource implements Serializable {
 	
 	public String toString() {
 	    return("local res source");
+	}
+    }
+    
+    public static class RemoteJarSource implements ResSource, Serializable {
+	private final JarFile jar;
+	private final String path;
+	
+	public RemoteJarSource(String path) throws IOException {
+	    this.path = path;
+	    jar = new JarFile(path);
+	}
+	
+	public InputStream get(String name) throws FileNotFoundException {
+	    try {
+		return jar.getInputStream(new JarEntry("res/" + name + ".res"));
+	    } catch (Throwable t) {
+		throw (new FileNotFoundException(String.format("Could not find resource in 'remote' jar <%s>: %s", path, name)));
+	    }
+	}
+	
+	public String toString() {
+	    return ("'remote' jar source");
 	}
     }
     
@@ -720,6 +744,11 @@ public class Resource implements Serializable {
 	    synchronized(Resource.class) {
 		if(_remote == null) {
 		    Pool remote = new Pool(local());
+		    try {
+			remote.add(new RemoteJarSource("client-remote-res.jar"));
+		    } catch (IOException e) {
+			e.printStackTrace();
+		    }
 		    if(prscache != null)
 			remote.add(new CacheSource(prscache));
 		    _remote = remote;;
