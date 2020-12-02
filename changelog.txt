@@ -1,3 +1,6 @@
+$size[14]{$u{Update for 02.12.20:}
+  * improved translation of craft window
+ 
 $size[14]{$u{Update for 30.11.20:}
   * merged loftar's changes
   * marked cellar door as passable
