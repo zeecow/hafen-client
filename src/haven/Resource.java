@@ -262,8 +262,12 @@ public class Resource implements Serializable {
     }
 
     public static class JarSource implements ResSource, Serializable {
+	private final String path;
+    
+	public JarSource(String path) {this.path = path;}
+    
 	public InputStream get(String name) throws FileNotFoundException {
-	    InputStream s = Resource.class.getResourceAsStream("/res/" + name + ".res");
+	    InputStream s = Resource.class.getResourceAsStream(path + name + ".res");
 	    if(s == null)
 		throw(new FileNotFoundException("Could not find resource locally: " + name));
 	    return(s);
@@ -722,7 +726,7 @@ public class Resource implements Serializable {
 	    synchronized(Resource.class) {
 		if(_local == null) {
 		    Pool local = new Pool(new FileSource(Config.getFile("res")));
-		    local.add(new JarSource());
+		    local.add(new JarSource("/res/"));
 		    try {
 			if(Config.resdir != null)
 			    local.add(new FileSource(new File(Config.resdir)));
@@ -744,11 +748,7 @@ public class Resource implements Serializable {
 	    synchronized(Resource.class) {
 		if(_remote == null) {
 		    Pool remote = new Pool(local());
-		    try {
-			remote.add(new RemoteJarSource("client-remote-res.jar"));
-		    } catch (IOException e) {
-			e.printStackTrace();
-		    }
+		    remote.add(new JarSource("/remote/"));
 		    if(prscache != null)
 			remote.add(new CacheSource(prscache));
 		    _remote = remote;;
