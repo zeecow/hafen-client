@@ -174,7 +174,7 @@ public abstract class ErrorGui extends JDialog implements ErrorStatus {
 				}
 			    });
 		    } else {
-			status.setText("The error has been reported.");
+			status.setText("");
 		    }
 		    pack();
 		}
