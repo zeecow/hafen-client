@@ -9,13 +9,14 @@ import java.util.List;
 
 public class QBuff extends ItemInfo.Tip {
     public final BufferedImage icon;
-    public final String name;
+    public final String name, original;
     public final double q;
     
     public QBuff(Owner owner, BufferedImage icon, String name, double q) {
 	super(owner);
 	this.icon = icon;
 	this.name = L10N.tooltip(name);
+	this.original = name;
 	this.q = q;
     }
     

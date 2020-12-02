@@ -20,10 +20,13 @@ public class QualityList extends ItemInfo {
 
     public QualityList(List<ItemInfo> list) {
 	super(null);
-	qualities = new LinkedList<Quality>();
+	qualities = new LinkedList<>();
 	for (ItemInfo inf : list) {
 	    if(inf.getClass().getName().equals(classname)) {
-		String name = Reflect.getFieldValueString(inf, "name");
+		String name = Reflect.getFieldValueString(inf, "original");
+		if(name == null) {
+		    name = Reflect.getFieldValueString(inf, "name");
+		}
 		double q = Reflect.getFieldValueDouble(inf, "q");
 		try {
 		    qualities.add(new Quality(QualityType.valueOf(name), q));
@@ -90,7 +93,6 @@ public class QualityList extends ItemInfo {
 	    return tex;
 	}
 
-	@SuppressWarnings("NullableProblems")
 	@Override
 	public int compareTo(Quality o) {
 	    return Double.compare(value, o != null ? o.value : 0);
