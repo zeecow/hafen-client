@@ -77,11 +77,10 @@ public class L10N {
 	try {
 	    URI uri = L10N.class.getResource("/i10n").toURI();
 	    FileSystem fs = FileSystems.newFileSystem(uri, Collections.emptyMap());
-	    return Files.list(fs.getPath("/i10n"))
+	    return Files.list(fs.getPath("/i10n/"))
 		.map(Path::getFileName)
 		.map(Path::toString)
-		.filter(s -> s.endsWith("/"))
-		.map(s -> s.substring(0, s.length() - 1))
+		.map(s -> (s.endsWith("/")) ? s.substring(0, s.length() - 1) : s)
 		.collect(Collectors.toList());
 	} catch (Exception ignored) {
 	}
