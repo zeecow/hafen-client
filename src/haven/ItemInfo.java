@@ -209,6 +209,10 @@ public abstract class ItemInfo {
 	    original = orig;
 	    this.str = str;
 	}
+    
+	public Name(Owner owner, Text str) {
+	    this(owner, str, str.text);
+	}
 	
 	public Name(Owner owner, String str) {
 	    this(owner, Text.render(str), str);
