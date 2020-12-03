@@ -39,7 +39,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Sk
     public long id;
     public final Glob glob;
     private boolean disposed = false;
-    Map<Class<? extends GAttrib>, GAttrib> attr = new HashMap<Class<? extends GAttrib>, GAttrib>();
+    final Map<Class<? extends GAttrib>, GAttrib> attr = new HashMap<Class<? extends GAttrib>, GAttrib>();
     public final Collection<Overlay> ols = new ArrayList<Overlay>();
     public final Collection<RenderTree.Slot> slots = new ArrayList<>(1);
     private final Collection<SetupMod> setupmods = new ArrayList<>();
@@ -222,8 +222,10 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Sk
     }
 
     public void ctick(double dt) {
+	synchronized (attr) {
 	for(GAttrib a : attr.values())
 	    a.ctick(dt);
+	}
 	loadrattr();
 	for(Iterator<Overlay> i = ols.iterator(); i.hasNext();) {
 	    Overlay ol = i.next();
@@ -351,8 +353,10 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Sk
 	    disposed = true;
 	    removalLock.notifyAll();
 	}
+	synchronized (attr) {
 	for(GAttrib a : attr.values())
 	    a.dispose();
+	}
 	for(ResAttr.Cell rd : rdata) {
 	    if(rd.attr != null)
 		rd.attr.dispose();
@@ -408,6 +412,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Sk
     }
 
     private void setattr(Class<? extends GAttrib> ac, GAttrib a) {
+	synchronized (attr) {
 	GAttrib prev = attr.remove(ac);
 	if(prev != null) {
 	    if((prev instanceof RenderTree.Node) && (prev.slots != null))
@@ -437,6 +442,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Sk
 	    prev.dispose();
 	if(ac == Drawable.class) {
 	    drawableUpdated();
+	}
 	}
     }
 
@@ -622,9 +628,11 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Sk
 	    if(ol.slots != null)
 		slot.add(ol);
 	}
+	synchronized (attr) {
 	for(GAttrib a : attr.values()) {
 	    if(a instanceof RenderTree.Node)
 		slot.add((RenderTree.Node)a);
+	}
 	}
 	slots.add(slot);
     }
