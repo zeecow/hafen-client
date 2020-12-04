@@ -17,7 +17,7 @@ public class GobDamageInfo extends GobInfo {
     
     public GobDamageInfo(Gob owner) {
 	super(owner);
-	up = 12;
+	up(12);
 	center = new Pair<>(0.5, 1.0);
 	if(gobDamage.containsKey(gob.id)) {
 	    damage = gobDamage.get(gob.id);
