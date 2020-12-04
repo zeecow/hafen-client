@@ -39,7 +39,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Sk
     public long id;
     public final Glob glob;
     private boolean disposed = false;
-    Map<Class<? extends GAttrib>, GAttrib> attr = new HashMap<Class<? extends GAttrib>, GAttrib>();
+    final Map<Class<? extends GAttrib>, GAttrib> attr = new HashMap<Class<? extends GAttrib>, GAttrib>();
     public final Collection<Overlay> ols = new ArrayList<Overlay>();
     public final Collection<RenderTree.Slot> slots = new ArrayList<>(1);
     private final Collection<SetupMod> setupmods = new ArrayList<>();
@@ -220,8 +220,15 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Sk
     public Gob(Glob glob, Coord2d c) {
 	this(glob, c, -1);
     }
-
+    
+    private Map<Class<? extends GAttrib>, GAttrib> cloneattrs() {
+	synchronized (this.attr) {
+	    return new HashMap<>(this.attr);
+	}
+    }
+    
     public void ctick(double dt) {
+	Map<Class<? extends GAttrib>, GAttrib> attr = cloneattrs();
 	for(GAttrib a : attr.values())
 	    a.ctick(dt);
 	loadrattr();
@@ -328,10 +335,9 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Sk
     }
     
     public void tick() {
-	synchronized (attr) {
-	    for (GAttrib a : attr.values())
-		a.tick();
-	}
+	Map<Class<? extends GAttrib>, GAttrib> attr = cloneattrs();
+	for (GAttrib a : attr.values())
+	    a.tick();
 	loadrattr();
     }
     
@@ -351,6 +357,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Sk
 	    disposed = true;
 	    removalLock.notifyAll();
 	}
+	Map<Class<? extends GAttrib>, GAttrib> attr = cloneattrs();
 	for(GAttrib a : attr.values())
 	    a.dispose();
 	for(ResAttr.Cell rd : rdata) {
@@ -408,35 +415,37 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Sk
     }
 
     private void setattr(Class<? extends GAttrib> ac, GAttrib a) {
-	GAttrib prev = attr.remove(ac);
-	if(prev != null) {
-	    if((prev instanceof RenderTree.Node) && (prev.slots != null))
-		RUtils.multirem(new ArrayList<>(prev.slots));
-	    if(prev instanceof SetupMod)
-		setupmods.remove(prev);
-	}
-	if(a != null) {
-	    if(a instanceof RenderTree.Node) {
-		try {
-		    RUtils.multiadd(this.slots, (RenderTree.Node)a);
-		} catch(Loading l) {
-		    if(prev instanceof RenderTree.Node) {
-			RUtils.multiadd(this.slots, (RenderTree.Node)prev);
-			attr.put(ac, prev);
-		    }
-		    if(prev instanceof SetupMod)
-			setupmods.add((SetupMod)prev);
-		    throw(l);
-		}
+	synchronized (attr) {
+	    GAttrib prev = attr.remove(ac);
+	    if(prev != null) {
+		if((prev instanceof RenderTree.Node) && (prev.slots != null))
+		    RUtils.multirem(new ArrayList<>(prev.slots));
+		if(prev instanceof SetupMod)
+		    setupmods.remove(prev);
 	    }
-	    if(a instanceof SetupMod)
-		setupmods.add((SetupMod)a);
-	    attr.put(ac, a);
-	}
-	if(prev != null)
-	    prev.dispose();
-	if(ac == Drawable.class) {
-	    drawableUpdated();
+	    if(a != null) {
+		if(a instanceof RenderTree.Node) {
+		    try {
+			RUtils.multiadd(this.slots, (RenderTree.Node) a);
+		    } catch (Loading l) {
+			if(prev instanceof RenderTree.Node) {
+			    RUtils.multiadd(this.slots, (RenderTree.Node) prev);
+			    attr.put(ac, prev);
+			}
+			if(prev instanceof SetupMod)
+			    setupmods.add((SetupMod) prev);
+			throw (l);
+		    }
+		}
+		if(a instanceof SetupMod)
+		    setupmods.add((SetupMod) a);
+		attr.put(ac, a);
+	    }
+	    if(prev != null)
+		prev.dispose();
+	    if(ac == Drawable.class) {
+		drawableUpdated();
+	    }
 	}
     }
 
@@ -622,6 +631,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Sk
 	    if(ol.slots != null)
 		slot.add(ol);
 	}
+	Map<Class<? extends GAttrib>, GAttrib> attr = cloneattrs();
 	for(GAttrib a : attr.values()) {
 	    if(a instanceof RenderTree.Node)
 		slot.add((RenderTree.Node)a);
