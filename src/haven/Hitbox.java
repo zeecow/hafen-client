@@ -170,7 +170,6 @@ public class Hitbox extends GAttrib implements RenderTree.Node, Rendered {
 		RenderLink.MeshMat mesh = (RenderLink.MeshMat) link.l;
 		return mesh.mesh.get();
 	    }
-	    System.out.println(link);
 	}
 	return res;
     }
