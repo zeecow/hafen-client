@@ -1452,6 +1452,21 @@ public class MapView extends PView implements DTarget, Console.Directory {
 	}
 	return(screenxf(new Coord3f((float)mc.x, (float)mc.y, cc.z)));
     }
+    
+    public Coord3f screenxf2(Coord2d mc) {
+	Coord3f cc;
+	try {
+	    cc = getcc();
+	} catch (Loading e) {
+	    return (null);
+	}
+	return (screenxf2(new Coord3f((float) mc.x, (float) mc.y, cc.z)));
+    }
+    
+    public Coord3f screenxf2(Coord3f mc) {
+	HomoCoord4f homo = clipxf(mc, false);
+	return homo.z < 0 ? null : homo.toview(Area.sized(this.sz));
+    }
 
     public double screenangle(Coord2d mc, boolean clip) {
 	Coord3f cc;
