@@ -1,3 +1,6 @@
+$size[14]{$u{Update for 04.12.20:}
+  * fixed object info (growth stage/damage etc) showing for objects behind camera under some angles.
+ 
 $size[14]{$u{Update for 02.12.20:}
   * improved translation of craft window
  
