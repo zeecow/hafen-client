@@ -184,7 +184,7 @@ public class WItem extends Widget implements DTarget2 {
 	return !qualityList.isEmpty() ? qualityList : null;
     }));
     
-    public final AttrCache<ItemInfo.Contents.Content> contains = new AttrCache<>(this::info, AttrCache.cache(ItemInfo::getContent)); 
+    public final AttrCache<ItemInfo.Contents.Content> contains = new AttrCache<>(this::info, AttrCache.cache(ItemInfo::getContent), ItemInfo.Contents.Content.EMPTY); 
 
     public final AttrCache<Tex> heurnum = new AttrCache<Tex>(this::info, AttrCache.cache(info -> {
 	String num = ItemInfo.getCount(info);

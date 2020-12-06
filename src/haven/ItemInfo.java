@@ -616,12 +616,18 @@ public abstract class ItemInfo {
     public static class AttrCache<R> implements Indir<R> {
 	private final Supplier<List<ItemInfo>> from;
 	private final Function<List<ItemInfo>, Supplier<R>> data;
+	private final R def;
 	private List<ItemInfo> forinfo = null;
 	private Supplier<R> save;
 
-	public AttrCache(Supplier<List<ItemInfo>> from, Function<List<ItemInfo>, Supplier<R>> data) {
+	public AttrCache(Supplier<List<ItemInfo>> from, Function<List<ItemInfo>, Supplier<R>> data, R def) {
 	    this.from = from;
 	    this.data = data;
+	    this.def = def;
+	}
+    
+	public AttrCache(Supplier<List<ItemInfo>> from, Function<List<ItemInfo>, Supplier<R>> data) {
+	    this(from, data, null);
 	}
 
 	public R get() {
@@ -633,7 +639,7 @@ public abstract class ItemInfo {
 		}
 		return(save.get());
 	    } catch(Loading l) {
-		return(null);
+		return(def);
 	    }
 	}
 
