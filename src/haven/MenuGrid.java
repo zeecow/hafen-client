@@ -79,7 +79,7 @@ public class MenuGrid extends Widget implements KeyBinding.Bindable {
 	    if(hk == 0)
 		return(KeyMatch.nil);
 	    //FIXME: I have no idea why exactly upper case keybinds continue to work properly.
-	    return KeyMatch.forcode(KeyStroke.getKeyStroke(Character.toUpperCase(hk), 0).getKeyCode(), 0);
+	    return KeyMatch.forcode(KeyStroke.getKeyStroke(Character.toUpperCase(hk), 0).getKeyCode(), KeyMatch.MODS & ~KeyMatch.S, 0);
 	}
 	public KeyBinding binding() {
 	    return(KeyBinding.get("scm/" + res.name, hotkey()));

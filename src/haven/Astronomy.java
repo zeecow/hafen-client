@@ -31,6 +31,7 @@ import java.util.Arrays;
 
 public class Astronomy {
     public final double dt, mp, yt, sp, sd;
+    public final double years, ym, md;
     public final boolean night;
     public final Color mc;
     public final int is;
@@ -51,7 +52,7 @@ public class Astronomy {
     private static final int DAY = 24 * HOUR;
     private static final int YEAR_DAYS = Season.yearLength();
     
-    public Astronomy(double dt, double mp, double yt, boolean night, Color mc, int is, double sp, double sd) {
+    public Astronomy(double dt, double mp, double yt, boolean night, Color mc, int is, double sp, double sd, double years, double ym, double md) {
 	this.dt = dt;
 	this.mp = mp;
 	this.yt = yt;
@@ -60,12 +61,14 @@ public class Astronomy {
 	this.is = is;
 	this.sp = sp;
 	this.sd = sd;
+	this.years = years;
+	this.ym = ym;
+	this.md = md;
 	this.hh = (int) (24 * dt);
 	this.mm = (int) (60 * (24 * dt - hh));
 	this.day = (int) (YEAR_DAYS * yt);
     
-	int seasonProgressSeconds = (int) (season().length * DAY * (sp)); //seconds since season started
-	scday = seasonProgressSeconds / DAY;
+	scday = (int) (season().length * sp);
 	
 	int seasonTs = (int) (season().length * DAY * (1 - sp)); //seconds remaining in season
 	srday = seasonTs / DAY;
