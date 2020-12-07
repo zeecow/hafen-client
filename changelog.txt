@@ -1,3 +1,6 @@
+$size[14]{$u{Update for 07.12.20:}
+  * merged loftar's changes.
+ 
 $size[14]{$u{Update for 04.12.20:}
   * fixed object info (growth stage/damage etc) showing for objects behind camera under some angles.
   * fixed quest markers showing wrong direction under some camera angles.

@@ -202,6 +202,12 @@ public class Makewindow extends Widget {
 	}
     }
 
+    public static final Coord qmodsz = UI.scale(20, 20);
+    private static final Map<Indir<Resource>, BufferedImage> qmicons = new WeakHashMap<>();
+    private static BufferedImage qmicon(Indir<Resource> qm) {
+	return(qmicons.computeIfAbsent(qm, res -> PUtils.convolve(res.get().layer(Resource.imgc).img, qmodsz, CharWnd.iconfilter)));
+    }
+
     public void draw(GOut g) {
 	Coord c = new Coord(xoff, 0);
 	boolean popt = false;
@@ -247,7 +253,7 @@ public class Makewindow extends Widget {
 	BufferedImage result = null;
 	for (Indir<Resource> qm : qmod) {
 	    try {
-		result = ItemInfo.catimgsh(8, result, qm.get().layer(Resource.imgc).img);
+		result = ItemInfo.catimgsh(8, result, qmicon(qm));
 		try {
 		    Glob.CAttr attr = ui.gui.chrwdg.findattr(qm.get().basename());
 		    if(attr != null) {
@@ -288,8 +294,8 @@ public class Makewindow extends Widget {
 	    c = new Coord(xoff, qmy);
 	    try {
 		for(Indir<Resource> qm : qmod) {
-		    Tex t = qm.get().layer(Resource.imgc).tex();
-		    Coord sz = t.sz();
+		    BufferedImage t = qmicon(qm);
+		    Coord sz = new Coord(t.getWidth(), t.getHeight());
 		    try {
 			Glob.CAttr attr = ui.gui.chrwdg.findattr(qm.get().basename());
 			if(attr != null) {

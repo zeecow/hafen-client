@@ -107,10 +107,11 @@ public class KeyBinder {
 	return modflags;
     }
     
-    public static void add(int code, int mods, Action action) {
+    public static Action add(int code, int mods, Action action) {
 	if(!binds.containsKey(action)) {
 	    binds.put(action, new KeyBind(code, mods, action));
 	}
+	return action;
     }
     
     public static KeyBind get(Action action) {
@@ -250,6 +251,39 @@ public class KeyBinder {
 	@Override
 	public String toString() {
 	    return shortcut();
+	}
+    }
+    
+    public static class KeyBindTip implements Indir<Tex> {
+	private final String text;
+	private final Action action;
+	private KeyBind bind;
+	private Tex rendered = null;
+	
+	public KeyBindTip(String text, Action action) {
+	    this.text = text;
+	    this.action = action;
+	    this.bind = KeyBinder.get(action);
+	}
+	
+	@Override
+	public Tex get() {
+	    KeyBinder.KeyBind bind = KeyBinder.get(action);
+	    if(this.bind != bind) {
+		this.bind = bind;
+		if(rendered != null) {
+		    rendered.dispose();
+		    rendered = null;
+		}
+	    }
+	    if(rendered == null) {
+		String tt = text;
+		if(this.bind != null && !this.bind.isEmpty()) {
+		    tt = String.format("%s ($col[255,255,0]{%s})", text, this.bind.shortcut());
+		}
+		rendered = RichText.render(tt, 0).tex();
+	    }
+	    return rendered;
 	}
     }
     
