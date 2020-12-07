@@ -81,7 +81,7 @@
       <arg line="-jar resources/LayerUtil.jar -re resources/src/local resources/compiled/res" />
     </exec>
     <exec executable="java" failifexecutionfails="false">
-      <arg line="-jar resources/LayerUtil.jar -re resources/src/remote resources/compiled/remote" />
+      <arg line="-jar resources/LayerUtil.jar -re resources/src/remote resources/compiled/res-preload" />
     </exec>
     <jar destfile="build/client-res.jar" update="true">
       <fileset dir="resources/compiled" />
