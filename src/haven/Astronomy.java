@@ -79,7 +79,7 @@ public class Astronomy {
     public Season season() { return Season.values()[is]; }
     
     enum Season {
-	Spring(30), Summer(90), Autumn(30), Winter(30);
+	Spring(30), Summer(105), Autumn(30), Winter(15);
 	
 	public final int length;
 	
