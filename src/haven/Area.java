@@ -101,6 +101,10 @@ public class Area implements Iterable<Coord>, java.io.Serializable {
 	return(margin(new Coord(m, m)));
     }
 
+    public Area div(Coord d) {
+	return(new Area(ul.div(d), br.sub(1, 1).div(d).add(1, 1)));
+    }
+
     public Iterator<Coord> iterator() {
 	return(new Iterator<Coord>() {
 		int x = ul.x, y = ul.y;
