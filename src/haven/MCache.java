@@ -66,12 +66,18 @@ public class MCache {
 	private int reqs = 0;
     }
 
+    public static interface OverlayInfo {
+	public Collection<String> tags();
+	public Material mat();
+    }
+
     @Resource.LayerName("overlay")
-    public static class OverlayInfo extends Resource.Layer {
+    public static class ResOverlay extends Resource.Layer implements OverlayInfo {
+	public final OverlayInfo ol;
 	public final Collection<String> tags;
 	private final int matid;
 
-	public OverlayInfo(Resource res, Message buf) {
+	public ResOverlay(Resource res, Message buf) {
 	    res.super();
 	    int ver = buf.uint8();
 	    if(ver == 1) {
@@ -103,6 +109,10 @@ public class MCache {
 	}
 
 	public void init() {
+	}
+
+	public Collection<String> tags() {
+	    return(tags);
 	}
 
 	public Material mat() {
