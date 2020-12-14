@@ -383,7 +383,7 @@ public class HashDirCache implements ResCache {
     }
 
     public String toString() {
-	return("FileCache(" + id + ")");
+	return("HashDirCache(" + id + ")");
     }
 
     public static HashDirCache forjnlp() {
