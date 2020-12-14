@@ -54,7 +54,7 @@ public class EquipProxy extends DraggableWidget implements DTarget2 {
 		g.image(invsq, c1);
 		WItem w = equipory.slots[slot];
 		if(w != null) {
-		    w.draw(g.reclipl(c1, g.sz()));
+		    w.draw(g.reclipl(c1, invsq.sz()));
 		} else if(ebgs[slot] != null) {
 		    g.image(ebgs[slot], c1);
 		}
