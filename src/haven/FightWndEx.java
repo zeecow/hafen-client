@@ -679,7 +679,7 @@ public class FightWndEx extends Widget {
 	wdgmsg("use", n);
     }
 
-    private final Text unused = new Text.Foundry(attrf.font.deriveFont(java.awt.Font.ITALIC)).aa(true).render("Unused save");
+    private final Text unused = new Text.Foundry(attrf.font.deriveFont(java.awt.Font.ITALIC)).aa(true).i10n_label("Unused save");
 
     public FightWndEx(int nsave, int nact, int max) {
 	super(Coord.z);
@@ -696,7 +696,7 @@ public class FightWndEx extends Widget {
 	acttypes.setSelectedColor(new Color(122, 191, 86, 153));
 	acttypes.select(0);
     
-	add(new Img(CharWnd.catf.render("Martial Arts & Combat Schools").tex()), 0, 0);
+	add(new Img(CharWnd.catf.i10n_label("Martial Arts & Combat Schools").tex()), 0, 0);
 	actlist = add(new Actions(UI.scale(250), 8), UI.scale(245, 58));
 	Frame.around(this, Collections.singletonList(actlist));
     
@@ -725,7 +725,7 @@ public class FightWndEx extends Widget {
 	}, UI.scale(437), y);
 	edit = add(new IButton("gfx/hud/btn-edit", "", "-d", "-h") {
 	    {
-		tooltip = "Rename";
+		tooltip = L10N.button("Rename");
 		recthit = true;
 	    }
 	
@@ -739,7 +739,7 @@ public class FightWndEx extends Widget {
 	}, UI.scale(380), y);
 	accept = add(new IButton("gfx/hud/btn-check", "", "-d", "-h") {
 	    {
-		tooltip = "Accept";
+		tooltip = L10N.button("Accept");
 		recthit = true;
 		hide();
 	    }
@@ -754,7 +754,7 @@ public class FightWndEx extends Widget {
 	}, UI.scale(380), y);
 	cancel = add(new IButton("gfx/hud/btn-x", "", "-d", "-h") {
 	    {
-		tooltip = "Cancel";
+		tooltip = L10N.button("Cancel");
 		recthit = true;
 		hide();
 	    }
@@ -851,7 +851,7 @@ public class FightWndEx extends Widget {
 		    if(args[i + 1] instanceof String)
 			saves[i] = attrf.render((String) args[i + 1]);
 		    else
-			saves[i] = attrf.render(String.format("Saved school %d", i + 1));
+			saves[i] = attrf.i10n_label(String.format("Saved school %d", i + 1));
 		} else {
 		    saves[i] = unused;
 		}

@@ -36,6 +36,8 @@ import java.io.*;
 import java.security.*;
 import javax.imageio.*;
 import java.awt.image.BufferedImage;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
 
 public class Resource implements Serializable {
     private static ResCache prscache;
@@ -280,7 +282,29 @@ public class Resource implements Serializable {
 	    return("local res source (" + base + ")");
 	}
     }
-
+    
+    public static class RemoteJarSource implements ResSource, Serializable {
+	private final JarFile jar;
+	private final String path;
+	
+	public RemoteJarSource(String path) throws IOException {
+	    this.path = path;
+	    jar = new JarFile(path);
+	}
+	
+	public InputStream get(String name) throws FileNotFoundException {
+	    try {
+		return jar.getInputStream(new JarEntry("res/" + name + ".res"));
+	    } catch (Throwable t) {
+		throw (new FileNotFoundException(String.format("Could not find resource in 'remote' jar <%s>: %s", path, name)));
+	    }
+	}
+	
+	public String toString() {
+	    return ("'remote' jar source");
+	}
+    }
+    
     public static class HttpSource implements ResSource, Serializable {
 	private final transient SslHelper ssl;
 	public URL baseurl;
@@ -1032,7 +1056,7 @@ public class Resource implements Serializable {
 	public final String t;
                 
 	public Tooltip(Message buf) {
-	    t = new String(buf.bytes(), Utils.utf8);
+	    t = L10N.tooltip(getres(), new String(buf.bytes(), Utils.utf8));
 	}
                 
 	public void init() {}
@@ -1128,7 +1152,7 @@ public class Resource implements Serializable {
 	public final String text;
 		
 	public Pagina(Message buf) {
-	    text = new String(buf.bytes(), Utils.utf8);
+	    text = L10N.pagina(getres(), new String(buf.bytes(), Utils.utf8));
 	}
 		
 	public void init() {}
@@ -1137,6 +1161,7 @@ public class Resource implements Serializable {
     @LayerName("action")
     public class AButton extends Layer {
 	public final String name;
+	public final String original;
 	public final Named parent;
 	public final char hk;
 	public final String[] ad;
@@ -1153,7 +1178,8 @@ public class Resource implements Serializable {
 		    throw(new LoadException("Illegal resource dependency", e, Resource.this));
 		}
 	    }
-	    name = buf.string();
+	    original = buf.string();
+	    name = L10N.action(getres(), original);
 	    buf.string(); /* Prerequisite skill */
 	    hk = (char)buf.uint16();
 	    ad = new String[buf.uint16()];

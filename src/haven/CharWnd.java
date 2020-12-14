@@ -234,7 +234,7 @@ public class CharWnd extends Window {
 		    cur = ItemInfo.catimgs(0, cur, ln);
 		    sum += el.a;
 		}
-		cur = ItemInfo.catimgs(0, cur, Text.render(String.format("Total: %s/%s", Utils.odformat2(sum, 2), Utils.odformat(cap, 2))).img);
+		cur = ItemInfo.catimgs(0, cur, Text.i10n_label(String.format("Total: %s/%s", Utils.odformat2(sum, 2), Utils.odformat(cap, 2))).img);
 		rtip = new TexI(cur);
 	    }
 	    return(rtip);
@@ -276,7 +276,7 @@ public class CharWnd extends Window {
 	private Tex rtip = null;
 	public Object tooltip(Coord c, Widget prev) {
 	    if(rtip == null) {
-		rtip = RichText.render(String.format("%s: %d%%\nFood efficacy: %d%%", lbl, Math.round((lglut) * 100), Math.round(gmod * 100)), -1).tex();
+		rtip = RichText.render(String.format("%s: %d%%\n%s: %d%%", lbl, Math.round((lglut) * 100), L10N.label("Food efficacy"), Math.round(gmod * 100)), -1).tex();
 	    }
 	    return(rtip);
 	}
@@ -605,6 +605,9 @@ public class CharWnd extends Window {
                 c = oc.add(-sz.x, 0);
             }
 	}
+    
+	@Override
+	protected boolean i10n() {return false;}
     }
 
     public class ExpLabel extends RLabel {
@@ -1003,7 +1006,7 @@ public class CharWnd extends Window {
 	    }
 	}
 
-	private static final Tex qcmp = catf.render("Quest completed").tex();
+	private static final Tex qcmp = catf.i10n_label("Quest completed").tex();
 	private static final Tex qfail = failf.render("Quest failed").tex();
 	public void done(GameUI parent) {
 	    parent.add(new Widget() {
@@ -1504,9 +1507,9 @@ public class CharWnd extends Window {
 
 	public CredoGrid(Coord sz) {
 	    super(sz);
-	    pcrc = new Img(GridList.dcatf.render("Pursuing").tex());
-	    ncrc = new Img(GridList.dcatf.render("Credos Available").tex());
-	    ccrc = new Img(GridList.dcatf.render("Credos Acquired").tex());
+	    pcrc = new Img(GridList.dcatf.i10n_label("Pursuing").tex());
+	    ncrc = new Img(GridList.dcatf.i10n_label("Credos Available").tex());
+	    ccrc = new Img(GridList.dcatf.i10n_label("Credos Acquired").tex());
 	    pbtn = new Button(btnw, "Pursue", false) {
 		    public void click() {
 			if(sel != null)
@@ -1924,7 +1927,7 @@ public class CharWnd extends Window {
                 base.add(new Attr(glob, "wil", other));
                 base.add(new Attr(glob, "psy", every));
                 Composer composer = new Composer(left);
-                left.add(settip(new Img(catf.render("Base Attributes").tex()), "gfx/hud/chr/tips/base"));
+                left.add(settip(new Img(catf.i10n_label("Base Attributes").tex()), "gfx/hud/chr/tips/base"));
                 composer.add(offy);
                 composer.pad(wbox.btloff().add(margin1, 0));
                 for (Attr v : base) {
@@ -1933,7 +1936,7 @@ public class CharWnd extends Window {
                 Frame.around(left, base);
                 composer.add(UI.scale(16));
                 composer.hpad(0);
-                composer.add(settip(new Img(catf.render("Food Event Points").tex()), "gfx/hud/chr/tips/fep"));
+                composer.add(settip(new Img(catf.i10n_label("Food Event Points").tex()), "gfx/hud/chr/tips/fep"));
                 feps = new FoodMeter();
                 composer.add(feps);
             }
@@ -1942,7 +1945,7 @@ public class CharWnd extends Window {
             Widget right = new Widget.Temporary();
             {
                 Composer composer = new Composer(right);
-                right.add(settip(new Img(catf.render("Food Satiations").tex()), "gfx/hud/chr/tips/constip"));
+                right.add(settip(new Img(catf.i10n_label("Food Satiations").tex()), "gfx/hud/chr/tips/constip"));
                 composer.add(offy);
                 cons = new Constipations(attrw, base.size());
                 composer.pad(wbox.btloff().add(margin1, 0));
@@ -1950,7 +1953,7 @@ public class CharWnd extends Window {
                 Frame.around(right, Collections.singletonList(cons));
                 composer.add(UI.scale(16));
                 composer.hpad(0);
-                composer.add(settip(new Img(catf.render("Hunger Level").tex()), "gfx/hud/chr/tips/hunger"));
+                composer.add(settip(new Img(catf.i10n_label("Hunger Level").tex()), "gfx/hud/chr/tips/hunger"));
                 glut = new GlutMeter();
                 composer.add(glut);
             }
@@ -1981,7 +1984,7 @@ public class CharWnd extends Window {
                 skill.add(new SAttr(glob, "survive", other));
                 skill.add(new SAttr(glob, "lore", every));
                 Composer composer = new Composer(left);
-                left.add(settip(new Img(catf.render("Abilities").tex()), "gfx/hud/chr/tips/sattr"));
+                left.add(settip(new Img(catf.i10n_label("Abilities").tex()), "gfx/hud/chr/tips/sattr"));
                 composer.add(offy);
                 composer.pad(wbox.btloff().add(margin1, 0));
                 for (SAttr v : skill) {
@@ -1995,7 +1998,7 @@ public class CharWnd extends Window {
             Widget right = new Widget.Temporary();
             {
                 Composer composer = new Composer(right);
-                right.add(settip(new Img(catf.render("Study Report").tex()), "gfx/hud/chr/tips/study"));
+                right.add(settip(new Img(catf.i10n_label("Study Report").tex()), "gfx/hud/chr/tips/study"));
                 composer.add(offy + UI.scale(151));
                 int fy = composer.y();
                 composer.add(margin1);
@@ -2054,7 +2057,7 @@ public class CharWnd extends Window {
             Widget left = new Widget.Temporary();
             LoadingTextBox info;
             {
-                left.add(settip(new Img(catf.render("Lore & Skills").tex()), "gfx/hud/chr/tips/skills"));
+                left.add(settip(new Img(catf.i10n_label("Lore & Skills").tex()), "gfx/hud/chr/tips/skills"));
                 info = new LoadingTextBox(new Coord(attrw, height), "", ifnd);
                 left.add(info, wbox.btloff().add(margin1, offy));
                 info.bg = new Color(0, 0, 0, 128);
@@ -2065,7 +2068,7 @@ public class CharWnd extends Window {
             Widget right = new Widget.Temporary();
             {
                 Composer composer = new Composer(right);
-                right.add(new Img(catf.render("Entries").tex()));
+                right.add(new Img(catf.i10n_label("Entries").tex()));
                 composer.add(offy);
                 Tabs lists = new Tabs(new Coord(margin1, composer.y()), new Coord(attrw + wbox.bisz().x, 0), right);
                 Tabs.Tab sktab = lists.add();
@@ -2117,6 +2120,9 @@ public class CharWnd extends Window {
                                 cexp = exp;
                             }
                         }
+			
+                        @Override
+			protected boolean i10n() { return true; }
                     });
                 }
 
@@ -2171,7 +2177,7 @@ public class CharWnd extends Window {
 	Tabs.Tab wounds;
 	{
 	    wounds = tabs.add();
-	    wounds.add(settip(new Img(catf.render("Health & Wounds").tex()), "gfx/hud/chr/tips/wounds"), new Coord(0, 0));
+	    wounds.add(settip(new Img(catf.i10n_label("Health & Wounds").tex()), "gfx/hud/chr/tips/wounds"), new Coord(0, 0));
 	    this.wounds = wounds.add(new WoundList(attrw, 12), new Coord(width + margin1, offy).add(wbox.btloff()));
 	    Frame.around(wounds, Collections.singletonList(this.wounds));
 	    woundbox = wounds.add(new Widget(new Coord(attrw, this.wounds.sz.y)) {
@@ -2193,7 +2199,7 @@ public class CharWnd extends Window {
 	Tabs.Tab quests;
 	{
 	    quests = tabs.add();
-	    quests.add(settip(new Img(catf.render("Quest Log").tex()), "gfx/hud/chr/tips/quests"), new Coord(0, 0));
+	    quests.add(settip(new Img(catf.i10n_label("Quest Log").tex()), "gfx/hud/chr/tips/quests"), new Coord(0, 0));
 	    questbox = quests.add(new Widget(new Coord(attrw, height)) {
 		    public void draw(GOut g) {
 			g.chcolor(0, 0, 0, 128);

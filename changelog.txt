@@ -6,10 +6,20 @@ $size[14]{$u{Update for 07.12.20:}
  
 $size[14]{$u{Update for 04.12.20:}
   * fixed object info (growth stage/damage etc) showing for objects behind camera under some angles.
+  * fixed quest markers showing wrong direction under some camera angles.
+ 
+$size[14]{$u{Update for 02.12.20:}
+  * improved translation of craft window
  
 $size[14]{$u{Update for 30.11.20:}
   * merged loftar's changes
   * marked cellar door as passable
+ 
+$size[14]{$u{Update for 29.11.20:}
+  * added action to drink tea or water in belt, hands or inventory. Default key bind is ALT+D, can be changed in Options.
+ 
+$size[14]{$u{Update for 28.11.20:}
+  * added client localization support
  
 $size[14]{$u{Update for 25.11.20:}
   * made radar button in Options toggle actual minimap icon settings

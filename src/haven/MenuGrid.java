@@ -74,6 +74,7 @@ public class MenuGrid extends Widget implements KeyBinding.Bindable {
 
 	public BufferedImage img() {return(res.layer(Resource.imgc).scaled());}
 	public String name() {return(res.layer(Resource.action).name);}
+	public String originalName() {return(res.layer(Resource.action).original);}
 	public KeyMatch hotkey() {
 	    char hk = res.layer(Resource.action).hk;
 	    if(hk == 0)
@@ -91,7 +92,7 @@ public class MenuGrid extends Widget implements KeyBinding.Bindable {
 	public String sortkey() {
 	    AButton ai = pag.act();
 	    if(ai.ad.length == 0)
-		return("\0" + name());
+		return("\0" + originalName());
 	    return(name());
 	}
 

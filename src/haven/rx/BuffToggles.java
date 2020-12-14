@@ -46,7 +46,7 @@ public class BuffToggles {
 	private boolean toggled = false;
 
 	public Toggle(String name, String resname, String action, String msgOn, String msgOff) {
-	    this.name = name;
+	    this.name = L10N.tooltip(resname, name);
 	    this.resname = resname;
 
 	    this.action = action;

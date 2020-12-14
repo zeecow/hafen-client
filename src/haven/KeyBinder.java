@@ -74,6 +74,7 @@ public class KeyBinder {
 	add(KeyEvent.VK_1, CTRL,  ACT_HAND_0);
 	add(KeyEvent.VK_2, CTRL,  ACT_HAND_1);
 	add(KeyEvent.VK_3, CTRL,  ACT_BELT);
+    	add(KeyEvent.VK_D, ALT,   ACT_DRINK);
 	add(KeyEvent.VK_C, ALT,   OPEN_QUICK_CRAFT);
 	add(KeyEvent.VK_B, ALT,   OPEN_QUICK_BUILD);
 	add(KeyEvent.VK_A, ALT,   OPEN_QUICK_ACTION);
@@ -298,6 +299,9 @@ public class KeyBinder {
  
 	public ShortcutWidget(KeyBind bind, Action2<KeyBind, KeyBind> update, String label) {
 	    btn = add(new Button(UI.scale(75), bind.shortcut()) {
+		  @Override
+		  protected boolean i10n() { return false; }
+	    
 		  @Override
 		  public void click() {
 		      ui.root.add(new ShortcutSelectorWdg(keyBind, ShortcutWidget.this), ui.mc.sub(50, 20));

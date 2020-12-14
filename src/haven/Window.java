@@ -28,6 +28,7 @@ package haven;
 
 import haven.rx.CharterBook;
 import haven.rx.Reactor;
+import me.ender.WindowDetector;
 
 import java.awt.*;
 import java.awt.Color;
@@ -93,6 +94,7 @@ public class Window extends Widget implements DTarget {
     protected WidgetCfg cfg = null;
     public boolean justclose = false;;
     private final Collection<Widget> twdgs = new LinkedList<Widget>();
+    private String title;
 
     @RName("wnd")
     public static class $_ implements Factory {
@@ -100,10 +102,7 @@ public class Window extends Widget implements DTarget {
 	    Coord sz = UI.scale((Coord)args[0]);
 	    String cap = (args.length > 1)?(String)args[1]:null;
 	    boolean lg = (args.length > 2)?((Integer)args[2] != 0):false;
-	    if("Sublime Portico".equals(cap) || "Charter Stone".equals(cap)) {
-		return new CharterBook(sz, cap, lg, Coord.z, Coord.z);
-	    }
-	    return(new Window(sz, cap, lg, Coord.z, Coord.z));
+	    return WindowDetector.newWindow(sz, cap, lg);
 	}
     }
 
@@ -156,15 +155,17 @@ public class Window extends Widget implements DTarget {
     }
 
     public void chcap(String cap) {
-	if(cap == null)
+	title = cap;
+	if(cap == null) {
 	    this.cap = null;
-	else
-	    this.cap = cf.render(cap);
-	cfg = WidgetCfg.get(cap);
+	} else {
+	    this.cap = cf.render(L10N.window(cap));
+	    cfg = WidgetCfg.get(cap);
+	}
     }
 
     public String caption() {
-	return (cap != null) ? cap.text : null;
+	return title;
     }
 
     public void cdraw(GOut g) {

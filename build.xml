@@ -52,7 +52,7 @@
     <mkdir dir="resources/classes" />
     <javac srcdir="resources/java" destdir="resources/classes" debug="on" source="1.8" target="1.8" includeantruntime="no">
       <classpath>
-        <pathelement path="build/hafen.jar" />
+        <pathelement path="build/classes" />
       </classpath>
       <compilerarg value="-Xlint:unchecked" />
       <compilerarg value="-Xlint:-options" />
@@ -78,7 +78,10 @@
 
   <target name="resources" depends="client-res-java">
     <exec executable="java" failifexecutionfails="false">
-      <arg line="-jar resources/LayerUtil.jar -re resources/src resources/compiled/res" />
+      <arg line="-jar resources/LayerUtil.jar -re resources/src/local resources/compiled/res" />
+    </exec>
+    <exec executable="java" failifexecutionfails="false">
+      <arg line="-jar resources/LayerUtil.jar -re resources/src/remote resources/compiled/res-preload" />
     </exec>
     <jar destfile="build/client-res.jar" update="true">
       <fileset dir="resources/compiled" />
@@ -86,6 +89,7 @@
       <file file="etc/radar.xml"/>
       <file file="etc/gob_path.json"/>
       <file file="etc/gob_radius.json"/>
+      <fileset dir="." includes="i10n/**/**.json"/>
     </jar>
     <copy file="lib/builtin-res.jar" todir="build"/>
     <copy file="lib/hafen-res.jar" todir="build"/>

@@ -40,7 +40,7 @@ public class Text {
     public static final Font sans  = new Font("Sans", Font.PLAIN, 10);
     public static final Font mono  = new Font("Monospaced", Font.PLAIN, 10);
     //public static final Font fraktur = Resource.local().loadwait("ui/fraktur").layer(Resource.Font.class).font;
-    public static final Font fraktur;
+    public static final Font fraktur = serif;
     public static final Font dfont = sans;
     public static final Foundry std;
     public final BufferedImage img;
@@ -52,14 +52,14 @@ public class Text {
     static {
 	std = new Foundry(sans, 10);
 
-	Font fnt = serif;
-	try {
-	    InputStream stream = Text.class.getResourceAsStream("font.ttf");
-	    fnt = Font.createFont(Font.TRUETYPE_FONT, stream);
-	} catch(FontFormatException ignored) {
-	} catch(IOException ignored) {
-	}
-	fraktur = fnt;
+//	Font fnt = serif;
+//	try {
+//	    InputStream stream = Text.class.getResourceAsStream("font.ttf");
+//	    fnt = Font.createFont(Font.TRUETYPE_FONT, stream);
+//	} catch(FontFormatException ignored) {
+//	} catch(IOException ignored) {
+//	}
+//	fraktur = fnt;
     }
 	
     public static class Line extends Text {
@@ -109,6 +109,10 @@ public class Text {
         
     public static abstract class Furnace {
 	public abstract Text render(String text);
+    
+	public Text i10n_label(String text) {
+	    return render(L10N.label(text));
+	}
 
 	public Text renderf(String fmt, Object... args) {
 	    return(render(String.format(fmt, args)));
@@ -310,6 +314,10 @@ public class Text {
 	
     public static Line render(String text) {
 	return(render(text, Color.WHITE));
+    }
+    
+    public static Text i10n_label(String text) {
+	return render(L10N.label(text));
     }
 	
     public Tex tex() {

@@ -113,7 +113,7 @@ public class FlowerMenu extends Widget {
 	public Petal(String name) {
 	    super(Coord.z);
 	    this.name = name;
-	    text = ptf.render(name, ptc);
+	    text = ptf.render(L10N.flower(name), ptc);
 	    resize(text.sz().x + UI.scale(25), ph);
 	}
 
@@ -279,12 +279,24 @@ public class FlowerMenu extends Widget {
     private void autochoose() {
 	for (int i = 0; i < options.length; i++) {
 	    String name = options[i];
-	    boolean auto = AUTOCHOOSE.containsKey(name) && AUTOCHOOSE.get(name);
+	    boolean auto = autochoose(name);
 	    boolean single = ui.modctrl && options.length == 1 && CFG.MENU_SINGLE_CTRL_CLICK.get();
 	    if(!ui.modshift && (auto || single)) {
 		autochoose = opts[i];
 	    }
 	}
+    }
+
+    public static boolean autochoose(String name) {
+	if(AUTOCHOOSE.containsKey(name)) {
+	    return AUTOCHOOSE.get(name);
+	} else {
+	    name = L10N.flower(name);
+	    if(AUTOCHOOSE.containsKey(name)) {
+		return AUTOCHOOSE.get(name);
+	    }
+	}
+	return false;
     }
     
     public void forceChoose(String opt) {

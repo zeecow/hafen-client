@@ -30,9 +30,6 @@ import me.ender.Reflect;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 import java.util.List;
 import java.util.*;
 import java.util.function.Function;
@@ -205,14 +202,24 @@ public abstract class ItemInfo {
 
     public static class Name extends Tip {
 	public final Text str;
+	public final String original;
 	
-	public Name(Owner owner, Text str) {
+	public Name(Owner owner, Text str, String orig) {
 	    super(owner);
+	    original = orig;
 	    this.str = str;
+	}
+    
+	public Name(Owner owner, Text str) {
+	    this(owner, str, str.text);
 	}
 	
 	public Name(Owner owner, String str) {
-	    this(owner, Text.render(str));
+	    this(owner, Text.render(str), str);
+	}
+    
+	public Name(Owner owner, String str, String orig) {
+	    this(owner, Text.render(str), orig);
 	}
 	
 	public BufferedImage tipimg() {
@@ -251,6 +258,7 @@ public abstract class ItemInfo {
     }
 
     public static class Contents extends Tip {
+        private static final Pattern PARSE = Pattern.compile("([\\d.]*) ([\\w]+) of ([\\w\\s]+)\\.?");
 	public final List<ItemInfo> sub;
 	private static final Text.Line ch = Text.render("Contents:");
 	
@@ -274,6 +282,43 @@ public abstract class ItemInfo {
 		    public BufferedImage tipimg() {return(shorttip(sub));}
 		    public int order() {return(100);}
 		});
+	}
+    
+	public Content content() {
+	    for (ItemInfo i : sub) {
+		if(i instanceof Name) {
+		    Matcher m = PARSE.matcher(((Name) i).original);
+		    if(m.find()) {
+			float count = 0;
+			try {
+			    count = Float.parseFloat(m.group(1));
+			} catch (Exception ignored) {}
+			return new Content(m.group(3), m.group(2), count);
+		    }
+		}
+	    }
+	    return Content.EMPTY;
+	}
+    
+	public static class Content {
+	    public final String name;
+	    public final String unit;
+	    public final float count;
+	
+	    public Content(String name, String unit, float count) {
+		this.name = name;
+		this.unit = unit;
+		this.count = count;
+	    }
+	
+	    public boolean is(String what) {
+		if(name == null || what == null) {
+		    return false;
+		}
+		return name.contains(what);
+	    }
+	
+	    public static final Content EMPTY = new Content(null, null, 0);
 	}
     }
 
@@ -426,7 +471,7 @@ public abstract class ItemInfo {
 	    } else if(info instanceof Name) {
 		Name name = (Name) info;
 		try {
-		    Matcher m = count_pattern.matcher(name.str.text);
+		    Matcher m = count_pattern.matcher(name.original);
 		    if(m.find()) {
 			res = m.group(1);
 		    }
@@ -439,7 +484,16 @@ public abstract class ItemInfo {
 	}
 	return null;
     }
-
+    
+    public static Contents.Content getContent(List<ItemInfo> infos) {
+	for (ItemInfo info : infos) {
+	    if(info instanceof Contents) {
+		return ((Contents) info).content();
+	    }
+	}
+	return Contents.Content.EMPTY;
+    }
+    
     public static Pair<Integer, Integer> getWear(List<ItemInfo> infos) {
 	infos = findall("haven.res.ui.tt.wear.Wear", infos);
 	for (ItemInfo info : infos) {
@@ -562,12 +616,18 @@ public abstract class ItemInfo {
     public static class AttrCache<R> implements Indir<R> {
 	private final Supplier<List<ItemInfo>> from;
 	private final Function<List<ItemInfo>, Supplier<R>> data;
+	private final R def;
 	private List<ItemInfo> forinfo = null;
 	private Supplier<R> save;
 
-	public AttrCache(Supplier<List<ItemInfo>> from, Function<List<ItemInfo>, Supplier<R>> data) {
+	public AttrCache(Supplier<List<ItemInfo>> from, Function<List<ItemInfo>, Supplier<R>> data, R def) {
 	    this.from = from;
 	    this.data = data;
+	    this.def = def;
+	}
+    
+	public AttrCache(Supplier<List<ItemInfo>> from, Function<List<ItemInfo>, Supplier<R>> data) {
+	    this(from, data, null);
 	}
 
 	public R get() {
@@ -579,7 +639,7 @@ public abstract class ItemInfo {
 		}
 		return(save.get());
 	    } catch(Loading l) {
-		return(null);
+		return(def);
 	    }
 	}
 

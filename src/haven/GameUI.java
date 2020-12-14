@@ -26,6 +26,7 @@
 
 package haven;
 
+import haven.Equipory.SLOTS;
 import haven.rx.BuffToggles;
 import haven.rx.Reactor;
 
@@ -63,6 +64,8 @@ public class GameUI extends ConsoleHost implements Console.Directory {
     public Window invwnd, equwnd, srchwnd, iconwnd;
     private CraftWindow makewnd;
     public Inventory maininv;
+    public Inventory beltinv;
+    public Hidewnd beltwnd;
     public Equipory equipory;
     public CharWnd chrwdg;
     public MapWnd mapfile;
@@ -230,7 +233,7 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 	    }, UI.scale(new Coord(10, 10)));
 	buffs = ulpanel.add(new Bufflist(), UI.scale(new Coord(95, 65)));
 	umpanel.add(calendar = new Cal(), Coord.z);
-	eqproxy = add(new EquipProxy(new int[]{6, 7, 11, 5}), new Coord(420, 5));
+	eqproxy = add(new EquipProxy(SLOTS.HAND_LEFT, SLOTS.HAND_RIGHT, SLOTS.BACK, SLOTS.BELT), new Coord(420, 5));
 	filter = add(new FilterWnd());
 	syslog = chat.add(new ChatUI.Log("System"));
 	opts = add(new OptWnd());
@@ -406,6 +409,7 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 
     @Override
     public void bound() {
+        super.bound();
 	BuffToggles.init(this);
     }
 
@@ -445,7 +449,7 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 
     public void toggleCraftList() {
 	if(craftlist == null){
-	    craftlist = add(new ActWindow("Craft...", "paginae/craft/.+"));
+	    craftlist = add(new ActWindow("Craft…", "paginae/craft/.+"));
 	    craftlist.addtwdg(craftlist.add(new IButton("gfx/hud/btn-help", "","-d","-h"){
 		@Override
 		public void click() {
@@ -461,7 +465,7 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 
     public void toggleBuildList() {
 	if(buildlist == null){
-	    buildlist = add(new ActWindow("Build...", "paginae/bld/.+"));
+	    buildlist = add(new ActWindow("Build…", "paginae/bld/.+"));
 	    buildlist.addtwdg(buildlist.add(new IButton("gfx/hud/btn-help", "","-d","-h"){
 		@Override
 		public void click() {
@@ -477,7 +481,7 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 
     public void toggleActList() {
 	if(actlist == null){
-	    actlist = add(new ActWindow("Act...", "paginae/act/.+|paginae/pose/.+|paginae/gov/.+|paginae/add/.+|gfx/fx/msrad|ui/tt/q/quality"));
+	    actlist = add(new ActWindow("Act…", "paginae/act/.+|paginae/pose/.+|paginae/gov/.+|paginae/add/.+|gfx/fx/msrad|ui/tt/q/quality"));
 	} else if(actlist.visible) {
 	    actlist.hide();
 	} else {
@@ -645,11 +649,11 @@ public class GameUI extends ConsoleHost implements Console.Directory {
     }
 
     public static class Hidewnd extends Window {
-	Hidewnd(Coord sz, String cap, boolean lg) {
+	public Hidewnd(Coord sz, String cap, boolean lg) {
 	    super(sz, cap, lg);
 	}
-
-	Hidewnd(Coord sz, String cap) {
+    
+	public Hidewnd(Coord sz, String cap) {
 	    super(sz, cap);
 	}
 
@@ -659,6 +663,10 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 		return;
 	    }
 	    super.wdgmsg(sender, msg, args);
+	}
+    
+	public void toggle() {
+	    show(!visible);
 	}
     }
 

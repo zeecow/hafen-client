@@ -31,9 +31,13 @@ import me.ender.Reflect;
 
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.awt.image.BufferedImage;
 import haven.ItemInfo.AttrCache;
+import rx.functions.Action1;
+import rx.functions.Action3;
+
 import static haven.Inventory.sqsz;
 
 public class WItem extends Widget implements DTarget2 {
@@ -45,10 +49,12 @@ public class WItem extends Widget implements DTarget2 {
     public final GItem item;
     private Resource cspr = null;
     private Message csdt = Message.nil;
+    private final List<Action3<WItem, Coord, Integer>> rClickListeners = new LinkedList<>();
 
     public WItem(GItem item) {
 	super(sqsz);
 	this.item = item;
+	this.item.onBound(widget -> this.bound());
 	CFG.REAL_TIME_CURIO.observe(cfg -> longtip = null);
 	CFG.SHOW_CURIO_LPH.observe(cfg -> longtip = null);
     }
@@ -177,6 +183,8 @@ public class WItem extends Widget implements DTarget2 {
 	QualityList qualityList = new QualityList(qualities);
 	return !qualityList.isEmpty() ? qualityList : null;
     }));
+    
+    public final AttrCache<ItemInfo.Contents.Content> contains = new AttrCache<>(this::info, AttrCache.cache(ItemInfo::getContent), ItemInfo.Contents.Content.EMPTY); 
 
     public final AttrCache<Tex> heurnum = new AttrCache<Tex>(this::info, AttrCache.cache(info -> {
 	String num = ItemInfo.getCount(info);
@@ -376,10 +384,31 @@ public class WItem extends Widget implements DTarget2 {
 	    item.wdgmsg("take", c);
 	    return true;
 	} else if(btn == 3) {
-	    item.wdgmsg("iact", c, ui.modflags());
+	    synchronized (rClickListeners) {
+		if(rClickListeners.isEmpty()) {
+		    item.wdgmsg("iact", c, ui.modflags());
+		} else {
+		    rClickListeners.forEach(action -> action.call(this, c, ui.modflags()));
+		}
+	    }
 	    return(true);
 	}
 	return(false);
+    }
+    
+    public void onRClick(Action3<WItem, Coord, Integer> action) {
+	synchronized (rClickListeners) {
+	    rClickListeners.add(action);
+	}
+    }
+    
+    public void rclick() {
+	rclick(Coord.z, 0);
+    }
+    
+    
+    public void rclick(Coord c, int flags) {
+	item.wdgmsg("iact", c, flags);
     }
 
     private boolean checkXfer(int button) {
@@ -407,7 +436,13 @@ public class WItem extends Widget implements DTarget2 {
 	}
 	return false;
     }
-
+    
+    @Override
+    public void dispose() {
+	synchronized (rClickListeners) {rClickListeners.clear();}
+	super.dispose();
+    }
+    
     public boolean drop(WItem target, Coord cc, Coord ul) {
 	return(false);
     }

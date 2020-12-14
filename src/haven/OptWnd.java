@@ -138,7 +138,7 @@ public class OptWnd extends Window {
 		    });
 		composer.add(new Label("Render scale"));
 		{
-		    Label dpy = new Label("");
+		    Label dpy = new Label.Untranslated("");
 		    final int steps = 4;
 		    composer.addr(
 			new HSlider(UI.scale(160), -2 * steps, 2 * steps, (int)Math.round(steps * Math.log(prefs.rscale.val) / Math.log(2.0f))) {
@@ -178,7 +178,7 @@ public class OptWnd extends Window {
 		    });
 		composer.add(new Label("Framerate limit (active window)"));
 		{
-		    Label dpy = new Label("");
+		    Label dpy = new Label.Untranslated("");
 		    final int max = 250;
 		    composer.addr(
 			    new HSlider(UI.scale(160), 1, max, (prefs.hz.val == Float.POSITIVE_INFINITY) ? max : prefs.hz.val.intValue()) {
@@ -187,7 +187,7 @@ public class OptWnd extends Window {
 			    }
 			    void dpy() {
 				if(this.val == max)
-				    dpy.settext("None");
+				    dpy.settext("∞");
 				else
 				    dpy.settext(Integer.toString(this.val));
 			    }
@@ -209,7 +209,7 @@ public class OptWnd extends Window {
 		}
 		composer.add(new Label("Framerate limit (background window)"));
 		{
-		    Label dpy = new Label("");
+		    Label dpy = new Label.Untranslated("");
 		    final int max = 250;
 		    composer.addr(
 			    new HSlider(UI.scale(160), 1, max, (prefs.bghz.val == Float.POSITIVE_INFINITY) ? max : prefs.bghz.val.intValue()) {
@@ -218,7 +218,7 @@ public class OptWnd extends Window {
 			    }
 			    void dpy() {
 				if(this.val == max)
-				    dpy.settext("None");
+				    dpy.settext("∞");
 				else
 				    dpy.settext(Integer.toString(this.val));
 			    }
@@ -311,7 +311,7 @@ public class OptWnd extends Window {
 		*/
 		composer.add(new Label("UI scale (requires restart)"));
 		{
-		    Label dpy = new Label("");
+		    Label dpy = new Label.Untranslated("");
 		    final double smin = 1, smax = Math.floor(UI.maxscale() / 0.25) * 0.25;
 		    final int steps = (int)Math.round((smax - smin) / 0.25);
 		    composer.addr(
@@ -475,7 +475,10 @@ public class OptWnd extends Window {
 		}
 		return(super.handle(ev));
 	    }
-
+	    
+	    @Override
+	    protected boolean i10n() { return false; }
+	    
 	    public Object tooltip(Coord c, Widget prev) {
 		return(kbtt.tex());
 	    }
@@ -742,9 +745,38 @@ public class OptWnd extends Window {
     private void initGeneralPanel() {
 	int x = 0;
 	int y = 0, my = 0;
+	int STEP = UI.scale(25);
+    
+	int tx = x + general.add(new Label("Language (requires restart):"), x, y).sz.x + UI.scale(5);
+	general.add(new Dropbox<String>(UI.scale(80), 5, UI.scale(16)) {
+	    @Override
+	    protected String listitem(int i) {
+		return L10N.LANGUAGES.get(i);
+	    }
+	
+	    @Override
+	    protected int listitems() {
+		return L10N.LANGUAGES.size();
+	    }
+	
+	    @Override
+	    protected void drawitem(GOut g, String item, int i) {
+		g.atext(item, UI.scale(3, 8), 0, 0.5);
+	    }
+	
+	    @Override
+	    public void change(String item) {
+		super.change(item);
+		if(!item.equals(L10N.LANGUAGE.get())) L10N.LANGUAGE.set(item);
+	    }
+	}, tx, y).change(L10N.LANGUAGE.get());
+    
+	y += STEP;
+	general.add(new CFGBox("Output missing translation lines", L10N.DBG), x, y);
+    
+	y += STEP;
 	general.add(new CFGBox("Store minimap tiles", CFG.STORE_MAP), x, y);
     
-	int STEP = UI.scale(25);
 	y += STEP;
 	general.add(new CFGBox("Store chat logs", CFG.STORE_CHAT_LOGS, "Logs are stored in 'chats' folder"), new Coord(x, y));
     
@@ -767,7 +799,7 @@ public class OptWnd extends Window {
 	y += STEP;
 	Label label = general.add(new Label(String.format("Auto pickup radius: %.2f", CFG.AUTO_PICK_RADIUS.get() / 11.0)), x, y);
 	y += UI.scale(15);
-	general.add(new CFGHSlider(UI.scale(120), CFG.AUTO_PICK_RADIUS, 33, 88) {
+	general.add(new CFGHSlider(UI.scale(150), CFG.AUTO_PICK_RADIUS, 33, 88) {
 	    @Override
 	    public void changed() {
 		label.settext(String.format("Auto pickup radius: %.02f", val / 11.0));
@@ -775,7 +807,7 @@ public class OptWnd extends Window {
 	}, x, y);
     
 	y += UI.scale(35);
-	general.add(new Button(UI.scale(120), "Toggle at login") {
+	general.add(new Button(UI.scale(150), "Toggle at login") {
 	    @Override
 	    public void click() {
 		if(ui.gui != null) {
@@ -858,7 +890,7 @@ public class OptWnd extends Window {
 	display.add(new CFGBox("Show object radius", CFG.SHOW_GOB_RADIUS, "Shows radius of mine supports, beehives etc.", true), x, y);
 
 	y += STEP;
-	display.add(new Button(UI.scale(120), "Show as buffs") {
+	display.add(new Button(UI.scale(150), "Show as buffs") {
 	    @Override
 	    public void click() {
 		if(ui.gui != null) {
@@ -934,7 +966,7 @@ public class OptWnd extends Window {
 	}, x, y);
  
 	my = Math.max(my, y);
-	x += UI.scale(250);
+	x += UI.scale(265);
 	y = 0;
 	display.add(new CFGBox("Use new combat UI", CFG.ALT_COMBAT_UI), x, y);
 	

@@ -137,9 +137,15 @@ public class AccountList extends Widget {
 
     public void add(String name, String token) {
 	Account c = new Account(name, token);
-	c.plb = add(new Button(UI.scale(200), name));
+	c.plb = add(new Button(UI.scale(200), name) {
+	    @Override
+	    protected boolean i10n() { return false; }
+	});
 	c.plb.hide();
-	c.del = add(new Button(UI.scale(20), "X"));
+	c.del = add(new Button(UI.scale(20), "X") {
+	    @Override
+	    protected boolean i10n() { return false; }
+	});
 	c.del.hide();
 	synchronized (accounts) {
 	    accounts.add(c);

@@ -141,7 +141,7 @@ public class TabStrip<T> extends Widget {
 
     public abstract static class Button<T> extends Widget {
 	public static final Coord padding = new Coord(5, 2);
-	public static final Text.Foundry font = new Text.Foundry(Text.fraktur, 14).aa(true);
+	public static final Text.Foundry font = new Text.Foundry(Text.serif, 14).aa(true);
 	private Color bg = new Color(0, 0, 0, 128);
 	private Tex image;
 	private Text text;

@@ -39,9 +39,9 @@ public class Makewindow extends Widget {
     List<Spec> inputs = Collections.emptyList();
     List<Spec> outputs = Collections.emptyList();
     List<Indir<Resource>> qmod = null;
-    static final Text qmodl = Text.render("Quality:");
+    static final Text qmodl = Text.render(L10N.label("Quality:"));
     static Coord boff = UI.scale(new Coord(7, 9));
-    final int xoff = UI.scale(45), qmy = UI.scale(38), outy = UI.scale(65);
+    final int xoff, qmy = UI.scale(38), outy = UI.scale(65);
     private Tex qtex;
     private boolean rebuild = false;
     public static final Text.Foundry nmf = new Text.Foundry(Text.serif, 20).aa(true);
@@ -157,8 +157,9 @@ public class Makewindow extends Widget {
     public static final KeyBinding kb_make = KeyBinding.get("make/one", KeyMatch.forcode(java.awt.event.KeyEvent.VK_ENTER, 0));
     public static final KeyBinding kb_makeall = KeyBinding.get("make/all", KeyMatch.forcode(java.awt.event.KeyEvent.VK_ENTER, KeyMatch.C));
     public Makewindow(String rcpnm) {
-	add(new Label("Input:"), new Coord(0, UI.scale(8)));
-	add(new Label("Result:"), new Coord(0, outy + UI.scale(8)));
+	int inputW = add(new Label("Input:"), new Coord(0, UI.scale(8))).sz.x;
+	int resultW = add(new Label("Result:"), new Coord(0, outy + UI.scale(8))).sz.x;
+	xoff = Math.max(inputW, resultW) + UI.scale(10);
 	add(new Button(UI.scale(85), "Craft"), UI.scale(new Coord(230, 75))).action(() -> wdgmsg("make", 0)).setgkey(kb_make);
 	add(new Button(UI.scale(85), "Craft All"), UI.scale(new Coord(325, 75))).action(() -> wdgmsg("make", 1)).setgkey(kb_makeall);
 	pack();
@@ -390,7 +391,7 @@ public class Makewindow extends Widget {
     }
 
     public static class Optional extends ItemInfo.Tip {
-	public static final Text text = RichText.render("$i{Optional}", 0);
+	public static final Text text = RichText.render(String.format("$i{%s}", L10N.label("Optional")), 0);
 	public Optional(Owner owner) {
 	    super(owner);
 	}

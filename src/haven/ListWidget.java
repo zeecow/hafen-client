@@ -26,6 +26,8 @@
 
 package haven;
 
+import java.util.Objects;
+
 public abstract class ListWidget<T> extends Widget {
     public final int itemh;
     public T sel;
@@ -66,7 +68,7 @@ public abstract class ListWidget<T> extends Widget {
 
     public int indexof(T item) {
         for (int i = 0; i < listitems(); i++)
-            if (listitem(i) == item)
+            if (Objects.equals(listitem(i), item))
                 return i;
         return -1;
     }

@@ -56,6 +56,33 @@ public class Equipory extends Widget implements DTarget {
 	new Coord(rx, 0 * yo),
 	new Coord(rx, 1 * yo),
     };
+    
+    public enum SLOTS {
+	HEAD(0),       //00: Headgear
+	ACCESSORY(1),  //01: Main Accessory
+	SHIRT(2),      //02: Shirt
+	ARMOR_BODY(3), //03: Torso Armor
+	GLOVES(4),     //04: Gloves
+	BELT(5),       //05: Belt
+	HAND_LEFT(6),  //06: Left Hand
+	HAND_RIGHT(7), //07: Right Hand
+	RING_LEFT(8),  //08: Left Hand Ring
+	RING_RIGHT(9), //09: Right Hand Ring
+	ROBE(10),      //10: Cloaks & Robes
+	BACK(11),      //11: Backpack
+	PANTS(12),     //12: Pants
+	ARMOR_LEG(13), //13: Leg Armor
+	CAPE(14),      //14: Cape
+	BOOTS(15),     //15: Shoes
+	STORE_HAT(16), //16: Hat from store
+	EYES(17),      //17: Eyes
+	MOUTH(18);     //18: Mouth
+    
+	public final int idx;
+	SLOTS(int idx) {
+	    this.idx = idx;
+	}
+    }
     public static final Tex[] ebgs = new Tex[ecoords.length];
     public static final Text[] etts = new Text[ecoords.length];
     static Coord isz;
@@ -77,7 +104,7 @@ public class Equipory extends Widget implements DTarget {
 	}
     }
 
-    WItem[] slots = new WItem[ecoords.length];
+    public WItem[] slots = new WItem[ecoords.length];
     Map<GItem, Collection<WItem>> wmap = new HashMap<>();
     private final Avaview ava;
 
@@ -142,6 +169,17 @@ public class Equipory extends Widget implements DTarget {
 		    WItem wdg = add(new WItem(g), ecoords[ep].add(1, 1));
 		    v.add(wdg);
 		    slots[ep] = wdg;
+		    if(ep == SLOTS.BELT.idx) {
+			wdg.onRClick((item, c, flags) -> {
+			    GameUI.Hidewnd belt = item.ui.gui.beltwnd;
+			    if(belt != null) {
+				belt.toggle();
+			    } else {
+			        item.rclick(c, flags);
+			    }
+			});
+			wdg.onBound(widget -> ((WItem) widget).rclick());
+		    }
 		}
 	    }
 	    v.trimToSize();

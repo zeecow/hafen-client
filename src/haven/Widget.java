@@ -27,6 +27,7 @@
 package haven;
 
 import haven.rx.Reactor;
+import me.ender.Reflect;
 import rx.Subscription;
 import rx.functions.Action0;
 import rx.functions.Action1;
@@ -53,7 +54,11 @@ public class Widget {
     private Widget prevtt;
     static Map<String, Factory> types = new TreeMap<String, Factory>();
     private final List<Subscription> subscriptions = new ArrayList<>();
-
+    protected final boolean i10n = i10n();
+    private boolean disposed = false;
+    private boolean bound = false;
+    private final List<Action1<Widget>> boundListeners = new LinkedList<>();
+    
     @dolda.jglob.Discoverable
     @Target(ElementType.TYPE)
     @Retention(RetentionPolicy.RUNTIME)
@@ -516,6 +521,12 @@ public class Widget {
     }
 
     public void dispose() {
+	synchronized (boundListeners) {boundListeners.clear();}
+        disposed = true;
+    }
+    
+    public boolean disposed() {
+	return disposed;
     }
 
     public void rdispose() {
@@ -1303,7 +1314,11 @@ public class Widget {
 	private KeyMatch rkey = null;
 
 	public KeyboundTip(String base) {
-	    this.base = base;
+	    this(base, true);
+	}
+    
+	public KeyboundTip(String base, boolean i10n) {
+	    this.base = i10n ? L10N.label(base) : base;
 	}
 
 	public KeyboundTip() {
@@ -1361,7 +1376,7 @@ public class Widget {
     }
 
     public Widget settip(String text) {
-	tooltip = new KeyboundTip(text);
+	tooltip = new KeyboundTip(text, !Reflect.is(this, "Pointer"));
 	return(this);
     }
     
@@ -1402,7 +1417,13 @@ public class Widget {
     }
 
     //called when this widget bound to id
-    public void bound() {}
+    public void bound() {
+	bound = true;
+	synchronized (boundListeners) {
+	    boundListeners.forEach(action -> action.call(this));
+	    boundListeners.clear();
+	}
+    }
 
     public final Collection<Anim> anims = new LinkedList<Anim>();
     public final Collection<Anim> nanims = new LinkedList<Anim>();
@@ -1483,6 +1504,18 @@ public class Widget {
 	    }
 	}
     }
+    
+    public void  onBound(Action1<Widget> action) {
+	synchronized (boundListeners) {
+	    if(bound) {
+		action.call(this);
+	    } else {
+		boundListeners.add(action);
+	    }
+	}
+    }
+    
+    protected boolean i10n() {return true;}
     
     public void listen(String event, Action1<Reactor.Event> callback) {
 	subscriptions.add(Reactor.listen(event, callback));

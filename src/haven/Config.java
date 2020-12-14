@@ -30,6 +30,7 @@ import haven.rx.Reactor;
 
 import java.io.*;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.Properties;
 
 import static haven.Utils.*;
@@ -158,10 +159,13 @@ public class Config {
 		exists = file.createNewFile();
 	    } catch (IOException ignored) {}
 	}
-	if(exists && file.canWrite()){
-	    try (PrintWriter out = new PrintWriter(file)) {
-		out.print(data);
-	    } catch (FileNotFoundException ignored) {
+	if(exists && file.canWrite()) {
+	    try (FileOutputStream fos = new FileOutputStream(file);
+		 OutputStreamWriter osw = new OutputStreamWriter(fos, StandardCharsets.UTF_8);
+		 BufferedWriter writer = new BufferedWriter(osw)) {
+		writer.write(data);
+	    } catch (IOException e) {
+		e.printStackTrace();
 	    }
 	}
     }

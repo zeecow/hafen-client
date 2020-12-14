@@ -83,8 +83,8 @@ public class FlowerList extends WidgetList<FlowerList.Item> {
 	    super(UI.scale(200, 25));
 	    this.name = name;
 
-	    cb = adda(new CheckBox(name), UI.scale(3, 12), 0, 0.5);
-	    cb.a = AUTOCHOOSE.get(name);
+	    cb = adda(new CheckBox.Untranslated(L10N.flower(name)), UI.scale(3, 12), 0, 0.5);
+	    cb.a = FlowerMenu.autochoose(name);
 	    cb.canactivate = true;
 
 	    add(new Button(UI.scale(24), "X"), UI.scale(175, 0));
