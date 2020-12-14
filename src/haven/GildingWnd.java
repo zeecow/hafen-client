@@ -10,6 +10,9 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import static haven.CharWnd.*;
+import static haven.PUtils.*;
+
 public class GildingWnd extends Window {
     private final WItem target;
     private final WItem gild;
@@ -110,10 +113,11 @@ public class GildingWnd extends Window {
 		    .reduce(0, Integer::sum)) / 100f);
 
 		return new Pair<>(k, ItemInfo.catimgsh(8, matches.stream()
-		    .map(res -> ItemInfo.catimgsh(1,
-			res.layer(Resource.imgc).img,
-			charWnd.findattr(res).compline().img)
-		    )
+		    .map(res -> {
+			BufferedImage val = charWnd.findattr(res).compline().img;
+			Coord tsz = new Coord(val.getHeight(), val.getHeight());
+			return ItemInfo.catimgsh(1, convolve(res.layer(Resource.imgc).img, tsz, iconfilter), val);
+		    })
 		    .toArray(BufferedImage[]::new)
 		));
 	    }
