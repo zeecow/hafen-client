@@ -533,6 +533,10 @@ public class MapMesh implements Rendered, Disposable {
 	    public void dispose() {
 		mesh.dispose();
 	    }
+
+	    public String toString() {
+		return(String.format("#<overlay %s>", id));
+	    }
 	}
 	return(new OL());
     }
