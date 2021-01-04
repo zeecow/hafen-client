@@ -451,12 +451,30 @@ public class MapMesh implements Rendered, Disposable {
 	}
     }
     
-    private static class OLOrder extends MLOrder {
-	OLOrder(int z) {super(z);}
+    public static class OLOrder extends Order<Rendered> {
+	public final MCache.OverlayInfo id;
+
+	public OLOrder(MCache.OverlayInfo id) {
+	    this.id = id;
+	}
 
 	public int mainz() {
 	    return(1002);
 	}
+
+	public boolean equals(Object x) {
+	    return((x instanceof OLOrder) && (((OLOrder)x).id == this.id));
+	}
+
+	public int hashCode() {
+	    return(System.identityHashCode(id));
+	}
+
+	private final static RComparator<Rendered> cmp = (a, b, sa, sb) -> {
+	    return(Utils.idcmp.compare(((OLOrder)sa.get(order)).id, ((OLOrder)sb.get(order)).id));
+	};
+
+	public RComparator<Rendered> cmp() {return(cmp);}
     }
     private static class OLArray {
 	MeshBuf dat;
@@ -521,8 +539,10 @@ public class MapMesh implements Rendered, Disposable {
 	FastMesh mesh = olvert.dat.mkmesh();
 	olvert.dat.clearfaces();
 	class OL implements Rendered, Disposable {
+	    final OLOrder order = new OLOrder(id);
+
 	    public boolean setup(RenderList rl) {
-		rl.prepo(new OLOrder(0));
+		rl.prepo(order);
 		return(true);
 	    }
 
