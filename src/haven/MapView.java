@@ -49,7 +49,6 @@ public class MapView extends PView implements DTarget, Console.Directory {
     private Collection<Rendered> extradraw = new LinkedList<Rendered>();
     public Camera camera = restorecam();
     private Plob placing = null;
-    private final Map<OverlayInfo, Integer> ols = new HashMap<>();
     private Grabber grab;
     private Selector selection;
     private Coord3f camoff = new Coord3f(Coord3f.o);
@@ -430,40 +429,53 @@ public class MapView extends PView implements DTarget, Console.Directory {
 	setcanfocus(true);
     }
     
-    public boolean visol(OverlayInfo id) {
-	synchronized(ols) {
-	    return(ols.containsKey(id));
+    public boolean visol(String tag) {
+	synchronized(oltags) {
+	    return(oltags.containsKey(tag));
 	}
     }
 
-    public void enol(OverlayInfo id) {
-	synchronized(ols) {
-	    ols.put(id, ols.getOrDefault(id, Integer.valueOf(0)) + 1);
+    public void enol(String tag) {
+	synchronized(oltags) {
+	    oltags.put(tag, oltags.getOrDefault(tag, 0) + 1);
 	}
     }
-	
-    public void disol(OverlayInfo id) {
-	synchronized(ols) {
-	    int rc = ols.getOrDefault(id, Integer.valueOf(0));
-	    if(--rc <= 0)
-		ols.remove(id);
+
+    public void disol(String tag) {
+	synchronized(oltags) {
+	    Integer rc = oltags.get(tag);
+	    if((rc != null) && (--rc > 0))
+		oltags.put(tag, rc);
 	    else
-		ols.put(id, rc);
+		oltags.remove(tag);;
 	}
     }
 
-    @Deprecated public boolean visol(int id) {
-	return(visol(MCache.olres.get(id).layer(MCache.ResOverlay.class)));
+    @Deprecated private String oltag(int id) {
+	switch(id) {
+	case 0: case 1:
+	    return("cplot");
+	case 2: case 3:
+	    return("vlg");
+	case 4: case 5:
+	    return("realm");
+	case 16:
+	    return("cplot-s");
+	case 17:
+	    return("sel");
+	}
+	return("n/a");
     }
-
+    @Deprecated public boolean visol(int id) {
+	return(visol(oltag(id)));
+    }
     @Deprecated public void enol(int... overlays) {
 	for(int id : overlays)
-	    enol(MCache.olres.get(id).layer(MCache.ResOverlay.class));
+	    enol(oltag(id));
     }
-
     @Deprecated public void disol(int... overlays) {
 	for(int id : overlays)
-	    disol(MCache.olres.get(id).layer(MCache.ResOverlay.class));
+	    disol(oltag(id));
     }
 
     private final Rendered flavobjs = new Rendered() {
@@ -523,26 +535,33 @@ public class MapView extends PView implements DTarget, Console.Directory {
 	    }
 	};
     
+    private final Map<String, Integer> oltags = new HashMap<>();
+    {oltags.put("show", 1);}
     private final Rendered mapol = new Rendered() {
 	    public void draw(GOut g) {}
 
 	    public boolean setup(RenderList rl) {
 		Coord cc = MapView.this.cc.floor(tilesz).div(MCache.cutsz);
-		Coord o = new Coord();
-		for(o.y = -view; o.y <= view; o.y++) {
-		    for(o.x = -view; o.x <= view; o.x++) {
-			Coord2d pc = cc.add(o).mul(MCache.cutsz).mul(tilesz);
-			Collection<OverlayInfo> ols;
-			synchronized(MapView.this.ols) {
-			    ols = new ArrayList<>(MapView.this.ols.keySet());
-			}
-			for(OverlayInfo olid : ols) {
-			    Rendered olcut = glob.map.getolcut(olid, cc.add(o));
-			    if(olcut != null) {
-				try {
-				    rl.add(olcut, GLState.compose(Location.xlate(new Coord3f((float)pc.x, -(float)pc.y, 0)), olid.mat()));
-				} catch(Loading l) {}
+		Area va = new Area(cc.sub(view, view), cc.add(view + 1, view + 1));
+		Collection<OverlayInfo> visol = new ArrayList<>();
+		synchronized(oltags) {
+		    for(OverlayInfo id : glob.map.getols(va.mul(MCache.cutsz))) {
+			for(String tag : id.tags()) {
+			    if(oltags.containsKey(tag)) {
+				visol.add(id);
+				break;
 			    }
+			}
+		    }
+		}
+		for(Coord gc : va) {
+		    Coord2d pc = gc.mul(MCache.cutsz).mul(tilesz);
+		    for(OverlayInfo olid : visol) {
+			Rendered olcut = glob.map.getolcut(olid, gc);
+			if(olcut != null) {
+			    try {
+				rl.add(olcut, GLState.compose(Location.xlate(new Coord3f((float)pc.x, -(float)pc.y, 0)), olid.mat()));
+			    } catch(Loading l) {}
 			}
 		    }
 		}
@@ -1368,36 +1387,22 @@ public class MapView extends PView implements DTarget, Console.Directory {
 	}
     }
 
-    // private Loader.Future<Collection<OverlayInfo>> olflash = null;
+    private Collection<String> olflash = null;
     private double olftimer;
 
     private void unflashol() {
-	/*
-	Loader.Future<Collection<OverlayInfo>> olflash = this.olflash;
 	if(olflash != null) {
-	    if(!olflash.cancel()) {
-		for(OverlayInfo ol : olflash.get())
-		    disol(ol);
-	    }
+	    olflash.forEach(this::disol);
 	}
 	olflash = null;
-	*/
 	olftimer = 0;
     }
 
-    private void flashol(Collection<Indir<Resource>> ols, double tm) {
+    private void flashol(Collection<String> ols, double tm) {
 	unflashol();
-	/*
-	Collection<OverlayInfo> ret = new ArrayList<>(ols.size());
-	olflash = glob.loader.defer(() -> {
-		while(!ols.isEmpty())
-		    ret.add(Utils.take(ols).get().layer(MCache.ResOverlay.class));
-		for(OverlayInfo ol : ret)
-		    enol(ol);
-		olftimer = Utils.rtime() + tm;
-		return(ret);
-	    });
-	*/
+	ols.forEach(this::enol);
+	olflash = ols;
+	olftimer = Utils.rtime() + tm;
     }
 
     public void uimsg(String msg, Object... args) {
@@ -1429,19 +1434,19 @@ public class MapView extends PView implements DTarget, Console.Directory {
 	    else
 		plgob = (Integer)args[0];
 	} else if(msg == "flashol") {
-	    Collection<Indir<Resource>> ols = new LinkedList<>();
+	    Collection<String> ols = new ArrayList<>();
 	    int olflash = (Integer)args[0];
 	    for(int i = 0; i < 32; i++) {
 		if((olflash & (1 << i)) != 0)
-		    ols.add(MCache.olres.get(i).indir());
+		    ols.add(oltag(i));
 	    }
 	    double tm = ((Number)args[1]).doubleValue() / 1000.0;
 	    flashol(ols, tm);
 	} else if(msg == "flashol2") {
-	    Collection<Indir<Resource>> ols = new LinkedList<>();
+	    Collection<String> ols = new LinkedList<>();
 	    double tm = ((Number)args[0]).doubleValue() / 100.0;
 	    for(int a = 1; a < args.length; a++)
-		ols.add(ui.sess.getres((Integer)args[a]));
+		ols.add((String)args[a]);
 	    flashol(ols, tm);
 	} else if(msg == "sel") {
 	    boolean sel = ((Integer)args[0]) != 0;
@@ -1767,7 +1772,6 @@ public class MapView extends PView implements DTarget, Console.Directory {
 
 	{
 	    grab(xl);
-	    enol(selol);
 	}
 
 	public boolean mmousedown(Coord mc, int button) {
@@ -1825,7 +1829,6 @@ public class MapView extends PView implements DTarget, Console.Directory {
 		    mgrab.remove();
 		}
 		release(xl);
-		disol(selol);
 	    }
 	}
     }
