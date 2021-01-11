@@ -1,3 +1,7 @@
+$size[14]{$u{Update for 11.01.21:}
+  * fixed object health percentage not updating properly
+  * merged loftar's changes.
+ 
 $size[14]{$u{Update for 11.12.20:}
   * fixed summer and winter season durations.
  
