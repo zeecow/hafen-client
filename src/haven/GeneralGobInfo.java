@@ -32,14 +32,6 @@ public class GeneralGobInfo extends GobInfo {
     }
     
     @Override
-    public void tick() {
-	if(this.health != gob.getattr(GobHealth.class)) {
-	    clean();
-	}
-	super.tick();
-    }
-
-    @Override
     public void dispose() {
 	health = null;
 	super.dispose();
