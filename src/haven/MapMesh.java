@@ -458,73 +458,83 @@ public class MapMesh implements Rendered, Disposable {
 	    return(1002);
 	}
     }
-    public Rendered[] makeols() {
-	final MeshBuf buf = new MeshBuf();
-	final MapSurface ms = data(gnd);
-	final MeshBuf.Vertex[] vl = new MeshBuf.Vertex[ms.vl.length];
-	final haven.Surface.Normals sn = ms.data(haven.Surface.nrm);
-	class Buf implements Tiler.MCons {
-	    int[] fl = new int[16];
-	    int fn = 0;
+    private static class OLArray {
+	MeshBuf dat;
+	MeshBuf.Vertex[] vl;
 
+	OLArray(MeshBuf dat, MeshBuf.Vertex[] vl) {
+	    this.dat = dat;
+	    this.vl = vl;
+	}
+    }
+    private OLArray makeolvbuf() {
+	MapSurface ms = data(gnd);
+	MeshBuf.Vertex[] vl = new MeshBuf.Vertex[ms.vl.length];
+	haven.Surface.Normals sn = ms.data(haven.Surface.nrm);
+	MeshBuf vbuf = new MeshBuf();
+	class Buf implements Tiler.MCons {
 	    public void faces(MapMesh m, Tiler.MPart d) {
 		for(Vertex v : d.v) {
 		    if(vl[v.vi] == null)
-			vl[v.vi] = buf.new Vertex(v, sn.get(v));
+			vl[v.vi] = vbuf.new Vertex(v, sn.get(v));
 		}
-		while(fn + d.f.length > fl.length)
-		    fl = Utils.extend(fl, fl.length * 2);
-		for(int fi : d.f)
-		    fl[fn++] = d.v[fi].vi;
+	    }
+	}
+	Buf buf = new Buf();
+	for(int y = 0; y < sz.y; y++) {
+	    for(int x = 0; x < sz.x; x++) {
+		Coord gc = ul.add(x, y);
+		map.tiler(map.gettile(gc)).lay(this, new Coord(x, y), gc, buf, false);
+	    }
+	}
+	return(new OLArray(vbuf, vl));
+    }
+    private OLArray olvert = null;
+    public Rendered makeol(MCache.OverlayInfo id) {
+	if(olvert == null)
+	    olvert = makeolvbuf();
+	olvert.dat.clearfaces();
+	class Buf implements Tiler.MCons {
+	    public void faces(MapMesh m, Tiler.MPart d) {
+		MeshBuf.Vertex[] vl = olvert.vl;
+		for(int i = 0; i < d.f.length; i += 3)
+		    olvert.dat.new Face(vl[d.v[d.f[i + 0]].vi],
+					vl[d.v[d.f[i + 1]].vi],
+					vl[d.v[d.f[i + 2]].vi]);
 	    }
 	}
 	Coord t = new Coord();
-	int[][] ol = new int[sz.x][sz.y];
+	Area a = Area.sized(ul, sz);
+	boolean[] ol = new boolean[a.area()];
+	map.getol(id, a, ol);
+	Buf buf = new Buf();
 	for(t.y = 0; t.y < sz.y; t.y++) {
 	    for(t.x = 0; t.x < sz.x; t.x++) {
-		ol[t.x][t.y] = map.getol(ul.add(t));
-	    }
-	}
-	Buf[] bufs = new Buf[32];
-	for(int i = 0; i < bufs.length; i++) {
-	    bufs[i] = new Buf();
-	    for(t.y = 0; t.y < sz.y; t.y++) {
-		for(t.x = 0; t.x < sz.x; t.x++) {
-		    if((ol[t.x][t.y] & (1 << i)) != 0) {
-			Coord gc = t.add(ul);
-			map.tiler(map.gettile(gc)).lay(this, t, gc, bufs[i], false);
-		    }
+		if(ol[t.x + (t.y * sz.x)]) {
+		    Coord gc = t.add(ul);
+		    map.tiler(map.gettile(gc)).lay(this, t, gc, buf, false);
 		}
 	    }
 	}
-	Rendered[] ret = new Rendered[32];
-	for(int i = 0; i < bufs.length; i++) {
-	    if(bufs[i].fn > 0) {
-		int[] fl = bufs[i].fl;
-		int fn = bufs[i].fn;
-		buf.clearfaces();
-		for(int o = 0; o < fn; o += 3)
-		    buf.new Face(vl[fl[o]], vl[fl[o + 1]], vl[fl[o + 2]]);
-		final FastMesh mesh = buf.mkmesh();
-		final int z = i;
-		class OL implements Rendered, Disposable {
-		    public void draw(GOut g) {
-			mesh.draw(g);
-		    }
+	if(olvert.dat.f.isEmpty())
+	    return(null);
+	FastMesh mesh = olvert.dat.mkmesh();
+	olvert.dat.clearfaces();
+	class OL implements Rendered, Disposable {
+	    public boolean setup(RenderList rl) {
+		rl.prepo(new OLOrder(0));
+		return(true);
+	    }
 
-		    public void dispose() {
-			mesh.dispose();
-		    }
+	    public void draw(GOut g) {
+		mesh.draw(g);
+	    }
 
-		    public boolean setup(RenderList rl) {
-			rl.prepo(new OLOrder(z));
-			return(true);
-		    }
-		}
-		ret[i] = new OL();
+	    public void dispose() {
+		mesh.dispose();
 	    }
 	}
-	return(ret);
+	return(new OL());
     }
 
     private void clean() {

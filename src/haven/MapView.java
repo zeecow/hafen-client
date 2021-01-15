@@ -36,6 +36,7 @@ import java.util.*;
 import java.lang.ref.*;
 import java.lang.reflect.*;
 import javax.media.opengl.*;
+import haven.MCache.OverlayInfo;
 
 public class MapView extends PView implements DTarget, Console.Directory {
     public static boolean clickdb = false;
@@ -48,7 +49,7 @@ public class MapView extends PView implements DTarget, Console.Directory {
     private Collection<Rendered> extradraw = new LinkedList<Rendered>();
     public Camera camera = restorecam();
     private Plob placing = null;
-    private int[] visol = new int[32];
+    private final Map<OverlayInfo, Integer> ols = new HashMap<>();
     private Grabber grab;
     private Selector selection;
     private Coord3f camoff = new Coord3f(Coord3f.o);
@@ -429,18 +430,40 @@ public class MapView extends PView implements DTarget, Console.Directory {
 	setcanfocus(true);
     }
     
-    public boolean visol(int ol) {
-	return(visol[ol] > 0);
+    public boolean visol(OverlayInfo id) {
+	synchronized(ols) {
+	    return(ols.containsKey(id));
+	}
     }
 
-    public void enol(int... overlays) {
-	for(int ol : overlays)
-	    visol[ol]++;
+    public void enol(OverlayInfo id) {
+	synchronized(ols) {
+	    ols.put(id, ols.getOrDefault(id, Integer.valueOf(0)) + 1);
+	}
     }
 	
-    public void disol(int... overlays) {
-	for(int ol : overlays)
-	    visol[ol]--;
+    public void disol(OverlayInfo id) {
+	synchronized(ols) {
+	    int rc = ols.getOrDefault(id, Integer.valueOf(0));
+	    if(--rc <= 0)
+		ols.remove(id);
+	    else
+		ols.put(id, rc);
+	}
+    }
+
+    @Deprecated public boolean visol(int id) {
+	return(visol(MCache.olres.get(id).get().layer(MCache.ResOverlay.class)));
+    }
+
+    @Deprecated public void enol(int... overlays) {
+	for(int id : overlays)
+	    enol(MCache.olres.get(id).get().layer(MCache.ResOverlay.class));
+    }
+
+    @Deprecated public void disol(int... overlays) {
+	for(int id : overlays)
+	    disol(MCache.olres.get(id).get().layer(MCache.ResOverlay.class));
     }
 
     private final Rendered flavobjs = new Rendered() {
@@ -500,30 +523,7 @@ public class MapView extends PView implements DTarget, Console.Directory {
 	    }
 	};
     
-    {
-	visol[6] = 1;
-    }
     private final Rendered mapol = new Rendered() {
-	    private final GLState[] mats;
-	    {
-		mats = new GLState[32];
-		mats[0] = olmat(255, 0, 128, 32);
-		mats[1] = olmat(0, 0, 255, 32);
-		mats[2] = olmat(255, 0, 0, 32);
-		mats[3] = olmat(128, 0, 255, 32);
-		mats[4] = olmat(255, 255, 255, 32);
-		mats[5] = olmat(0, 255, 128, 32);
-		mats[6] = olmat(0, 0, 0, 64);
-		mats[16] = olmat(0, 255, 0, 32);
-		mats[17] = olmat(255, 255, 0, 32);
-	    }
-
-	    private GLState olmat(int r, int g, int b, int a) {
-		return(new Material(Light.deflight,
-				    new Material.Colors(Color.BLACK, new Color(0, 0, 0, a), Color.BLACK, new Color(r, g, b, 255), 0),
-				    States.presdepth));
-	    }
-
 	    public void draw(GOut g) {}
 
 	    public boolean setup(RenderList rl) {
@@ -532,14 +532,16 @@ public class MapView extends PView implements DTarget, Console.Directory {
 		for(o.y = -view; o.y <= view; o.y++) {
 		    for(o.x = -view; o.x <= view; o.x++) {
 			Coord2d pc = cc.add(o).mul(MCache.cutsz).mul(tilesz);
-			for(int i = 0; i < visol.length; i++) {
-			    if(mats[i] == null)
-				continue;
-			    if(visol[i] > 0) {
-				Rendered olcut;
-				olcut = glob.map.getolcut(i, cc.add(o));
-				if(olcut != null)
-				    rl.add(olcut, GLState.compose(Location.xlate(new Coord3f((float)pc.x, -(float)pc.y, 0)), mats[i]));
+			Collection<OverlayInfo> ols;
+			synchronized(MapView.this.ols) {
+			    ols = new ArrayList<>(MapView.this.ols.keySet());
+			}
+			for(OverlayInfo olid : ols) {
+			    Rendered olcut = glob.map.getolcut(olid, cc.add(o));
+			    if(olcut != null) {
+				try {
+				    rl.add(olcut, GLState.compose(Location.xlate(new Coord3f((float)pc.x, -(float)pc.y, 0)), olid.mat()));
+				} catch(Loading l) {}
 			    }
 			}
 		    }
@@ -1366,16 +1368,36 @@ public class MapView extends PView implements DTarget, Console.Directory {
 	}
     }
 
-    private int olflash;
+    // private Loader.Future<Collection<OverlayInfo>> olflash = null;
     private double olftimer;
 
     private void unflashol() {
-	for(int i = 0; i < visol.length; i++) {
-	    if((olflash & (1 << i)) != 0)
-		visol[i]--;
+	/*
+	Loader.Future<Collection<OverlayInfo>> olflash = this.olflash;
+	if(olflash != null) {
+	    if(!olflash.cancel()) {
+		for(OverlayInfo ol : olflash.get())
+		    disol(ol);
+	    }
 	}
-	olflash = 0;
+	olflash = null;
+	*/
 	olftimer = 0;
+    }
+
+    private void flashol(Collection<Indir<Resource>> ols, double tm) {
+	unflashol();
+	/*
+	Collection<OverlayInfo> ret = new ArrayList<>(ols.size());
+	olflash = glob.loader.defer(() -> {
+		while(!ols.isEmpty())
+		    ret.add(Utils.take(ols).get().layer(MCache.ResOverlay.class));
+		for(OverlayInfo ol : ret)
+		    enol(ol);
+		olftimer = Utils.rtime() + tm;
+		return(ret);
+	    });
+	*/
     }
 
     public void uimsg(String msg, Object... args) {
@@ -1407,13 +1429,20 @@ public class MapView extends PView implements DTarget, Console.Directory {
 	    else
 		plgob = (Integer)args[0];
 	} else if(msg == "flashol") {
-	    unflashol();
-	    olflash = (Integer)args[0];
-	    for(int i = 0; i < visol.length; i++) {
+	    Collection<Indir<Resource>> ols = new LinkedList<>();
+	    int olflash = (Integer)args[0];
+	    for(int i = 0; i < 32; i++) {
 		if((olflash & (1 << i)) != 0)
-		    visol[i]++;
+		    ols.add(MCache.olres.get(i));
 	    }
-	    olftimer = Utils.rtime() + (((Number)args[1]).doubleValue() / 1000.0);
+	    double tm = ((Number)args[1]).doubleValue() / 1000.0;
+	    flashol(ols, tm);
+	} else if(msg == "flashol2") {
+	    Collection<Indir<Resource>> ols = new LinkedList<>();
+	    double tm = ((Number)args[0]).doubleValue() / 100.0;
+	    for(int a = 1; a < args.length; a++)
+		ols.add(ui.sess.getres((Integer)args[a]));
+	    flashol(ols, tm);
 	} else if(msg == "sel") {
 	    boolean sel = ((Integer)args[0]) != 0;
 	    synchronized(this) {
@@ -1706,6 +1735,19 @@ public class MapView extends PView implements DTarget, Console.Directory {
 	}
     }
 
+    public static final OverlayInfo selol = new OverlayInfo() {
+	    final Material mat = new Material(Light.deflight,
+					      new Material.Colors(Color.BLACK, new Color(0, 0, 0, 32), Color.BLACK, new Color(255, 255, 0, 255)),
+					      States.presdepth);
+
+	    public Collection<String> tags() {
+		return(Arrays.asList("show"));
+	    }
+
+	    public Material mat() {
+		return(mat);
+	    }
+	};
     private class Selector implements Grabber {
 	Coord sc;
 	MCache.Overlay ol;
@@ -1725,7 +1767,7 @@ public class MapView extends PView implements DTarget, Console.Directory {
 
 	{
 	    grab(xl);
-	    enol(17);
+	    enol(selol);
 	}
 
 	public boolean mmousedown(Coord mc, int button) {
@@ -1740,7 +1782,7 @@ public class MapView extends PView implements DTarget, Console.Directory {
 		modflags = ui.modflags();
 		xl.mv = true;
 		mgrab = ui.grabmouse(MapView.this);
-		ol = glob.map.new Overlay(sc, sc, 1 << 17);
+		ol = glob.map.new Overlay(Area.sized(sc, new Coord(1, 1)), selol);
 		return(true);
 	    }
 	}
@@ -1770,7 +1812,7 @@ public class MapView extends PView implements DTarget, Console.Directory {
 		    Coord tc = mc.div(MCache.tilesz2);
 		    Coord c1 = new Coord(Math.min(tc.x, sc.x), Math.min(tc.y, sc.y));
 		    Coord c2 = new Coord(Math.max(tc.x, sc.x), Math.max(tc.y, sc.y));
-		    ol.update(c1, c2);
+		    ol.update(new Area(c1, c2.add(1, 1)));
 		    tt = Text.render(String.format("%d\u00d7%d", c2.x - c1.x + 1, c2.y - c1.y + 1));
 		}
 	    }
@@ -1783,7 +1825,7 @@ public class MapView extends PView implements DTarget, Console.Directory {
 		    mgrab.remove();
 		}
 		release(xl);
-		disol(17);
+		disol(selol);
 	    }
 	}
     }
