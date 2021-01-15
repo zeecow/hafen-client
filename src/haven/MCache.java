@@ -167,6 +167,7 @@ public class MCache {
 	.put(17, Resource.remote().loadwait("gfx/tiles/overlay/sel"))
 	.map();
     public class Grid {
+	public final String mnm = null;
 	public final Coord gc, ul;
 	public final int tiles[] = new int[cmaps.x * cmaps.y];
 	public final float z[] = new float[cmaps.x * cmaps.y];
