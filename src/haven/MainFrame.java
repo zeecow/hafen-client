@@ -232,7 +232,13 @@ public class MainFrame extends java.awt.Frame implements Runnable, Console.Direc
 	}
     }
 
-    public void run() {
+	@Override
+	public void setTitle(String title) {
+    	title = title + " (zeecow mod)";
+		super.setTitle(title);
+	}
+
+	public void run() {
 	if(Thread.currentThread() != this.mt)
 	    throw(new RuntimeException("MainFrame is being run from an invalid context"));
 	Thread ui = new HackThread(p, "Haven UI thread");

@@ -27,6 +27,7 @@
 package haven;
 
 import java.util.*;
+import java.awt.Cursor;
 import java.awt.Toolkit;
 import java.awt.Robot;
 import java.awt.Point;
@@ -396,6 +397,17 @@ public class JOGLPanel extends GLCanvas implements Runnable, UIPanel, Console.Di
 	synchronized(ui) {
 	    curs = ui.getcurs(ui.mc);
 	}
+
+	// use system arrow pointer
+	try{
+		if(curs.name.endsWith("curs/arw")) {
+			lastcursor = null;
+			setCursor(Cursor.getDefaultCursor());
+			return;
+		}
+	}catch (Exception nevermind){
+	}
+
 	if(cursmode == "awt") {
 	    if(curs != lastcursor) {
 		try {

@@ -39,6 +39,7 @@ public class GItem extends AWidget implements ItemInfo.SpriteOwner, GSprite.Owne
     private GSprite spr;
     private ItemInfo.Raw rawinfo;
     private List<ItemInfo> info = Collections.emptyList();
+	private boolean minedItemDropped = false;
 
     @RName("item")
     public static class $_ implements Factory {
@@ -140,11 +141,26 @@ public class GItem extends AWidget implements ItemInfo.SpriteOwner, GSprite.Owne
 	if(spr == null) {
 	    try {
 		spr = this.spr = GSprite.create(this, res.get(), sdt.clone());
+		if (!minedItemDropped) {
+			dropMinedItem();
+			minedItemDropped = true;
+		}
 	    } catch(Loading l) {
 	    }
 	}
 	return(spr);
     }
+
+	private void dropMinedItem() {
+		Resource curs = ui.root.getcurs(Coord.z);
+		String name = this.resource().basename();
+		if (curs != null && curs.name.equals("gfx/hud/curs/mine") &&
+				(Config.dropMinedStones && Config.mineablesStone.contains(name) ||
+						Config.dropMinedOre && Config.mineablesOre.contains(name) ||
+						Config.dropMinedOrePrecious && Config.mineablesOrePrecious.contains(name) ||
+						Config.dropMinedCurios && Config.mineablesCurios.contains(name)))
+			this.wdgmsg("drop", Coord.z);
+	}
 
     public void tick(double dt) {
 	GSprite spr = spr();

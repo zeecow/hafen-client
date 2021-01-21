@@ -90,7 +90,11 @@
   <target name="deftgt" depends="jars, appletview" />
 
   <target name="run" depends="jars">
-    <java jar="build/hafen.jar" fork="true" />
+    <java fork="true" jar="build/hafen.jar">
+      <sysproperty key="haven.defserv" value="game.havenandhearth.com" />
+      <sysproperty key="haven.resurl" value="http://game.havenandhearth.com/render/res/" />
+      <sysproperty key="haven.cachebase" value="http://game.havenandhearth.com/render/" />
+    </java>
   </target>
   
   <target name="clean">
