@@ -46,6 +46,8 @@ public class Makewindow extends Widget {
     public List<Indir<Resource>> tools = new ArrayList<>();;
     private int xoff = UI.scale(45), qmy = UI.scale(38), outy = UI.scale(65);
     public static final Text.Foundry nmf = new Text.Foundry(Text.serif, 20).aa(true);
+    private static double softcap = 0;
+    private static Tex softTex = null;
 
     @RName("make")
     public static class $_ implements Factory {
@@ -241,13 +243,24 @@ public class Makewindow extends Widget {
 		x += qmodl.sz().x + UI.scale(5);
 		x = Math.max(x, xoff);
 		qmx = x;
+		int count = 0;
+		double product = 1.0;
 		for(Indir<Resource> qm : qmod) {
 		    try {
 			Tex t = qmicon(qm);
 			g.image(t, new Coord(x, qmy));
 			x += t.sz().x + UI.scale(1);
+		    
+			Glob.CAttr attr = ui.gui.chrwdg.findattr(qm.get().basename());
+			if(attr != null) {
+			    count++;
+			    product = product * attr.comp;
+			}
 		    } catch(Loading l) {
 		    }
+		}
+		if(count > 0) {
+		    x += drawSoftcap(g, new Coord(x, qmy), product, count);
 		}
 		x += UI.scale(25);
 	    }
@@ -275,6 +288,24 @@ public class Makewindow extends Widget {
 	    c = c.add(Inventory.sqsz.x, 0);
 	}
 	super.draw(g);
+    }
+    
+    private int drawSoftcap(GOut g, Coord p, double product, int count) {
+	if(count > 0) {
+	    double current = Math.pow(product, 1.0 / count);
+	    if(current != softcap || softTex == null) {
+		softcap = current;
+		String format = String.format("%s %.1f", L10N.label("Softcap:"), softcap);
+		Text txt = Text.renderstroked(format, Color.WHITE, Color.BLACK, Glob.CAttr.fnd);
+		if(softTex != null) {
+		    softTex.dispose();
+		}
+		softTex = new TexI(txt.img);
+	    }
+	    g.image(softTex, p.add(UI.scale(5), 0));
+	    return softTex.sz().x + UI.scale(6);
+	}
+	return 0;
     }
     
     private Tex buildQTex(Indir<Resource> res) {
