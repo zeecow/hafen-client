@@ -1,3 +1,6 @@
+$size[14]{$u{Update for 29.01.21:}
+  * merged loftar's changes
+ 
 $size[14]{$u{Update for 11.01.21:}
   * fixed object health percentage not updating properly
   * merged loftar's changes.
