@@ -118,7 +118,7 @@ public class CraftDBWnd extends Window implements DTarget2 {
     }
 
     private void init() {
-	CRAFT = paginafor(Resource.local().load("paginae/act/craft"));
+	CRAFT = paginafor(Resource.remote().load("paginae/act/craft"));
 	HISTORY = paginafor(Resource.local().load("paginae/act/history"));
 	FAVOURITES = paginafor(Resource.local().load("paginae/act/favourites"));
     
