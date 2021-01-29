@@ -902,7 +902,7 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 	if(equwnd != null)
 	    Utils.setprefc("wndc-equ", equwnd.c);
 	if(chrwdg != null)
-	    Utils.setprefc("wndc-chr", chrwdg.sz);
+	    Utils.setprefc("wndc-chr", chrwdg.c);
 	if(zerg != null)
 	    Utils.setprefc("wndc-zerg", zerg.c);
 	if(mapfile != null) {
@@ -981,7 +981,12 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 		addcmeter(new FEPMeter(chrwdg.feps));
 	    }
 	} else if(place == "craft") {
+	    String cap = "";
 	    final Widget mkwdg = child;
+	    if(mkwdg instanceof Makewindow)
+		cap = ((Makewindow)mkwdg).rcpnm;
+	    if(cap.equals(""))
+		cap = "Crafting";
 	    if(craftwnd != null){
 		craftwnd.setMakewindow(mkwdg);
 	    } else {

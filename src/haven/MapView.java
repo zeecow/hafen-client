@@ -216,7 +216,7 @@ public class MapView extends PView implements DTarget, Console.Directory {
     }
     static {camtypes.put("follow", FollowCam.class);}
 
-    public class FreeCam extends Camera {
+    public class SimpleCam extends Camera {
 	private float dist = 50.0f;
 	private float elev = (float)Math.PI / 4.0f;
 	private float angl = 0.0f;
@@ -249,10 +249,69 @@ public class MapView extends PView implements DTarget, Console.Directory {
 	}
 
 	public boolean wheel(Coord c, int amount) {
-	    float d = dist + (amount * 5);
+	    float d = dist + (amount * 25);
 	    if(d < 5)
 		d = 5;
 	    dist = d;
+	    return(true);
+	}
+    }
+    static {camtypes.put("worse", SimpleCam.class);}
+
+    public class FreeCam extends Camera {
+	private float dist = 50.0f, tdist = dist;
+	private float elev = (float)Math.PI / 4.0f, telev = elev;
+	private float angl = 0.0f, tangl = angl;
+	private Coord dragorig = null;
+	private float elevorig, anglorig;
+	private final float pi2 = (float)(Math.PI * 2);
+	private Coord3f cc = null;
+
+	public void tick(double dt) {
+	    float cf = (1f - (float)Math.pow(500, -dt * 3));
+	    angl = angl + ((tangl - angl) * cf);
+	    while(angl > pi2) {angl -= pi2; tangl -= pi2; anglorig -= pi2;}
+	    while(angl < 0)   {angl += pi2; tangl += pi2; anglorig += pi2;}
+	    if(Math.abs(tangl - angl) < 0.0001) angl = tangl;
+
+	    elev = elev + ((telev - elev) * cf);
+	    if(Math.abs(telev - elev) < 0.0001) elev = telev;
+
+	    dist = dist + ((tdist - dist) * cf);
+	    if(Math.abs(tdist - dist) < 0.0001) dist = tdist;
+
+	    Coord3f mc = getcc();
+	    mc.y = -mc.y;
+	    if((cc == null) || (Math.hypot(mc.x - cc.x, mc.y - cc.y) > 250))
+		cc = mc;
+	    else
+		cc = cc.add(mc.sub(cc).mul(cf));
+	    view = new haven.render.Camera(PointedCam.compute(cc.add(0.0f, 0.0f, 15f), dist, elev, angl));
+	}
+
+	public float angle() {
+	    return(angl);
+	}
+
+	public boolean click(Coord c) {
+	    elevorig = elev;
+	    anglorig = angl;
+	    dragorig = c;
+	    return(true);
+	}
+
+	public void drag(Coord c) {
+	    telev = elevorig - ((float)(c.y - dragorig.y) / 100.0f);
+	    if(telev < 0.0f) telev = 0.0f;
+	    if(telev > (Math.PI / 2.0)) telev = (float)Math.PI / 2.0f;
+	    tangl = anglorig + ((float)(c.x - dragorig.x) / 100.0f);
+	}
+
+	public boolean wheel(Coord c, int amount) {
+	    float d = tdist + (amount * 25);
+	    if(d < 5)
+		d = 5;
+	    tdist = d;
 	    return(true);
 	}
     }
@@ -346,14 +405,15 @@ public class MapView extends PView implements DTarget, Console.Directory {
 	}
 
 	public void tick2(double dt) {
+	    float cf = 1f - (float)Math.pow(500, -dt);
 	    Coord3f mc = getcc();
 	    mc.y = -mc.y;
 	    if((cc == null) || (Math.hypot(mc.x - cc.x, mc.y - cc.y) > 250))
 		cc = mc;
 	    else if(!exact || (mc.dist(cc) > 2))
-		cc = cc.add(mc.sub(cc).mul(1f - (float)Math.pow(500, -dt)));
+		cc = cc.add(mc.sub(cc).mul(cf));
 
-	    angl = angl + ((tangl - angl) * (1f - (float)Math.pow(500, -dt)));
+	    angl = angl + ((tangl - angl) * cf);
 	    while(angl > pi2) {angl -= pi2; tangl -= pi2; anglorig -= pi2;}
 	    while(angl < 0)   {angl += pi2; tangl += pi2; anglorig += pi2;}
 	    if(Math.abs(tangl - angl) < 0.001)
@@ -361,7 +421,7 @@ public class MapView extends PView implements DTarget, Console.Directory {
 	    else
 		jc = cc;
 
-	    field = field + ((tfield - field) * (1f - (float)Math.pow(500, -dt)));
+	    field = field + ((tfield - field) * cf);
 	    if(Math.abs(tfield - field) < 0.1)
 		field = tfield;
 	    else
@@ -733,9 +793,14 @@ public class MapView extends PView implements DTarget, Console.Directory {
 	int rc = 0;
 	boolean used;
 
-	final Grid grid = new Grid<RenderTree.Node>() {
+	final Grid base = new Grid<RenderTree.Node>() {
 		RenderTree.Node getcut(Coord cc) {
 		    return(map.getolcut(id, cc));
+		}
+	    };
+	final Grid outl = new Grid<RenderTree.Node>() {
+		RenderTree.Node getcut(Coord cc) {
+		    return(map.getololcut(id, cc));
 		}
 	    };
 
@@ -746,13 +811,16 @@ public class MapView extends PView implements DTarget, Console.Directory {
 	void tick() {
 	    super.tick();
 	    if(area != null) {
-		grid.tick();
+		base.tick();
+		outl.tick();
 	    }
 	}
 
 	public void added(RenderTree.Slot slot) {
-	    slot.ostate(id.mat());
-	    slot.add(grid);
+	    slot.add(base, id.mat());
+	    Material omat = id.omat();
+	    if(omat != null)
+		slot.add(outl, omat);
 	    super.added(slot);
 	}
 
@@ -760,7 +828,7 @@ public class MapView extends PView implements DTarget, Console.Directory {
 	    Loading ret = super.loading();
 	    if(ret != null)
 		return(ret);
-	    if((ret = grid.lastload) != null)
+	    if((ret = base.lastload) != null)
 		return(ret);
 	    return(null);
 	}
@@ -1355,7 +1423,9 @@ public class MapView extends PView implements DTarget, Console.Directory {
 	    clickdepth = new DepthBuffer<>(new Texture2D(sz, DataBuffer.Usage.STATIC, Texture.DEPTH, new VectorFormat(1, NumberFormat.FLOAT32), null).image(0));
 	    curclickbasic = Pipe.Op.compose(Clicklist.clickbasic, clickid, clickdepth, new States.Viewport(Area.sized(Coord.z, sz)));
 	}
-	return(Pipe.Op.compose(curclickbasic, camera));
+	/* XXX: FrameInfo shouldn't be treated specially. Is a new
+	 * Slot.Type in order, perhaps? */
+	return(Pipe.Op.compose(curclickbasic, camera, conf.state().get(FrameInfo.slot)));
     }
 
     private void checkmapclick(Render out, Pipe.Op basic, Coord c, Consumer<Coord2d> cb) {
@@ -2141,9 +2211,7 @@ public class MapView extends PView implements DTarget, Console.Directory {
 		return(Arrays.asList("show"));
 	    }
 
-	    public Material mat() {
-		return(mat);
-	    }
+	    public Material mat() {return(mat);}
 	};
     private class Selector implements Grabber {
 	Coord sc;
