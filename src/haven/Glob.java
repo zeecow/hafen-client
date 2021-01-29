@@ -88,6 +88,7 @@ public class Glob {
 	    this.base = base;
 	    this.comp = comp;
 	    compLine = null;
+	    Makewindow.invalidate(nm);
 	}
 
 	public Text.Line compline() {

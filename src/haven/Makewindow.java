@@ -210,7 +210,9 @@ public class Makewindow extends Widget {
     public static final Coord qmodsz = UI.scale(20, 20);
     private static final Map<Indir<Resource>, Tex> qmicons = new WeakHashMap<>();
     private Tex qmicon(Indir<Resource> qm) {
-	return qmicons.computeIfAbsent(qm, Makewindow.this::buildQTex);
+        synchronized (qmicons) {
+	    return qmicons.computeIfAbsent(qm, Makewindow.this::buildQTex);
+	}
     }
 
     public void draw(GOut g) {
@@ -285,6 +287,16 @@ public class Makewindow extends Widget {
 	} catch (Exception ignored) {
 	}
 	return new TexI(result);
+    }
+    
+    public static void invalidate(String name) {
+	synchronized (qmicons) {
+	    qmicons.keySet().forEach(res -> {
+		if(name.equals(res.get().basename())) {
+		    qmicons.remove(res);
+		}
+	    });
+	}
     }
     
     private int qmx, toolx;
