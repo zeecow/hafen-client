@@ -322,7 +322,8 @@ public class Makewindow extends Widget {
     
     public static void invalidate(String name) {
 	synchronized (qmicons) {
-	    qmicons.keySet().forEach(res -> {
+	    LinkedList<Indir<Resource>> tmp = new LinkedList<>(qmicons.keySet());
+	    tmp.forEach(res -> {
 		if(name.equals(res.get().basename())) {
 		    qmicons.remove(res);
 		}
