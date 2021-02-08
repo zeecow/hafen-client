@@ -79,8 +79,8 @@ public class CraftDBWnd extends Window implements DTarget2 {
 	private final Resource.Named res;
  
 	Mode(String name, boolean reparent) {
-	    Resource.local().loadwait(name);
-	    this.res = Resource.local().load(name);
+	    Resource.remote().loadwait(name);
+	    this.res = Resource.remote().load(name);
 	    this.reparent = reparent;
 	    this.items = new LinkedList<>();
 	}
@@ -119,8 +119,8 @@ public class CraftDBWnd extends Window implements DTarget2 {
 
     private void init() {
 	CRAFT = paginafor(Resource.remote().load("paginae/act/craft"));
-	HISTORY = paginafor(Resource.local().load("paginae/act/history"));
-	FAVOURITES = paginafor(Resource.local().load("paginae/act/favourites"));
+	HISTORY = paginafor(Resource.remote().load("paginae/act/history"));
+	FAVOURITES = paginafor(Resource.remote().load("paginae/act/favourites"));
     
 	loadFavourites(Config.userpath());
 	subscription = Reactor.PLAYER.subscribe(this::loadFavourites);
