@@ -1,3 +1,8 @@
+size[14]{$u{Update for 08.02.21:}
+  * merged loftar's changes
+  * hopefully fixed ConcurrentModificationException when updating attribute/skill values in craft window
+  * fixed crash when opening Extended Craft window
+ 
 $size[14]{$u{Update for 29.01.21:}
   * merged loftar's changes
  
