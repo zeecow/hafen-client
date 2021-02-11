@@ -91,52 +91,56 @@ public class Hitbox extends GAttrib implements RenderTree.Node, Rendered {
     }
     
     private static Model getModel(Gob gob) {
-	Resource res = getResource(gob);
-	Model model = MODEL_CACHE.get(res);
-	if(model == null) {
-	    List<List<Coord3f>> polygons = new LinkedList<>();
+	Model model;
+	synchronized (MODEL_CACHE) {
+	    Resource res = getResource(gob);
+	
+	    model = MODEL_CACHE.get(res);
+	    if(model == null) {
+		List<List<Coord3f>> polygons = new LinkedList<>();
 	    
-	    Collection<Resource.Neg> negs = res.layers(Resource.Neg.class);
-	    if(negs != null) {
-		for (Resource.Neg neg : negs) {
-		    List<Coord3f> box = new LinkedList<>();
-		    box.add(new Coord3f(neg.ac.x, neg.ac.y, Z));
-		    box.add(new Coord3f(neg.bc.x, neg.ac.y, Z));
-		    box.add(new Coord3f(neg.bc.x, neg.bc.y, Z));
-		    box.add(new Coord3f(neg.ac.x, neg.bc.y, Z));
+		Collection<Resource.Neg> negs = res.layers(Resource.Neg.class);
+		if(negs != null) {
+		    for (Resource.Neg neg : negs) {
+			List<Coord3f> box = new LinkedList<>();
+			box.add(new Coord3f(neg.ac.x, neg.ac.y, Z));
+			box.add(new Coord3f(neg.bc.x, neg.ac.y, Z));
+			box.add(new Coord3f(neg.bc.x, neg.bc.y, Z));
+			box.add(new Coord3f(neg.ac.x, neg.bc.y, Z));
 		    
-		    polygons.add(box);
-		}
+			polygons.add(box);
+		    }
 		
-	    }
+		}
 	    
-	    Collection<Resource.Obst> obstacles = res.layers(Resource.Obst.class);
-	    if(obstacles != null) {
-		for (Resource.Obst obstacle : obstacles) {
-		    if(!"build".equals(obstacle.id)) {
-			for (Coord2d[] polygon : obstacle.polygons) {
-			    polygons.add(Arrays.stream(polygon)
-				.map(coord2d -> new Coord3f(11 * (float) coord2d.x, 11 * (float) coord2d.y, Z))
-				.collect(Collectors.toList()));
+		Collection<Resource.Obst> obstacles = res.layers(Resource.Obst.class);
+		if(obstacles != null) {
+		    for (Resource.Obst obstacle : obstacles) {
+			if(!"build".equals(obstacle.id)) {
+			    for (Coord2d[] polygon : obstacle.polygons) {
+				polygons.add(Arrays.stream(polygon)
+				    .map(coord2d -> new Coord3f(11 * (float) coord2d.x, 11 * (float) coord2d.y, Z))
+				    .collect(Collectors.toList()));
+			    }
 			}
 		    }
 		}
-	    }
 	    
-	    if(!polygons.isEmpty()) {
-		List<Float> vertices = new LinkedList<>();
+		if(!polygons.isEmpty()) {
+		    List<Float> vertices = new LinkedList<>();
 		
-		for (List<Coord3f> polygon : polygons) {
-		    addLoopedVertices(vertices, polygon);
+		    for (List<Coord3f> polygon : polygons) {
+			addLoopedVertices(vertices, polygon);
+		    }
+		
+		    float[] data = convert(vertices);
+		    VertexArray.Buffer vbo = new VertexArray.Buffer(data.length * 4, DataBuffer.Usage.STATIC, DataBuffer.Filler.of(data));
+		    VertexArray va = new VertexArray(LAYOUT, vbo);
+		
+		    model = new Model(Model.Mode.LINES, va, null);
+		
+		    MODEL_CACHE.put(res, model);
 		}
-		
-		float[] data = convert(vertices);
-		VertexArray.Buffer vbo = new VertexArray.Buffer(data.length * 4, DataBuffer.Usage.STATIC, DataBuffer.Filler.of(data));
-		VertexArray va = new VertexArray(LAYOUT, vbo);
-		
-		model = new Model(Model.Mode.LINES, va, null);
-		
-		MODEL_CACHE.put(res, model);
 	    }
 	}
 	return model;
