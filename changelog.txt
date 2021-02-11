@@ -1,4 +1,7 @@
-size[14]{$u{Update for 08.02.21:}
+$size[14]{$u{Update for 11.02.21:}
+  * fixed some hitboxes being flipped on Y-axis
+ 
+$size[14]{$u{Update for 08.02.21:}
   * merged loftar's changes
   * hopefully fixed ConcurrentModificationException when updating attribute/skill values in craft window
   * fixed crash when opening Extended Craft window
