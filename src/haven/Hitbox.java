@@ -103,14 +103,13 @@ public class Hitbox extends GAttrib implements RenderTree.Node, Rendered {
 		if(negs != null) {
 		    for (Resource.Neg neg : negs) {
 			List<Coord3f> box = new LinkedList<>();
-			box.add(new Coord3f(neg.ac.x, neg.ac.y, Z));
-			box.add(new Coord3f(neg.bc.x, neg.ac.y, Z));
-			box.add(new Coord3f(neg.bc.x, neg.bc.y, Z));
-			box.add(new Coord3f(neg.ac.x, neg.bc.y, Z));
+			box.add(new Coord3f(neg.ac.x, -neg.ac.y, Z));
+			box.add(new Coord3f(neg.bc.x, -neg.ac.y, Z));
+			box.add(new Coord3f(neg.bc.x, -neg.bc.y, Z));
+			box.add(new Coord3f(neg.ac.x, -neg.bc.y, Z));
 		    
 			polygons.add(box);
 		    }
-		
 		}
 	    
 		Collection<Resource.Obst> obstacles = res.layers(Resource.Obst.class);
