@@ -540,6 +540,7 @@ public class OptWnd extends Window {
 	y = main.add(new PButton(UI.scale(200), "Video settings", 'v', video), 0, y).pos("bl").adds(0, 5).y;
 	y = main.add(new PButton(UI.scale(200), "Audio settings", 'a', audio), 0, y).pos("bl").adds(0, 5).y;
 	y = main.add(new PButton(UI.scale(200), "Keybindings", 'k', keybind), 0, y).pos("bl").adds(0, 5).y;
+	y = addMiningDropOptions(main, y);
 	y += UI.scale(60);
 	if(gopts) {
 	    y = main.add(new Button(UI.scale(200), "Switch character", false).action(() -> {
@@ -585,6 +586,59 @@ public class OptWnd extends Window {
 
 	chpanel(this.main);
     }
+
+	private int addMiningDropOptions(Panel main, int y) {
+    	//y += 15;
+		main.add(new CheckBox("Drop mined stones") {
+			{
+				a = Config.dropMinedStones;
+			}
+
+			public void set(boolean val) {
+				Utils.setprefb("dropMinedStones", val);
+				Config.dropMinedStones = val;
+				a = val;
+			}
+		}, 0, y);
+		y += 15;
+		main.add(new CheckBox("Drop mined ore") {
+			{
+				a = Config.dropMinedOre;
+			}
+
+			public void set(boolean val) {
+				Utils.setprefb("dropMinedOre", val);
+				Config.dropMinedOre = val;
+				a = val;
+			}
+		}, 0, y);
+		y += 15;
+		main.add(new CheckBox("Drop mined silver/gold") {
+			{
+				a = Config.dropMinedOrePrecious;
+			}
+
+			public void set(boolean val) {
+				Utils.setprefb("dropMinedOrePrecious", val);
+				Config.dropMinedOrePrecious = val;
+				a = val;
+			}
+		}, 0, y);
+		y += 15;
+		main.add(new CheckBox("Drop mined curios") {
+			{
+				a = Config.dropMinedCurios;
+			}
+
+			public void set(boolean val) {
+				Utils.setprefb("dropMinedCurios", val);
+				Config.dropMinedCurios = val;
+				a = val;
+			}
+		}, 0, y);
+
+		return y;
+	}
 
     public OptWnd() {
 	this(true);
