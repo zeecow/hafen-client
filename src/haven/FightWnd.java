@@ -256,10 +256,8 @@ public class FightWnd extends Widget {
 	    int ty = (itemh - act.rnm.sz().y) / 2;
 	    g.image(act.rnm.tex(), new Coord(itemh + UI.scale(2), ty));
 	    g.aimage(act.ru.tex(), new Coord(sz.x - UI.scale(45), ty), 1.0, 0.0);
-	    Tex addtex = add[da == idx?1:0];
-	    g.aimage(addtex, new Coord(sz.x - UI.scale(5), itemh / 2), 1.0, 0.5);
-	    Tex subtex = sub[ds == idx?1:0];
-	    g.aimage(subtex, new Coord(sz.x - UI.scale(20), itemh / 2), 1.0, 0.5);
+	    g.aimage(add[da == idx?1:0], new Coord(sz.x - UI.scale(10), itemh / 2), 1.0, 0.5);
+	    g.aimage(sub[ds == idx?1:0], new Coord(sz.x - UI.scale(25), itemh / 2), 1.0, 0.5);
 	}
 
 	public void change(final Action act) {
@@ -738,7 +736,7 @@ public class FightWnd extends Widget {
 	Frame.around(this, Collections.singletonList(info));
 
 	add(CharWnd.settip(new Img(CharWnd.catf.render("Martial Arts & Combat Schools").tex()), "gfx/hud/chr/tips/combat"), 0, 0);
-	actlist = add(new Actions(UI.scale(255), 8), UI.scale(new Coord(245, 35)).add(wbox.btloff()));
+	actlist = add(new Actions(UI.scale(250), 8), UI.scale(new Coord(245, 35)).add(wbox.btloff()));
 	Frame.around(this, Collections.singletonList(actlist));
 
 	p = add(new BView(), UI.scale(new Coord(5, 223)));

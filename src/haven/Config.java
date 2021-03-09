@@ -41,6 +41,7 @@ public class Config {
     public static String authuser = getprop("haven.authuser", null);
     public static String authserv = getprop("haven.authserv", null);
     public static String defserv = getprop("haven.defserv", "127.0.0.1");
+    public static String[] servargs = null;
     public static URL resurl = geturl("haven.resurl", "http://game.havenandhearth.com/res/");
     public static URL screenurl = geturl("haven.screenurl", "http://game.havenandhearth.com/mt/ss");
     public static URL cachebase = geturl("haven.cachebase", "http://game.havenandhearth.com/render/");
@@ -267,6 +268,8 @@ public class Config {
 		defserv = opt.rest[0];
 	    }
 	}
+	if(opt.rest.length > 1)
+	    servargs = Utils.splice(opt.rest, 1);
     }
     
     public static void setUserName(String username) {
