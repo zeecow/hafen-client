@@ -10,8 +10,8 @@ public class Generic extends Polity {
     public Generic(String name) {
 	super("Polity", name);
 	Composer lay = new Composer(this).vmrgn(UI.scale(5));
-	lay.add(new Img(CharWnd.catf.render("Polity").tex()));
-	lay.add(new Label(name, nmf));
+	lay.add(new Img(CharWnd.catf.i10n_label("Polity").tex()));
+	lay.add(new Label.Untranslated(name, nmf));
 	lay.add(new AuthMeter(new Coord(width, 20)));
 	lay.vmrgn(UI.scale(2)).add(new Label("Members:"));
 	lay.vmrgn(UI.scale(5)).add(Frame.with(new MemberList(width - Window.wbox.bisz().x, 7), true));

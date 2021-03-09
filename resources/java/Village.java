@@ -13,7 +13,7 @@ public class Village extends Polity {
     public Village(String name) {
 	super("Village", name);
 	Composer lay = new Composer(this).vmrgn(UI.scale(5));
-	lay.add(new Img(CharWnd.catf.render(L10N.label("Village")).tex()));
+	lay.add(new Img(CharWnd.catf.i10n_label("Village").tex()));
 	
 	lay.add(new Label.Untranslated(name, nmf));
 	lay.add(new AuthMeter(new Coord(width, UI.scale(20))));

@@ -60,7 +60,7 @@ public abstract class GridList<T> extends Widget {
 
 	public Text rname() {
 	    if(rname == null)
-		rname = catf.render(name);
+		rname = catf.i10n_label(name);
 	    return(rname);
 	}
     }
