@@ -40,7 +40,9 @@ import static haven.Window.wbox;
 
 public class FightWndEx extends Widget {
     public static final Text.Foundry fnd = new Text.Foundry(Text.sans.deriveFont(Font.BOLD), 14);
+    private static final Text.Foundry cntfnd = new Text.Foundry(Text.serif, 14);
     public final int nsave;
+    private final Button save;
     public int maxact;
     public final Actions actlist;
     public final ActionTypes acttypes;
@@ -160,7 +162,7 @@ public class FightWndEx extends Widget {
  
 	private Tex usage() {
 	    if(ru == null) {
-		ru = attrf.render(String.format("%d/%d", u, a));
+		ru = cntfnd.render(String.format("%d/%d", u, a));
 	    }
 	    return ru.tex();
 	}
@@ -168,7 +170,7 @@ public class FightWndEx extends Widget {
  
 	private Tex count() {
 	    if(rc == null) {
-		rc = attrf.render(String.format("%d", a - u));
+		rc = cntfnd.render(String.format("%d", a - u));
 	    }
 	    return rc.tex();
 	}
@@ -569,6 +571,7 @@ public class FightWndEx extends Widget {
 	}
 
 	public void edit() {
+	    FightWndEx.this.save.hide();
 	    FightWndEx.this.edit.hide();
 	    FightWndEx.this.accept.show();
 	    FightWndEx.this.cancel.show();
@@ -602,6 +605,7 @@ public class FightWndEx extends Widget {
 	}
 
 	public void cancel() {
+	    FightWndEx.this.save.show();
 	    FightWndEx.this.edit.show();
 	    FightWndEx.this.accept.hide();
 	    FightWndEx.this.cancel.hide();
@@ -681,6 +685,8 @@ public class FightWndEx extends Widget {
 
     private final Text unused = new Text.Foundry(attrf.font.deriveFont(java.awt.Font.ITALIC)).aa(true).i10n_label("Unused save");
 
+    
+    private static final Coord INFO_SZ = UI.scale(223, 0);
     public FightWndEx(int nsave, int nact, int max) {
 	super(Coord.z);
 	this.nsave = nsave;
@@ -690,26 +696,27 @@ public class FightWndEx extends Widget {
 	for (int i = 0; i < nsave; i++)
 	    saves[i] = unused;
     
-	Widget p;
+	Widget header = add(new Img(CharWnd.catf.i10n_label("Martial Arts & Combat Schools").tex()), 0, 0);
     
-	acttypes = add(new ActionTypes(this::actionTypeSelected), UI.scale(245, 32));
+	Coord boxSz = wbox.btloff();
+	info = add(new FightWnd.ImageInfoBox(INFO_SZ), header.pos("br").xs(5).addys(5).add(boxSz));
+    
+	acttypes = add(new ActionTypes(this::actionTypeSelected), info.pos("ur").addxs(5).addx(boxSz.x));
 	acttypes.setSelectedColor(new Color(122, 191, 86, 153));
 	acttypes.select(0);
     
-	add(new Img(CharWnd.catf.i10n_label("Martial Arts & Combat Schools").tex()), 0, 0);
-	actlist = add(new Actions(UI.scale(250), 8), UI.scale(245, 58));
+	actlist = add(new Actions(UI.scale(250), 8), acttypes.pos("bl").add(boxSz).addys(-1));
 	Frame.around(this, Collections.singletonList(actlist));
     
-	info = add(new FightWnd.ImageInfoBox(new Coord(UI.scale(223), actlist.sz.y + acttypes.sz.y)), UI.scale(5, 35).add(wbox.btloff()));
+	info.resize(INFO_SZ.addy(actlist.sz.y + acttypes.sz.y + boxSz.y));
 	Frame.around(this, Collections.singletonList(info));
     
-	int y = info.c.y + info.sz.y + UI.scale(15);
-	p = add(new BView(), UI.scale(5), y);
-	count = add(new Label(""), p.c.add(p.sz.x + UI.scale(10), 0));
+	Widget mappedActions = add(new BView(), info.pos("bl").addys(10));
+	count = add(new Label(""), mappedActions.pos("ur").adds(10, 5));
     
-	y += p.sz.y + UI.scale(5);
-    
-	add(new Button(UI.scale(65), "Save", false) {
+	savelist = add(new Savelist(UI.scale(370), 5), mappedActions.pos("bl").addys(5));
+	
+	save = adda(new Button(UI.scale(75), "Save", false) {
 	    public void click() {
 		if(savelist.sel == null || savelist.sel < 0) {
 		    getparent(GameUI.class).error("No save entry selected.");
@@ -722,7 +729,7 @@ public class FightWndEx extends Widget {
 		    }
 		}
 	    }
-	}, UI.scale(437), y);
+	}, savelist.pos("ur").x(actlist.pos("br").x), 1.0, 0.0);
 	edit = add(new IButton("gfx/hud/btn-edit", "", "-d", "-h") {
 	    {
 		tooltip = L10N.button("Rename");
@@ -736,7 +743,7 @@ public class FightWndEx extends Widget {
 		    savelist.edit();
 		}
 	    }
-	}, UI.scale(380), y);
+	}, savelist.pos("ur").addxs(5));
 	accept = add(new IButton("gfx/hud/btn-check", "", "-d", "-h") {
 	    {
 		tooltip = L10N.button("Accept");
@@ -751,7 +758,7 @@ public class FightWndEx extends Widget {
 		    savelist.saveName();
 		}
 	    }
-	}, UI.scale(380), y);
+	}, edit.c);
 	cancel = add(new IButton("gfx/hud/btn-x", "", "-d", "-h") {
 	    {
 		tooltip = L10N.button("Cancel");
@@ -766,8 +773,7 @@ public class FightWndEx extends Widget {
 		    savelist.cancel();
 		}
 	    }
-	}, UI.scale(400), y);
-	savelist = add(new Savelist(UI.scale(370), 5), UI.scale(5), y);
+	}, edit.pos("ur").addxs(20));
 	pack();
     }
 
