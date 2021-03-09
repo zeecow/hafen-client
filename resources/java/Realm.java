@@ -40,7 +40,7 @@ public class Realm extends Polity {
 			update(-1);
 		}
 
-		public void changed(int group) {
+		public void select(int group) {
 		    Realm.this.wdgmsg("gsel", group);
 		}
 	    });

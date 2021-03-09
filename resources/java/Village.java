@@ -26,7 +26,7 @@ public class Village extends Polity {
 		    update(-1);
 	    }
 	    
-	    public void changed(int group) {
+	    public void select(int group) {
 		Village.this.wdgmsg("gsel", group);
 	    }
 	});
