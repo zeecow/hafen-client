@@ -152,14 +152,19 @@ public class GItem extends AWidget implements ItemInfo.SpriteOwner, GSprite.Owne
     }
 
 	private void dropMinedItem() {
-		Resource curs = ui.root.getcurs(Coord.z);
 		String name = this.resource().basename();
-		if (curs != null && curs.name.equals("gfx/hud/curs/mine") &&
-				(Config.dropMinedStones && Config.mineablesStone.contains(name) ||
-						Config.dropMinedOre && Config.mineablesOre.contains(name) ||
-						Config.dropMinedOrePrecious && Config.mineablesOrePrecious.contains(name) ||
-						Config.dropMinedCurios && Config.mineablesCurios.contains(name)))
+		Resource curs = ui.root.getcurs(Coord.z);
+		if (curs != null && curs.name.equals("gfx/hud/curs/mine")) {
+			if (ZeeConfig.dropMinedStones && ZeeConfig.mineablesStone.contains(name) ||
+					ZeeConfig.dropMinedOre && ZeeConfig.mineablesOre.contains(name) ||
+					ZeeConfig.dropMinedOrePrecious && ZeeConfig.mineablesOrePrecious.contains(name) ||
+					ZeeConfig.dropMinedCurios && ZeeConfig.mineablesCurios.contains(name)) {
+				this.wdgmsg("drop", Coord.z);
+			}
+		}else if(ZeeConfig.dropSeeds && name.startsWith("seed-")){
+			//System.out.printf("%s\n", this.parent);
 			this.wdgmsg("drop", Coord.z);
+		}
 	}
 
     public void tick(double dt) {

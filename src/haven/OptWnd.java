@@ -591,48 +591,48 @@ public class OptWnd extends Window {
     	//y += 15;
 		main.add(new CheckBox("Drop mined stones") {
 			{
-				a = Config.dropMinedStones;
+				a = ZeeConfig.dropMinedStones;
 			}
 
 			public void set(boolean val) {
 				Utils.setprefb("dropMinedStones", val);
-				Config.dropMinedStones = val;
+				ZeeConfig.dropMinedStones = val;
 				a = val;
 			}
 		}, 0, y);
 		y += 15;
 		main.add(new CheckBox("Drop mined ore") {
 			{
-				a = Config.dropMinedOre;
+				a = ZeeConfig.dropMinedOre;
 			}
 
 			public void set(boolean val) {
 				Utils.setprefb("dropMinedOre", val);
-				Config.dropMinedOre = val;
+				ZeeConfig.dropMinedOre = val;
 				a = val;
 			}
 		}, 0, y);
 		y += 15;
 		main.add(new CheckBox("Drop mined silver/gold") {
 			{
-				a = Config.dropMinedOrePrecious;
+				a = ZeeConfig.dropMinedOrePrecious;
 			}
 
 			public void set(boolean val) {
 				Utils.setprefb("dropMinedOrePrecious", val);
-				Config.dropMinedOrePrecious = val;
+				ZeeConfig.dropMinedOrePrecious = val;
 				a = val;
 			}
 		}, 0, y);
 		y += 15;
 		main.add(new CheckBox("Drop mined curios") {
 			{
-				a = Config.dropMinedCurios;
+				a = ZeeConfig.dropMinedCurios;
 			}
 
 			public void set(boolean val) {
 				Utils.setprefb("dropMinedCurios", val);
-				Config.dropMinedCurios = val;
+				ZeeConfig.dropMinedCurios = val;
 				a = val;
 			}
 		}, 0, y);

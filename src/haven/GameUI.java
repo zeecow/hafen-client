@@ -705,7 +705,8 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 			pack();
 		    }
 		};
-	    invwnd.add(maininv = (Inventory)child, Coord.z);
+	    invwnd.add(maininv = (Inventory)child, 0, 20);
+	    invwnd.add(new ZeeMainInventoryOptions(), 0, 0);
 	    invwnd.pack();
 	    invwnd.hide();
 	    add(invwnd, Utils.getprefc("wndc-inv", new Coord(100, 100)));
