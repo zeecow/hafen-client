@@ -540,7 +540,7 @@ public class OptWnd extends Window {
 	y = main.add(new PButton(UI.scale(200), "Video settings", 'v', video), 0, y).pos("bl").adds(0, 5).y;
 	y = main.add(new PButton(UI.scale(200), "Audio settings", 'a', audio), 0, y).pos("bl").adds(0, 5).y;
 	y = main.add(new PButton(UI.scale(200), "Keybindings", 'k', keybind), 0, y).pos("bl").adds(0, 5).y;
-	y = addMiningDropOptions(main, y);
+	y = addZeecowOptions(main, y);
 	y += UI.scale(60);
 	if(gopts) {
 	    y = main.add(new Button(UI.scale(200), "Switch character", false).action(() -> {
@@ -587,9 +587,15 @@ public class OptWnd extends Window {
 	chpanel(this.main);
     }
 
-	private int addMiningDropOptions(Panel main, int y) {
-    	//y += 15;
-		main.add(new CheckBox("Drop mined stones") {
+	private int addZeecowOptions(Panel main, int y) {
+
+    	y += 7;
+
+		main.add(new Label("Zeecow options"), 0, y);
+
+		y += 17;
+
+    	main.add(new CheckBox("Drop mined stones") {
 			{
 				a = ZeeConfig.dropMinedStones;
 			}
@@ -599,8 +605,10 @@ public class OptWnd extends Window {
 				ZeeConfig.dropMinedStones = val;
 				a = val;
 			}
-		}, 0, y);
-		y += 15;
+		}, 15, y);
+
+		y += 17;
+
 		main.add(new CheckBox("Drop mined ore") {
 			{
 				a = ZeeConfig.dropMinedOre;
@@ -611,8 +619,10 @@ public class OptWnd extends Window {
 				ZeeConfig.dropMinedOre = val;
 				a = val;
 			}
-		}, 0, y);
-		y += 15;
+		}, 15, y);
+
+		y += 17;
+
 		main.add(new CheckBox("Drop mined silver/gold") {
 			{
 				a = ZeeConfig.dropMinedOrePrecious;
@@ -623,8 +633,10 @@ public class OptWnd extends Window {
 				ZeeConfig.dropMinedOrePrecious = val;
 				a = val;
 			}
-		}, 0, y);
-		y += 15;
+		}, 15, y);
+
+		y += 17;
+
 		main.add(new CheckBox("Drop mined curios") {
 			{
 				a = ZeeConfig.dropMinedCurios;
@@ -635,7 +647,25 @@ public class OptWnd extends Window {
 				ZeeConfig.dropMinedCurios = val;
 				a = val;
 			}
-		}, 0, y);
+		}, 15, y);
+
+		y += 13;
+
+		main.add(new Label("------------------------"), 15, y);
+
+		y += 13;
+
+		main.add(new CheckBox("Action search global") {
+			{
+				a = ZeeConfig.actionSearchGlobal;
+			}
+
+			public void set(boolean val) {
+				Utils.setprefb("actionSearchGlobal", val);
+				ZeeConfig.actionSearchGlobal = val;
+				a = val;
+			}
+		}, 15, y);
 
 		return y;
 	}

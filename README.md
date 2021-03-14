@@ -1,4 +1,5 @@
 # hafen-client
 Haven Zeecow
-- autodrop mined items and farming seeds
-- replace arrow cursor with system default
+- option for autodrop mined items, farming seeds
+- option for searching actions globally
+- replaces arrow cursor with system's default

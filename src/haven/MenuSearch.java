@@ -105,6 +105,8 @@ public class MenuSearch extends Window {
     private void updlist() {
 	recons = false;
 	Pagina root = this.root;
+	if(ZeeConfig.actionSearchGlobal)//search everything
+		root = null;
 	List<PagButton> found = new ArrayList<>();
 	{
 	    Collection<Pagina> leaves = new ArrayList<>();
