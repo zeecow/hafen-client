@@ -1,4 +1,4 @@
 # hafen-client
 Haven Zeecow
-- mining drop from inventory
+- autodrop mined items and farming seeds
 - replace arrow cursor with system default
