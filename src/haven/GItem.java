@@ -27,7 +27,6 @@
 package haven;
 
 import java.awt.Color;
-import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.util.*;
 
@@ -39,7 +38,7 @@ public class GItem extends AWidget implements ItemInfo.SpriteOwner, GSprite.Owne
     private GSprite spr;
     private ItemInfo.Raw rawinfo;
     private List<ItemInfo> info = Collections.emptyList();
-	private boolean minedItemDropped = false;
+	private boolean itemDropped = false;
 
     @RName("item")
     public static class $_ implements Factory {
@@ -141,9 +140,9 @@ public class GItem extends AWidget implements ItemInfo.SpriteOwner, GSprite.Owne
 	if(spr == null) {
 	    try {
 		spr = this.spr = GSprite.create(this, res.get(), sdt.clone());
-		if (!minedItemDropped) {
-			dropMinedItem();
-			minedItemDropped = true;
+		if (!itemDropped) {
+			dropItems();
+			itemDropped = true;
 		}
 	    } catch(Loading l) {
 	    }
@@ -151,19 +150,24 @@ public class GItem extends AWidget implements ItemInfo.SpriteOwner, GSprite.Owne
 	return(spr);
     }
 
-	private void dropMinedItem() {
+	private void dropItems() {
 		String name = this.resource().basename();
 		Resource curs = ui.root.getcurs(Coord.z);
+
 		if (curs != null && curs.name.equals("gfx/hud/curs/mine")) {
+			//drop mined item
 			if (ZeeConfig.dropMinedStones && ZeeConfig.mineablesStone.contains(name) ||
 					ZeeConfig.dropMinedOre && ZeeConfig.mineablesOre.contains(name) ||
 					ZeeConfig.dropMinedOrePrecious && ZeeConfig.mineablesOrePrecious.contains(name) ||
 					ZeeConfig.dropMinedCurios && ZeeConfig.mineablesCurios.contains(name)) {
 				this.wdgmsg("drop", Coord.z);
 			}
-		}else if(ZeeConfig.dropSeeds && name.startsWith("seed-")){
-			//System.out.printf("%s\n", this.parent);
-			this.wdgmsg("drop", Coord.z);
+		}else if(ZeeConfig.dropSeeds && name.startsWith("seed-") && this.parent instanceof Inventory){
+			//drop seeds before inventory is full
+			Inventory inv = (Inventory) this.parent;
+			if(inv.getNumberOfFreeSlots() < 3){
+				inv.dropItemsByName(name);
+			}
 		}
 	}
 

@@ -10,7 +10,7 @@ import java.util.Set;
 import static haven.Utils.getprop;
 
 public class ZeeConfig {
-    public static boolean dropSeeds = Utils.getprefb("dropSeeds", false);
+    public static boolean dropSeeds = false;//Utils.getprefb("dropSeeds", false);
     public static boolean dropMinedStones = Utils.getprefb("dropMinedStones", true);
     public static boolean dropMinedOre = Utils.getprefb("dropMinedOre", true);
     public static boolean dropMinedOrePrecious = Utils.getprefb("dropMinedOrePrecious", true);

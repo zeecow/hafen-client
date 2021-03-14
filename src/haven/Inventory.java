@@ -131,4 +131,36 @@ public class Inventory extends Widget implements DTarget {
 	    super.uimsg(msg, args);
 	}
     }
+
+
+	public List<WItem> getItemsByNameOrNames(String... names) {
+		List<WItem> items = new ArrayList<WItem>();
+		for (Widget wdg = child; wdg != null; wdg = wdg.next) {
+			if (wdg instanceof WItem) {
+				String wdgname = ((WItem) wdg).item.res.get().basename();
+				for (String name : names) {
+					if (wdgname.contains(name)) {
+						items.add((WItem) wdg);
+						break;
+					}
+				}
+			}
+		}
+		return items;
+	}
+
+	public int getNumberOfFreeSlots() {
+		int feespace = isz.x * isz.y;
+		for (Widget wdg = child; wdg != null; wdg = wdg.next) {
+			if (wdg instanceof WItem)
+				feespace -= (wdg.sz.x * wdg.sz.y) / (sqsz.x * sqsz.y);
+		}
+		return feespace;
+	}
+
+	public void dropItemsByName(String name) {
+		for (WItem wItem : getItemsByNameOrNames(name)) {
+			wItem.item.wdgmsg("drop", Coord.z);
+		}
+	}
 }

@@ -9,7 +9,7 @@ public class ZeeMainInventoryOptions extends Widget {
 
         add(new Label("Drop:"));
 
-        add(new CheckBox("seeds") {
+        add(new CheckBox("seedsWhenFull") {
             {
                 a = ZeeConfig.dropSeeds;
             }
