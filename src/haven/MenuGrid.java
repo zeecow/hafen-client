@@ -738,7 +738,8 @@ public class MenuGrid extends Widget implements KeyBinding.Bindable {
 	    Resource.AButton ad = res.layer(Resource.action);
 	    if (ad == null)
 		return null;
-	    return paginafor(ad.parent);
+	    Pagina parent = paginafor(ad.parent);
+	    return (parent == p) ? null : parent;
 	} catch (Loading e){
 	    return null;
 	}
