@@ -12,7 +12,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class ItemFilter {
-    private static final Pattern q = Pattern.compile("(?:(\\w+))?(?:^|:)([\\w*]+)?(?:([<>=+~])(\\d+(?:\\.\\d+)?)?([<>=+~])?)?");
+    private static final Pattern q = Pattern.compile("(?:(\\w+))?(?:^|:)([\\w\\p{L}*]+)?(?:([<>=+~])(\\d+(?:\\.\\d+)?)?([<>=+~])?)?");
     private static final Pattern float_p = Pattern.compile("(\\d+(?:\\.\\d+)?)");
     
     public static final String HELP_SIMPLE = "$size[20]{$b{Simple search}}\n" +
@@ -603,7 +603,8 @@ public class ItemFilter {
 	    Map<Resource, Integer> bonuses = ItemInfo.getBonuses(info);
 	    if(text != null && text.length() >= 3) {
 		for (Resource res : bonuses.keySet()) {
-		    if(res.layer(Resource.tooltip).t.toLowerCase().startsWith(text)) {
+		    Resource.Tooltip tip = res.layer(Resource.tooltip);
+		    if(tip.t.toLowerCase().startsWith(text) || tip.o.toLowerCase().startsWith(text)) {
 			return test(bonuses.get(res));
 		    }
 		}
