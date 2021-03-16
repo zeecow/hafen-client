@@ -163,4 +163,49 @@ public class Inventory extends Widget implements DTarget {
 			wItem.item.wdgmsg("drop", Coord.z);
 		}
 	}
+
+
+
+	public static Double getQuality(GItem item) {
+		try {
+			ItemInfo.Contents contents = getItemInfoContents(item.info());
+			if(contents != null) {
+				Double quality = getItemInfoQuality(contents.sub);
+				if(quality != null) {
+					return(quality);
+				}
+			}
+			return(getItemInfoQuality(item.info()));
+		} catch (NoSuchFieldException | IllegalAccessException e) {
+			e.printStackTrace();
+		}
+		return(null);
+	}
+
+	public static String getItemInfoName(List<ItemInfo> info) {
+		for(ItemInfo v : info) {
+			if(v instanceof ItemInfo.Name) {
+				return(((ItemInfo.Name) v).str.text);
+			}
+		}
+		return(null);
+	}
+
+	public static Double getItemInfoQuality(List<ItemInfo> info) throws NoSuchFieldException, IllegalAccessException {
+		for(ItemInfo v : info) {
+			if(v.getClass().getName().equals("Quality")) {
+				return((Double) v.getClass().getField("q").get(v));
+			}
+		}
+		return(null);
+	}
+
+	public static ItemInfo.Contents getItemInfoContents(List<ItemInfo> info) {
+		for(ItemInfo v : info) {
+			if(v instanceof ItemInfo.Contents) {
+				return((ItemInfo.Contents) v);
+			}
+		}
+		return(null);
+	}
 }

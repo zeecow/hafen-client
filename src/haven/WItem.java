@@ -197,6 +197,15 @@ public class WItem extends Widget implements DTarget {
     }
 
     public boolean mousedown(Coord c, int btn) {
+    if(ui.modmeta && !ui.modshift && !ui.modctrl){
+		if(btn==1)
+			System.out.printf("transfer-sort up %s\n", item.res.get().basename());
+		else if(btn==3)
+			System.out.printf("transfer-sort down %s\n", item.res.get().basename());
+		else
+			return false;
+		return true;
+	}
 	if(btn == 1) {
 	    if(ui.modshift) {
 		int n = ui.modctrl ? -1 : 1;
