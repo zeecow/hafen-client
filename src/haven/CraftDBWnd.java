@@ -177,11 +177,13 @@ public class CraftDBWnd extends Window implements DTarget2 {
 	    @Override
 	    public void selected(Pagina data) {
 	        if(data == HISTORY) {
-	            showHistory();
-	            return;
+		    showHistory();
+		} else if(data == FAVOURITES) {
+		    showFavourites();
+		} else {
+		    select(data, false, false);
+		    ui.gui.menu.use(data, false);
 		}
-		select(data, false, false);
-		ui.gui.menu.use(data, false);
 	    }
 	}, UI.scale(0, 28));
 	Pagina selected = current;
