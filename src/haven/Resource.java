@@ -1056,10 +1056,11 @@ public class Resource implements Serializable {
 
     @LayerName("tooltip")
     public class Tooltip extends Layer {
-	public final String t;
+	public final String t, o;
                 
 	public Tooltip(Message buf) {
-	    t = L10N.tooltip(getres(), new String(buf.bytes(), Utils.utf8));
+	    o = new String(buf.bytes(), Utils.utf8);
+	    t = L10N.tooltip(getres(), o);
 	}
                 
 	public void init() {}
