@@ -197,18 +197,14 @@ public class WItem extends Widget implements DTarget {
     }
 
     public boolean mousedown(Coord c, int btn) {
-    if(ui.modmeta && !ui.modshift && !ui.modctrl){
-    	Inventory inv;
-    	if(item.parent instanceof Inventory)
-			inv = (Inventory) item.parent;
-    	else
-    		return false;
-		if(btn==1)
-			System.out.printf("transfer-sort up %s\n", Inventory.getQuality(item));
-		else if(btn==3)
-			System.out.printf("transfer-sort down %s\n", Inventory.getQuality(item));
-		else
+    if(ui.modmeta && !ui.modshift && !ui.modctrl && !item.res.get().basename().contains("gemstone")){
+		if(btn==1) {
+			wdgmsg("transfer-sort", item, false);
+		}else if(btn==3) {
+			wdgmsg("transfer-sort", item, true);
+		}else {
 			return false;
+		}
 		return true;
 	}
 	if(btn == 1) {

@@ -35,6 +35,26 @@ public class Inventory extends Widget implements DTarget {
     public boolean dropul = true;
     public Coord isz;
     Map<GItem, WItem> wmap = new HashMap<GItem, WItem>();
+	public static final Comparator<WItem> ITEM_COMPARATOR_ASC = new Comparator<WItem>() {
+		@Override
+		public int compare(WItem o1, WItem o2) {
+			double q1=-1, q2=-1;
+			try {
+				q1 = Inventory.getQuality(o1.item);
+				q2 = Inventory.getQuality(o2.item);
+				return Double.compare(q1, q2);
+			}catch(Exception e){
+				System.out.println(q1+" "+q2);
+			}
+			return 0;
+		}
+	};
+	public static final Comparator<WItem> ITEM_COMPARATOR_DESC = new Comparator<WItem>() {
+		@Override
+		public int compare(WItem o1, WItem o2) {
+			return ITEM_COMPARATOR_ASC.compare(o2, o1);
+		}
+	};
 
     static {
 	Coord sz = sqsz.add(1, 1);
@@ -133,6 +153,40 @@ public class Inventory extends Widget implements DTarget {
     }
 
 
+
+
+	@Override
+	public void wdgmsg(Widget sender, String msg, Object... args) {
+		if(msg.equals("transfer-sort")){
+			process( getSame( (GItem)args[0], (Boolean)args[1]), "transfer");
+		} else {
+			super.wdgmsg(sender, msg, args);
+		}
+	}
+
+	private void process(List<WItem> items, String action) {
+		for (WItem item : items){
+			item.item.wdgmsg(action, Coord.z);
+		}
+	}
+
+	private List<WItem> getSame(GItem item, Boolean ascending) {
+		String name = item.res.get().basename();
+		GSprite spr = item.spr();
+		List<WItem> items = new ArrayList<>();
+		for(Widget wdg = lchild; wdg != null; wdg = wdg.prev) {
+			if(wdg.visible && wdg instanceof WItem) {
+				WItem wItem = (WItem) wdg;
+				GItem child = wItem.item;
+				if(child.res.get().basename().equals(name)){// ((spr == child.spr()) || (spr != null && spr.same(child.spr())))) {
+					items.add(wItem);
+				}
+			}
+		}
+		Collections.sort(items, ascending ? ITEM_COMPARATOR_ASC : ITEM_COMPARATOR_DESC);
+		return items;
+	}
+
 	public List<WItem> getItemsByNameOrNames(String... names) {
 		List<WItem> items = new ArrayList<WItem>();
 		for (Widget wdg = child; wdg != null; wdg = wdg.next) {
@@ -177,18 +231,9 @@ public class Inventory extends Widget implements DTarget {
 			}
 			return(getItemInfoQuality(item.info()));
 		} catch (NoSuchFieldException | IllegalAccessException e) {
-			e.printStackTrace();
+			System.out.println(e.getMessage());
 		}
-		return(null);
-	}
-
-	public static String getItemInfoName(List<ItemInfo> info) {
-		for(ItemInfo v : info) {
-			if(v instanceof ItemInfo.Name) {
-				return(((ItemInfo.Name) v).str.text);
-			}
-		}
-		return(null);
+		return Double.valueOf(0);
 	}
 
 	public static Double getItemInfoQuality(List<ItemInfo> info) throws NoSuchFieldException, IllegalAccessException {
