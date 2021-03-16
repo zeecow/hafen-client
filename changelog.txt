@@ -1,3 +1,6 @@
+$size[14]{$u{Update for 16.03.21:}
+  * fixed combat damage display not working
+ 
 $size[14]{$u{Update for 11.02.21:}
   * fixed some hitboxes being flipped on Y-axis
  
