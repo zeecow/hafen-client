@@ -45,9 +45,6 @@ public class GobDamageInfo extends GobInfo {
 	if(c == 61455) {//health
 	    damage += v;
 	    gobDamage.put(gob.id, damage);
-	    if(tex != null) {
-		tex.dispose();
-	    }
 	    clean();
 	}
     }

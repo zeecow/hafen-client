@@ -211,7 +211,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Sk
 	if(id < 0)
 	    virtual = true;
 	if(GobDamageInfo.has(this)) {
-	    damage = new GobDamageInfo(this);
+	    addDmg();
 	}
 	setattr(new GeneralGobInfo(this));
     }
@@ -311,7 +311,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Sk
 	    System.out.println(String.format("processDmg v: %d, c: %d", v, c));
 	    
 	    if(damage == null) {
-		damage = new GobDamageInfo(this);
+		addDmg();
 	    }
 	    damage.update(c, v);
 	} catch (Exception ignored) {
@@ -319,11 +319,14 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Sk
 	}
     }
     
+    private void addDmg() {
+	damage = new GobDamageInfo(this);
+	setattr(GobDamageInfo.class, damage);
+    }
+    
     public void clearDmg() {
-	if(damage != null) {
-	    damage.dispose();
-	    damage = null;
-	}
+	setattr(GobDamageInfo.class, null);
+	damage = null;
     }
     
     public void rclick() {
