@@ -9,23 +9,7 @@ public class ZeeInventoryOptions extends Widget {
 
         if(windowCap.contains("Inventory"))
             invMain();
-        else if(windowCap.contains("Equipment"))
-            invEquip();
         pack();
-    }
-
-    private void invEquip() {
-        add(new CheckBox("compact") {
-            {
-                a = ZeeConfig.equiporyCompact;
-            }
-
-            public void set(boolean val) {
-                Utils.setprefb("equiporyCompact", val);
-                ZeeConfig.equiporyCompact = val;
-                a = val;
-            }
-        }, 0, 0);
     }
 
     private void invMain() {

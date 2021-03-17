@@ -32,7 +32,7 @@ import static haven.Inventory.invsq;
 public class Equipory extends Widget implements DTarget {
     private static final Tex bg = Resource.loadtex("gfx/hud/equip/bg");
     private static final int
-	rx = invsq.sz().x + bg.sz().x,
+	rx = invsq.sz().x + (ZeeConfig.equiporyCompact ? invsq.sz().x : bg.sz().x),
 	yo = Inventory.sqsz.y;
     public static final Coord bgc = new Coord(invsq.sz().x, 0);
     public static final Coord ecoords[] = {
@@ -96,6 +96,8 @@ public class Equipory extends Widget implements DTarget {
     protected void added() {
 	if(ava.avagob == -2)
 	    ava.avagob = getparent(GameUI.class).plid;
+	if(ZeeConfig.equiporyCompact)
+		ava.hide();
     }
 
     public Equipory(long gobid) {

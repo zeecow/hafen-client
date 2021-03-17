@@ -1,6 +1,7 @@
 # hafen-client
 Haven Zeecow
-- option for autodrop mined items, farmed seeds
-- option for searching actions globally
+- autodrop mined items, farmed seeds
+- search actions globally
+- sort transfer with Alt+Rclick or Alt+Lclick (no gemstone yet)
+- compact equip window
 - replaces arrow cursor with system's default
-- sort transfer with Alt+Rclick or Alt+Lclick (no gemstone)

@@ -667,6 +667,20 @@ public class OptWnd extends Window {
 			}
 		}, 15, y);
 
+		y += 17;
+
+		main.add(new CheckBox("Compact equip window (restart)") {
+			{
+				a = ZeeConfig.equiporyCompact;
+			}
+
+			public void set(boolean val) {
+				Utils.setprefb("equiporyCompact", val);
+				ZeeConfig.equiporyCompact = val;
+				a = val;
+			}
+		}, 15, y);
+
 		return y;
 	}
 
