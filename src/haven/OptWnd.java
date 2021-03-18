@@ -681,6 +681,20 @@ public class OptWnd extends Window {
 			}
 		}, 15, y);
 
+		y += 17;
+
+		main.add(new CheckBox("Belt toggles equip window") {
+			{
+				a = ZeeConfig.beltToggleEquips;
+			}
+
+			public void set(boolean val) {
+				Utils.setprefb("beltToggleEquips", val);
+				ZeeConfig.beltToggleEquips = val;
+				a = val;
+			}
+		}, 15, y);
+
 		return y;
 	}
 

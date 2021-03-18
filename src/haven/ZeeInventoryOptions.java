@@ -25,5 +25,4 @@ public class ZeeInventoryOptions extends Widget {
             }
         }, 0, 0);
     }
-
 }

@@ -13,6 +13,7 @@ public class ZeeConfig {
     public static boolean actionSearchGlobal = Utils.getprefb("actionSearchGlobal", true);;
     public static boolean dropSeeds = false;//always starts off (TODO: set false when character loads)
     public static boolean equiporyCompact = Utils.getprefb("equiporyCompact", false);
+    public static boolean beltToggleEquips = Utils.getprefb("beltToggleEquips", true);
     public static boolean dropMinedStones = Utils.getprefb("dropMinedStones", true);
     public static boolean dropMinedOre = Utils.getprefb("dropMinedOre", true);
     public static boolean dropMinedOrePrecious = Utils.getprefb("dropMinedOrePrecious", true);

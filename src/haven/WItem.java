@@ -40,8 +40,9 @@ public class WItem extends Widget implements DTarget {
     public final GItem item;
     private Resource cspr = null;
     private Message csdt = Message.nil;
+	public static String lastWindowName;
 
-    public WItem(GItem item) {
+	public WItem(GItem item) {
 	super(sqsz);
 	this.item = item;
     }
@@ -216,6 +217,7 @@ public class WItem extends Widget implements DTarget {
 		item.wdgmsg("drop", c, n);
 	    } else {
 		item.wdgmsg("take", c);
+		this.lastWindowName = ((Window)item.parent.parent).cap.text;
 	    }
 	    return(true);
 	} else if(btn == 3) {
