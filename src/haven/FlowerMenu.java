@@ -27,8 +27,6 @@
 package haven;
 
 import java.awt.Color;
-import java.awt.desktop.SystemSleepEvent;
-import java.util.ArrayList;
 
 import static java.lang.Math.PI;
 
