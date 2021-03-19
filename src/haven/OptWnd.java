@@ -26,11 +26,13 @@
 
 package haven;
 
+import java.awt.*;
 import java.awt.event.KeyEvent;
 
 public class OptWnd extends Window {
     public final Panel main, video, audio, keybind;
     public Panel current;
+    public TextEntry textEntryAutoMenu;
 
     public void chpanel(Panel p) {
 	if(current != null)
@@ -694,6 +696,39 @@ public class OptWnd extends Window {
 				a = val;
 			}
 		}, 15, y);
+
+		y += 13;
+
+		main.add(new Label("------------------------"), 15, y);
+
+		y += 13;
+
+		main.add(new CheckBox("Auto click menu option:") {
+			{
+				a = ZeeConfig.autoClickMenuOption;
+			}
+
+			public void set(boolean val) {
+				Utils.setprefb("autoClickMenuOption", val);
+				ZeeConfig.autoClickMenuOption = val;
+				a = val;
+			}
+		}, 15, y);
+
+		y += 17;
+
+		textEntryAutoMenu = new TextEntry(150, ZeeConfig.autoClickMenuOptionList);
+		textEntryAutoMenu.setcanfocus(false);
+		main.add(textEntryAutoMenu,15, y);
+		main.add(new Button(30,"set"){
+			@Override
+			public void click() {
+				setfocus(this);
+				String str = textEntryAutoMenu.text.trim();
+				Utils.setpref("autoClickMenuOptionList", str);
+				ZeeConfig.autoClickMenuOptionList = str;
+			}
+		}, 165, y-2);
 
 		return y;
 	}

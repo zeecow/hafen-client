@@ -27,7 +27,9 @@
 package haven;
 
 import java.awt.Color;
-import java.awt.Font;
+import java.awt.desktop.SystemSleepEvent;
+import java.util.ArrayList;
+
 import static java.lang.Math.PI;
 
 public class FlowerMenu extends Widget {
@@ -39,6 +41,7 @@ public class FlowerMenu extends Widget {
     public static final int ph = UI.scale(30), ppl = 8;
     public Petal[] opts;
     private UI.Grab mg, kg;
+	private Petal autochoose;
 
     @RName("sm")
     public static class $_ implements Factory {
@@ -207,6 +210,7 @@ public class FlowerMenu extends Widget {
 	    add(opts[i] = new Petal(options[i]));
 	    opts[i].num = i;
 	}
+	autoClickPetal();
     }
 
     protected void added() {
@@ -266,4 +270,32 @@ public class FlowerMenu extends Widget {
 	    wdgmsg("cl", option.num, ui.modflags());
 	}
     }
+
+	@Override
+	protected void attach(UI ui) {
+		super.attach(ui);
+	}
+
+	@Override
+	public void tick(double dt) {
+		if(autochoose != null){
+			choose(autochoose);
+			autochoose = null;
+		}
+		super.tick(dt);
+	}
+
+	private void autoClickPetal(){
+    	if(!ZeeConfig.autoClickMenuOption)
+    		return;
+		String[] list = ZeeConfig.autoClickMenuOptionList.split(",");
+		for(int i = 0; i < opts.length; i++) {
+			for (int j = 0; j < list.length; j++) {
+				if( list[j].contentEquals(opts[i].text.text)){
+					autochoose = opts[i];
+					return;
+				}
+			}
+		}
+	}
 }
