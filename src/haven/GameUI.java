@@ -560,9 +560,8 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 
     private void updhand() {
 	if((hand.isEmpty() && (vhand != null)) || ((vhand != null) && !hand.contains(vhand.item))) {
-		if(ZeeConfig.beltToggleEquips && WItem.lastWindowName.contains("Belt") && equwnd.visible){
+		if(ZeeConfig.beltToggleEquips && (vhand.prev instanceof Window) && ((Window)vhand.prev).cap.text.contains("Belt") && equwnd.visible){
 			equwnd.hide();
-			WItem.lastWindowName = "";
 		}
 	    ui.destroy(vhand);
 	    vhand = null;
