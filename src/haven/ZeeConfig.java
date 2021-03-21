@@ -11,6 +11,7 @@ import static haven.Utils.getprop;
 public class ZeeConfig {
 
     public static boolean actionSearchGlobal = Utils.getprefb("actionSearchGlobal", true);
+    public static boolean animalRosterShorter = Utils.getprefb("animalRosterShorter", true);
     public static boolean autoClickMenuOption = Utils.getprefb("autoClickMenuOption", true);
     public static String autoClickMenuOptionList = Utils.getpref("autoClickMenuOptionList", "Pick");
     public static boolean beltToggleEquips = Utils.getprefb("beltToggleEquips", true);
@@ -20,7 +21,6 @@ public class ZeeConfig {
     public static boolean dropMinedStones = Utils.getprefb("dropMinedStones", true);
     public static boolean dropSeeds = false;//always starts off (TODO: set false when character loads)
     public static boolean equiporyCompact = Utils.getprefb("equiporyCompact", false);
-
 
     public final static Set<String> mineablesStone = new HashSet<String>(Arrays.asList(
             "gneiss",

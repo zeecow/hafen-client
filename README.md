@@ -4,6 +4,7 @@ original features:
  - search actions global
  - compact equip window
  - belt toggles equip window
+ - shorter animal roster
 
 other stuff:
  - autodrop mined items, farmed seeds

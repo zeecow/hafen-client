@@ -240,6 +240,9 @@ public class UI {
 		pwdg.addchild(wdg, pargs);
 	    }
 	    bind(wdg, id);
+	    if(ZeeConfig.animalRosterShorter && type.contains("rosters/")){
+	    	wdg.resize(wdg.sz.x,250);
+		}
 	}
     }
 

@@ -696,6 +696,20 @@ public class OptWnd extends Window {
 			}
 		}, 15, y);
 
+		y += 17;
+
+		main.add(new CheckBox("Shorter animal roster (logout)") {
+			{
+				a = ZeeConfig.animalRosterShorter;
+			}
+
+			public void set(boolean val) {
+				Utils.setprefb("animalRosterShorter", val);
+				ZeeConfig.animalRosterShorter = val;
+				a = val;
+			}
+		}, 15, y);
+
 		y += 13;
 
 		main.add(new Label("------------------------"), 15, y);
