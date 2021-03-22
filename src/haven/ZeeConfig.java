@@ -135,7 +135,7 @@ public class ZeeConfig {
             for (Widget w: wdg.children()) {
                 if(w.getClass().getSimpleName().contentEquals("Button")){
                     if(y==-1) { //calculate once
-                        y = (int) (w.c.y * ZeeConfig.cattleRosterHeightPercentage) - w.sz.y;
+                        y = (int) (w.c.y * ZeeConfig.cattleRosterHeightPercentage) - (int)(w.sz.y*0.6);
                     }
                     w.c.y = y;
                 }
