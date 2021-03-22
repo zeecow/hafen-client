@@ -34,8 +34,7 @@ import java.awt.DisplayMode;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.InputEvent;
-import java.awt.image.BufferedImage;
-import static haven.Utils.el;
+
 import haven.render.Environment;
 import haven.render.Render;
 
@@ -240,9 +239,7 @@ public class UI {
 		pwdg.addchild(wdg, pargs);
 	    }
 	    bind(wdg, id);
-	    if(ZeeConfig.animalRosterShorter && type.contains("rosters/")){
-	    	wdg.resize(wdg.sz.x,250);
-		}
+	    ZeeConfig.cattleRoster(type, wdg);
 	}
     }
 

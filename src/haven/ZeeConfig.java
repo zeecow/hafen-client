@@ -1,20 +1,18 @@
 package haven;
 
-import haven.Utils;
+import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
 import java.util.*;
 
-import static haven.Utils.getprop;
 
 public class ZeeConfig {
 
     public static boolean actionSearchGlobal = Utils.getprefb("actionSearchGlobal", true);
-    public static boolean animalRosterShorter = Utils.getprefb("animalRosterShorter", true);
     public static boolean autoClickMenuOption = Utils.getprefb("autoClickMenuOption", true);
-    public static String autoClickMenuOptionList = Utils.getpref("autoClickMenuOptionList", "Pick");
+    public static String autoClickMenuOptionList = Utils.getpref("autoClickMenuOptionList", "Pick,Pluck,Flay,Slice,Harvest wax");
     public static boolean beltToggleEquips = Utils.getprefb("beltToggleEquips", true);
+    public static double cattleRosterHeightPercentage = Utils.getprefd("cattleRosterHeight", 1.0);
     public static boolean dropMinedCurios = Utils.getprefb("dropMinedCurios", true);
     public static boolean dropMinedOre = Utils.getprefb("dropMinedOre", true);
     public static boolean dropMinedOrePrecious = Utils.getprefb("dropMinedOrePrecious", true);
@@ -103,9 +101,12 @@ public class ZeeConfig {
         }
         return fields;
     }
+
     public static void printAllFields(Object obj) {
         for (Field field : getAllFields(obj.getClass())) {
             field.setAccessible(true);
+            if (field.getDeclaringClass().isPrimitive())
+                continue;
             String name = field.getName();
             Object value = null;
             try {
@@ -116,4 +117,31 @@ public class ZeeConfig {
             System.out.printf("%s %s.%s = %s;\n", value==null?" ":"*", field.getDeclaringClass().getSimpleName(), name, value);
         }
     }
+
+
+    public static void printObj(Widget wdg) {
+        //System.out.println( new ReflectionToStringBuilder(wdg, RecursiveToStringStyle.MULTI_LINE_STYLE).toString());
+        System.out.println(ReflectionToStringBuilder.toString(wdg, new ZeeMyRecursiveToStringStyle(1)));
+    }
+
+    public static void cattleRoster(String type, Widget wdg) {
+        if(type.contains("rosters/") && ZeeConfig.cattleRosterHeightPercentage <1.0){
+
+            //resize "window"
+            wdg.resize(wdg.sz.x, (int)(wdg.sz.y * ZeeConfig.cattleRosterHeightPercentage));
+
+            //reposition buttons
+            int y = -1;
+            for (Widget w: wdg.children()) {
+                if(w.getClass().getSimpleName().contentEquals("Button")){
+                    if(y==-1) { //calculate once
+                        y = (int) (w.c.y * ZeeConfig.cattleRosterHeightPercentage) - w.sz.y;
+                    }
+                    w.c.y = y;
+                }
+            }
+        }
+    }
 }
+
+

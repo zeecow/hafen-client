@@ -31,7 +31,7 @@ import java.awt.event.KeyEvent;
 public class OptWnd extends Window {
     public final Panel main, video, audio, keybind;
     public Panel current;
-    public TextEntry textEntryAutoMenu;
+    public TextEntry textEntryAutoMenu, textEntryCattleRosterHeight;
 
     public void chpanel(Panel p) {
 	if(current != null)
@@ -696,40 +696,23 @@ public class OptWnd extends Window {
 			}
 		}, 15, y);
 
+
 		y += 17;
-
-		main.add(new CheckBox("Shorter animal roster (logout)") {
-			{
-				a = ZeeConfig.animalRosterShorter;
-			}
-
-			public void set(boolean val) {
-				Utils.setprefb("animalRosterShorter", val);
-				ZeeConfig.animalRosterShorter = val;
-				a = val;
-			}
-		}, 15, y);
-
-		y += 13;
-
 		main.add(new Label("------------------------"), 15, y);
-
 		y += 13;
+
 
 		main.add(new CheckBox("Auto click menu option:") {
 			{
 				a = ZeeConfig.autoClickMenuOption;
 			}
-
 			public void set(boolean val) {
 				Utils.setprefb("autoClickMenuOption", val);
 				ZeeConfig.autoClickMenuOption = val;
 				a = val;
 			}
 		}, 15, y);
-
 		y += 17;
-
 		textEntryAutoMenu = new TextEntry(150, ZeeConfig.autoClickMenuOptionList);
 		textEntryAutoMenu.setcanfocus(false);
 		main.add(textEntryAutoMenu,15, y);
@@ -742,6 +725,39 @@ public class OptWnd extends Window {
 				ZeeConfig.autoClickMenuOptionList = str;
 			}
 		}, 165, y-2);
+
+
+		y += 25;
+		main.add(new Label("------------------------"), 15, y);
+		y += 15;
+
+
+		main.add(new Label("Cattle Roster height % (logout)"), 15, y);
+		y += 17;
+		textEntryCattleRosterHeight = new TextEntry(37, ""+(int)(ZeeConfig.cattleRosterHeightPercentage*100)){
+			@Override
+			public boolean keydown(KeyEvent e) {
+				if(!Character.isDigit(e.getKeyChar()) && e.getKeyCode()!=KeyEvent.VK_DELETE && e.getKeyCode()!=KeyEvent.VK_BACK_SPACE && e.getKeyCode()!=KeyEvent.VK_LEFT && e.getKeyCode()!=KeyEvent.VK_RIGHT)
+					return false;
+				return super.keydown(e);
+			}
+		};
+		textEntryCattleRosterHeight.setcanfocus(false);
+		main.add(textEntryCattleRosterHeight,15, y);
+		main.add(new Button(30,"set"){
+			@Override
+			public void click() {
+				setfocus(this);
+				double heightPercentage = Double.parseDouble(textEntryCattleRosterHeight.text.trim());
+				if(heightPercentage > 100)
+					heightPercentage = 100.0;
+				else if(heightPercentage < 25)
+					heightPercentage = 25.0;
+				ZeeConfig.cattleRosterHeightPercentage = heightPercentage/100;
+				Utils.setprefd("cattleRosterHeight", ZeeConfig.cattleRosterHeightPercentage);
+				textEntryCattleRosterHeight.settext(""+(int)(ZeeConfig.cattleRosterHeightPercentage*100));
+			}
+		}, 60, y-2);
 
 		return y;
 	}

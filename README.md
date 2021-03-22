@@ -4,7 +4,7 @@ original features:
  - search actions global
  - compact equip window
  - belt toggles equip window
- - shorter animal roster
+ - shorter cattle roster window (unfinished)
 
 other stuff:
  - autodrop mined items, farmed seeds
