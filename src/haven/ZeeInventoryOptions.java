@@ -1,8 +1,5 @@
 package haven;
 
-import haven.CheckBox;
-import haven.Widget;
-
 public class ZeeInventoryOptions extends Widget {
 
     public ZeeInventoryOptions(String windowCap) {
@@ -13,7 +10,10 @@ public class ZeeInventoryOptions extends Widget {
     }
 
     private void invMain() {
-        add(new CheckBox("Drop seeds when full") {
+
+        add(new Label("drop:"), 0, 0);
+
+        add(new CheckBox("seeds") {
             {
                 a = ZeeConfig.dropSeeds;
             }
@@ -23,6 +23,18 @@ public class ZeeInventoryOptions extends Widget {
                 ZeeConfig.dropSeeds = val;
                 a = val;
             }
-        }, 0, 0);
+        }, 30, 0);
+
+        add(new CheckBox("soil") {
+            {
+                a = ZeeConfig.dropSoil;
+            }
+
+            public void set(boolean val) {
+                Utils.setprefb("dropSoil", val);
+                ZeeConfig.dropSoil = val;
+                a = val;
+            }
+        }, 80, 0);
     }
 }

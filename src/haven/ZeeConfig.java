@@ -18,7 +18,10 @@ public class ZeeConfig {
     public static boolean dropMinedOrePrecious = Utils.getprefb("dropMinedOrePrecious", true);
     public static boolean dropMinedStones = Utils.getprefb("dropMinedStones", true);
     public static boolean dropSeeds = false;//always starts off (TODO: set false when character loads)
+    public static boolean dropSoil = false;
     public static boolean equiporyCompact = Utils.getprefb("equiporyCompact", false);
+    public static String lastWindowDrop = "";
+    public static String lastWindowTake = "";
 
     public final static Set<String> mineablesStone = new HashSet<String>(Arrays.asList(
             "gneiss",

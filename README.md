@@ -4,10 +4,10 @@ original features:
  - search actions global
  - compact equip window
  - belt toggles equip window
- - shorter cattle roster window (unfinished)
+ - shorter cattle roster window
 
 other stuff:
- - autodrop mined items, farmed seeds
+ - autodrop mined items, seeds, soil
  - auto click menu options  
  - sort transfer with Alt+Rclick or Alt+Lclick (no gemstone yet)
  - replaces arrow cursor with system's default

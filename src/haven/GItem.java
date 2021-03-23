@@ -155,6 +155,7 @@ public class GItem extends AWidget implements ItemInfo.SpriteOwner, GSprite.Owne
 		Resource curs = ui.root.getcurs(Coord.z);
 
 		if (curs != null && curs.name.equals("gfx/hud/curs/mine")) {
+
 			//drop mined item
 			if (ZeeConfig.dropMinedStones && ZeeConfig.mineablesStone.contains(name) ||
 					ZeeConfig.dropMinedOre && ZeeConfig.mineablesOre.contains(name) ||
@@ -162,12 +163,21 @@ public class GItem extends AWidget implements ItemInfo.SpriteOwner, GSprite.Owne
 					ZeeConfig.dropMinedCurios && ZeeConfig.mineablesCurios.contains(name)) {
 				this.wdgmsg("drop", Coord.z);
 			}
-		}else if(ZeeConfig.dropSeeds && name.startsWith("seed-") && this.parent instanceof Inventory){
+
+		}else if( ZeeConfig.dropSoil && name.startsWith("soil") && this.parent instanceof Inventory) {
+
+			//drop soil
+			Inventory inv = (Inventory) this.parent;
+			inv.dropItemsByName(name);
+
+		}else if( (ZeeConfig.dropSeeds && name.startsWith("seed-")) && this.parent instanceof Inventory){
+
 			//drop seeds before inventory is full
 			Inventory inv = (Inventory) this.parent;
 			if(inv.getNumberOfFreeSlots() < 3){
 				inv.dropItemsByName(name);
 			}
+
 		}
 	}
 

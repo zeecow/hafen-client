@@ -27,12 +27,11 @@
 package haven;
 
 import java.awt.Color;
-import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.util.*;
-import java.util.function.*;
+
 import haven.ItemInfo.AttrCache;
-import static haven.ItemInfo.find;
+
 import static haven.Inventory.sqsz;
 
 public class WItem extends Widget implements DTarget {
@@ -40,7 +39,6 @@ public class WItem extends Widget implements DTarget {
     public final GItem item;
     private Resource cspr = null;
     private Message csdt = Message.nil;
-	public static String lastWindowName;
 
 	public WItem(GItem item) {
 	super(sqsz);
@@ -217,7 +215,7 @@ public class WItem extends Widget implements DTarget {
 		item.wdgmsg("drop", c, n);
 	    } else {
 		item.wdgmsg("take", c);
-		this.lastWindowName = ((Window)item.parent.parent).cap.text;
+		ZeeConfig.lastWindowTake = ((Window)item.parent.parent).cap.text;
 	    }
 	    return(true);
 	} else if(btn == 3) {
