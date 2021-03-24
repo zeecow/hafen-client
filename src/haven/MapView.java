@@ -495,6 +495,7 @@ public class MapView extends PView implements DTarget, Console.Directory {
 	this.clickmap = new ClickMap();
 	clmaptree.add(clickmap);
 	setcanfocus(true);
+	ZeeConfig.mapView = this;
     }
     
     protected void envdispose() {
@@ -587,6 +588,7 @@ public class MapView extends PView implements DTarget, Console.Directory {
 			nslot.remove();
 		}
 	    }
+		ZeeConfig.checkAutoHearth(ob);
 	}
 
 	public void added(RenderTree.Slot slot) {

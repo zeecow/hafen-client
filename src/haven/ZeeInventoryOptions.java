@@ -11,7 +11,7 @@ public class ZeeInventoryOptions extends Widget {
 
     private void invMain() {
 
-        add(new Label("drop:"), 0, 0);
+        add(new Label("Drop:"), 0, 0);
 
         add(new CheckBox("seeds") {
             {
@@ -23,7 +23,7 @@ public class ZeeInventoryOptions extends Widget {
                 ZeeConfig.dropSeeds = val;
                 a = val;
             }
-        }, 30, 0);
+        }, 33, 0);
 
         add(new CheckBox("soil") {
             {
@@ -35,6 +35,6 @@ public class ZeeInventoryOptions extends Widget {
                 ZeeConfig.dropSoil = val;
                 a = val;
             }
-        }, 80, 0);
+        }, 86, 0);
     }
 }

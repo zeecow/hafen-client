@@ -696,6 +696,19 @@ public class OptWnd extends Window {
 			}
 		}, 15, y);
 
+		y += 17;
+
+		main.add(new CheckBox("Hermit auto-hearth (alpha)") {
+			{
+				a = ZeeConfig.autoHearthOnStranger;
+			}
+
+			public void set(boolean val) {
+				Utils.setprefb("autoHearthOnStranger", val);
+				ZeeConfig.autoHearthOnStranger = val;
+				a = val;
+			}
+		}, 15, y);
 
 		y += 17;
 		main.add(new Label("------------------------"), 15, y);

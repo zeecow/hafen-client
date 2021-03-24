@@ -7,10 +7,13 @@ import java.util.*;
 
 
 public class ZeeConfig {
+    public static GameUI gameUI;
+    public static MapView mapView;
 
     public static boolean actionSearchGlobal = Utils.getprefb("actionSearchGlobal", true);
     public static boolean autoClickMenuOption = Utils.getprefb("autoClickMenuOption", true);
     public static String autoClickMenuOptionList = Utils.getpref("autoClickMenuOptionList", "Pick,Pluck,Flay,Slice,Harvest wax");
+    public static boolean autoHearthOnStranger = Utils.getprefb("autoHearthOnStranger", true);
     public static boolean beltToggleEquips = Utils.getprefb("beltToggleEquips", true);
     public static double cattleRosterHeightPercentage = Utils.getprefd("cattleRosterHeight", 1.0);
     public static boolean dropMinedCurios = Utils.getprefb("dropMinedCurios", true);
@@ -143,6 +146,16 @@ public class ZeeConfig {
                     w.c.y = y;
                 }
             }
+        }
+    }
+
+    public static void checkAutoHearth(Gob ob) {
+        if(ZeeConfig.autoHearthOnStranger
+                && ob!=null && ob.getres()!=null
+                && ob.getres().name.contains("borka/body")
+                && ob.id != mapView.player().id) {
+            gameUI.act("travel","hearth");
+            //System.out.println(ob.id + " != " + mapView.player().id +"  "+ob.getres().name.contains("borka/body"));
         }
     }
 }
