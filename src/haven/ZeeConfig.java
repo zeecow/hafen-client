@@ -2,6 +2,7 @@ package haven;
 
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 
+import javax.sound.midi.*;
 import java.lang.reflect.Field;
 import java.util.*;
 
@@ -155,9 +156,31 @@ public class ZeeConfig {
                 && ob.getres().name.contains("borka/body")
                 && ob.id != mapView.player().id) {
             gameUI.act("travel","hearth");
+            playMidi(midiAlertPlayers);
             //System.out.println(ob.id + " != " + mapView.player().id +"  "+ob.getres().name.contains("borka/body"));
         }
     }
+
+    public static void playMidi(String[] notes){
+        new ZeeSynth(notes).start();
+    }
+
+    //"note, duration_ms, volume_from0to127)",
+    //"rest_ms",
+    public static String[] midiAlertPlayers = new String[]{
+            "200",//rest avoid stuttering?
+            "2F#,500,100", "100", "2G,250,120",
+            "700",
+            "2F#,500,100", "100", "2G,250,120",
+            "700",
+            "2F#,300,85", "100", "2G,300", "100",
+            "2F#,200,90", "100", "2G,200", "100",
+            "2F#,200,100", "100", "2G,200", "100",
+            "2F#,200,110", "100", "2G,200", "100",
+            "2F#,200,120", "100", "2G,200", "100",
+            "2F#,200,120"
+    };
+
 }
 
 

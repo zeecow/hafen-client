@@ -5,6 +5,7 @@ original features:
  - compact equip window
  - belt toggles equip window
  - shorter cattle roster window
+ - basic MIDI sequencer for alerts
 
 other stuff:
  - autodrop mined items, seeds, soil
