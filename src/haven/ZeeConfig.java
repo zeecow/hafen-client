@@ -2,7 +2,6 @@ package haven;
 
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 
-import javax.sound.midi.*;
 import java.lang.reflect.Field;
 import java.util.*;
 
@@ -85,6 +84,33 @@ public class ZeeConfig {
             "petrifiedshell",
             "strangecrystal"
     ));
+    public final static Set<String> localizedResources = new HashSet<String>(Arrays.asList(
+            "gfx/terobjs/saltbasin",
+            "gfx/terobjs/abyssalchasm",
+            "gfx/terobjs/windthrow",
+            "gfx/terobjs/icespire",
+            "gfx/terobjs/woodheart",
+            "gfx/terobjs/jotunmussel",
+            "gfx/terobjs/guanopile",
+            "gfx/terobjs/geyser",
+            "gfx/terobjs/claypit",
+            "gfx/terobjs/caveorgan",
+            "gfx/terobjs/crystalpatch",
+            "gfx/terobjs/fairystone",
+            "gfx/terobjs/lilypadlotus"
+    ));
+    public final static Set<String> alarmItems = new HashSet<String>(Arrays.asList(
+        "gfx/terobjs/herbs/flotsam",
+        "gfx/terobjs/herbs/chimingbluebell",
+        "gfx/terobjs/herbs/edelweiss",
+        "gfx/terobjs/herbs/bloatedbolete",
+        "gfx/terobjs/herbs/glimmermoss",
+        "gfx/terobjs/herbs/camomile",
+        "gfx/terobjs/herbs/clay-cave",
+        "gfx/terobjs/herbs/mandrake",
+        "gfx/terobjs/herbs/seashell"
+    ));
+
 
     public static Collection<Field> getAllFields(Class<?> type) {
         TreeSet<Field> fields = new TreeSet<Field>(
@@ -127,7 +153,6 @@ public class ZeeConfig {
 
 
     public static void printObj(Widget wdg) {
-        //System.out.println( new ReflectionToStringBuilder(wdg, RecursiveToStringStyle.MULTI_LINE_STYLE).toString());
         System.out.println(ReflectionToStringBuilder.toString(wdg, new ZeeMyRecursiveToStringStyle(1)));
     }
 
@@ -150,13 +175,26 @@ public class ZeeConfig {
         }
     }
 
-    public static void checkAutoHearth(Gob ob) {
-        if(ZeeConfig.autoHearthOnStranger
-                && ob!=null && ob.getres()!=null
-                && ob.getres().name.contains("borka/body")
-                && ob.id != mapView.player().id) {
+    public static void checkGob(Gob gob) {
+
+        if(gob==null || gob.getres()==null)
+            return;
+
+        String name = gob.getres().name;
+
+        //auto hearth
+        if(ZeeConfig.autoHearthOnStranger && name.contains("borka/body") && gob.id != mapView.player().id) {
+
             gameUI.act("travel","hearth");
-            playMidi(midiAlertPlayers);
+            playMidi(midiJawsTheme);
+
+        }else if(alarmItems.contains(name)){
+
+            playMidi(midiWoodPecker);
+
+        }else if(localizedResources.contains(name)){
+
+            playMidi(midiUfoThirdKind);
         }
     }
 
@@ -166,8 +204,8 @@ public class ZeeConfig {
 
     //"note, duration_ms, volume_from0to127)",
     //"rest_ms",
-    public static String[] midiAlertPlayers = new String[]{
-            "200",//rest avoid stuttering?
+    public static String[] midiJawsTheme = new String[]{
+            "200",//avoid stuttering
             "2F#,500,100", "100", "2G,250,120",
             "700",
             "2F#,500,100", "100", "2G,250,120",
@@ -177,7 +215,34 @@ public class ZeeConfig {
             "2F#,200,100", "100", "2G,200", "100",
             "2F#,200,110", "100", "2G,200", "100",
             "2F#,200,120", "100", "2G,200", "100",
-            "2F#,200,120"
+            "2F#,200,120",
+            "200"//avoid cuts
+    };
+    public static String[] midiUfoThirdKind = new String[]{
+            "200",
+            "5D,300,100",
+            "5E,300,120",
+            "5C,600,110",
+            "4C,600,100",
+            "4G,1000,90",
+            "200"
+    };
+    public static String[] midiBeethoven5th = new String[]{
+            "200",
+            "3G,100,120","50",
+            "3G,100,120","50",
+            "3G,100,120","50",
+            "3D#,1000,120",
+            "200"
+    };
+    public static String[] midiWoodPecker= new String[]{
+            "200",
+            "5C,100,80","50",
+            "5F,100,90","50",
+            "5A,100,100","50",
+            "6C,300,120","50",
+            "5A,200,100",
+            "200"
     };
 
 }

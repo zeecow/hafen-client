@@ -588,7 +588,7 @@ public class MapView extends PView implements DTarget, Console.Directory {
 			nslot.remove();
 		}
 	    }
-		ZeeConfig.checkAutoHearth(ob);
+		ZeeConfig.checkGob(ob);
 	}
 
 	public void added(RenderTree.Slot slot) {
