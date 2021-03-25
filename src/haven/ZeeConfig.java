@@ -157,7 +157,6 @@ public class ZeeConfig {
                 && ob.id != mapView.player().id) {
             gameUI.act("travel","hearth");
             playMidi(midiAlertPlayers);
-            //System.out.println(ob.id + " != " + mapView.player().id +"  "+ob.getres().name.contains("borka/body"));
         }
     }
 
@@ -172,7 +171,7 @@ public class ZeeConfig {
             "2F#,500,100", "100", "2G,250,120",
             "700",
             "2F#,500,100", "100", "2G,250,120",
-            "700",
+            "400",
             "2F#,300,85", "100", "2G,300", "100",
             "2F#,200,90", "100", "2G,200", "100",
             "2F#,200,100", "100", "2G,200", "100",
