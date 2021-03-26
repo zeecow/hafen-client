@@ -581,7 +581,7 @@ public class OCache implements Iterable<Gob> {
     }
 
     public static void health(Gob g, int hp) {
-	g.setattr(new GobHealth(g, hp / 4.0f));
+	g.setattr(new GobHealth(g, hp));
     }
     public Delta health(Message msg) {
 	int hp = msg.uint8();
