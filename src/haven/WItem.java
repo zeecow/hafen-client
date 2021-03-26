@@ -215,10 +215,6 @@ public class WItem extends Widget implements DTarget {
 		item.wdgmsg("drop", c, n);
 	    } else {
 		item.wdgmsg("take", c);
-		try {
-			ZeeConfig.lastWindowTake = ((Window) item.parent.parent).cap.text;
-		}catch(Exception e){}
-		//System.out.println(ZeeConfig.lastWindowTake);
 	    }
 	    return(true);
 	} else if(btn == 3) {
@@ -228,7 +224,13 @@ public class WItem extends Widget implements DTarget {
 	return(false);
     }
 
-    public boolean drop(Coord cc, Coord ul) {
+	@Override
+	public boolean mouseup(Coord c, int button) {
+		ZeeConfig.checkBeltToggleWindow(this);
+		return super.mouseup(c, button);
+	}
+
+	public boolean drop(Coord cc, Coord ul) {
 	return(false);
     }
 

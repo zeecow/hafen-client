@@ -9,6 +9,7 @@ import java.util.*;
 public class ZeeConfig {
     public static GameUI gameUI;
     public static MapView mapView;
+    public static Window equipsWindow;
 
     public static boolean actionSearchGlobal = Utils.getprefb("actionSearchGlobal", true);
     public static boolean autoClickMenuOption = Utils.getprefb("autoClickMenuOption", true);
@@ -23,8 +24,7 @@ public class ZeeConfig {
     public static boolean dropSeeds = false;//always starts off (TODO: set false when character loads)
     public static boolean dropSoil = false;
     public static boolean equiporyCompact = Utils.getprefb("equiporyCompact", false);
-    public static String lastWindowDrop = "";
-    public static String lastWindowTake = "";
+    public static boolean equipWindowOpenedByBelt = false;
 
     public final static Set<String> mineablesStone = new HashSet<String>(Arrays.asList(
             "gneiss",
@@ -245,6 +245,24 @@ public class ZeeConfig {
             "200"
     };
 
+    public static void checkBeltToggleWindow(Widget wdg) {
+        if(wdg.parent!=null && wdg.parent.parent!=null && wdg.parent.parent instanceof Window){
+            String windowName = "";
+            try {
+                windowName = ((Window) wdg.parent.parent).cap.text;
+            }catch (Exception e){
+            }
+            if(!equipWindowOpenedByBelt && windowName.contains("Belt")){
+                equipsWindow.show();
+                equipWindowOpenedByBelt = true;
+            }
+        }else if(wdg.parent!=null && wdg.parent instanceof GameUI){
+            if(equipWindowOpenedByBelt){
+                equipsWindow.hide();
+                equipWindowOpenedByBelt = false;
+            }
+        }
+    }
 }
 
 

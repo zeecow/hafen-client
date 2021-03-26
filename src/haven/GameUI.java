@@ -561,18 +561,12 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 
     private void updhand() {
 	if((hand.isEmpty() && (vhand != null)) || ((vhand != null) && !hand.contains(vhand.item))) {
-		if(ZeeConfig.beltToggleEquips && ZeeConfig.lastWindowDrop.contains("Belt") && equwnd.visible){
-			equwnd.hide();
-		}
 	    ui.destroy(vhand);
 	    vhand = null;
 	}
 	if(!hand.isEmpty() && (vhand == null)) {
 	    DraggedItem fi = hand.iterator().next();
 	    vhand = add(new ItemDrag(fi.dc, fi.item));
-	    if(ZeeConfig.beltToggleEquips && ZeeConfig.lastWindowTake.contains("Belt") && !equwnd.visible){
-	    	equwnd.show();
-		}
 	}
     }
 
@@ -723,6 +717,7 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 	    equwnd.pack();
 	    equwnd.hide();
 	    add(equwnd, Utils.getprefc("wndc-equ", new Coord(400, 10)));
+	    ZeeConfig.equipsWindow = equwnd;
 	} else if(place == "hand") {
 	    GItem g = add((GItem)child);
 	    Coord lc = (Coord)args[1];
