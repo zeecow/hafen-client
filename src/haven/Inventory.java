@@ -135,7 +135,10 @@ public class Inventory extends Widget implements DTarget {
 	    dc = cc.div(sqsz);
 	wdgmsg("drop", dc);
 
-	ZeeConfig.lastWindowDrop = ((Window)this.parent).cap.text;
+	try {
+		ZeeConfig.lastWindowDrop = ((Window) this.parent).cap.text;
+	}catch(Exception e){}
+	//System.out.println(ZeeConfig.lastWindowDrop);
 
 	return(true);
     }

@@ -215,7 +215,10 @@ public class WItem extends Widget implements DTarget {
 		item.wdgmsg("drop", c, n);
 	    } else {
 		item.wdgmsg("take", c);
-		ZeeConfig.lastWindowTake = ((Window)item.parent.parent).cap.text;
+		try {
+			ZeeConfig.lastWindowTake = ((Window) item.parent.parent).cap.text;
+		}catch(Exception e){}
+		//System.out.println(ZeeConfig.lastWindowTake);
 	    }
 	    return(true);
 	} else if(btn == 3) {
