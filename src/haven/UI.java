@@ -239,7 +239,7 @@ public class UI {
 		pwdg.addchild(wdg, pargs);
 	    }
 	    bind(wdg, id);
-	    ZeeConfig.cattleRoster(type, wdg);
+	    ZeeConfig.checkRemoteWidget(type, wdg);
 	}
     }
 

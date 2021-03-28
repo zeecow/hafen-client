@@ -703,21 +703,20 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 	} else if(place == "inv") {
 	    invwnd = new Hidewnd(Coord.z, "Inventory") {
 		    public void cresize(Widget ch) {
-			pack();
+		    	pack();
 		    }
 		};
-	    invwnd.add(maininv = (Inventory)child, 0, 20);
-	    invwnd.add(new ZeeInventoryOptions("Inventory"), 0, 0);
+	    invwnd.add(maininv = (Inventory)child);
 	    invwnd.pack();
 	    invwnd.hide();
 	    add(invwnd, Utils.getprefc("wndc-inv", new Coord(100, 100)));
+		ZeeConfig.initWindowInventory();
 	} else if(place == "equ") {
 	    equwnd = new Hidewnd(Coord.z, "Equipment");
 	    equwnd.add(child, Coord.z);
 	    equwnd.pack();
 	    equwnd.hide();
 	    add(equwnd, Utils.getprefc("wndc-equ", new Coord(400, 10)));
-	    ZeeConfig.equipsWindow = equwnd;
 	} else if(place == "hand") {
 	    GItem g = add((GItem)child);
 	    Coord lc = (Coord)args[1];

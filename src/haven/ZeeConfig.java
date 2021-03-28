@@ -2,6 +2,7 @@ package haven;
 
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 
+import java.awt.event.KeyEvent;
 import java.lang.reflect.Field;
 import java.util.*;
 
@@ -9,7 +10,14 @@ import java.util.*;
 public class ZeeConfig {
     public static GameUI gameUI;
     public static MapView mapView;
-    public static Window equipsWindow;
+    public static Window windowBelt;
+    public static Window windowCattleRoster;
+    public static Window windowEquipment;
+    public static Window windowIconSettings;
+    public static Window windowInventory;
+    public static Window windowOptions;
+
+    public static HashMap<String,String> mapGobAlert = new HashMap<String,String>();
 
     public static boolean actionSearchGlobal = Utils.getprefb("actionSearchGlobal", true);
     public static boolean autoClickMenuOption = Utils.getprefb("autoClickMenuOption", true);
@@ -156,7 +164,9 @@ public class ZeeConfig {
         System.out.println(ReflectionToStringBuilder.toString(wdg, new ZeeMyRecursiveToStringStyle(1)));
     }
 
-    public static void cattleRoster(String type, Widget wdg) {
+    public static void checkRemoteWidget(String type, Widget wdg) {
+
+        //Cattle Roster
         if(type.contains("rosters/") && ZeeConfig.cattleRosterHeightPercentage <1.0){
 
             //resize "window"
@@ -176,30 +186,270 @@ public class ZeeConfig {
     }
 
     public static void checkGob(Gob gob) {
-
         if(gob==null || gob.getres()==null)
             return;
 
         String name = gob.getres().name;
+        if(mapGobAlert.put(name,"") == null) { //if gob is new
+            //System.out.println(name+"  "+mapGobAlert.size());
+        }
 
-        //auto hearth
         if(ZeeConfig.autoHearthOnStranger && name.contains("borka/body") && gob.id != mapView.player().id) {
-
             gameUI.act("travel","hearth");
             playMidi(midiJawsTheme);
-
         }else if(alarmItems.contains(name)){
-
             playMidi(midiWoodPecker);
-
         }else if(localizedResources.contains(name)){
-
             playMidi(midiUfoThirdKind);
+        }else if(name.endsWith("/adder")){
+            playMidi(midiJawsTheme);
         }
     }
 
+
+    public static void checkBeltToggleWindow(Widget wdg) {
+        if(wdg.parent!=null && wdg.parent.parent!=null && wdg.parent.parent instanceof Window){
+            String windowName = "";
+            try {
+                windowName = ((Window) wdg.parent.parent).cap.text;
+            }catch (Exception e){
+            }
+            if(!equipWindowOpenedByBelt && windowName.contains("Belt")){
+                windowEquipment.show();
+                equipWindowOpenedByBelt = true;
+            }
+        }else if(wdg.parent!=null && wdg.parent instanceof GameUI){
+            if(equipWindowOpenedByBelt){
+                windowEquipment.hide();
+                equipWindowOpenedByBelt = false;
+            }
+        }
+    }
+
+    public static void initWindowInventory() {
+        //add options interface
+        windowInventory.add(new ZeeInventoryOptions("Inventory"));
+
+        //change slots position
+        Widget invSlots = windowInventory.getchild(Inventory.class);
+        invSlots.c = new Coord(0,20);
+
+        windowInventory.pack();
+    }
+
+    public static void getWindow(Window window, String cap) {
+        cap = cap.trim();
+        if(cap.contains("Belt")) {
+            windowBelt = window;
+        }else if(cap.equalsIgnoreCase("Cattle Roster")) {
+            windowCattleRoster = window;
+        }else if(cap.contains("Equipment")) {
+            windowEquipment = window;
+        }else if(cap.contains("Icon settings")) {
+            windowIconSettings = window;
+        }else if(cap.contains("Inventory")) {
+            windowInventory = window;
+        }else if(cap.contains("Options")) {
+            windowOptions = window;
+        }
+    }
+
+
+    public static int addZeecowOptions(OptWnd.Panel main, int y) {
+        TextEntry textEntryAutoMenu;
+        TextEntry textEntryCattleRosterHeight;
+
+        y += 7;
+
+        main.add(new Label("Zeecow options"), 0, y);
+
+        y += 17;
+
+        main.add(new CheckBox("Drop mined stones") {
+            {
+                a = ZeeConfig.dropMinedStones;
+            }
+
+            public void set(boolean val) {
+                Utils.setprefb("dropMinedStones", val);
+                ZeeConfig.dropMinedStones = val;
+                a = val;
+            }
+        }, 15, y);
+
+        y += 17;
+
+        main.add(new CheckBox("Drop mined ore") {
+            {
+                a = ZeeConfig.dropMinedOre;
+            }
+
+            public void set(boolean val) {
+                Utils.setprefb("dropMinedOre", val);
+                ZeeConfig.dropMinedOre = val;
+                a = val;
+            }
+        }, 15, y);
+
+        y += 17;
+
+        main.add(new CheckBox("Drop mined silver/gold") {
+            {
+                a = ZeeConfig.dropMinedOrePrecious;
+            }
+
+            public void set(boolean val) {
+                Utils.setprefb("dropMinedOrePrecious", val);
+                ZeeConfig.dropMinedOrePrecious = val;
+                a = val;
+            }
+        }, 15, y);
+
+        y += 17;
+
+        main.add(new CheckBox("Drop mined curios") {
+            {
+                a = ZeeConfig.dropMinedCurios;
+            }
+
+            public void set(boolean val) {
+                Utils.setprefb("dropMinedCurios", val);
+                ZeeConfig.dropMinedCurios = val;
+                a = val;
+            }
+        }, 15, y);
+
+        y += 13;
+
+        main.add(new Label("------------------------"), 15, y);
+
+        y += 13;
+
+        main.add(new CheckBox("Action search global") {
+            {
+                a = ZeeConfig.actionSearchGlobal;
+            }
+
+            public void set(boolean val) {
+                Utils.setprefb("actionSearchGlobal", val);
+                ZeeConfig.actionSearchGlobal = val;
+                a = val;
+            }
+        }, 15, y);
+
+        y += 17;
+
+        main.add(new CheckBox("Compact equip window (restart)") {
+            {
+                a = ZeeConfig.equiporyCompact;
+            }
+
+            public void set(boolean val) {
+                Utils.setprefb("equiporyCompact", val);
+                ZeeConfig.equiporyCompact = val;
+                a = val;
+            }
+        }, 15, y);
+
+        y += 17;
+
+        main.add(new CheckBox("Belt toggles equip window") {
+            {
+                a = ZeeConfig.beltToggleEquips;
+            }
+
+            public void set(boolean val) {
+                Utils.setprefb("beltToggleEquips", val);
+                ZeeConfig.beltToggleEquips = val;
+                a = val;
+            }
+        }, 15, y);
+
+        y += 17;
+
+        main.add(new CheckBox("Hermit auto-hearth (alpha)") {
+            {
+                a = ZeeConfig.autoHearthOnStranger;
+            }
+
+            public void set(boolean val) {
+                Utils.setprefb("autoHearthOnStranger", val);
+                ZeeConfig.autoHearthOnStranger = val;
+                a = val;
+            }
+        }, 15, y);
+
+        y += 17;
+        main.add(new Label("------------------------"), 15, y);
+        y += 13;
+
+
+        main.add(new CheckBox("Auto click menu option:") {
+            {
+                a = ZeeConfig.autoClickMenuOption;
+            }
+            public void set(boolean val) {
+                Utils.setprefb("autoClickMenuOption", val);
+                ZeeConfig.autoClickMenuOption = val;
+                a = val;
+            }
+        }, 15, y);
+        y += 17;
+        textEntryAutoMenu = new TextEntry(150, ZeeConfig.autoClickMenuOptionList);
+        textEntryAutoMenu.setcanfocus(false);
+        main.add(textEntryAutoMenu,15, y);
+        main.add(new Button(30,"set"){
+            @Override
+            public void click() {
+                setfocus(this);
+                String str = textEntryAutoMenu.text.trim();
+                Utils.setpref("autoClickMenuOptionList", str);
+                ZeeConfig.autoClickMenuOptionList = str;
+            }
+        }, 165, y-2);
+
+
+        y += 25;
+        main.add(new Label("------------------------"), 15, y);
+        y += 15;
+
+
+        main.add(new Label("Cattle Roster height % (logout)"), 15, y);
+        y += 17;
+        textEntryCattleRosterHeight = new TextEntry(37, ""+(int)(ZeeConfig.cattleRosterHeightPercentage*100)){
+            @Override
+            public boolean keydown(KeyEvent e) {
+                if(!Character.isDigit(e.getKeyChar()) && e.getKeyCode()!=KeyEvent.VK_DELETE && e.getKeyCode()!=KeyEvent.VK_BACK_SPACE && e.getKeyCode()!=KeyEvent.VK_LEFT && e.getKeyCode()!=KeyEvent.VK_RIGHT)
+                    return false;
+                return super.keydown(e);
+            }
+        };
+        textEntryCattleRosterHeight.setcanfocus(false);
+        main.add(textEntryCattleRosterHeight,15, y);
+        main.add(new Button(30,"set"){
+            @Override
+            public void click() {
+                setfocus(this);
+                double heightPercentage = Double.parseDouble(textEntryCattleRosterHeight.text.trim());
+                if(heightPercentage > 100)
+                    heightPercentage = 100.0;
+                else if(heightPercentage < 25)
+                    heightPercentage = 25.0;
+                ZeeConfig.cattleRosterHeightPercentage = heightPercentage/100;
+                Utils.setprefd("cattleRosterHeight", ZeeConfig.cattleRosterHeightPercentage);
+                textEntryCattleRosterHeight.settext(""+(int)(ZeeConfig.cattleRosterHeightPercentage*100));
+            }
+        }, 60, y-2);
+
+        return y;
+    }
+
+
     public static void playMidi(String[] notes){
         new ZeeSynth(notes).start();
+    }
+    public static void playMidi(String[] notes, int instr){
+        new ZeeSynth(notes,instr).start();
     }
 
     //"note, duration_ms, volume_from0to127)",
@@ -237,32 +487,13 @@ public class ZeeConfig {
     };
     public static String[] midiWoodPecker= new String[]{
             "200",
-            "5C,100,80","50",
-            "5F,100,90","50",
-            "5A,100,100","50",
-            "6C,300,120","50",
+            "5C,80,80","50",
+            "5F,80,90","50",
+            "5A,80,100","50",
+            "6C,200,120",
             "5A,200,100",
             "200"
     };
-
-    public static void checkBeltToggleWindow(Widget wdg) {
-        if(wdg.parent!=null && wdg.parent.parent!=null && wdg.parent.parent instanceof Window){
-            String windowName = "";
-            try {
-                windowName = ((Window) wdg.parent.parent).cap.text;
-            }catch (Exception e){
-            }
-            if(!equipWindowOpenedByBelt && windowName.contains("Belt")){
-                equipsWindow.show();
-                equipWindowOpenedByBelt = true;
-            }
-        }else if(wdg.parent!=null && wdg.parent instanceof GameUI){
-            if(equipWindowOpenedByBelt){
-                equipsWindow.hide();
-                equipWindowOpenedByBelt = false;
-            }
-        }
-    }
 }
 
 

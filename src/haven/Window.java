@@ -99,6 +99,7 @@ public class Window extends Widget implements DTarget {
 	chcap(cap);
 	resize2(sz);
 	setfocustab(true);
+	ZeeConfig.getWindow(this, cap);
     }
 
     public Window(Coord sz, String cap, boolean lg) {

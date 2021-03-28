@@ -4,7 +4,7 @@ public class ZeeInventoryOptions extends Widget {
 
     public ZeeInventoryOptions(String windowCap) {
 
-        if(windowCap.contains("Inventory"))
+        if(windowCap.trim().equalsIgnoreCase("Inventory"))
             invMain();
         pack();
     }

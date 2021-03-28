@@ -11,14 +11,20 @@ public class ZeeSynth extends Thread{
 
     private static List<String> notes = Arrays.asList("C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B");
     private static MidiChannel[] channels;
-    private static int INSTRUMENT = 0; // 0 is a piano, 9 is percussion, other channels are for other instruments
-    private static int VOLUME = 80; // between 0 et 127
+    private static int volume = 80; // between 0 et 127
+    private static int instrument; // 0 piano, 9 percussion
     int lastVolume = -1;
 
     private static String[] playNotes;
 
     public ZeeSynth(String[] notess) {
+        instrument = 0;//piano
         playNotes = notess;
+    }
+
+    public ZeeSynth(String[] notes, int instr) {
+        instrument = instr;
+        playNotes = notes;
     }
 
     public void run() {
@@ -36,7 +42,7 @@ public class ZeeSynth extends Thread{
                     rest(Integer.parseInt(split[0]));
                 }else if(split.length==2){
                     if(lastVolume<0){
-                        lastVolume = VOLUME;
+                        lastVolume = volume;
                     }
                     play(split[0], Integer.parseInt(split[1]), lastVolume);
                 }else if(split.length==3){
@@ -59,9 +65,9 @@ public class ZeeSynth extends Thread{
      */
     private static void play(String note, int duration, int volume) throws InterruptedException
     {
-        channels[INSTRUMENT].noteOn(getMidiNoteId(note), volume );
+        channels[instrument].noteOn(getMidiNoteId(note), volume );
         Thread.sleep( duration );
-        channels[INSTRUMENT].noteOff(getMidiNoteId(note));
+        channels[instrument].noteOff(getMidiNoteId(note));
     }
 
     private static void rest(int duration) throws InterruptedException
