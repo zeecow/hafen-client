@@ -119,9 +119,6 @@ public class AccountList extends Widget {
 	    synchronized(accounts) {
 		for(Account account : accounts) {
 		    if(sender == account.plb) {
-			setpref("savedtoken", account.token);
-			setpref("tokenname", account.name);
-			setpref("tokenname", account.name);
 			super.wdgmsg("account", account.name, account.token);
 			break;
 		    } else if(sender == account.del) {

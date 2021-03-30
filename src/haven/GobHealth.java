@@ -32,7 +32,7 @@ import java.awt.image.BufferedImage;
 import haven.render.*;
 
 public class GobHealth extends GAttrib implements Gob.SetupMod {
-    public final int hp;
+    public final float hp;
     public final MixColor fx;
     private static final Text.Foundry gobhpf = new Text.Foundry(Text.sans.deriveFont(Font.BOLD), 14);
     private static final BufferedImage[] gobhp = new BufferedImage[]{
@@ -41,26 +41,23 @@ public class GobHealth extends GAttrib implements Gob.SetupMod {
 	Text.renderstroked("75%", new Color(230, 185, 185), Color.BLACK, gobhpf).img
     };
     
-    public GobHealth(Gob g, int hp) {
+    public GobHealth(Gob g, float hp) {
 	super(g);
 	this.hp = hp;
-	this.fx = new MixColor(255, 0, 0, 128 - ((hp * 128) / 4));
+	this.fx = new MixColor(255, 0, 0, 128 - Math.round(hp * 128));
     }
     
     public Pipe.Op gobstate() {
-	if(hp >= 4)
+	if(hp >= 1)
 	    return(null);
 	return(fx);
     }
 
     public BufferedImage text() {
-	if(hp <= gobhp.length && hp > 0) {
-	    return gobhp[hp - 1];
+	if(hp < 1) {
+	    int c = 75 + (int) Math.floor(hp * 180);
+	    return Text.renderstroked(String.format("%d%%", Math.round(100 * hp)), new Color(255, c, c)).img;
 	}
 	return null;
-    }
-
-    public double asfloat() {
-	return(((double)hp) / 4.0);
     }
 }
