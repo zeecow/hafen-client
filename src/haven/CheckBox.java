@@ -69,6 +69,9 @@ public class CheckBox extends ACheckBox {
         super.draw(g);
     }
     public boolean mousedown(Coord c, int button) {
+	if(hitbox && !c.isect(Coord.z, box.sz())){
+	    return false;
+	}
 	if(button == 1) {
 	    click();
 	    return(true);
