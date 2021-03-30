@@ -196,6 +196,7 @@ public class Bootstrap implements UI.Receiver, UI.Runner {
 	    ui.uimsg(1, "prg", "Connecting...");
 	    try {
 		sess = new Session(new InetSocketAddress(InetAddress.getByName(hostname), port), acctname, cookie);
+		sess.ui = ui;
 	    } catch(UnknownHostException e) {
 		ui.uimsg(1, "error", "Could not locate server");
 		continue retry;
