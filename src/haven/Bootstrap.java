@@ -144,6 +144,7 @@ public class Bootstrap implements UI.Receiver, UI.Runner {
 			    cookie = auth.getcookie();
 			    setpref("savedtoken-" + authed, Utils.byte2hex(auth.gettoken()));
 			    setpref("tokenname", authed);
+			    AccountList.storeAccount(authed, Utils.byte2hex(auth.gettoken()));
 			    break authed;
 			}
 		    }
@@ -235,6 +236,7 @@ public class Bootstrap implements UI.Receiver, UI.Runner {
 		    if(savepw) {
 			setpref("savedtoken-" + acctname, Utils.byte2hex(auth.gettoken()));
 			setpref("tokenname", tokenname = acctname);
+			AccountList.storeAccount(acctname, Utils.byte2hex(auth.gettoken()));
 		    }
 		} catch(UnknownHostException e) {
 		    ui.uimsg(1, "error", "Could not locate server");
