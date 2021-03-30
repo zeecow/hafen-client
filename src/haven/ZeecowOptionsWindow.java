@@ -8,8 +8,10 @@ import java.util.HashMap;
 
 public class ZeecowOptionsWindow extends JFrame {
     public HashMap<String, String> mapGobInfo;
-    public JPanel panelNorth, panelSouth, panelCenter;
+    public JTabbedPane tabbedPane;
+    public JPanel panelMisc, panelGobs, panelGobDetails;
     public JCheckBox cbDropMinedStone, cbDropMinedOre, cbDropMinedSilverGold, cbDropMinedCurios, cbActionSearchGlobal, cbCompactEquipsWindow, cbBeltTogglesEquips, cbAutohearth, cbAutoClickMenuOpts,cbCattleRosterHeight;
+    public JButton btnRefresh;
     public JTextField tfAutoClickMenu;
     public JComboBox cmbCattleRoster;
     public JList<String> listGobs;
@@ -32,19 +34,14 @@ public class ZeecowOptionsWindow extends JFrame {
     }
 
     private void setContents() {
-        panelNorth = new JPanel();
-        panelCenter = new JPanel();
-        panelSouth = new JPanel();
+        tabbedPane = new JTabbedPane();
+        getContentPane().add(tabbedPane);
 
-        panelNorth.setLayout(new BoxLayout(panelNorth, BoxLayout.PAGE_AXIS));
-        panelNorth.setAlignmentX(Component.LEFT_ALIGNMENT);
+        panelMisc = new JPanel();
+        panelMisc.setLayout(new BoxLayout(panelMisc, BoxLayout.PAGE_AXIS));
+        tabbedPane.addTab("Misc", panelMisc);
 
-        getContentPane().add(panelNorth,BorderLayout.NORTH);
-        getContentPane().add(panelCenter,BorderLayout.CENTER);
-        getContentPane().add(panelSouth,BorderLayout.SOUTH);
-
-        //Checkboxes
-        panelNorth.add(cbDropMinedStone = new JCheckBox("Drop mined stones"));
+        panelMisc.add(cbDropMinedStone = new JCheckBox("Drop mined stones"));
         cbDropMinedStone.setSelected(ZeeConfig.dropMinedStones);
         cbDropMinedStone.addActionListener(actionEvent -> {
             JCheckBox cb = (JCheckBox) actionEvent.getSource();
@@ -52,7 +49,7 @@ public class ZeecowOptionsWindow extends JFrame {
             Utils.setprefb("dropMinedStones",val);
         });
 
-        panelNorth.add(cbDropMinedOre = new JCheckBox("Drop mined ore"));
+        panelMisc.add(cbDropMinedOre = new JCheckBox("Drop mined ore"));
         cbDropMinedOre.setSelected(ZeeConfig.dropMinedOre);
         cbDropMinedOre.addActionListener(actionEvent -> {
             JCheckBox cb = (JCheckBox) actionEvent.getSource();
@@ -60,7 +57,7 @@ public class ZeecowOptionsWindow extends JFrame {
             Utils.setprefb("dropMinedOre",val);
         });
 
-        panelNorth.add(cbDropMinedSilverGold = new JCheckBox("Drop mined silver/gold"));
+        panelMisc.add(cbDropMinedSilverGold = new JCheckBox("Drop mined silver/gold"));
         cbDropMinedSilverGold.setSelected(ZeeConfig.dropMinedSilverGold);
         cbDropMinedSilverGold.addActionListener(actionEvent -> {
             JCheckBox cb = (JCheckBox) actionEvent.getSource();
@@ -68,7 +65,7 @@ public class ZeecowOptionsWindow extends JFrame {
             Utils.setprefb("dropMinedOrePrecious",val);
         });
 
-        panelNorth.add(cbDropMinedCurios = new JCheckBox("Drop mined curios"));
+        panelMisc.add(cbDropMinedCurios = new JCheckBox("Drop mined curios"));
         cbDropMinedCurios.setSelected(ZeeConfig.dropMinedCurios);
         cbDropMinedCurios.addActionListener(actionEvent -> {
             JCheckBox cb = (JCheckBox) actionEvent.getSource();
@@ -76,9 +73,9 @@ public class ZeecowOptionsWindow extends JFrame {
             Utils.setprefb("dropMinedCurios",val);
         });
 
-        panelNorth.add(new JLabel("--------------------"));
+        panelMisc.add(new JLabel("--------------------"));
 
-        panelNorth.add(cbActionSearchGlobal = new JCheckBox("Action search global"));
+        panelMisc.add(cbActionSearchGlobal = new JCheckBox("Action search global"));
         cbActionSearchGlobal.setSelected(ZeeConfig.actionSearchGlobal);
         cbActionSearchGlobal.addActionListener(actionEvent -> {
             JCheckBox cb = (JCheckBox) actionEvent.getSource();
@@ -86,7 +83,7 @@ public class ZeecowOptionsWindow extends JFrame {
             Utils.setprefb("actionSearchGlobal",val);
         });
 
-        panelNorth.add(cbCompactEquipsWindow = new JCheckBox("Compact equip window(restart)"));
+        panelMisc.add(cbCompactEquipsWindow = new JCheckBox("Compact equip window(restart)"));
         cbCompactEquipsWindow.setSelected(ZeeConfig.equiporyCompact);
         cbCompactEquipsWindow.addActionListener(actionEvent -> {
             JCheckBox cb = (JCheckBox) actionEvent.getSource();
@@ -94,7 +91,7 @@ public class ZeecowOptionsWindow extends JFrame {
             Utils.setprefb("equiporyCompact",val);
         });
 
-        panelNorth.add(cbBeltTogglesEquips = new JCheckBox("Belt toggles equips window"));
+        panelMisc.add(cbBeltTogglesEquips = new JCheckBox("Belt toggles equips window"));
         cbBeltTogglesEquips.setSelected(ZeeConfig.beltToggleEquips);
         cbBeltTogglesEquips.addActionListener(actionEvent -> {
             JCheckBox cb = (JCheckBox) actionEvent.getSource();
@@ -102,7 +99,7 @@ public class ZeecowOptionsWindow extends JFrame {
             Utils.setprefb("beltToggleEquips",val);
         });
 
-        panelNorth.add(cbAutohearth = new JCheckBox("Auto-hearth on players"));
+        panelMisc.add(cbAutohearth = new JCheckBox("Auto-hearth on players"));
         cbAutohearth.setSelected(ZeeConfig.autoHearthOnStranger);
         cbAutohearth.addActionListener(actionEvent -> {
             JCheckBox cb = (JCheckBox) actionEvent.getSource();
@@ -110,10 +107,10 @@ public class ZeecowOptionsWindow extends JFrame {
             Utils.setprefb("autoHearthOnStranger",val);
         });
 
-        panelNorth.add(new JLabel("--------------------"));
+        panelMisc.add(new JLabel("--------------------"));
 
         //auto click menus
-        panelNorth.add(cbAutoClickMenuOpts = new JCheckBox("Auto-click menu:"));
+        panelMisc.add(cbAutoClickMenuOpts = new JCheckBox("Auto-click menu:"));
         cbAutoClickMenuOpts.setSelected(ZeeConfig.autoClickMenuOption);
         cbAutoClickMenuOpts.addActionListener(actionEvent -> {
             JCheckBox cb = (JCheckBox) actionEvent.getSource();
@@ -121,7 +118,7 @@ public class ZeecowOptionsWindow extends JFrame {
             Utils.setprefb("autoClickMenuOption",val);
             tfAutoClickMenu.setEnabled(val);
         });
-        panelNorth.add(tfAutoClickMenu = new JTextField("",5));
+        panelMisc.add(tfAutoClickMenu = new JTextField("",5));
         tfAutoClickMenu.setText(ZeeConfig.autoClickMenuOptionList);
         tfAutoClickMenu.setEnabled(ZeeConfig.autoClickMenuOption);
         tfAutoClickMenu.addActionListener(actionEvent -> {
@@ -129,11 +126,10 @@ public class ZeecowOptionsWindow extends JFrame {
         });
 
 
-        panelNorth.add(new JLabel("--------------------"));
-
+        panelMisc.add(new JLabel("--------------------"));
 
         //cattle roster height
-        panelNorth.add(cbCattleRosterHeight = new JCheckBox("Cattle Roster height(logout)"));
+        panelMisc.add(cbCattleRosterHeight = new JCheckBox("Cattle Roster height(logout)"));
         cbCattleRosterHeight.setSelected(ZeeConfig.cattleRosterHeight);
         cbCattleRosterHeight.addActionListener(actionEvent -> {
             JCheckBox cb = (JCheckBox) actionEvent.getSource();
@@ -142,7 +138,7 @@ public class ZeecowOptionsWindow extends JFrame {
             cmbCattleRoster.setEnabled(val);
         });
         String[] perc = {"30%","40%","50%","60%","70%","80%","90%","100%"};
-        panelNorth.add(cmbCattleRoster = new JComboBox<String>(perc));
+        panelMisc.add(cmbCattleRoster = new JComboBox<String>(perc));
         cmbCattleRoster.setSelectedItem(((int)(ZeeConfig.cattleRosterHeightPercentage*100))+"%");
         cmbCattleRoster.setEnabled(ZeeConfig.cattleRosterHeight);
         cmbCattleRoster.addActionListener(e -> {
@@ -151,27 +147,39 @@ public class ZeecowOptionsWindow extends JFrame {
             Utils.setprefd("cattleRosterHeightPercentage", d);
         });
 
-        panelNorth.add(new JLabel("--------------------"));
-        panelNorth.add(new JLabel("Gobs seen"),BorderLayout.CENTER);
 
-        //Gob List
+        //Gobs tab
+        panelGobs = new JPanel();
+        panelGobs.setLayout(new BoxLayout(panelGobs, BoxLayout.PAGE_AXIS));
+        tabbedPane.add("Gobs", panelGobs);
+        buildPanelGobs();
+    }
+
+    private void buildPanelGobs() {
+        panelGobs.removeAll();
+        panelGobs.add(btnRefresh = new JButton("refresh"));
+        btnRefresh.addActionListener(evt -> {
+            buildPanelGobs();
+        });
         if(mapGobInfo.size() > 0)
             listGobs = new JList<String>(mapGobInfo.keySet().toArray(new String[0]));
         else
             listGobs = new JList<String>();
-        panelCenter.add(new JScrollPane(listGobs),BorderLayout.CENTER);
-        listGobs.setBorder(BorderFactory.createLoweredBevelBorder());
+        panelGobs.add(new JScrollPane(listGobs));
         listGobs.addListSelectionListener(new ListSelectionListener() {
             @Override
             public void valueChanged(ListSelectionEvent evt) {
                 gobSelected(evt.getFirstIndex());
             }
         });
+        panelGobDetails = new JPanel();
+        panelGobs.add(panelGobDetails);
+        tabbedPane.setTitleAt(1,"Gobs("+mapGobInfo.size()+")");
     }
 
     private void gobSelected(int i) {
-        panelSouth.removeAll();
-        panelSouth.add(new JLabel("Gob: "+listGobs.getSelectedValue()));
+        panelGobDetails.removeAll();
+        panelGobDetails.add(new JLabel("Gob: "+listGobs.getSelectedValue()));
         pack();
     }
 
