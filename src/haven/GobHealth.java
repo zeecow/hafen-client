@@ -34,12 +34,7 @@ import haven.render.*;
 public class GobHealth extends GAttrib implements Gob.SetupMod {
     public final float hp;
     public final MixColor fx;
-    private static final Text.Foundry gobhpf = new Text.Foundry(Text.sans.deriveFont(Font.BOLD), 14);
-    private static final BufferedImage[] gobhp = new BufferedImage[]{
-	Text.renderstroked("25%", new Color(255, 100, 100), Color.BLACK, gobhpf).img,
-	Text.renderstroked("50%", new Color(235, 130, 130), Color.BLACK, gobhpf).img,
-	Text.renderstroked("75%", new Color(230, 185, 185), Color.BLACK, gobhpf).img
-    };
+    private static final Text.Foundry gobhpf = new Text.Foundry(Text.sans.deriveFont(Font.BOLD), 12);
     
     public GobHealth(Gob g, float hp) {
 	super(g);
@@ -56,7 +51,7 @@ public class GobHealth extends GAttrib implements Gob.SetupMod {
     public BufferedImage text() {
 	if(hp < 1) {
 	    int c = 75 + (int) Math.floor(hp * 180);
-	    return Text.renderstroked(String.format("%d%%", Math.round(100 * hp)), new Color(255, c, c)).img;
+	    return Text.renderstroked(String.format("%d%%", Math.round(100 * hp)), new Color(255, c, c), Color.BLACK, gobhpf).img;
 	}
 	return null;
     }
