@@ -17,17 +17,18 @@ public class ZeeConfig {
     public static Window windowInventory;
     public static Window windowOptions;
 
-    public static HashMap<String,String> mapGobAlert = new HashMap<String,String>();
+    public static HashMap<String,String> mapGobInfo = new HashMap<String,String>();
 
     public static boolean actionSearchGlobal = Utils.getprefb("actionSearchGlobal", true);
     public static boolean autoClickMenuOption = Utils.getprefb("autoClickMenuOption", true);
     public static String autoClickMenuOptionList = Utils.getpref("autoClickMenuOptionList", "Pick,Pluck,Flay,Slice,Harvest wax");
     public static boolean autoHearthOnStranger = Utils.getprefb("autoHearthOnStranger", true);
     public static boolean beltToggleEquips = Utils.getprefb("beltToggleEquips", true);
-    public static double cattleRosterHeightPercentage = Utils.getprefd("cattleRosterHeight", 1.0);
+    public static boolean cattleRosterHeight = Utils.getprefb("cattleRosterHeight", false);
+    public static double cattleRosterHeightPercentage = Utils.getprefd("cattleRosterHeightPercentage", 1.0);
     public static boolean dropMinedCurios = Utils.getprefb("dropMinedCurios", true);
     public static boolean dropMinedOre = Utils.getprefb("dropMinedOre", true);
-    public static boolean dropMinedOrePrecious = Utils.getprefb("dropMinedOrePrecious", true);
+    public static boolean dropMinedSilverGold = Utils.getprefb("dropMinedOrePrecious", true);
     public static boolean dropMinedStones = Utils.getprefb("dropMinedStones", true);
     public static boolean dropSeeds = false;//always starts off (TODO: set false when character loads)
     public static boolean dropSoil = false;
@@ -118,6 +119,7 @@ public class ZeeConfig {
         "gfx/terobjs/herbs/mandrake",
         "gfx/terobjs/herbs/seashell"
     ));
+    public static ZeecowOptionsWindow zeecowOptions;
 
 
     public static Collection<Field> getAllFields(Class<?> type) {
@@ -190,7 +192,8 @@ public class ZeeConfig {
             return;
 
         String name = gob.getres().name;
-        if(mapGobAlert.put(name,"") == null) { //if gob is new
+        if(mapGobInfo.put(name,"") == null) {
+            //if gob is new
             //System.out.println(name+"  "+mapGobAlert.size());
         }
 
@@ -254,192 +257,21 @@ public class ZeeConfig {
         }
     }
 
-
     public static int addZeecowOptions(OptWnd.Panel main, int y) {
-        TextEntry textEntryAutoMenu;
-        TextEntry textEntryCattleRosterHeight;
 
         y += 7;
 
-        main.add(new Label("Zeecow options"), 0, y);
-
-        y += 17;
-
-        main.add(new CheckBox("Drop mined stones") {
-            {
-                a = ZeeConfig.dropMinedStones;
-            }
-
-            public void set(boolean val) {
-                Utils.setprefb("dropMinedStones", val);
-                ZeeConfig.dropMinedStones = val;
-                a = val;
-            }
-        }, 15, y);
-
-        y += 17;
-
-        main.add(new CheckBox("Drop mined ore") {
-            {
-                a = ZeeConfig.dropMinedOre;
-            }
-
-            public void set(boolean val) {
-                Utils.setprefb("dropMinedOre", val);
-                ZeeConfig.dropMinedOre = val;
-                a = val;
-            }
-        }, 15, y);
-
-        y += 17;
-
-        main.add(new CheckBox("Drop mined silver/gold") {
-            {
-                a = ZeeConfig.dropMinedOrePrecious;
-            }
-
-            public void set(boolean val) {
-                Utils.setprefb("dropMinedOrePrecious", val);
-                ZeeConfig.dropMinedOrePrecious = val;
-                a = val;
-            }
-        }, 15, y);
-
-        y += 17;
-
-        main.add(new CheckBox("Drop mined curios") {
-            {
-                a = ZeeConfig.dropMinedCurios;
-            }
-
-            public void set(boolean val) {
-                Utils.setprefb("dropMinedCurios", val);
-                ZeeConfig.dropMinedCurios = val;
-                a = val;
-            }
-        }, 15, y);
-
-        y += 13;
-
-        main.add(new Label("------------------------"), 15, y);
-
-        y += 13;
-
-        main.add(new CheckBox("Action search global") {
-            {
-                a = ZeeConfig.actionSearchGlobal;
-            }
-
-            public void set(boolean val) {
-                Utils.setprefb("actionSearchGlobal", val);
-                ZeeConfig.actionSearchGlobal = val;
-                a = val;
-            }
-        }, 15, y);
-
-        y += 17;
-
-        main.add(new CheckBox("Compact equip window (restart)") {
-            {
-                a = ZeeConfig.equiporyCompact;
-            }
-
-            public void set(boolean val) {
-                Utils.setprefb("equiporyCompact", val);
-                ZeeConfig.equiporyCompact = val;
-                a = val;
-            }
-        }, 15, y);
-
-        y += 17;
-
-        main.add(new CheckBox("Belt toggles equip window") {
-            {
-                a = ZeeConfig.beltToggleEquips;
-            }
-
-            public void set(boolean val) {
-                Utils.setprefb("beltToggleEquips", val);
-                ZeeConfig.beltToggleEquips = val;
-                a = val;
-            }
-        }, 15, y);
-
-        y += 17;
-
-        main.add(new CheckBox("Hermit auto-hearth (alpha)") {
-            {
-                a = ZeeConfig.autoHearthOnStranger;
-            }
-
-            public void set(boolean val) {
-                Utils.setprefb("autoHearthOnStranger", val);
-                ZeeConfig.autoHearthOnStranger = val;
-                a = val;
-            }
-        }, 15, y);
-
-        y += 17;
-        main.add(new Label("------------------------"), 15, y);
-        y += 13;
-
-
-        main.add(new CheckBox("Auto click menu option:") {
-            {
-                a = ZeeConfig.autoClickMenuOption;
-            }
-            public void set(boolean val) {
-                Utils.setprefb("autoClickMenuOption", val);
-                ZeeConfig.autoClickMenuOption = val;
-                a = val;
-            }
-        }, 15, y);
-        y += 17;
-        textEntryAutoMenu = new TextEntry(150, ZeeConfig.autoClickMenuOptionList);
-        textEntryAutoMenu.setcanfocus(false);
-        main.add(textEntryAutoMenu,15, y);
-        main.add(new Button(30,"set"){
+        main.add(new Button(200,"Zeecow options"){
             @Override
             public void click() {
-                setfocus(this);
-                String str = textEntryAutoMenu.text.trim();
-                Utils.setpref("autoClickMenuOptionList", str);
-                ZeeConfig.autoClickMenuOptionList = str;
+                if(ZeeConfig.zeecowOptions == null)
+                    ZeeConfig.zeecowOptions = new ZeecowOptionsWindow(mapGobInfo);
+                else
+                    ZeeConfig.zeecowOptions.toFront();
             }
-        }, 165, y-2);
+        }, 0, y);
 
-
-        y += 25;
-        main.add(new Label("------------------------"), 15, y);
-        y += 15;
-
-
-        main.add(new Label("Cattle Roster height % (logout)"), 15, y);
-        y += 17;
-        textEntryCattleRosterHeight = new TextEntry(37, ""+(int)(ZeeConfig.cattleRosterHeightPercentage*100)){
-            @Override
-            public boolean keydown(KeyEvent e) {
-                if(!Character.isDigit(e.getKeyChar()) && e.getKeyCode()!=KeyEvent.VK_DELETE && e.getKeyCode()!=KeyEvent.VK_BACK_SPACE && e.getKeyCode()!=KeyEvent.VK_LEFT && e.getKeyCode()!=KeyEvent.VK_RIGHT)
-                    return false;
-                return super.keydown(e);
-            }
-        };
-        textEntryCattleRosterHeight.setcanfocus(false);
-        main.add(textEntryCattleRosterHeight,15, y);
-        main.add(new Button(30,"set"){
-            @Override
-            public void click() {
-                setfocus(this);
-                double heightPercentage = Double.parseDouble(textEntryCattleRosterHeight.text.trim());
-                if(heightPercentage > 100)
-                    heightPercentage = 100.0;
-                else if(heightPercentage < 25)
-                    heightPercentage = 25.0;
-                ZeeConfig.cattleRosterHeightPercentage = heightPercentage/100;
-                Utils.setprefd("cattleRosterHeight", ZeeConfig.cattleRosterHeightPercentage);
-                textEntryCattleRosterHeight.settext(""+(int)(ZeeConfig.cattleRosterHeightPercentage*100));
-            }
-        }, 60, y-2);
+        y += 37;
 
         return y;
     }

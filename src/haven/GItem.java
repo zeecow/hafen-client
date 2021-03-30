@@ -159,7 +159,7 @@ public class GItem extends AWidget implements ItemInfo.SpriteOwner, GSprite.Owne
 			//drop mined item
 			if (ZeeConfig.dropMinedStones && ZeeConfig.mineablesStone.contains(name) ||
 					ZeeConfig.dropMinedOre && ZeeConfig.mineablesOre.contains(name) ||
-					ZeeConfig.dropMinedOrePrecious && ZeeConfig.mineablesOrePrecious.contains(name) ||
+					ZeeConfig.dropMinedSilverGold && ZeeConfig.mineablesOrePrecious.contains(name) ||
 					ZeeConfig.dropMinedCurios && ZeeConfig.mineablesCurios.contains(name)) {
 				this.wdgmsg("drop", Coord.z);
 			}
