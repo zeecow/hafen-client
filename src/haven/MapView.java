@@ -782,7 +782,7 @@ public class MapView extends PView implements DTarget, Console.Directory {
 		return(ret);
 	    if((ret = main.lastload) != null)
 		return(ret);
-	    if((ret = flavobjs.lastload) != null)
+	    if(CFG.DISPLAY_FLAVOR.get() && (ret = flavobjs.lastload) != null)
 		return(ret);
 	    return(null);
 	}
