@@ -1,3 +1,8 @@
+$size[14]{$u{Update for 30.03.21:}
+  * merged loftar's changes
+  * fixed eternal loading when creating new user with flavor objects disabled
+  * fixed client hanging when trying to use auto pickup (ALT+Q or X->Q)
+ 
 $size[14]{$u{Update for 16.03.21:}
   * fixed combat damage display not working
  
