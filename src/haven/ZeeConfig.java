@@ -2,9 +2,9 @@ package haven;
 
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 
-import java.awt.event.KeyEvent;
 import java.lang.reflect.Field;
 import java.util.*;
+
 
 
 public class ZeeConfig {
@@ -17,7 +17,7 @@ public class ZeeConfig {
     public static Window windowInventory;
     public static Window windowOptions;
 
-    public static HashMap<String,String> mapGobInfo = new HashMap<String,String>();
+    public static ZeecowOptionsWindow zeecowOptions;
 
     public static boolean actionSearchGlobal = Utils.getprefb("actionSearchGlobal", true);
     public static boolean autoClickMenuOption = Utils.getprefb("autoClickMenuOption", true);
@@ -34,6 +34,11 @@ public class ZeeConfig {
     public static boolean dropSoil = false;
     public static boolean equiporyCompact = Utils.getprefb("equiporyCompact", false);
     public static boolean equipWindowOpenedByBelt = false;
+    public static String mapGobSavedString = Utils.getpref("mapGobSavedString","");
+
+    public static HashMap<String,String> mapGobSession = new HashMap<String,String>();
+    public static HashMap<String,String> mapGobSaved = readMapGobSavedString();
+
 
     public final static Set<String> mineablesStone = new HashSet<String>(Arrays.asList(
             "gneiss",
@@ -119,7 +124,7 @@ public class ZeeConfig {
         "gfx/terobjs/herbs/mandrake",
         "gfx/terobjs/herbs/seashell"
     ));
-    public static ZeecowOptionsWindow zeecowOptions;
+    private static boolean soundReady = false;
 
 
     public static Collection<Field> getAllFields(Class<?> type) {
@@ -192,9 +197,16 @@ public class ZeeConfig {
             return;
 
         String name = gob.getres().name;
-        if(mapGobInfo.put(name,"") == null) {
-            //if gob is new
+        String path = "";
+
+        //if gob is new, add to session gobs
+        if(mapGobSession.put(name,"") == null) {
             //System.out.println(name+"  "+mapGobAlert.size());
+        }
+
+        //if gob alert is saved, play alert
+        if( (path = mapGobSaved.get(name)) != null){
+            ZeeConfig.playAudio(path);
         }
 
         if(ZeeConfig.autoHearthOnStranger && name.contains("borka/body") && gob.id != mapView.player().id) {
@@ -264,10 +276,10 @@ public class ZeeConfig {
         main.add(new Button(200,"Zeecow options"){
             @Override
             public void click() {
-                if(ZeeConfig.zeecowOptions == null)
-                    ZeeConfig.zeecowOptions = new ZeecowOptionsWindow(mapGobInfo);
+                if(zeecowOptions == null)
+                    zeecowOptions = new ZeecowOptionsWindow();
                 else
-                    ZeeConfig.zeecowOptions.toFront();
+                    zeecowOptions.toFront();
             }
         }, 0, y);
 
@@ -275,6 +287,24 @@ public class ZeeConfig {
 
         return y;
     }
+
+    private static HashMap<String, String> readMapGobSavedString() {
+        HashMap<String,String> ret = new HashMap<String,String>();
+        String[] mapStr = mapGobSavedString.split(",");
+        String[] gobInfo;
+        try {
+            for (String s : mapStr) {
+                if(s.isBlank())
+                    continue;
+                gobInfo = s.split("=");
+                ret.put(gobInfo[0], gobInfo.length>1 ? gobInfo[1] : "");
+            }
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
+        return ret;
+    }
+
 
 
     public static void playMidi(String[] notes){
@@ -284,7 +314,7 @@ public class ZeeConfig {
         new ZeeSynth(notes,instr).start();
     }
 
-    //"note, duration_ms, volume_from0to127)",
+    //"note, duration_ms, volume_from0to127",
     //"rest_ms",
     public static String[] midiJawsTheme = new String[]{
             "200",//avoid stuttering
@@ -326,6 +356,10 @@ public class ZeeConfig {
             "5A,200,100",
             "200"
     };
+
+    public static void playAudio(String filePath) {
+        new ZeeSynth(filePath).start();
+    }
 }
 
 

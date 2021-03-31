@@ -1,11 +1,15 @@
 package haven;
 
+import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
 import javax.sound.midi.MidiSystem;
 import javax.sound.midi.Synthesizer;
 import javax.sound.midi.MidiChannel;
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
 
 public class ZeeSynth extends Thread{
 
@@ -13,6 +17,7 @@ public class ZeeSynth extends Thread{
     private static MidiChannel[] channels;
     private static int volume = 80; // between 0 et 127
     private static int instrument; // 0 piano, 9 percussion
+    private String filePath = null;
     int lastVolume = -1;
 
     private static String[] playNotes;
@@ -27,7 +32,32 @@ public class ZeeSynth extends Thread{
         playNotes = notes;
     }
 
+    public ZeeSynth(String filePath) {
+        this.filePath = filePath;
+    }
+
+    private void player(){
+        //AIFC, AIFF, AU, SND, and WAVE
+        // convert at https://cloudconvert.com/
+        try {
+            File audio = new File(filePath).getCanonicalFile();
+            AudioInputStream stream = AudioSystem.getAudioInputStream(audio);
+            Clip clip = AudioSystem.getClip();
+            clip.open(stream);
+            synchronized (clip){
+                clip.start();
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+
     public void run() {
+
+        if(this.filePath != null){
+            player();
+            return;
+        }
 
         String[] split;
 

@@ -3,22 +3,22 @@ package haven;
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
-import java.util.HashMap;
 
 public class ZeecowOptionsWindow extends JFrame {
-    public HashMap<String, String> mapGobInfo;
     public JTabbedPane tabbedPane;
     public JPanel panelMisc, panelGobs, panelGobDetails;
     public JCheckBox cbDropMinedStone, cbDropMinedOre, cbDropMinedSilverGold, cbDropMinedCurios, cbActionSearchGlobal, cbCompactEquipsWindow, cbBeltTogglesEquips, cbAutohearth, cbAutoClickMenuOpts,cbCattleRosterHeight;
     public JButton btnRefresh;
     public JTextField tfAutoClickMenu;
     public JComboBox cmbCattleRoster;
-    public JList<String> listGobs;
+    public JList<String> listGobsTemp, listGobsSaved;
+    JButton btnAudioSave, btnAudioClear, btnAudioTest;
+    JTextField tfGobName, tfAudioPath;
 
-    public ZeecowOptionsWindow(HashMap<String, String> map){
+    public ZeecowOptionsWindow(){
         super.setTitle("Zeecow Haven Options");
-        this.mapGobInfo = map;
         setLocationRelativeTo(null);//center window
         setDefaultLookAndFeelDecorated(true);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -26,6 +26,8 @@ public class ZeecowOptionsWindow extends JFrame {
         pack();
         setVisible(true);
     }
+
+
 
     @Override
     public void dispose() {
@@ -122,7 +124,12 @@ public class ZeecowOptionsWindow extends JFrame {
         tfAutoClickMenu.setText(ZeeConfig.autoClickMenuOptionList);
         tfAutoClickMenu.setEnabled(ZeeConfig.autoClickMenuOption);
         tfAutoClickMenu.addActionListener(actionEvent -> {
-            System.out.println(actionEvent.getActionCommand());
+            String str = actionEvent.getActionCommand();
+            String[] strArr = str.split(",");
+            if(strArr!=null && strArr.length>0) {
+                ZeeConfig.autoClickMenuOptionList = str;
+                Utils.setpref("autoClickMenuOptionList",str.trim());
+            }
         });
 
 
@@ -161,26 +168,112 @@ public class ZeecowOptionsWindow extends JFrame {
         btnRefresh.addActionListener(evt -> {
             buildPanelGobs();
         });
-        if(mapGobInfo.size() > 0)
-            listGobs = new JList<String>(mapGobInfo.keySet().toArray(new String[0]));
-        else
-            listGobs = new JList<String>();
-        panelGobs.add(new JScrollPane(listGobs));
-        listGobs.addListSelectionListener(new ListSelectionListener() {
+
+        //list gobs temp
+        panelGobs.add(new JLabel("Session gobs: "+ZeeConfig.mapGobSession.size()));
+        if(ZeeConfig.mapGobSession.size() > 0) {
+            listGobsTemp = new JList<String>(ZeeConfig.mapGobSession.keySet().toArray(new String[0]));
+        }else {
+            listGobsTemp = new JList<String>();
+        }
+        panelGobs.add(new JScrollPane(listGobsTemp));
+        listGobsTemp.addListSelectionListener(new ListSelectionListener() {
             @Override
             public void valueChanged(ListSelectionEvent evt) {
-                gobSelected(evt.getFirstIndex());
+                if(evt.getValueIsAdjusting())
+                    return;
+                gobSelected(listGobsTemp,evt.getFirstIndex());
             }
         });
+
+        //list gobs saved
+        panelGobs.add(new JLabel("Alert gobs: "+ZeeConfig.mapGobSaved.size()));
+        if(ZeeConfig.mapGobSaved.size() > 0) {
+            listGobsSaved = new JList<String>(ZeeConfig.mapGobSaved.keySet().toArray(new String[0]));
+        }else {
+            listGobsSaved = new JList<String>();
+        }
+        panelGobs.add(new JScrollPane(listGobsSaved));
+        listGobsSaved.addListSelectionListener(new ListSelectionListener() {
+            @Override
+            public void valueChanged(ListSelectionEvent evt) {
+                if(evt.getValueIsAdjusting())
+                    return;
+                gobSelected(listGobsSaved,evt.getFirstIndex());
+            }
+        });
+
+        //details
         panelGobDetails = new JPanel();
+        panelGobDetails.setLayout(new BoxLayout(panelGobDetails,BoxLayout.PAGE_AXIS));
         panelGobs.add(panelGobDetails);
-        tabbedPane.setTitleAt(1,"Gobs("+mapGobInfo.size()+")");
+        tabbedPane.setTitleAt(1,"Gobs("+ZeeConfig.mapGobSession.size()+")");
     }
 
-    private void gobSelected(int i) {
+    private void gobSelected(JList<String> list, int i) {
         panelGobDetails.removeAll();
-        panelGobDetails.add(new JLabel("Gob: "+listGobs.getSelectedValue()));
+        panelGobDetails.add(new JLabel("Gob name:"),BorderLayout.NORTH);
+        panelGobDetails.add(tfGobName = new JTextField(list.getSelectedValue()),BorderLayout.NORTH);
+        panelGobDetails.add(new JLabel("Audio alert:"),BorderLayout.CENTER);
+        panelGobDetails.add(tfAudioPath = new JTextField(ZeeConfig.mapGobSaved.get(list.getSelectedValue())),BorderLayout.CENTER);
+        panelGobDetails.add(btnAudioSave = new JButton("Select Audio"),BorderLayout.CENTER);
+        btnAudioSave.addActionListener(evt->{ audioSave(); });
+        panelGobDetails.add(btnAudioClear = new JButton("Clear Audio"),BorderLayout.CENTER);
+        btnAudioClear.addActionListener(evt->{ audioClear(); });
+        panelGobDetails.add(btnAudioTest = new JButton("Test Audio"),BorderLayout.CENTER);
+        btnAudioTest.addActionListener(evt->{ audioTest(); });
         pack();
+    }
+
+    private void audioTest() {
+        String path = tfAudioPath.getText().trim();
+        if(path.isBlank()){
+            JOptionPane.showMessageDialog(this,"audio path is blank");
+        }else{
+            try{
+                ZeeConfig.playAudio(path);
+            }catch (Exception e){
+                JOptionPane.showMessageDialog(this,e.getMessage());
+            }
+        }
+    }
+
+    private void audioClear() {
+        if(JOptionPane.showConfirmDialog(this,"Clear audio settings?") == JOptionPane.OK_OPTION) {
+            ZeeConfig.mapGobSaved.remove(listGobsSaved.getSelectedValue());
+            Utils.setpref("mapGobSavedString",
+                ZeeConfig.mapGobSaved.toString()
+                    .replace("{","")
+                    .replace("}","")
+                    .trim()
+            );
+            buildPanelGobs();
+        }
+    }
+
+    private void audioSave() {
+        JFileChooser fileChooser;
+        fileChooser = new JFileChooser();
+        fileChooser.setCurrentDirectory(null);
+        fileChooser.setDialogTitle("select audio file");
+        fileChooser.setAcceptAllFileFilterUsed(false);
+        fileChooser.addChoosableFileFilter(new FileNameExtensionFilter("Audio files","mp3","wav","ogg","mid","midi"));
+        if (fileChooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
+            tfAudioPath.setText(fileChooser.getSelectedFile().getAbsolutePath());
+            ZeeConfig.mapGobSaved.put(
+                tfGobName.getText().trim(),
+                fileChooser.getSelectedFile().getAbsolutePath()
+            );
+            Utils.setpref("mapGobSavedString",
+                ZeeConfig.mapGobSaved.toString()
+                    .replace("{","")
+                    .replace("}","")
+                    .replace(", ",",")
+                    .replace(" ,",",")
+                    .trim()
+            );
+            buildPanelGobs();
+        }
     }
 
 }
