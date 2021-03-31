@@ -465,19 +465,22 @@ public class MainFrame extends java.awt.Frame implements Console.Directory {
 	/* Set up the error handler as early as humanly possible. */
 	ThreadGroup g = new ThreadGroup("Haven main group");
 	String ed;
-	if(!(ed = Utils.getprop("haven.errorurl", "")).equals("")) {
-	    try {
-		final haven.error.ErrorHandler hg = new haven.error.ErrorHandler(new java.net.URL(ed));
-		hg.sethandler(new haven.error.ErrorGui(null) {
-			public void errorsent() {
-			    hg.interrupt();
-			}
-		    });
-		g = hg;
-		new DeadlockWatchdog(hg).start();
-	    } catch(java.net.MalformedURLException e) {
+	URL errordest = null;
+	try {
+	    if(!(ed = Utils.getprop("haven.errorurl", "")).equals("")) {
+		errordest = new java.net.URL(ed);
 	    }
+	} catch (java.net.MalformedURLException e) {
 	}
+	final haven.error.ErrorHandler hg = new haven.error.ErrorHandler(errordest);
+	hg.sethandler(new haven.error.ErrorGui(null) {
+	    public void errorsent() {
+		hg.interrupt();
+	    }
+	});
+	g = hg;
+	new DeadlockWatchdog(hg).start();
+    
 	Thread main = new HackThread(g, () -> main2(args), "Haven main thread");
 	main.start();
     }
