@@ -897,7 +897,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Sk
     }
     
     public void updateTreeVisibility() {
-	if(anyOf(Tag.TREE, Tag.BUSH)) {
+	if(anyOf(GobTag.TREE, GobTag.BUSH)) {
 	    Drawable d = getattr(Drawable.class);
 	    Boolean needHide = CFG.HIDE_TREES.get();
 	    if(d != null && d.skipRender != needHide) {
@@ -909,41 +909,27 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Sk
     
     public final Placed placed = new Placed();
     
-    private final Set<Tag> tags = new HashSet<>();
+    private final Set<GobTag> tags = new HashSet<>();
     
     private void updateTags() {
-	tags.clear();
-	Resource res = getres();
-	if(res != null) {
-	    String name = res.name;
-	    
-	    if(name.startsWith("gfx/terobjs/trees")) {
-		if(name.endsWith("log") || name.endsWith("oldtrunk")) {
-		    tags.add(Tag.LOG);
-		} else if(name.contains("stump")) {
-		    tags.add(Tag.STUMP);
-		} else {
-		    tags.add(Tag.TREE);
-		}
-	    }
-	    if(name.startsWith("gfx/terobjs/bushes")) {
-		tags.add(Tag.BUSH);
-	    }
+	synchronized (tags) {
+	    tags.clear();
+	    tags.addAll(GobTag.tags(this));
 	}
     }
     
-    public boolean is(Tag tag) {
-	return tags.contains(tag);
+    public boolean is(GobTag tag) {
+	synchronized (tags) {
+	    return tags.contains(tag);
+	}
     }
     
-    public boolean anyOf(Tag... tags) {
-	for (Tag tag : tags) {
-	    if(is(tag)) {return true;}
+    public boolean anyOf(GobTag... tags) {
+	synchronized (this.tags) {
+	    for (GobTag tag : tags) {
+		if(is(tag)) {return true;}
+	    }
 	}
 	return false;
-    }
-    
-    private enum Tag {
-	TREE, BUSH, LOG, STUMP
     }
 }
