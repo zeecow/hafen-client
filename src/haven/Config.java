@@ -62,7 +62,7 @@ public class Config {
     public static Double uiscale = getfloat("haven.uiscale", null);
     public static byte[] authck = null, inittoken = null;
     public static String prefspec = "hafen";
-    public static final String confid = "";
+    public static final String confid = "ender";
     
     public static String version;
     public static final boolean isUpdate;
