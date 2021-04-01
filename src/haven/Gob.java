@@ -876,6 +876,11 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Sk
     }
     
     public void drawableUpdated() {
+	updateTags();
+	updateHitbox();
+    }
+    
+    public void updateHitbox() {
 	Boolean hitboxEnabled = CFG.DISPLAY_GOB_HITBOX.get();
 	if(hitboxEnabled) {
 	    if(hitbox != null) {
@@ -891,4 +896,42 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Sk
     }
     
     public final Placed placed = new Placed();
+    
+    private final Set<Tag> tags = new HashSet<>();
+    
+    private void updateTags() {
+	tags.clear();
+	Resource res = getres();
+	if(res != null) {
+	    String name = res.name;
+	    
+	    if(name.startsWith("gfx/terobjs/trees")) {
+		if(name.endsWith("log") || name.endsWith("oldtrunk")) {
+		    tags.add(Tag.LOG);
+		} else if(name.contains("stump")) {
+		    tags.add(Tag.STUMP);
+		} else {
+		    tags.add(Tag.TREE);
+		}
+	    }
+	    if(name.startsWith("gfx/terobjs/bushes")) {
+		tags.add(Tag.BUSH);
+	    }
+	}
+    }
+    
+    public boolean is(Tag tag) {
+	return tags.contains(tag);
+    }
+    
+    public boolean anyOf(Tag... tags) {
+	for (Tag tag : tags) {
+	    if(is(tag)) {return true;}
+	}
+	return false;
+    }
+    
+    private enum Tag {
+	TREE, BUSH, LOG, STUMP
+    }
 }
