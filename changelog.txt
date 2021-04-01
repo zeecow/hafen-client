@@ -1,3 +1,8 @@
+$size[14]{$u{Update for 01.04.21:}
+  * fixed missing error reporter window
+  * fixed custom actions on a custom toolbar not working after client restart
+  * added ability to hide trees and bushes. Access in MenuGrid by X->H or can be bound to shortcut in Options->Shortcut settings.
+ 
 $size[14]{$u{Update for 30.03.21:}
   * merged loftar's changes
   * fixed eternal loading when creating new user with flavor objects disabled
