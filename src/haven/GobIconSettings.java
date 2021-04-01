@@ -175,8 +175,8 @@ public class GobIconSettings extends Window {
 	filter = adda(new Label(FILTER_DEFAULT), FILTER_C, 1, 0);
 	h += UI.scale(5);
     
-	CategoryList categories = add(new CategoryList(UI.scale(200), 24, elh), 0, h);
-	list = add(new IconList(UI.scale(250), 25), UI.scale(210), h);
+	CategoryList categories = add(new CategoryList(UI.scale(200), DBG ? 12 : 24, elh), 0, h);
+	list = add(new IconList(UI.scale(250), DBG ? 12 : 25), UI.scale(210), h);
 	add(new CheckBox("Notification on newly seen icons") {
 	    {this.a = conf.notify;}
 	
