@@ -291,6 +291,8 @@ public class GobIconSettings extends Window {
 	    "/invobjs/frog",
 	    "/invobjs/grasshopper",
 	    "/invobjs/grub",
+	    "/invobjs/crab",
+	    "/invobjs/firefly",
 	    "/invobjs/hen",
 	    "/invobjs/jellyfish",
 	    "/invobjs/ladybug",
