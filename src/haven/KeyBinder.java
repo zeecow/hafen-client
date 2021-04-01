@@ -89,6 +89,7 @@ public class KeyBinder {
 	add(KeyEvent.VK_Z, CTRL,  TOGGLE_TILE_CENTERING);
 	add(KeyEvent.VK_S, CTRL,  TAKE_SCREENSHOT);
 	add(KeyEvent.VK_Q, ALT,   BOT_PICK_ALL_HERBS);
+	add(TOGGLE_HIDE_TREES);
     }
     
     private static synchronized void store() {
