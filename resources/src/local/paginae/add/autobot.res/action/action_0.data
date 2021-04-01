@@ -4,7 +4,7 @@ paginae/act/add
 #uint16 pver
 2
 #String name
-Auto pick 'herbs'
+Auto pick stuff
 #String preq
 
 #uint16 hk

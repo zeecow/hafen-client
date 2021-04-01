@@ -35,7 +35,7 @@ public enum Action {
 	Config.center_tile = !Config.center_tile;
 	gui.ui.message(String.format("Tile centering turned %s", Config.center_tile ? "ON" : "OFF"), GameUI.MsgType.INFO);
     }, "Toggle tile centering"),
-    BOT_PICK_ALL_HERBS(Bot::pickup_herbs, "Pick up all 'herbs' in radius", "Will automatically pickup all herbs/mussels/clay etc. in radius that can be changed in Options->General."),
+    BOT_PICK_ALL_HERBS(Bot::pickup, "Auto-pick stuff", "Will automatically pickup all herbs/mussels/clay/frogs/grasshoppers etc. in radius that can be changed in Options->General."),
     CLEAR_PLAYER_DAMAGE(GobDamageInfo::clearPlayerDamage, "Clear damage from player"),
     CLEAR_ALL_DAMAGE(GobDamageInfo::clearAllDamage, "Clear damage from everyone");
     

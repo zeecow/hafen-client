@@ -75,28 +75,31 @@ public class Bot implements Defer.Callable<Void> {
     }
     
     public static void pickup(GameUI gui, String filter, int limit) {
+	pickup(gui, startsWith(filter), limit);
+    }
+    
+    public static void pickup(GameUI gui, Predicate<Gob> filter) {
+	pickup(gui, filter, Integer.MAX_VALUE);
+    }
+    
+    public static void pickup(GameUI gui, Predicate<Gob> filter, int limit) {
 	List<Target> targets = gui.ui.sess.glob.oc.stream()
-	    .filter(startsWith(filter))
+	    .filter(filter)
 	    .filter(gob -> distanceToPlayer(gob) <= CFG.AUTO_PICK_RADIUS.get())
 	    .sorted(byDistance)
 	    .limit(limit)
 	    .map(Target::new)
 	    .collect(Collectors.toList());
-    
+	
 	start(new Bot(targets,
 	    Target::rclick,
-	    //selectFlower("Take branch"),
 	    selectFlower("Pick"),
 	    target -> target.gob.waitRemoval()
 	), gui.ui);
     }
     
-    public static void pickup_herbs(GameUI gui) {
-	pickup(gui,
-	    //"gfx/terobjs/items/branch",
-	    //"gfx/terobjs/trees/",
-	    "gfx/terobjs/herbs/"
-	);
+    public static void pickup(GameUI gui) {
+	pickup(gui, has(GobTag.PICKUP));
     }
     
     public static void selectFlower(GameUI gui, long gobid, String option) {
@@ -183,7 +186,11 @@ public class Bot implements Defer.Callable<Void> {
     };
     
     public static BotAction selectFlower(String option) {
-	return target -> Reactor.FLOWER.first().subscribe(flowerMenu -> flowerMenu.forceChoose(option));
+	return target -> {
+	    if(target.hasMenu()) {
+		Reactor.FLOWER.first().subscribe(flowerMenu -> flowerMenu.forceChoose(option));
+	    }
+	};
     }
     
     private static Predicate<Gob> startsWith(String text) {
@@ -193,6 +200,10 @@ public class Bot implements Defer.Callable<Void> {
 	    } catch (Exception ignored) {}
 	    return false;
 	};
+    }
+    
+    private static Predicate<Gob> has(GobTag tag) {
+	return gob -> gob.is(tag);
     }
     
     private interface BotAction {
@@ -219,13 +230,18 @@ public class Bot implements Defer.Callable<Void> {
 		if(item != null) {item.rclick();}
 	    }
 	}
-	
+    
 	public void highlight() {
 	    if(!disposed()) {
 		if(gob != null) {gob.highlight();}
 	    }
 	}
-	
+    
+	public boolean hasMenu() {
+	    if(gob != null) {return gob.is(GobTag.MENU);}
+	    return item != null;
+	}
+    
 	public boolean disposed() {
 	    return (item != null && item.disposed()) || (gob != null && gob.disposed());
 	}
