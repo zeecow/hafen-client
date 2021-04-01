@@ -276,6 +276,10 @@ public class MenuGrid extends Widget implements KeyBinding.Bindable {
     @Override
     public void bound() {
 	super.bound();
+	ui.gui.menuObservable.notifyObservers();
+    }
+    
+    private void initCustomPaginae() {
 	makeLocal("paginae/add/timer", Action.TOGGLE_TIMERS);
 	makeLocal("paginae/add/clear_player_dmg", Action.CLEAR_PLAYER_DAMAGE);
 	makeLocal("paginae/add/clear_all_dmg", Action.CLEAR_ALL_DAMAGE);
@@ -284,7 +288,6 @@ public class MenuGrid extends Widget implements KeyBinding.Bindable {
 	makeLocal("paginae/add/buildlist", Action.OPEN_QUICK_BUILD);
 	makeLocal("paginae/add/craftlist", Action.OPEN_QUICK_CRAFT);
 	makeLocal("paginae/add/autobot", Action.BOT_PICK_ALL_HERBS);
-	ui.gui.menuObservable.notifyObservers();
     }
     
     private void makeLocal(String path, CustomPaginaAction action) {
@@ -381,6 +384,7 @@ public class MenuGrid extends Widget implements KeyBinding.Bindable {
 
     public MenuGrid() {
 	super(bgsz.mul(gsz).add(UI.scale(1), UI.scale(1)));
+	initCustomPaginae();
     }
 
     public static Comparator<Pagina> sorter = new Comparator<Pagina>() {
