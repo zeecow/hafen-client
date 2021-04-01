@@ -422,11 +422,11 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Sk
 		    setupmods.remove(prev);
 	    }
 	    if(a != null) {
-		if(a instanceof RenderTree.Node) {
+		if(a instanceof RenderTree.Node && !a.skipRender) {
 		    try {
 			RUtils.multiadd(this.slots, (RenderTree.Node) a);
 		    } catch (Loading l) {
-			if(prev instanceof RenderTree.Node) {
+			if(prev instanceof RenderTree.Node && !prev.skipRender) {
 			    RUtils.multiadd(this.slots, (RenderTree.Node) prev);
 			    attr.put(ac, prev);
 			}
@@ -442,7 +442,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Sk
 	    if(prev != null)
 		prev.dispose();
 	    if(ac == Drawable.class) {
-		drawableUpdated();
+		if(a != prev) drawableUpdated();
 	    } else if(ac == GobHealth.class) {
 		GeneralGobInfo info = getattr(GeneralGobInfo.class);
 		if(info != null) {
@@ -636,8 +636,8 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Sk
 	}
 	Map<Class<? extends GAttrib>, GAttrib> attr = cloneattrs();
 	for(GAttrib a : attr.values()) {
-	    if(a instanceof RenderTree.Node)
-		slot.add((RenderTree.Node)a);
+	    if(a instanceof RenderTree.Node && !a.skipRender)
+		slot.add((RenderTree.Node) a);
 	}
 	slots.add(slot);
     }
@@ -878,6 +878,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Sk
     public void drawableUpdated() {
 	updateTags();
 	updateHitbox();
+	updateTreeVisibility();
     }
     
     public void updateHitbox() {
@@ -892,6 +893,17 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Sk
 	} else if(hitbox != null) {
 	    hitbox = null;
 	    delattr(Hitbox.class);
+	}
+    }
+    
+    public void updateTreeVisibility() {
+	if(anyOf(Tag.TREE, Tag.BUSH)) {
+	    Drawable d = getattr(Drawable.class);
+	    Boolean needHide = CFG.HIDE_TREES.get();
+	    if(d != null && d.skipRender != needHide) {
+		d.skipRender = needHide;
+		glob.loader.defer(() -> setattr(d), null);
+	    }
 	}
     }
     
