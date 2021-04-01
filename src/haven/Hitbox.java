@@ -68,7 +68,7 @@ public class Hitbox extends GAttrib implements RenderTree.Node, Rendered {
     private boolean passable() {
 	try {
 	    Resource res = gob.getres();
-	    String name = res.name;
+	    String name = res != null ? res.name : "";
 	    
 	    ResDrawable rd = gob.getattr(ResDrawable.class);
 	    if(rd != null) {
