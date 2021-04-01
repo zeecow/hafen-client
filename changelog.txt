@@ -1,4 +1,5 @@
 $size[14]{$u{Update for 01.04.21:}
+  * made auto-pickup work on small critters like rats and frogs
   * fixed missing error reporter window
   * fixed custom actions on a custom toolbar not working after client restart
   * added ability to hide trees and bushes. Access in MenuGrid by X->H or can be bound to shortcut in Options->Shortcut settings.
