@@ -1372,16 +1372,18 @@ public class Widget {
 
     public class KeyboundTip implements Indir<Tex> {
 	public final String base;
+	public final boolean rich;
 	private Tex rend = null;
 	private boolean hrend = false;
 	private KeyMatch rkey = null;
 
-	public KeyboundTip(String base) {
-	    this(base, true);
+	public KeyboundTip(String base, boolean rich, boolean i10n) {
+	    this.base = i10n ? L10N.label(base) : base;;
+	    this.rich = rich;
 	}
-    
-	public KeyboundTip(String base, boolean i10n) {
-	    this.base = i10n ? L10N.label(base) : base;
+
+	public KeyboundTip(String base) {
+	    this(base, false, true);
 	}
 
 	public KeyboundTip() {
@@ -1392,17 +1394,25 @@ public class Widget {
 	    KeyMatch key = (kb_gkey == null) ? null : kb_gkey.key();
 	    if(!hrend || (rkey != key)) {
 		String tip;
+		int w = 0;
 		if(base != null) {
-		    tip = RichText.Parser.quote(base);
-		    if((key != null) && (key != KeyMatch.nil))
-			tip = String.format("%s ($col[255,255,0]{%s})", tip, RichText.Parser.quote(kb_gkey.key().name()));
+		    if(rich) {
+			tip = base;
+			if((key != null) && (key != KeyMatch.nil))
+			    tip = String.format("%s\n\nKeyboard shortcut: $col[255,255,0]{%s}", tip, RichText.Parser.quote(kb_gkey.key().name()));
+			w = 300;
+		    } else {
+			tip = RichText.Parser.quote(base);
+			if((key != null) && (key != KeyMatch.nil))
+			    tip = String.format("%s ($col[255,255,0]{%s})", tip, RichText.Parser.quote(kb_gkey.key().name()));
+		    }
 		} else {
 		    if((key == null) || (key == KeyMatch.nil))
 			tip = null;
 		    else
 			tip = String.format("Keyboard shortcut: $col[255,255,0]{%s}", RichText.Parser.quote(kb_gkey.key().name()));
 		}
-		rend = (tip == null) ? null : RichText.render(tip, 0).tex();
+		rend = (tip == null) ? null : RichText.render(tip, w).tex();
 		hrend = true;
 		rkey = key;
 	    }
@@ -1438,8 +1448,13 @@ public class Widget {
 	return(tooltip(c, prev == this));
     }
 
+    public Widget settip(String text, boolean rich) {
+	tooltip = new KeyboundTip(text, rich, true);
+	return(this);
+    }
+
     public Widget settip(String text) {
-	tooltip = new KeyboundTip(text, !Reflect.is(this, "Pointer"));
+	tooltip = new KeyboundTip(text, false, !Reflect.is(this, "Pointer"));
 	return(this);
     }
     
