@@ -482,6 +482,13 @@ public class MapView extends PView implements DTarget, Console.Directory {
 	}
     }
     static {camtypes.put("ortho", SOrthoCam.class);}
+    
+    public class FreeSOrthoCam extends SOrthoCam {
+	public FreeSOrthoCam() {
+	    super("-f");
+	}
+    }
+    static {camtypes.put("ortho free", FreeSOrthoCam.class);}
 
     @RName("mapview")
     public static class $_ implements Factory {
