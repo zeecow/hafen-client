@@ -35,7 +35,6 @@ import java.lang.reflect.*;
 
 public class MainFrame extends java.awt.Frame implements Console.Directory {
     UIPanel p;
-    private static final String TITLE = String.format("Hafen (modified by Ender v%s)", Config.version);
     private final ThreadGroup g;
     private Thread mt;
     DisplayMode fsmode = null, prefs = null;
@@ -160,7 +159,7 @@ public class MainFrame extends java.awt.Frame implements Console.Directory {
     }
 
     public MainFrame(Coord isz) {
-	super(TITLE);
+	super();
 	Coord sz;
 	if(isz == null) {
 	    sz = Utils.getprefc("wndsz", new Coord(800, 600));
