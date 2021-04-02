@@ -1,3 +1,8 @@
+$size[14]{$u{Update for 02.04.21:}
+  * added free ortho cam to camera options
+  * added more global hotkeys (camera controls, claim display toggles)
+  * added rebinding of some widget-specific hotkeys added by loftar (quick chat, speed control, combat target switching)
+ 
 $size[14]{$u{Update for 01.04.21:}
   * made auto-pickup work on small critters like rats and frogs
   * fixed missing error reporter window
