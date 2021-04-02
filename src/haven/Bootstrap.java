@@ -214,6 +214,7 @@ public class Bootstrap implements UI.Receiver, UI.Runner {
 				token = Utils.hex2byte(tokenhex);
 				setpref("savedtoken", tokenhex);
 				setpref("tokenname", tokenname);
+				setpref("savedtoken-" + tokenname, tokenhex);
 				continue retry;
 			    } else {
 				creds = (AuthClient.Credentials) msg.args[0];
