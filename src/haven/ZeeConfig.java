@@ -2,6 +2,7 @@ package haven;
 
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 
+import java.io.*;
 import java.lang.reflect.Field;
 import java.util.*;
 
@@ -34,10 +35,6 @@ public class ZeeConfig {
     public static boolean dropSoil = false;
     public static boolean equiporyCompact = Utils.getprefb("equiporyCompact", false);
     public static boolean equipWindowOpenedByBelt = false;
-    public static String mapGobSavedString = Utils.getpref("mapGobSavedString","");
-
-    public static HashMap<String,String> mapGobSession = new HashMap<String,String>();
-    public static HashMap<String,String> mapGobSaved = readMapGobSavedString();
 
 
     public final static Set<String> mineablesStone = new HashSet<String>(Arrays.asList(
@@ -113,7 +110,7 @@ public class ZeeConfig {
             "gfx/terobjs/fairystone",
             "gfx/terobjs/lilypadlotus"
     ));
-    public final static Set<String> alarmItems = new HashSet<String>(Arrays.asList(
+    public final static Set<String> rareForageables = new HashSet<String>(Arrays.asList(
         "gfx/terobjs/herbs/flotsam",
         "gfx/terobjs/herbs/chimingbluebell",
         "gfx/terobjs/herbs/edelweiss",
@@ -124,7 +121,16 @@ public class ZeeConfig {
         "gfx/terobjs/herbs/mandrake",
         "gfx/terobjs/herbs/seashell"
     ));
-    private static boolean soundReady = false;
+
+
+    public static String mapGobSavedString;
+    public static String mapCategoryGobsString;
+    public static String mapCategoryAudioString;
+    public static HashMap<String,String> mapGobSession = new HashMap<String,String>();
+    public static HashMap<String,String> mapGobSaved = initMapGobSaved();
+    public static HashMap<String,String> mapCategoryGobs = initMapCategoryGobs();
+    public static HashMap<String,String> mapCategoryAudio = initMapCategoryAudio();
+
 
 
     public static Collection<Field> getAllFields(Class<?> type) {
@@ -211,13 +217,29 @@ public class ZeeConfig {
 
         if(ZeeConfig.autoHearthOnStranger && name.contains("borka/body") && gob.id != mapView.player().id) {
             gameUI.act("travel","hearth");
-            playMidi(midiJawsTheme);
-        }else if(alarmItems.contains(name)){
-            playMidi(midiWoodPecker);
+            try{
+                playAudio(mapCategoryAudio.get("Danger"));
+            }catch(Exception e) {
+                playMidi(midiJawsTheme);
+            }
+        }else if(rareForageables.contains(name)){
+            try{
+                playAudio(mapCategoryAudio.get("Rare Forageables"));
+            }catch(Exception e) {
+                playMidi(midiWoodPecker);
+            }
         }else if(localizedResources.contains(name)){
-            playMidi(midiUfoThirdKind);
+            try{
+                playAudio(mapCategoryAudio.get("Rare Forageables"));
+            }catch(Exception e) {
+                playMidi(midiUfoThirdKind);
+            }
         }else if(name.endsWith("/adder")){
-            playMidi(midiJawsTheme);
+            try{
+                playAudio(mapCategoryAudio.get("Danger"));
+            }catch(Exception e) {
+                playMidi(midiJawsTheme);
+            }
         }
     }
 
@@ -288,7 +310,51 @@ public class ZeeConfig {
         return y;
     }
 
-    private static HashMap<String, String> readMapGobSavedString() {
+    public static HashMap<String, String> initMapCategoryGobs() {
+        HashMap<String,String> mapCateGob = new HashMap<String,String>();
+        mapCategoryGobsString = Utils.getpref("mapCategoryGobsString","");
+        if(mapCategoryGobsString.isEmpty()) {
+            mapCateGob.put("Localized resources", localizedResources.toString());
+            mapCateGob.put("Rare forageables", rareForageables.toString());
+        }else{
+            //fill map object and return it
+            String[] mapStr = mapCategoryGobsString.split("],?");
+            String[] categArr;
+            for (String s: mapStr) {
+                if(s.trim().isEmpty())
+                    continue;
+                //"category=gob1,gob2"
+                s = s.replaceAll("[{}\\[\\]]+","");
+                categArr = s.split("=");
+                if(categArr.length<2)
+                    continue;
+                mapCateGob.put(categArr[0].trim(),categArr[1].trim());
+            }
+        }
+        return mapCateGob;
+    }
+
+
+    public static HashMap<String, String> initMapCategoryAudio() {
+        mapCategoryAudioString = Utils.getpref("mapCategoryAudioString","");
+        HashMap<String,String> ret = new HashMap<String,String>();
+        String[] mapStr = mapCategoryAudioString.split(",");
+        String[] categInfo;
+        try {
+            for (String s : mapStr) {
+                if(s.isBlank())
+                    continue;
+                categInfo = s.split("=");
+                ret.put(categInfo[0].trim(), categInfo.length>1 ? categInfo[1].trim() : "");
+            }
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
+        return ret;
+    }
+
+    public static HashMap<String, String> initMapGobSaved() {
+        mapGobSavedString = Utils.getpref("mapGobSavedString","");
         HashMap<String,String> ret = new HashMap<String,String>();
         String[] mapStr = mapGobSavedString.split(",");
         String[] gobInfo;
@@ -304,8 +370,6 @@ public class ZeeConfig {
         }
         return ret;
     }
-
-
 
     public static void playMidi(String[] notes){
         new ZeeSynth(notes).start();
@@ -359,6 +423,30 @@ public class ZeeConfig {
 
     public static void playAudio(String filePath) {
         new ZeeSynth(filePath).start();
+    }
+
+    public static String serialize(Serializable o) {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        try (ObjectOutputStream oos = new ObjectOutputStream(baos)) {
+            oos.writeObject(o);
+            oos.close();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return Base64.getEncoder().encodeToString(baos.toByteArray());
+    }
+
+    private static Object deserialize(String s){
+        byte[] data = Base64.getDecoder().decode(s);
+        Object o = null;
+        try (ObjectInputStream ois = new ObjectInputStream(
+                new ByteArrayInputStream(data))) {
+            o = ois.readObject();
+            ois.close();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return o;
     }
 }
 
