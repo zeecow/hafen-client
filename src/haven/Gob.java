@@ -308,7 +308,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Sk
 	    int v = msg.int32();
 	    msg.uint8();
 	    int c = msg.uint16();
-	    System.out.println(String.format("processDmg v: %d, c: %d", v, c));
+//	    System.out.println(String.format("processDmg v: %d, c: %d", v, c));
 	    
 	    if(damage == null) {
 		addDmg();

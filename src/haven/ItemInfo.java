@@ -551,8 +551,8 @@ public abstract class ItemInfo {
 		    Object spec = Reflect.getFieldValue(input, "spec");
 		    ResData resd = (ResData) Reflect.getFieldValue(spec, "res");
 		    Resource r = resd.res.get();
-		    Resource.Tooltip tt = r.layer(Resource.tooltip);
-		    System.out.println(String.format("%s x %d", (tt != null) ? tt.t : r.name, num));
+		    //Resource.Tooltip tt = r.layer(Resource.tooltip);
+		    //System.out.printf("%s x %d%n", (tt != null) ? tt.t : r.name, num);
 		    result.add(new Pair<>(r, num));
 		}
 	    }
