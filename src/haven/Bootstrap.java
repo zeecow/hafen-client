@@ -31,7 +31,6 @@ import java.net.*;
 import java.util.*;
 
 public class Bootstrap implements UI.Receiver, UI.Runner {
-    private static final String TITLE = String.format("modified by Ender (v%s)", Config.version);
     Session sess;
     String hostname;
     int port;
@@ -59,7 +58,7 @@ public class Bootstrap implements UI.Receiver, UI.Runner {
     
     @Override
     public String title() {
-	return TITLE;
+	return null;
     }
     
     public Bootstrap() {

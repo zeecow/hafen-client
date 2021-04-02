@@ -34,6 +34,7 @@ import java.util.*;
 import java.lang.reflect.*;
 
 public class MainFrame extends java.awt.Frame implements Console.Directory {
+    private static final String TITLE = String.format("Haven and Hearth modified by Ender (v%s)", Config.version);
     UIPanel p;
     private final ThreadGroup g;
     private Thread mt;
@@ -279,9 +280,9 @@ public class MainFrame extends java.awt.Frame implements Console.Directory {
 		fun = new Bootstrap();
 	    String t = fun.title();
 	    if(t == null)
-		setTitle("Haven and Hearth");
+		setTitle(TITLE);
 	    else
-		setTitle("Haven and Hearth \u2013 " + t);
+		setTitle(TITLE + " \u2013 " + t);
 	    fun = fun.run(p.newui(fun));
 	}
     }
