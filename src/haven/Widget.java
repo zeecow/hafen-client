@@ -891,9 +891,9 @@ public class Widget {
 	return(this);
     }
 	
-    public static final KeyMatch key_act = KeyMatch.forcode(KeyEvent.VK_ENTER, 0);
-    public static final KeyMatch key_esc = KeyMatch.forcode(KeyEvent.VK_ESCAPE, 0);
-    public static final KeyMatch key_tab = KeyMatch.forcode(KeyEvent.VK_TAB, 0);
+    public static final KeyMatch key_act = KeyMatch2.forcode(KeyEvent.VK_ENTER, 0);
+    public static final KeyMatch key_esc = KeyMatch2.forcode(KeyEvent.VK_ESCAPE, 0);
+    public static final KeyMatch key_tab = KeyMatch2.forcode(KeyEvent.VK_TAB, 0);
     public boolean keydown(KeyEvent ev) {
 	if(canactivate) {
 	    if(key_act.match(ev)) {
