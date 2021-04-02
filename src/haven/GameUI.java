@@ -1486,14 +1486,14 @@ public class GameUI extends ConsoleHost implements Console.Directory {
     public static class MenuCheckBox2 extends ICheckBox {
 	private final Action action;
     
-	MenuCheckBox2(String base, String tooltip, Action action) {
+	MenuCheckBox2(String base, String tooltip, Action action, int code, int mods) {
 	    super("gfx/hud/" + base, "", "-d", "-h", "-dh");
-	    this.action = action;
+	    this.action = KeyBinder.add(code, mods, action);
 	    this.tooltip = new KeyBindTip(tooltip, action);
 	}
     
-	MenuCheckBox2(String base, String tooltip, Action action, int code, int mods) {
-	    this(base, tooltip, KeyBinder.add(code, mods, action));
+	MenuCheckBox2(String base, String tooltip, Action action) {
+	    this(base, tooltip, action, 0, 0);
 	}
 	
 	@Override
@@ -1520,15 +1520,11 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 
 	public MapMenu() {
 	    super(mapmenubg.sz());
-	    add(new MenuCheckBox("lbtn-claim", kb_claim, "Display personal claims"), 0, 0).changed(a -> toggleol("cplot", a));
-	    add(new MenuCheckBox("lbtn-vil", kb_vil, "Display village claims"), 0, 0).changed(a -> toggleol("vlg", a));
-	    add(new MenuCheckBox("lbtn-rlm", kb_rlm, "Display realms"), 0, 0).changed(a -> toggleol("realm", a));
-	    add(new MenuCheckBox("lbtn-map", kb_map, "Map")).state(() -> wndstate(mapfile)).click(() -> {
-		    togglewnd(mapfile);
-		    if(mapfile != null)
-			Utils.setprefb("wndvis-map", mapfile.visible);
-		});
-	    add(new MenuCheckBox2("lbtn-ico",  "Icon settings", TOGGLE_MINIMAP_ICONS_SETTINGS).state(() -> wndstate(iconwnd)), 0, 0);
+	    add(new MenuCheckBox2("lbtn-claim",  "Display personal claims", TOGGLE_PERSONAL_CLAIMS));
+	    add(new MenuCheckBox2("lbtn-vil",  "Display village claims", TOGGLE_VILLAGE_CLAIMS));
+	    add(new MenuCheckBox2("lbtn-rlm",  "Display realms", TOGGLE_REALM_CLAIMS));
+	    add(new MenuCheckBox2("lbtn-map", "Map", TOGGLE_MAP, KeyEvent.VK_A, CTRL));
+	    add(new MenuCheckBox2("lbtn-ico",  "Icon settings", TOGGLE_MINIMAP_ICONS_SETTINGS));
 	}
 
 	public void draw(GOut g) {

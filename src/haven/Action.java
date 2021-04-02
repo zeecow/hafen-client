@@ -14,6 +14,10 @@ public enum Action {
     TOGGLE_TIMERS(GameUI::toggleTimers, "Toggle Timers"),
     TAKE_SCREENSHOT(GameUI::takeScreenshot, "Take Screenshot"),
     
+    TOGGLE_PERSONAL_CLAIMS(MapView.toggleolact("cplot"), "Display personal claims"),
+    TOGGLE_VILLAGE_CLAIMS(MapView.toggleolact("vlg"), "Display village claims"),
+    TOGGLE_REALM_CLAIMS(MapView.toggleolact("realm"), "Display realms"),
+    
     ACT_HAND_0(gui -> gui.eqproxy.activate(Equipory.SLOTS.HAND_LEFT, 1), "Left hand", "Left click on left hand slot."),
     ACT_HAND_1(gui -> gui.eqproxy.activate(Equipory.SLOTS.HAND_RIGHT,1), "Right hand", "Left click on right hand slot."),
     ACT_BELT(gui -> gui.eqproxy.activate(Equipory.SLOTS.BELT, 3), "Belt", "Right click on belt slot."),
@@ -36,6 +40,16 @@ public enum Action {
 	gui.ui.message(String.format("Tile centering turned %s", Config.center_tile ? "ON" : "OFF"), GameUI.MsgType.INFO);
     }, "Toggle tile centering"),
     BOT_PICK_ALL_HERBS(Bot::pickup, "Auto-pick stuff", "Will automatically pickup all herbs/mussels/clay/frogs/grasshoppers etc. in radius that can be changed in Options->General."),
+    
+    //Camera controls
+    CAM_ZOOM_IN(gui -> gui.map.zoomCamera(-1), "Camera zoom in"),
+    CAM_ZOOM_OUT(gui -> gui.map.zoomCamera(1), "Camera zoom out"),
+    CAM_ROTATE_LEFT(gui -> gui.map.rotateCamera(Coord.left), "Camera move left"),
+    CAM_ROTATE_RIGHT(gui -> gui.map.rotateCamera(Coord.right), "Camera move right"),
+    CAM_ROTATE_UP(gui -> gui.map.rotateCamera(Coord.up), "Camera move up"),
+    CAM_ROTATE_DOWN(gui -> gui.map.rotateCamera(Coord.down), "Camera move down"),
+    CAM_RESET(gui -> gui.map.resetCamera(), "Camera reset"),
+    
     CLEAR_PLAYER_DAMAGE(GobDamageInfo::clearPlayerDamage, "Clear damage from player"),
     CLEAR_ALL_DAMAGE(GobDamageInfo::clearAllDamage, "Clear damage from everyone");
     

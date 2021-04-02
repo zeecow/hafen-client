@@ -48,7 +48,7 @@ public class KeyMatch {
 	this.modmatch = modmatch & MODS;
     }
 
-    private static int mods(KeyEvent ev) {
+    protected static int mods(KeyEvent ev) {
 	int ret = 0;
 	if((ev.getModifiersEx() & InputEvent.SHIFT_DOWN_MASK) != 0) ret |= S;
 	if((ev.getModifiersEx() & InputEvent.CTRL_DOWN_MASK) != 0) ret |= C;
@@ -57,6 +57,11 @@ public class KeyMatch {
     }
 
     public boolean match(KeyEvent ev, int modign) {
+        //disable matching of all keys
+        return false;
+    }
+
+    public boolean match2(KeyEvent ev, int modign) {
 	int mod = mods(ev);
 	if((mod & modmask & ~modign) != (modmatch & ~modign))
 	    return(false);

@@ -95,6 +95,9 @@ public class MapView extends PView implements DTarget, Console.Directory {
 	    return(false);
 	}
 	
+	public void rotate(Coord r) {}
+	public void reset() {}
+	
 	public void resized() {
 	    float field = 0.5f;
 	    float aspect = ((float)sz.y) / ((float)sz.x);
@@ -379,8 +382,8 @@ public class MapView extends PView implements DTarget, Console.Directory {
     public class SOrthoCam extends OrthoCam {
 	private Coord dragorig = null;
 	private float anglorig;
-	private float tangl = angl;
-	private float tfield = field;
+	protected float tangl = angl;
+	protected float tfield = field;
 	private boolean isometric = true;
 	private final float pi2 = (float)(Math.PI * 2);
 	private double tf = 1.0;
@@ -421,9 +424,11 @@ public class MapView extends PView implements DTarget, Console.Directory {
 	    angl = angl + ((tangl - angl) * cf);
 	    while(angl > pi2) {angl -= pi2; tangl -= pi2; anglorig -= pi2;}
 	    while(angl < 0)   {angl += pi2; tangl += pi2; anglorig += pi2;}
-	    if(Math.abs(tangl - angl) < 0.001)
+	    if(Math.abs(tangl - angl) < 0.001) {
+		while (tangl < 0) {tangl += 2 * Math.PI;}
+		while (tangl > 2 * Math.PI) {tangl -= 2 * Math.PI;}
 		angl = tangl;
-	    else
+	    } else
 		jc = cc;
 
 	    field = field + ((tfield - field) * cf);
@@ -448,7 +453,7 @@ public class MapView extends PView implements DTarget, Console.Directory {
 		tangl = (float)(Math.PI * 0.5 * (Math.floor(tangl / (Math.PI * 0.5)) + 0.5));
 	}
 
-	private void chfield(float nf) {
+	protected void chfield(float nf) {
 	    tfield = nf;
 	    tfield = Math.max(Math.min(tfield, sz.x * (float)Math.sqrt(2) / 8f), 50);
 	    if(tfield > 100)
@@ -480,12 +485,30 @@ public class MapView extends PView implements DTarget, Console.Directory {
 	    }
 	    return(false);
 	}
+    
+	@Override
+	public void rotate(Coord r) {
+	    tangl = (float) (Math.PI * 0.5 * (Math.floor((tangl / (Math.PI * 0.5)) + 0.51 * r.x) + 0.5));
+	    chfield(tfield + 50 * r.y);
+	}
+    
+	@Override
+	public void reset() {
+	    tangl = angl + (float)Utils.cangle(-(float)Math.PI * 0.25f - angl);
+	    chfield((float)(100 * Math.sqrt(2)));
+	}
     }
     static {camtypes.put("ortho", SOrthoCam.class);}
     
     public class FreeSOrthoCam extends SOrthoCam {
 	public FreeSOrthoCam() {
 	    super("-f");
+	}
+    
+	@Override
+	public void rotate(Coord r) {
+	    tangl += 0.2 * Math.PI * r.x;
+	    chfield(tfield + 50 * r.y);
 	}
     }
     static {camtypes.put("ortho free", FreeSOrthoCam.class);}
@@ -2153,12 +2176,6 @@ public class MapView extends PView implements DTarget, Console.Directory {
 	    return(true);
 	}
 	*/
-	int code = ev.getKeyCode();
-	if(code == KeyEvent.VK_ADD) {
-	    return camera.wheel(Coord.z, 1);
-	} else if(code == KeyEvent.VK_SUBTRACT){
-	    return camera.wheel(Coord.z, -1);
-	}
 	return(false);
     }
 
@@ -2410,5 +2427,23 @@ public class MapView extends PView implements DTarget, Console.Directory {
     
     public void togglegrid() {
 	showgrid(gridlines == null);
+    }
+    
+    public void zoomCamera(int amount) { camera.wheel(Coord.z, amount); }
+    
+    public void rotateCamera(Coord r) { camera.rotate(r); }
+    
+    public void resetCamera() { camera.reset(); }
+    
+    public static Action.Do toggleolact(String tag) {
+	return gui -> {
+	    boolean vis = gui.map.visol(tag);
+	    if(vis){
+		gui.map.disol(tag);
+	    } else {
+		gui.map.enol(tag);
+		
+	    }
+	};
     }
 }

@@ -81,7 +81,7 @@ public class OptWnd extends Window {
 	public final int key;
 	
 	public AButton(int w, String title, int key, Action act) {
-	    super(w, title);
+	    super(w, title, false);
 	    this.act = act;
 	    this.key = key;
 	}
@@ -370,6 +370,7 @@ public class OptWnd extends Window {
 	    Widget prev;
 	    int y = 0;
 	    y = cont.adda(new Label("Main menu"), cont.sz.x / 2, y, 0.5, 0.0).pos("bl").adds(0, 5).y;
+	    /*
 	    y = addbtn(cont, "Inventory", GameUI.kb_inv, y);
 	    y = addbtn(cont, "Equipment", GameUI.kb_equ, y);
 	    y = addbtn(cont, "Character sheet", GameUI.kb_chr, y);
@@ -378,7 +379,9 @@ public class OptWnd extends Window {
 	    y = addbtn(cont, "Options", GameUI.kb_opt, y);
 	    y = addbtn(cont, "Search actions", GameUI.kb_srch, y);
 	    y = addbtn(cont, "Toggle chat", GameUI.kb_chat, y);
+	    */
 	    y = addbtn(cont, "Quick chat", ChatUI.kb_quick, y);
+	    /*
 	    y = addbtn(cont, "Take screenshot", GameUI.kb_shoot, y);
 	    y = addbtn(cont, "Minimap icons", GameUI.kb_ico, y);
 	    y = addbtn(cont, "Toggle UI", GameUI.kb_hide, y);
@@ -393,6 +396,7 @@ public class OptWnd extends Window {
 	    y = addbtn(cont, "Zoom in", MapView.kb_camin, y);
 	    y = addbtn(cont, "Zoom out", MapView.kb_camout, y);
 	    y = addbtn(cont, "Reset", MapView.kb_camreset, y);
+	    */
 	    y = cont.adda(new Label("Map window"), cont.sz.x / 2, y + UI.scale(10), 0.5, 0.0).pos("bl").adds(0, 5).y;
 	    y = addbtn(cont, "Reset view", MapWnd.kb_home, y);
 	    y = addbtn(cont, "Place marker", MapWnd.kb_mark, y);
@@ -404,8 +408,10 @@ public class OptWnd extends Window {
 	    for(int i = 0; i < 4; i++)
 		y = addbtn(cont, String.format("Set speed %d", i + 1), Speedget.kb_speeds[i], y);
 	    y = cont.adda(new Label("Combat actions"), cont.sz.x / 2, y + UI.scale(10), 0.5, 0.0).pos("bl").adds(0, 5).y;
+	    /*
 	    for(int i = 0; i < Fightsess.kb_acts.length; i++)
 		y = addbtn(cont, String.format("Combat action %d", i + 1), Fightsess.kb_acts[i], y);
+	    */
 	    y = addbtn(cont, "Switch targets", Fightsess.kb_relcycle, y);
 	    prev = adda(new PointBind(UI.scale(200)), scroll.pos("bl").adds(0, 10).x(scroll.sz.x / 2), 0.5, 0.0);
 	    prev = adda(new PButton(UI.scale(200), "Back", 27, back), prev.pos("bl").adds(0, 10).x(scroll.sz.x / 2), 0.5, 0.0);
@@ -574,18 +580,19 @@ public class OptWnd extends Window {
 	addPanelButton("Video settings", 'v', video, 0, 0);
 	addPanelButton("Audio settings", 'a', audio, 0, 1);
 	addPanelButton("Camera settings", 'c', camera, 0, 2);
+	addPanelButton("Widget shortcuts", 'k', keybind, 0, 3);
 
 	addPanelButton("General settings", 'g', general, 1, 0);
 	addPanelButton("Display settings", 'd', display, 1, 1);
 	addPanelButton("Radar settings", 'r', Action.TOGGLE_MINIMAP_ICONS_SETTINGS, 1, 2);
-	addPanelButton("Shortcut settings", 's', shortcuts, 1, 3);
+	addPanelButton("Global shortcuts", 's', shortcuts, 1, 3);
 
 	int y = 0;
 	Widget prev;
-	y = main.add(new PButton(UI.scale(200), "Video settings", 'v', video), 0, y).pos("bl").adds(0, 5).y;
-	y = main.add(new PButton(UI.scale(200), "Audio settings", 'a', audio), 0, y).pos("bl").adds(0, 5).y;
+	//y = main.add(new PButton(UI.scale(200), "Video settings", 'v', video), 0, y).pos("bl").adds(0, 5).y;
+	//y = main.add(new PButton(UI.scale(200), "Audio settings", 'a', audio), 0, y).pos("bl").adds(0, 5).y;
 	//y = main.add(new PButton(UI.scale(200), "Keybindings", 'k', keybind), 0, y).pos("bl").adds(0, 5).y;
-	y += UI.scale(60);
+	y += UI.scale(5 * PANEL_POS.y);
 	if(gopts) {
 	    y = main.add(new Button(UI.scale(200), "Switch character", false).action(() -> {
 			getparent(GameUI.class).act("lo", "cs");

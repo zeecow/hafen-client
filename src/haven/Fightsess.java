@@ -445,7 +445,7 @@ public class Fightsess extends Widget {
 	KeyBinding.get("fgt/8", KeyMatch.forcode(KeyEvent.VK_4, KeyMatch.S)),
 	KeyBinding.get("fgt/9", KeyMatch.forcode(KeyEvent.VK_5, KeyMatch.S)),
     };
-    public static final KeyBinding kb_relcycle =  KeyBinding.get("fgt-cycle", KeyMatch.forcode(KeyEvent.VK_TAB, KeyMatch.C), KeyMatch.S);
+    public static final KeyBinding kb_relcycle =  KeyBinding.get2("fgt-cycle", KeyMatch.forcode(KeyEvent.VK_TAB, KeyMatch.C), KeyMatch.S);
 
     /* XXX: This is a bit ugly, but release message do need to be
      * properly sequenced with use messages in some way. */

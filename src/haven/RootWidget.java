@@ -43,6 +43,9 @@ public class RootWidget extends ConsoleHost {
 	if(super.globtype(key, ev)) {
 	    return false;
 	}
+	if(KeyBinder.handle(ui, ev)) {
+	    return false;
+	}
 	if(key == '`') {
 	    GameUI gi = findchild(GameUI.class);
 	    if(Config.profile) {
@@ -71,7 +74,7 @@ public class RootWidget extends ConsoleHost {
 
     @Override
     public boolean keydown(KeyEvent ev) {
-	return super.keydown(ev) || KeyBinder.handle(ui, ev);
+	return super.keydown(ev);
     }
     
     @Override

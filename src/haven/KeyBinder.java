@@ -89,6 +89,16 @@ public class KeyBinder {
 	add(KeyEvent.VK_Z, CTRL,  TOGGLE_TILE_CENTERING);
 	add(KeyEvent.VK_S, CTRL,  TAKE_SCREENSHOT);
 	add(KeyEvent.VK_Q, ALT,   BOT_PICK_ALL_HERBS);
+	
+	//Camera controls
+	add(KeyEvent.VK_ADD, NONE, CAM_ZOOM_IN);
+	add(KeyEvent.VK_SUBTRACT, NONE, CAM_ZOOM_OUT);
+	add(KeyEvent.VK_LEFT, NONE, CAM_ROTATE_LEFT);
+	add(KeyEvent.VK_RIGHT, NONE, CAM_ROTATE_RIGHT);
+	add(KeyEvent.VK_UP, NONE, CAM_ROTATE_UP);
+	add(KeyEvent.VK_DOWN, NONE, CAM_ROTATE_DOWN);
+	add(KeyEvent.VK_HOME, NONE, CAM_RESET);
+	
 	add(TOGGLE_HIDE_TREES);
     }
     
