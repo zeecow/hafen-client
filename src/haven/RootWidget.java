@@ -71,7 +71,7 @@ public class RootWidget extends ConsoleHost {
 
     @Override
     public boolean keydown(KeyEvent ev) {
-	return KeyBinder.handle(ui, ev) || super.keydown(ev);
+	return super.keydown(ev) || KeyBinder.handle(ui, ev);
     }
     
     @Override
