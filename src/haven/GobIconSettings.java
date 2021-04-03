@@ -6,11 +6,11 @@ import java.util.Arrays;
 import java.util.Map;
 
 public class GobIconSettings extends Window {
-    public static final PUtils.Convolution ICON_FILTER = new PUtils.Hanning(1);
     public static final String FILTER_DEFAULT = "Start typing to filter";
     public static final Coord FILTER_C = UI.scale(445, 0);
     public final GobIcon.Settings conf;
     private final Runnable save;
+    private static GobCategory lastCategory = GobCategory.ALL;
     
     private static final boolean DBG = false;
     private static final Text.Foundry elf = CharWnd.attrf;
@@ -20,7 +20,7 @@ public class GobIconSettings extends Window {
     private final IconList list;
     private final CheckBox checkAll;
     private final Label filter;
-    private GobCategory category = GobCategory.ALL;
+    private GobCategory category = lastCategory;
     
     
     public class IconList extends FilteredListBox<GobIcon.SettingsWindow.Icon> {
@@ -187,7 +187,7 @@ public class GobIconSettings extends Window {
 	    }
 	}, categories.pos("bl").adds(5, 5));
 	
-	categories.change(0);
+	categories.change(category);
 	pack();
 	setfocus(list);
     }
@@ -245,7 +245,7 @@ public class GobIconSettings extends Window {
 	public void change(GobCategory item) {
 	    super.change(item);
 	    if(category != item) {
-		category = item;
+		lastCategory = category = item;
 		list.needfilter();
 	    }
 	}
