@@ -50,6 +50,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Sk
     private final Object removalLock = new Object();
     private GobDamageInfo damage;
     private Hitbox hitbox;
+    private Boolean isPlayer = null;
     public static final ChangeCallback CHANGED = new ChangeCallback() {
 	@Override
 	public void added(Gob ob) {
@@ -383,10 +384,14 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Sk
     }
     
     public boolean isPlayer() {
-	if(glob == null || glob.sess == null || glob.sess.ui == null || glob.sess.ui.gui == null || glob.sess.ui.gui.map == null) {
-	    return false;
+	if(isPlayer == null) {
+	    if(glob.sess == null || glob.sess.ui == null || glob.sess.ui.gui == null || glob.sess.ui.gui.map == null) {
+		return false;
+	    } else {
+		isPlayer = id == glob.sess.ui.gui.map.plgob;
+	    }
 	}
-        return id == glob.sess.ui.gui.map.plgob;
+	return isPlayer;
     }
 
     public Coord3f getc() {
