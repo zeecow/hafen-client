@@ -440,9 +440,8 @@ public class ZeecowOptionsWindow extends JFrame {
         fileChooser.addChoosableFileFilter(new FileNameExtensionFilter("Audio files","mp3","wav","ogg","mid","midi"));
         if (fileChooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
 
-            tfAudioPathCateg.setText(fileChooser.getSelectedFile().getAbsolutePath());
-
             if(tabbedPaneGobs.getSelectedIndex()==TABGOB_CATEGS){
+                tfAudioPathCateg.setText(fileChooser.getSelectedFile().getAbsolutePath());
                 //save audio for category
                 ZeeConfig.mapCategoryAudio.put(
                         tfCategName.getText().trim(),
@@ -457,6 +456,7 @@ public class ZeecowOptionsWindow extends JFrame {
                                 .trim()
                 );
             }else {
+                tfAudioPath.setText(fileChooser.getSelectedFile().getAbsolutePath());
                 //save audio for single gob
                 ZeeConfig.mapGobSaved.put(
                         tfGobName.getText().trim(),
