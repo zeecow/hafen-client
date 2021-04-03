@@ -2051,8 +2051,8 @@ public class MapView extends PView implements DTarget, Console.Directory {
 	    
 	    if(inf != null) {
 		args = Utils.extend(args, inf.clickargs());
-		if(inf.ci instanceof Gob.GobClick) {
-		    Gob gob = ((Gob.GobClick) inf.ci).gob;
+		Gob gob = Gob.from(inf.ci);
+		if(gob != null) {
 		    if(clickb == 3) {FlowerMenu.lastGob(gob);}
 		    if(ui.modmeta && clickb == 1) {
 			ChatUI.Channel chat = ui.gui.chat.sel;
