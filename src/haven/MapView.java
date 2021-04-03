@@ -535,6 +535,7 @@ public class MapView extends PView implements DTarget, Console.Directory {
 	basic.add(new Outlines(false));
 	basic.add(this.gobs = new Gobs());
 	basic.add(this.terrain = new Terrain());
+	basic.add(glob.oc.paths);
 	this.clickmap = new ClickMap();
 	clmaptree.add(clickmap);
 	setcanfocus(true);

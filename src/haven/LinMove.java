@@ -38,6 +38,7 @@ public class LinMove extends Moving {
 	this.v = v;
 	this.t = 0;
 	this.e = Double.NaN;
+	gob.glob.oc.paths.addPath(this);
     }
 
     public Coord3f getc() {
@@ -66,5 +67,18 @@ public class LinMove extends Moving {
 	    this.t = t;
 	    ts = false;
 	}
+    }
+    
+    @Override
+    public Coord3f gett() {
+	double mt = Double.isNaN(e) ? lt + MAXOVER : e;
+	return (gob.glob.map.getzp(s.add(v.mul(mt))));
+    }
+    
+    @Override
+    public void dispose() {
+	gob.glob.oc.paths.removePath(this);
+	super.dispose();
+	
     }
 }
