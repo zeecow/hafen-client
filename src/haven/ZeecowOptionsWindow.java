@@ -12,12 +12,13 @@ import java.util.List;
 
 public class ZeecowOptionsWindow extends JFrame {
     public JTabbedPane tabbedPane, tabbedPaneGobs;
-    public JPanel panelMisc, panelGobs, panelGobDetails, panelCategControls, panelTabCateg;
+    public JPanel panelMisc, panelGobs, panelGobDetails, panelDebug, panelTabCateg;
     public JCheckBox cbDropMinedStone, cbDropMinedOre, cbDropMinedSilverGold, cbDropMinedCurios, cbActionSearchGlobal, cbCompactEquipsWindow, cbBeltTogglesEquips, cbAutohearth, cbShowInventoryLogin, cbShowEquipsLogin, cbAutoClickMenuOpts, cbCattleRosterHeight;
     public JTextField tfAutoClickMenu, tfGobName, tfAudioPath, tfCategName, tfAudioPathCateg;
     public JComboBox<String> cmbCattleRoster, cmbGobCategory;
     public JList<String> listGobsTemp, listGobsSaved, listGobsCategories;
     public JButton btnRefresh, btnAudioSave, btnAudioClear, btnAudioTest, btnRemGobFromCateg, btnResetCateg, btnAddCateg;
+    public JTextArea txtAreaDebug;
     public static int TABGOB_SESSION = 0;
     public static int TABGOB_SAVED = 1;
     public static int TABGOB_CATEGS = 2;
@@ -51,6 +52,15 @@ public class ZeecowOptionsWindow extends JFrame {
         panelGobs.setLayout(new BoxLayout(panelGobs, BoxLayout.PAGE_AXIS));
         tabbedPane.add("Gobs(broken)", panelGobs);
         buildPanelGobs();
+
+        buildPanelDebug();
+    }
+
+    private void buildPanelDebug() {
+        panelDebug = new JPanel();
+        getContentPane().add(panelDebug,BorderLayout.SOUTH);
+        txtAreaDebug = new JTextArea(3,30);
+        panelDebug.add(new JScrollPane(txtAreaDebug));
     }
 
     private void buildPanelMisc() {
@@ -211,6 +221,7 @@ public class ZeecowOptionsWindow extends JFrame {
         });
         panelGobs.add(tabbedPaneGobs);
 
+
         //subtab gobs session list
         if(ZeeConfig.mapGobSession.size() > 0) {
             SortedSet<String> keys = new TreeSet<String>(ZeeConfig.mapGobSession.keySet());
@@ -227,6 +238,7 @@ public class ZeecowOptionsWindow extends JFrame {
                 updatePanelDetails();
             }
         });
+
 
         //subtab gobs saved list
         if(ZeeConfig.mapGobSaved.size() > 0) {

@@ -210,11 +210,6 @@ public class ZeeConfig {
             //System.out.println(name+"  "+mapGobAlert.size());
         }
 
-        //if gob alert is saved, play alert
-        if( (path = mapGobSaved.get(name)) != null){
-            ZeeConfig.playAudio(path);
-        }
-
         if(ZeeConfig.autoHearthOnStranger && name.contains("borka/body") && gob.id != mapView.player().id) {
             gameUI.act("travel","hearth");
             try{
@@ -222,6 +217,9 @@ public class ZeeConfig {
             }catch(Exception e) {
                 playMidi(midiJawsTheme);
             }
+        }else if( (path = mapGobSaved.get(name)) != null){
+            //if gob alert is saved, play alert
+            ZeeConfig.playAudio(path);
         }else if(rareForageables.contains(name)){
             try{
                 playAudio(mapCategoryAudio.get("Rare Forageables"));
