@@ -29,6 +29,7 @@ package haven;
 import haven.Equipory.SLOTS;
 import haven.rx.BuffToggles;
 import haven.rx.Reactor;
+import integrations.mapv4.MappingClient;
 
 import java.awt.*;
 import java.util.*;
@@ -936,6 +937,14 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 	    }
 	    if(mapstore != null) {
 		MapFile file = MapFile.load(mapstore, mapfilename());
+		if(CFG.AUTOMAP_UPLOAD.get()) {
+		    MappingClient.getInstance().ProcessMap(file, (m) -> {
+			if(m instanceof MapFile.PMarker) {
+			    return ((MapFile.PMarker)m).color.equals(Color.GREEN);
+			}
+			return true;
+		    });
+		}
 		mmap = blpanel.add(new CornerMap(UI.scale(new Coord(133, 133)), file), minimapc);
 		mmap.lower();
 		mapfile = new MapWnd(file, map, Utils.getprefc("wndsz-map", UI.scale(new Coord(700, 500))), "Map");
