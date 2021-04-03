@@ -3,7 +3,9 @@ $size[14]{$u{Update for 03.04.21:}
   * fixed "Pick All" action in flower menu not working
   * fixed Options->Display->Show biomes on minimap not working
   * added new inspect mode (X->I or can be bound in global keys). When on will show tooltip with resource name of the object or tile mouse points at.
-
+  * map icon settings window now can be closed by ESC
+  * map icon settings window now remembers selected category
+ 
 $size[14]{$u{Update for 02.04.21:}
   * added free ortho cam to camera options
   * added more global hotkeys (camera controls, claim display toggles)
