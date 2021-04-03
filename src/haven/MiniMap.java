@@ -881,11 +881,13 @@ public class MiniMap extends Widget {
 	    String newbiome = biome;
 	    if(loc == null) {
 		Gob player = ui.gui.map.player();
-		MCache mCache = ui.sess.glob.map;
-		int tile = mCache.gettile(player.rc.div(tilesz).floor());
-		Resource res = mCache.tilesetr(tile);
-		if(res != null) {
-		    newbiome = res.name;
+		if(player != null) {
+		    MCache mCache = ui.sess.glob.map;
+		    int tile = mCache.gettile(player.rc.div(tilesz).floor());
+		    Resource res = mCache.tilesetr(tile);
+		    if(res != null) {
+			newbiome = res.name;
+		    }
 		}
 	    } else {
 		MapFile map = loc.seg.file();
