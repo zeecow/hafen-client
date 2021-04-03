@@ -45,6 +45,7 @@ public class MiniMap extends Widget {
     public static final Tex bg = Resource.loadtex("gfx/hud/mmap/ptex");
     public static final Tex nomap = Resource.loadtex("gfx/hud/mmap/nomap");
     public static final Tex plp = ((TexI)Resource.loadtex("gfx/hud/mmap/plp")).filter(haven.render.Texture.Filter.LINEAR);
+    private static final Color BIOME_BG = new Color(0, 0, 0, 80);
     public final MapFile file;
     public Location curloc;
     public Location sessloc;
@@ -58,6 +59,8 @@ public class MiniMap extends Widget {
     protected Segment dseg;
     protected int dlvl;
     protected Location dloc;
+    private String biome;
+    private Tex biometex;
 
     public MiniMap(Coord sz, MapFile file) {
 	super(sz);
@@ -212,6 +215,14 @@ public class MiniMap extends Widget {
 	    }
 	}
 	icons = findicons(icons);
+	if(CFG.MMAP_SHOW_BIOMES.get()) {
+	    Coord mc = rootxlate(ui.mc);
+	    if(mc.isect(Coord.z, sz)) {
+		setBiome(xlate(mc));
+	    } else {
+		setBiome(null);
+	    }
+	}
     }
 
     public void center(Locator loc) {
@@ -596,6 +607,7 @@ public class MiniMap extends Widget {
 	if(dlvl <= 1)
 	    drawicons(g);
 	drawparty(g);
+	if(CFG.MMAP_SHOW_BIOMES.get()) {drawbiome(g); }
     }
 
     public void draw(GOut g) {
@@ -851,5 +863,55 @@ public class MiniMap extends Widget {
 	    g.rect(rc, VIEW_SZ.div(zmult));
 	    g.chcolor();
 	}
+    }
+    
+    void drawbiome(GOut g) {
+	if(biometex != null) {
+	    Coord mid = new Coord(g.sz().x / 2, 0);
+	    Coord tsz = biometex.sz();
+	    g.chcolor(BIOME_BG);
+	    g.frect(mid.sub(2 + tsz.x /2, 0), tsz.add(4, 2));
+	    g.chcolor();
+	    g.aimage(biometex, mid, 0.5f, 0);
+	}
+    }
+    
+    private void setBiome(Location loc) {
+	try {
+	    String newbiome = biome;
+	    if(loc == null) {
+		Gob player = ui.gui.map.player();
+		MCache mCache = ui.sess.glob.map;
+		int tile = mCache.gettile(player.rc.div(tilesz).floor());
+		Resource res = mCache.tilesetr(tile);
+		if(res != null) {
+		    newbiome = res.name;
+		}
+	    } else {
+		MapFile map = loc.seg.file();
+		if(map.lock.readLock().tryLock()) {
+		    try {
+			MapFile.Grid grid = loc.seg.grid(loc.tc.div(cmaps)).get();
+			if(grid != null) {
+			    int tile = grid.gettile(loc.tc.mod(cmaps));
+			    newbiome = grid.tilesets[tile].res.name;
+			}
+		    } finally {
+			map.lock.readLock().unlock();
+		    }
+		}
+	    }
+	    if(!newbiome.equals(biome)) {
+		biome = newbiome;
+		biometex = Text.renderstroked(prettybiome(biome)).tex();
+	    }
+	} catch (Loading ignored) {}
+    }
+    
+    private static String prettybiome(String biome) {
+	int k = biome.lastIndexOf("/");
+	biome = biome.substring(k + 1);
+	biome = biome.substring(0, 1).toUpperCase() + biome.substring(1);
+	return biome;
     }
 }
