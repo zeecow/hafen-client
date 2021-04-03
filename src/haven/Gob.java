@@ -932,4 +932,14 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Sk
 	}
 	return false;
     }
+    
+    public static Gob from(Clickable ci) {
+	if(ci instanceof Gob.GobClick) {
+	    return ((GobClick) ci).gob;
+	} else if(ci instanceof Composited.CompositeClick) {
+	    GobClick gi = ((Composited.CompositeClick) ci).gi;
+	    return gi != null ? gi.gob : null;
+	}
+	return null;
+    }
 }

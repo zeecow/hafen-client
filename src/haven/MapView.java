@@ -44,6 +44,7 @@ import haven.render.sl.Uniform;
 import haven.render.sl.Type;
 
 public class MapView extends PView implements DTarget, Console.Directory {
+    public static final Resource.Named inspectCursor = Resource.local().loadwait("gfx/hud/curs/studyx").indir();
     public static boolean clickdb = false;
     public long plgob = -1;
     public Coord2d cc;
@@ -60,6 +61,7 @@ public class MapView extends PView implements DTarget, Console.Directory {
     public static int plobgran = Utils.getprefi("plobgran", 8);
     private static final Map<String, Class<? extends Camera>> camtypes = new HashMap<String, Class<? extends Camera>>();
     private long mapupdate = 0;
+    String ttip = null;
 
     private boolean showgrid;
 
@@ -2078,6 +2080,7 @@ public class MapView extends PView implements DTarget, Console.Directory {
     public boolean mousedown(Coord c, int button) {
 	parent.setfocus(this);
 	Loader.Future<Plob> placing_l = this.placing;
+	if(button == 3) {stopInspecting();}
 	if(button == 2) {
 	    if(((Camera)camera).click(c)) {
 		camdrag = ui.grabmouse(this);
@@ -2104,6 +2107,8 @@ public class MapView extends PView implements DTarget, Console.Directory {
 	    if((placing.lastmc == null) || !placing.lastmc.equals(c)) {
 		placing.new Adjust(c, ui.modflags()).run();
 	    }
+	} else {
+	    inspect(c);
 	}
     }
     
@@ -2182,6 +2187,8 @@ public class MapView extends PView implements DTarget, Console.Directory {
 	if(selection != null) {
 	    if(selection.tt != null)
 		return(selection.tt);
+	} else if(ttip != null) {
+	    return ttip;
 	}
 	return(super.tooltip(c, prev));
     }
@@ -2444,5 +2451,65 @@ public class MapView extends PView implements DTarget, Console.Directory {
 		
 	    }
 	};
+    }
+    
+    public boolean isInspecting() {
+	return cursor == inspectCursor;
+    }
+    
+    public void startInspecting() {
+	if(cursor == null) {
+	    cursor = inspectCursor;
+	    inspect(rootxlate(ui.mc));
+	}
+    }
+    
+    public void stopInspecting() {
+	if(cursor == inspectCursor) {
+	    cursor = null;
+	}
+	ttip = null;
+    }
+    
+    public void toggleInspectMode() {
+	if(isInspecting()) {
+	    stopInspecting();
+	} else {
+	    startInspecting();
+	}
+    }
+    
+    private void inspect(Coord c) {
+	if(cursor == inspectCursor) {
+	    new Hittest(c) {
+		@Override
+		protected void hit(Coord pc, Coord2d mc, ClickData inf) {
+		    ttip = null;
+		    if(inf != null) {
+			Gob gob = Gob.from(inf.ci);
+			if(gob != null) {
+			    Resource res = gob.getres();
+			    if(res != null) {
+				ttip = res.name;
+			    }
+			}
+		    } else {
+			MCache mCache = ui.sess.glob.map;
+			int tile = mCache.gettile(mc.div(tilesz).floor());
+			Resource res = mCache.tilesetr(tile);
+			if(res != null) {
+			    ttip = res.name;
+			}
+		    }
+		}
+		
+		@Override
+		protected void nohit(Coord pc) {
+		    ttip = null;
+		}
+	    }.run();
+	} else {
+	    ttip = null;
+	}
     }
 }

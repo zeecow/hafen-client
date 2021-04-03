@@ -100,6 +100,7 @@ public class KeyBinder {
 	add(KeyEvent.VK_HOME, NONE, CAM_RESET);
 	
 	add(TOGGLE_HIDE_TREES);
+	add(TOGGLE_INSPECT);
     }
     
     private static synchronized void store() {
