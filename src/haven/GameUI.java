@@ -708,14 +708,16 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 		};
 	    invwnd.add(maininv = (Inventory)child);
 	    invwnd.pack();
-	    invwnd.hide();
+	    if(!ZeeConfig.showInventoryLogin)
+	    	invwnd.hide();
 	    add(invwnd, Utils.getprefc("wndc-inv", new Coord(100, 100)));
 		ZeeConfig.initWindowInventory();
 	} else if(place == "equ") {
 	    equwnd = new Hidewnd(Coord.z, "Equipment");
 	    equwnd.add(child, Coord.z);
 	    equwnd.pack();
-	    equwnd.hide();
+		if(!ZeeConfig.showEquipsLogin)
+	    	equwnd.hide();
 	    add(equwnd, Utils.getprefc("wndc-equ", new Coord(400, 10)));
 	} else if(place == "hand") {
 	    GItem g = add((GItem)child);

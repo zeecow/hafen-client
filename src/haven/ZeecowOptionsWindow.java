@@ -13,7 +13,7 @@ import java.util.List;
 public class ZeecowOptionsWindow extends JFrame {
     public JTabbedPane tabbedPane, tabbedPaneGobs;
     public JPanel panelMisc, panelGobs, panelGobDetails, panelCategControls, panelTabCateg;
-    public JCheckBox cbDropMinedStone, cbDropMinedOre, cbDropMinedSilverGold, cbDropMinedCurios, cbActionSearchGlobal, cbCompactEquipsWindow, cbBeltTogglesEquips, cbAutohearth, cbAutoClickMenuOpts,cbCattleRosterHeight;
+    public JCheckBox cbDropMinedStone, cbDropMinedOre, cbDropMinedSilverGold, cbDropMinedCurios, cbActionSearchGlobal, cbCompactEquipsWindow, cbBeltTogglesEquips, cbAutohearth, cbShowInventoryLogin, cbShowEquipsLogin, cbAutoClickMenuOpts, cbCattleRosterHeight;
     public JTextField tfAutoClickMenu, tfGobName, tfAudioPath, tfCategName, tfAudioPathCateg;
     public JComboBox<String> cmbCattleRoster, cmbGobCategory;
     public JList<String> listGobsTemp, listGobsSaved, listGobsCategories;
@@ -122,6 +122,22 @@ public class ZeecowOptionsWindow extends JFrame {
             JCheckBox cb = (JCheckBox) actionEvent.getSource();
             boolean val = ZeeConfig.autoHearthOnStranger = cb.isSelected();
             Utils.setprefb("autoHearthOnStranger",val);
+        });
+
+        panelMisc.add(cbShowInventoryLogin = new JCheckBox("Show inventory at login"));
+        cbShowInventoryLogin.setSelected(ZeeConfig.showInventoryLogin);
+        cbShowInventoryLogin.addActionListener(actionEvent -> {
+            JCheckBox cb = (JCheckBox) actionEvent.getSource();
+            boolean val = ZeeConfig.showInventoryLogin = cb.isSelected();
+            Utils.setprefb("showInventoryLogin",val);
+        });
+
+        panelMisc.add(cbShowEquipsLogin = new JCheckBox("Show equips at login"));
+        cbShowEquipsLogin.setSelected(ZeeConfig.showEquipsLogin);
+        cbShowEquipsLogin.addActionListener(actionEvent -> {
+            JCheckBox cb = (JCheckBox) actionEvent.getSource();
+            boolean val = ZeeConfig.showEquipsLogin = cb.isSelected();
+            Utils.setprefb("cbShowEquipsLogin",val);
         });
 
         panelMisc.add(new JLabel("--------------------"));

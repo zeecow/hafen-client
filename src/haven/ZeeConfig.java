@@ -35,6 +35,8 @@ public class ZeeConfig {
     public static boolean dropSoil = false;
     public static boolean equiporyCompact = Utils.getprefb("equiporyCompact", false);
     public static boolean equipWindowOpenedByBelt = false;
+    public static boolean showInventoryLogin = Utils.getprefb("showInventoryLogin", true);
+    public static boolean showEquipsLogin = Utils.getprefb("showInventoryLogin", true);
 
 
     public final static Set<String> mineablesStone = new HashSet<String>(Arrays.asList(
@@ -130,8 +132,6 @@ public class ZeeConfig {
     public static HashMap<String,String> mapGobSaved = initMapGobSaved();
     public static HashMap<String,String> mapCategoryGobs = initMapCategoryGobs();
     public static HashMap<String,String> mapCategoryAudio = initMapCategoryAudio();
-
-
 
     public static Collection<Field> getAllFields(Class<?> type) {
         TreeSet<Field> fields = new TreeSet<Field>(
