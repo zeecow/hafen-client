@@ -872,6 +872,7 @@ public class Widget {
     }
 
     public boolean globtype(char key, KeyEvent ev) {
+	if(!visible) {return false;}
 	KeyMatch gkey = this.gkey;
 	if(kb_gkey != null)
 	    gkey = kb_gkey.key();
