@@ -48,8 +48,9 @@ public abstract class FilteredListBox<T> extends Listbox<T> {
 	String before = filter.line;
 	if(filter.key(ev) && !before.equals(filter.line)) {
 	    needfilter();
+	    return true;
 	}
-	return true;
+	return false;
     }
     
     private static boolean ignoredKey(KeyEvent ev) {
