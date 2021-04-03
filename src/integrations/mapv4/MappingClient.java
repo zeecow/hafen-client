@@ -151,7 +151,7 @@ public class MappingClient {
 	}
     }
     
-    private Map<Long, MapRef> cache = new HashMap<Long, MapRef>();
+    private final Map<Long, MapRef> cache = new HashMap<Long, MapRef>();
     
     /***
      * Gets a MapRef (mapid, coordinate pair) for the players current location
@@ -337,6 +337,8 @@ public class MappingClient {
 		    final String json = data.toString();
 		    out.write(json.getBytes(StandardCharsets.UTF_8));
 		}
+		int code = connection.getResponseCode();
+		connection.disconnect();
 	    } catch (Exception ex) {
 		System.out.println(ex);
 	    }
@@ -515,12 +517,13 @@ public class MappingClient {
 			    buffer.write(data, 0, nRead);
 			}
 			buffer.flush();
-			JSONObject jo = new JSONObject(buffer.toString(StandardCharsets.UTF_8.name()));
-			JSONArray reqs = jo.getJSONArray("gridRequests");
+			String response = buffer.toString(StandardCharsets.UTF_8.name());
+			JSONObject jo = new JSONObject(response);
+			JSONArray reqs = jo.optJSONArray("gridRequests");
 			synchronized (cache) {
 			    cache.put(Long.valueOf(gridUpdate.grids[1][1]), new MapRef(jo.getLong("map"), new Coord(jo.getJSONObject("coords").getInt("x"), jo.getJSONObject("coords").getInt("y"))));
 			}
-			for (int i = 0; i < reqs.length(); i++) {
+			for (int i = 0; reqs != null && i < reqs.length(); i++) {
 			    gridsUploader.execute(new GridUploadTask(reqs.getString(i), gridUpdate.gridRefs.get(reqs.getString(i))));
 			}
 		    }
