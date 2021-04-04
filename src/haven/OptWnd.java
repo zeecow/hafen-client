@@ -836,7 +836,20 @@ public class OptWnd extends Window {
 	
 	y += STEP;
 	display.add(new CFGBox("Draw hitboxes on top", CFG.DISPLAY_GOB_HITBOX_TOP, "Draws hitboxes on top of everything", true), x, y);
-
+ 
+	y += STEP;
+	int tx = display.add(new CFGBox("Draw gob paths", CFG.DISPLAY_GOB_PATHS, "Draws lines where gobs are moving", true), x, y).sz.x;
+	display.add(new IButton("gfx/hud/opt", "", "-d", "-h") {
+	    @Override
+	    public void click() {
+		if(ui.gui != null) {
+		    PathVisualizer.CategoryOpts.toggle(ui.gui);
+		} else {
+		    PathVisualizer.CategoryOpts.toggle(ui.root);
+		}
+	    }
+	}, x + tx + UI.scale(10), y + UI.scale(1));
+	
 	y += STEP;
 	display.add(new CFGBox("Show food categories", CFG.DISPLAY_FOD_CATEGORIES, "Shows list of food categories in the tooltip", true), x, y);
 
@@ -874,7 +887,7 @@ public class OptWnd extends Window {
 	x += UI.scale(250);
 	y = 0;
 	my = Math.max(my, y);
-	int tx = x + display.add(new CFGBox("Show quality as:", CFG.Q_SHOW_SINGLE), x, y).sz.x;
+	tx = x + display.add(new CFGBox("Show quality as:", CFG.Q_SHOW_SINGLE), x, y).sz.x;
 	display.add(new QualityBox(UI.scale(100), 6, UI.scale(16), CFG.Q_SINGLE_TYPE), tx + UI.scale(5), y);
 
 	y += STEP;

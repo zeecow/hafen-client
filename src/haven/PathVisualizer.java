@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.*;
 
 public class PathVisualizer implements RenderTree.Node {
+    public static final HashSet<PathCategory> DEF_CATEGORIES = new HashSet<>(Arrays.asList(PathCategory.ME, PathCategory.FOE));
     private static final VertexArray.Layout LAYOUT = new VertexArray.Layout(new VertexArray.Layout.Input(Homo3D.vertex, new VectorFormat(3, NumberFormat.FLOAT32), 0, 0, 12));
     
     
@@ -35,7 +36,11 @@ public class PathVisualizer implements RenderTree.Node {
     
     private void update() {
 	Set<Moving> tmoves;
-	synchronized (moves) { tmoves = new HashSet<>(moves); }
+	if(CFG.DISPLAY_GOB_PATHS.get()) {
+	    synchronized (moves) { tmoves = new HashSet<>(moves); }
+	} else {
+	    tmoves = new HashSet<>();
+	}
 	Map<PathCategory, List<Pair<Coord3f, Coord3f>>> categorized = new HashMap<>();
  
 	for (Moving m : tmoves) {
@@ -51,10 +56,11 @@ public class PathVisualizer implements RenderTree.Node {
 	    } catch (Loading ignored) {}
 	}
  
+	Set<PathCategory> selected = CFG.DISPLAY_GOB_PATHS_FOR.get();
 	for (PathCategory cat : PathCategory.values()) {
 	    List<Pair<Coord3f, Coord3f>> lines = categorized.get(cat);
 	    MovingPath path = paths.get(cat);
-	    if(lines == null || lines.isEmpty()) {
+	    if(!selected.contains(cat) || lines == null || lines.isEmpty()) {
 		if(path != null) {
 		    path.update(null);
 		}
@@ -162,7 +168,7 @@ public class PathVisualizer implements RenderTree.Node {
     private static final float LINE_WIDTH = 1.5f;
     private static final Pipe.Op BASE = new States.LineWidth(LINE_WIDTH);
     
-    private enum PathCategory {
+    public enum PathCategory {
 	ME(new Color(118, 254, 196, 255), true),
 	FRIEND(new Color(109, 245, 251, 255)),
 	FOE(new Color(255, 134, 154, 255), true),
@@ -182,6 +188,65 @@ public class PathVisualizer implements RenderTree.Node {
 	
 	PathCategory(Color col) {
 	    this(col, false);
+	}
+    }
+    
+    public static class CategoryOpts extends Window {
+	private static Window instance;
+	
+	public static void toggle(Widget parent) {
+	    if(instance == null) {
+		instance = parent.add(new CategoryOpts());
+	    } else {
+		doClose();
+	    }
+	}
+	
+	private static void doClose() {
+	    if(instance != null) {
+		instance.reqdestroy();
+		instance = null;
+	    }
+	}
+ 
+	@Override
+	public void destroy() {
+	    super.destroy();
+	    instance = null;
+	}
+ 
+	public CategoryOpts() {
+	    super(Coord.z, "Display paths for");
+	    justclose = true;
+	    int y = 0;
+	    Set<PathCategory> selected = CFG.DISPLAY_GOB_PATHS_FOR.get();
+	    for (PathCategory cat : PathCategory.values()) {
+		CheckBox box = add(new CheckBox(pretty(cat.name()), false), 0, y);
+		box.a = selected.contains(cat);
+		box.changed(val -> {
+		    boolean changed;
+		    Set<PathCategory> categories = CFG.DISPLAY_GOB_PATHS_FOR.get();
+		    if(val) {
+			changed = categories.add(cat);
+		    } else {
+			changed = categories.remove(cat);
+		    }
+		    if(changed) {
+			CFG.DISPLAY_GOB_PATHS_FOR.set(categories);
+		    }
+		});
+		y += 25;
+	    }
+	    
+	    pack();
+	    if(asz.x < 200) {
+		resize(new Coord(200, asz.y));
+	    }
+	}
+	
+	private static String pretty(String name) {
+	    name = String.join(" ", name.split("_"));
+	    return Character.toUpperCase(name.charAt(0)) + name.substring(1).toLowerCase();
 	}
     }
 }
