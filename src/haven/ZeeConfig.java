@@ -264,6 +264,8 @@ public class ZeeConfig {
 
 
     public static void checkBeltToggleWindow(Widget wdg) {
+        if(!ZeeConfig.beltToggleEquips)
+            return;
         if(wdg.parent!=null && wdg.parent.parent!=null && wdg.parent.parent instanceof Window){
             String windowName = "";
             try {
@@ -272,13 +274,13 @@ public class ZeeConfig {
             }
             if(!equipWindowOpenedByBelt && windowName.contains("Belt")){
                 windowEquipment.show();
-                equipWindowOpenedByBelt = true;
+                if(windowEquipment.visible)
+                    equipWindowOpenedByBelt = false;
+                else
+                    equipWindowOpenedByBelt = false;
             }
-        }else if(wdg.parent!=null && wdg.parent instanceof GameUI){
-            if(equipWindowOpenedByBelt){
+        }else if(equipWindowOpenedByBelt && wdg.parent!=null && wdg.parent instanceof GameUI){
                 windowEquipment.hide();
-                equipWindowOpenedByBelt = false;
-            }
         }
     }
 

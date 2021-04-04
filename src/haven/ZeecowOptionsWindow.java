@@ -118,7 +118,7 @@ public class ZeecowOptionsWindow extends JFrame {
             Utils.setprefb("equiporyCompact",val);
         });
 
-        panelMisc.add(cbBeltTogglesEquips = new JCheckBox("Belt toggles equips window"));
+        panelMisc.add(cbBeltTogglesEquips = new JCheckBox("Belt toggles equips window(buggy)"));
         cbBeltTogglesEquips.setSelected(ZeeConfig.beltToggleEquips);
         cbBeltTogglesEquips.addActionListener(actionEvent -> {
             JCheckBox cb = (JCheckBox) actionEvent.getSource();
