@@ -70,8 +70,7 @@ public class PathVisualizer implements RenderTree.Node {
 	if(gob.isMe()) {
 	    return PathCategory.ME;
 	} else if(gob.is(GobTag.PLAYER)) {
-	    //TODO: differentiate between friends and foes here
-	    return PathCategory.FOE;
+	    return KinInfo.isFoe(gob) ? PathCategory.FOE : PathCategory.FRIEND;
 	} else {
 	    return PathCategory.DEFAULT;
 	}
@@ -152,7 +151,9 @@ public class PathVisualizer implements RenderTree.Node {
 		model = new Model(Model.Mode.LINES, va, null);
 	    }
 	    synchronized (slots) {
-		slots.forEach(RenderTree.Slot::update);
+		try {
+		    slots.forEach(RenderTree.Slot::update);
+		} catch (Exception ignored) {}
 	    }
 	}
 	
