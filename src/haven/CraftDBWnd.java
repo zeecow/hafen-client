@@ -256,6 +256,10 @@ public class CraftDBWnd extends Window implements DTarget2 {
     }
     
     private void toggleFavourite() {
+	if(current == null) {
+	    btnFavourite.state(false);
+	    return;
+	}
 	if(Favourites.items.contains(current)) {
 	    removeFromFavourites(current);
 	} else {
