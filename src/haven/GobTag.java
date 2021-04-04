@@ -14,7 +14,7 @@ public enum GobTag {
     PIG, SOW, HOG, PIGLET,
     SHEEP, EWE, RAM, LAMB,
     
-    PLAYER, FRIEND, FOE,
+    PLAYER, ME, FRIEND, FOE,
     
     MENU, PICKUP;
     
@@ -57,6 +57,11 @@ public enum GobTag {
                 tags.add(HERB);
             } else if(name.startsWith("gfx/borka/body")) {
                 tags.add(PLAYER);
+                if(gob.isMe()) {
+                    tags.add(ME);
+                } else {
+                    tags.add(KinInfo.isFoe(gob) ? FOE : FRIEND);
+                }
             } else if(name.startsWith("gfx/kritter/")) {
                 if(domesticated(gob, name, tags)) {
                     tags.add(ANIMAL);

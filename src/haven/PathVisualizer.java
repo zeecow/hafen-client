@@ -73,7 +73,7 @@ public class PathVisualizer implements RenderTree.Node {
     
     private PathCategory categorize(Moving m) {
 	Gob gob = m.gob;
-	if(gob.isMe()) {
+	if(gob.is(GobTag.ME)) {
 	    return PathCategory.ME;
 	} else if(gob.is(GobTag.PLAYER)) {
 	    return KinInfo.isFoe(gob) ? PathCategory.FOE : PathCategory.FRIEND;

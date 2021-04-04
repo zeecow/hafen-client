@@ -251,6 +251,8 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Sk
 	updstate();
 	if(virtual && ols.isEmpty() && (getattr(Drawable.class) == null))
 	    glob.oc.remove(this);
+    
+	isMe();
     }
 
     public void gtick(Render g) {
@@ -389,6 +391,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Sk
 		return false;
 	    } else {
 		isMe = id == glob.sess.ui.gui.map.plgob;
+		updateTags();
 	    }
 	}
 	return isMe;
@@ -461,6 +464,8 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Sk
 		prev.dispose();
 	    if(ac == Drawable.class) {
 		if(a != prev) drawableUpdated();
+	    } else if(ac == KinInfo.class) {
+		updateTags();
 	    } else if(ac == GobHealth.class) {
 		GeneralGobInfo info = getattr(GeneralGobInfo.class);
 		if(info != null) {
