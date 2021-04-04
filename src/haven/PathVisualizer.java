@@ -36,25 +36,30 @@ public class PathVisualizer implements RenderTree.Node {
     private void update() {
 	Set<Moving> tmoves;
 	synchronized (moves) { tmoves = new HashSet<>(moves); }
-	Map<PathCategory, Set<Moving>> categorized = new HashMap<>();
+	Map<PathCategory, List<Pair<Coord3f, Coord3f>>> categorized = new HashMap<>();
  
 	for (Moving m : tmoves) {
 	    PathCategory category = categorize(m);
 	    if(!categorized.containsKey(category)) {
-		categorized.put(category, new HashSet<>());
+		categorized.put(category, new LinkedList<>());
 	    }
-	    categorized.get(category).add(m);
+	    try {
+		categorized.get(category).add(new Pair<>(
+		    m.getc(),
+		    m.gett()
+		));
+	    } catch (Loading ignored) {}
 	}
  
 	for (PathCategory cat : PathCategory.values()) {
-	    Set<Moving> moveset = categorized.get(cat);
+	    List<Pair<Coord3f, Coord3f>> lines = categorized.get(cat);
 	    MovingPath path = paths.get(cat);
-	    if(moveset == null || moveset.isEmpty()) {
+	    if(lines == null || lines.isEmpty()) {
 		if(path != null) {
 		    path.update(null);
 		}
 	    } else {
-		path.update(moveset);
+		path.update(lines);
 	    }
 	}
     
@@ -127,34 +132,23 @@ public class PathVisualizer implements RenderTree.Node {
 	public void removed(RenderTree.Slot slot) {
 	    synchronized (slots) {slots.remove(slot);}
 	}
-	
+ 
 	@Override
 	public void draw(Pipe context, Render out) {
 	    if(model != null) {
 		out.draw(context, model);
 	    }
 	}
-	
-	public void update(Set<Moving> moves) {
-	    //TODO: make this method accept list of lines instead of list of Movings
-	    if(moves == null || moves.isEmpty()) {
+ 
+	public void update(List<Pair<Coord3f, Coord3f>> lines) {
+	    if(lines == null || lines.isEmpty()) {
 		model = null;
 	    } else {
-		List<Pair<Coord3f, Coord3f>> lines = new LinkedList<>();
-		for (Moving m : moves) {
-		    try {
-			lines.add(new Pair<>(
-			    m.getc(),
-			    m.gett()
-			));
-		    } catch (Loading ignored) {}
-		}
-		
 		float[] data = convert(lines);
-		
+	 
 		VertexArray.Buffer vbo = new VertexArray.Buffer(data.length * 4, DataBuffer.Usage.STATIC, DataBuffer.Filler.of(data));
 		VertexArray va = new VertexArray(LAYOUT, vbo);
-		
+	 
 		model = new Model(Model.Mode.LINES, va, null);
 	    }
 	    synchronized (slots) {
