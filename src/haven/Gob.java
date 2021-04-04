@@ -51,12 +51,13 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Sk
     private GobDamageInfo damage;
     private Hitbox hitbox;
     private Boolean isMe = null;
+    private GobWarning warning = null;
     public static final ChangeCallback CHANGED = new ChangeCallback() {
 	@Override
 	public void added(Gob ob) {
 	
 	}
-    
+ 
 	@Override
 	public void removed(Gob ob) {
 	    ob.dispose();
@@ -943,6 +944,17 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Sk
 	synchronized (this.tags) {
 	    this.tags.clear();
 	    this.tags.addAll(tags);
+	}
+	updateWarnings();
+    }
+    
+    private void updateWarnings() {
+	if(!anyOf(GobTag.AGGRESSIVE, GobTag.FOE)) {
+	    warning = null;
+	    delattr(GobWarning.class);
+	} else if(warning == null) {
+	    warning = new GobWarning(this);
+	    setattr(warning);
 	}
     }
     

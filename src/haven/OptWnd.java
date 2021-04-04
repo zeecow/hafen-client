@@ -776,7 +776,19 @@ public class OptWnd extends Window {
 	}, x, y);
     
 	y += UI.scale(35);
-	general.add(new Button(UI.scale(150), "Toggle at login") {
+	general.add(new Button(UI.scale(150), "Warning settings", false) {
+	    @Override
+	    public void click() {
+		if(ui.gui != null) {
+		    GobWarning.WarnCFGWnd.toggle(ui.gui);
+		} else {
+		    GobWarning.WarnCFGWnd.toggle(ui.root);
+		}
+	    }
+	}, x, y);
+ 
+	y += STEP;
+	general.add(new Button(UI.scale(150), "Toggle at login", false) {
 	    @Override
 	    public void click() {
 		if(ui.gui != null) {

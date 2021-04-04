@@ -44,7 +44,8 @@ public class CFG<T> {
     public static final CFG<Boolean> MMAP_SHOW_BIOMES = new CFG<>("ui.mmap_biomes", true);
     public static final CFG<Boolean> MENU_SINGLE_CTRL_CLICK = new CFG<>("ui.menu_single_ctrl_click", true);
     public static final CFG<Boolean> MENU_ADD_PICK_ALL = new CFG<>("ui.menu_add_pick_all", false);
-
+    
+    public static final CFG<GobWarning.WarnCFG> WARN_CONFIG = new CFG<>("general.warning", GobWarning.DEFAULT);
     public static final CFG<Boolean> REAL_TIME_CURIO = new CFG<>("ui.real_time_curio", false);
     public static final CFG<Boolean> SHOW_CURIO_LPH = new CFG<>("ui.show_curio_lph", false);
     public static final CFG<Boolean> SHOW_ITEM_DURABILITY = new CFG<>("ui.item_durability", false);
@@ -73,7 +74,7 @@ public class CFG<T> {
     private static final String CONFIG_JSON = "config.json";
     private static final Map<Object, Object> cfg;
     private static final Map<String, Object> cache = new HashMap<>();
-    private static final Gson gson;
+    public static final Gson gson;
     private final String path;
     public final T def;
     private List<Observer<T>> observers = new LinkedList<>();
