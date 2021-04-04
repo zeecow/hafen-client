@@ -50,7 +50,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Sk
     private final Object removalLock = new Object();
     private GobDamageInfo damage;
     private Hitbox hitbox;
-    private Boolean isPlayer = null;
+    private Boolean isMe = null;
     public static final ChangeCallback CHANGED = new ChangeCallback() {
 	@Override
 	public void added(Gob ob) {
@@ -375,7 +375,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Sk
 	Moving m = getattr(Moving.class);
 	if(m != null)
 	    m.move(c);
-	if(isPlayer() && CFG.AUTOMAP_TRACK.get()) {
+	if(isMe() && CFG.AUTOMAP_TRACK.get()) {
 	    MappingClient.getInstance().CheckGridCoord(c);
 	    MappingClient.getInstance().Track(id, c);
 	}
@@ -383,15 +383,15 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Sk
 	this.a = a;
     }
     
-    public boolean isPlayer() {
-	if(isPlayer == null) {
+    public boolean isMe() {
+	if(isMe == null) {
 	    if(glob.sess == null || glob.sess.ui == null || glob.sess.ui.gui == null || glob.sess.ui.gui.map == null) {
 		return false;
 	    } else {
-		isPlayer = id == glob.sess.ui.gui.map.plgob;
+		isMe = id == glob.sess.ui.gui.map.plgob;
 	    }
 	}
-	return isPlayer;
+	return isMe;
     }
 
     public Coord3f getc() {
