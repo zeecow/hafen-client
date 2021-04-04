@@ -428,7 +428,7 @@ public class OptWnd extends Window {
 
 	    public void set(KeyMatch key) {
 		super.set(key);
-		cmd.set(key);
+		cmd.set(KeyMatch2.from(key));
 	    }
 
 	    public void draw(GOut g) {
