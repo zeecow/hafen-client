@@ -1,4 +1,5 @@
 $size[14]{$u{Update for 04.04.21:}
+  * added integration with auto mapping servers. Configure in Options->Mapping settings.
   * fixed widget shortcuts not working in same session they were re-bound
   * fixed couple crashes related to fvourites in Extended Craft window
  
