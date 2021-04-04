@@ -164,10 +164,6 @@ public class PathVisualizer implements RenderTree.Node {
     
     }
     
-    private static final Pipe.Op TOP = Pipe.Op.compose(Rendered.last, States.Depthtest.none, States.maskdepth);
-    private static final float LINE_WIDTH = 1.5f;
-    private static final Pipe.Op BASE = new States.LineWidth(LINE_WIDTH);
-    
     public enum PathCategory {
 	ME(new Color(118, 254, 196, 255), true),
 	FRIEND(new Color(109, 245, 251, 255)),
@@ -179,11 +175,11 @@ public class PathVisualizer implements RenderTree.Node {
 	private final Pipe.Op state;
 	
 	PathCategory(Color col, boolean top) {
-	    if(top) {
-		state = Pipe.Op.compose(BASE, TOP, new BaseColor(col));
-	    } else {
-		state = Pipe.Op.compose(BASE, new BaseColor(col));
-	    }
+	    state = Pipe.Op.compose(
+		new BaseColor(col),
+		new States.LineWidth(1.5f),
+		top ? Pipe.Op.compose(Rendered.last, States.Depthtest.none, States.maskdepth) : null
+	    );
 	}
 	
 	PathCategory(Color col) {
