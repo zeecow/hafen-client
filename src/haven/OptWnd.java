@@ -33,7 +33,7 @@ import java.awt.event.KeyEvent;
 public class OptWnd extends Window {
     public static final Coord PANEL_POS = new Coord(220, 30);
     public static final Coord Q_TYPE_PADDING = new Coord(3, 0);
-    private final Panel display, general, camera, shortcuts;
+    private final Panel display, general, camera, shortcuts, mapping;
     public final Panel main, video, audio, keybind;
     public Panel current;
     private WidgetList<KeyBinder.ShortcutWidget> shortcutList;
@@ -576,6 +576,7 @@ public class OptWnd extends Window {
 	general = add(new Panel());
 	camera = add(new Panel());
 	shortcuts = add(new Panel());
+	mapping = add(new Panel());
 
 	addPanelButton("Video settings", 'v', video, 0, 0);
 	addPanelButton("Audio settings", 'a', audio, 0, 1);
@@ -586,6 +587,7 @@ public class OptWnd extends Window {
 	addPanelButton("Display settings", 'd', display, 1, 1);
 	addPanelButton("Radar settings", 'r', Action.TOGGLE_MINIMAP_ICONS_SETTINGS, 1, 2);
 	addPanelButton("Global shortcuts", 's', shortcuts, 1, 3);
+	addPanelButton("Mapping settings", 'm', mapping, 1, 4);
 
 	int y = 0;
 	Widget prev;
@@ -639,6 +641,7 @@ public class OptWnd extends Window {
 	initDisplayPanel();
 	initGeneralPanel();
 	initCameraPanel();
+	initMappingPanel();
 	main.pack();
 	chpanel(main);
     }
@@ -997,6 +1000,36 @@ public class OptWnd extends Window {
 	shortcuts.pack();
 	shortcuts.add(new PButton(UI.scale(200), "Back", 27, main), shortcuts.sz.x / 2 - 100, shortcuts.sz.y + 35);
 	shortcuts.pack();
+    }
+    
+    private void initMappingPanel() {
+	int x = 0, y = 0;
+	int STEP = UI.scale(25);
+	
+	mapping.add(new CFGBox("Upload enabled", CFG.AUTOMAP_UPLOAD), x, y);
+	y += STEP;
+	
+	mapping.add(new CFGBox("Tracking enabled", CFG.AUTOMAP_TRACK), x, y);
+	y += STEP;
+	
+	mapping.add(new Label("Mapping URL:"), x, y);
+	y += STEP;
+	
+	mapping.add(new TextEntry(UI.scale(250), CFG.AUTOMAP_ENDPOINT.get()) {
+	    @Override
+	    public boolean keydown(KeyEvent ev) {
+		if(!parent.visible)
+		    return false;
+		CFG.AUTOMAP_ENDPOINT.set(text);
+		return buf.key(ev);
+	    }
+	}, x, y);
+	
+	y += STEP;
+	
+	mapping.add(new PButton(UI.scale(200), "Back", 27, main), x, y);
+	
+	mapping.pack();
     }
     
     public OptWnd() {

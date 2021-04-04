@@ -29,6 +29,8 @@ package haven;
 import java.util.*;
 import java.util.function.*;
 import haven.render.*;
+import integrations.mapv4.MappingClient;
+
 import static haven.OCache.*;
 
 public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Skeleton.HasPose {
@@ -48,6 +50,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Sk
     private final Object removalLock = new Object();
     private GobDamageInfo damage;
     private Hitbox hitbox;
+    private Boolean isMe = null;
     public static final ChangeCallback CHANGED = new ChangeCallback() {
 	@Override
 	public void added(Gob ob) {
@@ -372,8 +375,23 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Sk
 	Moving m = getattr(Moving.class);
 	if(m != null)
 	    m.move(c);
+	if(isMe() && CFG.AUTOMAP_TRACK.get()) {
+	    MappingClient.getInstance().CheckGridCoord(c);
+	    MappingClient.getInstance().Track(id, c);
+	}
 	this.rc = c;
 	this.a = a;
+    }
+    
+    public boolean isMe() {
+	if(isMe == null) {
+	    if(glob.sess == null || glob.sess.ui == null || glob.sess.ui.gui == null || glob.sess.ui.gui.map == null) {
+		return false;
+	    } else {
+		isMe = id == glob.sess.ui.gui.map.plgob;
+	    }
+	}
+	return isMe;
     }
 
     public Coord3f getc() {

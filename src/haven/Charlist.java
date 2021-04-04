@@ -163,6 +163,7 @@ public class Charlist extends Widget {
 		    if(sender == c.plb) {
 			wdgmsg("play", c.name);
 			Config.setPlayerName(c.name);
+			Config.initAutomapper(ui);
 		    }
 		}
 	    }
