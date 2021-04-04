@@ -94,18 +94,14 @@ public class PathVisualizer implements RenderTree.Node {
     }
     
     public void addPath(Moving moving) {
-	synchronized (moves) {
-	    moves.add(moving);
-	    update();
-	}
+	synchronized (moves) { moves.add(moving); }
+	update();
     }
     
     
     public void removePath(Moving moving) {
-	synchronized (moves) {
-	    moves.remove(moving);
-	    update();
-	}
+	synchronized (moves) { moves.remove(moving); }
+	update();
     }
     
     public void tick(double dt) {
@@ -144,19 +140,20 @@ public class PathVisualizer implements RenderTree.Node {
 		model = null;
 	    } else {
 		float[] data = convert(lines);
-	 
+		
 		VertexArray.Buffer vbo = new VertexArray.Buffer(data.length * 4, DataBuffer.Usage.STATIC, DataBuffer.Filler.of(data));
 		VertexArray va = new VertexArray(LAYOUT, vbo);
-	 
+		
 		model = new Model(Model.Mode.LINES, va, null);
 	    }
-	    synchronized (slots) {
-		try {
-		    slots.forEach(RenderTree.Slot::update);
-		} catch (Exception ignored) {}
-	    }
+	    
+	    Collection<RenderTree.Slot> tslots;
+	    synchronized (slots) { tslots = new ArrayList<>(slots); }
+	    try {
+		tslots.forEach(RenderTree.Slot::update);
+	    } catch (Exception ignored) {}
 	}
-	
+    
     }
     
     private static final Pipe.Op TOP = Pipe.Op.compose(Rendered.last, States.Depthtest.none, States.maskdepth);
