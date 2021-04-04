@@ -141,8 +141,7 @@ public class CraftDBWnd extends Window implements DTarget2 {
     
 	box = add(new RecipeListBox(UI.scale(200), LIST_SIZE) {
 	    @Override
-	    protected void itemclick(Recipe recipe, int button) {
-		Pagina item = recipe.p;
+	    protected void itemclick(Pagina item, int button) {
 		if(button == 1) {
 		    if(item == ui.gui.menu.bk.pag) {
 			item = current;
@@ -339,7 +338,7 @@ public class CraftDBWnd extends Window implements DTarget2 {
 	    if(isBack) {
 		p = null;
 		if(box.listitems() > 1) {
-		    p = menu.getParent(box.listitem(1).p);
+		    p = menu.getParent(box.listitem(1));
 		}
 		setCurrent(p != null ? p : CRAFT);
 	    } else {
@@ -513,7 +512,7 @@ public class CraftDBWnd extends Window implements DTarget2 {
 	    box.setitems(filtered);
 	    if(filtered.isEmpty()) {
 		if(!needfilter) {closemake();}
-		box.change((Recipe) null);
+		box.change(null);
 		setCurrent(null);
 	    } else {
 		select(filtered.get(0), true, true);
@@ -535,17 +534,17 @@ public class CraftDBWnd extends Window implements DTarget2 {
 		}
 		return true;
 	    case KeyEvent.VK_DOWN:
-		select(box.listitem((box.selindex + 1) % box.listitems()).p, true, true);
+		select(box.listitem((box.selindex + 1) % box.listitems()), true, true);
 		return true;
 	    case KeyEvent.VK_UP:
-		select(box.listitem((Math.max(box.selindex, 0) - 1 + box.listitems()) % box.listitems()).p, true, true);
+		select(box.listitem((Math.max(box.selindex, 0) - 1 + box.listitems()) % box.listitems()), true, true);
 		return true;
 	    case KeyEvent.VK_ENTER:
 		if(box.sel != null) {
-		    if(!box.sel.p.isAction()) {
+		    if(!box.sel.isAction()) {
 			box.itemclick(box.sel, 1);
 		    } else if(makewnd != null) {
-		        makewnd.wdgmsg("make", ui.modctrl?1:0);
+			makewnd.wdgmsg("make", ui.modctrl ? 1 : 0);
 		    }
 		}
 		return true;
@@ -572,51 +571,22 @@ public class CraftDBWnd extends Window implements DTarget2 {
 	    || code == KeyEvent.VK_TAB;
     }
     
-    private static class Recipe {
-	public final Pagina p;
-	private Tex tex = null;
-
-	public Recipe(Pagina p) {
-	    this.p = p;
-	}
-
-	public Tex tex() {
-	    if(tex == null) {
-		Resource res = p.res();
-		if(res != null) {
-		    BufferedImage icon = PUtils.convolvedown(res.layer(Resource.imgc).img, ICON_SZ, CharWnd.iconfilter);
-
-		    Resource.AButton act = p.act();
-		    String name = "...";
-		    if(act != null) {
-			name = act.name;
-		    }
-		    BufferedImage text = Text.render(name).img;
-
-		    tex = new TexI(ItemInfo.catimgsh(3, icon, text));
-		}
-
-	    }
-	    return tex;
-	}
-    }
-
-    private static class RecipeListBox extends Listbox<Recipe> {
+    private static class RecipeListBox extends Listbox<Pagina> {
 	private static final Color BGCOLOR = new Color(0, 0, 0, 113);
 	private List<Pagina> list;
-	private List<Recipe> recipes;
-
+	private final Map<Pagina, Tex> texes = new HashMap<>();
+	
 	public RecipeListBox(int w, int h) {
 	    super(w, h, ICON_SZ.y);
 	    bgcolor = BGCOLOR;
 	}
-
+	
 	@Override
-	protected Recipe listitem(int i) {
+	protected Pagina listitem(int i) {
 	    if(list == null) {
 		return null;
 	    }
-	    return recipes.get(i);
+	    return list.get(i);
 	}
 
 	public void setitems(List<Pagina> list) {
@@ -624,31 +594,20 @@ public class CraftDBWnd extends Window implements DTarget2 {
 		return;
 	    }
 	    this.list = list;
-	    recipes = list.stream().map(Recipe::new).collect(Collectors.toList());
 	    sb.max = listitems() - h;
 	    sb.val = 0;
-	    if(!recipes.contains(sel)){
-	        selindex = -1;
+	    if(!list.contains(sel)) {
+		selindex = -1;
 	    }
 	}
 	
 	public void sort() {
-	    recipes.sort(Comparator.comparingInt(o -> this.list.indexOf(o.p)));
 	}
-
-	public void change(Pagina p) {
-	    for (Recipe r : recipes) {
-		if(r.p == p) {
-		    change(r);
-		    return;
-		}
-	    }
-	}
-
+	
 	@Override
-	public void change(Recipe item) {
+	public void change(Pagina item) {
 	    super.change(item);
-	    int k = recipes.indexOf(item);
+	    int k = list.indexOf(item);
 	    if(k >= 0) {
 		if(k < sb.val) {
 		    sb.val = k;
@@ -666,16 +625,37 @@ public class CraftDBWnd extends Window implements DTarget2 {
 	    }
 	    return list.size();
 	}
-
+	
 	@Override
-	protected void drawitem(GOut g, Recipe item, int i) {
+	protected void drawitem(GOut g, Pagina item, int i) {
 	    if(item == null) {
 		return;
 	    }
-	    Tex tex = item.tex();
+	    Tex tex = tex(item);
 	    if(tex != null) {
 		g.image(tex, Coord.z);
 	    }
+	}
+	
+	private Tex tex(Pagina p) {
+	    if(!texes.containsKey(p)) {
+		Tex tex = null;
+		Resource res = p.res();
+		if(res != null) {
+		    BufferedImage icon = PUtils.convolvedown(res.layer(Resource.imgc).img, ICON_SZ, CharWnd.iconfilter);
+		    
+		    Resource.AButton act = p.act();
+		    String name = "...";
+		    if(act != null) {
+			name = act.name;
+		    }
+		    BufferedImage text = Text.render(name).img;
+		    
+		    tex = new TexI(ItemInfo.catimgsh(3, icon, text));
+		}
+		texes.put(p, tex);
+	    }
+	    return texes.get(p);
 	}
     }
     
