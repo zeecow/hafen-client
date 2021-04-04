@@ -38,6 +38,8 @@ public class ZeeConfig {
     public static boolean showInventoryLogin = Utils.getprefb("showInventoryLogin", true);
     public static boolean showEquipsLogin = Utils.getprefb("showInventoryLogin", true);
 
+    public static String playingAudio = null;
+
 
     public final static Set<String> mineablesStone = new HashSet<String>(Arrays.asList(
             "gneiss",
@@ -122,6 +124,25 @@ public class ZeeConfig {
         "gfx/terobjs/herbs/clay-cave",
         "gfx/terobjs/herbs/mandrake",
         "gfx/terobjs/herbs/seashell"
+    ));
+    public final static Set<String> aggressiveGobs = new HashSet<String>(Arrays.asList(
+            "gfx/kritter/adder/adder",
+            "gfx/kritter/badger/badger",
+            "gfx/kritter/bat/bat",
+            "gfx/kritter/bear/bear",
+            "gfx/kritter/boar/boar",
+            "gfx/kritter/goldeneagle/goldeneagle",
+            "gfx/kritter/lynx/lynx",
+            "gfx/kritter/mammoth/mammoth",
+            "gfx/kritter/nidbane/nidbane",
+            "gfx/kritter/troll/troll",
+            "gfx/kritter/walrus/walrus",
+            "gfx/kritter/wildgoat/wildgoat",
+            "gfx/kritter/wolf/wolf",
+            "gfx/kritter/wolverine/wolverine"
+    ));
+    public final static Set<String> noIconGobs = new HashSet<String>(Arrays.asList(
+            "gfx/kritter/irrbloss/irrbloss" //irrlight
     ));
 
 
@@ -232,9 +253,9 @@ public class ZeeConfig {
             }catch(Exception e) {
                 playMidi(midiUfoThirdKind);
             }
-        }else if(name.endsWith("/adder")){
+        }else if(aggressiveGobs.contains(name)){
             try{
-                playAudio(mapCategoryAudio.get("Danger"));
+                playAudio(mapCategoryAudio.get("Agressive creatures"));
             }catch(Exception e) {
                 playMidi(midiJawsTheme);
             }
@@ -314,6 +335,7 @@ public class ZeeConfig {
         if(mapCategoryGobsString.isEmpty()) {
             mapCateGob.put("Localized resources", localizedResources.toString());
             mapCateGob.put("Rare forageables", rareForageables.toString());
+            mapCateGob.put("Agressive creatures", aggressiveGobs.toString());
         }else{
             //fill map object and return it
             String[] mapStr = mapCategoryGobsString.split("],?");
@@ -370,9 +392,13 @@ public class ZeeConfig {
     }
 
     public static void playMidi(String[] notes){
+        if(playingAudio!=null && playingAudio.contains(notes.toString()))
+            return;//avoid duplicate audio
         new ZeeSynth(notes).start();
     }
     public static void playMidi(String[] notes, int instr){
+        if(playingAudio!=null && playingAudio.contains(notes.toString()))
+            return;//avoid duplicate audio
         new ZeeSynth(notes,instr).start();
     }
 
@@ -420,6 +446,9 @@ public class ZeeConfig {
     };
 
     public static void playAudio(String filePath) {
+        if(playingAudio!=null && playingAudio.contains(filePath))
+            return;//avoid duplicate audio
+        playingAudio = filePath;
         new ZeeSynth(filePath).start();
     }
 

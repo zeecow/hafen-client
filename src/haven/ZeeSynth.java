@@ -22,6 +22,8 @@ public class ZeeSynth extends Thread{
 
     private static String[] playNotes;
 
+
+
     public ZeeSynth(String[] notess) {
         instrument = 0;//piano
         playNotes = notess;
@@ -50,18 +52,20 @@ public class ZeeSynth extends Thread{
         } catch (Exception ex) {
             ex.printStackTrace();
         }
+        finally {
+            ZeeConfig.playingAudio = null;
+        }
     }
 
     public void run() {
-
-        if(this.filePath != null){
-            player();
-            return;
-        }
-
-        String[] split;
-
         try {
+            if(this.filePath != null){
+                player();
+                return;
+            }
+            String[] split;
+
+
             Synthesizer synth = MidiSystem.getSynthesizer();
             synth.open();
             channels = synth.getChannels();
@@ -86,6 +90,9 @@ public class ZeeSynth extends Thread{
         }
         catch (Exception e) {
             throw new RuntimeException(e);
+        }
+        finally {
+            ZeeConfig.playingAudio = null;
         }
     }
 
