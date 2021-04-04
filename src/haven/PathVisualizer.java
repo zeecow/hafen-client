@@ -71,8 +71,10 @@ public class PathVisualizer implements RenderTree.Node {
 	    return PathCategory.ME;
 	} else if(gob.is(GobTag.PLAYER)) {
 	    return KinInfo.isFoe(gob) ? PathCategory.FOE : PathCategory.FRIEND;
+	} else if(gob.is(GobTag.AGGRESSIVE)) {
+	    return PathCategory.AGGRESSIVE_ANIMAL;
 	} else {
-	    return PathCategory.DEFAULT;
+	    return PathCategory.OTHER;
 	}
     }
     
@@ -157,21 +159,29 @@ public class PathVisualizer implements RenderTree.Node {
     }
     
     private static final Pipe.Op TOP = Pipe.Op.compose(Rendered.last, States.Depthtest.none, States.maskdepth);
-    private static final float LINE_WIDTH = 4f;
-    private static final Pipe.Op BASE = Pipe.Op.compose(new States.LineWidth(LINE_WIDTH), TOP);
+    private static final float LINE_WIDTH = 1.5f;
+    private static final Pipe.Op BASE = new States.LineWidth(LINE_WIDTH);
     
     private enum PathCategory {
-	ME(new Color(134, 255, 207, 255)),
-	FRIEND(new Color(134, 249, 255, 255)),
-	FOE(new Color(255, 134, 154, 255)),
-	ANIMAL_AGGRO(new Color(255, 134, 215, 255)),
-	DEFAULT(new Color(187, 187, 187, 255));
+	ME(new Color(118, 254, 196, 255), true),
+	FRIEND(new Color(109, 245, 251, 255)),
+	FOE(new Color(255, 134, 154, 255), true),
+	AGGRESSIVE_ANIMAL(new Color(255, 179, 122, 255), true),
+	OTHER(new Color(187, 187, 187, 255));
 	
 	
 	private final Pipe.Op state;
 	
+	PathCategory(Color col, boolean top) {
+	    if(top) {
+		state = Pipe.Op.compose(BASE, TOP, new BaseColor(col));
+	    } else {
+		state = Pipe.Op.compose(BASE, new BaseColor(col));
+	    }
+	}
+	
 	PathCategory(Color col) {
-	    state = Pipe.Op.compose(BASE, new BaseColor(col));
+	    this(col, false);
 	}
     }
 }
