@@ -19,7 +19,13 @@ public class ShowBuffsCfgWnd extends Window {
 	    instance = null;
 	}
     }
-
+    
+    @Override
+    public void close() {
+	super.close();
+	instance = null;
+    }
+    
     public ShowBuffsCfgWnd() {
 	super(Coord.z, "Show as buffs");
 	justclose = true;

@@ -872,7 +872,7 @@ public class OptWnd extends Window {
 	display.add(new CFGBox("Show object radius", CFG.SHOW_GOB_RADIUS, "Shows radius of mine supports, beehives etc.", true), x, y);
 
 	y += STEP;
-	display.add(new Button(UI.scale(150), "Show as buffs") {
+	display.add(new Button(UI.scale(150), "Show as buffs", false) {
 	    @Override
 	    public void click() {
 		if(ui.gui != null) {
