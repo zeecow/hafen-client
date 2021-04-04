@@ -14,6 +14,8 @@ public enum GobTag {
     PIG, SOW, HOG, PIGLET,
     SHEEP, EWE, RAM, LAMB,
     
+    PLAYER, FRIEND, FOE,
+    
     MENU, PICKUP;
     
     private static final String[] AGGRO = {
@@ -53,6 +55,8 @@ public enum GobTag {
                 tags.add(BUSH);
             } else if(name.startsWith("gfx/terobjs/herbs/")) {
                 tags.add(HERB);
+            } else if(name.startsWith("gfx/borka/body")) {
+                tags.add(PLAYER);
             } else if(name.startsWith("gfx/kritter/")) {
                 if(domesticated(gob, name, tags)) {
                     tags.add(ANIMAL);

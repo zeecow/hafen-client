@@ -61,8 +61,12 @@ public class PathVisualizer implements RenderTree.Node {
     }
     
     private PathCategory categorize(Moving m) {
-	if(m.gob.isMe()) {
+	Gob gob = m.gob;
+	if(gob.isMe()) {
 	    return PathCategory.ME;
+	} else if(gob.is(GobTag.PLAYER)) {
+	    //TODO: differentiate between friends and foes here
+	    return PathCategory.FOE;
 	} else {
 	    return PathCategory.DEFAULT;
 	}
@@ -165,8 +169,11 @@ public class PathVisualizer implements RenderTree.Node {
     private static final Pipe.Op BASE = Pipe.Op.compose(new States.LineWidth(LINE_WIDTH), TOP);
     
     private enum PathCategory {
-	DEFAULT(new Color(255, 134, 215, 255)),
-	ME(new Color(134, 249, 255, 255));
+	ME(new Color(134, 255, 207, 255)),
+	FRIEND(new Color(134, 249, 255, 255)),
+	FOE(new Color(255, 134, 154, 255)),
+	ANIMAL_AGGRO(new Color(255, 134, 215, 255)),
+	DEFAULT(new Color(187, 187, 187, 255));
 	
 	
 	private final Pipe.Op state;
