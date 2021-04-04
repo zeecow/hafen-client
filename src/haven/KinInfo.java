@@ -131,7 +131,7 @@ public class KinInfo extends GAttrib implements RenderTree.Node, PView.Render2D 
 	    KinInfo ki = gob.getattr(KinInfo.class);
 	    if(ki != null) {
 	        //mark as foe if in RED(2) group or WHITE(0) and not villager
-		return !(ki.group == 2 || ki.group == 0 && !ki.isVillager());
+		return ki.group == 2 || ki.group == 0 && !ki.isVillager();
 	    }
 	}
 	return true;
