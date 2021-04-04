@@ -34,29 +34,30 @@ public class PathVisualizer implements RenderTree.Node {
     }
     
     private void update() {
-	synchronized (moves) {
-	    Map<PathCategory, Set<Moving>> categorized = new HashMap<>();
-	    for (Moving m : moves) {
-		PathCategory category = categorize(m);
-		if(!categorized.containsKey(category)) {
-		    categorized.put(category, new HashSet<>());
-		}
-		categorized.get(category).add(m);
+	Set<Moving> tmoves;
+	synchronized (moves) { tmoves = new HashSet<>(moves); }
+	Map<PathCategory, Set<Moving>> categorized = new HashMap<>();
+ 
+	for (Moving m : tmoves) {
+	    PathCategory category = categorize(m);
+	    if(!categorized.containsKey(category)) {
+		categorized.put(category, new HashSet<>());
 	    }
-	    
-	    for (PathCategory cat : PathCategory.values()) {
-		Set<Moving> moveset = categorized.get(cat);
-		MovingPath path = paths.get(cat);
-		if(moveset == null || moveset.isEmpty()) {
-		    if(path != null) {
-			path.update(null);
-		    }
-		} else {
-		    path.update(moveset);
-		}
-	    }
-	    
+	    categorized.get(category).add(m);
 	}
+ 
+	for (PathCategory cat : PathCategory.values()) {
+	    Set<Moving> moveset = categorized.get(cat);
+	    MovingPath path = paths.get(cat);
+	    if(moveset == null || moveset.isEmpty()) {
+		if(path != null) {
+		    path.update(null);
+		}
+	    } else {
+		path.update(moveset);
+	    }
+	}
+    
     }
     
     private PathCategory categorize(Moving m) {
