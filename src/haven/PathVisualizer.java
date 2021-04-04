@@ -60,12 +60,11 @@ public class PathVisualizer implements RenderTree.Node {
     }
     
     private PathCategory categorize(Moving m) {
-	try {
-	    if(m.gob.id == m.gob.glob.sess.ui.gui.map.plgob) {
-		return PathCategory.ME;
-	    }
-	} catch (Exception ignored) {}
-	return PathCategory.DEFAULT;
+	if(m.gob.isMe()) {
+	    return PathCategory.ME;
+	} else {
+	    return PathCategory.DEFAULT;
+	}
     }
     
     private static final float Z = 1f;
