@@ -3,10 +3,7 @@ package haven;
 import haven.render.RenderTree;
 
 public class GobWarning extends GAttrib implements RenderTree.Node {
-    public static final WarnCFG DEFAULT = new WarnCFG(
-	new WarnVO(false, true),
-	new WarnVO(true, false)
-    );
+    public static final WarnCFG DEFAULT = new WarnCFG();
     
     private final ColoredRadius radius;
     private final WarnVO cfg;
@@ -53,6 +50,10 @@ public class GobWarning extends GAttrib implements RenderTree.Node {
 	public WarnVO player;
 	public WarnVO animal;
 	
+	public WarnCFG() {
+	    player = new WarnVO();
+	    animal = new WarnVO();
+	}
 	public WarnCFG(WarnVO p, WarnVO a) {
 	    player = p;
 	    animal = a;
