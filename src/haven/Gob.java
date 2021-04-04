@@ -252,7 +252,12 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Sk
 	if(virtual && ols.isEmpty() && (getattr(Drawable.class) == null))
 	    glob.oc.remove(this);
     
-	isMe();
+	if(isMe == null) {
+	    isMe();
+	    if(isMe != null) {
+		updateTags();
+	    }
+	}
     }
 
     public void gtick(Render g) {
@@ -377,7 +382,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Sk
 	Moving m = getattr(Moving.class);
 	if(m != null)
 	    m.move(c);
-	if(isMe() && CFG.AUTOMAP_TRACK.get()) {
+	if(Boolean.TRUE.equals(isMe()) && CFG.AUTOMAP_TRACK.get()) {
 	    MappingClient.getInstance().CheckGridCoord(c);
 	    MappingClient.getInstance().Track(id, c);
 	}
@@ -385,13 +390,12 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Sk
 	this.a = a;
     }
     
-    public boolean isMe() {
+    public Boolean isMe() {
 	if(isMe == null) {
-	    if(glob.sess == null || glob.sess.ui == null || glob.sess.ui.gui == null || glob.sess.ui.gui.map == null) {
-		return false;
+	    if(glob.sess.ui.gui == null || glob.sess.ui.gui.map == null) {
+		return null;
 	    } else {
 		isMe = id == glob.sess.ui.gui.map.plgob;
-		updateTags();
 	    }
 	}
 	return isMe;
@@ -934,10 +938,11 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Sk
     
     private final Set<GobTag> tags = new HashSet<>();
     
-    private void updateTags() {
-	synchronized (tags) {
-	    tags.clear();
-	    tags.addAll(GobTag.tags(this));
+    public void updateTags() {
+	Set<GobTag> tags = GobTag.tags(this);
+	synchronized (this.tags) {
+	    this.tags.clear();
+	    this.tags.addAll(tags);
 	}
     }
     

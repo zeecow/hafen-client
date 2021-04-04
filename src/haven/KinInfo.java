@@ -51,6 +51,7 @@ public class KinInfo extends GAttrib implements RenderTree.Node, PView.Render2D 
 	this.group = group;
 	this.type = type;
 	rnm = null;
+	gob.updateTags();
     }
     
     public Tex rendered() {

@@ -57,10 +57,13 @@ public enum GobTag {
                 tags.add(HERB);
             } else if(name.startsWith("gfx/borka/body")) {
                 tags.add(PLAYER);
-                if(gob.isMe()) {
-                    tags.add(ME);
-                } else {
-                    tags.add(KinInfo.isFoe(gob) ? FOE : FRIEND);
+                Boolean me = gob.isMe();
+                if(me != null) {
+                    if(me) {
+                        tags.add(ME);
+                    } else {
+                        tags.add(KinInfo.isFoe(gob) ? FOE : FRIEND);
+                    }
                 }
             } else if(name.startsWith("gfx/kritter/")) {
                 if(domesticated(gob, name, tags)) {
