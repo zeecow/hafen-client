@@ -1,3 +1,7 @@
+$size[14]{$u{Update for 05.04.21:}
+  * added option to display movement paths. Configured in Options->Display->Draw gob paths
+  * added option to highlight and warn about dangerous players and animals. Configured in Options->General->Warning settings 
+   
 $size[14]{$u{Update for 04.04.21:}
   * added integration with auto mapping servers. Configure in Options->Mapping settings.
   * fixed widget shortcuts not working in same session they were re-bound
