@@ -45,7 +45,7 @@ public class CFG<T> {
     public static final CFG<Boolean> MENU_SINGLE_CTRL_CLICK = new CFG<>("ui.menu_single_ctrl_click", true);
     public static final CFG<Boolean> MENU_ADD_PICK_ALL = new CFG<>("ui.menu_add_pick_all", false);
     
-    public static final CFG<GobWarning.WarnCFG> WARN_CONFIG = new CFG<>("general.warning", GobWarning.DEFAULT);
+    public static final CFG<Map<String, Map<String, Boolean>>> WARN_CONFIG = new CFG<>("general.warning", new HashMap<>());
     public static final CFG<Boolean> REAL_TIME_CURIO = new CFG<>("ui.real_time_curio", false);
     public static final CFG<Boolean> SHOW_CURIO_LPH = new CFG<>("ui.show_curio_lph", false);
     public static final CFG<Boolean> SHOW_ITEM_DURABILITY = new CFG<>("ui.item_durability", false);

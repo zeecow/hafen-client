@@ -2,25 +2,29 @@ package haven;
 
 import haven.render.RenderTree;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import static haven.GobWarning.WarnMethod.*;
+import static haven.GobWarning.WarnTarget.*;
+
 public class GobWarning extends GAttrib implements RenderTree.Node {
-    public static final WarnCFG DEFAULT = new WarnCFG();
-    
     private final ColoredRadius radius;
-    private final WarnVO cfg;
+    private final WarnTarget tgt;
     
     public GobWarning(Gob gob) {
 	super(gob);
 	String what = "Danger";
 	if(gob.is(GobTag.FOE)) {
-	    cfg = CFG.WARN_CONFIG.get().player;
+	    tgt = player;
 	    what = "Player";
 	} else if(gob.is(GobTag.AGGRESSIVE)) {
-	    cfg = CFG.WARN_CONFIG.get().animal;
+	    tgt = animal;
 	    what = "Dangerous animal";
 	} else {
-	    cfg = new WarnVO();
+	    tgt = null;
 	}
-	if(cfg.message) {
+	if(WarnCFG.get(tgt, message)) {
 	    gob.glob.sess.ui.message(String.format("%s spotted!", what), GameUI.MsgType.ERROR);
 	}
 	radius = new ColoredRadius(gob, 50);
@@ -29,34 +33,34 @@ public class GobWarning extends GAttrib implements RenderTree.Node {
     @Override
     public void added(RenderTree.Slot slot) {
 	super.added(slot);
-	if(cfg.highlight) {slot.add(radius);}
+	if(WarnCFG.get(tgt, highlight)) {slot.add(radius);}
     }
     
-    public static class WarnVO {
-	public boolean highlight;
-	public boolean message;
-	
-	public WarnVO() {
-	    this(false, false);
-	}
-	
-	public WarnVO(boolean h, boolean m) {
-	    highlight = h;
-	    message = m;
-	}
+    public enum WarnTarget {
+	player, animal
     }
     
-    public static class WarnCFG {
-	public WarnVO player;
-	public WarnVO animal;
+    public enum WarnMethod {
+	highlight, message
+    }
+    
+    private static class WarnCFG {
 	
-	public WarnCFG() {
-	    player = new WarnVO();
-	    animal = new WarnVO();
+	static boolean get(WarnTarget target, WarnMethod method) {
+	    if(target != null) {
+		Map<String, Boolean> cfg = CFG.WARN_CONFIG.get().getOrDefault(target.name(), new HashMap<>());
+		return cfg.getOrDefault(method.name(), false);
+	    }
+	    return false;
 	}
-	public WarnCFG(WarnVO p, WarnVO a) {
-	    player = p;
-	    animal = a;
+	
+	static void set(WarnTarget target, WarnMethod method, boolean value) {
+	    Map<String, Map<String, Boolean>> cfg = CFG.WARN_CONFIG.get();
+	    Map<String, Boolean> tcfg = cfg.getOrDefault(target.name(), new HashMap<>());
+	    tcfg.put(method.name(), value);
+	    cfg.put(target.name(), tcfg);
+	    CFG.WARN_CONFIG.set(cfg);
+	    
 	}
     }
     
@@ -88,39 +92,26 @@ public class GobWarning extends GAttrib implements RenderTree.Node {
 	    super(Coord.z, "Warn settings");
 	    justclose = true;
 	    int y = 0;
-	    WarnCFG cfg = CFG.WARN_CONFIG.get();
 	    
 	    //TODO: Make this pretty
 	    CheckBox box = add(new CheckBox("Highlight players", false), 0, y);
-	    box.a = cfg.player.highlight;
-	    box.changed(val -> {
-		cfg.player.highlight = val;
-		CFG.WARN_CONFIG.set(cfg);
-	    });
+	    box.a = WarnCFG.get(player, highlight);
+	    box.changed(val -> WarnCFG.set(player, highlight, val));
 	    y += 25;
 	    
 	    box = add(new CheckBox("Warn about players", false), 0, y);
-	    box.a = cfg.player.message;
-	    box.changed(val -> {
-		cfg.player.message = val;
-		CFG.WARN_CONFIG.set(cfg);
-	    });
+	    box.a = WarnCFG.get(player, message);
+	    box.changed(val -> WarnCFG.set(player, message, val));
 	    y += 35;
 	    
 	    box = add(new CheckBox("Highlight animals", false), 0, y);
-	    box.a = cfg.animal.highlight;
-	    box.changed(val -> {
-		cfg.animal.highlight = val;
-		CFG.WARN_CONFIG.set(cfg);
-	    });
+	    box.a = WarnCFG.get(WarnTarget.animal, highlight);
+	    box.changed(val -> WarnCFG.set(animal, highlight, val));
 	    y += 25;
 	    
 	    box = add(new CheckBox("Warn about animals", false), 0, y);
-	    box.a = cfg.animal.message;
-	    box.changed(val -> {
-		cfg.animal.message = val;
-		CFG.WARN_CONFIG.set(cfg);
-	    });
+	    box.a = WarnCFG.get(WarnTarget.animal, message);
+	    box.changed(val -> WarnCFG.set(animal, message, val));
 	    
 	    pack();
 	    if(asz.x < 200) {
