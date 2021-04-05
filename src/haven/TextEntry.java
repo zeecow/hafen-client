@@ -175,15 +175,16 @@ public class TextEntry extends SIWidget {
     }
 
     public boolean mousedown(Coord c, int button) {
-	parent.setfocus(this);
 	if(tcache != null) {
 	    buf.point = tcache.charat(c.x + sx);
 	}
+	parent.setfocus(this);
 	return(true);
     }
 
     public void gotfocus() {
 	focusstart = Utils.rtime();
+	super.gotfocus();
     }
 
     public void resize(int w) {
