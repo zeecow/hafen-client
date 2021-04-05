@@ -144,7 +144,12 @@
   </target>
   
   <target name="clean">
-    <delete dir="build" />
+    <delete dir="resources/classes" />
+    <delete dir="resources/compiled" />
+    <delete dir="build/classes" />
+    <delete dir="build/classes-lib" />
+    <delete file="build/client-res.jar" />
+    <delete file="build/hafen.jar" />
   </target>
   
   <target name="profile" depends="jars">
