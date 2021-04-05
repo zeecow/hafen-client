@@ -218,6 +218,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Sk
 	    addDmg();
 	}
 	setattr(new GeneralGobInfo(this));
+	updwait(this::drawableUpdated, waiting -> {});
     }
 
     public Gob(Glob glob, Coord2d c) {
@@ -904,12 +905,14 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Sk
     }
     
     public void drawableUpdated() {
+	if(updateseq == 0) {return;}
 	updateTags();
 	updateHitbox();
 	updateTreeVisibility();
     }
     
     public void updateHitbox() {
+	if(updateseq == 0) {return;}
 	Boolean hitboxEnabled = CFG.DISPLAY_GOB_HITBOX.get();
 	if(hitboxEnabled) {
 	    if(hitbox != null) {
@@ -925,6 +928,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Sk
     }
     
     public void updateTreeVisibility() {
+	if(updateseq == 0) {return;}
 	if(anyOf(GobTag.TREE, GobTag.BUSH)) {
 	    Drawable d = getattr(Drawable.class);
 	    Boolean needHide = CFG.HIDE_TREES.get();
@@ -940,6 +944,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Sk
     private final Set<GobTag> tags = new HashSet<>();
     
     public void updateTags() {
+	if(updateseq == 0) {return;}
 	Set<GobTag> tags = GobTag.tags(this);
 	synchronized (this.tags) {
 	    this.tags.clear();
@@ -949,6 +954,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Sk
     }
     
     private void updateWarnings() {
+	if(updateseq == 0) {return;}
 	if(!anyOf(GobTag.AGGRESSIVE, GobTag.FOE)) {
 	    warning = null;
 	    delattr(GobWarning.class);
