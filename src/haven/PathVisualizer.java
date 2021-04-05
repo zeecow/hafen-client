@@ -103,13 +103,11 @@ public class PathVisualizer implements RenderTree.Node {
     
     public void addPath(Moving moving) {
 	synchronized (moves) { moves.add(moving); }
-	update();
     }
     
     
     public void removePath(Moving moving) {
 	synchronized (moves) { moves.remove(moving); }
-	update();
     }
     
     public void tick(double dt) {
