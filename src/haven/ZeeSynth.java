@@ -10,28 +10,29 @@ import javax.sound.midi.MidiChannel;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
+import javax.sound.sampled.FloatControl;
 
 public class ZeeSynth extends Thread{
 
-    private static List<String> notes = Arrays.asList("C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B");
-    private static MidiChannel[] channels;
-    private static int volume = 80; // between 0 et 127
-    private static int instrument; // 0 piano, 9 percussion
+    private static List<String> midiNotes = Arrays.asList("C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B");
+    private static MidiChannel[] midiChannels;
+    private static int midiVolume = 80; // between 0 et 127
+    private static int midiInstrument; // 0 piano, 9 percussion
+    int midiLastVolume = -1;
+    private static String[] midiPlayNotes;
+
     private String filePath = null;
-    int lastVolume = -1;
-
-    private static String[] playNotes;
-
-
+    public static float volumeFile = 1.0F;
+    private Clip clip;
 
     public ZeeSynth(String[] notess) {
-        instrument = 0;//piano
-        playNotes = notess;
+        midiInstrument = 0;//piano
+        midiPlayNotes = notess;
     }
 
-    public ZeeSynth(String[] notes, int instr) {
-        instrument = instr;
-        playNotes = notes;
+    public ZeeSynth(String[] midiNotes, int instr) {
+        midiInstrument = instr;
+        midiPlayNotes = midiNotes;
     }
 
     public ZeeSynth(String filePath) {
@@ -40,12 +41,13 @@ public class ZeeSynth extends Thread{
 
     private void player(){
         //AIFC, AIFF, AU, SND, and WAVE
-        // convert at https://cloudconvert.com/
         try {
+            volumeFile = Float.parseFloat(Utils.getpref("sfxvol", "1.0"));
             File audio = new File(filePath).getCanonicalFile();
             AudioInputStream stream = AudioSystem.getAudioInputStream(audio);
-            Clip clip = AudioSystem.getClip();
+            clip = AudioSystem.getClip();
             clip.open(stream);
+            setVolume(volumeFile);
             synchronized (clip){
                 clip.start();
             }
@@ -59,29 +61,31 @@ public class ZeeSynth extends Thread{
 
     public void run() {
         try {
+
+            //play file
             if(this.filePath != null){
                 player();
                 return;
             }
+
+            //do midi
             String[] split;
-
-
             Synthesizer synth = MidiSystem.getSynthesizer();
             synth.open();
-            channels = synth.getChannels();
+            midiChannels = synth.getChannels();
 
-            for (String s: playNotes){
+            for (String s: midiPlayNotes){
                 split = s.split(",");
                 if(split.length==1) {
                     rest(Integer.parseInt(split[0]));
                 }else if(split.length==2){
-                    if(lastVolume<0){
-                        lastVolume = volume;
+                    if(midiLastVolume <0){
+                        midiLastVolume = midiVolume;
                     }
-                    play(split[0], Integer.parseInt(split[1]), lastVolume);
+                    play(split[0], Integer.parseInt(split[1]), midiLastVolume);
                 }else if(split.length==3){
-                    lastVolume = Integer.parseInt(split[2]);
-                    play(split[0], Integer.parseInt(split[1]), lastVolume);
+                    midiLastVolume = Integer.parseInt(split[2]);
+                    play(split[0], Integer.parseInt(split[1]), midiLastVolume);
                 }else
                     System.out.println("ZeeSynth empty notes");
             }
@@ -96,15 +100,27 @@ public class ZeeSynth extends Thread{
         }
     }
 
+    public float getVolume() {
+        FloatControl gainControl = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
+        return (float) Math.pow(10f, gainControl.getValue() / 20f);
+    }
+
+    public void setVolume(float volume) {
+        if (volume < 0f || volume > 1f)
+            throw new IllegalArgumentException("Volume not valid: " + volume);
+        FloatControl gainControl = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
+        gainControl.setValue(20f * (float) Math.log10(volume));
+    }
+
     /*
         "2F#,500,100",
         "2G,250,120",
      */
     private static void play(String note, int duration, int volume) throws InterruptedException
     {
-        channels[instrument].noteOn(getMidiNoteId(note), volume );
+        midiChannels[midiInstrument].noteOn(getMidiNoteId(note), volume );
         Thread.sleep( duration );
-        channels[instrument].noteOff(getMidiNoteId(note));
+        midiChannels[midiInstrument].noteOff(getMidiNoteId(note));
     }
 
     private static void rest(int duration) throws InterruptedException
@@ -115,6 +131,6 @@ public class ZeeSynth extends Thread{
     private static int getMidiNoteId(String note)
     {
         int octave = Integer.parseInt(note.substring(0, 1));
-        return notes.indexOf(note.substring(1)) + 12 * octave + 12;
+        return midiNotes.indexOf(note.substring(1)) + 12 * octave + 12;
     }
 }
