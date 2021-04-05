@@ -152,7 +152,7 @@ public class Buff extends Widget implements ItemInfo.ResOwner, Bufflist.Managed 
 		}
 	    }
 	    if(nmeter >= 0)
-		g.aimage(nmeter(), imgoff.add(isz).sub(1, 1), 1, 1, UI.scale(nmeter().sz()));
+		g.aimage(nmeter(), imgoff.add(isz).sub(1, 1), 1, 1);
 	    
 	    Double cmeter;
 	    if(this.cmeter >= 0) {
