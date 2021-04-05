@@ -141,6 +141,8 @@ public class CFG<T> {
 		    Class<?> defClass = name.def.getClass();
 		    if(defClass.isAssignableFrom(data.getClass())) {
 			value = (E) data;
+		    } else if(Map.class.isAssignableFrom(defClass) && Map.class.isAssignableFrom(data.getClass())) {
+			value = (E) data;
 		    } else if(Number.class.isAssignableFrom(defClass)) {
 			Number n = (Number) data;
 			value = (E) Utils.num2value(n, (Class<? extends Number>)defClass);
