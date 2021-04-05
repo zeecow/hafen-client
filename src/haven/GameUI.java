@@ -30,6 +30,7 @@ import haven.Equipory.SLOTS;
 import haven.rx.BuffToggles;
 import haven.rx.Reactor;
 import integrations.mapv4.MappingClient;
+import me.ender.timer.Timer;
 
 import java.awt.*;
 import java.util.*;
@@ -252,6 +253,7 @@ public class GameUI extends ConsoleHost implements Console.Directory {
     @Override
     protected void attach(UI ui) {
 	ui.gui = this;
+	Timer.start(this);
 	super.attach(ui);
     }
 
@@ -555,7 +557,7 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 	if(timers == null) {
 	    timers = add(new TimerPanel(), 250, 100);
 	} else {
-	    timers.toggle();
+	    timers.tvisible();
 	}
     }
     

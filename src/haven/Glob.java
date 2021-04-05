@@ -169,6 +169,7 @@ public class Glob {
 
 	oc.ctick(dt);
 	map.ctick(dt);
+	Timer.tick(dt);
 
 	lastctick = now;
     }
@@ -204,8 +205,7 @@ public class Glob {
 	    if(t == "tm") {
 		time = ((Number)a[n++]).doubleValue();
 		epoch = Utils.rtime();
-		Timer.server = (long)(1000*time);
-		Timer.local = (long) epoch;
+		Timer.server((long) (1000 * time));
 		if(!inc)
 		    lastrep = 0;
 	    } else if(t == "astro") {

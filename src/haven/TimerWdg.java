@@ -2,52 +2,41 @@ package haven;
 
 import me.ender.timer.Timer;
 
+import java.awt.*;
 import java.util.Date;
 
 public class TimerWdg extends Widget {
-
-    static Tex bg = Resource.loadtex("gfx/hud/bosq");
+    private static final Coord PAD = UI.scale(3, 3);
+    private static final Color BG = new Color(8, 8, 8, 128);
     private Timer timer;
     public final Label time;
     public Label name;
-    private Button start, stop, delete;
+    private final Button start, stop, delete;
     
     public TimerWdg(Timer timer) {
-	super(bg.sz());
-
+	super(Coord.z);
+	
 	this.timer = timer;
 	timer.listener = new Timer.UpdateCallback() {
 	    
 	    @Override
 	    public void update(Timer timer) {
-		synchronized(time) {
+		synchronized (time) {
 		    time.settext(timer.toString());
 		    updbtns();
 		}
 		
 	    }
-
-	    @Override
-	    public void complete(Timer timer) {
-		String name = timer.getName();
-		Window wnd = ui.root.add(new Window(Coord.z, name),new Coord(250, 100));
-		String str;
-		if (timer.remaining < -1500) {
-		    str = String.format("%s elapsed since timer named \"%s\"  finished it's work", timer.toString(), name);
-		} else {
-		    str = String.format("Timer named \"%s\" just finished it's work", name);
-		}
-		wnd.add(new Label(str));
-		wnd.justclose = true;
-		wnd.pack();
-	    }
 	};
-	name = add(new Label(timer.getName()), 5, 5);
-	time = add(new Label(timer.toString()), 5, 25);
+	name = add(new Label(timer.name), PAD);
+	time = add(new Label(timer.toString()), PAD.x, UI.scale(25));
 	
-	start = add(new Button(50, "start"), 90, 2);
-	stop = add(new Button(50, "stop"), 90, 2);
-	delete = add(new Button(50, "delete"), 90, 21);
+	start = add(new Button(UI.scale(50), "start", false), UI.scale(90), PAD.y);
+	stop = add(new Button(UI.scale(50), "stop", false), UI.scale(90), PAD.y);
+	delete = add(new Button(UI.scale(50), "delete", false), UI.scale(90, 30));
+	
+	pack();
+	sz = sz.add(PAD);
 	updbtns();
     }
 
@@ -82,7 +71,9 @@ public class TimerWdg extends Widget {
 
     @Override
     public void draw(GOut g) {
-	g.image(bg, Coord.z);
+	g.chcolor(BG);
+	g.frect2(Coord.z, sz);
+	g.chcolor();
 	super.draw(g);
     }
 
