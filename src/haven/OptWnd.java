@@ -899,22 +899,9 @@ public class OptWnd extends Window {
 	x += UI.scale(250);
 	y = 0;
 	my = Math.max(my, y);
-	tx = x + display.add(new CFGBox("Show quality as:", CFG.Q_SHOW_SINGLE), x, y).sz.x;
-	display.add(new QualityBox(UI.scale(100), 6, UI.scale(16), CFG.Q_SINGLE_TYPE), tx + UI.scale(5), y);
-
+	display.add(new CFGBox("Show item quality", CFG.Q_SHOW_SINGLE), x, y);
+	
 	y += STEP;
-	display.add(new CFGBox("Show on SHIFT:", CFG.Q_SHOW_SHIFT), x, y);
-	display.add(new QualityBox(UI.scale(100), 6, UI.scale(16), CFG.Q_SHIFT_TYPE), tx + UI.scale(5), y);
-
-	y += STEP;
-	display.add(new CFGBox("Show on CTRL:", CFG.Q_SHOW_CTRL), x, y);
-	display.add(new QualityBox(UI.scale(100), 6, UI.scale(16), CFG.Q_CTRL_TYPE), tx + UI.scale(5), y);
-
-	y += STEP;
-	display.add(new CFGBox("Show on ALT:", CFG.Q_SHOW_ALT), x, y);
-	display.add(new QualityBox(UI.scale(100), 6, UI.scale(16), CFG.Q_ALT_TYPE), tx + UI.scale(5), y);
-
-	y += 50;
 	display.add(new CFGBox("Real time curios", CFG.REAL_TIME_CURIO, "Show curiosity study time in real life hours, instead of server hours"), new Coord(x, y));
 
 	y += STEP;

@@ -49,7 +49,7 @@ public class QualityList extends ItemInfo {
     }
 
     public Quality single() {
-	return singles.get(CFG.Q_SINGLE_TYPE.get());
+	return singles.get(SingleType.Quality);
     }
 
     public Quality single(SingleType type) {

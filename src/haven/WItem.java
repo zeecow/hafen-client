@@ -366,15 +366,7 @@ public class WItem extends Widget implements DTarget2 {
     }
 
     private SingleType getQualityType() {
-	if(ui.modshift && CFG.Q_SHOW_SHIFT.get()) {
-	    return CFG.Q_SHIFT_TYPE.get();
-	} else if(ui.modctrl && CFG.Q_SHOW_CTRL.get()) {
-	    return CFG.Q_CTRL_TYPE.get();
-	} else if(ui.modmeta && CFG.Q_SHOW_ALT.get()) {
-	    return CFG.Q_ALT_TYPE.get();
-	} else {
-	    return CFG.Q_SHOW_SINGLE.get() ? CFG.Q_SINGLE_TYPE.get() : null;
-	}
+	return CFG.Q_SHOW_SINGLE.get() ? SingleType.Quality : null;
     }
 
     public boolean mousedown(Coord c, int btn) {
