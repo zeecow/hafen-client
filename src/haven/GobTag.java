@@ -19,7 +19,7 @@ public enum GobTag {
     MENU, PICKUP;
     
     private static final String[] AGGRO = {
-        "/bear", "/boar", "/troll", "/wolverine", "/badger", "/adder", "/wolf"
+        "/bear", "/boar", "/troll", "/wolverine", "/badger", "/adder", "/wolf", "/walrus"
     };
     
     
