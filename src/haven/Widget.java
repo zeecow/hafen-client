@@ -31,6 +31,7 @@ import me.ender.Reflect;
 import rx.Subscription;
 import rx.functions.Action0;
 import rx.functions.Action1;
+import rx.functions.Action2;
 
 import java.util.*;
 import java.lang.annotation.*;
@@ -59,6 +60,7 @@ public class Widget {
     private boolean disposed = false;
     private boolean bound = false;
     private final List<Action1<Widget>> boundListeners = new LinkedList<>();
+    private final List<Action2<Widget, Boolean>> focusListeners = new LinkedList<>();
     
     @dolda.jglob.Discoverable
     @Target(ElementType.TYPE)
@@ -537,10 +539,12 @@ public class Widget {
 	    focused.hasfocus = true;
 	    focused.gotfocus();
 	}
+	synchronized (focusListeners) { focusListeners.forEach(action -> action.call(this, true)); }
     }
 
     public void dispose() {
 	synchronized (boundListeners) {boundListeners.clear();}
+	synchronized (focusListeners) {focusListeners.clear();}
         disposed = true;
     }
     
@@ -589,6 +593,7 @@ public class Widget {
 	    focused.hasfocus = false;
 	    focused.lostfocus();
 	}
+	synchronized (focusListeners) { focusListeners.forEach(action -> action.call(this, false)); }
     }
 
     public void setfocus(Widget w) {
@@ -1567,6 +1572,10 @@ public class Widget {
 		boundListeners.add(action);
 	    }
 	}
+    }
+    
+    public void onFocused(Action2<Widget, Boolean> action) {
+	synchronized (focusListeners) { focusListeners.add(action); }
     }
     
     protected boolean i10n() {return true;}
