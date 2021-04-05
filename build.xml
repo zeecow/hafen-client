@@ -143,13 +143,19 @@
     </java>
   </target>
   
-  <target name="clean">
-    <delete dir="resources/classes" />
-    <delete dir="resources/compiled" />
+  <target name="clean" depends="clean-assets, clean-code">
+  </target>
+
+  <target name="clean-code">
     <delete dir="build/classes" />
     <delete dir="build/classes-lib" />
-    <delete file="build/client-res.jar" />
     <delete file="build/hafen.jar" />
+  </target>
+
+  <target name="clean-assets">
+    <delete dir="resources/classes" />
+    <delete dir="resources/compiled" />
+    <delete file="build/client-res.jar" />
   </target>
   
   <target name="profile" depends="jars">
