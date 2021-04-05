@@ -19,18 +19,18 @@ public enum GobTag {
     MENU, PICKUP;
     
     private static final String[] AGGRO = {
-        "/bear", "/boar", "/troll", "/wolverine", "/badger", "/adder", "/wolf", "/walrus"
+        "/bear", "/boar", "/troll", "/wolverine", "/badger", "/adder", "/wolf", "/walrus", "/lynx"
     };
     
     
     private static final String[] ANIMALS = {
-        "/fox", "/swan", "/bat", "/beaver"
+        "/fox", "/swan", "/bat", "/beaver", "/moose", "/reddeer"
     };
     
     private static final String[] CRITTERS = {
         "/rat", "/swan", "/squirrel", "/silkmoth", "/frog", "/rockdove", "/quail", "/toad", "/grasshopper",
         "/ladybug", "/forestsnail", "/dragonfly", "/forestlizard", "/waterstrider", "/firefly", "/sandflea",
-        "/rabbit", "/crab", "/cavemoth", "/grub", "/hedgehog"
+        "/rabbit", "/crab", "/cavemoth", "/hedgehog", "/stagbeetle", "jellyfish", "/mallard"
     };
     
     private static final boolean DBG = false;
