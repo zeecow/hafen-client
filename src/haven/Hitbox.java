@@ -118,7 +118,7 @@ public class Hitbox extends GAttrib implements RenderTree.Node, Rendered {
 			if(!"build".equals(obstacle.id)) {
 			    for (Coord2d[] polygon : obstacle.polygons) {
 				polygons.add(Arrays.stream(polygon)
-				    .map(coord2d -> new Coord3f(11 * (float) coord2d.x, 11 * (float) coord2d.y, Z))
+				    .map(coord2d -> new Coord3f(11 * (float) coord2d.x, -11 * (float) coord2d.y, Z))
 				    .collect(Collectors.toList()));
 			    }
 			}
