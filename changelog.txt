@@ -3,6 +3,9 @@ $size[14]{$u{Update for 05.04.21:}
   * merged wafflecat's pull request that fixes custom markers upload to auto map
   * added option to select which custom markers to upload, none by default
   * fixed crash in biome display
+  * improved handling of hidden cursor items
+  * show hitboxes for hidden objects even if hitbox display is turned off
+  * added option to disable UI toggling by spacebar (Options->General, on by default)
  
 $size[14]{$u{Update for 05.04.21:}
   * added option to display movement paths. Configured in Options->Display->Draw gob paths
