@@ -765,7 +765,7 @@ public class OptWnd extends Window {
 	general.add(new CFGBox("Add \"Pick All\" option", CFG.MENU_ADD_PICK_ALL, "If checked, will add new option that will allow to pick all same objects."), x, y);
     
 	y += STEP;
-	general.add(new CFGBox("Disable UI hiding by SPACEBAR", CFG.DISABLE_UI_HIDING, "If checked UI will always be visible and won't be toggled by pressing SPACEBAR"), x, y);
+	general.add(new CFGBox("Always show UI on start", CFG.DISABLE_UI_HIDING), x, y);
 	
 	y += STEP;
 	general.add(new CFGBox("Show F-key tool bar", CFG.SHOW_TOOLBELT_0), x, y);

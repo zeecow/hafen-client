@@ -579,7 +579,13 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 	    this.id = id;
 	    this.base = base;
 	    this.g = g;
-	    cur = show(tvis = Utils.getprefb(id + "-visible", true))?0:1;
+	    if(CFG.DISABLE_UI_HIDING.get()) {
+		tvis = true;
+	    } else {
+		tvis = Utils.getprefb(id + "-visible", true);
+		
+	    }
+	    cur = show(tvis)?0:1;
 	}
 
 	public <T extends Widget> T add(T child) {
@@ -1611,11 +1617,7 @@ public class GameUI extends ConsoleHost implements Console.Directory {
     }
 
     public void toggleui() {
-	if(CFG.DISABLE_UI_HIDING.get()) {
-	    toggleui(1);
-	} else {
-	    toggleui((uimode + 1) % 3);
-	}
+	toggleui((uimode + 1) % 3);
     }
 
     public void resize(Coord sz) {
