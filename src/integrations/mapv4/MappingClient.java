@@ -9,6 +9,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import javax.imageio.ImageIO;
+import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.lang.ref.WeakReference;
@@ -25,6 +26,18 @@ import java.util.stream.Collectors;
  * @author Vendan
  */
 public class MappingClient {
+    
+    public static final Map<String, Color> MARKER_COLORS = new HashMap<String, Color>() {{
+	put("Red", new Color(255,64,64));
+	put("Green", new Color(64,255,64));
+	put("Blue", new Color(96,160,255));
+	put("Cyan", new Color(0,255,255));
+	put("Yellow", new Color(255,255,0));
+	put("White", new Color(255,255,255));
+	put("Purple", new Color(211,64,255));
+	put("Orange", new Color(255,128,16));
+    }};
+    
     private ExecutorService gridsUploader = Executors.newSingleThreadExecutor();
     private ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(3);
     
