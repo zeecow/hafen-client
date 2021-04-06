@@ -913,7 +913,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Sk
     
     public void updateHitbox() {
 	if(updateseq == 0) {return;}
-	Boolean hitboxEnabled = CFG.DISPLAY_GOB_HITBOX.get();
+	boolean hitboxEnabled = CFG.DISPLAY_GOB_HITBOX.get() || is(GobTag.HIDDEN);
 	if(hitboxEnabled) {
 	    if(hitbox != null) {
 		hitbox.updateState();
@@ -935,6 +935,12 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Sk
 	    if(d != null && d.skipRender != needHide) {
 		d.skipRender = needHide;
 		glob.loader.defer(() -> setattr(d), null);
+		if(needHide) {
+		    tag(GobTag.HIDDEN);
+		} else {
+		    untag(GobTag.HIDDEN);
+		}
+		updateHitbox();
 	    }
 	}
     }
@@ -951,6 +957,14 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Sk
 	    this.tags.addAll(tags);
 	}
 	updateWarnings();
+    }
+    
+    public void tag(GobTag tag) {
+	synchronized (this.tags) { this.tags.add(tag); }
+    }
+    
+    public void untag(GobTag tag) {
+	synchronized (this.tags) { this.tags.remove(tag); }
     }
     
     private void updateWarnings() {

@@ -16,7 +16,7 @@ public enum GobTag {
     
     PLAYER, ME, FRIEND, FOE,
     
-    MENU, PICKUP;
+    MENU, PICKUP, HIDDEN;
     
     private static final String[] AGGRO = {
         "/bear", "/boar", "/troll", "/wolverine", "/badger", "/adder", "/wolf", "/walrus", "/lynx"
