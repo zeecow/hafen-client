@@ -1193,6 +1193,7 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 	    super("gfx/hud/" + base, "", "-d", "-h", "-dh");
 	    setgkey(gkey);
 	    settip(tooltip);
+		ZeeConfig.checkShowClaimsButtonState(this, base);
 	}
     }
 

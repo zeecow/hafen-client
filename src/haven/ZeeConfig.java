@@ -10,7 +10,6 @@ import java.util.*;
 
 public class ZeeConfig {
     public static GameUI gameUI;
-    public static MapView mapView;
     public static Window windowBelt;
     public static Window windowCattleRoster;
     public static Window windowEquipment;
@@ -123,8 +122,7 @@ public class ZeeConfig {
         "gfx/terobjs/herbs/camomile",
         "gfx/terobjs/herbs/clay-cave",
         "gfx/terobjs/herbs/mandrake",
-        "gfx/terobjs/herbs/seashell",
-            "gfx/terobjs/herbs/clover"
+        "gfx/terobjs/herbs/seashell"
     ));
     public final static Set<String> aggressiveGobs = new HashSet<String>(Arrays.asList(
             "gfx/kritter/adder/adder",
@@ -232,7 +230,7 @@ public class ZeeConfig {
             //System.out.println(name+"  "+mapGobAlert.size());
         }
 
-        if(ZeeConfig.autoHearthOnStranger && name.contains("borka/body") && gob.id != mapView.player().id) {
+        if(ZeeConfig.autoHearthOnStranger && name.contains("borka/body") && gob.id != gameUI.map.player().id) {
             gameUI.act("travel","hearth");
             try{
                 playAudio(mapCategoryAudio.get("Danger"));
@@ -263,7 +261,7 @@ public class ZeeConfig {
         }
     }
 
-
+    //FIXME some cases the behavior is wrong
     public static void checkBeltToggleWindow(Widget wdg) {
         if(!ZeeConfig.beltToggleEquips)
             return;
@@ -477,6 +475,18 @@ public class ZeeConfig {
             e.printStackTrace();
         }
         return o;
+    }
+
+    // updates buttons for showing claims
+    // MapView().enol() enable overlays
+    public static void checkShowClaimsButtonState(GameUI.MenuCheckBox menuCheckBox, String base) {
+        if(base.contains("lbtn-claim")) {
+            menuCheckBox.click();
+        }else if(base.contains("lbtn-vil")) {
+            menuCheckBox.click();
+        }else if(base.contains("lbtn-rlm")){
+            menuCheckBox.click();
+        }
     }
 }
 

@@ -495,7 +495,10 @@ public class MapView extends PView implements DTarget, Console.Directory {
 	this.clickmap = new ClickMap();
 	clmaptree.add(clickmap);
 	setcanfocus(true);
-	ZeeConfig.mapView = this;
+	//show claims by default, buttons updated in ZeeConfig
+	enol("cplot");
+	enol("vlg");
+	enol("realm");
     }
     
     protected void envdispose() {
