@@ -664,6 +664,8 @@ public class OptWnd extends Window {
 
     private void initCameraPanel() {
 	int x = 0, y = 0, my = 0;
+	int STEP = UI.scale(25);
+	int BIG_STEP = UI.scale(35);
 
 	int tx = x + camera.add(new Label("Camera:"), x, y).sz.x + 5;
 	camera.add(new Dropbox<String>(100, 5, 16) {
@@ -691,10 +693,10 @@ public class OptWnd extends Window {
 		}
 	    }
 	}, tx, y).sel = MapView.defcam();
-
-	y += 35;
+    
+	y += BIG_STEP;
 	camera.add(new Label("Brighten view"), x, y);
-	y += 15;
+	y += UI.scale(15);
 	camera.add(new HSlider(UI.scale(200), 0, 500, 0) {
 	    public void changed() {
 		CFG.CAMERA_BRIGHT.set(val / 1000.0f);
@@ -703,12 +705,17 @@ public class OptWnd extends Window {
 		}
 	    }
 	}, x, y).val = (int) (1000 * CFG.CAMERA_BRIGHT.get());
-
-
-	y += 25;
+    
+	y += BIG_STEP;
+	camera.add(new CFGBox("Invert horizontal camera rotation", CFG.CAMERA_INVERT_X), x, y);
+    
+	y += STEP;
+	camera.add(new CFGBox("Invert vertical camera rotation", CFG.CAMERA_INVERT_Y), x, y);
+    
+	y += BIG_STEP;
 	my = Math.max(my, y);
 
-	camera.add(new PButton(UI.scale(200), "Back", 27, main), 0, my + 35);
+	camera.add(new PButton(UI.scale(200), "Back", 27, main), 0, my);
 	camera.pack();
     }
 
