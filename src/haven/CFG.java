@@ -62,6 +62,7 @@ public class CFG<T> {
     
     public static final CFG<Boolean> AUTOMAP_UPLOAD = new CFG<>("automap.upload", false);
     public static final CFG<Boolean> AUTOMAP_TRACK = new CFG<>("automap.track", false);
+    public static final CFG<Set<BuddyWnd.Group>> AUTOMAP_MARKERS = new CFG<>("automap.markers", new HashSet<>(), new TypeToken<Set<BuddyWnd.Group>>(){});
     public static final CFG<String> AUTOMAP_ENDPOINT = new CFG<>("automap.andpoint", "");
 
     private static final String CONFIG_JSON = "config.json";

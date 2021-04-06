@@ -940,7 +940,9 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 		if(CFG.AUTOMAP_UPLOAD.get()) {
 		    MappingClient.getInstance().ProcessMap(file, (m) -> {
 			if(m instanceof MapFile.PMarker) {
-			    return ((MapFile.PMarker)m).color.equals(BuddyWnd.Group.Green.col);
+			    return CFG.AUTOMAP_MARKERS.get().stream()
+				.map(group -> group.col)
+				.anyMatch(color -> color.equals(((MapFile.PMarker)m).color));
 			}
 			return true;
 		    });

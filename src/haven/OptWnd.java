@@ -27,8 +27,10 @@
 package haven;
 
 
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.awt.event.KeyEvent;
+import java.util.Set;
 
 public class OptWnd extends Window {
     public static final Coord PANEL_POS = new Coord(220, 30);
@@ -1036,7 +1038,40 @@ public class OptWnd extends Window {
 		return buf.key(ev);
 	    }
 	}, x, y);
-	
+ 
+	y += STEP;
+	mapping.add(new Label("Upload custom markers:"), x, y);
+ 
+	y += STEP;
+	mapping.add(new BuddyWnd.GroupSelector(-1) {
+	    {
+		Set<BuddyWnd.Group> groups = CFG.AUTOMAP_MARKERS.get();
+		for (BuddyWnd.Group g : groups) {
+		    this.groups[g.ordinal()].select();
+		}
+	    }
+	    
+	    @Override
+	    public void update(int idx) {
+		if(idx >= 0 && idx < this.groups.length) {
+		    BuddyWnd.GroupRect group = this.groups[idx];
+		    if(group.selected()) {
+			group.unselect();
+		    } else {
+			group.select();
+		    }
+		    
+		    Set<BuddyWnd.Group> selected = new HashSet<>();
+		    for (int i = 0; i < this.groups.length; i++) {
+			if(this.groups[i].selected()) {
+			    selected.add(BuddyWnd.Group.values()[i]);
+			}
+		    }
+		    CFG.AUTOMAP_MARKERS.set(selected);
+		}
+	    }
+	}, x, y);
+ 
 	y += STEP;
 	
 	mapping.add(new PButton(UI.scale(200), "Back", 27, main), x, y);

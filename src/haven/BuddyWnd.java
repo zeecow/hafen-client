@@ -221,6 +221,8 @@ public class BuddyWnd extends Widget implements Iterable<BuddyWnd.Buddy> {
 	public void unselect() {
 	    selected = false;
 	}
+	
+	public boolean selected() {return selected;}
     }
 
     public static class GroupSelector extends Widget {
