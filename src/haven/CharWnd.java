@@ -662,7 +662,7 @@ public class CharWnd extends Window {
 	    pval = adda(new RLabel<Integer>(() -> texp, Utils::thformat, new Color(192, 192, 255, 255)),
 		plbl.pos("br").adds(0, 2).x(sz.x - UI.scale(2)), 1.0, 0.0);
 	    plbl = add(new Label("LP/hour:"), pval.pos("bl").adds(0, 2).xs(2));
-	    pval = adda(new RLabel<Integer>(() -> tlph, Utils::thformat, new Color(192, 192, 255, 255)),
+	    pval = adda(new RLabel<Integer>(() -> tlph, Utils::thformat, new Color(192, 255, 255, 255)),
 		plbl.pos("br").adds(0, 2).x(sz.x - UI.scale(2)), 1.0, 0.0);
 	    this.study.locked = CFG.LOCK_STUDY.get();
 	    add(new OptWnd.CFGBox("Lock study", CFG.LOCK_STUDY){
@@ -672,7 +672,10 @@ public class CharWnd extends Window {
 		    StudyInfo.this.study.locked = a;
 		}
 	    }, pval.pos("bl").adds(0, 5).xs(2));
+	    pack();
 	}
+ 
+	public Coord contentsz() { return super.contentsz().add(UI.scale(5, 2)); }
 
 	private void upd() {
 	    int texp = 0, tw = 0, tenc = 0, tlph = 0;
@@ -683,12 +686,12 @@ public class CharWnd extends Window {
 			texp += ci.exp;
 			tw += ci.mw;
 			tenc += ci.enc;
-			tlph += Curiosity.lph(ci.lph);
+			tlph += ci.lph;
 		    }
 		} catch(Loading l) {
 		}
 	    }
-	    this.texp = texp; this.tw = tw; this.tenc = tenc; this.tlph = tlph;
+	    this.texp = texp; this.tw = tw; this.tenc = tenc; this.tlph = Curiosity.lph(tlph);
 	}
 
 	public void tick(double dt) {
