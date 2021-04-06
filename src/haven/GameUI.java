@@ -1605,7 +1605,11 @@ public class GameUI extends ConsoleHost implements Console.Directory {
     }
 
     public void toggleui() {
-	toggleui((uimode + 1) % 3);
+	if(CFG.DISABLE_UI_HIDING.get()) {
+	    toggleui(1);
+	} else {
+	    toggleui((uimode + 1) % 3);
+	}
     }
 
     public void resize(Coord sz) {
