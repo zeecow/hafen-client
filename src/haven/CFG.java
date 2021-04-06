@@ -19,7 +19,7 @@ public class CFG<T> {
     public static final CFG<Boolean> DISPLAY_GOB_HITBOX = new CFG<>("display.gob_hitbox", false);
     public static final CFG<Boolean> DISPLAY_GOB_HITBOX_TOP = new CFG<>("display.gob_hitbox_top", false);
     public static final CFG<Boolean> DISPLAY_GOB_PATHS = new CFG<>("display.gob_paths.show", false);
-    public static final CFG<Set<PathCategory>> DISPLAY_GOB_PATHS_FOR = new CFG<>("display.gob_paths.categories", PathVisualizer.DEF_CATEGORIES);
+    public static final CFG<Set<PathCategory>> DISPLAY_GOB_PATHS_FOR = new CFG<>("display.gob_paths.categories", PathVisualizer.DEF_CATEGORIES, new TypeToken<Set<PathCategory>>(){});
     public static final CFG<Boolean> HIDE_TREES = new CFG<>("display.hide_gobs", false);
     public static final CFG<Boolean> DISPLAY_FOD_CATEGORIES = new CFG<>("display.food_category", true);
     public static final CFG<Boolean> SHOW_GOB_RADIUS = new CFG<>("display.show_gob_radius", false);
@@ -70,6 +70,7 @@ public class CFG<T> {
     public static final Gson gson;
     private final String path;
     public final T def;
+    private final Type t;
     private List<Observer<T>> observers = new LinkedList<>();
 
     static {
@@ -96,9 +97,14 @@ public class CFG<T> {
 	void updated(CFG<T> cfg);
     }
 
-    CFG(String path, T def) {
+    CFG(String path, T def, TypeToken<T> t) {
 	this.path = path;
 	this.def = def;
+	this.t = t == null ? null : t.getType();
+    }
+    
+    CFG(String path, T def) {
+	this(path, def, null);
     }
 
     public T get() {
@@ -141,6 +147,8 @@ public class CFG<T> {
 		    Class<?> defClass = name.def.getClass();
 		    if(defClass.isAssignableFrom(data.getClass())) {
 			value = (E) data;
+		    } else if(name.t != null) {
+			value = gson.fromJson(gson.toJson(data), name.t);
 		    } else if(Map.class.isAssignableFrom(defClass) && Map.class.isAssignableFrom(data.getClass())) {
 			value = (E) data;
 		    } else if(Number.class.isAssignableFrom(defClass)) {
