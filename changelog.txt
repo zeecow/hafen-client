@@ -1,4 +1,10 @@
 $size[14]{$u{Update for 05.04.21:}
+  * fixed timers (X->T)
+  * merged wafflecat's pull request that fixes custom markers upload to auto map
+  * added option to select which custom markers to upload, none by default
+  * fixed crash in biome display
+ 
+$size[14]{$u{Update for 05.04.21:}
   * added option to display movement paths. Configured in Options->Display->Draw gob paths
   * added option to highlight and warn about dangerous players and animals. Configured in Options->General->Warning settings 
   * fixed quest pointer in bad cam
