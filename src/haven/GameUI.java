@@ -79,7 +79,8 @@ public class GameUI extends ConsoleHost implements Console.Directory {
     public HelpWnd help;
     public OptWnd opts;
     public Collection<DraggedItem> hand = new LinkedList<DraggedItem>();
-    private Collection<DraggedItem> handSave = new LinkedList<DraggedItem>();
+    private final Collection<DraggedItem> handSave = new LinkedList<DraggedItem>();
+    private boolean handHidden = false;
     public WItem vhand;
     public ChatUI chat;
     public ChatUI.Channel syslog;
@@ -766,16 +767,16 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 	}
     }
 
-    public void toggleHand(){
-	if (hand.isEmpty()) {
+    public void toggleHand() {
+	if (handHidden) {
 	    hand.addAll(handSave);
 	    handSave.clear();
-	    updhand();
 	} else {
 	    handSave.addAll(hand);
 	    hand.clear();
-	    updhand();
 	}
+	updhand();
+	handHidden = !handHidden;
     }
 
     public void toggleStudy() {
@@ -980,7 +981,11 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 	} else if(place == "hand") {
 	    GItem g = add((GItem)child);
 	    Coord lc = (Coord)args[1];
-	    hand.add(new DraggedItem(g, lc));
+	    if(handHidden) {
+	    	handSave.add(new DraggedItem(g, lc));
+	    } else {
+	    	hand.add(new DraggedItem(g, lc));
+	    }
 	    updhand();
 	} else if(place == "chr") {
 	    studywnd = add(new StudyWnd());
@@ -1095,6 +1100,7 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 	    }
 	}
 	if(w instanceof GItem) {
+	    Collection<DraggedItem> hand = handHidden ? handSave : this.hand; 
 	    for(Iterator<DraggedItem> i = hand.iterator(); i.hasNext();) {
 		DraggedItem di = i.next();
 		if(di.item == w) {
