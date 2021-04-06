@@ -46,16 +46,34 @@ public class BuddyWnd extends Widget implements Iterable<BuddyWnd.Buddy> {
     public static final int offset = UI.scale(35);
     public static final Tex online = Resource.loadtex("gfx/hud/online");
     public static final Tex offline = Resource.loadtex("gfx/hud/offline");
-    public static final Color[] gc = new Color[] {
-	new Color(255, 255, 255),
-	new Color(64, 255, 64),
-	new Color(255, 64, 64),
-	new Color(96, 160, 255),
-	new Color(0, 255, 255),
-	new Color(255, 255, 0),
-	new Color(211, 64, 255),
-	new Color(255, 128, 16),
+    public static final Color[] gc = new Color[]{
+	Group.White.col,
+	Group.Green.col,
+	Group.Red.col,
+	Group.Blue.col,
+	Group.Cyan.col,
+	Group.Yellow.col,
+	Group.Purple.col,
+	Group.Orange.col,
     };
+    
+    public enum Group {
+	White(new Color(255, 255, 255)),
+	Green(new Color(64, 255, 64)),
+	Red(new Color(255, 64, 64)),
+	Blue(new Color(96, 160, 255)),
+	Cyan(new Color(0, 255, 255)),
+	Yellow(new Color(255, 255, 0)),
+	Purple(new Color(211, 64, 255)),
+	Orange(new Color(255, 128, 16));
+	
+	public final Color col;
+	
+	Group(Color col) {
+	    this.col = col;
+	}
+    }
+    
     private Comparator<Buddy> bcmp;
     private Comparator<Buddy> alphacmp = new Comparator<Buddy>() {
 	private Collator c = Collator.getInstance();

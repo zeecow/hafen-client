@@ -32,14 +32,12 @@ import haven.rx.Reactor;
 import integrations.mapv4.MappingClient;
 import me.ender.timer.Timer;
 
-import java.awt.*;
 import java.util.*;
 import java.util.function.*;
 import java.awt.Color;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 import java.awt.image.WritableRaster;
-import java.util.*;
 import java.util.List;
 
 import static haven.Action.*;
@@ -942,7 +940,7 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 		if(CFG.AUTOMAP_UPLOAD.get()) {
 		    MappingClient.getInstance().ProcessMap(file, (m) -> {
 			if(m instanceof MapFile.PMarker) {
-			    return ((MapFile.PMarker)m).color.equals(MappingClient.MARKER_COLORS.get("Green"));
+			    return ((MapFile.PMarker)m).color.equals(BuddyWnd.Group.Green.col);
 			}
 			return true;
 		    });
