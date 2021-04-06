@@ -644,7 +644,7 @@ public class CharWnd extends Window {
 
     public static class StudyInfo extends Widget {
 	public final Inventory study;
-	public int texp, tw, tenc;
+	public int texp, tw, tenc, tlph;
 
 	private StudyInfo(Coord sz, final Widget study) {
 	    super(sz);
@@ -661,6 +661,9 @@ public class CharWnd extends Window {
 	    plbl = add(new Label("Learning points:"), pval.pos("bl").adds(0, 2).xs(2));
 	    pval = adda(new RLabel<Integer>(() -> texp, Utils::thformat, new Color(192, 192, 255, 255)),
 		plbl.pos("br").adds(0, 2).x(sz.x - UI.scale(2)), 1.0, 0.0);
+	    plbl = add(new Label("LP/hour:"), pval.pos("bl").adds(0, 2).xs(2));
+	    pval = adda(new RLabel<Integer>(() -> tlph, Utils::thformat, new Color(192, 192, 255, 255)),
+		plbl.pos("br").adds(0, 2).x(sz.x - UI.scale(2)), 1.0, 0.0);
 	    this.study.locked = CFG.LOCK_STUDY.get();
 	    add(new OptWnd.CFGBox("Lock study", CFG.LOCK_STUDY){
 		@Override
@@ -672,7 +675,7 @@ public class CharWnd extends Window {
 	}
 
 	private void upd() {
-	    int texp = 0, tw = 0, tenc = 0;
+	    int texp = 0, tw = 0, tenc = 0, tlph = 0;
 	    for(GItem item : study.children(GItem.class)) {
 		try {
 		    Curiosity ci = ItemInfo.find(Curiosity.class, item.info());
@@ -680,11 +683,12 @@ public class CharWnd extends Window {
 			texp += ci.exp;
 			tw += ci.mw;
 			tenc += ci.enc;
+			tlph += Curiosity.lph(ci.lph);
 		    }
 		} catch(Loading l) {
 		}
 	    }
-	    this.texp = texp; this.tw = tw; this.tenc = tenc;
+	    this.texp = texp; this.tw = tw; this.tenc = tenc; this.tlph = tlph;
 	}
 
 	public void tick(double dt) {
