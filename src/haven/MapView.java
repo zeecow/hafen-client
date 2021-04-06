@@ -161,7 +161,7 @@ public class MapView extends PView implements DTarget, Console.Directory {
 	    tangl = tangl % ((float)Math.PI * 2.0f);
 	    wheel(Coord.z, 5 * r.y);
 	}
-    
+ 
 	@Override
 	public void reset() {
 	    elev = telev = (float)Math.PI / 6.0f;
@@ -292,7 +292,7 @@ public class MapView extends PView implements DTarget, Console.Directory {
 	    angl = angl + ((float) c.x / 100.0f);
 	    angl = angl % ((float) Math.PI * 2.0f);
 	}
-    
+ 
 	@Override
 	public void reset() {
 	    dist = 50.0f;
@@ -359,7 +359,7 @@ public class MapView extends PView implements DTarget, Console.Directory {
 	    telev = (float) Math.PI / 4.0f;
 	    tangl = 0.0f;
 	}
-    
+ 
 	public void drag(Coord c) {
 	    c = inversion(c, dragorig);
 	    telev = elevorig - ((float)(c.y - dragorig.y) / 100.0f);
@@ -2499,6 +2499,23 @@ public class MapView extends PView implements DTarget, Console.Directory {
 	    CFG.CAMERA_INVERT_X.get() ? -1 : 1,
 	    CFG.CAMERA_INVERT_Y.get() ? -1 : 1
 	)); 
+    }
+    
+    public void snapCameraWest() {
+	if(camera instanceof SOrthoCam)
+	    ((SOrthoCam) camera).tangl = (float) (2 * Math.PI);
+    }
+    public void snapCameraEast() {
+	if(camera instanceof SOrthoCam)
+	    ((SOrthoCam) camera).tangl = (float) Math.PI;
+    }
+    public void snapCameraNorth() {
+	if(camera instanceof SOrthoCam)
+	    ((SOrthoCam) camera).tangl = (float) (3 * Math.PI / 2);
+    }
+    public void snapCameraSouth() {
+	if(camera instanceof SOrthoCam)
+	    ((SOrthoCam) camera).tangl = (float) (Math.PI / 2);
     }
     
     public void resetCamera() { camera.reset(); }
