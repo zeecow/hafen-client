@@ -34,6 +34,7 @@ public class ZeeConfig {
     public static boolean dropSoil = false;
     public static boolean equiporyCompact = Utils.getprefb("equiporyCompact", false);
     public static boolean equipWindowOpenedByBelt = false;
+    public static boolean notifyBuddyOnline = Utils.getprefb("notifyBuddyOnline", false);;
     public static boolean showInventoryLogin = Utils.getprefb("showInventoryLogin", true);
     public static boolean showEquipsLogin = Utils.getprefb("showInventoryLogin", true);
 
@@ -478,7 +479,7 @@ public class ZeeConfig {
     }
 
     // updates buttons for showing claims
-    // MapView().enol() enable overlays
+    // MapView() constructor enable overlays using enol()
     public static void checkShowClaimsButtonState(GameUI.MenuCheckBox menuCheckBox, String base) {
         if(base.contains("lbtn-claim")) {
             menuCheckBox.click();

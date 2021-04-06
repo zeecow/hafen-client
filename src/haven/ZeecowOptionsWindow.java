@@ -13,7 +13,7 @@ import java.util.List;
 public class ZeecowOptionsWindow extends JFrame {
     public JTabbedPane tabbedPane, tabbedPaneGobs;
     public JPanel panelMisc, panelGobs, panelGobDetails, panelDebug, panelTabCateg;
-    public JCheckBox cbDropMinedStone, cbDropMinedOre, cbDropMinedSilverGold, cbDropMinedCurios, cbActionSearchGlobal, cbCompactEquipsWindow, cbBeltTogglesEquips, cbAutohearth, cbShowInventoryLogin, cbShowEquipsLogin, cbAutoClickMenuOpts, cbCattleRosterHeight;
+    public JCheckBox cbDropMinedStone, cbDropMinedOre, cbDropMinedSilverGold, cbDropMinedCurios, cbActionSearchGlobal, cbCompactEquipsWindow, cbBeltTogglesEquips, cbAutohearth, cbShowInventoryLogin, cbShowEquipsLogin, cbNotifyBuddyOnline,cbAutoClickMenuOpts, cbCattleRosterHeight;
     public JTextField tfAutoClickMenu, tfGobName, tfAudioPath, tfCategName, tfAudioPathCateg;
     public JComboBox<String> cmbCattleRoster, cmbGobCategory;
     public JList<String> listGobsTemp, listGobsSaved, listGobsCategories;
@@ -148,6 +148,14 @@ public class ZeecowOptionsWindow extends JFrame {
             JCheckBox cb = (JCheckBox) actionEvent.getSource();
             boolean val = ZeeConfig.showEquipsLogin = cb.isSelected();
             Utils.setprefb("cbShowEquipsLogin",val);
+        });
+
+        panelMisc.add(cbNotifyBuddyOnline = new JCheckBox("Notify when friends login"));
+        cbNotifyBuddyOnline.setSelected(ZeeConfig.notifyBuddyOnline);
+        cbNotifyBuddyOnline.addActionListener(actionEvent -> {
+            JCheckBox cb = (JCheckBox) actionEvent.getSource();
+            boolean val = ZeeConfig.notifyBuddyOnline = cb.isSelected();
+            Utils.setprefb("notifyBuddyOnline",val);
         });
 
         panelMisc.add(new JLabel("--------------------"));
