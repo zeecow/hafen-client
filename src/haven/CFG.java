@@ -4,7 +4,6 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import haven.PathVisualizer.PathCategory;
-import haven.QualityList.SingleType;
 import haven.rx.BuffToggles;
 import me.ender.Reflect;
 
@@ -72,7 +71,7 @@ public class CFG<T> {
     private final String path;
     public final T def;
     private final Type t;
-    private List<Observer<T>> observers = new LinkedList<>();
+    private final List<Observer<T>> observers = new LinkedList<>();
 
     static {
 	gson = (new GsonBuilder()).setPrettyPrinting().create();
@@ -89,8 +88,8 @@ public class CFG<T> {
 	cfg = tmp;
 
 	BuffToggles.toggles.forEach(toggle -> toggle.cfg(
-	    new CFG<Boolean>("display.buffs."+toggle.action, true),
-	    new CFG<Boolean>("general.start_toggle."+toggle.action, false)
+	    new CFG<>("display.buffs." + toggle.action, true),
+	    new CFG<>("general.start_toggle." + toggle.action, false)
 	));
     }
 
@@ -156,7 +155,7 @@ public class CFG<T> {
 			Number n = (Number) data;
 			value = (E) Utils.num2value(n, (Class<? extends Number>)defClass);
 		    } else if(Enum.class.isAssignableFrom(defClass)) {
-			Class<? extends Enum> enumType = Reflect.getEnumSuperclass(defClass);
+			@SuppressWarnings("rawtypes") Class<? extends Enum> enumType = Reflect.getEnumSuperclass(defClass);
 			if(enumType != null) {
 			    value = (E) Enum.valueOf(enumType, data.toString());
 			}
@@ -198,6 +197,7 @@ public class CFG<T> {
 	Config.saveFile(CONFIG_JSON, gson.toJson(cfg));
     }
 
+    @SuppressWarnings("rawtypes")
     private static Object retrieve(CFG name) {
 	String[] parts = name.path.split("\\.");
 	Object cur = cfg;
