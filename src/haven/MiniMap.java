@@ -905,6 +905,7 @@ public class MiniMap extends Widget {
 		    }
 		}
 	    }
+	    if(newbiome == null) {newbiome = "???";}
 	    if(!newbiome.equals(biome)) {
 		biome = newbiome;
 		biometex = Text.renderstroked(prettybiome(biome)).tex();
