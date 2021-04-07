@@ -5,6 +5,8 @@ $size[14]{$u{Update for 07.04.21:}
   * added options to show curio remaining time in tooltip or instead of progress
   * made widget shortcuts work regardless of language, provided you bound them using english language, or left as defaults.
   * use loftar's (widget) shortcuts to handle default UI buttons (Inventory, Minimap, Equipment etc.) 
+  * fixed quest pointers disappearing when target is just out of sight on ortho cam
+  * added distance to target to quest pointer tooltips
  
 $size[14]{$u{Update for 06.04.21:}
   * fixed timers (X->T)
