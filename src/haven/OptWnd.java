@@ -918,6 +918,12 @@ public class OptWnd extends Window {
 	display.add(new CFGBox("Real time curios", CFG.REAL_TIME_CURIO, "Show curiosity study time in real life hours, instead of server hours"), new Coord(x, y));
 
 	y += STEP;
+	display.add(new CFGBox("Display curio remaining time in tooltip", CFG.SHOW_CURIO_REMAINING_TT), new Coord(x, y));
+
+	y += STEP;
+	display.add(new CFGBox("Display curio remaining time instead of progress", CFG.SHOW_CURIO_REMAINING_METER), new Coord(x, y));
+
+	y += STEP;
 	display.add(new CFGBox("Show LP/H for curios", CFG.SHOW_CURIO_LPH, "Show how much learning point curio gives per hour"), new Coord(x, y));
 
 	y += STEP;
