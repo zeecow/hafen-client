@@ -394,7 +394,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Sk
     
     public Boolean isMe() {
 	if(isMe == null) {
-	    if(glob.sess.ui.gui == null || glob.sess.ui.gui.map == null) {
+	    if(glob.sess.ui.gui == null || glob.sess.ui.gui.map == null || glob.sess.ui.gui.map.plgob < 0) {
 		return null;
 	    } else {
 		isMe = id == glob.sess.ui.gui.map.plgob;
