@@ -16,6 +16,7 @@ public class Pointer extends Widget {
     public long gobid = -1;
     public boolean click;
     private Tex licon;
+    private String tip = null;
     
     public Pointer(Indir<Resource> icon) {
 	super(Coord.z);
@@ -154,6 +155,13 @@ public class Pointer extends Widget {
 	    licon = null;
 	} else if(name == "cl") {
 	    click = ((Integer) args[0]) != 0;
+	} else if(name == "tip") {
+	    Object tt = args[0];
+	    if(tt instanceof String) {
+		tip = (String) tt;
+	    } else {
+		super.uimsg(name, args);
+	    }
 	} else {
 	    super.uimsg(name, args);
 	}
@@ -161,7 +169,28 @@ public class Pointer extends Widget {
     
     public Object tooltip(Coord c, Widget prev) {
 	if((lc != null) && (lc.dist(c) < 20))
-	    return (tooltip);
+	    if(tip != null) {
+		double d = getDistance();
+		if(d > 0) {
+		    return String.format("%s (%.1fm)", tip, d);
+		} else {
+		    return tip;
+		}
+	    } else return (tooltip);
 	return (null);
+    }
+    
+    double getDistance() {
+	MapView map = getparent(GameUI.class).map;
+	Gob target = (gobid < 0) ? null : ui.sess.glob.oc.getgob(gobid);
+	Gob player = map == null ? null : map.player();
+	if(player != null) {
+	    if(target != null) {
+		return player.rc.dist(target.rc) / 11.0;
+	    } else if(tc != null) {
+		return player.rc.dist(tc) / 11.0;
+	    }
+	}
+	return -1;
     }
 }
