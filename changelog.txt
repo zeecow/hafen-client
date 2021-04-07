@@ -1,4 +1,9 @@
-$size[14]{$u{Update for 05.04.21:}
+$size[14]{$u{Update for 07.04.21:}
+  * merged wafflecat's pull request that ads LP/H to study window
+  * moved toggle chat and take screenshot to widget shortcuts + added widget binding for UI toggle
+  * fixed false player spotted alarm on travel
+ 
+$size[14]{$u{Update for 06.04.21:}
   * fixed timers (X->T)
   * merged wafflecat's pull request that fixes custom markers upload to auto map
   * added option to select which custom markers to upload, none by default
