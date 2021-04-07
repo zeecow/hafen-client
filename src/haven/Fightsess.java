@@ -434,18 +434,18 @@ public class Fightsess extends Widget {
     }
 
     public static final KeyBinding[] kb_acts = {
-	KeyBinding.get("fgt/0", KeyMatch.forcode(KeyEvent.VK_1, 0)),
-	KeyBinding.get("fgt/1", KeyMatch.forcode(KeyEvent.VK_2, 0)),
-	KeyBinding.get("fgt/2", KeyMatch.forcode(KeyEvent.VK_3, 0)),
-	KeyBinding.get("fgt/3", KeyMatch.forcode(KeyEvent.VK_4, 0)),
-	KeyBinding.get("fgt/4", KeyMatch.forcode(KeyEvent.VK_5, 0)),
-	KeyBinding.get("fgt/5", KeyMatch.forcode(KeyEvent.VK_1, KeyMatch.S)),
-	KeyBinding.get("fgt/6", KeyMatch.forcode(KeyEvent.VK_2, KeyMatch.S)),
-	KeyBinding.get("fgt/7", KeyMatch.forcode(KeyEvent.VK_3, KeyMatch.S)),
-	KeyBinding.get("fgt/8", KeyMatch.forcode(KeyEvent.VK_4, KeyMatch.S)),
-	KeyBinding.get("fgt/9", KeyMatch.forcode(KeyEvent.VK_5, KeyMatch.S)),
+	KeyBinding.get("fgt/0", KeyMatchFake.forcode(KeyEvent.VK_1, 0)),
+	KeyBinding.get("fgt/1", KeyMatchFake.forcode(KeyEvent.VK_2, 0)),
+	KeyBinding.get("fgt/2", KeyMatchFake.forcode(KeyEvent.VK_3, 0)),
+	KeyBinding.get("fgt/3", KeyMatchFake.forcode(KeyEvent.VK_4, 0)),
+	KeyBinding.get("fgt/4", KeyMatchFake.forcode(KeyEvent.VK_5, 0)),
+	KeyBinding.get("fgt/5", KeyMatchFake.forcode(KeyEvent.VK_1, KeyMatch.S)),
+	KeyBinding.get("fgt/6", KeyMatchFake.forcode(KeyEvent.VK_2, KeyMatch.S)),
+	KeyBinding.get("fgt/7", KeyMatchFake.forcode(KeyEvent.VK_3, KeyMatch.S)),
+	KeyBinding.get("fgt/8", KeyMatchFake.forcode(KeyEvent.VK_4, KeyMatch.S)),
+	KeyBinding.get("fgt/9", KeyMatchFake.forcode(KeyEvent.VK_5, KeyMatch.S)),
     };
-    public static final KeyBinding kb_relcycle =  KeyBinding.get2("fgt-cycle", KeyMatch.forcode(KeyEvent.VK_TAB, KeyMatch.C), KeyMatch.S);
+    public static final KeyBinding kb_relcycle =  KeyBinding.get("fgt-cycle", KeyMatch.forcode(KeyEvent.VK_TAB, KeyMatch.C), KeyMatch.S);
 
     /* XXX: This is a bit ugly, but release message do need to be
      * properly sequenced with use messages in some way. */

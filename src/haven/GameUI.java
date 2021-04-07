@@ -1569,9 +1569,9 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 	}
     }
 
-    public static final KeyBinding kb_shoot = KeyBinding.get2("screenshot", KeyMatch.forchar('S', KeyMatch.C));
-    public static final KeyBinding kb_chat = KeyBinding.get2("chat-toggle", KeyMatch.forchar('C', KeyMatch.C));
-    public static final KeyBinding kb_hide = KeyBinding.get2("ui-toggle", KeyMatch.nil);
+    public static final KeyBinding kb_shoot = KeyBinding.get("screenshot", KeyMatch.forchar('S', KeyMatch.C));
+    public static final KeyBinding kb_chat = KeyBinding.get("chat-toggle", KeyMatch.forchar('C', KeyMatch.C));
+    public static final KeyBinding kb_hide = KeyBinding.get("ui-toggle", KeyMatch.nil);
     public boolean globtype(char key, KeyEvent ev) {
 	if(key == ':') {
 	    entercmd();

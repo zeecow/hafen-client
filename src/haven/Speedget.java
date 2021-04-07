@@ -123,13 +123,13 @@ public class Speedget extends Widget {
 	return(null);
     }
 
-    public static final KeyBinding kb_speedup = KeyBinding.get2("speed-up", KeyMatch.forchar('R', KeyMatch.S | KeyMatch.C | KeyMatch.M, KeyMatch.C));
-    public static final KeyBinding kb_speeddn = KeyBinding.get2("speed-down", KeyMatch.forchar('R', KeyMatch.S | KeyMatch.C | KeyMatch.M, KeyMatch.S | KeyMatch.C));
+    public static final KeyBinding kb_speedup = KeyBinding.get("speed-up", KeyMatch.forchar('R', KeyMatch.S | KeyMatch.C | KeyMatch.M, KeyMatch.C));
+    public static final KeyBinding kb_speeddn = KeyBinding.get("speed-down", KeyMatch.forchar('R', KeyMatch.S | KeyMatch.C | KeyMatch.M, KeyMatch.S | KeyMatch.C));
     public static final KeyBinding[] kb_speeds = {
-	KeyBinding.get2("speed-set/0", KeyMatch.nil),
-	KeyBinding.get2("speed-set/1", KeyMatch.nil),
-	KeyBinding.get2("speed-set/2", KeyMatch.nil),
-	KeyBinding.get2("speed-set/3", KeyMatch.nil),
+	KeyBinding.get("speed-set/0", KeyMatch.nil),
+	KeyBinding.get("speed-set/1", KeyMatch.nil),
+	KeyBinding.get("speed-set/2", KeyMatch.nil),
+	KeyBinding.get("speed-set/3", KeyMatch.nil),
     };
     public boolean globtype(char key, KeyEvent ev) {
 	int dir = 0;

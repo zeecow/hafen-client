@@ -728,7 +728,7 @@ public class Widget {
 		    int modign = 0;
 		    if(args.length > 2)
 			modign = (Integer)args[2];
-		    setgkey(KeyBinding.get2("wgk/" + (String)args[1], key, modign));
+		    setgkey(KeyBinding.get("wgk/" + (String)args[1], key, modign));
 		} else {
 		    gkey = key;
 		}
@@ -865,10 +865,10 @@ public class Widget {
 	    modmask = KeyMatch.MODS;
 	Integer code = gkeys.get(key);
 	if(code != null)
-	    return(KeyMatch2.forcode(code, modmask, modmatch));
+	    return(KeyMatch.forcode(code, modmask, modmatch));
 	if(gkey < 32)
-	    return(KeyMatch2.forchar((char)((int)'A' + gkey - 1), KeyMatch.C));
-	return(KeyMatch2.forchar((char)key, modmask, modmatch));
+	    return(KeyMatch.forchar((char)((int)'A' + gkey - 1), KeyMatch.C));
+	return(KeyMatch.forchar((char)key, modmask, modmatch));
     }
 
     public boolean gkeytype(KeyEvent ev) {
@@ -897,9 +897,9 @@ public class Widget {
 	return(this);
     }
 	
-    public static final KeyMatch key_act = KeyMatch2.forcode(KeyEvent.VK_ENTER, 0);
-    public static final KeyMatch key_esc = KeyMatch2.forcode(KeyEvent.VK_ESCAPE, 0);
-    public static final KeyMatch key_tab = KeyMatch2.forcode(KeyEvent.VK_TAB, 0);
+    public static final KeyMatch key_act = KeyMatch.forcode(KeyEvent.VK_ENTER, 0);
+    public static final KeyMatch key_esc = KeyMatch.forcode(KeyEvent.VK_ESCAPE, 0);
+    public static final KeyMatch key_tab = KeyMatch.forcode(KeyEvent.VK_TAB, 0);
     public boolean keydown(KeyEvent ev) {
 	if(canactivate) {
 	    if(key_act.match(ev)) {

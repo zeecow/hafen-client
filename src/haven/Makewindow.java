@@ -160,8 +160,8 @@ public class Makewindow extends Widget {
 	}
     }
 
-    public static final KeyBinding kb_make = KeyBinding.get2("make/one", KeyMatch.forcode(java.awt.event.KeyEvent.VK_ENTER, 0));
-    public static final KeyBinding kb_makeall = KeyBinding.get2("make/all", KeyMatch.forcode(java.awt.event.KeyEvent.VK_ENTER, KeyMatch.C));
+    public static final KeyBinding kb_make = KeyBinding.get("make/one", KeyMatch.forcode(java.awt.event.KeyEvent.VK_ENTER, 0));
+    public static final KeyBinding kb_makeall = KeyBinding.get("make/all", KeyMatch.forcode(java.awt.event.KeyEvent.VK_ENTER, KeyMatch.C));
     public Makewindow(String rcpnm) {
 	int inputW = add(new Label("Input:"), new Coord(0, UI.scale(8))).sz.x;
 	int resultW = add(new Label("Result:"), new Coord(0, outy + UI.scale(8))).sz.x;
