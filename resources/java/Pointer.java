@@ -4,6 +4,7 @@ import haven.render.Model;
 
 import java.awt.*;
 
+import static haven.MCache.*;
 import static java.lang.Math.*;
 
 /* >wdg: Pointer */
@@ -92,10 +93,33 @@ public class Pointer extends Widget {
 		return;
 	    }
 	} else {
-	    sl = getparent(GameUI.class).map.screenxf2(tc);
+	    HomoCoord4f homo = getparent(GameUI.class).map.clipxf(getMap3d(tc), false);
+	    sl = homo.w < 0 ? null : homo.toview(Area.sized(this.sz));
 	}
 	if(sl != null && sl.z >= 0)
 	    drawarrow(g, new Coord(sl));
+    }
+    
+    Coord3f getMap3d(Coord2d mc) {
+	float z = 0;
+	MapView map = getparent(GameUI.class).map;
+	Gob player = map == null ? null : map.player();
+	if(player != null) {
+	    Coord3f pc = player.getc();
+	    z = pc.z;
+	    Coord2d gsz = tilesz.mul(cmaps.x, cmaps.y);
+	    Coord pgc = player.rc.floor(gsz);
+	    Coord mgc = mc.floor(gsz);
+	    if(pgc.manhattan2(mgc) <= 1) {
+		try {
+		    Coord3f mp = ui.sess.glob.map.getzp(mc);
+		    z = mp.z;
+		} catch (Loading ignored) {
+		    
+		}
+	    }
+	}
+	return new Coord3f((float) mc.x, (float) mc.y, z);
     }
     
     public void update(Coord2d tc, long gobid) {
