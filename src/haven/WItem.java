@@ -301,10 +301,11 @@ public class WItem extends Widget implements DTarget2 {
 	    
 	    if(studyTime != null) {
 		g.chcolor(8, 8, 8, 80);
-		int h = studyTime.sz().y - TEXT_PADD_BOT.y;
-		g.frect(new Coord(0, sz.y - h), new Coord(sz.x, h));
+		int h = studyTime.sz().y + TEXT_PADD_BOT.y;
+		boolean swap = CFG.SWAP_NUM_AND_Q.get();
+		g.frect(new Coord(0, swap ? 0 : sz.y - h), new Coord(sz.x, h));
 		g.chcolor();
-		g.aimage(studyTime, new Coord(sz.x / 2, sz.y), 0.5, 1);
+		g.aimage(studyTime, new Coord(sz.x / 2, swap ? 0 : sz.y), 0.5, swap ? 0 : 1);
 	    }
 	}
     }
