@@ -42,6 +42,7 @@ public class ZeecowOptionsWindow extends JFrame {
     }
 
     private void setContents() {
+        getContentPane().setPreferredSize(new Dimension(300,600));
         tabbedPane = new JTabbedPane();
         getContentPane().add(tabbedPane);
 
@@ -204,16 +205,14 @@ public class ZeecowOptionsWindow extends JFrame {
         });
     }
 
+
     private void buildPanelGobs() {
         panelGobs.removeAll();
-        panelGobs.add(btnRefresh = new JButton("refresh"));
-        btnRefresh.addActionListener(evt -> {
-            buildPanelGobs();
-        });
 
         //panel bottom details
         panelGobDetails = new JPanel();
         panelGobDetails.setLayout(new BoxLayout(panelGobDetails,BoxLayout.PAGE_AXIS));
+        panelGobDetails.setPreferredSize(new Dimension(300,300));
 
         //subtabs pane
         tabbedPaneGobs = new JTabbedPane();
@@ -237,7 +236,15 @@ public class ZeecowOptionsWindow extends JFrame {
         }else {
             listGobsTemp = new JList<String>();
         }
-        tabbedPaneGobs.addTab("Session("+ZeeConfig.mapGobSession.size()+")",new JScrollPane(listGobsTemp));
+        JPanel panelTabGobSess = new JPanel();
+        panelTabGobSess.setLayout(new BoxLayout(panelTabGobSess,BoxLayout.PAGE_AXIS));
+        panelTabGobSess.add(new JScrollPane(listGobsTemp));
+        tabbedPaneGobs.addTab("Session("+ZeeConfig.mapGobSession.size()+")", panelTabGobSess);
+        panelTabGobSess.add(btnRefresh = new JButton("refresh"));
+        btnRefresh.addActionListener(evt -> {
+            buildPanelGobs();
+        });
+
         listGobsTemp.addListSelectionListener(new ListSelectionListener() {
             @Override
             public void valueChanged(ListSelectionEvent evt) {
@@ -268,9 +275,11 @@ public class ZeecowOptionsWindow extends JFrame {
         panelTabCateg = new JPanel();
         panelTabCateg.setLayout(new BoxLayout(panelTabCateg,BoxLayout.PAGE_AXIS));
         tabbedPaneGobs.addTab("Categs",panelTabCateg);
-        panelTabCateg.add(btnResetCateg = new JButton("Reset categories"), BorderLayout.NORTH);
+        JPanel panelButtonCateg = new JPanel(new FlowLayout());
+        panelTabCateg.add(panelButtonCateg);
+        panelButtonCateg.add(btnResetCateg = new JButton("Reset categories"), BorderLayout.NORTH);
         btnResetCateg.addActionListener(evt->{ resetCategoriesToDefault(); });
-        panelTabCateg.add(btnAddCateg = new JButton("Add categories"), BorderLayout.NORTH);
+        panelButtonCateg.add(btnAddCateg = new JButton("Add categories"), BorderLayout.NORTH);
         btnAddCateg.addActionListener(evt->{ addCategoryNew(); });
         panelTabCateg.add(new JScrollPane(listGobsCategories), BorderLayout.CENTER);
         listGobsCategories.addListSelectionListener(new ListSelectionListener() {
@@ -282,32 +291,44 @@ public class ZeecowOptionsWindow extends JFrame {
         });
 
         panelGobs.add(panelGobDetails);
+        pack();
     }
 
 
     private void updatePanelDetails() {
+
+        //build category details
         if(tabbedPaneGobs.getSelectedIndex()==TABGOB_CATEGS){
             tabCategsSelected();
             return;
         }
+
+        //build gob details(saved and session)
         JList<String> list = null;
         if(tabbedPaneGobs.getSelectedIndex()==TABGOB_SESSION) {
             list = listGobsTemp;
         }else if(tabbedPaneGobs.getSelectedIndex()==TABGOB_SAVED) {
             list = listGobsSaved;
         }
+
         panelGobDetails.removeAll();
+
+        //gob name
         panelGobDetails.add(new JLabel("Gob name:"),BorderLayout.NORTH);
         panelGobDetails.add(tfGobName = new JTextField(list.getSelectedValue()),BorderLayout.NORTH);
 
-
+        //audio file name
         panelGobDetails.add(new JLabel("Audio alert:"),BorderLayout.CENTER);
         panelGobDetails.add(tfAudioPath = new JTextField(ZeeConfig.mapGobSaved.get(list.getSelectedValue())),BorderLayout.CENTER);
-        panelGobDetails.add(btnAudioSave = new JButton("Select Audio"),BorderLayout.SOUTH);
+
+        //audio buttons
+        JPanel panelAudioButtons;
+        panelGobDetails.add(panelAudioButtons = new JPanel(new FlowLayout()));
+        panelAudioButtons.add(btnAudioSave = new JButton("Select Audio"),BorderLayout.SOUTH);
         btnAudioSave.addActionListener(evt->{ audioSave(); });
-        panelGobDetails.add(btnAudioClear = new JButton("Clear Audio"),BorderLayout.SOUTH);
+        panelAudioButtons.add(btnAudioClear = new JButton("Clear Audio"),BorderLayout.SOUTH);
         btnAudioClear.addActionListener(evt->{ audioClear(); });
-        panelGobDetails.add(btnAudioTest = new JButton("Test Audio"),BorderLayout.SOUTH);
+        panelAudioButtons.add(btnAudioTest = new JButton("Test Audio"),BorderLayout.SOUTH);
         btnAudioTest.addActionListener(evt->{ audioTest(); });
 
 
@@ -325,7 +346,10 @@ public class ZeecowOptionsWindow extends JFrame {
         cmbGobCategory.addActionListener(evt->{
             addGobToCategory();
         });
-        panelGobDetails.add(btnRemGobFromCateg = new JButton("Remove from category"),BorderLayout.SOUTH);
+
+        JPanel panelButtonRemCateg = new JPanel(new FlowLayout());
+        panelGobDetails.add(panelButtonRemCateg);
+        panelButtonRemCateg.add(btnRemGobFromCateg = new JButton("Remove from category"),BorderLayout.SOUTH);
         btnRemGobFromCateg.addActionListener(evt->{ removeGobFromCategory(); });
         pack();
     }
@@ -363,15 +387,26 @@ public class ZeecowOptionsWindow extends JFrame {
 
     private void tabCategsSelected() {
         panelGobDetails.removeAll();
-        panelGobDetails.add(new JLabel("Category name:"),BorderLayout.NORTH);
+
+        //category name
+        JLabel label;
+        panelGobDetails.add(label=new JLabel("Category name:"),BorderLayout.NORTH);
+        label.setAlignmentX(Component.RIGHT_ALIGNMENT);
         panelGobDetails.add(tfCategName = new JTextField(listGobsCategories.getSelectedValue()),BorderLayout.NORTH);
-        panelGobDetails.add(new JLabel("Audio alert:"),BorderLayout.CENTER);
+
+        //category audio file
+        panelGobDetails.add(label=new JLabel("Audio alert:"),BorderLayout.CENTER);
+        label.setAlignmentX(Component.RIGHT_ALIGNMENT);
         panelGobDetails.add(tfAudioPathCateg = new JTextField(ZeeConfig.mapCategoryAudio.get(listGobsCategories.getSelectedValue())),BorderLayout.CENTER);
-        panelGobDetails.add(btnAudioSave = new JButton("Select Audio"),BorderLayout.SOUTH);
+
+        //audio buttons
+        JPanel panelAudioButtons;
+        panelGobDetails.add(panelAudioButtons = new JPanel(new FlowLayout()));
+        panelAudioButtons.add(btnAudioSave = new JButton("Select Audio"),BorderLayout.SOUTH);
         btnAudioSave.addActionListener(evt->{ audioSave(); });
-        panelGobDetails.add(btnAudioClear = new JButton("Clear Audio"),BorderLayout.SOUTH);
+        panelAudioButtons.add(btnAudioClear = new JButton("Clear Audio"),BorderLayout.SOUTH);
         btnAudioClear.addActionListener(evt->{ audioClear(); });
-        panelGobDetails.add(btnAudioTest = new JButton("Test Audio"),BorderLayout.SOUTH);
+        panelAudioButtons.add(btnAudioTest = new JButton("Test Audio"),BorderLayout.SOUTH);
         btnAudioTest.addActionListener(evt->{ audioTest(); });
         pack();
     }
@@ -476,9 +511,9 @@ public class ZeecowOptionsWindow extends JFrame {
         fileChooser.addChoosableFileFilter(new FileNameExtensionFilter("Audio files","mp3","wav","ogg","mid","midi"));
         if (fileChooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
 
+            //save audio for category
             if(tabbedPaneGobs.getSelectedIndex()==TABGOB_CATEGS){
                 tfAudioPathCateg.setText(fileChooser.getSelectedFile().getAbsolutePath());
-                //save audio for category
                 ZeeConfig.mapCategoryAudio.put(
                         tfCategName.getText().trim(),
                         fileChooser.getSelectedFile().getAbsolutePath()
@@ -492,8 +527,9 @@ public class ZeecowOptionsWindow extends JFrame {
                                 .trim()
                 );
             }else {
-                tfAudioPath.setText(fileChooser.getSelectedFile().getAbsolutePath());
+
                 //save audio for single gob
+                tfAudioPath.setText(fileChooser.getSelectedFile().getAbsolutePath());
                 ZeeConfig.mapGobSaved.put(
                         tfGobName.getText().trim(),
                         fileChooser.getSelectedFile().getAbsolutePath()
