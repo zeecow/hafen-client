@@ -372,7 +372,6 @@ public class OptWnd extends Window {
 	    Widget prev;
 	    int y = 0;
 	    y = cont.adda(new Label("Main menu"), cont.sz.x / 2, y, 0.5, 0.0).pos("bl").adds(0, 5).y;
-	    /*
 	    y = addbtn(cont, "Inventory", GameUI.kb_inv, y);
 	    y = addbtn(cont, "Equipment", GameUI.kb_equ, y);
 	    y = addbtn(cont, "Character sheet", GameUI.kb_chr, y);
@@ -381,18 +380,16 @@ public class OptWnd extends Window {
 	    y = addbtn(cont, "Options", GameUI.kb_opt, y);
 	    y = addbtn(cont, "Search actions", GameUI.kb_srch, y);
 	    y = addbtn(cont, "Toggle chat", GameUI.kb_chat, y);
-	    */
 	    y = addbtn(cont, "Quick chat", ChatUI.kb_quick, y);
 	    y = addbtn(cont, "Take screenshot", GameUI.kb_shoot, y);
-	    /*
-	    y = addbtn(cont, "Minimap icons", GameUI.kb_ico, y);*/
+	    y = addbtn(cont, "Minimap icons", GameUI.kb_ico, y);
 	    y = addbtn(cont, "Toggle UI", GameUI.kb_hide, y);
-	    /*
 	    y = cont.adda(new Label("Map options"), cont.sz.x / 2, y + UI.scale(10), 0.5, 0.0).pos("bl").adds(0, 5).y;
 	    y = addbtn(cont, "Display claims", GameUI.kb_claim, y);
 	    y = addbtn(cont, "Display villages", GameUI.kb_vil, y);
 	    y = addbtn(cont, "Display realms", GameUI.kb_rlm, y);
 	    y = addbtn(cont, "Display grid-lines", MapView.kb_grid, y);
+	    /*
 	    y = cont.adda(new Label("Camera control"), cont.sz.x / 2, y + UI.scale(10), 0.5, 0.0).pos("bl").adds(0, 5).y;
 	    y = addbtn(cont, "Rotate left", MapView.kb_camleft, y);
 	    y = addbtn(cont, "Rotate right", MapView.kb_camright, y);
@@ -431,7 +428,6 @@ public class OptWnd extends Window {
 
 	    public void set(KeyMatch key) {
 		super.set(key);
-		cmd.set(KeyMatch2.from(key));
 	    }
 
 	    public void draw(GOut g) {
@@ -588,9 +584,8 @@ public class OptWnd extends Window {
 
 	addPanelButton("General settings", 'g', general, 1, 0);
 	addPanelButton("Display settings", 'd', display, 1, 1);
-	addPanelButton("Radar settings", 'r', Action.TOGGLE_MINIMAP_ICONS_SETTINGS, 1, 2);
+	addPanelButton("Mapping settings", 'm', mapping, 1, 2);
 	addPanelButton("Global shortcuts", 's', shortcuts, 1, 3);
-	addPanelButton("Mapping settings", 'm', mapping, 1, 4);
 
 	int y = 0;
 	Widget prev;

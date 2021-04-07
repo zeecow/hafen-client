@@ -433,11 +433,11 @@ public class MapView extends PView implements DTarget, Console.Directory {
 	}
     }
 
-    public static KeyBinding kb_camleft  = KeyBinding.get("cam-left",  KeyMatch.forcode(KeyEvent.VK_LEFT, 0));
-    public static KeyBinding kb_camright = KeyBinding.get("cam-right", KeyMatch.forcode(KeyEvent.VK_RIGHT, 0));
-    public static KeyBinding kb_camin    = KeyBinding.get("cam-in",    KeyMatch.forcode(KeyEvent.VK_UP, 0));
-    public static KeyBinding kb_camout   = KeyBinding.get("cam-out",   KeyMatch.forcode(KeyEvent.VK_DOWN, 0));
-    public static KeyBinding kb_camreset = KeyBinding.get("cam-reset", KeyMatch.forcode(KeyEvent.VK_HOME, 0));
+    public static KeyBinding kb_camleft  = KeyBinding.get("cam-left",  KeyMatchFake.forcode(KeyEvent.VK_LEFT, 0));
+    public static KeyBinding kb_camright = KeyBinding.get("cam-right", KeyMatchFake.forcode(KeyEvent.VK_RIGHT, 0));
+    public static KeyBinding kb_camin    = KeyBinding.get("cam-in",    KeyMatchFake.forcode(KeyEvent.VK_UP, 0));
+    public static KeyBinding kb_camout   = KeyBinding.get("cam-out",   KeyMatchFake.forcode(KeyEvent.VK_DOWN, 0));
+    public static KeyBinding kb_camreset = KeyBinding.get("cam-reset", KeyMatchFake.forcode(KeyEvent.VK_HOME, 0));
     public class SOrthoCam extends OrthoCam {
 	private Coord dragorig = null;
 	private float anglorig;
@@ -2231,12 +2231,10 @@ public class MapView extends PView implements DTarget, Console.Directory {
 
     public static final KeyBinding kb_grid = KeyBinding.get("grid", KeyMatch.forchar('G', KeyMatch.C));
     public boolean globtype(char c, KeyEvent ev) {
-        /* Actually set in haven.Actions.TOGGLE_TILE_GRID
 	if(kb_grid.key().match(ev)) {
 	    showgrid(gridlines == null);
 	    return(true);
 	}
-	*/
 	return(false);
     }
 
@@ -2488,10 +2486,6 @@ public class MapView extends PView implements DTarget, Console.Directory {
 	    });
     }
     
-    public void togglegrid() {
-	showgrid(gridlines == null);
-    }
-    
     public void zoomCamera(int amount) { camera.wheel(Coord.z, amount); }
     
     public void rotateCamera(Coord r) {
@@ -2502,18 +2496,6 @@ public class MapView extends PView implements DTarget, Console.Directory {
     }
     
     public void resetCamera() { camera.reset(); }
-    
-    public static Action.Do toggleolact(String tag) {
-	return gui -> {
-	    boolean vis = gui.map.visol(tag);
-	    if(vis){
-		gui.map.disol(tag);
-	    } else {
-		gui.map.enol(tag);
-		
-	    }
-	};
-    }
     
     public boolean isInspecting() {
 	return cursor == inspectCursor;

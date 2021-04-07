@@ -274,7 +274,7 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 	closeWindow(studywnd); studywnd = null;
     }
 
-    public static final KeyBinding kb_srch = KeyBinding.get("scm-srch", KeyMatch.forchar('Z', KeyMatch.C));
+    public static final KeyBinding kb_srch = KeyBinding.get("scm-srch", KeyMatch.nil);
     private void menubuttons(Widget bg) {
 	brpanel.add(new MenuButton("csearch", kb_srch, "Search actions...") {
 		public void click() {
@@ -490,43 +490,6 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 	    actlist.hide();
 	} else {
 	    actlist.show();
-	}
-    }
-    
-    public void toggleInventory() {
-	if((invwnd != null) && invwnd.show(!invwnd.visible)) {
-	    invwnd.raise();
-	    fitwdg(invwnd);
-	}
-    }
-    
-    public void toggleEquipment() {
-	if((equwnd != null) && equwnd.show(!equwnd.visible)) {
-	    equwnd.raise();
-	    fitwdg(equwnd);
-	}
-    }
-    
-    public void toggleCharacter() {
-	if((chrwdg != null) && chrwdg.show(!chrwdg.visible)) {
-	    chrwdg.raise();
-	    fitwdg(chrwdg);
-	}
-    }
-    
-    public void toggleKinList() {
-	if(zerg.show(!zerg.visible)) {
-	    zerg.raise();
-	    fitwdg(zerg);
-	    setfocus(zerg);
-	}
-    }
-    
-    public void toggleOptions() {
-	if(opts.show(!opts.visible)) {
-	    opts.raise();
-	    fitwdg(opts);
-	    setfocus(opts);
 	}
     }
     
@@ -1493,11 +1456,11 @@ public class GameUI extends ConsoleHost implements Console.Directory {
     public class MainMenu extends Widget {
 	public MainMenu() {
 	    super(menubg.sz());
-	    add(new MenuCheckBox2("rbtn-inv", "Inventory", TOGGLE_INVENTORY, KeyEvent.VK_TAB, NONE).state(() -> wndstate(invwnd)) , 0, 0);
-	    add(new MenuCheckBox2("rbtn-equ", "Equipment", TOGGLE_EQUIPMENT, KeyEvent.VK_E, CTRL).state(() -> wndstate(equwnd)), 0, 0);
-	    add(new MenuCheckBox2("rbtn-chr", "Character Sheet", TOGGLE_CHARACTER, KeyEvent.VK_T, CTRL).state(() -> wndstate(chrwdg)), 0, 0);
-	    add(new MenuCheckBox2("rbtn-bud", "Kith & Kin", TOGGLE_KIN_LIST, KeyEvent.VK_B, CTRL).state(() -> wndstate(zerg)), 0, 0);
-	    add(new MenuCheckBox2("rbtn-opt", "Options", TOGGLE_OPTIONS, KeyEvent.VK_O, CTRL).state(() -> wndstate(opts)), 0, 0);
+	    add(new MenuCheckBox("rbtn-inv", kb_inv, "Inventory"), 0, 0).state(() -> wndstate(invwnd)).click(() -> togglewnd(invwnd));
+	    add(new MenuCheckBox("rbtn-equ", kb_equ, "Equipment"), 0, 0).state(() -> wndstate(equwnd)).click(() -> togglewnd(equwnd));
+	    add(new MenuCheckBox("rbtn-chr", kb_chr, "Character Sheet"), 0, 0).state(() -> wndstate(chrwdg)).click(() -> togglewnd(chrwdg));
+	    add(new MenuCheckBox("rbtn-bud", kb_bud, "Kith & Kin"), 0, 0).state(() -> wndstate(zerg)).click(() -> togglewnd(zerg));
+	    add(new MenuCheckBox("rbtn-opt", kb_opt, "Options"), 0, 0).state(() -> wndstate(opts)).click(() -> togglewnd(opts));
 	}
 
 	public void draw(GOut g) {
@@ -1506,25 +1469,6 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 	}
     }
     
-    public static class MenuCheckBox2 extends ICheckBox {
-	private final Action action;
-    
-	MenuCheckBox2(String base, String tooltip, Action action, int code, int mods) {
-	    super("gfx/hud/" + base, "", "-d", "-h", "-dh");
-	    this.action = KeyBinder.add(code, mods, action);
-	    this.tooltip = new KeyBindTip(tooltip, action);
-	}
-    
-	MenuCheckBox2(String base, String tooltip, Action action) {
-	    this(base, tooltip, action, 0, 0);
-	}
-	
-	@Override
-	public void click() {
-	    action.run(ui.gui);
-	}
-    }
-
     public static final KeyBinding kb_map = KeyBinding.get("map", KeyMatch.forchar('A', KeyMatch.C));
     public static final KeyBinding kb_claim = KeyBinding.get("ol-claim", KeyMatch.nil);
     public static final KeyBinding kb_vil = KeyBinding.get("ol-vil", KeyMatch.nil);
@@ -1543,11 +1487,26 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 
 	public MapMenu() {
 	    super(mapmenubg.sz());
-	    add(new MenuCheckBox2("lbtn-claim",  "Display personal claims", TOGGLE_PERSONAL_CLAIMS));
-	    add(new MenuCheckBox2("lbtn-vil",  "Display village claims", TOGGLE_VILLAGE_CLAIMS));
-	    add(new MenuCheckBox2("lbtn-rlm",  "Display realms", TOGGLE_REALM_CLAIMS));
-	    add(new MenuCheckBox2("lbtn-map", "Map", TOGGLE_MAP, KeyEvent.VK_A, CTRL));
-	    add(new MenuCheckBox2("lbtn-ico",  "Icon settings", TOGGLE_MINIMAP_ICONS_SETTINGS));
+	    add(new MenuCheckBox("lbtn-claim", kb_claim, "Display personal claims"), 0, 0).changed(a -> toggleol("cplot", a));
+	    add(new MenuCheckBox("lbtn-vil", kb_vil, "Display village claims"), 0, 0).changed(a -> toggleol("vlg", a));
+	    add(new MenuCheckBox("lbtn-rlm", kb_rlm, "Display realms"), 0, 0).changed(a -> toggleol("realm", a));
+	    add(new MenuCheckBox("lbtn-map", kb_map, "Map")).state(() -> wndstate(mapfile)).click(() -> {
+		togglewnd(mapfile);
+		if(mapfile != null)
+		    Utils.setprefb("wndvis-map", mapfile.visible);
+	    });
+	    add(new MenuCheckBox("lbtn-ico", kb_ico, "Icon settings"), 0, 0).state(() -> wndstate(iconwnd)).click(() -> {
+		if(iconconf == null)
+		    return;
+		if(iconwnd == null) {
+//		    iconwnd = new GobIcon.SettingsWindow(iconconf, () -> Utils.defer(GameUI.this::saveiconconf));
+		    iconwnd = new GobIconSettings(iconconf, () -> Utils.defer(GameUI.this::saveiconconf));
+		    fitwdg(GameUI.this.add(iconwnd, Utils.getprefc("wndc-icon", new Coord(200, 200))));
+		} else {
+		    ui.destroy(iconwnd);
+		    iconwnd = null;
+		}
+	    });
 	}
 
 	public void draw(GOut g) {
@@ -1556,19 +1515,6 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 	}
     }
     
-    public void toggleIconSettings(){
-	if(iconconf == null)
-	    return;
-	if(iconwnd == null) {
-//	    iconwnd = new GobIcon.SettingsWindow(iconconf, () -> Utils.defer(GameUI.this::saveiconconf));
-	    iconwnd = new GobIconSettings(iconconf, () -> Utils.defer(GameUI.this::saveiconconf));
-	    fitwdg(GameUI.this.add(iconwnd, Utils.getprefc("wndc-icon", new Coord(200, 200))));
-	} else {
-	    ui.destroy(iconwnd);
-	    iconwnd = null;
-	}
-    }
-
     public static final KeyBinding kb_shoot = KeyBinding.get("screenshot", KeyMatch.forchar('S', KeyMatch.C));
     public static final KeyBinding kb_chat = KeyBinding.get("chat-toggle", KeyMatch.forchar('C', KeyMatch.C));
     public static final KeyBinding kb_hide = KeyBinding.get("ui-toggle", KeyMatch.nil);
@@ -1815,7 +1761,7 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 	    adda(new IButton("gfx/hud/hb-btn-chat", "", "-d", "-h") {
 		    Tex glow;
 		    {
-			this.tooltip = RichText.render("Chat ($col[255,255,0]{Ctrl+C})", 0);
+//			this.tooltip = RichText.render("Chat ($col[255,255,0]{Ctrl+C})", 0);
 			glow = new TexI(PUtils.rasterimg(PUtils.blurmask(up.getRaster(), 2, 2, Color.WHITE)));
 		    }
 
