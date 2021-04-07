@@ -8,11 +8,9 @@ public enum Action {
     TOGGLE_CHARACTER(GameUI::toggleCharacter, "Character Sheet"),
     TOGGLE_KIN_LIST(GameUI::toggleKinList, "Kith & Kin"),
     TOGGLE_OPTIONS(GameUI::toggleOptions, "Options"),
-    TOGGLE_CHAT(GameUI::toggleChat, "Toggle Chat"),
     TOGGLE_MAP(GameUI::toggleMap, "Toggle Map"),
     TOGGLE_MINIMAP_ICONS_SETTINGS(GameUI::toggleIconSettings, "Show minimap icon settings"),
     TOGGLE_TIMERS(GameUI::toggleTimers, "Toggle Timers"),
-    TAKE_SCREENSHOT(GameUI::takeScreenshot, "Take Screenshot"),
     
     TOGGLE_PERSONAL_CLAIMS(MapView.toggleolact("cplot"), "Display personal claims"),
     TOGGLE_VILLAGE_CLAIMS(MapView.toggleolact("vlg"), "Display village claims"),

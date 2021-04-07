@@ -1569,15 +1569,21 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 	}
     }
 
-    public static final KeyBinding kb_shoot = KeyBinding.get("screenshot", KeyMatch.forchar('S', KeyMatch.M));
-    public static final KeyBinding kb_chat = KeyBinding.get("chat-toggle", KeyMatch.forchar('C', KeyMatch.C));
-    public static final KeyBinding kb_hide = KeyBinding.get("ui-toggle", KeyMatch.nil);
+    public static final KeyBinding kb_shoot = KeyBinding.get2("screenshot", KeyMatch.forchar('S', KeyMatch.M));
+    public static final KeyBinding kb_chat = KeyBinding.get2("chat-toggle", KeyMatch.forchar('C', KeyMatch.C));
+    public static final KeyBinding kb_hide = KeyBinding.get2("ui-toggle", KeyMatch.nil);
     public boolean globtype(char key, KeyEvent ev) {
 	if(key == ':') {
 	    entercmd();
 	    return(true);
-	} else if(key == ' ') {
+	} else if((Config.screenurl != null) && kb_shoot.key().match(ev)) {
+	    Screenshooter.take(this, Config.screenurl);
+	    return(true);
+	} else if(kb_hide.key().match(ev)) {
 	    toggleui();
+	    return(true);
+	} else if(kb_chat.key().match(ev)) {
+	    toggleChat();
 	    return(true);
 	} else if((key == 27) && (map != null) && !map.hasfocus) {
 	    setfocus(map);
@@ -1811,7 +1817,6 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 		    {
 			this.tooltip = RichText.render("Chat ($col[255,255,0]{Ctrl+C})", 0);
 			glow = new TexI(PUtils.rasterimg(PUtils.blurmask(up.getRaster(), 2, 2, Color.WHITE)));
-			KeyBinder.add(KeyEvent.VK_C, CTRL, TOGGLE_CHAT);
 		    }
 
 		    public void click() {
@@ -1823,10 +1828,10 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 		    if(!checkhit(c)) {
 			return null;
 		    }
-		    KeyBinder.KeyBind bind = KeyBinder.get(TOGGLE_CHAT);
 		    String tt = "Chat";
-		    if(bind != null && !bind.isEmpty()) {
-			tt = String.format("%s ($col[255,255,0]{%s})", tt, bind.shortcut());
+		    
+		    if(kb_chat.key() != KeyMatch.nil) {
+			tt = String.format("%s ($col[255,255,0]{%s})", tt, kb_chat.key().name());
 		    }
 		    return RichText.render(tt, 0);
 		}
