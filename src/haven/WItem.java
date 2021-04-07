@@ -315,9 +315,10 @@ public class WItem extends Widget implements DTarget2 {
     
     private Tex getStudyTime() {
 	Pair<String, String> data = study.get();
-	String value = data.a;
-	if(!Objects.equals(data.b, cachedTipValue)) {
-	    cachedTipValue = data.b;
+	String value = data == null ? null : data.a;
+	String tip = data == null ? null : data.b;
+	if(!Objects.equals(tip, cachedTipValue)) {
+	    cachedTipValue = tip;
 	    longtip = null;
 	}
 	if(value != null) {
