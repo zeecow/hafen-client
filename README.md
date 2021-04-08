@@ -5,6 +5,7 @@ original features:
  - compact equip window
  - belt toggles equip window
  - shorter cattle roster window
+ - reposition map window when compacted/expanded
 
 other stuff:
  - autodrop mined items, seeds, soil
@@ -12,4 +13,5 @@ other stuff:
  - sort transfer with Alt+Rclick or Alt+Lclick (no gemstone yet)
  - Auto-hearth  
  - replaces arrow cursor with system's default
- - basic MIDI sequencer for alerts
+ - show claims by default
+ - optional friend online notification
