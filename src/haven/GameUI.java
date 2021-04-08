@@ -433,6 +433,7 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 		    }
 		    for(String ln : lines) {
 			syslog.append(ln, Color.WHITE);
+		    	System.out.println(ln);
 		    }
 		}
 		
