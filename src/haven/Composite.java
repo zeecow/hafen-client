@@ -27,7 +27,8 @@
 package haven;
 
 import java.util.*;
-import java.lang.reflect.*;
+import java.util.stream.Collectors;
+
 import haven.render.*;
 import haven.Skeleton.Pose;
 import haven.Skeleton.PoseMod;
@@ -45,6 +46,7 @@ public class Composite extends Drawable {
     private boolean nposesold, retainequ = false;
     private float tptime;
     private WrapMode tpmode;
+    private String resId = null;
     
     public Composite(Gob gob, Indir<Resource> base) {
 	super(gob);
@@ -170,6 +172,7 @@ public class Composite extends Drawable {
 
     public void chmod(List<MD> mod) {
 	nmod = mod;
+	resId = makeResId();
     }
 
     public void chequ(List<ED> equ) {
@@ -178,5 +181,35 @@ public class Composite extends Drawable {
 
     public Object staticp() {
 	return(null);
+    }
+    
+    public String resId() { return resId; }
+    
+    private String makeResId() {
+	if(nmod == null) {return resId;}
+	
+	Set<String> res = new HashSet<>();
+	String name = null;
+	try {
+	    name = base.get().name;
+	    if("gfx/borka/body".equals(name)) {
+		return name;
+	    } else if(name != null) {
+		for (MD mod : nmod) {
+		    String mname = mod.mod.get().name;
+		    if(!name.equals(mname))
+			res.add(mname);
+		}
+	    }
+	} catch (Resource.Loading ignored) {}
+	
+	if(name == null) {
+	    return null;
+	} else if(res.isEmpty()) {
+	    return name;
+	} else {
+	    String mods = res.stream().sorted().collect(Collectors.joining(","));
+	    return String.format("%s[%s]", name, mods);
+	}
     }
 }

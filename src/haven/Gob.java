@@ -744,6 +744,13 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Sk
 	return(null);
     }
     
+    public String resid() {
+	Drawable d = getattr(Drawable.class);
+	if(d != null)
+	    return d.resId();
+	return null;
+    }
+    
     private static final ClassResolver<Gob> ctxr = new ClassResolver<Gob>()
 	.add(Glob.class, g -> g.glob)
 	.add(Session.class, g -> g.glob.sess);

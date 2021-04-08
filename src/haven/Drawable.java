@@ -35,6 +35,7 @@ public abstract class Drawable extends GAttrib implements Skeleton.HasPose, Rend
 	
     public abstract Resource getres();
     public abstract Indir<Resource> getires();
+    public abstract String resId();
     
     public void gtick(Render g) {
     }

@@ -63,4 +63,9 @@ public class SprDrawable extends Drawable {
     public Indir<Resource> getires() {
 	return null;
     }
+
+    @Override
+    public String resId() {
+	return null;
+    }
 }

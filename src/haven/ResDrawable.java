@@ -73,6 +73,12 @@ public class ResDrawable extends Drawable {
 	return res;
     }
     
+    
+    @Override
+    public String resId() {
+	return res.get().name;
+    }
+    
     public Skeleton.Pose getpose() {
 	return(Skeleton.getpose(spr));
     }
