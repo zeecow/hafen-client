@@ -1,0 +1,18 @@
+[
+  {"match": "gfx/kritter/bogturtle/bogturtle", "icon": "gfx/invobjs/bogturtle", "visible": true},
+  {"match": "gfx/kritter/chicken/chick", "icon": "gfx/kritter/chicken/icon-chick", "visible": true},
+  {"match": "gfx/kritter/chicken/chicken[gfx/kritter/chicken/hen]", "icon": "gfx/invobjs/hen", "visible": true},
+  {"match": "gfx/kritter/chicken/chicken[gfx/kritter/chicken/rooster]", "icon": "gfx/invobjs/rooster", "visible": true},
+  {"match": "gfx/kritter/magpie/magpie", "icon": "gfx/invobjs/magpie", "visible": true},
+  {"match": "gfx/kritter/mallard/mallard[gfx/kritter/mallard/mallard-f]", "icon": "gfx/invobjs/mallard-f", "visible": true},
+  {"match": "gfx/kritter/mallard/mallard[gfx/kritter/mallard/mallard-m]", "icon": "gfx/invobjs/mallard-m", "visible": true},
+  {"match": "gfx/kritter/rabbit/rabbit", "icon": "gfx/invobjs/rabbit", "visible": true},
+  {"match": "gfx/kritter/rabbit/rabbit[gfx/kritter/rabbit/doe]", "icon": "gfx/invobjs/rabbit-doe", "visible": true},
+  {"match": "gfx/kritter/rockdove/rockdove", "icon": "gfx/invobjs/rockdove", "visible": true},
+  {"match": "gfx/kritter/squirrel/squirrel", "icon": "gfx/kritter/squirrel/icon", "visible": true},
+
+  {"match": "gfx/terobjs/pow", "icon": "radar/hearthfire", "visible": true},
+  {"match": "gfx/terobjs/vehicle/rowboat", "icon": "radar/rowboat", "visible": true},
+  {"match": "gfx/terobjs/vehicle/dugout", "icon": "radar/dugout", "visible": true},
+  {"match": "gfx/terobjs/items/arrow", "icon": "gfx/invobjs/arrow", "visible": false}
+]

@@ -1,18 +1,17 @@
 package haven;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
+
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 public class Radar {
-    
+    public static final String CONFIG_JSON = "radar.json";
     private static final Map<String, String> gob2icon = new HashMap<>();
-    
-    static {
-        //TODO: read from config
-	gob2icon.put("gfx/kritter/squirrel/squirrel", "gfx/kritter/squirrel/icon");
-	gob2icon.put("gfx/kritter/chicken/chicken[gfx/kritter/chicken/hen]", "gfx/invobjs/hen");
-	gob2icon.put("gfx/terobjs/pow", "paginae/act/hearth");
-    }
     
     public static boolean process(GobIcon icon) {
 	try {
@@ -21,8 +20,7 @@ public class Radar {
 	    if(gres != null && ires != null) {
 		if(!ires.equals(gob2icon.get(gres))) {
 		    gob2icon.put(gres, ires);
-		    Debug.log.printf("%s => %s%n", gres, ires);
-		    //TODO: changed, save
+		    //if(gres.contains("kritter")) Debug.log.printf("gob2icon.put(\"%s\", \"%s\");%n", gres, ires);
 		}
 		return true;
 	    }
@@ -38,9 +36,14 @@ public class Radar {
 	return null;
     }
     
-    public static void addCustomSettings(Map<String, GobIcon.Setting> settings) {
-	//TODO: read from config
-	addSetting(settings, "paginae/act/hearth", true);
+    public static void addCustomSettings(Map<String, GobIcon.Setting> settings, UI ui) {
+	List<RadarItemVO> items = load(Config.loadJarFile(CONFIG_JSON));
+	items.addAll(load(Config.loadFSFile(CONFIG_JSON)));
+	for (RadarItemVO item : items) {
+	    gob2icon.put(item.match, item.icon);
+	    addSetting(settings, item.icon, item.visible);
+	}
+	ui.sess.glob.oc.gobAction(Gob::updateIcon);
     }
     
     private static void addSetting(Map<String, GobIcon.Setting> settings, String res, boolean def) {
@@ -49,5 +52,21 @@ public class Radar {
 	    cfg.show = cfg.defshow = def;
 	    settings.put(res, cfg);
 	}
+    }
+    
+    private static List<RadarItemVO> load(String json) {
+	if(json != null) {
+	    Gson gson = (new GsonBuilder()).setPrettyPrinting().create();
+	    try {
+		return gson.fromJson(json, new TypeToken<List<RadarItemVO>>() {
+		}.getType());
+	    } catch (Exception ignored) {}
+	}
+	return new LinkedList<>();
+    }
+    
+    private static class RadarItemVO {
+	String match, icon;
+	boolean visible;
     }
 }
