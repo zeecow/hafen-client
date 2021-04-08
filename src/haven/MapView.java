@@ -1790,7 +1790,6 @@ public class MapView extends PView implements DTarget, Console.Directory {
 	Loader.Future<Plob> placing = this.placing;
 	if((placing != null) && placing.done())
 	    placing.get().ctick(dt);
-	Radar.tick();
     }
     
     public void resize(Coord sz) {

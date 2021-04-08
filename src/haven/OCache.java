@@ -69,8 +69,6 @@ public class OCache implements Iterable<Gob> {
 
     public OCache(Glob glob) {
 	this.glob = glob;
-	Radar.clean();
-	callback(Radar.CHANGED);
 	callback(Gob.CHANGED);
 	CFG.DISPLAY_GOB_HITBOX.observe(cfg -> gobAction(Gob::updateHitbox));
 	CFG.DISPLAY_GOB_HITBOX_TOP.observe(cfg -> gobAction(Gob::updateHitbox));
@@ -253,7 +251,6 @@ public class OCache implements Iterable<Gob> {
 	    g.drawableUpdated();
 	} else if((d == null) || (d.res != res) || !d.sdt.equals(sdt)) {
 	    g.setattr(new ResDrawable(g, res, sdt));
-	    Radar.add(g, res);
 	}
     }
     public Delta cres(Message msg) {
@@ -335,7 +332,6 @@ public class OCache implements Iterable<Gob> {
 	if((cmp == null) || !cmp.base.equals(base)) {
 	    cmp = new Composite(g, base);
 	    g.setattr(cmp);
-	    Radar.add(g, cmp.base);
 	}
     }
     public Delta composite(Message msg) {
