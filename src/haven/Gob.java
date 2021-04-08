@@ -915,6 +915,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Sk
 	if(updateseq == 0) {return;}
 	updateTags();
 	updateHitbox();
+	updateIcon();
 	updateTreeVisibility();
     }
     
@@ -948,6 +949,15 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Sk
 		    untag(GobTag.HIDDEN);
 		}
 		updateHitbox();
+	    }
+	}
+    }
+    
+    public void updateIcon() {
+	if(getattr(GobIcon.class) == null) {
+	    GobIcon icon = Radar.getIcon(this);
+	    if(icon != null) {
+		setattr(icon);
 	    }
 	}
     }
