@@ -37,7 +37,6 @@ public class GobIcon extends GAttrib {
     private static final Map<Indir<Resource>, Image> cache = new WeakHashMap<>();
     public final Indir<Resource> res;
     private Image img;
-    private boolean setup = false;
 
     public GobIcon(Gob g, Indir<Resource> res) {
 	super(g);
@@ -101,12 +100,6 @@ public class GobIcon extends GAttrib {
 	} catch (Resource.Loading ignored) {}
 	return tt;
     }
-    
-    @Override
-    public void ctick(double dt) {
-	if(!setup) { setup = Radar.process(this); }
-    }
-    
     
     public static class Setting implements Serializable {
 	public Resource.Spec res;
