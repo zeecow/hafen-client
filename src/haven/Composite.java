@@ -204,7 +204,7 @@ public class Composite extends Drawable {
 			res.add(mname);
 		}
 	    }
-	} catch (Resource.Loading e) {
+	} catch (Loading e) {
 	    return null;
 	}
 	
