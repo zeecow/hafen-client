@@ -106,18 +106,18 @@ public class Pointer extends Widget {
 	MapView map = getparent(GameUI.class).map;
 	Gob player = map == null ? null : map.player();
 	if(player != null) {
-	    Coord3f pc = player.getc();
-	    z = pc.z;
-	    Coord2d gsz = tilesz.mul(cmaps.x, cmaps.y);
-	    Coord pgc = player.rc.floor(gsz);
-	    Coord mgc = mc.floor(gsz);
-	    if(pgc.manhattan2(mgc) <= 1) {
-		try {
+	    try {
+		Coord2d gsz = tilesz.mul(cmaps.x, cmaps.y);
+		Coord pgc = player.rc.floor(gsz);
+		Coord mgc = mc.floor(gsz);
+		if(pgc.manhattan2(mgc) <= 1) {
 		    Coord3f mp = ui.sess.glob.map.getzp(mc);
 		    z = mp.z;
-		} catch (Loading ignored) {
-		    
+		} else {
+		    z = player.getc().z;
 		}
+	    } catch (Loading ignored) {
+		
 	    }
 	}
 	return new Coord3f((float) mc.x, (float) mc.y, z);
