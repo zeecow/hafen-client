@@ -911,6 +911,10 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Sk
 	h.start();
     }
     
+    public String tooltip() {
+        return resid();
+    }
+    
     public void drawableUpdated() {
 	if(updateseq == 0) {return;}
 	updateTags();

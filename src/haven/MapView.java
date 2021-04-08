@@ -2516,10 +2516,7 @@ public class MapView extends PView implements DTarget, Console.Directory {
 		    if(inf != null) {
 			Gob gob = Gob.from(inf.ci);
 			if(gob != null) {
-			    Resource res = gob.getres();
-			    if(res != null) {
-				ttip = res.name;
-			    }
+			    ttip = gob.tooltip();
 			}
 		    } else {
 			MCache mCache = ui.sess.glob.map;
