@@ -118,9 +118,9 @@ public class CraftDBWnd extends Window implements DTarget2 {
     }
 
     private void init() {
-	CRAFT = paginafor(Resource.remote().load("paginae/act/craft"));
-	HISTORY = paginafor(Resource.remote().load("paginae/act/history"));
-	FAVOURITES = paginafor(Resource.remote().load("paginae/act/favourites"));
+	CRAFT = paginafor("paginae/act/craft");
+	HISTORY = paginafor("paginae/act/history");
+	FAVOURITES = paginafor("paginae/act/favourites");
     
 	loadFavourites(Config.userpath());
 	subscription = Reactor.PLAYER.subscribe(this::loadFavourites);
@@ -443,6 +443,10 @@ public class CraftDBWnd extends Window implements DTarget2 {
     
     private Pagina paginafor(Resource.Named res) {
 	return ui.gui.menu.paginafor(res);
+    }
+    
+    private Pagina paginafor(String name) {
+	return ui.gui.menu.findPagina(name);
     }
 
     private void updateInfo(WItem item){

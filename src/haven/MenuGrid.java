@@ -763,4 +763,28 @@ public class MenuGrid extends Widget implements KeyBinding.Bindable {
 	PagButton h = bhit(cc);
 	return((h == null) ? null : h.bind);
     }
+    
+    public Pagina findPagina(String name) {
+	Collection<Pagina> open, close = new HashSet<>();
+	synchronized (paginae) { open = new LinkedList<>(paginae); }
+	while (!open.isEmpty()) {
+	    Iterator<Pagina> iter = open.iterator();
+	    Pagina pag = iter.next();
+	    iter.remove();
+	    try {
+		if(name.equals(Pagina.name(pag))) {
+		    return pag;
+		}
+		AButton ad = pag.act();
+		if(ad != null) {
+		    Pagina parent = paginafor(ad.parent);
+		    if((parent != null) && !close.contains(parent) && !open.contains(parent))
+			open.add(parent);
+		}
+		close.add(pag);
+	    } catch (Loading ignored) {
+	    }
+	}
+	return null;
+    }
 }
