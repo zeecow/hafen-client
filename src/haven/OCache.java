@@ -250,11 +250,11 @@ public class OCache implements Iterable<Gob> {
 	if((d != null) && (d.res == res) && !d.sdt.equals(sdt) && (d.spr != null) && (d.spr instanceof Sprite.CUpd)) {
 	    ((Sprite.CUpd)d.spr).update(sdt);
 	    d.sdt = sdt;
+	    g.drawableUpdated();
 	} else if((d == null) || (d.res != res) || !d.sdt.equals(sdt)) {
 	    g.setattr(new ResDrawable(g, res, sdt));
 	    Radar.add(g, res);
 	}
-	g.drawableUpdated();
     }
     public Delta cres(Message msg) {
 	int resid = msg.uint16();
@@ -353,6 +353,7 @@ public class OCache implements Iterable<Gob> {
 		cmp.chposes(poses, interp);
 	    if(tposes != null)
 		cmp.tposes(tposes, WrapMode.ONCE, ttime);
+	    g.drawableUpdated();
 	}
     }
     public Delta cmppose(Message msg) {
@@ -400,6 +401,7 @@ public class OCache implements Iterable<Gob> {
 	if(cmp == null)
 	    throw(new RuntimeException(String.format("cmpmod on non-composed object: %s", mod)));
 	cmp.chmod(mod);
+	g.drawableUpdated();
     }
     public Delta cmpmod(Message msg) {
 	List<Composited.MD> mod = new LinkedList<Composited.MD>();
