@@ -1,3 +1,7 @@
+$size[14]{$u{Update for 09.04.21:}
+  * made small critters not disappear from minimap when dead
+  * added arrows, boats, dugouts and hearth fires to minimap icons
+ 
 $size[14]{$u{Update for 07.04.21:}
   * merged wafflecat's pull request that ads LP/H to study window
   * moved toggle chat and take screenshot to widget shortcuts + added widget binding for UI toggle
