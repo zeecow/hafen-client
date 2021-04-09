@@ -9,10 +9,11 @@
   {"match": "gfx/kritter/rabbit/rabbit", "icon": "gfx/invobjs/rabbit", "visible": true},
   {"match": "gfx/kritter/rabbit/rabbit[gfx/kritter/rabbit/doe]", "icon": "gfx/invobjs/rabbit-doe", "visible": true},
   {"match": "gfx/kritter/rockdove/rockdove", "icon": "gfx/invobjs/rockdove", "visible": true},
+  {"match": "gfx/kritter/ptarmigan/ptarmigan", "icon": "gfx/invobjs/ptarmigan", "visible": true},
   {"match": "gfx/kritter/squirrel/squirrel", "icon": "gfx/kritter/squirrel/icon", "visible": true},
 
   {"match": "gfx/terobjs/pow[hearth]", "icon": "radar/hearthfire", "visible": true},
   {"match": "gfx/terobjs/vehicle/rowboat", "icon": "radar/rowboat", "visible": true},
   {"match": "gfx/terobjs/vehicle/dugout", "icon": "radar/dugout", "visible": true},
-  {"match": "gfx/terobjs/items/arrow", "icon": "gfx/invobjs/arrow", "visible": false}
+  {"match": "gfx/terobjs/items/arrow", "icon": "gfx/invobjs/arrow", "visible": true}
 ]
