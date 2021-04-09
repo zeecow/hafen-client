@@ -10,7 +10,7 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class CharterBook extends Window {
+public class CharterBook extends WindowX {
     private static final String PREFIX = "The name of this charterstone is";
     public static final String CONFIG_JSON = "charterbook.json";
     private static boolean initialized = false;

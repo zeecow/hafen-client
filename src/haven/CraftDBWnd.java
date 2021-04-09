@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 import static haven.CraftDBWnd.Mode.*;
 import static haven.ItemFilter.*;
 
-public class CraftDBWnd extends Window implements DTarget2 {
+public class CraftDBWnd extends WindowX implements DTarget2 {
     private static final int PANEL_H = UI.scale(52);
     private static final Coord WND_SZ = UI.scale(635, 360).addy(PANEL_H);
     private static final Coord ICON_SZ = UI.scale(20, 20);

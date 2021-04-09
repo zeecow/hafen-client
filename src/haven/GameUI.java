@@ -236,7 +236,6 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 	umpanel.add(calendar = new Cal(), Coord.z);
 	eqproxy = add(new EquipProxy(SLOTS.HAND_LEFT, SLOTS.HAND_RIGHT, SLOTS.BACK, SLOTS.BELT), new Coord(420, 5));
 	filter = add(new FilterWnd());
-	filter.setDeco(WindowX.SMALL);
 	syslog = chat.add(new ChatUI.Log("System"));
 	opts = add(new OptWnd());
 	opts.hide();

@@ -32,7 +32,7 @@ import java.util.LinkedList;
 import java.awt.event.KeyEvent;
 import java.util.Set;
 
-public class OptWnd extends Window {
+public class OptWnd extends WindowX {
     public static final Coord PANEL_POS = new Coord(220, 30);
     public static final Coord Q_TYPE_PADDING = new Coord(3, 0);
     private final Panel display, general, camera, shortcuts, mapping;

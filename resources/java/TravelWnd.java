@@ -3,7 +3,7 @@ import haven.*;
 import java.util.*;
 
 /* >wdg: TravelWnd */
-public class TravelWnd extends Window {
+public class TravelWnd extends WindowX {
     public static final int W = UI.scale(200);
     public final TextEntry txt;
     public final NameList ls;

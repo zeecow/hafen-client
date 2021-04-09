@@ -201,7 +201,7 @@ public class GobIcon extends GAttrib {
 	}
     }
 
-    public static class SettingsWindow extends Window {
+    public static class SettingsWindow extends WindowX {
 	public final Settings conf;
 	private final Runnable save;
 

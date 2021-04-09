@@ -64,7 +64,7 @@ public class GobWarning extends GAttrib implements RenderTree.Node {
 	}
     }
     
-    public static class WarnCFGWnd extends Window {
+    public static class WarnCFGWnd extends WindowX {
 	private static Window instance;
 	
 	public static void toggle(Widget parent) {

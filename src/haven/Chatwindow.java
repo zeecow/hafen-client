@@ -26,7 +26,7 @@
 
 package haven;
 
-public class Chatwindow extends Window {
+public class Chatwindow extends WindowX {
     TextEntry in;
     Textlog out;
 	

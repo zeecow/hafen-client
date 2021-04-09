@@ -1,6 +1,6 @@
 package haven;
 
-public class ResizingWindow extends Window {
+public class ResizingWindow extends WindowX {
     private static final Coord gzsz = Window.bl.sz().add(5,5);
 
     private UI.Grab rsm;
