@@ -68,7 +68,7 @@ public class DraggableWidget extends Widget {
     protected void initCfg() {
 	cfg = WidgetCfg.get(name);
 	if(cfg != null) {
-	    c = cfg.c;
+	    c = cfg.c == null ? c : cfg.c;
 	} else {
 	    updateCfg();
 	}

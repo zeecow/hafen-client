@@ -133,7 +133,7 @@ public class Window extends Widget implements DTarget {
 
     protected void initCfg() {
 	if(cfg != null) {
-	    c = cfg.c;
+	    c = cfg.c == null ? c : cfg.c;
 	} else {
 	    updateCfg();
 	}
