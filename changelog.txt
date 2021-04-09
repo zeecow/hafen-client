@@ -1,6 +1,9 @@
 $size[14]{$u{Update for 09.04.21:}
   * made small critters not disappear from minimap when dead
   * added arrows, boats, dugouts and hearth fires to minimap icons
+  * added option to disable sounds when kin changes status (Options->Display->Play sound when kin changes status)
+  * made Map Window remember size and position separately for normal and compact modes
+  * show grid only on first 3 zoom levels and shoe view distance only on first 2 zoom levels
  
 $size[14]{$u{Update for 07.04.21:}
   * merged wafflecat's pull request that ads LP/H to study window
