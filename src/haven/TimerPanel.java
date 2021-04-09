@@ -20,7 +20,7 @@ public class TimerPanel extends Window {
     
     public static void complete(Timer timer, Widget parent) {
 	String name = timer.name;
-	Window wnd = parent.add(new Window(Coord.z, "Timer complete"), UI.scale(250, 100));
+	Window wnd = parent.add(new WindowX(Coord.z, "Timer complete"), UI.scale(250, 100));
 	String str;
 	if(timer.remaining < -1500) {
 	    str = String.format("%s elapsed since timer \"%s\"  finished", timer.toString(), name);

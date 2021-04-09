@@ -84,7 +84,7 @@ public class WindowDetector {
 	    belt.hide();
 	    return belt;
 	}
-	return (new Window(sz, title, lg));
+	return (new WindowX(sz, title, lg));
     }
     
     public static boolean isPortal(String title) {
