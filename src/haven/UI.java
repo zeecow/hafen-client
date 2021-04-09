@@ -516,8 +516,20 @@ public class UI {
     }
 
     public void message(String str, Color msgColor) {
-	if((cons!=null) && (gui!=null)){
+	if((cons != null) && (gui != null)) {
 	    gui.msg(str, msgColor);
+	}
+    }
+    
+    public void message(String str, Color msgColor, boolean sfx) {
+	if((cons != null) && (gui != null)) {
+	    gui.msg(str, msgColor, sfx);
+	}
+    }
+    
+    public void message(String str, Color msgColor, Resource sfx) {
+	if((cons != null) && (gui != null)) {
+	    gui.msg(str, msgColor, sfx);
 	}
     }
 

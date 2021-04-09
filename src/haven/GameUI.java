@@ -1594,8 +1594,16 @@ public class GameUI extends ConsoleHost implements Console.Directory {
     }
 
     public void msg(String msg, Color color) {
+	msg(msg, color, true);
+    }
+    
+    public void msg(String msg, Color color, boolean sfx) {
+	msg(msg, color, sfx ? msgsfx : null);
+    }
+    
+    public void msg(String msg, Color color, Resource sfx) {
 	msg(msg, color, color);
-	Audio.play(msgsfx);
+	if(sfx != null) {Audio.play(sfx);}
     }
 
     private static final Resource errsfx = Resource.local().loadwait("sfx/error");
