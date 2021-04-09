@@ -75,7 +75,7 @@ public class Window extends Widget implements DTarget {
 	    public Coord bisz() {return(super.bisz().sub(bo.mul(2)));}
 	    public Coord cisz() {return(super.cisz().sub(co.mul(2)));}
 	};
-    private static final BufferedImage[] cbtni = new BufferedImage[] {
+    public static final BufferedImage[] cbtni = new BufferedImage[] {
 	Resource.loadsimg("gfx/hud/wnd/lg/cbtnu"),
 	Resource.loadsimg("gfx/hud/wnd/lg/cbtnd"),
 	Resource.loadsimg("gfx/hud/wnd/lg/cbtnh")};
@@ -94,7 +94,7 @@ public class Window extends Widget implements DTarget {
     public boolean decohide = false;
     protected WidgetCfg cfg = null;
     public boolean justclose = false;;
-    private final Collection<Widget> twdgs = new LinkedList<Widget>();
+    protected final Collection<Widget> twdgs = new LinkedList<Widget>();
     private String title;
     protected Text.Furnace rcf = cf;
 

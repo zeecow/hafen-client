@@ -1,6 +1,9 @@
 package haven;
 
 import java.awt.*;
+import java.awt.image.BufferedImage;
+
+import static haven.PUtils.*;
 
 public class WindowX extends Window {
     public static final Decorator BIG = new OldSchool();
@@ -10,14 +13,43 @@ public class WindowX extends Window {
     
     public WindowX(Coord sz, String cap, boolean lg, Coord tlo, Coord rbo) {
 	super(sz, cap, lg, tlo, rbo);
+	setDeco(SMALL);
     }
     
     public WindowX(Coord sz, String cap, boolean lg) {
 	super(sz, cap, lg);
+	setDeco(SMALL);
     }
     
     public WindowX(Coord sz, String cap) {
 	super(sz, cap);
+	setDeco(SMALL);
+    }
+    
+    @Override
+    protected void drawwnd(GOut g) {
+    }
+    
+    @Override
+    public void draw(GOut g) {
+	if(!decohide)
+	    drawbg(g);
+	cdraw(g.reclip(atl, asz));
+	if(!decohide)
+	    drawframe(g);
+	super.draw(g);
+	if(!decohide) {
+	    drawtitle(g);
+	}
+    }
+    
+    @Override
+    public boolean checkhit(Coord c) {
+	if(deco != null) {
+	    return deco.checkhit(this, c);
+	} else {
+	    return super.checkhit(c);
+	}
     }
     
     @Override
@@ -34,8 +66,10 @@ public class WindowX extends Window {
     }
     
     public void setDeco(Decorator deco) {
-	this.deco = deco;
-	resize2(asz);
+	if(this.deco != deco) {
+	    this.deco = deco;
+	    if(deco != null) {deco.apply(this);}
+	}
     }
     
     @Override
@@ -56,13 +90,19 @@ public class WindowX extends Window {
 	}
     }
     
+    protected void drawtitle(GOut g) {
+	if(deco != null) {
+	    deco.drawtitle(this, g);
+	}
+    }
+    
     @Override
     protected void placetwdgs() {
-//	if(deco != null) {
-//	    
-//	} else {
-	super.placetwdgs();
-//	}
+	if(deco != null) {
+	    deco.placetwdgs(this);
+	} else {
+	    super.placetwdgs();
+	}
     }
     
     @Override
@@ -80,28 +120,44 @@ public class WindowX extends Window {
     interface Decorator {
 	
 	
+	default void apply(WindowX wnd) {
+	    wnd.chcap(wnd.cap != null ? wnd.cap.text : null);
+	    wnd.resize2(wnd.asz);
+	}
+	
+	void resize(WindowX wnd, Coord sz);
+	
 	void drawbg(WindowX wnd, GOut g);
 	
 	void drawframe(WindowX wnd, GOut g);
 	
-	void resize(WindowX wnd, Coord sz);
+	boolean checkhit(WindowX wnd, Coord c);
 	
 	Text.Furnace captionFont();
+	
+	default void drawtitle(WindowX wnd, GOut g) {}
+	
+	void placetwdgs(WindowX wnd);
     }
-    
     
     public static class Slim implements Decorator {
 	private static final Tex bg = Resource.loadtex("gfx/hud/wnd/bgtex");
 	private static final Tex cl = Resource.loadtex("gfx/hud/wnd/cleft");
-	private static final Tex cm = Resource.loadtex("gfx/hud/wnd/cmain");
+	private static final TexI cm = new TexI(Resource.loadsimg("gfx/hud/wnd/cmain"));
 	private static final Tex cr = Resource.loadtex("gfx/hud/wnd/cright");
-	private static final int capo = UI.scale(2), capio = UI.scale(2);
-	private static final Coord mrgn = UI.scale(3, 3);
-	private static final Text.Foundry cf = new Text.Foundry(Text.serif, 12);
+	private static final int capo = UI.scale(2), capio = UI.scale(1);
+	private static final Coord mrgn = UI.scale(1, 1);
+	private static final Text.Furnace cf = new Text.Imager(new PUtils.TexFurn(new Text.Foundry(Text.serif.deriveFont(Font.BOLD, UI.scale(14))).aa(true), ctex)) {
+	    protected BufferedImage proc(Text text) {
+		return (rasterimg(blurmask2(text.img.getRaster(), UI.rscale(0.75), UI.rscale(1.0), Color.BLACK)));
+	    }
+	};
 	
-	public static final Coord tlm = UI.scale(18, 30);
-	public static final Coord brm = UI.scale(13, 22);
-	public static final Coord cpo = UI.rscale(36, 12);
+	public static final BufferedImage[] cbtni = new BufferedImage[]{
+	    Resource.loadsimg("gfx/hud/btn-close"),
+	    Resource.loadsimg("gfx/hud/btn-close-d"),
+	    Resource.loadsimg("gfx/hud/btn-close-h")
+	};
 	
 	private static final IBox wbox = new IBox("gfx/hud/wnd", "tl", "tr", "bl", "br", "extvl", "extvr", "extht", "exthb") {
 	    final Coord co = UI.scale(3, 3), bo = UI.scale(2, 2);
@@ -118,39 +174,64 @@ public class WindowX extends Window {
 	
 	@Override
 	public void drawbg(WindowX wnd, GOut g) {
-//	    Coord bgc = new Coord();
-//	    for (bgc.y = wnd.cptl.y; bgc.y < wnd.cptl.y + wnd.wsz.y; bgc.y += bg.sz().y) {
-//		for (bgc.x = wnd.cptl.x; bgc.x < wnd.cptl.x + wnd.wsz.x; bgc.x += bg.sz().x)
-//		    g.image(bg, bgc, wnd.cptl, wnd.csz);
-//	    }
-	    g.chcolor(new Color(255, 57, 255,255));
-	    g.frect(wnd.cptl, wnd.wsz);
+	    g.chcolor(new Color(55, 64, 32, 200));
+	    g.frect(wnd.cptl.add(mrgn.mul(2)), wnd.wsz.sub(mrgn.mul(2)));
 	    g.chcolor();
 	}
 	
 	@Override
 	public void drawframe(WindowX wnd, GOut g) {
 	    wbox.draw(g, wnd.cptl, wnd.wsz);
+	}
+	
+	@Override
+	public void drawtitle(WindowX wnd, GOut g) {
 	    if(wnd.cap != null) {
 		int w = wnd.cap.sz().x;
 		int y = wnd.cptl.y + capo;
-		g.aimage(cl, new Coord(wnd.cptl.x , y), 0, 0.5);
+		g.aimage(cl, new Coord(wnd.cptl.x, y), 0, 0.5);
 		g.aimage(cm, new Coord(wnd.cptl.x + cl.sz().x, y), 0, 0.5, new Coord(w, cm.sz().y));
-		g.aimage(cr, new Coord(wnd.cptl.x  + w + cl.sz().x, y), 0, 0.5);
-		g.aimage(wnd.cap.tex(), new Coord(wnd.cptl.x + cl.sz().x, y - capo - capio),0, 0.5);
+		g.aimage(cr, new Coord(wnd.cptl.x + w + cl.sz().x, y), 0, 0.5);
+		g.aimage(wnd.cap.tex(), new Coord(wnd.cptl.x + cl.sz().x, y - capo - capio), 0, 0.5);
 	    }
+	}
+	
+	@Override
+	public boolean checkhit(WindowX wnd, Coord c) {
+	    if(wnd.decohide)
+		return (c.isect(wnd.atl, wnd.asz));
+	    return (c.isect(wnd.cptl, wnd.wsz)
+		|| c.isect(wnd.cptl.addy(-cm.sz.y), wnd.cpsz));
+	}
+	
+	@Override
+	public void apply(WindowX wnd) {
+	    wnd.cbtn.images(cbtni[0], cbtni[1], cbtni[2]);
+	    Decorator.super.apply(wnd);
 	}
 	
 	@Override
 	public void resize(WindowX wnd, Coord sz) {
 	    wnd.asz = sz;
 	    wnd.csz = wnd.asz.add(mrgn.mul(2));
-	    wnd.wsz = wnd.csz.add(wbox.bisz()).add(0, cm.sz().y);
-	    wnd.cptl = new Coord(wnd.tlo.x, Math.max(wnd.tlo.y, capo)+cm.sz().y/2);
+	    wnd.wsz = wnd.csz.add(wbox.bisz());
+	    wnd.cptl = new Coord(wnd.tlo.x, Math.max(wnd.tlo.y, capo) + cm.sz().y / 2);
+	    wnd.cpsz = new Coord(cl.sz().x + cm.sz.x + cr.sz().x, cm.sz.y);
 	    wnd.sz = wnd.wsz.add(wnd.cptl).add(wnd.rbo);
 	    wnd.ctl = wnd.cptl.add(wbox.btloff()).add(0, cm.sz().y / 2);
-	    wnd.atl = wnd.ctl.add(mrgn);
-	    wnd.cbtn.c = wnd.xlate(new Coord(wnd.ctl.x + wnd.csz.x - wnd.cbtn.sz.x, wnd.ctl.y).add(2, -2), false);
+	    wnd.atl = wnd.ctl.add(mrgn).addy(-cm.sz().y / 2);
+	    wnd.cbtn.c = wnd.xlate(new Coord(wnd.wsz.x - wnd.cbtn.sz.x, wnd.atl.y - wnd.cbtn.sz.y), false);
+	}
+	
+	@Override
+	public void placetwdgs(WindowX wnd) {
+	    int pad = UI.scale(1);
+	    int x = wnd.wsz.x - wnd.cbtn.sz.x;
+	    for (Widget ch : wnd.twdgs) {
+		if(ch.visible) {
+		    ch.c = wnd.xlate(new Coord(x -= ch.sz.x + pad, wnd.atl.y - ch.sz.y), false);
+		}
+	    }
 	}
 	
 	@Override
@@ -214,7 +295,22 @@ public class WindowX extends Window {
 		g.image(bm, mdo, Coord.z, cbr);
 	    g.image(br, wnd.tlo.add(wnd.wsz.sub(br.sz())));
 	}
-	
+    
+	@Override
+	public boolean checkhit(WindowX wnd, Coord c) {
+	    if(wnd.decohide)
+		return (c.isect(wnd.atl, wnd.asz));
+	    Coord cpc = c.sub(wnd.cptl);
+	    return (c.isect(wnd.ctl, wnd.csz)
+		|| (c.isect(wnd.cptl, wnd.cpsz) && (cm.back.getRaster().getSample(cpc.x % cm.back.getWidth(), cpc.y, 3) >= 128)));
+	}
+    
+	@Override
+	public void apply(WindowX wnd) {
+	    wnd.cbtn.images(Window.cbtni[0], Window.cbtni[1], Window.cbtni[2]);
+	    Decorator.super.apply(wnd);
+	}
+    
 	@Override
 	public void resize(WindowX wnd, Coord sz) {
 	    wnd.asz = sz;
@@ -230,10 +326,20 @@ public class WindowX extends Window {
 	    wnd.cmw = wnd.cmw - (cl.sz().x - cpo.x) - UI.scale(5);
 	    wnd.cbtn.c = wnd.xlate(wnd.tlo.add(wnd.wsz.x - wnd.cbtn.sz.x, 0), false);
 	}
-	
+    
 	@Override
 	public Text.Furnace captionFont() {
 	    return Window.cf;
+	}
+    
+	@Override
+	public void placetwdgs(WindowX wnd) {
+	    int x = wnd.sz.x - UI.scale(20);
+	    for (Widget ch : wnd.twdgs) {
+		if(ch.visible) {
+		    ch.c = wnd.xlate(new Coord(x -= ch.sz.x + UI.scale(5), wnd.ctl.y - ch.sz.y / 2), false);
+		}
+	    }
 	}
     }
 }
