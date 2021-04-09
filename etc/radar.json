@@ -11,7 +11,7 @@
   {"match": "gfx/kritter/rockdove/rockdove", "icon": "gfx/invobjs/rockdove", "visible": true},
   {"match": "gfx/kritter/squirrel/squirrel", "icon": "gfx/kritter/squirrel/icon", "visible": true},
 
-  {"match": "gfx/terobjs/pow", "icon": "radar/hearthfire", "visible": true},
+  {"match": "gfx/terobjs/pow[hearth]", "icon": "radar/hearthfire", "visible": true},
   {"match": "gfx/terobjs/vehicle/rowboat", "icon": "radar/rowboat", "visible": true},
   {"match": "gfx/terobjs/vehicle/dugout", "icon": "radar/dugout", "visible": true},
   {"match": "gfx/terobjs/items/arrow", "icon": "gfx/invobjs/arrow", "visible": false}
