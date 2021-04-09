@@ -147,7 +147,7 @@ public class BuddyWnd extends Widget implements Iterable<BuddyWnd.Buddy> {
 
 	private void chstatus(int status) {
 	    online = status;
-	    ui.message(String.format("%s is %s now.", name, online > 0 ? "ONLINE" : "OFFLINE"), gc[group]);
+	    ui.message(String.format("%s is %s now.", name, online > 0 ? "ONLINE" : "OFFLINE"), gc[group], CFG.DISPLAY_KINSFX.get());
 	}
 
 	public Text rname() {

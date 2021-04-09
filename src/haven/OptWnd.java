@@ -843,9 +843,12 @@ public class OptWnd extends Window {
 	int x = 0;
 	int y = 0;
 	int my = 0;
+	int STEP = UI.scale(25);
 	display.add(new CFGBox("Always show kin names", CFG.DISPLAY_KINNAMES), new Coord(x, y));
     
-	int STEP = UI.scale(25);
+	y += STEP;
+	display.add(new CFGBox("Play sound when kin changes status", CFG.DISPLAY_KINSFX), x, y);
+    
 	y += STEP;
 	display.add(new CFGBox("Show flavor objects", CFG.DISPLAY_FLAVOR), new Coord(x, y));
 
