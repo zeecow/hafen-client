@@ -152,7 +152,7 @@ public class Window extends Widget implements DTarget {
     }
 
     protected void storeCfg() {
-	WidgetCfg.set(caption(), cfg);
+	WidgetCfg.set(cfgName(caption()), cfg);
     }
 
     public void chcap(String cap) {
@@ -161,10 +161,21 @@ public class Window extends Widget implements DTarget {
 	    this.cap = null;
 	} else {
 	    this.cap = cf.render(L10N.window(cap));
-	    cfg = WidgetCfg.get(cap);
+	    cfg = WidgetCfg.get(cfgName(cap));
 	}
     }
-
+    
+    protected String cfgName(String cap) {
+	if(cap.matches("(.*)'s equipment")) {
+	    return "Character equipment ";
+	} else if(cap.matches("(.*)'s inventory")) {
+	    return "Character inventory ";
+	} else if(cap.matches("(.*)'s study")) {
+	    return "Character study ";
+	}
+	return cap;
+    }
+    
     public String caption() {
 	return title;
     }

@@ -31,6 +31,16 @@ public class WidgetCfg {
 	CFG = tmp;
     }
     
+    public WidgetCfg() {}
+    
+    public WidgetCfg(WidgetCfg cfg) {
+	if(cfg != null) {
+	    c = cfg.c != null ? cfg.c.add(Coord.z) : null;
+	    sz = cfg.sz != null ? cfg.sz.add(Coord.z) : null;
+	    data = cfg.data != null ? new HashMap<>(cfg.data) : null;
+	}
+    }
+    
     public void setValue(String key, Object value) {
 	if(data == null) {data = new HashMap<>();}
 	data.put(key, value);
@@ -43,14 +53,14 @@ public class WidgetCfg {
     public Object getValue(String key) {return getValue(key, null);}
     
     public static synchronized WidgetCfg get(String name) {
-	return name != null ? CFG.get(name) : null;
+	return name != null ? new WidgetCfg(CFG.get(name)) : null;
     }
     
     public static synchronized void set(String name, WidgetCfg cfg) {
 	if(name == null || cfg == null) {
 	    return;
 	}
-	CFG.put(name, cfg);
+	CFG.put(name, new WidgetCfg(cfg));
 	store();
     }
     
