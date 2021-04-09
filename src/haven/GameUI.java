@@ -920,7 +920,7 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 		}
 		mmap = blpanel.add(new CornerMap(UI.scale(new Coord(133, 133)), file), minimapc);
 		mmap.lower();
-		mapfile = new MapWnd(file, map, Utils.getprefc("wndsz-map", UI.scale(new Coord(700, 500))), "Map");
+		mapfile = new MapWnd2(file, map, Utils.getprefc("wndsz-map", UI.scale(new Coord(700, 500))), "Map");
 		mapfile.show(Utils.getprefb("wndvis-map", false));
 		add(mapfile, Utils.getprefc("wndc-map", new Coord(50, 50)));
 	    }
