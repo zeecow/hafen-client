@@ -7,10 +7,7 @@ import java.util.List;
 import javax.sound.midi.MidiSystem;
 import javax.sound.midi.Synthesizer;
 import javax.sound.midi.MidiChannel;
-import javax.sound.sampled.AudioInputStream;
-import javax.sound.sampled.AudioSystem;
-import javax.sound.sampled.Clip;
-import javax.sound.sampled.FloatControl;
+import javax.sound.sampled.*;
 
 public class ZeeSynth extends Thread{
 
@@ -40,21 +37,32 @@ public class ZeeSynth extends Thread{
     }
 
     private void player(){
+        File audio = null;
+        AudioInputStream stream = null;
         //AIFC, AIFF, AU, SND, and WAVE
         try {
             volumeFile = Float.parseFloat(Utils.getpref("sfxvol", "1.0"));
-            File audio = new File(filePath).getCanonicalFile();
-            AudioInputStream stream = AudioSystem.getAudioInputStream(audio);
+            audio = new File(filePath).getCanonicalFile();
+            stream = AudioSystem.getAudioInputStream(audio);
             clip = AudioSystem.getClip();
+            clip.addLineListener(new LineListener() {
+                public void update(LineEvent event) {
+                    if (event.getType() == LineEvent.Type.STOP) {
+                        clip.close();
+                    }
+                }
+            });
             clip.open(stream);
             setVolume(volumeFile);
-            synchronized (clip){
+            //synchronized (clip){
                 clip.start();
-            }
+            //}
         } catch (Exception ex) {
             ex.printStackTrace();
-        }
-        finally {
+            if(clip!=null && clip.isOpen()) {
+                clip.close();
+            }
+        }finally {
             ZeeConfig.playingAudio = null;
         }
     }
