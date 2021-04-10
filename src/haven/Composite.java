@@ -49,6 +49,7 @@ public class Composite extends Drawable {
     private List<MD> nmod2;
     boolean changed = false;
     private String resId = null;
+    private List<String> poses = new LinkedList<>();
     
     public Composite(Gob gob, Indir<Resource> base) {
 	super(gob);
@@ -109,6 +110,12 @@ public class Composite extends Drawable {
 	    try {
 		Composited.Poses np = comp.new Poses(loadposes(nposes, comp.skel, nposesold));
 		np.set(nposesold?0:ipollen);
+		List<String> poses = new LinkedList<>();
+		for (ResData pose : nposes) {
+		    poses.add(pose.res.get().name);
+		}
+		this.poses = poses;
+		gob.updateTags();
 		nposes = null;
 		updequ();
 	    } catch(Loading e) {}
@@ -232,5 +239,14 @@ public class Composite extends Drawable {
 		gob.drawableUpdated();
 	    }
 	}
+    }
+    
+    public boolean hasPose(String request) {
+	for (String pose : poses) {
+	    if(pose.contains(request)) {
+		return true;
+	    }
+	}
+	return false;
     }
 }

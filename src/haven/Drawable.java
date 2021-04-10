@@ -45,6 +45,8 @@ public abstract class Drawable extends GAttrib implements Skeleton.HasPose, Rend
         return null;
     }
     
+    public boolean hasPose(String poses) {return false;}
+    
     public void gtick(Render g) {
     }
 
