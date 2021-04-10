@@ -214,12 +214,12 @@ public class WindowX extends Window {
 	public void resize(WindowX wnd, Coord sz) {
 	    wnd.asz = sz;
 	    wnd.csz = wnd.asz.add(mrgn.mul(2));
-	    wnd.wsz = wnd.csz.add(wbox.bisz());
+	    wnd.wsz = wnd.csz.add(wbox.bisz()).addy(cm.sz().y / 2);
 	    wnd.cptl = new Coord(wnd.tlo.x, Math.max(wnd.tlo.y, capo) + cm.sz().y / 2);
 	    wnd.cpsz = new Coord(cl.sz().x + cm.sz.x + cr.sz().x, cm.sz.y);
 	    wnd.sz = wnd.wsz.add(wnd.cptl).add(wnd.rbo);
 	    wnd.ctl = wnd.cptl.add(wbox.btloff()).add(0, cm.sz().y / 2);
-	    wnd.atl = wnd.ctl.add(mrgn).addy(-cm.sz().y / 2);
+	    wnd.atl = wnd.ctl.add(mrgn);
 	    wnd.cbtn.c = wnd.xlate(new Coord(wnd.wsz.x - wnd.cbtn.sz.x, wnd.atl.y - wnd.cbtn.sz.y), false);
 	}
 	
