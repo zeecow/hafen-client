@@ -36,6 +36,11 @@ public class GobWarning extends GAttrib implements RenderTree.Node {
 	if(WarnCFG.get(tgt, highlight)) {slot.add(radius);}
     }
     
+    public static boolean needsWarning(Gob gob) {
+	return (gob.is(GobTag.FOE) && !gob.is(GobTag.DEAD))
+	    || (gob.is(GobTag.AGGRESSIVE) && !gob.anyOf(GobTag.DEAD, GobTag.KO));
+    }
+    
     public enum WarnTarget {
 	player, animal
     }

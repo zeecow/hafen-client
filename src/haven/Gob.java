@@ -990,7 +990,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Sk
     
     private void updateWarnings() {
 	if(updateseq == 0) {return;}
-	if(!anyOf(GobTag.AGGRESSIVE, GobTag.FOE)) {
+	if(!GobWarning.needsWarning(this)) {
 	    warning = null;
 	    delattr(GobWarning.class);
 	} else if(warning == null) {
