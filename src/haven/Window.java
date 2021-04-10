@@ -133,8 +133,8 @@ public class Window extends Widget implements DTarget {
     }
 
     protected void initCfg() {
-	if(cfg != null) {
-	    c = cfg.c == null ? c : xlate(cfg.c, false);
+	if(cfg != null && cfg.c != null) {
+	    c = xlate(cfg.c, false);
 	} else {
 	    updateCfg();
 	}
