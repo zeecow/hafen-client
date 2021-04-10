@@ -15,6 +15,7 @@ public enum GobTag {
     SHEEP, EWE, RAM, LAMB,
     
     PLAYER, ME, FRIEND, FOE,
+    KO, DEAD,
     
     MENU, PICKUP, HIDDEN;
     
@@ -90,6 +91,16 @@ public enum GobTag {
             
             if(!anyOf(tags, GobTag.STUMP, GobTag.ANIMAL) || anyOf(tags, GobTag.DOMESTIC)) {
                 tags.add(MENU);
+            }
+    
+            Drawable d = gob.getattr(Drawable.class);
+            if(d != null) {
+                if(d.hasPose("/knock")) {
+                    tags.add(KO);
+                }
+                if(d.hasPose("/dead")) {
+                    tags.add(DEAD);
+                }
             }
         }
         
