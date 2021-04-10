@@ -153,7 +153,9 @@ public class WindowX extends Window {
 	
 	default void apply(WindowX wnd) {
 	    wnd.chcap(wnd.cap != null ? wnd.cap.text : null);
+	    Coord tmp = wnd.atl;
 	    wnd.resize2(wnd.asz);
+	    wnd.c = wnd.c.add(tmp.sub((wnd.atl)));
 	}
 	
 	void resize(WindowX wnd, Coord sz);
