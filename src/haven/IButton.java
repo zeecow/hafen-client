@@ -164,6 +164,7 @@ public class IButton extends SIWidget {
 	this.down = down;
 	this.hover = hover;
 	sz = Utils.imgsz(up);
+	redraw();
     }
     
     public void images(BufferedImage up, BufferedImage down) {
