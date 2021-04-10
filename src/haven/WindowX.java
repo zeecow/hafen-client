@@ -9,21 +9,38 @@ public class WindowX extends Window {
     public static final Decorator BIG = new OldSchool();
     public static final Decorator SMALL = new Slim();
     
+    private final CFG.Observer<Theme> updateDecorator = this::updateDecorator;
+    
     protected Decorator deco;
     
     public WindowX(Coord sz, String cap, boolean lg, Coord tlo, Coord rbo) {
 	super(sz, cap, lg, tlo, rbo);
-	setDeco(SMALL);
+	initDecorator();
     }
     
     public WindowX(Coord sz, String cap, boolean lg) {
 	super(sz, cap, lg);
-	setDeco(SMALL);
+	initDecorator();
     }
     
     public WindowX(Coord sz, String cap) {
 	super(sz, cap);
-	setDeco(SMALL);
+	initDecorator();
+    }
+    
+    private void initDecorator() {
+	setDeco(CFG.THEME.get().deco());
+	CFG.THEME.observe(updateDecorator);
+    }
+    
+    @Override
+    public void destroy() {
+	CFG.THEME.unobserve(updateDecorator);
+	super.destroy();
+    }
+    
+    private void updateDecorator(CFG<Theme> theme) {
+	setDeco(theme.get().deco());
     }
     
     @Override
@@ -115,6 +132,20 @@ public class WindowX extends Window {
 	} else {
 	    super.resize2(sz);
 	}
+    }
+    
+    public static Decorator decoratorByType(DecoratorType type) {
+	switch (type) {
+	    case Big:
+		return BIG;
+	    case Slim:
+		return SMALL;
+	}
+	return null;
+    }
+    
+    enum DecoratorType {
+	Big, Slim;
     }
     
     interface Decorator {
