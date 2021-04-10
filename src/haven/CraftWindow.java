@@ -9,7 +9,7 @@ import static haven.TabStrip.frame;
 
 public class CraftWindow extends GameUI.Hidewnd {
     private final TabStrip<Pagina> tabStrip;
-    private final Map<String, TabStrip.Button<Pagina>> tabs = new HashMap<String, TabStrip.Button<Pagina>>();
+    private final Map<String, TabStrip.Button<Pagina>> tabs = new HashMap<>();
     private Widget makeWidget;
 
     public CraftWindow() {
@@ -45,8 +45,6 @@ public class CraftWindow extends GameUI.Hidewnd {
 	    Pagina lastCraft = ui.gui.menu.lastCraft;
 	    if(lastCraft != null) {
 		addTab(lastCraft);
-	    } else {
-		tabStrip.select((TabStrip.Button<Pagina>) null);
 	    }
 	    makeWidget = child;
 	    makeWidget.c = new Coord(5, tabStrip.sz.y + 5);
@@ -106,6 +104,7 @@ public class CraftWindow extends GameUI.Hidewnd {
 	TabStrip.Button<Pagina> added = tabStrip.insert(0, icon, text, pagina.act().name);
 	added.tag = pagina;
 	tabStrip.select(added);
+	added.setActive(true);
 	if(tabStrip.getButtonCount() > 4) {
 	    removeTab(tabStrip.getButtonCount() - 1);
 	}
