@@ -256,7 +256,8 @@ public class ZeecowOptionsWindow extends JFrame {
         panelTabGobSess.add(panelGobButtons);
         panelGobButtons.add(btnRefresh = new JButton("refresh"));
         btnRefresh.addActionListener(evt -> {
-            buildPanelGobs();
+            panelGobs.repaint();
+            panelGobs.validate();
         });
         panelGobButtons.add(btnPrintState = new JButton("print"));
         btnPrintState.addActionListener(evt -> {
@@ -506,6 +507,7 @@ public class ZeecowOptionsWindow extends JFrame {
             list.remove(gobName);
             strArr = Arrays.copyOf(list.toArray(), list.size(), String[].class);
             gobs = String.join(",",strArr);
+            gobs = "["+gobs+"]";
             ZeeConfig.mapCategoryGobs.replace(gobCategory, gobs);
             String str = ZeeConfig.mapCategoryGobs.toString();
             Utils.setpref("mapCategoryGobsString", str);
@@ -516,6 +518,8 @@ public class ZeecowOptionsWindow extends JFrame {
 
     private void addGobToCategory() {
         try {
+            if(cmbGobCategory==null || cmbGobCategory.getSelectedIndex() < 0)
+                return;
             String gobName = tfGobName.getText().trim();
             String gobCategory = cmbGobCategory.getSelectedItem().toString().trim();
 
@@ -588,7 +592,7 @@ public class ZeecowOptionsWindow extends JFrame {
 
             System.out.printf("audioClear() = \"%s\" \n", str);
             panelGobDetails.removeAll();
-            buildPanelGobs();
+            panelGobs.validate();
         }
     }
 
@@ -639,7 +643,8 @@ public class ZeecowOptionsWindow extends JFrame {
 
             System.out.printf("audioSave() = \"%s\" \n", str);
             panelGobDetails.removeAll();
-            buildPanelGobs();
+            panelGobs.validate();
+            //buildPanelGobs();
         }
     }
 
