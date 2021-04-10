@@ -5,7 +5,7 @@ import java.awt.event.KeyEvent;
 import haven.MenuGrid.Pagina;
 import haven.MenuGrid.PagButton;
 
-public class MenuSearch extends Window {
+public class MenuSearch extends WindowX {
     public final MenuGrid menu;
     public final Results rls;
     public final TextEntry sbox;

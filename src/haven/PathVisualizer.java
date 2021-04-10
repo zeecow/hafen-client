@@ -185,7 +185,7 @@ public class PathVisualizer implements RenderTree.Node {
 	}
     }
     
-    public static class CategoryOpts extends Window {
+    public static class CategoryOpts extends WindowX {
 	private static Window instance;
 	
 	public static void toggle(Widget parent) {

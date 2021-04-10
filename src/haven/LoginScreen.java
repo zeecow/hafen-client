@@ -42,7 +42,7 @@ public class LoginScreen extends Widget {
     private IButton btn;
     private Button optbtn;
     private OptWnd opts;
-    private Window log;
+    private WindowX log;
     AccountList accounts;
     
     public LoginScreen() {
@@ -56,7 +56,7 @@ public class LoginScreen extends Widget {
     }
     
     private void showChangeLog() {
-	log = ui.root.add(new Window(new Coord(50, 50), "Changelog"), new Coord(100, 50));
+	log = ui.root.add(new WindowX(new Coord(50, 50), "Changelog"), new Coord(100, 50));
 	log.justclose = true;
 	Textlog txt = log.add(new Textlog(UI.scale(450, 500)));
 	txt.quote = false;
@@ -285,7 +285,7 @@ public class LoginScreen extends Widget {
     protected void added() {
 	presize();
 	parent.setfocus(this);
-	if(Config.isUpdate){
+	if(Config.isUpdate || true) {
 	    showChangeLog();
 	}
     }

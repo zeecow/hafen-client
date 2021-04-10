@@ -622,7 +622,7 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 	}
     }
 
-    public static class Hidewnd extends Window {
+    public static class Hidewnd extends WindowX {
 	public Hidewnd(Coord sz, String cap, boolean lg) {
 	    super(sz, cap, lg);
 	}

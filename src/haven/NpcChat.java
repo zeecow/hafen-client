@@ -29,7 +29,7 @@ package haven;
 import java.util.*;
 import java.awt.Color;
 
-public class NpcChat extends Window {
+public class NpcChat extends WindowX {
 	Textlog out;
         List<Button> btns = null;
 	

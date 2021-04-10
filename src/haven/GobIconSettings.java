@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Map;
 
-public class GobIconSettings extends Window {
+public class GobIconSettings extends WindowX {
     public static final String FILTER_DEFAULT = "Start typing to filter";
     public static final Coord FILTER_C = UI.scale(445, 0);
     public final GobIcon.Settings conf;

@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 import static haven.CharWnd.*;
 import static haven.PUtils.*;
 
-public class GildingWnd extends Window {
+public class GildingWnd extends WindowX {
     private final WItem target;
     private final WItem gild;
     private BufferedImage igild;

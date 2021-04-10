@@ -37,7 +37,7 @@ import org.w3c.dom.*;
 import java.io.*;
 import java.net.*;
 
-public class Screenshooter extends Window {
+public class Screenshooter extends WindowX {
     public static final ComponentColorModel outcm = new ComponentColorModel(ColorSpace.getInstance(ColorSpace.CS_sRGB), new int[] {8, 8, 8}, false, false, ComponentColorModel.OPAQUE, DataBuffer.TYPE_BYTE);
     public static final PUtils.Convolution thumbflt = new PUtils.Lanczos(3);
     public final URL tgt;

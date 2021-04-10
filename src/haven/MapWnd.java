@@ -42,7 +42,7 @@ import static haven.Utils.eq;
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.*;
 
-public class MapWnd extends Window implements Console.Directory {
+public class MapWnd extends WindowX implements Console.Directory {
     public static final Resource markcurs = Resource.local().loadwait("gfx/hud/curs/flag");
     public final MapFile file;
     public final MiniMap view;
@@ -549,7 +549,7 @@ public class MapWnd extends Window implements Console.Directory {
 	}
     }
 
-    public static class ExportWindow extends Window implements MapFile.ExportStatus {
+    public static class ExportWindow extends WindowX implements MapFile.ExportStatus {
 	private Thread th;
 	private volatile String prog = "Exporting map...";
 
@@ -584,7 +584,7 @@ public class MapWnd extends Window implements Console.Directory {
 	}
     }
 
-    public static class ImportWindow extends Window {
+    public static class ImportWindow extends WindowX {
 	private Thread th;
 	private volatile String prog = "Initializing";
 	private double sprog = -1;

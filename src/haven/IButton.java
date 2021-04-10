@@ -158,4 +158,16 @@ public class IButton extends SIWidget {
 	    return(null);
 	return(super.tooltip(c, prev));
     }
+    
+    public void images(BufferedImage up, BufferedImage down, BufferedImage hover) {
+	this.up = up;
+	this.down = down;
+	this.hover = hover;
+	sz = Utils.imgsz(up);
+	redraw();
+    }
+    
+    public void images(BufferedImage up, BufferedImage down) {
+	images(up, down, up);
+    }
 }

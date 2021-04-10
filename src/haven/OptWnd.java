@@ -32,7 +32,7 @@ import java.util.LinkedList;
 import java.awt.event.KeyEvent;
 import java.util.Set;
 
-public class OptWnd extends Window {
+public class OptWnd extends WindowX {
     public static final Coord PANEL_POS = new Coord(220, 30);
     public static final Coord Q_TYPE_PADDING = new Coord(3, 0);
     private final Panel display, general, camera, shortcuts, mapping;
@@ -749,6 +749,31 @@ public class OptWnd extends Window {
 	y += STEP;
 	general.add(new CFGBox("Output missing translation lines", L10N.DBG), x, y);
     
+	y += STEP;
+	tx = x + general.add(new Label("Theme:"), x, y).sz.x + UI.scale(5);
+	general.add(new Dropbox<Theme>(UI.scale(100), 5, UI.scale(16)) {
+	    @Override
+	    protected Theme listitem(int i) {
+		return Theme.values()[i];
+	    }
+
+	    @Override
+	    protected int listitems() {
+		return Theme.values().length;
+	    }
+
+	    @Override
+	    protected void drawitem(GOut g, Theme item, int i) {
+		g.atext(item.name(), UI.scale(3, 8), 0, 0.5);
+	    }
+
+	    @Override
+	    public void change(Theme item) {
+		super.change(item);
+		if(!item.equals(CFG.THEME.get())) CFG.THEME.set(item, true);
+	    }
+	}, tx, y).change(CFG.THEME.get());
+	
 	y += STEP;
 	general.add(new CFGBox("Store minimap tiles", CFG.STORE_MAP), x, y);
     
