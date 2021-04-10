@@ -134,7 +134,7 @@ public class Window extends Widget implements DTarget {
 
     protected void initCfg() {
 	if(cfg != null) {
-	    c = cfg.c == null ? c : cfg.c;
+	    c = cfg.c == null ? c : xlate(cfg.c, false);
 	} else {
 	    updateCfg();
 	}
@@ -146,10 +146,10 @@ public class Window extends Widget implements DTarget {
     }
 
     protected void setCfg() {
-	if(cfg == null){
+	if(cfg == null) {
 	    cfg = new WidgetCfg();
 	}
-	cfg.c = c;
+	cfg.c = xlate(c, true);
     }
 
     protected void storeCfg() {
