@@ -57,7 +57,6 @@ public class LoginScreen extends Widget {
     
     private void showChangeLog() {
 	log = ui.root.add(new WindowX(new Coord(50, 50), "Changelog"), new Coord(100, 50));
-	log.setDeco(WindowX.SMALL);
 	log.justclose = true;
 	Textlog txt = log.add(new Textlog(UI.scale(450, 500)));
 	txt.quote = false;
