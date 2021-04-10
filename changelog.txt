@@ -1,12 +1,14 @@
 $size[14]{$u{Update for 09.04.21:}
   * added ability to change UI theme. For now affects only windows. Located at Options->General->UI Theme.
+  * do not warn about dead players.
+  * do not warn about dead or ko animals.
  
 $size[14]{$u{Update for 09.04.21:}
   * made small critters not disappear from minimap when dead
   * added arrows, boats, dugouts and hearth fires to minimap icons
   * added option to disable sounds when kin changes status (Options->Display->Play sound when kin changes status)
   * made Map Window remember size and position separately for normal and compact modes
-  * show grid only on first 3 zoom levels and shoe view distance only on first 2 zoom levels
+  * show grid only on first 3 zoom levels and show view distance only on first 2 zoom levels
   * added stone milestone to radar
  
 $size[14]{$u{Update for 07.04.21:}
