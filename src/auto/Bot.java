@@ -112,7 +112,7 @@ public class Bot implements Defer.Callable<Void> {
     }
     
     public static void drink(GameUI gui) {
-	Collection<Supplier<List<WItem>>> everywhere = Arrays.asList(BELT(gui), HANDS(gui), INVENTORY(gui));
+	Collection<Supplier<List<WItem>>> everywhere = Arrays.asList(HANDS(gui), INVENTORY(gui), BELT(gui));
 	Utils.chainOptionals(
 	    () -> findFirstThatContains("Tea", everywhere),
 	    () -> findFirstThatContains("Water", everywhere)
