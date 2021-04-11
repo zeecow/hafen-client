@@ -32,7 +32,7 @@ public enum GobTag {
     private static final String[] CRITTERS = {
         "/rat", "/swan", "/squirrel", "/silkmoth", "/frog", "/rockdove", "/quail", "/toad", "/grasshopper",
         "/ladybug", "/forestsnail", "/dragonfly", "/forestlizard", "/waterstrider", "/firefly", "/sandflea",
-        "/rabbit", "/crab", "/cavemoth", "/hedgehog", "/stagbeetle", "jellyfish", "/mallard", "/chicken"
+        "/rabbit", "/crab", "/cavemoth", "/hedgehog", "/stagbeetle", "jellyfish", "/mallard", "/chicken", "/irrbloss"
     };
     
     private static final boolean DBG = false;
