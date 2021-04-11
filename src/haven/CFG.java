@@ -12,6 +12,7 @@ import java.util.*;
 
 public class CFG<T> {
     public static final CFG<String> VERSION = new CFG<>("version", "");
+    public static final CFG<Integer> AUDIO_BUFFER = new CFG<>("display.audio.buffer", 4096);
     public static final CFG<Boolean> DISPLAY_KINNAMES = new CFG<>("display.kinnames", true);
     public static final CFG<Boolean> DISPLAY_KINSFX = new CFG<>("display.kinsfx", true);
     public static final CFG<Boolean> DISPLAY_FLAVOR = new CFG<>("display.flavor", true);

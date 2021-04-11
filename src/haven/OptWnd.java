@@ -633,6 +633,25 @@ public class OptWnd extends WindowX {
 		    ui.audio.amb.setvolume(val / 1000.0);
 		}
 	    }, prev.pos("bl").adds(0, 2));
+    
+	prev = audio.add(new Label("Audio buffer size"), prev.pos("bl").adds(0, 5));
+	Label value = audio.add(new Label.Untranslated(""), prev.pos("ur").adds(15, 0));
+	prev = audio.add(new HSlider(UI.scale(200), 1024, 44100, 1024) {
+	    protected void attach(UI ui) {
+		super.attach(ui);
+		val = Audio.bufsize / 4;
+		value.settext(String.format("%d", Audio.bufsize));
+	    }
+	
+	    public void changed() {
+		try {
+		    value.settext(String.format("%d", val));
+		    Audio.audiobuf(val);
+		} catch (Exception ignored) {
+		}
+	    }
+	}, prev.pos("bl").adds(0, 2));
+	
 	audio.add(new PButton(UI.scale(200), "Back", 27, this.main), prev.pos("bl").adds(0, 30));
 	audio.pack();
 

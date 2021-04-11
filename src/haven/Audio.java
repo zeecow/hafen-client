@@ -35,7 +35,7 @@ public class Audio {
     public static boolean enabled = true;
     private static Player player;
     public static final AudioFormat fmt = new AudioFormat(44100, 16, 2, true, false);
-    private static int bufsize = 4096;
+    public static int bufsize = CFG.AUDIO_BUFFER.get();
     public static double volume = 1.0;
     
     static {
@@ -609,16 +609,19 @@ public class Audio {
 		    setvolume(Double.parseDouble(args[1]));
 		}
 	    });
-	Console.setscmd("audiobuf", new Console.Command() {
-		public void run(Console cons, String[] args) throws Exception {
-		    int nsz = Integer.parseInt(args[1]);
-		    if(nsz > 44100)
-			throw(new Exception("Rejecting buffer longer than 1 second"));
-		    bufsize = nsz * 4;
-		    Player pl = ckpl(false);
-		    if(pl != null)
-			pl.reopen();
-		}
-	    });
+	Console.setscmd("audiobuf", (cons, args) -> {
+	    int nsz = Integer.parseInt(args[1]);
+	    audiobuf(nsz);
+	});
+    }
+    
+    public static void audiobuf(int nsz) throws Exception {
+	if(nsz > 44100)
+	    throw(new Exception("Rejecting buffer longer than 1 second"));
+	bufsize = nsz * 4;
+	Player pl = ckpl(false);
+	if(pl != null)
+	    pl.reopen();
+	CFG.AUDIO_BUFFER.set(bufsize);
     }
 }
