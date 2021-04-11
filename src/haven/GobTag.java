@@ -17,6 +17,8 @@ public enum GobTag {
     PIG, SOW, HOG, PIGLET,
     SHEEP, EWE, RAM, LAMB,
     
+    GEM,
+    
     PLAYER, ME, FRIEND, FOE,
     KO, DEAD, EMPTY, READY,
     
@@ -100,13 +102,15 @@ public enum GobTag {
                 boolean done = !empty && ols.stream().noneMatch(GobTag::isDrying);
                 if(empty) { tags.add(EMPTY); }
                 if(done) { tags.add(READY); }
+            } else if(name.endsWith("/gems/gemstone")) {
+                tags.add(GEM);
             }
             
-            if(anyOf(tags, GobTag.HERB, GobTag.CRITTER)) {
+            if(anyOf(tags, HERB, CRITTER, GEM)) {
                 tags.add(PICKUP);
             }
             
-            if(!anyOf(tags, GobTag.STUMP, GobTag.ANIMAL) || anyOf(tags, GobTag.DOMESTIC)) {
+            if(anyOf(tags, DOMESTIC, HERB, TREE, BUSH)) {
                 tags.add(MENU);
             }
     

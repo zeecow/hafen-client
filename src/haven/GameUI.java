@@ -1608,7 +1608,7 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 	if(sfx != null) {Audio.play(sfx);}
     }
 
-    private static final Resource errsfx = Resource.local().loadwait("sfx/error");
+    public static final Resource errsfx = Resource.local().loadwait("sfx/error");
     public void error(String msg) {
 	msg(msg, MsgType.ERROR);
     }
