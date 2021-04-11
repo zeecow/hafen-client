@@ -1,4 +1,14 @@
-$size[14]{$u{Update for 09.04.21:}
+$size[14]{$u{Update for 11.04.21:}
+  * added detection of empty/ready drying racks when gob info is turned on
+  * added option to always show current combat target
+  * made main menu buttons (inventory and the like) capture keys even if invisible
+  * added audio buffer size to options
+  * added gems to radar
+  * added gems to list of stuff to warn about
+  * added option (Options->General) to only pickup items with enabled minimap icons
+  * bumped maximum auto-pickup radius to 32 tiles
+ 
+ $size[14]{$u{Update for 10.04.21:}
   * added ability to change UI theme. For now affects only windows. Located at Options->General->UI Theme.
   * do not warn about dead players.
   * do not warn about dead or ko animals.
