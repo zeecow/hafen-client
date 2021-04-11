@@ -59,6 +59,7 @@ public class Widget {
     protected final boolean i10n = i10n();
     private boolean disposed = false;
     private boolean bound = false;
+    public boolean invisibleKeys = false;
     private final List<Action1<Widget>> boundListeners = new LinkedList<>();
     private final List<Action2<Widget, Boolean>> focusListeners = new LinkedList<>();
     
@@ -877,11 +878,10 @@ public class Widget {
     }
 
     public boolean globtype(char key, KeyEvent ev) {
-	if(!visible) {return false;}
 	KeyMatch gkey = this.gkey;
 	if(kb_gkey != null)
 	    gkey = kb_gkey.key();
-	if((gkey != null) && gkey.match(ev))
+	if((tvisible() || invisibleKeys) && (gkey != null) && gkey.match(ev))
 	    return(gkeytype(ev));
 	for(Widget wdg = lchild; wdg != null; wdg = wdg.prev) {
 	    if(wdg.globtype(key, ev))

@@ -1435,6 +1435,7 @@ public class GameUI extends ConsoleHost implements Console.Directory {
     public static class MenuButton extends IButton {
 	MenuButton(String base, KeyBinding gkey, String tooltip) {
 	    super("gfx/hud/" + base, "", "-d", "-h");
+	    invisibleKeys = true;
 	    setgkey(gkey);
 	    settip(tooltip);
 	}
@@ -1443,6 +1444,7 @@ public class GameUI extends ConsoleHost implements Console.Directory {
     public static class MenuCheckBox extends ICheckBox {
 	MenuCheckBox(String base, KeyBinding gkey, String tooltip) {
 	    super("gfx/hud/" + base, "", "-d", "-h", "-dh");
+	    invisibleKeys = true;
 	    setgkey(gkey);
 	    settip(tooltip);
 	}
