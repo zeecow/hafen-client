@@ -1,7 +1,10 @@
 package haven;
 
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public enum GobTag {
     TREE, BUSH, LOG, STUMP, HERB,
@@ -15,7 +18,7 @@ public enum GobTag {
     SHEEP, EWE, RAM, LAMB,
     
     PLAYER, ME, FRIEND, FOE,
-    KO, DEAD,
+    KO, DEAD, EMPTY, READY,
     
     MENU, PICKUP, HIDDEN;
     
@@ -43,7 +46,16 @@ public enum GobTag {
         Resource res = gob.getres();
         if(res != null) {
             String name = res.name;
-            
+    
+            List<String> ols = Collections.emptyList();
+            synchronized (gob.ols) {
+                try {
+                    ols = gob.ols.stream().map(overlay -> overlay.res.get().name).collect(Collectors.toList());
+                } catch (Loading e) {
+                    gob.tagsUpdated();
+                }
+            }
+    
             if(name.startsWith("gfx/terobjs/trees")) {
                 if(name.endsWith("log") || name.endsWith("oldtrunk")) {
                     tags.add(LOG);
@@ -83,6 +95,11 @@ public enum GobTag {
                     gob.glob.sess.ui.message(name, GameUI.MsgType.ERROR);
                     System.out.println(name);
                 }
+            } else if(name.endsWith("/dframe")) {
+                boolean empty = ols.isEmpty();
+                boolean done = !empty && ols.stream().noneMatch(GobTag::isDrying);
+                if(empty) { tags.add(EMPTY); }
+                if(done) { tags.add(READY); }
             }
             
             if(anyOf(tags, GobTag.HERB, GobTag.CRITTER)) {
@@ -103,8 +120,12 @@ public enum GobTag {
                 }
             }
         }
-        
+    
         return tags;
+    }
+    
+    private static boolean isDrying(String ol) {
+        return ol.endsWith("-blood") || ol.endsWith("-windweed") || ol.endsWith("-fishraw");
     }
     
     private static boolean ofType(String name, String[] patterns) {

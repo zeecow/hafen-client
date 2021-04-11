@@ -26,6 +26,7 @@
 
 package haven;
 
+import java.awt.*;
 import java.util.*;
 import java.util.function.*;
 import haven.render.*;
@@ -34,6 +35,8 @@ import integrations.mapv4.MappingClient;
 import static haven.OCache.*;
 
 public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Skeleton.HasPose {
+    private static final Color COL_READY = new Color(32, 250, 64, 128);
+    private static final Color COL_EMPTY = new Color(250, 128, 64, 128);
     public Coord2d rc;
     public double a;
     public boolean virtual = false;
@@ -54,6 +57,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Sk
     private final GeneralGobInfo info;
     private GobWarning warning = null;
     public StatusUpdates status = new StatusUpdates();
+    private final CustomColor customColor = new CustomColor();
     private final Set<GobTag> tags = new HashSet<>();
     public static final ChangeCallback CHANGED = new ChangeCallback() {
 	@Override
@@ -126,6 +130,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Sk
 	public void remove() {
 	    remove0();
 	    gob.ols.remove(this);
+	    gob.overlaysUpdated();
 	}
 
 	public void added(RenderTree.Slot slot) {
@@ -138,6 +143,27 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Sk
 	public void removed(RenderTree.Slot slot) {
 	    if(slots != null)
 		slots.remove(slot);
+	}
+    }
+    
+    private static class CustomColor implements SetupMod {
+	Pipe.Op op = null;
+	Color c = null;
+    
+	boolean color(Color c) {
+	    boolean changed = !Objects.equals(c, this.c);
+	    if(c == null) {
+		op = null;
+	    } else {
+		op = new MixColor(c);
+	    }
+	    this.c = c;
+	    return changed;
+	}
+    
+	@Override
+	public Pipe.Op gobstate() {
+	    return op;
 	}
     }
 
@@ -220,6 +246,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Sk
 	if(GobDamageInfo.has(this)) {
 	    addDmg();
 	}
+	setupmods.add(customColor);
 	info = new GeneralGobInfo(this);
 	setattr(info);
 	updwait(this::drawableUpdated, waiting -> {});
@@ -283,6 +310,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Sk
 	ol.add0();
 	ols.add(ol);
 	overlayAdded(ol);
+	overlaysUpdated();
     }
     public void addol(Overlay ol) {
 	addol(ol, true);
@@ -1019,6 +1047,8 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Sk
     
     public void drawableUpdated() { status.update(StatusType.drawable); }
     
+    public void overlaysUpdated() { status.update(StatusType.overlay); }
+    
     public void kinUpdated() {status.update(StatusType.kin);}
     
     public void hitboxUpdated() {status.update(StatusType.hitbox);}
@@ -1034,7 +1064,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Sk
 	StatusUpdates status = this.status;
 	this.status = new StatusUpdates();
 	
-	if(status.updated(StatusType.drawable, StatusType.kin, StatusType.id, StatusType.pose, StatusType.tags)) {
+	if(status.updated(StatusType.drawable, StatusType.kin, StatusType.id, StatusType.pose, StatusType.tags, StatusType.overlay)) {
 	    updateTags();
 	    status.update(StatusType.tags);
 	}
@@ -1057,9 +1087,23 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Sk
 	    updateWarnings();
 	}
 	
-	if(status.updated(StatusType.info, StatusType.tags)) {
+	if(status.updated(StatusType.info)) {
 	    info.clean();
 	}
+    
+	if(status.updated(StatusType.tags)) {
+	    updateColor();
+	}
+    }
+    
+    private void updateColor() {
+	Color c = null;
+	if(is(GobTag.EMPTY)) {
+	    c = COL_EMPTY;
+	} else if(is(GobTag.READY)) {
+	    c = COL_READY;
+	}
+	if(customColor.color(c)) {updstate();}
     }
     
     private static class StatusUpdates {
