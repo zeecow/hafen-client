@@ -819,6 +819,9 @@ public class OptWnd extends WindowX {
 	general.adda(new Speedget.SpeedSelector(UI.scale(100)), new Coord(x + tsz.x + UI.scale(5), y + tsz.y / 2), 0, 0.5);
     
 	y += STEP;
+	general.add(new CFGBox("Auto pickup only visible", CFG.AUTO_PICK_ONLY_RADAR, "If on will pickup only objects with enabled minimap icons"), x, y);
+	
+	y += STEP;
 	Label label = general.add(new Label(String.format("Auto pickup radius: %.2f", CFG.AUTO_PICK_RADIUS.get() / 11.0)), x, y);
 	y += UI.scale(15);
 	general.add(new CFGHSlider(UI.scale(150), CFG.AUTO_PICK_RADIUS, 33, 88) {
