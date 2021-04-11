@@ -48,6 +48,7 @@ public class ZeeSynth extends Thread{
             clip.addLineListener(new LineListener() {
                 public void update(LineEvent event) {
                     if (event.getType() == LineEvent.Type.STOP) {
+                        ZeeConfig.playingAudio = null;
                         clip.close();
                     }
                 }

@@ -504,6 +504,7 @@ public class ZeecowOptionsWindow extends JFrame {
             return;
         }
         String gobs = ZeeConfig.mapCategoryGobs.get(gobCategory);
+        System.out.println("removeGobFromCategory() > mapCategoryGobs.get() =  "+gobs);
         if(gobs!=null){
             String[] strArr = gobs.replace("[","").replace("]","").replace(", ",",").trim().split(",");
             ArrayList<String> list = new ArrayList<String>(Arrays.asList(strArr));

@@ -15,6 +15,10 @@ import java.util.*;
 
 
 public class ZeeConfig {
+    public static final String CTGNAME_PVP = "PVP and siege";
+    public static final String CTGNAME_AGROCREATURES = "Agressive creatures";
+    public static final String CTGNAME_RAREFORAGE = "Rare forageables";
+    public static final String CTGNAME_LOCRES = "Localized resources";
     public static GameUI gameUI;
     public static Window windowBelt;
     public static Window windowCattleRoster;
@@ -140,12 +144,18 @@ public class ZeeConfig {
             "gfx/kritter/goldeneagle/goldeneagle",
             "gfx/kritter/lynx/lynx",
             "gfx/kritter/mammoth/mammoth",
-            "gfx/kritter/nidbane/nidbane",
+            "gfx/kritter/moose/moose",
             "gfx/kritter/troll/troll",
             "gfx/kritter/walrus/walrus",
             "gfx/kritter/wildgoat/wildgoat",
             "gfx/kritter/wolf/wolf",
             "gfx/kritter/wolverine/wolverine"
+    ));
+    public final static Set<String> pvpGobs = new HashSet<String>(Arrays.asList(
+            "gfx/terobjs/vehicle/bram",
+            "gfx/terobjs/vehicle/catapult",
+            "gfx/kritter/nidbane/nidbane",
+            "gfx/terobjs/vehicle/wreckingball"
     ));
     public final static Set<String> noIconGobs = new HashSet<String>(Arrays.asList(
             "gfx/kritter/irrbloss/irrbloss" //irrlight
@@ -240,7 +250,7 @@ public class ZeeConfig {
         if(ZeeConfig.autoHearthOnStranger && name.contains("borka/body") && gob.id != gameUI.map.player().id) {
             gameUI.act("travel","hearth");
             try{
-                playAudio(mapCategoryAudio.get("Danger"));
+                playAudio(mapCategoryAudio.get(CTGNAME_PVP));
             }catch(Exception e) {
                 playMidi(midiJawsTheme);
             }
@@ -373,9 +383,10 @@ public class ZeeConfig {
         mapCategoryGobsString = Utils.getpref("mapCategoryGobsString","");
         if(mapCategoryGobsString.isEmpty()) {
             System.out.println("initMapCategoryGobs() > setting default categories");
-            mapCateGob.put("Localized resources", localizedResources.toString());
-            mapCateGob.put("Rare forageables", rareForageables.toString());
-            mapCateGob.put("Agressive creatures", aggressiveGobs.toString());
+            mapCateGob.put(CTGNAME_LOCRES, localizedResources.toString());
+            mapCateGob.put(CTGNAME_RAREFORAGE, rareForageables.toString());
+            mapCateGob.put(CTGNAME_AGROCREATURES, aggressiveGobs.toString());
+            mapCateGob.put(CTGNAME_PVP, pvpGobs.toString());
             mapCategoryGobsString = mapCateGob.toString();
         }else{
             System.out.println("initMapCategoryGobs() > fetching saved categories");
