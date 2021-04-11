@@ -228,7 +228,7 @@ public class Fightsess extends Widget {
 	    g.aimage(ip.get().tex(), altui ? new Coord(x0 - UI.scale(45), y0 - UI.scale(16)) : pcc.add(-UI.scale(75), 0), 1, 0.5);
 	    g.aimage(oip.get().tex(), altui ? new Coord(x0 + UI.scale(45), y0 - UI.scale(16)) : pcc.add(UI.scale(75), 0), 0, 0.5);
 
-	    if(fv.lsrel.size() > 1)
+	    if(fv.lsrel.size() > (CFG.ALWAYS_MARK_COMBAT_TARGET.get() ? 0 : 1))
 		curtgtfx = fxon(fv.current.gobid, tgtfx, curtgtfx);
 	}
 

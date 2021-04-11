@@ -993,6 +993,9 @@ public class OptWnd extends WindowX {
 	x += UI.scale(265);
 	y = 0;
 	display.add(new CFGBox("Use new combat UI", CFG.ALT_COMBAT_UI), x, y);
+    
+	y += STEP;
+	display.add(new CFGBox("Always mark current target", CFG.ALWAYS_MARK_COMBAT_TARGET , "Usually current target only marked when there's more than one"), x, y);
 	
 	y += STEP;
 	display.add(new CFGBox("Show combat damage", CFG.SHOW_COMBAT_DMG), x, y);
