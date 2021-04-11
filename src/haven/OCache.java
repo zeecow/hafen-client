@@ -72,7 +72,7 @@ public class OCache implements Iterable<Gob> {
 	callback(Gob.CHANGED);
 	CFG.DISPLAY_GOB_HITBOX.observe(cfg -> gobAction(Gob::updateHitbox));
 	CFG.DISPLAY_GOB_HITBOX_TOP.observe(cfg -> gobAction(Gob::updateHitbox));
-	CFG.HIDE_TREES.observe(cfg -> gobAction(Gob::updateTreeVisibility));
+	CFG.HIDE_TREES.observe(cfg -> gobAction(Gob::updateVisibility));
     }
     
     public void gobAction(Consumer<Gob> action) {
