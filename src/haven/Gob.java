@@ -35,8 +35,8 @@ import integrations.mapv4.MappingClient;
 import static haven.OCache.*;
 
 public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Skeleton.HasPose {
-    private static final Color COL_READY = new Color(32, 250, 64, 128);
-    private static final Color COL_EMPTY = new Color(250, 128, 64, 128);
+    private static final Color COL_READY = new Color(16, 255, 16, 128);
+    private static final Color COL_EMPTY = new Color(64, 200, 250, 64);
     public Coord2d rc;
     public double a;
     public boolean virtual = false;
@@ -1055,6 +1055,8 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Sk
     
     public void visibilityUpdated() {status.update(StatusType.visibility);}
     
+    public void infoUpdated() {status.update(StatusType.info);}
+    
     public void iconUpdated() { status.update(StatusType.icon);}
     
     public void tagsUpdated() {status.update(StatusType.tags);}
@@ -1091,7 +1093,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Sk
 	    info.clean();
 	}
     
-	if(status.updated(StatusType.tags)) {
+	if(status.updated(StatusType.tags, StatusType.info)) {
 	    updateColor();
 	}
     }
