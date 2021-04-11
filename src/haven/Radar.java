@@ -43,7 +43,7 @@ public class Radar {
 	    gob2icon.put(item.match, item.icon);
 	    addSetting(settings, item.icon, item.visible);
 	}
-	ui.sess.glob.oc.gobAction(Gob::updateIcon);
+	ui.sess.glob.oc.gobAction(Gob::iconUpdated);
     }
     
     private static void addSetting(Map<String, GobIcon.Setting> settings, String res, boolean def) {

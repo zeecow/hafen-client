@@ -111,7 +111,7 @@ public class Composite extends Drawable {
 		Composited.Poses np = comp.new Poses(loadposes(nposes, comp.skel, nposesold));
 		np.set(nposesold?0:ipollen);
 		this.poses = nposes.stream().map(pose -> pose.res.get().name).collect(Collectors.toList());
-		gob.updatePose();
+		gob.poseUpdated();
 		nposes = null;
 		updequ();
 	    } catch(Loading e) {}
@@ -232,7 +232,7 @@ public class Composite extends Drawable {
 		resId = id;
 		changed = false;
 		nmod2 = null;
-		gob.updateId();
+		gob.idUpdated();
 	    }
 	}
     }
