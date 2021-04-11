@@ -214,9 +214,13 @@ public class ZeecowOptionsWindow extends JFrame {
         panelGobs.removeAll();
 
         //panel bottom details
-        panelGobDetails = new JPanel();
-        panelGobDetails.setLayout(new BoxLayout(panelGobDetails,BoxLayout.PAGE_AXIS));
-        panelGobDetails.setPreferredSize(new Dimension(300,300));
+        if(panelGobDetails!=null) {
+            panelGobDetails.repaint();
+        }else {
+            panelGobDetails = new JPanel();
+            panelGobDetails.setLayout(new BoxLayout(panelGobDetails, BoxLayout.PAGE_AXIS));
+            panelGobDetails.setPreferredSize(new Dimension(300, 300));
+        }
 
         //subtabs pane
         tabbedPaneGobs = new JTabbedPane();
@@ -256,8 +260,7 @@ public class ZeecowOptionsWindow extends JFrame {
         panelTabGobSess.add(panelGobButtons);
         panelGobButtons.add(btnRefresh = new JButton("refresh"));
         btnRefresh.addActionListener(evt -> {
-            panelGobs.repaint();
-            panelGobs.validate();
+            buildPanelGobs();
         });
         panelGobButtons.add(btnPrintState = new JButton("print"));
         btnPrintState.addActionListener(evt -> {
@@ -495,11 +498,11 @@ public class ZeecowOptionsWindow extends JFrame {
         buildPanelGobs();
     }
 
-
-    private void removeGobFromCategory(){
-        String gobName = tfGobName.getText().trim();
-        String gobCategory = cmbGobCategory.getSelectedItem().toString().trim();
-
+    private void removeGobFromCategory(String gobName, String gobCategory) {
+        if(gobName==null || gobCategory==null || gobName.isEmpty() || gobCategory.isEmpty()) {
+            System.out.println("removeGobFromCategory(g,c) > gob or category invalid");
+            return;
+        }
         String gobs = ZeeConfig.mapCategoryGobs.get(gobCategory);
         if(gobs!=null){
             String[] strArr = gobs.replace("[","").replace("]","").replace(", ",",").trim().split(",");
@@ -512,7 +515,37 @@ public class ZeecowOptionsWindow extends JFrame {
             String str = ZeeConfig.mapCategoryGobs.toString();
             Utils.setpref("mapCategoryGobsString", str);
             ZeeConfig.mapCategoryGobsString = str;
-            cmbGobCategory.setSelectedIndex(-1);
+            System.out.printf("%s removed from %s\n",gobName, gobs);
+            System.out.println("contains() == "+gobs.contains(gobName));
+        }
+    }
+
+    private void removeGobFromCategory(){
+        String gobName = tfGobName.getText().trim();
+        String gobCategory = cmbGobCategory.getSelectedItem().toString().trim();
+        removeGobFromCategory(gobName,gobCategory);
+        cmbGobCategory.setSelectedIndex(-1);
+    }
+
+    private void addGobToCategory(String gobName, String gobCategory) {
+        if(gobName==null || gobCategory==null || gobName.isEmpty() || gobCategory.isEmpty()) {
+            System.out.println("addGobToCategory(g,c) > gob or category invalid");
+            return;
+        }
+        String gobs = ZeeConfig.mapCategoryGobs.get(gobCategory);
+        if (gobs != null) {
+            String[] strArr = gobs.replace("[", "").replace("]", "").replace(", ", ",").trim().split(",");
+            ArrayList<String> list = new ArrayList<String>(Arrays.asList(strArr));
+            list.add(gobName);
+            strArr = Arrays.copyOf(list.toArray(), list.size(), String[].class);
+            gobs = String.join(",", strArr);
+            gobs = "[" + gobs + "]";
+            ZeeConfig.mapCategoryGobs.put(gobCategory, gobs);
+            String str = ZeeConfig.mapCategoryGobs.toString();
+            Utils.setpref("mapCategoryGobsString", str);
+            ZeeConfig.mapCategoryGobsString = str;
+            System.out.printf("%s added to %s\n",gobName, gobs);
+            System.out.println("contains() == "+gobs.contains(gobName));
         }
     }
 
@@ -520,24 +553,19 @@ public class ZeecowOptionsWindow extends JFrame {
         try {
             if(cmbGobCategory==null || cmbGobCategory.getSelectedIndex() < 0)
                 return;
-            String gobName = tfGobName.getText().trim();
-            String gobCategory = cmbGobCategory.getSelectedItem().toString().trim();
 
-            String gobs = ZeeConfig.mapCategoryGobs.get(gobCategory);
-            if (gobs != null) {
-                String[] strArr = gobs.replace("[", "").replace("]", "").replace(", ", ",").trim().split(",");
-                ArrayList<String> list = new ArrayList<String>(Arrays.asList(strArr));
-                list.add(gobName);
-                strArr = Arrays.copyOf(list.toArray(), list.size(), String[].class);
-                gobs = String.join(",", strArr);
-                gobs = "[" + gobs + "]";
-                ZeeConfig.mapCategoryGobs.put(gobCategory, gobs);
-                String str = ZeeConfig.mapCategoryGobs.toString();
-                Utils.setpref("mapCategoryGobsString", str);
-                ZeeConfig.mapCategoryGobsString = str;
-                System.out.printf("%s added to %s\n",gobName, gobs);
-                System.out.println(gobs.contains(gobName));
+            String gobName = tfGobName.getText().trim();
+            String gobCategory =  cmbGobCategory.getSelectedItem().toString().trim();
+
+            //if gob already has category, remove it
+            String prevCategory = getCategoryByGob(gobName);
+            if(prevCategory!=null && !prevCategory.isEmpty()){
+                removeGobFromCategory(gobName,prevCategory);
+                System.out.printf("removed %s from %s\n",gobName,prevCategory);
             }
+
+            addGobToCategory(gobName,gobCategory);
+
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -581,7 +609,12 @@ public class ZeecowOptionsWindow extends JFrame {
 
             //remove gob audio
             } else {
-                ZeeConfig.mapGobSaved.remove(listGobsSaved.getSelectedValue().trim());
+                String gobName = tfGobName.getText().trim();
+                if (!ZeeConfig.mapGobSaved.containsKey(gobName)){
+                    JOptionPane.showMessageDialog(this,"Gob has no audio set.\n Try remove from category.");
+                    return;
+                }
+                ZeeConfig.mapGobSaved.remove(gobName);
                 str = ZeeConfig.mapGobSaved.toString()
                         .replace("{", "")
                         .replace("}", "")
@@ -597,6 +630,7 @@ public class ZeecowOptionsWindow extends JFrame {
     }
 
     private void audioSave() {
+        JList list;
         JFileChooser fileChooser;
         fileChooser = new JFileChooser();
         fileChooser.setCurrentDirectory(null);
@@ -609,6 +643,7 @@ public class ZeecowOptionsWindow extends JFrame {
 
             //save audio for category
             if(tabbedPaneGobs.getSelectedIndex()==TABGOB_CATEGS){
+                list = listGobsCategories;
                 tfAudioPathCateg.setText(fileChooser.getSelectedFile().getAbsolutePath());
                 ZeeConfig.mapCategoryAudio.put(
                         tfCategName.getText().trim(),
@@ -626,6 +661,7 @@ public class ZeecowOptionsWindow extends JFrame {
             } else {
 
                 //save audio for single gob
+                list = listGobsSaved;
                 tfAudioPath.setText(fileChooser.getSelectedFile().getAbsolutePath());
                 ZeeConfig.mapGobSaved.put(
                         tfGobName.getText().trim(),
@@ -642,9 +678,13 @@ public class ZeecowOptionsWindow extends JFrame {
             }
 
             System.out.printf("audioSave() = \"%s\" \n", str);
+            if(list!=null) {
+                list.clearSelection();
+                //list.updateUI();
+            }
             panelGobDetails.removeAll();
             panelGobs.validate();
-            //buildPanelGobs();
+            buildPanelGobs();
         }
     }
 
