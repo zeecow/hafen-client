@@ -824,7 +824,7 @@ public class OptWnd extends WindowX {
 	y += STEP;
 	Label label = general.add(new Label(String.format("Auto pickup radius: %.2f", CFG.AUTO_PICK_RADIUS.get() / 11.0)), x, y);
 	y += UI.scale(15);
-	general.add(new CFGHSlider(UI.scale(150), CFG.AUTO_PICK_RADIUS, 33, 88) {
+	general.add(new CFGHSlider(UI.scale(150), CFG.AUTO_PICK_RADIUS, 33, 352) {
 	    @Override
 	    public void changed() {
 		label.settext(String.format("Auto pickup radius: %.02f", val / 11.0));
