@@ -13,6 +13,7 @@
   {"match": "gfx/kritter/squirrel/squirrel", "icon": "gfx/kritter/squirrel/icon", "visible": true},
 
   {"match": "gfx/terobjs/pow[hearth]", "icon": "radar/hearthfire", "visible": true},
+  {"match": "gfx/terobjs/items/gems/gemstone", "icon": "radar/gem", "visible": true},
   {"match": "gfx/terobjs/vehicle/rowboat", "icon": "radar/rowboat", "visible": true},
   {"match": "gfx/terobjs/vehicle/dugout", "icon": "radar/dugout", "visible": true},
   {"match": "gfx/terobjs/road/milestone-stone-e", "icon": "radar/milestone-stone-e", "visible": true},
