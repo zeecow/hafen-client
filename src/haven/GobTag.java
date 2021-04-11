@@ -1,10 +1,6 @@
 package haven;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.*;
 
 public enum GobTag {
     TREE, BUSH, LOG, STUMP, HERB,
@@ -52,7 +48,13 @@ public enum GobTag {
             List<String> ols = Collections.emptyList();
             synchronized (gob.ols) {
                 try {
-                    ols = gob.ols.stream().map(overlay -> overlay.res.get().name).collect(Collectors.toList());
+                    List<String> list = new ArrayList<>();
+                    for (Gob.Overlay overlay : gob.ols) {
+                        if(overlay != null && overlay.res != null) {
+                            list.add(overlay.res.get().name);
+                        }
+                    }
+                    ols = list;
                 } catch (Loading e) {
                     gob.tagsUpdated();
                 }
