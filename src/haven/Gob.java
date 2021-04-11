@@ -1034,11 +1034,12 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Sk
 	StatusUpdates status = this.status;
 	this.status = new StatusUpdates();
 	
-	if(status.updated(StatusType.kin, StatusType.id, StatusType.pose, StatusType.tags)) {
+	if(status.updated(StatusType.drawable, StatusType.kin, StatusType.id, StatusType.pose, StatusType.tags)) {
 	    updateTags();
+	    status.update(StatusType.tags);
 	}
 	
-	if(status.updated(StatusType.drawable, StatusType.id, StatusType.visibility)) {
+	if(status.updated(StatusType.drawable, StatusType.visibility, StatusType.tags)) {
 	    if(updateVisibility()) {
 		status.update(StatusType.visibility);
 	    }
