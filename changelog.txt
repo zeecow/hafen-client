@@ -1,3 +1,9 @@
+$size[14]{$u{Update for 12.04.21:}
+  * merged loftar's changes
+  * added moose and cave rat to aggressive animals
+  * marked gems and irr lights for auto-pickup
+  * fixed drying rack coloring not being affected by gob info option
+ 
 $size[14]{$u{Update for 11.04.21:}
   * added detection of empty/ready drying racks when gob info is turned on
   * added option to always show current combat target
