@@ -54,6 +54,7 @@ public class GameUI extends ConsoleHost implements Console.Directory {
     public Avaview portrait;
     public MenuGrid menu;
     public MapView map;
+    public PathQueue pathQueue;
     public GobIcon.Settings iconconf;
     public MiniMap mmap;
     public Fightview fv;
@@ -892,6 +893,8 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 	if(place == "mapview") {
 	    child.resize(sz);
 	    map = add((MapView)child, Coord.z);
+	    this.pathQueue = new PathQueue(map);
+	    ui.sess.glob.oc.paths.path = this.pathQueue;
 	    map.lower();
 	    if(mmap != null)
 		ui.destroy(mmap);

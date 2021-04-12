@@ -21,6 +21,7 @@ public class CFG<T> {
     public static final CFG<Boolean> DISPLAY_GOB_HITBOX_TOP = new CFG<>("display.gob_hitbox_top", false);
     public static final CFG<Boolean> DISPLAY_GOB_PATHS = new CFG<>("display.gob_paths.show", false);
     public static final CFG<Set<PathCategory>> DISPLAY_GOB_PATHS_FOR = new CFG<>("display.gob_paths.categories", PathVisualizer.DEF_CATEGORIES, new TypeToken<Set<PathCategory>>(){});
+    public static final CFG<Boolean> QUEUE_PATHS = new CFG<>("general.queue_path", false);
     public static final CFG<Boolean> HIDE_TREES = new CFG<>("display.hide_gobs", false);
     public static final CFG<Boolean> DISPLAY_FOD_CATEGORIES = new CFG<>("display.food_category", true);
     public static final CFG<Boolean> SHOW_GOB_RADIUS = new CFG<>("display.show_gob_radius", false);

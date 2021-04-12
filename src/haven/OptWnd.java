@@ -794,6 +794,9 @@ public class OptWnd extends WindowX {
 	}, tx, y).change(CFG.THEME.get());
 	
 	y += STEP;
+	general.add(new CFGBox("Enable path queueing", CFG.QUEUE_PATHS, "ALT+LClick will queue movement"), x, y);
+	
+	y += STEP;
 	general.add(new CFGBox("Store minimap tiles", CFG.STORE_MAP), x, y);
     
 	y += STEP;

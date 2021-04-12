@@ -2105,7 +2105,18 @@ public class MapView extends PView implements DTarget, Console.Directory {
 		}
 	    }
 	    if(clickb == 1) {Bot.cancel();}
-	    wdgmsg("click", args);
+	    
+	    boolean send = true;
+	    if(clickb == 1 && CFG.QUEUE_PATHS.get()) {
+		if(ui.modmeta) {
+		    args[3] = 0;
+		    send = ui.gui.pathQueue.add(glob.map.getzp(mc));
+		} else {
+		    ui.gui.pathQueue.start(glob.map.getzp(mc));
+		}
+	    }
+	    if(send)
+		wdgmsg("click", args);
 	}
     }
     

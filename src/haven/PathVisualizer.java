@@ -10,6 +10,8 @@ public class PathVisualizer implements RenderTree.Node {
     public static final HashSet<PathCategory> DEF_CATEGORIES = new HashSet<>(Arrays.asList(PathCategory.ME, PathCategory.FOE));
     private static final VertexArray.Layout LAYOUT = new VertexArray.Layout(new VertexArray.Layout.Input(Homo3D.vertex, new VectorFormat(3, NumberFormat.FLOAT32), 0, 0, 12));
     
+    public PathQueue path;
+    
     
     public final Collection<RenderTree.Slot> slots = new ArrayList<>(1);
     private final Set<Moving> moves = new HashSet<>();
@@ -55,7 +57,9 @@ public class PathVisualizer implements RenderTree.Node {
 		));
 	    } catch (Loading ignored) {}
 	}
- 
+    
+	if(CFG.QUEUE_PATHS.get() && path != null) {categorized.put(PathCategory.QUEUED, path.lines());}
+    
 	Set<PathCategory> selected = CFG.DISPLAY_GOB_PATHS_FOR.get();
 	for (PathCategory cat : PathCategory.values()) {
 	    List<Pair<Coord3f, Coord3f>> lines = categorized.get(cat);
@@ -73,7 +77,7 @@ public class PathVisualizer implements RenderTree.Node {
     
     private PathCategory categorize(Moving m) {
 	Gob gob = m.gob;
-	if(gob.is(GobTag.ME)) {
+	if(gob.is(GobTag.ME) || gob.drivenByPlayer) {
 	    return PathCategory.ME;
 	} else if(gob.is(GobTag.PLAYER)) {
 	    return KinInfo.isFoe(gob) ? PathCategory.FOE : PathCategory.FRIEND;
@@ -102,11 +106,13 @@ public class PathVisualizer implements RenderTree.Node {
     }
     
     public void addPath(Moving moving) {
+	if(moving == null) {return;}
 	synchronized (moves) { moves.add(moving); }
     }
     
     
     public void removePath(Moving moving) {
+	if(moving == null) {return;}
 	synchronized (moves) { moves.remove(moving); }
     }
     
@@ -164,7 +170,8 @@ public class PathVisualizer implements RenderTree.Node {
     
     public enum PathCategory {
 	ME(new Color(118, 254, 196, 255), true),
-	FRIEND(new Color(109, 245, 251, 255)),
+	QUEUED(new Color(112, 204, 164, 255), true),
+	FRIEND(new Color(109, 211, 251, 255)),
 	FOE(new Color(255, 134, 154, 255), true),
 	AGGRESSIVE_ANIMAL(new Color(255, 179, 122, 255), true),
 	OTHER(new Color(187, 187, 187, 255));

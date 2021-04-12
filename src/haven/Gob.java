@@ -59,6 +59,8 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Sk
     public StatusUpdates status = new StatusUpdates();
     private final CustomColor customColor = new CustomColor();
     private final Set<GobTag> tags = new HashSet<>();
+    public boolean drivenByPlayer = false;
+    public long drives = 0;
     public static final ChangeCallback CHANGED = new ChangeCallback() {
 	@Override
 	public void added(Gob ob) {
@@ -473,8 +475,9 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Sk
     }
 
     private void setattr(Class<? extends GAttrib> ac, GAttrib a) {
+	GAttrib prev;
 	synchronized (attr) {
-	    GAttrib prev = attr.remove(ac);
+	    prev = attr.remove(ac);
 	    if(prev != null) {
 		if((prev instanceof RenderTree.Node) && (prev.slots != null))
 		    RUtils.multirem(new ArrayList<>(prev.slots));
@@ -509,6 +512,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Sk
 		status.update(StatusType.info);
 	    }
 	}
+	if(ac == Moving.class) {updateMovingInfo(a, prev);}
     }
 
     public void setattr(GAttrib a) {
@@ -1135,5 +1139,44 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Sk
     
     private enum StatusType {
 	drawable, overlay, tags, pose, id, info, kin, hitbox, icon, visibility;
+    }
+    
+    private void updateMovingInfo(GAttrib a, GAttrib prev) {
+	boolean me = is(GobTag.ME);
+	if(prev instanceof LinMove || prev instanceof Homing) {
+	    glob.oc.paths.removePath((Moving) prev);
+	}
+	if(a instanceof LinMove || a instanceof Homing) {
+	    glob.oc.paths.addPath((Moving) a);
+	}
+	drives = 0;
+	if(prev instanceof Following) {
+	    Following follow = (Following) prev;
+	    if(me) {
+		Gob tgt = follow.tgt();
+		if(tgt != null) {tgt.drivenByPlayer = false;}
+	    }
+	} else if(prev instanceof Homing) {
+	    Homing homing = (Homing) prev;
+	    if(me) {
+		Gob tgt = homing.tgt();
+		if(tgt != null) {tgt.drivenByPlayer = false;}
+	    }
+	}
+	if(a instanceof Following) {
+	    Following follow = (Following) a;
+	    drives = follow.tgt;
+	    if(me) {follow.tgt().drivenByPlayer = true;}
+	} else if(a instanceof Homing) {
+	    Homing homing = (Homing) a;
+	    drives = homing.tgt;
+	    if(me) {
+		Gob tgt = homing.tgt();
+		if(tgt != null) {tgt.drivenByPlayer = true;}
+	    }
+	}
+	if(glob.sess.ui.gui != null) {
+	    glob.sess.ui.gui.pathQueue.movementChange(this, prev, a);
+	}
     }
 }

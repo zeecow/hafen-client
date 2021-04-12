@@ -36,7 +36,6 @@ public class Homing extends Moving {
 	this.tgt = tgt;
 	this.tc = tc;
 	this.v = v;
-	gob.glob.oc.paths.addPath(this);
     }
     
     public Coord3f getc() {
@@ -78,12 +77,5 @@ public class Homing extends Moving {
 	} else {
 	    return tgt.getc();
 	}
-    }
-    
-    @Override
-    public void dispose() {
-	gob.glob.oc.paths.removePath(this);
-	super.dispose();
-	
     }
 }

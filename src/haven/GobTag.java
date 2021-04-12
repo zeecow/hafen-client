@@ -14,6 +14,7 @@ public enum GobTag {
     SHEEP, EWE, RAM, LAMB,
     
     GEM,
+    PUSHED, //vehicle that is pushed (wheelbarrow, plow)
     
     PLAYER, ME, FRIEND, FOE,
     KO, DEAD, EMPTY, READY,
@@ -106,6 +107,8 @@ public enum GobTag {
                 if(done) { tags.add(READY); }
             } else if(name.endsWith("/gems/gemstone")) {
                 tags.add(GEM);
+            } else if(name.endsWith("/wheelbarrow") || name.endsWith("/plow")) {
+                tags.add(PUSHED);
             }
             
             if(anyOf(tags, HERB, CRITTER, GEM)) {
