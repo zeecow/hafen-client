@@ -1169,10 +1169,12 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Sk
 	    if(me) {follow.tgt().drivenByPlayer = true;}
 	} else if(a instanceof Homing) {
 	    Homing homing = (Homing) a;
-	    drives = homing.tgt;
-	    if(me) {
-		Gob tgt = homing.tgt();
-		if(tgt != null) {tgt.drivenByPlayer = true;}
+	    Gob tgt = homing.tgt();
+	    if(tgt != null) {
+		if(tgt.is(GobTag.PUSHED)) {
+		    drives = homing.tgt;
+		    if(me) { tgt.drivenByPlayer = true;}
+		}
 	    }
 	}
 	if(glob.sess.ui.gui != null) {
