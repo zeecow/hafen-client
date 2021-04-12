@@ -76,7 +76,7 @@ public class GildingWnd extends WindowX {
 	} catch (Loading ignored) {}
 
 	if(target.gildable.get() && canSlot) {
-	    add(new Button(UI.scale(120), "Gild") {
+	    add(new Button(UI.scale(120), "Gild", false) {
 		@Override
 		public void click() {
 		    gild();
