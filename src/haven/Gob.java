@@ -407,8 +407,10 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Sk
 	    removalLock.notifyAll();
 	}
 	Map<Class<? extends GAttrib>, GAttrib> attr = cloneattrs();
-	for(GAttrib a : attr.values())
+	for(GAttrib a : attr.values()) {
+	    if(a instanceof Moving) { updateMovingInfo(null, a); }
 	    a.dispose();
+	}
 	for(ResAttr.Cell rd : rdata) {
 	    if(rd.attr != null)
 		rd.attr.dispose();
@@ -1143,7 +1145,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Sk
     
     private void updateMovingInfo(GAttrib a, GAttrib prev) {
 	boolean me = is(GobTag.ME);
-	if(prev instanceof LinMove || prev instanceof Homing) {
+	if(prev instanceof Moving) {
 	    glob.oc.paths.removePath((Moving) prev);
 	}
 	if(a instanceof LinMove || a instanceof Homing) {
