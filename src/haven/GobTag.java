@@ -21,12 +21,12 @@ public enum GobTag {
     MENU, PICKUP, HIDDEN;
     
     private static final String[] AGGRO = {
-        "/bear", "/boar", "/troll", "/wolverine", "/badger", "/adder", "/wolf", "/walrus", "/lynx", "/caverat"
+        "/bear", "/boar", "/troll", "/wolverine", "/badger", "/adder", "/wolf", "/walrus", "/lynx", "/caverat", "/moose"
     };
     
     
     private static final String[] ANIMALS = {
-        "/fox", "/swan", "/bat", "/beaver", "/moose", "/reddeer"
+        "/fox", "/swan", "/bat", "/beaver", "/reddeer"
     };
     
     private static final String[] CRITTERS = {
