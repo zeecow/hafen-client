@@ -1100,10 +1100,12 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Sk
     
     private void updateColor() {
 	Color c = null;
-	if(is(GobTag.EMPTY)) {
-	    c = COL_EMPTY;
-	} else if(is(GobTag.READY)) {
-	    c = COL_READY;
+	if(CFG.DISPLAY_GOB_INFO.get()) {
+	    if(is(GobTag.EMPTY)) {
+		c = COL_EMPTY;
+	    } else if(is(GobTag.READY)) {
+		c = COL_READY;
+	    }
 	}
 	if(customColor.color(c)) {updstate();}
     }
