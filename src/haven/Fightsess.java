@@ -469,7 +469,8 @@ public class Fightsess extends Widget {
     private UI.Grab holdgrab = null;
     private int held = -1;
     public boolean globtype(char key, KeyEvent ev) {
-	if((ev.getModifiersEx() & (InputEvent.CTRL_DOWN_MASK | KeyEvent.META_DOWN_MASK | KeyEvent.ALT_DOWN_MASK)) == 0) {
+//	if((ev.getModifiersEx() & (InputEvent.CTRL_DOWN_MASK | KeyEvent.META_DOWN_MASK | KeyEvent.ALT_DOWN_MASK)) == 0) 
+	{
 	    int fn = getAction(ev);
 	    if((fn >= 0) && (fn < actions.length)) {
 		MapView map = getparent(GameUI.class).map;
@@ -520,7 +521,8 @@ public class Fightsess extends Widget {
     }
 
     public boolean keyup(KeyEvent ev) {
-	if((holdgrab != null) && (kb_acts[held].key().match(ev, KeyMatch.MODS))) {
+//	if((holdgrab != null) && (kb_acts[held].key().match(ev, KeyMatch.MODS))) {
+	if((holdgrab != null) && (keybinds[held].match(ev))) {
 	    MapView map = getparent(GameUI.class).map;
 	    new Release(held);
 	    holdgrab.remove();
