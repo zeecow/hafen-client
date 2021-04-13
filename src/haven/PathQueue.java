@@ -134,7 +134,7 @@ public class PathQueue {
 	}
     }
     
-    private void clear() {
+    public void clear() {
 	synchronized (queue) {queue.clear();}
     }
     
