@@ -3,10 +3,12 @@ package haven;
 import java.util.LinkedList;
 import java.util.List;
 
+import static haven.MCache.*;
 import static haven.OCache.*;
 
 public class PathQueue {
     private static final boolean DBG = false;
+    private static final Coord2d gsz = tilesz.mul(cmaps.x, cmaps.y);
     private final List<Coord2d> queue = new LinkedList<>();
     private final MapView map;
     private Moving moving;
@@ -46,9 +48,21 @@ public class PathQueue {
 	    try {
 		Gob player = map.player();
 		if(player != null) {
-		    Coord3f current = moving == null ? player.getrc() : moving.gett();
+		    Coord2d pc = player.rc;
+		    Coord pgrid = pc.floor(gsz);
+		    float z = 0;
+		    Coord3f current = new Coord3f((float) pc.x, (float) pc.y, 0);
+		    try {
+			current = moving == null ? player.getrc() : moving.gett();
+			z = current.z;
+		    } catch (Loading ignored) {}
 		    for (Coord2d p : tmp) {
-		        Coord3f next = map.glob.map.getzp(p);
+			Coord3f next = new Coord3f((float) p.x, (float) p.y, z);
+			if(pgrid.manhattan2(p.floor(gsz)) <= 1) {
+			    try {
+				next = map.glob.map.getzp(p);
+			    } catch (Loading ignored) {}
+			}
 			lines.add(new Pair<>(current, next));
 			current = next;
 		    }
