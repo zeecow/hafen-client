@@ -3,7 +3,7 @@
 original features:
  - search actions global
  - compact equip window
- - belt toggles equip window
+ - auto toggle equip window
  - shorter cattle roster window
  - reposition map window when compacted/expanded
 

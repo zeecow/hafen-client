@@ -224,12 +224,6 @@ public class WItem extends Widget implements DTarget {
 	return(false);
     }
 
-	@Override
-	public boolean mouseup(Coord c, int button) {
-		ZeeConfig.checkBeltToggleWindow(this);
-		return super.mouseup(c, button);
-	}
-
 	public boolean drop(Coord cc, Coord ul) {
 	return(false);
     }

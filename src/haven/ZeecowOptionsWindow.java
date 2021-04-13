@@ -1,7 +1,5 @@
 package haven;
 
-import jdk.jshell.execution.Util;
-
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -9,10 +7,7 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.util.*;
-import java.util.List;
 
 public class ZeecowOptionsWindow extends JFrame {
     public JTabbedPane tabbedPane, tabbedPaneGobs;
@@ -123,11 +118,11 @@ public class ZeecowOptionsWindow extends JFrame {
             Utils.setprefb("equiporyCompact",val);
         });
 
-        panelMisc.add(cbBeltTogglesEquips = new JCheckBox("Belt toggles equips window(buggy)"));
-        cbBeltTogglesEquips.setSelected(ZeeConfig.beltToggleEquips);
+        panelMisc.add(cbBeltTogglesEquips = new JCheckBox("Auto toggle equips window"));
+        cbBeltTogglesEquips.setSelected(ZeeConfig.autoOpenEquips);
         cbBeltTogglesEquips.addActionListener(actionEvent -> {
             JCheckBox cb = (JCheckBox) actionEvent.getSource();
-            boolean val = ZeeConfig.beltToggleEquips = cb.isSelected();
+            boolean val = ZeeConfig.autoOpenEquips = cb.isSelected();
             Utils.setprefb("beltToggleEquips",val);
         });
 

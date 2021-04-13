@@ -33,7 +33,7 @@ public class ZeeConfig {
     public static boolean autoClickMenuOption = Utils.getprefb("autoClickMenuOption", true);
     public static String autoClickMenuOptionList = Utils.getpref("autoClickMenuOptionList", "Pick,Pluck,Flay,Slice,Harvest wax");
     public static boolean autoHearthOnStranger = Utils.getprefb("autoHearthOnStranger", true);
-    public static boolean beltToggleEquips = Utils.getprefb("beltToggleEquips", true);
+    public static boolean autoOpenEquips = Utils.getprefb("beltToggleEquips", true);
     public static boolean cattleRosterHeight = Utils.getprefb("cattleRosterHeight", false);
     public static double cattleRosterHeightPercentage = Utils.getprefd("cattleRosterHeightPercentage", 1.0);
     public static boolean dropMinedCurios = Utils.getprefb("dropMinedCurios", true);
@@ -43,10 +43,9 @@ public class ZeeConfig {
     public static boolean dropSeeds = false;//always starts off (TODO: set false when character loads)
     public static boolean dropSoil = false;
     public static boolean equiporyCompact = Utils.getprefb("equiporyCompact", false);
-    public static boolean equipWindowOpenedByBelt = false;
     public static boolean notifyBuddyOnline = Utils.getprefb("notifyBuddyOnline", false);;
     public static boolean showInventoryLogin = Utils.getprefb("showInventoryLogin", true);
-    public static boolean showEquipsLogin = Utils.getprefb("showInventoryLogin", true);
+    public static boolean showEquipsLogin = Utils.getprefb("showEquipsLogin", false);
 
     public static String playingAudio = null;
 
@@ -84,8 +83,9 @@ public class ZeeConfig {
             "diabase",
             "arkose",
             "diorite",
-            "kyanite",
-            "slate"
+            "slate",
+            "rhyolite",
+            "pumice"
     ));
     public final static Set<String> mineablesOre = new HashSet<String>(Arrays.asList(
             "cassiterite",
@@ -310,24 +310,18 @@ public class ZeeConfig {
 
 
     //FIXME some cases the behavior is wrong
-    public static void checkBeltToggleWindow(Widget wdg) {
-        if(!ZeeConfig.beltToggleEquips)
+    public static void checkAutoOpenEquips(boolean done) {
+        if(!ZeeConfig.autoOpenEquips)
             return;
-        if(wdg.parent!=null && wdg.parent.parent!=null && wdg.parent.parent instanceof Window){
-            String windowName = "";
-            try {
-                windowName = ((Window) wdg.parent.parent).cap.text;
-            }catch (Exception e){
-            }
-            if(!equipWindowOpenedByBelt && windowName.contains("Belt")){
+
+        if(!windowEquipment.visible) {
+            //from Equipory.drawslots()
+            Equipory.SlotInfo si = ItemInfo.find(Equipory.SlotInfo.class, gameUI.vhand.item.info());
+            if (si != null) {
                 windowEquipment.show();
-                if(windowEquipment.visible)
-                    equipWindowOpenedByBelt = false;
-                else
-                    equipWindowOpenedByBelt = false;
             }
-        }else if(equipWindowOpenedByBelt && wdg.parent!=null && wdg.parent instanceof GameUI){
-                windowEquipment.hide();
+        }else if(done){
+            windowEquipment.hide();
         }
     }
 
@@ -563,14 +557,6 @@ public class ZeeConfig {
             throw new UncheckedIOException(ioe);
         }
     }
-
-    // https://base64.guru/converter/encode/image
-    // output format: plain text
-    public static String imgB64Player = "iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAMAAAAoLQ9TAAAAYFBMVEVVgKZwnsUeMVNUgKWid0pQeaEoPWazlXMtR3FEaJPy6N4jNlzv4tZSfKNnlbtNdZ3Jm3UnPGXOpYONtdg2U4AuR3Jod3/DlGg4VoOxdkWJYTLp18aq0PJ+rNX///////8LjhFyAAAAIHRSTlP/////////////////////////////////////////AFxcG+0AAAABYktHRB5yCiArAAAAQGhJU1QAAwADAAMAAgACAAMAAgACAAEAAQABAAEAAQABAAEAAQABAAIAAQABAAEAAQABAAgACQAKAAwADgARABIAKABc1/X1vAAAABt0RVh0U29mdHdhcmUAZ2lmMnBuZyAwLjYgKGJldGEpqt1pkgAAAH5JREFUeJxtz9sSgyAMRVG0Wntv7Y2EhOP//6UBFPvQ/UTWTIaJm3KwysuVOVjYAOHBzEVcnp/MqxRgsX6guwSRIF0FfxpEBvEVvj6teFoATslbpElcmmMkK770gBVStyaOGXbaJ2p0H9u/MOHaa+7cYvkW9yO9PyOwXYt6/wxZlRoprCU+cgAAAABJRU5ErkJggg==";
-
-    public static  String imgB64Star = "iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAB90lEQVR42mNkwAPifVgtWZgZGeZu/HUclxpGfAacXMSzipmZgcEk+ksYyQa4mLEorO3lvg1ih5d9Vd1x/M8DkgxY38vV52TOWghiHzrzp9+34GsR0QZoKTLxHVvE85iRkZEPxP////8n28Qvspfv/PtElAGzajiLwj3YepHF1uz6VZzc9L0Pw4C2KM5wFX1Gc2lxJjkZcSZZAR5GWaC4ONBoJhSV/xn+AcmXH778f/zk1b/HT1/8e3T34v+TjJ76rGpz87g3cSv/V2dgYSAO/GFg+HaP8Wbq5K9+YC9oSzMLrCzmWSWrz+DKwE5A808GhqeXGHaH930Ju/z47wd4GIjwMrIsy+eZYO7BlI1P/+md/6ZGTfxS8OrT/z8YgWhvxCy7aRLPI3wGBBZ+ldt3+s9jrLFQEsseVpvOsRKfAW1zf4R3zv+5CqsBq7q4+t2tWAvAnN8MDH+fM74Ehj4Ds9R/cQZWiJo9J39PCC7+VojVgPtbeU8I8TGZM7xj/Hf+zL+5eQu+lv8DGjApnqvT2Iw5mUHoP9PHL/9Pynl+ssAwQFWOiePMXN6PX+4z3m5a8T195r6fR5ENT3Vgt66P4pzJq/hf1SLtM//1+/9+oBgQacVm4K3P5lW6/Gv38w//f2PzvwQ/I2tnJFfp7qu/ty05/OsCSAwA/W24+ow4DiYAAAAASUVORK5CYII=";
-
-    public static  String getImgB64Cave = "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAEnRFWHRUaXRsZQBDYXZlIFBhc3NhZ2WNnq5LAAAAK3RFWHRDcmVhdGlvbiBUaW1lAG9uIDI2IGF1ZyAyMDE1IDE0OjE2OjIwICswMTAwVwLkTwAAAAd0SU1FB+QKEBYsD+qNFfcAAAAJcEhZcwAAHsEAAB7BAcNpVFMAAAAEZ0FNQQAAsY8L/GEFAAAI1UlEQVR42sVXW2wcVxn+zszszOx9116vvXF8S3ASu62TJiH3klSkoARFRWoiUIvUCqUvoAohHnjoQ4VUEA+9BAmBkJBCCRIgaPuQijQtVBWBXJ2Lm/iSNL4kttfrXa+9uzM7s3Pnn8SkSe2kLiBxpE879p49//ffvv8M8H9ebIn7koR1hCbCHkILQScYhIb5zxKhSvgL4Q//SwK+gV8S1hOCmQS8A5uk+MYOnq8Lg89XYIs8E1TLw9lhy37/imuPF51Z2nuI8GuC8t8QyBBeSUXZ3n3rhMhDzR7XnmScCwGWyyDwQDwWwWxFu7054iKT8HBqjLk/OWrauZJbUHT32/TVe/czwD/A+G7f885G7rGffiMc3dQOPhXhmW4x2I4LifOwbu0jSGY6oZeyqNZs1BwORU1AYxTs2Z1hnoHFRvLuHs3w8nRW3+cl8BJhx8v7Q9FH2wUu3twDs5Il311YFO6e7XshhFLIDg+gWikjyBkIBQOwbMAkItMlD6syPNa1icFjfcaX6KwsoZ/g3W2Ee0DoVx3cKYVXpjkuEEmjYVkHOM9FU72MNR31SITpp0YZnCCSUQ+OIKGmGZAcFQnJRlAkEhUGUQ6yDSulOJ33NdwuYn4pBA4QWrd3CoJMB0VZARxVS8fqh8gwj45HtiEalOGVrkKWOciSB1FkUGoedIdHhPa0pCXUJ2PQTWBtm+Tb2UzYsFQCXYeekdOO5yFAMeelJtgTfyWv6PDWrZDkKDXcJDyqheaGJJqSMkzVQVTmEQ5JCASjSGfa0bY8jZhoojHBc/Pef5dgLYVAw9CU63rgDZ7gBdLgA0lwgTBi9a3gxDDsYAZNDQmEZAkNdQk0JCTUxUWkkhFI4TQMRnvUaXSkLNRHgBf2xmU/qp+uAWHRyuTgjRY8b9fDktDWuVYINnbR/xg4KQIWkKgLTCq6CWDF47A0FWF1Ci3LHDgcd4ukyUnIjo/BrM4hFGFojDNoBvNbvm5JXRCT2bcefziy5ut7d/Kp5atZgPKgVTWEYvVEnwdTr0MonwRvFSmELoVcgiAFIIbjcPgQspM5ZPMzEAUPJTNAxqlGBI5a1woOZl1f2I49KAWMHEl4nMiisTrGMw/VwjXMXP8Ahq5SAG3wlWsoiVtQi2+DnVwPW2qBI7eT5w1QNYZCsQTLMKGYjBLO+97DoMw/vSPExULcN7+zJ30n8oumoKJj2fBUFZMTUx6njLDDH5bQO92M321PgrkmzPptCMGBrmQRiFC+uDAsz0K1OotS7gokXodJBWt4EkpFalHXj74LzeLR0xKI0R8pQu5+KegOBMQf1IRUoOb7q5vsXPVRBJiGJ9fSt3oWW351GBdH+7AskENzWENAjkMsn4VZugaHIqRbHEqkiArZ4XgXZeoQ12MEj0TMZcf7NL6sOe/dj8CZDRs2NNTV1bOKzrOnv7wKxz9SoJSmcP7CSYxOjuPmdoZxmgiXEy7G+3XEoxnIngopRrKs5GBKq8GCIYSDDiXUxmzJhkOPfl/VhVzv79fses1wf75YCnpj8VjbwYMHWV9fH3oSWSRlA8XCCC71f4x3Zqu3Nj13M4OhNyu4cFRBeZWFG3/7AD/cvRkN4SCizVtQzmYh81UKeQ227dxOAXnvcJ5HE9RXTnPRIuQ4bs3rr73ONTU1YXh4GEPjJailHE784xLK88ZvlylD9nQV7cuDUEYdjFgKjlw4DzV/HkqxH1YtB9tSYTk2bNelqva9Jw4uYyIncLrpFhcrwouvvfpqsKVluVcqlZlWVTB4PY/nz5cpd/eGyaq6IPlH6rEQ4u9Tzinvm1I25FCSOsXBVLmISpWK1XVIPRkSEQHFsuMHgaLCPNPytAUEyPsvtHe0M8MwMDU1hZmZWfDkaXGOIRgMQtf1OwQ8moY8VY9GI7nbJflN8+QhDV95GWbL48hRzg3qfZu8NngHczSUbPqeJ4Ur6a7P/caCFESjUT0UCkFRVDYyMgJJktC2YhWeeuoADSIOgvBJsKpTLmo04R0y8vaHGp5ZH8NGGr0WJOhEiDEBKvE1aDjVxQKokQZYjt+ORNpm/lyLLiDgeZ5pmpZbLBZRKND0Ixf379+P3U88QVUeo0M/uTzpBWotul7MDdhIt22m/o8gQmWuqnQZ8HiYJECiwOh3AURCPKknm7dB5A3Pt9mzIAWqqgqnT51EjVIwNjaGrq4uOiCCd4/+iWrAvacGPv6j5gsicqdNhMitM7l2NGQqpHwm3JqCuqgLnXJvmC6miKwffuJDaWYYmLD8aWQviIDruufe+O0R5dixd5Ev5LFp06ZbwmFSSOvrU/dEwNZIUOgObBTJ+JkzWBcbREU1yWuePCpDlCz4gdYpBSXF9UXw1jCTJQdXbur+OH5lsTbcNz4+/ouBgQGju6vbbW1tJQ8sUjZG81/0U3Rno597f818ZJFCmmgKlBCMtyOVTgM0LQcmI3j7tIATV0VcvinAL5+waKMubGBOdUqSgN8v1ob+epEMbb0xNrqVnuWhoSESoRmY1j13CGRPGHeeO5uoU8oGWju30o1Ix4/fimC6qFLFC5AEF1mqjY4mG55g4uh5wzNs/ObusxaT4jemp/OrL1261JHJZCRKDXp7e0nDLT9NCzbTfQRdKxiaMyvwwqGLyJddPPf8QWzZto3Sx9G94CZmNNU7fsr0Lt5wfAXc9VkEbq1yudxNmhDqPXfWVatVwbbtRd8h/MtWT7eAt/7J0DdSw0sv/4jk10YuN43RsVFEOR2nLhf0iuH64jND+NlSCAyRtzO5XK5Qqxl0OXP9qvXl079WSXdv3NIZQF6TcX1Cwb79z0LTNPT3D+DKlcvI5wt+S89Nz6kTfmQJT37a0FLfDf21g/A9Qtc8keDGjetTX+0RxWs3BjHODL0x/BUxFApziqIwIuINDg5Okqr6BXeYMLjYoZ+HwN3Lf9H4fltb2/qVnSuaudnTV0/06ywcrkuk02mZZJubnp6u1Gq1I7TvxQcd9J8S+PfaRfgiIT7/6XeVn2e/Wt8k/PmzDvgXck0FMyzypcwAAAAASUVORK5CYII=";
 
 }
 

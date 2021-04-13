@@ -44,6 +44,7 @@ public class ItemDrag extends WItem {
 	g.chcolor(255, 255, 255, 128);
 	super.drawmain(g, spr);
 	g.chcolor();
+	ZeeConfig.checkAutoOpenEquips(false);
     }
 
     public boolean dropon(Widget w, Coord c) {
@@ -102,4 +103,10 @@ public class ItemDrag extends WItem {
     public void mousemove(Coord c) {
 	this.c = this.c.add(c.add(doff.inv()));
     }
+
+	@Override
+	public void dispose() {
+		ZeeConfig.checkAutoOpenEquips(true);
+		super.dispose();
+	}
 }
