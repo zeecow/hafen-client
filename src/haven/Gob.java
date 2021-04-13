@@ -30,6 +30,7 @@ import java.awt.*;
 import java.util.*;
 import java.util.function.*;
 import haven.render.*;
+import haven.res.gfx.fx.msrad.MSRad;
 import integrations.mapv4.MappingClient;
 
 import static haven.OCache.*;
@@ -61,12 +62,13 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Sk
     private final Set<GobTag> tags = new HashSet<>();
     public boolean drivenByPlayer = false;
     public long drives = 0;
+    private GobRadius radius = null;
     public static final ChangeCallback CHANGED = new ChangeCallback() {
 	@Override
 	public void added(Gob ob) {
-	
+	    
 	}
- 
+	
 	@Override
 	public void removed(Gob ob) {
 	    ob.dispose();
@@ -340,8 +342,6 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Sk
 		if(res != null) {
 		    if(res.name.equals("gfx/fx/floatimg")) {
 			processDmg(item.sdt.clone());
-		    } else if(res.name.equals("gfx/fx/msrad")) {
-			GobRadius.init();
 		    }
 //		    System.out.printf("overlayAdded: '%s'%n", res.name);
 		}
@@ -1071,26 +1071,36 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Sk
 	if(updateseq == 0 || !status.updated()) {return;}
 	StatusUpdates status = this.status;
 	this.status = new StatusUpdates();
-	
+    
 	if(status.updated(StatusType.drawable, StatusType.kin, StatusType.id, StatusType.pose, StatusType.tags, StatusType.overlay)) {
 	    updateTags();
 	    status.update(StatusType.tags);
 	}
-	
+    
 	if(status.updated(StatusType.drawable, StatusType.visibility, StatusType.tags)) {
 	    if(updateVisibility()) {
 		status.update(StatusType.visibility);
 	    }
 	}
-	
+    
+	if(status.updated(StatusType.drawable) && radius == null) {
+	    Resource res = getres();
+	    if(res != null) {
+		radius = GobRadius.get(res.name);
+		if(radius != null) {
+		    addol(new MSRad(this, radius.radius, radius.color(), radius.color2()));
+		}
+	    }
+	}
+    
 	if(status.updated(StatusType.drawable, StatusType.hitbox, StatusType.visibility)) {
 	    updateHitbox();
 	}
-	
+    
 	if(status.updated(StatusType.drawable, StatusType.id, StatusType.icon)) {
 	    updateIcon();
 	}
-	
+    
 	if(status.updated(StatusType.tags)) {
 	    updateWarnings();
 	}

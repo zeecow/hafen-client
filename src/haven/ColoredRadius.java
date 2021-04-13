@@ -41,10 +41,6 @@ public class ColoredRadius implements RenderTree.Node {
 	this.vbuf = vbuf;
     }
     
-    public ColoredRadius(Gob gob, float r) {
-	this(gob, r, new Color(192, 0, 0, 128), new Color(255, 224, 96));
-    }
-    
     private FillBuffer sidx(Indices dst, Environment env) {
 	FillBuffer ret = env.fillbuf(dst);
 	ShortBuffer buf = ret.push().asShortBuffer();
@@ -76,6 +72,7 @@ public class ColoredRadius implements RenderTree.Node {
 		posb.put((n + i) * 3 + 2, z - 10);
 	    }
 	} catch (Loading e) {
+	    lc = null;
 	    return;
 	}
 	vbuf.update(g);
@@ -84,8 +81,8 @@ public class ColoredRadius implements RenderTree.Node {
     public void gtick(Render g) {
 	Coord2d cc = gob.rc;
 	if((lc == null) || !lc.equals(cc)) {
-	    setz(g, gob.context(Glob.class), cc);
 	    lc = cc;
+	    setz(g, gob.context(Glob.class), cc);
 	}
     }
     
