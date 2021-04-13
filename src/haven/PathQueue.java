@@ -72,6 +72,26 @@ public class PathQueue {
 	return lines;
     }
     
+    public List<Pair<Coord2d, Coord2d>> minimapLines() {
+	LinkedList<Coord2d> tmp;
+	synchronized (queue) {
+	    tmp = new LinkedList<>(queue);
+	}
+	
+	List<Pair<Coord2d, Coord2d>> lines = new LinkedList<>();
+	if(!tmp.isEmpty()) {
+	    Gob player = map.player();
+	    if(player != null) {
+		Coord2d current = player.rc;
+		for (Coord2d p : tmp) {
+		    lines.add(new Pair<>(current, p));
+		    current = p;
+		}
+	    }
+	}
+	return lines;
+    }
+    
     private Coord2d pop() {
 	synchronized (queue) {
 	    if(queue.isEmpty()) { return null; }

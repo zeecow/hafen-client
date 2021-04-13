@@ -940,6 +940,9 @@ public class OptWnd extends WindowX {
 	display.add(new CFGBox("Show biomes on minimap", CFG.MMAP_SHOW_BIOMES), x, y);
 
 	y += STEP;
+	display.add(new CFGBox("Show queued path on minimap", CFG.MMAP_SHOW_PATH), x, y);
+
+	y += STEP;
 	display.add(new CFGBox("Simple crops", CFG.SIMPLE_CROPS, "Requires area reload"), x, y);
 
 	y += 35;

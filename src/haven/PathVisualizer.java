@@ -178,6 +178,7 @@ public class PathVisualizer implements RenderTree.Node {
 	
 	
 	private final Pipe.Op state;
+	public final Color color;
 	
 	PathCategory(Color col, boolean top) {
 	    state = Pipe.Op.compose(
@@ -185,6 +186,7 @@ public class PathVisualizer implements RenderTree.Node {
 		new States.LineWidth(1.5f),
 		top ? Pipe.Op.compose(Rendered.last, States.Depthtest.none, States.maskdepth) : null
 	    );
+	    color = col;
 	}
 	
 	PathCategory(Color col) {

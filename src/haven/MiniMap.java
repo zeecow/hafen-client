@@ -604,6 +604,7 @@ public class MiniMap extends Widget {
 	drawmarkers(g);
 	if(zoomlevel <= 2 && CFG.MMAP_GRID.get()) {drawgrid(g);}
 	if(zoomlevel <= 1 && CFG.MMAP_VIEW.get()) {drawview(g);}
+	if(CFG.MMAP_SHOW_PATH.get()) {drawMovement(g);}
 	if(dlvl <= 1)
 	    drawicons(g);
 	drawparty(g);
@@ -875,6 +876,17 @@ public class MiniMap extends Widget {
 	    g.frect(rc, VIEW_SZ.div(zmult));
 	    g.chcolor(VIEW_BORDER_COLOR);
 	    g.rect(rc, VIEW_SZ.div(zmult));
+	    g.chcolor();
+	}
+    }
+    
+    void drawMovement(GOut g) {
+	if(ui.gui.pathQueue!=null) {
+	    List<Pair<Coord2d, Coord2d>> lines = ui.gui.pathQueue.minimapLines();
+	    g.chcolor(PathVisualizer.PathCategory.ME.color);
+	    for (Pair<Coord2d, Coord2d> line : lines) {
+		g.line(p2c(line.a), p2c(line.b), 1.5);
+	    }
 	    g.chcolor();
 	}
     }
