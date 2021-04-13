@@ -7,7 +7,7 @@ import static haven.OCache.*;
 
 public class PathQueue {
     private static final boolean DBG = false;
-    private final List<Coord3f> queue = new LinkedList<>();
+    private final List<Coord2d> queue = new LinkedList<>();
     private final MapView map;
     private Moving moving;
     
@@ -18,7 +18,7 @@ public class PathQueue {
 	});
     }
     
-    public boolean add(Coord3f p) {
+    public boolean add(Coord2d p) {
 	boolean start = false;
 	synchronized (queue) {
 	    if(queue.isEmpty()) { start = true; }
@@ -28,7 +28,7 @@ public class PathQueue {
 	return start;
     }
     
-    public void start(Coord3f p) {
+    public void start(Coord2d p) {
 	synchronized (queue) {
 	    queue.clear();
 	    queue.add(p);
@@ -36,7 +36,7 @@ public class PathQueue {
     }
     
     public List<Pair<Coord3f, Coord3f>> lines() {
-	LinkedList<Coord3f> tmp;
+	LinkedList<Coord2d> tmp;
 	synchronized (queue) {
 	    tmp = new LinkedList<>(queue);
 	}
@@ -47,7 +47,8 @@ public class PathQueue {
 		Gob player = map.player();
 		if(player != null) {
 		    Coord3f current = moving == null ? player.getrc() : moving.gett();
-		    for (Coord3f next : tmp) {
+		    for (Coord2d p : tmp) {
+		        Coord3f next = map.glob.map.getzp(p);
 			lines.add(new Pair<>(current, next));
 			current = next;
 		    }
@@ -57,7 +58,7 @@ public class PathQueue {
 	return lines;
     }
     
-    private Coord3f pop() {
+    private Coord2d pop() {
 	synchronized (queue) {
 	    if(queue.isEmpty()) { return null; }
 	    queue.remove(0);
@@ -71,10 +72,9 @@ public class PathQueue {
 	moving = (Moving) to;
 	synchronized (queue) {
 	    if(to == null) {
-		Coord3f next = pop();
+		Coord2d next = pop();
 		if(next != null) {
-		    Coord2d mc = new Coord2d(next.x, next.y);
-		    map.wdgmsg("click", Coord.z, mc.floor(posres), 1, 0);
+		    map.wdgmsg("click", Coord.z, next.floor(posres), 1, 0);
 		}
 	    } else if(to instanceof Homing || to instanceof Following) {
 		clear();

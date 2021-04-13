@@ -382,9 +382,7 @@ public class FlowerMenu extends Widget {
 
     public void choose(int num) {
         if(num != -1 && target != null) {
-            try {
-            	ui.gui.pathQueue.start(target.getc());
-	    } catch (Loading ignored) {}
+	    ui.gui.pathQueue.start(target.rc);
 	}
 	if(num != -1 && PICK_ALL.equals(options[num])) {
 	    if(target != null) {
