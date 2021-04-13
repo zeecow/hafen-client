@@ -2088,6 +2088,7 @@ public class MapView extends PView implements DTarget, Console.Directory {
 	}
 	
 	protected void hit(Coord pc, Coord2d mc, ClickData inf) {
+	    if(Config.center_tile) { mc = mc.floor(tilesz).mul(tilesz).add(5, 5); }
 	    Object[] args = {pc, mc.floor(posres), clickb, ui.modflags()};
 	    
 	    if(inf != null) {
