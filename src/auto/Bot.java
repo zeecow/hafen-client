@@ -202,6 +202,7 @@ public class Bot implements Defer.Callable<Void> {
     public static BotAction selectFlower(String option) {
 	return target -> {
 	    if(target.hasMenu()) {
+		FlowerMenu.lastGob(target.gob);
 		Reactor.FLOWER.first().subscribe(flowerMenu -> flowerMenu.forceChoose(option));
 	    }
 	};
