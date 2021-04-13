@@ -147,7 +147,7 @@ public class ZeecowOptionsWindow extends JFrame {
         cbShowEquipsLogin.addActionListener(actionEvent -> {
             JCheckBox cb = (JCheckBox) actionEvent.getSource();
             boolean val = ZeeConfig.showEquipsLogin = cb.isSelected();
-            Utils.setprefb("cbShowEquipsLogin",val);
+            Utils.setprefb("showEquipsLogin",val);
         });
 
         panelMisc.add(cbNotifyBuddyOnline = new JCheckBox("Notify when friends login"));
@@ -517,10 +517,14 @@ public class ZeecowOptionsWindow extends JFrame {
     }
 
     private void removeGobFromCategory(){
-        String gobName = tfGobName.getText().trim();
-        String gobCategory = cmbGobCategory.getSelectedItem().toString().trim();
-        removeGobFromCategory(gobName,gobCategory);
-        cmbGobCategory.setSelectedIndex(-1);
+        try {
+            String gobName = tfGobName.getText().trim();
+            String gobCategory = cmbGobCategory.getSelectedItem().toString().trim();
+            removeGobFromCategory(gobName, gobCategory);
+            cmbGobCategory.setSelectedIndex(-1);
+        }catch(Exception e){
+            txtAreaDebug.setText(e.getMessage());
+        }
     }
 
     private void addGobToCategory(String gobName, String gobCategory) {
@@ -530,18 +534,26 @@ public class ZeecowOptionsWindow extends JFrame {
         }
         String gobs = ZeeConfig.mapCategoryGobs.get(gobCategory);
         if (gobs != null) {
+            System.out.printf("1. gobs = %s\n", gobs);
             String[] strArr = gobs.replace("[", "").replace("]", "").replace(", ", ",").trim().split(",");
+            System.out.printf("2. strArr len%s = %s\n", strArr.length,strArr);
             ArrayList<String> list = new ArrayList<String>(Arrays.asList(strArr));
+            System.out.printf("3. list size before = %s\n", list.size());
             list.add(gobName);
+            System.out.printf("4. list size after = %s\n", list.size());
             strArr = Arrays.copyOf(list.toArray(), list.size(), String[].class);
+            System.out.printf("5. strArr copy size = %s\n", strArr.length);
             gobs = String.join(",", strArr);
+            System.out.printf("6. gobs strArr join = %s\n", gobs);
             gobs = "[" + gobs + "]";
+            System.out.printf("7. [gobs] = %s\n", gobs);
             ZeeConfig.mapCategoryGobs.put(gobCategory, gobs);
             String str = ZeeConfig.mapCategoryGobs.toString();
+            System.out.printf("8. str mapCateGobs = %s\n", str);
             Utils.setpref("mapCategoryGobsString", str);
             ZeeConfig.mapCategoryGobsString = str;
-            System.out.printf("%s added to %s\n",gobName, gobs);
-            System.out.println("contains() == "+gobs.contains(gobName));
+            System.out.printf("9. %s added to %s\n",gobName, gobs);
+            System.out.printf("10. gobs.contains(%s) == %s\n",gobName,gobs.contains(gobName));
         }
     }
 
