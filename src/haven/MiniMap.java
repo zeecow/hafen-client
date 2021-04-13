@@ -602,12 +602,13 @@ public class MiniMap extends Widget {
     public void drawparts(GOut g){
 	drawmap(g);
 	drawmarkers(g);
-	if(zoomlevel <= 2 && CFG.MMAP_GRID.get()) {drawgrid(g);}
-	if(zoomlevel <= 1 && CFG.MMAP_VIEW.get()) {drawview(g);}
-	if(CFG.MMAP_SHOW_PATH.get()) {drawMovement(g);}
+	boolean playerSegment = (sessloc != null) && ((curloc == null) || (sessloc.seg == curloc.seg));
+	if(playerSegment && zoomlevel <= 2 && CFG.MMAP_GRID.get()) {drawgrid(g);}
+	if(playerSegment && zoomlevel <= 1 && CFG.MMAP_VIEW.get()) {drawview(g);}
+	if(playerSegment && CFG.MMAP_SHOW_PATH.get()) {drawMovement(g);}
 	if(dlvl <= 1)
 	    drawicons(g);
-	drawparty(g);
+	if(playerSegment) drawparty(g);
 	if(CFG.MMAP_SHOW_BIOMES.get()) {drawbiome(g); }
     }
 
