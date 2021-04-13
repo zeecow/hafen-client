@@ -886,7 +886,7 @@ public class MiniMap extends Widget {
 	    List<Pair<Coord2d, Coord2d>> lines = ui.gui.pathQueue.minimapLines();
 	    g.chcolor(PathVisualizer.PathCategory.ME.color);
 	    for (Pair<Coord2d, Coord2d> line : lines) {
-		g.line(p2c(line.a), p2c(line.b), 1.5);
+		g.clippedLine(p2c(line.a), p2c(line.b), 1.5);
 	    }
 	    g.chcolor();
 	}
