@@ -1,6 +1,7 @@
 $size[14]{$u{Update for 13.04.21:}
   * added effect radius display to beehives and food troughs
   * changed color of mine supports to something more neutral
+  * added option to display queued movement on minimap (Options->Display->Show queued path)
  
 $size[14]{$u{Update for 12.04.21:}
   * merged loftar's changes
