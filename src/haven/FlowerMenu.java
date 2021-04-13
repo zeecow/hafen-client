@@ -382,7 +382,9 @@ public class FlowerMenu extends Widget {
 
     public void choose(int num) {
         if(num != -1 && target != null) {
-            ui.gui.pathQueue.start(target.getc());
+            try {
+            	ui.gui.pathQueue.start(target.getc());
+	    } catch (Loading ignored) {}
 	}
 	if(num != -1 && PICK_ALL.equals(options[num])) {
 	    if(target != null) {
@@ -391,8 +393,8 @@ public class FlowerMenu extends Widget {
 		} catch (Exception ignored) {}
 	    }
 	    num = -1;
-	    target = null;
 	}
+	target = null;
 	wdgmsg("cl", num, ui.modflags());
     }
 }
