@@ -69,6 +69,7 @@ public class Config {
     public static final boolean isUpdate;
     public static boolean center_tile = false;
     private static String username, playername;
+    public static boolean always_true = true; //always true to facilitate changes with minimal intrusions into loftar's code
     
     static {
 	String p;
