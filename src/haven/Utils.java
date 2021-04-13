@@ -1916,6 +1916,61 @@ public class Utils {
 	return null;
     }
 
+    //Liang-Barsky algorithm
+    public static Pair<Coord, Coord> clipLine(Coord a, Coord b, Coord ul, Coord br) {
+	// Define the x/y clipping values for the border.
+	double edgeLeft = ul.x;
+	double edgeRight = br.x;
+	double edgeBottom = ul.y;
+	double edgeTop = br.y;
+	
+	// Define the start and end points of the line.
+	double x0src = a.x;
+	double y0src = a.y;
+	double x1src = b.x;
+	double y1src = b.y;
+	
+	double t0 = 0.0;
+	double t1 = 1.0;
+	double xdelta = x1src - x0src;
+	double ydelta = y1src - y0src;
+	double p = 0, q = 0, r;
+	
+	for (int edge = 0; edge < 4; edge++) {   // Traverse through left, right, bottom, top edges.
+	    if(edge == 0) {
+		p = -xdelta;
+		q = -(edgeLeft - x0src);
+	    }
+	    if(edge == 1) {
+		p = xdelta;
+		q = (edgeRight - x0src);
+	    }
+	    if(edge == 2) {
+		p = -ydelta;
+		q = -(edgeBottom - y0src);
+	    }
+	    if(edge == 3) {
+		p = ydelta;
+		q = (edgeTop - y0src);
+	    }
+	    if(p == 0 && q < 0) return null;   // Don't draw line at all. (parallel line outside)
+	    r = q / p;
+	    
+	    if(p < 0) {
+		if(r > t1) return null;         // Don't draw line at all.
+		else if(r > t0) t0 = r;         // Line is clipped!
+	    } else if(p > 0) {
+		if(r < t0) return null;      // Don't draw line at all.
+		else if(r < t1) t1 = r;      // Line is clipped!
+	    }
+	}
+	
+	return new Pair<>(
+	    new Coord((int) (x0src + t0 * xdelta), (int) (y0src + t0 * ydelta)),
+	    new Coord((int) (x0src + t1 * xdelta), (int) (y0src + t1 * ydelta))
+	);
+    }
+    
     public static boolean checkbit(int target, int index) {
 	return (target & (1 << index)) != 0;
     }
