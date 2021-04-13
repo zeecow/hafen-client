@@ -816,6 +816,12 @@ public class MiniMap extends Widget {
 			  button, ui.modflags());
 	    else {
 		if(button == 3) {FlowerMenu.lastGob(gob);}
+		if(Config.always_true) {
+		    Coord2d clickAt = loc.tc.sub(sessloc.tc).mul(tilesz).add(tilesz.div(2));
+		    mv.click(clickAt, button, mc,
+			clickAt.floor(posres),
+			button, ui.modflags());
+		} else
 		mv.wdgmsg("click", mc,
 			  loc.tc.sub(sessloc.tc).mul(tilesz).add(tilesz.div(2)).floor(posres),
 			  button, ui.modflags(), 0,
