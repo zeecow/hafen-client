@@ -819,8 +819,8 @@ public class MiniMap extends Widget {
 		if(Config.always_true) {
 		    Coord2d clickAt = loc.tc.sub(sessloc.tc).mul(tilesz).add(tilesz.div(2));
 		    mv.click(clickAt, button, mc,
-			clickAt.floor(posres),
-			button, ui.modflags());
+			clickAt.floor(posres), button, ui.modflags(), 0,
+			(int) gob.id, gob.rc.floor(posres), 0, -1);
 		} else
 		mv.wdgmsg("click", mc,
 			  loc.tc.sub(sessloc.tc).mul(tilesz).add(tilesz.div(2)).floor(posres),
