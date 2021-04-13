@@ -19,8 +19,8 @@ public class ColoredRadius implements RenderTree.Node {
     
     public ColoredRadius(Gob gob, float r, Color scol, Color ecol) {
 	this.gob = gob;
-	smat = new BaseColor(scol);
-	emat = Pipe.Op.compose(new BaseColor(ecol), new States.LineWidth(4));
+	smat = Pipe.Op.compose(new BaseColor(scol), Clickable.No);
+	emat = Pipe.Op.compose(new BaseColor(ecol), new States.LineWidth(4), Clickable.No);
 	int n = Math.max(24, (int) (2 * Math.PI * r / 11.0));
 	FloatBuffer posb = Utils.wfbuf(n * 3 * 2);
 	FloatBuffer nrmb = Utils.wfbuf(n * 3 * 2);
