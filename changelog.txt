@@ -1,3 +1,7 @@
+$size[14]{$u{Update for 14.04.21:}
+  * made gob radius not clickable
+  * hopefully fixed quest pointers
+ 
 $size[14]{$u{Update for 13.04.21:}
   * added effect radius display to beehives and food troughs
   * changed color of mine supports to something more neutral
