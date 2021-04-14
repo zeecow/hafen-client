@@ -3,6 +3,7 @@ package haven;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 
 import javax.imageio.ImageIO;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.awt.image.RenderedImage;
 import java.io.*;
@@ -30,6 +31,7 @@ public class ZeeConfig {
     public static ZeecowOptionsWindow zeecowOptions;
 
     public static boolean actionSearchGlobal = Utils.getprefb("actionSearchGlobal", true);
+    public static boolean alertOnPlayers = Utils.getprefb("alertOnPlayers", true);
     public static boolean autoClickMenuOption = Utils.getprefb("autoClickMenuOption", true);
     public static String autoClickMenuOptionList = Utils.getpref("autoClickMenuOptionList", "Pick,Pluck,Flay,Slice,Harvest wax");
     public static boolean autoHearthOnStranger = Utils.getprefb("autoHearthOnStranger", true);
@@ -170,6 +172,7 @@ public class ZeeConfig {
     public static HashMap<String,String> mapCategoryGobs = initMapCategoryGobs();
     public static HashMap<String,String> mapCategoryAudio = initMapCategoryAudio();
 
+
     public static Collection<Field> getAllFields(Class<?> type) {
         TreeSet<Field> fields = new TreeSet<Field>(
                 new Comparator<Field>() {
@@ -247,16 +250,19 @@ public class ZeeConfig {
             //System.out.println(name+"  "+mapGobAlert.size());
         }
 
-        if(ZeeConfig.autoHearthOnStranger && name.contains("borka/body") && gob.id != gameUI.map.player().id) {
-            gameUI.act("travel","hearth");
-            try{
-                playAudio(mapCategoryAudio.get(CTGNAME_PVP));
-            }catch(Exception e) {
-                playMidi(midiJawsTheme);
+        if(name.contains("borka/body") && gob.id != gameUI.map.player().id) {
+            if(autoHearthOnStranger)
+                gameUI.act("travel","hearth");
+            if(alertOnPlayers){
+                String audio = mapCategoryAudio.get(CTGNAME_PVP);
+                if(audio!=null && !audio.isEmpty())
+                    playAudio(decodeURL(audio));
+                else
+                    gameUI.error("player spotted");
             }
         }else if( (path = mapGobSaved.get(name)) != null){
             //if single gob alert is saved, play alert
-            ZeeConfig.playAudio(ZeeConfig.decodeURL(path));
+            ZeeConfig.playAudio(decodeURL(path));
         }else {
             //for each category in mapCategoryGobs...
             for (String categ: mapCategoryGobs.keySet()){
@@ -266,7 +272,7 @@ public class ZeeConfig {
                 if(mapCategoryGobs.get(categ).contains(name)){
                     //play audio for category
                     path = mapCategoryAudio.get(categ);
-                    ZeeConfig.playAudio(ZeeConfig.decodeURL(path));
+                    ZeeConfig.playAudio(decodeURL(path));
                 }
             }
         }
@@ -383,6 +389,7 @@ public class ZeeConfig {
             mapCateGob.put(CTGNAME_PVP, pvpGobs.toString());
             mapCategoryGobsString = mapCateGob.toString();
         }else{
+            //TOFIX losing brackets bug?
             System.out.println("initMapCategoryGobs() > fetching saved categories");
             //fill map object and return it
             String[] mapStr = mapCategoryGobsString.split("],?");
@@ -500,11 +507,18 @@ public class ZeeConfig {
             "200"
     };
 
+
+    private static double lasterrsfx = 0;
     public static void playAudio(String filePath) {
-        if(playingAudio!=null && playingAudio.contains(filePath))
-            return;//avoid duplicate audio
-        playingAudio = filePath;
-        new ZeeSynth(filePath).start();
+        double now = Utils.rtime();
+        if(now - lasterrsfx > 0.1) {
+            new ZeeSynth(filePath).start();
+            lasterrsfx = now;
+        }
+        //if(playingAudio!=null && playingAudio.contains(filePath))
+            //return;//avoid duplicate audio
+        //playingAudio = filePath;
+        //new ZeeSynth(filePath).start();
     }
 
 
