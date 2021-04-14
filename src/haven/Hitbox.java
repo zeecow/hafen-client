@@ -9,9 +9,10 @@ import java.util.stream.Collectors;
 
 import static haven.Sprite.*;
 
-public class Hitbox extends GAttrib implements RenderTree.Node, Rendered {
+public class Hitbox extends SlottedNode implements Rendered {
     private static final VertexArray.Layout LAYOUT = new VertexArray.Layout(new VertexArray.Layout.Input(Homo3D.vertex, new VectorFormat(3, NumberFormat.FLOAT32), 0, 0, 12));
     private final Model model;
+    private final Gob gob;
     private static final Map<Resource, Model> MODEL_CACHE = new HashMap<>();
     private static final float Z = 0.1f;
     private static final Color SOLID_COLOR = new Color(178, 71, 178, 255);
@@ -26,8 +27,8 @@ public class Hitbox extends GAttrib implements RenderTree.Node, Rendered {
     private Pipe.Op state;
     
     private Hitbox(Gob gob) {
-	super(gob);
 	model = getModel(gob);
+	this.gob = gob;
 	updateState();
     }
     
@@ -67,10 +68,9 @@ public class Hitbox extends GAttrib implements RenderTree.Node, Rendered {
     
     private boolean passable() {
 	try {
-	    Resource res = gob.getres();
-	    String name = res != null ? res.name : "";
+	    String name = gob.resid();
+	    ResDrawable rd = (gob.drawable instanceof ResDrawable) ? (ResDrawable) gob.drawable : null;
 	    
-	    ResDrawable rd = gob.getattr(ResDrawable.class);
 	    if(rd != null) {
 		MessageBuf sdt = rd.sdt.clone();
 		int state = sdt.eom() ? 0xffff0000 : decnum(sdt);
@@ -78,10 +78,8 @@ public class Hitbox extends GAttrib implements RenderTree.Node, Rendered {
 		    if(state == 1) { // gate is open
 			return true;
 		    }
-		} else if(name.endsWith("/pow")) {//fire
-		    if(state == 17 || state == 33) { // this fire is actually hearth fire
-			return true;
-		    }
+		} else if(name.endsWith("/pow[hearth]")) {//hearth fire
+		    return true;
 		} else if(name.equals("gfx/terobjs/arch/cellardoor") || name.equals("gfx/terobjs/fishingnet")) {
 		    return true;
 		}
