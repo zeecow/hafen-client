@@ -94,10 +94,15 @@ public class Pointer extends Widget {
 		return;
 	    }
 	} else {
-	    HomoCoord4f homo = getparent(GameUI.class).map.clipxf(getMap3d(tc), false);
-	    sl = homo.w < 0 ? null : homo.toview(Area.sized(this.sz));
+	    Coord3f map3d = getMap3d(tc);
+	    MapView map = getparent(GameUI.class).map;
+	    HomoCoord4f homo = map.clipxf(map3d, false);
+	    if(homo.w < 0) {
+		homo = map.clipxf(map3d, true);
+	    }
+	    sl = homo.toview(Area.sized(map.sz));
 	}
-	if(sl != null && sl.z >= 0)
+	if(sl != null)
 	    drawarrow(g, new Coord(sl));
     }
     
