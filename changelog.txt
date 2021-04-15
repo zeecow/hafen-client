@@ -1,5 +1,6 @@
 $size[14]{$u{Update for 15.04.21:}
   * fixed tile centering(CTRL+Z) not working for some types of clicks (like tree planting)
+  * made bunch of improvements to path queue handling of clicks on objects or while carrying object
  
 $size[14]{$u{Update for 14.04.21:}
   * made gob radius not clickable
