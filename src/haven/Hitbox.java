@@ -11,7 +11,7 @@ import static haven.Sprite.*;
 
 public class Hitbox extends SlottedNode implements Rendered {
     private static final VertexArray.Layout LAYOUT = new VertexArray.Layout(new VertexArray.Layout.Input(Homo3D.vertex, new VectorFormat(3, NumberFormat.FLOAT32), 0, 0, 12));
-    private final Model model;
+    private Model model;
     private final Gob gob;
     private static final Map<Resource, Model> MODEL_CACHE = new HashMap<>();
     private static final float Z = 0.1f;
@@ -57,6 +57,13 @@ public class Hitbox extends SlottedNode implements Rendered {
 	if(model != null && slots != null) {
 	    boolean top = CFG.DISPLAY_GOB_HITBOX_TOP.get();
 	    Pipe.Op newState = passable() ? (top ? PASSABLE_TOP : PASSABLE) : (top ? SOLID_TOP : SOLID);
+	    try {
+	    	Model m = getModel(gob);
+		if(m != null && m != model) {
+	    	    model = m;
+	    	    slots.forEach(RenderTree.Slot::update);
+		}
+	    }catch (Loading ignored) {}
 	    if(newState != state) {
 		state = newState;
 		for (RenderTree.Slot slot : slots) {
@@ -90,9 +97,8 @@ public class Hitbox extends SlottedNode implements Rendered {
     
     private static Model getModel(Gob gob) {
 	Model model;
+	Resource res = getResource(gob);
 	synchronized (MODEL_CACHE) {
-	    Resource res = getResource(gob);
-	
 	    model = MODEL_CACHE.get(res);
 	    if(model == null) {
 		List<List<Coord3f>> polygons = new LinkedList<>();

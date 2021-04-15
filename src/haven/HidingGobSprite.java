@@ -20,8 +20,9 @@ public class HidingGobSprite<T extends RenderTree.Node> extends Sprite {
 	this.visible = visible;
     }
     
-    public void show(boolean show) {
-	if(show == visible) {return;}
+    /**returns true if visibility actually changed*/
+    public boolean show(boolean show) {
+	if(show == visible) {return false;}
 	visible = show;
 	if(show) {
 	    Loading.waitfor(() -> RUtils.multiadd(slots, fx));
@@ -29,6 +30,7 @@ public class HidingGobSprite<T extends RenderTree.Node> extends Sprite {
 	    for (RenderTree.Slot slot : slots)
 		slot.clear();
 	}
+	return true;
     }
     
     public void added(RenderTree.Slot slot) {

@@ -951,8 +951,9 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Sk
 	boolean hitboxEnabled = CFG.DISPLAY_GOB_HITBOX.get() || is(GobTag.HIDDEN);
 	if(hitboxEnabled) {
 	    if(hitbox != null) {
-		hitbox.show(true);
-		hitbox.fx.updateState();
+		if(!hitbox.show(true)) {
+		    hitbox.fx.updateState();
+		}
 	    } else if(!virtual || this instanceof MapView.Plob) {
 		Hitbox hitbox = Hitbox.forGob(this);
 		if(hitbox != null) {
