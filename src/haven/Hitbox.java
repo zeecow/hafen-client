@@ -20,8 +20,8 @@ public class Hitbox extends SlottedNode implements Rendered {
     private static final float PASSABLE_WIDTH = 1.5f;
     private static final float SOLID_WIDTH = 3f;
     private static final Pipe.Op TOP = Pipe.Op.compose(Rendered.last, States.Depthtest.none, States.maskdepth);
-    private static final Pipe.Op SOLID = Pipe.Op.compose(new BaseColor(SOLID_COLOR), new States.LineWidth(SOLID_WIDTH), Clickable.No);
-    private static final Pipe.Op PASSABLE = Pipe.Op.compose(new BaseColor(PASSABLE_COLOR), new States.LineWidth(PASSABLE_WIDTH), Clickable.No);
+    private static final Pipe.Op SOLID = Pipe.Op.compose(new BaseColor(SOLID_COLOR), new States.LineWidth(SOLID_WIDTH));
+    private static final Pipe.Op PASSABLE = Pipe.Op.compose(new BaseColor(PASSABLE_COLOR), new States.LineWidth(PASSABLE_WIDTH));
     private static final Pipe.Op SOLID_TOP = Pipe.Op.compose(SOLID, TOP);
     private static final Pipe.Op PASSABLE_TOP = Pipe.Op.compose(PASSABLE, TOP);
     private Pipe.Op state;
