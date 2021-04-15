@@ -1188,8 +1188,6 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Sk
 		}
 	    }
 	}
-	if(glob.sess.ui.gui != null && glob.sess.ui.gui.pathQueue != null) {
-	    glob.sess.ui.gui.pathQueue.movementChange(this, prev, a);
-	}
+	glob.sess.ui.pathQueue().ifPresent(pathQueue -> pathQueue.movementChange(this, prev, a));
     }
 }

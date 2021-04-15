@@ -12,6 +12,8 @@ public class PathQueue {
     private final List<Coord2d> queue = new LinkedList<>();
     private final MapView map;
     private Moving moving;
+    private boolean clicked = false;
+    private Coord2d clickPos = null;
     
     public PathQueue(MapView map) {
 	this.map = map;
@@ -25,6 +27,7 @@ public class PathQueue {
 	synchronized (queue) {
 	    if(queue.isEmpty()) { start = true; }
 	    queue.add(p);
+	    unclick();
 	}
 	
 	return start;
@@ -34,7 +37,35 @@ public class PathQueue {
 	synchronized (queue) {
 	    queue.clear();
 	    queue.add(p);
+	    unclick();
 	}
+    }
+    
+    public void click(Coord2d mc, ClickData inf) {
+	if(inf != null) {
+	    click(Gob.from(inf.ci));
+	} else {
+	    click(mc);
+	}
+    }
+    
+    public void click(Gob gob) {
+	click(gob != null ? gob.rc : null);
+    }
+    
+    public void click(Coord2d pos) {
+	clicked = true;
+	this.clickPos = pos;
+    }
+    
+    public void click() {
+	clicked = true;
+	clickPos = null;
+    }
+    
+    public void unclick() {
+	clicked = false;
+	clickPos = null;
     }
     
     public List<Pair<Coord3f, Coord3f>> lines() {
@@ -108,8 +139,16 @@ public class PathQueue {
 	    if(to == null) {
 		Coord2d next = pop();
 		if(next != null) {
+		    unclick();
 		    map.wdgmsg("click", Coord.z, next.floor(posres), 1, 0);
 		}
+	    } else if(clicked) {
+		if(this.clickPos != null) {
+		    start(this.clickPos);
+		} else {
+		    clear();
+		}
+		unclick();
 	    } else if(to instanceof Homing || to instanceof Following) {
 		clear();
 	    }

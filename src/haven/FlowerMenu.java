@@ -265,6 +265,7 @@ public class FlowerMenu extends Widget {
     @Override
     protected void attach(UI ui) {
 	super.attach(ui);
+	ui.pathQueue().ifPresent(PathQueue::unclick);
 	opts = new Petal[options.length];
 	for(int i = 0; i < options.length; i++) {
 	    String name = options[i];
@@ -381,9 +382,7 @@ public class FlowerMenu extends Widget {
     }
 
     public void choose(int num) {
-        if(num != -1 && target != null) {
-	    ui.gui.pathQueue.start(target.rc);
-	}
+	if(num != -1) { ui.pathQueue().ifPresent(pathQueue -> pathQueue.click(target));	}
 	if(num != -1 && PICK_ALL.equals(options[num])) {
 	    if(target != null) {
 		try {

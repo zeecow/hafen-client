@@ -541,6 +541,10 @@ public class UI {
 	root.destroy();
 	audio.clear();
     }
+    
+    public Optional<PathQueue> pathQueue() {
+	return (gui != null && gui.pathQueue != null) ? Optional.of(gui.pathQueue) : Optional.empty();
+    }
 
     public static double scale(double v) {
 	return(v * scalef);

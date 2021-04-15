@@ -2064,6 +2064,7 @@ public class MapView extends PView implements DTarget, Console.Directory {
 			synchronized(ui) {
 			    if(mapcl != null) {
 				if(Config.center_tile) { mapcl = mapcl.floor(tilesz).mul(tilesz).add(5, 5); }
+				ui.pathQueue().ifPresent(pathQueue -> pathQueue.click(mapcl, objcl));
 				if(objcl == null)
 				    hit(pc, mapcl, null);
 				else
