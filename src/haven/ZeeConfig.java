@@ -370,6 +370,7 @@ public class ZeeConfig {
                     zeecowOptions = new ZeecowOptionsWindow();
                 else
                     zeecowOptions.toFront();
+                main.getparent(OptWnd.class).hide();
             }
         }, 0, y);
 
