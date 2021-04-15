@@ -762,29 +762,23 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Sk
     }
 
     public Resource getres() {
-	Drawable d = getattr(Drawable.class);
+	Drawable d = drawable;
 	if(d != null)
 	    return(d.getres());
 	return(null);
     }
 
     public Skeleton.Pose getpose() {
-	Drawable d = getattr(Drawable.class);
+	Drawable d = drawable;
 	if(d != null)
 	    return(d.getpose());
 	return(null);
     }
-
-    public Indir<Resource> getires(){
-	Drawable d = getattr(Drawable.class);
-	if(d != null)
-	    return(d.getires());
-	return(null);
-    }
     
     public String resid() {
-	if(drawable != null)
-	    return drawable.resId();
+	Drawable d = drawable;
+	if(d != null)
+	    return d.resId();
 	return null;
     }
     
