@@ -142,6 +142,8 @@ public class PathQueue {
 		    unclick();
 		    map.wdgmsg("click", Coord.z, next.floor(posres), 1, 0);
 		}
+	    } else if(to instanceof Homing || to instanceof Following) {
+		clear();
 	    } else if(clicked) {
 		if(this.clickPos != null) {
 		    start(this.clickPos);
@@ -149,8 +151,6 @@ public class PathQueue {
 		    clear();
 		}
 		unclick();
-	    } else if(to instanceof Homing || to instanceof Following) {
-		clear();
 	    }
 	}
     }
