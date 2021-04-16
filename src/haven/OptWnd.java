@@ -883,6 +883,31 @@ public class OptWnd extends WindowX {
 	    }
 	}, x + UI.scale(160), y - UI.scale(2));
     
+	y += STEP;
+	tx = x + general.add(new Label("Hold to ignore auto choose:"), x, y).sz.x + UI.scale(5);
+	general.add(new Dropbox<UI.KeyMod>(UI.scale(100), 5, UI.scale(16)) {
+	    @Override
+	    protected UI.KeyMod listitem(int i) {
+		return UI.KeyMod.values()[i];
+	    }
+	
+	    @Override
+	    protected int listitems() {
+		return UI.KeyMod.values().length;
+	    }
+	
+	    @Override
+	    protected void drawitem(GOut g, UI.KeyMod item, int i) {
+		g.atext(item.name(), UI.scale(3, 8), 0, 0.5);
+	    }
+	
+	    @Override
+	    public void change(UI.KeyMod item) {
+		super.change(item);
+		if(!item.equals(CFG.MENU_SKIP_AUTO_CHOOSE.get())) CFG.MENU_SKIP_AUTO_CHOOSE.set(item, true);
+	    }
+	}, tx, y).change(CFG.MENU_SKIP_AUTO_CHOOSE.get());
+    
 	my = Math.max(my, y);
     
 	general.add(new PButton(UI.scale(200), "Back", 27, main), 0, my + UI.scale(35));

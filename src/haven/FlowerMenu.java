@@ -282,7 +282,7 @@ public class FlowerMenu extends Widget {
 	    String name = options[i];
 	    boolean auto = autochoose(name);
 	    boolean single = ui.modctrl && options.length == 1 && CFG.MENU_SINGLE_CTRL_CLICK.get();
-	    if(!ui.modshift && (auto || single)) {
+	    if((ui.modflags() != CFG.MENU_SKIP_AUTO_CHOOSE.get().mod) && (auto || single)) {
 		autochoose = opts[i];
 	    }
 	}
