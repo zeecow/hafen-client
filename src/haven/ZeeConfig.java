@@ -53,63 +53,24 @@ public class ZeeConfig {
 
 
     public final static Set<String> mineablesStone = new HashSet<String>(Arrays.asList(
-            "gneiss",
-            "basalt",
-            "cinnabar",
-            "dolomite",
-            "feldspar",
-            "flint",
-            "granite",
-            "hornblende",
-            "limestone",
-            "marble",
-            "porphyry",
-            "quartz",
-            "sandstone",
-            "schist",
-            "blackcoal",
-            "zincspar",
-            "apatite",
-            "fluorospar",
-            "gabbro",
-            "corund",
-            "kyanite",
-            "mica",
-            "microlite",
-            "orthoclase",
-            "soapstone",
-            "sodalite",
-            "olivine",
-            "alabaster",
-            "breccia",
-            "diabase",
-            "arkose",
-            "diorite",
-            "slate",
-            "rhyolite",
-            "pumice"
+            "gneiss","basalt","cinnabar","dolomite","feldspar","flint",
+            "granite","hornblende","limestone","marble","porphyry","quartz",
+            "sandstone","schist","blackcoal","zincspar","apatite","fluorospar",
+            "gabbro","corund","kyanite","mica","microlite","orthoclase","soapstone",
+            "sodalite","olivine","alabaster","breccia","diabase","arkose",
+            "diorite","slate","arkose","eclogite","jasper","greenschist","pegmatite",
+            "ilmenite","rhyolite","pumice"
     ));
     public final static Set<String> mineablesOre = new HashSet<String>(Arrays.asList(
-            "cassiterite",
-            "chalcopyrite",
-            "malachite",
-            "ilmenite",
-            "limonite",
-            "hematite",
-            "magnetite"
+            "cassiterite","chalcopyrite","malachite","ilmenite",
+            "limonite","hematite","magnetite","leadglance","peacockore"
     ));
     public final static Set<String> mineablesOrePrecious = new HashSet<String>(Arrays.asList(
-            "galena",
-            "argentite",
-            "hornsilver",
-            "petzite",
-            "sylvanite",
-            "nagyagite"
+            "galena","argentite","hornsilver",
+            "petzite","sylvanite","nagyagite"
     ));
     public final static Set<String> mineablesCurios = new HashSet<String>(Arrays.asList(
-            "catgold",
-            "petrifiedshell",
-            "strangecrystal"
+            "catgold","petrifiedshell","strangecrystal","quarryquartz"
     ));
     public final static Set<String> localizedResources = new HashSet<String>(Arrays.asList(
             "gfx/terobjs/saltbasin",
