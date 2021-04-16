@@ -1,3 +1,8 @@
+$size[14]{$u{Update for 16.04.21:}
+  * added ability to change which mod key ignores auto choosing menus (Options->General)
+  * added auto peace option (Options->Display)
+  * added hhp and armor damage to gob damage overlay
+ 
 $size[14]{$u{Update for 15.04.21:}
   * fixed tile centering(CTRL+Z) not working for some types of clicks (like tree planting)
   * made bunch of improvements to path queue handling of clicks on objects or while carrying object
