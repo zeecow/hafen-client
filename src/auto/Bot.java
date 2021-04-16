@@ -199,11 +199,11 @@ public class Bot implements Defer.Callable<Void> {
 	return Long.compare(o1.id, o2.id);
     };
     
-    public static BotAction selectFlower(String option) {
+    public static BotAction selectFlower(String ...options) {
 	return target -> {
 	    if(target.hasMenu()) {
 		FlowerMenu.lastGob(target.gob);
-		Reactor.FLOWER.first().subscribe(flowerMenu -> flowerMenu.forceChoose(option));
+		Reactor.FLOWER.first().subscribe(flowerMenu -> flowerMenu.forceChoose(options));
 	    }
 	};
     }
