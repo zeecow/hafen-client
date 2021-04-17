@@ -27,6 +27,7 @@
 package haven;
 
 import haven.QualityList.SingleType;
+import haven.resutil.Curiosity;
 import me.ender.Reflect;
 
 import java.awt.*;
@@ -34,8 +35,9 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.awt.image.BufferedImage;
+import java.util.Objects;
+
 import haven.ItemInfo.AttrCache;
-import rx.functions.Action1;
 import rx.functions.Action3;
 
 import static haven.Inventory.sqsz;
@@ -184,6 +186,8 @@ public class WItem extends Widget implements DTarget2 {
 	return !qualityList.isEmpty() ? qualityList : null;
     }));
     
+    public final AttrCache<Pair<String, String>> study = new AttrCache<>(this::info, AttrCache.map1(Curiosity.class, curio -> curio::remainingTip));
+    
     public final AttrCache<ItemInfo.Contents.Content> contains = new AttrCache<>(this::info, AttrCache.cache(ItemInfo::getContent), ItemInfo.Contents.Content.EMPTY); 
 
     public final AttrCache<Tex> heurnum = new AttrCache<Tex>(this::info, AttrCache.cache(info -> {
@@ -283,8 +287,9 @@ public class WItem extends Widget implements DTarget2 {
     private void drawmeter(GOut g, Coord sz) {
 	Double meter = (item.meter > 0) ? (Double) (item.meter / 100.0) : itemmeter.get();
 	if(meter != null && meter > 0) {
-	    if(CFG.PROGRESS_NUMBER.get()) {
-		Tex tex = Text.renderstroked(String.format("%d%%", Math.round(100*meter))).tex();
+	    Tex studyTime = getStudyTime();
+	    if(studyTime == null && CFG.PROGRESS_NUMBER.get()) {
+		Tex tex = Text.renderstroked(String.format("%d%%", Math.round(100 * meter))).tex();
 		g.aimage(tex, sz.div(2), 0.5, 0.5);
 		tex.dispose();
 	    } else {
@@ -293,9 +298,47 @@ public class WItem extends Widget implements DTarget2 {
 		g.prect(half, half.inv(), half, meter * Math.PI * 2);
 		g.chcolor();
 	    }
+	    
+	    if(studyTime != null) {
+		g.chcolor(8, 8, 8, 80);
+		int h = studyTime.sz().y + TEXT_PADD_BOT.y;
+		boolean swap = CFG.SWAP_NUM_AND_Q.get();
+		g.frect(new Coord(0, swap ? 0 : sz.y - h), new Coord(sz.x, h));
+		g.chcolor();
+		g.aimage(studyTime, new Coord(sz.x / 2, swap ? 0 : sz.y), 0.5, swap ? 0 : 1);
+	    }
 	}
     }
-
+    
+    private String cachedStudyValue = null;
+    private String cachedTipValue = null;
+    private Tex cachedStudyTex = null;
+    
+    private Tex getStudyTime() {
+	Pair<String, String> data = study.get();
+	String value = data == null ? null : data.a;
+	String tip = data == null ? null : data.b;
+	if(!Objects.equals(tip, cachedTipValue)) {
+	    cachedTipValue = tip;
+	    longtip = null;
+	}
+	if(value != null) {
+	    if(!Objects.equals(value, cachedStudyValue)) {
+		if(cachedStudyTex != null) {
+		    cachedStudyTex.dispose();
+		    cachedStudyTex = null;
+		}
+	    }
+	    
+	    if(cachedStudyTex == null) {
+		cachedStudyValue = value;
+		cachedStudyTex = Text.renderstroked(value).tex();
+	    }
+	    return cachedStudyTex;
+	}
+	return null;
+    }
+    
     private void drawbars(GOut g, Coord sz) {
 	float bar = 0f;
 
@@ -378,6 +421,7 @@ public class WItem extends Widget implements DTarget2 {
 	} else if(btn == 3) {
 	    synchronized (rClickListeners) {
 		if(rClickListeners.isEmpty()) {
+		    FlowerMenu.lastGob(null);
 		    item.wdgmsg("iact", c, ui.modflags());
 		} else {
 		    rClickListeners.forEach(action -> action.call(this, c, ui.modflags()));
@@ -400,6 +444,7 @@ public class WItem extends Widget implements DTarget2 {
     
     
     public void rclick(Coord c, int flags) {
+        FlowerMenu.lastGob(null);
 	item.wdgmsg("iact", c, flags);
     }
 

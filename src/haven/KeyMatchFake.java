@@ -4,9 +4,9 @@ import java.awt.event.KeyEvent;
 
 import static java.awt.event.KeyEvent.*;
 
-public class KeyMatch2 extends KeyMatch {
+public class KeyMatchFake extends KeyMatch {
     
-    public KeyMatch2(char chr, boolean casematch, int code, boolean extmatch, String keyname, int modmask, int modmatch) {
+    public KeyMatchFake(char chr, boolean casematch, int code, boolean extmatch, String keyname, int modmask, int modmatch) {
 	super(chr, casematch, code, extmatch, keyname, modmask, modmatch);
     }
     
@@ -14,16 +14,16 @@ public class KeyMatch2 extends KeyMatch {
 	if(key == null) {
 	    return null;
 	}
-	return new KeyMatch2(key.chr, key.casematch, key.code, key.extmatch, key.keyname, key.modmask, key.modmatch);
+	return new KeyMatchFake(key.chr, key.casematch, key.code, key.extmatch, key.keyname, key.modmask, key.modmatch);
     }
     
     @Override
     public boolean match(KeyEvent ev, int modign) {
-	return match2(ev, modign);
+	return false;
     }
     
     public static KeyMatch forchar(char chr, int modmask, int modmatch) {
-	return (new KeyMatch2(chr, false, VK_UNDEFINED, false, Character.toString(chr), modmask, modmatch));
+	return(new KeyMatchFake('\0', false, KeyEvent.getExtendedKeyCodeForChar(chr), false, Character.toString(chr), modmask, modmatch));
     }
     
     public static KeyMatch forchar(char chr, int mods) {
@@ -31,7 +31,7 @@ public class KeyMatch2 extends KeyMatch {
     }
     
     public static KeyMatch forcode(int code, int modmask, int modmatch) {
-	return (new KeyMatch2('\0', false, code, false, KeyEvent.getKeyText(code), modmask, modmatch));
+	return (new KeyMatchFake('\0', false, code, false, KeyEvent.getKeyText(code), modmask, modmatch));
     }
     
     public static KeyMatch forcode(int code, int mods) {

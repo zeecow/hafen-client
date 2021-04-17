@@ -28,7 +28,7 @@ package haven;
 
 import java.util.*;
 
-public class Profwnd extends Window {
+public class Profwnd extends WindowX {
     private static final int h = 80;
     public final Profile prof;
     public double mt = 0.05;

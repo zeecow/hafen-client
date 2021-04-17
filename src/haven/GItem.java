@@ -39,6 +39,7 @@ public class GItem extends AWidget implements ItemInfo.SpriteOwner, GSprite.Owne
     public Indir<Resource> res;
     public MessageBuf sdt;
     public int meter = 0;
+    public long meterUpdated = 0; //last time meter was updated, ms 
     public int num = -1;
     private GSprite spr;
     private ItemInfo.Raw rawinfo;
@@ -214,8 +215,10 @@ public class GItem extends AWidget implements ItemInfo.SpriteOwner, GSprite.Owne
 	    info = null;
 	    rawinfo = new ItemInfo.Raw(args);
 	    filtered = 0;
+	    meterUpdated = System.currentTimeMillis();
 	    if(sendttupdate){wdgmsg("ttupdate");}
 	} else if(name == "meter") {
+	    meterUpdated = System.currentTimeMillis();	    
 	    meter = (int)((Number)args[0]).doubleValue();
 	}
     }

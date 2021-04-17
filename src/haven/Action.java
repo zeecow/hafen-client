@@ -3,21 +3,7 @@ package haven;
 import auto.Bot;
 
 public enum Action {
-    TOGGLE_INVENTORY(GameUI::toggleInventory, "Inventory"),
-    TOGGLE_EQUIPMENT(GameUI::toggleEquipment, "Equipment"),
-    TOGGLE_CHARACTER(GameUI::toggleCharacter, "Character Sheet"),
-    TOGGLE_KIN_LIST(GameUI::toggleKinList, "Kith & Kin"),
-    TOGGLE_OPTIONS(GameUI::toggleOptions, "Options"),
-    TOGGLE_CHAT(GameUI::toggleChat, "Toggle Chat"),
-    TOGGLE_MAP(GameUI::toggleMap, "Toggle Map"),
-    TOGGLE_MINIMAP_ICONS_SETTINGS(GameUI::toggleIconSettings, "Show minimap icon settings"),
     TOGGLE_TIMERS(GameUI::toggleTimers, "Toggle Timers"),
-    TAKE_SCREENSHOT(GameUI::takeScreenshot, "Take Screenshot"),
-    
-    TOGGLE_PERSONAL_CLAIMS(MapView.toggleolact("cplot"), "Display personal claims"),
-    TOGGLE_VILLAGE_CLAIMS(MapView.toggleolact("vlg"), "Display village claims"),
-    TOGGLE_REALM_CLAIMS(MapView.toggleolact("realm"), "Display realms"),
-    
     ACT_HAND_0(gui -> gui.eqproxy.activate(Equipory.SLOTS.HAND_LEFT, 1), "Left hand", "Left click on left hand slot."),
     ACT_HAND_1(gui -> gui.eqproxy.activate(Equipory.SLOTS.HAND_RIGHT,1), "Right hand", "Left click on right hand slot."),
     ACT_BELT(gui -> gui.eqproxy.activate(Equipory.SLOTS.BELT, 3), "Belt", "Right click on belt slot."),
@@ -33,7 +19,6 @@ public enum Action {
     TOGGLE_GOB_HITBOX(CFG.DISPLAY_GOB_HITBOX, "Display hitboxes"),
     TOGGLE_HIDE_TREES(CFG.HIDE_TREES, "Hide trees"),
     TOGGLE_GOB_RADIUS(CFG.SHOW_GOB_RADIUS, "Display radius", "Displays effective radius of beehives/mine supports etc."),
-    TOGGLE_TILE_GRID(gui -> gui.map.togglegrid(), "Show tile grid"),
     TOGGLE_TILE_CENTERING(gui ->
     {
 	Config.center_tile = !Config.center_tile;

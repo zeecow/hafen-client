@@ -349,7 +349,11 @@ public abstract class ItemInfo {
     }
 
     public static BufferedImage catimgsh(int margin, BufferedImage... imgs) {
-	int w = -margin, h = 0;
+	return catimgsh(margin, 0, null, imgs);
+    }
+    
+    public static BufferedImage catimgsh(int margin, int pad, Color bg, BufferedImage... imgs) {
+	int w = 2 * pad - margin, h = 0;
 	for(BufferedImage img : imgs) {
 	    if(img == null)
 		continue;
@@ -359,7 +363,11 @@ public abstract class ItemInfo {
 	}
 	BufferedImage ret = TexI.mkbuf(new Coord(w, h));
 	Graphics g = ret.getGraphics();
-	int x = 0;
+	if(bg != null) {
+	    g.setColor(bg);
+	    g.fillRect(0, 0, w, h);
+	}
+	int x = pad;
 	for(BufferedImage img : imgs) {
 	    if(img == null)
 		continue;

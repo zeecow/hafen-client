@@ -86,6 +86,7 @@ public class Bot implements Defer.Callable<Void> {
 	List<Target> targets = gui.ui.sess.glob.oc.stream()
 	    .filter(filter)
 	    .filter(gob -> distanceToPlayer(gob) <= CFG.AUTO_PICK_RADIUS.get())
+	    .filter(Bot::isOnRadar)
 	    .sorted(byDistance)
 	    .limit(limit)
 	    .map(Target::new)
@@ -112,7 +113,7 @@ public class Bot implements Defer.Callable<Void> {
     }
     
     public static void drink(GameUI gui) {
-	Collection<Supplier<List<WItem>>> everywhere = Arrays.asList(BELT(gui), HANDS(gui), INVENTORY(gui));
+	Collection<Supplier<List<WItem>>> everywhere = Arrays.asList(HANDS(gui), INVENTORY(gui), BELT(gui));
 	Utils.chainOptionals(
 	    () -> findFirstThatContains("Tea", everywhere),
 	    () -> findFirstThatContains("Water", everywhere)
@@ -172,6 +173,19 @@ public class Bot implements Defer.Callable<Void> {
 	};
     }
     
+    private static boolean isOnRadar(Gob gob) {
+	if(!CFG.AUTO_PICK_ONLY_RADAR.get()) {return true;}
+	GobIcon icon = gob.getattr(GobIcon.class);
+	GameUI gui = gob.glob.sess.ui.gui;
+	if(icon != null && gui != null) {
+	    try {
+		GobIcon.Setting s = gui.iconconf.get(icon.res.get());
+		return s.show;
+	    } catch (Loading ignored) {}
+	}
+	return true;
+    }
+    
     private static double distanceToPlayer(Gob gob) {
 	Gob p = gob.glob.oc.getgob(gob.glob.sess.ui.gui.plid);
 	return p.rc.dist(gob.rc);
@@ -185,10 +199,11 @@ public class Bot implements Defer.Callable<Void> {
 	return Long.compare(o1.id, o2.id);
     };
     
-    public static BotAction selectFlower(String option) {
+    public static BotAction selectFlower(String ...options) {
 	return target -> {
 	    if(target.hasMenu()) {
-		Reactor.FLOWER.first().subscribe(flowerMenu -> flowerMenu.forceChoose(option));
+		FlowerMenu.lastGob(target.gob);
+		Reactor.FLOWER.first().subscribe(flowerMenu -> flowerMenu.forceChoose(options));
 	    }
 	};
     }

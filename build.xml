@@ -86,7 +86,7 @@
     <jar destfile="build/client-res.jar" update="true">
       <fileset dir="resources/compiled" />
       <fileset dir="resources" includes="item_data/**"/>
-      <file file="etc/radar.xml"/>
+      <file file="etc/radar.json"/>
       <file file="etc/gob_path.json"/>
       <file file="etc/gob_radius.json"/>
       <fileset dir="." includes="i10n/**/**.json"/>
@@ -95,7 +95,7 @@
     <copy file="lib/hafen-res.jar" todir="build"/>
   </target>
 
-  <target name="jar" depends="hafen-client,buildinfo,lib-classes,resources">
+  <target name="jar" depends="hafen-client,buildinfo,lib-classes">
     <jar destfile="build/hafen.jar" update="true">
       <fileset dir="build/classes" />
       <fileset dir="build/classes-lib" />
@@ -118,7 +118,7 @@
     <fail unless="lib-builtin-jar" message="builtin-res.jar not available" />
   </target>
   
-  <target name="jars" depends="build-env, jar">
+  <target name="jars" depends="build-env, jar, resources">
     <copy todir="build">
       <fileset dir="lib">
 	<include name="jogl.jar" />

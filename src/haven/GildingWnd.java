@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 import static haven.CharWnd.*;
 import static haven.PUtils.*;
 
-public class GildingWnd extends Window {
+public class GildingWnd extends WindowX {
     private final WItem target;
     private final WItem gild;
     private BufferedImage igild;
@@ -76,7 +76,7 @@ public class GildingWnd extends Window {
 	} catch (Loading ignored) {}
 
 	if(target.gildable.get() && canSlot) {
-	    add(new Button(UI.scale(120), "Gild") {
+	    add(new Button(UI.scale(120), "Gild", false) {
 		@Override
 		public void click() {
 		    gild();

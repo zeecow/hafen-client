@@ -45,6 +45,7 @@ public class GobHealth extends GAttrib implements Gob.SetupMod {
     public Pipe.Op gobstate() {
 	if(hp >= 1)
 	    return(null);
+	if(CFG.DISPLAY_GOB_INFO.get()) {return null;}
 	return(fx);
     }
 

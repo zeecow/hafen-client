@@ -16,12 +16,7 @@ public class FilterWnd extends GameUI.Hidewnd {
 	    }
 	});
     
-	addtwdg(add(new IButton("gfx/hud/btn-help", "","-d","-h"){
-	    @Override
-	    public void click() {
-		ItemFilter.showHelp(ui, ItemFilter.FILTER_HELP);
-	    }
-	}));
+	addtwdg(add(new IButton("gfx/hud/btn-help", "","-d","-h", () -> ItemFilter.showHelp(ui, ItemFilter.FILTER_HELP))));
 	
 	pack();
 	hide();

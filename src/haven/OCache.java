@@ -69,12 +69,11 @@ public class OCache implements Iterable<Gob> {
 
     public OCache(Glob glob) {
 	this.glob = glob;
-	Radar.clean();
-	callback(Radar.CHANGED);
 	callback(Gob.CHANGED);
-	CFG.DISPLAY_GOB_HITBOX.observe(cfg -> gobAction(Gob::updateHitbox));
-	CFG.DISPLAY_GOB_HITBOX_TOP.observe(cfg -> gobAction(Gob::updateHitbox));
-	CFG.HIDE_TREES.observe(cfg -> gobAction(Gob::updateTreeVisibility));
+	CFG.DISPLAY_GOB_HITBOX.observe(cfg -> gobAction(Gob::hitboxUpdated));
+	CFG.DISPLAY_GOB_HITBOX_TOP.observe(cfg -> gobAction(Gob::hitboxUpdated));
+	CFG.HIDE_TREES.observe(cfg -> gobAction(Gob::visibilityUpdated));
+	CFG.DISPLAY_GOB_INFO.observe(cfg -> gobAction(Gob::infoUpdated));
     }
     
     public void gobAction(Consumer<Gob> action) {
@@ -250,11 +249,10 @@ public class OCache implements Iterable<Gob> {
 	if((d != null) && (d.res == res) && !d.sdt.equals(sdt) && (d.spr != null) && (d.spr instanceof Sprite.CUpd)) {
 	    ((Sprite.CUpd)d.spr).update(sdt);
 	    d.sdt = sdt;
+	    g.drawableUpdated();
 	} else if((d == null) || (d.res != res) || !d.sdt.equals(sdt)) {
 	    g.setattr(new ResDrawable(g, res, sdt));
-	    Radar.add(g, res);
 	}
-	g.drawableUpdated();
     }
     public Delta cres(Message msg) {
 	int resid = msg.uint16();
@@ -335,7 +333,6 @@ public class OCache implements Iterable<Gob> {
 	if((cmp == null) || !cmp.base.equals(base)) {
 	    cmp = new Composite(g, base);
 	    g.setattr(cmp);
-	    Radar.add(g, cmp.base);
 	}
     }
     public Delta composite(Message msg) {
@@ -353,6 +350,7 @@ public class OCache implements Iterable<Gob> {
 		cmp.chposes(poses, interp);
 	    if(tposes != null)
 		cmp.tposes(tposes, WrapMode.ONCE, ttime);
+	    g.drawableUpdated();
 	}
     }
     public Delta cmppose(Message msg) {
@@ -400,6 +398,7 @@ public class OCache implements Iterable<Gob> {
 	if(cmp == null)
 	    throw(new RuntimeException(String.format("cmpmod on non-composed object: %s", mod)));
 	cmp.chmod(mod);
+	g.drawableUpdated();
     }
     public Delta cmpmod(Message msg) {
 	List<Composited.MD> mod = new LinkedList<Composited.MD>();

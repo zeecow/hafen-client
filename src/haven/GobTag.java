@@ -1,7 +1,6 @@
 package haven;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 public enum GobTag {
     TREE, BUSH, LOG, STUMP, HERB,
@@ -14,23 +13,29 @@ public enum GobTag {
     PIG, SOW, HOG, PIGLET,
     SHEEP, EWE, RAM, LAMB,
     
+    GEM,
+    PUSHED, //vehicle that is pushed (wheelbarrow, plow)
+    
     PLAYER, ME, FRIEND, FOE,
+    KO, DEAD, EMPTY, READY,
     
     MENU, PICKUP, HIDDEN;
     
     private static final String[] AGGRO = {
-        "/bear", "/boar", "/troll", "/wolverine", "/badger", "/adder", "/wolf", "/walrus", "/lynx"
+        "/bear", "/boar", "/troll", "/wolverine", "/badger", "/adder", "/wolf", "/walrus", "/lynx", "/caverat", "/moose", 
+        "/mammoth"
     };
     
     
     private static final String[] ANIMALS = {
-        "/fox", "/swan", "/bat", "/beaver", "/moose", "/reddeer"
+        "/fox", "/swan", "/bat", "/beaver", "/reddeer"
     };
     
     private static final String[] CRITTERS = {
         "/rat", "/swan", "/squirrel", "/silkmoth", "/frog", "/rockdove", "/quail", "/toad", "/grasshopper",
         "/ladybug", "/forestsnail", "/dragonfly", "/forestlizard", "/waterstrider", "/firefly", "/sandflea",
-        "/rabbit", "/crab", "/cavemoth", "/hedgehog", "/stagbeetle", "jellyfish", "/mallard"
+        "/rabbit", "/crab", "/cavemoth", "/hedgehog", "/stagbeetle", "jellyfish", "/mallard", "/chicken", "/irrbloss",
+        "/cavecentipede"
     };
     
     private static final boolean DBG = false;
@@ -42,7 +47,22 @@ public enum GobTag {
         Resource res = gob.getres();
         if(res != null) {
             String name = res.name;
-            
+    
+            List<String> ols = Collections.emptyList();
+            synchronized (gob.ols) {
+                try {
+                    List<String> list = new ArrayList<>();
+                    for (Gob.Overlay overlay : gob.ols) {
+                        if(overlay != null && overlay.res != null) {
+                            list.add(overlay.res.get().name);
+                        }
+                    }
+                    ols = list;
+                } catch (Loading e) {
+                    gob.tagsUpdated();
+                }
+            }
+    
             if(name.startsWith("gfx/terobjs/trees")) {
                 if(name.endsWith("log") || name.endsWith("oldtrunk")) {
                     tags.add(LOG);
@@ -82,18 +102,41 @@ public enum GobTag {
                     gob.glob.sess.ui.message(name, GameUI.MsgType.ERROR);
                     System.out.println(name);
                 }
+            } else if(name.endsWith("/dframe")) {
+                boolean empty = ols.isEmpty();
+                boolean done = !empty && ols.stream().noneMatch(GobTag::isDrying);
+                if(empty) { tags.add(EMPTY); }
+                if(done) { tags.add(READY); }
+            } else if(name.endsWith("/gems/gemstone")) {
+                tags.add(GEM);
+            } else if(name.endsWith("/wheelbarrow") || name.endsWith("/plow")) {
+                tags.add(PUSHED);
             }
             
-            if(anyOf(tags, GobTag.HERB, GobTag.CRITTER)) {
+            if(anyOf(tags, HERB, CRITTER, GEM)) {
                 tags.add(PICKUP);
             }
             
-            if(!anyOf(tags, GobTag.STUMP, GobTag.ANIMAL) || anyOf(tags, GobTag.DOMESTIC)) {
+            if(anyOf(tags, DOMESTIC, HERB, TREE, BUSH)) {
                 tags.add(MENU);
             }
+    
+            Drawable d = gob.getattr(Drawable.class);
+            if(d != null) {
+                if(d.hasPose("/knock")) {
+                    tags.add(KO);
+                }
+                if(d.hasPose("/dead")) {
+                    tags.add(DEAD);
+                }
+            }
         }
-        
+    
         return tags;
+    }
+    
+    private static boolean isDrying(String ol) {
+        return ol.endsWith("-blood") || ol.endsWith("-windweed") || ol.endsWith("-fishraw");
     }
     
     private static boolean ofType(String name, String[] patterns) {

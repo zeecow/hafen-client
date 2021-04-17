@@ -2,7 +2,7 @@ package haven;
 
 import haven.rx.BuffToggles;
 
-public class LoginTogglesCfgWnd extends Window {
+public class LoginTogglesCfgWnd extends WindowX {
     private static Window instance;
 
     public static void toggle(Widget parent) {

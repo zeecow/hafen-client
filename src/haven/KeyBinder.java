@@ -85,9 +85,7 @@ public class KeyBinder {
 	add(KeyEvent.VK_I, ALT,   TOGGLE_GOB_INFO);
 	add(KeyEvent.VK_H, CTRL,  TOGGLE_GOB_HITBOX);
 	add(KeyEvent.VK_R, ALT,   TOGGLE_GOB_RADIUS);
-	add(KeyEvent.VK_G, CTRL,  TOGGLE_TILE_GRID);
 	add(KeyEvent.VK_Z, CTRL,  TOGGLE_TILE_CENTERING);
-	add(KeyEvent.VK_S, CTRL,  TAKE_SCREENSHOT);
 	add(KeyEvent.VK_Q, ALT,   BOT_PICK_ALL_HERBS);
 	
 	//Camera controls

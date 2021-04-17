@@ -32,7 +32,7 @@ import java.util.LinkedList;
 import java.awt.event.KeyEvent;
 import java.util.Set;
 
-public class OptWnd extends Window {
+public class OptWnd extends WindowX {
     public static final Coord PANEL_POS = new Coord(220, 30);
     public static final Coord Q_TYPE_PADDING = new Coord(3, 0);
     private final Panel display, general, camera, shortcuts, mapping;
@@ -372,7 +372,6 @@ public class OptWnd extends Window {
 	    Widget prev;
 	    int y = 0;
 	    y = cont.adda(new Label("Main menu"), cont.sz.x / 2, y, 0.5, 0.0).pos("bl").adds(0, 5).y;
-	    /*
 	    y = addbtn(cont, "Inventory", GameUI.kb_inv, y);
 	    y = addbtn(cont, "Equipment", GameUI.kb_equ, y);
 	    y = addbtn(cont, "Character sheet", GameUI.kb_chr, y);
@@ -381,9 +380,7 @@ public class OptWnd extends Window {
 	    y = addbtn(cont, "Options", GameUI.kb_opt, y);
 	    y = addbtn(cont, "Search actions", GameUI.kb_srch, y);
 	    y = addbtn(cont, "Toggle chat", GameUI.kb_chat, y);
-	    */
 	    y = addbtn(cont, "Quick chat", ChatUI.kb_quick, y);
-	    /*
 	    y = addbtn(cont, "Take screenshot", GameUI.kb_shoot, y);
 	    y = addbtn(cont, "Minimap icons", GameUI.kb_ico, y);
 	    y = addbtn(cont, "Toggle UI", GameUI.kb_hide, y);
@@ -392,6 +389,7 @@ public class OptWnd extends Window {
 	    y = addbtn(cont, "Display villages", GameUI.kb_vil, y);
 	    y = addbtn(cont, "Display realms", GameUI.kb_rlm, y);
 	    y = addbtn(cont, "Display grid-lines", MapView.kb_grid, y);
+	    /*
 	    y = cont.adda(new Label("Camera control"), cont.sz.x / 2, y + UI.scale(10), 0.5, 0.0).pos("bl").adds(0, 5).y;
 	    y = addbtn(cont, "Rotate left", MapView.kb_camleft, y);
 	    y = addbtn(cont, "Rotate right", MapView.kb_camright, y);
@@ -430,7 +428,7 @@ public class OptWnd extends Window {
 
 	    public void set(KeyMatch key) {
 		super.set(key);
-		cmd.set(KeyMatch2.from(key));
+		cmd.set(key);
 	    }
 
 	    public void draw(GOut g) {
@@ -587,9 +585,8 @@ public class OptWnd extends Window {
 
 	addPanelButton("General settings", 'g', general, 1, 0);
 	addPanelButton("Display settings", 'd', display, 1, 1);
-	addPanelButton("Radar settings", 'r', Action.TOGGLE_MINIMAP_ICONS_SETTINGS, 1, 2);
+	addPanelButton("Mapping settings", 'm', mapping, 1, 2);
 	addPanelButton("Global shortcuts", 's', shortcuts, 1, 3);
-	addPanelButton("Mapping settings", 'm', mapping, 1, 4);
 
 	int y = 0;
 	Widget prev;
@@ -636,6 +633,25 @@ public class OptWnd extends Window {
 		    ui.audio.amb.setvolume(val / 1000.0);
 		}
 	    }, prev.pos("bl").adds(0, 2));
+    
+	prev = audio.add(new Label("Audio buffer size"), prev.pos("bl").adds(0, 5));
+	Label value = audio.add(new Label.Untranslated(""), prev.pos("ur").adds(15, 0));
+	prev = audio.add(new HSlider(UI.scale(200), 1024, 44100, 1024) {
+	    protected void attach(UI ui) {
+		super.attach(ui);
+		val = Audio.bufsize / 4;
+		value.settext(String.format("%d", Audio.bufsize));
+	    }
+	
+	    public void changed() {
+		try {
+		    value.settext(String.format("%d", val));
+		    Audio.audiobuf(val);
+		} catch (Exception ignored) {
+		}
+	    }
+	}, prev.pos("bl").adds(0, 2));
+	
 	audio.add(new PButton(UI.scale(200), "Back", 27, this.main), prev.pos("bl").adds(0, 30));
 	audio.pack();
 
@@ -753,6 +769,34 @@ public class OptWnd extends Window {
 	general.add(new CFGBox("Output missing translation lines", L10N.DBG), x, y);
     
 	y += STEP;
+	tx = x + general.add(new Label("UI Theme:"), x, y).sz.x + UI.scale(5);
+	general.add(new Dropbox<Theme>(UI.scale(100), 5, UI.scale(16)) {
+	    @Override
+	    protected Theme listitem(int i) {
+		return Theme.values()[i];
+	    }
+
+	    @Override
+	    protected int listitems() {
+		return Theme.values().length;
+	    }
+
+	    @Override
+	    protected void drawitem(GOut g, Theme item, int i) {
+		g.atext(item.name(), UI.scale(3, 8), 0, 0.5);
+	    }
+
+	    @Override
+	    public void change(Theme item) {
+		super.change(item);
+		if(!item.equals(CFG.THEME.get())) CFG.THEME.set(item, true);
+	    }
+	}, tx, y).change(CFG.THEME.get());
+	
+	y += STEP;
+	general.add(new CFGBox("Enable path queueing", CFG.QUEUE_PATHS, "ALT+LClick will queue movement"), x, y);
+	
+	y += STEP;
 	general.add(new CFGBox("Store minimap tiles", CFG.STORE_MAP), x, y);
     
 	y += STEP;
@@ -778,9 +822,12 @@ public class OptWnd extends Window {
 	general.adda(new Speedget.SpeedSelector(UI.scale(100)), new Coord(x + tsz.x + UI.scale(5), y + tsz.y / 2), 0, 0.5);
     
 	y += STEP;
+	general.add(new CFGBox("Auto pickup only visible", CFG.AUTO_PICK_ONLY_RADAR, "If on will pickup only objects with enabled minimap icons"), x, y);
+	
+	y += STEP;
 	Label label = general.add(new Label(String.format("Auto pickup radius: %.2f", CFG.AUTO_PICK_RADIUS.get() / 11.0)), x, y);
 	y += UI.scale(15);
-	general.add(new CFGHSlider(UI.scale(150), CFG.AUTO_PICK_RADIUS, 33, 88) {
+	general.add(new CFGHSlider(UI.scale(150), CFG.AUTO_PICK_RADIUS, 33, 352) {
 	    @Override
 	    public void changed() {
 		label.settext(String.format("Auto pickup radius: %.02f", val / 11.0));
@@ -836,6 +883,31 @@ public class OptWnd extends Window {
 	    }
 	}, x + UI.scale(160), y - UI.scale(2));
     
+	y += STEP;
+	tx = x + general.add(new Label("Hold to ignore auto choose:"), x, y).sz.x + UI.scale(5);
+	general.add(new Dropbox<UI.KeyMod>(UI.scale(100), 5, UI.scale(16)) {
+	    @Override
+	    protected UI.KeyMod listitem(int i) {
+		return UI.KeyMod.values()[i];
+	    }
+	
+	    @Override
+	    protected int listitems() {
+		return UI.KeyMod.values().length;
+	    }
+	
+	    @Override
+	    protected void drawitem(GOut g, UI.KeyMod item, int i) {
+		g.atext(item.name(), UI.scale(3, 8), 0, 0.5);
+	    }
+	
+	    @Override
+	    public void change(UI.KeyMod item) {
+		super.change(item);
+		if(!item.equals(CFG.MENU_SKIP_AUTO_CHOOSE.get())) CFG.MENU_SKIP_AUTO_CHOOSE.set(item, true);
+	    }
+	}, tx, y).change(CFG.MENU_SKIP_AUTO_CHOOSE.get());
+    
 	my = Math.max(my, y);
     
 	general.add(new PButton(UI.scale(200), "Back", 27, main), 0, my + UI.scale(35));
@@ -846,9 +918,12 @@ public class OptWnd extends Window {
 	int x = 0;
 	int y = 0;
 	int my = 0;
+	int STEP = UI.scale(25);
 	display.add(new CFGBox("Always show kin names", CFG.DISPLAY_KINNAMES), new Coord(x, y));
     
-	int STEP = UI.scale(25);
+	y += STEP;
+	display.add(new CFGBox("Play sound when kin changes status", CFG.DISPLAY_KINSFX), x, y);
+    
 	y += STEP;
 	display.add(new CFGBox("Show flavor objects", CFG.DISPLAY_FLAVOR), new Coord(x, y));
 
@@ -890,6 +965,9 @@ public class OptWnd extends Window {
 	display.add(new CFGBox("Show biomes on minimap", CFG.MMAP_SHOW_BIOMES), x, y);
 
 	y += STEP;
+	display.add(new CFGBox("Show queued path on minimap", CFG.MMAP_SHOW_PATH), x, y);
+
+	y += STEP;
 	display.add(new CFGBox("Simple crops", CFG.SIMPLE_CROPS, "Requires area reload"), x, y);
 
 	y += 35;
@@ -915,6 +993,12 @@ public class OptWnd extends Window {
 	
 	y += STEP;
 	display.add(new CFGBox("Real time curios", CFG.REAL_TIME_CURIO, "Show curiosity study time in real life hours, instead of server hours"), new Coord(x, y));
+
+	y += STEP;
+	display.add(new CFGBox("Display curio remaining time in tooltip", CFG.SHOW_CURIO_REMAINING_TT), new Coord(x, y));
+
+	y += STEP;
+	display.add(new CFGBox("Display curio remaining time instead of progress", CFG.SHOW_CURIO_REMAINING_METER), new Coord(x, y));
 
 	y += STEP;
 	display.add(new CFGBox("Show LP/H for curios", CFG.SHOW_CURIO_LPH, "Show how much learning point curio gives per hour"), new Coord(x, y));
@@ -962,6 +1046,12 @@ public class OptWnd extends Window {
 	x += UI.scale(265);
 	y = 0;
 	display.add(new CFGBox("Use new combat UI", CFG.ALT_COMBAT_UI), x, y);
+    
+	y += STEP;
+	display.add(new CFGBox("Always mark current target", CFG.ALWAYS_MARK_COMBAT_TARGET , "Usually current target only marked when there's more than one"), x, y);
+    
+	y += STEP;
+	display.add(new CFGBox("Auto peace on combat start", CFG.COMBAT_AUTO_PEACE , "Automatically enter peacfull mode on combat start id enemy is aggressive - useful for taming"), x, y);
 	
 	y += STEP;
 	display.add(new CFGBox("Show combat damage", CFG.SHOW_COMBAT_DMG), x, y);

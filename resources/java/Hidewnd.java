@@ -2,10 +2,10 @@
 
 import haven.Coord;
 import haven.Widget;
-import haven.Window;
+import haven.WindowX;
 
 /* >wdg: Realm */
-public class Hidewnd extends Window {
+public class Hidewnd extends WindowX {
     Hidewnd(Coord sz, String cap, boolean lg) {
 	super(sz, cap, lg);
     }

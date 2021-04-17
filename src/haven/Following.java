@@ -64,6 +64,11 @@ public class Following extends Moving {
     public Gob tgt() {
 	return(gob.glob.oc.getgob(this.tgt));
     }
+    
+    public Coord3f gett() {
+	Gob tgt = tgt();
+	return tgt == null ? Coord3f.o : tgt.getc();
+    }
 
     private Skeleton.Pose getpose(Gob tgt) {
 	if(tgt == null)

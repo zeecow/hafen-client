@@ -2,9 +2,11 @@ package haven;
 
 import haven.render.RenderTree;
 
+import java.awt.*;
 import java.util.HashMap;
 import java.util.Map;
 
+import static haven.GameUI.*;
 import static haven.GobWarning.WarnMethod.*;
 import static haven.GobWarning.WarnTarget.*;
 
@@ -14,30 +16,54 @@ public class GobWarning extends GAttrib implements RenderTree.Node {
     
     public GobWarning(Gob gob) {
 	super(gob);
-	String what = "Danger";
-	if(gob.is(GobTag.FOE)) {
-	    tgt = player;
-	    what = "Player";
-	} else if(gob.is(GobTag.AGGRESSIVE)) {
-	    tgt = animal;
-	    what = "Dangerous animal";
+	tgt = categorize(gob);
+	if(tgt != null) {
+	    if(WarnCFG.get(tgt, message)) {
+		gob.glob.sess.ui.message(String.format("%s spotted!", tgt.message), tgt.mcol, errsfx);
+	    }
+	    radius = new ColoredRadius(gob, tgt.radius, tgt.scol, tgt.ecol);
 	} else {
-	    tgt = null;
+	    radius = null;
 	}
-	if(WarnCFG.get(tgt, message)) {
-	    gob.glob.sess.ui.message(String.format("%s spotted!", what), GameUI.MsgType.ERROR);
-	}
-	radius = new ColoredRadius(gob, 50);
     }
     
     @Override
     public void added(RenderTree.Slot slot) {
 	super.added(slot);
-	if(WarnCFG.get(tgt, highlight)) {slot.add(radius);}
+	if(radius != null && WarnCFG.get(tgt, highlight)) {slot.add(radius);}
+    }
+    
+    public static boolean needsWarning(Gob gob) {
+	return categorize(gob) != null;
+    }
+    
+    private static WarnTarget categorize(Gob gob) {
+	if(gob.is(GobTag.FOE) && !gob.is(GobTag.DEAD)) {
+	    return player;
+	} else if(gob.is(GobTag.AGGRESSIVE) && !gob.anyOf(GobTag.DEAD, GobTag.KO)) {
+	    return animal;
+	} else if(gob.is(GobTag.GEM)) {
+	    return gem;
+	}
+	return null;
     }
     
     public enum WarnTarget {
-	player, animal
+	player(50, "Player", Color.RED, new Color(192, 0, 0, 128), new Color(255, 224, 96)),
+	animal(50, "Dangerous animal", Color.RED, new Color(192, 0, 0, 128), new Color(255, 224, 96)),
+	gem(5, "Gem", Color.GREEN, new Color(0, 192, 122, 64), new Color(255, 90, 200, 128));
+	
+	private final int radius;
+	private final String message;
+	private final Color mcol, scol, ecol;
+	
+	WarnTarget(int radius, String message, Color mcol, Color scol, Color ecol) {
+	    this.radius = radius;
+	    this.message = message;
+	    this.mcol = mcol;
+	    this.scol = scol;
+	    this.ecol = ecol;
+	}
     }
     
     public enum WarnMethod {
@@ -60,11 +86,10 @@ public class GobWarning extends GAttrib implements RenderTree.Node {
 	    tcfg.put(method.name(), value);
 	    cfg.put(target.name(), tcfg);
 	    CFG.WARN_CONFIG.set(cfg);
-	    
 	}
     }
     
-    public static class WarnCFGWnd extends Window {
+    public static class WarnCFGWnd extends WindowX {
 	private static Window instance;
 	
 	public static void toggle(Widget parent) {
@@ -112,6 +137,16 @@ public class GobWarning extends GAttrib implements RenderTree.Node {
 	    box = add(new CheckBox("Warn about animals", false), 0, y);
 	    box.a = WarnCFG.get(WarnTarget.animal, message);
 	    box.changed(val -> WarnCFG.set(animal, message, val));
+	    y += 35;
+	    
+	    box = add(new CheckBox("Highlight gems", false), 0, y);
+	    box.a = WarnCFG.get(WarnTarget.gem, highlight);
+	    box.changed(val -> WarnCFG.set(gem, highlight, val));
+	    y += 25;
+	    
+	    box = add(new CheckBox("Warn about gems", false), 0, y);
+	    box.a = WarnCFG.get(gem, message);
+	    box.changed(val -> WarnCFG.set(gem, message, val));
 	    
 	    pack();
 	    if(asz.x < 200) {

@@ -75,7 +75,7 @@ public class Window extends Widget implements DTarget {
 	    public Coord bisz() {return(super.bisz().sub(bo.mul(2)));}
 	    public Coord cisz() {return(super.cisz().sub(co.mul(2)));}
 	};
-    private static final BufferedImage[] cbtni = new BufferedImage[] {
+    public static final BufferedImage[] cbtni = new BufferedImage[] {
 	Resource.loadsimg("gfx/hud/wnd/lg/cbtnu"),
 	Resource.loadsimg("gfx/hud/wnd/lg/cbtnd"),
 	Resource.loadsimg("gfx/hud/wnd/lg/cbtnh")};
@@ -94,8 +94,9 @@ public class Window extends Widget implements DTarget {
     public boolean decohide = false;
     protected WidgetCfg cfg = null;
     public boolean justclose = false;;
-    private final Collection<Widget> twdgs = new LinkedList<Widget>();
+    protected final Collection<Widget> twdgs = new LinkedList<Widget>();
     private String title;
+    protected Text.Furnace rcf = cf;
 
     @RName("wnd")
     public static class $_ implements Factory {
@@ -132,8 +133,8 @@ public class Window extends Widget implements DTarget {
     }
 
     protected void initCfg() {
-	if(cfg != null) {
-	    c = cfg.c;
+	if(cfg != null && cfg.c != null) {
+	    c = xlate(cfg.c, false);
 	} else {
 	    updateCfg();
 	}
@@ -145,14 +146,14 @@ public class Window extends Widget implements DTarget {
     }
 
     protected void setCfg() {
-	if(cfg == null){
+	if(cfg == null) {
 	    cfg = new WidgetCfg();
 	}
-	cfg.c = c;
+	cfg.c = xlate(c, true);
     }
 
     protected void storeCfg() {
-	WidgetCfg.set(caption(), cfg);
+	WidgetCfg.set(cfgName(caption()), cfg);
     }
 
     public void chcap(String cap) {
@@ -160,11 +161,22 @@ public class Window extends Widget implements DTarget {
 	if(cap == null) {
 	    this.cap = null;
 	} else {
-	    this.cap = cf.render(L10N.window(cap));
-	    cfg = WidgetCfg.get(cap);
+	    this.cap = rcf.render(L10N.window(cap));
+	    cfg = WidgetCfg.get(cfgName(cap));
 	}
     }
-
+    
+    protected String cfgName(String cap) {
+	if(cap.matches("(.*)'s equipment")) {
+	    return "Character equipment ";
+	} else if(cap.matches("(.*)'s inventory")) {
+	    return "Character inventory ";
+	} else if(cap.matches("(.*)'s study")) {
+	    return "Character study ";
+	}
+	return cap;
+    }
+    
     public String caption() {
 	return title;
     }
@@ -271,7 +283,7 @@ public class Window extends Widget implements DTarget {
 	cbtn.c = xlate(new Coord(ctl.x + csz.x - cbtn.sz.x, ctl.y).add(2, -2), false);
     }
 
-    private void resize2(Coord sz) {
+    protected void resize2(Coord sz) {
 	asz = sz;
 	csz = asz.add(mrgn.mul(2));
 	wsz = csz.add(tlm).add(brm);

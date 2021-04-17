@@ -262,6 +262,13 @@ public class GOut {
 	drawp(Model.Mode.LINES, data);
     }
     
+    public void clippedLine(Coord c1, Coord c2, double w) {
+	Pair<Coord, Coord> clipped = Utils.clipLine(c1, c2, Coord.z, sz());
+	if(clipped != null) {
+	    line(clipped.a, clipped.b, w);
+	}
+    }
+    
     public void line(Coord3f c1, Coord3f c2, double w) {
 	usestate(new States.LineWidth(w));
 	float[] data = {c1.x + tx.x + 0.5f, c1.y + tx.y + 0.5f,

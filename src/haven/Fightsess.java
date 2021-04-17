@@ -228,7 +228,7 @@ public class Fightsess extends Widget {
 	    g.aimage(ip.get().tex(), altui ? new Coord(x0 - UI.scale(45), y0 - UI.scale(16)) : pcc.add(-UI.scale(75), 0), 1, 0.5);
 	    g.aimage(oip.get().tex(), altui ? new Coord(x0 + UI.scale(45), y0 - UI.scale(16)) : pcc.add(UI.scale(75), 0), 0, 0.5);
 
-	    if(fv.lsrel.size() > 1)
+	    if(fv.lsrel.size() > (CFG.ALWAYS_MARK_COMBAT_TARGET.get() ? 0 : 1))
 		curtgtfx = fxon(fv.current.gobid, tgtfx, curtgtfx);
 	}
 
@@ -434,18 +434,18 @@ public class Fightsess extends Widget {
     }
 
     public static final KeyBinding[] kb_acts = {
-	KeyBinding.get("fgt/0", KeyMatch.forcode(KeyEvent.VK_1, 0)),
-	KeyBinding.get("fgt/1", KeyMatch.forcode(KeyEvent.VK_2, 0)),
-	KeyBinding.get("fgt/2", KeyMatch.forcode(KeyEvent.VK_3, 0)),
-	KeyBinding.get("fgt/3", KeyMatch.forcode(KeyEvent.VK_4, 0)),
-	KeyBinding.get("fgt/4", KeyMatch.forcode(KeyEvent.VK_5, 0)),
-	KeyBinding.get("fgt/5", KeyMatch.forcode(KeyEvent.VK_1, KeyMatch.S)),
-	KeyBinding.get("fgt/6", KeyMatch.forcode(KeyEvent.VK_2, KeyMatch.S)),
-	KeyBinding.get("fgt/7", KeyMatch.forcode(KeyEvent.VK_3, KeyMatch.S)),
-	KeyBinding.get("fgt/8", KeyMatch.forcode(KeyEvent.VK_4, KeyMatch.S)),
-	KeyBinding.get("fgt/9", KeyMatch.forcode(KeyEvent.VK_5, KeyMatch.S)),
+	KeyBinding.get("fgt/0", KeyMatchFake.forcode(KeyEvent.VK_1, 0)),
+	KeyBinding.get("fgt/1", KeyMatchFake.forcode(KeyEvent.VK_2, 0)),
+	KeyBinding.get("fgt/2", KeyMatchFake.forcode(KeyEvent.VK_3, 0)),
+	KeyBinding.get("fgt/3", KeyMatchFake.forcode(KeyEvent.VK_4, 0)),
+	KeyBinding.get("fgt/4", KeyMatchFake.forcode(KeyEvent.VK_5, 0)),
+	KeyBinding.get("fgt/5", KeyMatchFake.forcode(KeyEvent.VK_1, KeyMatch.S)),
+	KeyBinding.get("fgt/6", KeyMatchFake.forcode(KeyEvent.VK_2, KeyMatch.S)),
+	KeyBinding.get("fgt/7", KeyMatchFake.forcode(KeyEvent.VK_3, KeyMatch.S)),
+	KeyBinding.get("fgt/8", KeyMatchFake.forcode(KeyEvent.VK_4, KeyMatch.S)),
+	KeyBinding.get("fgt/9", KeyMatchFake.forcode(KeyEvent.VK_5, KeyMatch.S)),
     };
-    public static final KeyBinding kb_relcycle =  KeyBinding.get2("fgt-cycle", KeyMatch.forcode(KeyEvent.VK_TAB, KeyMatch.C), KeyMatch.S);
+    public static final KeyBinding kb_relcycle =  KeyBinding.get("fgt-cycle", KeyMatch.forcode(KeyEvent.VK_TAB, KeyMatch.C), KeyMatch.S);
 
     /* XXX: This is a bit ugly, but release message do need to be
      * properly sequenced with use messages in some way. */
@@ -469,7 +469,8 @@ public class Fightsess extends Widget {
     private UI.Grab holdgrab = null;
     private int held = -1;
     public boolean globtype(char key, KeyEvent ev) {
-	if((ev.getModifiersEx() & (InputEvent.CTRL_DOWN_MASK | KeyEvent.META_DOWN_MASK | KeyEvent.ALT_DOWN_MASK)) == 0) {
+//	if((ev.getModifiersEx() & (InputEvent.CTRL_DOWN_MASK | KeyEvent.META_DOWN_MASK | KeyEvent.ALT_DOWN_MASK)) == 0) 
+	{
 	    int fn = getAction(ev);
 	    if((fn >= 0) && (fn < actions.length)) {
 		MapView map = getparent(GameUI.class).map;
@@ -520,7 +521,8 @@ public class Fightsess extends Widget {
     }
 
     public boolean keyup(KeyEvent ev) {
-	if((holdgrab != null) && (kb_acts[held].key().match(ev, KeyMatch.MODS))) {
+//	if((holdgrab != null) && (kb_acts[held].key().match(ev, KeyMatch.MODS))) {
+	if((holdgrab != null) && (keybinds[held].match(ev))) {
 	    MapView map = getparent(GameUI.class).map;
 	    new Release(held);
 	    holdgrab.remove();

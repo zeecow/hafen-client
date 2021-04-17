@@ -100,15 +100,4 @@ public class KeyBinding {
 	    return(wdg.kb_gkey);
 	}
     }
-    
-    public static KeyBinding get2(String id, KeyMatch defkey, int modign) {
-	KeyBinding tmp = get(id, defkey, modign);
-	tmp = new KeyBinding(id, KeyMatch2.from(tmp.key()), modign);
-	tmp.key = KeyMatch2.from(tmp.key);
-	return tmp;
-    }
-    
-    public static KeyBinding get2(String id, KeyMatch defkey) {
-	return get2(id, defkey, 0);
-    }
 }

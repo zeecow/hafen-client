@@ -29,17 +29,21 @@ package haven;
 import java.util.*;
 import haven.render.*;
 
+import static haven.Sprite.*;
+
 public class ResDrawable extends Drawable {
     public final Indir<Resource> res;
     public final Sprite spr;
     MessageBuf sdt;
     // private double delay = 0; XXXRENDER
+    private final String resid;
 
     public ResDrawable(Gob gob, Indir<Resource> res, Message sdt) {
 	super(gob);
 	this.res = res;
 	this.sdt = new MessageBuf(sdt);
 	spr = Sprite.create(gob, res.get(), this.sdt.clone());
+	resid = makeResId();
     }
 
     public ResDrawable(Gob gob, Resource res) {
@@ -71,6 +75,23 @@ public class ResDrawable extends Drawable {
     @Override
     public Indir<Resource> getires() {
 	return res;
+    }
+    
+    
+    @Override
+    public String resId() {return resid;}
+    
+    public String makeResId() {
+	String name = res.get().name;
+	String extra = null;
+	MessageBuf sdt = this.sdt.clone();
+	int state = sdt.eom() ? 0xffff0000 : decnum(sdt);
+	if(name.endsWith("/pow")) {//fire
+	    if(state == 17 || state == 33) { // this fire is actually hearth fire
+		extra = "hearth";
+	    }
+	}
+	return extra == null ? name : String.format("%s[%s]", name, extra);
     }
     
     public Skeleton.Pose getpose() {

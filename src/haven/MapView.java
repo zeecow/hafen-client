@@ -433,11 +433,11 @@ public class MapView extends PView implements DTarget, Console.Directory {
 	}
     }
 
-    public static KeyBinding kb_camleft  = KeyBinding.get("cam-left",  KeyMatch.forcode(KeyEvent.VK_LEFT, 0));
-    public static KeyBinding kb_camright = KeyBinding.get("cam-right", KeyMatch.forcode(KeyEvent.VK_RIGHT, 0));
-    public static KeyBinding kb_camin    = KeyBinding.get("cam-in",    KeyMatch.forcode(KeyEvent.VK_UP, 0));
-    public static KeyBinding kb_camout   = KeyBinding.get("cam-out",   KeyMatch.forcode(KeyEvent.VK_DOWN, 0));
-    public static KeyBinding kb_camreset = KeyBinding.get("cam-reset", KeyMatch.forcode(KeyEvent.VK_HOME, 0));
+    public static KeyBinding kb_camleft  = KeyBinding.get("cam-left",  KeyMatchFake.forcode(KeyEvent.VK_LEFT, 0));
+    public static KeyBinding kb_camright = KeyBinding.get("cam-right", KeyMatchFake.forcode(KeyEvent.VK_RIGHT, 0));
+    public static KeyBinding kb_camin    = KeyBinding.get("cam-in",    KeyMatchFake.forcode(KeyEvent.VK_UP, 0));
+    public static KeyBinding kb_camout   = KeyBinding.get("cam-out",   KeyMatchFake.forcode(KeyEvent.VK_DOWN, 0));
+    public static KeyBinding kb_camreset = KeyBinding.get("cam-reset", KeyMatchFake.forcode(KeyEvent.VK_HOME, 0));
     public class SOrthoCam extends OrthoCam {
 	private Coord dragorig = null;
 	private float anglorig;
@@ -1686,21 +1686,6 @@ public class MapView extends PView implements DTarget, Console.Directory {
 	return(screenxf(new Coord3f((float)mc.x, (float)mc.y, cc.z)));
     }
     
-    public Coord3f screenxf2(Coord2d mc) {
-	Coord3f cc;
-	try {
-	    cc = getcc();
-	} catch (Loading e) {
-	    return (null);
-	}
-	return (screenxf2(new Coord3f((float) mc.x, (float) mc.y, cc.z)));
-    }
-    
-    public Coord3f screenxf2(Coord3f mc) {
-	HomoCoord4f homo = clipxf(mc, false);
-	return homo.z < 0 ? null : homo.toview(Area.sized(this.sz));
-    }
-
     public double screenangle(Coord2d mc, boolean clip) {
 	Coord3f cc;
 	try {
@@ -1805,7 +1790,6 @@ public class MapView extends PView implements DTarget, Console.Directory {
 	Loader.Future<Plob> placing = this.placing;
 	if((placing != null) && placing.done())
 	    placing.get().ctick(dt);
-	Radar.tick();
     }
     
     public void resize(Coord sz) {
@@ -2079,6 +2063,8 @@ public class MapView extends PView implements DTarget, Console.Directory {
 		new HackThread(() -> {
 			synchronized(ui) {
 			    if(mapcl != null) {
+				if(Config.center_tile) { mapcl = mapcl.floor(tilesz).mul(tilesz).add(5, 5); }
+				ui.pathQueue().ifPresent(pathQueue -> pathQueue.click(mapcl, objcl));
 				if(objcl == null)
 				    hit(pc, mapcl, null);
 				else
@@ -2121,8 +2107,23 @@ public class MapView extends PView implements DTarget, Console.Directory {
 		}
 	    }
 	    if(clickb == 1) {Bot.cancel();}
-	    wdgmsg("click", args);
+	    
+	    click(mc, clickb, args);
 	}
+    }
+    
+    public void click(Coord2d mc, int clickb, Object... args) {
+	boolean send = true;
+	if(clickb == 1 && CFG.QUEUE_PATHS.get()) {
+	    if(ui.modmeta) {
+		args[3] = 0;
+		send = ui.gui.pathQueue.add(mc);
+	    } else {
+		ui.gui.pathQueue.start(mc);
+	    }
+	}
+	if(send)
+	    wdgmsg("click", args);
     }
     
     public void grab(Grabber grab) {
@@ -2144,8 +2145,10 @@ public class MapView extends PView implements DTarget, Console.Directory {
 	    }
 	} else if((placing_l != null) && placing_l.done()) {
 	    Plob placing = placing_l.get();
-	    if(placing.lastmc != null)
-		wdgmsg("place", placing.rc.floor(posres), (int)Math.round(placing.a * 32768 / Math.PI), button, ui.modflags());
+	    if(placing.lastmc != null) {
+		wdgmsg("place", placing.rc.floor(posres), (int) Math.round(placing.a * 32768 / Math.PI), button, ui.modflags());
+		ui.gui.pathQueue.start(placing.rc);
+	    }
 	} else if((grab != null) && grab.mmousedown(c, button)) {
 	} else {
 	    new Click(c, button).run();
@@ -2231,12 +2234,10 @@ public class MapView extends PView implements DTarget, Console.Directory {
 
     public static final KeyBinding kb_grid = KeyBinding.get("grid", KeyMatch.forchar('G', KeyMatch.C));
     public boolean globtype(char c, KeyEvent ev) {
-        /* Actually set in haven.Actions.TOGGLE_TILE_GRID
 	if(kb_grid.key().match(ev)) {
 	    showgrid(gridlines == null);
 	    return(true);
 	}
-	*/
 	return(false);
     }
 
@@ -2488,10 +2489,6 @@ public class MapView extends PView implements DTarget, Console.Directory {
 	    });
     }
     
-    public void togglegrid() {
-	showgrid(gridlines == null);
-    }
-    
     public void zoomCamera(int amount) { camera.wheel(Coord.z, amount); }
     
     public void rotateCamera(Coord r) {
@@ -2519,18 +2516,6 @@ public class MapView extends PView implements DTarget, Console.Directory {
     }
     
     public void resetCamera() { camera.reset(); }
-    
-    public static Action.Do toggleolact(String tag) {
-	return gui -> {
-	    boolean vis = gui.map.visol(tag);
-	    if(vis){
-		gui.map.disol(tag);
-	    } else {
-		gui.map.enol(tag);
-		
-	    }
-	};
-    }
     
     public boolean isInspecting() {
 	return cursor == inspectCursor;
@@ -2567,10 +2552,7 @@ public class MapView extends PView implements DTarget, Console.Directory {
 		    if(inf != null) {
 			Gob gob = Gob.from(inf.ci);
 			if(gob != null) {
-			    Resource res = gob.getres();
-			    if(res != null) {
-				ttip = res.name;
-			    }
+			    ttip = gob.tooltip();
 			}
 		    } else {
 			MCache mCache = ui.sess.glob.map;

@@ -1350,7 +1350,7 @@ public class ChatUI extends Widget {
 	}
     }
 
-    public static final KeyBinding kb_quick = KeyBinding.get2("chat-quick", KeyMatch.forcode(KeyEvent.VK_ENTER, 0));
+    public static final KeyBinding kb_quick = KeyBinding.get("chat-quick", KeyMatch.forcode(KeyEvent.VK_ENTER, 0));
     public boolean globtype(char key, KeyEvent ev) {
 	if(kb_quick.key().match(ev)) {
 	    if(!visible && (sel instanceof EntryChannel)) {

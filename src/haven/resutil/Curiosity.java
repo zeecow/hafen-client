@@ -61,9 +61,11 @@ public class Curiosity extends ItemInfo.Tip {
 	StringBuilder buf = new StringBuilder();
 	for(int i = units.length - 1; i >= 0; i--) {
 	    if(vals[i] > 0) {
-		if(buf.length() > 0)
-		    buf.append(' ');
-		buf.append(vals[i]);
+		if(buf.length() > 0) {
+		    buf.append(String.format(" %02d", vals[i]));
+		} else {
+		    buf.append(vals[i]);
+		}
 		buf.append(units[i]);
 	    }
 	}
@@ -80,6 +82,10 @@ public class Curiosity extends ItemInfo.Tip {
 	    buf.append(String.format("Learning points: $col[192,192,255]{%s}\n", Utils.thformat(exp)));
 	if(time > 0)
 	    buf.append(String.format("Study time: $col[192,255,192]{%s}\n", timefmt(time)));
+	String remaining = remainingLongTip();
+	if(remaining != null) {
+	    buf.append(String.format("Remaining: $col[255,224,192]{%s}\n", remaining));
+	}
 	if(CFG.SHOW_CURIO_LPH.get() && lph > 0){
 	    buf.append(String.format("LP/H: $col[192,255,255]{%d}\n", lph(this.lph)));
 	}
@@ -90,6 +96,55 @@ public class Curiosity extends ItemInfo.Tip {
 	return(RichText.render(buf.toString(), 0).img);
     }
 
+    private String remainingLongTip() {
+        if(CFG.SHOW_CURIO_REMAINING_TT.get()) {
+	    return remainingLongTip(remaining());
+	} else {
+            return null;
+	}
+    }
+    
+    private String remainingLongTip(int remaining) {
+	if(remaining >= 0) {
+	    return timefmt(remaining);
+	}
+	return null;
+    }
+    
+    private String remainingShortTip(int time) {
+	if(!CFG.SHOW_CURIO_REMAINING_METER.get() || time < 0) {return null;}
+	time = (int) (time / Timer.SERVER_RATIO); //short tip is always in real time
+	if(time >= 60) {
+	    if(time > 3600) {
+		time = time / 60;
+	    }
+	    return String.format("%d:%02d", time / 60, time % 60);
+	} else {
+	    return String.format("%02d", time);
+	}
+    }
+    
+    public Pair<String, String> remainingTip() {
+	int time = remaining();
+	return new Pair<>(remainingShortTip(time), remainingLongTip(time));
+    }
+    
+    //return remaining study time in server seconds
+    public int remaining() {
+	if(owner instanceof GItem) {
+	    GItem item = ((GItem) owner);
+	    GItem.MeterInfo m = ItemInfo.find(GItem.MeterInfo.class, item.info());
+	    double meter = (m != null) ? m.meter() : 0;
+	    if(meter > 0) {
+		long now = System.currentTimeMillis();
+		long remStudy = (long) ((1.0 - meter) * time);
+		long elapsed = (long) (Timer.SERVER_RATIO * (now - item.meterUpdated) / 1000);
+		return (int) (remStudy - elapsed);
+	    }
+	}
+	return -1;
+    }
+    
     public static class Data implements ItemData.ITipData {
 	public final int lp, weight, xp, time;
 

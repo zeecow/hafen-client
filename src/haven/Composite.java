@@ -27,7 +27,8 @@
 package haven;
 
 import java.util.*;
-import java.lang.reflect.*;
+import java.util.stream.Collectors;
+
 import haven.render.*;
 import haven.Skeleton.Pose;
 import haven.Skeleton.PoseMod;
@@ -45,6 +46,10 @@ public class Composite extends Drawable {
     private boolean nposesold, retainequ = false;
     private float tptime;
     private WrapMode tpmode;
+    private List<MD> nmod2;
+    boolean changed = false;
+    private String resId = null;
+    private List<String> poses = new LinkedList<>();
     
     public Composite(Gob gob, Indir<Resource> base) {
 	super(gob);
@@ -105,6 +110,8 @@ public class Composite extends Drawable {
 	    try {
 		Composited.Poses np = comp.new Poses(loadposes(nposes, comp.skel, nposesold));
 		np.set(nposesold?0:ipollen);
+		this.poses = nposes.stream().map(pose -> pose.res.get().name).collect(Collectors.toList());
+		gob.poseUpdated();
 		nposes = null;
 		updequ();
 	    } catch(Loading e) {}
@@ -125,6 +132,7 @@ public class Composite extends Drawable {
 	} else if(!retainequ) {
 	    updequ();
 	}
+	processResId();
 	comp.tick(dt);
     }
 
@@ -170,6 +178,7 @@ public class Composite extends Drawable {
 
     public void chmod(List<MD> mod) {
 	nmod = mod;
+	changed(mod);
     }
 
     public void chequ(List<ED> equ) {
@@ -178,5 +187,62 @@ public class Composite extends Drawable {
 
     public Object staticp() {
 	return(null);
+    }
+    
+    public String resId() { return resId; }
+    
+    private String makeResId() {
+	if(nmod2 == null) {return resId;}
+	
+	Set<String> res = new HashSet<>();
+	String name;
+	try {
+	    name = base.get().name;
+	    if("gfx/borka/body".equals(name)) {
+		return name;
+	    } else if(name != null) {
+		for (MD mod : nmod2) {
+		    String mname = mod.mod.get().name;
+		    if(!name.equals(mname))
+			res.add(mname);
+		}
+	    }
+	} catch (Loading e) {
+	    return null;
+	}
+	
+	if(name == null) {
+	    return null;
+	} else if(res.isEmpty()) {
+	    return name;
+	} else {
+	    String mods = res.stream().sorted().collect(Collectors.joining(","));
+	    return String.format("%s[%s]", name, mods);
+	}
+    }
+    private void changed(List<MD> mods) {
+        nmod2 = mods;
+        changed = true;
+    }
+    
+    private void processResId() {
+	if(changed) {
+	    String id = makeResId();
+	    if(id != null) {
+		resId = id;
+		changed = false;
+		nmod2 = null;
+		gob.idUpdated();
+	    }
+	}
+    }
+    
+    public boolean hasPose(String request) {
+	for (String pose : poses) {
+	    if(pose.contains(request)) {
+		return true;
+	    }
+	}
+	return false;
     }
 }

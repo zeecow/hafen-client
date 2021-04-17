@@ -158,7 +158,7 @@ public class GobIcon extends GAttrib {
 	    buf.addstring("");
 	}
 
-	public static Settings load(Message buf) {
+	public static Settings load(Message buf, UI ui) {
 	    if(!Arrays.equals(buf.bytes(sig.length), sig))
 		throw(new Message.FormatError("Invalid signature"));
 	    int ver = buf.uint8();
@@ -196,11 +196,12 @@ public class GobIcon extends GAttrib {
 		    set.defshow = set.show;
 		ret.settings.put(res.name, set);
 	    }
+	    Radar.addCustomSettings(ret.settings, ui);
 	    return(ret);
 	}
     }
 
-    public static class SettingsWindow extends Window {
+    public static class SettingsWindow extends WindowX {
 	public final Settings conf;
 	private final Runnable save;
 

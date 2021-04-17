@@ -3,7 +3,7 @@ package haven;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
-import me.ender.Reflect;
+import haven.res.gfx.fx.msrad.MSRad;
 
 import java.awt.*;
 import java.lang.reflect.Type;
@@ -14,22 +14,14 @@ public class GobRadius {
     private static final String GOB_RADIUS_JSON = "gob_radius.json";
     public static final Map<String, GobRadius> gobRadiusCfg;
     static final Color DEF_COL = new Color(255, 255, 255, 128);
-    public static final Resource msrad = Resource.remote().loadwait("gfx/fx/msrad");
     
-    public String color;
+    public String color, color2;
     public float radius;
-    private static boolean init = false;
     
     static {
 	gobRadiusCfg = parseJson(Config.loadFile(GOB_RADIUS_JSON));
-    }
-    
-    static void init() {
-	if(!init) {
-	    init = true;
-	    showDefaultRadii(CFG.SHOW_GOB_RADIUS.get());
-	    CFG.SHOW_GOB_RADIUS.observe(GobRadius::showDefaultRadii);
-	}
+	showDefaultRadii(CFG.SHOW_GOB_RADIUS.get());
+	CFG.SHOW_GOB_RADIUS.observe(GobRadius::showDefaultRadii);
     }
     
     private static Map<String, GobRadius> parseJson(String json) {
@@ -60,11 +52,7 @@ public class GobRadius {
     }
     
     public static void showDefaultRadii(boolean show) {
-	try {
-	    Reflect.invokeStatic(msrad.layer(Resource.CodeEntry.class).get("spr"), "show", new Class[]{boolean.class}, show);
-	} catch (Exception ignored) {
-	    ignored.printStackTrace();
-	}
+	MSRad.show(show);
     }
     
     private static Gson getGson() {
@@ -77,6 +65,15 @@ public class GobRadius {
 	Color c = Utils.hex2color(color, null);
 	if(c == null) {
 	    return DEF_COL;
+	}
+	return c;
+    }
+    
+    public Color color2() {
+	Color c = Utils.hex2color(color2, null);
+	if(c == null) {
+	    c = color();
+	    return new Color(c.getRed(), c.getGreen(), c.getBlue(), 255);
 	}
 	return c;
     }

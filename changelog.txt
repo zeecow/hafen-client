@@ -1,4 +1,64 @@
-$size[14]{$u{Update for 05.04.21:}
+$size[14]{$u{Update for 16.04.21:}
+  * added ability to change which mod key ignores auto choosing menus (Options->General)
+  * added auto peace option (Options->Display)
+  * added hhp and armor damage to gob damage overlay
+ 
+$size[14]{$u{Update for 15.04.21:}
+  * fixed tile centering(CTRL+Z) not working for some types of clicks (like tree planting)
+  * made bunch of improvements to path queue handling of clicks on objects or while carrying object
+ 
+$size[14]{$u{Update for 14.04.21:}
+  * made gob radius not clickable
+  * hopefully fixed quest pointers
+ 
+$size[14]{$u{Update for 13.04.21:}
+  * added effect radius display to beehives and food troughs
+  * changed color of mine supports to something more neutral
+  * added option to display queued movement on minimap (Options->Display->Show queued path)
+ 
+$size[14]{$u{Update for 12.04.21:}
+  * merged loftar's changes
+  * added moose and cave rat to aggressive animals
+  * marked gems and irr lights for auto-pickup
+  * fixed drying rack coloring not being affected by gob info option
+  * added option (Options->General->Enable path queueing) to queue movement by ALT+LClick on map 
+  * added option to visualize queued path (Options->Display->Draw gob paths->Queued)
+  * fixed another deadlock in gob path visualizer
+ 
+$size[14]{$u{Update for 11.04.21:}
+  * added detection of empty/ready drying racks when gob info is turned on
+  * added option to always show current combat target
+  * made main menu buttons (inventory and the like) capture keys even if invisible
+  * added audio buffer size to options
+  * added gems to radar
+  * added gems to list of stuff to warn about
+  * added option (Options->General) to only pickup items with enabled minimap icons
+  * bumped maximum auto-pickup radius to 32 tiles
+ 
+ $size[14]{$u{Update for 10.04.21:}
+  * added ability to change UI theme. For now affects only windows. Located at Options->General->UI Theme.
+  * do not warn about dead players.
+  * do not warn about dead or ko animals.
+ 
+$size[14]{$u{Update for 09.04.21:}
+  * made small critters not disappear from minimap when dead
+  * added arrows, boats, dugouts and hearth fires to minimap icons
+  * added option to disable sounds when kin changes status (Options->Display->Play sound when kin changes status)
+  * made Map Window remember size and position separately for normal and compact modes
+  * show grid only on first 3 zoom levels and show view distance only on first 2 zoom levels
+  * added stone milestone to radar
+ 
+$size[14]{$u{Update for 07.04.21:}
+  * merged wafflecat's pull request that ads LP/H to study window
+  * moved toggle chat and take screenshot to widget shortcuts + added widget binding for UI toggle
+  * fixed false player spotted alarm on travel
+  * added options to show curio remaining time in tooltip or instead of progress
+  * made widget shortcuts work regardless of language, provided you bound them using english language, or left as defaults.
+  * use loftar's (widget) shortcuts to handle default UI buttons (Inventory, Minimap, Equipment etc.) 
+  * fixed quest pointers disappearing when target is just out of sight on ortho cam
+  * added distance to target to quest pointer tooltips
+ 
+$size[14]{$u{Update for 06.04.21:}
   * fixed timers (X->T)
   * merged wafflecat's pull request that fixes custom markers upload to auto map
   * added option to select which custom markers to upload, none by default

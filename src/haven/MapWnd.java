@@ -42,7 +42,7 @@ import static haven.Utils.eq;
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.*;
 
-public class MapWnd extends Window implements Console.Directory {
+public class MapWnd extends WindowX implements Console.Directory {
     public static final Resource markcurs = Resource.local().loadwait("gfx/hud/curs/flag");
     public final MapFile file;
     public final MiniMap view;
@@ -66,10 +66,10 @@ public class MapWnd extends Window implements Console.Directory {
     private final static Predicate<Marker> smarkers = (m -> m instanceof SMarker);
     private final static Comparator<Marker> namecmp = ((a, b) -> a.nm.compareTo(b.nm));
 
-    public static final KeyBinding kb_home = KeyBinding.get2("mapwnd/home", KeyMatch.forcode(KeyEvent.VK_HOME, 0));
-    public static final KeyBinding kb_mark = KeyBinding.get2("mapwnd/mark", KeyMatch.nil);
-    public static final KeyBinding kb_hmark = KeyBinding.get2("mapwnd/hmark", KeyMatch.forchar('M', KeyMatch.C));
-    public static final KeyBinding kb_compact = KeyBinding.get2("mapwnd/compact", KeyMatch.forchar('A', KeyMatch.M));
+    public static final KeyBinding kb_home = KeyBinding.get("mapwnd/home", KeyMatch.forcode(KeyEvent.VK_HOME, 0));
+    public static final KeyBinding kb_mark = KeyBinding.get("mapwnd/mark", KeyMatch.nil);
+    public static final KeyBinding kb_hmark = KeyBinding.get("mapwnd/hmark", KeyMatch.forcode(KeyEvent.VK_M, KeyMatch.C));
+    public static final KeyBinding kb_compact = KeyBinding.get("mapwnd/compact", KeyMatch.forchar('A', KeyMatch.M));
     public MapWnd(MapFile file, MapView mv, Coord sz, String title) {
 	super(sz, title, true);
 	this.file = file;
@@ -549,7 +549,7 @@ public class MapWnd extends Window implements Console.Directory {
 	}
     }
 
-    public static class ExportWindow extends Window implements MapFile.ExportStatus {
+    public static class ExportWindow extends WindowX implements MapFile.ExportStatus {
 	private Thread th;
 	private volatile String prog = "Exporting map...";
 
@@ -584,7 +584,7 @@ public class MapWnd extends Window implements Console.Directory {
 	}
     }
 
-    public static class ImportWindow extends Window {
+    public static class ImportWindow extends WindowX {
 	private Thread th;
 	private volatile String prog = "Initializing";
 	private double sprog = -1;

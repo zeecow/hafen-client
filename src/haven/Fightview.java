@@ -270,6 +270,9 @@ public class Fightview extends Widget {
 	    rel.ip = (Integer)args[2];
 	    rel.oip = (Integer)args[3];
             lsrel.addFirst(rel);
+	    if(rel.give.state == 0 && CFG.COMBAT_AUTO_PEACE.get()) {
+		wdgmsg("give", (int)rel.gobid, 1);
+	    }
             return;
         } else if(msg == "del") {
             Relation rel = getrel(uint32((Integer)args[0]));

@@ -26,7 +26,7 @@
 
 package haven;
 
-public class HelpWnd extends Window {
+public class HelpWnd extends WindowX {
     public static final RichText.Foundry fnd;
     public Indir<Resource> res;
     private Indir<Resource> showing = null;

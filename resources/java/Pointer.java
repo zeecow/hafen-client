@@ -4,6 +4,7 @@ import haven.render.Model;
 
 import java.awt.*;
 
+import static haven.MCache.*;
 import static java.lang.Math.*;
 
 /* >wdg: Pointer */
@@ -15,6 +16,7 @@ public class Pointer extends Widget {
     public long gobid = -1;
     public boolean click;
     private Tex licon;
+    private String tip = null;
     
     public Pointer(Indir<Resource> icon) {
 	super(Coord.z);
@@ -92,10 +94,38 @@ public class Pointer extends Widget {
 		return;
 	    }
 	} else {
-	    sl = getparent(GameUI.class).map.screenxf2(tc);
+	    Coord3f map3d = getMap3d(tc);
+	    MapView map = getparent(GameUI.class).map;
+	    HomoCoord4f homo = map.clipxf(map3d, false);
+	    if(homo.w < 0) {
+		homo = map.clipxf(map3d, true);
+	    }
+	    sl = homo.toview(Area.sized(map.sz));
 	}
-	if(sl != null && sl.z >= 0)
+	if(sl != null)
 	    drawarrow(g, new Coord(sl));
+    }
+    
+    Coord3f getMap3d(Coord2d mc) {
+	float z = 0;
+	MapView map = getparent(GameUI.class).map;
+	Gob player = map == null ? null : map.player();
+	if(player != null) {
+	    try {
+		Coord2d gsz = tilesz.mul(cmaps.x, cmaps.y);
+		Coord pgc = player.rc.floor(gsz);
+		Coord mgc = mc.floor(gsz);
+		if(pgc.manhattan2(mgc) <= 1) {
+		    Coord3f mp = ui.sess.glob.map.getzp(mc);
+		    z = mp.z;
+		} else {
+		    z = player.getc().z;
+		}
+	    } catch (Loading ignored) {
+		
+	    }
+	}
+	return new Coord3f((float) mc.x, (float) mc.y, z);
     }
     
     public void update(Coord2d tc, long gobid) {
@@ -130,6 +160,13 @@ public class Pointer extends Widget {
 	    licon = null;
 	} else if(name == "cl") {
 	    click = ((Integer) args[0]) != 0;
+	} else if(name == "tip") {
+	    Object tt = args[0];
+	    if(tt instanceof String) {
+		tip = (String) tt;
+	    } else {
+		super.uimsg(name, args);
+	    }
 	} else {
 	    super.uimsg(name, args);
 	}
@@ -137,7 +174,28 @@ public class Pointer extends Widget {
     
     public Object tooltip(Coord c, Widget prev) {
 	if((lc != null) && (lc.dist(c) < 20))
-	    return (tooltip);
+	    if(tip != null) {
+		double d = getDistance();
+		if(d > 0) {
+		    return String.format("%s (%.1fm)", tip, d);
+		} else {
+		    return tip;
+		}
+	    } else return (tooltip);
 	return (null);
+    }
+    
+    double getDistance() {
+	MapView map = getparent(GameUI.class).map;
+	Gob target = (gobid < 0) ? null : ui.sess.glob.oc.getgob(gobid);
+	Gob player = map == null ? null : map.player();
+	if(player != null) {
+	    if(target != null) {
+		return player.rc.dist(target.rc) / 11.0;
+	    } else if(tc != null) {
+		return player.rc.dist(tc) / 11.0;
+	    }
+	}
+	return -1;
     }
 }

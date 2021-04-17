@@ -26,7 +26,7 @@
 
 package haven;
 
-public class MapMod extends Window implements MapView.Grabber {
+public class MapMod extends WindowX implements MapView.Grabber {
     MapView mv;
     MapView.GrabXL grab;
     UI.Grab mgrab;

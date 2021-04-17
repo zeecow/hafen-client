@@ -602,11 +602,13 @@ public class MiniMap extends Widget {
     public void drawparts(GOut g){
 	drawmap(g);
 	drawmarkers(g);
-	if(CFG.MMAP_GRID.get()) {drawgrid(g);}
-	if(CFG.MMAP_VIEW.get()) {drawview(g);}
+	boolean playerSegment = (sessloc != null) && ((curloc == null) || (sessloc.seg == curloc.seg));
+	if(playerSegment && zoomlevel <= 2 && CFG.MMAP_GRID.get()) {drawgrid(g);}
+	if(playerSegment && zoomlevel <= 1 && CFG.MMAP_VIEW.get()) {drawview(g);}
+	if(playerSegment && CFG.MMAP_SHOW_PATH.get()) {drawMovement(g);}
 	if(dlvl <= 1)
 	    drawicons(g);
-	drawparty(g);
+	if(playerSegment) drawparty(g);
 	if(CFG.MMAP_SHOW_BIOMES.get()) {drawbiome(g); }
     }
 
@@ -805,11 +807,25 @@ public class MiniMap extends Widget {
 	if(mc == null) mc = ui.mc;
 	if((sessloc != null) && (sessloc.seg == loc.seg)) {
 	    if(gob == null)
+		if(Config.always_true) {
+		    Coord2d clickAt = loc.tc.sub(sessloc.tc).mul(tilesz).add(tilesz.div(2));
+		    ui.pathQueue().ifPresent(pathQueue -> pathQueue.click(clickAt));
+		    mv.click(clickAt, button, mc,
+			clickAt.floor(posres),
+			button, ui.modflags());
+		} else
 		mv.wdgmsg("click", mc,
 			  loc.tc.sub(sessloc.tc).mul(tilesz).add(tilesz.div(2)).floor(posres),
 			  button, ui.modflags());
 	    else {
 		if(button == 3) {FlowerMenu.lastGob(gob);}
+		if(Config.always_true) {
+		    Coord2d clickAt = loc.tc.sub(sessloc.tc).mul(tilesz).add(tilesz.div(2));
+		    ui.pathQueue().ifPresent(pathQueue -> pathQueue.click(gob));
+		    mv.click(clickAt, button, mc,
+			clickAt.floor(posres), button, ui.modflags(), 0,
+			(int) gob.id, gob.rc.floor(posres), 0, -1);
+		} else
 		mv.wdgmsg("click", mc,
 			  loc.tc.sub(sessloc.tc).mul(tilesz).add(tilesz.div(2)).floor(posres),
 			  button, ui.modflags(), 0,
@@ -863,6 +879,17 @@ public class MiniMap extends Widget {
 	    g.frect(rc, VIEW_SZ.div(zmult));
 	    g.chcolor(VIEW_BORDER_COLOR);
 	    g.rect(rc, VIEW_SZ.div(zmult));
+	    g.chcolor();
+	}
+    }
+    
+    void drawMovement(GOut g) {
+	if(ui.gui.pathQueue!=null) {
+	    List<Pair<Coord2d, Coord2d>> lines = ui.gui.pathQueue.minimapLines();
+	    g.chcolor(PathVisualizer.PathCategory.ME.color);
+	    for (Pair<Coord2d, Coord2d> line : lines) {
+		g.clippedLine(p2c(line.a), p2c(line.b), 1.5);
+	    }
 	    g.chcolor();
 	}
     }

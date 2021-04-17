@@ -19,8 +19,8 @@ public class ColoredRadius implements RenderTree.Node {
     
     public ColoredRadius(Gob gob, float r, Color scol, Color ecol) {
 	this.gob = gob;
-	smat = new BaseColor(scol);
-	emat = Pipe.Op.compose(new BaseColor(ecol), new States.LineWidth(4));
+	smat = Pipe.Op.compose(new BaseColor(scol), Clickable.No);
+	emat = Pipe.Op.compose(new BaseColor(ecol), new States.LineWidth(4), Clickable.No);
 	int n = Math.max(24, (int) (2 * Math.PI * r / 11.0));
 	FloatBuffer posb = Utils.wfbuf(n * 3 * 2);
 	FloatBuffer nrmb = Utils.wfbuf(n * 3 * 2);
@@ -39,10 +39,6 @@ public class ColoredRadius implements RenderTree.Node {
 	this.emod = new Model(Model.Mode.LINE_STRIP, vbuf.data(), new Indices(n + 1, NumberFormat.UINT16, DataBuffer.Usage.STATIC, this::eidx));
 	this.posa = posa;
 	this.vbuf = vbuf;
-    }
-    
-    public ColoredRadius(Gob gob, float r) {
-	this(gob, r, new Color(192, 0, 0, 128), new Color(255, 224, 96));
     }
     
     private FillBuffer sidx(Indices dst, Environment env) {
@@ -76,6 +72,7 @@ public class ColoredRadius implements RenderTree.Node {
 		posb.put((n + i) * 3 + 2, z - 10);
 	    }
 	} catch (Loading e) {
+	    lc = null;
 	    return;
 	}
 	vbuf.update(g);
@@ -84,8 +81,8 @@ public class ColoredRadius implements RenderTree.Node {
     public void gtick(Render g) {
 	Coord2d cc = gob.rc;
 	if((lc == null) || !lc.equals(cc)) {
-	    setz(g, gob.context(Glob.class), cc);
 	    lc = cc;
+	    setz(g, gob.context(Glob.class), cc);
 	}
     }
     

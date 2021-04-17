@@ -227,7 +227,7 @@ public class ItemFilter {
     }
     
     public static void showHelp(UI ui, String ...blocks) {
-	Window log = ui.root.add(new Window(new Coord(50, 50), "Filter Help"), new Coord(100, 50));
+	Window log = ui.root.add(new WindowX(new Coord(50, 50), "Filter Help"), new Coord(100, 50));
 	log.justclose = true;
 	Textlog txt = log.add(new Textlog(new Coord(450, 500)));
 	txt.quote = false;

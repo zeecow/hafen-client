@@ -9,15 +9,16 @@ import java.util.stream.Collectors;
 
 import static haven.Sprite.*;
 
-public class Hitbox extends GAttrib implements RenderTree.Node, Rendered {
+public class Hitbox extends SlottedNode implements Rendered {
     private static final VertexArray.Layout LAYOUT = new VertexArray.Layout(new VertexArray.Layout.Input(Homo3D.vertex, new VectorFormat(3, NumberFormat.FLOAT32), 0, 0, 12));
-    private final Model model;
+    private Model model;
+    private final Gob gob;
     private static final Map<Resource, Model> MODEL_CACHE = new HashMap<>();
     private static final float Z = 0.1f;
-    private static final Color SOLID_COLOR = new Color(180, 134, 255, 255);
+    private static final Color SOLID_COLOR = new Color(178, 71, 178, 255);
     private static final Color PASSABLE_COLOR = new Color(105, 207, 124, 255);
-    private static final float PASSABLE_WIDTH = 1f;
-    private static final float SOLID_WIDTH = 2f;
+    private static final float PASSABLE_WIDTH = 1.5f;
+    private static final float SOLID_WIDTH = 3f;
     private static final Pipe.Op TOP = Pipe.Op.compose(Rendered.last, States.Depthtest.none, States.maskdepth);
     private static final Pipe.Op SOLID = Pipe.Op.compose(new BaseColor(SOLID_COLOR), new States.LineWidth(SOLID_WIDTH));
     private static final Pipe.Op PASSABLE = Pipe.Op.compose(new BaseColor(PASSABLE_COLOR), new States.LineWidth(PASSABLE_WIDTH));
@@ -26,8 +27,8 @@ public class Hitbox extends GAttrib implements RenderTree.Node, Rendered {
     private Pipe.Op state;
     
     private Hitbox(Gob gob) {
-	super(gob);
 	model = getModel(gob);
+	this.gob = gob;
 	updateState();
     }
     
@@ -56,6 +57,13 @@ public class Hitbox extends GAttrib implements RenderTree.Node, Rendered {
 	if(model != null && slots != null) {
 	    boolean top = CFG.DISPLAY_GOB_HITBOX_TOP.get();
 	    Pipe.Op newState = passable() ? (top ? PASSABLE_TOP : PASSABLE) : (top ? SOLID_TOP : SOLID);
+	    try {
+	    	Model m = getModel(gob);
+		if(m != null && m != model) {
+	    	    model = m;
+	    	    slots.forEach(RenderTree.Slot::update);
+		}
+	    }catch (Loading ignored) {}
 	    if(newState != state) {
 		state = newState;
 		for (RenderTree.Slot slot : slots) {
@@ -67,10 +75,9 @@ public class Hitbox extends GAttrib implements RenderTree.Node, Rendered {
     
     private boolean passable() {
 	try {
-	    Resource res = gob.getres();
-	    String name = res != null ? res.name : "";
+	    String name = gob.resid();
+	    ResDrawable rd = (gob.drawable instanceof ResDrawable) ? (ResDrawable) gob.drawable : null;
 	    
-	    ResDrawable rd = gob.getattr(ResDrawable.class);
 	    if(rd != null) {
 		MessageBuf sdt = rd.sdt.clone();
 		int state = sdt.eom() ? 0xffff0000 : decnum(sdt);
@@ -78,11 +85,9 @@ public class Hitbox extends GAttrib implements RenderTree.Node, Rendered {
 		    if(state == 1) { // gate is open
 			return true;
 		    }
-		} else if(name.endsWith("/pow")) {//fire
-		    if(state == 17 || state == 33) { // this fire is actually hearth fire
-			return true;
-		    }
-		} else if(name.equals("gfx/terobjs/arch/cellardoor")) {
+		} else if(name.endsWith("/pow[hearth]")) {//hearth fire
+		    return true;
+		} else if(name.equals("gfx/terobjs/arch/cellardoor") || name.equals("gfx/terobjs/fishingnet")) {
 		    return true;
 		}
 	    }
@@ -92,9 +97,8 @@ public class Hitbox extends GAttrib implements RenderTree.Node, Rendered {
     
     private static Model getModel(Gob gob) {
 	Model model;
+	Resource res = getResource(gob);
 	synchronized (MODEL_CACHE) {
-	    Resource res = getResource(gob);
-	
 	    model = MODEL_CACHE.get(res);
 	    if(model == null) {
 		List<List<Coord3f>> polygons = new LinkedList<>();
