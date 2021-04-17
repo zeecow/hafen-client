@@ -618,6 +618,8 @@ public class MapView extends PView implements DTarget, Console.Directory {
  
 	@Override
 	public void snap(Direction dir) {
+	    if (isometric) return;
+	    
 	    switch (dir) {
 		case WEST:
 		    tangl = (float) (2 * Math.PI);
