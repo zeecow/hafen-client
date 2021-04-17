@@ -185,7 +185,7 @@ public class ZeecowOptionsWindow extends JFrame {
             String[] strArr = str.split(",");
             if(strArr!=null && strArr.length>0) {
                 ZeeConfig.autoClickMenuOptionList = str;
-                Utils.setpref("autoClickMenuOptionList",str.trim());
+                Utils.setpref("autoClickMenuOptionList",str.strip());
             }
         });
 
@@ -391,7 +391,7 @@ public class ZeecowOptionsWindow extends JFrame {
         panelGobDetails.add(cmbGobCategory = new JComboBox<String>(ZeeConfig.mapCategoryGobs.keySet().toArray(new String[0])),BorderLayout.CENTER);
 
         //update combo category
-        String categ = getCategoryByGob(tfGobName.getText().trim());
+        String categ = getCategoryByGob(tfGobName.getText().strip());
         if(categ!=null && !categ.isEmpty()) {
             cmbGobCategory.setSelectedItem(categ);
         }else {
@@ -412,11 +412,11 @@ public class ZeecowOptionsWindow extends JFrame {
 
     public void removeCategory(){
         if(JOptionPane.showConfirmDialog(this,"Delete category \""+listGobsCategories.getSelectedValue()+"\" ?") == JOptionPane.OK_OPTION){
-            ZeeConfig.mapCategoryGobs.remove(listGobsCategories.getSelectedValue().trim());
+            ZeeConfig.mapCategoryGobs.remove(listGobsCategories.getSelectedValue().strip());
             String str = ZeeConfig.mapCategoryGobs.toString()
                     .replace("{","")
                     .replace("}","")
-                    .trim();
+                    .strip();
             Utils.setpref("mapCategoryGobsString", str);
             ZeeConfig.mapCategoryGobsString = str;
         }
@@ -424,8 +424,8 @@ public class ZeecowOptionsWindow extends JFrame {
 
     private void addCategoryNew() {
         String categName = JOptionPane.showInputDialog("Type new category name: ");
-        if(categName!=null && !categName.trim().isEmpty()){
-            if (ZeeConfig.mapCategoryGobs.keySet().contains(categName.trim())){
+        if(categName!=null && !categName.strip().isEmpty()){
+            if (ZeeConfig.mapCategoryGobs.keySet().contains(categName.strip())){
                 JOptionPane.showMessageDialog(this,"Category already exists.");
                 return;
             }
@@ -433,7 +433,7 @@ public class ZeecowOptionsWindow extends JFrame {
             String str = ZeeConfig.mapCategoryGobs.toString()
                     .replace("{","")
                     .replace("}","")
-                    .trim();
+                    .strip();
             Utils.setpref("mapCategoryGobsString",str);
             ZeeConfig.mapCategoryGobsString = str;
         }
@@ -446,7 +446,7 @@ public class ZeecowOptionsWindow extends JFrame {
             s = ((String)map.get(key));
             if( s.contains(gobName) ){
                 System.out.println("getCategoryByGob() = "+key);
-                return ((String)key).trim();
+                return ((String)key).strip();
             }
         }
         System.out.println("getCategoryByGob() = null");
@@ -509,7 +509,7 @@ public class ZeecowOptionsWindow extends JFrame {
         String gobs = ZeeConfig.mapCategoryGobs.get(gobCategory);
         System.out.println("removeGobFromCategory() > mapCategoryGobs.get() =  "+gobs);
         if(gobs!=null){
-            String[] strArr = gobs.replace("[","").replace("]","").replace(", ",",").trim().split(",");
+            String[] strArr = gobs.replace("[","").replace("]","").replace(", ",",").strip().split(",");
             ArrayList<String> list = new ArrayList<String>(Arrays.asList(strArr));
             list.remove(gobName);
             strArr = Arrays.copyOf(list.toArray(), list.size(), String[].class);
@@ -526,8 +526,8 @@ public class ZeecowOptionsWindow extends JFrame {
 
     private void removeGobFromCategory(){
         try {
-            String gobName = tfGobName.getText().trim();
-            String gobCategory = cmbGobCategory.getSelectedItem().toString().trim();
+            String gobName = tfGobName.getText().strip();
+            String gobCategory = cmbGobCategory.getSelectedItem().toString().strip();
             removeGobFromCategory(gobName, gobCategory);
             cmbGobCategory.setSelectedIndex(-1);
         }catch(Exception e){
@@ -543,7 +543,7 @@ public class ZeecowOptionsWindow extends JFrame {
         String gobs = ZeeConfig.mapCategoryGobs.get(gobCategory);
         if (gobs != null) {
             System.out.printf("1. gobs = %s\n", gobs);
-            String[] strArr = gobs.replace("[", "").replace("]", "").replace(", ", ",").trim().split(",");
+            String[] strArr = gobs.replace("[", "").replace("]", "").replace(", ", ",").strip().split(",");
             System.out.printf("2. strArr len%s = %s\n", strArr.length,strArr);
             ArrayList<String> list = new ArrayList<String>(Arrays.asList(strArr));
             System.out.printf("3. list size before = %s\n", list.size());
@@ -570,8 +570,8 @@ public class ZeecowOptionsWindow extends JFrame {
             if(cmbGobCategory==null || cmbGobCategory.getSelectedIndex() < 0)
                 return;
 
-            String gobName = tfGobName.getText().trim();
-            String gobCategory =  cmbGobCategory.getSelectedItem().toString().trim();
+            String gobName = tfGobName.getText().strip();
+            String gobCategory =  cmbGobCategory.getSelectedItem().toString().strip();
 
             //if gob already has category, remove it
             String prevCategory = getCategoryByGob(gobName);
@@ -592,9 +592,9 @@ public class ZeecowOptionsWindow extends JFrame {
         String path;
 
         if(tabbedPaneGobs.getSelectedIndex()==TABGOB_CATEGS)
-            path = tfAudioPathCateg.getText().trim();
+            path = tfAudioPathCateg.getText().strip();
         else
-            path = tfAudioPath.getText().trim();
+            path = tfAudioPath.getText().strip();
 
         if(path.isBlank()){
             JOptionPane.showMessageDialog(this,"audio path is blank");
@@ -615,17 +615,17 @@ public class ZeecowOptionsWindow extends JFrame {
 
             //remove category audio
             if(tabbedPaneGobs.getSelectedIndex()==TABGOB_CATEGS) {
-                ZeeConfig.mapCategoryAudio.remove(listGobsCategories.getSelectedValue().trim());
+                ZeeConfig.mapCategoryAudio.remove(listGobsCategories.getSelectedValue().strip());
                 str = ZeeConfig.mapCategoryAudio.toString()
                         .replace("{", "")
                         .replace("}", "")
-                        .trim();
+                        .strip();
                 Utils.setpref("mapCategoryAudioString", str );
                 ZeeConfig.mapCategoryAudioString = str;
 
             //remove gob audio
             } else {
-                String gobName = tfGobName.getText().trim();
+                String gobName = tfGobName.getText().strip();
                 if (!ZeeConfig.mapGobSaved.containsKey(gobName)){
                     JOptionPane.showMessageDialog(this,"Gob has no audio set.\n Try remove from category.");
                     return;
@@ -634,7 +634,7 @@ public class ZeecowOptionsWindow extends JFrame {
                 str = ZeeConfig.mapGobSaved.toString()
                         .replace("{", "")
                         .replace("}", "")
-                        .trim();
+                        .strip();
                 Utils.setpref("mapGobSavedString", str);
                 ZeeConfig.mapGobSavedString = str;
             }
@@ -662,15 +662,15 @@ public class ZeecowOptionsWindow extends JFrame {
                 list = listGobsCategories;
                 tfAudioPathCateg.setText(fileChooser.getSelectedFile().getAbsolutePath());
                 ZeeConfig.mapCategoryAudio.put(
-                        tfCategName.getText().trim(),
-                        ZeeConfig.encodeURL(fileChooser.getSelectedFile().getAbsolutePath().trim())
+                        tfCategName.getText().strip(),
+                        ZeeConfig.encodeURL(fileChooser.getSelectedFile().getAbsolutePath().strip())
                 );
                 str = ZeeConfig.mapCategoryAudio.toString()
                         .replace("{","")
                         .replace("}","")
                         .replace(", ",",")
                         .replace(" ,",",")
-                        .trim();
+                        .strip();
                 Utils.setpref("mapCategoryAudioString", str);
                 ZeeConfig.mapCategoryAudioString = str;
 
@@ -680,15 +680,15 @@ public class ZeecowOptionsWindow extends JFrame {
                 list = listGobsSaved;
                 tfAudioPath.setText(fileChooser.getSelectedFile().getAbsolutePath());
                 ZeeConfig.mapGobSaved.put(
-                        tfGobName.getText().trim(),
-                        ZeeConfig.encodeURL(fileChooser.getSelectedFile().getAbsolutePath().trim())
+                        tfGobName.getText().strip(),
+                        ZeeConfig.encodeURL(fileChooser.getSelectedFile().getAbsolutePath().strip())
                 );
                 str = ZeeConfig.mapGobSaved.toString()
                         .replace("{","")
                         .replace("}","")
                         .replace(", ",",")
                         .replace(" ,",",")
-                        .trim();
+                        .strip();
                 Utils.setpref("mapGobSavedString", str);
                 ZeeConfig.mapGobSavedString = str;
             }
