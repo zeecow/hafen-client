@@ -2315,7 +2315,7 @@ public class CharWnd extends WindowX {
 		if(args[a] instanceof byte[])
 		    t.sdt = new MessageBuf((byte[])args[a++]);
 		double m = ((Number)args[a++]).doubleValue();
-		ui.sess.character.constipation.update(t.res, m);
+		ui.sess.character.constipation.update(t, m);
 		cons.update(t, m);
 	    }
 	} else if(nm == "csk") {
