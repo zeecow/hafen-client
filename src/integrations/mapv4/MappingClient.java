@@ -49,8 +49,8 @@ public class MappingClient {
     public static void destroy() {
 	synchronized (MappingClient.class) {
 	    if(INSTANCE != null) {
-	        INSTANCE.gridsUploader.shutdownNow();
-	        INSTANCE.scheduler.shutdownNow();
+	        INSTANCE.gridsUploader.shutdown();
+	        INSTANCE.scheduler.shutdown();
 		INSTANCE = null;
 	    }
 	}
