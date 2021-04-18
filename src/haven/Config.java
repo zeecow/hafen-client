@@ -317,13 +317,14 @@ public class Config {
     }
     
     public static void initAutomapper(UI ui) {
-	if(!MappingClient.initialized()) {
-	    MappingClient.init(ui.sess.glob);
-	    MappingClient automapper = MappingClient.getInstance();
-	    automapper.SetPlayerName(playername);
-	    automapper.SetEndpoint(CFG.AUTOMAP_ENDPOINT.get());
-	    automapper.EnableGridUploads(CFG.AUTOMAP_UPLOAD.get());
-	    automapper.EnableTracking(CFG.AUTOMAP_TRACK.get());
+        if (MappingClient.initialized()) {
+            MappingClient.destroy();
 	}
+	MappingClient.init(ui.sess.glob);
+	MappingClient automapper = MappingClient.getInstance();
+	automapper.SetPlayerName(playername);
+	automapper.SetEndpoint(CFG.AUTOMAP_ENDPOINT.get());
+	automapper.EnableGridUploads(CFG.AUTOMAP_UPLOAD.get());
+	automapper.EnableTracking(CFG.AUTOMAP_TRACK.get());
     }
 }
