@@ -27,6 +27,7 @@
 	<pathelement path="lib/jnlp.jar" />
 	<pathelement path="lib/jglob.jar" />
       <pathelement path="lib/commons-lang3-3.12.0.jar" />
+      <pathelement path="lib/gson.jar" />
       </classpath>
       <compilerarg value="-Xlint:unchecked" />
       <compilerarg value="-Xlint:-options" />
@@ -59,7 +60,7 @@
       <fileset dir="build/classes-lib" />
       <manifest>
 	<attribute name="Main-Class" value="haven.MainFrame" />
-	<attribute name="Class-Path" value="jogl.jar gluegen-rt.jar builtin-res.jar hafen-res.jar commons-lang3-3.12.0.jar" />
+	<attribute name="Class-Path" value="jogl.jar gluegen-rt.jar builtin-res.jar hafen-res.jar commons-lang3-3.12.0.jar gson.jar" />
       </manifest>
     </jar>
     <chmod file="build/hafen.jar" perm="a+x" />
@@ -84,6 +85,7 @@
 	<include name="hafen-res.jar" />
 	<include name="builtin-res.jar" />
       <include name="commons-lang3-3.12.0.jar" />
+      <include name="gson.jar" />
       </fileset>
       <fileset dir="lib/jogl-natives" />
     </copy>

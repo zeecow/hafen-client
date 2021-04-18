@@ -1,5 +1,6 @@
 package haven;
 
+import com.google.gson.Gson;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 
 import javax.imageio.ImageIO;
@@ -27,6 +28,8 @@ public class ZeeConfig {
     public static Window windowIconSettings;
     public static Window windowInventory;
     public static Window windowOptions;
+
+    public static Gson gson = new Gson();
 
     public static ZeecowOptionsWindow zeecowOptions;
 
@@ -171,8 +174,8 @@ public class ZeeConfig {
     }
 
 
-    public static void printObj(Widget wdg) {
-        System.out.println(ReflectionToStringBuilder.toString(wdg, new ZeeMyRecursiveToStringStyle(1)));
+    public static void printObj(Object ob) {
+        System.out.println(ReflectionToStringBuilder.toString(ob, new ZeeMyRecursiveToStringStyle(1)));
     }
 
     public static void checkRemoteWidget(String type, Widget wdg) {
