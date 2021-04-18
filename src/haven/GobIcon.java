@@ -123,8 +123,8 @@ public class GobIcon extends GAttrib {
 	    synchronized(cachegray) {
 		Image img = cachegray.get(res);
 		if(img == null) {
-		    img = new Image(res.get().layer(Resource.imgc),
-			PUtils.monochromize(res.get().layer(Resource.imgc).img, Color.WHITE));
+		    Resource.Image rimg = res.get().layer(Resource.imgc);
+		    img = new Image(rimg, PUtils.monochromize(rimg.img, Color.WHITE));
 		    cachegray.put(res, img);
 		}
 		this.imggray = img;
