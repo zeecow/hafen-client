@@ -3,13 +3,10 @@ package haven;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 
 import javax.imageio.ImageIO;
-import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.awt.image.RenderedImage;
 import java.io.*;
 import java.lang.reflect.Field;
-import java.net.URLDecoder;
-import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
@@ -20,6 +17,9 @@ public class ZeeConfig {
     public static final String CTGNAME_AGROCREATURES = "Agressive creatures";
     public static final String CTGNAME_RAREFORAGE = "Rare forageables";
     public static final String CTGNAME_LOCRES = "Localized resources";
+    public static final String MAP_GOB_SAVED = "mapGobSaved";
+    public static final String MAP_CATEGORY_AUDIO = "mapCategoryAudio";
+    public static final String MAP_CATEGORY_GOBS = "mapCategoryGobs";
     public static GameUI gameUI;
     public static Window windowBelt;
     public static Window windowCattleRoster;
@@ -125,12 +125,9 @@ public class ZeeConfig {
     ));
 
 
-    public static String mapGobSavedString;
-    public static String mapCategoryGobsString;
-    public static String mapCategoryAudioString;
     public static HashMap<String,String> mapGobSession = new HashMap<String,String>();
-    public static HashMap<String,String> mapGobSaved = initMapGobSaved();
-    public static HashMap<String,String> mapCategoryGobs = initMapCategoryGobs();
+    public static HashMap<String,String> mapGobAudio = initMapGobSaved();
+    public static HashMap<String, Set<String>> mapCategoryGobs = initMapCategoryGobs();
     public static HashMap<String,String> mapCategoryAudio = initMapCategoryAudio();
 
 
@@ -217,13 +214,13 @@ public class ZeeConfig {
             if(alertOnPlayers){
                 String audio = mapCategoryAudio.get(CTGNAME_PVP);
                 if(audio!=null && !audio.isEmpty())
-                    playAudio(decodeURL(audio));
+                    playAudio(audio);
                 else
                     gameUI.error("player spotted");
             }
-        }else if( (path = mapGobSaved.get(name)) != null){
+        }else if( (path = mapGobAudio.get(name)) != null){
             //if single gob alert is saved, play alert
-            ZeeConfig.playAudio(decodeURL(path));
+            ZeeConfig.playAudio(path);
         }else {
             //for each category in mapCategoryGobs...
             for (String categ: mapCategoryGobs.keySet()){
@@ -233,7 +230,7 @@ public class ZeeConfig {
                 if(mapCategoryGobs.get(categ).contains(name)){
                     //play audio for category
                     path = mapCategoryAudio.get(categ);
-                    ZeeConfig.playAudio(decodeURL(path));
+                    ZeeConfig.playAudio(path);
                 }
             }
         }
@@ -340,79 +337,39 @@ public class ZeeConfig {
         return y;
     }
 
-    public static HashMap<String, String> initMapCategoryGobs() {
-        HashMap<String,String> mapCateGob = new HashMap<String,String>();
-        mapCategoryGobsString = Utils.getpref("mapCategoryGobsString","");
-        if(mapCategoryGobsString.isEmpty()) {
-            System.out.println("initMapCategoryGobs() > setting default categories");
-            mapCateGob.put(CTGNAME_LOCRES, localizedResources.toString());
-            mapCateGob.put(CTGNAME_RAREFORAGE, rareForageables.toString());
-            mapCateGob.put(CTGNAME_AGROCREATURES, aggressiveGobs.toString());
-            mapCateGob.put(CTGNAME_PVP, pvpGobs.toString());
-            mapCategoryGobsString = mapCateGob.toString();
+    @SuppressWarnings("unchecked")
+    public static HashMap<String, Set<String>> initMapCategoryGobs() {
+        HashMap<String, Set<String>> ret;
+        String s = Utils.getpref("mapCategoryGobs","");
+        if(s.isEmpty()) {
+            ret = new HashMap<>();
+            ret.put(CTGNAME_LOCRES, localizedResources);
+            ret.put(CTGNAME_RAREFORAGE, rareForageables);
+            ret.put(CTGNAME_AGROCREATURES, aggressiveGobs);
+            ret.put(CTGNAME_PVP, pvpGobs);
+            Utils.setpref(MAP_CATEGORY_GOBS,serialize(ret));
         }else{
-            //TOFIX losing brackets bug?
-            System.out.println("initMapCategoryGobs() > fetching saved categories");
-            //fill map object and return it
-            String[] mapStr = mapCategoryGobsString.split("],?");
-            String[] categArr;
-            System.out.println("> len="+mapStr.length+"  "+mapCategoryGobsString);
-            for (String s: mapStr) {
-                if(s.trim().isEmpty()) {
-                    System.out.println("skipping \""+s+"\"");
-                    continue;
-                }
-                //"category=gob1,gob2"
-                s = s.replaceAll("[{}\\[\\]]+","");
-                categArr = s.split("=");
-                if(categArr.length<2) {
-                    System.out.println("skipping \"" + s + "\"");
-                    continue;
-                }
-                mapCateGob.put(categArr[0].trim(),categArr[1].trim());
-            }
+            ret = (HashMap<String, Set<String>>) deserialize(s);
         }
-        return mapCateGob;
+        return ret;
     }
 
-
+    @SuppressWarnings("unchecked")
     public static HashMap<String, String> initMapCategoryAudio() {
-        mapCategoryAudioString = Utils.getpref("mapCategoryAudioString","");
-        System.out.println("initMapCategoryAudio()");
-        HashMap<String,String> ret = new HashMap<String,String>();
-        String[] mapStr = mapCategoryAudioString.split(",");
-        String[] categInfo;
-        try {
-            for (String s : mapStr) {
-                if(s.isBlank())
-                    continue;
-                categInfo = s.split("=");
-                ret.put(categInfo[0].trim(), categInfo.length>1 ? categInfo[1].trim() : "");
-            }
-        }catch (Exception e) {
-            e.printStackTrace();
-        }
-        return ret;
+        String s = Utils.getpref(MAP_CATEGORY_AUDIO,"");
+        if (s.isEmpty())
+            return new HashMap<String,String> ();
+        else
+            return (HashMap<String, String>) deserialize(s);
     }
 
-
+    @SuppressWarnings("unchecked")
     public static HashMap<String, String> initMapGobSaved() {
-        mapGobSavedString = Utils.getpref("mapGobSavedString","");
-        System.out.println("initMapGobSaved()");
-        HashMap<String,String> ret = new HashMap<String,String>();
-        String[] mapStr = mapGobSavedString.split(",");
-        String[] gobInfo;
-        try {
-            for (String s : mapStr) {
-                if(s.isBlank())
-                    continue;
-                gobInfo = s.split("=");
-                ret.put(gobInfo[0], gobInfo.length>1 ? gobInfo[1].trim() : "");
-            }
-        }catch (Exception e) {
-            e.printStackTrace();
-        }
-        return ret;
+        String s = Utils.getpref(MAP_GOB_SAVED,"");
+        if (s.isEmpty())
+            return new HashMap<String,String> ();
+        else
+            return (HashMap<String, String>) deserialize(s);
     }
 
     public static void playMidi(String[] notes){
@@ -483,7 +440,7 @@ public class ZeeConfig {
         //new ZeeSynth(filePath).start();
     }
 
-
+/*
     public static String decodeURL(String s){
         return URLDecoder.decode(s, StandardCharsets.UTF_8);
     }
@@ -491,6 +448,8 @@ public class ZeeConfig {
     public static String encodeURL(String s){
         return URLEncoder.encode(s, StandardCharsets.UTF_8);
     }
+
+ */
 
     public static String serialize(Serializable o) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -503,7 +462,7 @@ public class ZeeConfig {
         return Base64.getEncoder().encodeToString(baos.toByteArray());
     }
 
-    private static Object deserialize(String s){
+    public static Object deserialize(String s){
         byte[] data = Base64.getDecoder().decode(s);
         Object o = null;
         try (ObjectInputStream ois = new ObjectInputStream(
