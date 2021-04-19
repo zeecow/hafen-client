@@ -285,7 +285,7 @@ public class LoginScreen extends Widget {
     protected void added() {
 	presize();
 	parent.setfocus(this);
-	if(Config.isUpdate || true) {
+	if(Config.isUpdate) {
 	    showChangeLog();
 	}
     }
