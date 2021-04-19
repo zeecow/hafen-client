@@ -1,3 +1,7 @@
+$size[14]{$u{Update for 19.04.21:}
+  * merged loftar's code
+  * fixed food satiety tooltip showing wrong categories
+ 
 $size[14]{$u{Update for 16.04.21:}
   * added ability to change which mod key ignores auto choosing menus (Options->General)
   * added auto peace option (Options->Display)
