@@ -2123,11 +2123,11 @@ public class CharWnd extends WindowX {
 		}
 
 		protected void depress() {
-		    Audio.play(Button.lbtdown.stream());
+		    ui.sfx(Button.lbtdown.stream());
 		}
 
 		protected void unpress() {
-		    Audio.play(Button.lbtup.stream());
+		    ui.sfx(Button.lbtup.stream());
 		}
 	    }
 

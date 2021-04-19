@@ -555,6 +555,13 @@ public class UI {
 	return (gui != null && gui.pathQueue != null) ? Optional.of(gui.pathQueue) : Optional.empty();
     }
 
+    public void sfx(Audio.CS clip) {
+	Audio.play(clip);
+    }
+    public void sfx(Resource clip) {
+	sfx(Audio.fromres(clip));
+    }
+
     public static double scale(double v) {
 	return(v * scalef);
     }
