@@ -65,6 +65,13 @@ public class MenuGrid extends Widget implements KeyBinding.Bindable {
 	    this.bind = binding();
 	}
 
+	public Integer usesCount() {
+		String name = name();
+		Integer count = ZeeConfig.mapActionUses.get(name);
+		if (count==null)
+			count=0;
+		return(count);
+	}
 	public BufferedImage img() {return(res.layer(Resource.imgc).scaled());}
 	public String name() {return(res.layer(Resource.action).name);}
 	public KeyMatch hotkey() {

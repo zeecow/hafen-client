@@ -72,7 +72,7 @@ public class Window extends Widget implements DTarget {
 	Resource.loadsimg("gfx/hud/wnd/lg/cbtnd"),
 	Resource.loadsimg("gfx/hud/wnd/lg/cbtnh")};
     public final Coord tlo, rbo, mrgn;
-    public final IButton cbtn;
+    public final Button cbtn;
     public boolean dt = false;
     public Text cap;
     public Coord wsz, ctl, csz, atl, asz, cptl, cpsz;
@@ -95,7 +95,8 @@ public class Window extends Widget implements DTarget {
 	this.tlo = tlo;
 	this.rbo = rbo;
 	this.mrgn = lg ? dlmrgn : dsmrgn;
-	cbtn = add(new IButton(cbtni[0], cbtni[1], cbtni[2]));
+	//cbtn = add(new IButton(cbtni[0], cbtni[1], cbtni[2]));
+	cbtn = add(new Button(30,"x"));
 	chcap(cap);
 	resize2(sz);
 	setfocustab(true);
@@ -217,7 +218,7 @@ public class Window extends Widget implements DTarget {
 	cptl = new Coord(ctl.x, tlo.y);
 	cpsz = tlo.add(cpo.x + cmw, cm.sz().y).sub(cptl);
 	cmw = cmw - (cl.sz().x - cpo.x) - UI.scale(5);
-	cbtn.c = xlate(tlo.add(wsz.x - cbtn.sz.x, 0), false);
+	cbtn.c = xlate(tlo.add(wsz.x - cbtn.sz.x, cbtn.sz.y), false);
 	for(Widget ch = child; ch != null; ch = ch.next)
 	    ch.presize();
     }

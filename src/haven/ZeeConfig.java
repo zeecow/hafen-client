@@ -21,13 +21,14 @@ public class ZeeConfig {
     public static final String MAP_GOB_SAVED = "mapGobSaved";
     public static final String MAP_CATEGORY_AUDIO = "mapCategoryAudio";
     public static final String MAP_CATEGORY_GOBS = "mapCategoryGobs";
+    public static final String MAP_ACTION_USES = "mapActionUses";
     public static GameUI gameUI;
     public static Window windowBelt;
     public static Window windowCattleRoster;
     public static Window windowEquipment;
     public static Window windowIconSettings;
     public static Window windowInventory;
-    public static Window windowOptions;
+    public static Window windowActions;
 
     public static Gson gson = new Gson();
 
@@ -132,6 +133,7 @@ public class ZeeConfig {
     public static HashMap<String,String> mapGobAudio = initMapGobSaved();
     public static HashMap<String, Set<String>> mapCategoryGobs = initMapCategoryGobs();
     public static HashMap<String,String> mapCategoryAudio = initMapCategoryAudio();
+    public static HashMap<String,Integer> mapActionUses= initMapActionUses();
 
 
     public static Collection<Field> getAllFields(Class<?> type) {
@@ -175,7 +177,12 @@ public class ZeeConfig {
 
 
     public static void printObj(Object ob) {
-        System.out.println(ReflectionToStringBuilder.toString(ob, new ZeeMyRecursiveToStringStyle(1)));
+        System.out.println(
+                ReflectionToStringBuilder.toString(
+                        ob,
+                        new ZeeMyRecursiveToStringStyle(1)
+                ).replace(",",",\n")
+        );
     }
 
     public static void checkRemoteWidget(String type, Widget wdg) {
@@ -315,8 +322,8 @@ public class ZeeConfig {
             windowIconSettings = window;
         }else if(cap.contains("Inventory")) {
             windowInventory = window;
-        }else if(cap.contains("Options")) {
-            windowOptions = window;
+        }else if(cap.contains("Action search")) {
+            windowActions = window;
         }
     }
 
@@ -375,11 +382,34 @@ public class ZeeConfig {
             return (HashMap<String, String>) deserialize(s);
     }
 
+    @SuppressWarnings("unchecked")
+    public static HashMap<String, Integer> initMapActionUses() {
+        String s = Utils.getpref(MAP_ACTION_USES,"");
+        if (s.isEmpty())
+            return new HashMap<String,Integer> ();
+        else
+            return (HashMap<String, Integer>) deserialize(s);
+    }
+
+    //count uses for each Action Search item
+    public static void actionUsed(String actionName) {
+        if(actionName==null || actionName.isEmpty())
+            return;
+        Integer uses = mapActionUses.get(actionName);
+        if(uses==null){
+            uses = 0;
+        }
+        uses++;
+        mapActionUses.put(actionName, uses);
+        Utils.setpref(MAP_ACTION_USES,serialize(mapActionUses));
+    }
+
     public static void playMidi(String[] notes){
         if(playingAudio!=null && playingAudio.contains(notes.toString()))
             return;//avoid duplicate audio
         new ZeeSynth(notes).start();
     }
+
     public static void playMidi(String[] notes, int instr){
         if(playingAudio!=null && playingAudio.contains(notes.toString()))
             return;//avoid duplicate audio
@@ -443,17 +473,6 @@ public class ZeeConfig {
         //new ZeeSynth(filePath).start();
     }
 
-/*
-    public static String decodeURL(String s){
-        return URLDecoder.decode(s, StandardCharsets.UTF_8);
-    }
-
-    public static String encodeURL(String s){
-        return URLEncoder.encode(s, StandardCharsets.UTF_8);
-    }
-
- */
-
     public static String serialize(Serializable o) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try (ObjectOutputStream oos = new ObjectOutputStream(baos)) {
@@ -495,7 +514,6 @@ public class ZeeConfig {
             throw new UncheckedIOException(ioe);
         }
     }
-
 }
 
 

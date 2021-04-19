@@ -1,7 +1,8 @@
 # Zeecow hafen-client
 
 original features:
- - search actions global
+ - search actions globally
+ - sort actions by most used craft items
  - compact equip window
  - auto toggle equip window
  - shorter cattle roster window
@@ -15,3 +16,4 @@ other stuff:
  - replaces arrow cursor with system's default
  - show claims by default
  - optional friend online notification
+ - big ugly close buttons

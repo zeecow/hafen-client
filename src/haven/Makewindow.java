@@ -164,6 +164,7 @@ public class Makewindow extends Widget {
 	add(new Button(UI.scale(85), "Craft All"), UI.scale(new Coord(360, 75))).action(() -> wdgmsg("make", 1)).setgkey(kb_makeall);
 	pack();
 	this.rcpnm = rcpnm;
+	ZeeConfig.actionUsed(rcpnm);
     }
 
     public void uimsg(String msg, Object... args) {

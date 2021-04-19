@@ -22,7 +22,7 @@ public class MenuSearch extends Window {
 	private Result(PagButton btn) {
 	    this.btn = btn;
 	}
-    }
+	}
 
     private static final Text.Foundry elf = CharWnd.attrf;
     private static final int elh = elf.height() + UI.scale(2);
@@ -130,7 +130,8 @@ public class MenuSearch extends Window {
 		}
 	    }
 	}
-	Collections.sort(found, Comparator.comparing(PagButton::name));
+	//Collections.sort(found, Comparator.comparing(PagButton::name));
+	Collections.sort(found, Comparator.comparing(PagButton::usesCount).reversed());
 	Map<PagButton, Result> prev = new HashMap<>();
 	for(Result pr : this.cur)
 	    prev.put(pr.btn, pr);
