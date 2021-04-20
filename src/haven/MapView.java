@@ -76,6 +76,10 @@ public class MapView extends PView implements DTarget, Console.Directory {
 	void mmousemove(Coord mc);
     }
 
+    private enum Direction {
+        WEST, EAST, NORTH, SOUTH
+    }
+    
     public abstract class Camera implements Pipe.Op {
 	protected haven.render.Camera view = new haven.render.Camera(Matrix4f.identity());
 	protected Projection proj = new Projection(Matrix4f.identity());
@@ -99,6 +103,7 @@ public class MapView extends PView implements DTarget, Console.Directory {
 	
 	public void rotate(Coord r) {}
 	public void reset() {}
+	public void snap(Direction dir) {}
 	
 	public void resized() {
 	    float field = 0.5f;
@@ -161,13 +166,31 @@ public class MapView extends PView implements DTarget, Console.Directory {
 	    tangl = tangl % ((float)Math.PI * 2.0f);
 	    wheel(Coord.z, 5 * r.y);
 	}
-    
+ 
 	@Override
 	public void reset() {
 	    elev = telev = (float)Math.PI / 6.0f;
 	    angl = tangl = 0.0f;
 	}
-    
+ 
+	@Override
+	public void snap(Direction dir) {
+	    switch (dir) {
+		case WEST:
+		    tangl = (float) (2 * Math.PI);
+		    break;
+		case EAST:
+		    tangl = (float) Math.PI;
+		    break;
+		case NORTH:
+		    tangl = (float) (3 * Math.PI / 2);
+		    break;
+		case SOUTH:
+		    tangl = (float) (Math.PI / 2);
+		    break;
+	    }
+	}
+ 
 	private double f0 = 0.2, f1 = 0.5, f2 = 0.9;
 	private double fl = Math.sqrt(2);
 	private double fa = ((fl * (f1 - f0)) - (f2 - f0)) / (fl - 2);
@@ -292,13 +315,32 @@ public class MapView extends PView implements DTarget, Console.Directory {
 	    angl = angl + ((float) c.x / 100.0f);
 	    angl = angl % ((float) Math.PI * 2.0f);
 	}
-    
+ 
 	@Override
 	public void reset() {
 	    dist = 50.0f;
 	    elev = (float) Math.PI / 4.0f;
 	    angl = 0.0f;
 	}
+ 
+	@Override
+	public void snap(Direction dir) {
+	    switch (dir) {
+		case WEST:
+		    angl = (float) (2 * Math.PI);
+		    break;
+		case EAST:
+		    angl = (float) Math.PI;
+		    break;
+		case NORTH:
+		    angl = (float) (3 * Math.PI / 2);
+		    break;
+		case SOUTH:
+		    angl = (float) (Math.PI / 2);
+		    break;
+	    }
+	}
+	
     }
     static {camtypes.put("worse", SimpleCam.class);}
 
@@ -359,7 +401,25 @@ public class MapView extends PView implements DTarget, Console.Directory {
 	    telev = (float) Math.PI / 4.0f;
 	    tangl = 0.0f;
 	}
-    
+ 
+	@Override
+	public void snap(Direction dir) {
+	    switch (dir) {
+		case WEST:
+		    tangl = (float) (2 * Math.PI);
+		    break;
+		case EAST:
+		    tangl = (float) Math.PI;
+		    break;
+		case NORTH:
+		    tangl = (float) (3 * Math.PI / 2);
+		    break;
+		case SOUTH:
+		    tangl = (float) (Math.PI / 2);
+		    break;
+	    }
+	}
+ 
 	public void drag(Coord c) {
 	    c = inversion(c, dragorig);
 	    telev = elevorig - ((float)(c.y - dragorig.y) / 100.0f);
@@ -555,6 +615,27 @@ public class MapView extends PView implements DTarget, Console.Directory {
 	    tangl = angl + (float)Utils.cangle(-(float)Math.PI * 0.25f - angl);
 	    chfield((float)(100 * Math.sqrt(2)));
 	}
+ 
+	@Override
+	public void snap(Direction dir) {
+	    if (isometric) return;
+	    
+	    switch (dir) {
+		case WEST:
+		    tangl = (float) (2 * Math.PI);
+		    break;
+		case EAST:
+		    tangl = (float) Math.PI;
+		    break;
+		case NORTH:
+		    tangl = (float) (3 * Math.PI / 2);
+		    break;
+		case SOUTH:
+		    tangl = (float) (Math.PI / 2);
+		    break;
+	    }
+	}
+    
     }
     static {camtypes.put("ortho", SOrthoCam.class);}
     
@@ -2496,6 +2577,19 @@ public class MapView extends PView implements DTarget, Console.Directory {
 	    CFG.CAMERA_INVERT_X.get() ? -1 : 1,
 	    CFG.CAMERA_INVERT_Y.get() ? -1 : 1
 	)); 
+    }
+    
+    public void snapCameraWest() {
+	camera.snap(Direction.WEST);
+    }
+    public void snapCameraEast() {
+	camera.snap(Direction.EAST);
+    }
+    public void snapCameraNorth() {
+	camera.snap(Direction.NORTH);
+    }
+    public void snapCameraSouth() {
+	camera.snap(Direction.SOUTH);
     }
     
     public void resetCamera() { camera.reset(); }

@@ -34,6 +34,10 @@ public enum Action {
     CAM_ROTATE_RIGHT(gui -> gui.map.rotateCamera(Coord.right), "Camera move right"),
     CAM_ROTATE_UP(gui -> gui.map.rotateCamera(Coord.up), "Camera move up"),
     CAM_ROTATE_DOWN(gui -> gui.map.rotateCamera(Coord.down), "Camera move down"),
+    CAM_SNAP_WEST(gui -> gui.map.snapCameraWest(), "Camera snap west"),
+    CAM_SNAP_EAST(gui -> gui.map.snapCameraEast(), "Camera snap east"),
+    CAM_SNAP_NORTH(gui -> gui.map.snapCameraNorth(), "Camera snap north"),
+    CAM_SNAP_SOUTH(gui -> gui.map.snapCameraSouth(), "Camera snap south"),
     CAM_RESET(gui -> gui.map.resetCamera(), "Camera reset"),
     
     CLEAR_PLAYER_DAMAGE(GobDamageInfo::clearPlayerDamage, "Clear damage from player"),
