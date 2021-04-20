@@ -127,6 +127,14 @@ public class JOGLPanel extends GLCanvas implements Runnable, UIPanel, Console.Di
 	newui(null);
 	if(Toolkit.getDefaultToolkit().getMaximumCursorColors() >= 256)
 	    cursmode = "awt";
+	
+	updateForceHWCursor(CFG.FORCE_HW_CURSOR);
+	CFG.FORCE_HW_CURSOR.observe(this::updateForceHWCursor);
+    }
+    
+    private void updateForceHWCursor(CFG<Boolean> cfg){
+	forceHW = cfg.get();
+	lastcursor = null;
     }
 
     private boolean iswap() {
@@ -397,13 +405,14 @@ public class JOGLPanel extends GLCanvas implements Runnable, UIPanel, Console.Di
     }
 
     private String cursmode = "tex";
+    private boolean forceHW = false;
     private Resource lastcursor = null;
     private void drawcursor(UI ui, GOut g) {
 	Resource curs;
 	synchronized(ui) {
 	    curs = ui.getcurs(ui.mc);
 	}
-	if(cursmode == "awt") {
+	if(cursmode == "awt" || forceHW) {
 	    if(curs != lastcursor) {
 		try {
 		    if(curs == null)

@@ -769,6 +769,9 @@ public class OptWnd extends WindowX {
 	general.add(new CFGBox("Output missing translation lines", L10N.DBG), x, y);
     
 	y += STEP;
+	general.add(new CFGBox("Force hardware cursor", CFG.FORCE_HW_CURSOR, null, true), x, y);
+    
+	y += STEP;
 	tx = x + general.add(new Label("UI Theme:"), x, y).sz.x + UI.scale(5);
 	general.add(new Dropbox<Theme>(UI.scale(100), 5, UI.scale(16)) {
 	    @Override
