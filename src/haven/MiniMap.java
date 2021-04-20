@@ -240,7 +240,7 @@ public class MiniMap extends Widget {
     public class DisplayIcon {
 	public final GobIcon icon;
 	public final Gob gob;
-	public final GobIcon.Image img, imggray;
+	public final GobIcon.Image img;
 	public Coord2d rc = null;
 	public Coord sc = null;
 	public double ang = 0.0;
@@ -252,7 +252,6 @@ public class MiniMap extends Widget {
 	    this.icon = icon;
 	    this.gob = icon.gob;
 	    this.img = icon.img();
-	    this.imggray = icon.imggray();
 	    this.z = this.img.z;
 	    this.stime = Utils.rtime();
 	}
@@ -595,7 +594,7 @@ public class MiniMap extends Widget {
 		g.chcolor(disp.kin() != null ? Color.WHITE : Color.RED);
 		g.aimage(RadarCFG.Symbols.$circle.tex, disp.sc, 0.5, 0.5);
 	    } else if (disp.isDead()) {
-	        img = disp.imggray;
+	        img = disp.icon.imggray();
 	    }
 	    
 	    if(disp.col != null)
