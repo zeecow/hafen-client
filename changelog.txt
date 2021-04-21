@@ -1,3 +1,9 @@
+$size[14]{$u{Update for 21.04.21:}
+  * fixed auto-peace not working on re-aggro
+  * show greyed-out icons for dead animals (wafflekat) 
+  * added camera snapping to cardinal directions by CTRL+Arrows (wafflekat) 
+  * fixed map uploader re-initialization on re-login (wafflekat) 
+ 
 $size[14]{$u{Update for 19.04.21:}
   * merged loftar's code
   * fixed food satiety tooltip showing wrong categories
@@ -53,7 +59,7 @@ $size[14]{$u{Update for 09.04.21:}
   * added stone milestone to radar
  
 $size[14]{$u{Update for 07.04.21:}
-  * merged wafflecat's pull request that ads LP/H to study window
+  * merged wafflekat's pull request that ads LP/H to study window
   * moved toggle chat and take screenshot to widget shortcuts + added widget binding for UI toggle
   * fixed false player spotted alarm on travel
   * added options to show curio remaining time in tooltip or instead of progress
@@ -64,7 +70,7 @@ $size[14]{$u{Update for 07.04.21:}
  
 $size[14]{$u{Update for 06.04.21:}
   * fixed timers (X->T)
-  * merged wafflecat's pull request that fixes custom markers upload to auto map
+  * merged wafflekat's pull request that fixes custom markers upload to auto map
   * added option to select which custom markers to upload, none by default
   * fixed crash in biome display
   * improved handling of hidden cursor items
