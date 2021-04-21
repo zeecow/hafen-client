@@ -245,9 +245,10 @@ public class Makewindow extends Widget {
 			x += t.sz().x + UI.scale(1);
 
 			//add stat(s) label(s)
+			x += 3;
 			Glob.CAttr stat = getparent(GameUI.class).chrwdg.findattr(qm.get().basename());
 			add(labelStat = new Label(""+stat.comp), x, qmy+5);
-			x += labelStat.sz.x + 3;
+			x += labelStat.sz.x + 7;
 			product = product * stat.comp;
 		    } catch(Loading l) {
 		    }
@@ -255,8 +256,8 @@ public class Makewindow extends Widget {
 
 		//add softcap label
 		double softcap = Math.pow(product, 1.0 / qmod.size());//qmod is the list of stats used by item
-		x += 10;
-		add(labelStat = new Label("Softcap: "+(int)softcap), x, qmy+5);
+		x += 15;
+		add(labelStat = new Label("Softcap:  "+(int)softcap), x, qmy+5);
 		x += labelStat.sz.x;
 
 		x += UI.scale(25);
