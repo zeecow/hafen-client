@@ -404,6 +404,13 @@ public class ZeeConfig {
         Utils.setpref(MAP_ACTION_USES,serialize(mapActionUses));
     }
 
+    public static int drawText(String text, GOut g, Coord p) {
+        Text txt = Text.render(text);
+        TexI softTex = new TexI(txt.img);
+        g.image(softTex, p);
+        return softTex.sz().x;
+    }
+
     public static void playMidi(String[] notes){
         if(playingAudio!=null && playingAudio.contains(notes.toString()))
             return;//avoid duplicate audio
