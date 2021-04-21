@@ -131,7 +131,7 @@ public class MenuSearch extends Window {
 	    }
 	}
 	//Collections.sort(found, Comparator.comparing(PagButton::name));
-	Collections.sort(found, Comparator.comparing(PagButton::usesCount).reversed());
+	Collections.sort(found, Comparator.comparingInt(PagButton::usesCount).reversed());
 	Map<PagButton, Result> prev = new HashMap<>();
 	for(Result pr : this.cur)
 	    prev.put(pr.btn, pr);

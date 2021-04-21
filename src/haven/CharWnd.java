@@ -2299,4 +2299,20 @@ public class CharWnd extends Window {
 	    super.uimsg(nm, args);
 	}
     }
+
+
+	public Glob.CAttr findattr(String name) {
+		for (SAttr skill : this.skill) {
+			if(name.equals(skill.attr.nm)) {
+				return skill.attr;
+			}
+		}
+		for (Attr stat : base) {
+			if(name.equals(stat.attr.nm)) {
+				return stat.attr;
+			}
+		}
+		return null;
+	}
+
 }

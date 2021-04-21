@@ -3,6 +3,7 @@
 original features:
  - search actions globally
  - sort actions by most used craft items
+ - big ugly close buttons
  - compact equip window
  - auto toggle equip window
  - shorter cattle roster window
@@ -16,4 +17,4 @@ other stuff:
  - replaces arrow cursor with system's default
  - show claims by default
  - optional friend online notification
- - big ugly close buttons
+ - craft window numbers
