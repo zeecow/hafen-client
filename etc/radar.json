@@ -19,5 +19,6 @@
   {"match": "gfx/terobjs/vehicle/dugout", "icon": "radar/dugout", "visible": true},
   {"match": "gfx/terobjs/road/milestone-stone-e", "icon": "radar/milestone-stone-e", "visible": true},
   {"match": "gfx/terobjs/road/milestone-stone-m", "icon": "radar/milestone-stone-m", "visible": true},
-  {"match": "gfx/terobjs/items/arrow", "icon": "gfx/invobjs/arrow", "visible": true}
+  {"match": "gfx/terobjs/items/arrow", "icon": "gfx/invobjs/arrow", "visible": true},
+  {"match": "gfx/kritter/midgeswarm/midgeswarm", "icon": "radar/midgeswarm", "visible": true}
 ]

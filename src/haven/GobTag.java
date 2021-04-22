@@ -23,7 +23,7 @@ public enum GobTag {
     
     private static final String[] AGGRO = {
         "/bear", "/boar", "/troll", "/wolverine", "/badger", "/adder", "/wolf", "/walrus", "/lynx", "/caverat", "/moose", 
-        "/mammoth"
+        "/mammoth", "/midgeswarm"
     };
     
     
