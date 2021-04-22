@@ -646,7 +646,7 @@ public class MiniMap extends Widget {
 	drawmap(g);
 	drawmarkers(g);
 	boolean playerSegment = (sessloc != null) && ((curloc == null) || (sessloc.seg == curloc.seg));
-	if(playerSegment && zoomlevel <= 2 && CFG.MMAP_GRID.get()) {drawgrid(g);}
+	if(zoomlevel <= 2 && CFG.MMAP_GRID.get()) {drawgrid(g);}
 	if(playerSegment && zoomlevel <= 1 && CFG.MMAP_VIEW.get()) {drawview(g);}
 	if(playerSegment && CFG.MMAP_SHOW_PATH.get()) {drawMovement(g);}
 	if(dlvl <= 1)
