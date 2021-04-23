@@ -696,6 +696,7 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 	    }
 	} else if(place == "menu") {
 	    menu = (MenuGrid)brpanel.add(child, menugridc);
+	    ZeeConfig.initToggles();
 	} else if(place == "fight") {
 	    fv = urpanel.add((Fightview)child, 0, 0);
 	} else if(place == "fsess") {

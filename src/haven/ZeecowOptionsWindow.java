@@ -186,14 +186,6 @@ public class ZeecowOptionsWindow extends JFrame {
                 Utils.setpref("autoClickMenuOptionList",str.strip());
             }
         });
-        panelMisc.add(cbAutoClickMenuShift = new JCheckBox("Require Shift key"));
-        cbAutoClickMenuShift.setSelected(ZeeConfig.autoClickMenuUsingShift);
-        cbAutoClickMenuShift.addActionListener(actionEvent -> {
-            JCheckBox cb = (JCheckBox) actionEvent.getSource();
-            boolean val = ZeeConfig.autoClickMenuUsingShift = cb.isSelected();
-            Utils.setprefb("autoClickMenuUsingShift",val);
-        });
-
 
         panelMisc.add(new JLabel("--------------------"));
 

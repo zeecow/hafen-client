@@ -277,8 +277,7 @@ public class FlowerMenu extends Widget {
 	@Override
 	public void tick(double dt) {
 		if(autochoose!=null){
-			if(ZeeConfig.autoClickMenuUsingShift && ui.modshift)
-				choose(autochoose);
+			choose(autochoose);
 			autochoose = null;
 		}
 		super.tick(dt);

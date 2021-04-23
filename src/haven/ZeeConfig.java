@@ -38,7 +38,6 @@ public class ZeeConfig {
     public static boolean alertOnPlayers = Utils.getprefb("alertOnPlayers", true);
     public static boolean autoClickMenuOption = Utils.getprefb("autoClickMenuOption", true);
     public static String autoClickMenuOptionList = Utils.getpref("autoClickMenuOptionList", "Pick,Pluck,Flay,Slice,Harvest wax");
-    public static boolean autoClickMenuUsingShift = Utils.getprefb("autoClickMenuUsingShift", true);;
     public static boolean autoHearthOnStranger = Utils.getprefb("autoHearthOnStranger", true);
     public static boolean autoOpenEquips = Utils.getprefb("beltToggleEquips", true);
     public static boolean cattleRosterHeight = Utils.getprefb("cattleRosterHeight", false);
@@ -411,6 +410,31 @@ public class ZeeConfig {
         g.image(softTex, p);
         return softTex.sz().x;
     }
+
+
+    public static boolean initTrackingDone = false;
+    public static boolean initSiegeDone = false;
+    public static void initToggles() {
+        new Thread(new Runnable() {
+            public void run() {
+                try {
+                    Thread.sleep(3000);
+                    if(!initTrackingDone) {
+                        gameUI.menu.wdgmsg("act", "tracking");
+                        initTrackingDone = true;
+                    }
+                    Thread.sleep(1500);
+                    if(!initSiegeDone) {
+                        gameUI.menu.wdgmsg("act", "siegeptr");//unnecessary?
+                        initSiegeDone = true;
+                    }
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
+    }
+
 
     public static void playMidi(String[] notes){
         if(playingAudio!=null && playingAudio.contains(notes.toString()))
