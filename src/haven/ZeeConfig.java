@@ -38,6 +38,7 @@ public class ZeeConfig {
     public static boolean alertOnPlayers = Utils.getprefb("alertOnPlayers", true);
     public static boolean autoClickMenuOption = Utils.getprefb("autoClickMenuOption", true);
     public static String autoClickMenuOptionList = Utils.getpref("autoClickMenuOptionList", "Pick,Pluck,Flay,Slice,Harvest wax");
+    public static boolean autoClickMenuUsingShift = Utils.getprefb("autoClickMenuUsingShift", true);;
     public static boolean autoHearthOnStranger = Utils.getprefb("autoHearthOnStranger", true);
     public static boolean autoOpenEquips = Utils.getprefb("beltToggleEquips", true);
     public static boolean cattleRosterHeight = Utils.getprefb("cattleRosterHeight", false);
@@ -329,7 +330,7 @@ public class ZeeConfig {
 
     public static int addZeecowOptions(OptWnd.Panel main, int y) {
 
-        y += 7;
+        y += 17;
 
         main.add(new Button(200,"Zeecow options"){
             @Override
@@ -342,7 +343,7 @@ public class ZeeConfig {
             }
         }, 0, y);
 
-        y += 37;
+        y += 17;
 
         return y;
     }

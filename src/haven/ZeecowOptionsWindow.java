@@ -12,7 +12,7 @@ import java.util.*;
 public class ZeecowOptionsWindow extends JFrame {
     public JTabbedPane tabbedPane, tabbedPaneGobs;
     public JPanel panelMisc, panelGobs, panelGobDetails, panelDebug, panelTabCateg;
-    public JCheckBox cbDropMinedStone, cbDropMinedOre, cbDropMinedSilverGold, cbDropMinedCurios, cbActionSearchGlobal, cbCompactEquipsWindow, cbBeltTogglesEquips, cbAutohearth, cbAlertOnPlayers,  cbShowInventoryLogin, cbShowEquipsLogin, cbNotifyBuddyOnline,cbAutoClickMenuOpts, cbCattleRosterHeight;
+    public JCheckBox cbDropMinedStone, cbDropMinedOre, cbDropMinedSilverGold, cbDropMinedCurios, cbActionSearchGlobal, cbCompactEquipsWindow, cbBeltTogglesEquips, cbAutohearth, cbAlertOnPlayers,  cbShowInventoryLogin, cbShowEquipsLogin, cbNotifyBuddyOnline,cbAutoClickMenuOpts, cbAutoClickMenuShift, cbCattleRosterHeight;
     public JTextField tfAutoClickMenu, tfGobName, tfAudioPath, tfCategName, tfAudioPathCateg;
     public JComboBox<String> cmbCattleRoster, cmbGobCategory;
     public JList<String> listGobsTemp, listGobsSaved, listGobsCategories;
@@ -185,6 +185,13 @@ public class ZeecowOptionsWindow extends JFrame {
                 ZeeConfig.autoClickMenuOptionList = str;
                 Utils.setpref("autoClickMenuOptionList",str.strip());
             }
+        });
+        panelMisc.add(cbAutoClickMenuShift = new JCheckBox("Require Shift key"));
+        cbAutoClickMenuShift.setSelected(ZeeConfig.autoClickMenuUsingShift);
+        cbAutoClickMenuShift.addActionListener(actionEvent -> {
+            JCheckBox cb = (JCheckBox) actionEvent.getSource();
+            boolean val = ZeeConfig.autoClickMenuUsingShift = cb.isSelected();
+            Utils.setprefb("autoClickMenuUsingShift",val);
         });
 
 
