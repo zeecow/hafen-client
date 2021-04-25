@@ -89,6 +89,7 @@
       <file file="etc/radar.json"/>
       <file file="etc/gob_path.json"/>
       <file file="etc/gob_radius.json"/>
+      <file file="etc/autochoose.json"/>
       <fileset dir="." includes="i10n/**/**.json"/>
     </jar>
     <copy file="lib/builtin-res.jar" todir="build"/>
