@@ -29,14 +29,10 @@ package haven;
 import auto.Bot;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.reflect.TypeToken;
 import haven.rx.Reactor;
 
 import java.awt.*;
-import java.lang.reflect.Type;
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
 
 import static java.lang.Math.*;
 
@@ -48,7 +44,8 @@ public class FlowerMenu extends Widget {
     public static final Tex pbg = Window.bg;
     public static final int ph = UI.scale(30), ppl = 8;
     public static final String PICK_ALL = "#Pick All";
-    public static Map<String, Boolean> AUTOCHOOSE = null;
+    public static final FlowerList.AutoChooseCFG AUTOCHOOSE;
+    private static final Gson gson;
     private static Gob target;
     public final String[] options;
     private Petal autochoose;
@@ -57,7 +54,23 @@ public class FlowerMenu extends Widget {
     private UI.Grab mg, kg;
 
     static {
-	loadAutochoose();
+	GsonBuilder builder = new GsonBuilder();
+	builder.registerTypeAdapter(FlowerList.AutoChooseCFG.class, new FlowerList.AutoChooseCFGAdapter());
+	builder.setPrettyPrinting();
+	gson = builder.create();
+	String json = Config.loadFile("autochoose.json");
+	FlowerList.AutoChooseCFG tmp = null;
+	if(json != null) {
+	    try {
+		tmp = gson.fromJson(json, FlowerList.AutoChooseCFG.class);
+	    } catch (Exception ignored) { }
+	}
+	if(tmp == null) {
+	    AUTOCHOOSE = new FlowerList.AutoChooseCFG();
+	    AUTOCHOOSE.put("Pick", false);
+	} else {
+	    AUTOCHOOSE = tmp;
+	}
     }
     
     public static void lastGob(Gob gob) {
@@ -70,25 +83,8 @@ public class FlowerMenu extends Widget {
 	super.destroy();
     }
     
-    private static void loadAutochoose() {
-	String json = Config.loadFile("autochoose.json");
-	if(json != null){
-	    try {
-		Gson gson = (new GsonBuilder()).create();
-		Type collectionType = new TypeToken<HashMap<String, Boolean>>(){}.getType();
-		AUTOCHOOSE = gson.fromJson(json, collectionType);
-	    }catch(Exception ignored){ }
-	}
-	if(AUTOCHOOSE == null){
-	    AUTOCHOOSE = new HashMap<>();
-	    AUTOCHOOSE.put("Pick", false);
-	}
-    }
-
-    @SuppressWarnings("SynchronizeOnNonFinalField")
     public static void  saveAutochoose() {
 	synchronized (AUTOCHOOSE) {
-	    Gson gson = (new GsonBuilder()).create();
 	    Config.saveFile("autochoose.json", gson.toJson(AUTOCHOOSE));
 	}
     }
@@ -274,33 +270,26 @@ public class FlowerMenu extends Widget {
 	    opts[i] = p;
 	}
     
-	if(!forceChoose()) {autochoose();}
+	if(!forceChoose()) {autochoose = autochoose();}
     }
     
-    private void autochoose() {
-	for (int i = 0; i < options.length; i++) {
-	    String name = options[i];
-	    boolean auto = autochoose(name);
-	    boolean single = ui.modctrl && options.length == 1 && CFG.MENU_SINGLE_CTRL_CLICK.get();
-	    if((ui.modflags() != CFG.MENU_SKIP_AUTO_CHOOSE.get().mod) && (auto || single)) {
-		autochoose = opts[i];
+    private Petal autochoose() {
+	if(ui.modctrl && options.length == 1 && CFG.MENU_SINGLE_CTRL_CLICK.get()) {
+	    return opts[0];
+	} else if(ui.modflags() != CFG.MENU_SKIP_AUTO_CHOOSE.get().mod) {
+	    int choice = AUTOCHOOSE.choose(options);
+	    if(choice != -1) {
+		return opts[choice];
 	    }
 	}
+	return null;
     }
 
     public static boolean autochoose(String name) {
-	if(AUTOCHOOSE.containsKey(name)) {
-	    return AUTOCHOOSE.get(name);
-	} else {
-	    name = L10N.flower(name);
-	    if(AUTOCHOOSE.containsKey(name)) {
-		return AUTOCHOOSE.get(name);
-	    }
-	}
-	return false;
+	return AUTOCHOOSE.active(name);
     }
     
-    public void forceChoose(String ...opt) {
+    public void forceChoose(String... opt) {
 	forceChoose = opt;
     }
     
