@@ -50,7 +50,9 @@ public class ZeeConfig {
     public static boolean dropSeeds = false;//always starts off (TODO: set false when character loads)
     public static boolean dropSoil = false;
     public static boolean equiporyCompact = Utils.getprefb("equiporyCompact", false);
-    public static boolean highlighAggressiveGobs = Utils.getprefb("highlighAggressiveGobs", true);
+    public static boolean highlightAggressiveGobs = Utils.getprefb("highlighAggressiveGobs", true);
+    public static boolean highlightCropsReady = Utils.getprefb("highlightCropsReady", true);
+    public static boolean highlightGrowingTrees = Utils.getprefb("highlightGrowingTrees", true);
     public static boolean notifyBuddyOnline = Utils.getprefb("notifyBuddyOnline", false);;
     public static boolean showInventoryLogin = Utils.getprefb("showInventoryLogin", true);
     public static boolean showEquipsLogin = Utils.getprefb("showEquipsLogin", false);
@@ -208,17 +210,85 @@ public class ZeeConfig {
         }
     }
 
+
+    private static boolean isSpriteKind(Gob gob, String... kind) {
+        List<String> kinds = Arrays.asList(kind);
+        boolean result = false;
+        Class spc;
+        Drawable d = gob.getattr(Drawable.class);
+        Resource.CodeEntry ce = gob.getres().layer(Resource.CodeEntry.class);
+        if(ce != null) {
+            spc = ce.get("spr");
+            result = spc != null && (kinds.contains(spc.getSimpleName()) || kinds.contains(spc.getSuperclass().getSimpleName()));
+        }
+        if(!result) {
+            if(d instanceof ResDrawable) {
+                Sprite spr = ((ResDrawable) d).spr;
+                if(spr == null) {throw new Loading();}
+                spc = spr.getClass();
+                result = kinds.contains(spc.getSimpleName()) || kinds.contains(spc.getSuperclass().getSimpleName());
+            }
+        }
+        return result;
+    }
+
+    private static Message getDrawableData(Gob gob) {
+        Drawable dr = gob.getattr(Drawable.class);
+        ResDrawable d = (dr instanceof ResDrawable) ? (ResDrawable) dr : null;
+        if(d != null)
+            return d.sdt.clone();
+        else
+            return null;
+    }
+
+
     public static void addGobHighlight(Gob gob) {
+
         if(gob==null || gob.getres()==null)
             return;
-        if(ZeeConfig.highlighAggressiveGobs) {
-            boolean aggro = mapCategoryGobs.get(CATEG_AGROCREATURES).contains(gob.getres().name);
-            if (aggro) {
-                synchronized (gob) {
-                    addGobHighlight2(gob, new MixColor(255, 0, 220, 200));
+
+        String gobname = gob.getres().name;
+
+        //System.out.println(gobname);
+
+        //aggressive gobs
+        if(ZeeConfig.highlightAggressiveGobs && mapCategoryGobs.get(CATEG_AGROCREATURES).contains(gobname)) {
+            addGobHighlight2(gob, new MixColor(255, 0, 220, 200));
+        }
+
+        //crops only (no trellis because Message.EOF exception)
+        else if(ZeeConfig.highlightCropsReady && gobname.startsWith("gfx/terobjs/plants/") && !gobname.endsWith("trellis")) {
+            int maxStage = 0;
+            for (FastMesh.MeshRes layer : gob.getres().layers(FastMesh.MeshRes.class)) {
+                if(layer.id / 10 > maxStage) {
+                    maxStage = layer.id / 10;
+                }
+            }
+            Message data = getDrawableData(gob);
+            if(data != null) {
+                int stage = data.uint8();
+                if(stage > maxStage)
+                    stage = maxStage;
+                if(stage==maxStage)
+                    addGobHighlight2(gob, new MixColor(0, 255, 255, 128));
+            }
+        }
+
+        //trees.
+        // gfx/terobjs/bushes/...
+        // gfx/terobjs/trees/...
+        // gfx/terobjs/gardenpot
+        else if(gobname.startsWith("gfx/terobjs/trees/")) {
+            Message data = getDrawableData(gob);
+            if(data != null && !data.eom()) {
+                data.skip(1);
+                int growth = data.eom() ? -1 : data.uint8();
+                if(growth < 100 && growth >= 0) {
+                    addGobHighlight2(gob, new MixColor(0, 255, 255, 128));
                 }
             }
         }
+
     }
 
     public static void addGobHighlight2(Gob gob, MixColor mc) {

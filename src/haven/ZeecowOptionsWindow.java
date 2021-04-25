@@ -13,7 +13,7 @@ import java.util.*;
 public class ZeecowOptionsWindow extends JFrame {
     public JTabbedPane tabbedPane, tabbedPaneGobs;
     public JPanel panelTabMisc, panelTabInterface, panelTabGobs, panelGobDetails, panelDebug, panelTabCateg;
-    public JCheckBox cbDropMinedStone, cbDropMinedOre, cbDropMinedSilverGold, cbDropMinedCurios, cbActionSearchGlobal, cbCompactEquipsWindow, cbBeltTogglesEquips, cbAutohearth, cbHighlighAggressiveGobs, cbAlertOnPlayers,  cbShowInventoryLogin, cbShowEquipsLogin, cbNotifyBuddyOnline,cbAutoClickMenuOpts, cbCattleRosterHeight;
+    public JCheckBox cbDropMinedStone, cbDropMinedOre, cbDropMinedSilverGold, cbDropMinedCurios, cbActionSearchGlobal, cbCompactEquipsWindow, cbBeltTogglesEquips, cbAutohearth, cbHighlighAggressiveGobs, cbHighlightCropsReady, cbHighlightGrowingTrees, cbAlertOnPlayers,  cbShowInventoryLogin, cbShowEquipsLogin, cbNotifyBuddyOnline,cbAutoClickMenuOpts, cbCattleRosterHeight;
     public JTextField tfAutoClickMenu, tfGobName, tfAudioPath, tfCategName, tfAudioPathCateg;
     public JComboBox<String> cmbCattleRoster, cmbGobCategory;
     public JList<String> listGobsTemp, listGobsSaved, listGobsCategories;
@@ -129,11 +129,27 @@ public class ZeecowOptionsWindow extends JFrame {
         });
 
         panelTabMisc.add(cbHighlighAggressiveGobs = new JCheckBox("Highlight aggressive gobs"));
-        cbHighlighAggressiveGobs.setSelected(ZeeConfig.highlighAggressiveGobs);
+        cbHighlighAggressiveGobs.setSelected(ZeeConfig.highlightAggressiveGobs);
         cbHighlighAggressiveGobs.addActionListener(actionEvent -> {
             JCheckBox cb = (JCheckBox) actionEvent.getSource();
-            boolean val = ZeeConfig.highlighAggressiveGobs = cb.isSelected();
+            boolean val = ZeeConfig.highlightAggressiveGobs = cb.isSelected();
             Utils.setprefb("highlighAggressiveGobs",val);
+        });
+
+        panelTabMisc.add(cbHighlightCropsReady = new JCheckBox("Highlight crops ready"));
+        cbHighlightCropsReady.setSelected(ZeeConfig.highlightCropsReady);
+        cbHighlightCropsReady.addActionListener(actionEvent -> {
+            JCheckBox cb = (JCheckBox) actionEvent.getSource();
+            boolean val = ZeeConfig.highlightCropsReady = cb.isSelected();
+            Utils.setprefb("highlightCropsReady",val);
+        });
+
+        panelTabMisc.add(cbHighlightGrowingTrees = new JCheckBox("Highlight growing trees"));
+        cbHighlightGrowingTrees.setSelected(ZeeConfig.highlightGrowingTrees);
+        cbHighlightGrowingTrees.addActionListener(actionEvent -> {
+            JCheckBox cb = (JCheckBox) actionEvent.getSource();
+            boolean val = ZeeConfig.highlightGrowingTrees = cb.isSelected();
+            Utils.setprefb("highlightGrowingTrees",val);
         });
 
         panelTabMisc.add(cbNotifyBuddyOnline = new JCheckBox("Notify when friends login"));
