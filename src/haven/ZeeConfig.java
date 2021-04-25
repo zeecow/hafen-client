@@ -1,6 +1,7 @@
 package haven;
 
 import com.google.gson.Gson;
+import haven.render.MixColor;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 
 import javax.imageio.ImageIO;
@@ -15,9 +16,9 @@ import java.util.*;
 
 public class ZeeConfig {
     public static final String CTGNAME_PVP = "PVP and siege";
-    public static final String CTGNAME_AGROCREATURES = "Agressive creatures";
-    public static final String CTGNAME_RAREFORAGE = "Rare forageables";
-    public static final String CTGNAME_LOCRES = "Localized resources";
+    public static final String CATEG_AGROCREATURES = "Agressive creatures";
+    public static final String CATEG_RAREFORAGE = "Rare forageables";
+    public static final String CATEG_LOCRES = "Localized resources";
     public static final String MAP_GOB_SAVED = "mapGobSaved";
     public static final String MAP_CATEGORY_AUDIO = "mapCategoryAudio";
     public static final String MAP_CATEGORY_GOBS = "mapCategoryGobs";
@@ -49,6 +50,7 @@ public class ZeeConfig {
     public static boolean dropSeeds = false;//always starts off (TODO: set false when character loads)
     public static boolean dropSoil = false;
     public static boolean equiporyCompact = Utils.getprefb("equiporyCompact", false);
+    public static boolean highlighAggressiveGobs = Utils.getprefb("highlighAggressiveGobs", true);
     public static boolean notifyBuddyOnline = Utils.getprefb("notifyBuddyOnline", false);;
     public static boolean showInventoryLogin = Utils.getprefb("showInventoryLogin", true);
     public static boolean showEquipsLogin = Utils.getprefb("showEquipsLogin", false);
@@ -206,7 +208,24 @@ public class ZeeConfig {
         }
     }
 
-    public static void checkGob(Gob gob) {
+    public static void addGobHighlight(Gob gob) {
+        if(gob==null || gob.getres()==null)
+            return;
+        if(ZeeConfig.highlighAggressiveGobs) {
+            boolean aggro = mapCategoryGobs.get(CATEG_AGROCREATURES).contains(gob.getres().name);
+            if (aggro) {
+                synchronized (gob) {
+                    addGobHighlight2(gob, new MixColor(255, 0, 220, 200));
+                }
+            }
+        }
+    }
+
+    public static void addGobHighlight2(Gob gob, MixColor mc) {
+        gob.setattr(new ZeeGobMixColor(gob, mc));
+    }
+
+    public static void checkGobAlert(Gob gob) {
         if(gob==null || gob.getres()==null)
             return;
 
@@ -217,6 +236,9 @@ public class ZeeConfig {
         if(mapGobSession.put(name,"") == null) {
             //System.out.println(name+"  "+mapGobAlert.size());
         }
+
+        //highlight gobs
+        addGobHighlight(gob);
 
         if(name.contains("borka/body") && gob.id != gameUI.map.player().id) {
             if(autoHearthOnStranger)
@@ -353,9 +375,9 @@ public class ZeeConfig {
         String s = Utils.getpref("mapCategoryGobs","");
         if(s.isEmpty()) {
             ret = new HashMap<>();
-            ret.put(CTGNAME_LOCRES, localizedResources);
-            ret.put(CTGNAME_RAREFORAGE, rareForageables);
-            ret.put(CTGNAME_AGROCREATURES, aggressiveGobs);
+            ret.put(CATEG_LOCRES, localizedResources);
+            ret.put(CATEG_RAREFORAGE, rareForageables);
+            ret.put(CATEG_AGROCREATURES, aggressiveGobs);
             ret.put(CTGNAME_PVP, pvpGobs);
             Utils.setpref(MAP_CATEGORY_GOBS,serialize(ret));
         }else{
@@ -546,6 +568,7 @@ public class ZeeConfig {
             throw new UncheckedIOException(ioe);
         }
     }
+
 }
 
 

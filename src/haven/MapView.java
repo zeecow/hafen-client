@@ -26,14 +26,12 @@
 
 package haven;
 
-import static haven.MCache.cmaps;
 import static haven.MCache.tilesz;
 import static haven.OCache.posres;
 import java.awt.Color;
 import java.awt.event.KeyEvent;
 import java.util.*;
 import java.util.function.*;
-import java.lang.ref.*;
 import java.lang.reflect.*;
 import haven.render.*;
 import haven.MCache.OverlayInfo;
@@ -590,8 +588,8 @@ public class MapView extends PView implements DTarget, Console.Directory {
 		    else
 			nslot.remove();
 		}
+		ZeeConfig.checkGobAlert(ob);
 	    }
-		ZeeConfig.checkGob(ob);
 	}
 
 	public void added(RenderTree.Slot slot) {
