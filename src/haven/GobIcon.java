@@ -190,7 +190,7 @@ public class GobIcon extends GAttrib {
 	    buf.adduint8(notify ? 1 : 0);
 	    for(Setting set : settings.values()) {
 		buf.addstring(set.res.name);
-		buf.adduint16(set.res.ver);
+		buf.addint16((short) set.res.ver);
 		buf.adduint8((byte)'s');
 		buf.adduint8(set.show ? 1 : 0);
 		buf.adduint8((byte)'d');
@@ -214,7 +214,7 @@ public class GobIcon extends GAttrib {
 		String resnm = buf.string();
 		if(resnm.equals(""))
 		    break;
-		int resver = buf.uint16();
+		int resver = buf.int16();
 		Resource.Spec res = new Resource.Spec(null, resnm, resver);
 		Setting set = new Setting(res);
 		boolean setdef = false;
