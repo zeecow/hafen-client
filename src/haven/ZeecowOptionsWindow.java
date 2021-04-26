@@ -12,12 +12,12 @@ import java.util.*;
 
 public class ZeecowOptionsWindow extends JFrame {
     public JTabbedPane tabbedPane, tabbedPaneGobs;
-    public JPanel panelTabMisc, panelTabInterface, panelTabGobs, panelGobDetails, panelDebug, panelTabCateg;
+    public JPanel panelTabMisc, panelTabInterface, panelTabGobs, panelDetailsBottom, panelTabCateg;
     public JCheckBox cbDropMinedStone, cbDropMinedOre, cbDropMinedSilverGold, cbDropMinedCurios, cbActionSearchGlobal, cbCompactEquipsWindow, cbBeltTogglesEquips, cbAutohearth, cbHighlighAggressiveGobs, cbHighlightCropsReady, cbHighlightGrowingTrees, cbAlertOnPlayers,  cbShowInventoryLogin, cbShowEquipsLogin, cbNotifyBuddyOnline,cbAutoClickMenuOpts, cbCattleRosterHeight;
     public JTextField tfAutoClickMenu, tfGobName, tfAudioPath, tfCategName, tfAudioPathCateg;
     public JComboBox<String> cmbCattleRoster, cmbGobCategory;
     public JList<String> listGobsTemp, listGobsSaved, listGobsCategories;
-    public JButton btnRefresh, btnPrintState, btnResetGobs, btnAudioSave, btnAudioClear, btnAudioTest, btnRemGobFromCateg, btnResetCateg, btnAddCateg;
+    public JButton btnRefresh, btnPrintState, btnResetGobs, btnAudioSave, btnAudioClear, btnAudioTest, btnRemGobFromCateg, btnGobHighlightColor, btnResetCateg, btnAddCateg;
     public JTextArea txtAreaDebug;
     public static int TABGOB_SESSION = 0;
     public static int TABGOB_SAVED = 1;
@@ -53,23 +53,15 @@ public class ZeecowOptionsWindow extends JFrame {
         panelTabGobs.setLayout(new BoxLayout(panelTabGobs, BoxLayout.PAGE_AXIS));
         tabbedPane.add("Gobs", panelTabGobs);
         buildTabGobs();
-
-        buildPanelDebug();
     }
 
-    private void buildPanelDebug() {
-        panelDebug = new JPanel();
-        getContentPane().add(panelDebug,BorderLayout.SOUTH);
-        txtAreaDebug = new JTextArea(3,30);
-        panelDebug.add(new JScrollPane(txtAreaDebug));
-    }
 
     private void buildTabMisc() {
         panelTabMisc = new JPanel();
         panelTabMisc.setLayout(new BoxLayout(panelTabMisc, BoxLayout.PAGE_AXIS));
         tabbedPane.addTab("Misc", panelTabMisc);
 
-        panelTabMisc.add(Box.createRigidArea(new Dimension(25,25)));
+        panelTabMisc.add(Box.createRigidArea(new Dimension(0,25)));
         panelTabMisc.add(cbDropMinedStone = new JCheckBox("Drop mined stones"));
         cbDropMinedStone.setSelected(ZeeConfig.dropMinedStones);
         cbDropMinedStone.addActionListener(actionEvent -> {
@@ -102,31 +94,7 @@ public class ZeecowOptionsWindow extends JFrame {
             Utils.setprefb("dropMinedCurios",val);
         });
 
-        panelTabMisc.add(Box.createRigidArea(new Dimension(25,25)));
-
-        panelTabMisc.add(cbActionSearchGlobal = new JCheckBox("Action search global"));
-        cbActionSearchGlobal.setSelected(ZeeConfig.actionSearchGlobal);
-        cbActionSearchGlobal.addActionListener(actionEvent -> {
-            JCheckBox cb = (JCheckBox) actionEvent.getSource();
-            boolean val = ZeeConfig.actionSearchGlobal = cb.isSelected();
-            Utils.setprefb("actionSearchGlobal",val);
-        });
-
-        panelTabMisc.add(cbAlertOnPlayers = new JCheckBox("Sound alert on players"));
-        cbAlertOnPlayers.setSelected(ZeeConfig.alertOnPlayers);
-        cbAlertOnPlayers.addActionListener(actionEvent -> {
-            JCheckBox cb = (JCheckBox) actionEvent.getSource();
-            boolean val = ZeeConfig.alertOnPlayers = cb.isSelected();
-            Utils.setprefb("alertOnPlayers",val);
-        });
-
-        panelTabMisc.add(cbAutohearth = new JCheckBox("Auto-hearth on players"));
-        cbAutohearth.setSelected(ZeeConfig.autoHearthOnStranger);
-        cbAutohearth.addActionListener(actionEvent -> {
-            JCheckBox cb = (JCheckBox) actionEvent.getSource();
-            boolean val = ZeeConfig.autoHearthOnStranger = cb.isSelected();
-            Utils.setprefb("autoHearthOnStranger",val);
-        });
+        panelTabMisc.add(Box.createRigidArea(new Dimension(0,25)));
 
         panelTabMisc.add(cbHighlighAggressiveGobs = new JCheckBox("Highlight aggressive gobs"));
         cbHighlighAggressiveGobs.setSelected(ZeeConfig.highlightAggressiveGobs);
@@ -152,6 +120,32 @@ public class ZeecowOptionsWindow extends JFrame {
             Utils.setprefb("highlightGrowingTrees",val);
         });
 
+        panelTabMisc.add(Box.createRigidArea(new Dimension(0,25)));
+
+        panelTabMisc.add(cbActionSearchGlobal = new JCheckBox("Action search global"));
+        cbActionSearchGlobal.setSelected(ZeeConfig.actionSearchGlobal);
+        cbActionSearchGlobal.addActionListener(actionEvent -> {
+            JCheckBox cb = (JCheckBox) actionEvent.getSource();
+            boolean val = ZeeConfig.actionSearchGlobal = cb.isSelected();
+            Utils.setprefb("actionSearchGlobal",val);
+        });
+
+        panelTabMisc.add(cbAlertOnPlayers = new JCheckBox("Sound alert on players"));
+        cbAlertOnPlayers.setSelected(ZeeConfig.alertOnPlayers);
+        cbAlertOnPlayers.addActionListener(actionEvent -> {
+            JCheckBox cb = (JCheckBox) actionEvent.getSource();
+            boolean val = ZeeConfig.alertOnPlayers = cb.isSelected();
+            Utils.setprefb("alertOnPlayers",val);
+        });
+
+        panelTabMisc.add(cbAutohearth = new JCheckBox("Auto-hearth on players"));
+        cbAutohearth.setSelected(ZeeConfig.autoHearthOnStranger);
+        cbAutohearth.addActionListener(actionEvent -> {
+            JCheckBox cb = (JCheckBox) actionEvent.getSource();
+            boolean val = ZeeConfig.autoHearthOnStranger = cb.isSelected();
+            Utils.setprefb("autoHearthOnStranger",val);
+        });
+
         panelTabMisc.add(cbNotifyBuddyOnline = new JCheckBox("Notify when friends login"));
         cbNotifyBuddyOnline.setSelected(ZeeConfig.notifyBuddyOnline);
         cbNotifyBuddyOnline.addActionListener(actionEvent -> {
@@ -160,10 +154,10 @@ public class ZeecowOptionsWindow extends JFrame {
             Utils.setprefb("notifyBuddyOnline",val);
         });
 
-        panelTabMisc.add(Box.createRigidArea(new Dimension(25,25)));
+        panelTabMisc.add(Box.createRigidArea(new Dimension(0,25)));
 
         //auto click menus
-        panelTabMisc.add(cbAutoClickMenuOpts = new JCheckBox("Auto-click menu:"));
+        panelTabMisc.add(cbAutoClickMenuOpts = new JCheckBox("Auto-click menus (in order)"));
         cbAutoClickMenuOpts.setSelected(ZeeConfig.autoClickMenuOption);
         cbAutoClickMenuOpts.addActionListener(actionEvent -> {
             JCheckBox cb = (JCheckBox) actionEvent.getSource();
@@ -251,12 +245,12 @@ public class ZeecowOptionsWindow extends JFrame {
         panelTabGobs.removeAll();
 
         //panel bottom details
-        if(panelGobDetails!=null) {
-            panelGobDetails.repaint();
+        if(panelDetailsBottom !=null) {
+            panelDetailsBottom.repaint();
         }else {
-            panelGobDetails = new JPanel();
-            panelGobDetails.setLayout(new BoxLayout(panelGobDetails, BoxLayout.PAGE_AXIS));
-            panelGobDetails.setPreferredSize(new Dimension(300, 300));
+            panelDetailsBottom = new JPanel();
+            panelDetailsBottom.setLayout(new BoxLayout(panelDetailsBottom, BoxLayout.PAGE_AXIS));
+            panelDetailsBottom.setPreferredSize(new Dimension(300, 300));
         }
 
         //subtabs pane
@@ -273,7 +267,7 @@ public class ZeecowOptionsWindow extends JFrame {
                 }catch (Exception e){
                     e.printStackTrace();
                 }
-                panelGobDetails.removeAll();
+                panelDetailsBottom.removeAll();
             }
         });
         panelTabGobs.add(tabbedPaneGobs);
@@ -354,7 +348,7 @@ public class ZeecowOptionsWindow extends JFrame {
             }
         });
 
-        panelTabGobs.add(panelGobDetails);
+        panelTabGobs.add(panelDetailsBottom);
         pack();
     }
 
@@ -394,41 +388,45 @@ public class ZeecowOptionsWindow extends JFrame {
             list = listGobsSaved;
         }
 
-        panelGobDetails.removeAll();
+        panelDetailsBottom.removeAll();
 
         //gob name
-        panelGobDetails.add(Box.createRigidArea(new Dimension(25,25)));
-        panelGobDetails.add(newLabelPanel("Gob name"));
-        panelGobDetails.add(tfGobName = new JTextField(list.getSelectedValue()),BorderLayout.NORTH);
+        JPanel panelGobName = new JPanel();
+        panelDetailsBottom.add(panelGobName);
+        panelGobName.setBorder(BorderFactory.createTitledBorder("Gob"));
+        panelGobName.add(tfGobName = new JTextField(list.getSelectedValue()),BorderLayout.NORTH);
         tfGobName.setMaximumSize(new Dimension(Integer.MAX_VALUE, tfGobName.getPreferredSize().height));
 
         //audio file name
-        panelGobDetails.add(Box.createRigidArea(new Dimension(25,25)));
-        panelGobDetails.add(newLabelPanel("Audio alert"));
+        JPanel panelGobAudio = new JPanel();
+        panelDetailsBottom.add(panelGobAudio);
+        panelGobAudio.setBorder(BorderFactory.createTitledBorder("Audio"));
+        panelGobAudio.add(Box.createVerticalGlue());
         String audioPath = ZeeConfig.mapGobAudio.get(list.getSelectedValue());
         if(audioPath==null)
             audioPath = "";
-        panelGobDetails.add(tfAudioPath = new JTextField(audioPath),BorderLayout.CENTER);
+        panelGobAudio.add(tfAudioPath = new JTextField(audioPath),BorderLayout.CENTER);
         tfAudioPath.setMaximumSize(new Dimension(Integer.MAX_VALUE, tfAudioPath.getPreferredSize().height));
 
         //audio buttons
         JPanel panelAudioButtons;
-        panelGobDetails.add(panelAudioButtons = new JPanel(new FlowLayout()));
-        panelAudioButtons.add(btnAudioSave = new JButton("Select Audio"),BorderLayout.SOUTH);
+        panelGobAudio.add(panelAudioButtons = new JPanel(new FlowLayout()));
+        panelAudioButtons.add(btnAudioSave = new JButton("Select"),BorderLayout.SOUTH);
         btnAudioSave.addActionListener(evt->{ audioSave(); });
-        panelAudioButtons.add(btnAudioClear = new JButton("Clear Audio"),BorderLayout.SOUTH);
+        panelAudioButtons.add(btnAudioClear = new JButton("Clear"),BorderLayout.SOUTH);
         btnAudioClear.addActionListener(evt->{ audioClear(); });
-        panelAudioButtons.add(btnAudioTest = new JButton("Test Audio"),BorderLayout.SOUTH);
+        panelAudioButtons.add(btnAudioTest = new JButton("Play"),BorderLayout.SOUTH);
         btnAudioTest.addActionListener(evt->{ audioTest(); });
 
 
         //combo category
-        panelGobDetails.add(Box.createRigidArea(new Dimension(25,25)));
-        panelGobDetails.add(newLabelPanel("Category"));
-        panelGobDetails.add(cmbGobCategory = new JComboBox<String>(ZeeConfig.mapCategoryGobs.keySet().toArray(new String[0])),BorderLayout.CENTER);
+        JPanel panelAddToCategory = new JPanel();
+        panelDetailsBottom.add(panelAddToCategory);
+        panelAddToCategory.setBorder(BorderFactory.createTitledBorder("Category"));
+        panelAddToCategory.add(cmbGobCategory = new JComboBox<String>(ZeeConfig.mapCategoryGobs.keySet().toArray(new String[0])),BorderLayout.CENTER);
         cmbGobCategory.setMaximumSize(new Dimension(Integer.MAX_VALUE, cmbGobCategory.getPreferredSize().height));
 
-        //update combo category
+        //init combo categ state
         String categ = getCategoryByGob(tfGobName.getText().strip());
         if(categ!=null && !categ.isEmpty()) {
             cmbGobCategory.setSelectedItem(categ);
@@ -436,15 +434,27 @@ public class ZeecowOptionsWindow extends JFrame {
             cmbGobCategory.setSelectedIndex(-1);
         }
 
-        // combo add gob to category
+        // add combo categ event listener
         cmbGobCategory.addActionListener(evt->{
             addGobToCategory();
         });
 
-        JPanel panelButtonRemCateg = new JPanel(new FlowLayout());
-        panelGobDetails.add(panelButtonRemCateg);
-        panelButtonRemCateg.add(btnRemGobFromCateg = new JButton("Remove from category"),BorderLayout.SOUTH);
+        //add button remove from categ
+        panelAddToCategory.add(Box.createVerticalGlue());
+        panelAddToCategory.add(btnRemGobFromCateg = new JButton("Clear"),BorderLayout.SOUTH);
         btnRemGobFromCateg.addActionListener(evt->{ removeGobFromCategory(); });
+
+
+        //Color highlight Button
+        JPanel panelHighlight = new JPanel();
+        panelDetailsBottom.add(panelHighlight);
+        panelHighlight.setBorder(BorderFactory.createTitledBorder("Highlight Color"));
+        panelHighlight.add(btnGobHighlightColor = new JButton("Select"),BorderLayout.SOUTH);
+        btnGobHighlightColor.addActionListener(evt->{
+            Color color = JColorChooser.showDialog(panelHighlight, "Gob Highlight Color", Color.CYAN);
+            panelHighlight.setBackground(color);
+        });
+
         pack();
     }
 
@@ -479,6 +489,7 @@ public class ZeecowOptionsWindow extends JFrame {
         }
     }
 
+
     private String getCategoryByGob(String gobName) {
         HashMap<String, Set<String>> map = ZeeConfig.mapCategoryGobs;
         for (String categ: map.keySet()){
@@ -488,33 +499,40 @@ public class ZeecowOptionsWindow extends JFrame {
         return null;
     }
 
+
     private void tabCategsSelected() {
-        panelGobDetails.removeAll();
+        panelDetailsBottom.removeAll();
 
         //category name
-        panelGobDetails.add(Box.createRigidArea(new Dimension(25,25)));
-        panelGobDetails.add(newLabelPanel("Category name"));
-        panelGobDetails.add(tfCategName = new JTextField(listGobsCategories.getSelectedValue()),BorderLayout.NORTH);
+        JPanel panelCategName = new JPanel();
+        panelDetailsBottom.add(panelCategName);
+        panelCategName.setBorder(BorderFactory.createTitledBorder("Category"));
+        panelCategName.add(tfCategName = new JTextField(listGobsCategories.getSelectedValue()));
         tfCategName.setMaximumSize(new Dimension(Integer.MAX_VALUE, tfCategName.getPreferredSize().height));
+        panelCategName.setMaximumSize(new Dimension(Integer.MAX_VALUE, panelCategName.getPreferredSize().height));
 
         //category audio file
-        panelGobDetails.add(Box.createRigidArea(new Dimension(25,25)));
-        panelGobDetails.add(newLabelPanel("Audio alert"));
+        JPanel panelCategAudio = new JPanel();
+        panelDetailsBottom.add(panelCategAudio);
+        panelCategAudio.setBorder(BorderFactory.createTitledBorder("Audio"));
         String audioPath = ZeeConfig.mapCategoryAudio.get(listGobsCategories.getSelectedValue());
         if(audioPath==null)
             audioPath = "";
-        panelGobDetails.add(tfAudioPathCateg = new JTextField(audioPath),BorderLayout.CENTER);
+        panelCategAudio.add(tfAudioPathCateg = new JTextField(audioPath));
         tfAudioPathCateg.setMaximumSize(new Dimension(Integer.MAX_VALUE, tfAudioPathCateg.getPreferredSize().height));
 
         //audio buttons
-        JPanel panelAudioButtons;
-        panelGobDetails.add(panelAudioButtons = new JPanel(new FlowLayout()));
-        panelAudioButtons.add(btnAudioSave = new JButton("Select Audio"),BorderLayout.SOUTH);
+        JPanel panelCategAudioButtons = new JPanel();
+        panelCategAudio.add(panelCategAudioButtons);
+        panelCategAudioButtons.add(btnAudioSave = new JButton("Select"));
         btnAudioSave.addActionListener(evt->{ audioSave(); });
-        panelAudioButtons.add(btnAudioClear = new JButton("Clear Audio"),BorderLayout.SOUTH);
+        panelCategAudioButtons.add(btnAudioClear = new JButton("Clear"));
         btnAudioClear.addActionListener(evt->{ audioClear(); });
-        panelAudioButtons.add(btnAudioTest = new JButton("Test Audio"),BorderLayout.SOUTH);
+        panelCategAudioButtons.add(btnAudioTest = new JButton("Test"));
         btnAudioTest.addActionListener(evt->{ audioTest(); });
+        //panelCategAudio.setMaximumSize(new Dimension(Integer.MAX_VALUE, panelCategAudio.getPreferredSize().height));
+
+
         pack();
     }
 
@@ -632,7 +650,7 @@ public class ZeecowOptionsWindow extends JFrame {
                 Utils.setpref(ZeeConfig.MAP_GOB_SAVED, ZeeConfig.serialize(ZeeConfig.mapGobAudio));
             }
 
-            panelGobDetails.removeAll();
+            panelDetailsBottom.removeAll();
             panelTabGobs.validate();
             buildTabGobs();
         }
@@ -676,7 +694,7 @@ public class ZeecowOptionsWindow extends JFrame {
                 list.clearSelection();
                 //list.updateUI();
             }
-            panelGobDetails.removeAll();
+            panelDetailsBottom.removeAll();
             panelTabGobs.validate();
             buildTabGobs();
         }
