@@ -1,8 +1,0 @@
-#CODEENTRY LAYER FOR RES www//\gfx\fx\msrad.res
-#int32 length
-1
-#String key[1]
-pagina
-#String value[1]
-haven.res.gfx.fx.msrad.ShowSupports$Fac
-
