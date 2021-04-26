@@ -303,6 +303,7 @@ public class Resource implements Serializable {
     }
     
     public static class HttpSource implements ResSource, Serializable {
+	public static final String USER_AGENT = "Haven/1.0";
 	private final transient SslHelper ssl;
 	public URL baseurl;
 	
@@ -345,7 +346,10 @@ public class Resource implements Serializable {
 			 * a bug in its internal cache where it refuses to
 			 * reload a URL even when it has changed. */
 			c.setUseCaches(false);
-			c.addRequestProperty("User-Agent", "Haven/1.0");
+			String ua = USER_AGENT;
+			if(!Config.confid.equals(""))
+			    ua += " (" + Config.confid + ")";
+			c.addRequestProperty("User-Agent", ua);
 			return(c.getInputStream());
 		    }
 		});
@@ -731,7 +735,7 @@ public class Resource implements Serializable {
 		    local.add(new JarSource("res"));
 		    try {
 			if(Config.resdir != null)
-			    local.add(new FileSource(Utils.path(Config.resdir)));
+			    local.add(new FileSource(Config.resdir));
 		    } catch(Exception e) {
 			/* Ignore these. We don't want to be crashing the client
 			 * for users just because of errors in development
