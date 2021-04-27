@@ -252,10 +252,17 @@ public class ZeeConfig {
 
         String gobname = gob.getres().name;
 
-        //System.out.println(gobname);
+        //custom gob colors
+        Color c;
+        if(ZeeConfig.mapGobColor.size() > 0  &&  (c = ZeeConfig.mapGobColor.get(gobname)) != null){
+            addGobHighlight2(
+                gob,
+                new MixColor(c.getRed(), c.getGreen(), c.getBlue(), c.getAlpha())
+            );
+        }
 
         //aggressive gobs
-        if(ZeeConfig.highlightAggressiveGobs && mapCategoryGobs.get(CATEG_AGROCREATURES).contains(gobname)) {
+        else if(ZeeConfig.highlightAggressiveGobs && mapCategoryGobs.get(CATEG_AGROCREATURES).contains(gobname)) {
             addGobHighlight2(gob, new MixColor(255, 0, 220, 200));
         }
 
@@ -278,10 +285,7 @@ public class ZeeConfig {
         }
 
         //trees.
-        // gfx/terobjs/bushes/...
-        // gfx/terobjs/trees/...
-        // gfx/terobjs/gardenpot
-        else if(gobname.startsWith("gfx/terobjs/trees/")) {
+        else if(gobname.startsWith("gfx/terobjs/trees/") || gobname.startsWith("gfx/terobjs/bushes/")) {
             Message data = getDrawableData(gob);
             if(data != null && !data.eom()) {
                 data.skip(1);

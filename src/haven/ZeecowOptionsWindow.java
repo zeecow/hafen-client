@@ -607,7 +607,6 @@ public class ZeecowOptionsWindow extends JFrame {
         int alpha = jSliderAlpha.getValue();
         Color color = new Color(c.getRed(),c.getGreen(),c.getBlue(),alpha);
         ZeeConfig.mapGobColor.put(gobName, color);
-        System.out.printf("add %s %s %s %s %s \n",gobName,color.getRed(),color.getGreen(),color.getBlue(),color.getAlpha());
         btnGobColorAdd.getParent().setBackground(color);
         Utils.setpref(ZeeConfig.MAP_GOB_COLOR, ZeeConfig.serialize(ZeeConfig.mapGobColor));
     }
