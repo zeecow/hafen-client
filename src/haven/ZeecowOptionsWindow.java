@@ -314,13 +314,8 @@ public class ZeecowOptionsWindow extends JFrame {
 
 
         //subtab gobs saved list
-        if(ZeeConfig.mapGobAudio.size() > 0) {
-            listGobsSaved = new JList<String>(ZeeConfig.mapGobAudio.keySet().toArray(new String[0]));
-        }else {
-            listGobsSaved = new JList<String>();
-        }
-        listGobsSaved.setVisibleRowCount(4);
-        tabbedPaneGobs.addTab("Saved("+ZeeConfig.mapGobAudio.size()+")",new JScrollPane(listGobsSaved));
+        listGobsSaved = fillUpListGobsSaved();
+        tabbedPaneGobs.addTab("Saved("+listGobsSaved.getModel().getSize()+")",new JScrollPane(listGobsSaved));
         listGobsSaved.addListSelectionListener(new ListSelectionListener() {
             public void valueChanged(ListSelectionEvent evt) {
                 if(evt.getValueIsAdjusting() || tabbedPaneGobs.getSelectedIndex()!=TABGOB_SAVED)
@@ -351,6 +346,17 @@ public class ZeecowOptionsWindow extends JFrame {
 
         panelTabGobs.add(panelDetailsBottom);
         pack();
+    }
+
+    private JList<String> fillUpListGobsSaved() {
+        Set<String> ret = new HashSet<String>();
+        if(ZeeConfig.mapGobAudio.size() > 0) {
+            ret.addAll(ZeeConfig.mapGobAudio.keySet());
+        }
+        if(ZeeConfig.mapGobColor.size() > 0) {
+            ret.addAll(ZeeConfig.mapGobColor.keySet());
+        }
+        return new JList<String>(ret.toArray(new String[0]));
     }
 
     private void printSavedSettings() {
