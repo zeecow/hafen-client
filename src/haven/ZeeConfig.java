@@ -5,13 +5,14 @@ import haven.render.MixColor;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 
 import javax.imageio.ImageIO;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.awt.image.RenderedImage;
 import java.io.*;
 import java.lang.reflect.Field;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
-
+import java.util.List;
 
 
 public class ZeeConfig {
@@ -23,6 +24,7 @@ public class ZeeConfig {
     public static final String MAP_CATEGORY_AUDIO = "mapCategoryAudio";
     public static final String MAP_CATEGORY_GOBS = "mapCategoryGobs";
     public static final String MAP_ACTION_USES = "mapActionUses";
+    public static final String MAP_GOB_COLOR = "mapGobSettings";
     public static GameUI gameUI;
     public static Window windowBelt;
     public static Window windowCattleRoster;
@@ -137,7 +139,8 @@ public class ZeeConfig {
     public static HashMap<String,String> mapGobAudio = initMapGobSaved();
     public static HashMap<String, Set<String>> mapCategoryGobs = initMapCategoryGobs();
     public static HashMap<String,String> mapCategoryAudio = initMapCategoryAudio();
-    public static HashMap<String,Integer> mapActionUses= initMapActionUses();
+    public static HashMap<String,Integer> mapActionUses = initMapActionUses();
+    public static HashMap<String, Color> mapGobColor = initMapGobSettings();
 
 
     public static Collection<Field> getAllFields(Class<?> type) {
@@ -481,6 +484,15 @@ public class ZeeConfig {
             return new HashMap<String,Integer> ();
         else
             return (HashMap<String, Integer>) deserialize(s);
+    }
+
+    @SuppressWarnings("unchecked")
+    public static HashMap<String, Color> initMapGobSettings() {
+        String s = Utils.getpref(MAP_GOB_COLOR,"");
+        if (s.isEmpty())
+            return new HashMap<String,Color> ();
+        else
+            return (HashMap<String, Color>) deserialize(s);
     }
 
     //count uses for each Action Search item
