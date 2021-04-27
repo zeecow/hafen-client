@@ -225,9 +225,9 @@ public class Bot implements Defer.Callable<Void> {
 	void call(Target target) throws InterruptedException;
     }
     
-    private static class Target {
-	private final Gob gob;
-	private final WItem item;
+    public static class Target {
+	public final Gob gob;
+	public final WItem item;
 	
 	public Target(Gob gob) {
 	    this.gob = gob;

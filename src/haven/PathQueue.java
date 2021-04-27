@@ -1,5 +1,7 @@
 package haven;
 
+import auto.Bot;
+
 import java.util.LinkedList;
 import java.util.List;
 
@@ -46,6 +48,12 @@ public class PathQueue {
 	    click(Gob.from(inf.ci));
 	} else {
 	    click(mc);
+	}
+    }
+    
+    public void click(Bot.Target target) {
+	if(target != null && target.gob != null) {
+	    click(target.gob);
 	}
     }
     

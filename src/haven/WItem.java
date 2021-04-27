@@ -421,7 +421,7 @@ public class WItem extends Widget implements DTarget2 {
 	} else if(btn == 3) {
 	    synchronized (rClickListeners) {
 		if(rClickListeners.isEmpty()) {
-		    FlowerMenu.lastGob(null);
+		    FlowerMenu.lastItem(this);
 		    item.wdgmsg("iact", c, ui.modflags());
 		} else {
 		    rClickListeners.forEach(action -> action.call(this, c, ui.modflags()));
