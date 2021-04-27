@@ -14,6 +14,7 @@ import static java.lang.Math.*;
 public class ProspectingWnd extends WindowX {
     private static final Queue<Dowse> EFFECTS = new ConcurrentLinkedQueue<>();
     public static final Queue<ProspectingWnd> WINDOWS = new ConcurrentLinkedQueue<>();
+    public static final Queue<QualityList.Quality> QUALITIES = new ConcurrentLinkedQueue<>();
     private RenderTree.Slot slot;
     
     public ProspectingWnd(Coord sz, String cap) {
@@ -45,11 +46,20 @@ public class ProspectingWnd extends WindowX {
     }
     
     public static void overlay(Gob gob, Gob.Overlay overlay) {
-	double a1 = Reflect.getFieldValueDouble(overlay.spr, "a1");
-	double a2 = Reflect.getFieldValueDouble(overlay.spr, "a2");
-	
-	EFFECTS.add(new Dowse(gob, a1, a2));
-	attachEffect();
+	if(!QUALITIES.isEmpty()) {
+	    
+	    double a1 = Reflect.getFieldValueDouble(overlay.spr, "a1");
+	    double a2 = Reflect.getFieldValueDouble(overlay.spr, "a2");
+	    
+	    EFFECTS.add(new Dowse(gob, a1, a2, QUALITIES.remove()));
+	    attachEffect();
+	}
+    }
+    
+    public static void item(WItem item) {
+	if(item != null) {
+	    QUALITIES.add(item.itemq.get().single());
+	}
     }
     
     public static class Dowse extends Sprite {
@@ -62,21 +72,26 @@ public class ProspectingWnd extends WindowX {
 	private final Coord3f c;
 	private final double a1;
 	private final double a2;
+	private final double r;
 	private final Model model;
 	
-	protected Dowse(Gob gob, double a1, double a2) {
+	protected Dowse(Gob gob, double a1, double a2, QualityList.Quality q) {
 	    super(gob, null);
 	    this.c = new Coord3f((float) gob.rc.x, (float) -gob.rc.y, 0.1f);
 	    this.a1 = a1;
 	    this.a2 = a2;
+	    if(q == null) {
+		r = 100;
+	    } else {
+		r = 110 * (q.value - 10);
+	    }
 	    model = new Model(Model.Mode.TRIANGLE_FAN, new VertexArray(fmt, new VertexArray.Buffer(v2(), DataBuffer.Usage.STREAM)), null);
 	}
 	
 	private ByteBuffer v2() {
 	    ByteBuffer buf = ByteBuffer.allocate(128);
 	    buf.order(ByteOrder.nativeOrder());
-	    byte alpha = (byte) 128;
-	    double r = 100;
+	    byte alpha = (byte) 80;
 	    
 	    buf.putFloat(c.x).putFloat(c.y).putFloat(c.z);
 	    buf.put((byte) 255).put((byte) 0).put((byte) 0).put(alpha);
