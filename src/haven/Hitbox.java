@@ -180,4 +180,17 @@ public class Hitbox extends SlottedNode implements Rendered {
 	}
 	return res;
     }
+    
+    public static void toggle(GameUI gui) {
+	boolean shown = CFG.DISPLAY_GOB_HITBOX.get();
+	boolean top = CFG.DISPLAY_GOB_HITBOX_TOP.get();
+	if(!shown) {
+	    CFG.DISPLAY_GOB_HITBOX.set(true);
+	} else if(!top) {
+	    CFG.DISPLAY_GOB_HITBOX_TOP.set(true);
+	} else {
+	    CFG.DISPLAY_GOB_HITBOX.set(false);
+	    CFG.DISPLAY_GOB_HITBOX_TOP.set(false);
+	}
+    }
 }
