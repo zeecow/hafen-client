@@ -731,7 +731,7 @@ public class Resource implements Serializable {
 	if(_local == null) {
 	    synchronized(Resource.class) {
 		if(_local == null) {
-		    Pool local = new Pool(new FileSource(Config.getFile("res").toPath()));
+		    Pool local = new Pool(/*new FileSource(Config.getFile("res").toPath())*/);
 		    local.add(new JarSource("res"));
 		    try {
 			if(Config.resdir != null)
