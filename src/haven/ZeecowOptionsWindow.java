@@ -12,13 +12,13 @@ import java.util.*;
 public class ZeecowOptionsWindow extends JFrame {
     public JTabbedPane tabbedPane, tabbedPaneGobs;
     public JPanel panelTabMisc, panelTabInterface, panelTabGobs, panelDetailsBottom, panelTabCateg;
-    public JCheckBox cbDropMinedStone, cbDropMinedOre, cbDropMinedSilverGold, cbDropMinedCurios, cbActionSearchGlobal, cbCompactEquipsWindow, cbBeltTogglesEquips, cbAutohearth, cbHighlighAggressiveGobs, cbHighlightCropsReady, cbHighlightGrowingTrees, cbAlertOnPlayers,  cbShowInventoryLogin, cbShowEquipsLogin, cbNotifyBuddyOnline,cbAutoClickMenuOpts, cbCattleRosterHeight;
+    public JCheckBox cbDropMinedStone, cbDropMinedOre, cbDropMinedSilverGold, cbDropMinedCurios, cbActionSearchGlobal, cbCompactEquipsWindow, cbBeltTogglesEquips, cbAutohearth, cbHighlighAggressiveGobs, cbHighlightCropsReady, cbHighlightGrowingTrees, cbAlertOnPlayers,  cbShowInventoryLogin, cbShowEquipsLogin, cbNotifyBuddyOnline, cbAutoClickMenuOpts, cbCattleRosterHeight;
     public JTextField tfAutoClickMenu, tfGobName, tfAudioPath, tfCategName, tfAudioPathCateg;
     public JComboBox<String> cmbCattleRoster, cmbGobCategory;
     public JList<String> listGobsTemp, listGobsSaved, listGobsCategories;
     public JButton btnRefresh, btnPrintState, btnResetGobs, btnAudioSave, btnAudioClear, btnAudioTest, btnRemGobFromCateg, btnGobColorAdd, btnGobColorRemove, btnResetCateg, btnAddCateg;
     public JTextArea txtAreaDebug;
-    public JSlider jSliderAlpha;
+    public JSlider sliderAlpha, sliderGobQueueSleep;
     public static int TABGOB_SESSION = 0;
     public static int TABGOB_SAVED = 1;
     public static int TABGOB_CATEGS = 2;
@@ -118,6 +118,16 @@ public class ZeecowOptionsWindow extends JFrame {
             JCheckBox cb = (JCheckBox) actionEvent.getSource();
             boolean val = ZeeConfig.highlightGrowingTrees = cb.isSelected();
             Utils.setprefb("highlightGrowingTrees",val);
+        });
+
+        panelTabMisc.add(new JLabel("Highlight Delay(ms)"));
+        panelTabMisc.add(sliderGobQueueSleep = new JSlider(JSlider.HORIZONTAL,2,20,ZeeConfig.gobHighlightDelayMs));
+        sliderGobQueueSleep.setToolTipText("More delay = smoother performance");
+        sliderGobQueueSleep.addChangeListener(evt -> {
+            if(!sliderGobQueueSleep.getValueIsAdjusting()) {
+                ZeeConfig.gobHighlightDelayMs = sliderGobQueueSleep.getValue();
+                Utils.setprefi("gobQueueSleepMs",ZeeConfig.gobHighlightDelayMs);
+            }
         });
 
         panelTabMisc.add(Box.createRigidArea(new Dimension(0,25)));
@@ -471,10 +481,10 @@ public class ZeecowOptionsWindow extends JFrame {
         //slider transparency
         Color color = ZeeConfig.mapGobColor.get(tfGobName.getText());
         int alpha = color!=null ? color.getAlpha() : 200;
-        jSliderAlpha = new JSlider(JSlider.HORIZONTAL,0, 255, alpha);
-        panelHighlight.add(jSliderAlpha);
-        jSliderAlpha.addChangeListener(evt -> {
-            if(!jSliderAlpha.getValueIsAdjusting()) {
+        sliderAlpha = new JSlider(JSlider.HORIZONTAL,0, 255, alpha);
+        panelHighlight.add(sliderAlpha);
+        sliderAlpha.addChangeListener(evt -> {
+            if(!sliderAlpha.getValueIsAdjusting()) {
                 updateGobColorAlpha();
             }
         });
@@ -482,7 +492,7 @@ public class ZeecowOptionsWindow extends JFrame {
         Color currentColor = ZeeConfig.mapGobColor.get(tfGobName.getText());
         if(currentColor!=null){
             btnGobColorAdd.getParent().setBackground(currentColor);
-            jSliderAlpha.setValue(currentColor.getAlpha());
+            sliderAlpha.setValue(currentColor.getAlpha());
         }
 
         pack();
@@ -492,11 +502,11 @@ public class ZeecowOptionsWindow extends JFrame {
         Color c = ZeeConfig.mapGobColor.get(tfGobName.getText());
         if(c==null)
             return;
-        int alpha = jSliderAlpha.getValue();
+        int alpha = sliderAlpha.getValue();
         c = new Color(c.getRed(),c.getGreen(),c.getBlue(),alpha);
         ZeeConfig.mapGobColor.put(tfGobName.getText(),c);
         Utils.setpref(ZeeConfig.MAP_GOB_COLOR, ZeeConfig.serialize(ZeeConfig.mapGobColor));
-        jSliderAlpha.getParent().repaint();
+        sliderAlpha.getParent().repaint();
     }
 
     private void removeGobColor() {
@@ -610,7 +620,7 @@ public class ZeecowOptionsWindow extends JFrame {
             JOptionPane.showMessageDialog(this, "Gob or color parameter missing");
             return;
         }
-        int alpha = jSliderAlpha.getValue();
+        int alpha = sliderAlpha.getValue();
         Color color = new Color(c.getRed(),c.getGreen(),c.getBlue(),alpha);
         ZeeConfig.mapGobColor.put(gobName, color);
         btnGobColorAdd.getParent().setBackground(color);

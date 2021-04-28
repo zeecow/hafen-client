@@ -739,6 +739,7 @@ public class OCache implements Iterable<Gob> {
 		if(!added) {
 		    add(gob);
 		    added = true;
+		    ZeeConfig.gobSetType(gob);
 		}
 		gob.updated();
 	    }

@@ -1,6 +1,5 @@
 package haven;
 
-import com.google.gson.Gson;
 import haven.render.MixColor;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 
@@ -25,6 +24,12 @@ public class ZeeConfig {
     public static final String MAP_CATEGORY_GOBS = "mapCategoryGobs";
     public static final String MAP_ACTION_USES = "mapActionUses";
     public static final String MAP_GOB_COLOR = "mapGobSettings";
+    public static final Integer GOBTYPE_IGNORE = 0;
+    public static final Integer GOBTYPE_TREE = 1;
+    public static final Integer GOBTYPE_BUSH = 2;
+    public static final Integer GOBTYPE_CROP = 3;
+    public static final Integer GOBTYPE_AGGRESSIVE = 4;
+    public static final Integer GOBTYPE_PLAYER = 5;
     public static GameUI gameUI;
     public static Window windowBelt;
     public static Window windowCattleRoster;
@@ -32,8 +37,6 @@ public class ZeeConfig {
     public static Window windowIconSettings;
     public static Window windowInventory;
     public static Window windowActions;
-
-    public static Gson gson = new Gson();
 
     public static ZeecowOptionsWindow zeecowOptions;
 
@@ -52,10 +55,11 @@ public class ZeeConfig {
     public static boolean dropSeeds = false;//always starts off (TODO: set false when character loads)
     public static boolean dropSoil = false;
     public static boolean equiporyCompact = Utils.getprefb("equiporyCompact", false);
+    public static int gobHighlightDelayMs = Utils.getprefi("gobQueueSleepMs", 10);
     public static boolean highlightAggressiveGobs = Utils.getprefb("highlighAggressiveGobs", true);
     public static boolean highlightCropsReady = Utils.getprefb("highlightCropsReady", true);
     public static boolean highlightGrowingTrees = Utils.getprefb("highlightGrowingTrees", true);
-    public static boolean notifyBuddyOnline = Utils.getprefb("notifyBuddyOnline", false);;
+    public static boolean notifyBuddyOnline = Utils.getprefb("notifyBuddyOnline", false);
     public static boolean showInventoryLogin = Utils.getprefb("showInventoryLogin", true);
     public static boolean showEquipsLogin = Utils.getprefb("showEquipsLogin", false);
 
@@ -136,6 +140,7 @@ public class ZeeConfig {
 
 
     public static HashMap<String,String> mapGobSession = new HashMap<String,String>();
+    public static final HashMap<Long,Integer> mapGobidType = new HashMap<Long,Integer>();
     public static HashMap<String,String> mapGobAudio = initMapGobSaved();
     public static HashMap<String, Set<String>> mapCategoryGobs = initMapCategoryGobs();
     public static HashMap<String,String> mapCategoryAudio = initMapCategoryAudio();
@@ -244,65 +249,102 @@ public class ZeeConfig {
             return null;
     }
 
+    private static Thread threadHighlight = null;
+    private static Queue<Gob> gobQueue = new LinkedList<>();
+    public static void gobHighlight(Gob gob) {
 
-    public static void addGobHighlight(Gob gob) {
-
-        if(gob==null || gob.getres()==null)
+        if(gob==null || mapGobidType.get(gob.id)==GOBTYPE_IGNORE)
             return;
 
-        String gobname = gob.getres().name;
+        gobQueue.add(gob);
 
-        //custom gob colors
-        Color c;
-        if(ZeeConfig.mapGobColor.size() > 0  &&  (c = ZeeConfig.mapGobColor.get(gobname)) != null){
-            addGobHighlight2(
-                gob,
-                new MixColor(c.getRed(), c.getGreen(), c.getBlue(), c.getAlpha())
-            );
-        }
+        if(threadHighlight==null){
+            threadHighlight = new Thread() {
+                @Override
+                public void run() {
+                    int lastSize = 0;
+                   while(true) {
+                       //sleep for better performance
+                       try {
+                           //if(lastSize!=gobQueue.size()) {
+                               //lastSize = gobQueue.size();
+                               //System.out.println("sleeping queue=" + lastSize);
+                           //}
+                           sleep(ZeeConfig.gobHighlightDelayMs);
+                       } catch (InterruptedException e){e.printStackTrace();}
 
-        //aggressive gobs
-        else if(ZeeConfig.highlightAggressiveGobs && mapCategoryGobs.get(CATEG_AGROCREATURES).contains(gobname)) {
-            addGobHighlight2(gob, new MixColor(255, 0, 220, 200));
-        }
+                       if(gobQueue.isEmpty())
+                           continue;
 
-        //crops only (no trellis because Message.EOF exception)
-        else if(ZeeConfig.highlightCropsReady && gobname.startsWith("gfx/terobjs/plants/") && !gobname.endsWith("trellis")) {
-            int maxStage = 0;
-            for (FastMesh.MeshRes layer : gob.getres().layers(FastMesh.MeshRes.class)) {
-                if(layer.id / 10 > maxStage) {
-                    maxStage = layer.id / 10;
+                       //remove gob from queue
+                       Gob gob;
+                       try{
+                           gob = gobQueue.remove();
+                       }catch (NoSuchElementException e){
+                           e.printStackTrace();
+                           continue;
+                       }
+                       if (gob.getres() == null)
+                           continue;
+
+                       //get Type and name
+                       Integer gobType = mapGobidType.get(gob.id);
+                       String gobname = gob.getres().name;
+                       Color c;
+                       //System.out.printf("gobHighlight id=%s len=%s \n",gob.id,mapGobidType.size(),gobType);
+
+                       //trees
+                       if(highlightGrowingTrees && (gobType==GOBTYPE_TREE || gobType==GOBTYPE_BUSH)) {
+                           Message data = getDrawableData(gob);
+                           if(data != null && !data.eom()) {
+                               data.skip(1);
+                               int growth = data.eom() ? -1 : data.uint8();
+                               if(growth < 100 && growth >= 0) {
+                                   gobHighlight2(gob, new MixColor(0, 255, 255, 200));
+                               }
+                           }
+                       }
+
+                       //crops
+                       else if(highlightCropsReady && gobType==GOBTYPE_CROP) {
+                           int maxStage = 0;
+                           for (FastMesh.MeshRes layer : gob.getres().layers(FastMesh.MeshRes.class)) {
+                               if(layer.id / 10 > maxStage) {
+                                   maxStage = layer.id / 10;
+                               }
+                           }
+                           Message data = getDrawableData(gob);
+                           if(data != null) {
+                               int stage = data.uint8();
+                               if(stage > maxStage)
+                                   stage = maxStage;
+                               if(stage==maxStage)
+                                   gobHighlight2(gob, new MixColor(0, 255, 255, 200));
+                           }
+                       }
+
+                       //aggressive gobs
+                       else if(ZeeConfig.highlightAggressiveGobs && mapGobidType.get(gob.id)==GOBTYPE_AGGRESSIVE ) {
+                           gobHighlight2(gob, new MixColor(255, 0, 220, 200));
+                       }
+
+                       //custom gob colors
+                       else if(ZeeConfig.mapGobColor.size() > 0  &&  (c = ZeeConfig.mapGobColor.get(gobname)) != null){
+                           gobHighlight2(gob, new MixColor(c.getRed(), c.getGreen(), c.getBlue(), c.getAlpha()));
+                       }
+                   }
                 }
-            }
-            Message data = getDrawableData(gob);
-            if(data != null) {
-                int stage = data.uint8();
-                if(stage > maxStage)
-                    stage = maxStage;
-                if(stage==maxStage)
-                    addGobHighlight2(gob, new MixColor(0, 255, 255, 128));
-            }
-        }
-
-        //trees.
-        else if(gobname.startsWith("gfx/terobjs/trees/") || gobname.startsWith("gfx/terobjs/bushes/")) {
-            Message data = getDrawableData(gob);
-            if(data != null && !data.eom()) {
-                data.skip(1);
-                int growth = data.eom() ? -1 : data.uint8();
-                if(growth < 100 && growth >= 0) {
-                    addGobHighlight2(gob, new MixColor(0, 255, 255, 128));
-                }
-            }
+            };
+            threadHighlight.start();
         }
 
     }
 
-    public static void addGobHighlight2(Gob gob, MixColor mc) {
+    public static void gobHighlight2(Gob gob, MixColor mc) {
         gob.setattr(new ZeeGobMixColor(gob, mc));
     }
 
-    public static void checkGobAlert(Gob gob) {
+    public static void gobCheck(Gob gob) {
         if(gob==null || gob.getres()==null)
             return;
 
@@ -315,9 +357,9 @@ public class ZeeConfig {
         }
 
         //highlight gobs
-        addGobHighlight(gob);
+        gobHighlight(gob);
 
-        if(name.contains("borka/body") && gob.id != gameUI.map.player().id) {
+        if(mapGobidType.get(gob.id)==GOBTYPE_PLAYER && gob.id != gameUI.map.player().id) {
             if(autoHearthOnStranger)
                 gameUI.act("travel","hearth");
             if(alertOnPlayers){
@@ -655,6 +697,25 @@ public class ZeeConfig {
         }
     }
 
+
+    public static void gobSetType(Gob gob) {
+        if(gob==null || gob.getres()==null || mapGobidType.containsKey(gob.id))
+            return;
+        String name = gob.getres().name;
+        //System.out.printf("gobSetType %s %s \n",name,gob.id);
+        if(name.startsWith("gfx/terobjs/trees/"))
+            mapGobidType.put(gob.id, GOBTYPE_TREE);
+        else if(name.startsWith("gfx/terobjs/bushes/"))
+            mapGobidType.put(gob.id, GOBTYPE_BUSH);
+        else if(name.startsWith("gfx/terobjs/plants/") && !name.endsWith("trellis"))
+            mapGobidType.put(gob.id, GOBTYPE_CROP);
+        else if(mapCategoryGobs.get(CATEG_AGROCREATURES).contains(name))
+            mapGobidType.put(gob.id, GOBTYPE_AGGRESSIVE);
+        else if(name.startsWith("gfx/borka/body"))
+            mapGobidType.put(gob.id, GOBTYPE_PLAYER);
+        //else if(!mapGobColor.containsKey(name) && !mapGobAudio.containsKey(name))
+            //mapGobidType.put(gob.id, GOBTYPE_IGNORE);
+    }
 }
 
 
