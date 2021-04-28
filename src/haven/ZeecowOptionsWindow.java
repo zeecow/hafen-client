@@ -444,7 +444,7 @@ public class ZeecowOptionsWindow extends JFrame {
         cmbGobCategory.setMaximumSize(new Dimension(Integer.MAX_VALUE, cmbGobCategory.getPreferredSize().height));
 
         //init combo categ state
-        String categ = getCategoryByGob(tfGobName.getText().strip());
+        String categ = getCategoryByGobName(tfGobName.getText().strip());
         if(categ!=null && !categ.isEmpty()) {
             cmbGobCategory.setSelectedItem(categ);
         }else {
@@ -530,13 +530,8 @@ public class ZeecowOptionsWindow extends JFrame {
     }
 
 
-    private String getCategoryByGob(String gobName) {
-        HashMap<String, Set<String>> map = ZeeConfig.mapCategoryGobs;
-        for (String categ: map.keySet()){
-            if (map.get(categ).contains(gobName))
-                return categ;
-        }
-        return null;
+    private String getCategoryByGobName(String gobName) {
+        return ZeeConfig.mapGobCategory.get(gobName);
     }
 
 
@@ -596,11 +591,20 @@ public class ZeecowOptionsWindow extends JFrame {
             JOptionPane.showMessageDialog(this,"removeGobFromCategory(g,c) > gob or category invalid");
             return;
         }
+
+        //remove from map Category->Gobs
         Set<String> gobs = ZeeConfig.mapCategoryGobs.get(gobCategory);
         if(gobs!=null){
             gobs.remove(gobName);
             ZeeConfig.mapCategoryGobs.put(gobCategory,gobs);
             Utils.setpref(ZeeConfig.MAP_CATEGORY_GOBS, ZeeConfig.serialize(ZeeConfig.mapCategoryGobs));
+        }
+
+        //remove from map Gob->Category
+        String categ = ZeeConfig.mapGobCategory.get(gobName);
+        if(categ!=null && !categ.isEmpty()){
+            ZeeConfig.mapGobCategory.remove(gobName);
+            Utils.setpref(ZeeConfig.MAP_GOB_CATEGORY, ZeeConfig.serialize(ZeeConfig.mapGobCategory));
         }
     }
 
@@ -632,12 +636,18 @@ public class ZeecowOptionsWindow extends JFrame {
             JOptionPane.showMessageDialog(this,"Gob or Category invalid");
             return;
         }
+
+        //add to map Category->Gobs
         Set<String> gobs = ZeeConfig.mapCategoryGobs.get(gobCategory);
         if (gobs != null) {
             gobs.add(gobName);
             ZeeConfig.mapCategoryGobs.put(gobCategory,gobs);
             Utils.setpref(ZeeConfig.MAP_CATEGORY_GOBS, ZeeConfig.serialize(ZeeConfig.mapCategoryGobs));
         }
+
+        //add to map GobCategory
+        ZeeConfig.mapGobCategory.put(gobName,gobCategory);
+        Utils.setpref(ZeeConfig.MAP_GOB_CATEGORY, ZeeConfig.serialize(ZeeConfig.mapGobCategory));
     }
 
     private void addGobToCategory() {
@@ -648,8 +658,8 @@ public class ZeecowOptionsWindow extends JFrame {
             String gobName = tfGobName.getText().strip();
             String gobCategory =  cmbGobCategory.getSelectedItem().toString().strip();
 
-            //if gob already has category, remove it
-            String prevCategory = getCategoryByGob(gobName);
+            //remove gob if already has category
+            String prevCategory = getCategoryByGobName(gobName);
             if(prevCategory!=null && !prevCategory.isEmpty()){
                 removeGobFromCategory(gobName,prevCategory);
             }

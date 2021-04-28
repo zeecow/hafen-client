@@ -20,6 +20,7 @@ public class ZeeConfig {
     public static final String CATEG_RAREFORAGE = "Rare forageables";
     public static final String CATEG_LOCRES = "Localized resources";
     public static final String MAP_GOB_SAVED = "mapGobSaved";
+    public static final String MAP_GOB_CATEGORY = "mapGobCategory";
     public static final String MAP_CATEGORY_AUDIO = "mapCategoryAudio";
     public static final String MAP_CATEGORY_GOBS = "mapCategoryGobs";
     public static final String MAP_ACTION_USES = "mapActionUses";
@@ -31,6 +32,7 @@ public class ZeeConfig {
     public static final Integer GOBTYPE_AGGRESSIVE = 4;
     public static final Integer GOBTYPE_PLAYER = 5;
     public static GameUI gameUI;
+    public static Glob glob;
     public static Window windowBelt;
     public static Window windowCattleRoster;
     public static Window windowEquipment;
@@ -141,11 +143,12 @@ public class ZeeConfig {
 
     public static HashMap<String,String> mapGobSession = new HashMap<String,String>();
     public static final HashMap<Long,Integer> mapGobidType = new HashMap<Long,Integer>();
-    public static HashMap<String,String> mapGobAudio = initMapGobSaved();
+    public static HashMap<String,String> mapGobAudio = initMapGobAudio();
+    public static HashMap<String,String> mapGobCategory = initMapGobCategory();
     public static HashMap<String, Set<String>> mapCategoryGobs = initMapCategoryGobs();
     public static HashMap<String,String> mapCategoryAudio = initMapCategoryAudio();
     public static HashMap<String,Integer> mapActionUses = initMapActionUses();
-    public static HashMap<String, Color> mapGobColor = initMapGobSettings();
+    public static HashMap<String, Color> mapGobColor = initMapGobColor();
 
 
     public static Collection<Field> getAllFields(Class<?> type) {
@@ -293,7 +296,7 @@ public class ZeeConfig {
                        Color c;
                        //System.out.printf("gobHighlight id=%s len=%s \n",gob.id,mapGobidType.size(),gobType);
 
-                       //trees
+                       //if it's a tree
                        if(highlightGrowingTrees && (gobType==GOBTYPE_TREE || gobType==GOBTYPE_BUSH)) {
                            Message data = getDrawableData(gob);
                            if(data != null && !data.eom()) {
@@ -305,7 +308,7 @@ public class ZeeConfig {
                            }
                        }
 
-                       //crops
+                       //if it's a crop
                        else if(highlightCropsReady && gobType==GOBTYPE_CROP) {
                            int maxStage = 0;
                            for (FastMesh.MeshRes layer : gob.getres().layers(FastMesh.MeshRes.class)) {
@@ -323,12 +326,12 @@ public class ZeeConfig {
                            }
                        }
 
-                       //aggressive gobs
+                       //if it's an aggressive gobs
                        else if(ZeeConfig.highlightAggressiveGobs && mapGobidType.get(gob.id)==GOBTYPE_AGGRESSIVE ) {
                            gobHighlight2(gob, new MixColor(255, 0, 220, 200));
                        }
 
-                       //custom gob colors
+                       //if it's a custom gob setting
                        else if(ZeeConfig.mapGobColor.size() > 0  &&  (c = ZeeConfig.mapGobColor.get(gobname)) != null){
                            gobHighlight2(gob, new MixColor(c.getRed(), c.getGreen(), c.getBlue(), c.getAlpha()));
                        }
@@ -515,8 +518,17 @@ public class ZeeConfig {
     }
 
     @SuppressWarnings("unchecked")
-    public static HashMap<String, String> initMapGobSaved() {
+    public static HashMap<String, String> initMapGobAudio() {
         String s = Utils.getpref(MAP_GOB_SAVED,"");
+        if (s.isEmpty())
+            return new HashMap<String,String> ();
+        else
+            return (HashMap<String, String>) deserialize(s);
+    }
+
+    @SuppressWarnings("unchecked")
+    public static HashMap<String, String> initMapGobCategory() {
+        String s = Utils.getpref(MAP_GOB_CATEGORY,"");
         if (s.isEmpty())
             return new HashMap<String,String> ();
         else
@@ -533,7 +545,7 @@ public class ZeeConfig {
     }
 
     @SuppressWarnings("unchecked")
-    public static HashMap<String, Color> initMapGobSettings() {
+    public static HashMap<String, Color> initMapGobColor() {
         String s = Utils.getpref(MAP_GOB_COLOR,"");
         if (s.isEmpty())
             return new HashMap<String,Color> ();
@@ -697,24 +709,37 @@ public class ZeeConfig {
         }
     }
 
+    public static void gobResetTypes(int gobid){
+        //reset GOBTYPE_AGGRESSIVE from mapCategoryGobs
+        //glob.sess.getres()
+        // glob.oc.getgob(gobid);
+
+        //reset GOBTYPE_IGNORE from mapGobColor, mapGobAudio, mapGobCategory
+    }
 
     public static void gobSetType(Gob gob) {
         if(gob==null || gob.getres()==null || mapGobidType.containsKey(gob.id))
             return;
-        String name = gob.getres().name;
-        //System.out.printf("gobSetType %s %s \n",name,gob.id);
-        if(name.startsWith("gfx/terobjs/trees/"))
+        String gobName = gob.getres().name;
+        //System.out.printf("gobSetType %s %s \n",gobName,gob.id);
+
+        if(gobName.startsWith("gfx/terobjs/trees/"))
             mapGobidType.put(gob.id, GOBTYPE_TREE);
-        else if(name.startsWith("gfx/terobjs/bushes/"))
+
+        else if(gobName.startsWith("gfx/terobjs/bushes/"))
             mapGobidType.put(gob.id, GOBTYPE_BUSH);
-        else if(name.startsWith("gfx/terobjs/plants/") && !name.endsWith("trellis"))
+
+        else if(gobName.startsWith("gfx/terobjs/plants/") && !gobName.endsWith("trellis"))
             mapGobidType.put(gob.id, GOBTYPE_CROP);
-        else if(mapCategoryGobs.get(CATEG_AGROCREATURES).contains(name))
+
+        else if(mapCategoryGobs.get(CATEG_AGROCREATURES).contains(gobName))
             mapGobidType.put(gob.id, GOBTYPE_AGGRESSIVE);
-        else if(name.startsWith("gfx/borka/body"))
+
+        else if(gobName.startsWith("gfx/borka/body"))
             mapGobidType.put(gob.id, GOBTYPE_PLAYER);
-        //else if(!mapGobColor.containsKey(name) && !mapGobAudio.containsKey(name))
-            //mapGobidType.put(gob.id, GOBTYPE_IGNORE);
+
+        else if(!mapGobColor.containsKey(gobName) && !mapGobAudio.containsKey(gobName) && !mapGobCategory.containsKey(gobName))
+            mapGobidType.put(gob.id, GOBTYPE_IGNORE);
     }
 }
 
