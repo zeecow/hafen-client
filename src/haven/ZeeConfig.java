@@ -253,39 +253,46 @@ public class ZeeConfig {
     }
 
     private static Thread threadHighlight = null;
-    private static Queue<Gob> gobQueue = new LinkedList<>();
-    public static void gobHighlight(Gob gob) {
+    private static final Queue<Gob> gobQueue = new LinkedList<>();
+    public static void gobHighlight(Gob g) {
 
-        if(gob==null || mapGobidType.get(gob.id)==GOBTYPE_IGNORE)
+        if(g==null || mapGobidType.get(g.id)==GOBTYPE_IGNORE)
             return;
 
-        gobQueue.add(gob);
+        synchronized (gobQueue) {
+            gobQueue.add(g);
+        }
 
         if(threadHighlight==null){
             threadHighlight = new Thread() {
                 @Override
                 public void run() {
                     int lastSize = 0;
+                    Gob gob;
                    while(true) {
-                       //sleep for better performance
-                       try {
-                           //if(lastSize!=gobQueue.size()) {
-                               //lastSize = gobQueue.size();
-                               //System.out.println("sleeping queue=" + lastSize);
-                           //}
-                           sleep(ZeeConfig.gobHighlightDelayMs);
-                       } catch (InterruptedException e){e.printStackTrace();}
+                           //sleep for smoother performance
+                           try {
+                               //if (lastSize != gobQueue.size()) {//TODO sync
+                                   //lastSize = gobQueue.size();
+                                   //System.out.println("sleeping queue=" + lastSize);
+                               //}
+                               sleep(ZeeConfig.gobHighlightDelayMs);
+                           } catch (InterruptedException e) {
+                               e.printStackTrace();
+                           }
 
-                       if(gobQueue.isEmpty())
-                           continue;
+                       synchronized (gobQueue) {
+                           if (gobQueue.isEmpty()) {
+                               continue;
+                           }
 
-                       //remove gob from queue
-                       Gob gob;
-                       try{
-                           gob = gobQueue.remove();
-                       }catch (NoSuchElementException e){
-                           e.printStackTrace();
-                           continue;
+                           //remove gob from queue
+                           try {
+                               gob = gobQueue.remove();
+                           } catch (NoSuchElementException e) {
+                               e.printStackTrace();
+                               continue;
+                           }
                        }
                        if (gob.getres() == null)
                            continue;
@@ -294,7 +301,7 @@ public class ZeeConfig {
                        Integer gobType = mapGobidType.get(gob.id);
                        String gobname = gob.getres().name;
                        Color c;
-                       //System.out.printf("gobHighlight id=%s len=%s \n",gob.id,mapGobidType.size(),gobType);
+                       //System.out.printf("gobHighlight id=%s len=%s type=%s \n", gob.id,mapGobidType.size(), gobType);
 
                        //if it's a tree
                        if(highlightGrowingTrees && (gobType==GOBTYPE_TREE || gobType==GOBTYPE_BUSH)) {
