@@ -54,7 +54,7 @@ public class GobWarning extends GAttrib implements RenderTree.Node {
 	player(50, "Player", Color.RED, new Color(192, 0, 0, 128), new Color(255, 224, 96)),
 	animal(50, "Dangerous animal", Color.RED, new Color(192, 0, 0, 128), new Color(255, 224, 96)),
 	gem(5, "Gem", Color.GREEN, new Color(0, 192, 122, 64), new Color(255, 90, 200, 128)),
-	midges(20, "Midges", Color.BLUE, new Color(128, 0, 255, 64), new Color(64, 64, 255, 128));
+	midges(15, "Midges", Color.BLUE, new Color(255, 255, 255, 64), new Color(128, 0, 255, 128));
 	
 	private final int radius;
 	private final String message;
