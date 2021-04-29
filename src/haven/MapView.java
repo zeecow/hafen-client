@@ -2193,9 +2193,21 @@ public class MapView extends PView implements DTarget, Console.Directory {
 	}
     }
     
-    public void click(Coord2d mc, int clickb, Object... args) {
+    public void click(Coord2d c, int button) {
+	click(c, button, ui.mc, c.floor(posres), button, ui.modflags());
+    }
+    
+    public void click(Gob gob, int button) {
+	click(gob, button, ui.mc);
+    }
+    
+    public void click(Gob gob, int button, Coord mouse) {
+	click(gob.rc, button, mouse, Coord.z, button, ui.modflags(), 0, (int) gob.id, gob.rc.floor(posres), 0, -1);
+    }
+    
+    public void click(Coord2d mc, int button, Object... args) {
 	boolean send = true;
-	if(clickb == 1 && CFG.QUEUE_PATHS.get()) {
+	if(button == 1 && CFG.QUEUE_PATHS.get()) {
 	    if(ui.modmeta) {
 		args[3] = 0;
 		send = ui.gui.pathQueue.add(mc);

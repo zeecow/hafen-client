@@ -130,7 +130,7 @@ public class Pointer extends Widget implements MiniMap.IPointer {
 	Coord2d tc = tc();
 	if(tc == null)
 	    return;
-	Gob gob = (gobid < 0) ? null : ui.sess.glob.oc.getgob(gobid);
+	Gob gob = getGob();
 	Coord3f sl;
 	if(gob != null) {
 	    try {
@@ -180,13 +180,24 @@ public class Pointer extends Widget implements MiniMap.IPointer {
     }
     
     public boolean mousedown(Coord c, int button) {
-	if(click && (lc != null)) {
-	    if(lc.dist(c) < 20) {
-		wdgmsg("click", button, ui.modflags());
-		return (true);
+	if(lc != null && lc.dist(c) < 20) {
+	    if(button == 1) {
+		Gob gob = getGob();
+		ui.gui.map.click(gob != null ? gob.rc : tc(), 1);
+	    } else if(button == 3) {
+		Gob gob = getGob();
+		if(gob != null) {
+		    ui.gui.map.click(gob, 3);
+		}
 	    }
+	    if(click) {wdgmsg("click", button, ui.modflags());}
+	    return (true);
 	}
 	return (super.mousedown(c, button));
+    }
+    
+    private Gob getGob() {
+	return (gobid < 0) ? null : ui.sess.glob.oc.getgob(gobid);
     }
     
     public void uimsg(String name, Object... args) {
@@ -238,7 +249,7 @@ public class Pointer extends Widget implements MiniMap.IPointer {
     
     double getDistance() {
 	MapView map = getparent(GameUI.class).map;
-	Gob target = (gobid < 0) ? null : ui.sess.glob.oc.getgob(gobid);
+	Gob target = getGob();
 	Gob player = map == null ? null : map.player();
 	if(player != null) {
 	    if(target != null) {
