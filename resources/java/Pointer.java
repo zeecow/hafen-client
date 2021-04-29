@@ -21,7 +21,7 @@ public class Pointer extends Widget implements MiniMap.IPointer {
     
     private BaseColor col = null;
     public Indir<Resource> icon;
-    public Coord2d tc;
+    public Coord2d tc, mc;
     public Coord lc;
     public long gobid = -1;
     public boolean click;
@@ -154,6 +154,7 @@ public class Pointer extends Widget implements MiniMap.IPointer {
     
     public void update(Coord2d tc, long gobid) {
 	this.tc = tc;
+	mc = null;
 	this.gobid = gobid;
     }
     
@@ -173,6 +174,7 @@ public class Pointer extends Widget implements MiniMap.IPointer {
 		tc = null;
 	    else
 		tc = ((Coord) args[0]).mul(OCache.posres);
+	    mc = null;
 	    if(args[1] == null)
 		gobid = -1;
 	    else
@@ -220,14 +222,37 @@ public class Pointer extends Widget implements MiniMap.IPointer {
 	if(player != null) {
 	    if(target != null) {
 		return player.rc.dist(target.rc) / 11.0;
-	    } else if(tc != null) {
-		return player.rc.dist(tc) / 11.0;
+	    } else {
+		Coord2d tc = tc();
+		if(tc != null) {
+		    return player.rc.dist(tc) / 11.0;
+		}
 	    }
 	}
 	return -1;
     }
     
-    public Coord2d tc() {return tc;}
+    public Coord2d tc() {
+	if(tc == null) {
+	    return null;
+	} else if(mc == null) {
+	    GameUI gui = getparent(GameUI.class);
+	    Gob player = gui.map.player();
+	    if(player != null) {
+		double d = player.rc.dist(tc);
+		if(d > 990) {
+		    mc = gui.mapfile.findMarkerPosition(tip);
+		    if(mc != null) {
+			return mc;
+		    }
+		}
+	    }
+	    mc = tc;
+	    return mc;
+	} else {
+	    return mc;
+	}
+    }
     
     public Coord sc(Coord c, Coord sz) {
 	Pair<Coord, Coord> p = screenp(c, sz);
