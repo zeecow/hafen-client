@@ -78,6 +78,8 @@ public class ZeeSynth extends Thread{
             }
 
             //do midi
+            if(midiPlayNotes==null)//TODO temporary fix for category having no sound set
+                return;
             String[] split;
             Synthesizer synth = MidiSystem.getSynthesizer();
             synth.open();
