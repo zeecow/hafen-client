@@ -1,3 +1,9 @@
+$size[14]{$u{Update for 29.04.21:}
+  * fixed another deadlock
+  * added dead bats to radar
+  * made hitbox toggle cycle through off - on - on top
+  * merged loftar's fix for freezes after login for some windows environments
+ 
 $size[14]{$u{Update for 26.04.21:}
   * merged loftar's code
   * fixed 'Weird version number' error
