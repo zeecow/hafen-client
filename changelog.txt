@@ -3,6 +3,7 @@ $size[14]{$u{Update for 29.04.21:}
   * added dead bats to radar
   * made hitbox toggle cycle through off - on - on top
   * merged loftar's fix for freezes after login for some windows environments
+  * prospecting now leaves its effect while result window is open, length of effect depends on rustroot quality
  
 $size[14]{$u{Update for 26.04.21:}
   * merged loftar's code
