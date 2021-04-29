@@ -257,11 +257,11 @@ public class MapWnd extends WindowX implements Console.Directory {
 		namesel.c = listf.c.add(0, listf.sz.y + UI.scale(10));
 		if(colsel != null) {
 		    colsel.c = namesel.c.add(0, namesel.sz.y + UI.scale(10));
-		    mremove.c = colsel.c.add(0, colsel.sz.y + UI.scale(10));
+//		    mremove.c = colsel.c.add(0, colsel.sz.y + UI.scale(10));
 		}
-		if(mtrack != null) {
-		    mtrack.c = namesel.c.add(UI.scale(105), namesel.sz.y + BuddyWnd.margin3 + UI.scale(20));
-		}
+		int y = namesel.sz.y + BuddyWnd.margin3 + UI.scale(20);
+		mremove.c = namesel.c.add(0, y);
+		mtrack.c = namesel.c.add(UI.scale(105), y);
 	    }
 	}
     }
@@ -451,14 +451,14 @@ public class MapWnd extends WindowX implements Console.Directory {
 				view.file.update(mark);
 			    }
 			});
-		    mremove = tool.add(new Button(UI.scale(95), "Remove", false) {
-			    public void click() {
-				view.file.remove(mark);
-				ui.gui.untrack(mark);
-				change2(null);
-			    }
-			});
 		}
+		mremove = tool.add(new Button(UI.scale(95), "Remove", false) {
+		    public void click() {
+			view.file.remove(mark);
+			ui.gui.untrack(mark);
+			change2(null);
+		    }
+		});
 		mtrack = tool.add(new Button(UI.scale(95), ui.gui.isTracked(mark) ? "Untrack" : "Track", false) {
 		    public void click() {
 			if(ui.gui.isTracked(mark)) {
