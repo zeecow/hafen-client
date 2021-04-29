@@ -454,14 +454,20 @@ public class MapWnd extends WindowX implements Console.Directory {
 		    mremove = tool.add(new Button(UI.scale(95), "Remove", false) {
 			    public void click() {
 				view.file.remove(mark);
+				ui.gui.untrack(mark);
 				change2(null);
 			    }
 			});
 		}
 		mtrack = tool.add(new Button(UI.scale(95), ui.gui.isTracked(mark) ? "Untrack" : "Track", false) {
 		    public void click() {
-			ui.gui.track(mark);
-			change(ui.gui.isTracked(mark) ? "Untrack" : "Track");
+			if(ui.gui.isTracked(mark)) {
+			    ui.gui.untrack(mark);
+			    change("Track");
+			} else {
+			    ui.gui.track(mark);
+			    change("Unrack");
+			}
 		    }
 		});
 		MapWnd.this.resize(asz);
