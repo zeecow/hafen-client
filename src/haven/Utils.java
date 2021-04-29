@@ -2019,6 +2019,22 @@ public class Utils {
 	);
     }
     
+    public static Optional<Coord2d> intersect(Pair<Coord2d, Coord2d> lineA, Pair<Coord2d, Coord2d> lineB) {
+	double a1 = lineA.b.y - lineA.a.y;
+	double b1 = lineA.a.x - lineA.b.x;
+	double c1 = a1 * lineA.a.x + b1 * lineA.a.y;
+	
+	double a2 = lineB.b.y - lineB.a.y;
+	double b2 = lineB.a.x - lineB.b.x;
+	double c2 = a2 * lineB.a.x + b2 * lineB.a.y;
+	
+	double delta = a1 * b2 - a2 * b1;
+	if(delta == 0) {
+	    return Optional.empty();
+	}
+	return Optional.of(new Coord2d((float) ((b2 * c1 - b1 * c2) / delta), (float) ((a1 * c2 - a2 * c1) / delta)));
+    }
+    
     public static boolean checkbit(int target, int index) {
 	return (target & (1 << index)) != 0;
     }

@@ -9,6 +9,7 @@ import static java.lang.Math.*;
 
 /* >wdg: Pointer */
 public class Pointer extends Widget implements MiniMap.IPointer {
+    private static final Color TRIANGULATION_COLOR = new Color(100, 100, 100);
     public static final BaseColor[] colors = new BaseColor[]{
 	new BaseColor(new Color(241, 227, 157, 255)),
 	new BaseColor(new Color(189, 157, 241, 255)),
@@ -28,6 +29,7 @@ public class Pointer extends Widget implements MiniMap.IPointer {
     public boolean click;
     private Tex licon;
     private String tip = null;
+    private boolean triangulating = false;
     
     public Pointer(Indir<Resource> icon) {
 	super(Coord.z);
@@ -111,6 +113,7 @@ public class Pointer extends Widget implements MiniMap.IPointer {
 	});
 	sc = tmp.add(ad);
 	if(icon != null) {
+	    if(triangulating) {g.chcolor(TRIANGULATION_COLOR);}
 	    try {
 		if(licon == null)
 		    licon = icon.get().layer(Resource.imgc).tex();
@@ -118,6 +121,7 @@ public class Pointer extends Widget implements MiniMap.IPointer {
 	    } catch (Loading l) {
 	    }
 	}
+	g.chcolor();
 	this.lc = sc;
     }
     
@@ -171,7 +175,7 @@ public class Pointer extends Widget implements MiniMap.IPointer {
     
     public void update(Coord2d tc, long gobid) {
 	this.tc = tc;
-	mc = null;
+	triangulate(tc);
 	this.gobid = gobid;
     }
     
@@ -191,7 +195,7 @@ public class Pointer extends Widget implements MiniMap.IPointer {
 		tc = null;
 	    else
 		tc = ((Coord) args[0]).mul(OCache.posres);
-	    mc = null;
+	    triangulate(tc);
 	    if(args[1] == null)
 		gobid = -1;
 	    else
@@ -225,7 +229,7 @@ public class Pointer extends Widget implements MiniMap.IPointer {
 	if(tip != null) {
 	    double d = getDistance();
 	    if(d > 0) {
-		return String.format("%s (%.1fm)", tip, d);
+		return String.format("%s (%.1fm%s)", tip, d, triangulating ? "[?]" : "");
 	    } else {
 		return tip;
 	    }
@@ -249,10 +253,29 @@ public class Pointer extends Widget implements MiniMap.IPointer {
 	return -1;
     }
     
+    Pair<Coord2d, Coord2d> firstLine = null;
+    
+    private void triangulate(Coord2d b) {
+	mc = null;
+	tc();
+	if(!triangulating) {return;}
+	Gob player = ui.gui.map.player();
+	if(player != null && b != null) {
+	    Pair<Coord2d, Coord2d> line = new Pair<>(player.rc, b);
+	    if(firstLine == null) {
+		firstLine = line;
+	    } else {
+		mc = Utils.intersect(firstLine, line).orElse(mc);
+		triangulating = mc == null;
+	    }
+	}
+    }
+    
     public Coord2d tc() {return tc(ui.gui.mapfile.playerSegment());}
     
     public Coord2d tc(long id) {
 	if(marker != null) {
+	    triangulating = false;
 	    MiniMap.Location loc = ui.gui.mapfile.view.sessloc;
 	    if(id == marker.seg) {
 		tc = mc = marker.tc.sub(loc.tc).mul(tilesz);
@@ -261,14 +284,16 @@ public class Pointer extends Widget implements MiniMap.IPointer {
 		return null;
 	    }
 	} else if(tc == null) {
+	    triangulating = false;
 	    return null;
 	} else if(mc == null) {
 	    GameUI gui = getparent(GameUI.class);
 	    Gob player = gui.map.player();
 	    if(player != null) {
-		double d = player.rc.dist(tc);
+		double d = player.rc.dist(tc) / 11.0;
 		if(d > 990) {
 		    mc = gui.mapfile.findMarkerPosition(tip);
+		    triangulating = mc == null;
 		    if(mc != null) {
 			return mc;
 		    }
