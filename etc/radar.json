@@ -11,6 +11,7 @@
   {"match": "gfx/kritter/rockdove/rockdove", "icon": "gfx/invobjs/rockdove", "visible": true},
   {"match": "gfx/kritter/ptarmigan/ptarmigan", "icon": "gfx/invobjs/ptarmigan", "visible": true},
   {"match": "gfx/kritter/squirrel/squirrel", "icon": "gfx/kritter/squirrel/icon", "visible": true},
+  {"match": "gfx/kritter/bat/bat", "icon": "gfx/kritter/bat/icon", "visible": true},
 
   {"match": "gfx/terobjs/pow[hearth]", "icon": "radar/hearthfire", "visible": true},
   {"match": "gfx/terobjs/items/gems/gemstone", "icon": "radar/gem", "visible": true},

@@ -343,6 +343,8 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Sk
 		if(res != null) {
 		    if(res.name.equals("gfx/fx/floatimg")) {
 			processDmg(item.sdt.clone());
+		    } else if(res.name.equals("gfx/fx/dowse")) {
+		        ProspectingWnd.overlay(this, item);
 		    }
 //		    System.out.printf("overlayAdded: '%s'%n", res.name);
 		}
@@ -972,10 +974,15 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Sk
 	    Boolean needHide = CFG.HIDE_TREES.get();
 	    if(d != null && d.skipRender != needHide) {
 		d.skipRender = needHide;
-		glob.loader.defer(() -> setattr(d), null);
 		if(needHide) {
 		    tag(GobTag.HIDDEN);
+		    if(d.slots != null) {
+			ArrayList<RenderTree.Slot> tmpSlots = new ArrayList<>(d.slots);
+			glob.loader.defer(() -> RUtils.multirem(tmpSlots), null);
+		    }
 		} else {
+		    ArrayList<RenderTree.Slot> tmpSlots = new ArrayList<>(slots);
+		    glob.loader.defer(() -> RUtils.multiadd(tmpSlots, d), null);
 		    untag(GobTag.HIDDEN);
 		}
 	    	return true;

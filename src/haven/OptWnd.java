@@ -613,7 +613,17 @@ public class OptWnd extends WindowX {
 		    Audio.setvolume(val / 1000.0);
 		}
 	    }, prev.pos("bl").adds(0, 2));
-	prev = audio.add(new Label("In-game event volume"), prev.pos("bl").adds(0, 15));
+	prev = audio.add(new Label("Interface sound volume"), prev.pos("bl").adds(0, 15));
+	prev = audio.add(new HSlider(UI.scale(200), 0, 1000, 0) {
+		protected void attach(UI ui) {
+		    super.attach(ui);
+		    val = (int)(ui.audio.aui.volume * 1000);
+		}
+		public void changed() {
+		    ui.audio.aui.setvolume(val / 1000.0);
+		}
+	    }, prev.pos("bl").adds(0, 2));
+	prev = audio.add(new Label("In-game event volume"), prev.pos("bl").adds(0, 5));
 	prev = audio.add(new HSlider(UI.scale(200), 0, 1000, 0) {
 		protected void attach(UI ui) {
 		    super.attach(ui);
@@ -870,7 +880,7 @@ public class OptWnd extends WindowX {
 	final FlowerList list = general.add(new FlowerList(), x, y);
     
 	y += list.sz.y + UI.scale(5);
-	final TextEntry value = general.add(new TextEntry(UI.scale(155), "") {
+	final TextEntry value = general.add(new TextEntry(UI.scale(160), "") {
 	    @Override
 	    public void activate(String text) {
 		list.add(text);
@@ -878,13 +888,13 @@ public class OptWnd extends WindowX {
 	    }
 	}, x, y);
     
-	general.add(new Button(UI.scale(45), "Add") {
+	general.add(new Button(UI.scale(85), "Add") {
 	    @Override
 	    public void click() {
 		list.add(value.text);
 		value.settext("");
 	    }
-	}, x + UI.scale(160), y - UI.scale(2));
+	}, x + UI.scale(165), y - UI.scale(2));
     
 	y += STEP;
 	tx = x + general.add(new Label("Hold to ignore auto choose:"), x, y).sz.x + UI.scale(5);

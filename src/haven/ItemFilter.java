@@ -44,7 +44,7 @@ public class ItemFilter {
 	"$font[monospaced,13]{  q:ess+21 }will find items with essence of at least 21\n";
     
     public static final String HELP_CURIO = "$size[20]{$b{Curiosity search}}\n" +
-	"Supports $font[monospaced,13]{lp} (learning point gained), $font[monospaced,13]{xp} (experience required) and $font[monospaced,13]{mw} (mental weight required) tags. They all interchangeable in the examples below.\n" +
+	"Supports $font[monospaced,13]{lp} (learning point gained), $font[monospaced,13]{lph} (learning point gained per hour), $font[monospaced,13]{xp} (experience required) and $font[monospaced,13]{mw} (mental weight required) tags. They all interchangeable in the examples below.\n" +
 	"$size[16]{\nExamples:}\n" +
 	"$font[monospaced,13]{  lp:    }will find items that grant LP.\n" +
 	"$font[monospaced,13]{  lp>100 }will find items that grant more than 100 LP.\n" +
@@ -165,6 +165,7 @@ public class ItemFilter {
 		    case "xp":
 		    case "lp":
 		    case "mw":
+		    case "lph":
 			tag = text;
 			break;
 		    case "q":
@@ -188,6 +189,7 @@ public class ItemFilter {
 		    case "xp":
 		    case "lp":
 		    case "mw":
+		    case "lph":
 			filter = new XP(tag, sign, value, opt);
 			break;
 		    case "energy":
@@ -405,6 +407,8 @@ public class ItemFilter {
 		Curiosity curio = (Curiosity) item;
 		if("lp".equals(text)) {
 		    return test(curio.exp);
+		} else if ("lph".equals(text)) {
+		    return test(Curiosity.lph(curio.lph));
 		} else if("xp".equals(text)) {
 		    return test(curio.enc);
 		} else if("mw".equals(text)) {

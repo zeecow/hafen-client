@@ -1,12 +1,17 @@
 package haven;
 
-import java.util.*;
+import com.google.gson.TypeAdapter;
+import com.google.gson.stream.JsonReader;
+import com.google.gson.stream.JsonWriter;
 
-import static haven.FlowerMenu.AUTOCHOOSE;
+import java.io.IOException;
+import java.util.*;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+
+import static haven.FlowerMenu.*;
 
 public class FlowerList extends WidgetList<FlowerList.Item> {
-
-    public static final Comparator<Item> ITEM_COMPARATOR = Comparator.comparing(o -> o.name);
     
     @Override
     protected void drawbg(GOut g) {
@@ -14,16 +19,15 @@ public class FlowerList extends WidgetList<FlowerList.Item> {
     }
     
     public FlowerList() {
-	super(UI.scale(200, 25), 10);
-
-	for(Map.Entry<String, Boolean> entry : AUTOCHOOSE.entrySet()) {
-	    additem(new Item(entry.getKey()));
+	super(UI.scale(235, 25), 10);
+	
+	for (AutoChooseCFG.Opt entry : AUTOCHOOSE.options) {
+	    additem(new Item(entry.name));
 	}
-
+	
 	update();
     }
 
-    @SuppressWarnings("SynchronizeOnNonFinalField")
     @Override
     public void wdgmsg(Widget sender, String msg, Object... args) {
 	switch(msg) {
@@ -37,12 +41,30 @@ public class FlowerList extends WidgetList<FlowerList.Item> {
 		break;
 	    }
 	    case "delete": {
-		String name = (String) args[0];
-		synchronized(AUTOCHOOSE) {
+		String name = ((Item) sender).name;
+		synchronized (AUTOCHOOSE) {
 		    AUTOCHOOSE.remove(name);
 		}
 		FlowerMenu.saveAutochoose();
 		removeitem((Item) sender, true);
+		update();
+		break;
+	    }
+	    case "up": {
+		String name = ((Item) sender).name;
+		synchronized (AUTOCHOOSE) {
+		    AUTOCHOOSE.up(name);
+		}
+		FlowerMenu.saveAutochoose();
+		update();
+		break;
+	    }
+	    case "down": {
+		String name = ((Item) sender).name;
+		synchronized (AUTOCHOOSE) {
+		    AUTOCHOOSE.down(name);
+		}
+		FlowerMenu.saveAutochoose();
 		update();
 		break;
 	    }
@@ -52,10 +74,9 @@ public class FlowerList extends WidgetList<FlowerList.Item> {
 	}
     }
 
-    @SuppressWarnings("SynchronizeOnNonFinalField")
     public void add(String name) {
-	if(name != null && !name.isEmpty() && !AUTOCHOOSE.containsKey(name)) {
-	    synchronized(AUTOCHOOSE) {
+	if(name != null && !name.isEmpty() && !AUTOCHOOSE.has(name)) {
+	    synchronized (AUTOCHOOSE) {
 		AUTOCHOOSE.put(name, true);
 	    }
 	    FlowerMenu.saveAutochoose();
@@ -65,11 +86,8 @@ public class FlowerList extends WidgetList<FlowerList.Item> {
     }
 
     private void update() {
-	list.sort(ITEM_COMPARATOR);
-	int n = listitems();
-	for(int i = 0; i < n; i++) {
-	    listitem(i).c = itempos(i);
-	}
+	list.sort(Comparator.comparingInt(o -> AUTOCHOOSE.index(o.name)));
+	updateChildPositions();
     }
 
     protected static class Item extends Widget {
@@ -87,7 +105,9 @@ public class FlowerList extends WidgetList<FlowerList.Item> {
 	    cb.a = FlowerMenu.autochoose(name);
 	    cb.canactivate = true;
 
-	    add(new Button(UI.scale(24), "X"), UI.scale(175, 0));
+	    add(new Button(UI.scale(24), "X", false), UI.scale(210, 0)).action(() -> wdgmsg("delete"));
+	    add(new Button(UI.scale(24), "⇑", false), UI.scale(180, 0)).action(() -> wdgmsg("up"));
+	    add(new Button(UI.scale(24), "⇓", false), UI.scale(156, 0)).action(() -> wdgmsg("down"));
 	}
 
 	@Override
@@ -135,6 +155,136 @@ public class FlowerList extends WidgetList<FlowerList.Item> {
 		    super.wdgmsg(sender, msg, args);
 		    break;
 	    }
+	}
+    }
+    
+    public static class AutoChooseCFG {
+	private static class Opt {
+	    public static final Opt empty = new Opt(null, false);
+	    
+	    final String name;
+	    private boolean enabled;
+	    
+	    public Opt(String name, boolean enabled) {
+		this.name = name;
+		this.enabled = enabled;
+	    }
+	}
+	
+	private final List<Opt> options = new LinkedList<>();
+	
+	public void put(String name) {put(name, false);}
+	
+	public void put(String name, boolean enabled) {
+	    Optional<Opt> found = find(name);
+	    if(!found.isPresent()) {
+		options.add(new Opt(name, enabled));
+	    } else {
+		found.get().enabled = enabled;
+	    }
+	}
+	
+	public void remove(String name) {
+	    options.removeIf(opt -> Objects.equals(name, opt.name));
+	}
+	
+	public void up(String name) {
+	    Iterator<Opt> iter = options.iterator();
+	    int i = 0;
+	    while (iter.hasNext()) {
+		Opt opt = iter.next();
+		if(Objects.equals(opt.name, name)) {
+		    if(i > 0) {
+			iter.remove();
+			options.add(i - 1, opt);
+		    }
+		    return;
+		}
+		i++;
+	    }
+	}
+	
+	public void down(String name) {
+	    Iterator<Opt> iter = options.iterator();
+	    int i = 0;
+	    int max = options.size() - 1;
+	    while (iter.hasNext()) {
+		Opt opt = iter.next();
+		if(Objects.equals(opt.name, name)) {
+		    if(i < max) {
+			iter.remove();
+			options.add(i + 1, opt);
+		    }
+		    return;
+		}
+		i++;
+	    }
+	}
+    
+	public int index(String name) {
+	    Predicate<Opt> check = byName(name);
+	    for (int i = 0; i < options.size(); i++) {
+		if(check.test(options.get(i))) {
+		    return i;
+		}
+	    }
+	    return -1;
+	}
+	
+	public Optional<Opt> find(String name) {
+	    return options.stream().filter(byName(name)).findFirst();
+	}
+	
+	public boolean has(String name) {
+	    return options.stream().anyMatch(byName(name));
+	}
+	
+	public boolean active(String name) {
+	    return find(name).orElse(Opt.empty).enabled;
+	}
+	
+	public List<String> active() {
+	    return options.stream().filter(opt -> opt.enabled).map(opt -> opt.name).collect(Collectors.toList());
+	}
+	
+	public int choose(String[] options) {
+	    List<String> active = active();
+	    for (String s : active) {
+		for (int i = 0; i < options.length; i++) {
+		    if(Objects.equals(s, options[i])) {
+			return i;
+		    }
+		}
+	    }
+	    return -1;
+	}
+	
+	private static Predicate<Opt> byName(String name) {
+	    return opt -> opt.name.equals(name) || opt.name.equals(L10N.flower(name));
+	}
+    }
+    
+    public static class AutoChooseCFGAdapter extends TypeAdapter<AutoChooseCFG> {
+	
+	@Override
+	public void write(JsonWriter out, AutoChooseCFG cfg) throws IOException {
+	    out.beginObject();
+	    for (AutoChooseCFG.Opt option : cfg.options) {
+		out.name(option.name);
+		out.value(option.enabled);
+	    }
+	    out.endObject();
+	}
+	
+	@Override
+	public AutoChooseCFG read(JsonReader in) throws IOException {
+	    AutoChooseCFG cfg = new AutoChooseCFG();
+	    in.beginObject();
+	    while (in.hasNext()) {
+		cfg.put(in.nextName(), in.nextBoolean());
+	    }
+	    in.endObject();
+	    return cfg;
 	}
     }
 }

@@ -83,6 +83,8 @@ public class WindowDetector {
 	    GameUI.Hidewnd belt = new GameUI.Hidewnd(sz, title, lg);
 	    belt.hide();
 	    return belt;
+	} else if(isProspecting(title)) {
+	    return new ProspectingWnd(sz, title);
 	}
 	return (new WindowX(sz, title, lg));
     }
@@ -93,5 +95,9 @@ public class WindowDetector {
     
     public static boolean isBelt(String title) {
 	return "Belt".equals(title);
+    }
+    
+    public static boolean isProspecting(String title) {
+	return "Prospecting".equals(title);
     }
 }
