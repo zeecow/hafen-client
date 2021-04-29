@@ -23,6 +23,7 @@ public class Pointer extends Widget implements MiniMap.IPointer {
     public Indir<Resource> icon;
     public Coord2d tc, mc;
     public Coord lc;
+    public MapFile.Marker marker;
     public long gobid = -1;
     public boolean click;
     private Tex licon;
@@ -33,7 +34,22 @@ public class Pointer extends Widget implements MiniMap.IPointer {
 	this.icon = icon;
     }
     
+    public Pointer(MapFile.Marker marker) {
+	super(Coord.z);
+	this.marker = marker;
+	tip = marker.nm;
+	if(marker instanceof MapFile.PMarker) {
+	    col = new BaseColor(((MapFile.PMarker) marker).color);
+	} else if(marker instanceof MapFile.SMarker) {
+	    icon = ((MapFile.SMarker) marker).res;
+	    col = colors[0];
+	}
+    }
+    
     public static Widget mkwidget(UI ui, Object... args) {
+	if(args[0] instanceof MapFile.Marker) {
+	    return new Pointer((MapFile.Marker) args[0]);
+	}
 	int iconid = (Integer) args[0];
 	Indir<Resource> icon = (iconid < 0) ? null : ui.sess.getres(iconid);
 	return (new Pointer(icon));
@@ -107,6 +123,7 @@ public class Pointer extends Widget implements MiniMap.IPointer {
     
     public void draw(GOut g) {
 	this.lc = null;
+	Coord2d tc = tc();
 	if(tc == null)
 	    return;
 	Gob gob = (gobid < 0) ? null : ui.sess.glob.oc.getgob(gobid);
@@ -232,8 +249,18 @@ public class Pointer extends Widget implements MiniMap.IPointer {
 	return -1;
     }
     
-    public Coord2d tc() {
-	if(tc == null) {
+    public Coord2d tc() {return tc(ui.gui.mapfile.playerSegment());}
+    
+    public Coord2d tc(long id) {
+	if(marker != null) {
+	    MiniMap.Location loc = ui.gui.mapfile.view.sessloc;
+	    if(id == marker.seg) {
+		tc = mc = marker.tc.sub(loc.tc).mul(tilesz);
+		return mc;
+	    } else {
+		return null;
+	    }
+	} else if(tc == null) {
 	    return null;
 	} else if(mc == null) {
 	    GameUI gui = getparent(GameUI.class);
@@ -252,6 +279,10 @@ public class Pointer extends Widget implements MiniMap.IPointer {
 	} else {
 	    return mc;
 	}
+    }
+    
+    public long seg() {
+	return marker != null ? marker.seg : ui.gui.mapfile.playerSegment();
     }
     
     public Coord sc(Coord c, Coord sz) {

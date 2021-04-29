@@ -58,6 +58,7 @@ public class MapWnd extends WindowX implements Console.Directory {
     private final Frame viewf;
     private GroupSelector colsel;
     private Button mremove;
+    private Button mtrack;
     private Predicate<Marker> mflt = pmarkers;
     private Comparator<Marker> mcmp = namecmp;
     private List<Marker> markers = Collections.emptyList();
@@ -258,6 +259,9 @@ public class MapWnd extends WindowX implements Console.Directory {
 		    colsel.c = namesel.c.add(0, namesel.sz.y + UI.scale(10));
 		    mremove.c = colsel.c.add(0, colsel.sz.y + UI.scale(10));
 		}
+		if(mtrack != null) {
+		    mtrack.c = namesel.c.add(UI.scale(105), namesel.sz.y + BuddyWnd.margin3 + UI.scale(20));
+		}
 	    }
 	}
     }
@@ -419,6 +423,8 @@ public class MapWnd extends WindowX implements Console.Directory {
 		    colsel = null;
 		    ui.destroy(mremove);
 		    mremove = null;
+		    ui.destroy(mtrack);
+		    mtrack = null;
 		}
 	    }
 
@@ -445,13 +451,19 @@ public class MapWnd extends WindowX implements Console.Directory {
 				view.file.update(mark);
 			    }
 			});
-		    mremove = tool.add(new Button(UI.scale(200), "Remove", false) {
+		    mremove = tool.add(new Button(UI.scale(95), "Remove", false) {
 			    public void click() {
 				view.file.remove(mark);
 				change2(null);
 			    }
 			});
 		}
+		mtrack = tool.add(new Button(UI.scale(95), ui.gui.isTracked(mark) ? "Untrack" : "Track", false) {
+		    public void click() {
+			ui.gui.track(mark);
+			change(ui.gui.isTracked(mark) ? "Untrack" : "Track");
+		    }
+		});
 		MapWnd.this.resize(asz);
 	    }
 	}
@@ -746,7 +758,13 @@ public class MapWnd extends WindowX implements Console.Directory {
 	}
 	return null;
     }
-
+    
+    public long playerSegment() {
+	Location sessloc = view.sessloc;
+	if(sessloc == null) {return 0;}
+	return sessloc.seg.id;
+    }
+    
     private Map<String, Console.Command> cmdmap = new TreeMap<String, Console.Command>();
     {
 	cmdmap.put("exportmap", new Console.Command() {

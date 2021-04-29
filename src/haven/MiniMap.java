@@ -657,7 +657,7 @@ public class MiniMap extends Widget {
 	if(zoomlevel <= 2 && CFG.MMAP_GRID.get()) {drawgrid(g);}
 	if(playerSegment && zoomlevel <= 1 && CFG.MMAP_VIEW.get()) {drawview(g);}
 	if(playerSegment && CFG.MMAP_SHOW_PATH.get()) {drawMovement(g);}
-	if(playerSegment && big) {drawPointers(g);}//TODO: add setting to show this?
+	if(big) {drawPointers(g);}//TODO: add setting to show this?
 	if(dlvl <= 1)
 	    drawicons(g);
 	if(playerSegment) drawparty(g);
@@ -851,12 +851,10 @@ public class MiniMap extends Widget {
 	    if(icon != null) {
 		return icon.tooltip();
 	    }
-	    boolean playerSegment = (sessloc != null) && ((curloc == null) || (sessloc.seg == curloc.seg));
-	    if(playerSegment) {
-		for (IPointer p : pointers()) {
-		    if(p.sc(p2c(p.tc()), sz).dist(c) < 20) {
-			return p.tooltip();
-		    }
+	    long curSeg = dloc.seg.id;
+	    for (IPointer p : pointers()) {
+		if(p.seg() == curSeg && p.sc(p2c(p.tc(curSeg)), sz).dist(c) < 20) {
+		    return p.tooltip();
 		}
 	    }
 	}
@@ -956,17 +954,22 @@ public class MiniMap extends Widget {
     
     void drawPointers(GOut g) {
 	for (IPointer p : pointers()) {
-	    Coord c = p2c(p.tc());
-	    p.drawmmarrow(g, c, sz);
+	    if(curloc != null && p.seg() == curloc.seg.id) {
+		p.drawmmarrow(g, p2c(p.tc(curloc.seg.id)), sz);
+	    }
 	}
 	g.chcolor();
     }
     
     private List<IPointer> pointers() {
+	if(curloc == null) {
+	    return Collections.emptyList();
+	}
+	long curSeg = curloc.seg.id;
 	return ui.gui.children().stream()
 	    .filter(widget -> widget instanceof IPointer)
 	    .map(widget -> (IPointer) widget)
-	    .filter(p -> p.tc() != null)
+	    .filter(p -> p.tc(curSeg) != null)
 	    .collect(Collectors.toList());
     }
     
@@ -1024,11 +1027,13 @@ public class MiniMap extends Widget {
     }
     
     public interface IPointer {
-	Coord2d tc();
+	Coord2d tc(long id);
 	
 	Coord sc(Coord c, Coord sz);
 	
 	Object tooltip();
+	
+	long seg();
 	
 	void drawmmarrow(GOut g, Coord tc, Coord sz);
     }
