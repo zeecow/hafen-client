@@ -265,6 +265,7 @@ public class MapWnd extends WindowX implements Console.Directory {
     private class View extends MiniMap {
 	View(MapFile file) {
 	    super(file);
+	    big = true;
 	}
 
 	public void drawgrid(GOut g, Coord ul, DisplayGrid disp) {

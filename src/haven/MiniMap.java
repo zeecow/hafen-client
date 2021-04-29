@@ -32,6 +32,8 @@ import java.util.List;
 
 import java.util.function.*;
 import java.awt.Color;
+import java.util.stream.Stream;
+
 import haven.MapFile.Segment;
 import haven.MapFile.DataGrid;
 import haven.MapFile.Grid;
@@ -63,6 +65,7 @@ public class MiniMap extends Widget {
     protected Location dloc;
     private String biome;
     private Tex biometex;
+    public boolean big = false;
 
     public MiniMap(Coord sz, MapFile file) {
 	super(sz);
@@ -654,6 +657,7 @@ public class MiniMap extends Widget {
 	if(zoomlevel <= 2 && CFG.MMAP_GRID.get()) {drawgrid(g);}
 	if(playerSegment && zoomlevel <= 1 && CFG.MMAP_VIEW.get()) {drawview(g);}
 	if(playerSegment && CFG.MMAP_SHOW_PATH.get()) {drawMovement(g);}
+	if(playerSegment && big) {drawPointers(g);}//TODO: add setting to show this?
 	if(dlvl <= 1)
 	    drawicons(g);
 	if(playerSegment) drawparty(g);
@@ -942,6 +946,23 @@ public class MiniMap extends Widget {
 	}
     }
     
+    void drawPointers(GOut g) {
+	pointers().forEach(p -> {
+	    Coord2d tc = p.tc();
+	    if(tc != null) {
+		Coord c = p2c(tc);
+		p.drawmmarrow(g, c, sz);
+	    }
+	});
+	g.chcolor();
+    }
+    
+    private Stream<IPointer> pointers() {
+	return ui.gui.children().stream()
+	    .filter(widget -> widget instanceof IPointer)
+	    .map(widget -> (IPointer) widget);
+    }
+    
     void drawbiome(GOut g) {
 	if(biometex != null) {
 	    Coord mid = new Coord(g.sz().x / 2, 0);
@@ -993,5 +1014,11 @@ public class MiniMap extends Widget {
 	biome = biome.substring(k + 1);
 	biome = biome.substring(0, 1).toUpperCase() + biome.substring(1);
 	return biome;
+    }
+    
+    public interface IPointer {
+	Coord2d tc();
+	
+	void drawmmarrow(GOut g, Coord tc, Coord sz);
     }
 }

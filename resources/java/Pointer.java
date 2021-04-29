@@ -8,7 +8,7 @@ import static haven.MCache.*;
 import static java.lang.Math.*;
 
 /* >wdg: Pointer */
-public class Pointer extends Widget {
+public class Pointer extends Widget implements MiniMap.IPointer {
     public static final BaseColor col = new BaseColor(new Color(241, 227, 157, 255));
     public Indir<Resource> icon;
     public Coord2d tc;
@@ -64,11 +64,14 @@ public class Pointer extends Widget {
 	
 	// gl.glEnable(GL2.GL_POLYGON_SMOOTH); XXXRENDER
 	g.usestate(col);
+	Coord tmp = sc;
+	sc = sc.add(g.tx);
 	g.drawp(Model.Mode.TRIANGLES, new float[]{
 	    sc.x, sc.y,
 	    sc.x + ad.x - (ad.y / 3), sc.y + ad.y + (ad.x / 3),
 	    sc.x + ad.x + (ad.y / 3), sc.y + ad.y - (ad.x / 3),
 	});
+	sc = tmp;
 	
 	if(icon != null) {
 	    try {
@@ -198,4 +201,14 @@ public class Pointer extends Widget {
 	}
 	return -1;
     }
+    
+    public Coord2d tc() {return tc;}
+    
+    public void drawmmarrow(GOut g, Coord tc, Coord sz) {
+        Coord tmp = this.sz;
+        this.sz = sz;
+        drawarrow(g, tc);
+        this.sz = tmp;
+    }
+    
 }
