@@ -46,7 +46,7 @@ public class FlowerMenu extends Widget {
     public static final String PICK_ALL = "#Pick All";
     public static final FlowerList.AutoChooseCFG AUTOCHOOSE;
     private static final Gson gson;
-    private static Gob target;
+    private static Bot.Target target;
     public final String[] options;
     private Petal autochoose;
     private String[] forceChoose;
@@ -74,7 +74,11 @@ public class FlowerMenu extends Widget {
     }
     
     public static void lastGob(Gob gob) {
-	target = gob;
+	target = new Bot.Target(gob);
+    }
+    
+    public static void lastItem(WItem item) {
+	target = new Bot.Target(item);
     }
     
     @Override
@@ -375,14 +379,18 @@ public class FlowerMenu extends Widget {
     }
 
     public void choose(int num) {
-	if(num != -1) { ui.pathQueue().ifPresent(pathQueue -> pathQueue.click(target));	}
-	if(num != -1 && PICK_ALL.equals(options[num])) {
-	    if(target != null) {
-		try {
-		    Bot.pickup(ui.gui, target.getres().name);
-		} catch (Exception ignored) {}
+	if(num != -1) {
+	    ui.pathQueue().ifPresent(pathQueue -> pathQueue.click(target));
+	    if(PICK_ALL.equals(options[num])) {
+		if(target != null && target.gob != null) {
+		    try {
+			Bot.pickup(ui.gui, target.gob.getres().name);
+		    } catch (Exception ignored) {}
+		}
+		num = -1;
+	    } else if("Prospect".equals(options[num]) && target != null) {
+		ProspectingWnd.item(target.item);
 	    }
-	    num = -1;
 	}
 	target = null;
 	wdgmsg("cl", num, ui.modflags());

@@ -343,6 +343,8 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Sk
 		if(res != null) {
 		    if(res.name.equals("gfx/fx/floatimg")) {
 			processDmg(item.sdt.clone());
+		    } else if(res.name.equals("gfx/fx/dowse")) {
+		        ProspectingWnd.overlay(this, item);
 		    }
 //		    System.out.printf("overlayAdded: '%s'%n", res.name);
 		}
