@@ -9,7 +9,17 @@ import static java.lang.Math.*;
 
 /* >wdg: Pointer */
 public class Pointer extends Widget implements MiniMap.IPointer {
-    public static final BaseColor col = new BaseColor(new Color(241, 227, 157, 255));
+    public static final BaseColor[] colors = new BaseColor[]{
+	new BaseColor(new Color(241, 227, 157, 255)),
+	new BaseColor(new Color(189, 157, 241, 255)),
+	new BaseColor(new Color(209, 241, 157, 255)),
+	new BaseColor(new Color(157, 212, 241, 255)),
+	new BaseColor(new Color(241, 157, 196, 255)),
+	new BaseColor(new Color(157, 241, 205, 255)),
+	new BaseColor(new Color(241, 193, 157, 255)),
+    };
+    
+    private BaseColor col = null;
     public Indir<Resource> icon;
     public Coord2d tc;
     public Coord lc;
@@ -71,6 +81,10 @@ public class Pointer extends Widget implements MiniMap.IPointer {
 	Coord ad = sp.b;
 	
 	// gl.glEnable(GL2.GL_POLYGON_SMOOTH); XXXRENDER
+	if(col == null) {
+	    int i = getparent(GameUI.class).chrwdg.getObjectiveIndex(tip);
+	    col = colors[i % colors.length];
+	}
 	g.usestate(col);
 	Coord tmp = sc;
 	sc = sc.add(g.tx);
@@ -79,17 +93,16 @@ public class Pointer extends Widget implements MiniMap.IPointer {
 	    sc.x + ad.x - (ad.y / 3), sc.y + ad.y + (ad.x / 3),
 	    sc.x + ad.x + (ad.y / 3), sc.y + ad.y - (ad.x / 3),
 	});
-	sc = tmp;
-	
+	sc = tmp.add(ad);
 	if(icon != null) {
 	    try {
 		if(licon == null)
 		    licon = icon.get().layer(Resource.imgc).tex();
-		g.aimage(licon, sc.add(ad), 0.5, 0.5);
+		g.aimage(licon, sc, 0.5, 0.5);
 	    } catch (Loading l) {
 	    }
 	}
-	this.lc = sc.add(ad);
+	this.lc = sc;
     }
     
     public void draw(GOut g) {

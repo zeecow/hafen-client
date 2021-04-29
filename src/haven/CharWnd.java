@@ -1800,6 +1800,20 @@ public class CharWnd extends WindowX {
 	    return(null);
 	}
     }
+    
+    public int getObjectiveIndex(String name) {
+	Set<Quest.Box> wdgs = children(Quest.Box.class);
+	if(!wdgs.isEmpty()) {
+	    for (Quest.Box wdg : wdgs) {
+		for (int i = 0; i < wdg.cond.length; i++) {
+		    if(wdg.cond[i].desc.contains(name)) {
+			return i;
+		    }
+		}
+	    }
+	}
+	return 0;
+    }
 
     public class QuestList extends Listbox<Quest> {
 	public List<Quest> quests = new ArrayList<Quest>();
