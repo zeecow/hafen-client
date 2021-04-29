@@ -32,7 +32,7 @@ import java.util.List;
 
 import java.util.function.*;
 import java.awt.Color;
-import java.util.stream.Stream;
+import java.util.stream.Collectors;
 
 import haven.MapFile.Segment;
 import haven.MapFile.DataGrid;
@@ -851,6 +851,14 @@ public class MiniMap extends Widget {
 	    if(icon != null) {
 		return icon.tooltip();
 	    }
+	    boolean playerSegment = (sessloc != null) && ((curloc == null) || (sessloc.seg == curloc.seg));
+	    if(playerSegment) {
+		for (IPointer p : pointers()) {
+		    if(p.sc(p2c(p.tc()), sz).dist(c) < 20) {
+			return p.tooltip();
+		    }
+		}
+	    }
 	}
 	return(super.tooltip(c, prev));
     }
@@ -947,20 +955,19 @@ public class MiniMap extends Widget {
     }
     
     void drawPointers(GOut g) {
-	pointers().forEach(p -> {
-	    Coord2d tc = p.tc();
-	    if(tc != null) {
-		Coord c = p2c(tc);
-		p.drawmmarrow(g, c, sz);
-	    }
-	});
+	for (IPointer p : pointers()) {
+	    Coord c = p2c(p.tc());
+	    p.drawmmarrow(g, c, sz);
+	}
 	g.chcolor();
     }
     
-    private Stream<IPointer> pointers() {
+    private List<IPointer> pointers() {
 	return ui.gui.children().stream()
 	    .filter(widget -> widget instanceof IPointer)
-	    .map(widget -> (IPointer) widget);
+	    .map(widget -> (IPointer) widget)
+	    .filter(p -> p.tc() != null)
+	    .collect(Collectors.toList());
     }
     
     void drawbiome(GOut g) {
@@ -1018,6 +1025,10 @@ public class MiniMap extends Widget {
     
     public interface IPointer {
 	Coord2d tc();
+	
+	Coord sc(Coord c, Coord sz);
+	
+	Object tooltip();
 	
 	void drawmmarrow(GOut g, Coord tc, Coord sz);
     }

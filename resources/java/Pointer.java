@@ -44,7 +44,7 @@ public class Pointer extends Widget implements MiniMap.IPointer {
 	return (0);
     }
     
-    private void drawarrow(GOut g, Coord tc) {
+    private Pair<Coord, Coord> screenp(Coord tc, Coord sz) {
 	Coord hsz = sz.div(2);
 	tc = tc.sub(hsz);
 	if(tc.equals(Coord.z))
@@ -61,6 +61,14 @@ public class Pointer extends Widget implements MiniMap.IPointer {
 	}
 	Coord ad = sc.sub(tc).norm(UI.scale(30.0));
 	sc = sc.add(hsz);
+	
+	return new Pair<>(sc, ad);
+    }
+    
+    private void drawarrow(GOut g, Coord tc) {
+	Pair<Coord, Coord> sp = screenp(tc, sz);
+	Coord sc = sp.a;
+	Coord ad = sp.b;
 	
 	// gl.glEnable(GL2.GL_POLYGON_SMOOTH); XXXRENDER
 	g.usestate(col);
@@ -177,15 +185,19 @@ public class Pointer extends Widget implements MiniMap.IPointer {
     
     public Object tooltip(Coord c, Widget prev) {
 	if((lc != null) && (lc.dist(c) < 20))
-	    if(tip != null) {
-		double d = getDistance();
-		if(d > 0) {
-		    return String.format("%s (%.1fm)", tip, d);
-		} else {
-		    return tip;
-		}
-	    } else return (tooltip);
+	    return tooltip();
 	return (null);
+    }
+    
+    public Object tooltip() {
+	if(tip != null) {
+	    double d = getDistance();
+	    if(d > 0) {
+		return String.format("%s (%.1fm)", tip, d);
+	    } else {
+		return tip;
+	    }
+	} else return (tooltip);
     }
     
     double getDistance() {
@@ -204,11 +216,18 @@ public class Pointer extends Widget implements MiniMap.IPointer {
     
     public Coord2d tc() {return tc;}
     
+    public Coord sc(Coord c, Coord sz) {
+	Pair<Coord, Coord> p = screenp(c, sz);
+	return p.a.add(p.b);
+    }
+    
     public void drawmmarrow(GOut g, Coord tc, Coord sz) {
-        Coord tmp = this.sz;
-        this.sz = sz;
-        drawarrow(g, tc);
-        this.sz = tmp;
+	Coord tsz = this.sz;
+	Coord tlc = this.lc;
+	this.sz = sz;
+	drawarrow(g, tc);
+	this.sz = tsz;
+	this.lc = tlc;
     }
     
 }
