@@ -1,6 +1,10 @@
 package haven;
 
 
+import java.util.Random;
+
+import static haven.MCache.*;
+
 public class MapWnd2 extends MapWnd {
     private boolean switching = true;
     
@@ -49,6 +53,22 @@ public class MapWnd2 extends MapWnd {
     protected void setCfg() {
 	super.setCfg();
 	cfg.sz = asz;
+    }
+    
+    public void addMarker(Gob gob) {
+	addMarker(gob.rc.floor(tilesz), Utils.prettyResName(gob.tooltip()));
+    }
+    
+    public void addMarker(Coord at) {
+	addMarker(at, "New marker");
+    }
+    
+    public void addMarker(Coord at, String name) {
+	at = at.add(view.sessloc.tc);
+	MapFile.Marker nm = new MapFile.PMarker(view.sessloc.seg.id, at, name, BuddyWnd.gc[new Random().nextInt(BuddyWnd.gc.length)]);
+	file.add(nm);
+	focus(nm);
+	domark = false;
     }
     
 }

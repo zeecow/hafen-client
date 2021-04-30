@@ -2177,6 +2177,10 @@ public class MapView extends PView implements DTarget, Console.Directory {
 		args = Utils.extend(args, inf.clickargs());
 		Gob gob = Gob.from(inf.ci);
 		if(gob != null) {
+		    if(ui.gui.mapfile.domark) {
+			ui.gui.mapfile.addMarker(gob);
+		        return;
+		    }
 		    if(clickb == 3) {FlowerMenu.lastGob(gob);}
 		    if(ui.modmeta && clickb == 1) {
 			ChatUI.Channel chat = ui.gui.chat.sel;
@@ -2186,6 +2190,9 @@ public class MapView extends PView implements DTarget, Console.Directory {
 			return;
 		    }
 		}
+	    } else if(ui.gui.mapfile.domark) {
+		ui.gui.mapfile.addMarker(mc.floor(tilesz));
+		return;
 	    }
 	    if(clickb == 1) {Bot.cancel();}
 	    
@@ -2231,7 +2238,15 @@ public class MapView extends PView implements DTarget, Console.Directory {
     public boolean mousedown(Coord c, int button) {
 	parent.setfocus(this);
 	Loader.Future<Plob> placing_l = this.placing;
-	if(button == 3) {stopInspecting();}
+	if(button == 3) {
+	    if(isInspecting()) {
+		stopInspecting();
+		return true;
+	    } else if(ui.gui.mapfile.domark) {
+		ui.gui.mapfile.domark = false;
+		return true;
+	    }
+	}
 	if(button == 2) {
 	    if(((Camera)camera).click(c)) {
 		camdrag = ui.grabmouse(this);
@@ -2661,5 +2676,13 @@ public class MapView extends PView implements DTarget, Console.Directory {
 	} else {
 	    ttip = null;
 	}
+    }
+    
+    @Override
+    public Resource getcurs(Coord c) {
+	if(ui.gui.mapfile.domark) {
+	    return MapWnd.markcurs;
+	}
+	return super.getcurs(c);
     }
 }

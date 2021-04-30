@@ -63,7 +63,7 @@ public class MapWnd extends WindowX implements Console.Directory {
     private Comparator<Marker> mcmp = namecmp;
     private List<Marker> markers = Collections.emptyList();
     private int markerseq = -1;
-    private boolean domark = false;
+    public boolean domark = false;
     private final Collection<Runnable> deferred = new LinkedList<>();
 
     private final static Predicate<Marker> pmarkers = (m -> m instanceof PMarker);
