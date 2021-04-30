@@ -449,7 +449,21 @@ public class ItemFilter {
 		return test(quality.single(type).value);
 	    }
 	}
-
+    
+	@Override
+	public boolean matches(List<ItemInfo> info) {
+	    QualityList q = ItemInfo.getContent(info).q;
+	    if(!q.isEmpty()) {
+		return match(q);
+	    }
+	    return super.matches(info);
+	}
+    
+	@Override
+	protected Sign getDefaultSign() {
+	    return Sign.EQUAL;
+	}
+    
 	private SingleType getTextType(String text) {
 	    SingleType[] types = SingleType.values();
 	    for (SingleType type : types) {
