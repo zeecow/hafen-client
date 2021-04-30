@@ -44,6 +44,8 @@ public class GobWarning extends GAttrib implements RenderTree.Node {
 	    return animal;
 	} else if(gob.is(GobTag.GEM)) {
 	    return gem;
+	} else if (gob.is(GobTag.MIDGES)) {
+	    return midges;
 	}
 	return null;
     }
@@ -51,7 +53,8 @@ public class GobWarning extends GAttrib implements RenderTree.Node {
     public enum WarnTarget {
 	player(50, "Player", Color.RED, new Color(192, 0, 0, 128), new Color(255, 224, 96)),
 	animal(50, "Dangerous animal", Color.RED, new Color(192, 0, 0, 128), new Color(255, 224, 96)),
-	gem(5, "Gem", Color.GREEN, new Color(0, 192, 122, 64), new Color(255, 90, 200, 128));
+	gem(5, "Gem", Color.GREEN, new Color(0, 192, 122, 64), new Color(255, 90, 200, 128)),
+	midges(15, "Midges", Color.MAGENTA, new Color(255, 255, 255, 64), new Color(128, 0, 255, 128));
 	
 	private final int radius;
 	private final String message;
@@ -147,6 +150,16 @@ public class GobWarning extends GAttrib implements RenderTree.Node {
 	    box = add(new CheckBox("Warn about gems", false), 0, y);
 	    box.a = WarnCFG.get(gem, message);
 	    box.changed(val -> WarnCFG.set(gem, message, val));
+	    y += 35;
+	    
+	    box = add(new CheckBox("Highlight midges", false), 0, y);
+	    box.a = WarnCFG.get(WarnTarget.midges, highlight);
+	    box.changed(val -> WarnCFG.set(midges, highlight, val));
+	    y += 25;
+	    
+	    box = add(new CheckBox("Warn about midges", false), 0, y);
+	    box.a = WarnCFG.get(midges, message);
+	    box.changed(val -> WarnCFG.set(midges, message, val));
 	    
 	    pack();
 	    if(asz.x < 200) {

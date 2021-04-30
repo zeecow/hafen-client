@@ -6,6 +6,8 @@ public enum GobTag {
     TREE, BUSH, LOG, STUMP, HERB,
     ANIMAL, AGGRESSIVE, CRITTER,
     
+    MIDGES,
+    
     DOMESTIC, YOUNG, ADULT,
     CATTLE, COW, BULL, CALF,
     GOAT, NANNY, BILLY, KID,
@@ -25,7 +27,6 @@ public enum GobTag {
         "/bear", "/boar", "/troll", "/wolverine", "/badger", "/adder", "/wolf", "/walrus", "/lynx", "/caverat", "/moose", 
         "/mammoth"
     };
-    
     
     private static final String[] ANIMALS = {
         "/fox", "/swan", "/bat", "/beaver", "/reddeer"
@@ -89,6 +90,8 @@ public enum GobTag {
                 if(domesticated(gob, name, tags)) {
                     tags.add(ANIMAL);
                     tags.add(DOMESTIC);
+                } else if (name.endsWith("/midgeswarm")) {
+                    tags.add(MIDGES);
                 } else if(ofType(name, CRITTERS)) {
                     tags.add(ANIMAL);
                     tags.add(CRITTER);
