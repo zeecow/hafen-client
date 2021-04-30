@@ -285,6 +285,7 @@ public abstract class ItemInfo {
 	}
     
 	public Content content() {
+	    QualityList q = new QualityList(sub);
 	    for (ItemInfo i : sub) {
 		if(i instanceof Name) {
 		    Matcher m = PARSE.matcher(((Name) i).original);
@@ -293,7 +294,7 @@ public abstract class ItemInfo {
 			try {
 			    count = Float.parseFloat(m.group(1));
 			} catch (Exception ignored) {}
-			return new Content(m.group(3), m.group(2), count);
+			return new Content(m.group(3), m.group(2), count, q);
 		    }
 		}
 	    }
@@ -304,11 +305,17 @@ public abstract class ItemInfo {
 	    public final String name;
 	    public final String unit;
 	    public final float count;
-	
+	    public final QualityList q;
+	    
 	    public Content(String name, String unit, float count) {
+		this(name, unit, count, new QualityList(Collections.emptyList()));
+	    }
+	    
+	    public Content(String name, String unit, float count, QualityList q) {
 		this.name = name;
 		this.unit = unit;
 		this.count = count;
+		this.q = q;
 	    }
 	
 	    public boolean is(String what) {
