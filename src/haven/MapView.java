@@ -588,9 +588,7 @@ public class MapView extends PView implements DTarget, Console.Directory {
 		    else
 			nslot.remove();
 		}
-		synchronized (ob) {
-			ZeeConfig.gobCheck(ob);
-		}
+		ZeeConfig.gobCheck(ob);
 	    }
 	}
 

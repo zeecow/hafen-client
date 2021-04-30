@@ -55,7 +55,6 @@ public class Glob {
 	this.sess = sess;
 	map = new MCache(sess);
 	party = new Party(this);
-	ZeeConfig.glob = this;
     }
 
     @Resource.PublishedCode(name = "wtr")

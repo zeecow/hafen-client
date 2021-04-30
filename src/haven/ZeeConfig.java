@@ -32,7 +32,6 @@ public class ZeeConfig {
     public static final Integer GOBTYPE_AGGRESSIVE = 4;
     public static final Integer GOBTYPE_PLAYER = 5;
     public static GameUI gameUI;
-    public static Glob glob;
     public static Window windowBelt;
     public static Window windowCattleRoster;
     public static Window windowEquipment;
@@ -351,7 +350,9 @@ public class ZeeConfig {
     }
 
     public static void gobHighlight2(Gob gob, MixColor mc) {
-        gob.setattr(new ZeeGobMixColor(gob, mc));
+        synchronized (gob) {
+            gob.setattr(new ZeeGobMixColor(gob, mc));
+        }
     }
 
     public static void gobCheck(Gob gob) {
