@@ -1,3 +1,17 @@
+$size[14]{$u{Update for 30.04.21:}
+  * made quality item filter match item content's quality, if present
+  * fixed/updated help text for item filters
+  * added 'Mark' button to prospecting window - it places marker on prospecting spot with the name of the detected mineral
+  * if you click on 'Add marker' on map window you can now click on ground or objects in main view to place markers
+  * added button to map window to show quest pointers on minimap
+  * made natural resources removable - useful when some rogue chops down your favourite quest giver tree
+  * added 'Track' button to markers - pressing it will show pointer like quests have that guides to location of that marker
+  * you can RClick on quest pointers to interact with quest giver, if in range
+  * you can LClick on pointer to start moving towards it
+  * if quest pointer doesn't have real coordinate (further away from target than 990m) it tries to find marker with quest giver's name and use it as destination. If there's no matching marker found it tries to triangulate target position.
+  * error report window now saves error text to error.log file
+  * added midges to gob warning (wafflekat)
+ 
 $size[14]{$u{Update for 29.04.21:}
   * fixed another deadlock
   * added dead bats to radar
