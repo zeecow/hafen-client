@@ -1016,16 +1016,9 @@ public class MiniMap extends Widget {
 	    if(newbiome == null) {newbiome = "???";}
 	    if(!newbiome.equals(biome)) {
 		biome = newbiome;
-		biometex = Text.renderstroked(prettybiome(biome)).tex();
+		biometex = Text.renderstroked(Utils.prettyResName(biome)).tex();
 	    }
 	} catch (Loading ignored) {}
-    }
-    
-    private static String prettybiome(String biome) {
-	int k = biome.lastIndexOf("/");
-	biome = biome.substring(k + 1);
-	biome = biome.substring(0, 1).toUpperCase() + biome.substring(1);
-	return biome;
     }
     
     public interface IPointer {

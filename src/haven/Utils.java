@@ -2035,6 +2035,13 @@ public class Utils {
 	return Optional.of(new Coord2d((float) ((b2 * c1 - b1 * c2) / delta), (float) ((a1 * c2 - a2 * c1) / delta)));
     }
     
+    public static String prettyResName(String resname) {
+	int k = resname.lastIndexOf("/");
+	resname = resname.substring(k + 1);
+	resname = resname.substring(0, 1).toUpperCase() + resname.substring(1);
+	return resname;
+    }
+    
     public static boolean checkbit(int target, int index) {
 	return (target & (1 << index)) != 0;
     }
