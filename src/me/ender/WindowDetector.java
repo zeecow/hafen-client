@@ -60,12 +60,18 @@ public class WindowDetector {
 	if(parent instanceof Window) {
 	    Window window = (Window) parent;
 	    //TODO: extract to separate class
-	    if("Milestone".equals(window.caption()) && f instanceof Label.$_) {
+	    String caption = window.caption();
+	    if("Milestone".equals(caption) && f instanceof Label.$_) {
 		String text = (String) cargs[0];
 		if(!text.equals("Make new trail:")) {
 		    return new Label.Untranslated.$_();
 		}
-		System.out.println(text);
+	    } else if(isProspecting(caption)) {
+	        if(f instanceof Label.$_) {
+		    ((ProspectingWnd) parent).text((String) cargs[0]);
+		} else if(f instanceof Button.$Btn) {
+	            return new Button.$BtnSmall();
+		}
 	    }
 	}
 	return f;

@@ -8,17 +8,32 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
+import static haven.MCache.*;
 import static java.lang.Math.*;
 
 public class ProspectingWnd extends WindowX {
     private static final Queue<Dowse> EFFECTS = new ConcurrentLinkedQueue<>();
     public static final Queue<ProspectingWnd> WINDOWS = new ConcurrentLinkedQueue<>();
     public static final Queue<QualityList.Quality> QUALITIES = new ConcurrentLinkedQueue<>();
+    private static final Pattern detect = Pattern.compile("There appears to be (.*) directly below.");
     private RenderTree.Slot slot;
+    private Coord2d pc;
+    private String detected;
+    private final Button mark;
     
     public ProspectingWnd(Coord sz, String cap) {
 	super(sz, cap);
+	mark = add(new Button(UI.scale(100), "Mark", false), UI.scale(105, 25));
+	mark.action(this::mark);
+    }
+    
+    @Override
+    public void pack() {
+	mark.c.y = children(Button.class).stream().filter(button -> button != mark).findFirst().orElse(mark).c.y;
+	super.pack();
     }
     
     @Override
@@ -32,7 +47,20 @@ public class ProspectingWnd extends WindowX {
     protected void attach(UI ui) {
 	super.attach(ui);
 	WINDOWS.add(this);
+	Gob player = ui.gui.map.player();
+	pc = player == null ? null : player.rc;
 	attachEffect();
+    }
+    
+    private void mark() {
+	if(detected == null) {return;}
+	if(pc == null) {
+	    Gob p = ui.gui.map.player();
+	    if(p != null) {pc = p.rc;}
+	}
+	if(pc != null) {
+	    ui.gui.mapfile.addMarker(pc.floor(tilesz), Utils.prettyResName(detected));
+	}
     }
     
     private void fx(Dowse fx) {
@@ -59,6 +87,15 @@ public class ProspectingWnd extends WindowX {
     public static void item(WItem item) {
 	if(item != null) {
 	    QUALITIES.add(item.itemq.get().single());
+	}
+    }
+    
+    public void text(String text) {
+	Matcher matcher = detect.matcher(text);
+	if(matcher.matches()) {
+	    detected = matcher.group(1);
+	} else if(mark != null) {
+	    mark.hide();
 	}
     }
     
