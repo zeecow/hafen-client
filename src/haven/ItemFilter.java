@@ -33,15 +33,13 @@ public class ItemFilter {
 	"$font[monospaced,13]{  has:water=2  }will find items that contain exactly 2L of water.\n";
     
     public static final String HELP_QUALITY = "$size[20]{$b{Quality search}}\n" +
-	"$font[monospaced,16]{q:[type][sign][value][opt]}\n" +
-	"Will highlight items with quality type defined by $font[monospaced,13]{[type]} or $font[monospaced,13]{[opt]} with quality value specified by $font[monospaced,13]{[sign]} and $font[monospaced,13]{[value]}.\n" +
-	"$font[monospaced,13]{[type]} is type of quality ($font[monospaced,13]{min, max, average, essence, vitality, substance}). You can write type not fully ($font[monospaced,13]{ess} will match essence, for example). If you omit type, it will be detected by $font[monospaced,13]{[opt]} (> means max, < means min, = and ~ means average). If $font[monospaced,13]{[opt]} not present too - then type selected to display on item ($font[monospaced,13]{Options->Display->Show single quality as}) will be used.\n" +
+	"$font[monospaced,16]{q[:][sign][value]}\n" +
+	"Will highlight items with quality value specified by $font[monospaced,13]{[sign]} and $font[monospaced,13]{[value]}.\n" +
 	"$font[monospaced,13]{[sign]} can be $font[monospaced,13]{>} (more), $font[monospaced,13]{+} (at least), $font[monospaced,13]{<} (less), $font[monospaced,13]{=} (exactly).\n" +
 	"$size[16]{\nExamples:}\n" +
-	"$font[monospaced,13]{  q:>5     }will find items with default quality higher than 5\n" +
-	"$font[monospaced,13]{  q:min<12 }will find items with minimum quality less than 12\n" +
-	"$font[monospaced,13]{  q:<15>   }will find items with maximum quality less than 15\n" +
-	"$font[monospaced,13]{  q:ess+21 }will find items with essence of at least 21\n";
+	"$font[monospaced,13]{  q:5   }will find items with quality of 5\n" +
+	"$font[monospaced,13]{  q<12  }will find items with quality less than 12\n" +
+	"$font[monospaced,13]{  q+21  }will find items with of at least 21\n";
     
     public static final String HELP_CURIO = "$size[20]{$b{Curiosity search}}\n" +
 	"Supports $font[monospaced,13]{lp} (learning point gained), $font[monospaced,13]{lph} (learning point gained per hour), $font[monospaced,13]{xp} (experience required) and $font[monospaced,13]{mw} (mental weight required) tags. They all interchangeable in the examples below.\n" +
