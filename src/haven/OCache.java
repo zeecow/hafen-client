@@ -232,6 +232,7 @@ public class OCache implements Iterable<Gob> {
 	} else if((d == null) || (d.res != res) || !d.sdt.equals(sdt)) {
 	    g.setattr(new ResDrawable(g, res, sdt));
 	}
+	ZeeConfig.highlight(g, ZeeConfig.getHighlightColor(g));
     }
     public Delta cres(Message msg) {
 	int resid = msg.uint16();

@@ -26,7 +26,6 @@
 
 package haven;
 
-import java.awt.Color;
 import haven.render.*;
 
 public class GobHealth extends GAttrib implements Gob.SetupMod {
@@ -36,7 +35,14 @@ public class GobHealth extends GAttrib implements Gob.SetupMod {
     public GobHealth(Gob g, int hp) {
 	super(g);
 	this.hp = hp;
-	this.fx = new MixColor(255, 0, 0, 128 - ((hp * 128) / 4));
+    if(hp==4)
+        this.fx = null;
+	else if(hp==3)
+        this.fx = ZeeConfig.MIXCOLOR_YELLOW;
+	else if(hp==2)
+        this.fx = ZeeConfig.MIXCOLOR_ORANGE;
+    else
+        this.fx = ZeeConfig.MIXCOLOR_RED;
     }
     
     public Pipe.Op gobstate() {

@@ -16,7 +16,7 @@ public class ZeecowOptionsWindow extends JFrame {
     public JTextField tfAutoClickMenu, tfGobName, tfAudioPath, tfCategName, tfAudioPathCateg;
     public JComboBox<String> cmbCattleRoster, cmbGobCategory;
     public JList<String> listGobsTemp, listGobsSaved, listGobsCategories;
-    public JButton btnRefresh, btnPrintState, btnResetGobs, btnAudioSave, btnAudioClear, btnAudioTest, btnRemGobFromCateg, btnGobColorAdd, btnGobColorRemove, btnResetCateg, btnAddCateg;
+    public JButton btnRefresh, btnPrintState, btnResetGobs, btnAudioSave, btnAudioClear, btnAudioTest, btnRemGobFromCateg, btnGobColorAdd, btnCategoryColorAdd, btnGobColorRemove, btnCategoryColorRemove, btnResetCateg, btnAddCateg;
     public JTextArea txtAreaDebug;
     public JSlider sliderAlpha, sliderGobQueueSleep;
     public static int TABGOB_SESSION = 0;
@@ -379,11 +379,21 @@ public class ZeecowOptionsWindow extends JFrame {
     }
 
     private void resetGobs() {
-        if(JOptionPane.showConfirmDialog(this,"Clear Gobs setitngs?") != JOptionPane.OK_OPTION)
+        if(JOptionPane.showConfirmDialog(this,"Clear All Gobs settings?") != JOptionPane.OK_OPTION)
             return;
 
-        ZeeConfig.mapGobAudio.clear();
-        Utils.setpref(ZeeConfig.MAP_GOB_SAVED,ZeeConfig.serialize(ZeeConfig.mapGobAudio));
+
+        //clear audios
+        Utils.setpref(ZeeConfig.MAP_GOB_AUDIO,"");
+        ZeeConfig.mapGobAudio = ZeeConfig.initMapGobAudio();
+
+        //clear colors
+        Utils.setpref(ZeeConfig.MAP_GOB_COLOR,"");
+        ZeeConfig.mapGobColor = ZeeConfig.initMapGobColor();
+
+        //clear categories
+        Utils.setpref(ZeeConfig.MAP_GOB_CATEGORY,"");
+        ZeeConfig.mapGobCategory = ZeeConfig.initMapGobCategory();
 
         buildTabGobs();
     }
@@ -509,11 +519,30 @@ public class ZeecowOptionsWindow extends JFrame {
         sliderAlpha.getParent().repaint();
     }
 
+    private void updateCategoryColorAlpha() {
+        Color c = ZeeConfig.mapCategoryColor.get(tfCategName.getText());
+        if(c==null)
+            return;
+        int alpha = sliderAlpha.getValue();
+        c = new Color(c.getRed(),c.getGreen(),c.getBlue(),alpha);
+        ZeeConfig.mapCategoryColor.put(tfCategName.getText(), c);
+        Utils.setpref(ZeeConfig.MAP_CATEGORY_COLOR, ZeeConfig.serialize(ZeeConfig.mapCategoryColor));
+        sliderAlpha.getParent().repaint();
+    }
+
     private void removeGobColor() {
         if(JOptionPane.showConfirmDialog(this,"Clear Gob Color?") == JOptionPane.OK_OPTION) {
             ZeeConfig.mapGobColor.remove(tfGobName.getText());
             btnGobColorAdd.getParent().setBackground(new JPanel().getBackground());
             Utils.setpref(ZeeConfig.MAP_GOB_COLOR, ZeeConfig.serialize(ZeeConfig.mapGobColor));
+        }
+    }
+
+    private void removeCategoryColor() {
+        if(JOptionPane.showConfirmDialog(this,"Clear Category Color?") == JOptionPane.OK_OPTION) {
+            ZeeConfig.mapCategoryColor.remove(tfCategName.getText());
+            btnCategoryColorAdd.getParent().setBackground(new JPanel().getBackground());
+            Utils.setpref(ZeeConfig.MAP_CATEGORY_COLOR, ZeeConfig.serialize(ZeeConfig.mapCategoryColor));
         }
     }
 
@@ -568,6 +597,39 @@ public class ZeecowOptionsWindow extends JFrame {
         //panelCategAudio.setMaximumSize(new Dimension(Integer.MAX_VALUE, panelCategAudio.getPreferredSize().height));
 
 
+        //Category Color highlight
+        //button
+        JPanel panelHighlight = new JPanel(new GridLayout(1,3));
+        panelDetailsBottom.add(panelHighlight);
+        panelHighlight.setBorder(BorderFactory.createTitledBorder("Highlight Color"));
+        panelHighlight.add(btnCategoryColorAdd = new JButton("Select"));
+        btnCategoryColorAdd.addActionListener(evt->{
+            Color color = JColorChooser.showDialog(panelHighlight, "Category Highlight Color", Color.MAGENTA);
+            if(color!=null){
+                addCategoryColor(tfCategName.getText(), color);
+            }
+        });
+        panelHighlight.add(btnCategoryColorRemove = new JButton("Clear"));
+        btnCategoryColorRemove.addActionListener(evt->{
+            removeCategoryColor();
+        });
+        //slider transparency
+        Color color = ZeeConfig.mapCategoryColor.get(tfCategName.getText());
+        int alpha = color!=null ? color.getAlpha() : 200;
+        sliderAlpha = new JSlider(JSlider.HORIZONTAL,0, 255, alpha);
+        panelHighlight.add(sliderAlpha);
+        sliderAlpha.addChangeListener(evt -> {
+            if(!sliderAlpha.getValueIsAdjusting()) {
+                updateCategoryColorAlpha();
+            }
+        });
+        //update color UI state
+        Color currentColor = ZeeConfig.mapCategoryColor.get(tfCategName.getText());
+        if(currentColor!=null){
+            btnCategoryColorAdd.getParent().setBackground(currentColor);
+            sliderAlpha.setValue(currentColor.getAlpha());
+        }
+
         pack();
     }
 
@@ -575,13 +637,20 @@ public class ZeecowOptionsWindow extends JFrame {
         if(JOptionPane.showConfirmDialog(this,"Reset categories?") != JOptionPane.OK_OPTION)
             return;
 
-        //reset map Category-Gob
+        //reset map Category-Gobs
         Utils.setpref(ZeeConfig.MAP_CATEGORY_GOBS,"");
         ZeeConfig.mapCategoryGobs = ZeeConfig.initMapCategoryGobs();
+        //reflect in GobCategory
+        Utils.setpref(ZeeConfig.MAP_GOB_CATEGORY,"");
+        ZeeConfig.mapGobCategory = ZeeConfig.initMapGobCategory();
 
         //reset map Category-Audio
         Utils.setpref(ZeeConfig.MAP_CATEGORY_AUDIO,"");
         ZeeConfig.mapCategoryAudio = ZeeConfig.initMapCategoryAudio();
+
+        //reset map Category-Color
+        Utils.setpref(ZeeConfig.MAP_CATEGORY_COLOR,"");
+        ZeeConfig.mapCategoryColor = ZeeConfig.initMapCategoryColor();
 
         buildTabGobs();
     }
@@ -631,6 +700,18 @@ public class ZeecowOptionsWindow extends JFrame {
         Utils.setpref(ZeeConfig.MAP_GOB_COLOR, ZeeConfig.serialize(ZeeConfig.mapGobColor));
     }
 
+    private void addCategoryColor(String categName, Color c) {
+        if (categName == null || categName.isEmpty() || c == null) {
+            JOptionPane.showMessageDialog(this, "Category or color parameter missing");
+            return;
+        }
+        int alpha = sliderAlpha.getValue();
+        Color color = new Color(c.getRed(),c.getGreen(),c.getBlue(),alpha);
+        ZeeConfig.mapCategoryColor.put(categName, color);
+        btnCategoryColorAdd.getParent().setBackground(color);
+        Utils.setpref(ZeeConfig.MAP_CATEGORY_COLOR, ZeeConfig.serialize(ZeeConfig.mapCategoryColor));
+    }
+
     private void addGobToCategory(String gobName, String gobCategory) {
         if(gobName==null || gobCategory==null || gobName.isEmpty() || gobCategory.isEmpty()) {
             JOptionPane.showMessageDialog(this,"Gob or Category invalid");
@@ -645,7 +726,7 @@ public class ZeecowOptionsWindow extends JFrame {
             Utils.setpref(ZeeConfig.MAP_CATEGORY_GOBS, ZeeConfig.serialize(ZeeConfig.mapCategoryGobs));
         }
 
-        //add to map GobCategory
+        //add to map Gob->Category
         ZeeConfig.mapGobCategory.put(gobName,gobCategory);
         Utils.setpref(ZeeConfig.MAP_GOB_CATEGORY, ZeeConfig.serialize(ZeeConfig.mapGobCategory));
     }
@@ -709,7 +790,7 @@ public class ZeecowOptionsWindow extends JFrame {
                     return;
                 }
                 ZeeConfig.mapGobAudio.remove(gobName);
-                Utils.setpref(ZeeConfig.MAP_GOB_SAVED, ZeeConfig.serialize(ZeeConfig.mapGobAudio));
+                Utils.setpref(ZeeConfig.MAP_GOB_AUDIO, ZeeConfig.serialize(ZeeConfig.mapGobAudio));
             }
 
             panelDetailsBottom.removeAll();
@@ -749,7 +830,7 @@ public class ZeecowOptionsWindow extends JFrame {
                         tfGobName.getText().strip(),
                         fileChooser.getSelectedFile().getAbsolutePath().strip()
                 );
-                Utils.setpref(ZeeConfig.MAP_GOB_SAVED, ZeeConfig.serialize(ZeeConfig.mapGobAudio));
+                Utils.setpref(ZeeConfig.MAP_GOB_AUDIO, ZeeConfig.serialize(ZeeConfig.mapGobAudio));
             }
 
             if(list!=null) {

@@ -17,4 +17,6 @@ other stuff:
  - replaces arrow cursor with system's default
  - show claims by default
  - optional friend online notification
- - craft window numbers
+ - craft window numbers-
+ - highlight damaged gobs more  
+ - highlight finished crops, growing trees, gobs and categories
