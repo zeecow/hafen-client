@@ -1653,6 +1653,32 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 	    this.sfx = (sfx != null) ? Resource.local().loadwait(sfx) : null;
 	}
     }
+    
+    private final Map<MapFile.Marker, Widget> trackedMarkers = new HashMap<>();
+    
+    public void track(MapFile.Marker marker) {
+	untrack(marker);
+	try {
+	    Factory f = Widget.gettype2("ui/locptr");
+	    if(f != null) {
+		Widget wdg = f.create(ui, new Object[]{marker});
+		trackedMarkers.put(marker, wdg);
+		ui.gui.add(wdg);
+	    }
+	} catch (InterruptedException ignored) {
+	}
+    }
+    
+    public void untrack(MapFile.Marker marker) {
+	Widget wdg = trackedMarkers.remove(marker);
+	if(wdg != null) {
+	    wdg.reqdestroy();
+	}
+    }
+    
+    public boolean isTracked(MapFile.Marker marker) {
+	return trackedMarkers.containsKey(marker);
+    }
 
     public void act(String... args) {
 	wdgmsg("act", (Object[])args);

@@ -58,6 +58,7 @@ public class MapWnd extends WindowX implements Console.Directory {
     private final Frame viewf;
     private GroupSelector colsel;
     private Button mremove;
+    private Button mtrack;
     private Predicate<Marker> mflt = pmarkers;
     private Comparator<Marker> mcmp = namecmp;
     private List<Marker> markers = Collections.emptyList();
@@ -115,30 +116,17 @@ public class MapWnd extends WindowX implements Console.Directory {
 	    .settip("Display provinces").setgkey(kb_prov);
 	toolbar.pack();
 	topbar = add(new Widget(Coord.z), Coord.z);
-	topbar.add(new Img(Resource.loadtex("gfx/hud/mmap/tfgwdg")) {
-	    public boolean mousedown(Coord c, int button) {
-		if((button == 1) && checkhit(c)) {
-		    MapWnd.this.drag(parentpos(MapWnd.this, c));
-		    return(true);
-		}
-		return(super.mousedown(c, button));
-	    }
-	}, Coord.z);
-	topbar.add(new IButton("gfx/hud/mmap/view", "", "-d", "-h") {
-	    {tooltip = Text.render("Display view distance");}
-	
-	    public void click() {
-		CFG.MMAP_VIEW.set(!CFG.MMAP_VIEW.get());
-	    }
-	});
     
-	topbar.add(new IButton("gfx/hud/mmap/grid", "", "-d", "-h") {
-	    {tooltip = Text.render("Display grid");}
+	Widget btn;
+	btn = topbar.add(new ICheckBox("gfx/hud/mmap/view", "", "-d", "-h"))
+	    .state(CFG.MMAP_VIEW::get).set(CFG.MMAP_VIEW::set).settip("Display view distance");
+    
+	btn = topbar.add(new ICheckBox("gfx/hud/mmap/grid", "", "-d", "-h"), btn.pos("ur"))
+	    .state(CFG.MMAP_GRID::get).set(CFG.MMAP_GRID::set).settip("Display grid");
+    
+	topbar.add(new ICheckBox("gfx/hud/mmap/pointer", "", "-d", "-h"), btn.pos("ur"))
+	    .state(CFG.MMAP_POINTER::get).set(CFG.MMAP_POINTER::set).settip("Display pointers");
 	
-	    public void click() {
-		CFG.MMAP_GRID.set(!CFG.MMAP_GRID.get());
-	    }
-	});
 	topbar.pack();
 	tool = add(new Toolbox());;
 	compact(Utils.getprefb("compact-map", false));
@@ -256,8 +244,11 @@ public class MapWnd extends WindowX implements Console.Directory {
 		namesel.c = listf.c.add(0, listf.sz.y + UI.scale(10));
 		if(colsel != null) {
 		    colsel.c = namesel.c.add(0, namesel.sz.y + UI.scale(10));
-		    mremove.c = colsel.c.add(0, colsel.sz.y + UI.scale(10));
+//		    mremove.c = colsel.c.add(0, colsel.sz.y + UI.scale(10));
 		}
+		int y = namesel.sz.y + BuddyWnd.margin3 + UI.scale(20);
+		mremove.c = namesel.c.add(0, y);
+		mtrack.c = namesel.c.add(UI.scale(105), y);
 	    }
 	}
     }
@@ -265,6 +256,7 @@ public class MapWnd extends WindowX implements Console.Directory {
     private class View extends MiniMap {
 	View(MapFile file) {
 	    super(file);
+	    big = true;
 	}
 
 	public void drawgrid(GOut g, Coord ul, DisplayGrid disp) {
@@ -418,6 +410,8 @@ public class MapWnd extends WindowX implements Console.Directory {
 		    colsel = null;
 		    ui.destroy(mremove);
 		    mremove = null;
+		    ui.destroy(mtrack);
+		    mtrack = null;
 		}
 	    }
 
@@ -444,13 +438,25 @@ public class MapWnd extends WindowX implements Console.Directory {
 				view.file.update(mark);
 			    }
 			});
-		    mremove = tool.add(new Button(UI.scale(200), "Remove", false) {
-			    public void click() {
-				view.file.remove(mark);
-				change2(null);
-			    }
-			});
 		}
+		mremove = tool.add(new Button(UI.scale(95), "Remove", false) {
+		    public void click() {
+			view.file.remove(mark);
+			ui.gui.untrack(mark);
+			change2(null);
+		    }
+		});
+		mtrack = tool.add(new Button(UI.scale(95), ui.gui.isTracked(mark) ? "Untrack" : "Track", false) {
+		    public void click() {
+			if(ui.gui.isTracked(mark)) {
+			    ui.gui.untrack(mark);
+			    change("Track");
+			} else {
+			    ui.gui.track(mark);
+			    change("Unrack");
+			}
+		    }
+		});
 		MapWnd.this.resize(asz);
 	    }
 	}
@@ -733,7 +739,25 @@ public class MapWnd extends WindowX implements Console.Directory {
 		importmap(fc.getSelectedFile().toPath());
 	    });
     }
-
+    
+    public Coord2d findMarkerPosition(String name) {
+	Location sessloc = view.sessloc;
+	if(sessloc == null) {return null;}
+	for (Map.Entry<Long, SMarker> e : file.smarkers.entrySet()) {
+	    SMarker m = e.getValue();
+	    if(m.seg == sessloc.seg.id && m.nm.contains(name)) {
+		return m.tc.sub(sessloc.tc).mul(tilesz);
+	    }
+	}
+	return null;
+    }
+    
+    public long playerSegment() {
+	Location sessloc = view.sessloc;
+	if(sessloc == null) {return 0;}
+	return sessloc.seg.id;
+    }
+    
     private Map<String, Console.Command> cmdmap = new TreeMap<String, Console.Command>();
     {
 	cmdmap.put("exportmap", new Console.Command() {

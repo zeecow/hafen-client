@@ -1,4 +1,4 @@
-#IMAGE LAYER FOR RES www//\lbtn-claim.res
+#IMAGE LAYER FOR RES www//\lbtn-claim-h.res
 #int16 z
 0
 #int16 subz
@@ -10,3 +10,5 @@
 #Coord o
 0
 0
+scale
+4.0

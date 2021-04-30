@@ -49,6 +49,7 @@ public class CFG<T> {
     public static final CFG<Boolean> MMAP_LIST = new CFG<>("ui.mmap_list", true);
     public static final CFG<Boolean> MMAP_VIEW = new CFG<>("ui.mmap_view", false);
     public static final CFG<Boolean> MMAP_GRID = new CFG<>("ui.mmap_grid", false);
+    public static final CFG<Boolean> MMAP_POINTER = new CFG<>("ui.mmap_pointer", false);
     public static final CFG<Boolean> MMAP_SHOW_BIOMES = new CFG<>("ui.mmap_biomes", true);
     public static final CFG<Boolean> MMAP_SHOW_PATH = new CFG<>("ui.mmap_path", false);
     public static final CFG<Boolean> MENU_SINGLE_CTRL_CLICK = new CFG<>("ui.menu_single_ctrl_click", true);
