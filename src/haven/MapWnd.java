@@ -116,30 +116,17 @@ public class MapWnd extends WindowX implements Console.Directory {
 	    .settip("Display provinces").setgkey(kb_prov);
 	toolbar.pack();
 	topbar = add(new Widget(Coord.z), Coord.z);
-	topbar.add(new Img(Resource.loadtex("gfx/hud/mmap/tfgwdg")) {
-	    public boolean mousedown(Coord c, int button) {
-		if((button == 1) && checkhit(c)) {
-		    MapWnd.this.drag(parentpos(MapWnd.this, c));
-		    return(true);
-		}
-		return(super.mousedown(c, button));
-	    }
-	}, Coord.z);
-	topbar.add(new IButton("gfx/hud/mmap/view", "", "-d", "-h") {
-	    {tooltip = Text.render("Display view distance");}
-	
-	    public void click() {
-		CFG.MMAP_VIEW.set(!CFG.MMAP_VIEW.get());
-	    }
-	});
     
-	topbar.add(new IButton("gfx/hud/mmap/grid", "", "-d", "-h") {
-	    {tooltip = Text.render("Display grid");}
+	Widget btn;
+	btn = topbar.add(new ICheckBox("gfx/hud/mmap/view", "", "-d", "-h"))
+	    .state(CFG.MMAP_VIEW::get).set(CFG.MMAP_VIEW::set).settip("Display view distance");
+    
+	btn = topbar.add(new ICheckBox("gfx/hud/mmap/grid", "", "-d", "-h"), btn.pos("ur"))
+	    .state(CFG.MMAP_GRID::get).set(CFG.MMAP_GRID::set).settip("Display grid");
+    
+	topbar.add(new ICheckBox("gfx/hud/mmap/pointer", "", "-d", "-h"), btn.pos("ur"))
+	    .state(CFG.MMAP_POINTER::get).set(CFG.MMAP_POINTER::set).settip("Display pointers");
 	
-	    public void click() {
-		CFG.MMAP_GRID.set(!CFG.MMAP_GRID.get());
-	    }
-	});
 	topbar.pack();
 	tool = add(new Toolbox());;
 	compact(Utils.getprefb("compact-map", false));

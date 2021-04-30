@@ -657,7 +657,7 @@ public class MiniMap extends Widget {
 	if(zoomlevel <= 2 && CFG.MMAP_GRID.get()) {drawgrid(g);}
 	if(playerSegment && zoomlevel <= 1 && CFG.MMAP_VIEW.get()) {drawview(g);}
 	if(playerSegment && CFG.MMAP_SHOW_PATH.get()) {drawMovement(g);}
-	if(big) {drawPointers(g);}//TODO: add setting to show this?
+	if(big && CFG.MMAP_POINTER.get()) {drawPointers(g);}
 	if(dlvl <= 1)
 	    drawicons(g);
 	if(playerSegment) drawparty(g);
@@ -851,10 +851,12 @@ public class MiniMap extends Widget {
 	    if(icon != null) {
 		return icon.tooltip();
 	    }
-	    long curSeg = dloc.seg.id;
-	    for (IPointer p : pointers()) {
-		if(p.seg() == curSeg && p.sc(p2c(p.tc(curSeg)), sz).dist(c) < 20) {
-		    return p.tooltip();
+	    if(CFG.MMAP_POINTER.get()) {
+		long curSeg = dloc.seg.id;
+		for (IPointer p : pointers()) {
+		    if(p.seg() == curSeg && p.sc(p2c(p.tc(curSeg)), sz).dist(c) < 20) {
+			return p.tooltip();
+		    }
 		}
 	    }
 	}
