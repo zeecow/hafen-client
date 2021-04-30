@@ -26,6 +26,8 @@
 
 package haven.error;
 
+import haven.Config;
+
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
@@ -128,6 +130,7 @@ public abstract class ErrorGui extends JDialog implements ErrorStatus {
 	java.io.StringWriter w = new java.io.StringWriter();
 	t.printStackTrace(new java.io.PrintWriter(w));
 	final String tr = w.toString();
+	Config.saveFile("error.log", tr);
 	SwingUtilities.invokeLater(new Runnable() {
 		public void run() {
 		    closebtn.setEnabled(false);
