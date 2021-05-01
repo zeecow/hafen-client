@@ -211,20 +211,20 @@ public class ZeecowOptionsWindow extends JFrame {
             Utils.setprefb("beltToggleEquips",val);
         });
 
-        panelTabInterface.add(cbShowInventoryLogin = new JCheckBox("Show inventory at login"));
-        cbShowInventoryLogin.setSelected(ZeeConfig.showInventoryLogin);
-        cbShowInventoryLogin.addActionListener(actionEvent -> {
-            JCheckBox cb = (JCheckBox) actionEvent.getSource();
-            boolean val = ZeeConfig.showInventoryLogin = cb.isSelected();
-            Utils.setprefb("showInventoryLogin",val);
-        });
-
         panelTabInterface.add(cbShowEquipsLogin = new JCheckBox("Show equips at login"));
         cbShowEquipsLogin.setSelected(ZeeConfig.showEquipsLogin);
         cbShowEquipsLogin.addActionListener(actionEvent -> {
             JCheckBox cb = (JCheckBox) actionEvent.getSource();
             boolean val = ZeeConfig.showEquipsLogin = cb.isSelected();
             Utils.setprefb("showEquipsLogin",val);
+        });
+
+        panelTabInterface.add(cbShowInventoryLogin = new JCheckBox("Show inventory at login"));
+        cbShowInventoryLogin.setSelected(ZeeConfig.showInventoryLogin);
+        cbShowInventoryLogin.addActionListener(actionEvent -> {
+            JCheckBox cb = (JCheckBox) actionEvent.getSource();
+            boolean val = ZeeConfig.showInventoryLogin = cb.isSelected();
+            Utils.setprefb("showInventoryLogin",val);
         });
 
         panelTabInterface.add(Box.createRigidArea(new Dimension(25,25)));

@@ -341,23 +341,21 @@ public class ZeeConfig {
         //}
     }
 
-    public static void gobAudio(Gob gob) {
-        if(gob==null || gob.getres()==null)
+    public static void gobAudio(String gobName, int gobId) {
+        if(gobName==null || gobName.isEmpty())
             return;
-
-        String name = gob.getres().name;
         String path = "";
         Integer gobType ;
 
         //if gob is new, add to session gobs
-        if(mapGobSession.put(name,"") == null) {
-            //System.out.println(name+"  "+mapGobSession.size());
+        if(mapGobSession.put(gobName,"") == null) {
+            //System.out.println(gobName+"  "+mapGobSession.size());
         }
 
-        gobType = mapGobidType.get(gob.id);
+        gobType = mapGobidType.get(gobId);
         if(gobType == null) {
-            System.out.println("gobAudio() > no type set for "+name);
-        }else if(gobType==GOBTYPE_PLAYER && gob.id != gameUI.map.player().id) {
+            //System.out.println("gobAudio() > no type set for "+gobName);
+        }else if(gobType==GOBTYPE_PLAYER && gobId != gameUI.map.player().id) {
             if(autoHearthOnStranger)
                 gameUI.act("travel","hearth");
             if(alertOnPlayers){
@@ -367,7 +365,7 @@ public class ZeeConfig {
                 else
                     gameUI.error("player spotted");
             }
-        }else if( (path = mapGobAudio.get(name)) != null){
+        }else if( (path = mapGobAudio.get(gobName)) != null){
             //if single gob alert is saved, play alert
             ZeeConfig.playAudio(path);
         }else {
@@ -376,7 +374,7 @@ public class ZeeConfig {
                 if(categ==null || categ.isEmpty())
                     continue;
                 //...check if gob is in category
-                if(mapCategoryGobs.get(categ).contains(name)){
+                if(mapCategoryGobs.get(categ).contains(gobName)){
                     //play audio for category
                     path = mapCategoryAudio.get(categ);
                     ZeeConfig.playAudio(path);
@@ -713,28 +711,27 @@ public class ZeeConfig {
         }
     }
 
-    public static void gobSetType(Gob gob) {
-        if(gob==null || gob.getres()==null || mapGobidType.containsKey(gob.id))
+    public static void gobSetType(String gobName, long gobId) {
+        if(gobName==null || gobName.isEmpty() || mapGobidType.containsKey(gobId))
             return;
-        String gobName = gob.getres().name;
 
         if(gobName.startsWith("gfx/terobjs/trees/")) {
-            mapGobidType.put(gob.id, GOBTYPE_TREE);
-            mapGobidName.put(gob.id, gobName);
+            mapGobidType.put(gobId, GOBTYPE_TREE);
+            mapGobidName.put(gobId, gobName);
         }else if(gobName.startsWith("gfx/terobjs/bushes/")) {
-            mapGobidType.put(gob.id, GOBTYPE_BUSH);
-            mapGobidName.put(gob.id, gobName);
+            mapGobidType.put(gobId, GOBTYPE_BUSH);
+            mapGobidName.put(gobId, gobName);
         }else if(gobName.startsWith("gfx/terobjs/plants/") && !gobName.endsWith("trellis")) {
-            mapGobidType.put(gob.id, GOBTYPE_CROP);
-            mapGobidName.put(gob.id, gobName);
+            mapGobidType.put(gobId, GOBTYPE_CROP);
+            mapGobidName.put(gobId, gobName);
         }else if(mapGobCategory.containsKey(gobName)) {
-            mapGobidType.put(gob.id, GOBTYPE_CATEGORIZED);
-            mapGobidName.put(gob.id, gobName);
+            mapGobidType.put(gobId, GOBTYPE_CATEGORIZED);
+            mapGobidName.put(gobId, gobName);
         }else if(gobName.startsWith("gfx/borka/body")) {
-            mapGobidType.put(gob.id, GOBTYPE_PLAYER);
-            mapGobidName.put(gob.id, gobName);
+            mapGobidType.put(gobId, GOBTYPE_PLAYER);
+            mapGobidName.put(gobId, gobName);
         }else if(!mapGobColor.containsKey(gobName) && !mapGobAudio.containsKey(gobName) && !mapGobCategory.containsKey(gobName)) {
-            mapGobidType.put(gob.id, GOBTYPE_IGNORE);
+            mapGobidType.put(gobId, GOBTYPE_IGNORE);
         }
 
         //System.out.printf("gobSetType() %s id=%s mapsize=%s\n",gobName,gob.id,mapGobidType.size());
