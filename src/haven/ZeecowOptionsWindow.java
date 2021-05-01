@@ -12,7 +12,7 @@ import java.util.*;
 public class ZeecowOptionsWindow extends JFrame {
     public JTabbedPane tabbedPane, tabbedPaneGobs;
     public JPanel panelTabMisc, panelTabInterface, panelTabGobs, panelDetailsBottom, panelTabCateg;
-    public JCheckBox cbDropMinedStone, cbDropMinedOre, cbDropMinedSilverGold, cbDropMinedCurios, cbActionSearchGlobal, cbCompactEquipsWindow, cbBeltTogglesEquips, cbAutohearth, cbHighlighAggressiveGobs, cbHighlightCropsReady, cbHighlightGrowingTrees, cbAlertOnPlayers,  cbShowInventoryLogin, cbShowEquipsLogin, cbNotifyBuddyOnline, cbAutoClickMenuOpts, cbCattleRosterHeight;
+    public JCheckBox cbDropMinedStone, cbDropMinedOre, cbDropMinedSilverGold, cbDropMinedCurios, cbActionSearchGlobal, cbCompactEquipsWindow, cbBeltTogglesEquips, cbAutohearth, cbHighlighAggressiveGobs, cbHighlightCropsReady, cbHighlightGrowingTrees, cbAlertOnPlayers,  cbShowInventoryLogin, cbShowEquipsLogin, cbNotifyBuddyOnline, cbZoomOrthoExtended, cbAutoClickMenuOpts, cbCattleRosterHeight;
     public JTextField tfAutoClickMenu, tfGobName, tfAudioPath, tfCategName, tfAudioPathCateg;
     public JComboBox<String> cmbCattleRoster, cmbGobCategory;
     public JList<String> listGobsTemp, listGobsSaved, listGobsCategories;
@@ -120,16 +120,6 @@ public class ZeecowOptionsWindow extends JFrame {
             Utils.setprefb("highlightGrowingTrees",val);
         });
 
-        panelTabMisc.add(new JLabel("Highlight Delay(ms)"));
-        panelTabMisc.add(sliderGobQueueSleep = new JSlider(JSlider.HORIZONTAL,2,20,ZeeConfig.gobHighlightDelayMs));
-        sliderGobQueueSleep.setToolTipText("More delay = smoother performance");
-        sliderGobQueueSleep.addChangeListener(evt -> {
-            if(!sliderGobQueueSleep.getValueIsAdjusting()) {
-                ZeeConfig.gobHighlightDelayMs = sliderGobQueueSleep.getValue();
-                Utils.setprefi("gobQueueSleepMs",ZeeConfig.gobHighlightDelayMs);
-            }
-        });
-
         panelTabMisc.add(Box.createRigidArea(new Dimension(0,25)));
 
         panelTabMisc.add(cbActionSearchGlobal = new JCheckBox("Action search global"));
@@ -162,6 +152,14 @@ public class ZeecowOptionsWindow extends JFrame {
             JCheckBox cb = (JCheckBox) actionEvent.getSource();
             boolean val = ZeeConfig.notifyBuddyOnline = cb.isSelected();
             Utils.setprefb("notifyBuddyOnline",val);
+        });
+
+        panelTabMisc.add(cbZoomOrthoExtended = new JCheckBox("Zoom extended for Ortho cam"));
+        cbZoomOrthoExtended.setSelected(ZeeConfig.zoomOrthoExtended);
+        cbZoomOrthoExtended.addActionListener(actionEvent -> {
+            JCheckBox cb = (JCheckBox) actionEvent.getSource();
+            boolean val = ZeeConfig.zoomOrthoExtended = cb.isSelected();
+            Utils.setprefb("zoomOrthoExtended",val);
         });
 
         panelTabMisc.add(Box.createRigidArea(new Dimension(0,25)));

@@ -70,6 +70,7 @@ public class ZeeConfig {
     public static boolean notifyBuddyOnline = Utils.getprefb("notifyBuddyOnline", false);
     public static boolean showInventoryLogin = Utils.getprefb("showInventoryLogin", true);
     public static boolean showEquipsLogin = Utils.getprefb("showEquipsLogin", false);
+    public static boolean zoomOrthoExtended = Utils.getprefb("zoomOrthoExtended", true);
 
     public static String playingAudio = null;
 
