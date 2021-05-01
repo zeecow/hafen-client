@@ -738,6 +738,16 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 	    vhand = add(new ItemDrag(fi.dc, fi.item));
 	}
     }
+    
+    public void togglePeace() {
+	try {
+	    if (fv != null && fv.current != null && fv.current.give != null) {
+		fv.current.give.wdgmsg("click", 1);
+	    }
+	} catch (Exception e) {
+	    e.printStackTrace();
+	}
+    }
 
     public void toggleHand() {
 	if (handHidden) {
