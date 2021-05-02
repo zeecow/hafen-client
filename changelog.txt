@@ -1,3 +1,8 @@
+$size[14]{$u{Update for 02.05.21:}
+  * made toggled windows (like study or filter) raise to top when toggled on
+  * fixed remove and track buttons not being removed for natural markers
+  * ignore exceptions while trying to remove hidden gobs from render tree
+ 
 $size[14]{$u{Update for 30.04.21:}
   * made quality item filter match item content's quality, if present
   * fixed/updated help text for item filters
