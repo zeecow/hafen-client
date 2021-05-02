@@ -67,8 +67,4 @@ public class FilterWnd extends GameUI.Hidewnd {
 	checkInput();
 	raise();
     }
-    
-    public void toggle() {
-	show(!visible);
-    }
 }

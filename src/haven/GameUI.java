@@ -643,6 +643,7 @@ public class GameUI extends ConsoleHost implements Console.Directory {
     
 	public void toggle() {
 	    show(!visible);
+	    if(visible) {this.raise();}
 	}
     }
 
@@ -752,7 +753,7 @@ public class GameUI extends ConsoleHost implements Console.Directory {
     }
 
     public void toggleStudy() {
-	studywnd.show(!studywnd.visible);
+	studywnd.toggle();
     }
 
     public void takeScreenshot() {
