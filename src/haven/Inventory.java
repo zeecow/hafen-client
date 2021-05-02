@@ -116,6 +116,8 @@ public class Inventory extends Widget implements DTarget {
 	if(child instanceof GItem) {
 	    GItem i = (GItem)child;
 	    wmap.put(i, add(new WItem(i), c.mul(sqsz).add(1, 1)));
+	    if(this.hasparent(ZeeConfig.windowInvMain))
+	    	ZeeConfig.addInvItem(i);
 	}
     }
     
@@ -124,6 +126,8 @@ public class Inventory extends Widget implements DTarget {
 	if(w instanceof GItem) {
 	    GItem i = (GItem)w;
 	    ui.destroy(wmap.remove(i));
+		if(this.hasparent(ZeeConfig.windowInvMain))
+			ZeeConfig.removeInvItem(i);
 	}
     }
     
@@ -202,6 +206,9 @@ public class Inventory extends Widget implements DTarget {
 		}
 		return items;
 	}
+	public static List<WItem> getItemsByNameOrNames(Inventory inv, String... names) {
+    	return inv.getItemsByNameOrNames(names);
+	}
 
 	public int getNumberOfFreeSlots() {
 		int feespace = isz.x * isz.y;
@@ -211,14 +218,15 @@ public class Inventory extends Widget implements DTarget {
 		}
 		return feespace;
 	}
+	public static int getNumberOfFreeSlots(Inventory inv) {
+		return inv.getNumberOfFreeSlots();
+	}
 
 	public void dropItemsByName(String name) {
 		for (WItem wItem : getItemsByNameOrNames(name)) {
 			wItem.item.wdgmsg("drop", Coord.z);
 		}
 	}
-
-
 
 	public static Double getQuality(GItem item) {
 		try {

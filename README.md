@@ -8,6 +8,7 @@ original features:
  - auto toggle equip window
  - shorter cattle roster window
  - reposition map window when compacted/expanded
+ - basic inventory item counter
 
 other stuff:
  - autodrop mined items, seeds, soil

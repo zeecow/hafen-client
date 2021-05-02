@@ -1,14 +1,12 @@
 package haven;
 
 import haven.render.MixColor;
-import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.awt.image.RenderedImage;
 import java.io.*;
-import java.lang.reflect.Field;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.List;
@@ -44,8 +42,9 @@ public class ZeeConfig {
     public static Window windowCattleRoster;
     public static Window windowEquipment;
     public static Window windowIconSettings;
-    public static Window windowInventory;
+    public static Window windowInvMain;
     public static Window windowActions;
+    public static ZeeInvMainOptionsWdg invMainoptionsWdg;
     public static ZeecowOptionsWindow zeecowOptions;
 
     public static boolean actionSearchGlobal = Utils.getprefb("actionSearchGlobal", true);
@@ -161,54 +160,6 @@ public class ZeeConfig {
     public static HashMap<String,Color> mapCategoryColor = initMapCategoryColor();
 
 
-    public static Collection<Field> getAllFields(Class<?> type) {
-        TreeSet<Field> fields = new TreeSet<Field>(
-                new Comparator<Field>() {
-                    @Override
-                    public int compare(Field o1, Field o2) {
-                        int res = o1.getName().compareTo(o2.getName());
-                        if (0 != res) {
-                            return res;
-                        }
-                        res = o1.getDeclaringClass().getSimpleName().compareTo(o2.getDeclaringClass().getSimpleName());
-                        if (0 != res) {
-                            return res;
-                        }
-                        res = o1.getDeclaringClass().getName().compareTo(o2.getDeclaringClass().getName());
-                        return res;
-                    }
-                });
-        for (Class<?> c = type; c != null; c = c.getSuperclass()) {
-            fields.addAll(Arrays.asList(c.getDeclaredFields()));
-        }
-        return fields;
-    }
-
-    public static void printAllFields(Object obj) {
-        for (Field field : getAllFields(obj.getClass())) {
-            field.setAccessible(true);
-            if (field.getDeclaringClass().isPrimitive())
-                continue;
-            String name = field.getName();
-            Object value = null;
-            try {
-                value = field.get(obj);
-            } catch (IllegalArgumentException | IllegalAccessException e) {
-                e.printStackTrace();
-            }
-            System.out.printf("%s %s.%s = %s;\n", value==null?" ":"*", field.getDeclaringClass().getSimpleName(), name, value);
-        }
-    }
-
-
-    public static void printObj(Object ob) {
-        System.out.println(
-                ReflectionToStringBuilder.toString(
-                        ob,
-                        new ZeeMyRecursiveToStringStyle(1)
-                ).replace(",",",\n")
-        );
-    }
 
     public static void checkRemoteWidget(String type, Widget wdg) {
 
@@ -437,15 +388,15 @@ public class ZeeConfig {
         }
     }
 
-    public static void initWindowInventory() {
+    public static void initWindowInvMain() {
         //add options interface
-        windowInventory.add(new ZeeInventoryOptions("Inventory"));
+        windowInvMain.add(invMainoptionsWdg = new ZeeInvMainOptionsWdg("Inventory"));
 
         //change slots position
-        Widget invSlots = windowInventory.getchild(Inventory.class);
+        Widget invSlots = windowInvMain.getchild(Inventory.class);
         invSlots.c = new Coord(0,20);
 
-        windowInventory.pack();
+        windowInvMain.pack();
     }
 
     public static void getWindow(Window window, String cap) {
@@ -459,7 +410,7 @@ public class ZeeConfig {
         }else if(cap.contains("Icon settings")) {
             windowIconSettings = window;
         }else if(cap.contains("Inventory")) {
-            windowInventory = window;
+            windowInvMain = window;
         }else if(cap.contains("Action search")) {
             windowActions = window;
         }
@@ -736,6 +687,38 @@ public class ZeeConfig {
         }
 
         //System.out.printf("gobSetType() %s id=%s mapsize=%s\n",gobName,gob.id,mapGobidType.size());
+    }
+
+    public static HashMap<String,Integer> mapInvItemNameCount = new HashMap<String,Integer>();
+    public static void addInvItem(GItem i) {
+        try {
+            String itemName = i.res.get().basename();
+            Integer count = countInvItems(itemName);
+            count++;
+            mapInvItemNameCount.put(itemName, count);
+            invMainoptionsWdg.updateLabelCount(itemName + "(" + count + ")");
+        }catch (Loading l){
+            l.printStackTrace();
+        }
+    }
+
+    public static void removeInvItem(GItem i) {
+        try{
+            String itemName = i.res.get().basename();
+            Integer count = countInvItems(itemName);
+            count--;
+            mapInvItemNameCount.put(itemName, count);
+            invMainoptionsWdg.updateLabelCount(itemName+"("+count+")");
+        }catch (Loading l){
+            l.printStackTrace();
+        }
+    }
+
+    private static Integer countInvItems(String itemName){
+        Integer count = mapInvItemNameCount.get(itemName);
+        if(count==null)
+            count = 0;
+        return count;
     }
 }
 

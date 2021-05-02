@@ -712,7 +712,7 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 	    if(!ZeeConfig.showInventoryLogin)
 	    	invwnd.hide();
 	    add(invwnd, Utils.getprefc("wndc-inv", new Coord(100, 100)));
-		ZeeConfig.initWindowInventory();
+		ZeeConfig.initWindowInvMain();
 	} else if(place == "equ") {
 	    equwnd = new Hidewnd(Coord.z, "Equipment");
 	    equwnd.add(child, Coord.z);
