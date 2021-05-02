@@ -5,10 +5,11 @@ import haven.render.Model;
 import java.awt.*;
 
 import static haven.MCache.*;
+import static haven.OCache.*;
 import static java.lang.Math.*;
 
 /* >wdg: Pointer */
-public class Pointer extends Widget implements MiniMap.IPointer {
+public class Pointer extends Widget implements MiniMap.IPointer, DTarget {
     private static final Color TRIANGULATION_COLOR = new Color(100, 100, 100);
     public static final BaseColor[] colors = new BaseColor[]{
 	new BaseColor(new Color(241, 227, 157, 255)),
@@ -335,4 +336,20 @@ public class Pointer extends Widget implements MiniMap.IPointer {
 	this.lc = tlc;
     }
     
+    @Override
+    public boolean drop(Coord cc, Coord ul) {
+	return false;
+    }
+    
+    @Override
+    public boolean iteminteract(Coord cc, Coord ul) {
+	if((lc != null) && (lc.dist(cc) < 20)) {
+	    Gob gob = getGob();
+	    if(gob != null) {
+		ui.gui.map.wdgmsg("itemact", ui.mc, Coord.z, ui.modflags(), 0, (int) gob.id, gob.rc.floor(posres), 0, -1);
+	    }
+	    return true;
+	}
+	return false;
+    }
 }
