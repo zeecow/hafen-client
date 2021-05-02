@@ -190,6 +190,13 @@ public class Pointer extends Widget implements MiniMap.IPointer, DTarget {
 		if(gob != null) {
 		    ui.gui.map.click(gob, 3);
 		}
+		if(ui.modctrl && marker != null) {
+		    if(ui.modmeta && marker instanceof MapFile.PMarker) {
+			ui.gui.mapfile.removeMarker(marker);
+		    } else {
+			ui.gui.untrack(marker);
+		    }
+		}
 	    }
 	    if(click) {wdgmsg("click", button, ui.modflags());}
 	    return (true);

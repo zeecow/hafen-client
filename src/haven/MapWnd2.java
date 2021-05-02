@@ -74,4 +74,15 @@ public class MapWnd2 extends MapWnd {
 	domark = false;
     }
     
+    public void removeMarker(MapFile.Marker marker) {
+	if(tool.list.sel == marker) {
+	    if(mremove != null) {
+		mremove.click();
+	    } else {
+		view.file.remove(marker);
+		ui.gui.untrack(marker);
+	    }
+	}
+    }
+    
 }

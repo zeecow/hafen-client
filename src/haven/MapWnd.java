@@ -57,7 +57,7 @@ public class MapWnd extends WindowX implements Console.Directory {
     private final Widget topbar;
     private final Frame viewf;
     private GroupSelector colsel;
-    private Button mremove;
+    protected Button mremove;
     private Button mtrack;
     private Predicate<Marker> mflt = pmarkers;
     private Comparator<Marker> mcmp = namecmp;
