@@ -978,7 +978,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Sk
 		    tag(GobTag.HIDDEN);
 		    if(d.slots != null) {
 			ArrayList<RenderTree.Slot> tmpSlots = new ArrayList<>(d.slots);
-			glob.loader.defer(() -> RUtils.multirem(tmpSlots), null);
+			glob.loader.defer(() -> RUtils.multiremSafe(tmpSlots), null);
 		    }
 		} else {
 		    ArrayList<RenderTree.Slot> tmpSlots = new ArrayList<>(slots);
