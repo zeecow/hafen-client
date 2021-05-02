@@ -697,8 +697,7 @@ public class ZeeConfig {
             count++;
             mapInvItemNameCount.put(itemName, count);
             invMainoptionsWdg.updateLabelCount(itemName + "(" + count + ")");
-        }catch (Loading l){
-            l.printStackTrace();
+        }catch (Resource.Loading e){
         }
     }
     public static void removeInvItem(GItem i) {
@@ -706,10 +705,11 @@ public class ZeeConfig {
             String itemName = i.res.get().basename();
             Integer count = countInvItems(itemName);
             count--;
+            if(count < 0)
+                count = 0;
             mapInvItemNameCount.put(itemName, count);
             invMainoptionsWdg.updateLabelCount(itemName+"("+count+")");
-        }catch (Loading l){
-            l.printStackTrace();
+        }catch (Resource.Loading e){
         }
     }
     private static Integer countInvItems(String itemName){

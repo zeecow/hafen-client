@@ -743,8 +743,7 @@ public class OCache implements Iterable<Gob> {
 		    try {
 				if (gob != null && gob.getres()!=null)
 					ZeeConfig.gobSetType(gob.getres().name, gob.id);
-			}catch (Loading l){
-		    	l.printStackTrace();
+			}catch (Resource.Loading e){
 			}
 		}
 		gob.updated();
