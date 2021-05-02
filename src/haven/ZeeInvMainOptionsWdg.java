@@ -59,10 +59,13 @@ public class ZeeInvMainOptionsWdg extends Widget {
         //update counter text
         labelCount.settext(s);
 
-        //position counter to the right
+        repositionLabelCount();
+    }
+
+    public void repositionLabelCount() {
+        //position counter at top right
         int x = invSlots.sz.x - labelCount.sz.x - 7;
         labelCount.c = new Coord(x, 0);
-
         pack();
     }
 }

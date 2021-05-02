@@ -62,7 +62,6 @@ public class ZeeConfig {
     public static boolean dropSeeds = false;//always starts off (TODO: set false when character loads)
     public static boolean dropSoil = false;
     public static boolean equiporyCompact = Utils.getprefb("equiporyCompact", false);
-    public static int gobHighlightDelayMs = Utils.getprefi("gobQueueSleepMs", 10);
     public static boolean highlightAggressiveGobs = Utils.getprefb("highlighAggressiveGobs", true);
     public static boolean highlightCropsReady = Utils.getprefb("highlightCropsReady", true);
     public static boolean highlightGrowingTrees = Utils.getprefb("highlightGrowingTrees", true);
@@ -689,6 +688,7 @@ public class ZeeConfig {
         //System.out.printf("gobSetType() %s id=%s mapsize=%s\n",gobName,gob.id,mapGobidType.size());
     }
 
+
     public static HashMap<String,Integer> mapInvItemNameCount = new HashMap<String,Integer>();
     public static void addInvItem(GItem i) {
         try {
@@ -701,7 +701,6 @@ public class ZeeConfig {
             l.printStackTrace();
         }
     }
-
     public static void removeInvItem(GItem i) {
         try{
             String itemName = i.res.get().basename();
@@ -713,7 +712,6 @@ public class ZeeConfig {
             l.printStackTrace();
         }
     }
-
     private static Integer countInvItems(String itemName){
         Integer count = mapInvItemNameCount.get(itemName);
         if(count==null)

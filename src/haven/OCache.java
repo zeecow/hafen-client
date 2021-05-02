@@ -741,7 +741,7 @@ public class OCache implements Iterable<Gob> {
 		    add(gob);
 		    added = true;
 		    try {
-				if (gob != null)
+				if (gob != null && gob.getres()!=null)
 					ZeeConfig.gobSetType(gob.getres().name, gob.id);
 			}catch (Loading l){
 		    	l.printStackTrace();

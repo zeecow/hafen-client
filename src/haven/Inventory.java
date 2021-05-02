@@ -149,6 +149,7 @@ public class Inventory extends Widget implements DTarget {
 	if(msg == "sz") {
 	    isz = (Coord)args[0];
 	    resize(invsq.sz().add(UI.scale(new Coord(-1, -1))).mul(isz).add(UI.scale(new Coord(1, 1))));
+	    ZeeConfig.invMainoptionsWdg.repositionLabelCount();
 	} else if(msg == "mode") {
 	    dropul = (((Integer)args[0]) == 0);
 	} else {
