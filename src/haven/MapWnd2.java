@@ -68,6 +68,9 @@ public class MapWnd2 extends MapWnd {
 	MapFile.Marker nm = new MapFile.PMarker(view.sessloc.seg.id, at, name, BuddyWnd.gc[new Random().nextInt(BuddyWnd.gc.length)]);
 	file.add(nm);
 	focus(nm);
+	if(ui.modctrl) {
+	    ui.gui.track(nm);
+	}
 	domark = false;
     }
     
