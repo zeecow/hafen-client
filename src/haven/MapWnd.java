@@ -408,8 +408,12 @@ public class MapWnd extends WindowX implements Console.Directory {
 		if(colsel != null) {
 		    ui.destroy(colsel);
 		    colsel = null;
+		}
+		if(mremove != null) {
 		    ui.destroy(mremove);
 		    mremove = null;
+		}
+		if(mtrack != null) {
 		    ui.destroy(mtrack);
 		    mtrack = null;
 		}
