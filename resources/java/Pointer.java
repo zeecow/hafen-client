@@ -290,7 +290,7 @@ public class Pointer extends Widget implements MiniMap.IPointer, DTarget {
 	    triangulating = false;
 	    MiniMap.Location loc = ui.gui.mapfile.view.sessloc;
 	    if(id == marker.seg) {
-		tc = mc = marker.tc.sub(loc.tc).mul(tilesz);
+		tc = mc = marker.tc.sub(loc.tc).mul(tilesz).add(6, 6);
 		return mc;
 	    } else {
 		return null;
