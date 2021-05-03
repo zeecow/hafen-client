@@ -1,3 +1,10 @@
+$size[14]{$u{Update for 03.05.21:}
+  * merged loftar's changes
+  * you can now deliver quest items through pointer
+  * holding CTRL while placing marker in-world will start tracking it - useful to not loose your boat
+  * CTRL+RClick on a custom pointer will stop tracking it
+  * CTRL+ALT+RClick on custom pointer will remove said pointer - useful when you've returned to your boat
+ 
 $size[14]{$u{Update for 02.05.21:}
   * made toggled windows (like study or filter) raise to top when toggled on
   * fixed remove and track buttons not being removed for natural markers
