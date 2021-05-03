@@ -41,6 +41,8 @@ import java.util.function.*;
 import java.awt.Graphics;
 import java.awt.Color;
 import java.awt.image.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Utils {
     public static final java.nio.charset.Charset utf8 = java.nio.charset.Charset.forName("UTF-8");
@@ -2035,7 +2037,12 @@ public class Utils {
 	return Optional.of(new Coord2d((float) ((b2 * c1 - b1 * c2) / delta), (float) ((a1 * c2 - a2 * c1) / delta)));
     }
     
+    private static final Pattern RESID = Pattern.compile(".*\\[([^,]*),?.*]");
     public static String prettyResName(String resname) {
+	Matcher m = RESID.matcher(resname);
+	if(m.matches()) {
+	    resname = m.group(1);
+	}
 	int k = resname.lastIndexOf("/");
 	resname = resname.substring(k + 1);
 	resname = resname.substring(0, 1).toUpperCase() + resname.substring(1);
