@@ -55,6 +55,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Sk
     private GobDamageInfo damage;
     private HidingGobSprite<Hitbox> hitbox = null;
     public Drawable drawable;
+    public Moving moving;
     private Boolean isMe = null;
     private final GeneralGobInfo info;
     private GobWarning warning = null;
@@ -405,6 +406,8 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Sk
     public boolean disposed() {return disposed;}
     
     public void dispose() {
+	drawable = null;
+	moving = null;
 	synchronized (removalLock) {
 	    disposed = true;
 	    removalLock.notifyAll();
@@ -512,6 +515,8 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Sk
 	    if(ac == Drawable.class) {
 		drawable = (Drawable) a;
 		if(a != prev) drawableUpdated();
+	    } else if(ac == Moving.class) {
+		moving = (Moving) a;
 	    } else if(ac == KinInfo.class) {
 		tagsUpdated();
 	    } else if(ac == GobHealth.class) {
