@@ -47,7 +47,9 @@ public class Pointer extends Widget implements MiniMap.IPointer, DTarget {
 	    icon = ((MapFile.SMarker) marker).res;
 	    col = colors[0];
 	} else if(marker instanceof MapWnd2.GobMarker) {
-	    col = new BaseColor(TRIANGULATION_COLOR);
+	    MapWnd2.GobMarker gobMarker = (MapWnd2.GobMarker) marker;
+	    col = new BaseColor(gobMarker.col);
+	    icon = gobMarker.res;
 	}
     }
     
@@ -116,7 +118,11 @@ public class Pointer extends Widget implements MiniMap.IPointer, DTarget {
 	});
 	sc = tmp.add(ad);
 	if(icon != null) {
-	    if(triangulating) {g.chcolor(TRIANGULATION_COLOR);}
+	    if(marker != null) {
+		g.chcolor();
+	    } else if(triangulating) {
+		g.chcolor(TRIANGULATION_COLOR);
+	    }
 	    try {
 		if(licon == null)
 		    licon = icon.get().layer(Resource.imgc).tex();

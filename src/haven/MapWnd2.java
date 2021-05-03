@@ -1,6 +1,7 @@
 package haven;
 
 
+import java.awt.*;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
@@ -27,10 +28,9 @@ public class MapWnd2 extends MapWnd {
     @Override
     public void compact(boolean a) {
 	switching = true;
-	String name = cfgName(caption());
 	storeCfg();
 	super.compact(a);
-	name = cfgName(caption());
+	String name = cfgName(caption());
 	cfg = WidgetCfg.get(name);
 	initCfg();
 	switching = false;
@@ -118,11 +118,27 @@ public class MapWnd2 extends MapWnd {
     
     public class GobMarker extends MapFile.Marker {
 	public final long gobid;
+	public final Indir<Resource> res;
 	private Coord2d rc = null;
+	public final Color col;
 	
 	public GobMarker(Gob gob) {
 	    super(0, gob.rc.floor(tilesz), gob.tooltip());
 	    this.gobid = gob.id;
+	    GobIcon icon = gob.getattr(GobIcon.class);
+	    res = (icon == null) ? null : icon.res;
+	    col = color(gob);
+	}
+	
+	private Color color(Gob gob) {
+	    if(gob.anyOf(GobTag.FOE, GobTag.AGGRESSIVE)) {
+		return new Color(220, 100, 100);
+	    } else if(gob.is(GobTag.FRIEND)) {
+		return new Color(100, 220, 100);
+	    } else if(gob.is(GobTag.ANIMAL)) {
+		return new Color(100, 200, 220);
+	    }
+	    return Color.LIGHT_GRAY;
 	}
 	
 	private void update() {
