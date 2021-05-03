@@ -45,6 +45,7 @@ import haven.render.sl.Type;
 
 public class MapView extends PView implements DTarget, Console.Directory {
     public static final Resource.Named inspectCursor = Resource.local().loadwait("gfx/hud/curs/studyx").indir();
+    public static final Resource.Named trackCursor = Resource.local().loadwait("gfx/hud/curs/track").indir();
     public static boolean clickdb = false;
     public long plgob = -1;
     public Coord2d cc;
@@ -2179,7 +2180,11 @@ public class MapView extends PView implements DTarget, Console.Directory {
 		if(gob != null) {
 		    if(ui.gui.mapfile.domark) {
 			ui.gui.mapfile.addMarker(gob);
-		        return;
+			return;
+		    } else if(isTracking()) {
+			ui.gui.mapfile.track(gob);
+			stopTracking();
+			return;
 		    }
 		    if(clickb == 3) {FlowerMenu.lastGob(gob);}
 		    if(ui.modmeta && clickb == 1) {
@@ -2246,6 +2251,9 @@ public class MapView extends PView implements DTarget, Console.Directory {
 		return true;
 	    } else if(ui.gui.mapfile.domark) {
 		ui.gui.mapfile.domark = false;
+		return true;
+	    } else if(isTracking()) {
+		stopTracking();
 		return true;
 	    }
 	}
@@ -2628,6 +2636,7 @@ public class MapView extends PView implements DTarget, Console.Directory {
     }
     
     public void startInspecting() {
+	stopCustomModes();
 	if(cursor == null) {
 	    cursor = inspectCursor;
 	    inspect(rootxlate(ui.mc));
@@ -2650,7 +2659,7 @@ public class MapView extends PView implements DTarget, Console.Directory {
     }
     
     private void inspect(Coord c) {
-	if(cursor == inspectCursor) {
+	if(cursor == inspectCursor || cursor == trackCursor) {
 	    new Hittest(c) {
 		@Override
 		protected void hit(Coord pc, Coord2d mc, ClickData inf) {
@@ -2658,9 +2667,9 @@ public class MapView extends PView implements DTarget, Console.Directory {
 		    if(inf != null) {
 			Gob gob = Gob.from(inf.ci);
 			if(gob != null) {
-			    ttip = gob.resid();
+			    ttip = cursor == inspectCursor ? gob.resid() : gob.tooltip();
 			}
-		    } else {
+		    } else if(cursor == inspectCursor) {
 			MCache mCache = ui.sess.glob.map;
 			int tile = mCache.gettile(mc.div(tilesz).floor());
 			Resource res = mCache.tilesetr(tile);
@@ -2678,6 +2687,37 @@ public class MapView extends PView implements DTarget, Console.Directory {
 	} else {
 	    ttip = null;
 	}
+    }
+    
+    public void toggleTrackingMode() {
+	if(isTracking()) {
+	    stopTracking();
+	} else {
+	    startTracking();
+	}
+    }
+    
+    public void startTracking() {
+	stopCustomModes();
+	if(cursor == null) {
+	    cursor = trackCursor;
+	    inspect(rootxlate(ui.mc));
+	}
+    }
+    
+    public boolean isTracking() {
+	return cursor == trackCursor;
+    }
+    
+    public void stopTracking() {
+	if(cursor == trackCursor) {
+	    cursor = null;
+	}
+    }
+    
+    private void stopCustomModes() {
+	stopInspecting();
+	stopTracking();
     }
     
     @Override

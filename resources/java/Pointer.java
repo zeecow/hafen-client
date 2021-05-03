@@ -46,6 +46,8 @@ public class Pointer extends Widget implements MiniMap.IPointer, DTarget {
 	} else if(marker instanceof MapFile.SMarker) {
 	    icon = ((MapFile.SMarker) marker).res;
 	    col = colors[0];
+	} else if(marker instanceof MapWnd2.GobMarker) {
+	    col = new BaseColor(TRIANGULATION_COLOR);
 	}
     }
     
@@ -194,11 +196,15 @@ public class Pointer extends Widget implements MiniMap.IPointer, DTarget {
 		if(gob != null) {
 		    ui.gui.map.click(gob, 3);
 		}
-		if(ui.modctrl && marker != null) {
-		    if(ui.modmeta && marker instanceof MapFile.PMarker) {
-			ui.gui.mapfile.removeMarker(marker);
-		    } else {
+		if(marker != null) {
+		    if(marker instanceof MapWnd2.GobMarker) {
 			ui.gui.untrack(marker);
+		    } else if(ui.modctrl) {
+			if(ui.modmeta && marker instanceof MapFile.PMarker) {
+			    ui.gui.mapfile.removeMarker(marker);
+			} else {
+			    ui.gui.untrack(marker);
+			}
 		    }
 		}
 	    }
@@ -301,7 +307,14 @@ public class Pointer extends Widget implements MiniMap.IPointer, DTarget {
 	    triangulating = false;
 	    MiniMap.Location loc = ui.gui.mapfile.view.sessloc;
 	    if(id == marker.seg) {
-		tc = mc = marker.tc.sub(loc.tc).mul(tilesz).add(6, 6);
+		Coord2d tmp = null;
+		if(marker instanceof MapWnd2.GobMarker) {
+		    tmp = ((MapWnd2.GobMarker) marker).rc();
+		}
+		if(tmp == null) {
+		    tmp = mc = marker.tc.sub(loc.tc).mul(tilesz).add(6, 6);
+		}
+		tc = mc = tmp;
 		return mc;
 	    } else {
 		return null;

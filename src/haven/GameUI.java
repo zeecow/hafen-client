@@ -1683,6 +1683,9 @@ public class GameUI extends ConsoleHost implements Console.Directory {
     public void untrack(MapFile.Marker marker) {
 	Widget wdg = trackedMarkers.remove(marker);
 	if(wdg != null) {
+	    if(marker instanceof MapWnd2.GobMarker){
+	        ui.gui.mapfile.untrack(((MapWnd2.GobMarker) marker).gobid);
+	    }
 	    wdg.reqdestroy();
 	}
     }
