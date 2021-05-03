@@ -184,7 +184,11 @@ public class Pointer extends Widget implements MiniMap.IPointer, DTarget {
 	if(lc != null && lc.dist(c) < 20) {
 	    if(button == 1) {
 		Gob gob = getGob();
-		ui.gui.map.click(gob != null ? gob.rc : tc(), 1);
+		if(gob != null) {
+		    ui.gui.map.click(gob, 1);
+		} else {
+		    ui.gui.map.click(tc(), 1);
+		}
 	    } else if(button == 3) {
 		Gob gob = getGob();
 		if(gob != null) {
