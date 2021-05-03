@@ -202,8 +202,10 @@ public class MenuGrid extends Widget implements KeyBinding.Bindable {
 	    {pag.button = this;}
 
 	    public void use() {
-		pag.scm.change(paginafor(pag.scm.cur.act().parent));
+		Pagina dst = paginafor(pag.scm.cur.act().parent);
+		pag.scm.change(dst);
 		curoff = 0;
+		selectCraft(dst);
 	    }
 
 	    public String name() {return("Back");}
@@ -620,7 +622,8 @@ public class MenuGrid extends Widget implements KeyBinding.Bindable {
 
     public void use(PagButton r, boolean reset) {
 	Collection<PagButton> sub = new ArrayList<>();
-	cons(r.pag, sub);
+	consb(r.pag, sub);
+	selectCraft(r.pag);
 	if(sub.size() > 0) {
 	    change(r.pag);
 	} else {
