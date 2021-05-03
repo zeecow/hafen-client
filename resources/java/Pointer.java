@@ -202,15 +202,11 @@ public class Pointer extends Widget implements MiniMap.IPointer, DTarget {
 		if(gob != null) {
 		    ui.gui.map.click(gob, 3);
 		}
-		if(marker != null) {
-		    if(marker instanceof MapWnd2.GobMarker) {
+		if(ui.modctrl && marker != null) {
+		    if(ui.modmeta && marker instanceof MapFile.PMarker) {
+			ui.gui.mapfile.removeMarker(marker);
+		    } else {
 			ui.gui.untrack(marker);
-		    } else if(ui.modctrl) {
-			if(ui.modmeta && marker instanceof MapFile.PMarker) {
-			    ui.gui.mapfile.removeMarker(marker);
-			} else {
-			    ui.gui.untrack(marker);
-			}
 		    }
 		}
 	    }
@@ -221,6 +217,9 @@ public class Pointer extends Widget implements MiniMap.IPointer, DTarget {
     }
     
     private Gob getGob() {
+	if(marker instanceof MapWnd2.GobMarker) {
+	    return ui.sess.glob.oc.getgob(((MapWnd2.GobMarker) marker).gobid);
+	}
 	return (gobid < 0) ? null : ui.sess.glob.oc.getgob(gobid);
     }
     
