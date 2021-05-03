@@ -56,7 +56,7 @@ public class MapWnd2 extends MapWnd {
     }
     
     public void addMarker(Gob gob) {
-	addMarker(gob.rc.floor(tilesz), Utils.prettyResName(gob.tooltip()));
+	addMarker(gob.rc.floor(tilesz), gob.tooltip());
     }
     
     public void addMarker(Coord at) {

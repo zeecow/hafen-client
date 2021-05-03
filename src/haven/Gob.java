@@ -945,7 +945,15 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Sk
     }
     
     public String tooltip() {
-        return resid();
+	String tt = null;
+	GobIcon icon = getattr(GobIcon.class);
+	if(icon != null) {
+	    tt = icon.tooltip();
+	}
+	if(tt == null) {
+	    tt = Utils.prettyResName(resid());
+	}
+	return tt;
     }
     
     private void updateHitbox() {
