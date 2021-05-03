@@ -155,5 +155,23 @@ public class MapWnd2 extends MapWnd {
 	public Coord2d rc() {
 	    return rc;
 	}
+    
+	public boolean hide() {
+	    Gob gob = ui.sess.glob.oc.getgob(gobid);
+	    Gob player = ui.gui.map.player();
+	    if(gob != null && player != null) {
+		if(gob.drivenByPlayer) {
+		    return true;
+		}
+		if(gob.moving instanceof Following) {
+		    return ((Following) gob.moving).tgt == gob.glob.sess.ui.gui.map.plgob;
+		} else if(gob.moving instanceof Homing) {
+		    Homing homing = (Homing) gob.moving;
+		    return homing.dist < 30 && homing.tgt == gob.glob.sess.ui.gui.map.plgob;
+		}
+		return gob.is(GobTag.VEHICLE) && gob.rc.dist(player.rc) < 25;
+	    }
+	    return false;
+	}
     }
 }

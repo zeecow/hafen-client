@@ -315,7 +315,9 @@ public class Pointer extends Widget implements MiniMap.IPointer, DTarget {
 	    if(id == marker.seg) {
 		Coord2d tmp = null;
 		if(marker instanceof MapWnd2.GobMarker) {
-		    tmp = ((MapWnd2.GobMarker) marker).rc();
+		    MapWnd2.GobMarker gobMarker = (MapWnd2.GobMarker) this.marker;
+		    if(gobMarker.hide()) {return null;}
+		    tmp = gobMarker.rc();
 		}
 		if(tmp == null) {
 		    tmp = mc = marker.tc.sub(loc.tc).mul(tilesz).add(6, 6);
