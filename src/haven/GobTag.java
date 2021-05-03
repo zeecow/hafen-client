@@ -16,7 +16,7 @@ public enum GobTag {
     SHEEP, EWE, RAM, LAMB,
     
     GEM,
-    PUSHED, //vehicle that is pushed (wheelbarrow, plow)
+    VEHICLE, PUSHED, //vehicle that is pushed (wheelbarrow, plow)
     
     PLAYER, ME, FRIEND, FOE,
     KO, DEAD, EMPTY, READY,
@@ -38,6 +38,8 @@ public enum GobTag {
         "/rabbit", "/crab", "/cavemoth", "/hedgehog", "/stagbeetle", "jellyfish", "/mallard", "/chicken", "/irrbloss",
         "/cavecentipede"
     };
+    
+    private static final String[] VEHICLES = {"/wheelbarrow", "/plow", "/cart", "/dugout", "/rowboat", "/snekkja", "/knarr"};
     
     private static final boolean DBG = false;
     private static final Set<String> UNKNOWN = new HashSet<>();
@@ -114,6 +116,9 @@ public enum GobTag {
                 tags.add(GEM);
             } else if(name.endsWith("/wheelbarrow") || name.endsWith("/plow")) {
                 tags.add(PUSHED);
+            }
+            if(ofType(name, VEHICLES)) {
+                tags.add(VEHICLE);
             }
             
             if(anyOf(tags, HERB, CRITTER, GEM)) {
