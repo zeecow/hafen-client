@@ -26,6 +26,7 @@ public enum Action {
     }, "Toggle tile centering"),
     TOGGLE_INSPECT(gui -> { gui.map.toggleInspectMode(); }, "Toggle inspect mode"),
     BOT_PICK_ALL_HERBS(Bot::pickup, "Auto-pick stuff", "Will automatically pickup all herbs/mussels/clay/frogs/grasshoppers etc. in radius that can be changed in Options->General."),
+    TOGGLE_PEACE(GameUI::togglePeace, "Toggle Peace", "Toggle peace for current target"),
     
     //Camera controls
     CAM_ZOOM_IN(gui -> gui.map.zoomCamera(-1), "Camera zoom in"),

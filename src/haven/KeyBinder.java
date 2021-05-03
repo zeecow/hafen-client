@@ -103,6 +103,7 @@ public class KeyBinder {
 	
 	add(TOGGLE_HIDE_TREES);
 	add(TOGGLE_INSPECT);
+	add(TOGGLE_PEACE);
     }
     
     private static synchronized void store() {
