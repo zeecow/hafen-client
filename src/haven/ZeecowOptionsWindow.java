@@ -361,6 +361,9 @@ public class ZeecowOptionsWindow extends JFrame {
         if(ZeeConfig.mapGobAudio.size() > 0) {
             ret.addAll(ZeeConfig.mapGobAudio.keySet());
         }
+        if(ZeeConfig.mapGobCategory.size() > 0) {
+            ret.addAll(ZeeConfig.mapGobCategory.keySet());
+        }
         if(ZeeConfig.mapGobColor.size() > 0) {
             ret.addAll(ZeeConfig.mapGobColor.keySet());
         }

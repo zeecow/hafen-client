@@ -31,6 +31,7 @@ public class ZeeConfig {
     public static final Integer GOBTYPE_CROP = 3;
     public static final Integer GOBTYPE_CATEGORIZED = 4;
     public static final Integer GOBTYPE_PLAYER = 5;
+    public static final Integer GOBTYPE_SAVED = 6;
     public static MixColor MIXCOLOR_RED = new MixColor(255,0,0,200);
     public static MixColor MIXCOLOR_ORANGE = new MixColor(255,128,0,200);
     public static MixColor MIXCOLOR_YELLOW = new MixColor(255,255,0,200);
@@ -219,8 +220,16 @@ public class ZeeConfig {
 
         //get Type and name
         Integer gobType = mapGobidType.get(gob.id);
-        String gobName = gob.getres().name;
+        String gobName;
         Color c;
+
+        try{
+            gobName = gob.getres().name;
+        }catch (Resource.Loading loading){
+            loading.printStackTrace();
+            return null;
+        }
+
         //System.out.printf("gobHighlight id=%s len=%s type=%s \n", gob.id,mapGobidType.size(), gobType);
 
         //if it's a tree
@@ -292,7 +301,7 @@ public class ZeeConfig {
         //}
     }
 
-    public static void gobAudio(String gobName, int gobId) {
+    public static void gobAudio(String gobName, long gobId) {
         if(gobName==null || gobName.isEmpty())
             return;
         String path = "";
@@ -317,6 +326,7 @@ public class ZeeConfig {
                     gameUI.error("player spotted");
             }
         }else if( (path = mapGobAudio.get(gobName)) != null){
+            System.out.println(gobName+" > playing custom audio");
             //if single gob alert is saved, play alert
             ZeeConfig.playAudio(path);
         }else {
@@ -326,6 +336,7 @@ public class ZeeConfig {
                     continue;
                 //...check if gob is in category
                 if(mapCategoryGobs.get(categ).contains(gobName)){
+                    System.out.println(gobName+" > playing category sound");
                     //play audio for category
                     path = mapCategoryAudio.get(categ);
                     ZeeConfig.playAudio(path);
@@ -681,11 +692,14 @@ public class ZeeConfig {
         }else if(gobName.startsWith("gfx/borka/body")) {
             mapGobidType.put(gobId, GOBTYPE_PLAYER);
             mapGobidName.put(gobId, gobName);
-        }else if(!mapGobColor.containsKey(gobName) && !mapGobAudio.containsKey(gobName) && !mapGobCategory.containsKey(gobName)) {
+        }else if(mapGobColor.containsKey(gobName) || mapGobAudio.containsKey(gobName) || mapGobCategory.containsKey(gobName)) {
+            mapGobidType.put(gobId, GOBTYPE_SAVED);
+            mapGobidName.put(gobId, gobName);
+        }else{
             mapGobidType.put(gobId, GOBTYPE_IGNORE);
         }
 
-        //System.out.printf("gobSetType() %s id=%s mapsize=%s\n",gobName,gob.id,mapGobidType.size());
+        //System.out.printf("gobSetType() %s id=%s type=%s mapsize=%s\n",gobName, gobId, mapGobidType.get(gobId), mapGobidType.size());
     }
 
 

@@ -13,6 +13,7 @@ public class ZeeGobHighlight extends GAttrib implements Gob.SetupMod {
     }
 
     public Pipe.Op gobstate() {
-        return(ZeeConfig.getHighlightColor(this.gob));
+        //return(ZeeConfig.getHighlightColor(this.gob));
+        return this.fx;
     }
 }
