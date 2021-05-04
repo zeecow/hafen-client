@@ -1124,7 +1124,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Sk
 	    updateWarnings();
 	}
 	
-	if(status.updated(StatusType.info)) {
+	if(status.updated(StatusType.info, StatusType.tags)) {
 	    info.clean();
 	}
     
