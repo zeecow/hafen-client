@@ -8,6 +8,7 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.util.*;
+import java.util.List;
 
 public class ZeecowOptionsWindow extends JFrame {
     public JTabbedPane tabbedPane, tabbedPaneGobs;
@@ -357,17 +358,21 @@ public class ZeecowOptionsWindow extends JFrame {
     }
 
     private JList<String> fillUpListGobsSaved() {
-        Set<String> ret = new HashSet<String>();
+        Set<String> set = new HashSet<String>();
+        JList<String> ret;
         if(ZeeConfig.mapGobAudio.size() > 0) {
-            ret.addAll(ZeeConfig.mapGobAudio.keySet());
+            set.addAll(ZeeConfig.mapGobAudio.keySet());
         }
         if(ZeeConfig.mapGobCategory.size() > 0) {
-            ret.addAll(ZeeConfig.mapGobCategory.keySet());
+            set.addAll(ZeeConfig.mapGobCategory.keySet());
         }
         if(ZeeConfig.mapGobColor.size() > 0) {
-            ret.addAll(ZeeConfig.mapGobColor.keySet());
+            set.addAll(ZeeConfig.mapGobColor.keySet());
         }
-        return new JList<String>(ret.toArray(new String[0]));
+        List<String> sortedList = new ArrayList<>(set);
+        Collections.sort(sortedList);
+        ret = new JList<String>(sortedList.toArray(new String[0]));
+        return ret;
     }
 
     private void printSavedSettings() {
@@ -392,7 +397,10 @@ public class ZeecowOptionsWindow extends JFrame {
         Utils.setpref(ZeeConfig.MAP_GOB_COLOR,"");
         ZeeConfig.mapGobColor = ZeeConfig.initMapGobColor();
 
-        //clear categories
+        //reset map Category-Gobs (always reset categs before gobs)
+        Utils.setpref(ZeeConfig.MAP_CATEGORY_GOBS,"");
+        ZeeConfig.mapCategoryGobs = ZeeConfig.initMapCategoryGobs();
+        //reflect in GobCategory
         Utils.setpref(ZeeConfig.MAP_GOB_CATEGORY,"");
         ZeeConfig.mapGobCategory = ZeeConfig.initMapGobCategory();
 
@@ -617,6 +625,8 @@ public class ZeecowOptionsWindow extends JFrame {
         //slider transparency
         Color color = ZeeConfig.mapCategoryColor.get(tfCategName.getText());
         int alpha = color!=null ? color.getAlpha() : 200;
+        if(alpha == 1)
+            alpha = 200;
         sliderAlpha = new JSlider(JSlider.HORIZONTAL,0, 255, alpha);
         panelHighlight.add(sliderAlpha);
         sliderAlpha.addChangeListener(evt -> {
@@ -638,7 +648,7 @@ public class ZeecowOptionsWindow extends JFrame {
         if(JOptionPane.showConfirmDialog(this,"Reset categories?") != JOptionPane.OK_OPTION)
             return;
 
-        //reset map Category-Gobs
+        //reset map Category-Gobs (always reset categs before gobs)
         Utils.setpref(ZeeConfig.MAP_CATEGORY_GOBS,"");
         ZeeConfig.mapCategoryGobs = ZeeConfig.initMapCategoryGobs();
         //reflect in GobCategory
@@ -721,11 +731,12 @@ public class ZeecowOptionsWindow extends JFrame {
 
         //add to map Category->Gobs
         Set<String> gobs = ZeeConfig.mapCategoryGobs.get(gobCategory);
-        if (gobs != null) {
-            gobs.add(gobName);
-            ZeeConfig.mapCategoryGobs.put(gobCategory,gobs);
-            Utils.setpref(ZeeConfig.MAP_CATEGORY_GOBS, ZeeConfig.serialize(ZeeConfig.mapCategoryGobs));
+        if (gobs == null) {
+            gobs = new HashSet<String>();
         }
+        gobs.add(gobName);//hashset adds only if not present already
+        ZeeConfig.mapCategoryGobs.put(gobCategory,gobs);
+        Utils.setpref(ZeeConfig.MAP_CATEGORY_GOBS, ZeeConfig.serialize(ZeeConfig.mapCategoryGobs));
 
         //add to map Gob->Category
         ZeeConfig.mapGobCategory.put(gobName,gobCategory);

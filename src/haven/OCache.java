@@ -232,7 +232,7 @@ public class OCache implements Iterable<Gob> {
 	} else if((d == null) || (d.res != res) || !d.sdt.equals(sdt)) {
 	    g.setattr(new ResDrawable(g, res, sdt));
 	}
-	ZeeConfig.highlight(g, ZeeConfig.getHighlightColor(g));
+	ZeeConfig.highlight(g, ZeeConfig.getHighlightDrawable(g));
     }
     public Delta cres(Message msg) {
 	int resid = msg.uint16();
@@ -740,11 +740,6 @@ public class OCache implements Iterable<Gob> {
 		if(!added) {
 		    add(gob);
 		    added = true;
-		    try {
-				if (gob != null && gob.getres()!=null)
-					ZeeConfig.gobSetType(gob.getres().name, gob.id);
-			}catch (Resource.Loading e){
-			}
 		}
 		gob.updated();
 	    }

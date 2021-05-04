@@ -6,8 +6,7 @@ import haven.render.Pipe;
 public class ZeeGobHighlight extends GAttrib implements Gob.SetupMod {
     public final MixColor fx;
 
-    public ZeeGobHighlight(Gob g, MixColor c)
-    {
+    public ZeeGobHighlight(Gob g, MixColor c) {
         super(g);
         this.fx = c;
     }
