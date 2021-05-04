@@ -983,7 +983,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Sk
     
     private boolean updateVisibility() {
 	if(anyOf(GobTag.TREE, GobTag.BUSH)) {
-	    Drawable d = getattr(Drawable.class);
+	    Drawable d = drawable;
 	    Boolean needHide = CFG.HIDE_TREES.get();
 	    if(d != null && d.skipRender != needHide) {
 		d.skipRender = needHide;

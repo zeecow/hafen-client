@@ -129,7 +129,7 @@ public enum GobTag {
                 tags.add(MENU);
             }
     
-            Drawable d = gob.getattr(Drawable.class);
+            Drawable d = gob.drawable;
             if(d != null) {
                 if(d.hasPose("/knock")) {
                     tags.add(KO);

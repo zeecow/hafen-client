@@ -91,7 +91,7 @@ public class GeneralGobInfo extends GobInfo {
     }
 
     private static Message getDrawableData(Gob gob) {
-	Drawable dr = gob.getattr(Drawable.class);
+	Drawable dr = gob.drawable;
 	ResDrawable d = (dr instanceof ResDrawable) ? (ResDrawable) dr : null;
 	if(d != null)
 	    return d.sdt.clone();
@@ -103,7 +103,7 @@ public class GeneralGobInfo extends GobInfo {
 	List<String> kinds = Arrays.asList(kind);
 	boolean result = false;
 	Class spc;
-	Drawable d = gob.getattr(Drawable.class);
+	Drawable d = gob.drawable;
 	Resource.CodeEntry ce = gob.getres().layer(Resource.CodeEntry.class);
 	if(ce != null) {
 	    spc = ce.get("spr");
