@@ -260,6 +260,7 @@ public class GameUI extends ConsoleHost implements Console.Directory {
     @Override
     public void destroy() {
 	closeWindows();
+	untrackAllMarkers();
 	super.destroy();
 	ui.gui = null;
     }
@@ -1688,6 +1689,11 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 	    }
 	    wdg.reqdestroy();
 	}
+    }
+    
+    private void untrackAllMarkers() {
+	Collection<MapFile.Marker> markers = new ArrayList<>(trackedMarkers.keySet());
+	markers.forEach(this::untrack);
     }
     
     public boolean isTracked(MapFile.Marker marker) {
