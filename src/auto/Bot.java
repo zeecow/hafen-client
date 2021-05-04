@@ -67,7 +67,10 @@ public class Bot implements Defer.Callable<Void> {
     private static void start(Bot bot, UI ui) {
 	cancel();
 	synchronized (lock) { current = bot; }
-	bot.run((result) -> ui.message(String.format("Task is %s.", result), GameUI.MsgType.INFO));
+	bot.run((result) -> {
+	    if (CFG.SHOW_BOT_MESSAGES.get())
+	    	ui.message(String.format("Task is %s.", result), GameUI.MsgType.INFO);
+	});
     }
     
     public static void pickup(GameUI gui, String filter) {

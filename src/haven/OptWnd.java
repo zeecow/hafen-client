@@ -1054,6 +1054,9 @@ public class OptWnd extends WindowX {
 		}
 	    }
 	}, x, y);
+	
+	y += STEP;
+	display.add(new CFGBox("Show Task Messages", CFG.SHOW_BOT_MESSAGES), x, y);
  
 	my = Math.max(my, y);
 	x += UI.scale(265);
