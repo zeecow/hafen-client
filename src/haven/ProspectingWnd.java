@@ -59,7 +59,7 @@ public class ProspectingWnd extends WindowX {
 	    if(p != null) {pc = p.rc;}
 	}
 	if(pc != null) {
-	    ui.gui.mapfile.addMarker(pc.floor(tilesz), Utils.prettyResName(detected));
+	    ui.gui.mapfile.addMarker(pc.floor(tilesz), String.format("%s (below)", Utils.prettyResName(detected)));
 	}
     }
     
