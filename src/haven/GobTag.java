@@ -39,7 +39,7 @@ public enum GobTag {
         "/cavecentipede"
     };
     
-    private static final String[] VEHICLES = {"/wheelbarrow", "/plow", "/cart", "/dugout", "/rowboat", "/snekkja", "/knarr"};
+    private static final String[] VEHICLES = {"/wheelbarrow", "/plow", "/cart", "/dugout", "/rowboat", "/vehicle/snekkja", "/vehicle/knarr", "/vehicle/wagon", "/vehicle/coracle", "/horse/mare", "/horse/stallion", "/vehicle/spark"};
     
     private static final boolean DBG = false;
     private static final Set<String> UNKNOWN = new HashSet<>();
