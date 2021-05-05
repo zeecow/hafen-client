@@ -1,3 +1,10 @@
+$size[14]{$u{Update for 05.05.21:}
+  * fixed cave rat not being tagged as aggressive
+  * add (below) to the name of prospecting markers
+  * show tree/bush growth from 0%
+  * added Logout button to character select (jamesblack)
+  * added option to disable bot messages (Options->Display->Show Task Messages) (jamesblack)
+ 
 $size[14]{$u{Update for 04.05.21:}
   * added toggle peace with current target (wafflekat)
   * added snekkja, knarr, stallion and mare to radar
