@@ -199,6 +199,11 @@ public class Composite extends Drawable {
 	try {
 	    name = base.get().name;
 	    if("gfx/borka/body".equals(name)) {
+		for (MD mod : nmod2) {
+		    if(mod.mod.get().name.contains("gfx/terobjs/mannequin")) {
+			return "gfx/terobjs/mannequin";
+		    }
+		}
 		return name;
 	    } else if(name != null) {
 		for (MD mod : nmod2) {
