@@ -47,10 +47,8 @@ public enum GobTag {
     public static Set<GobTag> tags(Gob gob) {
         Set<GobTag> tags = new HashSet<>();
         
-        Resource res = gob.getres();
-        if(res != null) {
-            String name = res.name;
-    
+        String name = gob.resid();
+        if(name != null) {
             List<String> ols = Collections.emptyList();
             synchronized (gob.ols) {
                 try {
