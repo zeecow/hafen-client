@@ -85,6 +85,7 @@ public class WidgetList<T extends Widget> extends ListWidget<T> {
 
 	int n = listitems();
 	sb.max = n - h;
+	sb.val = Math.min(sb.val, sb.max);
 	Coord isz = sb.vis() ? itemsz : widesz;
 	for(int i = 0; i < h; i++) {
 	    int idx = i + sb.val;
