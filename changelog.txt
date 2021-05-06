@@ -1,3 +1,9 @@
+$size[14]{$u{Update for 06.05.21:}
+  * fixed mannequins triggering player warning
+  * fixed X on flower menu auto-pick not working
+  * fixed global key bindings nto working when list is scrolled
+  * disable move queueing when you are a passenger
+ 
 $size[14]{$u{Update for 05.05.21:}
   * fixed cave rat not being tagged as aggressive
   * add (below) to the name of prospecting markers
