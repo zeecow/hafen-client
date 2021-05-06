@@ -84,7 +84,7 @@ public class WidgetList<T extends Widget> extends ListWidget<T> {
 	drawbg(g);
 
 	int n = listitems();
-	sb.max = n - h;
+	sb.max = Math.max(n - h, sb.min);
 	sb.val = Math.min(sb.val, sb.max);
 	Coord isz = sb.vis() ? itemsz : widesz;
 	for(int i = 0; i < h; i++) {
