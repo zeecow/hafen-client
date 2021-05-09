@@ -646,6 +646,10 @@ public abstract class ItemInfo {
 	}
 
 	public R get() {
+	    return get(def);
+	}
+    
+	public R get(R def) {
 	    try {
 		List<ItemInfo> info = from.get();
 		if(info != forinfo) {

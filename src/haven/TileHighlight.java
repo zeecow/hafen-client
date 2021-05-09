@@ -23,10 +23,10 @@ public class TileHighlight {
     private static String lastCategory = ALL;
     public static volatile long seq = 0;
     
-    private static final Text.Foundry elf = CharWnd.attrf;
-    private static final Color every = new Color(255, 255, 255, 16);
-    private static final Color other = new Color(255, 255, 255, 32);
-    private static final int elh = elf.height() + UI.scale(2);
+    public static final Text.Foundry elf = CharWnd.attrf;
+    public static final Color every = new Color(255, 255, 255, 16);
+    public static final Color other = new Color(255, 255, 255, 32);
+    public static final int elh = elf.height() + UI.scale(2);
     
     public static boolean isHighlighted(String name) {
 	synchronized (highlight) {

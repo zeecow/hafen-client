@@ -26,6 +26,8 @@
 
 package haven;
 
+import rx.functions.Action0;
+
 import java.util.*;
 import java.awt.image.WritableRaster;
 
@@ -33,6 +35,9 @@ public class Inventory extends Widget implements DTarget {
     public static final Coord sqsz = UI.scale(new Coord(33, 33));
     public static final Tex invsq;
     public boolean dropul = true;
+    private boolean canDropItems = false;
+    private boolean dropEnabled = false;
+    Action0 dropsCallback;
     public Coord isz;
     public static final Comparator<WItem> ITEM_COMPARATOR_ASC = new Comparator<WItem>() {
 	@Override
@@ -122,7 +127,17 @@ public class Inventory extends Widget implements DTarget {
 	if(child instanceof GItem) {
 	    GItem i = (GItem)child;
 	    wmap.put(i, add(new WItem(i), c.mul(sqsz).add(1, 1)));
+	    i.sendttupdate = canDropItems;
+	    if(dropEnabled) {
+		tryDrop(wmap.get(i));
+	    }
 	}
+    }
+    
+    @Override
+    public void destroy() {
+	ItemAutoDrop.removeCallback(dropsCallback);
+	super.destroy();
     }
     
     public void cdestroy(Widget w) {
@@ -162,10 +177,14 @@ public class Inventory extends Widget implements DTarget {
 
     @Override
     public void wdgmsg(Widget sender, String msg, Object... args) {
-	if(msg.equals("transfer-same")){
-	    process(getSame((GItem) args[0],(Boolean)args[1]), "transfer");
-	} else if(msg.equals("drop-same")){
+	if(msg.equals("transfer-same")) {
+	    process(getSame((GItem) args[0], (Boolean) args[1]), "transfer");
+	} else if(msg.equals("drop-same")) {
 	    process(getSame((GItem) args[0], (Boolean) args[1]), "drop");
+	} else if(msg.equals("ttupdate") && sender instanceof GItem && wmap.containsKey(sender)) {
+	    if(dropEnabled) {
+		tryDrop(wmap.get(sender));
+	    }
 	} else {
 	    super.wdgmsg(sender, msg, args);
 	}
@@ -193,7 +212,44 @@ public class Inventory extends Widget implements DTarget {
 	Collections.sort(items, ascending ? ITEM_COMPARATOR_ASC : ITEM_COMPARATOR_DESC);
 	return items;
     }
-
+    
+    public void enableDrops() {
+	if(parent instanceof Window) {
+	    canDropItems = true;
+	    dropsCallback = this::doDrops;
+	    ItemAutoDrop.addCallback(dropsCallback);
+	    Window wnd = (Window) parent;
+	    wnd.addtwdg(wnd.add(new ICheckBox("gfx/hud/btn-adrop", "", "-d", "-h")
+		.changed(this::doEnableDrops)
+		.rclick(this::showDropCFG)
+		.settip("Left-click to toggle item dropping\nRight-click to open settings", true)
+	    ));
+	}
+    }
+    
+    private void showDropCFG() {
+	ItemAutoDrop.toggle(ui);
+    }
+    
+    private void doEnableDrops(boolean v) {
+	dropEnabled = v;
+	doDrops();
+    }
+    
+    public void doDrops() {
+	if(dropEnabled) {
+	    for (Widget wdg = lchild; wdg != null; wdg = wdg.prev) {
+		if(wdg instanceof WItem) {
+		    tryDrop(((WItem) wdg));
+		}
+	    }
+	}
+    }
+    
+    private void tryDrop(WItem w) {
+	if(w != null) { w.tryDrop(); }
+    }
+    
     public static Coord invsz(Coord sz) {
 	return invsq.sz().add(new Coord(-1, -1)).mul(sz).add(new Coord(1, 1));
     }

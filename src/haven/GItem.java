@@ -222,4 +222,9 @@ public class GItem extends AWidget implements ItemInfo.SpriteOwner, GSprite.Owne
 	    meter = (int)((Number)args[0]).doubleValue();
 	}
     }
+    
+    public void drop() {
+	onBound(widget -> wdgmsg("drop", Coord.z));
+    }
+    
 }

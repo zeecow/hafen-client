@@ -52,7 +52,8 @@ public class WItem extends Widget implements DTarget2 {
     private Resource cspr = null;
     private Message csdt = Message.nil;
     private final List<Action3<WItem, Coord, Integer>> rClickListeners = new LinkedList<>();
-
+    private boolean checkDrop = false;
+    
     public WItem(GItem item) {
 	super(sqsz);
 	this.item = item;
@@ -144,7 +145,7 @@ public class WItem extends Widget implements DTarget2 {
 	}
     }
 
-    private List<ItemInfo> info() {return(item.info());}
+    public List<ItemInfo> info() {return(item.info());}
     public final AttrCache<Color> olcol = new AttrCache<>(this::info, AttrCache.cache(info -> {
 	Color ret = null;
 	for(ItemInfo inf : info) {
@@ -237,7 +238,7 @@ public class WItem extends Widget implements DTarget2 {
     public final AttrCache<String> name = new AttrCache<>(this::info, AttrCache.cache(info -> {
 	ItemInfo.Name name = ItemInfo.find(ItemInfo.Name.class, info);
 	return (name != null && name.str != null && name.str.text != null) ? name.str.text : "";
-    }));
+    }), "");
 
     private GSprite lspr = null;
     public void tick(double dt) {
@@ -254,6 +255,7 @@ public class WItem extends Widget implements DTarget2 {
 	    resize(sz);
 	    lspr = spr;
 	}
+	checkDrop();
     }
 
     public void draw(GOut g) {
@@ -489,6 +491,22 @@ public class WItem extends Widget implements DTarget2 {
 	    item.wdgmsg("itemact", ui.modflags());
 	}
 	return(true);
+    }
+    
+    public void tryDrop() {
+        checkDrop = true;
+    }
+    
+    private void checkDrop() {
+	if(checkDrop) {
+	    String name = this.name.get(null);
+	    if(name != null) {
+		checkDrop = false;
+		if(ItemAutoDrop.needDrop(name)) {
+		    item.drop();
+		}
+	    }
+	}
     }
 
 }
