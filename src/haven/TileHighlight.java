@@ -265,6 +265,7 @@ public class TileHighlight {
 	    public void change(String item) {
 		super.change(item);
 		list.setItems(tiles.getOrDefault(item, Collections.emptyList()));
+		list.sb.val = 0;
 		category = lastCategory = item;
 	    }
 	    
