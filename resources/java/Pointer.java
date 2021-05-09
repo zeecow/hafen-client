@@ -289,19 +289,28 @@ public class Pointer extends Widget implements MiniMap.IPointer, DTarget {
     }
     
     Pair<Coord2d, Coord2d> firstLine = null;
+    long firsSegment = -1;
     
     private void triangulate(Coord2d b) {
+        if(b == null) {
+            firstLine = null;
+            return;
+	}
 	mc = null;
 	tc();
 	if(!triangulating) {return;}
+	long curseg = ui.gui.mapfile.playerSegment();
 	Gob player = ui.gui.map.player();
-	if(player != null && b != null) {
+	if(player != null) {
 	    Pair<Coord2d, Coord2d> line = new Pair<>(player.rc, b);
 	    if(firstLine == null) {
+	        firsSegment = curseg;
 		firstLine = line;
-	    } else {
+	    } else if(curseg == firsSegment) {
 		mc = Utils.intersect(firstLine, line).orElse(mc);
 		triangulating = mc == null;
+	    } else {
+	        firstLine = null;
 	    }
 	}
     }
