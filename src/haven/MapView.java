@@ -2722,7 +2722,7 @@ public class MapView extends PView implements DTarget, Console.Directory {
     
     @Override
     public Resource getcurs(Coord c) {
-	if(ui.gui.mapfile.domark) {
+	if(ui.gui.mapfile != null && ui.gui.mapfile.domark) {
 	    return MapWnd.markcurs;
 	}
 	return super.getcurs(c);
