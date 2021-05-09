@@ -26,6 +26,10 @@
 
 package haven;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
+
 import java.awt.RenderingHints;
 import java.io.*;
 import java.nio.*;
@@ -2040,7 +2044,14 @@ public class Utils {
     }
     
     private static final Pattern RESID = Pattern.compile(".*\\[([^,]*),?.*]");
+    private static final Map<String, String> customNames = new HashMap<>();
+    private static boolean customNamesInit = false;
+    
     public static String prettyResName(String resname) {
+	tryInitCustomNames();
+	if(customNames.containsKey(resname)) {
+	    return customNames.get(resname);
+	}
 	Matcher m = RESID.matcher(resname);
 	if(m.matches()) {
 	    resname = m.group(1);
@@ -2049,6 +2060,16 @@ public class Utils {
 	resname = resname.substring(k + 1);
 	resname = resname.substring(0, 1).toUpperCase() + resname.substring(1);
 	return resname;
+    }
+    
+    private static void tryInitCustomNames() {
+	if(customNamesInit) {return;}
+	customNamesInit = true;
+	try {
+	    Gson gson = new GsonBuilder().create();
+	    customNames.putAll(gson.fromJson(Config.loadJarFile("tile_names.json"), new TypeToken<Map<String, String>>() {
+	    }.getType()));
+	} catch (Exception ignored) {}
     }
     
     public static boolean checkbit(int target, int index) {
