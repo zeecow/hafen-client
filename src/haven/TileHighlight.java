@@ -130,7 +130,6 @@ public class TileHighlight {
 	
 	private boolean raised = false;
 	private final TileList list;
-	private final CheckBox checkAll;
 	private final Label filter;
 	private String category = lastCategory;
 	
@@ -139,7 +138,7 @@ public class TileHighlight {
 	    justclose = true;
 	    
 	    int h = add(new Label("Categories: "), Coord.z).sz.y;
-	    checkAll = add(new CheckBox("Select All") {
+	    add(new CheckBox("Select All") {
 		@Override
 		public void changed(boolean val) {
 		    list.filtered.forEach(item -> {
@@ -150,12 +149,12 @@ public class TileHighlight {
 			}
 		    });
 		}
-	    }, UI.scale(210, 0));
+	    }, UI.scale(135, 0));
 	    h += UI.scale(5);
 	    
-	    add(new CategoryList(UI.scale(200), 8, elh), 0, h).sel = category;
+	    add(new CategoryList(UI.scale(125), 8, elh), 0, h).sel = category;
 	    
-	    list = add(new TileList(UI.scale(200), UI.unscale(12)), UI.scale(210), h);
+	    list = add(new TileList(UI.scale(220), UI.unscale(12)), UI.scale(135), h);
 	    filter = adda(new Label(FILTER_DEFAULT), list.pos("ur").y(0), 1, 0);
 	    pack();
 	    setfocus(list);
