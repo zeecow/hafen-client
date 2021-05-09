@@ -127,7 +127,7 @@ public class MapWnd extends WindowX implements Console.Directory {
 	btn = topbar.add(new ICheckBox("gfx/hud/mmap/pointer", "", "-d", "-h"), btn.pos("ur"))
 	    .state(CFG.MMAP_POINTER::get).set(CFG.MMAP_POINTER::set).settip("Display pointers");
     
-	btn = topbar.add(new ICheckBox("gfx/hud/mmap/pointer", "", "-d", "-h"), btn.pos("ur"))
+	btn = topbar.add(new ICheckBox("gfx/hud/mmap/tile-seek", "", "-d", "-h"), btn.pos("ur"))
 	    .changed(a -> toggleol(TileHighlight.TAG, a))
 	    .rclick(() -> {TileHighlight.toggle(ui);})
 	    .settip("Left-click to toggle tile highlight\nRight-click to open settings", true);
