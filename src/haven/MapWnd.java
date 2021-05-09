@@ -124,8 +124,13 @@ public class MapWnd extends WindowX implements Console.Directory {
 	btn = topbar.add(new ICheckBox("gfx/hud/mmap/grid", "", "-d", "-h"), btn.pos("ur"))
 	    .state(CFG.MMAP_GRID::get).set(CFG.MMAP_GRID::set).settip("Display grid");
     
-	topbar.add(new ICheckBox("gfx/hud/mmap/pointer", "", "-d", "-h"), btn.pos("ur"))
+	btn = topbar.add(new ICheckBox("gfx/hud/mmap/pointer", "", "-d", "-h"), btn.pos("ur"))
 	    .state(CFG.MMAP_POINTER::get).set(CFG.MMAP_POINTER::set).settip("Display pointers");
+    
+	btn = topbar.add(new ICheckBox("gfx/hud/mmap/pointer", "", "-d", "-h"), btn.pos("ur"))
+	    .changed(a -> toggleol(TileHighlight.TAG, a))
+	    .rclick(() -> {TileHighlight.toggle(ui);})
+	    .settip("Left-click to toggle tile highlight\nRight-click to open settings", true);
 	
 	topbar.pack();
 	tool = add(new Toolbox());;
@@ -254,6 +259,8 @@ public class MapWnd extends WindowX implements Console.Directory {
     }
 
     private class View extends MiniMap {
+        private double a = 0;
+        
 	View(MapFile file) {
 	    super(file);
 	    big = true;
@@ -263,9 +270,17 @@ public class MapWnd extends WindowX implements Console.Directory {
 	    super.drawgrid(g, ul, disp);
 	    for(String tag : overlays) {
 		try {
-		    Tex img = disp.olimg(tag);
+		    int alpha = 128;
+		    Tex img;
+		    if(TileHighlight.TAG.equals(tag)) {
+			alpha = (int) (100 + 155 * a);
+			img = disp.tileimg();
+		    } else {
+			img = disp.olimg(tag);
+			
+		    }
 		    if(img != null) {
-			g.chcolor(255, 255, 255, 64);
+			g.chcolor(255, 255, 255, alpha);
 			g.image(img, ul, UI.scale(img.sz()));
 		    }
 		} catch(Loading l) {
@@ -336,6 +351,12 @@ public class MapWnd extends WindowX implements Console.Directory {
 	    if(domark)
 		return(markcurs);
 	    return(super.getcurs(c));
+	}
+    
+	@Override
+	public void tick(double dt) {
+	    super.tick(dt);
+	    a = Math.sin(Math.PI * ((System.currentTimeMillis() % 1000) / 1000.0));
 	}
     }
 

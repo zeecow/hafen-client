@@ -70,6 +70,7 @@ public class GameUI extends ConsoleHost implements Console.Directory {
     public Equipory equipory;
     public CharWnd chrwdg;
     public MapWnd2 mapfile;
+    public TileHighlight.TileHighlightCFG tileHighlight;
     private Widget qqview;
     public BuddyWnd buddies;
     public EquipProxy eqproxy;
