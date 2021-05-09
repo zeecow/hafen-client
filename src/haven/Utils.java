@@ -1937,10 +1937,12 @@ public class Utils {
 	StringBuilder buffer = new StringBuilder();
 	BufferedReader in = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8));
 	String line;
-    
+	boolean first = true;
 	try {
 	    while ((line = in.readLine()) != null) {
+		if(!first) {buffer.append("\n");}
 		buffer.append(line);
+		first = false;
 	    }
 	} catch (IOException ignored) {
 	}
