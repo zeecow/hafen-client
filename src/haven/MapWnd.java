@@ -695,7 +695,7 @@ public class MapWnd extends Window implements Console.Directory {
 	    newfocusable(tool);
 	decohide(a);
 	pack();
-	ZeeConfig.checkMapCompact(this,a);
+	ZeeConfig.windowMapCompact(this,a);
     }
 
     public void recenter() {

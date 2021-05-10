@@ -24,6 +24,7 @@ public class ZeeConfig {
     public static final String MAP_CATEGORY_GOBS = "mapCategoryGobs";
     public static final String MAP_ACTION_USES = "mapActionUses";
     public static final String MAP_GOB_COLOR = "mapGobSettings";
+    public static final String MAP_WND_POS = "mapWindowPos";
     public static MixColor MIXCOLOR_RED = new MixColor(255,0,0,200);
     public static MixColor MIXCOLOR_ORANGE = new MixColor(255,128,0,200);
     public static MixColor MIXCOLOR_YELLOW = new MixColor(255,255,0,200);
@@ -32,12 +33,8 @@ public class ZeeConfig {
 
 
     public static GameUI gameUI;
-    public static Window windowBelt;
-    public static Window windowCattleRoster;
     public static Window windowEquipment;
-    public static Window windowIconSettings;
     public static Window windowInvMain;
-    public static Window windowActions;
     public static ZeeInvMainOptionsWdg invMainoptionsWdg;
     public static ZeecowOptionsWindow zeecowOptions;
 
@@ -62,11 +59,10 @@ public class ZeeConfig {
     public static boolean notifyBuddyOnline = Utils.getprefb("notifyBuddyOnline", false);
     public static boolean showInventoryLogin = Utils.getprefb("showInventoryLogin", true);
     public static boolean showEquipsLogin = Utils.getprefb("showEquipsLogin", false);
+    public static boolean rememberWindowsPos = Utils.getprefb("rememberWindowsPos", true);
     public static boolean zoomOrthoExtended = Utils.getprefb("zoomOrthoExtended", true);
 
     public static String playingAudio = null;
-
-
 
     public final static Set<String> mineablesStone = new HashSet<String>(Arrays.asList(
             "gneiss","basalt","cinnabar","dolomite","feldspar","flint",
@@ -149,6 +145,7 @@ public class ZeeConfig {
     public static HashMap<String,Integer> mapActionUses = initMapActionUses();
     public static HashMap<String, Color> mapGobColor = initMapGobColor();
     public static HashMap<String,Color> mapCategoryColor = initMapCategoryColor();
+    public static HashMap<String,Coord> mapWindowPos = initMapWindowPos();
 
 
 
@@ -395,7 +392,7 @@ public class ZeeConfig {
 
     // make expanded map window fit screen
     private static Coord mapWndLastPos;
-    public static void checkMapCompact(MapWnd mapWnd, boolean compact) {
+    public static void windowMapCompact(MapWnd mapWnd, boolean compact) {
         if(compact && mapWnd.c.equals(0,0))//special startup condition?
             return;
         Coord screenSize = gameUI.map.sz;
@@ -444,20 +441,20 @@ public class ZeeConfig {
         windowInvMain.pack();
     }
 
-    public static void getWindow(Window window, String cap) {
-        cap = cap.trim();
-        if(cap.contains("Belt")) {
-            windowBelt = window;
-        }else if(cap.equalsIgnoreCase("Cattle Roster")) {
-            windowCattleRoster = window;
-        }else if(cap.contains("Equipment")) {
+    public static void windowAdded(Window window) {
+        String windowTitle = window.cap.text;
+        if(windowTitle.contains("Equipment")) {
             windowEquipment = window;
-        }else if(cap.contains("Icon settings")) {
-            windowIconSettings = window;
-        }else if(cap.contains("Inventory")) {
+        }else if(windowTitle.contains("Inventory")) {
             windowInvMain = window;
-        }else if(cap.contains("Action search")) {
-            windowActions = window;
+        }
+
+        //reposition window if saved
+        Coord c;
+        if(rememberWindowsPos && !(window instanceof MapWnd)){
+            if((c = mapWindowPos.get(windowTitle)) != null) {
+                window.c = c;
+            }
         }
     }
 
@@ -564,6 +561,15 @@ public class ZeeConfig {
             return (HashMap<String, Color>) deserialize(s);
     }
 
+    @SuppressWarnings("unchecked")
+    public static HashMap<String, Coord> initMapWindowPos() {
+        String s = Utils.getpref(MAP_WND_POS,"");
+        if (s.isEmpty())
+            return new HashMap<String,Coord> ();
+        else
+            return (HashMap<String, Coord>) deserialize(s);
+    }
+
     //count uses for each Action Search item
     public static void actionUsed(String actionName) {
         if(actionName==null || actionName.isEmpty())
@@ -574,7 +580,17 @@ public class ZeeConfig {
         }
         uses++;
         mapActionUses.put(actionName, uses);
-        Utils.setpref(MAP_ACTION_USES,serialize(mapActionUses));
+        Utils.setpref(MAP_ACTION_USES, serialize(mapActionUses));
+    }
+
+    public static void windowChangedPos(Window window) {
+        if(!ZeeConfig.rememberWindowsPos || window==null)
+            return;
+        String name = window.cap.text;
+        if(name==null || name.isEmpty() || window instanceof MapWnd)
+            return;
+        mapWindowPos.put(name, new Coord(window.c));
+        Utils.setpref(MAP_WND_POS, serialize(mapWindowPos));
     }
 
     public static int drawText(String text, GOut g, Coord p) {

@@ -100,7 +100,6 @@ public class Window extends Widget implements DTarget {
 	chcap(cap);
 	resize2(sz);
 	setfocustab(true);
-	ZeeConfig.getWindow(this, cap);
     }
 
     public Window(Coord sz, String cap, boolean lg) {
@@ -113,6 +112,7 @@ public class Window extends Widget implements DTarget {
 
     protected void added() {
 	parent.setfocus(this);
+	ZeeConfig.windowAdded(this);
     }
 
     public void chcap(String cap) {
@@ -290,6 +290,7 @@ public class Window extends Widget implements DTarget {
 	if(dm != null) {
 	    dm.remove();
 	    dm = null;
+		ZeeConfig.windowChangedPos(this);
 	} else {
 	    super.mouseup(c, button);
 	}
