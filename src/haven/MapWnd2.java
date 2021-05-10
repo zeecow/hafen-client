@@ -78,7 +78,7 @@ public class MapWnd2 extends MapWnd {
     }
     
     public void removeMarker(MapFile.Marker marker) {
-	if(tool.list.sel == marker) {
+	if(tool.list.sel != null && tool.list.sel.mark == marker) {
 	    if(mremove != null) {
 		mremove.click();
 	    } else {
