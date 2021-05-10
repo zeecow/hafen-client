@@ -1,3 +1,7 @@
+$size[14]{$u{Update for 10.05.21:}
+  * added tile highlight to map window - LClick on a new button to toggle it, RClick to open tile selection
+  * added item auto drop to main inventory. LClick on new button to toggle it, RClick to open settings.
+ 
 $size[14]{$u{Update for 06.05.21:}
   * fixed mannequins triggering player warning
   * fixed X on flower menu auto-pick not working
