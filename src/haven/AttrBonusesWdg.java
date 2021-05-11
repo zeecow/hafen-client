@@ -106,13 +106,14 @@ public class AttrBonusesWdg extends Widget implements ItemInfo.Owner {
     
     private void doUpdate() {
 	try {
+	    if(items == null) {return;}
 	    boolean isMe = isMe();
 	    List<Entry<Resource, Integer>> tmp = Arrays.stream(items)
 		.filter(Objects::nonNull)
 		.map(wItem -> wItem.item)
 		.distinct()
 		.map(GItem::info)
-		.map(info -> getBonuses(info, isMe ? ui.sess.glob.cattr : null))
+		.map(info -> getBonuses(info, isMe ? cattr() : null))
 		.map(Map::entrySet)
 		.flatMap(Collection::stream)
 		.collect(Collectors.toList());
@@ -146,8 +147,16 @@ public class AttrBonusesWdg extends Widget implements ItemInfo.Owner {
 	} catch (Loading ignored) {}
     }
     
+    private Map<String, Glob.CAttr> cattr() {
+	if(ui != null) {
+	    return ui.sess.glob.cattr;
+	}
+	return null;
+    }
+    
     private void addDerivedStat(Resource res, String attr1, String attr2) {
-	Map<String, Glob.CAttr> cattr = ui.sess.glob.cattr;
+	Map<String, Glob.CAttr> cattr = cattr();
+	if(cattr == null) {return;}
 	Glob.CAttr a1 = cattr.get(attr1);
 	Glob.CAttr a2 = cattr.get(attr2);
 	if(a1 != null && a2 != null) {
