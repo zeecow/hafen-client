@@ -145,7 +145,7 @@ public enum GobTag {
         return ol.endsWith("-blood") || ol.endsWith("-windweed") || ol.endsWith("-fishraw");
     }
     
-    private static boolean ofType(String name, String[] patterns) {
+    public static boolean ofType(String name, String[] patterns) {
         for (String pattern : patterns) {
             if(name.contains(pattern)) { return true; }
         }

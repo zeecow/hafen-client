@@ -57,6 +57,9 @@ public class Session implements Resource.Resolver {
     static final int ackthresh = 30;
 
     private static final String[] LOCAL_CACHED = new String[]{
+	"gfx/hud/chr/custom/mine",
+	"gfx/hud/chr/custom/detect",
+	"gfx/hud/chr/custom/sneak",
 	"gfx/hud/chr/custom/ahard",
 	"gfx/hud/chr/custom/asoft"
     };

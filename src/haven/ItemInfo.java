@@ -41,10 +41,13 @@ import java.util.stream.Collectors;
 public abstract class ItemInfo {
     public static final Resource armor_hard = Resource.local().loadwait("gfx/hud/chr/custom/ahard");
     public static final Resource armor_soft = Resource.local().loadwait("gfx/hud/chr/custom/asoft");
+    public static final Resource detection = Resource.local().loadwait("gfx/hud/chr/custom/detect");
+    public static final Resource sneak = Resource.local().loadwait("gfx/hud/chr/custom/sneak");
+    public static final Resource mining = Resource.local().loadwait("gfx/hud/chr/custom/mine");
     static final Pattern count_pattern = Pattern.compile("(?:^|[\\s])([0-9]*\\.?[0-9]+\\s*%?)");
     public final Owner owner;
     
-    public static ItemInfo make(Session sess, String resname, Object ...args) {
+    public static ItemInfo make(Session sess, String resname, Object... args) {
 	Resource res = Resource.remote().load(resname).get();
 	InfoFactory f = res.layer(Resource.CodeEntry.class).get(InfoFactory.class);
 	return f.build(new SessOwner(sess), args);
@@ -529,8 +532,10 @@ public abstract class ItemInfo {
 	return null;
     }
 
+    private final static String[] mining_tools = {"Pickaxe", "Stone Axe", "Metal Axe", "Woodsman's Axe"};
+    
     @SuppressWarnings("unchecked")
-    public static Map<Resource, Integer> getBonuses(List<ItemInfo> infos) {
+    public static Map<Resource, Integer> getBonuses(List<ItemInfo> infos, Map<String, Glob.CAttr> attrs) {
 	List<ItemInfo> slotInfos = ItemInfo.findall("ISlots", infos);
 	List<ItemInfo> gilding = ItemInfo.findall("Slotted", infos);
 	Map<Resource, Integer> bonuses = new HashMap<>();
@@ -551,6 +556,18 @@ public abstract class ItemInfo {
 	if (wear != null) {
 	    bonuses.put(armor_hard, wear.a);
 	    bonuses.put(armor_soft, wear.b);
+	}
+	if(attrs != null) {
+	    Glob.CAttr str = attrs.get("str");
+	    Name name = ItemInfo.find(Name.class, infos);
+	    QualityList q = new QualityList(infos);
+	    if(str != null && name != null && !q.isEmpty() && GobTag.ofType(name.original, mining_tools)) {
+		double miningStrength = str.comp * q.single().value;
+		if(name.original.equals("Pickaxe")) {
+		    miningStrength = 2 * miningStrength;
+		}
+		bonuses.put(mining, (int) Math.sqrt(miningStrength));
+	    }
 	}
 	return bonuses;
     }

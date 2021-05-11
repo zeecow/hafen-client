@@ -5,8 +5,10 @@ import java.util.*;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
+import static haven.ItemInfo.*;
+
 public class AttrBonusesWdg extends Widget implements ItemInfo.Owner {
-    private static final Coord bonusc = new Coord(0, 20);
+    private static final Coord bonusc = UI.scale(0, 20);
     private static final OwnerContext.ClassResolver<AttrBonusesWdg> ctxr = new ClassResolver<AttrBonusesWdg>()
 	.add(Glob.class, wdg -> wdg.ui.sess.glob)
 	.add(Session.class, wdg -> wdg.ui.sess);
@@ -22,9 +24,10 @@ public class AttrBonusesWdg extends Widget implements ItemInfo.Owner {
     private BufferedImage tip = null;
 
     private CharWnd charWnd = null;
+    private long attrseq = 0;
 
     public AttrBonusesWdg(int y) {
-	super(new Coord(175, y));
+	super(new Coord(UI.scale(175), y));
 	add(new Label("Equipment bonuses:"));
 	bar = adda(new Scrollbar(y - bonusc.y, 0, 0), sz.x, bonusc.y, 1, 0);
     }
@@ -38,9 +41,12 @@ public class AttrBonusesWdg extends Widget implements ItemInfo.Owner {
     public void update(WItem[] items) {
 	this.items = items;
 	needUpdate = true;
-
     }
-
+    
+    private boolean isMe() {
+	return parent == ui.gui.equipory;
+    }
+    
     @Override
     public void draw(GOut g) {
 	if(needRedraw) {
@@ -77,6 +83,7 @@ public class AttrBonusesWdg extends Widget implements ItemInfo.Owner {
     @Override
     public void tick(double dt) {
 	super.tick(dt);
+	checkAttributes();
 	if(needUpdate) {
 	    doUpdate();
 	}
@@ -88,17 +95,37 @@ public class AttrBonusesWdg extends Widget implements ItemInfo.Owner {
 	    build();
 	}
     }
-
+    
+    private void checkAttributes() {
+	long tseq = ui.sess.glob.attrseq;
+	if(attrseq != tseq) {
+	    needUpdate = true;
+	    attrseq = tseq;
+	}
+    }
+    
     private void doUpdate() {
 	try {
-	    bonuses = Arrays.stream(items)
+	    boolean isMe = isMe();
+	    List<Entry<Resource, Integer>> tmp = Arrays.stream(items)
 		.filter(Objects::nonNull)
 		.map(wItem -> wItem.item)
 		.distinct()
 		.map(GItem::info)
-		.map(ItemInfo::getBonuses)
+		.map(info -> getBonuses(info, isMe ? ui.sess.glob.cattr : null))
 		.map(Map::entrySet)
 		.flatMap(Collection::stream)
+		.collect(Collectors.toList());
+	    
+	    int miningStrength = 0;
+	    for (Entry<Resource, Integer> e : tmp) {
+		if(e.getKey() == mining) {
+		    miningStrength = Math.max(miningStrength, e.getValue());
+		}
+	    }
+	    
+	    bonuses = tmp.stream()
+		.filter(e -> e.getKey() != mining)
 		.collect(
 		    Collectors.toMap(
 			Entry::getKey,
@@ -106,12 +133,28 @@ public class AttrBonusesWdg extends Widget implements ItemInfo.Owner {
 			Integer::sum
 		    )
 		);
-
+	    
+	    if(isMe) {
+		if(miningStrength > 0) {
+		    bonuses.put(mining, miningStrength);
+		}
+		addDerivedStat(detection, "prc", "explore");
+		addDerivedStat(sneak, "int", "stealth");
+	    }
 	    needUpdate = false;
 	    needBuild = true;
 	} catch (Loading ignored) {}
     }
-
+    
+    private void addDerivedStat(Resource res, String attr1, String attr2) {
+	Map<String, Glob.CAttr> cattr = ui.sess.glob.cattr;
+	Glob.CAttr a1 = cattr.get(attr1);
+	Glob.CAttr a2 = cattr.get(attr2);
+	if(a1 != null && a2 != null) {
+	    bonuses.put(res, a1.comp * a2.comp);
+	}
+    }
+    
     private void build() {
 	try {
 	    if(bonuses != null) {

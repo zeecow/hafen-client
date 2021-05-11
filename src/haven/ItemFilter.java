@@ -612,7 +612,7 @@ public class ItemFilter {
 	
 	@Override
 	public boolean matches(List<ItemInfo> info) {
-	    Map<Resource, Integer> bonuses = ItemInfo.getBonuses(info);
+	    Map<Resource, Integer> bonuses = ItemInfo.getBonuses(info, null);
 	    if(text != null && text.length() >= 3) {
 		for (Resource res : bonuses.keySet()) {
 		    Resource.Tooltip tip = res.layer(Resource.tooltip);

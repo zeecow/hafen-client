@@ -55,6 +55,7 @@ public class Glob {
     public double skyblend = 0.0;
     public final Map<String, CAttr> cattr = new HashMap<String, CAttr>();
     private Map<Indir<Resource>, Object> wmap = new HashMap<Indir<Resource>, Object>();
+    public volatile long attrseq = 0;
     
     public Glob(Session sess) {
 	this.sess = sess;
@@ -338,6 +339,7 @@ public class Glob {
 	    } else {
 		a.update(base, comp);
 	    }
+	    attrseq++;
 	}
     }
 
