@@ -46,6 +46,8 @@ public enum GobTag {
     
     public static Set<GobTag> tags(Gob gob) {
         Set<GobTag> tags = new HashSet<>();
+        GameUI gui = gob.context(GameUI.class);
+        Equipory equipory = gui != null ? gui.equipory : null;
         
         String name = gob.resid();
         if(name != null) {
@@ -104,6 +106,11 @@ public enum GobTag {
                     UNKNOWN.add(name);
                     gob.glob.sess.ui.message(name, GameUI.MsgType.ERROR);
                     System.out.println(name);
+                }
+                if(name.contains("/bat")) {
+                    if(equipory == null || !equipory.has("/batcape")) {
+                        tags.add(AGGRESSIVE);
+                    }
                 }
             } else if(name.endsWith("/dframe")) {
                 boolean empty = ols.isEmpty();

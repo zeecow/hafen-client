@@ -107,6 +107,7 @@ public class Equipory extends Widget implements DTarget {
     public WItem[] slots = new WItem[ecoords.length];
     Map<GItem, Collection<WItem>> wmap = new HashMap<>();
     private final Avaview ava;
+    public volatile long seq = 0;
 
     AttrBonusesWdg bonuses;
 	
@@ -185,6 +186,7 @@ public class Equipory extends Widget implements DTarget {
 	    v.trimToSize();
 	    g.sendttupdate = true;
 	    wmap.put(g, v);
+	    synchronized (ava) {seq++;}
 	} else {
 	    super.addchild(child, args);
 	}
@@ -209,6 +211,7 @@ public class Equipory extends Widget implements DTarget {
 		}
 	    }
 	    bonuses.update(slots);
+	    synchronized (ava) {seq++;}
 	}
     }
 
@@ -273,5 +276,10 @@ public class Equipory extends Widget implements DTarget {
 
     public boolean iteminteract(Coord cc, Coord ul) {
 	return(false);
+    }
+    
+    public boolean has(String name) {
+	return wmap.keySet().stream()
+	    .anyMatch(item -> item.resname().contains(name));
     }
 }

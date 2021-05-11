@@ -65,6 +65,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Sk
     public boolean drivenByPlayer = false;
     public long drives = 0;
     private GobRadius radius = null;
+    private long eseq = 0;
     public static final ChangeCallback CHANGED = new ChangeCallback() {
 	@Override
 	public void added(Gob ob) {
@@ -296,6 +297,11 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Sk
 	    if(isMe != null) {
 		tagsUpdated();
 	    }
+	}
+	long tseq = eseq();
+	if(eseq != tseq && is(GobTag.ANIMAL)) {
+	    eseq = tseq;
+	    tagsUpdated();
 	}
 	updateState();
     }
@@ -791,6 +797,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Sk
     
     private static final ClassResolver<Gob> ctxr = new ClassResolver<Gob>()
 	.add(Glob.class, g -> g.glob)
+	.add(GameUI.class, g -> g.glob.sess.ui.gui)
 	.add(Session.class, g -> g.glob.sess);
     public <T> T context(Class<T> cl) {return(ctxr.context(cl, this));}
 
@@ -1209,5 +1216,12 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Sk
 	    }
 	}
 	glob.sess.ui.pathQueue().ifPresent(pathQueue -> pathQueue.movementChange(this, prev, a));
+    }
+    
+    private long eseq() {
+	if(glob.sess.ui.gui != null && glob.sess.ui.gui.equipory != null) {
+	    return glob.sess.ui.gui.equipory.seq;
+	}
+	return 0;
     }
 }
