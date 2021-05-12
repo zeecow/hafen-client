@@ -32,6 +32,10 @@ public enum GobTag {
         "/fox", "/swan", "/bat", "/beaver", "/reddeer"
     };
     
+    private static final String[] LIKE_HERB = {
+        "/precioussnowflake"
+    };
+    
     private static final String[] CRITTERS = {
         "/rat/rat", "/swan", "/squirrel", "/silkmoth", "/frog", "/rockdove", "/quail", "/toad", "/grasshopper",
         "/ladybug", "/forestsnail", "/dragonfly", "/forestlizard", "/waterstrider", "/firefly", "/sandflea",
@@ -76,7 +80,7 @@ public enum GobTag {
                 }
             } else if(name.startsWith("gfx/terobjs/bushes")) {
                 tags.add(BUSH);
-            } else if(name.startsWith("gfx/terobjs/herbs/")) {
+            } else if(name.startsWith("gfx/terobjs/herbs/") || ofType(name, LIKE_HERB)) {
                 tags.add(HERB);
             } else if(name.startsWith("gfx/borka/body")) {
                 tags.add(PLAYER);
