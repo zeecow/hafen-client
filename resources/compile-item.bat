@@ -1,3 +1,3 @@
 @echo off
 Echo Compiling
-java -jar LayerUtil.jar -re custom/res/%1 src/custom/%1
+java -jar LayerUtil.jar -re src/custom/%1 custom/res/%1

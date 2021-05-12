@@ -1,3 +1,3 @@
 @echo off
-compile-item %1
-cp src/custom/%1 ../%1
+call compile-item.bat %1
+copy custom/res/%1 ../res/%1
