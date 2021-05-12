@@ -93,10 +93,7 @@ public enum GobTag {
                     }
                 }
             } else if(name.startsWith("gfx/kritter/")) {
-                if(domesticated(gob, name, tags)) {
-                    tags.add(ANIMAL);
-                    tags.add(DOMESTIC);
-                } else if (name.endsWith("/midgeswarm")) {
+                if(name.endsWith("/midgeswarm")) {
                     tags.add(MIDGES);
                 } else if(ofType(name, CRITTERS)) {
                     tags.add(ANIMAL);
@@ -106,6 +103,9 @@ public enum GobTag {
                     tags.add(AGGRESSIVE);
                 } else if(ofType(name, ANIMALS)) {
                     tags.add(ANIMAL);
+                } else if(domesticated(gob, name, tags)) {
+                    tags.add(ANIMAL);
+                    tags.add(DOMESTIC);
                 } else if(DBG && !UNKNOWN.contains(name)) {
                     UNKNOWN.add(name);
                     gob.glob.sess.ui.message(name, GameUI.MsgType.ERROR);
