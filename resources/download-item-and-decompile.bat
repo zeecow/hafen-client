@@ -1,3 +1,3 @@
 @echo off
-download-item %1
+call download-item.bat %1
 decompile-item %1
