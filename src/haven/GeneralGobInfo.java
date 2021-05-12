@@ -6,6 +6,10 @@ import java.util.Arrays;
 import java.util.List;
 
 public class GeneralGobInfo extends GobInfo {
+    private static int TREE_START = 10;
+    private static int BUSH_START = 30;
+    private static double TREE_MULT = 100.0 / (100.0 - TREE_START);
+    private static double BUSH_MULT = 100.0 / (100.0 - BUSH_START);
     private GobHealth health;
 
     protected GeneralGobInfo(Gob owner) {
@@ -69,6 +73,11 @@ public class GeneralGobInfo extends GobInfo {
 		data.skip(1);
 		int growth = data.eom() ? -1 : data.uint8();
 		if(growth < 100 && growth >= 0) {
+		    if(gob.is(GobTag.TREE)) {
+			growth = (int) (TREE_MULT * (growth - TREE_START));
+		    } else if(gob.is(GobTag.BUSH)) {
+			growth = (int) (BUSH_MULT * (growth - BUSH_START));
+		    }
 		    Color c = Utils.blendcol(growth / 100.0, Color.RED, Color.ORANGE, Color.YELLOW, Color.GREEN);
 		    line = Text.std.renderstroked(String.format("%d%%", growth), c, Color.BLACK);
 		}
@@ -82,7 +91,7 @@ public class GeneralGobInfo extends GobInfo {
     }
 
     private static Message getDrawableData(Gob gob) {
-	Drawable dr = gob.getattr(Drawable.class);
+	Drawable dr = gob.drawable;
 	ResDrawable d = (dr instanceof ResDrawable) ? (ResDrawable) dr : null;
 	if(d != null)
 	    return d.sdt.clone();
@@ -94,7 +103,7 @@ public class GeneralGobInfo extends GobInfo {
 	List<String> kinds = Arrays.asList(kind);
 	boolean result = false;
 	Class spc;
-	Drawable d = gob.getattr(Drawable.class);
+	Drawable d = gob.drawable;
 	Resource.CodeEntry ce = gob.getres().layer(Resource.CodeEntry.class);
 	if(ce != null) {
 	    spc = ce.get("spr");

@@ -41,6 +41,8 @@ import java.util.function.*;
 import java.awt.Graphics;
 import java.awt.Color;
 import java.awt.image.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Utils {
     public static final java.nio.charset.Charset utf8 = java.nio.charset.Charset.forName("UTF-8");
@@ -2017,6 +2019,34 @@ public class Utils {
 	    new Coord((int) (x0src + t0 * xdelta), (int) (y0src + t0 * ydelta)),
 	    new Coord((int) (x0src + t1 * xdelta), (int) (y0src + t1 * ydelta))
 	);
+    }
+    
+    public static Optional<Coord2d> intersect(Pair<Coord2d, Coord2d> lineA, Pair<Coord2d, Coord2d> lineB) {
+	double a1 = lineA.b.y - lineA.a.y;
+	double b1 = lineA.a.x - lineA.b.x;
+	double c1 = a1 * lineA.a.x + b1 * lineA.a.y;
+	
+	double a2 = lineB.b.y - lineB.a.y;
+	double b2 = lineB.a.x - lineB.b.x;
+	double c2 = a2 * lineB.a.x + b2 * lineB.a.y;
+	
+	double delta = a1 * b2 - a2 * b1;
+	if(delta == 0) {
+	    return Optional.empty();
+	}
+	return Optional.of(new Coord2d((float) ((b2 * c1 - b1 * c2) / delta), (float) ((a1 * c2 - a2 * c1) / delta)));
+    }
+    
+    private static final Pattern RESID = Pattern.compile(".*\\[([^,]*),?.*]");
+    public static String prettyResName(String resname) {
+	Matcher m = RESID.matcher(resname);
+	if(m.matches()) {
+	    resname = m.group(1);
+	}
+	int k = resname.lastIndexOf("/");
+	resname = resname.substring(k + 1);
+	resname = resname.substring(0, 1).toUpperCase() + resname.substring(1);
+	return resname;
     }
     
     public static boolean checkbit(int target, int index) {

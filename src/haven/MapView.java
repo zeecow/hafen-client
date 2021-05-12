@@ -45,6 +45,7 @@ import haven.render.sl.Type;
 
 public class MapView extends PView implements DTarget, Console.Directory {
     public static final Resource.Named inspectCursor = Resource.local().loadwait("gfx/hud/curs/studyx").indir();
+    public static final Resource.Named trackCursor = Resource.local().loadwait("gfx/hud/curs/track").indir();
     public static boolean clickdb = false;
     public long plgob = -1;
     public Coord2d cc;
@@ -76,6 +77,10 @@ public class MapView extends PView implements DTarget, Console.Directory {
 	void mmousemove(Coord mc);
     }
 
+    private enum Direction {
+        WEST, EAST, NORTH, SOUTH
+    }
+    
     public abstract class Camera implements Pipe.Op {
 	protected haven.render.Camera view = new haven.render.Camera(Matrix4f.identity());
 	protected Projection proj = new Projection(Matrix4f.identity());
@@ -99,6 +104,7 @@ public class MapView extends PView implements DTarget, Console.Directory {
 	
 	public void rotate(Coord r) {}
 	public void reset() {}
+	public void snap(Direction dir) {}
 	
 	public void resized() {
 	    float field = 0.5f;
@@ -161,13 +167,31 @@ public class MapView extends PView implements DTarget, Console.Directory {
 	    tangl = tangl % ((float)Math.PI * 2.0f);
 	    wheel(Coord.z, 5 * r.y);
 	}
-    
+ 
 	@Override
 	public void reset() {
 	    elev = telev = (float)Math.PI / 6.0f;
 	    angl = tangl = 0.0f;
 	}
-    
+ 
+	@Override
+	public void snap(Direction dir) {
+	    switch (dir) {
+		case WEST:
+		    tangl = (float) (2 * Math.PI);
+		    break;
+		case EAST:
+		    tangl = (float) Math.PI;
+		    break;
+		case NORTH:
+		    tangl = (float) (3 * Math.PI / 2);
+		    break;
+		case SOUTH:
+		    tangl = (float) (Math.PI / 2);
+		    break;
+	    }
+	}
+ 
 	private double f0 = 0.2, f1 = 0.5, f2 = 0.9;
 	private double fl = Math.sqrt(2);
 	private double fa = ((fl * (f1 - f0)) - (f2 - f0)) / (fl - 2);
@@ -292,13 +316,32 @@ public class MapView extends PView implements DTarget, Console.Directory {
 	    angl = angl + ((float) c.x / 100.0f);
 	    angl = angl % ((float) Math.PI * 2.0f);
 	}
-    
+ 
 	@Override
 	public void reset() {
 	    dist = 50.0f;
 	    elev = (float) Math.PI / 4.0f;
 	    angl = 0.0f;
 	}
+ 
+	@Override
+	public void snap(Direction dir) {
+	    switch (dir) {
+		case WEST:
+		    angl = (float) (2 * Math.PI);
+		    break;
+		case EAST:
+		    angl = (float) Math.PI;
+		    break;
+		case NORTH:
+		    angl = (float) (3 * Math.PI / 2);
+		    break;
+		case SOUTH:
+		    angl = (float) (Math.PI / 2);
+		    break;
+	    }
+	}
+	
     }
     static {camtypes.put("worse", SimpleCam.class);}
 
@@ -359,7 +402,25 @@ public class MapView extends PView implements DTarget, Console.Directory {
 	    telev = (float) Math.PI / 4.0f;
 	    tangl = 0.0f;
 	}
-    
+ 
+	@Override
+	public void snap(Direction dir) {
+	    switch (dir) {
+		case WEST:
+		    tangl = (float) (2 * Math.PI);
+		    break;
+		case EAST:
+		    tangl = (float) Math.PI;
+		    break;
+		case NORTH:
+		    tangl = (float) (3 * Math.PI / 2);
+		    break;
+		case SOUTH:
+		    tangl = (float) (Math.PI / 2);
+		    break;
+	    }
+	}
+ 
 	public void drag(Coord c) {
 	    c = inversion(c, dragorig);
 	    telev = elevorig - ((float)(c.y - dragorig.y) / 100.0f);
@@ -555,6 +616,27 @@ public class MapView extends PView implements DTarget, Console.Directory {
 	    tangl = angl + (float)Utils.cangle(-(float)Math.PI * 0.25f - angl);
 	    chfield((float)(100 * Math.sqrt(2)));
 	}
+ 
+	@Override
+	public void snap(Direction dir) {
+	    if (isometric) return;
+	    
+	    switch (dir) {
+		case WEST:
+		    tangl = (float) (2 * Math.PI);
+		    break;
+		case EAST:
+		    tangl = (float) Math.PI;
+		    break;
+		case NORTH:
+		    tangl = (float) (3 * Math.PI / 2);
+		    break;
+		case SOUTH:
+		    tangl = (float) (Math.PI / 2);
+		    break;
+	    }
+	}
+    
     }
     static {camtypes.put("ortho", SOrthoCam.class);}
     
@@ -2096,6 +2178,14 @@ public class MapView extends PView implements DTarget, Console.Directory {
 		args = Utils.extend(args, inf.clickargs());
 		Gob gob = Gob.from(inf.ci);
 		if(gob != null) {
+		    if(ui.gui.mapfile.domark) {
+			ui.gui.mapfile.addMarker(gob);
+			return;
+		    } else if(isTracking()) {
+			ui.gui.mapfile.track(gob);
+			stopTracking();
+			return;
+		    }
 		    if(clickb == 3) {FlowerMenu.lastGob(gob);}
 		    if(ui.modmeta && clickb == 1) {
 			ChatUI.Channel chat = ui.gui.chat.sel;
@@ -2105,6 +2195,9 @@ public class MapView extends PView implements DTarget, Console.Directory {
 			return;
 		    }
 		}
+	    } else if(ui.gui.mapfile.domark) {
+		ui.gui.mapfile.addMarker(mc.floor(tilesz));
+		return;
 	    }
 	    if(clickb == 1) {Bot.cancel();}
 	    
@@ -2112,9 +2205,23 @@ public class MapView extends PView implements DTarget, Console.Directory {
 	}
     }
     
-    public void click(Coord2d mc, int clickb, Object... args) {
+    public void click(Coord2d c, int button) {
+	click(c, button, ui.mc, c.floor(posres), button, ui.modflags());
+    }
+    
+    public void click(Gob gob, int button) {
+	click(gob, button, ui.mc);
+    }
+    
+    public void click(Gob gob, int button, Coord mouse) {
+	if(button == 3) {FlowerMenu.lastGob(gob);}
+	Coord mc = gob.rc.floor(posres);
+	click(gob.rc, button, mouse, mc, button, ui.modflags(), 0, (int) gob.id, mc, 0, -1);
+    }
+    
+    public void click(Coord2d mc, int button, Object... args) {
 	boolean send = true;
-	if(clickb == 1 && CFG.QUEUE_PATHS.get()) {
+	if(button == 1 && CFG.QUEUE_PATHS.get()) {
 	    if(ui.modmeta) {
 		args[3] = 0;
 		send = ui.gui.pathQueue.add(mc);
@@ -2138,7 +2245,18 @@ public class MapView extends PView implements DTarget, Console.Directory {
     public boolean mousedown(Coord c, int button) {
 	parent.setfocus(this);
 	Loader.Future<Plob> placing_l = this.placing;
-	if(button == 3) {stopInspecting();}
+	if(button == 3) {
+	    if(isInspecting()) {
+		stopInspecting();
+		return true;
+	    } else if(ui.gui.mapfile.domark) {
+		ui.gui.mapfile.domark = false;
+		return true;
+	    } else if(isTracking()) {
+		stopTracking();
+		return true;
+	    }
+	}
 	if(button == 2) {
 	    if(((Camera)camera).click(c)) {
 		camdrag = ui.grabmouse(this);
@@ -2498,6 +2616,19 @@ public class MapView extends PView implements DTarget, Console.Directory {
 	)); 
     }
     
+    public void snapCameraWest() {
+	camera.snap(Direction.WEST);
+    }
+    public void snapCameraEast() {
+	camera.snap(Direction.EAST);
+    }
+    public void snapCameraNorth() {
+	camera.snap(Direction.NORTH);
+    }
+    public void snapCameraSouth() {
+	camera.snap(Direction.SOUTH);
+    }
+    
     public void resetCamera() { camera.reset(); }
     
     public boolean isInspecting() {
@@ -2505,6 +2636,7 @@ public class MapView extends PView implements DTarget, Console.Directory {
     }
     
     public void startInspecting() {
+	stopCustomModes();
 	if(cursor == null) {
 	    cursor = inspectCursor;
 	    inspect(rootxlate(ui.mc));
@@ -2527,7 +2659,7 @@ public class MapView extends PView implements DTarget, Console.Directory {
     }
     
     private void inspect(Coord c) {
-	if(cursor == inspectCursor) {
+	if(cursor == inspectCursor || cursor == trackCursor) {
 	    new Hittest(c) {
 		@Override
 		protected void hit(Coord pc, Coord2d mc, ClickData inf) {
@@ -2535,9 +2667,9 @@ public class MapView extends PView implements DTarget, Console.Directory {
 		    if(inf != null) {
 			Gob gob = Gob.from(inf.ci);
 			if(gob != null) {
-			    ttip = gob.tooltip();
+			    ttip = cursor == inspectCursor ? gob.resid() : gob.tooltip();
 			}
-		    } else {
+		    } else if(cursor == inspectCursor) {
 			MCache mCache = ui.sess.glob.map;
 			int tile = mCache.gettile(mc.div(tilesz).floor());
 			Resource res = mCache.tilesetr(tile);
@@ -2555,5 +2687,44 @@ public class MapView extends PView implements DTarget, Console.Directory {
 	} else {
 	    ttip = null;
 	}
+    }
+    
+    public void toggleTrackingMode() {
+	if(isTracking()) {
+	    stopTracking();
+	} else {
+	    startTracking();
+	}
+    }
+    
+    public void startTracking() {
+	stopCustomModes();
+	if(cursor == null) {
+	    cursor = trackCursor;
+	    inspect(rootxlate(ui.mc));
+	}
+    }
+    
+    public boolean isTracking() {
+	return cursor == trackCursor;
+    }
+    
+    public void stopTracking() {
+	if(cursor == trackCursor) {
+	    cursor = null;
+	}
+    }
+    
+    private void stopCustomModes() {
+	stopInspecting();
+	stopTracking();
+    }
+    
+    @Override
+    public Resource getcurs(Coord c) {
+	if(ui.gui.mapfile.domark) {
+	    return MapWnd.markcurs;
+	}
+	return super.getcurs(c);
     }
 }

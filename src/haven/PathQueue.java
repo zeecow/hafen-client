@@ -1,5 +1,7 @@
 package haven;
 
+import auto.Bot;
+
 import java.util.LinkedList;
 import java.util.List;
 
@@ -14,6 +16,7 @@ public class PathQueue {
     private Moving moving;
     private boolean clicked = false;
     private Coord2d clickPos = null;
+    private boolean passenger = false;
     
     public PathQueue(MapView map) {
 	this.map = map;
@@ -25,6 +28,7 @@ public class PathQueue {
     public boolean add(Coord2d p) {
 	boolean start = false;
 	synchronized (queue) {
+	    if(passenger) {return false;}
 	    if(queue.isEmpty()) { start = true; }
 	    queue.add(p);
 	    unclick();
@@ -35,6 +39,7 @@ public class PathQueue {
     
     public void start(Coord2d p) {
 	synchronized (queue) {
+	    if(passenger) {return;}
 	    queue.clear();
 	    queue.add(p);
 	    unclick();
@@ -46,6 +51,12 @@ public class PathQueue {
 	    click(Gob.from(inf.ci));
 	} else {
 	    click(mc);
+	}
+    }
+    
+    public void click(Bot.Target target) {
+	if(target != null && target.gob != null) {
+	    click(target.gob);
 	}
     }
     
@@ -132,6 +143,9 @@ public class PathQueue {
     }
     
     public void movementChange(Gob gob, GAttrib from, GAttrib to) {
+	if(gob.is(GobTag.ME)) {
+	    synchronized (queue) {checkPassenger((Moving) to);}
+	}
 	if(skip(gob)) {return;}
 	if(DBG) {log(gob, from, to);}
 	moving = (Moving) to;
@@ -152,6 +166,34 @@ public class PathQueue {
 		}
 		unclick();
 	    }
+	}
+    }
+    
+    private void checkPassenger(Moving moving) {
+	boolean passenger = false;
+	if(moving instanceof Following) {
+	    Following follow = (Following) moving;
+	    Gob vehicle = follow.tgt();
+	    if(vehicle != null) {
+		String id = vehicle.resid();
+		String pos = follow.xfname;
+		if(id.contains("/vehicle/snekkja")) {
+		    passenger = !pos.equals("m0");
+		} else if(id.contains("/vehicle/knarr")) {
+		    passenger = !pos.equals("m0"); //TODO: check if knarr works properly
+		} else if(id.contains("/vehicle/rowboat")) {
+		    passenger = !pos.equals("d");
+		} else if(id.contains("/vehicle/spark")) {
+		    passenger = !pos.equals("d");
+		} else if(id.contains("/vehicle/wagon")) {
+		    passenger = !pos.equals("d0");
+		}
+		if(DBG) Debug.log.printf("vehicle: '%s', position: '%s', passenger: %s%n", id, pos, passenger);
+	    }
+	}
+	this.passenger = passenger;
+	if(passenger) {
+	    clear();
 	}
     }
     

@@ -16,7 +16,7 @@ public enum Action {
     TOGGLE_STUDY(GameUI::toggleStudy, "Toggle study window"),
     FILTER(gui -> gui.filter.toggle(), "Show item filter"),
     TOGGLE_GOB_INFO(CFG.DISPLAY_GOB_INFO, "Display info", "Display crop/tree growth and object health overlay."),
-    TOGGLE_GOB_HITBOX(CFG.DISPLAY_GOB_HITBOX, "Display hitboxes"),
+    TOGGLE_GOB_HITBOX(Hitbox::toggle, "Display hitboxes"),
     TOGGLE_HIDE_TREES(CFG.HIDE_TREES, "Hide trees"),
     TOGGLE_GOB_RADIUS(CFG.SHOW_GOB_RADIUS, "Display radius", "Displays effective radius of beehives/mine supports etc."),
     TOGGLE_TILE_CENTERING(gui ->
@@ -25,7 +25,9 @@ public enum Action {
 	gui.ui.message(String.format("Tile centering turned %s", Config.center_tile ? "ON" : "OFF"), GameUI.MsgType.INFO);
     }, "Toggle tile centering"),
     TOGGLE_INSPECT(gui -> { gui.map.toggleInspectMode(); }, "Toggle inspect mode"),
+    TRACK_OBJECT(gui -> { gui.map.toggleTrackingMode(); }, "Track object"),
     BOT_PICK_ALL_HERBS(Bot::pickup, "Auto-pick stuff", "Will automatically pickup all herbs/mussels/clay/frogs/grasshoppers etc. in radius that can be changed in Options->General."),
+    TOGGLE_PEACE(GameUI::togglePeace, "Toggle Peace", "Toggle peace for current target"),
     
     //Camera controls
     CAM_ZOOM_IN(gui -> gui.map.zoomCamera(-1), "Camera zoom in"),
@@ -34,6 +36,10 @@ public enum Action {
     CAM_ROTATE_RIGHT(gui -> gui.map.rotateCamera(Coord.right), "Camera move right"),
     CAM_ROTATE_UP(gui -> gui.map.rotateCamera(Coord.up), "Camera move up"),
     CAM_ROTATE_DOWN(gui -> gui.map.rotateCamera(Coord.down), "Camera move down"),
+    CAM_SNAP_WEST(gui -> gui.map.snapCameraWest(), "Camera snap west"),
+    CAM_SNAP_EAST(gui -> gui.map.snapCameraEast(), "Camera snap east"),
+    CAM_SNAP_NORTH(gui -> gui.map.snapCameraNorth(), "Camera snap north"),
+    CAM_SNAP_SOUTH(gui -> gui.map.snapCameraSouth(), "Camera snap south"),
     CAM_RESET(gui -> gui.map.resetCamera(), "Camera reset"),
     
     CLEAR_PLAYER_DAMAGE(GobDamageInfo::clearPlayerDamage, "Clear damage from player"),

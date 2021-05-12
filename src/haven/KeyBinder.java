@@ -95,10 +95,15 @@ public class KeyBinder {
 	add(KeyEvent.VK_RIGHT, NONE, CAM_ROTATE_RIGHT);
 	add(KeyEvent.VK_UP, NONE, CAM_ROTATE_UP);
 	add(KeyEvent.VK_DOWN, NONE, CAM_ROTATE_DOWN);
+	add(KeyEvent.VK_LEFT, CTRL, CAM_SNAP_WEST);
+	add(KeyEvent.VK_RIGHT, CTRL, CAM_SNAP_EAST);
+	add(KeyEvent.VK_UP, CTRL, CAM_SNAP_NORTH);
+	add(KeyEvent.VK_DOWN, CTRL, CAM_SNAP_SOUTH);
 	add(KeyEvent.VK_HOME, NONE, CAM_RESET);
 	
 	add(TOGGLE_HIDE_TREES);
 	add(TOGGLE_INSPECT);
+	add(TOGGLE_PEACE);
     }
     
     private static synchronized void store() {
@@ -168,7 +173,7 @@ public class KeyBinder {
 	    case COMBAT:
 		return makeCombatWidgets();
 	}
-	return null;
+	throw new IllegalArgumentException(String.format("Unknown KeyBindType: %s", type));
     }
     
     private static List<ShortcutWidget> makeGeneralWidgets() {
@@ -339,6 +344,7 @@ public class KeyBinder {
 	    }
 	    btn.autosize(true);
 	    btn.c.x = UI.scale(300) - btn.sz.x;
+	    sz = UI.scale(300, 24);
 	    add(new Label(label), UI.scale(5, 5));
 	}
     

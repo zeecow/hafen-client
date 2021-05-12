@@ -58,6 +58,16 @@ public class RUtils {
 	for(Slot slot : slots)
 	    slot.remove();
     }
+    
+    public static void multiremSafe(Collection<Slot> slots) {
+	if(slots == null)
+	    return;
+	for (Slot slot : slots) {
+	    try {
+		slot.remove();
+	    } catch (Exception ignored) {}
+	}
+    }
 
     public static void readd(Collection<Slot> slots, Consumer<Slot> add, Runnable revert) {
 	Collection<Slot> ch = new ArrayList<>(slots.size());

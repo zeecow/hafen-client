@@ -1,3 +1,70 @@
+$size[14]{$u{Update for 06.05.21:}
+  * fixed mannequins triggering player warning
+  * fixed X on flower menu auto-pick not working
+  * fixed global key bindings nto working when list is scrolled
+  * disable move queueing when you are a passenger
+ 
+$size[14]{$u{Update for 05.05.21:}
+  * fixed cave rat not being tagged as aggressive
+  * add (below) to the name of prospecting markers
+  * show tree/bush growth from 0%
+  * added Logout button to character select (jamesblack)
+  * added option to disable bot messages (Options->Display->Show Task Messages) (jamesblack)
+ 
+$size[14]{$u{Update for 04.05.21:}
+  * added toggle peace with current target (wafflekat)
+  * added snekkja, knarr, stallion and mare to radar
+  * improved quest pointer's handling of clicks
+  * added gob tracking (e$b{X}tended $b{->} t$b{R}ack) - will show pointer to object's last seen position. Works only within session. Useful to not loose track of a boat left behind, or fleeing animal.
+ 
+$size[14]{$u{Update for 03.05.21:}
+  * merged loftar's changes
+  * you can now deliver quest items through pointer
+  * holding CTRL while placing marker in-world will start tracking it - useful to not loose your boat
+  * CTRL+RClick on a custom pointer will stop tracking it
+  * CTRL+ALT+RClick on custom pointer will remove said pointer - useful when you've returned to your boat
+ 
+$size[14]{$u{Update for 02.05.21:}
+  * made toggled windows (like study or filter) raise to top when toggled on
+  * fixed remove and track buttons not being removed for natural markers
+  * ignore exceptions while trying to remove hidden gobs from render tree
+ 
+$size[14]{$u{Update for 30.04.21:}
+  * made quality item filter match item content's quality, if present
+  * fixed/updated help text for item filters
+  * added 'Mark' button to prospecting window - it places marker on prospecting spot with the name of the detected mineral
+  * if you click on 'Add marker' on map window you can now click on ground or objects in main view to place markers
+  * added button to map window to show quest pointers on minimap
+  * made natural resources removable - useful when some rogue chops down your favourite quest giver tree
+  * added 'Track' button to markers - pressing it will show pointer like quests have that guides to location of that marker
+  * you can RClick on quest pointers to interact with quest giver, if in range
+  * you can LClick on pointer to start moving towards it
+  * if quest pointer doesn't have real coordinate (further away from target than 990m) it tries to find marker with quest giver's name and use it as destination. If there's no matching marker found it tries to triangulate target position.
+  * error report window now saves error text to error.log file
+  * added midges to gob warning (wafflekat)
+ 
+$size[14]{$u{Update for 29.04.21:}
+  * fixed another deadlock
+  * added dead bats to radar
+  * made hitbox toggle cycle through off - on - on top
+  * merged loftar's fix for freezes after login for some windows environments
+  * prospecting now leaves its effect while result window is open, length of effect depends on rustroot quality
+ 
+$size[14]{$u{Update for 26.04.21:}
+  * merged loftar's code
+  * fixed 'Weird version number' error
+ 
+$size[14]{$u{Update for 25.04.21:}
+  * added radius to mine ladders
+  * fixed grid being shown only in player's map segment
+  * added ability to change priority of flower menu auto-selection
+ 
+$size[14]{$u{Update for 21.04.21:}
+  * fixed auto-peace not working on re-aggro
+  * show greyed-out icons for dead animals (wafflekat) 
+  * added camera snapping to cardinal directions by CTRL+Arrows (wafflekat) 
+  * fixed map uploader re-initialization on re-login (wafflekat) 
+ 
 $size[14]{$u{Update for 19.04.21:}
   * merged loftar's code
   * fixed food satiety tooltip showing wrong categories
@@ -53,7 +120,7 @@ $size[14]{$u{Update for 09.04.21:}
   * added stone milestone to radar
  
 $size[14]{$u{Update for 07.04.21:}
-  * merged wafflecat's pull request that ads LP/H to study window
+  * merged wafflekat's pull request that ads LP/H to study window
   * moved toggle chat and take screenshot to widget shortcuts + added widget binding for UI toggle
   * fixed false player spotted alarm on travel
   * added options to show curio remaining time in tooltip or instead of progress
@@ -64,7 +131,7 @@ $size[14]{$u{Update for 07.04.21:}
  
 $size[14]{$u{Update for 06.04.21:}
   * fixed timers (X->T)
-  * merged wafflecat's pull request that fixes custom markers upload to auto map
+  * merged wafflekat's pull request that fixes custom markers upload to auto map
   * added option to select which custom markers to upload, none by default
   * fixed crash in biome display
   * improved handling of hidden cursor items

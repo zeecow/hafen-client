@@ -6,6 +6,8 @@ public enum GobTag {
     TREE, BUSH, LOG, STUMP, HERB,
     ANIMAL, AGGRESSIVE, CRITTER,
     
+    MIDGES,
+    
     DOMESTIC, YOUNG, ADULT,
     CATTLE, COW, BULL, CALF,
     GOAT, NANNY, BILLY, KID,
@@ -14,7 +16,7 @@ public enum GobTag {
     SHEEP, EWE, RAM, LAMB,
     
     GEM,
-    PUSHED, //vehicle that is pushed (wheelbarrow, plow)
+    VEHICLE, PUSHED, //vehicle that is pushed (wheelbarrow, plow)
     
     PLAYER, ME, FRIEND, FOE,
     KO, DEAD, EMPTY, READY,
@@ -22,21 +24,22 @@ public enum GobTag {
     MENU, PICKUP, HIDDEN;
     
     private static final String[] AGGRO = {
-        "/bear", "/boar", "/troll", "/wolverine", "/badger", "/adder", "/wolf", "/walrus", "/lynx", "/caverat", "/moose", 
+        "/bear", "/boar", "/troll", "/wolverine", "/badger", "/adder", "/wolf", "/walrus", "/lynx", "/rat/caverat", "/moose", 
         "/mammoth"
     };
-    
     
     private static final String[] ANIMALS = {
         "/fox", "/swan", "/bat", "/beaver", "/reddeer"
     };
     
     private static final String[] CRITTERS = {
-        "/rat", "/swan", "/squirrel", "/silkmoth", "/frog", "/rockdove", "/quail", "/toad", "/grasshopper",
+        "/rat/rat", "/swan", "/squirrel", "/silkmoth", "/frog", "/rockdove", "/quail", "/toad", "/grasshopper",
         "/ladybug", "/forestsnail", "/dragonfly", "/forestlizard", "/waterstrider", "/firefly", "/sandflea",
         "/rabbit", "/crab", "/cavemoth", "/hedgehog", "/stagbeetle", "jellyfish", "/mallard", "/chicken", "/irrbloss",
         "/cavecentipede"
     };
+    
+    private static final String[] VEHICLES = {"/wheelbarrow", "/plow", "/cart", "/dugout", "/rowboat", "/vehicle/snekkja", "/vehicle/knarr", "/vehicle/wagon", "/vehicle/coracle", "/horse/mare", "/horse/stallion", "/vehicle/spark"};
     
     private static final boolean DBG = false;
     private static final Set<String> UNKNOWN = new HashSet<>();
@@ -44,10 +47,8 @@ public enum GobTag {
     public static Set<GobTag> tags(Gob gob) {
         Set<GobTag> tags = new HashSet<>();
         
-        Resource res = gob.getres();
-        if(res != null) {
-            String name = res.name;
-    
+        String name = gob.resid();
+        if(name != null) {
             List<String> ols = Collections.emptyList();
             synchronized (gob.ols) {
                 try {
@@ -89,6 +90,8 @@ public enum GobTag {
                 if(domesticated(gob, name, tags)) {
                     tags.add(ANIMAL);
                     tags.add(DOMESTIC);
+                } else if (name.endsWith("/midgeswarm")) {
+                    tags.add(MIDGES);
                 } else if(ofType(name, CRITTERS)) {
                     tags.add(ANIMAL);
                     tags.add(CRITTER);
@@ -112,6 +115,9 @@ public enum GobTag {
             } else if(name.endsWith("/wheelbarrow") || name.endsWith("/plow")) {
                 tags.add(PUSHED);
             }
+            if(ofType(name, VEHICLES)) {
+                tags.add(VEHICLE);
+            }
             
             if(anyOf(tags, HERB, CRITTER, GEM)) {
                 tags.add(PICKUP);
@@ -121,7 +127,7 @@ public enum GobTag {
                 tags.add(MENU);
             }
     
-            Drawable d = gob.getattr(Drawable.class);
+            Drawable d = gob.drawable;
             if(d != null) {
                 if(d.hasPose("/knock")) {
                     tags.add(KO);

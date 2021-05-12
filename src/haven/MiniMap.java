@@ -32,6 +32,8 @@ import java.util.List;
 
 import java.util.function.*;
 import java.awt.Color;
+import java.util.stream.Collectors;
+
 import haven.MapFile.Segment;
 import haven.MapFile.DataGrid;
 import haven.MapFile.Grid;
@@ -63,6 +65,7 @@ public class MiniMap extends Widget {
     protected Location dloc;
     private String biome;
     private Tex biometex;
+    public boolean big = false;
 
     public MiniMap(Coord sz, MapFile file) {
 	super(sz);
@@ -259,6 +262,9 @@ public class MiniMap extends Widget {
 	public void update(Coord2d rc, double ang) {
 	    this.rc = rc;
 	    this.ang = ang;
+	}
+
+	public void dispupdate() {
 	    if((this.rc == null) || (sessloc == null) || (dloc == null) || (dloc.seg != sessloc.seg))
 		this.sc = null;
 	    else
@@ -283,6 +289,10 @@ public class MiniMap extends Widget {
     
 	public boolean isPlayer() {
 	    return "gfx/hud/mmap/plo".equals(icon.res.get().name);
+	}
+	
+	public boolean isDead() {
+	    return gob.anyOf(GobTag.DEAD, GobTag.KO);
 	}
     }
 
@@ -506,6 +516,8 @@ public class MiniMap extends Widget {
 		file.lock.readLock().unlock();
 	    }
 	}
+	for(DisplayIcon icon : icons)
+	    icon.dispupdate();
     }
 
     public void drawgrid(GOut g, Coord ul, DisplayGrid disp) {
@@ -589,6 +601,8 @@ public class MiniMap extends Widget {
 	    if(disp.isPlayer()) {
 		g.chcolor(disp.kin() != null ? Color.WHITE : Color.RED);
 		g.aimage(RadarCFG.Symbols.$circle.tex, disp.sc, 0.5, 0.5);
+	    } else if (disp.isDead()) {
+	        img = disp.icon.imggray();
 	    }
 	    
 	    if(disp.col != null)
@@ -640,9 +654,10 @@ public class MiniMap extends Widget {
 	drawmap(g);
 	drawmarkers(g);
 	boolean playerSegment = (sessloc != null) && ((curloc == null) || (sessloc.seg == curloc.seg));
-	if(playerSegment && zoomlevel <= 2 && CFG.MMAP_GRID.get()) {drawgrid(g);}
+	if(zoomlevel <= 2 && CFG.MMAP_GRID.get()) {drawgrid(g);}
 	if(playerSegment && zoomlevel <= 1 && CFG.MMAP_VIEW.get()) {drawview(g);}
 	if(playerSegment && CFG.MMAP_SHOW_PATH.get()) {drawMovement(g);}
+	if(big && CFG.MMAP_POINTER.get()) {drawPointers(g);}
 	if(dlvl <= 1)
 	    drawicons(g);
 	if(playerSegment) drawparty(g);
@@ -836,6 +851,14 @@ public class MiniMap extends Widget {
 	    if(icon != null) {
 		return icon.tooltip();
 	    }
+	    if(CFG.MMAP_POINTER.get()) {
+		long curSeg = dloc.seg.id;
+		for (IPointer p : pointers()) {
+		    if(p.seg() == curSeg && p.sc(p2c(p.tc(curSeg)), sz).dist(c) < 20) {
+			return p.tooltip();
+		    }
+		}
+	    }
 	}
 	return(super.tooltip(c, prev));
     }
@@ -931,6 +954,27 @@ public class MiniMap extends Widget {
 	}
     }
     
+    void drawPointers(GOut g) {
+	for (IPointer p : pointers()) {
+	    if(curloc != null && p.seg() == curloc.seg.id) {
+		p.drawmmarrow(g, p2c(p.tc(curloc.seg.id)), sz);
+	    }
+	}
+	g.chcolor();
+    }
+    
+    private List<IPointer> pointers() {
+	if(curloc == null) {
+	    return Collections.emptyList();
+	}
+	long curSeg = curloc.seg.id;
+	return ui.gui.children().stream()
+	    .filter(widget -> widget instanceof IPointer)
+	    .map(widget -> (IPointer) widget)
+	    .filter(p -> p.tc(curSeg) != null)
+	    .collect(Collectors.toList());
+    }
+    
     void drawbiome(GOut g) {
 	if(biometex != null) {
 	    Coord mid = new Coord(g.sz().x / 2, 0);
@@ -972,15 +1016,20 @@ public class MiniMap extends Widget {
 	    if(newbiome == null) {newbiome = "???";}
 	    if(!newbiome.equals(biome)) {
 		biome = newbiome;
-		biometex = Text.renderstroked(prettybiome(biome)).tex();
+		biometex = Text.renderstroked(Utils.prettyResName(biome)).tex();
 	    }
 	} catch (Loading ignored) {}
     }
     
-    private static String prettybiome(String biome) {
-	int k = biome.lastIndexOf("/");
-	biome = biome.substring(k + 1);
-	biome = biome.substring(0, 1).toUpperCase() + biome.substring(1);
-	return biome;
+    public interface IPointer {
+	Coord2d tc(long id);
+	
+	Coord sc(Coord c, Coord sz);
+	
+	Object tooltip();
+	
+	long seg();
+	
+	void drawmmarrow(GOut g, Coord tc, Coord sz);
     }
 }

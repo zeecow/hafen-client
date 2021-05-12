@@ -33,18 +33,16 @@ public class ItemFilter {
 	"$font[monospaced,13]{  has:water=2  }will find items that contain exactly 2L of water.\n";
     
     public static final String HELP_QUALITY = "$size[20]{$b{Quality search}}\n" +
-	"$font[monospaced,16]{q:[type][sign][value][opt]}\n" +
-	"Will highlight items with quality type defined by $font[monospaced,13]{[type]} or $font[monospaced,13]{[opt]} with quality value specified by $font[monospaced,13]{[sign]} and $font[monospaced,13]{[value]}.\n" +
-	"$font[monospaced,13]{[type]} is type of quality ($font[monospaced,13]{min, max, average, essence, vitality, substance}). You can write type not fully ($font[monospaced,13]{ess} will match essence, for example). If you omit type, it will be detected by $font[monospaced,13]{[opt]} (> means max, < means min, = and ~ means average). If $font[monospaced,13]{[opt]} not present too - then type selected to display on item ($font[monospaced,13]{Options->Display->Show single quality as}) will be used.\n" +
+	"$font[monospaced,16]{q[:][sign][value]}\n" +
+	"Will highlight items with quality value specified by $font[monospaced,13]{[sign]} and $font[monospaced,13]{[value]}.\n" +
 	"$font[monospaced,13]{[sign]} can be $font[monospaced,13]{>} (more), $font[monospaced,13]{+} (at least), $font[monospaced,13]{<} (less), $font[monospaced,13]{=} (exactly).\n" +
 	"$size[16]{\nExamples:}\n" +
-	"$font[monospaced,13]{  q:>5     }will find items with default quality higher than 5\n" +
-	"$font[monospaced,13]{  q:min<12 }will find items with minimum quality less than 12\n" +
-	"$font[monospaced,13]{  q:<15>   }will find items with maximum quality less than 15\n" +
-	"$font[monospaced,13]{  q:ess+21 }will find items with essence of at least 21\n";
+	"$font[monospaced,13]{  q:5   }will find items with quality of 5\n" +
+	"$font[monospaced,13]{  q<12  }will find items with quality less than 12\n" +
+	"$font[monospaced,13]{  q+21  }will find items with quality of at least 21\n";
     
     public static final String HELP_CURIO = "$size[20]{$b{Curiosity search}}\n" +
-	"Supports $font[monospaced,13]{lp} (learning point gained), $font[monospaced,13]{xp} (experience required) and $font[monospaced,13]{mw} (mental weight required) tags. They all interchangeable in the examples below.\n" +
+	"Supports $font[monospaced,13]{lp} (learning point gained), $font[monospaced,13]{lph} (learning point gained per hour), $font[monospaced,13]{xp} (experience required) and $font[monospaced,13]{mw} (mental weight required) tags. They all interchangeable in the examples below.\n" +
 	"$size[16]{\nExamples:}\n" +
 	"$font[monospaced,13]{  lp:    }will find items that grant LP.\n" +
 	"$font[monospaced,13]{  lp>100 }will find items that grant more than 100 LP.\n" +
@@ -71,9 +69,9 @@ public class ItemFilter {
     public static final String HELP_ARMOR = "$size[20]{$b{Armor search}}\n" +
 	"$font[monospaced,16]{armor:[type][sign][value]}\n" +
 	"Will highlight items that grant armor of type $font[monospaced,13]{[type]} in quantity described by $font[monospaced,13]{[sign]} and $font[monospaced,13]{[value]}.\n" +
-	"Use $font[monospaced,13]{hard} or $font[monospaced,13]{deflect} type to denote hard (deflecting) armor.\n" +
-	"Use $font[monospaced,13]{soft} or $font[monospaced,13]{soak} type to denote soft (soaking) armor.\n" +
-	"Use $font[monospaced,13]{all}, $font[monospaced,13]{any}, $font[monospaced,13]{total}, $font[monospaced,13]{*} or leave empty to denote sum of soak and deflect.\n" +
+	"Use $font[monospaced,13]{hard} or $font[monospaced,13]{deflect} or $font[monospaced,13]{h} type to denote hard armor.\n" +
+	"Use $font[monospaced,13]{soft} or $font[monospaced,13]{soak} or $font[monospaced,13]{s} type to denote soft armor.\n" +
+	"Use $font[monospaced,13]{all}, $font[monospaced,13]{any}, $font[monospaced,13]{total}, $font[monospaced,13]{*} or leave empty to denote sum of hard and soft armor.\n" +
 	"$font[monospaced,13]{[type]} can be entered partially.\n" +
 	"$size[16]{\nExamples:}\n" +
 	"$font[monospaced,13]{  armor:hard>1 }will find items providing more than 1 hard armor.\n" +
@@ -165,6 +163,7 @@ public class ItemFilter {
 		    case "xp":
 		    case "lp":
 		    case "mw":
+		    case "lph":
 			tag = text;
 			break;
 		    case "q":
@@ -188,6 +187,7 @@ public class ItemFilter {
 		    case "xp":
 		    case "lp":
 		    case "mw":
+		    case "lph":
 			filter = new XP(tag, sign, value, opt);
 			break;
 		    case "energy":
@@ -229,7 +229,7 @@ public class ItemFilter {
     public static void showHelp(UI ui, String ...blocks) {
 	Window log = ui.root.add(new WindowX(new Coord(50, 50), "Filter Help"), new Coord(100, 50));
 	log.justclose = true;
-	Textlog txt = log.add(new Textlog(new Coord(450, 500)));
+	Textlog txt = log.add(new Textlog(UI.scale(450, 500)));
 	txt.quote = false;
 	txt.maxLines = -1;
 	log.pack();
@@ -405,6 +405,8 @@ public class ItemFilter {
 		Curiosity curio = (Curiosity) item;
 		if("lp".equals(text)) {
 		    return test(curio.exp);
+		} else if ("lph".equals(text)) {
+		    return test(Curiosity.lph(curio.lph));
 		} else if("xp".equals(text)) {
 		    return test(curio.enc);
 		} else if("mw".equals(text)) {
@@ -445,7 +447,21 @@ public class ItemFilter {
 		return test(quality.single(type).value);
 	    }
 	}
-
+    
+	@Override
+	public boolean matches(List<ItemInfo> info) {
+	    QualityList q = ItemInfo.getContent(info).q;
+	    if(!q.isEmpty()) {
+		return match(q);
+	    }
+	    return super.matches(info);
+	}
+    
+	@Override
+	protected Sign getDefaultSign() {
+	    return Sign.EQUAL;
+	}
+    
 	private SingleType getTextType(String text) {
 	    SingleType[] types = SingleType.values();
 	    for (SingleType type : types) {
@@ -512,12 +528,12 @@ public class ItemFilter {
 	    }
 	    return false;
 	}
-    } 
+    }
     
     private static class Armor extends Complex {
-	private static String[] hard = {"hard", "deflect"};
-	private static String[] soft = {"soft", "soak"};
-	private static String[] all = {"all", "any", "total", "*"};
+	private static final String[] hard = {"hard", "deflect", "h"};
+	private static final String[] soft = {"soft", "soak", "s"};
+	private static final String[] all = {"all", "any", "total", "*"};
 	
 	private Armor(String text, String sign, String value, String opts) {
 	    super(text, sign, value, opts);
@@ -527,34 +543,7 @@ public class ItemFilter {
 	public boolean matches(List<ItemInfo> info) {
 	    Pair<Integer, Integer> armor = ItemInfo.getArmor(info);
 	    if(armor != null) {
-		int type = -1;//no match
-		if(text.isEmpty()) {
-		    type = 0;//all
-		} else {
-		    for (String tmp : all) {
-			if(tmp.startsWith(text)) {
-			    type = 0;//all
-			    break;
-			}
-		    }
-		    if(type == -1) {
-			for (String tmp : hard) {
-			    if(tmp.startsWith(text)) {
-				type = 1;//hard
-				break;
-			    }
-			}
-		    }
-		    if(type == -1) {
-			for (String tmp : soft) {
-			    if(tmp.startsWith(text)) {
-				type = 2;//soft
-				break;
-			    }
-			}
-		    }
-		}
-		switch (type) {
+		switch (getType(text)) {
 		    case 0://all
 			return test(armor.a + armor.b);
 		    case 1://hard
@@ -566,6 +555,29 @@ public class ItemFilter {
 		}
 	    }
 	    return false;
+	}
+	
+	private int getType(String text) {
+	    if(text == null || text.isEmpty()) {
+		return 0;//all
+	    } else {
+		for (String tmp : all) {
+		    if(tmp.startsWith(text)) {
+			return 0;//all
+		    }
+		}
+		for (String tmp : hard) {
+		    if(tmp.startsWith(text)) {
+			return 1;//hard
+		    }
+		}
+		for (String tmp : soft) {
+		    if(tmp.startsWith(text)) {
+			return 2;//soft
+		    }
+		}
+	    }
+	    return -1;
 	}
     }
     

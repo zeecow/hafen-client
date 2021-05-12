@@ -20,7 +20,12 @@ public class WidgetList<T extends Widget> extends ListWidget<T> {
 	this.itemsz = itemsz;
 	this.h = h;
 	sz = BOX.bisz().add(itemsz.x, h * itemsz.y);
-	sb = add(new Scrollbar(sz.y, 0, 20), sz.x, 0);
+	sb = add(new Scrollbar(sz.y, 0, 20) {
+	    @Override
+	    public void changed() {
+		updateChildPositions();
+	    }
+	}, sz.x, 0);
 	this.widesz = itemsz.add(sb.sz.x, 0);
 	pack();
     }
@@ -56,7 +61,7 @@ public class WidgetList<T extends Widget> extends ListWidget<T> {
     }
 
     public Coord itempos(int idx) {
-	return BTLOFF.add(0, idx * itemsz.y);
+	return BTLOFF.add(0, idx * itemsz.y).addy(-sb.val * itemh);
     }
 
     protected void drawbg(GOut g) {
@@ -79,14 +84,15 @@ public class WidgetList<T extends Widget> extends ListWidget<T> {
 	drawbg(g);
 
 	int n = listitems();
-	sb.max = n - h;
+	sb.max = Math.max(n - h, sb.min);
+	sb.val = Math.min(sb.val, sb.max);
 	Coord isz = sb.vis() ? itemsz : widesz;
 	for(int i = 0; i < h; i++) {
 	    int idx = i + sb.val;
 	    if(idx >= n)
 		break;
 	    T item = listitem(idx);
-	    GOut ig = g.reclip(itempos(i), isz);
+	    GOut ig = g.reclip(itempos(idx), isz);
 	    if(item == sel) {
 		drawsel(ig, Listbox.selc);
 	    } else if(item == over) {
@@ -139,11 +145,10 @@ public class WidgetList<T extends Widget> extends ListWidget<T> {
     }
 
     @Override
-    public boolean mousedown(Coord c0, int button) {
-	Coord c = (c0.x < sb.c.x) ? c0.add(0, sb.val * itemh) : c0;
+    public boolean mousedown(Coord c, int button) {
 	if(super.mousedown(c, button))
 	    return (true);
-	T item = itemat(c0);
+	T item = itemat(c);
 	if((item == null) && (button == 1))
 	    change(null);
 	else if(item != null)
@@ -160,7 +165,14 @@ public class WidgetList<T extends Widget> extends ListWidget<T> {
 	    over = null;
 	}
     }
-
+    
+    protected void updateChildPositions() {
+	int n = listitems();
+	for (int i = 0; i < n; i++) {
+	    listitem(i).c = itempos(i);
+	}
+    }
+    
     @Override
     public boolean mousewheel(Coord c, int amount) {
 	sb.ch(amount);

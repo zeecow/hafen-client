@@ -30,6 +30,8 @@ import haven.Resource.AButton;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.Color;
+import java.awt.Font;
 import java.awt.event.KeyEvent;
 import java.awt.font.TextAttribute;
 import java.awt.image.BufferedImage;
@@ -50,7 +52,7 @@ public class MenuGrid extends Widget implements KeyBinding.Bindable {
     private PagButton pressed, layout[][] = new PagButton[gsz.x][gsz.y];
     private UI.Grab grab;
     private int curoff = 0;
-    private boolean recons = true;
+    private boolean recons = true, showkeys = false;
     private Map<Character, PagButton> hotmap = new HashMap<>();
     public Pagina lastCraft = null;
 
@@ -96,6 +98,30 @@ public class MenuGrid extends Widget implements KeyBinding.Bindable {
 	    return(name());
 	}
 
+	private char bindchr(KeyMatch key) {
+	    if(key.modmatch != 0)
+		return(0);
+	    char vkey = key.chr;
+	    if((vkey == 0) && (key.keyname.length() == 1))
+		vkey = key.keyname.charAt(0);
+	    return(vkey);
+	}
+
+	public static final Text.Foundry keyfnd = new Text.Foundry(Text.sans.deriveFont(Font.BOLD), 10);
+	private Tex keyrend = null;
+	private boolean haskeyrend = false;
+	public Tex keyrend() {
+	    if(!haskeyrend) {
+		char vkey = bindchr(bind.key());
+		if(vkey != 0)
+		    keyrend = new TexI(Utils.outline2(keyfnd.render(Character.toString(vkey), Color.WHITE).img, Color.BLACK));
+		else
+		    keyrend = null;
+		haskeyrend = true;
+	    }
+	    return(keyrend);
+	}
+
 	private List<ItemInfo> info = null;
 	public List<ItemInfo> info() {
 	    if(info == null)
@@ -112,9 +138,7 @@ public class MenuGrid extends Widget implements KeyBinding.Bindable {
 	    String tt = name();
 	    KeyMatch key = bind.key();
 	    int pos = -1;
-	    char vkey = key.chr;
-	    if((vkey == 0) && (key.keyname.length() == 1))
-		vkey = key.keyname.charAt(0);
+	    char vkey = bindchr(key);
 	    if((vkey != 0) && (key.modmatch == 0))
 		pos = tt.toUpperCase().indexOf(Character.toUpperCase(vkey));
 	    if(pos >= 0)
@@ -165,7 +189,8 @@ public class MenuGrid extends Widget implements KeyBinding.Bindable {
 		if((curoff + 14) >= curbtns.size())
 		    curoff = 0;
 		else
-		    curoff += 14;
+		    curoff += (gsz.x * gsz.y) - 2;
+		updlayout();
 	    }
 
 	    public String name() {return("More...");}
@@ -177,8 +202,10 @@ public class MenuGrid extends Widget implements KeyBinding.Bindable {
 	    {pag.button = this;}
 
 	    public void use() {
-		pag.scm.cur = paginafor(pag.scm.cur.act().parent);
+		Pagina dst = paginafor(pag.scm.cur.act().parent);
+		pag.scm.change(dst);
 		curoff = 0;
+		selectCraft(dst);
 	    }
 
 	    public String name() {return("Back");}
@@ -290,6 +317,7 @@ public class MenuGrid extends Widget implements KeyBinding.Bindable {
 	makeLocal("paginae/add/autobot", Action.BOT_PICK_ALL_HERBS);
 	makeLocal("paginae/add/hide_trees", Action.TOGGLE_HIDE_TREES);
 	makeLocal("paginae/add/inspect", Action.TOGGLE_INSPECT);
+	makeLocal("paginae/add/track", Action.TRACK_OBJECT);
     }
     
     private void makeLocal(String path, CustomPaginaAction action) {
@@ -480,6 +508,11 @@ public class MenuGrid extends Widget implements KeyBinding.Bindable {
 			System.err.println(info.scm == this);
 			throw(e);
 		    }
+		    if(showkeys) {
+			Tex ki = btn.keyrend();
+			if(ki != null)
+			    g.aimage(ki, p.add(bgsz.x - UI.scale(2), UI.scale(1)), 1.0, 0.0);
+		    }
 		    if(info.meter > 0) {
 			double m = info.meter;
 			if(info.dtime > 0)
@@ -576,41 +609,33 @@ public class MenuGrid extends Widget implements KeyBinding.Bindable {
 	}
     }
 
+    public void change(Pagina dst) {
+	this.cur = dst;
+	curoff = 0;
+	if(dst == null)
+	    showkeys = false;
+	updlayout();
+    }
+    
     public void use(Pagina p, boolean reset) {
 	if(p != null) { use(p.button(), reset); }
     }
-    
-    public void use(PagButton pbtn, boolean reset) {
-        Pagina r = pbtn.pag;
-	Collection<Pagina> sub = new LinkedList<Pagina>(),
-	    cur = new LinkedList<Pagina>();
-	cons(r, sub);
-	cons(this.cur, cur);
-	selectCraft(r);
+
+    public void use(PagButton r, boolean reset) {
+	Collection<PagButton> sub = new ArrayList<>();
+	consb(r.pag, sub);
+	selectCraft(r.pag);
 	if(sub.size() > 0) {
-	    this.cur = r;
-	    curoff = 0;
-	} else if(r == bk.pag) {
-	    this.cur = paginafor(this.cur.act().parent);
-	    curoff = 0;
-	    selectCraft(this.cur);
-	} else if(r == next.pag) {
-	    if((curoff + 14) >= cur.size())
-		curoff = 0;
-	    else
-		curoff += 14;
+	    change(r.pag);
 	} else {
-	    r.newp = 0;
-	    if(isCrafting(r)){
-		lastCraft = r;
+	    r.pag.newp = 0;
+	    r.use();
+	    if(isCrafting(r.pag)) {
+		lastCraft = r.pag;
 	    }
-	    pbtn.use();
-	    if(reset) {
-		this.cur = null;
-		curoff = 0;
-	    }
+	    if(reset)
+		change(null);
 	}
-	updlayout();
     }
 
     public void senduse(String... ad) {
@@ -643,11 +668,9 @@ public class MenuGrid extends Widget implements KeyBinding.Bindable {
     public void uimsg(String msg, Object... args) {
 	if(msg == "goto") {
 	    if(args[0] == null)
-		cur = null;
+		change(null);
 	    else
-		cur = paginafor(ui.sess.getres((Integer)args[0]));
-	    curoff = 0;
-	    updlayout();
+		change(paginafor(ui.sess.getres((Integer)args[0])));
 	} else if(msg == "fill") {
 	    synchronized(paginae) {
 		int a = 0;
@@ -687,10 +710,8 @@ public class MenuGrid extends Widget implements KeyBinding.Bindable {
     public static final KeyBinding kb_back = KeyBinding.get("scm-back", KeyMatch.forcode(KeyEvent.VK_BACK_SPACE, 0));
     public static final KeyBinding kb_next = KeyBinding.get("scm-next", KeyMatch.forchar('N', KeyMatch.S | KeyMatch.C | KeyMatch.M, KeyMatch.S));
     public boolean globtype(char k, KeyEvent ev) {
-	if((kb_root.key().match(ev)) && (this.cur != null)) {
-	    this.cur = null;
-	    curoff = 0;
-	    updlayout();
+	if(kb_root.key().match(ev) && (this.cur != null)) {
+	    change(null);
 	    return(true);
 	} else if(kb_back.key().match(ev) && (this.cur != null)) {
 	    use(bk, false);
@@ -711,7 +732,9 @@ public class MenuGrid extends Widget implements KeyBinding.Bindable {
 	    }
 	}
 	if(pag != null) {
-	    use(pag, true);
+	    use(pag, (KeyMatch.mods(ev) & KeyMatch.S) == 0);
+	    if(this.cur != null)
+		showkeys = true;
 	    return(true);
 	}
 	return(false);

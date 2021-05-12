@@ -69,7 +69,7 @@ public class GameUI extends ConsoleHost implements Console.Directory {
     public Hidewnd beltwnd;
     public Equipory equipory;
     public CharWnd chrwdg;
-    public MapWnd mapfile;
+    public MapWnd2 mapfile;
     private Widget qqview;
     public BuddyWnd buddies;
     public EquipProxy eqproxy;
@@ -260,6 +260,7 @@ public class GameUI extends ConsoleHost implements Console.Directory {
     @Override
     public void destroy() {
 	closeWindows();
+	untrackAllMarkers();
 	super.destroy();
 	ui.gui = null;
     }
@@ -643,6 +644,7 @@ public class GameUI extends ConsoleHost implements Console.Directory {
     
 	public void toggle() {
 	    show(!visible);
+	    if(visible) {this.raise();}
 	}
     }
 
@@ -738,6 +740,16 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 	    vhand = add(new ItemDrag(fi.dc, fi.item));
 	}
     }
+    
+    public void togglePeace() {
+	try {
+	    if (fv != null && fv.current != null && fv.current.give != null) {
+		fv.current.give.wdgmsg("click", 1);
+	    }
+	} catch (Exception e) {
+	    e.printStackTrace();
+	}
+    }
 
     public void toggleHand() {
 	if (handHidden) {
@@ -752,7 +764,7 @@ public class GameUI extends ConsoleHost implements Console.Directory {
     }
 
     public void toggleStudy() {
-	studywnd.show(!studywnd.visible);
+	studywnd.toggle();
     }
 
     public void takeScreenshot() {
@@ -1652,6 +1664,40 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 	    this.color = color;
 	    this.sfx = (sfx != null) ? Resource.local().loadwait(sfx) : null;
 	}
+    }
+    
+    private final Map<MapFile.Marker, Widget> trackedMarkers = new HashMap<>();
+    
+    public void track(MapFile.Marker marker) {
+	untrack(marker);
+	try {
+	    Factory f = Widget.gettype2("ui/locptr");
+	    if(f != null) {
+		Widget wdg = f.create(ui, new Object[]{marker});
+		trackedMarkers.put(marker, wdg);
+		ui.gui.add(wdg);
+	    }
+	} catch (InterruptedException ignored) {
+	}
+    }
+    
+    public void untrack(MapFile.Marker marker) {
+	Widget wdg = trackedMarkers.remove(marker);
+	if(wdg != null) {
+	    if(marker instanceof MapWnd2.GobMarker){
+	        ui.gui.mapfile.untrack(((MapWnd2.GobMarker) marker).gobid);
+	    }
+	    wdg.reqdestroy();
+	}
+    }
+    
+    private void untrackAllMarkers() {
+	Collection<MapFile.Marker> markers = new ArrayList<>(trackedMarkers.keySet());
+	markers.forEach(this::untrack);
+    }
+    
+    public boolean isTracked(MapFile.Marker marker) {
+	return trackedMarkers.containsKey(marker);
     }
 
     public void act(String... args) {

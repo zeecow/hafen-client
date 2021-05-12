@@ -55,6 +55,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Sk
     private GobDamageInfo damage;
     private HidingGobSprite<Hitbox> hitbox = null;
     public Drawable drawable;
+    public Moving moving;
     private Boolean isMe = null;
     private final GeneralGobInfo info;
     private GobWarning warning = null;
@@ -343,6 +344,8 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Sk
 		if(res != null) {
 		    if(res.name.equals("gfx/fx/floatimg")) {
 			processDmg(item.sdt.clone());
+		    } else if(res.name.equals("gfx/fx/dowse")) {
+		        ProspectingWnd.overlay(this, item);
 		    }
 //		    System.out.printf("overlayAdded: '%s'%n", res.name);
 		}
@@ -380,7 +383,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Sk
     public void rclick() {
 	try {
 	    MapView map = glob.sess.ui.gui.map;
-	    map.wdgmsg("click", Coord.z, Coord.z, 3, 0, 0, (int) id, rc.floor(posres), 0, -1);
+	    map.click(this, 3, Coord.z);
 	} catch (Exception ignored) {}
     }
     
@@ -403,6 +406,8 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Sk
     public boolean disposed() {return disposed;}
     
     public void dispose() {
+	drawable = null;
+	moving = null;
 	synchronized (removalLock) {
 	    disposed = true;
 	    removalLock.notifyAll();
@@ -510,6 +515,8 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Sk
 	    if(ac == Drawable.class) {
 		drawable = (Drawable) a;
 		if(a != prev) drawableUpdated();
+	    } else if(ac == Moving.class) {
+		moving = (Moving) a;
 	    } else if(ac == KinInfo.class) {
 		tagsUpdated();
 	    } else if(ac == GobHealth.class) {
@@ -943,7 +950,15 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Sk
     }
     
     public String tooltip() {
-        return resid();
+	String tt = null;
+	GobIcon icon = getattr(GobIcon.class);
+	if(icon != null) {
+	    tt = icon.tooltip();
+	}
+	if(tt == null) {
+	    tt = Utils.prettyResName(resid());
+	}
+	return tt;
     }
     
     private void updateHitbox() {
@@ -968,14 +983,19 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Sk
     
     private boolean updateVisibility() {
 	if(anyOf(GobTag.TREE, GobTag.BUSH)) {
-	    Drawable d = getattr(Drawable.class);
+	    Drawable d = drawable;
 	    Boolean needHide = CFG.HIDE_TREES.get();
 	    if(d != null && d.skipRender != needHide) {
 		d.skipRender = needHide;
-		glob.loader.defer(() -> setattr(d), null);
 		if(needHide) {
 		    tag(GobTag.HIDDEN);
+		    if(d.slots != null) {
+			ArrayList<RenderTree.Slot> tmpSlots = new ArrayList<>(d.slots);
+			glob.loader.defer(() -> RUtils.multiremSafe(tmpSlots), null);
+		    }
 		} else {
+		    ArrayList<RenderTree.Slot> tmpSlots = new ArrayList<>(slots);
+		    glob.loader.defer(() -> RUtils.multiadd(tmpSlots, d), null);
 		    untag(GobTag.HIDDEN);
 		}
 	    	return true;
@@ -1104,7 +1124,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Sk
 	    updateWarnings();
 	}
 	
-	if(status.updated(StatusType.info)) {
+	if(status.updated(StatusType.info, StatusType.tags)) {
 	    info.clean();
 	}
     

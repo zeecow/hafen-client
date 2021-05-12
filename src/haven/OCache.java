@@ -141,6 +141,9 @@ public class OCache implements Iterable<Gob> {
 	else
 	    copy.parallelStream().forEach(task);
 	paths.tick(dt);
+	if(glob.sess.ui != null && glob.sess.ui.gui != null && glob.sess.ui.gui.mapfile != null) {
+	    glob.sess.ui.gui.mapfile.updateGobMarkers();
+	}
     }
 
     public void gtick(Render g) {

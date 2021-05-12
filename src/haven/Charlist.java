@@ -37,6 +37,7 @@ public class Charlist extends Widget {
     public static final int btnw = UI.scale(100);
     public int height, y, sel = 0;
     public IButton sau, sad;
+    public Button logout;
     public List<Char> chars = new ArrayList<Char>();
     Avaview avalink;
     
@@ -129,6 +130,16 @@ public class Charlist extends Widget {
 		y += bg.sz().y + margin;
 	    }
 	}
+	logout = parent.add(new Button(UI.scale(90), "Log out") {
+	    @Override
+		public void click() {
+		Session sess = ((RemoteUI) ui.rcvr).sess;
+		synchronized (sess) {
+		    sess.close();
+		}
+		super.click();
+	    }
+	}, UI.scale(100, 553));
 	super.draw(g);
     }
     

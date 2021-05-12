@@ -46,6 +46,16 @@ public class MappingClient {
 	}
     }
     
+    public static void destroy() {
+	synchronized (MappingClient.class) {
+	    if(INSTANCE != null) {
+	        INSTANCE.gridsUploader.shutdown();
+	        INSTANCE.scheduler.shutdown();
+		INSTANCE = null;
+	    }
+	}
+    }
+    
     public static boolean initialized() {return INSTANCE != null;}
     
     public static MappingClient getInstance() {
