@@ -64,6 +64,7 @@
   "Ore": [
     "gfx/tiles/rocks/cassiterite",
     "gfx/tiles/rocks/chalcopyrite",
+    "gfx/tiles/rocks/cinnabar",
     "gfx/tiles/rocks/hematite",
     "gfx/tiles/rocks/ilmenite",
     "gfx/tiles/rocks/leadglance",
