@@ -97,7 +97,8 @@ public class GobDamageInfo extends GobInfo {
     
     public static void clearAllDamage(GameUI gui) {
 	ArrayList<Long> gobIds = new ArrayList<>(gobDamage.keySet());
-	for (long id : gobIds) {
+	for (Long id : gobIds) {
+	    if(id == null) {continue;}
 	    clearDamage(gui.ui.sess.glob.oc.getgob(id), id);
 	}
     }
