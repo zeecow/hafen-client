@@ -247,7 +247,7 @@ public class KeyBinder {
 	    if(isEmpty()) {return shortened ? "" : "<UNBOUND>";}
 	    String key = KeyEvent.getKeyText(code);
 	    if ((mods & SHIFT) != 0) {
-		key = (shortened ? "⇧" : "SHIT+") + key;
+		key = (shortened ? "⇧" : "SHIFT+") + key;
 	    }
 	    if ((mods & ALT) != 0) {
 		key = (shortened ? "A" : "ALT+") + key;
