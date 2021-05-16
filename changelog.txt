@@ -1,3 +1,10 @@
+$size[14]{$u{Update for 16.05.21:}
+  * changed options layout to (hopefully) more intuitive one
+  * added option to toggle flat cupboards
+  * always visualize queued path if path queueing is on
+  * added Argentite (Silvershine), Cinnabar,  Galena, Horn silver, Nagyagite (Leaf ore), Petzite (Direvein) and Sylvanite (Schrifterz) to list of tiles to highlight
+  * added ability to zoom in closer on mini map
+ 
 $size[14]{$u{Update for 12.05.21:}
   * added display of detection (perception * exploration) to stat list on Equipment window
   * added display of sneak (intellect * stealth) to stat list on Equipment window
