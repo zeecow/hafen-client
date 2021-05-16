@@ -208,7 +208,12 @@ public class WItem extends Widget implements DTarget2 {
 	}
     };
     
-    public final AttrCache<Pair<Integer, Integer>> wear = new AttrCache<Pair<Integer, Integer>>(this::info, AttrCache.cache(ItemInfo::getWear));
+    public final AttrCache<Pair<Double, Color>> wear = new AttrCache<>(this::info, AttrCache.cache(info->{
+	Pair<Integer, Integer> wear = ItemInfo.getWear(info);
+	if(wear == null) return (null);
+	double bar = (float) (wear.b - wear.a) / wear.b;
+	return new Pair<>(bar, Utils.blendcol(bar, Color.RED, Color.ORANGE, Color.YELLOW, Color.GREEN));
+    }));
     
     public final AttrCache<Tex> armor = new AttrCache<Tex>(this::info, AttrCache.cache(info -> {
 	Pair<Integer, Integer> armor = ItemInfo.getArmor(info);
@@ -263,7 +268,6 @@ public class WItem extends Widget implements DTarget2 {
 	if(spr != null) {
 	    Coord sz = spr.sz();
 	    g.defstate();
-	    drawbars(g, sz);
 	    if(olcol.get() != null)
 		g.usestate(new ColorMask(olcol.get()));
 	    if(item.matches) {
@@ -278,6 +282,7 @@ public class WItem extends Widget implements DTarget2 {
 		for(GItem.InfoOverlay<?> ol : ols)
 		    ol.draw(g);
 	    }
+	    drawbars(g, sz);
 	    drawnum(g, sz);
 	    drawmeter(g, sz);
 	    drawq(g);
@@ -342,22 +347,15 @@ public class WItem extends Widget implements DTarget2 {
     }
     
     private void drawbars(GOut g, Coord sz) {
-	float bar = 0f;
-
-	if(CFG.SHOW_ITEM_WEAR_BAR.get() && this.wear.get() != null) {
-	    Pair<Integer, Integer> wear = this.wear.get();
-	    if(wear.a > 0) {
-		bar = (float) (wear.b - wear.a) / wear.b;
+	if(CFG.SHOW_ITEM_WEAR_BAR.get()) {
+	    Pair<Double, Color> wear = this.wear.get();
+	    if(wear != null) {
+		g.chcolor(wear.b);
+		int h = (int) (sz.y * wear.a);
+		g.frect(new Coord(0, sz.y - h), new Coord(4, h));
+		g.chcolor();
 	    }
 	}
-
-	if(bar > 0) {
-	    g.chcolor(Utils.blendcol(Color.RED, Color.GREEN, bar));
-	    int h = (int) (sz.y * bar);
-	    g.frect(new Coord(0, sz.y - h), new Coord(4, h));
-	    g.chcolor();
-	}
-
     }
 
     private void drawnum(GOut g, Coord sz) {
