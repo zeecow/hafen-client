@@ -66,6 +66,7 @@ public class MiniMap extends Widget {
     private String biome;
     private Tex biometex;
     public boolean big = false;
+    public int scale = 1;
 
     public MiniMap(Coord sz, MapFile file) {
 	super(sz);
@@ -508,11 +509,11 @@ public class MiniMap extends Widget {
     }
 
     private float scalef() {
-	return(UI.unscale((float)(1 << dlvl)));
+	return(UI.unscale((float)(1 << dlvl)) / scale);
     }
 
     public Coord st2c(Coord tc) {
-	return(UI.scale(tc.add(sessloc.tc).sub(dloc.tc).div(1 << dlvl)).add(sz.div(2)));
+	return(UI.scale(tc.add(sessloc.tc).sub(dloc.tc).div(1 << dlvl)).mul(scale).add(sz.div(2)));
     }
 
     public Coord p2c(Coord2d pc) {
@@ -557,7 +558,7 @@ public class MiniMap extends Widget {
 	try {
 	    Tex img = disp.img();
 	    if(img != null)
-		g.image(img, ul, UI.scale(img.sz()));
+		g.image(img, ul, UI.scale(img.sz()).mul(scale));
 	} catch(Loading l) {
 	}
     }
@@ -565,7 +566,7 @@ public class MiniMap extends Widget {
     public void drawmap(GOut g) {
 	Coord hsz = sz.div(2);
 	for(Coord c : dgext) {
-	    Coord ul = UI.scale(c.mul(cmaps)).sub(dloc.tc.div(scalef())).add(hsz);
+	    Coord ul = UI.scale(c.mul(cmaps).mul(scale)).sub(dloc.tc.div(scalef())).add(hsz);
 	    DisplayGrid disp = display[dgext.ri(c)];
 	    if(disp == null)
 		continue;
@@ -864,9 +865,15 @@ public class MiniMap extends Widget {
 
     public boolean mousewheel(Coord c, int amount) {
 	if(amount > 0) {
+	    if(scale > 1) {
+		scale--;
+	    } else
 	    if(allowzoomout())
 		zoomlevel = Math.min(zoomlevel + 1, dlvl + 1);
 	} else {
+	    if(zoomlevel == 0 && scale < 4) {
+		scale++;
+	    }
 	    zoomlevel = Math.max(zoomlevel - 1, 0);
 	}
 	return(true);
@@ -932,7 +939,7 @@ public class MiniMap extends Widget {
     void drawgrid(GOut g) {
 	int zmult = 1 << zoomlevel;
 	Coord offset = sz.div(2).sub(dloc.tc.div(scalef()));
-	Coord zmaps = cmaps.div( (float)zmult);
+	Coord zmaps = cmaps.div( (float)zmult).mul(scale);
     
 	double width = UI.scale(1f);
 	Color col = g.getcolor();
@@ -968,10 +975,11 @@ public class MiniMap extends Widget {
 	Gob player = ui.gui.map.player();
 	if(player != null) {
 	    Coord rc = p2c(player.rc.floor(sgridsz).sub(4, 4).mul(sgridsz));
+	    Coord viewsz = VIEW_SZ.div(zmult).mul(scale);
 	    g.chcolor(VIEW_BG_COLOR);
-	    g.frect(rc, VIEW_SZ.div(zmult));
+	    g.frect(rc, viewsz);
 	    g.chcolor(VIEW_BORDER_COLOR);
-	    g.rect(rc, VIEW_SZ.div(zmult));
+	    g.rect(rc, viewsz);
 	    g.chcolor();
 	}
     }
