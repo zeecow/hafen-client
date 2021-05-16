@@ -58,11 +58,14 @@ public class PathVisualizer implements RenderTree.Node {
 	    } catch (Loading ignored) {}
 	}
     
-	Set<PathCategory> selected = CFG.DISPLAY_GOB_PATHS_FOR.get();
+	Set<PathCategory> selected = new HashSet<>(CFG.DISPLAY_GOB_PATHS_FOR.get());
 	if(CFG.QUEUE_PATHS.get() && path != null) {
-	    categorized.put(PathCategory.QUEUED, path.lines());
-	    selected.add(PathCategory.QUEUED);
-	    selected.add(PathCategory.ME);
+	    List<Pair<Coord3f, Coord3f>> lines = path.lines();
+	    categorized.put(PathCategory.QUEUED, lines);
+	    if(!selected.contains(PathCategory.ME) && lines.size() > 1) {
+		selected.add(PathCategory.ME);
+	    }
+	    if(selected.contains(PathCategory.ME)) {selected.add(PathCategory.QUEUED);}
 	}
     
 	for (PathCategory cat : PathCategory.values()) {
@@ -240,6 +243,7 @@ public class PathVisualizer implements RenderTree.Node {
 			changed = categories.remove(cat);
 		    }
 		    if(changed) {
+			categories.remove(PathCategory.QUEUED);
 			CFG.DISPLAY_GOB_PATHS_FOR.set(categories);
 		    }
 		});
