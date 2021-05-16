@@ -37,8 +37,6 @@ import java.nio.file.*;
 import java.security.*;
 import javax.imageio.*;
 import java.awt.image.BufferedImage;
-import java.util.jar.JarEntry;
-import java.util.jar.JarFile;
 
 public class Resource implements Serializable {
     private static ResCache prscache;
@@ -297,25 +295,20 @@ public class Resource implements Serializable {
 	}
     }
     
-    public static class RemoteJarSource implements ResSource, Serializable {
-	private final JarFile jar;
-	private final String path;
-	
-	public RemoteJarSource(String path) throws IOException {
-	    this.path = path;
-	    jar = new JarFile(path);
+    public static class CustomizedJarSource extends JarSource {
+	public CustomizedJarSource(String base) {
+	    super(base);
 	}
 	
 	public InputStream get(String name) throws FileNotFoundException {
-	    try {
-		return jar.getInputStream(new JarEntry("res/" + name + ".res"));
-	    } catch (Throwable t) {
-		throw (new FileNotFoundException(String.format("Could not find resource in 'remote' jar <%s>: %s", path, name)));
+	    if(name.contains("gfx/terobjs/cupboard") && !CFG.FLAT_CUPBOARDS.get()) {
+		throw new FileNotFoundException("Could not find resource locally: " + name);
 	    }
+	    return super.get(name);
 	}
 	
 	public String toString() {
-	    return ("'remote' jar source");
+	    return ("'custom' jar source");
 	}
     }
     
@@ -770,7 +763,7 @@ public class Resource implements Serializable {
 	if(_remote == null) {
 	    synchronized(Resource.class) {
 		if(_remote == null) {
-		    Pool remote = new Pool(local(), new JarSource("res-preload"));
+		    Pool remote = new Pool(local(), new CustomizedJarSource("customized-remote"), new JarSource("res-preload"));
 		    if(prscache != null)
 			remote.add(new CacheSource(prscache));
 		    _remote = remote;;
