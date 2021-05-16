@@ -58,9 +58,13 @@ public class PathVisualizer implements RenderTree.Node {
 	    } catch (Loading ignored) {}
 	}
     
-	if(CFG.QUEUE_PATHS.get() && path != null) {categorized.put(PathCategory.QUEUED, path.lines());}
-    
 	Set<PathCategory> selected = CFG.DISPLAY_GOB_PATHS_FOR.get();
+	if(CFG.QUEUE_PATHS.get() && path != null) {
+	    categorized.put(PathCategory.QUEUED, path.lines());
+	    selected.add(PathCategory.QUEUED);
+	    selected.add(PathCategory.ME);
+	}
+    
 	for (PathCategory cat : PathCategory.values()) {
 	    List<Pair<Coord3f, Coord3f>> lines = categorized.get(cat);
 	    MovingPath path = paths.get(cat);
@@ -224,6 +228,7 @@ public class PathVisualizer implements RenderTree.Node {
 	    int y = 0;
 	    Set<PathCategory> selected = CFG.DISPLAY_GOB_PATHS_FOR.get();
 	    for (PathCategory cat : PathCategory.values()) {
+		if(cat == PathCategory.QUEUED) {continue;}
 		CheckBox box = add(new CheckBox(pretty(cat.name()), false), 0, y);
 		box.a = selected.contains(cat);
 		box.changed(val -> {
