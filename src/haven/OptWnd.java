@@ -32,11 +32,14 @@ import java.util.LinkedList;
 import java.awt.event.KeyEvent;
 import java.util.Set;
 
+import static haven.Text.*;
+
 public class OptWnd extends WindowX {
     public static final Coord PANEL_POS = new Coord(220, 30);
     public static final Coord Q_TYPE_PADDING = new Coord(3, 0);
-    private final Panel display, general, camera, shortcuts, mapping;
+    private final Panel display, general, camera, shortcuts, mapping, uipanel, combat;
     public final Panel main, video, audio, keybind;
+    private static final Text.Foundry LBL_FNT = new Text.Foundry(sans, 14);
     public Panel current;
     private WidgetList<KeyBinder.ShortcutWidget> shortcutList;
     
@@ -573,27 +576,38 @@ public class OptWnd extends WindowX {
 	audio = add(new Panel());
 	keybind = add(new BindingPanel(main));
 	display = add(new Panel());
+	uipanel = add(new Panel());
+	combat = add(new Panel());
 	general = add(new Panel());
 	camera = add(new Panel());
 	shortcuts = add(new Panel());
 	mapping = add(new Panel());
 
-	addPanelButton("Video settings", 'v', video, 0, 0);
-	addPanelButton("Audio settings", 'a', audio, 0, 1);
-	addPanelButton("Camera settings", 'c', camera, 0, 2);
-	addPanelButton("Widget shortcuts", 'k', keybind, 0, 3);
+	int row = 0, colum = 0, mrow = 1;
+	
+	addPanelButton("Video settings", 'v', video, colum, row++);
+	addPanelButton("Audio settings", 'a', audio, colum, row++);
+	addPanelButton("Camera settings", 'c', camera, colum, row++);
+	addPanelButton("Widget shortcuts", 'k', keybind, colum, row++);
+	addPanelButton("Global shortcuts", 's', shortcuts, colum, row++);
+    
+	colum++;
+	mrow = Math.max(mrow, row);
+	row = 0;
 
-	addPanelButton("General settings", 'g', general, 1, 0);
-	addPanelButton("Display settings", 'd', display, 1, 1);
-	addPanelButton("Mapping settings", 'm', mapping, 1, 2);
-	addPanelButton("Global shortcuts", 's', shortcuts, 1, 3);
+	addPanelButton("General", 'g', general, colum, row++);
+	addPanelButton("UI", 'u', uipanel, colum, row++);
+	addPanelButton("Display", 'd', display, colum, row++);
+	addPanelButton("Combat", 'b', combat, colum, row++);
+	addPanelButton("Map upload", 'm', mapping, colum, row++);
 
 	int y = 0;
+	mrow = Math.max(mrow, row);
 	Widget prev;
 	//y = main.add(new PButton(UI.scale(200), "Video settings", 'v', video), 0, y).pos("bl").adds(0, 5).y;
 	//y = main.add(new PButton(UI.scale(200), "Audio settings", 'a', audio), 0, y).pos("bl").adds(0, 5).y;
 	//y = main.add(new PButton(UI.scale(200), "Keybindings", 'k', keybind), 0, y).pos("bl").adds(0, 5).y;
-	y += UI.scale(5 * PANEL_POS.y);
+	y += UI.scale((mrow + 1) * PANEL_POS.y);
 	if(gopts) {
 	    y = main.add(new Button(UI.scale(200), "Switch character", false).action(() -> {
 			getparent(GameUI.class).act("lo", "cs");
@@ -666,10 +680,12 @@ public class OptWnd extends WindowX {
 	audio.pack();
 
 	chpanel(this.main);
-	initDisplayPanel();
-	initGeneralPanel();
+	initDisplayPanel(display);
+	initUIPanel(uipanel);
+	initCombatPanel(combat);
+	initGeneralPanel(general);
 	initCameraPanel();
-	initMappingPanel();
+	initMappingPanel(mapping);
 	main.pack();
 	chpanel(main);
     }
@@ -746,13 +762,20 @@ public class OptWnd extends WindowX {
     }
 
 
-    private void initGeneralPanel() {
-	int x = 0;
-	int y = 0, my = 0;
+    private void initGeneralPanel(Panel panel) {
 	int STEP = UI.scale(25);
+	int START;
+	int x, y;
+	int my = 0, tx;
     
-	int tx = x + general.add(new Label("Language (requires restart):"), x, y).sz.x + UI.scale(5);
-	general.add(new Dropbox<String>(UI.scale(80), 5, UI.scale(16)) {
+	Widget title = panel.add(new Label("General settings", LBL_FNT), 0, 0);
+	START = title.sz.y + UI.scale(10);
+    
+	x = 0;
+	y = START;
+    
+	tx = x + panel.add(new Label("Language (requires restart):"), x, y).sz.x + UI.scale(5);
+	panel.add(new Dropbox<String>(UI.scale(80), 5, UI.scale(16)) {
 	    @Override
 	    protected String listitem(int i) {
 		return L10N.LANGUAGES.get(i);
@@ -776,79 +799,39 @@ public class OptWnd extends WindowX {
 	}, tx, y).change(L10N.LANGUAGE.get());
     
 	y += STEP;
-	general.add(new CFGBox("Output missing translation lines", L10N.DBG), x, y);
+	panel.add(new CFGBox("Output missing translation lines", L10N.DBG), x, y);
     
 	y += STEP;
-	general.add(new CFGBox("Force hardware cursor", CFG.FORCE_HW_CURSOR, null, true), x, y);
-    
-	y += STEP;
-	tx = x + general.add(new Label("UI Theme:"), x, y).sz.x + UI.scale(5);
-	general.add(new Dropbox<Theme>(UI.scale(100), 5, UI.scale(16)) {
-	    @Override
-	    protected Theme listitem(int i) {
-		return Theme.values()[i];
-	    }
-
-	    @Override
-	    protected int listitems() {
-		return Theme.values().length;
-	    }
-
-	    @Override
-	    protected void drawitem(GOut g, Theme item, int i) {
-		g.atext(item.name(), UI.scale(3, 8), 0, 0.5);
-	    }
-
-	    @Override
-	    public void change(Theme item) {
-		super.change(item);
-		if(!item.equals(CFG.THEME.get())) CFG.THEME.set(item, true);
-	    }
-	}, tx, y).change(CFG.THEME.get());
+	panel.add(new CFGBox("Force hardware cursor", CFG.FORCE_HW_CURSOR, null, true), x, y);
 	
 	y += STEP;
-	general.add(new CFGBox("Enable path queueing", CFG.QUEUE_PATHS, "ALT+LClick will queue movement"), x, y);
-	
-	y += STEP;
-	general.add(new CFGBox("Store minimap tiles", CFG.STORE_MAP), x, y);
+	panel.add(new CFGBox("Store minimap tiles", CFG.STORE_MAP), x, y);
     
 	y += STEP;
-	general.add(new CFGBox("Store chat logs", CFG.STORE_CHAT_LOGS, "Logs are stored in 'chats' folder"), new Coord(x, y));
+	panel.add(new CFGBox("Store chat logs", CFG.STORE_CHAT_LOGS, "Logs are stored in 'chats' folder"), new Coord(x, y));
     
 	y += STEP;
-	general.add(new CFGBox("Single item CTRL choose", CFG.MENU_SINGLE_CTRL_CLICK, "If checked, will automatically select single item menus if CTRL is pressed when menu is opened."), x, y);
+	panel.add(new CFGBox("Enable path queueing", CFG.QUEUE_PATHS, "ALT+LClick will queue movement"), x, y);
     
 	y += STEP;
-	general.add(new CFGBox("Add \"Pick All\" option", CFG.MENU_ADD_PICK_ALL, "If checked, will add new option that will allow to pick all same objects."), x, y);
+	Coord tsz = panel.add(new Label("Default speed:"), x, y).sz;
+	panel.adda(new Speedget.SpeedSelector(UI.scale(100)), new Coord(x + tsz.x + UI.scale(5), y + tsz.y / 2), 0, 0.5);
     
-	y += STEP;
-	general.add(new CFGBox("Always show UI on start", CFG.DISABLE_UI_HIDING), x, y);
-	
-	y += STEP;
-	general.add(new CFGBox("Show F-key tool bar", CFG.SHOW_TOOLBELT_0), x, y);
-    
-	y += STEP;
-	general.add(new CFGBox("Show extra tool bar", CFG.SHOW_TOOLBELT_1), x, y);
-	
-	y += STEP;
-	Coord tsz = general.add(new Label("Default speed:"), x, y).sz;
-	general.adda(new Speedget.SpeedSelector(UI.scale(100)), new Coord(x + tsz.x + UI.scale(5), y + tsz.y / 2), 0, 0.5);
-    
-	y += STEP;
-	general.add(new CFGBox("Auto pickup only visible", CFG.AUTO_PICK_ONLY_RADAR, "If on will pickup only objects with enabled minimap icons"), x, y);
-	
-	y += STEP;
-	Label label = general.add(new Label(String.format("Auto pickup radius: %.2f", CFG.AUTO_PICK_RADIUS.get() / 11.0)), x, y);
+	y += 2 * STEP;
+	Label label = panel.add(new Label(String.format("Auto pickup radius: %.2f", CFG.AUTO_PICK_RADIUS.get() / 11.0)), x, y);
 	y += UI.scale(15);
-	general.add(new CFGHSlider(UI.scale(150), CFG.AUTO_PICK_RADIUS, 33, 352) {
+	panel.add(new CFGHSlider(UI.scale(150), CFG.AUTO_PICK_RADIUS, 33, 352) {
 	    @Override
 	    public void changed() {
 		label.settext(String.format("Auto pickup radius: %.02f", val / 11.0));
 	    }
 	}, x, y);
     
-	y += UI.scale(35);
-	general.add(new Button(UI.scale(150), "Warning settings", false) {
+	y += STEP;
+	panel.add(new CFGBox("Auto pickup only visible", CFG.AUTO_PICK_ONLY_RADAR, "If on will pickup only objects with enabled minimap icons"), x, y);
+    
+	y += 2 * STEP;
+	panel.add(new Button(UI.scale(150), "Warning settings", false) {
 	    @Override
 	    public void click() {
 		if(ui.gui != null) {
@@ -860,7 +843,7 @@ public class OptWnd extends WindowX {
 	}, x, y);
  
 	y += STEP;
-	general.add(new Button(UI.scale(150), "Toggle at login", false) {
+	panel.add(new Button(UI.scale(150), "Toggle at login", false) {
 	    @Override
 	    public void click() {
 		if(ui.gui != null) {
@@ -873,14 +856,14 @@ public class OptWnd extends WindowX {
     
 	my = Math.max(my, y);
 	x += UI.scale(250);
-	y = 0;
+	y = START;
     
-	general.add(new Label("Choose menu items to select automatically:"), x, y);
+	panel.add(new Label("Choose menu items to select automatically:"), x, y);
 	y += UI.scale(15);
-	final FlowerList list = general.add(new FlowerList(), x, y);
+	final FlowerList list = panel.add(new FlowerList(), x, y);
     
 	y += list.sz.y + UI.scale(5);
-	final TextEntry value = general.add(new TextEntry(UI.scale(160), "") {
+	final TextEntry value = panel.add(new TextEntry(UI.scale(160), "") {
 	    @Override
 	    public void activate(String text) {
 		list.add(text);
@@ -888,7 +871,7 @@ public class OptWnd extends WindowX {
 	    }
 	}, x, y);
     
-	general.add(new Button(UI.scale(85), "Add") {
+	panel.add(new Button(UI.scale(85), "Add") {
 	    @Override
 	    public void click() {
 		list.add(value.text);
@@ -897,8 +880,8 @@ public class OptWnd extends WindowX {
 	}, x + UI.scale(165), y - UI.scale(2));
     
 	y += STEP;
-	tx = x + general.add(new Label("Hold to ignore auto choose:"), x, y).sz.x + UI.scale(5);
-	general.add(new Dropbox<UI.KeyMod>(UI.scale(100), 5, UI.scale(16)) {
+	tx = x + panel.add(new Label("Hold to ignore auto choose:"), x, y).sz.x + UI.scale(5);
+	panel.add(new Dropbox<UI.KeyMod>(UI.scale(100), 5, UI.scale(16)) {
 	    @Override
 	    protected UI.KeyMod listitem(int i) {
 		return UI.KeyMod.values()[i];
@@ -921,37 +904,50 @@ public class OptWnd extends WindowX {
 	    }
 	}, tx, y).change(CFG.MENU_SKIP_AUTO_CHOOSE.get());
     
+	y += STEP;
+	panel.add(new CFGBox("Single item CTRL choose", CFG.MENU_SINGLE_CTRL_CLICK, "If checked, will automatically select single item menus if CTRL is pressed when menu is opened."), x, y);
+    
+	y += STEP;
+	panel.add(new CFGBox("Add \"Pick All\" option", CFG.MENU_ADD_PICK_ALL, "If checked, will add new option that will allow to pick all same objects."), x, y);
+    
 	my = Math.max(my, y);
     
-	general.add(new PButton(UI.scale(200), "Back", 27, main), 0, my + UI.scale(35));
-	general.pack();
+	panel.add(new PButton(UI.scale(200), "Back", 27, main), 0, my + UI.scale(35));
+	panel.pack();
+	title.c.x = (panel.sz.x - title.sz.x) / 2;
     }
 
-    private void initDisplayPanel() {
-	int x = 0;
-	int y = 0;
-	int my = 0;
+    private void initDisplayPanel(Panel panel) {
 	int STEP = UI.scale(25);
-	display.add(new CFGBox("Always show kin names", CFG.DISPLAY_KINNAMES), new Coord(x, y));
+	int START;
+	int x, y;
+	int my = 0, tx;
     
-	y += STEP;
-	display.add(new CFGBox("Play sound when kin changes status", CFG.DISPLAY_KINSFX), x, y);
+	Widget title = panel.add(new Label("Display settings", LBL_FNT), 0, 0);
+	START = title.sz.y + UI.scale(10);
     
-	y += STEP;
-	display.add(new CFGBox("Show flavor objects", CFG.DISPLAY_FLAVOR), new Coord(x, y));
-
-	y += STEP;
-	display.add(new CFGBox("Show gob info", CFG.DISPLAY_GOB_INFO, "Enables damage and crop/tree growth stage displaying", true), x, y);
-    
-	y += STEP;
-	display.add(new CFGBox("Show gob hitboxes", CFG.DISPLAY_GOB_HITBOX, "Enables hitboxes around all objects", true), x, y);
+	x = 0;
+	y = START;
+	panel.add(new CFGBox("Show flavor objects", CFG.DISPLAY_FLAVOR, "Requires restart"), x, y);
 	
 	y += STEP;
-	display.add(new CFGBox("Draw hitboxes on top", CFG.DISPLAY_GOB_HITBOX_TOP, "Draws hitboxes on top of everything", true), x, y);
- 
+	panel.add(new CFGBox("Simple crops", CFG.SIMPLE_CROPS, "Requires area reload"), x, y);
+	
 	y += STEP;
-	int tx = display.add(new CFGBox("Draw gob paths", CFG.DISPLAY_GOB_PATHS, "Draws lines where gobs are moving", true), x, y).sz.x;
-	display.add(new IButton("gfx/hud/opt", "", "-d", "-h") {
+	panel.add(new CFGBox("Always show kin names", CFG.DISPLAY_KINNAMES), x, y);
+	
+	y += STEP;
+	panel.add(new CFGBox("Play sound when kin changes status", CFG.DISPLAY_KINSFX), x, y);
+    
+	y += STEP;
+	panel.add(new CFGBox("Show task status messages", CFG.SHOW_BOT_MESSAGES, "Will log task (like auto-pickup or auto-drink) status to system log"), x, y);
+
+	y += STEP;
+	panel.add(new CFGBox("Show object info", CFG.DISPLAY_GOB_INFO, "Enables damage and crop/tree growth stage displaying", true), x, y);
+    
+	y += STEP;
+	tx = panel.add(new CFGBox("Draw paths", CFG.DISPLAY_GOB_PATHS, "Draws lines where objects are moving", true), x, y).sz.x;
+	panel.add(new IButton("gfx/hud/opt", "", "-d", "-h") {
 	    @Override
 	    public void click() {
 		if(ui.gui != null) {
@@ -962,32 +958,11 @@ public class OptWnd extends WindowX {
 	    }
 	}, x + tx + UI.scale(10), y + UI.scale(1));
 	
-	y += STEP;
-	display.add(new CFGBox("Show food categories", CFG.DISPLAY_FOD_CATEGORIES, "Shows list of food categories in the tooltip", true), x, y);
-
-	y += STEP;
-	display.add(new CFGBox("Show timestamps in chat messages", CFG.SHOW_CHAT_TIMESTAMP), new Coord(x, y));
-
-	y += STEP;
-	display.add(new CFGBox("Swap item quality and number", CFG.SWAP_NUM_AND_Q), x, y);
-
-	y += STEP;
-	display.add(new CFGBox("Show item progress as number", CFG.PROGRESS_NUMBER), x, y);
-
-	y += STEP;
-	display.add(new CFGBox("Show biomes on minimap", CFG.MMAP_SHOW_BIOMES), x, y);
-
-	y += STEP;
-	display.add(new CFGBox("Show queued path on minimap", CFG.MMAP_SHOW_PATH), x, y);
-
-	y += STEP;
-	display.add(new CFGBox("Simple crops", CFG.SIMPLE_CROPS, "Requires area reload"), x, y);
-
 	y += 35;
-	display.add(new CFGBox("Show object radius", CFG.SHOW_GOB_RADIUS, "Shows radius of mine supports, beehives etc.", true), x, y);
+	panel.add(new CFGBox("Show object radius", CFG.SHOW_GOB_RADIUS, "Shows radius of mine supports, beehives etc.", true), x, y);
 
 	y += STEP;
-	display.add(new Button(UI.scale(150), "Show as buffs", false) {
+	panel.add(new Button(UI.scale(150), "Show as buffs", false) {
 	    @Override
 	    public void click() {
 		if(ui.gui != null) {
@@ -997,51 +972,61 @@ public class OptWnd extends WindowX {
 		}
 	    }
 	}, x, y);
+ 
+	my = Math.max(my, y);
 
-	my = Math.max(my, y);
-	x += UI.scale(250);
-	y = 0;
-	my = Math.max(my, y);
-	display.add(new CFGBox("Show item quality", CFG.Q_SHOW_SINGLE), x, y);
+	panel.add(new PButton(UI.scale(200), "Back", 27, main), new Coord(0, my + UI.scale(35)));
+	panel.pack();
+	title.c.x = (panel.sz.x - title.sz.x) / 2;
+    }
+    
+    private void initUIPanel(Panel panel) {
+	int STEP = UI.scale(25);
+	int START;
+	int x, y;
+	int my = 0, tx;
+    
+	Widget title = panel.add(new Label("UI settings", LBL_FNT), 0, 0);
+	START = title.sz.y + UI.scale(10); 
+	
+	x = 0;
+    	y = START;
+	//first row
+	tx = x + panel.add(new Label("UI Theme:"), x, y).sz.x + UI.scale(5);
+	panel.add(new Dropbox<Theme>(UI.scale(100), 5, UI.scale(16)) {
+	    @Override
+	    protected Theme listitem(int i) {
+		return Theme.values()[i];
+	    }
+	
+	    @Override
+	    protected int listitems() {
+		return Theme.values().length;
+	    }
+	
+	    @Override
+	    protected void drawitem(GOut g, Theme item, int i) {
+		g.atext(item.name(), UI.scale(3, 8), 0, 0.5);
+	    }
+	
+	    @Override
+	    public void change(Theme item) {
+		super.change(item);
+		if(!item.equals(CFG.THEME.get())) CFG.THEME.set(item, true);
+	    }
+	}, tx, y).change(CFG.THEME.get());
+    
+	y += STEP;
+	panel.add(new CFGBox("Always show UI on start", CFG.DISABLE_UI_HIDING), x, y);
+    
+	y += STEP;
+	panel.add(new CFGBox("Show F-key tool bar", CFG.SHOW_TOOLBELT_0), x, y);
+    
+	y += STEP;
+	panel.add(new CFGBox("Show extra tool bar", CFG.SHOW_TOOLBELT_1), x, y);
 	
 	y += STEP;
-	display.add(new CFGBox("Real time curios", CFG.REAL_TIME_CURIO, "Show curiosity study time in real life hours, instead of server hours"), new Coord(x, y));
-
-	y += STEP;
-	display.add(new CFGBox("Display curio remaining time in tooltip", CFG.SHOW_CURIO_REMAINING_TT), new Coord(x, y));
-
-	y += STEP;
-	display.add(new CFGBox("Display curio remaining time instead of progress", CFG.SHOW_CURIO_REMAINING_METER), new Coord(x, y));
-
-	y += STEP;
-	display.add(new CFGBox("Show LP/H for curios", CFG.SHOW_CURIO_LPH, "Show how much learning point curio gives per hour"), new Coord(x, y));
-
-	y += STEP;
-	display.add(new CFGBox("Show item durability", CFG.SHOW_ITEM_DURABILITY), new Coord(x, y));
-
-	y += STEP;
-	display.add(new CFGBox("Show item wear bar", CFG.SHOW_ITEM_WEAR_BAR), new Coord(x, y));
-
-	y += STEP;
-	display.add(new CFGBox("Show item armor", CFG.SHOW_ITEM_ARMOR), new Coord(x, y));
-
-	y += STEP;
-	display.add(new CFGBox("Show hunger meter", CFG.HUNGER_METER) {
-	    @Override
-	    public void set(boolean a) {
-		super.set(a);
-		if(ui.gui != null && ui.gui.chrwdg != null) {
-		    if(a) {
-			ui.gui.addcmeter(new HungerMeter(ui.gui.chrwdg.glut));
-		    } else {
-			ui.gui.delcmeter(HungerMeter.class);
-		    }
-		}
-	    }
-	}, x, y);
-
-	y += STEP;
-	display.add(new CFGBox("Show FEP meter", CFG.FEP_METER) {
+	panel.add(new CFGBox("Show FEP meter", CFG.FEP_METER) {
 	    @Override
 	    public void set(boolean a) {
 		super.set(a);
@@ -1054,40 +1039,120 @@ public class OptWnd extends WindowX {
 		}
 	    }
 	}, x, y);
+    
+	y += STEP;
+	panel.add(new CFGBox("Show hunger meter", CFG.HUNGER_METER) {
+	    @Override
+	    public void set(boolean a) {
+		super.set(a);
+		if(ui.gui != null && ui.gui.chrwdg != null) {
+		    if(a) {
+			ui.gui.addcmeter(new HungerMeter(ui.gui.chrwdg.glut));
+		    } else {
+			ui.gui.delcmeter(HungerMeter.class);
+		    }
+		}
+	    }
+	}, x, y);
 	
 	y += STEP;
-	display.add(new CFGBox("Show Task Messages", CFG.SHOW_BOT_MESSAGES), x, y);
- 
+	panel.add(new CFGBox("Show timestamps in chat messages", CFG.SHOW_CHAT_TIMESTAMP), new Coord(x, y));
+    
+	y += STEP;
+	panel.add(new CFGBox("Show food categories", CFG.DISPLAY_FOD_CATEGORIES, "Shows list of food categories in the tooltip", true), x, y);
+    
+	y += STEP;
+	panel.add(new CFGBox("Show biomes on minimap", CFG.MMAP_SHOW_BIOMES), x, y);
+    
+	y += STEP;
+	panel.add(new CFGBox("Show queued path on minimap", CFG.MMAP_SHOW_PATH), x, y);
+    
+	//second row
 	my = Math.max(my, y);
 	x += UI.scale(265);
-	y = 0;
-	display.add(new CFGBox("Use new combat UI", CFG.ALT_COMBAT_UI), x, y);
+	y = START;
+	panel.add(new CFGBox("Real time curios", CFG.REAL_TIME_CURIO, "Show curiosity study time in real life hours, instead of server hours"), new Coord(x, y));
     
 	y += STEP;
-	display.add(new CFGBox("Always mark current target", CFG.ALWAYS_MARK_COMBAT_TARGET , "Usually current target only marked when there's more than one"), x, y);
+	panel.add(new CFGBox("Display curio remaining time in tooltip", CFG.SHOW_CURIO_REMAINING_TT), new Coord(x, y));
     
 	y += STEP;
-	display.add(new CFGBox("Auto peace on combat start", CFG.COMBAT_AUTO_PEACE , "Automatically enter peacfull mode on combat start id enemy is aggressive - useful for taming"), x, y);
-	
+	panel.add(new CFGBox("Display curio remaining time instead of progress", CFG.SHOW_CURIO_REMAINING_METER), new Coord(x, y));
+    
 	y += STEP;
-	display.add(new CFGBox("Show combat damage", CFG.SHOW_COMBAT_DMG), x, y);
-	
+	panel.add(new CFGBox("Show LP/H for curios", CFG.SHOW_CURIO_LPH, "Show how much learning point curio gives per hour"), new Coord(x, y));
+    
+	y += 2*STEP;
+	panel.add(new CFGBox("Show item quality", CFG.Q_SHOW_SINGLE), x, y);
+    
 	y += STEP;
-	display.add(new CFGBox("Clear player damage after combat", CFG.CLEAR_PLAYER_DMG_AFTER_COMBAT), x, y);
-	
+	panel.add(new CFGBox("Swap item quality and number", CFG.SWAP_NUM_AND_Q), x, y);
+    
 	y += STEP;
-	display.add(new CFGBox("Clear all damage after combat", CFG.CLEAR_ALL_DMG_AFTER_COMBAT), x, y);
-	
+	panel.add(new CFGBox("Show item progress as number", CFG.PROGRESS_NUMBER), x, y);
+    
 	y += STEP;
-	display.add(new CFGBox("Simplified combat openings", CFG.SIMPLE_COMBAT_OPENINGS, "Show openings as solid colors with numbers"), x, y);
-	
+	panel.add(new CFGBox("Show item durability", CFG.SHOW_ITEM_DURABILITY), new Coord(x, y));
+    
 	y += STEP;
-	display.add(new CFGBox("Display combat keys", CFG.SHOW_COMBAT_KEYS), x, y);
+	panel.add(new CFGBox("Show item wear bar", CFG.SHOW_ITEM_WEAR_BAR), new Coord(x, y));
+    
+	y += STEP;
+	panel.add(new CFGBox("Show item armor", CFG.SHOW_ITEM_ARMOR), new Coord(x, y));
 	
 	my = Math.max(my, y);
-
-	display.add(new PButton(UI.scale(200), "Back", 27, main), new Coord(0, my + UI.scale(35)));
-	display.pack();
+    
+	panel.add(new PButton(UI.scale(200), "Back", 27, main), new Coord(0, my + UI.scale(35)));
+	panel.pack();
+	title.c.x = (panel.sz.x - title.sz.x) / 2;
+    }
+    
+    private void initCombatPanel(Panel panel) {
+	int STEP = UI.scale(25);
+	int START;
+	int x, y;
+	int my = 0, tx;
+    
+	Widget title = panel.add(new Label("Combat settings", LBL_FNT), 0, 0);
+	START = title.sz.y + UI.scale(10);
+    
+	x = 0;
+	y = START;
+	//first row
+	panel.add(new CFGBox("Use new combat UI", CFG.ALT_COMBAT_UI), x, y);
+    
+	y += STEP;
+	panel.add(new CFGBox("Always mark current target", CFG.ALWAYS_MARK_COMBAT_TARGET , "Usually current target only marked when there's more than one"), x, y);
+    
+	y += STEP;
+	panel.add(new CFGBox("Auto peace on combat start", CFG.COMBAT_AUTO_PEACE , "Automatically enter peaceful mode on combat start id enemy is aggressive - useful for taming"), x, y);
+    
+	y += STEP;
+	panel.add(new CFGBox("Show combat damage", CFG.SHOW_COMBAT_DMG), x, y);
+    
+	y += STEP;
+	panel.add(new CFGBox("Clear player damage after combat", CFG.CLEAR_PLAYER_DMG_AFTER_COMBAT), x, y);
+    
+	y += STEP;
+	panel.add(new CFGBox("Clear all damage after combat", CFG.CLEAR_ALL_DMG_AFTER_COMBAT), x, y);
+    
+	y += STEP;
+	panel.add(new CFGBox("Simplified combat openings", CFG.SIMPLE_COMBAT_OPENINGS, "Show openings as solid colors with numbers"), x, y);
+    
+	y += STEP;
+	panel.add(new CFGBox("Display combat keys", CFG.SHOW_COMBAT_KEYS), x, y);
+	
+	//second row
+	my = Math.max(my, y);
+	x += UI.scale(265);
+	y = START;
+	
+	
+	my = Math.max(my, y);
+    
+	panel.add(new PButton(UI.scale(200), "Back", 27, main), new Coord(0, my + UI.scale(35)));
+	panel.pack();
+	title.c.x = (panel.sz.x - title.sz.x) / 2;
     }
 
     private void populateShortcutsPanel(KeyBinder.KeyBindType type) {
@@ -1123,20 +1188,28 @@ public class OptWnd extends WindowX {
 	shortcuts.pack();
     }
     
-    private void initMappingPanel() {
-	int x = 0, y = 0;
+    private void initMappingPanel(Panel panel) {
 	int STEP = UI.scale(25);
+	int START;
+	int x, y;
+	int my = 0, tx;
+    
+	Widget title = panel.add(new Label("Map upload settings", LBL_FNT), 0, 0);
+	START = title.sz.y + UI.scale(10);
+    
+	x = 0;
+	y = START;
 	
-	mapping.add(new CFGBox("Upload enabled", CFG.AUTOMAP_UPLOAD), x, y);
+	panel.add(new CFGBox("Upload enabled", CFG.AUTOMAP_UPLOAD), x, y);
 	y += STEP;
 	
-	mapping.add(new CFGBox("Tracking enabled", CFG.AUTOMAP_TRACK), x, y);
+	panel.add(new CFGBox("Tracking enabled", CFG.AUTOMAP_TRACK), x, y);
 	y += STEP;
 	
-	mapping.add(new Label("Mapping URL:"), x, y);
+	panel.add(new Label("Mapping URL:"), x, y);
 	y += STEP;
 	
-	mapping.add(new TextEntry(UI.scale(250), CFG.AUTOMAP_ENDPOINT.get()) {
+	panel.add(new TextEntry(UI.scale(250), CFG.AUTOMAP_ENDPOINT.get()) {
 	    @Override
 	    public boolean keydown(KeyEvent ev) {
 		if(!parent.visible)
@@ -1147,10 +1220,10 @@ public class OptWnd extends WindowX {
 	}, x, y);
  
 	y += STEP;
-	mapping.add(new Label("Upload custom markers:"), x, y);
+	panel.add(new Label("Upload custom markers:"), x, y);
  
 	y += STEP;
-	mapping.add(new BuddyWnd.GroupSelector(-1) {
+	panel.add(new BuddyWnd.GroupSelector(-1) {
 	    {
 		Set<BuddyWnd.Group> groups = CFG.AUTOMAP_MARKERS.get();
 		for (BuddyWnd.Group g : groups) {
@@ -1181,9 +1254,9 @@ public class OptWnd extends WindowX {
  
 	y += STEP;
 	
-	mapping.add(new PButton(UI.scale(200), "Back", 27, main), x, y);
-	
-	mapping.pack();
+	panel.add(new PButton(UI.scale(200), "Back", 27, main), x, y);
+	panel.pack();
+	title.c.x = (panel.sz.x - title.sz.x) / 2;
     }
     
     public OptWnd() {
