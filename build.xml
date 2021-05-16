@@ -84,6 +84,7 @@
       <arg line="-jar resources/LayerUtil.jar -re resources/src/remote resources/compiled/res-preload" />
     </exec>
     <jar destfile="build/client-res.jar" update="true">
+      <fileset dir="resources/pre-compiled" />
       <fileset dir="resources/compiled" />
       <fileset dir="resources" includes="item_data/**"/>
       <file file="etc/radar.json"/>
