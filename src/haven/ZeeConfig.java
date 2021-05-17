@@ -421,9 +421,13 @@ public class ZeeConfig {
 
         if(!windowEquipment.visible) {
             //from Equipory.drawslots()
-            Equipory.SlotInfo si = ItemInfo.find(Equipory.SlotInfo.class, gameUI.vhand.item.info());
-            if (si != null) {
-                windowEquipment.show();
+            if((gameUI != null) && (gameUI.vhand != null)) {
+                try {
+                    Equipory.SlotInfo si = ItemInfo.find(Equipory.SlotInfo.class, gameUI.vhand.item.info());
+                    if(si != null)
+                        windowEquipment.show();
+                } catch(Loading l) {
+                }
             }
         }else if(done){
             windowEquipment.hide();
