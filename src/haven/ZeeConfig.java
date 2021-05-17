@@ -46,6 +46,7 @@ public class ZeeConfig {
     public static boolean autoOpenEquips = Utils.getprefb("beltToggleEquips", true);
     public static boolean cattleRosterHeight = Utils.getprefb("cattleRosterHeight", false);
     public static double cattleRosterHeightPercentage = Utils.getprefd("cattleRosterHeightPercentage", 1.0);
+    public static boolean cursorModeAWT = Utils.getprefb("cursorModeAWT", false);
     public static boolean dropMinedCurios = Utils.getprefb("dropMinedCurios", true);
     public static boolean dropMinedOre = Utils.getprefb("dropMinedOre", true);
     public static boolean dropMinedSilverGold = Utils.getprefb("dropMinedOrePrecious", true);
@@ -146,7 +147,6 @@ public class ZeeConfig {
     public static HashMap<String, Color> mapGobColor = initMapGobColor();
     public static HashMap<String,Color> mapCategoryColor = initMapCategoryColor();
     public static HashMap<String,Coord> mapWindowPos = initMapWindowPos();
-
 
 
     public static void checkRemoteWidget(String type, Widget wdg) {
@@ -735,26 +735,6 @@ public class ZeeConfig {
             throw new UncheckedIOException(ioe);
         }
     }
-
-    public static void gobSetType(String gobName, long gobId) {
-        if(gobName==null || gobName.isEmpty())
-            return;
-
-        if(gobName.startsWith("gfx/terobjs/trees/")) {
-
-        }else if(gobName.startsWith("gfx/terobjs/bushes/")) {
-
-        }else if(gobName.startsWith("gfx/terobjs/plants/") && !gobName.endsWith("trellis")) {
-
-        }else if(mapGobCategory.containsKey(gobName)) {
-
-        }else if(gobName.startsWith("gfx/borka/body")) {
-
-        }else if(mapGobColor.containsKey(gobName) || mapGobAudio.containsKey(gobName) || mapGobCategory.containsKey(gobName)) {
-
-        }
-    }
-
 
     public static HashMap<String,Integer> mapInvItemNameCount = new HashMap<String,Integer>();
     public static void addInvItem(GItem i) {

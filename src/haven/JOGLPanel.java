@@ -415,6 +415,10 @@ public class JOGLPanel extends GLCanvas implements Runnable, UIPanel, Console.Di
 	}catch (Exception nevermind){
 	}
 
+	if(ZeeConfig.cursorModeAWT){
+		cursmode = "awt";
+	}
+
 	if(cursmode == "awt") {
 	    if(curs != lastcursor) {
 		try {

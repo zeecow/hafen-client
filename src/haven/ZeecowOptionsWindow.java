@@ -13,7 +13,7 @@ import java.util.List;
 public class ZeecowOptionsWindow extends JFrame {
     public JTabbedPane tabbedPane, tabbedPaneGobs;
     public JPanel panelTabMisc, panelTabInterface, panelTabGobs, panelDetailsBottom, panelTabCateg;
-    public JCheckBox cbDropMinedStone, cbDropMinedOre, cbDropMinedSilverGold, cbDropMinedCurios, cbActionSearchGlobal, cbCompactEquipsWindow, cbBeltTogglesEquips, cbAutohearth, cbHighlighAggressiveGobs, cbHighlightCropsReady, cbHighlightGrowingTrees, cbAlertOnPlayers,  cbShowInventoryLogin, cbRememberWindowsPos, cbShowEquipsLogin, cbNotifyBuddyOnline, cbZoomOrthoExtended, cbAutoClickMenuOpts, cbCattleRosterHeight;
+    public JCheckBox cbDropMinedStone, cbDropMinedOre, cbDropMinedSilverGold, cbDropMinedCurios, cbActionSearchGlobal, cbCompactEquipsWindow, cbBeltTogglesEquips, cbAutohearth, cbHighlighAggressiveGobs, cbHighlightCropsReady, cbHighlightGrowingTrees, cbAlertOnPlayers,  cbShowInventoryLogin, cbCursorModeAWT, cbRememberWindowsPos, cbShowEquipsLogin, cbNotifyBuddyOnline, cbZoomOrthoExtended, cbAutoClickMenuOpts, cbCattleRosterHeight;
     public JTextField tfAutoClickMenu, tfGobName, tfAudioPath, tfCategName, tfAudioPathCateg;
     public JComboBox<String> cmbCattleRoster, cmbGobCategory;
     public JList<String> listGobsTemp, listGobsSaved, listGobsCategories;
@@ -224,6 +224,14 @@ public class ZeecowOptionsWindow extends JFrame {
             JCheckBox cb = (JCheckBox) actionEvent.getSource();
             boolean val = ZeeConfig.showInventoryLogin = cb.isSelected();
             Utils.setprefb("showInventoryLogin",val);
+        });
+
+        panelTabInterface.add(cbCursorModeAWT = new JCheckBox("Cursor mode AWT"));
+        cbCursorModeAWT.setSelected(ZeeConfig.cursorModeAWT);
+        cbCursorModeAWT.addActionListener(actionEvent -> {
+            JCheckBox cb = (JCheckBox) actionEvent.getSource();
+            boolean val = ZeeConfig.cursorModeAWT = cb.isSelected();
+            Utils.setprefb("cursorModeAWT",val);
         });
 
         panelTabInterface.add(Box.createRigidArea(new Dimension(25,25)));
