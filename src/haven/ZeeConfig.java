@@ -46,7 +46,6 @@ public class ZeeConfig {
     public static boolean autoOpenEquips = Utils.getprefb("beltToggleEquips", true);
     public static boolean cattleRosterHeight = Utils.getprefb("cattleRosterHeight", false);
     public static double cattleRosterHeightPercentage = Utils.getprefd("cattleRosterHeightPercentage", 1.0);
-    public static boolean cursorModeAWT = Utils.getprefb("cursorModeAWT", false);
     public static boolean dropMinedCurios = Utils.getprefb("dropMinedCurios", true);
     public static boolean dropMinedOre = Utils.getprefb("dropMinedOre", true);
     public static boolean dropMinedSilverGold = Utils.getprefb("dropMinedOrePrecious", true);
