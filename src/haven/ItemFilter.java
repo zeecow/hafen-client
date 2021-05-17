@@ -177,7 +177,7 @@ public class ItemFilter {
 		}
 	    }
 	    if(tag == null) {
-		filter = new Text(text, false);
+		filter = new Text(text, true);
 	    } else {
 		tag = tag.toLowerCase();
 		switch (tag) {
