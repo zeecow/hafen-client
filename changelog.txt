@@ -1,3 +1,8 @@
+$size[14]{$u{Update for 17.05.21:}
+  * merged loftar's changes
+  * fixed potential crash when equipping items
+  * added spring bumblebee to pickup list
+ 
 $size[14]{$u{Update for 16.05.21:}
   * changed options layout to (hopefully) more intuitive one
   * added option to toggle flat cupboards
