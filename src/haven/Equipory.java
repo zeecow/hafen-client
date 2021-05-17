@@ -280,6 +280,12 @@ public class Equipory extends Widget implements DTarget {
     
     public boolean has(String name) {
 	return wmap.keySet().stream()
-	    .anyMatch(item -> item.resname().contains(name));
+	    .anyMatch(item -> {
+		try {
+		    return item.resname().contains(name);
+		} catch (Loading ignored) {
+		    return false;
+		}
+	    });
     }
 }
