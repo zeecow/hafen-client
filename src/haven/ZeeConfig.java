@@ -357,7 +357,6 @@ public class ZeeConfig {
                     gameUI.error("player spotted");
             }
         }else if( (path = mapGobAudio.get(gobName)) != null){
-            System.out.println(gobName+" > playing custom audio");
             //if single gob alert is saved, play alert
             ZeeConfig.playAudio(path);
         }else {
@@ -367,7 +366,6 @@ public class ZeeConfig {
                     continue;
                 //...check if gob is in category
                 if(mapCategoryGobs.get(categ).contains(gobName)){
-                    System.out.println(gobName+" > playing category sound");
                     //play audio for category
                     path = mapCategoryAudio.get(categ);
                     ZeeConfig.playAudio(path);
