@@ -141,9 +141,9 @@ public class ExtInventory extends Widget implements DTarget {
 	int szx = 0;
 	if(inv.visible && parent != null) {
 	    szx = inv.sz.x;
-	    for (Widget widget : parent.children()) {
-		if(widget != this) {
-		    szx = Math.max(szx, widget.pos("ur").x);
+	    for (Widget w : wnd.children()) {
+		if(w != this && (wnd != parent || w != wnd.cbtn && !wnd.twdgs.contains(w))) {
+		    szx = Math.max(szx, w.pos("ur").x);
 		}
 	    }
 	}
