@@ -29,8 +29,8 @@ package haven;
 import java.awt.image.BufferedImage;
 
 public class ICheckBox extends ACheckBox {
-    public final Tex up, down, hoverup, hoverdown;
-    private final BufferedImage img;
+    public Tex up, down, hoverup, hoverdown;
+    private BufferedImage img;
     public boolean h;
 
     @RName("ichk")
@@ -74,6 +74,29 @@ public class ICheckBox extends ACheckBox {
     }
     public ICheckBox(String base, String up, String down) {
 	this(Resource.loadtex(base + up), Resource.loadtex(base + down));
+    }
+    
+    public void setTex(Tex up, Tex down, Tex hoverup, Tex hoverdown) {
+	this.up = up;
+	this.down = down;
+	this.hoverup = hoverup;
+	this.hoverdown = hoverdown;
+	if(up instanceof TexI)
+	    this.img = ((TexI)up).back;
+	else
+	    this.img = null;
+    }
+    
+    public void setTex(String base, String up, String down, String hoverup, String hoverdown) {
+	setTex(Resource.loadtex(base + up), Resource.loadtex(base + down), Resource.loadtex(base + hoverup), Resource.loadtex(base + hoverdown));
+    }
+    
+    public void setTex(String base, String up, String down, String hover) {
+	setTex(Resource.loadtex(base + up), Resource.loadtex(base + down), Resource.loadtex(base + hover));
+    }
+    
+    public void setTex(Tex up, Tex down, Tex hover) {
+	setTex(up, down, hover, down);
     }
 
     public void draw(GOut g) {

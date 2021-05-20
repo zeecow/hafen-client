@@ -38,6 +38,7 @@ public class Inventory extends Widget implements DTarget {
     public boolean dropul = true;
     private boolean canDropItems = false;
     private boolean dropEnabled = false;
+    public ExtInventory ext;
     Action0 dropsCallback;
     public Coord isz;
     public static final Comparator<WItem> ITEM_COMPARATOR_ASC = new Comparator<WItem>() {
@@ -132,6 +133,7 @@ public class Inventory extends Widget implements DTarget {
 	    if(dropEnabled) {
 		tryDrop(wmap.get(i));
 	    }
+	    if(ext != null) {ext.itemsChanged();}
 	}
     }
     
@@ -146,6 +148,7 @@ public class Inventory extends Widget implements DTarget {
 	if(w instanceof GItem) {
 	    GItem i = (GItem)w;
 	    ui.destroy(wmap.remove(i));
+	    if(ext != null) {ext.itemsChanged();}
 	}
     }
     
@@ -216,6 +219,25 @@ public class Inventory extends Widget implements DTarget {
     
     private static boolean isSame(String name, GSprite spr, GItem item) {
 	return item.resname().equals(name) && ((spr == item.spr()) || (spr != null && spr.same(item.spr())));
+    }
+    
+    public int size() {
+	return isz.x * isz.y;
+    }
+    
+    public int filled() {
+	int count = 0;
+	for (Widget wdg = lchild; wdg != null; wdg = wdg.prev) {
+	    if(wdg instanceof WItem) {
+		Coord sz = ((WItem) wdg).lsz;
+		count += sz.x * sz.y;
+	    }
+	}
+	return count;
+    }
+    
+    public int free() {
+	return size() - filled();
     }
     
     public void enableDrops() {

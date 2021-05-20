@@ -48,6 +48,7 @@ public class WItem extends Widget implements DTarget2 {
     public static final Color DURABILITY_COLOR = new Color(214, 253, 255);
     public static final Color ARMOR_COLOR = new Color(255, 227, 191);
     public static final Color MATCH_COLOR = new Color(255, 32, 255, 255);
+    public Coord lsz = new Coord(1, 1);
     public final GItem item;
     private Resource cspr = null;
     private Message csdt = Message.nil;
@@ -253,6 +254,7 @@ public class WItem extends Widget implements DTarget2 {
 	GSprite spr = item.spr();
 	if((spr != null) && (spr != lspr)) {
 	    Coord sz = new Coord(spr.sz());
+	    lsz = new Coord(((sz.x / sqsz.x) + 1), ((sz.y / sqsz.y) + 1));
 	    if((sz.x % sqsz.x) != 0)
 		sz.x = sqsz.x * ((sz.x / sqsz.x) + 1);
 	    if((sz.y % sqsz.y) != 0)

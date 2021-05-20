@@ -2,12 +2,8 @@ package haven;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
-import java.util.SortedMap;
-import java.util.TreeMap;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class ExtInventory extends Widget implements DTarget {
@@ -19,18 +15,22 @@ public class ExtInventory extends Widget implements DTarget {
     private static final Color found = new Color(255, 255, 0, 32);
     private static final String CFG_GROUP = "ext.group";
     private static final String CFG_SHOW = "ext.show";
+    private static final String CFG_INV = "ext.inv";
     public final Inventory inv;
     private final ItemGroupList list;
     private final Widget extension;
+    private final Label space;
     private SortedMap<ItemType, List<GItem>> groups;
     private final Dropbox<Grouping> grouping;
     private boolean disabled = false;
+    private boolean showInv = true;
+    private boolean needUpdate = false;
     private WindowX wnd;
-    private final ACheckBox chb_show = new ICheckBox("gfx/hud/btn-extlist", "", "-d", "-h")
-	.changed(this::setVisibility);
+    private final ICheckBox chb_show = new ICheckBox("gfx/hud/btn-extlist", "", "-d", "-h");
     
     public ExtInventory(Coord sz) {
 	inv = new Inventory(sz);
+	inv.ext = this;
 	extension = new Widget();
 	Composer composer = new Composer(extension).hmrgn(margin).vmrgn(margin);
 	grouping = new Dropbox<Grouping>(UI.scale(75), 5, UI.scale(16)) {
@@ -57,13 +57,16 @@ public class ExtInventory extends Widget implements DTarget {
 		    wnd.cfg.setValue(CFG_GROUP, item.name());
 		    wnd.storeCfg();
 		}
+		needUpdate = true;
 		super.change(item);
 	    }
 	};
+	space = new Label("");
 	grouping.sel = Grouping.NONE;
 	composer.addr(new Label("Group by:"), grouping);
-	list = new ItemGroupList(listw, (inv.sz.y - composer.y() - margin) / itemh, itemh);
+	list = new ItemGroupList(listw, (inv.sz.y - composer.y() - 2 * margin - space.sz.y) / itemh, itemh);
 	composer.add(list);
+	composer.add(space);
 	extension.pack();
 	composer = new Composer(this).hmrgn(margin);
 	composer.addr(inv, extension);
@@ -72,14 +75,12 @@ public class ExtInventory extends Widget implements DTarget {
     
     public void hideExtension() {
 	extension.hide();
-	pack();
-	if(wnd != null) {wnd.pack();}
+	updateLayout();
     }
     
     public void showExtension() {
 	extension.show();
-	pack();
-	if(wnd != null) {wnd.pack();}
+	updateLayout();
     }
     
     public void disable() {
@@ -94,14 +95,22 @@ public class ExtInventory extends Widget implements DTarget {
 	wnd = getparent(WindowX.class);
 	if(wnd != null) {
 	    boolean vis = !disabled && wnd.cfg.getValue(CFG_SHOW, false);
+	    showInv = wnd.cfg.getValue(CFG_INV, true);
 	    if(!disabled) {
 		chb_show.a = vis;
-		wnd.addtwdg(wnd.add(chb_show).settip("Toggle extra info"));
+		wnd.addtwdg(wnd.add(chb_show)
+		    .rclick(this::toggleInventory)
+		    .changed(this::setVisibility)
+		    .settip("LClick to toggle extra info\nRClick to hide inventory when info is visible", true)
+		);
 		grouping.sel = Grouping.valueOf(wnd.cfg.getValue(CFG_GROUP, Grouping.NONE.name()));
 	    }
 	    if(!vis) {
 		hideExtension();
+	    } else {
+		updateLayout();
 	    }
+	    extension.setfocus(list);
 	}
     }
     
@@ -117,6 +126,40 @@ public class ExtInventory extends Widget implements DTarget {
 	}
     }
     
+    private void toggleInventory() {
+	showInv = !showInv;
+	if(wnd != null) {
+	    wnd.cfg.setValue(CFG_INV, showInv);
+	    wnd.storeCfg();
+	}
+	updateLayout();
+    }
+    
+    private void updateLayout() {
+	inv.visible = showInv || !extension.visible;
+	
+	int szx = showInv ? inv.sz.x : 0;
+	int szy = inv.sz.y;
+	extension.move(new Coord(inv.c.x + szx + margin, extension.c.y));
+	list.resize(new Coord(list.sz.x, szy - grouping.sz.y - space.sz.y - 2 * margin));
+	space.c.y = list.pos("bl").y + margin;
+	extension.pack();
+	pack();
+	if(wnd != null) {wnd.pack();}
+	if(showInv) {
+	    chb_show.setTex("gfx/hud/btn-extlist", "", "-d", "-h");
+	} else {
+	    chb_show.setTex("gfx/hud/btn-extlist2", "", "-d", "-h");
+	}
+    }
+    
+    private void updateSpace() {
+	String value = String.format("%d/%d", inv.filled(), inv.size());
+	if(!value.equals(space.texts)) {
+	    space.settext(value);
+	}
+    }
+    
     @Override
     public boolean drop(Coord cc, Coord ul) {
 	return (inv.drop(cc, ul));
@@ -126,18 +169,22 @@ public class ExtInventory extends Widget implements DTarget {
     public boolean iteminteract(Coord cc, Coord ul) {
 	return (inv.iteminteract(cc, ul));
     }
-
+    
     @Override
     public void addchild(Widget child, Object... args) {
 	inv.addchild(child, args);
     }
-
+    
     @Override
     public void cdestroy(Widget w) {
 	super.cdestroy(w);
 	inv.cdestroy(w);
     }
-
+    
+    public void itemsChanged() {
+	needUpdate = true;
+    }
+    
     @Override
     public void wdgmsg(Widget sender, String msg, Object... args) {
 	if(sender == inv) {
@@ -146,7 +193,7 @@ public class ExtInventory extends Widget implements DTarget {
 	    super.wdgmsg(sender, msg, args);
 	}
     }
-
+    
     @Override
     public void uimsg(String msg, Object... args) {
 	if(msg.equals("sz") || msg.equals("mode")) {
@@ -154,10 +201,7 @@ public class ExtInventory extends Widget implements DTarget {
 	    int szy = inv.sz.y;
 	    inv.uimsg(msg, args);
 	    if((szx != inv.sz.x) || (szy != inv.sz.y)) {
-		extension.move(new Coord(inv.c.x + inv.sz.x + margin, extension.c.y));
-		list.resize(new Coord(list.sz.x, list.sz.y + inv.sz.y - szy));
-		extension.pack();
-		pack();
+		updateLayout();
 	    }
 	} else {
 	    super.uimsg(msg, args);
@@ -172,15 +216,20 @@ public class ExtInventory extends Widget implements DTarget {
 
     @Override
     public void tick(double dt) {
-	SortedMap<ItemType, List<GItem>> groups = new TreeMap<>();
-	inv.forEachItem((g, w) -> {
-	    try {
-		Double quality = quality(g, grouping.sel);
-		groups.computeIfAbsent(new ItemType(name(g), quality), k -> new ArrayList<>()).add(g);
-	    } catch (Loading ignored) {
-	    }
-	});
-	this.groups = groups;
+	if(needUpdate) {
+	    needUpdate = false;
+	    SortedMap<ItemType, List<GItem>> groups = new TreeMap<>();
+	    inv.forEachItem((g, w) -> {
+		try {
+		    Double quality = quality(g, grouping.sel);
+		    groups.computeIfAbsent(new ItemType(name(g), quality), k -> new ArrayList<>()).add(g);
+		} catch (Loading ignored) {
+		    needUpdate = true;
+		}
+	    });
+	    this.groups = groups;
+	}
+	updateSpace();
 	super.tick(dt);
     }
 
@@ -290,12 +339,10 @@ public class ExtInventory extends Widget implements DTarget {
 	final List<GItem> items;
 	final WItem sample;
 	private final Text.Line text;
-	private final Grouping g;
 	private Tex icon;
 	
 	public ItemsGroup(ItemType type, List<GItem> items, UI ui, Grouping g) {
 	    super(new Coord(listw, itemh));
-	    this.g = g;
 	    this.ui = ui;
 	    this.type = type;
 	    this.items = items;
