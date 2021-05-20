@@ -152,7 +152,7 @@ public class Bot implements Defer.Callable<Void> {
     
     
     private static Supplier<List<WItem>> INVENTORY(GameUI gui) {
-	return () -> items(gui.maininv);
+	return () -> items(gui.maininv.inv);
     }
     
     private static Supplier<List<WItem>> BELT(GameUI gui) {

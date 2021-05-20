@@ -52,7 +52,9 @@ public class WindowDetector {
 	AnimalFarm.processCattleInfo(window);
 	if(isBelt(window.caption())) {
 	    window.ui.gui.beltwnd = (GameUI.Hidewnd) window;
-	    window.ui.gui.beltinv = window.getchild(Inventory.class);
+	    ExtInventory extInventory = window.getchild(ExtInventory.class);
+	    extInventory.hideExtension();
+	    window.ui.gui.beltinv = extInventory.inv;
 	}
     }
     

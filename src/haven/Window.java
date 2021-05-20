@@ -316,8 +316,8 @@ public class Window extends Widget implements DTarget {
 
     public void uimsg(String msg, Object... args) {
 	if(msg == "pack") {
-	    pack();
 	    report(ON_PACK);
+	    pack();
 	} else if(msg == "dt") {
 	    dt = (Integer)args[0] != 0;
 	} else if(msg == "cap") {
