@@ -16,6 +16,7 @@ public class ExtInventory extends Widget implements DTarget {
     private static final String CFG_GROUP = "ext.group";
     private static final String CFG_SHOW = "ext.show";
     private static final String CFG_INV = "ext.inv";
+    private static final Set<String> EXCLUDES = Collections.unmodifiableSet(new HashSet<>(Arrays.asList("Steelbox", "Pouch", "Frame", "Tub", "Fireplace", "Rack", "Pane mold", "Table", "Purse")));
     public final Inventory inv;
     private final ItemGroupList list;
     private final Widget extension;
@@ -95,6 +96,7 @@ public class ExtInventory extends Widget implements DTarget {
     protected void added() {
 	wnd = getparent(WindowX.class);
 	if(wnd != null) {
+	    disabled = disabled || needDisableExtraInventory(wnd.caption());
 	    boolean vis = !disabled && wnd.cfg.getValue(CFG_SHOW, false);
 	    showInv = wnd.cfg.getValue(CFG_INV, true);
 	    if(!disabled) {
@@ -344,6 +346,7 @@ public class ExtInventory extends Widget implements DTarget {
     }
     
     private static class ItemsGroup extends Widget {
+        private static final Color progc = new Color(31, 209, 185, 128);
 	private static final BufferedImage def = WItem.missing.layer(Resource.imgc).img;
 	private static final Text.Foundry foundry = new Text.Foundry(Text.sans, 12).aa(true);
 	final ItemType type;
@@ -357,6 +360,7 @@ public class ExtInventory extends Widget implements DTarget {
 	    this.ui = ui;
 	    this.type = type;
 	    this.items = items;
+	    items.sort(ExtInventory::byQuality);
 	    this.sample = new WItem(items.get(0));
 	    double quality;
 	    if(type.quality == null) {
@@ -388,6 +392,12 @@ public class ExtInventory extends Widget implements DTarget {
 		}
 	    }
 	    if(icon != null) {
+		double meter = sample.meter();
+		if(meter > 0) {
+		    g.chcolor(progc);
+		    g.frect(new Coord(icon.sz().x + margin, 0), new Coord((int) ((sz.x - icon.sz().x - margin) * meter), sz.y));
+		    g.chcolor();
+		}
 		g.aimage(icon, new Coord(0, itemh / 2), 0.0, 0.5);
 		g.aimage(text.tex(), new Coord(icon.sz().x + margin, itemh / 2), 0.0, 0.5);
 	    } else {
@@ -397,40 +407,55 @@ public class ExtInventory extends Widget implements DTarget {
 
 	@Override
 	public boolean mousedown(Coord c, int button) {
-	    if(button == 1) {
-		if(ui.modshift) {
-		    if(ui.modmeta) {
-			for(GItem item : items) {
-			    item.wdgmsg("transfer", Inventory.sqsz.div(2), 1);
-			}
-		    } else {
-			items.get(0).wdgmsg("transfer", Inventory.sqsz.div(2), 1);
-		    }
-		} else if(ui.modctrl) {
-		    if(ui.modmeta) {
-			for(GItem item : items) {
-			    item.wdgmsg("drop", Inventory.sqsz.div(2), 1);
-			}
-		    } else {
-			items.get(0).wdgmsg("drop", Inventory.sqsz.div(2), 1);
-		    }
-		} else {
-		    items.get(0).wdgmsg("take", Inventory.sqsz.div(2));
-		}
-		return(true);
+	    if(ui.modshift && (button == 1 || button == 3)) {
+		process(items, "transfer", ui.modmeta, button == 3);
+		return true;
+	    } else if(ui.modctrl && (button == 1 || button == 3)) {
+		process(items, "drop", ui.modmeta, button == 3);
+		return true;
+	    } else if(button == 1) {
+		items.get(0).wdgmsg("take", Inventory.sqsz.div(2));
+		return true;
 	    } else if(button == 3) {
 		items.get(0).wdgmsg("iact", Inventory.sqsz.div(2), ui.modflags());
-		return(true);
+		return true;
 	    }
-	    return(false);
+	    return (false);
 	}
-
+    
+	private static void process(final List<GItem> items, String action, boolean all, boolean reverse) {
+	    if(reverse) {
+		items.sort(ExtInventory::byReverseQuality);
+	    } else {
+		items.sort(ExtInventory::byQuality);
+	    }
+	    if(!all) {
+		items.get(0).wdgmsg(action, Inventory.sqsz.div(2), 1);
+	    } else {
+		for (GItem item : items) {
+		    item.wdgmsg(action, Inventory.sqsz.div(2), 1);
+		}
+	    }
+	}
+	
 	@Override
 	public Object tooltip(Coord c, Widget prev) {
 	    return(sample.tooltip(c, prev));
 	}
     }
-
+    
+    private static int byReverseQuality(GItem a, GItem b) {
+	return Double.compare(quality(a, Grouping.Q), quality(b, Grouping.Q));
+    }
+    
+    private static int byQuality(GItem a, GItem b) {
+	return Double.compare(quality(b, Grouping.Q), quality(a, Grouping.Q));
+    }
+    
+    public static boolean needDisableExtraInventory(String title) {
+	return EXCLUDES.contains(title);
+    }
+    
     private class ItemGroupList extends Searchbox<ItemsGroup> {
 	private List<ItemsGroup> groups = Collections.emptyList();
 

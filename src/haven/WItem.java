@@ -216,6 +216,11 @@ public class WItem extends Widget implements DTarget2 {
 	return new Pair<>(bar, Utils.blendcol(bar, Color.RED, Color.ORANGE, Color.YELLOW, Color.GREEN));
     }));
     
+    public double meter() {
+	Double meter = (item.meter > 0) ? (Double) (item.meter / 100.0) : itemmeter.get();
+	return meter == null ? 0 : meter;
+    }
+    
     public final AttrCache<Tex> armor = new AttrCache<Tex>(this::info, AttrCache.cache(info -> {
 	Pair<Integer, Integer> armor = ItemInfo.getArmor(info);
 	if(armor == null) return (null);
@@ -294,8 +299,8 @@ public class WItem extends Widget implements DTarget2 {
     }
 
     private void drawmeter(GOut g, Coord sz) {
-	Double meter = (item.meter > 0) ? (Double) (item.meter / 100.0) : itemmeter.get();
-	if(meter != null && meter > 0) {
+	double meter = meter();
+	if(meter > 0) {
 	    Tex studyTime = getStudyTime();
 	    if(studyTime == null && CFG.PROGRESS_NUMBER.get()) {
 		Tex tex = Text.renderstroked(String.format("%d%%", Math.round(100 * meter))).tex();

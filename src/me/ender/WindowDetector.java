@@ -55,8 +55,6 @@ public class WindowDetector {
 	    ExtInventory extInventory = window.getchild(ExtInventory.class);
 	    extInventory.disable();
 	    window.ui.gui.beltinv = extInventory.inv;
-	} else if(isSteelCrucible(window.caption())) {
-	    window.children(ExtInventory.class).forEach(ExtInventory::disable);
 	}
     }
     
@@ -105,10 +103,6 @@ public class WindowDetector {
     
     public static boolean isBelt(String title) {
 	return "Belt".equals(title);
-    }
-    
-    public static boolean isSteelCrucible(String title) {
-	return "Steelbox".equals(title);
     }
     
     public static boolean isProspecting(String title) {
