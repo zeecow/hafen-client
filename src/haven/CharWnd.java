@@ -2237,7 +2237,7 @@ public class CharWnd extends WindowX {
 	String place = (args[0] instanceof String)?(((String)args[0]).intern()):null;
 	if(place == "study") {
 	    if(child instanceof ExtInventory)
-		((ExtInventory) child).hideExtension();
+		((ExtInventory) child).disable();
 	    sattr.add(child, studyc.add(wbox.btloff()));
 	    Widget f = Frame.around(sattr, Collections.singletonList(child));
 	    Widget inf = sattr.add(new StudyInfo(new Coord(attrw - child.sz.x - wbox.bisz().x - margin1, child.sz.y), child), child.pos("ur").add(wbox.bisz().x + margin1, 0));

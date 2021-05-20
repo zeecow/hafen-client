@@ -269,6 +269,11 @@ public class Window extends Widget implements DTarget {
 	twdgs.add(wdg);
 	placetwdgs();
     }
+    
+    public void remtwdg(Widget wdg) {
+	twdgs.remove(wdg);
+	placetwdgs();
+    }
 
     protected void placetwdgs() {
 	int x = sz.x - UI.scale(20);

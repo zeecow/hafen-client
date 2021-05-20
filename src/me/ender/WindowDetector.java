@@ -53,7 +53,7 @@ public class WindowDetector {
 	if(isBelt(window.caption())) {
 	    window.ui.gui.beltwnd = (GameUI.Hidewnd) window;
 	    ExtInventory extInventory = window.getchild(ExtInventory.class);
-	    extInventory.hideExtension();
+	    extInventory.disable();
 	    window.ui.gui.beltinv = extInventory.inv;
 	}
     }

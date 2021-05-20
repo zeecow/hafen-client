@@ -219,11 +219,11 @@ public class Inventory extends Widget implements DTarget {
     }
     
     public void enableDrops() {
-	if(parent instanceof Window) {
+        Window wnd = getparent(Window.class);
+	if(wnd != null) {
 	    canDropItems = true;
 	    dropsCallback = this::doDrops;
 	    ItemAutoDrop.addCallback(dropsCallback);
-	    Window wnd = (Window) parent;
 	    wnd.addtwdg(wnd.add(new ICheckBox("gfx/hud/btn-adrop", "", "-d", "-h")
 		.changed(this::doEnableDrops)
 		.rclick(this::showDropCFG)

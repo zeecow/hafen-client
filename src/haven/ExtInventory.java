@@ -17,27 +17,51 @@ public class ExtInventory extends Widget implements DTarget {
     private static final Color even = new Color(255, 255, 255, 16);
     private static final Color odd = new Color(255, 255, 255, 32);
     private static final Color found = new Color(255, 255, 0, 32);
+    private static final String CFG_GROUP = "ext.group";
+    private static final String CFG_SHOW = "ext.show";
     public final Inventory inv;
     private final ItemGroupList list;
     private final Widget extension;
     private SortedMap<ItemType, List<GItem>> groups;
-    private boolean groupbyq = true;
-
+    private final Dropbox<Grouping> grouping;
+    private boolean disabled = false;
+    private WindowX wnd;
+    private final ACheckBox chb_show = new ICheckBox("gfx/hud/btn-extlist", "", "-d", "-h")
+	.changed(this::setVisibility);
+    
     public ExtInventory(Coord sz) {
 	inv = new Inventory(sz);
 	extension = new Widget();
 	Composer composer = new Composer(extension).hmrgn(margin).vmrgn(margin);
-	composer.add(new CheckBox("Group by quality") {
-	    {
-		a = groupbyq;
-	    }
-
+	grouping = new Dropbox<Grouping>(UI.scale(75), 5, UI.scale(16)) {
+	    {bgcolor = new Color(16, 16, 16, 128);}
+	    
 	    @Override
-	    public void set(boolean a) {
-		groupbyq = a;
-		super.set(a);
+	    protected Grouping listitem(int i) {
+		return Grouping.values()[i];
 	    }
-	});
+	    
+	    @Override
+	    protected int listitems() {
+		return Grouping.values().length;
+	    }
+	    
+	    @Override
+	    protected void drawitem(GOut g, Grouping item, int i) {
+		g.atext(item.name, UI.scale(3, 8), 0, 0.5);
+	    }
+	    
+	    @Override
+	    public void change(Grouping item) {
+		if(item != sel && wnd != null) {
+		    wnd.cfg.setValue(CFG_GROUP, item.name());
+		    wnd.storeCfg();
+		}
+		super.change(item);
+	    }
+	};
+	grouping.sel = Grouping.NONE;
+	composer.addr(new Label("Group by:"), grouping);
 	list = new ItemGroupList(listw, (inv.sz.y - composer.y() - margin) / itemh, itemh);
 	composer.add(list);
 	extension.pack();
@@ -45,20 +69,62 @@ public class ExtInventory extends Widget implements DTarget {
 	composer.addr(inv, extension);
 	pack();
     }
-
+    
     public void hideExtension() {
 	extension.hide();
 	pack();
+	if(wnd != null) {wnd.pack();}
     }
-
+    
+    public void showExtension() {
+	extension.show();
+	pack();
+	if(wnd != null) {wnd.pack();}
+    }
+    
+    public void disable() {
+	hideExtension();
+	disabled = true;
+	chb_show.hide();
+	if(wnd != null) {wnd.placetwdgs();}
+    }
+    
+    @Override
+    protected void added() {
+	wnd = getparent(WindowX.class);
+	if(wnd != null) {
+	    boolean vis = !disabled && wnd.cfg.getValue(CFG_SHOW, false);
+	    if(!disabled) {
+		chb_show.a = vis;
+		wnd.addtwdg(wnd.add(chb_show).settip("Toggle extra info"));
+		grouping.sel = Grouping.valueOf(wnd.cfg.getValue(CFG_GROUP, Grouping.NONE.name()));
+	    }
+	    if(!vis) {
+		hideExtension();
+	    }
+	}
+    }
+    
+    private void setVisibility(boolean v) {
+	if(wnd != null) {
+	    wnd.cfg.setValue(CFG_SHOW, v);
+	    wnd.storeCfg();
+	}
+	if(v) {
+	    showExtension();
+	} else {
+	    hideExtension();
+	}
+    }
+    
     @Override
     public boolean drop(Coord cc, Coord ul) {
-	return(inv.drop(cc, ul));
+	return (inv.drop(cc, ul));
     }
-
+    
     @Override
     public boolean iteminteract(Coord cc, Coord ul) {
-	return(inv.iteminteract(cc, ul));
+	return (inv.iteminteract(cc, ul));
     }
 
     @Override
@@ -109,7 +175,7 @@ public class ExtInventory extends Widget implements DTarget {
 	SortedMap<ItemType, List<GItem>> groups = new TreeMap<>();
 	inv.forEachItem((g, w) -> {
 	    try {
-		Double quality = groupbyq ? quality(g) : null;
+		Double quality = quality(g, grouping.sel);
 		groups.computeIfAbsent(new ItemType(name(g), quality), k -> new ArrayList<>()).add(g);
 	    } catch (Loading ignored) {
 	    }
@@ -133,34 +199,53 @@ public class ExtInventory extends Widget implements DTarget {
 		name += " " + contentName;
 	    }
 	}
-	return(name);
+	return (name);
     }
-
+    
     private static Double quality(GItem item) {
+	return quality(item, Grouping.Q);
+    }
+    
+    private static Double quality(GItem item, Grouping g) {
+	if(g == null || g == Grouping.NONE) {return null;}
 	try {
 	    ItemInfo.Contents contents = findcontents(item.info());
 	    if(contents != null) {
 		Double quality = findquality(contents.sub);
 		if(quality != null) {
-		    return(quality);
+		    return quantifyQ(quality, g);
 		}
 	    }
-	    return(findquality(item.info()));
+	    return quantifyQ(findquality(item.info()), g);
 	} catch (NoSuchFieldException | IllegalAccessException e) {
 	    e.printStackTrace();
 	}
-	return(null);
+	return (null);
     }
-
+    
+    private static Double quantifyQ(Double q, Grouping g) {
+	if(q == null) {return null;}
+	if(g == Grouping.Q1) {
+	    q = Math.floor(q);
+	} else if(g == Grouping.Q5) {
+	    q = Math.floor(q);
+	    q -= q % 5;
+	} else if(g == Grouping.Q10) {
+	    q = Math.floor(q);
+	    q -= q % 10;
+	}
+	return q;
+    }
+    
     private static String findname(List<ItemInfo> info) {
-	for(ItemInfo v : info) {
+	for (ItemInfo v : info) {
 	    if(v instanceof ItemInfo.Name) {
-		return(((ItemInfo.Name) v).str.text);
+		return (((ItemInfo.Name) v).str.text);
 	    }
 	}
-	return(null);
+	return (null);
     }
-
+    
     private static Double findquality(List<ItemInfo> info) throws NoSuchFieldException, IllegalAccessException {
 	for(ItemInfo v : info) {
 	    if(v.getClass().getName().equals("Quality")) {
@@ -197,18 +282,20 @@ public class ExtInventory extends Widget implements DTarget {
 	    return(-Double.compare(quality, other.quality));
 	}
     }
-
+    
     private static class ItemsGroup extends Widget {
-	private static final BufferedImage def = Resource.loadimg("gfx/hud/mmap/x");
+	private static final BufferedImage def = WItem.missing.layer(Resource.imgc).img;
 	private static final Text.Foundry foundry = new Text.Foundry(Text.sans, 12).aa(true);
 	final ItemType type;
 	final List<GItem> items;
 	final WItem sample;
 	private final Text.Line text;
+	private final Grouping g;
 	private Tex icon;
-
-	public ItemsGroup(ItemType type, List<GItem> items, UI ui) {
+	
+	public ItemsGroup(ItemType type, List<GItem> items, UI ui, Grouping g) {
 	    super(new Coord(listw, itemh));
+	    this.g = g;
 	    this.ui = ui;
 	    this.type = type;
 	    this.items = items;
@@ -216,11 +303,12 @@ public class ExtInventory extends Widget implements DTarget {
 	    double quality;
 	    if(type.quality == null) {
 		quality = items.stream().map(ExtInventory::quality).filter(Objects::nonNull).reduce(0.0, Double::sum)
-			/ items.stream().map(ExtInventory::quality).filter(Objects::nonNull).count();
+		    / items.stream().map(ExtInventory::quality).filter(Objects::nonNull).count();
 	    } else {
 		quality = type.quality;
 	    }
-	    this.text = foundry.render(String.format("%sq%.1f (%d)", type.quality != null ? "" : "avg ", quality, items.size()));
+	    String format = (g == Grouping.NONE || g == Grouping.Q) ? "%sq%.1f (%d)" : "%sq%.0f+ (%d)";
+	    this.text = foundry.render(String.format(format, type.quality != null ? "" : "avg ", quality, items.size()));
 	}
 
 	@Override
@@ -253,7 +341,7 @@ public class ExtInventory extends Widget implements DTarget {
 	public boolean mousedown(Coord c, int button) {
 	    if(button == 1) {
 		if(ui.modshift) {
-		    if(ui.modctrl) {
+		    if(ui.modmeta) {
 			for(GItem item : items) {
 			    item.wdgmsg("transfer", Inventory.sqsz.div(2), 1);
 			}
@@ -325,13 +413,23 @@ public class ExtInventory extends Widget implements DTarget {
 		groups = Collections.emptyList();
 	    } else {
 		groups = ExtInventory.this.groups.entrySet().stream()
-			.map(v -> new ItemsGroup(v.getKey(), v.getValue(), ui)).collect(Collectors.toList());
+		    .map(v -> new ItemsGroup(v.getKey(), v.getValue(), ui, grouping.sel)).collect(Collectors.toList());
 	    }
 	    super.tick(dt);
 	}
-
+    
 	@Override
 	protected void drawbg(GOut g) {
+	}
+    
+	@Override
+	public Object tooltip(Coord c, Widget prev) {
+	    int idx = idxat(c);
+	    ItemsGroup item = (idx >= listitems()) ? null : listitem(idx);
+	    if(item != null) {
+		return item.tooltip(Coord.z, prev);
+	    }
+	    return super.tooltip(c, prev);
 	}
     }
     
@@ -343,5 +441,13 @@ public class ExtInventory extends Widget implements DTarget {
 	} else {
 	    return null;
 	}
+    }
+    
+    enum Grouping {
+	NONE("Type"), Q("Quality"), Q1("Quality 1"), Q5("Quality 5"), Q10("Quality 10");
+	
+	private final String name;
+	
+	Grouping(String name) {this.name = name;}
     }
 }
