@@ -25,6 +25,7 @@ public class ExtInventory extends Widget implements DTarget {
     private boolean disabled = false;
     private boolean showInv = true;
     private boolean needUpdate = false;
+    private boolean once = true;
     private WindowX wnd;
     private final ICheckBox chb_show = new ICheckBox("gfx/hud/btn-extlist", "", "-d", "-h");
     
@@ -104,12 +105,9 @@ public class ExtInventory extends Widget implements DTarget {
 		    .settip("LClick to toggle extra info\nRClick to hide inventory when info is visible", true)
 		);
 		grouping.sel = Grouping.valueOf(wnd.cfg.getValue(CFG_GROUP, Grouping.NONE.name()));
+		needUpdate = true;
 	    }
-	    if(!vis) {
-		hideExtension();
-	    } else {
-		updateLayout();
-	    }
+	    hideExtension();
 	    extension.setfocus(list);
 	}
     }
@@ -138,11 +136,18 @@ public class ExtInventory extends Widget implements DTarget {
     private void updateLayout() {
 	inv.visible = showInv || !extension.visible;
 	
-	int szx = showInv ? inv.sz.x : 0;
-	int szy = inv.sz.y;
-	extension.move(new Coord(inv.c.x + szx + margin, extension.c.y));
-	list.resize(new Coord(list.sz.x, szy - grouping.sz.y - space.sz.y - 2 * margin));
-	space.c.y = list.pos("bl").y + margin;
+	int szx = 0;
+	if(inv.visible && parent != null) {
+	    szx = inv.sz.x;
+	    for (Widget widget : parent.children()) {
+		if(widget != this) {
+		    szx = Math.max(szx, widget.pos("ur").x);
+		}
+	    }
+	}
+	extension.move(new Coord(szx + margin, extension.c.y));
+	space.c.y = inv.pos("bl").y - space.sz.y;
+	list.resize(new Coord(list.sz.x, space.c.y - grouping.sz.y - 2 * margin));
 	extension.pack();
 	pack();
 	if(wnd != null) {wnd.pack();}
@@ -228,6 +233,12 @@ public class ExtInventory extends Widget implements DTarget {
 		}
 	    });
 	    this.groups = groups;
+	}
+	if(once) {
+	    once = false;
+	    if(!disabled && chb_show.a) {
+		showExtension();
+	    }
 	}
 	updateSpace();
 	super.tick(dt);
