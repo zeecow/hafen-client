@@ -327,6 +327,8 @@ public abstract class ItemInfo {
 		}
 		return name.contains(what);
 	    }
+	    
+	    public boolean empty() {return count == 0 || name == null;}
 	
 	    public static final Content EMPTY = new Content(null, null, 0);
 	}

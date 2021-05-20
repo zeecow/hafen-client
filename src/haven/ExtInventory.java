@@ -21,7 +21,7 @@ public class ExtInventory extends Widget implements DTarget {
     private final ItemGroupList list;
     private final Widget extension;
     private final Label space;
-    private SortedMap<ItemType, List<GItem>> groups;
+    private SortedMap<ItemType, List<WItem>> groups;
     private final Dropbox<Grouping> grouping;
     private boolean disabled = false;
     private boolean showInv = true;
@@ -65,7 +65,7 @@ public class ExtInventory extends Widget implements DTarget {
 	};
 	space = new Label("");
 	grouping.sel = Grouping.NONE;
-	composer.addr(new Label("Group by:"), grouping);
+	composer.addr(new Label("Group:"), grouping);
 	list = new ItemGroupList(listw, (inv.sz.y - composer.y() - 2 * margin - space.sz.y) / itemh, itemh);
 	composer.add(list);
 	composer.add(space);
@@ -223,13 +223,15 @@ public class ExtInventory extends Widget implements DTarget {
 
     @Override
     public void tick(double dt) {
-	if(needUpdate) {
+	if(needUpdate && extension.visible) {
 	    needUpdate = false;
-	    SortedMap<ItemType, List<GItem>> groups = new TreeMap<>();
+	    SortedMap<ItemType, List<WItem>> groups = new TreeMap<>();
 	    inv.forEachItem((g, w) -> {
 		try {
-		    Double quality = quality(g, grouping.sel);
-		    groups.computeIfAbsent(new ItemType(name(g), quality), k -> new ArrayList<>()).add(g);
+		    Double quality = quality(w, grouping.sel);
+		    ItemType type = new ItemType(name(w), quality);
+		    if(type.loading) {needUpdate = true;}
+		    groups.computeIfAbsent(type, k -> new ArrayList<>()).add(w);
 		} catch (Loading ignored) {
 		    needUpdate = true;
 		}
@@ -245,44 +247,24 @@ public class ExtInventory extends Widget implements DTarget {
 	updateSpace();
 	super.tick(dt);
     }
-
-    private static String name(GItem item) {
-	String name = "???";
-	for(ItemInfo v : item.info()) {
-	    if(v instanceof ItemInfo.Name) {
-		name = ((ItemInfo.Name) v).str.text;
-		break;
-	    }
-	}
-	ItemInfo.Contents contents = findcontents(item.info());
-	if(contents != null) {
-	    String contentName = findname(contents.sub);
-	    if(contentName != null) {
-		name += " " + contentName;
-	    }
+    
+    private static String name(WItem item) {
+	String name = item.name.get("???");
+	ItemInfo.Contents.Content content = item.contains.get();
+	if(!content.empty()) {
+	    name = String.format("%s, (%s)", name, content.name);
 	}
 	return (name);
     }
     
-    private static Double quality(GItem item) {
+    private static Double quality(WItem item) {
 	return quality(item, Grouping.Q);
     }
     
-    private static Double quality(GItem item, Grouping g) {
+    private static Double quality(WItem item, Grouping g) {
 	if(g == null || g == Grouping.NONE) {return null;}
-	try {
-	    ItemInfo.Contents contents = findcontents(item.info());
-	    if(contents != null) {
-		Double quality = findquality(contents.sub);
-		if(quality != null) {
-		    return quantifyQ(quality, g);
-		}
-	    }
-	    return quantifyQ(findquality(item.info()), g);
-	} catch (NoSuchFieldException | IllegalAccessException e) {
-	    e.printStackTrace();
-	}
-	return (null);
+	QualityList q = item.itemq.get();
+	return (q == null || q.isEmpty()) ? null : quantifyQ(q.single().value, g);
     }
     
     private static Double quantifyQ(Double q, Grouping g) {
@@ -299,40 +281,15 @@ public class ExtInventory extends Widget implements DTarget {
 	return q;
     }
     
-    private static String findname(List<ItemInfo> info) {
-	for (ItemInfo v : info) {
-	    if(v instanceof ItemInfo.Name) {
-		return (((ItemInfo.Name) v).str.text);
-	    }
-	}
-	return (null);
-    }
-    
-    private static Double findquality(List<ItemInfo> info) throws NoSuchFieldException, IllegalAccessException {
-	for(ItemInfo v : info) {
-	    if(v.getClass().getName().equals("Quality")) {
-		return((Double) v.getClass().getField("q").get(v));
-	    }
-	}
-	return(null);
-    }
-
-    private static ItemInfo.Contents findcontents(List<ItemInfo> info) {
-	for(ItemInfo v : info) {
-	    if(v instanceof ItemInfo.Contents) {
-		return((ItemInfo.Contents) v);
-	    }
-	}
-	return(null);
-    }
-
     private static class ItemType implements Comparable<ItemType> {
 	final String name;
 	final Double quality;
+	final boolean loading;
 
 	public ItemType(String name, Double quality) {
 	    this.name = name;
 	    this.quality = quality;
+	    loading = name.startsWith("???");
 	}
 
 	@Override
@@ -346,22 +303,23 @@ public class ExtInventory extends Widget implements DTarget {
     }
     
     private static class ItemsGroup extends Widget {
-        private static final Color progc = new Color(31, 209, 185, 128);
+	private static final Map<String, Tex> cache = new WeakHashMap<>();
+	private static final Color progc = new Color(31, 209, 185, 128);
 	private static final BufferedImage def = WItem.missing.layer(Resource.imgc).img;
 	private static final Text.Foundry foundry = new Text.Foundry(Text.sans, 12).aa(true);
 	final ItemType type;
-	final List<GItem> items;
+	final List<WItem> items;
 	final WItem sample;
 	private final Text.Line text;
 	private Tex icon;
 	
-	public ItemsGroup(ItemType type, List<GItem> items, UI ui, Grouping g) {
+	public ItemsGroup(ItemType type, List<WItem> items, UI ui, Grouping g) {
 	    super(new Coord(listw, itemh));
 	    this.ui = ui;
 	    this.type = type;
 	    this.items = items;
 	    items.sort(ExtInventory::byQuality);
-	    this.sample = new WItem(items.get(0));
+	    this.sample = items.get(0);
 	    double quality;
 	    if(type.quality == null) {
 		quality = items.stream().map(ExtInventory::quality).filter(Objects::nonNull).reduce(0.0, Double::sum)
@@ -376,19 +334,24 @@ public class ExtInventory extends Widget implements DTarget {
 	@Override
 	public void draw(GOut g) {
 	    if(icon == null) {
-		try {
-		    GSprite sprite = sample.item.sprite();
-		    if(sprite instanceof GSprite.ImageSprite) {
-			icon = GobIcon.SettingsWindow.Icon.tex(((GSprite.ImageSprite) sprite).image());
-		    } else {
-			Resource.Image image = sample.item.resource().layer(Resource.imgc);
-			if(image == null) {
-			    icon = GobIcon.SettingsWindow.Icon.tex(def);
+		if(cache.containsKey(type.name)) {
+		    icon = cache.get(type.name);
+		} else if(!type.loading) {
+		    try {
+			GSprite sprite = sample.item.sprite();
+			if(sprite instanceof GSprite.ImageSprite) {
+			    icon = GobIcon.SettingsWindow.Icon.tex(((GSprite.ImageSprite) sprite).image());
 			} else {
-			    icon = GobIcon.SettingsWindow.Icon.tex(image.img);
+			    Resource.Image image = sample.item.resource().layer(Resource.imgc);
+			    if(image == null) {
+				icon = GobIcon.SettingsWindow.Icon.tex(def);
+			    } else {
+				icon = GobIcon.SettingsWindow.Icon.tex(image.img);
+			    }
 			}
+			cache.put(type.name, icon);
+		    } catch (Loading ignored) {
 		    }
-		} catch (Loading ignored) {
 		}
 	    }
 	    if(icon != null) {
@@ -423,7 +386,7 @@ public class ExtInventory extends Widget implements DTarget {
 	    return (false);
 	}
     
-	private static void process(final List<GItem> items, String action, boolean all, boolean reverse) {
+	private static void process(final List<WItem> items, String action, boolean all, boolean reverse) {
 	    if(reverse) {
 		items.sort(ExtInventory::byReverseQuality);
 	    } else {
@@ -432,7 +395,7 @@ public class ExtInventory extends Widget implements DTarget {
 	    if(!all) {
 		items.get(0).wdgmsg(action, Inventory.sqsz.div(2), 1);
 	    } else {
-		for (GItem item : items) {
+		for (WItem item : items) {
 		    item.wdgmsg(action, Inventory.sqsz.div(2), 1);
 		}
 	    }
@@ -444,11 +407,11 @@ public class ExtInventory extends Widget implements DTarget {
 	}
     }
     
-    private static int byReverseQuality(GItem a, GItem b) {
+    private static int byReverseQuality(WItem a, WItem b) {
 	return Double.compare(quality(a, Grouping.Q), quality(b, Grouping.Q));
     }
     
-    private static int byQuality(GItem a, GItem b) {
+    private static int byQuality(WItem a, WItem b) {
 	return Double.compare(quality(b, Grouping.Q), quality(a, Grouping.Q));
     }
     

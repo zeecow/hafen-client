@@ -169,29 +169,18 @@ public class WItem extends Widget implements DTarget2 {
 	});
     public final AttrCache<Double> itemmeter = new AttrCache<>(this::info, AttrCache.map1(GItem.MeterInfo.class, minf -> minf::meter));
     
-    public final AttrCache<QualityList> itemq = new AttrCache<QualityList>(this::info, AttrCache.cache(info -> {
-	List<ItemInfo.Contents> contents = ItemInfo.findall(ItemInfo.Contents.class, info);
-	List<ItemInfo> qualities = null;
-	if(!contents.isEmpty()) {
-	    for(ItemInfo.Contents content : contents) {
-		List<ItemInfo> tmp = ItemInfo.findall(QualityList.classname, content.sub);
-		if(!tmp.isEmpty()) {
-		    qualities = tmp;
-		}
-	    }
+    public final AttrCache<ItemInfo.Contents.Content> contains = new AttrCache<>(this::info, AttrCache.cache(ItemInfo::getContent), ItemInfo.Contents.Content.EMPTY);
+    
+    public final AttrCache<QualityList> itemq = new AttrCache<>(this::info, AttrCache.cache(info -> {
+	ItemInfo.Contents.Content content = contains.get();
+	if(!content.empty() && !content.q.isEmpty()) {
+	    return content.q;
 	}
-	if(qualities == null || qualities.isEmpty()) {
-	    qualities = ItemInfo.findall(QualityList.classname, info);
-	}
-	
-	QualityList qualityList = new QualityList(qualities);
-	return !qualityList.isEmpty() ? qualityList : null;
+	return new QualityList(ItemInfo.findall(QualityList.classname, info));
     }));
     
     public final AttrCache<Pair<String, String>> study = new AttrCache<>(this::info, AttrCache.map1(Curiosity.class, curio -> curio::remainingTip));
     
-    public final AttrCache<ItemInfo.Contents.Content> contains = new AttrCache<>(this::info, AttrCache.cache(ItemInfo::getContent), ItemInfo.Contents.Content.EMPTY); 
-
     public final AttrCache<Tex> heurnum = new AttrCache<Tex>(this::info, AttrCache.cache(info -> {
 	String num = ItemInfo.getCount(info);
 	if(num == null) return null;
@@ -395,7 +384,7 @@ public class WItem extends Widget implements DTarget2 {
 
     private void drawq(GOut g) {
 	QualityList quality = itemq.get();
-	if(quality != null) {
+	if(quality != null && !quality.isEmpty()) {
 	    Tex tex = null;
 	    SingleType qtype = getQualityType();
 	    if(qtype != null) {
