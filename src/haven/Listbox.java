@@ -130,8 +130,9 @@ public abstract class Listbox<T> extends ListWidget<T> {
 		}
 	    }
 	    itemclick(item, c.sub(idxc(idx)), button);
+	    return true;
 	}
-	return(true);
+	return(false);
     }
 
     @Override
