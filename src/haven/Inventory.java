@@ -204,13 +204,17 @@ public class Inventory extends Widget implements DTarget {
 	    if(wdg.visible && wdg instanceof WItem) {
 		WItem wItem = (WItem) wdg;
 		GItem child = wItem.item;
-		if(child.resname().equals(name) && ((spr == child.spr()) || (spr != null && spr.same(child.spr())))) {
+		if(item.matches == child.matches && isSame(name, spr, child)) {
 		    items.add(wItem);
 		}
 	    }
 	}
-	Collections.sort(items, ascending ? ITEM_COMPARATOR_ASC : ITEM_COMPARATOR_DESC);
+	items.sort(ascending ? ITEM_COMPARATOR_ASC : ITEM_COMPARATOR_DESC);
 	return items;
+    }
+    
+    private static boolean isSame(String name, GSprite spr, GItem item) {
+	return item.resname().equals(name) && ((spr == item.spr()) || (spr != null && spr.same(item.spr())));
     }
     
     public void enableDrops() {
