@@ -377,10 +377,10 @@ public class ExtInventory extends Widget implements DTarget {
 		process(items, "drop", ui.modmeta, button == 3);
 		return true;
 	    } else if(button == 1) {
-		items.get(0).wdgmsg("take", Inventory.sqsz.div(2));
+		items.get(0).item.wdgmsg("take", Inventory.sqsz.div(2));
 		return true;
 	    } else if(button == 3) {
-		items.get(0).wdgmsg("iact", Inventory.sqsz.div(2), ui.modflags());
+		items.get(0).item.wdgmsg("iact", Inventory.sqsz.div(2), ui.modflags());
 		return true;
 	    }
 	    return (false);
@@ -393,10 +393,10 @@ public class ExtInventory extends Widget implements DTarget {
 		items.sort(ExtInventory::byQuality);
 	    }
 	    if(!all) {
-		items.get(0).wdgmsg(action, Inventory.sqsz.div(2), 1);
+		items.get(0).item.wdgmsg(action, Inventory.sqsz.div(2), 1);
 	    } else {
 		for (WItem item : items) {
-		    item.wdgmsg(action, Inventory.sqsz.div(2), 1);
+		    item.item.wdgmsg(action, Inventory.sqsz.div(2), 1);
 		}
 	    }
 	}
