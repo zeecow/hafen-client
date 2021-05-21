@@ -237,7 +237,18 @@ public class WItem extends Widget implements DTarget2 {
     
     public final AttrCache<String> name = new AttrCache<>(this::info, AttrCache.cache(info -> {
 	ItemInfo.Name name = ItemInfo.find(ItemInfo.Name.class, info);
-	return (name != null && name.str != null && name.str.text != null) ? name.str.text : "";
+	String result = "???";
+	if(name != null) {
+	    result = name.original;
+	    ItemInfo.Contents.Content content = ItemInfo.Contents.content(name.original);
+	    if(!content.empty()) {result = content.name();}
+	
+	    content = contains.get();
+	    if(!content.empty()) {
+		result = String.format("%s (%s)", result, content.name());
+	    }
+	}
+	return result;
     }), "");
 
     private GSprite lspr = null;

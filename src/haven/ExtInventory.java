@@ -254,12 +254,7 @@ public class ExtInventory extends Widget implements DTarget {
     }
     
     private static String name(WItem item) {
-	String name = item.name.get("???");
-	ItemInfo.Contents.Content content = item.contains.get();
-	if(!content.empty()) {
-	    name = String.format("%s, (%s)", name, content.name);
-	}
-	return (name);
+	return item.name.get("???");
     }
     
     private static Double quality(WItem item) {
