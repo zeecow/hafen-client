@@ -410,11 +410,16 @@ public class ExtInventory extends Widget implements DTarget {
     }
     
     private static int byReverseQuality(WItem a, WItem b) {
-	return Double.compare(quality(a, Grouping.Q), quality(b, Grouping.Q));
+	return byQuality(b, a);
     }
     
     private static int byQuality(WItem a, WItem b) {
-	return Double.compare(quality(b, Grouping.Q), quality(a, Grouping.Q));
+	Double qa = quality(a, Grouping.Q);
+	Double qb = quality(b, Grouping.Q);
+	if(Objects.equals(qa, qb)) {return 0;}
+	if(qa == null) {return 1;}
+	if(qb == null) {return -1;}
+	return Double.compare(qb, qa);
     }
     
     public static boolean needDisableExtraInventory(String title) {
