@@ -139,16 +139,19 @@ public class ExtInventory extends Widget implements DTarget {
 	inv.visible = showInv || !extension.visible;
 	
 	int szx = 0;
+	int szy = inv.pos("br").y;
 	if(inv.visible && parent != null) {
 	    szx = inv.sz.x;
 	    for (Widget w : wnd.children()) {
 		if(w != this && (wnd != parent || w != wnd.cbtn && !wnd.twdgs.contains(w))) {
-		    szx = Math.max(szx, w.pos("ur").x);
+		    Position p = w.pos("br");
+		    szx = Math.max(szx, p.x);
+		    szy = Math.max(szy, p.y);
 		}
 	    }
 	}
 	extension.move(new Coord(szx + margin, extension.c.y));
-	space.c.y = inv.pos("bl").y - space.sz.y;
+	space.c.y = szy - space.sz.y;
 	list.resize(new Coord(list.sz.x, space.c.y - grouping.sz.y - 2 * margin));
 	extension.pack();
 	pack();
