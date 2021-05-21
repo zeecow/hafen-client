@@ -244,7 +244,9 @@ public class ExtInventory extends Widget implements DTarget {
 		showExtension();
 	    }
 	}
-	updateSpace();
+	if(extension.visible) {
+	    updateSpace();
+	}
 	super.tick(dt);
     }
     
