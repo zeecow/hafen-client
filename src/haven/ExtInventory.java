@@ -327,8 +327,14 @@ public class ExtInventory extends Widget implements DTarget {
 	    } else {
 		quality = type.quality;
 	    }
-	    String format = (g == Grouping.NONE || g == Grouping.Q) ? "%sq%.1f (%d)" : "%sq%.0f+ (%d)";
-	    this.text = foundry.render(String.format(format, type.quality != null ? "" : "avg ", quality, items.size()));
+	    String quantity = Utils.f2s(items.stream().map(wItem -> wItem.quantity.get()).reduce(0f, Float::sum));
+	    String q = type.name;
+	    if(!Double.isNaN(quality)) {
+		String avg = type.quality != null ? "" : "avg ";
+		String sign = (g == Grouping.NONE || g == Grouping.Q) ? "" : "+";
+		q = String.format("%sq%s%s", avg, Utils.f2s(quality, 1), sign);
+	    }
+	    this.text = foundry.render(String.format("%s (%s)", q, quantity));
 	}
 
 	@Override
@@ -364,7 +370,7 @@ public class ExtInventory extends Widget implements DTarget {
 		g.aimage(icon, new Coord(0, itemh / 2), 0.0, 0.5);
 		g.aimage(text.tex(), new Coord(icon.sz().x + margin, itemh / 2), 0.0, 0.5);
 	    } else {
-		g.aimage(text.tex(), new Coord(margin, itemh / 2), 0.0, 0.5);
+		g.aimage(text.tex(), new Coord(0, itemh / 2), 0.0, 0.5);
 	    }
 	}
 

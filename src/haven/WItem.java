@@ -250,6 +250,23 @@ public class WItem extends Widget implements DTarget2 {
 	}
 	return result;
     }), "");
+    
+    public final AttrCache<Float> quantity = new AttrCache<>(this::info, AttrCache.cache(info -> {
+	float result = 1;
+	ItemInfo.Name name = ItemInfo.find(ItemInfo.Name.class, info);
+	if(name != null) {
+	    ItemInfo.Contents.Content content = ItemInfo.Contents.content(name.original);
+	    if(!content.empty()) {
+		result = content.count;
+	    } else {
+		content = contains.get();
+		if(!content.empty()) {
+		    result = content.count;
+		}
+	    }
+	}
+	return result;
+    }), 1f);
 
     private GSprite lspr = null;
     public void tick(double dt) {

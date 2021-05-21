@@ -38,6 +38,7 @@ import java.net.URL;
 import java.lang.ref.*;
 import java.lang.reflect.*;
 import java.nio.charset.StandardCharsets;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.prefs.*;
 import java.util.*;
@@ -1970,6 +1971,15 @@ public class Utils {
 	    return Integer.toHexString(col.getRGB());
 	}
 	return null;
+    }
+    
+    private static final DecimalFormat f2sfmt = new DecimalFormat("0");
+    
+    public static String f2s(double f) {return f2s(f, 2);}
+    
+    public static String f2s(double f, int precision) {
+	f2sfmt.setMaximumFractionDigits(precision);
+	return f2sfmt.format(f);
     }
 
     //Liang-Barsky algorithm
