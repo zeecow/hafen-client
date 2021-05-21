@@ -308,6 +308,25 @@ public class ZeeConfig {
         return null;
     }
 
+    public static void resetDefaultCateg(String categ) {
+        if(categ.contentEquals(ZeeConfig.CATEG_LOCRES)){
+            ZeeConfig.mapCategoryGobs.put(ZeeConfig.CATEG_LOCRES, ZeeConfig.localizedResources);
+        }else if(categ.contentEquals(ZeeConfig.CATEG_RAREFORAGE)){
+            ZeeConfig.mapCategoryGobs.put(ZeeConfig.CATEG_RAREFORAGE, ZeeConfig.rareForageables);
+        }else if(categ.contentEquals(ZeeConfig.CATEG_PVPANDSIEGE)){
+            ZeeConfig.mapCategoryGobs.put(ZeeConfig.CATEG_PVPANDSIEGE, ZeeConfig.pvpGobs);
+        }else if(categ.contentEquals(ZeeConfig.CATEG_AGROCREATURES)){
+            ZeeConfig.mapCategoryGobs.put(ZeeConfig.CATEG_AGROCREATURES, ZeeConfig.aggressiveGobs);
+        }
+    }
+
+    public static boolean isDefaultCateg(String categ) {
+        if(categ.contentEquals(CATEG_LOCRES) || categ.contentEquals(CATEG_AGROCREATURES) || categ.contentEquals(CATEG_PVPANDSIEGE) || categ.contentEquals(CATEG_RAREFORAGE))
+            return true;
+        else
+            return false;
+    }
+
     public static boolean isPlayer(String gobName) {
         return gobName.startsWith("gfx/borka/body");
     }

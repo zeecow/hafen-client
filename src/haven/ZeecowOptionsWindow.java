@@ -17,7 +17,7 @@ public class ZeecowOptionsWindow extends JFrame {
     public JTextField tfAutoClickMenu, tfGobName, tfAudioPath, tfCategName, tfAudioPathCateg;
     public JComboBox<String> cmbCattleRoster, cmbGobCategory;
     public JList<String> listGobsTemp, listGobsSaved, listGobsCategories;
-    public JButton btnRefresh, btnPrintState, btnResetGobs, btnAudioSave, btnAudioClear, btnAudioTest, btnRemGobFromCateg, btnGobColorAdd, btnCategoryColorAdd, btnGobColorRemove, btnCategoryColorRemove, btnResetCateg, btnAddCateg, btnResetWindowsPos;
+    public JButton btnRefresh, btnPrintState, btnResetGobs, btnAudioSave, btnAudioClear, btnAudioTest, btnRemGobFromCateg, btnGobColorAdd, btnCategoryColorAdd, btnGobColorRemove, btnCategoryColorRemove, btnResetCateg, btnAddCateg, btnRemoveCateg, btnResetWindowsPos;
     public JTextArea txtAreaDebug;
     public JSlider sliderAlpha, sliderGobQueueSleep;
     public static int TABGOB_SESSION = 0;
@@ -363,10 +363,12 @@ public class ZeecowOptionsWindow extends JFrame {
         tabbedPaneGobs.addTab("Categs("+ZeeConfig.mapCategoryGobs.size()+")", panelTabCateg);
         JPanel panelButtonCateg = new JPanel(new FlowLayout());
         panelTabCateg.add(panelButtonCateg);
-        panelButtonCateg.add(btnResetCateg = new JButton("Reset categories"), BorderLayout.NORTH);
+        panelButtonCateg.add(btnResetCateg = new JButton("Reset"), BorderLayout.NORTH);
         btnResetCateg.addActionListener(evt->{ resetCategoriesToDefault(); });
-        panelButtonCateg.add(btnAddCateg = new JButton("Add categories"), BorderLayout.NORTH);
+        panelButtonCateg.add(btnAddCateg = new JButton("Add"), BorderLayout.NORTH);
         btnAddCateg.addActionListener(evt->{ addCategoryNew(); });
+        panelButtonCateg.add(btnRemoveCateg = new JButton("Remove"), BorderLayout.NORTH);
+        btnRemoveCateg.addActionListener(evt->{ removeCategory(); });
         panelTabCateg.add(new JScrollPane(listGobsCategories), BorderLayout.CENTER);
         listGobsCategories.addListSelectionListener(new ListSelectionListener() {
             public void valueChanged(ListSelectionEvent evt) {
@@ -585,9 +587,44 @@ public class ZeecowOptionsWindow extends JFrame {
                 JOptionPane.showMessageDialog(this,"Category already exists.");
                 return;
             }
-            ZeeConfig.mapCategoryGobs.put(categName, Collections.singleton(""));
+            ZeeConfig.mapCategoryGobs.put(categName, new HashSet<String>());
             Utils.setpref(ZeeConfig.MAP_CATEGORY_GOBS, ZeeConfig.serialize(ZeeConfig.mapCategoryGobs));
+            buildTabGobs();
         }
+    }
+
+    private void removeCategory(){
+        String categ = tfCategName.getText();
+
+        if(JOptionPane.showConfirmDialog(this,"Remove category \""+categ+"\" ?") != JOptionPane.OK_OPTION)
+            return;
+
+        //update map gob-categ
+        for(String gob: ZeeConfig.mapGobCategory.keySet())
+            if(ZeeConfig.mapGobCategory.get(gob).contentEquals(categ))
+                ZeeConfig.mapGobCategory.remove(gob);
+
+        //update map categ-color
+        ZeeConfig.mapCategoryColor.remove(categ);
+
+        //update map categ-audio
+        ZeeConfig.mapCategoryAudio.remove(categ);
+
+        //update map categ-gobs
+        if(ZeeConfig.isDefaultCateg(categ)){
+            ZeeConfig.resetDefaultCateg(categ);
+        }else {
+            ZeeConfig.mapCategoryGobs.remove(categ);//custom categ
+        }
+
+        //save maps
+        Utils.setpref(ZeeConfig.MAP_GOB_CATEGORY, ZeeConfig.serialize(ZeeConfig.mapGobCategory));
+        Utils.setpref(ZeeConfig.MAP_CATEGORY_COLOR, ZeeConfig.serialize(ZeeConfig.mapCategoryColor));
+        Utils.setpref(ZeeConfig.MAP_CATEGORY_AUDIO, ZeeConfig.serialize(ZeeConfig.mapCategoryAudio));
+        Utils.setpref(ZeeConfig.MAP_CATEGORY_GOBS, ZeeConfig.serialize(ZeeConfig.mapCategoryGobs));
+
+        //reset options window
+        buildTabGobs();
     }
 
 
