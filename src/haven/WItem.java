@@ -267,6 +267,8 @@ public class WItem extends Widget implements DTarget2 {
 	}
 	return result;
     }), 1f);
+    
+    public final AttrCache<Curiosity> curio = new AttrCache<>(this::info, AttrCache.cache(info -> ItemInfo.find(Curiosity.class, info)), null);
 
     private GSprite lspr = null;
     public void tick(double dt) {
