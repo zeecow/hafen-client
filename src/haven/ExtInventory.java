@@ -117,7 +117,7 @@ public class ExtInventory extends Widget {
 		wnd.addtwdg(wnd.add(chb_show)
 		    .rclick(this::toggleInventory)
 		    .changed(this::setVisibility)
-		    .settip("LClick to toggle extra info\nRClick to hide inventory when info is visible\nTaping ALT toggles between displaying quality, name and info", true)
+		    .settip("LClick to toggle extra info\nRClick to hide inventory when info is visible\nTapping ALT toggles between displaying quality, name and info", true)
 		);
 		grouping.sel = Grouping.valueOf(wnd.cfg.getValue(CFG_GROUP, Grouping.NONE.name()));
 		needUpdate = true;
