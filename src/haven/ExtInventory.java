@@ -18,11 +18,12 @@ public class ExtInventory extends Widget implements DTarget {
     private static final String CFG_GROUP = "ext.group";
     private static final String CFG_SHOW = "ext.show";
     private static final String CFG_INV = "ext.inv";
+    private static final String[] TYPES = new String[]{"Q", "N", "I"};
     private static final Set<String> EXCLUDES = Collections.unmodifiableSet(new HashSet<>(Arrays.asList("Steelbox", "Pouch", "Frame", "Tub", "Fireplace", "Rack", "Pane mold", "Table", "Purse")));
     public final Inventory inv;
     private final ItemGroupList list;
     private final Widget extension;
-    private final Label space;
+    private final Label space, type;
     private SortedMap<ItemType, List<WItem>> groups;
     private final Dropbox<Grouping> grouping;
     private boolean disabled = false;
@@ -66,8 +67,9 @@ public class ExtInventory extends Widget implements DTarget {
 	    }
 	};
 	space = new Label("");
+	type = new Label("Q");
 	grouping.sel = Grouping.NONE;
-	composer.addr(new Label("Group:"), grouping);
+	composer.addr(new Label("Group:"), grouping, type);
 	list = new ItemGroupList(listw, (inv.sz.y - composer.y() - 2 * margin - space.sz.y) / itemh, itemh);
 	composer.add(list);
 	composer.add(space);
@@ -252,6 +254,10 @@ public class ExtInventory extends Widget implements DTarget {
 	}
 	if(extension.visible) {
 	    updateSpace();
+	    String t = TYPES[(int) (ui.root.ALTs() % TYPES.length)];
+	    if(!t.equals(type.texts)) {
+		type.settext(t);
+	    }
 	}
 	super.tick(dt);
     }
@@ -331,14 +337,15 @@ public class ExtInventory extends Widget implements DTarget {
 		quality = type.quality;
 	    }
 	    String quantity = Utils.f2s(items.stream().map(wItem -> wItem.quantity.get()).reduce(0f, Float::sum));
-	    String q = type.name;
+	    this.text[1] = fnd.render(String.format("%s× %s", quantity, type.name)).tex();
 	    if(!Double.isNaN(quality)) {
 		String avg = type.quality != null ? "" : "~";
 		String sign = (g == Grouping.NONE || g == Grouping.Q) ? "" : "+";
-		q = String.format("%sq%s%s", avg, Utils.f2s(quality, 1), sign);
+		String q = String.format("%sq%s%s", avg, Utils.f2s(quality, 1), sign);
+		this.text[0] = fnd.render(String.format("%s× %s", quantity, q)).tex();
+	    } else {
+		this.text[0] = text[1];
 	    }
-	    this.text[0] = fnd.render(String.format("%s× %s", quantity, q)).tex();
-	    this.text[1] = fnd.render(String.format("%s× %s", quantity, type.name)).tex();
 	    this.text[2] = info(sample, quantity, text[1]);
 	}
     
