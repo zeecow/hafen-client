@@ -278,11 +278,15 @@ public class WItem extends Widget implements DTarget2 {
 	GSprite spr = item.spr();
 	if((spr != null) && (spr != lspr)) {
 	    Coord sz = new Coord(spr.sz());
-	    lsz = new Coord(((sz.x / sqsz.x) + 1), ((sz.y / sqsz.y) + 1));
-	    if((sz.x % sqsz.x) != 0)
+	    lsz = sz.div(sqsz);
+	    if((sz.x % sqsz.x) != 0) {
 		sz.x = sqsz.x * ((sz.x / sqsz.x) + 1);
-	    if((sz.y % sqsz.y) != 0)
+		lsz.x += 1;
+	    }
+	    if((sz.y % sqsz.y) != 0) {
 		sz.y = sqsz.y * ((sz.y / sqsz.y) + 1);
+		lsz.y += 1;
+	    }
 	    resize(sz);
 	    lspr = spr;
 	}
