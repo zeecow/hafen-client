@@ -1,5 +1,7 @@
 package haven;
 
+import haven.resutil.Curiosity;
+
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.List;
@@ -8,7 +10,7 @@ import java.util.stream.Collectors;
 
 public class ExtInventory extends Widget implements DTarget {
     private static final int margin = UI.scale(5);
-    private static final int listw = UI.scale(125);
+    private static final int listw = UI.scale(150);
     private static final int itemh = UI.scale(20);
     private static final Color even = new Color(255, 255, 255, 16);
     private static final Color odd = new Color(255, 255, 255, 32);
@@ -307,11 +309,11 @@ public class ExtInventory extends Widget implements DTarget {
 	private static final Map<String, Tex> cache = new WeakHashMap<>();
 	private static final Color progc = new Color(31, 209, 185, 128);
 	private static final BufferedImage def = WItem.missing.layer(Resource.imgc).img;
-	private static final Text.Foundry foundry = new Text.Foundry(Text.sans, 12).aa(true);
+	private static final Text.Foundry fnd = new Text.Foundry(Text.sans, 10).aa(true);
 	final ItemType type;
 	final List<WItem> items;
 	final WItem sample;
-	private final Text.Line text;
+	private final Tex[] text = new Tex[3];
 	private Tex icon;
 	
 	public ItemsGroup(ItemType type, List<WItem> items, UI ui, Grouping g) {
@@ -331,11 +333,22 @@ public class ExtInventory extends Widget implements DTarget {
 	    String quantity = Utils.f2s(items.stream().map(wItem -> wItem.quantity.get()).reduce(0f, Float::sum));
 	    String q = type.name;
 	    if(!Double.isNaN(quality)) {
-		String avg = type.quality != null ? "" : "avg ";
+		String avg = type.quality != null ? "" : "~";
 		String sign = (g == Grouping.NONE || g == Grouping.Q) ? "" : "+";
 		q = String.format("%sq%s%s", avg, Utils.f2s(quality, 1), sign);
 	    }
-	    this.text = foundry.render(String.format("%s (%s)", q, quantity));
+	    this.text[0] = fnd.render(String.format("%s× %s", quantity, q)).tex();
+	    this.text[1] = fnd.render(String.format("%s× %s", quantity, type.name)).tex();
+	    this.text[2] = info(sample, quantity, text[1]);
+	}
+    
+	private static Tex info(WItem itm, String count, Tex def) {
+	    Curiosity curio = itm.curio.get();
+	    if(curio != null) {
+	        int lph = Curiosity.lph(curio.lph);
+	        return RichText.render(String.format("%s× lph: $col[192,255,255]{%d} mw: $col[255,192,255]{%d}", count, lph, curio.mw), 0).tex();
+	    }
+	    return def;
 	}
 
 	@Override
@@ -361,6 +374,7 @@ public class ExtInventory extends Widget implements DTarget {
 		    }
 		}
 	    }
+	    int mode = (int) (ui.root.ALTs() % text.length);
 	    if(icon != null) {
 		double meter = sample.meter();
 		if(meter > 0) {
@@ -369,9 +383,9 @@ public class ExtInventory extends Widget implements DTarget {
 		    g.chcolor();
 		}
 		g.aimage(icon, new Coord(0, itemh / 2), 0.0, 0.5);
-		g.aimage(text.tex(), new Coord(icon.sz().x + margin, itemh / 2), 0.0, 0.5);
+		g.aimage(text[mode], new Coord(icon.sz().x + margin, itemh / 2), 0.0, 0.5);
 	    } else {
-		g.aimage(text.tex(), new Coord(0, itemh / 2), 0.0, 0.5);
+		g.aimage(text[mode], new Coord(0, itemh / 2), 0.0, 0.5);
 	    }
 	}
 
