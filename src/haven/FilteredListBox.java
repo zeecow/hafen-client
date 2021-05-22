@@ -15,6 +15,7 @@ public abstract class FilteredListBox<T> extends Listbox<T> {
     
     public FilteredListBox(int w, int h, int itemh) {
 	super(w, h, itemh);
+	setcanfocus(true);
     }
     
     public void setItems(List<T> items) {
