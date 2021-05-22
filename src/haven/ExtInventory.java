@@ -334,12 +334,12 @@ public class ExtInventory extends Widget {
 		quality = type.quality;
 	    }
 	    String quantity = Utils.f2s(items.stream().map(wItem -> wItem.quantity.get()).reduce(0f, Float::sum));
-	    this.text[1] = fnd.render(String.format("%s× %s", quantity, type.name)).tex();
+	    this.text[1] = fnd.render(String.format("×%s %s", quantity, type.name)).tex();
 	    if(!Double.isNaN(quality)) {
 		String avg = type.quality != null ? "" : "~";
 		String sign = (g == Grouping.NONE || g == Grouping.Q) ? "" : "+";
 		String q = String.format("%sq%s%s", avg, Utils.f2s(quality, 1), sign);
-		this.text[0] = fnd.render(String.format("%s× %s", quantity, q)).tex();
+		this.text[0] = fnd.render(String.format("×%s %s", quantity, q)).tex();
 	    } else {
 		this.text[0] = text[1];
 	    }
@@ -350,7 +350,7 @@ public class ExtInventory extends Widget {
 	    Curiosity curio = itm.curio.get();
 	    if(curio != null) {
 	        int lph = Curiosity.lph(curio.lph);
-	        return RichText.render(String.format("%s× lph: $col[192,255,255]{%d} mw: $col[255,192,255]{%d}", count, lph, curio.mw), 0).tex();
+	        return RichText.render(String.format("×%s lph: $col[192,255,255]{%d}  mw: $col[255,192,255]{%d}", count, lph, curio.mw), 0).tex();
 	    }
 	    return def;
 	}
