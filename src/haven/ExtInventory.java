@@ -415,12 +415,11 @@ public class ExtInventory extends Widget {
 	    } else if(ui.modctrl && (button == 1 || button == 3)) {
 		process(items, "drop", ui.modmeta, button == 3);
 		return true;
-	    } else if(button == 1) {
-		items.get(0).item.wdgmsg("take", sqsz.div(2));
-		return true;
-	    } else if(button == 3) {
-		items.get(0).item.wdgmsg("iact", sqsz.div(2), ui.modflags());
-		return true;
+	    } else {
+		WItem item = items.get(0);
+		if(!item.disposed()) {
+		    item.mousedown(sqsz.div(2), button);
+		}
 	    }
 	    return (false);
 	}
