@@ -133,7 +133,7 @@ public class Inventory extends Widget implements DTarget {
 	    if(dropEnabled) {
 		tryDrop(wmap.get(i));
 	    }
-	    if(ext != null) {ext.itemsChanged();}
+	    itemsChanged();
 	}
     }
     
@@ -148,7 +148,7 @@ public class Inventory extends Widget implements DTarget {
 	if(w instanceof GItem) {
 	    GItem i = (GItem)w;
 	    ui.destroy(wmap.remove(i));
-	    if(ext != null) {ext.itemsChanged();}
+	    itemsChanged();
 	}
     }
     
@@ -293,6 +293,9 @@ public class Inventory extends Widget implements DTarget {
 		.settip("Left-click to toggle item dropping\nRight-click to open settings", true)
 	    ));
 	}
+    }
+    public void itemsChanged() {
+	if(ext != null) {ext.itemsChanged();}
     }
     
     private void showDropCFG() {

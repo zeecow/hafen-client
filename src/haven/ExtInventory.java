@@ -9,6 +9,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static haven.Inventory.*;
+import static haven.WItem.*;
 
 public class ExtInventory extends Widget {
     private static final int margin = UI.scale(5);
@@ -234,7 +235,7 @@ public class ExtInventory extends Widget {
 	    inv.forEachItem((g, w) -> {
 		try {
 		    Double quality = quality(w, grouping.sel);
-		    ItemType type = new ItemType(name(w), quality);
+		    ItemType type = new ItemType(name(w), quality, w.item.matches);
 		    if(type.loading) {needUpdate = true;}
 		    groups.computeIfAbsent(type, k -> new ArrayList<>()).add(w);
 		} catch (Loading ignored) {
@@ -292,16 +293,20 @@ public class ExtInventory extends Widget {
     private static class ItemType implements Comparable<ItemType> {
 	final String name;
 	final Double quality;
+	final boolean matches;
 	final boolean loading;
 
-	public ItemType(String name, Double quality) {
+	public ItemType(String name, Double quality, boolean matches) {
 	    this.name = name;
 	    this.quality = quality;
+	    this.matches = matches;
 	    loading = name.startsWith("???");
 	}
 
 	@Override
 	public int compareTo(ItemType other) {
+	    int byMatch = Boolean.compare(other.matches, matches);
+	    if(byMatch != 0) { return byMatch; }
 	    int byName = name.compareTo(other.name);
 	    if((byName != 0) || (quality == null) || (other.quality == null)) {
 		return(byName);
@@ -393,6 +398,11 @@ public class ExtInventory extends Widget {
 		g.aimage(text[mode], new Coord(itemh + margin, itemh / 2), 0.0, 0.5);
 	    } else {
 		g.aimage(text[mode], new Coord(0, itemh / 2), 0.0, 0.5);
+	    }
+	    if(type.matches) {
+		g.chcolor(MATCH_COLOR);
+		g.rect(Coord.z, sz);
+		g.chcolor();
 	    }
 	}
 

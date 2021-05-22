@@ -26,6 +26,8 @@
 
 package haven;
 
+import rx.functions.Action0;
+
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
@@ -47,6 +49,7 @@ public class GItem extends AWidget implements ItemInfo.SpriteOwner, GSprite.Owne
     public boolean matches = false;
     public boolean sendttupdate = false;
     private long filtered = 0;
+    private final List<Action0> matchListeners = new ArrayList<>();
 
     public static void setFilter(ItemFilter filter) {
 	GItem.filter = filter;
@@ -182,8 +185,25 @@ public class GItem extends AWidget implements ItemInfo.SpriteOwner, GSprite.Owne
 	    if(filtered < lastFilter && spr != null) {
 		matches = filter != null && filter.matches(info());
 		filtered = lastFilter;
+		List<Action0> listeners;
+		synchronized (matchListeners) {
+		    listeners = new ArrayList<>(matchListeners);
+		}
+		listeners.forEach(Action0::call);
 	    }
 	} catch (Loading ignored) {}
+    }
+    
+    public void addMatchListener(Action0 listener) {
+	synchronized (matchListeners) {
+	    matchListeners.add(listener);
+	}
+    }
+    
+    public void remMatchListener(Action0 listener) {
+	synchronized (matchListeners) {
+	    matchListeners.remove(listener);
+	}
     }
 
     public List<ItemInfo> info() {

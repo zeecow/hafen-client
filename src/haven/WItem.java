@@ -38,6 +38,7 @@ import java.awt.image.BufferedImage;
 import java.util.Objects;
 
 import haven.ItemInfo.AttrCache;
+import rx.functions.Action0;
 import rx.functions.Action3;
 
 import static haven.Inventory.sqsz;
@@ -54,13 +55,16 @@ public class WItem extends Widget implements DTarget2 {
     private Message csdt = Message.nil;
     private final List<Action3<WItem, Coord, Integer>> rClickListeners = new LinkedList<>();
     private boolean checkDrop = false;
+    private final CFG.Observer<Boolean> resetTooltip = cfg -> longtip = null;
+    private final Action0 itemMatched = this::itemMatched;
     
     public WItem(GItem item) {
 	super(sqsz);
 	this.item = item;
 	this.item.onBound(widget -> this.bound());
-	CFG.REAL_TIME_CURIO.observe(cfg -> longtip = null);
-	CFG.SHOW_CURIO_LPH.observe(cfg -> longtip = null);
+	CFG.REAL_TIME_CURIO.observe(resetTooltip);
+	CFG.SHOW_CURIO_LPH.observe(resetTooltip);
+	item.addMatchListener(itemMatched);
     }
 
     public void drawmain(GOut g, GSprite spr) {
@@ -167,7 +171,7 @@ public class WItem extends Widget implements DTarget2 {
 	    GItem.InfoOverlay<?>[] ret = buf.toArray(new GItem.InfoOverlay<?>[0]);
 	    return(() -> ret);
 	});
-    public final AttrCache<Double> itemmeter = new AttrCache<>(this::info, AttrCache.map1(GItem.MeterInfo.class, minf -> minf::meter));
+    public final AttrCache<Double> itemmeter = new AttrCache<Double>(this::info, AttrCache.map1(GItem.MeterInfo.class, minf -> minf::meter));
     
     public final AttrCache<ItemInfo.Contents.Content> contains = new AttrCache<>(this::info, AttrCache.cache(ItemInfo::getContent), ItemInfo.Contents.Content.EMPTY);
     
@@ -507,7 +511,15 @@ public class WItem extends Widget implements DTarget2 {
     @Override
     public void dispose() {
 	synchronized (rClickListeners) {rClickListeners.clear();}
+	CFG.SHOW_CURIO_LPH.unobserve(resetTooltip);
+	CFG.REAL_TIME_CURIO.unobserve(resetTooltip);
+	item.remMatchListener(itemMatched);
 	super.dispose();
+    }
+    
+    private void itemMatched() {
+        Inventory inv = getparent(Inventory.class);
+	if(inv != null) {inv.itemsChanged();}
     }
     
     public boolean drop(WItem target, Coord cc, Coord ul) {
