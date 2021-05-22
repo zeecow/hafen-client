@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static haven.Inventory.*;
+
 public class ExtInventory extends Widget implements DTarget {
     private static final int margin = UI.scale(5);
     private static final int listw = UI.scale(150);
@@ -389,8 +391,9 @@ public class ExtInventory extends Widget implements DTarget {
 		    g.frect(new Coord(icon.sz().x + margin, 0), new Coord((int) ((sz.x - icon.sz().x - margin) * meter), sz.y));
 		    g.chcolor();
 		}
-		g.aimage(icon, new Coord(0, itemh / 2), 0.0, 0.5);
-		g.aimage(text[mode], new Coord(icon.sz().x + margin, itemh / 2), 0.0, 0.5);
+		int sx = (itemh - icon.sz().x) / 2;
+		g.aimage(icon, new Coord(sx, itemh / 2), 0.0, 0.5);
+		g.aimage(text[mode], new Coord(itemh + margin, itemh / 2), 0.0, 0.5);
 	    } else {
 		g.aimage(text[mode], new Coord(0, itemh / 2), 0.0, 0.5);
 	    }
@@ -405,10 +408,10 @@ public class ExtInventory extends Widget implements DTarget {
 		process(items, "drop", ui.modmeta, button == 3);
 		return true;
 	    } else if(button == 1) {
-		items.get(0).item.wdgmsg("take", Inventory.sqsz.div(2));
+		items.get(0).item.wdgmsg("take", sqsz.div(2));
 		return true;
 	    } else if(button == 3) {
-		items.get(0).item.wdgmsg("iact", Inventory.sqsz.div(2), ui.modflags());
+		items.get(0).item.wdgmsg("iact", sqsz.div(2), ui.modflags());
 		return true;
 	    }
 	    return (false);
@@ -421,10 +424,10 @@ public class ExtInventory extends Widget implements DTarget {
 		items.sort(ExtInventory::byQuality);
 	    }
 	    if(!all) {
-		items.get(0).item.wdgmsg(action, Inventory.sqsz.div(2), 1);
+		items.get(0).item.wdgmsg(action, sqsz.div(2), 1);
 	    } else {
 		for (WItem item : items) {
-		    item.item.wdgmsg(action, Inventory.sqsz.div(2), 1);
+		    item.item.wdgmsg(action, sqsz.div(2), 1);
 		}
 	    }
 	}
