@@ -128,18 +128,21 @@ public interface UIPanel extends Runnable {
 	    synchronized(this) {
 		events.add(e);
 		notifyAll();
+		if(e.getKeyCode() == KeyEvent.VK_ALT) {e.consume();}
 	    }
 	}
 	public void keyPressed(KeyEvent e) {
 	    synchronized(this) {
 		events.add(e);
 		notifyAll();
+		if(e.getKeyCode() == KeyEvent.VK_ALT) {e.consume();}
 	    }
 	}
 	public void keyReleased(KeyEvent e) {
 	    synchronized(this) {
 		events.add(e);
 		notifyAll();
+		if(e.getKeyCode() == KeyEvent.VK_ALT) {e.consume();}
 	    }
 	}
 	public void mouseEntered(MouseEvent e) {}
