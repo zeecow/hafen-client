@@ -59,6 +59,11 @@ public class ExtInventory extends Widget {
 	    }
 	    
 	    @Override
+	    public Object itemtip(Grouping item) {
+		return item.tip;
+	    }
+	    
+	    @Override
 	    public void change(Grouping item) {
 		if(item != sel && wnd != null) {
 		    wnd.cfg.setValue(CFG_GROUP, item.name());
@@ -522,10 +527,17 @@ public class ExtInventory extends Widget {
     }
     
     enum Grouping {
-	NONE("Type"), Q("Quality"), Q1("Quality 1"), Q5("Quality 5"), Q10("Quality 10");
+	NONE("Type", "Groups items by type and content"),
+	Q("Quality", "Groups items by type, content and quality"),
+	Q1("Quality 1", "Groups items by type, content and quality with step 1"),
+	Q5("Quality 5", "Groups items by type, content and quality with step 5"),
+	Q10("Quality 10", "Groups items by type, content and quality with step 10");
 	
 	private final String name;
+	private final String tip;
 	
-	Grouping(String name) {this.name = name;}
+	Grouping(String name, String tip) {this.name = name;
+	    this.tip = tip;
+	}
     }
 }
