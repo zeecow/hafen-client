@@ -240,6 +240,7 @@ public class ExtInventory extends Widget implements DTarget {
 		}
 	    });
 	    this.groups = groups;
+	    list.changed();
 	}
 	if(once) {
 	    once = false;
@@ -432,6 +433,7 @@ public class ExtInventory extends Widget implements DTarget {
     
     private class ItemGroupList extends Searchbox<ItemsGroup> {
 	private List<ItemsGroup> groups = Collections.emptyList();
+	private boolean needsUpdate = false;
 
 	public ItemGroupList(int w, int h, int itemh) {
 	    super(w, h, itemh);
@@ -463,15 +465,20 @@ public class ExtInventory extends Widget implements DTarget {
 	    g.chcolor();
 	    item.draw(g);
 	}
+    
+	public void changed() {needsUpdate = true;}
 
 	@Override
 	public void tick(double dt) {
-	    if(ExtInventory.this.groups == null) {
-		groups = Collections.emptyList();
-	    } else {
-		groups = ExtInventory.this.groups.entrySet().stream()
-		    .map(v -> new ItemsGroup(v.getKey(), v.getValue(), ui, grouping.sel)).collect(Collectors.toList());
+	    if(needsUpdate) {
+		if(ExtInventory.this.groups == null) {
+		    groups = Collections.emptyList();
+		} else {
+		    groups = ExtInventory.this.groups.entrySet().stream()
+			.map(v -> new ItemsGroup(v.getKey(), v.getValue(), ui, grouping.sel)).collect(Collectors.toList());
+		}
 	    }
+	    needsUpdate = false;
 	    super.tick(dt);
 	}
     
