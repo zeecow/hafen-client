@@ -250,8 +250,8 @@ public class Inventory extends Widget implements DTarget {
 	    }
 	}
 	Coord t = new Coord(0, 0);
-	for (t.x = 0; t.x <= isz.x - size.x; t.x++) {
-	    for (t.y = 0; t.y <= isz.y - size.y; t.y++) {
+	for (t.y = 0; t.y <= isz.y - size.y; t.y++) {
+	    for (t.x = 0; t.x <= isz.x - size.x; t.x++) {
 		if(fits(slots, isz, t, size)) {
 		    return t;
 		}
