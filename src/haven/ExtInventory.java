@@ -20,7 +20,7 @@ public class ExtInventory extends Widget {
     private static final String CFG_GROUP = "ext.group";
     private static final String CFG_SHOW = "ext.show";
     private static final String CFG_INV = "ext.inv";
-    private static final String[] TYPES = new String[]{"Q", "N", "I"};
+    private static final String[] TYPES = new String[]{"Quality", "Name", "Info"};
     private static final Set<String> EXCLUDES = Collections.unmodifiableSet(new HashSet<>(Arrays.asList("Steelbox", "Pouch", "Frame", "Tub", "Fireplace", "Rack", "Pane mold", "Table", "Purse")));
     public final Inventory inv;
     private final ItemGroupList list;
@@ -74,12 +74,13 @@ public class ExtInventory extends Widget {
 	    }
 	};
 	space = new Label("");
-	type = new Label("Q");
+	type = new Label(TYPES[0]);
 	grouping.sel = Grouping.NONE;
-	composer.addr(new Label("Group:"), grouping, type);
+	composer.addr(new Label("Group:"), grouping);
 	list = new ItemGroupList(listw, (inv.sz.y - composer.y() - 2 * margin - space.sz.y) / itemh, itemh);
 	composer.add(list);
-	composer.add(space);
+	composer.addr(space, type);
+	type.c.x = listw - type.sz.x - margin;
 	extension.pack();
 	composer = new Composer(this).hmrgn(margin);
 	composer.addr(inv, extension);
@@ -115,7 +116,7 @@ public class ExtInventory extends Widget {
 		wnd.addtwdg(wnd.add(chb_show)
 		    .rclick(this::toggleInventory)
 		    .changed(this::setVisibility)
-		    .settip("LClick to toggle extra info\nRClick to hide inventory when info is visible", true)
+		    .settip("LClick to toggle extra info\nRClick to hide inventory when info is visible\nTaping ALT toggles between displaying quality, name and info", true)
 		);
 		grouping.sel = Grouping.valueOf(wnd.cfg.getValue(CFG_GROUP, Grouping.NONE.name()));
 		needUpdate = true;
@@ -162,7 +163,7 @@ public class ExtInventory extends Widget {
 	    }
 	}
 	extension.move(new Coord(szx + margin, extension.c.y));
-	space.c.y = szy - space.sz.y;
+	type.c.y = space.c.y = szy - space.sz.y;
 	list.resize(new Coord(list.sz.x, space.c.y - grouping.sz.y - 2 * margin));
 	extension.pack();
 	pack();
@@ -254,6 +255,7 @@ public class ExtInventory extends Widget {
 	    String t = TYPES[(int) (ui.root.ALTs() % TYPES.length)];
 	    if(!t.equals(type.texts)) {
 		type.settext(t);
+		type.c.x = listw - type.sz.x - margin;
 	    }
 	}
 	super.tick(dt);
