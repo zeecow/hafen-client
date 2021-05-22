@@ -32,6 +32,7 @@ public class ExtInventory extends Widget {
     private boolean disabled = false;
     private boolean showInv = true;
     private boolean needUpdate = false;
+    private double waitUpdate = 0;
     private boolean once = true;
     private WindowX wnd;
     private final ICheckBox chb_show = new ICheckBox("gfx/hud/btn-extlist", "", "-d", "-h");
@@ -195,6 +196,7 @@ public class ExtInventory extends Widget {
     }
     
     public void itemsChanged() {
+	waitUpdate = 0.05;
 	needUpdate = true;
     }
     
@@ -229,7 +231,8 @@ public class ExtInventory extends Widget {
 
     @Override
     public void tick(double dt) {
-	if(needUpdate && extension.visible) {
+	if(waitUpdate > 0) {waitUpdate -= dt;}
+	if(needUpdate && extension.visible && waitUpdate <= 0) {
 	    needUpdate = false;
 	    SortedMap<ItemType, List<WItem>> groups = new TreeMap<>();
 	    inv.forEachItem((g, w) -> {
@@ -431,10 +434,15 @@ public class ExtInventory extends Widget {
 		items.sort(ExtInventory::byQuality);
 	    }
 	    if(!all) {
-		items.get(0).item.wdgmsg(action, sqsz.div(2), 1);
+		WItem item = items.get(0);
+		if(!item.disposed()) {
+		    item.item.wdgmsg(action, sqsz.div(2), 1);
+		}
 	    } else {
 		for (WItem item : items) {
-		    item.item.wdgmsg(action, sqsz.div(2), 1);
+		    if(!item.disposed()) {
+			item.item.wdgmsg(action, sqsz.div(2), 1);
+		    }
 		}
 	    }
 	}
