@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 
 import static haven.Inventory.*;
 
-public class ExtInventory extends Widget implements DTarget {
+public class ExtInventory extends Widget {
     private static final int margin = UI.scale(5);
     private static final int listw = UI.scale(150);
     private static final int itemh = UI.scale(20);
@@ -174,16 +174,6 @@ public class ExtInventory extends Widget implements DTarget {
 	if(!value.equals(space.texts)) {
 	    space.settext(value);
 	}
-    }
-    
-    @Override
-    public boolean drop(Coord cc, Coord ul) {
-	return (inv.drop(cc, ul));
-    }
-    
-    @Override
-    public boolean iteminteract(Coord cc, Coord ul) {
-	return (inv.iteminteract(cc, ul));
     }
     
     @Override
