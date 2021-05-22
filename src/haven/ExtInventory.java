@@ -17,7 +17,6 @@ public class ExtInventory extends Widget {
     private static final int itemh = UI.scale(20);
     private static final Color even = new Color(255, 255, 255, 16);
     private static final Color odd = new Color(255, 255, 255, 32);
-    private static final Color found = new Color(255, 255, 0, 32);
     private static final String CFG_GROUP = "ext.group";
     private static final String CFG_SHOW = "ext.show";
     private static final String CFG_INV = "ext.inv";
@@ -124,7 +123,6 @@ public class ExtInventory extends Widget {
 		needUpdate = true;
 	    }
 	    hideExtension();
-	    extension.setfocus(list);
 	}
     }
     
@@ -489,17 +487,12 @@ public class ExtInventory extends Widget {
 	}
     }
     
-    private class ItemGroupList extends Searchbox<ItemsGroup> {
+    private class ItemGroupList extends Listbox<ItemsGroup> {
 	private List<ItemsGroup> groups = Collections.emptyList();
 	private boolean needsUpdate = false;
 
 	public ItemGroupList(int w, int h, int itemh) {
 	    super(w, h, itemh);
-	}
-
-	@Override
-	protected boolean searchmatch(int idx, String text) {
-	    return(groups.get(idx).type.name.toLowerCase().contains(text.toLowerCase()));
 	}
 
 	@Override
@@ -514,10 +507,6 @@ public class ExtInventory extends Widget {
 
 	@Override
 	protected void drawitem(GOut g, ItemsGroup item, int i) {
-	    if(soughtitem(i)) {
-		g.chcolor(found);
-		g.frect(Coord.z, g.sz());
-	    }
 	    g.chcolor(((i % 2) == 0) ? even : odd);
 	    g.frect(Coord.z, g.sz());
 	    g.chcolor();
