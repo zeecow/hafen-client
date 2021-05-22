@@ -391,7 +391,7 @@ public class ExtInventory extends Widget {
 		double meter = sample.meter();
 		if(meter > 0) {
 		    g.chcolor(progc);
-		    g.frect(new Coord(icon.sz().x + margin, 0), new Coord((int) ((sz.x - icon.sz().x - margin) * meter), sz.y));
+		    g.frect(new Coord(itemh + margin, 0), new Coord((int) ((sz.x - itemh - margin) * meter), sz.y));
 		    g.chcolor();
 		}
 		int sx = (itemh - icon.sz().x) / 2;
