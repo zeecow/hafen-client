@@ -431,7 +431,7 @@ public class ExtInventory extends Widget implements DTarget {
 	
 	@Override
 	public Object tooltip(Coord c, Widget prev) {
-	    return(sample.tooltip(c, prev));
+	    return(sample.tooltip(c, sample));
 	}
     }
     
