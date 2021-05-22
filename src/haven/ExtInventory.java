@@ -38,7 +38,7 @@ public class ExtInventory extends Widget {
     public ExtInventory(Coord sz) {
 	inv = new Inventory(sz);
 	inv.ext = this;
-	extension = new Widget();
+	extension = new Extension();
 	Composer composer = new Composer(extension).hmrgn(margin).vmrgn(margin);
 	grouping = new Dropbox<Grouping>(UI.scale(75), 5, UI.scale(16)) {
 	    {bgcolor = new Color(16, 16, 16, 128);}
@@ -450,6 +450,25 @@ public class ExtInventory extends Widget {
     
     public static boolean needDisableExtraInventory(String title) {
 	return EXCLUDES.contains(title);
+    }
+    
+    private class Extension extends Widget implements DTarget2 {
+	@Override
+	public boolean drop(WItem target, Coord cc, Coord ul) {
+	    Coord c = inv.findPlaceFor(target.lsz);
+	    if(c != null) {
+		c = c.mul(sqsz).add(sqsz.div(2));
+		inv.drop(c, c);
+	    } else {
+		ui.message("Non enough space!", GameUI.MsgType.BAD);
+	    }
+	    return true;
+	}
+	
+	@Override
+	public boolean iteminteract(WItem target, Coord cc, Coord ul) {
+	    return false;
+	}
     }
     
     private class ItemGroupList extends Searchbox<ItemsGroup> {

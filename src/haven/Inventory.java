@@ -240,6 +240,47 @@ public class Inventory extends Widget implements DTarget {
 	return size() - filled();
     }
     
+    public Coord findPlaceFor(Coord size) {
+	boolean[] slots = new boolean[isz.x * isz.y];
+	for (Widget wdg = lchild; wdg != null; wdg = wdg.prev) {
+	    if(wdg instanceof WItem) {
+		Coord p = wdg.c.div(sqsz);
+		Coord sz = ((WItem) wdg).lsz;
+		fill(slots, isz, p, sz);
+	    }
+	}
+	Coord t = new Coord(0, 0);
+	for (t.x = 0; t.x <= isz.x - size.x; t.x++) {
+	    for (t.y = 0; t.y <= isz.y - size.y; t.y++) {
+		if(fits(slots, isz, t, size)) {
+		    return t;
+		}
+	    }
+	}
+	return null;
+    }
+    
+    private static void fill(boolean[] slots, Coord isz, Coord p, Coord sz) {
+	for (int x = 0; x < sz.x; x++) {
+	    for (int y = 0; y < sz.y; y++) {
+		if(p.x + x < isz.x && p.y + y < isz.y) {
+		    slots[p.x + x + isz.x * (p.y + y)] = true;
+		}
+	    }
+	}
+    }
+    
+    private static boolean fits(boolean[] slots, Coord isz, Coord p, Coord sz) {
+	for (int x = 0; x < sz.x; x++) {
+	    if(p.x + x >= isz.x) {return false;}
+	    for (int y = 0; y < sz.y; y++) {
+		if(p.y + y >= isz.y) {return false;}
+		if(slots[p.x + x + isz.x * (p.y + y)]) return false;
+	    }
+	}
+	return true;
+    }
+    
     public void enableDrops() {
         Window wnd = getparent(Window.class);
 	if(wnd != null) {
