@@ -387,6 +387,7 @@ public class UI {
 		key = 0;
 	    root.globtype(key, ev);
 	}
+	root.processModDown(ev);
     }
 	
     public void keyup(KeyEvent ev) {
@@ -396,6 +397,7 @@ public class UI {
 		return;
 	}
 	root.keyup(ev);
+	root.processModUp(ev);
     }
 	
     private Coord wdgxlate(Coord c, Widget wdg) {

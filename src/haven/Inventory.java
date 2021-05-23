@@ -30,6 +30,7 @@ import rx.functions.Action0;
 
 import java.util.*;
 import java.awt.image.WritableRaster;
+import java.util.function.BiConsumer;
 
 public class Inventory extends Widget implements DTarget {
     public static final Coord sqsz = UI.scale(new Coord(33, 33));
@@ -37,6 +38,7 @@ public class Inventory extends Widget implements DTarget {
     public boolean dropul = true;
     private boolean canDropItems = false;
     private boolean dropEnabled = false;
+    public ExtInventory ext;
     Action0 dropsCallback;
     public Coord isz;
     public static final Comparator<WItem> ITEM_COMPARATOR_ASC = new Comparator<WItem>() {
@@ -83,7 +85,7 @@ public class Inventory extends Widget implements DTarget {
     @RName("inv")
     public static class $_ implements Factory {
 	public Widget create(UI ui, Object[] args) {
-	    return(new Inventory((Coord)args[0]));
+	    return(new ExtInventory((Coord)args[0]));
 	}
     }
 
@@ -105,12 +107,12 @@ public class Inventory extends Widget implements DTarget {
     public boolean mousewheel(Coord c, int amount) {
 	if(locked){return false;}
 	if(ui.modshift) {
-	    Inventory minv = getparent(GameUI.class).maininv;
-	    if(minv != this) {
+	    ExtInventory minv = getparent(GameUI.class).maininv;
+	    if(minv != this.parent) {
 		if(amount < 0)
 		    wdgmsg("invxf", minv.wdgid(), 1);
 		else if(amount > 0)
-		    minv.wdgmsg("invxf", this.wdgid(), 1);
+		    minv.wdgmsg("invxf", parent.wdgid(), 1);
 	    }
 	}
 	return(true);
@@ -131,6 +133,7 @@ public class Inventory extends Widget implements DTarget {
 	    if(dropEnabled) {
 		tryDrop(wmap.get(i));
 	    }
+	    itemsChanged();
 	}
     }
     
@@ -145,6 +148,7 @@ public class Inventory extends Widget implements DTarget {
 	if(w instanceof GItem) {
 	    GItem i = (GItem)w;
 	    ui.destroy(wmap.remove(i));
+	    itemsChanged();
 	}
     }
     
@@ -204,27 +208,94 @@ public class Inventory extends Widget implements DTarget {
 	    if(wdg.visible && wdg instanceof WItem) {
 		WItem wItem = (WItem) wdg;
 		GItem child = wItem.item;
-		if(child.resname().equals(name) && ((spr == child.spr()) || (spr != null && spr.same(child.spr())))) {
+		if(item.matches == child.matches && isSame(name, spr, child)) {
 		    items.add(wItem);
 		}
 	    }
 	}
-	Collections.sort(items, ascending ? ITEM_COMPARATOR_ASC : ITEM_COMPARATOR_DESC);
+	items.sort(ascending ? ITEM_COMPARATOR_ASC : ITEM_COMPARATOR_DESC);
 	return items;
     }
     
+    private static boolean isSame(String name, GSprite spr, GItem item) {
+	return item.resname().equals(name) && ((spr == item.spr()) || (spr != null && spr.same(item.spr())));
+    }
+    
+    public int size() {
+	return isz.x * isz.y;
+    }
+    
+    public int filled() {
+	int count = 0;
+	for (Widget wdg = lchild; wdg != null; wdg = wdg.prev) {
+	    if(wdg instanceof WItem) {
+		Coord sz = ((WItem) wdg).lsz;
+		count += sz.x * sz.y;
+	    }
+	}
+	return count;
+    }
+    
+    public int free() {
+	return size() - filled();
+    }
+    
+    public Coord findPlaceFor(Coord size) {
+	boolean[] slots = new boolean[isz.x * isz.y];
+	for (Widget wdg = lchild; wdg != null; wdg = wdg.prev) {
+	    if(wdg instanceof WItem) {
+		Coord p = wdg.c.div(sqsz);
+		Coord sz = ((WItem) wdg).lsz;
+		fill(slots, isz, p, sz);
+	    }
+	}
+	Coord t = new Coord(0, 0);
+	for (t.y = 0; t.y <= isz.y - size.y; t.y++) {
+	    for (t.x = 0; t.x <= isz.x - size.x; t.x++) {
+		if(fits(slots, isz, t, size)) {
+		    return t;
+		}
+	    }
+	}
+	return null;
+    }
+    
+    private static void fill(boolean[] slots, Coord isz, Coord p, Coord sz) {
+	for (int x = 0; x < sz.x; x++) {
+	    for (int y = 0; y < sz.y; y++) {
+		if(p.x + x < isz.x && p.y + y < isz.y) {
+		    slots[p.x + x + isz.x * (p.y + y)] = true;
+		}
+	    }
+	}
+    }
+    
+    private static boolean fits(boolean[] slots, Coord isz, Coord p, Coord sz) {
+	for (int x = 0; x < sz.x; x++) {
+	    if(p.x + x >= isz.x) {return false;}
+	    for (int y = 0; y < sz.y; y++) {
+		if(p.y + y >= isz.y) {return false;}
+		if(slots[p.x + x + isz.x * (p.y + y)]) return false;
+	    }
+	}
+	return true;
+    }
+    
     public void enableDrops() {
-	if(parent instanceof Window) {
+        Window wnd = getparent(Window.class);
+	if(wnd != null) {
 	    canDropItems = true;
 	    dropsCallback = this::doDrops;
 	    ItemAutoDrop.addCallback(dropsCallback);
-	    Window wnd = (Window) parent;
 	    wnd.addtwdg(wnd.add(new ICheckBox("gfx/hud/btn-adrop", "", "-d", "-h")
 		.changed(this::doEnableDrops)
 		.rclick(this::showDropCFG)
 		.settip("Left-click to toggle item dropping\nRight-click to open settings", true)
 	    ));
 	}
+    }
+    public void itemsChanged() {
+	if(ext != null) {ext.itemsChanged();}
     }
     
     private void showDropCFG() {
@@ -260,5 +331,9 @@ public class Inventory extends Widget implements DTarget {
 
     public static Coord sqoff(Coord c){
 	return c.mul(invsq.sz());
+    }
+
+    public void forEachItem(BiConsumer<GItem, WItem> consumer) {
+	wmap.forEach(consumer);
     }
 }

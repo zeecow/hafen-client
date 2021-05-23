@@ -38,6 +38,7 @@ import java.awt.image.BufferedImage;
 import java.util.Objects;
 
 import haven.ItemInfo.AttrCache;
+import rx.functions.Action0;
 import rx.functions.Action3;
 
 import static haven.Inventory.sqsz;
@@ -48,18 +49,22 @@ public class WItem extends Widget implements DTarget2 {
     public static final Color DURABILITY_COLOR = new Color(214, 253, 255);
     public static final Color ARMOR_COLOR = new Color(255, 227, 191);
     public static final Color MATCH_COLOR = new Color(255, 32, 255, 255);
+    public Coord lsz = new Coord(1, 1);
     public final GItem item;
     private Resource cspr = null;
     private Message csdt = Message.nil;
     private final List<Action3<WItem, Coord, Integer>> rClickListeners = new LinkedList<>();
     private boolean checkDrop = false;
+    private final CFG.Observer<Boolean> resetTooltip = cfg -> longtip = null;
+    private final Action0 itemMatched = this::itemMatched;
     
     public WItem(GItem item) {
 	super(sqsz);
 	this.item = item;
 	this.item.onBound(widget -> this.bound());
-	CFG.REAL_TIME_CURIO.observe(cfg -> longtip = null);
-	CFG.SHOW_CURIO_LPH.observe(cfg -> longtip = null);
+	CFG.REAL_TIME_CURIO.observe(resetTooltip);
+	CFG.SHOW_CURIO_LPH.observe(resetTooltip);
+	item.addMatchListener(itemMatched);
     }
 
     public void drawmain(GOut g, GSprite spr) {
@@ -166,31 +171,20 @@ public class WItem extends Widget implements DTarget2 {
 	    GItem.InfoOverlay<?>[] ret = buf.toArray(new GItem.InfoOverlay<?>[0]);
 	    return(() -> ret);
 	});
-    public final AttrCache<Double> itemmeter = new AttrCache<>(this::info, AttrCache.map1(GItem.MeterInfo.class, minf -> minf::meter));
+    public final AttrCache<Double> itemmeter = new AttrCache<Double>(this::info, AttrCache.map1(GItem.MeterInfo.class, minf -> minf::meter));
     
-    public final AttrCache<QualityList> itemq = new AttrCache<QualityList>(this::info, AttrCache.cache(info -> {
-	List<ItemInfo.Contents> contents = ItemInfo.findall(ItemInfo.Contents.class, info);
-	List<ItemInfo> qualities = null;
-	if(!contents.isEmpty()) {
-	    for(ItemInfo.Contents content : contents) {
-		List<ItemInfo> tmp = ItemInfo.findall(QualityList.classname, content.sub);
-		if(!tmp.isEmpty()) {
-		    qualities = tmp;
-		}
-	    }
+    public final AttrCache<ItemInfo.Contents.Content> contains = new AttrCache<>(this::info, AttrCache.cache(ItemInfo::getContent), ItemInfo.Contents.Content.EMPTY);
+    
+    public final AttrCache<QualityList> itemq = new AttrCache<>(this::info, AttrCache.cache(info -> {
+	ItemInfo.Contents.Content content = contains.get();
+	if(!content.empty() && !content.q.isEmpty()) {
+	    return content.q;
 	}
-	if(qualities == null || qualities.isEmpty()) {
-	    qualities = ItemInfo.findall(QualityList.classname, info);
-	}
-	
-	QualityList qualityList = new QualityList(qualities);
-	return !qualityList.isEmpty() ? qualityList : null;
+	return new QualityList(ItemInfo.findall(QualityList.classname, info));
     }));
     
     public final AttrCache<Pair<String, String>> study = new AttrCache<>(this::info, AttrCache.map1(Curiosity.class, curio -> curio::remainingTip));
     
-    public final AttrCache<ItemInfo.Contents.Content> contains = new AttrCache<>(this::info, AttrCache.cache(ItemInfo::getContent), ItemInfo.Contents.Content.EMPTY); 
-
     public final AttrCache<Tex> heurnum = new AttrCache<Tex>(this::info, AttrCache.cache(info -> {
 	String num = ItemInfo.getCount(info);
 	if(num == null) return null;
@@ -214,6 +208,11 @@ public class WItem extends Widget implements DTarget2 {
 	double bar = (float) (wear.b - wear.a) / wear.b;
 	return new Pair<>(bar, Utils.blendcol(bar, Color.RED, Color.ORANGE, Color.YELLOW, Color.GREEN));
     }));
+    
+    public double meter() {
+	Double meter = (item.meter > 0) ? (Double) (item.meter / 100.0) : itemmeter.get();
+	return meter == null ? 0 : meter;
+    }
     
     public final AttrCache<Tex> armor = new AttrCache<Tex>(this::info, AttrCache.cache(info -> {
 	Pair<Integer, Integer> armor = ItemInfo.getArmor(info);
@@ -242,8 +241,38 @@ public class WItem extends Widget implements DTarget2 {
     
     public final AttrCache<String> name = new AttrCache<>(this::info, AttrCache.cache(info -> {
 	ItemInfo.Name name = ItemInfo.find(ItemInfo.Name.class, info);
-	return (name != null && name.str != null && name.str.text != null) ? name.str.text : "";
+	String result = "???";
+	if(name != null) {
+	    result = name.original;
+	    ItemInfo.Contents.Content content = ItemInfo.Contents.content(name.original);
+	    if(!content.empty()) {result = content.name();}
+	
+	    content = contains.get();
+	    if(!content.empty()) {
+		result = String.format("%s (%s)", result, content.name());
+	    }
+	}
+	return result;
     }), "");
+    
+    public final AttrCache<Float> quantity = new AttrCache<>(this::info, AttrCache.cache(info -> {
+	float result = 1;
+	ItemInfo.Name name = ItemInfo.find(ItemInfo.Name.class, info);
+	if(name != null) {
+	    ItemInfo.Contents.Content content = ItemInfo.Contents.content(name.original);
+	    if(!content.empty()) {
+		result = content.count;
+	    } else {
+		content = contains.get();
+		if(!content.empty()) {
+		    result = content.count;
+		}
+	    }
+	}
+	return result;
+    }), 1f);
+    
+    public final AttrCache<Curiosity> curio = new AttrCache<>(this::info, AttrCache.cache(info -> ItemInfo.find(Curiosity.class, info)), null);
 
     private GSprite lspr = null;
     public void tick(double dt) {
@@ -253,10 +282,15 @@ public class WItem extends Widget implements DTarget2 {
 	GSprite spr = item.spr();
 	if((spr != null) && (spr != lspr)) {
 	    Coord sz = new Coord(spr.sz());
-	    if((sz.x % sqsz.x) != 0)
+	    lsz = sz.div(sqsz);
+	    if((sz.x % sqsz.x) != 0) {
 		sz.x = sqsz.x * ((sz.x / sqsz.x) + 1);
-	    if((sz.y % sqsz.y) != 0)
+		lsz.x += 1;
+	    }
+	    if((sz.y % sqsz.y) != 0) {
 		sz.y = sqsz.y * ((sz.y / sqsz.y) + 1);
+		lsz.y += 1;
+	    }
 	    resize(sz);
 	    lspr = spr;
 	}
@@ -292,8 +326,8 @@ public class WItem extends Widget implements DTarget2 {
     }
 
     private void drawmeter(GOut g, Coord sz) {
-	Double meter = (item.meter > 0) ? (Double) (item.meter / 100.0) : itemmeter.get();
-	if(meter != null && meter > 0) {
+	double meter = meter();
+	if(meter > 0) {
 	    Tex studyTime = getStudyTime();
 	    if(studyTime == null && CFG.PROGRESS_NUMBER.get()) {
 		Tex tex = Text.renderstroked(String.format("%d%%", Math.round(100 * meter))).tex();
@@ -388,7 +422,7 @@ public class WItem extends Widget implements DTarget2 {
 
     private void drawq(GOut g) {
 	QualityList quality = itemq.get();
-	if(quality != null) {
+	if(quality != null && !quality.isEmpty()) {
 	    Tex tex = null;
 	    SingleType qtype = getQualityType();
 	    if(qtype != null) {
@@ -477,7 +511,15 @@ public class WItem extends Widget implements DTarget2 {
     @Override
     public void dispose() {
 	synchronized (rClickListeners) {rClickListeners.clear();}
+	CFG.SHOW_CURIO_LPH.unobserve(resetTooltip);
+	CFG.REAL_TIME_CURIO.unobserve(resetTooltip);
+	item.remMatchListener(itemMatched);
 	super.dispose();
+    }
+    
+    private void itemMatched() {
+        Inventory inv = getparent(Inventory.class);
+	if(inv != null) {inv.itemsChanged();}
     }
     
     public boolean drop(WItem target, Coord cc, Coord ul) {

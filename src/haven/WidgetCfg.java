@@ -46,8 +46,8 @@ public class WidgetCfg {
 	data.put(key, value);
     }
     
-    public Object getValue(String key, Object def) {
-	return (data == null) ? def : data.getOrDefault(key, def);
+    public <T> T getValue(String key, T def) {
+	return (data == null) ? def : (T) data.getOrDefault(key, def);
     }
     
     public Object getValue(String key) {return getValue(key, null);}

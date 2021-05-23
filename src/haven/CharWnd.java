@@ -34,6 +34,7 @@ import java.util.List;
 import java.util.stream.IntStream;
 
 
+import static haven.ExtInventory.*;
 import static haven.PUtils.*;
 import haven.resutil.FoodInfo;
 import haven.resutil.Curiosity;
@@ -655,7 +656,7 @@ public class CharWnd extends WindowX {
 
 	private StudyInfo(Coord sz, final Widget study) {
 	    super(sz);
-	    this.study = (Inventory) study;
+	    this.study = inventory(study);
 	    Widget plbl, pval;
 	    plbl = add(new Label("Attention:"), UI.scale(2, 2));
 	    pval = adda(new RLabel<Pair<Integer, Integer>>(() -> new Pair<>(tw, (ui == null) ? 0 : ui.sess.glob.getcattr("int").comp),
@@ -2235,11 +2236,13 @@ public class CharWnd extends WindowX {
     public void addchild(Widget child, Object... args) {
 	String place = (args[0] instanceof String)?(((String)args[0]).intern()):null;
 	if(place == "study") {
+	    if(child instanceof ExtInventory)
+		((ExtInventory) child).disable();
 	    sattr.add(child, studyc.add(wbox.btloff()));
 	    Widget f = Frame.around(sattr, Collections.singletonList(child));
 	    Widget inf = sattr.add(new StudyInfo(new Coord(attrw - child.sz.x - wbox.bisz().x - margin1, child.sz.y), child), child.pos("ur").add(wbox.bisz().x + margin1, 0));
 	    Frame.around(sattr, Collections.singletonList(inf));
-	    getparent(GameUI.class).studywnd.setStudy((Inventory)child);
+	    getparent(GameUI.class).studywnd.setStudy(inventory(child));
 	} else if(place == "fmg") {
 	    fgt.add(child, 0, 0);
 	} else if(place == "wound") {

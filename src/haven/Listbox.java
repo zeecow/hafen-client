@@ -111,6 +111,18 @@ public abstract class Listbox<T> extends ListWidget<T> {
 	    return(null);
 	return(listitem(idx));
     }
+    
+    protected Object itemtip(T item) {return null;}
+    
+    @Override
+    public Object tooltip(Coord c, Widget prev) {
+	Object tip = null;
+	T item = itemat(c);
+	if(item != null) {
+	    tip = itemtip(item);
+	}
+	return tip != null ? tip : super.tooltip(c, prev);
+    }
 
     public boolean mousedown(Coord c, int button) {
 	if(super.mousedown(c, button))
@@ -119,9 +131,20 @@ public abstract class Listbox<T> extends ListWidget<T> {
 	T item = (idx >= listitems()) ? null : listitem(idx);
 	if((item == null) && (button == 1))
 	    change(null);
-	else if(item != null)
+	else if(item != null) {
+	    if(item instanceof Widget) {
+		Widget wdg = (Widget) item;
+		if(wdg.visible) {
+		    Coord cc = xlate(wdg.c.addy(c.y / itemh * itemh), true);
+		    if(c.isect(cc, wdg.sz) && wdg.mousedown(c.add(cc.inv()), button)) {
+			return(true);
+		    }
+		}
+	    }
 	    itemclick(item, c.sub(idxc(idx)), button);
-	return(true);
+	    return true;
+	}
+	return(false);
     }
 
     @Override

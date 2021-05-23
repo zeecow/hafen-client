@@ -291,18 +291,27 @@ public abstract class ItemInfo {
 	    QualityList q = new QualityList(sub);
 	    for (ItemInfo i : sub) {
 		if(i instanceof Name) {
-		    Matcher m = PARSE.matcher(((Name) i).original);
-		    if(m.find()) {
-			float count = 0;
-			try {
-			    count = Float.parseFloat(m.group(1));
-			} catch (Exception ignored) {}
-			return new Content(m.group(3), m.group(2), count, q);
-		    }
+		    return content(((Name) i).original, q);
 		}
 	    }
 	    return Content.EMPTY;
 	}
+	
+	public static Content content(String name){
+	    return content(name, new QualityList(Collections.emptyList()));
+	}
+	
+	public static Content content(String name, QualityList q){
+	    Matcher m = PARSE.matcher(name);
+	    if(m.find()) {
+		float count = 0;
+		try {
+		    count = Float.parseFloat(m.group(1));
+		} catch (Exception ignored) {}
+		return new Content(m.group(3), m.group(2), count, q);
+	    }
+	    return Content.EMPTY;
+	} 
     
 	public static class Content {
 	    public final String name;
@@ -320,6 +329,13 @@ public abstract class ItemInfo {
 		this.count = count;
 		this.q = q;
 	    }
+	    
+	    public String name() {
+		if("seeds".equals(unit)) {
+		    return String.format("Seeds of %s", name);
+		}
+		return name;
+	    }
 	
 	    public boolean is(String what) {
 		if(name == null || what == null) {
@@ -327,6 +343,8 @@ public abstract class ItemInfo {
 		}
 		return name.contains(what);
 	    }
+	    
+	    public boolean empty() {return count == 0 || name == null;}
 	
 	    public static final Content EMPTY = new Content(null, null, 0);
 	}
