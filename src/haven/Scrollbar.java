@@ -43,6 +43,17 @@ public class Scrollbar extends Widget {
 	return(max > min);
     }
     
+    public void min(int min) {
+        this.min = min;
+        ch(0);
+    }
+    
+    
+    public void max(int max) {
+	this.max = max;
+	ch(0);
+    }
+    
     public void draw(GOut g) {
 	if(vis()) {
 	    int cx = (sflarp.sz().x / 2) - (schain.sz().x / 2);

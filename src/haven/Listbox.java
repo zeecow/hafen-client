@@ -61,7 +61,7 @@ public abstract class Listbox<T> extends ListWidget<T> {
     }
 
     public void draw(GOut g) {
-	sb.max = listitems() - h;
+	sb.max(listitems() - h);
 	drawbg(g);
 	int n = listitems();
 	for(int i = 0; (i * itemh) < sz.y; i++) {
