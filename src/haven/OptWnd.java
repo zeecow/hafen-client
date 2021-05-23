@@ -1293,7 +1293,7 @@ public class OptWnd extends WindowX {
 
 	public CFGBox(String lbl, CFG<Boolean> cfg, String tip, boolean observe) {
 	    super(lbl);
-
+	    set = null;
 	    this.cfg = cfg;
 	    defval();
 	    if(tip != null) {
@@ -1310,6 +1310,7 @@ public class OptWnd extends WindowX {
 	public void set(boolean a) {
 	    this.a = a;
 	    cfg.set(a);
+	    if(set != null) {set.accept(a);}
 	}
 
 	@Override
