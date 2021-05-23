@@ -109,16 +109,27 @@ public class RootWidget extends ConsoleHost {
     public long SHIFTs() {return presses[2];}
     
     private boolean isCTRL(KeyEvent ev) {
-	return ev.getKeyCode() == KeyEvent.VK_CONTROL && ev.getExtendedKeyCode() == KeyEvent.VK_CONTROL;
+	return ev.getModifiersEx() == (ev.getModifiersEx() & KeyEvent.CTRL_DOWN_MASK)
+	    && KeyEvent.VK_CONTROL == ev.getExtendedKeyCode()
+	    && KeyEvent.VK_CONTROL == ev.getKeyCode();
     }
     
     private boolean isALT(KeyEvent ev) {
-	return (ev.getKeyCode() == KeyEvent.VK_ALT && ev.getExtendedKeyCode() == KeyEvent.VK_ALT) ||
-	    (ev.getKeyCode() == KeyEvent.VK_META && ev.getExtendedKeyCode() == KeyEvent.VK_META);
+	return (
+	    ev.getModifiersEx() == (ev.getModifiersEx() & KeyEvent.ALT_DOWN_MASK)
+		&& KeyEvent.VK_ALT == ev.getExtendedKeyCode()
+		&& KeyEvent.VK_ALT == ev.getKeyCode()
+	) || (
+	    ev.getModifiersEx() == (ev.getModifiersEx() & KeyEvent.META_DOWN_MASK)
+		&& KeyEvent.VK_META == ev.getExtendedKeyCode()
+		&& KeyEvent.VK_META == ev.getKeyCode()
+	);
     }
     
     private boolean isSHIFT(KeyEvent ev) {
-	return ev.getKeyCode() == KeyEvent.VK_SHIFT && ev.getExtendedKeyCode() == KeyEvent.VK_SHIFT;
+	return ev.getModifiersEx() == (ev.getModifiersEx() & KeyEvent.SHIFT_DOWN_MASK)
+	    && KeyEvent.VK_SHIFT == ev.getExtendedKeyCode()
+	    && KeyEvent.VK_SHIFT == ev.getKeyCode();
     }
     
     @Override
