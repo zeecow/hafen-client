@@ -47,14 +47,14 @@ public class ItemAutoDrop {
 	    if(wnd != null) {wnd.addItem(name);}
 	}
 	if(value) {
-	    updateCallbacks.forEach(Action0::call);
+	    updateCallbacks();
 	}
     }
     
     private static boolean add(String name) {
 	if(cfg.put(name, true) == null) {
 	    save();
-	    updateCallbacks.forEach(Action0::call);
+	    updateCallbacks();
 	    return true;
 	}
 	return false;
@@ -66,6 +66,11 @@ public class ItemAutoDrop {
 	    save();
 	}
     }
+    
+    private static void updateCallbacks() {
+	updateCallbacks.forEach(Action0::call);
+    }
+    
     
     private static void tryInit() {
 	if(gson != null) {return;}
@@ -111,7 +116,7 @@ public class ItemAutoDrop {
 		    list.filtered.forEach(item -> ItemAutoDrop.cfg.put(item.name, val));
 		    save();
 		    if(val) {
-			updateCallbacks.forEach(Action0::call);
+			updateCallbacks();
 		    }
 		}
 	    }).pos("bl").y + UI.scale(3);
@@ -120,12 +125,18 @@ public class ItemAutoDrop {
 	    Position ur = list.pos("ur");
 	    filter = adda(new Label(FILTER_DEFAULT), ur, 1, 1);
 	    
-	    h = add(new Label("Drop item on this window to add it to list"), list.pos("bl").addys(10)).pos("bl").y;
-	    add(new Label("Right-click item to remove it"), 0, h);
+	    Coord p = list.pos("bl").addys(10);
+	    p = add(new OptWnd.CFGBox("Don't drop filtered items", CFG.AUTO_DROP_RESPECT_FILTER).set(CFGWnd::respectFilterChanged), p).pos("bl").addys(10);
+	    p = add(new Label("Drop item on this window to add it to list"), p).pos("bl");
+	    add(new Label("Right-click item to remove it"), p);
 	    
 	    pack();
 	    setfocus(list);
 	    populateList();
+	}
+    
+	private static void respectFilterChanged(Boolean v) {
+	    if(!v) {updateCallbacks();}
 	}
 	
 	@Override
