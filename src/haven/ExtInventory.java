@@ -60,9 +60,7 @@ public class ExtInventory extends Widget {
 	    }
 	    
 	    @Override
-	    public Object itemtip(Grouping item) {
-		return item.tip;
-	    }
+	    public Object itemtip(Grouping item) { return ""; }
 	    
 	    @Override
 	    public void change(Grouping item) {
@@ -77,7 +75,7 @@ public class ExtInventory extends Widget {
 	space = new Label("");
 	type = new Label(TYPES[0]);
 	grouping.sel = Grouping.NONE;
-	composer.addr(new Label("Group:"), grouping);
+	composer.addr(new Label("Group:"), grouping, new IButton("gfx/hud/btn-help", "","-d","-h", this::showHelp).settip("Help"));
 	list = new ItemGroupList(listw, (inv.sz.y - composer.y() - 2 * margin - space.sz.y) / itemh, itemh);
 	composer.add(list);
 	composer.addr(space, type);
@@ -86,6 +84,10 @@ public class ExtInventory extends Widget {
 	composer = new Composer(this).hmrgn(margin);
 	composer.addr(inv, extension);
 	pack();
+    }
+    
+    private void showHelp() {
+        HelpWnd.show(ui, "halp/extrainv");
     }
     
     public void hideExtension() {
@@ -554,17 +556,14 @@ public class ExtInventory extends Widget {
     }
     
     enum Grouping {
-	NONE("Type", "Groups items by type and content"),
-	Q("Quality", "Groups items by type, content and quality"),
-	Q1("Quality 1", "Groups items by type, content and quality with step 1"),
-	Q5("Quality 5", "Groups items by type, content and quality with step 5"),
-	Q10("Quality 10", "Groups items by type, content and quality with step 10");
+	NONE("Type"),
+	Q("Quality"),
+	Q1("Quality 1"),
+	Q5("Quality 5"),
+	Q10("Quality 10");
 	
 	private final String name;
-	private final String tip;
 	
-	Grouping(String name, String tip) {this.name = name;
-	    this.tip = tip;
-	}
+	Grouping(String name) {this.name = name; }
     }
 }
