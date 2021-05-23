@@ -1,3 +1,11 @@
+$size[14]{$u{Update for 23.05.21:}
+  * added wrecking ball to radar
+  * fixed client freezing when pressing TAB with map icon settings open
+  * made ESC clear filter text from item filter
+  * made mass item transfers and drops respect filtered status - filtered items are considered separate group
+  * added option to not auto-drop items matched by item filter (on by default, accessible in auto-drop settings)
+  * added $img[gfx/hud/btn-extlist] button to most windows with inventory. Toggles extra inventory list. Detailed info on its inner workings can be read in help accessible through $img[gfx/hud/btn-help] button inside it.
+ 
 $size[14]{$u{Update for 17.05.21:}
   * merged loftar's changes
   * fixed potential crash when equipping items
