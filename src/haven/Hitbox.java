@@ -79,12 +79,13 @@ public class Hitbox extends SlottedNode implements Rendered {
 	    ResDrawable rd = (gob.drawable instanceof ResDrawable) ? (ResDrawable) gob.drawable : null;
 	    
 	    if(rd != null) {
-		MessageBuf sdt = rd.sdt.clone();
-		int state = sdt.eom() ? 0xffff0000 : decnum(sdt);
+		int state = gob.sdt();
 		if(name.endsWith("gate") && name.startsWith("gfx/terobjs/arch")) {//gates
 		    if(state == 1) { // gate is open
 			return true;
 		    }
+		} else if(name.endsWith("/dng/antdoor")) {
+		    return state == 1 || state == 13;
 		} else if(name.endsWith("/pow[hearth]")) {//hearth fire
 		    return true;
 		} else if(name.equals("gfx/terobjs/arch/cellardoor") || name.equals("gfx/terobjs/fishingnet")) {
