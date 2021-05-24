@@ -25,7 +25,7 @@ public enum GobTag {
     
     private static final String[] AGGRO = {
         "/bear", "/boar", "/troll", "/wolverine", "/badger", "/adder", "/wolf", "/walrus", "/lynx", "/rat/caverat", "/moose", 
-        "/mammoth", "/goat/wildgoat"
+        "/mammoth", "/goat/wildgoat", "/spermwhale", "/orca"
     };
     
     private static final String[] ANIMALS = {
