@@ -211,6 +211,11 @@ public class MenuGrid extends Widget implements KeyBinding.Bindable {
 	public void use() {
 	    action.perform(pag);
 	}
+    
+	@Override
+	public void use(Interaction iact) {
+	    action.perform(pag);
+	}
     }
     
     public final PagButton next = new PagButton(new Pagina(this, Resource.local().loadwait("gfx/hud/sc-next").indir())) {
