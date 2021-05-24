@@ -28,6 +28,9 @@ public enum GobTag {
         "/mammoth", "/goat/wildgoat", "/spermwhale", "/orca"
     };
     
+    private static final String[] BIG_PARTS = {
+        "/orca/orcabeef"
+    };
     private static final String[] ANIMALS = {
         "/fox", "/swan", "/bat", "/beaver", "/reddeer"
     };
@@ -102,6 +105,8 @@ public enum GobTag {
                 } else if(ofType(name, CRITTERS)) {
                     tags.add(ANIMAL);
                     tags.add(CRITTER);
+                } else if(ofType(name, BIG_PARTS)) {
+                    //ignore big parts of animals like Orca
                 } else if(ofType(name, AGGRO)) {
                     tags.add(ANIMAL);
                     tags.add(AGGRESSIVE);
