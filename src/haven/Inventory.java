@@ -44,7 +44,7 @@ public class Inventory extends Widget implements DTarget {
 				q2 = Inventory.getQuality(o2.item);
 				return Double.compare(q1, q2);
 			}catch(Exception e){
-				System.out.println(q1+" "+q2);
+				System.out.println("Inventory.ITEM_COMPARATOR_ASC > "+q1+" "+q2);
 			}
 			return 0;
 		}
@@ -231,6 +231,7 @@ public class Inventory extends Widget implements DTarget {
 
 	public static Double getQuality(GItem item) {
 		try {
+			/*
 			ItemInfo.Contents contents = getItemInfoContents(item.info());
 			if(contents != null) {
 				Double quality = getItemInfoQuality(contents.sub);
@@ -238,8 +239,9 @@ public class Inventory extends Widget implements DTarget {
 					return(quality);
 				}
 			}
+			*/
 			return(getItemInfoQuality(item.info()));
-		} catch (NoSuchFieldException | IllegalAccessException e) {
+		} catch (Exception e) {
 			System.out.println(e.getMessage());
 		}
 		return Double.valueOf(0);
@@ -247,7 +249,7 @@ public class Inventory extends Widget implements DTarget {
 
 	public static Double getItemInfoQuality(List<ItemInfo> info) throws NoSuchFieldException, IllegalAccessException {
 		for(ItemInfo v : info) {
-			if(v.getClass().getName().equals("Quality")) {
+			if(v.getClass().getSimpleName().equals("Quality")) {
 				return((Double) v.getClass().getField("q").get(v));
 			}
 		}
