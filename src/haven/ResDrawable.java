@@ -84,14 +84,21 @@ public class ResDrawable extends Drawable {
     public String makeResId() {
 	String name = res.get().name;
 	String extra = null;
-	MessageBuf sdt = this.sdt.clone();
-	int state = sdt.eom() ? 0xffff0000 : decnum(sdt);
+	int state =  sdtnum();
 	if(name.endsWith("/pow")) {//fire
 	    if(state == 17 || state == 33) { // this fire is actually hearth fire
 		extra = "hearth";
 	    }
 	}
 	return extra == null ? name : String.format("%s[%s]", name, extra);
+    }
+    
+    public int sdtnum() {
+	if (sdt != null) {
+	    Message msg = sdt.clone();
+	    return msg.eom() ? 0xffff000 : decnum(msg);
+	}
+	return 0;
     }
     
     public Skeleton.Pose getpose() {

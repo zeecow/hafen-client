@@ -1073,6 +1073,16 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Sk
 	return null;
     }
     
+    //Useful for getting stage information or model type
+    public int sdt() {
+        Drawable d = drawable;
+        if(d instanceof ResDrawable) {
+	    ResDrawable dw = (ResDrawable) d;
+		return dw.sdtnum();
+	}
+	return 0;
+    }
+    
     public void poseUpdated() {status.update(StatusType.pose);}
     
     public void idUpdated() {status.update(StatusType.id);}
