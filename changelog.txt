@@ -1,3 +1,6 @@
+$size[14]{$u{Update for 24.05.21:}
+  * merged loftar's changes
+ 
 $size[14]{$u{Update for 23.05.21:}
   * added wrecking ball to radar
   * fixed client freezing when pressing TAB with map icon settings open
