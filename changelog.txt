@@ -1,6 +1,7 @@
 $size[14]{$u{Update for 24.05.21:}
   * merged loftar's changes
   * added orcas and whales to aggressive animals list
+  * fixed custom action not working from Menu grid
  
 $size[14]{$u{Update for 23.05.21:}
   * added wrecking ball to radar
