@@ -63,6 +63,7 @@
   ],
   "Ore": [
     "gfx/tiles/rocks/argentite",
+    "gfx/tiles/rocks/blackcoal",
     "gfx/tiles/rocks/cassiterite",
     "gfx/tiles/rocks/chalcopyrite",
     "gfx/tiles/rocks/cinnabar",
