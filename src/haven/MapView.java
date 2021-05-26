@@ -873,7 +873,7 @@ public class MapView extends PView implements DTarget, Console.Directory {
 	    ol.tick();
     }
 
-    private static final Material gridmat = new Material(new BaseColor(255, 255, 255, 48), States.maskdepth, new MapMesh.OLOrder(null),
+    private static final Material gridmat = new Material(new BaseColor(0, 255, 0, 48), States.maskdepth, new MapMesh.OLOrder(null),
 							 Location.xlate(new Coord3f(0, 0, 0.5f))   /* Apparently, there is no depth bias for lines. :P */
 							 );
     private class GridLines extends MapRaster {
