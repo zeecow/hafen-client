@@ -1,3 +1,10 @@
+$size[14]{$u{Update for 27.05.21:}
+  * added ability to drop items onto avatar view in the top-left to equip them
+  * moved auto-pickup to $img[paginae/act/add,h=16,c] $img[gfx/hud/breadcrumb,h=16,c] $img[paginae/act/automation,h=16,c] $img[gfx/hud/breadcrumb,h=16,c] $img[paginae/add/autobot,h=16,c] 
+  * added action to feed nearest oven with 4 branches ($img[paginae/act/add,h=16,c] $img[gfx/hud/breadcrumb,h=16,c] $img[paginae/act/automation,h=16,c] $img[gfx/hud/breadcrumb,h=16,c] $img[paginae/add/foven4,h=16,c]) 
+  * added action to feed smelter with 9 coal ($img[paginae/act/add,h=16,c] $img[gfx/hud/breadcrumb,h=16,c] $img[paginae/act/automation,h=16,c] $img[gfx/hud/breadcrumb,h=16,c] $img[paginae/add/fsmelter9,h=16,c]) 
+  * added action to feed smelter with 12 coal ($img[paginae/act/add,h=16,c] $img[gfx/hud/breadcrumb,h=16,c] $img[paginae/act/automation,h=16,c] $img[gfx/hud/breadcrumb,h=16,c] $img[paginae/add/fsmelter12,h=16,c]) 
+ 
 $size[14]{$u{Update for 24.05.21:}
   * merged loftar's changes
   * added orcas and whales to aggressive animals list
@@ -9,7 +16,7 @@ $size[14]{$u{Update for 23.05.21:}
   * made ESC clear filter text from item filter
   * made mass item transfers and drops respect filtered status - filtered items are considered separate group
   * added option to not auto-drop items matched by item filter (on by default, accessible in auto-drop settings)
-  * added $img[gfx/hud/btn-extlist] button to most windows with inventory. Toggles extra inventory list. Detailed info on its inner workings can be read in help accessible through $img[gfx/hud/btn-help] button inside it.
+  * added $img[gfx/hud/btn-extlist,c] button to most windows with inventory. Toggles extra inventory list. Detailed info on its inner workings can be read in help accessible through $img[gfx/hud/btn-help,c] button inside it.
  
 $size[14]{$u{Update for 17.05.21:}
   * merged loftar's changes
