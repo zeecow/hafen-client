@@ -102,6 +102,7 @@ public class RichText extends Text {
 	public double lh = -1, bh = -1;
 	public Map<? extends Attribute, ?> attrs;
 	public float imgscale = 1.0f;
+	public boolean center = false;
 	private Coord sz = null;
 	
 	public Image(BufferedImage img) {
@@ -141,7 +142,16 @@ public class RichText extends Text {
 	
 	public int width() {return(sz.x);}
 	public int height() {return(sz.y);}
-	public int baseline() {return(sz.y - 1);}
+    
+	public int baseline() {
+	    if(center) {
+		LineMetrics lm = lm();
+		float ascent = lm.getAscent();
+		float height = lm.getHeight();
+		return (int) (ascent + (sz.y - height) / 2);
+	    }
+	    return sz.y - 1;
+	}
 
 	public void render(Graphics2D g) {
 	    g.drawImage(PUtils.uiscale(img, sz), x, y, null);
@@ -436,6 +446,10 @@ public class RichText extends Text {
 		Image img = new Image(res, id);
 		img.attrs = attrs;
 		for(; a < args.length; a++) {
+		    if("c".equals(args[a])) {
+		        img.center = true;
+		        continue;
+		    }
 		    int p = args[a].indexOf('=');
 		    if(p < 0)
 			continue;
