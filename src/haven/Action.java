@@ -42,6 +42,10 @@ public enum Action {
     CAM_SNAP_SOUTH(gui -> gui.map.snapCameraSouth(), "Camera snap south"),
     CAM_RESET(gui -> gui.map.resetCamera(), "Camera reset"),
     
+    FUEL_SMELTER_9(gui -> Bot.fuelGob(gui, "terobjs/smelter", "Coal", 9)),
+    FUEL_SMELTER_12(gui -> Bot.fuelGob(gui, "terobjs/smelter", "Coal", 12)),
+    FUEL_OVEN_4(gui -> Bot.fuelGob(gui, "terobjs/oven", "Branch", 4)),
+    
     CLEAR_PLAYER_DAMAGE(GobDamageInfo::clearPlayerDamage, "Clear damage from player"),
     CLEAR_ALL_DAMAGE(GobDamageInfo::clearAllDamage, "Clear damage from everyone");
     
@@ -54,6 +58,10 @@ public enum Action {
 	this.name = name;
 	this.action = action;
 	this.description = description;
+    }
+    
+    Action(Do action) {
+        this(action, null);
     }
     
     Action(Do action, String name) {

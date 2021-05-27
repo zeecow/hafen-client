@@ -84,6 +84,7 @@ public class GameUI extends ConsoleHost implements Console.Directory {
     private final Collection<DraggedItem> handSave = new LinkedList<DraggedItem>();
     private boolean handHidden = false;
     public WItem vhand;
+    public final Object heldNotifier = new Object();
     public ChatUI chat;
     public ChatUI.Channel syslog;
     public double prog = -1;
@@ -796,8 +797,8 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 	}
     }
 
-    static class DraggedItem {
-	final GItem item;
+    public static class DraggedItem {
+	public final GItem item;
 	final Coord dc;
 
 	DraggedItem(GItem item, Coord dc) {
@@ -836,6 +837,16 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 	}
 	updhand();
 	handHidden = !handHidden;
+    }
+    
+    public DraggedItem hand() {
+	Collection<DraggedItem> collection;
+	if(handHidden) {
+	    collection = handSave;
+	} else {
+	    collection = hand;
+	}
+	return collection.stream().findFirst().orElse(null);
     }
 
     public void toggleStudy() {
@@ -1049,6 +1060,7 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 	    	hand.add(new DraggedItem(g, lc));
 	    }
 	    updhand();
+	    synchronized (heldNotifier) { heldNotifier.notifyAll(); }
 	} else if(place == "chr") {
 	    studywnd = add(new StudyWnd());
 	    studywnd.hide();
@@ -1168,6 +1180,7 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 		if(di.item == w) {
 		    i.remove();
 		    updhand();
+		    synchronized (heldNotifier) { heldNotifier.notifyAll(); }
 		}
 	    }
 	} else if(polities.contains(w)) {

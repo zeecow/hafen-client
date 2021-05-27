@@ -17,6 +17,7 @@ public class Bot implements Defer.Callable<Void> {
     private final BotAction[] actions;
     private Defer.Future<Void> task;
     private boolean cancelled = false;
+    private static final Object waiter = new Object();
     
     public Bot(List<Target> targets, BotAction... actions) {
 	this.targets = targets;
@@ -127,6 +128,109 @@ public class Bot implements Defer.Callable<Void> {
 	start(new Bot(Collections.singletonList(new Target(item)), Target::rclick, selectFlower("Drink")), item.ui);
     }
     
+    public static void fuelGob(GameUI gui, String name, String fuel, int count) {
+	List<Target> targets = getNearestTargets(gui, name, 1);
+	
+	if(!targets.isEmpty()) {
+	    start(new Bot(targets, fuelWith(gui, fuel, count)), gui.ui);
+	}
+    }
+    
+    private static List<Target> getNearestTargets(GameUI gui, String name, int limit) {
+	return gui.ui.sess.glob.oc.stream()
+	    .filter(gobIs(name))
+	    .filter(gob -> distanceToPlayer(gob) <= CFG.AUTO_PICK_RADIUS.get())
+	    .sorted(byDistance)
+	    .limit(limit)
+	    .map(Target::new)
+	    .collect(Collectors.toList());
+    }
+    
+    public static BotAction fuelWith(GameUI gui, String fuel, int count) {
+	return target -> {
+	    Supplier<List<WItem>> inventory = INVENTORY(gui);
+	    float has = countItems(fuel, inventory);
+	    if(has >= count) {
+		for (int i = 0; i < count; i++) {
+		    Optional<WItem> w = findFirstItem(fuel, inventory);
+		    if(w.isPresent()) {
+			w.get().take();
+			if(!waitHeld(gui, fuel)) {
+			    cancel();
+			    return;
+			}
+			target.interact();
+			if(!waitHeld(gui, null)) {
+			    cancel();
+			    return;
+			}
+		    } else {
+			cancel();
+			return;
+		    }
+		}
+	    } else {
+		cancel();
+	    }
+	};
+    }
+    
+    private static boolean isHeld(GameUI gui, String what) throws Loading {
+	GameUI.DraggedItem drag = gui.hand();
+	if(drag == null && what == null) {
+	    return true;
+	}
+	if(drag != null && what != null) {
+	    return drag.item.is2(what);
+	}
+	return false;
+    }
+    
+    private static boolean waitHeld(GameUI gui, String what) {
+	if(Boolean.TRUE.equals(doWaitLoad(() -> isHeld(gui, what)))) {
+	    return true;
+	}
+	if(waitHeldChanged(gui)) {
+	    return Boolean.TRUE.equals(doWaitLoad(() -> isHeld(gui, what)));
+	}
+	return false;
+    }
+    
+    private static boolean waitHeldChanged(GameUI gui) {
+	boolean result = true;
+	try {
+	    synchronized (gui.heldNotifier) {
+		gui.heldNotifier.wait(5000);
+	    }
+	} catch (InterruptedException e) {
+	    result = false;
+	}
+	return result;
+    }
+    
+    private static <T> T doWaitLoad(Supplier<T> action) {
+	T result = null;
+	boolean ready = false;
+	while (!ready) {
+	    try {
+		result = action.get();
+		ready = true;
+	    } catch (Loading e) {
+		pause(100);
+	    }
+	}
+	return result;
+    }
+    
+    private static void pause(long ms) {
+	synchronized (waiter) {
+	    try {
+		waiter.wait(ms);
+	    } catch (InterruptedException ignore) {
+	    }
+	}
+    }
+    
     private static List<WItem> items(Inventory inv) {
 	return inv != null ? inv.children().stream()
 	    .filter(widget -> widget instanceof WItem)
@@ -148,6 +252,28 @@ public class Bot implements Defer.Callable<Void> {
     
     private static Predicate<WItem> contains(String what) {
 	return w -> w.contains.get().is(what);
+    }
+    
+    private static Predicate<Gob> gobIs(String what) {
+	return g -> {
+	    if(g == null) { return false; }
+	    String id = g.resid();
+	    if(id == null) {return false;}
+	    return id.contains(what);
+	};
+    }
+    
+    private static float countItems(String what, Supplier<List<WItem>> where) {
+	return where.get().stream()
+	    .filter(wItem -> wItem.is(what))
+	    .map(wItem -> wItem.quantity.get())
+	    .reduce(0f, Float::sum);
+    }
+    
+    private static Optional<WItem> findFirstItem(String what, Supplier<List<WItem>> where) {
+	return where.get().stream()
+	    .filter(wItem -> wItem.is(what))
+	    .findFirst();
     }
     
     
@@ -246,6 +372,13 @@ public class Bot implements Defer.Callable<Void> {
 	    if(!disposed()) {
 		if(gob != null) {gob.rclick();}
 		if(item != null) {item.rclick();}
+	    }
+	}
+    
+	public void interact() {
+	    if(!disposed()) {
+		if(gob != null) {gob.itemact();}
+		if(item != null) {/*TODO: implement*/}
 	    }
 	}
     
