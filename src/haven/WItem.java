@@ -439,6 +439,10 @@ public class WItem extends Widget implements DTarget2 {
 	}
     }
     
+    public void take() {
+	item.wdgmsg("take", sz.div(2), 0);
+    }
+    
     public void rclick() {
 	rclick(Coord.z, 0);
     }
