@@ -31,11 +31,9 @@ import haven.resutil.Curiosity;
 import me.ender.Reflect;
 
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 import java.awt.image.BufferedImage;
-import java.util.Objects;
+import java.util.List;
 
 import haven.ItemInfo.AttrCache;
 import rx.functions.Action0;
@@ -60,6 +58,10 @@ public class WItem extends Widget implements DTarget2 {
     
     public WItem(GItem item) {
 	super(sqsz);
+	contains =  item.contains;
+	name =  item.name;
+	quantity =  item.quantity;
+	itemq =  item.itemq;
 	this.item = item;
 	this.item.onBound(widget -> this.bound());
 	CFG.REAL_TIME_CURIO.observe(resetTooltip);
@@ -173,15 +175,9 @@ public class WItem extends Widget implements DTarget2 {
 	});
     public final AttrCache<Double> itemmeter = new AttrCache<Double>(this::info, AttrCache.map1(GItem.MeterInfo.class, minf -> minf::meter));
     
-    public final AttrCache<ItemInfo.Contents.Content> contains = new AttrCache<>(this::info, AttrCache.cache(ItemInfo::getContent), ItemInfo.Contents.Content.EMPTY);
+    public final AttrCache<ItemInfo.Contents.Content> contains;
     
-    public final AttrCache<QualityList> itemq = new AttrCache<>(this::info, AttrCache.cache(info -> {
-	ItemInfo.Contents.Content content = contains.get();
-	if(!content.empty() && !content.q.isEmpty()) {
-	    return content.q;
-	}
-	return new QualityList(ItemInfo.findall(QualityList.classname, info));
-    }));
+    public final AttrCache<QualityList> itemq;
     
     public final AttrCache<Pair<String, String>> study = new AttrCache<>(this::info, AttrCache.map1(Curiosity.class, curio -> curio::remainingTip));
     
@@ -239,38 +235,9 @@ public class WItem extends Widget implements DTarget2 {
 	return false;
     }));
     
-    public final AttrCache<String> name = new AttrCache<>(this::info, AttrCache.cache(info -> {
-	ItemInfo.Name name = ItemInfo.find(ItemInfo.Name.class, info);
-	String result = "???";
-	if(name != null) {
-	    result = name.original;
-	    ItemInfo.Contents.Content content = ItemInfo.Contents.content(name.original);
-	    if(!content.empty()) {result = content.name();}
-	
-	    content = contains.get();
-	    if(!content.empty()) {
-		result = String.format("%s (%s)", result, content.name());
-	    }
-	}
-	return result;
-    }), "");
+    public final AttrCache<String> name;
     
-    public final AttrCache<Float> quantity = new AttrCache<>(this::info, AttrCache.cache(info -> {
-	float result = 1;
-	ItemInfo.Name name = ItemInfo.find(ItemInfo.Name.class, info);
-	if(name != null) {
-	    ItemInfo.Contents.Content content = ItemInfo.Contents.content(name.original);
-	    if(!content.empty()) {
-		result = content.count;
-	    } else {
-		content = contains.get();
-		if(!content.empty()) {
-		    result = content.count;
-		}
-	    }
-	}
-	return result;
-    }), 1f);
+    public final AttrCache<Float> quantity;
     
     public final AttrCache<Curiosity> curio = new AttrCache<>(this::info, AttrCache.cache(info -> ItemInfo.find(Curiosity.class, info)), null);
 
@@ -480,6 +447,10 @@ public class WItem extends Widget implements DTarget2 {
     public void rclick(Coord c, int flags) {
         FlowerMenu.lastGob(null);
 	item.wdgmsg("iact", c, flags);
+    }
+    
+    public boolean is(String what) {
+	return item.is(what);
     }
 
     private boolean checkXfer(int button) {

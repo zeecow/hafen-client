@@ -179,6 +179,60 @@ public class GItem extends AWidget implements ItemInfo.SpriteOwner, GSprite.Owne
 	    spr.tick(dt);
 	testMatch();
     }
+    
+    public final ItemInfo.AttrCache<ItemInfo.Contents.Content> contains = new ItemInfo.AttrCache<>(this::info, ItemInfo.AttrCache.cache(ItemInfo::getContent), ItemInfo.Contents.Content.EMPTY);
+    
+    public final ItemInfo.AttrCache<QualityList> itemq = new ItemInfo.AttrCache<>(this::info, ItemInfo.AttrCache.cache(info -> {
+	ItemInfo.Contents.Content content = contains.get();
+	if(!content.empty() && !content.q.isEmpty()) {
+	    return content.q;
+	}
+	return new QualityList(ItemInfo.findall(QualityList.classname, info));
+    }));
+    
+    public final ItemInfo.AttrCache<Float> quantity = new ItemInfo.AttrCache<>(this::info, ItemInfo.AttrCache.cache(info -> {
+	float result = 1;
+	ItemInfo.Name name = ItemInfo.find(ItemInfo.Name.class, info);
+	if(name != null) {
+	    ItemInfo.Contents.Content content = ItemInfo.Contents.content(name.original);
+	    if(!content.empty()) {
+		result = content.count;
+	    } else {
+		content = contains.get();
+		if(!content.empty()) {
+		    result = content.count;
+		}
+	    }
+	}
+	return result;
+    }), 1f);
+    
+    public final ItemInfo.AttrCache<String> name = new ItemInfo.AttrCache<>(this::info, ItemInfo.AttrCache.cache(info -> {
+	ItemInfo.Name name = ItemInfo.find(ItemInfo.Name.class, info);
+	String result = "???";
+	if(name != null) {
+	    result = name.original;
+	    ItemInfo.Contents.Content content = ItemInfo.Contents.content(name.original);
+	    if(!content.empty()) {result = content.name();}
+	    
+	    content = contains.get();
+	    if(!content.empty()) {
+		result = String.format("%s (%s)", result, content.name());
+	    }
+	}
+	return result;
+    }), "");
+    
+    public boolean is(String what) {
+	return name.get("").contains(what) || contains.get().is(what);
+    }
+    
+    public boolean is2(String what) throws Loading {
+	if(info().isEmpty()) {throw new Loading("item is not ready!");}
+	String name = this.name.get(null);
+	if(name == null) {throw new Loading("item is not ready!");}
+	return name.contains(what) || contains.get().is(what);
+    }
 
     public void testMatch() {
 	try {
