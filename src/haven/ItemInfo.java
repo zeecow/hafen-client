@@ -261,7 +261,7 @@ public abstract class ItemInfo {
     }
 
     public static class Contents extends Tip {
-        private static final Pattern PARSE = Pattern.compile("([\\d.]*) ([\\w]+) of ([\\w\\s]+)\\.?");
+        private static final Pattern PARSE = Pattern.compile("([\\d.]*) ([\\w]+) of (.*)");
 	public final List<ItemInfo> sub;
 	private static final Text.Line ch = Text.render("Contents:");
 	
