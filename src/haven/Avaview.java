@@ -33,7 +33,7 @@ import haven.Composited.Desc;
 import haven.Composited.MD;
 import haven.Composited.ED;
 
-public class Avaview extends PView {
+public class Avaview extends PView implements DTarget{
     public static final Tex missing = Resource.loadtex("gfx/hud/equip/missing");
     public static final Coord dasz = missing.sz();
     public Color color = Color.WHITE;
@@ -278,5 +278,18 @@ public class Avaview extends PView {
 	    return(true);
 	}
 	return(super.mousedown(c, button));
+    }
+    
+    @Override
+    public boolean drop(Coord cc, Coord ul) {
+	if(ui.plid() == avagob) {
+	    ui.equipory().ifPresent(Equipory::sendDrop);
+	}
+	return true;
+    }
+    
+    @Override
+    public boolean iteminteract(Coord cc, Coord ul) {
+	return false;
     }
 }

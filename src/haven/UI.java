@@ -652,6 +652,20 @@ public class UI {
 	scale = Math.max(Math.min(scale, maxscale()), 1.0);
 	return(scale);
     }
+    
+    public long plid() {
+	if(gui != null) {
+	    return gui.plid;
+	}
+	return 0;
+    }
+    
+    public Optional<Equipory> equipory() {
+	if(gui != null && gui.equipory != null) {
+	    return Optional.of(gui.equipory);
+	}
+	return Optional.empty();
+    }
 
     static {
 	scalef = loadscale();

@@ -288,4 +288,12 @@ public class Equipory extends Widget implements DTarget {
 		}
 	    });
     }
+    
+    public void sendDrop() {
+	sendDrop(-1);
+    }
+    
+    public void sendDrop(int slot) {
+	wdgmsg("drop", slot);
+    }
 }
