@@ -106,6 +106,7 @@ public class ZeeConfig {
         "gfx/terobjs/herbs/bloatedbolete",
         "gfx/terobjs/herbs/glimmermoss",
         "gfx/terobjs/herbs/camomile",
+        "gfx/terobjs/herbs/cavecoral",
         "gfx/terobjs/herbs/clay-cave",
         "gfx/terobjs/herbs/mandrake",
         "gfx/terobjs/herbs/seashell"
