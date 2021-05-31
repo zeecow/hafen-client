@@ -31,6 +31,7 @@ public class Pointer extends Widget implements MiniMap.IPointer, DTarget {
     private Tex licon;
     private String tip = null;
     private boolean triangulating = false;
+    long lastseg = -1;
     
     public Pointer(Indir<Resource> icon) {
 	super(Coord.z);
@@ -136,6 +137,10 @@ public class Pointer extends Widget implements MiniMap.IPointer, DTarget {
     
     public void draw(GOut g) {
 	this.lc = null;
+	long curseg = ui.gui.mapfile.playerSegment();
+	if(lastseg != curseg) {
+	    segmentChanged(curseg);
+	}
 	Coord2d tc = tc();
 	if(tc == null)
 	    return;
@@ -313,6 +318,14 @@ public class Pointer extends Widget implements MiniMap.IPointer, DTarget {
 	        firstLine = null;
 	    }
 	}
+    }
+    
+    private void segmentChanged(long curseg) {
+	mc = null;
+	firstLine = null;
+	firsSegment = -1;
+	triangulating = false;
+	lastseg = curseg;
     }
     
     public Coord2d tc() {return tc(ui.gui.mapfile.playerSegment());}

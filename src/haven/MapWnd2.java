@@ -140,20 +140,23 @@ public class MapWnd2 extends MapWnd {
 	    }
 	    return Color.LIGHT_GRAY;
 	}
-	
-	private void update() {
+    
+	public void update() {
 	    Gob gob = ui.sess.glob.oc.getgob(gobid);
 	    if(gob != null) {
 		seg = view.sessloc.seg.id;
-		rc = gob.rc;
 		try {
-		    tc = rc.floor(tilesz).add(view.sessloc.tc);
+		    rc = gob.rc.add(view.sessloc.tc.mul(tilesz));
+		    tc = rc.floor(tilesz);
 		} catch (Exception ignore) {}
 	    }
 	}
-	
+    
 	public Coord2d rc() {
-	    return rc;
+	    try {
+		return rc.sub(view.sessloc.tc.mul(tilesz));
+	    } catch (Exception ignore) {}
+	    return null;
 	}
     
 	public boolean hide() {
