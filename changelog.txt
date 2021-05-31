@@ -1,3 +1,6 @@
+$size[14]{$u{Update for 31.05.21:}
+  * fixed quest/object pointers showing wrong direction after teleportation
+ 
 $size[14]{$u{Update for 27.05.21:}
   * added ability to drop items onto avatar view in the top-left to equip them
   * moved auto-pickup to $img[paginae/act/add,h=16,c] $img[gfx/hud/breadcrumb,h=16,c] $img[paginae/act/automation,h=16,c] $img[gfx/hud/breadcrumb,h=16,c] $img[paginae/add/autobot,h=16,c] 
