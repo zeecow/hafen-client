@@ -283,22 +283,28 @@ public class GameUI extends ConsoleHost implements Console.Directory {
     private void menubuttons(Widget bg) {
 	brpanel.add(new MenuButton("csearch", kb_srch, "Search actions...") {
 		public void click() {
-		    if(menu == null)
-			return;
-		    if(srchwnd == null) {
-			srchwnd = new MenuSearch(menu);
-			fitwdg(GameUI.this.add(srchwnd, Utils.getprefc("wndc-srch", new Coord(200, 200))));
-		    } else {
-			if(!srchwnd.hasfocus) {
-			    this.setfocus(srchwnd);
-			} else {
-			    ui.destroy(srchwnd);
-			    srchwnd = null;
-			}
-		    }
+		    toggleSearchWindow();
 		}
 	    }, bg.c);
     }
+
+    // used by Zeeconfig.searchInputMakeWnd
+    public MenuSearch toggleSearchWindow(){
+		if(menu == null)
+			return null;
+		if(srchwnd == null) {
+			srchwnd = new MenuSearch(menu);
+			fitwdg(GameUI.this.add(srchwnd, Utils.getprefc("wndc-srch", new Coord(200, 200))));
+		} else {
+			if(!srchwnd.hasfocus) {
+				this.setfocus(srchwnd);
+			} else {
+				ui.destroy(srchwnd);
+				srchwnd = null;
+			}
+		}
+		return (MenuSearch) srchwnd;
+	}
 
     /* Ice cream */
     private final IButton[] fold_br = new IButton[4];

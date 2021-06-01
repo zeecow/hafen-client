@@ -27,7 +27,6 @@
 package haven;
 
 import java.util.*;
-import java.awt.Font;
 import java.awt.Color;
 import java.awt.image.BufferedImage;
 
@@ -160,6 +159,7 @@ public class Makewindow extends Widget {
     public Makewindow(String rcpnm) {
 	add(new Label("Input:"), new Coord(0, UI.scale(8)));
 	add(new Label("Result:"), new Coord(0, outy + UI.scale(8)));
+	add(ZeeConfig.btnSearchInput = new Button(UI.scale(85), "Search"), UI.scale(new Coord(170, 75))).action(() -> wdgmsg("mkWindowFindInputs", 0));
 	add(new Button(UI.scale(85), "Craft"), UI.scale(new Coord(265, 75))).action(() -> wdgmsg("make", 0)).setgkey(kb_make);
 	add(new Button(UI.scale(85), "Craft All"), UI.scale(new Coord(360, 75))).action(() -> wdgmsg("make", 1)).setgkey(kb_makeall);
 	pack();
@@ -167,7 +167,22 @@ public class Makewindow extends Widget {
 	ZeeConfig.actionUsed(rcpnm);
     }
 
-    public void uimsg(String msg, Object... args) {
+	int inputCount = 0;
+	@Override
+	public void wdgmsg(String msg, Object... args) {
+    	if(msg.contentEquals("mkWindowFindInputs")){
+    		String nextInputName = ZeeConfig.getItemInfoName(inputs.get(inputCount).info());
+			ZeeConfig.searchNextInputMakeWnd(nextInputName);
+			inputCount++;
+			if(inputCount >= inputs.size())
+				inputCount = 0;
+			ZeeConfig.btnSearchInput.change("Search "+(inputCount+1)+"/"+inputs.size());
+		}else {
+			super.wdgmsg(msg, args);
+		}
+	}
+
+	public void uimsg(String msg, Object... args) {
 	if(msg == "inpop") {
 	    List<Spec> inputs = new LinkedList<Spec>();
 	    for(int i = 0; i < args.length;) {
@@ -180,6 +195,8 @@ public class Makewindow extends Widget {
 		inputs.add(new Spec(ui.sess.getres(resid), sdt, num, info));
 	    }
 	    this.inputs = inputs;
+	    if(ZeeConfig.btnSearchInput != null)
+	    	ZeeConfig.btnSearchInput.change("Search "+1+"/"+inputs.size());
 	} else if(msg == "opop") {
 	    List<Spec> outputs = new LinkedList<Spec>();
 	    for(int i = 0; i < args.length;) {

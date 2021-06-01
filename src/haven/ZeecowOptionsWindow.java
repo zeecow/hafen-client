@@ -13,11 +13,11 @@ import java.util.List;
 public class ZeecowOptionsWindow extends JFrame {
     public JTabbedPane tabbedPane, tabbedPaneGobs;
     public JPanel panelTabMisc, panelTabInterface, panelTabGobs, panelDetailsBottom, panelTabCateg;
-    public JCheckBox cbDropMinedStone, cbDropMinedOre, cbDropMinedSilverGold, cbDropMinedCurios, cbActionSearchGlobal, cbCompactEquipsWindow, cbBeltTogglesEquips, cbAutohearth, cbHighlighAggressiveGobs, cbHighlightCropsReady, cbHighlightGrowingTrees, cbAlertOnPlayers,  cbShowInventoryLogin, cbRememberWindowsPos, cbShowEquipsLogin, cbNotifyBuddyOnline, cbZoomOrthoExtended, cbAutoClickMenuOpts, cbCattleRosterHeight;
+    public JCheckBox cbDropMinedStone, cbDropMinedOre, cbDropMinedSilverGold, cbDropMinedCurios, cbActionSearchGlobal, cbCompactEquipsWindow, cbBeltTogglesEquips, cbAutohearth, cbHighlighAggressiveGobs, cbHighlightCropsReady, cbHighlightGrowingTrees, cbAlertOnPlayers,  cbShowInventoryLogin, cbRememberWindowsPos, cbSortActionsByUse, cbShowEquipsLogin, cbNotifyBuddyOnline, cbZoomOrthoExtended, cbAutoClickMenuOpts, cbCattleRosterHeight;
     public JTextField tfAutoClickMenu, tfGobName, tfAudioPath, tfCategName, tfAudioPathCateg;
     public JComboBox<String> cmbCattleRoster, cmbGobCategory;
     public JList<String> listGobsTemp, listGobsSaved, listGobsCategories;
-    public JButton btnRefresh, btnPrintState, btnResetGobs, btnAudioSave, btnAudioClear, btnAudioTest, btnRemGobFromCateg, btnGobColorAdd, btnCategoryColorAdd, btnGobColorRemove, btnCategoryColorRemove, btnResetCateg, btnAddCateg, btnRemoveCateg, btnResetWindowsPos;
+    public JButton btnRefresh, btnPrintState, btnResetGobs, btnAudioSave, btnAudioClear, btnAudioTest, btnRemGobFromCateg, btnGobColorAdd, btnCategoryColorAdd, btnGobColorRemove, btnCategoryColorRemove, btnResetCateg, btnAddCateg, btnRemoveCateg, btnResetWindowsPos, btnResetActionUses;
     public JTextArea txtAreaDebug;
     public JSlider sliderAlpha, sliderGobQueueSleep;
     public static int TABGOB_SESSION = 0;
@@ -236,9 +236,24 @@ public class ZeecowOptionsWindow extends JFrame {
             Utils.setprefb("rememberWindowsPos",val);
         });
 
-        panelTabInterface.add(btnResetWindowsPos = new JButton("reset windows pos"));
+        panelTabInterface.add(btnResetWindowsPos = new JButton("reset windows pos ("+ZeeConfig.mapWindowPos.size()+")"));
         btnResetWindowsPos.addActionListener(evt -> {
             resetWindowsPos();
+        });
+
+        panelTabInterface.add(Box.createRigidArea(new Dimension(25,25)));
+
+        panelTabInterface.add(cbSortActionsByUse= new JCheckBox("Sort actions by uses"));
+        cbSortActionsByUse.setSelected(ZeeConfig.sortActionsByUses);
+        cbSortActionsByUse.addActionListener(actionEvent -> {
+            JCheckBox cb = (JCheckBox) actionEvent.getSource();
+            boolean val = ZeeConfig.sortActionsByUses = cb.isSelected();
+            Utils.setprefb("sortActionsByUses",val);
+        });
+
+        panelTabInterface.add(btnResetActionUses = new JButton("reset actions uses ("+ZeeConfig.mapActionUses.size()+")"));
+        btnResetActionUses.addActionListener(evt -> {
+            resetActionUses();
         });
 
         panelTabInterface.add(Box.createRigidArea(new Dimension(25,25)));
@@ -262,6 +277,14 @@ public class ZeecowOptionsWindow extends JFrame {
             double d = ZeeConfig.cattleRosterHeightPercentage = Double.parseDouble(val) / 100;
             Utils.setprefd("cattleRosterHeightPercentage", d);
         });
+    }
+
+    private void resetActionUses() {
+        if(JOptionPane.showConfirmDialog(this,"Confirm reset action uses?") != JOptionPane.OK_OPTION){
+            return;
+        }
+        Utils.setpref(ZeeConfig.MAP_ACTION_USES,"");
+        ZeeConfig.mapActionUses = ZeeConfig.initMapActionUses();
     }
 
     private void resetWindowsPos() {

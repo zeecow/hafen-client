@@ -1,6 +1,8 @@
 package haven;
 
 import haven.render.MixColor;
+import org.apache.commons.lang3.builder.RecursiveToStringStyle;
+import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -10,6 +12,7 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 public class ZeeConfig {
@@ -37,6 +40,7 @@ public class ZeeConfig {
     public static Window windowInvMain;
     public static ZeeInvMainOptionsWdg invMainoptionsWdg;
     public static ZeecowOptionsWindow zeecowOptions;
+    public static Button btnSearchInput;
 
     public static boolean actionSearchGlobal = Utils.getprefb("actionSearchGlobal", true);
     public static boolean alertOnPlayers = Utils.getprefb("alertOnPlayers", true);
@@ -59,6 +63,7 @@ public class ZeeConfig {
     public static boolean notifyBuddyOnline = Utils.getprefb("notifyBuddyOnline", false);
     public static boolean showInventoryLogin = Utils.getprefb("showInventoryLogin", true);
     public static boolean showEquipsLogin = Utils.getprefb("showEquipsLogin", false);
+    public static boolean sortActionsByUses = Utils.getprefb("sortActionsByUses", true);;
     public static boolean rememberWindowsPos = Utils.getprefb("rememberWindowsPos", true);
     public static boolean zoomOrthoExtended = Utils.getprefb("zoomOrthoExtended", true);
 
@@ -472,7 +477,7 @@ public class ZeeConfig {
 
         //reposition window if saved
         Coord c;
-        if(rememberWindowsPos && !(window instanceof MapWnd)){
+        if(rememberWindowsPos && !(window instanceof MapWnd) ){
             if((c = mapWindowPos.get(windowTitle)) != null) {
                 window.c = c;
             }
@@ -601,17 +606,35 @@ public class ZeeConfig {
         }
         uses++;
         mapActionUses.put(actionName, uses);
+        if(mapActionUses.size() > 30) {
+            //sort by value and limit to first 30
+            mapActionUses = mapActionUses.entrySet().stream()
+                .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
+                .limit(30)
+                .collect(Collectors.toMap(
+                    Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1, HashMap::new));
+        }
         Utils.setpref(MAP_ACTION_USES, serialize(mapActionUses));
     }
 
     public static void windowChangedPos(Window window) {
         if(!ZeeConfig.rememberWindowsPos || window==null)
             return;
-        String name = window.cap.text;
+        String name = ((Window)window).cap.text;
         if(name==null || name.isEmpty() || window instanceof MapWnd)
             return;
+        if(isMakewindow(window))
+            name = "Makewindow";
         mapWindowPos.put(name, new Coord(window.c));
         Utils.setpref(MAP_WND_POS, serialize(mapWindowPos));
+    }
+
+    public static boolean isMakewindow(Window window) {
+        for (Button b: window.children(Button.class)) {
+            if(b.text.text.contentEquals("Craft All"))
+                return true;
+        }
+        return false;
     }
 
     public static int drawText(String text, GOut g, Coord p) {
@@ -787,6 +810,23 @@ public class ZeeConfig {
         return count;
     }
 
+    public static void searchNextInputMakeWnd(String inputName) {
+        MenuSearch searchWindow = gameUI.toggleSearchWindow();
+        searchWindow.sbox.settext(inputName);
+    }
+
+    public static String getItemInfoName(List<ItemInfo> info) {
+        try {
+            for (ItemInfo v : info) {
+                if (v.getClass().getSimpleName().equals("Name")) {
+                    return ((Text)v.getClass().getField("str").get(v)).text;
+                }
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return(null);
+    }
 }
 
 

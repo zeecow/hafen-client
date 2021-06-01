@@ -3,6 +3,7 @@
 original features:
  - search actions globally
  - sort actions by most used craft items
+ - craft window search button for ingredients 
  - big ugly close buttons
  - compact equip window
  - auto toggle equip window
