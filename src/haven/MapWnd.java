@@ -1026,10 +1026,14 @@ public class MapWnd extends WindowX implements Console.Directory {
 	return null;
     }
     
-    public long playerSegment() {
+    public long playerSegmentId() {
 	Location sessloc = view.sessloc;
 	if(sessloc == null) {return 0;}
 	return sessloc.seg.id;
+    }
+    
+    public Location playerLocation() {
+	return view.sessloc;
     }
     
     private Map<String, Console.Command> cmdmap = new TreeMap<String, Console.Command>();

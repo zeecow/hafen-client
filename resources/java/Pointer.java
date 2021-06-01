@@ -3,6 +3,7 @@ import haven.render.BaseColor;
 import haven.render.Model;
 
 import java.awt.*;
+import java.util.Objects;
 
 import static haven.MCache.*;
 import static haven.OCache.*;
@@ -32,6 +33,7 @@ public class Pointer extends Widget implements MiniMap.IPointer, DTarget {
     private String tip = null;
     private boolean triangulating = false;
     long lastseg = -1;
+    Coord lastsegtc = null;
     
     public Pointer(Indir<Resource> icon) {
 	super(Coord.z);
@@ -137,9 +139,9 @@ public class Pointer extends Widget implements MiniMap.IPointer, DTarget {
     
     public void draw(GOut g) {
 	this.lc = null;
-	long curseg = ui.gui.mapfile.playerSegment();
-	if(lastseg != curseg) {
-	    segmentChanged(curseg);
+	MiniMap.Location curloc = ui.gui.mapfile.playerLocation();
+	if(curloc!= null && (lastseg != curloc.seg.id || !Objects.equals(lastsegtc, curloc.tc)) ) {
+	    segmentChanged(curloc);
 	}
 	Coord2d tc = tc();
 	if(tc == null)
@@ -304,7 +306,7 @@ public class Pointer extends Widget implements MiniMap.IPointer, DTarget {
 	mc = null;
 	tc();
 	if(!triangulating) {return;}
-	long curseg = ui.gui.mapfile.playerSegment();
+	long curseg = ui.gui.mapfile.playerSegmentId();
 	Gob player = ui.gui.map.player();
 	if(player != null) {
 	    Pair<Coord2d, Coord2d> line = new Pair<>(player.rc, b);
@@ -320,15 +322,16 @@ public class Pointer extends Widget implements MiniMap.IPointer, DTarget {
 	}
     }
     
-    private void segmentChanged(long curseg) {
+    private void segmentChanged(MiniMap.Location curseg) {
 	mc = null;
 	firstLine = null;
 	firsSegment = -1;
 	triangulating = false;
-	lastseg = curseg;
+	lastseg = curseg.seg.id;
+	lastsegtc = curseg.tc;
     }
     
-    public Coord2d tc() {return tc(ui.gui.mapfile.playerSegment());}
+    public Coord2d tc() {return tc(ui.gui.mapfile.playerSegmentId());}
     
     public Coord2d tc(long id) {
 	if(marker != null) {
@@ -373,7 +376,7 @@ public class Pointer extends Widget implements MiniMap.IPointer, DTarget {
     }
     
     public long seg() {
-	return marker != null ? marker.seg : ui.gui.mapfile.playerSegment();
+	return marker != null ? marker.seg : ui.gui.mapfile.playerSegmentId();
     }
     
     public Coord sc(Coord c, Coord sz) {
