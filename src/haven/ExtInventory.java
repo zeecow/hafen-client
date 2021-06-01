@@ -1,6 +1,9 @@
 package haven;
 
+import auto.Bot;
 import haven.resutil.Curiosity;
+import haven.rx.Reactor;
+import rx.Subscription;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -35,11 +38,13 @@ public class ExtInventory extends Widget {
     private boolean once = true;
     private WindowX wnd;
     private final ICheckBox chb_show = new ICheckBox("gfx/hud/btn-extlist", "", "-d", "-h");
+    private final ICheckBox chb_repeat = new ICheckBox("gfx/hud/btn-repeat", "", "-d", "-h");
     
     public ExtInventory(Coord sz) {
 	inv = new Inventory(sz);
 	inv.ext = this;
 	extension = new Extension();
+	chb_repeat.settip("$b{Toggle repeat mode}\nApply any menu action to\nall items in the group.", true);
 	Composer composer = new Composer(extension).hmrgn(margin).vmrgn(margin);
 	grouping = new Dropbox<Grouping>(UI.scale(75), 5, UI.scale(16)) {
 	    {bgcolor = new Color(16, 16, 16, 128);}
@@ -75,7 +80,12 @@ public class ExtInventory extends Widget {
 	space = new Label("");
 	type = new Label(TYPES[0]);
 	grouping.sel = Grouping.NONE;
-	composer.addr(new Label("Group:"), grouping, new IButton("gfx/hud/btn-help", "","-d","-h", this::showHelp).settip("Help"));
+	composer.addr(
+	    new Label("Group:"), 
+	    grouping, 
+	    chb_repeat, 
+	    new IButton("gfx/hud/btn-help", "","-d","-h", this::showHelp).settip("Help")
+	);
 	list = new ItemGroupList(listw, (inv.sz.y - composer.y() - 2 * margin - space.sz.y) / itemh, itemh);
 	composer.add(list);
 	composer.addr(space, type);
@@ -327,10 +337,13 @@ public class ExtInventory extends Widget {
 	final List<WItem> items;
 	final WItem sample;
 	private final Tex[] text = new Tex[3];
+	private final Subscription flowerSubscription;
+	private final ExtInventory extInventory;
 	private Tex icon;
 	
-	public ItemsGroup(ItemType type, List<WItem> items, UI ui, Grouping g) {
+	public ItemsGroup(ExtInventory extInventory, ItemType type, List<WItem> items, UI ui, Grouping g) {
 	    super(new Coord(listw, itemh));
+	    this.extInventory = extInventory;
 	    this.ui = ui;
 	    this.type = type;
 	    this.items = items;
@@ -354,7 +367,23 @@ public class ExtInventory extends Widget {
 		this.text[0] = text[1];
 	    }
 	    this.text[2] = info(sample, quantity, text[1]);
+	    flowerSubscription = Reactor.FLOWER_CHOICE.subscribe(this::flowerChoice);
 	}
+    
+	@Override
+	public void dispose() {
+	    flowerSubscription.unsubscribe();
+	    super.dispose();
+	}
+    
+	private void flowerChoice(FlowerMenu.Choice choice) {
+	    if(extInventory.chb_repeat.a && !choice.forced && choice.opt != null && choice.target != null && choice.target.item == sample) {
+		flowerSubscription.unsubscribe();
+		List<WItem> targets = items.stream().filter(wItem -> wItem != sample).collect(Collectors.toList());
+		Bot.selectFlowerOnItems(ui.gui, choice.opt, targets);
+	    }
+	}
+	
     
 	private static Tex info(WItem itm, String count, Tex def) {
 	    Curiosity curio = itm.curio.get();
@@ -514,16 +543,23 @@ public class ExtInventory extends Widget {
 	    item.draw(g);
 	}
     
+	@Override
+	public void dispose() {
+	    groups.forEach(ItemsGroup::dispose);
+	    super.dispose();
+	}
+    
 	public void changed() {needsUpdate = true;}
 
 	@Override
 	public void tick(double dt) {
 	    if(needsUpdate) {
+	        groups.forEach(ItemsGroup::dispose);
 		if(ExtInventory.this.groups == null) {
 		    groups = Collections.emptyList();
 		} else {
 		    groups = ExtInventory.this.groups.entrySet().stream()
-			.map(v -> new ItemsGroup(v.getKey(), v.getValue(), ui, grouping.sel)).collect(Collectors.toList());
+			.map(v -> new ItemsGroup(ExtInventory.this, v.getKey(), v.getValue(), ui, grouping.sel)).collect(Collectors.toList());
 		}
 	    }
 	    needsUpdate = false;

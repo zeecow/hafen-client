@@ -113,6 +113,18 @@ public class Bot implements Defer.Callable<Void> {
 	    .map(Target::new)
 	    .collect(Collectors.toList());
 	
+	selectFlower(gui, option, targets);
+    }
+    
+    public static void selectFlowerOnItems(GameUI gui, String option, List<WItem> items) {
+	List<Target> targets = items.stream()
+	    .map(Target::new)
+	    .collect(Collectors.toList());
+    
+	selectFlower(gui, option, targets);
+    }
+    
+    public static void selectFlower(GameUI gui, String option, List<Target> targets) {
 	start(new Bot(targets, Target::rclick, selectFlower(option)), gui.ui);
     }
     
@@ -146,7 +158,7 @@ public class Bot implements Defer.Callable<Void> {
 	    .collect(Collectors.toList());
     }
     
-    public static BotAction fuelWith(GameUI gui, String fuel, int count) {
+    private static BotAction fuelWith(GameUI gui, String fuel, int count) {
 	return target -> {
 	    Supplier<List<WItem>> inventory = INVENTORY(gui);
 	    float has = countItems(fuel, inventory);
@@ -229,6 +241,10 @@ public class Bot implements Defer.Callable<Void> {
 	    } catch (InterruptedException ignore) {
 	    }
 	}
+    }
+    
+    private static void unpause() {
+	synchronized (waiter) { waiter.notifyAll(); }
     }
     
     private static List<WItem> items(Inventory inv) {
@@ -328,11 +344,15 @@ public class Bot implements Defer.Callable<Void> {
 	return Long.compare(o1.id, o2.id);
     };
     
-    public static BotAction selectFlower(String ...options) {
+    private static BotAction selectFlower(String... options) {
 	return target -> {
 	    if(target.hasMenu()) {
-		FlowerMenu.lastGob(target.gob);
-		Reactor.FLOWER.first().subscribe(flowerMenu -> flowerMenu.forceChoose(options));
+		FlowerMenu.lastTarget(target);
+		Reactor.FLOWER.first().subscribe(flowerMenu -> {
+		    Reactor.FLOWER_CHOICE.first().subscribe(choice -> unpause());
+		    flowerMenu.forceChoose(options);
+		});
+		pause(5000);
 	    }
 	};
     }

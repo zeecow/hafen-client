@@ -20,6 +20,8 @@ public class Reactor {
  
     public static final PublishSubject<FlowerMenu> FLOWER = PublishSubject.create();
     
+    public static final PublishSubject<FlowerMenu.Choice> FLOWER_CHOICE = PublishSubject.create();
+    
     /** Publishes window events */
     public static final PublishSubject<Pair<Window, String>> WINDOW = PublishSubject.create();
     

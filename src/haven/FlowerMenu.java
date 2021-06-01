@@ -50,6 +50,7 @@ public class FlowerMenu extends Widget {
     public final String[] options;
     private Petal autochoose;
     private String[] forceChoose;
+    private boolean forceChosen = false;
     public Petal[] opts;
     private UI.Grab mg, kg;
 
@@ -79,6 +80,10 @@ public class FlowerMenu extends Widget {
     
     public static void lastItem(WItem item) {
 	target = new Bot.Target(item);
+    }
+    
+    public static void lastTarget(Bot.Target target) {
+	FlowerMenu.target = target;
     }
     
     @Override
@@ -274,7 +279,8 @@ public class FlowerMenu extends Widget {
 	    opts[i] = p;
 	}
     
-	if(!forceChoose()) {autochoose = autochoose();}
+	forceChosen = forceChoose();
+	if(!forceChosen) {autochoose = autochoose();}
     }
     
     private Petal autochoose() {
@@ -392,7 +398,22 @@ public class FlowerMenu extends Widget {
 		ProspectingWnd.item(target.item);
 	    }
 	}
+	Choice choice = new Choice(num != -1 ? options[num] : null, target, forceChosen);
 	target = null;
 	wdgmsg("cl", num, ui.modflags());
+	Reactor.FLOWER_CHOICE.onNext(choice);
+    }
+    
+    public static class Choice {
+	public final String opt;
+	public final Bot.Target target;
+	public final boolean forced;
+	
+	public Choice(String opt, Bot.Target target, boolean forced) {
+	    this.opt = opt;
+	    this.target = target;
+	    this.forced = forced;
+	}
+	
     }
 }
