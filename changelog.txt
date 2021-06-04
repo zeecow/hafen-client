@@ -1,3 +1,8 @@
+$size[14]{$u{Update for 04.06.21:}
+  * moved gob icons for black coal, galena and sylvanite to ores
+  * moved gob icons for eclogite, green schist, jasper, mica, pegmatite and rhyolite to rocks
+  * made whale parts not be considered aggressive
+ 
 $size[14]{$u{Update for 01.06.21:}
   * another fix for quest pointers and teleportation
   * added option (Options->General->Item drop protection) that makes item on cursor be dropped only if CTRL is pressed.
