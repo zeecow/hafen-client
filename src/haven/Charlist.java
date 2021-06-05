@@ -92,6 +92,15 @@ public class Charlist extends Widget {
 
     protected void added() {
 	parent.setfocus(this);
+	logout = parent.add(new Button(UI.scale(90), "Log out") {
+	    @Override
+	    public void click() {
+		RemoteUI rui = (RemoteUI) ui.rcvr;
+		synchronized (rui.sess) {
+		    rui.sess.close();
+		}
+	    }
+	}, UI.scale(100, 553));
     }
 
     public void scroll(int amount) {
@@ -130,16 +139,6 @@ public class Charlist extends Widget {
 		y += bg.sz().y + margin;
 	    }
 	}
-	logout = parent.add(new Button(UI.scale(90), "Log out") {
-	    @Override
-		public void click() {
-		Session sess = ((RemoteUI) ui.rcvr).sess;
-		synchronized (sess) {
-		    sess.close();
-		}
-		super.click();
-	    }
-	}, UI.scale(100, 553));
 	super.draw(g);
     }
     
