@@ -60,17 +60,27 @@ public class ToolBelt extends DraggableWidget implements DTarget, DropTarget {
     }
     
     public ToolBelt(String name, int start, int group, int[] beltkeys) {
+        this(name, start, group, beltkeys.length, beltkeys);
+    }
+    
+    public ToolBelt(String name, int start, int group, int size) {
+	this(name, start, group, size, null);
+    }
+    
+    public ToolBelt(String name, int start, int group, int size, int[] beltkeys) {
 	super(name);
 	this.start = start;
 	this.group = group;
 	this.beltkeys = beltkeys;
-	size = beltkeys.length;
+	this.size = size;
 	keys = new Tex[size];
 	custom = new GameUI.PaginaBeltSlot[size];
 	loadBelt();
-	for (int i = 0; i < size; i++) {
-	    if(beltkeys[i] != 0) {
-		keys[i] = Text.renderstroked(KeyEvent.getKeyText(beltkeys[i]), fnd).tex();
+	if(beltkeys != null) {
+	    for (int i = 0; i < size; i++) {
+		if(beltkeys[i] != 0) {
+		    keys[i] = Text.renderstroked(KeyEvent.getKeyText(beltkeys[i]), fnd).tex();
+		}
 	    }
 	}
     
@@ -221,7 +231,7 @@ public class ToolBelt extends DraggableWidget implements DTarget, DropTarget {
     
     @Override
     public boolean globtype(char key, KeyEvent ev) {
-	if(!visible || key != 0 || ui.modflags() != 0) { return false;}
+	if(!visible || beltkeys == null || key != 0 || ui.modflags() != 0) { return false;}
 	for (int i = 0; i < beltkeys.length; i++) {
 	    if(ev.getKeyCode() == beltkeys[i]) {
 		keyact(slot(i));

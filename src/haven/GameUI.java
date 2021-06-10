@@ -1973,7 +1973,7 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 	toolbelt0.visible = CFG.SHOW_TOOLBELT_0.get();
 	CFG.SHOW_TOOLBELT_0.observe(cfg -> toolbelt0.visible = cfg.get());
 	
-	ToolBelt toolbelt1 = add(new ToolBelt("Belt1", 120, 4, new int[12]), 50, 250);
+	ToolBelt toolbelt1 = add(new ToolBelt("Belt1", 120, 4, 12), 50, 250);
 	toolbelt1.visible = CFG.SHOW_TOOLBELT_1.get();
 	CFG.SHOW_TOOLBELT_1.observe(cfg -> toolbelt1.visible = cfg.get());
     }
