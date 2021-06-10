@@ -1,3 +1,6 @@
+$size[14]{$u{Update for 10.06.21:}
+  * display quality of inspected objects
+ 
 $size[14]{$u{Update for 04.06.21:}
   * moved gob icons for black coal, galena and sylvanite to ores
   * moved gob icons for eclogite, green schist, jasper, mica, pegmatite and rhyolite to rocks
