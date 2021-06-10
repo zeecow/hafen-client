@@ -1092,6 +1092,11 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Sk
 	return 0;
     }
     
+    public void setQuality(int q) {
+        info.setQ(q);
+        status.update(StatusType.info);
+    }
+    
     public void poseUpdated() {status.update(StatusType.pose);}
     
     public void idUpdated() {status.update(StatusType.id);}

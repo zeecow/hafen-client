@@ -2178,6 +2178,9 @@ public class MapView extends PView implements DTarget, Console.Directory {
 		args = Utils.extend(args, inf.clickargs());
 		Gob gob = Gob.from(inf.ci);
 		if(gob != null) {
+		    if(ui.isCursor("gfx/hud/curs/study")) {
+		        ui.gui.setDetectGob(gob);
+		    }
 		    if(ui.gui.mapfile.domark) {
 			ui.gui.mapfile.addMarker(gob);
 			return;

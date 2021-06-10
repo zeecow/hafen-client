@@ -39,6 +39,7 @@ import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 import java.awt.image.WritableRaster;
 import java.util.List;
+import java.util.regex.Matcher;
 
 import static haven.Action.*;
 import static haven.Inventory.*;
@@ -96,6 +97,7 @@ public class GameUI extends ConsoleHost implements Console.Directory {
     public CraftDBWnd craftwnd = null;
     public ActWindow craftlist, buildlist, actlist;
     public TimerPanel timers;
+    private Gob detectGob;
     public StudyWnd studywnd;
     public Observable menuObservable = new Observable(){
 	@Override
@@ -1697,9 +1699,24 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 	resize(parent.sz);
     }
     
+    public void setDetectGob(Gob gob) {
+        detectGob = gob;
+    }
+    
     public void msg(String msg, Color color, Color logcol) {
 	msgtime = Utils.rtime();
 	lastmsg = msgfoundry.render(msg, color);
+	Gob g = detectGob;
+	if(g != null) {
+	    Matcher m = GeneralGobInfo.GOB_Q.matcher(msg);
+	    if(m.matches()) {
+		try {
+		    int q = Integer.parseInt(m.group(1));
+		    g.setQuality(q);
+		} catch (Exception ignored) {}
+		detectGob = null;
+	    }
+	}
 	syslog.append(msg, logcol);
     }
 

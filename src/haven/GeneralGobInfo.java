@@ -3,17 +3,37 @@ package haven;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.regex.Pattern;
 
 public class GeneralGobInfo extends GobInfo {
-    private static int TREE_START = 10;
-    private static int BUSH_START = 30;
-    private static double TREE_MULT = 100.0 / (100.0 - TREE_START);
-    private static double BUSH_MULT = 100.0 / (100.0 - BUSH_START);
+    private static final int TREE_START = 10;
+    private static final int BUSH_START = 30;
+    private static final double TREE_MULT = 100.0 / (100.0 - TREE_START);
+    private static final double BUSH_MULT = 100.0 / (100.0 - BUSH_START);
+    private static final Color Q_COL = new Color(235, 252, 255, 255);
+    private static final Color BG = new Color(0, 0, 0, 84);
+    public static Pattern GOB_Q = Pattern.compile("Quality: (\\d+)");
+    private static final Map<Long, Integer> gobQ = new LinkedHashMap<Long, Integer>() {
+	@Override
+	protected boolean removeEldestEntry(Map.Entry eldest) {
+	    return size() > 50;
+	}
+    };
     private GobHealth health;
+    int q;
 
     protected GeneralGobInfo(Gob owner) {
 	super(owner);
+	q = gobQ.getOrDefault(gob.id, 0);
+    }
+    
+    
+    public void setQ(int q) {
+	gobQ.put(gob.id, q);
+	this.q = q;
     }
     
     @Override
@@ -27,12 +47,13 @@ public class GeneralGobInfo extends GobInfo {
 
 	BufferedImage growth = growth();
 	BufferedImage health = health();
+	BufferedImage quality = quality();
 
-	if(growth == null && health == null) {
+	if(growth == null && health == null && quality == null) {
 	    return null;
 	}
 
-	return new TexI(ItemInfo.catimgsh(3, health, growth));
+	return new TexI(ItemInfo.catimgsh(3, 0, BG, health, growth, quality));
     }
     
     @Override
@@ -41,6 +62,13 @@ public class GeneralGobInfo extends GobInfo {
 	super.dispose();
     }
 
+    private BufferedImage quality() {
+	if(q != 0) {
+	    return Text.std.renderstroked(String.format("Q: %d", q), Q_COL, Color.BLACK).img;
+	}
+	return null;
+    }
+    
     private BufferedImage health() {
 	health = gob.getattr(GobHealth.class);
 	if(health != null) {

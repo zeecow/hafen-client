@@ -9,6 +9,7 @@ public abstract class GobInfo extends GAttrib implements RenderTree.Node, PView.
     private Coord3f pos = new Coord3f(0, 0, 1);
     protected final Object texLock = new Object();
     protected Pair<Double, Double> center = new Pair<>(0.5, 0.5);
+    protected boolean dirty = true;
     
     public GobInfo(Gob owner) {
 	super(owner);
@@ -23,8 +24,9 @@ public abstract class GobInfo extends GAttrib implements RenderTree.Node, PView.
     @Override
     public void ctick(double dt) {
 	synchronized (texLock) {
-	    if(enabled() && tex == null) {
+	    if(enabled() && dirty && tex == null) {
 		tex = render();
+		dirty = false;
 	    }
 	}
     }
@@ -52,6 +54,7 @@ public abstract class GobInfo extends GAttrib implements RenderTree.Node, PView.
 		tex = null;
 	    }
 	}
+	dirty = true;
     }
 
     public void dispose() {
