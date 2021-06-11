@@ -606,7 +606,7 @@ public class ZeeConfig {
         }
         uses++;
         mapActionUses.put(actionName, uses);
-        if(mapActionUses.size() > 30) {
+        if(mapActionUses.size() > 130) {
             //sort by value and limit to first 30
             mapActionUses = mapActionUses.entrySet().stream()
                 .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
