@@ -1,3 +1,8 @@
+$size[14]{$u{Update for 14.06.21:}
+  * merged loftar's changes
+  * List inventory: move items highlighted for crafting into different group
+  * List inventory: properly differentiate items with same name but different icons (like bills of possession and their stubs)
+ 
 $size[14]{$u{Update for 10.06.21:}
   * display quality of inspected objects
  
