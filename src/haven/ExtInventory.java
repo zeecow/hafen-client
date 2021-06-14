@@ -248,7 +248,7 @@ public class ExtInventory extends Widget {
 	    inv.forEachItem((g, w) -> {
 		try {
 		    Double quality = quality(w, grouping.sel);
-		    ItemType type = new ItemType(name(w), quality, w.item.matches);
+		    ItemType type = new ItemType(name(w), resname(w), quality, w.item.matches);
 		    if(type.loading) {needUpdate = true;}
 		    groups.computeIfAbsent(type, k -> new ArrayList<>()).add(w);
 		} catch (Loading ignored) {
@@ -279,6 +279,10 @@ public class ExtInventory extends Widget {
 	return item.name.get("???");
     }
     
+    private static String resname(WItem item) {
+	return item.item.resname();
+    }
+    
     private static Double quality(WItem item) {
 	return quality(item, Grouping.Q);
     }
@@ -305,15 +309,19 @@ public class ExtInventory extends Widget {
     
     private static class ItemType implements Comparable<ItemType> {
 	final String name;
+	final String resname;
 	final Double quality;
 	final boolean matches;
 	final boolean loading;
+	final String cacheId;
 
-	public ItemType(String name, Double quality, boolean matches) {
+	public ItemType(String name, String resname, Double quality, boolean matches) {
 	    this.name = name;
+	    this.resname = resname;
 	    this.quality = quality;
 	    this.matches = matches;
 	    loading = name.startsWith("???");
+	    cacheId = String.format("%s@%s", resname, name);
 	}
 
 	@Override
@@ -321,6 +329,9 @@ public class ExtInventory extends Widget {
 	    int byMatch = Boolean.compare(other.matches, matches);
 	    if(byMatch != 0) { return byMatch; }
 	    int byName = name.compareTo(other.name);
+	    if(byName == 0) {
+		byName = resname.compareTo(other.resname);
+	    }
 	    if((byName != 0) || (quality == null) || (other.quality == null)) {
 		return(byName);
 	    }
@@ -397,8 +408,8 @@ public class ExtInventory extends Widget {
 	@Override
 	public void draw(GOut g) {
 	    if(icon == null) {
-		if(cache.containsKey(type.name)) {
-		    icon = cache.get(type.name);
+		if(cache.containsKey(type.cacheId)) {
+		    icon = cache.get(type.cacheId);
 		} else if(!type.loading) {
 		    try {
 			GSprite sprite = sample.item.sprite();
@@ -412,7 +423,7 @@ public class ExtInventory extends Widget {
 				icon = GobIcon.SettingsWindow.Icon.tex(image.img);
 			    }
 			}
-			cache.put(type.name, icon);
+			cache.put(type.cacheId, icon);
 		    } catch (Loading ignored) {
 		    }
 		}
