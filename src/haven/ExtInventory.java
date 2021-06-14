@@ -248,7 +248,7 @@ public class ExtInventory extends Widget {
 	    inv.forEachItem((g, w) -> {
 		try {
 		    Double quality = quality(w, grouping.sel);
-		    ItemType type = new ItemType(name(w), resname(w), quality, w.item.matches);
+		    ItemType type = new ItemType(w, quality);
 		    if(type.loading) {needUpdate = true;}
 		    groups.computeIfAbsent(type, k -> new ArrayList<>()).add(w);
 		} catch (Loading ignored) {
@@ -315,11 +315,11 @@ public class ExtInventory extends Widget {
 	final boolean loading;
 	final String cacheId;
 
-	public ItemType(String name, String resname, Double quality, boolean matches) {
-	    this.name = name;
-	    this.resname = resname;
+	public ItemType(WItem w, Double quality) {
+	    this.name = name(w);
+	    this.resname = resname(w);
 	    this.quality = quality;
-	    this.matches = matches;
+	    this.matches = w.item.matches;
 	    loading = name.startsWith("???");
 	    cacheId = String.format("%s@%s", resname, name);
 	}
