@@ -186,7 +186,7 @@ public class MapWnd2 extends MapWnd {
     
 	@Override
 	public Area area() {
-	    return new Area(Coord.z, Coord.z);
+	    return null;
 	}
     }
 }
