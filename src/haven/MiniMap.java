@@ -36,11 +36,9 @@ import java.util.stream.Collectors;
 
 import haven.MapFile.Segment;
 import haven.MapFile.DataGrid;
-import haven.MapFile.Grid;
 import haven.MapFile.GridInfo;
-import haven.MapFile.Marker;
-import haven.MapFile.PMarker;
-import haven.MapFile.SMarker;
+import me.ender.minimap.*;
+
 import static haven.MCache.cmaps;
 import static haven.MCache.tilesz;
 import static haven.OCache.posres;
@@ -341,7 +339,11 @@ public class MiniMap extends Widget {
 		this.hit = Area.sized(flagcc.inv(), UI.scale(flagbg.sz));
 	}
 
-	public void draw(GOut g, Coord c) {
+	public void draw(GOut g, Coord c, final float scale, final UI ui, final MapFile file) {
+	    if(Config.always_true) {
+		m.draw(g, c, tip, scale, file);
+		return;
+	    }
 	    if(m instanceof PMarker) {
 		Coord ul = c.sub(flagcc);
 		g.chcolor(((PMarker)m).color);
@@ -583,7 +585,7 @@ public class MiniMap extends Widget {
 	    for(DisplayMarker mark : dgrid.markers(true)) {
 		if(filter(mark))
 		    continue;
-		mark.draw(g, mark.m.tc.sub(dloc.tc).div(scalef()).add(hsz));
+		mark.draw(g, mark.m.tc.sub(dloc.tc).div(scalef()).add(hsz), scale, ui, file);
 	    }
 	}
     }

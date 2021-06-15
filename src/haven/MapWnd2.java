@@ -1,6 +1,8 @@
 package haven;
 
 
+import me.ender.minimap.*;
+
 import java.awt.*;
 import java.util.HashMap;
 import java.util.Map;
@@ -68,7 +70,7 @@ public class MapWnd2 extends MapWnd {
     
     public void addMarker(Coord at, String name) {
 	at = at.add(view.sessloc.tc);
-	MapFile.Marker nm = new MapFile.PMarker(view.sessloc.seg.id, at, name, BuddyWnd.gc[new Random().nextInt(BuddyWnd.gc.length)]);
+	Marker nm = new PMarker(view.sessloc.seg.id, at, name, BuddyWnd.gc[new Random().nextInt(BuddyWnd.gc.length)]);
 	file.add(nm);
 	focus(nm);
 	if(ui.modctrl) {
@@ -77,7 +79,7 @@ public class MapWnd2 extends MapWnd {
 	domark = false;
     }
     
-    public void removeMarker(MapFile.Marker marker) {
+    public void removeMarker(Marker marker) {
 	if(tool.list.sel != null && tool.list.sel.mark == marker) {
 	    if(mremove != null) {
 		mremove.click();
@@ -116,7 +118,7 @@ public class MapWnd2 extends MapWnd {
 	}
     }
     
-    public class GobMarker extends MapFile.Marker {
+    public class GobMarker extends Marker {
 	public final long gobid;
 	public final Indir<Resource> res;
 	private Coord2d rc = null;
@@ -175,6 +177,16 @@ public class MapWnd2 extends MapWnd {
 		return gob.is(GobTag.VEHICLE) && gob.rc.dist(player.rc) < 25;
 	    }
 	    return false;
+	}
+    
+	@Override
+	public void draw(GOut g, Coord c, Text tip, float scale, MapFile file) {
+	
+	}
+    
+	@Override
+	public Area area() {
+	    return new Area(Coord.z, Coord.z);
 	}
     }
 }

@@ -35,6 +35,8 @@ import java.awt.image.BufferedImage;
 import java.awt.image.WritableRaster;
 import haven.render.*;
 import haven.Defer.Future;
+import me.ender.minimap.*;
+
 import static haven.MCache.cmaps;
 
 public class MapFile {

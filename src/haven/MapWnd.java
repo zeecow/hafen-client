@@ -34,11 +34,10 @@ import java.nio.channels.*;
 import java.awt.Color;
 import java.awt.event.KeyEvent;
 import java.awt.image.*;
-import haven.MapFile.Marker;
-import haven.MapFile.PMarker;
-import haven.MapFile.SMarker;
 import haven.MiniMap.*;
 import haven.BuddyWnd.GroupSelector;
+import me.ender.minimap.*;
+
 import static haven.MCache.tilesz;
 import static haven.MCache.cmaps;
 import static haven.Utils.eq;
