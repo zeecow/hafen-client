@@ -2,7 +2,7 @@
   basic: {
     "gfx/terobjs/wonders/tarpit": {
       name: "Tarpit",
-      res: "gfx/terobjs/mm/tarpit"
+      res: "radar/tarpit"
     },
     "gfx/terobjs/minehole": {
       name: "Minehole",

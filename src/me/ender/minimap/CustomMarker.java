@@ -3,13 +3,16 @@ package me.ender.minimap;
 import haven.*;
 
 import java.awt.*;
+import java.awt.image.WritableRaster;
 import java.util.Map;
 import java.util.Objects;
 import java.util.WeakHashMap;
 
+import static haven.MapWnd.MarkerType.*;
+
 // Simple custom icons that are a combo of PMarker (color) and SMarker (Custom res)
 public class CustomMarker extends Marker {
-    private static final Map<Indir<Resource>, Image> cache = new WeakHashMap<>();
+    private static final Map<String, Image> cache = new WeakHashMap<>();
     
     public Color color;
     public final Resource.Spec res;
@@ -40,34 +43,31 @@ public class CustomMarker extends Marker {
     
     @Override
     public void draw(GOut g, Coord c, Text tip, final float scale, final MapFile file) {
-	final Image img = image();
-	if(img != null) {
-	    g.chcolor(color);
+	final Image img = image(res, color);
+	if(img != null && img.tex != null) {
 	    final Coord ul = c.sub(img.cc);
 	    g.image(img.tex, ul);
 	    if(CFG.MMAP_SHOW_MARKER_NAMES.get()) {
 		g.aimage(tip.tex(), c.addy(UI.scale(5)), 0.5, 0);
 	    }
-	    g.chcolor();
 	}
     }
     
     @Override
     public Area area() {
-	final Image img = image();
+	final Image img = image(res, Color.WHITE);
 	if(img == null) {return null;}
 	Coord sz = img.tex.sz();
 	return Area.sized(sz.div(2).inv(), sz);
     }
     
-    public Image image() {
-	Image image = cache.get(this.res);
+    public static Image image(Resource.Spec spec, Color col) {
+	String cacheId = String.format("%s:c[%d]", spec.name, col.getRGB());
+	Image image = cache.get(cacheId);
 	if(image == null) {
 	    try {
-		final Resource res = Resource.loadsaved(Resource.remote(), this.res);
-		final Resource.Image img = res.layer(Resource.imgc);
-		image = new Image(img);
-		cache.put(this.res, image);
+		image = new Image(Resource.loadsaved(Resource.remote(), spec), col);
+		cache.put(cacheId, image);
 	    } catch (Loading ignored) {}
 	}
 	return image;
@@ -78,12 +78,33 @@ public class CustomMarker extends Marker {
 	return Objects.hash(super.hashCode(), color, res);
     }
     
-    private static class Image {
-	final Tex tex;
-	final Coord cc;
+    public static class Image {
+	public final Tex tex;
+	public final Coord cc;
 	
-	public Image(Resource.Image img) {
-	    this.tex = img.tex();
+	public Image(Resource res, Color col) {
+	    Resource.Image bg = res.layer(Resource.imgc, 0);
+	    Resource.Image fg = res.layer(Resource.imgc, 1);
+	    if(bg == null) {bg = res.layer(Resource.imgc);}
+	    if(bg == null) {
+		throw new IllegalArgumentException(String.format("res '%s' has no image layers!", res.name));
+	    }
+	    Coord sz;
+	    if(fg == null) {
+		sz = new Coord(bg.o.x + bg.sz.x, bg.o.y + bg.sz.y);
+	    } else {
+		sz = new Coord(Math.max(bg.o.x + bg.sz.x, fg.o.x + fg.sz.x),
+		    Math.max(bg.o.y + bg.sz.y, fg.o.y + fg.sz.y));
+	    }
+	    
+	    WritableRaster buf = PUtils.imgraster(sz);
+	    PUtils.blit(buf, PUtils.coercergba(bg.img).getRaster(), bg.o);
+	    PUtils.colmul(buf, col);
+	    if(fg != null) {
+		PUtils.alphablit(buf, PUtils.coercergba(fg.img).getRaster(), fg.o);
+	    }
+	    
+	    this.tex = new TexI(PUtils.uiscale(PUtils.rasterimg(buf), new Coord(iconsz, iconsz)));
 	    this.cc = tex.sz().div(2);
 	}
     }

@@ -1,4 +1,4 @@
-#IMAGE LAYER FOR RES www//\cave.res
+#IMAGE LAYER FOR RES www//\minehole.res
 #int16 z
 0
 #int16 subz
@@ -6,9 +6,9 @@
 #Byte nooff
 0
 #int16 id
-0
+1
 #Coord o
-3
+0
 0
 scale
-1.6
+4.0

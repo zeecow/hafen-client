@@ -49,7 +49,7 @@ public class MapWnd extends WindowX implements Console.Directory {
     public final MapFile file;
     public final MiniMap view;
     public final MapView mv;
-    public final Toolbox tool;
+    public final Toolbox2 tool;
     public final Collection<String> overlays = new java.util.concurrent.CopyOnWriteArraySet<>();
     public MarkerConfig markcfg = MarkerConfig.showall, cmarkers = null;
     private final Locator player;
@@ -69,6 +69,7 @@ public class MapWnd extends WindowX implements Console.Directory {
 
     private final static Predicate<Marker> pmarkers = (m -> m instanceof PMarker);
     private final static Predicate<Marker> smarkers = (m -> m instanceof SMarker);
+    private final static Predicate<Marker> custmarkers = (m -> m instanceof CustomMarker);
     private final static Comparator<ListMarker> namecmp = ((a, b) -> a.mark.nm.compareTo(b.mark.nm));
     private final static Comparator<ListMarker> typecmp = Comparator.comparing((ListMarker lm) -> lm.type).thenComparing(namecmp);
 
@@ -149,7 +150,7 @@ public class MapWnd extends WindowX implements Console.Directory {
 	    .settip("Left-click to toggle tile highlight\nRight-click to open settings", true);
 	
 	topbar.pack();
-	tool = add(new Toolbox());;
+	tool = add(new Toolbox2());;
 	compact(Utils.getprefb("compact-map", false));
 	resize(sz);
     }
@@ -547,7 +548,7 @@ public class MapWnd extends WindowX implements Console.Directory {
     public static class CustomMarkerType extends MarkerType {
 	private final Resource.Spec spec;
 	public final Color col;
-	private Tex icon = null;
+	private CustomMarker.Image icon = null;
 	
 	public CustomMarkerType(Color col, Resource.Spec spec) {
 	    this.col = col;
@@ -556,15 +557,9 @@ public class MapWnd extends WindowX implements Console.Directory {
 	
 	public Tex icon() {
 	    if(icon == null) {
-		Resource.Image fg = MiniMap.DisplayMarker.flagfg, bg = MiniMap.DisplayMarker.flagbg;
-		WritableRaster buf = PUtils.imgraster(new Coord(Math.max(fg.o.x + fg.sz.x, bg.o.x + bg.sz.x),
-		    Math.max(fg.o.y + fg.sz.y, bg.o.y + bg.sz.y)));
-		PUtils.blit(buf, PUtils.coercergba(fg.img).getRaster(), fg.o);
-		PUtils.colmul(buf, col);
-		PUtils.alphablit(buf, PUtils.coercergba(bg.img).getRaster(), bg.o);
-		icon = new TexI(PUtils.uiscale(PUtils.rasterimg(buf), new Coord(iconsz, iconsz)));
+		icon = CustomMarker.image(spec, col);
 	    }
-	    return(icon);
+	    return icon != null ? icon.tex : null;
 	}
 	
 	public boolean equals(CustomMarkerType that) {
@@ -763,6 +758,14 @@ public class MapWnd extends WindowX implements Console.Directory {
 				view.file.update(mark);
 			    }
 			});
+		} else if(mark instanceof CustomMarker) {
+		    CustomMarker cm = (CustomMarker) mark;
+		    colsel = tool.add(new GroupSelector(Math.max(0, Utils.index(BuddyWnd.gc, cm.color))) {
+			public void changed(int group) {
+			    cm.color = BuddyWnd.gc[group];
+			    view.file.update(mark);
+			}
+		    });
 		}
 		mremove = tool.add(new Button(UI.scale(95), "Remove", false) {
 		    public void click() {
@@ -1090,6 +1093,128 @@ public class MapWnd extends WindowX implements Console.Directory {
     
     public Location playerLocation() {
 	return view.sessloc;
+    }
+    
+    enum MarkerCategory {
+	placed("Placed", pmarkers), natural("Natural", smarkers), custom("Custom", custmarkers);
+	
+	private final String name;
+	private final Predicate<Marker> filter;
+	
+	MarkerCategory(String name, Predicate<Marker> filter) {
+	    this.name = name;
+	    this.filter = filter;
+	}
+    }
+    
+    enum MarkerSorting {
+	name("Name", namecmp), type("Type", typecmp);
+	
+	private final String label;
+	private final Comparator<ListMarker> comparator;
+	
+	MarkerSorting(String label, Comparator<ListMarker> cmp) {
+	    this.label = label;
+	    this.comparator = cmp;
+	}
+    }
+    
+    public class Toolbox2 extends Widget {
+	public final MarkerList list;
+	private final Frame listf;
+	private final Button mebtn, mibtn;
+	private final Dropbox<MarkerCategory> categories;
+	private final Dropbox<MarkerSorting> sorting;
+	private TextEntry namesel;
+	private final Coord cat_c = UI.scale(3, 8);
+	private final int sort_w = UI.scale(75);
+	
+	private Toolbox2() {
+	    super(UI.scale(200, 200));
+	    listf = add(new Frame(UI.scale(new Coord(200, 200)), false), 0, 0);
+	    list = listf.add(new MarkerList(listf.inner().x, 0), 0, 0);
+	    
+	    categories = add(new Dropbox<MarkerCategory>(UI.scale(100), MarkerCategory.values().length, UI.scale(16)) {
+		@Override
+		protected MarkerCategory listitem(int i) {
+		    return MarkerCategory.values()[i];
+		}
+		
+		@Override
+		protected int listitems() {
+		    return MarkerCategory.values().length;
+		}
+		
+		@Override
+		protected void drawitem(GOut g, MarkerCategory item, int i) {
+		    g.atext(item.name, cat_c, 0, 0.5);
+		}
+		
+		@Override
+		public void change(MarkerCategory item) {
+		    super.change(item);
+		    mflt = item.filter;
+		    markerseq = -1;
+		}
+	    });
+	    categories.change(MarkerCategory.placed);
+	    
+	    sorting = add(new Dropbox<MarkerSorting>(sort_w, MarkerSorting.values().length, UI.scale(16)) {
+		@Override
+		protected MarkerSorting listitem(int i) {
+		    return MarkerSorting.values()[i];
+		}
+		
+		@Override
+		protected int listitems() {
+		    return MarkerSorting.values().length;
+		}
+		
+		@Override
+		protected void drawitem(GOut g, MarkerSorting item, int i) {
+		    g.atext(item.label, cat_c, 0, 0.5);
+		}
+		
+		@Override
+		public void change(MarkerSorting item) {
+		    super.change(item);
+		    mcmp = item.comparator;
+		    markerseq = -1;
+		}
+	    });
+	    sorting.change(MarkerSorting.name);
+	    
+	    mebtn = add(new Button(btnw, "Export...", false) {
+		public void click() {
+		    exportmap();
+		}
+	    });
+	    mibtn = add(new Button(btnw, "Import...", false) {
+		public void click() {
+		    importmap();
+		}
+	    });
+	}
+	
+	public void resize(int h) {
+	    super.resize(new Coord(sz.x, h));
+	    categories.c = new Coord(UI.scale(3), 0);
+	    sorting.c = new Coord(sz.x - sort_w - UI.scale(3), 0);
+	    listf.resize(listf.sz.x, sz.y - UI.scale(150));
+	    listf.c = new Coord(sz.x - listf.sz.x, categories.sz.y + UI.scale(3));
+	    list.resize(listf.inner());
+	    mebtn.c = new Coord(0, sz.y - mebtn.sz.y - UI.scale(5));
+	    mibtn.c = new Coord(sz.x - btnw, sz.y - mibtn.sz.y - UI.scale(5));
+	    if(namesel != null) {
+		namesel.c = listf.c.add(0, listf.sz.y + UI.scale(10));
+		if(colsel != null) {
+		    colsel.c = namesel.c.add(0, namesel.sz.y + UI.scale(10));
+		}
+		int y = namesel.sz.y + BuddyWnd.margin3 + UI.scale(20);
+		mremove.c = namesel.c.add(0, y);
+		mtrack.c = namesel.c.add(UI.scale(105), y);
+	    }
+	}
     }
     
     private Map<String, Console.Command> cmdmap = new TreeMap<String, Console.Command>();

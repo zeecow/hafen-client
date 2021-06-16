@@ -40,9 +40,7 @@ public class PMarker extends Marker {
 	g.chcolor();
 	g.image(flagbg, ul);
 	if(CFG.MMAP_SHOW_MARKER_NAMES.get()) {
-	    final Coord tipc = new Coord(ul.x + flagbg.img.getWidth() / 2 - tip.sz().x / 2,
-		ul.y - tip.sz().y);
-	    g.image(tip.tex(), tipc);
+	    g.aimage(tip.tex(), c, 0.5, 0.75);
 	}
     }
     

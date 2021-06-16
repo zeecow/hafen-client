@@ -33,8 +33,7 @@ public class SMarker extends Marker {
 	    final Coord ul = c.sub(cc);
 	    g.image(img, ul);
 	    if(CFG.MMAP_SHOW_MARKER_NAMES.get()) {
-		final Coord tipc = new Coord(ul.x + img.ssz.x / 2 - tip.sz().x / 2, ul.y - tip.sz().y);
-		g.image(tip.tex(), tipc);
+		g.aimage(tip.tex(), c.addy(UI.scale(3)), 0.5, 0);
 	    }
 	} catch (Loading ignored) {}
     }
