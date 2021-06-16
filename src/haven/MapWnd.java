@@ -65,7 +65,7 @@ public class MapWnd extends WindowX implements Console.Directory {
     private int markerseq = -1;
     public boolean domark = false;
     private int olalpha = 64;
-    private final Collection<Runnable> deferred = new LinkedList<>();
+    protected final Collection<Runnable> deferred = new LinkedList<>();
 
     private final static Predicate<Marker> pmarkers = (m -> m instanceof PMarker);
     private final static Predicate<Marker> smarkers = (m -> m instanceof SMarker);
@@ -438,6 +438,9 @@ public class MapWnd extends WindowX implements Console.Directory {
 		return(types.intern(new PMarkerType(((PMarker)mark).color)));
 	    } else if(mark instanceof SMarker) {
 		return(types.intern(new SMarkerType(((SMarker)mark).res)));
+	    } else if(mark instanceof CustomMarker) {
+		CustomMarker cmark = (CustomMarker) mark;
+		return(types.intern(new CustomMarkerType(cmark.color, cmark.res)));
 	    } else {
 		return(null);
 	    }
@@ -537,6 +540,60 @@ public class MapWnd extends WindowX implements Console.Directory {
 	public int compareTo(MarkerType that) {
 	    if(that instanceof SMarkerType)
 		return(compareTo((SMarkerType)that));
+	    return(super.compareTo(that));
+	}
+    }
+    
+    public static class CustomMarkerType extends MarkerType {
+	private final Resource.Spec spec;
+	public final Color col;
+	private Tex icon = null;
+	
+	public CustomMarkerType(Color col, Resource.Spec spec) {
+	    this.col = col;
+	    this.spec = spec;
+	}
+	
+	public Tex icon() {
+	    if(icon == null) {
+		Resource.Image fg = MiniMap.DisplayMarker.flagfg, bg = MiniMap.DisplayMarker.flagbg;
+		WritableRaster buf = PUtils.imgraster(new Coord(Math.max(fg.o.x + fg.sz.x, bg.o.x + bg.sz.x),
+		    Math.max(fg.o.y + fg.sz.y, bg.o.y + bg.sz.y)));
+		PUtils.blit(buf, PUtils.coercergba(fg.img).getRaster(), fg.o);
+		PUtils.colmul(buf, col);
+		PUtils.alphablit(buf, PUtils.coercergba(bg.img).getRaster(), bg.o);
+		icon = new TexI(PUtils.uiscale(PUtils.rasterimg(buf), new Coord(iconsz, iconsz)));
+	    }
+	    return(icon);
+	}
+	
+	public boolean equals(CustomMarkerType that) {
+	    return(Utils.eq(this.col, that.col) && Utils.eq(this.spec, that.spec));
+	}
+	public boolean equals(Object that) {
+	    return((that instanceof CustomMarkerType) && equals((CustomMarkerType)that));
+	}
+	
+	public int hashCode() {
+	    return Objects.hash(col.hashCode(), spec);
+	}
+	
+	public int compareTo(CustomMarkerType that) {
+	    int byRes = this.spec.name.compareTo(that.spec.name);
+	    if(byRes != 0) {return byRes;}
+	    
+	    int a = Utils.index(BuddyWnd.gc, this.col), b = Utils.index(BuddyWnd.gc, that.col);
+	    if((a >= 0) && (b >= 0))
+		return(a - b);
+	    if((a < 0) && (b >= 0))
+		return(1);
+	    if((a >= 0) && (b < 0))
+		return(-1);
+	    return(Utils.idcmp.compare(this.col, that.col));
+	}
+	public int compareTo(MarkerType that) {
+	    if(that instanceof CustomMarkerType)
+		return(compareTo((CustomMarkerType)that));
 	    return(super.compareTo(that));
 	}
     }

@@ -35,9 +35,11 @@ import java.awt.image.BufferedImage;
 import java.awt.image.WritableRaster;
 import haven.render.*;
 import haven.Defer.Future;
+import me.ender.IDPool;
 import me.ender.minimap.*;
 
 import static haven.MCache.cmaps;
+import static me.ender.minimap.AutoMarkers.*;
 
 public class MapFile {
     public static boolean debug = false;
@@ -47,6 +49,7 @@ public class MapFile {
     public final Collection<Marker> markers = new ArrayList<>();
     public final Map<Long, SMarker> smarkers = new HashMap<>();
     public int markerseq = 0;
+    public IDPool markerids = new IDPool(0, Long.MAX_VALUE);
     public final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
 
     public MapFile(ResCache store, String filename) {
@@ -69,10 +72,10 @@ public class MapFile {
 	buf.append(datum);
 	return(buf.toString());
     }
-    private InputStream sfetch(String ctl, Object... args) throws IOException {
+    public InputStream sfetch(String ctl, Object... args) throws IOException {
 	return(store.fetch(mangle(String.format(ctl, args))));
     }
-    private OutputStream sstore(String ctl, Object... args) throws IOException {
+    public OutputStream sstore(String ctl, Object... args) throws IOException {
 	return(store.store(mangle(String.format(ctl, args))));
     }
 
@@ -116,6 +119,7 @@ public class MapFile {
 	    warn(e, "error when loading index: %s", e);
 	    return(null);
 	}
+	loadCustomMarkers(file);
 	return(file);
     }
 
@@ -127,6 +131,7 @@ public class MapFile {
 	} catch(IOException e) {
 	    throw(new StreamMessage.IOError(e));
 	}
+	Collection<Marker> markers = defaultMarkers(this.markers);
 	try(StreamMessage out = new StreamMessage(fp)) {
 	    out.adduint8(1);
 	    out.addint32(knownsegs.size());
@@ -136,6 +141,7 @@ public class MapFile {
 	    for(Marker mark : markers)
 		savemarker(out, mark);
 	}
+	saveCustomMarkers(this);
     }
 
     public void defersave() {
@@ -269,32 +275,32 @@ public class MapFile {
 	}
     }
 
-    public abstract static class Marker {
+    public abstract static class MarkerOld {
 	public long seg;
 	public Coord tc;
 	public String nm;
 
-	public Marker(long seg, Coord tc, String nm) {
+	public MarkerOld(long seg, Coord tc, String nm) {
 	    this.seg = seg;
 	    this.tc = tc;
 	    this.nm = nm;
 	}
     }
 
-    public static class PMarker extends Marker {
+    public static class PMarkerOld extends MarkerOld {
 	public Color color;
 
-	public PMarker(long seg, Coord tc, String nm, Color color) {
+	public PMarkerOld(long seg, Coord tc, String nm, Color color) {
 	    super(seg, tc, nm);
 	    this.color = color;
 	}
     }
 
-    public static class SMarker extends Marker {
+    public static class SMarkerOld extends MarkerOld {
 	public long oid;
 	public Resource.Spec res;
 
-	public SMarker(long seg, Coord tc, String nm, long oid, Resource.Spec res) {
+	public SMarkerOld(long seg, Coord tc, String nm, long oid, Resource.Spec res) {
 	    super(seg, tc, nm);
 	    this.oid = oid;
 	    this.res = res;

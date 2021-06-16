@@ -118,6 +118,40 @@ public class MapWnd2 extends MapWnd {
 	}
     }
     
+    public void markobj(String icon, String name, Coord2d mc) {
+	synchronized (deferred) {
+	    deferred.add(() -> {
+		final Coord tc = mc.floor(tilesz);
+		MCache.Grid obg = ui.sess.glob.map.getgrid(tc.div(cmaps));
+		if(!view.file.lock.writeLock().tryLock())
+		    throw (new Loading());
+		try {
+		    MapFile.GridInfo info = view.file.gridinfo.get(obg.id);
+		    if(info == null)
+			throw (new Loading());
+		    Coord sc = tc.add(info.sc.sub(obg.gc).mul(cmaps));
+		    //Check for duplicate
+		    for (final Marker mark : view.file.markers) {
+			if(mark instanceof CustomMarker) {
+			    if(mark.seg == info.seg && sc.equals(mark.tc)) {
+				return;
+			    }
+			}
+		    }
+		    
+		    final Marker mark = new CustomMarker(info.seg, sc, name, Color.WHITE, new Resource.Spec(Resource.remote(), icon));
+		    view.file.add(mark);
+		} finally {
+		    view.file.lock.writeLock().unlock();
+		}
+	    });
+	}
+    }
+    
+    public void markobj(AutoMarkers.Mark mark, Coord2d mc) {
+	markobj(mark.res, mark.name, mc);
+    }
+    
     public class GobMarker extends Marker {
 	public final long gobid;
 	public final Indir<Resource> res;
