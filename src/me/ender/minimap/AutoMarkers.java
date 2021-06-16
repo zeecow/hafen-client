@@ -94,7 +94,7 @@ public class AutoMarkers {
 	}
     }
     
-    private static Marker loadcmarker(Message fp) {
+    public static Marker loadcmarker(Message fp) {
 	int ver = fp.uint8();
 	long seg = fp.int64();
 	Coord tc = fp.coord();
@@ -114,7 +114,7 @@ public class AutoMarkers {
 	}
     }
     
-    private static void savecmarker(Message fp, Marker mark) {
+    public static void savecmarker(Message fp, Marker mark) {
 	if(mark instanceof CustomMarker) {
 	    CustomMarker rm = (CustomMarker) mark;
 	    fp.adduint8(1);

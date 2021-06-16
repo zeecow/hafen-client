@@ -133,7 +133,7 @@ public class MapWnd2 extends MapWnd {
 		    //Check for duplicate
 		    for (final Marker mark : view.file.markers) {
 			if(mark instanceof CustomMarker) {
-			    if(mark.seg == info.seg && sc.equals(mark.tc)) {
+			    if(mark.seg == info.seg && sc.equals(mark.tc) && icon.equals(((CustomMarker) mark).res.name)) {
 				return;
 			    }
 			}

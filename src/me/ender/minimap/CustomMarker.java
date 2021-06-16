@@ -78,6 +78,12 @@ public class CustomMarker extends Marker {
 	return Objects.hash(super.hashCode(), color, res);
     }
     
+    public static boolean equals(CustomMarker a, CustomMarker b) {
+	return a.seg == b.seg
+	    && a.tc.equals(b.tc)
+	    && a.res.name.equals(b.res.name);
+    }
+    
     public static class Image {
 	public final Tex tex;
 	public final Coord cc;

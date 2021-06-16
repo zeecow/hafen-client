@@ -1669,9 +1669,16 @@ public class MapFile {
 	    if(!filter.includemark(mark))
 		continue;
 	    MessageBuf buf = new MessageBuf();
-	    savemarker(buf, mark);
+	    String layerName;
+	    if(mark instanceof CustomMarker) {
+		savecmarker(buf, mark);
+		layerName = "custmark";
+	    } else {
+		savemarker(buf, mark);
+		layerName = "mark";
+	    }
 	    byte[] od = buf.fin();
-	    zout.addstring("mark");
+	    zout.addstring(layerName);
 	    zout.addint32(od.length);
 	    zout.addbytes(od);
 	    Utils.checkirq();
@@ -1854,6 +1861,9 @@ public class MapFile {
 	}
 
 	Marker prevmark(Marker mark) {
+	    if(mark instanceof CustomMarker) {
+		return prevcmark((CustomMarker) mark);
+	    }
 	    for(Marker pm : MapFile.this.markers) {
 		if((pm.getClass() != mark.getClass()) || !pm.nm.equals(mark.nm) || !pm.tc.equals(mark.tc))
 		    continue;
@@ -1865,9 +1875,35 @@ public class MapFile {
 	    }
 	    return(null);
 	}
+    
+	Marker prevcmark(CustomMarker mark) {
+	    for (Marker pm : MapFile.this.markers) {
+		if(pm instanceof CustomMarker) {
+		    if(CustomMarker.equals((CustomMarker) pm, mark)) {
+			return pm;
+		    }
+		}
+	    }
+	    return (null);
+	}
 
 	void importmark(Message data) {
 	    Marker mark = loadmarker(data);
+	    ImportedSegment seg = segs.get(mark.seg);
+	    if((seg == null) || (seg.noff == null))
+		return;
+	    Coord soff = seg.offs.get(seg.nseg);
+	    if(soff == null)
+		return;
+	    mark.tc = mark.tc.add(soff.mul(cmaps));
+	    mark.seg = seg.nseg;
+	    if(filter.includemark(mark, prevmark(mark))) {
+		add(mark);
+	    }
+	}
+
+	void importcmark(Message data) {
+	    Marker mark = loadcmarker(data);
 	    ImportedSegment seg = segs.get(mark.seg);
 	    if((seg == null) || (seg.noff == null))
 		return;
@@ -1901,6 +1937,12 @@ public class MapFile {
 			    importmark(lay);
 			} catch(RuntimeException exc) {
 			    filter.handleerror(exc, "mark");
+			}
+		    } else if(type.equals("custmark")) {
+			try {
+			    importcmark(lay);
+			} catch(RuntimeException exc) {
+			    filter.handleerror(exc, "custmark");
 			}
 		    }
 		    lay.skip();
