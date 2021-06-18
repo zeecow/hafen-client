@@ -721,7 +721,10 @@ public class MapWnd extends WindowX implements Console.Directory {
 
 	public void change2(ListMarker lm) {
 	    this.sel = lm;
-
+	    change3(lm != null ? lm.mark : null);
+	}
+	
+	public void change3(Marker mark) {
 	    if(tool.namesel != null) {
 		ui.destroy(tool.namesel);
 		tool.namesel = null;
@@ -739,8 +742,7 @@ public class MapWnd extends WindowX implements Console.Directory {
 		}
 	    }
 
-	    if(lm != null) {
-		Marker mark = lm.mark;
+	    if(mark != null) {
 		if(tool.namesel == null) {
 		    tool.namesel = tool.add(new TextEntry(UI.scale(200), "") {
 			    {dshow = true;}
@@ -828,9 +830,11 @@ public class MapWnd extends WindowX implements Console.Directory {
 	    if(lm.mark == m) {
 		tool.list.change2(lm);
 		tool.list.display(lm);
-		break;
+		return;
 	    }
 	}
+	tool.list.change2(null);
+	tool.list.change3(m);
     }
 
     protected void drawframe(GOut g) {
