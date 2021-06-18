@@ -6,6 +6,7 @@ import me.ender.minimap.*;
 import java.awt.*;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Random;
 
 import static haven.MCache.*;
@@ -221,6 +222,11 @@ public class MapWnd2 extends MapWnd {
 	@Override
 	public Area area() {
 	    return null;
+	}
+    
+	@Override
+	public int hashCode() {
+	    return Objects.hash(gobid);
 	}
     }
 }
