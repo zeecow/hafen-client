@@ -1073,9 +1073,6 @@ public class OptWnd extends WindowX {
 	y += STEP;
 	panel.add(new CFGBox("Show queued path on minimap", CFG.MMAP_SHOW_PATH), x, y);
     
-	y += STEP;
-	panel.add(new CFGBox("Show marker names on minimap", CFG.MMAP_SHOW_MARKER_NAMES), x, y);
-    
 	//second row
 	my = Math.max(my, y);
 	x += UI.scale(265);
