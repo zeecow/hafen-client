@@ -148,6 +148,11 @@ public class MapWnd extends WindowX implements Console.Directory {
 	    .changed(a -> toggleol(TileHighlight.TAG, a))
 	    .rclick(() -> {TileHighlight.toggle(ui);})
 	    .settip("Left-click to toggle tile highlight\nRight-click to open settings", true);
+    
+	btn = topbar.add(new ICheckBox("gfx/hud/mmap/marknames", "", "-d", "-h"), btn.pos("ur"))
+	    .state(CFG.MMAP_SHOW_MARKER_NAMES::get)
+	    .set(CFG.MMAP_SHOW_MARKER_NAMES::set)
+	    .settip("Show marker names");
 	
 	topbar.pack();
 	tool = add(new Toolbox2());;
