@@ -30,6 +30,7 @@ import haven.Equipory.SLOTS;
 import haven.rx.BuffToggles;
 import haven.rx.Reactor;
 import integrations.mapv4.MappingClient;
+import me.ender.minimap.*;
 import me.ender.timer.Timer;
 
 import java.util.*;
@@ -1014,10 +1015,10 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 		MapFile file = MapFile.load(mapstore, mapfilename());
 		if(CFG.AUTOMAP_UPLOAD.get()) {
 		    MappingClient.getInstance().ProcessMap(file, (m) -> {
-			if(m instanceof MapFile.PMarker) {
+			if(m instanceof PMarker) {
 			    return CFG.AUTOMAP_MARKERS.get().stream()
 				.map(group -> group.col)
-				.anyMatch(color -> color.equals(((MapFile.PMarker)m).color));
+				.anyMatch(color -> color.equals(((PMarker)m).color));
 			}
 			return true;
 		    });
@@ -1304,8 +1305,8 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 	}
 
 	public boolean clickmarker(DisplayMarker mark, Location loc, int button, boolean press) {
-	    if(mark.m instanceof MapFile.SMarker) {
-		Gob gob = MarkerID.find(ui.sess.glob.oc, ((MapFile.SMarker)mark.m).oid);
+	    if(mark.m instanceof SMarker) {
+		Gob gob = MarkerID.find(ui.sess.glob.oc, ((SMarker)mark.m).oid);
 		if(gob != null)
 		    mvclick(map, null, loc, gob, button);
 	    }
@@ -1775,9 +1776,9 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 	}
     }
     
-    private final Map<MapFile.Marker, Widget> trackedMarkers = new HashMap<>();
+    private final Map<Marker, Widget> trackedMarkers = new HashMap<>();
     
-    public void track(MapFile.Marker marker) {
+    public void track(Marker marker) {
 	untrack(marker);
 	try {
 	    Factory f = Widget.gettype2("ui/locptr");
@@ -1790,7 +1791,7 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 	}
     }
     
-    public void untrack(MapFile.Marker marker) {
+    public void untrack(Marker marker) {
 	Widget wdg = trackedMarkers.remove(marker);
 	if(wdg != null) {
 	    if(marker instanceof MapWnd2.GobMarker){
@@ -1801,11 +1802,11 @@ public class GameUI extends ConsoleHost implements Console.Directory {
     }
     
     private void untrackAllMarkers() {
-	Collection<MapFile.Marker> markers = new ArrayList<>(trackedMarkers.keySet());
+	Collection<Marker> markers = new ArrayList<>(trackedMarkers.keySet());
 	markers.forEach(this::untrack);
     }
     
-    public boolean isTracked(MapFile.Marker marker) {
+    public boolean isTracked(Marker marker) {
 	return trackedMarkers.containsKey(marker);
     }
 
