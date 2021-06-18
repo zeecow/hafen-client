@@ -32,7 +32,7 @@ public class SMarker extends Marker {
 	    final Coord cc = neg != null ? neg.cc : img.ssz.div(2);
 	    final Coord ul = c.sub(cc);
 	    g.image(img, ul);
-	    if(CFG.MMAP_SHOW_MARKER_NAMES.get()) {
+	    if(tip != null && CFG.MMAP_SHOW_MARKER_NAMES.get()) {
 		g.aimage(tip.tex(), c.addy(UI.scale(3)), 0.5, 0);
 	    }
 	} catch (Loading ignored) {}

@@ -39,7 +39,7 @@ public class PMarker extends Marker {
 	g.image(flagfg, ul);
 	g.chcolor();
 	g.image(flagbg, ul);
-	if(CFG.MMAP_SHOW_MARKER_NAMES.get()) {
+	if(tip != null && CFG.MMAP_SHOW_MARKER_NAMES.get()) {
 	    g.aimage(tip.tex(), c, 0.5, 0.75);
 	}
     }

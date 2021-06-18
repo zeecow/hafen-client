@@ -47,7 +47,7 @@ public class CustomMarker extends Marker {
 	if(img != null && img.tex != null) {
 	    final Coord ul = c.sub(img.cc);
 	    g.image(img.tex, ul);
-	    if(CFG.MMAP_SHOW_MARKER_NAMES.get()) {
+	    if(tip != null && CFG.MMAP_SHOW_MARKER_NAMES.get()) {
 		g.aimage(tip.tex(), c.addy(UI.scale(5)), 0.5, 0);
 	    }
 	}

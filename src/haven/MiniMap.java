@@ -339,10 +339,10 @@ public class MiniMap extends Widget {
 		this.hit = Area.sized(flagcc.inv(), UI.scale(flagbg.sz));
 	}
 
-	public void draw(GOut g, Coord c, final float scale, final UI ui, final MapFile file) {
+	public void draw(GOut g, Coord c, final float scale, final UI ui, final MapFile file, final boolean canShowName) {
 	    if(Config.always_true) {
 		checkTip(m.tip(ui));
-		if(visible()) {m.draw(g, c, tip, scale, file);}
+		if(visible()) {m.draw(g, c, canShowName ? tip : null, scale, file);}
 		return;
 	    }
 	    if(m instanceof PMarker) {
@@ -606,7 +606,7 @@ public class MiniMap extends Widget {
 	    for(DisplayMarker mark : dgrid.markers(true, ui)) {
 		if(filter(mark))
 		    continue;
-		mark.draw(g, mark.m.tc.sub(dloc.tc).div(scalef()).add(hsz), scale, ui, file);
+		mark.draw(g, mark.m.tc.sub(dloc.tc).div(scalef()).add(hsz), scale, ui, file, big);
 	    }
 	}
     }
