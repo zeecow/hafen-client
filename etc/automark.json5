@@ -13,11 +13,11 @@
       res: "radar/mine-ladder"
     },
     "gfx/tiles/ridges/cavein": {
-      name: "Cave entrance",
+      name: "Cave",
       res: "radar/cave-in"
     },
     "gfx/tiles/ridges/caveout": {
-      name: "Cave exit",
+      name: "Exit",
       res: "radar/cave-out"
     }
   }
