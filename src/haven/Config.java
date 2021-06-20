@@ -65,7 +65,7 @@ public class Config {
     public static boolean softres = getprop("haven.softres", "on").equals("on");
     public static Double uiscale = getfloat("haven.uiscale", null);
     public static byte[] authck = null, inittoken = null;
-    public static String prefspec = "hafen";
+    public static String prefspec = getprop("haven.prefspec", "hafen");
     public static final String confid = "ender";
     
     public static String version;
@@ -222,10 +222,11 @@ public class Config {
 	out.println("  -A AUTHSERV[:PORT] Use specified authentication server");
 	out.println("  -u USER            Authenticate as USER (together with -C)");
 	out.println("  -C HEXCOOKIE       Authenticate with specified hex-encoded cookie");
+	out.println("  -p PREFSPEC        Use alternate preference prefix");
     }
 
     public static void cmdline(String[] args) {
-	PosixArgs opt = PosixArgs.getopt(args, "hdPGU:r:A:u:C:");
+	PosixArgs opt = PosixArgs.getopt(args, "hdPGU:r:A:u:C:p:");
 	if(opt == null) {
 	    usage(System.err);
 	    System.exit(1);
@@ -270,6 +271,9 @@ public class Config {
 		break;
 	    case 'C':
 		authck = Utils.hex2byte(opt.arg);
+		break;
+	    case 'p':
+		prefspec = opt.arg;
 		break;
 	    }
 	}
