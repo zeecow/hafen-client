@@ -1,3 +1,7 @@
+$size[14]{$u{Update for 05.07.21:}
+  * fixed trees sometimes have no hitboxes while hidden
+  * added tooltip to marker list for markers with long names
+ 
 $size[14]{$u{Update for 18.06.21:}
   * added Marble to tile highlight
   * added custom markers that auto-mark tarpits, cave entrances and exits, mineholes and ladders.
