@@ -672,7 +672,17 @@ public class MapWnd extends WindowX implements Console.Directory {
 	public ListMarker listitem(int idx) {return(markers.get(idx));}
 	public int listitems() {return(markers.size());}
 	public boolean searchmatch(int idx, String txt) {return(markers.get(idx).mark.nm.toLowerCase().indexOf(txt.toLowerCase()) >= 0);}
-
+    
+	@Override
+	protected Object itemtip(ListMarker item) {
+	    Tex nameTex = names.apply(item.mark.nm).tex();
+	    int namePos = UI.scale(10) + MarkerType.iconsz;
+	    if((nameTex.sz().x + namePos) > sb.c.x) {
+		return item.mark.nm;
+	    }
+	    return null;
+	}
+    
 	public MarkerList(int w, int n) {
 	    super(w, n, UI.scale(20));
 	}
