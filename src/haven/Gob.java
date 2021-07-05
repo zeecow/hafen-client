@@ -1011,7 +1011,6 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Sk
 	    if(d != null && d.skipRender != needHide) {
 		d.skipRender = needHide;
 		if(needHide) {
-		    tag(GobTag.HIDDEN);
 		    if(d.slots != null) {
 			ArrayList<RenderTree.Slot> tmpSlots = new ArrayList<>(d.slots);
 			glob.loader.defer(() -> RUtils.multiremSafe(tmpSlots), null);
@@ -1019,10 +1018,14 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Sk
 		} else {
 		    ArrayList<RenderTree.Slot> tmpSlots = new ArrayList<>(slots);
 		    glob.loader.defer(() -> RUtils.multiadd(tmpSlots, d), null);
-		    untag(GobTag.HIDDEN);
 		}
-	    	return true;
 	    }
+	    if(needHide) {
+		tag(GobTag.HIDDEN);
+	    } else {
+	        untag(GobTag.HIDDEN);
+	    }
+	    return true;
 	}
 	return false;
     }
