@@ -45,9 +45,10 @@ public class ZeeConfig {
     public static boolean actionSearchGlobal = Utils.getprefb("actionSearchGlobal", true);
     public static boolean alertOnPlayers = Utils.getprefb("alertOnPlayers", true);
     public static boolean autoClickMenuOption = Utils.getprefb("autoClickMenuOption", true);
-    public static String autoClickMenuOptionList = Utils.getpref("autoClickMenuOptionList", "Pick,Pluck,Flay,Slice,Harvest wax");
+    public static String autoClickMenuOptionList = Utils.getpref("autoClickMenuOptionList", "Pick,Harvest wax");
     public static boolean autoHearthOnStranger = Utils.getprefb("autoHearthOnStranger", true);
     public static boolean autoOpenEquips = Utils.getprefb("beltToggleEquips", true);
+    public static boolean butcherAuto = false;
     public static boolean cattleRosterHeight = Utils.getprefb("cattleRosterHeight", false);
     public static double cattleRosterHeightPercentage = Utils.getprefd("cattleRosterHeightPercentage", 1.0);
     public static boolean dropMinedCurios = Utils.getprefb("dropMinedCurios", true);
@@ -787,7 +788,7 @@ public class ZeeConfig {
             Integer count = countInvItems(itemName);
             count++;
             mapInvItemNameCount.put(itemName, count);
-            invMainoptionsWdg.updateLabelCount(itemName + "(" + count + ")");
+            invMainoptionsWdg.updateLabelCount(itemName,count);
         }catch (Resource.Loading e){
         }
     }
@@ -799,7 +800,7 @@ public class ZeeConfig {
             if(count < 0)
                 count = 0;
             mapInvItemNameCount.put(itemName, count);
-            invMainoptionsWdg.updateLabelCount(itemName+"("+count+")");
+            invMainoptionsWdg.updateLabelCount(itemName,count);
         }catch (Resource.Loading e){
         }
     }

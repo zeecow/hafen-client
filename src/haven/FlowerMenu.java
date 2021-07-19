@@ -285,14 +285,26 @@ public class FlowerMenu extends Widget {
 
 	//auto click the first match
 	private void autoClickPetal(){
-    	if(!ZeeConfig.autoClickMenuOption)
-    		return;
-		String[] list = ZeeConfig.autoClickMenuOptionList.split(",");
-		for(int i = 0; i < opts.length; i++) {
-			for (int j = 0; j < list.length; j++) {
-				if( list[j].contentEquals(opts[i].text.text)){
-					autochoose = opts[i];
-					return;
+		System.out.println(ZeeConfig.butcherAuto);
+		if(ZeeConfig.butcherAuto) {
+			String[] list = {"Wring neck","Skin","Flay","Pluck","Clean","Butcher","Collect bones"};
+			for (int i = 0; i < opts.length; i++) {
+				for (int j = 0; j < list.length; j++) {
+					if (list[j].contentEquals(opts[i].text.text)) {
+						autochoose = opts[i];
+						return;
+					}
+				}
+			}
+		}
+    	if(ZeeConfig.autoClickMenuOption) {
+			String[] list = ZeeConfig.autoClickMenuOptionList.split(",");
+			for (int i = 0; i < opts.length; i++) {
+				for (int j = 0; j < list.length; j++) {
+					if (list[j].contentEquals(opts[i].text.text)) {
+						autochoose = opts[i];
+						return;
+					}
 				}
 			}
 		}
