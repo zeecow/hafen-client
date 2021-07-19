@@ -463,7 +463,7 @@ public class ZeeConfig {
 
         //change slots position
         Widget invSlots = windowInvMain.getchild(Inventory.class);
-        invSlots.c = new Coord(0,20);
+        invSlots.c = new Coord(0,30);
 
         windowInvMain.pack();
     }

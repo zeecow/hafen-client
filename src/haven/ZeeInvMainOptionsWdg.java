@@ -47,7 +47,7 @@ public class ZeeInvMainOptionsWdg extends Widget {
             }
         }, x, 0);
 
-        x += cbSoil.sz.x + 5;
+        x = 0;
 
         add(cbButcher = new CheckBox("butchmode") {
             {
@@ -59,19 +59,16 @@ public class ZeeInvMainOptionsWdg extends Widget {
                 ZeeConfig.butcherAuto = val;
                 a = val;
             }
-        }, x, 0);
+        }, x, 15);
 
-        x += cbSoil.sz.x + 5;
-
-        add(labelCount = new Label(""), x, 0);
-
+        add(labelCount = new Label(""), 0, 0);
         pack();
     }
 
     public void updateLabelCount(String itemName, Integer count) {
 
         //update counter text
-        labelCount.settext(itemName.substring(0, Math.min(7, itemName.length())) + "..." + count);
+        labelCount.settext(itemName + "(" + count +")");
 
         repositionLabelCount();
     }
@@ -79,7 +76,8 @@ public class ZeeInvMainOptionsWdg extends Widget {
     public void repositionLabelCount() {
         //position counter at top right
         int x = invSlots.sz.x - labelCount.sz.x;
-        labelCount.c = new Coord(x, 10);
+        int y = invSlots.sz.y + 20;
+        labelCount.c = new Coord(x, y);
         pack();
     }
 }

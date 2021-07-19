@@ -285,7 +285,6 @@ public class FlowerMenu extends Widget {
 
 	//auto click the first match
 	private void autoClickPetal(){
-		System.out.println(ZeeConfig.butcherAuto);
 		if(ZeeConfig.butcherAuto) {
 			String[] list = {"Wring neck","Skin","Flay","Pluck","Clean","Butcher","Collect bones"};
 			for (int i = 0; i < opts.length; i++) {
