@@ -217,7 +217,7 @@ public class Utils {
 	return((raw - 186) * (1.0 / 31.0));
     }
 
-    static synchronized Preferences prefs() {
+    public static synchronized Preferences prefs() {
 	if(prefs == null) {
 	    Preferences node = Preferences.userNodeForPackage(Utils.class);
 	    if(Config.prefspec != null)
@@ -227,67 +227,67 @@ public class Utils {
 	return(prefs);
     }
 
-    static String getpref(String prefname, String def) {
+    public static String getpref(String prefname, String def) {
 	try {
 	    return(prefs().get(prefname, def));
 	} catch(SecurityException e) {
 	    return(def);
 	}
     }
-	
-    static void setpref(String prefname, String val) {
+
+    public static void setpref(String prefname, String val) {
 	try {
 	    prefs().put(prefname, val);
 	} catch(SecurityException e) {
 	}
     }
-    
-    static int getprefi(String prefname, int def) {
+
+    public static int getprefi(String prefname, int def) {
 	try {
 	    return(prefs().getInt(prefname, def));
 	} catch(SecurityException e) {
 	    return(def);
 	}
     }
-    
-    static void setprefi(String prefname, int val) {
+
+    public static void setprefi(String prefname, int val) {
 	try {
 	    prefs().putInt(prefname, val);
 	} catch(SecurityException e) {
 	}
     }
 
-    static double getprefd(String prefname, double def) {
+    public static double getprefd(String prefname, double def) {
 	try {
 	    return(prefs().getDouble(prefname, def));
 	} catch(SecurityException e) {
 	    return(def);
 	}
     }
-    
-    static void setprefd(String prefname, double val) {
+
+    public static void setprefd(String prefname, double val) {
 	try {
 	    prefs().putDouble(prefname, val);
 	} catch(SecurityException e) {
 	}
     }
 
-    static boolean getprefb(String prefname, boolean def) {
+    public static boolean getprefb(String prefname, boolean def) {
 	try {
 	    return(prefs().getBoolean(prefname, def));
 	} catch(SecurityException e) {
 	    return(def);
 	}
     }
-    
-    static void setprefb(String prefname, boolean val) {
+
+    public static void setprefb(String prefname, boolean val) {
 	try {
 	    prefs().putBoolean(prefname, val);
 	} catch(SecurityException e) {
 	}
     }
 
-    static Coord getprefc(String prefname, Coord def) {
+    public static Coord getprefc(String prefname, Coord def) {
 	try {
 	    String val = prefs().get(prefname, null);
 	    if(val == null)
@@ -300,15 +300,15 @@ public class Utils {
 	    return(def);
 	}
     }
-    
-    static void setprefc(String prefname, Coord val) {
+
+    public static void setprefc(String prefname, Coord val) {
 	try {
 	    prefs().put(prefname, val.x + "x" + val.y);
 	} catch(SecurityException e) {
 	}
     }
 
-    static byte[] getprefb(String prefname, byte[] def) {
+    public static byte[] getprefb(String prefname, byte[] def) {
 	try {
 	    return(prefs().getByteArray(prefname, def));
 	} catch(SecurityException e) {
@@ -316,13 +316,46 @@ public class Utils {
 	}
     }
 	
-    static void setprefb(String prefname, byte[] val) {
+    public static void setprefb(String prefname, byte[] val) {
 	try {
 	    prefs().putByteArray(prefname, val);
 	} catch(SecurityException e) {
 	}
     }
-    
+
+    public static List<String> getprefsl(String prefname, String[] def) {
+	byte[] enc = getprefb(prefname, null);
+	if(enc == null)
+	    return((def == null) ? null : Arrays.asList(def));
+	ByteBuffer buf = ByteBuffer.wrap(enc);
+	ArrayList<String> ret = new ArrayList<>();
+	for(int i = 0, s = 0; i < buf.capacity(); i++) {
+	    if(buf.get(i) == 0) {
+		buf.position(s).limit(i);
+		CharBuffer dec = utf8.decode(buf);
+		ret.add(dec.toString());
+		s = i + 1;
+		buf.limit(buf.capacity());
+	    }
+	}
+	ret.trimToSize();
+	return(ret);
+    }
+
+    public static void setprefsl(String prefname, Iterable<? extends CharSequence> val) {
+	ByteBuffer buf = ByteBuffer.allocate(1024);
+	for(CharSequence str : val) {
+	    ByteBuffer enc = utf8.encode(CharBuffer.wrap(str));
+	    buf = growbuf(buf, enc.remaining() + 1);
+	    buf.put(enc);
+	    buf.put((byte)0);
+	}
+	buf.flip();
+	byte[] enc = new byte[buf.remaining()];
+	buf.get(enc);
+	setprefb(prefname, enc);
+    }
+
     public static String getprop(String propname, String def) {
 	try {
 	    String ret;

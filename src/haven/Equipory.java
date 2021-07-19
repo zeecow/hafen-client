@@ -98,6 +98,7 @@ public class Equipory extends Widget implements DTarget {
 	    ava.avagob = getparent(GameUI.class).plid;
 	if(ZeeConfig.equiporyCompact)
 		ava.hide();
+	super.added();
     }
 
     public Equipory(long gobid) {
