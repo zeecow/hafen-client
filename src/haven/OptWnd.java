@@ -950,6 +950,9 @@ public class OptWnd extends WindowX {
     
 	y += STEP;
 	panel.add(new CFGBox("Flat cupboards (needs restart)", CFG.FLAT_CUPBOARDS, "Makes cupboards look like floor hatches", true), x, y);
+
+	y += STEP;
+	panel.add(new CFGBox("Display container fullness", CFG.SHOW_CONTAINER_FULLNESS, "Makes containers tint different colors when they are empty or full", true), x, y);
     
 	y += STEP;
 	tx = panel.add(new CFGBox("Draw paths", CFG.DISPLAY_GOB_PATHS, "Draws lines where objects are moving", true), x, y).sz.x;
