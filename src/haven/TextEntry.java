@@ -44,7 +44,7 @@ public class TextEntry extends SIWidget {
     public LineEdit buf;
     public int sx;
     public boolean pw = false;
-    public String text;
+    @Deprecated public String text;
     private boolean dirty = false;
     private double focusstart;
     private Text.Line tcache = null;
@@ -190,5 +190,9 @@ public class TextEntry extends SIWidget {
     public void resize(int w) {
 	resize(w, sz.y);
 	redraw();
+    }
+
+    public String text() {
+	return(this.text);
     }
 }

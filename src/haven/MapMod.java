@@ -61,6 +61,7 @@ public class MapMod extends WindowX implements MapView.Grabber {
     protected void added() {
 	map = ui.sess.glob.map;
 	mv = getparent(GameUI.class).map;
+	super.added();
 	grab = mv.new GrabXL(this);
         mv.grab(grab);
     }
@@ -145,7 +146,7 @@ public class MapMod extends WindowX implements MapView.Grabber {
             return;
         }
         if(sender == tilenm) {
-            wdgmsg("tilenm", tilenm.text);
+            wdgmsg("tilenm", tilenm.text());
             return;
         }
         super.wdgmsg(sender, msg, args);
