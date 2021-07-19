@@ -167,7 +167,7 @@ public enum GobTag {
                 if(d.hasPose("/knock")) {
                     tags.add(KO);
                 }
-                if(d.hasPose("/dead")) {
+                if(d.hasPose("/dead") || d.hasPose("/waterdead")) {
                     tags.add(DEAD);
                 }
             }
