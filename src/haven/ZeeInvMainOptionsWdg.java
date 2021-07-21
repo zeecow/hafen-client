@@ -3,7 +3,7 @@ package haven;
 public class ZeeInvMainOptionsWdg extends Widget {
 
     Label labelDrop, labelCount;
-    CheckBox cbSeeds, cbSoil, cbButcher;
+    CheckBox cbSeeds, cbSoil, cbButcher, cbAutomenu;
     Widget invSlots;
 
     public ZeeInvMainOptionsWdg(String windowCap) {
@@ -17,37 +17,19 @@ public class ZeeInvMainOptionsWdg extends Widget {
 
         int x = 0;
 
-        add(labelDrop = new Label("Drop:"), x, 0);
-
-        x += labelDrop.sz.x + 5;
-
-        add(cbSeeds = new CheckBox("seeds") {
+        add(cbAutomenu = new CheckBox("automenu") {
             {
-                a = ZeeConfig.dropSeeds;
+                a = ZeeConfig.autoClickMenuOption;
             }
 
             public void set(boolean val) {
-                Utils.setprefb("dropSeeds", val);
-                ZeeConfig.dropSeeds = val;
+                Utils.setprefb("autoClickMenuOption", val);
+                ZeeConfig.autoClickMenuOption = val;
                 a = val;
             }
         }, x, 0);
 
-        x += cbSeeds.sz.x + 5;
-
-        add(cbSoil = new CheckBox("soil") {
-            {
-                a = ZeeConfig.dropSoil;
-            }
-
-            public void set(boolean val) {
-                Utils.setprefb("dropSoil", val);
-                ZeeConfig.dropSoil = val;
-                a = val;
-            }
-        }, x, 0);
-
-        x = 0;
+        x += cbAutomenu.sz.x + 5;
 
         add(cbButcher = new CheckBox("butchmode") {
             {
@@ -57,6 +39,34 @@ public class ZeeInvMainOptionsWdg extends Widget {
             public void set(boolean val) {
                 Utils.setprefb("butcherAuto", val);
                 ZeeConfig.butcherAuto = val;
+                a = val;
+            }
+        }, x, 0);
+
+        x = 0;
+
+        add(cbSeeds = new CheckBox("dropseed") {
+            {
+                a = ZeeConfig.dropSeeds;
+            }
+
+            public void set(boolean val) {
+                Utils.setprefb("dropSeeds", val);
+                ZeeConfig.dropSeeds = val;
+                a = val;
+            }
+        }, x, 15);
+
+        x += cbSeeds.sz.x + 5;
+
+        add(cbSoil = new CheckBox("dropsoil") {
+            {
+                a = ZeeConfig.dropSoil;
+            }
+
+            public void set(boolean val) {
+                Utils.setprefb("dropSoil", val);
+                ZeeConfig.dropSoil = val;
                 a = val;
             }
         }, x, 15);
