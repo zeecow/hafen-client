@@ -1,8 +1,6 @@
 package haven;
 
 import haven.render.MixColor;
-import org.apache.commons.lang3.builder.RecursiveToStringStyle;
-import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -28,6 +26,7 @@ public class ZeeConfig {
     public static final String MAP_ACTION_USES = "mapActionUses";
     public static final String MAP_GOB_COLOR = "mapGobSettings";
     public static final String MAP_WND_POS = "mapWindowPos";
+    public static final String MAKE_WINDOW_NAME = "Makewindow";
     public static MixColor MIXCOLOR_RED = new MixColor(255,0,0,200);
     public static MixColor MIXCOLOR_ORANGE = new MixColor(255,128,0,200);
     public static MixColor MIXCOLOR_YELLOW = new MixColor(255,255,0,200);
@@ -479,6 +478,9 @@ public class ZeeConfig {
         //reposition window if saved
         Coord c;
         if(rememberWindowsPos && !(window instanceof MapWnd) ){
+            if(isMakewindow(window)){
+                windowTitle = MAKE_WINDOW_NAME;
+            }
             if((c = mapWindowPos.get(windowTitle)) != null) {
                 window.c = c;
             }
@@ -625,7 +627,7 @@ public class ZeeConfig {
         if(name==null || name.isEmpty() || window instanceof MapWnd)
             return;
         if(isMakewindow(window))
-            name = "Makewindow";
+            name = MAKE_WINDOW_NAME;
         mapWindowPos.put(name, new Coord(window.c));
         Utils.setpref(MAP_WND_POS, serialize(mapWindowPos));
     }
