@@ -603,7 +603,7 @@ public class MiniMap extends Widget {
     public void drawparts(GOut g){
 	drawmap(g);
 	drawmarkers(g);
-	if(ZeeConfig.showIconsZoomOut || dlvl == 0)
+	if( (ZeeConfig.showIconsZoomOut && dlvl<=2) || dlvl == 0)
 	    drawicons(g);
 	drawparty(g);
     }
