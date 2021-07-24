@@ -62,6 +62,7 @@ public class ZeeConfig {
     public static boolean highlightGrowingTrees = Utils.getprefb("highlightGrowingTrees", true);
     public static boolean notifyBuddyOnline = Utils.getprefb("notifyBuddyOnline", false);
     public static boolean showInventoryLogin = Utils.getprefb("showInventoryLogin", true);
+    public static boolean showIconsZoomOut = Utils.getprefb("showIconsZoomOut", true);
     public static boolean showEquipsLogin = Utils.getprefb("showEquipsLogin", false);
     public static boolean sortActionsByUses = Utils.getprefb("sortActionsByUses", true);;
     public static boolean rememberWindowsPos = Utils.getprefb("rememberWindowsPos", true);
