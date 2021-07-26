@@ -340,7 +340,8 @@ public class Utils {
 	ArrayList<String> ret = new ArrayList<>();
 	for(int i = 0, s = 0; i < buf.capacity(); i++) {
 	    if(buf.get(i) == 0) {
-		((Buffer) buf).position(s).limit(i);
+		((Buffer) buf).position(s);
+		((Buffer) buf).limit(i);
 		CharBuffer dec = utf8.decode(buf);
 		ret.add(dec.toString());
 		s = i + 1;
