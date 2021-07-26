@@ -345,7 +345,7 @@ public class Utils {
 		CharBuffer dec = utf8.decode(buf);
 		ret.add(dec.toString());
 		s = i + 1;
-		buf.limit(buf.capacity());
+		((Buffer) buf).limit(buf.capacity());
 	    }
 	}
 	ret.trimToSize();
