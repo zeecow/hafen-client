@@ -246,10 +246,10 @@ public class UI {
 	if(f == null)
 	    throw(new UIException("Bad widget name", type, cargs));
 	synchronized(this) {
-	    Widget pwdg = parent != 65535?getwidget(parent):null;
+	    Widget pwdg = parent != -1 ? getwidget(parent) : null;
 	    Widget wdg = WindowDetector.create(pwdg, f, this, cargs);
 	    wdg.attach(this);
-	    if(parent != 65535) {
+	    if(parent != -1) {
 		if(pwdg == null)
 		    throw(new UIException("Null parent widget " + parent + " for " + id, type, cargs));
 		pwdg.addchild(wdg, pargs);
