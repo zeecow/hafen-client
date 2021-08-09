@@ -13,7 +13,7 @@ import java.util.List;
 public class ZeecowOptionsWindow extends JFrame {
     public JTabbedPane tabbedPane, tabbedPaneGobs;
     public JPanel panelTabMisc, panelTabInterface, panelTabGobs, panelDetailsBottom, panelTabCateg;
-    public JCheckBox cbDropMinedStone, cbDropMinedOre, cbDropMinedSilverGold, cbDropMinedCurios, cbActionSearchGlobal, cbCompactEquipsWindow, cbBeltTogglesEquips, cbAutohearth, cbHighlighAggressiveGobs, cbHighlightCropsReady, cbHighlightGrowingTrees, cbAlertOnPlayers,  cbShowInventoryLogin, cbShowIconsZoomOut, cbRememberWindowsPos, cbSortActionsByUse, cbShowEquipsLogin, cbNotifyBuddyOnline, cbZoomOrthoExtended, cbAutoClickMenuOpts, cbCattleRosterHeight;
+    public JCheckBox cbDropMinedStone, cbDropMinedOre, cbDropMinedSilverGold, cbDropMinedCurios, cbActionSearchGlobal, cbCompactEquipsWindow, cbBeltTogglesEquips, cbAutohearth, cbHighlighAggressiveGobs, cbHighlightCropsReady, cbHighlightGrowingTrees, cbMiniTrees, cbAlertOnPlayers,  cbShowInventoryLogin, cbShowIconsZoomOut, cbRememberWindowsPos, cbSortActionsByUse, cbShowEquipsLogin, cbNotifyBuddyOnline, cbZoomOrthoExtended, cbAutoClickMenuOpts, cbCattleRosterHeight;
     public JTextField tfAutoClickMenu, tfGobName, tfAudioPath, tfCategName, tfAudioPathCateg;
     public JComboBox<String> cmbCattleRoster, cmbGobCategory;
     public JList<String> listGobsTemp, listGobsSaved, listGobsCategories;
@@ -62,7 +62,7 @@ public class ZeecowOptionsWindow extends JFrame {
         panelTabMisc.setLayout(new BoxLayout(panelTabMisc, BoxLayout.PAGE_AXIS));
         tabbedPane.addTab("Misc", panelTabMisc);
 
-        panelTabMisc.add(Box.createRigidArea(new Dimension(0,25)));
+        panelTabMisc.add(Box.createRigidArea(new Dimension(0,5)));
         panelTabMisc.add(cbDropMinedStone = new JCheckBox("Drop mined stones"));
         cbDropMinedStone.setSelected(ZeeConfig.dropMinedStones);
         cbDropMinedStone.addActionListener(actionEvent -> {
@@ -95,7 +95,7 @@ public class ZeecowOptionsWindow extends JFrame {
             Utils.setprefb("dropMinedCurios",val);
         });
 
-        panelTabMisc.add(Box.createRigidArea(new Dimension(0,25)));
+        panelTabMisc.add(Box.createRigidArea(new Dimension(0,5)));
 
         panelTabMisc.add(cbHighlighAggressiveGobs = new JCheckBox("Highlight aggressive gobs"));
         cbHighlighAggressiveGobs.setSelected(ZeeConfig.highlightAggressiveGobs);
@@ -121,7 +121,17 @@ public class ZeecowOptionsWindow extends JFrame {
             Utils.setprefb("highlightGrowingTrees",val);
         });
 
-        panelTabMisc.add(Box.createRigidArea(new Dimension(0,25)));
+        panelTabMisc.add(Box.createRigidArea(new Dimension(0,5)));
+
+        panelTabMisc.add(cbMiniTrees= new JCheckBox("Mini trees :3"));
+        cbMiniTrees.setSelected(ZeeConfig.miniTrees);
+        cbMiniTrees.addActionListener(actionEvent -> {
+            JCheckBox cb = (JCheckBox) actionEvent.getSource();
+            boolean val = ZeeConfig.miniTrees = cb.isSelected();
+            Utils.setprefb("miniTrees",val);
+        });
+
+        panelTabMisc.add(Box.createRigidArea(new Dimension(0,5)));
 
         panelTabMisc.add(cbActionSearchGlobal = new JCheckBox("Action search global"));
         cbActionSearchGlobal.setSelected(ZeeConfig.actionSearchGlobal);
@@ -163,7 +173,7 @@ public class ZeecowOptionsWindow extends JFrame {
             Utils.setprefb("zoomOrthoExtended",val);
         });
 
-        panelTabMisc.add(Box.createRigidArea(new Dimension(0,25)));
+        panelTabMisc.add(Box.createRigidArea(new Dimension(0,5)));
 
         //auto click menus
         panelTabMisc.add(cbAutoClickMenuOpts = new JCheckBox("Auto-click menus (in order)"));
@@ -193,7 +203,7 @@ public class ZeecowOptionsWindow extends JFrame {
         panelTabInterface.setLayout(new BoxLayout(panelTabInterface, BoxLayout.PAGE_AXIS));
         tabbedPane.addTab("Interface", panelTabInterface);
 
-        panelTabInterface.add(Box.createRigidArea(new Dimension(25,25)));
+        panelTabInterface.add(Box.createRigidArea(new Dimension(0,25)));
         panelTabInterface.add(cbCompactEquipsWindow = new JCheckBox("Compact equip window(restart)"));
         cbCompactEquipsWindow.setSelected(ZeeConfig.equiporyCompact);
         cbCompactEquipsWindow.addActionListener(actionEvent -> {
@@ -234,7 +244,7 @@ public class ZeecowOptionsWindow extends JFrame {
             Utils.setprefb("showIconsZoomOut",val);
         });
 
-        panelTabInterface.add(Box.createRigidArea(new Dimension(25,25)));
+        panelTabInterface.add(Box.createRigidArea(new Dimension(0,25)));
 
         panelTabInterface.add(cbRememberWindowsPos= new JCheckBox("Remember windows pos"));
         cbRememberWindowsPos.setSelected(ZeeConfig.rememberWindowsPos);
@@ -249,7 +259,7 @@ public class ZeecowOptionsWindow extends JFrame {
             resetWindowsPos();
         });
 
-        panelTabInterface.add(Box.createRigidArea(new Dimension(25,25)));
+        panelTabInterface.add(Box.createRigidArea(new Dimension(0,25)));
 
         panelTabInterface.add(cbSortActionsByUse= new JCheckBox("Sort actions by uses"));
         cbSortActionsByUse.setSelected(ZeeConfig.sortActionsByUses);
@@ -264,7 +274,7 @@ public class ZeecowOptionsWindow extends JFrame {
             resetActionUses();
         });
 
-        panelTabInterface.add(Box.createRigidArea(new Dimension(25,25)));
+        panelTabInterface.add(Box.createRigidArea(new Dimension(0,25)));
 
         //cattle roster height
         panelTabInterface.add(cbCattleRosterHeight = new JCheckBox("Cattle Roster height(logout)"));

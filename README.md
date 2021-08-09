@@ -23,3 +23,4 @@ other stuff:
  - highlight damaged gobs more  
  - highlight finished crops, growing trees, gobs and categories
  - zoom extended for ortho cam
+ - mini trees
