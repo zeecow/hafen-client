@@ -51,13 +51,13 @@ public class ResDrawable extends Drawable {
         if ( ZeeConfig.isTree(res.name) && !sdtCopy.eom()) {
             byte[] args = new byte[2];
             args[0] = (byte) sdtCopy.uint8();
-            int fscale = 25;
-            if (!sdtCopy.eom()) {
+            int fscale = ZeeConfig.miniTreesSize;
+            /*if (!sdtCopy.eom()) {
                 fscale = sdtCopy.uint8();
                 if (fscale > 25)
                     fscale = 25;
 
-            }
+            }*/
             args[1] = (byte) fscale;
             sdtCopy = new MessageBuf(args);
         }

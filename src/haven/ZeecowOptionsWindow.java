@@ -15,7 +15,7 @@ public class ZeecowOptionsWindow extends JFrame {
     public JPanel panelTabMisc, panelTabInterface, panelTabGobs, panelDetailsBottom, panelTabCateg;
     public JCheckBox cbDropMinedStone, cbDropMinedOre, cbDropMinedSilverGold, cbDropMinedCurios, cbActionSearchGlobal, cbCompactEquipsWindow, cbBeltTogglesEquips, cbAutohearth, cbHighlighAggressiveGobs, cbHighlightCropsReady, cbHighlightGrowingTrees, cbMiniTrees, cbAlertOnPlayers,  cbShowInventoryLogin, cbShowIconsZoomOut, cbRememberWindowsPos, cbSortActionsByUse, cbShowEquipsLogin, cbNotifyBuddyOnline, cbZoomOrthoExtended, cbAutoClickMenuOpts, cbCattleRosterHeight;
     public JTextField tfAutoClickMenu, tfGobName, tfAudioPath, tfCategName, tfAudioPathCateg;
-    public JComboBox<String> cmbCattleRoster, cmbGobCategory;
+    public JComboBox<String> cmbCattleRoster, cmbGobCategory, cmbMiniTreeSize;
     public JList<String> listGobsTemp, listGobsSaved, listGobsCategories;
     public JButton btnRefresh, btnPrintState, btnResetGobs, btnAudioSave, btnAudioClear, btnAudioTest, btnRemGobFromCateg, btnGobColorAdd, btnCategoryColorAdd, btnGobColorRemove, btnCategoryColorRemove, btnResetCateg, btnAddCateg, btnRemoveCateg, btnResetWindowsPos, btnResetActionUses;
     public JTextArea txtAreaDebug;
@@ -129,6 +129,19 @@ public class ZeecowOptionsWindow extends JFrame {
             JCheckBox cb = (JCheckBox) actionEvent.getSource();
             boolean val = ZeeConfig.miniTrees = cb.isSelected();
             Utils.setprefb("miniTrees",val);
+            cmbMiniTreeSize.setEnabled(val);
+        });
+
+        //mini trees size
+        String[] perc = {"30%","40%","50%","60%","70%","80%"};
+        panelTabMisc.add(cmbMiniTreeSize = new JComboBox<String>(perc));
+        cmbMiniTreeSize.setMaximumSize(new Dimension(Integer.MAX_VALUE, cmbMiniTreeSize.getPreferredSize().height));
+        cmbMiniTreeSize.setSelectedItem(ZeeConfig.miniTreesSize+"%");
+        cmbMiniTreeSize.setEnabled(ZeeConfig.miniTrees);
+        cmbMiniTreeSize.addActionListener(e -> {
+            String val = cmbMiniTreeSize.getSelectedItem().toString().split("%")[0];
+            Integer num = ZeeConfig.miniTreesSize = Integer.parseInt(val);
+            Utils.setprefi("miniTreesSize", num);
         });
 
         panelTabMisc.add(Box.createRigidArea(new Dimension(0,5)));
