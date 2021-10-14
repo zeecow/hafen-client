@@ -13,8 +13,8 @@ import java.util.List;
 public class ZeecowOptionsWindow extends JFrame {
     public JTabbedPane tabbedPane, tabbedPaneGobs;
     public JPanel panelTabMisc, panelTabInterface, panelTabGobs, panelDetailsBottom, panelTabCateg;
-    public JCheckBox cbDropMinedStone, cbDropMinedOre, cbDropMinedSilverGold, cbDropMinedCurios, cbActionSearchGlobal, cbCompactEquipsWindow, cbBeltTogglesEquips, cbAutohearth, cbHighlighAggressiveGobs, cbHighlightCropsReady, cbHighlightGrowingTrees, cbMiniTrees, cbAlertOnPlayers,  cbShowInventoryLogin, cbShowIconsZoomOut, cbRememberWindowsPos, cbSortActionsByUse, cbShowEquipsLogin, cbNotifyBuddyOnline, cbZoomOrthoExtended, cbAutoClickMenuOpts, cbCattleRosterHeight;
-    public JTextField tfAutoClickMenu, tfGobName, tfAudioPath, tfCategName, tfAudioPathCateg;
+    public JCheckBox cbDropMinedStone, cbDropMinedOre, cbDropMinedSilverGold, cbDropMinedCurios, cbActionSearchGlobal, cbCompactEquipsWindow, cbBeltTogglesEquips, cbAutohearth, cbHighlighAggressiveGobs, cbHighlightCropsReady, cbHighlightGrowingTrees, cbMiniTrees, cbAlertOnPlayers,  cbShowInventoryLogin, cbShowIconsZoomOut, cbRememberWindowsPos, cbSortActionsByUse, cbShowEquipsLogin, cbNotifyBuddyOnline, cbZoomOrthoExtended, cbCattleRosterHeight;
+    public JTextField tfAutoClickMenu, tfButchermode, tfGobName, tfAudioPath, tfCategName, tfAudioPathCateg;
     public JComboBox<String> cmbCattleRoster, cmbGobCategory, cmbMiniTreeSize;
     public JList<String> listGobsTemp, listGobsSaved, listGobsCategories;
     public JButton btnRefresh, btnPrintState, btnResetGobs, btnAudioSave, btnAudioClear, btnAudioTest, btnRemGobFromCateg, btnGobColorAdd, btnCategoryColorAdd, btnGobColorRemove, btnCategoryColorRemove, btnResetCateg, btnAddCateg, btnRemoveCateg, btnResetWindowsPos, btnResetActionUses;
@@ -188,25 +188,31 @@ public class ZeecowOptionsWindow extends JFrame {
 
         panelTabMisc.add(Box.createRigidArea(new Dimension(0,5)));
 
-        //auto click menus
-        panelTabMisc.add(cbAutoClickMenuOpts = new JCheckBox("Auto-click menus (in order)"));
-        cbAutoClickMenuOpts.setSelected(ZeeConfig.autoClickMenuOption);
-        cbAutoClickMenuOpts.addActionListener(actionEvent -> {
-            JCheckBox cb = (JCheckBox) actionEvent.getSource();
-            boolean val = ZeeConfig.autoClickMenuOption = cb.isSelected();
-            Utils.setprefb("autoClickMenuOption",val);
-            tfAutoClickMenu.setEnabled(val);
-        });
+        //auto click menu list
+        panelTabMisc.add(new JLabel("Automenu list:"));
         panelTabMisc.add(tfAutoClickMenu = new JTextField("",5));
         tfAutoClickMenu.setMaximumSize(new Dimension(Integer.MAX_VALUE, tfAutoClickMenu.getPreferredSize().height));
         tfAutoClickMenu.setText(ZeeConfig.autoClickMenuOptionList);
-        tfAutoClickMenu.setEnabled(ZeeConfig.autoClickMenuOption);
         tfAutoClickMenu.addActionListener(actionEvent -> {
             String str = actionEvent.getActionCommand();
             String[] strArr = str.split(",");
             if(strArr!=null && strArr.length>0) {
                 ZeeConfig.autoClickMenuOptionList = str;
                 Utils.setpref("autoClickMenuOptionList",str.strip());
+            }
+        });
+
+        //butcher mode  list
+        panelTabMisc.add(new JLabel("Butchermode list:"));
+        panelTabMisc.add(tfButchermode= new JTextField("",5));
+        tfButchermode.setMaximumSize(new Dimension(Integer.MAX_VALUE, tfButchermode.getPreferredSize().height));
+        tfButchermode.setText(ZeeConfig.butcherAutoList);
+        tfButchermode.addActionListener(actionEvent -> {
+            String str = actionEvent.getActionCommand();
+            String[] strArr = str.split(",");
+            if(strArr!=null && strArr.length>0) {
+                ZeeConfig.butcherAutoList = str;
+                Utils.setpref("butcherAutoList",str.strip());
             }
         });
     }

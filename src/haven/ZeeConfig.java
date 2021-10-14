@@ -48,7 +48,7 @@ public class ZeeConfig {
     public static boolean autoHearthOnStranger = Utils.getprefb("autoHearthOnStranger", true);
     public static boolean autoOpenEquips = Utils.getprefb("beltToggleEquips", true);
     public static boolean butcherAuto = false;
-    public static String[] butcherAutoList = {"Break","Scale","Wring neck","Kill","Skin","Flay","Pluck","Clean","Butcher","Collect bones"};
+    public static String butcherAutoList = Utils.getpref("butcherAutoList","Break,Scale,Wring neck,Kill,Skin,Flay,Pluck,Clean,Butcher,Collect bones");
     public static boolean cattleRosterHeight = Utils.getprefb("cattleRosterHeight", false);
     public static double cattleRosterHeightPercentage = Utils.getprefd("cattleRosterHeightPercentage", 1.0);
     public static boolean dropMinedCurios = Utils.getprefb("dropMinedCurios", true);
@@ -337,8 +337,9 @@ public class ZeeConfig {
             return false;
     }
 
-    public static boolean isPlayer(String gobName) {
-        return gobName.startsWith("gfx/borka/body");
+    public static boolean isPlayer(Gob gob) {
+        boolean isMannequim = (gob.getattr(GobHealth.class) != null);// mannequim object has health attr
+        return gob.getres().name.startsWith("gfx/borka/body") && !isMannequim;
     }
 
     public static boolean isTree(String gobName) {
@@ -364,7 +365,9 @@ public class ZeeConfig {
         }
     }
 
-    public static void gobAudio(String gobName, long gobId) {
+    public static void gobAudio(Gob gob) {
+        String gobName = gob.getres().name;
+        long gobId = gob.id;
         if(gobName==null || gobName.isEmpty())
             return;
         String path = "";
@@ -375,7 +378,7 @@ public class ZeeConfig {
             //System.out.println(gobName+"  "+mapGobSession.size());
         }
 
-        if(isPlayer(gobName)  &&  gobId != gameUI.map.player().id) {
+        if(isPlayer(gob)  &&  gobId != gameUI.map.player().id) {
             if(autoHearthOnStranger)
                 gameUI.act("travel","hearth");
             if(alertOnPlayers){
