@@ -47,6 +47,7 @@ public class ZeeConfig {
     public static String autoClickMenuOptionList = Utils.getpref("autoClickMenuOptionList", "Pick,Harvest wax");
     public static boolean autoHearthOnStranger = Utils.getprefb("autoHearthOnStranger", true);
     public static boolean autoOpenEquips = Utils.getprefb("beltToggleEquips", true);
+    public static boolean autoOpenBelt = Utils.getprefb("autoOpenBelt", true);
     public static boolean butcherAuto = false;
     public static String butcherAutoList = Utils.getpref("butcherAutoList","Break,Scale,Wring neck,Kill,Skin,Flay,Pluck,Clean,Butcher,Collect bones");
     public static boolean cattleRosterHeight = Utils.getprefb("cattleRosterHeight", false);
@@ -661,7 +662,8 @@ public class ZeeConfig {
         new Thread(new Runnable() {
             public void run() {
                 try {
-                    Thread.sleep(3000);
+                    checkOpenBelt();
+                    Thread.sleep(1500);
                     if(!initTrackingDone) {
                         gameUI.menu.wdgmsg("act", "tracking");
                         initTrackingDone = true;
@@ -836,6 +838,16 @@ public class ZeeConfig {
             e.printStackTrace();
         }
         return(null);
+    }
+
+    public static void checkOpenBelt() {
+        if (autoOpenBelt) {
+            windowEquipment.getchild(Equipory.class).children(WItem.class).forEach(witem -> {
+                if (witem.item.res.get().name.endsWith("belt")) {
+                    witem.mousedown(Coord.z, 3);
+                }
+            });
+        }
     }
 }
 
