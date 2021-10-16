@@ -4,6 +4,7 @@ import haven.render.MixColor;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
+import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 import java.awt.image.RenderedImage;
 import java.io.*;
@@ -14,6 +15,7 @@ import java.util.stream.Collectors;
 
 
 public class ZeeConfig {
+    public static final int KEYCODE_TAB = 9;
     public static final String CATEG_PVPANDSIEGE = "PVP and siege";
     public static final String CATEG_AGROCREATURES = "Agressive creatures";
     public static final String CATEG_RAREFORAGE = "Rare forageables";
@@ -35,8 +37,7 @@ public class ZeeConfig {
 
 
     public static GameUI gameUI;
-    public static Window windowEquipment;
-    public static Window windowInvMain;
+    public static Window windowEquipment,windowInvMain;
     public static ZeeInvMainOptionsWdg invMainoptionsWdg;
     public static ZeecowOptionsWindow zeecowOptions;
     public static Button btnSearchInput;
@@ -63,6 +64,7 @@ public class ZeeConfig {
     public static boolean highlightAggressiveGobs = Utils.getprefb("highlighAggressiveGobs", true);
     public static boolean highlightCropsReady = Utils.getprefb("highlightCropsReady", true);
     public static boolean highlightGrowingTrees = Utils.getprefb("highlightGrowingTrees", true);
+    public static boolean keyBeltShiftTab = Utils.getprefb("keyBeltShiftTab", true);
     public static boolean miniTrees = Utils.getprefb("miniTrees", false);
     public static Integer miniTreesSize = Utils.getprefi("miniTreesSize", 50);
     public static boolean notifyBuddyOnline = Utils.getprefb("notifyBuddyOnline", false);
@@ -658,7 +660,7 @@ public class ZeeConfig {
 
 
     public static boolean initTrackingDone = false;
-    public static boolean initSiegeDone = false;
+    //public static boolean initSiegeDone = false;
     public static void initToggles() {
         new Thread(new Runnable() {
             public void run() {
@@ -669,11 +671,11 @@ public class ZeeConfig {
                         gameUI.menu.wdgmsg("act", "tracking");
                         initTrackingDone = true;
                     }
-                    Thread.sleep(1500);
-                    if(!initSiegeDone) {
-                        gameUI.menu.wdgmsg("act", "siegeptr");//unnecessary?
-                        initSiegeDone = true;
-                    }
+                    //Thread.sleep(1500);
+                    //if(!initSiegeDone) {
+                        //gameUI.menu.wdgmsg("act", "siegeptr");//unnecessary?
+                        //initSiegeDone = true;
+                    //}
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -843,12 +845,39 @@ public class ZeeConfig {
 
     public static void checkOpenBelt() {
         if (autoOpenBelt) {
-            windowEquipment.getchild(Equipory.class).children(WItem.class).forEach(witem -> {
-                if (witem.item.res.get().name.endsWith("belt")) {
-                    witem.mousedown(Coord.z, 3);
-                }
-            });
+            openBelt();
         }
+    }
+
+    private static void openBelt() {
+        windowEquipment.getchild(Equipory.class).children(WItem.class).forEach(witem -> {
+            if (witem.item.res.get().name.endsWith("belt")) {
+                witem.mousedown(Coord.z, 3);
+            }
+        });
+    }
+
+    public static boolean matchKeyShortcut(KeyEvent ev) {
+        // Shift+Tab toggles Belt
+        if(ZeeConfig.keyBeltShiftTab && ev.getKeyCode()==KEYCODE_TAB && ev.isShiftDown()){
+            Window belt = getWindow("Belt");
+            if( belt != null){
+                belt.getchild(Button.class).click();//click close button
+            }else {
+                openBelt();
+            }
+        }
+        return false;
+    }
+
+    private static Window getWindow(String name) {
+        Set<Window> windows = gameUI.children(Window.class);
+        for(Window w : windows) {
+            if(w.cap.text.equalsIgnoreCase(name)){
+                return w;
+            }
+        }
+        return null;
     }
 }
 
