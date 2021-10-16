@@ -52,6 +52,7 @@ public class ZeeConfig {
     public static String butcherAutoList = Utils.getpref("butcherAutoList","Break,Scale,Wring neck,Kill,Skin,Flay,Pluck,Clean,Butcher,Collect bones");
     public static boolean cattleRosterHeight = Utils.getprefb("cattleRosterHeight", false);
     public static double cattleRosterHeightPercentage = Utils.getprefd("cattleRosterHeightPercentage", 1.0);
+    public static boolean dropHoldingItemAltKey = Utils.getprefb("dropHoldingItemAltKey", true);
     public static boolean dropMinedCurios = Utils.getprefb("dropMinedCurios", true);
     public static boolean dropMinedOre = Utils.getprefb("dropMinedOre", true);
     public static boolean dropMinedSilverGold = Utils.getprefb("dropMinedOrePrecious", true);

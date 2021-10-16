@@ -13,7 +13,7 @@ import java.util.List;
 public class ZeecowOptionsWindow extends JFrame {
     public JTabbedPane tabbedPane, tabbedPaneGobs;
     public JPanel panelTabMisc, panelTabInterface, panelTabGobs, panelDetailsBottom, panelTabCateg;
-    public JCheckBox cbDropMinedStone, cbDropMinedOre, cbDropMinedSilverGold, cbDropMinedCurios, cbActionSearchGlobal, cbCompactEquipsWindow, cbBeltTogglesEquips, cbAutohearth, cbHighlighAggressiveGobs, cbHighlightCropsReady, cbHighlightGrowingTrees, cbMiniTrees, cbAlertOnPlayers,  cbShowInventoryLogin, cbShowIconsZoomOut, cbRememberWindowsPos, cbSortActionsByUse, cbShowEquipsLogin, cbNotifyBuddyOnline, cbZoomOrthoExtended, cbCattleRosterHeight;
+    public JCheckBox cbDropAltKeyOnly, cbDropMinedStone, cbDropMinedOre, cbDropMinedSilverGold, cbDropMinedCurios, cbActionSearchGlobal, cbCompactEquipsWindow, cbBeltTogglesEquips, cbAutohearth, cbHighlighAggressiveGobs, cbHighlightCropsReady, cbHighlightGrowingTrees, cbMiniTrees, cbAlertOnPlayers,  cbShowInventoryLogin, cbShowIconsZoomOut, cbRememberWindowsPos, cbSortActionsByUse, cbShowEquipsLogin, cbNotifyBuddyOnline, cbZoomOrthoExtended, cbCattleRosterHeight;
     public JTextField tfAutoClickMenu, tfButchermode, tfGobName, tfAudioPath, tfCategName, tfAudioPathCateg;
     public JComboBox<String> cmbCattleRoster, cmbGobCategory, cmbMiniTreeSize;
     public JList<String> listGobsTemp, listGobsSaved, listGobsCategories;
@@ -62,7 +62,16 @@ public class ZeecowOptionsWindow extends JFrame {
         panelTabMisc.setLayout(new BoxLayout(panelTabMisc, BoxLayout.PAGE_AXIS));
         tabbedPane.addTab("Misc", panelTabMisc);
 
+        panelTabMisc.add(cbDropAltKeyOnly = new JCheckBox("Alt+click drops holding item"));
+        cbDropAltKeyOnly.setSelected(ZeeConfig.dropHoldingItemAltKey);
+        cbDropAltKeyOnly.addActionListener(actionEvent -> {
+            JCheckBox cb = (JCheckBox) actionEvent.getSource();
+            boolean val = ZeeConfig.dropHoldingItemAltKey = cb.isSelected();
+            Utils.setprefb("dropHoldingItemAltKey",val);
+        });
+
         panelTabMisc.add(Box.createRigidArea(new Dimension(0,5)));
+
         panelTabMisc.add(cbDropMinedStone = new JCheckBox("Drop mined stones"));
         cbDropMinedStone.setSelected(ZeeConfig.dropMinedStones);
         cbDropMinedStone.addActionListener(actionEvent -> {

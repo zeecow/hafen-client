@@ -2053,6 +2053,8 @@ public class MapView extends PView implements DTarget, Console.Directory {
     }
     
     public boolean drop(final Coord cc, Coord ul) {
+		if(ZeeConfig.dropHoldingItemAltKey && !ui.modmeta)
+			return false;
 	new Hittest(cc) {
 	    public void hit(Coord pc, Coord2d mc, ClickData inf) {
 		wdgmsg("drop", pc, mc.floor(posres), ui.modflags());
