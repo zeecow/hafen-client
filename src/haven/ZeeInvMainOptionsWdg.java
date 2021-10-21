@@ -1,5 +1,8 @@
 package haven;
 
+import java.util.Arrays;
+import java.util.regex.Pattern;
+
 public class ZeeInvMainOptionsWdg extends Widget {
 
     Label labelDrop, labelCount;
@@ -76,15 +79,13 @@ public class ZeeInvMainOptionsWdg extends Widget {
     }
 
     public void updateLabelCount(String itemName, Integer count) {
-
         //update counter text
-        labelCount.settext(itemName + "(" + count +")");
-
+        labelCount.settext( itemName.replaceAll(".+/","")+ "(" + count +")");
         repositionLabelCount();
     }
 
     public void repositionLabelCount() {
-        //position counter at top right
+        //position counter at bottom right
         int x = invSlots.sz.x - labelCount.sz.x;
         int y = invSlots.sz.y + 20;
         labelCount.c = new Coord(x, y);

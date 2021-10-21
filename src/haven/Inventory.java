@@ -30,6 +30,7 @@ import java.util.*;
 import java.awt.image.WritableRaster;
 
 public class Inventory extends Widget implements DTarget {
+	public Boolean mainInv = null;
     public static final Coord sqsz = UI.scale(new Coord(33, 33));
     public static final Tex invsq;
     public boolean dropul = true;
@@ -116,17 +117,17 @@ public class Inventory extends Widget implements DTarget {
 	if(child instanceof GItem) {
 	    GItem i = (GItem)child;
 	    wmap.put(i, add(new WItem(i), c.mul(sqsz).add(1, 1)));
-	    if(this.hasparent(ZeeConfig.windowInvMain))
+	    if(isMainInv())
 	    	ZeeConfig.addInvItem(i);
 	}
     }
-    
-    public void cdestroy(Widget w) {
+
+	public void cdestroy(Widget w) {
 	super.cdestroy(w);
 	if(w instanceof GItem) {
 	    GItem i = (GItem)w;
 	    ui.destroy(wmap.remove(i));
-		if(this.hasparent(ZeeConfig.windowInvMain))
+		if(isMainInv())
 			ZeeConfig.removeInvItem(i);
 	}
     }
@@ -156,8 +157,6 @@ public class Inventory extends Widget implements DTarget {
 	    super.uimsg(msg, args);
 	}
     }
-
-
 
 
 	@Override
@@ -237,6 +236,37 @@ public class Inventory extends Widget implements DTarget {
 		return inv.getNumberOfFreeSlots();
 	}
 
+	public List<Coord> getFreeSlots() {
+		List<Coord> coords = new ArrayList<>();
+
+		//init array with 0s
+		int[][] inv = new int[isz.x][isz.y];
+		for (int i = 0; i < isz.x; i++) {
+			for (int j = 0; j < isz.y; j++) {
+				inv[i][j] = 0;// free slot
+			}
+		}
+
+		//set occupied slots to 1
+		for (Widget wdg = child; wdg != null; wdg = wdg.next) {
+			if (wdg instanceof WItem) {
+				WItem item = (WItem) wdg;
+				Coord div = item.c.div(sqsz);
+				inv[div.x][div.y] = 1;
+			}
+		}
+
+		//collect empty coords for return list
+		for (int i = 0; i < isz.x; i++) {
+			for (int j = 0; j < isz.y; j++) {
+				if(inv[i][j] == 0)
+					coords.add(new Coord(i,j));
+			}
+		}
+
+		return coords;
+	}
+
 	public void dropItemsByName(String name) {
 		for (WItem wItem : getItemsByNameOrNames(name)) {
 			wItem.item.wdgmsg("drop", Coord.z);
@@ -277,5 +307,16 @@ public class Inventory extends Widget implements DTarget {
 			}
 		}
 		return(null);
+	}
+
+	private boolean isMainInv() {
+		if(mainInv == null){
+			Window w = this.getparent(Window.class);
+			if( w != null && w.cap.text.equalsIgnoreCase("Inventory"))
+				mainInv = Boolean.TRUE;
+			else
+				mainInv = Boolean.FALSE;
+		}
+		return mainInv;
 	}
 }

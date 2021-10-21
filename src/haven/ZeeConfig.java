@@ -54,6 +54,7 @@ public class ZeeConfig {
     public static boolean cattleRosterHeight = Utils.getprefb("cattleRosterHeight", false);
     public static double cattleRosterHeightPercentage = Utils.getprefd("cattleRosterHeightPercentage", 1.0);
     public static boolean ctrlClickMinimapContent = Utils.getprefb("dropCtrlClickMinimapContent", true);
+    public static boolean debugWidgetMsgs = false;//disabled by default
     public static boolean dropHoldingItemAltKey = Utils.getprefb("dropHoldingItemAltKey", true);
     public static boolean dropMinedCurios = Utils.getprefb("dropMinedCurios", true);
     public static boolean dropMinedOre = Utils.getprefb("dropMinedOre", true);
@@ -799,7 +800,7 @@ public class ZeeConfig {
     public static HashMap<String,Integer> mapInvItemNameCount = new HashMap<String,Integer>();
     public static void addInvItem(GItem i) {
         try {
-            String itemName = i.res.get().basename();
+            String itemName = i.getres().name;
             Integer count = countInvItems(itemName);
             count++;
             mapInvItemNameCount.put(itemName, count);
@@ -809,7 +810,7 @@ public class ZeeConfig {
     }
     public static void removeInvItem(GItem i) {
         try{
-            String itemName = i.res.get().basename();
+            String itemName = i.getres().name;
             Integer count = countInvItems(itemName);
             count--;
             if(count < 0)
@@ -850,7 +851,7 @@ public class ZeeConfig {
         }
     }
 
-    private static void openBelt() {
+    public static void openBelt() {
         windowEquipment.getchild(Equipory.class).children(WItem.class).forEach(witem -> {
             if (witem.item.res.get().name.endsWith("belt")) {
                 witem.mousedown(Coord.z, 3);
@@ -871,7 +872,7 @@ public class ZeeConfig {
         return false;
     }
 
-    private static Window getWindow(String name) {
+    public static Window getWindow(String name) {
         Set<Window> windows = gameUI.children(Window.class);
         for(Window w : windows) {
             if(w.cap.text.equalsIgnoreCase(name)){

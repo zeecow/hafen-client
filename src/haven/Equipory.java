@@ -30,6 +30,7 @@ import java.util.*;
 import static haven.Inventory.invsq;
 
 public class Equipory extends Widget implements DTarget {
+	WItem leftHand, rightHand;
     private static final Tex bg = Resource.loadtex("gfx/hud/equip/bg");
     private static final int
 	rx = invsq.sz().x + (ZeeConfig.equiporyCompact ? invsq.sz().x : bg.sz().x),
@@ -134,8 +135,13 @@ public class Equipory extends Widget implements DTarget {
 	    ArrayList<WItem> v = new ArrayList<>();
 	    for(int i = 0; i < args.length; i++) {
 		int ep = (Integer)args[i];
+		WItem w = null;
 		if(ep < ecoords.length)
-		    v.add(add(new WItem(g), ecoords[ep].add(1, 1)));
+		    v.add(add(w=new WItem(g), ecoords[ep].add(1, 1)));
+			if(ep==6)
+				leftHand = w;
+			else if(ep==7)
+				rightHand = w;
 	    }
 	    v.trimToSize();
 	    wmap.put(g, v);
@@ -147,6 +153,11 @@ public class Equipory extends Widget implements DTarget {
     public void cdestroy(Widget w) {
 	super.cdestroy(w);
 	if(w instanceof GItem) {
+		if(leftHand!=null && w.equals(leftHand.item)) {
+			leftHand = null;
+		}else if(rightHand!=null && w.equals(rightHand.item)) {
+			rightHand = null;
+		}
 	    GItem i = (GItem)w;
 	    for(WItem v : wmap.remove(i))
 		ui.destroy(v);

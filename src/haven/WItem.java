@@ -192,6 +192,14 @@ public class WItem extends Widget implements DTarget {
     }
 
     public boolean mousedown(Coord c, int btn) {
+
+	// middle-click item starts equipManager
+	if(btn == 2) {
+		new ZeeEquipManager(this).start();
+		return false;
+	}
+
+	// sort transfer
     if(ui.modmeta && !ui.modshift && !ui.modctrl && !item.res.get().basename().contains("gemstone")){
 		if(btn==1) {
 			wdgmsg("transfer-sort", item, false);
@@ -202,6 +210,7 @@ public class WItem extends Widget implements DTarget {
 		}
 		return true;
 	}
+
 	if(btn == 1) {
 	    if(ui.modshift) {
 		int n = ui.modctrl ? -1 : 1;
