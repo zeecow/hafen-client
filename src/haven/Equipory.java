@@ -153,7 +153,9 @@ public class Equipory extends Widget implements DTarget {
     public void cdestroy(Widget w) {
 	super.cdestroy(w);
 	if(w instanceof GItem) {
-		if(leftHand!=null && w.equals(leftHand.item)) {
+		if(ZeeConfig.isTwoHandedItem(((GItem) w).getres().name)) {
+			leftHand = rightHand = null;
+		}if(leftHand!=null && w.equals(leftHand.item)) {
 			leftHand = null;
 		}else if(rightHand!=null && w.equals(rightHand.item)) {
 			rightHand = null;

@@ -1,5 +1,6 @@
 package haven;
 
+import java.util.Arrays;
 import java.util.List;
 
 public class ZeeEquipManager extends Thread{
@@ -23,7 +24,7 @@ public class ZeeEquipManager extends Thread{
         leftHandItemName = (equipory.leftHand==null ? "" : equipory.leftHand.item.getres().name);
         rightHandItemName = (equipory.rightHand==null ? "" : equipory.rightHand.item.getres().name);
         itemSourceWindow = wItem.getparent(Window.class).cap.text;//save source window name before pickup
-        System.out.println(itemName +" , "+ leftHandItemName +" , "+ rightHandItemName);
+        //System.out.println(itemName +" , "+ leftHandItemName +" , "+ rightHandItemName);
     }
 
 
@@ -32,11 +33,11 @@ public class ZeeEquipManager extends Thread{
         try{
 
             if(ZeeConfig.getWindow("Belt")==null){
-                System.out.println("no belt window");
+                ZeeConfig.gameUI.msg("no belt window");
                 return;
             }
             if(ZeeConfig.getWindow("Equipment")==null){
-                System.out.println("no equips window");
+                ZeeConfig.gameUI.msg("no equips window");
                 return;
             }
 
@@ -44,8 +45,16 @@ public class ZeeEquipManager extends Thread{
 
                 pickUpItem();
                 if(isSourceBeltWindow()) {//send to equipory
-                    equipAnyHand();//drop at -1, server decide
-                    if(isHoldingItem())//equip was a switch or failed?
+                    if(isLeftHandEmpty() || isRightHandEmpty())
+                        equipEmptyHand();
+                    else if (!isItemSack(leftHandItemName))//avoid switching sack for sack
+                        equipLeftHand();
+                    else if(!isItemSack(rightHandItemName))
+                        equipRightHand();
+                    else //both hands are sacks?
+                        equipAnyHand(); //drop at -1, server decide
+
+                    if(isHoldingItem())//equip was a switch or failed
                         trySendItemToBelt();
                 }else if(isSourceEquipsWindow()){//send to belt
                     if(isHoldingItem()){ //unequip sack was successfull
@@ -87,14 +96,46 @@ public class ZeeEquipManager extends Thread{
                     }
                 }
 
-            }else{// 1 hand item
+            }else{// 1handed item
 
-                pickUpItem();
-                if(isSourceBeltWindow()) {//send to equipory
-                    equipEmptyHand();
-                    if(isHoldingItem())//switched item or failed?
-                        trySendItemToBelt();
+                if(isSourceBeltWindow()) { // send to equipory
+                    if(isLeftHandEmpty() || isRightHandEmpty()) {
+                        pickUpItem();
+                        equipEmptyHand();
+                    }else { // both hands occupied
+                        if(!isItemSack(leftHandItemName)) {
+                            //switch item for left hand
+                            pickUpItem();
+                            equipLeftHand();
+                            trySendItemToBelt();
+                        }else if(!isItemSack(rightHandItemName)) {
+                            //switch item for right hand
+                            pickUpItem();
+                            equipRightHand();
+                            trySendItemToBelt();
+                        }else{ // both hands are sacks
+                            unequipLeftItem();
+                            if (isHoldingItem()) {//unequip left sack successful
+                                if(trySendItemToBelt()) {
+                                    pickUpItem();
+                                    equipEmptyHand();
+                                }else
+                                    ZeeConfig.gameUI.msg("Belt is full");
+                            }else{//left sack cannot unequip
+                                unequipRightItem();
+                                if (isHoldingItem()){//unequip right sack successful
+                                    if(trySendItemToBelt()) {
+                                        pickUpItem();
+                                        equipEmptyHand();
+                                    }else
+                                        ZeeConfig.gameUI.msg("Belt is full");
+                                }
+                            }
+                        }
+                    }
+
                 }else if(isSourceEquipsWindow()){//send to belt
+                    pickUpItem();
                     if(!trySendItemToBelt())
                         equipAnyHand();//belt full?
                 }
@@ -113,9 +154,7 @@ public class ZeeEquipManager extends Thread{
     }
 
     private boolean isTwoHandedItem(String name) {
-        if(name.endsWith("scythe") || name.endsWith("pickaxe") || name.contains("shovel"))
-            return true;
-        return false;
+        return ZeeConfig.isTwoHandedItem(name);
     }
 
     private void equipAnyHand() throws InterruptedException {
@@ -217,7 +256,10 @@ public class ZeeEquipManager extends Thread{
     }
 
     private boolean isItemSack() {
-        return itemName.endsWith("travellerssack") || itemName.endsWith("bindle");
+        return isItemSack(itemName);
     }
 
+    private boolean isItemSack(String name) {
+        return name.endsWith("travellerssack") || name.endsWith("bindle");
+    }
 }

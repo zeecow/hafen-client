@@ -194,7 +194,7 @@ public class WItem extends Widget implements DTarget {
     public boolean mousedown(Coord c, int btn) {
 
 	// middle-click item starts equipManager
-	if(btn == 2) {
+	if(btn == 2 && ZeeConfig.midclickEquipManager) {
 		new ZeeEquipManager(this).start();
 		return false;
 	}

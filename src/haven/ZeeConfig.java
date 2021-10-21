@@ -67,6 +67,7 @@ public class ZeeConfig {
     public static boolean highlightCropsReady = Utils.getprefb("highlightCropsReady", true);
     public static boolean highlightGrowingTrees = Utils.getprefb("highlightGrowingTrees", true);
     public static boolean keyBeltShiftTab = Utils.getprefb("keyBeltShiftTab", true);
+    public static boolean midclickEquipManager = Utils.getprefb("midclickEquipManager", true);
     public static boolean miniTrees = Utils.getprefb("miniTrees", false);
     public static Integer miniTreesSize = Utils.getprefi("miniTreesSize", 50);
     public static boolean notifyBuddyOnline = Utils.getprefb("notifyBuddyOnline", false);
@@ -880,6 +881,18 @@ public class ZeeConfig {
             }
         }
         return null;
+    }
+
+    public static boolean isTwoHandedItem(String name) {
+        String[] items = {"scythe","pickaxe","shovel","b12axe",
+                "boarspear","cutblade","sledgehammer",
+                "huntersbow","rangersbow","dowsingrod"};
+        for (int i = 0; i < items.length; i++) {
+            if (name.contains(items[i])){
+                return true;
+            }
+        }
+        return false;
     }
 }
 

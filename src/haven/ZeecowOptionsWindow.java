@@ -13,7 +13,7 @@ import java.util.List;
 public class ZeecowOptionsWindow extends JFrame {
     public JTabbedPane tabbedPane, tabbedPaneGobs;
     public JPanel panelTabMisc, panelTabInterface, panelTabGobs, panelDetailsBottom, panelTabCateg;
-    public JCheckBox cbDropAltKeyOnly, cbCtrlClickMinimapContent, cbDropMinedStone, cbDropMinedOre, cbDropMinedSilverGold, cbDropMinedCurios, cbActionSearchGlobal, cbCompactEquipsWindow, cbBeltTogglesEquips, cbAutohearth, cbHighlighAggressiveGobs, cbHighlightCropsReady, cbHighlightGrowingTrees, cbMiniTrees, cbAlertOnPlayers,  cbShowInventoryLogin, cbShowBeltLogin, cbKeyBeltShiftTab, cbShowIconsZoomOut, cbRememberWindowsPos, cbSortActionsByUse, cbDebugWidgetMsgs, cbShowEquipsLogin, cbNotifyBuddyOnline, cbZoomOrthoExtended, cbCattleRosterHeight;
+    public JCheckBox cbDropAltKeyOnly, cbCtrlClickMinimapContent, cbDropMinedStone, cbDropMinedOre, cbDropMinedSilverGold, cbDropMinedCurios, cbActionSearchGlobal, cbCompactEquipsWindow, cbBeltTogglesEquips, cbAutohearth, cbHighlighAggressiveGobs, cbHighlightCropsReady, cbHighlightGrowingTrees, cbMiniTrees, cbAlertOnPlayers,  cbShowInventoryLogin, cbShowBeltLogin, cbKeyBeltShiftTab, cbShowIconsZoomOut, cbRememberWindowsPos, cbSortActionsByUse, cbDebugWidgetMsgs, cbMidclickEquipManager, cbShowEquipsLogin, cbNotifyBuddyOnline, cbZoomOrthoExtended, cbCattleRosterHeight;
     public JTextField tfAutoClickMenu, tfButchermode, tfGobName, tfAudioPath, tfCategName, tfAudioPathCateg;
     public JComboBox<String> cmbCattleRoster, cmbGobCategory, cmbMiniTreeSize;
     public JList<String> listGobsTemp, listGobsSaved, listGobsCategories;
@@ -261,6 +261,14 @@ public class ZeecowOptionsWindow extends JFrame {
             JCheckBox cb = (JCheckBox) actionEvent.getSource();
             boolean val = ZeeConfig.showEquipsLogin = cb.isSelected();
             Utils.setprefb("showEquipsLogin",val);
+        });
+
+        panelTabInterface.add(cbMidclickEquipManager = new JCheckBox("Mid-click belt autoequip"));
+        cbMidclickEquipManager.setSelected(ZeeConfig.midclickEquipManager);
+        cbMidclickEquipManager.addActionListener(actionEvent -> {
+            JCheckBox cb = (JCheckBox) actionEvent.getSource();
+            boolean val = ZeeConfig.midclickEquipManager = cb.isSelected();
+            Utils.setprefb("midclickEquipManager",val);
         });
 
         panelTabInterface.add(cbShowInventoryLogin = new JCheckBox("Show inventory at login"));
