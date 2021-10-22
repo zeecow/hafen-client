@@ -49,6 +49,7 @@ public class ZeeConfig {
     public static boolean autoHearthOnStranger = Utils.getprefb("autoHearthOnStranger", true);
     public static boolean autoOpenEquips = Utils.getprefb("beltToggleEquips", true);
     public static boolean autoOpenBelt = Utils.getprefb("autoOpenBelt", true);
+    public static boolean autoRunLogin = Utils.getprefb("autoRunLogin", true);
     public static boolean butcherAuto = false;
     public static String butcherAutoList = Utils.getpref("butcherAutoList","Break,Scale,Wring neck,Kill,Skin,Flay,Pluck,Clean,Butcher,Collect bones");
     public static boolean cattleRosterHeight = Utils.getprefb("cattleRosterHeight", false);
@@ -74,7 +75,7 @@ public class ZeeConfig {
     public static boolean showInventoryLogin = Utils.getprefb("showInventoryLogin", true);
     public static boolean showIconsZoomOut = Utils.getprefb("showIconsZoomOut", true);
     public static boolean showEquipsLogin = Utils.getprefb("showEquipsLogin", false);
-    public static boolean sortActionsByUses = Utils.getprefb("sortActionsByUses", true);;
+    public static boolean sortActionsByUses = Utils.getprefb("sortActionsByUses", true);
     public static boolean rememberWindowsPos = Utils.getprefb("rememberWindowsPos", true);
     public static boolean zoomOrthoExtended = Utils.getprefb("zoomOrthoExtended", true);
 
@@ -668,24 +669,30 @@ public class ZeeConfig {
         new Thread(new Runnable() {
             public void run() {
                 try {
-                    checkOpenBelt();
+
+                    if(autoRunLogin)
+                        gameUI.ulpanel.getchild(Speedget.class).set(2);
+
+                    if (autoOpenBelt)
+                        openBelt();
+
                     Thread.sleep(1500);
+
                     if(!initTrackingDone) {
                         gameUI.menu.wdgmsg("act", "tracking");
                         initTrackingDone = true;
                     }
-                    //Thread.sleep(1500);
-                    //if(!initSiegeDone) {
-                        //gameUI.menu.wdgmsg("act", "siegeptr");//unnecessary?
-                        //initSiegeDone = true;
-                    //}
+                    /*Thread.sleep(1500);
+                    if(!initSiegeDone) {
+                        gameUI.menu.wdgmsg("act", "siegeptr");//unnecessary?
+                        initSiegeDone = true;
+                    }*/
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
             }
         }).start();
     }
-
 
     public static void playMidi(String[] notes){
         if(playingAudio!=null && playingAudio.contains(notes.toString()))
@@ -844,12 +851,6 @@ public class ZeeConfig {
             e.printStackTrace();
         }
         return(null);
-    }
-
-    public static void checkOpenBelt() {
-        if (autoOpenBelt) {
-            openBelt();
-        }
     }
 
     public static void openBelt() {

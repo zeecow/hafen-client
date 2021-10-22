@@ -13,7 +13,7 @@ import java.util.List;
 public class ZeecowOptionsWindow extends JFrame {
     public JTabbedPane tabbedPane, tabbedPaneGobs;
     public JPanel panelTabMisc, panelTabInterface, panelTabGobs, panelDetailsBottom, panelTabCateg;
-    public JCheckBox cbDropAltKeyOnly, cbCtrlClickMinimapContent, cbDropMinedStone, cbDropMinedOre, cbDropMinedSilverGold, cbDropMinedCurios, cbActionSearchGlobal, cbCompactEquipsWindow, cbBeltTogglesEquips, cbAutohearth, cbHighlighAggressiveGobs, cbHighlightCropsReady, cbHighlightGrowingTrees, cbMiniTrees, cbAlertOnPlayers,  cbShowInventoryLogin, cbShowBeltLogin, cbKeyBeltShiftTab, cbShowIconsZoomOut, cbRememberWindowsPos, cbSortActionsByUse, cbDebugWidgetMsgs, cbMidclickEquipManager, cbShowEquipsLogin, cbNotifyBuddyOnline, cbZoomOrthoExtended, cbCattleRosterHeight;
+    public JCheckBox cbDropAltKeyOnly, cbCtrlClickMinimapContent, cbDropMinedStone, cbDropMinedOre, cbDropMinedSilverGold, cbDropMinedCurios, cbActionSearchGlobal, cbCompactEquipsWindow, cbBeltTogglesEquips, cbAutoRunLogin, cbAutohearth, cbHighlighAggressiveGobs, cbHighlightCropsReady, cbHighlightGrowingTrees, cbMiniTrees, cbAlertOnPlayers,  cbShowInventoryLogin, cbShowBeltLogin, cbKeyBeltShiftTab, cbShowIconsZoomOut, cbRememberWindowsPos, cbSortActionsByUse, cbDebugWidgetMsgs, cbMidclickEquipManager, cbShowEquipsLogin, cbNotifyBuddyOnline, cbZoomOrthoExtended, cbCattleRosterHeight;
     public JTextField tfAutoClickMenu, tfButchermode, tfGobName, tfAudioPath, tfCategName, tfAudioPathCateg;
     public JComboBox<String> cmbCattleRoster, cmbGobCategory, cmbMiniTreeSize;
     public JList<String> listGobsTemp, listGobsSaved, listGobsCategories;
@@ -61,8 +61,6 @@ public class ZeecowOptionsWindow extends JFrame {
         panelTabMisc = new JPanel();
         panelTabMisc.setLayout(new BoxLayout(panelTabMisc, BoxLayout.PAGE_AXIS));
         tabbedPane.addTab("Misc", panelTabMisc);
-
-        panelTabMisc.add(Box.createRigidArea(new Dimension(0,5)));
 
         panelTabMisc.add(cbDropMinedStone = new JCheckBox("Drop mined stones"));
         cbDropMinedStone.setSelected(ZeeConfig.dropMinedStones);
@@ -147,14 +145,6 @@ public class ZeecowOptionsWindow extends JFrame {
 
         panelTabMisc.add(Box.createRigidArea(new Dimension(0,5)));
 
-        panelTabMisc.add(cbActionSearchGlobal = new JCheckBox("Action search global"));
-        cbActionSearchGlobal.setSelected(ZeeConfig.actionSearchGlobal);
-        cbActionSearchGlobal.addActionListener(actionEvent -> {
-            JCheckBox cb = (JCheckBox) actionEvent.getSource();
-            boolean val = ZeeConfig.actionSearchGlobal = cb.isSelected();
-            Utils.setprefb("actionSearchGlobal",val);
-        });
-
         panelTabMisc.add(cbAlertOnPlayers = new JCheckBox("Sound alert on players"));
         cbAlertOnPlayers.setSelected(ZeeConfig.alertOnPlayers);
         cbAlertOnPlayers.addActionListener(actionEvent -> {
@@ -171,20 +161,12 @@ public class ZeecowOptionsWindow extends JFrame {
             Utils.setprefb("autoHearthOnStranger",val);
         });
 
-        panelTabMisc.add(cbNotifyBuddyOnline = new JCheckBox("Notify when friends login"));
-        cbNotifyBuddyOnline.setSelected(ZeeConfig.notifyBuddyOnline);
-        cbNotifyBuddyOnline.addActionListener(actionEvent -> {
+        panelTabMisc.add(cbAutoRunLogin = new JCheckBox("Auto-run on login"));
+        cbAutoRunLogin.setSelected(ZeeConfig.autoRunLogin);
+        cbAutoRunLogin.addActionListener(actionEvent -> {
             JCheckBox cb = (JCheckBox) actionEvent.getSource();
-            boolean val = ZeeConfig.notifyBuddyOnline = cb.isSelected();
-            Utils.setprefb("notifyBuddyOnline",val);
-        });
-
-        panelTabMisc.add(cbZoomOrthoExtended = new JCheckBox("Zoom extended for Ortho cam"));
-        cbZoomOrthoExtended.setSelected(ZeeConfig.zoomOrthoExtended);
-        cbZoomOrthoExtended.addActionListener(actionEvent -> {
-            JCheckBox cb = (JCheckBox) actionEvent.getSource();
-            boolean val = ZeeConfig.zoomOrthoExtended = cb.isSelected();
-            Utils.setprefb("zoomOrthoExtended",val);
+            boolean val = ZeeConfig.autoRunLogin = cb.isSelected();
+            Utils.setprefb("autoRunLogin",val);
         });
 
         panelTabMisc.add(Box.createRigidArea(new Dimension(0,5)));
@@ -301,6 +283,30 @@ public class ZeecowOptionsWindow extends JFrame {
             JCheckBox cb = (JCheckBox) actionEvent.getSource();
             boolean val = ZeeConfig.showIconsZoomOut = cb.isSelected();
             Utils.setprefb("showIconsZoomOut",val);
+        });
+
+        panelTabInterface.add(cbNotifyBuddyOnline = new JCheckBox("Notify when friends login"));
+        cbNotifyBuddyOnline.setSelected(ZeeConfig.notifyBuddyOnline);
+        cbNotifyBuddyOnline.addActionListener(actionEvent -> {
+            JCheckBox cb = (JCheckBox) actionEvent.getSource();
+            boolean val = ZeeConfig.notifyBuddyOnline = cb.isSelected();
+            Utils.setprefb("notifyBuddyOnline",val);
+        });
+
+        panelTabInterface.add(cbZoomOrthoExtended = new JCheckBox("Zoom extended for Ortho cam"));
+        cbZoomOrthoExtended.setSelected(ZeeConfig.zoomOrthoExtended);
+        cbZoomOrthoExtended.addActionListener(actionEvent -> {
+            JCheckBox cb = (JCheckBox) actionEvent.getSource();
+            boolean val = ZeeConfig.zoomOrthoExtended = cb.isSelected();
+            Utils.setprefb("zoomOrthoExtended",val);
+        });
+
+        panelTabInterface.add(cbActionSearchGlobal = new JCheckBox("Action search global"));
+        cbActionSearchGlobal.setSelected(ZeeConfig.actionSearchGlobal);
+        cbActionSearchGlobal.addActionListener(actionEvent -> {
+            JCheckBox cb = (JCheckBox) actionEvent.getSource();
+            boolean val = ZeeConfig.actionSearchGlobal = cb.isSelected();
+            Utils.setprefb("actionSearchGlobal",val);
         });
 
         panelTabInterface.add(Box.createRigidArea(new Dimension(0,25)));
