@@ -1,6 +1,5 @@
 package haven;
 
-import java.util.Arrays;
 import java.util.List;
 
 public class ZeeEquipManager extends Thread{
@@ -19,7 +18,7 @@ public class ZeeEquipManager extends Thread{
 
     public ZeeEquipManager(WItem wItem) {
         this.wItem = wItem;
-        itemName = wItem.item.getres().name;
+        itemName = wItem.item.getres().name;//clicked item, started manager
         equipory = ZeeConfig.windowEquipment.getchild(Equipory.class);
         leftHandItemName = (equipory.leftHand==null ? "" : equipory.leftHand.item.getres().name);
         rightHandItemName = (equipory.rightHand==null ? "" : equipory.rightHand.item.getres().name);
@@ -41,7 +40,7 @@ public class ZeeEquipManager extends Thread{
                 return;
             }
 
-            if (isItemSack()) {
+            if (isItemSack()) { // travellersack or bindle
 
                 pickUpItem();
                 if(isSourceBeltWindow()) {//send to equipory
@@ -63,7 +62,7 @@ public class ZeeEquipManager extends Thread{
                     }
                 }
 
-            }else if(isTwoHandedItem()) {
+            }else if(isTwoHandedItem()) {//2 handed item
 
                 if(isSourceBeltWindow()) {
                     if(!isLeftHandEmpty() && isTwoHandedItem(leftHandItemName)) {
@@ -99,11 +98,31 @@ public class ZeeEquipManager extends Thread{
             }else{// 1handed item
 
                 if(isSourceBeltWindow()) { // send to equipory
-                    if(isLeftHandEmpty() || isRightHandEmpty()) {
+                    if(isLeftHandEmpty() || isRightHandEmpty()) {//1 item equipped
                         pickUpItem();
                         equipEmptyHand();
-                    }else { // both hands occupied
-                        if(!isItemSack(leftHandItemName)) {
+                    }else { // 2 items equipped
+                        if(isShield()) {
+                            //avoid replacing 1handed swords
+                            pickUpItem();
+                            if (!isOneHandedSword(leftHandItemName)){
+                                equipLeftHand();
+                            }else if (!isOneHandedSword(rightHandItemName)){
+                                equipRightHand();
+                            }else
+                                equipAnyHand();
+                            trySendItemToBelt();
+                        }else if(isOneHandedSword()) {
+                            //avoid replacing shields
+                            pickUpItem();
+                            if (!isShield(leftHandItemName)){
+                                equipLeftHand();
+                            }else if (!isShield(rightHandItemName)){
+                                equipRightHand();
+                            }else//2 shields?
+                                equipAnyHand();
+                            trySendItemToBelt();
+                        }else if(!isItemSack(leftHandItemName)) {
                             //switch item for left hand
                             pickUpItem();
                             equipLeftHand();
@@ -136,8 +155,10 @@ public class ZeeEquipManager extends Thread{
 
                 }else if(isSourceEquipsWindow()){//send to belt
                     pickUpItem();
-                    if(!trySendItemToBelt())
+                    if(!trySendItemToBelt()) {
                         equipAnyHand();//belt full?
+                        ZeeConfig.gameUI.msg("Belt is full");
+                    }
                 }
 
             }
@@ -147,12 +168,42 @@ public class ZeeEquipManager extends Thread{
         }
     }
 
-    private boolean isTwoHandedItem() {
-        if(isTwoHandedItem(itemName))
-            return true;
+    private boolean isOneHandedSword() {
+        return isOneHandedSword(itemName);
+    }
+    private boolean isOneHandedSword(String name) {
+        String[] items = {"fyrdsword","hirdsword","bronzesword"};
+        for (int i = 0; i < items.length; i++) {
+            if (name.contains(items[i])){
+                return true;
+            }
+        }
         return false;
     }
 
+    private boolean isOneHandedWeapon() {
+        return isOneHandedWeapon(itemName);
+    }
+    private boolean isOneHandedWeapon(String name) {
+        String[] items = {"fyrdsword","hirdsword","bronzesword","axe-m","woodsmansaxe","stoneaxe","butcherscleaver","sling"};
+        for (int i = 0; i < items.length; i++) {
+            if (name.contains(items[i])){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean isShield() {
+        return isShield(itemName);
+    }
+    private boolean isShield(String name) {
+        return name.contains("roundshield");
+    }
+
+    private boolean isTwoHandedItem() {
+        return isTwoHandedItem(itemName);
+    }
     private boolean isTwoHandedItem(String name) {
         return ZeeConfig.isTwoHandedItem(name);
     }
