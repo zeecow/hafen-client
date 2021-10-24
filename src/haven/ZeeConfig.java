@@ -54,6 +54,8 @@ public class ZeeConfig {
     public static String butcherAutoList = Utils.getpref("butcherAutoList","Break,Scale,Wring neck,Kill,Skin,Flay,Pluck,Clean,Butcher,Collect bones");
     public static boolean cattleRosterHeight = Utils.getprefb("cattleRosterHeight", false);
     public static double cattleRosterHeightPercentage = Utils.getprefd("cattleRosterHeightPercentage", 1.0);
+    public static boolean clickPetal = false;
+    public static String clickPetalName = "";
     public static boolean ctrlClickMinimapContent = Utils.getprefb("dropCtrlClickMinimapContent", true);
     public static boolean debugWidgetMsgs = false;//disabled by default
     public static boolean dropHoldingItemAltKey = Utils.getprefb("dropHoldingItemAltKey", true);
@@ -884,12 +886,19 @@ public class ZeeConfig {
         return null;
     }
 
-    /**
-     * Coordinates of the center of the screen
-     * @return Coordinates of the center of the screen
-     */
+    //screen center coord
     public static Coord getCenterScreenCoord() {
         return ZeeConfig.gameUI.map.sz.div(2);
+    }
+
+    // set flags for clickWItem
+    public static void scheduleClickPetal(String name) {
+        clickPetal = true;
+        clickPetalName = name;
+    }
+
+    public static void clickWItem(WItem item, int btn){
+        item.item.wdgmsg("iact", item.item.c.div(2), item.ui.modflags());
     }
 }
 

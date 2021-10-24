@@ -11,6 +11,7 @@ original features:
  - reposition map window when compacted/expanded
  - basic inventory item counter
  - mid-click switch items from belt/equips
+ - mid-click gobs for small auto tasks
 
 other stuff:
  - autodrop mined items, seeds, soil

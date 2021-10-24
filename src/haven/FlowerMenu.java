@@ -285,6 +285,16 @@ public class FlowerMenu extends Widget {
 
 	//auto click the first match
 	private void autoClickPetal(){
+		if(ZeeConfig.clickPetal){//used by ZeeClickGobManager and ZeeEquipManager
+			for (int i = 0; i < opts.length; i++) {
+				if (ZeeConfig.clickPetalName.contentEquals(opts[i].text.text)) {
+					autochoose = opts[i];
+				}
+			}
+			ZeeConfig.clickPetal = false;
+			ZeeConfig.clickPetalName = "";
+			return;
+		}
 		if(ZeeConfig.butcherAuto) {
 			String[] list = ZeeConfig.butcherAutoList.split(",");
 			for (int i = 0; i < opts.length; i++) {

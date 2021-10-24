@@ -29,7 +29,6 @@ public class ZeeEquipManager extends Thread{
         //System.out.println(itemName +" , "+ leftHandItemName +" , "+ rightHandItemName);
     }
 
-
     @Override
     public void run() {
         try{
@@ -43,7 +42,10 @@ public class ZeeEquipManager extends Thread{
                 return;
             }
 
-            if (isItemSack()) { // travellersack or bindle
+            if(isItemDrinkingVessel()) {
+                drinkFrom();
+            }
+            else if (isItemSack()) { // travellersack or bindle
 
                 pickUpItem();
                 if(isSourceBeltWindow()) {//send to equipory
@@ -65,7 +67,8 @@ public class ZeeEquipManager extends Thread{
                     }
                 }
 
-            }else if(isTwoHandedItem()) {//2 handed item
+            }
+            else if(isTwoHandedItem()) {//2 handed item
 
                 if(isSourceBeltWindow()) {
                     if(!isLeftHandEmpty() && isTwoHandedItem(leftHandItemName)) {
@@ -90,7 +93,8 @@ public class ZeeEquipManager extends Thread{
                             }
                         }
                     }
-                }else if(isSourceEquipsWindow()) {
+                }
+                else if(isSourceEquipsWindow()) {
                     if (ZeeEquipManager.getInvBelt().getNumberOfFreeSlots() > 0) {
                         //send to belt if possible
                         pickUpItem();
@@ -98,7 +102,8 @@ public class ZeeEquipManager extends Thread{
                     }
                 }
 
-            }else{// 1handed item
+            }
+            else{// 1handed item
 
                 if(isSourceBeltWindow()) { // send to equipory
                     if(isLeftHandEmpty() || isRightHandEmpty()) {//1 item equipped
@@ -171,6 +176,24 @@ public class ZeeEquipManager extends Thread{
         }
     }
 
+    private void drinkFrom() {
+        ZeeConfig.scheduleClickPetal("Drink");
+        ZeeConfig.clickWItem(wItem,3);
+    }
+
+    private boolean isItemDrinkingVessel() {
+        return isItemDrinkingVessel(itemName);
+    }
+    private boolean isItemDrinkingVessel(String name) {
+        String[] items = {"waterskin","bucket"};
+        for (int i = 0; i < items.length; i++) {
+            if (name.contains(items[i])){
+                return true;
+            }
+        }
+        return false;
+    }
+
     private boolean isOneHandedSword() {
         return isOneHandedSword(itemName);
     }
@@ -209,7 +232,7 @@ public class ZeeEquipManager extends Thread{
         Thread.sleep(SLEEP_MS);
     }
 
-    private boolean trySendItemToBelt() {
+    public static boolean trySendItemToBelt() {
         try{
             List<Coord> freeSlots = ZeeEquipManager.getInvBelt().getFreeSlots();
             if (freeSlots.size()==0)
@@ -245,7 +268,7 @@ public class ZeeEquipManager extends Thread{
         return true;
     }
 
-    private boolean isHoldingItem() {
+    public static boolean isHoldingItem() {
         return (ZeeConfig.gameUI.vhand != null);
     }
 
@@ -334,5 +357,40 @@ public class ZeeEquipManager extends Thread{
                 invBelt = w.getchild(Inventory.class);
         }
         return  invBelt;
+    }
+
+    public static boolean pickupBeltItem(String name) {
+        try {
+            WItem witem = getInvBelt().getWItemsByName(name).get(0);
+            return pickUpItem(witem);
+        }catch (Exception e){
+            return false;
+        }
+    }
+
+    public static WItem getBeltWItem(String name) {
+        try {
+            WItem witem = getInvBelt().getWItemsByName(name).get(0);
+            return witem;
+        }catch (Exception e){
+            return null;
+        }
+    }
+
+    public static boolean isItemEquipped(String name){
+        try {
+            Equipory eq = ZeeConfig.windowEquipment.getchild(Equipory.class);
+            return eq.leftHand.item.getres().name.contains(name)
+                    || eq.rightHand.item.getres().name.contains(name);
+        }catch (Exception e){
+            return false;
+        }
+    }
+
+    public static void equipItem(String name) {
+        if(ZeeEquipManager.isItemEquipped(name))
+            return;
+        WItem item = ZeeEquipManager.getBeltWItem(name);
+        new ZeeEquipManager(item).run();//use equipManager logic
     }
 }
