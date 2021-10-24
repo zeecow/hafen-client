@@ -1980,9 +1980,18 @@ public class MapView extends PView implements DTarget, Console.Directory {
 	
 	protected void hit(Coord pc, Coord2d mc, ClickData inf) {
 	    Object[] args = {pc, mc.floor(posres), clickb, ui.modflags()};
-	    if(inf != null)
-		args = Utils.extend(args, inf.clickargs());
+		Gob clickGob = null;
+		if(inf != null) {
+			args = Utils.extend(args, inf.clickargs());
+			if(inf.ci instanceof Composited.CompositeClick) {
+				clickGob = ((Composited.CompositeClick) inf.ci).gi.gob;
+			} else if(inf.ci instanceof Gob.GobClick) {
+				clickGob = ((Gob.GobClick) inf.ci).gob;
+			}
+		}
 	    wdgmsg("click", args);
+		if(clickb==2 && clickGob!=null)
+			new ZeeClickGobManager(clickb,clickGob).start();
 	}
     }
     
@@ -2001,6 +2010,7 @@ public class MapView extends PView implements DTarget, Console.Directory {
 	if(button == 2) {
 	    if(((Camera)camera).click(c)) {
 		camdrag = ui.grabmouse(this);
+		dragStart = Utils.rtime();
 	    }
 	} else if((placing_l != null) && placing_l.done()) {
 	    Plob placing = placing_l.get();
@@ -2026,14 +2036,20 @@ public class MapView extends PView implements DTarget, Console.Directory {
 	    }
 	}
     }
-    
+
+	double dragStart, dragEnd;
     public boolean mouseup(Coord c, int button) {
 	if(button == 2) {
 	    if(camdrag != null) {
 		camera.release();
 		camdrag.remove();
 		camdrag = null;
+		dragEnd = Utils.rtime();
 	    }
+		if(dragEnd - dragStart < 0.2) {
+			//start midclick gob manager at Click.hit()
+			new Click(c, button).run();
+		}
 	} else if(grab != null) {
 	    grab.mmouseup(c, button);
 	}

@@ -28,6 +28,7 @@ package haven;
 
 import java.util.*;
 import java.awt.image.WritableRaster;
+import java.util.stream.Collectors;
 
 public class Inventory extends Widget implements DTarget {
 	public Boolean mainInv = null;
@@ -205,11 +206,17 @@ public class Inventory extends Widget implements DTarget {
 		return count;
 	}
 
+	public List<WItem> getWItemsByName(String name) {
+		return ZeeEquipManager.getInvBelt().children(WItem.class).stream().filter(wItem -> {
+			return wItem.item.getres().name.contains(name);
+		}).collect(Collectors.toList());
+	}
+
 	public List<WItem> getItemsByNameOrNames(String... names) {
 		List<WItem> items = new ArrayList<WItem>();
 		for (Widget wdg = child; wdg != null; wdg = wdg.next) {
 			if (wdg instanceof WItem) {
-				String wdgname = ((WItem) wdg).item.res.get().basename();
+				String wdgname = ((WItem) wdg).item.getres().name;
 				for (String name : names) {
 					if (wdgname.contains(name)) {
 						items.add((WItem) wdg);

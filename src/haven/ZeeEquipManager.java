@@ -2,16 +2,19 @@ package haven;
 
 import java.util.List;
 
+/*
+mid-click auto-equips items from belt/hands
+ */
 public class ZeeEquipManager extends Thread{
 
     static long SLEEP_MS = 77;
-    static long PING_MS = 333;
+    static long PING_MS = 200;
     static long TIMEOUT_MS = 2000;
     private final WItem wItem;
     String itemName;
     String leftHandItemName, rightHandItemName, itemSourceWindow;
     Equipory equipory;
-    Inventory invBelt = null;
+    static Inventory invBelt = null;
 
 
 
@@ -77,7 +80,7 @@ public class ZeeEquipManager extends Thread{
                         trySendItemToBelt();
                     }else if(!isLeftHandEmpty() && !isRightHandEmpty()){
                         //switch 2handed item for 2 separate items
-                        if (getInvBelt().getNumberOfFreeSlots() > 0) {
+                        if (ZeeEquipManager.getInvBelt().getNumberOfFreeSlots() > 0) {
                             unequipLeftItem();//unequip 1st item
                             if(trySendItemToBelt()){
                                 //switch for remaining item
@@ -88,7 +91,7 @@ public class ZeeEquipManager extends Thread{
                         }
                     }
                 }else if(isSourceEquipsWindow()) {
-                    if (getInvBelt().getNumberOfFreeSlots() > 0) {
+                    if (ZeeEquipManager.getInvBelt().getNumberOfFreeSlots() > 0) {
                         //send to belt if possible
                         pickUpItem();
                         trySendItemToBelt();
@@ -201,56 +204,45 @@ public class ZeeEquipManager extends Thread{
         return name.contains("roundshield");
     }
 
-    private boolean isTwoHandedItem() {
-        return isTwoHandedItem(itemName);
-    }
-    private boolean isTwoHandedItem(String name) {
-        return ZeeConfig.isTwoHandedItem(name);
-    }
-
     private void equipAnyHand() throws InterruptedException {
         equipory.wdgmsg("drop",-1);//server decide
-        Thread.sleep(PING_MS);
+        Thread.sleep(SLEEP_MS);
     }
 
     private boolean trySendItemToBelt() {
         try{
-            List<Coord> freeSlots = getInvBelt().getFreeSlots();
+            List<Coord> freeSlots = ZeeEquipManager.getInvBelt().getFreeSlots();
             if (freeSlots.size()==0)
                 return false;//belt full
             Coord c = freeSlots.get(0);
-            getInvBelt().wdgmsg("drop", c);
-            waitFreeHand();
-            return true;
-        }catch (NullPointerException e){
+            ZeeEquipManager.getInvBelt().wdgmsg("drop", c);
+            return waitFreeHand();
+        }catch (Exception e){
             e.printStackTrace();
+            return false;
         }
-        return false;
     }
 
-    private void waitFreeHand() {
+    public static boolean waitFreeHand() {
         int max = (int) TIMEOUT_MS;
         while(max>0 && ZeeConfig.gameUI.vhand!=null) {
             max -= SLEEP_MS;
             try { Thread.sleep(SLEEP_MS); } catch (InterruptedException e) { e.printStackTrace(); }
         }
+        if(max<=0)
+            return false;
+        return true;
     }
 
-    private void waitOccupiedHand() {
+    public static boolean waitOccupiedHand() {
         int max = (int) TIMEOUT_MS;
         while(max>0 && ZeeConfig.gameUI.vhand==null) {
             max -= SLEEP_MS;
             try { Thread.sleep(SLEEP_MS); } catch (InterruptedException e) { e.printStackTrace(); }
         }
-    }
-
-    private Inventory getInvBelt() {
-        if (invBelt==null) {
-            Window w = ZeeConfig.getWindow("Belt");
-            if(w!=null)
-                invBelt = w.getchild(Inventory.class);
-        }
-        return  invBelt;
+        if(max<=0)
+            return false;
+        return true;
     }
 
     private boolean isHoldingItem() {
@@ -266,21 +258,21 @@ public class ZeeEquipManager extends Thread{
     }
 
     private void equipLeftHand() {
-        waitOccupiedHand();
+        //waitOccupiedHand();
         equipory.wdgmsg("drop", 6);
     }
 
     private void equipRightHand() {
-        waitOccupiedHand();
+        //waitOccupiedHand();
         equipory.wdgmsg("drop", 7);
     }
 
-    private void equipEmptyHand() throws InterruptedException {
+    private boolean equipEmptyHand() {
         if(isLeftHandEmpty())
             equipLeftHand();
         else if(isRightHandEmpty())
             equipRightHand();
-        Thread.sleep(PING_MS);
+        return waitFreeHand();
     }
 
     private boolean isLeftHandEmpty() {
@@ -291,19 +283,23 @@ public class ZeeEquipManager extends Thread{
         return (equipory.rightHand==null);
     }
 
-    private void pickUpItem() {
+
+    private boolean pickUpItem() {
+        return pickUpItem(wItem);
+    }
+    public static boolean pickUpItem(WItem wItem) {
         wItem.item.wdgmsg("take", new Coord(wItem.sz.x / 2, wItem.sz.y / 2));
-        waitOccupiedHand();
+        return waitOccupiedHand();
     }
 
-    private void unequipLeftItem() {
+    private boolean unequipLeftItem() {
         equipory.leftHand.item.wdgmsg("take", new Coord(equipory.leftHand.sz.x/2, equipory.leftHand.sz.y/2));
-        waitOccupiedHand();
+        return waitOccupiedHand();
     }
 
-    private void unequipRightItem() {
+    private boolean unequipRightItem() {
         equipory.rightHand.item.wdgmsg("take", new Coord(equipory.rightHand.sz.x/2, equipory.rightHand.sz.y/2));
-        waitOccupiedHand();
+        return waitOccupiedHand();
     }
 
     private boolean isItemSack() {
@@ -312,5 +308,31 @@ public class ZeeEquipManager extends Thread{
 
     private boolean isItemSack(String name) {
         return name.endsWith("travellerssack") || name.endsWith("bindle");
+    }
+
+
+    private boolean isTwoHandedItem() {
+        return isTwoHandedItem(itemName);
+    }
+    public static boolean isTwoHandedItem(String name) {
+        String[] items = {"scythe","pickaxe","shovel","b12axe",
+                "boarspear","cutblade","sledgehammer",
+                "huntersbow","rangersbow","dowsingrod"};
+        for (int i = 0; i < items.length; i++) {
+            if (name.contains(items[i])){
+                return true;
+            }
+        }
+        return false;
+    }
+
+
+    public static Inventory getInvBelt() {
+        if (invBelt==null) {
+            Window w = ZeeConfig.getWindow("Belt");
+            if(w!=null)
+                invBelt = w.getchild(Inventory.class);
+        }
+        return  invBelt;
     }
 }

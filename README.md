@@ -10,7 +10,7 @@ original features:
  - shorter cattle roster window
  - reposition map window when compacted/expanded
  - basic inventory item counter
- - middle click item for auto equip/unequip
+ - mid-click switch items from belt/equips
 
 other stuff:
  - autodrop mined items, seeds, soil

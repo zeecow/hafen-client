@@ -884,16 +884,12 @@ public class ZeeConfig {
         return null;
     }
 
-    public static boolean isTwoHandedItem(String name) {
-        String[] items = {"scythe","pickaxe","shovel","b12axe",
-                "boarspear","cutblade","sledgehammer",
-                "huntersbow","rangersbow","dowsingrod"};
-        for (int i = 0; i < items.length; i++) {
-            if (name.contains(items[i])){
-                return true;
-            }
-        }
-        return false;
+    /**
+     * Coordinates of the center of the screen
+     * @return Coordinates of the center of the screen
+     */
+    public static Coord getCenterScreenCoord() {
+        return ZeeConfig.gameUI.map.sz.div(2);
     }
 }
 
