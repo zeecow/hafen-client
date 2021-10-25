@@ -1121,6 +1121,7 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 	} else if(msg == "msg") {
 	    String text = (String)args[0];
 	    msg(text);
+		ZeeConfig.checkUiMsgText(text,args);
 	} else if(msg == "prog") {
 	    if(args.length > 0)
 		prog = ((Number)args[0]).doubleValue() / 100.0;

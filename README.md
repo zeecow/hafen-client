@@ -10,8 +10,9 @@ original features:
  - shorter cattle roster window
  - reposition map window when compacted/expanded
  - basic inventory item counter
- - mid-click switch items from belt/equips
- - mid-click gobs for small auto tasks
+ - mid-click belt items to equip/unequip, drink from vessel
+ - long mid-click gobs for lift, destroy
+ - short mid-click gobs for inspect, mount horse, light torch
 
 other stuff:
  - autodrop mined items, seeds, soil

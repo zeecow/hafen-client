@@ -2010,7 +2010,8 @@ public class MapView extends PView implements DTarget, Console.Directory {
 	if(button == 2) {
 	    if(((Camera)camera).click(c)) {
 		camdrag = ui.grabmouse(this);
-		angleStart = camera.angle();
+		ZeeClickGobManager.camAngleStart = camera.angle();
+		ZeeClickGobManager.clickStartMs = System.currentTimeMillis();
 	    }
 	} else if((placing_l != null) && placing_l.done()) {
 	    Plob placing = placing_l.get();
@@ -2037,17 +2038,17 @@ public class MapView extends PView implements DTarget, Console.Directory {
 	}
     }
 
-	float angleStart, angleEnd, angleDiff;
     public boolean mouseup(Coord c, int button) {
 	if(button == 2) {
 	    if(camdrag != null) {
 		camera.release();
 		camdrag.remove();
 		camdrag = null;
-		angleEnd = camera.angle();
+		ZeeClickGobManager.camAngleEnd = camera.angle();
+		ZeeClickGobManager.clickEndMs = System.currentTimeMillis();
 	    }
-		angleDiff = angleEnd - angleStart;
-		if(angleDiff == 0.0) {
+		ZeeClickGobManager.camAngleDiff = ZeeClickGobManager.camAngleEnd - ZeeClickGobManager.camAngleStart;
+		if(ZeeClickGobManager.camAngleDiff == 0.0) {//avoid dragclicks
 			//start midclick gob manager at Click.hit()
 			new Click(c, button).run();
 		}

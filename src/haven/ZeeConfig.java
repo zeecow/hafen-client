@@ -4,6 +4,7 @@ import haven.render.MixColor;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
+import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 import java.awt.image.RenderedImage;
@@ -900,6 +901,17 @@ public class ZeeConfig {
     public static void clickWItem(WItem item, int btn){
         item.item.wdgmsg("iact", item.item.c.div(2), item.ui.modflags());
     }
+
+    public static String textQuality, textGrowth;
+    public static void checkUiMsgText(String text, Object[] args) {
+        if (text.startsWith("Quality")) {
+            textQuality = text;
+        }else if (text.endsWith("grown")) {
+            textGrowth = text;
+            gameUI.msg(textQuality+" ("+textGrowth+")");//show quality and growth inline
+        }
+    }
+
 }
 
 

@@ -3,7 +3,8 @@ package haven;
 import java.util.List;
 
 /*
-mid-click auto-equips items from belt/hands
+    Mid-click auto-equips items from belt/hands.
+    Drinks from vessels: waterskin, bucket.
  */
 public class ZeeEquipManager extends Thread{
 
@@ -185,7 +186,7 @@ public class ZeeEquipManager extends Thread{
         return isItemDrinkingVessel(itemName);
     }
     private boolean isItemDrinkingVessel(String name) {
-        String[] items = {"waterskin","bucket"};
+        String[] items = {"waterskin","waterflask","bucket"};
         for (int i = 0; i < items.length; i++) {
             if (name.contains(items[i])){
                 return true;
