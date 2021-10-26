@@ -40,7 +40,7 @@ public class ZeeClickItemManager extends Thread{
 
             //sort-transfer
             if(!itemSourceWindow.equalsIgnoreCase("Belt") && !itemSourceWindow.equalsIgnoreCase("Equipment")){
-                if(containerOpen()) { //avoid belt transfer?
+                if(transferWindowOpen()) { //avoid belt transfer?
                     if(longClick())
                         wItem.wdgmsg("transfer-sort", wItem.item, true);//ascending order
                     else
@@ -196,11 +196,13 @@ public class ZeeClickItemManager extends Thread{
         return clickDiffMs > 250;
     }
 
-    private boolean containerOpen() {
+    private boolean transferWindowOpen() {
         String windowsNames = getWindowsNames();
         String[] containers = (
-            "Knarr,Snekkja,Wagon,Cupboard,Chest,Table,Crate,Saddlebags,Basket,Box"
-            +"Furnace,Smelter,Desk,Trunk,Shed,Coffer,Packrack,Strongbox,Stockpile"
+            "Knarr,Snekkja,Wagon,Cupboard,Chest,Table,Crate,Saddlebags,Basket,Box,"
+            +"Furnace,Smelter,Desk,Trunk,Shed,Coffer,Packrack,Strongbox,Stockpile,"
+            +"Tub,Compost Bin,Extraction Press,Cheese Rack,Herbalist Table,Frame,"
+            +"Chicken Coop,Rabbit Hutch,Archery Target"
         ).split(",");
         for (String contName: containers) {
             if (windowsNames.contains(contName))

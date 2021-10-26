@@ -44,12 +44,18 @@ public class ZeeClickGobManager extends Thread{
             /*
             long clicks
              */
-            if (isDestroyGob()) {
+            if(isGobStockpile() || gobNameStartsWith("gfx/terobjs/dframe")) {
+                gobClick(3, UI.MOD_SHIFT);//pick up all items (shift + rclick)
+            } if (isDestroyGob()) {
                 destroyGob();
             } else if (isLiftGob()) {
                 liftGob();
             }
         }
+    }
+
+    private boolean isGobStockpile() {
+        return gobName.startsWith("gfx/terobjs/stockpile");
     }
 
     private boolean isGobGroundItem() {
