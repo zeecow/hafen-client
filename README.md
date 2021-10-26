@@ -10,9 +10,8 @@ original features:
  - shorter cattle roster window
  - reposition map window when compacted/expanded
  - basic inventory item counter
- - mid-click belt items to equip/unequip, drink from vessel
- - long mid-click gobs for lift, destroy
- - short mid-click gobs for inspect, mount horse, light torch
+ - middle-click gobs/items for inspect, sort-transfer, pick up, Giddyup!, light torch, auto-equip from belt, more?
+ - long middle-click gobs/items for lift up, destroy trellis plant, equip shovel and remove stump, more?
 
 other stuff:
  - autodrop mined items, seeds, soil

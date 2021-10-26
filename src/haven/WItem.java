@@ -191,11 +191,21 @@ public class WItem extends Widget implements DTarget {
 	}
     }
 
-    public boolean mousedown(Coord c, int btn) {
+	@Override
+	public boolean mouseup(Coord c, int btn) {
+		if(btn == 2 && ZeeConfig.midclickEquipManager) {
+			ZeeClickItemManager.clickEndMs = System.currentTimeMillis();
+			new ZeeClickItemManager(this).start();
+			return false;
+		}
+		return super.mouseup(c, btn);
+	}
+
+	public boolean mousedown(Coord c, int btn) {
 
 	// middle-click item starts equipManager
 	if(btn == 2 && ZeeConfig.midclickEquipManager) {
-		new ZeeEquipManager(this).start();
+		ZeeClickItemManager.clickStartMs = System.currentTimeMillis();
 		return false;
 	}
 

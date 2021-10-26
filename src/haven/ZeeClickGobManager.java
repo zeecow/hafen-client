@@ -28,8 +28,10 @@ public class ZeeClickGobManager extends Thread{
             /*
             short clicks
              */
-            if (isGobFireSource()) {
-                if (ZeeEquipManager.pickupBeltItem("torch")) {
+            if(isGobGroundItem()) {
+                gobClick(3, UI.MOD_SHIFT);//pick up all items (shift + rclick)
+            } else if (isGobFireSource()) {
+                if (ZeeClickItemManager.pickupBeltItem("torch")) {
                     gobItemAct(0);
                 }
             } else if (isGobHorse()) {
@@ -50,6 +52,10 @@ public class ZeeClickGobManager extends Thread{
         }
     }
 
+    private boolean isGobGroundItem() {
+        return gobName.startsWith("gfx/terobjs/items/");
+    }
+
     private boolean longClick() {
         return clickDiffMs > 250;
     }
@@ -58,7 +64,7 @@ public class ZeeClickGobManager extends Thread{
         if(isGobTree() || isGobBush() || isGobBoulder())
             return true;
         String list = "/meatgrinder,/potterswheel,/well,/dframe,"
-                +"/smelter,/crucible,/steelcrucible,/fineryforge,/kiln,/tarkiln,/oven"
+                +"/smelter,/crucible,/steelcrucible,/fineryforge,/kiln,/tarkiln,/oven,"
                 +"/compostbin,/gardenpot,/beehive,/htable,/bed-sturdy,/boughbed,/alchemiststable,"
                 +"/gemwheel,/spark,/cauldron,/churn,/chair-rustic,"
                 +"/royalthrone,curdingtub,log,/still,/oldtrunk,/anvil,"
@@ -71,7 +77,7 @@ public class ZeeClickGobManager extends Thread{
         if(isGobTrellisPlant()){
             return true;
         }else if(isGobTreeStump()){
-            ZeeEquipManager.equipItem("shovel");
+            ZeeClickItemManager.equipItem("shovel");
             return true;
         }
         return false;
@@ -79,7 +85,7 @@ public class ZeeClickGobManager extends Thread{
 
     private boolean isLiftGob() {
         if(isGobBush()) {
-            ZeeEquipManager.equipItem("shovel");
+            ZeeClickItemManager.equipItem("shovel");
             return true;
         }
         if(isGobBoulder())
@@ -179,5 +185,9 @@ public class ZeeClickGobManager extends Thread{
 
     public void gobClick(int btn) {
         ZeeConfig.gameUI.map.wdgmsg("click", ZeeConfig.getCenterScreenCoord(), gob.rc.floor(OCache.posres), btn, 0, 1, (int)gob.id, gob.rc.floor(OCache.posres), -1, -1);
+    }
+
+    public void gobClick(int btn, int mod) {
+        ZeeConfig.gameUI.map.wdgmsg("click", ZeeConfig.getCenterScreenCoord(), gob.rc.floor(OCache.posres), btn, mod, 1, (int)gob.id, gob.rc.floor(OCache.posres), -1, -1);
     }
 }

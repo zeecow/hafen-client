@@ -1,12 +1,13 @@
 package haven;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 /*
     Mid-click auto-equips items from belt/hands.
     Drinks from vessels: waterskin, bucket.
  */
-public class ZeeEquipManager extends Thread{
+public class ZeeClickItemManager extends Thread{
 
     static long SLEEP_MS = 77;
     static long PING_MS = 200;
@@ -16,11 +17,12 @@ public class ZeeEquipManager extends Thread{
     String leftHandItemName, rightHandItemName, itemSourceWindow;
     Equipory equipory;
     static Inventory invBelt = null;
+    public static long clickStartMs, clickEndMs, clickDiffMs;
 
 
 
-
-    public ZeeEquipManager(WItem wItem) {
+    public ZeeClickItemManager(WItem wItem) {
+        clickDiffMs = clickEndMs - clickStartMs;
         this.wItem = wItem;
         itemName = wItem.item.getres().name;//clicked item, started manager
         equipory = ZeeConfig.windowEquipment.getchild(Equipory.class);
@@ -28,11 +30,24 @@ public class ZeeEquipManager extends Thread{
         rightHandItemName = (equipory.rightHand==null ? "" : equipory.rightHand.item.getres().name);
         itemSourceWindow = wItem.getparent(Window.class).cap.text;//save source window name before pickup
         //System.out.println(itemName +" , "+ leftHandItemName +" , "+ rightHandItemName);
+        //System.out.println(clickDiffMs+" > "+itemName);
     }
 
     @Override
     public void run() {
+
         try{
+
+            //sort-transfer
+            if(!itemSourceWindow.equalsIgnoreCase("Belt") && !itemSourceWindow.equalsIgnoreCase("Equipment")){
+                if(containerOpen()) { //avoid belt transfer?
+                    if(longClick())
+                        wItem.wdgmsg("transfer-sort", wItem.item, true);//ascending order
+                    else
+                        wItem.wdgmsg("transfer-sort", wItem.item, false);//descending order
+                    return;
+                }
+            }
 
             if(ZeeConfig.getWindow("Belt")==null){
                 ZeeConfig.gameUI.msg("no belt window");
@@ -84,7 +99,7 @@ public class ZeeEquipManager extends Thread{
                         trySendItemToBelt();
                     }else if(!isLeftHandEmpty() && !isRightHandEmpty()){
                         //switch 2handed item for 2 separate items
-                        if (ZeeEquipManager.getInvBelt().getNumberOfFreeSlots() > 0) {
+                        if (ZeeClickItemManager.getInvBelt().getNumberOfFreeSlots() > 0) {
                             unequipLeftItem();//unequip 1st item
                             if(trySendItemToBelt()){
                                 //switch for remaining item
@@ -96,7 +111,7 @@ public class ZeeEquipManager extends Thread{
                     }
                 }
                 else if(isSourceEquipsWindow()) {
-                    if (ZeeEquipManager.getInvBelt().getNumberOfFreeSlots() > 0) {
+                    if (ZeeClickItemManager.getInvBelt().getNumberOfFreeSlots() > 0) {
                         //send to belt if possible
                         pickUpItem();
                         trySendItemToBelt();
@@ -177,6 +192,27 @@ public class ZeeEquipManager extends Thread{
         }
     }
 
+    private boolean longClick() {
+        return clickDiffMs > 250;
+    }
+
+    private boolean containerOpen() {
+        String windowsNames = getWindowsNames();
+        String[] containers = (
+            "Knarr,Snekkja,Wagon,Cupboard,Chest,Table,Crate,Saddlebags,Basket,Box"
+            +"Furnace,Smelter,Desk,Trunk,Shed,Coffer,Packrack,Strongbox,Stockpile"
+        ).split(",");
+        for (String contName: containers) {
+            if (windowsNames.contains(contName))
+                return true;
+        }
+        return false;
+    }
+
+    private String getWindowsNames() {
+        return ZeeConfig.gameUI.children(Window.class).stream().map(window -> window.cap.text).collect(Collectors.joining(","));
+    }
+
     private void drinkFrom() {
         ZeeConfig.scheduleClickPetal("Drink");
         ZeeConfig.clickWItem(wItem,3);
@@ -235,11 +271,11 @@ public class ZeeEquipManager extends Thread{
 
     public static boolean trySendItemToBelt() {
         try{
-            List<Coord> freeSlots = ZeeEquipManager.getInvBelt().getFreeSlots();
+            List<Coord> freeSlots = ZeeClickItemManager.getInvBelt().getFreeSlots();
             if (freeSlots.size()==0)
                 return false;//belt full
             Coord c = freeSlots.get(0);
-            ZeeEquipManager.getInvBelt().wdgmsg("drop", c);
+            ZeeClickItemManager.getInvBelt().wdgmsg("drop", c);
             return waitFreeHand();
         }catch (Exception e){
             e.printStackTrace();
@@ -389,9 +425,9 @@ public class ZeeEquipManager extends Thread{
     }
 
     public static void equipItem(String name) {
-        if(ZeeEquipManager.isItemEquipped(name))
+        if(ZeeClickItemManager.isItemEquipped(name))
             return;
-        WItem item = ZeeEquipManager.getBeltWItem(name);
-        new ZeeEquipManager(item).run();//use equipManager logic
+        WItem item = ZeeClickItemManager.getBeltWItem(name);
+        new ZeeClickItemManager(item).run();//use equipManager logic
     }
 }
