@@ -15,6 +15,7 @@ public class ZeeClickItemManager extends Thread{
     private final WItem wItem;
     String itemName;
     String leftHandItemName, rightHandItemName, itemSourceWindow;
+    boolean cancelManager = false;
     Equipory equipory;
     static Inventory invBelt = null;
     public static long clickStartMs, clickEndMs, clickDiffMs;
@@ -30,13 +31,21 @@ public class ZeeClickItemManager extends Thread{
         equipory = ZeeConfig.windowEquipment.getchild(Equipory.class);
         leftHandItemName = (equipory.leftHand==null ? "" : equipory.leftHand.item.getres().name);
         rightHandItemName = (equipory.rightHand==null ? "" : equipory.rightHand.item.getres().name);
-        itemSourceWindow = wItem.getparent(Window.class).cap.text;//save source window name before pickup
+        try{
+            itemSourceWindow = wItem.getparent(Window.class).cap.text;//save source window name before pickup
+        }catch (NullPointerException e){
+            //error caused by midClicking again before task ending
+            cancelManager = true;
+        }
         //System.out.println(itemName +" , "+ leftHandItemName +" , "+ rightHandItemName);
         //System.out.println(clickDiffMs+" > "+itemName);
     }
 
     @Override
     public void run() {
+
+        if(cancelManager)
+            return;
 
         try{
 
@@ -257,7 +266,7 @@ public class ZeeClickItemManager extends Thread{
             "Knarr,Snekkja,Wagon,Cupboard,Chest,Table,Crate,Saddlebags,Basket,Box,"
             +"Furnace,Smelter,Desk,Trunk,Shed,Coffer,Packrack,Strongbox,Stockpile,"
             +"Tub,Compost Bin,Extraction Press,Cheese Rack,Herbalist Table,Frame,"
-            +"Chicken Coop,Rabbit Hutch,Archery Target"
+            +"Chicken Coop,Rabbit Hutch,Archery Target,Creel,Oven,Steel crucible"
         ).split(",");
         for (String contName: containers) {
             if (windowsNames.contains(contName))
@@ -340,7 +349,7 @@ public class ZeeClickItemManager extends Thread{
         }
     }
 
-    public static boolean waitFreeHand() {
+        public static boolean waitFreeHand() {
         int max = (int) TIMEOUT_MS;
         while(max>0 && ZeeConfig.gameUI.vhand!=null) {
             max -= SLEEP_MS;

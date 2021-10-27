@@ -32,7 +32,7 @@ public class ZeeClickGobManager extends Thread{
 
         if(clickedTerrain()){
             //pickupClosestGob();
-            System.out.println("pickupClosestGob()");
+            //System.out.println("pickupClosestGob()");
             return;
         }
 
@@ -48,6 +48,8 @@ public class ZeeClickGobManager extends Thread{
                 }
             } else if (isGobHorse()) {
                 clickPetal("Giddyup!");
+            } else if (isGobName("/barrel")) {
+                gobClick(3,UI.MOD_SHIFT);//take from barrel
             } else if (isInspectGob()) {
                 inspectGob();
             }
@@ -56,7 +58,7 @@ public class ZeeClickGobManager extends Thread{
             /*
             long clicks
              */
-            if(isGobStockpile() || gobNameStartsWith("gfx/terobjs/dframe")) {
+            if(isGobStockpile() || isGobName("/dframe")) {
                 gobClick(3, UI.MOD_SHIFT);//pick up all items (shift + rclick)
             } if (isDestroyGob()) {
                 destroyGob();
@@ -126,6 +128,7 @@ public class ZeeClickGobManager extends Thread{
             return true;
         }else if(isGobTreeStump()){
             ZeeClickItemManager.equipItem("shovel");
+            ZeeClickItemManager.waitFreeHand();
             return true;
         }
         return false;
