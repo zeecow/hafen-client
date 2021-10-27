@@ -10,8 +10,9 @@ original features:
  - shorter cattle roster window
  - reposition map window when compacted/expanded
  - basic inventory item counter
- - middle-click gobs/items for inspect, sort-transfer, pick up, Giddyup!, light torch, auto-equip from belt, more?
- - long middle-click gobs/items for lift up, destroy trellis plant, equip shovel and remove stump, more?
+ - MidClick gobs/items for inspect, sort-transfer, pick up, Giddyup!, light torch, auto-equip from belt, more?
+ - LongMidClick gobs/items for lift up, destroy trellis plant, equip shovel and remove stump, more?
+ - Ctrl+LongMidClick to kill all cocoons
 
 other stuff:
  - autodrop mined items, seeds, soil

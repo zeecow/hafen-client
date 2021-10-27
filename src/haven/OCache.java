@@ -28,6 +28,8 @@ package haven;
 
 import java.util.*;
 import java.util.function.Consumer;
+import java.util.stream.Stream;
+
 import haven.render.Render;
 
 public class OCache implements Iterable<Gob> {
@@ -830,4 +832,6 @@ public class OCache implements Iterable<Gob> {
 	    return(ng);
 	}
     }
+
+	public synchronized Stream<Gob> gobStream() {return Stream.of(objs.values().toArray(new Gob[0]));}
 }

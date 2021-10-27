@@ -1990,8 +1990,8 @@ public class MapView extends PView implements DTarget, Console.Directory {
 			}
 		}
 	    wdgmsg("click", args);
-		if(clickb==2 && clickGob!=null)
-			new ZeeClickGobManager(clickb,clickGob).start();
+		if(clickb==2)
+			new ZeeClickGobManager(mc,clickGob).start();
 	}
     }
     

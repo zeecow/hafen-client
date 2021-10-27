@@ -267,6 +267,7 @@ public class FlowerMenu extends Widget {
 	} else {
 	    wdgmsg("cl", option.num, ui.modflags());
 	}
+	ZeeClickItemManager.resetClickPetal();
     }
 
 	@Override
@@ -285,14 +286,12 @@ public class FlowerMenu extends Widget {
 
 	//auto click the first match
 	private void autoClickPetal(){
-		if(ZeeConfig.clickPetal){//used by ZeeClickGobManager and ZeeEquipManager
+		if(ZeeClickItemManager.clickPetal){//used by ZeeClickGobManager and ZeeClickItemManager
 			for (int i = 0; i < opts.length; i++) {
-				if (ZeeConfig.clickPetalName.contentEquals(opts[i].text.text)) {
+				if (ZeeClickItemManager.clickPetalName.contentEquals(opts[i].text.text)) {
 					autochoose = opts[i];
 				}
 			}
-			ZeeConfig.clickPetal = false;
-			ZeeConfig.clickPetalName = "";
 			return;
 		}
 		if(ZeeConfig.butcherAuto) {
