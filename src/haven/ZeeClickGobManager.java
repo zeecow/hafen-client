@@ -10,9 +10,11 @@ import java.util.stream.Collectors;
     Long click: lift, destroy.
  */
 public class ZeeClickGobManager extends Thread{
-    private static Coord2d clickCoord;
-    private static Gob gob;
-    private static String gobName;
+    static final long LONG_CLICK_MS = 333;
+    Coord2d clickCoord;
+    Gob gob;
+    String gobName;
+    boolean clickedTerrain = false;
 
     public static float camAngleStart, camAngleEnd, camAngleDiff;
     public static long clickStartMs, clickEndMs, clickDiffMs;
@@ -22,6 +24,8 @@ public class ZeeClickGobManager extends Thread{
         if(gobClicked!=null) {
             gob = gobClicked;
             gobName = gob.getres().name;
+        }else{
+            clickedTerrain = true;
         }
         clickDiffMs = clickEndMs - clickStartMs;
         //System.out.println(clickDiffMs+"ms > "+gobName);
@@ -30,17 +34,19 @@ public class ZeeClickGobManager extends Thread{
     @Override
     public void run() {
 
-        if(clickedTerrain()){
+        if(isGroundClick()){
             //pickupClosestGob();
             //System.out.println("pickupClosestGob()");
             return;
         }
 
-        if(!longClick()){
+        if(!isLongClick()){
             /*
             short clicks
              */
-            if(isGobGroundItem()) {
+            if(isGobTrellisPlant()) {
+                harvestOneTrellis();
+            } else if(isGobGroundItem()) {
                 gobClick(3, UI.MOD_SHIFT);//pick up all items (shift + rclick)
             } else if (isGobFireSource()) {
                 if (ZeeClickItemManager.pickupBeltItem("torch")) {
@@ -58,13 +64,28 @@ public class ZeeClickGobManager extends Thread{
             /*
             long clicks
              */
-            if(isGobStockpile() || isGobName("/dframe")) {
+            if(isGobCrop()){
+                gobClick(gob,3,UI.MOD_SHIFT);//start farming area
+            } if(isGobStockpile() || isGobName("/dframe")) {
                 gobClick(3, UI.MOD_SHIFT);//pick up all items (shift + rclick)
             } if (isDestroyGob()) {
                 destroyGob();
             } else if (isLiftGob()) {
                 liftGob();
             }
+        }
+    }
+
+    private void harvestOneTrellis() {
+        if(ZeeClickItemManager.pickupBeltItem("scythe")){
+            //hold scythe for user unequip it
+        }else if(ZeeClickItemManager.getLeftHandName().endsWith("scythe")){
+            //hold scythe for user unequip it
+            ZeeClickItemManager.unequipLeftItem();
+        }else{
+            //no scythe around, just harvest
+            ZeeClickItemManager.scheduleClickPetal("Harvest");
+            gobClick(gob,3);
         }
     }
 
@@ -94,8 +115,8 @@ public class ZeeClickGobManager extends Thread{
         System.out.println("closest = "+closestGob.getres().name+" > "+closestDist);
     }
 
-    private boolean clickedTerrain() {
-        return (gob==null);
+    public boolean isGroundClick() {
+        return clickedTerrain;
     }
 
     private boolean isGobStockpile() {
@@ -106,8 +127,8 @@ public class ZeeClickGobManager extends Thread{
         return gobName.startsWith("gfx/terobjs/items/");
     }
 
-    private boolean longClick() {
-        return clickDiffMs > 250;
+    private boolean isLongClick() {
+        return clickDiffMs > LONG_CLICK_MS;
     }
 
     private boolean isInspectGob(){
@@ -126,7 +147,7 @@ public class ZeeClickGobManager extends Thread{
     private boolean isDestroyGob(){
         if(isGobTrellisPlant()){
             return true;
-        }else if(isGobTreeStump()){
+        } else if(isGobTreeStump()){
             ZeeClickItemManager.equipItem("shovel");
             ZeeClickItemManager.waitFreeHand();
             return true;
@@ -137,6 +158,7 @@ public class ZeeClickGobManager extends Thread{
     private boolean isLiftGob() {
         if(isGobBush()) {
             ZeeClickItemManager.equipItem("shovel");
+            ZeeClickItemManager.waitFreeHand();
             return true;
         }
         if(isGobBoulder())
@@ -185,8 +207,15 @@ public class ZeeClickGobManager extends Thread{
         gobClick(1);
     }
 
-    private boolean isGobTrellisPlant() {
-        return gobNameEndsWith("hops,pepper");
+    public boolean isGobTrellisPlant() {
+        return gobNameEndsWith("plants/wine,plants/hops,plants/pepper,plants/peas,plants/cucumber");
+    }
+
+    public boolean isGobCrop() {
+        return gobNameEndsWith("plants/carrot,plants/beet,plants/yellowonion,plants/redonion,"
+                +"plants/leek,plants/lettuce,plants/pipeweed,plants/hemp,plants/flax,"
+                +"plants/turnip,plants/millet,plants/barley,plants/wheat,plants/poppy,plants/pumpkin"
+        );
     }
 
     private boolean gobNameEndsWith(String list) {

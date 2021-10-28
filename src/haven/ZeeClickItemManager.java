@@ -8,15 +8,15 @@ import java.util.stream.Collectors;
     Drinks from vessels: waterskin, bucket.
  */
 public class ZeeClickItemManager extends Thread{
-
-    static long SLEEP_MS = 77;
-    static long PING_MS = 200;
-    static long TIMEOUT_MS = 2000;
+    static final long LONG_CLICK_MS = 333;
+    static final long SLEEP_MS = 77;
+    static final long PING_MS = 200;
+    static final long TIMEOUT_MS = 2000;
     private final WItem wItem;
     String itemName;
     String leftHandItemName, rightHandItemName, itemSourceWindow;
     boolean cancelManager = false;
-    Equipory equipory;
+    public static Equipory equipory;
     static Inventory invBelt = null;
     public static long clickStartMs, clickEndMs, clickDiffMs;
     public static boolean clickPetal = false;
@@ -257,7 +257,7 @@ public class ZeeClickItemManager extends Thread{
     }
 
     private boolean isLongClick() {
-        return clickDiffMs > 250;
+        return clickDiffMs > LONG_CLICK_MS;
     }
 
     private boolean transferWindowOpen() {
@@ -418,12 +418,12 @@ public class ZeeClickItemManager extends Thread{
         return waitOccupiedHand();
     }
 
-    private boolean unequipLeftItem() {
+    public static boolean unequipLeftItem() {
         equipory.leftHand.item.wdgmsg("take", new Coord(equipory.leftHand.sz.x/2, equipory.leftHand.sz.y/2));
         return waitOccupiedHand();
     }
 
-    private boolean unequipRightItem() {
+    public static boolean unequipRightItem() {
         equipory.rightHand.item.wdgmsg("take", new Coord(equipory.rightHand.sz.x/2, equipory.rightHand.sz.y/2));
         return waitOccupiedHand();
     }
@@ -488,6 +488,32 @@ public class ZeeClickItemManager extends Thread{
         }catch (Exception e){
             return false;
         }
+    }
+
+    public static Equipory getEquipory(){
+        if (equipory==null)
+            equipory = ZeeConfig.windowEquipment.getchild(Equipory.class);
+        return equipory;
+    }
+
+    public static WItem getLeftHand() {
+        return getEquipory().leftHand;
+    }
+    public static WItem getRightHand() {
+        return getEquipory().rightHand;
+    }
+
+    public static String getLeftHandName() {
+        if(getEquipory().leftHand==null)
+            return "";
+        else
+            return getEquipory().leftHand.item.getres().name;
+    }
+    public static String getRightHandName() {
+        if(getEquipory().rightHand==null)
+            return "";
+        else
+            return getEquipory().rightHand.item.getres().name;
     }
 
     public static void equipItem(String name) {
