@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
     Drinks from vessels: waterskin, bucket.
  */
 public class ZeeClickItemManager extends Thread{
+
     static final long LONG_CLICK_MS = 333;
     static final long SLEEP_MS = 77;
     static final long PING_MS = 200;
@@ -19,19 +20,16 @@ public class ZeeClickItemManager extends Thread{
     public static Equipory equipory;
     static Inventory invBelt = null;
     public static long clickStartMs, clickEndMs, clickDiffMs;
-    public static boolean clickPetal = false;
-    public static String clickPetalName = "";
-
-
+    
 
     public ZeeClickItemManager(WItem wItem) {
         clickDiffMs = clickEndMs - clickStartMs;
         this.wItem = wItem;
-        itemName = wItem.item.getres().name;//clicked item, started manager
         equipory = ZeeConfig.windowEquipment.getchild(Equipory.class);
         leftHandItemName = (equipory.leftHand==null ? "" : equipory.leftHand.item.getres().name);
         rightHandItemName = (equipory.rightHand==null ? "" : equipory.rightHand.item.getres().name);
         try{
+            itemName = wItem.item.getres().name;//clicked item, started manager
             itemSourceWindow = wItem.getparent(Window.class).cap.text;//save source window name before pickup
         }catch (NullPointerException e){
             //error caused by midClicking again before task ending
@@ -220,17 +218,17 @@ public class ZeeClickItemManager extends Thread{
                     .filter(wItem1 -> wItem1.item.getres().name.endsWith("silkcocoon") || wItem1.item.getres().name.endsWith("chrysalis"))
                     .collect(Collectors.toList());
             for (WItem w: items) {
-                scheduleClickPetal("Kill");
+                ZeeConfig.scheduleClickPetal("Kill");
                 try {
                     clickWItem(w);
                     int max = (int) TIMEOUT_MS;
-                    while(max>0 && clickPetal){//wait FlowerMenu end and set clickPetal to false
+                    while(max>0 && ZeeConfig.clickPetal){//wait FlowerMenu end and set clickPetal to false
                         max -= SLEEP_MS;
                         Thread.sleep(SLEEP_MS);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
-                    resetClickPetal();
+                    ZeeConfig.resetClickPetal();
                     ZeeConfig.gameUI.msg("Kill cocoons: "+e.getMessage());
                     return false;
                 }
@@ -244,16 +242,6 @@ public class ZeeClickItemManager extends Thread{
 
     public static void clickWItem(WItem item){
         item.item.wdgmsg("iact", item.item.c.div(2), item.ui.modflags());
-    }
-
-    // set flags for clickWItem and ZeeClickGobManager.gobClick
-    public static void scheduleClickPetal(String name) {
-        clickPetal = true;
-        clickPetalName = name;
-    }
-    public static void resetClickPetal() {
-        clickPetal = false;
-        clickPetalName = "";
     }
 
     private boolean isLongClick() {
@@ -280,7 +268,7 @@ public class ZeeClickItemManager extends Thread{
     }
 
     private void drinkFrom() {
-        scheduleClickPetal("Drink");
+        ZeeConfig.scheduleClickPetal("Drink");
         clickWItem(wItem);
     }
 

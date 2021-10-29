@@ -592,6 +592,7 @@ public class MapView extends PView implements DTarget, Console.Directory {
 		if(ob!=null && ob.getres()!=null)
 			ZeeConfig.gobAudio(ob);
 			ZeeConfig.highlight(ob, ZeeConfig.getHighlightColor(ob));
+			ZeeMiningManager.checkNearBoulder(ob);
 	    }
 	}
 

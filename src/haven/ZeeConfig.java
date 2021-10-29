@@ -36,7 +36,6 @@ public class ZeeConfig {
     public static MixColor MIXCOLOR_MAGENTA= new MixColor(255,0,255,200);
     public static MixColor MIXCOLOR_LIGHTBLUE = new MixColor(0, 255, 255, 200);
 
-
     public static GameUI gameUI;
     public static Window windowEquipment,windowInvMain;
     public static ZeeInvMainOptionsWdg invMainoptionsWdg;
@@ -45,6 +44,7 @@ public class ZeeConfig {
 
     public static boolean actionSearchGlobal = Utils.getprefb("actionSearchGlobal", true);
     public static boolean alertOnPlayers = Utils.getprefb("alertOnPlayers", true);
+    public static boolean autoChipMinedBoulder = Utils.getprefb("autoChipMinedBoulder", true);
     public static boolean autoClickMenuOption = Utils.getprefb("autoClickMenuOption", true);
     public static String autoClickMenuOptionList = Utils.getpref("autoClickMenuOptionList", "Pick,Harvest wax");
     public static boolean autoHearthOnStranger = Utils.getprefb("autoHearthOnStranger", true);
@@ -81,6 +81,8 @@ public class ZeeConfig {
     public static boolean zoomOrthoExtended = Utils.getprefb("zoomOrthoExtended", true);
 
     public static String playingAudio = null;
+    public static boolean clickPetal = false;
+    public static String clickPetalName = "";
 
     public final static Set<String> mineablesStone = new HashSet<String>(Arrays.asList(
             "gneiss","basalt","cinnabar","dolomite","feldspar","flint",
@@ -900,6 +902,50 @@ public class ZeeConfig {
         }
     }
 
+    // set flags for clickWItem and ZeeClickGobManager.gobClick
+    public static void scheduleClickPetal(String name) {
+        ZeeConfig.clickPetal = true;
+        ZeeConfig.clickPetalName = name;
+    }
+    public static void resetClickPetal() {
+        ZeeConfig.clickPetal = false;
+        ZeeConfig.clickPetalName = "";
+    }
+
+    public static String getCursorName() {
+        try {
+            return gameUI.map.ui.getcurs(Coord.z).name;
+        } catch(Exception e) {
+            return null;
+        }
+    }
+
+    /**
+     * action names: dig, mine, carry, destroy, fish, inspect, repair,
+     *      crime, swim, tracking, aggro, shoot
+     */
+    public static final String ACT_DIG = "dig", ACT_MINE = "mine", ACT_CARRY = "carry",
+            ACT_DESTROY = "destroy", ACT_FISH = "fish", ACT_INSPECT = "inspect",
+            ACT_REPAIR = "repair", ACT_CRIME = "crime", ACT_SWIM = "swim",
+            ACT_TRACKING = "tracking", ACT_AGGRO = "aggro", ACT_SHOOT = "shoot";
+    public static void cursorChange(String name) {
+        gameUI.menu.wdgmsg("act", name);
+    }
+
+    public static void checkCharSelection(String msg) {
+        if(msg.equalsIgnoreCase("play")){
+            ZeeConfig.resetCharSelected();
+        }
+    }
+
+    //reset state
+    public static void resetCharSelected() {
+        ZeeClickItemManager.invBelt = null;
+    }
+
+    public static void println(String s) {
+        System.out.println(s);
+    }
 }
 
 

@@ -84,7 +84,7 @@ public class ZeeClickGobManager extends Thread{
             ZeeClickItemManager.unequipLeftItem();
         }else{
             //no scythe around, just harvest
-            ZeeClickItemManager.scheduleClickPetal("Harvest");
+            ZeeConfig.scheduleClickPetal("Harvest");
             gobClick(gob,3);
         }
     }
@@ -173,7 +173,8 @@ public class ZeeClickGobManager extends Thread{
     }
 
     private boolean isGobBoulder() {
-        return gobName.startsWith("gfx/terobjs/bumlings/");
+        return gobName.startsWith("gfx/terobjs/bumlings/") &&
+               !gobName.startsWith("gfx/terobjs/bumlings/ras");
     }
 
     private boolean isGobBush() {
@@ -243,7 +244,7 @@ public class ZeeClickGobManager extends Thread{
     }
 
     private void clickPetal(String petalName) {
-        ZeeClickItemManager.scheduleClickPetal(petalName);
+        ZeeConfig.scheduleClickPetal(petalName);
         gobClick(3);
     }
 
@@ -271,11 +272,11 @@ public class ZeeClickGobManager extends Thread{
         ZeeConfig.gameUI.map.wdgmsg("click", ZeeConfig.getCenterScreenCoord(), gob.rc.floor(OCache.posres), btn, mod, 1, (int)gob.id, gob.rc.floor(OCache.posres), -1, -1);
     }
 
-    public void gobClick(Gob g, int btn) {
+    public static void gobClick(Gob g, int btn) {
         ZeeConfig.gameUI.map.wdgmsg("click", ZeeConfig.getCenterScreenCoord(), g.rc.floor(OCache.posres), btn, 0, 1, (int)g.id, g.rc.floor(OCache.posres), -1, -1);
     }
 
-    public void gobClick(Gob g, int btn, int mod) {
+    public static void gobClick(Gob g, int btn, int mod) {
         ZeeConfig.gameUI.map.wdgmsg("click", ZeeConfig.getCenterScreenCoord(), g.rc.floor(OCache.posres), btn, mod, 1, (int)g.id, g.rc.floor(OCache.posres), -1, -1);
     }
 

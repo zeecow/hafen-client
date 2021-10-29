@@ -157,11 +157,14 @@ public class GItem extends AWidget implements ItemInfo.SpriteOwner, GSprite.Owne
 
 		if (curs != null && curs.name.equals("gfx/hud/curs/mine")) {
 
+			ZeeMiningManager.lastDropItemMs = System.currentTimeMillis();
+
 			//drop mined item
 			if (ZeeConfig.dropMinedStones && ZeeConfig.mineablesStone.contains(name) ||
 					ZeeConfig.dropMinedOre && ZeeConfig.mineablesOre.contains(name) ||
 					ZeeConfig.dropMinedSilverGold && ZeeConfig.mineablesOrePrecious.contains(name) ||
-					ZeeConfig.dropMinedCurios && ZeeConfig.mineablesCurios.contains(name)) {
+					ZeeConfig.dropMinedCurios && ZeeConfig.mineablesCurios.contains(name) )
+			{
 				this.wdgmsg("drop", Coord.z);
 			}
 
