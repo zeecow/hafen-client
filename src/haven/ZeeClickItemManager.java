@@ -7,12 +7,8 @@ import java.util.stream.Collectors;
     Mid-click auto-equips items from belt/hands.
     Drinks from vessels: waterskin, bucket.
  */
-public class ZeeClickItemManager extends Thread{
+public class ZeeClickItemManager extends ZeeThread{
 
-    static final long LONG_CLICK_MS = 333;
-    static final long SLEEP_MS = 77;
-    static final long PING_MS = 200;
-    static final long TIMEOUT_MS = 2000;
     private final WItem wItem;
     String itemName;
     String leftHandItemName, rightHandItemName, itemSourceWindow;
@@ -320,7 +316,7 @@ public class ZeeClickItemManager extends Thread{
 
     private void equipAnyHand() throws InterruptedException {
         equipory.wdgmsg("drop",-1);//server decide
-        Thread.sleep(SLEEP_MS);
+        waitOccupiedHand();
     }
 
     public static boolean trySendItemToBelt() {
@@ -337,28 +333,6 @@ public class ZeeClickItemManager extends Thread{
         }
     }
 
-        public static boolean waitFreeHand() {
-        int max = (int) TIMEOUT_MS;
-        while(max>0 && ZeeConfig.gameUI.vhand!=null) {
-            max -= SLEEP_MS;
-            try { Thread.sleep(SLEEP_MS); } catch (InterruptedException e) { e.printStackTrace(); }
-        }
-        if(max<=0)
-            return false;
-        return true;
-    }
-
-    public static boolean waitOccupiedHand() {
-        int max = (int) TIMEOUT_MS;
-        while(max>0 && ZeeConfig.gameUI.vhand==null) {
-            max -= SLEEP_MS;
-            try { Thread.sleep(SLEEP_MS); } catch (InterruptedException e) { e.printStackTrace(); }
-        }
-        if(max<=0)
-            return false;
-        return true;
-    }
-
     public static boolean isHoldingItem() {
         return (ZeeConfig.gameUI.vhand != null);
     }
@@ -372,13 +346,13 @@ public class ZeeClickItemManager extends Thread{
     }
 
     private void equipLeftHand() {
-        //waitOccupiedHand();
         equipory.wdgmsg("drop", 6);
+        waitOccupiedHand();
     }
 
     private void equipRightHand() {
-        //waitOccupiedHand();
         equipory.wdgmsg("drop", 7);
+        waitOccupiedHand();
     }
 
     private boolean equipEmptyHand() {

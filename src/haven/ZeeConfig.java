@@ -4,7 +4,6 @@ import haven.render.MixColor;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
-import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 import java.awt.image.RenderedImage;
@@ -41,6 +40,12 @@ public class ZeeConfig {
     public static ZeeInvMainOptionsWdg invMainoptionsWdg;
     public static ZeecowOptionsWindow zeecowOptions;
     public static Button btnSearchInput;
+
+    public static String playingAudio = null;
+    public static boolean clickPetal = false;
+    public static String clickPetalName = "";
+    public static String uiMsgTextQuality, uiMsgTextGrowth, uiMsgTextMemories;
+    public static long now, lastUiMessageMs = 0;
 
     public static boolean actionSearchGlobal = Utils.getprefb("actionSearchGlobal", true);
     public static boolean alertOnPlayers = Utils.getprefb("alertOnPlayers", true);
@@ -79,10 +84,6 @@ public class ZeeConfig {
     public static boolean sortActionsByUses = Utils.getprefb("sortActionsByUses", true);
     public static boolean rememberWindowsPos = Utils.getprefb("rememberWindowsPos", true);
     public static boolean zoomOrthoExtended = Utils.getprefb("zoomOrthoExtended", true);
-
-    public static String playingAudio = null;
-    public static boolean clickPetal = false;
-    public static String clickPetalName = "";
 
     public final static Set<String> mineablesStone = new HashSet<String>(Arrays.asList(
             "gneiss","basalt","cinnabar","dolomite","feldspar","flint",
@@ -892,13 +893,23 @@ public class ZeeConfig {
         return ZeeConfig.gameUI.map.sz.div(2);
     }
 
-    public static String textQuality, textGrowth;
+    // compile multi-line messages into single-line
     public static void checkUiMsgText(String text, Object[] args) {
+        now = System.currentTimeMillis();
+        if(now - lastUiMessageMs > 555){ //new message
+            lastUiMessageMs = now;
+            uiMsgTextQuality = "";
+            uiMsgTextGrowth = "";
+            uiMsgTextMemories = "";
+        }
+        if (text.contains("Memories")) {
+            uiMsgTextMemories = "Memories of pain";
+        }
         if (text.startsWith("Quality")) {
-            textQuality = text;
+            uiMsgTextQuality = text;
         }else if (text.endsWith("grown")) {
-            textGrowth = text;
-            gameUI.msg(textQuality+" ("+textGrowth+")");//show quality and growth inline
+            uiMsgTextGrowth = text;
+            gameUI.msg( uiMsgTextQuality + " ,  " + uiMsgTextGrowth );
         }
     }
 

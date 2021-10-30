@@ -9,8 +9,8 @@ import java.util.stream.Collectors;
     Short click: inspect, light torch, mount horse.
     Long click: lift, destroy.
  */
-public class ZeeClickGobManager extends Thread{
-    static final long LONG_CLICK_MS = 333;
+public class ZeeClickGobManager extends ZeeThread{
+
     Coord2d clickCoord;
     Gob gob;
     String gobName;
@@ -149,8 +149,7 @@ public class ZeeClickGobManager extends Thread{
             return true;
         } else if(isGobTreeStump()){
             ZeeClickItemManager.equipItem("shovel");
-            ZeeClickItemManager.waitFreeHand();
-            return true;
+            return waitItemEquipped("shovel");
         }
         return false;
     }
@@ -158,8 +157,7 @@ public class ZeeClickGobManager extends Thread{
     private boolean isLiftGob() {
         if(isGobBush()) {
             ZeeClickItemManager.equipItem("shovel");
-            ZeeClickItemManager.waitFreeHand();
-            return true;
+            return waitFreeHand();
         }
         if(isGobBoulder())
             return true;
