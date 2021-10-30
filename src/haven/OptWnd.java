@@ -877,7 +877,7 @@ public class OptWnd extends WindowX {
 	panel.add(new Button(UI.scale(85), "Add") {
 	    @Override
 	    public void click() {
-		list.add(value.text);
+		list.add(value.text());
 		value.settext("");
 	    }
 	}, x + UI.scale(165), y - UI.scale(2));
@@ -1223,7 +1223,7 @@ public class OptWnd extends WindowX {
 	    public boolean keydown(KeyEvent ev) {
 		if(!parent.visible)
 		    return false;
-		CFG.AUTOMAP_ENDPOINT.set(text);
+		CFG.AUTOMAP_ENDPOINT.set(text());
 		return buf.key(ev);
 	    }
 	}, x, y);

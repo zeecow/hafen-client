@@ -36,7 +36,7 @@ import java.lang.reflect.*;
 
 public class MainFrame extends java.awt.Frame implements Console.Directory {
     private static final String TITLE = String.format("Haven and Hearth modified by Ender (v%s)", Config.version);
-    UIPanel p;
+    final UIPanel p;
     private final ThreadGroup g;
     private Thread mt;
     DisplayMode fsmode = null, prefs = null;
@@ -171,8 +171,7 @@ public class MainFrame extends java.awt.Frame implements Console.Directory {
 	    sz = isz;
 	}
 	this.g = new ThreadGroup(HackThread.tg(), "Haven client");
-	JOGLPanel p = new JOGLPanel(sz);
-	this.p = p;
+	Component pp = (Component)(this.p = new JOGLPanel(sz));
 	if(fsmode == null) {
 	    Coord pfm = Utils.getprefc("fsmode", null);
 	    if(pfm != null)
@@ -184,10 +183,10 @@ public class MainFrame extends java.awt.Frame implements Console.Directory {
 	}
 	if(fsmode == null)
 	    fsmode = findmode(800, 600);
-	add(p);
+	add(pp);
 	pack();
 	setResizable(!Utils.getprefb("wndlock", false));
-	p.requestFocus();
+	pp.requestFocus();
 	seticon();
 	setVisible(true);
 	addWindowListener(new WindowAdapter() {
