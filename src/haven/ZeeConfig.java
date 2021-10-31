@@ -11,6 +11,7 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.List;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 
@@ -44,7 +45,7 @@ public class ZeeConfig {
     public static String playingAudio = null;
     public static boolean clickPetal = false;
     public static String clickPetalName = "";
-    public static String uiMsgTextQuality, uiMsgTextGrowth, uiMsgTextMemories;
+    public static String uiMsgTextQuality, uiMsgTextGrowth, uiMsgTextMemories, uiMsgTextGemWheel;
     public static long now, lastUiMessageMs = 0;
 
     public static boolean actionSearchGlobal = Utils.getprefb("actionSearchGlobal", true);
@@ -901,15 +902,23 @@ public class ZeeConfig {
             uiMsgTextQuality = "";
             uiMsgTextGrowth = "";
             uiMsgTextMemories = "";
+            uiMsgTextGemWheel = "";
         }
         if (text.contains("Memories")) {
             uiMsgTextMemories = "Memories of pain";
         }
-        if (text.startsWith("Quality")) {
+        if (text.contains("Quality")) {
             uiMsgTextQuality = text;
-        }else if (text.endsWith("grown")) {
+        }
+        if (text.contains("grown")) {
             uiMsgTextGrowth = text;
             gameUI.msg( uiMsgTextQuality + " ,  " + uiMsgTextGrowth );
+        }
+        if(text.contains("wheel")){
+            uiMsgTextGemWheel = text
+                    .replaceFirst("This wheel can cut at","")
+                    .replaceFirst(".","");
+            gameUI.msg( uiMsgTextQuality + " ,  " + uiMsgTextGemWheel );
         }
     }
 

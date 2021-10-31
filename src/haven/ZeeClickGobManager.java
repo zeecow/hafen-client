@@ -14,31 +14,20 @@ public class ZeeClickGobManager extends ZeeThread{
     Coord2d clickCoord;
     Gob gob;
     String gobName;
-    boolean clickedTerrain = false;
 
     public static float camAngleStart, camAngleEnd, camAngleDiff;
     public static long clickStartMs, clickEndMs, clickDiffMs;
 
     public ZeeClickGobManager(Coord2d cc, Gob gobClicked) {
         clickCoord = cc;
-        if(gobClicked!=null) {
-            gob = gobClicked;
-            gobName = gob.getres().name;
-        }else{
-            clickedTerrain = true;
-        }
+        gob = gobClicked;
+        gobName = gob.getres().name;
         clickDiffMs = clickEndMs - clickStartMs;
         //System.out.println(clickDiffMs+"ms > "+gobName);
     }
 
     @Override
     public void run() {
-
-        if(isGroundClick()){
-            //pickupClosestGob();
-            //System.out.println("pickupClosestGob()");
-            return;
-        }
 
         if(!isLongClick()){
             /*
@@ -113,10 +102,6 @@ public class ZeeClickGobManager extends ZeeThread{
         }
         gobClick(closestGob,3);//pickup item (right click)
         System.out.println("closest = "+closestGob.getres().name+" > "+closestDist);
-    }
-
-    public boolean isGroundClick() {
-        return clickedTerrain;
     }
 
     private boolean isGobStockpile() {
