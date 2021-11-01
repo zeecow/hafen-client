@@ -39,6 +39,7 @@ public class GItem extends AWidget implements ItemInfo.SpriteOwner, GSprite.Owne
     private ItemInfo.Raw rawinfo;
     private List<ItemInfo> info = Collections.emptyList();
 	private boolean itemDropped = false;
+	private boolean itemCounted = false;
 
     @RName("item")
     public static class $_ implements Factory {
@@ -140,11 +141,17 @@ public class GItem extends AWidget implements ItemInfo.SpriteOwner, GSprite.Owne
 	GSprite spr = this.spr;
 	if(spr == null) {
 	    try {
-		spr = this.spr = GSprite.create(this, res.get(), sdt.clone());
-		if (!itemDropped) {
-			dropItems();
-			itemDropped = true;
-		}
+			spr = this.spr = GSprite.create(this, res.get(), sdt.clone());
+			if (!itemDropped) {
+				itemDropped = true;
+				dropItems();
+			}
+			if(!itemCounted){
+				itemCounted = true;
+				Window w = this.getparent(Window.class);
+				if(w!=null && w.cap.text.equalsIgnoreCase("Inventory"))
+					ZeeConfig.addInvItem(this);
+			}
 	    } catch(Loading l) {
 	    }
 	}

@@ -118,8 +118,6 @@ public class Inventory extends Widget implements DTarget {
 	if(child instanceof GItem) {
 	    GItem i = (GItem)child;
 	    wmap.put(i, add(new WItem(i), c.mul(sqsz).add(1, 1)));
-	    if(isMainInv())
-	    	ZeeConfig.addInvItem(i);
 	}
     }
 
@@ -316,7 +314,7 @@ public class Inventory extends Widget implements DTarget {
 		return(null);
 	}
 
-	private boolean isMainInv() {
+	public boolean isMainInv() {
 		if(mainInv == null){
 			Window w = this.getparent(Window.class);
 			if( w != null && w.cap.text.equalsIgnoreCase("Inventory"))
