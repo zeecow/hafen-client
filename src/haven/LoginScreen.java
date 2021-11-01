@@ -109,7 +109,10 @@ public class LoginScreen extends Widget {
 
 	    private UserEntry(int w) {
 		super(w, "");
-		history.addAll(Utils.getprefsl("saved-tokens@" + hostname, new String[] {}));
+		//history.addAll(Utils.getprefsl("saved-tokens@" + hostname, new String[] {}));
+		synchronized (AccountList.accountmap) {
+		    history.addAll(AccountList.accountmap.keySet());
+		}
 	    }
 
 	    protected void changed() {
