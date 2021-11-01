@@ -250,7 +250,8 @@ public class ZeeClickItemManager extends ZeeThread{
             "Knarr,Snekkja,Wagon,Cupboard,Chest,Table,Crate,Saddlebags,Basket,Box,"
             +"Furnace,Smelter,Desk,Trunk,Shed,Coffer,Packrack,Strongbox,Stockpile,"
             +"Tub,Compost Bin,Extraction Press,Cheese Rack,Herbalist Table,Frame,"
-            +"Chicken Coop,Rabbit Hutch,Archery Target,Creel,Oven,Steel crucible"
+            +"Chicken Coop,Rabbit Hutch,Archery Target,Creel,Oven,Steel crucible,"
+            +"Cauldron"
         ).split(",");
         for (String contName: containers) {
             if (windowsNames.contains(contName))

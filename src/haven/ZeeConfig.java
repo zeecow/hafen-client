@@ -858,14 +858,6 @@ public class ZeeConfig {
         return(null);
     }
 
-    public static void openBelt() {
-        windowEquipment.getchild(Equipory.class).children(WItem.class).forEach(witem -> {
-            if (witem.item.res.get().name.endsWith("belt")) {
-                witem.mousedown(Coord.z, 3);
-            }
-        });
-    }
-
     public static boolean matchKeyShortcut(KeyEvent ev) {
         // Shift+Tab toggles Belt
         if(ZeeConfig.keyBeltShiftTab && ev.getKeyCode()==KEYCODE_TAB && ev.isShiftDown()){
@@ -960,7 +952,20 @@ public class ZeeConfig {
 
     //reset state
     public static void resetCharSelected() {
+        resetBeltState();
+    }
+
+    private static void resetBeltState() {
         ZeeClickItemManager.invBelt = null;
+    }
+
+    public static void openBelt() {
+        windowEquipment.getchild(Equipory.class).children(WItem.class).forEach(witem -> {
+            if (witem.item.res.get().name.endsWith("belt")) {
+                witem.mousedown(Coord.z, 3);
+                resetBeltState();
+            }
+        });
     }
 
     public static void println(String s) {
