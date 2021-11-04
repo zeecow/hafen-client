@@ -275,4 +275,9 @@ public class ZeeClickGobManager extends ZeeThread{
     public static double distanceCoordGob(Coord2d c, Gob gob) {
         return c.dist(gob.rc);
     }
+
+    // return Gob or null
+    public static Gob findGobById(long id) {
+        return ZeeConfig.gameUI.ui.sess.glob.oc.getgob(id);
+    }
 }

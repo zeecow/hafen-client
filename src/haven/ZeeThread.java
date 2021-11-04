@@ -8,34 +8,44 @@ public class ZeeThread  extends Thread{
 
     public static boolean waitFreeHand() {
         int max = (int) TIMEOUT_MS;
-        while(max>0 && ZeeConfig.gameUI.vhand!=null) {
-            max -= SLEEP_MS;
-            try { Thread.sleep(SLEEP_MS); } catch (InterruptedException e) { e.printStackTrace(); }
+        try {
+            while(max>0 && ZeeConfig.gameUI.vhand!=null) {
+                max -= SLEEP_MS;
+                Thread.sleep(SLEEP_MS);
+            }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
-        if(max<=0)
-            return false;
-        return true;
+        return (ZeeConfig.gameUI.vhand == null);
     }
 
     public static boolean waitOccupiedHand() {
         int max = (int) TIMEOUT_MS;
-        while(max>0 && ZeeConfig.gameUI.vhand==null) {
-            max -= SLEEP_MS;
-            try { Thread.sleep(SLEEP_MS); } catch (InterruptedException e) { e.printStackTrace(); }
+        try{
+            while(max>0 && ZeeConfig.gameUI.vhand==null) {
+                max -= SLEEP_MS;
+                Thread.sleep(SLEEP_MS);
+            }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
-        if(max<=0)
-            return false;
-        return true;
+        return (ZeeConfig.gameUI.vhand != null);
     }
 
     public static boolean waitItemEquipped(String name) {
         int max = (int) TIMEOUT_MS;
-        while(max>0 && !ZeeClickItemManager.isItemEquipped(name)) {
-            max -= SLEEP_MS;
-            try { Thread.sleep(SLEEP_MS); } catch (InterruptedException e) { e.printStackTrace(); }
+        try {
+            while(max>0 && !ZeeClickItemManager.isItemEquipped(name)) {
+                max -= SLEEP_MS;
+                Thread.sleep(SLEEP_MS);
+            }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
-        if(max<=0)
-            return false;
-        return true;
+        return ZeeClickItemManager.isItemEquipped(name);
+    }
+
+    public static void println(String s) {
+        System.out.println(s);
     }
 }

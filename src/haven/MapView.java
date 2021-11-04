@@ -2226,6 +2226,7 @@ public class MapView extends PView implements DTarget, Console.Directory {
 		    tt = null;
 		    ol.destroy();
 		    mgrab.remove();
+			ZeeMiningManager.saveMiningSelection(new Coord(sc), new Coord(ec), modflags);
 		    wdgmsg("sel", sc, ec, modflags);
 		    sc = null;
 		}

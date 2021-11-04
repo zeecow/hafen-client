@@ -7,14 +7,23 @@ public class ZeeMiningManager extends Thread{
     public static long lastDropItemMs = 0;
     private final String task;
     private final Gob gob;
+    public static Coord savedSelSc, savedSelEc;
+    public static int   savedSelModflags;
 
     public ZeeMiningManager(String task, Gob gob){
         this.task = task;
         this.gob = gob;
     }
 
+    public static void saveMiningSelection(Coord sc, Coord ec, int modflags) {
+        savedSelSc = sc;
+        savedSelEc = ec;
+        savedSelModflags = savedSelModflags;
+    }
+
     @Override
     public void run() {
+        println("mining manager on");
         try {
             if (task.equalsIgnoreCase(ACTION_CHIP_BOULDER)) {
                 ZeeClickGobManager.gobClick(gob, 3);//remove mining cursor
@@ -22,11 +31,31 @@ public class ZeeMiningManager extends Thread{
                 ZeeConfig.scheduleClickPetal("Chip stone");
                 ZeeClickGobManager.gobClick(gob, 3);//chip boulder
                 ZeeConfig.cursorChange(ZeeConfig.ACT_MINE);//restore mining icon for autodrop
+                if(waitBoulderFinish()){
+                    println("chip boulder done");
+                    ZeeConfig.gameUI.map.wdgmsg("sel", savedSelSc, savedSelEc, savedSelModflags);
+                }else{
+                    println("still chipping???");
+                }
+
             }
         }catch (Exception e){
             e.printStackTrace();
-            ZeeConfig.resetClickPetal();
         }
+        ZeeConfig.resetClickPetal();
+        println("mining manager off");
+    }
+
+    private boolean waitBoulderFinish() {
+        try {
+            while (ZeeClickGobManager.findGobById(gob.id) != null) {
+                //println("gob still exist > "+ZeeClickGobManager.findGobById(gob.id));
+                Thread.sleep(2000);//sleep 1s
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return (ZeeClickGobManager.findGobById(gob.id) == null);
     }
 
     /*
@@ -34,15 +63,11 @@ public class ZeeMiningManager extends Thread{
      */
     public static void checkNearBoulder(Gob gob) {
         if(ZeeConfig.autoChipMinedBoulder && isMining() && isBoulder(gob)){
-            println(ZeeClickGobManager.distanceToPlayer(gob)+" to "+gob.getres().name);
+            //println(ZeeClickGobManager.distanceToPlayer(gob)+" to "+gob.getres().name);
             if(ZeeClickGobManager.distanceToPlayer(gob) < 25){
                 if(isCombatActive()) // cancel if combat active
                     return;
-                //TODO: ignore distant boulders
-                println("chip boulder");
                 new ZeeMiningManager(ACTION_CHIP_BOULDER, gob).start();
-            }else{
-                println("ignore distante boulder");
             }
         }
     }
@@ -58,7 +83,7 @@ public class ZeeMiningManager extends Thread{
 
     private static boolean isMining() {
         long now = System.currentTimeMillis();
-        if(now - lastDropItemMs > 2000) {
+        if(now - lastDropItemMs > 999) {
             //if last mined item is older than 2s, consider not mining
             return false;
         }else{

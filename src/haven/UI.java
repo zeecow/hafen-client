@@ -323,9 +323,9 @@ public class UI {
     }
 	
     public void wdgmsg(Widget sender, String msg, Object... args) {
-		if(ZeeConfig.debugWidgetMsgs)
-			System.out.println(sender +" ; "+ msg +" ; "+ Arrays.toString(args));
-		ZeeConfig.checkCharSelection(msg);
+	if(ZeeConfig.debugWidgetMsgs)
+		System.out.println(sender +" ; "+ msg +" ; "+ Arrays.toString(args));
+	ZeeConfig.checkCharSelection(msg);
 	int id = widgetid(sender);
 	if(id < 0) {
 	    new Warning("wdgmsg sender (%s) is not in rwidgets, message is %s", sender.getClass().getName(), msg).issue();
