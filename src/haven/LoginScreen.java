@@ -60,6 +60,7 @@ public class LoginScreen extends Widget {
 	optbtn.setgkey(GameUI.kb_opt);
 	adda(login = new Credbox(), bgc.adds(0, 10), 0.5, 0.0).hide();
 	accounts = add(new AccountList(10));
+	adda(new StatusLabel(hostname, 0.5), bgc.x, bg.sz().y, 0.5, 1);
 	CharterBook.init();
     }
     
