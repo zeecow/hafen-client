@@ -48,7 +48,7 @@ public class Config {
     public static URL resurl = geturl("haven.resurl", "http://game.havenandhearth.com/res/");
     public static URL screenurl = geturl("haven.screenurl", "http://game.havenandhearth.com/mt/ss");
     public static URL cachebase = geturl("haven.cachebase", "http://game.havenandhearth.com/render/");
-    public static URL mapbase = geturl("haven.mapbase", "http://game.havenandhearth.com/hres/\"");
+    public static URL mapbase = geturl("haven.mapbase", "http://game.havenandhearth.com/hres/");
     public static boolean dbtext = getbool("haven.dbtext", false);
     public static boolean bounddb = getbool("haven.bounddb", false);
     public static boolean profile = getbool("haven.profile", false);
