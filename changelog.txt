@@ -1,3 +1,8 @@
+$size[14]{$u{Update for 04.11.21:}
+  * merged loftar's changes
+  * added tooltips to food satiations
+  * added server status to login screen
+ 
 $size[14]{$u{Update for 19.07.21:}
   * merged loftar's changes
   * added option to tint containers based on how full they are (Options->Display->Display container fullness)
