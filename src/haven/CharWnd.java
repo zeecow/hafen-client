@@ -305,6 +305,7 @@ public class CharWnd extends WindowX {
 	    public double a;
 	    private Tex tt, at;
 	    private BufferedImage tip;
+	    private String name;
 	    private boolean hl;
 
 	    public El(ResData t, double a) {this.t = t; this.a = a;}
@@ -327,9 +328,12 @@ public class CharWnd extends WindowX {
 		    g.drawImage(rnm.img, elh + 5, ((elh - rnm.sz().y) / 2) + 1, null);
 		    g.dispose();
 		    tt = new TexI(buf);
+		    name = nm;
 		}
 		return(tt);
 	    }
+	    
+	    String tip() {return name != null ? String.format("%s %d%%", name, ((int) (100 * (1 - a)))) : null;}
 
 	    public Tex at() {
 		if(at == null) {
@@ -410,7 +414,12 @@ public class CharWnd extends WindowX {
 		    }
 		});
 	}
-
+    
+	@Override
+	protected Object itemtip(El item) {
+	    return item.tip();
+	}
+    
 	public void update(ResData t, double a) {
 	    prev: {
 		for(Iterator<El> i = els.iterator(); i.hasNext();) {
