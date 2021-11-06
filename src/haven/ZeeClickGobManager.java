@@ -40,6 +40,8 @@ public class ZeeClickGobManager extends ZeeThread{
             } else if (isGobFireSource()) {
                 if (ZeeClickItemManager.pickupBeltItem("torch")) {
                     gobItemAct(0);
+                }else if(ZeeClickItemManager.pickupHandItem("torch")){
+                    gobItemAct(0);
                 }
             } else if (isGobHorse()) {
                 clickPetal("Giddyup!");

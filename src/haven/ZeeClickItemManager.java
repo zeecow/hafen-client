@@ -275,7 +275,7 @@ public class ZeeClickItemManager extends ZeeThread{
             +"Furnace,Smelter,Desk,Trunk,Shed,Coffer,Packrack,Strongbox,Stockpile,"
             +"Tub,Compost Bin,Extraction Press,Cheese Rack,Herbalist Table,Frame,"
             +"Chicken Coop,Rabbit Hutch,Archery Target,Creel,Oven,Steel crucible,"
-            +"Cauldron,Pane mold"
+            +"Cauldron,Pane mold,Kiln"
         ).split(",");
         for (String contName: containers) {
             if (windowsNames.contains(contName))
@@ -471,6 +471,18 @@ public class ZeeClickItemManager extends ZeeThread{
         }catch (Exception e){
             return false;
         }
+    }
+
+    public static boolean pickupHandItem(String name) {
+        try {
+            if(getLeftHandName().contains(name))
+                return pickUpItem(getLeftHand());
+            else if(getRightHandName().contains(name))
+                return pickUpItem(getRightHand());
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return false;
     }
 
     public static WItem getBeltWItem(String name) {
