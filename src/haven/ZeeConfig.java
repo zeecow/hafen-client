@@ -44,7 +44,7 @@ public class ZeeConfig {
     public static String playingAudio = null;
     public static boolean clickPetal = false;
     public static String clickPetalName = "";
-    public static String uiMsgTextQuality, uiMsgTextBuffer, uiMsgTextGrowth, uiMsgTextMemories, uiMsgTextGemWheel, uiMsgTextLock;
+    public static String uiMsgTextQuality, uiMsgTextBuffer;
     public static long now, lastUiMessageMs = 0;
 
     public static boolean actionSearchGlobal = Utils.getprefb("actionSearchGlobal", true);
@@ -895,7 +895,7 @@ public class ZeeConfig {
         }
         if (text.contains("Quality")) {
             uiMsgTextQuality = text;
-        }else if(!text.contains("Memories")){
+        }else if(uiMsgTextQuality!=null && !uiMsgTextQuality.isEmpty() && !text.contains("Memories")){
             uiMsgTextBuffer += ", " + text;
             gameUI.msg(uiMsgTextQuality + uiMsgTextBuffer);
         }
