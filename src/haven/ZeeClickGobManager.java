@@ -126,7 +126,7 @@ public class ZeeClickGobManager extends ZeeThread{
                 +"/compostbin,/gardenpot,/beehive,/htable,/bed-sturdy,/boughbed,/alchemiststable,"
                 +"/gemwheel,/spark,/cauldron,/churn,/chair-rustic,"
                 +"/royalthrone,curdingtub,log,/still,/oldtrunk,/anvil,"
-                +"/loom,/swheel,"
+                +"/loom,/swheel,knarr,snekkja,dock,"
                 +"/ttub,/cheeserack,/dreca,/glasspaneframe";
         return gobNameEndsWith(list);
     }
