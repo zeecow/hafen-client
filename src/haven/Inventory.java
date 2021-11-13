@@ -205,9 +205,10 @@ public class Inventory extends Widget implements DTarget {
 	}
 
 	public List<WItem> getWItemsByName(String name) {
-		return ZeeClickItemManager.getInvBelt().children(WItem.class).stream().filter(wItem -> {
-			return wItem.item.getres().name.contains(name);
-		}).collect(Collectors.toList());
+		return this.children(WItem.class)
+				.stream()
+				.filter( wItem -> wItem.item.getres().name.contains(name) )
+				.collect(Collectors.toList());
 	}
 
 	public List<WItem> getItemsByNameOrNames(String... names) {

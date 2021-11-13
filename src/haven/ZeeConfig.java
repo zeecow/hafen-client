@@ -138,6 +138,7 @@ public class ZeeConfig {
             "gfx/kritter/bat/bat",
             "gfx/kritter/bear/bear",
             "gfx/kritter/boar/boar",
+            "gfx/kritter/caveangler/caveangler",
             "gfx/kritter/goldeneagle/goldeneagle",
             "gfx/kritter/lynx/lynx",
             "gfx/kritter/mammoth/mammoth",
@@ -153,9 +154,6 @@ public class ZeeConfig {
             "gfx/terobjs/vehicle/catapult",
             "gfx/kritter/nidbane/nidbane",
             "gfx/terobjs/vehicle/wreckingball"
-    ));
-    public final static Set<String> noIconGobs = new HashSet<String>(Arrays.asList(
-            "gfx/kritter/irrbloss/irrbloss" //irrlight
     ));
 
 

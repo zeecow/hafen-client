@@ -31,6 +31,7 @@ public class ZeeClickItemManager extends ZeeThread{
             //error caused by midClicking again before task ending
             cancelManager = true;
         }
+        //println(itemName);
     }
 
     @Override
@@ -448,7 +449,6 @@ public class ZeeClickItemManager extends ZeeThread{
         }
         return false;
     }
-
 
     public static Inventory getInvBelt() {
         if (invBelt==null) {

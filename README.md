@@ -12,7 +12,7 @@ original features:
  - basic inventory item counter
  - MidClick gobs/items for inspect, sort-transfer, pick up, Giddyup!, light torch, auto-equip from belt, more?
  - LongMidClick gobs/items for lift up, destroy trellis plant, equip shovel and remove stump, more?
- - Ctrl+LongMidClick to kill all cocoons
+ - Ctrl+LongMidClick to kill all cocoons, auto-fill oven and smelter
 
 other stuff:
  - autodrop mined items, seeds, soil

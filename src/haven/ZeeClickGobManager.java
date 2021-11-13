@@ -14,6 +14,7 @@ public class ZeeClickGobManager extends ZeeThread{
     Coord2d clickCoord;
     Gob gob;
     String gobName;
+    static Inventory mainInv;
 
     public static float camAngleStart, camAngleEnd, camAngleDiff;
     public static long clickStartMs, clickEndMs, clickDiffMs;
@@ -55,16 +56,105 @@ public class ZeeClickGobManager extends ZeeThread{
             /*
             long clicks
              */
-            if(isGobCrop()){
+            if ( isFuelAction() ) {
+                addFuelToGob();
+            } else if(isGobCrop()) {
                 gobClick(gob,3,UI.MOD_SHIFT);//start farming area
-            } if(isGobStockpile() || isGobName("/dframe")) {
+            } else if(isGobStockpile() || isGobName("/dframe")) {
                 gobClick(3, UI.MOD_SHIFT);//pick up all items (shift + rclick)
-            } if (isDestroyGob()) {
+            } else if (isDestroyGob()) {
                 destroyGob();
             } else if (isLiftGob()) {
                 liftGob();
             }
         }
+    }
+
+    private void addFuelToGob() {
+
+        if(gobName.endsWith("oven")){
+            /*
+                fuel oven with 4 branches
+             */
+           List<WItem> branches = getMainInventory().getWItemsByName("branch");
+           if(branches.size() < 4){
+               ZeeConfig.gameUI.msg("Need 4 branches to fuel oven");
+               return;
+           }
+
+           new ZeeThread() {
+               public void run() {
+                   boolean exit = false;
+                   int added = 0;
+                   while(!exit && added<4 && branches.size() > 0){
+                       if(ZeeClickItemManager.pickUpItem(branches.get(0))){
+                           gobItemAct(0);
+                           if(waitFreeHand()){
+                               branches.remove(0);
+                               added++;
+                           }else{
+                               ZeeConfig.gameUI.msg("Couldn't right click oven");
+                               exit = true;
+                           }
+                       }else {
+                           ZeeConfig.gameUI.msg("Couldn't pickup branch");
+                           exit = true;
+                       }
+                   }
+                   ZeeConfig.gameUI.msg("Added "+added+" branches");
+               }
+           }.start();
+
+        }else if(gobName.endsWith("smelter")){
+            /*
+                fuel smelter with 9 branches (well mined ore)
+             */
+            List<WItem> coal = getMainInventory().getWItemsByName("coal");
+            if(coal.size() < 9){
+                ZeeConfig.gameUI.msg("Need 9 coal to fuel smelter");
+                return;
+            }
+
+            new ZeeThread() {
+                public void run() {
+                    boolean exit = false;
+                    int added = 0;
+                    while(!exit && added<9 && coal.size() > 0){
+                        if(ZeeClickItemManager.pickUpItem(coal.get(0))){
+                            gobItemAct(0);
+                            if(waitFreeHand()){
+                                coal.remove(0);
+                                added++;
+                            }else{
+                                ZeeConfig.gameUI.msg("Couldn't right click smelter");
+                                exit = true;
+                            }
+                        }else {
+                            ZeeConfig.gameUI.msg("Couldn't pickup coal");
+                            exit = true;
+                        }
+                    }
+                    ZeeConfig.gameUI.msg("Added "+added+" coal");
+                }
+            }.start();
+        }
+    }
+
+    public static Inventory getMainInventory() {
+        if(mainInv==null)
+            mainInv = ZeeConfig.getWindow("Inventory").getchild(Inventory.class);
+        return mainInv;
+    }
+
+    private boolean isFuelAction() {
+        if(!ZeeConfig.gameUI.ui.modctrl)
+            return false; // require Ctrl to fuel
+
+        if (gobName.endsWith("oven") || gobName.endsWith("smelter")){
+            return true;
+        }
+
+        return false;
     }
 
     private void harvestOneTrellis() {
