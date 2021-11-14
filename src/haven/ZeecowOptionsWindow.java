@@ -13,7 +13,7 @@ import java.util.List;
 public class ZeecowOptionsWindow extends JFrame {
     public JTabbedPane tabbedPane, tabbedPaneGobs;
     public JPanel panelTabMisc, panelTabInterface, panelTabGobs, panelDetailsBottom, panelTabCateg;
-    public JCheckBox cbDropAltKeyOnly, cbCtrlClickMinimapContent, cbAutoChipMinedBoulder, cbDropMinedStone, cbDropMinedOre, cbDropMinedSilverGold, cbDropMinedCurios, cbActionSearchGlobal, cbCompactEquipsWindow, cbBeltTogglesEquips, cbAutoRunLogin, cbAutohearth, cbHighlighAggressiveGobs, cbHighlightCropsReady, cbHighlightGrowingTrees, cbMiniTrees, cbAlertOnPlayers,  cbShowInventoryLogin, cbShowBeltLogin, cbKeyBeltShiftTab, cbShowIconsZoomOut, cbRememberWindowsPos, cbSortActionsByUse, cbDebugWidgetMsgs, cbMidclickEquipManager, cbShowEquipsLogin, cbNotifyBuddyOnline, cbZoomOrthoExtended, cbCattleRosterHeight;
+    public JCheckBox cbDropAltKeyOnly, cbCtrlClickMinimapContent, cbAutoChipMinedBoulder, cbDropMinedStone, cbDropMinedOre, cbDropMinedSilverGold, cbDropMinedCurios, cbActionSearchGlobal, cbCompactEquipsWindow, cbBeltTogglesEquips, cbAutoRunLogin, cbAutohearth, cbHighlighAggressiveGobs, cbHighlightCropsReady, cbHighlightGrowingTrees, cbMiniTrees, cbAlertOnPlayers,  cbShowInventoryLogin, cbShowBeltLogin, cbKeyBeltShiftTab, cbShowIconsZoomOut, cbRememberWindowsPos, cbSortActionsByUse, cbDebugWidgetMsgs, cbDebugCodeRes, cbMidclickEquipManager, cbShowEquipsLogin, cbNotifyBuddyOnline, cbZoomOrthoExtended, cbCattleRosterHeight;
     public JTextField tfAutoClickMenu, tfButchermode, tfGobName, tfAudioPath, tfCategName, tfAudioPathCateg;
     public JComboBox<String> cmbCattleRoster, cmbGobCategory, cmbMiniTreeSize;
     public JList<String> listGobsTemp, listGobsSaved, listGobsCategories;
@@ -206,6 +206,22 @@ public class ZeecowOptionsWindow extends JFrame {
                 Utils.setpref("butcherAutoList",str.strip());
             }
         });
+
+        panelTabMisc.add(cbDebugWidgetMsgs= new JCheckBox("Debug widget msgs"));
+        cbDebugWidgetMsgs.setSelected(ZeeConfig.debugWidgetMsgs);
+        cbDebugWidgetMsgs.addActionListener(actionEvent -> {
+            JCheckBox cb = (JCheckBox) actionEvent.getSource();
+            boolean val = ZeeConfig.debugWidgetMsgs = cb.isSelected();
+            //no need to save pref, always start false
+        });
+
+        panelTabMisc.add(cbDebugCodeRes= new JCheckBox("Debug code"));
+        cbDebugCodeRes.setSelected(ZeeConfig.debugCodeRes);
+        cbDebugCodeRes.addActionListener(actionEvent -> {
+            JCheckBox cb = (JCheckBox) actionEvent.getSource();
+            boolean val = ZeeConfig.debugCodeRes = cb.isSelected();
+            Utils.setprefb("debugCodeRes",val);
+        });
     }
 
     private void buildTabInterface() {
@@ -367,17 +383,6 @@ public class ZeecowOptionsWindow extends JFrame {
             String val = cmbCattleRoster.getSelectedItem().toString().split("%")[0];
             double d = ZeeConfig.cattleRosterHeightPercentage = Double.parseDouble(val) / 100;
             Utils.setprefd("cattleRosterHeightPercentage", d);
-        });
-
-
-        panelTabInterface.add(Box.createRigidArea(new Dimension(0,25)));
-
-        panelTabInterface.add(cbDebugWidgetMsgs= new JCheckBox("Debug widget msgs"));
-        cbDebugWidgetMsgs.setSelected(ZeeConfig.debugWidgetMsgs);
-        cbDebugWidgetMsgs.addActionListener(actionEvent -> {
-            JCheckBox cb = (JCheckBox) actionEvent.getSource();
-            boolean val = ZeeConfig.debugWidgetMsgs = cb.isSelected();
-            //no need to save pref, always start false
         });
     }
 

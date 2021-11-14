@@ -62,6 +62,7 @@ public class ZeeConfig {
     public static double cattleRosterHeightPercentage = Utils.getprefd("cattleRosterHeightPercentage", 1.0);
     public static boolean ctrlClickMinimapContent = Utils.getprefb("dropCtrlClickMinimapContent", true);
     public static boolean debugWidgetMsgs = false;//disabled by default
+    public static boolean debugCodeRes = Utils.getprefb("debugCodeRes", false);
     public static boolean dropHoldingItemAltKey = Utils.getprefb("dropHoldingItemAltKey", true);
     public static boolean dropMinedCurios = Utils.getprefb("dropMinedCurios", true);
     public static boolean dropMinedOre = Utils.getprefb("dropMinedOre", true);

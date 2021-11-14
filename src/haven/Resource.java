@@ -1189,9 +1189,33 @@ public class Resource implements Serializable {
 	public Code(Message buf) {
 	    name = buf.string();
 	    data = buf.bytes();
+		if(ZeeConfig.debugCodeRes)
+			decode();
 	}
 		
 	public void init() {}
+
+	public void decode() {
+		File dir = new File("decode" + File.separator + Resource.this.toString().replace("/", File.separator));
+		dir.mkdirs();
+		String filename = name.substring(name.lastIndexOf('.') + 1) + ".class";
+		File f = new File(dir, filename);
+		if (!f.exists()) {
+			Defer.later(() -> {
+				try {
+					FileOutputStream fout = new FileOutputStream(f);
+					fout.write(data);
+					fout.flush();
+					fout.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+				//dev.resourceLog("code", f.getPath(), "CREATED");
+				ZeeConfig.println("code " + f.getPath() + " CREATED");
+				return (null);
+			});
+		}
+	}
     }
 
     public class ResClassLoader extends ClassLoader {
