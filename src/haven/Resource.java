@@ -1343,7 +1343,9 @@ public class Resource implements Serializable {
 						Code c = clmap.get(name);
 						if(c == null)
 						    throw(new ResourceClassNotFoundException(name, Resource.this));
-						return(defineClass(name, c.data, 0, c.data.length));
+						Class<?> qlass = defineClass(name, c.data, 0, c.data.length);
+						ZeeConfig.checkClassMod(name, qlass);
+						return (qlass);
 					    }
 					};
 				}

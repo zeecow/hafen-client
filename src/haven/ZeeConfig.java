@@ -697,6 +697,16 @@ public class ZeeConfig {
         }).start();
     }
 
+    public static void checkClassMod(String name, Class<?> qlass){
+        try {
+            if(name.equals("haven.res.ui.tt.q.quality.Quality")) {
+                qlass.getDeclaredField("show").setBoolean(qlass, true);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     public static void playMidi(String[] notes){
         if(playingAudio!=null && playingAudio.contains(notes.toString()))
             return;//avoid duplicate audio
