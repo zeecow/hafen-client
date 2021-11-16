@@ -31,7 +31,7 @@ public class ZeeClickItemManager extends ZeeThread{
             //error caused by midClicking again before task ending
             cancelManager = true;
         }
-        //println(itemName);
+        //println(itemName +"  "+ wItem.c.div(33));
     }
 
     @Override
@@ -44,6 +44,9 @@ public class ZeeClickItemManager extends ZeeThread{
 
             //kill all, eat all, etc...
             if(actOnAllInventoryItems()){
+                return;
+            } else if (isLongClick() && isFishingItem()) {
+                equipFishingItem();
                 return;
             }
 
@@ -209,6 +212,61 @@ public class ZeeClickItemManager extends ZeeThread{
         }catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public static void equiporyItemAct(String itemNameContains){
+        getEquipory().children(WItem.class).forEach(witem -> {
+            if (witem.item.res.get().name.contains(itemNameContains)) {
+                witem.item.wdgmsg("itemact",0);
+            }
+        });
+    }
+
+    private void equipFishingItem() {
+        //   gfx/invobjs/small/primrod-h
+        //   gfx/invobjs/small/bushpole-l
+        try {
+            if (itemName.contains("lure-")){
+                // equip lure on primrod
+                if(getLeftHandName().contains("/primrod") || getRightHandName().contains("/primrod")){
+                    if(pickUpItem()){
+                        equiporyItemAct("/primrod");
+                        Thread.sleep(PING_MS / 2);
+                        wItem.getparent(Inventory.class).wdgmsg("drop", wItem.c.div(33));
+                    }
+                } else {
+                    ZeeConfig.gameUI.msg("no fish rod equipped");
+                }
+            } else {
+                //equip hook or line
+                String rodName = "";
+                if(getLeftHandName().contains("/primrod") || getRightHandName().contains("/primrod")) {
+                    rodName = "/primrod";
+                } else if(getLeftHandName().contains("/bushpole") || getRightHandName().contains("/bushpole")){
+                    rodName = "/bushpole";
+                } else {
+                    ZeeConfig.gameUI.msg("no fish pole equipped");
+                    return;
+                }
+                if(pickUpItem()){
+                    equiporyItemAct(rodName);
+                    Thread.sleep(PING_MS / 2);
+                    wItem.getparent(Inventory.class).wdgmsg("drop", wItem.c.div(33));
+                }
+            }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private boolean isFishingItem() {
+        String[] items = {"fline-","hook-","lure-"};
+        for (int i = 0; i < items.length; i++) {
+            if (itemName.contains(items[i])){
+                return true;
+            }
+        }
+        return false;
     }
 
     public String getHoldingItemName() {

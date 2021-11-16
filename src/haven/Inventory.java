@@ -325,4 +325,13 @@ public class Inventory extends Widget implements DTarget {
 		}
 		return mainInv;
 	}
+
+	public WItem getItemByCoord(Coord c) {
+		for (WItem item : this.children(WItem.class)) {
+			if (c.isect(xlate(item.c, true), item.sz)) {
+				return item;
+			}
+		}
+		return null;
+	}
 }

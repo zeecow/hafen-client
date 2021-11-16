@@ -5,6 +5,7 @@ public class ZeeThread  extends Thread{
     static final long SLEEP_MS = 50;
     static final long TIMEOUT_MS = 2000;
     static final long LONG_CLICK_MS = 333;
+    static final long PING_MS = 250;
 
     public static boolean waitFreeHand() {
         int max = (int) TIMEOUT_MS;

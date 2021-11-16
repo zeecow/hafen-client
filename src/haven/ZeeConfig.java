@@ -1,6 +1,9 @@
 package haven;
 
+import haven.render.BaseColor;
 import haven.render.MixColor;
+import haven.render.Pipe;
+import haven.render.States;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -8,6 +11,8 @@ import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 import java.awt.image.RenderedImage;
 import java.io.*;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.List;
@@ -699,12 +704,42 @@ public class ZeeConfig {
 
     public static void checkClassMod(String name, Class<?> qlass){
         try {
+
             if(name.equals("haven.res.ui.tt.q.quality.Quality")) {
+
+                /*
+                    Set Quality toggle on
+                 */
                 qlass.getDeclaredField("show").setBoolean(qlass, true);
+
+            }else if(name.equals("haven.res.gfx.fx.bprad.BPRad")){
+
+                /*
+                    Change radius color
+                 */
+                setFinalStatic(
+                    qlass.getDeclaredField("smat"),
+                    new BaseColor(new Color(139, 139, 185, 48))
+                );
+                setFinalStatic(
+                    qlass.getDeclaredField("emat"),
+                    Pipe.Op.compose(new Pipe.Op[]{new BaseColor(new Color(139, 139, 185, 48)), new States.LineWidth(1)})
+                );
+
             }
+
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    // https://stackoverflow.com/a/3301720
+    public static void setFinalStatic(Field field, Object newValue) throws Exception {
+        field.setAccessible(true);
+        Field modifiersField = Field.class.getDeclaredField("modifiers");
+        modifiersField.setAccessible(true);
+        modifiersField.setInt(field, field.getModifiers() & ~Modifier.FINAL);
+        field.set(null, newValue);
     }
 
     public static void playMidi(String[] notes){
