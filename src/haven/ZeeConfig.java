@@ -172,6 +172,7 @@ public class ZeeConfig {
     public static HashMap<String, Color> mapGobColor = initMapGobColor();
     public static HashMap<String,Color> mapCategoryColor = initMapCategoryColor();
     public static HashMap<String,Coord> mapWindowPos = initMapWindowPos();
+    public static GobIcon.SettingsWindow.IconList iconList;
 
 
     public static void checkRemoteWidget(String type, Widget wdg) {
@@ -359,17 +360,127 @@ public class ZeeConfig {
     }
 
     public static boolean isTree(String gobName) {
-        return gobName.startsWith("gfx/terobjs/trees/");
+        return gobName.contains("/trees/");
     }
 
     public static boolean isBush(String gobName) {
-        return gobName.startsWith("gfx/terobjs/bushes/");
+        return gobName.contains("/bushes/");
     }
 
     public static boolean isCrop(String gobName) {
         return gobName.startsWith("gfx/terobjs/plants/") && !gobName.endsWith("trellis");
     }
 
+    public static boolean isBug(String name){
+        /*
+        private static final String[] CRITTERS = {
+            "/rat/rat", "/swan", "/squirrel", "/silkmoth", "/frog", "/rockdove", "/quail", "/toad", "/grasshopper",
+            "/ladybug", "/forestsnail", "/dragonfly", "/forestlizard", "/waterstrider", "/firefly", "/sandflea",
+            "/rabbit", "/crab", "/cavemoth", "/hedgehog", "/stagbeetle", "jellyfish", "/mallard", "/chicken", "/irrbloss",
+            "/cavecentipede", "/bogturtle", "/moonmoth", "/monarchbutterfly", "/items/grub", "/springbumblebee"
+        };
+         */
+        String[] list = {
+            "/silkmoth","/grasshopper","/ladybug","/dragonfly","/waterstrider","/firefly","/sandflea",
+            "/cavemoth","/stagbeetle","/cavecentipede","/moonmoth","/monarchbutterfly","/items/grub",
+            "/springbumblebee"
+        };
+        for (int i = 0; i < list.length; i++) {
+            if(name.contains(list[i]))
+                return true;
+        }
+        return false;
+    }
+
+    public static boolean isString(String name){
+        String[] list = {
+            "nettle","taproot","cattail"
+        };
+        for (int i = 0; i < list.length; i++) {
+            if(name.contains(list[i]))
+                return true;
+        }
+        return false;
+    }
+
+    public static boolean isBird(String name){
+        String[] list = {
+            "rockdove","quail","/chick","/hen","/rooster","eagle","owl","magpie",
+            "mallard","pelican","seagull","swan","ptarmigan","grouse"
+        };
+        for (int i = 0; i < list.length; i++) {
+            if(name.contains(list[i]))
+                return true;
+        }
+        return false;
+    }
+
+    public static boolean isHerb(String name){
+        return name.contains("/herbs/");
+    }
+
+    public static boolean isFlower(String name){
+        String[] list = {
+            "bloodstern","camomile","cavebulb","chimingbluebell","clover","coltsfoot","dandelion",
+            "edelweiss","frogscrown","heartsease","marshmallow","stingingnettle","thornythistle",
+            "yarrow","snapdragon","wintergreen"
+        };
+        for (int i = 0; i < list.length; i++) {
+            if(name.contains(list[i]))
+                return true;
+        }
+        return false;
+    }
+
+    public static boolean isMushroom(String name){
+        String[] list = {
+            "bolete","truffle","trumpet","cavelantern","chanterelles","morel","fairy","blewit",
+            "puffball","indigo","parasol","snowtop","yellowfeet"
+        };
+        for (int i = 0; i < list.length; i++) {
+            if(name.contains(list[i]))
+                return true;
+        }
+        return false;
+    }
+
+    public static boolean isTreeToughBark(String name){
+        String[] list = {
+            "trees/linden","trees/birch","trees/wartybirch","trees/willow","trees/cedar",
+            "trees/elm","trees/juniper","trees/beech","trees/mulberry"
+        };
+        for (int i = 0; i < list.length; i++) {
+            if(name.contains(list[i]))
+                return true;
+        }
+        return false;
+    }
+
+    public static boolean isTreeFruit(String name){
+        String[] list = {
+            "trees/cherrie","trees/fig","trees/lemon","trees/medlar","trees/mulberry",
+            "trees/pear","trees/persimmon","trees/plum","trees/quince","trees/apple",
+            "trees/sorb"
+        };
+        for (int i = 0; i < list.length; i++) {
+            if(name.contains(list[i]))
+                return true;
+        }
+        return false;
+    }
+
+    public static boolean isTreeNuts(String name){
+        String[] list = {
+            "trees/almond","trees/beech","trees/chestnut","trees/hazel",
+            "trees/walnut","trees/carob","trees/king","trees/oak",
+            "bushes/witherstand"
+        };
+        for (int i = 0; i < list.length; i++) {
+            if(name.contains(list[i]))
+                return true;
+        }
+        return false;
+    }
 
     public static void highlight(Gob gob, MixColor mc) {
         if(gob==null || mc==null)

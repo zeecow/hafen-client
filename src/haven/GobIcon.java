@@ -224,12 +224,18 @@ public class GobIcon extends GAttrib {
 	    private Coord showc;
 	    private List<Icon> ordered = Collections.emptyList();
 	    private Map<String, Setting> cur = null;
+		private Map<String, Setting> curFilter = null;
 	    private boolean reorder = false;
 
 	    private IconList(int w, int h) {
 		super(w, h, elh);
 		this.showc = showc();
 	    }
+		private IconList(int w, int h, Map<String,GobIcon.Setting> cur) {
+			super(w, h, elh);
+			this.curFilter = cur;
+			this.showc = showc();
+		}
 
 	    private Coord showc() {
 		return(new Coord(sz.x - (sb.vis() ? sb.sz.x : 0) - ((elh - CheckBox.sbox.sz().y) / 2) - CheckBox.sbox.sz().x,
@@ -239,7 +245,7 @@ public class GobIcon extends GAttrib {
 	    public void tick(double dt) {
 		Map<String, Setting> cur = this.cur;
 		if(cur != conf.settings) {
-		    cur = conf.settings;
+		    cur = (curFilter!=null ? curFilter : conf.settings);
 		    ArrayList<Icon> ordered = new ArrayList<>();
 		    for(Setting set : cur.values())
 			ordered.add(new Icon(set));
@@ -336,8 +342,11 @@ public class GobIcon extends GAttrib {
 	    super(Coord.z, "Icon settings");
 	    this.conf = conf;
 	    this.save = save;
-	    Widget prev = add(new IconList(UI.scale(250), 25), Coord.z);
-	    add(new CheckBox("Notification on newly seen icons") {
+		ZeeConfig.iconList = new IconList(UI.scale(250), 25);
+
+		Widget prev = add(ZeeConfig.iconList, Coord.z);
+
+		add(new CheckBox("Notification on newly seen icons") {
 		    {this.a = conf.notify;}
 
 		    public void changed(boolean val) {
@@ -346,7 +355,61 @@ public class GobIcon extends GAttrib {
 			    save.run();
 		    }
 		}, prev.pos("bl").adds(5, 5));
+
+		//filter categories
+		RadioGroup radioGroup = new RadioGroup(this) {
+			public void changed(int btn, String lbl) {
+				toggleFilterIconList(lbl);
+			}
+		};
+		radioGroup.add("all", prev.pos("bl").adds(5, 35));
+		radioGroup.add("bird", prev.pos("bl").adds(43, 35));
+		radioGroup.add("bug", prev.pos("bl").adds(87, 35));
+		radioGroup.add("bush", prev.pos("bl").adds(129, 35));
+		radioGroup.add("flower", prev.pos("bl").adds(179, 35));
+		radioGroup.add("herb", prev.pos("bl").adds(5, 55));
+		radioGroup.add("mush", prev.pos("bl").adds(53, 55));
+		radioGroup.add("string", prev.pos("bl").adds(105, 55));
+		radioGroup.add("tree", prev.pos("bl").adds(5, 75));
+		radioGroup.add("bark", prev.pos("bl").adds(60, 75));
+		radioGroup.add("fruit", prev.pos("bl").adds(105, 75));
+		radioGroup.add("nuts", prev.pos("bl").adds(150, 75));
+		radioGroup.check(0);
+
 	    pack();
+	}
+
+	public void toggleFilterIconList(String filterName) {
+		Window win = ZeeConfig.iconList.getparent(Window.class);
+		Map<String, GobIcon.Setting> filteredList = null;
+		if(!filterName.equals("all")) {
+			filteredList = new HashMap<String, GobIcon.Setting>(conf.settings);
+		}
+		if(filterName.equals("bird"))
+			filteredList.entrySet().removeIf(entry -> !ZeeConfig.isBird(entry.getKey()));
+		else if(filterName.equals("bug"))
+			filteredList.entrySet().removeIf(entry -> !ZeeConfig.isBug(entry.getKey()));
+		else if(filterName.equals("bush"))
+			filteredList.entrySet().removeIf(entry -> !ZeeConfig.isBush(entry.getKey()));
+		else if(filterName.equals("flower"))
+			filteredList.entrySet().removeIf(entry -> !ZeeConfig.isFlower(entry.getKey()));
+		else if(filterName.equals("herb"))
+			filteredList.entrySet().removeIf(entry -> !ZeeConfig.isHerb(entry.getKey()));
+		else if(filterName.equals("mush"))
+			filteredList.entrySet().removeIf(entry -> !ZeeConfig.isMushroom(entry.getKey()));
+		else if(filterName.equals("string"))
+			filteredList.entrySet().removeIf(entry -> !ZeeConfig.isString(entry.getKey()));
+		else if(filterName.equals("tree"))
+			filteredList.entrySet().removeIf(entry -> !ZeeConfig.isTree(entry.getKey()));
+		else if(filterName.equals("bark"))
+			filteredList.entrySet().removeIf(entry -> !ZeeConfig.isTreeToughBark(entry.getKey()));
+		else if(filterName.equals("fruit"))
+			filteredList.entrySet().removeIf(entry -> !ZeeConfig.isTreeFruit(entry.getKey()));
+		else if(filterName.equals("nuts"))
+			filteredList.entrySet().removeIf(entry -> !ZeeConfig.isTreeNuts(entry.getKey()));
+		ZeeConfig.iconList.remove();
+		ZeeConfig.iconList = new GobIcon.SettingsWindow.IconList(UI.scale(250), 25, filteredList);
+		win.add(ZeeConfig.iconList, Coord.z);
 	}
     }
 }
