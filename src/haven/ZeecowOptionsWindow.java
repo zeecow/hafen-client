@@ -11,6 +11,7 @@ import java.util.*;
 import java.util.List;
 
 public class ZeecowOptionsWindow extends JFrame {
+    public GridBagConstraints c;
     public JTabbedPane tabbedPane, tabbedPaneGobs;
     public JPanel panelTabMisc, panelTabInterface, panelTabGobs, panelDetailsBottom, panelTabCateg;
     public JCheckBox cbDropAltKeyOnly, cbCtrlClickMinimapContent, cbAutoChipMinedBoulder, cbDropMinedStone, cbDropMinedOre, cbDropMinedSilverGold, cbDropMinedCurios, cbActionSearchGlobal, cbCompactEquipsWindow, cbBeltTogglesEquips, cbAutoRunLogin, cbAutohearth, cbHighlighAggressiveGobs, cbHighlightCropsReady, cbHighlightGrowingTrees, cbMiniTrees, cbAlertOnPlayers,  cbShowInventoryLogin, cbShowBeltLogin, cbKeyBeltShiftTab, cbShowIconsZoomOut, cbRememberWindowsPos, cbSortActionsByUse, cbDebugWidgetMsgs, cbDebugCodeRes, cbMidclickEquipManager, cbShowEquipsLogin, cbNotifyBuddyOnline, cbZoomOrthoExtended, cbCattleRosterHeight;
@@ -41,7 +42,10 @@ public class ZeecowOptionsWindow extends JFrame {
     }
 
     private void setContents() {
-        getContentPane().setPreferredSize(new Dimension(300,600));
+        c = new GridBagConstraints();
+        c.fill = GridBagConstraints.HORIZONTAL; // natural height, maximum width
+        c.gridwidth = GridBagConstraints.REMAINDER; // last one in its row
+
         tabbedPane = new JTabbedPane();
         getContentPane().add(tabbedPane);
 
@@ -50,19 +54,17 @@ public class ZeecowOptionsWindow extends JFrame {
         buildTabInterface();
 
         //Gobs tabbbed pane
-        panelTabGobs = new JPanel();
-        panelTabGobs.setLayout(new BoxLayout(panelTabGobs, BoxLayout.PAGE_AXIS));
-        tabbedPane.add("Gobs", panelTabGobs);
+        panelTabGobs = new JPanel(new GridBagLayout());
+        tabbedPane.addTab("Gobs", panelTabGobs);
         buildTabGobs();
     }
 
-
     private void buildTabMisc() {
-        panelTabMisc = new JPanel();
-        panelTabMisc.setLayout(new BoxLayout(panelTabMisc, BoxLayout.PAGE_AXIS));
+
+        panelTabMisc = new JPanel(new GridBagLayout());
         tabbedPane.addTab("Misc", panelTabMisc);
 
-        panelTabMisc.add(cbAutoChipMinedBoulder = new JCheckBox("Auto chip mined boulder"));
+        panelTabMisc.add(cbAutoChipMinedBoulder = new JCheckBox("Auto chip mined boulder"), c);
         cbAutoChipMinedBoulder.setSelected(ZeeConfig.autoChipMinedBoulder);
         cbAutoChipMinedBoulder.addActionListener(actionEvent -> {
             JCheckBox cb = (JCheckBox) actionEvent.getSource();
@@ -70,7 +72,7 @@ public class ZeecowOptionsWindow extends JFrame {
             Utils.setprefb("autoChipMinedBoulder",val);
         });
 
-        panelTabMisc.add(cbDropMinedStone = new JCheckBox("Drop mined stones"));
+        panelTabMisc.add(cbDropMinedStone = new JCheckBox("Drop mined stones"), c);
         cbDropMinedStone.setSelected(ZeeConfig.dropMinedStones);
         cbDropMinedStone.addActionListener(actionEvent -> {
             JCheckBox cb = (JCheckBox) actionEvent.getSource();
@@ -78,7 +80,7 @@ public class ZeecowOptionsWindow extends JFrame {
             Utils.setprefb("dropMinedStones",val);
         });
 
-        panelTabMisc.add(cbDropMinedOre = new JCheckBox("Drop mined ore"));
+        panelTabMisc.add(cbDropMinedOre = new JCheckBox("Drop mined ore"), c);
         cbDropMinedOre.setSelected(ZeeConfig.dropMinedOre);
         cbDropMinedOre.addActionListener(actionEvent -> {
             JCheckBox cb = (JCheckBox) actionEvent.getSource();
@@ -86,7 +88,7 @@ public class ZeecowOptionsWindow extends JFrame {
             Utils.setprefb("dropMinedOre",val);
         });
 
-        panelTabMisc.add(cbDropMinedSilverGold = new JCheckBox("Drop mined silver/gold"));
+        panelTabMisc.add(cbDropMinedSilverGold = new JCheckBox("Drop mined silver/gold"), c);
         cbDropMinedSilverGold.setSelected(ZeeConfig.dropMinedSilverGold);
         cbDropMinedSilverGold.addActionListener(actionEvent -> {
             JCheckBox cb = (JCheckBox) actionEvent.getSource();
@@ -94,7 +96,7 @@ public class ZeecowOptionsWindow extends JFrame {
             Utils.setprefb("dropMinedOrePrecious",val);
         });
 
-        panelTabMisc.add(cbDropMinedCurios = new JCheckBox("Drop mined curios"));
+        panelTabMisc.add(cbDropMinedCurios = new JCheckBox("Drop mined curios"), c);
         cbDropMinedCurios.setSelected(ZeeConfig.dropMinedCurios);
         cbDropMinedCurios.addActionListener(actionEvent -> {
             JCheckBox cb = (JCheckBox) actionEvent.getSource();
@@ -102,9 +104,7 @@ public class ZeecowOptionsWindow extends JFrame {
             Utils.setprefb("dropMinedCurios",val);
         });
 
-        panelTabMisc.add(Box.createRigidArea(new Dimension(0,5)));
-
-        panelTabMisc.add(cbHighlighAggressiveGobs = new JCheckBox("Highlight aggressive gobs"));
+        panelTabMisc.add(cbHighlighAggressiveGobs = new JCheckBox("Highlight aggressive gobs"), c);
         cbHighlighAggressiveGobs.setSelected(ZeeConfig.highlightAggressiveGobs);
         cbHighlighAggressiveGobs.addActionListener(actionEvent -> {
             JCheckBox cb = (JCheckBox) actionEvent.getSource();
@@ -112,7 +112,7 @@ public class ZeecowOptionsWindow extends JFrame {
             Utils.setprefb("highlighAggressiveGobs",val);
         });
 
-        panelTabMisc.add(cbHighlightCropsReady = new JCheckBox("Highlight crops ready"));
+        panelTabMisc.add(cbHighlightCropsReady = new JCheckBox("Highlight crops ready"), c);
         cbHighlightCropsReady.setSelected(ZeeConfig.highlightCropsReady);
         cbHighlightCropsReady.addActionListener(actionEvent -> {
             JCheckBox cb = (JCheckBox) actionEvent.getSource();
@@ -120,7 +120,7 @@ public class ZeecowOptionsWindow extends JFrame {
             Utils.setprefb("highlightCropsReady",val);
         });
 
-        panelTabMisc.add(cbHighlightGrowingTrees = new JCheckBox("Highlight growing trees"));
+        panelTabMisc.add(cbHighlightGrowingTrees = new JCheckBox("Highlight growing trees"), c);
         cbHighlightGrowingTrees.setSelected(ZeeConfig.highlightGrowingTrees);
         cbHighlightGrowingTrees.addActionListener(actionEvent -> {
             JCheckBox cb = (JCheckBox) actionEvent.getSource();
@@ -128,9 +128,7 @@ public class ZeecowOptionsWindow extends JFrame {
             Utils.setprefb("highlightGrowingTrees",val);
         });
 
-        panelTabMisc.add(Box.createRigidArea(new Dimension(0,5)));
-
-        panelTabMisc.add(cbMiniTrees= new JCheckBox("Mini trees :3"));
+        panelTabMisc.add(cbMiniTrees= new JCheckBox("Mini trees :3"), c);
         cbMiniTrees.setSelected(ZeeConfig.miniTrees);
         cbMiniTrees.addActionListener(actionEvent -> {
             JCheckBox cb = (JCheckBox) actionEvent.getSource();
@@ -141,7 +139,7 @@ public class ZeecowOptionsWindow extends JFrame {
 
         //mini trees size
         String[] perc = {"30%","40%","50%","60%","70%","80%"};
-        panelTabMisc.add(cmbMiniTreeSize = new JComboBox<String>(perc));
+        panelTabMisc.add(cmbMiniTreeSize = new JComboBox<String>(perc), c);
         cmbMiniTreeSize.setMaximumSize(new Dimension(Integer.MAX_VALUE, cmbMiniTreeSize.getPreferredSize().height));
         cmbMiniTreeSize.setSelectedItem(ZeeConfig.miniTreesSize+"%");
         cmbMiniTreeSize.setEnabled(ZeeConfig.miniTrees);
@@ -151,9 +149,7 @@ public class ZeecowOptionsWindow extends JFrame {
             Utils.setprefi("miniTreesSize", num);
         });
 
-        panelTabMisc.add(Box.createRigidArea(new Dimension(0,5)));
-
-        panelTabMisc.add(cbAlertOnPlayers = new JCheckBox("Sound alert on players"));
+        panelTabMisc.add(cbAlertOnPlayers = new JCheckBox("Sound alert on players"), c);
         cbAlertOnPlayers.setSelected(ZeeConfig.alertOnPlayers);
         cbAlertOnPlayers.addActionListener(actionEvent -> {
             JCheckBox cb = (JCheckBox) actionEvent.getSource();
@@ -161,7 +157,7 @@ public class ZeecowOptionsWindow extends JFrame {
             Utils.setprefb("alertOnPlayers",val);
         });
 
-        panelTabMisc.add(cbAutohearth = new JCheckBox("Auto-hearth on players"));
+        panelTabMisc.add(cbAutohearth = new JCheckBox("Auto-hearth on players"), c);
         cbAutohearth.setSelected(ZeeConfig.autoHearthOnStranger);
         cbAutohearth.addActionListener(actionEvent -> {
             JCheckBox cb = (JCheckBox) actionEvent.getSource();
@@ -169,7 +165,7 @@ public class ZeecowOptionsWindow extends JFrame {
             Utils.setprefb("autoHearthOnStranger",val);
         });
 
-        panelTabMisc.add(cbAutoRunLogin = new JCheckBox("Auto-run on login"));
+        panelTabMisc.add(cbAutoRunLogin = new JCheckBox("Auto-run on login"), c);
         cbAutoRunLogin.setSelected(ZeeConfig.autoRunLogin);
         cbAutoRunLogin.addActionListener(actionEvent -> {
             JCheckBox cb = (JCheckBox) actionEvent.getSource();
@@ -177,11 +173,9 @@ public class ZeecowOptionsWindow extends JFrame {
             Utils.setprefb("autoRunLogin",val);
         });
 
-        panelTabMisc.add(Box.createRigidArea(new Dimension(0,5)));
-
         //auto click menu list
-        panelTabMisc.add(new JLabel("Automenu list:"));
-        panelTabMisc.add(tfAutoClickMenu = new JTextField("",5));
+        panelTabMisc.add(new JLabel("Automenu list:"), c);
+        panelTabMisc.add(tfAutoClickMenu = new JTextField("",5), c);
         tfAutoClickMenu.setMaximumSize(new Dimension(Integer.MAX_VALUE, tfAutoClickMenu.getPreferredSize().height));
         tfAutoClickMenu.setText(ZeeConfig.autoClickMenuOptionList);
         tfAutoClickMenu.addActionListener(actionEvent -> {
@@ -194,8 +188,8 @@ public class ZeecowOptionsWindow extends JFrame {
         });
 
         //butcher mode  list
-        panelTabMisc.add(new JLabel("Butchermode list:"));
-        panelTabMisc.add(tfButchermode= new JTextField("",5));
+        panelTabMisc.add(new JLabel("Butchermode list:"), c);
+        panelTabMisc.add(tfButchermode= new JTextField("",5), c);
         tfButchermode.setMaximumSize(new Dimension(Integer.MAX_VALUE, tfButchermode.getPreferredSize().height));
         tfButchermode.setText(ZeeConfig.butcherAutoList);
         tfButchermode.addActionListener(actionEvent -> {
@@ -207,7 +201,7 @@ public class ZeecowOptionsWindow extends JFrame {
             }
         });
 
-        panelTabMisc.add(cbDebugWidgetMsgs= new JCheckBox("Debug widget msgs"));
+        panelTabMisc.add(cbDebugWidgetMsgs= new JCheckBox("Debug widget msgs"), c);
         cbDebugWidgetMsgs.setSelected(ZeeConfig.debugWidgetMsgs);
         cbDebugWidgetMsgs.addActionListener(actionEvent -> {
             JCheckBox cb = (JCheckBox) actionEvent.getSource();
@@ -215,7 +209,7 @@ public class ZeecowOptionsWindow extends JFrame {
             //no need to save pref, always start false
         });
 
-        panelTabMisc.add(cbDebugCodeRes= new JCheckBox("Debug code"));
+        panelTabMisc.add(cbDebugCodeRes= new JCheckBox("Debug code"), c);
         cbDebugCodeRes.setSelected(ZeeConfig.debugCodeRes);
         cbDebugCodeRes.addActionListener(actionEvent -> {
             JCheckBox cb = (JCheckBox) actionEvent.getSource();
@@ -225,11 +219,11 @@ public class ZeecowOptionsWindow extends JFrame {
     }
 
     private void buildTabInterface() {
-        panelTabInterface = new JPanel();
-        panelTabInterface.setLayout(new BoxLayout(panelTabInterface, BoxLayout.PAGE_AXIS));
+
+        panelTabInterface = new JPanel(new GridBagLayout());
         tabbedPane.addTab("Interface", panelTabInterface);
 
-        panelTabInterface.add(cbDropAltKeyOnly = new JCheckBox("Alt+click drops holding item"));
+        panelTabInterface.add(cbDropAltKeyOnly = new JCheckBox("Alt+click drops holding item"), c);
         cbDropAltKeyOnly.setSelected(ZeeConfig.dropHoldingItemAltKey);
         cbDropAltKeyOnly.addActionListener(actionEvent -> {
             JCheckBox cb = (JCheckBox) actionEvent.getSource();
@@ -237,7 +231,7 @@ public class ZeecowOptionsWindow extends JFrame {
             Utils.setprefb("dropHoldingItemAltKey",val);
         });
 
-        panelTabInterface.add(cbCtrlClickMinimapContent = new JCheckBox("Ctrl scroll/resize minimap"));
+        panelTabInterface.add(cbCtrlClickMinimapContent = new JCheckBox("Ctrl scroll/resize minimap"), c);
         cbCtrlClickMinimapContent.setSelected(ZeeConfig.ctrlClickMinimapContent);
         cbCtrlClickMinimapContent.addActionListener(actionEvent -> {
             JCheckBox cb = (JCheckBox) actionEvent.getSource();
@@ -245,7 +239,7 @@ public class ZeecowOptionsWindow extends JFrame {
             Utils.setprefb("dropCtrlClickMinimapContent",val);
         });
 
-        panelTabInterface.add(cbCompactEquipsWindow = new JCheckBox("Compact equip window(restart)"));
+        panelTabInterface.add(cbCompactEquipsWindow = new JCheckBox("Compact equip window(restart)"), c);
         cbCompactEquipsWindow.setSelected(ZeeConfig.equiporyCompact);
         cbCompactEquipsWindow.addActionListener(actionEvent -> {
             JCheckBox cb = (JCheckBox) actionEvent.getSource();
@@ -253,7 +247,7 @@ public class ZeecowOptionsWindow extends JFrame {
             Utils.setprefb("equiporyCompact",val);
         });
 
-        panelTabInterface.add(cbBeltTogglesEquips = new JCheckBox("Auto toggle equips window"));
+        panelTabInterface.add(cbBeltTogglesEquips = new JCheckBox("Auto toggle equips window"), c);
         cbBeltTogglesEquips.setSelected(ZeeConfig.autoOpenEquips);
         cbBeltTogglesEquips.addActionListener(actionEvent -> {
             JCheckBox cb = (JCheckBox) actionEvent.getSource();
@@ -261,7 +255,7 @@ public class ZeecowOptionsWindow extends JFrame {
             Utils.setprefb("beltToggleEquips",val);
         });
 
-        panelTabInterface.add(cbShowEquipsLogin = new JCheckBox("Show equips at login"));
+        panelTabInterface.add(cbShowEquipsLogin = new JCheckBox("Show equips at login"), c);
         cbShowEquipsLogin.setSelected(ZeeConfig.showEquipsLogin);
         cbShowEquipsLogin.addActionListener(actionEvent -> {
             JCheckBox cb = (JCheckBox) actionEvent.getSource();
@@ -269,7 +263,7 @@ public class ZeecowOptionsWindow extends JFrame {
             Utils.setprefb("showEquipsLogin",val);
         });
 
-        panelTabInterface.add(cbMidclickEquipManager = new JCheckBox("Mid-click belt autoequip"));
+        panelTabInterface.add(cbMidclickEquipManager = new JCheckBox("Mid-click belt autoequip"), c);
         cbMidclickEquipManager.setSelected(ZeeConfig.midclickEquipManager);
         cbMidclickEquipManager.addActionListener(actionEvent -> {
             JCheckBox cb = (JCheckBox) actionEvent.getSource();
@@ -277,7 +271,7 @@ public class ZeecowOptionsWindow extends JFrame {
             Utils.setprefb("midclickEquipManager",val);
         });
 
-        panelTabInterface.add(cbShowInventoryLogin = new JCheckBox("Show inventory at login"));
+        panelTabInterface.add(cbShowInventoryLogin = new JCheckBox("Show inventory at login"), c);
         cbShowInventoryLogin.setSelected(ZeeConfig.showInventoryLogin);
         cbShowInventoryLogin.addActionListener(actionEvent -> {
             JCheckBox cb = (JCheckBox) actionEvent.getSource();
@@ -285,7 +279,7 @@ public class ZeecowOptionsWindow extends JFrame {
             Utils.setprefb("showInventoryLogin",val);
         });
 
-        panelTabInterface.add(cbShowBeltLogin = new JCheckBox("Show belt at login"));
+        panelTabInterface.add(cbShowBeltLogin = new JCheckBox("Show belt at login"), c);
         cbShowBeltLogin.setSelected(ZeeConfig.autoOpenBelt);
         cbShowBeltLogin.addActionListener(actionEvent -> {
             JCheckBox cb = (JCheckBox) actionEvent.getSource();
@@ -293,7 +287,7 @@ public class ZeecowOptionsWindow extends JFrame {
             Utils.setprefb("autoOpenBelt",val);
         });
 
-        panelTabInterface.add(cbKeyBeltShiftTab = new JCheckBox("Shift+Tab toggles belt"));
+        panelTabInterface.add(cbKeyBeltShiftTab = new JCheckBox("Shift+Tab toggles belt"), c);
         cbKeyBeltShiftTab.setSelected(ZeeConfig.keyBeltShiftTab);
         cbKeyBeltShiftTab.addActionListener(actionEvent -> {
             JCheckBox cb = (JCheckBox) actionEvent.getSource();
@@ -301,7 +295,7 @@ public class ZeecowOptionsWindow extends JFrame {
             Utils.setprefb("keyBeltShiftTab",val);
         });
 
-        panelTabInterface.add(cbShowIconsZoomOut = new JCheckBox("Show icons while zoomed out"));
+        panelTabInterface.add(cbShowIconsZoomOut = new JCheckBox("Show icons while zoomed out"), c);
         cbShowIconsZoomOut.setSelected(ZeeConfig.showIconsZoomOut);
         cbShowIconsZoomOut.addActionListener(actionEvent -> {
             JCheckBox cb = (JCheckBox) actionEvent.getSource();
@@ -309,7 +303,7 @@ public class ZeecowOptionsWindow extends JFrame {
             Utils.setprefb("showIconsZoomOut",val);
         });
 
-        panelTabInterface.add(cbNotifyBuddyOnline = new JCheckBox("Notify when friends login"));
+        panelTabInterface.add(cbNotifyBuddyOnline = new JCheckBox("Notify when friends login"), c);
         cbNotifyBuddyOnline.setSelected(ZeeConfig.notifyBuddyOnline);
         cbNotifyBuddyOnline.addActionListener(actionEvent -> {
             JCheckBox cb = (JCheckBox) actionEvent.getSource();
@@ -317,7 +311,7 @@ public class ZeecowOptionsWindow extends JFrame {
             Utils.setprefb("notifyBuddyOnline",val);
         });
 
-        panelTabInterface.add(cbZoomOrthoExtended = new JCheckBox("Zoom extended for Ortho cam"));
+        panelTabInterface.add(cbZoomOrthoExtended = new JCheckBox("Zoom extended for Ortho cam"), c);
         cbZoomOrthoExtended.setSelected(ZeeConfig.zoomOrthoExtended);
         cbZoomOrthoExtended.addActionListener(actionEvent -> {
             JCheckBox cb = (JCheckBox) actionEvent.getSource();
@@ -325,7 +319,7 @@ public class ZeecowOptionsWindow extends JFrame {
             Utils.setprefb("zoomOrthoExtended",val);
         });
 
-        panelTabInterface.add(cbActionSearchGlobal = new JCheckBox("Action search global"));
+        panelTabInterface.add(cbActionSearchGlobal = new JCheckBox("Action search global"), c);
         cbActionSearchGlobal.setSelected(ZeeConfig.actionSearchGlobal);
         cbActionSearchGlobal.addActionListener(actionEvent -> {
             JCheckBox cb = (JCheckBox) actionEvent.getSource();
@@ -333,9 +327,7 @@ public class ZeecowOptionsWindow extends JFrame {
             Utils.setprefb("actionSearchGlobal",val);
         });
 
-        panelTabInterface.add(Box.createRigidArea(new Dimension(0,25)));
-
-        panelTabInterface.add(cbRememberWindowsPos= new JCheckBox("Remember windows pos"));
+        panelTabInterface.add(cbRememberWindowsPos= new JCheckBox("Remember windows pos"), c);
         cbRememberWindowsPos.setSelected(ZeeConfig.rememberWindowsPos);
         cbRememberWindowsPos.addActionListener(actionEvent -> {
             JCheckBox cb = (JCheckBox) actionEvent.getSource();
@@ -343,14 +335,12 @@ public class ZeecowOptionsWindow extends JFrame {
             Utils.setprefb("rememberWindowsPos",val);
         });
 
-        panelTabInterface.add(btnResetWindowsPos = new JButton("reset windows pos ("+ZeeConfig.mapWindowPos.size()+")"));
+        panelTabInterface.add(btnResetWindowsPos = new JButton("reset windows pos ("+ZeeConfig.mapWindowPos.size()+")"), c);
         btnResetWindowsPos.addActionListener(evt -> {
             resetWindowsPos();
         });
 
-        panelTabInterface.add(Box.createRigidArea(new Dimension(0,25)));
-
-        panelTabInterface.add(cbSortActionsByUse= new JCheckBox("Sort actions by uses"));
+        panelTabInterface.add(cbSortActionsByUse= new JCheckBox("Sort actions by uses"), c);
         cbSortActionsByUse.setSelected(ZeeConfig.sortActionsByUses);
         cbSortActionsByUse.addActionListener(actionEvent -> {
             JCheckBox cb = (JCheckBox) actionEvent.getSource();
@@ -358,15 +348,13 @@ public class ZeecowOptionsWindow extends JFrame {
             Utils.setprefb("sortActionsByUses",val);
         });
 
-        panelTabInterface.add(btnResetActionUses = new JButton("reset actions uses ("+ZeeConfig.mapActionUses.size()+")"));
+        panelTabInterface.add(btnResetActionUses = new JButton("reset actions uses ("+ZeeConfig.mapActionUses.size()+")"), c);
         btnResetActionUses.addActionListener(evt -> {
             resetActionUses();
         });
 
-        panelTabInterface.add(Box.createRigidArea(new Dimension(0,25)));
-
         //cattle roster height
-        panelTabInterface.add(cbCattleRosterHeight = new JCheckBox("Cattle Roster height(logout)"));
+        panelTabInterface.add(cbCattleRosterHeight = new JCheckBox("Cattle Roster height(logout)"), c);
         cbCattleRosterHeight.setSelected(ZeeConfig.cattleRosterHeight);
         cbCattleRosterHeight.addActionListener(actionEvent -> {
             JCheckBox cb = (JCheckBox) actionEvent.getSource();
@@ -375,7 +363,7 @@ public class ZeecowOptionsWindow extends JFrame {
             cmbCattleRoster.setEnabled(val);
         });
         String[] perc = {"30%","40%","50%","60%","70%","80%","90%","100%"};
-        panelTabInterface.add(cmbCattleRoster = new JComboBox<String>(perc));
+        panelTabInterface.add(cmbCattleRoster = new JComboBox<String>(perc), c);
         cmbCattleRoster.setMaximumSize(new Dimension(Integer.MAX_VALUE, cmbCattleRoster.getPreferredSize().height));
         cmbCattleRoster.setSelectedItem(((int)(ZeeConfig.cattleRosterHeightPercentage*100))+"%");
         cmbCattleRoster.setEnabled(ZeeConfig.cattleRosterHeight);
@@ -386,33 +374,15 @@ public class ZeecowOptionsWindow extends JFrame {
         });
     }
 
-    private void resetActionUses() {
-        if(JOptionPane.showConfirmDialog(this,"Confirm reset action uses?") != JOptionPane.OK_OPTION){
-            return;
-        }
-        Utils.setpref(ZeeConfig.MAP_ACTION_USES,"");
-        ZeeConfig.mapActionUses = ZeeConfig.initMapActionUses();
-    }
-
-    private void resetWindowsPos() {
-        if(JOptionPane.showConfirmDialog(this,"Confirm reset windows pos?") != JOptionPane.OK_OPTION){
-            return;
-        }
-        Utils.setpref(ZeeConfig.MAP_WND_POS,"");
-        ZeeConfig.mapWindowPos = ZeeConfig.initMapWindowPos();
-    }
-
-
     private void buildTabGobs() {
+
         panelTabGobs.removeAll();
 
         //panel bottom details
         if(panelDetailsBottom !=null) {
             panelDetailsBottom.repaint();
         }else {
-            panelDetailsBottom = new JPanel();
-            panelDetailsBottom.setLayout(new BoxLayout(panelDetailsBottom, BoxLayout.PAGE_AXIS));
-            panelDetailsBottom.setPreferredSize(new Dimension(300, 300));
+            panelDetailsBottom = new JPanel(new GridBagLayout());
         }
 
         //subtabs pane
@@ -432,7 +402,7 @@ public class ZeecowOptionsWindow extends JFrame {
                 panelDetailsBottom.removeAll();
             }
         });
-        panelTabGobs.add(tabbedPaneGobs);
+        panelTabGobs.add(tabbedPaneGobs, c);
 
 
         //subtab gobs session list
@@ -442,15 +412,14 @@ public class ZeecowOptionsWindow extends JFrame {
         }else {
             listGobsTemp = new JList<String>();
         }
-        JPanel panelTabGobSess = new JPanel();
-        panelTabGobSess.setLayout(new BoxLayout(panelTabGobSess,BoxLayout.PAGE_AXIS));
-        panelTabGobSess.add(new JScrollPane(listGobsTemp));
+        JPanel panelTabGobSess = new JPanel(new GridBagLayout());
+        panelTabGobSess.add(new JScrollPane(listGobsTemp), c);
         tabbedPaneGobs.addTab("Session("+ZeeConfig.mapGobSession.size()+")", panelTabGobSess);
 
 
         //panel gobs main buttons
         JPanel panelGobButtons = new JPanel(new FlowLayout());
-        panelTabGobSess.add(panelGobButtons);
+        panelTabGobSess.add(panelGobButtons, c);
         panelGobButtons.add(btnRefresh = new JButton("refresh"));
         btnRefresh.addActionListener(evt -> {
             buildTabGobs();
@@ -488,18 +457,17 @@ public class ZeecowOptionsWindow extends JFrame {
 
         //subtab gobs category
         listGobsCategories = new JList<String>(ZeeConfig.mapCategoryGobs.keySet().toArray(new String[0]));
-        panelTabCateg = new JPanel();
-        panelTabCateg.setLayout(new BoxLayout(panelTabCateg, BoxLayout.PAGE_AXIS));
+        panelTabCateg = new JPanel(new GridBagLayout());
         tabbedPaneGobs.addTab("Categs("+ZeeConfig.mapCategoryGobs.size()+")", panelTabCateg);
         JPanel panelButtonCateg = new JPanel(new FlowLayout());
-        panelTabCateg.add(panelButtonCateg);
-        panelButtonCateg.add(btnResetCateg = new JButton("Reset"), BorderLayout.NORTH);
+        panelTabCateg.add(panelButtonCateg, c);
+        panelButtonCateg.add(btnResetCateg = new JButton("Reset"));
         btnResetCateg.addActionListener(evt->{ resetCategoriesToDefault(); });
-        panelButtonCateg.add(btnAddCateg = new JButton("Add"), BorderLayout.NORTH);
+        panelButtonCateg.add(btnAddCateg = new JButton("Add"));
         btnAddCateg.addActionListener(evt->{ addCategoryNew(); });
-        panelButtonCateg.add(btnRemoveCateg = new JButton("Remove"), BorderLayout.NORTH);
+        panelButtonCateg.add(btnRemoveCateg = new JButton("Remove"));
         btnRemoveCateg.addActionListener(evt->{ removeCategory(); });
-        panelTabCateg.add(new JScrollPane(listGobsCategories), BorderLayout.CENTER);
+        panelTabCateg.add(new JScrollPane(listGobsCategories), c);
         listGobsCategories.addListSelectionListener(new ListSelectionListener() {
             public void valueChanged(ListSelectionEvent evt) {
                 if(evt.getValueIsAdjusting() || tabbedPaneGobs.getSelectedIndex()!=TABGOB_CATEGS)
@@ -508,8 +476,24 @@ public class ZeecowOptionsWindow extends JFrame {
             }
         });
 
-        panelTabGobs.add(panelDetailsBottom);
+        panelTabGobs.add(panelDetailsBottom, c);
         pack();
+    }
+
+    private void resetActionUses() {
+        if(JOptionPane.showConfirmDialog(this,"Confirm reset action uses?") != JOptionPane.OK_OPTION){
+            return;
+        }
+        Utils.setpref(ZeeConfig.MAP_ACTION_USES,"");
+        ZeeConfig.mapActionUses = ZeeConfig.initMapActionUses();
+    }
+
+    private void resetWindowsPos() {
+        if(JOptionPane.showConfirmDialog(this,"Confirm reset windows pos?") != JOptionPane.OK_OPTION){
+            return;
+        }
+        Utils.setpref(ZeeConfig.MAP_WND_POS,"");
+        ZeeConfig.mapWindowPos = ZeeConfig.initMapWindowPos();
     }
 
     private JList<String> fillUpListGobsSaved() {
@@ -582,39 +566,39 @@ public class ZeecowOptionsWindow extends JFrame {
         panelDetailsBottom.removeAll();
 
         //gob name
-        JPanel panelGobName = new JPanel();
-        panelDetailsBottom.add(panelGobName);
+        JPanel panelGobName = new JPanel(new GridBagLayout());
+        panelDetailsBottom.add(panelGobName, c);
         panelGobName.setBorder(BorderFactory.createTitledBorder("Gob"));
-        panelGobName.add(tfGobName = new JTextField(list.getSelectedValue()),BorderLayout.NORTH);
+        panelGobName.add(tfGobName = new JTextField(list.getSelectedValue()), c);
         tfGobName.setMaximumSize(new Dimension(Integer.MAX_VALUE, tfGobName.getPreferredSize().height));
 
         //audio file name
-        JPanel panelGobAudio = new JPanel();
-        panelDetailsBottom.add(panelGobAudio);
+        JPanel panelGobAudio = new JPanel(new GridBagLayout());
+        panelDetailsBottom.add(panelGobAudio, c);
         panelGobAudio.setBorder(BorderFactory.createTitledBorder("Audio"));
         panelGobAudio.add(Box.createVerticalGlue());
         String audioPath = ZeeConfig.mapGobAudio.get(list.getSelectedValue());
         if(audioPath==null)
             audioPath = "";
-        panelGobAudio.add(tfAudioPath = new JTextField(audioPath),BorderLayout.CENTER);
+        panelGobAudio.add(tfAudioPath = new JTextField(audioPath), c);
         tfAudioPath.setMaximumSize(new Dimension(Integer.MAX_VALUE, tfAudioPath.getPreferredSize().height));
 
         //audio buttons
         JPanel panelAudioButtons;
-        panelGobAudio.add(panelAudioButtons = new JPanel(new FlowLayout()));
-        panelAudioButtons.add(btnAudioSave = new JButton("Select"),BorderLayout.SOUTH);
+        panelGobAudio.add(panelAudioButtons = new JPanel(new FlowLayout()), c);
+        panelAudioButtons.add(btnAudioSave = new JButton("Select"));
         btnAudioSave.addActionListener(evt->{ audioSave(); });
-        panelAudioButtons.add(btnAudioClear = new JButton("Clear"),BorderLayout.SOUTH);
+        panelAudioButtons.add(btnAudioClear = new JButton("Clear"));
         btnAudioClear.addActionListener(evt->{ audioClear(); });
-        panelAudioButtons.add(btnAudioTest = new JButton("Play"),BorderLayout.SOUTH);
+        panelAudioButtons.add(btnAudioTest = new JButton("Play"));
         btnAudioTest.addActionListener(evt->{ audioTest(); });
 
 
         //combo category
-        JPanel panelAddToCategory = new JPanel();
-        panelDetailsBottom.add(panelAddToCategory);
+        JPanel panelAddToCategory = new JPanel(new GridBagLayout());
+        panelDetailsBottom.add(panelAddToCategory, c);
         panelAddToCategory.setBorder(BorderFactory.createTitledBorder("Category"));
-        panelAddToCategory.add(cmbGobCategory = new JComboBox<String>(ZeeConfig.mapCategoryGobs.keySet().toArray(new String[0])),BorderLayout.CENTER);
+        panelAddToCategory.add(cmbGobCategory = new JComboBox<String>(ZeeConfig.mapCategoryGobs.keySet().toArray(new String[0])), c);
         cmbGobCategory.setMaximumSize(new Dimension(Integer.MAX_VALUE, cmbGobCategory.getPreferredSize().height));
 
         //init combo categ state
@@ -631,24 +615,25 @@ public class ZeecowOptionsWindow extends JFrame {
         });
 
         //add button remove from categ
-        panelAddToCategory.add(Box.createVerticalGlue());
-        panelAddToCategory.add(btnRemGobFromCateg = new JButton("Clear"),BorderLayout.SOUTH);
+        panelAddToCategory.add(btnRemGobFromCateg = new JButton("Clear"), c);
         btnRemGobFromCateg.addActionListener(evt->{ removeGobFromCategory(); });
 
 
         //Color highlight
         //button
-        JPanel panelHighlight = new JPanel(new GridLayout(1,3));
-        panelDetailsBottom.add(panelHighlight);
+        JPanel panelHighlight = new JPanel(new GridBagLayout());
+        panelDetailsBottom.add(panelHighlight, c);
         panelHighlight.setBorder(BorderFactory.createTitledBorder("Highlight Color"));
-        panelHighlight.add(btnGobColorAdd = new JButton("Select"));
+        c.gridwidth = GridBagConstraints.RELATIVE;
+        panelHighlight.add(btnGobColorAdd = new JButton("Select") , c);
         btnGobColorAdd.addActionListener(evt->{
             Color color = JColorChooser.showDialog(panelHighlight, "Gob Highlight Color", Color.MAGENTA);
             if(color!=null){
                 addGobColor(tfGobName.getText(), color);
             }
         });
-        panelHighlight.add(btnGobColorRemove = new JButton("Clear"));
+        c.gridwidth = GridBagConstraints.REMAINDER;
+        panelHighlight.add(btnGobColorRemove = new JButton("Clear"), c);
         btnGobColorRemove.addActionListener(evt->{
             removeGobColor();
         });
@@ -656,7 +641,7 @@ public class ZeecowOptionsWindow extends JFrame {
         Color color = ZeeConfig.mapGobColor.get(tfGobName.getText());
         int alpha = color!=null ? color.getAlpha() : 200;
         sliderAlpha = new JSlider(JSlider.HORIZONTAL,0, 255, alpha);
-        panelHighlight.add(sliderAlpha);
+        panelHighlight.add(sliderAlpha, c);
         sliderAlpha.addChangeListener(evt -> {
             if(!sliderAlpha.getValueIsAdjusting()) {
                 updateGobColorAlpha();
@@ -767,26 +752,26 @@ public class ZeecowOptionsWindow extends JFrame {
         panelDetailsBottom.removeAll();
 
         //category name
-        JPanel panelCategName = new JPanel();
-        panelDetailsBottom.add(panelCategName);
+        JPanel panelCategName = new JPanel(new GridBagLayout());
+        panelDetailsBottom.add(panelCategName, c);
         panelCategName.setBorder(BorderFactory.createTitledBorder("Category"));
         panelCategName.add(tfCategName = new JTextField(listGobsCategories.getSelectedValue()));
         tfCategName.setMaximumSize(new Dimension(Integer.MAX_VALUE, tfCategName.getPreferredSize().height));
         panelCategName.setMaximumSize(new Dimension(Integer.MAX_VALUE, panelCategName.getPreferredSize().height));
 
         //category audio file
-        JPanel panelCategAudio = new JPanel();
-        panelDetailsBottom.add(panelCategAudio);
+        JPanel panelCategAudio = new JPanel(new GridBagLayout());
+        panelDetailsBottom.add(panelCategAudio, c);
         panelCategAudio.setBorder(BorderFactory.createTitledBorder("Audio"));
         String audioPath = ZeeConfig.mapCategoryAudio.get(listGobsCategories.getSelectedValue());
         if(audioPath==null)
             audioPath = "";
-        panelCategAudio.add(tfAudioPathCateg = new JTextField(audioPath));
+        panelCategAudio.add(tfAudioPathCateg = new JTextField(audioPath), c);
         tfAudioPathCateg.setMaximumSize(new Dimension(Integer.MAX_VALUE, tfAudioPathCateg.getPreferredSize().height));
 
         //audio buttons
-        JPanel panelCategAudioButtons = new JPanel();
-        panelCategAudio.add(panelCategAudioButtons);
+        JPanel panelCategAudioButtons = new JPanel(new FlowLayout());
+        panelCategAudio.add(panelCategAudioButtons, c);
         panelCategAudioButtons.add(btnAudioSave = new JButton("Select"));
         btnAudioSave.addActionListener(evt->{ audioSave(); });
         panelCategAudioButtons.add(btnAudioClear = new JButton("Clear"));
@@ -798,17 +783,19 @@ public class ZeecowOptionsWindow extends JFrame {
 
         //Category Color highlight
         //button
-        JPanel panelHighlight = new JPanel(new GridLayout(1,3));
-        panelDetailsBottom.add(panelHighlight);
+        JPanel panelHighlight = new JPanel(new GridBagLayout());
+        panelDetailsBottom.add(panelHighlight, c);
         panelHighlight.setBorder(BorderFactory.createTitledBorder("Highlight Color"));
-        panelHighlight.add(btnCategoryColorAdd = new JButton("Select"));
+        c.gridwidth = GridBagConstraints.RELATIVE;
+        panelHighlight.add(btnCategoryColorAdd = new JButton("Select"), c);
         btnCategoryColorAdd.addActionListener(evt->{
             Color color = JColorChooser.showDialog(panelHighlight, "Category Highlight Color", Color.MAGENTA);
             if(color!=null){
                 addCategoryColor(tfCategName.getText(), color);
             }
         });
-        panelHighlight.add(btnCategoryColorRemove = new JButton("Clear"));
+        c.gridwidth = GridBagConstraints.REMAINDER;
+        panelHighlight.add(btnCategoryColorRemove = new JButton("Clear"), c);
         btnCategoryColorRemove.addActionListener(evt->{
             removeCategoryColor();
         });
@@ -818,7 +805,7 @@ public class ZeecowOptionsWindow extends JFrame {
         if(alpha == 1)
             alpha = 200;
         sliderAlpha = new JSlider(JSlider.HORIZONTAL,0, 255, alpha);
-        panelHighlight.add(sliderAlpha);
+        panelHighlight.add(sliderAlpha, c);
         sliderAlpha.addChangeListener(evt -> {
             if(!sliderAlpha.getValueIsAdjusting()) {
                 updateCategoryColorAlpha();
