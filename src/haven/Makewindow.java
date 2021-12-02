@@ -159,26 +159,35 @@ public class Makewindow extends Widget {
     public Makewindow(String rcpnm) {
 	add(new Label("Input:"), new Coord(0, UI.scale(8)));
 	add(new Label("Result:"), new Coord(0, outy + UI.scale(8)));
-	add(ZeeConfig.btnSearchInput = new Button(UI.scale(85), "Search"), UI.scale(new Coord(170, 75))).action(() -> wdgmsg("mkWindowFindInputs", 0));
+	add(ZeeConfig.btnMkWndBack = new Button(UI.scale(30), "<"), UI.scale(new Coord(100, 75))).action(() -> wdgmsg("mkWindowHistoryBack", 0));
+	add(ZeeConfig.btnMkWndFwd = new Button(UI.scale(30), ">"), UI.scale(new Coord(135, 75))).action(() -> wdgmsg("mkWindowHistoryFwd", 0));
+	add(ZeeConfig.btnMkWndSearchInput = new Button(UI.scale(85), "Search"), UI.scale(new Coord(170, 75))).action(() -> wdgmsg("mkWindowFindInputs", 0));
 	add(new Button(UI.scale(85), "Craft"), UI.scale(new Coord(265, 75))).action(() -> wdgmsg("make", 0)).setgkey(kb_make);
 	add(new Button(UI.scale(85), "Craft All"), UI.scale(new Coord(360, 75))).action(() -> wdgmsg("make", 1)).setgkey(kb_makeall);
 	pack();
 	this.rcpnm = rcpnm;
 	ZeeConfig.actionUsed(rcpnm);
+	ZeeConfig.craftHistoryUpdtBtns();
     }
 
 	int inputCount = 0;
-	@Override
-	public void wdgmsg(String msg, Object... args) {
-    	if(msg.contentEquals("mkWindowFindInputs")){
+	public void wdgmsg(Widget sender, String msg, Object... args) {
+		if(msg.contentEquals("mkWindowFindInputs")){
     		String nextInputName = ZeeConfig.getItemInfoName(inputs.get(inputCount).info());
 			ZeeConfig.searchNextInputMakeWnd(nextInputName);
 			inputCount++;
 			if(inputCount >= inputs.size())
 				inputCount = 0;
-			ZeeConfig.btnSearchInput.change("Search "+(inputCount+1)+"/"+inputs.size());
-		}else {
-			super.wdgmsg(msg, args);
+			ZeeConfig.btnMkWndSearchInput.change("Search "+(inputCount+1)+"/"+inputs.size());
+		} else if(msg.contentEquals("mkWindowHistoryBack")) {
+			ZeeConfig.craftHistoryGoBack();
+		} else if(msg.contentEquals("mkWindowHistoryFwd")) {
+			ZeeConfig.craftHistoryGoFwd();
+		} else if(msg.contentEquals("close")) {
+			ZeeConfig.craftHistoryReset();
+			super.wdgmsg(sender, msg, args);
+		} else {
+			super.wdgmsg(sender, msg, args);
 		}
 	}
 
@@ -195,8 +204,8 @@ public class Makewindow extends Widget {
 		inputs.add(new Spec(ui.sess.getres(resid), sdt, num, info));
 	    }
 	    this.inputs = inputs;
-	    if(ZeeConfig.btnSearchInput != null)
-	    	ZeeConfig.btnSearchInput.change("Search "+1+"/"+inputs.size());
+	    if(ZeeConfig.btnMkWndSearchInput != null)
+	    	ZeeConfig.btnMkWndSearchInput.change("Search "+1+"/"+inputs.size());
 	} else if(msg == "opop") {
 	    List<Spec> outputs = new LinkedList<Spec>();
 	    for(int i = 0; i < args.length;) {
@@ -317,7 +326,7 @@ public class Makewindow extends Widget {
 		    Coord tsz = qmicon(qm).sz();
 		    if(mc.isect(c, tsz))
 			return(qm.get().layer(Resource.tooltip).t);
-		    c = c.add(tsz.x + UI.scale(1), 0);
+		    c = c.add(tsz.x + UI.scale(30), 0);
 		}
 	    } catch(Loading l) {
 	    }

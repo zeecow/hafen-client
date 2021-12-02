@@ -20,7 +20,6 @@ import java.util.stream.Collectors;
 
 
 public class ZeeConfig {
-    public static final int KEYCODE_TAB = 9;
     public static final String CATEG_PVPANDSIEGE = "PVP and siege";
     public static final String CATEG_AGROCREATURES = "Agressive creatures";
     public static final String CATEG_RAREFORAGE = "Rare forageables";
@@ -44,7 +43,7 @@ public class ZeeConfig {
     public static Window windowEquipment,windowInvMain;
     public static ZeeInvMainOptionsWdg invMainoptionsWdg;
     public static ZeecowOptionsWindow zeecowOptions;
-    public static Button btnSearchInput;
+    public static Button btnMkWndSearchInput, btnMkWndBack, btnMkWndFwd;
 
     public static String playingAudio = null;
     public static boolean clickPetal = false;
@@ -65,6 +64,8 @@ public class ZeeConfig {
     public static String butcherAutoList = Utils.getpref("butcherAutoList","Break,Scale,Wring neck,Kill,Skin,Flay,Pluck,Clean,Butcher,Collect bones");
     public static boolean cattleRosterHeight = Utils.getprefb("cattleRosterHeight", false);
     public static double cattleRosterHeightPercentage = Utils.getprefd("cattleRosterHeightPercentage", 1.0);
+    public static List<String> craftHistoryList = new ArrayList<String>();
+    public static int craftHistoryPos = -1;
     public static boolean ctrlClickMinimapContent = Utils.getprefb("dropCtrlClickMinimapContent", true);
     public static boolean debugWidgetMsgs = false;//disabled by default
     public static boolean debugCodeRes = Utils.getprefb("debugCodeRes", false);
@@ -1015,7 +1016,7 @@ public class ZeeConfig {
 
     public static boolean matchKeyShortcut(KeyEvent ev) {
         // Shift+Tab toggles Belt
-        if(ZeeConfig.keyBeltShiftTab && ev.getKeyCode()==KEYCODE_TAB && ev.isShiftDown()){
+        if(ZeeConfig.keyBeltShiftTab && ev.getKeyCode()==KeyEvent.VK_TAB && ev.isShiftDown()){
             Window belt = getWindow("Belt");
             if( belt != null){
                 belt.getchild(Button.class).click();//click close button
@@ -1125,6 +1126,44 @@ public class ZeeConfig {
 
     public static void println(String s) {
         System.out.println(s);
+    }
+
+
+    public static void craftHistoryAdd(String msg, Object[] args) {
+        // haven.MenuGrid@c046fa2, act, [craft, snowball, 0]
+        if(!msg.contentEquals("act") || !args[0].toString().contentEquals("craft"))
+            return;
+        String name = (String) args[1];
+        if(craftHistoryList.contains(name))
+            return;
+        craftHistoryList.add(name);
+        craftHistoryPos = craftHistoryList.size() - 1;
+    }
+
+    public static void craftHistoryGoBack() {
+        if(craftHistoryPos <= 0)
+            return;
+        craftHistoryPos--;
+        craftHistoryUpdtBtns();
+        gameUI.menu.wdgmsg("act", "craft", craftHistoryList.get(craftHistoryPos), "0");
+    }
+
+    public static void craftHistoryGoFwd() {
+        if(craftHistoryPos == craftHistoryList.size()-1)
+            return;
+        craftHistoryPos++;
+        craftHistoryUpdtBtns();
+        gameUI.menu.wdgmsg("act", "craft", craftHistoryList.get(craftHistoryPos), "0");
+    }
+
+    public static void craftHistoryUpdtBtns() {
+        btnMkWndBack.change("<" + (craftHistoryPos==0 ? "" : craftHistoryPos) );
+        btnMkWndFwd.change(">" + (craftHistoryPos==craftHistoryList.size()-1 ? "" : (craftHistoryList.size()-1-craftHistoryPos)) );
+    }
+
+    public static void craftHistoryReset() {
+        craftHistoryList.clear();
+        craftHistoryPos = -1;
     }
 }
 

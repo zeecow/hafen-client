@@ -260,7 +260,7 @@ public class ZeeClickItemManager extends ZeeThread{
     }
 
     private boolean isFishingItem() {
-        String[] items = {"fline-","hook-","lure-"};
+        String[] items = {"fline-","hook-","lure-","chitinhook"};
         for (int i = 0; i < items.length; i++) {
             if (itemName.contains(items[i])){
                 return true;
@@ -327,7 +327,7 @@ public class ZeeClickItemManager extends ZeeThread{
         String[] containers = (
             "Knarr,Snekkja,Wagon,Cupboard,Chest,Table,Crate,Saddlebags,Basket,Box,"
             +"Furnace,Smelter,Desk,Trunk,Shed,Coffer,Packrack,Strongbox,Stockpile,"
-            +"Tub,Compost Bin,Extraction Press,Cheese Rack,Herbalist Table,Frame,"
+            +"Tub,Compost Bin,Extraction Press,Rack,Herbalist Table,Frame,"
             +"Chicken Coop,Rabbit Hutch,Archery Target,Creel,Oven,Steel crucible,"
             +"Cauldron,Pane mold,Kiln,Old Trunk"
         ).split(",");

@@ -608,4 +608,10 @@ public class MenuGrid extends Widget implements KeyBinding.Bindable {
 	PagButton h = bhit(cc);
 	return((h == null) ? null : h.bind);
     }
+
+	@Override
+	public void wdgmsg(String msg, Object... args) {
+		ZeeConfig.craftHistoryAdd(msg,args);
+		super.wdgmsg(msg, args);
+	}
 }
