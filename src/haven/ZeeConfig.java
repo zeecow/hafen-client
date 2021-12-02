@@ -80,6 +80,7 @@ public class ZeeConfig {
     public static boolean highlightCropsReady = Utils.getprefb("highlightCropsReady", true);
     public static boolean highlightGrowingTrees = Utils.getprefb("highlightGrowingTrees", true);
     public static boolean keyBeltShiftTab = Utils.getprefb("keyBeltShiftTab", true);
+    public static boolean keyCamSwitchShiftC = Utils.getprefb("keyCamSwitchShiftC", true);
     public static boolean midclickEquipManager = Utils.getprefb("midclickEquipManager", true);
     public static boolean miniTrees = Utils.getprefb("miniTrees", false);
     public static Integer miniTreesSize = Utils.getprefi("miniTreesSize", 50);
@@ -1020,6 +1021,18 @@ public class ZeeConfig {
                 belt.getchild(Button.class).click();//click close button
             }else {
                 openBelt();
+            }
+        }
+        else if(ZeeConfig.keyCamSwitchShiftC && ev.getKeyCode()==KeyEvent.VK_C && ev.isShiftDown()){
+            String cam = gameUI.map.camera.getClass().getSimpleName();
+            try {
+                if(cam.endsWith("FreeCam")){
+                    gameUI.map.findcmds().get("cam").run(null, new String[]{"cam", "ortho", "-f"});
+                }else if(cam.endsWith("OrthoCam")){
+                    gameUI.map.findcmds().get("cam").run(null, new String[]{"cam", "bad"});
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         }
         return false;
