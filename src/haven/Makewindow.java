@@ -26,6 +26,7 @@
 
 package haven;
 
+import java.awt.event.KeyEvent;
 import java.util.*;
 import java.awt.Color;
 import java.awt.image.BufferedImage;
@@ -161,13 +162,15 @@ public class Makewindow extends Widget {
 	add(new Label("Result:"), new Coord(0, outy + UI.scale(8)));
 	add(ZeeConfig.btnMkWndBack = new Button(UI.scale(30), "<"), UI.scale(new Coord(100, 75))).action(() -> wdgmsg("mkWindowHistoryBack", 0));
 	add(ZeeConfig.btnMkWndFwd = new Button(UI.scale(30), ">"), UI.scale(new Coord(135, 75))).action(() -> wdgmsg("mkWindowHistoryFwd", 0));
-	add(ZeeConfig.btnMkWndSearchInput = new Button(UI.scale(85), "Search"), UI.scale(new Coord(170, 75))).action(() -> wdgmsg("mkWindowFindInputs", 0));
+	add(ZeeConfig.btnMkWndDel = new Button(UI.scale(30), "x"), UI.scale(new Coord(170, 75))).action(() -> wdgmsg("mkWindowHistoryDel", 0));
+	add(ZeeConfig.btnMkWndSearchInput = new Button(UI.scale(85), "Search"), UI.scale(new Coord(360, 0))).action(() -> wdgmsg("mkWindowFindInputs", 0));
 	add(new Button(UI.scale(85), "Craft"), UI.scale(new Coord(265, 75))).action(() -> wdgmsg("make", 0)).setgkey(kb_make);
 	add(new Button(UI.scale(85), "Craft All"), UI.scale(new Coord(360, 75))).action(() -> wdgmsg("make", 1)).setgkey(kb_makeall);
 	pack();
 	this.rcpnm = rcpnm;
 	ZeeConfig.actionUsed(rcpnm);
 	ZeeConfig.craftHistoryUpdtBtns();
+	ZeeConfig.makeWindow = this;
     }
 
 	int inputCount = 0;
@@ -183,8 +186,10 @@ public class Makewindow extends Widget {
 			ZeeConfig.craftHistoryGoBack();
 		} else if(msg.contentEquals("mkWindowHistoryFwd")) {
 			ZeeConfig.craftHistoryGoFwd();
+		} else if(msg.contentEquals("mkWindowHistoryDel")) {
+			ZeeConfig.craftHistoryDelItem();
 		} else if(msg.contentEquals("close")) {
-			ZeeConfig.craftHistoryReset();
+			ZeeConfig.craftHistorySave();
 			super.wdgmsg(sender, msg, args);
 		} else {
 			super.wdgmsg(sender, msg, args);

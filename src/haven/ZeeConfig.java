@@ -41,9 +41,10 @@ public class ZeeConfig {
 
     public static GameUI gameUI;
     public static Window windowEquipment,windowInvMain;
+    public static Makewindow makeWindow;
     public static ZeeInvMainOptionsWdg invMainoptionsWdg;
     public static ZeecowOptionsWindow zeecowOptions;
-    public static Button btnMkWndSearchInput, btnMkWndBack, btnMkWndFwd;
+    public static Button btnMkWndSearchInput, btnMkWndBack, btnMkWndFwd, btnMkWndDel;
 
     public static String playingAudio = null;
     public static boolean clickPetal = false;
@@ -64,8 +65,9 @@ public class ZeeConfig {
     public static String butcherAutoList = Utils.getpref("butcherAutoList","Break,Scale,Wring neck,Kill,Skin,Flay,Pluck,Clean,Butcher,Collect bones");
     public static boolean cattleRosterHeight = Utils.getprefb("cattleRosterHeight", false);
     public static double cattleRosterHeightPercentage = Utils.getprefd("cattleRosterHeightPercentage", 1.0);
-    public static List<String> craftHistoryList = new ArrayList<String>();
+    public static List<String> craftHistoryList = initCraftHistory();
     public static int craftHistoryPos = -1;
+    public static boolean isCraftHistoryNavigation = false;
     public static boolean ctrlClickMinimapContent = Utils.getprefb("dropCtrlClickMinimapContent", true);
     public static boolean debugWidgetMsgs = false;//disabled by default
     public static boolean debugCodeRes = Utils.getprefb("debugCodeRes", false);
@@ -708,6 +710,22 @@ public class ZeeConfig {
             return (HashMap<String, String>) deserialize(s);
     }
 
+    public static List<String> initCraftHistory() {
+        String s = Utils.getpref("craftHistoryList", "");
+        if (s.isEmpty()){
+            craftHistoryPos = -1;
+            return new ArrayList<String>();
+        }else{
+            ArrayList<String> arr = new ArrayList<String>();
+            String arrs[] = s.split(",");
+            for (int i = 0; i < arrs.length; i++) {
+                arr.add(arrs[i]);
+            }
+            craftHistoryPos = arr.size();
+            return arr;
+        }
+    }
+
     @SuppressWarnings("unchecked")
     public static HashMap<String, Integer> initMapActionUses() {
         String s = Utils.getpref(MAP_ACTION_USES,"");
@@ -1124,27 +1142,45 @@ public class ZeeConfig {
         });
     }
 
-    public static void println(String s) {
-        System.out.println(s);
-    }
-
-
     public static void craftHistoryAdd(String msg, Object[] args) {
         // haven.MenuGrid@c046fa2, act, [craft, snowball, 0]
-        if(!msg.contentEquals("act") || !args[0].toString().contentEquals("craft"))
+        if( isCraftHistoryNavigation || !msg.contentEquals("act") || !args[0].toString().contentEquals("craft"))
             return;
+
         String name = (String) args[1];
-        if(craftHistoryList.contains(name))
-            return;
+        if(craftHistoryList.contains(name)) { // name already on history
+            craftHistoryList.remove(name);
+        }
         craftHistoryList.add(name);
+
+        if(craftHistoryList.size() > 7) { // max history size
+            craftHistoryList.remove(0);
+        }
+
         craftHistoryPos = craftHistoryList.size() - 1;
+    }
+
+    public static void craftHistoryDelItem() {
+        if (craftHistoryList.size() == 0)
+            return;
+        String name = craftHistoryList.remove(craftHistoryPos);
+        if(craftHistoryPos >= craftHistoryList.size()-1) {
+            craftHistoryPos = craftHistoryList.size() - 1;
+        }
+        if(craftHistoryPos > -1) {
+            isCraftHistoryNavigation = true;
+            gameUI.menu.wdgmsg("act", "craft", craftHistoryList.get(craftHistoryPos), "0");
+        }else{
+            makeWindow.wdgmsg("close");
+        }
     }
 
     public static void craftHistoryGoBack() {
         if(craftHistoryPos <= 0)
             return;
         craftHistoryPos--;
-        craftHistoryUpdtBtns();
+        //craftHistoryUpdtBtns();
+        isCraftHistoryNavigation = true;
         gameUI.menu.wdgmsg("act", "craft", craftHistoryList.get(craftHistoryPos), "0");
     }
 
@@ -1152,7 +1188,8 @@ public class ZeeConfig {
         if(craftHistoryPos == craftHistoryList.size()-1)
             return;
         craftHistoryPos++;
-        craftHistoryUpdtBtns();
+        //craftHistoryUpdtBtns();
+        isCraftHistoryNavigation = true;
         gameUI.menu.wdgmsg("act", "craft", craftHistoryList.get(craftHistoryPos), "0");
     }
 
@@ -1161,9 +1198,14 @@ public class ZeeConfig {
         btnMkWndFwd.change(">" + (craftHistoryPos==craftHistoryList.size()-1 ? "" : (craftHistoryList.size()-1-craftHistoryPos)) );
     }
 
-    public static void craftHistoryReset() {
-        craftHistoryList.clear();
-        craftHistoryPos = -1;
+    public static void craftHistorySave() {
+        Utils.setpref("craftHistoryList", String.join(",", craftHistoryList));
+        craftHistoryPos = craftHistoryList.size() - 1;
+    }
+
+
+    public static void println(String s) {
+        System.out.println(s);
     }
 }
 

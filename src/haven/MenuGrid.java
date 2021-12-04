@@ -69,6 +69,9 @@ public class MenuGrid extends Widget implements KeyBinding.Bindable {
 
 	public Interaction(int btn, int modflags) {
 	    this(btn, modflags, null, null);
+		if(btn==1){
+			ZeeConfig.isCraftHistoryNavigation = false;
+		}
 	}
 
 	public Interaction() {
