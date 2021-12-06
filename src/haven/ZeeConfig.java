@@ -51,6 +51,7 @@ public class ZeeConfig {
     public static String clickPetalName = "";
     public static String uiMsgTextQuality, uiMsgTextBuffer;
     public static long now, lastUiMessageMs = 0;
+    public static Object[] lastMapViewClickArgs;
 
     public static boolean actionSearchGlobal = Utils.getprefb("actionSearchGlobal", true);
     public static boolean alertOnPlayers = Utils.getprefb("alertOnPlayers", true);

@@ -225,6 +225,11 @@ public class ZeeClickItemManager extends ZeeThread{
     private void equipFishingItem() {
         //   gfx/invobjs/small/primrod-h
         //   gfx/invobjs/small/bushpole-l
+        /*
+            haven.MenuGrid@35e8b5d9 ; act ; [fish, 0]
+            haven.GameUI@3692df36 ; focus ; [8]
+            haven.MapView@6c6f1998 ; click ; [(711, 519), (1067680, 1019086), 1, 0, 0, 156122677, (1068567, 1021959), 0, -1]
+         */
         try {
             if (itemName.contains("lure-")){
                 // equip lure on primrod
@@ -254,6 +259,11 @@ public class ZeeClickItemManager extends ZeeThread{
                     wItem.getparent(Inventory.class).wdgmsg("drop", wItem.c.div(33));
                 }
             }
+
+            // click fishing spot again
+            Thread.sleep(PING_MS / 2);
+            ZeeConfig.gameUI.map.wdgmsg("click", ZeeConfig.lastMapViewClickArgs);
+
         } catch (InterruptedException e) {
             e.printStackTrace();
         }

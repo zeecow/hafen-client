@@ -10,9 +10,11 @@ original features:
  - shorter cattle roster window
  - reposition map window when compacted/expanded
  - basic inventory item counter
- - MidClick gobs/items for inspect, sort-transfer, pick up, Giddyup!, light torch, auto-equip from belt, more?
- - LongMidClick gobs/items for lift up, destroy trellis plant, equip shovel and remove stump, more?
- - Ctrl+LongMidClick to kill all cocoons, auto-fill oven and smelter
+ - MidClick gob: [inspect] , [Giddyup!] , [light torch]
+   - LongMidClick gob: [lift up] , [destroy trellis plant]
+ - MidClick item: [sort-transfer] , [pick-up all] , [quick-equip from belt]
+   - LongMidClick item: [sort-transfer inverse] , [equip fishing item and recast]
+   - CtrlLongMidClick item: [kill all silk-cocoons] , [auto-fill oven/smelter]
 
 other stuff:
  - autodrop mined items, seeds, soil
@@ -22,7 +24,7 @@ other stuff:
  - replaces arrow cursor with system's default
  - show claims by default
  - optional friend online notification
- - craft window numbers
+ - craft window numbers, history, search ingredients
  - highlight damaged gobs more  
  - highlight finished crops, growing trees, gobs and categories
  - zoom extended for ortho cam
