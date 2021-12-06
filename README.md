@@ -12,9 +12,10 @@ original features:
  - basic inventory item counter
  - MidClick gob: [inspect] , [Giddyup!] , [light torch]
    - LongMidClick gob: [lift up] , [destroy trellis plant]
+   - CtrlLongMidClick gob: [auto-fill oven/smelter]
  - MidClick item: [sort-transfer] , [pick-up all] , [quick-equip from belt]
    - LongMidClick item: [sort-transfer inverse] , [equip fishing item and recast]
-   - CtrlLongMidClick item: [kill all silk-cocoons] , [auto-fill oven/smelter]
+   - CtrlLongMidClick item: [kill all silk-cocoons]
 
 other stuff:
  - autodrop mined items, seeds, soil

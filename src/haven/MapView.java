@@ -744,11 +744,11 @@ public class MapView extends PView implements DTarget, Console.Directory {
 		    return(map.getcut(cc));
 		}
 	    };
-	final Grid flavobjs = new Grid<RenderTree.Node>(false) {
+	/*final Grid flavobjs = new Grid<RenderTree.Node>(false) {
 		RenderTree.Node getcut(Coord cc) {
 		    return(map.getfo(cc));
 		}
-	    };
+	    };*/
 
 	private Terrain() {
 	}
@@ -757,13 +757,13 @@ public class MapView extends PView implements DTarget, Console.Directory {
 	    super.tick();
 	    if(area != null) {
 		main.tick();
-		flavobjs.tick();
+		//flavobjs.tick();
 	    }
 	}
 
 	public void added(RenderTree.Slot slot) {
 	    slot.add(main);
-	    slot.add(flavobjs);
+	    //slot.add(flavobjs);
 	    super.added(slot);
 	}
 
@@ -773,8 +773,8 @@ public class MapView extends PView implements DTarget, Console.Directory {
 		return(ret);
 	    if((ret = main.lastload) != null)
 		return(ret);
-	    if((ret = flavobjs.lastload) != null)
-		return(ret);
+	    //if((ret = flavobjs.lastload) != null)
+		//return(ret);
 	    return(null);
 	}
     }
