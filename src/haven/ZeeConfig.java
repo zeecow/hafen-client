@@ -408,6 +408,10 @@ public class ZeeConfig {
         return false;
     }
 
+    public static boolean isKritter(String name){
+        return name.contains("/kritter/");
+    }
+
     public static boolean isBird(String name){
         String[] list = {
             "rockdove","quail","/chick","/hen","/rooster","eagle","owl","magpie",
@@ -439,7 +443,7 @@ public class ZeeConfig {
 
     public static boolean isMushroom(String name){
         String[] list = {
-            "bolete","truffle","trumpet","cavelantern","chanterelles","morel","fairy","blewit",
+            "bolete","truffle","trumpet","cavelantern","chantrelle","morel","fairy","blewit",
             "puffball","indigo","parasol","snowtop","yellowfeet"
         };
         for (int i = 0; i < list.length; i++) {
@@ -453,6 +457,18 @@ public class ZeeConfig {
         String[] list = {
             "trees/linden","trees/birch","trees/wartybirch","trees/willow","trees/cedar",
             "trees/elm","trees/juniper","trees/beech","trees/mulberry"
+        };
+        for (int i = 0; i < list.length; i++) {
+            if(name.contains(list[i]))
+                return true;
+        }
+        return false;
+    }
+
+    public static boolean isTreeBough(String name){
+        String[] list = {
+                "trees/linden","trees/alder","trees/yew","trees/spruce",
+                "trees/elm","trees/fir","trees/sweetgum"
         };
         for (int i = 0; i < list.length; i++) {
             if(name.contains(list[i]))

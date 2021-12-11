@@ -370,10 +370,12 @@ public class GobIcon extends GAttrib {
 		radioGroup.add("herb", prev.pos("bl").adds(5, 55));
 		radioGroup.add("mush", prev.pos("bl").adds(53, 55));
 		radioGroup.add("string", prev.pos("bl").adds(105, 55));
+		radioGroup.add("kritt", prev.pos("bl").adds(155, 55));
 		radioGroup.add("tree", prev.pos("bl").adds(5, 75));
-		radioGroup.add("bark", prev.pos("bl").adds(60, 75));
-		radioGroup.add("fruit", prev.pos("bl").adds(105, 75));
-		radioGroup.add("nuts", prev.pos("bl").adds(150, 75));
+		radioGroup.add("bark", prev.pos("bl").adds(50, 75));
+		radioGroup.add("bough", prev.pos("bl").adds(98, 75));
+		radioGroup.add("fruit", prev.pos("bl").adds(150, 75));
+		radioGroup.add("nuts", prev.pos("bl").adds(195, 75));
 		radioGroup.check(0);
 
 	    pack();
@@ -399,10 +401,14 @@ public class GobIcon extends GAttrib {
 			filteredList.entrySet().removeIf(entry -> !ZeeConfig.isMushroom(entry.getKey()));
 		else if(filterName.equals("string"))
 			filteredList.entrySet().removeIf(entry -> !ZeeConfig.isString(entry.getKey()));
+		else if(filterName.equals("kritt"))
+			filteredList.entrySet().removeIf(entry -> !ZeeConfig.isKritter(entry.getKey()));
 		else if(filterName.equals("tree"))
 			filteredList.entrySet().removeIf(entry -> !ZeeConfig.isTree(entry.getKey()));
 		else if(filterName.equals("bark"))
 			filteredList.entrySet().removeIf(entry -> !ZeeConfig.isTreeToughBark(entry.getKey()));
+		else if(filterName.equals("bough"))
+			filteredList.entrySet().removeIf(entry -> !ZeeConfig.isTreeBough(entry.getKey()));
 		else if(filterName.equals("fruit"))
 			filteredList.entrySet().removeIf(entry -> !ZeeConfig.isTreeFruit(entry.getKey()));
 		else if(filterName.equals("nuts"))
