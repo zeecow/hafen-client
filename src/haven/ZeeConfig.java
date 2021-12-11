@@ -1144,6 +1144,8 @@ public class ZeeConfig {
     //reset state
     public static void resetCharSelected() {
         resetBeltState();
+        ZeeClickGobManager.mainInv = null;
+        ZeeClickItemManager.equipory = null;
     }
 
     private static void resetBeltState() {
