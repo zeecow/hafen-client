@@ -1,12 +1,9 @@
 package haven;
 
-import java.util.Arrays;
-import java.util.regex.Pattern;
-
 public class ZeeInvMainOptionsWdg extends Widget {
 
     Label labelDrop, labelCount;
-    CheckBox cbSeeds, cbSoil, cbButcher, cbAutomenu;
+    public static CheckBox cbSeeds, cbSoil, cbButcher, cbFarmer, cbAutomenu;
     Widget invSlots;
 
     public ZeeInvMainOptionsWdg(String windowCap) {
@@ -34,15 +31,29 @@ public class ZeeInvMainOptionsWdg extends Widget {
 
         x += cbAutomenu.sz.x + 5;
 
-        add(cbButcher = new CheckBox("butchmode") {
+        add(cbButcher = new CheckBox("butch") {
             {
-                a = ZeeConfig.butcherAuto;
+                a = ZeeConfig.butcherMode;
             }
 
             public void set(boolean val) {
-                Utils.setprefb("butcherAuto", val);
-                ZeeConfig.butcherAuto = val;
+                ZeeConfig.butcherMode = val;
                 a = val;
+            }
+        }, x, 0);
+
+        x += cbButcher.sz.x + 5;
+
+        add(cbFarmer = new CheckBox("farm") {
+            {
+                a = ZeeConfig.farmerMode;
+            }
+
+            public void set(boolean val) {
+                ZeeConfig.farmerMode = val;
+                a = val;
+                if(!val)
+                    ZeeFarmingManager.busy = false;
             }
         }, x, 0);
 
@@ -54,7 +65,6 @@ public class ZeeInvMainOptionsWdg extends Widget {
             }
 
             public void set(boolean val) {
-                Utils.setprefb("dropSeeds", val);
                 ZeeConfig.dropSeeds = val;
                 a = val;
             }
@@ -68,7 +78,6 @@ public class ZeeInvMainOptionsWdg extends Widget {
             }
 
             public void set(boolean val) {
-                Utils.setprefb("dropSoil", val);
                 ZeeConfig.dropSoil = val;
                 a = val;
             }

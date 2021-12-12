@@ -77,7 +77,7 @@ public class Inventory extends Widget implements DTarget {
 	invsq = new TexI(PUtils.rasterimg(buf));
     }
 
-    @RName("inv")
+	@RName("inv")
     public static class $_ implements Factory {
 	public Widget create(UI ui, Object[] args) {
 	    return(new Inventory((Coord)args[0]));
@@ -194,7 +194,7 @@ public class Inventory extends Widget implements DTarget {
     	int count = 0;
 		for (Widget wdg = child; wdg != null; wdg = wdg.next) {
 			if (wdg instanceof WItem) {
-				String wdgname = ((WItem) wdg).item.res.get().basename();
+				String wdgname = ((WItem) wdg).item.res.get().name;
 				if (wdgname.contains(name)) {
 					count++;
 					break;
@@ -204,6 +204,7 @@ public class Inventory extends Widget implements DTarget {
 		return count;
 	}
 
+	// FIXME: collect() may throw NullException if filter finds a null
 	public List<WItem> getWItemsByName(String name) {
 		return this.children(WItem.class)
 				.stream()
@@ -330,6 +331,15 @@ public class Inventory extends Widget implements DTarget {
 		for (WItem item : this.children(WItem.class)) {
 			if (c.isect(xlate(item.c, true), item.sz)) {
 				return item;
+			}
+		}
+		return null;
+	}
+
+	public WItem getWItemByGItem(GItem gItem) {
+		for (WItem wItem : this.children(WItem.class)) {
+			if (wItem.item.equals(gItem)) {
+				return wItem;
 			}
 		}
 		return null;

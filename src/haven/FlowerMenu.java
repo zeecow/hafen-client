@@ -294,7 +294,7 @@ public class FlowerMenu extends Widget {
 			}
 			return;
 		}
-		if(ZeeConfig.butcherAuto) {
+		if(ZeeConfig.butcherMode) {
 			String[] list = ZeeConfig.butcherAutoList.split(",");
 			for (int i = 0; i < opts.length; i++) {
 				for (int j = 0; j < list.length; j++) {

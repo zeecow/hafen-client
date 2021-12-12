@@ -7,18 +7,10 @@ public class ZeeMiningManager extends Thread{
     public static long lastDropItemMs = 0;
     private final String task;
     private final Gob gob;
-    public static Coord savedSelSc, savedSelEc;
-    public static int   savedSelModflags;
 
     public ZeeMiningManager(String task, Gob gob){
         this.task = task;
         this.gob = gob;
-    }
-
-    public static void saveMiningSelection(Coord sc, Coord ec, int modflags) {
-        savedSelSc = sc;
-        savedSelEc = ec;
-        savedSelModflags = savedSelModflags;
     }
 
     @Override
@@ -33,7 +25,7 @@ public class ZeeMiningManager extends Thread{
                 ZeeConfig.cursorChange(ZeeConfig.ACT_MINE);//restore mining icon for autodrop
                 if(waitBoulderFinish()){
                     println("chip boulder done");
-                    ZeeConfig.gameUI.map.wdgmsg("sel", savedSelSc, savedSelEc, savedSelModflags);
+                    ZeeConfig.gameUI.map.wdgmsg("sel", ZeeConfig.savedTileSelStartCoord, ZeeConfig.savedTileSelEndCoord, ZeeConfig.savedTileSelModflags);
                 }else{
                     println("still chipping???");
                 }
@@ -64,7 +56,7 @@ public class ZeeMiningManager extends Thread{
     public static void checkNearBoulder(Gob gob) {
         if(ZeeConfig.autoChipMinedBoulder && isMining() && isBoulder(gob)){
             //println(ZeeClickGobManager.distanceToPlayer(gob)+" to "+gob.getres().name);
-            if(ZeeClickGobManager.distanceToPlayer(gob) < 25){
+            if(ZeeConfig.distanceToPlayer(gob) < 25){
                 if(isCombatActive()) // cancel if combat active
                     return;
                 new ZeeMiningManager(ACTION_CHIP_BOULDER, gob).start();

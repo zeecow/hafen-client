@@ -52,6 +52,13 @@ public class ZeeConfig {
     public static String uiMsgTextQuality, uiMsgTextBuffer;
     public static long now, lastUiMessageMs = 0;
     public static Object[] lastMapViewClickArgs;
+    public static Gob lastMapViewClickGob;
+    public static String lastMapViewClickGobName;
+    public static Coord2d lastMapViewClickCoord2d;
+    public static int lastMapViewClickButton;
+    public static Coord savedTileSelStartCoord, savedTileSelEndCoord;
+    public static int savedTileSelModflags;
+    public static MCache.Overlay savedTileSelOverlay;
 
     public static boolean actionSearchGlobal = Utils.getprefb("actionSearchGlobal", true);
     public static boolean alertOnPlayers = Utils.getprefb("alertOnPlayers", true);
@@ -62,7 +69,7 @@ public class ZeeConfig {
     public static boolean autoOpenEquips = Utils.getprefb("beltToggleEquips", true);
     public static boolean autoOpenBelt = Utils.getprefb("autoOpenBelt", true);
     public static boolean autoRunLogin = Utils.getprefb("autoRunLogin", true);
-    public static boolean butcherAuto = false;
+    public static boolean butcherMode = false;
     public static String butcherAutoList = Utils.getpref("butcherAutoList","Break,Scale,Wring neck,Kill,Skin,Flay,Pluck,Clean,Butcher,Collect bones");
     public static boolean cattleRosterHeight = Utils.getprefb("cattleRosterHeight", false);
     public static double cattleRosterHeightPercentage = Utils.getprefd("cattleRosterHeightPercentage", 1.0);
@@ -77,9 +84,10 @@ public class ZeeConfig {
     public static boolean dropMinedOre = Utils.getprefb("dropMinedOre", true);
     public static boolean dropMinedSilverGold = Utils.getprefb("dropMinedOrePrecious", true);
     public static boolean dropMinedStones = Utils.getprefb("dropMinedStones", true);
-    public static boolean dropSeeds = false;//always starts off (TODO: set false when character loads)
+    public static boolean dropSeeds = false;
     public static boolean dropSoil = false;
     public static boolean equiporyCompact = Utils.getprefb("equiporyCompact", false);
+    public static boolean farmerMode = false;
     public static boolean highlightAggressiveGobs = Utils.getprefb("highlighAggressiveGobs", true);
     public static boolean highlightCropsReady = Utils.getprefb("highlightCropsReady", true);
     public static boolean highlightGrowingTrees = Utils.getprefb("highlightGrowingTrees", true);
@@ -591,7 +599,6 @@ public class ZeeConfig {
     }
 
 
-    //FIXME some cases the behavior is wrong
     public static void checkAutoOpenEquips(boolean done) {
         if(!ZeeConfig.autoOpenEquips)
             return;
@@ -1119,7 +1126,8 @@ public class ZeeConfig {
         try {
             return gameUI.map.ui.getcurs(Coord.z).name;
         } catch(Exception e) {
-            return null;
+            e.printStackTrace();
+            return "";
         }
     }
 
@@ -1222,6 +1230,103 @@ public class ZeeConfig {
         craftHistoryPos = craftHistoryList.size() - 1;
     }
 
+    public static void saveTileSelection(Coord sc, Coord ec, int modflags, MCache.Overlay ol) {
+        savedTileSelStartCoord = sc;
+        savedTileSelEndCoord = ec;
+        savedTileSelModflags = modflags;
+        savedTileSelOverlay = ol;
+    }
+
+    public static void resetTileSelection(){
+        savedTileSelStartCoord = null;
+        savedTileSelEndCoord = null;
+        savedTileSelModflags = -1;
+        if(savedTileSelOverlay!=null)
+            savedTileSelOverlay.destroy();
+    }
+
+    public static void expandTileSelectionBy(int numTiles) {
+        savedTileSelStartCoord.x += numTiles;
+        savedTileSelStartCoord.y += numTiles;
+        savedTileSelEndCoord.x -= numTiles;
+        savedTileSelEndCoord.y -= numTiles;
+    }
+
+    public static void printGobs(){
+        List<String> gobs = ZeeConfig.gameUI.ui.sess.glob.oc.gobStream().map(gob -> gob.getres().name).collect(Collectors.toList());
+        System.out.println(gobs.size()+" > "+gobs.toString());
+    }
+
+    public static List<Gob> findGobsByName(String name) {
+        return ZeeConfig.gameUI.ui.sess.glob.oc.gobStream().filter(gob -> {
+            if(gob!=null && gob.getres()!=null && gob.getres().name.contains(name))
+                return true;
+            else
+                return false;
+        }).collect(Collectors.toList());
+    }
+
+    public static void gobClicked(int clickb, Coord2d mc, Object[] args, Gob clickGob) {
+        lastMapViewClickButton = clickb;
+        lastMapViewClickCoord2d = mc;
+        lastMapViewClickArgs = args;
+        lastMapViewClickGob = clickGob;
+        if(clickGob!=null) {
+            lastMapViewClickGobName = clickGob.getres().name;
+        }
+        if(clickb==2 && clickGob!=null) {
+            new ZeeClickGobManager(mc, clickGob).start();
+        }
+    }
+
+    public static Gob getClosestGob(List<Gob> gobs) {
+        Gob closestGob = gobs.get(0);
+        double closestDist = distanceToPlayer(closestGob);
+        double dist;
+        for (Gob g : gobs) {
+            dist = distanceToPlayer(g);
+            if (dist < closestDist) {
+                closestGob = g;
+                closestDist = dist;
+            }
+        }
+        return closestGob;
+    }
+
+    public static double distanceToPlayer(Gob gob) {
+        return ZeeConfig.getPlayerGob().rc.dist(gob.rc);
+    }
+
+    public static int getPlantStage(Gob g){
+        ResDrawable rd = g.getattr(ResDrawable.class);
+        String name = g.getres().name;;
+        if(name.startsWith("gfx/terobjs/plants") && !name.endsWith("trellis") && rd != null) {
+            int stage = rd.sdt.peekrbuf(0);
+            return stage;
+        }
+        return -1;
+    }
+
+    public static Gob getPlayerGob() {
+        return gameUI.map.player();
+    }
+
+    public static boolean isPlayerMoving() {
+        Moving mov = getPlayerGob().getattr(Moving.class);
+        return ( mov!=null && mov.getv()>0);
+    }
+
+    public static boolean isPlayerDrinking(){
+        return getHourglass() > -1;
+    }
+
+    /**
+     * Returns value of hourglass, -1 = no hourglass, else the value between 0.0 and 1.0
+     * @return value of hourglass
+     */
+    public static double getHourglass() {
+        return gameUI.prog;
+    }
 
     public static void println(String s) {
         System.out.println(s);

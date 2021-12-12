@@ -304,7 +304,7 @@ public class ZeeClickItemManager extends ZeeThread{
             for (WItem w: items) {
                 ZeeConfig.scheduleClickPetal("Kill");
                 try {
-                    clickWItem(w);
+                    wItemAct(w);
                     int max = (int) TIMEOUT_MS;
                     while(max>0 && ZeeConfig.clickPetal){//wait FlowerMenu end and set clickPetal to false
                         max -= SLEEP_MS;
@@ -324,8 +324,12 @@ public class ZeeClickItemManager extends ZeeThread{
         return false;
     }
 
-    public static void clickWItem(WItem item){
+    public static void wItemAct(WItem item){
         item.item.wdgmsg("iact", item.item.c.div(2), item.ui.modflags());
+    }
+
+    public static void gItemAct(GItem item, int modflags){
+        item.wdgmsg("iact", item.c.div(2), modflags);
     }
 
     private boolean isLongClick() {
@@ -354,7 +358,7 @@ public class ZeeClickItemManager extends ZeeThread{
 
     private void drinkFrom() {
         ZeeConfig.scheduleClickPetal("Drink");
-        clickWItem(wItem);
+        wItemAct(wItem);
     }
 
     private boolean isItemDrinkingVessel() {

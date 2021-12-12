@@ -1,6 +1,7 @@
 package haven;
 
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -333,10 +334,14 @@ public class ZeeClickGobManager extends ZeeThread{
 
     /**
      * Itemact with gob, to fill trough with item in hand for example
-     * @param mod 1 = shift, 2 = ctrl, 4 = alt
+     * @param mod 1 = shift, 2 = ctrl, 4 = alt  (3 = ctrl+shift ?)
      */
     public void gobItemAct(int mod) {
         ZeeConfig.gameUI.map.wdgmsg("itemact", Coord.z, gob.rc.floor(OCache.posres), mod, 0, (int) gob.id, gob.rc.floor(OCache.posres), 0, -1);
+    }
+
+    public static void gobItemAct(Gob g, int mod) {
+        ZeeConfig.gameUI.map.wdgmsg("itemact", Coord.z, g.rc.floor(OCache.posres), mod, 0, (int) g.id, g.rc.floor(OCache.posres), 0, -1);
     }
 
     public void gobClick(int btn) {
@@ -355,15 +360,6 @@ public class ZeeClickGobManager extends ZeeThread{
         ZeeConfig.gameUI.map.wdgmsg("click", ZeeConfig.getCenterScreenCoord(), g.rc.floor(OCache.posres), btn, mod, 1, (int)g.id, g.rc.floor(OCache.posres), -1, -1);
     }
 
-    public static void printGobs(){
-        List<String> gobs = ZeeConfig.gameUI.ui.sess.glob.oc.gobStream().map(gob -> gob.getres().name).collect(Collectors.toList());
-        System.out.println(gobs.size()+" > "+gobs.toString());
-    }
-
-    public static double distanceToPlayer(Gob gob) {
-        return ZeeConfig.gameUI.map.player().rc.dist(gob.rc);
-    }
-
     public static double distanceCoordGob(Coord2d c, Gob gob) {
         return c.dist(gob.rc);
     }
@@ -371,5 +367,14 @@ public class ZeeClickGobManager extends ZeeThread{
     // return Gob or null
     public static Gob findGobById(long id) {
         return ZeeConfig.gameUI.ui.sess.glob.oc.getgob(id);
+    }
+
+    public static List<String> getOverlayNames(Gob gob) {
+        List<String> ret = new ArrayList<>();
+        for (Gob.Overlay ol : gob.ols) {
+            if(ol.res != null)
+                ret.add(ol.res.get().name);
+        }
+        return ret;
     }
 }

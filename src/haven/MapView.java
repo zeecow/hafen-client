@@ -1991,9 +1991,7 @@ public class MapView extends PView implements DTarget, Console.Directory {
 			}
 		}
 	    wdgmsg("click", args);
-		ZeeConfig.lastMapViewClickArgs = args;
-		if(clickb==2 && clickGob!=null)
-			new ZeeClickGobManager(mc,clickGob).start();
+		ZeeConfig.gobClicked(clickb,mc,args,clickGob);
 	}
     }
     
@@ -2225,9 +2223,16 @@ public class MapView extends PView implements DTarget, Console.Directory {
 		    Coord ec = mc.div(MCache.tilesz2);
 		    xl.mv = false;
 		    tt = null;
-		    ol.destroy();
+			if(!ZeeConfig.farmerMode) {
+				ol.destroy();
+			}else {
+				//farmer mode preserve overlay, unless cancel button
+				if(button != 1){
+					ol.destroy();
+				}
+			}
 		    mgrab.remove();
-			ZeeMiningManager.saveMiningSelection(new Coord(sc), new Coord(ec), modflags);
+			ZeeConfig.saveTileSelection(new Coord(sc), new Coord(ec), modflags, ol);
 		    wdgmsg("sel", sc, ec, modflags);
 		    sc = null;
 		}

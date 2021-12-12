@@ -92,7 +92,7 @@ public class GItem extends AWidget implements ItemInfo.SpriteOwner, GSprite.Owne
 	}
 
 	public static BufferedImage numrender(int num, Color col) {
-		col = Color.white;
+		//col = Color.white;
 	    return(Utils.outline2(Text.render(Integer.toString(num), col).img, Utils.contrast(col)));
 	}
     }
@@ -175,19 +175,30 @@ public class GItem extends AWidget implements ItemInfo.SpriteOwner, GSprite.Owne
 				this.wdgmsg("drop", Coord.z);
 			}
 
-		}else if( ZeeConfig.dropSoil && name.startsWith("soil") && this.parent instanceof Inventory) {
+		}else if( ZeeConfig.farmerMode && !ZeeFarmingManager.busy && name.startsWith("seed-") && this.parent instanceof Inventory){
 
-			//drop soil
-			Inventory inv = (Inventory) this.parent;
-			inv.dropItemsByName(name);
+			if(ZeeConfig.savedTileSelEndCoord == null) {
+				ZeeConfig.println("> Farmer mode: no tile selection. Canceling...");
+				ZeeConfig.farmerMode = false;
+				ZeeFarmingManager.resetInitialState();
+				ZeeInvMainOptionsWdg.cbFarmer.click();//deselect farmerMode checkbox
+			}else {
+				new ZeeFarmingManager(this, name).start();
+			}
 
-		}else if( (ZeeConfig.dropSeeds && name.startsWith("seed-")) && this.parent instanceof Inventory){
+		}else if( ZeeConfig.dropSeeds && name.startsWith("seed-") && this.parent instanceof Inventory){
 
 			//drop seeds before inventory is full
 			Inventory inv = (Inventory) this.parent;
 			if(inv.getNumberOfFreeSlots() < 3){
 				inv.dropItemsByName(name);
 			}
+
+		}else if( ZeeConfig.dropSoil && name.startsWith("soil") && this.parent instanceof Inventory) {
+
+			//drop soil
+			Inventory inv = (Inventory) this.parent;
+			inv.dropItemsByName(name);
 
 		}
 	}
