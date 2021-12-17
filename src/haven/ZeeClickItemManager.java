@@ -58,6 +58,12 @@ public class ZeeClickItemManager extends ZeeThread{
                     else
                         wItem.wdgmsg("transfer-sort", wItem.item, false);//descending order
                     return;
+                }else {
+                    //no transfer window open
+                    if(itemSourceWindow.equalsIgnoreCase("Inventory") && isItemPlantable()){
+                        //activate farming area cursor
+                        itemAct(wItem,UI.MOD_SHIFT);
+                    }
                 }
             }
 
@@ -92,13 +98,13 @@ public class ZeeClickItemManager extends ZeeThread{
                         ZeeConfig.gameUI.msg("both hand sacks");
                     }
 
-                    if(isHoldingItem()) {//equip was a switch or failed
+                    if(ZeeConfig.isPlayerHoldingItem()) {//equip was a switch or failed
                         ZeeConfig.gameUI.msg("couldn't switch sack");
                         trySendItemToBelt();
                     }
                 }else if(isSourceEquipsWindow()){//send to belt
                     pickUpItem();
-                    if(isHoldingItem()){ //unequip sack was successfull
+                    if(ZeeConfig.isPlayerHoldingItem()){ //unequip sack was successfull
                         if(!trySendItemToBelt())
                             println("belt full?");
                     }
@@ -304,7 +310,7 @@ public class ZeeClickItemManager extends ZeeThread{
             for (WItem w: items) {
                 ZeeConfig.scheduleClickPetal("Kill");
                 try {
-                    wItemAct(w);
+                    itemAct(w);
                     int max = (int) TIMEOUT_MS;
                     while(max>0 && ZeeConfig.clickPetal){//wait FlowerMenu end and set clickPetal to false
                         max -= SLEEP_MS;
@@ -324,8 +330,12 @@ public class ZeeClickItemManager extends ZeeThread{
         return false;
     }
 
-    public static void wItemAct(WItem item){
-        item.item.wdgmsg("iact", item.item.c.div(2), item.ui.modflags());
+    public static void itemAct(WItem item){
+        itemAct(item, item.ui.modflags());
+    }
+
+    public static void itemAct(WItem item, int modflags){
+        gItemAct(item.item, modflags);
     }
 
     public static void gItemAct(GItem item, int modflags){
@@ -358,7 +368,7 @@ public class ZeeClickItemManager extends ZeeThread{
 
     private void drinkFrom() {
         ZeeConfig.scheduleClickPetal("Drink");
-        wItemAct(wItem);
+        itemAct(wItem);
     }
 
     private boolean isItemDrinkingVessel() {
@@ -408,7 +418,7 @@ public class ZeeClickItemManager extends ZeeThread{
     }
 
     public static boolean trySendItemToBelt() {
-        if(!isHoldingItem())
+        if(!ZeeConfig.isPlayerHoldingItem())
             return false;
         try{
             List<Coord> freeSlots = ZeeClickItemManager.getInvBelt().getFreeSlots();
@@ -421,10 +431,6 @@ public class ZeeClickItemManager extends ZeeThread{
             e.printStackTrace();
             return false;
         }
-    }
-
-    public static boolean isHoldingItem() {
-        return (ZeeConfig.gameUI.vhand != null);
     }
 
     private boolean isSourceBeltWindow() {
@@ -506,6 +512,14 @@ public class ZeeClickItemManager extends ZeeThread{
         return name.endsWith("travellerssack") || name.endsWith("bindle");
     }
 
+    private boolean isItemPlantable() {
+        println("is item Plantable "+itemName);
+        String endList = "barley,carrot,cucumber,flax,grape,hemp,leek,lettuce,millet,"
+                +"pipeweed,poppy,pumpkin,wheat,turnip,wheat,barley,"
+                +"beetroot,yellowonion,redonion";
+        String name = itemName.replace("gfx/invobjs/","");
+        return endList.contains(name);
+    }
 
     private boolean isTwoHandedItem() {
         return isTwoHandedItem(itemName);

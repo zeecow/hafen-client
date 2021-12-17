@@ -120,7 +120,7 @@ public class ZeeFarmingManager extends ZeeThread{
             //wait getting to the barrel
             waitPlayerIdleFor(2000);
 
-            while (!isBarrelEmpty(lastBarrel) && !isInventoryFull()) {
+            while (!ZeeClickGobManager.isBarrelEmpty(lastBarrel) && !isInventoryFull()) {
                 ZeeClickGobManager.gobClick(lastBarrel, 3, UI.MOD_SHIFT);
                 //TODO: waitInvCHanges
                 Thread.sleep(PING_MS);
@@ -250,7 +250,7 @@ public class ZeeFarmingManager extends ZeeThread{
     private List<Gob> getEmptyCloseBarrels() {
         List<Gob> emptyBarrels = ZeeConfig.findGobsByName("barrel");
         emptyBarrels.removeIf(gob -> ZeeConfig.distanceToPlayer(gob) > MAX_BARREL_DIST); //remove distant barrels
-        emptyBarrels.removeIf(gob -> !isBarrelEmpty(gob)); //remove non-empty barrels
+        emptyBarrels.removeIf(gob -> !ZeeClickGobManager.isBarrelEmpty(gob)); //remove non-empty barrels
         return emptyBarrels;
     }
 
@@ -280,7 +280,7 @@ public class ZeeFarmingManager extends ZeeThread{
                 waitPlayerMove();
                 waitPlayerStop();
                 Thread.sleep(PING_MS);//wait storing seed
-                if (ZeeClickItemManager.isHoldingItem()) {
+                if (ZeeConfig.isPlayerHoldingItem()) {
                     if(percSeedsToStore==1) {
                         // store all seeds (ctrl+shift)
                         println("store all seeds (ctrl+shift)");
@@ -298,7 +298,7 @@ public class ZeeFarmingManager extends ZeeThread{
                             ZeeClickGobManager.gobItemAct(lastBarrel, 0);
                     }
                     waitFreeHand();
-                    if (ZeeClickItemManager.isHoldingItem()) { //barrel full?
+                    if (ZeeConfig.isPlayerHoldingItem()) { //barrel full?
                         ZeeConfig.gameUI.msg("Barrel full or player blocked?");
                         println("barrel full");
                         lastBarrel = null;
@@ -313,10 +313,4 @@ public class ZeeFarmingManager extends ZeeThread{
         }
     }
 
-    /*
-        barrel is empty if has no overlays ("gfx/terobjs/barrel-flax")
-     */
-    private boolean isBarrelEmpty(Gob barrel){
-        return ZeeClickGobManager.getOverlayNames(barrel).isEmpty();
-    }
 }

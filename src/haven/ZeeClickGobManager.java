@@ -25,6 +25,7 @@ public class ZeeClickGobManager extends ZeeThread{
         gob = gobClicked;
         gobName = gob.getres().name;
         clickDiffMs = clickEndMs - clickStartMs;
+        getMainInventory();
         //System.out.println(clickDiffMs+"ms > "+gobName);
     }
 
@@ -57,18 +58,31 @@ public class ZeeClickGobManager extends ZeeThread{
             /*
             long clicks
              */
-            if ( isFuelAction() ) {
-                addFuelToGob();
-            } else if(isGobCrop()) {
-                gobClick(gob,3,UI.MOD_SHIFT);//start farming area
-            } else if(isGobStockpile() || isGobName("/dframe")) {
-                gobClick(3, UI.MOD_SHIFT);//pick up all items (shift + rclick)
-            } else if (isDestroyGob()) {
-                destroyGob();
-            } else if (isLiftGob()) {
-                liftGob();
+            if(ZeeConfig.gameUI.ui.modctrl) {
+                if (isFuelAction()) {
+                    addFuelToGob();
+                } else if (isBarrelTakeAll()) {
+                    barrelTakeAllSeeds();
+                }
+            }else{
+                if (isGobCrop()) {
+                    gobClick(gob, 3, UI.MOD_SHIFT);//start farming area
+                } else if (isGobStockpile() || isGobName("/dframe")) {
+                    gobClick(3, UI.MOD_SHIFT);//pick up all items (shift + rclick)
+                } else if (isDestroyGob()) {
+                    destroyGob();
+                } else if (isLiftGob()) {
+                    liftGob();
+                }
             }
         }
+    }
+
+    /*
+        barrel is empty if has no overlays ("gfx/terobjs/barrel-flax")
+    */
+    public static boolean isBarrelEmpty(Gob barrel){
+        return ZeeClickGobManager.getOverlayNames(barrel).isEmpty();
     }
 
     private void addFuelToGob() {
@@ -148,13 +162,9 @@ public class ZeeClickGobManager extends ZeeThread{
     }
 
     private boolean isFuelAction() {
-        if(!ZeeConfig.gameUI.ui.modctrl)
-            return false; // require Ctrl to fuel
-
         if (gobName.endsWith("oven") || gobName.endsWith("smelter")){
             return true;
         }
-
         return false;
     }
 
@@ -244,7 +254,7 @@ public class ZeeClickGobManager extends ZeeThread{
                 +"/gemwheel,/ancestralshrine,/spark,/cauldron,/churn,/table-rustic,/chair-rustic,"
                 +"/royalthrone,/trough,curdingtub,/plow,/barrel,/still,log,/oldtrunk,chest,/anvil,"
                 +"/cupboard,/studydesk,/demijohn,/quern,/wreckingball-fold,/loom,/swheel,"
-                +"/ttub,/cheeserack,/archerytarget,/dreca,/glasspaneframe";
+                +"/ttub,/cheeserack,/archerytarget,/dreca,/glasspaneframe,/runestone";
         return gobNameEndsWith(endList);
     }
 
@@ -267,6 +277,51 @@ public class ZeeClickGobManager extends ZeeThread{
 
     private boolean isGobTreeLog() {
         return gobName.startsWith("gfx/terobjs/trees/") && gobName.endsWith("log");
+    }
+
+    private boolean isBarrelTakeAll() {
+        if(!gobName.endsWith("barrel") || isBarrelEmpty(gob)){
+            return false;
+        }
+        String endList = "barley,carrot,cucumber,flax,grape,hemp,leek,lettuce,millet,"+
+            "pipeweed,poppy,pumpkin,wheat,turnip,wheat,barley";
+        return getOverlayNames(gob).stream().anyMatch(overlayName -> {
+            return endList.contains( overlayName.replace("gfx/terobjs/barrel-",""));
+        });
+    }
+
+    private void barrelTakeAllSeeds() {
+        try{
+            // shift+rclick last barrel
+            ZeeClickGobManager.gobClick(gob, 3, UI.MOD_SHIFT);
+
+            //wait getting to the barrel
+            waitPlayerIdleFor(1000);
+
+            while (!ZeeClickGobManager.isBarrelEmpty(gob) && !isInventoryFull()) {
+                ZeeClickGobManager.gobClick(gob, 3, UI.MOD_SHIFT);
+                //TODO: waitInvCHanges
+                Thread.sleep(PING_MS);
+            }
+
+            //if holding seed, store in barrel
+            Thread.sleep(PING_MS);
+            if(ZeeConfig.isPlayerHoldingItem()) {
+                ZeeClickGobManager.gobItemAct(gob, 0);
+            }
+
+            if (isInventoryFull())
+                ZeeConfig.msg("Inventory full");
+            else
+                ZeeConfig.msg("Took everything");
+
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    private boolean isInventoryFull() {
+        return getMainInventory().getNumberOfFreeSlots() == 0;
     }
 
     private void destroyGob() {
@@ -369,6 +424,7 @@ public class ZeeClickGobManager extends ZeeThread{
         return ZeeConfig.gameUI.ui.sess.glob.oc.getgob(id);
     }
 
+    // "gfx/terobjs/barrel-flax"
     public static List<String> getOverlayNames(Gob gob) {
         List<String> ret = new ArrayList<>();
         for (Gob.Overlay ol : gob.ols) {

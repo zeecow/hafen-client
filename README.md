@@ -10,12 +10,13 @@ original features:
  - shorter cattle roster window
  - reposition map window when compacted/expanded
  - basic inventory item counter
- - MidClick gob: [inspect] , [Giddyup!] , [light torch]
-   - LongMidClick gob: [lift up] , [destroy trellis plant]
-   - CtrlLongMidClick gob: [auto-fill oven/smelter]
- - MidClick item: [sort-transfer] , [pick-up all] , [quick-equip from belt]
-   - LongMidClick item: [sort-transfer inverse] , [equip fishing item and recast]
-   - CtrlLongMidClick item: [kill all silk-cocoons]
+ - mid click object/item for small tasks:
+   - MidClick obj: [inspect] , [Giddyup!] , [light torch]
+     - LongMidClick obj: [lift up] , [destroy trellis plant] , [farm area icon]
+     - CtrlLongMidClick obj: [auto-fill oven/smelter] , [take all barrel seeds]
+   - MidClick item: [sort-transfer] , [pick-up all] , [quick-equip from belt]
+     - LongMidClick item: [sort-transfer inverse] , [equip fishing item and recast]
+     - CtrlLongMidClick item: [kill all silk-cocoons]
 
 other stuff:
  - autodrop mined items, seeds, soil

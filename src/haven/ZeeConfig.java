@@ -1320,12 +1320,20 @@ public class ZeeConfig {
         return getHourglass() > -1;
     }
 
+    public static boolean isPlayerHoldingItem() {
+        return (gameUI.vhand != null);
+    }
+
     /**
      * Returns value of hourglass, -1 = no hourglass, else the value between 0.0 and 1.0
      * @return value of hourglass
      */
     public static double getHourglass() {
         return gameUI.prog;
+    }
+
+    public static void msg(String s) {
+        gameUI.msg(s);
     }
 
     public static void println(String s) {
