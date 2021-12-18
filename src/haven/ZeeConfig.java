@@ -643,8 +643,17 @@ public class ZeeConfig {
             if(isMakewindow(window)){
                 windowTitle = MAKE_WINDOW_NAME;
             }
-            if((c = mapWindowPos.get(windowTitle)) != null) {
-                window.c = c;
+            String singleWindows = "Craft,Inventory,Character,Options,Kith & Kin,Equipment";
+            if(singleWindows.contains(windowTitle)){ // avoid searching multiple Windows
+                //use saved position window
+                if ((c = mapWindowPos.get(windowTitle)) != null) {
+                    window.c = c;
+                }
+            } else if( getWindows(windowTitle).size() == 1 ) { //search multiple windows
+                //use saved position window
+                if ((c = mapWindowPos.get(windowTitle)) != null) {
+                    window.c = c;
+                }
             }
         }
     }
@@ -1089,6 +1098,19 @@ public class ZeeConfig {
             }
         }
         return null;
+    }
+
+    public static List<Window> getWindows(String name) {
+        List<Window> ret = new ArrayList<>();
+        if(gameUI==null)
+            return ret;
+        Set<Window> windows = gameUI.children(Window.class);
+        for(Window w : windows) {
+            if(w.cap.text.equalsIgnoreCase(name)){
+                ret.add(w);
+            }
+        }
+        return ret;
     }
 
     //screen center coord
