@@ -126,6 +126,9 @@ public class ZeeFarmingManager extends ZeeThread{
                 Thread.sleep(PING_MS);
             }
 
+            if(waitHoldingItem())//store remaining holding item
+                ZeeClickGobManager.gobItemAct(lastBarrel, 0);
+
             if (!isInventoryFull()) {
                 println("inv not full, barrel is empty?");
                 lastBarrel = null;
@@ -146,6 +149,7 @@ public class ZeeFarmingManager extends ZeeThread{
         }
     }
 
+    //TODO
     private void storeSeedsByQuality() {
         try {
             List<Gob> emptyBarrels = getEmptyCloseBarrels();
@@ -222,6 +226,9 @@ public class ZeeFarmingManager extends ZeeThread{
             return false;
         }
         plants.removeIf(plt -> ZeeConfig.getPlantStage(plt) == 0);
+        if (plants.size()==0) {
+            return false;
+        }
         Gob g = ZeeConfig.getClosestGob(plants);
         //println("closest "+g+" , stage "+ZeeConfig.getPlantStage(g));
         if(g!=null) {
@@ -294,17 +301,18 @@ public class ZeeFarmingManager extends ZeeThread{
                             ZeeClickGobManager.gobItemAct(lastBarrel, UI.MOD_SHIFT);
                             Thread.sleep(PING_MS);//wait storing seed
                         }
-                        if(ZeeConfig.gameUI.vhand!=null)//store seed in hand
+                        Thread.sleep(PING_MS);
+                        if(ZeeConfig.isPlayerHoldingItem())//store seed in hand
                             ZeeClickGobManager.gobItemAct(lastBarrel, 0);
                     }
-                    waitFreeHand();
-                    if (ZeeConfig.isPlayerHoldingItem()) { //barrel full?
+                    if(waitNotHoldingItem()) {
+                        println("seeds stored");
+                    } else {
+                        //still holding item = barrel full?
                         ZeeConfig.gameUI.msg("Barrel full or player blocked?");
                         println("barrel full");
                         lastBarrel = null;
                         println("lastBarrel = null");
-                    } else {
-                        println("seeds stored");
                     }
                 }
             }

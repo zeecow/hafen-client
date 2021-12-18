@@ -426,7 +426,7 @@ public class ZeeClickItemManager extends ZeeThread{
                 return false;//belt full
             Coord c = freeSlots.get(0);
             ZeeClickItemManager.getInvBelt().wdgmsg("drop", c);
-            return waitFreeHand();
+            return waitNotHoldingItem();
         }catch (Exception e){
             e.printStackTrace();
             return false;
@@ -446,11 +446,11 @@ public class ZeeClickItemManager extends ZeeThread{
      */
     private void equipLeftOccupiedHand() {
         equipory.wdgmsg("drop", 6);
-        waitOccupiedHand();
+        waitHoldingItem();
     }
     private void equipRightOccupiedHand() {
         equipory.wdgmsg("drop", 7);
-        waitOccupiedHand();
+        waitHoldingItem();
     }
 
     /*
@@ -458,11 +458,11 @@ public class ZeeClickItemManager extends ZeeThread{
      */
     private void equipLeftEmptyHand() {
         equipory.wdgmsg("drop", 6);
-        waitFreeHand();
+        waitNotHoldingItem();
     }
     private void equipRightEmptyHand() {
         equipory.wdgmsg("drop", 7);
-        waitFreeHand();
+        waitNotHoldingItem();
     }
 
     private boolean equipEmptyHand() {
@@ -470,7 +470,7 @@ public class ZeeClickItemManager extends ZeeThread{
             equipLeftEmptyHand();
         else if(isRightHandEmpty())
             equipRightEmptyHand();
-        return waitFreeHand();
+        return waitNotHoldingItem();
     }
 
     private boolean isLeftHandEmpty() {
@@ -487,21 +487,21 @@ public class ZeeClickItemManager extends ZeeThread{
     }
     public static boolean pickUpItem(WItem wItem) {
         wItem.item.wdgmsg("take", new Coord(wItem.sz.x / 2, wItem.sz.y / 2));
-        return waitOccupiedHand();
+        return waitHoldingItem();
     }
 
     public static boolean unequipLeftItem() {
         if(equipory.leftHand==null)
             return true;
         equipory.leftHand.item.wdgmsg("take", new Coord(equipory.leftHand.sz.x/2, equipory.leftHand.sz.y/2));
-        return waitOccupiedHand();
+        return waitHoldingItem();
     }
 
     public static boolean unequipRightItem() {
         if(equipory.rightHand==null)
             return true;
         equipory.rightHand.item.wdgmsg("take", new Coord(equipory.rightHand.sz.x/2, equipory.rightHand.sz.y/2));
-        return waitOccupiedHand();
+        return waitHoldingItem();
     }
 
     private boolean isItemSack() {

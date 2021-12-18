@@ -104,7 +104,7 @@ public class ZeeClickGobManager extends ZeeThread{
                    while(!exit && added<4 && branches.size() > 0){
                        if(ZeeClickItemManager.pickUpItem(branches.get(0))){
                            gobItemAct(0);
-                           if(waitFreeHand()){
+                           if(waitNotHoldingItem()){
                                branches.remove(0);
                                added++;
                            }else{
@@ -137,7 +137,7 @@ public class ZeeClickGobManager extends ZeeThread{
                     while(!exit && added<9 && coal.size() > 0){
                         if(ZeeClickItemManager.pickUpItem(coal.get(0))){
                             gobItemAct(0);
-                            if(waitFreeHand()){
+                            if(waitNotHoldingItem()){
                                 coal.remove(0);
                                 added++;
                             }else{
@@ -245,7 +245,7 @@ public class ZeeClickGobManager extends ZeeThread{
     private boolean isLiftGob() {
         if(isGobBush()) {
             ZeeClickItemManager.equipItem("shovel");
-            return waitFreeHand();
+            return waitNotHoldingItem();
         }
         if(isGobBoulder())
             return true;
@@ -305,10 +305,8 @@ public class ZeeClickGobManager extends ZeeThread{
             }
 
             //if holding seed, store in barrel
-            Thread.sleep(PING_MS);
-            if(ZeeConfig.isPlayerHoldingItem()) {
-                ZeeClickGobManager.gobItemAct(gob, 0);
-            }
+            waitHoldingItem();
+            ZeeClickGobManager.gobItemAct(gob, 0);
 
             if (isInventoryFull())
                 ZeeConfig.msg("Inventory full");

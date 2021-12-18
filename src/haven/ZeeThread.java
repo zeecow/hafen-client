@@ -7,7 +7,7 @@ public class ZeeThread  extends Thread{
     static final long LONG_CLICK_MS = 333;
     static final long PING_MS = 250;
 
-    public static boolean waitFreeHand() {
+    public static boolean waitNotHoldingItem() {
         int max = (int) TIMEOUT_MS;
         try {
             while(max>0 && ZeeConfig.gameUI.vhand!=null) {
@@ -20,7 +20,7 @@ public class ZeeThread  extends Thread{
         return (ZeeConfig.gameUI.vhand == null);
     }
 
-    public static boolean waitOccupiedHand() {
+    public static boolean waitHoldingItem() {
         int max = (int) TIMEOUT_MS;
         try{
             while(max>0 && ZeeConfig.gameUI.vhand==null) {
