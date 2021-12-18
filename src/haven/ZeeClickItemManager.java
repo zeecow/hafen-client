@@ -513,10 +513,11 @@ public class ZeeClickItemManager extends ZeeThread{
     }
 
     private boolean isItemPlantable() {
-        println("is item Plantable "+itemName);
-        String endList = "barley,carrot,cucumber,flax,grape,hemp,leek,lettuce,millet,"
-                +"pipeweed,poppy,pumpkin,wheat,turnip,wheat,barley,"
-                +"beetroot,yellowonion,redonion";
+        //println("is item Plantable "+itemName);
+        String endList = "seed-barley,seed-carrot,carrot,seed-cucumber,seed-flax,"
+            +"seed-grape,seed-hemp,seed-leek,leek,seed-lettuce,seed-millet,"
+            +"seed-pipeweed,seed-poppy,seed-pumpkin,seed-wheat,seed-turnip,turnip,"
+            +"seed-wheat,seed-barley,beetroot,yellowonion,redonion";
         String name = itemName.replace("gfx/invobjs/","");
         return endList.contains(name);
     }
