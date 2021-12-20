@@ -25,6 +25,7 @@ public class ZeeFarmingManager extends ZeeThread{
             println(">new crop name, forget last barrel ("+lastBarrel+")");
             lastBarrel = null;
             mapBarrelSeedql.clear();
+            ZeeConfig.removeGobText(lastBarrel);
         }else{
             println(">same crop name, use last barrel ("+lastBarrel+")");
         }
@@ -39,7 +40,8 @@ public class ZeeFarmingManager extends ZeeThread{
         isHarvestDone = false;
         isPlantingDone = false;
         ZeeConfig.resetTileSelection();
-        ZeeConfig.autoHearthOnStranger = Utils.getprefb("autoHearthOnStranger", true);;
+        ZeeConfig.autoHearthOnStranger = Utils.getprefb("autoHearthOnStranger", true);
+        ZeeConfig.removeGobText(lastBarrel);
     }
 
     private void updateWItem() {
@@ -265,11 +267,11 @@ public class ZeeFarmingManager extends ZeeThread{
         try {
             List<Gob> emptyBarrels = getEmptyCloseBarrels();
             println("barrels = " + emptyBarrels.size());
-            if (emptyBarrels.size() == 0) {
+            if (emptyBarrels.size()==0) {
                 /*
                     no barrels, drop seeds
                  */
-                ZeeConfig.gameUI.msg("No empty barrels close, dropping seeds.");
+                ZeeConfig.gameUI.msg("No empty barrels, lastBarrel null, dropping seeds.");
                 println("No empty barrels close, dropping seeds.");
                 inv.dropItemsByName(lastItemName);
 
@@ -280,7 +282,10 @@ public class ZeeFarmingManager extends ZeeThread{
                 println(">choose barrel");
                 if (lastBarrel == null) { // find empty barrel?
                     lastBarrel = ZeeConfig.getClosestGob(emptyBarrels);
+                }else{
+                    ZeeConfig.removeGobText(lastBarrel);
                 }
+                ZeeConfig.addGobText(lastBarrel, "SEEDS", 0,255,0,255,10);
                 updateWItem();
                 ZeeClickItemManager.pickUpItem(wItem);
                 ZeeClickGobManager.gobItemAct(lastBarrel, UI.MOD_SHIFT);

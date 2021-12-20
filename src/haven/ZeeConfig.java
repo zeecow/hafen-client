@@ -185,6 +185,7 @@ public class ZeeConfig {
     public static HashMap<String, Color> mapGobColor = initMapGobColor();
     public static HashMap<String,Color> mapCategoryColor = initMapCategoryColor();
     public static HashMap<String,Coord> mapWindowPos = initMapWindowPos();
+    public static HashMap<Gob,Integer> mapGobTextId = new HashMap<Gob,Integer>();
     public static GobIcon.SettingsWindow.IconList iconList;
 
 
@@ -1352,6 +1353,25 @@ public class ZeeConfig {
      */
     public static double getHourglass() {
         return gameUI.prog;
+    }
+
+    public static int addGobText(Gob gob, String text, int r, int g, int b, int a, int height) {
+        Gob.Overlay gt = new Gob.Overlay(gob, new ZeeGobText(gob, text, new Color(r, g, b, a), height));
+        gameUI.ui.sess.glob.loader.defer(() -> {synchronized(gob) {
+            gob.addol(gt);
+        }}, null);
+        mapGobTextId.put(gob,gt.id);
+        return gt.id;
+    }
+
+    public static void removeGobText(Gob gob) {
+        if(gob==null)
+            return;
+        gameUI.ui.sess.glob.loader.defer(() -> {synchronized(gob) {
+            Integer id = mapGobTextId.get(gob);
+            if(id != null)
+                gob.findol(id).remove();
+        }}, null);
     }
 
     public static void msg(String s) {
