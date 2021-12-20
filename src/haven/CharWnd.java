@@ -526,10 +526,10 @@ public class CharWnd extends WindowX {
 	    this.rnm = attrf.render(res.layer(Resource.tooltip).t);
 	    this.attr = glob.getcattr(attr);
 	    this.bg = bg;
-	    adda(new IButton("gfx/hud/buttons/add", "u", "d", null) {
+	    adda(new IButton("gfx/hud/buttons/add", "u", "d", "h") {
 		    public void click() {if(ui.modshift){adj(5);}else if(ui.modctrl){adj(10);}else{adj(1);}}
 		}, sz.x - margin1, sz.y / 2, 1, 0.5);
-	    adda(new IButton("gfx/hud/buttons/sub", "u", "d", null) {
+	    adda(new IButton("gfx/hud/buttons/sub", "u", "d", "h") {
 		    public void click() {if(ui.modshift){adj(-5);}else if(ui.modctrl){adj(-10);}else{adj(-1);}}
 		}, sz.x - margin3, sz.y / 2, 1, 0.5);
 	}

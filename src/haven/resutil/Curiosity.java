@@ -29,13 +29,17 @@ package haven.resutil;
 import haven.*;
 import me.ender.timer.Timer;
 
+import java.awt.Color;
+import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 
 import static haven.QualityList.SingleType.*;
 
-public class Curiosity extends ItemInfo.Tip {
+public class Curiosity extends ItemInfo.Tip implements GItem.ColorInfo {
+    public final Color better = new Color(0, 255, 0, 64), worse = new Color(255, 0, 0, 64);
     public final int exp, mw, enc, time;
     public transient final int lph;
+    public final UI ui;
 
     public Curiosity(Owner owner, int exp, int mw, int enc, int time) {
 	super(owner);
@@ -44,6 +48,13 @@ public class Curiosity extends ItemInfo.Tip {
 	this.enc = enc;
 	this.time = time;
 	this.lph = (exp > 0 && time > 0) ? (3600 * exp / time) : 0;
+	UI ui = null;
+	if(owner instanceof Widget) {
+	    Widget wdg = (Widget)owner;
+	    if(wdg.getparent(CharWnd.class) != null)
+		ui = wdg.ui;
+	}
+	this.ui = ui;
     }
 
     static String[] units = {"s", "m", "h", "d"};
@@ -79,7 +90,7 @@ public class Curiosity extends ItemInfo.Tip {
     public BufferedImage tipimg() {
 	StringBuilder buf = new StringBuilder();
 	if(exp > 0)
-	    buf.append(String.format("Learning points: $col[192,192,255]{%s}\n", Utils.thformat(exp)));
+	    buf.append(String.format("Learning points: $col[192,192,255]{%s} ($col[192,192,255]{%s}/h)\n", Utils.thformat(exp), Utils.thformat(Math.round(exp / (time / 3600.0)))));
 	if(time > 0)
 	    buf.append(String.format("Study time: $col[192,255,192]{%s}\n", timefmt(time)));
 	String remaining = remainingLongTip();
@@ -95,6 +106,25 @@ public class Curiosity extends ItemInfo.Tip {
 	if(enc > 0)
 	    buf.append(String.format("Experience cost: $col[255,255,192]{%d}\n", enc));
 	return(RichText.render(buf.toString(), 0).img);
+    }
+
+    public Color olcol() {
+	Object tip = (ui == null) ? null : ui.lasttip;
+	if(tip instanceof ItemInfo.InfoTip) {
+	    Curiosity that = ItemInfo.find(Curiosity.class, ((ItemInfo.InfoTip)tip).info());
+	    if(that != null) {
+		double crate = (double)that.exp / (double)that.time;
+		double trate = (double)this.exp / (double)this.time;
+		if(Debug.ff)
+		    Debug.dump(trate, crate);
+		double ε = 0.5 / 3600.0;
+		if(trate < crate - ε)
+		    return(worse);
+		if(trate > crate + ε)
+		    return(better);
+	    }
+	}
+	return(null);
     }
 
     private String remainingLongTip() {
