@@ -187,6 +187,7 @@ public class ZeeConfig {
     public static HashMap<String,Coord> mapWindowPos = initMapWindowPos();
     public static HashMap<Gob,Integer> mapGobTextId = new HashMap<Gob,Integer>();
     public static GobIcon.SettingsWindow.IconList iconList;
+    public static int windowTxtentryTiles2Barrel;
 
 
     public static void checkRemoteWidget(String type, Widget wdg) {
@@ -1119,7 +1120,10 @@ public class ZeeConfig {
         return ZeeConfig.gameUI.map.sz.div(2);
     }
 
-    // compile multi-line messages into single-line
+    /*
+        - compile multi-line messages into single-line
+        - show text ql above gob
+     */
     public static void checkUiMsgText(String text) {
         now = System.currentTimeMillis();
         if(now - lastUiMessageMs > 555) { //new message
@@ -1129,6 +1133,8 @@ public class ZeeConfig {
         }
         if (text.contains("Quality")) {
             uiMsgTextQuality = text;
+            String ql = uiMsgTextQuality.replaceAll("[^0-9]", "");
+            ZeeConfig.addGobText(ZeeConfig.lastMapViewClickGob, ql, 0,255,0,255,10);
         }else if(uiMsgTextQuality!=null && !uiMsgTextQuality.isEmpty() && !text.contains("Memories")){
             uiMsgTextBuffer += ", " + text;
             gameUI.msg(uiMsgTextQuality + uiMsgTextBuffer);
@@ -1369,8 +1375,28 @@ public class ZeeConfig {
             return;
         gameUI.ui.sess.glob.loader.defer(() -> {synchronized(gob) {
             Integer id = mapGobTextId.get(gob);
-            if(id != null)
+            Gob.Overlay ol = gob.findol(id);
+            if(id!=null  && ol!=null)
                 gob.findol(id).remove();
+        }}, null);
+    }
+
+    public static void addGobColor(Gob gob, int r, int g, int b, int a) {
+        if(gob==null)
+            return;
+        gameUI.ui.sess.glob.loader.defer(() -> {synchronized(gob) {
+            if(gob.getattr(ZeeGobColor.class) != null) {
+                gob.delattr(ZeeGobColor.class);
+            }
+            gob.setattr(new ZeeGobColor(gob, new MixColor(r, g, b, a)));
+        }}, null);
+    }
+
+    public static void removeGobColor(Gob gob) {
+        if(gob==null)
+            return;
+        gameUI.ui.sess.glob.loader.defer(() -> {synchronized(gob) {
+            gob.delattr(ZeeGobColor.class);
         }}, null);
     }
 
@@ -1378,8 +1404,15 @@ public class ZeeConfig {
         gameUI.msg(s);
     }
 
+    public static String strArgs(Object... args){
+        return Arrays.toString(args);
+    }
     public static void println(String s) {
         System.out.println(s);
+    }
+
+    public static boolean isControlKey(int keyCode) {
+        return keyCode==KeyEvent.VK_RIGHT || keyCode==KeyEvent.VK_LEFT || keyCode==KeyEvent.VK_BACK_SPACE || keyCode==KeyEvent.VK_DELETE || keyCode==KeyEvent.VK_HOME || keyCode==KeyEvent.VK_END;
     }
 }
 

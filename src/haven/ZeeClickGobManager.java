@@ -66,7 +66,9 @@ public class ZeeClickGobManager extends ZeeThread{
                 }
             }else{
                 if (isGobCrop()) {
-                    gobClick(gob, 3, UI.MOD_SHIFT);//start farming area
+                    ZeeFarmingManager.showWindow();
+                    if(!ZeeConfig.getCursorName().equals(ZeeFarmingManager.CURSOR_HARVEST))
+                        gobClick(gob, 3, UI.MOD_SHIFT);//activate cursor harvest if needed
                 } else if (isGobStockpile() || isGobName("/dframe")) {
                     gobClick(3, UI.MOD_SHIFT);//pick up all items (shift + rclick)
                 } else if (isDestroyGob()) {
@@ -344,7 +346,8 @@ public class ZeeClickGobManager extends ZeeThread{
     public boolean isGobCrop() {
         return gobNameEndsWith("plants/carrot,plants/beet,plants/yellowonion,plants/redonion,"
                 +"plants/leek,plants/lettuce,plants/pipeweed,plants/hemp,plants/flax,"
-                +"plants/turnip,plants/millet,plants/barley,plants/wheat,plants/poppy,plants/pumpkin"
+                +"plants/turnip,plants/millet,plants/barley,plants/wheat,plants/poppy,"
+                +"plants/pumpkin,plants/fallowplant"
         );
     }
 

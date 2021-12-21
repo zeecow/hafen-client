@@ -144,7 +144,7 @@ public class GItem extends AWidget implements ItemInfo.SpriteOwner, GSprite.Owne
 			spr = this.spr = GSprite.create(this, res.get(), sdt.clone());
 			if (!itemDropped) {
 				itemDropped = true;
-				dropItems();
+				onSpriteCreated();
 			}
 			if(!itemCounted){
 				itemCounted = true;
@@ -158,15 +158,17 @@ public class GItem extends AWidget implements ItemInfo.SpriteOwner, GSprite.Owne
 	return(spr);
     }
 
-	private void dropItems() {
+
+	/*
+		check item for dropping and other actions
+	 */
+	private void onSpriteCreated() {
 		String name = this.resource().basename();
 		Resource curs = ui.root.getcurs(Coord.z);
 
 		if (curs != null && curs.name.equals("gfx/hud/curs/mine")) {
-
-			ZeeMiningManager.lastDropItemMs = System.currentTimeMillis();
-
 			//drop mined item
+			ZeeMiningManager.lastDropItemMs = System.currentTimeMillis();
 			if (ZeeConfig.dropMinedStones && ZeeConfig.mineablesStone.contains(name) ||
 					ZeeConfig.dropMinedOre && ZeeConfig.mineablesOre.contains(name) ||
 					ZeeConfig.dropMinedSilverGold && ZeeConfig.mineablesOrePrecious.contains(name) ||
@@ -174,9 +176,8 @@ public class GItem extends AWidget implements ItemInfo.SpriteOwner, GSprite.Owne
 			{
 				this.wdgmsg("drop", Coord.z);
 			}
-
 		}else if( ZeeConfig.farmerMode && !ZeeFarmingManager.busy && name.startsWith("seed-") && this.parent instanceof Inventory){
-
+			//farmer mode
 			if(ZeeConfig.savedTileSelEndCoord == null) {
 				ZeeConfig.println("> Farmer mode: no tile selection. Canceling...");
 				ZeeConfig.farmerMode = false;
@@ -185,21 +186,16 @@ public class GItem extends AWidget implements ItemInfo.SpriteOwner, GSprite.Owne
 			}else {
 				new ZeeFarmingManager(this, name).start();
 			}
-
 		}else if( ZeeConfig.dropSeeds && name.startsWith("seed-") && this.parent instanceof Inventory){
-
-			//drop seeds before inventory is full
+			//drop seeds
 			Inventory inv = (Inventory) this.parent;
 			if(inv.getNumberOfFreeSlots() < 3){
 				inv.dropItemsByName(name);
 			}
-
 		}else if( ZeeConfig.dropSoil && name.startsWith("soil") && this.parent instanceof Inventory) {
-
 			//drop soil
 			Inventory inv = (Inventory) this.parent;
 			inv.dropItemsByName(name);
-
 		}
 	}
 
