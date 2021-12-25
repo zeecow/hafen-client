@@ -2233,7 +2233,8 @@ public class MapView extends PView implements DTarget, Console.Directory {
 			}
 		    mgrab.remove();
 			ZeeConfig.saveTileSelection(new Coord(sc), new Coord(ec), modflags, ol);
-		    wdgmsg("sel", sc, ec, modflags);
+			//ZeeConfig.clickTile(sc.sub(ec));
+		    wdgmsg("sel", sc, ec, modflags); // TODO uncomment
 		    sc = null;
 		}
 		return(true);

@@ -42,21 +42,6 @@ public class ZeeInvMainOptionsWdg extends Widget {
             }
         }, x, 0);
 
-        x += cbButcher.sz.x + 5;
-
-        add(cbFarmer = new CheckBox("farm") {
-            {
-                a = ZeeConfig.farmerMode;
-            }
-
-            public void set(boolean val) {
-                ZeeConfig.farmerMode = val;
-                a = val;
-                if(!val)
-                    ZeeFarmingManager.busy = false;
-            }
-        }, x, 0);
-
         x = 0;
 
         add(cbSeeds = new CheckBox("dropseed") {

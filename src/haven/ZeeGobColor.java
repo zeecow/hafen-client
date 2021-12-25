@@ -4,7 +4,7 @@ import haven.render.MixColor;
 import haven.render.Pipe;
 
 public class ZeeGobColor extends GAttrib implements Gob.SetupMod {
-    private MixColor color;
+    public MixColor color;
 
     public ZeeGobColor(Gob g, MixColor color) {
         super(g);

@@ -18,6 +18,8 @@ import java.util.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static haven.OCache.posres;
+
 
 public class ZeeConfig {
     public static final String CATEG_PVPANDSIEGE = "PVP and siege";
@@ -1316,6 +1318,8 @@ public class ZeeConfig {
     }
 
     public static Gob getClosestGob(List<Gob> gobs) {
+        if(gobs==null)
+            return null;
         Gob closestGob = gobs.get(0);
         double closestDist = distanceToPlayer(closestGob);
         double dist;
@@ -1407,6 +1411,28 @@ public class ZeeConfig {
         }}, null);
     }
 
+
+    /*
+        ardClient methods, not ready
+     */
+    public static Coord coordToTile(Coord2d c) {
+        return c.div(11, 11).floor();
+    }
+    // Click tile at its center point
+    public static void clickTile(Coord tile) {
+        Coord2d origin = new Coord2d(gameUI.map.player().rc.div(11).floor().mul(11));
+        //origin = origin.sub(11 * 45, 11 * 45);// Get rid of negative coordinates
+        println("clickTile "+tile+" , "+origin);
+        //gameUI.map.wdgmsg("click", mc, origin.add(tile.x * 11, tile.y * 11).floor(posres), 1, 0);
+        gameUI.map.wdgmsg("click", getCenterScreenCoord(), origin.add(tile.x * 11, tile.y * 11).floor(posres), 1, 0);
+        //gameUI.map.pllastcc = origin.add(tile.x * 11, tile.y * 11).add(11 / 2.0, 11 / 2.0);
+    }
+    public static void moveToMinimap(final Coord2d c) {
+        //haven.MapView@270ae938 ; click ; [(584, 538), (-942390, -1030793), 1, 0]
+        //haven.MapView@270ae938 ; click ; [(599, 520), (-942525, -1031626), 1, 0, 0, 1848630602, (-942390, -1030793), 0, 33751039]
+        gameUI.map.wdgmsg("click", new Coord(1, 1), c.floor(posres), 1, 0);
+    }
+
     public static void msg(String s) {
         gameUI.msg(s);
     }
@@ -1414,12 +1440,13 @@ public class ZeeConfig {
     public static String strArgs(Object... args){
         return Arrays.toString(args);
     }
+
     public static void println(String s) {
         System.out.println(s);
     }
 
     public static boolean isControlKey(int keyCode) {
-        return keyCode==KeyEvent.VK_RIGHT || keyCode==KeyEvent.VK_LEFT || keyCode==KeyEvent.VK_BACK_SPACE || keyCode==KeyEvent.VK_DELETE || keyCode==KeyEvent.VK_HOME || keyCode==KeyEvent.VK_END;
+        return keyCode==KeyEvent.VK_RIGHT || keyCode==KeyEvent.VK_LEFT || keyCode==KeyEvent.VK_BACK_SPACE || keyCode==KeyEvent.VK_DELETE || keyCode==KeyEvent.VK_HOME || keyCode==KeyEvent.VK_END || keyCode==KeyEvent.VK_SPACE;
     }
 }
 

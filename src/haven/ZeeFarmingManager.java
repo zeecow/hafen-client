@@ -1,17 +1,18 @@
 package haven;
 
 import java.awt.event.KeyEvent;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
 public class ZeeFarmingManager extends ZeeThread{
 
+    public static final int BARREL_PRIORITY_EMPTY = 0;
+    public static final int BARREL_PRIORITY_NONEMPTY = 1;
+    public static final int BARREL_PRIORITY_CLOSEST = 2;
     public static long IDLE_MS = 2222;
     public static final String CURSOR_HARVEST = "gfx/hud/curs/harvest";
     public static final int MAX_BARREL_DIST = 300;
     public static final double TILE_SIZE = MCache.tilesz.x;
-    public static int tiles2Barrel = 0;
     public static Gob lastBarrel;
     public static boolean busy;
     public static String gItemName, lastItemName;
@@ -21,9 +22,14 @@ public class ZeeFarmingManager extends ZeeThread{
     public static boolean isHarvestDone, isPlantingDone, isScytheEquiped;
     public static HashMap<Gob,Integer> mapBarrelSeedql = new HashMap<Gob,Integer> ();
     public static Window windowManager;
-    public static boolean windowCheckboxHarvest, windowCheckboxPlant;
-    public static String windowRadiogroupSeeds;
-    public static TextEntry windowTxtentryTilesBarrel;
+
+    public static boolean farmerCbHarvest = Utils.getprefb("farmerCbHarvest",true);
+    public static boolean farmerCbReplant = Utils.getprefb("farmerCbPlant",true);
+    public static int farmerRbSeeds = Utils.getprefi("farmerRbSeeds",0);
+    public static int farmerRgBarrelPriority = Utils.getprefi("farmerRgBarrelPriority",0);
+    public static int farmerTxtTilesBarrel = Utils.getprefi("farmerTxtTilesBarrel",27);
+    public static TextEntry textEntryTilesBarrel;
+    public static Gob farmerGobCrop;
 
 
     public ZeeFarmingManager(GItem g, String name) {
@@ -43,10 +49,9 @@ public class ZeeFarmingManager extends ZeeThread{
         wItem = inv.getWItemByGItem(gItem);
     }
 
-    public ZeeFarmingManager(int tileX) {
+    public ZeeFarmingManager() {
         println("marking barrels");
         gItem = null;
-        tiles2Barrel = tileX;
     }
 
     public static void resetInitialState() {
@@ -66,19 +71,17 @@ public class ZeeFarmingManager extends ZeeThread{
 
     public void run(){
         if (gItem==null){
-            getEmptyCloseBarrels().forEach(gob -> {
+            getBarrels().forEach(gob -> {
                 ZeeConfig.addGobColor(gob,0,255,0,255);
                 ZeeConfig.addGobText(gob,"↓",0,255,0,255,10);
             });
         }else{
-            autoFarmOld();
+            startFarming();
         }
     }
 
-    private void autoFarmOld() {
+    private void startFarming() {
         ZeeConfig.autoHearthOnStranger = false;
-
-        println("busy="+busy+" , harvestIsDone="+ isHarvestDone +" , plantingIsDone="+ isPlantingDone+" , autoHearthOnStranger="+ZeeConfig.autoHearthOnStranger);
 
         try{
 
@@ -87,8 +90,7 @@ public class ZeeFarmingManager extends ZeeThread{
                 println("> harvesting");
                 waitPlayerIdleFor(2000);
                 if(inventoryHasSeeds()) {
-                    //storeSeedsByQuality();
-                    storeSeedsInBarrel(1);
+                    storeSeedsInBarrel();
                     if(!isInventoryFull()) {
                         harvestPlants();
                     }else {
@@ -100,25 +102,28 @@ public class ZeeFarmingManager extends ZeeThread{
                 }
             }
 
-            isPlantingDone = false;
-            isScytheEquiped = ZeeClickItemManager.isItemEquipped("scythe");
-            while(busy && !isPlantingDone) {
-                println("> planting");
-                if (!inventoryHasSeeds()) {
-                    if(getSeedsFromBarrel()) {
-                        plantSeeds();
-                    }else {
-                        println("planting done, seed barrel empty");
+            if(ZeeFarmingManager.farmerCbReplant) {
+                isPlantingDone = false;
+                isScytheEquiped = ZeeClickItemManager.isItemEquipped("scythe");
+                while (busy && !isPlantingDone) {
+                    println("> planting");
+                    if (!inventoryHasSeeds()) {
+                        if (getSeedsFromBarrel()) {
+                            plantSeeds();
+                        } else {
+                            println("planting done, seed barrel empty");
+                            isPlantingDone = true;
+                        }
+                    } else {
                         isPlantingDone = true;
                     }
-                }else{
-                    isPlantingDone = true;
+                    waitPlayerIdleFor(2000);
                 }
-                waitPlayerIdleFor(2000);
+
+                println("> final store barrel");
+                storeSeedsInBarrel();
             }
 
-            println("> final store barrel");
-            storeSeedsInBarrel(1);
             println(">exit");
 
         }catch (Exception e){
@@ -177,22 +182,6 @@ public class ZeeFarmingManager extends ZeeThread{
         }
     }
 
-    //TODO
-    private void storeSeedsByQuality() {
-        try {
-            List<Gob> emptyBarrels = getEmptyCloseBarrels();
-            if (emptyBarrels.size() == 0) {
-                ZeeConfig.gameUI.msg("No empty barrels close, dropping seeds.");
-                println("No empty barrels close, dropping seeds.");
-                inv.dropItemsByName(lastItemName);
-            } else {
-                println("barrels = " + emptyBarrels.size());
-            }
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-    }
-
     private boolean isInventoryFull() {
         return inv.getNumberOfFreeSlots() == 0;
     }
@@ -247,13 +236,13 @@ public class ZeeFarmingManager extends ZeeThread{
         return ret;
     }
 
-    private boolean activateCursorHarvestGob() {
+    public static boolean activateCursorHarvestGob() {
         //println("find gobs named "+ZeeConfig.lastMapViewClickGobName);
         List<Gob> plants = ZeeConfig.findGobsByName(ZeeConfig.lastMapViewClickGobName);
         if (plants.size()==0) {
             return false;
         }
-        plants.removeIf(plt -> ZeeConfig.getPlantStage(plt) == 0);
+        plants.removeIf(plt -> ZeeConfig.getPlantStage(plt) == 0  &&  !ZeeConfig.lastMapViewClickGobName.contains("/fallowplant"));
         if (plants.size()==0) {
             return false;
         }
@@ -268,7 +257,7 @@ public class ZeeFarmingManager extends ZeeThread{
         }
     }
 
-    private boolean activateCursorPlantGItem(GItem gi) {
+    public static boolean activateCursorPlantGItem(GItem gi) {
         //haven.GItem@3a68ee9c ; iact ; [(23, 16), 1]
         ZeeClickItemManager.gItemAct(gi, UI.MOD_SHIFT);
         return waitCursor(CURSOR_HARVEST);
@@ -282,18 +271,31 @@ public class ZeeFarmingManager extends ZeeThread{
         return inv.getWItemsByName(lastItemName).size();
     }
 
-    private List<Gob> getEmptyCloseBarrels() {
+    private List<Gob> getBarrels() {
         List<Gob> emptyBarrels = ZeeConfig.findGobsByName("barrel");
-        emptyBarrels.removeIf(gob -> ZeeConfig.distanceToPlayer(gob) > (tiles2Barrel==0 ? MAX_BARREL_DIST : tiles2Barrel*TILE_SIZE )); //remove distant barrels
-        emptyBarrels.removeIf(gob -> !ZeeClickGobManager.isBarrelEmpty(gob)); //remove non-empty barrels
+        emptyBarrels.removeIf(barrel -> {
+            if(ZeeConfig.distanceToPlayer(barrel) > farmerTxtTilesBarrel * TILE_SIZE)
+                return true;//remove distant barrels
+            ZeeGobColor c = barrel.getattr(ZeeGobColor.class);
+            //if(c!=null) println("barrel attr, red="+c.color.color().getRed()+" , blue="+c.color.color().getBlue());
+            if(c!=null && c.color.color().getRed()==1) {
+                //println("remove red barrel");
+                return true;//remove inaccessible barrels (red)
+            }
+            if(c!=null && c.color.color().getBlue()==1) {
+                //println("remove blue barrel");
+                return true;//remove full barrels (blue)
+            }
+            return false;
+        });
         return emptyBarrels;
     }
 
-    private void storeSeedsInBarrel(double percSeedsToStore) {
+    private void storeSeedsInBarrel() {
         try {
-            List<Gob> emptyBarrels = getEmptyCloseBarrels();
-            println("barrels = " + emptyBarrels.size());
-            if (emptyBarrels.size()==0) {
+            List<Gob> barrels = getBarrels();
+            println("barrels = " + barrels.size());
+            if (barrels.size()==0) {
                 /*
                     no barrels, drop seeds
                  */
@@ -305,12 +307,14 @@ public class ZeeFarmingManager extends ZeeThread{
                 /*
                     find barrel and store seeds
                  */
-                //emptyBarrels.forEach(b -> ZeeConfig.addGobColor(b,0,255,0,255));
                 println(">choose barrel");
-                if (lastBarrel == null) { // find empty barrel?
-                    lastBarrel = ZeeConfig.getClosestGob(emptyBarrels);
-                }else{
+                if (lastBarrel != null)
                     ZeeConfig.removeGobText(lastBarrel);
+                lastBarrel = ZeeConfig.getClosestGob(barrels);
+                if(lastBarrel==null){
+                    println("get closest barrel = null");
+                    resetInitialState();
+                    return;
                 }
                 ZeeConfig.addGobText(lastBarrel, "SEEDS", 0,255,0,255,10);
                 updateWItem();
@@ -320,31 +324,27 @@ public class ZeeFarmingManager extends ZeeThread{
                 waitPlayerStop();
                 Thread.sleep(PING_MS);//wait storing seed
                 if (ZeeConfig.isPlayerHoldingItem()) {
-                    if(percSeedsToStore==1) {
-                        // store all seeds (ctrl+shift)
-                        println("store all seeds (ctrl+shift)");
-                        ZeeClickGobManager.gobItemAct(lastBarrel, 3);
-                    }else{
-                        // store percentage of seed items
-                        int numSeedItems = getNumberOfSeedItems();
-                        int part = (int) (numSeedItems * percSeedsToStore);
-                        println("store perc seeds "+part+"/"+numSeedItems);
-                        for (int i=0; i<part ; i++) {
-                            ZeeClickGobManager.gobItemAct(lastBarrel, UI.MOD_SHIFT);
-                            Thread.sleep(PING_MS);//wait storing seed
-                        }
-                        Thread.sleep(PING_MS);
-                        if(ZeeConfig.isPlayerHoldingItem())//store seed in hand
-                            ZeeClickGobManager.gobItemAct(lastBarrel, 0);
-                    }
+                    // store all seeds (ctrl+shift)
+                    println("store all seeds (ctrl+shift)");
+                    ZeeClickGobManager.gobItemAct(lastBarrel, 3);
                     if(waitNotHoldingItem()) {
                         println("seeds stored");
                         ZeeConfig.addGobColor(lastBarrel,0,255,0,255);
                     } else {
-                        //still holding item = barrel full?
-                        ZeeConfig.gameUI.msg("Barrel full or player blocked?");
-                        println("barrel full (lastBarrel=null)");
-                        ZeeConfig.removeGobText(lastBarrel);
+                        //still holding item
+                        if(ZeeConfig.distanceToPlayer(lastBarrel) > TILE_SIZE*2){
+                            //can't reach barrel
+                            println("can't reach barrel? mark it red");
+                            ZeeConfig.addGobColor(lastBarrel,255,0,0,255);
+                            ZeeConfig.removeGobText(lastBarrel);
+                            ZeeConfig.addGobText(lastBarrel,"inaccessible",255,0,0,255,10);
+                        }else{
+                            //barrel full
+                            println("barrel full? mark it blue");
+                            ZeeConfig.addGobColor(lastBarrel,0,0,255,255);
+                            ZeeConfig.removeGobText(lastBarrel);
+                            ZeeConfig.addGobText(lastBarrel,"full",0,0,255,255,10);
+                        }
                         lastBarrel = null;
                     }
                 }
@@ -354,58 +354,107 @@ public class ZeeFarmingManager extends ZeeThread{
         }
     }
 
-    public static void showWindow() {
+    // gfx/terobjs/barrel-flax
+    // gfx/invobjs/seed-flax
+    public static boolean isBarrelSameSeeds(Gob barrel, String seedName) {
+        String seed = seedName.replace("gfx/invobjs/seed-","");
+        return ZeeClickGobManager.getOverlayNames(barrel).contains("gfx/terobjs/barrel-" + seed);
+    }
+
+    public static void showWindow(Gob gobCrop) {
         Widget wdg;
+        ZeeFarmingManager.farmerGobCrop = gobCrop;
+        ZeeConfig.farmerMode = true;
+
         if(windowManager ==null){
-            windowManager = new ZeeWindow(new Coord(300,120), "Farming manager");
+
+            windowManager = new ZeeWindow(new Coord(300,120), "Farming manager"){
+                @Override
+                public void wdgmsg(String msg, Object... args) {
+                    if (msg=="close"){
+                        ZeeConfig.farmerMode = false;
+                    }
+                    super.wdgmsg(msg, args);
+                }
+            };
+
 
             //checkbox harvest
+            /*
             wdg = windowManager.add(new CheckBox("harvest") {
-                {
-                    a = ZeeFarmingManager.windowCheckboxHarvest;
-                }
+                { a = ZeeFarmingManager.farmerCbHarvest; }
                 public void set(boolean val) {
-                    ZeeFarmingManager.windowCheckboxHarvest = val;
+                    ZeeFarmingManager.farmerCbHarvest = val;
                     a = val;
+                    Utils.setprefb("farmerCbHarvest",val);
                 }
             }, 0, 0);
+             */
+
 
             //checkbox plant
-            wdg = windowManager.add(new CheckBox("plant") {
-                {
-                    a = ZeeFarmingManager.windowCheckboxPlant;
-                }
+            wdg = windowManager.add(new CheckBox("replant after harvest") {
+                { a = ZeeFarmingManager.farmerCbReplant;  }
                 public void set(boolean val) {
-                    ZeeFarmingManager.windowCheckboxPlant = val;
+                    ZeeFarmingManager.farmerCbReplant = val;
                     a = val;
+                    Utils.setprefb("farmerCbPlant",val);
                 }
-            }, 0, 15);
+            }, 0, 7);
+
 
             // radio drop store
             RadioGroup grp = new RadioGroup(windowManager) {
                 public void changed(int opt, String lbl) {
-                    ZeeFarmingManager.windowRadiogroupSeeds = lbl;
+                    ZeeFarmingManager.farmerRbSeeds = opt;
+                    Utils.setprefi("farmerRbSeeds",opt);
                 }
             };
             wdg = windowManager.add(new Label("Seeds: "), 0, 30);
             wdg = grp.add("store", new Coord(37, 30));
             wdg = grp.add("drop", new Coord(85, 30));
+            grp.check(ZeeFarmingManager.farmerRbSeeds);
+
 
             // barrel tiles
             wdg = windowManager.add(new Label("Max tiles to barrel: "), 0, 50);
-            ZeeFarmingManager.windowTxtentryTilesBarrel = new TextEntry(UI.scale(45),""+(int)(ZeeFarmingManager.MAX_BARREL_DIST/MCache.tilesz.x)){
+            ZeeFarmingManager.textEntryTilesBarrel = new TextEntry(UI.scale(45),""+(int)(ZeeFarmingManager.MAX_BARREL_DIST/MCache.tilesz.x)){
                 public boolean keydown(KeyEvent e) {
                     if(!Character.isDigit(e.getKeyChar()) && !ZeeConfig.isControlKey(e.getKeyCode()))
                         return false;
                     return super.keydown(e);
                 }
+                public void changed(ReadLine buf) {
+                    if(!buf.line().isEmpty()) {
+                        ZeeFarmingManager.farmerTxtTilesBarrel = Integer.parseInt(buf.line());
+                        Utils.setprefi("farmerTxtTilesBarrel", ZeeFarmingManager.farmerTxtTilesBarrel);
+                    }
+                    super.changed(buf);
+                }
             };
-            wdg = windowManager.add(ZeeFarmingManager.windowTxtentryTilesBarrel, 95, 50-3);
+            wdg = windowManager.add(ZeeFarmingManager.textEntryTilesBarrel, 95, 50-3);
             wdg = windowManager.add(new ZeeWindow.ZeeButton(UI.scale(45),"test"), 145,50-4);
+            ZeeFarmingManager.textEntryTilesBarrel.settext(""+ZeeFarmingManager.farmerTxtTilesBarrel);
 
-            //start button
-            wdg = windowManager.add(new ZeeWindow.ZeeButton(UI.scale(45),"start"),300-40, 120-20);
+
+            /*
+            // radio barrel priority
+            RadioGroup grp2 = new RadioGroup(windowManager) {
+                public void changed(int opt, String lbl) {
+                    ZeeFarmingManager.farmerRgBarrelPriority = opt;
+                    Utils.setprefi("farmerRgBarrelPriority",opt);
+                }
+            };
+            wdg = windowManager.add(new Label("Barrel priority: "), 0, 70);
+            wdg = grp2.add("empty", new Coord(72, 70));
+            wdg = grp2.add("non-empty", new Coord(127, 70));
+            //wdg = grp2.add("closest", new Coord(205, 70));
+            grp2.check(ZeeFarmingManager.farmerRgBarrelPriority);
+             */
+
+            //add window
             ZeeConfig.gameUI.add(windowManager, new Coord(100,100));
+
         }else {
             windowManager.show();
         }
