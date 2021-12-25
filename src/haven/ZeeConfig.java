@@ -54,7 +54,8 @@ public class ZeeConfig {
     public static Object[] lastMapViewClickArgs;
     public static Gob lastMapViewClickGob;
     public static String lastMapViewClickGobName;
-    public static Coord2d lastMapViewClickCoord2d;
+    public static Coord lastMapViewClickPc;
+    public static Coord2d lastMapViewClickMc;
     public static int lastMapViewClickButton;
     public static Coord savedTileSelStartCoord, savedTileSelEndCoord;
     public static int savedTileSelModflags;
@@ -1302,9 +1303,10 @@ public class ZeeConfig {
         }).collect(Collectors.toList());
     }
 
-    public static void gobClicked(int clickb, Coord2d mc, Object[] args, Gob clickGob) {
+    public static void gobClicked(int clickb, Coord pc, Coord2d mc, Object[] args, Gob clickGob) {
         lastMapViewClickButton = clickb;
-        lastMapViewClickCoord2d = mc;
+        lastMapViewClickPc = pc;
+        lastMapViewClickMc = mc;
         lastMapViewClickArgs = args;
         lastMapViewClickGob = clickGob;
         if(clickGob!=null) {
@@ -1316,6 +1318,8 @@ public class ZeeConfig {
     }
 
     public static Gob getClosestGob(List<Gob> gobs) {
+        if(gobs==null)
+            return null;
         Gob closestGob = gobs.get(0);
         double closestDist = distanceToPlayer(closestGob);
         double dist;
@@ -1369,6 +1373,7 @@ public class ZeeConfig {
     }
 
     public static int addGobText(Gob gob, String text, int r, int g, int b, int a, int height) {
+        removeGobText(gob);//cleanup previous text
         Gob.Overlay gt = new Gob.Overlay(gob, new ZeeGobText(gob, text, new Color(r, g, b, a), height));
         gameUI.ui.sess.glob.loader.defer(() -> {synchronized(gob) {
             gob.addol(gt);
@@ -1382,8 +1387,10 @@ public class ZeeConfig {
             return;
         gameUI.ui.sess.glob.loader.defer(() -> {synchronized(gob) {
             Integer id = mapGobTextId.get(gob);
+            if (id==null)
+                return;
             Gob.Overlay ol = gob.findol(id);
-            if(id!=null  && ol!=null)
+            if(ol!=null)
                 gob.findol(id).remove();
         }}, null);
     }
@@ -1407,6 +1414,11 @@ public class ZeeConfig {
         }}, null);
     }
 
+
+    public static void cancelClick() {
+        gameUI.map.wdgmsg("click", Coord.z, Coord.z, 3, 0);
+    }
+
     public static void msg(String s) {
         gameUI.msg(s);
     }
@@ -1414,13 +1426,12 @@ public class ZeeConfig {
     public static String strArgs(Object... args){
         return Arrays.toString(args);
     }
+
     public static void println(String s) {
         System.out.println(s);
     }
 
     public static boolean isControlKey(int keyCode) {
-        return keyCode==KeyEvent.VK_RIGHT || keyCode==KeyEvent.VK_LEFT || keyCode==KeyEvent.VK_BACK_SPACE || keyCode==KeyEvent.VK_DELETE || keyCode==KeyEvent.VK_HOME || keyCode==KeyEvent.VK_END;
+        return keyCode==KeyEvent.VK_RIGHT || keyCode==KeyEvent.VK_LEFT || keyCode==KeyEvent.VK_BACK_SPACE || keyCode==KeyEvent.VK_DELETE || keyCode==KeyEvent.VK_HOME || keyCode==KeyEvent.VK_END || keyCode==KeyEvent.VK_SPACE;
     }
 }
-
-

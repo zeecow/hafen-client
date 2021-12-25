@@ -182,7 +182,6 @@ public class GItem extends AWidget implements ItemInfo.SpriteOwner, GSprite.Owne
 				ZeeConfig.println("> Farmer mode: no tile selection. Canceling...");
 				ZeeConfig.farmerMode = false;
 				ZeeFarmingManager.resetInitialState();
-				ZeeInvMainOptionsWdg.cbFarmer.click();//deselect farmerMode checkbox
 			}else {
 				new ZeeFarmingManager(this, name).start();
 			}

@@ -66,7 +66,7 @@ public class ZeeClickGobManager extends ZeeThread{
                 }
             }else{
                 if (isGobCrop()) {
-                    ZeeFarmingManager.showWindow();
+                    ZeeFarmingManager.showWindow(gob);
                     if(!ZeeConfig.getCursorName().equals(ZeeFarmingManager.CURSOR_HARVEST))
                         gobClick(gob, 3, UI.MOD_SHIFT);//activate cursor harvest if needed
                 } else if (isGobStockpile() || isGobName("/dframe")) {
@@ -337,6 +337,7 @@ public class ZeeClickGobManager extends ZeeThread{
     private void inspectGob() {
         ZeeConfig.gameUI.menu.wdgmsg("act","inspect","0");
         gobClick(1);
+        ZeeConfig.cancelClick();
     }
 
     public boolean isGobTrellisPlant() {

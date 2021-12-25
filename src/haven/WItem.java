@@ -208,8 +208,6 @@ public class WItem extends Widget implements DTarget {
 			return false;
 		}else if (btn==3 && ui.modshift && ZeeConfig.farmerMode) {
 			ZeeConfig.println("> disabling farmer mode, start with harvesting instead of planting");
-			ZeeConfig.gameUI.msg("disabling farmer mode, start with harvesting instead of planting");
-			ZeeInvMainOptionsWdg.cbFarmer.click();
 		}
 		return super.mouseup(c, btn);
 	}
