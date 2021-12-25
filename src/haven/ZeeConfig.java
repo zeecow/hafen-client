@@ -645,17 +645,24 @@ public class ZeeConfig {
             if(isMakewindow(window)){
                 windowTitle = MAKE_WINDOW_NAME;
             }
-            String singleWindows = "Craft,Inventory,Character,Options,Kith & Kin,Equipment";
-            if(singleWindows.contains(windowTitle)){ // avoid searching multiple Windows
-                //use saved position window
-                if ((c = mapWindowPos.get(windowTitle)) != null) {
-                    window.c = c;
-                }
-            } else if( getWindows(windowTitle).size() == 1 ) { //search multiple windows
-                //use saved position window
-                if ((c = mapWindowPos.get(windowTitle)) != null) {
-                    window.c = c;
-                }
+            //use saved position window
+            if ((c = mapWindowPos.get(windowTitle)) != null) {
+                window.c = c;
+            }
+        }
+
+        //show organize button if duplicate windows
+        String singleWindows = "Craft,Inventory,Character,Options,Kith & Kin,Equipment";
+        if(!singleWindows.contains(windowTitle)) { // avoid searching multiple Windows
+            List<Window> wins= getWindows(windowTitle);
+            if (wins.size() > 1) {
+                //add organize button
+                window.add(
+                    new ZeeWindow.ZeeButton(25,
+                    ZeeWindow.ZeeButton.TEXT_ORGANIZEWINDOWS),
+                    window.cbtn.c.x-25,
+                    window.cbtn.c.y
+                );
             }
         }
     }

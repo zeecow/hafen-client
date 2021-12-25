@@ -96,7 +96,7 @@ public class Window extends Widget implements DTarget {
 	this.rbo = rbo;
 	this.mrgn = lg ? dlmrgn : dsmrgn;
 	//cbtn = add(new IButton(cbtni[0], cbtni[1], cbtni[2]));
-	cbtn = add(new Button(30,"x"));
+	cbtn = add(new Button(25,"x"));
 	chcap(cap);
 	resize2(sz);
 	setfocustab(true);
