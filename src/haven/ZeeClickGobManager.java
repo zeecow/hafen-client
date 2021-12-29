@@ -59,14 +59,17 @@ public class ZeeClickGobManager extends ZeeThread{
             long clicks
              */
             if(ZeeConfig.gameUI.ui.modctrl) {
-                if (isFuelAction()) {
+                if (isGobCrop()) {
+                    ZeeFarmingManager.showWindow(gob);
+                    if(!ZeeConfig.getCursorName().equals(ZeeConfig.CURSOR_HARVEST))
+                        gobClick(gob, 3, UI.MOD_SHIFT);//activate cursor harvest if needed
+                } else if (isFuelAction()) {
                     addFuelToGob();
                 } else if (isBarrelTakeAll()) {
                     barrelTakeAllSeeds();
                 }
             }else{
                 if (isGobCrop()) {
-                    ZeeFarmingManager.showWindow(gob);
                     if(!ZeeConfig.getCursorName().equals(ZeeConfig.CURSOR_HARVEST))
                         gobClick(gob, 3, UI.MOD_SHIFT);//activate cursor harvest if needed
                 } else if (isGobStockpile() || isGobName("/dframe")) {

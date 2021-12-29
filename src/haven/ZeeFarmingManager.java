@@ -119,7 +119,7 @@ public class ZeeFarmingManager extends ZeeThread{
                         if (getSeedsFromBarrel()) {
                             plantSeeds();
                         } else {
-                            println("planting done, seed barrel empty");
+                            println("seed barrel empty");
                             isPlantingDone = true;
                         }
                     } else {
@@ -174,13 +174,22 @@ public class ZeeFarmingManager extends ZeeThread{
                 ZeeClickGobManager.gobItemAct(lastBarrel, 0);
 
             if (!isInventoryFull()) {
-                println("inv not full, barrel is empty?");
-                lastBarrel = null;
-                if (inventoryHasSeeds()) {
-                    println("got last seeds from barrel");
-                    return true;
-                } else {
-                    println("got no seeds from barrel");
+                println("inv not full");
+                if(ZeeClickGobManager.isBarrelEmpty(lastBarrel)){
+                    println("barrel empty, find another");
+                    List<Gob> barrels = findAnotherSeedBarrel();
+                    if(barrels.size()==0) {
+                        println("no more seed barrels, planting done");
+                        isPlantingDone = true;
+                        lastBarrel = null;
+                        return false;
+                    }else{
+                        println("found another seed barrel... call recursive method");
+                        lastBarrel = ZeeConfig.getClosestGob(barrels);
+                        return getSeedsFromBarrel();//TODO: recursive check
+                    }
+                }else{
+                    println("impossible state?");
                     return false;
                 }
             }else{
@@ -191,6 +200,19 @@ public class ZeeFarmingManager extends ZeeThread{
             e.printStackTrace();
             return false;
         }
+    }
+
+    public static List<Gob> findAnotherSeedBarrel() {
+        println(">find another seed barrel");
+        List<Gob> barrels = getBarrels();
+        barrels.removeIf(b -> {
+            if (ZeeClickGobManager.isBarrelEmpty(b))
+                return true;
+            if (!isBarrelSameSeeds(b,lastItemName))
+                return true;
+            return false;
+        });
+        return barrels;
     }
 
     private boolean isInventoryFull() {
@@ -212,6 +234,8 @@ public class ZeeFarmingManager extends ZeeThread{
              */
             ZeeConfig.gameUI.map.wdgmsg("sel", ZeeConfig.savedTileSelStartCoord, ZeeConfig.savedTileSelEndCoord, ZeeConfig.savedTileSelModflags);
             return true;
+        }else{
+            println("couldn't activate cursor for planting");
         }
         return false;
     }
@@ -250,6 +274,7 @@ public class ZeeFarmingManager extends ZeeThread{
     }
 
     public static boolean activateCursorHarvestGob() {
+        println("activateCursorHarvestGob()");
         //println("find gobs named "+ZeeConfig.lastMapViewClickGobName);
         List<Gob> plants = ZeeConfig.findGobsByName(ZeeConfig.lastMapViewClickGobName);
         if (plants.size()==0) {
@@ -272,6 +297,7 @@ public class ZeeFarmingManager extends ZeeThread{
 
     public static boolean activateCursorPlantGItem(GItem gi) {
         //haven.GItem@3a68ee9c ; iact ; [(23, 16), 1]
+        println("activateCursorPlantGItem()");
         ZeeClickItemManager.gItemAct(gi, UI.MOD_SHIFT);
         return waitCursor(ZeeConfig.CURSOR_HARVEST);
     }
@@ -284,20 +310,14 @@ public class ZeeFarmingManager extends ZeeThread{
         return inv.getWItemsByName(lastItemName).size();
     }
 
-    private List<Gob> getBarrels() {
+    public static List<Gob> getBarrels() {
         List<Gob> emptyBarrels = ZeeConfig.findGobsByName("barrel");
         emptyBarrels.removeIf(barrel -> {
             if(ZeeConfig.distanceToPlayer(barrel) > farmerTxtTilesBarrel * TILE_SIZE)
                 return true;//remove distant barrels
             ZeeGobColor c = barrel.getattr(ZeeGobColor.class);
-            //if(c!=null) println("barrel attr, red="+c.color.color().getRed()+" , blue="+c.color.color().getBlue());
             if(c!=null && c.color.color().getRed()==1) {
-                //println("remove red barrel");
                 return true;//remove inaccessible barrels (red)
-            }
-            if(c!=null && c.color.color().getBlue()==1) {
-                //println("remove blue barrel");
-                return true;//remove full barrels (blue)
             }
             return false;
         });
@@ -321,9 +341,15 @@ public class ZeeFarmingManager extends ZeeThread{
                     find barrel and store seeds
                  */
                 println(">choose barrel");
-
-                if (lastBarrel != null)
-                    ZeeConfig.removeGobText(lastBarrel);
+                barrels.removeIf(b -> {
+                    ZeeGobColor c = b.getattr(ZeeGobColor.class);
+                    if(c!=null && c.color.color().getBlue()==1) {
+                        return true;//remove possible marked full(blue) barrels
+                    }
+                    return false;
+                });
+                //if (lastBarrel != null)
+                //    ZeeConfig.removeGobText(lastBarrel);
                 lastBarrel = ZeeConfig.getClosestGob(barrels);
                 if(lastBarrel==null){
                     println("get closest barrel = null");
@@ -331,7 +357,7 @@ public class ZeeFarmingManager extends ZeeThread{
                     return;
                 }
                 ZeeConfig.addGobText(ZeeConfig.getPlayerGob(),"storing",0,255,255,255,10);
-                ZeeConfig.addGobText(lastBarrel, "SEEDS", 0,255,0,255,10);
+                ZeeConfig.addGobText(lastBarrel, getBarrelText(), 0,255,0,255,10);
                 updateWItem();
                 ZeeClickItemManager.pickUpItem(wItem);
                 ZeeClickGobManager.gobItemAct(lastBarrel, UI.MOD_SHIFT);
@@ -344,7 +370,7 @@ public class ZeeFarmingManager extends ZeeThread{
                     ZeeClickGobManager.gobItemAct(lastBarrel, 3);
                     if(waitNotHoldingItem()) {
                         println("seeds stored");
-                        ZeeConfig.addGobColor(lastBarrel,0,255,0,255);
+                        //ZeeConfig.addGobColor(lastBarrel,0,255,0,255);
                     } else {
                         //still holding item
                         if(ZeeConfig.distanceToPlayer(lastBarrel) > TILE_SIZE*2){
@@ -352,13 +378,13 @@ public class ZeeFarmingManager extends ZeeThread{
                             println("can't reach barrel? mark it red");
                             ZeeConfig.addGobColor(lastBarrel,255,0,0,255);
                             ZeeConfig.removeGobText(lastBarrel);
-                            ZeeConfig.addGobText(lastBarrel,"inaccessible",255,0,0,255,10);
+                            //ZeeConfig.addGobText(lastBarrel,"inaccessible",255,0,0,255,10);
                         }else{
                             //barrel full
                             println("barrel full? mark it blue");
                             ZeeConfig.addGobColor(lastBarrel,0,0,255,255);
                             ZeeConfig.removeGobText(lastBarrel);
-                            ZeeConfig.addGobText(lastBarrel,"full",0,0,255,255,10);
+                            //ZeeConfig.addGobText(lastBarrel,"full",0,0,255,255,10);
                         }
                         lastBarrel = null;
                     }
@@ -369,11 +395,25 @@ public class ZeeFarmingManager extends ZeeThread{
         }
     }
 
+    public static String getBarrelText() {
+        return getSeedName() +" q"+ Inventory.getQuality(gItem).intValue();
+    }
+
+    public static String getSeedName() {
+        return lastItemName.replace("seed-","");
+    }
+
     // gfx/terobjs/barrel-flax
     // gfx/invobjs/seed-flax
     public static boolean isBarrelSameSeeds(Gob barrel, String seedName) {
-        String seed = seedName.replace("gfx/invobjs/seed-","");
-        return ZeeClickGobManager.getOverlayNames(barrel).contains("gfx/terobjs/barrel-" + seed);
+        String seed = seedName.replace("seed-","");
+        if(ZeeClickGobManager.getOverlayNames(barrel).contains("gfx/terobjs/barrel-" + seed)) {
+            //println("same seeds , gfx/terobjs/barrel-" + seed);
+            return true;
+        }else {
+            //println("not same seeds , gfx/terobjs/barrel-" + seed);
+            return false;
+        }
     }
 
     public static void showWindow(Gob gobCrop) {
@@ -393,19 +433,6 @@ public class ZeeFarmingManager extends ZeeThread{
                     super.wdgmsg(msg, args);
                 }
             };
-
-
-            //checkbox harvest
-            /*
-            wdg = windowManager.add(new CheckBox("harvest") {
-                { a = ZeeFarmingManager.farmerCbHarvest; }
-                public void set(boolean val) {
-                    ZeeFarmingManager.farmerCbHarvest = val;
-                    a = val;
-                    Utils.setprefb("farmerCbHarvest",val);
-                }
-            }, 0, 0);
-             */
 
 
             //checkbox plant
@@ -453,21 +480,8 @@ public class ZeeFarmingManager extends ZeeThread{
             wdg = windowManager.add(new ZeeWindow.ZeeButton(UI.scale(45),"test"), 145,50-4);
             ZeeFarmingManager.textEntryTilesBarrel.settext(""+ZeeFarmingManager.farmerTxtTilesBarrel);
 
-
-            /*
-            // radio barrel priority
-            RadioGroup grp2 = new RadioGroup(windowManager) {
-                public void changed(int opt, String lbl) {
-                    ZeeFarmingManager.farmerRgBarrelPriority = opt;
-                    Utils.setprefi("farmerRgBarrelPriority",opt);
-                }
-            };
-            wdg = windowManager.add(new Label("Barrel priority: "), 0, 70);
-            wdg = grp2.add("empty", new Coord(72, 70));
-            wdg = grp2.add("non-empty", new Coord(127, 70));
-            //wdg = grp2.add("closest", new Coord(205, 70));
-            grp2.check(ZeeFarmingManager.farmerRgBarrelPriority);
-             */
+            //add bottom note
+            wdg = windowManager.add(new Label("(no path-find, remove field obstacles, surround with barrels)"), 0, 120-15);
 
             //add window
             ZeeConfig.gameUI.add(windowManager, new Coord(100,100));

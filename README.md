@@ -5,6 +5,7 @@ original features:
  - sort actions by most used craft items
  - craft window search button for ingredients 
  - big ugly close buttons
+ - organize duplicate windows button 
  - compact equip window
  - auto toggle equip window
  - shorter cattle roster window
@@ -13,7 +14,7 @@ original features:
  - mid click object/item for small tasks:
    - MidClick obj: [inspect] , [Giddyup!] , [light torch]
      - LongMidClick obj: [lift up] , [destroy trellis plant] , [farm area cursor], [take all from stockpile]
-     - CtrlLongMidClick obj: [auto-fill oven/smelter] , [take all barrel seeds]
+     - CtrlLongMidClick obj: [auto-fill oven/smelter] , [take all barrel seeds], [farm manager window]
    - MidClick item: [sort-transfer] , [pick-up all] , [quick-equip from belt]
      - LongMidClick item: [sort-transfer inverse] , [equip fishing item and recast] , [plant seed cursor]
      - CtrlLongMidClick item: [kill all silk-cocoons] , [feast all similar food]
