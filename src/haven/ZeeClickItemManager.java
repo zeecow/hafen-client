@@ -31,7 +31,7 @@ public class ZeeClickItemManager extends ZeeThread{
             //error caused by midClicking again before task ending
             cancelManager = true;
         }
-        //println(itemName +"  "+ wItem.c.div(33));
+        //println(itemName +"  "+ wItem.c.div(33)+"  "+ZeeConfig.getCursorName());
     }
 
     @Override
@@ -43,7 +43,8 @@ public class ZeeClickItemManager extends ZeeThread{
         try{
 
             //kill all, eat all, etc...
-            if(actOnAllInventoryItems()){
+            if(wItem.ui.modctrl && isLongClick()){
+                actOnAllInventoryItems();
                 return;
             } else if (isLongClick() && isFishingItem()) {
                 equipFishingItem();
@@ -298,36 +299,61 @@ public class ZeeClickItemManager extends ZeeThread{
 
     private boolean actOnAllInventoryItems() {
 
-        if(!wItem.ui.modctrl || !isLongClick())// require Ctrl + LongClick
-            return false;
-
         // kill all inventory cocoons
         if(itemName.endsWith("silkcocoon") || itemName.endsWith("chrysalis")){
             Inventory inv = wItem.getparent(Inventory.class);
             List<WItem> items = inv.children(WItem.class).stream()
-                    .filter(wItem1 -> wItem1.item.getres().name.endsWith("silkcocoon") || wItem1.item.getres().name.endsWith("chrysalis"))
-                    .collect(Collectors.toList());
-            for (WItem w: items) {
-                ZeeConfig.scheduleClickPetal("Kill");
-                try {
-                    itemAct(w);
-                    int max = (int) TIMEOUT_MS;
-                    while(max>0 && ZeeConfig.clickPetal){//wait FlowerMenu end and set clickPetal to false
-                        max -= SLEEP_MS;
-                        Thread.sleep(SLEEP_MS);
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    ZeeConfig.resetClickPetal();
-                    ZeeConfig.gameUI.msg("Kill cocoons: "+e.getMessage());
-                    return false;
-                }
-            }
+                .filter(wItem1 -> wItem1.item.getres().name.endsWith("silkcocoon") || wItem1.item.getres().name.endsWith("chrysalis"))
+                .collect(Collectors.toList());
+            clickAllItemsPetal(items,"Kill");
             ZeeConfig.gameUI.msg(items.size()+" cocoons clicked");
             return true;
         }
 
+        //eat all table similar items
+        else if(ZeeConfig.getCursorName().equals(ZeeConfig.CURSOR_EAT)){
+            Inventory inv = wItem.getparent(Inventory.class);
+            List<WItem> items = inv.children(WItem.class).stream()
+                .filter(wItem1 -> wItem1.item.getres().name.equals(itemName))
+                .collect(Collectors.toList());
+            takeAllInvItems(inv, items);
+            ZeeConfig.gameUI.msg(items.size()+" noms");
+            return true;
+        }
+
         return false;
+    }
+
+    public static void takeAllInvItems(Inventory inv, List<WItem> items) {
+        try {
+            for (WItem w : items) {
+                w.item.wdgmsg("take", w.getInvSlotCoord());
+                Thread.sleep(PING_MS);
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+            ZeeConfig.gameUI.msg("takeAllInvItems: "+e.getMessage());
+        }
+    }
+
+    public static boolean clickAllItemsPetal(List<WItem> items, String petalName) {
+        for (WItem w: items) {
+            ZeeConfig.scheduleClickPetalOnce(petalName);
+            try {
+                itemAct(w);
+                int max = (int) TIMEOUT_MS;
+                while(max>0 && ZeeConfig.clickPetal){//wait FlowerMenu end and set clickPetal to false
+                    max -= SLEEP_MS;
+                    Thread.sleep(SLEEP_MS);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                ZeeConfig.resetClickPetal();
+                ZeeConfig.gameUI.msg("clickAllItemsPetal: "+e.getMessage());
+                return false;
+            }
+        }
+        return true;
     }
 
     public static void itemAct(WItem item){
@@ -367,7 +393,7 @@ public class ZeeClickItemManager extends ZeeThread{
     }
 
     private void drinkFrom() {
-        ZeeConfig.scheduleClickPetal("Drink");
+        ZeeConfig.scheduleClickPetalOnce("Drink");
         itemAct(wItem);
     }
 

@@ -67,7 +67,7 @@ public class ZeeClickGobManager extends ZeeThread{
             }else{
                 if (isGobCrop()) {
                     ZeeFarmingManager.showWindow(gob);
-                    if(!ZeeConfig.getCursorName().equals(ZeeFarmingManager.CURSOR_HARVEST))
+                    if(!ZeeConfig.getCursorName().equals(ZeeConfig.CURSOR_HARVEST))
                         gobClick(gob, 3, UI.MOD_SHIFT);//activate cursor harvest if needed
                 } else if (isGobStockpile() || isGobName("/dframe")) {
                     gobClick(3, UI.MOD_SHIFT);//pick up all items (shift + rclick)
@@ -178,7 +178,7 @@ public class ZeeClickGobManager extends ZeeThread{
             ZeeClickItemManager.unequipLeftItem();
         }else{
             //no scythe around, just harvest
-            ZeeConfig.scheduleClickPetal("Harvest");
+            ZeeConfig.scheduleClickPetalOnce("Harvest");
             gobClick(gob,3);
         }
     }
@@ -377,7 +377,7 @@ public class ZeeClickGobManager extends ZeeThread{
     }
 
     private void clickPetal(String petalName) {
-        ZeeConfig.scheduleClickPetal(petalName);
+        ZeeConfig.scheduleClickPetalOnce(petalName);
         gobClick(3);
     }
 

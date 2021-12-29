@@ -10,7 +10,6 @@ public class ZeeFarmingManager extends ZeeThread{
     public static final int RB_SEEDS_DROP = 1;
     public static final int RB_SEEDS_WAIT = 2;
     public static long IDLE_MS = 2222;
-    public static final String CURSOR_HARVEST = "gfx/hud/curs/harvest";
     public static final int MAX_BARREL_DIST = 300;
     public static final double TILE_SIZE = MCache.tilesz.x;
     public static Gob lastBarrel;
@@ -153,7 +152,7 @@ public class ZeeFarmingManager extends ZeeThread{
             ZeeConfig.addGobText(ZeeConfig.getPlayerGob(),"getting seeds...",0,255,255,255,10);
 
             //remove harvest cursor
-            if(ZeeConfig.getCursorName().equals(CURSOR_HARVEST)){
+            if(ZeeConfig.getCursorName().equals(ZeeConfig.CURSOR_HARVEST)){
                 println("remove cursor harvest");
                 ZeeClickGobManager.gobClick(lastBarrel,3);
             }
@@ -264,7 +263,7 @@ public class ZeeFarmingManager extends ZeeThread{
         //println("closest "+g+" , stage "+ZeeConfig.getPlantStage(g));
         if(g!=null) {
             ZeeClickGobManager.gobClick(g, 3, UI.MOD_SHIFT);
-            return waitCursor(CURSOR_HARVEST);
+            return waitCursor(ZeeConfig.CURSOR_HARVEST);
         }else {
             println("no gobs to shift+click");
             return false;
@@ -274,7 +273,7 @@ public class ZeeFarmingManager extends ZeeThread{
     public static boolean activateCursorPlantGItem(GItem gi) {
         //haven.GItem@3a68ee9c ; iact ; [(23, 16), 1]
         ZeeClickItemManager.gItemAct(gi, UI.MOD_SHIFT);
-        return waitCursor(CURSOR_HARVEST);
+        return waitCursor(ZeeConfig.CURSOR_HARVEST);
     }
 
     private boolean inventoryHasSeeds() {

@@ -12,11 +12,11 @@ original features:
  - basic inventory item counter
  - mid click object/item for small tasks:
    - MidClick obj: [inspect] , [Giddyup!] , [light torch]
-     - LongMidClick obj: [lift up] , [destroy trellis plant] , [farm area icon]
+     - LongMidClick obj: [lift up] , [destroy trellis plant] , [farm area cursor], [take all from stockpile]
      - CtrlLongMidClick obj: [auto-fill oven/smelter] , [take all barrel seeds]
    - MidClick item: [sort-transfer] , [pick-up all] , [quick-equip from belt]
-     - LongMidClick item: [sort-transfer inverse] , [equip fishing item and recast]
-     - CtrlLongMidClick item: [kill all silk-cocoons]
+     - LongMidClick item: [sort-transfer inverse] , [equip fishing item and recast] , [plant seed cursor]
+     - CtrlLongMidClick item: [kill all silk-cocoons] , [feast all similar food]
 
 other stuff:
  - autodrop mined items, seeds, soil

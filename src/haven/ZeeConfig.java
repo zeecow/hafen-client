@@ -33,6 +33,16 @@ public class ZeeConfig {
     public static final String MAP_GOB_COLOR = "mapGobSettings";
     public static final String MAP_WND_POS = "mapWindowPos";
     public static final String MAKE_WINDOW_NAME = "Makewindow";
+
+    public static final String CURSOR_ARW = "gfx/hud/curs/arw";//cursor
+    public static final String CURSOR_ATK = "gfx/hud/curs/atk";
+    public static final String CURSOR_EAT = "gfx/hud/curs/eat";//feast
+    public static final String CURSOR_DIG = "gfx/hud/curs/dig";
+    public static final String CURSOR_HAND = "gfx/hud/curs/hand";//push,lift
+    public static final String CURSOR_HARVEST = "gfx/hud/curs/harvest";
+    public static final String CURSOR_MINE = "gfx/hud/curs/mine";//destroy
+    public static final String CURSOR_SHOOT = "gfx/hud/curs/shoot";
+
     public static MixColor MIXCOLOR_RED = new MixColor(255,0,0,200);
     public static MixColor MIXCOLOR_ORANGE = new MixColor(255,128,0,200);
     public static MixColor MIXCOLOR_YELLOW = new MixColor(255,255,0,200);
@@ -1150,7 +1160,7 @@ public class ZeeConfig {
     }
 
     // set flags for clickWItem and ZeeClickGobManager.gobClick
-    public static void scheduleClickPetal(String name) {
+    public static void scheduleClickPetalOnce(String name) {
         ZeeConfig.clickPetal = true;
         ZeeConfig.clickPetalName = name;
     }
@@ -1173,9 +1183,9 @@ public class ZeeConfig {
      *      crime, swim, tracking, aggro, shoot
      */
     public static final String ACT_DIG = "dig", ACT_MINE = "mine", ACT_CARRY = "carry",
-            ACT_DESTROY = "destroy", ACT_FISH = "fish", ACT_INSPECT = "inspect",
-            ACT_REPAIR = "repair", ACT_CRIME = "crime", ACT_SWIM = "swim",
-            ACT_TRACKING = "tracking", ACT_AGGRO = "aggro", ACT_SHOOT = "shoot";
+        ACT_DESTROY = "destroy", ACT_FISH = "fish", ACT_INSPECT = "inspect",
+        ACT_REPAIR = "repair", ACT_CRIME = "crime", ACT_SWIM = "swim",
+        ACT_TRACKING = "tracking", ACT_AGGRO = "aggro", ACT_SHOOT = "shoot";
     public static void cursorChange(String name) {
         gameUI.menu.wdgmsg("act", name);
     }

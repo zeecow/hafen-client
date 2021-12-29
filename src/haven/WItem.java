@@ -258,4 +258,8 @@ public class WItem extends Widget implements DTarget {
 	item.wdgmsg("itemact", ui.modflags());
 	return(true);
     }
+
+	public Coord getInvSlotCoord() {
+		return c.div(33);
+	}
 }

@@ -20,7 +20,7 @@ public class ZeeMiningManager extends Thread{
             if (task.equalsIgnoreCase(ACTION_CHIP_BOULDER)) {
                 ZeeClickGobManager.gobClick(gob, 3);//remove mining cursor
                 Thread.sleep(MS_CURSOR_CHANGE);//wait cursor change
-                ZeeConfig.scheduleClickPetal("Chip stone");
+                ZeeConfig.scheduleClickPetalOnce("Chip stone");
                 ZeeClickGobManager.gobClick(gob, 3);//chip boulder
                 ZeeConfig.cursorChange(ZeeConfig.ACT_MINE);//restore mining icon for autodrop
                 if(waitBoulderFinish()){
