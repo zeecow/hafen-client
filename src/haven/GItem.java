@@ -163,38 +163,47 @@ public class GItem extends AWidget implements ItemInfo.SpriteOwner, GSprite.Owne
 		check item for dropping and other actions
 	 */
 	private void onSpriteCreated() {
-		String name = this.resource().basename();
+		String basename = this.resource().basename();
+		//String fullname = this.resource().name;
 		Resource curs = ui.root.getcurs(Coord.z);
 
 		if (curs != null && curs.name.equals("gfx/hud/curs/mine")) {
 			//drop mined item
 			ZeeMiningManager.lastDropItemMs = System.currentTimeMillis();
-			if (ZeeConfig.dropMinedStones && ZeeConfig.mineablesStone.contains(name) ||
-					ZeeConfig.dropMinedOre && ZeeConfig.mineablesOre.contains(name) ||
-					ZeeConfig.dropMinedSilverGold && ZeeConfig.mineablesOrePrecious.contains(name) ||
-					ZeeConfig.dropMinedCurios && ZeeConfig.mineablesCurios.contains(name) )
+			if (ZeeConfig.dropMinedStones && ZeeConfig.mineablesStone.contains(basename) ||
+					ZeeConfig.dropMinedOre && ZeeConfig.mineablesOre.contains(basename) ||
+					ZeeConfig.dropMinedSilverGold && ZeeConfig.mineablesOrePrecious.contains(basename) ||
+					ZeeConfig.dropMinedCurios && ZeeConfig.mineablesCurios.contains(basename) )
 			{
 				this.wdgmsg("drop", Coord.z);
 			}
-		}else if( ZeeConfig.farmerMode && !ZeeFarmingManager.busy && name.startsWith("seed-") && this.parent instanceof Inventory){
-			//farmer mode
-			if(ZeeConfig.savedTileSelEndCoord == null) {
-				ZeeConfig.println("> Farmer mode: no tile selection. Canceling...");
-				ZeeConfig.farmerMode = false;
-				ZeeFarmingManager.resetInitialState();
-			}else {
-				new ZeeFarmingManager(this, name).start();
+		}else if( ZeeConfig.farmerMode ) {
+			if(ZeeFarmingManager.busy) {
+				//drop non-seed crops
+				if (!basename.startsWith("seed-") && ZeeConfig.isItemCrop(basename)) {
+					this.wdgmsg("drop", Coord.z);
+				}
+			}else if(basename.startsWith("seed-") && this.parent instanceof Inventory) {
+				if (ZeeConfig.savedTileSelEndCoord == null) {
+					//cancel farmermode
+					ZeeConfig.println("> Farmer mode: no tile selection. Canceling...");
+					ZeeConfig.farmerMode = false;
+					ZeeFarmingManager.resetInitialState();
+				} else {
+					//start farmermode
+					new ZeeFarmingManager(this, basename).start();
+				}
 			}
-		}else if( ZeeConfig.dropSeeds && name.startsWith("seed-") && this.parent instanceof Inventory){
+		}else if( ZeeConfig.dropSeeds && basename.startsWith("seed-") && this.parent instanceof Inventory){
 			//drop seeds
 			Inventory inv = (Inventory) this.parent;
 			if(inv.getNumberOfFreeSlots() < 3){
-				inv.dropItemsByName(name);
+				inv.dropItemsByName(basename);
 			}
-		}else if( ZeeConfig.dropSoil && name.startsWith("soil") && this.parent instanceof Inventory) {
+		}else if( ZeeConfig.dropSoil && basename.startsWith("soil") && this.parent instanceof Inventory) {
 			//drop soil
 			Inventory inv = (Inventory) this.parent;
-			inv.dropItemsByName(name);
+			inv.dropItemsByName(basename);
 		}
 	}
 

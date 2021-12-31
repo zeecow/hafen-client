@@ -14,7 +14,7 @@ public class ZeeFarmingManager extends ZeeThread{
     public static final double TILE_SIZE = MCache.tilesz.x;
     public static Gob lastBarrel;
     public static boolean busy;
-    public static String gItemName, lastItemName;
+    public static String gItemNameSeed, lastItemNameSeed;
     public static GItem gItem;
     public static WItem wItem;
     public static Inventory inv;
@@ -31,11 +31,11 @@ public class ZeeFarmingManager extends ZeeThread{
     public static Gob farmerGobCrop;
 
 
-    public ZeeFarmingManager(GItem g, String name) {
+    public ZeeFarmingManager(GItem g, String nameSeed) {
         busy = true;
         gItem = g;
-        gItemName = name;
-        if(!name.equals(lastItemName)) {
+        gItemNameSeed = nameSeed;// "seed-turnip"
+        if(!nameSeed.equals(lastItemNameSeed)) {
             println(">new crop name, forget last barrel ("+lastBarrel+")");
             lastBarrel = null;
             mapBarrelSeedql.clear();
@@ -43,7 +43,7 @@ public class ZeeFarmingManager extends ZeeThread{
         }else{
             println(">same crop name, use last barrel ("+lastBarrel+")");
         }
-        lastItemName = name;
+        lastItemNameSeed = nameSeed;
         inv = (Inventory) gItem.parent;
         wItem = inv.getWItemByGItem(gItem);
     }
@@ -65,7 +65,7 @@ public class ZeeFarmingManager extends ZeeThread{
     }
 
     private void updateWItem() {
-        wItem = inv.getWItemsByName(gItemName).get(0);
+        wItem = inv.getWItemsByName(gItemNameSeed).get(0);
         gItem = wItem.item;
     }
 
@@ -94,7 +94,7 @@ public class ZeeFarmingManager extends ZeeThread{
                     if (ZeeFarmingManager.farmerRbSeeds == RB_SEEDS_STORE){
                         storeSeedsInBarrel();
                     }else if(ZeeFarmingManager.farmerRbSeeds == RB_SEEDS_DROP) {
-                        inv.dropItemsByName(lastItemName);
+                        inv.dropItemsByName(lastItemNameSeed);
                     }else if(ZeeFarmingManager.farmerRbSeeds == RB_SEEDS_WAIT) {
                         resetInitialState();
                         return;
@@ -208,7 +208,7 @@ public class ZeeFarmingManager extends ZeeThread{
         barrels.removeIf(b -> {
             if (ZeeClickGobManager.isBarrelEmpty(b))
                 return true;
-            if (!isBarrelSameSeeds(b,lastItemName))
+            if (!isBarrelSameSeeds(b, lastItemNameSeed))
                 return true;
             return false;
         });
@@ -266,7 +266,7 @@ public class ZeeFarmingManager extends ZeeThread{
 
     public int getTotalSeedAmount(){
         int ret = 0;
-        WItem[] arr = inv.getWItemsByName(gItemName).toArray(new WItem[0]);
+        WItem[] arr = inv.getWItemsByName(gItemNameSeed).toArray(new WItem[0]);
         for (int i = 0; i < arr.length ; i++) {
             ret += getSeedsAmount(arr[i].item);
         }
@@ -303,11 +303,11 @@ public class ZeeFarmingManager extends ZeeThread{
     }
 
     private boolean inventoryHasSeeds() {
-        return inv.getWItemsByName(lastItemName).size() > 0;
+        return inv.getWItemsByName(lastItemNameSeed).size() > 0;
     }
 
     private int getNumberOfSeedItems(){
-        return inv.getWItemsByName(lastItemName).size();
+        return inv.getWItemsByName(lastItemNameSeed).size();
     }
 
     public static List<Gob> getBarrels() {
@@ -334,7 +334,7 @@ public class ZeeFarmingManager extends ZeeThread{
                  */
                 ZeeConfig.gameUI.msg("No empty barrels, lastBarrel null, dropping seeds.");
                 println("No empty barrels close, dropping seeds.");
-                inv.dropItemsByName(lastItemName);
+                inv.dropItemsByName(lastItemNameSeed);
 
             } else {
                 /*
@@ -400,7 +400,7 @@ public class ZeeFarmingManager extends ZeeThread{
     }
 
     public static String getSeedName() {
-        return lastItemName.replace("seed-","");
+        return lastItemNameSeed.replace("seed-","");
     }
 
     // gfx/terobjs/barrel-flax
@@ -446,7 +446,7 @@ public class ZeeFarmingManager extends ZeeThread{
             }, 0, 7);
 
 
-            // radio drop store
+            // radiogroup seeds
             RadioGroup grp = new RadioGroup(windowManager) {
                 public void changed(int opt, String lbl) {
                     ZeeFarmingManager.farmerRbSeeds = opt;

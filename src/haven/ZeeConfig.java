@@ -284,7 +284,7 @@ public class ZeeConfig {
         }
 
         //if it's a crop
-        else if(highlightCropsReady && isCrop(gobName)) {
+        else if(highlightCropsReady && isGobCrop(gobName)) {
             //System.out.printf(" CROP \n");
             int maxStage = 0;
             for (FastMesh.MeshRes layer : gob.getres().layers(FastMesh.MeshRes.class)) {
@@ -393,8 +393,16 @@ public class ZeeConfig {
         return gobName.contains("/bushes/");
     }
 
-    public static boolean isCrop(String gobName) {
+    public static boolean isGobCrop(String gobName) {
         return gobName.startsWith("gfx/terobjs/plants/") && !gobName.endsWith("trellis");
+    }
+
+    //  gfx/invobjs/turnip , gfx/invobjs/seed-turnip
+    public static boolean isItemCrop(String basename) {
+        String crops = "seed-turnip,seed-carrot,seed-flax,seed-hemp,seed-leek,seed-poppy,"
+            +"seed-pipeweed,seed-cucumber,seed-barley,seed-wheat,seed-millet,seed-lettuce,"
+            +"seed-pumpkin,beetroot";
+        return crops.contains(basename);
     }
 
     public static boolean isBug(String name){
