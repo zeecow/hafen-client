@@ -3,7 +3,7 @@ package haven;
 public class ZeeInvMainOptionsWdg extends Widget {
 
     Label labelDrop, labelCount;
-    public static CheckBox cbSeeds, cbSoil, cbButcher, cbFarmer, cbAutomenu;
+    public static CheckBox cbSeeds, cbSoil, cbButcher, cbPiler, cbAutomenu;
     Widget invSlots;
 
     public ZeeInvMainOptionsWdg(String windowCap) {
@@ -38,6 +38,19 @@ public class ZeeInvMainOptionsWdg extends Widget {
 
             public void set(boolean val) {
                 ZeeConfig.butcherMode = val;
+                a = val;
+            }
+        }, x, 0);
+
+        x += cbButcher.sz.x + 5;
+
+        add(cbPiler = new CheckBox("piler") {
+            {
+                a = ZeeConfig.pilerMode;
+            }
+
+            public void set(boolean val) {
+                ZeeConfig.pilerMode = val;
                 a = val;
             }
         }, x, 0);

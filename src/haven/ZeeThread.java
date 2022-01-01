@@ -164,11 +164,14 @@ public class ZeeThread  extends Thread{
         return inv.getNumberOfFreeSlots() == 0;
     }
 
-    private static long now() {
+    static long now() {
         return System.currentTimeMillis();
     }
 
     public static void println(String s) {
         System.out.println(s);
+    }
+    public static void println(int i) {
+        System.out.println(i);
     }
 }

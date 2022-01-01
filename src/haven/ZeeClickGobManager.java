@@ -19,6 +19,8 @@ public class ZeeClickGobManager extends ZeeThread{
 
     public static float camAngleStart, camAngleEnd, camAngleDiff;
     public static long clickStartMs, clickEndMs, clickDiffMs;
+    public static boolean clickPetal = false;
+    public static String clickPetalName = "";
 
     public ZeeClickGobManager(Coord2d cc, Gob gobClicked) {
         clickCoord = cc;
@@ -47,7 +49,7 @@ public class ZeeClickGobManager extends ZeeThread{
                     gobItemAct(0);
                 }
             } else if (isGobHorse()) {
-                clickPetal("Giddyup!");
+                clickGobPetal("Giddyup!");
             } else if (isGobName("/barrel")) {
                 gobClick(3,UI.MOD_SHIFT);//take from barrel
             } else if (isInspectGob()) {
@@ -181,8 +183,7 @@ public class ZeeClickGobManager extends ZeeThread{
             ZeeClickItemManager.unequipLeftItem();
         }else{
             //no scythe around, just harvest
-            ZeeConfig.scheduleClickPetalOnce("Harvest");
-            gobClick(gob,3);
+            clickGobPetal("Harvest");
         }
     }
 
@@ -379,9 +380,25 @@ public class ZeeClickGobManager extends ZeeThread{
         return gobName.endsWith(name);
     }
 
-    private void clickPetal(String petalName) {
-        ZeeConfig.scheduleClickPetalOnce(petalName);
+    private void clickGobPetal(String petalName) {
+        ZeeClickGobManager.scheduleClickPetalOnce(petalName);
         gobClick(3);
+    }
+
+    public static void clickGobPetal(Gob gob, String petalName) {
+        ZeeClickGobManager.scheduleClickPetalOnce(petalName);
+        gobClick(gob,3);
+    }
+
+    // set flags for clickWItem and ZeeClickGobManager.gobClick
+    public static void scheduleClickPetalOnce(String name) {
+        clickPetal = true;
+        clickPetalName = name;
+    }
+
+    public static void resetClickPetal() {
+        clickPetal = false;
+        clickPetalName = "";
     }
 
     private boolean isGobHorse() {

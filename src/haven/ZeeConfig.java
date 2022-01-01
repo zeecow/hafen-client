@@ -57,8 +57,6 @@ public class ZeeConfig {
     public static Button btnMkWndSearchInput, btnMkWndBack, btnMkWndFwd, btnMkWndDel;
 
     public static String playingAudio = null;
-    public static boolean clickPetal = false;
-    public static String clickPetalName = "";
     public static String uiMsgTextQuality, uiMsgTextBuffer;
     public static long now, lastUiMessageMs = 0;
     public static Object[] lastMapViewClickArgs;
@@ -67,6 +65,7 @@ public class ZeeConfig {
     public static Coord lastMapViewClickPc;
     public static Coord2d lastMapViewClickMc;
     public static int lastMapViewClickButton;
+    public static long lastMapViewClickGobMs;
     public static Coord savedTileSelStartCoord, savedTileSelEndCoord;
     public static int savedTileSelModflags;
     public static MCache.Overlay savedTileSelOverlay;
@@ -108,6 +107,7 @@ public class ZeeConfig {
     public static boolean miniTrees = Utils.getprefb("miniTrees", false);
     public static Integer miniTreesSize = Utils.getprefi("miniTreesSize", 50);
     public static boolean notifyBuddyOnline = Utils.getprefb("notifyBuddyOnline", false);
+    public static boolean pilerMode = false;
     public static boolean showInventoryLogin = Utils.getprefb("showInventoryLogin", true);
     public static boolean showIconsZoomOut = Utils.getprefb("showIconsZoomOut", true);
     public static boolean showEquipsLogin = Utils.getprefb("showEquipsLogin", false);
@@ -1160,21 +1160,11 @@ public class ZeeConfig {
         if (text.contains("Quality")) {
             uiMsgTextQuality = text;
             String ql = uiMsgTextQuality.replaceAll("[^0-9]", "");
-            ZeeConfig.addGobText(ZeeConfig.lastMapViewClickGob, ql, 0,255,0,255,10);
+            ZeeConfig.addGobText(ZeeConfig.lastMapViewClickGob, ql, 0,255,0,255,5);
         }else if(uiMsgTextQuality!=null && !uiMsgTextQuality.isEmpty() && !text.contains("Memories")){
             uiMsgTextBuffer += ", " + text;
             gameUI.msg(uiMsgTextQuality + uiMsgTextBuffer);
         }
-    }
-
-    // set flags for clickWItem and ZeeClickGobManager.gobClick
-    public static void scheduleClickPetalOnce(String name) {
-        ZeeConfig.clickPetal = true;
-        ZeeConfig.clickPetalName = name;
-    }
-    public static void resetClickPetal() {
-        ZeeConfig.clickPetal = false;
-        ZeeConfig.clickPetalName = "";
     }
 
     public static String getCursorName() {
@@ -1327,8 +1317,11 @@ public class ZeeConfig {
         lastMapViewClickMc = mc;
         lastMapViewClickArgs = args;
         lastMapViewClickGob = clickGob;
+        lastMapViewClickGobMs = ZeeThread.now();
         if(clickGob!=null) {
             lastMapViewClickGobName = clickGob.getres().name;
+            if(ZeeConfig.pilerMode)
+                ZeeStockpileManager.checkClickedGob(clickGob);
         }
         if(clickb==2 && clickGob!=null) {
             new ZeeClickGobManager(mc, clickGob).start();

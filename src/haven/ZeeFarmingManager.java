@@ -264,10 +264,6 @@ public class ZeeFarmingManager extends ZeeThread{
         }
     }
 
-    private long now() {
-        return System.currentTimeMillis();
-    }
-
     public static int getSeedsAmount(GItem gItem) {
         ItemInfo[] info = gItem.info().toArray(new ItemInfo[0]);
         for (ItemInfo i: info) {

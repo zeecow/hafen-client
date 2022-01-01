@@ -338,17 +338,17 @@ public class ZeeClickItemManager extends ZeeThread{
 
     public static boolean clickAllItemsPetal(List<WItem> items, String petalName) {
         for (WItem w: items) {
-            ZeeConfig.scheduleClickPetalOnce(petalName);
+            ZeeClickGobManager.scheduleClickPetalOnce(petalName);
             try {
                 itemAct(w);
                 int max = (int) TIMEOUT_MS;
-                while(max>0 && ZeeConfig.clickPetal){//wait FlowerMenu end and set clickPetal to false
+                while(max>0 && ZeeClickGobManager.clickPetal){//wait FlowerMenu end and set clickPetal to false
                     max -= SLEEP_MS;
                     Thread.sleep(SLEEP_MS);
                 }
             } catch (Exception e) {
                 e.printStackTrace();
-                ZeeConfig.resetClickPetal();
+                ZeeClickGobManager.resetClickPetal();
                 ZeeConfig.gameUI.msg("clickAllItemsPetal: "+e.getMessage());
                 return false;
             }
@@ -393,7 +393,7 @@ public class ZeeClickItemManager extends ZeeThread{
     }
 
     private void drinkFrom() {
-        ZeeConfig.scheduleClickPetalOnce("Drink");
+        ZeeClickGobManager.scheduleClickPetalOnce("Drink");
         itemAct(wItem);
     }
 
