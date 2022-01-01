@@ -71,11 +71,13 @@ public class ZeeFarmingManager extends ZeeThread{
 
     public void run(){
         if (gItem==null){
+            //highlight barrels in range
             getBarrels().forEach(gob -> {
                 ZeeConfig.addGobColor(gob,0,255,0,255);
                 ZeeConfig.addGobText(gob,"↓",0,255,0,255,10);
             });
         }else{
+            //start farmer
             startFarming();
         }
     }
@@ -85,11 +87,14 @@ public class ZeeFarmingManager extends ZeeThread{
 
         try{
 
+            /*
+                harvest stage
+             */
             isHarvestDone = false;
             while(busy && !isHarvestDone) {
                 println("> harvesting");
                 ZeeConfig.addGobText(ZeeConfig.getPlayerGob(),"harvesting",0,255,255,255,10);
-                waitPlayerIdleFor(2000);
+                waitPlayerIdleFor(2000);//already farming
                 if(inventoryHasSeeds()) {
                     if (ZeeFarmingManager.farmerRbSeeds == RB_SEEDS_STORE){
                         storeSeedsInBarrel();
@@ -110,6 +115,9 @@ public class ZeeFarmingManager extends ZeeThread{
                 }
             }
 
+            /*
+                planting stage
+             */
             if(ZeeFarmingManager.farmerCbReplant) {
                 isPlantingDone = false;
                 isScytheEquiped = ZeeClickItemManager.isItemEquipped("scythe");
@@ -175,14 +183,19 @@ public class ZeeFarmingManager extends ZeeThread{
 
             if (!isInventoryFull()) {
                 println("inv not full");
-                if(ZeeClickGobManager.isBarrelEmpty(lastBarrel)){
+                if(isBarrelEmpty(lastBarrel)){
                     println("barrel empty, find another");
                     List<Gob> barrels = findAnotherSeedBarrel();
                     if(barrels.size()==0) {
-                        println("no more seed barrels, planting done");
-                        isPlantingDone = true;
-                        lastBarrel = null;
-                        return false;
+                        if(getTotalSeedAmount() >= 5) {
+                            println("planting what seeds are in inventory");
+                            return true;
+                        }else {
+                            println("no more seed barrels, planting done");
+                            isPlantingDone = true;
+                            lastBarrel = null;
+                            return false;
+                        }
                     }else{
                         println("found another seed barrel... call recursive method");
                         lastBarrel = ZeeConfig.getClosestGob(barrels);
@@ -346,6 +359,9 @@ public class ZeeFarmingManager extends ZeeThread{
                     if(c!=null && c.color.color().getBlue()==1) {
                         return true;//remove possible marked full(blue) barrels
                     }
+                    if (!isBarrelEmpty(b) && !isBarrelSameSeeds(b,gItemNameSeed)){
+                        return true;//remove non-empty, non-matching seed barrels
+                    }
                     return false;
                 });
                 //if (lastBarrel != null)
@@ -393,6 +409,10 @@ public class ZeeFarmingManager extends ZeeThread{
         }catch (Exception e){
             e.printStackTrace();
         }
+    }
+
+    public static boolean isBarrelEmpty(Gob b) {
+        return ZeeClickGobManager.isBarrelEmpty(b);
     }
 
     public static String getBarrelText() {
