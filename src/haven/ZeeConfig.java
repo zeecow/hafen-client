@@ -25,6 +25,12 @@ public class ZeeConfig {
     public static final String CATEG_RAREFORAGE = "Rare forageables";
     public static final String CATEG_LOCRES = "Localized resources";
     public static final String MAP_GOB_AUDIO = "mapGobSaved";
+    public static final String MAP_ANIMAL_FORMAT = "mapAnimalFormat";
+    public static final String MAP_ANIMAL_FORMAT_PIG = "pig";
+    public static final String MAP_ANIMAL_FORMAT_HORSE = "horse";
+    public static final String MAP_ANIMAL_FORMAT_CATTLE = "cattle";
+    public static final String MAP_ANIMAL_FORMAT_GOAT = "goat";
+    public static final String MAP_ANIMAL_FORMAT_SHEEP = "sheep";
     public static final String MAP_GOB_CATEGORY = "mapGobCategory";
     public static final String MAP_CATEGORY_AUDIO = "mapCategoryAudio";
     public static final String MAP_CATEGORY_COLOR = "mapCategoryColor";
@@ -187,6 +193,7 @@ public class ZeeConfig {
     ));
 
 
+    public static HashMap<String,String> mapTamedAnimalNameFormat = initMapTamedAnimals();
     public static HashMap<String,String> mapGobSession = new HashMap<String,String>();
     public static HashMap<String, Set<String>> mapCategoryGobs = initMapCategoryGobs();//init categs first
     public static HashMap<String,String> mapGobAudio = initMapGobAudio();
@@ -670,6 +677,9 @@ public class ZeeConfig {
             }
         }
 
+        //tamed animal window
+        windowTamedAnimal(window,windowTitle);
+
         //show organize button if duplicate windows
         String singleWindows = "Craft,Inventory,Character,Options,Kith & Kin,Equipment";
         if(!singleWindows.contains(windowTitle)) { // avoid searching multiple Windows
@@ -684,6 +694,110 @@ public class ZeeConfig {
                 );
             }
         }
+    }
+
+    private static void windowTamedAnimal(Window window, String windowTitle) {
+        if (!isWindowTamedAnimal(windowTitle))
+            return;
+
+        TextEntry textEntryTop = window.getchild(TextEntry.class);
+        Label[] labels = window.children(Label.class).stream().toArray(Label[] ::new);
+        int breedY = labels[labels.length-1].c.y;
+
+        // values help labels ([0] for Quality, [1] for Meat...)
+        Label[] vals = windowTamedAnimalLabelValues(window,labels);
+        for (int i = 0; i < vals.length; i++) {
+            window.add( new Label("["+i+"]"), vals[i].c.x+26, vals[i].c.y );
+        }
+
+        // textEntry format
+        TextEntry textEntryBottom = window.add(
+            new TextEntry( UI.scale(200), windowTamedAnimalGetFormat(windowTitle)),
+        0, breedY+20);
+
+        // button name
+        window.add(new ZeeWindow.ZeeButton(UI.scale(45),"name"){
+            public void wdgmsg(String msg, Object... args) {
+                if (msg.equals("activate")){
+                    String nameFormat = textEntryBottom.text();
+                    String animalName = nameFormat;
+                    for (int i = 0; i < vals.length; i++) {
+                        animalName = animalName.replace("["+i+"]", vals[i].texts.replace("%",""));
+                    }
+                    animalName = animalName.replace("[MF]",windowTamedAnimalGetGender(windowTitle));
+                    textEntryTop.settext(animalName);
+                    windowTamedAnimalUpdateFormat(windowTitle, nameFormat);
+                }
+            }
+        }, textEntryBottom.sz.x+3, breedY+20);
+
+        window.pack();
+    }
+
+    private static String windowTamedAnimalGetFormat(String animal) {
+        String ret = "";
+
+        if(animal.equals("Hog") || animal.equals("Sow"))
+            ret = mapTamedAnimalNameFormat.get(MAP_ANIMAL_FORMAT_PIG);
+        else if(animal.equals("Bull") || animal.equals("Cow"))
+            ret = mapTamedAnimalNameFormat.get(MAP_ANIMAL_FORMAT_CATTLE);
+        else if(animal.equals("Stallion") || animal.equals("Mare"))
+            ret = mapTamedAnimalNameFormat.get(MAP_ANIMAL_FORMAT_HORSE);
+        else if(animal.equals("Nanny") || animal.equals("Billy"))
+            ret = mapTamedAnimalNameFormat.get(MAP_ANIMAL_FORMAT_GOAT);
+        else if(animal.equals("Ewe") || animal.equals("Ram"))
+            ret = mapTamedAnimalNameFormat.get(MAP_ANIMAL_FORMAT_SHEEP);
+
+        return ret;
+    }
+
+    public static String removeSuffix(final String s, final String suffix) {
+        if (s != null && s.endsWith(suffix)) {
+            return s.split(suffix)[0];
+        }
+        return s;
+    }
+
+    private static void windowTamedAnimalUpdateFormat(String animal, String nameFormat) {
+
+        if(animal.equals("Hog") || animal.equals("Sow"))
+            mapTamedAnimalNameFormat.put(MAP_ANIMAL_FORMAT_PIG, nameFormat);
+        else if(animal.equals("Bull") || animal.equals("Cow"))
+            mapTamedAnimalNameFormat.put(MAP_ANIMAL_FORMAT_CATTLE, nameFormat);
+        else if(animal.equals("Stallion") || animal.equals("Mare"))
+            mapTamedAnimalNameFormat.put(MAP_ANIMAL_FORMAT_HORSE, nameFormat);
+        else if(animal.equals("Nanny") || animal.equals("Billy"))
+            mapTamedAnimalNameFormat.put(MAP_ANIMAL_FORMAT_GOAT, nameFormat);
+        else if(animal.equals("Ewe") || animal.equals("Ram"))
+            mapTamedAnimalNameFormat.put(MAP_ANIMAL_FORMAT_SHEEP, nameFormat);
+
+        Utils.setpref(ZeeConfig.MAP_ANIMAL_FORMAT, ZeeConfig.serialize(ZeeConfig.mapTamedAnimalNameFormat));
+    }
+
+    private static String windowTamedAnimalGetGender(String animal) {
+        String male = "Hog,Bull,Stallion,Billy,Ram";
+        String gender = male.contains(animal) ? "M" : "F";
+        return gender;
+    }
+
+    private static Label[] windowTamedAnimalLabelValues(Window window, Label[] labels) {
+        //HashMap<String,String> mapStatsNameValue = new HashMap<>();
+        Label[] vals = new Label[(labels.length/2)-1];//ignore "Born to" label
+        String name,val;
+        int j = 0;
+        for (int i = 2; i < labels.length; i++) { // skip fist 2 labels ("Born to" and "unbranded")
+            if( i % 2 == 1 ) { // if odd column == stat value
+                //name = labels[i-1].texts;
+                //val = labels[i].texts;
+                vals[j++] = labels[i]; // label value
+            }
+        }
+        return vals;
+    }
+
+    public static boolean isWindowTamedAnimal(String windowTitle) {
+        String list = "Sow,Hog,Cow,Bull,Stallion,Mare,Nanny,Billy,Ewe,Ram";
+        return list.contains(windowTitle);
     }
 
     public static int addZeecowOptions(OptWnd.Panel main, int y) {
@@ -748,6 +862,24 @@ public class ZeeConfig {
         String s = Utils.getpref(MAP_GOB_AUDIO,"");
         if (s.isEmpty())
             return new HashMap<String,String> ();
+        else
+            return (HashMap<String, String>) deserialize(s);
+    }
+
+    @SuppressWarnings("unchecked")
+    public static HashMap<String, String> initMapTamedAnimals() {
+        //String s = "";//run once to reset on login
+        String s = Utils.getpref(MAP_ANIMAL_FORMAT,"");
+        if (s.isEmpty()) {
+            HashMap<String, String> ret = new HashMap<>();
+            ret.put(MAP_ANIMAL_FORMAT_HORSE, "en[1] st[2] [MF]"); // endurance, stamina
+            ret.put(MAP_ANIMAL_FORMAT_PIG, "tr[3] mt[1] [MF]"); // truffle, meat
+            ret.put(MAP_ANIMAL_FORMAT_CATTLE, "mk[2] [MF]"); // quality, milk
+            ret.put(MAP_ANIMAL_FORMAT_GOAT, "mk[2] w[3] [MF]"); // quality, milk, wool
+            ret.put(MAP_ANIMAL_FORMAT_SHEEP, "mk[2] w[3] [MF]");
+            Utils.setpref(MAP_ANIMAL_FORMAT,serialize(ret));
+            return ret;
+        }
         else
             return (HashMap<String, String>) deserialize(s);
     }
