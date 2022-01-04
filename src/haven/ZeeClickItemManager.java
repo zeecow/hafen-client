@@ -338,6 +338,26 @@ public class ZeeClickItemManager extends ZeeThread{
 
     public static boolean clickAllItemsPetal(List<WItem> items, String petalName) {
         for (WItem w: items) {
+            //ZeeClickGobManager.scheduleClickPetalOnce(petalName);
+            try {
+                itemAct(w);
+                if(waitFlowerMenu()){
+                    choosePetal(getFlowerMenu(),petalName);
+                }else{
+                    println("clickAllItemsPetal > no flower menu for "+petalName);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                ZeeClickGobManager.resetClickPetal();
+                ZeeConfig.gameUI.msg("clickAllItemsPetal: "+e.getMessage());
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public static boolean clickAllItemsPetalOld(List<WItem> items, String petalName) {
+        for (WItem w: items) {
             ZeeClickGobManager.scheduleClickPetalOnce(petalName);
             try {
                 itemAct(w);

@@ -380,14 +380,29 @@ public class ZeeClickGobManager extends ZeeThread{
         return gobName.endsWith(name);
     }
 
-    private void clickGobPetal(String petalName) {
-        ZeeClickGobManager.scheduleClickPetalOnce(petalName);
+    private boolean clickGobPetal(String petalName) {
+        //ZeeClickGobManager.scheduleClickPetalOnce(petalName);
         gobClick(3);
+        if(waitFlowerMenu()){
+            println("clickGobPetal1 > choosing "+petalName);
+            return choosePetal(getFlowerMenu(), petalName);
+        }else{
+            println("clickGobPetal1 > no flower menu?");
+            return false;
+        }
     }
 
-    public static void clickGobPetal(Gob gob, String petalName) {
-        ZeeClickGobManager.scheduleClickPetalOnce(petalName);
+    // TODO: test miningManager chipboulder use
+    public static boolean clickGobPetal(Gob gob, String petalName) {
+        //ZeeClickGobManager.scheduleClickPetalOnce(petalName);
         gobClick(gob,3);
+        if(waitFlowerMenu()){
+            println("clickGobPetal2 > choosing "+petalName);
+            return choosePetal(getFlowerMenu(), petalName);
+        }else{
+            println("clickGobPetal2 > no flower menu?");
+            return false;
+        }
     }
 
     // set flags for clickWItem and ZeeClickGobManager.gobClick
