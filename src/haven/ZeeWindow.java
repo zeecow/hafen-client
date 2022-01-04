@@ -29,20 +29,9 @@ public class ZeeWindow extends Window {
             String windowName = this.getparent(Window.class).cap.text;
             //ZeeConfig.println(windowName+" > "+ buttonText +" > "+msg);
             if(msg.equals("activate")){
-                if (windowName.equals("Farming manager")) {
-                    if (buttonText.equals("test")) {
-                        try {
-                            int tiles = Integer.parseInt(ZeeFarmingManager.textEntryTilesBarrel.text().strip());
-                            new ZeeFarmingManager().start();
-                        } catch (NumberFormatException e) {
-                            ZeeConfig.msg("numbers only");
-                        }
-                    }
-                }else{
-                    //organize duplicate windows
-                    if(buttonText.equals(TEXT_ORGANIZEWINDOWS)){
-                        organizeDuplicateWindows(windowName);
-                    }
+                //organize duplicate windows
+                if(buttonText.equals(TEXT_ORGANIZEWINDOWS)){
+                    organizeDuplicateWindows(windowName);
                 }
             }
         }
