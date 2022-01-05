@@ -42,19 +42,6 @@ public class ZeeInvMainOptionsWdg extends Widget {
             }
         }, x, 0);
 
-        x += cbButcher.sz.x + 5;
-
-        add(cbPiler = new CheckBox("piler") {
-            {
-                a = ZeeConfig.pilerMode;
-            }
-
-            public void set(boolean val) {
-                ZeeConfig.pilerMode = val;
-                a = val;
-            }
-        }, x, 0);
-
         x = 0;
 
         add(cbSeeds = new CheckBox("dropseed") {
