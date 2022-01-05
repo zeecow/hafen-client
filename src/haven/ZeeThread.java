@@ -175,7 +175,7 @@ public class ZeeThread  extends Thread{
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        println("wait flowermenu = "+fm);
+        //println("wait flowermenu = "+fm);
         return (fm != null);
     }
 

@@ -337,6 +337,7 @@ public class ZeeClickItemManager extends ZeeThread{
     }
 
     public static boolean clickAllItemsPetal(List<WItem> items, String petalName) {
+        ZeeConfig.addGobText(ZeeConfig.getPlayerGob(),"clicking "+items.size()+" items",0,255,255,255,10);
         for (WItem w: items) {
             //ZeeClickGobManager.scheduleClickPetalOnce(petalName);
             try {
@@ -350,9 +351,11 @@ public class ZeeClickItemManager extends ZeeThread{
                 e.printStackTrace();
                 ZeeClickGobManager.resetClickPetal();
                 ZeeConfig.gameUI.msg("clickAllItemsPetal: "+e.getMessage());
+                ZeeConfig.removeGobText(ZeeConfig.getPlayerGob());
                 return false;
             }
         }
+        ZeeConfig.removeGobText(ZeeConfig.getPlayerGob());
         return true;
     }
 
