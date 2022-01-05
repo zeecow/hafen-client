@@ -204,6 +204,8 @@ public class GItem extends AWidget implements ItemInfo.SpriteOwner, GSprite.Owne
 			//drop soil
 			Inventory inv = (Inventory) this.parent;
 			inv.dropItemsByName(basename);
+		}else if(ZeeConfig.pilerMode){
+			ZeeStockpileManager.lastInvItemName = basename;
 		}
 	}
 

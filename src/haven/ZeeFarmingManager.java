@@ -146,7 +146,7 @@ public class ZeeFarmingManager extends ZeeThread{
                         if (getSeedsFromBarrel()) {
                             plantSeeds();
                         } else {
-                            println("seed barrel empty");
+                            println("getSeedsFromBarrel() > seed barrel empty, planting done");
                             isPlantingDone = true;
                         }
                     } else {
@@ -214,7 +214,7 @@ public class ZeeFarmingManager extends ZeeThread{
                             println("planting what seeds are in inventory");
                             return true;
                         }else {
-                            println("no more seed barrels, planting done");
+                            println("getTotalSeedAmount() < 5, planting done?");
                             isPlantingDone = true;
                             lastBarrel = null;
                             return false;

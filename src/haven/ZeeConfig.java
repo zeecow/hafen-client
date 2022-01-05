@@ -1450,8 +1450,6 @@ public class ZeeConfig {
         lastMapViewClickGobMs = ZeeThread.now();
         if(clickGob!=null) {
             lastMapViewClickGobName = clickGob.getres().name;
-            if(ZeeConfig.pilerMode)
-                ZeeStockpileManager.checkClickedGob(clickGob);
         }
         if(clickb==2 && clickGob!=null) {
             new ZeeClickGobManager(mc, clickGob).start();

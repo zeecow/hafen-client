@@ -397,7 +397,7 @@ public class ZeeClickGobManager extends ZeeThread{
         //ZeeClickGobManager.scheduleClickPetalOnce(petalName);
         gobClick(gob,3);
         if(waitFlowerMenu()){
-            println("clickGobPetal2 > choosing "+petalName);
+            //println("clickGobPetal2 > choosing "+petalName);
             return choosePetal(getFlowerMenu(), petalName);
         }else{
             println("clickGobPetal2 > no flower menu?");
