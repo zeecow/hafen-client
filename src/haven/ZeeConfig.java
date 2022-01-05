@@ -787,8 +787,6 @@ public class ZeeConfig {
         int j = 0;
         for (int i = 2; i < labels.length; i++) { // skip fist 2 labels ("Born to" and "unbranded")
             if( i % 2 == 1 ) { // if odd column == stat value
-                //name = labels[i-1].texts;
-                //val = labels[i].texts;
                 vals[j++] = labels[i]; // label value
             }
         }
@@ -872,12 +870,12 @@ public class ZeeConfig {
         String s = Utils.getpref(MAP_ANIMAL_FORMAT,"");
         if (s.isEmpty()) {
             HashMap<String, String> ret = new HashMap<>();
-            ret.put(MAP_ANIMAL_FORMAT_HORSE, "en[1] st[2] [MF]"); // endurance, stamina
-            ret.put(MAP_ANIMAL_FORMAT_PIG, "tr[3] mt[1] [MF]"); // truffle, meat
-            ret.put(MAP_ANIMAL_FORMAT_CATTLE, "mk[2] [MF]"); // quality, milk
-            ret.put(MAP_ANIMAL_FORMAT_GOAT, "mk[2] w[3] [MF]"); // quality, milk, wool
-            ret.put(MAP_ANIMAL_FORMAT_SHEEP, "mk[2] w[3] [MF]");
-            Utils.setpref(MAP_ANIMAL_FORMAT,serialize(ret));
+            ret.put(MAP_ANIMAL_FORMAT_HORSE, "([MF]) q[0] e[1] s[2]"); // ql, endurance, stamina
+            ret.put(MAP_ANIMAL_FORMAT_PIG, "([MF]) q[0] t[3] m[1]"); // ql, truffle, meat
+            ret.put(MAP_ANIMAL_FORMAT_CATTLE, "([MF]) q[0] m[2]"); // ql, milk
+            ret.put(MAP_ANIMAL_FORMAT_GOAT, "([MF]) q[0] m[2] w[3]"); // ql, milk, wool
+            ret.put(MAP_ANIMAL_FORMAT_SHEEP, "([MF]) q[0] m[2] w[3]");
+            Utils.setpref(MAP_ANIMAL_FORMAT, serialize(ret));
             return ret;
         }
         else
