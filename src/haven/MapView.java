@@ -1757,6 +1757,7 @@ public class MapView extends PView implements DTarget, Console.Directory {
 	    if(ui.mc.isect(rootpos(), sz))
 		new Adjust(ui.mc.sub(rootpos()), 0).run();
 	    this.slot = basic.add(this.placed);
+		ZeeStockpileManager.lastGobPlaced = this;
 	}
 
 	private class Adjust extends Maptest {

@@ -1,17 +1,19 @@
 package haven;
 
+import java.util.Arrays;
 import java.util.List;
 
 public class ZeeStockpileManager extends ZeeThread{
 
     static ZeeWindow windowManager;
-    public static Gob gobPile, gobSource;
     public static boolean busy;
     static GameUI gameUI;
     static Inventory mainInv;
     static boolean audioExit;
     public static String lastPetalName;
     public static String lastInvItemName;
+    public static Gob gobPile, gobSource;
+    public static MapView.Plob lastGobPlaced;
 
     public ZeeStockpileManager() {
         busy = true;
@@ -108,8 +110,11 @@ public class ZeeStockpileManager extends ZeeThread{
 
 
     public static void checkPlacedPileUIWdgmsg(Widget sender, String msg) {
-        if(ZeeConfig.pilerMode && msg.equals("place") && sender instanceof MapView) {
-            showWindow();
+        if(msg.equals("place") && sender instanceof MapView) {
+            if(lastGobPlaced!=null && lastGobPlaced.getres()!=null && lastGobPlaced.getres().name.contains("/stockpile-")) {
+                showWindow();
+                //println("lastPlaced = " + lastGobPlaced.getres().name);
+            }
         }
     }
 

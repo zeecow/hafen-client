@@ -327,7 +327,7 @@ public class UI {
 		System.out.println(sender +" ; "+ msg +" ; "+ Arrays.toString(args));
 	ZeeConfig.checkCharSelection(msg);
 	if (ZeeConfig.pilerMode)
-		ZeeStockpileManager.checkPlacedPileUIWdgmsg(sender,msg);
+		ZeeStockpileManager.checkPlacedPileUIWdgmsg(sender, msg);
 	int id = widgetid(sender);
 	if(id < 0) {
 	    new Warning("wdgmsg sender (%s) is not in rwidgets, message is %s", sender.getClass().getName(), msg).issue();
