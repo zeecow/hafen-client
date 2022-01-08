@@ -105,7 +105,7 @@ public class ZeeThread  extends Thread{
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        println("wait cursor "+name+" = "+ZeeConfig.getCursorName().equals(name));
+        //println("wait cursor "+name+" = "+ZeeConfig.getCursorName().equals(name));
         return ZeeConfig.getCursorName().equals(name);
     }
 
@@ -124,7 +124,7 @@ public class ZeeThread  extends Thread{
     }
 
     public static boolean waitPlayerIdle(){
-        println("waitPlayerIdle()");
+        //println("waitPlayerIdle()");
         int max = (int) TIMEOUT_MS * 3;
         int counter = max;
         try {
@@ -165,7 +165,7 @@ public class ZeeThread  extends Thread{
     }
 
     public static boolean waitInvFullOrHoldingItem(Inventory inv) {
-        println("wait inv full or holding item1");
+        //println("wait inv full or holding item1");
         if(ZeeConfig.isPlayerHoldingItem())
             return true;
         int timer = (int) TIMEOUT_MS;

@@ -205,7 +205,8 @@ public class GItem extends AWidget implements ItemInfo.SpriteOwner, GSprite.Owne
 			Inventory inv = (Inventory) this.parent;
 			inv.dropItemsByName(basename);
 		}else if(ZeeConfig.pilerMode){
-			ZeeStockpileManager.lastInvItemName = basename;
+			ZeeStockpileManager.lastInvItemBaseName = basename;
+			ZeeStockpileManager.lastInvItemMs = ZeeThread.now();
 		}
 	}
 

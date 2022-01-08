@@ -1,17 +1,21 @@
 package haven;
 
-import java.util.Arrays;
 import java.util.List;
 
 public class ZeeStockpileManager extends ZeeThread{
 
+    public static final String STOCKPILE_LEAF = "gfx/terobjs/stockpile-leaf";
+    public static final String STOCKPILE_BLOCK = "gfx/terobjs/stockpile-wblock";
+    public static final String STOCKPILE_BOARD = "gfx/terobjs/stockpile-board";
+    public static final String BASENAME_MULB_LEAF = "leaf-mulberrytree";
     static ZeeWindow windowManager;
     public static boolean busy;
     static GameUI gameUI;
     static Inventory mainInv;
     static boolean audioExit;
     public static String lastPetalName;
-    public static String lastInvItemName;
+    public static String lastInvItemBaseName;
+    public static long lastInvItemMs;
     public static Gob gobPile, gobSource;
     public static MapView.Plob lastGobPlaced;
 
@@ -67,7 +71,7 @@ public class ZeeStockpileManager extends ZeeThread{
                 waitInvFullOrHoldingItem(mainInv);
 
             if (gameUI.vhand == null) {//if not holding item
-                List<WItem> invItems = mainInv.getWItemsByName(lastInvItemName);
+                List<WItem> invItems = mainInv.getWItemsByName(lastInvItemBaseName);
                 if(invItems.size()==0) {
                     //no inventory items, try getting more from source
                     if( gobSource==null || !ZeeClickGobManager.clickGobPetal(gobSource, lastPetalName) ){
@@ -109,11 +113,24 @@ public class ZeeStockpileManager extends ZeeThread{
     }
 
 
+
     public static void checkPlacedPileUIWdgmsg(Widget sender, String msg) {
         if(msg.equals("place") && sender instanceof MapView) {
             if(lastGobPlaced!=null && lastGobPlaced.getres()!=null && lastGobPlaced.getres().name.contains("/stockpile-")) {
-                showWindow();
-                //println("lastPlaced = " + lastGobPlaced.getres().name);
+                String name = lastGobPlaced.getres().name;
+                boolean show = false;
+
+                if(now() - lastInvItemMs > 3000) //3s
+                    show = false; // time limit to avoid late unwanted window popup
+                else if(name.equals(STOCKPILE_LEAF) && lastInvItemBaseName.equals(BASENAME_MULB_LEAF))
+                    show = true;
+                else if(name.equals(STOCKPILE_BLOCK) && lastInvItemBaseName.startsWith("wblock-"))
+                    show = true;
+                else if(name.equals(STOCKPILE_BOARD) && lastInvItemBaseName.contains("board-"))
+                    show = true;
+
+                if(show)
+                    showWindow();
             }
         }
     }
@@ -200,7 +217,7 @@ public class ZeeStockpileManager extends ZeeThread{
     private static void pileItems() throws InterruptedException {
         cancelFlowerMenu();
         if (gameUI.vhand == null) {//if not holding item
-            List<WItem> invItems = mainInv.getWItemsByName(lastInvItemName);
+            List<WItem> invItems = mainInv.getWItemsByName(lastInvItemBaseName);
             if(invItems.size()==0) {
                 return;//inv has no more items
             }

@@ -11,6 +11,9 @@ original features:
  - shorter cattle roster window
  - reposition map window when compacted/expanded
  - basic inventory item counter
+ - animal window name stats generator
+ - stockpile helper: mulberry leaves, woodblocks, boards
+ - seed-farmer helper: no pathfinding, buggy (ctrlLongMidClick crop)
  - mid click object/item for small tasks:
    - MidClick obj: [inspect] , [Giddyup!] , [light torch]
      - LongMidClick obj: [lift up] , [destroy trellis plant] , [farm area cursor], [take all from stockpile]
