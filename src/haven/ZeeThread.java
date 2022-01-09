@@ -105,7 +105,7 @@ public class ZeeThread  extends Thread{
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        //println("wait cursor "+name+" = "+ZeeConfig.getCursorName().equals(name));
+        println("wait cursor "+name+" = "+ZeeConfig.getCursorName().equals(name));
         return ZeeConfig.getCursorName().equals(name);
     }
 

@@ -115,18 +115,11 @@ public class ZeeFarmingManager extends ZeeThread{
                 ZeeConfig.addGobText(ZeeConfig.getPlayerGob(),"harvesting",0,255,255,255,10);
                 waitPlayerIdleFor(2000);//already farming
                 if(inventoryHasSeeds()) {
-                    if (ZeeFarmingManager.farmerRbSeeds == RB_SEEDS_STORE){
-                        storeSeedsInBarrel();
-                    }else if(ZeeFarmingManager.farmerRbSeeds == RB_SEEDS_DROP) {
-                        inv.dropItemsByName(lastItemNameSeed);
-                    }else if(ZeeFarmingManager.farmerRbSeeds == RB_SEEDS_WAIT) {
-                        resetInitialState();
-                        return;
-                    }
+                    storeSeedsInBarrel();
                     if(!isInventoryFull()) {
                         harvestPlants();
                     }else {
-                        println("harvest done, inv full");
+                        println("harvest done, inv full, out of barrels?");
                         isHarvestDone = true;
                     }
                 }else{
@@ -324,6 +317,7 @@ public class ZeeFarmingManager extends ZeeThread{
         }
         plants.removeIf(plt -> ZeeConfig.getPlantStage(plt) == 0  &&  !ZeeConfig.lastMapViewClickGobName.contains("/fallowplant"));
         if (plants.size()==0) {
+            println("no plants to click");
             return false;
         }
         Gob g = ZeeConfig.getClosestGob(plants);
@@ -433,6 +427,8 @@ public class ZeeFarmingManager extends ZeeThread{
                         }
                         lastBarrel = null;
                     }
+                }else{
+                    println(">storing >player not holding seed? timeout problem?");
                 }
             }
         }catch (Exception e){
@@ -496,6 +492,7 @@ public class ZeeFarmingManager extends ZeeThread{
 
 
             // radiogroup seeds
+            /*
             RadioGroup grp = new RadioGroup(windowManager) {
                 public void changed(int opt, String lbl) {
                     ZeeFarmingManager.farmerRbSeeds = opt;
@@ -507,10 +504,11 @@ public class ZeeFarmingManager extends ZeeThread{
             wdg = grp.add("drop", new Coord(85, 30));
             wdg = grp.add("wait", new Coord(137, 30));
             grp.check(ZeeFarmingManager.farmerRbSeeds);
+            */
 
 
             // barrel tiles textEntry
-            wdg = windowManager.add(new Label("Max tiles to barrel: "), 0, 50);
+            wdg = windowManager.add(new Label("Max tiles to barrel: "), 0, 30);
             ZeeFarmingManager.textEntryTilesBarrel = new TextEntry(UI.scale(45),""+(int)(ZeeFarmingManager.MAX_BARREL_DIST/MCache.tilesz.x)){
                 public boolean keydown(KeyEvent e) {
                     if(!Character.isDigit(e.getKeyChar()) && !ZeeConfig.isControlKey(e.getKeyCode()))
@@ -525,7 +523,8 @@ public class ZeeFarmingManager extends ZeeThread{
                     super.changed(buf);
                 }
             };
-            wdg = windowManager.add(ZeeFarmingManager.textEntryTilesBarrel, 95, 50-3);
+            wdg = windowManager.add(ZeeFarmingManager.textEntryTilesBarrel, 95, 30-3);
+
 
             //barrel tiles Button
             wdg = windowManager.add(new ZeeWindow.ZeeButton(UI.scale(45),"test"){
@@ -542,8 +541,10 @@ public class ZeeFarmingManager extends ZeeThread{
             }, 145,50-4);
             ZeeFarmingManager.textEntryTilesBarrel.settext(""+ZeeFarmingManager.farmerTxtTilesBarrel);
 
+
             //add bottom note
             wdg = windowManager.add(new Label("(no path-find, remove field obstacles, surround with barrels)"), 0, 120-15);
+
 
             //add window
             ZeeConfig.gameUI.add(windowManager, new Coord(100,100));
