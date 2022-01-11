@@ -178,7 +178,7 @@ public class GItem extends AWidget implements ItemInfo.SpriteOwner, GSprite.Owne
 				this.wdgmsg("drop", Coord.z);
 			}
 		}else if( ZeeConfig.farmerMode ) {
-			if(ZeeFarmingManager.busy) {
+			if(ZeeSeedFarmingManager.busy) {
 				//drop non-seed crops
 				if (!basename.startsWith("seed-") && ZeeConfig.isItemCrop(basename)) {
 					this.wdgmsg("drop", Coord.z);
@@ -188,10 +188,10 @@ public class GItem extends AWidget implements ItemInfo.SpriteOwner, GSprite.Owne
 					//cancel farmermode
 					ZeeConfig.println("> Farmer mode: no tile selection. Canceling...");
 					ZeeConfig.farmerMode = false;
-					ZeeFarmingManager.resetInitialState();
+					ZeeSeedFarmingManager.resetInitialState();
 				} else {
 					//start farmermode
-					new ZeeFarmingManager(this, basename).start();
+					new ZeeSeedFarmingManager(this, basename).start();
 				}
 			}
 		}else if( ZeeConfig.dropSeeds && basename.startsWith("seed-") && this.parent instanceof Inventory){

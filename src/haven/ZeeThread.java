@@ -77,16 +77,16 @@ public class ZeeThread  extends Thread{
     /*
         returns true if player idle for idleMS
      */
-    public static boolean waitPlayerIdleFor(long idleMS) {
+    public static boolean waitPlayerIdleFor(int idleSeconds) {
         //println("wait player idle");
-        long timer = idleMS;
+        long timer = idleSeconds * 1000;
         try {
             while( timer > 0 ) {
                 if(ZeeConfig.isPlayerMoving() || ZeeConfig.isPlayerDrinking()){
-                    timer = idleMS; //reset timer if player moving or dringing
+                    timer = idleSeconds * 1000; //reset timer if player moving or dringing
                 }
-                timer -= SLEEP_MS;
-                Thread.sleep(SLEEP_MS);
+                timer -= PING_MS;
+                Thread.sleep(PING_MS);
             }
         } catch (InterruptedException e) {
             e.printStackTrace();
@@ -105,7 +105,7 @@ public class ZeeThread  extends Thread{
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        println("wait cursor "+name+" = "+ZeeConfig.getCursorName().equals(name));
+        //println("wait cursor "+name+" = "+ZeeConfig.getCursorName().equals(name));
         return ZeeConfig.getCursorName().equals(name);
     }
 

@@ -62,7 +62,7 @@ public class ZeeClickGobManager extends ZeeThread{
              */
             if(ZeeConfig.gameUI.ui.modctrl) {
                 if (isGobCrop()) {
-                    ZeeFarmingManager.showWindow(gob);
+                    ZeeSeedFarmingManager.showWindow(gob);
                     if(!ZeeConfig.getCursorName().equals(ZeeConfig.CURSOR_HARVEST))
                         gobClick(gob, 3, UI.MOD_SHIFT);//activate cursor harvest if needed
                 } else if (isFuelAction()) {
@@ -302,7 +302,7 @@ public class ZeeClickGobManager extends ZeeThread{
             ZeeClickGobManager.gobClick(gob, 3, UI.MOD_SHIFT);
 
             //wait getting to the barrel
-            waitPlayerIdleFor(1000);
+            waitPlayerIdleFor(1);
 
             while (!ZeeClickGobManager.isBarrelEmpty(gob) && !isInventoryFull()) {
                 ZeeClickGobManager.gobClick(gob, 3, UI.MOD_SHIFT);

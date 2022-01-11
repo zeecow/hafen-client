@@ -163,7 +163,7 @@ public class ZeeStockpileManager extends ZeeThread{
 
         if(windowManager ==null) {
 
-            windowManager = new ZeeWindow(new Coord(300, 120), "Stockpile manager") {
+            windowManager = new ZeeWindow(new Coord(150, 60), "Stockpile manager") {
                 public void wdgmsg(String msg, Object... args) {
                     if (msg.equals("close")) {
                         audioExit = false;
@@ -179,7 +179,7 @@ public class ZeeStockpileManager extends ZeeThread{
                         new ZeeStockpileManager().start();
                     }
                 }
-            }, 115,45);
+            }, 5,5);
 
 
             ZeeConfig.gameUI.add(windowManager, new Coord(100,100));
