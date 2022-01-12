@@ -84,9 +84,10 @@ public class ZeeThread  extends Thread{
             while( timer > 0 ) {
                 if(ZeeConfig.isPlayerMoving() || ZeeConfig.isPlayerDrinking()){
                     timer = idleSeconds * 1000; //reset timer if player moving or dringing
+                }else {
+                    timer -= SLEEP_MS;
                 }
-                timer -= PING_MS;
-                Thread.sleep(PING_MS);
+                Thread.sleep(SLEEP_MS);
             }
         } catch (InterruptedException e) {
             e.printStackTrace();
