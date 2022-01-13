@@ -28,7 +28,7 @@ public class ZeeClickGobManager extends ZeeThread{
         gobName = gob.getres().name;
         clickDiffMs = clickEndMs - clickStartMs;
         getMainInventory();
-        //System.out.println(clickDiffMs+"ms > "+gobName);
+        //println(clickDiffMs+"ms > "+gobName);
     }
 
     @Override

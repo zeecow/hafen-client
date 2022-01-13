@@ -140,19 +140,25 @@ public class ZeeSeedFarmingManager extends ZeeThread{
                         if (getSeedsFromBarrel()) {
                             plantSeeds();
                             if(waitPlayerIdleFor(2)){
-                                println("planting done 1");
-                                isPlantingDone = true;
+                                if(getTotalSeedAmount() >= 5) {
+                                    println("planting done 0");
+                                    isPlantingDone = true;
+                                }else{
+                                    println("planted all inv seeds, get more? 1");
+                                }
                             }
                         } else {
-                            println("planting done 2");
+                            println("planting done 1, no seeds from barrel?");
                             isPlantingDone = true;
                         }
                     } else {
                         println("getTotalSeedAmount() >= 5");
                         plantSeeds();
-                        if(waitPlayerIdleFor(2)){
-                            println("planting done 3");
+                        if(getTotalSeedAmount() >= 5) {
+                            println("planting done 2");
                             isPlantingDone = true;
+                        }else{
+                            println("planted all inv seeds, get more? 2");
                         }
                     }
                 }
