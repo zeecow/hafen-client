@@ -1553,6 +1553,14 @@ public class ZeeConfig {
         }}, null);
     }
 
+    public static ZeeGobColor getGobColor(Gob gob) {
+        if(gob==null)
+            return null;
+        synchronized(gob) {
+            return gob.getattr(ZeeGobColor.class);
+        }
+    }
+
 
     public static void cancelClick() {
         gameUI.map.wdgmsg("click", Coord.z, Coord.z, 3, 0);

@@ -198,6 +198,16 @@ public class ZeeSeedFarmingManager extends ZeeThread{
             //wait getting to the barrel
             waitPlayerIdleFor(2);
 
+            // if barrel unreachable, recursive call
+            if(ZeeConfig.distanceToPlayer(lastBarrel) > 5){
+                println(">barrel unreachable 1");
+                markBarrelUnreachable(lastBarrel);
+                List<Gob> barrels = findAnotherSeedBarrel();
+                lastBarrel = ZeeConfig.getClosestGob(barrels);
+                return getSeedsFromBarrel();
+            }
+
+            // get seeds
             while (!ZeeClickGobManager.isBarrelEmpty(lastBarrel) && !isInventoryFull()) {
                 ZeeClickGobManager.gobClick(lastBarrel, 3, UI.MOD_SHIFT);
                 //TODO: waitInvCHanges
@@ -429,15 +439,11 @@ public class ZeeSeedFarmingManager extends ZeeThread{
                         if(ZeeConfig.distanceToPlayer(lastBarrel) > TILE_SIZE*2){
                             //can't reach barrel
                             println("can't reach barrel? mark it red");
-                            ZeeConfig.addGobColor(lastBarrel,255,0,0,255);
-                            ZeeConfig.removeGobText(lastBarrel);
-                            //ZeeConfig.addGobText(lastBarrel,"inaccessible",255,0,0,255,10);
+                            markBarrelUnreachable(lastBarrel);
                         }else{
                             //barrel full
                             println("barrel full? mark it blue");
-                            ZeeConfig.addGobColor(lastBarrel,0,0,255,255);
-                            ZeeConfig.removeGobText(lastBarrel);
-                            //ZeeConfig.addGobText(lastBarrel,"full",0,0,255,255,10);
+                            markBarrelFull(lastBarrel);
                         }
                         lastBarrel = null;
                     }
@@ -448,6 +454,14 @@ public class ZeeSeedFarmingManager extends ZeeThread{
         }catch (Exception e){
             e.printStackTrace();
         }
+    }
+
+    public static void markBarrelFull(Gob lastBarrel) {
+        ZeeConfig.addGobColor(lastBarrel,0,0,255,255);
+    }
+
+    public static void markBarrelUnreachable(Gob lastBarrel) {
+        ZeeConfig.addGobColor(lastBarrel,255,0,0,255);
     }
 
     public static boolean isBarrelEmpty(Gob b) {
