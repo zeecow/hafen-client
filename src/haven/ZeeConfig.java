@@ -1457,7 +1457,7 @@ public class ZeeConfig {
     }
 
     public static Gob getClosestGob(List<Gob> gobs) {
-        if(gobs==null)
+        if(gobs==null || gobs.size()==0)
             return null;
         Gob closestGob = gobs.get(0);
         double closestDist = distanceToPlayer(closestGob);
@@ -1509,6 +1509,26 @@ public class ZeeConfig {
      */
     public static double getHourglass() {
         return gameUI.prog;
+    }
+
+    public static void addPlayerText(String s) {
+        addGobText(getPlayerGob(),s,0,255,0,255,10);
+    }
+
+    public static void addPlayerText(String s, int r, int g, int b, int a, int h) {
+        addGobText(getPlayerGob(),s,r,g,b,a,h);
+    }
+
+    public static void removePlayerText() {
+        removeGobText(getPlayerGob());
+    }
+
+    public static void addGobText(Gob g, String s){
+        addGobText(g,s,0,255,0,255,5);
+    }
+
+    public static void addGobText(Gob g, String s, int height){
+        addGobText(g,s,0,255,0,255,height);
     }
 
     public static int addGobText(Gob gob, String text, int r, int g, int b, int a, int height) {

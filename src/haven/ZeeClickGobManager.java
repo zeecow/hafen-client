@@ -28,7 +28,7 @@ public class ZeeClickGobManager extends ZeeThread{
         gobName = gob.getres().name;
         clickDiffMs = clickEndMs - clickStartMs;
         getMainInventory();
-        //println(clickDiffMs+"ms > "+gobName);
+        //println(clickDiffMs+"ms > "+gobName+" dist="+ZeeConfig.distanceToPlayer(gob));
     }
 
     @Override
@@ -305,6 +305,13 @@ public class ZeeClickGobManager extends ZeeThread{
             //wait getting to the barrel
             waitPlayerIdleFor(1);
 
+            if(ZeeConfig.distanceToPlayer(gob) > ZeeSeedFarmingManager.MIN_ACCESSIBLE_DIST){
+                ZeeConfig.msg("barrel unreachable");
+                return;
+            }
+
+            ZeeConfig.addPlayerText("taking seeds...");
+
             while (!ZeeClickGobManager.isBarrelEmpty(gob) && !isInventoryFull()) {
                 ZeeClickGobManager.gobClick(gob, 3, UI.MOD_SHIFT);
                 //TODO: waitInvCHanges
@@ -323,6 +330,7 @@ public class ZeeClickGobManager extends ZeeThread{
         }catch (Exception e){
             e.printStackTrace();
         }
+        ZeeConfig.removePlayerText();
     }
 
     private boolean isInventoryFull() {
