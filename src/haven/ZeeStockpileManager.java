@@ -18,9 +18,7 @@ public class ZeeStockpileManager extends ZeeThread{
     public static long lastInvItemMs;
     public static Gob gobPile, gobSource;
     public static MapView.Plob lastGobPlaced;
-    public static long lastGobPlacedMs;
     public static String lastGroundItemName;
-    public static long lastGroundItemNameMs = 0;
     static boolean isGroundItems;
 
     public ZeeStockpileManager(boolean groundItems) {
@@ -53,7 +51,6 @@ public class ZeeStockpileManager extends ZeeThread{
         if (gobName.equals("gfx/terobjs/items/tobacco-fresh")) {
             ZeeConfig.pilerMode = true;
             lastGroundItemName = gobName;
-            lastGroundItemNameMs = now();
         }
     }
 
@@ -189,8 +186,9 @@ public class ZeeStockpileManager extends ZeeThread{
             if(lastGobPlaced!=null && lastGobPlaced.getres()!=null && lastGobPlaced.getres().name.contains("/stockpile-")) {
 
                 //lastGobPlacedMs = now();
+                //println((now() - lastGroundItemNameMs)+" < "+5000);
 
-                if(now() - lastGroundItemNameMs < 5000) {
+                if(lastGroundItemName.endsWith(lastInvItemBaseName)  &&  now() - lastInvItemMs < 3000) {
                     showWindow(true);
                 } else {
                     String name = lastGobPlaced.getres().name;
