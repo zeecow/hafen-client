@@ -6,11 +6,7 @@ import java.util.List;
 
 public class ZeeSeedFarmingManager extends ZeeThread{
 
-    public static final int RB_SEEDS_STORE = 0;
-    public static final int RB_SEEDS_DROP = 1;
-    public static final int RB_SEEDS_WAIT = 2;
     public static final int MIN_ACCESSIBLE_DIST = 15;//TODO: isPlayerMountingHorse()
-    public static long IDLE_MS = 2222;
     public static final int MAX_BARREL_DIST = 300;
     public static final double TILE_SIZE = MCache.tilesz.x;
     public static Gob lastBarrel;
@@ -24,10 +20,7 @@ public class ZeeSeedFarmingManager extends ZeeThread{
     public static Window windowManager;
     public static int recursiveGetSeedsCount;
 
-    public static boolean farmerCbHarvest = Utils.getprefb("farmerCbHarvest",true);
     public static boolean farmerCbReplant = Utils.getprefb("farmerCbPlant",false);
-    public static int farmerRbSeeds = Utils.getprefi("farmerRbSeeds",RB_SEEDS_WAIT);
-    public static int farmerRgBarrelPriority = Utils.getprefi("farmerRgBarrelPriority",0);
     public static int farmerTxtTilesBarrel = Utils.getprefi("farmerTxtTilesBarrel",27);
     public static TextEntry textEntryTilesBarrel;
     public static Gob farmerGobCrop;

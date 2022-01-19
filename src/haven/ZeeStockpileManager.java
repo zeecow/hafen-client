@@ -188,7 +188,7 @@ public class ZeeStockpileManager extends ZeeThread{
                 //lastGobPlacedMs = now();
                 //println((now() - lastGroundItemNameMs)+" < "+5000);
 
-                if(lastGroundItemName.endsWith(lastInvItemBaseName)  &&  now() - lastInvItemMs < 3000) {
+                if(lastGroundItemName!=null && lastGroundItemName.endsWith(lastInvItemBaseName)  &&  now() - lastInvItemMs < 3000) {
                     showWindow(true);
                 } else {
                     String name = lastGobPlaced.getres().name;
