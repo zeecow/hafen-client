@@ -1992,7 +1992,7 @@ public class MapView extends PView implements DTarget, Console.Directory {
 			}
 		}
 	    wdgmsg("click", args);
-		ZeeConfig.gobClicked(clickb,pc,mc,args,clickGob);
+		ZeeConfig.mapClicked(clickb,pc,mc,args,clickGob);
 	}
     }
     
@@ -2234,7 +2234,7 @@ public class MapView extends PView implements DTarget, Console.Directory {
 			}
 		    mgrab.remove();
 			ZeeConfig.saveTileSelection(new Coord(sc), new Coord(ec), modflags, ol);
-		    wdgmsg("sel", sc, ec, modflags); // TODO uncomment
+		    wdgmsg("sel", sc, ec, modflags);//TODO
 		    sc = null;
 		}
 		return(true);

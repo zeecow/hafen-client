@@ -133,7 +133,7 @@ public class ZeeSeedFarmingManager extends ZeeThread{
                         println("getTotalSeedAmount() < 5");
                         if (getSeedsFromBarrel()) {
                             plantSeeds();
-                            if(waitPlayerIdleFor(2)){
+                            if(waitPlayerIdleFor(3)){
                                 if(getTotalSeedAmount() >= 5) {
                                     println("planting done 0");
                                     isPlantingDone = true;
@@ -248,10 +248,16 @@ public class ZeeSeedFarmingManager extends ZeeThread{
                          */
                         recursiveGetSeedsCount++;
                         if(recursiveGetSeedsCount > 2){
-                            println(">stuck at recursive barrel search?");
-                            //TODO: replant if getTotalSeedAmount() >= 5
-                            resetInitialState();
-                            return false;
+                            println(">max recursive find barrel...");
+                            if(getTotalSeedAmount() >= 5) {
+                                println("planting what seeds are in inventory 3");
+                                return true;
+                            }else {
+                                println("out of seeds from barrels and inv, planting done 3 ");
+                                isPlantingDone = true;
+                                lastBarrel = null;
+                                return false;
+                            }
                         }
                         println(">recursive find another barrel... "+recursiveGetSeedsCount);
                         lastBarrel = ZeeConfig.getClosestGob(barrels);
@@ -262,7 +268,7 @@ public class ZeeSeedFarmingManager extends ZeeThread{
                     return false;
                 }
             }else{
-                println("inv full from barrel");
+                println("inv full from barrel... (rec="+recursiveGetSeedsCount+")");
                 return true;
             }
         }catch (Exception e){

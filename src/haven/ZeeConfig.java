@@ -18,6 +18,8 @@ import java.util.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static haven.OCache.posres;
+
 
 public class ZeeConfig {
     public static final String CATEG_PVPANDSIEGE = "PVP and siege";
@@ -1271,11 +1273,6 @@ public class ZeeConfig {
         return ret;
     }
 
-    //screen center coord
-    public static Coord getCenterScreenCoord() {
-        return ZeeConfig.gameUI.map.sz.div(2);
-    }
-
     /*
         - compile multi-line messages into single-line
         - show text ql above gob
@@ -1441,7 +1438,7 @@ public class ZeeConfig {
         }).collect(Collectors.toList());
     }
 
-    public static void gobClicked(int clickb, Coord pc, Coord2d mc, Object[] args, Gob clickGob) {
+    public static void mapClicked(int clickb, Coord pc, Coord2d mc, Object[] args, Gob clickGob) {
         lastMapViewClickButton = clickb;
         lastMapViewClickPc = pc;
         lastMapViewClickMc = mc;
@@ -1584,6 +1581,30 @@ public class ZeeConfig {
 
     public static void cancelClick() {
         gameUI.map.wdgmsg("click", Coord.z, Coord.z, 3, 0);
+    }
+
+    public static void clickTile(Coord tile) {
+        Coord2d origin = new Coord2d(gameUI.map.player().rc.div(11).floor().mul(11));
+        //Coord2d origin = gameUI.map.player().rc;
+        gameUI.map.wdgmsg("click", tile, origin.floor(posres), 1, 0);
+        //gameUI.map.wdgmsg("click", getCenterScreenCoord(gameUI), origin.add(tile.x * 11, tile.y * 11).add(11 / 2.0, 11 / 2.0).floor(posres), 1, 0);
+        //gameUI.map.pllastcc = origin.add(tile.x * 11, tile.y * 11).add(11 / 2.0, 11 / 2.0);
+    }
+
+    public static Coord coordToTile(Coord2d c) {
+        return c.div(11, 11).floor();
+    }
+
+    public static Coord getCenterScreenCoord(GameUI ui) {
+        Coord sc, sz;
+        sz = ui.map.sz;
+        sc = new Coord((int) Math.round(Math.random() * 200 + sz.x / 2f - 100),
+                (int) Math.round(Math.random() * 200 + sz.y / 2f - 100));
+        return sc;
+    }
+
+    public static Coord getCenterScreenCoord() {
+        return ZeeConfig.gameUI.map.sz.div(2);
     }
 
     public static void msg(String s) {
