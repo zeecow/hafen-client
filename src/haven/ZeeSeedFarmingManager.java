@@ -1,7 +1,6 @@
 package haven;
 
 import java.awt.event.KeyEvent;
-import java.util.HashMap;
 import java.util.List;
 
 public class ZeeSeedFarmingManager extends ZeeThread{
@@ -11,12 +10,11 @@ public class ZeeSeedFarmingManager extends ZeeThread{
     public static final double TILE_SIZE = MCache.tilesz.x;
     public static Gob lastBarrel;
     public static boolean busy;
-    public static String gItemNameSeed, lastItemNameSeed;
+    public static String gItemSeedBasename, lastItemSeedBasename;
     public static GItem gItem;
     public static WItem wItem;
     public static Inventory inv;
     public static boolean isHarvestDone, isPlantingDone, isScytheEquiped;
-    public static HashMap<Gob,Integer> mapBarrelSeedql = new HashMap<Gob,Integer> ();
     public static Window windowManager;
     public static int recursiveGetSeedsCount;
 
@@ -29,16 +27,15 @@ public class ZeeSeedFarmingManager extends ZeeThread{
     public ZeeSeedFarmingManager(GItem g, String nameSeed) {
         busy = true;
         gItem = g;
-        gItemNameSeed = nameSeed;// "seed-turnip"
-        if(!nameSeed.equals(lastItemNameSeed)) {
+        gItemSeedBasename = nameSeed;// "seed-turnip"
+        if(!nameSeed.equals(lastItemSeedBasename)) {
             println(">new crop name, forget last barrel ("+lastBarrel+")");
             lastBarrel = null;
-            mapBarrelSeedql.clear();
             ZeeConfig.removeGobText(lastBarrel);
         }else{
             println(">same crop name, use last barrel ("+lastBarrel+")");
         }
-        lastItemNameSeed = nameSeed;
+        lastItemSeedBasename = nameSeed;
         inv = (Inventory) gItem.parent;
         wItem = inv.getWItemByGItem(gItem);
         recursiveGetSeedsCount = 0;
@@ -61,7 +58,7 @@ public class ZeeSeedFarmingManager extends ZeeThread{
     }
 
     private void updateWItem() {
-        wItem = inv.getWItemsByName(gItemNameSeed).get(0);
+        wItem = inv.getWItemsByName(gItemSeedBasename).get(0);
         gItem = wItem.item;
     }
 
@@ -75,7 +72,7 @@ public class ZeeSeedFarmingManager extends ZeeThread{
 
     private void testBarrelsTiles() {
         //highlight barrels in range
-        getBarrels().forEach(gob -> {
+        getAccessibleBarrels().forEach(gob -> {
             ZeeConfig.addGobColor(gob,0,255,0,255);
             ZeeConfig.addGobText(gob,"↓",0,255,0,255,10);
         });
@@ -105,7 +102,7 @@ public class ZeeSeedFarmingManager extends ZeeThread{
              */
             isHarvestDone = false;
             while(busy && !isHarvestDone) {
-                println("> harvesting");
+                println("> harvesting loop");
                 ZeeConfig.addGobText(ZeeConfig.getPlayerGob(),"harvesting",0,255,255,255,10);
                 waitPlayerIdleFor(2);//already farming
                 if(inventoryHasSeeds()) {
@@ -128,32 +125,22 @@ public class ZeeSeedFarmingManager extends ZeeThread{
                 isPlantingDone = false;
                 isScytheEquiped = ZeeClickItemManager.isItemEquipped("scythe");
                 while (busy && !isPlantingDone) {
-                    println("> planting");
+                    println("> planting loop");
                     if (getTotalSeedAmount() < 5) {
-                        println("getTotalSeedAmount() < 5");
-                        if (getSeedsFromBarrel()) {
-                            plantSeeds();
-                            if(waitPlayerIdleFor(3)){
-                                if(getTotalSeedAmount() >= 5) {
-                                    println("planting done 0");
-                                    isPlantingDone = true;
-                                }else{
-                                    println("planted all inv seeds, get more? 1");
-                                }
-                            }
-                        } else {
-                            println("planting done 1, no seeds from barrel?");
+                        println("total seeds < 5, get from barrels");
+                        if (!getSeedsFromMultipleBarrels(gItemSeedBasename)) {
+                            println("planting done, no seeds from barrel?");
                             isPlantingDone = true;
+                            break;
                         }
-                    } else {
-                        println("getTotalSeedAmount() >= 5");
-                        plantSeeds();
-                        if(getTotalSeedAmount() >= 5) {
-                            println("planting done 2");
-                            isPlantingDone = true;
-                        }else{
-                            println("planted all inv seeds, get more? 2");
-                        }
+                    }
+                    plantSeeds();
+                    waitPlayerIdleFor(2);
+                    if(getTotalSeedAmount() >= 5) {
+                        println("planting done");
+                        isPlantingDone = true;
+                    }else{
+                        println("planted all inv seeds, get more?");
                     }
                 }
 
@@ -169,128 +156,71 @@ public class ZeeSeedFarmingManager extends ZeeThread{
         resetInitialState();
     }
 
-    //TODO: consider multiple barrels from mapBarrelSeedql
-    private boolean getSeedsFromBarrel() {
+    private boolean getSeedsFromMultipleBarrels(String seedBaseName) {
         try {
-            if (lastBarrel == null) {
-                println("getSeedsFromBarrel() > no lastBarrel defined");
-                return false;
-            }
+            ZeeConfig.addGobText(ZeeConfig.getPlayerGob(),"getting seeds",0,255,255,255,10);
 
-            ZeeConfig.addGobText(ZeeConfig.getPlayerGob(),"getting seeds...",0,255,255,255,10);
+            while(!isInventoryFull()){
 
-            //remove harvest cursor
-            if(ZeeConfig.getCursorName().equals(ZeeConfig.CURSOR_HARVEST)){
-                println("remove cursor harvest");
-                ZeeClickGobManager.gobClick(lastBarrel,3);
-            }
-
-            // shift+rclick last barrel
-            println("> get seeds from barrel");
-            ZeeClickGobManager.gobClick(lastBarrel, 3, UI.MOD_SHIFT);
-
-            //wait getting to the barrel
-            waitPlayerIdleFor(2);
-
-            // if barrel unreachable, recursive call
-            double dist = ZeeConfig.distanceToPlayer(lastBarrel);
-            if(dist > MIN_ACCESSIBLE_DIST){
-                println(">barrel unreachable 1, dist="+dist);
-                markBarrelUnreachable(lastBarrel);
-                List<Gob> barrels = findAnotherSeedBarrel();
-                if(barrels.size()==0){
-                    if(getTotalSeedAmount() >= 5) {
-                        println("planting what seeds are in inventory 1");
-                        return true;
-                    }else {
-                        println("out of seeds from barrels and inv, planting done 1 ");
-                        isPlantingDone = true;
-                        lastBarrel = null;
-                        return false;
-                    }
+                // select all seed barrels
+                List<Gob> barrels = getAllSeedBarrels(seedBaseName);
+                if (barrels.isEmpty()){
+                    println("no barrels containing "+seedBaseName);
+                    break;
                 }
-                lastBarrel = ZeeConfig.getClosestGob(barrels);
-                return getSeedsFromBarrel();
+
+                // get closest barrel
+                Gob closestBarrel = ZeeConfig.getClosestGob(barrels);
+
+                // try access barrel and get seeds
+                getSeedsFromBarrel(closestBarrel);
             }
 
-            // get seeds
-            while (!ZeeClickGobManager.isBarrelEmpty(lastBarrel) && !isInventoryFull()) {
-                ZeeClickGobManager.gobClick(lastBarrel, 3, UI.MOD_SHIFT);
-                //TODO: waitInvCHanges
-                Thread.sleep(PING_MS);
-            }
-
-            if(waitHoldingItem())//store remaining holding item
-                ZeeClickGobManager.gobItemAct(lastBarrel, 0);
-
-            /*
-                try fill up inventory with seeds
-             */
-            if (!isInventoryFull()) {
-                println("inv not full");
-                if(isBarrelEmpty(lastBarrel)){
-                    println("barrel empty, find another");
-                    List<Gob> barrels = findAnotherSeedBarrel();
-                    if(barrels.size()==0) {
-                        recursiveGetSeedsCount = 0;
-                        if(getTotalSeedAmount() >= 5) {
-                            println("planting what seeds are in inventory 2");
-                            return true;
-                        }else {
-                            println("out of seeds from barrels and inv, planting done 2 ");
-                            isPlantingDone = true;
-                            lastBarrel = null;
-                            return false;
-                        }
-                    }else{
-                        /*
-                            recursively search another seed barrel
-                         */
-                        recursiveGetSeedsCount++;
-                        if(recursiveGetSeedsCount > 2){
-                            println(">max recursive find barrel...");
-                            if(getTotalSeedAmount() >= 5) {
-                                println("planting what seeds are in inventory 3");
-                                return true;
-                            }else {
-                                println("out of seeds from barrels and inv, planting done 3 ");
-                                isPlantingDone = true;
-                                lastBarrel = null;
-                                return false;
-                            }
-                        }
-                        println(">recursive find another barrel... "+recursiveGetSeedsCount);
-                        lastBarrel = ZeeConfig.getClosestGob(barrels);
-                        return getSeedsFromBarrel();
-                    }
-                }else{
-                    println("impossible state?");
-                    return false;
-                }
-            }else{
-                println("inv full from barrel... (rec="+recursiveGetSeedsCount+")");
-                return true;
-            }
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
-            return false;
         }
+
+        return getTotalSeedAmount() > 5;
     }
 
-    public static List<Gob> findAnotherSeedBarrel() {
-        println(">find another seed barrel");
-        List<Gob> barrels = getBarrels();
+    public static boolean isBarrelAccessible(Gob barrel) {
+        ZeeClickGobManager.gobClick(barrel, 3);
+        waitPlayerIdleFor(2);
+        double dist = ZeeConfig.distanceToPlayer(barrel);
+        return dist < MIN_ACCESSIBLE_DIST;
+    }
+
+    public static boolean getSeedsFromBarrel(Gob barrel) throws InterruptedException {
+        println(">get seeds from barrel");
+        if(!isBarrelAccessible(barrel)){
+            markBarrelInaccessible(barrel);
+            return false;
+        }
+        while (!isBarrelEmpty(barrel) && !isInventoryFull()) {
+            ZeeClickGobManager.gobClick(barrel, 3, UI.MOD_SHIFT);
+            //TODO: waitInvCHanges
+            Thread.sleep(PING_MS+100);
+        }
+        if(waitHoldingItem())//store remaining holding item
+            ZeeClickGobManager.gobItemAct(lastBarrel, 0);
+        return getTotalSeedAmount() > 5;
+    }
+
+
+    public static List<Gob> getAllSeedBarrels(String seedBaseName) {
+        //println(">get all seed barrels");
+        List<Gob> barrels = getAccessibleBarrels();
         barrels.removeIf(b -> {
             if (ZeeClickGobManager.isBarrelEmpty(b))
                 return true;
-            if (!isBarrelSameSeeds(b, lastItemNameSeed))
+            if (!isBarrelSameSeeds(b, seedBaseName))
                 return true;
             return false;
         });
         return barrels;
     }
 
-    private boolean isInventoryFull() {
+    public static boolean isInventoryFull() {
         return inv.getNumberOfFreeSlots() == 0;
     }
 
@@ -307,6 +237,7 @@ public class ZeeSeedFarmingManager extends ZeeThread{
                 println("after  sc=" + ZeeConfig.savedTileSelStartCoord + "  ec=" + ZeeConfig.savedTileSelEndCoord);
             }
              */
+            println("planting...");
             ZeeConfig.gameUI.map.wdgmsg("sel", ZeeConfig.savedTileSelStartCoord, ZeeConfig.savedTileSelEndCoord, ZeeConfig.savedTileSelModflags);
             return true;
         }else{
@@ -335,9 +266,9 @@ public class ZeeSeedFarmingManager extends ZeeThread{
         return 0;
     }
 
-    public int getTotalSeedAmount(){
+    public static int getTotalSeedAmount(){
         int ret = 0;
-        WItem[] arr = inv.getWItemsByName(gItemNameSeed).toArray(new WItem[0]);
+        WItem[] arr = inv.getWItemsByName(gItemSeedBasename).toArray(new WItem[0]);
         for (int i = 0; i < arr.length ; i++) {
             ret += getSeedsAmount(arr[i].item);
         }
@@ -375,19 +306,18 @@ public class ZeeSeedFarmingManager extends ZeeThread{
     }
 
     private boolean inventoryHasSeeds() {
-        return inv.getWItemsByName(lastItemNameSeed).size() > 0;
+        return inv.getWItemsByName(gItemSeedBasename).size() > 0;
     }
 
     private int getNumberOfSeedItems(){
-        return inv.getWItemsByName(lastItemNameSeed).size();
+        return inv.getWItemsByName(gItemSeedBasename).size();
     }
 
-    public static List<Gob> getBarrels() {
+    public static List<Gob> getAccessibleBarrels() {
         List<Gob> emptyBarrels = ZeeConfig.findGobsByName("barrel");
         emptyBarrels.removeIf(barrel -> {
             if(ZeeConfig.distanceToPlayer(barrel) > farmerTxtTilesBarrel * TILE_SIZE)
                 return true;//remove distant barrels
-            ZeeGobColor c = barrel.getattr(ZeeGobColor.class);
             if(isBarrelMarkedInaccessible(barrel)) {
                 return true;//remove inaccessible barrels (red)
             }
@@ -414,7 +344,7 @@ public class ZeeSeedFarmingManager extends ZeeThread{
 
     private void storeSeedsInBarrel() {
         try {
-            List<Gob> barrels = getBarrels();
+            List<Gob> barrels = getAccessibleBarrels();
             println("barrels = " + barrels.size());
             if (barrels.size()==0) {
                 /*
@@ -422,7 +352,7 @@ public class ZeeSeedFarmingManager extends ZeeThread{
                  */
                 ZeeConfig.gameUI.msg("No empty barrels, lastBarrel null, dropping seeds.");
                 println("No empty barrels close, dropping seeds.");
-                inv.dropItemsByName(lastItemNameSeed);
+                inv.dropItemsByName(gItemSeedBasename);
 
             } else {
                 /*
@@ -434,7 +364,7 @@ public class ZeeSeedFarmingManager extends ZeeThread{
                     if(c!=null && c.color.color().getBlue()==1) {
                         return true;//remove possible marked full(blue) barrels
                     }
-                    if (!isBarrelEmpty(b) && !isBarrelSameSeeds(b,gItemNameSeed)){
+                    if (!isBarrelEmpty(b) && !isBarrelSameSeeds(b, gItemSeedBasename)){
                         return true;//remove non-empty, non-matching seed barrels
                     }
                     return false;
@@ -463,20 +393,23 @@ public class ZeeSeedFarmingManager extends ZeeThread{
                         println("seeds stored");
                         //ZeeConfig.addGobColor(lastBarrel,0,255,0,255);
                     } else {
-                        //still holding item
-                        if(ZeeConfig.distanceToPlayer(lastBarrel) > TILE_SIZE*2){
-                            //can't reach barrel
-                            println("can't reach barrel? mark it red");
-                            markBarrelUnreachable(lastBarrel);
-                        }else{
-                            //barrel full
-                            println("barrel full? mark it blue");
-                            markBarrelFull(lastBarrel);
-                        }
+                        //still holding item?
+                        println("still holding item 1, mark barrel full");
+                        markBarrelFull(lastBarrel);
                         lastBarrel = null;
                     }
                 }else{
-                    println(">storing >player not holding seed? timeout problem?");
+                    //still holding item?
+                    if(ZeeConfig.distanceToPlayer(lastBarrel) > MIN_ACCESSIBLE_DIST){
+                        //can't reach barrel
+                        println("still holding item 2, mark barrel unaccessible");
+                        markBarrelInaccessible(lastBarrel);
+                    }else{
+                        //barrel full
+                        println("still holding item 2, mark barrel full");
+                        markBarrelFull(lastBarrel);
+                    }
+                    lastBarrel = null;
                 }
             }
         }catch (Exception e){
@@ -488,7 +421,7 @@ public class ZeeSeedFarmingManager extends ZeeThread{
         ZeeConfig.addGobColor(lastBarrel,0,0,255,255);
     }
 
-    public static void markBarrelUnreachable(Gob lastBarrel) {
+    public static void markBarrelInaccessible(Gob lastBarrel) {
         ZeeConfig.addGobColor(lastBarrel,255,0,0,255);
     }
 
@@ -497,11 +430,9 @@ public class ZeeSeedFarmingManager extends ZeeThread{
     }
 
     public static String getBarrelText() {
-        return getSeedName() +" q"+ Inventory.getQuality(gItem).intValue();
-    }
-
-    public static String getSeedName() {
-        return lastItemNameSeed.replace("seed-","");
+        return gItemSeedBasename.replace("seed-","")
+                + " q"
+                + Inventory.getQuality(gItem).intValue();
     }
 
     // gfx/terobjs/barrel-flax

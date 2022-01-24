@@ -349,8 +349,8 @@ public class GobIcon extends GAttrib {
 	    private IconList(Coord sz) {
 		super(sz, elh);
 	    }
-		private IconList(int w, int h, Map<String,GobIcon.Setting> cur) {
-			super(w, h, elh);
+		private IconList(Coord sz, Map<String,GobIcon.Setting> cur) {
+			super( sz, elh);
 			this.curFilter = cur;
 			//this.showc = showc();
 		}
@@ -527,7 +527,7 @@ public class GobIcon extends GAttrib {
 	    this.conf = conf;
 	    this.save = save;
 	    add(this.cont = new PackCont.LinPack.VPack(), Coord.z).margin(UI.scale(5)).packpar(true);
-	    list = cont.last(new IconList(UI.scale(250, 500)), 0);
+	    list = cont.last(new IconList(UI.scale(250, 400)), 0);
 	    cont.last(new HRuler(list.sz.x), 0);
 	    cont.last(new CheckBox("Notification on newly seen icons") {
 		    {this.a = conf.notify;}
@@ -565,6 +565,7 @@ public class GobIcon extends GAttrib {
 		 */
 	}
 
+	/*
 	public void toggleFilterIconList(String filterName) {
 		Window win = ZeeConfig.iconList.getparent(Window.class);
 		Map<String, GobIcon.Setting> filteredList = null;
@@ -598,8 +599,9 @@ public class GobIcon extends GAttrib {
 		else if(filterName.equals("nuts"))
 			filteredList.entrySet().removeIf(entry -> !ZeeConfig.isTreeNuts(entry.getKey()));
 		ZeeConfig.iconList.remove();
-		ZeeConfig.iconList = new GobIcon.SettingsWindow.IconList(UI.scale(250), 25, filteredList);
+		ZeeConfig.iconList = new GobIcon.SettingsWindow.IconList(UI.scale(250, 400), filteredList);
 		win.add(ZeeConfig.iconList, Coord.z);
 	}
+	*/
     }
 }
