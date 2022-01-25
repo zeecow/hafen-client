@@ -1125,9 +1125,9 @@ public class ZeeConfig {
     private static double lasterrsfx = 0;
     public static void playAudio(String filePath) {
         double now = Utils.rtime();
-        if(now - lasterrsfx > 0.1) {
-            new ZeeSynth(filePath).start();
+        if(now - lasterrsfx > 0.5) {
             lasterrsfx = now;
+            new ZeeSynth(filePath).start();
         }
         //if(playingAudio!=null && playingAudio.contains(filePath))
             //return;//avoid duplicate audio
