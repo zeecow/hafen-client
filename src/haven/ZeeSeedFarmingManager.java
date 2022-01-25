@@ -32,8 +32,6 @@ public class ZeeSeedFarmingManager extends ZeeThread{
             println(">new crop name, forget last barrel ("+lastBarrel+")");
             lastBarrel = null;
             ZeeConfig.removeGobText(lastBarrel);
-        }else{
-            println(">same crop name, use last barrel ("+lastBarrel+")");
         }
         lastItemSeedBasename = nameSeed;
         inv = (Inventory) gItem.parent;
@@ -53,7 +51,8 @@ public class ZeeSeedFarmingManager extends ZeeThread{
         isPlantingDone = true;
         ZeeConfig.resetTileSelection();
         ZeeConfig.autoHearthOnStranger = Utils.getprefb("autoHearthOnStranger", true);
-        ZeeConfig.removeGobText(lastBarrel);
+        if(lastBarrel!=null)
+            ZeeConfig.removeGobText(lastBarrel);
         ZeeConfig.removeGobText(ZeeConfig.getPlayerGob());
     }
 
