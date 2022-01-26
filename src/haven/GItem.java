@@ -163,11 +163,13 @@ public class GItem extends AWidget implements ItemInfo.SpriteOwner, GSprite.Owne
 		check item for dropping and other actions
 	 */
 	private void onSpriteCreated() {
-		String basename = this.resource().basename();
-		//String fullname = this.resource().name;
-		Resource curs = ui.root.getcurs(Coord.z);
 
-		if (curs != null && curs.name.equals("gfx/hud/curs/mine")) {
+		String basename = this.resource().basename();
+		Resource curs = ui.root.getcurs(Coord.z);
+		ZeeConfig.lastInvItemBaseName = basename;
+		ZeeConfig.lastInvItemMs = ZeeThread.now();
+
+		if (curs != null && curs.name.equals(ZeeConfig.CURSOR_MINE)) {
 			//drop mined item
 			ZeeMiningManager.lastDropItemMs = System.currentTimeMillis();
 			if (ZeeConfig.dropMinedStones && ZeeConfig.mineablesStone.contains(basename) ||
@@ -204,9 +206,6 @@ public class GItem extends AWidget implements ItemInfo.SpriteOwner, GSprite.Owne
 			//drop soil
 			Inventory inv = (Inventory) this.parent;
 			inv.dropItemsByName(basename);
-		}else if(ZeeConfig.pilerMode){
-			ZeeStockpileManager.lastInvItemBaseName = basename;
-			ZeeStockpileManager.lastInvItemMs = ZeeThread.now();
 		}
 	}
 

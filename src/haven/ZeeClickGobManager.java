@@ -350,7 +350,7 @@ public class ZeeClickGobManager extends ZeeThread{
     private void inspectGob() {
         ZeeConfig.gameUI.menu.wdgmsg("act","inspect","0");
         gobClick(1);
-        ZeeConfig.cancelClick();
+        ZeeConfig.clickGroundZero();
     }
 
     public boolean isGobTrellisPlant() {
@@ -401,12 +401,13 @@ public class ZeeClickGobManager extends ZeeThread{
         }
     }
 
-    // TODO: test miningManager chipboulder use
     public static boolean clickGobPetal(Gob gob, String petalName) {
-        //ZeeClickGobManager.scheduleClickPetalOnce(petalName);
+        if (gob==null){
+            println(">clickGobPetal gob null");
+            return false;
+        }
         gobClick(gob,3);
         if(waitFlowerMenu()){
-            //println("clickGobPetal2 > choosing "+petalName);
             return choosePetal(getFlowerMenu(), petalName);
         }else{
             println("clickGobPetal2 > no flower menu?");

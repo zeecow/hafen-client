@@ -14,8 +14,6 @@ public class ZeeStockpileManager extends ZeeThread{
     static Inventory mainInv;
     static boolean audioExit;
     public static String lastPetalName;
-    public static String lastInvItemBaseName;
-    public static long lastInvItemMs;
     public static Gob gobPile, gobSource;
     public static MapView.Plob lastGobPlaced;
     public static String lastGroundItemName;
@@ -136,7 +134,7 @@ public class ZeeStockpileManager extends ZeeThread{
                 waitInvFullOrHoldingItem(mainInv);
 
             if (gameUI.vhand == null) {//if not holding item
-                List<WItem> invItems = mainInv.getWItemsByName(lastInvItemBaseName);
+                List<WItem> invItems = mainInv.getWItemsByName(ZeeConfig.lastInvItemBaseName);
                 if(invItems.size()==0) {
                     //no inventory items, try getting more from source
                     if( gobSource==null || !ZeeClickGobManager.clickGobPetal(gobSource, lastPetalName) ){
@@ -188,19 +186,19 @@ public class ZeeStockpileManager extends ZeeThread{
                 //lastGobPlacedMs = now();
                 //println((now() - lastGroundItemNameMs)+" < "+5000);
 
-                if(lastGroundItemName!=null && lastGroundItemName.endsWith(lastInvItemBaseName)  &&  now() - lastInvItemMs < 3000) {
+                if(lastGroundItemName!=null && lastGroundItemName.endsWith(ZeeConfig.lastInvItemBaseName)  &&  now() - ZeeConfig.lastInvItemMs < 3000) {
                     showWindow(true);
                 } else {
                     String name = lastGobPlaced.getres().name;
                     boolean show = false;
 
-                    if (now() - lastInvItemMs > 3000) //3s
+                    if (now() - ZeeConfig.lastInvItemMs > 3000) //3s
                         show = false; // time limit to avoid late unwanted window popup
-                    else if (name.equals(STOCKPILE_LEAF) && lastInvItemBaseName.equals(BASENAME_MULB_LEAF))
+                    else if (name.equals(STOCKPILE_LEAF) && ZeeConfig.lastInvItemBaseName.equals(BASENAME_MULB_LEAF))
                         show = true;
-                    else if (name.equals(STOCKPILE_BLOCK) && lastInvItemBaseName.startsWith("wblock-"))
+                    else if (name.equals(STOCKPILE_BLOCK) && ZeeConfig.lastInvItemBaseName.startsWith("wblock-"))
                         show = true;
-                    else if (name.equals(STOCKPILE_BOARD) && lastInvItemBaseName.contains("board-"))
+                    else if (name.equals(STOCKPILE_BOARD) && ZeeConfig.lastInvItemBaseName.contains("board-"))
                         show = true;
 
                     if(show)
@@ -292,7 +290,7 @@ public class ZeeStockpileManager extends ZeeThread{
     private static void pileItems() throws InterruptedException {
         cancelFlowerMenu();
         if (gameUI.vhand == null) {//if not holding item
-            List<WItem> invItems = mainInv.getWItemsByName(lastInvItemBaseName);
+            List<WItem> invItems = mainInv.getWItemsByName(ZeeConfig.lastInvItemBaseName);
             if(invItems.size()==0) {
                 return;//inv has no more items
             }

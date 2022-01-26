@@ -82,7 +82,7 @@ public class ZeeThread  extends Thread{
         long timer = idleSeconds * 1000;
         try {
             while( timer > 0 ) {
-                if(ZeeConfig.isPlayerMoving() || ZeeConfig.isPlayerDrinking()){
+                if(ZeeConfig.isPlayerMoving() || ZeeConfig.isPlayerDrinking() ){
                     timer = idleSeconds * 1000; //reset timer if player moving or dringing
                 }else {
                     timer -= SLEEP_MS;
@@ -124,23 +124,25 @@ public class ZeeThread  extends Thread{
         return (g!=null && g.resource()!=null && g.resource().basename()!=null);
     }
 
-    public static boolean waitPlayerIdle(){
-        //println("waitPlayerIdle()");
-        int max = (int) TIMEOUT_MS * 3;
-        int counter = max;
+
+    public static void waitPlayerIdle(){
         try {
-            while(counter > 0) {
-                if(ZeeConfig.isPlayerMoving())
-                    counter = max; //reset
-                else
-                    counter -= PING_MS;
-                println("idle counter "+counter);
-                Thread.sleep(PING_MS);
+
+            if(!ZeeConfig.isPlayerMoving()) { // started idle
+                // wait player move
+                while(!ZeeConfig.isPlayerMoving()) {
+                    Thread.sleep(SLEEP_MS);
+                }
             }
+
+            // wait player stop
+            while(ZeeConfig.isPlayerMoving()) {
+                Thread.sleep(SLEEP_MS);
+            }
+
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        return counter <= 0;
     }
 
     static int invFreeSlots, lastInvFreeSlots;

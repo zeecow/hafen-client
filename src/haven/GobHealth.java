@@ -33,16 +33,21 @@ public class GobHealth extends GAttrib implements Gob.SetupMod {
     public final MixColor fx;
     
     public GobHealth(Gob g, int hp) {
-	super(g);
-	this.hp = hp;
-    if(hp==4)
-        this.fx = null;
-	else if(hp==3)
-        this.fx = ZeeConfig.MIXCOLOR_YELLOW;
-	else if(hp==2)
-        this.fx = ZeeConfig.MIXCOLOR_ORANGE;
-    else
-        this.fx = ZeeConfig.MIXCOLOR_RED;
+        super(g);
+        this.hp = hp;
+        if(hp==4) {
+            this.fx = null;
+        }else if(hp==3) {
+            this.fx = ZeeConfig.MIXCOLOR_YELLOW;
+        }else if(hp==2) {
+            this.fx = ZeeConfig.MIXCOLOR_ORANGE;
+            if (ZeeMiningManager.mining)
+                ZeeMiningManager.notifyColumn(g,hp);
+        }else {
+            this.fx = ZeeConfig.MIXCOLOR_RED;
+            if (ZeeMiningManager.mining)
+                ZeeMiningManager.notifyColumn(g,hp);
+        }
     }
     
     public Pipe.Op gobstate() {

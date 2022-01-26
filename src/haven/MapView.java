@@ -592,7 +592,8 @@ public class MapView extends PView implements DTarget, Console.Directory {
 		if(ob!=null && ob.getres()!=null)
 			ZeeConfig.gobAudio(ob);
 			ZeeConfig.highlight(ob, ZeeConfig.getHighlightColor(ob));
-			ZeeMiningManager.checkNearBoulder(ob);
+			if (ZeeMiningManager.mining)
+				ZeeMiningManager.checkGobBoulder(ob);
 	    }
 	}
 
@@ -2224,10 +2225,10 @@ public class MapView extends PView implements DTarget, Console.Directory {
 		    Coord ec = mc.div(MCache.tilesz2);
 		    xl.mv = false;
 		    tt = null;
-			if(!ZeeConfig.farmerMode) {
+			if(!ZeeConfig.farmerMode && !ZeeConfig.getCursorName().equals(ZeeConfig.CURSOR_MINE)) {
 				ol.destroy();
 			}else {
-				//farmer mode preserve overlay, unless cancel button
+				// farmermode and mining preserve overlay, unless cancel button
 				if(button != 1){
 					ol.destroy();
 				}

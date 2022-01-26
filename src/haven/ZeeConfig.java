@@ -77,6 +77,8 @@ public class ZeeConfig {
     public static Coord savedTileSelStartCoord, savedTileSelEndCoord;
     public static int savedTileSelModflags;
     public static MCache.Overlay savedTileSelOverlay;
+    public static String lastInvItemBaseName;
+    public static long lastInvItemMs;
 
     public static boolean actionSearchGlobal = Utils.getprefb("actionSearchGlobal", true);
     public static boolean alertOnPlayers = Utils.getprefb("alertOnPlayers", true);
@@ -207,7 +209,9 @@ public class ZeeConfig {
     public static HashMap<String,Coord> mapWindowPos = initMapWindowPos();
     public static HashMap<Gob,Integer> mapGobTextId = new HashMap<Gob,Integer>();
     public static GobIcon.SettingsWindow.IconList iconList;
-    public static int windowTxtentryTiles2Barrel;
+    public static Dropbox<String> iconListFilterBox;
+    public static int iconListY;
+    public static Window iconListWin;
 
 
     public static void checkRemoteWidget(String type, Widget wdg) {
@@ -1407,6 +1411,9 @@ public class ZeeConfig {
         savedTileSelEndCoord = ec;
         savedTileSelModflags = modflags;
         savedTileSelOverlay = ol;
+        if (getCursorName().equals(CURSOR_MINE)){
+            new ZeeMiningManager().start();
+        }
     }
 
     public static void resetTileSelection(){
@@ -1578,9 +1585,13 @@ public class ZeeConfig {
         }
     }
 
-
-    public static void cancelClick() {
+    // simulate cancel click
+    public static void clickGroundZero() {
         gameUI.map.wdgmsg("click", Coord.z, Coord.z, 3, 0);
+    }
+
+    public static void clickGroundZero(int btn) {
+        gameUI.map.wdgmsg("click", Coord.z, Coord.z, btn, 0);
     }
 
     public static void clickTile(Coord tile) {
