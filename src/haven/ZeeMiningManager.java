@@ -62,8 +62,10 @@ public class ZeeMiningManager extends ZeeThread{
     }
 
 
-    public static void notifyColumn(Gob column, int hp){
-        ZeeConfig.addGobText(column,(hp*25)+"%");
+    public static void notifyColumn(Gob gob, int hp){
+        if (!isMineSupport(gob))
+            return;
+        ZeeConfig.addGobText(gob,(hp*25)+"%");
         stopMining();
     }
 
@@ -142,6 +144,13 @@ public class ZeeMiningManager extends ZeeThread{
                 gob.getres().name.startsWith("gfx/terobjs/bumlings/") &&
                 !gob.getres().name.startsWith("gfx/terobjs/bumlings/ras") // cave-in boulder
         );
+    }
+
+    public static boolean isMineSupport(Gob gob) {
+        return gob!=null && gob.getres()!=null &&
+            (gob.getres().name.equals("gfx/terobjs/minebeam") ||
+            gob.getres().name.equals("gfx/terobjs/column") ||
+            gob.getres().name.equals("gfx/terobjs/minesupport"));
     }
 
     public static void println(String s) {
