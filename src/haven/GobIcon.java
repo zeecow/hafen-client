@@ -323,8 +323,8 @@ public class GobIcon extends GAttrib {
     public static class SettingsWindow extends Window {
 	public final Settings conf;
 	private final Runnable save;
-	private final PackCont.LinPack cont = null;
-	private final IconList list = null;
+	private final PackCont.LinPack cont;
+	private final IconList list;
 	private Widget setbox;
 
 	public static class Icon {
@@ -343,30 +343,20 @@ public class GobIcon extends GAttrib {
 	public class IconList extends SSearchBox<Icon, IconList.IconLine> {
 	    private List<Icon> ordered = Collections.emptyList();
 	    private Map<String, Setting> cur = null;
-		private Map<String, Setting> curFilter = null;
 	    private boolean reorder = false;
 
 	    private IconList(Coord sz) {
 		super(sz, elh);
 	    }
-		private IconList(Coord sz, Map<String,GobIcon.Setting> cur) {
-			super( sz, elh);
-			this.curFilter = cur;
-			//this.showc = showc();
-		}
 
 	    public class IconLine extends SListWidget.ItemWidget<Icon> {
 		public IconLine(Coord sz, Icon icon) {
 		    super(IconList.this, sz, icon);
 		    Widget prev;
-		    prev = adda(new CheckBox("").state(() -> icon.conf.notify).set(andsave(val -> {
-				icon.conf.notify = val;
-				change(icon);
-			})).settip("Notify"), sz.x - UI.scale(2) - (sz.y / 2), sz.y / 2, 0.5, 0.5);
-		    prev = adda(new CheckBox("").state(() -> icon.conf.show).set(andsave(val -> {
-				icon.conf.show = val;
-				change(icon);
-			})).settip("Display"),prev.c.x - UI.scale(2) - (sz.y / 2), sz.y / 2, 0.5, 0.5);
+		    prev = adda(new CheckBox("").state(() -> icon.conf.notify).set(andsave(val -> icon.conf.notify = val)).settip("Notify"),
+				sz.x - UI.scale(2) - (sz.y / 2), sz.y / 2, 0.5, 0.5);
+		    prev = adda(new CheckBox("").state(() -> icon.conf.show).set(andsave(val -> icon.conf.show = val)).settip("Display"),
+				prev.c.x - UI.scale(2) - (sz.y / 2), sz.y / 2, 0.5, 0.5);
 		    add(SListWidget.IconText.of(Coord.of(prev.c.x - UI.scale(2), sz.y), () -> item.conf.res.loadsaved(Resource.remote())), Coord.z);
 		}
 	    }
@@ -381,7 +371,7 @@ public class GobIcon extends GAttrib {
 	    public void tick(double dt) {
 		Map<String, Setting> cur = this.cur;
 		if(cur != conf.settings) {
-			cur = (curFilter!=null ? curFilter : conf.settings);
+		    cur = conf.settings;
 		    ArrayList<Icon> ordered = new ArrayList<>(cur.size());
 		    for(Setting conf : cur.values())
 			ordered.add(new Icon(conf));
@@ -433,9 +423,7 @@ public class GobIcon extends GAttrib {
 		    setbox = null;
 		}
 		if(icon != null) {
-		    //setbox = cont.after(new IconSettings(sz.x - UI.scale(10), icon.conf), list, UI.scale(5));
-			setbox = ZeeConfig.iconListWin.add(new IconSettings(sz.x - UI.scale(10), icon.conf),0, ZeeConfig.iconListY);
-			ZeeConfig.iconListWin.pack();
+		    setbox = cont.after(new IconSettings(sz.x - UI.scale(10), icon.conf), list, UI.scale(5));
 		}
 	    }
 	}
@@ -532,20 +520,6 @@ public class GobIcon extends GAttrib {
 	    super(Coord.z, "Icon settings");
 	    this.conf = conf;
 	    this.save = save;
-		Widget prev = add(getFilter(),0,0);
-		prev = add(ZeeConfig.iconList = new IconList(UI.scale(250, 400)),0, prev.c.y+prev.sz.y);
-		prev = add(new CheckBox("Notification on newly seen icons") {
-			{this.a = conf.notify;}
-			public void changed(boolean val) {
-				conf.notify = val;
-				if(save != null)
-					save.run();
-			}
-		}, 0, prev.c.y + prev.sz.y);
-		ZeeConfig.iconListY = prev.c.y + prev.sz.y;
-		ZeeConfig.iconListWin = ZeeConfig.iconList.getparent(Window.class);
-		pack();
-		/*
 	    add(this.cont = new PackCont.LinPack.VPack(), Coord.z).margin(UI.scale(5)).packpar(true);
 	    list = cont.last(new IconList(UI.scale(250, 500)), 0);
 	    cont.last(new HRuler(list.sz.x), 0);
@@ -559,83 +533,20 @@ public class GobIcon extends GAttrib {
 		    }
 		}, UI.scale(5));
 	    cont.pack();
-		 */
 	}
+    }
 
-	public Widget getFilter(){
-
-		if (ZeeConfig.iconListFilterBox != null)
-			return ZeeConfig.iconListFilterBox;
-
-		ZeeConfig.iconListFilterBox =  new Dropbox<String>(150,14,20) {
-			private final List<String> filters = new ArrayList<String>() {{
-				add("all");add("bird");add("bug");add("bush");
-				add("flower");add("herbs");add("mushroom");
-				add("string");add("kritters");add("trees");
-				add("tree bark");add("tree bough");add("tree fruit");add("tree nuts");
-			}};
-			protected String listitem(int idx) {
-				return(filters.get(idx));
-			}
-			protected int listitems() {
-				return(filters.size());
-			}
-			protected void drawitem(GOut g, String name, int idx) {
-				g.atext(name, Coord.of(0, g.sz().y / 2), 0.0, 0.5);
-			}
-			public void change(String filter) {
-				super.change(filter);
-				toggleFilterIconList(filter);
-			}
-			public void dispose() {
-				super.dispose();
-				this.sel = "";
-			}
-		};
-
-		return ZeeConfig.iconListFilterBox;
+    @OCache.DeltaType(OCache.OD_ICON)
+    public static class $icon implements OCache.Delta {
+	public void apply(Gob g, Message msg) {
+	    int resid = msg.uint16();
+	    Indir<Resource> res;
+	    if(resid == 65535) {
+		g.delattr(GobIcon.class);
+	    } else {
+		int ifl = msg.uint8();
+		g.setattr(new GobIcon(g, OCache.Delta.getres(g, resid)));
+	    }
 	}
-
-
-	public void toggleFilterIconList(String filterName) {
-		ZeeConfig.println("toggle filter "+filterName);
-		Map<String, GobIcon.Setting> filteredList = null;
-		if(!filterName.equals("all")) {
-			filteredList = new HashMap<String, GobIcon.Setting>(conf.settings);
-		}
-		if(filterName.equals("bird"))
-			filteredList.entrySet().removeIf(entry -> !ZeeConfig.isBird(entry.getKey()));
-		else if(filterName.equals("bug"))
-			filteredList.entrySet().removeIf(entry -> !ZeeConfig.isBug(entry.getKey()));
-		else if(filterName.equals("bush"))
-			filteredList.entrySet().removeIf(entry -> !ZeeConfig.isBush(entry.getKey()));
-		else if(filterName.equals("flower"))
-			filteredList.entrySet().removeIf(entry -> !ZeeConfig.isFlower(entry.getKey()));
-		else if(filterName.equals("herbs"))
-			filteredList.entrySet().removeIf(entry -> !ZeeConfig.isHerb(entry.getKey()));
-		else if(filterName.equals("mushroom"))
-			filteredList.entrySet().removeIf(entry -> !ZeeConfig.isMushroom(entry.getKey()));
-		else if(filterName.equals("string"))
-			filteredList.entrySet().removeIf(entry -> !ZeeConfig.isString(entry.getKey()));
-		else if(filterName.equals("kritters"))
-			filteredList.entrySet().removeIf(entry -> !ZeeConfig.isKritter(entry.getKey()));
-		else if(filterName.equals("trees"))
-			filteredList.entrySet().removeIf(entry -> !ZeeConfig.isTree(entry.getKey()));
-		else if(filterName.equals("tree bark"))
-			filteredList.entrySet().removeIf(entry -> !ZeeConfig.isTreeToughBark(entry.getKey()));
-		else if(filterName.equals("tree bough"))
-			filteredList.entrySet().removeIf(entry -> !ZeeConfig.isTreeBough(entry.getKey()));
-		else if(filterName.equals("tree fruit"))
-			filteredList.entrySet().removeIf(entry -> !ZeeConfig.isTreeFruit(entry.getKey()));
-		else if(filterName.equals("tree nuts"))
-			filteredList.entrySet().removeIf(entry -> !ZeeConfig.isTreeNuts(entry.getKey()));
-
-		int y = ZeeConfig.iconList.c.y;
-		ZeeConfig.iconList.remove();
-		ZeeConfig.iconList = new IconList(UI.scale(250, 400), filteredList);
-		ZeeConfig.iconListWin.add(ZeeConfig.iconList, 0, y);
-		ZeeConfig.iconListWin.pack();
-	}
-
-	}
+    }
 }

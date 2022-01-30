@@ -26,13 +26,14 @@
 
 package haven;
 
+import java.awt.Color;
 import haven.render.*;
 
 public class GobHealth extends GAttrib implements Gob.SetupMod {
-    public final int hp;
+    public final float hp;
     public final MixColor fx;
     
-    public GobHealth(Gob g, int hp) {
+    public GobHealth(Gob g, float hp) {
         super(g);
         this.hp = hp;
         if(hp==4) {
@@ -51,12 +52,20 @@ public class GobHealth extends GAttrib implements Gob.SetupMod {
     }
     
     public Pipe.Op gobstate() {
-	if(hp >= 4)
+	if(hp >= 1)
 	    return(null);
 	return(fx);
     }
 
     public double asfloat() {
-	return(((double)hp) / 4.0);
+        return(((double)hp) / 4.0);
+    }
+
+    @OCache.DeltaType(OCache.OD_HEALTH)
+    public static class $health implements OCache.Delta {
+	public void apply(Gob g, Message msg) {
+	    int hp = msg.uint8();
+	    g.setattr(new GobHealth(g, hp / 4.0f));
+	}
     }
 }

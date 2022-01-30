@@ -26,8 +26,8 @@
 
 package haven;
 
-import java.awt.event.KeyEvent;
 import java.util.*;
+import java.awt.Font;
 import java.awt.Color;
 import java.awt.image.BufferedImage;
 
@@ -196,7 +196,7 @@ public class Makewindow extends Widget {
 		}
 	}
 
-	public void uimsg(String msg, Object... args) {
+    public void uimsg(String msg, Object... args) {
 	if(msg == "inpop") {
 	    List<Spec> inputs = new LinkedList<Spec>();
 	    for(int i = 0; i < args.length;) {
@@ -238,7 +238,7 @@ public class Makewindow extends Widget {
     public static final Coord qmodsz = UI.scale(20, 20);
     private static final Map<Indir<Resource>, Tex> qmicons = new WeakHashMap<>();
     private static Tex qmicon(Indir<Resource> qm) {
-	return(qmicons.computeIfAbsent(qm, res -> new TexI(PUtils.convolve(res.get().layer(Resource.imgc).img, qmodsz, CharWnd.iconfilter))));
+	return(qmicons.computeIfAbsent(qm, res -> new TexI(PUtils.convolve(res.get().flayer(Resource.imgc).img, qmodsz, CharWnd.iconfilter))));
     }
 
     public void draw(GOut g) {
@@ -330,7 +330,7 @@ public class Makewindow extends Widget {
 		for(Indir<Resource> qm : qmod) {
 		    Coord tsz = qmicon(qm).sz();
 		    if(mc.isect(c, tsz))
-			return(qm.get().layer(Resource.tooltip).t);
+			return(qm.get().flayer(Resource.tooltip).t);
 		    c = c.add(tsz.x + UI.scale(30), 0);
 		}
 	    } catch(Loading l) {
@@ -342,7 +342,7 @@ public class Makewindow extends Widget {
 		for(Indir<Resource> tool : tools) {
 		    Coord tsz = qmicon(tool).sz();
 		    if(mc.isect(c, tsz))
-			return(tool.get().layer(Resource.tooltip).t);
+			return(tool.get().flayer(Resource.tooltip).t);
 		    c = c.add(tsz.x + UI.scale(1), 0);
 		}
 	    } catch(Loading l) {

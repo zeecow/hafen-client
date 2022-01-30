@@ -351,7 +351,7 @@ public class MiniMap extends Widget {
 		try {
 		    if(cc == null) {
 			Resource res = sm.res.loadsaved(Resource.remote());
-			img = res.layer(Resource.imgc);
+			img = res.flayer(Resource.imgc);
 			Resource.Neg neg = res.layer(Resource.negc);
 			cc = (neg != null) ? neg.cc : img.ssz.div(2);
 			if(hit == null)
@@ -606,17 +606,15 @@ public class MiniMap extends Widget {
     }
 
     public void remparty() {
-	Set<Gob> memb = new HashSet<>();
+	Set<Long> memb = new HashSet<>();
 	synchronized(ui.sess.glob.party.memb) {
 	    for(Party.Member m : ui.sess.glob.party.memb.values()) {
-		Gob gob = m.getgob();
-		if(gob != null)
-		    memb.add(gob);
+		memb.add(m.gobid);
 	    }
 	}
 	for(Iterator<DisplayIcon> it = icons.iterator(); it.hasNext();) {
 	    DisplayIcon icon = it.next();
-	    if(memb.contains(icon.gob))
+	    if(memb.contains(icon.gob.id))
 		it.remove();
 	}
     }
