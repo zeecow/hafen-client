@@ -138,7 +138,7 @@ public class ZeeMiningManager extends ZeeThread{
         return mining && (ZeeConfig.isPlayerMoving() || !isInventoryIdle());
     }
 
-    private static boolean isBoulder(Gob gob) {
+    public static boolean isBoulder(Gob gob) {
         return (gob!=null &&
                 gob.getres()!=null &&
                 gob.getres().name.startsWith("gfx/terobjs/bumlings/") &&

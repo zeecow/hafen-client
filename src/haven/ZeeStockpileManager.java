@@ -7,6 +7,7 @@ public class ZeeStockpileManager extends ZeeThread{
     public static final String STOCKPILE_LEAF = "gfx/terobjs/stockpile-leaf";
     public static final String STOCKPILE_BLOCK = "gfx/terobjs/stockpile-wblock";
     public static final String STOCKPILE_BOARD = "gfx/terobjs/stockpile-board";
+    public static final String STOCKPILE_STONE = "gfx/terobjs/stockpile-stone";
     public static final String BASENAME_MULB_LEAF = "leaf-mulberrytree";
     static ZeeWindow windowManager;
     public static boolean busy;
@@ -114,6 +115,8 @@ public class ZeeStockpileManager extends ZeeThread{
             gobPile = ZeeConfig.getClosestGob(ZeeConfig.findGobsByName("stockpile-wblock"));
         else if (lastPetalName.equals("Make boards"))
             gobPile = ZeeConfig.getClosestGob(ZeeConfig.findGobsByName("stockpile-board"));
+        else if (lastPetalName.equals("Chip stone"))
+            gobPile = ZeeConfig.getClosestGob(ZeeConfig.findGobsByName("stockpile-stone"));
 
         //mark gob pile and source
         ZeeConfig.addGobText(gobPile,"pile",0,255,0,255,10);
@@ -200,6 +203,8 @@ public class ZeeStockpileManager extends ZeeThread{
                         show = true;
                     else if (name.equals(STOCKPILE_BOARD) && ZeeConfig.lastInvItemBaseName.contains("board-"))
                         show = true;
+                    else if (name.equals(STOCKPILE_STONE) && ZeeMiningManager.isBoulder(gobSource))
+                        show = true;
 
                     if(show)
                         showWindow(false);
@@ -223,6 +228,9 @@ public class ZeeStockpileManager extends ZeeThread{
             ZeeConfig.pilerMode = true;
             gobSource = ZeeConfig.lastMapViewClickGob;
         }else if(petalName.equals("Make boards")){
+            ZeeConfig.pilerMode = true;
+            gobSource = ZeeConfig.lastMapViewClickGob;
+        }else if(petalName.equals("Chip stone")){
             ZeeConfig.pilerMode = true;
             gobSource = ZeeConfig.lastMapViewClickGob;
         }else{
