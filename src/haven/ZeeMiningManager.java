@@ -62,7 +62,7 @@ public class ZeeMiningManager extends ZeeThread{
     }
 
 
-    public static void notifyColumn(Gob gob, int hp){
+    public static void notifyColumn(Gob gob, float hp){
         if (!isMineSupport(gob))
             return;
         ZeeConfig.addGobText(gob,(hp*25)+"%");
