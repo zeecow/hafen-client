@@ -131,10 +131,11 @@ public class ZeeStockpileManager extends ZeeThread{
 
         while(busy) {
 
-            if (lastPetalName.equals("Make boards"))
-                waitInvFullOrHoldingItem(mainInv, 3000);//boards take longer to make
-            else
-                waitInvFullOrHoldingItem(mainInv);
+            //if (lastPetalName.equals("Make boards") || lastPetalName.equals("Chip stone"))
+            //    waitInvFullOrHoldingItem(mainInv, 3000);// boards/boulder take longer to make
+            //else
+            //    waitInvFullOrHoldingItem(mainInv);
+            waitInvFullOrHoldingItem(mainInv, 3000);
 
             if (gameUI.vhand == null) {//if not holding item
                 List<WItem> invItems = mainInv.getWItemsByName(ZeeConfig.lastInvItemBaseName);
