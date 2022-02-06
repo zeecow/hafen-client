@@ -135,7 +135,7 @@ public class ZeeStockpileManager extends ZeeThread{
             //    waitInvFullOrHoldingItem(mainInv, 3000);// boards/boulder take longer to make
             //else
             //    waitInvFullOrHoldingItem(mainInv);
-            waitInvFullOrHoldingItem(mainInv, 3000);
+            waitInvFullOrHoldingItem(mainInv, 3000);// boards/boulder takes longer to produce item
 
             if (gameUI.vhand == null) {//if not holding item
                 List<WItem> invItems = mainInv.getWItemsByName(ZeeConfig.lastInvItemBaseName);

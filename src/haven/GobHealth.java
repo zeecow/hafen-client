@@ -36,11 +36,11 @@ public class GobHealth extends GAttrib implements Gob.SetupMod {
     public GobHealth(Gob g, float hp) {
         super(g);
         this.hp = hp;
-        if(hp==4) {
+        if(hp==1) {
             this.fx = null;
-        }else if(hp==3) {
+        }else if(hp==.75) {
             this.fx = ZeeConfig.MIXCOLOR_YELLOW;
-        }else if(hp==2) {
+        }else if(hp==.50) {
             this.fx = ZeeConfig.MIXCOLOR_ORANGE;
             if (ZeeMiningManager.mining)
                 ZeeMiningManager.notifyColumn(g,hp);

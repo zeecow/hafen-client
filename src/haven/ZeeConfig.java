@@ -1411,9 +1411,6 @@ public class ZeeConfig {
         savedTileSelEndCoord = ec;
         savedTileSelModflags = modflags;
         savedTileSelOverlay = ol;
-        if (getCursorName().equals(CURSOR_MINE)){
-            new ZeeMiningManager().start();
-        }
     }
 
     public static void resetTileSelection(){

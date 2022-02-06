@@ -4,57 +4,59 @@ import java.util.List;
 
 public class ZeeMiningManager extends ZeeThread{
 
+    public static final String ACTION_CHIP_BOULDER = "chip boulder";
+    private static final long MS_CURSOR_CHANGE = 200;
     private static final double DIST_BOULDER = 25;
+    private final String task;
     public static long lastDropItemMs = 0;
     public static boolean mining;
     public static boolean isChipBoulder;
     public static Gob gobBoulder;
     public static ZeeMiningManager manager;
 
-    public ZeeMiningManager(){
-        manager = this;
-        mining = true;
-        isChipBoulder = false;
+    public ZeeMiningManager(String task, Gob gob){
+        this.task = task;
+        this.gobBoulder = gob;
     }
 
     @Override
     public void run() {
         println("mining manager on");
         try {
-            waitPlayerIdle();
-            println("player idle");
-            ZeeConfig.lastInvItemMs = now();// avoid isMining() break
-            while(mining && !interrupted()){
-                sleep(PING_MS);
-                if(isCombatActive()) {
-                    println("combat active, stop mining");
-                    continue;
-                }if(isChipBoulder){
-                    println("isChipBoulder true");
-                    chipBoulder(gobBoulder);
-                    isChipBoulder = false;
-                    ZeeConfig.lastInvItemMs = now();// avoid isMining() break
-                    continue;
-                }else if (isMining()) {
-                    println("keep mining");
+            if (task.equalsIgnoreCase(ACTION_CHIP_BOULDER)) {
+                ZeeClickGobManager.gobClick(gobBoulder, 3);//remove mining cursor
+                Thread.sleep(MS_CURSOR_CHANGE);//wait cursor change
+                ZeeClickGobManager.clickGobPetal(gobBoulder,"Chip stone");//chip boulder
+                ZeeConfig.cursorChange(ZeeConfig.ACT_MINE);//restore mining icon for autodrop
+                if(waitBoulderFinish(gobBoulder)){
+                    println("chip boulder done");
+                    ZeeConfig.gameUI.map.wdgmsg("sel", ZeeConfig.savedTileSelStartCoord, ZeeConfig.savedTileSelEndCoord, ZeeConfig.savedTileSelModflags);
                 }else{
-                    println("break loop");
-                    break;
+                    println("still chipping???");
                 }
+
             }
         }catch (Exception e){
             e.printStackTrace();
         }
-        cancelThread();
+        ZeeClickGobManager.resetClickPetal();
         println("mining manager off");
     }
 
-    public static void checkGobBoulder(Gob gob) {
-        if (isBoulder(gob) && ZeeConfig.distanceToPlayer(gob) < DIST_BOULDER){
-            isChipBoulder = true;
-            gobBoulder = gob;
+    /*
+    check if new boulder was created while mining
+ */
+    public static void checkNearBoulder(Gob gob) {
+        if(ZeeConfig.autoChipMinedBoulder && isMining() && isBoulder(gob)){
+            //println(ZeeClickGobManager.distanceToPlayer(gob)+" to "+gob.getres().name);
+            if(ZeeConfig.distanceToPlayer(gob) < DIST_BOULDER){
+                if(isCombatActive()) // cancel if combat active
+                    return;
+                new ZeeMiningManager(ACTION_CHIP_BOULDER, gob).start();
+            }
         }
     }
+
 
     //TODO: if mining tile is too hard, 2000ms may not be enough
     public static boolean isInventoryIdle() {
@@ -65,11 +67,12 @@ public class ZeeMiningManager extends ZeeThread{
     public static void notifyColumn(Gob gob, float hp){
         if (!isMineSupport(gob))
             return;
-        ZeeConfig.addGobText(gob,(hp*25)+"%");
+        ZeeConfig.addGobText(gob,(hp*100)+"%");
         stopMining();
     }
 
     public static void stopMining() {
+        println("stop mining");
         try {
             ZeeConfig.gameUI.msg("stop mining");
             ZeeConfig.clickGroundZero();//remove cursor?
@@ -134,8 +137,13 @@ public class ZeeMiningManager extends ZeeThread{
     }
 
     private static boolean isMining() {
-        println("> isMinig() > " + mining +" && "+ "(" + ZeeConfig.isPlayerMoving() +" || "+ !isInventoryIdle() + ")");
-        return mining && (ZeeConfig.isPlayerMoving() || !isInventoryIdle());
+        long now = System.currentTimeMillis();
+        if(now - lastDropItemMs > 999) {
+            //if last mined item is older than Xms, consider not mining
+            return false;
+        }else{
+            return true;
+        }
     }
 
     public static boolean isBoulder(Gob gob) {
