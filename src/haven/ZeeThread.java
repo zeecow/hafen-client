@@ -8,7 +8,7 @@ public class ZeeThread  extends Thread{
     static final long PING_MS = 250;
 
     public static boolean waitNotHoldingItem() {
-        int max = (int) TIMEOUT_MS;
+        long max = TIMEOUT_MS;
         try {
             while(max>0 && ZeeConfig.gameUI.vhand!=null) {
                 max -= SLEEP_MS;
@@ -21,7 +21,20 @@ public class ZeeThread  extends Thread{
     }
 
     public static boolean waitHoldingItem() {
-        int max = (int) TIMEOUT_MS;
+        long max = TIMEOUT_MS;
+        try{
+            while(max>0 && ZeeConfig.gameUI.vhand==null) {
+                max -= SLEEP_MS;
+                Thread.sleep(SLEEP_MS);
+            }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        return (ZeeConfig.gameUI.vhand != null);
+    }
+
+    public static boolean waitHoldingItem(long timeOutMs) {
+        long max = timeOutMs;
         try{
             while(max>0 && ZeeConfig.gameUI.vhand==null) {
                 max -= SLEEP_MS;
