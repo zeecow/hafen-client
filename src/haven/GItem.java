@@ -186,6 +186,7 @@ public class GItem extends AWidget implements ItemInfo.SpriteOwner, GSprite.Owne
 					this.wdgmsg("drop", Coord.z);
 				}
 			}else if(basename.startsWith("seed-") && this.parent instanceof Inventory) {
+				//farmermode not busy
 				if (ZeeConfig.savedTileSelEndCoord == null) {
 					//cancel farmermode
 					ZeeConfig.println("> Farmer mode: no tile selection. Canceling...");
