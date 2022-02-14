@@ -15,7 +15,7 @@ original features:
  - stockpile helper: mulberry leaves, woodblocks, boards
  - seed-farmer helper: no pathfinding, buggy (ctrlLongMidClick crop)
  - mid click object/item for small tasks:
-   - MidClick obj: [inspect] , [Giddyup!] , [light torch]
+   - MidClick obj: [inspect] , [Giddyup!] , [light torch], [toggle barrel label]
      - LongMidClick obj: [lift up] , [destroy trellis plant] , [farm area cursor], [take all from stockpile]
      - CtrlLongMidClick obj: [auto-fill oven/smelter] , [take all barrel seeds], [farm manager window]
    - MidClick item: [sort-transfer] , [pick-up all] , [quick-equip from belt]

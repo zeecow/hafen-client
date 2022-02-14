@@ -14,7 +14,7 @@ public class ZeeSeedFarmingManager extends ZeeThread{
     public static GItem gItem;
     public static WItem wItem;
     public static Inventory inv;
-    public static boolean isHarvestDone, isPlantingDone, isScytheEquiped;
+    public static boolean isHarvestDone, isPlantingDone;
     public static Window windowManager;
 
     public static boolean farmerCbReplant = Utils.getprefb("farmerCbPlant",false);
@@ -50,13 +50,14 @@ public class ZeeSeedFarmingManager extends ZeeThread{
     private void updateWItem() {
         wItem = inv.getWItemsByName(gItemSeedBasename).get(0);
         gItem = wItem.item;
+        println("updateWItem()  >  witem="+wItem+",  gItem="+gItem);
     }
 
     public void run(){
         startFarming();
     }
 
-    public static void testBarrelsTiles() {
+    public static void testBarrelsTiles(boolean allBarrels) {
         //highlight barrels in range
         List<Gob> barrels = ZeeConfig.findGobsByName("barrel");
 
@@ -66,7 +67,7 @@ public class ZeeSeedFarmingManager extends ZeeThread{
             ZeeConfig.removeGobColor(gob);
 
             //tag barrels in tile range
-            if(ZeeConfig.distanceToPlayer(gob) <= farmerTxtTilesBarrel * TILE_SIZE) {
+            if(allBarrels  ||  ZeeConfig.distanceToPlayer(gob) <= farmerTxtTilesBarrel * TILE_SIZE) {
                 if (!ZeeClickGobManager.isBarrelEmpty(gob)) {
                     ZeeConfig.addGobText(gob, getBarrelOverlayBasename(gob));
                 }
@@ -118,7 +119,6 @@ public class ZeeSeedFarmingManager extends ZeeThread{
             if(ZeeSeedFarmingManager.farmerCbReplant) {
                 int totseeds;
                 isPlantingDone = false;
-                isScytheEquiped = ZeeClickItemManager.isItemEquipped("scythe");
                 while (busy && !isPlantingDone) {
                     println("> planting loop");
                     if (getTotalSeedAmount() < 5) {
@@ -225,15 +225,6 @@ public class ZeeSeedFarmingManager extends ZeeThread{
         ZeeConfig.addGobText(ZeeConfig.getPlayerGob(),"planting",0,255,255,255,10);
         updateWItem();
         if(activateCursorPlantGItem(gItem)) {
-            /*
-            if(isScytheEquiped){
-                println("> expand planting tile selection");
-                // expand tile selection by 1 tile, due to scythe's overharvesting
-                println("before  sc=" + ZeeConfig.savedTileSelStartCoord + "  ec=" + ZeeConfig.savedTileSelEndCoord);
-                ZeeConfig.expandTileSelectionBy(1);
-                println("after  sc=" + ZeeConfig.savedTileSelStartCoord + "  ec=" + ZeeConfig.savedTileSelEndCoord);
-            }
-             */
             println("planting...");
             ZeeConfig.gameUI.map.wdgmsg("sel", ZeeConfig.savedTileSelStartCoord, ZeeConfig.savedTileSelEndCoord, ZeeConfig.savedTileSelModflags);
             return true;
@@ -519,7 +510,7 @@ public class ZeeSeedFarmingManager extends ZeeThread{
                     if (msg.equals("activate")){
                         try {
                             int tiles = Integer.parseInt(textEntryTilesBarrel.text().strip());
-                            ZeeSeedFarmingManager.testBarrelsTiles();
+                            ZeeSeedFarmingManager.testBarrelsTiles(false);
                         } catch (NumberFormatException e) {
                             ZeeConfig.msg("numbers only");
                         }

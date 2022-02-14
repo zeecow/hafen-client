@@ -21,6 +21,7 @@ public class ZeeClickGobManager extends ZeeThread{
     public static long clickStartMs, clickEndMs, clickDiffMs;
     public static boolean clickPetal = false;
     public static String clickPetalName = "";
+    public static boolean barrelLabelOn = false;
 
     public ZeeClickGobManager(Coord2d cc, Gob gobClicked) {
         clickCoord = cc;
@@ -52,7 +53,11 @@ public class ZeeClickGobManager extends ZeeThread{
             } else if (isGobHorse()) {
                 clickGobPetal("Giddyup!");
             } else if (isGobName("/barrel")) {
-                gobClick(3,UI.MOD_SHIFT);//take from barrel
+                if (barrelLabelOn)
+                    ZeeSeedFarmingManager.testBarrelsTilesClear();
+                else
+                    ZeeSeedFarmingManager.testBarrelsTiles(true);
+                barrelLabelOn = !barrelLabelOn;
             } else if (isInspectGob()) {
                 inspectGob();
             }
