@@ -225,7 +225,7 @@ public class ZeeSeedFarmingManager extends ZeeThread{
         ZeeConfig.addGobText(ZeeConfig.getPlayerGob(),"planting",0,255,255,255,10);
         updateWItem();
         if(activateCursorPlantGItem(gItem)) {
-            println("planting...");
+            println("planting... cursor="+ZeeConfig.getCursorName());
             ZeeConfig.gameUI.map.wdgmsg("sel", ZeeConfig.savedTileSelStartCoord, ZeeConfig.savedTileSelEndCoord, ZeeConfig.savedTileSelModflags);
             return true;
         }else{
@@ -286,7 +286,7 @@ public class ZeeSeedFarmingManager extends ZeeThread{
 
     public static boolean activateCursorPlantGItem(GItem gi) {
         //haven.GItem@3a68ee9c ; iact ; [(23, 16), 1]
-        println("activateCursorPlantGItem > "+gi);
+        println("activateCursorPlantGItem > "+gi+", seeds = "+getSeedsAmount(gi));
         ZeeClickItemManager.gItemAct(gi, UI.MOD_SHIFT);
         return waitCursor(ZeeConfig.CURSOR_HARVEST);
     }
@@ -445,7 +445,7 @@ public class ZeeSeedFarmingManager extends ZeeThread{
 
         if(windowManager ==null){
 
-            windowManager = new ZeeWindow(new Coord(300,120), "Seed Farming manager"){
+            windowManager = new ZeeWindow(new Coord(280,90), "Seed Farming manager"){
                 @Override
                 public void wdgmsg(String msg, Object... args) {
                     if (msg=="close"){
@@ -466,22 +466,6 @@ public class ZeeSeedFarmingManager extends ZeeThread{
                     Utils.setprefb("farmerCbPlant",val);
                 }
             }, 0, 7);
-
-
-            // radiogroup seeds
-            /*
-            RadioGroup grp = new RadioGroup(windowManager) {
-                public void changed(int opt, String lbl) {
-                    ZeeFarmingManager.farmerRbSeeds = opt;
-                    Utils.setprefi("farmerRbSeeds",opt);
-                }
-            };
-            wdg = windowManager.add(new Label("Seeds: "), 0, 30);
-            wdg = grp.add("store", new Coord(37, 30));
-            wdg = grp.add("drop", new Coord(85, 30));
-            wdg = grp.add("wait", new Coord(137, 30));
-            grp.check(ZeeFarmingManager.farmerRbSeeds);
-            */
 
 
             // barrel tiles textEntry
@@ -531,7 +515,8 @@ public class ZeeSeedFarmingManager extends ZeeThread{
 
 
             //add bottom note
-            wdg = windowManager.add(new Label("(no path-find, remove field obstacles, surround with barrels)"), 0, 120-15);
+            wdg = windowManager.add(new Label("Start from the field's center."), 0, 90-30);
+            wdg = windowManager.add(new Label("Remove field obstacles, surround with barrels."), 0, 90-15);
 
 
             //add window
