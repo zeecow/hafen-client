@@ -513,7 +513,6 @@ public class ZeeSeedFarmingManager extends ZeeThread{
             }, wdg.c.x+wdg.sz.x+5,30-4);
 
 
-
             //add bottom note
             wdg = windowManager.add(new Label("Start from the field's center."), 0, 90-30);
             wdg = windowManager.add(new Label("Remove field obstacles, surround with barrels."), 0, 90-15);

@@ -16,8 +16,8 @@ original features:
  - seed-farmer helper: no pathfinding, buggy (ctrlLongMidClick crop)
  - mid click object/item for small tasks:
    - MidClick obj: [inspect] , [Giddyup!] , [light torch], [toggle barrel label]
-     - LongMidClick obj: [lift up] , [destroy trellis plant] , [farm area cursor], [take all from stockpile]
-     - CtrlLongMidClick obj: [auto-fill oven/smelter] , [take all barrel seeds], [farm manager window]
+     - LongMidClick obj: [lift up] , [FlowerMenu: fuel oven/smelter, remove trellis], [remove stump], [farm area cursor], [take all from stockpile]
+     - CtrlLongMidClick obj: [take all barrel seeds], [farm manager window]
    - MidClick item: [sort-transfer] , [pick-up all] , [quick-equip from belt]
      - LongMidClick item: [sort-transfer inverse] , [equip fishing item and recast] , [plant seed cursor]
      - CtrlLongMidClick item: [kill all silk-cocoons] , [feast all similar food]
