@@ -1,10 +1,16 @@
 package haven;
 
 public class ZeeFlowerMenu extends FlowerMenu{
-    public static final String STR_PETAL_ADD12COAL = "Add 12 coal";
-    public static final String STR_PETAL_ADD9COAL = "Add 9 coal";
-    public static final String STR_PETAL_ADD4BRANCH = "Add 4 branch";
-    public static final String STR_PETAL_REMOVE_TRELLIS = "Remove plant";
+
+    public static final String STRPETAL_ADD12COAL = "Add 12 coal";
+    public static final String STRPETAL_ADD9COAL = "Add 9 coal";
+    public static final String STRPETAL_ADD4BRANCH = "Add 4 branch";
+    public static final String STRPETAL_REMOVETRELLIS = "Remove plant";
+    public static final String STRPETAL_REMOVETREEANDSTUMP = "Remove tree & stump";
+    public static final String STRPETAL_BARRELTAKEALL = "Take all";
+    public static final String STRPETAL_CURSORHARVEST = "Harvest area";
+    public static final String STRPETAL_SEEDFARMER = "Start Seed Farmer";
+
     private final Gob gob;
 
     /*

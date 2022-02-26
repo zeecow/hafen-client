@@ -1453,7 +1453,7 @@ public class ZeeConfig {
             lastMapViewClickGobName = clickGob.getres().name;
         }
         if(clickb==2 && clickGob!=null) {
-            new ZeeClickGobManager(mc, clickGob).start();
+            new ZeeClickGobManager(pc, mc, clickGob).start();
         }
     }
 
