@@ -427,6 +427,8 @@ public class UI {
 		return;
 	}
 	root.mouseup(c, button);
+	if (button==2)
+		ZeeConfig.lastUiClickCoord = c;
     }
 	
     public void mousemove(MouseEvent ev, Coord c) {

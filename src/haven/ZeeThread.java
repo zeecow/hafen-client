@@ -245,6 +245,21 @@ public class ZeeThread  extends Thread{
         return (fm != null);
     }
 
+    public static boolean waitNoFlowerMenu() {
+        int max = (int) TIMEOUT_MS;
+        FlowerMenu fm = null;
+        try {
+            while(max>0 && (fm = ZeeConfig.gameUI.ui.root.getchild(FlowerMenu.class)) != null) {
+                max -= SLEEP_MS;
+                Thread.sleep(SLEEP_MS);
+            }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        //println("wait no flowermenu = "+fm);
+        return (fm == null);
+    }
+
     public static FlowerMenu getFlowerMenu() {
         return ZeeConfig.gameUI.ui.root.getchild(FlowerMenu.class);
     }

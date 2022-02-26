@@ -10,8 +10,11 @@ public class ZeeFlowerMenu extends FlowerMenu{
     public static final String STRPETAL_BARRELTAKEALL = "Take all";
     public static final String STRPETAL_CURSORHARVEST = "Harvest area";
     public static final String STRPETAL_SEEDFARMER = "Start Seed Farmer";
+    public static final String STRPETAL_KILLALL = "Kill all";
+    public static final String STRPETAL_EATALL = "Eat all";
 
     private final Gob gob;
+    private final WItem wItem;
 
     /*
     haven.FlowerMenu@367eed1e ; cl ; [0, 0]
@@ -20,14 +23,27 @@ public class ZeeFlowerMenu extends FlowerMenu{
     public ZeeFlowerMenu(Gob gob, String ... opts) {
         super(opts);
         this.gob = gob;
+        this.wItem = null;
+    }
+
+    public ZeeFlowerMenu(WItem wItem, String ... opts) {
+        super(opts);
+        this.gob = null;
+        this.wItem = wItem;
     }
 
     @Override
     public void choose(Petal opt) {
         if (opt!=null) {
-            //ZeeConfig.println(">choose " + opt);
-            ZeeClickGobManager.chooseGobFlowerMenu(gob,opt);
+            String petalName = opt.name;
+            uimsg("cancel");
+            if (gob!=null) {
+                ZeeClickGobManager.chooseGobFlowerMenu(gob, petalName);
+            }else if (wItem!=null) {
+                ZeeClickItemManager.chooseItemFlowerMenu(wItem, petalName);
+            }
         }
-        uimsg("cancel");
+        else
+            uimsg("cancel");
     }
 }

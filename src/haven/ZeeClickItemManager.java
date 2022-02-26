@@ -10,17 +10,29 @@ import java.util.stream.Collectors;
 public class ZeeClickItemManager extends ZeeThread{
 
     private final WItem wItem;
+    private Coord coord;
     String itemName;
     String leftHandItemName, rightHandItemName, itemSourceWindow;
     boolean cancelManager = false;
     public static Equipory equipory;
     static Inventory invBelt = null;
     public static long clickStartMs, clickEndMs, clickDiffMs;
-    
+    public static ZeeFlowerMenu lastMenu = null;
+
+    public ZeeClickItemManager(WItem wItem, Coord c) {
+        clickDiffMs = clickEndMs - clickStartMs;
+        this.wItem = wItem;
+        this.coord = c;
+        init(wItem);
+    }
 
     public ZeeClickItemManager(WItem wItem) {
         clickDiffMs = clickEndMs - clickStartMs;
         this.wItem = wItem;
+        init(wItem);
+    }
+
+    private void init(WItem wItem) {
         equipory = ZeeConfig.windowEquipment.getchild(Equipory.class);
         leftHandItemName = (equipory.leftHand==null ? "" : equipory.leftHand.item.getres().name);
         rightHandItemName = (equipory.rightHand==null ? "" : equipory.rightHand.item.getres().name);
@@ -42,17 +54,19 @@ public class ZeeClickItemManager extends ZeeThread{
 
         try{
 
-            //kill all, eat all, etc...
-            if(wItem.ui.modctrl && isLongClick()){
-                actOnAllInventoryItems();
+            // item context menu
+            if(showItemFlowerMenu()){
                 return;
-            } else if (isLongClick() && isFishingItem()) {
+            }
+
+            // fishing
+            if (isLongClick() && isFishingItem()) {
                 equipFishingItem();
                 return;
             }
 
-            //sort-transfer
-            if(!itemSourceWindow.equalsIgnoreCase("Belt") && !itemSourceWindow.equalsIgnoreCase("Equipment")){
+            // sort-transfer
+            if(!isItemWindowBelt() && !isItemWindowEquips()){
                 if(transferWindowOpen()) { //avoid belt transfer?
                     if(isLongClick())
                         wItem.wdgmsg("transfer-sort", wItem.item, true);//ascending order
@@ -61,7 +75,7 @@ public class ZeeClickItemManager extends ZeeThread{
                     return;
                 }else {
                     //no transfer window open
-                    if(itemSourceWindow.equalsIgnoreCase("Inventory") && isItemPlantable()){
+                    if(isItemWindowName("Inventory") && isItemPlantable()){
                         //activate farming area cursor
                         itemAct(wItem,UI.MOD_SHIFT);
                     }
@@ -83,7 +97,7 @@ public class ZeeClickItemManager extends ZeeThread{
             }
             else if (isItemSack()) { // travellersack or bindle
 
-                if(isSourceBeltWindow()) {//send to equipory
+                if(isItemWindowBelt()) {//send to equipory
                     if(isLeftHandEmpty() || isRightHandEmpty()) {
                         pickUpItem();
                         equipEmptyHand();
@@ -103,7 +117,7 @@ public class ZeeClickItemManager extends ZeeThread{
                         ZeeConfig.gameUI.msg("couldn't switch sack");
                         trySendItemToBelt();
                     }
-                }else if(isSourceEquipsWindow()){//send to belt
+                }else if(isItemWindowEquips()){//send to belt
                     pickUpItem();
                     if(ZeeConfig.isPlayerHoldingItem()){ //unequip sack was successfull
                         if(!trySendItemToBelt())
@@ -114,7 +128,7 @@ public class ZeeClickItemManager extends ZeeThread{
             }
             else if(isTwoHandedItem()) {//2 handed item
 
-                if(isSourceBeltWindow()) {
+                if(isItemWindowBelt()) {
                     if(!isLeftHandEmpty() && isTwoHandedItem(leftHandItemName)) {
                         //switch 2handed item for another 2handed item
                         pickUpItem();
@@ -142,7 +156,7 @@ public class ZeeClickItemManager extends ZeeThread{
                         }
                     }
                 }
-                else if(isSourceEquipsWindow()) {
+                else if(isItemWindowEquips()) {
                     if (ZeeClickItemManager.getInvBelt().getNumberOfFreeSlots() > 0) {
                         //send to belt if possible
                         pickUpItem();
@@ -153,7 +167,7 @@ public class ZeeClickItemManager extends ZeeThread{
             }
             else{// 1handed item
 
-                if(isSourceBeltWindow()) { // send to equipory
+                if(isItemWindowBelt()) { // send to equipory
                     if(isLeftHandEmpty() || isRightHandEmpty()) {//1 item equipped
                         pickUpItem();
                         equipEmptyHand();
@@ -207,7 +221,7 @@ public class ZeeClickItemManager extends ZeeThread{
                         }
                     }
 
-                }else if(isSourceEquipsWindow()){//send to belt
+                }else if(isItemWindowEquips()){//send to belt
                     pickUpItem();
                     if(!trySendItemToBelt()) {
                         ZeeConfig.gameUI.msg("Belt is full");
@@ -297,38 +311,72 @@ public class ZeeClickItemManager extends ZeeThread{
         return "";
     }
 
-    private boolean actOnAllInventoryItems() {
 
-        // kill all inventory cocoons
+    public static void chooseItemFlowerMenu(WItem wItem, String petalName) {
+
+        String itemName = wItem.item.getres().name;
+
+        if(petalName.equals(ZeeFlowerMenu.STRPETAL_KILLALL))
+        {
+            // kill all inventory cocoons
+            if(itemName.endsWith("silkcocoon") || itemName.endsWith("chrysalis")){
+                Inventory inv = wItem.getparent(Inventory.class);
+                List<WItem> items = inv.children(WItem.class).stream()
+                        .filter(wItem1 -> wItem1.item.getres().name.endsWith("silkcocoon") || wItem1.item.getres().name.endsWith("chrysalis"))
+                        .collect(Collectors.toList());
+                clickAllItemsPetal(items,"Kill");
+                ZeeConfig.gameUI.msg(items.size()+" cocoons clicked");
+            }
+        }
+        else if(petalName.equals(ZeeFlowerMenu.STRPETAL_EATALL))
+        {
+            //eat all table similar items
+            if(ZeeConfig.getCursorName().equals(ZeeConfig.CURSOR_EAT)){
+                Inventory inv = wItem.getparent(Inventory.class);
+                List<WItem> items = inv.children(WItem.class).stream()
+                        .filter(wItem1 -> wItem1.item.getres().name.equals(itemName))
+                        .collect(Collectors.toList());
+                takeAllInvItems(inv, items);
+                ZeeConfig.gameUI.msg(items.size()+" noms");
+            }
+        }
+        else
+        {
+            println("chooseItemFlowerMenu > unknown case");
+        }
+    }
+
+
+    private boolean showItemFlowerMenu(){
+
+        if (!isLongClick())
+            return false;
+
+        boolean showMenu = true;
+
         if(itemName.endsWith("silkcocoon") || itemName.endsWith("chrysalis")){
-            Inventory inv = wItem.getparent(Inventory.class);
-            List<WItem> items = inv.children(WItem.class).stream()
-                .filter(wItem1 -> wItem1.item.getres().name.endsWith("silkcocoon") || wItem1.item.getres().name.endsWith("chrysalis"))
-                .collect(Collectors.toList());
-            clickAllItemsPetal(items,"Kill");
-            ZeeConfig.gameUI.msg(items.size()+" cocoons clicked");
-            return true;
+            lastMenu = new ZeeFlowerMenu(wItem, ZeeFlowerMenu.STRPETAL_KILLALL);
+        }
+        else if (isItemWindowTable() && ZeeConfig.getCursorName().equals(ZeeConfig.CURSOR_EAT)){
+            lastMenu = new ZeeFlowerMenu(wItem, ZeeFlowerMenu.STRPETAL_EATALL);
+        }
+        else{
+            showMenu = false;
         }
 
-        //eat all table similar items
-        else if(ZeeConfig.getCursorName().equals(ZeeConfig.CURSOR_EAT)){
-            Inventory inv = wItem.getparent(Inventory.class);
-            List<WItem> items = inv.children(WItem.class).stream()
-                .filter(wItem1 -> wItem1.item.getres().name.equals(itemName))
-                .collect(Collectors.toList());
-            takeAllInvItems(inv, items);
-            ZeeConfig.gameUI.msg(items.size()+" noms");
-            return true;
+        if (showMenu) {
+            ZeeConfig.gameUI.ui.root.add(lastMenu, ZeeConfig.lastUiClickCoord);
         }
 
-        return false;
+        return showMenu;
     }
 
     public static void takeAllInvItems(Inventory inv, List<WItem> items) {
         try {
+            lastMenu.destroy();
             for (WItem w : items) {
-                w.item.wdgmsg("take", w.getInvSlotCoord());
                 Thread.sleep(PING_MS);
+                w.item.wdgmsg("take", w.getInvSlotCoord());
             }
         }catch (Exception e){
             e.printStackTrace();
@@ -356,26 +404,6 @@ public class ZeeClickItemManager extends ZeeThread{
             }
         }
         ZeeConfig.removeGobText(ZeeConfig.getPlayerGob());
-        return true;
-    }
-
-    public static boolean clickAllItemsPetalOld(List<WItem> items, String petalName) {
-        for (WItem w: items) {
-            ZeeClickGobManager.scheduleClickPetalOnce(petalName);
-            try {
-                itemAct(w);
-                int max = (int) TIMEOUT_MS;
-                while(max>0 && ZeeClickGobManager.clickPetal){//wait FlowerMenu end and set clickPetal to false
-                    max -= SLEEP_MS;
-                    Thread.sleep(SLEEP_MS);
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-                ZeeClickGobManager.resetClickPetal();
-                ZeeConfig.gameUI.msg("clickAllItemsPetal: "+e.getMessage());
-                return false;
-            }
-        }
         return true;
     }
 
@@ -483,12 +511,17 @@ public class ZeeClickItemManager extends ZeeThread{
         }
     }
 
-    private boolean isSourceBeltWindow() {
-        return (itemSourceWindow.equalsIgnoreCase("Belt"));
+    private boolean isItemWindowName(String windowName){
+        return (itemSourceWindow.equalsIgnoreCase(windowName));
     }
-
-    private boolean isSourceEquipsWindow() {
-        return (itemSourceWindow.equalsIgnoreCase("Equipment"));
+    private boolean isItemWindowBelt() {
+        return isItemWindowName("Belt");
+    }
+    private boolean isItemWindowEquips() {
+        return isItemWindowName("Equipment");
+    }
+    private boolean isItemWindowTable() {
+        return isItemWindowName("Table");
     }
 
     /*

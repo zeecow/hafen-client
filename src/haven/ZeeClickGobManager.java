@@ -88,27 +88,27 @@ public class ZeeClickGobManager extends ZeeThread{
     }
 
 
-    public static void chooseGobFlowerMenu(Gob gob, FlowerMenu.Petal petal){
+    public static void chooseGobFlowerMenu(Gob gob, String petalName){
 
         String gobName = gob.getres().name;
 
         if(gobName.endsWith("terobjs/oven")) {
-            addFuelToGob(gob,petal);
+            addFuelToGob(gob,petalName);
         }
         else if(gobName.endsWith("terobjs/smelter")){
-            addFuelToGob(gob,petal);
+            addFuelToGob(gob,petalName);
         }
         else if (isGobTrellisPlant(gobName)){
             destroyGob(gob);
         }
         else if(isGobTree(gobName)){
-            removeTreeAndStump(gob,petal);
+            removeTreeAndStump(gob,petalName);
         }
         else if (isGobCrop(gobName)) {
-            if (petal.name.equals(ZeeFlowerMenu.STRPETAL_SEEDFARMER)) {
+            if (petalName.equals(ZeeFlowerMenu.STRPETAL_SEEDFARMER)) {
                 ZeeSeedFarmingManager.showWindow(gob);
             }
-            else if (petal.name.equals(ZeeFlowerMenu.STRPETAL_CURSORHARVEST)) {
+            else if (petalName.equals(ZeeFlowerMenu.STRPETAL_CURSORHARVEST)) {
                 if (!ZeeConfig.getCursorName().equals(ZeeConfig.CURSOR_HARVEST))
                     gobClick(gob, 3, UI.MOD_SHIFT);
             }
@@ -165,15 +165,15 @@ public class ZeeClickGobManager extends ZeeThread{
         return ZeeClickGobManager.getOverlayNames(barrel).isEmpty();
     }
 
-    public static void removeTreeAndStump(Gob gob, FlowerMenu.Petal petal){
+    public static void removeTreeAndStump(Gob gob, String petalName){
         println(">removeTreeAndStump");
     }
 
-    public static void addFuelToGob(Gob gob, FlowerMenu.Petal petal) {
+    public static void addFuelToGob(Gob gob, String petalName) {
 
         String gobName = gob.getres().name;
 
-        if(gobName.endsWith("oven") && petal.name.equals(ZeeFlowerMenu.STRPETAL_ADD4BRANCH)){
+        if(gobName.endsWith("oven") && petalName.equals(ZeeFlowerMenu.STRPETAL_ADD4BRANCH)){
            List<WItem> branches = getMainInventory().getWItemsByName("branch");
            if(branches.size() < 4){
                ZeeConfig.gameUI.msg("Need 4 branches to fuel oven");
@@ -208,7 +208,7 @@ public class ZeeClickGobManager extends ZeeThread{
                 fuel smelter with 9 or 12 coal
              */
             int num = 12;
-            if (petal.name.equals(ZeeFlowerMenu.STRPETAL_ADD9COAL))
+            if (petalName.equals(ZeeFlowerMenu.STRPETAL_ADD9COAL))
                 num = 9;
             final int numCoal = num;
 

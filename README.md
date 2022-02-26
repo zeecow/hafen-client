@@ -18,8 +18,7 @@ original features:
    - MidClick obj: [inspect] , [Giddyup!] , [light torch], [toggle barrel label]
      - LongMidClick obj: [lift up] , [Context Menu for some objs], [take all from stockpile]
    - MidClick item: [sort-transfer] , [pick-up all] , [quick-equip from belt]
-     - LongMidClick item: [sort-transfer inverse] , [equip fishing item and recast] , [plant seed cursor]
-     - CtrlLongMidClick item: [kill all silk-cocoons] , [feast all similar food]
+     - LongMidClick item: [sort-transfer inverse] , [Context Menu: kill all cocoons, feast all similar food], [equip fishing item and recast] , [plant seed cursor], 
 
 other stuff:
  - autodrop mined items, seeds, soil

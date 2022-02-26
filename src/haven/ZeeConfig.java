@@ -79,6 +79,7 @@ public class ZeeConfig {
     public static MCache.Overlay savedTileSelOverlay;
     public static String lastInvItemBaseName;
     public static long lastInvItemMs;
+    public static Coord lastUiClickCoord;
 
     public static boolean actionSearchGlobal = Utils.getprefb("actionSearchGlobal", true);
     public static boolean alertOnPlayers = Utils.getprefb("alertOnPlayers", true);
