@@ -17,7 +17,6 @@ public class ZeeClickItemManager extends ZeeThread{
     public static Equipory equipory;
     static Inventory invBelt = null;
     public static long clickStartMs, clickEndMs, clickDiffMs;
-    public static ZeeFlowerMenu lastMenu = null;
 
     public ZeeClickItemManager(WItem wItem, Coord c) {
         clickDiffMs = clickEndMs - clickStartMs;
@@ -320,24 +319,32 @@ public class ZeeClickItemManager extends ZeeThread{
         {
             // kill all inventory cocoons
             if(itemName.endsWith("silkcocoon") || itemName.endsWith("chrysalis")){
-                Inventory inv = wItem.getparent(Inventory.class);
-                List<WItem> items = inv.children(WItem.class).stream()
-                        .filter(wItem1 -> wItem1.item.getres().name.endsWith("silkcocoon") || wItem1.item.getres().name.endsWith("chrysalis"))
-                        .collect(Collectors.toList());
-                clickAllItemsPetal(items,"Kill");
-                ZeeConfig.gameUI.msg(items.size()+" cocoons clicked");
+                new ZeeThread() {
+                    public void run() {
+                        Inventory inv = wItem.getparent(Inventory.class);
+                        List<WItem> items = inv.children(WItem.class).stream()
+                                .filter(wItem1 -> wItem1.item.getres().name.endsWith("silkcocoon") || wItem1.item.getres().name.endsWith("chrysalis"))
+                                .collect(Collectors.toList());
+                        clickAllItemsPetal(items,"Kill");
+                        ZeeConfig.gameUI.msg(items.size()+" cocoons clicked");
+                    }
+                }.start();
             }
         }
         else if(petalName.equals(ZeeFlowerMenu.STRPETAL_EATALL))
         {
             //eat all table similar items
             if(ZeeConfig.getCursorName().equals(ZeeConfig.CURSOR_EAT)){
-                Inventory inv = wItem.getparent(Inventory.class);
-                List<WItem> items = inv.children(WItem.class).stream()
-                        .filter(wItem1 -> wItem1.item.getres().name.equals(itemName))
-                        .collect(Collectors.toList());
-                takeAllInvItems(inv, items);
-                ZeeConfig.gameUI.msg(items.size()+" noms");
+                new ZeeThread() {
+                    public void run() {
+                        Inventory inv = wItem.getparent(Inventory.class);
+                        List<WItem> items = inv.children(WItem.class).stream()
+                                .filter(wItem1 -> wItem1.item.getres().name.equals(itemName))
+                                .collect(Collectors.toList());
+                        takeAllInvItems(inv, items);
+                        ZeeConfig.gameUI.msg(items.size() + " noms");
+                    }
+                }.start();
             }
         }
         else
@@ -353,19 +360,20 @@ public class ZeeClickItemManager extends ZeeThread{
             return false;
 
         boolean showMenu = true;
+        ZeeFlowerMenu menu = null;
 
         if(itemName.endsWith("silkcocoon") || itemName.endsWith("chrysalis")){
-            lastMenu = new ZeeFlowerMenu(wItem, ZeeFlowerMenu.STRPETAL_KILLALL);
+            menu = new ZeeFlowerMenu(wItem, ZeeFlowerMenu.STRPETAL_KILLALL);
         }
         else if (isItemWindowTable() && ZeeConfig.getCursorName().equals(ZeeConfig.CURSOR_EAT)){
-            lastMenu = new ZeeFlowerMenu(wItem, ZeeFlowerMenu.STRPETAL_EATALL);
+            menu = new ZeeFlowerMenu(wItem, ZeeFlowerMenu.STRPETAL_EATALL);
         }
         else{
             showMenu = false;
         }
 
         if (showMenu) {
-            ZeeConfig.gameUI.ui.root.add(lastMenu, ZeeConfig.lastUiClickCoord);
+            ZeeConfig.gameUI.ui.root.add(menu, ZeeConfig.lastUiClickCoord);
         }
 
         return showMenu;
@@ -373,7 +381,6 @@ public class ZeeClickItemManager extends ZeeThread{
 
     public static void takeAllInvItems(Inventory inv, List<WItem> items) {
         try {
-            lastMenu.destroy();
             for (WItem w : items) {
                 Thread.sleep(PING_MS);
                 w.item.wdgmsg("take", w.getInvSlotCoord());
