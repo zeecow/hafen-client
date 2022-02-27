@@ -379,39 +379,44 @@ public class ZeeClickGobManager extends ZeeThread{
     }
 
     public static void barrelTakeAllSeeds(Gob gob){
-        try{
-            // shift+rclick last barrel
-            ZeeClickGobManager.gobClick(gob, 3, UI.MOD_SHIFT);
+        new ZeeThread() {
+            @Override
+            public void run() {
+                try{
+                    // shift+rclick last barrel
+                    ZeeClickGobManager.gobClick(gob, 3, UI.MOD_SHIFT);
 
-            //wait getting to the barrel
-            waitPlayerIdleFor(1);
+                    //wait getting to the barrel
+                    waitPlayerIdleFor(1);
 
-            if(ZeeConfig.distanceToPlayer(gob) > ZeeSeedFarmingManager.MIN_ACCESSIBLE_DIST){
-                ZeeConfig.msg("barrel unreachable");
-                return;
+                    if (ZeeConfig.distanceToPlayer(gob) > ZeeSeedFarmingManager.MIN_ACCESSIBLE_DIST) {
+                        ZeeConfig.msg("barrel unreachable");
+                        return;
+                    }
+
+                    ZeeConfig.addPlayerText("taking seeds...");
+
+                    while (!ZeeClickGobManager.isBarrelEmpty(gob) && !isInventoryFull()) {
+                        ZeeClickGobManager.gobClick(gob, 3, UI.MOD_SHIFT);
+                        //TODO: waitInvCHanges
+                        Thread.sleep(PING_MS);
+                    }
+
+                    //if holding seed, store in barrel
+                    waitHoldingItem();
+                    ZeeClickGobManager.gobItemAct(gob, 0);
+
+                    if (isInventoryFull())
+                        ZeeConfig.msg("Inventory full");
+                    else
+                        ZeeConfig.msg("Took everything");
+
+                }catch(Exception e){
+                    e.printStackTrace();
+                }
+                ZeeConfig.removePlayerText();
             }
-
-            ZeeConfig.addPlayerText("taking seeds...");
-
-            while (!ZeeClickGobManager.isBarrelEmpty(gob) && !isInventoryFull()) {
-                ZeeClickGobManager.gobClick(gob, 3, UI.MOD_SHIFT);
-                //TODO: waitInvCHanges
-                Thread.sleep(PING_MS);
-            }
-
-            //if holding seed, store in barrel
-            waitHoldingItem();
-            ZeeClickGobManager.gobItemAct(gob, 0);
-
-            if (isInventoryFull())
-                ZeeConfig.msg("Inventory full");
-            else
-                ZeeConfig.msg("Took everything");
-
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-        ZeeConfig.removePlayerText();
+        }.start();
     }
 
     private void barrelTakeAllSeeds() {
