@@ -1434,7 +1434,25 @@ public class ZeeConfig {
         System.out.println(gobs.size()+" > "+gobs.toString());
     }
 
-    public static List<Gob> findGobsByName(String name) {
+    public static List<Gob> findGobsByNameEndsWith(String name) {
+        return ZeeConfig.gameUI.ui.sess.glob.oc.gobStream().filter(gob -> {
+            if(gob!=null && gob.getres()!=null && gob.getres().name.endsWith(name))
+                return true;
+            else
+                return false;
+        }).collect(Collectors.toList());
+    }
+
+    public static List<Gob> findGobsByNameStartsWith(String name) {
+        return ZeeConfig.gameUI.ui.sess.glob.oc.gobStream().filter(gob -> {
+            if(gob!=null && gob.getres()!=null && gob.getres().name.startsWith(name))
+                return true;
+            else
+                return false;
+        }).collect(Collectors.toList());
+    }
+
+    public static List<Gob> findGobsByNameContains(String name) {
         return ZeeConfig.gameUI.ui.sess.glob.oc.gobStream().filter(gob -> {
             if(gob!=null && gob.getres()!=null && gob.getres().name.contains(name))
                 return true;
@@ -1490,6 +1508,11 @@ public class ZeeConfig {
 
     public static Gob getPlayerGob() {
         return gameUI.map.player();
+    }
+
+    // Returns 0-100
+    public static double getStamina() {
+        return (100 * gameUI.getmeter("stam", 0).a);
     }
 
     public static boolean isPlayerMoving() {

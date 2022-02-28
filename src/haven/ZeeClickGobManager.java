@@ -77,9 +77,7 @@ public class ZeeClickGobManager extends ZeeThread{
             } else if (isGobStockpile() || isGobName("/dframe")) {
                 gobClick(3, UI.MOD_SHIFT);//pick up all items (shift + rclick)
             } else if(isGobTreeStump()){
-                ZeeClickItemManager.equipItem("shovel");
-                waitItemEquipped("shovel");
-                destroyGob();
+                removeStump(gob);
             }else if (isLiftGob()) {
                 liftGob();
             }
@@ -148,7 +146,7 @@ public class ZeeClickGobManager extends ZeeThread{
         }
         else{
             showMenu = false;
-            println("showGobFlowerMenu() > unkown case");
+            //println("showGobFlowerMenu() > unkown case");
         }
 
 
@@ -166,7 +164,33 @@ public class ZeeClickGobManager extends ZeeThread{
     }
 
     public static void removeTreeAndStump(Gob gob, String petalName){
-        println(">removeTreeAndStump");
+        new ZeeThread() {
+            public void run() {
+                try{
+                    ZeeConfig.addGobText(ZeeConfig.getPlayerGob(),"removing tree & stump...");
+                    waitNoFlowerMenu();
+                    clickGobPetal(gob,"Chop");
+                    if(waitStaminaIdleMs(3000)){
+                        Gob stump = ZeeConfig.getClosestGob(ZeeConfig.findGobsByNameEndsWith("stump"));
+                        if (stump!=null) {
+                            ZeeConfig.addGobText(stump,"stump");
+                            removeStump(stump);
+                        }else {
+                            println("stump == null");
+                        }
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                ZeeConfig.removeGobText(ZeeConfig.getPlayerGob());
+            }
+        }.start();
+    }
+
+    public static void removeStump(Gob gob) {
+        ZeeClickItemManager.equipItem("shovel");
+        waitItemEquipped("shovel");
+        destroyGob(gob);
     }
 
     public static void addFuelToGob(Gob gob, String petalName) {

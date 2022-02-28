@@ -65,7 +65,7 @@ public class ZeeStockpileManager extends ZeeThread{
 
         if (lastGroundItemName.equals("gfx/terobjs/items/tobacco-fresh")){
 
-            gobPile = ZeeConfig.getClosestGob(ZeeConfig.findGobsByName("stockpile-pipeleaves"));
+            gobPile = ZeeConfig.getClosestGob(ZeeConfig.findGobsByNameContains("stockpile-pipeleaves"));
             ZeeConfig.removeGobText(gobPile);
             ZeeConfig.addGobText(gobPile,"pile",0,255,0,255,10);
 
@@ -77,7 +77,7 @@ public class ZeeStockpileManager extends ZeeThread{
             }
 
             while (busy) {
-                leaves = ZeeConfig.findGobsByName("gfx/terobjs/items/tobacco-fresh");
+                leaves = ZeeConfig.findGobsByNameContains("gfx/terobjs/items/tobacco-fresh");
                 if(leaves.size()==0){
                     exitManager();
                     return;
@@ -110,13 +110,13 @@ public class ZeeStockpileManager extends ZeeThread{
 
         //find pile
         if(lastPetalName.equals("Pick leaf"))
-            gobPile = ZeeConfig.getClosestGob(ZeeConfig.findGobsByName("stockpile-leaf"));
+            gobPile = ZeeConfig.getClosestGob(ZeeConfig.findGobsByNameContains("stockpile-leaf"));
         else if (lastPetalName.equals("Chop into blocks"))
-            gobPile = ZeeConfig.getClosestGob(ZeeConfig.findGobsByName("stockpile-wblock"));
+            gobPile = ZeeConfig.getClosestGob(ZeeConfig.findGobsByNameContains("stockpile-wblock"));
         else if (lastPetalName.equals("Make boards"))
-            gobPile = ZeeConfig.getClosestGob(ZeeConfig.findGobsByName("stockpile-board"));
+            gobPile = ZeeConfig.getClosestGob(ZeeConfig.findGobsByNameContains("stockpile-board"));
         else if (lastPetalName.equals("Chip stone"))
-            gobPile = ZeeConfig.getClosestGob(ZeeConfig.findGobsByName("stockpile-stone"));
+            gobPile = ZeeConfig.getClosestGob(ZeeConfig.findGobsByNameContains("stockpile-stone"));
 
         //mark gob pile and source
         ZeeConfig.addGobText(gobPile,"pile",0,255,0,255,10);
