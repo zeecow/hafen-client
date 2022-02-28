@@ -356,7 +356,7 @@ public class ZeeClickGobManager extends ZeeThread{
         return isGobTree(gobName);
     }
     public static boolean isGobTree(String gobName) {
-        return gobName.startsWith("gfx/terobjs/trees/") && !gobName.endsWith("log");
+        return gobName.startsWith("gfx/terobjs/trees/") && !gobName.endsWith("log") && !gobName.endsWith("stump");
     }
 
     private boolean isGobTreeLog() {
