@@ -266,7 +266,7 @@ public class ZeeThread  extends Thread{
         try {
             stam = lastStam = ZeeConfig.getStamina();
             while(timeoutMs > 0) {
-                if(Math.abs(lastStam - stam) > 0) // if stamina changed...
+                if(Math.abs(lastStam - stam) > 1) // if stamina changed...
                     timeoutMs = idleMs; // ...restore timeout
                 else
                     timeoutMs -= PING_MS;
@@ -277,7 +277,7 @@ public class ZeeThread  extends Thread{
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        println("waitStaminaIdleMs > ret "+(timeoutMs <= 0));
+        //println("waitStaminaIdleMs > ret "+(timeoutMs <= 0));
         return (timeoutMs <= 0);
     }
 
