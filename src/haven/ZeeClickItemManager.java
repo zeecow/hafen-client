@@ -437,8 +437,8 @@ public class ZeeClickItemManager extends ZeeThread{
             +"Furnace,Smelter,Desk,Trunk,Shed,Coffer,Packrack,Strongbox,Stockpile,"
             +"Tub,Compost Bin,Extraction Press,Rack,Herbalist Table,Frame,"
             +"Chicken Coop,Rabbit Hutch,Archery Target,Creel,Oven,Steel crucible,"
-            +"Cauldron,Pane mold,Kiln,Old Trunk,Smoke shed,Finery Forge,Tidepool,"
-            +"Steelbox,Metal Cabinet"
+            +"Cauldron,Pane mold,Kiln,Old Trunk,Old Stump,Smoke shed,Finery Forge,"
+            +"Steelbox,Metal Cabinet,Tidepool"
         ).split(",");
         for (String contName: containers) {
             if (windowsNames.contains(contName))
