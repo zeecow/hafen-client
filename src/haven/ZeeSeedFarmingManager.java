@@ -48,7 +48,14 @@ public class ZeeSeedFarmingManager extends ZeeThread{
     }
 
     private void updateWItem() {
-        wItem = inv.getWItemsByName(gItemSeedBasename).get(0);
+        List<WItem> items = inv.getWItemsByName(gItemSeedBasename);
+        items.removeIf(w -> {
+            if (getSeedsAmount(w.item) < 5)
+                return true;//remove seedpile with less than 5 seeds
+            else
+                return false;
+        });
+        wItem = items.get(0);
         gItem = wItem.item;
     }
 
