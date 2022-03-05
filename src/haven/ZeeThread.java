@@ -231,7 +231,7 @@ public class ZeeThread  extends Thread{
     }
 
     public static boolean waitFlowerMenu() {
-        int max = (int) TIMEOUT_MS;
+        long max = TIMEOUT_MS;
         FlowerMenu fm = null;
         try {
             while(max>0 && (fm = ZeeConfig.gameUI.ui.root.getchild(FlowerMenu.class)) == null) {

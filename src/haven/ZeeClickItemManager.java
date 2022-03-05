@@ -321,12 +321,14 @@ public class ZeeClickItemManager extends ZeeThread{
             if(itemName.endsWith("silkcocoon") || itemName.endsWith("chrysalis")){
                 new ZeeThread() {
                     public void run() {
-                        Inventory inv = wItem.getparent(Inventory.class);
-                        List<WItem> items = inv.children(WItem.class).stream()
-                                .filter(wItem1 -> wItem1.item.getres().name.endsWith("silkcocoon") || wItem1.item.getres().name.endsWith("chrysalis"))
-                                .collect(Collectors.toList());
-                        clickAllItemsPetal(items,"Kill");
-                        ZeeConfig.gameUI.msg(items.size()+" cocoons clicked");
+                        if (waitNoFlowerMenu()) {//wait petal "Kill All" is gone
+                            Inventory inv = wItem.getparent(Inventory.class);
+                            List<WItem> items = inv.children(WItem.class).stream()
+                                    .filter(wItem1 -> wItem1.item.getres().name.endsWith("silkcocoon") || wItem1.item.getres().name.endsWith("chrysalis"))
+                                    .collect(Collectors.toList());
+                            clickAllItemsPetal(items, "Kill");
+                            ZeeConfig.gameUI.msg(items.size() + " cocoons clicked");
+                        }
                     }
                 }.start();
             }
@@ -398,7 +400,7 @@ public class ZeeClickItemManager extends ZeeThread{
             try {
                 itemAct(w);
                 if(waitFlowerMenu()){
-                    choosePetal(getFlowerMenu(),petalName);
+                    choosePetal(getFlowerMenu(), petalName);
                 }else{
                     println("clickAllItemsPetal > no flower menu for "+petalName);
                 }
