@@ -82,6 +82,7 @@ public class ZeeConfig {
     public static Coord lastUiClickCoord;
 
     public static boolean actionSearchGlobal = Utils.getprefb("actionSearchGlobal", true);
+    public static int aggroRadiusTiles = Utils.getprefi("aggroRadiusTiles", 11);
     public static boolean alertOnPlayers = Utils.getprefb("alertOnPlayers", true);
     public static boolean autoChipMinedBoulder = Utils.getprefb("autoChipMinedBoulder", true);
     public static boolean autoClickMenuOption = Utils.getprefb("autoClickMenuOption", true);
@@ -109,7 +110,6 @@ public class ZeeConfig {
     public static boolean dropSoil = false;
     public static boolean equiporyCompact = Utils.getprefb("equiporyCompact", false);
     public static boolean farmerMode = false;
-    public static boolean highlightAggressiveGobs = Utils.getprefb("highlighAggressiveGobs", true);
     public static boolean highlightCropsReady = Utils.getprefb("highlightCropsReady", true);
     public static boolean highlightGrowingTrees = Utils.getprefb("highlightGrowingTrees", true);
     public static boolean keyBeltShiftTab = Utils.getprefb("keyBeltShiftTab", true);
@@ -335,42 +335,25 @@ public class ZeeConfig {
             return null;
         }
 
-        //System.out.printf("gobHighlight %s ", gobName);
-
-        //if highlight aggressive gob
-        if(ZeeConfig.highlightAggressiveGobs && mapCategoryGobs.get(CATEG_AGROCREATURES).contains(gobName)) {
-            //System.out.printf(" AGRRO \n");
-            c = mapCategoryColor.get(CATEG_AGROCREATURES);
-            if(c==null) {
-                //set default categ color if empty
-                c = ZeeConfig.MIXCOLOR_MAGENTA.color();
-                ZeeConfig.mapCategoryColor.put(ZeeConfig.CATEG_AGROCREATURES, c);
-            }
-            return new MixColor(c.getRed(), c.getGreen(), c.getBlue(), c.getAlpha());
+        if(mapCategoryGobs.get(CATEG_AGROCREATURES).contains(gobName)) {
+            //aggro radius
+            if (ZeeConfig.aggroRadiusTiles > 0)
+                gob.addol(new Gob.Overlay(gob, new ZeeGobRadius(gob, null, ZeeConfig.aggroRadiusTiles * MCache.tilesz2.y)));
         }
-
-        //if it's a custom gob setting, prioritize
         else if(ZeeConfig.mapGobColor.size() > 0   &&   (c = ZeeConfig.mapGobColor.get(gobName)) != null){
-            //System.out.printf("  SAVEDGOB \n");
+            //highlight gob
             return new MixColor(c.getRed(), c.getGreen(), c.getBlue(), c.getAlpha());
         }
-
-        //finally check if gob has category
         else if((categ = ZeeConfig.mapGobCategory.get(gobName)) != null){
-            //System.out.printf(" CATEGOB ");
+            //highlight category
             c = mapCategoryColor.get(categ);
             if(c==null) {
-                //System.out.printf(" null \n");
                 //set default categ color if empty
                 c = ZeeConfig.MIXCOLOR_YELLOW.color();
                 ZeeConfig.mapCategoryColor.put(categ, c);
             }
-            //else System.out.printf(" color=%s \n",c.toString());
             return new MixColor(c.getRed(),c.getGreen(),c.getBlue(),c.getAlpha());
         }
-        //else System.out.printf(" NOPE ");
-
-        //System.out.printf("\n");
 
         return null;
     }

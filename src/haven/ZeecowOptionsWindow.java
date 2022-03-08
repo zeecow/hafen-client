@@ -14,8 +14,8 @@ public class ZeecowOptionsWindow extends JFrame {
     public GridBagConstraints c;
     public JTabbedPane tabbedPane, tabbedPaneGobs;
     public JPanel panelTabMisc, panelTabInterface, panelTabGobs, panelDetailsBottom, panelTabCateg;
-    public JCheckBox cbDropAltKeyOnly, cbCtrlClickMinimapContent, cbAutoChipMinedBoulder, cbDropMinedStone, cbDropMinedOre, cbDropMinedSilverGold, cbDropMinedCurios, cbActionSearchGlobal, cbCompactEquipsWindow, cbBeltTogglesEquips, cbAutoRunLogin, cbAutohearth, cbHighlighAggressiveGobs, cbHighlightCropsReady, cbHighlightGrowingTrees, cbMiniTrees, cbAlertOnPlayers,  cbShowInventoryLogin, cbShowBeltLogin, cbKeyBeltShiftTab, cbKeyCamSwitchShiftC, cbShowIconsZoomOut, cbRememberWindowsPos, cbSortActionsByUse, cbDebugWidgetMsgs, cbDebugCodeRes, cbMidclickEquipManager, cbShowEquipsLogin, cbNotifyBuddyOnline, cbZoomOrthoExtended, cbCattleRosterHeight;
-    public JTextField tfAutoClickMenu, tfButchermode, tfGobName, tfAudioPath, tfCategName, tfAudioPathCateg;
+    public JCheckBox cbDropAltKeyOnly, cbCtrlClickMinimapContent, cbAutoChipMinedBoulder, cbDropMinedStone, cbDropMinedOre, cbDropMinedSilverGold, cbDropMinedCurios, cbActionSearchGlobal, cbCompactEquipsWindow, cbBeltTogglesEquips, cbAutoRunLogin, cbAutohearth, cbHighlightCropsReady, cbHighlightGrowingTrees, cbMiniTrees, cbAlertOnPlayers,  cbShowInventoryLogin, cbShowBeltLogin, cbKeyBeltShiftTab, cbKeyCamSwitchShiftC, cbShowIconsZoomOut, cbRememberWindowsPos, cbSortActionsByUse, cbDebugWidgetMsgs, cbDebugCodeRes, cbMidclickEquipManager, cbShowEquipsLogin, cbNotifyBuddyOnline, cbZoomOrthoExtended, cbCattleRosterHeight;
+    public JTextField tfAutoClickMenu, tfAggroRadiusTiles, tfButchermode, tfGobName, tfAudioPath, tfCategName, tfAudioPathCateg;
     public JComboBox<String> cmbCattleRoster, cmbGobCategory, cmbMiniTreeSize;
     public JList<String> listGobsTemp, listGobsSaved, listGobsCategories;
     public JButton btnRefresh, btnPrintState, btnResetGobs, btnAudioSave, btnAudioClear, btnAudioTest, btnRemGobFromCateg, btnGobColorAdd, btnCategoryColorAdd, btnGobColorRemove, btnCategoryColorRemove, btnResetCateg, btnAddCateg, btnRemoveCateg, btnResetWindowsPos, btnResetActionUses;
@@ -103,14 +103,6 @@ public class ZeecowOptionsWindow extends JFrame {
             Utils.setprefb("dropMinedCurios",val);
         });
 
-        panelTabMisc.add(cbHighlighAggressiveGobs = new JCheckBox("Highlight aggressive gobs"), c);
-        cbHighlighAggressiveGobs.setSelected(ZeeConfig.highlightAggressiveGobs);
-        cbHighlighAggressiveGobs.addActionListener(actionEvent -> {
-            JCheckBox cb = (JCheckBox) actionEvent.getSource();
-            boolean val = ZeeConfig.highlightAggressiveGobs = cb.isSelected();
-            Utils.setprefb("highlighAggressiveGobs",val);
-        });
-
         panelTabMisc.add(cbHighlightCropsReady = new JCheckBox("Highlight crops ready"), c);
         cbHighlightCropsReady.setSelected(ZeeConfig.highlightCropsReady);
         cbHighlightCropsReady.addActionListener(actionEvent -> {
@@ -170,6 +162,20 @@ public class ZeecowOptionsWindow extends JFrame {
             JCheckBox cb = (JCheckBox) actionEvent.getSource();
             boolean val = ZeeConfig.autoRunLogin = cb.isSelected();
             Utils.setprefb("autoRunLogin",val);
+        });
+
+        //agro radius tiles
+        panelTabMisc.add(new JLabel("Aggro radius tiles:"), c);
+        panelTabMisc.add(tfAggroRadiusTiles = new JTextField("",5), c);
+        tfAggroRadiusTiles.setMaximumSize(new Dimension(Integer.MAX_VALUE, tfAggroRadiusTiles.getPreferredSize().height));
+        tfAggroRadiusTiles.setText(""+ZeeConfig.aggroRadiusTiles);
+        tfAggroRadiusTiles.addActionListener(actionEvent -> {
+            String str = actionEvent.getActionCommand();
+            str = str.strip();
+            if(str!=null && str.chars().allMatch(Character::isDigit)) {
+                ZeeConfig.aggroRadiusTiles = Integer.parseInt(str);
+                Utils.setpref("aggroRadiusTiles",str);
+            }
         });
 
         //auto click menu list
