@@ -326,8 +326,7 @@ public class ZeeClickItemManager extends ZeeThread{
                             List<WItem> items = inv.children(WItem.class).stream()
                                     .filter(wItem1 -> wItem1.item.getres().name.endsWith("silkcocoon") || wItem1.item.getres().name.endsWith("chrysalis"))
                                     .collect(Collectors.toList());
-                            clickAllItemsPetal(items, "Kill");
-                            ZeeConfig.gameUI.msg(items.size() + " cocoons clicked");
+                            ZeeConfig.gameUI.msg(clickAllItemsPetal(items, "Kill") + " cocoons clicked");
                         }
                     }
                 }.start();
@@ -393,26 +392,29 @@ public class ZeeClickItemManager extends ZeeThread{
         }
     }
 
-    public static boolean clickAllItemsPetal(List<WItem> items, String petalName) {
+    public static int clickAllItemsPetal(List<WItem> items, String petalName) {
         ZeeConfig.addGobText(ZeeConfig.getPlayerGob(),"clicking "+items.size()+" items",0,255,255,255,10);
+        int itemsClicked = 0;
         for (WItem w: items) {
             try {
+                if (ZeeConfig.clickCancelTask())
+                    throw new Exception("cancel click");
                 itemAct(w);
                 if(waitFlowerMenu()){
                     choosePetal(getFlowerMenu(), petalName);
+                    itemsClicked++;
                 }else{
                     println("clickAllItemsPetal > no flower menu for "+petalName);
                 }
             } catch (Exception e) {
                 e.printStackTrace();
                 ZeeClickGobManager.resetClickPetal();
-                ZeeConfig.gameUI.msg("clickAllItemsPetal: "+e.getMessage());
                 ZeeConfig.removeGobText(ZeeConfig.getPlayerGob());
-                return false;
+                return itemsClicked;
             }
         }
         ZeeConfig.removeGobText(ZeeConfig.getPlayerGob());
-        return true;
+        return itemsClicked;
     }
 
     public static void itemAct(WItem item){

@@ -1641,4 +1641,9 @@ public class ZeeConfig {
     public static boolean isGobRemoved(Gob gob) {
         return gob==null || gameUI.ui.sess.glob.oc.getgob(gob.id)==null;
     }
+
+    public static boolean clickCancelTask() {
+        //cancel if clicked right/left button
+        return lastMapViewClickButton != 2;
+    }
 }

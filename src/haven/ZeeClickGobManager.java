@@ -178,7 +178,7 @@ public class ZeeClickGobManager extends ZeeThread{
                     Gob closestPlant = firstPlant;
                     double dist;
                     do{
-                        if (ZeeConfig.lastMapViewClickButton != 2) {
+                        if (ZeeConfig.clickCancelTask()) {
                             // cancel if clicked right/left button
                             println("cancel click");
                             break;
@@ -457,8 +457,9 @@ public class ZeeClickGobManager extends ZeeThread{
 
                     while (!ZeeClickGobManager.isBarrelEmpty(gob) && !isInventoryFull()) {
                         ZeeClickGobManager.gobClick(gob, 3, UI.MOD_SHIFT);
-                        //TODO: waitInvCHanges
                         Thread.sleep(PING_MS);
+                        if (ZeeConfig.clickCancelTask())
+                            break;
                     }
 
                     //if holding seed, store in barrel
