@@ -281,6 +281,31 @@ public class ZeeThread  extends Thread{
         return (timeoutMs <= 0);
     }
 
+    public static boolean waitGobRemoved(Gob gob){
+        try{
+            while(!ZeeConfig.isGobRemoved(gob)){
+                Thread.sleep(PING_MS);
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return ZeeConfig.isGobRemoved(gob);
+    }
+
+    public static boolean waitGobRemovedSeconds(Gob gob, int timeoutSeconds){
+        try{
+            long timeoutMs = timeoutSeconds * 1000L;
+            while(timeoutMs>=0 && !ZeeConfig.isGobRemoved(gob)){
+                timeoutMs -= PING_MS;
+                Thread.sleep(PING_MS);
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        //println("returning "+(gob==null));
+        return ZeeConfig.isGobRemoved(gob);
+    }
+
     public static FlowerMenu getFlowerMenu() {
         return ZeeConfig.gameUI.ui.root.getchild(FlowerMenu.class);
     }

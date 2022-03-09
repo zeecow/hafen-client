@@ -97,7 +97,11 @@ public class ZeeClickGobManager extends ZeeThread{
             addFuelToGob(gob,petalName);
         }
         else if (isGobTrellisPlant(gobName)){
-            destroyGob(gob);
+            if(petalName.equals(ZeeFlowerMenu.STRPETAL_REMOVEPLANT)) {
+                destroyGob(gob);
+            }else if (petalName.equals(ZeeFlowerMenu.STRPETAL_REMOVEALLPLANTS)){
+                removeAllTrellisPlants(gob);
+            }
         }
         else if(isGobTree(gobName)){
             removeTreeAndStump(gob,petalName);
@@ -133,7 +137,7 @@ public class ZeeClickGobManager extends ZeeThread{
             menu = new ZeeFlowerMenu(gob,ZeeFlowerMenu.STRPETAL_ADD9COAL, ZeeFlowerMenu.STRPETAL_ADD12COAL);
         }
         else if (isGobTrellisPlant()){
-            menu = new ZeeFlowerMenu(gob,ZeeFlowerMenu.STRPETAL_REMOVETRELLIS);
+            menu = new ZeeFlowerMenu(gob,ZeeFlowerMenu.STRPETAL_REMOVEPLANT, ZeeFlowerMenu.STRPETAL_REMOVEALLPLANTS);
         }
         else if (isGobTree()){
             menu = new ZeeFlowerMenu(gob,ZeeFlowerMenu.STRPETAL_REMOVETREEANDSTUMP);
@@ -161,6 +165,37 @@ public class ZeeClickGobManager extends ZeeThread{
     // barrel is empty if has no overlays ("gfx/terobjs/barrel-flax")
     public static boolean isBarrelEmpty(Gob barrel){
         return ZeeClickGobManager.getOverlayNames(barrel).isEmpty();
+    }
+
+    private static void removeAllTrellisPlants(Gob firstPlant) {
+        new ZeeThread() {
+            public void run() {
+                try{
+                    String gobName = firstPlant.getres().basename();
+                    ZeeConfig.addGobText(ZeeConfig.getPlayerGob(),"removing all "+gobName);
+                    waitNoFlowerMenu();
+                    waitPlayerIdleFor(1);
+                    Gob closestPlant = firstPlant;
+                    double dist;
+                    do{
+                        if (ZeeConfig.lastMapViewClickButton != 2) {
+                            // cancel if clicked right/left button
+                            println("cancel click");
+                            break;
+                        }
+                        ZeeConfig.addGobText(closestPlant,"next");
+                        destroyGob(closestPlant);
+                        waitGobRemoved(closestPlant);
+                        closestPlant = ZeeConfig.getClosestGob(ZeeConfig.findGobsByNameContains(gobName));
+                        dist = ZeeConfig.distanceToPlayer(closestPlant);
+                        //println("dist "+dist);
+                    }while(dist < 25);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                ZeeConfig.removeGobText(ZeeConfig.getPlayerGob());
+            }
+        }.start();
     }
 
     public static void removeTreeAndStump(Gob gob, String petalName){
