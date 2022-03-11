@@ -401,14 +401,6 @@ public class ZeeConfig {
     }
 
     public static boolean isBug(String name){
-        /*
-        private static final String[] CRITTERS = {
-            "/rat/rat", "/swan", "/squirrel", "/silkmoth", "/frog", "/rockdove", "/quail", "/toad", "/grasshopper",
-            "/ladybug", "/forestsnail", "/dragonfly", "/forestlizard", "/waterstrider", "/firefly", "/sandflea",
-            "/rabbit", "/crab", "/cavemoth", "/hedgehog", "/stagbeetle", "jellyfish", "/mallard", "/chicken", "/irrbloss",
-            "/cavecentipede", "/bogturtle", "/moonmoth", "/monarchbutterfly", "/items/grub", "/springbumblebee"
-        };
-         */
         String[] list = {
             "/silkmoth","/grasshopper","/ladybug","/dragonfly","/waterstrider","/firefly","/sandflea",
             "/cavemoth","/stagbeetle","/cavecentipede","/moonmoth","/monarchbutterfly","/items/grub",
@@ -421,9 +413,73 @@ public class ZeeConfig {
         return false;
     }
 
+    public static boolean isAggressive(String name){
+        /*
+        private static final String[] CRITTERS = {
+            "/rat/rat", "/swan", "/squirrel", "/silkmoth", "/frog/", "/rockdove", "/quail", "/toad", "/grasshopper",
+            "/ladybug", "/forestsnail", "/dragonfly", "/forestlizard", "/waterstrider", "/firefly", "/sandflea",
+            "/rabbit", "/crab/", "/cavemoth", "/hedgehog", "/stagbeetle", "jellyfish", "/mallard", "/chick","/hen",
+            "/rooster", "/irrbloss",
+            "/cavecentipede", "/bogturtle", "/moonmoth", "/monarchbutterfly", "/items/grub", "/springbumblebee"
+        };
+         */
+        String[] list = {
+               "/adder","/sandflea","/boar/","/badger/","/bear/","/bat/","/boreworm/",
+                "/ooze/","/cavelouse/","/caveangler/","orca","/goldeneagle/","/lynx/",
+                "/mammoth/","/moose/","/troll/","/walrus/","/goat/","/wolf/","/wolverine/",
+                "player"
+        };
+        for (int i = 0; i < list.length; i++) {
+            if(name.contains(list[i]))
+                return true;
+        }
+        return false;
+    }
+
+    public static boolean isSmallAnimal(String name){
+        /*
+        private static final String[] CRITTERS = {
+            "/rat/rat", "/swan", "/squirrel", "/silkmoth", "/frog/", "/rockdove", "/quail", "/toad", "/grasshopper",
+            "/ladybug", "/forestsnail", "/dragonfly", "/forestlizard", "/waterstrider", "/firefly", "/sandflea",
+            "/rabbit", "/crab/", "/cavemoth", "/hedgehog", "/stagbeetle", "jellyfish", "/mallard", "/chick","/hen",
+            "/rooster", "/irrbloss",
+            "/cavecentipede", "/bogturtle", "/moonmoth", "/monarchbutterfly", "/items/grub", "/springbumblebee"
+        };
+         */
+        String[] endlist = {
+                "rockdove","quail","/hen","/rooster","magpie",
+                "mallard","seagull","ptarmigan","grouse",
+                "/rat/rat","/squirrel","/hedgehog","/bogturtle",
+                "/rabbit","doe","/crab","/jellyfish",
+                "/frog","/toad","/forestlizard","snail",
+                "/adder"
+        };
+        for (int i = 0; i < endlist.length; i++) {
+            if(name.endsWith(endlist[i]))
+                return true;
+        }
+        return false;
+    }
+
+    private static boolean isIconsCategNoobies(String name) {
+        String[] list = {
+                "/hen","/rabbit","/rat/rat",
+                "/grasshopper","/ladybug","/dragonfly","/waterstrider",
+                "/cavemoth","/items/grub","/springbumblebee",
+                "stingingnettle","taproot","cattail",
+                "clover","snapdragon",
+                "bloatedbolete","/chantrelles","morel","parasol","yellowfoot"
+        };
+        for (int i = 0; i < list.length; i++) {
+            if(name.endsWith(list[i]))
+                return true;
+        }
+        return false;
+    }
+
     public static boolean isString(String name){
         String[] list = {
-            "nettle","taproot","cattail"
+            "stingingnettle","taproot","cattail"
         };
         for (int i = 0; i < list.length; i++) {
             if(name.contains(list[i]))
@@ -467,8 +523,8 @@ public class ZeeConfig {
 
     public static boolean isMushroom(String name){
         String[] list = {
-            "bolete","truffle","trumpet","cavelantern","chantrelle","morel","fairy","blewit",
-            "puffball","indigo","parasol","snowtop","yellowfeet"
+            "bolete","truffle","trumpet","cavelantern","chantrelles","morel","fairy","blewit",
+            "puffball","indigo","parasol","snowtop","yellowfoot"
         };
         for (int i = 0; i < list.length; i++) {
             if(name.contains(list[i]))
@@ -1654,11 +1710,13 @@ public class ZeeConfig {
             String space = "     ";
             private final List<String> filters = new ArrayList<String>() {{
                 add(space+"all");
-                add(space+"bird");
-                add(space+"bug");
-                add(space+"bush");
-                add(space+"flower");
-                add(space+"mushroom");
+                add(space+"birds");
+                add(space+"bugs");
+                add(space+"bushes");
+                add(space+"flowers");
+                add(space+"mushrooms");
+                add(space+"noob stuff");
+                add(space+"small animals");
                 add(space+"string");
                 add(space+"trees");
                     add(space+space+"bark");
@@ -1701,17 +1759,17 @@ public class ZeeConfig {
 
         //println("pre "+filteredList.size());
 
-        if(filter.equals("bird"))
+        if(filter.equals("birds"))
             filteredList.removeIf(entry -> !ZeeConfig.isBird(entry.conf.res.name));
-        else if(filter.equals("bug"))
+        else if(filter.equals("bugs"))
             filteredList.removeIf(entry -> !ZeeConfig.isBug(entry.conf.res.name));
-        else if(filter.equals("bush"))
+        else if(filter.equals("bushes"))
             filteredList.removeIf(entry -> !ZeeConfig.isBush(entry.conf.res.name));
-        else if(filter.equals("flower"))
+        else if(filter.equals("flowers"))
             filteredList.removeIf(entry -> !ZeeConfig.isFlower(entry.conf.res.name));
         else if(filter.equals("/herbs/"))
             filteredList.removeIf(entry -> !ZeeConfig.isHerb(entry.conf.res.name));
-        else if(filter.equals("mushroom"))
+        else if(filter.equals("mushrooms"))
             filteredList.removeIf(entry -> !ZeeConfig.isMushroom(entry.conf.res.name));
         else if(filter.equals("string"))
             filteredList.removeIf(entry -> !ZeeConfig.isString(entry.conf.res.name));
@@ -1727,9 +1785,24 @@ public class ZeeConfig {
             filteredList.removeIf(entry -> !ZeeConfig.isTreeFruit(entry.conf.res.name));
         else if(filter.equals("nuts"))
             filteredList.removeIf(entry -> !ZeeConfig.isTreeNuts(entry.conf.res.name));
+        else if(filter.equals("noob stuff"))
+            filteredList.removeIf(entry -> !ZeeConfig.isIconsCategNoobies(entry.conf.res.name));
+        else if(filter.equals("small animals"))
+            filteredList.removeIf(entry -> !ZeeConfig.isSmallAnimal(entry.conf.res.name));
+        else if(filter.equals("aggressive"))
+            filteredList.removeIf(entry -> !ZeeConfig.isAggressive(entry.conf.res.name));
 
         //println("pos "+filteredList.size());
         return filteredList;
+    }
+
+    public static <T, E> T getKeyByValue(Map<T, E> map, E value) {
+        for (Map.Entry<T, E> entry : map.entrySet()) {
+            if (Objects.equals(value, entry.getValue())) {
+                return entry.getKey();
+            }
+        }
+        return null;
     }
 
 }
