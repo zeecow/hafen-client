@@ -341,8 +341,8 @@ public class GobIcon extends GAttrib {
 	private static final Text.Foundry elf = CharWnd.attrf;
 	private static final int elh = elf.height() + UI.scale(2);
 	public class IconList extends SSearchBox<Icon, IconList.IconLine> {
-	    private List<Icon> ordered = Collections.emptyList();
-	    private Map<String, Setting> cur = null;
+	    public List<Icon> ordered = Collections.emptyList();
+	    public Map<String, Setting> cur = null;
 	    private boolean reorder = false;
 
 	    private IconList(Coord sz) {
@@ -366,43 +366,47 @@ public class GobIcon extends GAttrib {
 		       (icon.name.toLowerCase().indexOf(text.toLowerCase()) >= 0));
 	    }
 	    protected List<Icon> allitems() {return(ordered);}
-	    protected IconLine makeitem(Icon icon, int idx, Coord sz) {return(new IconLine(sz, icon));}
+		protected IconLine makeitem(Icon icon, int idx, Coord sz) {return(new IconLine(sz, icon));}
 
 	    public void tick(double dt) {
-		Map<String, Setting> cur = this.cur;
-		if(cur != conf.settings) {
-		    cur = conf.settings;
-		    ArrayList<Icon> ordered = new ArrayList<>(cur.size());
-		    for(Setting conf : cur.values())
-			ordered.add(new Icon(conf));
-		    this.cur = cur;
-		    this.ordered = ordered;
-		    reorder = true;
-		}
-		if(reorder) {
-		    reorder = false;
-		    for(Icon icon : ordered) {
-			if(icon.name == null) {
-			    try {
-				Resource.Tooltip name = icon.conf.res.loadsaved(Resource.remote()).layer(Resource.tooltip);
-				icon.name = (name == null) ? "???" : name.t;
-			    } catch(Loading l) {
-				reorder = true;
-			    }
-			}
-		    }
-		    Collections.sort(ordered, (a, b) -> {
-			    if((a.name == null) && (b.name == null))
-				return(0);
-			    if(a.name == null)
-				return(1);
-			    if(b.name == null)
-				return(-1);
-			    return(a.name.compareTo(b.name));
-			});
-		}
+		initOrdered();
 		super.tick(dt);
 	    }
+
+		public void initOrdered(){
+			Map<String, Setting> cur = this.cur;
+			if(cur != conf.settings) {
+				cur = conf.settings;
+				ArrayList<Icon> ordered = new ArrayList<>(cur.size());
+				for(Setting conf : cur.values())
+					ordered.add(new Icon(conf));
+				this.cur = cur;
+				this.ordered = ordered;
+				reorder = true;
+			}
+			if(reorder) {
+				reorder = false;
+				for(Icon icon : ordered) {
+					if(icon.name == null) {
+						try {
+							Resource.Tooltip name = icon.conf.res.loadsaved(Resource.remote()).layer(Resource.tooltip);
+							icon.name = (name == null) ? "???" : name.t;
+						} catch(Loading l) {
+							reorder = true;
+						}
+					}
+				}
+				Collections.sort(ordered, (a, b) -> {
+					if((a.name == null) && (b.name == null))
+						return(0);
+					if(a.name == null)
+						return(1);
+					if(b.name == null)
+						return(-1);
+					return(a.name.compareTo(b.name));
+				});
+			}
+		}
 
 	    public boolean keydown(java.awt.event.KeyEvent ev) {
 		if(ev.getKeyCode() == java.awt.event.KeyEvent.VK_SPACE) {
@@ -521,7 +525,8 @@ public class GobIcon extends GAttrib {
 	    this.conf = conf;
 	    this.save = save;
 	    add(this.cont = new PackCont.LinPack.VPack(), Coord.z).margin(UI.scale(5)).packpar(true);
-	    list = cont.last(new IconList(UI.scale(250, 500)), 0);
+		cont.last(ZeeConfig.getIconFilterWidget(),0);
+	    list = ZeeConfig.iconList = cont.last(new IconList(UI.scale(250, 500)), 0);
 	    cont.last(new HRuler(list.sz.x), 0);
 	    cont.last(new CheckBox("Notification on newly seen icons") {
 		    {this.a = conf.notify;}

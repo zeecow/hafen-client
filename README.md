@@ -1,6 +1,6 @@
 # Zeecow hafen-client
 
-original features:
+features:
  - search actions globally
  - sort actions by most used craft items
  - craft window search button for ingredients 
@@ -14,6 +14,7 @@ original features:
  - animal window name stats generator
  - stockpile helper: mulberry leaves, woodblocks, boards
  - seed-farmer helper: no pathfinding, buggy (ctrlLongMidClick crop)
+ - icon list categs
  - mid click object/item for small tasks:
    - MidClick obj: [inspect] , [Giddyup!] , [light torch], [toggle barrel label]
      - Long MidClick obj: [lift up] , [Context Menu for oven/smelter/tree/plant], [take all from stockpile]

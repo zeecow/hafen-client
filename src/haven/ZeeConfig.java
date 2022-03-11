@@ -63,6 +63,8 @@ public class ZeeConfig {
     public static ZeeInvMainOptionsWdg invMainoptionsWdg;
     public static ZeecowOptionsWindow zeecowOptions;
     public static Button btnMkWndSearchInput, btnMkWndBack, btnMkWndFwd, btnMkWndDel;
+    public static GobIcon.SettingsWindow.IconList iconList;
+    private static Dropbox<String> iconListFilterBox;
 
     public static String playingAudio = null;
     public static String uiMsgTextQuality, uiMsgTextBuffer;
@@ -209,10 +211,6 @@ public class ZeeConfig {
     public static HashMap<String,Color> mapCategoryColor = initMapCategoryColor();
     public static HashMap<String,Coord> mapWindowPos = initMapWindowPos();
     public static HashMap<Gob,Integer> mapGobTextId = new HashMap<Gob,Integer>();
-    public static GobIcon.SettingsWindow.IconList iconList;
-    public static Dropbox<String> iconListFilterBox;
-    public static int iconListY;
-    public static Window iconListWin;
 
 
     public static void checkRemoteWidget(String type, Widget wdg) {
@@ -1646,4 +1644,92 @@ public class ZeeConfig {
         //cancel if clicked right/left button
         return lastMapViewClickButton != 2;
     }
+
+    public static Widget getIconFilterWidget(){
+
+        if (iconListFilterBox != null)
+            return iconListFilterBox;
+
+        iconListFilterBox =  new Dropbox<String>(150,14,20) {
+            String space = "     ";
+            private final List<String> filters = new ArrayList<String>() {{
+                add(space+"all");
+                add(space+"bird");
+                add(space+"bug");
+                add(space+"bush");
+                add(space+"flower");
+                add(space+"mushroom");
+                add(space+"string");
+                add(space+"trees");
+                    add(space+space+"bark");
+                    add(space+space+"bough");
+                    add(space+space+"fruit");
+                    add(space+space+"nuts");
+                add(space+"/kritters/");
+                add(space+"/herbs/");
+            }};
+            protected String listitem(int idx) {
+                return(filters.get(idx));
+            }
+            protected int listitems() {
+                return(filters.size());
+            }
+            protected void drawitem(GOut g, String name, int idx) {
+                g.atext(name, Coord.of(0, g.sz().y / 2), 0.0, 0.5);
+            }
+            public void change(String filter) {
+                super.change(filter);
+                iconList.cur = null;
+                iconList.initOrdered();
+                if(!filter.equalsIgnoreCase("all")) {
+                    iconList.ordered = getIconsFiltered(filter.strip(), iconList.ordered);
+                }
+            }
+            public void dispose() {
+                super.dispose();
+                this.sel = "";
+            }
+        };
+
+        return iconListFilterBox;
+    }
+
+
+    public static List<GobIcon.SettingsWindow.Icon> getIconsFiltered(String filter, List<GobIcon.SettingsWindow.Icon> listOrdered) {
+
+        ArrayList<GobIcon.SettingsWindow.Icon> filteredList = new ArrayList<>(listOrdered);
+
+        //println("pre "+filteredList.size());
+
+        if(filter.equals("bird"))
+            filteredList.removeIf(entry -> !ZeeConfig.isBird(entry.conf.res.name));
+        else if(filter.equals("bug"))
+            filteredList.removeIf(entry -> !ZeeConfig.isBug(entry.conf.res.name));
+        else if(filter.equals("bush"))
+            filteredList.removeIf(entry -> !ZeeConfig.isBush(entry.conf.res.name));
+        else if(filter.equals("flower"))
+            filteredList.removeIf(entry -> !ZeeConfig.isFlower(entry.conf.res.name));
+        else if(filter.equals("/herbs/"))
+            filteredList.removeIf(entry -> !ZeeConfig.isHerb(entry.conf.res.name));
+        else if(filter.equals("mushroom"))
+            filteredList.removeIf(entry -> !ZeeConfig.isMushroom(entry.conf.res.name));
+        else if(filter.equals("string"))
+            filteredList.removeIf(entry -> !ZeeConfig.isString(entry.conf.res.name));
+        else if(filter.equals("/kritters/"))
+            filteredList.removeIf(entry -> !ZeeConfig.isKritter(entry.conf.res.name));
+        else if(filter.equals("trees"))
+            filteredList.removeIf(entry -> !ZeeConfig.isTree(entry.conf.res.name));
+        else if(filter.equals("bark"))
+            filteredList.removeIf(entry -> !ZeeConfig.isTreeToughBark(entry.conf.res.name));
+        else if(filter.equals("bough"))
+            filteredList.removeIf(entry -> !ZeeConfig.isTreeBough(entry.conf.res.name));
+        else if(filter.equals("fruit"))
+            filteredList.removeIf(entry -> !ZeeConfig.isTreeFruit(entry.conf.res.name));
+        else if(filter.equals("nuts"))
+            filteredList.removeIf(entry -> !ZeeConfig.isTreeNuts(entry.conf.res.name));
+
+        //println("pos "+filteredList.size());
+        return filteredList;
+    }
+
 }
