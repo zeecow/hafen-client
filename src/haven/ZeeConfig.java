@@ -265,13 +265,11 @@ public class ZeeConfig {
             return null;
     }
 
-    public static MixColor getHighlightDrawable(Gob gob) {
+    public static MixColor getHighlightDrawableColor(Gob gob) {
         if(gob==null)
             return null;
 
-        //get Type and name
-        String gobName, categ;
-        Color c;
+        String gobName;
 
         try{
             gobName = gob.getres().name;
@@ -318,32 +316,19 @@ public class ZeeConfig {
         return null;
     }
 
-    public static MixColor getHighlightColor(Gob gob) {
-        if(gob==null || gob.getres()==null)
-            return null;
+    public static MixColor getHighlightGobColor(Gob gob) {
 
         //get Type and name
-        String gobName, categ;
+        String gobName = gob.resName;
+        String categ;
         Color c;
 
-        try{
-            gobName = gob.getres().name;
-        }catch (Resource.Loading loading){
-            loading.printStackTrace();
-            return null;
-        }
-
-        if(mapCategoryGobs.get(CATEG_AGROCREATURES).contains(gobName)) {
-            //aggro radius
-            if (ZeeConfig.aggroRadiusTiles > 0)
-                gob.addol(new Gob.Overlay(gob, new ZeeGobRadius(gob, null, ZeeConfig.aggroRadiusTiles * MCache.tilesz2.y)));
-        }
-        else if(ZeeConfig.mapGobColor.size() > 0   &&   (c = ZeeConfig.mapGobColor.get(gobName)) != null){
-            //highlight gob
+        if(ZeeConfig.mapGobColor.size() > 0   &&   (c = ZeeConfig.mapGobColor.get(gobName)) != null){
+            //highlight gob 1st priority
             return new MixColor(c.getRed(), c.getGreen(), c.getBlue(), c.getAlpha());
         }
         else if((categ = ZeeConfig.mapGobCategory.get(gobName)) != null){
-            //highlight category
+            //highlight category 2nd priority
             c = mapCategoryColor.get(categ);
             if(c==null) {
                 //set default categ color if empty
@@ -450,7 +435,7 @@ public class ZeeConfig {
                 "rockdove","quail","/hen","/rooster","magpie",
                 "mallard","seagull","ptarmigan","grouse",
                 "/rat/rat","/squirrel","/hedgehog","/bogturtle",
-                "/rabbit","doe","/crab","/jellyfish",
+                "/rabbit","rabbit-doe","/crab","/jellyfish",
                 "/frog","/toad","/forestlizard","snail",
                 "/adder"
         };
@@ -463,7 +448,7 @@ public class ZeeConfig {
 
     private static boolean isIconsCategNoobies(String name) {
         String[] list = {
-                "/hen","/rabbit","/rat/rat",
+                "/hen","/rooster","/rabbit","rabbit-doe","/rat/rat",
                 "/grasshopper","/ladybug","/dragonfly","/waterstrider",
                 "/cavemoth","/items/grub","/springbumblebee",
                 "stingingnettle","taproot","cattail",
@@ -583,23 +568,20 @@ public class ZeeConfig {
         return false;
     }
 
-    public static void highlight(Gob gob, MixColor mc) {
+    public static void applyGobSettingsHighlight(Gob gob, MixColor mc) {
         if(gob==null || mc==null)
             return;
         try {
             gob.setattr(new ZeeGobHighlight(gob, mc));
-        }catch (Resource.Loading e){
+        } catch (Resource.Loading e) {
             e.printStackTrace();
         }
     }
 
-    public static void gobAudio(Gob gob) {
-        String gobName = gob.getres().name;
+    public static void applyGobSettingsAudio(Gob gob) {
+        String gobName = gob.resName;
         long gobId = gob.id;
-        if(gobName==null || gobName.isEmpty())
-            return;
         String path = "";
-        Integer gobType ;
 
         //if gob is new, add to session gobs
         if(mapGobSession.put(gobName,"") == null) {
@@ -1703,8 +1685,9 @@ public class ZeeConfig {
 
     public static Widget getIconFilterWidget(){
 
-        if (iconListFilterBox != null)
+        if (iconListFilterBox != null) {
             return iconListFilterBox;
+        }
 
         iconListFilterBox =  new Dropbox<String>(150,14,20) {
             String space = "     ";
@@ -1740,8 +1723,9 @@ public class ZeeConfig {
                 super.change(filter);
                 iconList.cur = null;
                 iconList.initOrdered();
+                filter = filter.strip();//remove formatting spaces
                 if(!filter.equalsIgnoreCase("all")) {
-                    iconList.ordered = getIconsFiltered(filter.strip(), iconList.ordered);
+                    iconList.ordered = getIconsFiltered(filter, iconList.ordered);
                 }
             }
             public void dispose() {
@@ -1806,4 +1790,26 @@ public class ZeeConfig {
         return null;
     }
 
+    public static void applyGobSettings(Gob ob) {
+        if(ob!=null && ob.getres()!=null) {
+            try{
+                ob.resName = ob.getres().name;
+            }catch (Resource.Loading loading){
+                loading.printStackTrace();
+                return;
+            }
+            ZeeConfig.applyGobSettingsAudio(ob);
+            ZeeConfig.applyGobSettingsAggro(ob);
+            ZeeConfig.applyGobSettingsHighlight(ob, ZeeConfig.getHighlightGobColor(ob));
+            ZeeMiningManager.checkNearBoulder(ob);
+        }
+    }
+
+    private static void applyGobSettingsAggro(Gob gob) {
+        if(mapCategoryGobs.get(CATEG_AGROCREATURES).contains(gob.resName)) {
+            //aggro radius
+            if (ZeeConfig.aggroRadiusTiles > 0)
+                gob.addol(new Gob.Overlay(gob, new ZeeGobRadius(gob, null, ZeeConfig.aggroRadiusTiles * MCache.tilesz2.y)));
+        }
+    }
 }

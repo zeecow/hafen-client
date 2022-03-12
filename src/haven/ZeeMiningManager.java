@@ -147,18 +147,15 @@ public class ZeeMiningManager extends ZeeThread{
     }
 
     public static boolean isBoulder(Gob gob) {
-        return (gob!=null &&
-                gob.getres()!=null &&
-                gob.getres().name.startsWith("gfx/terobjs/bumlings/") &&
-                !gob.getres().name.startsWith("gfx/terobjs/bumlings/ras") // cave-in boulder
+        return (gob.resName.startsWith("gfx/terobjs/bumlings/") &&
+                !gob.resName.startsWith("gfx/terobjs/bumlings/ras") // cave-in boulder
         );
     }
 
     public static boolean isMineSupport(Gob gob) {
-        return gob!=null && gob.getres()!=null &&
-            (gob.getres().name.equals("gfx/terobjs/minebeam") ||
-            gob.getres().name.equals("gfx/terobjs/column") ||
-            gob.getres().name.equals("gfx/terobjs/minesupport"));
+        return gob.resName.equals("gfx/terobjs/minebeam") ||
+                gob.resName.equals("gfx/terobjs/column") ||
+                gob.resName.equals("gfx/terobjs/minesupport");
     }
 
     public static void println(String s) {

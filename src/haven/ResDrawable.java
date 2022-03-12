@@ -113,7 +113,8 @@ public class ResDrawable extends Drawable {
 	    } else if((d == null) || (d.res != res) || !d.sdt.equals(sdt)) {
 		g.setattr(new ResDrawable(g, res, sdt));
 	    }
-        ZeeConfig.highlight(g, ZeeConfig.getHighlightDrawable(g));
+        if (ZeeConfig.highlightGrowingTrees || ZeeConfig.highlightCropsReady)
+            ZeeConfig.applyGobSettingsHighlight(g, ZeeConfig.getHighlightDrawableColor(g));
 	}
     }
 }

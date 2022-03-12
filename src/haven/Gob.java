@@ -34,7 +34,8 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Sk
     public Coord2d rc;
     public double a;
     public boolean virtual = false;
-    int clprio = 0;
+	public String resName = "";
+	int clprio = 0;
     public long id;
     public final Glob glob;
     Map<Class<? extends GAttrib>, GAttrib> attr = new HashMap<Class<? extends GAttrib>, GAttrib>();

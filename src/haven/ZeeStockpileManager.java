@@ -166,7 +166,7 @@ public class ZeeStockpileManager extends ZeeThread{
                     pileAndExit();
                 }
             } else {
-                println("holding item? try stockpiling...");
+                //println("holding item? try stockpiling...");
                 ZeeClickGobManager.gobItemAct(gobPile, UI.MOD_SHIFT);//right click stockpile
                 waitNotHoldingItem();
                 if( gobSource==null || !ZeeClickGobManager.clickGobPetal(gobSource, lastPetalName) ){

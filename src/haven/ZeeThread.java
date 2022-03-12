@@ -206,7 +206,7 @@ public class ZeeThread  extends Thread{
     }
 
     public static boolean waitInvFullOrHoldingItem(Inventory inv, int timeOutMs) {
-        println("wait inv full or holding item2");
+        //println("wait inv full or holding item2");
         if(ZeeConfig.isPlayerHoldingItem())
             return true;
         int timer = timeOutMs;
