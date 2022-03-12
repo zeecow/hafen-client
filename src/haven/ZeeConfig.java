@@ -427,7 +427,7 @@ public class ZeeConfig {
                "/adder","/sandflea","/boar/","/badger/","/bear/","/bat/","/boreworm/",
                 "/ooze/","/cavelouse/","/caveangler/","orca","/goldeneagle/","/lynx/",
                 "/mammoth/","/moose/","/troll/","/walrus/","/goat/","/wolf/","/wolverine/",
-                "player"
+                "/plo"
         };
         for (int i = 0; i < list.length; i++) {
             if(name.contains(list[i]))
@@ -467,8 +467,8 @@ public class ZeeConfig {
                 "/grasshopper","/ladybug","/dragonfly","/waterstrider",
                 "/cavemoth","/items/grub","/springbumblebee",
                 "stingingnettle","taproot","cattail",
-                "clover","snapdragon",
-                "bloatedbolete","/chantrelles","morel","parasol","yellowfoot"
+                "clover","snapdragon","/windweed",
+                "bloatedbolete","/chantrelles","/lorchel","parasol","yellowfoot"
         };
         for (int i = 0; i < list.length; i++) {
             if(name.endsWith(list[i]))
@@ -523,7 +523,7 @@ public class ZeeConfig {
 
     public static boolean isMushroom(String name){
         String[] list = {
-            "bolete","truffle","trumpet","cavelantern","chantrelles","morel","fairy","blewit",
+            "bolete","truffle","trumpet","cavelantern","chantrelles","/lorchel","fairy","blewit",
             "puffball","indigo","parasol","snowtop","yellowfoot"
         };
         for (int i = 0; i < list.length; i++) {
@@ -1710,6 +1710,7 @@ public class ZeeConfig {
             String space = "     ";
             private final List<String> filters = new ArrayList<String>() {{
                 add(space+"all");
+                add(space+"aggressive");
                 add(space+"birds");
                 add(space+"bugs");
                 add(space+"bushes");
