@@ -181,18 +181,16 @@ public class ZeeClickGobManager extends ZeeThread{
                         ZeeConfig.msg("no wheelbarrow close");
                     }else {
                         double dist = ZeeConfig.distanceToPlayer(wb);
-                        if (dist < 10) {// using wheelbarrow
-                            ZeeConfig.clickGroundZero();//remove hand cursor
-                            liftGob(wb);
+                        ZeeConfig.clickGroundZero();//remove hand cursor
+                        liftGob(wb);
+                        waitPlayerIdleFor(1);
+                        dist = ZeeConfig.distanceToPlayer(wb);
+                        if (dist==0) {
+                            gobClick(gate, 3);
                             waitPlayerIdleFor(1);
-                            dist = ZeeConfig.distanceToPlayer(wb);
-                            if (dist==0) {
-                                gobClick(gate, 3);
-                                waitPlayerIdleFor(1);
-                            }else{
-                                //impossible case?
-                                ZeeConfig.msg("wheelbarrow unreachable?");
-                            }
+                        }else{
+                            //impossible case?
+                            ZeeConfig.msg("wheelbarrow unreachable?");
                         }
                     }
                 }catch (Exception e){
