@@ -1812,4 +1812,8 @@ public class ZeeConfig {
                 gob.addol(new Gob.Overlay(gob, new ZeeGobRadius(gob, null, ZeeConfig.aggroRadiusTiles * MCache.tilesz2.y)));
         }
     }
+
+    public static Gob getClosestGobName(String name) {
+        return getClosestGob(findGobsByNameContains(name));
+    }
 }

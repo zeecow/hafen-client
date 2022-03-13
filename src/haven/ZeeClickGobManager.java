@@ -34,7 +34,7 @@ public class ZeeClickGobManager extends ZeeThread{
 
         if(!isLongClick()){
             /*
-            short clicks
+                short clicks
              */
             if(isGobTrellisPlant()) {
                 harvestOneTrellis();
@@ -56,12 +56,10 @@ public class ZeeClickGobManager extends ZeeThread{
             } else if (isInspectGob()) {
                 inspectGob();
             }
-
         } else {
             /*
-            long clicks
+                long clicks
              */
-
             if(showGobFlowerMenu()) {
                 //ok
             }else if (isGobCrop()) {
@@ -73,6 +71,8 @@ public class ZeeClickGobManager extends ZeeThread{
                 removeStump(gob);
             }else if (isLiftGob()) {
                 liftGob();
+            }else if (isGobGate() && ZeeConfig.CURSOR_HAND.equals(ZeeConfig.getCursorName())){
+                openGateWheelbarrow(gob);
             }
 
         }
@@ -167,6 +167,46 @@ public class ZeeClickGobManager extends ZeeThread{
         }
 
         return showMenu;
+    }
+
+    private void openGateWheelbarrow(Gob gate) {
+        // gfx/terobjs/vehicle/wheelbarrow
+        new ZeeThread(){
+            public void run() {
+                try {
+                    waitNoFlowerMenu();
+                    ZeeConfig.addPlayerText("open gate wb");
+                    Gob wb = ZeeConfig.getClosestGobName("gfx/terobjs/vehicle/wheelbarrow");
+                    if (wb==null){
+                        ZeeConfig.msg("no wheelbarrow close");
+                    }else {
+                        double dist = ZeeConfig.distanceToPlayer(wb);
+                        if (dist < 10) {// using wheelbarrow
+                            ZeeConfig.clickGroundZero();//remove hand cursor
+                            liftGob(wb);
+                            waitPlayerIdleFor(1);
+                            dist = ZeeConfig.distanceToPlayer(wb);
+                            if (dist==0) {
+                                gobClick(gate, 3);
+                                waitPlayerIdleFor(1);
+                            }else{
+                                //impossible case?
+                                ZeeConfig.msg("wheelbarrow unreachable?");
+                            }
+                        }
+                    }
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+                ZeeConfig.removePlayerText();
+            }
+        }.start();
+    }
+
+    public boolean isGobGate() {
+        if (gobName.startsWith("gfx/terobjs/arch/") && gobName.endsWith("gate"))
+            return true;
+        return false;
     }
 
 
