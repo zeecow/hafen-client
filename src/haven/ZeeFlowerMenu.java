@@ -13,6 +13,7 @@ public class ZeeFlowerMenu extends FlowerMenu{
     public static final String STRPETAL_SEEDFARMER = "Start Seed Farmer";
     public static final String STRPETAL_KILLALL = "Kill all";
     public static final String STRPETAL_EATALL = "Eat all";
+    public static final String STRPETAL_LIFTUPGOB = "Lift up";
 
     private final Gob gob;
     private final WItem wItem;

@@ -120,7 +120,11 @@ public class ZeeClickGobManager extends ZeeThread{
             }
         }
         else if (isBarrelTakeAll(gob)) {
-            barrelTakeAllSeeds(gob);
+            if (petalName.equals(ZeeFlowerMenu.STRPETAL_BARRELTAKEALL)) {
+                barrelTakeAllSeeds(gob);
+            }else if (petalName.equals(ZeeFlowerMenu.STRPETAL_LIFTUPGOB)){
+                liftGob(gob);
+            }
         }
         else{
             println("chooseGobFlowerMenu > unkown case");
@@ -150,7 +154,7 @@ public class ZeeClickGobManager extends ZeeThread{
             menu = new ZeeFlowerMenu(gob,ZeeFlowerMenu.STRPETAL_SEEDFARMER,ZeeFlowerMenu.STRPETAL_CURSORHARVEST);
         }
         else if (isBarrelTakeAll()) {
-            menu = new ZeeFlowerMenu(gob,ZeeFlowerMenu.STRPETAL_BARRELTAKEALL);
+            menu = new ZeeFlowerMenu(gob,ZeeFlowerMenu.STRPETAL_BARRELTAKEALL,ZeeFlowerMenu.STRPETAL_LIFTUPGOB);
         }
         else{
             showMenu = false;
@@ -431,10 +435,13 @@ public class ZeeClickGobManager extends ZeeThread{
         if(!gobName.endsWith("barrel") || isBarrelEmpty(gob)){
             return false;
         }
-        String endList = "barley,carrot,cucumber,flax,grape,hemp,leek,lettuce,millet,"+
-                "pipeweed,poppy,pumpkin,wheat,turnip,wheat,barley";
+        String list = "barley,carrot,cucumber,flax,grape,hemp,leek,lettuce,millet"
+                +",pipeweed,poppy,pumpkin,wheat,turnip,wheat,barley,wheatflour,barleyflour,milletflour"
+                +",ashes,gelatin,cavedust,caveslime,chitinpowder"
+                +",colorred,coloryellow,colorblue,colorgreen,colorblack,colorwhite,colorgray"
+                +",colororange,colorbeige,colorbrown,colorlime,colorturquoise,colorteal,colorpurple";
         return getOverlayNames(gob).stream().anyMatch(overlayName -> {
-            return endList.contains( overlayName.replace("gfx/terobjs/barrel-",""));
+            return list.contains(overlayName.replace("gfx/terobjs/barrel-",""));
         });
     }
     private boolean isBarrelTakeAll() {
@@ -457,7 +464,7 @@ public class ZeeClickGobManager extends ZeeThread{
                         return;
                     }
 
-                    ZeeConfig.addPlayerText("taking seeds...");
+                    ZeeConfig.addPlayerText("taking contents...");
 
                     while (!ZeeClickGobManager.isBarrelEmpty(gob) && !isInventoryFull()) {
                         ZeeClickGobManager.gobClick(gob, 3, UI.MOD_SHIFT);
@@ -472,7 +479,7 @@ public class ZeeClickGobManager extends ZeeThread{
 
                     if (isInventoryFull())
                         ZeeConfig.msg("Inventory full");
-                    else
+                    else if (!ZeeConfig.clickCancelTask())
                         ZeeConfig.msg("Took everything");
 
                 }catch(Exception e){
@@ -499,9 +506,12 @@ public class ZeeClickGobManager extends ZeeThread{
         destroyGob(gob);
     }
 
-    private void liftGob() {
+    public static void liftGob(Gob gob) {
         ZeeConfig.gameUI.menu.wdgmsg("act", "carry","0");
-        gobClick(1);
+        gobClick(gob,1);
+    }
+    private void liftGob() {
+        liftGob(gob);
     }
 
     private void inspectGob() {
