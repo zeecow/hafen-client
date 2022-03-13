@@ -660,6 +660,15 @@ public class ZeeClickItemManager extends ZeeThread{
         return false;
     }
 
+    public static boolean pickUpInvItem(Inventory inv, String name) {
+        try {
+            WItem witem = inv.getWItemsByName(name).get(0);
+            return pickUpItem(witem);
+        }catch (Exception e){
+            return false;
+        }
+    }
+
     public static WItem getBeltWItem(String name) {
         try {
             WItem witem = getInvBelt().getWItemsByName(name).get(0);

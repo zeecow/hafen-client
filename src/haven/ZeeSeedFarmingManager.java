@@ -47,20 +47,23 @@ public class ZeeSeedFarmingManager extends ZeeThread{
         ZeeConfig.removeGobText(ZeeConfig.getPlayerGob());
     }
 
-    private void updateWItem() {
+    /*
+        Update seed-pile reference.
+        Returns true if pile contains 5+ seeds, else returns false.
+     */
+    private boolean updateSeedPileReference() {
         List<WItem> items = inv.getWItemsByName(gItemSeedBasename);
         for (WItem item : items) {
             if (getSeedsAmount(item.item) >= 5){
+                // seed-pile big enough for planting
                 wItem = item;
                 gItem = item.item;
-                return;
+                return true;
             }
         }
-        /*
-        items.removeIf(w -> (getSeedsAmount(w.item) < 5));
         wItem = items.get(0);
         gItem = wItem.item;
-         */
+        return false;
     }
 
     public void run(){
@@ -139,11 +142,21 @@ public class ZeeSeedFarmingManager extends ZeeThread{
                     }
                     plantSeeds();
                     waitPlayerIdleFor(3);
-                    if((getTotalSeedAmount()) >= 5) {
-                        isPlantingDone = true;
+                    if(getTotalSeedAmount() >= 5) {
+                        // player idle, 5+ seeds
+                        if (getNumberOfSeedItems() == 1) {
+                            // player idle, 5+ seeds, 1 seed-pile, area is fully planted
+                            isPlantingDone = true;
+                            println("planting done");
+                        }else{
+                            // player idle, 5+ seeds, 2+ seed-piles, area probably still need planting
+                            println("store small seed-piles and try planting again ");
+                            storeSeedsInBarrel(); //store and try planting one more time
+                        }
                     }
                 }
 
+                //final store barrel
                 storeSeedsInBarrel();
             }
 
@@ -223,12 +236,11 @@ public class ZeeSeedFarmingManager extends ZeeThread{
 
     private boolean plantSeeds() {
         ZeeConfig.addGobText(ZeeConfig.getPlayerGob(),"planting",0,255,255,255,10);
-        updateWItem();
-        if(activateCursorPlantGItem(gItem)) {
+        if(updateSeedPileReference() && activateCursorPlantGItem(gItem)) {
             ZeeConfig.gameUI.map.wdgmsg("sel", ZeeConfig.savedTileSelStartCoord, ZeeConfig.savedTileSelEndCoord, ZeeConfig.savedTileSelModflags);
             return true;
         }else{
-            println("couldn't activate cursor for planting");
+            println("couldn't activate planting cursor?");
         }
         return false;
     }
@@ -359,7 +371,7 @@ public class ZeeSeedFarmingManager extends ZeeThread{
                 }
                 ZeeConfig.addGobText(ZeeConfig.getPlayerGob(),"storing",0,255,255,255,10);
                 ZeeConfig.addGobText(lastBarrel, getSeedNameAndQl(), 0,255,0,255,10);
-                updateWItem();
+                updateSeedPileReference();
                 ZeeClickItemManager.pickUpItem(wItem);
                 ZeeClickGobManager.gobItemAct(lastBarrel, UI.MOD_SHIFT);//store first seeds
                 waitPlayerMove();//wait reaching barrel

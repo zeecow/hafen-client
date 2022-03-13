@@ -5,11 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-/*
-    Mid-click gob for automating small tasks.
-    Short click: inspect, light torch, mount horse.
-    Long click: lift, destroy.
- */
 public class ZeeClickGobManager extends ZeeThread{
 
     Coord coordPc;
@@ -47,9 +42,7 @@ public class ZeeClickGobManager extends ZeeThread{
                 gobClick(3, UI.MOD_SHIFT);//pick up all items (shift + rclick)
                 ZeeStockpileManager.checkGroundItemClicked(gobName);
             } else if (isGobFireSource()) {
-                if (ZeeClickItemManager.pickupBeltItem("torch")) {
-                    gobItemAct(0);
-                }else if(ZeeClickItemManager.pickupHandItem("torch")){
+                if (pickupTorch()) {
                     gobItemAct(0);
                 }
             } else if (isGobHorse()) {
@@ -83,6 +76,17 @@ public class ZeeClickGobManager extends ZeeThread{
             }
 
         }
+    }
+
+    public static boolean pickupTorch() {
+        if (ZeeClickItemManager.pickupBeltItem("/torch")) {
+            return true;
+        }else if(ZeeClickItemManager.pickupHandItem("/torch")){
+            return true;
+        }else if (ZeeClickItemManager.pickUpInvItem(getMainInventory(),"/torch")){
+            return true;
+        }
+        return false;
     }
 
 
