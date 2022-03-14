@@ -11,7 +11,6 @@ public class ZeeClickGobManager extends ZeeThread{
     Coord2d coordCc;
     Gob gob;
     String gobName;
-    static Inventory mainInv;
 
     public static float camAngleStart, camAngleEnd, camAngleDiff;
     public static long clickStartMs, clickEndMs, clickDiffMs;
@@ -25,7 +24,7 @@ public class ZeeClickGobManager extends ZeeThread{
         gob = gobClicked;
         gobName = gob.getres().name;
         clickDiffMs = clickEndMs - clickStartMs;
-        getMainInventory();
+        ZeeConfig.getMainInventory();
         //println(clickDiffMs+"ms > "+gobName+" dist="+ZeeConfig.distanceToPlayer(gob));
     }
 
@@ -83,7 +82,7 @@ public class ZeeClickGobManager extends ZeeThread{
             return true;
         }else if(ZeeClickItemManager.pickupHandItem("/torch")){
             return true;
-        }else if (ZeeClickItemManager.pickUpInvItem(getMainInventory(),"/torch")){
+        }else if (ZeeClickItemManager.pickUpInvItem(ZeeConfig.getMainInventory(),"/torch")){
             return true;
         }
         return false;
@@ -279,7 +278,7 @@ public class ZeeClickGobManager extends ZeeThread{
         String gobName = gob.getres().name;
 
         if(gobName.endsWith("oven") && petalName.equals(ZeeFlowerMenu.STRPETAL_ADD4BRANCH)){
-           List<WItem> branches = getMainInventory().getWItemsByName("branch");
+           List<WItem> branches = ZeeConfig.getMainInventory().getWItemsByName("branch");
            if(branches.size() < 4){
                ZeeConfig.gameUI.msg("Need 4 branches to fuel oven");
                return;
@@ -317,7 +316,7 @@ public class ZeeClickGobManager extends ZeeThread{
                 num = 9;
             final int numCoal = num;
 
-            List<WItem> coal = getMainInventory().getWItemsByName("coal");
+            List<WItem> coal = ZeeConfig.getMainInventory().getWItemsByName("coal");
             if(coal.size() < numCoal){
                 ZeeConfig.gameUI.msg("Need "+numCoal+" coal to fuel smelter");
                 return;
@@ -346,12 +345,6 @@ public class ZeeClickGobManager extends ZeeThread{
                 }
             }.start();
         }
-    }
-
-    public static Inventory getMainInventory() {
-        if(mainInv==null)
-            mainInv = ZeeConfig.getWindow("Inventory").getchild(Inventory.class);
-        return mainInv;
     }
 
     private boolean isFuelAction() {
@@ -533,7 +526,7 @@ public class ZeeClickGobManager extends ZeeThread{
     }
 
     public static boolean isInventoryFull() {
-        return getMainInventory().getNumberOfFreeSlots() == 0;
+        return ZeeConfig.getMainInventory().getNumberOfFreeSlots() == 0;
     }
 
     public static void destroyGob(Gob gob) {

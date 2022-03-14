@@ -12,6 +12,7 @@ public class ZeeClickItemManager extends ZeeThread{
     private final WItem wItem;
     private Coord coord;
     String itemName;
+    String itemBasename;
     String leftHandItemName, rightHandItemName, itemSourceWindow;
     boolean cancelManager = false;
     public static Equipory equipory;
@@ -37,12 +38,13 @@ public class ZeeClickItemManager extends ZeeThread{
         rightHandItemName = (equipory.rightHand==null ? "" : equipory.rightHand.item.getres().name);
         try{
             itemName = wItem.item.getres().name;//clicked item, started manager
+            itemBasename = wItem.item.getres().basename();
             itemSourceWindow = wItem.getparent(Window.class).cap.text;//save source window name before pickup
         }catch (NullPointerException e){
             //error caused by midClicking again before task ending
             cancelManager = true;
         }
-        //println(itemName +"  "+ wItem.c.div(33)+"  "+ZeeConfig.getCursorName());
+        println(itemName +"  "+ wItem.c.div(33)+"  "+ZeeConfig.getCursorName());
     }
 
     @Override

@@ -37,6 +37,10 @@ public class ZeeSeedFarmingManager extends ZeeThread{
         wItem = inv.getWItemByGItem(gItem);
     }
 
+    public void run(){
+        startFarming();
+    }
+
     public static void resetInitialState() {
         //println(">reset initial state");
         busy = false;
@@ -53,22 +57,24 @@ public class ZeeSeedFarmingManager extends ZeeThread{
      */
     private boolean updateSeedPileReference() {
         List<WItem> items = inv.getWItemsByName(gItemSeedBasename);
+        int seeds;
         for (WItem item : items) {
-            if (getSeedsAmount(item.item) >= 5){
+            seeds = getSeedsAmount(item.item);
+            if (seeds >= 5){
                 // seed-pile big enough for planting
                 wItem = item;
                 gItem = item.item;
+                //println("updateSeed > plantable > "+seeds);
                 return true;
             }
         }
         wItem = items.get(0);
         gItem = wItem.item;
+        seeds = getSeedsAmount(gItem);
+        //println("updateSeed > not plantable > "+seeds);
         return false;
     }
 
-    public void run(){
-        startFarming();
-    }
 
     public static void testBarrelsTiles(boolean allBarrels) {
         //highlight barrels in range
@@ -118,7 +124,7 @@ public class ZeeSeedFarmingManager extends ZeeThread{
                     if(!isInventoryFull()) {
                         harvestPlants();
                     }else {
-                        //println("harvest done, inv full, out of barrels?");
+                        println("harvest done, inv full, out of barrels?");
                         isHarvestDone = true;
                     }
                 }else{
@@ -132,10 +138,11 @@ public class ZeeSeedFarmingManager extends ZeeThread{
             if(ZeeSeedFarmingManager.farmerCbReplant) {
                 isPlantingDone = false;
                 while (busy && !isPlantingDone) {
-                    //println("> planting loop");
+                    println("> planting loop");
                     if (getTotalSeedAmount() < 5) {
-                        //println("total seeds < 5, get from barrels");
+                        println("total seeds < 5, get from barrels");
                         if (!getSeedsFromMultipleBarrels(gItemSeedBasename)) {
+                            println("planting done, out of seeds");
                             isPlantingDone = true;
                             break;
                         }
@@ -146,14 +153,23 @@ public class ZeeSeedFarmingManager extends ZeeThread{
                         // player idle, 5+ seeds
                         if (getNumberOfSeedItems() == 1) {
                             // player idle, 5+ seeds, 1 seed-pile, area is fully planted
+                            println("planting done, 1 plantable seedpile");
                             isPlantingDone = true;
-                            println("planting done");
+                            break;
                         }else{
-                            // player idle, 5+ seeds, 2+ seed-piles, area probably still need planting
-                            println("store small seed-piles and try planting again ");
-                            storeSeedsInBarrel(); //store and try planting one more time
+                            // player idle, 5+ seeds, 2+ seed-piles, area may still need planting
+                            int plantablePiles = getNumPlantableSeedPiles();
+                            if (plantablePiles == 0) {
+                                println("no plantable piles, store and try again ");
+                                storeSeedsInBarrel(); //store and try planting one more time
+                            }else{
+                                println("planting done, 1+ plantable seedpiles");
+                                isPlantingDone = true;
+                                break;
+                            }
                         }
                     }
+                    //else restart plant loop
                 }
 
                 //final store barrel
@@ -164,6 +180,12 @@ public class ZeeSeedFarmingManager extends ZeeThread{
             e.printStackTrace();
         }
         resetInitialState();
+    }
+
+    private int getNumPlantableSeedPiles() {
+        List<WItem> plantablePiles = ZeeConfig.getMainInventory().getWItemsByName(gItemSeedBasename);
+        plantablePiles.removeIf(w -> (getSeedsAmount(w.item) < 5));
+        return plantablePiles.size();
     }
 
     private boolean getSeedsFromMultipleBarrels(String seedBaseName) {
@@ -240,7 +262,7 @@ public class ZeeSeedFarmingManager extends ZeeThread{
             ZeeConfig.gameUI.map.wdgmsg("sel", ZeeConfig.savedTileSelStartCoord, ZeeConfig.savedTileSelEndCoord, ZeeConfig.savedTileSelModflags);
             return true;
         }else{
-            println("couldn't activate planting cursor?");
+            println("could not plant seed (small seedpiles?)");
         }
         return false;
     }
@@ -296,7 +318,7 @@ public class ZeeSeedFarmingManager extends ZeeThread{
 
     public static boolean activateCursorPlantGItem(GItem gi) {
         //haven.GItem@3a68ee9c ; iact ; [(23, 16), 1]
-        println("activateCursorPlantGItem > "+gi+", seeds = "+getSeedsAmount(gi));
+        //println("activateCursorPlantGItem > "+gi+", seeds = "+getSeedsAmount(gi));
         ZeeClickItemManager.gItemAct(gi, UI.MOD_SHIFT);
         return waitCursor(ZeeConfig.CURSOR_HARVEST);
     }

@@ -65,6 +65,7 @@ public class ZeeConfig {
     public static Button btnMkWndSearchInput, btnMkWndBack, btnMkWndFwd, btnMkWndDel;
     public static GobIcon.SettingsWindow.IconList iconList;
     private static Dropbox<String> iconListFilterBox;
+    private static Inventory mainInv;
 
     public static String playingAudio = null;
     public static String uiMsgTextQuality, uiMsgTextBuffer;
@@ -1348,7 +1349,7 @@ public class ZeeConfig {
     //reset state
     public static void resetCharSelected() {
         resetBeltState();
-        ZeeClickGobManager.mainInv = null;
+        mainInv = null;
         ZeeClickItemManager.equipory = null;
     }
 
@@ -1815,5 +1816,11 @@ public class ZeeConfig {
 
     public static Gob getClosestGobName(String name) {
         return getClosestGob(findGobsByNameContains(name));
+    }
+
+    public static Inventory getMainInventory() {
+        if(mainInv==null)
+            mainInv = ZeeConfig.getWindow("Inventory").getchild(Inventory.class);
+        return mainInv;
     }
 }
