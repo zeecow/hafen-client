@@ -16,6 +16,7 @@ import java.lang.reflect.Modifier;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 import static haven.OCache.posres;
@@ -212,28 +213,6 @@ public class ZeeConfig {
     public static HashMap<String,Color> mapCategoryColor = initMapCategoryColor();
     public static HashMap<String,Coord> mapWindowPos = initMapWindowPos();
     public static HashMap<Gob,Integer> mapGobTextId = new HashMap<Gob,Integer>();
-
-
-    public static void checkRemoteWidget(String type, Widget wdg) {
-
-        //Cattle Roster
-        if(type.contains("rosters/") && ZeeConfig.cattleRosterHeightPercentage <1.0){
-
-            //resize "window"
-            wdg.resize(wdg.sz.x, (int)(wdg.sz.y * ZeeConfig.cattleRosterHeightPercentage));
-
-            //reposition buttons
-            int y = -1;
-            for (Widget w: wdg.children()) {
-                if(w.getClass().getSimpleName().contentEquals("Button")){
-                    if(y==-1) { //calculate once
-                        y = (int) (w.c.y * ZeeConfig.cattleRosterHeightPercentage) - (int)(w.sz.y*0.6);
-                    }
-                    w.c.y = y;
-                }
-            }
-        }
-    }
 
 
     private static boolean isSpriteKind(Gob gob, String... kind) {
@@ -684,15 +663,69 @@ public class ZeeConfig {
         windowInvMain.pack();
     }
 
+
     public static void windowAdded(Window window) {
+
         String windowTitle = window.cap.text;
-        if(windowTitle.contains("Equipment")) {
+
+        if(windowTitle.equals("Equipment")) {
             windowEquipment = window;
-        }else if(windowTitle.contains("Inventory")) {
+        }else if(windowTitle.equals("Inventory")) {
             windowInvMain = window;
+        }else if(windowTitle.equals("Barter Stand")){
+            windowModBarterStand(window);
+        } else if (isWindowAnimalStats(windowTitle)){
+            windowModAnimalStats(window, windowTitle);
         }
 
-        //reposition window if saved
+        windowReposition(window,windowTitle);
+
+        windowModOrganizeButton(window, windowTitle);
+    }
+
+    
+    public static void checkRemoteWidget(String type, Widget wdg) {
+        //Cattle Roster
+        if(type.contains("rosters/") && ZeeConfig.cattleRosterHeightPercentage <1.0){
+            wdg.resize(wdg.sz.x, (int)(wdg.sz.y * ZeeConfig.cattleRosterHeightPercentage));//resize "window"
+            int y = -1;
+            for (Widget w: wdg.children()) { //reposition buttons
+                if(w.getClass().getSimpleName().contentEquals("Button")){
+                    if(y==-1) { //calculate once
+                        y = (int) (w.c.y * ZeeConfig.cattleRosterHeightPercentage) - (int)(w.sz.y*0.6);
+                    }
+                    w.c.y = y;
+                }
+            }
+        }
+    }
+
+
+    private static void windowModBarterStand(Window window) {
+        int v = 20;
+        window.children(Button.class).forEach(button -> {
+            String buttonName = button.text.text;
+            if (buttonName.equalsIgnoreCase("x"))
+                return;//skip close button
+            if(buttonName.contains("Resign"))
+                button.c = button.c.addy( -(v * 5) );
+            else
+                button.c = button.c.addy( - v );//change, buy,
+        });
+        AtomicInteger i = new AtomicInteger(0);
+        window.children().forEach(el -> {
+            if (el.getClass().getSimpleName().equals("Shopbox")){
+                el.sz = el.sz.addy( - v );
+                if ( i.get() > 0 )
+                    el.c = el.c.addy( - (v * i.get()) );
+                i.getAndIncrement();
+            }
+        });
+        window.resize(380,440);
+    }
+
+
+    private static void windowReposition(Window window, String windowTitle) {
         Coord c;
         if(rememberWindowsPos && !(window instanceof MapWnd) ){
             if(isMakewindow(window)){
@@ -703,29 +736,29 @@ public class ZeeConfig {
                 window.c = c;
             }
         }
+    }
 
-        //tamed animal window
-        windowTamedAnimal(window,windowTitle);
 
-        //show organize button if duplicate windows
+    /*
+        show organize button for duplicate windows
+     */
+    private static void windowModOrganizeButton(Window window, String windowTitle) {
         String singleWindows = "Craft,Inventory,Character,Options,Kith & Kin,Equipment";
         if(!singleWindows.contains(windowTitle)) { // avoid searching multiple Windows
             List<Window> wins= getWindows(windowTitle);
             if (wins.size() > 1) {
                 //add organize button
                 window.add(
-                    new ZeeWindow.ZeeButton(25,
-                    ZeeWindow.ZeeButton.TEXT_ORGANIZEWINDOWS),
-                    window.cbtn.c.x-25,
-                    window.cbtn.c.y
+                        new ZeeWindow.ZeeButton(25,
+                                ZeeWindow.ZeeButton.TEXT_ORGANIZEWINDOWS),
+                        window.cbtn.c.x-25,
+                        window.cbtn.c.y
                 );
             }
         }
     }
 
-    private static void windowTamedAnimal(Window window, String windowTitle) {
-        if (!isWindowTamedAnimal(windowTitle))
-            return;
+    private static void windowModAnimalStats(Window window, String windowTitle) {
 
         TextEntry textEntryTop = window.getchild(TextEntry.class);
         Label[] labels = window.children(Label.class).stream().toArray(Label[] ::new);
@@ -820,7 +853,7 @@ public class ZeeConfig {
         return vals;
     }
 
-    public static boolean isWindowTamedAnimal(String windowTitle) {
+    public static boolean isWindowAnimalStats(String windowTitle) {
         String list = "Sow,Hog,Cow,Bull,Stallion,Mare,Nanny,Billy,Ewe,Ram";
         return list.contains(windowTitle);
     }
@@ -1312,7 +1345,7 @@ public class ZeeConfig {
         if (text.contains("Quality")) {
             uiMsgTextQuality = text;
             String ql = uiMsgTextQuality.replaceAll("[^0-9]", "");
-            ZeeConfig.addGobText(ZeeConfig.lastMapViewClickGob, ql, 0,255,0,255,5);
+            ZeeConfig.addGobText(ZeeConfig.lastMapViewClickGob, ql, 0,255,0,255,0);
         }else if(uiMsgTextQuality!=null && !uiMsgTextQuality.isEmpty() && !text.contains("Memories")){
             uiMsgTextBuffer += ", " + text;
             gameUI.msg(uiMsgTextQuality + uiMsgTextBuffer);
