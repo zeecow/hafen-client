@@ -230,10 +230,12 @@ public class ZeeSeedFarmingManager extends ZeeThread{
         while(!isBarrelEmpty(barrel) && !isInventoryFull()){
             ZeeClickGobManager.gobClick(barrel, 3, UI.MOD_SHIFT);
             //TODO: waitInvCHanges
-            Thread.sleep(PING_MS+100);
+            Thread.sleep(PING_MS*2);
         }
-        if(waitHoldingItem(4000))//store remaining holding item
-            ZeeClickGobManager.gobItemAct(lastBarrel, 0);
+        if(waitHoldingItem(4000)) {//store remaining holding item
+            ZeeClickGobManager.gobItemAct(barrel, 0);
+            Thread.sleep(1000);
+        }
         println("getSeedsFromBarrel() > holding item = "+ZeeConfig.isPlayerHoldingItem());
         return getTotalSeedAmount() >= 5;
     }
