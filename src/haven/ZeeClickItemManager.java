@@ -44,7 +44,7 @@ public class ZeeClickItemManager extends ZeeThread{
             //error caused by midClicking again before task ending
             cancelManager = true;
         }
-        println(itemName +"  "+ wItem.c.div(33)+"  "+ZeeConfig.getCursorName());
+        //println(itemName +"  "+ wItem.c.div(33)+"  "+ZeeConfig.getCursorName());
     }
 
     @Override
