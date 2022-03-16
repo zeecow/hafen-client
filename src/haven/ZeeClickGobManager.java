@@ -93,7 +93,10 @@ public class ZeeClickGobManager extends ZeeThread{
 
         String gobName = gob.getres().name;
 
-        if(gobName.endsWith("terobjs/oven")) {
+        if (petalName.equals(ZeeFlowerMenu.STRPETAL_LIFTUPGOB)){
+            liftGob(gob);
+        }
+        else if(gobName.endsWith("terobjs/oven")) {
             addFuelToGob(gob,petalName);
         }
         else if(gobName.endsWith("terobjs/smelter")){
@@ -121,13 +124,56 @@ public class ZeeClickGobManager extends ZeeThread{
         else if (isBarrelTakeAll(gob)) {
             if (petalName.equals(ZeeFlowerMenu.STRPETAL_BARRELTAKEALL)) {
                 barrelTakeAllSeeds(gob);
-            }else if (petalName.equals(ZeeFlowerMenu.STRPETAL_LIFTUPGOB)){
-                liftGob(gob);
             }
+        }
+        else if (petalName.equals(ZeeFlowerMenu.STRPETAL_DESTROYTREELOG2) || petalName.equals(ZeeFlowerMenu.STRPETAL_DESTROYTREELOG3) || petalName.equals(ZeeFlowerMenu.STRPETAL_DESTROYTREELOG4)){
+            destroyTreelogs(gob,petalName);
         }
         else{
             println("chooseGobFlowerMenu > unkown case");
         }
+    }
+
+    private static void destroyTreelogs(Gob firstTreelog, String petalName) {
+        if (!ZeeClickItemManager.isItemEquipped("/bonesaw") || ZeeClickItemManager.isItemEquipped("/saw-m")){
+            ZeeConfig.msg("need bone saw equipped, no metal saw");
+            return;
+        }
+        new ZeeThread(){
+            public void run() {
+                try {
+                    waitNoFlowerMenu();
+                    Gob treelog = firstTreelog;
+                    String treelogName = treelog.getres().name;
+                    int logs = 2;
+                    if (petalName.equals(ZeeFlowerMenu.STRPETAL_DESTROYTREELOG3))
+                        logs = 3;
+                    else if (petalName.equals(ZeeFlowerMenu.STRPETAL_DESTROYTREELOG4))
+                        logs = 4;
+                    ZeeConfig.isDestroyingTreelogs = true;
+                    while (logs>0 && !ZeeConfig.clickCancelTask()){
+                        ZeeConfig.addPlayerText("destroying "+logs+" treelog(s)");
+                        clickGobPetal(treelog,"Make boards");
+                        waitNoFlowerMenu();
+                        waitStaminaIdleMs(3500);//no stam change means log is done
+                        if (waitGobRemovedSeconds(treelog,10) && !ZeeConfig.clickCancelTask()){
+                            logs--;
+                            treelog = ZeeConfig.getClosestGobName(treelogName);
+                        }else{
+                            if (ZeeConfig.clickCancelTask()) {
+                                ZeeConfig.msg("destroy treelog canceled by click");
+                                println("destroy treelog canceled by click");
+                            }
+                            logs = 0;
+                        }
+                    }
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+                ZeeConfig.isDestroyingTreelogs = false;
+                ZeeConfig.removePlayerText();
+            }
+        }.start();
     }
 
 
@@ -138,7 +184,7 @@ public class ZeeClickGobManager extends ZeeThread{
 
 
         if(gobName.endsWith("terobjs/oven")){
-            menu = new ZeeFlowerMenu(gob,ZeeFlowerMenu.STRPETAL_ADD4BRANCH);
+            menu = new ZeeFlowerMenu(gob, ZeeFlowerMenu.STRPETAL_ADD4BRANCH);
         }
         else if(gobName.endsWith("terobjs/smelter")){
             menu = new ZeeFlowerMenu(gob,ZeeFlowerMenu.STRPETAL_ADD9COAL, ZeeFlowerMenu.STRPETAL_ADD12COAL);
@@ -147,13 +193,19 @@ public class ZeeClickGobManager extends ZeeThread{
             menu = new ZeeFlowerMenu(gob,ZeeFlowerMenu.STRPETAL_REMOVEPLANT, ZeeFlowerMenu.STRPETAL_REMOVEALLPLANTS);
         }
         else if (isGobTree()){
-            menu = new ZeeFlowerMenu(gob,ZeeFlowerMenu.STRPETAL_REMOVETREEANDSTUMP);
+            menu = new ZeeFlowerMenu(gob, ZeeFlowerMenu.STRPETAL_REMOVETREEANDSTUMP);
         }
         else if (isGobCrop()) {
-            menu = new ZeeFlowerMenu(gob,ZeeFlowerMenu.STRPETAL_SEEDFARMER,ZeeFlowerMenu.STRPETAL_CURSORHARVEST);
+            menu = new ZeeFlowerMenu(gob,ZeeFlowerMenu.STRPETAL_SEEDFARMER, ZeeFlowerMenu.STRPETAL_CURSORHARVEST);
         }
         else if (isBarrelTakeAll()) {
-            menu = new ZeeFlowerMenu(gob,ZeeFlowerMenu.STRPETAL_BARRELTAKEALL,ZeeFlowerMenu.STRPETAL_LIFTUPGOB);
+            menu = new ZeeFlowerMenu(gob,ZeeFlowerMenu.STRPETAL_BARRELTAKEALL, ZeeFlowerMenu.STRPETAL_LIFTUPGOB);
+        }
+        else if (isDestroyTreelog()) {
+            menu = new ZeeFlowerMenu( gob,
+                ZeeFlowerMenu.STRPETAL_LIFTUPGOB, ZeeFlowerMenu.STRPETAL_DESTROYTREELOG2,
+                ZeeFlowerMenu.STRPETAL_DESTROYTREELOG3, ZeeFlowerMenu.STRPETAL_DESTROYTREELOG4
+            );
         }
         else{
             showMenu = false;
@@ -166,6 +218,12 @@ public class ZeeClickGobManager extends ZeeThread{
         }
 
         return showMenu;
+    }
+
+    private boolean isDestroyTreelog() {
+        if(isGobTreeLog() && ZeeClickItemManager.isItemEquipped("bonesaw"))
+            return true;
+        return false;
     }
 
     private void openGateWheelbarrow(Gob gate) {

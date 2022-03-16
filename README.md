@@ -17,9 +17,13 @@ features:
  - icon list categs
  - mid click object/item for small tasks:
    - MidClick obj: [inspect] , [Giddyup!] , [light torch], [toggle barrel label]
-     - Long MidClick obj: [lift up] , [Context Menu for oven/smelter/tree/plant], [take all from stockpile]
+     - Long MidClick obj: [Context Menu*], [lift up] , [take all from stockpile]
    - MidClick item: [sort-transfer] , [pick-up all] , [quick-equip from belt], [seed-planting cursor]
-     - Long MidClick item: [sort-transfer inverse] , [Context Menu: kill cocoons, feast all food], [equip fishing item and recast]  
+     - Long MidClick item: [Context Menu*], [sort-transfer inverse], [equip fishing item and recast]
+   - Context menus 
+     - obj: add branch to oven, add coal to smelter, remove tree and stump, remove trellis plant(s), destroy treelogs(if bonesaw is equipped)
+     - item: kill all cocoons, feast all food
+
 
 other stuff:
  - autodrop mined items, seeds, soil

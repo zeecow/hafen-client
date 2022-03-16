@@ -277,24 +277,26 @@ public class ZeeThread  extends Thread{
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        //println("waitStaminaIdleMs > ret "+(timeoutMs <= 0));
+        println("waitStaminaIdleMs > ret="+(timeoutMs <= 0));
         return (timeoutMs <= 0);
     }
 
     public static boolean waitGobRemoved(Gob gob){
         try{
+            println("waitGobRemoved > enter loop");
             while(!ZeeConfig.isGobRemoved(gob)){
-                Thread.sleep(PING_MS);
+                Thread.sleep(1000);
             }
         }catch (Exception e){
             e.printStackTrace();
         }
+        println("waitGobRemoved > ret="+ZeeConfig.isGobRemoved(gob));
         return ZeeConfig.isGobRemoved(gob);
     }
 
     public static boolean waitGobRemovedSeconds(Gob gob, int timeoutSeconds){
+        long timeoutMs = timeoutSeconds * 1000L;
         try{
-            long timeoutMs = timeoutSeconds * 1000L;
             while(timeoutMs>=0 && !ZeeConfig.isGobRemoved(gob)){
                 timeoutMs -= PING_MS;
                 Thread.sleep(PING_MS);
@@ -302,7 +304,7 @@ public class ZeeThread  extends Thread{
         }catch (Exception e){
             e.printStackTrace();
         }
-        //println("returning "+(gob==null));
+        println("waitGobRemovedSeconds > ret="+ZeeConfig.isGobRemoved(gob)+", timeoutMs="+timeoutMs);
         return ZeeConfig.isGobRemoved(gob);
     }
 

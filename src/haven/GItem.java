@@ -179,31 +179,39 @@ public class GItem extends AWidget implements ItemInfo.SpriteOwner, GSprite.Owne
 			{
 				this.wdgmsg("drop", Coord.z);
 			}
-		}else if( ZeeConfig.farmerMode ) {
+		}
+		else if( ZeeConfig.farmerMode ) {
 			if(ZeeSeedFarmingManager.busy) {
 				//drop non-seed crops
 				if (!basename.startsWith("seed-") && ZeeConfig.isItemCrop(basename)) {
 					this.wdgmsg("drop", Coord.z);
 				}
-			}else if(basename.startsWith("seed-") && this.parent instanceof Inventory) {
+			}
+			else if(basename.startsWith("seed-") && this.parent instanceof Inventory) {
 				//farmermode not busy
 				if (ZeeConfig.savedTileSelEndCoord == null) {
 					//cancel farmermode
 					ZeeConfig.println("> Farmer mode: no tile selection. Canceling...");
 					ZeeConfig.farmerMode = false;
 					ZeeSeedFarmingManager.resetInitialState();
-				} else {
+				}
+				else {
 					//start farmermode
 					new ZeeSeedFarmingManager(this, basename).start();
 				}
 			}
-		}else if( ZeeConfig.dropSeeds && basename.startsWith("seed-") && this.parent instanceof Inventory){
+		}
+		else if (ZeeConfig.isDestroyingTreelogs && basename.startsWith("board-")){
+			this.wdgmsg("drop", Coord.z);
+		}
+		else if( ZeeConfig.dropSeeds && basename.startsWith("seed-") && this.parent instanceof Inventory){
 			//drop seeds
 			Inventory inv = (Inventory) this.parent;
 			if(inv.getNumberOfFreeSlots() < 3){
 				inv.dropItemsByName(basename);
 			}
-		}else if( ZeeConfig.dropSoil && basename.startsWith("soil") && this.parent instanceof Inventory) {
+		}
+		else if( ZeeConfig.dropSoil && basename.startsWith("soil") && this.parent instanceof Inventory) {
 			//drop soil
 			Inventory inv = (Inventory) this.parent;
 			inv.dropItemsByName(basename);

@@ -14,6 +14,9 @@ public class ZeeFlowerMenu extends FlowerMenu{
     public static final String STRPETAL_KILLALL = "Kill all";
     public static final String STRPETAL_EATALL = "Eat all";
     public static final String STRPETAL_LIFTUPGOB = "Lift up";
+    public static final String STRPETAL_DESTROYTREELOG2 = "Destroy treelog x2";
+    public static final String STRPETAL_DESTROYTREELOG3 = "Destroy treelog x3";
+    public static final String STRPETAL_DESTROYTREELOG4 = "Destroy treelog x4";
 
     private final Gob gob;
     private final WItem wItem;
