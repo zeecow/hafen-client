@@ -138,7 +138,17 @@ public class ZeeStockpileManager extends ZeeThread{
             waitInvFullOrHoldingItem(mainInv, 3000);// boards/boulder takes longer to produce item
 
             if (gameUI.vhand == null) {//if not holding item
-                List<WItem> invItems = mainInv.getWItemsByName(ZeeConfig.lastInvItemBaseName);
+                /*
+                    gfx/invobjs/wblock-maple
+                    gfx/invobjs/board-maple
+                 */
+                List<WItem> invItems;
+                if (lastPetalName.equals("Make boards"))
+                    invItems = mainInv.getWItemsByName("gfx/invobjs/board-");//avoid spiral curio
+                else if (lastPetalName.equals("Chop into blocks"))
+                    invItems = mainInv.getWItemsByName("gfx/invobjs/wblock-");//avoid splinter curio
+                else
+                    invItems = mainInv.getWItemsByName(ZeeConfig.lastInvItemBaseName);//get last inv item without checking
                 if(invItems.size()==0) {
                     //no inventory items, try getting more from source
                     if( gobSource==null || !ZeeClickGobManager.clickGobPetal(gobSource, lastPetalName) ){
@@ -148,12 +158,12 @@ public class ZeeStockpileManager extends ZeeThread{
                     continue;
                 }
                 WItem wItem = invItems.get(0);
-                if (ZeeClickItemManager.pickUpItem(wItem)) { //pickup mulberry leaf
+                if (ZeeClickItemManager.pickUpItem(wItem)) { //pickup inv item
                     ZeeClickGobManager.gobItemAct(gobPile, UI.MOD_SHIFT);//right click stockpile
                     if (waitNotHoldingItem()) {
                         //piling successfull, try getting more from source
                         if( gobSource==null || !ZeeClickGobManager.clickGobPetal(gobSource, lastPetalName) ){
-                            println("no more source? gobSource2 = "+gobSource);
+                            println("gob source consumed = "+gobSource);
                             pileAndExit();
                         }
                     } else {
