@@ -1862,4 +1862,16 @@ public class ZeeConfig {
             mainInv = ZeeConfig.getWindow("Inventory").getchild(Inventory.class);
         return mainInv;
     }
+
+    public static void cancelFlowerMenu() {
+        try {
+            FlowerMenu fm = ZeeConfig.gameUI.ui.root.getchild(FlowerMenu.class);
+            if (fm != null) {
+                fm.choose(null);
+                fm.destroy();
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
 }

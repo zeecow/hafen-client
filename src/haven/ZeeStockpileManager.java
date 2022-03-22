@@ -297,17 +297,9 @@ public class ZeeStockpileManager extends ZeeThread{
     }
 
 
-    public static void cancelFlowerMenu() throws InterruptedException {
-        FlowerMenu fm = ZeeConfig.gameUI.ui.root.getchild(FlowerMenu.class);
-        if(fm != null) {
-            fm.choose(null);
-            fm.destroy();
-        }
-    }
-
 
     private static void pileItems() throws InterruptedException {
-        cancelFlowerMenu();
+        ZeeConfig.cancelFlowerMenu();
         if (gameUI.vhand == null) {//if not holding item
             List<WItem> invItems = mainInv.getWItemsByName(ZeeConfig.lastInvItemBaseName);
             if(invItems.size()==0) {

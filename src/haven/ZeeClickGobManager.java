@@ -157,8 +157,9 @@ public class ZeeClickGobManager extends ZeeThread{
                         ZeeConfig.addPlayerText("destroying "+logs+" treelog(s)");
                         clickGobPetal(treelog,"Make boards");
                         waitNoFlowerMenu();
-                        waitStaminaIdleMs(3500);//no stam change means log is done
-                        if (waitGobRemovedSeconds(treelog,10) && !ZeeConfig.clickCancelTask()){
+                        waitStaminaIdleMs(3500);//no stam change means treelog is done
+                        //if (waitGobRemovedSeconds(treelog,10) && !ZeeConfig.clickCancelTask()){
+                        if (!gobHasFlowermenu(treelog) && !ZeeConfig.clickCancelTask()){
                             logs--;
                             treelog = ZeeConfig.getClosestGobName(treelogName);
                         }else{
@@ -681,6 +682,24 @@ public class ZeeClickGobManager extends ZeeThread{
             return choosePetal(getFlowerMenu(), petalName);
         }else{
             println("clickGobPetal2 > no flower menu?");
+            return false;
+        }
+    }
+
+    // if gob has flowermenu returns true
+    public static boolean gobHasFlowermenu(Gob gob) {
+        if (gob == null) {
+            println(">gobHasFlowermenu gob null");
+            return false;
+        }
+        gobClick(gob, 3);
+        if (waitFlowerMenu()) {
+            // menu opened means gob exist
+            ZeeConfig.cancelFlowerMenu();
+            waitNoFlowerMenu();
+            return true;
+        } else {
+            println("gobHasFlowermenu > cant click gob");
             return false;
         }
     }
