@@ -312,11 +312,11 @@ public class ZeeClickGobManager extends ZeeThread{
                     clickGobPetal(gob,"Chop");
                     if(waitStaminaIdleMs(3000)){
                         Gob stump = ZeeConfig.getClosestGob(ZeeConfig.findGobsByNameEndsWith("stump"));
-                        if (stump!=null) {
+                        if (stump!=null && ZeeConfig.distanceToPlayer(stump) > 25) {
                             ZeeConfig.addGobText(stump,"stump");
                             removeStump(stump);
                         }else {
-                            println("stump == null");
+                            println("no stump close");
                         }
                     }
                 } catch (Exception e) {
