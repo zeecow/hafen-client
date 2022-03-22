@@ -12,6 +12,7 @@ import java.awt.image.BufferedImage;
 import java.awt.image.RenderedImage;
 import java.io.*;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
@@ -84,6 +85,7 @@ public class ZeeConfig {
     public static String lastInvItemBaseName;
     public static long lastInvItemMs;
     public static Coord lastUiClickCoord;
+    public static Class<?> classMSRad;
 
     public static boolean actionSearchGlobal = Utils.getprefb("actionSearchGlobal", true);
     public static int aggroRadiusTiles = Utils.getprefi("aggroRadiusTiles", 11);
@@ -1085,30 +1087,33 @@ public class ZeeConfig {
         }).start();
     }
 
+    public static void toggleMineSupport() {
+        try {
+            Field field = classMSRad.getDeclaredField("show");
+            Method method = classMSRad.getMethod("show",boolean.class);
+            //field.setBoolean(classMSRad, !field.getBoolean(classMSRad));
+            method.invoke(classMSRad, !field.getBoolean(classMSRad));
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
     public static void checkClassMod(String name, Class<?> qlass){
         try {
 
             if(name.equals("haven.res.ui.tt.q.quality.Quality")) {
-
-                /*
-                    Set Quality toggle on
-                 */
+                //Set Quality toggle on
                 qlass.getDeclaredField("show").setBoolean(qlass, true);
-
-            }else if(name.equals("haven.res.gfx.fx.bprad.BPRad")){
-
-                /*
-                    Change radius color
-                 */
-                setFinalStatic(
-                    qlass.getDeclaredField("smat"),
-                    new BaseColor(new Color(139, 139, 185, 48))
-                );
-                setFinalStatic(
-                    qlass.getDeclaredField("emat"),
-                    Pipe.Op.compose(new Pipe.Op[]{new BaseColor(new Color(139, 139, 185, 48)), new States.LineWidth(1)})
-                );
-
+            }
+            else if(name.equals("haven.res.gfx.fx.bprad.BPRad")){
+                //Change radius color
+                setFinalStatic( qlass.getDeclaredField("smat"),
+                    new BaseColor(new Color(139, 139, 185, 48)) );
+                setFinalStatic( qlass.getDeclaredField("emat"),
+                    Pipe.Op.compose(new Pipe.Op[]{new BaseColor(new Color(139, 139, 185, 48)), new States.LineWidth(1)})  );
+            }
+            else if (name.equals("haven.res.gfx.fx.msrad.MSRad")){
+                classMSRad = qlass;
             }
 
         } catch (Exception e) {

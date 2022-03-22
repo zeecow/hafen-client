@@ -16,7 +16,7 @@ features:
  - seed-farmer helper: no pathfinding, buggy (ctrlLongMidClick crop)
  - icon list categs
  - mid click object/item for small tasks:
-   - MidClick obj: [inspect] , [Giddyup!] , [light torch], [toggle barrel label]
+   - MidClick obj: [inspect] , [Giddyup!] , [light torch], [toggle barrels label], [toggle mine support radius]
      - Long MidClick obj: [Context Menu*], [lift up] , [take all from stockpile]
    - MidClick item: [sort-transfer] , [pick-up all] , [quick-equip from belt], [seed-planting cursor]
      - Long MidClick item: [Context Menu*], [sort-transfer inverse], [equip fishing item and recast]

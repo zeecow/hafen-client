@@ -54,6 +54,8 @@ public class ZeeClickGobManager extends ZeeThread{
                 barrelLabelOn = !barrelLabelOn;
             } else if (isInspectGob()) {
                 inspectGob();
+            } else if (isGobMineSupport()) {
+                ZeeConfig.toggleMineSupport();
             }
         } else {
             /*
@@ -472,6 +474,12 @@ public class ZeeClickGobManager extends ZeeThread{
                 +"/royalthrone,curdingtub,log,/still,/oldtrunk,/anvil,"
                 +"/loom,/swheel,knarr,snekkja,dock,"
                 +"/ttub,/cheeserack,/dreca,/glasspaneframe";
+        return gobNameEndsWith(gobName, list);
+    }
+
+
+    public boolean isGobMineSupport() {
+        String list = "/minebeam,/column,/minesupport";
         return gobNameEndsWith(gobName, list);
     }
 
