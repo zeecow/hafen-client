@@ -32,6 +32,30 @@ public class ZeeClickItemManager extends ZeeThread{
         init(wItem);
     }
 
+    public static void equipAxeChopTree() {
+        /*
+            gfx/invobjs/woodsmansaxe
+            gfx/invobjs/axe-m
+            gfx/invobjs/butcherscleaver
+            gfx/invobjs/stoneaxe
+         */
+        if (isItemEquipped("woodsmansaxe"))
+            return;
+        WItem axe = getBeltWItem("woodsmansaxe");
+        if (axe!=null){
+            equipBeltItem("woodsmansaxe");
+            waitItemEquipped("woodsmansaxe");
+        }else{
+            if (isItemEquipped("axe-m"))
+                return;
+            axe = getBeltWItem("axe-m");
+            if (axe!=null){
+                equipBeltItem("axe-m");
+                waitItemEquipped("axe-m");
+            }
+        }
+    }
+
     private void init(WItem wItem) {
         equipory = ZeeConfig.windowEquipment.getchild(Equipory.class);
         leftHandItemName = (equipory.leftHand==null ? "" : equipory.leftHand.item.getres().name);
@@ -166,6 +190,28 @@ public class ZeeClickItemManager extends ZeeThread{
                 }
 
             }
+            else if (isItemAxe()) {//try switch axe for axe (1handed)
+
+                if (isItemAxe(leftHandItemName) && isItemAxe(rightHandItemName)) {
+                    // unequip 1 of 2 axes, before next steps
+                    if (unequipLeftItem()) {
+                        if(!trySendItemToBelt()) {
+                            equipEmptyHand(); // fall back
+                        }
+                    }
+                }
+                pickUpItem();
+                if (isItemAxe(getLeftHandName())) {
+                    equipLeftOccupiedHand(); //switch left hand axe
+                }else if (isItemAxe(getRightHandName())) {
+                    equipRightOccupiedHand(); // switch right hand axe
+                }else if (isLeftHandEmpty() || isRightHandEmpty()) {
+                    equipEmptyHand();
+                }else {
+                    equipLeftOccupiedHand();//all hands occupied, equip left
+                }
+                trySendItemToBelt();
+            }
             else{// 1handed item
 
                 if(isItemWindowBelt()) { // send to equipory
@@ -178,7 +224,7 @@ public class ZeeClickItemManager extends ZeeThread{
                             pickUpItem();
                             equipLeftOccupiedHand();
                             trySendItemToBelt();
-                        }if(isShield()) {
+                        }else if(isShield()) {
                             //avoid replacing 1handed swords
                             pickUpItem();
                             if (!isOneHandedSword(leftHandItemName)){
@@ -222,7 +268,8 @@ public class ZeeClickItemManager extends ZeeThread{
                         }
                     }
 
-                }else if(isItemWindowEquips()){//send to belt
+                }
+                else if(isItemWindowEquips()){//send to belt
                     pickUpItem();
                     if(!trySendItemToBelt()) {
                         ZeeConfig.gameUI.msg("Belt is full");
@@ -602,9 +649,15 @@ public class ZeeClickItemManager extends ZeeThread{
     private boolean isItemSack() {
         return isItemSack(itemName);
     }
-
-    private boolean isItemSack(String name) {
+    public static boolean isItemSack(String name) {
         return name.endsWith("travellerssack") || name.endsWith("bindle");
+    }
+
+    private boolean isItemAxe() {
+        return isItemAxe(itemName);
+    }
+    public static boolean isItemAxe(String name) {
+        return name.endsWith("woodsmansaxe") || name.endsWith("axe-m") || name.endsWith("butcherscleaver") || name.endsWith("stoneaxe");
     }
 
     private boolean isItemPlantable() {
@@ -716,10 +769,13 @@ public class ZeeClickItemManager extends ZeeThread{
             return getEquipory().rightHand.item.getres().name;
     }
 
-    public static void equipItem(String name) {
+    public static void equipBeltItem(String name) {
         if(ZeeClickItemManager.isItemEquipped(name))
             return;
         WItem item = ZeeClickItemManager.getBeltWItem(name);
-        new ZeeClickItemManager(item).start();//use equipManager logic
+        if (item!=null)
+            new ZeeClickItemManager(item).start();//use equipManager logic
+        else
+            println("itemManager.equipBeltItem() > item '"+name+"' not found");
     }
 }

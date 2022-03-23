@@ -310,10 +310,11 @@ public class ZeeClickGobManager extends ZeeThread{
                 try{
                     ZeeConfig.addGobText(ZeeConfig.getPlayerGob(),"removing tree & stump...");
                     waitNoFlowerMenu();
+                    ZeeClickItemManager.equipAxeChopTree();
                     clickGobPetal(gob,"Chop");
                     if(waitStaminaIdleMs(3000)){
                         Gob stump = ZeeConfig.getClosestGob(ZeeConfig.findGobsByNameEndsWith("stump"));
-                        if (stump!=null && ZeeConfig.distanceToPlayer(stump) > 25) {
+                        if (stump!=null && ZeeConfig.distanceToPlayer(stump) < 25) {
                             ZeeConfig.addGobText(stump,"stump");
                             removeStump(stump);
                         }else {
@@ -329,7 +330,7 @@ public class ZeeClickGobManager extends ZeeThread{
     }
 
     public static void removeStump(Gob gob) {
-        ZeeClickItemManager.equipItem("shovel");
+        ZeeClickItemManager.equipBeltItem("shovel");
         waitItemEquipped("shovel");
         destroyGob(gob);
     }
@@ -487,7 +488,7 @@ public class ZeeClickGobManager extends ZeeThread{
 
     private boolean isLiftGob() {
         if(isGobBush()) {
-            ZeeClickItemManager.equipItem("shovel");
+            ZeeClickItemManager.equipBeltItem("shovel");
             return waitNotHoldingItem();
         }
         if(isGobBoulder())
