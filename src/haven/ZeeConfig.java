@@ -677,8 +677,12 @@ public class ZeeConfig {
             windowInvMain = window;
         }else if(windowTitle.equals("Barter Stand")){
             windowModBarterStand(window);
-        } else if (isWindowAnimalStats(windowTitle)){
+        }else if(isWindowAnimalStats(windowTitle)){
             windowModAnimalStats(window, windowTitle);
+        }
+
+        if(windowTitle.equals("Boil Pepper Drupes")){
+            ZeeCookManager.pepperRecipeBuildUI();
         }
 
         windowReposition(window,windowTitle);
@@ -1407,6 +1411,11 @@ public class ZeeConfig {
 
     public static void craftHistoryAdd(String msg, Object[] args) {
         // haven.MenuGrid@c046fa2, act, [craft, snowball, 0]
+
+        if (msg.contentEquals("act") && args[0].toString().contentEquals("craft") && !args[1].toString().contentEquals("boiledpepper")){
+            ZeeCookManager.exitManager("changed recipe");
+        }
+
         if( isCraftHistoryNavigation || !msg.contentEquals("act") || !args[0].toString().contentEquals("craft"))
             return;
 
@@ -1529,9 +1538,11 @@ public class ZeeConfig {
         lastMapViewClickGobMs = ZeeThread.now();
         if(clickGob!=null) {
             lastMapViewClickGobName = clickGob.getres().name;
-        }
-        if(clickb==2 && clickGob!=null) {
-            new ZeeClickGobManager(pc, mc, clickGob).start();
+            if (ZeeCookManager.pepperRecipeOpen)
+                ZeeCookManager.gobClicked(clickGob,lastMapViewClickGobName,clickb);
+            if(clickb == 2) {
+                new ZeeClickGobManager(pc, mc, clickGob).start();
+            }
         }
     }
 
@@ -1674,12 +1685,18 @@ public class ZeeConfig {
         gameUI.map.wdgmsg("click", Coord.z, Coord.z, btn, 0);
     }
 
-    public static void clickTile(Coord tile) {
-        Coord2d origin = new Coord2d(gameUI.map.player().rc.div(11).floor().mul(11));
-        //Coord2d origin = gameUI.map.player().rc;
-        gameUI.map.wdgmsg("click", tile, origin.floor(posres), 1, 0);
-        //gameUI.map.wdgmsg("click", getCenterScreenCoord(gameUI), origin.add(tile.x * 11, tile.y * 11).add(11 / 2.0, 11 / 2.0).floor(posres), 1, 0);
-        //gameUI.map.pllastcc = origin.add(tile.x * 11, tile.y * 11).add(11 / 2.0, 11 / 2.0);
+    /*
+        //save player origin
+        Coord origin = ZeeConfig.getTileCoord(getPlayerGob());
+        ...
+        //move player back to origin
+        Zeeconfig.clickTile(origin,3);
+     */
+    public static void clickTile(Coord tileCoord, int btn) {
+        gameUI.map.wdgmsg("click", ZeeConfig.getCenterScreenCoord(), tileCoord, btn, 0);
+    }
+    public static Coord getTileCoord(Gob gob){
+        return gob.rc.floor(OCache.posres);
     }
 
     public static Coord coordToTile(Coord2d c) {
@@ -1873,5 +1890,12 @@ public class ZeeConfig {
         }catch (Exception e){
             e.printStackTrace();
         }
+    }
+
+    public static String getBarrelOverlayBasename(Gob barrel){
+        List<String> ols =  ZeeClickGobManager.getOverlayNames(barrel);
+        if(ols.isEmpty())
+            return "";
+        return ols.get(0).replace("gfx/terobjs/barrel-","");
     }
 }

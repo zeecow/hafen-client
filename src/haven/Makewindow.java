@@ -27,7 +27,6 @@
 package haven;
 
 import java.util.*;
-import java.awt.Font;
 import java.awt.Color;
 import java.awt.image.BufferedImage;
 
@@ -168,9 +167,9 @@ public class Makewindow extends Widget {
 	add(new Button(UI.scale(85), "Craft All"), UI.scale(new Coord(360, 75))).action(() -> wdgmsg("make", 1)).setgkey(kb_makeall);
 	pack();
 	this.rcpnm = rcpnm;
+	ZeeConfig.makeWindow = this;
 	ZeeConfig.actionUsed(rcpnm);
 	ZeeConfig.craftHistoryUpdtBtns();
-	ZeeConfig.makeWindow = this;
     }
 
 	int inputCount = 0;
@@ -190,8 +189,14 @@ public class Makewindow extends Widget {
 			ZeeConfig.craftHistoryDelItem();
 		} else if(msg.contentEquals("close")) {
 			ZeeConfig.craftHistorySave();
+			if (ZeeCookManager.pepperRecipeOpen)
+				ZeeCookManager.exitManager("craft window closed");
 			super.wdgmsg(sender, msg, args);
-		} else {
+		} else if (msg.equals("make") && args[0]=="1") {//craft all
+			super.wdgmsg(sender, msg, args);
+			if (ZeeCookManager.pepperRecipeOpen)
+				ZeeCookManager.clickedCraftAll();
+		}else{
 			super.wdgmsg(sender, msg, args);
 		}
 	}

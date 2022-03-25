@@ -88,7 +88,7 @@ public class ZeeSeedFarmingManager extends ZeeThread{
             //tag barrels in tile range
             if(allBarrels  ||  ZeeConfig.distanceToPlayer(gob) <= farmerTxtTilesBarrel * TILE_SIZE) {
                 if (!ZeeClickGobManager.isBarrelEmpty(gob)) {
-                    ZeeConfig.addGobText(gob, getBarrelOverlayBasename(gob));
+                    ZeeConfig.addGobText(gob, ZeeConfig.getBarrelOverlayBasename(gob));
                 }
                 ZeeConfig.addGobColor(gob, 0, 255, 0, 255);
             }
@@ -442,13 +442,6 @@ public class ZeeSeedFarmingManager extends ZeeThread{
         return gItemSeedBasename.replace("seed-","")
                 + " q"
                 + Inventory.getQuality(gItem).intValue();
-    }
-
-    public static String getBarrelOverlayBasename(Gob barrel){
-        List<String> ols =  ZeeClickGobManager.getOverlayNames(barrel);
-        if(ols.isEmpty())
-            return "";
-        return ols.get(0).replace("gfx/terobjs/barrel-","");
     }
 
     // gfx/terobjs/barrel-flax

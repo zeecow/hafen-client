@@ -360,7 +360,7 @@ public class ZeeClickItemManager extends ZeeThread{
     }
 
 
-    public static void chooseItemFlowerMenu(WItem wItem, String petalName) {
+    public static void itemZeeMenuClicked(WItem wItem, String petalName) {
 
         String itemName = wItem.item.getres().name;
 

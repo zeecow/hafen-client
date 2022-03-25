@@ -91,7 +91,7 @@ public class ZeeClickGobManager extends ZeeThread{
     }
 
 
-    public static void chooseGobFlowerMenu(Gob gob, String petalName){
+    public static void gobZeeMenuClicked(Gob gob, String petalName){
 
         String gobName = gob.getres().name;
 
@@ -156,7 +156,7 @@ public class ZeeClickGobManager extends ZeeThread{
                     while (logs>0 && !ZeeConfig.clickCancelTask()){
                         ZeeConfig.addPlayerText("destroying "+logs+" treelog(s)");
                         clickGobPetal(treelog,"Make boards");
-                        waitNoFlowerMenu();
+                        //waitNoFlowerMenu();
                         waitStaminaIdleMs(3500);//no stam change means treelog is done
                         //if (waitGobRemovedSeconds(treelog,10) && !ZeeConfig.clickCancelTask()){
                         if (!gobHasFlowermenu(treelog) && !ZeeConfig.clickCancelTask()){
@@ -243,7 +243,7 @@ public class ZeeClickGobManager extends ZeeThread{
                         double dist = ZeeConfig.distanceToPlayer(wb);
                         ZeeConfig.clickGroundZero();//remove hand cursor
                         liftGob(wb);
-                        waitPlayerIdleFor(1);
+                        //waitPlayerIdleFor(1);
                         dist = ZeeConfig.distanceToPlayer(wb);
                         if (dist==0) {
                             gobClick(gate, 3);
@@ -608,6 +608,7 @@ public class ZeeClickGobManager extends ZeeThread{
     public static void liftGob(Gob gob) {
         ZeeConfig.gameUI.menu.wdgmsg("act", "carry","0");
         gobClick(gob,1);
+        waitPlayerIdleFor(1);
     }
     private void liftGob() {
         liftGob(gob);
@@ -635,6 +636,11 @@ public class ZeeClickGobManager extends ZeeThread{
     }
     public boolean isGobCrop() {
         return isGobCrop(gobName);
+    }
+
+    public static boolean isGobCookContainer(String gobName) {
+        String containers ="cupboard,chest,crate,basket,box,coffer,cabinet";
+        return gobNameEndsWith(gobName,containers);
     }
 
     private static boolean gobNameEndsWith(String gobName, String list) {
@@ -680,9 +686,10 @@ public class ZeeClickGobManager extends ZeeThread{
         }
         gobClick(gob,3);
         if(waitFlowerMenu()){
-            return choosePetal(getFlowerMenu(), petalName);
+            choosePetal(getFlowerMenu(), petalName);
+            return waitNoFlowerMenu();
         }else{
-            println("clickGobPetal2 > no flower menu?");
+            println("clickGobPetal > no flower menu?");
             return false;
         }
     }

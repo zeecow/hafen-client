@@ -43,9 +43,9 @@ public class ZeeFlowerMenu extends FlowerMenu{
             String petalName = opt.name;
             uimsg("cancel");
             if (gob!=null) {
-                ZeeClickGobManager.chooseGobFlowerMenu(gob, petalName);
+                ZeeClickGobManager.gobZeeMenuClicked(gob, petalName);
             }else if (wItem!=null) {
-                ZeeClickItemManager.chooseItemFlowerMenu(wItem, petalName);
+                ZeeClickItemManager.itemZeeMenuClicked(wItem, petalName);
             }
         }
         else
