@@ -1543,13 +1543,16 @@ public class ZeeConfig {
         lastMapViewClickArgs = args;
         lastMapViewClickGob = clickGob;
         lastMapViewClickGobMs = ZeeThread.now();
-        if(clickGob!=null) {
+        if(clickGob!=null) { //clicked gob object
             lastMapViewClickGobName = clickGob.getres().name;
             if (ZeeCookManager.pepperRecipeOpen)
                 ZeeCookManager.gobClicked(clickGob,lastMapViewClickGobName,clickb);
             if(clickb == 2) {
                 new ZeeClickGobManager(pc, mc, clickGob).start();
             }
+        }else{ // clicked ground?
+            if (clickb==2 && ZeeConfig.isPlayerHoldingItem()) // if midclick holding item...
+                ZeeConfig.clickTile(mc.floor(posres),1, 0); // ...mote to tile (ctrl+click)
         }
     }
 
@@ -1701,6 +1704,9 @@ public class ZeeConfig {
      */
     public static void clickTile(Coord tileCoord, int btn) {
         gameUI.map.wdgmsg("click", ZeeConfig.getCenterScreenCoord(), tileCoord, btn, 0);
+    }
+    public static void clickTile(Coord tileCoord, int btn, int mod) {
+        gameUI.map.wdgmsg("click", ZeeConfig.getCenterScreenCoord(), tileCoord, btn, mod);
     }
     public static Coord getTileCoord(Gob gob){
         return gob.rc.floor(OCache.posres);

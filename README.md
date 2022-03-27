@@ -12,10 +12,12 @@ features:
  - reposition map window when compacted/expanded
  - basic inventory item counter
  - animal window name stats generator
- - stockpile helper: mulberry leaves, woodblocks, boards
- - seed-farmer helper: no pathfinding, buggy (ctrlLongMidClick crop)
+ - stockpile manager: mulberry leaves, woodblocks, boards
+ - seed-farmer manager: no pathfinding, buggy (ctrlLongMidClick crop)
+ - cook manager: auto cook pepper and refill cauldron until barrel is empty
  - icon list categs
- - mid click object/item for small tasks:
+ - midclick ground while holding item will move to location (simulates ctrl+click)
+ - midclick object/item for small tasks:
    - MidClick obj: [inspect] , [Giddyup!] , [light torch], [toggle barrels label], [toggle mine support radius]
      - Long MidClick obj: [Context Menu*], [lift up] , [take all from stockpile]
    - MidClick item: [sort-transfer] , [pick-up all] , [quick-equip from belt], [seed-planting cursor]
