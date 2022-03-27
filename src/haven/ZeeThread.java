@@ -260,6 +260,30 @@ public class ZeeThread  extends Thread{
         return (fm == null);
     }
 
+    //  parameters combination may vary depending on player task
+    public static boolean waitStaminaIdleMs(long playerIdleMs, double stamChangeActive, long threadSleepMs) {
+        long timeoutMs = playerIdleMs;
+        double lastStam, stam, absChange;
+        try {
+            stam = lastStam = ZeeConfig.getStamina();
+            while(timeoutMs > 0) {
+                absChange = Math.abs(lastStam - stam);
+                //println(""+absChange);
+                if( absChange >= stamChangeActive) // if stamina changed...
+                    timeoutMs = playerIdleMs; // ...restore timeout
+                else
+                    timeoutMs -= threadSleepMs;
+                Thread.sleep(threadSleepMs);
+                lastStam = stam;
+                stam = ZeeConfig.getStamina();
+            }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        //println("waitStaminaIdleMs > ret="+(timeoutMs <= 0)+" "+timeoutMs);
+        return (timeoutMs <= 0);
+    }
+
     public static boolean waitStaminaIdleMs(long idleMs) {
         long timeoutMs = idleMs;
         double lastStam, stam;
@@ -277,7 +301,7 @@ public class ZeeThread  extends Thread{
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        println("waitStaminaIdleMs > ret="+(timeoutMs <= 0));
+        //println("waitStaminaIdleMs > ret="+(timeoutMs <= 0));
         return (timeoutMs <= 0);
     }
 

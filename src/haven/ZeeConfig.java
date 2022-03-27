@@ -682,7 +682,7 @@ public class ZeeConfig {
         }
 
         if(windowTitle.equals("Boil Pepper Drupes")){
-            ZeeCookManager.pepperRecipeBuildUI();
+            ZeeCookManager.pepperRecipeOpened(window);
         }
 
         windowReposition(window,windowTitle);
@@ -1345,7 +1345,7 @@ public class ZeeConfig {
         - compile multi-line messages into single-line
         - show text ql above gob
      */
-    public static void checkUiMsgText(String text) {
+    public static void checkUiMsg(String text) {
         now = System.currentTimeMillis();
         if(now - lastUiMessageMs > 555) { //new message
             lastUiMessageMs = now;
@@ -1360,6 +1360,11 @@ public class ZeeConfig {
             uiMsgTextBuffer += ", " + text;
             gameUI.msg(uiMsgTextQuality + uiMsgTextBuffer);
         }
+    }
+
+    public static void checkUiErr(String text){
+        if (ZeeCookManager.busy && ZeeCookManager.pepperRecipeOpen && text.contains("You do not have all the ingredients."))
+            ZeeCookManager.exitManager(text);
     }
 
     public static String getCursorName() {
@@ -1411,9 +1416,10 @@ public class ZeeConfig {
 
     public static void craftHistoryAdd(String msg, Object[] args) {
         // haven.MenuGrid@c046fa2, act, [craft, snowball, 0]
+        //println(msg+" > "+ZeeConfig.strArgs(args));
 
-        if (msg.contentEquals("act") && args[0].toString().contentEquals("craft") && !args[1].toString().contentEquals("boiledpepper")){
-            ZeeCookManager.exitManager("changed recipe");
+        if (ZeeCookManager.pepperRecipeOpen && msg.contentEquals("act") && args[0].toString().contentEquals("craft") && !args[1].toString().contentEquals("boiledpepper")){
+            ZeeCookManager.exitManager("changed recipe "+args[1]);
         }
 
         if( isCraftHistoryNavigation || !msg.contentEquals("act") || !args[0].toString().contentEquals("craft"))

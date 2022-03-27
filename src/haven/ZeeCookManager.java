@@ -7,14 +7,29 @@ public class ZeeCookManager extends ZeeThread{
 
     static boolean busy;
     static boolean pepperRecipeOpen;
-    static CheckBox cbAutoCook;
-    static Label labelStatus;
     static Gob gobCauldron, gobBarrel;
     static Set<Gob> gobsContainers = new HashSet<>();
+    static ZeeWindow.ZeeButton cookButton;
 
 
     public ZeeCookManager(){
         busy = true;
+        cookButton.disable(true);
+    }
+
+    public static void pepperRecipeOpened(Window window) {
+        ZeeCookManager.pepperRecipeOpen = true;
+        cookButton = new ZeeWindow.ZeeButton(UI.scale(85),"auto-cook"){
+            public void wdgmsg(String msg, Object... args) {
+                super.wdgmsg(msg, args);
+                if (msg.equals("activate")){
+                    if (!busy)
+                        new ZeeCookManager().start();
+                }
+            }
+        };
+        window.add(cookButton,360,45);
+        cookButton.disable(!isPepperCookReady());
     }
 
 
@@ -24,29 +39,40 @@ public class ZeeCookManager extends ZeeThread{
         try {
             while (busy) {
                 ZeeConfig.addPlayerText("cooking");
-                waitStaminaIdleMs(2000);
+                ZeeConfig.makeWindow.wdgmsg("make",1); // 0==craft, 1==craft all
+                waitStaminaIdleMs(3000,1,500);
                 ZeeConfig.removePlayerText();
                 if (gobBarrel != null) {
                     if (ZeeConfig.getBarrelOverlayBasename(gobBarrel).equals("water")) {
 
+                        if(!busy)
+                            continue;
                         ZeeConfig.addPlayerText("fetch barrel");
                         barrelCoord = ZeeConfig.getTileCoord(gobBarrel);
                         ZeeClickGobManager.liftGob(gobBarrel);
 
+                        if(!busy)
+                            continue;
                         ZeeConfig.addPlayerText("fill up caldron");
                         ZeeClickGobManager.gobClick(gobCauldron,3);
                         waitPlayerIdleFor(1);
 
+                        if(!busy)
+                            continue;
                         ZeeConfig.addPlayerText("place barrel");
                         ZeeConfig.clickTile(barrelCoord,3);
                         waitPlayerIdleFor(1);
 
+                        if(!busy)
+                            continue;
                         ZeeConfig.addPlayerText("open cauldron");
                         ZeeClickGobManager.clickGobPetal(gobCauldron,"Open");
                         //waitNoFlowerMenu();
                         waitPlayerIdleFor(1);
 
                         if (gobsContainers.size() > 0) {
+                            if(!busy)
+                                continue;
                             ZeeConfig.addPlayerText("open containers");
                             gobsContainers.forEach(gob -> {
                                 ZeeClickGobManager.gobClick(gob, 3);
@@ -55,9 +81,6 @@ public class ZeeCookManager extends ZeeThread{
                         }else{
                             exitManager("no containers registered");
                         }
-
-                        // craft all and loop again
-                        ZeeConfig.makeWindow.wdgmsg("make",1); // 0==craft, 1==craft all
 
                     } else {
                         exitManager("barrel is empty");
@@ -71,6 +94,7 @@ public class ZeeCookManager extends ZeeThread{
         }
         busy = false;
         println("> end cook manager ");
+        cookButton.disable(!isPepperCookReady());
     }
 
 
@@ -91,41 +115,13 @@ public class ZeeCookManager extends ZeeThread{
         }
 
         addGobTexts();
-        //labelStatus.settext(getLabelStatusText());
+
+        cookButton.disable(!isPepperCookReady());
     }
 
 
-    private static String getLabelStatusText() {
-        return "cauldron"+(gobCauldron==null?"?":"")+", "
-                +"barrel"+(gobBarrel==null?"?":"")+", "
-                +"containers("+(gobsContainers.size())+")";
-    }
-
-
-    public static void pepperRecipeBuildUI() {
-        pepperRecipeOpen = true;
-        if (cbAutoCook==null){
-            cbAutoCook = new CheckBox("try autocook"){
-                public void changed(boolean val) {
-                    super.changed(val);
-                    if (val) {
-                        //println("TODO start thread");
-                        //new ZeeCookManager().start();
-                    }else {
-                        //exitManager("checkbox set false");
-                    }
-                }
-            };
-            //labelStatus = new Label(getLabelStatusText());
-        }
-        ZeeConfig.makeWindow.add(cbAutoCook,360,40);
-        //ZeeConfig.makeWindow.add(labelStatus,290,60);
-    }
-
-
-    public static void clickedCraftAll() {
-        if (!busy)
-            new ZeeCookManager().start();
+    public static boolean isPepperCookReady() {
+        return (!busy && gobCauldron!=null && gobBarrel!=null && gobsContainers.size()>0);
     }
 
 

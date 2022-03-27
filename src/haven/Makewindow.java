@@ -192,11 +192,7 @@ public class Makewindow extends Widget {
 			if (ZeeCookManager.pepperRecipeOpen)
 				ZeeCookManager.exitManager("craft window closed");
 			super.wdgmsg(sender, msg, args);
-		} else if (msg.equals("make") && args[0]=="1") {//craft all
-			super.wdgmsg(sender, msg, args);
-			if (ZeeCookManager.pepperRecipeOpen)
-				ZeeCookManager.clickedCraftAll();
-		}else{
+		} else {
 			super.wdgmsg(sender, msg, args);
 		}
 	}
