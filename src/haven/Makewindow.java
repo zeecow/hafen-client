@@ -189,8 +189,10 @@ public class Makewindow extends Widget {
 			ZeeConfig.craftHistoryDelItem();
 		} else if(msg.contentEquals("close")) {
 			ZeeConfig.craftHistorySave();
-			if (ZeeCookManager.pepperRecipeOpen)
+			if (ZeeCookManager.pepperRecipeOpen) {
+				ZeeCookManager.pepperRecipeOpen = false;
 				ZeeCookManager.exitManager("craft window closed");
+			}
 			super.wdgmsg(sender, msg, args);
 		} else {
 			super.wdgmsg(sender, msg, args);

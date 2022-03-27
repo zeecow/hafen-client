@@ -30,6 +30,7 @@ public class ZeeCookManager extends ZeeThread{
         };
         window.add(cookButton,360,45);
         cookButton.disable(!isPepperCookReady());
+        addGobTexts();
     }
 
 
@@ -38,10 +39,15 @@ public class ZeeCookManager extends ZeeThread{
         println("> start cook manager ");
         try {
             while (busy) {
+
                 ZeeConfig.addPlayerText("cooking");
                 ZeeConfig.makeWindow.wdgmsg("make",1); // 0==craft, 1==craft all
                 waitStaminaIdleMs(3000,1,500);
                 ZeeConfig.removePlayerText();
+
+                if(!busy)
+                    continue;
+
                 if (gobBarrel != null) {
                     if (ZeeConfig.getBarrelOverlayBasename(gobBarrel).equals("water")) {
 
@@ -126,10 +132,14 @@ public class ZeeCookManager extends ZeeThread{
 
 
     public static void exitManager(String msg) {
-        println("exitManager() > "+msg);
+        println("CookManager exit > "+msg);
         busy = false;
-        pepperRecipeOpen = false;
+        //pepperRecipeOpen = false;
         removeGobTexts();
+        gobCauldron = gobBarrel = null;
+        gobsContainers.clear();
+        if (cookButton!=null)
+            cookButton.disable(true);
     }
 
 

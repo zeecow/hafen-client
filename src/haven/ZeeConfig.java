@@ -1419,6 +1419,7 @@ public class ZeeConfig {
         //println(msg+" > "+ZeeConfig.strArgs(args));
 
         if (ZeeCookManager.pepperRecipeOpen && msg.contentEquals("act") && args[0].toString().contentEquals("craft") && !args[1].toString().contentEquals("boiledpepper")){
+            ZeeCookManager.pepperRecipeOpen = false;
             ZeeCookManager.exitManager("changed recipe "+args[1]);
         }
 
