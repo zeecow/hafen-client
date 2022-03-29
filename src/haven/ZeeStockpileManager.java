@@ -30,8 +30,6 @@ public class ZeeStockpileManager extends ZeeThread{
 
     @Override
     public void run() {
-        println(">pile start");
-        ZeeConfig.addGobText(ZeeConfig.getPlayerGob(),"auto piling",0,255,0,255,10);
         try{
             if(isGroundItems)
                 pileGroundItems();
@@ -42,13 +40,11 @@ public class ZeeStockpileManager extends ZeeThread{
         }
         busy = false;
         ZeeConfig.removeGobText(ZeeConfig.getPlayerGob());
-        println(">pile end");
     }
 
 
     public static void checkGroundItemClicked(String gobName) {
         if (gobName.equals("gfx/terobjs/items/tobacco-fresh")) {
-            ZeeConfig.pilerMode = true;
             lastGroundItemName = gobName;
         }
     }
@@ -67,6 +63,7 @@ public class ZeeStockpileManager extends ZeeThread{
 
             gobPile = ZeeConfig.getClosestGob(ZeeConfig.findGobsByNameContains("stockpile-pipeleaves"));
             ZeeConfig.removeGobText(gobPile);
+            ZeeConfig.addPlayerText("auto piling");
             ZeeConfig.addGobText(gobPile,"pile",0,255,0,255,10);
 
             invLeaves = mainInv.getWItemsByName("tobacco-fresh");
@@ -119,6 +116,7 @@ public class ZeeStockpileManager extends ZeeThread{
             gobPile = ZeeConfig.getClosestGob(ZeeConfig.findGobsByNameContains("stockpile-stone"));
 
         //mark gob pile and source
+        ZeeConfig.addPlayerText("auto piling");
         ZeeConfig.addGobText(gobPile,"pile",0,255,0,255,10);
         ZeeConfig.addGobText(gobSource,"source",0,255,0,255,10);
 
@@ -151,17 +149,23 @@ public class ZeeStockpileManager extends ZeeThread{
                     invItems = mainInv.getWItemsByName(ZeeConfig.lastInvItemBaseName);//get last inv item without checking
                 if(invItems.size()==0) {
                     //no inventory items, try getting more from source
+                    if(!busy)
+                        continue;
                     if( gobSource==null || !ZeeClickGobManager.clickGobPetal(gobSource, lastPetalName) ){
                         println("no more source? gobSource1 = "+gobSource);
                         pileAndExit();
                     }
                     continue;
                 }
+                if(!busy)
+                    continue;
                 WItem wItem = invItems.get(0);
                 if (ZeeClickItemManager.pickUpItem(wItem)) { //pickup inv item
                     ZeeClickGobManager.gobItemAct(gobPile, UI.MOD_SHIFT);//right click stockpile
                     if (waitNotHoldingItem()) {
                         //piling successfull, try getting more from source
+                        if(!busy)
+                            continue;
                         if( gobSource==null || !ZeeClickGobManager.clickGobPetal(gobSource, lastPetalName) ){
                             println("gob source consumed = "+gobSource);
                             pileAndExit();
@@ -177,6 +181,8 @@ public class ZeeStockpileManager extends ZeeThread{
                 }
             } else {
                 //println("holding item? try stockpiling...");
+                if(!busy)
+                    continue;
                 ZeeClickGobManager.gobItemAct(gobPile, UI.MOD_SHIFT);//right click stockpile
                 waitNotHoldingItem();
                 if( gobSource==null || !ZeeClickGobManager.clickGobPetal(gobSource, lastPetalName) ){
@@ -185,86 +191,84 @@ public class ZeeStockpileManager extends ZeeThread{
                     return;
                 }
             }
-
         }
+        //pileAndExit();
     }
 
-
-
-    public static void checkPlacedPileUIWdgmsg(Widget sender, String msg) {
-
-        if(msg.equals("place") && sender instanceof MapView) {
-
-            if(lastGobPlaced!=null && lastGobPlaced.getres()!=null && lastGobPlaced.getres().name.contains("/stockpile-")) {
-
-                //lastGobPlacedMs = now();
-                //println((now() - lastGroundItemNameMs)+" < "+5000);
-
-                if(lastGroundItemName!=null && lastGroundItemName.endsWith(ZeeConfig.lastInvItemBaseName)  &&  now() - ZeeConfig.lastInvItemMs < 3000) {
-                    showWindow(true);
-                } else {
-                    String name = lastGobPlaced.getres().name;
-                    boolean show = false;
-
-                    if (now() - ZeeConfig.lastInvItemMs > 3000) //3s
-                        show = false; // time limit to avoid late unwanted window popup
-                    else if (name.equals(STOCKPILE_LEAF) && ZeeConfig.lastInvItemBaseName.equals(BASENAME_MULB_LEAF))
-                        show = true;
-                    else if (name.equals(STOCKPILE_BLOCK) && ZeeConfig.lastInvItemBaseName.startsWith("wblock-"))
-                        show = true;
-                    else if (name.equals(STOCKPILE_BOARD) && ZeeConfig.lastInvItemBaseName.contains("board-"))
-                        show = true;
-                    else if (name.equals(STOCKPILE_STONE) && ZeeMiningManager.isBoulder(gobSource))
-                        show = true;
-
-                    if(show)
-                        showWindow(false);
+    public static void checkWdgmsgPileExists() {
+        new ZeeThread() {
+            public void run() {
+                try {
+                    waitNotHoldingItem(5000);
+                    Gob closestPile = ZeeConfig.getClosestGobName("/stockpile-");
+                    checkShowWindow(closestPile.getres().name);
+                }catch (Exception e){
+                    e.printStackTrace();
                 }
+            }
+        }.start();
+    }
+
+    public static void checkWdgmsgPilePlacing() {
+
+        if(lastGobPlaced!=null && lastGobPlaced.getres()!=null && lastGobPlaced.getres().name.contains("/stockpile-")) {
+            //lastGobPlacedMs = now();
+            //println((now() - lastGroundItemNameMs)+" < "+5000);
+            if(lastGroundItemName!=null && lastGroundItemName.endsWith(ZeeConfig.lastInvItemBaseName)  &&  now() - ZeeConfig.lastInvItemMs < 3000) {
+                showWindow(true);
+            } else {
+                String pileGobName = lastGobPlaced.getres().name;
+                checkShowWindow(pileGobName);
             }
         }
     }
 
+    private static void checkShowWindow(String pileGobName) {
+        boolean show = false;
+        if (now() - ZeeConfig.lastInvItemMs > 3000) //3s
+            show = false; // time limit to avoid late unwanted window popup
+        else if (pileGobName.equals(STOCKPILE_LEAF) && ZeeConfig.lastInvItemBaseName.equals(BASENAME_MULB_LEAF))
+            show = true;
+        else if (pileGobName.equals(STOCKPILE_BLOCK) && ZeeConfig.lastInvItemBaseName.startsWith("wblock-"))
+            show = true;
+        else if (pileGobName.equals(STOCKPILE_BOARD) && ZeeConfig.lastInvItemBaseName.contains("board-"))
+            show = true;
+        else if (pileGobName.equals(STOCKPILE_STONE) && ZeeMiningManager.isBoulder(gobSource))
+            show = true;
+
+        if(show)
+            showWindow(false);
+    }
 
     public static void checkClickedPetal(String petalName) {
         lastPetalName = petalName;
         if (petalName.equals("Pick leaf")) {
             if (ZeeConfig.lastMapViewClickGobName.equals("gfx/terobjs/trees/mulberry")
                 || ZeeConfig.lastMapViewClickGobName.equals("gfx/terobjs/trees/laurel")) {
-                ZeeConfig.pilerMode = true;
                 gobSource = ZeeConfig.lastMapViewClickGob;
-            }else{
-                ZeeConfig.pilerMode = false;
             }
         }else if(petalName.equals("Chop into blocks")){
-            ZeeConfig.pilerMode = true;
             gobSource = ZeeConfig.lastMapViewClickGob;
         }else if(petalName.equals("Make boards")){
-            ZeeConfig.pilerMode = true;
             gobSource = ZeeConfig.lastMapViewClickGob;
         }else if(petalName.equals("Chip stone")){
-            ZeeConfig.pilerMode = true;
             gobSource = ZeeConfig.lastMapViewClickGob;
-        }else{
-            ZeeConfig.pilerMode = false;
         }
     }
 
     private static void showWindow(boolean groundItems) {
-
         Widget wdg;
-
         if(windowManager ==null) {
-
             windowManager = new ZeeWindow(new Coord(150, 60), "Stockpile manager") {
                 public void wdgmsg(String msg, Object... args) {
                     if (msg.equals("close")) {
                         audioExit = false;
+                        busy = false;
                         exitManager();
                     }else
                         super.wdgmsg(msg, args);
                 }
             };
-
             wdg = windowManager.add(new ZeeWindow.ZeeButton(UI.scale(75),"auto pile"){
                 public void wdgmsg(String msg, Object... args) {
                     if(msg.equals("activate")){
@@ -272,10 +276,7 @@ public class ZeeStockpileManager extends ZeeThread{
                     }
                 }
             }, 5,5);
-
-
             ZeeConfig.gameUI.add(windowManager, new Coord(100,100));
-
         }else{
             windowManager.show();
         }
@@ -288,9 +289,12 @@ public class ZeeStockpileManager extends ZeeThread{
 
     public static void exitManager() {
         busy = false;
-        ZeeConfig.pilerMode = false;
+        if (ZeeConfig.pilerMode)
+            ZeeInvMainOptionsWdg.cbPiler.set(false);
+        ZeeConfig.removePlayerText();
         ZeeConfig.removeGobText(gobPile);
         ZeeConfig.removeGobText(gobSource);
+        gobPile = gobSource = null;
         if (audioExit)
             gameUI.msg("Pile manager ended.");
         windowManager.hide();
@@ -300,6 +304,7 @@ public class ZeeStockpileManager extends ZeeThread{
 
     private static void pileItems() throws InterruptedException {
         ZeeConfig.cancelFlowerMenu();
+        waitNoFlowerMenu();
         if (gameUI.vhand == null) {//if not holding item
             List<WItem> invItems = mainInv.getWItemsByName(ZeeConfig.lastInvItemBaseName);
             if(invItems.size()==0) {

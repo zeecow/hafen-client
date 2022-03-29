@@ -266,7 +266,8 @@ public class FlowerMenu extends Widget {
 	    wdgmsg("cl", -1);
 	} else {
 	    wdgmsg("cl", option.num, ui.modflags());
-		ZeeStockpileManager.checkClickedPetal(option.name);
+		if (ZeeConfig.pilerMode)
+			ZeeStockpileManager.checkClickedPetal(option.name);
 	}
 	ZeeClickGobManager.resetClickPetal();
     }

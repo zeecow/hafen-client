@@ -39,7 +39,8 @@ public class ZeeClickGobManager extends ZeeThread{
                 harvestOneTrellis();
             } else if(isGobGroundItem()) {
                 gobClick(3, UI.MOD_SHIFT);//pick up all items (shift + rclick)
-                ZeeStockpileManager.checkGroundItemClicked(gobName);
+                if (ZeeConfig.pilerMode)
+                    ZeeStockpileManager.checkGroundItemClicked(gobName);
             } else if (isGobFireSource()) {
                 if (pickupTorch()) {
                     gobItemAct(0);

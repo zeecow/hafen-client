@@ -2352,4 +2352,15 @@ public class MapView extends PView implements DTarget, Console.Directory {
 		}
 	    });
     }
+
+	@Override
+	public void wdgmsg(String msg, Object... args) {
+		super.wdgmsg(msg, args);
+		if (ZeeConfig.pilerMode) {
+			if (msg.equals("place"))
+				ZeeStockpileManager.checkWdgmsgPilePlacing();
+			else if (msg.equals("itemact"))
+				ZeeStockpileManager.checkWdgmsgPileExists();
+		}
+	}
 }
