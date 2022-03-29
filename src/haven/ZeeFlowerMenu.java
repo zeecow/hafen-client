@@ -42,11 +42,19 @@ public class ZeeFlowerMenu extends FlowerMenu{
         if (opt!=null) {
             String petalName = opt.name;
             uimsg("cancel");
-            if (gob!=null) {
-                ZeeClickGobManager.gobZeeMenuClicked(gob, petalName);
-            }else if (wItem!=null) {
-                ZeeClickItemManager.itemZeeMenuClicked(wItem, petalName);
-            }
+            new ZeeThread(){
+                public void run() {
+                    try{
+                        if (gob != null) {
+                            ZeeClickGobManager.gobZeeMenuClicked(gob, petalName);
+                        } else if (wItem != null) {
+                            ZeeClickItemManager.itemZeeMenuClicked(wItem, petalName);
+                        }
+                    }catch(Exception e){
+                        e.printStackTrace();
+                    }
+                }
+            }.start();
         }
         else
             uimsg("cancel");

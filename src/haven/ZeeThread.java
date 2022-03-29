@@ -103,7 +103,6 @@ public class ZeeThread  extends Thread{
         returns true if player idle for idleMS
      */
     public static boolean waitPlayerIdleFor(int idleSeconds) {
-        //println("wait player idle");
         long timer = idleSeconds * 1000;
         try {
             while( timer > 0 ) {

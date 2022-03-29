@@ -368,33 +368,25 @@ public class ZeeClickItemManager extends ZeeThread{
         {
             // kill all inventory cocoons
             if(itemName.endsWith("silkcocoon") || itemName.endsWith("chrysalis")){
-                new ZeeThread() {
-                    public void run() {
-                        if (waitNoFlowerMenu()) {//wait petal "Kill All" is gone
-                            Inventory inv = wItem.getparent(Inventory.class);
-                            List<WItem> items = inv.children(WItem.class).stream()
-                                    .filter(wItem1 -> wItem1.item.getres().name.endsWith("silkcocoon") || wItem1.item.getres().name.endsWith("chrysalis"))
-                                    .collect(Collectors.toList());
-                            ZeeConfig.gameUI.msg(clickAllItemsPetal(items, "Kill") + " cocoons clicked");
-                        }
-                    }
-                }.start();
+                if (waitNoFlowerMenu()) {//wait petal "Kill All" is gone
+                    Inventory inv = wItem.getparent(Inventory.class);
+                    List<WItem> items = inv.children(WItem.class).stream()
+                            .filter(wItem1 -> wItem1.item.getres().name.endsWith("silkcocoon") || wItem1.item.getres().name.endsWith("chrysalis"))
+                            .collect(Collectors.toList());
+                    ZeeConfig.gameUI.msg(clickAllItemsPetal(items, "Kill") + " cocoons clicked");
+                }
             }
         }
         else if(petalName.equals(ZeeFlowerMenu.STRPETAL_EATALL))
         {
             //eat all table similar items
             if(ZeeConfig.getCursorName().equals(ZeeConfig.CURSOR_EAT)){
-                new ZeeThread() {
-                    public void run() {
-                        Inventory inv = wItem.getparent(Inventory.class);
-                        List<WItem> items = inv.children(WItem.class).stream()
-                                .filter(wItem1 -> wItem1.item.getres().name.equals(itemName))
-                                .collect(Collectors.toList());
-                        takeAllInvItems(inv, items);
-                        ZeeConfig.gameUI.msg(items.size() + " noms");
-                    }
-                }.start();
+                Inventory inv = wItem.getparent(Inventory.class);
+                List<WItem> items = inv.children(WItem.class).stream()
+                        .filter(wItem1 -> wItem1.item.getres().name.equals(itemName))
+                        .collect(Collectors.toList());
+                takeAllInvItems(inv, items);
+                ZeeConfig.gameUI.msg(items.size() + " noms");
             }
         }
         else
