@@ -35,48 +35,80 @@ public class ZeeClickGobManager extends ZeeThread{
             /*
                 short clicks
              */
-            if(isGobTrellisPlant()) {
+            if (ZeeConfig.isPlayerHoldingItem()){
+                clickedGobHoldingItem();
+            }
+            else if(isGobTrellisPlant()) {
                 harvestOneTrellis();
-            } else if(isGobGroundItem()) {
+            }
+            else if(isGobGroundItem()) {
                 gobClick(3, UI.MOD_SHIFT);//pick up all items (shift + rclick)
                 if (ZeeConfig.pilerMode)
                     ZeeStockpileManager.checkGroundItemClicked(gobName);
-            } else if (isGobFireSource()) {
-                if (pickupTorch()) {
+            }
+            else if (isGobFireSource()) {
+                if (pickupTorch())
                     gobItemAct(0);
-                }
-            } else if (isGobHorse()) {
+            }
+            else if (isGobHorse()) {
                 clickGobPetal("Giddyup!");
-            } else if (isGobName("/barrel")) {
+            }
+            else if (isGobName("/barrel")) {
                 if (barrelLabelOn)
                     ZeeSeedFarmingManager.testBarrelsTilesClear();
                 else
                     ZeeSeedFarmingManager.testBarrelsTiles(true);
                 barrelLabelOn = !barrelLabelOn;
-            } else if (isInspectGob()) {
+            }
+            else if (isGobName("/dreca")){ // dream catcher
+                twoDreamsPlease();
+            }
+            else if (isInspectGob()) {
                 inspectGob();
-            } else if (isGobMineSupport()) {
+            }
+            else if (isGobMineSupport()) {
                 ZeeConfig.toggleMineSupport();
             }
-        } else {
+        }
+        else {
             /*
                 long clicks
              */
             if(showGobFlowerMenu()) {
                 //ok
-            }else if (isGobCrop()) {
+            }
+            else if (isGobCrop()) {
                 if(!ZeeConfig.getCursorName().equals(ZeeConfig.CURSOR_HARVEST))
                     gobClick(gob, 3, UI.MOD_SHIFT);//activate cursor harvest if needed
-            } else if (isGobStockpile() || isGobName("/dframe")) {
+            }
+            else if (isGobStockpile() || isGobName("/dframe")) {
                 gobClick(3, UI.MOD_SHIFT);//pick up all items (shift + rclick)
-            } else if(isGobTreeStump()){
+            }
+            else if(isGobTreeStump()){
                 removeStump(gob);
-            }else if (isLiftGob()) {
+            }
+            else if (isLiftGob()) {
                 liftGob();
-            }else if (isGobGate() && ZeeConfig.CURSOR_HAND.equals(ZeeConfig.getCursorName())){
+            }
+            else if (isGobGate() && ZeeConfig.CURSOR_HAND.equals(ZeeConfig.getCursorName())){
                 openGateWheelbarrow(gob);
             }
 
+        }
+    }
+
+    private void clickedGobHoldingItem() {
+        if (isGobStockpile())
+            gobItemAct(UI.MOD_SHIFT);//try piling all items
+        else
+            gobClick(gob,3,0); // try ctrl+click simulation
+    }
+
+    private void twoDreamsPlease() {
+        if(clickGobPetal("Harvest")) {
+            waitNoFlowerMenu();
+            if(clickGobPetal("Harvest"))
+                waitNoFlowerMenu();
         }
     }
 
@@ -644,7 +676,7 @@ public class ZeeClickGobManager extends ZeeThread{
             //println("clickGobPetal1 > choosing "+petalName);
             return choosePetal(getFlowerMenu(), petalName);
         }else{
-            println("clickGobPetal1 > no flower menu?");
+            //println("clickGobPetal1 > no flower menu?");
             return false;
         }
     }

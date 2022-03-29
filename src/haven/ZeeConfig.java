@@ -1551,9 +1551,9 @@ public class ZeeConfig {
             if(clickb == 2) {
                 new ZeeClickGobManager(pc, mc, clickGob).start();
             }
-        }else{ // clicked ground?
-            if (clickb==2 && ZeeConfig.isPlayerHoldingItem()) // if midclick holding item...
-                ZeeConfig.clickTile(mc.floor(posres),1, 0); // ...mote to tile (ctrl+click)
+        }else{ // clicked ground
+            if (clickb==2 && ZeeConfig.isPlayerHoldingItem()) //move while holding item
+                ZeeConfig.clickTile(mc.floor(posres),1, 0);
         }
     }
 

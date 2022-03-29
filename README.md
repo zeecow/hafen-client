@@ -18,12 +18,12 @@ features:
  - icon list categs
  - midclick ground while holding item will move to location (simulates ctrl+click)
  - midclick object/item for small tasks:
-   - MidClick obj: [inspect] , [Giddyup!] , [light torch], [toggle barrels label], [toggle mine support radius]
-     - Long MidClick obj: [Context Menu*], [lift up] , [take all from stockpile]
-   - MidClick item: [sort-transfer] , [pick-up all] , [quick-equip from belt], [seed-planting cursor]
-     - Long MidClick item: [Context Menu*], [sort-transfer inverse], [equip fishing item and recast]
-   - Context menus 
-     - obj: add branch to oven, add coal to smelter, remove tree and stump, remove trellis plant(s), destroy treelogs(if bonesaw is equipped)
+   - MidClick obj: inspect, Giddyup!, light torch, toggle barrels label, toggle mine support radius, hold item click attempts
+     - Long MidClick obj: Context Menu*, lift up, take all from stockpile
+   - MidClick item: sort-transfer, pick-up all, quick-equip from belt, seed-planting cursor
+     - Long MidClick item: Context Menu*, sort-transfer inverse, equip fishing item and recast
+   - Context menus for midclick 
+     - obj: add branch to oven, add coal to smelter, remove tree and stump, remove trellis plant(s), destroy treelogs(if bonesaw is equipped), haverst two dreams
      - item: kill all cocoons, feast all food
 
 
