@@ -262,13 +262,13 @@ public class ZeeClickGobManager extends ZeeThread{
         // gfx/terobjs/vehicle/wheelbarrow
         try {
             waitNoFlowerMenu();
-            ZeeConfig.addPlayerText("open gate wb");
+            ZeeConfig.addPlayerText("clicking gate");
             Gob wb = ZeeConfig.getClosestGobName("gfx/terobjs/vehicle/wheelbarrow");
             if (wb==null){
                 ZeeConfig.msg("no wheelbarrow close");
             }else {
                 double dist = ZeeConfig.distanceToPlayer(wb);
-                ZeeConfig.clickGroundZero();//remove hand cursor
+                ZeeConfig.clickRemoveCursor();//remove hand cursor
                 liftGob(wb);
                 //waitPlayerIdleFor(1);
                 dist = ZeeConfig.distanceToPlayer(wb);
@@ -619,7 +619,8 @@ public class ZeeClickGobManager extends ZeeThread{
     private void inspectGob() {
         ZeeConfig.gameUI.menu.wdgmsg("act","inspect","0");
         gobClick(1);
-        ZeeConfig.clickGroundZero();
+        //waitPlayerIdleFor(1);
+        ZeeConfig.clickRemoveCursor();
     }
 
     public static boolean isGobTrellisPlant(String gobName) {
@@ -691,7 +692,7 @@ public class ZeeClickGobManager extends ZeeThread{
             choosePetal(getFlowerMenu(), petalName);
             return waitNoFlowerMenu();
         }else{
-            println("clickGobPetal > no flower menu?");
+            //println("clickGobPetal > no flower menu?");
             return false;
         }
     }

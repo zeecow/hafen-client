@@ -45,7 +45,7 @@ public class ZeeMiningManager extends ZeeThread{
 
     /*
     check if new boulder was created while mining
- */
+    */
     public static void checkNearBoulder(Gob gob) {
         if(ZeeConfig.autoChipMinedBoulder && isMining() && isBoulder(gob)){
             //println(ZeeClickGobManager.distanceToPlayer(gob)+" to "+gob.getres().name);
@@ -75,9 +75,9 @@ public class ZeeMiningManager extends ZeeThread{
         println("stop mining");
         try {
             ZeeConfig.gameUI.msg("stop mining");
-            ZeeConfig.clickGroundZero();//remove cursor?
+            ZeeConfig.clickRemoveCursor();
             Thread.sleep(PING_MS+100);
-            ZeeConfig.clickGroundZero(1);//right click ground
+            ZeeConfig.clickGroundZero(1);//click ground
             cancelThread();
         } catch (InterruptedException e) {
             e.printStackTrace();
@@ -94,7 +94,7 @@ public class ZeeMiningManager extends ZeeThread{
     public static void chipBoulder(Gob boulder) {
         try {
             //ZeeClickGobManager.gobClick(boulder, 3);
-            ZeeConfig.clickGroundZero();//remove mining cursor
+            ZeeConfig.clickRemoveCursor();//remove mining cursor
             if(!waitCursor(ZeeConfig.CURSOR_ARW)){
                 println(">chipBoulder couldn't change cursor to arrow");
                 return;

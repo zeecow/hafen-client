@@ -90,16 +90,15 @@ public class ZeeStockpileManager extends ZeeThread{
                     ZeeClickGobManager.gobItemAct(gobPile, UI.MOD_SHIFT);
                     waitPlayerIdleFor(1);
                     if(ZeeConfig.isPlayerHoldingItem()){
-                        println("stockpile full");
-                        exitManager();
+                        exitManager("pileGroundItems() > stockpile full");
                     }
                 }else{
-                    println("no close leaf");
-                    exitManager();
+                    exitManager("no close leaf");
                 }
             }
         }
     }
+
 
     // gfx/terobjs/stockpile-board
     // gfx/terobjs/stockpile-wblock
@@ -129,13 +128,9 @@ public class ZeeStockpileManager extends ZeeThread{
 
         while(busy) {
 
-            //if (lastPetalName.equals("Make boards") || lastPetalName.equals("Chip stone"))
-            //    waitInvFullOrHoldingItem(mainInv, 3000);// boards/boulder take longer to make
-            //else
-            //    waitInvFullOrHoldingItem(mainInv);
             waitInvFullOrHoldingItem(mainInv, 3000);// boards/boulder takes longer to produce item
 
-            if (gameUI.vhand == null) {//if not holding item
+            if (!ZeeConfig.isPlayerHoldingItem()) { //if not holding item
                 /*
                     gfx/invobjs/wblock-maple
                     gfx/invobjs/board-maple
@@ -160,35 +155,45 @@ public class ZeeStockpileManager extends ZeeThread{
                 if(!busy)
                     continue;
                 WItem wItem = invItems.get(0);
+                String itemName = wItem.item.getres().name;
                 if (ZeeClickItemManager.pickUpItem(wItem)) { //pickup inv item
                     ZeeClickGobManager.gobItemAct(gobPile, UI.MOD_SHIFT);//right click stockpile
-                    if (waitNotHoldingItem()) {
-                        //piling successfull, try getting more from source
+                    if (waitNotHoldingItem()) {//piling successfull
+                        if (mainInv.getWItemsByName(itemName).size() > 0)
+                            exitManager("pile full (inv still has items)");
                         if(!busy)
                             continue;
+                        //try getting more from source
                         if( gobSource==null || !ZeeClickGobManager.clickGobPetal(gobSource, lastPetalName) ){
                             println("gob source consumed = "+gobSource);
                             pileAndExit();
                         }
                     } else {
-                        println("pile full?");
-                        gameUI.msg("stockpile full?");
-                        pileAndExit();
+                        exitManager("pile full??");
                     }
                 } else {
-                    println("couldn't pickup source item?");
-                    pileAndExit();
+                    //pileAndExit();
+                    exitManager("couldn't pickup source item??");
                 }
-            } else {
-                //println("holding item? try stockpiling...");
+            }
+            else {
+                //holding item? try stockpiling...
                 if(!busy)
                     continue;
+                String itemName = gameUI.vhand.item.getres().name;
                 ZeeClickGobManager.gobItemAct(gobPile, UI.MOD_SHIFT);//right click stockpile
-                waitNotHoldingItem();
-                if( gobSource==null || !ZeeClickGobManager.clickGobPetal(gobSource, lastPetalName) ){
-                    println("no more source? gobSource3 = "+gobSource);
-                    pileAndExit();
-                    return;
+                if(waitNotHoldingItem()) {
+                    if (mainInv.getWItemsByName(itemName).size() > 0)
+                        exitManager("pile full (inv still has items) 2");
+                    if (!busy)
+                        continue;
+                    if (gobSource == null || !ZeeClickGobManager.clickGobPetal(gobSource, lastPetalName)) {
+                        println("no more source? gobSource3 = " + gobSource);
+                        pileAndExit();
+                        return;
+                    }
+                } else {
+                    exitManager("pile full?? 2");
                 }
             }
         }
@@ -225,7 +230,9 @@ public class ZeeStockpileManager extends ZeeThread{
 
     private static void checkShowWindow(String pileGobName) {
         boolean show = false;
-        if (now() - ZeeConfig.lastInvItemMs > 3000) //3s
+        if (lastPetalName==null || gobSource==null)
+            show = false;
+        else if (now() - ZeeConfig.lastInvItemMs > 3000) //3s
             show = false; // time limit to avoid late unwanted window popup
         else if (pileGobName.equals(STOCKPILE_LEAF) && ZeeConfig.lastInvItemBaseName.equals(BASENAME_MULB_LEAF))
             show = true;
@@ -287,8 +294,13 @@ public class ZeeStockpileManager extends ZeeThread{
         exitManager();
     }
 
+    public static void exitManager(String msg) {
+        exitManager();
+        println(msg);
+    }
     public static void exitManager() {
         busy = false;
+        ZeeConfig.clickGroundZero(1);
         if (ZeeConfig.pilerMode)
             ZeeInvMainOptionsWdg.cbPiler.set(false);
         ZeeConfig.removePlayerText();
@@ -305,7 +317,7 @@ public class ZeeStockpileManager extends ZeeThread{
     private static void pileItems() throws InterruptedException {
         ZeeConfig.cancelFlowerMenu();
         waitNoFlowerMenu();
-        if (gameUI.vhand == null) {//if not holding item
+        if (!ZeeConfig.isPlayerHoldingItem()) {//if not holding item
             List<WItem> invItems = mainInv.getWItemsByName(ZeeConfig.lastInvItemBaseName);
             if(invItems.size()==0) {
                 return;//inv has no more items
@@ -314,12 +326,12 @@ public class ZeeStockpileManager extends ZeeThread{
             if (ZeeClickItemManager.pickUpItem(wItem)) { //pickup source item
                 ZeeClickGobManager.gobItemAct(gobPile, UI.MOD_SHIFT);//shift+right click stockpile
                 if (!waitNotHoldingItem()) {
-                    println("pileItems > pile full?");
+                    exitManager("pileItems > pile full?");
                 }
             } else {
-                println("pileItems > couldn't pickup item?");
+                exitManager("pileItems > couldn't pickup item?");
             }
-        } else {
+        } else if (gobPile!=null){
             ZeeClickGobManager.gobItemAct(gobPile, UI.MOD_SHIFT);//shift+right click stockpile
         }
     }

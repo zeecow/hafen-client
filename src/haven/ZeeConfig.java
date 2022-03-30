@@ -1365,6 +1365,9 @@ public class ZeeConfig {
     public static void checkUiErr(String text){
         if (ZeeCookManager.busy && ZeeCookManager.pepperRecipeOpen && text.contains("You do not have all the ingredients."))
             ZeeCookManager.exitManager(text);
+
+        if (ZeeStockpileManager.busy && text.contains("That stockpile is already full."))
+            ZeeStockpileManager.exitManager("checkUiErr() > pile is full");
     }
 
     public static String getCursorName() {
@@ -1591,6 +1594,10 @@ public class ZeeConfig {
         return gameUI.map.player();
     }
 
+    public static Coord getPlayerCoord(){
+        return getTileCoord(getPlayerGob());
+    }
+
     // Returns 0-100
     public static double getStamina() {
         return (100 * gameUI.getmeter("stam", 0).a);
@@ -1688,12 +1695,15 @@ public class ZeeConfig {
     }
 
     // simulate cancel click
-    public static void clickGroundZero() {
-        gameUI.map.wdgmsg("click", Coord.z, Coord.z, 3, 0);
+    public static void clickGroundZero(int btn) {
+        clickTile(getPlayerCoord(),btn);
+    }
+    public static void clickGroundZero(int btn, int mod) {
+        clickTile(getPlayerCoord(),btn,mod);
     }
 
-    public static void clickGroundZero(int btn) {
-        gameUI.map.wdgmsg("click", Coord.z, Coord.z, btn, 0);
+    public static void clickRemoveCursor(){
+        ZeeConfig.clickTile(Coord.z,3);
     }
 
     /*
