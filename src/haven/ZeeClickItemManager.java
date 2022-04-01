@@ -69,6 +69,7 @@ public class ZeeClickItemManager extends ZeeThread{
             cancelManager = true;
         }
         //println(itemName +"  "+ wItem.c.div(33)+"  "+ZeeConfig.getCursorName());
+        //println("left: "+leftHandItemName);println("right: "+rightHandItemName);
     }
 
     @Override
@@ -190,9 +191,9 @@ public class ZeeClickItemManager extends ZeeThread{
                 }
 
             }
-            else if (isItemAxe()) {//try switch axe for axe (1handed)
+            else if (isItemAxeChopTree()) { // try switch axe for axe (1handed)
 
-                if (isItemAxe(leftHandItemName) && isItemAxe(rightHandItemName)) {
+                if (isItemAxeChopTree(leftHandItemName) && isItemAxeChopTree(rightHandItemName)) {
                     // unequip 1 of 2 axes, before next steps
                     if (unequipLeftItem()) {
                         if(!trySendItemToBelt()) {
@@ -201,9 +202,13 @@ public class ZeeClickItemManager extends ZeeThread{
                     }
                 }
                 pickUpItem();
-                if (isItemAxe(getLeftHandName())) {
+                if (isItemSack(leftHandItemName) && !isItemSack(rightHandItemName)) {
+                    equipRightOccupiedHand();
+                }else if (!isItemSack(leftHandItemName) && isItemSack(rightHandItemName)) {
+                    equipLeftOccupiedHand();
+                }else if (isItemAxeChopTree(getLeftHandName())) {
                     equipLeftOccupiedHand(); //switch left hand axe
-                }else if (isItemAxe(getRightHandName())) {
+                }else if (isItemAxeChopTree(getRightHandName())) {
                     equipRightOccupiedHand(); // switch right hand axe
                 }else if (isLeftHandEmpty() || isRightHandEmpty()) {
                     equipEmptyHand();
@@ -218,7 +223,8 @@ public class ZeeClickItemManager extends ZeeThread{
                     if(isLeftHandEmpty() || isRightHandEmpty()) {//1 item equipped
                         pickUpItem();
                         equipEmptyHand();
-                    }else { // 2 hands occupied
+                    }
+                    else { // 2 hands occupied
                         if(isTwoHandedItem(getLeftHandName())) {
                             //switch 1handed for 2handed
                             pickUpItem();
@@ -645,10 +651,10 @@ public class ZeeClickItemManager extends ZeeThread{
         return name.endsWith("travellerssack") || name.endsWith("bindle");
     }
 
-    private boolean isItemAxe() {
-        return isItemAxe(itemName);
+    private boolean isItemAxeChopTree() {
+        return isItemAxeChopTree(itemName);
     }
-    public static boolean isItemAxe(String name) {
+    public static boolean isItemAxeChopTree(String name) {
         return name.endsWith("woodsmansaxe") || name.endsWith("axe-m") || name.endsWith("butcherscleaver") || name.endsWith("stoneaxe");
     }
 
