@@ -1770,7 +1770,7 @@ public class ZeeConfig {
             return iconListFilterBox;
         }
 
-        iconListFilterBox =  new Dropbox<String>(150,14,20) {
+        iconListFilterBox =  new Dropbox<String>(110,14,20) {
             String space = "     ";
             private final List<String> filters = new ArrayList<String>() {{
                 add(space+"all");
