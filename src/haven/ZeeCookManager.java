@@ -54,7 +54,7 @@ public class ZeeCookManager extends ZeeThread{
                         if(!busy)
                             continue;
                         ZeeConfig.addPlayerText("fetch barrel");
-                        barrelCoord = ZeeConfig.getTileCoord(gobBarrel);
+                        barrelCoord = ZeeConfig.getCoordGob(gobBarrel);
                         ZeeClickGobManager.liftGob(gobBarrel);
 
                         if(!busy)

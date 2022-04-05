@@ -1387,8 +1387,8 @@ public class ZeeConfig {
         ACT_DESTROY = "destroy", ACT_FISH = "fish", ACT_INSPECT = "inspect",
         ACT_REPAIR = "repair", ACT_CRIME = "crime", ACT_SWIM = "swim",
         ACT_TRACKING = "tracking", ACT_AGGRO = "aggro", ACT_SHOOT = "shoot";
-    public static void cursorChange(String name) {
-        gameUI.menu.wdgmsg("act", name);
+    public static void cursorChange(String action) {
+        gameUI.menu.wdgmsg("act", action);
     }
 
     public static void checkCharSelection(String msg) {
@@ -1491,6 +1491,7 @@ public class ZeeConfig {
         savedTileSelEndCoord = ec;
         savedTileSelModflags = modflags;
         savedTileSelOverlay = ol;
+        ZeeMiningManager.checkTunnelMining(sc,ec);
     }
 
     public static void resetTileSelection(){
@@ -1595,7 +1596,10 @@ public class ZeeConfig {
     }
 
     public static Coord getPlayerCoord(){
-        return getTileCoord(getPlayerGob());
+        return getCoordGob(getPlayerGob());
+    }
+    public static Coord getPlayerTile(){
+        return coordToTile(getPlayerGob().rc);
     }
 
     // Returns 0-100
@@ -1719,7 +1723,7 @@ public class ZeeConfig {
     public static void clickTile(Coord tileCoord, int btn, int mod) {
         gameUI.map.wdgmsg("click", ZeeConfig.getCenterScreenCoord(), tileCoord, btn, mod);
     }
-    public static Coord getTileCoord(Gob gob){
+    public static Coord getCoordGob(Gob gob){
         return gob.rc.floor(OCache.posres);
     }
 
