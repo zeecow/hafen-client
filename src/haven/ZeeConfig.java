@@ -279,24 +279,31 @@ public class ZeeConfig {
         //if it's a crop
         else if(highlightCropsReady && isGobCrop(gobName)) {
             //System.out.printf(" CROP \n");
-            int maxStage = 0;
-            for (FastMesh.MeshRes layer : gob.getres().layers(FastMesh.MeshRes.class)) {
-                if(layer.id / 10 > maxStage) {
-                    maxStage = layer.id / 10;
-                }
-            }
-            Message data = getDrawableData(gob);
-            if(data != null) {
-                int stage = data.uint8();
-                if(stage > maxStage)
-                    stage = maxStage;
-                if(stage==maxStage)
-                    return MIXCOLOR_LIGHTBLUE;
-            }
+            if (isCropMaxStage(gob))
+                return MIXCOLOR_LIGHTBLUE;
         }
         //else System.out.printf(" NOPE \n");
 
         return null;
+    }
+
+    public static boolean isCropMaxStage(Gob gob) {
+        boolean ret = false;
+        int maxStage = 0;
+        for (FastMesh.MeshRes layer : gob.getres().layers(FastMesh.MeshRes.class)) {
+            if(layer.id / 10 > maxStage) {
+                maxStage = layer.id / 10;
+            }
+        }
+        Message data = getDrawableData(gob);
+        if(data != null) {
+            int stage = data.uint8();
+            if(stage > maxStage)
+                stage = maxStage;
+            if(stage==maxStage)
+                ret = true;
+        }
+        return ret;
     }
 
     public static MixColor getHighlightGobColor(Gob gob) {
