@@ -66,7 +66,7 @@ public class ZeeCookManager extends ZeeThread{
                         if(!busy)
                             continue;
                         ZeeConfig.addPlayerText("place barrel");
-                        ZeeConfig.clickTile(barrelCoord,3);
+                        ZeeConfig.clickCoord(barrelCoord,3);
                         waitPlayerIdleFor(1);
 
                         if(!busy)

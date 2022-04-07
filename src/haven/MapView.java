@@ -498,6 +498,7 @@ public class MapView extends PView implements DTarget, Console.Directory {
 	enol("cplot");
 	enol("vlg");
 	enol("realm");
+	ZeeConfig.glob = glob;
     }
     
     protected void envdispose() {
@@ -871,7 +872,7 @@ public class MapView extends PView implements DTarget, Console.Directory {
 	    ol.tick();
     }
 
-    private static final Material gridmat = new Material(new BaseColor(0, 255, 0, 48), States.maskdepth, new MapMesh.OLOrder(null),
+    private static final Material gridmat = new Material(new BaseColor(0, 0, 128, 96), States.maskdepth, new MapMesh.OLOrder(null),
 							 Location.xlate(new Coord3f(0, 0, 0.5f))   /* Apparently, there is no depth bias for lines. :P */
 							 );
     private class GridLines extends MapRaster {
@@ -2231,7 +2232,7 @@ public class MapView extends PView implements DTarget, Console.Directory {
 			}
 		    mgrab.remove();
 			ZeeConfig.saveTileSelection(new Coord(sc), new Coord(ec), modflags, ol);
-		    wdgmsg("sel", sc, ec, modflags);//TODO
+		    wdgmsg("sel", sc, ec, modflags);
 		    sc = null;
 		}
 		return(true);

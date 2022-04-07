@@ -1,11 +1,13 @@
 package haven;
 
-import java.awt.desktop.AppReopenedEvent;
-
 public class ZeeMiningManager extends ZeeThread{
 
-    public static final String TASK_CHIP_BOULDER = "chip boulder";
-    public static final String TASK_MAKE_TUNNEL = "make tunnel";
+    public static final String TASK_CHIP_BOULDER = "TASK_CHIP_BOULDER";
+    public static final String TASK_MINE_AREA = "TASK_MINE_AREA";
+    public static final String DIR_NORTH = "DIR_NORTH";
+    public static final String DIR_SOUTH = "DIR_SOUTH";
+    public static final String DIR_WEST = "DIR_WEST";
+    public static final String DIR_EAST = "DIR_EAST";
     private static final long MS_CURSOR_CHANGE = 200;
     private static final double DIST_BOULDER = 25;
     private final String task;
@@ -16,8 +18,10 @@ public class ZeeMiningManager extends ZeeThread{
     public static Gob gobBoulder;
     public static ZeeMiningManager manager;
     static ZeeWindow windowManager;
-    static ZeeWindow.ZeeButton windowButtonTunnel;
-    static Coord tunnelPlec, tunnelSubc, tunnelColc;
+    static MCache.Overlay ol;
+    static Coord areasize = new Coord(1,1);
+    static String lastDir = "";
+    static Coord upperLeft;
 
     public ZeeMiningManager(String task){
         this.task = task;
@@ -32,11 +36,10 @@ public class ZeeMiningManager extends ZeeThread{
     public void run() {
         println(">mining manager on");
         try {
-            if (task.contentEquals(TASK_CHIP_BOULDER)) {
+            if (task.contentEquals(TASK_CHIP_BOULDER))
                 taskChipBoulder();
-            }else if (task.contentEquals(TASK_MAKE_TUNNEL)){
-                taskMakeTunnel();
-            }
+            else if (task.contentEquals(TASK_MINE_AREA))
+                taskMineArea();
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -44,45 +47,125 @@ public class ZeeMiningManager extends ZeeThread{
         println(">mining manager off");
     }
 
-    public static void checkTunnelMining(Coord sc, Coord ec) {
-        //println("sc="+sc+"  ec="+ec);
-        //println("sc-ec="+(sc.sub(ec))+"  ec-sc="+ec.sub(sc));
-        //println("player coord="+ZeeConfig.getPlayerCoord());
-        //println("player tile="+ZeeConfig.getPlayerTile());
-        // sc-ec=(10, 0)  ec-sc=(-10, 0)
-        if (!ZeeConfig.getCursorName().contentEquals(ZeeConfig.CURSOR_MINE))
+    private void taskMineArea() throws Exception{
+        if (ol==null || ol.a.sz().x<1 || ol.a.sz().y<1) {
+            println("area invalid");
             return;
-        Coord tiles = sc.sub(ec);
-        if((Math.abs(tiles.x)==10 && tiles.y==0)
-            || (Math.abs(tiles.y)==10 && tiles.x==0)) // if tunnel is 11x1 tiles
-        {
-            new ZeeThread() {
-                public void run() {
-                    waitStaminaIdleMs(2);
-                    Coord plec = ZeeMiningManager.tunnelPlec = ZeeConfig.getPlayerCoord();
-                    Coord subc = ZeeMiningManager.tunnelSubc = plec.sub(ec);
-                    Coord colc = ZeeMiningManager.tunnelColc = new Coord();
-                    if ((subc.x==0 && Math.abs(subc.y)==1) || (subc.y==0 && Math.abs(subc.x)==1)) {
-                        //show window if player ended mining on prev to last tile
-                        if (subc.x==0) {
-                            colc.x = ec.x + 1;
-                            colc.y = ec.y;
-                        }else{
-                            colc.x = ec.x;
-                            colc.y = ec.y + 1;
-                        }
-                        showWindowTunnel();
-                    }else
-                        println("checkTunnelMining > plec="+plec+"  ec="+ec+"  subc="+subc);
+        }
+        ZeeConfig.cursorChange(ZeeConfig.ACT_MINE);
+        waitCursor(ZeeConfig.CURSOR_MINE);
+        /*
+            areasize (1, 3)   dir=DIR_NORTH
+            ol.a.ul(-927, -1001)  ol.a.br(-926, -998)
+            haven.MapView@2124b275 ; sel ; [(-927, -1001), (-927, -1003), 0] (DIG BUTTON)
+            haven.MapView@2124b275 ; sel ; [(-927, -999), (-927, -1001), 0]
+            ===============
+            areasize (1, 3)   dir=DIR_SOUTH
+            ol.a.ul(-927, -999)  ol.a.br(-926, -996)
+            haven.MapView@24c17ef8 ; sel ; [(-927, -999), (-927, -1001), 0] (DIG BUTTON)
+            haven.MapView@24c17ef8 ; sel ; [(-927, -999), (-927, -997), 0]
+            ===============
+            areasize (3, 1)   dir=DIR_WEST
+            ol.a.ul(-929, -999)  ol.a.br(-926, -998)
+            haven.MapView@1e8d5a05 ; sel ; [(-929, -999), (-931, -999), 0] (DIG BUTTON)
+            haven.MapView@1e8d5a05 ; sel ; [(-927, -999), (-929, -999), 0]
+            ===============
+            areasize (3, 1)   dir=DIR_EAST
+            ol.a.ul(-1027, -999)  ol.a.br(-1024, -998)
+            haven.MapView@2001b699 ; sel ; [(-1027, -999), (-1029, -999), 0] (DIG BUTTON)
+            haven.MapView@2001b699 ; sel ; [(-1027, -999), (-1025, -999), 0]
+         */
+        Coord c1=null,c2=null;
+        Coord areasub1 = areasize.sub(1,1);
+        if(lastDir.contentEquals(DIR_NORTH)) {
+            c1 = upperLeft.add(areasub1);
+            c2 = upperLeft;
+        }else if(lastDir.contentEquals(DIR_SOUTH)) {
+            c1 = upperLeft;
+            c2 = upperLeft.add(areasub1);
+        }else if(lastDir.contentEquals(DIR_WEST)) {
+            c1 = upperLeft.add(areasub1);
+            c2 = upperLeft;
+        }else if(lastDir.contentEquals(DIR_EAST)) {
+            c1 = upperLeft;
+            c2 = upperLeft.add(areasub1);
+        }
+        println("ol.a.ul"+ol.a.ul+"  ol.a.br"+ol.a.br);
+        if (c1!=null && c2!=null) {
+            println("mine coords  "+c1+"  "+c2);
+            ZeeConfig.gameUI.map.wdgmsg("sel", c1, c2, 0);
+        }else {
+            println("mine coords null");
+        }
+        //ZeeConfig.gameUI.map.wdgmsg("sel", upperLeft, upperLeft.sub(areasize.sub(1,1)), 0);
+        waitPlayerIdleFor(2);
+
+        ol.destroy();
+        ol=null;
+        /*
+            test overlay
+            sleep(3000);
+            ol = ZeeConfig.glob.map.new Overlay(Area.sized(upperLeft, areasize), MapView.selol);
+         */
+    }
+
+
+    private static void changeAreasize(String dir) {
+
+        //println(dir + "  rc"+ZeeConfig.getPlayerGob().rc+"  coord"+ZeeConfig.getPlayerCoord()+"  tile"+ZeeConfig.getPlayerTile());
+
+        if (!dir.contentEquals(lastDir))
+            areasize = new Coord(1,1);
+        if(dir.contentEquals(DIR_NORTH))
+            areasize = areasize.add(0,1);
+        else if(dir.contentEquals(DIR_SOUTH))
+            areasize = areasize.add(0,1);
+        else if(dir.contentEquals(DIR_WEST))
+            areasize = areasize.add(1,0);
+        else if(dir.contentEquals(DIR_EAST))
+            areasize = areasize.add(1,0);
+
+        lastDir = dir;
+
+        Gob column = ZeeConfig.getClosestGobName("gfx/terobjs/column");
+        if (column==null) {
+            ZeeConfig.msg("player must be next to stonecolumn");
+        }else{
+            int dist = (int) ZeeConfig.distanceToPlayer(column);
+            ZeeConfig.addGobText(column, "dist " + dist);
+            if (dist > 12) {
+                ZeeConfig.msg("player must be next to stonecolumn");
+            }else{
+                //mc.div(MCache.tilesz2);
+                upperLeft = ZeeConfig.coordToTile(ZeeConfig.getPlayerGob().rc);
+
+                if (dir.contentEquals(DIR_NORTH))
+                    upperLeft.y -= Math.abs(areasize.y-1);
+                else if (dir.contentEquals(DIR_WEST))
+                    upperLeft.x -= Math.abs(areasize.x-1);
+
+                println("upperLeft "+upperLeft);
+                if(ol==null) {
+                    ol = ZeeConfig.glob.map.new Overlay(Area.sized(upperLeft, areasize), MapView.selol);
+                }else{
+                    /*
+                    Coord tc = mc.div(MCache.tilesz2);
+                    Coord c1 = new Coord(Math.min(tc.x, sc.x), Math.min(tc.y, sc.y));
+                    Coord c2 = new Coord(Math.max(tc.x, sc.x), Math.max(tc.y, sc.y));
+                    ol.update(new Area(c1, c2.add(1, 1)));
+                     */
+                    areasize = new Coord(Math.abs(areasize.x),Math.abs(areasize.y));
+                    ol.update(Area.sized(upperLeft, areasize));
                 }
-            }.start();
+                println("areasize "+areasize+"   dir="+dir);
+            }
         }
     }
 
-    private static void showWindowTunnel() {
+    public static void showWindowTunnel() {
         Widget wdg;
         if(windowManager ==null) {
-            windowManager = new ZeeWindow(new Coord(150, 60), "Tunnelling") {
+            windowManager = new ZeeWindow(new Coord(200, 90), "Mine manager") {
                 public void wdgmsg(String msg, Object... args) {
                     if (msg.equals("close")) {
                         busy = false;
@@ -91,17 +174,46 @@ public class ZeeMiningManager extends ZeeThread{
                         super.wdgmsg(msg, args);
                 }
             };
-            windowButtonTunnel = windowManager.add(new ZeeWindow.ZeeButton(UI.scale(85),"make tunnel"){
+            wdg = windowManager.add(new ZeeWindow.ZeeButton(UI.scale(30),"N"){
                 public void wdgmsg(String msg, Object... args) {
                     if(msg.equals("activate")){
-                        new ZeeMiningManager(TASK_MAKE_TUNNEL).start();
+                        changeAreasize(DIR_NORTH);
                     }
                 }
-            }, 5,5);
+            }, 35,5);
+            wdg = windowManager.add(new ZeeWindow.ZeeButton(UI.scale(30),"W"){
+                public void wdgmsg(String msg, Object... args) {
+                    if(msg.equals("activate")){
+                        changeAreasize(DIR_WEST);
+                    }
+                }
+            }, 5,30);
+            wdg = windowManager.add(new ZeeWindow.ZeeButton(UI.scale(30),"E"){
+                public void wdgmsg(String msg, Object... args) {
+                    if(msg.equals("activate")){
+                        changeAreasize(DIR_EAST);
+                    }
+                }
+            }, 65,30);
+            wdg = windowManager.add(new ZeeWindow.ZeeButton(UI.scale(30),"S"){
+                public void wdgmsg(String msg, Object... args) {
+                    if(msg.equals("activate")){
+                        changeAreasize(DIR_SOUTH);
+                    }
+                }
+            }, 35,60);
+            wdg = windowManager.add(new ZeeWindow.ZeeButton(UI.scale(60),"dig"){
+                public void wdgmsg(String msg, Object... args) {
+                    if(msg.equals("activate")){
+                        new ZeeMiningManager(TASK_MINE_AREA).start();
+                    }
+                }
+            }, 120,5);
             ZeeConfig.gameUI.add(windowManager, new Coord(100,100));
         }else{
             windowManager.show();
         }
+        changeAreasize("");
     }
 
     public static void exitManager(String msg) {
@@ -112,153 +224,14 @@ public class ZeeMiningManager extends ZeeThread{
         busy = false;
         ZeeConfig.clickGroundZero(1);
         windowManager.hide();
-    }
-
-    private void taskMakeTunnel() {
-        try {
-
-            /*
-                mine stonecolumn 1x1 tile
-             */
-            //tunnelPlec
-            //tunnelSubc
-            Coord colc = new Coord();
-            if (tunnelSubc.x==0);
-            ZeeConfig.gameUI.map.wdgmsg("sel", colc, colc, ZeeConfig.savedTileSelModflags);
-            waitPlayerIdleFor(2);
-
-
-            /*
-                build stonecolumn
-             */
-            //haven.MenuGrid@6ce8cd1d ; act ; [bp, column, 0, (-1000024, -1019956)]
-            //haven.MapView@620bad61 ; place ; [(-1000960, -1017344), -32768, 1, 0]
-
-        } catch (Exception e) {
-            e.printStackTrace();
+        if (ol!=null) {
+            ol.destroy();
+            ol = null;
         }
+        areasize = new Coord(1,1);
+        lastDir = "";
     }
 
-    private void taskMakeTunnel_old() {
-        try {
-            println("  >task make_tunnel on");
-            ZeeConfig.addPlayerText("tunneling");
-            // check if standing next to stone column, before start digging
-            windowButtonTunnel.disable(true);
-            Coord playersc = ZeeConfig.getPlayerTile();
-            waitPlayerIdleFor(2);
-            windowButtonTunnel.disable(false);
-            Gob column = ZeeConfig.getClosestGobName("gfx/terobjs/column");
-            if (column!=null) {
-                int dist = (int)ZeeConfig.distanceToPlayer(column);
-                ZeeConfig.addGobText(column, "dist " + dist);
-                if (dist < 15) {
-                    println("    make tunnel");
-                    Coord sc = ZeeConfig.savedTileSelStartCoord;
-                    Coord ec = ZeeConfig.savedTileSelEndCoord;
-                    Coord playerec = ZeeConfig.getPlayerTile();
-                    println("sc="+sc+"  ec="+ec);
-                    println("sc-ec="+(sc.sub(ec))+"  ec-sc="+ec.sub(sc));
-                    println("playersc="+playersc+"  playerec="+playerec);
-                    println("playersc-playerec="+(playersc.sub(playerec))+"  playerec-playersc="+playerec.sub(playersc));
-
-                    /*
-                        calculate tunnel coords
-                     */
-                    Coord newsc, newec, coordBuildColumn;
-                    int signal;
-                    if(sc.x == ec.x){
-                        // tunnel direction = X
-                        println("tunnel on X="+sc.x);
-                        newsc = new Coord(sc.x,0);
-                        newec = new Coord(sc.x,0);
-                        // extend coord that is closer to playerEndCoord
-                        if( Math.abs(playerec.y - ec.y) < Math.abs(playerec.y - sc.y) ){
-                            //playerEndCoord is closer to ec
-                            println("playerEndCoord is closer to ec "+ec);
-                            if (ec.y < 0)
-                                signal = -1;
-                            else
-                                signal = 1;
-                            newsc.y = ec.y + (1 * signal);
-                            newec.y = ec.y + (11 * signal);
-                        }else{
-                            //playerEndCoord is closer to sc
-                            println("playerEndCoord is closer to sc "+sc);
-                            if (sc.y < 0)
-                                signal = -1;
-                            else
-                                signal = 1;
-                            newsc.y = sc.y + (1 * signal);
-                            newec.y = sc.y + (11 * signal);
-                        }
-                        coordBuildColumn = new Coord(sc.x+1, newec.y);
-                        println("coordBuildColumn xdir "+coordBuildColumn);
-                    }
-                    else{
-                        // tunnel direction = Y
-                        println("tunnel on Y="+sc.y);
-                        newsc = new Coord(0, sc.y);
-                        newec = new Coord(0, sc.y);
-                        // extend coord that is closer to playerEndCoord
-                        if( Math.abs(playerec.x - ec.x) < Math.abs(playerec.x - sc.x) ){
-                            //playerEndCoord is closer to ec
-                            println("playerEndCoord is closer to ec "+ec);
-                            if (ec.x < 0)
-                                signal = -1;
-                            else
-                                signal = 1;
-                            newsc.x = ec.x + (1 * signal);
-                            newec.x = ec.x + (11 * signal);
-                        }else{
-                            //playerEndCoord is closer to sc
-                            println("playerEndCoord is closer to sc "+sc);
-                            if (sc.x < 0)
-                                signal = -1;
-                            else
-                                signal = 1;
-                            newsc.x = sc.x + (1 * signal);
-                            newec.x = sc.x + (11 * signal);
-                        }
-                        coordBuildColumn = new Coord(sc.y+1, newec.x);
-                        println("coordBuildColumn ydir "+coordBuildColumn);
-                    }
-
-                    /*
-                        mine tunnel
-                     */
-                    println("new tunnel  =  newsc"+newsc+"  newec"+newec);
-                    ZeeConfig.cursorChange(ZeeConfig.ACT_MINE);
-                    waitCursor(ZeeConfig.CURSOR_MINE);
-                    ZeeConfig.gameUI.map.wdgmsg("sel", newsc, newec, ZeeConfig.savedTileSelModflags);
-                    waitPlayerIdleFor(2);
-
-                    /*
-                        mine stonecolumn 1x1 tile
-                     */
-                    ZeeConfig.gameUI.map.wdgmsg("sel", coordBuildColumn, coordBuildColumn, ZeeConfig.savedTileSelModflags);
-                    waitPlayerIdleFor(2);
-
-
-                    /*
-                        build stonecolumn
-                     */
-                    //haven.MenuGrid@6ce8cd1d ; act ; [bp, column, 0, (-1000024, -1019956)]
-                    //haven.MapView@620bad61 ; place ; [(-1000960, -1017344), -32768, 1, 0]
-                }
-                else{
-                    println("    no column next tile (dist="+dist+")");
-                }
-            }
-            else {
-                println("    column null");
-            }
-            println("  >task make_tunnel off");
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-        ZeeConfig.removePlayerText();
-    }
 
     private void taskChipBoulder() throws Exception {
         println(">task chip_boulder on");

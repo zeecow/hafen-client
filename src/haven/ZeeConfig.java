@@ -68,6 +68,7 @@ public class ZeeConfig {
     public static GobIcon.SettingsWindow.IconList iconList;
     private static Dropbox<String> iconListFilterBox;
     private static Inventory mainInv;
+    public static Glob glob;
 
     public static String playingAudio = null;
     public static String uiMsgTextQuality, uiMsgTextBuffer;
@@ -1498,7 +1499,6 @@ public class ZeeConfig {
         savedTileSelEndCoord = ec;
         savedTileSelModflags = modflags;
         savedTileSelOverlay = ol;
-        ZeeMiningManager.checkTunnelMining(sc,ec);
     }
 
     public static void resetTileSelection(){
@@ -1564,7 +1564,7 @@ public class ZeeConfig {
             }
         }else{ // clicked ground
             if (clickb==2 && ZeeConfig.isPlayerHoldingItem()) //move while holding item
-                ZeeConfig.clickTile(mc.floor(posres),1, 0);
+                ZeeConfig.clickCoord(mc.floor(posres),1, 0);
         }
     }
 
@@ -1707,28 +1707,21 @@ public class ZeeConfig {
 
     // simulate cancel click
     public static void clickGroundZero(int btn) {
-        clickTile(getPlayerCoord(),btn);
+        clickCoord(getPlayerCoord(),btn);
     }
     public static void clickGroundZero(int btn, int mod) {
-        clickTile(getPlayerCoord(),btn,mod);
+        clickCoord(getPlayerCoord(),btn,mod);
     }
 
     public static void clickRemoveCursor(){
-        ZeeConfig.clickTile(Coord.z,3);
+        ZeeConfig.clickCoord(Coord.z,3);
     }
 
-    /*
-        //save player origin
-        Coord origin = ZeeConfig.getTileCoord(getPlayerGob());
-        ...
-        //move player back to origin
-        Zeeconfig.clickTile(origin,3);
-     */
-    public static void clickTile(Coord tileCoord, int btn) {
-        gameUI.map.wdgmsg("click", ZeeConfig.getCenterScreenCoord(), tileCoord, btn, 0);
+    public static void clickCoord(Coord coord, int btn) {
+        gameUI.map.wdgmsg("click", ZeeConfig.getCenterScreenCoord(), coord, btn, 0);
     }
-    public static void clickTile(Coord tileCoord, int btn, int mod) {
-        gameUI.map.wdgmsg("click", ZeeConfig.getCenterScreenCoord(), tileCoord, btn, mod);
+    public static void clickCoord(Coord coord, int btn, int mod) {
+        gameUI.map.wdgmsg("click", ZeeConfig.getCenterScreenCoord(), coord, btn, mod);
     }
     public static Coord getCoordGob(Gob gob){
         return gob.rc.floor(OCache.posres);
@@ -1736,6 +1729,9 @@ public class ZeeConfig {
 
     public static Coord coordToTile(Coord2d c) {
         return c.div(11, 11).floor();
+    }
+    public static Coord coordToTile(Coord c) {
+        return c.div(MCache.tilesz2);
     }
 
     public static Coord getCenterScreenCoord(GameUI ui) {

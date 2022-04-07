@@ -164,7 +164,9 @@ public class ZeeClickGobManager extends ZeeThread{
         else if (petalName.equals(ZeeFlowerMenu.STRPETAL_DESTROYTREELOG2) || petalName.equals(ZeeFlowerMenu.STRPETAL_DESTROYTREELOG3) || petalName.equals(ZeeFlowerMenu.STRPETAL_DESTROYTREELOG4)){
             destroyTreelogs(gob,petalName);
         }
-        else{
+        if (petalName.equals(ZeeFlowerMenu.STRPETAL_SHOWTUNNELWINDOW)) {
+            ZeeMiningManager.showWindowTunnel();
+        }else{
             println("chooseGobFlowerMenu > unkown case");
         }
     }
@@ -239,7 +241,9 @@ public class ZeeClickGobManager extends ZeeThread{
                 ZeeFlowerMenu.STRPETAL_DESTROYTREELOG3, ZeeFlowerMenu.STRPETAL_DESTROYTREELOG4
             );
         }
-        else{
+        else if (gobName.endsWith("/column") || ZeeConfig.isPlayer(gob)) {
+            menu = new ZeeFlowerMenu(gob, ZeeFlowerMenu.STRPETAL_SHOWTUNNELWINDOW);
+        }else{
             showMenu = false;
             //println("showGobFlowerMenu() > unkown case");
         }
