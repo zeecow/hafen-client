@@ -675,7 +675,7 @@ public class ZeeConfig {
             windowEquipment = window;
         }else if(windowTitle.equals("Inventory")) {
             windowInvMain = window;
-        }else if(windowTitle.equals("Barter Stand")){
+        }else if(windowTitle.equals("Barter Stand") && window.sz.x > 300){//avoid build window
             windowModBarterStand(window);
         }else if(isWindowAnimalStats(windowTitle)){
             windowModAnimalStats(window, windowTitle);
