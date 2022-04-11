@@ -197,7 +197,6 @@ public class Inventory extends Widget implements DTarget {
 				String wdgname = ((WItem) wdg).item.res.get().name;
 				if (wdgname.contains(name)) {
 					count++;
-					break;
 				}
 			}
 		}

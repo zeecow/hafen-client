@@ -191,8 +191,8 @@ public class GItem extends AWidget implements ItemInfo.SpriteOwner, GSprite.Owne
 				//farmermode not busy
 				if (ZeeConfig.savedTileSelEndCoord == null) {
 					//cancel farmermode
-					ZeeConfig.println("> Farmer mode: no tile selection. Canceling...");
-					ZeeConfig.farmerMode = false;
+					ZeeConfig.println("seedfarmer > no tile selection, reset initial state");
+					//ZeeConfig.farmerMode = false; //TODO test
 					ZeeSeedFarmingManager.resetInitialState();
 				}
 				else {

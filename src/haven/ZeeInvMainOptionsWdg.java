@@ -44,7 +44,7 @@ public class ZeeInvMainOptionsWdg extends Widget {
 
         x += cbButcher.sz.x + 5;
 
-        add(cbPiler = new CheckBox("pile") {
+        add(cbPiler = new CheckBox("piler") {
             {
                 a = ZeeConfig.pilerMode;
             }

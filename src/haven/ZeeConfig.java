@@ -135,7 +135,7 @@ public class ZeeConfig {
     public static boolean zoomOrthoExtended = Utils.getprefb("zoomOrthoExtended", true);
 
     public final static Set<String> mineablesStone = new HashSet<String>(Arrays.asList(
-            "gneiss","basalt","cinnabar","dolomite","feldspar","flint",
+            "gneiss","basalt","dolomite","feldspar","flint",
             "granite","hornblende","limestone","marble","porphyry","quartz",
             "sandstone","schist","blackcoal","zincspar","apatite","fluorospar",
             "gabbro","corund","kyanite","mica","microlite","orthoclase","soapstone",
@@ -144,7 +144,7 @@ public class ZeeConfig {
             "ilmenite","rhyolite","pumice"
     ));
     public final static Set<String> mineablesOre = new HashSet<String>(Arrays.asList(
-            "cassiterite","chalcopyrite","malachite","ilmenite",
+            "cassiterite","chalcopyrite","malachite","ilmenite","cinnabar",
             "limonite","hematite","magnetite","leadglance","peacockore"
     ));
     public final static Set<String> mineablesOrePrecious = new HashSet<String>(Arrays.asList(
@@ -1336,6 +1336,16 @@ public class ZeeConfig {
         return null;
     }
 
+    public static Button getButtonNamed(Window win, String name) {
+        Set<Button> buttons = win.children(Button.class);
+        for(Button b : buttons) {
+            if(b.text.text.equalsIgnoreCase(name)){
+                return b;
+            }
+        }
+        return null;
+    }
+
     public static List<Window> getWindows(String name) {
         List<Window> ret = new ArrayList<>();
         if(gameUI==null)
@@ -1709,6 +1719,7 @@ public class ZeeConfig {
     public static void clickGroundZero(int btn) {
         clickCoord(getPlayerCoord(),btn);
     }
+
     public static void clickGroundZero(int btn, int mod) {
         clickCoord(getPlayerCoord(),btn,mod);
     }
@@ -1718,11 +1729,27 @@ public class ZeeConfig {
     }
 
     public static void clickCoord(Coord coord, int btn) {
-        gameUI.map.wdgmsg("click", ZeeConfig.getCenterScreenCoord(), coord, btn, 0);
+        clickCoord(coord, btn, 0);
     }
+
     public static void clickCoord(Coord coord, int btn, int mod) {
         gameUI.map.wdgmsg("click", ZeeConfig.getCenterScreenCoord(), coord, btn, mod);
     }
+
+    public static void clickTile(Coord c, int btn) {
+        clickCoord(tileToCoord(c), btn, 0);
+    }
+
+    public static void clickTile(Coord c, int btn, int mod) {
+        clickCoord(tileToCoord(c), btn);
+    }
+
+    public static Coord getAreaCenterTile(Area a){
+        Coord center = a.ul.add(a.sz().div(2));
+        //println("ul"+a.ul+"  br"+a.br+"  sz"+a.sz()+"  center"+center);
+        return center;
+    }
+
     public static Coord getCoordGob(Gob gob){
         return gob.rc.floor(OCache.posres);
     }
@@ -1732,6 +1759,12 @@ public class ZeeConfig {
     }
     public static Coord coordToTile(Coord c) {
         return c.div(MCache.tilesz2);
+    }
+
+    public static Coord tileToCoord(Coord tile){
+        // 0x1.0p-10 = 1/1024 = 0.0009765625 in base 10
+        //1023,5
+        return tile.mul(1023.5);
     }
 
     public static Coord getCenterScreenCoord(GameUI ui) {

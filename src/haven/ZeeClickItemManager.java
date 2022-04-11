@@ -56,6 +56,13 @@ public class ZeeClickItemManager extends ZeeThread{
         }
     }
 
+    public static WItem getSackFromBelt() {
+        WItem ret = getBeltWItem("travellerssack");
+        if (ret==null)
+            ret = ret = getBeltWItem("bindle");
+        return ret;
+    }
+
     private void init(WItem wItem) {
         equipory = ZeeConfig.windowEquipment.getchild(Equipory.class);
         leftHandItemName = (equipory.leftHand==null ? "" : equipory.leftHand.item.getres().name);
@@ -647,6 +654,7 @@ public class ZeeClickItemManager extends ZeeThread{
     private boolean isItemSack() {
         return isItemSack(itemName);
     }
+    
     public static boolean isItemSack(String name) {
         return name.endsWith("travellerssack") || name.endsWith("bindle");
     }

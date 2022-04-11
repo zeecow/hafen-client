@@ -182,6 +182,10 @@ public class Fightview extends Widget {
 		ZeeConfig.println(">combat relations, cancel mining");
 		ZeeMiningManager.stopMining();
 	}
+	if (ZeeSeedFarmingManager.busy){
+		ZeeConfig.println(">combat relations, cancel farming");
+		ZeeSeedFarmingManager.resetInitialState();
+	}
     }
     
     public void destroy() {

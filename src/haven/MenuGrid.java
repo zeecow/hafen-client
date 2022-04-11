@@ -614,7 +614,8 @@ public class MenuGrid extends Widget implements KeyBinding.Bindable {
 
 	@Override
 	public void wdgmsg(String msg, Object... args) {
-		ZeeConfig.craftHistoryAdd(msg,args);
+		if (msg.contentEquals("act") && args[0].toString().contentEquals("craft"))
+			ZeeConfig.craftHistoryAdd(msg,args);
 		super.wdgmsg(msg, args);
 	}
 }

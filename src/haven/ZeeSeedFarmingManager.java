@@ -7,7 +7,6 @@ public class ZeeSeedFarmingManager extends ZeeThread{
 
     public static final int MIN_ACCESSIBLE_DIST = 15;//TODO: isPlayerMountingHorse()
     public static final int MAX_BARREL_DIST = 300;
-    public static final double TILE_SIZE = MCache.tilesz.x;
     public static Gob lastBarrel;
     public static boolean busy;
     public static String gItemSeedBasename, lastItemSeedBasename;
@@ -16,6 +15,7 @@ public class ZeeSeedFarmingManager extends ZeeThread{
     public static Inventory inv;
     public static boolean isHarvestDone, isPlantingDone;
     public static Window windowManager;
+    public static ZeeSeedFarmingManager manager;
 
     public static boolean farmerCbReplant = Utils.getprefb("farmerCbPlant",false);
     public static int farmerTxtTilesBarrel = Utils.getprefi("farmerTxtTilesBarrel",27);
@@ -38,17 +38,22 @@ public class ZeeSeedFarmingManager extends ZeeThread{
     }
 
     public void run(){
+        manager = this;
         startFarming();
     }
 
     public static void resetInitialState() {
-        //println(">reset initial state");
-        busy = false;
-        isHarvestDone = true;
-        isPlantingDone = true;
-        ZeeConfig.resetTileSelection();
-        ZeeConfig.autoHearthOnStranger = Utils.getprefb("autoHearthOnStranger", true);
-        ZeeConfig.removeGobText(ZeeConfig.getPlayerGob());
+        try {
+            busy = false;
+            isHarvestDone = true;
+            isPlantingDone = true;
+            ZeeConfig.resetTileSelection();
+            ZeeConfig.autoHearthOnStranger = Utils.getprefb("autoHearthOnStranger", true);
+            ZeeConfig.removeGobText(ZeeConfig.getPlayerGob());
+            manager.interrupt();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     /*
@@ -117,7 +122,7 @@ public class ZeeSeedFarmingManager extends ZeeThread{
             isHarvestDone = false;
             while(busy && !isHarvestDone) {
                 //println("> harvesting loop");
-                ZeeConfig.addGobText(ZeeConfig.getPlayerGob(),"harvesting",0,255,255,255,10);
+                ZeeConfig.addPlayerText("harvesting");
                 waitPlayerIdleFor(2);//already farming
                 if(inventoryHasSeeds()) {
                     storeSeedsInBarrel();
@@ -190,7 +195,7 @@ public class ZeeSeedFarmingManager extends ZeeThread{
 
     private boolean getSeedsFromMultipleBarrels(String seedBaseName) {
         try {
-            ZeeConfig.addGobText(ZeeConfig.getPlayerGob(),"getting seeds",0,255,255,255,10);
+            ZeeConfig.addPlayerText("getting seeds");
 
             while(!isInventoryFull()){
 
@@ -259,7 +264,7 @@ public class ZeeSeedFarmingManager extends ZeeThread{
     }
 
     private boolean plantSeeds() {
-        ZeeConfig.addGobText(ZeeConfig.getPlayerGob(),"planting",0,255,255,255,10);
+        ZeeConfig.addPlayerText("planting");
         if(updateSeedPileReference() && activateCursorPlantGItem(gItem)) {
             ZeeConfig.gameUI.map.wdgmsg("sel", ZeeConfig.savedTileSelStartCoord, ZeeConfig.savedTileSelEndCoord, ZeeConfig.savedTileSelModflags);
             return true;
@@ -270,7 +275,7 @@ public class ZeeSeedFarmingManager extends ZeeThread{
     }
 
     private boolean harvestPlants() {
-        ZeeConfig.addGobText(ZeeConfig.getPlayerGob(),"harvesting",0,255,255,255,10);
+        ZeeConfig.addPlayerText("harvesting");
         if(activateCursorHarvestGob()) {
             ZeeConfig.gameUI.map.wdgmsg("sel", ZeeConfig.savedTileSelStartCoord, ZeeConfig.savedTileSelEndCoord, ZeeConfig.savedTileSelModflags);
             return true;
@@ -364,6 +369,10 @@ public class ZeeSeedFarmingManager extends ZeeThread{
 
     private void storeSeedsInBarrel() {
         try {
+            //move to area center before choosing barrel
+            ZeeConfig.addPlayerText("centering");
+            ZeeConfig.clickTile(ZeeConfig.getAreaCenterTile(ZeeConfig.savedTileSelOverlay.a),1);
+            waitPlayerIdleFor(1);
             List<Gob> barrels = getAccessibleBarrels();
             if (barrels.size()==0) {
                 /*
@@ -393,8 +402,8 @@ public class ZeeSeedFarmingManager extends ZeeThread{
                     resetInitialState();
                     return;
                 }
-                ZeeConfig.addGobText(ZeeConfig.getPlayerGob(),"storing",0,255,255,255,10);
-                ZeeConfig.addGobText(lastBarrel, getSeedNameAndQl(), 0,255,0,255,10);
+                ZeeConfig.addPlayerText("storing");
+                ZeeConfig.addGobText(lastBarrel, getSeedNameAndQl());
                 updateSeedPileReference();
                 ZeeClickItemManager.pickUpItem(wItem);
                 ZeeClickGobManager.gobItemAct(lastBarrel, UI.MOD_SHIFT);//store first seeds
@@ -533,7 +542,7 @@ public class ZeeSeedFarmingManager extends ZeeThread{
 
 
             //add bottom note
-            wdg = windowManager.add(new Label("Start from the field's center."), 0, 90-30);
+            wdg = windowManager.add(new Label("No path-finding."), 0, 90-30);
             wdg = windowManager.add(new Label("Remove field obstacles, surround with barrels."), 0, 90-15);
 
 

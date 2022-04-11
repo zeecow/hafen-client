@@ -7,6 +7,8 @@ public class ZeeThread  extends Thread{
     static final long LONG_CLICK_MS = 333;
     static final long PING_MS = 250;
 
+    public static final double TILE_SIZE = MCache.tilesz.x;
+
     public static boolean waitNotHoldingItem() {
         long max = TIMEOUT_MS;
         try {
@@ -103,6 +105,7 @@ public class ZeeThread  extends Thread{
         returns true if player idle for idleMS
      */
     public static boolean waitPlayerIdleFor(int idleSeconds) {
+        //println("waitPlayerIdleFor "+idleSeconds+"s");
         long timer = idleSeconds * 1000;
         try {
             while( timer > 0 ) {
@@ -116,6 +119,7 @@ public class ZeeThread  extends Thread{
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+        //println("waitPlayerIdleFor ret "+(timer<=0));
         return timer <= 0;
     }
 
@@ -191,29 +195,47 @@ public class ZeeThread  extends Thread{
         return inv.getNumberOfFreeSlots() == 0;
     }
 
-    public static boolean waitInvFullOrHoldingItem(Inventory inv) {
-        //println("wait inv full or holding item1");
-        if(ZeeConfig.isPlayerHoldingItem())
-            return true;
-        int timer = (int) TIMEOUT_MS;
+    public static boolean waitInvFreeSlotsIdleSec(int idleSec) {
+        return waitInvFreeSlotsIdleSec(ZeeConfig.getMainInventory(),idleSec);
+    }
+
+    public static boolean waitInvFreeSlotsIdleSec(Inventory inv, int idleSec) {
+        long timerMs = idleSec*1000;
+        //println("waitInvFreeSlotsIdleSec "+timerMs+"ms");
         try {
-            lastInvFreeSlots = invFreeSlots = inv.getNumberOfFreeSlots();
-            while( timer > 0  && !ZeeConfig.isPlayerHoldingItem() && (invFreeSlots = inv.getNumberOfFreeSlots()) > 0 ) {
+            lastInvFreeSlots = inv.getNumberOfFreeSlots();
+            while( timerMs > 0 ){
+                invFreeSlots = inv.getNumberOfFreeSlots();
                 if(lastInvFreeSlots != invFreeSlots) {
                     // reset timer if free slots changed
-                    timer = (int) TIMEOUT_MS;
+                    timerMs = idleSec*1000;
                     lastInvFreeSlots = invFreeSlots;
-                }else{
-                    timer -= SLEEP_MS;
+                }else {
+                    // freeslots didnt change
+                    timerMs -= 500;
                 }
+                Thread.sleep(500);
+            }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        //println("waitInvFreeSlotsIdleMs ret "+(timerMs <= 0)+" "+timerMs+"ms");
+        return timerMs <= 0;
+    }
+
+    public static boolean waitInvIdleMs(long idleMs) {
+        //println("waitInvIdleMs "+idleMs);
+        long interval = 0;
+        try {
+            ZeeConfig.lastInvItemMs = now();
+            while( (interval = now()-ZeeConfig.lastInvItemMs) < idleMs  ) {
                 Thread.sleep(SLEEP_MS);
             }
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        if(ZeeConfig.isPlayerHoldingItem())
-            return true;
-        return inv.getNumberOfFreeSlots() == 0;
+        //println("waitInvIdleMs ret "+(interval >= idleMs));
+        return interval >= idleMs;
     }
 
     public static boolean waitInvFullOrHoldingItem(Inventory inv, int timeOutMs) {
