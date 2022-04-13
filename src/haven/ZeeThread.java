@@ -17,9 +17,9 @@ public class ZeeThread  extends Thread{
                 try {
                     while (true) {
                         lastStam = ZeeConfig.getStamina();
-                        sleep(500);// TODO test 1000ms too
+                        sleep(1000);
                         stamChangeSec = ZeeConfig.getStamina() - lastStam ;
-                        //println("stam/.5sec  "+stamChangeSec+"    lastStam "+lastStam);
+                        //println("stam/sec  "+stamChangeSec+"    lastStam "+lastStam);
                     }
                 }catch (InterruptedException ie){
                     //println("staMonitor sleep interrupted");
@@ -136,7 +136,7 @@ public class ZeeThread  extends Thread{
         returns true if player idle for idleMS
      */
     public static boolean waitPlayerIdleFor(int idleSeconds) {
-        println("waitPlayerIdleFor "+idleSeconds+"s");
+        //println("waitPlayerIdleFor "+idleSeconds+"s");
         staminaMonitorStart();
         long timer = idleSeconds * 1000;
         try {
@@ -152,30 +152,13 @@ public class ZeeThread  extends Thread{
             e.printStackTrace();
         }
         staminaMonitorStop();
-        println("waitPlayerIdleFor ret "+(timer<=0));
+        //println("waitPlayerIdleFor ret "+(timer<=0));
         return timer <= 0;
     }
 
 
     public static boolean waitPlayerIdle() {
-        staminaMonitorStart();
-        long timer = 1000;
-        println("waitPlayerIdle ("+timer+"ms)");
-        try {
-            while( timer > 0 ) {
-                if(ZeeConfig.isPlayerMoving() || stamChangeSec!=0){//ZeeConfig.isPlayerDrinking() ){
-                    timer = 1000; //reset timer if player moving or stamina changing
-                }else {
-                    timer -= SLEEP_MS;
-                }
-                Thread.sleep(SLEEP_MS);
-            }
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        staminaMonitorStop();
-        println("waitPlayerIdle ret "+(timer<=0));
-        return timer <= 0;
+        return waitPlayerIdleFor(2);
     }
 
 
