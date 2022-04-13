@@ -135,7 +135,7 @@ public class ZeeConfig {
     public static boolean zoomOrthoExtended = Utils.getprefb("zoomOrthoExtended", true);
 
     public final static Set<String> mineablesStone = new HashSet<String>(Arrays.asList(
-            "gneiss","basalt","dolomite","feldspar","flint",
+            "stone","gneiss","basalt","dolomite","feldspar","flint",
             "granite","hornblende","limestone","marble","porphyry","quartz",
             "sandstone","schist","blackcoal","zincspar","apatite","fluorospar",
             "gabbro","corund","kyanite","mica","microlite","orthoclase","soapstone",

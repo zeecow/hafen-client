@@ -6,8 +6,39 @@ public class ZeeThread  extends Thread{
     static final long TIMEOUT_MS = 2000;
     static final long LONG_CLICK_MS = 333;
     static final long PING_MS = 250;
-
     public static final double TILE_SIZE = MCache.tilesz.x;
+    static double stamChangeSec = 0;
+    static Thread stamThread;
+
+    public static void staminaMonitorStart() {
+        stamThread = new Thread(){
+            public void run() {
+                double lastStam;
+                try {
+                    while (true) {
+                        lastStam = ZeeConfig.getStamina();
+                        sleep(500);// TODO test 1000ms too
+                        stamChangeSec = ZeeConfig.getStamina() - lastStam ;
+                        //println("stam/.5sec  "+stamChangeSec+"    lastStam "+lastStam);
+                    }
+                }catch (InterruptedException ie){
+                    //println("staMonitor sleep interrupted");
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+            }
+        };
+        stamThread.start();
+    }
+
+    public static void staminaMonitorStop(){
+        try {
+            if (stamThread!=null)
+                stamThread.interrupt();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
 
     public static boolean waitNotHoldingItem() {
         long max = TIMEOUT_MS;
@@ -105,12 +136,13 @@ public class ZeeThread  extends Thread{
         returns true if player idle for idleMS
      */
     public static boolean waitPlayerIdleFor(int idleSeconds) {
-        //println("waitPlayerIdleFor "+idleSeconds+"s");
+        println("waitPlayerIdleFor "+idleSeconds+"s");
+        staminaMonitorStart();
         long timer = idleSeconds * 1000;
         try {
             while( timer > 0 ) {
-                if(ZeeConfig.isPlayerMoving() || ZeeConfig.isPlayerDrinking() ){
-                    timer = idleSeconds * 1000; //reset timer if player moving or dringing
+                if(ZeeConfig.isPlayerMoving() || stamChangeSec!=0){//ZeeConfig.isPlayerDrinking() ){
+                    timer = idleSeconds * 1000; //reset timer if player moving or stamina changing
                 }else {
                     timer -= SLEEP_MS;
                 }
@@ -119,9 +151,33 @@ public class ZeeThread  extends Thread{
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        //println("waitPlayerIdleFor ret "+(timer<=0));
+        staminaMonitorStop();
+        println("waitPlayerIdleFor ret "+(timer<=0));
         return timer <= 0;
     }
+
+
+    public static boolean waitPlayerIdle() {
+        staminaMonitorStart();
+        long timer = 1000;
+        println("waitPlayerIdle ("+timer+"ms)");
+        try {
+            while( timer > 0 ) {
+                if(ZeeConfig.isPlayerMoving() || stamChangeSec!=0){//ZeeConfig.isPlayerDrinking() ){
+                    timer = 1000; //reset timer if player moving or stamina changing
+                }else {
+                    timer -= SLEEP_MS;
+                }
+                Thread.sleep(SLEEP_MS);
+            }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        staminaMonitorStop();
+        println("waitPlayerIdle ret "+(timer<=0));
+        return timer <= 0;
+    }
+
 
     public static boolean waitCursor(String name) {
         //println("wait cursor "+name);
@@ -153,26 +209,6 @@ public class ZeeThread  extends Thread{
     }
 
 
-    public static void waitPlayerIdle(){
-        try {
-
-            if(!ZeeConfig.isPlayerMoving()) { // started idle
-                // wait player move
-                while(!ZeeConfig.isPlayerMoving()) {
-                    Thread.sleep(SLEEP_MS);
-                }
-            }
-
-            // wait player stop
-            while(ZeeConfig.isPlayerMoving()) {
-                Thread.sleep(SLEEP_MS);
-            }
-
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-    }
-
     static int invFreeSlots, lastInvFreeSlots;
     public static boolean waitInvFull(Inventory inv) {
         //println("wait inv full");
@@ -193,6 +229,10 @@ public class ZeeThread  extends Thread{
             e.printStackTrace();
         }
         return inv.getNumberOfFreeSlots() == 0;
+    }
+
+    public static boolean waitInvFreeSlotsIdle() {
+        return waitInvFreeSlotsIdleSec(2);//TODO use 3 if necessary
     }
 
     public static boolean waitInvFreeSlotsIdleSec(int idleSec) {
@@ -221,6 +261,10 @@ public class ZeeThread  extends Thread{
         }
         //println("waitInvFreeSlotsIdleMs ret "+(timerMs <= 0)+" "+timerMs+"ms");
         return timerMs <= 0;
+    }
+
+    public static boolean waitInvIdle() {
+        return waitInvIdleMs(1000);
     }
 
     public static boolean waitInvIdleMs(long idleMs) {
@@ -334,7 +378,7 @@ public class ZeeThread  extends Thread{
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        //println("waitStaminaIdleMs > ret="+(timeoutMs <= 0));
+        println("waitStaminaIdleMs > ret="+(timeoutMs <= 0));
         return (timeoutMs <= 0);
     }
 

@@ -22,6 +22,7 @@ public class ZeeMiningManager extends ZeeThread{
     public static Gob gobBoulder;
     public static ZeeMiningManager manager;
     static ZeeWindow windowManager;
+    static ZeeWindow.ZeeButton btnNorth, btnSouth, btnWest, btnEast, btnDig;
     static MCache.Overlay ol;
     static Coord areasize = new Coord(1,1);
     static String lastDir = "";
@@ -140,22 +141,26 @@ public class ZeeMiningManager extends ZeeThread{
         /*
         mine until reach tile c2
          */
+        ZeeConfig.addPlayerText("dig");
+        disableBtns(true);
         ZeeConfig.clickTile(c1,1);//start at c1
         mineTiles(c1,c2);
         ZeeConfig.autoChipMinedBoulder = false;//will use another chipboulder code
-        waitPlayerIdleFor(2);
+        waitPlayerIdle();//waitPlayerIdleFor(2);
         Gob boulder = ZeeConfig.getClosestGobName("gfx/terobjs/bumlings/");
         //chip close boulder(s)
         while (boulder!=null && ZeeConfig.distanceToPlayer(boulder) < DIST_BOULDER) {
-            println("chipping boulder");
+            //println("chipping boulder");
+            ZeeConfig.addPlayerText("boulder");
             if (!chipBoulder(boulder)){
                 ZeeConfig.autoChipMinedBoulder = Utils.getprefb("autoChipMinedBoulder", true);
                 return exitManager("couldn't chip boulder");
             }
-            println("chipped boulder");
+            //println("boulder done");
             //resume mining
+            ZeeConfig.addPlayerText("dig");
             mineTiles(c1,c2);
-            waitPlayerIdleFor(2);
+            waitPlayerIdle();//waitPlayerIdleFor(2);
             boulder = ZeeConfig.getClosestGobName("gfx/terobjs/bumlings/");
         }
         ZeeConfig.autoChipMinedBoulder = Utils.getprefb("autoChipMinedBoulder", true);
@@ -167,13 +172,14 @@ public class ZeeMiningManager extends ZeeThread{
         /*
         mine column tile
          */
+        ZeeConfig.addPlayerText("col");
         ZeeConfig.clickRemoveCursor();
         waitCursor(ZeeConfig.CURSOR_ARW);
         if (!mining)
             return exitManager("mining canceled 3");
         //ZeeConfig.clickCoord(ZeeConfig.tileToCoord(c2),1);
         ZeeConfig.clickTile(c2,1);//move to end tile
-        waitPlayerIdleFor(2);
+        waitPlayerIdle();//waitPlayerIdleFor(2);
         if (!mining)
             return exitManager("mining canceled 3.1");
         Coord tileNewCol;
@@ -183,11 +189,11 @@ public class ZeeMiningManager extends ZeeThread{
             tileNewCol = c2.add(0,1);
         else
             return exitManager("no tile for new column");
-        println("new col tile "+tileNewCol);
+        //println("new col tile "+tileNewCol);
         mineTiles(tileNewCol,tileNewCol);
         if (!mining)
             return exitManager("mining canceled 3.2");
-        waitPlayerIdleFor(2);
+        waitPlayerIdle();//waitPlayerIdleFor(2);
         if (!mining)
             return exitManager("mining canceled 3.3");
         //highlightTiles(tileNewCol,1);waitPlayerIdleFor(3);
@@ -197,8 +203,9 @@ public class ZeeMiningManager extends ZeeThread{
         get stones
          */
         //realign player (caused by boulder on tileNewCol)
+        ZeeConfig.addPlayerText("stones");
         ZeeConfig.clickTile(c2,1);
-        waitPlayerIdleFor(1);
+        waitPlayerIdle();//waitPlayerIdleFor(1);
         if (!pickStones(30)) {
             return exitManager("not enough stones for new column");
         }
@@ -215,8 +222,9 @@ public class ZeeMiningManager extends ZeeThread{
         /*
         build column
          */
+        ZeeConfig.addPlayerText("col");
         ZeeConfig.clickTile(c2,1);//move to end tile
-        waitPlayerIdleFor(2);
+        waitPlayerIdle();//waitPlayerIdleFor(2);
         ZeeConfig.gameUI.menu.wdgmsg("act","bp","column","0");
         sleep(1000);
         if (!mining)
@@ -234,9 +242,9 @@ public class ZeeMiningManager extends ZeeThread{
         buildBtn.click();
         if (!mining)
             return exitManager("mining canceled 4.2");
-        waitInvFreeSlotsIdleSec(3);//wait building
+        waitInvFreeSlotsIdle();//waitInvFreeSlotsIdleSec(3);//wait building
         ZeeConfig.clickTile(c2,1);//realign to c2
-        waitPlayerIdleFor(1);
+        waitPlayerIdle();//waitPlayerIdleFor(1);
         inv.children(WItem.class).forEach(wItem -> {//drop remaining inv stones
             if (ZeeConfig.mineablesStone.contains(wItem.item.getres().basename()))
                 wItem.item.wdgmsg("drop", Coord.z);
@@ -250,16 +258,22 @@ public class ZeeMiningManager extends ZeeThread{
         update overlay for next tiles
          */
         upperLeft = ZeeConfig.coordToTile(ZeeConfig.getPlayerGob().rc);
-        println("upperLeft before"+upperLeft);
+        //println("upperLeft before"+upperLeft);
         if (lastDir.contentEquals(DIR_NORTH))
             upperLeft.y -= Math.abs(areasize.y)-1;
         else if (lastDir.contentEquals(DIR_WEST))
             upperLeft.x -= Math.abs(areasize.x)-1;
-        println("upperLeft after"+upperLeft);
+        //println("upperLeft after"+upperLeft);
         highlightTiles(upperLeft,areasize);
-        println("areasize "+areasize);
+        //println("areasize "+areasize);
 
+
+        /*
+        finish
+         */
         mining = false;
+        ZeeConfig.removePlayerText();
+        disableBtns(false);
 
         return true;
     }
@@ -293,16 +307,13 @@ public class ZeeMiningManager extends ZeeThread{
         if (invItems.size() >= wantedStones)
             return true;
         if(inv.getNumberOfFreeSlots() < wantedStones){
-            println(1);
             WItem sack = ZeeClickItemManager.getSackFromBelt();//1st sack
             if (sack!=null) {
-                println(2);
                 Thread t = new ZeeClickItemManager(sack);
                 t.start();
                 t.join();//wait equip sack
                 sack = ZeeClickItemManager.getSackFromBelt();//2nd sack
                 if(inv.getNumberOfFreeSlots()<wantedStones && sack!=null){
-                    println(3);
                     t = new ZeeClickItemManager(sack);
                     t.start();
                     t.join();//wait equip 2nd sack
@@ -310,7 +321,6 @@ public class ZeeMiningManager extends ZeeThread{
             }
         }
         int invStones = invItems.size();
-        //println("4 > invStones "+invStones);
         while (mining  &&  invStones<wantedStones && inv.getNumberOfFreeSlots()!=0) {
             terobjs = ZeeConfig.findGobsByNameContains("gfx/terobjs/items/");
             terobjs.removeIf(item -> !ZeeConfig.mineablesStone.contains(item.getres().basename()));//remove non-stones
@@ -324,7 +334,7 @@ public class ZeeMiningManager extends ZeeThread{
                 return false;
             }
             ZeeClickGobManager.gobClick(closestStone,3,UI.MOD_SHIFT);//pick all
-            waitInvIdleMs(2000);
+            waitInvIdle();//waitInvIdleMs(2000);
             invStones += inv.countItemsByName(closestStone.getres().basename());
             //println("loop > invStones "+invStones);
         }
@@ -334,7 +344,7 @@ public class ZeeMiningManager extends ZeeThread{
                 waitNotHoldingItem();
             }
         }
-        println("returning "+invStones+" invStones "+(invStones >= wantedStones) +" || "+ (inv.getNumberOfFreeSlots()==0));
+        println("got "+invStones+" stones ,  enough="+(invStones >= wantedStones) +" , invfull="+ (inv.getNumberOfFreeSlots()==0));
         return invStones >= wantedStones || inv.getNumberOfFreeSlots()==0;
     }
 
@@ -380,7 +390,6 @@ public class ZeeMiningManager extends ZeeThread{
     }
 
     public static void showWindowMining() {
-        Widget wdg;
         if(windowManager ==null) {
             windowManager = new ZeeWindow(new Coord(200, 90), "Mine manager") {
                 public void wdgmsg(String msg, Object... args) {
@@ -390,35 +399,35 @@ public class ZeeMiningManager extends ZeeThread{
                         super.wdgmsg(msg, args);
                 }
             };
-            wdg = windowManager.add(new ZeeWindow.ZeeButton(UI.scale(30),"N"){
+            btnNorth = windowManager.add(new ZeeWindow.ZeeButton(UI.scale(30),"N"){
                 public void wdgmsg(String msg, Object... args) {
                     if(msg.equals("activate")){
                         changeAreasize(DIR_NORTH);
                     }
                 }
             }, 35,5);
-            wdg = windowManager.add(new ZeeWindow.ZeeButton(UI.scale(30),"W"){
+            btnWest = windowManager.add(new ZeeWindow.ZeeButton(UI.scale(30),"W"){
                 public void wdgmsg(String msg, Object... args) {
                     if(msg.equals("activate")){
                         changeAreasize(DIR_WEST);
                     }
                 }
             }, 5,30);
-            wdg = windowManager.add(new ZeeWindow.ZeeButton(UI.scale(30),"E"){
+            btnEast = windowManager.add(new ZeeWindow.ZeeButton(UI.scale(30),"E"){
                 public void wdgmsg(String msg, Object... args) {
                     if(msg.equals("activate")){
                         changeAreasize(DIR_EAST);
                     }
                 }
             }, 65,30);
-            wdg = windowManager.add(new ZeeWindow.ZeeButton(UI.scale(30),"S"){
+            btnSouth = windowManager.add(new ZeeWindow.ZeeButton(UI.scale(30),"S"){
                 public void wdgmsg(String msg, Object... args) {
                     if(msg.equals("activate")){
                         changeAreasize(DIR_SOUTH);
                     }
                 }
             }, 35,60);
-            wdg = windowManager.add(new ZeeWindow.ZeeButton(UI.scale(60),"dig"){
+            btnDig = windowManager.add(new ZeeWindow.ZeeButton(UI.scale(60),"dig"){
                 public void wdgmsg(String msg, Object... args) {
                     if(msg.equals("activate")){
                         new ZeeMiningManager(TASK_MINE_AREA).start();
@@ -426,7 +435,7 @@ public class ZeeMiningManager extends ZeeThread{
                 }
             }, 120,5);
             /*
-            wdg = windowManager.add(new ZeeWindow.ZeeButton(UI.scale(80),"test"){
+            windowManager.add(new ZeeWindow.ZeeButton(UI.scale(80),"test"){
                 public void wdgmsg(String msg, Object... args) {
                     if(msg.equals("activate")){
                         new ZeeMiningManager(TASK_TEST).start();
@@ -437,8 +446,17 @@ public class ZeeMiningManager extends ZeeThread{
             ZeeConfig.gameUI.add(windowManager, new Coord(100,100));
         }else{
             windowManager.show();
+            disableBtns(false);
         }
         changeAreasize("");
+    }
+
+    public static void disableBtns(boolean dis){
+        btnDig.disable(dis);
+        btnSouth.disable(dis);
+        btnEast.disable(dis);
+        btnWest.disable(dis);
+        btnNorth.disable(dis);
     }
 
     public static boolean exitManager(String msg) {
@@ -455,6 +473,7 @@ public class ZeeMiningManager extends ZeeThread{
         }
         areasize = new Coord(1,1);
         lastDir = "";
+        ZeeConfig.removePlayerText();
         return false;
     }
 
@@ -503,19 +522,25 @@ public class ZeeMiningManager extends ZeeThread{
     }
 
     public static void stopMining() {
-        try {
-            mining = false;
-            isChipBoulder = false;
-            println("stop mining");
-            ZeeConfig.gameUI.msg("stop mining");
-            ZeeConfig.clickRemoveCursor();
-            waitCursor(ZeeConfig.CURSOR_ARW);
-            ZeeConfig.clickGroundZero(1);//click ground to stop mining
-            ZeeConfig.resetTileSelection();
-            manager.interrupt();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        new ZeeThread(){
+            public void run() {
+                try {
+                    mining = false;
+                    isChipBoulder = false;
+                    println("stop mining");
+                    ZeeConfig.gameUI.msg("stop mining");
+                    ZeeConfig.clickRemoveCursor();
+                    waitCursor(ZeeConfig.CURSOR_ARW);
+                    ZeeConfig.clickGroundZero(1);//click ground to stop mining?
+                    ZeeThread.staminaMonitorStop();//case stam monitor thread is running
+                    manager.interrupt();
+                    ZeeConfig.resetTileSelection();
+                    ZeeConfig.removePlayerText();
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+            }
+        }.start();
     }
 
     public static boolean chipBoulder(Gob boulder) {
