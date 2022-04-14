@@ -157,11 +157,6 @@ public class ZeeThread  extends Thread{
     }
 
 
-    public static boolean waitPlayerIdle() {
-        return waitPlayerIdleFor(2);
-    }
-
-
     public static boolean waitCursor(String name) {
         //println("wait cursor "+name);
         int max = (int) TIMEOUT_MS*2;
@@ -246,23 +241,31 @@ public class ZeeThread  extends Thread{
         return timerMs <= 0;
     }
 
-    public static boolean waitInvIdle() {
-        return waitInvIdleMs(1000);
-    }
-
     public static boolean waitInvIdleMs(long idleMs) {
-        //println("waitInvIdleMs "+idleMs);
-        long interval = 0;
+        println("waitInvIdleMs "+idleMs);
+        long timeElapsed = 0;
+        long timeout = 5000;
+        long startingMs;
         try {
-            ZeeConfig.lastInvItemMs = now();
-            while( (interval = now()-ZeeConfig.lastInvItemMs) < idleMs  ) {
+            //wait first item
+            startingMs = now();
+            while (timeout >= 0  &&  startingMs > ZeeConfig.lastInvItemMs){
+                Thread.sleep(SLEEP_MS);
+                timeout -= SLEEP_MS;
+            }
+            if (timeout <= 0){
+                println("waitInvIdleMs timeout");
+                return false;
+            }
+            // wait inventory idle for idleMs
+            while( (timeElapsed = now()-ZeeConfig.lastInvItemMs) < idleMs ) {
                 Thread.sleep(SLEEP_MS);
             }
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        //println("waitInvIdleMs ret "+(interval >= idleMs));
-        return interval >= idleMs;
+        println("waitInvIdleMs ret "+(timeElapsed >= idleMs));
+        return timeElapsed >= idleMs;
     }
 
     public static boolean waitInvFullOrHoldingItem(Inventory inv, int timeOutMs) {

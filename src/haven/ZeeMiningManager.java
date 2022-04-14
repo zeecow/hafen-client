@@ -2,7 +2,6 @@ package haven;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 
 public class ZeeMiningManager extends ZeeThread{
 
@@ -55,18 +54,11 @@ public class ZeeMiningManager extends ZeeThread{
         ZeeClickGobManager.resetClickPetal();
     }
 
+    private static boolean showTestBtn = false;//change to show/hide button
     private void taskTest() throws Exception{
-        mining = true;
-        upperLeft = ZeeConfig.coordToTile(ZeeConfig.getPlayerGob().rc);
-        println("upperLeft before"+upperLeft);
-        if (lastDir.contentEquals(DIR_NORTH))
-            upperLeft.y -= Math.abs(areasize.y)-1;
-        else if (lastDir.contentEquals(DIR_WEST))
-            upperLeft.x -= Math.abs(areasize.x)-1;
-        println("upperLeft after"+upperLeft);
-        highlightTiles(upperLeft,areasize);
-        println("areasize "+areasize);
-        mining = false;
+        mining=true;
+        pickStones(5);
+        mining=false;
     }
 
     public static void highlightTiles(Coord topleft, int areasize){
@@ -151,9 +143,9 @@ public class ZeeMiningManager extends ZeeThread{
         if (!mining)
             return exitManager("mining canceled 2");
         ZeeConfig.autoChipMinedBoulder = false;//will use another chipboulder code
-        Gob boulder = ZeeConfig.getClosestGobName("gfx/terobjs/bumlings/");
+        Gob boulder = getBoulderCloseEnoughForChipping();
         //chip close boulder(s)
-        while (boulder!=null && ZeeConfig.distanceToPlayer(boulder) < DIST_BOULDER) {
+        while (boulder!=null) {
             ZeeConfig.addPlayerText("boulder");
             if (!mining)
                 return exitManager("mining canceled 2.1");
@@ -170,7 +162,7 @@ public class ZeeMiningManager extends ZeeThread{
             mineTiles(c1,c2);
             if (!mining)
                 return exitManager("mining canceled 2.4");
-            boulder = ZeeConfig.getClosestGobName("gfx/terobjs/bumlings/");
+            boulder = getBoulderCloseEnoughForChipping();
         }
         ZeeConfig.autoChipMinedBoulder = Utils.getprefb("autoChipMinedBoulder", true);
 
@@ -203,6 +195,16 @@ public class ZeeMiningManager extends ZeeThread{
         mineTiles(tileNewCol,tileNewCol);
         if (!mining)
             return exitManager("mining canceled 3.4");
+        //possible newcoltile boulder
+        Gob b = getBoulderCloseEnoughForChipping();
+        if (b!=null){
+            ZeeConfig.autoChipMinedBoulder = false;
+            if(!chipBoulder(b)){
+                ZeeConfig.autoChipMinedBoulder = Utils.getprefb("autoChipMinedBoulder", true);
+                return exitManager("couldn't chip boulder at newcoltile");
+            }
+            ZeeConfig.autoChipMinedBoulder = Utils.getprefb("autoChipMinedBoulder", true);
+        }
 
 
         /*
@@ -283,6 +285,14 @@ public class ZeeMiningManager extends ZeeThread{
         return true;
     }
 
+    public static Gob getBoulderCloseEnoughForChipping() {
+        Gob boulder = ZeeConfig.getClosestGobName("gfx/terobjs/bumlings/");
+        if (boulder!=null && ZeeConfig.distanceToPlayer(boulder) < DIST_BOULDER){
+            return boulder;
+        }
+        return null;
+    }
+
 
     public static void mineTiles(Coord c1, Coord c2) {
         mining = true;
@@ -340,7 +350,9 @@ public class ZeeMiningManager extends ZeeThread{
                 return false;
             }
             ZeeClickGobManager.gobClick(closestStone,3,UI.MOD_SHIFT);//pick all
-            waitInvIdle();//waitInvIdleMs(2000);
+            if(!waitInvIdleMs(1000)){
+                return exitManager("couldn't reach stone (timeout)");
+            }
             invStones += inv.countItemsByName(closestStone.getres().basename());
             //println("loop > invStones "+invStones);
         }
@@ -440,15 +452,15 @@ public class ZeeMiningManager extends ZeeThread{
                     }
                 }
             }, 120,5);
-            /*
-            windowManager.add(new ZeeWindow.ZeeButton(UI.scale(80),"test"){
-                public void wdgmsg(String msg, Object... args) {
-                    if(msg.equals("activate")){
-                        new ZeeMiningManager(TASK_TEST).start();
+            if (showTestBtn) {
+                windowManager.add(new ZeeWindow.ZeeButton(UI.scale(80), "test") {
+                    public void wdgmsg(String msg, Object... args) {
+                        if (msg.equals("activate")) {
+                            new ZeeMiningManager(TASK_TEST).start();
+                        }
                     }
-                }
-            }, 120,35);
-             */
+                }, 120, 35);
+            }
             windowManager.add(new CheckBox("debug"){
                 public void changed(boolean val) {
                     debug = val;
