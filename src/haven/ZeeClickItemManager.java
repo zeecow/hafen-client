@@ -449,16 +449,22 @@ public class ZeeClickItemManager extends ZeeThread{
     public static int clickAllItemsPetal(List<WItem> items, String petalName) {
         ZeeConfig.addGobText(ZeeConfig.getPlayerGob(),"clicking "+items.size()+" items",0,255,255,255,10);
         int itemsClicked = 0;
+        ZeeConfig.lastMapViewClickButton = 2; // setup for clickCancelTask()
+        int countNoMenu = 0;
         for (WItem w: items) {
             try {
-                if (ZeeConfig.clickCancelTask())
-                    throw new Exception("cancel click");
+                if (ZeeConfig.clickCancelTask()) {
+                    ZeeClickGobManager.resetClickPetal();
+                    ZeeConfig.removeGobText(ZeeConfig.getPlayerGob());
+                    return itemsClicked;
+                }
                 itemAct(w);
                 if(waitFlowerMenu()){
                     choosePetal(getFlowerMenu(), petalName);
                     itemsClicked++;
                 }else{
-                    println("clickAllItemsPetal > no flower menu for "+petalName);
+                    countNoMenu++;
+                    println("clickAllItemsPetal > no flowermenu "+countNoMenu+"/"+items.size());
                 }
             } catch (Exception e) {
                 e.printStackTrace();
