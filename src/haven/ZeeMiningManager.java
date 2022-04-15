@@ -56,9 +56,11 @@ public class ZeeMiningManager extends ZeeThread{
 
     private static boolean showTestBtn = false;//change to show/hide button
     private void taskTest() throws Exception{
+
         mining=true;
-        pickStones(5);
+        pickStones(30);
         mining=false;
+
     }
 
     public static void highlightTiles(Coord topleft, int areasize){
@@ -333,6 +335,7 @@ public class ZeeMiningManager extends ZeeThread{
                     t.join();//wait equip 2nd sack
                 }
             }
+            waitNotHoldingItem();
         }
         int invStones = invItems.size();
         while (mining  &&  invStones<wantedStones && inv.getNumberOfFreeSlots()!=0) {
@@ -347,6 +350,7 @@ public class ZeeMiningManager extends ZeeThread{
                 println("stones too far away");
                 return false;
             }
+            //println("clicking closestStone "+closestStone.getres().basename());
             ZeeClickGobManager.gobClick(closestStone,3,UI.MOD_SHIFT);//pick all
             if(!waitInvIdleMs(1000)){
                 return exitManager("couldn't reach stone (timeout)");

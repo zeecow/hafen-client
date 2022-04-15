@@ -52,6 +52,7 @@ public class ZeeThread  extends Thread{
         }
         return (ZeeConfig.gameUI.vhand == null);
     }
+
     public static boolean waitNotHoldingItem(long timeOutMs) {
         long max = timeOutMs;
         try {
@@ -242,13 +243,13 @@ public class ZeeThread  extends Thread{
     }
 
     public static boolean waitInvIdleMs(long idleMs) {
-        println("waitInvIdleMs "+idleMs);
+        //println("waitInvIdleMs "+idleMs);
         long timeElapsed = 0;
         long timeout = 5000;
         long startingMs;
         try {
             //wait first item
-            startingMs = now();
+            startingMs = ZeeConfig.lastInvItemMs = now();
             while (timeout >= 0  &&  startingMs > ZeeConfig.lastInvItemMs){
                 Thread.sleep(SLEEP_MS);
                 timeout -= SLEEP_MS;
@@ -264,7 +265,7 @@ public class ZeeThread  extends Thread{
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        println("waitInvIdleMs ret "+(timeElapsed >= idleMs));
+        //println("waitInvIdleMs ret "+(timeElapsed >= idleMs));
         return timeElapsed >= idleMs;
     }
 
