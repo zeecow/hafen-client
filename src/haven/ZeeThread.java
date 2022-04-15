@@ -142,7 +142,7 @@ public class ZeeThread  extends Thread{
         long timer = idleSeconds * 1000;
         try {
             while( timer > 0 ) {
-                if(ZeeConfig.isPlayerMoving() || stamChangeSec!=0){//ZeeConfig.isPlayerDrinking() ){
+                if(ZeeConfig.isPlayerMoving() || stamChangeSec!=0){
                     timer = idleSeconds * 1000; //reset timer if player moving or stamina changing
                 }else {
                     timer -= SLEEP_MS;
@@ -155,6 +155,28 @@ public class ZeeThread  extends Thread{
         staminaMonitorStop();
         //println("waitPlayerIdleFor ret "+(timer<=0));
         return timer <= 0;
+    }
+
+
+    public static boolean waitPlayerIdleOrHoldingItem(int idleSeconds) {
+        //println("waitPlayerIdleFor "+idleSeconds+"s");
+        staminaMonitorStart();
+        long timer = idleSeconds * 1000;
+        try {
+            while( timer > 0  &&  !ZeeConfig.isPlayerHoldingItem()) {
+                if(stamChangeSec!=0 || ZeeConfig.isPlayerMoving()){
+                    timer = idleSeconds * 1000; //reset timer if player moving or stamina changing
+                }else {
+                    timer -= SLEEP_MS;
+                }
+                Thread.sleep(SLEEP_MS);
+            }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        staminaMonitorStop();
+        //println("waitPlayerIdleFor ret "+(timer<=0));
+        return timer <= 0  ||  ZeeConfig.isPlayerHoldingItem();
     }
 
 

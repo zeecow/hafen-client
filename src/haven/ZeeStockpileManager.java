@@ -128,7 +128,11 @@ public class ZeeStockpileManager extends ZeeThread{
 
         while(busy) {
 
-            waitInvFullOrHoldingItem(mainInv, 3000);// boards/boulder takes longer to produce item
+            if (lastPetalName.equals("Pick leaf"))
+                waitInvIdleMs(2000);//TODO remove special case if possible
+            else
+                waitPlayerIdleOrHoldingItem(2);//blocks, boards, stones
+            //waitInvFullOrHoldingItem(mainInv, 3000);// boards/boulder takes longer to produce item
 
             if (!ZeeConfig.isPlayerHoldingItem()) { //if not holding item
                 /*
