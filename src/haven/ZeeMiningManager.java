@@ -54,13 +54,25 @@ public class ZeeMiningManager extends ZeeThread{
         ZeeClickGobManager.resetClickPetal();
     }
 
-    private static boolean showTestBtn = false;//change to show/hide button
+    private static boolean showTestBtn = true;//change to show/hide button
     private void taskTest() throws Exception{
-
-        mining=true;
-        pickStones(30);
-        mining=false;
-
+        println("playertile"+ZeeConfig.getPlayerTile()+"  upperLeft"+upperLeft+"  areasize"+areasize);
+        Coord c1=null,c2=null;
+        Coord areasub1 = areasize.sub(1,1);
+        boolean positive = upperLeft.x >= 0;
+        debug("positive="+positive);
+        if(lastDir.contentEquals(DIR_NORTH) || lastDir.contentEquals(DIR_WEST)) {
+            c1 = positive? upperLeft.add(1,1) : upperLeft.add(areasub1);
+            c2 = positive? upperLeft.add(areasize) : upperLeft;
+        }else if(lastDir.contentEquals(DIR_SOUTH) || lastDir.contentEquals(DIR_EAST)) {
+            c1 = positive? upperLeft.add(areasize) : upperLeft;
+            c2 = positive? upperLeft.add(1,1) : upperLeft.add(areasub1);
+        }
+        debug("upperleft"+upperLeft+"  c1"+c1+"  c2"+c2+"  areasize"+areasize);
+        debug("ol.a.ul"+ol.a.ul+"  ol.a.br"+ol.a.br);
+        ZeeConfig.clickTile(ZeeConfig.getTileFartherToPlayer(c1,c2),1);
+        waitPlayerIdleFor(1);
+        ZeeConfig.clickTile(ZeeConfig.getTileFartherToPlayer(c1,c2),1);
     }
 
     public static void highlightTiles(Coord topleft, int areasize){
@@ -68,6 +80,7 @@ public class ZeeMiningManager extends ZeeThread{
     }
 
     public static void highlightTiles(Coord topleft, Coord areasize){
+        debug("highlightTiles >  topleft"+topleft+"  areasize"+areasize);
         if(ol==null) {
             ol = ZeeConfig.glob.map.new Overlay(Area.sized(topleft, areasize), MapView.selol);
         }else{
@@ -93,47 +106,21 @@ public class ZeeMiningManager extends ZeeThread{
 
         Inventory inv = ZeeConfig.getMainInventory();
 
-        /*
-            areasize (1, 3)   dir=DIR_NORTH
-            ol.a.ul(-927, -1001)  ol.a.br(-926, -998)
-            haven.MapView@2124b275 ; sel ; [(-927, -1001), (-927, -1003), 0] (DIG BUTTON)
-            haven.MapView@2124b275 ; sel ; [(-927, -999), (-927, -1001), 0]
-            ===============
-            areasize (1, 3)   dir=DIR_SOUTH
-            ol.a.ul(-927, -999)  ol.a.br(-926, -996)
-            haven.MapView@24c17ef8 ; sel ; [(-927, -999), (-927, -1001), 0] (DIG BUTTON)
-            haven.MapView@24c17ef8 ; sel ; [(-927, -999), (-927, -997), 0]
-            ===============
-            areasize (3, 1)   dir=DIR_WEST
-            ol.a.ul(-929, -999)  ol.a.br(-926, -998)
-            haven.MapView@1e8d5a05 ; sel ; [(-929, -999), (-931, -999), 0] (DIG BUTTON)
-            haven.MapView@1e8d5a05 ; sel ; [(-927, -999), (-929, -999), 0]
-            ===============
-            areasize (3, 1)   dir=DIR_EAST
-            ol.a.ul(-1027, -999)  ol.a.br(-1024, -998)
-            haven.MapView@2001b699 ; sel ; [(-1027, -999), (-1029, -999), 0] (DIG BUTTON)
-            haven.MapView@2001b699 ; sel ; [(-1027, -999), (-1025, -999), 0]
-         */
         Coord c1=null,c2=null;
         Coord areasub1 = areasize.sub(1,1);
-        if(lastDir.contentEquals(DIR_NORTH)) {
-            c1 = upperLeft.add(areasub1);
-            c2 = upperLeft;
-        }else if(lastDir.contentEquals(DIR_SOUTH)) {
-            c1 = upperLeft;
-            c2 = upperLeft.add(areasub1);
-        }else if(lastDir.contentEquals(DIR_WEST)) {
-            c1 = upperLeft.add(areasub1);
-            c2 = upperLeft;
-        }else if(lastDir.contentEquals(DIR_EAST)) {
-            c1 = upperLeft;
-            c2 = upperLeft.add(areasub1);
+        boolean positive = upperLeft.x >= 0;
+        if(lastDir.contentEquals(DIR_NORTH) || lastDir.contentEquals(DIR_WEST)) {
+            c1 = positive? upperLeft.add(1,1) : upperLeft.add(areasub1);
+            c2 = positive? upperLeft.add(areasize) : upperLeft;
+        }else if(lastDir.contentEquals(DIR_SOUTH) || lastDir.contentEquals(DIR_EAST)) {
+            c1 = positive? upperLeft.add(areasize) : upperLeft;
+            c2 = positive? upperLeft.add(1,1) : upperLeft.add(areasub1);
         }
         if (c1==null || c2==null) {
             return exitManager("mine coords null");
         }
         debug("upperleft"+upperLeft+"  c1"+c1+"  c2"+c2+"  areasize"+areasize);
-        //debug("ol.a.ul"+ol.a.ul+"  ol.a.br"+ol.a.br);
+        debug("ol.a.ul"+ol.a.ul+"  ol.a.br"+ol.a.br);
 
 
         /*

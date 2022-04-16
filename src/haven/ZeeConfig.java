@@ -1962,4 +1962,19 @@ public class ZeeConfig {
             return "";
         return ols.get(0).replace("gfx/terobjs/barrel-","");
     }
+
+    public static Coord getTileFartherToPlayer(Coord c1, Coord c2) {
+        Coord p = getPlayerTile();
+        if (p.dist(c1) > p.dist(c2))
+            return c1;
+        return c2;
+    }
+
+    public static Coord getTileCloserToPlayer(Coord c1, Coord c2) {
+        Coord p = getPlayerTile();
+        if (p.dist(c1) < p.dist(c2))
+            return c1;
+        return c2;
+    }
+
 }
