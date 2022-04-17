@@ -1421,6 +1421,7 @@ public class ZeeConfig {
         mainInv = null;
         ZeeClickItemManager.equipory = null;
         ZeeStockpileManager.windowManager = null;
+        ZeeMiningManager.windowManager = null;
     }
 
     private static void resetBeltState() {

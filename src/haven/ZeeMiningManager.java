@@ -68,11 +68,34 @@ public class ZeeMiningManager extends ZeeThread{
             c1 = positive? upperLeft.add(areasize) : upperLeft;
             c2 = positive? upperLeft.add(1,1) : upperLeft.add(areasub1);
         }
+        Coord startTile = ZeeConfig.getTileCloserToPlayer(c1,c2);
+        Coord endTile = ZeeConfig.getTileFartherToPlayer(c1,c2);
         debug("upperleft"+upperLeft+"  c1"+c1+"  c2"+c2+"  areasize"+areasize);
         debug("ol.a.ul"+ol.a.ul+"  ol.a.br"+ol.a.br);
-        ZeeConfig.clickTile(ZeeConfig.getTileFartherToPlayer(c1,c2),1);
+        ZeeConfig.clickTile(startTile,1);
         waitPlayerIdleFor(1);
-        ZeeConfig.clickTile(ZeeConfig.getTileFartherToPlayer(c1,c2),1);
+        ZeeConfig.clickTile(endTile,1);
+        waitPlayerIdleFor(1);
+
+
+        /*
+            update overlay for next tiles
+         */
+        upperLeft = endTile;
+        debug("upperLeft before"+upperLeft);
+        if (positive) {
+            if (lastDir.contentEquals(DIR_NORTH) || lastDir.contentEquals(DIR_WEST))
+                upperLeft = ol.a.ul.sub(areasub1);
+            else if(lastDir.contentEquals(DIR_SOUTH) || lastDir.contentEquals(DIR_EAST))
+                upperLeft = ol.a.ul.add(areasub1);
+        } else {
+            if (lastDir.contentEquals(DIR_NORTH))
+                upperLeft.y -= Math.abs(areasize.y)-1;
+            else if (lastDir.contentEquals(DIR_WEST))
+                upperLeft.x -= Math.abs(areasize.x)-1;
+        }
+        debug("upperLeft after"+upperLeft);
+        highlightTiles(upperLeft,areasize);
     }
 
     public static void highlightTiles(Coord topleft, int areasize){
@@ -106,7 +129,7 @@ public class ZeeMiningManager extends ZeeThread{
 
         Inventory inv = ZeeConfig.getMainInventory();
 
-        Coord c1=null,c2=null;
+        Coord c1=null,c2=null,startTile=null,endTile=null;
         Coord areasub1 = areasize.sub(1,1);
         boolean positive = upperLeft.x >= 0;
         if(lastDir.contentEquals(DIR_NORTH) || lastDir.contentEquals(DIR_WEST)) {
@@ -119,8 +142,10 @@ public class ZeeMiningManager extends ZeeThread{
         if (c1==null || c2==null) {
             return exitManager("mine coords null");
         }
+        startTile = ZeeConfig.getTileCloserToPlayer(c1,c2);
+        endTile = ZeeConfig.getTileFartherToPlayer(c1,c2);
         debug("upperleft"+upperLeft+"  c1"+c1+"  c2"+c2+"  areasize"+areasize);
-        debug("ol.a.ul"+ol.a.ul+"  ol.a.br"+ol.a.br);
+        debug("startTile"+startTile+"  endTile"+endTile);
 
 
         /*
@@ -129,7 +154,8 @@ public class ZeeMiningManager extends ZeeThread{
         mining = true;
         ZeeConfig.addPlayerText("dig");
         disableBtns(true);
-        ZeeConfig.clickTile(c1,1);//start at c1
+        debug("click startTile "+startTile);
+        ZeeConfig.clickTile(startTile,1);//start at c1
         mineTiles(c1,c2);
         if (!mining)
             return exitManager("mining canceled 2");
@@ -163,8 +189,7 @@ public class ZeeMiningManager extends ZeeThread{
         waitCursor(ZeeConfig.CURSOR_ARW);
         if (!mining)
             return exitManager("mining canceled 3");
-        //ZeeConfig.clickCoord(ZeeConfig.tileToCoord(c2),1);
-        ZeeConfig.clickTile(c2,1);//move to end tile
+        ZeeConfig.clickTile(endTile,1);
         if (!mining)
             return exitManager("mining canceled 3.1");
         waitPlayerIdleFor(1);
@@ -172,9 +197,9 @@ public class ZeeMiningManager extends ZeeThread{
             return exitManager("mining canceled 3.2");
         Coord tileNewCol;
         if (miningVertical())
-            tileNewCol = c2.add(1,0);
+            tileNewCol = endTile.add(1,0);
         else if (miningHorizontal())
-            tileNewCol = c2.add(0,1);
+            tileNewCol = endTile.add(0,1);
         else
             return exitManager("no tile for new column");
         debug("new col tile "+tileNewCol);
@@ -198,7 +223,7 @@ public class ZeeMiningManager extends ZeeThread{
          */
         //realign player (caused by boulder on tileNewCol)
         ZeeConfig.addPlayerText("stones");
-        ZeeConfig.clickTile(c2,1);
+        ZeeConfig.clickTile(endTile,1);
         waitPlayerIdleFor(1);
         if (!pickStones(30)) {
             return exitManager("not enough stones for new column");
@@ -217,7 +242,7 @@ public class ZeeMiningManager extends ZeeThread{
         build column
          */
         ZeeConfig.addPlayerText("col");
-        ZeeConfig.clickTile(c2,1);//move to end tile
+        ZeeConfig.clickTile(endTile,1);
         waitPlayerIdleFor(1);
         ZeeConfig.gameUI.menu.wdgmsg("act","bp","column","0");
         sleep(1000);
@@ -237,7 +262,7 @@ public class ZeeMiningManager extends ZeeThread{
         if (!mining)
             return exitManager("mining canceled 4.2");
         waitInvFreeSlotsIdle();
-        ZeeConfig.clickTile(c2,1);//realign to c2
+        ZeeConfig.clickTile(endTile,1);//realign to endTile
         waitPlayerIdleFor(1);
         inv.children(WItem.class).forEach(wItem -> {//drop remaining inv stones
             if (ZeeConfig.mineablesStone.contains(wItem.item.getres().basename()))
@@ -249,14 +274,21 @@ public class ZeeMiningManager extends ZeeThread{
 
 
         /*
-        update overlay for next tiles
+            update overlay for next tiles
          */
-        upperLeft = ZeeConfig.coordToTile(ZeeConfig.getPlayerGob().rc);
+        upperLeft = endTile;
         debug("upperLeft before"+upperLeft);
-        if (lastDir.contentEquals(DIR_NORTH))
-            upperLeft.y -= Math.abs(areasize.y)-1;
-        else if (lastDir.contentEquals(DIR_WEST))
-            upperLeft.x -= Math.abs(areasize.x)-1;
+        if (positive) {
+            if (lastDir.contentEquals(DIR_NORTH) || lastDir.contentEquals(DIR_WEST))
+                upperLeft = ol.a.ul.sub(areasub1);
+            else if(lastDir.contentEquals(DIR_SOUTH) || lastDir.contentEquals(DIR_EAST))
+                upperLeft = ol.a.ul.add(areasub1);
+        } else {
+            if (lastDir.contentEquals(DIR_NORTH))
+                upperLeft.y -= Math.abs(areasize.y)-1;
+            else if (lastDir.contentEquals(DIR_WEST))
+                upperLeft.x -= Math.abs(areasize.x)-1;
+        }
         debug("upperLeft after"+upperLeft);
         highlightTiles(upperLeft,areasize);
 
@@ -283,7 +315,7 @@ public class ZeeMiningManager extends ZeeThread{
 
     public static void mineTiles(Coord c1, Coord c2) {
         mining = true;
-        debug("mine coords  c1"+c1+"  c2"+c2);
+        debug("mine tiles  c1"+c1+"  c2"+c2);
         ZeeConfig.cursorChange(ZeeConfig.ACT_MINE);
         waitCursor(ZeeConfig.CURSOR_MINE);
         ZeeConfig.gameUI.map.wdgmsg("sel", c1, c2, 0);
