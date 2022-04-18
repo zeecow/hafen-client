@@ -61,21 +61,34 @@ public class ZeeMiningManager extends ZeeThread{
         Coord areasub1 = areasize.sub(1,1);
         boolean positive = upperLeft.x >= 0;
         debug("positive="+positive);
+        /*
+            DIR_WEST
+            playertile(1020, 1022)  upperLeft(1017, 1022)  areasize(4, 1)
+            ol.a.ul(1017, 1022)  ol.a.br(1021, 1023)
+            mine tiles  c1(1018, 1023)  c2(1021, 1023)
+            haven.MapView@5050cddf ; sel ; [(1018, 1023), (1021, 1023), 0] (TEST BTN)
+            haven.MapView@5050cddf ; sel ; [(1020, 1022), (1017, 1022), 0]
+            =======
+            DIR_SOUTH
+            playertile(1019, 1021)  upperLeft(1019, 1021)  areasize(1, 4)
+            ol.a.ul(1019, 1021)  ol.a.br(1020, 1025)
+            mine tiles  c1(1020, 1025)  c2(1020, 1022)
+            haven.MapView@5050cddf ; sel ; [(1020, 1025), (1020, 1022), 0] (TEST BTN)
+            haven.MapView@5050cddf ; sel ; [(1019, 1021), (1019, 1024), 0]
+         */
         if(lastDir.contentEquals(DIR_NORTH) || lastDir.contentEquals(DIR_WEST)) {
-            c1 = positive? upperLeft.add(1,1) : upperLeft.add(areasub1);
-            c2 = positive? upperLeft.add(areasize) : upperLeft;
+            c1 = positive? ol.a.ul.add(areasub1) : upperLeft.add(areasub1);
+            c2 = positive? ol.a.ul : upperLeft;
         }else if(lastDir.contentEquals(DIR_SOUTH) || lastDir.contentEquals(DIR_EAST)) {
-            c1 = positive? upperLeft.add(areasize) : upperLeft;
-            c2 = positive? upperLeft.add(1,1) : upperLeft.add(areasub1);
+            c1 = positive? ol.a.ul : upperLeft;
+            c2 = positive? ol.a.ul.add(areasub1) : upperLeft.add(areasub1);
         }
         Coord startTile = ZeeConfig.getTileCloserToPlayer(c1,c2);
         Coord endTile = ZeeConfig.getTileFartherToPlayer(c1,c2);
         debug("upperleft"+upperLeft+"  c1"+c1+"  c2"+c2+"  areasize"+areasize);
         debug("ol.a.ul"+ol.a.ul+"  ol.a.br"+ol.a.br);
-        ZeeConfig.clickTile(startTile,1);
-        waitPlayerIdleFor(1);
-        ZeeConfig.clickTile(endTile,1);
-        waitPlayerIdleFor(1);
+        mineTiles(c1,c2);
+        ZeeConfig.clickTile(endTile,1);//TODO mineOverlayArea(ol) and overlayMineArea(c1,c2)
 
 
         /*
@@ -320,6 +333,8 @@ public class ZeeMiningManager extends ZeeThread{
         waitCursor(ZeeConfig.CURSOR_MINE);
         ZeeConfig.gameUI.map.wdgmsg("sel", c1, c2, 0);
         waitPlayerIdleFor(2);//minimum 2 sec
+        ZeeConfig.clickRemoveCursor();
+        waitCursor(ZeeConfig.CURSOR_ARW);
     }
 
 
