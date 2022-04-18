@@ -2,6 +2,8 @@ package haven;
 
 import java.util.List;
 
+import static haven.OCache.posres;
+
 public class ZeeStockpileManager extends ZeeThread{
 
     public static final String STOCKPILE_LEAF = "gfx/terobjs/stockpile-leaf";
@@ -317,7 +319,6 @@ public class ZeeStockpileManager extends ZeeThread{
     }
 
 
-
     private static void pileItems() throws InterruptedException {
         ZeeConfig.cancelFlowerMenu();
         waitNoFlowerMenu();
@@ -340,4 +341,58 @@ public class ZeeStockpileManager extends ZeeThread{
         }
     }
 
+
+    public static void unloadWheelbarrowAtStockpile(Gob gobStockpile) throws Exception{
+        try {
+            ZeeConfig.addPlayerText("wheeling");
+            Coord stockpileCoord = ZeeConfig.lastMapViewClickMc.floor(posres);
+            if (ZeeConfig.isPlayerMountingHorse())
+                ZeeConfig.unmountPlayerFromHorse(stockpileCoord);
+            sleep(500);
+            Coord pc = ZeeConfig.getPlayerCoord();
+            Coord subc = ZeeConfig.getCoordGob(gobStockpile).sub(pc);
+            int xsignal, ysignal;
+            xsignal = subc.x >= 0 ? 1 : -1;
+            ysignal = subc.y >= 0 ? 1 : -1;
+            //println("pc"+pc+"  subc"+subc+"  pc.add"+Coord.of(xsignal*200,ysignal*200));
+            ZeeConfig.clickCoord(pc.add(xsignal * 500, ysignal * 500), 3);//drop wheelbarrow
+            sleep(PING_MS);
+            Gob wb = ZeeConfig.getClosestGobName("gfx/terobjs/vehicle/wheelbarrow");
+            ZeeClickGobManager.gobClick(wb, 3);//activate wheelbarrow
+            sleep(PING_MS);
+            //ZeeConfig.clickCoord(stockpileCoord,3);//drop stockpile
+            ZeeClickGobManager.gobClick(gobStockpile, 3);
+            waitPlayerIdleFor(1);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        ZeeConfig.removePlayerText();
+    }
+
+
+    public static void unloadWheelbarrowStockpileAtGround(Coord mcFloorPosres) {
+        try {
+            ZeeConfig.addPlayerText("wheeling");
+            if (ZeeConfig.isPlayerMountingHorse()){
+                ZeeConfig.unmountPlayerFromHorse(mcFloorPosres);
+            }
+            sleep(500);
+            Coord pc = ZeeConfig.getPlayerCoord();
+            Coord subc = mcFloorPosres.sub(pc);
+            int xsignal, ysignal;
+            xsignal = subc.x >= 0 ? 1 : -1;
+            ysignal = subc.y >= 0 ? 1 : -1;
+            //println("pc"+pc+"  subc"+subc+"  pc.add"+Coord.of(xsignal*200,ysignal*200));
+            ZeeConfig.clickCoord(pc.add(xsignal*500,ysignal*500), 3);//drop wheelbarrow
+            sleep(PING_MS);
+            Gob wb = ZeeConfig.getClosestGobName("gfx/terobjs/vehicle/wheelbarrow");
+            ZeeClickGobManager.gobClick(wb,3);//activate wheelbarrow
+            sleep(PING_MS);
+            ZeeConfig.clickCoord(mcFloorPosres,3);//drop stockpile
+            waitPlayerIdleFor(1);
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+        ZeeConfig.removePlayerText();
+    }
 }

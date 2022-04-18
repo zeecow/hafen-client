@@ -1574,9 +1574,42 @@ public class ZeeConfig {
                 new ZeeClickGobManager(pc, mc, clickGob).start();
             }
         }else{ // clicked ground
-            if (clickb==2 && ZeeConfig.isPlayerHoldingItem()) //move while holding item
-                ZeeConfig.clickCoord(mc.floor(posres),1, 0);
+            if (clickb==2) {
+                if (isPlayerHoldingItem()) { //move while holding item
+                    clickCoord(mc.floor(posres), 1, 0);
+                }else if (ZeeClickGobManager.isLongClick() && isPlayerCarryingWheelbarrow()){
+                    new ZeeThread() {
+                        public void run() {
+                            ZeeStockpileManager.unloadWheelbarrowStockpileAtGround(mc.floor(posres));
+                        }
+                    }.start();
+                }
+            }
         }
+    }
+
+
+    public static void unmountPlayerFromHorse(Coord mcFloorPosres) {
+        clickCoord(mcFloorPosres,1,2);//unmount at direction of mcFloorPosres
+    }
+
+    public static boolean isPlayerCarryingWheelbarrow() {
+        return isPlayerCarryingGob("gfx/terobjs/vehicle/wheelbarrow");
+    }
+
+    public static boolean isPlayerMountingHorse() {
+        return isPlayerSharingGobCoord("gfx/kritter/horse/");
+    }
+
+    public static boolean isPlayerCarryingGob(String gobNameContains) {
+        return  isPlayerSharingGobCoord(gobNameContains);
+    }
+
+    public static boolean isPlayerSharingGobCoord(String gobNameContains){
+        Gob g = getClosestGobName(gobNameContains);
+        if (g==null)
+            return false;
+        return distanceToPlayer(g)==0;
     }
 
     public static Gob getClosestGob(List<Gob> gobs) {

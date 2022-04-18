@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static haven.OCache.posres;
+
 public class ZeeClickGobManager extends ZeeThread{
 
     Coord coordPc;
@@ -30,70 +32,62 @@ public class ZeeClickGobManager extends ZeeThread{
 
     @Override
     public void run() {
-
-        if(!isLongClick()){
+        try {
+            if (!isLongClick()) {
             /*
                 short clicks
              */
-            if (ZeeConfig.isPlayerHoldingItem()){
-                clickedGobHoldingItem();
+                if (ZeeConfig.isPlayerHoldingItem()) {
+                    clickedGobHoldingItem();
+                } else if (isGobTrellisPlant()) {
+                    harvestOneTrellis();
+                } else if (isGobGroundItem()) {
+                    gobClick(3, UI.MOD_SHIFT);//pick up all items (shift + rclick)
+                    if (ZeeConfig.pilerMode)
+                        ZeeStockpileManager.checkGroundItemClicked(gobName);
+                } else if (isGobFireSource()) {
+                    if (pickupTorch())
+                        gobItemAct(0);
+                } else if (isGobHorse()) {
+                    clickGobPetal("Giddyup!");
+                } else if (isGobName("/barrel")) {
+                    if (barrelLabelOn)
+                        ZeeSeedFarmingManager.testBarrelsTilesClear();
+                    else
+                        ZeeSeedFarmingManager.testBarrelsTiles(true);
+                    barrelLabelOn = !barrelLabelOn;
+                } else if (isGobName("/dreca")) { // dream catcher
+                    twoDreamsPlease();
+                } else if (isInspectGob()) {
+                    inspectGob();
+                } else if (isGobMineSupport()) {
+                    ZeeConfig.toggleMineSupport();
+                }
             }
-            else if(isGobTrellisPlant()) {
-                harvestOneTrellis();
-            }
-            else if(isGobGroundItem()) {
-                gobClick(3, UI.MOD_SHIFT);//pick up all items (shift + rclick)
-                if (ZeeConfig.pilerMode)
-                    ZeeStockpileManager.checkGroundItemClicked(gobName);
-            }
-            else if (isGobFireSource()) {
-                if (pickupTorch())
-                    gobItemAct(0);
-            }
-            else if (isGobHorse()) {
-                clickGobPetal("Giddyup!");
-            }
-            else if (isGobName("/barrel")) {
-                if (barrelLabelOn)
-                    ZeeSeedFarmingManager.testBarrelsTilesClear();
-                else
-                    ZeeSeedFarmingManager.testBarrelsTiles(true);
-                barrelLabelOn = !barrelLabelOn;
-            }
-            else if (isGobName("/dreca")){ // dream catcher
-                twoDreamsPlease();
-            }
-            else if (isInspectGob()) {
-                inspectGob();
-            }
-            else if (isGobMineSupport()) {
-                ZeeConfig.toggleMineSupport();
+            else {
+                /*
+                    long clicks
+                 */
+                if (showGobFlowerMenu()) {
+                    //ok
+                } else if (isGobCrop()) {
+                    if (!ZeeConfig.getCursorName().equals(ZeeConfig.CURSOR_HARVEST))
+                        gobClick(gob, 3, UI.MOD_SHIFT);//activate cursor harvest if needed
+                } else if (isGobStockpile() && ZeeConfig.isPlayerCarryingWheelbarrow()) {
+                    ZeeStockpileManager.unloadWheelbarrowAtStockpile(gob);
+                } else if (isGobStockpile() || isGobName("/dframe")) {
+                    gobClick(3, UI.MOD_SHIFT);//pick up all items (shift + rclick)
+                } else if (isGobTreeStump()) {
+                    removeStump(gob);
+                } else if (isLiftGob()) {
+                    liftGob();
+                } else if (isGobGate() && ZeeConfig.CURSOR_HAND.equals(ZeeConfig.getCursorName())) {
+                    openGateWheelbarrow(gob);
+                }
             }
         }
-        else {
-            /*
-                long clicks
-             */
-            if(showGobFlowerMenu()) {
-                //ok
-            }
-            else if (isGobCrop()) {
-                if(!ZeeConfig.getCursorName().equals(ZeeConfig.CURSOR_HARVEST))
-                    gobClick(gob, 3, UI.MOD_SHIFT);//activate cursor harvest if needed
-            }
-            else if (isGobStockpile() || isGobName("/dframe")) {
-                gobClick(3, UI.MOD_SHIFT);//pick up all items (shift + rclick)
-            }
-            else if(isGobTreeStump()){
-                removeStump(gob);
-            }
-            else if (isLiftGob()) {
-                liftGob();
-            }
-            else if (isGobGate() && ZeeConfig.CURSOR_HAND.equals(ZeeConfig.getCursorName())){
-                openGateWheelbarrow(gob);
-            }
-
+        catch (Exception e){
+            e.printStackTrace();
         }
     }
 
@@ -462,7 +456,7 @@ public class ZeeClickGobManager extends ZeeThread{
             }
         }
         gobClick(closestGob,3);//pickup item (right click)
-        System.out.println("closest = "+closestGob.getres().name+" > "+closestDist);
+        //System.out.println("closest = "+closestGob.getres().name+" > "+closestDist);
     }
 
     private boolean isGobStockpile() {
@@ -473,7 +467,8 @@ public class ZeeClickGobManager extends ZeeThread{
         return gobName.startsWith("gfx/terobjs/items/");
     }
 
-    private boolean isLongClick() {
+    public static boolean isLongClick() {
+        clickDiffMs = clickEndMs - clickStartMs;
         return clickDiffMs > LONG_CLICK_MS;
     }
 
