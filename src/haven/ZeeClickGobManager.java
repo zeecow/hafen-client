@@ -49,7 +49,7 @@ public class ZeeClickGobManager extends ZeeThread{
                     if (pickupTorch())
                         gobItemAct(0);
                 } else if (isGobHorse()) {
-                    clickGobPetal("Giddyup!");
+                    mountHorse();
                 } else if (isGobName("/barrel")) {
                     if (barrelLabelOn)
                         ZeeSeedFarmingManager.testBarrelsTilesClear();
@@ -89,6 +89,13 @@ public class ZeeClickGobManager extends ZeeThread{
         catch (Exception e){
             e.printStackTrace();
         }
+    }
+
+    private void mountHorse() {
+        clickGobPetal("Giddyup!");
+        waitPlayerIdleFor(1);
+        if (ZeeConfig.isPlayerMountingHorse())
+            ZeeConfig.setSpeed(ZeeConfig.PLAYER_SPEED_2);
     }
 
     private void clickedGobHoldingItem() {
@@ -260,7 +267,7 @@ public class ZeeClickGobManager extends ZeeThread{
         // gfx/terobjs/vehicle/wheelbarrow
         try {
             waitNoFlowerMenu();
-            ZeeConfig.addPlayerText("clicking gate");
+            ZeeConfig.addPlayerText("wheeling");
             Gob wb = ZeeConfig.getClosestGobName("gfx/terobjs/vehicle/wheelbarrow");
             if (wb==null){
                 ZeeConfig.msg("no wheelbarrow close");

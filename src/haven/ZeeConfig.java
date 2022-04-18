@@ -53,6 +53,11 @@ public class ZeeConfig {
     public static final String CURSOR_MINE = "gfx/hud/curs/mine";//destroy
     public static final String CURSOR_SHOOT = "gfx/hud/curs/shoot";
 
+    public static final int PLAYER_SPEED_0 = 0;
+    public static final int PLAYER_SPEED_1 = 1;
+    public static final int PLAYER_SPEED_2 = 2;
+    public static final int PLAYER_SPEED_3 = 3;
+
     public static MixColor MIXCOLOR_RED = new MixColor(255,0,0,200);
     public static MixColor MIXCOLOR_ORANGE = new MixColor(255,128,0,200);
     public static MixColor MIXCOLOR_YELLOW = new MixColor(255,255,0,200);
@@ -1076,7 +1081,7 @@ public class ZeeConfig {
                 try {
 
                     if(autoRunLogin)
-                        gameUI.ulpanel.getchild(Speedget.class).set(2);
+                        setSpeed(PLAYER_SPEED_2);
 
                     if (autoOpenBelt)
                         openBelt();
@@ -1097,6 +1102,10 @@ public class ZeeConfig {
                 }
             }
         }).start();
+    }
+
+    public static void setSpeed(int spd) {
+        gameUI.ulpanel.getchild(Speedget.class).set(spd);
     }
 
     public static void toggleMineSupport() {

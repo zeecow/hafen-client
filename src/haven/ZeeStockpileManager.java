@@ -354,15 +354,19 @@ public class ZeeStockpileManager extends ZeeThread{
             int xsignal, ysignal;
             xsignal = subc.x >= 0 ? 1 : -1;
             ysignal = subc.y >= 0 ? 1 : -1;
-            //println("pc"+pc+"  subc"+subc+"  pc.add"+Coord.of(xsignal*200,ysignal*200));
-            ZeeConfig.clickCoord(pc.add(xsignal * 500, ysignal * 500), 3);//drop wheelbarrow
+            //drop wheelbarrow
+            ZeeConfig.clickCoord(pc.add(xsignal * 500, ysignal * 500), 3);
             sleep(PING_MS);
-            Gob wb = ZeeConfig.getClosestGobName("gfx/terobjs/vehicle/wheelbarrow");
-            ZeeClickGobManager.gobClick(wb, 3);//activate wheelbarrow
-            sleep(PING_MS);
-            //ZeeConfig.clickCoord(stockpileCoord,3);//drop stockpile
-            ZeeClickGobManager.gobClick(gobStockpile, 3);
-            waitPlayerIdleFor(1);
+            if (!ZeeConfig.isPlayerCarryingWheelbarrow()){
+                Gob wb = ZeeConfig.getClosestGobName("gfx/terobjs/vehicle/wheelbarrow");
+                //activate wheelbarrow
+                ZeeClickGobManager.gobClick(wb, 3);
+                sleep(PING_MS);
+                //use wheelbarrow on stockpile
+                ZeeClickGobManager.gobClick(gobStockpile, 3);
+                waitPlayerIdleFor(1);
+            }else
+                ZeeConfig.msg("couldn't drop wheelbarrow");
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -382,14 +386,19 @@ public class ZeeStockpileManager extends ZeeThread{
             int xsignal, ysignal;
             xsignal = subc.x >= 0 ? 1 : -1;
             ysignal = subc.y >= 0 ? 1 : -1;
-            //println("pc"+pc+"  subc"+subc+"  pc.add"+Coord.of(xsignal*200,ysignal*200));
-            ZeeConfig.clickCoord(pc.add(xsignal*500,ysignal*500), 3);//drop wheelbarrow
+            //drop wheelbarrow
+            ZeeConfig.clickCoord(pc.add(xsignal*500,ysignal*500), 3);
             sleep(PING_MS);
-            Gob wb = ZeeConfig.getClosestGobName("gfx/terobjs/vehicle/wheelbarrow");
-            ZeeClickGobManager.gobClick(wb,3);//activate wheelbarrow
-            sleep(PING_MS);
-            ZeeConfig.clickCoord(mcFloorPosres,3);//drop stockpile
-            waitPlayerIdleFor(1);
+            if (!ZeeConfig.isPlayerCarryingWheelbarrow()) {
+                Gob wb = ZeeConfig.getClosestGobName("gfx/terobjs/vehicle/wheelbarrow");
+                //activate wheelbarrow
+                ZeeClickGobManager.gobClick(wb, 3);
+                sleep(PING_MS);
+                //use wheelbarrow at stockpile
+                ZeeConfig.clickCoord(mcFloorPosres, 3);
+                waitPlayerIdleFor(1);
+            }else
+                ZeeConfig.msg("couldn't drop wheelbarrow");
         } catch (Exception e){
             e.printStackTrace();
         }
