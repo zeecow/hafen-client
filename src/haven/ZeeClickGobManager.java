@@ -10,9 +10,10 @@ import static haven.OCache.posres;
 public class ZeeClickGobManager extends ZeeThread{
 
     Coord coordPc;
-    Coord2d coordCc;
+    Coord2d coordMc;
     Gob gob;
     String gobName;
+    boolean isGroundClick;
 
     public static float camAngleStart, camAngleEnd, camAngleDiff;
     public static long clickStartMs, clickEndMs, clickDiffMs;
@@ -20,11 +21,12 @@ public class ZeeClickGobManager extends ZeeThread{
     public static String clickPetalName = "";
     public static boolean barrelLabelOn = false;
 
-    public ZeeClickGobManager(Coord pc, Coord2d cc, Gob gobClicked) {
+    public ZeeClickGobManager(Coord pc, Coord2d mc, Gob gobClicked) {
         coordPc = pc;
-        coordCc = cc;
+        coordMc = mc;
         gob = gobClicked;
-        gobName = gob.getres().name;
+        isGroundClick = (gob==null);
+        gobName = isGroundClick ? "" : gob.getres().name;
         clickDiffMs = clickEndMs - clickStartMs;
         ZeeConfig.getMainInventory();
         //println(clickDiffMs+"ms > "+gobName+" dist="+ZeeConfig.distanceToPlayer(gob));
@@ -68,7 +70,7 @@ public class ZeeClickGobManager extends ZeeThread{
                 /*
                     long clicks
                  */
-                if (showGobFlowerMenu()) {
+                if (!isGroundClick && showGobFlowerMenu()) {
                     //ok
                 } else if (isGobCrop()) {
                     if (!ZeeConfig.getCursorName().equals(ZeeConfig.CURSOR_HARVEST))
@@ -83,6 +85,10 @@ public class ZeeClickGobManager extends ZeeThread{
                     liftGob();
                 } else if (isGobGate() && ZeeConfig.CURSOR_HAND.equals(ZeeConfig.getCursorName())) {
                     openGateWheelbarrow(gob);
+                } else if (isGroundClick && ZeeConfig.isPlayerCarryingWheelbarrow()){
+                    ZeeStockpileManager.unloadWheelbarrowStockpileAtGround(coordMc.floor(posres));
+                } else if (isGroundClick && ZeeConfig.isPlayerMountingHorse()){
+                    dismountHorse();
                 }
             }
         }
@@ -91,11 +97,20 @@ public class ZeeClickGobManager extends ZeeThread{
         }
     }
 
+    private void dismountHorse() {
+        ZeeConfig.clickCoord(coordMc.floor(posres),1,UI.MOD_CTRL);
+    }
+
     private void mountHorse() {
+        int playerSpeed = ZeeConfig.getPlayerSpeed();
         clickGobPetal("Giddyup!");
-        waitPlayerIdleFor(1);
-        if (ZeeConfig.isPlayerMountingHorse())
-            ZeeConfig.setSpeed(ZeeConfig.PLAYER_SPEED_2);
+        waitPlayerMounted(gob);
+        if (ZeeConfig.isPlayerMountingHorse()) {
+            if (playerSpeed <= ZeeConfig.PLAYER_SPEED_1)
+                ZeeConfig.setPlayerSpeed(ZeeConfig.PLAYER_SPEED_1);//min auto horse speed
+            else
+                ZeeConfig.setPlayerSpeed(ZeeConfig.PLAYER_SPEED_2);//max auto horse speed
+        }
     }
 
     private void clickedGobHoldingItem() {
@@ -452,10 +467,10 @@ public class ZeeClickGobManager extends ZeeThread{
             return;
         }
         Gob closestGob = gobs.get(0);
-        double closestDist = distanceCoordGob(coordCc, closestGob);
+        double closestDist = distanceCoordGob(coordMc, closestGob);
         double dist;
         for (Gob g: gobs) {
-            dist = distanceCoordGob(coordCc, g);
+            dist = distanceCoordGob(coordMc, g);
             System.out.println(g.getres().name+" > "+dist);
             if(closestDist > dist) {
                 closestDist = dist;

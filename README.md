@@ -18,8 +18,8 @@ features:
  - icon list categs
  - midclick ground 
    - while holding item will move to location (simulates ctrl+click)
-   - while mounting horse will try to unmount
-   - while carrying wheelbarrow will try to(unmount and) unload stockpile at ground or compatible stockpile
+   - while mounting horse will try to dismount
+   - while carrying wheelbarrow will try to(dismount and) unload stockpile at ground or compatible stockpile
  - midclick object/item for small tasks:
    - MidClick obj: inspect, Giddyup!, light torch, toggle barrels label, toggle mine support radius, hold item click attempts
      - Long MidClick obj: Context Menu*, lift up, take all from stockpile

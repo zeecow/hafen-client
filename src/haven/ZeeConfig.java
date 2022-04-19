@@ -1081,7 +1081,7 @@ public class ZeeConfig {
                 try {
 
                     if(autoRunLogin)
-                        setSpeed(PLAYER_SPEED_2);
+                        setPlayerSpeed(PLAYER_SPEED_2);
 
                     if (autoOpenBelt)
                         openBelt();
@@ -1104,7 +1104,11 @@ public class ZeeConfig {
         }).start();
     }
 
-    public static void setSpeed(int spd) {
+    public static int getPlayerSpeed() {
+        return gameUI.ulpanel.getchild(Speedget.class).cur;
+    }
+
+    public static void setPlayerSpeed(int spd) {
         gameUI.ulpanel.getchild(Speedget.class).set(spd);
     }
 
@@ -1586,13 +1590,8 @@ public class ZeeConfig {
             if (clickb==2) {
                 if (isPlayerHoldingItem()) { //move while holding item
                     clickCoord(mc.floor(posres), 1, 0);
-                }else if (ZeeClickGobManager.isLongClick() && isPlayerCarryingWheelbarrow()){
-                    new ZeeThread() {
-                        public void run() {
-                            ZeeStockpileManager.unloadWheelbarrowStockpileAtGround(mc.floor(posres));
-                        }
-                    }.start();
-                }
+                }else
+                    new ZeeClickGobManager(pc,mc,null).start();
             }
         }
     }
@@ -1618,7 +1617,13 @@ public class ZeeConfig {
         Gob g = getClosestGobName(gobNameContains);
         if (g==null)
             return false;
-        return distanceToPlayer(g)==0;
+        return getCoordGob(g).compareTo(getPlayerCoord()) == 0;
+    }
+
+    public static boolean isPlayerSharingGobCoord(Gob g){
+        if (g==null)
+            return false;
+        return getCoordGob(g).compareTo(getPlayerCoord()) == 0;
     }
 
     public static Gob getClosestGob(List<Gob> gobs) {

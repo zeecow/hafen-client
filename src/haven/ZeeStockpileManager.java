@@ -356,12 +356,12 @@ public class ZeeStockpileManager extends ZeeThread{
             ysignal = subc.y >= 0 ? 1 : -1;
             //drop wheelbarrow
             ZeeConfig.clickCoord(pc.add(xsignal * 500, ysignal * 500), 3);
-            sleep(PING_MS);
+            sleep(500);
             if (!ZeeConfig.isPlayerCarryingWheelbarrow()){
                 Gob wb = ZeeConfig.getClosestGobName("gfx/terobjs/vehicle/wheelbarrow");
                 //activate wheelbarrow
                 ZeeClickGobManager.gobClick(wb, 3);
-                sleep(PING_MS);
+                sleep(500);
                 //use wheelbarrow on stockpile
                 ZeeClickGobManager.gobClick(gobStockpile, 3);
                 waitPlayerIdleFor(1);
@@ -388,12 +388,12 @@ public class ZeeStockpileManager extends ZeeThread{
             ysignal = subc.y >= 0 ? 1 : -1;
             //drop wheelbarrow
             ZeeConfig.clickCoord(pc.add(xsignal*500,ysignal*500), 3);
-            sleep(PING_MS);
+            sleep(500);
             if (!ZeeConfig.isPlayerCarryingWheelbarrow()) {
                 Gob wb = ZeeConfig.getClosestGobName("gfx/terobjs/vehicle/wheelbarrow");
                 //activate wheelbarrow
                 ZeeClickGobManager.gobClick(wb, 3);
-                sleep(PING_MS);
+                sleep(500);
                 //use wheelbarrow at stockpile
                 ZeeConfig.clickCoord(mcFloorPosres, 3);
                 waitPlayerIdleFor(1);
