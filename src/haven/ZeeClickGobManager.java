@@ -29,7 +29,7 @@ public class ZeeClickGobManager extends ZeeThread{
         gobName = isGroundClick ? "" : gob.getres().name;
         clickDiffMs = clickEndMs - clickStartMs;
         ZeeConfig.getMainInventory();
-        //println(clickDiffMs+"ms > "+gobName+" dist="+ZeeConfig.distanceToPlayer(gob));
+        //println(clickDiffMs+"ms > "+gobName + (isGroundClick ? mc : " dist="+ZeeConfig.distanceToPlayer(gob)));
     }
 
     @Override
@@ -144,7 +144,10 @@ public class ZeeClickGobManager extends ZeeThread{
 
         String gobName = gob.getres().name;
 
-        if (petalName.equals(ZeeFlowerMenu.STRPETAL_LIFTUPGOB)){
+        if (petalName.equals(ZeeFlowerMenu.STRPETAL_AUTO_BUTCH_BIG)){
+            autoButchBigAnimal(gob);
+        }
+        else if (petalName.equals(ZeeFlowerMenu.STRPETAL_LIFTUPGOB)){
             liftGob(gob);
         }
         else if(gobName.endsWith("terobjs/oven")) {
@@ -185,6 +188,38 @@ public class ZeeClickGobManager extends ZeeThread{
         }else{
             println("chooseGobFlowerMenu > unkown case");
         }
+    }
+
+    public static void autoButchBigAnimal(Gob gob) {
+        new ZeeThread() {
+            public void run() {
+                boolean butcherBackup = ZeeConfig.butcherMode;
+                ZeeConfig.butcherAutoList = ZeeConfig.DEF_BUTCH_AUTO_LIST;
+                try{
+                    ZeeConfig.addPlayerText("autobutch");
+                    ZeeConfig.lastMapViewClickButton = 2;//prepare for clickCancelTask()
+                    while (!ZeeConfig.clickCancelTask() && gobHasFlowermenu(gob)) {
+
+                        //prepare settings and click gob
+                        ZeeConfig.lastInvItemMs = 0;
+                        ZeeConfig.butcherMode = true;
+                        ZeeConfig.autoClickMenuOption = false;
+                        gobClick(gob,3);
+
+                        //wait inventory idle
+                        if (ZeeClickItemManager.isItemEquipped("/butcherscleaver"))
+                            waitInvIdleMs(1000);
+                        else
+                            waitInvIdleMs(2000);
+                    }
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+                ZeeConfig.butcherMode = butcherBackup;
+                ZeeConfig.autoClickMenuOption = Utils.getprefb("autoClickMenuOption", true);
+                ZeeConfig.removePlayerText();
+            }
+        }.start();
     }
 
     private static void destroyTreelogs(Gob firstTreelog, String petalName) {
@@ -232,8 +267,12 @@ public class ZeeClickGobManager extends ZeeThread{
         boolean showMenu = true;
         ZeeFlowerMenu menu = null;
 
-
-        if(gobName.endsWith("terobjs/oven")){
+        if (isGobBigAnimal()) {
+            showMenu = isGobBigDeadAnimal_thread();//thread wait
+            if (showMenu)
+                menu = new ZeeFlowerMenu(gob, ZeeFlowerMenu.STRPETAL_AUTO_BUTCH_BIG, ZeeFlowerMenu.STRPETAL_LIFTUPGOB);
+        }
+        else if(gobName.endsWith("terobjs/oven")){
             menu = new ZeeFlowerMenu(gob, ZeeFlowerMenu.STRPETAL_ADD4BRANCH);
         }
         else if(gobName.endsWith("terobjs/smelter")){
@@ -264,12 +303,52 @@ public class ZeeClickGobManager extends ZeeThread{
             //println("showGobFlowerMenu() > unkown case");
         }
 
-
         if (showMenu) {
             ZeeConfig.gameUI.ui.root.add(menu, coordPc);
         }
 
         return showMenu;
+    }
+
+    static boolean isGobDeadAnimal;
+    private boolean isGobBigDeadAnimal_thread() {
+        try{
+            ZeeThread zt = new ZeeThread() {
+                public void run() {
+                    gobClick(gob, 3);
+                    waitFlowerMenu();
+                    FlowerMenu fm = getFlowerMenu();
+                    for (int i = 0; i < fm.opts.length; i++) {
+                        //if animal gob has butch menu, means is dead
+                        if (ZeeConfig.DEF_BUTCH_AUTO_LIST.contains(fm.opts[i].name)){
+                            isGobDeadAnimal = true;
+                            break;
+                        }
+                    }
+                    //close menu before returning
+                    ZeeConfig.cancelFlowerMenu();
+                    waitNoFlowerMenu();
+                }
+            };
+
+            //disable automenu settings before thread clicks gob
+            ZeeConfig.autoClickMenuOption = false;
+            ZeeConfig.butcherMode = false;
+
+            //start thread and wait it finish
+            isGobDeadAnimal = false;
+            zt.start();
+            zt.join();//wait thread
+
+            //restore automenu settings
+            ZeeConfig.autoClickMenuOption = Utils.getprefb("autoClickMenuOption", true);
+
+            return isGobDeadAnimal;
+
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return false;
     }
 
     private boolean isDestroyTreelog() {
@@ -720,20 +799,37 @@ public class ZeeClickGobManager extends ZeeThread{
 
     // if gob has flowermenu returns true
     public static boolean gobHasFlowermenu(Gob gob) {
-        if (gob == null) {
-            println(">gobHasFlowermenu gob null");
+        boolean ret;
+        if (ZeeConfig.isGobRemoved(gob)) {
+            println(">gobHasFlowermenu gob is inexistent");
             return false;
         }
+
+        //select arrow cursor
+        ZeeConfig.clickRemoveCursor();
+        waitCursor(ZeeConfig.CURSOR_ARW);
+
+        //disable auto options before clicking gob
+        boolean butchBackup = ZeeConfig.butcherMode;
+        ZeeConfig.butcherMode = ZeeConfig.autoClickMenuOption = false;
+
+        //click gob and wait menu
         gobClick(gob, 3);
         if (waitFlowerMenu()) {
             // menu opened means gob exist
             ZeeConfig.cancelFlowerMenu();
             waitNoFlowerMenu();
-            return true;
+            println("gobHasFlowermenu > true");
+            ret = true;
         } else {
             println("gobHasFlowermenu > cant click gob");
-            return false;
+            ret = false;
         }
+
+        //restore settings and return
+        ZeeConfig.butcherMode = butchBackup;
+        ZeeConfig.autoClickMenuOption = Utils.getprefb("autoClickMenuOption", true);
+        return ret;
     }
 
     // set flags for clickWItem and ZeeClickGobManager.gobClick
@@ -745,6 +841,18 @@ public class ZeeClickGobManager extends ZeeThread{
     public static void resetClickPetal() {//TODO check if still needed
         clickPetal = false;
         clickPetalName = "";
+    }
+
+    private boolean isGobBigAnimal(){
+        return gobNameEndsWith(
+            gobName,
+            "/stallion,/mare,/foal,/hog,/sow,/piglet,"
+            +"/goat,/nanny,/kid,/sheep,/lamb,/cattle,/calf,"
+            +"/wildhorse,/aurochs,/mouflon,/wildgoat,"
+            +"/adder,/badger,/bear,/boar,/beaver,/deer,/reindeer,/fox,"
+            +"/seal,/otter,/caveangler,/boreworm,/caverat,"
+            +"/lynx,/mammoth,/moose,/troll,/walrus,/wolf,/wolverine"
+        );
     }
 
     private boolean isGobHorse() {

@@ -22,6 +22,7 @@ public class ZeeFlowerMenu extends FlowerMenu{
     public static final String STRPETAL_TRANSFER_DESC = "Transfer DESC";
     public static final String STRPETAL_AUTO_BUTCH = "Auto-butch";
     public static final String STRPETAL_AUTO_BUTCH_ALL = "Auto-butch all";
+    public static final String STRPETAL_AUTO_BUTCH_BIG = "Auto-butch";
 
     private final Gob gob;
     private final WItem wItem;
