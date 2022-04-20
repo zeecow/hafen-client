@@ -18,6 +18,10 @@ public class ZeeFlowerMenu extends FlowerMenu{
     public static final String STRPETAL_DESTROYTREELOG3 = "Destroy treelog x3";
     public static final String STRPETAL_DESTROYTREELOG4 = "Destroy treelog x4";
     public static final String STRPETAL_SHOWWINDOWMINING = "Show window";
+    public static final String STRPETAL_TRANSFER_ASC = "Transfer ASC";
+    public static final String STRPETAL_TRANSFER_DESC = "Transfer DESC";
+    public static final String STRPETAL_AUTO_BUTCH = "Auto-butch";
+    public static final String STRPETAL_AUTO_BUTCH_ALL = "Auto-butch all";
 
     private final Gob gob;
     private final WItem wItem;

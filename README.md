@@ -18,6 +18,7 @@ features:
  - icon list categs
  - midclick ground 
    - while holding item will move to location (simulates ctrl+click)
+ - long midclick ground
    - while mounting horse will try to dismount
    - while carrying wheelbarrow will try to(dismount and) unload stockpile at ground or compatible stockpile
  - midclick object/item for small tasks:
@@ -27,7 +28,7 @@ features:
      - Long MidClick item: Context Menu*, sort-transfer inverse, equip fishing item and recast
    - Context menus for midclick 
      - obj: add branch to oven, add coal to smelter, remove tree and stump, remove trellis plant(s), destroy treelogs(if bonesaw is equipped), haverst two dreams
-     - item: kill all cocoons, feast all food
+     - item: kill all cocoons, feast all food, auto butch, transfer asc/desc
 
 
 other stuff:

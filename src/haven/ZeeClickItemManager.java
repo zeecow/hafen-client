@@ -1,5 +1,6 @@
 package haven;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -32,37 +33,6 @@ public class ZeeClickItemManager extends ZeeThread{
         init(wItem);
     }
 
-    public static void equipAxeChopTree() {
-        /*
-            gfx/invobjs/woodsmansaxe
-            gfx/invobjs/axe-m
-            gfx/invobjs/butcherscleaver
-            gfx/invobjs/stoneaxe
-         */
-        if (isItemEquipped("woodsmansaxe"))
-            return;
-        WItem axe = getBeltWItem("woodsmansaxe");
-        if (axe!=null){
-            equipBeltItem("woodsmansaxe");
-            waitItemEquipped("woodsmansaxe");
-        }else{
-            if (isItemEquipped("axe-m"))
-                return;
-            axe = getBeltWItem("axe-m");
-            if (axe!=null){
-                equipBeltItem("axe-m");
-                waitItemEquipped("axe-m");
-            }
-        }
-    }
-
-    public static WItem getSackFromBelt() {
-        WItem ret = getBeltWItem("travellerssack");
-        if (ret==null)
-            ret = ret = getBeltWItem("bindle");
-        return ret;
-    }
-
     private void init(WItem wItem) {
         equipory = ZeeConfig.windowEquipment.getchild(Equipory.class);
         leftHandItemName = (equipory.leftHand==null ? "" : equipory.leftHand.item.getres().name);
@@ -75,8 +45,7 @@ public class ZeeClickItemManager extends ZeeThread{
             //error caused by midClicking again before task ending
             cancelManager = true;
         }
-        //println(itemName +"  "+ wItem.c.div(33)+"  "+ZeeConfig.getCursorName());
-        //println("left: "+leftHandItemName);println("right: "+rightHandItemName);
+        //println(itemName +"  "+ getWItemCoord(wItem)+"  "+ZeeConfig.getCursorName());
     }
 
     @Override
@@ -292,7 +261,8 @@ public class ZeeClickItemManager extends ZeeThread{
             }
 
         }catch (Exception e) {
-            throw new RuntimeException(e);
+            //throw new RuntimeException(e);
+            e.printStackTrace();
         }
     }
 
@@ -302,6 +272,37 @@ public class ZeeClickItemManager extends ZeeThread{
                 witem.item.wdgmsg("itemact",0);
             }
         });
+    }
+
+    public static void equipAxeChopTree() {
+        /*
+            gfx/invobjs/woodsmansaxe
+            gfx/invobjs/axe-m
+            gfx/invobjs/butcherscleaver
+            gfx/invobjs/stoneaxe
+         */
+        if (isItemEquipped("woodsmansaxe"))
+            return;
+        WItem axe = getBeltWItem("woodsmansaxe");
+        if (axe!=null){
+            equipBeltItem("woodsmansaxe");
+            waitItemEquipped("woodsmansaxe");
+        }else{
+            if (isItemEquipped("axe-m"))
+                return;
+            axe = getBeltWItem("axe-m");
+            if (axe!=null){
+                equipBeltItem("axe-m");
+                waitItemEquipped("axe-m");
+            }
+        }
+    }
+
+    public static WItem getSackFromBelt() {
+        WItem ret = getBeltWItem("travellerssack");
+        if (ret==null)
+            ret = ret = getBeltWItem("bindle");
+        return ret;
     }
 
     private void equipFishingItem() {
@@ -377,7 +378,23 @@ public class ZeeClickItemManager extends ZeeThread{
 
         String itemName = wItem.item.getres().name;
 
-        if(petalName.equals(ZeeFlowerMenu.STRPETAL_KILLALL))
+        if(petalName.equals(ZeeFlowerMenu.STRPETAL_TRANSFER_ASC))
+        {
+            wItem.wdgmsg("transfer-sort", wItem.item, true);// true = ascending order
+        }
+        else if(petalName.equals(ZeeFlowerMenu.STRPETAL_TRANSFER_DESC))
+        {
+            wItem.wdgmsg("transfer-sort", wItem.item, false);// false = descending order
+        }
+        else if(petalName.equals(ZeeFlowerMenu.STRPETAL_AUTO_BUTCH))
+        {
+            autoButch(wItem,false);
+        }
+        else if(petalName.equals(ZeeFlowerMenu.STRPETAL_AUTO_BUTCH_ALL))
+        {
+            autoButch(wItem,true);
+        }
+        else if(petalName.equals(ZeeFlowerMenu.STRPETAL_KILLALL))
         {
             // kill all inventory cocoons
             if(itemName.endsWith("silkcocoon") || itemName.endsWith("chrysalis")){
@@ -409,6 +426,90 @@ public class ZeeClickItemManager extends ZeeThread{
     }
 
 
+    private static void autoButch(WItem wItem, boolean butchAll) {
+        new ZeeThread() {
+            public void run() {
+                boolean bmBackup = ZeeConfig.butcherMode;
+                try {
+                    ZeeConfig.addPlayerText("autobutch");
+
+                    //adjust autobutch settings
+                    ZeeConfig.butcherMode = true;
+                    ZeeConfig.butcherAutoList = ZeeConfig.DEF_BUTCH_AUTO_LIST;
+
+                    //start
+                    WItem item = wItem;
+                    Inventory inv = getItemInventory(item);
+                    Coord itemSlotCoord = getWItemCoord(item);
+                    String itemName = getWItemName(item);
+                    String firstItemName = itemName;
+                    long changeMs;
+
+                    while (!itemName.endsWith("/meat")) {
+
+                        //butch item
+                        changeMs = now();
+                        itemAct(item);
+
+                        //wait inventory changes
+                        while (changeMs > ZeeConfig.lastInvItemMs) {
+                            sleep(PING_MS);
+                        }
+
+                        //get next stage item (dead,plucked,clean...)
+                        item = inv.getItemBySlotCoord(itemSlotCoord);
+                        itemName = getWItemName(item);
+
+                        //if butch is over("/meat"), check for "butch all" next item
+                        if (butchAll && itemName.endsWith("/meat")){
+
+                            //get items with same name
+                            List<WItem> items;
+                            if (ZeeConfig.isFish(firstItemName))
+                                items = inv.getWItemsByName("/fish-"); //consider all fish the same
+                            else
+                                items = inv.getWItemsByName(firstItemName);
+
+                            if (items.size() < 1){
+                                //no more items to butch
+                                break;
+                            }else{
+                                //update next item vars
+                                item = items.get(0);
+                                itemName = getWItemName(item);
+                                itemSlotCoord = getWItemCoord(item);
+                            }
+                        }
+                    }
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+                //restore settings
+                ZeeConfig.butcherMode = bmBackup;
+                ZeeConfig.butcherAutoList = Utils.getpref("butcherAutoList",ZeeConfig.DEF_AUTO_CLICK_MENU_LIST);
+                ZeeConfig.removePlayerText();
+            }
+        }.start();
+    }
+
+    public static Inventory getItemInventory(WItem wItem) {
+        if (wItem==null)
+            return null;
+        return wItem.getparent(Inventory.class);
+    }
+
+    public static Coord getWItemCoord(WItem wItem){
+        return wItem.c.div(33);
+    }
+
+    public static String getWItemName(WItem wItem) {
+        String name = "";
+        if (wItem!=null && wItem.item!=null && wItem.item.getres()!=null)
+            name = wItem.item.getres().name;
+        return name;
+    }
+
+
     private boolean showItemFlowerMenu(){
 
         if (!isLongClick())
@@ -417,8 +518,40 @@ public class ZeeClickItemManager extends ZeeThread{
         boolean showMenu = true;
         ZeeFlowerMenu menu = null;
 
-        if(itemName.endsWith("silkcocoon") || itemName.endsWith("chrysalis")){
-            menu = new ZeeFlowerMenu(wItem, ZeeFlowerMenu.STRPETAL_KILLALL);
+        ArrayList<String> opts = new ArrayList<String>();//petals array
+        Inventory inv = getItemInventory(wItem);
+
+        if (ZeeConfig.isFish(itemName)) {
+            if (inv.countItemsByName("/fish-") > 1){
+                opts.add(ZeeFlowerMenu.STRPETAL_AUTO_BUTCH_ALL);
+                if (transferWindowOpen()) {
+                    opts.add(ZeeFlowerMenu.STRPETAL_TRANSFER_ASC);
+                    opts.add(ZeeFlowerMenu.STRPETAL_TRANSFER_DESC);
+                }
+            }
+            if (opts.size()==0)
+                showMenu = false;
+            else
+                menu = new ZeeFlowerMenu(wItem, opts.toArray(String[]::new));
+        }
+        else if (ZeeConfig.isButchableSmallAnimal(itemName)) {
+            opts.add(ZeeFlowerMenu.STRPETAL_AUTO_BUTCH);
+            if (inv.countItemsByName(itemName) > 1){
+                opts.add(ZeeFlowerMenu.STRPETAL_AUTO_BUTCH_ALL);
+            }
+            if (transferWindowOpen()) {
+                opts.add(ZeeFlowerMenu.STRPETAL_TRANSFER_ASC);
+                opts.add(ZeeFlowerMenu.STRPETAL_TRANSFER_DESC);
+            }
+            menu = new ZeeFlowerMenu(wItem, opts.toArray(String[]::new));
+        }
+        else if(itemName.endsWith("silkcocoon") || itemName.endsWith("chrysalis")){
+            opts.add(ZeeFlowerMenu.STRPETAL_KILLALL);
+            if (transferWindowOpen()) {
+                opts.add(ZeeFlowerMenu.STRPETAL_TRANSFER_ASC);
+                opts.add(ZeeFlowerMenu.STRPETAL_TRANSFER_DESC);
+            }
+            menu = new ZeeFlowerMenu(wItem, opts.toArray(String[]::new));
         }
         else if (isItemWindowTable() && ZeeConfig.getCursorName().equals(ZeeConfig.CURSOR_EAT)){
             menu = new ZeeFlowerMenu(wItem, ZeeFlowerMenu.STRPETAL_EATALL);
@@ -427,7 +560,7 @@ public class ZeeClickItemManager extends ZeeThread{
             showMenu = false;
         }
 
-        if (showMenu) {
+        if (showMenu && menu!=null) {
             ZeeConfig.gameUI.ui.root.add(menu, ZeeConfig.lastUiClickCoord);
         }
 

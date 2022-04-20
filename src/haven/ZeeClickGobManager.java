@@ -742,7 +742,7 @@ public class ZeeClickGobManager extends ZeeThread{
         clickPetalName = name;
     }
 
-    public static void resetClickPetal() {
+    public static void resetClickPetal() {//TODO check if still needed
         clickPetal = false;
         clickPetalName = "";
     }

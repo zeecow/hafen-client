@@ -174,15 +174,20 @@ public class Inventory extends Widget implements DTarget {
 	}
 
 	private List<WItem> getSame(GItem item, Boolean ascending) {
-		String name = item.res.get().basename();
-		GSprite spr = item.spr();
+		String name = item.res.get().name;
 		List<WItem> items = new ArrayList<>();
+		WItem w;
+		boolean isFish = ZeeConfig.isFish(name);
 		for(Widget wdg = lchild; wdg != null; wdg = wdg.prev) {
 			if(wdg.visible && wdg instanceof WItem) {
-				WItem wItem = (WItem) wdg;
-				GItem child = wItem.item;
-				if(child.res.get().basename().equals(name)){// ((spr == child.spr()) || (spr != null && spr.same(child.spr())))) {
-					items.add(wItem);
+				w = (WItem) wdg;
+				//consider all fish the same
+				if ( isFish && ZeeConfig.isFish(w.item.res.get().name)){
+					items.add(w);
+					continue;
+				}
+				if(w.item.res.get().name.contains(name)){
+					items.add(w);
 				}
 			}
 		}
@@ -324,6 +329,15 @@ public class Inventory extends Widget implements DTarget {
 				mainInv = Boolean.FALSE;
 		}
 		return mainInv;
+	}
+
+	public WItem getItemBySlotCoord(Coord c) {
+		for (WItem item : this.children(WItem.class)) {
+			if (c.compareTo(ZeeClickItemManager.getWItemCoord(item)) == 0) {
+				return item;
+			}
+		}
+		return null;
 	}
 
 	public WItem getItemByCoord(Coord c) {

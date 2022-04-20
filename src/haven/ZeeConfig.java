@@ -53,6 +53,9 @@ public class ZeeConfig {
     public static final String CURSOR_MINE = "gfx/hud/curs/mine";//destroy
     public static final String CURSOR_SHOOT = "gfx/hud/curs/shoot";
 
+    public static final String DEF_BUTCH_AUTO_LIST = "Break,Scale,Wring neck,Kill,Skin,Flay,Pluck,Clean,Butcher,Collect bones";
+    public static final String DEF_AUTO_CLICK_MENU_LIST = "Pick,Harvest wax";
+
     public static final int PLAYER_SPEED_0 = 0;
     public static final int PLAYER_SPEED_1 = 1;
     public static final int PLAYER_SPEED_2 = 2;
@@ -98,13 +101,13 @@ public class ZeeConfig {
     public static boolean alertOnPlayers = Utils.getprefb("alertOnPlayers", true);
     public static boolean autoChipMinedBoulder = Utils.getprefb("autoChipMinedBoulder", true);
     public static boolean autoClickMenuOption = Utils.getprefb("autoClickMenuOption", true);
-    public static String autoClickMenuOptionList = Utils.getpref("autoClickMenuOptionList", "Pick,Harvest wax");
+    public static String autoClickMenuOptionList = Utils.getpref("autoClickMenuOptionList", DEF_AUTO_CLICK_MENU_LIST);
     public static boolean autoHearthOnStranger = Utils.getprefb("autoHearthOnStranger", true);
     public static boolean autoOpenEquips = Utils.getprefb("beltToggleEquips", true);
     public static boolean autoOpenBelt = Utils.getprefb("autoOpenBelt", true);
     public static boolean autoRunLogin = Utils.getprefb("autoRunLogin", true);
     public static boolean butcherMode = false;
-    public static String butcherAutoList = Utils.getpref("butcherAutoList","Break,Scale,Wring neck,Kill,Skin,Flay,Pluck,Clean,Butcher,Collect bones");
+    public static String butcherAutoList = Utils.getpref("butcherAutoList",DEF_BUTCH_AUTO_LIST);
     public static boolean cattleRosterHeight = Utils.getprefb("cattleRosterHeight", false);
     public static double cattleRosterHeightPercentage = Utils.getprefd("cattleRosterHeightPercentage", 1.0);
     public static List<String> craftHistoryList = initCraftHistory();
@@ -417,6 +420,33 @@ public class ZeeConfig {
         return false;
     }
 
+    public static boolean isFish(String name){
+        return name.contains("/fish-");
+    }
+
+    public static boolean isButchableSmallAnimal(String name){
+        /*
+        Kill > Pluck > Butch = "gfx/invobjs/meat"
+            gfx/invobjs/rooster
+            gfx/invobjs/rooster-dead
+            gfx/invobjs/chicken-plucked
+            gfx/invobjs/chicken-cleaned, gfx/invobjs/adder-clean
+            gfx/invobjs/meat
+         */
+        String[] endlist = {
+                "rockdove","quail","/hen","/rooster","magpie", // "/crab"
+                "mallard","seagull","ptarmigan","grouse",
+                "/squirrel","/hedgehog","/bogturtle",
+                "/rabbit-buck","rabbit-doe","/adder",
+                "-dead","-plucked","-cleaned","-clean"
+        };
+        for (int i = 0; i < endlist.length; i++) {
+            if(name.endsWith(endlist[i]) || isFish(name))
+                return true;
+        }
+        return false;
+    }
+
     public static boolean isSmallAnimal(String name){
         /*
         private static final String[] CRITTERS = {
@@ -431,7 +461,7 @@ public class ZeeConfig {
                 "rockdove","quail","/hen","/rooster","magpie",
                 "mallard","seagull","ptarmigan","grouse",
                 "/rat/rat","/squirrel","/hedgehog","/bogturtle",
-                "/rabbit","rabbit-doe","/crab","/jellyfish",
+                "/rabbit-buck","rabbit-doe","/crab","/jellyfish",
                 "/frog","/toad","/forestlizard","snail",
                 "/adder"
         };
