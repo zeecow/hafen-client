@@ -3,8 +3,7 @@
 features:
  - search actions globally
  - sort actions by most used craft items
- - craft window button for ingredients search
- - craft window buttons for back/fwd history 
+ - craft window buttons for ingredients and history
  - big ugly close buttons
  - button for auto-organizing duplicate windows  
  - compact equip window
@@ -34,6 +33,7 @@ features:
    - show context menu for various objs (details below)
    - lift up obj 
    - take all from stockpile obj
+   - while holding item will try to store all on barrel obj
    - while carrying wheelbarrow will try to(dismount and) unload at stockpile obj
    - while using wheelbarrow will lift it up and click gate obj 
  - midclick item 

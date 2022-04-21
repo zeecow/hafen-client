@@ -70,7 +70,7 @@ public class ZeeClickGobManager extends ZeeThread{
                 /*
                     long clicks
                  */
-                if (!isGroundClick && showGobFlowerMenu()) {
+                if (!isGroundClick && !ZeeConfig.isPlayerHoldingItem() && showGobFlowerMenu()) {
                     //ok
                 } else if (isGobCrop()) {
                     if (!ZeeConfig.getCursorName().equals(ZeeConfig.CURSOR_HARVEST))
@@ -81,6 +81,11 @@ public class ZeeClickGobManager extends ZeeThread{
                     gobClick(3, UI.MOD_SHIFT);//pick up all items (shift + rclick)
                 } else if (isGobTreeStump()) {
                     removeStump(gob);
+                } else if (ZeeConfig.isPlayerHoldingItem() && isGobName("/barrel")) {
+                    if (ZeeSeedFarmingManager.isBarrelEmpty(gob))
+                        gobItemAct(UI.MOD_SHIFT);//shift+rclick
+                    else
+                        gobItemAct(3);//ctrl+shift+rclick
                 } else if (isLiftGob()) {
                     liftGob();
                 } else if (isGobGate() && ZeeConfig.CURSOR_HAND.equals(ZeeConfig.getCursorName())) {
