@@ -37,6 +37,7 @@ features:
    - while carrying wheelbarrow will try to(dismount and) unload at stockpile/container
    - while driving wheelbarrow will lift it up and open gate obj
    - while driving wheelbarrow will lift it up and place on cart obj
+   - while carrying/driving wheelbarrow will mount horse obj and lift wheelbarrow again
  - midclick item 
    - sort-transfer item ascending(?) 
    - pick-up all

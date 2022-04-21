@@ -87,14 +87,19 @@ public class ZeeClickGobManager extends ZeeThread{
                     else
                         gobItemAct(3);//ctrl+shift+rclick
                 } else if (isGroundClick){
-                    if (ZeeConfig.isPlayerCarryingWheelbarrow())
-                        ZeeStockpileManager.unloadWheelbarrowStockpileAtGround(coordMc.floor(posres));
-                    else if (ZeeConfig.isPlayerMountingHorse())
+                    if (ZeeConfig.isPlayerMountingHorse())
                         dismountHorse();
+                    else if (ZeeConfig.isPlayerCarryingWheelbarrow())
+                        ZeeStockpileManager.unloadWheelbarrowStockpileAtGround(coordMc.floor(posres));
                 } else if (ZeeConfig.isPlayerCarryingWheelbarrow()) {
-                    unloadWheelbarrowAtGob();
+                    if (isGobHorse())
+                        mountHorseCarryingWheelbarrow();
+                    else
+                        unloadWheelbarrowAtGob();
                 } else if (!isGobName("/wheelbarrow") && ZeeConfig.isPlayerDrivingWheelbarrow()) {
-                    if (isGobGate())
+                    if (isGobHorse())
+                        mountHorseDrivingWheelbarrow();
+                    else if (isGobGate())
                         openGateWheelbarrow();
                     else if (isGobName("/cart"))
                         liftAndStoreWheelbarrow();
@@ -116,16 +121,19 @@ public class ZeeClickGobManager extends ZeeThread{
         ZeeConfig.clickCoord(coordMc.floor(posres),1,UI.MOD_CTRL);
     }
 
-    private void mountHorse() {
+    public static void mountHorse(Gob horse){
         int playerSpeed = ZeeConfig.getPlayerSpeed();
-        clickGobPetal("Giddyup!");
-        waitPlayerMounted(gob);
+        clickGobPetal(horse,"Giddyup!");
+        waitPlayerMounted(horse);
         if (ZeeConfig.isPlayerMountingHorse()) {
             if (playerSpeed <= ZeeConfig.PLAYER_SPEED_1)
                 ZeeConfig.setPlayerSpeed(ZeeConfig.PLAYER_SPEED_1);//min auto horse speed
             else
                 ZeeConfig.setPlayerSpeed(ZeeConfig.PLAYER_SPEED_2);//max auto horse speed
         }
+    }
+    private void mountHorse() {
+        mountHorse(gob);
     }
 
     private void clickedGobHoldingItem() {
@@ -331,7 +339,10 @@ public class ZeeClickGobManager extends ZeeThread{
             ZeeThread zt = new ZeeThread() {
                 public void run() {
                     gobClick(gob, 3);
-                    waitFlowerMenu();
+                    if (!waitFlowerMenu()) {//no menu detected
+                        isGobDeadAnimal = false;
+                        return;
+                    }
                     FlowerMenu fm = getFlowerMenu();
                     for (int i = 0; i < fm.opts.length; i++) {
                         //if animal gob has butch menu, means is dead
@@ -370,6 +381,66 @@ public class ZeeClickGobManager extends ZeeThread{
         if(isGobTreeLog() && ZeeClickItemManager.isItemEquipped("bonesaw"))
             return true;
         return false;
+    }
+
+    private void mountHorseDrivingWheelbarrow(){
+        Gob horse = gob;
+        try{
+            //waitNoFlowerMenu();
+            ZeeConfig.addPlayerText("mounting");
+            Gob wb = ZeeConfig.getClosestGobName("gfx/terobjs/vehicle/wheelbarrow");
+            if (wb == null) {
+                ZeeConfig.msg("no wheelbarrow close");
+            } else {
+                Coord pc = ZeeConfig.getPlayerCoord();
+                Coord subc = ZeeConfig.getCoordGob(horse).sub(pc);
+                int xsignal, ysignal;
+                xsignal = subc.x >= 0 ? -1 : 1;//switch 1s to change direction relative to horse
+                ysignal = subc.y >= 0 ? -1 : 1;
+                //try position wheelbarrow away from horse direction
+                ZeeConfig.clickCoord(pc.add(xsignal * 500, ysignal * 500), 1);
+                sleep(PING_MS);
+                gobClick(wb,3);//stop driving wheelbarrow
+                sleep(PING_MS);
+                mountHorse(horse);
+                waitPlayerMounted(horse);
+                liftGob(wb);// lift wheelbarrow
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        ZeeConfig.removePlayerText();
+    }
+
+    private void mountHorseCarryingWheelbarrow() {
+        Gob horse = gob;
+        try {
+            //waitNoFlowerMenu();
+            ZeeConfig.addPlayerText("mounting");
+            Gob wb = ZeeConfig.getClosestGobName("gfx/terobjs/vehicle/wheelbarrow");
+            if (wb == null) {
+                ZeeConfig.msg("no wheelbarrow close");
+            } else {
+                Coord pc = ZeeConfig.getPlayerCoord();
+                Coord subc = ZeeConfig.getCoordGob(horse).sub(pc);
+                int xsignal, ysignal;
+                xsignal = subc.x >= 0 ? -1 : 1;
+                ysignal = subc.y >= 0 ? -1 : 1;
+                //try to drop wheelbarrow away from horse direction
+                ZeeConfig.clickCoord(pc.add(xsignal * 500, ysignal * 500), 3);
+                sleep(500);
+                //if drop wb success
+                if (!ZeeConfig.isPlayerCarryingWheelbarrow()) {
+                    ZeeConfig.clickRemoveCursor();//remove hand cursor
+                    mountHorse();//mount horse
+                    waitPlayerMounted(horse);
+                    liftGob(wb);//lift wheelbarrow
+                }
+            }
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+        ZeeConfig.removePlayerText();
     }
 
     private void liftAndStoreWheelbarrow(){
