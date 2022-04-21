@@ -327,13 +327,14 @@ public class ZeeThread  extends Thread{
                     timer = timeOutMs;
                     lastInvFreeSlots = invFreeSlots;
                 }else{
-                    timer -= SLEEP_MS;
+                    timer -= SLEEP_MS;//TODO test PING_MS
                 }
                 Thread.sleep(SLEEP_MS);
             }
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+        //println("hasFreeslots="+(inv.getNumberOfFreeSlots()>0)+"  holdingItem="+ZeeConfig.isPlayerHoldingItem());
         if(ZeeConfig.isPlayerHoldingItem())
             return true;
         return inv.getNumberOfFreeSlots() == 0;

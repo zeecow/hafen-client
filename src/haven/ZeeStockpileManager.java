@@ -117,9 +117,9 @@ public class ZeeStockpileManager extends ZeeThread{
             gobPile = ZeeConfig.getClosestGob(ZeeConfig.findGobsByNameContains("stockpile-stone"));
 
         //mark gob pile and source
-        ZeeConfig.addPlayerText("auto piling");
-        ZeeConfig.addGobText(gobPile,"pile",0,255,0,255,10);
-        ZeeConfig.addGobText(gobSource,"source",0,255,0,255,10);
+        ZeeConfig.addPlayerText("piling");
+        ZeeConfig.addGobText(gobPile,"pile");
+        ZeeConfig.addGobText(gobSource,"source");
 
         //start collection from source
         if( gobSource==null || !ZeeClickGobManager.clickGobPetal(gobSource, lastPetalName) ){
@@ -130,11 +130,7 @@ public class ZeeStockpileManager extends ZeeThread{
 
         while(busy) {
 
-            if (lastPetalName.equals("Pick leaf"))
-                waitInvIdleMs(2000);//TODO remove special case if possible
-            else
-                waitPlayerIdleOrHoldingItem(2);//blocks, boards, stones
-            //waitInvFullOrHoldingItem(mainInv, 3000);// boards/boulder takes longer to produce item
+            waitInvFullOrHoldingItem(mainInv, 3000);
 
             if (!ZeeConfig.isPlayerHoldingItem()) { //if not holding item
                 /*
@@ -189,10 +185,12 @@ public class ZeeStockpileManager extends ZeeThread{
                 String itemName = gameUI.vhand.item.getres().name;
                 ZeeClickGobManager.gobItemAct(gobPile, UI.MOD_SHIFT);//right click stockpile
                 if(waitNotHoldingItem()) {
+                    //check if pile full
                     if (mainInv.getWItemsByName(itemName).size() > 0)
                         exitManager("pile full (inv still has items) 2");
                     if (!busy)
                         continue;
+                    //check if tree still have leafs
                     if (gobSource == null || !ZeeClickGobManager.clickGobPetal(gobSource, lastPetalName)) {
                         println("no more source? gobSource3 = " + gobSource);
                         pileAndExit();
