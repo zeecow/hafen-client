@@ -61,6 +61,8 @@ public class ZeeConfig {
     public static final int PLAYER_SPEED_2 = 2;
     public static final int PLAYER_SPEED_3 = 3;
 
+    public static final double MAX_DIST_DRIVING_WHEELBARROW = 15;
+
     public static MixColor MIXCOLOR_RED = new MixColor(255,0,0,200);
     public static MixColor MIXCOLOR_ORANGE = new MixColor(255,128,0,200);
     public static MixColor MIXCOLOR_YELLOW = new MixColor(255,255,0,200);
@@ -1632,7 +1634,25 @@ public class ZeeConfig {
     }
 
     public static boolean isPlayerCarryingWheelbarrow() {
+        //if cursor is hand, player maybe driving wb instead of carrying
+        if (getCursorName().contentEquals(CURSOR_HAND))
+            return false;
         return isPlayerCarryingGob("gfx/terobjs/vehicle/wheelbarrow");
+    }
+
+    public static boolean isPlayerDrivingWheelbarrow() {
+        if (!getCursorName().contentEquals(CURSOR_HAND))
+            return false;
+
+        Gob wb = getClosestGobName("/wheelbarrow");
+        if (wb==null)
+            return false;
+
+        double dist = distanceToPlayer(wb);
+        if (dist <= ZeeConfig.MAX_DIST_DRIVING_WHEELBARROW)
+            return true;
+
+        return false;
     }
 
     public static boolean isPlayerMountingHorse() {

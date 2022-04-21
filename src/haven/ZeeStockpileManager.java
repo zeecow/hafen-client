@@ -352,7 +352,7 @@ public class ZeeStockpileManager extends ZeeThread{
             int xsignal, ysignal;
             xsignal = subc.x >= 0 ? 1 : -1;
             ysignal = subc.y >= 0 ? 1 : -1;
-            //drop wheelbarrow
+            //try to drop wheelbarrow towards stockpile
             ZeeConfig.clickCoord(pc.add(xsignal * 500, ysignal * 500), 3);
             sleep(500);
             if (!ZeeConfig.isPlayerCarryingWheelbarrow()){

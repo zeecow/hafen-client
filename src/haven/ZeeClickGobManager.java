@@ -86,20 +86,30 @@ public class ZeeClickGobManager extends ZeeThread{
                         gobItemAct(UI.MOD_SHIFT);//shift+rclick
                     else
                         gobItemAct(3);//ctrl+shift+rclick
+                } else if (isGroundClick){
+                    if (ZeeConfig.isPlayerCarryingWheelbarrow())
+                        ZeeStockpileManager.unloadWheelbarrowStockpileAtGround(coordMc.floor(posres));
+                    else if (ZeeConfig.isPlayerMountingHorse())
+                        dismountHorse();
+                } else if (ZeeConfig.isPlayerCarryingWheelbarrow()) {
+                    unloadWheelbarrowAtGob();
+                } else if (!isGobName("/wheelbarrow") && ZeeConfig.isPlayerDrivingWheelbarrow()) {
+                    if (isGobGate())
+                        openGateWheelbarrow();
+                    else if (isGobName("/cart"))
+                        liftAndStoreWheelbarrow();
                 } else if (isLiftGob()) {
                     liftGob();
-                } else if (isGobGate() && ZeeConfig.CURSOR_HAND.equals(ZeeConfig.getCursorName())) {
-                    openGateWheelbarrow(gob);
-                } else if (isGroundClick && ZeeConfig.isPlayerCarryingWheelbarrow()){
-                    ZeeStockpileManager.unloadWheelbarrowStockpileAtGround(coordMc.floor(posres));
-                } else if (isGroundClick && ZeeConfig.isPlayerMountingHorse()){
-                    dismountHorse();
                 }
             }
         }
         catch (Exception e){
             e.printStackTrace();
         }
+    }
+
+    private void unloadWheelbarrowAtGob() throws Exception {
+        ZeeStockpileManager.unloadWheelbarrowAtStockpile(gob);
     }
 
     private void dismountHorse() {
@@ -362,8 +372,35 @@ public class ZeeClickGobManager extends ZeeThread{
         return false;
     }
 
-    private void openGateWheelbarrow(Gob gate) {
+    private void liftAndStoreWheelbarrow(){
+        Gob storage = gob;
+        try {
+            waitNoFlowerMenu();
+            ZeeConfig.addPlayerText("storing");
+            Gob wb = ZeeConfig.getClosestGobName("gfx/terobjs/vehicle/wheelbarrow");
+            if (wb==null){
+                ZeeConfig.msg("no wheelbarrow close");
+            }else {
+                double dist;
+                ZeeConfig.clickRemoveCursor();//remove hand cursor
+                liftGob(wb);
+                dist = ZeeConfig.distanceToPlayer(wb);
+                if (dist==0) {
+                    gobClick(storage, 3);
+                    waitPlayerIdleFor(1);
+                }else{
+                    ZeeConfig.msg("wheelbarrow unreachable?");//impossible case?
+                }
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        ZeeConfig.removePlayerText();
+    }
+
+    private void openGateWheelbarrow() {
         // gfx/terobjs/vehicle/wheelbarrow
+        Gob gate = gob;
         try {
             waitNoFlowerMenu();
             ZeeConfig.addPlayerText("wheeling");

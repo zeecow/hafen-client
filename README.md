@@ -34,8 +34,9 @@ features:
    - lift up obj 
    - take all from stockpile obj
    - while holding item will try to store all on barrel obj
-   - while carrying wheelbarrow will try to(dismount and) unload at stockpile obj
-   - while using wheelbarrow will lift it up and click gate obj 
+   - while carrying wheelbarrow will try to(dismount and) unload at stockpile/container
+   - while driving wheelbarrow will lift it up and open gate obj
+   - while driving wheelbarrow will lift it up and place on cart obj
  - midclick item 
    - sort-transfer item ascending(?) 
    - pick-up all
