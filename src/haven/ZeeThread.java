@@ -158,6 +158,25 @@ public class ZeeThread  extends Thread{
     }
 
 
+    public static boolean waitPlayerDismounted(Gob mount) {
+        //println("waitPlayerDismounted");
+        long timer = TIMEOUT_MS;
+        try {
+            while( timer > 0 ) {
+                if (!ZeeConfig.isPlayerSharingGobCoord(mount))
+                    break;
+                else
+                    timer -= PING_MS;
+                Thread.sleep(PING_MS);
+            }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        //println("waitPlayerDismounted ret "+!ZeeConfig.isPlayerSharingGobCoord(mount));
+        return !ZeeConfig.isPlayerSharingGobCoord(mount);
+    }
+
+
     public static boolean waitPlayerMounted(Gob mount) {
         //println("waitPlayerMounted");
         long timer = TIMEOUT_MS;
@@ -168,9 +187,9 @@ public class ZeeThread  extends Thread{
                 if(ZeeConfig.isPlayerMoving()){
                     timer = TIMEOUT_MS; //reset timer if player moving
                 } else {
-                    timer -= SLEEP_MS;
+                    timer -= PING_MS;
                 }
-                Thread.sleep(SLEEP_MS);
+                Thread.sleep(PING_MS);
             }
         } catch (InterruptedException e) {
             e.printStackTrace();

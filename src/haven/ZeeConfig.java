@@ -1635,10 +1635,10 @@ public class ZeeConfig {
     }
 
     public static boolean isPlayerCarryingWheelbarrow() {
-        //if cursor is hand, player maybe driving wb instead of carrying
+        //if cursor is hand, player maybe driving wb at (0,0) instead of carrying
         if (getCursorName().contentEquals(CURSOR_HAND))
             return false;
-        return isPlayerCarryingGob("gfx/terobjs/vehicle/wheelbarrow");
+        return isPlayerCarryingGob("/wheelbarrow");
     }
 
     public static boolean isPlayerDrivingWheelbarrow() {
@@ -1666,15 +1666,16 @@ public class ZeeConfig {
 
     public static boolean isPlayerSharingGobCoord(String gobNameContains){
         Gob g = getClosestGobName(gobNameContains);
-        if (g==null)
-            return false;
-        return getCoordGob(g).compareTo(getPlayerCoord()) == 0;
+        //println(gobNameContains);
+        return isPlayerSharingGobCoord(g);
     }
 
     public static boolean isPlayerSharingGobCoord(Gob g){
         if (g==null)
             return false;
-        return getCoordGob(g).compareTo(getPlayerCoord()) == 0;
+        double dist = distanceToPlayer(g);
+        //println("dist2pl="+dist+"  g="+g.getc()+"  p="+getPlayerGob().getc());
+        return dist == 0;
     }
 
     public static Gob getClosestGob(List<Gob> gobs) {
@@ -1694,7 +1695,7 @@ public class ZeeConfig {
     }
 
     public static double distanceToPlayer(Gob gob) {
-        return ZeeConfig.getPlayerGob().rc.dist(gob.rc);
+        return ZeeConfig.getPlayerGob().getc().dist(gob.getc());//TODO use rc if necessary
     }
 
     public static int getPlantStage(Gob g){

@@ -91,6 +91,8 @@ public class ZeeClickGobManager extends ZeeThread{
                         dismountHorse();
                     else if (ZeeConfig.isPlayerCarryingWheelbarrow())
                         ZeeStockpileManager.unloadWheelbarrowStockpileAtGround(coordMc.floor(posres));
+                    else
+                        println("wtf ");
                 } else if (ZeeConfig.isPlayerCarryingWheelbarrow()) {
                     if (isGobHorse())
                         mountHorseCarryingWheelbarrow();
@@ -118,7 +120,12 @@ public class ZeeClickGobManager extends ZeeThread{
     }
 
     private void dismountHorse() {
+        Gob horse = ZeeConfig.getClosestGobName("gfx/kritter/horse/");
         ZeeConfig.clickCoord(coordMc.floor(posres),1,UI.MOD_CTRL);
+        waitPlayerDismounted(horse);
+        if (!ZeeConfig.isPlayerMountingHorse()) {
+            ZeeConfig.setPlayerSpeed(ZeeConfig.PLAYER_SPEED_2);
+        }
     }
 
     public static void mountHorse(Gob horse){
