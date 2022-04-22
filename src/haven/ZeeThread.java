@@ -484,20 +484,21 @@ public class ZeeThread  extends Thread{
     public static void clickButtonUntilMsgOrHoldingItem(Button button, String playerText) {
         new ZeeThread(){
             public void run() {
-                long diffUiMsgMs;
+                long diffUiMsgMs, diffWarningMs;
                 Window w = button.getparent(Window.class);
-                int windowId = ZeeConfig.gameUI.ui.widgetid(w);
+                int windowId = w.wdgid();
                 try {
                     ZeeConfig.addPlayerText(playerText);
-                    ZeeConfig.lastUIMsgMs = 0;
-                    diffUiMsgMs = now() - ZeeConfig.lastUIMsgMs;
-                    while (!ZeeConfig.isPlayerHoldingItem()  &&  diffUiMsgMs > 500  &&  windowId != -1){
+                    ZeeConfig.lastHafenWarningMs = ZeeConfig.lastUIMsgMs = 0;
+                    diffWarningMs = diffUiMsgMs = now() - ZeeConfig.lastUIMsgMs;
+                    while (!ZeeConfig.isPlayerHoldingItem() && diffUiMsgMs>500 && diffWarningMs>500 && windowId!=-1){
                         button.click();
                         sleep(PING_MS);
                         diffUiMsgMs = now() - ZeeConfig.lastUIMsgMs;
-                        windowId = ZeeConfig.gameUI.ui.widgetid(w);
+                        diffWarningMs = now() - ZeeConfig.lastHafenWarningMs;
+                        windowId = w.wdgid();
                     }
-                    //println("done, holding="+ZeeConfig.isPlayerHoldingItem()+", diffMs="+diffUiMsgMs+"  winId="+windowId);
+                    //println("done, holding="+ZeeConfig.isPlayerHoldingItem()+", diffUiMsgMs="+diffUiMsgMs+", diffWarningMs="+diffWarningMs+"  winId="+windowId);
                 }catch (Exception e){
                     e.printStackTrace();
                 }

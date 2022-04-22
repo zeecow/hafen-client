@@ -16,7 +16,7 @@ features:
  - seed-farmer manager: no pathfinding, buggy (ctrlLongMidClick crop)
  - cook manager: auto cook pepper and refill cauldron until barrel is empty(no pathfinding)
  - icon list categs
- - midclick Barter Stand "Buy" button to keep buying more until stop condition 
+ - midclick Barter Stand "Buy" button to auto-buy  
  - midclick ground 
    - while holding item will move to location (simulates ctrl+click)
  - long midclick ground

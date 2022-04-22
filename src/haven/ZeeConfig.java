@@ -82,7 +82,7 @@ public class ZeeConfig {
 
     public static String playingAudio = null;
     public static String uiMsgTextQuality, uiMsgTextBuffer;
-    public static long now, lastUiQualityMsgMs=0, lastUIMsgMs;
+    public static long now, lastUiQualityMsgMs=0, lastUIMsgMs, lastHafenWarningMs=0;
     public static Object[] lastMapViewClickArgs;
     public static Gob lastMapViewClickGob;
     public static String lastMapViewClickGobName;
