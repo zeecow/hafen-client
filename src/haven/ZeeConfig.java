@@ -101,6 +101,7 @@ public class ZeeConfig {
     public static boolean actionSearchGlobal = Utils.getprefb("actionSearchGlobal", true);
     public static int aggroRadiusTiles = Utils.getprefi("aggroRadiusTiles", 11);
     public static boolean alertOnPlayers = Utils.getprefb("alertOnPlayers", true);
+    public static boolean allowMidclickAutoBuy = false;
     public static boolean autoChipMinedBoulder = Utils.getprefb("autoChipMinedBoulder", true);
     public static boolean autoClickMenuOption = Utils.getprefb("autoClickMenuOption", true);
     public static String autoClickMenuOptionList = Utils.getpref("autoClickMenuOptionList", DEF_AUTO_CLICK_MENU_LIST);
@@ -227,6 +228,7 @@ public class ZeeConfig {
     public static HashMap<String,Color> mapCategoryColor = initMapCategoryColor();
     public static HashMap<String,Coord> mapWindowPos = initMapWindowPos();
     public static HashMap<Gob,Integer> mapGobTextId = new HashMap<Gob,Integer>();
+
 
 
     private static boolean isSpriteKind(Gob gob, String... kind) {
@@ -762,7 +764,7 @@ public class ZeeConfig {
             if(buttonName.contains("Resign"))
                 button.c = button.c.addy( -(v * 5) );
             else
-                button.c = button.c.addy( - v );//change, buy,
+                button.c = button.c.addy( - v );//change, buy
         });
         AtomicInteger i = new AtomicInteger(0);
         window.children().forEach(el -> {
@@ -773,6 +775,12 @@ public class ZeeConfig {
                 i.getAndIncrement();
             }
         });
+        ZeeConfig.allowMidclickAutoBuy = false;
+        window.add(new CheckBox("allow midclick auto-buy"){
+            public void changed(boolean val) {
+                ZeeConfig.allowMidclickAutoBuy = val;
+            }
+        },0,420);
         window.resize(380,440);
     }
 
@@ -2082,6 +2090,10 @@ public class ZeeConfig {
             Window w = button.getparent(Window.class);
             if (w==null || !w.cap.text.contentEquals("Barter Stand"))
                 return;
+            if (!ZeeConfig.allowMidclickAutoBuy){
+                ZeeConfig.msg("Click bottom checkbox to allow auto-buy");
+                return;
+            }
             ZeeThread.clickButtonUntilMsgOrHoldingItem(button,"buying");
         }
     }
