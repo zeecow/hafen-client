@@ -362,7 +362,6 @@ public class ZeeStockpileManager extends ZeeThread{
                 sleep(500);
                 //use wheelbarrow on stockpile
                 ZeeClickGobManager.gobClick(gobStockpile, 3);
-                waitPlayerIdleFor(1);
             }else
                 ZeeConfig.msg("couldn't drop wheelbarrow");
         }catch (Exception e){
@@ -394,7 +393,6 @@ public class ZeeStockpileManager extends ZeeThread{
                 sleep(500);
                 //use wheelbarrow at stockpile
                 ZeeConfig.clickCoord(mcFloorPosres, 3);
-                waitPlayerIdleFor(1);
             }else
                 ZeeConfig.msg("couldn't drop wheelbarrow");
         } catch (Exception e){

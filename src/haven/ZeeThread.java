@@ -462,6 +462,31 @@ public class ZeeThread  extends Thread{
         return false;
     }
 
+    public static void clickButtonUntilMsgOrHoldingItem(Button button, String playerText) {
+        new ZeeThread(){
+            public void run() {
+                long diffUiMsgMs;
+                Window w = button.getparent(Window.class);
+                int windowId = ZeeConfig.gameUI.ui.widgetid(w);
+                try {
+                    ZeeConfig.addPlayerText(playerText);
+                    ZeeConfig.lastUIMsgMs = 0;
+                    diffUiMsgMs = now() - ZeeConfig.lastUIMsgMs;
+                    while (!ZeeConfig.isPlayerHoldingItem()  &&  diffUiMsgMs > 500  &&  windowId != -1){
+                        button.click();
+                        sleep(PING_MS);
+                        diffUiMsgMs = now() - ZeeConfig.lastUIMsgMs;
+                        windowId = ZeeConfig.gameUI.ui.widgetid(w);
+                    }
+                    //println("done, holding="+ZeeConfig.isPlayerHoldingItem()+", diffMs="+diffUiMsgMs+"  winId="+windowId);
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+                ZeeConfig.removePlayerText();
+            }
+        }.start();
+    }
+
     static long now() {
         return System.currentTimeMillis();
     }

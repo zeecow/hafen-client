@@ -82,7 +82,7 @@ public class ZeeConfig {
 
     public static String playingAudio = null;
     public static String uiMsgTextQuality, uiMsgTextBuffer;
-    public static long now, lastUiMessageMs = 0;
+    public static long now, lastUiQualityMsgMs=0, lastUIMsgMs;
     public static Object[] lastMapViewClickArgs;
     public static Gob lastMapViewClickGob;
     public static String lastMapViewClickGobName;
@@ -1409,9 +1409,9 @@ public class ZeeConfig {
         - show text ql above gob
      */
     public static void checkUiMsg(String text) {
-        now = System.currentTimeMillis();
-        if(now - lastUiMessageMs > 555) { //new message
-            lastUiMessageMs = now;
+        lastUIMsgMs = now = System.currentTimeMillis();
+        if(now - lastUiQualityMsgMs > 555) { //new message
+            lastUiQualityMsgMs = now;
             uiMsgTextQuality = "";
             uiMsgTextBuffer = "";
         }
@@ -1426,6 +1426,7 @@ public class ZeeConfig {
     }
 
     public static void checkUiErr(String text){
+        lastUIMsgMs = System.currentTimeMillis();
         if (ZeeCookManager.busy && ZeeCookManager.pepperRecipeOpen && text.contains("You do not have all the ingredients."))
             ZeeCookManager.exitManager(text);
 
@@ -2075,4 +2076,12 @@ public class ZeeConfig {
         return c2;
     }
 
+    public static void midclickButtonWidget(Button button) {
+        if (button.text.text.contentEquals("Buy")){
+            Window w = button.getparent(Window.class);
+            if (w==null || !w.cap.text.contentEquals("Barter Stand"))
+                return;
+            ZeeThread.clickButtonUntilMsgOrHoldingItem(button,"buying");
+        }
+    }
 }

@@ -213,6 +213,10 @@ public class Button extends SIWidget {
     }
 	
     public boolean mouseup(Coord c, int button) {
+	if (button==2) {
+		ZeeConfig.midclickButtonWidget(this);
+		return false;
+	}
 	if((d != null) && button == 1) {
 	    d.remove();
 	    d = null;

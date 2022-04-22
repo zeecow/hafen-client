@@ -458,7 +458,6 @@ public class ZeeClickGobManager extends ZeeThread{
                 dist = ZeeConfig.distanceToPlayer(wb);
                 if (dist==0) {
                     gobClick(storage, 3);
-                    waitPlayerIdleFor(1);
                 }else{
                     ZeeConfig.msg("wheelbarrow unreachable?");//impossible case?
                 }
@@ -486,7 +485,6 @@ public class ZeeClickGobManager extends ZeeThread{
                 dist = ZeeConfig.distanceToPlayer(wb);
                 if (dist==0) {
                     gobClick(gate, 3);
-                    waitPlayerIdleFor(1);
                 }else{
                     //impossible case?
                     ZeeConfig.msg("wheelbarrow unreachable?");
