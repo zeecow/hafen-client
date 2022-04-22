@@ -161,6 +161,7 @@ public class ZeeStockpileManager extends ZeeThread{
                 if (ZeeClickItemManager.pickUpItem(wItem)) { //pickup inv item
                     ZeeClickGobManager.gobItemAct(gobPile, UI.MOD_SHIFT);//right click stockpile
                     if (waitNotHoldingItem()) {//piling successfull
+                        sleep(1000);//wait inv transfer to stockpile
                         if (mainInv.getWItemsByName(itemName).size() > 0)
                             exitManager("pile full (inv still has items)");
                         if(!busy)
@@ -185,6 +186,7 @@ public class ZeeStockpileManager extends ZeeThread{
                 String itemName = gameUI.vhand.item.getres().name;
                 ZeeClickGobManager.gobItemAct(gobPile, UI.MOD_SHIFT);//right click stockpile
                 if(waitNotHoldingItem()) {
+                    sleep(1000);
                     //check if pile full
                     if (mainInv.getWItemsByName(itemName).size() > 0)
                         exitManager("pile full (inv still has items) 2");
