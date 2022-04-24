@@ -60,10 +60,10 @@ public class ZeeClickGobManager extends ZeeThread{
                     barrelLabelOn = !barrelLabelOn;
                 } else if (isGobName("/dreca")) { // dream catcher
                     twoDreamsPlease();
-                } else if (isInspectGob()) {
-                    inspectGob();
                 } else if (isGobMineSupport()) {
                     ZeeConfig.toggleMineSupport();
+                } else if (isInspectGob()) {
+                    inspectGob();
                 }
             }
             else {
@@ -194,7 +194,10 @@ public class ZeeClickGobManager extends ZeeThread{
             }
         }
         else if(isGobTree(gobName)){
-            removeTreeAndStump(gob,petalName);
+            if (petalName.contentEquals(ZeeFlowerMenu.STRPETAL_REMOVETREEANDSTUMP))
+                removeTreeAndStump(gob,petalName);
+            else if (petalName.contentEquals(ZeeFlowerMenu.STRPETAL_INSPECT))//towercap case
+                inspectGob(gob);
         }
         else if (isGobCrop(gobName)) {
             if (petalName.equals(ZeeFlowerMenu.STRPETAL_SEEDFARMER)) {
@@ -296,6 +299,7 @@ public class ZeeClickGobManager extends ZeeThread{
 
         boolean showMenu = true;
         ZeeFlowerMenu menu = null;
+        ArrayList<String> opts;//petals array
 
         if (isGobBigAnimal()) {
             showMenu = isGobBigDeadAnimal_thread();//thread wait
@@ -312,7 +316,11 @@ public class ZeeClickGobManager extends ZeeThread{
             menu = new ZeeFlowerMenu(gob,ZeeFlowerMenu.STRPETAL_REMOVEPLANT, ZeeFlowerMenu.STRPETAL_REMOVEALLPLANTS);
         }
         else if (isGobTree()){
-            menu = new ZeeFlowerMenu(gob, ZeeFlowerMenu.STRPETAL_REMOVETREEANDSTUMP);
+            opts = new ArrayList<String>();
+            opts.add(ZeeFlowerMenu.STRPETAL_REMOVETREEANDSTUMP);
+            if (gobName.endsWith("/towercap"))
+                opts.add(ZeeFlowerMenu.STRPETAL_INSPECT);
+            menu = new ZeeFlowerMenu(gob, opts.toArray(String[]::new));
         }
         else if (isGobCrop()) {
             menu = new ZeeFlowerMenu(gob,ZeeFlowerMenu.STRPETAL_SEEDFARMER, ZeeFlowerMenu.STRPETAL_CURSORHARVEST);
@@ -699,14 +707,14 @@ public class ZeeClickGobManager extends ZeeThread{
                 +"/compostbin,/gardenpot,/beehive,/htable,/bed-sturdy,/boughbed,/alchemiststable,"
                 +"/gemwheel,/spark,/cauldron,/churn,/chair-rustic,"
                 +"/royalthrone,curdingtub,log,/still,/oldtrunk,/anvil,"
-                +"/loom,/swheel,knarr,snekkja,dock,"
+                +"/loom,/swheel,knarr,snekkja,dock,/ropewalk,"
                 +"/ttub,/cheeserack,/dreca,/glasspaneframe";
         return gobNameEndsWith(gobName, list);
     }
 
 
     public boolean isGobMineSupport() {
-        String list = "/minebeam,/column,/minesupport";
+        String list = "/minebeam,/column,/minesupport,/naturalminesupport,/towercap";
         return gobNameEndsWith(gobName, list);
     }
 
@@ -835,9 +843,12 @@ public class ZeeClickGobManager extends ZeeThread{
     }
 
     private void inspectGob() {
+        inspectGob(gob);
+    }
+
+    public static void inspectGob(Gob gob){
         ZeeConfig.gameUI.menu.wdgmsg("act","inspect","0");
-        gobClick(1);
-        //waitPlayerIdleFor(1);
+        gobClick(gob, 1);
         ZeeConfig.clickRemoveCursor();
     }
 

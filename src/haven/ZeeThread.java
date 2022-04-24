@@ -430,7 +430,7 @@ public class ZeeThread  extends Thread{
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        println("waitStaminaIdleMs > ret="+(timeoutMs <= 0));
+        //println("waitStaminaIdleMs > ret="+(timeoutMs <= 0));
         return (timeoutMs <= 0);
     }
 
