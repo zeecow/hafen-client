@@ -71,7 +71,15 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Sk
 	    this.spr = spr;
 	}
 
-	private void init() {
+	public Overlay(Gob gob, Sprite spr, int id) {
+		this.gob = gob;
+		this.id = id;
+		this.res = null;
+		this.sdt = null;
+		this.spr = spr;
+	}
+
+		private void init() {
 	    if(spr == null) {
 		spr = Sprite.create(gob, res.get(), sdt);
 		if(added && (spr instanceof SetupMod))

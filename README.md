@@ -30,6 +30,7 @@ features:
    - open "Cargo" on Knarr/Snekkja obj
    - toggle barrels labels 
    - toggle mine support radius 
+   - toggle aggressive animal obj radius
    - while holding item will try to ctrl+click obj(containers,stockpiles)
  - long midclick object
    - show context menu for various objs (details below)

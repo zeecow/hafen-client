@@ -1,6 +1,8 @@
 package haven;
 
 
+import haven.render.BaseColor;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -8,6 +10,8 @@ import java.util.stream.Collectors;
 import static haven.OCache.posres;
 
 public class ZeeClickGobManager extends ZeeThread{
+
+    public static final int OVERLAY_ID_AGGRO = 1341;
 
     Coord coordPc;
     Coord2d coordMc;
@@ -62,6 +66,8 @@ public class ZeeClickGobManager extends ZeeThread{
                     ZeeConfig.toggleMineSupport();
                 }  else if(isGobName("/knarr") || isGobName("/snekkja")) {
                     clickGobPetal("Cargo");
+                }else if(ZeeConfig.isAggressive(gobName)){
+                    toggleOverlayAggro();
                 }else if (isInspectGob()) {
                     inspectGob();
                 }
@@ -114,6 +120,28 @@ public class ZeeClickGobManager extends ZeeThread{
         }
         catch (Exception e){
             e.printStackTrace();
+        }
+    }
+
+    private void toggleOverlayAggro() {
+        Gob.Overlay ol = gob.findol(OVERLAY_ID_AGGRO);
+        if (ol!=null) {
+            //remove all aggro radius
+            ZeeConfig.findGobsByNameStartsWith("gfx/kritter/").forEach(gob1 -> {
+                if (ZeeConfig.isAggressive(gob1.getres().name)) {
+                    Gob.Overlay ol1 = gob1.findol(OVERLAY_ID_AGGRO);
+                    if (ol1!=null)
+                        ol1.remove();
+                }
+            });
+        }
+        else if (ZeeConfig.aggroRadiusTiles > 0) {
+            //add all aggro radius
+            ZeeConfig.findGobsByNameStartsWith("gfx/kritter/").forEach(gob1 -> {
+                if (ZeeConfig.isAggressive(gob1.getres().name)) {
+                    gob1.addol(new Gob.Overlay(gob1, new ZeeGobRadius(gob1, null, ZeeConfig.aggroRadiusTiles * MCache.tilesz2.y), ZeeClickGobManager.OVERLAY_ID_AGGRO));
+                }
+            });
         }
     }
 

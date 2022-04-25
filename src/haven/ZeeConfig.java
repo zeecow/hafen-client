@@ -402,15 +402,6 @@ public class ZeeConfig {
     }
 
     public static boolean isAggressive(String name){
-        /*
-        private static final String[] CRITTERS = {
-            "/rat/rat", "/swan", "/squirrel", "/silkmoth", "/frog/", "/rockdove", "/quail", "/toad", "/grasshopper",
-            "/ladybug", "/forestsnail", "/dragonfly", "/forestlizard", "/waterstrider", "/firefly", "/sandflea",
-            "/rabbit", "/crab/", "/cavemoth", "/hedgehog", "/stagbeetle", "jellyfish", "/mallard", "/chick","/hen",
-            "/rooster", "/irrbloss",
-            "/cavecentipede", "/bogturtle", "/moonmoth", "/monarchbutterfly", "/items/grub", "/springbumblebee"
-        };
-         */
         String[] list = {
                "/adder","/sandflea","/boar/","/badger/","/bear/","/bat/","/boreworm/",
                 "/ooze/","/cavelouse/","/caveangler/","orca","/goldeneagle/","/lynx/",
@@ -2038,7 +2029,7 @@ public class ZeeConfig {
         if(mapCategoryGobs.get(CATEG_AGROCREATURES).contains(gob.resName)) {
             //aggro radius
             if (ZeeConfig.aggroRadiusTiles > 0)
-                gob.addol(new Gob.Overlay(gob, new ZeeGobRadius(gob, null, ZeeConfig.aggroRadiusTiles * MCache.tilesz2.y)));
+                gob.addol(new Gob.Overlay(gob, new ZeeGobRadius(gob, null, ZeeConfig.aggroRadiusTiles * MCache.tilesz2.y), ZeeClickGobManager.OVERLAY_ID_AGGRO));
         }
     }
 
