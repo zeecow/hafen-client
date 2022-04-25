@@ -34,6 +34,7 @@ features:
    - show context menu for various objs (details below)
    - lift up obj 
    - take all from stockpile obj
+   - open Knarr/Snekkja obj Cargo
    - while holding item will try to store all on barrel obj
    - while carrying wheelbarrow will try to(dismount and) unload at stockpile/container
    - while driving wheelbarrow will lift it up and open gate obj
@@ -49,6 +50,7 @@ features:
    - show context menu for various items (details below)
    - sort-transfer inverse
    - equip fishing hook/lure and recast
+   - equip two sack items from belt
  - long midclick context menus for objects
    - auto butch dead animal objs
    - start seed farmer for crop objs: harvest, store and replant seeds (no pathfinding)

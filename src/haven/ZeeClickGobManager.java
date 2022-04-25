@@ -103,6 +103,8 @@ public class ZeeClickGobManager extends ZeeThread{
                         openGateWheelbarrow();
                     else if (isGobName("/cart"))
                         liftAndStoreWheelbarrow();
+                } else if(isGobName("/knarr") || isGobName("/snekkja")) {
+                    clickGobPetal("Cargo");
                 } else if (isLiftGob()) {
                     liftGob();
                 }
