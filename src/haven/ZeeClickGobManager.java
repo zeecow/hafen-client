@@ -404,6 +404,7 @@ public class ZeeClickGobManager extends ZeeThread{
 
             //disable automenu settings before thread clicks gob
             ZeeConfig.autoClickMenuOption = false;
+            boolean butchBackup = ZeeConfig.butcherMode;
             ZeeConfig.butcherMode = false;
 
             //start thread and wait it finish
@@ -413,6 +414,7 @@ public class ZeeClickGobManager extends ZeeThread{
 
             //restore automenu settings
             ZeeConfig.autoClickMenuOption = Utils.getprefb("autoClickMenuOption", true);
+            ZeeConfig.butcherMode = butchBackup;
 
             return isGobDeadAnimal;
 
