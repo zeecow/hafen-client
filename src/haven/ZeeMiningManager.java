@@ -51,11 +51,10 @@ public class ZeeMiningManager extends ZeeThread{
             e.printStackTrace();
             stopMining();
         }
-        ZeeClickGobManager.resetClickPetal();
     }
 
     private static boolean showTestBtn = true;//change to show/hide button
-    private void taskTest_old() throws Exception{
+    private void taskTest() throws Exception{
         println("playertile"+ZeeConfig.getPlayerTile()+"  upperLeft"+upperLeft+"  areasize"+areasize);
         Coord c1=null,c2=null;
         Coord areasub1 = areasize.sub(1,1);
@@ -87,8 +86,7 @@ public class ZeeMiningManager extends ZeeThread{
         Coord endTile = ZeeConfig.getTileFartherToPlayer(c1,c2);
         debug("upperleft"+upperLeft+"  c1"+c1+"  c2"+c2+"  areasize"+areasize);
         debug("ol.a.ul"+ol.a.ul+"  ol.a.br"+ol.a.br);
-        //mineTiles(c1,c2);
-        mineTiles(ol.a);
+        mineTiles(c1,c2);
         ZeeConfig.clickTile(endTile,1);//TODO mineOverlayArea(ol) and overlayMineArea(c1,c2)
 
 
@@ -112,29 +110,6 @@ public class ZeeMiningManager extends ZeeThread{
         highlightTiles(upperLeft,areasize);
     }
 
-    private void taskTest() throws Exception{
-        mineTiles(ol.a);
-    }
-
-    public static void mineTiles(Area a) {
-        mineTiles(a.ul, a.br);
-        /*
-            DIR_WEST
-            playertile(1020, 1022)  upperLeft(1017, 1022)  areasize(4, 1)
-            ol.a.ul(1017, 1022)  ol.a.br(1021, 1023)
-            mine tiles  c1(1018, 1023)  c2(1021, 1023)
-            haven.MapView@5050cddf ; sel ; [(1018, 1023), (1021, 1023), 0] (TEST BTN)
-            haven.MapView@5050cddf ; sel ; [(1020, 1022), (1017, 1022), 0]
-            =======
-            DIR_SOUTH
-            playertile(1019, 1021)  upperLeft(1019, 1021)  areasize(1, 4)
-            ol.a.ul(1019, 1021)  ol.a.br(1020, 1025)
-            mine tiles  c1(1020, 1025)  c2(1020, 1022)
-            haven.MapView@5050cddf ; sel ; [(1020, 1025), (1020, 1022), 0] (TEST BTN)
-            haven.MapView@5050cddf ; sel ; [(1019, 1021), (1019, 1024), 0]
-        */
-    }
-
 
     public static void mineTiles(Coord c1, Coord c2) {
         mining = true;
@@ -145,11 +120,6 @@ public class ZeeMiningManager extends ZeeThread{
         waitPlayerIdleFor(2);//minimum 2 sec
         ZeeConfig.clickRemoveCursor();
         waitCursor(ZeeConfig.CURSOR_ARW);
-    }
-
-
-    public static void highlightTiles(Coord topleft, int areasize){
-        highlightTiles(topleft, Coord.of(areasize));
     }
 
 

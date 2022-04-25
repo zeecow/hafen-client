@@ -1435,7 +1435,9 @@ public class ZeeConfig {
 
     public static String getCursorName() {
         try {
-            return gameUI.map.ui.getcurs(Coord.z).name;
+            synchronized(gameUI.map.ui) {
+                return gameUI.map.ui.getcurs(Coord.z).name;
+            }
         } catch(Exception e) {
             e.printStackTrace();
             return "";
