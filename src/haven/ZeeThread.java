@@ -306,7 +306,7 @@ public class ZeeThread  extends Thread{
     }
 
     public static boolean waitInvIdleMs(long idleMs) {
-        println("waitInvIdleMs "+idleMs);
+        //println("waitInvIdleMs "+idleMs);
         long timeElapsed = 0;
         long timeout = 5000;
         long startingMs;
@@ -329,7 +329,7 @@ public class ZeeThread  extends Thread{
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        println("waitInvIdleMs ret "+(timeElapsed >= idleMs));
+        //println("waitInvIdleMs ret "+(timeElapsed >= idleMs));
         return timeElapsed >= idleMs;
     }
 

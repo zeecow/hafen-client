@@ -27,6 +27,7 @@ features:
    - harvest 2 dreams from dreamcatch obj
    - Giddyup! if obj is horse
    - lightup torch on firesource obj
+   - open "Cargo" on Knarr/Snekkja obj
    - toggle barrels labels 
    - toggle mine support radius 
    - while holding item will try to ctrl+click obj(containers,stockpiles)
@@ -34,7 +35,7 @@ features:
    - show context menu for various objs (details below)
    - lift up obj 
    - take all from stockpile obj
-   - open Knarr/Snekkja obj Cargo
+   - click "Man the helm" on Knarr/Snekkja obj
    - while holding item will try to store all on barrel obj
    - while carrying wheelbarrow will try to(dismount and) unload at stockpile/container
    - while driving wheelbarrow will lift it up and open gate obj

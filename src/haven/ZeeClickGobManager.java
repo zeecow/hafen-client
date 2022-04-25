@@ -60,7 +60,9 @@ public class ZeeClickGobManager extends ZeeThread{
                     twoDreamsPlease();
                 } else if (isGobMineSupport()) {
                     ZeeConfig.toggleMineSupport();
-                } else if (isInspectGob()) {
+                }  else if(isGobName("/knarr") || isGobName("/snekkja")) {
+                    clickGobPetal("Cargo");
+                }else if (isInspectGob()) {
                     inspectGob();
                 }
             }
@@ -104,7 +106,7 @@ public class ZeeClickGobManager extends ZeeThread{
                     else if (isGobName("/cart"))
                         liftAndStoreWheelbarrow();
                 } else if(isGobName("/knarr") || isGobName("/snekkja")) {
-                    clickGobPetal("Cargo");
+                    clickGobPetal("Man the helm");
                 } else if (isLiftGob()) {
                     liftGob();
                 }
@@ -953,10 +955,10 @@ public class ZeeClickGobManager extends ZeeThread{
             // menu opened means gob exist
             ZeeConfig.cancelFlowerMenu();
             waitNoFlowerMenu();
-            println("gobHasFlowermenu > true");
+            //println("gobHasFlowermenu > true");
             ret = true;
         } else {
-            println("gobHasFlowermenu > cant click gob");
+            //println("gobHasFlowermenu > cant click gob");
             ret = false;
         }
 
