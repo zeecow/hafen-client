@@ -100,7 +100,10 @@ public class ZeeClickItemManager extends ZeeThread{
             else if (isItemSack()) { // travellersack or bindle
 
                 if(isItemWindowBelt()) {//send to equipory
-                    if(isLeftHandEmpty() || isRightHandEmpty()) {
+
+                    if(isLongClick()) {
+                        equipTwoSacks();
+                    } else if(isLeftHandEmpty() || isRightHandEmpty()) {
                         pickUpItem();
                         equipEmptyHand();
                     }else if (!isItemSack(leftHandItemName)) {//avoid switching sack for sack
@@ -119,7 +122,8 @@ public class ZeeClickItemManager extends ZeeThread{
                         ZeeConfig.gameUI.msg("couldn't switch sack");
                         trySendItemToBelt();
                     }
-                }else if(isItemWindowEquips()){//send to belt
+                }
+                else if(isItemWindowEquips()){//send to belt
                     pickUpItem();
                     if(ZeeConfig.isPlayerHoldingItem()){ //unequip sack was successfull
                         if(!trySendItemToBelt())
@@ -266,6 +270,31 @@ public class ZeeClickItemManager extends ZeeThread{
         }
     }
 
+    private void equipTwoSacks() {
+        pickUpItem();
+        if (isLeftHandEmpty()) {
+            equipLeftEmptyHand();
+        }else {
+            equipLeftOccupiedHand();
+            if(!trySendItemToBelt()){
+                println("equipTwoSacks() > couldnt switch left item");
+                return;
+            }
+        }
+        WItem sack2 = getSackFromBelt();
+        if (sack2 != null){
+            pickUpItem(sack2);
+            if (isRightHandEmpty()) {
+                equipRightEmptyHand();
+            }else {
+                equipRightOccupiedHand();
+                if(!trySendItemToBelt()){
+                    println("equipTwoSacks() > couldnt switch right item");
+                }
+            }
+        }
+    }
+
     public static void equiporyItemAct(String itemNameContains){
         getEquipory().children(WItem.class).forEach(witem -> {
             if (witem.item.res.get().name.contains(itemNameContains)) {
@@ -301,7 +330,7 @@ public class ZeeClickItemManager extends ZeeThread{
     public static WItem getSackFromBelt() {
         WItem ret = getBeltWItem("travellerssack");
         if (ret==null)
-            ret = ret = getBeltWItem("bindle");
+            ret = getBeltWItem("bindle");
         return ret;
     }
 
@@ -587,7 +616,7 @@ public class ZeeClickItemManager extends ZeeThread{
         for (WItem w: items) {
             try {
                 if (ZeeConfig.clickCancelTask()) {
-                    ZeeClickGobManager.resetClickPetal();
+                    //ZeeClickGobManager.resetClickPetal();
                     ZeeConfig.removeGobText(ZeeConfig.getPlayerGob());
                     return itemsClicked;
                 }
@@ -601,7 +630,7 @@ public class ZeeClickItemManager extends ZeeThread{
                 }
             } catch (Exception e) {
                 e.printStackTrace();
-                ZeeClickGobManager.resetClickPetal();
+                //ZeeClickGobManager.resetClickPetal();
                 ZeeConfig.removeGobText(ZeeConfig.getPlayerGob());
                 return itemsClicked;
             }
@@ -648,9 +677,26 @@ public class ZeeClickItemManager extends ZeeThread{
     }
 
     private void drinkFrom() {
-        ZeeClickGobManager.scheduleClickPetalOnce("Drink");
-        itemAct(wItem);
+        //ZeeClickGobManager.scheduleClickPetalOnce("Drink");
+        //itemAct(wItem);
+        clickItemPetal(wItem,"Drink");
     }
+
+    public static boolean clickItemPetal(WItem wItem, String petalName) {
+        if (wItem==null){
+            println(">clickItemPetal wItem null");
+            return false;
+        }
+        itemAct(wItem);
+        if(waitFlowerMenu()){
+            choosePetal(getFlowerMenu(), petalName);
+            return waitNoFlowerMenu();
+        }else{
+            //println("clickItemPetal > no flower menu?");
+            return false;
+        }
+    }
+
 
     private boolean isItemDrinkingVessel() {
         return isItemDrinkingVessel(itemName);

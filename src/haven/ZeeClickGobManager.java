@@ -17,8 +17,6 @@ public class ZeeClickGobManager extends ZeeThread{
 
     public static float camAngleStart, camAngleEnd, camAngleDiff;
     public static long clickStartMs, clickEndMs, clickDiffMs;
-    public static boolean clickPetal = false;
-    public static String clickPetalName = "";
     public static boolean barrelLabelOn = false;
 
     public ZeeClickGobManager(Coord pc, Coord2d mc, Gob gobClicked) {
@@ -964,17 +962,6 @@ public class ZeeClickGobManager extends ZeeThread{
         ZeeConfig.butcherMode = butchBackup;
         ZeeConfig.autoClickMenuOption = Utils.getprefb("autoClickMenuOption", true);
         return ret;
-    }
-
-    // set flags for clickWItem and ZeeClickGobManager.gobClick
-    public static void scheduleClickPetalOnce(String name) {
-        clickPetal = true;
-        clickPetalName = name;
-    }
-
-    public static void resetClickPetal() {//TODO check if still needed
-        clickPetal = false;
-        clickPetalName = "";
     }
 
     private boolean isGobBigAnimal(){

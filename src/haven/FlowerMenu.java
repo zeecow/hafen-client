@@ -268,7 +268,6 @@ public class FlowerMenu extends Widget {
 	    wdgmsg("cl", option.num, ui.modflags());
 		ZeeStockpileManager.checkClickedPetal(option.name);
 	}
-	ZeeClickGobManager.resetClickPetal();
     }
 
 	@Override
@@ -287,14 +286,6 @@ public class FlowerMenu extends Widget {
 
 	//auto click the first match
 	private void autoClickPetal(){
-		if(ZeeClickGobManager.clickPetal){//used by ZeeClickGobManager and ZeeClickItemManager
-			for (int i = 0; i < opts.length; i++) {
-				if (ZeeClickGobManager.clickPetalName.contentEquals(opts[i].text.text)) {
-					autochoose = opts[i];
-				}
-			}
-			return;
-		}
 		if(ZeeConfig.butcherMode) {
 			String[] list = ZeeConfig.butcherAutoList.split(",");
 			for (int i = 0; i < opts.length; i++) {
