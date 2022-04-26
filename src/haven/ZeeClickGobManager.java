@@ -948,6 +948,12 @@ public class ZeeClickGobManager extends ZeeThread{
             println(">clickGobPetal gob null");
             return false;
         }
+        //make sure cursor is arrow before clicking gob
+        if (!ZeeConfig.getCursorName().contentEquals(ZeeConfig.CURSOR_ARW)){
+            ZeeConfig.clickRemoveCursor();
+            if (!waitCursor(ZeeConfig.CURSOR_ARW))
+                return false;
+        }
         gobClick(gob,3);
         if(waitFlowerMenu()){
             choosePetal(getFlowerMenu(), petalName);
