@@ -369,7 +369,7 @@ public class ZeeConfig {
     }
 
     public static boolean isTree(String gobName) {
-        return gobName.contains("/trees/");
+        return ZeeClickGobManager.isGobTree(gobName);
     }
 
     public static boolean isBush(String gobName) {
@@ -1496,13 +1496,15 @@ public class ZeeConfig {
         if( isCraftHistoryNavigation || !msg.contentEquals("act") || !args[0].toString().contentEquals("craft"))
             return;
 
+        // if name already on history, add to the end
         String name = (String) args[1];
-        if(craftHistoryList.contains(name)) { // name already on history
+        if(craftHistoryList.contains(name)) {
             craftHistoryList.remove(name);
         }
         craftHistoryList.add(name);
 
-        if(craftHistoryList.size() > 7) { // max history size
+        // if history full, remove first one
+        if(craftHistoryList.size() > 7) {
             craftHistoryList.remove(0);
         }
 
@@ -1900,7 +1902,7 @@ public class ZeeConfig {
         return gob==null || gameUI.ui.sess.glob.oc.getgob(gob.id)==null;
     }
 
-    public static boolean clickCancelTask() {
+    public static boolean isTaskCanceledByGroundClick() {
         //cancel if clicked right/left button
         return lastMapViewClickButton != 2;
     }
@@ -2089,5 +2091,9 @@ public class ZeeConfig {
             }
             ZeeThread.clickButtonUntilMsgOrHoldingItem(button,"buying");
         }
+    }
+
+    public static double getItemQuality(WItem item) {
+        return Inventory.getQuality(item.item);
     }
 }

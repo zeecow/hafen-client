@@ -93,6 +93,7 @@ public class ZeeThread  extends Thread{
     }
 
     public static boolean waitItemEquipped(String name) {
+        //println("waitItemEquipped > "+name);
         int max = (int) TIMEOUT_MS;
         try {
             while(max>0 && !ZeeClickItemManager.isItemEquipped(name)) {
@@ -102,6 +103,7 @@ public class ZeeThread  extends Thread{
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+        //println("waitItemEquipped > ret "+ZeeClickItemManager.isItemEquipped(name));
         return ZeeClickItemManager.isItemEquipped(name);
     }
 

@@ -1,8 +1,6 @@
 package haven;
 
 
-import haven.render.BaseColor;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -224,10 +222,14 @@ public class ZeeClickGobManager extends ZeeThread{
             }
         }
         else if(isGobTree(gobName)){
-            if (petalName.contentEquals(ZeeFlowerMenu.STRPETAL_REMOVETREEANDSTUMP))
-                removeTreeAndStump(gob,petalName);
-            else if (petalName.contentEquals(ZeeFlowerMenu.STRPETAL_INSPECT))//towercap case
+            if (petalName.contentEquals(ZeeFlowerMenu.STRPETAL_REMOVETREEANDSTUMP)
+                || petalName.contentEquals(ZeeFlowerMenu.STRPETAL_REMOVEALLTREES))
+            {
+                removeTreeAndStump(gob, petalName);
+            }
+            else if (petalName.contentEquals(ZeeFlowerMenu.STRPETAL_INSPECT)) {//towercap case
                 inspectGob(gob);
+            }
         }
         else if (isGobCrop(gobName)) {
             if (petalName.equals(ZeeFlowerMenu.STRPETAL_SEEDFARMER)) {
@@ -243,7 +245,11 @@ public class ZeeClickGobManager extends ZeeThread{
                 barrelTakeAllSeeds(gob);
             }
         }
-        else if (petalName.equals(ZeeFlowerMenu.STRPETAL_DESTROYTREELOG2) || petalName.equals(ZeeFlowerMenu.STRPETAL_DESTROYTREELOG3) || petalName.equals(ZeeFlowerMenu.STRPETAL_DESTROYTREELOG4)){
+        else if ( petalName.equals(ZeeFlowerMenu.STRPETAL_DESTROYTREELOG2)
+            || petalName.equals(ZeeFlowerMenu.STRPETAL_DESTROYTREELOG3)
+            || petalName.equals(ZeeFlowerMenu.STRPETAL_DESTROYTREELOG4)
+            || petalName.contentEquals(ZeeFlowerMenu.STRPETAL_DESTROYALL))
+        {
             destroyTreelogs(gob,petalName);
         }
         else if (petalName.equals(ZeeFlowerMenu.STRPETAL_SHOWWINDOWMINING)) {
@@ -261,7 +267,7 @@ public class ZeeClickGobManager extends ZeeThread{
                 try{
                     ZeeConfig.addPlayerText("autobutch");
                     ZeeConfig.lastMapViewClickButton = 2;//prepare for clickCancelTask()
-                    while (!ZeeConfig.clickCancelTask() && gobHasFlowermenu(deadAnimal)) {
+                    while (!ZeeConfig.isTaskCanceledByGroundClick() && gobHasFlowermenu(deadAnimal)) {
 
                         //prepare settings and click gob
                         ZeeConfig.lastInvItemMs = 0;
@@ -299,22 +305,30 @@ public class ZeeClickGobManager extends ZeeThread{
                 logs = 3;
             else if (petalName.equals(ZeeFlowerMenu.STRPETAL_DESTROYTREELOG4))
                 logs = 4;
+            else if (petalName.equals(ZeeFlowerMenu.STRPETAL_DESTROYALL))
+                logs = 999;
             ZeeConfig.isDestroyingTreelogs = true;
-            while (logs>0 && !ZeeConfig.clickCancelTask()){
-                ZeeConfig.addPlayerText("destroying "+logs+" treelog(s)");
-                clickGobPetal(treelog,"Make boards");
-                //waitNoFlowerMenu();
-                waitStaminaIdleMs(3500);//no stam change means treelog is done
-                //if (waitGobRemovedSeconds(treelog,10) && !ZeeConfig.clickCancelTask()){
-                if (!gobHasFlowermenu(treelog) && !ZeeConfig.clickCancelTask()){
+            ZeeConfig.lastMapViewClickButton = 2;//prepare for cancel click
+            while (logs>0 && !ZeeConfig.isTaskCanceledByGroundClick()){
+                ZeeConfig.addPlayerText("treelogs "+logs);
+                if (!clickGobPetal(treelog,"Make boards")){
+                    println("can't click treelog = "+treelog);
+                    logs = -1;
+                    continue;
+                }
+                waitPlayerIdleFor(3);
+                if (!gobHasFlowermenu(treelog) && !ZeeConfig.isTaskCanceledByGroundClick()){
                     logs--;
-                    treelog = ZeeConfig.getClosestGobName(treelogName);
+                    if (petalName.equals(ZeeFlowerMenu.STRPETAL_DESTROYALL))
+                        treelog = getClosestTreeLog();
+                    else
+                        treelog = ZeeConfig.getClosestGobName(treelogName);
                 }else{
-                    if (ZeeConfig.clickCancelTask()) {
+                    if (ZeeConfig.isTaskCanceledByGroundClick()) {
                         ZeeConfig.msg("destroy treelog canceled by click");
                         println("destroy treelog canceled by click");
                     }
-                    logs = 0;
+                    logs = -1;
                 }
             }
         }catch (Exception e){
@@ -324,6 +338,17 @@ public class ZeeClickGobManager extends ZeeThread{
         ZeeConfig.removePlayerText();
     }
 
+    public static Gob getClosestTree() {
+        List<Gob> list = ZeeConfig.findGobsByNameContains("/trees/");
+        list.removeIf(gob1 -> !isGobTree(gob1.getres().name));
+        return ZeeConfig.getClosestGob(list);
+    }
+
+    public static Gob getClosestTreeLog() {
+        List<Gob> list = ZeeConfig.findGobsByNameContains("/trees/");
+        list.removeIf(gob1 -> !isGobTreeLog(gob1.getres().name));
+        return ZeeConfig.getClosestGob(list);
+    }
 
     private boolean showGobFlowerMenu(){
 
@@ -348,6 +373,7 @@ public class ZeeClickGobManager extends ZeeThread{
         else if (isGobTree()){
             opts = new ArrayList<String>();
             opts.add(ZeeFlowerMenu.STRPETAL_REMOVETREEANDSTUMP);
+            opts.add(ZeeFlowerMenu.STRPETAL_REMOVEALLTREES);
             if (gobName.endsWith("/towercap"))
                 opts.add(ZeeFlowerMenu.STRPETAL_INSPECT);
             menu = new ZeeFlowerMenu(gob, opts.toArray(String[]::new));
@@ -361,7 +387,8 @@ public class ZeeClickGobManager extends ZeeThread{
         else if (isDestroyTreelog()) {
             menu = new ZeeFlowerMenu( gob,
                 ZeeFlowerMenu.STRPETAL_LIFTUPGOB, ZeeFlowerMenu.STRPETAL_DESTROYTREELOG2,
-                ZeeFlowerMenu.STRPETAL_DESTROYTREELOG3, ZeeFlowerMenu.STRPETAL_DESTROYTREELOG4
+                ZeeFlowerMenu.STRPETAL_DESTROYTREELOG3, ZeeFlowerMenu.STRPETAL_DESTROYTREELOG4,
+                ZeeFlowerMenu.STRPETAL_DESTROYALL
             );
         }
         else if (gobName.endsWith("/column")) {
@@ -564,7 +591,7 @@ public class ZeeClickGobManager extends ZeeThread{
             Gob closestPlant = firstPlant;
             double dist;
             do{
-                if (ZeeConfig.clickCancelTask()) {
+                if (ZeeConfig.isTaskCanceledByGroundClick()) {
                     // cancel if clicked right/left button
                     println("cancel click");
                     break;
@@ -582,25 +609,37 @@ public class ZeeClickGobManager extends ZeeThread{
         ZeeConfig.removeGobText(ZeeConfig.getPlayerGob());
     }
 
-    public static void removeTreeAndStump(Gob gob, String petalName){
+    public static void removeTreeAndStump(Gob tree, String petalName){
         try{
-            ZeeConfig.addGobText(ZeeConfig.getPlayerGob(),"removing tree & stump...");
+            if (petalName.contentEquals(ZeeFlowerMenu.STRPETAL_REMOVEALLTREES))
+                ZeeConfig.addPlayerText("removing all trees");
+            else
+                ZeeConfig.addPlayerText("removing tree & stump");
             waitNoFlowerMenu();
             ZeeClickItemManager.equipAxeChopTree();
-            clickGobPetal(gob,"Chop");
-            if(waitStaminaIdleMs(3000)){
-                Gob stump = ZeeConfig.getClosestGob(ZeeConfig.findGobsByNameEndsWith("stump"));
-                if (stump!=null && ZeeConfig.distanceToPlayer(stump) < 25) {
-                    ZeeConfig.addGobText(stump,"stump");
-                    removeStump(stump);
-                }else {
-                    println("no stump close");
+            ZeeConfig.lastMapViewClickButton = 2;//prepare for cancel click
+            while (tree!=null && !ZeeConfig.isTaskCanceledByGroundClick()) {
+                clickGobPetal(tree, "Chop");
+                if (waitPlayerIdleFor(2) && !ZeeConfig.isTaskCanceledByGroundClick()) {
+                    Gob stump = ZeeConfig.getClosestGob(ZeeConfig.findGobsByNameEndsWith("stump"));
+                    if (stump != null && ZeeConfig.distanceToPlayer(stump) < 25) {
+                        ZeeConfig.addGobText(stump, "stump");
+                        removeStump(stump);
+                        waitPlayerIdleFor(2);
+                    } else {
+                        println("no stump close");
+                    }
+                    if (petalName.contentEquals(ZeeFlowerMenu.STRPETAL_REMOVEALLTREES))
+                        tree = getClosestTree();
+                    else
+                        tree = null;
+                    //println("next tree = "+tree);
                 }
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
-        ZeeConfig.removeGobText(ZeeConfig.getPlayerGob());
+        ZeeConfig.removePlayerText();
     }
 
     public static void removeStump(Gob gob) {
@@ -787,11 +826,15 @@ public class ZeeClickGobManager extends ZeeThread{
         return isGobTree(gobName);
     }
     public static boolean isGobTree(String gobName) {
-        return gobName.startsWith("gfx/terobjs/trees/") && !gobName.endsWith("log") && !gobName.endsWith("stump");
+        return gobName.startsWith("gfx/terobjs/trees/") && !gobName.endsWith("log") && !gobName.endsWith("stump") && !gobName.endsWith("oldtrunk");
+    }
+
+    public static boolean isGobTreeLog(String gobName){
+        return gobName.startsWith("gfx/terobjs/trees/") && gobName.endsWith("log");
     }
 
     private boolean isGobTreeLog() {
-        return gobName.startsWith("gfx/terobjs/trees/") && gobName.endsWith("log");
+        return isGobTreeLog(gobName);
     }
 
     public static boolean isBarrelTakeAll(Gob gob) {
@@ -830,7 +873,7 @@ public class ZeeClickGobManager extends ZeeThread{
             while (!ZeeClickGobManager.isBarrelEmpty(gob) && !isInventoryFull()) {
                 ZeeClickGobManager.gobClick(gob, 3, UI.MOD_SHIFT);
                 Thread.sleep(PING_MS);
-                if (ZeeConfig.clickCancelTask())
+                if (ZeeConfig.isTaskCanceledByGroundClick())
                     break;
             }
 
@@ -840,7 +883,7 @@ public class ZeeClickGobManager extends ZeeThread{
 
             if (isInventoryFull())
                 ZeeConfig.msg("Inventory full");
-            else if (!ZeeConfig.clickCancelTask())
+            else if (!ZeeConfig.isTaskCanceledByGroundClick())
                 ZeeConfig.msg("Took everything");
 
         }catch(Exception e){
@@ -945,7 +988,7 @@ public class ZeeClickGobManager extends ZeeThread{
 
     public static boolean clickGobPetal(Gob gob, String petalName) {
         if (gob==null){
-            println(">clickGobPetal gob null");
+            //println(">clickGobPetal gob null");
             return false;
         }
         //make sure cursor is arrow before clicking gob
@@ -971,7 +1014,7 @@ public class ZeeClickGobManager extends ZeeThread{
 
         //no gob, no menu
         if (ZeeConfig.isGobRemoved(gob)) {
-            println(">gobHasFlowermenu gob is inexistent");
+            //println(">gobHasFlowermenu gob is inexistent");
             return false;
         }
 

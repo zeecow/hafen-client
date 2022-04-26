@@ -473,7 +473,6 @@ public class ZeeClickItemManager extends ZeeThread{
                     String itemName = getWItemName(item);
                     String firstItemName = itemName;
                     long changeMs;
-
                     while (!itemName.endsWith("/meat")) {
 
                         //butch item
@@ -510,6 +509,7 @@ public class ZeeClickItemManager extends ZeeThread{
                             }
                         }
                     }
+
                 }catch (Exception e){
                     e.printStackTrace();
                 }
@@ -519,6 +519,21 @@ public class ZeeClickItemManager extends ZeeThread{
                 ZeeConfig.removePlayerText();
             }
         }.start();
+    }
+
+
+    public static boolean sameNameAndQuality(WItem w1, WItem w2) {
+        boolean ret = false;
+        if (w1.item.getres().name.contentEquals(w2.item.getres().name)){
+            if (getItemQuality(w1) == getItemQuality(w2))
+                ret = true;
+        }
+        return ret;
+    }
+
+
+    public static double getItemQuality(WItem w) {
+        return ZeeConfig.getItemQuality(w);
     }
 
     public static Inventory getItemInventory(WItem wItem) {
@@ -615,7 +630,7 @@ public class ZeeClickItemManager extends ZeeThread{
         int countNoMenu = 0;
         for (WItem w: items) {
             try {
-                if (ZeeConfig.clickCancelTask()) {
+                if (ZeeConfig.isTaskCanceledByGroundClick()) {
                     //ZeeClickGobManager.resetClickPetal();
                     ZeeConfig.removeGobText(ZeeConfig.getPlayerGob());
                     return itemsClicked;
@@ -851,18 +866,39 @@ public class ZeeClickItemManager extends ZeeThread{
         return name.endsWith("woodsmansaxe") || name.endsWith("axe-m") || name.endsWith("butcherscleaver") || name.endsWith("stoneaxe");
     }
 
+    public static boolean isItemButchingTool(WItem wItem){
+        boolean ret = isItemButchingTool(wItem.item.getres().name);
+        //println("isItemButchingTool > "+ret+" > "+wItem.item.getres().name);
+        return ret;
+    }
+    public static boolean isItemButchingTool(String itemName){
+        String endlist = "woodsmansaxe,axe-m,butcherscleaver,stoneaxe,fyrdsword,hirdsword,bronzesword,b12axe,cutblade";
+        String[] arr = endlist.split(",");
+        for (int i = 0; i < arr.length; i++) {
+            if (itemName.endsWith(arr[i]))
+                return true;
+        }
+        return false;
+    }
+    private boolean isItemButchingTool(){
+        return isItemButchingTool(itemName);
+    }
+
     private boolean isItemPlantable() {
         //println("is item Plantable "+itemName);
-        String endList = "seed-barley,seed-carrot,carrot,seed-cucumber,seed-flax,"
+        String list = "seed-barley,seed-carrot,carrot,seed-cucumber,seed-flax,"
             +"seed-grape,seed-hemp,seed-leek,leek,seed-lettuce,seed-millet,"
             +"seed-pipeweed,seed-poppy,seed-pumpkin,seed-wheat,seed-turnip,turnip,"
             +"seed-wheat,seed-barley,beetroot,yellowonion,redonion";
         String name = itemName.replace("gfx/invobjs/","");
-        return endList.contains(name);
+        return list.contains(name);
     }
 
     private boolean isTwoHandedItem() {
         return isTwoHandedItem(itemName);
+    }
+    public static boolean isTwoHandedItem(WItem w) {
+        return isTwoHandedItem(w.item.getres().name);
     }
     public static boolean isTwoHandedItem(String name) {
         String[] items = {"scythe","pickaxe","shovel","b12axe",
@@ -924,11 +960,21 @@ public class ZeeClickItemManager extends ZeeThread{
         }
     }
 
+    public static boolean isItemEquipped(WItem w){
+        try {
+            return sameNameAndQuality(getLeftHand(),w) || sameNameAndQuality(getRightHand(),w);
+        }catch (Exception e){
+            return false;
+        }
+    }
     public static boolean isItemEquipped(String name){
         try {
+            /*
             Equipory eq = ZeeConfig.windowEquipment.getchild(Equipory.class);
             return eq.leftHand.item.getres().name.contains(name)
                     || eq.rightHand.item.getres().name.contains(name);
+             */
+            return getLeftHandName().contains(name) || getRightHandName().contains(name);
         }catch (Exception e){
             return false;
         }

@@ -150,9 +150,11 @@ public class ZeeMiningManager extends ZeeThread{
 
         Inventory inv = ZeeConfig.getMainInventory();
 
-        Coord c1=null,c2=null,startTile=null,endTile=null;
+        Coord c1=null, c2=null, startTile, endTile;
         Coord areasub1 = areasize.sub(1,1);
         boolean positive = upperLeft.x >= 0;
+        if (positive)
+            ZeeConfig.msg("Coords > 0");
         if(lastDir.contentEquals(DIR_NORTH) || lastDir.contentEquals(DIR_WEST)) {
             c1 = positive? upperLeft.add(1,1) : upperLeft.add(areasub1);
             c2 = positive? upperLeft.add(areasize) : upperLeft;

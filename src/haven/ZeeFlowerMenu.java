@@ -8,6 +8,7 @@ public class ZeeFlowerMenu extends FlowerMenu{
     public static final String STRPETAL_REMOVEPLANT = "Remove plant";
     public static final String STRPETAL_REMOVEALLPLANTS = "Remove all plants";
     public static final String STRPETAL_REMOVETREEANDSTUMP = "Remove tree & stump";
+    public static final String STRPETAL_REMOVEALLTREES = "Remove all trees";
     public static final String STRPETAL_BARRELTAKEALL = "Take all";
     public static final String STRPETAL_CURSORHARVEST = "Harvest area";
     public static final String STRPETAL_SEEDFARMER = "Start Seed Farmer";
@@ -17,6 +18,7 @@ public class ZeeFlowerMenu extends FlowerMenu{
     public static final String STRPETAL_DESTROYTREELOG2 = "Destroy treelog x2";
     public static final String STRPETAL_DESTROYTREELOG3 = "Destroy treelog x3";
     public static final String STRPETAL_DESTROYTREELOG4 = "Destroy treelog x4";
+    public static final String STRPETAL_DESTROYALL = "Destroy all";
     public static final String STRPETAL_SHOWWINDOWMINING = "Show window";
     public static final String STRPETAL_TRANSFER_ASC = "Transfer ASC";
     public static final String STRPETAL_TRANSFER_DESC = "Transfer DESC";
