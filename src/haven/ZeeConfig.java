@@ -126,11 +126,11 @@ public class ZeeConfig {
     public static boolean dropMinedStones = Utils.getprefb("dropMinedStones", true);
     public static boolean dropSeeds = false;
     public static boolean dropSoil = false;
+    public static boolean dropBoards = false;
     public static boolean equiporyCompact = Utils.getprefb("equiporyCompact", false);
     public static boolean farmerMode = false;
     public static boolean highlightCropsReady = Utils.getprefb("highlightCropsReady", true);
     public static boolean highlightGrowingTrees = Utils.getprefb("highlightGrowingTrees", true);
-    public static boolean isDestroyingTreelogs = false;
     public static boolean keyBeltShiftTab = Utils.getprefb("keyBeltShiftTab", true);
     public static boolean keyCamSwitchShiftC = Utils.getprefb("keyCamSwitchShiftC", true);
     public static boolean midclickEquipManager = Utils.getprefb("midclickEquipManager", true);

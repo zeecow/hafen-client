@@ -20,9 +20,9 @@ public class ZeeClickGobManager extends ZeeThread{
     public static float camAngleStart, camAngleEnd, camAngleDiff;
     public static long clickStartMs, clickEndMs, clickDiffMs;
     public static boolean barrelLabelOn = false;
-    private static boolean isRemovingAllTrees;
-    private static ArrayList<Gob> treesForRemoval;
-    private static Gob currentRemovingTree;
+    public static boolean isRemovingAllTrees, isDestroyingAllTreelogs;
+    private static ArrayList<Gob> treesForRemoval, treelogsForDestruction;
+    private static Gob currentRemovingTree, currentDestroyingTreelog;
 
     public ZeeClickGobManager(Coord pc, Coord2d mc, Gob gobClicked) {
         coordPc = pc;
@@ -79,6 +79,8 @@ public class ZeeClickGobManager extends ZeeThread{
                  */
                 if (isRemovingAllTrees && isGobTree()) {
                     scheduleRemoveTree();
+                } else if (isDestroyingAllTreelogs && isGobTreeLog()) {
+                    scheduleDestroyTreelog();
                 } else if (!isGroundClick && !ZeeConfig.isPlayerHoldingItem() && showGobFlowerMenu()) {
                     //ZeeFlowerMenu
                 } else if (isGobCrop()) {
@@ -126,6 +128,34 @@ public class ZeeClickGobManager extends ZeeThread{
         }
     }
 
+    private void scheduleDestroyTreelog() {
+        Gob treelog = gob;
+        if (treelogsForDestruction==null) {
+            treelogsForDestruction = new ArrayList<Gob>();
+        }
+
+        if (treelogsForDestruction.contains(treelog)) {
+            // remove treelog from queue
+            removeScheduledTreelog(treelog);
+        } else if (!currentDestroyingTreelog.equals(treelog)){
+            // add treelog to queue
+            treelogsForDestruction.add(treelog);
+            ZeeConfig.addGobText(treelog,"des "+treelogsForDestruction.size());
+        }
+    }
+
+    private static Gob removeScheduledTreelog(Gob treelog) {
+        // remove treelog from queue
+        treelogsForDestruction.remove(treelog);
+        ZeeConfig.removeGobText(treelog);
+        // update queue gob's texts
+        for (int i = 0; i < treelogsForDestruction.size(); i++) {
+            ZeeConfig.addGobText(treelogsForDestruction.get(i),"des "+(i+1));
+        }
+        return treelog;
+    }
+
+
     private void scheduleRemoveTree() {
         Gob tree = gob;
         if (treesForRemoval==null) {
@@ -143,7 +173,7 @@ public class ZeeClickGobManager extends ZeeThread{
     }
 
     private static Gob removeScheduledTree(Gob tree) {
-        // remove tree
+        // remove tree from queue
         treesForRemoval.remove(tree);
         ZeeConfig.removeGobText(tree);
         // update queue gob's texts
@@ -277,9 +307,8 @@ public class ZeeClickGobManager extends ZeeThread{
                 barrelTakeAllSeeds(gob);
             }
         }
-        else if ( petalName.equals(ZeeFlowerMenu.STRPETAL_DESTROYTREELOG2)
-            || petalName.equals(ZeeFlowerMenu.STRPETAL_DESTROYTREELOG3)
-            || petalName.equals(ZeeFlowerMenu.STRPETAL_DESTROYTREELOG4)
+        else if ( petalName.equals(ZeeFlowerMenu.STRPETAL_DESTROYTREELOG3)
+            || petalName.equals(ZeeFlowerMenu.STRPETAL_DESTROYTREELOG5)
             || petalName.contentEquals(ZeeFlowerMenu.STRPETAL_DESTROYALL))
         {
             destroyTreelogs(gob,petalName);
@@ -333,28 +362,40 @@ public class ZeeClickGobManager extends ZeeThread{
             Gob treelog = firstTreelog;
             String treelogName = treelog.getres().name;
             int logs = 2;
-            if (petalName.equals(ZeeFlowerMenu.STRPETAL_DESTROYTREELOG3))
+            if (petalName.equals(ZeeFlowerMenu.STRPETAL_DESTROYTREELOG3)) {
                 logs = 3;
-            else if (petalName.equals(ZeeFlowerMenu.STRPETAL_DESTROYTREELOG4))
-                logs = 4;
-            else if (petalName.equals(ZeeFlowerMenu.STRPETAL_DESTROYALL))
+            } else if (petalName.equals(ZeeFlowerMenu.STRPETAL_DESTROYTREELOG5)) {
+                logs = 5;
+            } else if (petalName.equals(ZeeFlowerMenu.STRPETAL_DESTROYALL)) {
+                isDestroyingAllTreelogs = true;
                 logs = 999;
-            ZeeConfig.isDestroyingTreelogs = true;
+            }
+            ZeeConfig.dropBoards = true;
             ZeeConfig.lastMapViewClickButton = 2;//prepare for cancel click
-            while (logs>0 && !ZeeConfig.isTaskCanceledByGroundClick()){
+            while ( logs > 0  &&  !ZeeConfig.isTaskCanceledByGroundClick() ) {
                 ZeeConfig.addPlayerText("treelogs "+logs);
                 if (!clickGobPetal(treelog,"Make boards")){
                     println("can't click treelog = "+treelog);
                     logs = -1;
+                    currentDestroyingTreelog = null;
                     continue;
                 }
+                currentDestroyingTreelog = treelog;
                 waitPlayerIdleFor(3);
                 if (!gobHasFlowermenu(treelog) && !ZeeConfig.isTaskCanceledByGroundClick()){
                     logs--;
-                    if (petalName.equals(ZeeFlowerMenu.STRPETAL_DESTROYALL))
-                        treelog = getClosestTreeLog();
-                    else
+                    if (isDestroyingAllTreelogs){
+                        if (treelogsForDestruction != null) {
+                            if (treelogsForDestruction.size() > 0) {
+                                treelog = removeScheduledTreelog(treelogsForDestruction.remove(0));
+                            } else {
+                                //stop destroying when queue consumed
+                                logs = -1;
+                            }
+                        }
+                    }else {
                         treelog = ZeeConfig.getClosestGobName(treelogName);
+                    }
                 }else{
                     if (ZeeConfig.isTaskCanceledByGroundClick()) {
                         ZeeConfig.msg("destroy treelog canceled by click");
@@ -366,7 +407,10 @@ public class ZeeClickGobManager extends ZeeThread{
         }catch (Exception e){
             e.printStackTrace();
         }
-        ZeeConfig.isDestroyingTreelogs = false;
+        isDestroyingAllTreelogs = false;
+        ZeeConfig.dropBoards = false;
+        currentDestroyingTreelog = null;
+        treelogsForDestruction = null;
         ZeeConfig.removePlayerText();
     }
 
@@ -417,9 +461,9 @@ public class ZeeClickGobManager extends ZeeThread{
             menu = new ZeeFlowerMenu(gob,ZeeFlowerMenu.STRPETAL_BARRELTAKEALL, ZeeFlowerMenu.STRPETAL_LIFTUPGOB);
         }
         else if (isDestroyTreelog()) {
-            menu = new ZeeFlowerMenu( gob,
-                ZeeFlowerMenu.STRPETAL_LIFTUPGOB, ZeeFlowerMenu.STRPETAL_DESTROYTREELOG2,
-                ZeeFlowerMenu.STRPETAL_DESTROYTREELOG3, ZeeFlowerMenu.STRPETAL_DESTROYTREELOG4,
+            menu = new ZeeFlowerMenu( gob, ZeeFlowerMenu.STRPETAL_LIFTUPGOB,
+                ZeeFlowerMenu.STRPETAL_DESTROYTREELOG3,
+                ZeeFlowerMenu.STRPETAL_DESTROYTREELOG5,
                 ZeeFlowerMenu.STRPETAL_DESTROYALL
             );
         }

@@ -201,7 +201,7 @@ public class GItem extends AWidget implements ItemInfo.SpriteOwner, GSprite.Owne
 				}
 			}
 		}
-		else if (ZeeConfig.isDestroyingTreelogs && basename.startsWith("board-")){
+		else if (ZeeConfig.dropBoards && basename.startsWith("board-")){
 			this.wdgmsg("drop", Coord.z);
 		}
 		else if( ZeeConfig.dropSeeds && basename.startsWith("seed-") && this.parent instanceof Inventory){

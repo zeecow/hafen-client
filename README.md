@@ -38,7 +38,8 @@ features:
    - take all from stockpile obj
    - click "Man the helm" on Knarr/Snekkja obj
    - while holding item will try to store all on barrel obj
-   - add/remove tree obj to "Remove all trees" ordered queue 
+   - add/remove tree obj to "Remove all trees" ordered queue
+   - add/remove treelog obj to "Destroy all" ordered queue
    - while carrying wheelbarrow will try to(dismount and) unload at stockpile/container
    - while driving wheelbarrow will lift it up and open gate obj
    - while driving wheelbarrow will lift it up and place on cart obj
