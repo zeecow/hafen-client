@@ -665,9 +665,13 @@ public class ZeeClickGobManager extends ZeeThread{
                         println("no stump close");
                     }
                     if (isRemovingAllTrees) {
-                        if (treesForRemoval!=null && treesForRemoval.size()>0){
-                            tree = removeScheduledTree(treesForRemoval.remove(0));
-                        }else {
+                        if (treesForRemoval!=null){
+                            if (treesForRemoval.size()>0)
+                                tree = removeScheduledTree(treesForRemoval.remove(0));
+                            else
+                                tree = null; // stop removing trees if queue was consumed
+                        }else{
+                            // remove all trees until player blocked or something
                             tree = getClosestTree();
                         }
                     }else {
