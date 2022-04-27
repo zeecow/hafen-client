@@ -20,6 +20,9 @@ public class ZeeClickGobManager extends ZeeThread{
     public static float camAngleStart, camAngleEnd, camAngleDiff;
     public static long clickStartMs, clickEndMs, clickDiffMs;
     public static boolean barrelLabelOn = false;
+    private static boolean isRemovingAllTrees;
+    private static ArrayList<Gob> treesForRemoval;
+    private static Gob currentRemovingTree;
 
     public ZeeClickGobManager(Coord pc, Coord2d mc, Gob gobClicked) {
         coordPc = pc;
@@ -74,8 +77,10 @@ public class ZeeClickGobManager extends ZeeThread{
                 /*
                     long clicks
                  */
-                if (!isGroundClick && !ZeeConfig.isPlayerHoldingItem() && showGobFlowerMenu()) {
-                    //ok
+                if (isRemovingAllTrees && isGobTree()) {
+                    scheduleRemoveTree();
+                } else if (!isGroundClick && !ZeeConfig.isPlayerHoldingItem() && showGobFlowerMenu()) {
+                    //ZeeFlowerMenu
                 } else if (isGobCrop()) {
                     if (!ZeeConfig.getCursorName().equals(ZeeConfig.CURSOR_HARVEST))
                         gobClick(gob, 3, UI.MOD_SHIFT);//activate cursor harvest if needed
@@ -119,6 +124,33 @@ public class ZeeClickGobManager extends ZeeThread{
         catch (Exception e){
             e.printStackTrace();
         }
+    }
+
+    private void scheduleRemoveTree() {
+        Gob tree = gob;
+        if (treesForRemoval==null) {
+            treesForRemoval = new ArrayList<Gob>();
+        }
+
+        if (treesForRemoval.contains(tree)) {
+            // remove tree from queue
+            removeScheduledTree(tree);
+        } else if (!currentRemovingTree.equals(tree)){
+            // add tree to queue
+            treesForRemoval.add(tree);
+            ZeeConfig.addGobText(tree,"rem "+treesForRemoval.size());
+        }
+    }
+
+    private static Gob removeScheduledTree(Gob tree) {
+        // remove tree
+        treesForRemoval.remove(tree);
+        ZeeConfig.removeGobText(tree);
+        // update queue gob's texts
+        for (int i = 0; i < treesForRemoval.size(); i++) {
+            ZeeConfig.addGobText(treesForRemoval.get(i),"rem "+(i+1));
+        }
+        return tree;
     }
 
     private void toggleOverlayAggro() {
@@ -611,15 +643,18 @@ public class ZeeClickGobManager extends ZeeThread{
 
     public static void removeTreeAndStump(Gob tree, String petalName){
         try{
-            if (petalName.contentEquals(ZeeFlowerMenu.STRPETAL_REMOVEALLTREES))
+            if (petalName.contentEquals(ZeeFlowerMenu.STRPETAL_REMOVEALLTREES)) {
                 ZeeConfig.addPlayerText("removing all trees");
-            else
+                isRemovingAllTrees = true;
+            }else {
                 ZeeConfig.addPlayerText("removing tree & stump");
+            }
             waitNoFlowerMenu();
             ZeeClickItemManager.equipAxeChopTree();
             ZeeConfig.lastMapViewClickButton = 2;//prepare for cancel click
             while (tree!=null && !ZeeConfig.isTaskCanceledByGroundClick()) {
                 clickGobPetal(tree, "Chop");
+                currentRemovingTree = tree;
                 if (waitPlayerIdleFor(2) && !ZeeConfig.isTaskCanceledByGroundClick()) {
                     Gob stump = ZeeConfig.getClosestGob(ZeeConfig.findGobsByNameEndsWith("stump"));
                     if (stump != null && ZeeConfig.distanceToPlayer(stump) < 25) {
@@ -629,16 +664,23 @@ public class ZeeClickGobManager extends ZeeThread{
                     } else {
                         println("no stump close");
                     }
-                    if (petalName.contentEquals(ZeeFlowerMenu.STRPETAL_REMOVEALLTREES))
-                        tree = getClosestTree();
-                    else
+                    if (isRemovingAllTrees) {
+                        if (treesForRemoval!=null && treesForRemoval.size()>0){
+                            tree = removeScheduledTree(treesForRemoval.remove(0));
+                        }else {
+                            tree = getClosestTree();
+                        }
+                    }else {
                         tree = null;
+                    }
                     //println("next tree = "+tree);
                 }
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
+        isRemovingAllTrees = false;
+        currentRemovingTree = null;
         ZeeConfig.removePlayerText();
     }
 
