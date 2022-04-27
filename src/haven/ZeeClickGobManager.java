@@ -385,6 +385,7 @@ public class ZeeClickGobManager extends ZeeThread{
                 if (!gobHasFlowermenu(treelog) && !ZeeConfig.isTaskCanceledByGroundClick()){
                     logs--;
                     if (isDestroyingAllTreelogs){
+                        // destroy all, treelog queue is present
                         if (treelogsForDestruction != null) {
                             if (treelogsForDestruction.size() > 0) {
                                 treelog = removeScheduledTreelog(treelogsForDestruction.remove(0));
@@ -392,8 +393,12 @@ public class ZeeClickGobManager extends ZeeThread{
                                 //stop destroying when queue consumed
                                 logs = -1;
                             }
+                        }else{
+                            // destroy all, no treelog queue
+                            treelog = getClosestTreeLog();
                         }
-                    }else {
+                    } else {
+                        // destroy 3 or 5 same type treelogs
                         treelog = ZeeConfig.getClosestGobName(treelogName);
                     }
                 }else{

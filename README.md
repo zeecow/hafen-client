@@ -83,4 +83,5 @@ other stuff:
  - highlight damaged gobs more  
  - highlight finished crops, growing trees, gobs and categories
  - zoom extended for ortho cam
+ - Shift+c alternates cams ortho/free 
  - mini trees
