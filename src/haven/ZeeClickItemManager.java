@@ -473,42 +473,62 @@ public class ZeeClickItemManager extends ZeeThread{
                     String itemName = getWItemName(item);
                     String firstItemName = itemName;
                     long changeMs;
-                    while (!itemName.endsWith("/meat")) {
+                    while ( !(itemName.endsWith("-clean") || itemName.endsWith("-cleaned")) ) {
 
-                        //butch item
+                        //butch item and wait inventory changes
                         changeMs = now();
                         itemAct(item);
-
-                        //wait inventory changes
                         while (changeMs > ZeeConfig.lastInvItemMs) {
                             sleep(PING_MS);
                         }
 
-                        //get next stage item (dead,plucked,clean...)
-                        item = inv.getItemBySlotCoord(itemSlotCoord);
+                        // get next stage item, ends with "-dead", "-plucked", "-clean" or "-cleaned"
+                        item = inv.getItemBySlotCoord(itemSlotCoord);//TODO empty slot may change 1-slot-item position
                         itemName = getWItemName(item);
+                        //println("next item > "+itemName);
 
-                        //if butch is over("/meat"), check for "butch all" next item
-                        if (butchAll && itemName.endsWith("/meat")){
+                        //if butch is over("-clean"), prepare next "butch all" item
+                        if (butchAll && (itemName.endsWith("-clean") || itemName.endsWith("-cleaned"))){
 
-                            //get items with same name
+                            //butch "-clean" item and wait inventory changes
+                            //println("last butch 2> "+itemName);
+                            changeMs = now();
+                            itemAct(item);
+                            while (changeMs > ZeeConfig.lastInvItemMs) {
+                                sleep(PING_MS);
+                            }
+
+                            //get next dead animal for butching
                             List<WItem> items;
                             if (ZeeConfig.isFish(firstItemName))
                                 items = inv.getWItemsByName("/fish-"); //consider all fish the same
                             else
                                 items = inv.getWItemsByName(firstItemName);
 
-                            if (items.size() < 1){
+                            if (items.size() == 0){
                                 //no more items to butch
+                                //println("no more items");
                                 break;
                             }else{
-                                //update next item vars
+                                //update next dead animal vars
                                 item = items.get(0);
                                 itemName = getWItemName(item);
                                 itemSlotCoord = getWItemCoord(item);
+                                //println("next item > "+itemName);
                             }
                         }
                     }
+
+                    //single butch animal last action
+                    if (!butchAll && (itemName.endsWith("-clean") || itemName.endsWith("-cleaned"))) {
+                        //println("last butch > " + itemName);
+                        changeMs = now();
+                        itemAct(item);
+                        while (changeMs > ZeeConfig.lastInvItemMs) {
+                            sleep(PING_MS);
+                        }
+                    }
+
 
                 }catch (Exception e){
                     e.printStackTrace();

@@ -432,7 +432,7 @@ public class ZeeConfig {
                 "rockdove","quail","/hen","/rooster","magpie", // "/crab"
                 "mallard","seagull","ptarmigan","grouse",
                 "/squirrel","/hedgehog","/bogturtle",
-                "/rabbit-buck","rabbit-doe","/adder",
+                "/rabbit-buck","rabbit-doe","/adder","/mole",
                 "-dead","-plucked","-cleaned","-clean"
         };
         for (int i = 0; i < endlist.length; i++) {
@@ -1620,7 +1620,7 @@ public class ZeeConfig {
             if (ZeeCookManager.pepperRecipeOpen)
                 ZeeCookManager.gobClicked(clickGob,lastMapViewClickGobName,clickb);
             if(clickb == 2) {
-                new ZeeClickGobManager(pc, mc, clickGob).start();
+                ZeeClickGobManager.checkMidClickGob(pc, mc, clickGob, lastMapViewClickGobName);
             } else if (clickb == 3){
                 ZeeClickGobManager.checkRightClickGob(pc, mc, clickGob, lastMapViewClickGobName);
             }
