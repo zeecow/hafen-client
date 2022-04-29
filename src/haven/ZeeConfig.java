@@ -1629,7 +1629,7 @@ public class ZeeConfig {
                 if (isPlayerHoldingItem()) { //move while holding item
                     clickCoord(mc.floor(posres), 1, 0);
                 }else
-                    new ZeeClickGobManager(pc,mc,null).start();
+                    ZeeClickGobManager.checkMidClickGob(pc,mc,null,"");
             }
         }
     }

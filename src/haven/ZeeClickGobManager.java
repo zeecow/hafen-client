@@ -30,7 +30,6 @@ public class ZeeClickGobManager extends ZeeThread{
         gob = gobClicked;
         isGroundClick = (gob==null);
         gobName = isGroundClick ? "" : gob.getres().name;
-        //clickDiffMs = clickEndMs - clickStartMs;
         ZeeConfig.getMainInventory();
         //println(clickDiffMs+"ms > "+gobName + (isGroundClick ? mc : " dist="+ZeeConfig.distanceToPlayer(gob)));
     }
