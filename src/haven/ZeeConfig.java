@@ -1621,6 +1621,8 @@ public class ZeeConfig {
                 ZeeCookManager.gobClicked(clickGob,lastMapViewClickGobName,clickb);
             if(clickb == 2) {
                 new ZeeClickGobManager(pc, mc, clickGob).start();
+            } else if (clickb == 3){
+                ZeeClickGobManager.checkRightClickGob(pc, mc, clickGob, lastMapViewClickGobName);
             }
         }else{ // clicked ground
             if (clickb==2) {

@@ -35,7 +35,6 @@ public class ZeeClickGobManager extends ZeeThread{
         //println(clickDiffMs+"ms > "+gobName + (isGroundClick ? mc : " dist="+ZeeConfig.distanceToPlayer(gob)));
     }
 
-    @Override
     public void run() {
         try {
             if (!isLongClick()) {
@@ -53,8 +52,8 @@ public class ZeeClickGobManager extends ZeeThread{
                 } else if (isGobFireSource()) {
                     if (pickupTorch())
                         gobItemAct(0);
-                } else if (isGobHorse()) {
-                    mountHorse();
+                } else if (isGobHorse(gobName)) {
+                    mountHorse(gob);
                 } else if (isGobName("/barrel")) {
                     if (barrelLabelOn)
                         ZeeSeedFarmingManager.testBarrelsTilesClear();
@@ -86,9 +85,9 @@ public class ZeeClickGobManager extends ZeeThread{
                 } else if (isGobCrop()) {
                     if (!ZeeConfig.getCursorName().equals(ZeeConfig.CURSOR_HARVEST))
                         gobClick(gob, 3, UI.MOD_SHIFT);//activate cursor harvest if needed
-                } else if (isGobStockpile() && ZeeConfig.isPlayerCarryingWheelbarrow()) {
+                } else if (isGobStockpile(gobName) && ZeeConfig.isPlayerCarryingWheelbarrow()) {
                     ZeeStockpileManager.unloadWheelbarrowAtStockpile(gob);
-                } else if (isGobStockpile() || isGobName("/dframe")) {
+                } else if (isGobStockpile(gobName) || isGobName("/dframe")) {
                     gobClick(3, UI.MOD_SHIFT);//pick up all items (shift + rclick)
                 } else if (isGobTreeStump()) {
                     removeStump(gob);
@@ -99,26 +98,26 @@ public class ZeeClickGobManager extends ZeeThread{
                         gobItemAct(3);//ctrl+shift+rclick
                 } else if (isGroundClick){
                     if (ZeeConfig.isPlayerMountingHorse())
-                        dismountHorse();
+                        dismountHorse(coordMc);
                     else if (ZeeConfig.isPlayerCarryingWheelbarrow())
                         ZeeStockpileManager.unloadWheelbarrowStockpileAtGround(coordMc.floor(posres));
                     else
                         println("wtf ");
                 } else if (ZeeConfig.isPlayerCarryingWheelbarrow()) {
-                    if (isGobHorse())
-                        mountHorseCarryingWheelbarrow();
+                    if (isGobHorse(gobName))
+                        mountHorseCarryingWheelbarrow(gob);
                     else
-                        unloadWheelbarrowAtGob();
+                        unloadWheelbarrowAtGob(gob);
                 } else if (!isGobName("/wheelbarrow") && ZeeConfig.isPlayerDrivingWheelbarrow()) {
-                    if (isGobHorse())
-                        mountHorseDrivingWheelbarrow();
-                    else if (isGobGate())
-                        openGateWheelbarrow();
+                    if (isGobHorse(gobName))
+                        mountHorseDrivingWheelbarrow(gob);
+                    else if (isGobGate(gobName))
+                        openGateWheelbarrow(gob);
                     else if (isGobName("/cart"))
-                        liftAndStoreWheelbarrow();
+                        liftAndStoreWheelbarrow(gob);
                 } else if(isGobName("/knarr") || isGobName("/snekkja")) {
                     clickGobPetal("Man the helm");
-                } else if (isLiftGob()) {
+                } else if (isLiftGob(gobName) || isGobBush(gobName)) {
                     liftGob();
                 }
             }
@@ -126,6 +125,82 @@ public class ZeeClickGobManager extends ZeeThread{
         catch (Exception e){
             e.printStackTrace();
         }
+    }
+
+    public static void checkRightClickGob(Coord pc, Coord2d mc, Gob gob, String gobName) {
+
+        // lift up wheelbarrow while mounting horse
+        if(gobName.endsWith("wheelbarrow") && ZeeConfig.isPlayerMountingHorse() && (ZeeConfig.distanceToPlayer(gob) > ZeeConfig.MAX_DIST_DRIVING_WHEELBARROW)){
+            new ZeeThread() {
+                public void run() {
+                    dismountHorse(mc);
+                    gobClick(gob,3);
+                }
+            }.start();
+        }
+        // while driving wheelbarrow, open gate, store wb on cart
+        else if (gobNameEndsWith(gobName,"cart,gate") && ZeeConfig.isPlayerDrivingWheelbarrow()){
+            new ZeeThread() {
+                public void run() {
+                    if (isGobGate(gobName))
+                        openGateWheelbarrow(gob);
+                    else if (gobName.endsWith("/cart"))
+                        liftAndStoreWheelbarrow(gob);
+                }
+            }.start();
+        }
+        // enter gob building/cave while mounting horse and carrying rope
+        else if (isGobEntranceBlockingHorse(gobName) && ZeeConfig.isPlayerMountingHorse()){
+            if (ZeeConfig.getMainInventory().countItemsByName("rope") > 0) {
+                new ZeeThread() {
+                    public void run() {
+                        dismountHorse(mc);
+                        if (isGobHouse(gobName))
+                            gobClick(gob,3,0,16);//gob's door?
+                        else
+                            gobClick(gob,3);
+                    }
+                }.start();
+            }
+        }
+        // use wheelbarrow on stockpile, dismount if necessary
+        else if ( isGobStockpile(gobName) && ZeeConfig.isPlayerCarryingWheelbarrow()){
+            new ZeeThread() {
+                public void run() {
+                    if (ZeeConfig.isPlayerMountingHorse())
+                        dismountHorse(mc);
+                    unloadWheelbarrowAtGob(gob);
+                }
+            }.start();
+        }
+        // mount horse while carrying/driving wheelbarrow
+        else if ( isGobHorse(gobName) && (ZeeConfig.isPlayerCarryingWheelbarrow() || ZeeConfig.isPlayerDrivingWheelbarrow())){
+            new ZeeThread() {
+                public void run() {
+                    if (ZeeConfig.isPlayerMountingHorse())
+                        dismountHorse(mc);//horse to horse?
+                    if (ZeeConfig.isPlayerDrivingWheelbarrow())
+                        mountHorseDrivingWheelbarrow(gob);
+                    else
+                        mountHorseCarryingWheelbarrow(gob);
+                }
+            }.start();
+        }
+
+    }
+
+    private static boolean isGobEntranceBlockingHorse(String gobName) {
+        return isGobHouseDoor(gobName) || isGobHouse(gobName)
+                || gobNameEndsWith(gobName,"/igloo,/cavein,/caveout");
+    }
+
+    public static boolean isGobHouseDoor(String gobName){
+        return gobName.endsWith("-door");
+    }
+
+    public static boolean isGobHouse(String gobName) {
+        String list = "/logcabin,/timberhouse,/stonestead,/stonemansion,/stonetower,/greathall,/windmill";
+        return gobNameEndsWith(gobName,list);
     }
 
     private void scheduleDestroyTreelog() {
@@ -205,11 +280,11 @@ public class ZeeClickGobManager extends ZeeThread{
         }
     }
 
-    private void unloadWheelbarrowAtGob() throws Exception {
+    private static void unloadWheelbarrowAtGob(Gob gob) {
         ZeeStockpileManager.unloadWheelbarrowAtStockpile(gob);
     }
 
-    private void dismountHorse() {
+    public static void dismountHorse(Coord2d coordMc) {
         Gob horse = ZeeConfig.getClosestGobName("gfx/kritter/horse/");
         ZeeConfig.clickCoord(coordMc.floor(posres),1,UI.MOD_CTRL);
         waitPlayerDismounted(horse);
@@ -229,12 +304,9 @@ public class ZeeClickGobManager extends ZeeThread{
                 ZeeConfig.setPlayerSpeed(ZeeConfig.PLAYER_SPEED_2);//max auto horse speed
         }
     }
-    private void mountHorse() {
-        mountHorse(gob);
-    }
 
     private void clickedGobHoldingItem() {
-        if (isGobStockpile())
+        if (isGobStockpile(gobName))
             gobItemAct(UI.MOD_SHIFT);//try piling all items
         else
             gobClick(gob,3,0); // try ctrl+click simulation
@@ -538,7 +610,7 @@ public class ZeeClickGobManager extends ZeeThread{
         return false;
     }
 
-    private void mountHorseDrivingWheelbarrow(){
+    private static void mountHorseDrivingWheelbarrow(Gob gob){
         Gob horse = gob;
         try{
             //waitNoFlowerMenu();
@@ -567,7 +639,7 @@ public class ZeeClickGobManager extends ZeeThread{
         ZeeConfig.removePlayerText();
     }
 
-    private void mountHorseCarryingWheelbarrow() {
+    private static void mountHorseCarryingWheelbarrow(Gob gob) {
         Gob horse = gob;
         try {
             //waitNoFlowerMenu();
@@ -587,7 +659,7 @@ public class ZeeClickGobManager extends ZeeThread{
                 //if drop wb success
                 if (!ZeeConfig.isPlayerCarryingWheelbarrow()) {
                     ZeeConfig.clickRemoveCursor();//remove hand cursor
-                    mountHorse();//mount horse
+                    mountHorse(horse);
                     waitPlayerMounted(horse);
                     liftGob(wb);//lift wheelbarrow
                 }
@@ -598,7 +670,7 @@ public class ZeeClickGobManager extends ZeeThread{
         ZeeConfig.removePlayerText();
     }
 
-    private void liftAndStoreWheelbarrow(){
+    private static void liftAndStoreWheelbarrow(Gob gob){
         Gob storage = gob;
         try {
             waitNoFlowerMenu();
@@ -623,7 +695,7 @@ public class ZeeClickGobManager extends ZeeThread{
         ZeeConfig.removePlayerText();
     }
 
-    private void openGateWheelbarrow() {
+    private static void openGateWheelbarrow(Gob gob) {
         // gfx/terobjs/vehicle/wheelbarrow
         Gob gate = gob;
         try {
@@ -651,7 +723,7 @@ public class ZeeClickGobManager extends ZeeThread{
         ZeeConfig.removePlayerText();
     }
 
-    public boolean isGobGate() {
+    public static boolean isGobGate(String gobName) {
         if (gobName.startsWith("gfx/terobjs/arch/") && gobName.endsWith("gate"))
             return true;
         return false;
@@ -852,7 +924,7 @@ public class ZeeClickGobManager extends ZeeThread{
         //System.out.println("closest = "+closestGob.getres().name+" > "+closestDist);
     }
 
-    private boolean isGobStockpile() {
+    public static boolean isGobStockpile(String gobName) {
         return gobName.startsWith("gfx/terobjs/stockpile");
     }
 
@@ -866,7 +938,7 @@ public class ZeeClickGobManager extends ZeeThread{
     }
 
     private boolean isInspectGob(){
-        if(isGobTree() || isGobBush() || isGobBoulder())
+        if(isGobTree() || isGobBush(gobName) || isGobBoulder(gobName))
             return true;
         String list = "/meatgrinder,/potterswheel,/well,/dframe,"
                 +"/smelter,/crucible,/steelcrucible,/fineryforge,/kiln,/tarkiln,/oven,"
@@ -885,12 +957,8 @@ public class ZeeClickGobManager extends ZeeThread{
     }
 
 
-    private boolean isLiftGob() {
-        if(isGobBush()) {
-            ZeeClickItemManager.equipBeltItem("shovel");
-            return waitNotHoldingItem();
-        }
-        if(isGobBoulder())
+    private static boolean isLiftGob(String gobName) {
+        if(isGobBoulder(gobName))
             return true;
         String endList = "/meatgrinder,/potterswheel,/iconsign,/rowboat,/dugout,/wheelbarrow,"
                 +"/compostbin,/gardenpot,/beehive,/htable,/bed-sturdy,/boughbed,/alchemiststable,"
@@ -901,12 +969,12 @@ public class ZeeClickGobManager extends ZeeThread{
         return gobNameEndsWith(gobName,endList);
     }
 
-    private boolean isGobBoulder() {
+    private static boolean isGobBoulder(String gobName) {
         return gobName.startsWith("gfx/terobjs/bumlings/") &&
                !gobName.startsWith("gfx/terobjs/bumlings/ras");
     }
 
-    private boolean isGobBush() {
+    public static boolean isGobBush(String gobName) {
         return gobName.startsWith("gfx/terobjs/bushes");
     }
 
@@ -1004,6 +1072,10 @@ public class ZeeClickGobManager extends ZeeThread{
     }
 
     public static void liftGob(Gob gob) {
+        if(isGobBush(gob.getres().name)) {
+            ZeeClickItemManager.equipBeltItem("shovel");
+            waitItemEquipped("shovel");
+        }
         ZeeConfig.gameUI.menu.wdgmsg("act", "carry","0");
         gobClick(gob,1);
         waitPlayerIdleFor(1);
@@ -1154,7 +1226,7 @@ public class ZeeClickGobManager extends ZeeThread{
         );
     }
 
-    private boolean isGobHorse() {
+    public static boolean isGobHorse(String gobName) {
         return gobNameEndsWith(gobName, "stallion,mare,horse");
     }
 
@@ -1180,6 +1252,10 @@ public class ZeeClickGobManager extends ZeeThread{
 
     public void gobClick(int btn, int mod) {
         ZeeConfig.gameUI.map.wdgmsg("click", ZeeConfig.getCenterScreenCoord(), gob.rc.floor(OCache.posres), btn, mod, 0, (int)gob.id, gob.rc.floor(OCache.posres), 0, -1);
+    }
+
+    public static void gobClick(Gob g, int btn, int mod, int x) {
+        ZeeConfig.gameUI.map.wdgmsg("click", ZeeConfig.getCenterScreenCoord(), g.rc.floor(OCache.posres), btn, mod, 0, (int)g.id, g.rc.floor(OCache.posres), 0, x);
     }
 
     public static void gobClick(Gob g, int btn) {

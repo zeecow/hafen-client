@@ -342,7 +342,7 @@ public class ZeeStockpileManager extends ZeeThread{
     }
 
 
-    public static void unloadWheelbarrowAtStockpile(Gob gobStockpile) throws Exception{
+    public static void unloadWheelbarrowAtStockpile(Gob gobStockpile) {
         try {
             ZeeConfig.addPlayerText("wheeling");
             Coord stockpileCoord = ZeeConfig.lastMapViewClickMc.floor(posres);
