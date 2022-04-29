@@ -432,7 +432,7 @@ public class ZeeConfig {
                 "rockdove","quail","/hen","/rooster","magpie", // "/crab"
                 "mallard","seagull","ptarmigan","grouse",
                 "/squirrel","/hedgehog","/bogturtle",
-                "/rabbit-buck","rabbit-doe","/adder","/mole",
+                "/rabbit-buck","-doe","/adder","/mole",
                 "-dead","-plucked","-cleaned","-clean"
         };
         for (int i = 0; i < endlist.length; i++) {
