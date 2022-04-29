@@ -514,6 +514,8 @@ public class ZeeClickGobManager extends ZeeThread{
         isDestroyingAllTreelogs = false;
         ZeeConfig.dropBoards = false;
         currentDestroyingTreelog = null;
+        if (treelogsForDestruction!=null)
+            treelogsForDestruction.clear();
         treelogsForDestruction = null;
         ZeeConfig.removePlayerText();
     }
@@ -833,6 +835,9 @@ public class ZeeClickGobManager extends ZeeThread{
         }
         isRemovingAllTrees = false;
         currentRemovingTree = null;
+        if (treesForRemoval!=null)
+            treesForRemoval.clear();
+        treesForRemoval = null;
         ZeeConfig.removePlayerText();
     }
 
