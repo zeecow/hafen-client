@@ -455,11 +455,11 @@ public class ZeeClickGobManager extends ZeeThread{
             ZeeConfig.msg("need bone saw equipped, no metal saw");
             return;
         }
+        Gob treelog = firstTreelog;
+        int logs = 2;
         try {
             waitNoFlowerMenu();
-            Gob treelog = firstTreelog;
             String treelogName = treelog.getres().name;
-            int logs = 2;
             if (petalName.equals(ZeeFlowerMenu.STRPETAL_DESTROYTREELOG3)) {
                 logs = 3;
             } else if (petalName.equals(ZeeFlowerMenu.STRPETAL_DESTROYTREELOG5)) {
@@ -489,6 +489,7 @@ public class ZeeClickGobManager extends ZeeThread{
                                 treelog = removeScheduledTreelog(treelogsForDestruction.remove(0));
                             } else {
                                 //stop destroying when queue consumed
+                                println("logs -1, treelogsForDestruction empty");
                                 logs = -1;
                             }
                         }else{
@@ -503,13 +504,20 @@ public class ZeeClickGobManager extends ZeeThread{
                     if (ZeeConfig.isTaskCanceledByGroundClick()) {
                         ZeeConfig.msg("destroy treelog canceled by click");
                         println("destroy treelog canceled by click");
-                    }
+                    }else
+                        println("destreelog canceled by gobHasFlowermenu?");
                     logs = -1;
                 }
             }
         }catch (Exception e){
             e.printStackTrace();
         }
+        println("exit destroyTreelogs > logs="+logs
+            +"  isDestroying="+isDestroyingAllTreelogs
+            +"  currentTreelog="+currentDestroyingTreelog
+            +"  treelog="+treelog
+            +"  treelogsQueue="+(treelogsForDestruction==null?"null":treelogsForDestruction.size())
+        );
         isDestroyingAllTreelogs = false;
         ZeeConfig.dropBoards = false;
         currentDestroyingTreelog = null;

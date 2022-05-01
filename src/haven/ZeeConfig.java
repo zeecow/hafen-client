@@ -1621,7 +1621,7 @@ public class ZeeConfig {
                 ZeeCookManager.gobClicked(clickGob,lastMapViewClickGobName,clickb);
             if(clickb == 2) {
                 ZeeClickGobManager.checkMidClickGob(pc, mc, clickGob, lastMapViewClickGobName);
-            } else if (clickb == 3){
+            } else if (clickb==3 && gameUI.ui.modflags()==0){//no mod keys
                 ZeeClickGobManager.checkRightClickGob(pc, mc, clickGob, lastMapViewClickGobName);
             }
         }else{ // clicked ground
@@ -1671,7 +1671,10 @@ public class ZeeConfig {
 
     public static boolean isPlayerSharingGobCoord(String gobNameContains){
         Gob g = getClosestGobName(gobNameContains);
-        //println(gobNameContains);
+        if (g==null) {
+            println("isPlayerSharingGobCoord > gob null");
+            return false;
+        }
         return isPlayerSharingGobCoord(g);
     }
 

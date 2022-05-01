@@ -15,6 +15,7 @@ public class ZeeMiningManager extends ZeeThread{
     private static final long MS_CURSOR_CHANGE = 200;
     private static final double DIST_BOULDER = 25;
     static boolean debug = false;
+    static boolean useOreForColumns = false;
     private final String task;
     public static long lastDropItemMs = 0;
     public static boolean mining;
@@ -372,7 +373,13 @@ public class ZeeMiningManager extends ZeeThread{
         int invStones = invItems.size();
         while (mining  &&  invStones<wantedStones && inv.getNumberOfFreeSlots()!=0) {
             terobjs = ZeeConfig.findGobsByNameContains("gfx/terobjs/items/");
-            terobjs.removeIf(item -> !ZeeConfig.mineablesStone.contains(item.getres().basename()));//remove non-stones
+            //filter column stone types
+            terobjs.removeIf(item -> {
+                String name = item.getres().basename();
+                if (useOreForColumns && "leadglance,cassiterite,chalcopyrite,cinnabar,malachite".contains(name))
+                    return true;
+                return !ZeeConfig.mineablesStone.contains(item.getres().basename());
+            });
             if (terobjs.size() == 0)
                 break; //no stones to pick, end loop
             closestStone = ZeeConfig.getClosestGob(terobjs);
@@ -442,8 +449,11 @@ public class ZeeMiningManager extends ZeeThread{
     }
 
     public static void showWindowMining() {
+
         if(windowManager ==null) {
-            windowManager = new ZeeWindow(new Coord(200, 90), "Mine manager") {
+
+            //window
+            windowManager = new ZeeWindow(new Coord(260, 110), "Mine manager") {
                 public void wdgmsg(String msg, Object... args) {
                     if (msg.equals("close")) {
                         exitManager();
@@ -451,6 +461,9 @@ public class ZeeMiningManager extends ZeeThread{
                         super.wdgmsg(msg, args);
                 }
             };
+
+
+            // buttons N, S, W, E
             btnNorth = windowManager.add(new ZeeWindow.ZeeButton(UI.scale(30),"N"){
                 public void wdgmsg(String msg, Object... args) {
                     if(msg.equals("activate")){
@@ -479,6 +492,25 @@ public class ZeeMiningManager extends ZeeThread{
                     }
                 }
             }, 35,60);
+
+
+            //checkbox debug
+            windowManager.add(new CheckBox("debug"){
+                public void changed(boolean val) {
+                    debug = val;
+                }
+            },5,85);
+
+
+            //checkbox ore column
+            windowManager.add(new CheckBox("ore column: lead, cass, chalco, cinna, mala"){
+                public void changed(boolean val) {
+                    useOreForColumns = val;
+                }
+            },5,100);
+
+
+            //button dig
             btnDig = windowManager.add(new ZeeWindow.ZeeButton(UI.scale(60),"dig"){
                 public void wdgmsg(String msg, Object... args) {
                     if(msg.equals("activate")){
@@ -486,6 +518,9 @@ public class ZeeMiningManager extends ZeeThread{
                     }
                 }
             }, 120,5);
+
+
+            //button test
             if (showTestBtn) {
                 windowManager.add(new ZeeWindow.ZeeButton(UI.scale(80), "test") {
                     public void wdgmsg(String msg, Object... args) {
@@ -495,12 +530,11 @@ public class ZeeMiningManager extends ZeeThread{
                     }
                 }, 120, 35);
             }
-            windowManager.add(new CheckBox("debug"){
-                public void changed(boolean val) {
-                    debug = val;
-                }
-            },145,80);
+
+
+            //add window
             ZeeConfig.gameUI.add(windowManager, new Coord(100,100));
+
         }else{
             windowManager.show();
             disableBtns(false);
@@ -538,9 +572,12 @@ public class ZeeMiningManager extends ZeeThread{
 
     private void taskChipBoulder() throws Exception {
         println(">task chip_boulder on");
-        ZeeClickGobManager.gobClick(gobBoulder, 3);//remove mining cursor
-        Thread.sleep(MS_CURSOR_CHANGE);//wait cursor change
+        ZeeConfig.addPlayerText("boulder");
+        ZeeConfig.clickRemoveCursor();
+        waitCursor(ZeeConfig.CURSOR_ARW);
+        sleep(1000);//wait boulder clickable
         ZeeClickGobManager.clickGobPetal(gobBoulder,"Chip stone");//chip boulder
+        sleep(100);
         ZeeConfig.cursorChange(ZeeConfig.ACT_MINE);//restore mining icon for autodrop
         if(waitBoulderFinish(gobBoulder)){
             println("chip boulder done");
@@ -549,6 +586,7 @@ public class ZeeMiningManager extends ZeeThread{
             println("still chipping???");
         }
         println(">task chip_boulder off");
+        ZeeConfig.removePlayerText();
     }
 
     /*
