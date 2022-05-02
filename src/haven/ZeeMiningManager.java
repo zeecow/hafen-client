@@ -1,5 +1,6 @@
 package haven;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -23,7 +24,7 @@ public class ZeeMiningManager extends ZeeThread{
     public static Gob gobBoulder;
     public static ZeeMiningManager manager;
     static ZeeWindow windowManager;
-    static ZeeWindow.ZeeButton btnNorth, btnSouth, btnWest, btnEast, btnDig;
+    static ZeeWindow.ZeeButton btnNorth, btnSouth, btnWest, btnEast, btnDig, btnTest;
     static MCache.Overlay ol;
     static Coord areasize = new Coord(1,1);
     static String lastDir = "";
@@ -44,9 +45,13 @@ public class ZeeMiningManager extends ZeeThread{
         try {
             if (task.contentEquals(TASK_CHIP_BOULDER))
                 taskChipBoulder();
-            else if (task.contentEquals(TASK_MINE_AREA))
-                taskMineArea();
-            else if (task.contentEquals(TASK_TEST))
+            else if (task.contentEquals(TASK_MINE_AREA)) {
+                if (arraySubTasks==null || arraySubTasks.size()==0){
+                    taskMineAreaInit();
+                }else{
+                    taskMineAreaNextSubtask();
+                }
+            }else if (task.contentEquals(TASK_TEST))
                 taskTest();
         }catch (Exception e){
             e.printStackTrace();
@@ -54,7 +59,7 @@ public class ZeeMiningManager extends ZeeThread{
         }
     }
 
-    private static boolean showTestBtn = true;//change to show/hide button
+    private static boolean showTestBtn = false;//change to show/hide button
     private void taskTest() throws Exception{
         println("playertile"+ZeeConfig.getPlayerTile()+"  upperLeft"+upperLeft+"  areasize"+areasize);
         Coord c1=null,c2=null;
@@ -112,7 +117,7 @@ public class ZeeMiningManager extends ZeeThread{
     }
 
 
-    public static void mineTiles(Coord c1, Coord c2) {
+    public static void mineTiles(Coord c1, Coord c2) throws InterruptedException{
         mining = true;
         debug("mine tiles  c1"+c1+"  c2"+c2);
         ZeeConfig.cursorChange(ZeeConfig.ACT_MINE);
@@ -140,7 +145,287 @@ public class ZeeMiningManager extends ZeeThread{
         }
     }
 
-    private boolean taskMineArea() throws Exception{
+
+    private ArrayList<ZeeThread> arraySubTasks;
+    private static Coord tileNewCol;
+    private static ZeeThread currentSubTask;
+    private void taskMineAreaInit() throws Exception{
+
+        println("init subtasks");
+
+        if (ol==null || ol.a.sz().x<1 || ol.a.sz().y<1) {
+            println("area invalid");
+            return;
+        }
+
+        // find coords
+        ZeeConfig.autoChipMinedBoulder = false; //use specific boulder code
+        Inventory inv = ZeeConfig.getMainInventory();
+        Coord c1 = null, c2 = null, startTile, endTile;
+        Coord areasub1 = areasize.sub(1,1);
+        boolean positive = upperLeft.x >= 0;
+        if (positive)
+            ZeeConfig.msg("Coords > 0");
+        if(lastDir.contentEquals(DIR_NORTH) || lastDir.contentEquals(DIR_WEST)) {
+            c1 = positive? upperLeft.add(1,1) : upperLeft.add(areasub1);
+            c2 = positive? upperLeft.add(areasize) : upperLeft;
+        }else if(lastDir.contentEquals(DIR_SOUTH) || lastDir.contentEquals(DIR_EAST)) {
+            c1 = positive? upperLeft.add(areasize) : upperLeft;
+            c2 = positive? upperLeft.add(1,1) : upperLeft.add(areasub1);
+        }
+        if (c1==null || c2==null) {
+            println("mine coords null");
+            return;
+        }
+        startTile = ZeeConfig.getTileCloserToPlayer(c1,c2);
+        endTile = ZeeConfig.getTileFartherToPlayer(c1,c2);
+        debug("upperleft"+upperLeft+"  c1"+c1+"  c2"+c2+"  areasize"+areasize);
+        debug("startTile"+startTile+"  endTile"+endTile);
+
+
+        // setup
+        disableBtns(true);
+        arraySubTasks = new ArrayList<ZeeThread>();
+        Coord finalC1 = c1;
+        Coord finalC2 = c2;
+
+
+        // subtask: mine until reach tile c2
+        arraySubTasks.add(new ZeeThread(){
+            public void run() {
+                println("subtask: mine until reach tile c2");
+                try{
+                    mining = true;
+                    ZeeConfig.addPlayerText("dig");
+                    debug("click startTile "+startTile);
+                    ZeeConfig.clickTile(startTile,1);//start at c1
+                    mineTiles(finalC1, finalC2);
+                    if (!mining) {
+                        println("mining canceled 2");
+                        return;
+                    }
+                    Gob boulder = getBoulderCloseEnoughForChipping();
+                    //chip close boulder(s)
+                    while (boulder!=null) {
+                        ZeeConfig.addPlayerText("boulder");
+                        if (!mining) {
+                            println("mining canceled 2.1");
+                            return;
+                        }
+                        if (!chipBoulder(boulder)){
+                            println("couldn't chip boulder");
+                            return;
+                        }
+                        if (!mining) {
+                            println("mining canceled 2.2");
+                            return;
+                        }
+                        //resume mining
+                        ZeeConfig.addPlayerText("dig");
+                        if (!mining) {
+                            println("mining canceled 2.3");
+                            return;
+                        }
+                        mineTiles(finalC1, finalC2);
+                        if (!mining) {
+                            println("mining canceled 2.4");
+                            return;
+                        }
+                        boulder = getBoulderCloseEnoughForChipping();
+                    }
+                }catch (InterruptedException e){
+                    println("next subtask: mine column tile");
+                }
+                taskMineAreaNextSubtask();
+            }
+        });
+
+
+        // subtask: mine column tile
+        arraySubTasks.add(new ZeeThread(){
+            public void run() {
+                println("subtask: mine column tile");
+                try{
+                    ZeeConfig.addPlayerText("col");
+                    ZeeConfig.clickRemoveCursor();
+                    waitCursor(ZeeConfig.CURSOR_ARW);
+                    if (!mining) {
+                        println("mining canceled 3");
+                        return;
+                    }
+                    ZeeConfig.clickTile(endTile,1);
+                    if (!mining) {
+                        println("mining canceled 3.1");
+                        return;
+                    }
+                    waitPlayerIdleFor(1);
+                    if (!mining) {
+                        println("mining canceled 3.2");
+                        return;
+                    }
+                    if (miningVertical())
+                        tileNewCol = endTile.add(1,0);
+                    else if (miningHorizontal())
+                        tileNewCol = endTile.add(0,1);
+                    else {
+                        println("no tile for new column");
+                        return;
+                    }
+                    debug("new col tile "+tileNewCol);
+                    if (!mining) {
+                        exitManager("mining canceled 3.3");
+                        return;
+                    }
+                    mineTiles(tileNewCol,tileNewCol);
+                    if (!mining) {
+                        println("mining canceled 3.4");
+                        return;
+                    }
+                    //possible newcoltile boulder
+                    Gob b = getBoulderCloseEnoughForChipping();
+                    if (b!=null){
+                        ZeeConfig.addPlayerText("boulder");
+                        if(!chipBoulder(b)){
+                            println("couldn't chip boulder at newcoltile");
+                            return;
+                        }
+                    }
+                }catch (InterruptedException e){
+                    println("next subtask: get stones");
+                }
+                taskMineAreaNextSubtask();
+            }
+        });
+
+
+        // subtask: get stones
+        arraySubTasks.add(new ZeeThread(){
+            public void run() {
+                println("subtask: get stones");
+                try {
+                    ZeeConfig.addPlayerText("stones");
+                    ZeeConfig.clickTile(endTile, 1); // realign player (caused by boulder on tileNewCol)
+                    waitPlayerIdleFor(1);
+                    if (!pickStones(30)) {
+                        println("not enough stones for new column");
+                        return;
+                    }
+                }catch (InterruptedException e){
+                    println("next subtask: build column");
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                taskMineAreaNextSubtask();
+            }
+        });
+
+
+        // subtask: build col
+        arraySubTasks.add(new ZeeThread(){
+            public void run() {
+                println("subtask: build col");
+                try{
+                    // check metal
+                    if (inv.countItemsByName("/bar-bronze")==0 && inv.countItemsByName("/bar-castiron")==0 && inv.countItemsByName("/bar-wroughtiron")==0 ){
+                        println("no hard-metal for new column");
+                        return;
+                    }
+                    ZeeConfig.addPlayerText("col");
+                    ZeeConfig.clickTile(endTile,1);
+                    waitPlayerIdleFor(1);
+                    ZeeConfig.gameUI.menu.wdgmsg("act","bp","column","0");
+                    sleep(1000);
+                    if (!mining) {
+                        println("mining canceled 4");
+                        return;
+                    }
+                    ZeeConfig.gameUI.map.wdgmsg("place",ZeeConfig.tileToCoord(tileNewCol),0,1,0);
+                    sleep(1000);
+                    if (!mining) {
+                        println("mining canceled 4.1");
+                        return;
+                    }
+                    Window colWin = ZeeConfig.getWindow("Stone column");
+                    if (colWin==null) {
+                        println("no window for new column");
+                        return;
+                    }
+                    Button buildBtn = ZeeConfig.getButtonNamed(colWin,"Build");
+                    if (buildBtn==null)
+                        return;
+                    buildBtn.click();
+                    if (!mining) {
+                        println("mining canceled 4.2");
+                        return;
+                    }
+                    waitInvFreeSlotsIdle();
+                    ZeeConfig.clickTile(endTile,1);//realign to endTile
+                    waitPlayerIdleFor(1);
+                    inv.children(WItem.class).forEach(wItem -> {//drop remaining inv stones
+                        if (ZeeConfig.mineablesStone.contains(wItem.item.getres().basename()))
+                            wItem.item.wdgmsg("drop", Coord.z);
+                    });
+                    colWin = ZeeConfig.getWindow("Stone column");
+                    if (colWin!=null) {
+                        println("no mats for new column");
+                        return;
+                    }
+                }catch (InterruptedException e){
+                    println("next subtask: update overlay");
+                }
+                taskMineAreaNextSubtask();
+            }
+        });
+
+
+        // subtask: update overlay for next tiles
+        arraySubTasks.add(new ZeeThread(){
+            public void run() {
+                println("subtask: update overlay for next tiles");
+                btnDig.disable(true);
+                upperLeft = endTile;
+                debug("upperLeft before"+upperLeft);
+                if (positive) {
+                    if (lastDir.contentEquals(DIR_NORTH) || lastDir.contentEquals(DIR_WEST))
+                        upperLeft = ol.a.ul.sub(areasub1);
+                    else if(lastDir.contentEquals(DIR_SOUTH) || lastDir.contentEquals(DIR_EAST))
+                        upperLeft = ol.a.ul.add(areasub1);
+                } else {
+                    if (lastDir.contentEquals(DIR_NORTH))
+                        upperLeft.y -= Math.abs(areasize.y)-1;
+                    else if (lastDir.contentEquals(DIR_WEST))
+                        upperLeft.x -= Math.abs(areasize.x)-1;
+                }
+                debug("upperLeft after"+upperLeft);
+                highlightTiles(upperLeft,areasize);
+
+
+                // reset
+                mining = false;
+                ZeeConfig.autoChipMinedBoulder = Utils.getprefb("autoChipMinedBoulder", true);
+                ZeeConfig.removePlayerText();
+                disableBtns(false);
+                btnDig.disable(false);
+            }
+        });
+
+
+        //start first subtask
+        taskMineAreaNextSubtask();
+    }
+
+    private void taskMineAreaNextSubtask(){
+        println("next subtask");
+        if (currentSubTask!=null && currentSubTask.isAlive())
+            currentSubTask.interrupt();
+        if (arraySubTasks!=null && arraySubTasks.size()>0){
+            currentSubTask = arraySubTasks.remove(0);
+            currentSubTask.start();
+        }
+        println("   arraySubTasks = "+(arraySubTasks==null ? "null" : arraySubTasks.size()));
+    }
+
+    private boolean taskMineArea_old() throws Exception{
 
         if (ol==null || ol.a.sz().x<1 || ol.a.sz().y<1) {
             println("area invalid");
@@ -327,6 +612,7 @@ public class ZeeMiningManager extends ZeeThread{
 
         return true;
     }
+
 
     public static Gob getBoulderCloseEnoughForChipping() {
         Gob boulder = ZeeConfig.getClosestGobName("gfx/terobjs/bumlings/");
@@ -532,7 +818,7 @@ public class ZeeMiningManager extends ZeeThread{
 
             //button test
             if (showTestBtn) {
-                windowManager.add(new ZeeWindow.ZeeButton(UI.scale(80), "test") {
+                btnTest = windowManager.add(new ZeeWindow.ZeeButton(UI.scale(80), "test") {
                     public void wdgmsg(String msg, Object... args) {
                         if (msg.equals("activate")) {
                             new ZeeMiningManager(TASK_TEST).start();
@@ -553,11 +839,13 @@ public class ZeeMiningManager extends ZeeThread{
     }
 
     public static void disableBtns(boolean dis){
-        btnDig.disable(dis);
+        //btnDig.disable(dis);
         btnSouth.disable(dis);
         btnEast.disable(dis);
         btnWest.disable(dis);
         btnNorth.disable(dis);
+        if (btnTest!=null)
+            btnTest.disable(dis);
     }
 
     public static boolean exitManager(String msg) {
