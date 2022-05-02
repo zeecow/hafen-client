@@ -893,7 +893,7 @@ public class ZeeMiningManager extends ZeeThread{
             println("chip boulder done");
             ZeeConfig.gameUI.map.wdgmsg("sel", ZeeConfig.savedTileSelStartCoord, ZeeConfig.savedTileSelEndCoord, ZeeConfig.savedTileSelModflags);
         }else{
-            println("still chipping???");
+            println("canceled chipping boulder?");
         }
         println(">task chip_boulder off");
         ZeeConfig.removePlayerText();
@@ -964,7 +964,8 @@ public class ZeeMiningManager extends ZeeThread{
 
     private static boolean waitBoulderFinish(Gob boulder) {
         try {
-            while (ZeeClickGobManager.findGobById(boulder.id) != null) {
+            ZeeConfig.lastMapViewClickButton = 2;
+            while (!ZeeConfig.isTaskCanceledByGroundClick() && ZeeClickGobManager.findGobById(boulder.id) != null) {
                 //println("gob still exist > "+ZeeClickGobManager.findGobById(boulder.id));
                 Thread.sleep(PING_MS);//sleep 1s
             }
