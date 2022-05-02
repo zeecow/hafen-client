@@ -1193,7 +1193,7 @@ public class ZeeClickGobManager extends ZeeThread{
         return gobNameEndsWith(
             gobName,
             "/stallion,/mare,/foal,/hog,/sow,/piglet,"
-            +"/goat,/nanny,/kid,/sheep,/lamb,/cattle,/calf,"
+            +"/billy,/nanny,/kid,/sheep,/lamb,/cattle,/calf,"
             +"/wildhorse,/aurochs,/mouflon,/wildgoat,"
             +"/adder,/badger,/bear,/boar,/beaver,/deer,/reindeer,/fox,"
             +"/seal,/otter,/caveangler,/boreworm,/caverat,"
