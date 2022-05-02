@@ -415,6 +415,10 @@ public class ZeeMiningManager extends ZeeThread{
     }
 
     private void taskMineAreaNextSubtask(){
+        if (!mining){
+            println("mining == false, next task cancelled");
+            return;
+        }
         println("next subtask");
         if (currentSubTask!=null && currentSubTask.isAlive())
             currentSubTask.interrupt();
@@ -423,6 +427,14 @@ public class ZeeMiningManager extends ZeeThread{
             currentSubTask.start();
         }
         println("   arraySubTasks = "+(arraySubTasks==null ? "null" : arraySubTasks.size()));
+    }
+
+    private void taskMineAreaStopAll(){
+        println("taskMineAreaStop > removing subtasks");
+        if (currentSubTask!=null && currentSubTask.isAlive())
+            currentSubTask.interrupt();
+        if(arraySubTasks!=null)
+            arraySubTasks.clear();
     }
 
     private boolean taskMineArea_old() throws Exception{
@@ -920,9 +932,11 @@ public class ZeeMiningManager extends ZeeThread{
                     waitCursor(ZeeConfig.CURSOR_ARW);
                     ZeeConfig.clickGroundZero(1);//click ground to stop mining?
                     ZeeThread.staminaMonitorStop();//case stam monitor thread is running
+                    manager.taskMineAreaStopAll();
                     manager.interrupt();
                     ZeeConfig.resetTileSelection();
                     ZeeConfig.removePlayerText();
+
                 }catch (Exception e){
                     e.printStackTrace();
                 }
