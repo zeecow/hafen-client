@@ -351,10 +351,19 @@ public class ZeeMiningManager extends ZeeThread{
         List<Gob> terobjs;
         Gob closestStone;
         Inventory inv = ZeeConfig.getMainInventory();
+
+        //check if inventory stones are enough
         List<WItem> invItems = new LinkedList<>(inv.children(WItem.class));
-        invItems.removeIf(wItem -> !ZeeConfig.mineablesStone.contains(wItem.item.getres().basename()));
+        invItems.removeIf(item -> {
+            String name = item.item.getres().basename();
+            if (useOreForColumns && "leadglance,cassiterite,chalcopyrite,cinnabar,malachite".contains(name))
+                return false;
+            return !ZeeConfig.mineablesStone.contains(name);
+        });
         if (invItems.size() >= wantedStones)
             return true;
+
+        // if not enough stones, equip sack(s)
         if(inv.getNumberOfFreeSlots() < wantedStones){
             WItem sack = ZeeClickItemManager.getSackFromBelt();//1st sack
             if (sack!=null) {
@@ -370,15 +379,16 @@ public class ZeeMiningManager extends ZeeThread{
             }
             waitNotHoldingItem();
         }
+
+        //loop pickup stone types until total reached
         int invStones = invItems.size();
         while (mining  &&  invStones<wantedStones && inv.getNumberOfFreeSlots()!=0) {
             terobjs = ZeeConfig.findGobsByNameContains("gfx/terobjs/items/");
-            //filter column stone types
-            terobjs.removeIf(item -> {
+            terobjs.removeIf(item -> {//filter column stone types
                 String name = item.getres().basename();
                 if (useOreForColumns && "leadglance,cassiterite,chalcopyrite,cinnabar,malachite".contains(name))
-                    return true;
-                return !ZeeConfig.mineablesStone.contains(item.getres().basename());
+                    return false;
+                return !ZeeConfig.mineablesStone.contains(name);
             });
             if (terobjs.size() == 0)
                 break; //no stones to pick, end loop

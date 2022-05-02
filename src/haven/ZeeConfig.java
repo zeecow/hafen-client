@@ -152,7 +152,7 @@ public class ZeeConfig {
             "gabbro","corund","kyanite","mica","microlite","orthoclase","soapstone",
             "sodalite","olivine","alabaster","breccia","diabase","arkose",
             "diorite","slate","arkose","eclogite","jasper","greenschist","pegmatite",
-            "ilmenite","rhyolite","pumice"
+            "rhyolite","pumice"
     ));
     public final static Set<String> mineablesOre = new HashSet<String>(Arrays.asList(
             "cassiterite","chalcopyrite","malachite","ilmenite","cinnabar",

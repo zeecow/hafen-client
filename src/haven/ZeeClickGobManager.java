@@ -31,12 +31,13 @@ public class ZeeClickGobManager extends ZeeThread{
         isGroundClick = (gob==null);
         gobName = isGroundClick ? "" : gob.getres().name;
         ZeeConfig.getMainInventory();
-        //println(clickDiffMs+"ms > "+gobName + (isGroundClick ? mc : " dist="+ZeeConfig.distanceToPlayer(gob)));
     }
 
     public static void checkMidClickGob(Coord pc, Coord2d mc, Gob gob, String gobName) {
 
         clickDiffMs = clickEndMs - clickStartMs;
+
+        //println(clickDiffMs+"ms > "+gobName + " dist="+ZeeConfig.distanceToPlayer(gob));
 
         if (isLongMidClick()) {
             /*
