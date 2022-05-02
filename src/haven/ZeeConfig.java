@@ -1672,7 +1672,6 @@ public class ZeeConfig {
     public static boolean isPlayerSharingGobCoord(String gobNameContains){
         Gob g = getClosestGobName(gobNameContains);
         if (g==null) {
-            println("isPlayerSharingGobCoord > gob null");
             return false;
         }
         return isPlayerSharingGobCoord(g);
