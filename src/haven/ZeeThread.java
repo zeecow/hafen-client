@@ -152,7 +152,7 @@ public class ZeeThread  extends Thread{
                 Thread.sleep(SLEEP_MS);
             }
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            //e.printStackTrace();
         }
         staminaMonitorStop();
         //println("waitPlayerIdleFor ret "+(timer<=0));

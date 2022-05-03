@@ -411,6 +411,7 @@ public class ZeeMiningManager extends ZeeThread{
 
 
         //start first subtask
+        mining = true;
         taskMineAreaNextSubtask();
     }
 
@@ -420,9 +421,9 @@ public class ZeeMiningManager extends ZeeThread{
             return;
         }
         println("next subtask");
-        if (currentSubTask!=null && currentSubTask.isAlive())
+        if (currentSubTask != null && currentSubTask.isAlive())
             currentSubTask.interrupt();
-        if (arraySubTasks!=null && arraySubTasks.size()>0){
+        if (arraySubTasks != null && arraySubTasks.size() > 0) {
             currentSubTask = arraySubTasks.remove(0);
             currentSubTask.start();
         }
