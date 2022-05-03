@@ -71,8 +71,7 @@ public class ZeeManagerItemClick extends ZeeThread{
             if (isCheeseTrayFill()){
                 fillUpCheeseTray();
                 return;
-            }else
-                println("nope");
+            }
 
             // sort-transfer
             if(!isItemWindowBelt() && !isItemWindowEquips()){
