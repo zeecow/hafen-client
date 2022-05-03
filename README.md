@@ -50,6 +50,7 @@ features:
    - pick-up all
    - quick-equip from belt
    - seed-planting cursor
+   - while holding cheese-curd will fill up cheese-tray item
  - long midclick item
    - sort-transfer item descending(?)
    - show context menu for various items (details below)

@@ -327,7 +327,7 @@ public class ZeeManagerFarmer extends ZeeThread{
     public static boolean activateCursorPlantGItem(GItem gi) {
         //haven.GItem@3a68ee9c ; iact ; [(23, 16), 1]
         //println("activateCursorPlantGItem > "+gi+", seeds = "+getSeedsAmount(gi));
-        ZeeManagerItemClick.gItemAct(gi, UI.MOD_SHIFT);
+        ZeeManagerItemClick.gItemActCoord(gi, UI.MOD_SHIFT);
         return waitCursor(ZeeConfig.CURSOR_HARVEST);
     }
 

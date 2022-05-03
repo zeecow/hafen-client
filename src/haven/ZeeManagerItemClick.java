@@ -67,6 +67,13 @@ public class ZeeManagerItemClick extends ZeeThread{
                 return;
             }
 
+            //cheese-tray
+            if (isCheeseTrayFill()){
+                fillUpCheeseTray();
+                return;
+            }else
+                println("nope");
+
             // sort-transfer
             if(!isItemWindowBelt() && !isItemWindowEquips()){
                 if(transferWindowOpen()) { //avoid belt transfer?
@@ -79,7 +86,7 @@ public class ZeeManagerItemClick extends ZeeThread{
                     //no transfer window open
                     if(isItemWindowName("Inventory") && isItemPlantable()){
                         //activate farming area cursor
-                        itemAct(wItem,UI.MOD_SHIFT);
+                        itemActCoord(wItem,UI.MOD_SHIFT);
                     }
                 }
             }
@@ -268,6 +275,19 @@ public class ZeeManagerItemClick extends ZeeThread{
             //throw new RuntimeException(e);
             e.printStackTrace();
         }
+    }
+
+    private void fillUpCheeseTray() throws InterruptedException {
+        // shift+click cheesetray 4 times
+        for (int i = 0; i <4; i++) {
+            itemAct(wItem, UI.MOD_SHIFT);
+            sleep(PING_MS);
+        }
+    }
+
+    private boolean isCheeseTrayFill() {
+        return itemName.contains("/cheesetray")
+            && getHoldingItemName().contains("/curd");
     }
 
 
@@ -486,7 +506,7 @@ public class ZeeManagerItemClick extends ZeeThread{
 
                         //butch item and wait inventory changes
                         changeMs = now();
-                        itemAct(item);
+                        itemActCoord(item);
                         while (changeMs > ZeeConfig.lastInvItemMs) {
                             sleep(PING_MS);
                         }
@@ -502,7 +522,7 @@ public class ZeeManagerItemClick extends ZeeThread{
                             //butch "-clean" item and wait inventory changes
                             //println("last butch 2> "+itemName);
                             changeMs = now();
-                            itemAct(item);
+                            itemActCoord(item);
                             while (changeMs > ZeeConfig.lastInvItemMs) {
                                 sleep(PING_MS);
                             }
@@ -532,7 +552,7 @@ public class ZeeManagerItemClick extends ZeeThread{
                     if (!butchAll && (itemName.endsWith("-clean") || itemName.endsWith("-cleaned"))) {
                         //println("last butch > " + itemName);
                         changeMs = now();
-                        itemAct(item);
+                        itemActCoord(item);
                         while (changeMs > ZeeConfig.lastInvItemMs) {
                             sleep(PING_MS);
                         }
@@ -583,7 +603,7 @@ public class ZeeManagerItemClick extends ZeeThread{
     }
 
 
-    private boolean showItemFlowerMenu(){
+    public boolean showItemFlowerMenu(){
 
         if (!isLongClick())
             return false;
@@ -664,7 +684,7 @@ public class ZeeManagerItemClick extends ZeeThread{
                     ZeeConfig.removeGobText(ZeeConfig.getPlayerGob());
                     return itemsClicked;
                 }
-                itemAct(w);
+                itemActCoord(w);
                 if(waitFlowerMenu()){
                     choosePetal(getFlowerMenu(), petalName);
                     itemsClicked++;
@@ -686,12 +706,20 @@ public class ZeeManagerItemClick extends ZeeThread{
     public static void itemAct(WItem item){
         itemAct(item, item.ui.modflags());
     }
-
     public static void itemAct(WItem item, int modflags){
         gItemAct(item.item, modflags);
     }
-
     public static void gItemAct(GItem item, int modflags){
+        item.wdgmsg("itemact", modflags);
+    }
+
+    public static void itemActCoord(WItem item){
+        itemActCoord(item, item.ui.modflags());
+    }
+    public static void itemActCoord(WItem item, int modflags){
+        gItemActCoord(item.item, modflags);
+    }
+    public static void gItemActCoord(GItem item, int modflags){
         item.wdgmsg("iact", item.c.div(2), modflags);
     }
 
@@ -731,7 +759,7 @@ public class ZeeManagerItemClick extends ZeeThread{
             println(">clickItemPetal wItem null");
             return false;
         }
-        itemAct(wItem);
+        itemActCoord(wItem);
         if(waitFlowerMenu()){
             choosePetal(getFlowerMenu(), petalName);
             return waitNoFlowerMenu();
