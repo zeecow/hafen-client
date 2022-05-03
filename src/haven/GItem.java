@@ -171,7 +171,7 @@ public class GItem extends AWidget implements ItemInfo.SpriteOwner, GSprite.Owne
 
 		if (curs != null && curs.name.equals(ZeeConfig.CURSOR_MINE)) {
 			//drop mined item
-			ZeeMiningManager.lastDropItemMs = System.currentTimeMillis();
+			ZeeManagerMiner.lastDropItemMs = System.currentTimeMillis();
 			if (ZeeConfig.dropMinedStones && ZeeConfig.mineablesStone.contains(basename) ||
 					ZeeConfig.dropMinedOre && ZeeConfig.mineablesOre.contains(basename) ||
 					ZeeConfig.dropMinedSilverGold && ZeeConfig.mineablesOrePrecious.contains(basename) ||
@@ -181,7 +181,7 @@ public class GItem extends AWidget implements ItemInfo.SpriteOwner, GSprite.Owne
 			}
 		}
 		else if( ZeeConfig.farmerMode ) {
-			if(ZeeSeedFarmingManager.busy) {
+			if(ZeeManagerFarmer.busy) {
 				//drop non-seed crops
 				if (!basename.startsWith("seed-") && ZeeConfig.isItemCrop(basename)) {
 					this.wdgmsg("drop", Coord.z);
@@ -193,11 +193,11 @@ public class GItem extends AWidget implements ItemInfo.SpriteOwner, GSprite.Owne
 					//cancel farmermode
 					ZeeConfig.println("seedfarmer > no tile selection, reset initial state");
 					//ZeeConfig.farmerMode = false; //TODO test
-					ZeeSeedFarmingManager.resetInitialState();
+					ZeeManagerFarmer.resetInitialState();
 				}
 				else {
 					//start farmermode
-					new ZeeSeedFarmingManager(this, basename).start();
+					new ZeeManagerFarmer(this, basename).start();
 				}
 			}
 		}

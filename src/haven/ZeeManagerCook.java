@@ -3,7 +3,7 @@ package haven;
 import java.util.HashSet;
 import java.util.Set;
 
-public class ZeeCookManager extends ZeeThread{
+public class ZeeManagerCook extends ZeeThread{
 
     static boolean busy;
     static boolean pepperRecipeOpen;
@@ -12,19 +12,19 @@ public class ZeeCookManager extends ZeeThread{
     static ZeeWindow.ZeeButton cookButton;
 
 
-    public ZeeCookManager(){
+    public ZeeManagerCook(){
         busy = true;
         cookButton.disable(true);
     }
 
     public static void pepperRecipeOpened(Window window) {
-        ZeeCookManager.pepperRecipeOpen = true;
+        ZeeManagerCook.pepperRecipeOpen = true;
         cookButton = new ZeeWindow.ZeeButton(UI.scale(85),"auto-cook"){
             public void wdgmsg(String msg, Object... args) {
                 super.wdgmsg(msg, args);
                 if (msg.equals("activate")){
                     if (!busy)
-                        new ZeeCookManager().start();
+                        new ZeeManagerCook().start();
                 }
             }
         };
@@ -55,12 +55,12 @@ public class ZeeCookManager extends ZeeThread{
                             continue;
                         ZeeConfig.addPlayerText("fetch barrel");
                         barrelCoord = ZeeConfig.getCoordGob(gobBarrel);
-                        ZeeClickGobManager.liftGob(gobBarrel);
+                        ZeeManagerGobClick.liftGob(gobBarrel);
 
                         if(!busy)
                             continue;
                         ZeeConfig.addPlayerText("fill up caldron");
-                        ZeeClickGobManager.gobClick(gobCauldron,3);
+                        ZeeManagerGobClick.gobClick(gobCauldron,3);
                         waitPlayerIdleFor(1);
 
                         if(!busy)
@@ -72,7 +72,7 @@ public class ZeeCookManager extends ZeeThread{
                         if(!busy)
                             continue;
                         ZeeConfig.addPlayerText("open cauldron");
-                        ZeeClickGobManager.clickGobPetal(gobCauldron,"Open");
+                        ZeeManagerGobClick.clickGobPetal(gobCauldron,"Open");
                         //waitNoFlowerMenu();
                         waitPlayerIdleFor(1);
 
@@ -81,7 +81,7 @@ public class ZeeCookManager extends ZeeThread{
                                 continue;
                             ZeeConfig.addPlayerText("open containers");
                             gobsContainers.forEach(gob -> {
-                                ZeeClickGobManager.gobClick(gob, 3);
+                                ZeeManagerGobClick.gobClick(gob, 3);
                                 try {Thread.sleep(PING_MS);} catch(InterruptedException e){e.printStackTrace();}
                             });
                         }else{
@@ -111,7 +111,7 @@ public class ZeeCookManager extends ZeeThread{
 
         if (clickb==3 && gobName.contains("cauldron")){
             gobCauldron = gob;
-        } else if (clickb==3 && ZeeClickGobManager.isGobCookContainer(gobName)){
+        } else if (clickb==3 && ZeeManagerGobClick.isGobCookContainer(gobName)){
             //double distCauldron = ZeeConfig.distanceToPlayer(gobCauldron);
             //println("dist cauldron " + distCauldron);
             //if (distCauldron < 7) // 6.9812401343731

@@ -1755,7 +1755,7 @@ public class MapView extends PView implements DTarget, Console.Directory {
 	    if(ui.mc.isect(rootpos(), sz))
 		new Adjust(ui.mc.sub(rootpos()), 0).run();
 	    this.slot = basic.add(this.placed);
-		ZeeStockpileManager.lastGobPlaced = this;
+		ZeeManagerStockpile.lastGobPlaced = this;
 	}
 
 	private class Adjust extends Maptest {
@@ -2009,8 +2009,8 @@ public class MapView extends PView implements DTarget, Console.Directory {
 	if(button == 2) {
 	    if(((Camera)camera).click(c)) {
 		camdrag = ui.grabmouse(this);
-		ZeeClickGobManager.camAngleStart = camera.angle();
-		ZeeClickGobManager.clickStartMs = System.currentTimeMillis();
+		ZeeManagerGobClick.camAngleStart = camera.angle();
+		ZeeManagerGobClick.clickStartMs = System.currentTimeMillis();
 	    }
 	} else if((placing_l != null) && placing_l.done()) {
 	    Plob placing = placing_l.get();
@@ -2043,11 +2043,11 @@ public class MapView extends PView implements DTarget, Console.Directory {
 		camera.release();
 		camdrag.remove();
 		camdrag = null;
-		ZeeClickGobManager.camAngleEnd = camera.angle();
-		ZeeClickGobManager.clickEndMs = System.currentTimeMillis();
+		ZeeManagerGobClick.camAngleEnd = camera.angle();
+		ZeeManagerGobClick.clickEndMs = System.currentTimeMillis();
 	    }
-		ZeeClickGobManager.camAngleDiff = ZeeClickGobManager.camAngleEnd - ZeeClickGobManager.camAngleStart;
-		if(ZeeClickGobManager.camAngleDiff == 0.0) {//avoid dragclicks
+		ZeeManagerGobClick.camAngleDiff = ZeeManagerGobClick.camAngleEnd - ZeeManagerGobClick.camAngleStart;
+		if(ZeeManagerGobClick.camAngleDiff == 0.0) {//avoid dragclicks
 			//start midclick gob manager at Click.hit()
 			new Click(c, button).run();
 		}
@@ -2359,9 +2359,9 @@ public class MapView extends PView implements DTarget, Console.Directory {
 		super.wdgmsg(msg, args);
 		if (ZeeConfig.pilerMode) {
 			if (msg.equals("place"))
-				ZeeStockpileManager.checkWdgmsgPilePlacing();
+				ZeeManagerStockpile.checkWdgmsgPilePlacing();
 			else if (msg.equals("itemact"))
-				ZeeStockpileManager.checkWdgmsgPileExists();
+				ZeeManagerStockpile.checkWdgmsgPileExists();
 		}
 	}
 }

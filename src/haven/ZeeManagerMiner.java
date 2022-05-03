@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-public class ZeeMiningManager extends ZeeThread{
+public class ZeeManagerMiner extends ZeeThread{
 
     public static final String TASK_CHIP_BOULDER = "TASK_CHIP_BOULDER";
     public static final String TASK_MINE_AREA = "TASK_MINE_AREA";
@@ -22,7 +22,7 @@ public class ZeeMiningManager extends ZeeThread{
     public static boolean mining;
     public static boolean isChipBoulder;
     public static Gob gobBoulder;
-    public static ZeeMiningManager manager;
+    public static ZeeManagerMiner manager;
     static ZeeWindow windowManager;
     static ZeeWindow.ZeeButton btnNorth, btnSouth, btnWest, btnEast, btnDig, btnTest;
     static MCache.Overlay ol;
@@ -30,11 +30,11 @@ public class ZeeMiningManager extends ZeeThread{
     static String lastDir = "";
     static Coord upperLeft;
 
-    public ZeeMiningManager(String task){
+    public ZeeManagerMiner(String task){
         this.task = task;
     }
 
-    public ZeeMiningManager(String task, Gob gob){
+    public ZeeManagerMiner(String task, Gob gob){
         this.task = task;
         this.gobBoulder = gob;
     }
@@ -664,14 +664,14 @@ public class ZeeMiningManager extends ZeeThread{
 
         // if not enough stones, equip sack(s)
         if(inv.getNumberOfFreeSlots() < wantedStones){
-            WItem sack = ZeeClickItemManager.getSackFromBelt();//1st sack
+            WItem sack = ZeeManagerItemClick.getSackFromBelt();//1st sack
             if (sack!=null) {
-                Thread t = new ZeeClickItemManager(sack);
+                Thread t = new ZeeManagerItemClick(sack);
                 t.start();
                 t.join();//wait equip sack
-                sack = ZeeClickItemManager.getSackFromBelt();//2nd sack
+                sack = ZeeManagerItemClick.getSackFromBelt();//2nd sack
                 if(inv.getNumberOfFreeSlots()<wantedStones && sack!=null){
-                    t = new ZeeClickItemManager(sack);
+                    t = new ZeeManagerItemClick(sack);
                     t.start();
                     t.join();//wait equip 2nd sack
                 }
@@ -699,7 +699,7 @@ public class ZeeMiningManager extends ZeeThread{
                 return false;
             }
             //println("clicking closestStone "+closestStone.getres().basename());
-            ZeeClickGobManager.gobClick(closestStone,3,UI.MOD_SHIFT);//pick all
+            ZeeManagerGobClick.gobClick(closestStone,3,UI.MOD_SHIFT);//pick all
             if(!waitInvIdleMs(1000)){
                 return exitManager("couldn't reach stone (timeout)");
             }
@@ -823,7 +823,7 @@ public class ZeeMiningManager extends ZeeThread{
             btnDig = windowManager.add(new ZeeWindow.ZeeButton(UI.scale(60),"dig"){
                 public void wdgmsg(String msg, Object... args) {
                     if(msg.equals("activate")){
-                        new ZeeMiningManager(TASK_MINE_AREA).start();
+                        new ZeeManagerMiner(TASK_MINE_AREA).start();
                     }
                 }
             }, 120,5);
@@ -834,7 +834,7 @@ public class ZeeMiningManager extends ZeeThread{
                 btnTest = windowManager.add(new ZeeWindow.ZeeButton(UI.scale(80), "test") {
                     public void wdgmsg(String msg, Object... args) {
                         if (msg.equals("activate")) {
-                            new ZeeMiningManager(TASK_TEST).start();
+                            new ZeeManagerMiner(TASK_TEST).start();
                         }
                     }
                 }, 120, 35);
@@ -887,7 +887,7 @@ public class ZeeMiningManager extends ZeeThread{
         ZeeConfig.clickRemoveCursor();
         waitCursor(ZeeConfig.CURSOR_ARW);
         sleep(1000);//wait boulder clickable
-        ZeeClickGobManager.clickGobPetal(gobBoulder,"Chip stone");//chip boulder
+        ZeeManagerGobClick.clickGobPetal(gobBoulder,"Chip stone");//chip boulder
         sleep(100);
         ZeeConfig.cursorChange(ZeeConfig.ACT_MINE);//restore mining icon for autodrop
         if(waitBoulderFinish(gobBoulder)){
@@ -909,7 +909,7 @@ public class ZeeMiningManager extends ZeeThread{
             if(ZeeConfig.distanceToPlayer(gob) < DIST_BOULDER){
                 if(isCombatActive()) // cancel if combat active
                     return;
-                new ZeeMiningManager(TASK_CHIP_BOULDER, gob).start();
+                new ZeeManagerMiner(TASK_CHIP_BOULDER, gob).start();
             }
         }
     }
@@ -953,7 +953,7 @@ public class ZeeMiningManager extends ZeeThread{
                 println(">chipBoulder couldn't change cursor to arrow");
                 return false;
             }
-            ZeeClickGobManager.clickGobPetal(boulder, "Chip stone");//chip boulder
+            ZeeManagerGobClick.clickGobPetal(boulder, "Chip stone");//chip boulder
             waitNoFlowerMenu();
             ZeeConfig.cursorChange(ZeeConfig.ACT_MINE);//restore mining icon for autodrop
             return waitBoulderFinish(boulder);
@@ -966,14 +966,14 @@ public class ZeeMiningManager extends ZeeThread{
     private static boolean waitBoulderFinish(Gob boulder) {
         try {
             ZeeConfig.lastMapViewClickButton = 2;
-            while (!ZeeConfig.isTaskCanceledByGroundClick() && ZeeClickGobManager.findGobById(boulder.id) != null) {
+            while (!ZeeConfig.isTaskCanceledByGroundClick() && ZeeManagerGobClick.findGobById(boulder.id) != null) {
                 //println("gob still exist > "+ZeeClickGobManager.findGobById(boulder.id));
                 Thread.sleep(PING_MS);//sleep 1s
             }
         }catch (Exception e){
             e.printStackTrace();
         }
-        return (ZeeClickGobManager.findGobById(boulder.id) == null);
+        return (ZeeManagerGobClick.findGobById(boulder.id) == null);
     }
 
 

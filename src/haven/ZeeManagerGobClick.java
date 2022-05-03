@@ -3,11 +3,10 @@ package haven;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static haven.OCache.posres;
 
-public class ZeeClickGobManager extends ZeeThread{
+public class ZeeManagerGobClick extends ZeeThread{
 
     public static final int OVERLAY_ID_AGGRO = 1341;
 
@@ -24,7 +23,7 @@ public class ZeeClickGobManager extends ZeeThread{
     private static ArrayList<Gob> treesForRemoval, treelogsForDestruction;
     private static Gob currentRemovingTree, currentDestroyingTreelog;
 
-    public ZeeClickGobManager(Coord pc, Coord2d mc, Gob gobClicked) {
+    public ZeeManagerGobClick(Coord pc, Coord2d mc, Gob gobClicked) {
         coordPc = pc;
         coordMc = mc;
         gob = gobClicked;
@@ -43,7 +42,7 @@ public class ZeeClickGobManager extends ZeeThread{
             /*
                 long mid-clicks
              */
-            new ZeeClickGobManager(pc,mc,gob).start();
+            new ZeeManagerGobClick(pc,mc,gob).start();
         }
         else {
             /*
@@ -60,7 +59,7 @@ public class ZeeClickGobManager extends ZeeThread{
             } else if (isGobGroundItem(gobName)) {
                 gobClick(gob,3, UI.MOD_SHIFT);//pick up all items (shift + rclick)
                 if (ZeeConfig.pilerMode)
-                    ZeeStockpileManager.checkGroundItemClicked(gobName);
+                    ZeeManagerStockpile.checkGroundItemClicked(gobName);
             } else if (isGobFireSource(gobName)) {
                 new ZeeThread() {
                     public void run() {
@@ -76,9 +75,9 @@ public class ZeeClickGobManager extends ZeeThread{
                 }.start();
             } else if (gobName.endsWith("/barrel")) {
                 if (barrelLabelOn)
-                    ZeeSeedFarmingManager.testBarrelsTilesClear();
+                    ZeeManagerFarmer.testBarrelsTilesClear();
                 else
-                    ZeeSeedFarmingManager.testBarrelsTiles(true);
+                    ZeeManagerFarmer.testBarrelsTiles(true);
                 barrelLabelOn = !barrelLabelOn;
             } else if (gobName.endsWith("/dreca")) { // dream catcher
                 new ZeeThread() {
@@ -115,13 +114,13 @@ public class ZeeClickGobManager extends ZeeThread{
                     if (!ZeeConfig.getCursorName().equals(ZeeConfig.CURSOR_HARVEST))
                         gobClick(gob, 3, UI.MOD_SHIFT);//activate cursor harvest if needed
                 } else if (isGobStockpile(gobName) && ZeeConfig.isPlayerCarryingWheelbarrow()) {
-                    ZeeStockpileManager.unloadWheelbarrowAtStockpile(gob);
+                    ZeeManagerStockpile.unloadWheelbarrowAtStockpile(gob);
                 } else if (isGobStockpile(gobName) || gobName.endsWith("/dframe")) {
                     gobClick(gob,3, UI.MOD_SHIFT);//pick up all items (shift + rclick)
                 } else if (isGobTreeStump(gobName)) {
                     removeStump(gob);
                 } else if (ZeeConfig.isPlayerHoldingItem() && gobName.endsWith("/barrel")) {
-                    if (ZeeSeedFarmingManager.isBarrelEmpty(gob))
+                    if (ZeeManagerFarmer.isBarrelEmpty(gob))
                         gobItemAct(gob,UI.MOD_SHIFT);//shift+rclick
                     else
                         gobItemAct(gob,3);//ctrl+shift+rclick
@@ -129,7 +128,7 @@ public class ZeeClickGobManager extends ZeeThread{
                     if (ZeeConfig.isPlayerMountingHorse())
                         dismountHorse(coordMc);
                     else if (ZeeConfig.isPlayerCarryingWheelbarrow())
-                        ZeeStockpileManager.unloadWheelbarrowStockpileAtGround(coordMc.floor(posres));
+                        ZeeManagerStockpile.unloadWheelbarrowStockpileAtGround(coordMc.floor(posres));
                     else
                         println("wtf ");
                 } else if (ZeeConfig.isPlayerCarryingWheelbarrow()) {
@@ -301,14 +300,14 @@ public class ZeeClickGobManager extends ZeeThread{
             //add all aggro radius
             ZeeConfig.findGobsByNameStartsWith("gfx/kritter/").forEach(gob1 -> {
                 if (ZeeConfig.isAggressive(gob1.getres().name)) {
-                    gob1.addol(new Gob.Overlay(gob1, new ZeeGobRadius(gob1, null, ZeeConfig.aggroRadiusTiles * MCache.tilesz2.y), ZeeClickGobManager.OVERLAY_ID_AGGRO));
+                    gob1.addol(new Gob.Overlay(gob1, new ZeeGobRadius(gob1, null, ZeeConfig.aggroRadiusTiles * MCache.tilesz2.y), ZeeManagerGobClick.OVERLAY_ID_AGGRO));
                 }
             });
         }
     }
 
     private static void unloadWheelbarrowAtGob(Gob gob) {
-        ZeeStockpileManager.unloadWheelbarrowAtStockpile(gob);
+        ZeeManagerStockpile.unloadWheelbarrowAtStockpile(gob);
     }
 
     public static void dismountHorse(Coord2d coordMc) {
@@ -348,11 +347,11 @@ public class ZeeClickGobManager extends ZeeThread{
     }
 
     public static boolean pickupTorch() {
-        if (ZeeClickItemManager.pickupBeltItem("/torch")) {
+        if (ZeeManagerItemClick.pickupBeltItem("/torch")) {
             return true;
-        }else if(ZeeClickItemManager.pickupHandItem("/torch")){
+        }else if(ZeeManagerItemClick.pickupHandItem("/torch")){
             return true;
-        }else if (ZeeClickItemManager.pickUpInvItem(ZeeConfig.getMainInventory(),"/torch")){
+        }else if (ZeeManagerItemClick.pickUpInvItem(ZeeConfig.getMainInventory(),"/torch")){
             return true;
         }
         return false;
@@ -394,7 +393,7 @@ public class ZeeClickGobManager extends ZeeThread{
         }
         else if (isGobCrop(gobName)) {
             if (petalName.equals(ZeeFlowerMenu.STRPETAL_SEEDFARMER)) {
-                ZeeSeedFarmingManager.showWindow(gob);
+                ZeeManagerFarmer.showWindow(gob);
             }
             else if (petalName.equals(ZeeFlowerMenu.STRPETAL_CURSORHARVEST)) {
                 if (!ZeeConfig.getCursorName().equals(ZeeConfig.CURSOR_HARVEST))
@@ -413,7 +412,7 @@ public class ZeeClickGobManager extends ZeeThread{
             destroyTreelogs(gob,petalName);
         }
         else if (petalName.equals(ZeeFlowerMenu.STRPETAL_SHOWWINDOWMINING)) {
-            ZeeMiningManager.showWindowMining();
+            ZeeManagerMiner.showWindowMining();
         }else{
             println("chooseGobFlowerMenu > unkown case");
         }
@@ -436,7 +435,7 @@ public class ZeeClickGobManager extends ZeeThread{
                         gobClick(deadAnimal,3);
 
                         //wait inventory idle
-                        if (ZeeClickItemManager.isItemEquipped("/butcherscleaver"))
+                        if (ZeeManagerItemClick.isItemEquipped("/butcherscleaver"))
                             waitInvIdleMs(1000);
                         else
                             waitInvIdleMs(2000);
@@ -452,7 +451,7 @@ public class ZeeClickGobManager extends ZeeThread{
     }
 
     private static void destroyTreelogs(Gob firstTreelog, String petalName) {
-        if (!ZeeClickItemManager.isItemEquipped("/bonesaw") || ZeeClickItemManager.isItemEquipped("/saw-m")){
+        if (!ZeeManagerItemClick.isItemEquipped("/bonesaw") || ZeeManagerItemClick.isItemEquipped("/saw-m")){
             ZeeConfig.msg("need bone saw equipped, no metal saw");
             return;
         }
@@ -642,7 +641,7 @@ public class ZeeClickGobManager extends ZeeThread{
     }
 
     private boolean isDestroyTreelog() {
-        if(isGobTreeLog(gobName) && ZeeClickItemManager.isItemEquipped("bonesaw"))
+        if(isGobTreeLog(gobName) && ZeeManagerItemClick.isItemEquipped("bonesaw"))
             return true;
         return false;
     }
@@ -769,7 +768,7 @@ public class ZeeClickGobManager extends ZeeThread{
 
     // barrel is empty if has no overlays ("gfx/terobjs/barrel-flax")
     public static boolean isBarrelEmpty(Gob barrel){
-        return ZeeClickGobManager.getOverlayNames(barrel).isEmpty();
+        return ZeeManagerGobClick.getOverlayNames(barrel).isEmpty();
     }
 
     private static void removeAllTrellisPlants(Gob firstPlant) {
@@ -808,7 +807,7 @@ public class ZeeClickGobManager extends ZeeThread{
                 ZeeConfig.addPlayerText("removing tree & stump");
             }
             waitNoFlowerMenu();
-            ZeeClickItemManager.equipAxeChopTree();
+            ZeeManagerItemClick.equipAxeChopTree();
             ZeeConfig.lastMapViewClickButton = 2;//prepare for cancel click
             while (tree!=null && !ZeeConfig.isTaskCanceledByGroundClick()) {
                 clickGobPetal(tree, "Chop");
@@ -850,7 +849,7 @@ public class ZeeClickGobManager extends ZeeThread{
     }
 
     public static void removeStump(Gob gob) {
-        ZeeClickItemManager.equipBeltItem("shovel");
+        ZeeManagerItemClick.equipBeltItem("shovel");
         waitItemEquipped("shovel");
         destroyGob(gob);
     }
@@ -869,7 +868,7 @@ public class ZeeClickGobManager extends ZeeThread{
            boolean exit = false;
            int added = 0;
            while(!exit && added<4 && branches.size() > 0){
-               if(ZeeClickItemManager.pickUpItem(branches.get(0))){
+               if(ZeeManagerItemClick.pickUpItem(branches.get(0))){
                    gobItemAct(gob,0);
                    if(waitNotHoldingItem()){
                        branches.remove(0);
@@ -901,7 +900,7 @@ public class ZeeClickGobManager extends ZeeThread{
             boolean exit = false;
             int added = 0;
             while(!exit && added<numCoal && coal.size() > 0){
-                if(ZeeClickItemManager.pickUpItem(coal.get(0))){
+                if(ZeeManagerItemClick.pickUpItem(coal.get(0))){
                     gobItemAct(gob,0);
                     if(waitNotHoldingItem()){
                         coal.remove(0);
@@ -927,11 +926,11 @@ public class ZeeClickGobManager extends ZeeThread{
     }
 
     private static void harvestOneTrellis(Gob gob) {
-        if(ZeeClickItemManager.pickupBeltItem("scythe")){
+        if(ZeeManagerItemClick.pickupBeltItem("scythe")){
             //hold scythe for user unequip it
-        }else if(ZeeClickItemManager.getLeftHandName().endsWith("scythe")){
+        }else if(ZeeManagerItemClick.getLeftHandName().endsWith("scythe")){
             //hold scythe for user unequip it
-            ZeeClickItemManager.unequipLeftItem();
+            ZeeManagerItemClick.unequipLeftItem();
         }else{
             //no scythe around, just harvest
             clickGobPetal(gob,"Harvest");
@@ -1025,20 +1024,20 @@ public class ZeeClickGobManager extends ZeeThread{
     public static void barrelTakeAllSeeds(Gob gob){
         try{
             // shift+rclick last barrel
-            ZeeClickGobManager.gobClick(gob, 3, UI.MOD_SHIFT);
+            ZeeManagerGobClick.gobClick(gob, 3, UI.MOD_SHIFT);
 
             //wait getting to the barrel
             waitPlayerIdleFor(1);
 
-            if (ZeeConfig.distanceToPlayer(gob) > ZeeSeedFarmingManager.MIN_ACCESSIBLE_DIST) {
+            if (ZeeConfig.distanceToPlayer(gob) > ZeeManagerFarmer.MIN_ACCESSIBLE_DIST) {
                 ZeeConfig.msg("barrel unreachable");
                 return;
             }
 
             ZeeConfig.addPlayerText("taking contents...");
 
-            while (!ZeeClickGobManager.isBarrelEmpty(gob) && !isInventoryFull()) {
-                ZeeClickGobManager.gobClick(gob, 3, UI.MOD_SHIFT);
+            while (!ZeeManagerGobClick.isBarrelEmpty(gob) && !isInventoryFull()) {
+                ZeeManagerGobClick.gobClick(gob, 3, UI.MOD_SHIFT);
                 Thread.sleep(PING_MS);
                 if (ZeeConfig.isTaskCanceledByGroundClick())
                     break;
@@ -1046,7 +1045,7 @@ public class ZeeClickGobManager extends ZeeThread{
 
             //if holding seed, store in barrel
             waitHoldingItem();
-            ZeeClickGobManager.gobItemAct(gob, 0);
+            ZeeManagerGobClick.gobItemAct(gob, 0);
 
             if (isInventoryFull())
                 ZeeConfig.msg("Inventory full");
@@ -1077,7 +1076,7 @@ public class ZeeClickGobManager extends ZeeThread{
 
     public static void liftGob(Gob gob) {
         if(isGobBush(gob.getres().name)) {
-            ZeeClickItemManager.equipBeltItem("shovel");
+            ZeeManagerItemClick.equipBeltItem("shovel");
             waitItemEquipped("shovel");
         }
         ZeeConfig.gameUI.menu.wdgmsg("act", "carry","0");

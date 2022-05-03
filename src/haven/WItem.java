@@ -203,8 +203,8 @@ public class WItem extends Widget implements DTarget {
 	@Override
 	public boolean mouseup(Coord c, int btn) {
 		if (btn == 2 && ZeeConfig.midclickEquipManager) {
-			ZeeClickItemManager.clickEndMs = System.currentTimeMillis();
-			new ZeeClickItemManager(this,c).start();
+			ZeeManagerItemClick.clickEndMs = System.currentTimeMillis();
+			new ZeeManagerItemClick(this,c).start();
 			return false;
 		}else if (btn==3 && ui.modshift && ZeeConfig.farmerMode) {
 			ZeeConfig.println("> disabling farmer mode, start with harvesting instead of planting");
@@ -216,7 +216,7 @@ public class WItem extends Widget implements DTarget {
 
 	// middle-click item starts equipManager
 	if(btn == 2 && ZeeConfig.midclickEquipManager) {
-		ZeeClickItemManager.clickStartMs = System.currentTimeMillis();
+		ZeeManagerItemClick.clickStartMs = System.currentTimeMillis();
 		return false;
 	}
 

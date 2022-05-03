@@ -4,7 +4,7 @@ import java.util.List;
 
 import static haven.OCache.posres;
 
-public class ZeeStockpileManager extends ZeeThread{
+public class ZeeManagerStockpile extends ZeeThread{
 
     public static final String STOCKPILE_LEAF = "gfx/terobjs/stockpile-leaf";
     public static final String STOCKPILE_BLOCK = "gfx/terobjs/stockpile-wblock";
@@ -22,7 +22,7 @@ public class ZeeStockpileManager extends ZeeThread{
     public static String lastGroundItemName;
     static boolean isGroundItems;
 
-    public ZeeStockpileManager(boolean groundItems) {
+    public ZeeManagerStockpile(boolean groundItems) {
         busy = true;
         audioExit = true;
         gameUI = ZeeConfig.gameUI;
@@ -70,8 +70,8 @@ public class ZeeStockpileManager extends ZeeThread{
 
             invLeaves = mainInv.getWItemsByName("tobacco-fresh");
             if(invLeaves.size()>0) {
-                ZeeClickItemManager.pickUpItem(invLeaves.get(0));
-                ZeeClickGobManager.gobItemAct(gobPile, UI.MOD_SHIFT);
+                ZeeManagerItemClick.pickUpItem(invLeaves.get(0));
+                ZeeManagerGobClick.gobItemAct(gobPile, UI.MOD_SHIFT);
                 waitNotHoldingItem();
             }
 
@@ -83,13 +83,13 @@ public class ZeeStockpileManager extends ZeeThread{
                 }
                 closestLeaf = ZeeConfig.getClosestGob(leaves);
                 if (closestLeaf != null) {
-                    ZeeClickGobManager.gobClick(closestLeaf, 3, UI.MOD_SHIFT);
+                    ZeeManagerGobClick.gobClick(closestLeaf, 3, UI.MOD_SHIFT);
                     waitPlayerIdleFor(1);
                     if (!ZeeConfig.isPlayerHoldingItem()) {
                         invLeaves = mainInv.getWItemsByName("tobacco-fresh");
-                        ZeeClickItemManager.pickUpItem(invLeaves.get(0));
+                        ZeeManagerItemClick.pickUpItem(invLeaves.get(0));
                     }
-                    ZeeClickGobManager.gobItemAct(gobPile, UI.MOD_SHIFT);
+                    ZeeManagerGobClick.gobItemAct(gobPile, UI.MOD_SHIFT);
                     waitPlayerIdleFor(1);
                     if(ZeeConfig.isPlayerHoldingItem()){
                         exitManager("pileGroundItems() > stockpile full");
@@ -122,7 +122,7 @@ public class ZeeStockpileManager extends ZeeThread{
         ZeeConfig.addGobText(gobSource,"source");
 
         //start collection from source
-        if( gobSource==null || !ZeeClickGobManager.clickGobPetal(gobSource, lastPetalName) ){
+        if( gobSource==null || !ZeeManagerGobClick.clickGobPetal(gobSource, lastPetalName) ){
             println("no more source? gobSource0 = "+gobSource);
             pileAndExit();
             return;
@@ -148,7 +148,7 @@ public class ZeeStockpileManager extends ZeeThread{
                     //no inventory items, try getting more from source
                     if(!busy)
                         continue;
-                    if( gobSource==null || !ZeeClickGobManager.clickGobPetal(gobSource, lastPetalName) ){
+                    if( gobSource==null || !ZeeManagerGobClick.clickGobPetal(gobSource, lastPetalName) ){
                         println("no more source? gobSource1 = "+gobSource);
                         pileAndExit();
                     }
@@ -158,8 +158,8 @@ public class ZeeStockpileManager extends ZeeThread{
                     continue;
                 WItem wItem = invItems.get(0);
                 String itemName = wItem.item.getres().name;
-                if (ZeeClickItemManager.pickUpItem(wItem)) { //pickup inv item
-                    ZeeClickGobManager.gobItemAct(gobPile, UI.MOD_SHIFT);//right click stockpile
+                if (ZeeManagerItemClick.pickUpItem(wItem)) { //pickup inv item
+                    ZeeManagerGobClick.gobItemAct(gobPile, UI.MOD_SHIFT);//right click stockpile
                     if (waitNotHoldingItem()) {//piling successfull
                         sleep(1000);//wait inv transfer to stockpile
                         if (mainInv.getWItemsByName(itemName).size() > 0)
@@ -167,7 +167,7 @@ public class ZeeStockpileManager extends ZeeThread{
                         if(!busy)
                             continue;
                         //try getting more from source
-                        if( gobSource==null || !ZeeClickGobManager.clickGobPetal(gobSource, lastPetalName) ){
+                        if( gobSource==null || !ZeeManagerGobClick.clickGobPetal(gobSource, lastPetalName) ){
                             println("gob source consumed = "+gobSource);
                             pileAndExit();
                         }
@@ -184,7 +184,7 @@ public class ZeeStockpileManager extends ZeeThread{
                 if(!busy)
                     continue;
                 String itemName = gameUI.vhand.item.getres().name;
-                ZeeClickGobManager.gobItemAct(gobPile, UI.MOD_SHIFT);//right click stockpile
+                ZeeManagerGobClick.gobItemAct(gobPile, UI.MOD_SHIFT);//right click stockpile
                 if(waitNotHoldingItem()) {
                     sleep(1000);
                     //check if pile full
@@ -193,7 +193,7 @@ public class ZeeStockpileManager extends ZeeThread{
                     if (!busy)
                         continue;
                     //check if tree still have leafs
-                    if (gobSource == null || !ZeeClickGobManager.clickGobPetal(gobSource, lastPetalName)) {
+                    if (gobSource == null || !ZeeManagerGobClick.clickGobPetal(gobSource, lastPetalName)) {
                         println("no more source? gobSource3 = " + gobSource);
                         pileAndExit();
                         return;
@@ -246,7 +246,7 @@ public class ZeeStockpileManager extends ZeeThread{
             show = true;
         else if (pileGobName.equals(STOCKPILE_BOARD) && ZeeConfig.lastInvItemBaseName.contains("board-"))
             show = true;
-        else if (pileGobName.equals(STOCKPILE_STONE) && ZeeMiningManager.isBoulder(gobSource))
+        else if (pileGobName.equals(STOCKPILE_STONE) && ZeeManagerMiner.isBoulder(gobSource))
             show = true;
 
         if(show)
@@ -285,7 +285,7 @@ public class ZeeStockpileManager extends ZeeThread{
             wdg = windowManager.add(new ZeeWindow.ZeeButton(UI.scale(75),"auto pile"){
                 public void wdgmsg(String msg, Object... args) {
                     if(msg.equals("activate")){
-                        new ZeeStockpileManager(groundItems).start();
+                        new ZeeManagerStockpile(groundItems).start();
                     }
                 }
             }, 5,5);
@@ -328,8 +328,8 @@ public class ZeeStockpileManager extends ZeeThread{
                 return;//inv has no more items
             }
             WItem wItem = invItems.get(0);
-            if (ZeeClickItemManager.pickUpItem(wItem)) { //pickup source item
-                ZeeClickGobManager.gobItemAct(gobPile, UI.MOD_SHIFT);//shift+right click stockpile
+            if (ZeeManagerItemClick.pickUpItem(wItem)) { //pickup source item
+                ZeeManagerGobClick.gobItemAct(gobPile, UI.MOD_SHIFT);//shift+right click stockpile
                 if (!waitNotHoldingItem()) {
                     exitManager("pileItems > pile full?");
                 }
@@ -337,7 +337,7 @@ public class ZeeStockpileManager extends ZeeThread{
                 exitManager("pileItems > couldn't pickup item?");
             }
         } else if (gobPile!=null){
-            ZeeClickGobManager.gobItemAct(gobPile, UI.MOD_SHIFT);//shift+right click stockpile
+            ZeeManagerGobClick.gobItemAct(gobPile, UI.MOD_SHIFT);//shift+right click stockpile
         }
     }
 
@@ -360,10 +360,10 @@ public class ZeeStockpileManager extends ZeeThread{
             if (!ZeeConfig.isPlayerCarryingWheelbarrow()){
                 Gob wb = ZeeConfig.getClosestGobName("gfx/terobjs/vehicle/wheelbarrow");
                 //activate wheelbarrow
-                ZeeClickGobManager.gobClick(wb, 3);
+                ZeeManagerGobClick.gobClick(wb, 3);
                 sleep(500);
                 //use wheelbarrow on stockpile
-                ZeeClickGobManager.gobClick(gobStockpile, 3);
+                ZeeManagerGobClick.gobClick(gobStockpile, 3);
             }else
                 ZeeConfig.msg("couldn't drop wheelbarrow");
         }catch (Exception e){
@@ -391,7 +391,7 @@ public class ZeeStockpileManager extends ZeeThread{
             if (!ZeeConfig.isPlayerCarryingWheelbarrow()) {
                 Gob wb = ZeeConfig.getClosestGobName("gfx/terobjs/vehicle/wheelbarrow");
                 //activate wheelbarrow
-                ZeeClickGobManager.gobClick(wb, 3);
+                ZeeManagerGobClick.gobClick(wb, 3);
                 sleep(500);
                 //use wheelbarrow at stockpile
                 ZeeConfig.clickCoord(mcFloorPosres, 3);

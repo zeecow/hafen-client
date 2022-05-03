@@ -178,13 +178,13 @@ public class Fightview extends Widget {
 	    curava.avagob = rel.gobid;
 	}
 	current = rel;
-	if(ZeeMiningManager.mining) {
+	if(ZeeManagerMiner.mining) {
 		ZeeConfig.println(">combat relations, cancel mining");
-		ZeeMiningManager.stopMining();
+		ZeeManagerMiner.stopMining();
 	}
-	if (ZeeSeedFarmingManager.busy){
+	if (ZeeManagerFarmer.busy){
 		ZeeConfig.println(">combat relations, cancel farming");
-		ZeeSeedFarmingManager.resetInitialState();
+		ZeeManagerFarmer.resetInitialState();
 	}
     }
     

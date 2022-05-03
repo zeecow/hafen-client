@@ -8,7 +8,7 @@ import java.util.stream.Collectors;
     Mid-click auto-equips items from belt/hands.
     Drinks from vessels: waterskin, bucket.
  */
-public class ZeeClickItemManager extends ZeeThread{
+public class ZeeManagerItemClick extends ZeeThread{
 
     private final WItem wItem;
     private Coord coord;
@@ -20,14 +20,14 @@ public class ZeeClickItemManager extends ZeeThread{
     static Inventory invBelt = null;
     public static long clickStartMs, clickEndMs, clickDiffMs;
 
-    public ZeeClickItemManager(WItem wItem, Coord c) {
+    public ZeeManagerItemClick(WItem wItem, Coord c) {
         clickDiffMs = clickEndMs - clickStartMs;
         this.wItem = wItem;
         this.coord = c;
         init(wItem);
     }
 
-    public ZeeClickItemManager(WItem wItem) {
+    public ZeeManagerItemClick(WItem wItem) {
         clickDiffMs = clickEndMs - clickStartMs;
         this.wItem = wItem;
         init(wItem);
@@ -35,8 +35,8 @@ public class ZeeClickItemManager extends ZeeThread{
 
     private void init(WItem wItem) {
         equipory = ZeeConfig.windowEquipment.getchild(Equipory.class);
-        leftHandItemName = (equipory.leftHand==null ? "" : equipory.leftHand.item.getres().name);
-        rightHandItemName = (equipory.rightHand==null ? "" : equipory.rightHand.item.getres().name);
+        leftHandItemName = (getEquipory().leftHand==null ? "" : getEquipory().leftHand.item.getres().name);
+        rightHandItemName = (getEquipory().rightHand==null ? "" : getEquipory().rightHand.item.getres().name);
         try{
             itemName = wItem.item.getres().name;//clicked item, started manager
             itemBasename = wItem.item.getres().basename();
@@ -152,7 +152,7 @@ public class ZeeClickItemManager extends ZeeThread{
                         trySendItemToBelt();
                     }else if(!isLeftHandEmpty() && !isRightHandEmpty()){
                         //switch 2handed item for 2 separate items
-                        if (ZeeClickItemManager.getInvBelt().getNumberOfFreeSlots() > 0) {
+                        if (ZeeManagerItemClick.getInvBelt().getNumberOfFreeSlots() > 0) {
                             unequipLeftItem();//unequip 1st item
                             if(trySendItemToBelt()){
                                 pickUpItem();
@@ -163,7 +163,7 @@ public class ZeeClickItemManager extends ZeeThread{
                     }
                 }
                 else if(isItemWindowEquips()) {
-                    if (ZeeClickItemManager.getInvBelt().getNumberOfFreeSlots() > 0) {
+                    if (ZeeManagerItemClick.getInvBelt().getNumberOfFreeSlots() > 0) {
                         //send to belt if possible
                         pickUpItem();
                         trySendItemToBelt();
@@ -270,29 +270,38 @@ public class ZeeClickItemManager extends ZeeThread{
         }
     }
 
-    private void equipTwoSacks() {
-        pickUpItem();
-        if (isLeftHandEmpty()) {
-            equipLeftEmptyHand();
-        }else {
-            equipLeftOccupiedHand();
-            if(!trySendItemToBelt()){
-                println("equipTwoSacks() > couldnt switch left item");
-                return;
+
+    private static void equipTwoSacks(WItem sack){
+        if (sack!=null) {
+            pickUpItem(sack);
+            if (isLeftHandEmpty()) {
+                equipLeftEmptyHand();
+            } else {
+                equipLeftOccupiedHand();
+                if (!trySendItemToBelt()) {
+                    println("equipTwoSacks() > couldnt switch left item");
+                    return;
+                }
             }
-        }
-        WItem sack2 = getSackFromBelt();
-        if (sack2 != null){
-            pickUpItem(sack2);
-            if (isRightHandEmpty()) {
-                equipRightEmptyHand();
-            }else {
-                equipRightOccupiedHand();
-                if(!trySendItemToBelt()){
-                    println("equipTwoSacks() > couldnt switch right item");
+            sack = getSackFromBelt();
+            if (sack != null) {
+                pickUpItem(sack);
+                if (isRightHandEmpty()) {
+                    equipRightEmptyHand();
+                } else {
+                    equipRightOccupiedHand();
+                    if (!trySendItemToBelt()) {
+                        println("equipTwoSacks() > couldnt switch right item");
+                    }
                 }
             }
         }
+    }
+
+    public static void equipTwoSacks() {
+        WItem sack = getSackFromBelt();
+        if (sack!=null)
+            equipTwoSacks(sack);
     }
 
     public static void equiporyItemAct(String itemNameContains){
@@ -783,11 +792,11 @@ public class ZeeClickItemManager extends ZeeThread{
         if(!ZeeConfig.isPlayerHoldingItem())
             return false;
         try{
-            List<Coord> freeSlots = ZeeClickItemManager.getInvBelt().getFreeSlots();
+            List<Coord> freeSlots = ZeeManagerItemClick.getInvBelt().getFreeSlots();
             if (freeSlots.size()==0)
                 return false;//belt full
             Coord c = freeSlots.get(0);
-            ZeeClickItemManager.getInvBelt().wdgmsg("drop", c);
+            ZeeManagerItemClick.getInvBelt().wdgmsg("drop", c);
             return waitNotHoldingItem();
         }catch (Exception e){
             e.printStackTrace();
@@ -811,24 +820,24 @@ public class ZeeClickItemManager extends ZeeThread{
     /*
         equip occupied hand and wait
      */
-    private void equipLeftOccupiedHand() {
-        equipory.wdgmsg("drop", 6);
+    public static void equipLeftOccupiedHand() {
+        getEquipory().wdgmsg("drop", 6);
         waitHoldingItem();
     }
-    private void equipRightOccupiedHand() {
-        equipory.wdgmsg("drop", 7);
+    public static void equipRightOccupiedHand() {
+        getEquipory().wdgmsg("drop", 7);
         waitHoldingItem();
     }
 
     /*
         equip empty hand and wait
      */
-    private void equipLeftEmptyHand() {
-        equipory.wdgmsg("drop", 6);
+    public static void equipLeftEmptyHand() {
+        getEquipory().wdgmsg("drop", 6);
         waitNotHoldingItem();
     }
-    private void equipRightEmptyHand() {
-        equipory.wdgmsg("drop", 7);
+    public static void equipRightEmptyHand() {
+        getEquipory().wdgmsg("drop", 7);
         waitNotHoldingItem();
     }
 
@@ -840,12 +849,12 @@ public class ZeeClickItemManager extends ZeeThread{
         return waitNotHoldingItem();
     }
 
-    private boolean isLeftHandEmpty() {
-        return (equipory.leftHand==null);
+    public static boolean isLeftHandEmpty() {
+        return (getEquipory().leftHand==null);
     }
 
-    private boolean isRightHandEmpty() {
-        return (equipory.rightHand==null);
+    public static boolean isRightHandEmpty() {
+        return (getEquipory().rightHand==null);
     }
 
 
@@ -858,16 +867,16 @@ public class ZeeClickItemManager extends ZeeThread{
     }
 
     public static boolean unequipLeftItem() {
-        if(equipory.leftHand==null)
+        if(getEquipory().leftHand==null)
             return true;
-        equipory.leftHand.item.wdgmsg("take", new Coord(equipory.leftHand.sz.x/2, equipory.leftHand.sz.y/2));
+        getEquipory().leftHand.item.wdgmsg("take", new Coord(getEquipory().leftHand.sz.x/2, getEquipory().leftHand.sz.y/2));
         return waitHoldingItem();
     }
 
     public static boolean unequipRightItem() {
-        if(equipory.rightHand==null)
+        if(getEquipory().rightHand==null)
             return true;
-        equipory.rightHand.item.wdgmsg("take", new Coord(equipory.rightHand.sz.x/2, equipory.rightHand.sz.y/2));
+        getEquipory().rightHand.item.wdgmsg("take", new Coord(getEquipory().rightHand.sz.x/2, getEquipory().rightHand.sz.y/2));
         return waitHoldingItem();
     }
 
@@ -1027,11 +1036,11 @@ public class ZeeClickItemManager extends ZeeThread{
     }
 
     public static void equipBeltItem(String name) {
-        if(ZeeClickItemManager.isItemEquipped(name))
+        if(ZeeManagerItemClick.isItemEquipped(name))
             return;
-        WItem item = ZeeClickItemManager.getBeltWItem(name);
+        WItem item = ZeeManagerItemClick.getBeltWItem(name);
         if (item!=null)
-            new ZeeClickItemManager(item).start();//use equipManager logic
+            new ZeeManagerItemClick(item).start();//use equipManager logic
         else
             println("itemManager.equipBeltItem() > item '"+name+"' not found");
     }

@@ -333,7 +333,7 @@ public class Inventory extends Widget implements DTarget {
 
 	public WItem getItemBySlotCoord(Coord c) {
 		for (WItem item : this.children(WItem.class)) {
-			if (c.compareTo(ZeeClickItemManager.getWItemCoord(item)) == 0) {
+			if (c.compareTo(ZeeManagerItemClick.getWItemCoord(item)) == 0) {
 				return item;
 			}
 		}

@@ -3,7 +3,7 @@ package haven;
 import java.awt.event.KeyEvent;
 import java.util.List;
 
-public class ZeeSeedFarmingManager extends ZeeThread{
+public class ZeeManagerFarmer extends ZeeThread{
 
     public static final int MIN_ACCESSIBLE_DIST = 15;//TODO: isPlayerMountingHorse()
     public static final int MAX_BARREL_DIST = 300;
@@ -15,7 +15,7 @@ public class ZeeSeedFarmingManager extends ZeeThread{
     public static Inventory inv;
     public static boolean isHarvestDone, isPlantingDone;
     public static Window windowManager;
-    public static ZeeSeedFarmingManager manager;
+    public static ZeeManagerFarmer manager;
 
     public static boolean farmerCbReplant = Utils.getprefb("farmerCbPlant",false);
     public static int farmerTxtTilesBarrel = Utils.getprefi("farmerTxtTilesBarrel",27);
@@ -23,7 +23,7 @@ public class ZeeSeedFarmingManager extends ZeeThread{
     public static Gob farmerGobCrop;
 
 
-    public ZeeSeedFarmingManager(GItem g, String nameSeed) {
+    public ZeeManagerFarmer(GItem g, String nameSeed) {
         busy = true;
         gItem = g;
         gItemSeedBasename = nameSeed;// "seed-turnip"
@@ -92,7 +92,7 @@ public class ZeeSeedFarmingManager extends ZeeThread{
 
             //tag barrels in tile range
             if(allBarrels  ||  ZeeConfig.distanceToPlayer(gob) <= farmerTxtTilesBarrel * TILE_SIZE) {
-                if (!ZeeClickGobManager.isBarrelEmpty(gob)) {
+                if (!ZeeManagerGobClick.isBarrelEmpty(gob)) {
                     ZeeConfig.addGobText(gob, ZeeConfig.getBarrelOverlayBasename(gob));
                 }
                 ZeeConfig.addGobColor(gob, 0, 255, 0, 255);
@@ -140,8 +140,9 @@ public class ZeeSeedFarmingManager extends ZeeThread{
             /*
                 planting stage
              */
-            if(ZeeSeedFarmingManager.farmerCbReplant) {
+            if(ZeeManagerFarmer.farmerCbReplant) {
                 isPlantingDone = false;
+                ZeeManagerItemClick.equipTwoSacks();
                 while (busy && !isPlantingDone) {
                     println("> planting loop");
                     if (getTotalSeedAmount() < 5) {
@@ -221,7 +222,7 @@ public class ZeeSeedFarmingManager extends ZeeThread{
     }
 
     public static boolean isBarrelAccessible(Gob barrel) {
-        ZeeClickGobManager.gobClick(barrel, 3);
+        ZeeManagerGobClick.gobClick(barrel, 3);
         waitPlayerIdleFor(2);
         double dist = ZeeConfig.distanceToPlayer(barrel);
         return dist < MIN_ACCESSIBLE_DIST;
@@ -233,12 +234,12 @@ public class ZeeSeedFarmingManager extends ZeeThread{
             return false;
         }
         while(!isBarrelEmpty(barrel) && !isInventoryFull()){
-            ZeeClickGobManager.gobClick(barrel, 3, UI.MOD_SHIFT);
+            ZeeManagerGobClick.gobClick(barrel, 3, UI.MOD_SHIFT);
             //TODO: waitInvCHanges
             Thread.sleep(PING_MS*2);
         }
         if(waitHoldingItem(4000)) {//store remaining holding item
-            ZeeClickGobManager.gobItemAct(barrel, 0);
+            ZeeManagerGobClick.gobItemAct(barrel, 0);
             Thread.sleep(1000);
         }
         println("getSeedsFromBarrel() > holding item = "+ZeeConfig.isPlayerHoldingItem());
@@ -250,7 +251,7 @@ public class ZeeSeedFarmingManager extends ZeeThread{
         //println(">get all seed barrels");
         List<Gob> barrels = getAccessibleBarrels();
         barrels.removeIf(b -> {
-            if (ZeeClickGobManager.isBarrelEmpty(b))
+            if (ZeeManagerGobClick.isBarrelEmpty(b))
                 return true;
             if (!isBarrelSameSeeds(b, seedBaseName))
                 return true;
@@ -315,7 +316,7 @@ public class ZeeSeedFarmingManager extends ZeeThread{
         }
         Gob g = ZeeConfig.getClosestGob(plants);
         if(g!=null) {
-            ZeeClickGobManager.gobClick(g, 3, UI.MOD_SHIFT);
+            ZeeManagerGobClick.gobClick(g, 3, UI.MOD_SHIFT);
             return waitCursor(ZeeConfig.CURSOR_HARVEST);
         }else {
             //println("no gobs to shift+click");
@@ -326,7 +327,7 @@ public class ZeeSeedFarmingManager extends ZeeThread{
     public static boolean activateCursorPlantGItem(GItem gi) {
         //haven.GItem@3a68ee9c ; iact ; [(23, 16), 1]
         //println("activateCursorPlantGItem > "+gi+", seeds = "+getSeedsAmount(gi));
-        ZeeClickItemManager.gItemAct(gi, UI.MOD_SHIFT);
+        ZeeManagerItemClick.gItemAct(gi, UI.MOD_SHIFT);
         return waitCursor(ZeeConfig.CURSOR_HARVEST);
     }
 
@@ -405,14 +406,14 @@ public class ZeeSeedFarmingManager extends ZeeThread{
                 ZeeConfig.addPlayerText("storing");
                 ZeeConfig.addGobText(lastBarrel, getSeedNameAndQl());
                 updateSeedPileReference();
-                ZeeClickItemManager.pickUpItem(wItem);
-                ZeeClickGobManager.gobItemAct(lastBarrel, UI.MOD_SHIFT);//store first seeds
+                ZeeManagerItemClick.pickUpItem(wItem);
+                ZeeManagerGobClick.gobItemAct(lastBarrel, UI.MOD_SHIFT);//store first seeds
                 waitPlayerMove();//wait reaching barrel
                 waitPlayerStop();
                 Thread.sleep(1000);//wait storing seed
                 if (ZeeConfig.isPlayerHoldingItem()) {
                     // store all seeds (ctrl+shift)
-                    ZeeClickGobManager.gobItemAct(lastBarrel, 3);//3==ctrl+shift
+                    ZeeManagerGobClick.gobItemAct(lastBarrel, 3);//3==ctrl+shift
                     if(waitNotHoldingItem()) {
                         ZeeConfig.addGobText(lastBarrel, getSeedNameAndQl());
                     } else {
@@ -444,7 +445,7 @@ public class ZeeSeedFarmingManager extends ZeeThread{
     }
 
     public static boolean isBarrelEmpty(Gob b) {
-        return ZeeClickGobManager.isBarrelEmpty(b);
+        return ZeeManagerGobClick.isBarrelEmpty(b);
     }
 
     public static String getSeedNameAndQl() {
@@ -457,7 +458,7 @@ public class ZeeSeedFarmingManager extends ZeeThread{
     // gfx/invobjs/seed-flax
     public static boolean isBarrelSameSeeds(Gob barrel, String seedName) {
         String seed = seedName.replace("seed-","");
-        if(ZeeClickGobManager.getOverlayNames(barrel).contains("gfx/terobjs/barrel-" + seed)) {
+        if(ZeeManagerGobClick.getOverlayNames(barrel).contains("gfx/terobjs/barrel-" + seed)) {
             //println("same seeds , gfx/terobjs/barrel-" + seed);
             return true;
         }else {
@@ -468,7 +469,7 @@ public class ZeeSeedFarmingManager extends ZeeThread{
 
     public static void showWindow(Gob gobCrop) {
         Widget wdg;
-        ZeeSeedFarmingManager.farmerGobCrop = gobCrop;
+        ZeeManagerFarmer.farmerGobCrop = gobCrop;
         ZeeConfig.farmerMode = true;
 
         if(windowManager ==null){
@@ -487,9 +488,9 @@ public class ZeeSeedFarmingManager extends ZeeThread{
 
             //checkbox plant
             wdg = windowManager.add(new CheckBox("replant after harvest") {
-                { a = ZeeSeedFarmingManager.farmerCbReplant;  }
+                { a = ZeeManagerFarmer.farmerCbReplant;  }
                 public void set(boolean val) {
-                    ZeeSeedFarmingManager.farmerCbReplant = val;
+                    ZeeManagerFarmer.farmerCbReplant = val;
                     a = val;
                     Utils.setprefb("farmerCbPlant",val);
                 }
@@ -498,7 +499,7 @@ public class ZeeSeedFarmingManager extends ZeeThread{
 
             // barrel tiles textEntry
             wdg = windowManager.add(new Label("Max tiles to barrel: "), 0, 30);
-            ZeeSeedFarmingManager.textEntryTilesBarrel = new TextEntry(UI.scale(45),""+(int)(ZeeSeedFarmingManager.MAX_BARREL_DIST/MCache.tilesz.x)){
+            ZeeManagerFarmer.textEntryTilesBarrel = new TextEntry(UI.scale(45),""+(int)(ZeeManagerFarmer.MAX_BARREL_DIST/MCache.tilesz.x)){
                 public boolean keydown(KeyEvent e) {
                     if(!Character.isDigit(e.getKeyChar()) && !ZeeConfig.isControlKey(e.getKeyCode()))
                         return false;
@@ -506,14 +507,14 @@ public class ZeeSeedFarmingManager extends ZeeThread{
                 }
                 public void changed(ReadLine buf) {
                     if(!buf.line().isEmpty()) {
-                        ZeeSeedFarmingManager.farmerTxtTilesBarrel = Integer.parseInt(buf.line());
-                        Utils.setprefi("farmerTxtTilesBarrel", ZeeSeedFarmingManager.farmerTxtTilesBarrel);
+                        ZeeManagerFarmer.farmerTxtTilesBarrel = Integer.parseInt(buf.line());
+                        Utils.setprefi("farmerTxtTilesBarrel", ZeeManagerFarmer.farmerTxtTilesBarrel);
                     }
                     super.changed(buf);
                 }
             };
-            wdg = windowManager.add(ZeeSeedFarmingManager.textEntryTilesBarrel, 95, 30-3);
-            ZeeSeedFarmingManager.textEntryTilesBarrel.settext(""+ ZeeSeedFarmingManager.farmerTxtTilesBarrel);
+            wdg = windowManager.add(ZeeManagerFarmer.textEntryTilesBarrel, 95, 30-3);
+            ZeeManagerFarmer.textEntryTilesBarrel.settext(""+ ZeeManagerFarmer.farmerTxtTilesBarrel);
 
 
             //barrel tiles test Button
@@ -522,7 +523,7 @@ public class ZeeSeedFarmingManager extends ZeeThread{
                     if (msg.equals("activate")){
                         try {
                             int tiles = Integer.parseInt(textEntryTilesBarrel.text().strip());
-                            ZeeSeedFarmingManager.testBarrelsTiles(false);
+                            ZeeManagerFarmer.testBarrelsTiles(false);
                         } catch (NumberFormatException e) {
                             ZeeConfig.msg("numbers only");
                         }
@@ -535,7 +536,7 @@ public class ZeeSeedFarmingManager extends ZeeThread{
             wdg = windowManager.add(new ZeeWindow.ZeeButton(UI.scale(45),"clear"){
                 public void wdgmsg(String msg, Object... args) {
                     if (msg.equals("activate")){
-                        ZeeSeedFarmingManager.testBarrelsTilesClear();
+                        ZeeManagerFarmer.testBarrelsTilesClear();
                     }
                 }
             }, wdg.c.x+wdg.sz.x+5,30-4);

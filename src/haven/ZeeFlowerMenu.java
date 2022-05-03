@@ -54,9 +54,9 @@ public class ZeeFlowerMenu extends FlowerMenu{
                 public void run() {
                     try{
                         if (gob != null) {
-                            ZeeClickGobManager.gobZeeMenuClicked(gob, petalName);
+                            ZeeManagerGobClick.gobZeeMenuClicked(gob, petalName);
                         } else if (wItem != null) {
-                            ZeeClickItemManager.itemZeeMenuClicked(wItem, petalName);
+                            ZeeManagerItemClick.itemZeeMenuClicked(wItem, petalName);
                         }
                     }catch(Exception e){
                         e.printStackTrace();

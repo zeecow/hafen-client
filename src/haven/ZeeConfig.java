@@ -369,7 +369,7 @@ public class ZeeConfig {
     }
 
     public static boolean isTree(String gobName) {
-        return ZeeClickGobManager.isGobTree(gobName);
+        return ZeeManagerGobClick.isGobTree(gobName);
     }
 
     public static boolean isBush(String gobName) {
@@ -720,7 +720,7 @@ public class ZeeConfig {
         }
 
         if(windowTitle.equals("Boil Pepper Drupes")){
-            ZeeCookManager.pepperRecipeOpened(window);
+            ZeeManagerCook.pepperRecipeOpened(window);
         }
 
         windowReposition(window,windowTitle);
@@ -1426,11 +1426,11 @@ public class ZeeConfig {
 
     public static void checkUiErr(String text){
         lastUIMsgMs = System.currentTimeMillis();
-        if (ZeeCookManager.busy && ZeeCookManager.pepperRecipeOpen && text.contains("You do not have all the ingredients."))
-            ZeeCookManager.exitManager(text);
+        if (ZeeManagerCook.busy && ZeeManagerCook.pepperRecipeOpen && text.contains("You do not have all the ingredients."))
+            ZeeManagerCook.exitManager(text);
 
-        if (ZeeStockpileManager.busy && text.contains("That stockpile is already full."))
-            ZeeStockpileManager.exitManager("checkUiErr() > pile is full");
+        if (ZeeManagerStockpile.busy && text.contains("That stockpile is already full."))
+            ZeeManagerStockpile.exitManager("checkUiErr() > pile is full");
     }
 
     public static String getCursorName() {
@@ -1466,13 +1466,13 @@ public class ZeeConfig {
     public static void resetCharSelected() {
         resetBeltState();
         mainInv = null;
-        ZeeClickItemManager.equipory = null;
-        ZeeStockpileManager.windowManager = null;
-        ZeeMiningManager.windowManager = null;
+        ZeeManagerItemClick.equipory = null;
+        ZeeManagerStockpile.windowManager = null;
+        ZeeManagerMiner.windowManager = null;
     }
 
     private static void resetBeltState() {
-        ZeeClickItemManager.invBelt = null;
+        ZeeManagerItemClick.invBelt = null;
     }
 
     public static void openBelt() {
@@ -1488,9 +1488,9 @@ public class ZeeConfig {
         // haven.MenuGrid@c046fa2, act, [craft, snowball, 0]
         //println(msg+" > "+ZeeConfig.strArgs(args));
 
-        if (ZeeCookManager.pepperRecipeOpen && msg.contentEquals("act") && args[0].toString().contentEquals("craft") && !args[1].toString().contentEquals("boiledpepper")){
-            ZeeCookManager.pepperRecipeOpen = false;
-            ZeeCookManager.exitManager("changed recipe "+args[1]);
+        if (ZeeManagerCook.pepperRecipeOpen && msg.contentEquals("act") && args[0].toString().contentEquals("craft") && !args[1].toString().contentEquals("boiledpepper")){
+            ZeeManagerCook.pepperRecipeOpen = false;
+            ZeeManagerCook.exitManager("changed recipe "+args[1]);
         }
 
         if( isCraftHistoryNavigation || !msg.contentEquals("act") || !args[0].toString().contentEquals("craft"))
@@ -1617,19 +1617,19 @@ public class ZeeConfig {
         lastMapViewClickGobMs = ZeeThread.now();
         if(clickGob!=null) { //clicked gob object
             lastMapViewClickGobName = clickGob.getres().name;
-            if (ZeeCookManager.pepperRecipeOpen)
-                ZeeCookManager.gobClicked(clickGob,lastMapViewClickGobName,clickb);
+            if (ZeeManagerCook.pepperRecipeOpen)
+                ZeeManagerCook.gobClicked(clickGob,lastMapViewClickGobName,clickb);
             if(clickb == 2) {
-                ZeeClickGobManager.checkMidClickGob(pc, mc, clickGob, lastMapViewClickGobName);
+                ZeeManagerGobClick.checkMidClickGob(pc, mc, clickGob, lastMapViewClickGobName);
             } else if (clickb==3 && gameUI.ui.modflags()==0){//no mod keys
-                ZeeClickGobManager.checkRightClickGob(pc, mc, clickGob, lastMapViewClickGobName);
+                ZeeManagerGobClick.checkRightClickGob(pc, mc, clickGob, lastMapViewClickGobName);
             }
         }else{ // clicked ground
             if (clickb==2) {
                 if (isPlayerHoldingItem()) { //move while holding item
                     clickCoord(mc.floor(posres), 1, 0);
                 }else
-                    ZeeClickGobManager.checkMidClickGob(pc,mc,null,"");
+                    ZeeManagerGobClick.checkMidClickGob(pc,mc,null,"");
             }
         }
     }
@@ -2029,7 +2029,7 @@ public class ZeeConfig {
             ZeeConfig.applyGobSettingsAudio(ob);
             ZeeConfig.applyGobSettingsAggro(ob);
             ZeeConfig.applyGobSettingsHighlight(ob, ZeeConfig.getHighlightGobColor(ob));
-            ZeeMiningManager.checkNearBoulder(ob);
+            ZeeManagerMiner.checkNearBoulder(ob);
         }
     }
 
@@ -2037,7 +2037,7 @@ public class ZeeConfig {
         if(mapCategoryGobs.get(CATEG_AGROCREATURES).contains(gob.resName)) {
             //aggro radius
             if (ZeeConfig.aggroRadiusTiles > 0)
-                gob.addol(new Gob.Overlay(gob, new ZeeGobRadius(gob, null, ZeeConfig.aggroRadiusTiles * MCache.tilesz2.y), ZeeClickGobManager.OVERLAY_ID_AGGRO));
+                gob.addol(new Gob.Overlay(gob, new ZeeGobRadius(gob, null, ZeeConfig.aggroRadiusTiles * MCache.tilesz2.y), ZeeManagerGobClick.OVERLAY_ID_AGGRO));
         }
     }
 
@@ -2064,7 +2064,7 @@ public class ZeeConfig {
     }
 
     public static String getBarrelOverlayBasename(Gob barrel){
-        List<String> ols =  ZeeClickGobManager.getOverlayNames(barrel);
+        List<String> ols =  ZeeManagerGobClick.getOverlayNames(barrel);
         if(ols.isEmpty())
             return "";
         return ols.get(0).replace("gfx/terobjs/barrel-","");

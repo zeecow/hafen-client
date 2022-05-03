@@ -26,7 +26,6 @@
 
 package haven;
 
-import java.awt.Color;
 import haven.render.*;
 
 public class GobHealth extends GAttrib implements Gob.SetupMod {
@@ -42,12 +41,12 @@ public class GobHealth extends GAttrib implements Gob.SetupMod {
             this.fx = ZeeConfig.MIXCOLOR_YELLOW;
         }else if(hp==.50) {
             this.fx = ZeeConfig.MIXCOLOR_ORANGE;
-            if (ZeeMiningManager.mining)
-                ZeeMiningManager.notifyColumn(g,hp);
+            if (ZeeManagerMiner.mining)
+                ZeeManagerMiner.notifyColumn(g,hp);
         }else {
             this.fx = ZeeConfig.MIXCOLOR_RED;
-            if (ZeeMiningManager.mining)
-                ZeeMiningManager.notifyColumn(g,hp);
+            if (ZeeManagerMiner.mining)
+                ZeeManagerMiner.notifyColumn(g,hp);
         }
     }
     
