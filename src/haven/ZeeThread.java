@@ -145,7 +145,7 @@ public class ZeeThread  extends Thread{
 
     //TODO add mounted active poses
     private static boolean waitPlayerIdleMounted() {
-        return waitPlayerPosesContainsNone(
+        return waitNotPlayerPoseInList(
                 ZeeConfig.POSE_PLAYER_DRINK,
                 ZeeConfig.POSE_PLAYER_CHOPTREE,
                 ZeeConfig.POSE_PLAYER_DIGSHOVEL,
@@ -154,7 +154,7 @@ public class ZeeThread  extends Thread{
         );
     }
 
-    private static boolean waitPlayerPosesContainsNone(String ... poseList) {
+    private static boolean waitNotPlayerPoseInList(String ... poseList) {
         //println(">waitPlayerPosesContainsNone");
         String playerPoses = "";
         boolean exit = false;
@@ -178,6 +178,20 @@ public class ZeeThread  extends Thread{
         }
         //println("waitPlayerPosesContainsNone ret "+exit);
         return exit;
+    }
+
+    public static boolean waitNotPlayerPose(String poseName) {
+        String poses = "";
+        try{
+            do{
+                //println("waitNotPlayerPose > "+poses);
+                sleep(PING_MS*2);
+            }while((poses = ZeeConfig.getPlayerPoses()).contains(poseName));
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        //println("waitNotPlayerPose ret "+(!poses.contains(poseName))+" , "+poseName);
+        return !poses.contains(poseName);
     }
 
     public static boolean waitPlayerPose(String poseName) {

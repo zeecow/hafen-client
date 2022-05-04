@@ -57,6 +57,7 @@ public class ZeeConfig {
     public static final String POSE_PLAYER_IDLE_MOUNTED = "gfx/borka/riding-idle";
     public static final String POSE_PLAYER_WALK = "gfx/borka/walking";
     public static final String POSE_PLAYER_RUN = "gfx/borka/running";
+    public static final String POSE_PLAYER_BUTCH = "gfx/borka/butcher";
     public static final String POSE_PLAYER_BUILD = "gfx/borka/buildan";
     public static final String POSE_PLAYER_SAW = "gfx/borka/sawing";
     public static final String POSE_PLAYER_CHOPBLOCK = "gfx/borka/choppan";
