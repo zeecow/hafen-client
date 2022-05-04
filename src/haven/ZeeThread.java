@@ -135,6 +135,25 @@ public class ZeeThread  extends Thread{
         return !ZeeConfig.isPlayerMoving();
     }
 
+
+    public static boolean waitPlayerPoseIdle(){
+        return waitPlayerPose(ZeeConfig.POSE_PLAYER_IDLE);
+    }
+
+    public static boolean waitPlayerPose(String poseName) {
+        String poses = "";
+        try{
+            do{
+                //println("waitPlayerPose > "+poses);
+                sleep(PING_MS*2);
+            }while(!(poses = ZeeConfig.getPlayerPoses()).contains(poseName));
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        //println("waitPlayerPose > "+(poses.contains(poseName))+" ["+poseName+"]");
+        return poses.contains(poseName);
+    }
+
     /*
         returns true if player idle for idleMS
      */
@@ -152,7 +171,7 @@ public class ZeeThread  extends Thread{
                 Thread.sleep(SLEEP_MS);
             }
         } catch (InterruptedException e) {
-            //e.printStackTrace();
+            e.printStackTrace();
         }
         staminaMonitorStop();
         //println("waitPlayerIdleFor ret "+(timer<=0));
@@ -313,7 +332,7 @@ public class ZeeThread  extends Thread{
         long timeout = 5000;
         long startingMs;
         try {
-            //wait first item
+            //wait first item, timeout 5s
             ZeeConfig.lastInvItemMs = 0;
             startingMs = now();
             while (timeout >= 0  &&  startingMs > ZeeConfig.lastInvItemMs){

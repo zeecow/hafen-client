@@ -37,6 +37,7 @@ public class ZeeManagerGobClick extends ZeeThread{
         clickDiffMs = clickEndMs - clickStartMs;
 
         //println(clickDiffMs+"ms > "+gobName + " dist="+ZeeConfig.distanceToPlayer(gob));
+        //println(gobName + " poses = "+ZeeConfig.getGobPoses(gob));
 
         if (isLongMidClick()) {
             /*
@@ -479,8 +480,8 @@ public class ZeeManagerGobClick extends ZeeThread{
                     continue;
                 }
                 currentDestroyingTreelog = treelog;
-                waitPlayerIdleFor(3);
-                if (!gobHasFlowermenu(treelog) && !ZeeConfig.isTaskCanceledByGroundClick()){
+                waitPlayerPoseIdle();
+                if (!ZeeConfig.isTaskCanceledByGroundClick()){
                     logs--;
                     if (isDestroyingAllTreelogs){
                         // destroy all, treelog queue is present
@@ -512,12 +513,6 @@ public class ZeeManagerGobClick extends ZeeThread{
         }catch (Exception e){
             e.printStackTrace();
         }
-        println("exit destroyTreelogs > logs="+logs
-            +"  isDestroying="+isDestroyingAllTreelogs
-            +"  currentTreelog="+currentDestroyingTreelog
-            +"  treelog="+treelog
-            +"  treelogsQueue="+(treelogsForDestruction==null?"null":treelogsForDestruction.size())
-        );
         isDestroyingAllTreelogs = false;
         ZeeConfig.dropBoards = false;
         currentDestroyingTreelog = null;
@@ -812,12 +807,13 @@ public class ZeeManagerGobClick extends ZeeThread{
             while (tree!=null && !ZeeConfig.isTaskCanceledByGroundClick()) {
                 clickGobPetal(tree, "Chop");
                 currentRemovingTree = tree;
-                if (waitPlayerIdleFor(2) && !ZeeConfig.isTaskCanceledByGroundClick()) {
+                if (waitPlayerPoseIdle() && !ZeeConfig.isTaskCanceledByGroundClick()) {//waitPlayerIdleFor(2)
                     Gob stump = ZeeConfig.getClosestGob(ZeeConfig.findGobsByNameEndsWith("stump"));
                     if (stump != null && ZeeConfig.distanceToPlayer(stump) < 25) {
                         ZeeConfig.addGobText(stump, "stump");
                         removeStump(stump);
-                        waitPlayerIdleFor(2);
+                        //waitPlayerIdleFor(2);
+                        waitPlayerPoseIdle();
                     } else {
                         println("no stump close");
                     }

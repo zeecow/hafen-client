@@ -42,6 +42,7 @@ public class Composite extends Drawable {
     public List<MD> nmod;
     public List<ED> nequ;
     private Collection<ResData> nposes = null, tposes = null;
+	public Collection<ResData> prevposes;
     private boolean nposesold, retainequ = false;
     private float tptime;
     private WrapMode tpmode;
@@ -105,6 +106,7 @@ public class Composite extends Drawable {
 	    try {
 		Composited.Poses np = comp.new Poses(loadposes(nposes, comp.skel, nposesold));
 		np.set(nposesold?0:ipollen);
+		prevposes = nposes;
 		nposes = null;
 		updequ();
 	    } catch(Loading e) {}

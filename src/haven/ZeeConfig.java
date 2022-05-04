@@ -53,6 +53,21 @@ public class ZeeConfig {
     public static final String CURSOR_MINE = "gfx/hud/curs/mine";//destroy
     public static final String CURSOR_SHOOT = "gfx/hud/curs/shoot";
 
+    public static final String POSE_PLAYER_IDLE = "gfx/borka/idle";
+    public static final String POSE_PLAYER_WALK = "gfx/borka/walking";
+    public static final String POSE_PLAYER_RUN = "gfx/borka/running";
+    public static final String POSE_PLAYER_BUILD = "gfx/borka/buildan";
+    public static final String POSE_PLAYER_SAW = "gfx/borka/sawing";
+    public static final String POSE_PLAYER_CHOPBLOCK = "gfx/borka/choppan";
+    public static final String POSE_PLAYER_CHOPTREE = "gfx/borka/treechop";
+    public static final String POSE_PLAYER_DIGSHOVEL = "gfx/borka/shoveldig";
+    public static final String POSE_PLAYER_DRINK = "gfx/borka/drinkan";
+    public static final String POSE_PLAYER_PICK = "gfx/borka/pickan";
+    public static final String POSE_PLAYER_LIFT = "gfx/borka/banzai";
+    public static final String POSE_PLAYER_CARRYFLAT = "gfx/borka/carry-flat";//idle pickaxe
+    public static final String POSE_PLAYER_TRAVELHOMESHRUG = "gfx/borka/pointconfused";
+    public static final String POSE_PLAYER_TRAVELHOMEPOINT = "gfx/borka/pointhome";
+
     public static final String DEF_BUTCH_AUTO_LIST = "Break,Scale,Wring neck,Kill,Skin,Flay,Pluck,Clean,Butcher,Collect bones";
     public static final String DEF_AUTO_CLICK_MENU_LIST = "Pick,Harvest wax";
 
@@ -2099,5 +2114,24 @@ public class ZeeConfig {
 
     public static double getItemQuality(WItem item) {
         return Inventory.getQuality(item.item);
+    }
+
+    public static String getPlayerPoses() {
+        return getGobPoses(getPlayerGob());
+    }
+
+    public static String getGobPoses(Gob gob) {
+        String ret = "";
+        Drawable d = gob.getattr(Drawable.class);
+        if (d instanceof Composite) {
+            Composite comp = (Composite) d;
+            for (ResData rd : comp.prevposes) {
+                try {
+                    ret += rd.res.get().name + " ";
+                } catch (Loading l) {
+                }
+            }
+        }
+        return ret;
     }
 }
