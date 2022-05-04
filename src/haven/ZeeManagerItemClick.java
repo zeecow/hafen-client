@@ -45,7 +45,8 @@ public class ZeeManagerItemClick extends ZeeThread{
             //error caused by midClicking again before task ending
             cancelManager = true;
         }
-        //println(itemName +"  "+ getWItemCoord(wItem)+"  "+ZeeConfig.getCursorName());
+        println(itemName +"  "+ getWItemCoord(wItem)+"  "+ZeeConfig.getCursorName());
+        getItemOverlays(wItem);
     }
 
     @Override
@@ -1070,5 +1071,31 @@ public class ZeeManagerItemClick extends ZeeThread{
             new ZeeManagerItemClick(item).start();//use equipManager logic
         else
             println("itemManager.equipBeltItem() > item '"+name+"' not found");
+    }
+
+    public static void getItemOverlays(WItem item) {
+        println("getItemOverlays ");
+        item.item.info().forEach(itemInfo -> {
+            if(itemInfo.getClass().getSimpleName().equals("Quality")) {
+                try {
+                    println("Quality.q = "+ itemInfo.getClass().getField("q").get(itemInfo));
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                } catch (NoSuchFieldException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+//        if(cup.itemols!=null) {
+//            println("  cup.itemols > "+cup.itemols);
+//            if (cup.itemols.get()!=null) {
+//                println("    cup.itemols.get().length > "+cup.itemols.get().length);
+//                for (int i = 0; i < cup.itemols.get().length; i++) {
+//                    println("      cup.itemols.get()[i] > "+cup.itemols.get()[i].getClass().getSimpleName());
+//                }
+//            }else
+//                println("  cup.itemols.get() null");
+//        }else
+//            println("  cup.itemols null");
     }
 }

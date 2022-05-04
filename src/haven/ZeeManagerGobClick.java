@@ -1,6 +1,8 @@
 package haven;
 
 
+import haven.resutil.WaterTile;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -65,7 +67,7 @@ public class ZeeManagerGobClick extends ZeeThread{
                 new ZeeThread() {
                     public void run() {
                         if (pickupTorch())
-                            gobItemAct(gob,0);
+                            itemActGob(gob,0);
                     }
                 }.start();
             } else if (isGobHorse(gobName)) {
@@ -122,16 +124,16 @@ public class ZeeManagerGobClick extends ZeeThread{
                     removeStump(gob);
                 } else if (ZeeConfig.isPlayerHoldingItem() && gobName.endsWith("/barrel")) {
                     if (ZeeManagerFarmer.isBarrelEmpty(gob))
-                        gobItemAct(gob,UI.MOD_SHIFT);//shift+rclick
+                        itemActGob(gob,UI.MOD_SHIFT);//shift+rclick
                     else
-                        gobItemAct(gob,3);//ctrl+shift+rclick
+                        itemActGob(gob,3);//ctrl+shift+rclick
                 } else if (isGroundClick){
-                    if (ZeeConfig.isPlayerMountingHorse())
+                    if (isWaterTile(coordMc))
+                        inspectWaterAt(coordMc);
+                    else if (ZeeConfig.isPlayerMountingHorse())
                         dismountHorse(coordMc);
                     else if (ZeeConfig.isPlayerCarryingWheelbarrow())
                         ZeeManagerStockpile.unloadWheelbarrowStockpileAtGround(coordMc.floor(posres));
-                    else
-                        println("wtf ");
                 } else if (ZeeConfig.isPlayerCarryingWheelbarrow()) {
                     if (isGobHorse(gobName))
                         mountHorseCarryingWheelbarrow(gob);
@@ -155,6 +157,35 @@ public class ZeeManagerGobClick extends ZeeThread{
             e.printStackTrace();
         }
     }
+
+    private void inspectWaterAt(Coord2d coordMc) {
+        // gfx/invobjs/woodencup
+        List<WItem> cups = ZeeConfig.getMainInventory().getWItemsByName("/woodencup");
+        if (cups==null || cups.size()==0){
+            println("need woodencup to inspect");
+            return;
+        }
+        WItem cup = cups.get(0);
+        ZeeManagerItemClick.pickUpItem(cup);
+        // haven.MapView@22e2c39e ; itemact ; [(700, 483), (-940973, -996124), 0]
+        ZeeConfig.itemActTile(coordMc.floor(posres));
+        waitPlayerIdleFor(2);
+        ZeeManagerItemClick.getItemOverlays(cup);
+    }
+
+    public static boolean isWaterTile(Coord2d coordMc) {
+        Tiler t = getTilerAt(coordMc);
+        return t!=null && t instanceof WaterTile;
+    }
+
+    public static Tiler getTilerAt(Coord2d coordMc) {
+        int id = ZeeConfig.gameUI.ui.sess.glob.map.getTileSafe(coordMc.floor(MCache.tilesz));
+        Tiler tl = ZeeConfig.gameUI.ui.sess.glob.map.tiler(id);
+        Resource res = ZeeConfig.gameUI.ui.sess.glob.map.tilesetr(id);
+        println("getTilerAt > id="+id+" , tl="+tl.getClass().getSimpleName()+" , res="+res.name);
+        return tl;
+    }
+
 
     public static void checkRightClickGob(Coord pc, Coord2d mc, Gob gob, String gobName) {
 
@@ -334,7 +365,7 @@ public class ZeeManagerGobClick extends ZeeThread{
 
     private static void clickedGobHoldingItem(Gob gob, String gobName) {
         if (isGobStockpile(gobName))
-            gobItemAct(gob,UI.MOD_SHIFT);//try piling all items
+            itemActGob(gob,UI.MOD_SHIFT);//try piling all items
         else
             gobClick(gob,3,0); // try ctrl+click simulation
     }
@@ -812,6 +843,7 @@ public class ZeeManagerGobClick extends ZeeThread{
                 clickGobPetal(tree, "Chop");
                 currentRemovingTree = tree;
                 if (waitPlayerPoseIdle() && !ZeeConfig.isTaskCanceledByGroundClick()) {//waitPlayerIdleFor(2)
+                    sleep(1500);//wait new stump loading
                     Gob stump = ZeeConfig.getClosestGob(ZeeConfig.findGobsByNameEndsWith("stump"));
                     if (stump != null && ZeeConfig.distanceToPlayer(stump) < 25) {
                         ZeeConfig.addGobText(stump, "stump");
@@ -869,7 +901,7 @@ public class ZeeManagerGobClick extends ZeeThread{
            int added = 0;
            while(!exit && added<4 && branches.size() > 0){
                if(ZeeManagerItemClick.pickUpItem(branches.get(0))){
-                   gobItemAct(gob,0);
+                   itemActGob(gob,0);
                    if(waitNotHoldingItem()){
                        branches.remove(0);
                        added++;
@@ -901,7 +933,7 @@ public class ZeeManagerGobClick extends ZeeThread{
             int added = 0;
             while(!exit && added<numCoal && coal.size() > 0){
                 if(ZeeManagerItemClick.pickUpItem(coal.get(0))){
-                    gobItemAct(gob,0);
+                    itemActGob(gob,0);
                     if(waitNotHoldingItem()){
                         coal.remove(0);
                         added++;
@@ -1045,7 +1077,7 @@ public class ZeeManagerGobClick extends ZeeThread{
 
             //if holding seed, store in barrel
             waitHoldingItem();
-            ZeeManagerGobClick.gobItemAct(gob, 0);
+            ZeeManagerGobClick.itemActGob(gob, 0);
 
             if (isInventoryFull())
                 ZeeConfig.msg("Inventory full");
@@ -1213,7 +1245,7 @@ public class ZeeManagerGobClick extends ZeeThread{
      * Itemact with gob, to fill trough with item in hand for example
      * @param mod 1 = shift, 2 = ctrl, 4 = alt  (3 = ctrl+shift ?)
      */
-    public static void gobItemAct(Gob g, int mod) {
+    public static void itemActGob(Gob g, int mod) {
         ZeeConfig.gameUI.map.wdgmsg("itemact", Coord.z, g.rc.floor(OCache.posres), mod, 0, (int) g.id, g.rc.floor(OCache.posres), 0, -1);
     }
 

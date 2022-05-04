@@ -4,6 +4,7 @@ import haven.render.BaseColor;
 import haven.render.MixColor;
 import haven.render.Pipe;
 import haven.render.States;
+import haven.resutil.WaterTile;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -1840,14 +1841,19 @@ public class ZeeConfig {
         }
     }
 
-    // simulate cancel click
-    public static void clickGroundZero(int btn) {
-        clickCoord(getPlayerCoord(),btn);
+    public static void stopMovingEscKey() {
+        // sends escape key to root ui
+        gameUI.ui.root.wdgmsg("gk", 27);
     }
 
-    public static void clickGroundZero(int btn, int mod) {
-        clickCoord(getPlayerCoord(),btn,mod);
+    public static void getPlayerTileType(){
+        int id = gameUI.ui.sess.glob.map.getTileSafe(getPlayerGob().rc.floor(MCache.tilesz));
+        Tiler tl = gameUI.ui.sess.glob.map.tiler(id);
+        Resource res = gameUI.ui.sess.glob.map.tilesetr(id);
+        println("id="+id+" , tl="+tl.getClass().getSimpleName()+" , res="+res.name);
     }
+    public static List<String> bogtype = new ArrayList<>(Arrays.asList("gfx/tiles/bog", "gfx/tiles/bogwater", "gfx/tiles/fen", "gfx/tiles/fenwater", "gfx/tiles/swamp", "gfx/tiles/swampwater", "", ""));
+
 
     public static void clickRemoveCursor(){
         ZeeConfig.clickCoord(Coord.z,3);
@@ -1867,6 +1873,15 @@ public class ZeeConfig {
 
     public static void clickTile(Coord c, int btn, int mod) {
         clickCoord(tileToCoord(c), btn);
+    }
+
+    public static void itemActTile(Coord coord) {
+        itemActTile(coord,0);
+    }
+
+    public static void itemActTile(Coord coord, int mod) {
+        //haven.MapView@22e2c39e ; itemact ; [(700, 483), (-940973, -996124), 0]
+        gameUI.map.wdgmsg("itemact", ZeeConfig.getCenterScreenCoord(), coord,  mod);
     }
 
     public static Coord getAreaCenterTile(Area a){

@@ -622,11 +622,12 @@ public class ZeeManagerMiner extends ZeeThread{
         println(msg);
         return exitManager();
     }
+
     public static boolean exitManager() {
         mining = false;
         repeatTaskMineArea = false;
         ZeeConfig.autoChipMinedBoulder = Utils.getprefb("autoChipMinedBoulder", true);
-        ZeeConfig.clickGroundZero(1);
+        ZeeConfig.stopMovingEscKey();
         windowManager.hide();
         if (ol!=null) {
             ol.destroy();
@@ -689,7 +690,7 @@ public class ZeeManagerMiner extends ZeeThread{
                     ZeeConfig.gameUI.msg("stop mining");
                     ZeeConfig.clickRemoveCursor();
                     waitCursor(ZeeConfig.CURSOR_ARW);
-                    ZeeConfig.clickGroundZero(1);//click ground to stop mining?
+                    ZeeConfig.stopMovingEscKey();
                     ZeeThread.staminaMonitorStop();//case stam monitor thread is running
                     manager.interrupt();
                     ZeeConfig.resetTileSelection();
