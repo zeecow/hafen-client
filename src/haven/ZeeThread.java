@@ -137,7 +137,47 @@ public class ZeeThread  extends Thread{
 
 
     public static boolean waitPlayerPoseIdle(){
-        return waitPlayerPose(ZeeConfig.POSE_PLAYER_IDLE);
+        if (ZeeConfig.isPlayerMountingHorse())
+            return waitPlayerIdleMounted();
+        else
+            return waitPlayerPose(ZeeConfig.POSE_PLAYER_IDLE);
+    }
+
+    //TODO add mounted active poses
+    private static boolean waitPlayerIdleMounted() {
+        return waitPlayerPosesContainsNone(
+                ZeeConfig.POSE_PLAYER_DRINK,
+                ZeeConfig.POSE_PLAYER_CHOPTREE,
+                ZeeConfig.POSE_PLAYER_DIGSHOVEL,
+                ZeeConfig.POSE_PLAYER_PICK,
+                ZeeConfig.POSE_PLAYER_SAW
+        );
+    }
+
+    private static boolean waitPlayerPosesContainsNone(String ... poseList) {
+        //println(">waitPlayerPosesContainsNone");
+        String playerPoses = "";
+        boolean exit = false;
+        try{
+            do{
+                sleep(PING_MS*2);
+                playerPoses = ZeeConfig.getPlayerPoses();
+                //println("   "+playerPoses);
+                exit = true;
+                for (int i = 0; i < poseList.length; i++) {
+                    //println("      "+poseList[i]);
+                    if (playerPoses.contains(poseList[i])){//if contains pose...
+                        //println("break");
+                        exit = false;
+                        break;//... break, loop and sleep again
+                    }
+                }
+            }while(!exit || ZeeConfig.isPlayerMoving());
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        //println("waitPlayerPosesContainsNone ret "+exit);
+        return exit;
     }
 
     public static boolean waitPlayerPose(String poseName) {
@@ -150,7 +190,7 @@ public class ZeeThread  extends Thread{
         }catch (Exception e){
             e.printStackTrace();
         }
-        //println("waitPlayerPose > "+(poses.contains(poseName))+" ["+poseName+"]");
+        //println("waitPlayerPose > "+(poses.contains(poseName))+" "+poseName);
         return poses.contains(poseName);
     }
 

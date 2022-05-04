@@ -54,6 +54,7 @@ public class ZeeConfig {
     public static final String CURSOR_SHOOT = "gfx/hud/curs/shoot";
 
     public static final String POSE_PLAYER_IDLE = "gfx/borka/idle";
+    public static final String POSE_PLAYER_IDLE_MOUNTED = "gfx/borka/riding-idle";
     public static final String POSE_PLAYER_WALK = "gfx/borka/walking";
     public static final String POSE_PLAYER_RUN = "gfx/borka/running";
     public static final String POSE_PLAYER_BUILD = "gfx/borka/buildan";
@@ -1677,7 +1678,8 @@ public class ZeeConfig {
     }
 
     public static boolean isPlayerMountingHorse() {
-        return isPlayerSharingGobCoord("gfx/kritter/horse/");
+        return getPlayerPoses().contains("gfx/borka/riding");
+        //return isPlayerSharingGobCoord("gfx/kritter/horse/");
     }
 
     public static boolean isPlayerCarryingGob(String gobNameContains) {
@@ -2132,6 +2134,6 @@ public class ZeeConfig {
                 }
             }
         }
-        return ret;
+        return ret.strip();
     }
 }
