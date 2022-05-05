@@ -1112,7 +1112,7 @@ public class ZeeManagerItemClick extends ZeeThread{
             msg += " q" + ql;
         }else
             println("contents null? try picking  up item first");
-        println("msg = "+msg);
+        //println("msg = "+msg);
         return msg;
     }
 

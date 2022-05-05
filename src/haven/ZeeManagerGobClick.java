@@ -3,7 +3,6 @@ package haven;
 
 import haven.resutil.WaterTile;
 
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -165,7 +164,7 @@ public class ZeeManagerGobClick extends ZeeThread{
         Inventory inv = ZeeConfig.getMainInventory();
         List<WItem> cups = inv.getWItemsByName("/woodencup");
         if (cups==null || cups.size()==0){
-            println("need woodencup to inspect");
+            ZeeConfig.msg("need woodencup to inspect water");
             return;
         }
 
@@ -178,6 +177,14 @@ public class ZeeManagerGobClick extends ZeeThread{
         // show msg
         String msg = ZeeManagerItemClick.getHoldingItemContentsNameQl();
         ZeeConfig.msg(msg);
+        new ZeeThread(){
+            public void run() {
+                ZeeConfig.addPlayerText(msg);
+                // wait click before removing player text
+                waitMapClick();
+                ZeeConfig.removePlayerText();
+            }
+        }.start();
         //haven.ChatUI$MultiChat@dd1ed65 ; msg ; ["hello world"]
 
         //empty cup
@@ -197,7 +204,7 @@ public class ZeeManagerGobClick extends ZeeThread{
         int id = ZeeConfig.gameUI.ui.sess.glob.map.getTileSafe(coordMc.floor(MCache.tilesz));
         Tiler tl = ZeeConfig.gameUI.ui.sess.glob.map.tiler(id);
         Resource res = ZeeConfig.gameUI.ui.sess.glob.map.tilesetr(id);
-        println("getTilerAt > id="+id+" , tl="+tl.getClass().getSimpleName()+" , res="+res.name);
+        //println("getTilerAt > id="+id+" , tl="+tl.getClass().getSimpleName()+" , res="+res.name);
         return tl;
     }
 

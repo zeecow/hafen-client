@@ -449,6 +449,20 @@ public class ZeeThread  extends Thread{
         return (fm != null);
     }
 
+    public static boolean waitMapClick(){
+        boolean ret;
+        long lastClick = now();
+        while ( ZeeConfig.lastMapViewClickMs < lastClick ) {
+            try {
+                sleep(500);
+            } catch (Exception e) {
+                e.printStackTrace();
+                return false;
+            }
+        }
+        return true;
+    }
+
     public static boolean waitNoFlowerMenu() {
         int max = (int) TIMEOUT_MS;
         FlowerMenu fm = null;

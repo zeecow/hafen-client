@@ -4,7 +4,6 @@ import haven.render.BaseColor;
 import haven.render.MixColor;
 import haven.render.Pipe;
 import haven.render.States;
-import haven.resutil.WaterTile;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -108,7 +107,7 @@ public class ZeeConfig {
     public static Coord lastMapViewClickPc;
     public static Coord2d lastMapViewClickMc;
     public static int lastMapViewClickButton;
-    public static long lastMapViewClickGobMs;
+    public static long lastMapViewClickMs;
     public static Coord savedTileSelStartCoord, savedTileSelEndCoord;
     public static int savedTileSelModflags;
     public static MCache.Overlay savedTileSelOverlay;
@@ -1619,8 +1618,8 @@ public class ZeeConfig {
         lastMapViewClickPc = pc;
         lastMapViewClickMc = mc;
         lastMapViewClickArgs = args;
+        lastMapViewClickMs = ZeeThread.now();
         lastMapViewClickGob = clickGob;
-        lastMapViewClickGobMs = ZeeThread.now();
         if(clickGob!=null) { //clicked gob object
             lastMapViewClickGobName = clickGob.getres().name;
             if (ZeeManagerCook.pepperRecipeOpen)
