@@ -643,7 +643,7 @@ public class ZeeManagerGobClick extends ZeeThread{
         // gfx/kritter/pig/knock-piglet
         String poses = ZeeConfig.getGobPoses(gob);
         println("isGobKnocked > "+poses);
-        return poses.contains("/knock-");
+        return poses.contains("/knock");
     }
 
     static boolean isGobDeadAnimal;
@@ -1249,7 +1249,7 @@ public class ZeeManagerGobClick extends ZeeThread{
             "/stallion,/mare,/foal,/hog,/sow,/piglet,"
             +"/billy,/nanny,/kid,/sheep,/lamb,/cattle,/calf,"
             +"/wildhorse,/aurochs,/mouflon,/wildgoat,"
-            +"/adder,/badger,/bear,/boar,/beaver,/deer,/reindeer,/fox,"
+            +"/adder,/badger,/bear,/boar,/beaver,/deer,/reindeer,/reddeer,/fox,"
             +"/seal,/otter,/caveangler,/boreworm,/caverat,"
             +"/lynx,/mammoth,/moose,/troll,/walrus,/wolf,/wolverine"
         );
