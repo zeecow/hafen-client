@@ -286,38 +286,11 @@ public class Inventory extends Widget implements DTarget {
 
 	public static Double getQuality(GItem item) {
 		try {
-			/*
-			ItemInfo.Contents contents = getItemInfoContents(item.info());
-			if(contents != null) {
-				Double quality = getItemInfoQuality(contents.sub);
-				if(quality != null) {
-					return(quality);
-				}
-			}
-			*/
-			return(getItemInfoQuality(item.info()));
+			return(ZeeManagerItemClick.getItemInfoQuality(item.info()));
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 		}
 		return Double.valueOf(0);
-	}
-
-	public static Double getItemInfoQuality(List<ItemInfo> info) throws NoSuchFieldException, IllegalAccessException {
-		for(ItemInfo v : info) {
-			if(v.getClass().getSimpleName().equals("Quality")) {
-				return((Double) v.getClass().getField("q").get(v));
-			}
-		}
-		return(null);
-	}
-
-	public static ItemInfo.Contents getItemInfoContents(List<ItemInfo> info) {
-		for(ItemInfo v : info) {
-			if(v instanceof ItemInfo.Contents) {
-				return((ItemInfo.Contents) v);
-			}
-		}
-		return(null);
 	}
 
 	public boolean isMainInv() {

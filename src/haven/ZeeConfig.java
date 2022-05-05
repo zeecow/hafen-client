@@ -94,6 +94,7 @@ public class ZeeConfig {
     public static ZeecowOptionsWindow zeecowOptions;
     public static Button btnMkWndSearchInput, btnMkWndBack, btnMkWndFwd, btnMkWndDel;
     public static GobIcon.SettingsWindow.IconList iconList;
+    public static ChatUI.Channel multiChat;
     private static Dropbox<String> iconListFilterBox;
     private static Inventory mainInv;
     public static Glob glob;
@@ -1348,19 +1349,6 @@ public class ZeeConfig {
     public static void searchNextInputMakeWnd(String inputName) {
         MenuSearch searchWindow = gameUI.toggleSearchWindow();
         searchWindow.sbox.settext(inputName);
-    }
-
-    public static String getItemInfoName(List<ItemInfo> info) {
-        try {
-            for (ItemInfo v : info) {
-                if (v.getClass().getSimpleName().equals("Name")) {
-                    return ((Text)v.getClass().getField("str").get(v)).text;
-                }
-            }
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-        return(null);
     }
 
     public static boolean matchKeyShortcut(KeyEvent ev) {

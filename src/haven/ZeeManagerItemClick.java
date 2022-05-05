@@ -45,8 +45,7 @@ public class ZeeManagerItemClick extends ZeeThread{
             //error caused by midClicking again before task ending
             cancelManager = true;
         }
-        println(itemName +"  "+ getWItemCoord(wItem)+"  "+ZeeConfig.getCursorName());
-        getItemOverlays(wItem);
+        //println(itemName +"  "+ getWItemCoord(wItem)+"  "+ZeeConfig.getCursorName());
     }
 
     @Override
@@ -116,24 +115,24 @@ public class ZeeManagerItemClick extends ZeeThread{
                     }else if (!isItemSack(leftHandItemName)) {//avoid switching sack for sack
                         pickUpItem();
                         equipLeftOccupiedHand();
-                        trySendItemToBelt();
+                        dropHoldingItemToBelt();
                     }else if(!isItemSack(rightHandItemName)) {
                         pickUpItem();
                         equipRightOccupiedHand();
-                        trySendItemToBelt();
+                        dropHoldingItemToBelt();
                     }else { //both hands are sacks?
                         ZeeConfig.gameUI.msg("both hand sacks");
                     }
 
                     if(ZeeConfig.isPlayerHoldingItem()) {//equip was a switch or failed
                         ZeeConfig.gameUI.msg("couldn't switch sack");
-                        trySendItemToBelt();
+                        dropHoldingItemToBelt();
                     }
                 }
                 else if(isItemWindowEquips()){//send to belt
                     pickUpItem();
                     if(ZeeConfig.isPlayerHoldingItem()){ //unequip sack was successfull
-                        if(!trySendItemToBelt())
+                        if(!dropHoldingItemToBelt())
                             println("belt full?");
                     }
                 }
@@ -146,7 +145,7 @@ public class ZeeManagerItemClick extends ZeeThread{
                         //switch 2handed item for another 2handed item
                         pickUpItem();
                         equipLeftOccupiedHand();
-                        trySendItemToBelt();
+                        dropHoldingItemToBelt();
                     }else if(isLeftHandEmpty() || isRightHandEmpty()) {
                         //switch for 2handed item for 1handed equipped, or none equipped
                         pickUpItem();
@@ -156,15 +155,15 @@ public class ZeeManagerItemClick extends ZeeThread{
                             equipRightOccupiedHand();
                         else
                             equipLeftEmptyHand();
-                        trySendItemToBelt();
+                        dropHoldingItemToBelt();
                     }else if(!isLeftHandEmpty() && !isRightHandEmpty()){
                         //switch 2handed item for 2 separate items
                         if (ZeeManagerItemClick.getInvBelt().getNumberOfFreeSlots() > 0) {
                             unequipLeftItem();//unequip 1st item
-                            if(trySendItemToBelt()){
+                            if(dropHoldingItemToBelt()){
                                 pickUpItem();
                                 equipRightOccupiedHand();//switch for 2nd item
-                                trySendItemToBelt();
+                                dropHoldingItemToBelt();
                             }
                         }
                     }
@@ -173,7 +172,7 @@ public class ZeeManagerItemClick extends ZeeThread{
                     if (ZeeManagerItemClick.getInvBelt().getNumberOfFreeSlots() > 0) {
                         //send to belt if possible
                         pickUpItem();
-                        trySendItemToBelt();
+                        dropHoldingItemToBelt();
                     }
                 }
 
@@ -183,7 +182,7 @@ public class ZeeManagerItemClick extends ZeeThread{
                 if (isItemAxeChopTree(leftHandItemName) && isItemAxeChopTree(rightHandItemName)) {
                     // unequip 1 of 2 axes, before next steps
                     if (unequipLeftItem()) {
-                        if(!trySendItemToBelt()) {
+                        if(!dropHoldingItemToBelt()) {
                             equipEmptyHand(); // fall back
                         }
                     }
@@ -202,7 +201,7 @@ public class ZeeManagerItemClick extends ZeeThread{
                 }else {
                     equipLeftOccupiedHand();//all hands occupied, equip left
                 }
-                trySendItemToBelt();
+                dropHoldingItemToBelt();
             }
             else{// 1handed item
 
@@ -216,16 +215,16 @@ public class ZeeManagerItemClick extends ZeeThread{
                             //switch 1handed for 2handed
                             pickUpItem();
                             equipLeftOccupiedHand();
-                            trySendItemToBelt();
+                            dropHoldingItemToBelt();
                         }else if(isShield()) {
                             //avoid replacing 1handed swords
                             pickUpItem();
                             if (!isOneHandedSword(leftHandItemName)){
                                 equipLeftOccupiedHand();
-                                trySendItemToBelt();
+                                dropHoldingItemToBelt();
                             }else if (!isOneHandedSword(rightHandItemName)){
                                 equipRightOccupiedHand();
-                                trySendItemToBelt();
+                                dropHoldingItemToBelt();
                             }else
                                 println("2 swords equipped? let user decide...");
                         }else if(isOneHandedSword()) {
@@ -233,22 +232,22 @@ public class ZeeManagerItemClick extends ZeeThread{
                             pickUpItem();
                             if (!isShield(leftHandItemName)){
                                 equipLeftOccupiedHand();
-                                trySendItemToBelt();
+                                dropHoldingItemToBelt();
                             }else if (!isShield(rightHandItemName)){
                                 equipRightOccupiedHand();
-                                trySendItemToBelt();
+                                dropHoldingItemToBelt();
                             }else//2 shields?
                                 println("2 shields equipped? let user decide...");
                         }else if(!isItemSack(leftHandItemName)) {
                             //switch 1handed item for left hand
                             pickUpItem();
                             equipLeftOccupiedHand();
-                            trySendItemToBelt();
+                            dropHoldingItemToBelt();
                         }else if(!isItemSack(rightHandItemName)) {
                             //switch 1handed item for right hand
                             pickUpItem();
                             equipRightOccupiedHand();
-                            trySendItemToBelt();
+                            dropHoldingItemToBelt();
                         }else{
                             // switch 1handed item for one of both sacks equipped
                             pickUpItem();
@@ -257,14 +256,14 @@ public class ZeeManagerItemClick extends ZeeThread{
                                 //couldn't switch, try other sack
                                 equipRightOccupiedHand();
                             }
-                            trySendItemToBelt();
+                            dropHoldingItemToBelt();
                         }
                     }
 
                 }
                 else if(isItemWindowEquips()){//send to belt
                     pickUpItem();
-                    if(!trySendItemToBelt()) {
+                    if(!dropHoldingItemToBelt()) {
                         ZeeConfig.gameUI.msg("Belt is full");
                     }
                 }
@@ -298,7 +297,7 @@ public class ZeeManagerItemClick extends ZeeThread{
                 equipLeftEmptyHand();
             } else {
                 equipLeftOccupiedHand();
-                if (!trySendItemToBelt()) {
+                if (!dropHoldingItemToBelt()) {
                     println("equipTwoSacks() > couldnt switch left item");
                     return;
                 }
@@ -310,7 +309,7 @@ public class ZeeManagerItemClick extends ZeeThread{
                     equipRightEmptyHand();
                 } else {
                     equipRightOccupiedHand();
-                    if (!trySendItemToBelt()) {
+                    if (!dropHoldingItemToBelt()) {
                         println("equipTwoSacks() > couldnt switch right item");
                     }
                 }
@@ -816,19 +815,40 @@ public class ZeeManagerItemClick extends ZeeThread{
         return name.contains("roundshield");
     }
 
-    public static boolean trySendItemToBelt() {
-        if(!ZeeConfig.isPlayerHoldingItem())
+    public static boolean dropHoldingItemToBelt() {
+        return dropHoldingItemToInv(ZeeManagerItemClick.getInvBelt());
+    }
+
+    public static boolean dropHoldingItemToInv(Inventory inv) {
+        if(!ZeeConfig.isPlayerHoldingItem() || inv==null)
             return false;
         try{
-            List<Coord> freeSlots = ZeeManagerItemClick.getInvBelt().getFreeSlots();
+            List<Coord> freeSlots = inv.getFreeSlots();
             if (freeSlots.size()==0)
-                return false;//belt full
+                return false;//inv full
             Coord c = freeSlots.get(0);
-            ZeeManagerItemClick.getInvBelt().wdgmsg("drop", c);
+            inv.wdgmsg("drop", c);
             return waitNotHoldingItem();
         }catch (Exception e){
             e.printStackTrace();
             return false;
+        }
+    }
+
+    public static Coord dropHoldingItemToInvAndRetCoord(Inventory inv) {
+        if(!ZeeConfig.isPlayerHoldingItem() || inv==null)
+            return null;
+        try{
+            List<Coord> freeSlots = inv.getFreeSlots();
+            if (freeSlots.size()==0)
+                return null;//inv full
+            Coord c = freeSlots.get(0);
+            inv.wdgmsg("drop", c);
+            waitNotHoldingItem();
+            return c;
+        }catch (Exception e){
+            e.printStackTrace();
+            return null;
         }
     }
 
@@ -1073,29 +1093,65 @@ public class ZeeManagerItemClick extends ZeeThread{
             println("itemManager.equipBeltItem() > item '"+name+"' not found");
     }
 
-    public static void getItemOverlays(WItem item) {
-        println("getItemOverlays ");
-        item.item.info().forEach(itemInfo -> {
-            if(itemInfo.getClass().getSimpleName().equals("Quality")) {
-                try {
-                    println("Quality.q = "+ itemInfo.getClass().getField("q").get(itemInfo));
-                } catch (IllegalAccessException e) {
-                    e.printStackTrace();
-                } catch (NoSuchFieldException e) {
-                    e.printStackTrace();
+    public static WItem getHoldingItem(){
+        return ZeeConfig.gameUI.vhand;
+    }
+
+    public static String getHoldingItemContentsNameQl() {
+        WItem item = getHoldingItem();
+        String msg = "";
+        if (item==null){
+            println("getHoldingItemContentsNameQl > not holding item?");
+            return "";
+        }
+        ItemInfo.Contents contents = getItemInfoContents(item.item.info());
+        if (contents!=null && contents.sub!=null) {
+            String name = getItemInfoName(contents.sub);
+            double ql = getItemInfoQuality(contents.sub);
+            msg += name.replaceAll(".+ of ","");// 0.45 l of Water
+            msg += " q" + ql;
+        }else
+            println("contents null? try picking  up item first");
+        println("msg = "+msg);
+        return msg;
+    }
+
+    public static String getItemInfoName(List<ItemInfo> info) {
+        try {
+            for (ItemInfo v : info) {
+                if (v.getClass().getSimpleName().equals("Name")) {
+                    return ((Text)v.getClass().getField("str").get(v)).text;
                 }
             }
-        });
-//        if(cup.itemols!=null) {
-//            println("  cup.itemols > "+cup.itemols);
-//            if (cup.itemols.get()!=null) {
-//                println("    cup.itemols.get().length > "+cup.itemols.get().length);
-//                for (int i = 0; i < cup.itemols.get().length; i++) {
-//                    println("      cup.itemols.get()[i] > "+cup.itemols.get()[i].getClass().getSimpleName());
-//                }
-//            }else
-//                println("  cup.itemols.get() null");
-//        }else
-//            println("  cup.itemols null");
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return(null);
+    }
+
+    public static Double getItemInfoQuality(List<ItemInfo> info) {
+        try{
+            for(ItemInfo v : info) {
+                if(v.getClass().getSimpleName().equals("Quality")) {
+                    return((Double) v.getClass().getField("q").get(v));
+                }
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return(null);
+    }
+
+    public static ItemInfo.Contents getItemInfoContents(List<ItemInfo> info) {
+        try{
+            for(ItemInfo v : info) {
+                if(v instanceof ItemInfo.Contents) {
+                    return((ItemInfo.Contents) v);
+                }
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return(null);
     }
 }

@@ -864,6 +864,7 @@ public class ChatUI extends Widget {
 	    String name = (String)args[0];
 	    int urgency = (Integer)args[1];
 	    Channel ret = new MultiChat(false, name, urgency);
+		ZeeConfig.multiChat = ret;
 	    if(args.length > 2)
 		ret.icon(ui.sess.getres((Integer)args[2]));
 	    return(ret);

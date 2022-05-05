@@ -21,6 +21,7 @@ features:
  - midclick ground 
    - while holding item will move to location (simulates ctrl+click)
  - long midclick ground
+   - inspect water tile using inventory woodencup  
    - while mounting horse will try to dismount
    - while carrying wheelbarrow will try to(dismount and) unload stockpile at ground
  - midclick object 

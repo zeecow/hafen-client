@@ -175,7 +175,7 @@ public class Makewindow extends Widget {
 	int inputCount = 0;
 	public void wdgmsg(Widget sender, String msg, Object... args) {
 		if(msg.contentEquals("mkWindowFindInputs")){
-    		String nextInputName = ZeeConfig.getItemInfoName(inputs.get(inputCount).info());
+    		String nextInputName = ZeeManagerItemClick.getItemInfoName(inputs.get(inputCount).info());
 			ZeeConfig.searchNextInputMakeWnd(nextInputName);
 			inputCount++;
 			if(inputCount >= inputs.size())

@@ -3,6 +3,7 @@ package haven;
 
 import haven.resutil.WaterTile;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -159,18 +160,32 @@ public class ZeeManagerGobClick extends ZeeThread{
     }
 
     private void inspectWaterAt(Coord2d coordMc) {
-        // gfx/invobjs/woodencup
-        List<WItem> cups = ZeeConfig.getMainInventory().getWItemsByName("/woodencup");
+
+        // require wooden cup
+        Inventory inv = ZeeConfig.getMainInventory();
+        List<WItem> cups = inv.getWItemsByName("/woodencup");
         if (cups==null || cups.size()==0){
             println("need woodencup to inspect");
             return;
         }
+
+        // pickup inv cup, click water, return cup
         WItem cup = cups.get(0);
         ZeeManagerItemClick.pickUpItem(cup);
-        // haven.MapView@22e2c39e ; itemact ; [(700, 483), (-940973, -996124), 0]
         ZeeConfig.itemActTile(coordMc.floor(posres));
-        waitPlayerIdleFor(2);
-        ZeeManagerItemClick.getItemOverlays(cup);
+        waitPlayerIdleFor(1);
+
+        // show msg
+        String msg = ZeeManagerItemClick.getHoldingItemContentsNameQl();
+        ZeeConfig.msg(msg);
+        //haven.ChatUI$MultiChat@dd1ed65 ; msg ; ["hello world"]
+
+        //empty cup
+        Coord cupSlot = ZeeManagerItemClick.dropHoldingItemToInvAndRetCoord(inv);
+        if (cupSlot!=null) {
+            cup = inv.getItemBySlotCoord(cupSlot);
+            ZeeManagerItemClick.clickItemPetal(cup, "Empty");
+        }
     }
 
     public static boolean isWaterTile(Coord2d coordMc) {
