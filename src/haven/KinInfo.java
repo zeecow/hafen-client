@@ -126,7 +126,7 @@ public class KinInfo extends GAttrib implements RenderTree.Node, PView.Render2D 
     public static class $buddy implements OCache.Delta {
 	public void apply(Gob g, Message msg) {
 	    String name = msg.string();
-	    if(name.length() > 0) {
+	    if(name.length() > 0 && ZeeConfig.showKinNames) {
 		int group = msg.uint8();
 		int btype = msg.uint8();
 		KinInfo b = g.getattr(KinInfo.class);

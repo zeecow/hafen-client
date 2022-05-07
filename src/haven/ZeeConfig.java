@@ -159,6 +159,7 @@ public class ZeeConfig {
     public static boolean showInventoryLogin = Utils.getprefb("showInventoryLogin", true);
     public static boolean showIconsZoomOut = Utils.getprefb("showIconsZoomOut", true);
     public static boolean showEquipsLogin = Utils.getprefb("showEquipsLogin", false);
+    public static boolean showKinNames = Utils.getprefb("showKinNames", true);
     public static boolean sortActionsByUses = Utils.getprefb("sortActionsByUses", true);
     public static boolean rememberWindowsPos = Utils.getprefb("rememberWindowsPos", true);
     public static boolean zoomOrthoExtended = Utils.getprefb("zoomOrthoExtended", true);

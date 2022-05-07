@@ -14,7 +14,7 @@ public class ZeecowOptionsWindow extends JFrame {
     public GridBagConstraints c;
     public JTabbedPane tabbedPane, tabbedPaneGobs;
     public JPanel panelTabMisc, panelTabInterface, panelTabGobs, panelDetailsBottom, panelTabCateg;
-    public JCheckBox cbDropAltKeyOnly, cbCtrlClickMinimapContent, cbAutoChipMinedBoulder, cbDropMinedStone, cbDropMinedOre, cbDropMinedSilverGold, cbDropMinedCurios, cbActionSearchGlobal, cbCompactEquipsWindow, cbBeltTogglesEquips, cbAutoRunLogin, cbAutohearth, cbHighlightCropsReady, cbHighlightGrowingTrees, cbMiniTrees, cbAlertOnPlayers,  cbShowInventoryLogin, cbShowBeltLogin, cbKeyBeltShiftTab, cbKeyCamSwitchShiftC, cbShowIconsZoomOut, cbRememberWindowsPos, cbSortActionsByUse, cbDebugWidgetMsgs, cbDebugCodeRes, cbMidclickEquipManager, cbShowEquipsLogin, cbNotifyBuddyOnline, cbZoomOrthoExtended, cbCattleRosterHeight;
+    public JCheckBox cbDropAltKeyOnly, cbShowKinNames, cbCtrlClickMinimapContent, cbAutoChipMinedBoulder, cbDropMinedStone, cbDropMinedOre, cbDropMinedSilverGold, cbDropMinedCurios, cbActionSearchGlobal, cbCompactEquipsWindow, cbBeltTogglesEquips, cbAutoRunLogin, cbAutohearth, cbHighlightCropsReady, cbHighlightGrowingTrees, cbMiniTrees, cbAlertOnPlayers,  cbShowInventoryLogin, cbShowBeltLogin, cbKeyBeltShiftTab, cbKeyCamSwitchShiftC, cbShowIconsZoomOut, cbRememberWindowsPos, cbSortActionsByUse, cbDebugWidgetMsgs, cbDebugCodeRes, cbMidclickEquipManager, cbShowEquipsLogin, cbNotifyBuddyOnline, cbZoomOrthoExtended, cbCattleRosterHeight;
     public JTextField tfAutoClickMenu, tfAggroRadiusTiles, tfButchermode, tfGobName, tfAudioPath, tfCategName, tfAudioPathCateg;
     public JComboBox<String> cmbCattleRoster, cmbGobCategory, cmbMiniTreeSize;
     public JList<String> listGobsTemp, listGobsSaved, listGobsCategories;
@@ -62,6 +62,14 @@ public class ZeecowOptionsWindow extends JFrame {
 
         panelTabMisc = new JPanel(new GridBagLayout());
         tabbedPane.addTab("Misc", panelTabMisc);
+
+        panelTabMisc.add(cbDropAltKeyOnly = new JCheckBox("Alt+click drops holding item"), c);
+        cbDropAltKeyOnly.setSelected(ZeeConfig.dropHoldingItemAltKey);
+        cbDropAltKeyOnly.addActionListener(actionEvent -> {
+            JCheckBox cb = (JCheckBox) actionEvent.getSource();
+            boolean val = ZeeConfig.dropHoldingItemAltKey = cb.isSelected();
+            Utils.setprefb("dropHoldingItemAltKey",val);
+        });
 
         panelTabMisc.add(cbAutoChipMinedBoulder = new JCheckBox("Auto chip mined boulder"), c);
         cbAutoChipMinedBoulder.setSelected(ZeeConfig.autoChipMinedBoulder);
@@ -228,12 +236,12 @@ public class ZeecowOptionsWindow extends JFrame {
         panelTabInterface = new JPanel(new GridBagLayout());
         tabbedPane.addTab("Interface", panelTabInterface);
 
-        panelTabInterface.add(cbDropAltKeyOnly = new JCheckBox("Alt+click drops holding item"), c);
-        cbDropAltKeyOnly.setSelected(ZeeConfig.dropHoldingItemAltKey);
-        cbDropAltKeyOnly.addActionListener(actionEvent -> {
+        panelTabInterface.add(cbShowKinNames = new JCheckBox("Show kin names (hearthfire)"), c);
+        cbShowKinNames.setSelected(ZeeConfig.showKinNames);
+        cbShowKinNames.addActionListener(actionEvent -> {
             JCheckBox cb = (JCheckBox) actionEvent.getSource();
-            boolean val = ZeeConfig.dropHoldingItemAltKey = cb.isSelected();
-            Utils.setprefb("dropHoldingItemAltKey",val);
+            boolean val = ZeeConfig.showKinNames = cb.isSelected();
+            Utils.setprefb("showKinNames",val);
         });
 
         panelTabInterface.add(cbCtrlClickMinimapContent = new JCheckBox("Ctrl scroll/resize minimap"), c);
