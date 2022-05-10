@@ -766,33 +766,66 @@ public class ZeeConfig {
     }
 
 
+    private static int bstandPriceX = 110; // price x (sprite img)
+    private static int bstandQlX = 155; // quality x (label ql)
     private static void windowModBarterStand(Window window) {
+
         int v = 20;
+        int winmidx = window.sz.x / 2;
+
+        // change buttons
         window.children(Button.class).forEach(button -> {
             String buttonName = button.text.text;
+            // skip close button
             if (buttonName.equalsIgnoreCase("x"))
-                return;//skip close button
-            if(buttonName.contains("Resign"))
-                button.c = button.c.addy( -(v * 5) );
-            else
-                button.c = button.c.addy( - v );//change, buy
+                return;
+            // resign button
+            if(buttonName.contains("Resign")) {
+                button.resize(button.sz.x/2, button.sz.y);
+                button.c = button.c.add(-50, -(v * 5));
+                button.change("Resign");
+            }
+            // buttons change, buy, connect
+            else {
+                int btnmidx = button.sz.x / 2;
+                int btnaddx = 0;
+                button.c = button.c.addy(-v);
+                button.resize(btnmidx, button.sz.y);
+                if (!buttonName.contains("Buy") && !buttonName.contains("Change"))
+                    btnaddx -= btnmidx;
+                if (button.c.x >= winmidx)
+                    btnaddx -= 110;
+                button.c = button.c.add(btnaddx,0);
+                button.change(buttonName.substring(0,3));
+            }
         });
+
+        // change shopboxes and textentries
         AtomicInteger i = new AtomicInteger(0);
         window.children().forEach(el -> {
+            //shopbox
             if (el.getClass().getSimpleName().equals("Shopbox")){
-                el.sz = el.sz.addy( - v );
+                // change size x and y
+                el.sz = el.sz.add(-115, - v);
+                // change y, except first one
                 if ( i.get() > 0 )
                     el.c = el.c.addy( - (v * i.get()) );
+                // half textentry
+                el.children(TextEntry.class).forEach(te -> te.resize(UI.scale(35)));
                 i.getAndIncrement();
             }
         });
+
+        // auto-buy checkbox
         ZeeConfig.allowMidclickAutoBuy = false;
         window.add(new CheckBox("allow midclick auto-buy"){
             public void changed(boolean val) {
                 ZeeConfig.allowMidclickAutoBuy = val;
             }
-        },0,420);
-        window.resize(380,440);
+        },0,410);
+
+
+        window.resize(260,440);
     }
 
 
@@ -1191,11 +1224,26 @@ public class ZeeConfig {
             else if (name.equals("haven.res.gfx.fx.msrad.MSRad")){
                 classMSRad = qlass;
             }
+            else if(name.equals("haven.res.ui.barterbox.Shopbox")) {
 
+                // pricec = UI.scale(200, 5);
+                setFinalStatic(
+                        qlass.getDeclaredField("pricec"),
+                        UI.scale(bstandPriceX, 5)
+                );
+
+                // qualc = UI.scale(260, 5).add(Inventory.invsq.sz());
+                setFinalStatic(
+                        qlass.getDeclaredField("qualc"),
+                        UI.scale(bstandQlX, 5).add(Inventory.invsq.sz())
+                );
+
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
+
 
     // https://stackoverflow.com/a/3301720
     public static void setFinalStatic(Field field, Object newValue) throws Exception {
