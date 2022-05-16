@@ -9,6 +9,7 @@ public class ZeeManagerStockpile extends ZeeThread{
     public static final String STOCKPILE_LEAF = "gfx/terobjs/stockpile-leaf";
     public static final String STOCKPILE_BLOCK = "gfx/terobjs/stockpile-wblock";
     public static final String STOCKPILE_BOARD = "gfx/terobjs/stockpile-board";
+    public static final String STOCKPILE_COAL = "gfx/terobjs/stockpile-coal";
     public static final String STOCKPILE_STONE = "gfx/terobjs/stockpile-stone";
     public static final String BASENAME_MULB_LEAF = "leaf-mulberrytree";
     static ZeeWindow windowManager;
@@ -115,6 +116,8 @@ public class ZeeManagerStockpile extends ZeeThread{
             gobPile = ZeeConfig.getClosestGob(ZeeConfig.findGobsByNameContains("stockpile-board"));
         else if (lastPetalName.equals("Chip stone"))
             gobPile = ZeeConfig.getClosestGob(ZeeConfig.findGobsByNameContains("stockpile-stone"));
+        else if (lastPetalName.equals("Collect coal"))
+            gobPile = ZeeConfig.getClosestGob(ZeeConfig.findGobsByNameContains("stockpile-coal"));
 
         //mark gob pile and source
         ZeeConfig.addPlayerText("piling");
@@ -240,11 +243,15 @@ public class ZeeManagerStockpile extends ZeeThread{
             show = false;
         else if (now() - ZeeConfig.lastInvItemMs > 3000) //3s
             show = false; // time limit to avoid late unwanted window popup
-        else if (pileGobName.equals(STOCKPILE_LEAF) && ZeeConfig.lastInvItemBaseName.equals(BASENAME_MULB_LEAF))
+        else if (pileGobName.equals(STOCKPILE_LEAF) && ZeeConfig.lastInvItemBaseName.contentEquals(BASENAME_MULB_LEAF))
+            show = true;
+        else if (pileGobName.equals(STOCKPILE_LEAF) && ZeeConfig.lastInvItemBaseName.contentEquals("leaf-laurel"))
             show = true;
         else if (pileGobName.equals(STOCKPILE_BLOCK) && ZeeConfig.lastInvItemBaseName.startsWith("wblock-"))
             show = true;
         else if (pileGobName.equals(STOCKPILE_BOARD) && ZeeConfig.lastInvItemBaseName.contains("board-"))
+            show = true;
+        else if (pileGobName.equals(STOCKPILE_COAL) && ZeeConfig.lastInvItemBaseName.contentEquals("coal"))
             show = true;
         else if (pileGobName.equals(STOCKPILE_STONE) && ZeeManagerMiner.isBoulder(gobSource))
             show = true;
@@ -265,6 +272,8 @@ public class ZeeManagerStockpile extends ZeeThread{
         }else if(petalName.equals("Make boards")){
             gobSource = ZeeConfig.lastMapViewClickGob;
         }else if(petalName.equals("Chip stone")){
+            gobSource = ZeeConfig.lastMapViewClickGob;
+        }else if(petalName.equals("Collect coal")){
             gobSource = ZeeConfig.lastMapViewClickGob;
         }
     }

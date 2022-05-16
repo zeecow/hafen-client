@@ -38,7 +38,7 @@ public class ZeeManagerGobClick extends ZeeThread{
 
         clickDiffMs = clickEndMs - clickStartMs;
 
-        //println(clickDiffMs+"ms > "+gobName + " dist="+ZeeConfig.distanceToPlayer(gob));
+        //println(clickDiffMs+"ms > "+gobName + (gob==null ? "" : " dist="+ZeeConfig.distanceToPlayer(gob)));
         //println(gobName + " poses = "+ZeeConfig.getGobPoses(gob));
 
         if (isLongMidClick()) {
@@ -1009,7 +1009,7 @@ public class ZeeManagerGobClick extends ZeeThread{
     private static boolean isInspectGob(String gobName){
         if(isGobTree(gobName) || isGobBush(gobName) || isGobBoulder(gobName))
             return true;
-        String list = "/meatgrinder,/potterswheel,/well,/dframe,"
+        String list = "/meatgrinder,/potterswheel,/well,/dframe,/smokeshed,"
                 +"/smelter,/crucible,/steelcrucible,/fineryforge,/kiln,/tarkiln,/oven,"
                 +"/compostbin,/gardenpot,/beehive,/htable,/bed-sturdy,/boughbed,/alchemiststable,"
                 +"/gemwheel,/spark,/cauldron,/churn,/chair-rustic,"

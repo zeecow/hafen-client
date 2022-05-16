@@ -58,7 +58,7 @@ public class ZeeManagerMiner extends ZeeThread{
         }
     }
 
-    private static boolean showTestBtn = true;//change to show/hide button
+    private static boolean showTestBtn = false;//change to show/hide button
     private void taskTest() throws Exception{
 
         Coord startTile = ZeeConfig.getTileCloserToPlayer(ol.a.ul, ol.a.br.sub(Coord.of(1)));
