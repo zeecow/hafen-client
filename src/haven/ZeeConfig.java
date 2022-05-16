@@ -35,13 +35,13 @@ public class ZeeConfig {
     public static final String MAP_ANIMAL_FORMAT_CATTLE = "cattle";
     public static final String MAP_ANIMAL_FORMAT_GOAT = "goat";
     public static final String MAP_ANIMAL_FORMAT_SHEEP = "sheep";
-    public static final String MAP_GOB_CATEGORY = "mapGobCategory";
-    public static final String MAP_CATEGORY_AUDIO = "mapCategoryAudio";
-    public static final String MAP_CATEGORY_COLOR = "mapCategoryColor";
-    public static final String MAP_CATEGORY_GOBS = "mapCategoryGobs";
-    public static final String MAP_ACTION_USES = "mapActionUses";
-    public static final String MAP_GOB_COLOR = "mapGobSettings";
-    public static final String MAP_WND_POS = "mapWindowPos";
+    public static final String MAP_GOB_CATEGORY = "mapGobCategory2";
+    public static final String MAP_CATEGORY_AUDIO = "mapCategoryAudio2";
+    public static final String MAP_CATEGORY_COLOR = "mapCategoryColor2";
+    public static final String MAP_CATEGORY_GOBS = "mapCategoryGobs2";
+    public static final String MAP_ACTION_USES = "mapActionUses2";
+    public static final String MAP_GOB_COLOR = "mapGobSettings2";
+    public static final String MAP_WND_POS = "mapWindowPos2";
     public static final String MAKE_WINDOW_NAME = "Makewindow";
 
     public static final String CURSOR_ARW = "gfx/hud/curs/arw";//cursor
@@ -836,7 +836,7 @@ public class ZeeConfig {
                 windowTitle = MAKE_WINDOW_NAME;
             }
             //use saved position window
-            if ((c = mapWindowPos.get(windowTitle)) != null) {
+            if (mapWindowPos!=null && (c = mapWindowPos.get(windowTitle)) != null) {
                 window.c = c;
             }
         }
@@ -1805,7 +1805,7 @@ public class ZeeConfig {
      * @return value of hourglass
      */
     public static double getHourglass() {
-        return gameUI.prog;
+        return gameUI.prog.prog;
     }
 
     public static void addPlayerText(String s) {
