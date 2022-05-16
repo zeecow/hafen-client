@@ -1941,7 +1941,8 @@ public class ZeeConfig {
     public static Coord tileToCoord(Coord tile){
         // 0x1.0p-10 = 1/1024 = 0.0009765625 in base 10
         //1023,5
-        return tile.mul(1023.5);
+        return tile.mul(1023.45);//TODO find better way
+        //return tile.mul(Double.parseDouble(ZeeManagerMiner.txtTest.text()));
     }
 
     public static Coord getCenterScreenCoord(GameUI ui) {

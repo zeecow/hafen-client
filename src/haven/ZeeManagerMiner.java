@@ -25,6 +25,7 @@ public class ZeeManagerMiner extends ZeeThread{
     public static ZeeManagerMiner manager;
     static ZeeWindow windowManager;
     static ZeeWindow.ZeeButton btnNorth, btnSouth, btnWest, btnEast, btnDig, btnTest;
+    static TextEntry txtTest;
     static MCache.Overlay ol;
     static Coord areasize = new Coord(1,1);
     static String lastDir = "";
@@ -57,61 +58,19 @@ public class ZeeManagerMiner extends ZeeThread{
         }
     }
 
-    private static boolean showTestBtn = false;//change to show/hide button
+    private static boolean showTestBtn = true;//change to show/hide button
     private void taskTest() throws Exception{
-        println("playertile"+ZeeConfig.getPlayerTile()+"  upperLeft"+upperLeft+"  areasize"+areasize);
-        Coord c1=null,c2=null;
-        Coord areasub1 = areasize.sub(1,1);
-        boolean positive = upperLeft.x >= 0;
-        debug("positive="+positive);
-        /*
-            DIR_WEST
-            playertile(1020, 1022)  upperLeft(1017, 1022)  areasize(4, 1)
-            ol.a.ul(1017, 1022)  ol.a.br(1021, 1023)
-            mine tiles  c1(1018, 1023)  c2(1021, 1023)
-            haven.MapView@5050cddf ; sel ; [(1018, 1023), (1021, 1023), 0] (TEST BTN)
-            haven.MapView@5050cddf ; sel ; [(1020, 1022), (1017, 1022), 0]
-            =======
-            DIR_SOUTH
-            playertile(1019, 1021)  upperLeft(1019, 1021)  areasize(1, 4)
-            ol.a.ul(1019, 1021)  ol.a.br(1020, 1025)
-            mine tiles  c1(1020, 1025)  c2(1020, 1022)
-            haven.MapView@5050cddf ; sel ; [(1020, 1025), (1020, 1022), 0] (TEST BTN)
-            haven.MapView@5050cddf ; sel ; [(1019, 1021), (1019, 1024), 0]
-         */
-        if(lastDir.contentEquals(DIR_NORTH) || lastDir.contentEquals(DIR_WEST)) {
-            c1 = positive? ol.a.ul.add(areasub1) : upperLeft.add(areasub1);
-            c2 = positive? ol.a.ul : upperLeft;
-        }else if(lastDir.contentEquals(DIR_SOUTH) || lastDir.contentEquals(DIR_EAST)) {
-            c1 = positive? ol.a.ul : upperLeft;
-            c2 = positive? ol.a.ul.add(areasub1) : upperLeft.add(areasub1);
-        }
-        Coord startTile = ZeeConfig.getTileCloserToPlayer(c1,c2);
-        Coord endTile = ZeeConfig.getTileFartherToPlayer(c1,c2);
-        debug("upperleft"+upperLeft+"  c1"+c1+"  c2"+c2+"  areasize"+areasize);
-        debug("ol.a.ul"+ol.a.ul+"  ol.a.br"+ol.a.br);
-        mineTiles(c1,c2);
-        ZeeConfig.clickTile(endTile,1);//TODO mineOverlayArea(ol) and overlayMineArea(c1,c2)
 
+        Coord startTile = ZeeConfig.getTileCloserToPlayer(ol.a.ul, ol.a.br.sub(Coord.of(1)));
+        Coord endTile = ZeeConfig.getTileFartherToPlayer(ol.a.ul, ol.a.br);
+//        ZeeConfig.clickTile(endTile,1);
+//        waitPlayerIdleFor(1);
+//        ZeeConfig.clickTile(startTile,1);
 
-        /*
-            update overlay for next tiles
-         */
-        upperLeft = endTile;
-        debug("upperLeft before"+upperLeft);
-        if (positive) {
-            if (lastDir.contentEquals(DIR_NORTH) || lastDir.contentEquals(DIR_WEST))
-                upperLeft = ol.a.ul.sub(areasub1);
-            else if(lastDir.contentEquals(DIR_SOUTH) || lastDir.contentEquals(DIR_EAST))
-                upperLeft = ol.a.ul.add(areasub1);
-        } else {
-            if (lastDir.contentEquals(DIR_NORTH))
-                upperLeft.y -= Math.abs(areasize.y)-1;
-            else if (lastDir.contentEquals(DIR_WEST))
-                upperLeft.x -= Math.abs(areasize.x)-1;
-        }
-        debug("upperLeft after"+upperLeft);
-        highlightTiles(upperLeft,areasize);
+        ZeeConfig.gameUI.menu.wdgmsg("act","bp","column","0");
+        sleep(1500);
+        ZeeConfig.gameUI.map.wdgmsg("place",ZeeConfig.tileToCoord(endTile),0,1,0);
+
     }
 
 
@@ -595,6 +554,8 @@ public class ZeeManagerMiner extends ZeeThread{
                         }
                     }
                 }, 120, 35);
+
+                txtTest = windowManager.add(new TextEntry(UI.scale(80),"1023.45"),120,70);
             }
 
 

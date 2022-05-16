@@ -1259,7 +1259,7 @@ public class ZeeManagerGobClick extends ZeeThread{
     }
 
     private static boolean isGobFireSource(String gobName) {
-        return gobNameEndsWith(gobName,"brazier,pow,snowlantern");
+        return gobNameEndsWith(gobName,"brazier,pow,snowlantern,/bonfire");
     }
 
     /**
