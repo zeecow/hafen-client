@@ -2190,4 +2190,24 @@ public class ZeeConfig {
         }
         return ret.strip();
     }
+
+    public static Tiler getTilerAt(Coord2d coordMc) {
+        return getTilerAt(coordMc.floor(MCache.tilesz));
+    }
+
+    public static Tiler getTilerAt(Coord tile) {
+        int id = ZeeConfig.gameUI.ui.sess.glob.map.getTileSafe(tile);
+        Tiler tl = ZeeConfig.gameUI.ui.sess.glob.map.tiler(id);
+        return tl;
+    }
+
+    public static String getTileResName(Coord tileCoord) {
+        int id = ZeeConfig.gameUI.ui.sess.glob.map.getTileSafe(tileCoord);
+        Resource res = ZeeConfig.gameUI.ui.sess.glob.map.tilesetr(id);
+        return res.name;
+    }
+
+    public static String getTileResName(Coord2d mc) {
+        return getTileResName(mc.floor(MCache.tilesz));
+    }
 }

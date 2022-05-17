@@ -196,16 +196,8 @@ public class ZeeManagerGobClick extends ZeeThread{
     }
 
     public static boolean isWaterTile(Coord2d coordMc) {
-        Tiler t = getTilerAt(coordMc);
+        Tiler t = ZeeConfig.getTilerAt(coordMc);
         return t!=null && t instanceof WaterTile;
-    }
-
-    public static Tiler getTilerAt(Coord2d coordMc) {
-        int id = ZeeConfig.gameUI.ui.sess.glob.map.getTileSafe(coordMc.floor(MCache.tilesz));
-        Tiler tl = ZeeConfig.gameUI.ui.sess.glob.map.tiler(id);
-        Resource res = ZeeConfig.gameUI.ui.sess.glob.map.tilesetr(id);
-        //println("getTilerAt > id="+id+" , tl="+tl.getClass().getSimpleName()+" , res="+res.name);
-        return tl;
     }
 
 
