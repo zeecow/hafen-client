@@ -12,7 +12,7 @@ features:
  - reposition map window when compacted/expanded
  - basic inventory item counter
  - tamed animal name generator, using animal's stats 
- - auto-pile helper for mulberry leaves, woodblocks, boards
+ - auto-pile helper for mulberry leaves, woodblocks, boards, coal, ground stones
  - seed-farmer manager: no pathfinding, buggy (ctrlLongMidClick crop)
  - cook manager: auto cook pepper and refill cauldron until barrel is empty(no pathfinding)
  - icon list categs
@@ -20,6 +20,7 @@ features:
  - midclick Barter Stand "Buy" button to auto-buy  
  - midclick ground 
    - while holding item will move to location (simulates ctrl+click)
+   - while inspecting icon active, will msg tile name
  - long midclick ground
    - inspect water tile using inventory woodencup  
    - while mounting horse will try to dismount

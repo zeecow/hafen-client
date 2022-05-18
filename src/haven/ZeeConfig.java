@@ -52,6 +52,7 @@ public class ZeeConfig {
     public static final String CURSOR_HARVEST = "gfx/hud/curs/harvest";
     public static final String CURSOR_MINE = "gfx/hud/curs/mine";//destroy
     public static final String CURSOR_SHOOT = "gfx/hud/curs/shoot";
+    public static final String CURSOR_INSPECT = "gfx/hud/curs/study";
 
     public static final String POSE_PLAYER_IDLE = "gfx/borka/idle";
     public static final String POSE_PLAYER_IDLE_MOUNTED = "gfx/borka/riding-idle";

@@ -51,7 +51,10 @@ public class ZeeManagerGobClick extends ZeeThread{
             /*
                 short mid-clicks
              */
-            if (ZeeConfig.isPlayerHoldingItem()) {
+            if(gob==null) {//ground clicks
+                if (ZeeConfig.getCursorName().contentEquals(ZeeConfig.CURSOR_INSPECT))
+                    ZeeConfig.msg(ZeeConfig.getTileResName(mc));
+            } else if (ZeeConfig.isPlayerHoldingItem()) {
                 clickedGobHoldingItem(gob,gobName);
             } else if (isGobTrellisPlant(gobName)) {
                 new ZeeThread() {
