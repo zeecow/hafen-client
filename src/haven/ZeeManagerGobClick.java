@@ -818,12 +818,13 @@ public class ZeeManagerGobClick extends ZeeThread{
     }
 
     private static void removeAllTrellisPlants(Gob firstPlant) {
+        Gob closestPlant = null;
         try{
             String gobName = firstPlant.getres().basename();
-            ZeeConfig.addGobText(ZeeConfig.getPlayerGob(),"removing all "+gobName);
+            ZeeConfig.addGobText(ZeeConfig.getPlayerGob(),"rem "+gobName);
             waitNoFlowerMenu();
             waitPlayerIdleFor(1);
-            Gob closestPlant = firstPlant;
+            closestPlant = firstPlant;
             double dist;
             do{
                 if (ZeeConfig.isTaskCanceledByGroundClick()) {
@@ -831,7 +832,7 @@ public class ZeeManagerGobClick extends ZeeThread{
                     println("cancel click");
                     break;
                 }
-                ZeeConfig.addGobText(closestPlant,"next");
+                ZeeConfig.addGobText(closestPlant,"plant");
                 destroyGob(closestPlant);
                 waitGobRemoved(closestPlant);
                 closestPlant = ZeeConfig.getClosestGob(ZeeConfig.findGobsByNameContains(gobName));
@@ -841,7 +842,8 @@ public class ZeeManagerGobClick extends ZeeThread{
         } catch (Exception e) {
             e.printStackTrace();
         }
-        ZeeConfig.removeGobText(ZeeConfig.getPlayerGob());
+        ZeeConfig.removePlayerText();
+        ZeeConfig.removeGobText(closestPlant);
     }
 
     public static void removeTreeAndStump(Gob tree, String petalName){
