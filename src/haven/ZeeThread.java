@@ -523,16 +523,16 @@ public class ZeeThread  extends Thread{
         return (timeoutMs <= 0);
     }
 
-    public static boolean waitGobRemoved(Gob gob){
+    public static boolean waitGobRemovedOrCancelClick(Gob gob){
         try{
-            println("waitGobRemoved > enter loop");
-            while(!ZeeConfig.isGobRemoved(gob)){
+            //println("waitGobRemoved > enter loop");
+            while(!ZeeConfig.isGobRemoved(gob) && !ZeeConfig.isTaskCanceledByGroundClick()){
                 Thread.sleep(1000);
             }
         }catch (Exception e){
             e.printStackTrace();
         }
-        println("waitGobRemoved > ret="+ZeeConfig.isGobRemoved(gob));
+        //println("waitGobRemoved > ret="+ZeeConfig.isGobRemoved(gob));
         return ZeeConfig.isGobRemoved(gob);
     }
 

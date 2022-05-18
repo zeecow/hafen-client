@@ -834,7 +834,8 @@ public class ZeeManagerGobClick extends ZeeThread{
                 }
                 ZeeConfig.addGobText(closestPlant,"plant");
                 destroyGob(closestPlant);
-                waitGobRemoved(closestPlant);
+                if(!waitGobRemovedOrCancelClick(closestPlant))
+                    break;
                 closestPlant = ZeeConfig.getClosestGob(ZeeConfig.findGobsByNameContains(gobName));
                 dist = ZeeConfig.distanceToPlayer(closestPlant);
                 //println("dist "+dist);
