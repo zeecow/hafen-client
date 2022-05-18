@@ -65,6 +65,7 @@ public class ZeeConfig {
     public static final String POSE_PLAYER_DIGSHOVEL = "gfx/borka/shoveldig";
     public static final String POSE_PLAYER_DRINK = "gfx/borka/drinkan";
     public static final String POSE_PLAYER_PICK = "gfx/borka/pickan";
+    public static final String POSE_PLAYER_PICKGROUND = "gfx/borka/pickaxeanspot";
     public static final String POSE_PLAYER_LIFT = "gfx/borka/banzai";
     public static final String POSE_PLAYER_CARRYFLAT = "gfx/borka/carry-flat";//idle pickaxe
     public static final String POSE_PLAYER_TRAVELHOMESHRUG = "gfx/borka/pointconfused";
@@ -1670,17 +1671,33 @@ public class ZeeConfig {
         lastMapViewClickArgs = args;
         lastMapViewClickMs = ZeeThread.now();
         lastMapViewClickGob = clickGob;
-        if(clickGob!=null) { //clicked gob object
+        // clicked gob object
+        if(clickGob!=null) {
             lastMapViewClickGobName = clickGob.getres().name;
             if (ZeeManagerCook.pepperRecipeOpen)
                 ZeeManagerCook.gobClicked(clickGob,lastMapViewClickGobName,clickb);
             if(clickb == 2) {
                 ZeeManagerGobClick.checkMidClickGob(pc, mc, clickGob, lastMapViewClickGobName);
-            } else if (clickb==3 && gameUI.ui.modflags()==0){//no mod keys
+            } else if (clickb==3 && gameUI.ui.modflags()==0){// no mod keys
                 ZeeManagerGobClick.checkRightClickGob(pc, mc, clickGob, lastMapViewClickGobName);
             }
-        }else{ // clicked ground
-            if (clickb==2) {
+        }
+        // clicked ground
+        else{
+            if (clickb==1) {
+                // pile stones from tile source
+                if ( pilerMode && getCursorName().contentEquals(CURSOR_DIG) ) {
+                    String tileName = getTileResName(mc);
+                    if(isTileStoneSource(tileName)) {
+                        ZeeManagerStockpile.diggingStone = true;
+                        ZeeManagerStockpile.lastTileStoneSourceCoordMc = mc;
+                        ZeeManagerStockpile.lastTileStoneSourceTileName = tileName;
+                    } else
+                        ZeeManagerStockpile.diggingStone = false;
+                } else
+                    ZeeManagerStockpile.diggingStone = false;
+            }
+            else if (clickb==2) {
                 if (isPlayerHoldingItem()) { //move while holding item
                     clickCoord(mc.floor(posres), 1, 0);
                 }else
@@ -2209,5 +2226,11 @@ public class ZeeConfig {
 
     public static String getTileResName(Coord2d mc) {
         return getTileResName(mc.floor(MCache.tilesz));
+    }
+
+    private static boolean isTileStoneSource(String tileResName) {
+        String list = "gfx/tiles/sandcliff , gfx/tiles/mountain";
+        //println(tileResName);
+        return list.contains(tileResName);
     }
 }
