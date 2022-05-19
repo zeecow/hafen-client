@@ -213,7 +213,7 @@ public class ZeeManagerGobClick extends ZeeThread{
                     try {
                         if(!waitPlayerDistToGob(gob,15))
                             return;
-                        sleep(PING_MS);
+                        sleep(555);
                         String barrelName = ZeeConfig.getBarrelOverlayBasename(gob);
                         if (!barrelName.isEmpty())
                             ZeeConfig.addGobTextTemp(gob, barrelName);
@@ -1155,7 +1155,8 @@ public class ZeeManagerGobClick extends ZeeThread{
         }
         ZeeConfig.gameUI.menu.wdgmsg("act", "carry","0");
         gobClick(gob,1);
-        waitPlayerIdleFor(1);
+        //waitPlayerIdleFor(1);
+        waitPlayerDistToGob(gob,0);
     }
 
     public static void inspectGob(Gob gob){

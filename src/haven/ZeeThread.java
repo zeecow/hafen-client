@@ -235,19 +235,21 @@ public class ZeeThread  extends Thread{
 
     public static boolean waitPlayerDistToGob(Gob gob, int dist) {
         //println("waitPlayerDistToGob "+dist);
-        long idleMs = 0;
-        try {
-            while( idleMs < 1000 && dist < ZeeConfig.distanceToPlayer(gob) ) {
-                Thread.sleep(SLEEP_MS);
-                if(!ZeeConfig.isPlayerMoving()){
-                    idleMs += SLEEP_MS;
+        if (ZeeConfig.distanceToPlayer(gob) > dist) {
+            try {
+                long idleMs = 0;
+                while (idleMs < 1000 && ZeeConfig.distanceToPlayer(gob) > dist) {
+                    Thread.sleep(SLEEP_MS);
+                    if (!ZeeConfig.isPlayerMoving()) {
+                        idleMs += SLEEP_MS;
+                    }
                 }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
-        } catch (InterruptedException e) {
-            e.printStackTrace();
         }
-        //println("waitPlayerDistToGob ret "+(dist >= ZeeConfig.distanceToPlayer(gob)));
-        return dist >= ZeeConfig.distanceToPlayer(gob);
+        //println("waitPlayerDistToGob ret "+(ZeeConfig.distanceToPlayer(gob) <= dist)+"  "+ZeeConfig.distanceToPlayer(gob));
+        return ZeeConfig.distanceToPlayer(gob) <= dist;
     }
 
 
