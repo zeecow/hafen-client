@@ -206,8 +206,29 @@ public class ZeeManagerGobClick extends ZeeThread{
 
     public static void checkRightClickGob(Coord pc, Coord2d mc, Gob gob, String gobName) {
 
+        // click barrel transfer
+        if (gobName.endsWith("/barrel") && ZeeConfig.getPlayerPoses().contains(ZeeConfig.POSE_PLAYER_LIFT)) {
+            new ZeeThread() {
+                public void run() {
+                    try {
+                        if(!waitPlayerDistToGob(gob,15))
+                            return;
+                        sleep(PING_MS);
+                        String barrelName = ZeeConfig.getBarrelOverlayBasename(gob);
+                        ZeeConfig.addGobText(gob, barrelName);
+                        Gob carryingBarrel = ZeeConfig.isPlayerCarryingGob("/barrel");
+                        if (carryingBarrel!=null) {
+                            barrelName = ZeeConfig.getBarrelOverlayBasename(carryingBarrel);
+                            ZeeConfig.addGobText(carryingBarrel, barrelName);
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            }.start();
+        }
         // lift up wheelbarrow while mounting horse
-        if(gobName.endsWith("wheelbarrow") && ZeeConfig.isPlayerMountingHorse() && (ZeeConfig.distanceToPlayer(gob) > ZeeConfig.MAX_DIST_DRIVING_WHEELBARROW)){
+        else if(gobName.endsWith("wheelbarrow") && ZeeConfig.isPlayerMountingHorse() && (ZeeConfig.distanceToPlayer(gob) > ZeeConfig.MAX_DIST_DRIVING_WHEELBARROW)){
             new ZeeThread() {
                 public void run() {
                     dismountHorse(mc);

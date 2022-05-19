@@ -233,12 +233,30 @@ public class ZeeThread  extends Thread{
     }
 
 
+    public static boolean waitPlayerDistToGob(Gob gob, int dist) {
+        //println("waitPlayerDistToGob "+dist);
+        long idleMs = 0;
+        try {
+            while( idleMs < 1000 && dist < ZeeConfig.distanceToPlayer(gob) ) {
+                Thread.sleep(SLEEP_MS);
+                if(!ZeeConfig.isPlayerMoving()){
+                    idleMs += SLEEP_MS;
+                }
+            }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        //println("waitPlayerDistToGob ret "+(dist >= ZeeConfig.distanceToPlayer(gob)));
+        return dist >= ZeeConfig.distanceToPlayer(gob);
+    }
+
+
     public static boolean waitPlayerDismounted(Gob mount) {
         //println("waitPlayerDismounted");
         long timer = TIMEOUT_MS;
         try {
             while( timer > 0 ) {
-                if (!ZeeConfig.isPlayerSharingGobCoord(mount))
+                if (ZeeConfig.isPlayerSharingGobCoord(mount)==null)
                     break;
                 else
                     timer -= PING_MS;
@@ -248,7 +266,7 @@ public class ZeeThread  extends Thread{
             e.printStackTrace();
         }
         //println("waitPlayerDismounted ret "+!ZeeConfig.isPlayerSharingGobCoord(mount));
-        return !ZeeConfig.isPlayerSharingGobCoord(mount);
+        return ZeeConfig.isPlayerSharingGobCoord(mount)==null;
     }
 
 
@@ -257,7 +275,7 @@ public class ZeeThread  extends Thread{
         long timer = TIMEOUT_MS;
         try {
             while( timer > 0 ) {
-                if (ZeeConfig.isPlayerSharingGobCoord(mount))
+                if (ZeeConfig.isPlayerSharingGobCoord(mount)!=null)
                     break;
                 if(ZeeConfig.isPlayerMoving()){
                     timer = TIMEOUT_MS; //reset timer if player moving
@@ -270,7 +288,7 @@ public class ZeeThread  extends Thread{
             e.printStackTrace();
         }
         //println("waitPlayerMounted ret "+ZeeConfig.isPlayerSharingGobCoord(mount));
-        return ZeeConfig.isPlayerSharingGobCoord(mount);
+        return ZeeConfig.isPlayerSharingGobCoord(mount)!=null;
     }
 
 

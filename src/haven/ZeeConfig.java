@@ -1665,7 +1665,7 @@ public class ZeeConfig {
         }).collect(Collectors.toList());
     }
 
-    public static void mapClicked(int clickb, Coord pc, Coord2d mc, Object[] args, Gob clickGob) {
+    public static void checkMapClicked(int clickb, Coord pc, Coord2d mc, Object[] args, Gob clickGob) {
         lastMapViewClickButton = clickb;
         lastMapViewClickPc = pc;
         lastMapViewClickMc = mc;
@@ -1716,7 +1716,7 @@ public class ZeeConfig {
         //if cursor is hand, player maybe driving wb at (0,0) instead of carrying
         if (getCursorName().contentEquals(CURSOR_HAND))
             return false;
-        return isPlayerCarryingGob("/wheelbarrow");
+        return isPlayerCarryingGob("/wheelbarrow")!=null;
     }
 
     public static boolean isPlayerDrivingWheelbarrow() {
@@ -1739,24 +1739,27 @@ public class ZeeConfig {
         //return isPlayerSharingGobCoord("gfx/kritter/horse/");
     }
 
-    public static boolean isPlayerCarryingGob(String gobNameContains) {
+    public static Gob isPlayerCarryingGob(String gobNameContains) {
         return  isPlayerSharingGobCoord(gobNameContains);
     }
 
-    public static boolean isPlayerSharingGobCoord(String gobNameContains){
+    public static Gob isPlayerSharingGobCoord(String gobNameContains){
         Gob g = getClosestGobName(gobNameContains);
         if (g==null) {
-            return false;
+            return null;
         }
         return isPlayerSharingGobCoord(g);
     }
 
-    public static boolean isPlayerSharingGobCoord(Gob g){
+    public static Gob isPlayerSharingGobCoord(Gob g){
         if (g==null)
-            return false;
+            return null;
         double dist = distanceToPlayer(g);
         //println("dist2pl="+dist+"  g="+g.getc()+"  p="+getPlayerGob().getc());
-        return dist == 0;
+        if (dist == 0)
+            return g;
+        else
+            return null;
     }
 
     public static Gob getClosestGob(List<Gob> gobs) {
