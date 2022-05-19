@@ -1841,6 +1841,20 @@ public class ZeeConfig {
         removeGobText(getPlayerGob());
     }
 
+    public static void addGobTextTemp(Gob g, String s){
+        new ZeeThread() {
+            public void run() {
+                try {
+                    addGobText(g,s);
+                    sleep(2000); // wait before removing text
+                    removeGobText(g);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }.start();
+    }
+
     public static void addGobText(Gob g, String s){
         addGobText(g,s,0,255,0,255,5);
     }

@@ -215,11 +215,13 @@ public class ZeeManagerGobClick extends ZeeThread{
                             return;
                         sleep(PING_MS);
                         String barrelName = ZeeConfig.getBarrelOverlayBasename(gob);
-                        ZeeConfig.addGobText(gob, barrelName);
+                        if (!barrelName.isEmpty())
+                            ZeeConfig.addGobTextTemp(gob, barrelName);
                         Gob carryingBarrel = ZeeConfig.isPlayerCarryingGob("/barrel");
                         if (carryingBarrel!=null) {
                             barrelName = ZeeConfig.getBarrelOverlayBasename(carryingBarrel);
-                            ZeeConfig.addGobText(carryingBarrel, barrelName);
+                            if (!barrelName.isEmpty())
+                                ZeeConfig.addGobTextTemp(carryingBarrel, barrelName);
                         }
                     } catch (Exception e) {
                         e.printStackTrace();
