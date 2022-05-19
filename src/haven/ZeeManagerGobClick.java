@@ -120,7 +120,7 @@ public class ZeeManagerGobClick extends ZeeThread{
                     if (!ZeeConfig.getCursorName().equals(ZeeConfig.CURSOR_HARVEST))
                         gobClick(gob, 3, UI.MOD_SHIFT);//activate cursor harvest if needed
                 } else if (isGobStockpile(gobName) && ZeeConfig.isPlayerCarryingWheelbarrow()) {
-                    ZeeManagerStockpile.unloadWheelbarrowAtStockpile(gob);
+                    ZeeManagerStockpile.useWheelbarrowAtStockpile(gob);
                 } else if (isGobStockpile(gobName) || gobName.endsWith("/dframe")) {
                     gobClick(gob,3, UI.MOD_SHIFT);//pick up all items (shift + rclick)
                 } else if (isGobTreeStump(gobName)) {
@@ -379,7 +379,7 @@ public class ZeeManagerGobClick extends ZeeThread{
     }
 
     private static void unloadWheelbarrowAtGob(Gob gob) {
-        ZeeManagerStockpile.unloadWheelbarrowAtStockpile(gob);
+        ZeeManagerStockpile.useWheelbarrowAtStockpile(gob);
     }
 
     public static void dismountHorse(Coord2d coordMc) {

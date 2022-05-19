@@ -420,13 +420,14 @@ public class ZeeManagerStockpile extends ZeeThread{
     }
 
 
-    public static void unloadWheelbarrowAtStockpile(Gob gobStockpile) {
+    public static void useWheelbarrowAtStockpile(Gob gobStockpile) {
         try {
             ZeeConfig.addPlayerText("wheeling");
             Coord stockpileCoord = ZeeConfig.lastMapViewClickMc.floor(posres);
-            if (ZeeConfig.isPlayerMountingHorse())
+            if (ZeeConfig.isPlayerMountingHorse()) {
                 ZeeConfig.unmountPlayerFromHorse(stockpileCoord);
-            sleep(500);
+                sleep(555);
+            }
             Coord pc = ZeeConfig.getPlayerCoord();
             Coord subc = ZeeConfig.getCoordGob(gobStockpile).sub(pc);
             int xsignal, ysignal;
@@ -434,12 +435,12 @@ public class ZeeManagerStockpile extends ZeeThread{
             ysignal = subc.y >= 0 ? 1 : -1;
             //try to drop wheelbarrow towards stockpile
             ZeeConfig.clickCoord(pc.add(xsignal * 500, ysignal * 500), 3);
-            sleep(500);
+            sleep(555);
             if (!ZeeConfig.isPlayerCarryingWheelbarrow()){
                 Gob wb = ZeeConfig.getClosestGobName("gfx/terobjs/vehicle/wheelbarrow");
                 //activate wheelbarrow
                 ZeeManagerGobClick.gobClick(wb, 3);
-                sleep(500);
+                sleep(555);
                 //use wheelbarrow on stockpile
                 ZeeManagerGobClick.gobClick(gobStockpile, 3);
             }else
