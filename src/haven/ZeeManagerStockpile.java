@@ -440,9 +440,10 @@ public class ZeeManagerStockpile extends ZeeThread{
                 Gob wb = ZeeConfig.getClosestGobName("gfx/terobjs/vehicle/wheelbarrow");
                 //activate wheelbarrow
                 ZeeManagerGobClick.gobClick(wb, 3);
-                sleep(555);
+                sleep(PING_MS);
                 //use wheelbarrow on stockpile
                 ZeeManagerGobClick.gobClick(gobStockpile, 3);
+                waitPlayerIdleVelocity();
             }else
                 ZeeConfig.msg("couldn't drop wheelbarrow");
         }catch (Exception e){
@@ -471,9 +472,10 @@ public class ZeeManagerStockpile extends ZeeThread{
                 Gob wb = ZeeConfig.getClosestGobName("gfx/terobjs/vehicle/wheelbarrow");
                 //activate wheelbarrow
                 ZeeManagerGobClick.gobClick(wb, 3);
-                sleep(500);
+                sleep(PING_MS);
                 //use wheelbarrow at stockpile
                 ZeeConfig.clickCoord(mcFloorPosres, 3);
+                waitPlayerIdleVelocity();
             }else
                 ZeeConfig.msg("couldn't drop wheelbarrow");
         } catch (Exception e){

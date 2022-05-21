@@ -135,6 +135,29 @@ public class ZeeThread  extends Thread{
         return !ZeeConfig.isPlayerMoving();
     }
 
+    public static boolean waitPlayerIdleVelocity() {
+        //println("waitPlayerIdleVelocity");
+        //int max = (int) TIMEOUT_MS;
+        Gob player = ZeeConfig.getPlayerGob();
+        try {
+
+            //wait start moving
+            while( player.getv() == 0 ){
+                sleep(SLEEP_MS);
+            }
+
+            //wait stop moving
+            while ( player.getv() != 0 ){
+                sleep(SLEEP_MS);
+            }
+
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        //println("waitPlayerIdleVelocity playerVel="+player.getv());
+        return player.getv() == 0;
+    }
+
 
     public static boolean waitPlayerPoseIdle(){
         if (ZeeConfig.isPlayerMountingHorse())

@@ -789,7 +789,8 @@ public class ZeeManagerGobClick extends ZeeThread{
                 liftGob(wb);
                 dist = ZeeConfig.distanceToPlayer(wb);
                 if (dist==0) {
-                    gobClick(storage, 3);
+                    gobClick(storage, 3);// click storage
+                    waitPlayerIdleVelocity();
                 }else{
                     ZeeConfig.msg("wheelbarrow unreachable?");//impossible case?
                 }
@@ -812,11 +813,13 @@ public class ZeeManagerGobClick extends ZeeThread{
             }else {
                 double dist = ZeeConfig.distanceToPlayer(wb);
                 ZeeConfig.clickRemoveCursor();//remove hand cursor
+                waitCursor(ZeeConfig.CURSOR_ARW);
                 liftGob(wb);
-                //waitPlayerIdleFor(1);
+                sleep(PING_MS);
                 dist = ZeeConfig.distanceToPlayer(wb);
                 if (dist==0) {
                     gobClick(gate, 3);
+                    waitPlayerIdleVelocity();
                 }else{
                     //impossible case?
                     ZeeConfig.msg("wheelbarrow unreachable?");
@@ -1155,7 +1158,6 @@ public class ZeeManagerGobClick extends ZeeThread{
         }
         ZeeConfig.gameUI.menu.wdgmsg("act", "carry","0");
         gobClick(gob,1);
-        //waitPlayerIdleFor(1);
         waitPlayerDistToGob(gob,0);
     }
 
