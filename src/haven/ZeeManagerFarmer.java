@@ -124,6 +124,7 @@ public class ZeeManagerFarmer extends ZeeThread{
                 //println("> harvesting loop");
                 ZeeConfig.addPlayerText("harvesting");
                 waitPlayerIdleFor(2);//already farming
+                //waitPlayerIdleVelocityMs(777);// TODO consider drink
                 if(inventoryHasSeeds()) {
                     storeSeedsInBarrel();
                     if(!isInventoryFull()) {
@@ -155,6 +156,7 @@ public class ZeeManagerFarmer extends ZeeThread{
                     }
                     plantSeeds();
                     waitPlayerIdleFor(3);
+                    //waitPlayerIdleVelocityMs(777);// TODO consider drink
                     if(getTotalSeedAmount() >= 5) {
                         // player idle, 5+ seeds
                         if (getNumberOfSeedItems() == 1) {
@@ -223,9 +225,7 @@ public class ZeeManagerFarmer extends ZeeThread{
 
     public static boolean isBarrelAccessible(Gob barrel) {
         ZeeManagerGobClick.gobClick(barrel, 3);
-        waitPlayerIdleFor(2);
-        double dist = ZeeConfig.distanceToPlayer(barrel);
-        return dist < MIN_ACCESSIBLE_DIST;
+        return waitPlayerDistToGob(barrel,15);//waitPlayerIdleFor(2);
     }
 
     public static boolean getSeedsFromBarrel(Gob barrel) throws InterruptedException {
@@ -235,14 +235,14 @@ public class ZeeManagerFarmer extends ZeeThread{
         }
         while(!isBarrelEmpty(barrel) && !isInventoryFull()){
             ZeeManagerGobClick.gobClick(barrel, 3, UI.MOD_SHIFT);
-            //TODO: waitInvCHanges
+            //TODO: waitInvItemAddedOrChanged
             Thread.sleep(PING_MS*2);
         }
         if(waitHoldingItem(4000)) {//store remaining holding item
             ZeeManagerGobClick.itemActGob(barrel, 0);
             Thread.sleep(1000);
         }
-        println("getSeedsFromBarrel() > holding item = "+ZeeConfig.isPlayerHoldingItem());
+        //println("getSeedsFromBarrel() > holding item = "+ZeeConfig.isPlayerHoldingItem());
         return getTotalSeedAmount() >= 5;
     }
 
@@ -373,7 +373,7 @@ public class ZeeManagerFarmer extends ZeeThread{
             //move to area center before choosing barrel
             ZeeConfig.addPlayerText("centering");
             ZeeConfig.clickTile(ZeeConfig.getAreaCenterTile(ZeeConfig.savedTileSelOverlay.a),1);
-            waitPlayerIdleFor(1);
+            waitPlayerIdleVelocity();//waitPlayerIdleFor(1);
             List<Gob> barrels = getAccessibleBarrels();
             if (barrels.size()==0) {
                 /*
@@ -408,13 +408,16 @@ public class ZeeManagerFarmer extends ZeeThread{
                 updateSeedPileReference();
                 ZeeManagerItemClick.pickUpItem(wItem);
                 ZeeManagerGobClick.itemActGob(lastBarrel, UI.MOD_SHIFT);//store first seeds
-                waitPlayerMove();//wait reaching barrel
-                waitPlayerStop();
-                Thread.sleep(1000);//wait storing seed
-                if (ZeeConfig.isPlayerHoldingItem()) {
+                //waitPlayerMove();//wait reaching barrel
+                //waitPlayerStop();
+                //Thread.sleep(1000);//wait seed transfer
+                waitPlayerDistToGob(lastBarrel,15);//wait reaching barrel
+                waitHoldingItemChanged();//wait 1st seed transfer
+                if (ZeeConfig.isPlayerHoldingItem()) {//2nd seed transfer?
                     // store all seeds (ctrl+shift)
                     ZeeManagerGobClick.itemActGob(lastBarrel, 3);//3==ctrl+shift
                     if(waitNotHoldingItem()) {
+                        //all seeds stored
                         ZeeConfig.addGobText(lastBarrel, getSeedNameAndQl());
                     } else {
                         //still holding item?
@@ -428,6 +431,7 @@ public class ZeeManagerFarmer extends ZeeThread{
                         lastBarrel = null;
                     }
                 }else{
+                    // all seeds stored
                     ZeeConfig.addGobText(lastBarrel, getSeedNameAndQl());
                 }
             }

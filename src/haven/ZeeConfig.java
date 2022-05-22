@@ -1739,6 +1739,13 @@ public class ZeeConfig {
         //return isPlayerSharingGobCoord("gfx/kritter/horse/");
     }
 
+    public static Gob getPlayerMountedHorse(){
+        if (isPlayerMountingHorse())
+            return ZeeConfig.getClosestGobName("gfx/kritter/horse/");
+        else
+            return null;
+    }
+
     public static Gob isPlayerCarryingGob(String gobNameContains) {
         return  isPlayerSharingGobCoord(gobNameContains);
     }

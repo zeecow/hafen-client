@@ -40,6 +40,28 @@ public class ZeeThread  extends Thread{
         }
     }
 
+    public static boolean waitHoldingItemChanged() {
+        //println("waitHoldingItemChanged");
+        long max = TIMEOUT_MS;
+        if(ZeeConfig.gameUI.vhand==null) {
+            println("waitHoldingItemChanged vhand null");
+            return false;
+        }
+        int itemId = ZeeConfig.gameUI.vhand.item.wdgid();
+        try {
+            while(max>0  &&  ZeeConfig.gameUI.vhand!=null  &&  itemId == ZeeConfig.gameUI.vhand.item.wdgid()) {
+                max -= SLEEP_MS;
+                Thread.sleep(SLEEP_MS);
+            }
+            sleep(PING_MS);//wait vhand update?
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        boolean ret = (ZeeConfig.gameUI.vhand == null  ||  itemId != ZeeConfig.gameUI.vhand.item.wdgid());
+        //println("waitHoldingItemChanged  ret="+ret + (ZeeConfig.gameUI.vhand==null ? "  vhand=null" : "  vhandId="+ZeeConfig.gameUI.vhand.item.wdgid()));
+        return ret;
+    }
+
     public static boolean waitNotHoldingItem() {
         long max = TIMEOUT_MS;
         try {
@@ -135,27 +157,72 @@ public class ZeeThread  extends Thread{
         return !ZeeConfig.isPlayerMoving();
     }
 
-    public static boolean waitPlayerIdleVelocity() {
-        //println("waitPlayerIdleVelocity");
-        //int max = (int) TIMEOUT_MS;
-        Gob player = ZeeConfig.getPlayerGob();
+    public static boolean waitGobIdleVelocity(Gob gob) {
+        if (gob==null) {
+            println("waitGobIdleVelocity gob null");
+            return false;
+        }
+        //println("waitGobIdleVelocity "+gob.getres().name);
+        long countMs = 0;
         try {
 
-            //wait start moving
-            while( player.getv() == 0 ){
+            //wait start moving for a while
+            while( gob.getv() == 0 && countMs<777){
                 sleep(SLEEP_MS);
+                countMs += SLEEP_MS;
             }
 
             //wait stop moving
-            while ( player.getv() != 0 ){
+            while ( gob.getv() != 0 ){
                 sleep(SLEEP_MS);
             }
 
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        //println("waitPlayerIdleVelocity playerVel="+player.getv());
-        return player.getv() == 0;
+        //println("waitGobIdleVelocity gobVel="+gob.getv());
+        return gob.getv() == 0;
+    }
+
+    public static boolean waitPlayerIdleVelocity() {
+        return waitGobIdleVelocity(ZeeConfig.getPlayerGob());
+    }
+
+    public static boolean waitGobIdleVelocityMs(Gob gob, long idleMs_min777) {
+        if (gob==null) {
+            println("waitGobIdleVelocityMs gob null");
+            return false;
+        }
+        //println("waitGobIdleVelocityMs");
+        long countMs = 0;
+        try {
+
+            //wait moving for a while
+            while( gob.getv() == 0  &&  countMs<idleMs_min777){
+                sleep(SLEEP_MS);
+                countMs += SLEEP_MS;
+            }
+
+            //wait stop moving
+            countMs = 0;
+            while ( countMs < idleMs_min777 ){
+                sleep(SLEEP_MS);
+                if (gob.getv() == 0)//player idle
+                    countMs += SLEEP_MS;
+                else
+                    countMs = 0;//reset counter if player moves
+                //println("count "+countMs);
+            }
+
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        //println("waitGobIdleVelocityMs  gobVel="+gob.getv()+"  countMs="+countMs);
+        return gob.getv() == 0;
+    }
+
+    public static boolean waitPlayerIdleVelocityMs(long idleMs_min777) {
+        return waitGobIdleVelocityMs(ZeeConfig.getPlayerGob(), idleMs_min777);
     }
 
 
