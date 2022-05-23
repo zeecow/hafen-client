@@ -55,7 +55,8 @@ public class ZeeConfig {
     public static final String CURSOR_INSPECT = "gfx/hud/curs/study";
 
     public static final String POSE_PLAYER_IDLE = "gfx/borka/idle";
-    public static final String POSE_PLAYER_IDLE_MOUNTED = "gfx/borka/riding-idle";
+    public static final String POSE_PLAYER_RIDING_IDLE = "gfx/borka/riding-idle";
+    public static final String POSE_PLAYER_RIDING_TROT = "gfx/borka/riding-trot";
     public static final String POSE_PLAYER_WALK = "gfx/borka/walking";
     public static final String POSE_PLAYER_RUN = "gfx/borka/running";
     public static final String POSE_PLAYER_BUTCH = "gfx/borka/butcher";
@@ -1824,6 +1825,10 @@ public class ZeeConfig {
         return getHourglass() > -1;
     }
 
+    public static boolean isPlayerDrinkingPose(){
+        return getPlayerPoses().contains(POSE_PLAYER_DRINK);
+    }
+
     public static boolean isPlayerHoldingItem() {
         return (gameUI.vhand != null);
     }
@@ -1833,6 +1838,8 @@ public class ZeeConfig {
      * @return value of hourglass
      */
     public static double getHourglass() {
+        if (gameUI.prog==null)
+            return -777;
         return gameUI.prog.prog;
     }
 

@@ -123,8 +123,8 @@ public class ZeeManagerFarmer extends ZeeThread{
             while(busy && !isHarvestDone) {
                 //println("> harvesting loop");
                 ZeeConfig.addPlayerText("harvesting");
-                waitPlayerIdleFor(2);//already farming
-                //waitPlayerIdleVelocityMs(777);// TODO consider drink
+                //waitPlayerIdleFor(2);//already farming
+                waitPlayerIdleVelocityMs(999);
                 if(inventoryHasSeeds()) {
                     storeSeedsInBarrel();
                     if(!isInventoryFull()) {
@@ -155,8 +155,8 @@ public class ZeeManagerFarmer extends ZeeThread{
                         }
                     }
                     plantSeeds();
-                    waitPlayerIdleFor(3);
-                    //waitPlayerIdleVelocityMs(777);// TODO consider drink
+                    //waitPlayerIdleFor(3);
+                    waitPlayerIdleVelocityMs(999);
                     if(getTotalSeedAmount() >= 5) {
                         // player idle, 5+ seeds
                         if (getNumberOfSeedItems() == 1) {
