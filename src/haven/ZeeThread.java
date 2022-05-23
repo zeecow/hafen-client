@@ -164,17 +164,20 @@ public class ZeeThread  extends Thread{
         }
         //println("waitGobIdleVelocity "+gob.getres().name);
         boolean isPlayer = ZeeConfig.isPlayer(gob);
+        Gob playerHorse = null;
+        if (isPlayer)
+            playerHorse = ZeeConfig.getPlayerMountedHorse();
         long countMs = 0;
         try {
 
             // wait start moving for a while
-            while( (gob.getv()==0  &&  countMs<777)  || (isPlayer && ZeeConfig.isPlayerDrinkingPose()) ){
+            while( (gob.getv()==0  &&  countMs<777) || (isPlayer && ZeeConfig.isPlayerPoseDrinkOrMove(playerHorse)) ) {
                 sleep(SLEEP_MS);
                 countMs += SLEEP_MS;
             }
 
             // wait idle
-            while ( gob.getv()!=0  || (isPlayer && ZeeConfig.isPlayerDrinkingPose()) ){
+            while ( gob.getv()!=0  || (isPlayer && ZeeConfig.isPlayerPoseDrinkOrMove(playerHorse)) ){
                 sleep(SLEEP_MS);
             }
 
@@ -197,6 +200,9 @@ public class ZeeThread  extends Thread{
         }
         //println("waitGobIdleVelocityMs");
         boolean isPlayer = ZeeConfig.isPlayer(gob);
+        Gob playerHorse = null;
+        if (isPlayer)
+            playerHorse = ZeeConfig.getPlayerMountedHorse();
         long countMs = 0;
         try {
 
@@ -204,7 +210,8 @@ public class ZeeThread  extends Thread{
             while( gob.getv()==0  &&  countMs<idleMs_min777 )
             {
                 sleep(SLEEP_MS);
-                if( !isPlayer || !ZeeConfig.isPlayerDrinkingPose() )//doesn't count if player drinking
+                //doesn't count if player drinking,troting
+                if( !isPlayer || !ZeeConfig.isPlayerPoseDrinkOrMove(playerHorse) )
                     countMs += SLEEP_MS;
             }
 
@@ -212,7 +219,8 @@ public class ZeeThread  extends Thread{
             countMs = 0;
             while ( countMs < idleMs_min777 ) {
                 sleep(SLEEP_MS);
-                if ( !ZeeConfig.isPlayerDrinkingPose()  &&  gob.getv()==0 ) // player idle
+                // player idle
+                if ( gob.getv()==0  &&  !ZeeConfig.isPlayerPoseDrinkOrMove(playerHorse) )
                     countMs += SLEEP_MS;
                 else
                     countMs = 0; // reset counter if player moves

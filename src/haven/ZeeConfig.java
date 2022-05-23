@@ -54,11 +54,19 @@ public class ZeeConfig {
     public static final String CURSOR_SHOOT = "gfx/hud/curs/shoot";
     public static final String CURSOR_INSPECT = "gfx/hud/curs/study";
 
+    public static final String POSE_HORSE_IDLE = "gfx/kritter/horse/idle";
+    public static final String POSE_HORSE_WALKING = "gfx/kritter/horse/walking";//speed 0
+    public static final String POSE_HORSE_PACE = "gfx/kritter/horse/pace";//speed 1
+    public static final String POSE_HORSE_TROT = "gfx/kritter/horse/trot";//speed 2
+    public static final String POSE_HORSE_GALLOP = "gfx/kritter/horse/gallop";//speed 3
+
+    public static final String POSE_PLAYER_RIDING_IDLE = "gfx/borka/riding-idle";//speed 0, 1
+    public static final String POSE_PLAYER_RIDING_TROT = "gfx/borka/riding-trot";//speed 2
+    public static final String POSE_PLAYER_RIDING_GALLOP = "gfx/borka/riding-gallop";//speed 3
+
     public static final String POSE_PLAYER_IDLE = "gfx/borka/idle";
-    public static final String POSE_PLAYER_RIDING_IDLE = "gfx/borka/riding-idle";
-    public static final String POSE_PLAYER_RIDING_TROT = "gfx/borka/riding-trot";
-    public static final String POSE_PLAYER_WALK = "gfx/borka/walking";
-    public static final String POSE_PLAYER_RUN = "gfx/borka/running";
+    public static final String POSE_PLAYER_WALK = "gfx/borka/walking";//speed 0, 1
+    public static final String POSE_PLAYER_RUN = "gfx/borka/running";//speed 2, 3
     public static final String POSE_PLAYER_BUTCH = "gfx/borka/butcher";
     public static final String POSE_PLAYER_BUILD = "gfx/borka/buildan";
     public static final String POSE_PLAYER_SAW = "gfx/borka/sawing";
@@ -1821,6 +1829,28 @@ public class ZeeConfig {
         return ( mov!=null && mov.getv()>0);
     }
 
+    public static boolean isPlayerPoseDrinkOrMove(Gob mountedHorse){
+
+        if (isPlayerDrinkingPose())
+            return true;
+
+        if (mountedHorse==null)
+            // not mounted
+            return ZeeConfig.playerHasAnyPose(
+                    ZeeConfig.POSE_PLAYER_WALK,
+                    ZeeConfig.POSE_PLAYER_RUN
+            );
+        else
+            // mounted
+            return ZeeConfig.gobHasAnyPose(
+                    mountedHorse,
+                    ZeeConfig.POSE_HORSE_WALKING,
+                    ZeeConfig.POSE_HORSE_PACE,
+                    ZeeConfig.POSE_HORSE_TROT,
+                    ZeeConfig.POSE_HORSE_GALLOP
+            );
+    }
+
     public static boolean isPlayerDrinking(){
         return getHourglass() > -1;
     }
@@ -2223,6 +2253,19 @@ public class ZeeConfig {
 
     public static String getPlayerPoses() {
         return getGobPoses(getPlayerGob());
+    }
+
+    public static boolean playerHasAnyPose(String ... poses){
+        return gobHasAnyPose(getPlayerGob(),poses);
+    }
+
+    public static boolean gobHasAnyPose(Gob gob, String ... poses){
+        String gobPoses = getGobPoses(gob);
+        for (int i = 0; i < poses.length; i++) {
+            if (gobPoses.contains(poses[i]))
+                return true;
+        }
+        return false;
     }
 
     public static String getGobPoses(Gob gob) {

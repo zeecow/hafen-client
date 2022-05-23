@@ -155,8 +155,9 @@ public class ZeeManagerFarmer extends ZeeThread{
                         }
                     }
                     plantSeeds();
-                    //waitPlayerIdleFor(3);
-                    waitPlayerIdleVelocityMs(999);
+                    waitPlayerIdleFor(3);
+                    //waitPlayerIdleVelocityMs(2000);
+                    //println("planting stopped?");
                     if(getTotalSeedAmount() >= 5) {
                         // player idle, 5+ seeds
                         if (getNumberOfSeedItems() == 1) {
@@ -297,10 +298,11 @@ public class ZeeManagerFarmer extends ZeeThread{
 
     public static int getTotalSeedAmount(){
         int ret = 0;
-        WItem[] arr = inv.getWItemsByName(gItemSeedBasename).toArray(new WItem[0]);
+        WItem[] arr = ZeeConfig.getMainInventory().getWItemsByName(gItemSeedBasename).toArray(new WItem[0]);
         for (int i = 0; i < arr.length ; i++) {
             ret += getSeedsAmount(arr[i].item);
         }
+        println("tot seed "+ret);
         return ret;
     }
 
@@ -408,11 +410,8 @@ public class ZeeManagerFarmer extends ZeeThread{
                 updateSeedPileReference();
                 ZeeManagerItemClick.pickUpItem(wItem);
                 ZeeManagerGobClick.itemActGob(lastBarrel, UI.MOD_SHIFT);//store first seeds
-                //waitPlayerMove();//wait reaching barrel
-                //waitPlayerStop();
-                //Thread.sleep(1000);//wait seed transfer
                 waitPlayerDistToGob(lastBarrel,15);//wait reaching barrel
-                waitHoldingItemChanged();//wait 1st seed transfer
+                sleep(1000);//waitHoldingItemChanged();//wait 1st seed transfer
                 if (ZeeConfig.isPlayerHoldingItem()) {//2nd seed transfer?
                     // store all seeds (ctrl+shift)
                     ZeeManagerGobClick.itemActGob(lastBarrel, 3);//3==ctrl+shift
