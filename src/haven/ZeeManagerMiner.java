@@ -5,7 +5,6 @@ import java.util.List;
 
 public class ZeeManagerMiner extends ZeeThread{
 
-    public static final String TASK_CHIP_BOULDER = "TASK_CHIP_BOULDER";
     public static final String TASK_MINE_AREA = "TASK_MINE_AREA";
     public static final String TASK_TEST = "TASK_TEST";
     public static final String DIR_NORTH = "DIR_NORTH";
@@ -35,18 +34,42 @@ public class ZeeManagerMiner extends ZeeThread{
         this.task = task;
     }
 
-    public ZeeManagerMiner(String task, Gob gob){
-        this.task = task;
-        this.gobBoulder = gob;
+    public static void checkMiningSelection() {
+        if (ZeeConfig.getCursorName().contentEquals(ZeeConfig.CURSOR_MINE)){
+            if (ZeeConfig.isPlayerMountingHorse()){
+                ZeeConfig.msg("TROLL ALERT: mining on horse");
+                return;
+            }
+            new ZeeThread(){
+                public void run() {
+                    try {
+                        if (isCombatActive())
+                            return;
+                        waitPlayerPoseMs(ZeeConfig.POSE_PLAYER_IDLE, 1000);
+                        if (isCombatActive())
+                            return;
+                        Gob boulder = getBoulderCloseEnoughForChipping();
+                        if (boulder == null) {
+                            //println("checkMiningSelection > stopped, no boulder ");
+                            return;
+                        }
+                        if (isCombatActive())
+                            return;
+                        taskChipBoulder(boulder);
+                    }catch (Exception e){
+                        e.printStackTrace();
+                        ZeeConfig.removePlayerText();
+                    }
+                }
+            }.start();
+        }
     }
 
     @Override
     public void run() {
         manager = this;
         try {
-            if (task.contentEquals(TASK_CHIP_BOULDER))
-                taskChipBoulder();
-            else if (task.contentEquals(TASK_MINE_AREA)) {
+            if (task.contentEquals(TASK_MINE_AREA)) {
                 do {
                     taskMineArea();
                 } while(repeatTaskMineArea);
@@ -81,7 +104,7 @@ public class ZeeManagerMiner extends ZeeThread{
         waitCursor(ZeeConfig.CURSOR_MINE);
         ZeeConfig.gameUI.map.wdgmsg("sel", c1, c2, 0);
         //waitPlayerIdleFor(2);//minimum 2 sec
-        waitPlayerPoseIdle();
+        waitPlayerIdlePose();
         ZeeConfig.clickRemoveCursor();
         waitCursor(ZeeConfig.CURSOR_ARW);
     }
@@ -196,7 +219,7 @@ public class ZeeManagerMiner extends ZeeThread{
             return;
         }
         //waitPlayerIdleFor(1);
-        waitPlayerPoseIdle();
+        waitPlayerIdlePose();
         if (!mining) {
             exitManager("mining canceled 3.2");
             return;
@@ -238,7 +261,7 @@ public class ZeeManagerMiner extends ZeeThread{
         ZeeConfig.addPlayerText("stones");
         ZeeConfig.clickTile(endTile,1);
         //waitPlayerIdleFor(1);
-        waitPlayerPoseIdle();
+        waitPlayerIdlePose();
         if (!pickStones(30)) {
             exitManager("not enough stones for new column");
             return;
@@ -260,7 +283,7 @@ public class ZeeManagerMiner extends ZeeThread{
         ZeeConfig.addPlayerText("col");
         ZeeConfig.clickTile(endTile,1);
         //waitPlayerIdleFor(1);
-        waitPlayerPoseIdle();
+        waitPlayerIdlePose();
         ZeeConfig.gameUI.menu.wdgmsg("act","bp","column","0");
         sleep(1000);
         if (!mining) {
@@ -289,10 +312,10 @@ public class ZeeManagerMiner extends ZeeThread{
             return;
         }
         //waitInvFreeSlotsIdle();
-        waitPlayerPoseIdle();
+        waitPlayerIdlePose();
         ZeeConfig.clickTile(endTile,1);//realign to endTile
         //waitPlayerIdleFor(1);
-        waitPlayerPoseIdle();
+        waitPlayerIdlePose();
         inv.children(WItem.class).forEach(wItem -> {//drop remaining inv stones
             if (ZeeConfig.mineablesStone.contains(wItem.item.getres().basename()))
                 wItem.item.wdgmsg("drop", Coord.z);
@@ -601,37 +624,40 @@ public class ZeeManagerMiner extends ZeeThread{
     }
 
 
-    private void taskChipBoulder() throws Exception {
+    public static void taskChipBoulder(Gob gobBoulder) throws Exception {
         println(">task chip_boulder on");
         ZeeConfig.addPlayerText("boulder");
+
+        //wait boulder loading/clickable
+        sleep(1000);
+        if (isCombatActive())
+            return;
+
+        //activate arrow cursor
         ZeeConfig.clickRemoveCursor();
         waitCursor(ZeeConfig.CURSOR_ARW);
-        sleep(1000);//wait boulder clickable
-        ZeeManagerGobClick.clickGobPetal(gobBoulder,"Chip stone");//chip boulder
+
+        //select chip menu from boulder
+        if (isCombatActive())
+            return;
+        ZeeManagerGobClick.clickGobPetal(gobBoulder,"Chip stone");
         sleep(100);
-        ZeeConfig.cursorChange(ZeeConfig.ACT_MINE);//restore mining icon for autodrop
-        if(waitPlayerPoseIdle()){ //waitBoulderFinish(gobBoulder)
+
+        //restore mining icon for autodrop
+        ZeeConfig.cursorChange(ZeeConfig.ACT_MINE);
+
+        //wait chipping stop
+        if(waitPlayerIdlePose()){
+            if (isCombatActive())
+                return;
             println("chip boulder done");
             ZeeConfig.gameUI.map.wdgmsg("sel", ZeeConfig.savedTileSelStartCoord, ZeeConfig.savedTileSelEndCoord, ZeeConfig.savedTileSelModflags);
         }else{
             println("canceled chipping boulder?");
         }
+
         println(">task chip_boulder off");
         ZeeConfig.removePlayerText();
-    }
-
-    /*
-    check if new boulder was created while mining
-    */
-    public static void checkNearBoulder(Gob gob) {
-        if(ZeeConfig.autoChipMinedBoulder && isMining() && isBoulder(gob)){
-            //println(ZeeClickGobManager.distanceToPlayer(gob)+" to "+gob.getres().name);
-            if(ZeeConfig.distanceToPlayer(gob) < DIST_BOULDER){
-                if(isCombatActive()) // cancel if combat active
-                    return;
-                new ZeeManagerMiner(TASK_CHIP_BOULDER, gob).start();
-            }
-        }
     }
 
     public static void notifyColumn(Gob gob, float hp){
@@ -676,7 +702,7 @@ public class ZeeManagerMiner extends ZeeThread{
             waitNoFlowerMenu();
             ZeeConfig.cursorChange(ZeeConfig.ACT_MINE);//restore mining icon for autodrop
             //return waitBoulderFinish(boulder);
-            return waitPlayerPoseIdle();
+            return waitPlayerIdlePose();
         }catch (Exception e){
             e.printStackTrace();
         }

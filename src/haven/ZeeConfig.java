@@ -2179,7 +2179,7 @@ public class ZeeConfig {
             ZeeConfig.applyGobSettingsAudio(ob);
             ZeeConfig.applyGobSettingsAggro(ob);
             ZeeConfig.applyGobSettingsHighlight(ob, ZeeConfig.getHighlightGobColor(ob));
-            ZeeManagerMiner.checkNearBoulder(ob);
+            //ZeeManagerMiner.checkNearBoulder(ob);
         }
     }
 

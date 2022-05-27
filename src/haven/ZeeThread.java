@@ -238,8 +238,16 @@ public class ZeeThread  extends Thread{
         return waitGobIdleVelocityMs(ZeeConfig.getPlayerGob(), idleMs_min777);
     }
 
+    //TODO test
+    public static boolean waitPlayerIdlePoseMs(long idleMs){
+        if (ZeeConfig.isPlayerMountingHorse())
+            return waitPlayerIdleMountedMs(idleMs);
+        else
+            return waitPlayerPoseMs(ZeeConfig.POSE_PLAYER_IDLE,idleMs);
+    }
 
-    public static boolean waitPlayerPoseIdle(){
+
+    public static boolean waitPlayerIdlePose(){
         if (ZeeConfig.isPlayerMountingHorse())
             return waitPlayerIdleMounted();
         else
@@ -247,8 +255,8 @@ public class ZeeThread  extends Thread{
     }
 
     //TODO add mounted active poses
-    private static boolean waitPlayerIdleMounted() {
-        return waitNotPlayerPoseInList(
+    public static boolean waitPlayerIdleMounted() {
+        return waitPlayerPoseNotInList(
                 ZeeConfig.POSE_PLAYER_DRINK,
                 ZeeConfig.POSE_PLAYER_CHOPTREE,
                 ZeeConfig.POSE_PLAYER_DIGSHOVEL,
@@ -257,7 +265,45 @@ public class ZeeThread  extends Thread{
         );
     }
 
-    private static boolean waitNotPlayerPoseInList(String ... poseList) {
+    //TODO test
+    public static boolean waitPlayerIdleMountedMs(long idleMs) {
+        return waitPlayerPoseNotInListMs(
+                idleMs,
+                ZeeConfig.POSE_PLAYER_DRINK,
+                ZeeConfig.POSE_PLAYER_CHOPTREE,
+                ZeeConfig.POSE_PLAYER_DIGSHOVEL,
+                ZeeConfig.POSE_PLAYER_PICK,
+                ZeeConfig.POSE_PLAYER_SAW
+        );
+    }
+
+    public static boolean waitPlayerPoseNotInListMs(long idleMs, String ... poseList) {
+        println(">waitPlayerPoseNotInListMs");
+        String playerPoses = "";
+        long countMs = 0;
+        try{
+            do{
+                sleep(PING_MS);
+                countMs += PING_MS;
+                playerPoses = ZeeConfig.getPlayerPoses();
+                //println("   "+playerPoses);
+                for (int i = 0; i < poseList.length; i++) {
+                    //println("      "+poseList[i]);
+                    if (playerPoses.contains(poseList[i])){//if contains pose...
+                        //println("break");
+                        countMs = 0;
+                        break;//... break, loop and sleep again
+                    }
+                }
+            }while(countMs < idleMs || ZeeConfig.isPlayerMoving());
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        println("waitPlayerPoseNotInListMs ret "+(countMs >= idleMs));
+        return countMs >= idleMs; //waited for idleMs
+    }
+
+    public static boolean waitPlayerPoseNotInList(String ... poseList) {
         //println(">waitPlayerPosesContainsNone");
         String playerPoses = "";
         boolean exit = false;
@@ -308,6 +354,25 @@ public class ZeeThread  extends Thread{
             e.printStackTrace();
         }
         //println("waitPlayerPose > "+(poses.contains(poseName))+" "+poseName);
+        return poses.contains(poseName);
+    }
+
+    public static boolean waitPlayerPoseMs(String poseName, long idleMs) {
+        //println("waitPlayerPoseMs ");
+        String poses = "";
+        long countMs = 0;
+        try{
+            while( countMs < idleMs ){
+                countMs += SLEEP_MS;
+                if (!(poses = ZeeConfig.getPlayerPoses()).contains(poseName))
+                    countMs = 0; // reset if pose not present
+                else
+                    sleep(SLEEP_MS);
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        //println("waitPlayerPoseMs "+countMs+"ms "+(poses.contains(poseName))+" "+poseName);
         return poses.contains(poseName);
     }
 

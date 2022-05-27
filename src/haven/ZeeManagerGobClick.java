@@ -550,7 +550,7 @@ public class ZeeManagerGobClick extends ZeeThread{
                     continue;
                 }
                 currentDestroyingTreelog = treelog;
-                waitPlayerPoseIdle();
+                waitPlayerIdlePose();
                 if (!ZeeConfig.isTaskCanceledByGroundClick()){
                     logs--;
                     if (isDestroyingAllTreelogs){
@@ -887,14 +887,14 @@ public class ZeeManagerGobClick extends ZeeThread{
             while (tree!=null && !ZeeConfig.isTaskCanceledByGroundClick()) {
                 clickGobPetal(tree, "Chop");
                 currentRemovingTree = tree;
-                if (waitPlayerPoseIdle() && !ZeeConfig.isTaskCanceledByGroundClick()) {//waitPlayerIdleFor(2)
+                if (waitPlayerIdlePose() && !ZeeConfig.isTaskCanceledByGroundClick()) {//waitPlayerIdleFor(2)
                     sleep(1500);//wait new stump loading
                     Gob stump = ZeeConfig.getClosestGob(ZeeConfig.findGobsByNameEndsWith("stump"));
                     if (stump != null && ZeeConfig.distanceToPlayer(stump) < 25) {
                         ZeeConfig.addGobText(stump, "stump");
                         removeStump(stump);
                         //waitPlayerIdleFor(2);
-                        waitPlayerPoseIdle();
+                        waitPlayerIdlePose();
                     } else {
                         println("no stump close");
                     }
