@@ -660,7 +660,7 @@ public class ZeeManagerGobClick extends ZeeThread{
     public static boolean isGobKnocked(Gob gob){
         String poses = ZeeConfig.getGobPoses(gob);
         //println("isGobKnocked > "+poses);
-        return poses.contains("/knock");
+        return poses.contains("/knock") || poses.endsWith("-knock");
     }
 
     static boolean isGobDeadAnimal;
