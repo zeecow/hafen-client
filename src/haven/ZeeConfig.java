@@ -742,12 +742,18 @@ public class ZeeConfig {
 
         if(windowTitle.equals("Equipment")) {
             windowEquipment = window;
-        }else if(windowTitle.equals("Inventory")) {
+        }
+        else if(windowTitle.equals("Inventory")) {
             windowInvMain = window;
-        }else if(windowTitle.equals("Barter Stand") && window.sz.x > 300){//avoid build window
+        }
+        else if(windowTitle.equals("Barter Stand") && window.sz.x > 300){//avoid build window
             windowModBarterStand(window);
-        }else if(isWindowAnimalStats(windowTitle)){
+        }
+        else if(isWindowAnimalStats(windowTitle)){
             windowModAnimalStats(window, windowTitle);
+        }
+        else if (windowTitle.contentEquals("Oven") || windowTitle.contentEquals("Kiln") || windowTitle.contains("Smelter")){
+            windowAddFuelGUI(window,windowTitle);
         }
 
         if(windowTitle.equals("Boil Pepper Drupes")){
@@ -759,7 +765,78 @@ public class ZeeConfig {
         windowModOrganizeButton(window, windowTitle);
     }
 
-    
+    private static void windowAddFuelGUI(Window window, String windowTitle) {
+
+        int y = window.sz.y - 60;
+        int x = 45;
+        int txtsz = 40;
+        int btnsz = 60;
+        TextEntry te;
+        Button btn;
+
+        if (windowTitle.contentEquals("Oven")) {
+            window.add(te=new TextEntry(txtsz,"4"), 0, y);
+            window.add(btn=new Button(UI.scale(btnsz),"branch"){
+                public void wdgmsg(String msg, Object... args) {
+                    if (msg.contentEquals("activate"))
+                        windowAddFuel(te.text(),this.text.text,"oven");
+                }
+            },x,y);
+            window.add(btn=new Button(UI.scale(btnsz),"coal"){
+                public void wdgmsg(String msg, Object... args) {
+                    if (msg.contentEquals("activate"))
+                        windowAddFuel(te.text(),this.text.text,"oven");
+                }
+            },x+btn.sz.x,y);
+        }
+        else if (windowTitle.contentEquals("Kiln")) {
+            window.add(te=new TextEntry(txtsz,"1"), 0, y);
+            window.add(btn=new Button(UI.scale(btnsz),"branch"){
+                public void wdgmsg(String msg, Object... args) {
+                    if (msg.contentEquals("activate"))
+                        windowAddFuel(te.text(),this.text.text,"kiln");
+                }
+            },x,y);
+            window.add(btn=new Button(UI.scale(btnsz),"coal"){
+                public void wdgmsg(String msg, Object... args) {
+                    if (msg.contentEquals("activate"))
+                        windowAddFuel(te.text(),this.text.text,"kiln");
+                }
+            },x+btn.sz.x,y);
+        }
+        else if ( windowTitle.contains("Smelter") ){
+            window.add(te=new TextEntry(txtsz,"9"), 0, y);
+            window.add(btn=new Button(UI.scale(btnsz),"coal"){
+                public void wdgmsg(String msg, Object... args) {
+                    if (msg.contentEquals("activate"))
+                        windowAddFuel(te.text(),this.text.text,"smelter");
+                }
+            },x,y);
+        }
+
+        window.pack();
+    }
+
+    private static void windowAddFuel(String txtNum, String fuelName, String gobName) {
+        try {
+            int num = Integer.parseInt(txtNum);
+            if (num < 1){
+                msgError("invalid quantity");
+                return;
+            }
+            Gob g = getClosestGobName(gobName);
+            if (g==null){
+                msgError("Fuel target not found");
+                return;
+            }
+            List<WItem> items = getMainInventory().getWItemsByName(fuelName);
+            ZeeManagerGobClick.addItemsToGob(items,num,g);
+        }catch (NumberFormatException e){
+            ZeeConfig.msg(e.getMessage());
+        }
+    }
+
+
     public static void checkRemoteWidget(String type, Widget wdg) {
         //Cattle Roster
         if(type.contains("rosters/") && ZeeConfig.cattleRosterHeightPercentage <1.0){
@@ -1899,6 +1976,20 @@ public class ZeeConfig {
         }.start();
     }
 
+    public static void addGobTextTempMs(Gob g, String s, int waitMs){
+        new ZeeThread() {
+            public void run() {
+                try {
+                    addGobText(g,s);
+                    sleep(waitMs); // wait before removing text
+                    removeGobText(g);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }.start();
+    }
+
     public static void addGobText(Gob g, String s){
         addGobText(g,s,0,255,0,255,5);
     }
@@ -2038,6 +2129,10 @@ public class ZeeConfig {
 
     public static void msg(String s) {
         gameUI.msg(s);
+    }
+
+    public static void msgError(String s) {
+        gameUI.error(s);
     }
 
     public static String strArgs(Object... args){

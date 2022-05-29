@@ -17,6 +17,7 @@ features:
  - cook manager: auto cook pepper and refill cauldron until barrel is empty(no pathfinding)
  - icon list categs
  - label trasfering barrels
+ - Window fuel buttons for Oven, Kiln, Smelter
  - rightclicking doors, cave, gate, wheelbarrow, stockpiles, horse, cart, will interact with these objects whenever possible
  - midclick Barter Stand "Buy" button to auto-buy  
  - midclick ground 

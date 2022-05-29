@@ -441,10 +441,10 @@ public class ZeeManagerGobClick extends ZeeThread{
             liftGob(gob);
         }
         else if(gobName.endsWith("terobjs/oven")) {
-            addFuelToGob(gob,petalName);
+            addFuelGobMenu(gob,petalName);
         }
         else if(gobName.endsWith("terobjs/smelter")){
-            addFuelToGob(gob,petalName);
+            addFuelGobMenu(gob,petalName);
         }
         else if (isGobTrellisPlant(gobName)){
             if(petalName.equals(ZeeFlowerMenu.STRPETAL_REMOVEPLANT)) {
@@ -931,7 +931,40 @@ public class ZeeManagerGobClick extends ZeeThread{
         destroyGob(gob);
     }
 
-    public static void addFuelToGob(Gob gob, String petalName) {
+    public static void addItemsToGob(List<WItem> invItens, int num, Gob gob){
+        new ZeeThread(){
+            public void run() {
+                try{
+                    if(invItens.size() < num){
+                        ZeeConfig.msgError("Need "+num+" item(s)");
+                        return;
+                    }
+                    boolean exit = false;
+                    int added = 0;
+                    while(!exit && added<num && invItens.size() > 0){
+                        if(ZeeManagerItemClick.pickUpItem(invItens.get(0))){
+                            itemActGob(gob,0);
+                            if(waitNotHoldingItem()){
+                                invItens.remove(0);
+                                added++;
+                            }else{
+                                ZeeConfig.msgError("Couldn't right click "+gob.getres().basename());
+                                exit = true;
+                            }
+                        }else {
+                            ZeeConfig.msgError("Couldn't pickup inventory item");
+                            exit = true;
+                        }
+                    }
+                    ZeeConfig.addGobTextTempMs(gob,"Added "+added+" item(s)",3000);
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+            }
+        }.start();
+    }
+
+    public static void addFuelGobMenu(Gob gob, String petalName) {
         String gobName = gob.getres().name;
         if(gobName.endsWith("oven") && petalName.equals(ZeeFlowerMenu.STRPETAL_ADD4BRANCH)){
             /*
