@@ -145,13 +145,14 @@ public class ZeeManagerStockpile extends ZeeThread{
 
         while(busy) {
 
+            // wait reaching source
+            waitPlayerDistToGob(gobSource,15);
+
+            // wait inv full
             waitInvFullOrHoldingItem(mainInv, 3000);
 
-            if (!ZeeConfig.isPlayerHoldingItem()) { //if not holding item
-                /*
-                    gfx/invobjs/wblock-maple
-                    gfx/invobjs/board-maple
-                 */
+            // if not holding item
+            if (!ZeeConfig.isPlayerHoldingItem()) {
                 List<WItem> invItems;
                 if (lastPetalName.equals("Make boards"))
                     invItems = mainInv.getWItemsByName("gfx/invobjs/board-");//avoid spiral curio
@@ -173,8 +174,10 @@ public class ZeeManagerStockpile extends ZeeThread{
                     continue;
                 WItem wItem = invItems.get(0);
                 String itemName = wItem.item.getres().name;
-                if (ZeeManagerItemClick.pickUpItem(wItem)) { //pickup inv item
-                    ZeeManagerGobClick.itemActGob(gobPile, UI.MOD_SHIFT);//right click stockpile
+                //pickup inv item
+                if (ZeeManagerItemClick.pickUpItem(wItem)) {
+                    //right click stockpile
+                    ZeeManagerGobClick.itemActGob(gobPile, UI.MOD_SHIFT);
                     if (waitNotHoldingItem()) {//piling successfull
                         sleep(1000);//wait inv transfer to stockpile
                         if (mainInv.getWItemsByName(itemName).size() > 0)
@@ -194,8 +197,9 @@ public class ZeeManagerStockpile extends ZeeThread{
                     exitManager("couldn't pickup source item??");
                 }
             }
+            //holding item? try stockpiling...
             else {
-                //holding item? try stockpiling...
+
                 if(!busy)
                     continue;
                 String itemName = gameUI.vhand.item.getres().name;
