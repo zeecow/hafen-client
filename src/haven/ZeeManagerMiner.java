@@ -16,6 +16,7 @@ public class ZeeManagerMiner extends ZeeThread{
     static boolean debug = false;
     static boolean repeatTaskMineArea = false;
     static boolean useOreForColumns = false;
+    static boolean semiHelperAutoPickStones = false;
     private final String task;
     public static long lastDropItemMs = 0;
     public static boolean mining;
@@ -86,6 +87,11 @@ public class ZeeManagerMiner extends ZeeThread{
                                     semiHelperButtonAct.change("Pick stones");
                                     semiHelperButtonAct.disable(false);
                                     ZeeConfig.clickRemoveCursor();
+                                    waitCursor(ZeeConfig.CURSOR_ARW);
+                                    if (semiHelperAutoPickStones){
+                                        semiHelperButtonAct.click();
+                                        semiHelperButtonAct.disable(true);
+                                    }
                                 }
                             }
                             return;
@@ -119,7 +125,8 @@ public class ZeeManagerMiner extends ZeeThread{
     private static void showWindowSemiHelper() {
         if (semiHelperWindow == null) {
             Widget wdg;
-            semiHelperWindow = new ZeeWindow(new Coord(260, 110), "Miner Semi Helper") {
+
+            semiHelperWindow = new ZeeWindow(new Coord(240, 100), "Miner Semi Helper") {
                 public void wdgmsg(String msg, Object... args) {
                     if (msg.equals("close")) {
                         semiHelperExit();
@@ -127,8 +134,10 @@ public class ZeeManagerMiner extends ZeeThread{
                         super.wdgmsg(msg, args);
                 }
             };
+
             wdg = semiHelperWindow.add( semiHelperLabelStatus = new Label("idle"));
             semiHelperStage = SEMIHELPER_STAGE0_IDLE;
+
             wdg = semiHelperWindow.add( semiHelperButtonAct = new Button(UI.scale(85),"Pick stones"){
                 public void wdgmsg(String msg, Object... args) {
                     if (msg.equals("activate")) {
@@ -164,13 +173,27 @@ public class ZeeManagerMiner extends ZeeThread{
                         }
                     }
                 }
-            },0,wdg.c.y+wdg.sz.y);
+            },0,wdg.c.y+wdg.sz.y+3);
+
+            //checkbox auto click button pick stones
+            semiHelperWindow.add(new CheckBox("auto click"){
+                public void changed(boolean val) {
+                    semiHelperAutoPickStones = val;
+                }
+            },wdg.c.x+wdg.sz.x+3 , wdg.c.y+3);
+
+            //checkbox ore column
+            wdg = semiHelperWindow.add(new CheckBox("ore col: lead, cass, chalco, cinna, mala"){
+                public void changed(boolean val) {
+                    useOreForColumns = val;
+                }
+            },0,wdg.c.y+wdg.sz.y+3);
 
             //add window
             ZeeConfig.gameUI.add(semiHelperWindow, new Coord(100,100));
         }
         else{
-            windowManager.show();
+            semiHelperWindow.show();
         }
     }
 
@@ -587,7 +610,7 @@ public class ZeeManagerMiner extends ZeeThread{
             }
             //println("clicking closestStone "+closestStone.getres().basename());
             ZeeManagerGobClick.gobClick(closestStone,3,UI.MOD_SHIFT);//pick all
-            if(!waitInvIdleMs(999)){
+            if(!waitInvIdleMs(500)){
                 return exitManager("couldn't reach stone (timeout)");
             }
             //invStones += inv.countItemsByName(closestStone.getres().basename());
