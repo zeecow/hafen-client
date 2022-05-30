@@ -22,7 +22,7 @@ public class ZeeManagerMiner extends ZeeThread{
     public static boolean isChipBoulder;
     public static Gob gobBoulder;
     public static ZeeManagerMiner manager;
-    static ZeeWindow windowManager;
+    static ZeeWindow windowManager, semiHelperWindow;
     static ZeeWindow.ZeeButton btnNorth, btnSouth, btnWest, btnEast, btnDig, btnTest;
     static TextEntry txtTest;
     static MCache.Overlay ol;
@@ -36,25 +36,65 @@ public class ZeeManagerMiner extends ZeeThread{
 
     public static void checkMiningSelection() {
         if (ZeeConfig.getCursorName().contentEquals(ZeeConfig.CURSOR_MINE)){
+
+            // skip if mining on horse
             if (ZeeConfig.isPlayerMountingHorse()){
-                ZeeConfig.msg("TROLL ALERT: mining on horse");
+                ZeeConfig.msgError("TROLL RISK: mining on horse");
                 return;
             }
+
+            // if tunnel mining, show Helper Window
+            if (!isSemiHelper && isTunnel(ZeeConfig.savedTileSelOverlay.a.sz())){
+                isSemiHelper = true;
+                showWindowSemiHelper();
+                semiHelperButtonAct.disable(true);
+            }
+
+            // wait player idle, if boulder close, chip it and resume mining
             new ZeeThread(){
                 public void run() {
                     try {
                         if (isCombatActive())
                             return;
-                        waitPlayerPoseMs(ZeeConfig.POSE_PLAYER_IDLE, 1000);
+                        if (isSemiHelper) {
+                            semiHelperLabelStatus.settext("mining");
+                            if (semiHelperStage == SEMIHELPER_STAGE0_IDLE) {
+                                semiHelperStage = SEMIHELPER_STAGE1_MINETUNNEL;
+                            } else {
+                                semiHelperStage = SEMIHELPER_STAGE2_MINECOL;
+                                ZeeConfig.removePlayerText();
+                            }
+                        }
+                        waitPlayerPoseMs(ZeeConfig.POSE_PLAYER_IDLE, 1000);//wait mining stop
                         if (isCombatActive())
                             return;
                         Gob boulder = getBoulderCloseEnoughForChipping();
+                        // mining ended, since no boulder
                         if (boulder == null) {
-                            //println("checkMiningSelection > stopped, no boulder ");
+                            if (isSemiHelper) {
+                                semiHelperLabelStatus.settext("mining done");
+                                if (semiHelperStage == SEMIHELPER_STAGE1_MINETUNNEL) {
+                                    semiHelperStage = SEMIHELPER_STAGE2_MINECOL;
+                                    // prepare mining cursor
+                                    ZeeConfig.cursorChange(ZeeConfig.ACT_MINE);
+                                    semiHelperLabelStatus.settext("waiting column tile");
+                                    ZeeConfig.addPlayerText("click new col tile");
+                                } else if (semiHelperStage == SEMIHELPER_STAGE2_MINECOL) {
+                                    semiHelperStage = SEMIHELPER_STAGE3_PICKSTONE;
+                                    //save player final coord
+                                    semiHelperLastPlayerCoord = ZeeConfig.getPlayerCoord();
+                                    semiHelperButtonAct.change("Pick stones");
+                                    semiHelperButtonAct.disable(false);
+                                    ZeeConfig.clickRemoveCursor();
+                                }
+                            }
                             return;
                         }
                         if (isCombatActive())
                             return;
+                        if (isSemiHelper) {
+                            semiHelperLabelStatus.settext("boulder");
+                        }
                         taskChipBoulder(boulder);
                     }catch (Exception e){
                         e.printStackTrace();
@@ -63,6 +103,123 @@ public class ZeeManagerMiner extends ZeeThread{
                 }
             }.start();
         }
+    }
+
+    static Coord semiHelperLastPlayerCoord;
+    static Label semiHelperLabelStatus;
+    static Button semiHelperButtonAct;
+    static int semiHelperStage = 0;
+    static boolean isSemiHelper = false;
+    static final int SEMIHELPER_STAGE0_IDLE = 0;
+    static final int SEMIHELPER_STAGE1_MINETUNNEL = 1;
+    static final int SEMIHELPER_STAGE2_MINECOL = 2;
+    static final int SEMIHELPER_STAGE3_PICKSTONE = 3;
+    static final int SEMIHELPER_STAGE4_BUILDCOL = 4;
+    static final int SEMIHELPER_STAGE5_FAIL = 5;
+    private static void showWindowSemiHelper() {
+        if (semiHelperWindow == null) {
+            Widget wdg;
+            semiHelperWindow = new ZeeWindow(new Coord(260, 110), "Miner Semi Helper") {
+                public void wdgmsg(String msg, Object... args) {
+                    if (msg.equals("close")) {
+                        semiHelperExit();
+                    } else
+                        super.wdgmsg(msg, args);
+                }
+            };
+            wdg = semiHelperWindow.add( semiHelperLabelStatus = new Label("idle"));
+            semiHelperStage = SEMIHELPER_STAGE0_IDLE;
+            wdg = semiHelperWindow.add( semiHelperButtonAct = new Button(UI.scale(85),"Pick stones"){
+                public void wdgmsg(String msg, Object... args) {
+                    if (msg.equals("activate")) {
+                        // action pick stones
+                        if (this.text.text.contentEquals("Pick stones")) {
+                            //disable button before picking stones
+                            this.disable(true);
+                            new ZeeThread(){
+                                public void run() {
+                                    try {
+                                        semiHelperLabelStatus.settext("picking stones");
+                                        mining = true;
+                                        if (pickStones(30)){
+                                            //move to player mining end coord
+                                            ZeeConfig.clickCoord(semiHelperLastPlayerCoord,1);
+                                            waitPlayerIdlePose();
+                                            semiHelperStage = SEMIHELPER_STAGE4_BUILDCOL;
+                                            // select menu item for stone column
+                                            ZeeConfig.gameUI.menu.wdgmsg("act","bp","column","0");
+                                            ZeeConfig.addPlayerText("wait place col");
+                                        }else{
+                                            int invStones = pickStonesInvCount();
+                                            ZeeConfig.msgError("missing "+invStones+" stones");
+                                            ZeeConfig.println("missing "+invStones+" stones");
+                                            semiHelperExit();
+                                        }
+                                    } catch (Exception e) {
+                                        e.printStackTrace();
+                                    }
+                                    mining = false;
+                                }
+                            }.start();
+                        }
+                    }
+                }
+            },0,wdg.c.y+wdg.sz.y);
+
+            //add window
+            ZeeConfig.gameUI.add(semiHelperWindow, new Coord(100,100));
+        }
+        else{
+            windowManager.show();
+        }
+    }
+
+    public static int semiHelperExit() {
+        int ret = semiHelperStage;
+        mining = false;
+        isSemiHelper = false;
+        semiHelperStage = 0;
+        ZeeConfig.removePlayerText();
+        if (semiHelperWindow!=null)
+            semiHelperWindow.hide();
+        return ret;
+    }
+
+    public static boolean isTunnel(Coord sz) {
+        int minSize = 9;
+        if (sz.x==1 && sz.y>=minSize)
+            return true;
+        if (sz.y==1 && sz.x>=minSize)
+            return true;
+        return false;
+    }
+
+    public static void semiHelperBuildColumn(Window window) {
+        Button buildBtn = ZeeConfig.getButtonNamed(window,"Build");
+        if (buildBtn==null) {
+            println("ZeeConfig.windowAdded() > no button for building column");
+            return;
+        }
+        new ZeeThread(){
+            public void run() {
+                buildBtn.click();
+                waitPlayerPoseNotInList(ZeeConfig.POSE_PLAYER_BUILD);
+                ZeeConfig.removePlayerText();
+                //drop remaining inv stones
+                ZeeConfig.getMainInventory().children(WItem.class).forEach(wItem -> {
+                    if (ZeeConfig.mineablesStone.contains(wItem.item.getres().basename()))
+                        wItem.item.wdgmsg("drop", Coord.z);
+                });
+                // if window still open, means not enough mats
+                if (ZeeConfig.getWindow("Stone Column") != null) {
+                    println("miner semi helper > not enough mats for column");
+                    ZeeManagerMiner.semiHelperStage = ZeeManagerMiner.SEMIHELPER_STAGE5_FAIL;
+                    return;
+                }
+                //exit semiHelper window
+                semiHelperExit();
+            }
+        }.start();
     }
 
     @Override
@@ -296,7 +453,7 @@ public class ZeeManagerMiner extends ZeeThread{
             exitManager("mining canceled 4.1");
             return;
         }
-        Window colWin = ZeeConfig.getWindow("Stone column");
+        Window colWin = ZeeConfig.getWindow("Stone Column");
         if (colWin==null) {
             exitManager("no window for new column");
             return;
@@ -320,7 +477,7 @@ public class ZeeManagerMiner extends ZeeThread{
             if (ZeeConfig.mineablesStone.contains(wItem.item.getres().basename()))
                 wItem.item.wdgmsg("drop", Coord.z);
         });
-        colWin = ZeeConfig.getWindow("Stone column");
+        colWin = ZeeConfig.getWindow("Stone Column");
         if (colWin!=null) {
             exitManager("no mats for new column");
             return;
@@ -382,15 +539,15 @@ public class ZeeManagerMiner extends ZeeThread{
         Gob closestStone;
         Inventory inv = ZeeConfig.getMainInventory();
 
+        // set arrow cursor
+        if (!ZeeConfig.CURSOR_ARW.contentEquals(ZeeConfig.getCursorName())) {
+            ZeeConfig.clickRemoveCursor();
+            waitCursor(ZeeConfig.CURSOR_ARW);
+        }
+
         //check if inventory stones are enough
-        List<WItem> invItems = new LinkedList<>(inv.children(WItem.class));
-        invItems.removeIf(item -> {
-            String name = item.item.getres().basename();
-            if (useOreForColumns && "leadglance,cassiterite,chalcopyrite,cinnabar,malachite".contains(name))
-                return false;
-            return !ZeeConfig.mineablesStone.contains(name);
-        });
-        if (invItems.size() >= wantedStones)
+        int invStones = pickStonesInvCount();
+        if (invStones >= wantedStones)
             return true;
 
         // if not enough stones, equip sack(s)
@@ -411,7 +568,6 @@ public class ZeeManagerMiner extends ZeeThread{
         }
 
         //loop pickup stone types until total reached
-        int invStones = invItems.size();
         while (mining  &&  invStones<wantedStones && inv.getNumberOfFreeSlots()!=0) {
             terobjs = ZeeConfig.findGobsByNameContains("gfx/terobjs/items/");
             terobjs.removeIf(item -> {//filter column stone types
@@ -431,10 +587,11 @@ public class ZeeManagerMiner extends ZeeThread{
             }
             //println("clicking closestStone "+closestStone.getres().basename());
             ZeeManagerGobClick.gobClick(closestStone,3,UI.MOD_SHIFT);//pick all
-            if(!waitInvIdleMs(500)){
+            if(!waitInvIdleMs(999)){
                 return exitManager("couldn't reach stone (timeout)");
             }
-            invStones += inv.countItemsByName(closestStone.getres().basename());
+            //invStones += inv.countItemsByName(closestStone.getres().basename());
+            invStones = pickStonesInvCount();
             //println("loop > invStones "+invStones);
         }
         if (ZeeConfig.isPlayerHoldingItem()){//drop if holding stone
@@ -443,8 +600,19 @@ public class ZeeManagerMiner extends ZeeThread{
                 waitNotHoldingItem();
             }
         }
-        debug("got "+invStones+" stones ,  enough="+(invStones >= wantedStones) +" , invfull="+ (inv.getNumberOfFreeSlots()==0));
+        println("got "+invStones+" stones ,  enough="+(invStones >= wantedStones) +" , invfull="+ (inv.getNumberOfFreeSlots()==0));
         return invStones >= wantedStones || inv.getNumberOfFreeSlots()==0;
+    }
+
+    private static int pickStonesInvCount() {
+        List<WItem> invItems = new LinkedList<>(ZeeConfig.getMainInventory().children(WItem.class));
+        invItems.removeIf(item -> {
+            String name = item.item.getres().basename();
+            if (useOreForColumns && "leadglance,cassiterite,chalcopyrite,cinnabar,malachite".contains(name))
+                return false;
+            return !ZeeConfig.mineablesStone.contains(name);
+        });
+        return invItems.size();
     }
 
 
@@ -585,7 +753,8 @@ public class ZeeManagerMiner extends ZeeThread{
             //add window
             ZeeConfig.gameUI.add(windowManager, new Coord(100,100));
 
-        }else{
+        }
+        else{
             windowManager.show();
             disableBtns(false);
         }
@@ -674,15 +843,17 @@ public class ZeeManagerMiner extends ZeeThread{
                     mining = false;
                     isChipBoulder = false;
                     println("stop mining");
-                    ZeeConfig.gameUI.msg("stop mining");
+                    ZeeConfig.msgError("stop mining");
                     ZeeConfig.clickRemoveCursor();
                     waitCursor(ZeeConfig.CURSOR_ARW);
                     ZeeConfig.stopMovingEscKey();
                     ZeeThread.staminaMonitorStop();//case stam monitor thread is running
-                    manager.interrupt();
+                    if (manager != null)
+                        manager.interrupt();
+                    if (isSemiHelper)
+                        semiHelperExit();
                     ZeeConfig.resetTileSelection();
                     ZeeConfig.removePlayerText();
-
                 }catch (Exception e){
                     e.printStackTrace();
                 }
@@ -726,7 +897,10 @@ public class ZeeManagerMiner extends ZeeThread{
 
     public static boolean isCombatActive() {
         try {
-            return ZeeConfig.gameUI.fv.current != null;
+            boolean isCombat = ZeeConfig.gameUI.fv.current != null;
+            if (isCombat && isSemiHelper)
+                semiHelperExit();
+            return isCombat;
         }catch (Exception e){
             e.printStackTrace();
         }

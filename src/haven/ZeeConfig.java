@@ -80,6 +80,7 @@ public class ZeeConfig {
     public static final String POSE_PLAYER_CARRYFLAT = "gfx/borka/carry-flat";//idle pickaxe
     public static final String POSE_PLAYER_TRAVELHOMESHRUG = "gfx/borka/pointconfused";
     public static final String POSE_PLAYER_TRAVELHOMEPOINT = "gfx/borka/pointhome";
+    public static final String POSE_PLAYER_THINK = "gfx/borka/thinkan";
 
     public static final String DEF_BUTCH_AUTO_LIST = "Break,Scale,Wring neck,Kill,Skin,Flay,Pluck,Clean,Butcher,Collect bones";
     public static final String DEF_AUTO_CLICK_MENU_LIST = "Pick,Harvest wax";
@@ -754,6 +755,9 @@ public class ZeeConfig {
         }
         else if (windowTitle.contentEquals("Oven") || windowTitle.contentEquals("Kiln") || windowTitle.contains("Smelter")){
             windowAddFuelGUI(window,windowTitle);
+        }
+        else if (ZeeManagerMiner.semiHelperStage==ZeeManagerMiner.SEMIHELPER_STAGE4_BUILDCOL && windowTitle.contentEquals("Stone Column")){
+            ZeeManagerMiner.semiHelperBuildColumn(window);
         }
 
         if(windowTitle.equals("Boil Pepper Drupes")){
