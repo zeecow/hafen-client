@@ -412,6 +412,7 @@ public class ZeeManagerGobClick extends ZeeThread{
 
     private static void twoDreamsPlease(Gob gob) {
         if(clickGobPetal(gob,"Harvest")) {
+            waitPlayerDistToGob(gob,15);
             waitNoFlowerMenu();
             if(clickGobPetal(gob,"Harvest"))
                 waitNoFlowerMenu();
