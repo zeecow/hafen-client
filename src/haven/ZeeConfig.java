@@ -754,7 +754,8 @@ public class ZeeConfig {
             windowModAnimalStats(window, windowTitle);
         }
         else if (windowTitle.contentEquals("Oven") || windowTitle.contentEquals("Kiln") || windowTitle.contains("Smelter")){
-            windowAddFuelGUI(window,windowTitle);
+            if (!isBuildWindow(window))
+                windowAddFuelGUI(window,windowTitle);
         }
         else if (ZeeManagerMiner.semiHelperStage==ZeeManagerMiner.SEMIHELPER_STAGE4_BUILDCOL && windowTitle.contentEquals("Stone Column")){
             ZeeManagerMiner.semiHelperBuildColumn(window);
@@ -767,6 +768,10 @@ public class ZeeConfig {
         windowReposition(window,windowTitle);
 
         windowModOrganizeButton(window, windowTitle);
+    }
+
+    public static boolean isBuildWindow(Window window) {
+        return getButtonNamed(window,"Build") != null;
     }
 
     private static void windowAddFuelGUI(Window window, String windowTitle) {
