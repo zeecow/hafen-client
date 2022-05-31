@@ -936,6 +936,7 @@ public class ZeeManagerGobClick extends ZeeThread{
         new ZeeThread(){
             public void run() {
                 try{
+                    ZeeConfig.addPlayerText("adding");
                     if(invItens.size() < num){
                         ZeeConfig.msgError("Need "+num+" item(s)");
                         return;
@@ -957,6 +958,7 @@ public class ZeeManagerGobClick extends ZeeThread{
                             exit = true;
                         }
                     }
+                    ZeeConfig.removePlayerText();
                     ZeeConfig.addGobTextTempMs(gob,"Added "+added+" item(s)",3000);
                 }catch (Exception e){
                     e.printStackTrace();

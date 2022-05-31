@@ -18,6 +18,7 @@ features:
  - icon list categs
  - label trasfering barrels
  - Window fuel buttons for Oven, Kiln, Smelter
+ - keys up/down control volume
  - rightclicking doors, cave, gate, wheelbarrow, stockpiles, horse, cart, will interact with these objects whenever possible
  - midclick Barter Stand "Buy" button to auto-buy  
  - midclick ground 
