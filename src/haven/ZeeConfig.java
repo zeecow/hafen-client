@@ -163,6 +163,7 @@ public class ZeeConfig {
     public static boolean highlightGrowingTrees = Utils.getprefb("highlightGrowingTrees", true);
     public static boolean keyBeltShiftTab = Utils.getprefb("keyBeltShiftTab", true);
     public static boolean keyCamSwitchShiftC = Utils.getprefb("keyCamSwitchShiftC", true);
+    public static boolean keyUpDownAudioControl = Utils.getprefb("keyUpDownAudioControl", true);
     public static boolean midclickEquipManager = Utils.getprefb("midclickEquipManager", true);
     public static boolean miniTrees = Utils.getprefb("miniTrees", false);
     public static Integer miniTreesSize = Utils.getprefi("miniTreesSize", 50);
@@ -1498,15 +1499,37 @@ public class ZeeConfig {
     }
 
     public static boolean matchKeyShortcut(KeyEvent ev) {
+
+        // Arrow up/down changes audio volume
+        if (ZeeConfig.keyUpDownAudioControl && ev.getKeyCode()==KeyEvent.VK_UP){
+            double vol = Audio.volume;
+            if (vol < 0.9)
+                Audio.setvolume(Double.parseDouble(String.format("%.1f", vol)) + 0.1);
+            else if (vol < 1)
+                Audio.setvolume(1); // max 1
+            msg("volume "+Audio.volume);
+            return true;
+        }
+        else if (ZeeConfig.keyUpDownAudioControl && ev.getKeyCode()==KeyEvent.VK_DOWN){
+            double vol = Audio.volume;
+            if (vol > 0.1)
+                Audio.setvolume(Double.parseDouble(String.format("%.1f", vol)) - 0.1);
+            else if (vol > 0)
+                Audio.setvolume(0); // min 0
+            msg("volume "+Audio.volume);
+            return true;
+        }
         // Shift+Tab toggles Belt
-        if(ZeeConfig.keyBeltShiftTab && ev.getKeyCode()==KeyEvent.VK_TAB && ev.isShiftDown()){
+        else if(ZeeConfig.keyBeltShiftTab && ev.getKeyCode()==KeyEvent.VK_TAB && ev.isShiftDown()){
             Window belt = getWindow("Belt");
             if( belt != null){
                 belt.getchild(Button.class).click();//click close button
             }else {
                 openBelt();
             }
+            return true;
         }
+        // Shift+c alternate cams bad/ortho
         else if(ZeeConfig.keyCamSwitchShiftC && ev.getKeyCode()==KeyEvent.VK_C && ev.isShiftDown()){
             String cam = gameUI.map.camera.getClass().getSimpleName();
             try {
@@ -1518,6 +1541,7 @@ public class ZeeConfig {
             } catch (Exception e) {
                 e.printStackTrace();
             }
+            return true;
         }
         return false;
     }
