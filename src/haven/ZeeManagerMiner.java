@@ -26,7 +26,7 @@ public class ZeeManagerMiner extends ZeeThread{
             // if tunnel mining, show Helper Window
             if (tunnelCheckbox && !tunneling && isTunnel(ZeeConfig.savedTileSelOverlay.a.sz())){
                 tunneling = true;
-                showWindowTunnelHelper();
+                tunnelHelperShowWindow();
                 tunnelHelperButtonAct.disable(true);
             }
 
@@ -37,30 +37,38 @@ public class ZeeManagerMiner extends ZeeThread{
                         if (isCombatActive())
                             return;
                         if (tunneling) {
-                            tunnelHelperLabelStatus.settext("mining");
                             if (tunnelHelperStage == TUNNELHELPER_STAGE0_IDLE) {
-                                tunnelHelperStage = TUNNELHELPER_STAGE1_MINETUNNEL;
+                                tunnelHelperSetStage(TUNNELHELPER_STAGE1_MINETUNNEL);
                             }
                         }
-                        waitPlayerPoseMs(ZeeConfig.POSE_PLAYER_IDLE, 1000);//wait mining stop
+
+                        // wait mining stop
+                        waitPlayerPoseMs(ZeeConfig.POSE_PLAYER_IDLE, 1000);
                         if (isCombatActive())
                             return;
+
+                        // save player coord after mining new col tile
+                        if (tunneling && tunnelHelperStage == TUNNELHELPER_STAGE2_WAITNEWCOLTILE){
+                            tunnelHelperEndCoord = ZeeConfig.getPlayerCoord();
+                            tunnelHelperSetStage(TUNNELHELPER_STAGE2_MINECOL);
+                        }
+
+                        // check if boulder close
                         Gob boulder = getBoulderCloseEnoughForChipping();
-                        // mining ended, since no boulder
+
+                        // no boulder, mining stopped
                         if (boulder == null) {
                             if (tunneling) {
-                                tunnelHelperLabelStatus.settext("mining done");
+                                // finished mining tunnel
                                 if (tunnelHelperStage == TUNNELHELPER_STAGE1_MINETUNNEL) {
-                                    tunnelHelperStage = TUNNELHELPER_STAGE2_MINECOL;
-                                    // prepare mining cursor
-                                    ZeeConfig.cursorChange(ZeeConfig.ACT_MINE);
-                                    tunnelHelperLabelStatus.settext("waiting column tile");
+                                    tunnelHelperSetStage(TUNNELHELPER_STAGE2_WAITNEWCOLTILE);
+                                    ZeeConfig.cursorChange(ZeeConfig.ACT_MINE);// prepare mining cursor
                                     ZeeConfig.addPlayerText("click new col tile");
-                                } else if (tunnelHelperStage == TUNNELHELPER_STAGE2_MINECOL) {
-                                    tunnelHelperStage = TUNNELHELPER_STAGE3_PICKSTONE;
+                                }
+                                // finished mining new col tile
+                                else if (tunnelHelperStage == TUNNELHELPER_STAGE2_MINECOL) {
+                                    tunnelHelperSetStage(TUNNELHELPER_STAGE3_PICKSTONE);
                                     ZeeConfig.removePlayerText();
-                                    //save player final coord
-                                    tunnelHelperLastPlayerCoord = ZeeConfig.getPlayerCoord();
                                     tunnelHelperButtonAct.change("Pick stones");
                                     tunnelHelperButtonAct.disable(false);
                                     ZeeConfig.clickRemoveCursor();
@@ -73,12 +81,13 @@ public class ZeeManagerMiner extends ZeeThread{
                             }
                             return;
                         }
+
                         if (isCombatActive())
                             return;
-                        if (tunneling) {
-                            tunnelHelperLabelStatus.settext("boulder");
-                        }
+
+                        // chip boulder
                         taskChipBoulder(boulder);
+
                     }catch (Exception e){
                         e.printStackTrace();
                         ZeeConfig.removePlayerText();
@@ -90,18 +99,19 @@ public class ZeeManagerMiner extends ZeeThread{
 
     static boolean tunnelCheckbox = false;
     static boolean tunneling = false;
-    static Coord tunnelHelperLastPlayerCoord;
+    static Coord tunnelHelperEndCoord;
     static Label tunnelHelperLabelStatus;
     static Button tunnelHelperButtonAct;
     static int tunnelHelperStage = 0;
     static boolean tunnelHelperAutoPickStones = false;
+    static final int TUNNELHELPER_STAGE_FAIL = -1;
     static final int TUNNELHELPER_STAGE0_IDLE = 0;
     static final int TUNNELHELPER_STAGE1_MINETUNNEL = 1;
-    static final int TUNNELHELPER_STAGE2_MINECOL = 2;
-    static final int TUNNELHELPER_STAGE3_PICKSTONE = 3;
-    static final int TUNNELHELPER_STAGE4_BUILDCOL = 4;
-    static final int TUNNELHELPER_STAGE5_FAIL = 5;
-    private static void showWindowTunnelHelper() {
+    static final int TUNNELHELPER_STAGE2_WAITNEWCOLTILE = 2;
+    static final int TUNNELHELPER_STAGE2_MINECOL = 3;
+    static final int TUNNELHELPER_STAGE3_PICKSTONE = 4;
+    static final int TUNNELHELPER_STAGE4_BUILDCOL = 5;
+    private static void tunnelHelperShowWindow() {
         if (tunnelHelperWindow == null) {
             Widget wdg;
 
@@ -115,7 +125,7 @@ public class ZeeManagerMiner extends ZeeThread{
             };
 
             wdg = tunnelHelperWindow.add( tunnelHelperLabelStatus = new Label("idle"));
-            tunnelHelperStage = TUNNELHELPER_STAGE0_IDLE;
+            tunnelHelperSetStage(TUNNELHELPER_STAGE0_IDLE);
 
             wdg = tunnelHelperWindow.add( tunnelHelperButtonAct = new Button(UI.scale(85),"Pick stones"){
                 public void wdgmsg(String msg, Object... args) {
@@ -127,20 +137,19 @@ public class ZeeManagerMiner extends ZeeThread{
                             new ZeeThread(){
                                 public void run() {
                                     try {
-                                        tunnelHelperLabelStatus.settext("picking stones");
                                         mining = true;
                                         if (pickStones(30)){
                                             //move to player mining end coord
-                                            ZeeConfig.clickCoord(tunnelHelperLastPlayerCoord,1);
+                                            ZeeConfig.clickCoord(tunnelHelperEndCoord,1);
                                             waitPlayerIdlePose();
-                                            tunnelHelperStage = TUNNELHELPER_STAGE4_BUILDCOL;
+                                            tunnelHelperSetStage(TUNNELHELPER_STAGE4_BUILDCOL);
                                             // select menu item for stone column
                                             ZeeConfig.gameUI.menu.wdgmsg("act","bp","column","0");
                                             ZeeConfig.addPlayerText("wait place col");
                                         }else{
                                             int invStones = pickStonesInvCount();
-                                            ZeeConfig.msgError("missing "+invStones+" stones");
-                                            ZeeConfig.println("missing "+invStones+" stones");
+                                            ZeeConfig.msgError("missing "+(30-invStones)+" stones");
+                                            ZeeConfig.println("missing "+(30-invStones)+" stones");
                                             tunnelHelperExit();
                                         }
                                     } catch (Exception e) {
@@ -176,11 +185,32 @@ public class ZeeManagerMiner extends ZeeThread{
         }
     }
 
+    private static void tunnelHelperSetStage(int stage) {
+        String name = "unknown";
+        switch (stage){
+            case TUNNELHELPER_STAGE_FAIL:
+                name = "fail"; break;
+            case TUNNELHELPER_STAGE0_IDLE:
+                name = "idle"; break;
+            case TUNNELHELPER_STAGE1_MINETUNNEL:
+                name = "mine tunnel"; break;
+            case TUNNELHELPER_STAGE2_WAITNEWCOLTILE:
+                name = "wait new col tile"; break;
+            case TUNNELHELPER_STAGE3_PICKSTONE:
+                name = "pick stone"; break;
+            case TUNNELHELPER_STAGE4_BUILDCOL:
+                name = "build new col"; break;
+        }
+        println("stage " +tunnelHelperStage+ " to "+stage+" ("+name+")");
+        tunnelHelperStage = stage;
+        tunnelHelperLabelStatus.settext("stage "+stage+" - "+name);
+    }
+
     public static int tunnelHelperExit() {
         int ret = tunnelHelperStage;
         mining = false;
         tunneling = false;
-        tunnelHelperStage = TUNNELHELPER_STAGE0_IDLE;
+        tunnelHelperSetStage(TUNNELHELPER_STAGE0_IDLE);
         ZeeConfig.removePlayerText();
         if (tunnelHelperWindow !=null)
             tunnelHelperWindow.hide();
@@ -209,19 +239,22 @@ public class ZeeManagerMiner extends ZeeThread{
                 buildBtn.click();
                 waitPlayerPoseNotInList(ZeeConfig.POSE_PLAYER_BUILD);
                 ZeeConfig.removePlayerText();
+
                 //back to saved coord
-                ZeeConfig.clickCoord(tunnelHelperLastPlayerCoord,1);
+                ZeeConfig.clickCoord(tunnelHelperEndCoord,1);
                 waitPlayerIdlePose();
+
                 //drop remaining inv stones
                 ZeeConfig.getMainInventory().children(WItem.class).forEach(wItem -> {
                     String name = wItem.item.getres().basename();
                     if (ZeeConfig.mineablesStone.contains(name) || (useOreForColumns && listOreColumn.contains(name)))
                         wItem.item.wdgmsg("drop", Coord.z);
                 });
+
                 // if window still open, means not enough mats
                 if (ZeeConfig.getWindow("Stone Column") != null) {
                     println("miner semi helper > not enough mats for column");
-                    ZeeManagerMiner.tunnelHelperStage = ZeeManagerMiner.TUNNELHELPER_STAGE5_FAIL;
+                    tunnelHelperSetStage(ZeeManagerMiner.TUNNELHELPER_STAGE_FAIL);
                     tunnelHelperExit();
                     return;
                 }
@@ -230,10 +263,10 @@ public class ZeeManagerMiner extends ZeeThread{
                 if (ZeeInvMainOptionsWdg.cbTunnel!=null && !ZeeInvMainOptionsWdg.cbTunnel.a) {
                     tunnelHelperExit();
                 }
+                //reset initial stage
                 else{
-                    //reset initial stage
                     tunneling = false;
-                    tunnelHelperStage = TUNNELHELPER_STAGE0_IDLE;
+                    tunnelHelperSetStage(TUNNELHELPER_STAGE0_IDLE);
                 }
             }
         }.start();
