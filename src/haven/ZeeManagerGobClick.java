@@ -484,9 +484,7 @@ public class ZeeManagerGobClick extends ZeeThread{
         {
             destroyTreelogs(gob,petalName);
         }
-        else if (petalName.equals(ZeeFlowerMenu.STRPETAL_SHOWWINDOWMINING)) {
-            ZeeManagerMiner.showWindowMining();
-        }else{
+        else{
             println("chooseGobFlowerMenu > unkown case");
         }
     }
@@ -643,9 +641,6 @@ public class ZeeManagerGobClick extends ZeeThread{
                 ZeeFlowerMenu.STRPETAL_DESTROYTREELOG5,
                 ZeeFlowerMenu.STRPETAL_DESTROYALL
             );
-        }
-        else if (gobName.endsWith("/column")) {
-            menu = new ZeeFlowerMenu(gob, ZeeFlowerMenu.STRPETAL_SHOWWINDOWMINING);
         }else{
             showMenu = false;
             //println("showGobFlowerMenu() > unkown case");
