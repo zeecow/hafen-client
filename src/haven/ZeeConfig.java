@@ -775,6 +775,8 @@ public class ZeeConfig {
         return getButtonNamed(window,"Build") != null;
     }
 
+
+    static Gob windowFuelTargetGob;
     private static void windowAddFuelGUI(Window window, String windowTitle) {
 
         int y = window.sz.y - 60;
@@ -784,18 +786,20 @@ public class ZeeConfig {
         TextEntry te;
         Button btn;
 
+        windowFuelTargetGob = lastMapViewClickGob;
+
         if (windowTitle.contentEquals("Oven")) {
             window.add(te=new TextEntry(txtsz,"4"), 0, y);
             window.add(btn=new Button(UI.scale(btnsz),"branch"){
                 public void wdgmsg(String msg, Object... args) {
                     if (msg.contentEquals("activate"))
-                        windowAddFuel(te.text(),this.text.text,"oven");
+                        windowAddFuel(te.text(),this.text.text,windowFuelTargetGob);
                 }
             },x,y);
             window.add(btn=new Button(UI.scale(btnsz),"coal"){
                 public void wdgmsg(String msg, Object... args) {
                     if (msg.contentEquals("activate"))
-                        windowAddFuel(te.text(),this.text.text,"oven");
+                        windowAddFuel(te.text(),this.text.text,windowFuelTargetGob);
                 }
             },x+btn.sz.x,y);
         }
@@ -804,13 +808,13 @@ public class ZeeConfig {
             window.add(btn=new Button(UI.scale(btnsz),"branch"){
                 public void wdgmsg(String msg, Object... args) {
                     if (msg.contentEquals("activate"))
-                        windowAddFuel(te.text(),this.text.text,"kiln");
+                        windowAddFuel(te.text(),this.text.text,windowFuelTargetGob);
                 }
             },x,y);
             window.add(btn=new Button(UI.scale(btnsz),"coal"){
                 public void wdgmsg(String msg, Object... args) {
                     if (msg.contentEquals("activate"))
-                        windowAddFuel(te.text(),this.text.text,"kiln");
+                        windowAddFuel(te.text(),this.text.text,windowFuelTargetGob);
                 }
             },x+btn.sz.x,y);
         }
@@ -819,7 +823,7 @@ public class ZeeConfig {
             window.add(btn=new Button(UI.scale(btnsz),"coal"){
                 public void wdgmsg(String msg, Object... args) {
                     if (msg.contentEquals("activate"))
-                        windowAddFuel(te.text(),this.text.text,"smelter");
+                        windowAddFuel(te.text(),this.text.text,windowFuelTargetGob);
                 }
             },x,y);
         }
@@ -827,14 +831,13 @@ public class ZeeConfig {
         window.pack();
     }
 
-    private static void windowAddFuel(String txtNum, String fuelName, String gobName) {
+    private static void windowAddFuel(String txtNum, String fuelName, Gob g) {
         try {
             int num = Integer.parseInt(txtNum);
             if (num < 1){
                 msgError("invalid quantity");
                 return;
             }
-            Gob g = getClosestGobName(gobName);
             if (g==null){
                 msgError("Fuel target not found");
                 return;
