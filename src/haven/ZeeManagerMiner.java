@@ -399,7 +399,8 @@ public class ZeeManagerMiner extends ZeeThread{
 
     public static void taskChipBoulder(Gob gobBoulder) throws Exception {
         //println(">task chip_boulder on");
-        //ZeeConfig.addPlayerText("boulder");
+        if (!tunneling)
+            ZeeConfig.addPlayerText("boulder");
 
         //wait boulder loading/clickable
         sleep(1000);
@@ -430,7 +431,8 @@ public class ZeeManagerMiner extends ZeeThread{
         }
 
         //println(">task chip_boulder off");
-        //ZeeConfig.removePlayerText();
+        if (!tunneling)
+            ZeeConfig.removePlayerText();
     }
 
     public static void notifyColumn(Gob gob, float hp){
