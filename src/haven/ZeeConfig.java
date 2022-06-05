@@ -1836,10 +1836,7 @@ public class ZeeConfig {
     }
 
     public static boolean isPlayerCarryingWheelbarrow() {
-        //if cursor is hand, player maybe driving wb at (0,0) instead of carrying
-        if (getCursorName().contentEquals(CURSOR_HAND))
-            return false;
-        return isPlayerCarryingGob("/wheelbarrow")!=null;
+        return isPlayerLiftingGob("/wheelbarrow") != null;
     }
 
     public static boolean isPlayerDrivingWheelbarrow() {
@@ -1858,7 +1855,9 @@ public class ZeeConfig {
             return null;
     }
 
-    public static Gob isPlayerCarryingGob(String gobNameContains) {
+    public static Gob isPlayerLiftingGob(String gobNameContains) {
+        if (!playerHasAnyPose(POSE_PLAYER_LIFT)) // not lifting anything
+            return null;
         return  isPlayerSharingGobCoord(gobNameContains);
     }
 

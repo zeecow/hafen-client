@@ -217,7 +217,7 @@ public class ZeeManagerGobClick extends ZeeThread{
                         String barrelName = ZeeConfig.getBarrelOverlayBasename(gob);
                         if (!barrelName.isEmpty())
                             ZeeConfig.addGobTextTemp(gob, barrelName);
-                        Gob carryingBarrel = ZeeConfig.isPlayerCarryingGob("/barrel");
+                        Gob carryingBarrel = ZeeConfig.isPlayerLiftingGob("/barrel");
                         if (carryingBarrel!=null) {
                             barrelName = ZeeConfig.getBarrelOverlayBasename(carryingBarrel);
                             if (!barrelName.isEmpty())
