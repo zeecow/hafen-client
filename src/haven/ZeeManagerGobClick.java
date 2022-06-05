@@ -808,8 +808,6 @@ public class ZeeManagerGobClick extends ZeeThread{
                 ZeeConfig.msg("no wheelbarrow close");
             }else {
                 double dist;
-                //ZeeConfig.clickRemoveCursor();//remove hand cursor
-                //waitCursor(ZeeConfig.CURSOR_ARW);
                 liftGob(wb);
                 sleep(PING_MS);
                 dist = ZeeConfig.distanceToPlayer(wb);

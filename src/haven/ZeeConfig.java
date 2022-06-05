@@ -81,6 +81,7 @@ public class ZeeConfig {
     public static final String POSE_PLAYER_TRAVELHOMESHRUG = "gfx/borka/pointconfused";
     public static final String POSE_PLAYER_TRAVELHOMEPOINT = "gfx/borka/pointhome";
     public static final String POSE_PLAYER_THINK = "gfx/borka/thinkan";
+    public static final String POSE_PLAYER_DRIVE_WHEELBARROW = "gfx/borka/carry";
 
     public static final String DEF_BUTCH_AUTO_LIST = "Break,Scale,Wring neck,Kill,Skin,Flay,Pluck,Clean,Butcher,Collect bones";
     public static final String DEF_AUTO_CLICK_MENU_LIST = "Pick,Harvest wax";
@@ -1842,18 +1843,7 @@ public class ZeeConfig {
     }
 
     public static boolean isPlayerDrivingWheelbarrow() {
-        if (!getCursorName().contentEquals(CURSOR_HAND))
-            return false;
-
-        Gob wb = getClosestGobName("/wheelbarrow");
-        if (wb==null)
-            return false;
-
-        double dist = distanceToPlayer(wb);
-        if (dist <= ZeeConfig.MAX_DIST_DRIVING_WHEELBARROW)
-            return true;
-
-        return false;
+        return playerHasAnyPose(POSE_PLAYER_DRIVE_WHEELBARROW);
     }
 
     public static boolean isPlayerMountingHorse() {
