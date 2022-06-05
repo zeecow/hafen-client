@@ -938,7 +938,12 @@ public class ZeeManagerGobClick extends ZeeThread{
                     }
                     boolean exit = false;
                     int added = 0;
-                    while(!exit && added<num && invItens.size() > 0){
+                    ZeeConfig.lastMapViewClickButton = 2;//prepare for cancel click
+                    while(  !ZeeConfig.isTaskCanceledByGroundClick()
+                            && !exit
+                            && added < num
+                            && invItens.size() > 0)
+                    {
                         if(ZeeManagerItemClick.pickUpItem(invItens.get(0))){
                             itemActGob(gob,0);
                             if(waitNotHoldingItem()){
