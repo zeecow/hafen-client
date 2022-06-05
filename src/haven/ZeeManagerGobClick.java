@@ -807,13 +807,13 @@ public class ZeeManagerGobClick extends ZeeThread{
             if (wb==null){
                 ZeeConfig.msg("no wheelbarrow close");
             }else {
-                double dist = ZeeConfig.distanceToPlayer(wb);
-                ZeeConfig.clickRemoveCursor();//remove hand cursor
-                waitCursor(ZeeConfig.CURSOR_ARW);
+                double dist;
+                //ZeeConfig.clickRemoveCursor();//remove hand cursor
+                //waitCursor(ZeeConfig.CURSOR_ARW);
                 liftGob(wb);
                 sleep(PING_MS);
                 dist = ZeeConfig.distanceToPlayer(wb);
-                if (dist==0) {
+                if (dist==0) {//lifted wb
                     gobClick(gate, 3);
                     waitPlayerIdleVelocity();
                 }else{
@@ -1193,6 +1193,7 @@ public class ZeeManagerGobClick extends ZeeThread{
             waitItemEquipped("shovel");
         }
         ZeeConfig.gameUI.menu.wdgmsg("act", "carry","0");
+        waitCursor(ZeeConfig.CURSOR_HAND);
         gobClick(gob,1);
         waitPlayerDistToGob(gob,0);
     }
