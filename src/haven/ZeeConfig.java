@@ -2379,11 +2379,13 @@ public class ZeeConfig {
         return gobHasAnyPose(getPlayerGob(),poses);
     }
 
-    public static boolean gobHasAnyPose(Gob gob, String ... poses){
-        String gobPoses = getGobPoses(gob);
-        for (int i = 0; i < poses.length; i++) {
-            if (gobPoses.contains(poses[i]))
-                return true;
+    public static boolean gobHasAnyPose(Gob gob, String ... wantedPoses){
+        String[] gobPoses = getGobPoses(gob).split(",");
+        for (int i = 0; i < wantedPoses.length; i++) {
+            for (int j = 0; j < gobPoses.length; j++) {
+                if (gobPoses[j].contentEquals(wantedPoses[i]))
+                    return true;
+            }
         }
         return false;
     }
@@ -2395,11 +2397,13 @@ public class ZeeConfig {
             Composite comp = (Composite) d;
             for (ResData rd : comp.prevposes) {
                 try {
-                    ret += rd.res.get().name + " ";
+                    ret += rd.res.get().name + ",";
                 } catch (Loading l) {
                 }
             }
         }
+        if (ret.endsWith(","))
+            ret = ret.substring(0,ret.length() - 1);
         return ret.strip();
     }
 

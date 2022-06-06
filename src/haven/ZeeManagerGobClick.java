@@ -39,7 +39,7 @@ public class ZeeManagerGobClick extends ZeeThread{
         clickDiffMs = clickEndMs - clickStartMs;
 
         //println(clickDiffMs+"ms > "+gobName + (gob==null ? "" : " dist="+ZeeConfig.distanceToPlayer(gob)));
-        //println(gobName + " poses = "+ZeeConfig.getGobPoses(gob));
+        //if (gob!=null) println(gobName + " poses = "+ZeeConfig.getGobPoses(gob));
 
         if (isLongMidClick()) {
             /*
