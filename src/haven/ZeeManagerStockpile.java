@@ -460,10 +460,6 @@ public class ZeeManagerStockpile extends ZeeThread{
     public static void unloadWheelbarrowStockpileAtGround(Coord mcFloorPosres) {
         try {
             ZeeConfig.addPlayerText("wheeling");
-            if (ZeeConfig.isPlayerMountingHorse()){
-                ZeeConfig.unmountPlayerFromHorse(mcFloorPosres);
-            }
-            sleep(500);
             Coord pc = ZeeConfig.getPlayerCoord();
             Coord subc = mcFloorPosres.sub(pc);
             int xsignal, ysignal;
