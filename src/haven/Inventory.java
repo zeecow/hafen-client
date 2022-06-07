@@ -77,7 +77,7 @@ public class Inventory extends Widget implements DTarget {
 	invsq = new TexI(PUtils.rasterimg(buf));
     }
 
-	@RName("inv")
+    @RName("inv")
     public static class $_ implements Factory {
 	public Widget create(UI ui, Object[] args) {
 	    return(new Inventory((Coord)args[0]));
@@ -329,5 +329,27 @@ public class Inventory extends Widget implements DTarget {
 			}
 		}
 		return null;
+	}
+
+	public List<WItem> getItemsWithColorOverlay() {
+		List<WItem> ret = new ArrayList<>();
+		for (WItem wItem : this.children(WItem.class)) {
+			for(ItemInfo inf : wItem.item.info()) {
+				if(inf instanceof GItem.ColorInfo)
+					ret.add(wItem);
+			}
+		}
+		return ret;
+	}
+
+	public List<WItem> getItemsByInfoClass(String classNameEndsWith) {
+		List<WItem> ret = new ArrayList<>();
+		for (WItem wItem : this.children(WItem.class)) {
+			for(ItemInfo inf : wItem.item.info()) {
+				if(inf.getClass().getName().endsWith(classNameEndsWith))
+					ret.add(wItem);
+			}
+		}
+		return ret;
 	}
 }
