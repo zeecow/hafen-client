@@ -2428,8 +2428,12 @@ public class ZeeConfig {
     }
 
     private static boolean isTileStoneSource(String tileResName) {
-        String list = "gfx/tiles/sandcliff , gfx/tiles/mountain";
+        String[] list = "gfx/tiles/sandcliff,gfx/tiles/mountain".split(",");
         //println(tileResName);
-        return list.contains(tileResName);
+        for (int i = 0; i < list.length; i++) {
+            if (list[i].contentEquals(tileResName))
+                return true;
+        }
+        return false;
     }
 }
