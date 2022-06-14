@@ -81,7 +81,8 @@ public class ZeeConfig {
     public static final String POSE_PLAYER_TRAVELHOMESHRUG = "gfx/borka/pointconfused";
     public static final String POSE_PLAYER_TRAVELHOMEPOINT = "gfx/borka/pointhome";
     public static final String POSE_PLAYER_THINK = "gfx/borka/thinkan";
-    public static final String POSE_PLAYER_DRIVE_WHEELBARROW = "gfx/borka/carry";
+    public static final String POSE_PLAYER_DRIVE_WHEELBARROW = "gfx/borka/carry"; //same as pickaxe
+    public static final String POSE_PLAYER_CARRY_PICKAXE = "gfx/borka/carry"; //same as wheelbarrow
 
     public static final String DEF_BUTCH_AUTO_LIST = "Break,Scale,Wring neck,Kill,Skin,Flay,Pluck,Clean,Butcher,Collect bones";
     public static final String DEF_AUTO_CLICK_MENU_LIST = "Pick,Harvest wax";
@@ -1840,7 +1841,7 @@ public class ZeeConfig {
     }
 
     public static boolean isPlayerDrivingWheelbarrow() {
-        return playerHasAnyPose(POSE_PLAYER_DRIVE_WHEELBARROW);
+        return playerHasAnyPose(POSE_PLAYER_DRIVE_WHEELBARROW) && getCursorName().contentEquals(CURSOR_HAND);
     }
 
     public static boolean isPlayerMountingHorse() {
@@ -2383,8 +2384,9 @@ public class ZeeConfig {
         String[] gobPoses = getGobPoses(gob).split(",");
         for (int i = 0; i < wantedPoses.length; i++) {
             for (int j = 0; j < gobPoses.length; j++) {
-                if (gobPoses[j].contentEquals(wantedPoses[i]))
+                if (gobPoses[j].contentEquals(wantedPoses[i])) {
                     return true;
+                }
             }
         }
         return false;
