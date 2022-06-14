@@ -10,8 +10,7 @@ public class ZeeManagerMiner extends ZeeThread{
     public static long lastDropItemMs = 0;
     public static boolean mining;
     public static ZeeManagerMiner manager;
-    static ZeeWindow windowManager, tunnelHelperWindow;
-    static MCache.Overlay ol;
+    static ZeeWindow tunnelHelperWindow;
     static String listOreColumn = "leadglance,cassiterite,chalcopyrite,cinnabar,malachite";
 
     public static void checkMiningSelection() {

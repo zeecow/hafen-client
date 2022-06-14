@@ -718,7 +718,7 @@ public class ZeeManagerGobClick extends ZeeThread{
             ZeeConfig.addPlayerText("mounting");
             Gob wb = ZeeConfig.getClosestGobName("gfx/terobjs/vehicle/wheelbarrow");
             if (wb == null) {
-                ZeeConfig.msg("no wheelbarrow close");
+                ZeeConfig.msg("no wheelbarrow close 1");
             } else {
                 Coord pc = ZeeConfig.getPlayerCoord();
                 Coord subc = ZeeConfig.getCoordGob(horse).sub(pc);
@@ -747,7 +747,7 @@ public class ZeeManagerGobClick extends ZeeThread{
             ZeeConfig.addPlayerText("mounting");
             Gob wb = ZeeConfig.getClosestGobName("gfx/terobjs/vehicle/wheelbarrow");
             if (wb == null) {
-                ZeeConfig.msg("no wheelbarrow close");
+                ZeeConfig.msg("no wheelbarrow close 2");
             } else {
                 Coord pc = ZeeConfig.getPlayerCoord();
                 Coord subc = ZeeConfig.getCoordGob(horse).sub(pc);
@@ -778,7 +778,7 @@ public class ZeeManagerGobClick extends ZeeThread{
             ZeeConfig.addPlayerText("storing");
             Gob wb = ZeeConfig.getClosestGobName("gfx/terobjs/vehicle/wheelbarrow");
             if (wb==null){
-                ZeeConfig.msg("no wheelbarrow close");
+                ZeeConfig.msg("no wheelbarrow close 3");
             }else {
                 double dist;
                 ZeeConfig.clickRemoveCursor();//remove hand cursor
@@ -805,7 +805,7 @@ public class ZeeManagerGobClick extends ZeeThread{
             ZeeConfig.addPlayerText("wheeling");
             Gob wb = ZeeConfig.getClosestGobName("gfx/terobjs/vehicle/wheelbarrow");
             if (wb==null){
-                ZeeConfig.msg("no wheelbarrow close");
+                ZeeConfig.msg("no wheelbarrow close 4");
             }else {
                 double dist;
                 liftGob(wb);
