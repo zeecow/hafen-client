@@ -760,7 +760,7 @@ public class ZeeConfig {
             if (!isBuildWindow(window))
                 windowAddFuelGUI(window,windowTitle);
         }
-        else if (ZeeManagerMiner.tunnelHelperStage == ZeeManagerMiner.TUNNELHELPER_STAGE4_BUILDCOL && windowTitle.contentEquals("Stone Column")){
+        else if (ZeeManagerMiner.tunnelHelperStage == ZeeManagerMiner.TUNNELHELPER_STAGE5_BUILDCOL && windowTitle.contentEquals("Stone Column")){
             ZeeManagerMiner.tunnelHelperBuildColumn(window);
         }
 
