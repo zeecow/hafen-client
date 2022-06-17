@@ -284,7 +284,7 @@ public class ZeeManagerGobClick extends ZeeThread{
         return isGobHouseInnerDoor(gobName) || isGobHouse(gobName) || isGobChair(gobName)
                 || gobNameEndsWith(gobName,
                     "/upstairs,/downstairs,/cavein,/caveout,/burrow,/igloo," +
-                        "/wheelbarrow,/loom,/cauldron,/churn,/swheel" +
+                        "/wheelbarrow,/loom,/cauldron,/churn,/swheel,/ropewalk," +
                         "/meatgrinder,/potterswheel,/quern,/plow"
                 );
     }
