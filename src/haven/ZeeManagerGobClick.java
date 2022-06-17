@@ -151,7 +151,7 @@ public class ZeeManagerGobClick extends ZeeThread{
                         liftAndStoreWheelbarrow(gob);
                 } else if(gobName.endsWith("/knarr") || gobName.endsWith("/snekkja")) {
                     clickGobPetal(gob,"Man the helm");
-                } else if (isLiftGob(gobName) || isGobBush(gobName)) {
+                } else if (isGobLiftable(gobName) || isGobBush(gobName)) {
                     liftGob(gob);
                 }
             }
@@ -229,16 +229,7 @@ public class ZeeManagerGobClick extends ZeeThread{
                 }
             }.start();
         }
-        // lift up wheelbarrow while mounting horse
-        else if(gobName.endsWith("wheelbarrow") && ZeeConfig.isPlayerMountingHorse() && (ZeeConfig.distanceToPlayer(gob) > ZeeConfig.MAX_DIST_DRIVING_WHEELBARROW)){
-            new ZeeThread() {
-                public void run() {
-                    dismountHorse(mc);
-                    gobClick(gob,3);
-                }
-            }.start();
-        }
-        // while driving wheelbarrow, open gate, store wb on cart
+        // while driving wheelbarrow: open gate, store wb on cart
         else if (gobNameEndsWith(gobName,"cart,gate") && ZeeConfig.isPlayerDrivingWheelbarrow()){
             new ZeeThread() {
                 public void run() {
@@ -249,9 +240,9 @@ public class ZeeManagerGobClick extends ZeeThread{
                 }
             }.start();
         }
-        // enter gob building/cave while mounting horse and carrying rope
-        else if (isGobEntranceBlockingHorse(gobName) && ZeeConfig.isPlayerMountingHorse()){
-            if (ZeeConfig.getMainInventory().countItemsByName("rope") > 0) {
+        // gob requires unmounting horse (rope in inventory)
+        else if (isGobRequireUmountHorse(gobName) && ZeeConfig.isPlayerMountingHorse()){
+            if (ZeeConfig.getMainInventory().countItemsByName("/rope") > 0) {
                 new ZeeThread() {
                     public void run() {
                         dismountHorse(mc);
@@ -289,12 +280,21 @@ public class ZeeManagerGobClick extends ZeeThread{
 
     }
 
-    private static boolean isGobEntranceBlockingHorse(String gobName) {
-        return isGobHouseDoor(gobName) || isGobHouse(gobName)
-                || gobNameEndsWith(gobName,"/igloo,/cavein,/caveout");
+    static boolean isGobRequireUmountHorse(String gobName) {
+        return isGobHouseInnerDoor(gobName) || isGobHouse(gobName) || isGobChair(gobName)
+                || gobNameEndsWith(gobName,
+                    "/upstairs,/downstairs,/cavein,/caveout,/burrow,/igloo," +
+                        "/wheelbarrow,/loom,/cauldron,/churn,/swheel" +
+                        "/meatgrinder,/potterswheel,/quern,/plow"
+                );
     }
 
-    public static boolean isGobHouseDoor(String gobName){
+    static boolean isGobChair(String gobName) {
+        String list = "/chair-rustic,/stonethrone,/royalthrone";
+        return gobNameEndsWith(gobName,list);
+    }
+
+    public static boolean isGobHouseInnerDoor(String gobName){
         return gobName.endsWith("-door");
     }
 
@@ -1084,13 +1084,14 @@ public class ZeeManagerGobClick extends ZeeThread{
     }
 
 
-    private static boolean isLiftGob(String gobName) {
+    private static boolean isGobLiftable(String gobName) {
         if(isGobBoulder(gobName))
             return true;
         String endList = "/meatgrinder,/potterswheel,/iconsign,/rowboat,/dugout,/wheelbarrow,"
                 +"/compostbin,/gardenpot,/beehive,/htable,/bed-sturdy,/boughbed,/alchemiststable,"
-                +"/gemwheel,/ancestralshrine,/spark,/cauldron,/churn,/table-rustic,/chair-rustic,"
-                +"/royalthrone,/trough,curdingtub,/plow,/barrel,/still,log,/oldtrunk,chest,/anvil,"
+                +"/gemwheel,/ancestralshrine,/spark,/cauldron,/churn,"
+                +"/table-rustic,/table-stone,/chair-rustic,/stonethrone,/royalthrone,"
+                +"/trough,curdingtub,/plow,/barrel,/still,log,/oldtrunk,chest,/anvil,"
                 +"/cupboard,/studydesk,/demijohn,/quern,/wreckingball-fold,/loom,/swheel,"
                 +"/ttub,/cheeserack,/archerytarget,/dreca,/glasspaneframe,/runestone";
         return gobNameEndsWith(gobName,endList);
