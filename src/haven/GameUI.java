@@ -38,8 +38,8 @@ public class GameUI extends ConsoleHost implements Console.Directory {
     private static final int blpw = UI.scale(142), brpw = UI.scale(142);
     public final String chrid, genus;
     public final long plid;
-    public final Hidepanel ulpanel, umpanel, urpanel, blpanel, mapmenupanel, brpanel, menupanel;
-    public Avaview portrait;
+    private final Hidepanel ulpanel, umpanel, urpanel, blpanel, mapmenupanel, brpanel, menupanel;
+    public Widget portrait;
     public MenuGrid menu;
     public MapView map;
     public GobIcon.Settings iconconf;
@@ -259,12 +259,8 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 	menupanel.add(new MainMenu(), 0, 0);
 	menubuttons(rbtnimg);
 	foldbuttons();
-	portrait = ulpanel.add(new Avaview(Avaview.dasz, plid, "avacam") {
-		public boolean mousedown(Coord c, int button) {
-		    return(true);
-		}
-	    }, UI.scale(new Coord(10, 10)));
-	buffs = ulpanel.add(new Bufflist(), UI.scale(new Coord(95, 65)));
+	portrait = ulpanel.add(Frame.with(new Avaview(Avaview.dasz, plid, "avacam"), false), UI.scale(10, 10));
+	buffs = ulpanel.add(new Bufflist(), portrait.c.x + portrait.sz.x + UI.scale(10), portrait.c.y + ((IMeter.fsz.y + UI.scale(2)) * 2) + UI.scale(5 - 2));
 	umpanel.add(new Cal(), Coord.z);
 	syslog = chat.add(new ChatUI.Log("System"));
 	opts = add(new OptWnd());
@@ -503,6 +499,10 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 
 	public void presize() {
 	    move();
+	}
+
+	public void cresize(Widget ch) {
+	    sz = contentsz();
 	}
 
 	public boolean mshow(final boolean vis) {
@@ -792,10 +792,10 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 	} else if(place == "inv") {
 	    invwnd = new Hidewnd(Coord.z, "Inventory") {
 		    public void cresize(Widget ch) {
-		    	pack();
+			pack();
 		    }
 		};
-	    invwnd.add(maininv = (Inventory)child);
+	    invwnd.add(maininv = (Inventory)child, Coord.z);
 	    invwnd.pack();
 	    if(!ZeeConfig.showInventoryLogin)
 	    	invwnd.hide();
@@ -854,7 +854,7 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 	} else if(place == "chat") {
 	    chat.addchild(child);
 	} else if(place == "party") {
-	    add(child, UI.scale(10), UI.scale(95));
+	    add(child, portrait.pos("bl").adds(0, 10));
 	} else if(place == "meter") {
 	    int x = (meters.size() % 3) * (IMeter.fsz.x + UI.scale(5));
 	    int y = (meters.size() / 3) * (IMeter.fsz.y + UI.scale(2));
