@@ -132,6 +132,8 @@ public class Window extends Widget implements DTarget {
 	    for(bgc.x = ctl.x; bgc.x < cbr.x; bgc.x += bg.sz().x)
 		g.image(bg, bgc, ctl, cbr);
 	}
+	if (ZeeConfig.simpleWindows)
+		return;
 	bgc.x = ctl.x;
 	for(bgc.y = ctl.y; bgc.y < cbr.y; bgc.y += bgl.sz().y)
 	    g.image(bgl, bgc, ctl, cbr);
@@ -141,6 +143,10 @@ public class Window extends Widget implements DTarget {
     }
 
     protected void drawframe(GOut g) {
+	if (ZeeConfig.simpleWindows) {
+		g.image(cap.tex(), new Coord(tlm.x, cpo.y));//draw window title
+		return;
+	}
 	Coord mdo, cbr;
 	g.image(cl, tlo);
 	mdo = tlo.add(cl.sz().x, 0);
@@ -182,7 +188,7 @@ public class Window extends Widget implements DTarget {
 	    drawbg(g);
 	cdraw(g.reclip(atl, asz));
 	if(!decohide)
-	    drawframe(g);
+		drawframe(g);
     }
 
     public void draw(GOut g) {

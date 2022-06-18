@@ -179,6 +179,8 @@ public class ZeeConfig {
     public static boolean sortActionsByUses = Utils.getprefb("sortActionsByUses", true);
     public static boolean rememberWindowsPos = Utils.getprefb("rememberWindowsPos", true);
     public static boolean zoomOrthoExtended = Utils.getprefb("zoomOrthoExtended", true);
+    public static boolean simpleWindows = Utils.getprefb("simpleWindows", true);
+    public static boolean simpleButtons = Utils.getprefb("simpleButtons", true);
 
     public final static Set<String> mineablesStone = new HashSet<String>(Arrays.asList(
             "stone","gneiss","basalt","dolomite","feldspar","flint",

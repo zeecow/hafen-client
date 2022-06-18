@@ -124,19 +124,31 @@ public class Button extends SIWidget {
 	Graphics g = img.getGraphics();
 	int yo = lg?((hl - hs) / 2):0;
 
-	g.drawImage(a?dt:ut, UI.scale(4), yo + UI.scale(4), sz.x - UI.scale(8), hs - UI.scale(8), null);
+	if (ZeeConfig.simpleButtons) {
+		int pad = 4;
+		g.drawImage(a ? dt : ut,
+				UI.scale(4) -(pad/2), // left
+				yo + UI.scale(4) -(pad/2), // top
+				sz.x - UI.scale(8) +pad, // right
+				hs - UI.scale(8) +pad, //bottom
+				null
+		);
+	}else
+		g.drawImage(a?dt:ut, UI.scale(4), yo + UI.scale(4), sz.x - UI.scale(8), hs - UI.scale(8), null);
 
 	Coord tc = sz.sub(Utils.imgsz(cont)).div(2);
 	if(a)
 	    tc = tc.add(UI.scale(1), UI.scale(1));
 	g.drawImage(cont, tc.x, tc.y, null);
 
-	g.drawImage(bl, 0, yo, null);
-	g.drawImage(br, sz.x - br.getWidth(), yo, null);
-	g.drawImage(bt, bl.getWidth(), yo, sz.x - bl.getWidth() - br.getWidth(), bt.getHeight(), null);
-	g.drawImage(bb, bl.getWidth(), yo + hs - bb.getHeight(), sz.x - bl.getWidth() - br.getWidth(), bb.getHeight(), null);
-	if(lg)
-	    g.drawImage(bm, (sz.x - bm.getWidth()) / 2, 0, null);
+	if (!ZeeConfig.simpleButtons) {
+		g.drawImage(bl, 0, yo, null);
+		g.drawImage(br, sz.x - br.getWidth(), yo, null);
+		g.drawImage(bt, bl.getWidth(), yo, sz.x - bl.getWidth() - br.getWidth(), bt.getHeight(), null);
+		g.drawImage(bb, bl.getWidth(), yo + hs - bb.getHeight(), sz.x - bl.getWidth() - br.getWidth(), bb.getHeight(), null);
+		if (lg)
+			g.drawImage(bm, (sz.x - bm.getWidth()) / 2, 0, null);
+	}
 
 	g.dispose();
 
