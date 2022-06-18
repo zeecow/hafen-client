@@ -192,7 +192,14 @@ public class MiniMap extends Widget {
     }
 
     private Locator sesslocator;
+	double dtCount = 0;
     public void tick(double dt) {
+	if (ZeeConfig.slowMiniMap) {
+		dtCount += dt;
+		if (dtCount < 0.3)
+			return;
+		dtCount = 0;
+	}
 	if(setloc != null) {
 	    try {
 		Location loc = resolve(setloc);

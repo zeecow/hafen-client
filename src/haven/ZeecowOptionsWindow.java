@@ -14,7 +14,7 @@ public class ZeecowOptionsWindow extends JFrame {
     public GridBagConstraints c;
     public JTabbedPane tabbedPane, tabbedPaneGobs;
     public JPanel panelTabMisc, panelTabInterface, panelTabGobs, panelDetailsBottom, panelTabCateg;
-    public JCheckBox cbDropAltKeyOnly, cbShowKinNames, cbCtrlClickMinimapContent, cbAutoChipMinedBoulder, cbDropMinedStone, cbDropMinedOre, cbDropMinedSilverGold, cbDropMinedCurios, cbActionSearchGlobal, cbCompactEquipsWindow, cbBeltTogglesEquips, cbAutoRunLogin, cbAutohearth, cbHighlightCropsReady, cbHighlightGrowingTrees, cbMiniTrees, cbKeyUpDownAudioControl, cbAlertOnPlayers,  cbShowInventoryLogin, cbShowBeltLogin, cbKeyBeltShiftTab, cbKeyCamSwitchShiftC, cbShowIconsZoomOut, cbRememberWindowsPos, cbSortActionsByUse, cbDebugWidgetMsgs, cbDebugCodeRes, cbMidclickEquipManager, cbShowEquipsLogin, cbNotifyBuddyOnline, cbZoomOrthoExtended, cbCattleRosterHeight;
+    public JCheckBox cbDropAltKeyOnly, cbShowKinNames, cbCtrlClickMinimapContent, cbSlowMiniMap, cbAutoChipMinedBoulder, cbDropMinedStone, cbDropMinedOre, cbDropMinedSilverGold, cbDropMinedCurios, cbActionSearchGlobal, cbCompactEquipsWindow, cbBeltTogglesEquips, cbAutoRunLogin, cbAutohearth, cbHighlightCropsReady, cbHighlightGrowingTrees, cbMiniTrees, cbKeyUpDownAudioControl, cbAlertOnPlayers,  cbShowInventoryLogin, cbShowBeltLogin, cbKeyBeltShiftTab, cbKeyCamSwitchShiftC, cbShowIconsZoomOut, cbRememberWindowsPos, cbSortActionsByUse, cbDebugWidgetMsgs, cbDebugCodeRes, cbMidclickEquipManager, cbShowEquipsLogin, cbNotifyBuddyOnline, cbZoomOrthoExtended, cbCattleRosterHeight;
     public JTextField tfAutoClickMenu, tfAggroRadiusTiles, tfButchermode, tfGobName, tfAudioPath, tfCategName, tfAudioPathCateg;
     public JComboBox<String> cmbCattleRoster, cmbGobCategory, cmbMiniTreeSize;
     public JList<String> listGobsTemp, listGobsSaved, listGobsCategories;
@@ -252,12 +252,20 @@ public class ZeecowOptionsWindow extends JFrame {
             Utils.setprefb("showKinNames",val);
         });
 
+        panelTabInterface.add(cbSlowMiniMap = new JCheckBox("Slower mini-map"), c);
+        cbSlowMiniMap.setSelected(ZeeConfig.slowMiniMap);
+        cbSlowMiniMap.addActionListener(actionEvent -> {
+            JCheckBox cb = (JCheckBox) actionEvent.getSource();
+            boolean val = ZeeConfig.slowMiniMap = cb.isSelected();
+            Utils.setprefb("slowMiniMap",val);
+        });
+
         panelTabInterface.add(cbCtrlClickMinimapContent = new JCheckBox("Ctrl scroll/resize minimap"), c);
         cbCtrlClickMinimapContent.setSelected(ZeeConfig.ctrlClickMinimapContent);
         cbCtrlClickMinimapContent.addActionListener(actionEvent -> {
             JCheckBox cb = (JCheckBox) actionEvent.getSource();
             boolean val = ZeeConfig.ctrlClickMinimapContent = cb.isSelected();
-            Utils.setprefb("dropCtrlClickMinimapContent",val);
+            Utils.setprefb("ctrlClickMinimapContent",val);
         });
 
         panelTabInterface.add(cbCompactEquipsWindow = new JCheckBox("Compact equip window(restart)"), c);

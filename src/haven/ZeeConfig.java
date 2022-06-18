@@ -148,7 +148,7 @@ public class ZeeConfig {
     public static List<String> craftHistoryList = initCraftHistory();
     public static int craftHistoryPos = -1;
     public static boolean isCraftHistoryNavigation = false;
-    public static boolean ctrlClickMinimapContent = Utils.getprefb("dropCtrlClickMinimapContent", true);
+    public static boolean ctrlClickMinimapContent = Utils.getprefb("ctrlClickMinimapContent", true);
     public static boolean debugWidgetMsgs = false;//disabled by default
     public static boolean debugCodeRes = Utils.getprefb("debugCodeRes", false);
     public static boolean dropHoldingItemAltKey = Utils.getprefb("dropHoldingItemAltKey", true);
@@ -175,6 +175,7 @@ public class ZeeConfig {
     public static boolean showIconsZoomOut = Utils.getprefb("showIconsZoomOut", true);
     public static boolean showEquipsLogin = Utils.getprefb("showEquipsLogin", false);
     public static boolean showKinNames = Utils.getprefb("showKinNames", true);
+    public static boolean slowMiniMap = Utils.getprefb("slowMiniMap", true);
     public static boolean sortActionsByUses = Utils.getprefb("sortActionsByUses", true);
     public static boolean rememberWindowsPos = Utils.getprefb("rememberWindowsPos", true);
     public static boolean zoomOrthoExtended = Utils.getprefb("zoomOrthoExtended", true);
