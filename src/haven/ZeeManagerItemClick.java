@@ -76,10 +76,18 @@ public class ZeeManagerItemClick extends ZeeThread{
             // sort-transfer
             if(!isItemWindowBelt() && !isItemWindowEquips()){
                 if(transferWindowOpen()) { //avoid belt transfer?
+                    //long click
                     if(isLongClick())
-                        wItem.wdgmsg("transfer-sort", wItem.item, true);//ascending order
+                        wItem.wdgmsg("transfer-sort", wItem.item, true); // sort transfer asc
+                    //short click
+                    else  if(ZeeConfig.windowShortMidclickTransferMode.contentEquals("one"))
+                        wItem.item.wdgmsg("transfer", Coord.z);// transfer single item
+                    else if(ZeeConfig.windowShortMidclickTransferMode.contentEquals("asc"))
+                        wItem.wdgmsg("transfer-sort", wItem.item, true);// sort transfer asc
                     else
-                        wItem.wdgmsg("transfer-sort", wItem.item, false);//descending order
+                        wItem.wdgmsg("transfer-sort", wItem.item, false);// sort transfer des
+
+
                     return;
                 }else {
                     //no transfer window open

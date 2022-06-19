@@ -182,6 +182,7 @@ public class ZeeConfig {
     public static boolean simpleWindows = Utils.getprefb("simpleWindows", true);
     public static Color simpleWindowsBgColor = new Color(55, 64, 32, 255);
     public static boolean simpleButtons = Utils.getprefb("simpleButtons", true);
+    public static String windowShortMidclickTransferMode = "des";//default shortMidclick transfer descending
 
 
     public final static Set<String> mineablesStone = new HashSet<String>(Arrays.asList(
@@ -268,7 +269,6 @@ public class ZeeConfig {
     public static HashMap<String,Color> mapCategoryColor = initMapCategoryColor();
     public static HashMap<String,Coord> mapWindowPos = initMapWindowPos();
     public static HashMap<Gob,Integer> mapGobTextId = new HashMap<Gob,Integer>();
-
 
 
     private static boolean isSpriteKind(Gob gob, String... kind) {
@@ -740,6 +740,9 @@ public class ZeeConfig {
         //change slots position
         Widget invSlots = windowInvMain.getchild(Inventory.class);
         invSlots.c = new Coord(0,30);
+
+        // add radio buttons for transfer options
+        invMainoptionsWdg.addWindowTransferOptions();
 
         windowInvMain.pack();
     }

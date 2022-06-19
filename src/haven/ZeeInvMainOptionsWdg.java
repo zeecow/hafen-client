@@ -104,6 +104,40 @@ public class ZeeInvMainOptionsWdg extends Widget {
         repositionLabelCount();
     }
 
+    void addWindowTransferOptions() {
+        Inventory inv = ZeeConfig.getMainInventory();
+        Window window = inv.getparent(Window.class);
+
+        if (inv == null) {
+            return;
+        }
+
+        RadioGroup rg = new RadioGroup(window){
+            public void changed(int btn, String lbl) {
+                ZeeConfig.windowShortMidclickTransferMode = lbl;
+            }
+        };
+        int padx = 5;
+        Widget wdg = rg.add("des", new Coord(0, inv.c.y + inv.sz.y + 2));
+        wdg = rg.add("asc", new Coord(wdg.c.x+wdg.sz.x+padx, wdg.c.y));
+        wdg = rg.add("one", new Coord(wdg.c.x+wdg.sz.x+padx, wdg.c.y));
+        rg.check(ZeeConfig.windowShortMidclickTransferMode);//default des
+        //window.resize(window.contentsz().addy(-2));
+        pack();
+    }
+
+    private void repositionTransferOptions() {
+        invSlots.getparent(Window.class).children(RadioGroup.RadioButton.class).forEach(radioButton -> {
+            radioButton.c.y = invSlots.c.y + invSlots.sz.y + 2;
+        });
+        pack();
+    }
+
+    public void reposition() {
+        repositionLabelCount();
+        repositionTransferOptions();
+    }
+
     public void repositionLabelCount() {
         //position counter at bottom right
         int x = invSlots.sz.x - labelCount.sz.x;
