@@ -180,7 +180,9 @@ public class ZeeConfig {
     public static boolean rememberWindowsPos = Utils.getprefb("rememberWindowsPos", true);
     public static boolean zoomOrthoExtended = Utils.getprefb("zoomOrthoExtended", true);
     public static boolean simpleWindows = Utils.getprefb("simpleWindows", true);
+    public static Color simpleWindowsBgColor = new Color(55, 64, 32, 255);
     public static boolean simpleButtons = Utils.getprefb("simpleButtons", true);
+
 
     public final static Set<String> mineablesStone = new HashSet<String>(Arrays.asList(
             "stone","gneiss","basalt","dolomite","feldspar","flint",

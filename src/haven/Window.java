@@ -96,7 +96,7 @@ public class Window extends Widget implements DTarget {
 	this.rbo = rbo;
 	this.mrgn = lg ? dlmrgn : dsmrgn;
 	//cbtn = add(new IButton(cbtni[0], cbtni[1], cbtni[2]));
-	cbtn = add(new Button(25,"x"));
+	cbtn = add(new Button(25,"x"));//big close button
 	chcap(cap);
 	resize2(sz);
 	setfocustab(true);
@@ -125,15 +125,23 @@ public class Window extends Widget implements DTarget {
     public void cdraw(GOut g) {
     }
 
+	public void drawbgcolor(GOut g, Color c) {
+		g.chcolor(c);
+		g.frect( tlm, new Coord(wsz.x - 34, wsz.y - 54) );
+		g.chcolor();
+	}
+
     protected void drawbg(GOut g) {
+	if (ZeeConfig.simpleWindows) {
+		drawbgcolor(g,ZeeConfig.simpleWindowsBgColor);
+		return;
+	}
 	Coord bgc = new Coord();
 	Coord cbr = ctl.add(csz);
 	for(bgc.y = ctl.y; bgc.y < cbr.y; bgc.y += bg.sz().y) {
 	    for(bgc.x = ctl.x; bgc.x < cbr.x; bgc.x += bg.sz().x)
 		g.image(bg, bgc, ctl, cbr);
 	}
-	if (ZeeConfig.simpleWindows)
-		return;
 	bgc.x = ctl.x;
 	for(bgc.y = ctl.y; bgc.y < cbr.y; bgc.y += bgl.sz().y)
 	    g.image(bgl, bgc, ctl, cbr);
