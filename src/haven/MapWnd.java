@@ -343,6 +343,8 @@ public class MapWnd extends Window implements Console.Directory {
 	    g.frect(Coord.z, sz);
 	    g.chcolor();
 	    super.draw(g);
+		if (ZeeConfig.shapeIcons)
+			ZeeManagerIcons.drawIcons(g,sessloc,dloc,dlvl,sz);
 	}
 
 	public Resource getcurs(Coord c) {

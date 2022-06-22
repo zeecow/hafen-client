@@ -13,8 +13,8 @@ import java.util.List;
 public class ZeecowOptionsWindow extends JFrame {
     public GridBagConstraints c;
     public JTabbedPane tabbedPane, tabbedPaneGobs;
-    public JPanel panelTabMisc, panelTabInterface, panelTabGobs, panelDetailsBottom, panelTabCateg;
-    public JCheckBox cbDropAltKeyOnly, cbShowKinNames, cbSimpleButtons, cbSimpleWindows, cbCtrlClickMinimapContent, cbSlowMiniMap, cbAutoChipMinedBoulder, cbDropMinedStone, cbDropMinedOre, cbDropMinedSilverGold, cbDropMinedCurios, cbActionSearchGlobal, cbCompactEquipsWindow, cbBeltTogglesEquips, cbAutoRunLogin, cbAutohearth, cbHighlightCropsReady, cbHighlightGrowingTrees, cbMiniTrees, cbKeyUpDownAudioControl, cbAlertOnPlayers,  cbShowInventoryLogin, cbShowBeltLogin, cbKeyBeltShiftTab, cbKeyCamSwitchShiftC, cbShowIconsZoomOut, cbRememberWindowsPos, cbSortActionsByUse, cbDebugWidgetMsgs, cbDebugCodeRes, cbMidclickEquipManager, cbShowEquipsLogin, cbNotifyBuddyOnline, cbZoomOrthoExtended, cbCattleRosterHeight;
+    public JPanel panelTabMisc, panelTabInterface, panelTabGobs, panelTabMinimap, panelDetailsBottom, panelTabCateg;
+    public JCheckBox cbDropAltKeyOnly, cbShowKinNames, cbSimpleButtons, cbSimpleWindows, cbCtrlClickMinimapContent, cbShapeIcons, cbSlowMiniMap, cbAutoChipMinedBoulder, cbDropMinedStone, cbDropMinedOre, cbDropMinedSilverGold, cbDropMinedCurios, cbActionSearchGlobal, cbCompactEquipsWindow, cbBeltTogglesEquips, cbAutoRunLogin, cbAutohearth, cbHighlightCropsReady, cbHighlightGrowingTrees, cbMiniTrees, cbKeyUpDownAudioControl, cbAlertOnPlayers,  cbShowInventoryLogin, cbShowBeltLogin, cbKeyBeltShiftTab, cbKeyCamSwitchShiftC, cbShowIconsZoomOut, cbRememberWindowsPos, cbSortActionsByUse, cbDebugWidgetMsgs, cbDebugCodeRes, cbMidclickEquipManager, cbShowEquipsLogin, cbNotifyBuddyOnline, cbZoomOrthoExtended, cbCattleRosterHeight;
     public JTextField tfAutoClickMenu, tfAggroRadiusTiles, tfButchermode, tfGobName, tfAudioPath, tfCategName, tfAudioPathCateg;
     public JComboBox<String> cmbCattleRoster, cmbGobCategory, cmbMiniTreeSize;
     public JList<String> listGobsTemp, listGobsSaved, listGobsCategories;
@@ -52,10 +52,51 @@ public class ZeecowOptionsWindow extends JFrame {
 
         buildTabInterface();
 
+        buildTabMinimap();
+
         //Gobs tabbbed pane
         panelTabGobs = new JPanel(new BorderLayout());
         tabbedPane.addTab("Gobs", panelTabGobs);
         buildTabGobs();
+    }
+
+    private void buildTabMinimap() {
+
+        panelTabMinimap = new JPanel(new GridBagLayout());
+        tabbedPane.addTab("Minimap", panelTabMinimap);
+
+        panelTabMinimap.add(cbShapeIcons = new JCheckBox("Show basic shape icons"), c);
+        cbShapeIcons.setSelected(ZeeConfig.shapeIcons);
+        cbShapeIcons.addActionListener(actionEvent -> {
+            JCheckBox cb = (JCheckBox) actionEvent.getSource();
+            boolean val = ZeeConfig.shapeIcons = cb.isSelected();
+            Utils.setprefb("shapeIcons",val);
+        });
+
+        panelTabMinimap.add(cbSlowMiniMap = new JCheckBox("Slower mini-map"), c);
+        cbSlowMiniMap.setSelected(ZeeConfig.slowMiniMap);
+        cbSlowMiniMap.addActionListener(actionEvent -> {
+            JCheckBox cb = (JCheckBox) actionEvent.getSource();
+            boolean val = ZeeConfig.slowMiniMap = cb.isSelected();
+            Utils.setprefb("slowMiniMap",val);
+        });
+
+        panelTabMinimap.add(cbCtrlClickMinimapContent = new JCheckBox("Require Ctrl to pan/resize"), c);
+        cbCtrlClickMinimapContent.setSelected(ZeeConfig.ctrlClickMinimapContent);
+        cbCtrlClickMinimapContent.addActionListener(actionEvent -> {
+            JCheckBox cb = (JCheckBox) actionEvent.getSource();
+            boolean val = ZeeConfig.ctrlClickMinimapContent = cb.isSelected();
+            Utils.setprefb("ctrlClickMinimapContent",val);
+        });
+
+        panelTabMinimap.add(cbShowIconsZoomOut = new JCheckBox("Show icons while zoomed out"), c);
+        cbShowIconsZoomOut.setSelected(ZeeConfig.showIconsZoomOut);
+        cbShowIconsZoomOut.addActionListener(actionEvent -> {
+            JCheckBox cb = (JCheckBox) actionEvent.getSource();
+            boolean val = ZeeConfig.showIconsZoomOut = cb.isSelected();
+            Utils.setprefb("showIconsZoomOut",val);
+        });
+
     }
 
     private void buildTabMisc() {
@@ -252,22 +293,6 @@ public class ZeecowOptionsWindow extends JFrame {
             Utils.setprefb("showKinNames",val);
         });
 
-        panelTabInterface.add(cbSlowMiniMap = new JCheckBox("Slower mini-map"), c);
-        cbSlowMiniMap.setSelected(ZeeConfig.slowMiniMap);
-        cbSlowMiniMap.addActionListener(actionEvent -> {
-            JCheckBox cb = (JCheckBox) actionEvent.getSource();
-            boolean val = ZeeConfig.slowMiniMap = cb.isSelected();
-            Utils.setprefb("slowMiniMap",val);
-        });
-
-        panelTabInterface.add(cbCtrlClickMinimapContent = new JCheckBox("Ctrl scroll/resize minimap"), c);
-        cbCtrlClickMinimapContent.setSelected(ZeeConfig.ctrlClickMinimapContent);
-        cbCtrlClickMinimapContent.addActionListener(actionEvent -> {
-            JCheckBox cb = (JCheckBox) actionEvent.getSource();
-            boolean val = ZeeConfig.ctrlClickMinimapContent = cb.isSelected();
-            Utils.setprefb("ctrlClickMinimapContent",val);
-        });
-
         panelTabInterface.add(cbSimpleWindows = new JCheckBox("Simple windows"), c);
         cbSimpleWindows.setSelected(ZeeConfig.simpleWindows);
         cbSimpleWindows.addActionListener(actionEvent -> {
@@ -346,14 +371,6 @@ public class ZeecowOptionsWindow extends JFrame {
             JCheckBox cb = (JCheckBox) actionEvent.getSource();
             boolean val = ZeeConfig.keyCamSwitchShiftC = cb.isSelected();
             Utils.setprefb("keyCamSwitchShiftC",val);
-        });
-
-        panelTabInterface.add(cbShowIconsZoomOut = new JCheckBox("Show icons while zoomed out"), c);
-        cbShowIconsZoomOut.setSelected(ZeeConfig.showIconsZoomOut);
-        cbShowIconsZoomOut.addActionListener(actionEvent -> {
-            JCheckBox cb = (JCheckBox) actionEvent.getSource();
-            boolean val = ZeeConfig.showIconsZoomOut = cb.isSelected();
-            Utils.setprefb("showIconsZoomOut",val);
         });
 
         panelTabInterface.add(cbNotifyBuddyOnline = new JCheckBox("Notify when friends login"), c);

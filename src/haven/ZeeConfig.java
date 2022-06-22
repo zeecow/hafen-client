@@ -176,6 +176,7 @@ public class ZeeConfig {
     public static boolean showEquipsLogin = Utils.getprefb("showEquipsLogin", false);
     public static boolean showKinNames = Utils.getprefb("showKinNames", true);
     public static boolean slowMiniMap = Utils.getprefb("slowMiniMap", true);
+    public static boolean shapeIcons = Utils.getprefb("shapeIcons", false);
     public static boolean sortActionsByUses = Utils.getprefb("sortActionsByUses", true);
     public static boolean rememberWindowsPos = Utils.getprefb("rememberWindowsPos", true);
     public static boolean zoomOrthoExtended = Utils.getprefb("zoomOrthoExtended", true);

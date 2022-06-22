@@ -570,24 +570,28 @@ public class MiniMap extends Widget {
 		pmap.put(disp.gob, disp);
 	}
 	List<DisplayIcon> ret = new ArrayList<>();
+	if (ZeeConfig.shapeIcons)
+		ZeeManagerIcons.clearQueue();
 	OCache oc = ui.sess.glob.oc;
 	synchronized(oc) {
 	    for(Gob gob : oc) {
 		try {
 		    GobIcon icon = gob.getattr(GobIcon.class);
 		    if(icon != null) {
-			GobIcon.Setting conf = iconconf.get(icon.res.get());
-			if((conf != null) && conf.show) {
-			    DisplayIcon disp = pmap.remove(gob);
-			    if(disp == null)
-				disp = new DisplayIcon(icon, conf);
-			    disp.update(gob.rc, gob.a);
-			    KinInfo kin = gob.getattr(KinInfo.class);
-			    if((kin != null) && (kin.group < BuddyWnd.gc.length))
-				disp.col = BuddyWnd.gc[kin.group];
-			    ret.add(disp);
+				GobIcon.Setting conf = iconconf.get(icon.res.get());
+				if((conf != null) && conf.show) {
+					DisplayIcon disp = pmap.remove(gob);
+					if(disp == null)
+					disp = new DisplayIcon(icon, conf);
+					disp.update(gob.rc, gob.a);
+					KinInfo kin = gob.getattr(KinInfo.class);
+					if((kin != null) && (kin.group < BuddyWnd.gc.length))
+					disp.col = BuddyWnd.gc[kin.group];
+					ret.add(disp);
+				}
+		    }else if (ZeeConfig.shapeIcons) {
+				ZeeManagerIcons.addQueue(gob);
 			}
-		    }
 		} catch(Loading l) {}
 	    }
 	}
