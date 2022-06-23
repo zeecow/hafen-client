@@ -13,10 +13,10 @@ import java.util.List;
 public class ZeecowOptionsWindow extends JFrame {
     public GridBagConstraints c;
     public JTabbedPane tabbedPane, tabbedPaneGobs;
-    public JPanel panelTabMisc, panelTabInterface, panelTabGobs, panelTabMinimap, panelDetailsBottom, panelTabCateg;
+    public JPanel panelTabMisc, panelTabInterface, panelTabGobs, panelTabMinimap, panelDetailsBottom, panelTabCateg, panelShapeIcons;
     public JCheckBox cbDropAltKeyOnly, cbShowKinNames, cbSimpleButtons, cbSimpleWindows, cbCtrlClickMinimapContent, cbShapeIcons, cbSlowMiniMap, cbAutoChipMinedBoulder, cbDropMinedStone, cbDropMinedOre, cbDropMinedSilverGold, cbDropMinedCurios, cbActionSearchGlobal, cbCompactEquipsWindow, cbBeltTogglesEquips, cbAutoRunLogin, cbAutohearth, cbHighlightCropsReady, cbHighlightGrowingTrees, cbMiniTrees, cbKeyUpDownAudioControl, cbAlertOnPlayers,  cbShowInventoryLogin, cbShowBeltLogin, cbKeyBeltShiftTab, cbKeyCamSwitchShiftC, cbShowIconsZoomOut, cbRememberWindowsPos, cbSortActionsByUse, cbDebugWidgetMsgs, cbDebugCodeRes, cbMidclickEquipManager, cbShowEquipsLogin, cbNotifyBuddyOnline, cbZoomOrthoExtended, cbCattleRosterHeight;
     public JTextField tfAutoClickMenu, tfAggroRadiusTiles, tfButchermode, tfGobName, tfAudioPath, tfCategName, tfAudioPathCateg;
-    public JComboBox<String> cmbCattleRoster, cmbGobCategory, cmbMiniTreeSize;
+    public JComboBox<String> cmbCattleRoster, cmbGobCategory, cmbMiniTreeSize, comboShapeIcons;
     public JList<String> listGobsTemp, listGobsSaved, listGobsCategories;
     public JButton btnRefresh, btnPrintState, btnResetGobs, btnAudioSave, btnAudioClear, btnAudioTest, btnRemGobFromCateg, btnGobColorAdd, btnCategoryColorAdd, btnGobColorRemove, btnCategoryColorRemove, btnResetCateg, btnAddCateg, btnRemoveCateg, btnResetWindowsPos, btnResetActionUses;
     public JTextArea txtAreaDebug;
@@ -65,14 +65,6 @@ public class ZeecowOptionsWindow extends JFrame {
         panelTabMinimap = new JPanel(new GridBagLayout());
         tabbedPane.addTab("Minimap", panelTabMinimap);
 
-        panelTabMinimap.add(cbShapeIcons = new JCheckBox("Show basic shape icons"), c);
-        cbShapeIcons.setSelected(ZeeConfig.shapeIcons);
-        cbShapeIcons.addActionListener(actionEvent -> {
-            JCheckBox cb = (JCheckBox) actionEvent.getSource();
-            boolean val = ZeeConfig.shapeIcons = cb.isSelected();
-            Utils.setprefb("shapeIcons",val);
-        });
-
         panelTabMinimap.add(cbSlowMiniMap = new JCheckBox("Slower mini-map"), c);
         cbSlowMiniMap.setSelected(ZeeConfig.slowMiniMap);
         cbSlowMiniMap.addActionListener(actionEvent -> {
@@ -97,6 +89,42 @@ public class ZeecowOptionsWindow extends JFrame {
             Utils.setprefb("showIconsZoomOut",val);
         });
 
+        panelTabMinimap.add(cbShapeIcons = new JCheckBox("Show basic shape icons"), c);
+        cbShapeIcons.setSelected(ZeeConfig.shapeIcons);
+        cbShapeIcons.addActionListener(actionEvent -> {
+            JCheckBox cb = (JCheckBox) actionEvent.getSource();
+            boolean val = ZeeConfig.shapeIcons = cb.isSelected();
+            Utils.setprefb("shapeIcons",val);
+            comboShapeIcons.setEnabled(ZeeConfig.shapeIcons);
+            comboShapeIcons.setSelectedIndex(0);
+            if (panelShapeIcons!=null){
+                panelTabMinimap.remove(panelShapeIcons);
+                pack();
+                repaint();
+            }
+        });
+
+        panelTabMinimap.add(comboShapeIcons = new JComboBox<String>(ZeeConfig.shapeIconsList.split(";")), c);
+        comboShapeIcons.insertItemAt("", 0);
+        comboShapeIcons.setSelectedIndex(0);
+        comboShapeIcons.setMaximumSize(new Dimension(Integer.MAX_VALUE, comboShapeIcons.getPreferredSize().height));
+        comboShapeIcons.setEnabled(ZeeConfig.shapeIcons);
+        comboShapeIcons.addActionListener(e -> {
+            if (comboShapeIcons.getSelectedIndex()==0) {
+                if (panelShapeIcons!=null){
+                    panelTabMinimap.remove(panelShapeIcons);
+                    pack();
+                    repaint();
+                }
+                return;
+            }
+            if (panelShapeIcons!=null){
+                panelTabMinimap.remove(panelShapeIcons);
+            }
+            panelTabMinimap.add(panelShapeIcons = new ZeeManagerIcons.ShapeIconsOptPanel(comboShapeIcons));
+            pack();
+            repaint();
+        });
     }
 
     private void buildTabMisc() {

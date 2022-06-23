@@ -86,6 +86,7 @@ public class ZeeConfig {
 
     public static final String DEF_BUTCH_AUTO_LIST = "Break,Scale,Wring neck,Kill,Skin,Flay,Pluck,Clean,Butcher,Collect bones";
     public static final String DEF_AUTO_CLICK_MENU_LIST = "Pick,Harvest wax";
+    public static final String DEF_SHAPEICON_LIST = "/horse/ 1,circle 3 3,0 255 0;/vehicle/ 1,rect 3 3,139 69 19";
 
     public static final int PLAYER_SPEED_0 = 0;
     public static final int PLAYER_SPEED_1 = 1;
@@ -171,12 +172,13 @@ public class ZeeConfig {
     public static Integer miniTreesSize = Utils.getprefi("miniTreesSize", 50);
     public static boolean notifyBuddyOnline = Utils.getprefb("notifyBuddyOnline", false);
     public static boolean pilerMode = false;
+    public static boolean shapeIcons = Utils.getprefb("shapeIcons", false);
+    public static String shapeIconsList = Utils.getpref("shapeIconsList",DEF_SHAPEICON_LIST);
     public static boolean showInventoryLogin = Utils.getprefb("showInventoryLogin", true);
     public static boolean showIconsZoomOut = Utils.getprefb("showIconsZoomOut", true);
     public static boolean showEquipsLogin = Utils.getprefb("showEquipsLogin", false);
     public static boolean showKinNames = Utils.getprefb("showKinNames", true);
     public static boolean slowMiniMap = Utils.getprefb("slowMiniMap", true);
-    public static boolean shapeIcons = Utils.getprefb("shapeIcons", false);
     public static boolean sortActionsByUses = Utils.getprefb("sortActionsByUses", true);
     public static boolean rememberWindowsPos = Utils.getprefb("rememberWindowsPos", true);
     public static boolean zoomOrthoExtended = Utils.getprefb("zoomOrthoExtended", true);
@@ -2446,5 +2448,13 @@ public class ZeeConfig {
                 return true;
         }
         return false;
+    }
+
+    public static Color getComplementaryColor(Color bgColor) {
+        return new Color(
+            255-bgColor.getRed(),
+            255-bgColor.getGreen(),
+            255-bgColor.getBlue()
+        );
     }
 }
