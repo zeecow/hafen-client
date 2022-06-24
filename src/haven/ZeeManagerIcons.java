@@ -2,9 +2,9 @@ package haven;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.Window;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class ZeeManagerIcons {
@@ -99,8 +99,10 @@ public class ZeeManagerIcons {
 
     static class ShapeIconsOptPanel extends JPanel{
         JComboBox nameCombo, shapeCombo;
-        JTextField nameTF, colorTF, shapeTF;
+        JTextField nameTF, colorTF;
         JPanel panelTop, panelCenter, panelBottom;
+        JSpinner jspIconSize;
+        JButton btnGobColor;
         public ShapeIconsOptPanel(JComboBox<String> comboRule){
             this.setLayout(new BorderLayout());
             this.add(panelTop = new JPanel(new FlowLayout(FlowLayout.LEFT)), BorderLayout.NORTH);
@@ -111,21 +113,34 @@ public class ZeeManagerIcons {
             String[] arrShape = arr[1].split(" ");
             String[] arrColor = arr[2].split(" ");
 
+            panelTop.add(new JLabel("Gob name"));
             panelTop.add(nameCombo = new JComboBox<>(new String[]{"startsWith", "contains", "endsWith"}), BorderLayout.NORTH);
             nameCombo.setSelectedIndex(Integer.parseInt(arrGobName[1]));
             panelTop.add(nameTF = new JTextField(arrGobName[0]));//gob query
             nameTF.setBorder(BorderFactory.createEmptyBorder(2, 5, 2, 5));
 
+            panelCenter.add(new JLabel("Icon:"));
             panelCenter.add(shapeCombo = new JComboBox<>(new String[]{"circle", "triangle", "rect"}));
             shapeCombo.setSelectedItem(arrShape[0]);//shape name
-            panelCenter.add(shapeTF = new JTextField(String.join(" ",Arrays.copyOfRange(arrShape,1,arrShape.length))));
-            shapeTF.setBorder(BorderFactory.createEmptyBorder(2, 5, 2, 5));
+            int shapeSize = Integer.parseInt(arrShape[1]);
+            SpinnerNumberModel model = new SpinnerNumberModel(shapeSize, 3, 10, 1);
+            jspIconSize = new JSpinner(model);
+            jspIconSize.setValue(shapeSize);//shape size
+            jspIconSize.setBorder(BorderFactory.createEmptyBorder(2, 5, 2, 5));
+            panelCenter.add(new JLabel("size"));
+            panelCenter.add(jspIconSize);
 
-            panelBottom.add(new JLabel("RGB: "));
-            panelBottom.add(colorTF = new JTextField(String.join(" ", arrColor)));
-            colorTF.setBorder(BorderFactory.createEmptyBorder(2, 5, 2, 5));
-            colorTF.setBackground(new Color(Integer.parseInt(arrColor[0]), Integer.parseInt(arrColor[1]), Integer.parseInt(arrColor[2])));
-            colorTF.setForeground(ZeeConfig.getComplementaryColor(colorTF.getBackground()));
+            Color c = new Color(Integer.parseInt(arrColor[0]),Integer.parseInt(arrColor[1]),Integer.parseInt(arrColor[2]));
+            panelBottom.add(btnGobColor = new JButton("Icon color"));
+            btnGobColor.setBackground(c);
+            btnGobColor.setForeground(ZeeConfig.getComplementaryColor(c));
+            btnGobColor.addActionListener(evt->{
+                Color color = JColorChooser.showDialog(panelBottom, "Gob Highlight Color", c, false);
+                if(color!=null){
+                    btnGobColor.setBackground(color);
+                    btnGobColor.setForeground(ZeeConfig.getComplementaryColor(color));
+                }
+            });
         }
     }
 }
