@@ -99,24 +99,18 @@ public class ZeecowOptionsWindow extends JFrame {
             comboShapeIcons.setEnabled(ZeeConfig.shapeIcons);
             comboShapeIcons.setSelectedIndex(0);
             if (panelShapeIcons!=null){
-                panelTabMinimap.remove(panelShapeIcons);
-                pack();
-                repaint();
+                removePanelShape(actionEvent);
             }
         });
 
-        panelTabMinimap.add(comboShapeIcons = new JComboBox<String>(ZeeConfig.shapeIconsList.split(";")), c);
-        comboShapeIcons.insertItemAt("", 0);
+        DefaultComboBoxModel<String> model = new DefaultComboBoxModel<>(ZeeConfig.shapeIconsList.split(";"));
+        model.insertElementAt(" ",0);//empty option
+        comboShapeIcons = new JComboBox<String>(model);
         comboShapeIcons.setSelectedIndex(0);
+        panelTabMinimap.add(comboShapeIcons, c);
         comboShapeIcons.setMaximumSize(new Dimension(Integer.MAX_VALUE, comboShapeIcons.getPreferredSize().height));
         comboShapeIcons.setEnabled(ZeeConfig.shapeIcons);
         comboShapeIcons.addActionListener(e -> {
-            if ( comboShapeIcons.getSelectedIndex()==0 ) {
-                if (panelShapeIcons!=null){
-                    removePanelShape(e);
-                }
-                return;
-            }
             if (panelShapeIcons!=null){
                 removePanelShape(e);
             }
@@ -124,11 +118,50 @@ public class ZeecowOptionsWindow extends JFrame {
             panelTabMinimap.add(panelShapeIconsSaveCancel = new JPanel(new FlowLayout(FlowLayout.LEFT)),c);
             panelShapeIconsSaveCancel.add(btnShapeIconSave = new JButton("Save"));
             btnShapeIconSave.addActionListener(evt->{
-                ZeeConfig.println("save > "+comboShapeIcons.getSelectedItem().toString());
+                //save list
+                String rule = ZeeManagerIcons.ShapeIconsOptPanel.getRule(this);
+                if (rule==null)
+                    return;
+                if(ZeeConfig.shapeIconsList.contains(rule)) {
+                    JOptionPane.showMessageDialog(this,"rule already exist");
+                    return;
+                }
+                String newList = "";
+                if (!ZeeConfig.shapeIconsList.isBlank())
+                    newList += ";";
+                newList += rule;
+                ZeeConfig.println("new list > "+newList);
+                ZeeConfig.shapeIconsList = newList;
+                //update combo
+                DefaultComboBoxModel<String> m = new DefaultComboBoxModel<>(newList.split(";"));
+                m.insertElementAt(" ",0);
+                comboShapeIcons.setModel(m);
+                removePanelShape(evt);
             });
             panelShapeIconsSaveCancel.add(btnSapeIconDelete = new JButton("Delete"));
             btnSapeIconDelete.addActionListener(evt->{
-                ZeeConfig.println("delete > "+comboShapeIcons.getSelectedItem().toString());
+                String rule = ZeeManagerIcons.ShapeIconsOptPanel.getRule(this);
+                if (rule==null)
+                    return;
+                if(!ZeeConfig.shapeIconsList.contains(rule)) {
+                    JOptionPane.showMessageDialog(this,"rule doesn't exist");
+                    return;
+                }
+                List<String> linkedList = new LinkedList<>(Arrays.asList(ZeeConfig.shapeIconsList.split(";")));
+                linkedList.remove(rule);
+                String[] newArray = linkedList.toArray(new String[0]);
+                String newList = String.join(";",newArray);
+                ZeeConfig.println("new list > "+ newList);
+                ZeeConfig.shapeIconsList = newList;
+                if(ZeeManagerIcons.mapRuleImg.containsKey(rule)){
+                    ZeeManagerIcons.mapRuleImg.remove(rule);
+                    ZeeConfig.println("mapRuleImg size "+ZeeManagerIcons.mapRuleImg.size());
+                }
+                //update combo
+                DefaultComboBoxModel<String> m = new DefaultComboBoxModel<>(newList.split(";"));
+                m.insertElementAt(" ",0);
+                comboShapeIcons.setModel(m);
+                removePanelShape(evt);
             });
             pack();
             repaint();
