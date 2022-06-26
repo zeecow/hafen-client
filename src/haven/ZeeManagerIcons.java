@@ -24,7 +24,7 @@ public class ZeeManagerIcons {
         //check all rules for gobName
         for (int i = 0; i < rules.length; i++) {
 
-            // rule example: "/horse/ 1,circle 3,0 255 0"
+            // rule example: "/horse/ 1,square 6 0 1,0 255 0;"
             ruleArr = rules[i].split(",");
 
             // skip gob if name doesnt match rule
@@ -44,15 +44,21 @@ public class ZeeManagerIcons {
             ruleColor = ruleArr[2].split(" ");
             Color c = new Color( Integer.parseInt(ruleColor[0]), Integer.parseInt(ruleColor[1]), Integer.parseInt(ruleColor[2]));
 
-            // generate image
+            // generate image ("/horse/ 1,square 6 0 1,0 255 0")
             ruleShape = ruleArr[1].split(" ");
-            int num = Integer.parseInt(ruleShape[1]);
+            int size = Integer.parseInt(ruleShape[1]);
+            boolean border = !ruleShape[2].contentEquals("0");
+            boolean shadow = !ruleShape[3].contentEquals("0");
             if (ruleShape[0].contentEquals("circle"))
-                retImg = imgCirle(num,c);
+                retImg = imgCirle(size,c,border,shadow);
             else if (ruleShape[0].contentEquals("square"))
-                retImg = imgSquare(num,c);
-            else if (ruleShape[0].contentEquals("triangle"))
-                retImg = imgTriangleUp(num,c);
+                retImg = imgSquare(size,c,border,shadow);
+            else if (ruleShape[0].contentEquals("triangleUp"))
+                retImg = imgTriangleUp(size,c,border,shadow);
+            else if (ruleShape[0].contentEquals("triangleDown"))
+                retImg = imgTriangleDown(size,c,border,shadow);
+            else if (ruleShape[0].contentEquals("diamond"))
+                retImg = imgDiamond(size,c,border,shadow);
 
             // store and return
             mapRuleImg.put(rules[i],retImg);
@@ -62,41 +68,41 @@ public class ZeeManagerIcons {
         return null;
     }
 
-    private static BufferedImage imgSquare(int side, Color c) {
-        return imgRect(side,side,c,1);
+    private static BufferedImage imgSquare(int side, Color c, boolean border, boolean shadow) {
+        return imgRect(side,side,c,border,shadow?1:0);
     }
 
-    private static BufferedImage imgCirle(int diameter, Color c) {
+    private static BufferedImage imgCirle(int diameter, Color c, boolean border, boolean shadow) {
         if (diameter < 5)
             diameter = 5;
-        return imgOval(diameter,diameter,c,2);
+        return imgOval(diameter,diameter,c,border,shadow?2:0);
     }
 
-    private static BufferedImage imgTriangleUp(int s, Color c) {
+    private static BufferedImage imgTriangleUp(int s, Color c, boolean border, boolean shadow) {
         return imgPolygon(s, s,
             new int[]{ s/2, 0, s}, // x points
             new int[]{ 0, s, s}, // y points
-            3, c, 3
+            3, c, border, shadow?3:0
         );
     }
 
-    private static BufferedImage imgTriangleDown(int s, Color c) {
+    private static BufferedImage imgTriangleDown(int s, Color c, boolean border, boolean shadow) {
         return imgPolygon(s, s,
                 new int[]{ 0, s, s/2}, // x points
                 new int[]{ 0, 0, s}, // y points
-                3, c, 3
+                3, c, border, shadow?3:0
         );
     }
 
-    private static BufferedImage imgDiamond(int s, Color c) {
+    private static BufferedImage imgDiamond(int s, Color c, boolean border, boolean shadow) {
         return imgPolygon(s, s,
             new int[]{ s/2, 0, s/2, s }, // x points
             new int[]{ 0, s/2, s, s/2 }, // y points
-            4, c, 2
+            4, c, border, shadow?2:0
         );
     }
 
-    private static BufferedImage imgRect(int w, int h, Color c, int shadow) {
+    private static BufferedImage imgRect(int w, int h, Color c, boolean border, int shadow) {
         int type = BufferedImage.TYPE_INT_ARGB;
         BufferedImage ret = new BufferedImage(w+shadow, h+shadow, type);
         Graphics2D g2d = ret.createGraphics();
@@ -106,11 +112,15 @@ public class ZeeManagerIcons {
         }
         g2d.setColor(c);
         g2d.fillRect(0, 0, w-shadow, h-shadow);
+        if (border) {
+            g2d.setColor(ZeeConfig.getComplementaryColor(c));
+            g2d.drawRect(0, 0, w-shadow, h-shadow);
+        }
         g2d.dispose();
         return ret;
     }
 
-    private static BufferedImage imgOval(int w, int h, Color c, int shadow) {
+    private static BufferedImage imgOval(int w, int h, Color c, boolean border, int shadow) {
         int type = BufferedImage.TYPE_INT_ARGB;
         BufferedImage ret = new BufferedImage(w+shadow, h+shadow, type);
         Graphics2D g2d = ret.createGraphics();
@@ -121,12 +131,14 @@ public class ZeeManagerIcons {
         }
         g2d.setColor(c);
         g2d.fillOval(0, 0, w-shadow, h-shadow);
+        if (border)
+            g2d.setColor(ZeeConfig.getComplementaryColor(c));
         g2d.drawOval(0, 0, w-shadow, h-shadow);
         g2d.dispose();
         return ret;
     }
 
-    private static BufferedImage imgPolygon(int w, int h, int[] xPoints, int[] yPoints, int points, Color c, int shadow) {
+    private static BufferedImage imgPolygon(int w, int h, int[] xPoints, int[] yPoints, int points, Color c, boolean border, int shadow) {
         int type = BufferedImage.TYPE_INT_ARGB;
         BufferedImage ret = new BufferedImage(w+shadow, h+shadow, type);
         Graphics2D g2d = ret.createGraphics();
@@ -145,6 +157,8 @@ public class ZeeManagerIcons {
         }
         g2d.setColor(c);
         g2d.fillPolygon(xPoints,yPoints,points);
+        if (border)
+            g2d.setColor(ZeeConfig.getComplementaryColor(c));
         g2d.drawPolygon(xPoints,yPoints,points);
         g2d.dispose();
         return ret;
@@ -181,11 +195,12 @@ public class ZeeManagerIcons {
         static JPanel panelTop, panelCenter, panelBottom;
         static JSpinner jspIconSize;
         static JButton btnGobColor;
+        static JCheckBox cbBorder, cbShadow;
 
         public ShapeIconsOptPanel(JComboBox<String> comboRule){
             this.setLayout(new BorderLayout());
             this.add(panelTop = new JPanel(new BorderLayout()), BorderLayout.NORTH);
-            this.add(panelCenter = new JPanel(new FlowLayout(FlowLayout.LEFT)), BorderLayout.CENTER);
+            this.add(panelCenter = new JPanel(new BorderLayout()), BorderLayout.CENTER);
             this.add(panelBottom = new JPanel(new FlowLayout(FlowLayout.LEFT)), BorderLayout.SOUTH);
 
             JPanel pan = new JPanel(new FlowLayout(FlowLayout.LEFT));
@@ -195,13 +210,23 @@ public class ZeeManagerIcons {
             panelTop.add(nameTF = new JTextField(), BorderLayout.SOUTH);//gob query
             nameTF.setBorder(BorderFactory.createEmptyBorder(2, 5, 2, 5));
 
-            panelCenter.add(new JLabel("Icon:"));
-            panelCenter.add(shapeCombo = new JComboBox<>(new String[]{"circle", "triangle", "square"}));
+            // combo shape, size
+            pan = new JPanel(new FlowLayout(FlowLayout.LEFT));
+            panelCenter.add(pan,BorderLayout.NORTH);
+            pan.add(new JLabel("Icon:"));
+            pan.add(shapeCombo = new JComboBox<>(new String[]{"circle", "square", "triangleUp", "triangleDown", "diamond"}));
             SpinnerNumberModel model = new SpinnerNumberModel(3, 3, 10, 1);
             jspIconSize = new JSpinner(model);
             jspIconSize.setBorder(BorderFactory.createEmptyBorder(2, 5, 2, 5));
-            panelCenter.add(new JLabel("size"));
-            panelCenter.add(jspIconSize);
+            pan.add(new JLabel("size"));
+            pan.add(jspIconSize);
+
+            // checkbox border, shadow
+            pan = new JPanel(new FlowLayout(FlowLayout.LEFT));
+            panelCenter.add(pan,BorderLayout.SOUTH);
+            pan.add(cbBorder = new JCheckBox("border"));
+            pan.add(cbShadow = new JCheckBox("shadow"));
+
 
             panelBottom.add(btnGobColor = new JButton("Icon color"));
             btnGobColor.addActionListener(evt->{
@@ -217,6 +242,7 @@ public class ZeeManagerIcons {
         }
 
         private static void fillData(String selectedValue){
+            //  "/horse/ 1,square 6 0 1,0 255 0"
             String[] arr = selectedValue.split(",");
             String[] arrGobName = arr[0].split(" ");
             String[] arrShape = arr[1].split(" ");
@@ -225,6 +251,8 @@ public class ZeeManagerIcons {
             nameTF.setText(arrGobName[0]);//gob query
             shapeCombo.setSelectedItem(arrShape[0]);//shape name
             int shapeSize = Integer.parseInt(arrShape[1]);
+            cbBorder.setSelected(!arrShape[2].contentEquals("0"));
+            cbShadow.setSelected(!arrShape[3].contentEquals("0"));
             jspIconSize.setValue(shapeSize);//shape size
             Color c = new Color(Integer.parseInt(arrColor[0]),Integer.parseInt(arrColor[1]),Integer.parseInt(arrColor[2]));
             btnGobColor.setBackground(c);
@@ -259,19 +287,19 @@ public class ZeeManagerIcons {
     static BufferedImage testcircle, testtriangleup, testtriangledown, testdiamond;
     public static void testIconsLoginScreen(GOut g) {
         if (testcircle ==null)
-            testcircle = ZeeManagerIcons.imgCirle(8, Color.BLUE);
+            testcircle = ZeeManagerIcons.imgCirle(9, Color.BLUE,true,false);
         g.image(testcircle,Coord.of(50));
 
         if (testtriangleup ==null)
-            testtriangleup = ZeeManagerIcons.imgTriangleUp(8, Color.BLUE);
+            testtriangleup = ZeeManagerIcons.imgTriangleUp(9, Color.BLUE,false,true);
         g.image(testtriangleup,Coord.of(100));
 
         if (testtriangledown ==null)
-            testtriangledown = ZeeManagerIcons.imgTriangleDown(8, Color.BLUE);
+            testtriangledown = ZeeManagerIcons.imgTriangleDown(9, Color.BLUE,false,true);
         g.image(testtriangledown,Coord.of(150));
 
         if (testdiamond==null)
-            testdiamond = ZeeManagerIcons.imgDiamond(8, Color.BLUE);
+            testdiamond = ZeeManagerIcons.imgDiamond(9, Color.BLUE,true, false);
         g.image(testdiamond,Coord.of(200));
     }
 

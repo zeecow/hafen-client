@@ -90,6 +90,8 @@ public class ZeecowOptionsWindow extends JFrame {
             Utils.setprefb("showIconsZoomOut",val);
         });
 
+
+        // checkbox shape icons
         panelTabMinimap.add(cbShapeIcons = new JCheckBox("Show basic shape icons"), c);
         cbShapeIcons.setSelected(ZeeConfig.shapeIcons);
         cbShapeIcons.addActionListener(actionEvent -> {
@@ -103,6 +105,7 @@ public class ZeecowOptionsWindow extends JFrame {
             }
         });
 
+        // combobox shape icons
         DefaultComboBoxModel<String> model = new DefaultComboBoxModel<>(ZeeConfig.shapeIconsList.split(";"));
         model.insertElementAt(" ",0);//empty option
         comboShapeIcons = new JComboBox<String>(model);
