@@ -126,8 +126,8 @@ public class ZeecowOptionsWindow extends JFrame {
                     JOptionPane.showMessageDialog(this,"rule already exist");
                     return;
                 }
-                String newList = "";
-                if (!ZeeConfig.shapeIconsList.isBlank())
+                String newList = ZeeConfig.shapeIconsList;
+                if (!newList.isBlank())
                     newList += ";";
                 newList += rule;
                 ZeeConfig.println("new list > "+newList);
