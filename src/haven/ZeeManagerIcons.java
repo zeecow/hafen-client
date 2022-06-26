@@ -52,7 +52,7 @@ public class ZeeManagerIcons {
             else if (ruleShape[0].contentEquals("square"))
                 retImg = imgSquare(num,c);
             else if (ruleShape[0].contentEquals("triangle"))
-                retImg = imgTriangle(num,c);
+                retImg = imgTriangleUp(num,c);
 
             // store and return
             mapRuleImg.put(rules[i],retImg);
@@ -63,43 +63,89 @@ public class ZeeManagerIcons {
     }
 
     private static BufferedImage imgSquare(int side, Color c) {
-        return imgRect(side,side,c);
+        return imgRect(side,side,c,1);
     }
 
     private static BufferedImage imgCirle(int diameter, Color c) {
-        return imgOval(diameter,diameter,c);
+        if (diameter < 5)
+            diameter = 5;
+        return imgOval(diameter,diameter,c,2);
     }
 
-    private static BufferedImage imgTriangle(int size, Color c) {
-        return imgPolygon(size, size, new int[]{size/2,0,size}, new int[]{0,size,size}, 3, c);
+    private static BufferedImage imgTriangleUp(int s, Color c) {
+        return imgPolygon(s, s,
+            new int[]{ s/2, 0, s}, // x points
+            new int[]{ 0, s, s}, // y points
+            3, c, 3
+        );
     }
 
-    private static BufferedImage imgRect(int w, int h, Color c) {
+    private static BufferedImage imgTriangleDown(int s, Color c) {
+        return imgPolygon(s, s,
+                new int[]{ 0, s, s/2}, // x points
+                new int[]{ 0, 0, s}, // y points
+                3, c, 3
+        );
+    }
+
+    private static BufferedImage imgDiamond(int s, Color c) {
+        return imgPolygon(s, s,
+            new int[]{ s/2, 0, s/2, s }, // x points
+            new int[]{ 0, s/2, s, s/2 }, // y points
+            4, c, 2
+        );
+    }
+
+    private static BufferedImage imgRect(int w, int h, Color c, int shadow) {
         int type = BufferedImage.TYPE_INT_ARGB;
-        BufferedImage ret = new BufferedImage(w, h, type);
+        BufferedImage ret = new BufferedImage(w+shadow, h+shadow, type);
         Graphics2D g2d = ret.createGraphics();
+        if (shadow > 0){
+            g2d.setColor(Color.BLACK);
+            g2d.fillRect(shadow, shadow, w, h);
+        }
         g2d.setColor(c);
-        g2d.fillRect(0, 0, w, h);
+        g2d.fillRect(0, 0, w-shadow, h-shadow);
         g2d.dispose();
         return ret;
     }
 
-    private static BufferedImage imgOval(int w, int h, Color c) {
+    private static BufferedImage imgOval(int w, int h, Color c, int shadow) {
         int type = BufferedImage.TYPE_INT_ARGB;
-        BufferedImage ret = new BufferedImage(w, h, type);
+        BufferedImage ret = new BufferedImage(w+shadow, h+shadow, type);
         Graphics2D g2d = ret.createGraphics();
+        if (shadow > 0){
+            g2d.setColor(Color.BLACK);
+            g2d.fillOval(shadow, shadow, w, h);
+            g2d.drawOval(shadow, shadow, w, h);
+        }
         g2d.setColor(c);
-        g2d.fillOval(0, 0, w, h);
+        g2d.fillOval(0, 0, w-shadow, h-shadow);
+        g2d.drawOval(0, 0, w-shadow, h-shadow);
         g2d.dispose();
         return ret;
     }
 
-    private static BufferedImage imgPolygon(int w, int h, int[] xPoints, int[] yPoints, int points, Color c) {
+    private static BufferedImage imgPolygon(int w, int h, int[] xPoints, int[] yPoints, int points, Color c, int shadow) {
         int type = BufferedImage.TYPE_INT_ARGB;
-        BufferedImage ret = new BufferedImage(w, h, type);
+        BufferedImage ret = new BufferedImage(w+shadow, h+shadow, type);
         Graphics2D g2d = ret.createGraphics();
+        if (shadow > 0){
+            g2d.setColor(Color.BLACK);
+            for (int i = 0; i < xPoints.length; i++) {
+                xPoints[i] += shadow;
+                yPoints[i] += shadow;
+            }
+            g2d.fillPolygon(xPoints,yPoints,points);
+            g2d.drawPolygon(xPoints,yPoints,points);
+            for (int i = 0; i < xPoints.length; i++) {
+                xPoints[i] -= shadow;
+                yPoints[i] -= shadow;
+            }
+        }
         g2d.setColor(c);
         g2d.fillPolygon(xPoints,yPoints,points);
+        g2d.drawPolygon(xPoints,yPoints,points);
         g2d.dispose();
         return ret;
     }
@@ -126,10 +172,6 @@ public class ZeeManagerIcons {
 
     public static void clearQueue() {
         gobs.clear();
-    }
-
-    private static void println(String s) {
-        ZeeConfig.println(s);
     }
 
     static class ShapeIconsOptPanel extends JPanel{
@@ -201,5 +243,39 @@ public class ZeeManagerIcons {
                 btnGobColor.getBackground().getBlue();
             return rule;
         }
+    }
+
+    public static BufferedImage convertToBufferedImage(Image image)
+    {
+        BufferedImage newImage = new BufferedImage(
+                image.getWidth(null), image.getHeight(null),
+                BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g = newImage.createGraphics();
+        g.drawImage(image, 0, 0, null);
+        g.dispose();
+        return newImage;
+    }
+
+    static BufferedImage testcircle, testtriangleup, testtriangledown, testdiamond;
+    public static void testIconsLoginScreen(GOut g) {
+        if (testcircle ==null)
+            testcircle = ZeeManagerIcons.imgCirle(8, Color.BLUE);
+        g.image(testcircle,Coord.of(50));
+
+        if (testtriangleup ==null)
+            testtriangleup = ZeeManagerIcons.imgTriangleUp(8, Color.BLUE);
+        g.image(testtriangleup,Coord.of(100));
+
+        if (testtriangledown ==null)
+            testtriangledown = ZeeManagerIcons.imgTriangleDown(8, Color.BLUE);
+        g.image(testtriangledown,Coord.of(150));
+
+        if (testdiamond==null)
+            testdiamond = ZeeManagerIcons.imgDiamond(8, Color.BLUE);
+        g.image(testdiamond,Coord.of(200));
+    }
+
+    private static void println(String s) {
+        ZeeConfig.println(s);
     }
 }

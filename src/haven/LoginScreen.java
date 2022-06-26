@@ -26,8 +26,11 @@
 
 package haven;
 
+import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.util.*;
 import java.awt.event.KeyEvent;
+import java.util.List;
 
 public class LoginScreen extends Widget {
     public static final Text.Foundry
@@ -347,5 +350,6 @@ public class LoginScreen extends Widget {
 	    g.aimage(error.tex(), bgc.adds(0, 150), 0.5, 0.0);
 	if(progress != null)
 	    g.aimage(progress.tex(), bgc.adds(0, 50), 0.5, 0.0);
+	ZeeManagerIcons.testIconsLoginScreen(g);
     }
 }

@@ -86,7 +86,7 @@ public class ZeeConfig {
 
     public static final String DEF_BUTCH_AUTO_LIST = "Break,Scale,Wring neck,Kill,Skin,Flay,Pluck,Clean,Butcher,Collect bones";
     public static final String DEF_AUTO_CLICK_MENU_LIST = "Pick,Harvest wax";
-    public static final String DEF_SHAPEICON_LIST = "/horse/ 1,circle 3,0 255 0;/vehicle/ 1,square 3,139 69 19";
+    public static final String DEF_SHAPEICON_LIST = "/horse/ 1,square 6,0 255 0;/cart 1,circle 8,139 69 19;/wheelbarrow 1,triangle 8,0 0 255";
 
     public static final int PLAYER_SPEED_0 = 0;
     public static final int PLAYER_SPEED_1 = 1;
