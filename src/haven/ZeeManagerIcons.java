@@ -59,6 +59,8 @@ public class ZeeManagerIcons {
                 retImg = imgTriangleDown(size,c,border,shadow);
             else if (ruleShape[0].contentEquals("diamond"))
                 retImg = imgDiamond(size,c,border,shadow);
+            else if (ruleShape[0].contentEquals("boat"))
+                retImg = imgBoat(size,c,border,shadow);
 
             // store and return
             mapRuleImg.put(rules[i],retImg);
@@ -75,7 +77,7 @@ public class ZeeManagerIcons {
     private static BufferedImage imgCirle(int diameter, Color c, boolean border, boolean shadow) {
         if (diameter < 5)
             diameter = 5;
-        return imgOval(diameter,diameter,c,border,shadow?2:0);
+        return imgOval(diameter,diameter,c,border,shadow?1:0);
     }
 
     private static BufferedImage imgTriangleUp(int s, Color c, boolean border, boolean shadow) {
@@ -95,10 +97,20 @@ public class ZeeManagerIcons {
     }
 
     private static BufferedImage imgDiamond(int s, Color c, boolean border, boolean shadow) {
+        if (s % 2 > 0)
+            s++; // only even works
         return imgPolygon(s, s,
             new int[]{ s/2, 0, s/2, s }, // x points
             new int[]{ 0, s/2, s, s/2 }, // y points
             4, c, border, shadow?2:0
+        );
+    }
+
+    private static BufferedImage imgBoat(int s, Color c, boolean border, boolean shadow) {
+        return imgPolygon(s*2, s,
+                new int[]{ 0, s, s-(s/4), s/4 }, // x points
+                new int[]{ s/2, s/2, s, s }, // y points
+                4, c, border, shadow?2:0
         );
     }
 
@@ -191,7 +203,7 @@ public class ZeeManagerIcons {
     static class ShapeIconsOptPanel extends JPanel{
 
         static JComboBox nameCombo, shapeCombo;
-        static JTextField nameTF, colorTF;
+        static JTextField nameTF;
         static JPanel panelTop, panelCenter, panelBottom;
         static JSpinner jspIconSize;
         static JButton btnGobColor;
@@ -214,7 +226,7 @@ public class ZeeManagerIcons {
             pan = new JPanel(new FlowLayout(FlowLayout.LEFT));
             panelCenter.add(pan,BorderLayout.NORTH);
             pan.add(new JLabel("Icon:"));
-            pan.add(shapeCombo = new JComboBox<>(new String[]{"circle", "square", "triangleUp", "triangleDown", "diamond"}));
+            pan.add(shapeCombo = new JComboBox<>(new String[]{"boat","circle","diamond","square", "triangleUp", "triangleDown"}));
             SpinnerNumberModel model = new SpinnerNumberModel(3, 3, 10, 1);
             jspIconSize = new JSpinner(model);
             jspIconSize.setBorder(BorderFactory.createEmptyBorder(2, 5, 2, 5));
@@ -264,10 +276,12 @@ public class ZeeManagerIcons {
                 JOptionPane.showMessageDialog(parent,"gob name empty");
                 return null;
             }
-            String rule =  nameTF.getText() + " " + nameCombo.getSelectedIndex() + "," +
-                shapeCombo.getSelectedItem().toString() + " " + jspIconSize.getValue() + "," +
-                btnGobColor.getBackground().getRed() + " " +
-                btnGobColor.getBackground().getGreen() + " " +
+            String border = cbBorder.isSelected() ? "1" : "0";
+            String shadow = cbShadow.isSelected() ? "1" : "0";
+            String rule =  nameTF.getText() +" "+ nameCombo.getSelectedIndex() +","+
+                shapeCombo.getSelectedItem().toString() +" "+ jspIconSize.getValue() +" "+ border +" "+ shadow +","+
+                btnGobColor.getBackground().getRed() +" "+
+                btnGobColor.getBackground().getGreen() +" "+
                 btnGobColor.getBackground().getBlue();
             return rule;
         }
@@ -284,23 +298,60 @@ public class ZeeManagerIcons {
         return newImage;
     }
 
-    static BufferedImage testcircle, testtriangleup, testtriangledown, testdiamond;
+    static BufferedImage[] testcircle, testtriangleup, testtriangledown, testdiamond, testboat;
     public static void testIconsLoginScreen(GOut g) {
-        if (testcircle ==null)
-            testcircle = ZeeManagerIcons.imgCirle(9, Color.BLUE,true,false);
-        g.image(testcircle,Coord.of(50));
+        if (testcircle ==null) {
+            testcircle = new BufferedImage[5];
+            for (int i = 0; i < 5; i++) {
+                testcircle[i] = ZeeManagerIcons.imgCirle(10-i, Color.BLUE, false, true);
+            }
+        }
+        for (int i = 0; i < testcircle.length; i++) {
+            g.image(testcircle[i],Coord.of(50+(i*20), 50));
+        }
 
-        if (testtriangleup ==null)
-            testtriangleup = ZeeManagerIcons.imgTriangleUp(9, Color.BLUE,false,true);
-        g.image(testtriangleup,Coord.of(100));
+        if (testtriangleup ==null) {
+            testtriangleup = new BufferedImage[5];
+            for (int i = 0; i < 5; i++) {
+                testtriangleup[i] = ZeeManagerIcons.imgTriangleUp(10-i, Color.BLUE, false, true);
+            }
+        }
+        for (int i = 0; i < testtriangleup.length; i++) {
+            g.image(testtriangleup[i],Coord.of(50+(i*20), 100));
+        }
 
-        if (testtriangledown ==null)
-            testtriangledown = ZeeManagerIcons.imgTriangleDown(9, Color.BLUE,false,true);
-        g.image(testtriangledown,Coord.of(150));
 
-        if (testdiamond==null)
-            testdiamond = ZeeManagerIcons.imgDiamond(9, Color.BLUE,true, false);
-        g.image(testdiamond,Coord.of(200));
+        if (testtriangledown ==null) {
+            testtriangledown = new BufferedImage[5];
+            for (int i = 0; i < 5; i++) {
+                testtriangledown[i] = ZeeManagerIcons.imgTriangleDown(10-i, Color.BLUE, false, true);
+            }
+        }
+        for (int i = 0; i < testtriangledown.length; i++) {
+            g.image(testtriangledown[i],Coord.of(50+(i*20), 150));
+        }
+
+
+        if (testdiamond ==null) {
+            testdiamond = new BufferedImage[5];
+            for (int i = 0; i < 5; i++) {
+                testdiamond[i] = ZeeManagerIcons.imgDiamond(10-i, Color.BLUE, false, true);
+            }
+        }
+        for (int i = 0; i < testdiamond.length; i++) {
+            g.image(testdiamond[i],Coord.of(50+(i*20), 200));
+        }
+
+
+        if (testboat ==null) {
+            testboat = new BufferedImage[5];
+            for (int i = 0; i < 5; i++) {
+                testboat[i] = ZeeManagerIcons.imgBoat(10-i, Color.BLUE, false, true);
+            }
+        }
+        for (int i = 0; i < testboat.length; i++) {
+            g.image(testboat[i],Coord.of(50+(i*30), 250));
+        }
     }
 
     private static void println(String s) {
