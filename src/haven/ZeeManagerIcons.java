@@ -129,10 +129,10 @@ public class ZeeManagerIcons {
         BufferedImage ret = new BufferedImage(w+shadow, h+shadow, type);
         Graphics2D g2d = ret.createGraphics();
 
-        // fill shadow
+        // draw shadow
         if (shadow > 0){
             g2d.setColor(Color.BLACK);
-            g2d.fillRect(shadow, shadow, w, h);
+            g2d.fillRect(shadow, shadow, w-1, h-1);
         }
 
         // fill rectangle
@@ -142,7 +142,7 @@ public class ZeeManagerIcons {
         // draw border
         if (border) {
             g2d.setColor(ZeeConfig.getComplementaryColor(c));
-            g2d.drawRect(0, 0, w-shadow-1, h-shadow-1);
+            drawRectFix(g2d,0, 0, w-shadow, h-shadow);
         }
 
         g2d.dispose();
@@ -191,6 +191,10 @@ public class ZeeManagerIcons {
         g2d.drawPolygon(xPoints,yPoints,points);
         g2d.dispose();
         return ret;
+    }
+
+    public static void drawRectFix(Graphics g, int x, int y, int w, int h) {
+        g.drawRect(x, y, w - 1, h - 1);
     }
 
     public static void drawIcons(GOut g, MiniMap.Location sessloc, MiniMap.Location dloc, int dlvl, Coord sz) {
