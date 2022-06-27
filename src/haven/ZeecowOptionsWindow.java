@@ -19,7 +19,7 @@ public class ZeecowOptionsWindow extends JFrame {
     public JTextField tfAutoClickMenu, tfAggroRadiusTiles, tfButchermode, tfGobName, tfAudioPath, tfCategName, tfAudioPathCateg;
     public JComboBox<String> cmbCattleRoster, cmbGobCategory, cmbMiniTreeSize, comboShapeIcons;
     public JList<String> listGobsTemp, listGobsSaved, listGobsCategories;
-    public JButton btnRefresh, btnPrintState, btnResetGobs, btnAudioSave, btnAudioClear, btnAudioTest, btnRemGobFromCateg, btnGobColorAdd, btnCategoryColorAdd, btnGobColorRemove, btnCategoryColorRemove, btnResetCateg, btnAddCateg, btnRemoveCateg, btnResetWindowsPos, btnResetActionUses, btnShapeIconSave, btnSapeIconDelete;
+    public JButton btnRefresh, btnPrintState, btnResetGobs, btnAudioSave, btnAudioClear, btnAudioTest, btnRemGobFromCateg, btnGobColorAdd, btnCategoryColorAdd, btnGobColorRemove, btnCategoryColorRemove, btnResetCateg, btnAddCateg, btnRemoveCateg, btnResetWindowsPos, btnResetActionUses, btnSapeIconPreview, btnShapeIconSave, btnSapeIconDelete;
     public JTextArea txtAreaDebug;
     public static int TABGOB_SESSION = 0;
     public static int TABGOB_SAVED = 1;
@@ -119,6 +119,8 @@ public class ZeecowOptionsWindow extends JFrame {
             }
             panelTabMinimap.add(panelShapeIcons = new ZeeManagerIcons.ShapeIconsOptPanel(comboShapeIcons),c);
             panelTabMinimap.add(panelShapeIconsSaveCancel = new JPanel(new FlowLayout(FlowLayout.LEFT)),c);
+            panelShapeIconsSaveCancel.add(btnSapeIconPreview = new JButton("Preview"));
+            btnSapeIconPreview.addActionListener(this::previewShapeIcons);
             panelShapeIconsSaveCancel.add(btnShapeIconSave = new JButton("Save"));
             btnShapeIconSave.addActionListener(this::saveShapeIcons);
             panelShapeIconsSaveCancel.add(btnSapeIconDelete = new JButton("Delete"));
@@ -126,6 +128,15 @@ public class ZeecowOptionsWindow extends JFrame {
             pack();
             repaint();
         });
+    }
+
+    private void previewShapeIcons(ActionEvent evt){
+        String rule = ZeeManagerIcons.ShapeIconsOptPanel.getRule(this);
+        if (rule==null)
+            return;
+        btnSapeIconPreview.setVerticalTextPosition(SwingConstants.CENTER);
+        btnSapeIconPreview.setHorizontalTextPosition(SwingConstants.LEFT);
+        btnSapeIconPreview.setIcon(new ImageIcon(ZeeManagerIcons.generateImage(rule.split(","))));
     }
 
     private void deleteShapeIcons(ActionEvent evt) {

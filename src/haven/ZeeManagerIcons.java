@@ -18,7 +18,7 @@ public class ZeeManagerIcons {
 
         BufferedImage retImg = null;
         String gobName = gob.getres().name;
-        String[] ruleArr, ruleName, ruleShape, ruleColor;
+        String[] ruleArr, ruleName;
         String[] rules = ZeeConfig.shapeIconsList.split(";");
 
         //check all rules for gobName
@@ -40,27 +40,7 @@ public class ZeeManagerIcons {
             if (mapRuleImg.containsKey(rules[i]))
                 return mapRuleImg.get(rules[i]);
 
-            // generate color
-            ruleColor = ruleArr[2].split(" ");
-            Color c = new Color( Integer.parseInt(ruleColor[0]), Integer.parseInt(ruleColor[1]), Integer.parseInt(ruleColor[2]));
-
-            // generate image ("/horse/ 1,square 6 0 1,0 255 0")
-            ruleShape = ruleArr[1].split(" ");
-            int size = Integer.parseInt(ruleShape[1]);
-            boolean border = !ruleShape[2].contentEquals("0");
-            boolean shadow = !ruleShape[3].contentEquals("0");
-            if (ruleShape[0].contentEquals("circle"))
-                retImg = imgCirle(size,c,border,shadow);
-            else if (ruleShape[0].contentEquals("square"))
-                retImg = imgSquare(size,c,border,shadow);
-            else if (ruleShape[0].contentEquals("triangleUp"))
-                retImg = imgTriangleUp(size,c,border,shadow);
-            else if (ruleShape[0].contentEquals("triangleDown"))
-                retImg = imgTriangleDown(size,c,border,shadow);
-            else if (ruleShape[0].contentEquals("diamond"))
-                retImg = imgDiamond(size,c,border,shadow);
-            else if (ruleShape[0].contentEquals("boat"))
-                retImg = imgBoat(size,c,border,shadow);
+            retImg = generateImage(ruleArr);
 
             // store and return
             mapRuleImg.put(rules[i],retImg);
@@ -68,6 +48,36 @@ public class ZeeManagerIcons {
             return retImg;
         }
         return null;
+    }
+
+    public static BufferedImage generateImage(String[] ruleArr) {
+
+        BufferedImage retImg = null;
+        String[] ruleShape, ruleColor;
+
+        // generate color
+        ruleColor = ruleArr[2].split(" ");
+        Color c = new Color( Integer.parseInt(ruleColor[0]), Integer.parseInt(ruleColor[1]), Integer.parseInt(ruleColor[2]));
+
+        // generate image ("/horse/ 1,square 6 0 1,0 255 0")
+        ruleShape = ruleArr[1].split(" ");
+        int size = Integer.parseInt(ruleShape[1]);
+        boolean border = !ruleShape[2].contentEquals("0");
+        boolean shadow = !ruleShape[3].contentEquals("0");
+        if (ruleShape[0].contentEquals("circle"))
+            retImg = imgCirle(size,c,border,shadow);
+        else if (ruleShape[0].contentEquals("square"))
+            retImg = imgSquare(size,c,border,shadow);
+        else if (ruleShape[0].contentEquals("triangleUp"))
+            retImg = imgTriangleUp(size,c,border,shadow);
+        else if (ruleShape[0].contentEquals("triangleDown"))
+            retImg = imgTriangleDown(size,c,border,shadow);
+        else if (ruleShape[0].contentEquals("diamond"))
+            retImg = imgDiamond(size,c,border,shadow);
+        else if (ruleShape[0].contentEquals("boat"))
+            retImg = imgBoat(size,c,border,shadow);
+
+        return retImg;
     }
 
     private static BufferedImage imgSquare(int side, Color c, boolean border, boolean shadow) {
@@ -118,16 +128,23 @@ public class ZeeManagerIcons {
         int type = BufferedImage.TYPE_INT_ARGB;
         BufferedImage ret = new BufferedImage(w+shadow, h+shadow, type);
         Graphics2D g2d = ret.createGraphics();
+
+        // fill shadow
         if (shadow > 0){
             g2d.setColor(Color.BLACK);
             g2d.fillRect(shadow, shadow, w, h);
         }
+
+        // fill rectangle
         g2d.setColor(c);
         g2d.fillRect(0, 0, w-shadow, h-shadow);
+
+        // draw border
         if (border) {
             g2d.setColor(ZeeConfig.getComplementaryColor(c));
             g2d.drawRect(0, 0, w-shadow, h-shadow);
         }
+
         g2d.dispose();
         return ret;
     }
