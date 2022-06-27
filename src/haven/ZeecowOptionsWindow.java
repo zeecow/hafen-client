@@ -120,55 +120,64 @@ public class ZeecowOptionsWindow extends JFrame {
             panelTabMinimap.add(panelShapeIcons = new ZeeManagerIcons.ShapeIconsOptPanel(comboShapeIcons),c);
             panelTabMinimap.add(panelShapeIconsSaveCancel = new JPanel(new FlowLayout(FlowLayout.LEFT)),c);
             panelShapeIconsSaveCancel.add(btnShapeIconSave = new JButton("Save"));
-            btnShapeIconSave.addActionListener(evt->{
-                //save list
-                String rule = ZeeManagerIcons.ShapeIconsOptPanel.getRule(this);
-                if (rule==null)
-                    return;
-                if(ZeeConfig.shapeIconsList.contains(rule)) {
-                    JOptionPane.showMessageDialog(this,"rule already exist");
-                    return;
-                }
-                String newList = ZeeConfig.shapeIconsList;
-                if (!newList.isBlank())
-                    newList += ";";
-                newList += rule;
-                ZeeConfig.println("new list > "+newList);
-                ZeeConfig.shapeIconsList = newList;
-                //update combo
-                DefaultComboBoxModel<String> m = new DefaultComboBoxModel<>(newList.split(";"));
-                m.insertElementAt(" ",0);
-                comboShapeIcons.setModel(m);
-                removePanelShape(evt);
-            });
+            btnShapeIconSave.addActionListener(this::saveShapeIcons);
             panelShapeIconsSaveCancel.add(btnSapeIconDelete = new JButton("Delete"));
-            btnSapeIconDelete.addActionListener(evt->{
-                String rule = ZeeManagerIcons.ShapeIconsOptPanel.getRule(this);
-                if (rule==null)
-                    return;
-                if(!ZeeConfig.shapeIconsList.contains(rule)) {
-                    JOptionPane.showMessageDialog(this,"rule doesn't exist");
-                    return;
-                }
-                List<String> linkedList = new LinkedList<>(Arrays.asList(ZeeConfig.shapeIconsList.split(";")));
-                linkedList.remove(rule);
-                String[] newArray = linkedList.toArray(new String[0]);
-                String newList = String.join(";",newArray);
-                ZeeConfig.println("new list > "+ newList);
-                ZeeConfig.shapeIconsList = newList;
-                if(ZeeManagerIcons.mapRuleImg.containsKey(rule)){
-                    ZeeManagerIcons.mapRuleImg.remove(rule);
-                    ZeeConfig.println("mapRuleImg size "+ZeeManagerIcons.mapRuleImg.size());
-                }
-                //update combo
-                DefaultComboBoxModel<String> m = new DefaultComboBoxModel<>(newList.split(";"));
-                m.insertElementAt(" ",0);
-                comboShapeIcons.setModel(m);
-                removePanelShape(evt);
-            });
+            btnSapeIconDelete.addActionListener(this::deleteShapeIcons);
             pack();
             repaint();
         });
+    }
+
+    private void deleteShapeIcons(ActionEvent evt) {
+        //save list
+        String rule = ZeeManagerIcons.ShapeIconsOptPanel.getRule(this);
+        if (rule==null)
+            return;
+        if(!ZeeConfig.shapeIconsList.contains(rule)) {
+            JOptionPane.showMessageDialog(this,"rule doesn't exist");
+            return;
+        }
+        List<String> linkedList = new LinkedList<>(Arrays.asList(ZeeConfig.shapeIconsList.split(";")));
+        linkedList.remove(rule);
+        String[] newArray = linkedList.toArray(new String[0]);
+        String newList = String.join(";",newArray);
+        ZeeConfig.println("new list > "+ newList);
+        Utils.setpref("shapeIconsList",newList);
+        ZeeConfig.shapeIconsList = newList;
+        if(ZeeManagerIcons.mapRuleImg.containsKey(rule)){
+            ZeeManagerIcons.mapRuleImg.remove(rule);
+            ZeeConfig.println("mapRuleImg size "+ZeeManagerIcons.mapRuleImg.size());
+        }
+
+        //update combo
+        DefaultComboBoxModel<String> m = new DefaultComboBoxModel<>(newList.split(";"));
+        m.insertElementAt(" ",0);
+        comboShapeIcons.setModel(m);
+        removePanelShape(evt);
+    }
+
+    private void saveShapeIcons(ActionEvent evt) {
+        //save list
+        String rule = ZeeManagerIcons.ShapeIconsOptPanel.getRule(this);
+        if (rule==null)
+            return;
+        if(ZeeConfig.shapeIconsList.contains(rule)) {
+            JOptionPane.showMessageDialog(this,"rule already exist");
+            return;
+        }
+        String newList = ZeeConfig.shapeIconsList;
+        if (!newList.isBlank())
+            newList += ";";
+        newList += rule;
+        ZeeConfig.println("new list > "+newList);
+        Utils.setpref("shapeIconsList",newList);
+        ZeeConfig.shapeIconsList = newList;
+
+        //update combo
+        DefaultComboBoxModel<String> m = new DefaultComboBoxModel<>(newList.split(";"));
+        m.insertElementAt(" ",0);
+        comboShapeIcons.setModel(m);
+        removePanelShape(evt);
     }
 
     private void removePanelShape(ActionEvent evt) {
