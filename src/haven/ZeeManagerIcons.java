@@ -124,7 +124,7 @@ public class ZeeManagerIcons {
         );
     }
 
-    private static BufferedImage imgRect(int w, int h, Color c, boolean border, int shadow) {
+    public static BufferedImage imgRect(int w, int h, Color c, boolean border, int shadow) {
         int type = BufferedImage.TYPE_INT_ARGB;
         BufferedImage ret = new BufferedImage(w+shadow, h+shadow, type);
         Graphics2D g2d = ret.createGraphics();
@@ -142,7 +142,7 @@ public class ZeeManagerIcons {
         // draw border
         if (border) {
             g2d.setColor(ZeeConfig.getComplementaryColor(c));
-            g2d.drawRect(0, 0, w-shadow, h-shadow);
+            g2d.drawRect(0, 0, w-shadow-1, h-shadow-1);
         }
 
         g2d.dispose();

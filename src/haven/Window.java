@@ -125,10 +125,15 @@ public class Window extends Widget implements DTarget {
     public void cdraw(GOut g) {
     }
 
+	BufferedImage bgImgSimpleWindow = null;
 	public void drawbgcolor(GOut g, Color c) {
-		g.chcolor(c);
-		g.frect( tlm, new Coord(wsz.x - 34, wsz.y - 54) );
-		g.chcolor();
+		if (bgImgSimpleWindow ==null) {
+			bgImgSimpleWindow = ZeeManagerIcons.imgRect(wsz.x-34, wsz.y-54, c,true,0);
+		}
+		//g.chcolor(c);
+		g.image(bgImgSimpleWindow,tlm);
+		//g.frect( tlm, new Coord(wsz.x - 34, wsz.y - 54) );
+		//g.chcolor();
 	}
 
     protected void drawbg(GOut g) {
@@ -238,6 +243,7 @@ public class Window extends Widget implements DTarget {
     }
 
     public void resize(Coord sz) {
+	bgImgSimpleWindow = null;
 	resize2(sz);
     }
 
