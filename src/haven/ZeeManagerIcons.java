@@ -153,16 +153,23 @@ public class ZeeManagerIcons {
         int type = BufferedImage.TYPE_INT_ARGB;
         BufferedImage ret = new BufferedImage(w+shadow, h+shadow, type);
         Graphics2D g2d = ret.createGraphics();
+
+        // drawfill shadow
         if (shadow > 0){
             g2d.setColor(Color.BLACK);
-            g2d.fillOval(shadow, shadow, w, h);
-            g2d.drawOval(shadow, shadow, w, h);
+            g2d.fillOval(shadow, shadow, w-2, h-2);
+            g2d.drawOval(shadow, shadow, w-2, h-2);
         }
+
+        // fill circle
         g2d.setColor(c);
-        g2d.fillOval(0, 0, w-shadow, h-shadow);
+        g2d.fillOval(0, 0, w-shadow-1, h-shadow-1);
+
+        //draw border
         if (border)
             g2d.setColor(ZeeConfig.getComplementaryColor(c));
-        g2d.drawOval(0, 0, w-shadow, h-shadow);
+        g2d.drawOval(0, 0, w - shadow - 1, h - shadow - 1);//always draw border to fix circl shape
+
         g2d.dispose();
         return ret;
     }
