@@ -14,12 +14,12 @@ import java.util.List;
 public class ZeecowOptionsWindow extends JFrame {
     public GridBagConstraints c;
     public JTabbedPane tabbedPane, tabbedPaneGobs;
-    public JPanel panelTabMisc, panelTabInterface, panelTabGobs, panelTabMinimap, panelDetailsBottom, panelTabCateg, panelShapeIcons, panelShapeIconsSaveCancel;
-    public JCheckBox cbDropAltKeyOnly, cbShowKinNames, cbSimpleButtons, cbSimpleWindows, cbCtrlClickMinimapContent, cbShapeIcons, cbSlowMiniMap, cbAutoChipMinedBoulder, cbDropMinedStone, cbDropMinedOre, cbDropMinedSilverGold, cbDropMinedCurios, cbActionSearchGlobal, cbCompactEquipsWindow, cbBeltTogglesEquips, cbAutoRunLogin, cbAutohearth, cbHighlightCropsReady, cbHighlightGrowingTrees, cbMiniTrees, cbKeyUpDownAudioControl, cbAlertOnPlayers,  cbShowInventoryLogin, cbShowBeltLogin, cbKeyBeltShiftTab, cbKeyCamSwitchShiftC, cbShowIconsZoomOut, cbRememberWindowsPos, cbSortActionsByUse, cbDebugWidgetMsgs, cbDebugCodeRes, cbMidclickEquipManager, cbShowEquipsLogin, cbNotifyBuddyOnline, cbZoomOrthoExtended, cbCattleRosterHeight;
+    public JPanel panelTabMisc, panelTabInterface, panelTabGobs, panelTabKeys, panelTabMinimap, panelDetailsBottom, panelTabCateg, panelShapeIcons, panelShapeIconsSaveCancel;
+    public JCheckBox cbDropAltKeyOnly, cbShowKinNames, cbSimpleWindowBorder, cbSimpleButtons, cbSimpleWindows, cbCtrlClickMinimapContent, cbShapeIcons, cbSlowMiniMap, cbAutoChipMinedBoulder, cbDropMinedStone, cbDropMinedOre, cbDropMinedSilverGold, cbDropMinedCurios, cbActionSearchGlobal, cbCompactEquipsWindow, cbBeltTogglesEquips, cbAutoRunLogin, cbAutohearth, cbHighlightCropsReady, cbHighlightGrowingTrees, cbMiniTrees, cbKeyUpDownAudioControl, cbAlertOnPlayers,  cbShowInventoryLogin, cbShowBeltLogin, cbKeyBeltShiftTab, cbKeyCamSwitchShiftC, cbShowIconsZoomOut, cbRememberWindowsPos, cbSortActionsByUse, cbDebugWidgetMsgs, cbDebugCodeRes, cbMidclickEquipManager, cbShowEquipsLogin, cbNotifyBuddyOnline, cbZoomOrthoExtended, cbCattleRosterHeight;
     public JTextField tfAutoClickMenu, tfAggroRadiusTiles, tfButchermode, tfGobName, tfAudioPath, tfCategName, tfAudioPathCateg;
     public JComboBox<String> cmbCattleRoster, cmbGobCategory, cmbMiniTreeSize, comboShapeIcons;
     public JList<String> listGobsTemp, listGobsSaved, listGobsCategories;
-    public JButton btnRefresh, btnPrintState, btnResetGobs, btnAudioSave, btnAudioClear, btnAudioTest, btnRemGobFromCateg, btnGobColorAdd, btnCategoryColorAdd, btnGobColorRemove, btnCategoryColorRemove, btnResetCateg, btnAddCateg, btnRemoveCateg, btnResetWindowsPos, btnResetActionUses, btnSapeIconPreview, btnShapeIconSave, btnSapeIconDelete;
+    public JButton btnRefresh, btnPrintState, btnResetGobs, btnAudioSave, btnAudioClear, btnAudioTest, btnRemGobFromCateg, btnGobColorAdd, btnCategoryColorAdd, btnGobColorRemove, btnCategoryColorRemove, btnResetCateg, btnAddCateg, btnRemoveCateg, btnResetWindowsPos, btnResetActionUses, btnSapeIconPreview, btnShapeIconSave, btnSapeIconDelete, btnSolidColorWindow;
     public JTextArea txtAreaDebug;
     public static int TABGOB_SESSION = 0;
     public static int TABGOB_SAVED = 1;
@@ -53,12 +53,61 @@ public class ZeecowOptionsWindow extends JFrame {
 
         buildTabInterface();
 
+        buildTabKeys();
+
         buildTabMinimap();
 
         //Gobs tabbbed pane
         panelTabGobs = new JPanel(new BorderLayout());
         tabbedPane.addTab("Gobs", panelTabGobs);
         buildTabGobs();
+    }
+
+
+    private void buildTabKeys() {
+
+        panelTabKeys = new JPanel(new GridBagLayout());
+        tabbedPane.addTab("Keys", panelTabKeys);
+
+        panelTabKeys.add(cbCtrlClickMinimapContent = new JCheckBox("Ctrl+click to pan/resize minimap"), c);
+        cbCtrlClickMinimapContent.setSelected(ZeeConfig.ctrlClickMinimapContent);
+        cbCtrlClickMinimapContent.addActionListener(actionEvent -> {
+            JCheckBox cb = (JCheckBox) actionEvent.getSource();
+            boolean val = ZeeConfig.ctrlClickMinimapContent = cb.isSelected();
+            Utils.setprefb("ctrlClickMinimapContent",val);
+        });
+
+        panelTabKeys.add(cbDropAltKeyOnly = new JCheckBox("Alt+click drops holding item"), c);
+        cbDropAltKeyOnly.setSelected(ZeeConfig.dropHoldingItemAltKey);
+        cbDropAltKeyOnly.addActionListener(actionEvent -> {
+            JCheckBox cb = (JCheckBox) actionEvent.getSource();
+            boolean val = ZeeConfig.dropHoldingItemAltKey = cb.isSelected();
+            Utils.setprefb("dropHoldingItemAltKey",val);
+        });
+
+        panelTabKeys.add(cbKeyUpDownAudioControl = new JCheckBox("Key up/down controls volume"), c);
+        cbKeyUpDownAudioControl.setSelected(ZeeConfig.keyUpDownAudioControl);
+        cbKeyUpDownAudioControl.addActionListener(actionEvent -> {
+            JCheckBox cb = (JCheckBox) actionEvent.getSource();
+            boolean val = ZeeConfig.keyUpDownAudioControl = cb.isSelected();
+            Utils.setprefb("keyUpDownAudioControl",val);
+        });
+
+        panelTabKeys.add(cbKeyBeltShiftTab = new JCheckBox("Shift+Tab toggles belt"), c);
+        cbKeyBeltShiftTab.setSelected(ZeeConfig.keyBeltShiftTab);
+        cbKeyBeltShiftTab.addActionListener(actionEvent -> {
+            JCheckBox cb = (JCheckBox) actionEvent.getSource();
+            boolean val = ZeeConfig.keyBeltShiftTab = cb.isSelected();
+            Utils.setprefb("keyBeltShiftTab",val);
+        });
+
+        panelTabKeys.add(cbKeyCamSwitchShiftC = new JCheckBox("Shift+C switch cams"), c);
+        cbKeyCamSwitchShiftC.setSelected(ZeeConfig.keyCamSwitchShiftC);
+        cbKeyCamSwitchShiftC.addActionListener(actionEvent -> {
+            JCheckBox cb = (JCheckBox) actionEvent.getSource();
+            boolean val = ZeeConfig.keyCamSwitchShiftC = cb.isSelected();
+            Utils.setprefb("keyCamSwitchShiftC",val);
+        });
     }
 
     private void buildTabMinimap() {
@@ -74,14 +123,6 @@ public class ZeecowOptionsWindow extends JFrame {
             Utils.setprefb("slowMiniMap",val);
         });
 
-        panelTabMinimap.add(cbCtrlClickMinimapContent = new JCheckBox("Require Ctrl to pan/resize"), c);
-        cbCtrlClickMinimapContent.setSelected(ZeeConfig.ctrlClickMinimapContent);
-        cbCtrlClickMinimapContent.addActionListener(actionEvent -> {
-            JCheckBox cb = (JCheckBox) actionEvent.getSource();
-            boolean val = ZeeConfig.ctrlClickMinimapContent = cb.isSelected();
-            Utils.setprefb("ctrlClickMinimapContent",val);
-        });
-
         panelTabMinimap.add(cbShowIconsZoomOut = new JCheckBox("Show icons while zoomed out"), c);
         cbShowIconsZoomOut.setSelected(ZeeConfig.showIconsZoomOut);
         cbShowIconsZoomOut.addActionListener(actionEvent -> {
@@ -89,7 +130,6 @@ public class ZeecowOptionsWindow extends JFrame {
             boolean val = ZeeConfig.showIconsZoomOut = cb.isSelected();
             Utils.setprefb("showIconsZoomOut",val);
         });
-
 
         // checkbox shape icons
         panelTabMinimap.add(cbShapeIcons = new JCheckBox("Show basic shape icons"), c);
@@ -203,14 +243,6 @@ public class ZeecowOptionsWindow extends JFrame {
         panelTabMisc = new JPanel(new GridBagLayout());
         tabbedPane.addTab("Misc", panelTabMisc);
 
-        panelTabMisc.add(cbDropAltKeyOnly = new JCheckBox("Alt+click drops holding item"), c);
-        cbDropAltKeyOnly.setSelected(ZeeConfig.dropHoldingItemAltKey);
-        cbDropAltKeyOnly.addActionListener(actionEvent -> {
-            JCheckBox cb = (JCheckBox) actionEvent.getSource();
-            boolean val = ZeeConfig.dropHoldingItemAltKey = cb.isSelected();
-            Utils.setprefb("dropHoldingItemAltKey",val);
-        });
-
         panelTabMisc.add(cbAutoChipMinedBoulder = new JCheckBox("Auto chip mined boulder"), c);
         cbAutoChipMinedBoulder.setSelected(ZeeConfig.autoChipMinedBoulder);
         cbAutoChipMinedBoulder.addActionListener(actionEvent -> {
@@ -286,14 +318,6 @@ public class ZeecowOptionsWindow extends JFrame {
             String val = cmbMiniTreeSize.getSelectedItem().toString().split("%")[0];
             Integer num = ZeeConfig.miniTreesSize = Integer.parseInt(val);
             Utils.setprefi("miniTreesSize", num);
-        });
-
-        panelTabMisc.add(cbKeyUpDownAudioControl = new JCheckBox("Key up/down audio control"), c);
-        cbKeyUpDownAudioControl.setSelected(ZeeConfig.keyUpDownAudioControl);
-        cbKeyUpDownAudioControl.addActionListener(actionEvent -> {
-            JCheckBox cb = (JCheckBox) actionEvent.getSource();
-            boolean val = ZeeConfig.keyUpDownAudioControl = cb.isSelected();
-            Utils.setprefb("keyUpDownAudioControl",val);
         });
 
         panelTabMisc.add(cbAlertOnPlayers = new JCheckBox("Sound alert on players"), c);
@@ -392,12 +416,45 @@ public class ZeecowOptionsWindow extends JFrame {
             Utils.setprefb("showKinNames",val);
         });
 
-        panelTabInterface.add(cbSimpleWindows = new JCheckBox("Simple windows"), c);
+        panelTabInterface.add(cbSimpleWindows = new JCheckBox("Solid color windows"), c);
+        cbSimpleWindows.setEnabled(ZeeConfig.gameUI!=null);
         cbSimpleWindows.setSelected(ZeeConfig.simpleWindows);
         cbSimpleWindows.addActionListener(actionEvent -> {
             JCheckBox cb = (JCheckBox) actionEvent.getSource();
             boolean val = ZeeConfig.simpleWindows = cb.isSelected();
             Utils.setprefb("simpleWindows",val);
+            if(ZeeConfig.gameUI == null)
+                val = false;
+            btnSolidColorWindow.setEnabled(val);
+            cbSimpleWindowBorder.setEnabled(val);
+        });
+
+        // simple window color
+        JPanel pan = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        panelTabInterface.add(pan,c);
+        pan.add(btnSolidColorWindow = new JButton("color"));
+        Color colBtn = ZeeConfig.intToColor(ZeeConfig.simpleWindowColorInt);
+        btnSolidColorWindow.setEnabled(ZeeConfig.gameUI!=null);
+        btnSolidColorWindow.setBackground(colBtn);
+        btnSolidColorWindow.setForeground(ZeeConfig.getComplementaryColor(colBtn));
+        btnSolidColorWindow.addActionListener(evt->{
+            Color color = JColorChooser.showDialog(pan, "Pick Color", ZeeConfig.intToColor(ZeeConfig.simpleWindowColorInt), false);
+            if (color==null)
+                color = ZeeConfig.DEF_SIMPLE_WINDOW_COLOR;
+            btnSolidColorWindow.setBackground(color);
+            btnSolidColorWindow.setForeground(ZeeConfig.getComplementaryColor(color));
+            ZeeConfig.simpleWindowColorInt = ZeeConfig.colorToInt(color);
+            Utils.setprefi("simpleWindowColorInt",ZeeConfig.simpleWindowColorInt);
+            ZeeConfig.simpleWindowsGenerateImg();
+        });
+        pan.add(cbSimpleWindowBorder = new JCheckBox("auto-color border"));
+        cbSimpleWindowBorder.setEnabled(ZeeConfig.gameUI!=null);
+        cbSimpleWindowBorder.setSelected(ZeeConfig.simpleWindowBorder);
+        cbSimpleWindowBorder.addActionListener(actionEvent -> {
+            JCheckBox cb = (JCheckBox) actionEvent.getSource();
+            boolean val = ZeeConfig.simpleWindowBorder  = cb.isSelected();
+            Utils.setprefb("simpleWindowBorder",val);
+            ZeeConfig.simpleWindowsGenerateImg();
         });
 
         panelTabInterface.add(cbSimpleButtons = new JCheckBox("Simple buttons (logoff)"), c);
@@ -432,7 +489,7 @@ public class ZeecowOptionsWindow extends JFrame {
             Utils.setprefb("showEquipsLogin",val);
         });
 
-        panelTabInterface.add(cbMidclickEquipManager = new JCheckBox("Mid-click belt autoequip"), c);
+        panelTabInterface.add(cbMidclickEquipManager = new JCheckBox("Mid-click belt item to autoequip"), c);
         cbMidclickEquipManager.setSelected(ZeeConfig.midclickEquipManager);
         cbMidclickEquipManager.addActionListener(actionEvent -> {
             JCheckBox cb = (JCheckBox) actionEvent.getSource();
@@ -456,22 +513,6 @@ public class ZeecowOptionsWindow extends JFrame {
             Utils.setprefb("autoOpenBelt",val);
         });
 
-        panelTabInterface.add(cbKeyBeltShiftTab = new JCheckBox("Shift+Tab toggles belt"), c);
-        cbKeyBeltShiftTab.setSelected(ZeeConfig.keyBeltShiftTab);
-        cbKeyBeltShiftTab.addActionListener(actionEvent -> {
-            JCheckBox cb = (JCheckBox) actionEvent.getSource();
-            boolean val = ZeeConfig.keyBeltShiftTab = cb.isSelected();
-            Utils.setprefb("keyBeltShiftTab",val);
-        });
-
-        panelTabInterface.add(cbKeyCamSwitchShiftC = new JCheckBox("Shift+C switch cam"), c);
-        cbKeyCamSwitchShiftC.setSelected(ZeeConfig.keyCamSwitchShiftC);
-        cbKeyCamSwitchShiftC.addActionListener(actionEvent -> {
-            JCheckBox cb = (JCheckBox) actionEvent.getSource();
-            boolean val = ZeeConfig.keyCamSwitchShiftC = cb.isSelected();
-            Utils.setprefb("keyCamSwitchShiftC",val);
-        });
-
         panelTabInterface.add(cbNotifyBuddyOnline = new JCheckBox("Notify when friends login"), c);
         cbNotifyBuddyOnline.setSelected(ZeeConfig.notifyBuddyOnline);
         cbNotifyBuddyOnline.addActionListener(actionEvent -> {
@@ -488,7 +529,7 @@ public class ZeecowOptionsWindow extends JFrame {
             Utils.setprefb("zoomOrthoExtended",val);
         });
 
-        panelTabInterface.add(cbActionSearchGlobal = new JCheckBox("Action search global"), c);
+        panelTabInterface.add(cbActionSearchGlobal = new JCheckBox("Action search globally"), c);
         cbActionSearchGlobal.setSelected(ZeeConfig.actionSearchGlobal);
         cbActionSearchGlobal.addActionListener(actionEvent -> {
             JCheckBox cb = (JCheckBox) actionEvent.getSource();

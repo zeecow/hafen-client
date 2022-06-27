@@ -87,6 +87,7 @@ public class ZeeConfig {
     public static final String DEF_BUTCH_AUTO_LIST = "Break,Scale,Wring neck,Kill,Skin,Flay,Pluck,Clean,Butcher,Collect bones";
     public static final String DEF_AUTO_CLICK_MENU_LIST = "Pick,Harvest wax";
     public static final String DEF_SHAPEICON_LIST = "/vehicle/ 1,square 3 0 0,255 255 153;/horse/ 1,square 3 0 0,0 255 255;/knarr 2,boat 10 0 0,255 255 102;/snekkja 2,boat 8 0 0,255 255 102;/rowboat 2,boat 5 0 0,255 255 102;/dugout 2,boat 5 0 0,255 255 102";
+    public static final Color DEF_SIMPLE_WINDOW_COLOR = new Color(55, 64, 32, 255);
 
     public static final int PLAYER_SPEED_0 = 0;
     public static final int PLAYER_SPEED_1 = 1;
@@ -183,7 +184,8 @@ public class ZeeConfig {
     public static boolean rememberWindowsPos = Utils.getprefb("rememberWindowsPos", true);
     public static boolean zoomOrthoExtended = Utils.getprefb("zoomOrthoExtended", true);
     public static boolean simpleWindows = Utils.getprefb("simpleWindows", true);
-    public static Color simpleWindowsBgColor = new Color(55, 64, 32, 255);
+    public static int simpleWindowColorInt = Utils.getprefi("simpleWindowColorInt",ZeeConfig.colorToInt(DEF_SIMPLE_WINDOW_COLOR));
+    public static boolean simpleWindowBorder = Utils.getprefb("simpleWindowBorder", true);
     public static boolean simpleButtons = Utils.getprefb("simpleButtons", true);
     public static String windowShortMidclickTransferMode = "des";//default shortMidclick transfer descending
 
@@ -1091,7 +1093,7 @@ public class ZeeConfig {
             }
         }, 0, y);
 
-        y += 17;
+        y += 10;
 
         return y;
     }
@@ -2456,5 +2458,19 @@ public class ZeeConfig {
             255-bgColor.getGreen(),
             255-bgColor.getBlue()
         );
+    }
+
+    public static Color intToColor(int rgb){
+        return new Color(rgb);
+    }
+
+    public static int colorToInt(Color c){
+        return c.getRGB();
+    }
+
+    public static void simpleWindowsGenerateImg() {
+        gameUI.children(Window.class).forEach(window -> {
+            window.bgImgSimpleWindow = null;
+        });
     }
 }

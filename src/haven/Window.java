@@ -125,10 +125,11 @@ public class Window extends Widget implements DTarget {
     public void cdraw(GOut g) {
     }
 
-	BufferedImage bgImgSimpleWindow = null;
+	public BufferedImage bgImgSimpleWindow = null;
 	public void drawbgcolor(GOut g, Color c) {
-		if (bgImgSimpleWindow ==null) {
-			bgImgSimpleWindow = ZeeManagerIcons.imgRect(wsz.x-34, wsz.y-54, c,true,0);
+		if (bgImgSimpleWindow == null) {
+			ZeeConfig.println("gen img");
+			bgImgSimpleWindow = ZeeManagerIcons.imgRect(wsz.x-34, wsz.y-54, c,ZeeConfig.simpleWindowBorder,0);
 		}
 		//g.chcolor(c);
 		g.image(bgImgSimpleWindow,tlm);
@@ -138,7 +139,7 @@ public class Window extends Widget implements DTarget {
 
     protected void drawbg(GOut g) {
 	if (ZeeConfig.simpleWindows) {
-		drawbgcolor(g,ZeeConfig.simpleWindowsBgColor);
+		drawbgcolor(g,ZeeConfig.intToColor(ZeeConfig.simpleWindowColorInt));
 		return;
 	}
 	Coord bgc = new Coord();
