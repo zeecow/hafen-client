@@ -94,7 +94,7 @@ public class ZeeManagerIcons {
         return imgPolygon(s, s,
             new int[]{ s/2, 0, s}, // x points
             new int[]{ 0, s, s}, // y points
-            3, c, border, shadow?3:0
+            3, c, border, shadow?1:0
         );
     }
 
@@ -102,7 +102,7 @@ public class ZeeManagerIcons {
         return imgPolygon(s, s,
                 new int[]{ 0, s, s/2}, // x points
                 new int[]{ 0, 0, s}, // y points
-                3, c, border, shadow?3:0
+                3, c, border, shadow?1:0
         );
     }
 
@@ -112,7 +112,7 @@ public class ZeeManagerIcons {
         return imgPolygon(s, s,
             new int[]{ s/2, 0, s/2, s }, // x points
             new int[]{ 0, s/2, s, s/2 }, // y points
-            4, c, border, shadow?2:0
+            4, c, border, shadow?1:0
         );
     }
 
@@ -120,7 +120,7 @@ public class ZeeManagerIcons {
         return imgPolygon(s*2, s,
                 new int[]{ 0, s, s-(s/4), s/4 }, // x points
                 new int[]{ s/2, s/2, s, s }, // y points
-                4, c, border, shadow?2:0
+                4, c, border, shadow?1:0
         );
     }
 
@@ -176,26 +176,34 @@ public class ZeeManagerIcons {
 
     private static BufferedImage imgPolygon(int w, int h, int[] xPoints, int[] yPoints, int points, Color c, boolean border, int shadow) {
         int type = BufferedImage.TYPE_INT_ARGB;
-        BufferedImage ret = new BufferedImage(w+shadow, h+shadow, type);
+        BufferedImage ret = new BufferedImage(w+shadow+1, h+shadow+1, type);
         Graphics2D g2d = ret.createGraphics();
-        if (shadow > 0){
+
+        // draw shadow
+        if (shadow > 0) {
             g2d.setColor(Color.BLACK);
             for (int i = 0; i < xPoints.length; i++) {
-                xPoints[i] += shadow;
-                yPoints[i] += shadow;
+                xPoints[i] += shadow ;
+                yPoints[i] += shadow ;
             }
             g2d.fillPolygon(xPoints,yPoints,points);
             g2d.drawPolygon(xPoints,yPoints,points);
             for (int i = 0; i < xPoints.length; i++) {
-                xPoints[i] -= shadow;
-                yPoints[i] -= shadow;
+                xPoints[i] -= shadow ;
+                yPoints[i] -= shadow ;
             }
         }
+
+        // fill polygon
         g2d.setColor(c);
         g2d.fillPolygon(xPoints,yPoints,points);
-        if (border)
+
+        // draw border always to correct outline
+        if (border) {
             g2d.setColor(ZeeConfig.getComplementaryColor(c));
-        g2d.drawPolygon(xPoints,yPoints,points);
+        }
+        g2d.drawPolygon(xPoints, yPoints, points);
+
         g2d.dispose();
         return ret;
     }
