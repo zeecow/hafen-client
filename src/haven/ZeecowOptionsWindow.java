@@ -445,7 +445,7 @@ public class ZeecowOptionsWindow extends JFrame {
             btnSolidColorWindow.setForeground(ZeeConfig.getComplementaryColor(color));
             ZeeConfig.simpleWindowColorInt = ZeeConfig.colorToInt(color);
             Utils.setprefi("simpleWindowColorInt",ZeeConfig.simpleWindowColorInt);
-            ZeeConfig.simpleWindowsGenerateImg();
+            ZeeConfig.simpleWindowsUpdateAll();
         });
         pan.add(cbSimpleWindowBorder = new JCheckBox("auto-color border"));
         cbSimpleWindowBorder.setEnabled(ZeeConfig.gameUI!=null);
@@ -454,7 +454,7 @@ public class ZeecowOptionsWindow extends JFrame {
             JCheckBox cb = (JCheckBox) actionEvent.getSource();
             boolean val = ZeeConfig.simpleWindowBorder  = cb.isSelected();
             Utils.setprefb("simpleWindowBorder",val);
-            ZeeConfig.simpleWindowsGenerateImg();
+            ZeeConfig.simpleWindowsUpdateAll();
         });
 
         panelTabInterface.add(cbSimpleButtons = new JCheckBox("Simple buttons (logoff)"), c);

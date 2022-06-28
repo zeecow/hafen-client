@@ -781,7 +781,8 @@ public class ZeeConfig {
             ZeeManagerCook.pepperRecipeOpened(window);
         }
 
-        windowReposition(window,windowTitle);
+        if (!windowTitle.contentEquals("Options"))
+            windowReposition(window,windowTitle);
 
         windowModOrganizeButton(window, windowTitle);
     }
@@ -2468,9 +2469,12 @@ public class ZeeConfig {
         return c.getRGB();
     }
 
-    public static void simpleWindowsGenerateImg() {
-        gameUI.children(Window.class).forEach(window -> {
-            window.bgImgSimpleWindow = null;
-        });
+    public static void simpleWindowsUpdateAll() {
+        gameUI.children(Window.class).forEach(ZeeConfig::simpleWindowsResize);
+    }
+
+    public static void simpleWindowsResize(Window w) {
+        if (w != null)
+            w.bgImgSimpleWindow = null;
     }
 }

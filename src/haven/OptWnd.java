@@ -44,6 +44,7 @@ public class OptWnd extends Window {
 	    Coord cc = this.c.add(this.sz.div(2));
 	    pack();
 	    move(cc.sub(this.sz.div(2)));
+		ZeeConfig.simpleWindowsResize(this);
 	}
     }
 
