@@ -104,6 +104,7 @@ public class OCache implements Iterable<Gob> {
 	}
 	if(old != null) {
 	    synchronized(old) {
+		old.removed();
 		for(ChangeCallback cb : cbs)
 		    cb.removed(old);
 	    }
