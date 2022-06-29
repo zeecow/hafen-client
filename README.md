@@ -1,11 +1,13 @@
 # Zeecow hafen-client
 
-features:
+Client focusing on small helper tasks, many using mouse middle button, and other stuff:
+
  - search actions globally
  - sort actions by most used craft items
  - craft window buttons for ingredients and history
- - big ugly close buttons
- - button for auto-organizing duplicate windows  
+ - bigger close buttons
+ - button for auto-organizing duplicate windows
+ - simple window and buttons
  - compact equip window
  - auto toggle equip window
  - shorter cattle roster window
@@ -16,6 +18,7 @@ features:
  - seed-farmer manager: no pathfinding, buggy (ctrlLongMidClick crop)
  - cook manager: auto cook pepper and refill cauldron until barrel is empty(no pathfinding)
  - icon list categs
+ - shaped icons options
  - label trasfering barrels
  - Window fuel buttons for Oven, Kiln, Smelter
  - keys up/down control volume

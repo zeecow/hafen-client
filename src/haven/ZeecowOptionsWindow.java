@@ -406,7 +406,7 @@ public class ZeecowOptionsWindow extends JFrame {
     private void buildTabInterface() {
 
         panelTabInterface = new JPanel(new GridBagLayout());
-        tabbedPane.addTab("Interface", panelTabInterface);
+        tabbedPane.addTab("UI", panelTabInterface);
 
         panelTabInterface.add(cbShowKinNames = new JCheckBox("Show kin names (hearthfire)"), c);
         cbShowKinNames.setSelected(ZeeConfig.showKinNames);
