@@ -27,6 +27,7 @@
 package haven;
 
 import java.util.*;
+import dolda.coe.*;
 import java.awt.Color;
 
 public abstract class Message {
@@ -464,14 +465,29 @@ public abstract class Message {
 		addfloat64(((Coord2d)o).x);
 		addfloat64(((Coord2d)o).y);
 	    } else if(o instanceof Object[]) {
-			adduint8(T_TTOL);
-			addlist((Object[])o);
-			adduint8(T_END);
-		}else {
+		adduint8(T_TTOL);
+		addlist((Object[])o);
+		adduint8(T_END);
+	    } else {
 		throw(new RuntimeException("Cannot encode a " + o.getClass() + " as TTO"));
 	    }
 	}
 	return(this);
+    }
+
+    static {
+	ObjectData.register(Message.class, (msg, buf) -> {
+		if((msg.rbuf.length > 0) || (msg.rh != 0) || (msg.rt != 0)) {
+		    buf.put(Symbol.get("read-buf"), msg.rbuf);
+		    buf.put(Symbol.get("read-head"), msg.rh);
+		    buf.put(Symbol.get("read-tail"), msg.rt);
+		}
+		if((msg.wbuf.length > 0) || (msg.wh != 0) || (msg.wt != 0)) {
+		    buf.put(Symbol.get("write-buf"), msg.wbuf);
+		    buf.put(Symbol.get("write-head"), msg.wh);
+		    buf.put(Symbol.get("write-tail"), msg.wt);
+		}
+	    });
     }
 
 	public int peekrbuf(int i) {
