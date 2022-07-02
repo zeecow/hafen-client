@@ -163,6 +163,7 @@ public class ZeeConfig {
     public static boolean dropBoards = false;
     public static boolean equiporyCompact = Utils.getprefb("equiporyCompact", false);
     public static boolean farmerMode = false;
+    public static boolean hideFxSmoke = Utils.getprefb("hideFxSmoke", true);
     public static boolean highlightCropsReady = Utils.getprefb("highlightCropsReady", true);
     public static boolean highlightGrowingTrees = Utils.getprefb("highlightGrowingTrees", true);
     public static boolean keyBeltShiftTab = Utils.getprefb("keyBeltShiftTab", true);
