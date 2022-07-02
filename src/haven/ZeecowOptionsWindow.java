@@ -293,43 +293,6 @@ public class ZeecowOptionsWindow extends JFrame {
             Utils.setprefb("dropMinedCurios",val);
         });
 
-        panelTabMisc.add(cbHighlightCropsReady = new JCheckBox("Highlight crops ready"), c);
-        cbHighlightCropsReady.setSelected(ZeeConfig.highlightCropsReady);
-        cbHighlightCropsReady.addActionListener(actionEvent -> {
-            JCheckBox cb = (JCheckBox) actionEvent.getSource();
-            boolean val = ZeeConfig.highlightCropsReady = cb.isSelected();
-            Utils.setprefb("highlightCropsReady",val);
-        });
-
-        panelTabMisc.add(cbHighlightGrowingTrees = new JCheckBox("Highlight growing trees"), c);
-        cbHighlightGrowingTrees.setSelected(ZeeConfig.highlightGrowingTrees);
-        cbHighlightGrowingTrees.addActionListener(actionEvent -> {
-            JCheckBox cb = (JCheckBox) actionEvent.getSource();
-            boolean val = ZeeConfig.highlightGrowingTrees = cb.isSelected();
-            Utils.setprefb("highlightGrowingTrees",val);
-        });
-
-        panelTabMisc.add(cbMiniTrees= new JCheckBox("Mini trees :3"), c);
-        cbMiniTrees.setSelected(ZeeConfig.miniTrees);
-        cbMiniTrees.addActionListener(actionEvent -> {
-            JCheckBox cb = (JCheckBox) actionEvent.getSource();
-            boolean val = ZeeConfig.miniTrees = cb.isSelected();
-            Utils.setprefb("miniTrees",val);
-            cmbMiniTreeSize.setEnabled(val);
-        });
-
-        //mini trees size
-        String[] perc = {"30%","40%","50%","60%","70%","80%"};
-        panelTabMisc.add(cmbMiniTreeSize = new JComboBox<String>(perc), c);
-        cmbMiniTreeSize.setMaximumSize(new Dimension(Integer.MAX_VALUE, cmbMiniTreeSize.getPreferredSize().height));
-        cmbMiniTreeSize.setSelectedItem(ZeeConfig.miniTreesSize+"%");
-        cmbMiniTreeSize.setEnabled(ZeeConfig.miniTrees);
-        cmbMiniTreeSize.addActionListener(e -> {
-            String val = cmbMiniTreeSize.getSelectedItem().toString().split("%")[0];
-            Integer num = ZeeConfig.miniTreesSize = Integer.parseInt(val);
-            Utils.setprefi("miniTreesSize", num);
-        });
-
         panelTabMisc.add(cbAlertOnPlayers = new JCheckBox("Sound alert on players"), c);
         cbAlertOnPlayers.setSelected(ZeeConfig.alertOnPlayers);
         cbAlertOnPlayers.addActionListener(actionEvent -> {
@@ -354,10 +317,50 @@ public class ZeecowOptionsWindow extends JFrame {
             Utils.setprefb("autoRunLogin",val);
         });
 
+        panelTabMisc.add(cbHighlightCropsReady = new JCheckBox("Highlight crops ready"), c);
+        cbHighlightCropsReady.setSelected(ZeeConfig.highlightCropsReady);
+        cbHighlightCropsReady.addActionListener(actionEvent -> {
+            JCheckBox cb = (JCheckBox) actionEvent.getSource();
+            boolean val = ZeeConfig.highlightCropsReady = cb.isSelected();
+            Utils.setprefb("highlightCropsReady",val);
+        });
+
+        panelTabMisc.add(cbHighlightGrowingTrees = new JCheckBox("Highlight growing trees"), c);
+        cbHighlightGrowingTrees.setSelected(ZeeConfig.highlightGrowingTrees);
+        cbHighlightGrowingTrees.addActionListener(actionEvent -> {
+            JCheckBox cb = (JCheckBox) actionEvent.getSource();
+            boolean val = ZeeConfig.highlightGrowingTrees = cb.isSelected();
+            Utils.setprefb("highlightGrowingTrees",val);
+        });
+
+        pan = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        panelTabMisc.add(pan,c);
+        pan.add(cbMiniTrees= new JCheckBox("Mini trees :3"), c);
+        cbMiniTrees.setSelected(ZeeConfig.miniTrees);
+        cbMiniTrees.addActionListener(actionEvent -> {
+            JCheckBox cb = (JCheckBox) actionEvent.getSource();
+            boolean val = ZeeConfig.miniTrees = cb.isSelected();
+            Utils.setprefb("miniTrees",val);
+            cmbMiniTreeSize.setEnabled(val);
+        });
+
+        //mini trees size
+        String[] perc = {"30%","40%","50%","60%","70%","80%"};
+        pan.add(cmbMiniTreeSize = new JComboBox<String>(perc), c);
+        cmbMiniTreeSize.setSelectedItem(ZeeConfig.miniTreesSize+"%");
+        cmbMiniTreeSize.setEnabled(ZeeConfig.miniTrees);
+        cmbMiniTreeSize.addActionListener(e -> {
+            String val = cmbMiniTreeSize.getSelectedItem().toString().split("%")[0];
+            Integer num = ZeeConfig.miniTreesSize = Integer.parseInt(val);
+            Utils.setprefi("miniTreesSize", num);
+        });
+
         //agro radius tiles
-        panelTabMisc.add(new JLabel("Aggro radius tiles:"), c);
-        panelTabMisc.add(tfAggroRadiusTiles = new JTextField("",5), c);
-        tfAggroRadiusTiles.setMaximumSize(new Dimension(Integer.MAX_VALUE, tfAggroRadiusTiles.getPreferredSize().height));
+        pan = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        panelTabMisc.add(pan,c);
+        pan.add(new JLabel("Aggro radius tiles"));
+        pan.add(tfAggroRadiusTiles = new JTextField("",5));
+        //tfAggroRadiusTiles.setMaximumSize(new Dimension(Integer.MAX_VALUE, tfAggroRadiusTiles.getPreferredSize().height));
         tfAggroRadiusTiles.setText(""+ZeeConfig.aggroRadiusTiles);
         tfAggroRadiusTiles.addActionListener(actionEvent -> {
             String str = actionEvent.getActionCommand();
