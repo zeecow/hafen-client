@@ -164,6 +164,7 @@ public class ZeeConfig {
     public static boolean equiporyCompact = Utils.getprefb("equiporyCompact", false);
     public static boolean farmerMode = false;
     public static boolean hideFxSmoke = Utils.getprefb("hideFxSmoke", true);
+    public static boolean hideFxAnimations = Utils.getprefb("hideFxAnimations", true);
     public static boolean highlightCropsReady = Utils.getprefb("highlightCropsReady", true);
     public static boolean highlightGrowingTrees = Utils.getprefb("highlightGrowingTrees", true);
     public static boolean keyBeltShiftTab = Utils.getprefb("keyBeltShiftTab", true);
@@ -2477,5 +2478,13 @@ public class ZeeConfig {
     public static void simpleWindowsResize(Window w) {
         if (w != null)
             w.bgImgSimpleWindow = null;
+    }
+
+    public static boolean hideAnimation(Resource res) {
+        if (res!=null && "/chimingbluebell,/saptap,/brazierflame,/stockpile-trash,/beehive,/cigar,/dreca".contains(res.basename())) {
+            return true;
+        }
+        //ZeeConfig.println("res " + (res!=null?res.name:"null"));
+        return false;
     }
 }

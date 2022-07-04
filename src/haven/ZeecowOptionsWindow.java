@@ -15,7 +15,7 @@ public class ZeecowOptionsWindow extends JFrame {
     public GridBagConstraints c;
     public JTabbedPane tabbedPane, tabbedPaneGobs;
     public JPanel panelTabMisc, panelTabInterface, panelTabGobs, panelTabKeys, panelTabMinimap, panelDetailsBottom, panelTabCateg, panelShapeIcons, panelShapeIconsSaveCancel;
-    public JCheckBox cbDropAltKeyOnly, cbShowKinNames, cbSimpleWindowBorder, cbSimpleButtons, cbSimpleWindows, cbCtrlClickMinimapContent, cbShapeIcons, cbSlowMiniMap, cbHideFxSmoke, cbAutoChipMinedBoulder, cbDropMinedStone, cbDropMinedOre, cbDropMinedSilverGold, cbDropMinedCurios, cbActionSearchGlobal, cbCompactEquipsWindow, cbBeltTogglesEquips, cbAutoRunLogin, cbAutohearth, cbHighlightCropsReady, cbHighlightGrowingTrees, cbMiniTrees, cbKeyUpDownAudioControl, cbAlertOnPlayers,  cbShowInventoryLogin, cbShowBeltLogin, cbKeyBeltShiftTab, cbKeyCamSwitchShiftC, cbShowIconsZoomOut, cbRememberWindowsPos, cbSortActionsByUse, cbDebugWidgetMsgs, cbDebugCodeRes, cbMidclickEquipManager, cbShowEquipsLogin, cbNotifyBuddyOnline, cbZoomOrthoExtended, cbCattleRosterHeight;
+    public JCheckBox cbDropAltKeyOnly, cbShowKinNames, cbSimpleWindowBorder, cbSimpleButtons, cbSimpleWindows, cbCtrlClickMinimapContent, cbShapeIcons, cbSlowMiniMap, cbHideFxAnimations, cbHideFxSmoke, cbAutoChipMinedBoulder, cbDropMinedStone, cbDropMinedOre, cbDropMinedSilverGold, cbDropMinedCurios, cbActionSearchGlobal, cbCompactEquipsWindow, cbBeltTogglesEquips, cbAutoRunLogin, cbAutohearth, cbHighlightCropsReady, cbHighlightGrowingTrees, cbMiniTrees, cbKeyUpDownAudioControl, cbAlertOnPlayers,  cbShowInventoryLogin, cbShowBeltLogin, cbKeyBeltShiftTab, cbKeyCamSwitchShiftC, cbShowIconsZoomOut, cbRememberWindowsPos, cbSortActionsByUse, cbDebugWidgetMsgs, cbDebugCodeRes, cbMidclickEquipManager, cbShowEquipsLogin, cbNotifyBuddyOnline, cbZoomOrthoExtended, cbCattleRosterHeight;
     public JTextField tfAutoClickMenu, tfAggroRadiusTiles, tfButchermode, tfGobName, tfAudioPath, tfCategName, tfAudioPathCateg;
     public JComboBox<String> cmbCattleRoster, cmbGobCategory, cmbMiniTreeSize, comboShapeIcons;
     public JList<String> listGobsTemp, listGobsSaved, listGobsCategories;
@@ -244,6 +244,14 @@ public class ZeecowOptionsWindow extends JFrame {
 
         panelTabMisc = new JPanel(new GridBagLayout());
         tabbedPane.addTab("Misc", panelTabMisc);
+
+        panelTabMisc.add(cbHideFxAnimations = new JCheckBox("hide animations"), c);
+        cbHideFxAnimations.setSelected(ZeeConfig.hideFxAnimations);
+        cbHideFxAnimations.addActionListener(actionEvent -> {
+            JCheckBox cb = (JCheckBox) actionEvent.getSource();
+            boolean val = ZeeConfig.hideFxAnimations = cb.isSelected();
+            Utils.setprefb("hideFxAnimations",val);
+        });
 
         panelTabMisc.add(cbHideFxSmoke = new JCheckBox("hide smoke effects"), c);
         cbHideFxSmoke.setSelected(ZeeConfig.hideFxSmoke);

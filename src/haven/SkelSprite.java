@@ -54,7 +54,7 @@ public class SkelSprite extends Sprite implements Sprite.CUpd, Skeleton.HasPose 
     
     public static final Factory fact = new Factory() {
 	    public Sprite create(Owner owner, Resource res, Message sdt) {
-		if(res.layer(Skeleton.Res.class) == null)
+		if(res.layer(Skeleton.Res.class) == null  ||  (ZeeConfig.hideFxAnimations && ZeeConfig.hideAnimation(res)) )
 		    return(null);
 		return(new SkelSprite(owner, res, sdt) {
 			public String toString() {
