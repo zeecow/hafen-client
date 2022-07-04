@@ -509,7 +509,8 @@ public class ZeeManagerItemClick extends ZeeThread{
                     String itemName = getWItemName(item);
                     String firstItemName = itemName;
                     long changeMs;
-                    while ( !(itemName.endsWith("-clean") || itemName.endsWith("-cleaned")) ) {
+                    ZeeConfig.lastMapViewClickButton = 2;//prepare for cancel click
+                    while (!ZeeConfig.isTaskCanceledByGroundClick() && (!(itemName.endsWith("-clean") || itemName.endsWith("-cleaned"))) ){
 
                         //butch item and wait inventory changes
                         changeMs = now();
@@ -556,7 +557,7 @@ public class ZeeManagerItemClick extends ZeeThread{
                     }
 
                     //single butch animal last action
-                    if (!butchAll && (itemName.endsWith("-clean") || itemName.endsWith("-cleaned"))) {
+                    if (!ZeeConfig.isTaskCanceledByGroundClick() && !butchAll && (itemName.endsWith("-clean") || itemName.endsWith("-cleaned"))) {
                         //println("last butch > " + itemName);
                         changeMs = now();
                         itemActCoord(item);
