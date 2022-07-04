@@ -91,10 +91,13 @@ public class ISBox extends Widget implements DTarget {
     }
     
     public boolean mousewheel(Coord c, int amount) {
+    int flags = ui.modflags();
+    if (ZeeConfig.scrollTransferItems)
+        flags = UI.MOD_SHIFT;
 	if(amount < 0)
-	    wdgmsg("xfer2", -1, ui.modflags());
+	    wdgmsg("xfer2", -1, flags);
 	if(amount > 0)
-	    wdgmsg("xfer2", 1, ui.modflags());
+	    wdgmsg("xfer2", 1, flags);
 	return(true);
     }
     

@@ -22,6 +22,7 @@ Client focusing on small helper tasks, many using mouse middle button, and other
  - label trasfering barrels
  - Window fuel buttons for Oven, Kiln, Smelter
  - keys up/down control volume
+ - scroll transfer items directly (no shift)
  - rightclicking doors, cave, gate, wheelbarrow, stockpiles, horse, cart, will interact with these objects whenever possible
  - midclick Barter Stand "Buy" button to auto-buy  
  - midclick ground 
@@ -95,3 +96,4 @@ other stuff:
  - zoom extended for ortho cam
  - Shift+c alternates cams ortho/free 
  - mini trees
+ - hide smoke and some animations

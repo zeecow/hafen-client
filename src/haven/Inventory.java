@@ -100,7 +100,7 @@ public class Inventory extends Widget implements DTarget {
     }
     
     public boolean mousewheel(Coord c, int amount) {
-	if(ui.modshift) {
+	if(ui.modshift || ZeeConfig.scrollTransferItems) {
 	    Inventory minv = getparent(GameUI.class).maininv;
 	    if(minv != this) {
 		if(amount < 0)
