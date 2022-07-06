@@ -1,9 +1,6 @@
 package haven;
 
-import haven.render.BaseColor;
-import haven.render.MixColor;
-import haven.render.Pipe;
-import haven.render.States;
+import haven.render.*;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -88,6 +85,7 @@ public class ZeeConfig {
     public static final String DEF_AUTO_CLICK_MENU_LIST = "Pick,Harvest wax";
     public static final String DEF_SHAPEICON_LIST = "/vehicle/ 1,square 3 0 0,255 255 153;/horse/ 1,square 3 0 0,0 255 255;/knarr 2,boat 10 0 0,255 255 102;/snekkja 2,boat 8 0 0,255 255 102;/rowboat 2,boat 5 0 0,255 255 102;/dugout 2,boat 5 0 0,255 255 102";
     public static final Color DEF_SIMPLE_WINDOW_COLOR = new Color(55, 64, 32, 255);
+    public static final Color DEF_GRID_COLOR = new Color(0, 0, 128, 96);
 
     public static final int PLAYER_SPEED_0 = 0;
     public static final int PLAYER_SPEED_1 = 1;
@@ -143,6 +141,7 @@ public class ZeeConfig {
     public static boolean autoOpenEquips = Utils.getprefb("beltToggleEquips", true);
     public static boolean autoOpenBelt = Utils.getprefb("autoOpenBelt", true);
     public static boolean autoRunLogin = Utils.getprefb("autoRunLogin", true);
+    public static boolean autoToggleGridPlacement = Utils.getprefb("autoToggleGridPlacement", true);
     public static boolean butcherMode = false;
     public static String butcherAutoList = Utils.getpref("butcherAutoList",DEF_BUTCH_AUTO_LIST);
     public static boolean cattleRosterHeight = Utils.getprefb("cattleRosterHeight", false);
@@ -189,6 +188,7 @@ public class ZeeConfig {
     public static boolean zoomOrthoExtended = Utils.getprefb("zoomOrthoExtended", true);
     public static boolean simpleWindows = Utils.getprefb("simpleWindows", true);
     public static int simpleWindowColorInt = Utils.getprefi("simpleWindowColorInt",ZeeConfig.colorToInt(DEF_SIMPLE_WINDOW_COLOR));
+    public static int gridColorInt = Utils.getprefi("gridColorInt",ZeeConfig.colorToInt(DEF_GRID_COLOR));
     public static boolean simpleWindowBorder = Utils.getprefb("simpleWindowBorder", true);
     public static boolean simpleButtons = Utils.getprefb("simpleButtons", true);
     public static String windowShortMidclickTransferMode = "des";//default shortMidclick transfer descending
@@ -2488,5 +2488,14 @@ public class ZeeConfig {
         }
         //ZeeConfig.println("res " + (res!=null?res.name:"null"));
         return false;
+    }
+
+    public static void newGridColor(Color newColor) {
+        MapView.gridmat = new Material(
+                new BaseColor(newColor),
+                States.maskdepth,
+                new MapMesh.OLOrder(null),
+                Location.xlate(new Coord3f(0, 0, 0.5f))
+        );
     }
 }

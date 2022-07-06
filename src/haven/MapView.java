@@ -850,9 +850,11 @@ public class MapView extends PView implements DTarget, Console.Directory {
 	    ol.tick();
     }
 
-    private static final Material gridmat = new Material(new BaseColor(0, 0, 128, 96), States.maskdepth, new MapMesh.OLOrder(null),
-							 Location.xlate(new Coord3f(0, 0, 0.5f))   /* Apparently, there is no depth bias for lines. :P */
-							 );
+    public static Material gridmat = new Material(
+			new BaseColor(ZeeConfig.intToColor(ZeeConfig.gridColorInt)),
+			States.maskdepth, new MapMesh.OLOrder(null),
+			Location.xlate(new Coord3f(0, 0, 0.5f))   /* Apparently, there is no depth bias for lines. :P */
+	);
     private class GridLines extends MapRaster {
 	final Grid grid = new Grid<RenderTree.Node>() {
 		RenderTree.Node getcut(Coord cc) {
@@ -1771,6 +1773,8 @@ public class MapView extends PView implements DTarget, Console.Directory {
 
     public void uimsg(String msg, Object... args) {
 	if(msg == "place") {
+		if (ZeeConfig.autoToggleGridPlacement)
+			showgrid(true);
 	    Loader.Future<Plob> placing = this.placing;
 	    if(placing != null) {
 		if(!placing.cancel()) {
@@ -1812,6 +1816,8 @@ public class MapView extends PView implements DTarget, Console.Directory {
 		});
 	} else if(msg == "unplace") {
 	    Loader.Future<Plob> placing = this.placing;
+		if (ZeeConfig.autoToggleGridPlacement)
+			showgrid(false);
 	    if(placing != null) {
 		if(!placing.cancel()) {
 		    Plob ob = placing.get();

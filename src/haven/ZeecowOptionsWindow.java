@@ -15,11 +15,11 @@ public class ZeecowOptionsWindow extends JFrame {
     public GridBagConstraints c;
     public JTabbedPane tabbedPane, tabbedPaneGobs;
     public JPanel panelTabMisc, panelTabInterface, panelTabGobs, panelTabKeys, panelTabMinimap, panelDetailsBottom, panelTabCateg, panelShapeIcons, panelShapeIconsSaveCancel;
-    public JCheckBox cbDropAltKeyOnly, cbShowKinNames, cbSimpleWindowBorder, cbSimpleButtons, cbSimpleWindows, cbFreeGobPlacement, cbScrollTransferItems, cbCtrlClickMinimapContent, cbShapeIcons, cbSlowMiniMap, cbHideFxAnimations, cbHideFxSmoke, cbAutoChipMinedBoulder, cbDropMinedStone, cbDropMinedOre, cbDropMinedSilverGold, cbDropMinedCurios, cbActionSearchGlobal, cbCompactEquipsWindow, cbBeltTogglesEquips, cbAutoRunLogin, cbAutohearth, cbHighlightCropsReady, cbHighlightGrowingTrees, cbMiniTrees, cbKeyUpDownAudioControl, cbAlertOnPlayers,  cbShowInventoryLogin, cbShowBeltLogin, cbKeyBeltShiftTab, cbKeyCamSwitchShiftC, cbShowIconsZoomOut, cbRememberWindowsPos, cbSortActionsByUse, cbDebugWidgetMsgs, cbDebugCodeRes, cbMidclickEquipManager, cbShowEquipsLogin, cbNotifyBuddyOnline, cbZoomOrthoExtended, cbCattleRosterHeight;
+    public JCheckBox cbDropAltKeyOnly, cbShowKinNames, cbSimpleWindowBorder, cbSimpleButtons, cbSimpleWindows, cbFreeGobPlacement, cbScrollTransferItems, cbCtrlClickMinimapContent, cbShapeIcons, cbSlowMiniMap, cbHideFxAnimations, cbHideFxSmoke, cbAutoChipMinedBoulder, cbDropMinedStone, cbDropMinedOre, cbDropMinedSilverGold, cbDropMinedCurios, cbActionSearchGlobal, cbCompactEquipsWindow, cbBeltTogglesEquips, cbAutoRunLogin, cbAutohearth, cbHighlightCropsReady, cbHighlightGrowingTrees, cbMiniTrees, cbKeyUpDownAudioControl, cbAlertOnPlayers,  cbShowInventoryLogin, cbShowBeltLogin, cbKeyBeltShiftTab, cbKeyCamSwitchShiftC, cbShowIconsZoomOut, cbRememberWindowsPos, cbSortActionsByUse, cbDebugWidgetMsgs, cbDebugCodeRes, cbMidclickEquipManager, cbShowEquipsLogin, cbNotifyBuddyOnline, cbZoomOrthoExtended, cbCattleRosterHeight, cbAutoToggleGridPlacement;
     public JTextField tfAutoClickMenu, tfAggroRadiusTiles, tfButchermode, tfGobName, tfAudioPath, tfCategName, tfAudioPathCateg;
     public JComboBox<String> cmbCattleRoster, cmbGobCategory, cmbMiniTreeSize, comboShapeIcons;
     public JList<String> listGobsTemp, listGobsSaved, listGobsCategories;
-    public JButton btnRefresh, btnPrintState, btnResetGobs, btnAudioSave, btnAudioClear, btnAudioTest, btnRemGobFromCateg, btnGobColorAdd, btnCategoryColorAdd, btnGobColorRemove, btnCategoryColorRemove, btnResetCateg, btnAddCateg, btnRemoveCateg, btnResetWindowsPos, btnResetActionUses, btnSapeIconPreview, btnShapeIconSave, btnSapeIconDelete, btnSolidColorWindow;
+    public JButton btnRefresh, btnPrintState, btnResetGobs, btnAudioSave, btnAudioClear, btnAudioTest, btnRemGobFromCateg, btnGobColorAdd, btnCategoryColorAdd, btnGobColorRemove, btnCategoryColorRemove, btnResetCateg, btnAddCateg, btnRemoveCateg, btnResetWindowsPos, btnResetActionUses, btnSapeIconPreview, btnShapeIconSave, btnSapeIconDelete, btnSolidColorWindow, btnGridGolor;
     public JTextArea txtAreaDebug;
     public static int TABGOB_SESSION = 0;
     public static int TABGOB_SAVED = 1;
@@ -442,6 +442,8 @@ public class ZeecowOptionsWindow extends JFrame {
 
     private void buildTabInterface() {
 
+        JPanel pan;
+
         panelTabInterface = new JPanel(new GridBagLayout());
         tabbedPane.addTab("UI", panelTabInterface);
 
@@ -467,7 +469,7 @@ public class ZeecowOptionsWindow extends JFrame {
         });
 
         // simple window color
-        JPanel pan = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        pan = new JPanel(new FlowLayout(FlowLayout.LEFT));
         panelTabInterface.add(pan,c);
         pan.add(btnSolidColorWindow = new JButton("color"));
         Color colBtn = ZeeConfig.intToColor(ZeeConfig.simpleWindowColorInt);
@@ -475,7 +477,7 @@ public class ZeecowOptionsWindow extends JFrame {
         btnSolidColorWindow.setBackground(colBtn);
         btnSolidColorWindow.setForeground(ZeeConfig.getComplementaryColor(colBtn));
         btnSolidColorWindow.addActionListener(evt->{
-            Color color = JColorChooser.showDialog(pan, "Pick Color", ZeeConfig.intToColor(ZeeConfig.simpleWindowColorInt), false);
+            Color color = JColorChooser.showDialog(panelTabInterface, "Pick Color", ZeeConfig.intToColor(ZeeConfig.simpleWindowColorInt), false);
             if (color==null)
                 color = ZeeConfig.DEF_SIMPLE_WINDOW_COLOR;
             btnSolidColorWindow.setBackground(color);
@@ -618,6 +620,31 @@ public class ZeecowOptionsWindow extends JFrame {
             String val = cmbCattleRoster.getSelectedItem().toString().split("%")[0];
             double d = ZeeConfig.cattleRosterHeightPercentage = Double.parseDouble(val) / 100;
             Utils.setprefd("cattleRosterHeightPercentage", d);
+        });
+
+        panelTabInterface.add(cbAutoToggleGridPlacement= new JCheckBox("Show grid on placement "), c);
+        cbAutoToggleGridPlacement.setSelected(ZeeConfig.autoToggleGridPlacement);
+        cbAutoToggleGridPlacement.addActionListener(actionEvent -> {
+            JCheckBox cb = (JCheckBox) actionEvent.getSource();
+            boolean val = ZeeConfig.autoToggleGridPlacement = cb.isSelected();
+            Utils.setprefb("autoToggleGridPlacement",val);
+        });
+
+        pan = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        panelTabInterface.add(pan,c);
+        pan.add(btnGridGolor= new JButton("grid color"));
+        colBtn = ZeeConfig.intToColor(ZeeConfig.gridColorInt);
+        btnGridGolor.setBackground(colBtn);
+        btnGridGolor.setForeground(ZeeConfig.getComplementaryColor(colBtn));
+        btnGridGolor.addActionListener(evt->{
+            Color color = JColorChooser.showDialog(panelTabMisc, "Pick Color", ZeeConfig.intToColor(ZeeConfig.gridColorInt), true);
+            if (color==null)
+                color = ZeeConfig.DEF_GRID_COLOR;
+            btnGridGolor.setBackground(color);
+            btnGridGolor.setForeground(ZeeConfig.getComplementaryColor(color));
+            ZeeConfig.gridColorInt = ZeeConfig.colorToInt(color);
+            Utils.setprefi("gridColorInt",ZeeConfig.gridColorInt);
+            ZeeConfig.newGridColor(color);
         });
     }
 
