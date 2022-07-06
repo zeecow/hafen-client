@@ -1676,7 +1676,7 @@ public class MapView extends PView implements DTarget, Console.Directory {
 
 	public void adjust(Plob plob, Coord pc, Coord2d mc, int modflags) {
 	    Coord2d nc;
-	    if((modflags & 2) == 0)
+	    if((modflags & 2) == 0  &&  !ZeeConfig.freeGobPlacement)
 		nc = mc.floor(tilesz).mul(tilesz).add(tilesz.div(2));
 	    else if(gran != null)
 		nc = mc.add(gran.div(2)).floor(gran).mul(gran);
@@ -1690,7 +1690,7 @@ public class MapView extends PView implements DTarget, Console.Directory {
 	}
 
 	public boolean rotate(Plob plob, int amount, int modflags) {
-	    if((modflags & 1) == 0)
+	    if((modflags & 1) == 0 && !ZeeConfig.freeGobPlacement)
 		return(false);
 	    freerot = true;
 	    double na;

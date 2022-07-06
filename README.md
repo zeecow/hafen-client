@@ -23,6 +23,7 @@ Client focusing on small helper tasks, many using mouse middle button, and other
  - Window fuel buttons for Oven, Kiln, Smelter
  - keys up/down control volume
  - scroll transfer items directly (no shift)
+ - free gob placement
  - rightclicking doors, cave, gate, wheelbarrow, stockpiles, horse, cart, will interact with these objects whenever possible
  - midclick Barter Stand "Buy" button to auto-buy  
  - midclick ground 
