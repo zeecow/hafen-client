@@ -1089,7 +1089,7 @@ public class ZeeManagerGobClick extends ZeeThread{
             return true;
         String endList = "/meatgrinder,/potterswheel,/iconsign,/rowboat,/dugout,/wheelbarrow,"
                 +"/compostbin,/gardenpot,/beehive,/htable,/bed-sturdy,/boughbed,/alchemiststable,"
-                +"/gemwheel,/ancestralshrine,/spark,/cauldron,/churn,"
+                +"/gemwheel,/ancestralshrine,/spark,/cauldron,/churn,/wardrobe,"
                 +"/table-rustic,/table-stone,/chair-rustic,/stonethrone,/royalthrone,"
                 +"/trough,curdingtub,/plow,/barrel,/still,log,/oldtrunk,chest,/anvil,"
                 +"/cupboard,/studydesk,/demijohn,/quern,/wreckingball-fold,/loom,/swheel,"
