@@ -488,7 +488,7 @@ public class ZeeThread  extends Thread{
         //println("wait cursor "+name);
         int max = (int) TIMEOUT_MS*2;
         try {
-            while(max>0 && !ZeeConfig.getCursorName().equals(name)) {
+            while(max>0 && ZeeConfig.getCursorName()!=null && !ZeeConfig.getCursorName().equals(name)) {
                 max -= SLEEP_MS;
                 Thread.sleep(SLEEP_MS);
             }

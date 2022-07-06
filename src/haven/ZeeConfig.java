@@ -2496,4 +2496,12 @@ public class ZeeConfig {
                 Location.xlate(new Coord3f(0, 0, 0.5f))
         );
     }
+
+    public static void checkCursorToggleGrid(Resource curs) {
+        if (curs.name.contentEquals(CURSOR_HARVEST) || curs.name.contentEquals(CURSOR_HARVEST)){
+            gameUI.map.showgrid(true);
+        }else {
+            gameUI.map.showgrid(false);
+        }
+    }
 }

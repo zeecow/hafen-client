@@ -412,13 +412,10 @@ public class JOGLPanel extends GLCanvas implements Runnable, UIPanel, Console.Di
 	}
 
 	// use system arrow pointer
-	try{
-		if(curs.name.endsWith("curs/arw")) {
-			lastcursor = null;
-			setCursor(Cursor.getDefaultCursor());
-			return;
-		}
-	}catch (Exception nevermind){
+	if(curs!=lastcursor && curs.name.contentEquals(ZeeConfig.CURSOR_ARW)) {
+		lastcursor = null;
+		setCursor(Cursor.getDefaultCursor());
+		return;
 	}
 
 	if(cursmode == "awt") {
