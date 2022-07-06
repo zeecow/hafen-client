@@ -852,7 +852,8 @@ public class MapView extends PView implements DTarget, Console.Directory {
 
     public static Material gridmat = new Material(
 			new BaseColor(ZeeConfig.intToColor(ZeeConfig.gridColorInt)),
-			States.maskdepth, new MapMesh.OLOrder(null),
+			States.maskdepth,
+			new MapMesh.OLOrder(null),
 			Location.xlate(new Coord3f(0, 0, 0.5f))   /* Apparently, there is no depth bias for lines. :P */
 	);
     private class GridLines extends MapRaster {

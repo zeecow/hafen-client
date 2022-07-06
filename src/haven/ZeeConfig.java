@@ -85,14 +85,12 @@ public class ZeeConfig {
     public static final String DEF_AUTO_CLICK_MENU_LIST = "Pick,Harvest wax";
     public static final String DEF_SHAPEICON_LIST = "/vehicle/ 1,square 3 0 0,255 255 153;/horse/ 1,square 3 0 0,0 255 255;/knarr 2,boat 10 0 0,255 255 102;/snekkja 2,boat 8 0 0,255 255 102;/rowboat 2,boat 5 0 0,255 255 102;/dugout 2,boat 5 0 0,255 255 102";
     public static final Color DEF_SIMPLE_WINDOW_COLOR = new Color(55, 64, 32, 255);
-    public static final Color DEF_GRID_COLOR = new Color(0, 0, 128, 96);
+    public static final Color DEF_GRID_COLOR = new Color(204, 204, 255, 45);
 
     public static final int PLAYER_SPEED_0 = 0;
     public static final int PLAYER_SPEED_1 = 1;
     public static final int PLAYER_SPEED_2 = 2;
     public static final int PLAYER_SPEED_3 = 3;
-
-    public static final double MAX_DIST_DRIVING_WHEELBARROW = 15;
 
     public static MixColor MIXCOLOR_RED = new MixColor(255,0,0,200);
     public static MixColor MIXCOLOR_ORANGE = new MixColor(255,128,0,200);
