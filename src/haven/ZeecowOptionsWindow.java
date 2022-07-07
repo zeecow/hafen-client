@@ -15,7 +15,7 @@ public class ZeecowOptionsWindow extends JFrame {
     public GridBagConstraints c;
     public JTabbedPane tabbedPane, tabbedPaneGobs;
     public JPanel panelTabMisc, panelTabInterface, panelTabGobs, panelTabKeys, panelTabMinimap, panelDetailsBottom, panelTabCateg, panelShapeIcons, panelShapeIconsSaveCancel;
-    public JCheckBox cbDropAltKeyOnly, cbShowKinNames, cbSimpleWindowBorder, cbSimpleButtons, cbSimpleWindows, cbFreeGobPlacement, cbScrollTransferItems, cbCtrlClickMinimapContent, cbShapeIcons, cbSlowMiniMap, cbHideFxAnimations, cbHideFxSmoke, cbAutoChipMinedBoulder, cbDropMinedStone, cbDropMinedOre, cbDropMinedSilverGold, cbDropMinedCurios, cbActionSearchGlobal, cbCompactEquipsWindow, cbBeltTogglesEquips, cbAutoRunLogin, cbAutohearth, cbHighlightCropsReady, cbHighlightGrowingTrees, cbMiniTrees, cbKeyUpDownAudioControl, cbAlertOnPlayers,  cbShowInventoryLogin, cbShowBeltLogin, cbKeyBeltShiftTab, cbKeyCamSwitchShiftC, cbShowIconsZoomOut, cbRememberWindowsPos, cbSortActionsByUse, cbDebugWidgetMsgs, cbDebugCodeRes, cbMidclickEquipManager, cbShowEquipsLogin, cbNotifyBuddyOnline, cbZoomOrthoExtended, cbCattleRosterHeight, cbAutoToggleGridPlacement;
+    public JCheckBox cbDropAltKeyOnly, cbShowKinNames, cbSimpleWindowBorder, cbSimpleButtons, cbSimpleWindows, cbFreeGobPlacement, cbScrollTransferItems, cbCtrlClickMinimapContent, cbShapeIcons, cbSlowMiniMap, cbHideFxAnimations, cbHideFxSmoke, cbAutoChipMinedBoulder, cbDropMinedStone, cbDropMinedOre, cbDropMinedSilverGold, cbDropMinedCurios, cbActionSearchGlobal, cbCompactEquipsWindow, cbBeltTogglesEquips, cbAutoRunLogin, cbAutohearth, cbHighlightCropsReady, cbHighlightGrowingTrees, cbMiniTrees, cbKeyUpDownAudioControl, cbAlertOnPlayers,  cbShowInventoryLogin, cbShowBeltLogin, cbKeyBeltShiftTab, cbKeyCamSwitchShiftC, cbShowIconsZoomOut, cbRememberWindowsPos, cbSortActionsByUse, cbDebugWidgetMsgs, cbDebugCodeRes, cbMidclickEquipManager, cbShowEquipsLogin, cbNotifyBuddyOnline, cbZoomOrthoExtended, cbCattleRosterHeight, cbAutoToggleGridLines;
     public JTextField tfAutoClickMenu, tfAggroRadiusTiles, tfButchermode, tfGobName, tfAudioPath, tfCategName, tfAudioPathCateg;
     public JComboBox<String> cmbCattleRoster, cmbGobCategory, cmbMiniTreeSize, comboShapeIcons;
     public JList<String> listGobsTemp, listGobsSaved, listGobsCategories;
@@ -622,12 +622,12 @@ public class ZeecowOptionsWindow extends JFrame {
             Utils.setprefd("cattleRosterHeightPercentage", d);
         });
 
-        panelTabInterface.add(cbAutoToggleGridPlacement= new JCheckBox("Show grid on placement "), c);
-        cbAutoToggleGridPlacement.setSelected(ZeeConfig.autoToggleGridPlacement);
-        cbAutoToggleGridPlacement.addActionListener(actionEvent -> {
+        panelTabInterface.add(cbAutoToggleGridLines = new JCheckBox("Auto-toggle grid lines"), c);
+        cbAutoToggleGridLines.setSelected(ZeeConfig.autoToggleGridLines);
+        cbAutoToggleGridLines.addActionListener(actionEvent -> {
             JCheckBox cb = (JCheckBox) actionEvent.getSource();
-            boolean val = ZeeConfig.autoToggleGridPlacement = cb.isSelected();
-            Utils.setprefb("autoToggleGridPlacement",val);
+            boolean val = ZeeConfig.autoToggleGridLines = cb.isSelected();
+            Utils.setprefb("autoToggleGridLines",val);
         });
 
         pan = new JPanel(new FlowLayout(FlowLayout.LEFT));

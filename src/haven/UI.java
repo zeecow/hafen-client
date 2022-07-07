@@ -344,6 +344,8 @@ public class UI {
 	} else {
 	    throw(new UIException("Uimsg to non-existent widget " + id, msg, args));
 	}
+	if (ZeeConfig.autoToggleGridLines && msg.contentEquals("curs"))
+		ZeeConfig.checkCursorToggleGridLines((String) args[0]);
     }
 	
     public void error(String msg) {

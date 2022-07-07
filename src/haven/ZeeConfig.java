@@ -139,7 +139,7 @@ public class ZeeConfig {
     public static boolean autoOpenEquips = Utils.getprefb("beltToggleEquips", true);
     public static boolean autoOpenBelt = Utils.getprefb("autoOpenBelt", true);
     public static boolean autoRunLogin = Utils.getprefb("autoRunLogin", true);
-    public static boolean autoToggleGridPlacement = Utils.getprefb("autoToggleGridPlacement", true);
+    public static boolean autoToggleGridLines = Utils.getprefb("autoToggleGridLines", true);
     public static boolean butcherMode = false;
     public static String butcherAutoList = Utils.getpref("butcherAutoList",DEF_BUTCH_AUTO_LIST);
     public static boolean cattleRosterHeight = Utils.getprefb("cattleRosterHeight", false);
@@ -2497,8 +2497,8 @@ public class ZeeConfig {
         );
     }
 
-    public static void checkCursorToggleGrid(Resource curs) {
-        if (curs.name.contentEquals(CURSOR_HARVEST) || curs.name.contentEquals(CURSOR_HARVEST)){
+    public static void checkCursorToggleGridLines(String curs) {
+        if (curs.contentEquals(CURSOR_HARVEST) || curs.contentEquals(CURSOR_MINE)){
             gameUI.map.showgrid(true);
         }else {
             gameUI.map.showgrid(false);
