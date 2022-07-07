@@ -332,10 +332,14 @@ public class ZeeThread  extends Thread{
     public static boolean waitNotPlayerPose(String poseName) {
         String poses = "";
         try{
+            ZeeConfig.lastMapViewClickButton = 2;//prepare for cancel click
             do{
                 //println("waitNotPlayerPose > "+poses);
                 sleep(PING_MS*2);
-            }while((poses = ZeeConfig.getPlayerPoses()).contains(poseName));
+            } while (
+                (poses = ZeeConfig.getPlayerPoses()).contains(poseName)
+                && !ZeeConfig.isTaskCanceledByGroundClick()
+            );
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -346,10 +350,14 @@ public class ZeeThread  extends Thread{
     public static boolean waitPlayerPose(String poseName) {
         String poses = "";
         try{
+            ZeeConfig.lastMapViewClickButton = 2;//prepare for cancel click
             do{
                 //println("waitPlayerPose > "+poses);
                 sleep(PING_MS*2);
-            }while(!(poses = ZeeConfig.getPlayerPoses()).contains(poseName));
+            } while (
+                !(poses = ZeeConfig.getPlayerPoses()).contains(poseName)
+                && !ZeeConfig.isTaskCanceledByGroundClick()
+            );
         }catch (Exception e){
             e.printStackTrace();
         }
