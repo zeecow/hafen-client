@@ -229,6 +229,22 @@ public class ZeeManagerGobClick extends ZeeThread{
                 }
             }.start();
         }
+        // auto gridline if driving wheelbarrel
+        else if(gobName.endsWith("/wheelbarrow")){
+            new ZeeThread() {
+                public void run() {
+                    try {
+                        if(waitPlayerPose(ZeeConfig.POSE_PLAYER_DRIVE_WHEELBARROW)){
+                            if (ZeeConfig.getCursorName().contentEquals(ZeeConfig.CURSOR_HAND)){
+                                ZeeConfig.gameUI.map.showgrid(true);
+                            }
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            }.start();
+        }
         // while driving wheelbarrow: open gate, store wb on cart
         else if (gobNameEndsWith(gobName,"cart,gate") && ZeeConfig.isPlayerDrivingWheelbarrow()){
             new ZeeThread() {

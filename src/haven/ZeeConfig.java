@@ -161,6 +161,7 @@ public class ZeeConfig {
     public static boolean equiporyCompact = Utils.getprefb("equiporyCompact", false);
     public static boolean farmerMode = false;
     public static boolean freeGobPlacement = Utils.getprefb("freeGobPlacement", true);
+    public static int gridColorInt = Utils.getprefi("gridColorInt",ZeeConfig.colorToInt(DEF_GRID_COLOR));
     public static boolean hideFxSmoke = Utils.getprefb("hideFxSmoke", true);
     public static boolean hideFxAnimations = Utils.getprefb("hideFxAnimations", true);
     public static boolean highlightCropsReady = Utils.getprefb("highlightCropsReady", true);
@@ -186,7 +187,6 @@ public class ZeeConfig {
     public static boolean zoomOrthoExtended = Utils.getprefb("zoomOrthoExtended", true);
     public static boolean simpleWindows = Utils.getprefb("simpleWindows", true);
     public static int simpleWindowColorInt = Utils.getprefi("simpleWindowColorInt",ZeeConfig.colorToInt(DEF_SIMPLE_WINDOW_COLOR));
-    public static int gridColorInt = Utils.getprefi("gridColorInt",ZeeConfig.colorToInt(DEF_GRID_COLOR));
     public static boolean simpleWindowBorder = Utils.getprefb("simpleWindowBorder", true);
     public static boolean simpleButtons = Utils.getprefb("simpleButtons", true);
     public static String windowShortMidclickTransferMode = "des";//default shortMidclick transfer descending
@@ -2410,6 +2410,8 @@ public class ZeeConfig {
 
     public static String getGobPoses(Gob gob) {
         String ret = "";
+        if (gob==null)
+            return ret;
         Drawable d = gob.getattr(Drawable.class);
         if (d instanceof Composite) {
             Composite comp = (Composite) d;
@@ -2498,9 +2500,14 @@ public class ZeeConfig {
     }
 
     public static void checkCursorToggleGridLines(String curs) {
-        if (curs.contentEquals(CURSOR_HARVEST) || curs.contentEquals(CURSOR_MINE)){
+        if ( curs.contentEquals(CURSOR_HARVEST)
+            || curs.contentEquals(CURSOR_MINE)
+            || curs.contentEquals(CURSOR_DIG) )
+        {
             gameUI.map.showgrid(true);
-        }else {
+        }
+        else
+        {
             gameUI.map.showgrid(false);
         }
     }
