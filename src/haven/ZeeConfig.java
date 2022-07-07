@@ -2464,7 +2464,7 @@ public class ZeeConfig {
     }
 
     public static Color intToColor(int rgb){
-        return new Color(rgb);
+        return new Color(rgb,true);
     }
 
     public static int colorToInt(Color c){
