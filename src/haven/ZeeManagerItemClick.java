@@ -86,12 +86,12 @@ public class ZeeManagerItemClick extends ZeeThread{
                         wItem.wdgmsg("transfer-sort", wItem.item, true);// sort transfer asc
                     else
                         wItem.wdgmsg("transfer-sort", wItem.item, false);// sort transfer des
-
-
                     return;
                 }else {
                     //no transfer window open
-                    if(isItemWindowName("Inventory") && isItemPlantable()){
+                    //if(isItemWindowName("Inventory") && isItemPlantable()){
+                    if(wItem.getparent(Window.class).cap.text.contains("Inventory") && isItemPlantable(wItem.item.getres().name))
+                    {
                         //activate farming area cursor
                         itemActCoord(wItem,UI.MOD_SHIFT);
                     }
@@ -971,12 +971,15 @@ public class ZeeManagerItemClick extends ZeeThread{
     }
 
     private boolean isItemPlantable() {
-        //println("is item Plantable "+itemName);
+        return isItemPlantable(itemName);
+    }
+
+    public static boolean isItemPlantable(String name){
         String list = "seed-barley,seed-carrot,carrot,seed-cucumber,seed-flax,"
-            +"seed-grape,seed-hemp,seed-leek,leek,seed-lettuce,seed-millet,"
-            +"seed-pipeweed,seed-poppy,seed-pumpkin,seed-wheat,seed-turnip,turnip,"
-            +"seed-wheat,seed-barley,beetroot,yellowonion,redonion";
-        String name = itemName.replace("gfx/invobjs/","");
+                +"seed-grape,seed-hemp,seed-leek,leek,seed-lettuce,seed-millet,"
+                +"seed-pipeweed,seed-poppy,seed-pumpkin,seed-wheat,seed-turnip,turnip,"
+                +"seed-wheat,seed-barley,beetroot,yellowonion,redonion";
+        name = name.replace("gfx/invobjs/","");
         return list.contains(name);
     }
 
