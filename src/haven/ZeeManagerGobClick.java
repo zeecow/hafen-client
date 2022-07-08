@@ -121,6 +121,7 @@ public class ZeeManagerGobClick extends ZeeThread{
                         gobClick(gob, 3, UI.MOD_SHIFT);//activate cursor harvest if needed
                 } else if (isGobStockpile(gobName) && ZeeConfig.isPlayerCarryingWheelbarrow()) {
                     ZeeManagerStockpile.useWheelbarrowAtStockpile(gob);
+                    ZeeConfig.gameUI.map.showgrid(true);
                 } else if (isGobStockpile(gobName) || gobName.endsWith("/dframe")) {
                     gobClick(gob,3, UI.MOD_SHIFT);//pick up all items (shift + rclick)
                 } else if (isGobTreeStump(gobName)) {
@@ -135,13 +136,17 @@ public class ZeeManagerGobClick extends ZeeThread{
                         inspectWaterAt(coordMc);
                     else if (ZeeConfig.isPlayerMountingHorse())
                         dismountHorse(coordMc);
-                    else if (ZeeConfig.isPlayerCarryingWheelbarrow())
+                    else if (ZeeConfig.isPlayerCarryingWheelbarrow()) {
                         ZeeManagerStockpile.unloadWheelbarrowStockpileAtGround(coordMc.floor(posres));
+                        ZeeConfig.gameUI.map.showgrid(true);
+                    }
                 } else if (ZeeConfig.isPlayerCarryingWheelbarrow()) {
-                    if (isGobHorse(gobName))
+                    if (isGobHorse(gobName)) {
                         mountHorseCarryingWheelbarrow(gob);
-                    else
+                    } else {
                         unloadWheelbarrowAtGob(gob);
+                        ZeeConfig.gameUI.map.showgrid(true);
+                    }
                 } else if (!gobName.endsWith("/wheelbarrow") && ZeeConfig.isPlayerDrivingWheelbarrow()) {
                     if (isGobHorse(gobName))
                         mountHorseDrivingWheelbarrow(gob);
@@ -277,6 +282,7 @@ public class ZeeManagerGobClick extends ZeeThread{
                     if (ZeeConfig.isPlayerMountingHorse())
                         dismountHorse(mc);
                     unloadWheelbarrowAtGob(gob);
+                    ZeeConfig.gameUI.map.showgrid(true);
                 }
             }.start();
         }
