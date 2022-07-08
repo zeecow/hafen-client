@@ -75,7 +75,7 @@ public class ZeeManagerFarmer extends ZeeThread{
         }
         wItem = items.get(0);
         gItem = wItem.item;
-        seeds = getSeedsAmount(gItem);
+        //seeds = getSeedsAmount(gItem);
         //println("updateSeed > not plantable > "+seeds);
         return false;
     }
