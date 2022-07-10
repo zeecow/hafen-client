@@ -26,12 +26,14 @@
 
 package haven;
 
+import static haven.MCache.cmaps;
 import static haven.MCache.tilesz;
 import static haven.OCache.posres;
 import java.awt.Color;
 import java.awt.event.KeyEvent;
 import java.util.*;
 import java.util.function.*;
+import java.lang.ref.*;
 import java.lang.reflect.*;
 import haven.render.*;
 import haven.MCache.OverlayInfo;
@@ -375,9 +377,10 @@ public class MapView extends PView implements DTarget, Console.Directory {
 	private float tfield = field;
 	private boolean isometric = true;
 	private final float pi2 = (float)(Math.PI * 2);
+	private double tf = 1.0;
 
 	public SOrthoCam(String... args) {
-	    PosixArgs opt = PosixArgs.getopt(args, "enif");
+	    PosixArgs opt = PosixArgs.getopt(args, "enift:Z:");
 	    for(char c : opt.parsed()) {
 		switch(c) {
 		case 'e':
@@ -392,11 +395,18 @@ public class MapView extends PView implements DTarget, Console.Directory {
 		case 'f':
 		    isometric = false;
 		    break;
+		case 't':
+		    tf = Double.parseDouble(opt.arg);
+		    break;
+		case 'Z':
+		    field = tfield = Float.parseFloat(opt.arg);
+		    break;
 		}
 	    }
 	}
 
 	public void tick2(double dt) {
+	    dt *= tf;
 	    float cf = 1f - (float)Math.pow(500, -dt);
 	    Coord3f mc = getcc();
 	    mc.y = -mc.y;
@@ -720,7 +730,7 @@ public class MapView extends PView implements DTarget, Console.Directory {
 		    return(map.getcut(cc));
 		}
 	    };
-	/*final Grid flavobjs = new Grid<RenderTree.Node>(false) {
+/*	final Grid flavobjs = new Grid<RenderTree.Node>(false) {
 		RenderTree.Node getcut(Coord cc) {
 		    return(map.getfo(cc));
 		}
@@ -1279,7 +1289,7 @@ public class MapView extends PView implements DTarget, Console.Directory {
 	    if((draw == null) || !out.env().compatible(draw)) {
 		if(draw != null)
 		    dispose();
-		draw = out.env().drawlist();
+		draw = out.env().drawlist().desc("click-list: " + this);
 		if(doinst) {
 		    instancer = new InstanceList(this);
 		    instancer.add(draw, Rendered.class);
@@ -1875,17 +1885,12 @@ public class MapView extends PView implements DTarget, Console.Directory {
 	    out.clear(bstate, FragID.fragid, FColor.BLACK);
 	    out.clear(bstate, 1.0);
 	    checkmapclick(out, basic, pc, mc -> {
-		    /* XXX: This is somewhat doubtfully nice, but running
-		     * it in the defer group would cause unnecessary
-		     * latency, and it shouldn't really be a problem. */
-		    new HackThread(() -> {
-			    synchronized(ui) {
-				if(mc != null)
-				    hit(pc, mc);
-				else
-				    nohit(pc);
-			    }
-		    }, "Hit-test callback").start();
+		    synchronized(ui) {
+			if(mc != null)
+			    hit(pc, mc);
+			else
+			    nohit(pc);
+		    }
 		});
 	    env.submit(out);
 	}
@@ -1924,21 +1929,16 @@ public class MapView extends PView implements DTarget, Console.Directory {
 			done = true;
 	    }
 	    if(done) {
-		/* XXX: This is somewhat doubtfully nice, but running
-		 * it in the defer group would cause unnecessary
-		 * latency, and it shouldn't really be a problem. */
-		new HackThread(() -> {
-			synchronized(ui) {
-			    if(mapcl != null) {
-				if(objcl == null)
-				    hit(pc, mapcl, null);
-				else
-				    hit(pc, mapcl, objcl);
-			    } else {
-				nohit(pc);
-			    }
-			}
-		}, "Hit-test callback").start();
+		synchronized(ui) {
+		    if(mapcl != null) {
+			if(objcl == null)
+			    hit(pc, mapcl, null);
+			else
+			    hit(pc, mapcl, objcl);
+		    } else {
+			nohit(pc);
+		    }
+		}
 	    }
 	}
 	
@@ -2012,7 +2012,7 @@ public class MapView extends PView implements DTarget, Console.Directory {
 	    }
 	}
     }
-
+    
     public boolean mouseup(Coord c, int button) {
 	if(button == 2) {
 	    if(camdrag != null) {
@@ -2201,7 +2201,7 @@ public class MapView extends PView implements DTarget, Console.Directory {
 			if(!ZeeConfig.farmerMode){
 				ol.destroy();
 			}else {
-				// farmermode and mining preserve overlay, unless cancel button
+				// farmermode preserve overlay, unless cancel button
 				if(button != 1){
 					ol.destroy();
 				}

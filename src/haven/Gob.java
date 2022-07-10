@@ -110,9 +110,17 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Sk
 	    added = false;
 	}
 
-	public void remove() {
+	public void remove(boolean async) {
+	    if(async) {
+		gob.defer(() -> remove(false));
+		return;
+	    }
 	    remove0();
 	    gob.ols.remove(this);
+	}
+
+	public void remove() {
+	    remove(true);
 	}
 
 	public void added(RenderTree.Slot slot) {
@@ -178,7 +186,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Sk
     }
 
     void removed() {
-	removed = false;
+	removed = true;
     }
 
     private void deferred() {
