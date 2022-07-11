@@ -465,10 +465,10 @@ public class ZeeManagerGobClick extends ZeeThread{
 
         String gobName = gob.getres().name;
 
-        if (petalName.equals(ZeeFlowerMenu.STRPETAL_AUTOBUTCH_BIGDEADANIMAL)){
+        if (petalName.contentEquals(ZeeFlowerMenu.STRPETAL_AUTOBUTCH_BIGDEADANIMAL)){
             autoButchBigDeadAnimal(gob);
         }
-        else if (petalName.equals(ZeeFlowerMenu.STRPETAL_LIFTUPGOB)){
+        else if (petalName.contentEquals(ZeeFlowerMenu.STRPETAL_LIFTUPGOB)){
             liftGob(gob);
         }
         else if(gobName.endsWith("terobjs/oven")) {
@@ -478,10 +478,15 @@ public class ZeeManagerGobClick extends ZeeThread{
             addFuelGobMenu(gob,petalName);
         }
         else if (isGobTrellisPlant(gobName)){
-            if(petalName.equals(ZeeFlowerMenu.STRPETAL_REMOVEPLANT)) {
+            if(petalName.contentEquals(ZeeFlowerMenu.STRPETAL_REMOVEPLANT)) {
                 destroyGob(gob);
-            }else if (petalName.equals(ZeeFlowerMenu.STRPETAL_REMOVEALLPLANTS)){
+            }
+            else if (petalName.contentEquals(ZeeFlowerMenu.STRPETAL_REMOVEALLPLANTS)){
                 removeAllTrellisPlants(gob);
+            }
+            else if(petalName.contentEquals(ZeeFlowerMenu.STRPETAL_CURSORHARVEST)){
+                if (!ZeeConfig.getCursorName().equals(ZeeConfig.CURSOR_HARVEST))
+                    gobClick(gob, 3, UI.MOD_SHIFT);
             }
         }
         else if(isGobTree(gobName)){
@@ -649,7 +654,7 @@ public class ZeeManagerGobClick extends ZeeThread{
             menu = new ZeeFlowerMenu(gob,ZeeFlowerMenu.STRPETAL_ADD9COAL, ZeeFlowerMenu.STRPETAL_ADD12COAL);
         }
         else if (isGobTrellisPlant(gobName)){
-            menu = new ZeeFlowerMenu(gob,ZeeFlowerMenu.STRPETAL_REMOVEPLANT, ZeeFlowerMenu.STRPETAL_REMOVEALLPLANTS);
+            menu = new ZeeFlowerMenu(gob,ZeeFlowerMenu.STRPETAL_REMOVEPLANT, ZeeFlowerMenu.STRPETAL_REMOVEALLPLANTS,ZeeFlowerMenu.STRPETAL_CURSORHARVEST);
         }
         else if (isGobTree(gobName)){
             opts = new ArrayList<String>();
