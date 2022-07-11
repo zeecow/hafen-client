@@ -237,15 +237,19 @@ public class ZeeManagerGobClick extends ZeeThread{
                 }
             }.start();
         }
-        // auto gridline if driving wheelbarrel
-        else if(gobName.endsWith("/wheelbarrow") && ZeeConfig.autoToggleGridLines){
+        // clicked wheelbarrel
+        else if(gobName.endsWith("/wheelbarrow")){
             new ZeeThread() {
                 public void run() {
                     try {
-                        if(waitPlayerPose(ZeeConfig.POSE_PLAYER_DRIVE_WHEELBARROW)){
-                            if (ZeeConfig.getCursorName().contentEquals(ZeeConfig.CURSOR_HAND)){
-                                ZeeConfig.gameUI.map.showgrid(true);
-                            }
+                        //dismount and click wb
+                        if (ZeeConfig.isPlayerMountingHorse()){
+                            dismountHorse(mc);
+                            gobClick(gob,3);
+                        }
+                        //show gridline
+                        if(ZeeConfig.autoToggleGridLines && waitPlayerPose(ZeeConfig.POSE_PLAYER_DRIVE_WHEELBARROW)){
+                            ZeeConfig.gameUI.map.showgrid(true);
                         }
                     } catch (Exception e) {
                         e.printStackTrace();
