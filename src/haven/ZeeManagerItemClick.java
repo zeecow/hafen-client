@@ -781,8 +781,8 @@ public class ZeeManagerItemClick extends ZeeThread{
     private boolean isItemDrinkingVessel() {
         return isItemDrinkingVessel(itemName);
     }
-    private boolean isItemDrinkingVessel(String name) {
-        String[] items = {"waterskin","waterflask","bucket"};
+    public static boolean isItemDrinkingVessel(String name) {
+        String[] items = {"waterskin","bucket-","kuksa","woodencup","glassjug","waterflask","tankard","metalmug","winebottle","wineglass"};
         for (int i = 0; i < items.length; i++) {
             if (name.contains(items[i])){
                 return true;
@@ -940,7 +940,7 @@ public class ZeeManagerItemClick extends ZeeThread{
     private boolean isItemSack() {
         return isItemSack(itemName);
     }
-    
+
     public static boolean isItemSack(String name) {
         return name.endsWith("travellerssack") || name.endsWith("bindle");
     }
@@ -1109,6 +1109,15 @@ public class ZeeManagerItemClick extends ZeeThread{
         return ZeeConfig.gameUI.vhand;
     }
 
+    // "3.00 l of Water"
+    public static String getItemContentsName(WItem w) {
+        ItemInfo.Contents contents = getItemInfoContents(w.item.info());
+        if (contents!=null && contents.sub!=null) {
+            return getItemInfoName(contents.sub);
+        }
+        return "";
+    }
+
     public static String getHoldingItemContentsNameQl() {
         WItem item = getHoldingItem();
         String msg = "";
@@ -1165,5 +1174,83 @@ public class ZeeManagerItemClick extends ZeeThread{
             e.printStackTrace();
         }
         return(null);
+    }
+
+    static boolean drinkThreadWorking = false;
+    public static void drinkFromBeltHandsInv() {
+        if (drinkThreadWorking) {
+            println("drink thread working");
+            return;
+        }
+        new ZeeThread(){
+            public void run() {
+                try {
+                    Inventory inv;
+                    drinkThreadWorking = true;
+
+                    // drink from belt
+                    inv = getInvBelt();
+                    if (inv!=null) {
+                        WItem beltItems[] = inv.children(WItem.class).toArray(WItem[]::new);
+                        for (int i = 0; i < beltItems.length; i++) {
+                            String name = beltItems[i].item.getres().basename();
+                            String contents;
+                            if (isItemDrinkingVessel(name)) {
+                                // "3.00 l of Water"
+                                contents = getItemContentsName(beltItems[i]);
+                                if (contents.contains("Water")) {
+                                    println("drink belt " + contents);
+                                    if(clickItemPetal(beltItems[i], "Drink"))
+                                        ZeeManagerItemClick.waitPlayerPoseNotInList(ZeeConfig.POSE_PLAYER_DRINK);
+                                    drinkThreadWorking = false;
+                                    break;
+                                }
+                            }
+                        }
+                        if (!drinkThreadWorking)
+                            return;
+                    }
+
+                    // drink from inv
+                    inv = ZeeConfig.getMainInventory();
+                    if (inv!=null){
+                        WItem invItems[] = inv.children(WItem.class).toArray(WItem[]::new);
+                        for (int i = 0; i < invItems.length; i++) {
+                            String name = invItems[i].item.getres().basename();
+                            String contents;
+                            if (isItemDrinkingVessel(name)) {
+                                // "3.00 l of Water"
+                                contents = getItemContentsName(invItems[i]);
+                                if (contents.contains("Water")) {
+                                    println("drink inv " + contents);
+                                    if (clickItemPetal(invItems[i], "Drink"))
+                                        ZeeManagerItemClick.waitPlayerPoseNotInList(ZeeConfig.POSE_PLAYER_DRINK);
+                                    drinkThreadWorking = false;
+                                    break;
+                                }
+                            }
+                        }
+                        if (!drinkThreadWorking)
+                            return;
+                    }
+
+                    // drink form hands (bucket?)
+                    WItem w = null;
+                    if(getLeftHandName().contains("bucket-water") || getLeftHandName().contains("bucket-tea"))
+                        w = getLeftHand();
+                    else if(getRightHandName().contains("bucket-water") || getRightHandName().contains("bucket-tea"))
+                        w = getRightHand();
+                    if (w!=null){
+                        //println("drink hands " + getItemContentsName(w));
+                        if(clickItemPetal(w, "Drink"))
+                            ZeeManagerItemClick.waitPlayerPoseNotInList(ZeeConfig.POSE_PLAYER_DRINK);
+                    }
+
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+                drinkThreadWorking = false;
+            }
+        }.start();
     }
 }

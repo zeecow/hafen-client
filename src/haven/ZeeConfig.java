@@ -109,6 +109,7 @@ public class ZeeConfig {
     private static Dropbox<String> iconListFilterBox;
     private static Inventory mainInv;
     public static Glob glob;
+    public static LayerMeter meterStamina;
 
     public static String playingAudio = null;
     public static String uiMsgTextQuality, uiMsgTextBuffer;
@@ -150,6 +151,9 @@ public class ZeeConfig {
     public static boolean ctrlClickMinimapContent = Utils.getprefb("ctrlClickMinimapContent", true);
     public static boolean debugWidgetMsgs = false;//disabled by default
     public static boolean debugCodeRes = Utils.getprefb("debugCodeRes", false);
+    public static boolean drinkKey = Utils.getprefb("drinkKey", true);
+    public static boolean drinkAuto = Utils.getprefb("drinkAuto", true);
+    public static Integer drinkAutoValue = Utils.getprefi("drinkAutoValue", 50);
     public static boolean dropHoldingItemAltKey = Utils.getprefb("dropHoldingItemAltKey", true);
     public static boolean dropMinedCurios = Utils.getprefb("dropMinedCurios", true);
     public static boolean dropMinedOre = Utils.getprefb("dropMinedOre", true);
@@ -1521,8 +1525,14 @@ public class ZeeConfig {
 
     public static boolean matchKeyShortcut(KeyEvent ev) {
 
+        //println(ev.getKeyCode()+"  "+ev.getKeyChar());
+
+        // key drink '
+        if (ZeeConfig.drinkKey && ev.getKeyCode()==222){
+            ZeeManagerItemClick.drinkFromBeltHandsInv();
+        }
         // Arrow up/down changes audio volume
-        if (ZeeConfig.keyUpDownAudioControl && ev.getKeyCode()==KeyEvent.VK_UP){
+        else if (ZeeConfig.keyUpDownAudioControl && ev.getKeyCode()==KeyEvent.VK_UP){
             double vol = Audio.volume;
             if (vol < 0.9)
                 Audio.setvolume(Double.parseDouble(String.format("%.1f", vol)) + 0.1);
@@ -1664,6 +1674,8 @@ public class ZeeConfig {
         resetBeltState();
         mainInv = null;
         ZeeManagerItemClick.equipory = null;
+        ZeeConfig.meterStamina = null;
+        ZeeConfig.lastMeterStaminaValue = 0;
         ZeeManagerStockpile.windowManager = null;
         ZeeManagerMiner.tunnelHelperWindow = null;
     }
@@ -2509,6 +2521,29 @@ public class ZeeConfig {
         else
         {
             gameUI.map.showgrid(false);
+        }
+    }
+
+    static double lastMeterStaminaValue = 0;
+    static void checkMeterTip(LayerMeter layerMeter, Object[] args) {
+        if( ZeeConfig.drinkAuto
+            && !ZeeManagerItemClick.drinkThreadWorking
+            && args[0].toString().contains("Stamina") )
+        {
+            if (meterStamina==null) {
+                meterStamina = layerMeter;
+                println("new meter stamina");
+            } else {
+                double val = meterStamina.meters.get(0).a;
+                // if stamina is decreasing
+                if (val - lastMeterStaminaValue < 0) {
+                    if (val*100 <= ZeeConfig.drinkAutoValue) {
+                        println("start drinking " + val);
+                        ZeeManagerItemClick.drinkFromBeltHandsInv();
+                    }
+                }
+                lastMeterStaminaValue = val;
+            }
         }
     }
 }

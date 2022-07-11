@@ -14,10 +14,10 @@ import java.util.List;
 public class ZeecowOptionsWindow extends JFrame {
     public GridBagConstraints c;
     public JTabbedPane tabbedPane, tabbedPaneGobs;
-    public JPanel panelTabMisc, panelTabInterface, panelTabGobs, panelTabKeys, panelTabMinimap, panelDetailsBottom, panelTabCateg, panelShapeIcons, panelShapeIconsSaveCancel;
-    public JCheckBox cbDropAltKeyOnly, cbShowKinNames, cbSimpleWindowBorder, cbSimpleButtons, cbSimpleWindows, cbFreeGobPlacement, cbScrollTransferItems, cbCtrlClickMinimapContent, cbShapeIcons, cbSlowMiniMap, cbHideFxAnimations, cbHideFxSmoke, cbAutoChipMinedBoulder, cbDropMinedStone, cbDropMinedOre, cbDropMinedSilverGold, cbDropMinedCurios, cbActionSearchGlobal, cbCompactEquipsWindow, cbBeltTogglesEquips, cbAutoRunLogin, cbAutohearth, cbHighlightCropsReady, cbHighlightGrowingTrees, cbMiniTrees, cbKeyUpDownAudioControl, cbAlertOnPlayers,  cbShowInventoryLogin, cbShowBeltLogin, cbKeyBeltShiftTab, cbKeyCamSwitchShiftC, cbShowIconsZoomOut, cbRememberWindowsPos, cbSortActionsByUse, cbDebugWidgetMsgs, cbDebugCodeRes, cbMidclickEquipManager, cbShowEquipsLogin, cbNotifyBuddyOnline, cbZoomOrthoExtended, cbCattleRosterHeight, cbAutoToggleGridLines;
+    public JPanel panelTabMisc, panelTabInterface, panelTabGobs, panelTabControls, panelTabMinimap, panelDetailsBottom, panelTabCateg, panelShapeIcons, panelShapeIconsSaveCancel;
+    public JCheckBox cbDropAltKeyOnly, cbShowKinNames, cbSimpleWindowBorder, cbSimpleButtons, cbSimpleWindows, cbFreeGobPlacement, cbScrollTransferItems, cbCtrlClickMinimapContent, cbShapeIcons, cbSlowMiniMap, cbHideFxAnimations, cbHideFxSmoke, cbAutoChipMinedBoulder, cbDropMinedStone, cbDropMinedOre, cbDropMinedSilverGold, cbDropMinedCurios, cbActionSearchGlobal, cbCompactEquipsWindow, cbBeltTogglesEquips, cbAutoRunLogin, cbAutohearth, cbHighlightCropsReady, cbHighlightGrowingTrees, cbMiniTrees, cbKeyUpDownAudioControl, cbAlertOnPlayers,  cbShowInventoryLogin, cbShowBeltLogin, cbKeyBeltShiftTab, cbDrinkKey, cbDrinkAuto, cbKeyCamSwitchShiftC, cbShowIconsZoomOut, cbRememberWindowsPos, cbSortActionsByUse, cbDebugWidgetMsgs, cbDebugCodeRes, cbMidclickEquipManager, cbShowEquipsLogin, cbNotifyBuddyOnline, cbZoomOrthoExtended, cbCattleRosterHeight, cbAutoToggleGridLines;
     public JTextField tfAutoClickMenu, tfAggroRadiusTiles, tfButchermode, tfGobName, tfAudioPath, tfCategName, tfAudioPathCateg;
-    public JComboBox<String> cmbCattleRoster, cmbGobCategory, cmbMiniTreeSize, comboShapeIcons;
+    public JComboBox<String> cmbCattleRoster, cmbGobCategory, cmbMiniTreeSize, comboShapeIcons, cmbDrinkAutoValue;
     public JList<String> listGobsTemp, listGobsSaved, listGobsCategories;
     public JButton btnRefresh, btnPrintState, btnResetGobs, btnAudioSave, btnAudioClear, btnAudioTest, btnRemGobFromCateg, btnGobColorAdd, btnCategoryColorAdd, btnGobColorRemove, btnCategoryColorRemove, btnResetCateg, btnAddCateg, btnRemoveCateg, btnResetWindowsPos, btnResetActionUses, btnSapeIconPreview, btnShapeIconSave, btnSapeIconDelete, btnSolidColorWindow, btnGridGolor;
     public JTextArea txtAreaDebug;
@@ -66,10 +66,12 @@ public class ZeecowOptionsWindow extends JFrame {
 
     private void buildTabControls() {
 
-        panelTabKeys = new JPanel(new GridBagLayout());
-        tabbedPane.addTab("Controls", panelTabKeys);
+        JPanel pan;
 
-        panelTabKeys.add(cbFreeGobPlacement = new JCheckBox("free gob placement"), c);
+        panelTabControls = new JPanel(new GridBagLayout());
+        tabbedPane.addTab("Controls", panelTabControls);
+
+        panelTabControls.add(cbFreeGobPlacement = new JCheckBox("free gob placement"), c);
         cbFreeGobPlacement.setSelected(ZeeConfig.freeGobPlacement);
         cbFreeGobPlacement.addActionListener(actionEvent -> {
             JCheckBox cb = (JCheckBox) actionEvent.getSource();
@@ -77,7 +79,7 @@ public class ZeecowOptionsWindow extends JFrame {
             Utils.setprefb("freeGobPlacement",val);
         });
 
-        panelTabKeys.add(cbScrollTransferItems = new JCheckBox("scroll transfer items directly"), c);
+        panelTabControls.add(cbScrollTransferItems = new JCheckBox("scroll transfer items directly"), c);
         cbScrollTransferItems.setSelected(ZeeConfig.scrollTransferItems);
         cbScrollTransferItems.addActionListener(actionEvent -> {
             JCheckBox cb = (JCheckBox) actionEvent.getSource();
@@ -85,7 +87,7 @@ public class ZeecowOptionsWindow extends JFrame {
             Utils.setprefb("scrollTransferItems",val);
         });
 
-        panelTabKeys.add(cbCtrlClickMinimapContent = new JCheckBox("Ctrl+click to pan/resize minimap"), c);
+        panelTabControls.add(cbCtrlClickMinimapContent = new JCheckBox("Ctrl+click to pan/resize minimap"), c);
         cbCtrlClickMinimapContent.setSelected(ZeeConfig.ctrlClickMinimapContent);
         cbCtrlClickMinimapContent.addActionListener(actionEvent -> {
             JCheckBox cb = (JCheckBox) actionEvent.getSource();
@@ -93,7 +95,7 @@ public class ZeecowOptionsWindow extends JFrame {
             Utils.setprefb("ctrlClickMinimapContent",val);
         });
 
-        panelTabKeys.add(cbDropAltKeyOnly = new JCheckBox("Alt+click drops holding item"), c);
+        panelTabControls.add(cbDropAltKeyOnly = new JCheckBox("Alt+click drops holding item"), c);
         cbDropAltKeyOnly.setSelected(ZeeConfig.dropHoldingItemAltKey);
         cbDropAltKeyOnly.addActionListener(actionEvent -> {
             JCheckBox cb = (JCheckBox) actionEvent.getSource();
@@ -101,7 +103,7 @@ public class ZeecowOptionsWindow extends JFrame {
             Utils.setprefb("dropHoldingItemAltKey",val);
         });
 
-        panelTabKeys.add(cbKeyUpDownAudioControl = new JCheckBox("Key up/down controls volume"), c);
+        panelTabControls.add(cbKeyUpDownAudioControl = new JCheckBox("Key up/down controls volume"), c);
         cbKeyUpDownAudioControl.setSelected(ZeeConfig.keyUpDownAudioControl);
         cbKeyUpDownAudioControl.addActionListener(actionEvent -> {
             JCheckBox cb = (JCheckBox) actionEvent.getSource();
@@ -109,7 +111,7 @@ public class ZeecowOptionsWindow extends JFrame {
             Utils.setprefb("keyUpDownAudioControl",val);
         });
 
-        panelTabKeys.add(cbKeyBeltShiftTab = new JCheckBox("Shift+Tab toggles belt"), c);
+        panelTabControls.add(cbKeyBeltShiftTab = new JCheckBox("Shift+Tab toggles belt"), c);
         cbKeyBeltShiftTab.setSelected(ZeeConfig.keyBeltShiftTab);
         cbKeyBeltShiftTab.addActionListener(actionEvent -> {
             JCheckBox cb = (JCheckBox) actionEvent.getSource();
@@ -117,12 +119,41 @@ public class ZeecowOptionsWindow extends JFrame {
             Utils.setprefb("keyBeltShiftTab",val);
         });
 
-        panelTabKeys.add(cbKeyCamSwitchShiftC = new JCheckBox("Shift+C switch cams"), c);
+        panelTabControls.add(cbKeyCamSwitchShiftC = new JCheckBox("Shift+C switch cams"), c);
         cbKeyCamSwitchShiftC.setSelected(ZeeConfig.keyCamSwitchShiftC);
         cbKeyCamSwitchShiftC.addActionListener(actionEvent -> {
             JCheckBox cb = (JCheckBox) actionEvent.getSource();
             boolean val = ZeeConfig.keyCamSwitchShiftC = cb.isSelected();
             Utils.setprefb("keyCamSwitchShiftC",val);
+        });
+
+        panelTabControls.add(cbDrinkKey = new JCheckBox("Drink key ' (single quote) "), c);
+        cbDrinkKey.setSelected(ZeeConfig.drinkKey);
+        cbDrinkKey.addActionListener(actionEvent -> {
+            JCheckBox cb = (JCheckBox) actionEvent.getSource();
+            boolean val = ZeeConfig.drinkKey = cb.isSelected();
+            Utils.setprefb("drinkKey",val);
+        });
+
+        pan = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        panelTabControls.add(pan,c);
+        pan.add(cbDrinkAuto= new JCheckBox("Auto drink at"), c);
+        cbDrinkAuto.setSelected(ZeeConfig.drinkAuto);
+        cbDrinkAuto.addActionListener(actionEvent -> {
+            JCheckBox cb = (JCheckBox) actionEvent.getSource();
+            boolean val = ZeeConfig.drinkAuto = cb.isSelected();
+            Utils.setprefb("drinkAuto",val);
+            cmbDrinkAutoValue.setEnabled(val);
+        });
+        //mini trees size
+        String[] perc = {"30%","40%","50%","60%","70%","80%"};
+        pan.add(cmbDrinkAutoValue = new JComboBox<String>(perc), c);
+        cmbDrinkAutoValue.setSelectedItem(ZeeConfig.drinkAutoValue+"%");
+        cmbDrinkAutoValue.setEnabled(ZeeConfig.drinkAuto);
+        cmbDrinkAutoValue.addActionListener(e -> {
+            String val = cmbDrinkAutoValue.getSelectedItem().toString().split("%")[0];
+            Integer num = ZeeConfig.drinkAutoValue = Integer.parseInt(val);
+            Utils.setprefi("drinkAutoValue", num);
         });
     }
 
