@@ -315,7 +315,7 @@ public class ZeeManagerGobClick extends ZeeThread{
                 || gobNameEndsWith(gobName,
                     "/upstairs,/downstairs,/cavein,/caveout,/burrow,/igloo," +
                         "/wheelbarrow,/loom,/cauldron,/churn,/swheel,/ropewalk," +
-                        "/meatgrinder,/potterswheel,/quern,/plow"
+                        "/meatgrinder,/potterswheel,/quern,/plow,/winepress"
                 );
     }
 
