@@ -144,6 +144,8 @@ public class ZeecowOptionsWindow extends JFrame {
             boolean val = ZeeConfig.drinkAuto = cb.isSelected();
             Utils.setprefb("drinkAuto",val);
             cmbDrinkAutoValue.setEnabled(val);
+            if (ZeeInvMainOptionsWdg.cbDrink!=null)
+                ZeeInvMainOptionsWdg.cbDrink.set(val);
         });
         //mini trees size
         String[] perc = {"30%","40%","50%","60%","70%","80%"};

@@ -3,7 +3,7 @@ package haven;
 public class ZeeInvMainOptionsWdg extends Widget {
 
     Label labelDrop, labelCount;
-    public static CheckBox cbSeeds, cbSoil, cbButcher, cbPiler, cbAutomenu, cbTunnel;
+    public static CheckBox cbSeeds, cbSoil, cbButcher, cbPiler, cbAutomenu, cbTunnel, cbDrink;
     Widget invSlots;
 
     public ZeeInvMainOptionsWdg(String windowCap) {
@@ -17,7 +17,7 @@ public class ZeeInvMainOptionsWdg extends Widget {
 
         int x = 0;
 
-        add(cbAutomenu = new CheckBox("automenu") {
+        add(cbAutomenu = new CheckBox("mn") {
             {
                 a = ZeeConfig.autoClickMenuOption;
             }
@@ -28,10 +28,11 @@ public class ZeeInvMainOptionsWdg extends Widget {
                 a = val;
             }
         }, x, 0);
+        cbAutomenu.settip("auto menu list");
 
         x += cbAutomenu.sz.x + 5;
 
-        add(cbButcher = new CheckBox("butch") {
+        add(cbButcher = new CheckBox("bt") {
             {
                 a = ZeeConfig.butcherMode;
             }
@@ -41,23 +42,25 @@ public class ZeeInvMainOptionsWdg extends Widget {
                 a = val;
             }
         }, x, 0);
+        cbButcher.settip("auto menu butch list");
 
         x += cbButcher.sz.x + 5;
 
-        add(cbPiler = new CheckBox("piler") {
+        add(cbDrink = new CheckBox("dk") {
             {
-                a = ZeeConfig.pilerMode;
+                a = ZeeConfig.drinkAuto;
             }
 
             public void set(boolean val) {
-                ZeeConfig.pilerMode = val;
+                ZeeConfig.drinkAuto = val;
                 a = val;
             }
         }, x, 0);
+        cbDrink.settip("auto drink");
 
         x = 0;
 
-        add(cbSeeds = new CheckBox("dropseed") {
+        add(cbSeeds = new CheckBox("sd") {
             {
                 a = ZeeConfig.dropSeeds;
             }
@@ -67,10 +70,11 @@ public class ZeeInvMainOptionsWdg extends Widget {
                 a = val;
             }
         }, x, 15);
+        cbSeeds.settip("drop seeds");
 
         x += cbSeeds.sz.x + 5;
 
-        add(cbSoil = new CheckBox("soil") {
+        add(cbSoil = new CheckBox("sl") {
             {
                 a = ZeeConfig.dropSoil;
             }
@@ -80,10 +84,11 @@ public class ZeeInvMainOptionsWdg extends Widget {
                 a = val;
             }
         }, x, 15);
+        cbSoil.settip("drop soil");
 
         x += cbSoil.sz.x + 5;
 
-        add(cbTunnel = new CheckBox("tunnel") {
+        add(cbTunnel = new CheckBox("tn") {
             {
                 a = ZeeManagerMiner.tunnelCheckbox;
             }
@@ -93,6 +98,21 @@ public class ZeeInvMainOptionsWdg extends Widget {
                 a = val;
             }
         }, x, 15);
+        cbTunnel.settip("tunnel helper");
+
+        x += cbTunnel.sz.x + 5;
+
+        add(cbPiler = new CheckBox("pl") {
+            {
+                a = ZeeConfig.pilerMode;
+            }
+
+            public void set(boolean val) {
+                ZeeConfig.pilerMode = val;
+                a = val;
+            }
+        }, x, 15);
+        cbPiler.settip("pile helper");
 
         add(labelCount = new Label(""), 0, 0);
         pack();
@@ -119,8 +139,11 @@ public class ZeeInvMainOptionsWdg extends Widget {
         };
         int padx = 5;
         Widget wdg = rg.add("des", new Coord(0, inv.c.y + inv.sz.y + 2));
+        wdg.settip("midclick transfer descending order");
         wdg = rg.add("asc", new Coord(wdg.c.x+wdg.sz.x+padx, wdg.c.y));
+        wdg.settip("midclick transfer ascending order");
         wdg = rg.add("one", new Coord(wdg.c.x+wdg.sz.x+padx, wdg.c.y));
+        wdg.settip("midclick transfer one");
         rg.check(ZeeConfig.windowShortMidclickTransferMode);//default des
         //window.resize(window.contentsz().addy(-2));
         pack();

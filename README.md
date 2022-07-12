@@ -86,7 +86,8 @@ Client focusing on small helper tasks, many using mouse middle button, and other
 
 other stuff:
  - autodrop mined items, seeds, soil
- - auto click menu options  
+ - auto click menu options
+ - auto drink
  - sort transfer with Alt+Rclick or Alt+Lclick (no gemstone yet)
  - Auto-hearth  
  - replaces arrow cursor with system's default
