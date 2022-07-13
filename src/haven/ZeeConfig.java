@@ -123,6 +123,7 @@ public class ZeeConfig {
     public static long lastMapViewClickMs;
     public static Coord savedTileSelStartCoord, savedTileSelEndCoord;
     public static int savedTileSelModflags;
+    public static long savedTileSelMs;
     public static MCache.Overlay savedTileSelOverlay;
     public static String lastInvItemBaseName;
     public static long lastInvItemMs;
@@ -1768,6 +1769,7 @@ public class ZeeConfig {
         savedTileSelEndCoord = ec;
         savedTileSelModflags = modflags;
         savedTileSelOverlay = ol;
+        savedTileSelMs = System.currentTimeMillis();
     }
 
     public static void resetTileSelection(){
@@ -1776,6 +1778,7 @@ public class ZeeConfig {
         savedTileSelModflags = -1;
         if(savedTileSelOverlay!=null)
             savedTileSelOverlay.destroy();
+        savedTileSelMs = 0;
     }
 
     public static void expandTileSelectionBy(int numTiles) {
@@ -2333,7 +2336,9 @@ public class ZeeConfig {
     }
 
     private static void applyGobSettingsAggro(Gob gob) {
-        if(mapCategoryGobs.get(CATEG_AGROCREATURES).contains(gob.resName)) {
+        if( mapCategoryGobs.get(CATEG_AGROCREATURES).contains(gob.resName)) {
+            if (gob.resName.contentEquals("gfx/kritter/bat/bat") && ZeeManagerItemClick.isItemEquipped("/batcape"))
+                return;
             //aggro radius
             if (ZeeConfig.aggroRadiusTiles > 0)
                 gob.addol(new Gob.Overlay(gob, new ZeeGobRadius(gob, null, ZeeConfig.aggroRadiusTiles * MCache.tilesz2.y), ZeeManagerGobClick.OVERLAY_ID_AGGRO));
@@ -2538,8 +2543,8 @@ public class ZeeConfig {
                 // if stamina is decreasing
                 if (val - lastMeterStaminaValue < 0) {
                     if (val*100 <= ZeeConfig.drinkAutoValue) {
-                        //println("============");
-                       // println("drink " + val + "  pose: "+getPlayerPoses());
+                        println("============");
+                        println("drink " + val + "  pose: "+getPlayerPoses());
                         ZeeManagerItemClick.drinkFromBeltHandsInv();
                     }
                 }

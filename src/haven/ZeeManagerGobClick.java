@@ -556,7 +556,7 @@ public class ZeeManagerGobClick extends ZeeThread{
     }
 
     private static void destroyTreelogs(Gob firstTreelog, String petalName) {
-        if (!ZeeManagerItemClick.isItemEquipped("/bonesaw") || ZeeManagerItemClick.isItemEquipped("/saw-m")){
+        if (!ZeeManagerItemClick.isItemInHandSlot("/bonesaw") || ZeeManagerItemClick.isItemInHandSlot("/saw-m")){
             ZeeConfig.msg("need bone saw equipped, no metal saw");
             return;
         }
@@ -741,7 +741,7 @@ public class ZeeManagerGobClick extends ZeeThread{
     }
 
     private boolean isDestroyTreelog() {
-        if(isGobTreeLog(gobName) && ZeeManagerItemClick.isItemEquipped("bonesaw"))
+        if(isGobTreeLog(gobName) && ZeeManagerItemClick.isItemInHandSlot("bonesaw"))
             return true;
         return false;
     }

@@ -346,14 +346,14 @@ public class ZeeManagerItemClick extends ZeeThread{
             gfx/invobjs/butcherscleaver
             gfx/invobjs/stoneaxe
          */
-        if (isItemEquipped("woodsmansaxe"))
+        if (isItemInHandSlot("woodsmansaxe"))
             return;
         WItem axe = getBeltWItem("woodsmansaxe");
         if (axe!=null){
             equipBeltItem("woodsmansaxe");
             waitItemEquipped("woodsmansaxe");
         }else{
-            if (isItemEquipped("axe-m"))
+            if (isItemInHandSlot("axe-m"))
                 return;
             axe = getBeltWItem("axe-m");
             if (axe!=null){
@@ -1049,14 +1049,20 @@ public class ZeeManagerItemClick extends ZeeThread{
         }
     }
 
-    public static boolean isItemEquipped(WItem w){
+    public static boolean isItemEquipped(String nameContains){
         try {
-            return sameNameAndQuality(getLeftHand(),w) || sameNameAndQuality(getRightHand(),w);
+            GItem items[] = getEquipory().wmap.keySet().toArray(new GItem[]{});
+            for (int i = 0; i < items.length; i++) {
+                if (items[i].getres().name.contains(nameContains))
+                    return true;
+            }
         }catch (Exception e){
-            return false;
+            e.printStackTrace();
         }
+        return false;
     }
-    public static boolean isItemEquipped(String name){
+
+    public static boolean isItemInHandSlot(String name){
         try {
             /*
             Equipory eq = ZeeConfig.windowEquipment.getchild(Equipory.class);
@@ -1096,7 +1102,7 @@ public class ZeeManagerItemClick extends ZeeThread{
     }
 
     public static void equipBeltItem(String name) {
-        if(ZeeManagerItemClick.isItemEquipped(name))
+        if(ZeeManagerItemClick.isItemInHandSlot(name))
             return;
         WItem item = ZeeManagerItemClick.getBeltWItem(name);
         if (item!=null)
