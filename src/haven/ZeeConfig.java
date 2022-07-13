@@ -2538,7 +2538,8 @@ public class ZeeConfig {
                 // if stamina is decreasing
                 if (val - lastMeterStaminaValue < 0) {
                     if (val*100 <= ZeeConfig.drinkAutoValue) {
-                        println("start drinking " + val);
+                        //println("============");
+                       // println("drink " + val + "  pose: "+getPlayerPoses());
                         ZeeManagerItemClick.drinkFromBeltHandsInv();
                     }
                 }
