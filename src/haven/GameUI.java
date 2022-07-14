@@ -26,6 +26,7 @@
 
 package haven;
 
+import java.awt.image.BufferedImage;
 import java.util.*;
 import java.util.function.*;
 import java.awt.Color;
@@ -1670,11 +1671,12 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 	    return(true);
 	}
     }
-    
+
     {
 	String val = Utils.getpref("belttype", "n");
 	if(val.equals("n")) {
-	    beltwdg = add(new NKeyBelt());
+	    //beltwdg = add(new NKeyBelt());
+		beltwdg = add(new ZeeBelt());
 	} else if(val.equals("f")) {
 	    beltwdg = add(new FKeyBelt());
 	} else {
@@ -1754,5 +1756,87 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 		if (meters != null && midx < meters.size())
 			return meters.get(midx);
 		return null;
+	}
+
+	private static final BufferedImage zeeBeltBg = ZeeManagerIcons.imgRect(450, 37, ZeeConfig.intToColor(ZeeConfig.simpleWindowColorInt), ZeeConfig.simpleWindowBorder,0);
+
+	public class ZeeBelt extends Belt {
+		public int curbelt = 0;
+		final Coord pagoff = UI.scale(new Coord(1, 1));
+
+		public ZeeBelt() {
+			super(new Coord(zeeBeltBg.getWidth(), zeeBeltBg.getHeight()));
+			adda(new IButton("gfx/hud/hb-btn-chat", "", "-d", "-h") {
+				Tex glow;
+				{
+					this.tooltip = RichText.render("Chat ($col[255,255,0]{Ctrl+C})", 0);
+					glow = new TexI(PUtils.rasterimg(PUtils.blurmask(up.getRaster(), 2, 2, Color.WHITE)));
+				}
+
+				public void click() {
+					if(chat.targeth == 0) {
+						chat.sresize(chat.savedh);
+						setfocus(chat);
+					} else {
+						chat.sresize(0);
+					}
+					Utils.setprefb("chatvis", chat.targeth != 0);
+				}
+
+				public void draw(GOut g) {
+					super.draw(g);
+					Color urg = chat.urgcols[chat.urgency];
+					if(urg != null) {
+						GOut g2 = g.reclipl(new Coord(-2, -2), g.sz().add(4, 4));
+						g2.chcolor(urg.getRed(), urg.getGreen(), urg.getBlue(), 128);
+						g2.image(glow, Coord.z, UI.scale(glow.sz()));
+					}
+				}
+			}, sz, 1, 1);
+		}
+
+		private Coord beltc(int i) {
+			return(pagoff.add(UI.scale((36 * i) + (10 * (i / 5))), 0));
+		}
+
+		public int beltslot(Coord c) {
+			for(int i = 0; i < 10; i++) {
+				if(c.isect(beltc(i), invsq.sz()))
+					return(i + (curbelt * 12));
+			}
+			return(-1);
+		}
+
+		public void draw(GOut g) {
+			g.image(zeeBeltBg, Coord.z);
+			for(int i = 0; i < 10; i++) {
+				int slot = i + (curbelt * 12);
+				Coord c = beltc(i);
+				g.image(invsq, beltc(i));
+				try {
+					if(belt[slot] != null) {
+						belt[slot].spr().draw(g.reclip(c.add(UI.scale(1), UI.scale(1)), invsq.sz().sub(UI.scale(2), UI.scale(2))));
+					}
+				} catch(Loading e) {}
+				g.chcolor(156, 180, 158, 255);
+				FastText.aprintf(g, c.add(invsq.sz().sub(UI.scale(2), 0)), 1, 1, "%d", (i + 1) % 10);
+				g.chcolor();
+			}
+			super.draw(g);
+		}
+
+		public boolean globtype(char key, KeyEvent ev) {
+			int c = ev.getKeyCode();
+			if((c < KeyEvent.VK_0) || (c > KeyEvent.VK_9))
+				return(false);
+			int i = Utils.floormod(c - KeyEvent.VK_0 - 1, 10);
+			boolean M = (ev.getModifiersEx() & (KeyEvent.META_DOWN_MASK | KeyEvent.ALT_DOWN_MASK)) != 0;
+			if(M) {
+				curbelt = i;
+			} else {
+				keyact(i + (curbelt * 12));
+			}
+			return(true);
+		}
 	}
 }
