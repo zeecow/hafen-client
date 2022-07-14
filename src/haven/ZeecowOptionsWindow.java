@@ -147,7 +147,7 @@ public class ZeecowOptionsWindow extends JFrame {
             if (ZeeInvMainOptionsWdg.cbDrink!=null)
                 ZeeInvMainOptionsWdg.cbDrink.set(val);
         });
-        //mini trees size
+        //drink auto limit
         String[] perc = {"30%","40%","50%","60%","70%","80%"};
         pan.add(cmbDrinkAutoValue = new JComboBox<String>(perc), c);
         cmbDrinkAutoValue.setSelectedItem(ZeeConfig.drinkAutoValue+"%");

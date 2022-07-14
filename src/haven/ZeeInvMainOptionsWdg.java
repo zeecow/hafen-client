@@ -52,6 +52,7 @@ public class ZeeInvMainOptionsWdg extends Widget {
             }
 
             public void set(boolean val) {
+                Utils.setprefb("drinkAuto", val);
                 ZeeConfig.drinkAuto = val;
                 a = val;
             }
