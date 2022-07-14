@@ -23,7 +23,7 @@ public class ZeeManagerMiner extends ZeeThread{
             }
 
             // if tunnel mining, show Helper Window
-            if (tunnelCheckbox && !tunneling && isTunnel(ZeeConfig.savedTileSelOverlay.a.sz())){
+            if (tunnelCheckbox && !tunneling && isTunnel(ZeeConfig.lastSavedOverlay.a.sz())){
                 tunneling = true;
                 tunnelHelperShowWindow();
                 tunnelHelperButtonAct.disable(true);
@@ -432,7 +432,7 @@ public class ZeeManagerMiner extends ZeeThread{
             if (isCombatActive())
                 return;
             //println("chip boulder done");
-            ZeeConfig.gameUI.map.wdgmsg("sel", ZeeConfig.savedTileSelStartCoord, ZeeConfig.savedTileSelEndCoord, ZeeConfig.savedTileSelModflags);
+            ZeeConfig.gameUI.map.wdgmsg("sel", ZeeConfig.lastSavedOverlayStartCoord, ZeeConfig.lastSavedOverlayEndCoord, ZeeConfig.lastSavedOverlayModflags);
         }else{
             println("canceled chipping boulder?");
         }

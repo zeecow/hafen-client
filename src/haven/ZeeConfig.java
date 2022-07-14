@@ -80,6 +80,7 @@ public class ZeeConfig {
     public static final String POSE_PLAYER_THINK = "gfx/borka/thinkan";
     public static final String POSE_PLAYER_DRIVE_WHEELBARROW = "gfx/borka/carry"; //same as pickaxe
     public static final String POSE_PLAYER_CARRY_PICKAXE = "gfx/borka/carry"; //same as wheelbarrow
+    public static final String POSE_PLAYER_CARRY_SCYTHEARMS = "gfx/borka/scythearms";
 
     public static final String DEF_BUTCH_AUTO_LIST = "Break,Scale,Wring neck,Kill,Skin,Flay,Pluck,Clean,Butcher,Collect bones";
     public static final String DEF_AUTO_CLICK_MENU_LIST = "Pick,Harvest wax";
@@ -121,10 +122,10 @@ public class ZeeConfig {
     public static Coord2d lastMapViewClickMc;
     public static int lastMapViewClickButton;
     public static long lastMapViewClickMs;
-    public static Coord savedTileSelStartCoord, savedTileSelEndCoord;
-    public static int savedTileSelModflags;
-    public static long savedTileSelMs;
-    public static MCache.Overlay savedTileSelOverlay;
+    public static Coord lastSavedOverlayStartCoord, lastSavedOverlayEndCoord;
+    public static int lastSavedOverlayModflags;
+    public static long lastSavedOverlayMs;
+    public static MCache.Overlay lastSavedOverlay;
     public static String lastInvItemBaseName;
     public static long lastInvItemMs;
     public static Coord lastUiClickCoord;
@@ -1639,6 +1640,9 @@ public class ZeeConfig {
 
         if (ZeeManagerStockpile.busy && text.contains("That stockpile is already full."))
             ZeeManagerStockpile.exitManager("checkUiErr() > pile is full");
+
+        if (ZeeConfig.drinkAuto && text.contains(" tired "))
+            ZeeManagerItemClick.drinkFromBeltHandsInv();
     }
 
     public static String getCursorName() {
@@ -1765,27 +1769,20 @@ public class ZeeConfig {
     }
 
     public static void saveTileSelection(Coord sc, Coord ec, int modflags, MCache.Overlay ol) {
-        savedTileSelStartCoord = sc;
-        savedTileSelEndCoord = ec;
-        savedTileSelModflags = modflags;
-        savedTileSelOverlay = ol;
-        savedTileSelMs = System.currentTimeMillis();
+        lastSavedOverlayStartCoord = sc;
+        lastSavedOverlayEndCoord = ec;
+        lastSavedOverlayModflags = modflags;
+        lastSavedOverlay = ol;
+        lastSavedOverlayMs = System.currentTimeMillis();
     }
 
     public static void resetTileSelection(){
-        savedTileSelStartCoord = null;
-        savedTileSelEndCoord = null;
-        savedTileSelModflags = -1;
-        if(savedTileSelOverlay!=null)
-            savedTileSelOverlay.destroy();
-        savedTileSelMs = 0;
-    }
-
-    public static void expandTileSelectionBy(int numTiles) {
-        savedTileSelStartCoord.x += numTiles;
-        savedTileSelStartCoord.y += numTiles;
-        savedTileSelEndCoord.x -= numTiles;
-        savedTileSelEndCoord.y -= numTiles;
+        lastSavedOverlayStartCoord = null;
+        lastSavedOverlayEndCoord = null;
+        lastSavedOverlayModflags = -1;
+        if(lastSavedOverlay !=null)
+            lastSavedOverlay.destroy();
+        lastSavedOverlayMs = 0;
     }
 
     public static void printGobs(){
@@ -2537,7 +2534,9 @@ public class ZeeConfig {
         {
             if (meterStamina==null) {
                 meterStamina = layerMeter;
-                println("new meter stamina");
+                lastMeterStaminaValue = meterStamina.meters.get(0).a;
+                println("============");
+                println("new meter stamina "+lastMeterStaminaValue);
             } else {
                 double val = meterStamina.meters.get(0).a;
                 // if stamina is decreasing

@@ -268,7 +268,7 @@ public class ZeeManagerFarmer extends ZeeThread{
     private boolean plantSeeds() {
         ZeeConfig.addPlayerText("planting");
         if(updateSeedPileReference() && activateCursorPlantGItem(gItem)) {
-            ZeeConfig.gameUI.map.wdgmsg("sel", ZeeConfig.savedTileSelStartCoord, ZeeConfig.savedTileSelEndCoord, ZeeConfig.savedTileSelModflags);
+            ZeeConfig.gameUI.map.wdgmsg("sel", ZeeConfig.lastSavedOverlayStartCoord, ZeeConfig.lastSavedOverlayEndCoord, ZeeConfig.lastSavedOverlayModflags);
             return true;
         }else{
             println("could not plant seed (small seedpiles?)");
@@ -279,7 +279,7 @@ public class ZeeManagerFarmer extends ZeeThread{
     private boolean harvestPlants() {
         ZeeConfig.addPlayerText("harvesting");
         if(activateCursorHarvestGob()) {
-            ZeeConfig.gameUI.map.wdgmsg("sel", ZeeConfig.savedTileSelStartCoord, ZeeConfig.savedTileSelEndCoord, ZeeConfig.savedTileSelModflags);
+            ZeeConfig.gameUI.map.wdgmsg("sel", ZeeConfig.lastSavedOverlayStartCoord, ZeeConfig.lastSavedOverlayEndCoord, ZeeConfig.lastSavedOverlayModflags);
             return true;
         }else {
             //println("out of plants to harvest");
@@ -374,7 +374,7 @@ public class ZeeManagerFarmer extends ZeeThread{
         try {
             //move to area center before choosing barrel
             ZeeConfig.addPlayerText("centering");
-            ZeeConfig.clickTile(ZeeConfig.getAreaCenterTile(ZeeConfig.savedTileSelOverlay.a),1);
+            ZeeConfig.clickTile(ZeeConfig.getAreaCenterTile(ZeeConfig.lastSavedOverlay.a),1);
             waitPlayerIdleVelocity();//waitPlayerIdleFor(1);
             List<Gob> barrels = getAccessibleBarrels();
             if (barrels.size()==0) {

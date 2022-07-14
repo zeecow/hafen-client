@@ -769,10 +769,11 @@ public class ZeeManagerItemClick extends ZeeThread{
         }
         itemActCoord(wItem);
         if(waitFlowerMenu()){
+            //println("clickItemPetal > flower menu");
             choosePetal(getFlowerMenu(), petalName);
             return waitNoFlowerMenu();
         }else{
-            //println("clickItemPetal > no flower menu?");
+            //println("clickItemPetal > no flower menu");
             return false;
         }
     }
@@ -1190,13 +1191,21 @@ public class ZeeManagerItemClick extends ZeeThread{
         }
         new ZeeThread(){
             public void run() {
+                boolean resumeFarming = false;
                 try {
                     Inventory inv;
                     drinkThreadWorking = true;
 
+                    // stop farming before drinking
+/*                    if (now()-ZeeConfig.lastSavedOverlayMs <(1000*30)){
+                        ZeeConfig.stopMovingEscKey();
+                        resumeFarming = true;
+                        println("stop farming");
+                        sleep(500);
+                    }*/
+
                     // drink from belt
-                    inv = getInvBelt();
-                    if (inv!=null) {
+                    if ((inv = getInvBelt()) != null) {
                         WItem beltItems[] = inv.children(WItem.class).toArray(WItem[]::new);
                         for (int i = 0; i < beltItems.length; i++) {
                             String name = beltItems[i].item.getres().basename();
@@ -1213,13 +1222,10 @@ public class ZeeManagerItemClick extends ZeeThread{
                                 }
                             }
                         }
-                        if (!drinkThreadWorking)
-                            return;
                     }
 
                     // drink from inv
-                    inv = ZeeConfig.getMainInventory();
-                    if (inv!=null){
+                    else if ((inv = ZeeConfig.getMainInventory()) != null){
                         WItem invItems[] = inv.children(WItem.class).toArray(WItem[]::new);
                         for (int i = 0; i < invItems.length; i++) {
                             String name = invItems[i].item.getres().basename();
@@ -1236,25 +1242,35 @@ public class ZeeManagerItemClick extends ZeeThread{
                                 }
                             }
                         }
-                        if (!drinkThreadWorking)
-                            return;
                     }
 
                     // drink form hands (bucket?)
-                    WItem w = null;
-                    if(getLeftHandName().contains("bucket-water") || getLeftHandName().contains("bucket-tea"))
-                        w = getLeftHand();
-                    else if(getRightHandName().contains("bucket-water") || getRightHandName().contains("bucket-tea"))
-                        w = getRightHand();
-                    if (w!=null){
-                        //println("drink hands " + getItemContentsName(w));
-                        if(clickItemPetal(w, "Drink"))
-                            ZeeManagerItemClick.waitPlayerPoseNotInList(ZeeConfig.POSE_PLAYER_DRINK);
+                    else {
+                        WItem w = null;
+                        if (getLeftHandName().contains("bucket-water") || getLeftHandName().contains("bucket-tea"))
+                            w = getLeftHand();
+                        else if (getRightHandName().contains("bucket-water") || getRightHandName().contains("bucket-tea"))
+                            w = getRightHand();
+                        if (w != null) {
+                            //println("drink hands " + getItemContentsName(w));
+                            if (clickItemPetal(w, "Drink"))
+                                ZeeManagerItemClick.waitPlayerPoseNotInList(ZeeConfig.POSE_PLAYER_DRINK);
+                        }
                     }
 
                 }catch (Exception e){
                     e.printStackTrace();
                 }
+
+/*                if (resumeFarming){
+                    println("resume farming");
+                    if(ZeeManagerFarmer.activateCursorHarvestGob()) {
+                        ZeeConfig.gameUI.map.wdgmsg("sel", ZeeConfig.lastSavedOverlayStartCoord, ZeeConfig.lastSavedOverlayEndCoord, ZeeConfig.lastSavedOverlayModflags);
+                    }else {
+                        println("out of plants to harvest");
+                    }
+                }*/
+
                 drinkThreadWorking = false;
             }
         }.start();

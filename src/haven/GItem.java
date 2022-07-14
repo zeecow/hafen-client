@@ -189,7 +189,7 @@ public class GItem extends AWidget implements ItemInfo.SpriteOwner, GSprite.Owne
 			}
 			else if(basename.startsWith("seed-") && this.parent instanceof Inventory) {
 				//farmermode not busy
-				if (ZeeConfig.savedTileSelEndCoord == null) {
+				if (ZeeConfig.lastSavedOverlayEndCoord == null) {
 					//cancel farmermode
 					ZeeConfig.println("seedfarmer > no tile selection, reset initial state");
 					//ZeeConfig.farmerMode = false; //TODO test
