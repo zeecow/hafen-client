@@ -1765,8 +1765,24 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 		final Coord pagoff = UI.scale(new Coord(1, 1));
 
 		public ZeeBelt() {
+
 			super(new Coord(zeeBeltBg.getWidth(), zeeBeltBg.getHeight()));
-			adda(new IButton("gfx/hud/hb-btn-chat", "", "-d", "-h") {
+
+			add(new Button(20,"-"){
+				public void wdgmsg(String msg, Object... args) {
+					if (msg.contentEquals("activate"))
+						beltContract();
+				}
+			},zeeBeltBg.getWidth()-75,7);
+
+			add(new Button(20,"+"){
+				public void wdgmsg(String msg, Object... args) {
+					if (msg.contentEquals("activate"))
+						beltExpand();
+				}
+			},zeeBeltBg.getWidth()-50,7);
+
+			add(new IButton("gfx/hud/hb-btn-chat", "", "-d", "-h") {
 				Tex glow;
 				{
 					this.tooltip = RichText.render("Chat ($col[255,255,0]{Ctrl+C})", 0);
@@ -1792,7 +1808,15 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 						g2.image(glow, Coord.z, UI.scale(glow.sz()));
 					}
 				}
-			}, sz, 1, 1);
+			}, zeeBeltBg.getWidth()-25, 7);
+		}
+
+		private void beltContract() {
+			ZeeConfig.println("contract");
+		}
+
+		private void beltExpand() {
+			ZeeConfig.println("expand");
 		}
 
 		private Coord beltc(int i) {
