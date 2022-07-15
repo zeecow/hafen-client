@@ -149,7 +149,7 @@ public class ZeeManagerIcons {
         return ret;
     }
 
-    private static BufferedImage imgOval(int w, int h, Color c, boolean border, int shadow) {
+    public static BufferedImage imgOval(int w, int h, Color c, boolean border, int shadow) {
         int type = BufferedImage.TYPE_INT_ARGB;
         BufferedImage ret = new BufferedImage(w+shadow, h+shadow, type);
         Graphics2D g2d = ret.createGraphics();
@@ -174,7 +174,7 @@ public class ZeeManagerIcons {
         return ret;
     }
 
-    private static BufferedImage imgPolygon(int w, int h, int[] xPoints, int[] yPoints, int points, Color c, boolean border, int shadow) {
+    public static BufferedImage imgPolygon(int w, int h, int[] xPoints, int[] yPoints, int points, Color c, boolean border, int shadow) {
         int type = BufferedImage.TYPE_INT_ARGB;
         BufferedImage ret = new BufferedImage(w+shadow+1, h+shadow+1, type);
         Graphics2D g2d = ret.createGraphics();

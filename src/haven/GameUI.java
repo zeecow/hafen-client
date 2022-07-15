@@ -1758,30 +1758,34 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 		return null;
 	}
 
-	private static final BufferedImage zeeBeltBg = ZeeManagerIcons.imgRect(450, 37, ZeeConfig.intToColor(ZeeConfig.simpleWindowColorInt), ZeeConfig.simpleWindowBorder,0);
+
+	private static final BufferedImage zeeBeltBg = ZeeManagerIcons.imgPolygon(
+			450, 37, new int[] {0,375,375,450,450, 0}, // x points
+			new int[] {0,  0, 12, 12, 37,37}, // y points
+			6, ZeeConfig.intToColor(ZeeConfig.simpleWindowColorInt), ZeeConfig.simpleWindowBorder,0
+	);
 
 	public class ZeeBelt extends Belt {
+
 		public int curbelt = 0;
 		final Coord pagoff = UI.scale(new Coord(1, 1));
+		Label lblCurBelt;
 
 		public ZeeBelt() {
-
 			super(new Coord(zeeBeltBg.getWidth(), zeeBeltBg.getHeight()));
-
 			add(new Button(20,"-"){
 				public void wdgmsg(String msg, Object... args) {
 					if (msg.contentEquals("activate"))
 						beltContract();
 				}
-			},zeeBeltBg.getWidth()-75,7);
-
+			},zeeBeltBg.getWidth()-77,13);
+			add(lblCurBelt = new Label("0/9"),zeeBeltBg.getWidth()-58,18);
 			add(new Button(20,"+"){
 				public void wdgmsg(String msg, Object... args) {
 					if (msg.contentEquals("activate"))
 						beltExpand();
 				}
-			},zeeBeltBg.getWidth()-50,7);
-
+			},zeeBeltBg.getWidth()-43,13);
 			add(new IButton("gfx/hud/hb-btn-chat", "", "-d", "-h") {
 				Tex glow;
 				{
@@ -1808,25 +1812,38 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 						g2.image(glow, Coord.z, UI.scale(glow.sz()));
 					}
 				}
-			}, zeeBeltBg.getWidth()-25, 7);
+			}, zeeBeltBg.getWidth()-24, 13);
 		}
 
 		private void beltContract() {
-			ZeeConfig.println("contract");
+			if (curbelt > 0){
+				curbelt--;
+			}else{
+				curbelt = 9;//jumps from 0 to 9
+			}
+			lblCurBelt.settext(curbelt+"/9");
 		}
 
 		private void beltExpand() {
-			ZeeConfig.println("expand");
+			if (curbelt < 9){
+				curbelt++;
+			}else{
+				curbelt = 0;//jumps from 9 to 0
+			}
+			lblCurBelt.settext(curbelt+"/9");
 		}
 
 		private Coord beltc(int i) {
-			return(pagoff.add(UI.scale((36 * i) + (10 * (i / 5))), 0));
+			return pagoff.add(
+				UI.scale((36 * i) + (10 * (i / 5))),
+				0
+			);
 		}
 
 		public int beltslot(Coord c) {
 			for(int i = 0; i < 10; i++) {
-				if(c.isect(beltc(i), invsq.sz()))
-					return(i + (curbelt * 12));
+				if( c.isect( beltc(i), invsq.sz() ) )
+					return( i + (curbelt * 12) );
 			}
 			return(-1);
 		}
@@ -1836,10 +1853,13 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 			for(int i = 0; i < 10; i++) {
 				int slot = i + (curbelt * 12);
 				Coord c = beltc(i);
-				g.image(invsq, beltc(i));
+				g.image(invsq, beltc(i));//g.image(invsq, beltc(i).addy( -1 * (((numbelts-1)/2) * invsq.sz().y)) );
 				try {
 					if(belt[slot] != null) {
-						belt[slot].spr().draw(g.reclip(c.add(UI.scale(1), UI.scale(1)), invsq.sz().sub(UI.scale(2), UI.scale(2))));
+						belt[slot].spr().draw( g.reclip(
+							c.add( UI.scale(1), UI.scale(1) ),
+							invsq.sz().sub( UI.scale(2), UI.scale(2) )
+						) );
 					}
 				} catch(Loading e) {}
 				g.chcolor(156, 180, 158, 255);

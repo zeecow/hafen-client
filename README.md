@@ -100,3 +100,4 @@ other stuff:
  - Shift+c alternates cams ortho/free 
  - mini trees
  - hide smoke and some animations
+ - keybelt shortcuts navigation 
