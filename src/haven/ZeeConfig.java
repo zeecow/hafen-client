@@ -1676,24 +1676,20 @@ public class ZeeConfig {
 
     //reset state
     public static void resetCharSelected() {
-        resetBeltState();
         mainInv = null;
+        meterStamina = null;
+        lastMeterStaminaValue = 0;
+        ZeeManagerItemClick.invBelt = null;
         ZeeManagerItemClick.equipory = null;
-        ZeeConfig.meterStamina = null;
-        ZeeConfig.lastMeterStaminaValue = 0;
         ZeeManagerStockpile.windowManager = null;
         ZeeManagerMiner.tunnelHelperWindow = null;
-    }
-
-    private static void resetBeltState() {
-        ZeeManagerItemClick.invBelt = null;
     }
 
     public static void openBelt() {
         windowEquipment.getchild(Equipory.class).children(WItem.class).forEach(witem -> {
             if (witem.item.res.get().name.endsWith("belt")) {
                 witem.mousedown(Coord.z, 3);
-                resetBeltState();
+                ZeeManagerItemClick.invBelt = null;
             }
         });
     }
