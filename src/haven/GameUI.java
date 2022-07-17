@@ -68,6 +68,7 @@ public class GameUI extends ConsoleHost implements Console.Directory {
     private boolean afk = false;
     public BeltSlot[] belt = new BeltSlot[144];
     public Belt beltwdg;
+	public ZeeHistWdg zeeHistWdg;
     public final Map<Integer, String> polowners = new HashMap<Integer, String>();
     public Bufflist buffs;
 
@@ -989,6 +990,7 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 
     public void draw(GOut g) {
 	beltwdg.c = new Coord(chat.c.x, Math.min(chat.c.y - beltwdg.sz.y, sz.y - beltwdg.sz.y));
+	zeeHistWdg.c = beltwdg.c.add(beltwdg.sz.x+10,0);
 	super.draw(g);
 	int by = sz.y;
 	if(chat.visible())
@@ -1477,6 +1479,7 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 	if(prog != null)
 	    prog.move(sz.sub(prog.sz).mul(0.5, 0.35));
 	beltwdg.c = new Coord(blpw + UI.scale(10), sz.y - beltwdg.sz.y - UI.scale(5));
+	zeeHistWdg.c = beltwdg.c.add(10,0);
 	super.resize(sz);
     }
     
@@ -1673,15 +1676,16 @@ public class GameUI extends ConsoleHost implements Console.Directory {
     }
 
     {
-	String val = Utils.getpref("belttype", "n");
+	beltwdg = add(new ZeeBelt());
+	zeeHistWdg = add(new ZeeHistWdg());
+	/*String val = Utils.getpref("belttype", "n");
 	if(val.equals("n")) {
-	    //beltwdg = add(new NKeyBelt());
-		beltwdg = add(new ZeeBelt());
+	    beltwdg = add(new NKeyBelt());
 	} else if(val.equals("f")) {
 	    beltwdg = add(new FKeyBelt());
 	} else {
 	    beltwdg = add(new NKeyBelt());
-	}
+	}*/
     }
     
     private Map<String, Console.Command> cmdmap = new TreeMap<String, Console.Command>();
@@ -1773,17 +1777,17 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 
 		public ZeeBelt() {
 			super(new Coord(zeeBeltBg.getWidth(), zeeBeltBg.getHeight()));
-			add(new Button(20,"-"){
+			add(new Button(20,"<"){
 				public void wdgmsg(String msg, Object... args) {
 					if (msg.contentEquals("activate"))
-						beltContract();
+						beltPrev();
 				}
 			},zeeBeltBg.getWidth()-77,13);
 			add(lblCurBelt = new Label("0/9"),zeeBeltBg.getWidth()-58,18);
-			add(new Button(20,"+"){
+			add(new Button(20,">"){
 				public void wdgmsg(String msg, Object... args) {
 					if (msg.contentEquals("activate"))
-						beltExpand();
+						beltNext();
 				}
 			},zeeBeltBg.getWidth()-43,13);
 			add(new IButton("gfx/hud/hb-btn-chat", "", "-d", "-h") {
@@ -1815,7 +1819,7 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 			}, zeeBeltBg.getWidth()-24, 13);
 		}
 
-		private void beltContract() {
+		private void beltPrev() {
 			if (curbelt > 0){
 				curbelt--;
 			}else{
@@ -1824,7 +1828,7 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 			lblCurBelt.settext(curbelt+"/9");
 		}
 
-		private void beltExpand() {
+		private void beltNext() {
 			if (curbelt < 9){
 				curbelt++;
 			}else{

@@ -1683,6 +1683,7 @@ public class ZeeConfig {
         ZeeManagerItemClick.equipory = null;
         ZeeManagerStockpile.windowManager = null;
         ZeeManagerMiner.tunnelHelperWindow = null;
+        ZeeHistWdg.listHistButtons.clear();
     }
 
     public static void openBelt() {

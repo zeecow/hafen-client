@@ -120,6 +120,7 @@ public class MenuGrid extends Widget implements KeyBinding.Bindable {
 		    args = Utils.extend(args, iact.click.clickargs());
 	    }
 	    pag.scm.wdgmsg("act", args);
+		ZeeHistWdg.checkMenuHistory(this,args);
 	}
 
 	public String sortkey() {
