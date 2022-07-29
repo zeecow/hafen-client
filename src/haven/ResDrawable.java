@@ -26,11 +26,12 @@
 
 package haven;
 
+import java.util.*;
 import haven.render.*;
 
 public class ResDrawable extends Drawable {
     public final Indir<Resource> res;
-    public Sprite spr;
+    public final Sprite spr;
     MessageBuf sdt;
     // private double delay = 0; XXXRENDER
 
@@ -38,31 +39,7 @@ public class ResDrawable extends Drawable {
 	super(gob);
 	this.res = res;
 	this.sdt = new MessageBuf(sdt);
-	if(ZeeConfig.miniTrees)
-        init();
-	else
-        spr = Sprite.create(gob, res.get(), this.sdt.clone());
-    }
-
-    public void init() {
-        Resource res = this.res.get();
-
-        MessageBuf sdtCopy = this.sdt.clone();
-        if ( ZeeConfig.isTree(res.name) && !sdtCopy.eom()) {
-            byte[] args = new byte[2];
-            args[0] = (byte) sdtCopy.uint8();
-            int fscale = ZeeConfig.miniTreesSize;
-            /*if (!sdtCopy.eom()) {
-                fscale = sdtCopy.uint8();
-                if (fscale > 25)
-                    fscale = 25;
-
-            }*/
-            args[1] = (byte) fscale;
-            sdtCopy = new MessageBuf(args);
-        }
-
-        spr = Sprite.create(gob, res, sdtCopy);
+	spr = Sprite.create(gob, res.get(), this.sdt.clone());
     }
 
     public ResDrawable(Gob gob, Resource res) {
@@ -113,7 +90,7 @@ public class ResDrawable extends Drawable {
 	    } else if((d == null) || (d.res != res) || !d.sdt.equals(sdt)) {
 		g.setattr(new ResDrawable(g, res, sdt));
 	    }
-        if (ZeeConfig.highlightGrowingTrees || ZeeConfig.highlightCropsReady)
+        if (ZeeConfig.highlightCropsReady)
             ZeeConfig.applyGobSettingsHighlight(g, ZeeConfig.getHighlightDrawableColor(g));
 	}
     }

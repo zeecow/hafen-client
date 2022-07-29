@@ -15,7 +15,7 @@ public class ZeecowOptionsWindow extends JFrame {
     public GridBagConstraints c;
     public JTabbedPane tabbedPane, tabbedPaneGobs;
     public JPanel panelTabMisc, panelTabInterface, panelTabGobs, panelTabControls, panelTabMinimap, panelDetailsBottom, panelTabCateg, panelShapeIcons, panelShapeIconsSaveCancel;
-    public JCheckBox cbDropAltKeyOnly, cbShowKinNames, cbSimpleWindowBorder, cbSimpleButtons, cbSimpleWindows, cbFreeGobPlacement, cbScrollTransferItems, cbCtrlClickMinimapContent, cbShapeIcons, cbSlowMiniMap, cbHideFxAnimations, cbHideFxSmoke, cbAutoChipMinedBoulder, cbDropMinedStone, cbDropMinedOre, cbDropMinedSilverGold, cbDropMinedCurios, cbActionSearchGlobal, cbCompactEquipsWindow, cbBeltTogglesEquips, cbAutoRunLogin, cbAutohearth, cbHighlightCropsReady, cbHighlightGrowingTrees, cbMiniTrees, cbKeyUpDownAudioControl, cbAlertOnPlayers,  cbShowInventoryLogin, cbShowBeltLogin, cbKeyBeltShiftTab, cbDrinkKey, cbDrinkAuto, cbKeyCamSwitchShiftC, cbShowIconsZoomOut, cbRememberWindowsPos, cbSortActionsByUse, cbDebugWidgetMsgs, cbDebugCodeRes, cbMidclickEquipManager, cbShowEquipsLogin, cbNotifyBuddyOnline, cbZoomOrthoExtended, cbCattleRosterHeight, cbAutoToggleGridLines;
+    public JCheckBox cbDropAltKeyOnly, cbShowKinNames, cbSimpleWindowBorder, cbSimpleButtons, cbSimpleWindows, cbFreeGobPlacement, cbScrollTransferItems, cbCtrlClickMinimapContent, cbShapeIcons, cbSlowMiniMap, cbHideFxAnimations, cbHideFxSmoke, cbAutoChipMinedBoulder, cbDropMinedStone, cbDropMinedOre, cbDropMinedSilverGold, cbDropMinedCurios, cbActionSearchGlobal, cbCompactEquipsWindow, cbBeltTogglesEquips, cbAutoRunLogin, cbAutohearth, cbHighlightCropsReady, cbTreeAnimation, cbShowGrowingTreePercentage, cbMiniTrees, cbKeyUpDownAudioControl, cbAlertOnPlayers,  cbShowInventoryLogin, cbShowBeltLogin, cbKeyBeltShiftTab, cbDrinkKey, cbDrinkAuto, cbKeyCamSwitchShiftC, cbShowIconsZoomOut, cbRememberWindowsPos, cbSortActionsByUse, cbDebugWidgetMsgs, cbDebugCodeRes, cbMidclickEquipManager, cbShowEquipsLogin, cbNotifyBuddyOnline, cbZoomOrthoExtended, cbCattleRosterHeight, cbAutoToggleGridLines;
     public JTextField tfAutoClickMenu, tfAggroRadiusTiles, tfButchermode, tfGobName, tfAudioPath, tfCategName, tfAudioPathCateg;
     public JComboBox<String> cmbCattleRoster, cmbGobCategory, cmbMiniTreeSize, comboShapeIcons, cmbDrinkAutoValue;
     public JList<String> listGobsTemp, listGobsSaved, listGobsCategories;
@@ -382,12 +382,20 @@ public class ZeecowOptionsWindow extends JFrame {
             Utils.setprefb("highlightCropsReady",val);
         });
 
-        panelTabMisc.add(cbHighlightGrowingTrees = new JCheckBox("Highlight growing trees"), c);
-        cbHighlightGrowingTrees.setSelected(ZeeConfig.highlightGrowingTrees);
-        cbHighlightGrowingTrees.addActionListener(actionEvent -> {
+        panelTabMisc.add(cbShowGrowingTreePercentage = new JCheckBox("Show growing tree %"), c);
+        cbShowGrowingTreePercentage.setSelected(ZeeConfig.showGrowingTreePercentage);
+        cbShowGrowingTreePercentage.addActionListener(actionEvent -> {
             JCheckBox cb = (JCheckBox) actionEvent.getSource();
-            boolean val = ZeeConfig.highlightGrowingTrees = cb.isSelected();
-            Utils.setprefb("highlightGrowingTrees",val);
+            boolean val = ZeeConfig.showGrowingTreePercentage = cb.isSelected();
+            Utils.setprefb("showGrowingTreePercentage",val);
+        });
+
+        panelTabMisc.add(cbTreeAnimation = new JCheckBox("Show tree animation"), c);
+        cbTreeAnimation.setSelected(ZeeConfig.treeAnimation);
+        cbTreeAnimation.addActionListener(actionEvent -> {
+            JCheckBox cb = (JCheckBox) actionEvent.getSource();
+            boolean val = ZeeConfig.treeAnimation = cb.isSelected();
+            Utils.setprefb("treeAnimation",val);
         });
 
         pan = new JPanel(new FlowLayout(FlowLayout.LEFT));

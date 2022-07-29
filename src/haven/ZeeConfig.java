@@ -171,7 +171,8 @@ public class ZeeConfig {
     public static boolean hideFxSmoke = Utils.getprefb("hideFxSmoke", true);
     public static boolean hideFxAnimations = Utils.getprefb("hideFxAnimations", true);
     public static boolean highlightCropsReady = Utils.getprefb("highlightCropsReady", true);
-    public static boolean highlightGrowingTrees = Utils.getprefb("highlightGrowingTrees", true);
+    public static boolean showGrowingTreePercentage = Utils.getprefb("showGrowingTreePercentage", true);
+    public static boolean treeAnimation = Utils.getprefb("treeAnimation", false);
     public static boolean keyBeltShiftTab = Utils.getprefb("keyBeltShiftTab", true);
     public static boolean keyCamSwitchShiftC = Utils.getprefb("keyCamSwitchShiftC", true);
     public static boolean keyUpDownAudioControl = Utils.getprefb("keyUpDownAudioControl", true);
@@ -329,21 +330,8 @@ public class ZeeConfig {
 
         //System.out.printf("gobHighlightDrawable %s ", gobName);
 
-        //if it's a tree
-        if(highlightGrowingTrees && (isTree(gobName) || isBush(gobName))) {
-            //System.out.printf(" TREE/BUSH \n");
-            Message data = getDrawableData(gob);
-            if(data != null && !data.eom()) {
-                data.skip(1);
-                int growth = data.eom() ? -1 : data.uint8();
-                if(growth < 100 && growth >= 0) {
-                    return MIXCOLOR_LIGHTBLUE;
-                }
-            }
-        }
-
         //if it's a crop
-        else if(highlightCropsReady && isGobCrop(gobName)) {
+        if(highlightCropsReady && isGobCrop(gobName)) {
             //System.out.printf(" CROP \n");
             if (isCropMaxStage(gob))
                 return MIXCOLOR_LIGHTBLUE;
