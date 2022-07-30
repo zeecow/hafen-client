@@ -411,17 +411,17 @@ public class MCache implements MapSource {
 	}
 	
 	public void tick(double dt) {
-	    for(Flavobjs fol : fo) {
+/*	    for(Flavobjs fol : fo) {
 		if(fol != null)
 		    fol.tick(dt);
-	    }
+	    }*/
 	}
 	
 	public void gtick(Render g) {
-	    for(Flavobjs fol : fo) {
+/*	    for(Flavobjs fol : fo) {
 		if(fol != null)
 		    fol.gtick(g);
-	    }
+	    }*/
 	}
 	
 	private void invalidate() {
