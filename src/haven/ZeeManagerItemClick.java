@@ -45,7 +45,7 @@ public class ZeeManagerItemClick extends ZeeThread{
             //error caused by midClicking again before task ending
             cancelManager = true;
         }
-        //println(itemName +"  "+ getWItemCoord(wItem)+"  "+ZeeConfig.getCursorName());
+        println(itemName +"  "+ getWItemCoord(wItem)+"  "+ZeeConfig.getCursorName());
     }
 
     @Override
@@ -73,29 +73,25 @@ public class ZeeManagerItemClick extends ZeeThread{
                 return;
             }
 
-            // sort-transfer
-            if(!isItemWindowBelt() && !isItemWindowEquips()){
-                if(isTransferWindowOpened()) { //avoid belt transfer?
-                    //long click
-                    if(isLongClick())
-                        wItem.wdgmsg("transfer-sort", wItem.item, true); // sort transfer asc
-                    //short click
-                    else  if(ZeeConfig.windowShortMidclickTransferMode.contentEquals("one"))
-                        wItem.item.wdgmsg("transfer", Coord.z);// transfer single item
-                    else if(ZeeConfig.windowShortMidclickTransferMode.contentEquals("asc"))
-                        wItem.wdgmsg("transfer-sort", wItem.item, true);// sort transfer asc
-                    else
-                        wItem.wdgmsg("transfer-sort", wItem.item, false);// sort transfer des
-                    return;
-                }else {
-                    //no transfer window open
-                    if(isItemWindowName("Inventory") && isItemPlantable())
-                    {
-                        //activate farming area cursor
-                        itemActCoord(wItem,UI.MOD_SHIFT);
-                    }
-                }
+            // if not hand item, do sort-transfer
+            if(!isItemHandEquipable()){
+                if(isLongClick())
+                    wItem.wdgmsg("transfer-sort", wItem.item, true); // sort transfer asc
+                //short click
+                else  if(ZeeConfig.windowShortMidclickTransferMode.contentEquals("one"))
+                    wItem.item.wdgmsg("transfer", Coord.z);// transfer single item
+                else if(ZeeConfig.windowShortMidclickTransferMode.contentEquals("asc"))
+                    wItem.wdgmsg("transfer-sort", wItem.item, true);// sort transfer asc
+                else
+                    wItem.wdgmsg("transfer-sort", wItem.item, false);// sort transfer des
+                return;
             }
+            else  if(isItemWindowName("Inventory") && isItemPlantable())
+            {
+                //activate farming area cursor
+                itemActCoord(wItem,UI.MOD_SHIFT);
+            }
+
 
             //check for windows belt/equips ?
             if(ZeeConfig.getWindow("Belt")==null){
@@ -983,6 +979,27 @@ public class ZeeManagerItemClick extends ZeeThread{
                 +"seed-wheat,seed-barley,beetroot,yellowonion,redonion,peapod";
         name = name.replace("gfx/invobjs/","");
         return list.contains(name);
+    }
+
+    public boolean isItemHandEquipable() {
+        String[] items = {
+            // weapons tools
+            "b12axe","boarspear","cutblade","fyrdsword","hirdsword","bronzesword","sling",
+            "sledgehammer","huntersbow","rangersbow","roundshield",
+            "axe-m","woodsmansaxe","stoneaxe","butcherscleaver",
+            // tools equips
+            "bonesaw","saw-m","scythe","pickaxe","shovel","smithshammer","shears",
+            "travellerssack","bindle","bushpole","primrod","glassrod","dowsingrod",
+            "fryingpan","lantern","torch","mortarandpestle","bucket","volvawand",
+            // instruments
+            "flute","harmonica","bagpipe","drum"
+        };
+        for (int i = 0; i < items.length; i++) {
+            if (itemName.contains(items[i])){
+                return true;
+            }
+        }
+        return false;
     }
 
     private boolean isTwoHandedItem() {
