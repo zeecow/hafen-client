@@ -75,7 +75,7 @@ public class ZeeManagerItemClick extends ZeeThread{
 
             // sort-transfer
             if(!isItemWindowBelt() && !isItemWindowEquips()){
-                if(transferWindowOpen()) { //avoid belt transfer?
+                if(isTransferWindowOpened()) { //avoid belt transfer?
                     //long click
                     if(isLongClick())
                         wItem.wdgmsg("transfer-sort", wItem.item, true); // sort transfer asc
@@ -89,8 +89,7 @@ public class ZeeManagerItemClick extends ZeeThread{
                     return;
                 }else {
                     //no transfer window open
-                    //if(isItemWindowName("Inventory") && isItemPlantable()){
-                    if(wItem.getparent(Window.class).cap.text.contains("Inventory") && isItemPlantable(wItem.item.getres().name))
+                    if(isItemWindowName("Inventory") && isItemPlantable())
                     {
                         //activate farming area cursor
                         itemActCoord(wItem,UI.MOD_SHIFT);
@@ -625,7 +624,7 @@ public class ZeeManagerItemClick extends ZeeThread{
         if (ZeeConfig.isFish(itemName)) {
             if (inv.countItemsByName("/fish-") > 1){
                 opts.add(ZeeFlowerMenu.STRPETAL_AUTO_BUTCH_ALL);
-                if (transferWindowOpen()) {
+                if (isTransferWindowOpened()) {
                     opts.add(ZeeFlowerMenu.STRPETAL_TRANSFER_ASC);
                     opts.add(ZeeFlowerMenu.STRPETAL_TRANSFER_DESC);
                 }
@@ -640,7 +639,7 @@ public class ZeeManagerItemClick extends ZeeThread{
             if (inv.countItemsByName(itemName) > 1){
                 opts.add(ZeeFlowerMenu.STRPETAL_AUTO_BUTCH_ALL);
             }
-            if (transferWindowOpen()) {
+            if (isTransferWindowOpened()) {
                 opts.add(ZeeFlowerMenu.STRPETAL_TRANSFER_ASC);
                 opts.add(ZeeFlowerMenu.STRPETAL_TRANSFER_DESC);
             }
@@ -648,7 +647,7 @@ public class ZeeManagerItemClick extends ZeeThread{
         }
         else if(itemName.endsWith("silkcocoon") || itemName.endsWith("chrysalis")){
             opts.add(ZeeFlowerMenu.STRPETAL_KILLALL);
-            if (transferWindowOpen()) {
+            if (isTransferWindowOpened()) {
                 opts.add(ZeeFlowerMenu.STRPETAL_TRANSFER_ASC);
                 opts.add(ZeeFlowerMenu.STRPETAL_TRANSFER_DESC);
             }
@@ -735,7 +734,7 @@ public class ZeeManagerItemClick extends ZeeThread{
         return clickDiffMs > LONG_CLICK_MS;
     }
 
-    private boolean transferWindowOpen() {
+    private boolean isTransferWindowOpened() {
         String windowsNames = getWindowsNames();
         String[] containers = (
             "Knarr,Snekkja,Wagon,Cupboard,Chest,Table,Crate,Saddlebags,Basket,Box,"
@@ -746,8 +745,10 @@ public class ZeeManagerItemClick extends ZeeThread{
             +"Steelbox,Metal Cabinet,Tidepool,Quiver"
         ).split(",");
         for (String contName: containers) {
-            if (windowsNames.contains(contName))
+            if (windowsNames.contains(contName)) {
+                println("debug > transferWindowOpen() > "+contName);
                 return true;
+            }
         }
         return false;
     }
