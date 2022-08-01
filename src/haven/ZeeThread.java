@@ -41,12 +41,12 @@ public class ZeeThread  extends Thread{
     }
 
     public static boolean waitHoldingItemChanged() {
-        //println("waitHoldingItemChanged");
         long max = TIMEOUT_MS;
         if(ZeeConfig.gameUI.vhand==null) {
-            println("waitHoldingItemChanged vhand null");
+            //println("waitHoldingItemChanged > vhand null");
             return false;
         }
+        //println("waitHoldingItemChanged > "+ZeeConfig.gameUI.vhand.item.wdgid());
         int itemId = ZeeConfig.gameUI.vhand.item.wdgid();
         try {
             while(max>0  &&  ZeeConfig.gameUI.vhand!=null  &&  itemId == ZeeConfig.gameUI.vhand.item.wdgid()) {
@@ -91,6 +91,7 @@ public class ZeeThread  extends Thread{
     public static boolean waitHoldingItem() {
         long max = TIMEOUT_MS;
         try{
+            //sleep(PING_MS*3); //item switch requires extra waiting
             while(max>0 && ZeeConfig.gameUI.vhand==null) {
                 max -= SLEEP_MS;
                 Thread.sleep(SLEEP_MS);

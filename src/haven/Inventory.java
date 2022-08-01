@@ -244,21 +244,81 @@ public class Inventory extends Widget implements DTarget {
 		}
 		return feespace;
 	}
+
 	public static int getNumberOfFreeSlots(Inventory inv) {
 		return inv.getNumberOfFreeSlots();
 	}
 
+
+	//returns topleft from free slot area (w,h)
+	public Coord getFreeSlotAreaSized(int w, int h) {
+		// inv size is inverted? x=cols, y=rows
+		int[][] inv = new int[isz.y][isz.x];
+		//init array with 0s
+		for (int i = 0; i < isz.y; i++) {
+			for (int j = 0; j < isz.x; j++) {
+				inv[i][j] = 0;// free slot
+			}
+		}
+		//printMatrix(inv);
+		//set occupied slots to 1
+		int itcont = 0;
+		for (Widget wdg = child; wdg != null; wdg = wdg.next) {
+			if (wdg instanceof WItem) {
+				WItem item = (WItem) wdg;
+				itcont++;
+				Coord div = item.c.div(sqsz);
+				Coord itsz = item.sz.div(sqsz);
+				//TODO update getFreeSlots
+				for (int i = 0; i < itsz.y; i++) {
+					for (int j = 0; j < itsz.x; j++) {
+						if( div.y + i < isz.y  &&  div.x + j < isz.x )
+							inv[div.y+i][div.x+j] = itcont;
+					}
+				}
+			}
+		}
+		//printMatrix(inv);
+		//search free area sized (w,h)
+		boolean blocked;
+		for (int i = 0; i < (isz.y-(w-1)); i++) {
+			for (int j = 0; j < (isz.x-(h-1)); j++) {
+				blocked = false;
+				for (int iw = 0; iw < w && !blocked; iw++) {
+					for (int jh = 0; jh < h && !blocked; jh++) {
+						if ( inv[i + iw][j + jh] != 0)
+							blocked = true;
+					}
+				}
+				if (!blocked) {
+					Coord ret = new Coord(j,i);
+					//ZeeConfig.println("free slots topleft "+ret+"   itsz "+w+","+h);
+					return ret;
+				}
+			}
+		}
+		return null;
+	}
+
+	private void printMatrix(int[][] matrix) {
+		System.out.println("printMatrix "+matrix.length+" x "+matrix[0].length + " , isz "+isz );
+		for (int i = 0; i < matrix.length; i++) {
+			for (int j = 0; j < matrix[i].length; j++) {
+				System.out.print(matrix[i][j] + " ");
+			}
+			System.out.println();
+		}
+	}
+
 	public List<Coord> getFreeSlots() {
 		List<Coord> coords = new ArrayList<>();
-
-		//init array with 0s
 		int[][] inv = new int[isz.x][isz.y];
+		//init array with 0s
 		for (int i = 0; i < isz.x; i++) {
 			for (int j = 0; j < isz.y; j++) {
 				inv[i][j] = 0;// free slot
 			}
 		}
-
 		//set occupied slots to 1
 		for (Widget wdg = child; wdg != null; wdg = wdg.next) {
 			if (wdg instanceof WItem) {
@@ -267,7 +327,6 @@ public class Inventory extends Widget implements DTarget {
 				inv[div.x][div.y] = 1;
 			}
 		}
-
 		//collect empty coords for return list
 		for (int i = 0; i < isz.x; i++) {
 			for (int j = 0; j < isz.y; j++) {
@@ -275,7 +334,6 @@ public class Inventory extends Widget implements DTarget {
 					coords.add(new Coord(i,j));
 			}
 		}
-
 		return coords;
 	}
 
