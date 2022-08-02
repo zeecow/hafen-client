@@ -278,7 +278,7 @@ public class Inventory extends Widget implements DTarget {
 				}
 			}
 		}
-		printMatrix(inv);
+		//printMatrix(inv);
 		//search free area sized (w,h)
 		boolean blocked;
 		for (int i = 0; i < (isz.y-(h-1)); i++) {

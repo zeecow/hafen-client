@@ -207,6 +207,10 @@ public class ZeeManagerItemClick extends ZeeThread{
                     equipRightOccupiedHand(); // switch right hand axe
                 }else if (isLeftHandEmpty() || isRightHandEmpty()) {
                     equipEmptyHand();
+                }else if (getLeftHandName().contains("/bucket")){
+                    equipRightOccupiedHand();
+                }else if (getRightHandName().contains("/bucket")){
+                    equipLeftOccupiedHand();
                 }else {
                     equipLeftOccupiedHand();//all hands occupied, equip left
                 }
@@ -222,6 +226,14 @@ public class ZeeManagerItemClick extends ZeeThread{
                     else { // 2 hands occupied
                         if(isTwoHandedItem(getLeftHandName())) {
                             //switch 1handed for 2handed
+                            pickUpItem();
+                            equipLeftOccupiedHand();
+                            dropHoldingItemToBeltOrInv();
+                        }else if (leftHandItemName.contains("bucket")){
+                            pickUpItem();
+                            equipRightOccupiedHand();
+                            dropHoldingItemToBeltOrInv();
+                        }else if (rightHandItemName.contains("bucket")){
                             pickUpItem();
                             equipLeftOccupiedHand();
                             dropHoldingItemToBeltOrInv();
@@ -247,7 +259,8 @@ public class ZeeManagerItemClick extends ZeeThread{
                                 dropHoldingItemToBeltOrInv();
                             }else//2 shields?
                                 println("2 shields equipped? let user decide...");
-                        }else if(!isItemSack(leftHandItemName)) {
+                        }
+                        else if(!isItemSack(leftHandItemName)) {
                             //switch 1handed item for left hand
                             pickUpItem();
                             equipLeftOccupiedHand();
