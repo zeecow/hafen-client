@@ -141,7 +141,7 @@ public class ZeeManagerItemClick extends ZeeThread{
                     pickUpItem();
                     if(ZeeConfig.isPlayerHoldingItem()){ //unequip sack was successfull
                         if(!dropHoldingItemToBeltOrInv())
-                            println("belt full?");
+                            println("drop inv full?");
                     }
                 }
 
@@ -842,7 +842,8 @@ public class ZeeManagerItemClick extends ZeeThread{
         if(!ZeeConfig.isPlayerHoldingItem() || inv==null)
             return false;
         try{
-            if (inv.getparent(Window.class).cap.text.contentEquals("Belt")){
+            String windowTitle = inv.getparent(Window.class).cap.text;
+            if (windowTitle.contentEquals("Belt")){
                 List<Coord> freeSlots = inv.getFreeSlots();
                 if (freeSlots.size()==0)
                     return false;//inv full
@@ -850,16 +851,21 @@ public class ZeeManagerItemClick extends ZeeThread{
                 inv.wdgmsg("drop", c);
                 return waitNotHoldingItem();
             }
-            else{
+            else if(windowTitle.contentEquals("Inventory")){
                 //no belt, drop to inv area
                 WItem holdingItem = getHoldingItem();
                 Coord itemSize = holdingItem.sz.div(Inventory.sqsz);
                 Coord topLeftSlot = inv.getFreeSlotAreaSized(itemSize.x,itemSize.y);
                 if (topLeftSlot==null) {
+                    println("dropHoldingItemToInv > topLeftSlot null");
                     return false;
                 }
                 inv.wdgmsg("drop", topLeftSlot);
-                return waitHoldingItemChanged();//waitNotHoldingItem();
+                sleep(PING_MS*4);
+                return !ZeeConfig.isPlayerHoldingItem();//waitHoldingItemChanged();//waitNotHoldingItem();
+            }
+            else {
+                ZeeConfig.println("dropHoldingItemToInv > "+windowTitle);
             }
         }catch (Exception e){
             e.printStackTrace();

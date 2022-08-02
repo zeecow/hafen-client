@@ -278,21 +278,29 @@ public class Inventory extends Widget implements DTarget {
 				}
 			}
 		}
-		//printMatrix(inv);
+		printMatrix(inv);
 		//search free area sized (w,h)
 		boolean blocked;
-		for (int i = 0; i < (isz.y-(w-1)); i++) {
-			for (int j = 0; j < (isz.x-(h-1)); j++) {
+		for (int i = 0; i < (isz.y-(h-1)); i++) {
+			for (int j = 0; j < (isz.x-(w-1)); j++) {
+				// occupied slot
+				if (inv[i][j] != 0)
+					continue;
+				// check if free slots fit item size
 				blocked = false;
-				for (int iw = 0; iw < w && !blocked; iw++) {
-					for (int jh = 0; jh < h && !blocked; jh++) {
-						if ( inv[i + iw][j + jh] != 0)
+				for (int iw = 0; iw < w; iw++) {
+					for (int jh = 0; jh < h; jh++) {
+						if(inv[i + iw][j + jh] != 0) {
 							blocked = true;
+							break;
+						}
 					}
+					if (blocked)
+						break;
 				}
 				if (!blocked) {
 					Coord ret = new Coord(j,i);
-					//ZeeConfig.println("free slots topleft "+ret+"   itsz "+w+","+h);
+					ZeeConfig.println("free slots topleft "+ret+"   itsz "+w+","+h);
 					return ret;
 				}
 			}
