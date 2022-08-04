@@ -74,7 +74,7 @@ public class ZeeManagerItemClick extends ZeeThread{
             }
 
             // if not hand item, do sort-transfer
-            if( !isItemHandEquipable() && isTransferWindowOpened()){
+            if( isTransferWindowOpened()){
                 if(isLongClick())
                     wItem.wdgmsg("transfer-sort", wItem.item, true); // sort transfer asc
                 //short click
@@ -86,14 +86,14 @@ public class ZeeManagerItemClick extends ZeeThread{
                     wItem.wdgmsg("transfer-sort", wItem.item, false);// sort transfer des
                 return;
             }
-            else  if(isItemWindowName("Inventory") && isItemPlantable())
+            else if(isItemWindowName("Inventory") && isItemPlantable())
             {
                 //activate farming area cursor
                 itemActCoord(wItem,UI.MOD_SHIFT);
                 return;
             }
-            else if (!isItemHandEquipable()) {
-                //println("do nothing");
+            else if (isItemHandEquipable() && !isItemWindowName("Inventory") && !isItemWindowName("Belt")) {
+                println("itemManager > only Belt and Inventory allowed");
                 return;
             }
 
@@ -167,8 +167,9 @@ public class ZeeManagerItemClick extends ZeeThread{
                     }else if(!isLeftHandEmpty() && !isRightHandEmpty()){
                         // switch 2handed item for 2 separate items
                         // (if belt is null, main inv is used)
-                        if (ZeeManagerItemClick.getInvBelt()==null || ZeeManagerItemClick.getInvBelt().getNumberOfFreeSlots() > 0) {
+                        if (ZeeConfig.getWindow("Belt")==null || ZeeManagerItemClick.getInvBelt().getNumberOfFreeSlots() > 0) {
                             unequipLeftItem();//unequip 1st item
+                            sleep(PING_MS*4);
                             if(dropHoldingItemToBeltOrInv()){
                                 pickUpItem();
                                 equipRightOccupiedHand();//switch for 2nd item
@@ -870,7 +871,7 @@ public class ZeeManagerItemClick extends ZeeThread{
                 Coord itemSize = holdingItem.sz.div(Inventory.sqsz);
                 Coord topLeftSlot = inv.getFreeSlotAreaSized(itemSize.x,itemSize.y);
                 if (topLeftSlot==null) {
-                    println("dropHoldingItemToInv > topLeftSlot null");
+                    //println("dropHoldingItemToInv > topLeftSlot null");
                     return false;
                 }
                 inv.wdgmsg("drop", topLeftSlot);

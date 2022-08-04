@@ -100,7 +100,7 @@ public class ZeeConfig {
     public static MixColor MIXCOLOR_LIGHTBLUE = new MixColor(0, 255, 255, 200);
 
     public static GameUI gameUI;
-    public static Window windowEquipment,windowInvMain;
+    public static Window windowEquipment,windowInvMain, toggleEquipsLastWindowClicked;
     public static Makewindow makeWindow;
     public static ZeeInvMainOptionsWdg invMainoptionsWdg;
     public static ZeecowOptionsWindow zeecowOptions;
@@ -139,7 +139,8 @@ public class ZeeConfig {
     public static boolean autoClickMenuOption = Utils.getprefb("autoClickMenuOption", true);
     public static String autoClickMenuOptionList = Utils.getpref("autoClickMenuOptionList", DEF_AUTO_CLICK_MENU_LIST);
     public static boolean autoHearthOnStranger = Utils.getprefb("autoHearthOnStranger", true);
-    public static boolean autoOpenEquips = Utils.getprefb("beltToggleEquips", true);
+    public static boolean autoToggleEquips = Utils.getprefb("autoToggleEquips", true);
+    public static boolean autoToggleEquipsReposition = Utils.getprefb("autoToggleEquipsReposition", true);
     public static boolean autoOpenBelt = Utils.getprefb("autoOpenBelt", true);
     public static boolean autoRunLogin = Utils.getprefb("autoRunLogin", true);
     public static boolean autoToggleGridLines = Utils.getprefb("autoToggleGridLines", true);
@@ -715,8 +716,9 @@ public class ZeeConfig {
     }
 
 
+    static Coord autoToggleEquipsBackupCoord;
     public static void checkAutoOpenEquips(boolean done) {
-        if(!ZeeConfig.autoOpenEquips)
+        if(!ZeeConfig.autoToggleEquips)
             return;
 
         if(!windowEquipment.visible) {
@@ -724,13 +726,30 @@ public class ZeeConfig {
             if((gameUI != null) && (gameUI.vhand != null)) {
                 try {
                     Equipory.SlotInfo si = ItemInfo.find(Equipory.SlotInfo.class, gameUI.vhand.item.info());
-                    if(si != null)
+                    if(si != null) {
                         windowEquipment.show();
+                        if (autoToggleEquipsReposition && toggleEquipsLastWindowClicked !=null) {
+                            int x,y;
+                            if (toggleEquipsLastWindowClicked.c.x > gameUI.sz.x/2)
+                                x = toggleEquipsLastWindowClicked.c.x - windowEquipment.sz.x;
+                            else
+                                x = toggleEquipsLastWindowClicked.c.x + toggleEquipsLastWindowClicked.sz.x;
+                            y = toggleEquipsLastWindowClicked.c.y;
+                            autoToggleEquipsBackupCoord = Coord.of(windowEquipment.c);
+                            windowEquipment.c = new Coord(x,y);
+                            if (windowEquipment.c.y + windowEquipment.sz.y >= gameUI.sz.y) {
+                                y = gameUI.sz.y - windowEquipment.sz.y;
+                                windowEquipment.c = new Coord(x,y);
+                            }
+                        }
+                    }
                 } catch(Loading l) {
                 }
             }
         }else if(done){
             windowEquipment.hide();
+            if (autoToggleEquipsReposition && autoToggleEquipsBackupCoord!=null)
+                windowEquipment.c = autoToggleEquipsBackupCoord;
         }
     }
 
@@ -1243,7 +1262,7 @@ public class ZeeConfig {
     }
 
     public static void windowChangedPos(Window window) {
-        if(!ZeeConfig.rememberWindowsPos || window==null)
+        if(!rememberWindowsPos || window==null || autoToggleEquipsReposition)
             return;
         String name = ((Window)window).cap.text;
         if(name==null || name.isEmpty() || window instanceof MapWnd)
@@ -1252,6 +1271,7 @@ public class ZeeConfig {
             name = MAKE_WINDOW_NAME;
         mapWindowPos.put(name, new Coord(window.c));
         Utils.setpref(MAP_WND_POS, serialize(mapWindowPos));
+        ZeeConfig.println("autoToggleEquipsReposition "+autoToggleEquipsReposition);
     }
 
     public static boolean isMakewindow(Window window) {

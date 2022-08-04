@@ -272,25 +272,28 @@ public class Inventory extends Widget implements DTarget {
 				//TODO update getFreeSlots
 				for (int i = 0; i < itsz.y; i++) {
 					for (int j = 0; j < itsz.x; j++) {
-						if( div.y + i < isz.y  &&  div.x + j < isz.x )
+						if( div.x + j < isz.x  &&  div.y + i < isz.y )
 							inv[div.y+i][div.x+j] = itcont;
 					}
 				}
 			}
 		}
-		//printMatrix(inv);
+		ZeeConfig.println("=======");
+		ZeeConfig.println("itemsz("+w+","+h+")  "+((ZeeConfig.gameUI!=null&&ZeeConfig.gameUI.vhand!=null&&ZeeConfig.gameUI.vhand.item!=null)?ZeeManagerItemClick.getHoldingItem().item.getres().basename():""));
+		printMatrix(inv);
 		//search free area sized (w,h)
 		boolean blocked;
-		for (int i = 0; i < (isz.y-(h-1)); i++) {
-			for (int j = 0; j < (isz.x-(w-1)); j++) {
+		for (int i = 0; i < (inv.length); i++) {
+			for (int j = 0; j < (inv[0].length); j++) {
 				// occupied slot
 				if (inv[i][j] != 0)
 					continue;
+				//ZeeConfig.println(i+","+j);
 				// check if free slots fit item size
 				blocked = false;
-				for (int iw = 0; iw < w; iw++) {
-					for (int jh = 0; jh < h; jh++) {
-						if(inv[i + iw][j + jh] != 0) {
+				for (int iw = 0; iw < w-1; iw++) {
+					for (int jh = 0; jh < h-1; jh++) {
+						if( i+iw >= inv.length || j+jh >= inv[0].length || inv[i + iw][j + jh] != 0) {
 							blocked = true;
 							break;
 						}
@@ -300,11 +303,12 @@ public class Inventory extends Widget implements DTarget {
 				}
 				if (!blocked) {
 					Coord ret = new Coord(j,i);
-					ZeeConfig.println("free slots topleft "+ret+"   itsz "+w+","+h);
+					ZeeConfig.println("free slots topleft "+ret+"  itemsz("+w+","+h+")");
 					return ret;
 				}
 			}
 		}
+		ZeeConfig.println("no free slots for itemsz("+w+","+h+")");
 		return null;
 	}
 

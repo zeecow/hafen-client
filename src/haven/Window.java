@@ -310,6 +310,8 @@ public class Window extends Widget implements DTarget {
 	} else {
 	    super.mouseup(c, button);
 	}
+	if(!cap.text.contentEquals("Equipment"))
+		ZeeConfig.toggleEquipsLastWindowClicked = this;
 	return(true);
     }
 
