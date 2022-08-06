@@ -99,12 +99,12 @@ public class ZeeManagerItemClick extends ZeeThread{
 
 
             //check for windows belt/equips ?
-            /*if(ZeeConfig.getWindow("Belt")==null){
-                ZeeConfig.gameUI.msg("no belt window");
+            if(ZeeConfig.getWindow("Belt")==null){
+                ZeeConfig.gameUI.error("no belt window");
                 return;
-            }*/
+            }
             if(ZeeConfig.getWindow("Equipment")==null){
-                ZeeConfig.gameUI.msg("no equips window");
+                ZeeConfig.gameUI.error("no equips window");
                 return;
             }
 
@@ -129,11 +129,11 @@ public class ZeeManagerItemClick extends ZeeThread{
                         equipRightOccupiedHand();
                         dropHoldingItemToBeltOrInv();
                     }else { //both hands are sacks?
-                        ZeeConfig.gameUI.msg("both hand sacks");
+                        ZeeConfig.gameUI.error("both hand sacks");
                     }
 
                     if(ZeeConfig.isPlayerHoldingItem()) {//equip was a switch or failed
-                        ZeeConfig.gameUI.msg("couldn't switch sack");
+                        ZeeConfig.gameUI.error("couldn't switch sack");
                         dropHoldingItemToBeltOrInv();
                     }
                 }
@@ -165,11 +165,9 @@ public class ZeeManagerItemClick extends ZeeThread{
                             equipLeftEmptyHand();
                         dropHoldingItemToBeltOrInv();
                     }else if(!isLeftHandEmpty() && !isRightHandEmpty()){
-                        // switch 2handed item for 2 separate items
-                        // (if belt is null, main inv is used)
-                        if (ZeeConfig.getWindow("Belt")==null || ZeeManagerItemClick.getInvBelt().getNumberOfFreeSlots() > 0) {
+                        //switch 2handed item for 2 separate items
+                        if (ZeeManagerItemClick.getInvBelt().getNumberOfFreeSlots() > 0) {
                             unequipLeftItem();//unequip 1st item
-                            sleep(PING_MS*4);
                             if(dropHoldingItemToBeltOrInv()){
                                 pickUpItem();
                                 equipRightOccupiedHand();//switch for 2nd item
@@ -287,7 +285,7 @@ public class ZeeManagerItemClick extends ZeeThread{
                 else if(isItemWindowEquips()){//send to belt
                     pickUpItem();
                     if(!dropHoldingItemToBeltOrInv()) {
-                        ZeeConfig.gameUI.msg("Belt is full");
+                        ZeeConfig.gameUI.error("Belt is full");
                     }
                 }
 
@@ -403,7 +401,7 @@ public class ZeeManagerItemClick extends ZeeThread{
                         wItem.getparent(Inventory.class).wdgmsg("drop", wItem.c.div(33));
                     }
                 } else {
-                    ZeeConfig.gameUI.msg("no fish rod equipped");
+                    ZeeConfig.gameUI.error("no fish rod equipped");
                 }
             } else {
                 //equip hook or line
@@ -413,7 +411,7 @@ public class ZeeManagerItemClick extends ZeeThread{
                 } else if(getLeftHandName().contains("/bushpole") || getRightHandName().contains("/bushpole")){
                     rodName = "/bushpole";
                 } else {
-                    ZeeConfig.gameUI.msg("no fish pole equipped");
+                    ZeeConfig.gameUI.error("no fish pole equipped");
                     return;
                 }
                 if(pickUpItem()){
@@ -845,7 +843,8 @@ public class ZeeManagerItemClick extends ZeeThread{
     public static boolean dropHoldingItemToBeltOrInv() {
         Inventory inv;
         if(ZeeConfig.getWindow("Belt")==null){
-            inv = ZeeConfig.getMainInventory();
+            return false;
+            //inv = ZeeConfig.getMainInventory(); // TODO fix fitting item to inventory
         }else{
             inv = ZeeManagerItemClick.getInvBelt();
         }
