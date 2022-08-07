@@ -189,6 +189,8 @@ public class ZeeConfig {
     public static boolean showIconsZoomOut = Utils.getprefb("showIconsZoomOut", true);
     public static boolean showEquipsLogin = Utils.getprefb("showEquipsLogin", false);
     public static boolean showKinNames = Utils.getprefb("showKinNames", true);
+    public static boolean simpleCrops = Utils.getprefb("simpleCrops", true);
+    public static boolean simpleHerbs = Utils.getprefb("simpleHerbs", true);
     public static boolean slowMiniMap = Utils.getprefb("slowMiniMap", true);
     public static boolean sortActionsByUses = Utils.getprefb("sortActionsByUses", true);
     public static boolean rememberWindowsPos = Utils.getprefb("rememberWindowsPos", true);
@@ -2230,6 +2232,8 @@ public class ZeeConfig {
                 add(space+"bugs");
                 add(space+"bushes");
                 add(space+"flowers");
+                add(space+"herbs");
+                add(space+"kritters");
                 add(space+"mushrooms");
                 add(space+"noob stuff");
                 add(space+"small animals");
@@ -2239,8 +2243,6 @@ public class ZeeConfig {
                     add(space+space+"bough");
                     add(space+space+"fruit");
                     add(space+space+"nuts");
-                add(space+"/kritters/");
-                add(space+"/herbs/");
             }};
             protected String listitem(int idx) {
                 return(filters.get(idx));
@@ -2284,16 +2286,16 @@ public class ZeeConfig {
             filteredList.removeIf(entry -> !ZeeConfig.isBush(entry.conf.res.name));
         else if(filter.equals("flowers"))
             filteredList.removeIf(entry -> !ZeeConfig.isFlower(entry.conf.res.name));
-        else if(filter.equals("/herbs/"))
+        else if(filter.equals("herbs"))
             filteredList.removeIf(entry -> !ZeeConfig.isHerb(entry.conf.res.name));
         else if(filter.equals("mushrooms"))
             filteredList.removeIf(entry -> !ZeeConfig.isMushroom(entry.conf.res.name));
         else if(filter.equals("string"))
             filteredList.removeIf(entry -> !ZeeConfig.isString(entry.conf.res.name));
-        else if(filter.equals("/kritters/"))
+        else if(filter.equals("kritters"))
             filteredList.removeIf(entry -> !ZeeConfig.isKritter(entry.conf.res.name));
         else if(filter.equals("trees"))
-            filteredList.removeIf(entry -> !ZeeConfig.isTree(entry.conf.res.name));
+            filteredList.removeIf(entry -> !entry.conf.res.name.contains("/trees/"));
         else if(filter.equals("bark"))
             filteredList.removeIf(entry -> !ZeeConfig.isTreeToughBark(entry.conf.res.name));
         else if(filter.equals("bough"))

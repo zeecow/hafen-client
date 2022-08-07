@@ -114,6 +114,8 @@ public class Tree extends Sprite {
 	}
 	parts = mkparts(res, s, fl);
 	sel = s;
+	if (ZeeConfig.hideFxAnimations)
+		this.leaves = null;
     }
 
     private static final haven.res.lib.tree.Factory deffac = new haven.res.lib.tree.Factory();

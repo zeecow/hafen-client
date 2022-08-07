@@ -15,7 +15,7 @@ public class ZeecowOptionsWindow extends JFrame {
     public GridBagConstraints c;
     public JTabbedPane tabbedPane, tabbedPaneGobs;
     public JPanel panelTabMisc, panelTabInterface, panelTabGobs, panelTabControls, panelTabMinimap, panelDetailsBottom, panelTabCateg, panelShapeIcons, panelShapeIconsSaveCancel;
-    public JCheckBox cbDropAltKeyOnly, cbShowKinNames, cbSimpleWindowBorder, cbSimpleButtons, cbSimpleWindows, cbFreeGobPlacement, cbScrollTransferItems, cbCtrlClickMinimapContent, cbShapeIcons, cbSlowMiniMap, cbHideFxAnimations, cbHideFxSmoke, cbAutoChipMinedBoulder, cbDropMinedStone, cbDropMinedOre, cbDropMinedSilverGold, cbDropMinedCurios, cbActionSearchGlobal, cbCompactEquipsWindow, cbBeltTogglesEquipsReposition, cbBeltTogglesEquips, cbAutoRunLogin, cbAutohearth, cbHighlightCropsReady, cbTreeAnimation, cbShowGrowingTreePercentage, cbMiniTrees, cbKeyUpDownAudioControl, cbAlertOnPlayers,  cbShowInventoryLogin, cbShowBeltLogin, cbKeyBeltShiftTab, cbDrinkKey, cbDrinkAuto, cbKeyCamSwitchShiftC, cbShowIconsZoomOut, cbRememberWindowsPos, cbSortActionsByUse, cbDebugWidgetMsgs, cbDebugCodeRes, cbMidclickEquipManager, cbShowEquipsLogin, cbNotifyBuddyOnline, cbZoomOrthoExtended, cbCattleRosterHeight, cbAutoToggleGridLines;
+    public JCheckBox cbDropAltKeyOnly, cbShowKinNames, cbSimpleWindowBorder, cbSimpleButtons, cbSimpleWindows, cbFreeGobPlacement, cbScrollTransferItems, cbCtrlClickMinimapContent, cbShapeIcons, cbSlowMiniMap, cbHideFxAnimations, cbHideFxSmoke, cbAutoChipMinedBoulder, cbDropMinedStone, cbDropMinedOre, cbDropMinedSilverGold, cbDropMinedCurios, cbActionSearchGlobal, cbCompactEquipsWindow, cbBeltTogglesEquipsReposition, cbBeltTogglesEquips, cbAutoRunLogin, cbAutohearth, cbHighlightCropsReady, cbSimpleHerbs, cbSimpleCrops, cbTreeAnimation, cbShowGrowingTreePercentage, cbMiniTrees, cbKeyUpDownAudioControl, cbAlertOnPlayers,  cbShowInventoryLogin, cbShowBeltLogin, cbKeyBeltShiftTab, cbDrinkKey, cbDrinkAuto, cbKeyCamSwitchShiftC, cbShowIconsZoomOut, cbRememberWindowsPos, cbSortActionsByUse, cbDebugWidgetMsgs, cbDebugCodeRes, cbMidclickEquipManager, cbShowEquipsLogin, cbNotifyBuddyOnline, cbZoomOrthoExtended, cbCattleRosterHeight, cbAutoToggleGridLines;
     public JTextField tfAutoClickMenu, tfAggroRadiusTiles, tfButchermode, tfGobName, tfAudioPath, tfCategName, tfAudioPathCateg;
     public JComboBox<String> cmbCattleRoster, cmbGobCategory, cmbMiniTreeSize, comboShapeIcons, cmbDrinkAutoValue;
     public JList<String> listGobsTemp, listGobsSaved, listGobsCategories;
@@ -294,7 +294,7 @@ public class ZeecowOptionsWindow extends JFrame {
         panelTabMisc = new JPanel(new GridBagLayout());
         tabbedPane.addTab("Misc", panelTabMisc);
 
-        panelTabMisc.add(cbHideFxAnimations = new JCheckBox("hide animations"), c);
+        panelTabMisc.add(cbHideFxAnimations = new JCheckBox("hide some animations"), c);
         cbHideFxAnimations.setSelected(ZeeConfig.hideFxAnimations);
         cbHideFxAnimations.addActionListener(actionEvent -> {
             JCheckBox cb = (JCheckBox) actionEvent.getSource();
@@ -372,6 +372,22 @@ public class ZeecowOptionsWindow extends JFrame {
             JCheckBox cb = (JCheckBox) actionEvent.getSource();
             boolean val = ZeeConfig.autoRunLogin = cb.isSelected();
             Utils.setprefb("autoRunLogin",val);
+        });
+
+        panelTabMisc.add(cbSimpleHerbs = new JCheckBox("Simple herbs"), c);
+        cbSimpleHerbs.setSelected(ZeeConfig.simpleHerbs);
+        cbSimpleHerbs.addActionListener(actionEvent -> {
+            JCheckBox cb = (JCheckBox) actionEvent.getSource();
+            boolean val = ZeeConfig.simpleHerbs = cb.isSelected();
+            Utils.setprefb("simpleHerbs",val);
+        });
+
+        panelTabMisc.add(cbSimpleCrops = new JCheckBox("Simple crops (restart)"), c);
+        cbSimpleCrops.setSelected(ZeeConfig.simpleCrops);
+        cbSimpleCrops.addActionListener(actionEvent -> {
+            JCheckBox cb = (JCheckBox) actionEvent.getSource();
+            boolean val = ZeeConfig.simpleCrops = cb.isSelected();
+            Utils.setprefb("simpleCrops",val);
         });
 
         panelTabMisc.add(cbHighlightCropsReady = new JCheckBox("Highlight crops ready"), c);
