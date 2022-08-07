@@ -353,7 +353,27 @@ public class GobIcon extends GAttrib {
 		public IconLine(Coord sz, Icon icon) {
 		    super(IconList.this, sz, icon);
 		    Widget prev;
-		    prev = adda(new CheckBox("").state(() -> icon.conf.notify).set(andsave(val -> icon.conf.notify = val)).settip("Notify"),
+		    prev = adda(new CheckBox(""){
+						@Override
+						public boolean mouseup(Coord c, int button) {
+							if (button!=1)
+								return super.mouseup(c, button);
+							if (this.state()){
+								if (icon.conf.resns==null) {
+									// default "Bell 2"
+									icon.conf.resns = NotificationSetting.builtin.get(1).res;
+									if(save!=null && ZeeConfig.allowIconNotifySave()) {
+										save.run();
+										ZeeConfig.lastIconNotifySaveMs = ZeeThread.now();
+										ZeeConfig.println("saved "+icon.conf.resns);
+									}else
+										ZeeConfig.println("not saved "+icon.conf.resns);
+								}
+								list.change(icon);//select icon line
+							}
+							return super.mouseup(c, button);
+						}
+					}.state(() -> icon.conf.notify).set(andsave(val -> icon.conf.notify = val)).settip("Notify"),
 				sz.x - UI.scale(2) - (sz.y / 2), sz.y / 2, 0.5, 0.5);
 		    prev = adda(new CheckBox("").state(() -> icon.conf.show).set(andsave(val -> icon.conf.show = val)).settip("Display"),
 				prev.c.x - UI.scale(2) - (sz.y / 2), sz.y / 2, 0.5, 0.5);

@@ -2558,4 +2558,9 @@ public class ZeeConfig {
             }
         }
     }
+
+    static long lastIconNotifySaveMs = ZeeThread.now();
+    public static boolean allowIconNotifySave() {
+        return ZeeThread.now() - lastIconNotifySaveMs > 1000;
+    }
 }
