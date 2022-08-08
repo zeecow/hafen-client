@@ -1270,7 +1270,7 @@ public class ZeeManagerItemClick extends ZeeThread{
                                 if (contents.contains("Water")) {
                                     //println("drink belt " + contents);
                                     if(clickItemPetal(beltItems[i], "Drink")) {
-                                        ZeeManagerItemClick.waitPlayerPoseNotInList(ZeeConfig.POSE_PLAYER_DRINK);
+                                        //ZeeManagerItemClick.waitPlayerPoseNotInList(ZeeConfig.POSE_PLAYER_DRINK);
                                         drank = true;
                                     }
                                     break;
@@ -1291,7 +1291,7 @@ public class ZeeManagerItemClick extends ZeeThread{
                                 if (contents.contains("Water")) {
                                     //println("drink inv " + contents);
                                     if (clickItemPetal(invItems[i], "Drink")) {
-                                        ZeeManagerItemClick.waitPlayerPoseNotInList(ZeeConfig.POSE_PLAYER_DRINK);
+                                        //ZeeManagerItemClick.waitPlayerPoseNotInList(ZeeConfig.POSE_PLAYER_DRINK);
                                         drank = true;
                                     }
                                     break;
@@ -1310,7 +1310,8 @@ public class ZeeManagerItemClick extends ZeeThread{
                         if (w != null) {
                             //println("drink bucket " + getItemContentsName(w));
                             if (clickItemPetal(w, "Drink")) {
-                                ZeeManagerItemClick.waitPlayerPoseNotInList(ZeeConfig.POSE_PLAYER_DRINK);
+                                //ZeeManagerItemClick.waitPlayerPoseNotInList(ZeeConfig.POSE_PLAYER_DRINK);
+                                drank = true;
                             }
                         }
                     }

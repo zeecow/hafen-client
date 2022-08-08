@@ -110,7 +110,6 @@ public class ZeeConfig {
     private static Dropbox<String> iconListFilterBox;
     private static Inventory mainInv;
     public static Glob glob;
-    public static LayerMeter meterStamina;
 
     public static String playingAudio = null;
     public static String uiMsgTextQuality, uiMsgTextBuffer;
@@ -155,8 +154,6 @@ public class ZeeConfig {
     public static boolean debugWidgetMsgs = false;//disabled by default
     public static boolean debugCodeRes = Utils.getprefb("debugCodeRes", false);
     public static boolean drinkKey = Utils.getprefb("drinkKey", true);
-    public static boolean drinkAuto = Utils.getprefb("drinkAuto", true);
-    public static Integer drinkAutoValue = Utils.getprefi("drinkAutoValue", 50);
     public static boolean dropHoldingItemAltKey = Utils.getprefb("dropHoldingItemAltKey", true);
     public static boolean dropMinedCurios = Utils.getprefb("dropMinedCurios", true);
     public static boolean dropMinedOre = Utils.getprefb("dropMinedOre", true);
@@ -1651,9 +1648,6 @@ public class ZeeConfig {
 
         if (ZeeManagerStockpile.busy && text.contains("That stockpile is already full."))
             ZeeManagerStockpile.exitManager("checkUiErr() > pile is full");
-
-        if (ZeeConfig.drinkAuto && text.contains(" tired "))
-            ZeeManagerItemClick.drinkFromBeltHandsInv();
     }
 
     public static String getCursorName() {
@@ -1688,8 +1682,6 @@ public class ZeeConfig {
     //reset state
     public static void resetCharSelected() {
         mainInv = null;
-        meterStamina = null;
-        lastMeterStaminaValue = 0;
         ZeeManagerItemClick.invBelt = null;
         ZeeManagerItemClick.equipory = null;
         ZeeManagerStockpile.windowManager = null;
@@ -2531,32 +2523,6 @@ public class ZeeConfig {
         else
         {
             gameUI.map.showgrid(false);
-        }
-    }
-
-    static double lastMeterStaminaValue = 0;
-    static void checkMeterTip(LayerMeter layerMeter, Object[] args) {
-        if( ZeeConfig.drinkAuto
-            && !ZeeManagerItemClick.drinkThreadWorking
-            && args[0].toString().contains("Stamina") )
-        {
-            if (meterStamina==null) {
-                meterStamina = layerMeter;
-                lastMeterStaminaValue = meterStamina.meters.get(0).a;
-                println("============");
-                println("new meter stamina "+lastMeterStaminaValue);
-            } else {
-                double val = meterStamina.meters.get(0).a;
-                // if stamina is decreasing
-                if (val - lastMeterStaminaValue < 0) {
-                    if (val*100 <= ZeeConfig.drinkAutoValue) {
-                        println("============");
-                        println("drink " + val + "  pose: "+getPlayerPoses());
-                        ZeeManagerItemClick.drinkFromBeltHandsInv();
-                    }
-                }
-                lastMeterStaminaValue = val;
-            }
         }
     }
 

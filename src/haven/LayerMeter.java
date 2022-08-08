@@ -119,7 +119,6 @@ public abstract class LayerMeter extends Widget implements ItemInfo.Owner {
 	} else if(msg == "col") {
 	    set(meters.isEmpty() ? 0 : meters.get(0).a, (Color)args[0]);
 	} else if(msg == "tip") {
-		ZeeConfig.checkMeterTip(this,args);
 	    if(args[0] instanceof Object[]) {
 		rawinfo = new ItemInfo.Raw((Object[])args[0]);
 		info = null;

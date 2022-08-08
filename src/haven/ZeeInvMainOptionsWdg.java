@@ -44,21 +44,6 @@ public class ZeeInvMainOptionsWdg extends Widget {
         }, x, 0);
         cbButcher.settip("auto menu butch list");
 
-        x += cbButcher.sz.x + 5;
-
-        add(cbDrink = new CheckBox("dk") {
-            {
-                a = ZeeConfig.drinkAuto;
-            }
-
-            public void set(boolean val) {
-                Utils.setprefb("drinkAuto", val);
-                ZeeConfig.drinkAuto = val;
-                a = val;
-            }
-        }, x, 0);
-        cbDrink.settip("auto drink");
-
         x = 0;
 
         add(cbSeeds = new CheckBox("sd") {

@@ -134,29 +134,6 @@ public class ZeecowOptionsWindow extends JFrame {
             boolean val = ZeeConfig.drinkKey = cb.isSelected();
             Utils.setprefb("drinkKey",val);
         });
-
-        pan = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        panelTabControls.add(pan,c);
-        pan.add(cbDrinkAuto= new JCheckBox("Auto drink at"), c);
-        cbDrinkAuto.setSelected(ZeeConfig.drinkAuto);
-        cbDrinkAuto.addActionListener(actionEvent -> {
-            JCheckBox cb = (JCheckBox) actionEvent.getSource();
-            boolean val = ZeeConfig.drinkAuto = cb.isSelected();
-            Utils.setprefb("drinkAuto",val);
-            cmbDrinkAutoValue.setEnabled(val);
-            if (ZeeInvMainOptionsWdg.cbDrink!=null)
-                ZeeInvMainOptionsWdg.cbDrink.set(val);
-        });
-        //drink auto limit
-        String[] perc = {"30%","40%","50%","60%","70%","80%"};
-        pan.add(cmbDrinkAutoValue = new JComboBox<String>(perc), c);
-        cmbDrinkAutoValue.setSelectedItem(ZeeConfig.drinkAutoValue+"%");
-        cmbDrinkAutoValue.setEnabled(ZeeConfig.drinkAuto);
-        cmbDrinkAutoValue.addActionListener(e -> {
-            String val = cmbDrinkAutoValue.getSelectedItem().toString().split("%")[0];
-            Integer num = ZeeConfig.drinkAutoValue = Integer.parseInt(val);
-            Utils.setprefi("drinkAutoValue", num);
-        });
     }
 
     private void buildTabMinimap() {
