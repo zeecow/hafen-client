@@ -406,8 +406,10 @@ public class Inventory extends Widget implements DTarget {
 		List<WItem> ret = new ArrayList<>();
 		for (WItem wItem : this.children(WItem.class)) {
 			for(ItemInfo inf : wItem.item.info()) {
-				if(inf instanceof GItem.ColorInfo)
+				if(inf instanceof GItem.ColorInfo) {
 					ret.add(wItem);
+					break;//add wItem once
+				}
 			}
 		}
 		return ret;

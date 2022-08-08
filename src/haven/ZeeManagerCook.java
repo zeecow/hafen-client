@@ -1,6 +1,8 @@
 package haven;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 public class ZeeManagerCook extends ZeeThread{
@@ -160,6 +162,38 @@ public class ZeeManagerCook extends ZeeThread{
             ZeeConfig.removeGobText(gobBarrel);
         if (gobsContainers.size()>0)
             gobsContainers.forEach(ZeeConfig::removeGobText);
+    }
+
+
+    static WItem herbalswillJar;
+    public static void herbalswillRecipeOpened(Window window) {
+        new ZeeThread(){
+            public void run() {
+                try{
+                    sleep(777);//wait inv items selection
+                    List<WItem> selectedItems = new ArrayList<WItem>();
+                    List<Window> windows = ZeeConfig.getContainersWindows();
+                    Window invWindow = ZeeConfig.getWindow("Inventory");
+                    if (invWindow!=null)
+                        windows.add(invWindow);
+                    Inventory inv;
+                    for (int i = 0; i < windows.size(); i++) {
+                        inv = windows.get(i).getchild(Inventory.class);
+                        if (inv!=null)
+                            selectedItems.addAll(inv.getItemsWithColorOverlay());
+                    }
+                    ZeeConfig.println("selected items: "+selectedItems.size());
+                    selectedItems.forEach(w -> {
+                        ZeeConfig.println(w.item.getres().name);
+                        if (w.item.getres().name.contentEquals("gfx/invobjs/jar")){
+                            herbalswillJar = w;
+                        }
+                    });
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+            }
+        }.start();
     }
 
 }

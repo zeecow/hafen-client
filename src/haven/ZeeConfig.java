@@ -791,8 +791,12 @@ public class ZeeConfig {
             ZeeManagerMiner.tunnelHelperBuildColumn(window);
         }
 
-        if(windowTitle.equals("Boil Pepper Drupes")){
+        // Craft window
+        if(windowTitle.contentEquals("Boil Pepper Drupes")){
             ZeeManagerCook.pepperRecipeOpened(window);
+        }
+        else if (windowTitle.contentEquals("Herbal Swill")){
+            ZeeManagerCook.herbalswillRecipeOpened(window);
         }
 
         if (!windowTitle.contentEquals("Options"))
@@ -1605,6 +1609,40 @@ public class ZeeConfig {
             }
         }
         return null;
+    }
+
+    public static boolean isWindowContainer(Window window) {
+        String[] containers = (
+                "Knarr,Snekkja,Wagon,Cupboard,Chest,Table,Crate,Saddlebags,Basket,Box,"
+                        +"Furnace,Smelter,Desk,Trunk,Shed,Coffer,Packrack,Strongbox,Stockpile,"
+                        +"Tub,Compost Bin,Extraction Press,Rack,Herbalist Table,Frame,"
+                        +"Chicken Coop,Rabbit Hutch,Archery Target,Creel,Oven,Steel crucible,"
+                        +"Cauldron,Pane mold,Kiln,Old Trunk,Old Stump,Smoke shed,Finery Forge,"
+                        +"Steelbox,Metal Cabinet,Tidepool,Quiver"
+        ).split(",");
+        for (String contName: containers) {
+            if (window.cap.text.contains(contName)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static List<Window> getContainersWindows() {
+        List<Window> ret = new ArrayList<>();
+        if(gameUI==null)
+            return ret;
+        Set<Window> windows = gameUI.children(Window.class);
+        for(Window w : windows) {
+            if(isWindowContainer(w)){
+                ret.add(w);
+            }
+        }
+        return ret;
+    }
+
+    public static Set<Window> getWindowsOpened() {
+        return gameUI.children(Window.class);
     }
 
     public static List<Window> getWindows(String name) {

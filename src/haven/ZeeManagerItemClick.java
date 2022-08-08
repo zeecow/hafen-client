@@ -74,7 +74,7 @@ public class ZeeManagerItemClick extends ZeeThread{
             }
 
             // if not hand item, do sort-transfer
-            if( isTransferWindowOpened() && !isItemWindowName("Inventory") && !isItemWindowName("Belt")){
+            if( isTransferWindowOpened() && !isItemWindowName("Belt")){
                 if(isLongClick())
                     wItem.wdgmsg("transfer-sort", wItem.item, true); // sort transfer asc
                 //short click
@@ -93,7 +93,11 @@ public class ZeeManagerItemClick extends ZeeThread{
                 return;
             }
             else if (isItemHandEquipable() && !isItemWindowName("Inventory") && !isItemWindowName("Belt")) {
-                println("itemManager > only Belt and Inventory allowed");
+                println("itemManager > only Belt and Inventory allowed (for now?)");
+                return;
+            }
+            else if (!isItemHandEquipable()) {
+                // cancel manager and do nothing
                 return;
             }
 
@@ -749,26 +753,7 @@ public class ZeeManagerItemClick extends ZeeThread{
     }
 
     private boolean isTransferWindowOpened() {
-        String windowsNames = getWindowsNames();
-        String[] containers = (
-            "Knarr,Snekkja,Wagon,Cupboard,Chest,Table,Crate,Saddlebags,Basket,Box,"
-            +"Furnace,Smelter,Desk,Trunk,Shed,Coffer,Packrack,Strongbox,Stockpile,"
-            +"Tub,Compost Bin,Extraction Press,Rack,Herbalist Table,Frame,"
-            +"Chicken Coop,Rabbit Hutch,Archery Target,Creel,Oven,Steel crucible,"
-            +"Cauldron,Pane mold,Kiln,Old Trunk,Old Stump,Smoke shed,Finery Forge,"
-            +"Steelbox,Metal Cabinet,Tidepool,Quiver"
-        ).split(",");
-        for (String contName: containers) {
-            if (windowsNames.contains(contName)) {
-                println("debug > transferWindowOpen() > "+contName);
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private String getWindowsNames() {
-        return ZeeConfig.gameUI.children(Window.class).stream().map(window -> window.cap.text).collect(Collectors.joining(","));
+        return (ZeeConfig.getContainersWindows().size() > 0);
     }
 
     private void drinkFrom() {
