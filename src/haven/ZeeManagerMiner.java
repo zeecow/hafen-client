@@ -58,6 +58,8 @@ public class ZeeManagerMiner extends ZeeThread{
                         }
 
                         // check if boulder close
+                        if (!ZeeConfig.autoChipMinedBoulder)
+                            return;
                         Gob boulder = getBoulderCloseEnoughForChipping();
 
                         // no boulder, mining stopped
@@ -405,6 +407,10 @@ public class ZeeManagerMiner extends ZeeThread{
     }
 
     public static void taskChipBoulder(Gob gobBoulder) throws Exception {
+
+        if (!ZeeConfig.autoChipMinedBoulder)
+            return;
+
         //println(">task chip_boulder on");
         if (!tunneling)
             ZeeConfig.addPlayerText("boulder");
