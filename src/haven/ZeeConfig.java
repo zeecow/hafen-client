@@ -1264,16 +1264,17 @@ public class ZeeConfig {
     }
 
     public static void windowChangedPos(Window window) {
-        if(!rememberWindowsPos || window==null || autoToggleEquipsReposition)
+        if(!rememberWindowsPos || window==null)
             return;
         String name = ((Window)window).cap.text;
-        if(name==null || name.isEmpty() || window instanceof MapWnd)
+        if( name==null || name.isEmpty()
+            || (autoToggleEquipsReposition && name.contentEquals("Equipement"))
+            || window instanceof MapWnd)
             return;
         if(isMakewindow(window))
             name = MAKE_WINDOW_NAME;
         mapWindowPos.put(name, new Coord(window.c));
         Utils.setpref(MAP_WND_POS, serialize(mapWindowPos));
-        ZeeConfig.println("autoToggleEquipsReposition "+autoToggleEquipsReposition);
     }
 
     public static boolean isMakewindow(Window window) {
