@@ -74,7 +74,7 @@ public class ZeeManagerItemClick extends ZeeThread{
             }
 
             // if not hand item, do sort-transfer
-            if( isTransferWindowOpened()){
+            if( isTransferWindowOpened() && !isItemWindowName("Inventory") && !isItemWindowName("Belt")){
                 if(isLongClick())
                     wItem.wdgmsg("transfer-sort", wItem.item, true); // sort transfer asc
                 //short click
