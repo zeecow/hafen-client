@@ -45,7 +45,7 @@ public class ZeeManagerItemClick extends ZeeThread{
             //error caused by midClicking again before task ending
             cancelManager = true;
         }
-        //println(itemName +"  "+ getWItemCoord(wItem)+"  "+ZeeConfig.getCursorName());
+        //println(itemName +"  "+ getWItemCoord(wItem));//+"  "+ZeeConfig.getCursorName());
     }
 
     @Override
@@ -1054,7 +1054,7 @@ public class ZeeManagerItemClick extends ZeeThread{
     }
     public static boolean isTwoHandedItem(String name) {
         String[] items = {"scythe","pickaxe","shovel","b12axe",
-                "boarspear","cutblade","sledgehammer",
+                "boarspear","cutblade","sledgehammer", "mortarandpestle",
                 "huntersbow","rangersbow","dowsingrod"};
         for (int i = 0; i < items.length; i++) {
             if (name.contains(items[i])){
