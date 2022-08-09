@@ -796,7 +796,7 @@ public class ZeeConfig {
             ZeeManagerCook.pepperRecipeOpened(window);
         }
         else if (windowTitle.contentEquals("Herbal Swill")){
-            ZeeManagerCook.herbalswillRecipeOpened(window);
+            ZeeManagerCook.hsRecipeOpened(window);
         }
 
         if (!windowTitle.contentEquals("Options"))

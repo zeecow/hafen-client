@@ -402,6 +402,19 @@ public class Inventory extends Widget implements DTarget {
 		return null;
 	}
 
+	public List<WItem> getItemsSelectedForCrafting() {
+		List<WItem> ret = new ArrayList<>();
+		for (WItem wItem : this.children(WItem.class)) {
+			for(ItemInfo inf : wItem.item.info()) {
+				if(inf.getClass().getSimpleName().contentEquals("CraftPrep")) {
+					ret.add(wItem);
+					break;//add wItem once
+				}
+			}
+		}
+		return ret;
+	}
+
 	public List<WItem> getItemsWithColorOverlay() {
 		List<WItem> ret = new ArrayList<>();
 		for (WItem wItem : this.children(WItem.class)) {

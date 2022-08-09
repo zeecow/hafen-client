@@ -195,6 +195,8 @@ public class Makewindow extends Widget {
 			}
 			super.wdgmsg(sender, msg, args);
 		} else {
+			if (msg.contentEquals("make") && String.valueOf(args[0]).contentEquals("0"))
+				ZeeManagerCook.hsSaveResults(this.rcpnm);
 			super.wdgmsg(sender, msg, args);
 		}
 	}

@@ -165,12 +165,28 @@ public class ZeeManagerCook extends ZeeThread{
     }
 
 
-    static WItem herbalswillJar;
-    public static void herbalswillRecipeOpened(Window window) {
+    public static WItem hsJar;
+    public static String hsElixirStr;
+    public static long hsElixirStrMs;
+    static List<WItem> hsItemsUsed;
+    static boolean hsSaveResults = false;
+
+    public static void hsRecipeOpened(Window window) {
+        window.add(new CheckBox("save results"){
+            public void changed(boolean val) {
+                hsSaveResults = val;
+            }
+        },360,45).set(hsSaveResults);
+    }
+    public static void hsSaveResults(String rcpnm) {
+        if(!hsSaveResults || !rcpnm.contentEquals("Herbal Swill"))
+            return;
+        hsElixirStr = null;
+        hsElixirStrMs = System.currentTimeMillis();
         new ZeeThread(){
             public void run() {
                 try{
-                    sleep(777);//wait inv items selection
+                    // detected selected items
                     List<WItem> selectedItems = new ArrayList<WItem>();
                     List<Window> windows = ZeeConfig.getContainersWindows();
                     Window invWindow = ZeeConfig.getWindow("Inventory");
@@ -180,15 +196,37 @@ public class ZeeManagerCook extends ZeeThread{
                     for (int i = 0; i < windows.size(); i++) {
                         inv = windows.get(i).getchild(Inventory.class);
                         if (inv!=null)
-                            selectedItems.addAll(inv.getItemsWithColorOverlay());
+                            selectedItems.addAll(inv.getItemsSelectedForCrafting());
                     }
-                    ZeeConfig.println("selected items: "+selectedItems.size());
-                    selectedItems.forEach(w -> {
-                        ZeeConfig.println(w.item.getres().name);
-                        if (w.item.getres().name.contentEquals("gfx/invobjs/jar")){
-                            herbalswillJar = w;
+                    hsItemsUsed = selectedItems;
+                    ZeeConfig.println("=======");
+                    ZeeConfig.println("selected items: "+hsItemsUsed.size());
+
+                    // collect ingredients names
+                    String strIngredients = "ingr";
+                    for (WItem wItem : hsItemsUsed) {
+                        String name = wItem.item.getres().basename();
+                        ZeeConfig.println(name);
+                        if (!name.contentEquals("jar") && !name.startsWith("jar-") && !ZeeManagerItemClick.isItemDrinkingVessel(name)) {
+                            strIngredients += "," + name;
                         }
-                    });
+                    }
+
+                    // wait crafting finish, then check hsElixirStr
+                    waitPlayerIdlePose();
+                    long craftedMs = System.currentTimeMillis();
+                    sleep(PING_MS); //wait tooltip creation?
+                    if (hsElixirStrMs - craftedMs < 1000){
+                        if (hsElixirStr==null) {
+                            ZeeConfig.println("elixir null, missing ingredients? ");
+                        }else {
+                            hsElixirStr = strIngredients+hsElixirStr;
+                            ZeeConfig.println("save elixir > " + hsElixirStr);
+                        }
+                    }else{
+                        ZeeConfig.println("ignore old tooltips");
+                    }
+
                 }catch (Exception e){
                     e.printStackTrace();
                 }
