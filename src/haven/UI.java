@@ -361,6 +361,13 @@ public class UI {
 	}
     }
 	
+    public void error(String msg) {
+	/* XXX: This should be generalized. */
+	GameUI gui = root.findchild(GameUI.class);
+	if(gui != null)
+	    gui.error(msg);
+    }
+
     private void setmods(InputEvent ev) {
 	setmods(ev.getModifiersEx());
     }

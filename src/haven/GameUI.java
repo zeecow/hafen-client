@@ -89,7 +89,7 @@ public class GameUI extends ConsoleHost implements Console.Directory {
     public final Object heldNotifier = new Object();
     public ChatUI chat;
     public ChatUI.Channel syslog;
-    public double prog = -1;
+    public Progress prog = null;
     private boolean afk = false;
     public BeltSlot[] belt = new BeltSlot[144];
     public Belt beltwdg;
@@ -250,7 +250,7 @@ public class GameUI extends ConsoleHost implements Console.Directory {
     public static class $_ implements Factory {
 	public Widget create(UI ui, Object[] args) {
 	    String chrid = (String)args[0];
-	    int plid = (Integer)args[1];
+	    long plid = Utils.uint32((Integer)args[1]);
 	    String genus = "";
 	    if(args.length > 2)
 		genus = (String)args[2];
@@ -670,6 +670,10 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 	    move();
 	}
 
+	public void cresize(Widget ch) {
+	    sz = contentsz();
+	}
+
 	public boolean mshow(final boolean vis) {
 	    clearanims(Anim.class);
 	    if(vis)
@@ -822,8 +826,8 @@ public class GameUI extends ConsoleHost implements Console.Directory {
     
     public void togglePeace() {
 	try {
-	    if (fv != null && fv.current != null && fv.current.give != null) {
-		fv.current.give.wdgmsg("click", 1);
+	    if (fv != null && fv.curdisp != null && fv.curdisp.give != null) {
+		fv.curdisp.give.wdgmsg("click", 1);
 	    }
 	} catch (Exception e) {
 	    e.printStackTrace();
@@ -1012,16 +1016,24 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 		}
 	    }
 	    if(mapstore != null) {
-		MapFile file = MapFile.load(mapstore, mapfilename());
-		if(CFG.AUTOMAP_UPLOAD.get()) {
-		    MappingClient.getInstance().ProcessMap(file, (m) -> {
-			if(m instanceof PMarker) {
-			    return CFG.AUTOMAP_MARKERS.get().stream()
-				.map(group -> group.col)
-				.anyMatch(color -> color.equals(((PMarker)m).color));
-			}
-			return true;
-		    });
+		MapFile file;
+		try {
+		    file = MapFile.load(mapstore, mapfilename());
+		    if(CFG.AUTOMAP_UPLOAD.get()) {
+			MappingClient.getInstance().ProcessMap(file, (m) -> {
+			    if(m instanceof PMarker) {
+				return CFG.AUTOMAP_MARKERS.get().stream()
+				    .map(group -> group.col)
+				    .anyMatch(color -> color.equals(((PMarker)m).color));
+			    }
+			    return true;
+			});
+		    }
+		} catch(java.io.IOException e) {
+		    /* XXX: Not quite sure what to do here. It's
+		     * certainly not obvious that overwriting the
+		     * existing mapfile with a new one is better. */
+		    throw(new RuntimeException("failed to load mapfile", e));
 		}
 		mmap = blpanel.add(new CornerMap(UI.scale(new Coord(133, 133)), file), minimapc);
 		mmap.lower();
@@ -1208,33 +1220,56 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 	mmap.lower();
     }
 
-    private static final Resource.Anim progt = Resource.local().loadwait("gfx/hud/prog").layer(Resource.animc);
-    private Tex curprog = null;
-    private int curprogf, curprogb;
-    private void drawprog(GOut g, double prog) {
-	int fr = Utils.clip((int)Math.floor(prog * progt.f.length), 0, progt.f.length - 2);
-	int bf = Utils.clip((int)(((prog * progt.f.length) - fr) * 255), 0, 255);
-	if((curprog == null) || (curprogf != fr) || (curprogb != bf)) {
-	    if(curprog != null)
-		curprog.dispose();
+    public static class Progress extends Widget {
+	private static final Resource.Anim progt = Resource.local().loadwait("gfx/hud/prog").layer(Resource.animc);
+	public double prog;
+	private TexI curi;
+	private String tip;
+
+	public Progress(double prog) {
+	    super(progt.f[0][0].ssz);
+	    set(prog);
+	}
+
+	public void set(double prog) {
+	    int fr = Utils.clip((int)Math.floor(prog * progt.f.length), 0, progt.f.length - 2);
+	    int bf = Utils.clip((int)(((prog * progt.f.length) - fr) * 255), 0, 255);
 	    WritableRaster buf = PUtils.imgraster(progt.f[fr][0].ssz);
 	    PUtils.blit(buf, progt.f[fr][0].scaled().getRaster(), Coord.z);
 	    PUtils.blendblit(buf, progt.f[fr + 1][0].scaled().getRaster(), Coord.z, bf);
+	    
 	    BufferedImage img = PUtils.rasterimg(buf);
-
 	    BufferedImage txt = Text.renderstroked(String.format("%d%%", (int) (100 * prog))).img;
 	    img.getGraphics().drawImage(txt, (img.getWidth() - txt.getWidth()) / 2, UI.scale(8) - txt.getHeight() / 2, null);
+	    
+	    if(this.curi != null)
+		this.curi.dispose();
+	    this.curi = new TexI(img);
 
-	    curprog = new TexI(img); curprogf = fr; curprogb = bf;
+	    double d = Math.abs(prog - this.prog);
+	    int dec = Math.max(0, (int)Math.round(-Math.log10(d)) - 2);
+	    this.tip = String.format("%." + dec + "f%%", prog * 100);
+	    this.prog = prog;
 	}
-	g.aimage(curprog, new Coord(sz.x / 2, (sz.y * 4) / 10), 0.5, 0.5);
+
+	public void draw(GOut g) {
+	    g.image(curi, Coord.z);
+	}
+
+	public boolean checkhit(Coord c) {
+	    return(Utils.checkhit(curi.back, c, 10));
+	}
+
+	public Object tooltip(Coord c, Widget prev) {
+	    if(checkhit(c))
+		return(tip);
+	    return(super.tooltip(c, prev));
+	}
     }
 
     public void draw(GOut g) {
 	beltwdg.c = new Coord(chat.c.x, Math.min(chat.c.y - beltwdg.sz.y, sz.y - beltwdg.sz.y));
 	super.draw(g);
-	if(prog >= 0)
-	    drawprog(g, prog);
 	int by = sz.y;
 	if(chat.visible())
 	    by = Math.min(by, chat.c.y);
@@ -1401,10 +1436,18 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 	    Reactor.IMSG.onNext(text);
 	    msg(text);
 	} else if(msg == "prog") {
-	    if(args.length > 0)
-		prog = ((Number)args[0]).doubleValue() / 100.0;
-	    else
-		prog = -1;
+	    if(args.length > 0) {
+		double p = ((Number)args[0]).doubleValue() / 100.0;
+		if(prog == null)
+		    prog = adda(new Progress(p), 0.5, 0.35);
+		else
+		    prog.set(p);
+	    } else {
+		if(prog != null) {
+		    prog.reqdestroy();
+		    prog = null;
+		}
+	    }
 	} else if(msg == "setbelt") {
 	    int slot = (Integer)args[0];
 	    if(args.length < 2) {
@@ -1613,8 +1656,9 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 		if(iconconf == null)
 		    return;
 		if(iconwnd == null) {
-//		    iconwnd = new GobIcon.SettingsWindow(iconconf, () -> Utils.defer(GameUI.this::saveiconconf));
-		    iconwnd = new GobIconSettings(iconconf, () -> Utils.defer(GameUI.this::saveiconconf));
+		    //TODO: switch when custom settings re-implemented
+		    iconwnd = new GobIcon.SettingsWindow(iconconf, () -> Utils.defer(GameUI.this::saveiconconf));
+		    //iconwnd = new GobIconSettings(iconconf, () -> Utils.defer(GameUI.this::saveiconconf));
 		    fitwdg(GameUI.this.add(iconwnd, Utils.getprefc("wndc-icon", new Coord(200, 200))));
 		} else {
 		    ui.destroy(iconwnd);
@@ -1632,6 +1676,8 @@ public class GameUI extends ConsoleHost implements Console.Directory {
     public static final KeyBinding kb_shoot = KeyBinding.get("screenshot", KeyMatch.forchar('S', KeyMatch.C));
     public static final KeyBinding kb_chat = KeyBinding.get("chat-toggle", KeyMatch.forchar('C', KeyMatch.C));
     public static final KeyBinding kb_hide = KeyBinding.get("ui-toggle", KeyMatch.nil);
+    public static final KeyBinding kb_logout = KeyBinding.get("logout", KeyMatch.nil);
+    public static final KeyBinding kb_switchchr = KeyBinding.get("logout-cs", KeyMatch.nil);
     public boolean globtype(char key, KeyEvent ev) {
 	if(key == ':') {
 	    entercmd();
@@ -1641,6 +1687,12 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 	    return(true);
 	} else if(kb_hide.key().match(ev)) {
 	    toggleui();
+	    return(true);
+	} else if(kb_logout.key().match(ev)) {
+	    act("lo");
+	    return(true);
+	} else if(kb_switchchr.key().match(ev)) {
+	    act("lo", "cs");
 	    return(true);
 	} else if(kb_chat.key().match(ev)) {
 	    toggleChat();
@@ -1692,6 +1744,8 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 	chat.move(new Coord(blpw, sz.y));
 	if(map != null)
 	    map.resize(sz);
+	if(prog != null)
+	    prog.move(sz.sub(prog.sz).mul(0.5, 0.35));
 	beltwdg.c = new Coord(blpw + UI.scale(10), sz.y - beltwdg.sz.y - UI.scale(5));
 	super.resize(sz);
     }

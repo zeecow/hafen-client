@@ -249,8 +249,9 @@ public class Bootstrap implements UI.Receiver, UI.Runner {
 		    }
 		    cookie = auth.getcookie();
 		    if(savepw) {
-			settoken(acctname, hostname, auth.gettoken());
-			AccountList.storeAccount(acctname, Utils.byte2hex(auth.gettoken()));
+			byte[] ntoken = (creds instanceof AuthClient.TokenCred) ? ((AuthClient.TokenCred)creds).token : auth.gettoken();
+			settoken(acctname, hostname, ntoken);
+			AccountList.storeAccount(acctname, Utils.byte2hex(ntoken));
 		    }
 		} catch(UnknownHostException e) {
 		    ui.uimsg(1, "error", "Could not locate server");
@@ -281,7 +282,7 @@ public class Bootstrap implements UI.Receiver, UI.Runner {
 				    if(error == null)
 					error = "Connection failed";;
 				    ui.uimsg(1, "error", error);
-				    break;
+				    continue retry;
 				}
 				sess.wait();
 			    }

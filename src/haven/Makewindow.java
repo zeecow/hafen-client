@@ -346,7 +346,7 @@ public class Makewindow extends Widget {
 		    Tex t = qmicon(qm);
 		    Coord sz = t.sz();
 		    if(mc.isect(c, sz))
-			return(qm.get().layer(Resource.tooltip).t);
+			return(qm.get().flayer(Resource.tooltip).t);
 		    c = c.add(sz.x + UI.scale(1), 0);
 		}
 	    } catch(Loading l) {
@@ -358,7 +358,7 @@ public class Makewindow extends Widget {
 		for(Indir<Resource> tool : tools) {
 		    Coord tsz = qmicon(tool).sz();
 		    if(mc.isect(c, tsz))
-			return(tool.get().layer(Resource.tooltip).t);
+			return(tool.get().flayer(Resource.tooltip).t);
 		    c = c.add(tsz.x + UI.scale(1), 0);
 		}
 	    } catch(Loading l) {

@@ -76,8 +76,8 @@ public class FoodInfo extends ItemInfo.Tip {
 	private final String res;
 	
 	public Event(Resource res, double a) {
-	    this.ev = res.layer(CharWnd.FoodMeter.Event.class);
-	    this.img = PUtils.convolve(res.layer(Resource.imgc).img, imgsz, CharWnd.iconfilter);
+	    this.ev = res.flayer(CharWnd.FoodMeter.Event.class);
+	    this.img = PUtils.convolve(res.flayer(Resource.imgc).img, imgsz, CharWnd.iconfilter);
 	    this.a = a;
 	    this.res = res.name;
 	}

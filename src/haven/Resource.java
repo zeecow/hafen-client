@@ -313,9 +313,20 @@ public class Resource implements Serializable {
     }
     
     public static class HttpSource implements ResSource, Serializable {
-	public static final String USER_AGENT = "Haven/1.0";
+	public static final String USER_AGENT;
 	private final transient SslHelper ssl;
 	public URL baseurl;
+
+	static {
+	    StringBuilder buf = new StringBuilder();
+	    buf.append("Haven/1.0");
+	    if(!Config.confid.equals(""))
+		buf.append(" (" + Config.confid + ")");
+	    String jv = Utils.getprop("java.version", null);
+	    if((jv != null) && !jv.equals(""))
+		buf.append(" Java/" + jv);
+	    USER_AGENT = buf.toString();
+	}
 	
 	{
 	    ssl = new SslHelper();
@@ -356,10 +367,7 @@ public class Resource implements Serializable {
 			 * a bug in its internal cache where it refuses to
 			 * reload a URL even when it has changed. */
 			c.setUseCaches(false);
-			String ua = USER_AGENT;
-			if(!Config.confid.equals(""))
-			    ua += " (" + Config.confid + ")";
-			c.addRequestProperty("User-Agent", ua);
+			c.addRequestProperty("User-Agent", USER_AGENT);
 			return(c.getInputStream());
 		    }
 		});
@@ -395,6 +403,17 @@ public class Resource implements Serializable {
 
 	public void boostprio(int prio) {
 	    res.boostprio(prio);
+	}
+    }
+
+    public static class LoadFailedException extends RuntimeException {
+	public final String name;
+	public final int ver;
+
+	public LoadFailedException(String name, int ver, LoadException cause) {
+	    super("Failed to load resource " + name + " (v" + ver + ")", cause);
+	    this.name = name;
+	    this.ver = ver;
 	}
     }
 
@@ -453,7 +472,7 @@ public class Resource implements Serializable {
 		    throw(new Loading(this));
 		}
 		if(error != null)
-		    throw(new RuntimeException("Delayed error in resource " + name + " (v" + ver + "), from " + error.src, error));
+		    throw(new LoadFailedException(name, ver, error));
 		return(res);
 	    }
 
@@ -843,6 +862,13 @@ public class Resource implements Serializable {
 	public Resource getres() {
 	    return(Resource.this);
 	}
+
+	public String toString() {
+	    if(this instanceof IDLayer)
+		return(String.format("#<%s (%s) in %s>", getClass().getSimpleName(), ((IDLayer)this).layerid(), Resource.this.name));
+	    else
+		return(String.format("#<%s in %s>", getClass().getSimpleName(), Resource.this.name));
+	}
     }
 
     public interface LayerFactory<T extends Layer> {
@@ -1213,17 +1239,29 @@ public class Resource implements Serializable {
 	public interface Instancer<I> {
 	    public I make(Class<?> cl, Resource res, Object... args);
 
-	    public static <T> T stdmake(Class<T> cl, Resource ires, Object[] args) {
+	    public static <T, U extends T> T stdmake(Class<T> type, Class<U> cl, Resource ires, Object[] args) {
 		try {
-		    Constructor<T> cons = cl.getConstructor(Resource.class, Object[].class);
+		    Function<Object[], T> make = Utils.smthfun(cl, "instantiate", type, Resource.class, Object[].class);
+		    return(make.apply(new Object[] {ires, args}));
+		} catch(NoSuchMethodException e) {}
+		try {
+		    Function<Object[], T> make = Utils.smthfun(cl, "instantiate", type, Object[].class);
+		    return(make.apply(new Object[] {args}));
+		} catch(NoSuchMethodException e) {}
+		try {
+		    Function<Object[], T> make = Utils.smthfun(cl, "instantiate", type, Resource.class);
+		    return(make.apply(new Object[] {ires}));
+		} catch(NoSuchMethodException e) {}
+		try {
+		    Constructor<U> cons = cl.getConstructor(Resource.class, Object[].class);
 		    return(Utils.construct(cons, new Object[] {ires, args}));
 		} catch(NoSuchMethodException e) {}
 		try {
-		    Constructor<T> cons = cl.getConstructor(Object[].class);
+		    Constructor<U> cons = cl.getConstructor(Object[].class);
 		    return(Utils.construct(cons, new Object[] {args}));
 		} catch(NoSuchMethodException e) {}
 		try {
-		    Constructor<T> cons = cl.getConstructor(Resource.class);
+		    Constructor<U> cons = cl.getConstructor(Resource.class);
 		    return(Utils.construct(cons, new Object[] {ires}));
 		} catch(NoSuchMethodException e) {}
 		return(Utils.construct(cl));
@@ -1239,7 +1277,7 @@ public class Resource implements Serializable {
 		public I make(Class<?> cl, Resource res, Object... args) {
 		    if(!type.isAssignableFrom(cl))
 			return(null);
-		    return(stdmake(cl.asSubclass(type), res, args));
+		    return(stdmake(type, cl.asSubclass(type), res, args));
 		}
 	    }
 
@@ -1657,6 +1695,12 @@ public class Resource implements Serializable {
 	    });
     }
 
+    public static class NoSuchLayerException extends NoSuchElementException {
+	public NoSuchLayerException(String message) {
+	    super(message);
+	}
+    }
+
     public <L extends Layer> L layer(Class<L> cl) {
 	used = true;
 	for(Layer l : layers) {
@@ -1664,6 +1708,11 @@ public class Resource implements Serializable {
 		return(cl.cast(l));
 	}
 	return(null);
+    }
+    public <L extends Layer> L flayer(Class<L> cl) {
+	L l = layer(cl);
+	if(l == null) throw(new NoSuchLayerException("no " + cl + " in " + name));
+	return(l);
     }
 
     public <L> Collection<L> layers(Class<L> cl, Predicate<? super L> sel) {
@@ -1700,6 +1749,11 @@ public class Resource implements Serializable {
 	    }
 	}
 	return(null);
+    }
+    public <I, L extends IDLayer<I>> L flayer(Class<L> cl, I id) {
+	L l = layer(cl, id);
+	if(l == null) throw(new NoSuchLayerException("no " + cl + " in " + name + " with id " + id));
+	return(l);
     }
 
     public boolean equals(Object other) {

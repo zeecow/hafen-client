@@ -63,7 +63,6 @@
       <classpath>
 	<pathelement path="lib/ext/jogl/jogl-all.jar" />
 	<pathelement path="lib/ext/jogl/gluegen-rt.jar" />
-	<pathelement path="lib/jnlp.jar" />
 	<pathelement path="lib/jglob.jar" />
 	<pathelement path="lib/gson-2.8.6.jar" />
         <pathelement path="lib/rxjava-1.1.5.jar" />
@@ -92,10 +91,6 @@
       <compilerarg value="-Xlint:unchecked" />
       <compilerarg value="-Xlint:-options" />
     </javac>
-  </target>
-
-  <target name="appletview" depends="build-env">
-    <copy file="etc/applet.html" todir="build" />
   </target>
 
   <target name="lib-classes" depends="build-env" unless="unpacked-lib">

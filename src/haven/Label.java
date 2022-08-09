@@ -75,6 +75,7 @@ public class Label extends Widget {
 	
     public void settext(String text) {
 	text = i10n(text);
+	this.text.dispose();
 	this.text = f.render(texts = text, col);
 	sz = this.text.sz();
     }
@@ -83,8 +84,14 @@ public class Label extends Widget {
 	
     public void setcolor(Color color) {
 	col = color;
+	this.text.dispose();
 	this.text = f.render(texts, col);
 	sz = this.text.sz();
+    }
+
+    public void dispose() {
+	super.dispose();
+	this.text.dispose();
     }
 	
     public void uimsg(String msg, Object... args) {

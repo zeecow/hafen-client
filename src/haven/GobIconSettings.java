@@ -55,11 +55,11 @@ public class GobIconSettings extends WindowX {
 	    if(reorder) {
 		reorder = false;
 		for (GobIcon.SettingsWindow.Icon icon : filtered) {
-		    if(icon.name == null) {
+		    if(icon.tname == null) {
 			try {
 			    Resource.Tooltip name = icon.conf.res.loadsaved(Resource.remote()).layer(Resource.tooltip);
-			    icon.name = elf.render((name == null) ? "???" : name.t);
-			    icon.resnm = elf2.render(icon.conf.res.name);
+			    icon.tname = elf.render((name.t == null) ? "???" : name.t);
+			    icon.tresnm = elf2.render(icon.conf.res.name);
 			} catch (Loading l) {
 			    reorder = true;
 			}
@@ -72,7 +72,7 @@ public class GobIconSettings extends WindowX {
 			return (1);
 		    if(b.name == null)
 			return (-1);
-		    return (a.name.text.compareTo(b.name.text));
+		    return (a.name.compareTo(b.name));
 		});
 	    }
 	}
@@ -99,7 +99,7 @@ public class GobIconSettings extends WindowX {
 	    }
 	    if(item.name == null)
 		return (false);
-	    return (item.name.text.toLowerCase().contains(filter.toLowerCase()));
+	    return (item.name.toLowerCase().contains(filter.toLowerCase()));
 	}
 	
 	public void draw(GOut g) {
@@ -115,13 +115,13 @@ public class GobIconSettings extends WindowX {
 		g.aimage(icon.img(), new Coord(0, elh / 2), 0.0, 0.5);
 	    } catch (Loading ignored) {}
 	    if(DBG) {
-		if(icon.name != null)
-		    g.aimage(icon.name.tex(), new Coord(elh + UI.scale(5), 0), 0.0, 0);
-		if(icon.resnm != null)
-		    g.aimage(icon.resnm.tex(), new Coord(elh + UI.scale(5), elh), 0.0, 1);
+		if(icon.tname != null)
+		    g.aimage(icon.tname.tex(), new Coord(elh + UI.scale(5), 0), 0.0, 0);
+		if(icon.tresnm != null)
+		    g.aimage(icon.tresnm.tex(), new Coord(elh + UI.scale(5), elh), 0.0, 1);
 	    } else {
-		if(icon.name != null)
-		    g.aimage(icon.name.tex(), new Coord(elh + UI.scale(5), elh / 2), 0.0, 0.5);
+		if(icon.tname != null)
+		    g.aimage(icon.tname.tex(), new Coord(elh + UI.scale(5), elh / 2), 0.0, 0.5);
 	    }
 	    g.image(CheckBox.sbox, showc);
 	    if(icon.conf.show)
@@ -229,8 +229,8 @@ public class GobIconSettings extends WindowX {
 	    try {
 		GobIcon.SettingsWindow.Icon icon = cat.icon();
 		g.aimage(icon.img(), new Coord(0, elh / 2), 0.0, 0.5);
-		if(icon.name != null) {
-		    g.aimage(icon.name.tex(), new Coord(elh + UI.scale(5), elh / 2), 0.0, 0.5);
+		if(icon.tname != null) {
+		    g.aimage(icon.tname.tex(), new Coord(elh + UI.scale(5), elh / 2), 0.0, 0.5);
 		}
 		if(cat != GobCategory.ALL) {
 		    g.image(CheckBox.sbox, showc);
@@ -397,7 +397,7 @@ public class GobIconSettings extends WindowX {
 		
 		icon = new GobIcon.SettingsWindow.Icon(new GobIcon.Setting(spec));
 		Resource.Tooltip name = res.layer(Resource.tooltip);
-		icon.name = elf.render((name == null) ? "???" : name.t);
+		icon.tname = elf.render((name == null) ? "???" : name.t);
 	    }
 	    return icon;
 	}

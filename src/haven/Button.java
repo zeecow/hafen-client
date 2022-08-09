@@ -51,7 +51,7 @@ public class Button extends SIWidget {
     public Runnable action = null;
     static Text.Foundry tf = new Text.Foundry(Text.serif.deriveFont(Font.BOLD, UI.scale(12f))).aa(true);
     static Text.Furnace nf = new PUtils.BlurFurn(new PUtils.TexFurn(tf, Window.ctex), 1, 1, new Color(80, 40, 0));
-    private boolean a = false;
+    private boolean a = false, dis = false;
     private UI.Grab d = null;
 	
     @RName("btn")
@@ -147,7 +147,7 @@ public class Button extends SIWidget {
 	Graphics g = img.getGraphics();
 	int yo = lg?((hl - hs) / 2):0;
 
-	g.drawImage(a?dt:ut, 4, yo + 4, sz.x - 8, hs - 8, null);
+	g.drawImage(a?dt:ut, UI.scale(4), yo + UI.scale(4), sz.x - UI.scale(8), hs - UI.scale(8), null);
 
 	Coord tc = sz.sub(Utils.imgsz(cont)).div(2);
 	if(a)
@@ -162,6 +162,9 @@ public class Button extends SIWidget {
 	    g.drawImage(bm, (sz.x - bm.getWidth()) / 2, 0, null);
 
 	g.dispose();
+
+	if(dis)
+	    PUtils.monochromize(img, Color.LIGHT_GRAY);
     }
 	
     public void change(String text, Color col) {
@@ -175,6 +178,11 @@ public class Button extends SIWidget {
 	if(i10n) text = L10N.button(text);
 	this.text = nf.render(text);
 	this.cont = this.text.img;
+	redraw();
+    }
+
+    public void disable(boolean dis) {
+	this.dis = dis;
 	redraw();
     }
 
@@ -194,6 +202,8 @@ public class Button extends SIWidget {
 		change((String)args[0], (Color)args[1]);
 	    else
 		change((String)args[0]);
+	} else if(msg == "dis") {
+	    disable(((Integer)args[1]) != 0);
 	} else {
 	    super.uimsg(msg, args);
 	}
@@ -218,7 +228,7 @@ public class Button extends SIWidget {
     }
 
     public boolean mousedown(Coord c, int button) {
-	if(button != 1)
+	if((button != 1) || dis)
 	    return(false);
 	a = true;
 	d = ui.grabmouse(this);
