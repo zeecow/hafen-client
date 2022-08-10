@@ -309,7 +309,7 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 	foldbuttons();
 	portrait = ulpanel.add(Frame.with(new Avaview(Avaview.dasz, plid, "avacam"), false), UI.scale(10, 10));
 	buffs = ulpanel.add(new Bufflist(), portrait.c.x + portrait.sz.x + UI.scale(10), portrait.c.y + ((IMeter.fsz.y + UI.scale(2)) * 2) + UI.scale(5 - 2));
-	umpanel.add(new Cal(), Coord.z);
+	calendar = umpanel.add(new Cal(), Coord.z);
 	eqproxy = add(new EquipProxy(SLOTS.HAND_LEFT, SLOTS.HAND_RIGHT, SLOTS.BACK, SLOTS.BELT), new Coord(420, 5));
 	filter = add(new FilterWnd());
 	syslog = chat.add(new ChatUI.Log("System"));
