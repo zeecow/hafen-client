@@ -685,6 +685,7 @@ public class MapWnd extends WindowX implements Console.Directory {
 		    protected void drawicon(GOut g) {
 			try {
 			    Tex icon = lm.type.icon();
+			    if(icon == null) {return;}
 			    if(markcfg.filter(lm.type))
 				g.chcolor(255, 255, 255, 128);
 			    g.aimage(icon, Coord.of(sz.y / 2), 0.5, 0.5);
