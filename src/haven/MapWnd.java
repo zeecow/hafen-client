@@ -669,8 +669,6 @@ public class MapWnd extends WindowX implements Console.Directory {
 	public MarkerList(Coord sz) {
 	    super(sz, MarkerType.iconsz);
 	}
-//TODO: check
-//	private final Text.Foundry fnd = new Text.Foundry(Text.sans, 18).aa(true);
 
 	public List<ListMarker> allitems() {return(markers);}
 	public boolean searchmatch(ListMarker lm, String txt) {return(lm.mark.nm.toLowerCase().indexOf(txt.toLowerCase()) >= 0);}
@@ -705,17 +703,6 @@ public class MapWnd extends WindowX implements Console.Directory {
 	    return(ret);
 	}
     
-	//TODO: check
-//	@Override
-//	protected Object itemtip(ListMarker item) {
-//	    Tex nameTex = names.apply(item.mark.nm).tex();
-//	    int namePos = UI.scale(10) + MarkerType.iconsz;
-//	    if((nameTex.sz().x + namePos) > sb.c.x) {
-//		return item.mark.nm;
-//	    }
-//	    return null;
-//	}
-
 	private void toggletype(MarkerType type) {
 	    MarkerConfig nc = markcfg.toggle(type);
 	    markcfg = nc;
