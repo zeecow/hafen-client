@@ -169,6 +169,7 @@ public class ZeeConfig {
     public static boolean hideFxSmoke = Utils.getprefb("hideFxSmoke", true);
     public static boolean hideFxAnimations = Utils.getprefb("hideFxAnimations", true);
     public static boolean highlightCropsReady = Utils.getprefb("highlightCropsReady", true);
+    public static String listAlchHerbalSwill = Utils.getpref("listAlchHerbalSwill","");
     public static boolean showGrowingTreePercentage = Utils.getprefb("showGrowingTreePercentage", true);
     public static boolean treeAnimation = Utils.getprefb("treeAnimation", false);
     public static boolean keyBeltShiftTab = Utils.getprefb("keyBeltShiftTab", true);
@@ -794,9 +795,6 @@ public class ZeeConfig {
         // Craft window
         if(windowTitle.contentEquals("Boil Pepper Drupes")){
             ZeeManagerCook.pepperRecipeOpened(window);
-        }
-        else if (windowTitle.contentEquals("Herbal Swill")){
-            ZeeManagerCook.hsRecipeOpened(window);
         }
 
         if (!windowTitle.contentEquals("Options"))

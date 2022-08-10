@@ -14,8 +14,8 @@ public class Elixir extends ItemInfo.Tip {
 	super(owner);
 	this.time = time;
 	this.effs = effs;
-	ZeeManagerCook.hsElixirStr = getElixirStr();
-	ZeeManagerCook.hsElixirStrMs = System.currentTimeMillis();
+	ZeeResearch.hsElixirStr = getElixirStr();
+	ZeeResearch.hsElixirStrMs = System.currentTimeMillis();
     }
 
     public static ItemInfo mkinfo(Owner owner, Object... args) {
@@ -61,6 +61,8 @@ public class Elixir extends ItemInfo.Tip {
     }
 
 	public String getElixirStr(){
+		// returns ";attr,name,val;heal,name,val;wound,name,val;time,val"
+		// ingrs prepended later ("ingr,i1,i2" )
 		String ret = "";
 		for(ItemInfo eff : effs){
 			if (eff instanceof AttrMod) {
