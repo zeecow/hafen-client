@@ -203,7 +203,7 @@ public class ShadowMap extends State {
 	    if((back == null) || !out.env().compatible(back)) {
 		if(back != null)
 		    back.dispose();
-		back = out.env().drawlist();
+		back = out.env().drawlist().desc("shadow-list: " + this);
 		back.asyncadd(this, Rendered.class);
 	    }
 	    back.draw(out);
@@ -247,7 +247,7 @@ public class ShadowMap extends State {
 	data.basic(basic);
 	data.draw(out);
 	if(false)
-	    GOut.getimage(out, lbuf.image(0), Debug::dumpimage);
+	    GOut.getimage(out, lbuf.image(0), false, Debug::dumpimage);
     }
 
     public void apply(Pipe buf) {

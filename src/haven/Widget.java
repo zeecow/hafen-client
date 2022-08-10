@@ -189,13 +189,7 @@ public class Widget {
 		name = name.substring(0, p);
 	    }
 	    Indir<Resource> res = Resource.remote().load(name, ver, 10);
-	    while(true) {
-		try {
-		    return(res.get().getcode(Factory.class, true));
-		} catch(Loading l) {
-		    l.waitfor();
-		}
-	    }
+	    return(Loading.waitforint(() -> res.get().getcode(Factory.class, true)));
 	}
     }
 
@@ -695,6 +689,8 @@ public class Widget {
 	    pack();
 	} else if(msg == "z") {
 	    z((Integer)args[0]);
+	} else if(msg == "show") {
+	    show((Integer)args[0] != 0);
 	} else if(msg == "curs") {
 	    if(args.length == 0)
 		cursor = null;

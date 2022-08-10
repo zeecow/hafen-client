@@ -39,7 +39,9 @@ public class MainFrame extends java.awt.Frame implements Console.Directory {
     final UIPanel p;
     private final ThreadGroup g;
     private Thread mt;
+    boolean fullscreen;
     DisplayMode fsmode = null, prefs = null;
+    Coord prefssz = null;
 	
     static {
 	try {
@@ -64,16 +66,20 @@ public class MainFrame extends java.awt.Frame implements Console.Directory {
 	
     public void setfs() {
 	GraphicsDevice dev = getGraphicsConfiguration().getDevice();
-	if(prefs != null)
+	if(fullscreen)
 	    return;
-	prefs = dev.getDisplayMode();
+	fullscreen = true;
+	prefssz = new Coord(getSize());
 	try {
 	    setVisible(false);
 	    dispose();
 	    setUndecorated(true);
 	    setVisible(true);
 	    dev.setFullScreenWindow(this);
-	    dev.setDisplayMode(fsmode);
+	    if(fsmode != null) {
+		prefs = dev.getDisplayMode();
+		dev.setDisplayMode(fsmode);
+	    }
 	    pack();
 	} catch(Exception e) {
 	    throw(new RuntimeException(e));
@@ -82,23 +88,22 @@ public class MainFrame extends java.awt.Frame implements Console.Directory {
 	
     public void setwnd() {
 	GraphicsDevice dev = getGraphicsConfiguration().getDevice();
-	if(prefs == null)
+	if(!fullscreen)
 	    return;
 	try {
-	    dev.setDisplayMode(prefs);
+	    if(prefs != null)
+		dev.setDisplayMode(prefs);
 	    dev.setFullScreenWindow(null);
 	    setVisible(false);
 	    dispose();
 	    setUndecorated(false);
+	    if(prefssz != null)
+		setSize(prefssz.x, prefssz.y);
 	    setVisible(true);
 	} catch(Exception e) {
 	    throw(new RuntimeException(e));
 	}
-	prefs = null;
-    }
-
-    public boolean hasfs() {
-	return(prefs != null);
+	fullscreen = false;
     }
 
     private Map<String, Console.Command> cmdmap = new TreeMap<String, Console.Command>();
@@ -124,7 +129,10 @@ public class MainFrame extends java.awt.Frame implements Console.Directory {
 	    });
 	cmdmap.put("fsmode", new Console.Command() {
 		public void run(Console cons, String[] args) throws Exception {
-		    if(args.length == 3) {
+		    if((args.length < 2) || args[1].equals("none")) {
+			fsmode = null;
+			Utils.setprefc("fsmode", Coord.z);
+		    } else if(args.length == 3) {
 			DisplayMode mode = findmode(Integer.parseInt(args[1]), Integer.parseInt(args[2]));
 			if(mode == null)
 			    throw(new Exception("No such mode is available"));
@@ -174,15 +182,9 @@ public class MainFrame extends java.awt.Frame implements Console.Directory {
 	Component pp = (Component)(this.p = new JOGLPanel(sz));
 	if(fsmode == null) {
 	    Coord pfm = Utils.getprefc("fsmode", null);
-	    if(pfm != null)
+	    if((pfm != null) && !pfm.equals(Coord.z))
 		fsmode = findmode(pfm.x, pfm.y);
 	}
-	if(fsmode == null) {
-	    DisplayMode cm = getGraphicsConfiguration().getDevice().getDisplayMode();
-	    fsmode = findmode(cm.getWidth(), cm.getHeight());
-	}
-	if(fsmode == null)
-	    fsmode = findmode(800, 600);
 	add(pp);
 	pack();
 	setResizable(!Utils.getprefb("wndlock", false));
@@ -207,7 +209,7 @@ public class MainFrame extends java.awt.Frame implements Console.Directory {
     }
 	
     private void savewndstate() {
-	if(prefs == null) {
+	if(!fullscreen) {
 	    if(getExtendedState() == NORMAL)
 		/* Apparent, getSize attempts to return the "outer
 		 * size" of the window, including WM decorations, even
@@ -222,6 +224,12 @@ public class MainFrame extends java.awt.Frame implements Console.Directory {
 	}
     }
 
+    public static class ConnectionError extends RuntimeException {
+	public ConnectionError(String mesg) {
+	    super(mesg);
+	}
+    }
+
     public static Session connect(Object[] args) {
 	String username;
 	byte[] cookie;
@@ -229,16 +237,20 @@ public class MainFrame extends java.awt.Frame implements Console.Directory {
 	    username = Config.authuser;
 	    cookie = Config.authck;
 	} else {
-	    if((username = Utils.getpref("tokenname@" + Config.defserv, null)) == null)
-		throw(new RuntimeException("No explicit or saved username"));
-	    String token = Utils.getpref("savedtoken@" + Config.defserv, null);
+	    if(Config.authuser != null) {
+		username = Config.authuser;
+	    } else {
+		if((username = Utils.getpref("tokenname@" + Config.defserv, null)) == null)
+		    throw(new ConnectionError("no explicit or saved username for host: " + Config.defserv));
+	    }
+	    String token = Utils.getpref("savedtoken-" + username + "@" + Config.defserv, null);
 	    if(token == null)
-		throw(new RuntimeException("No saved token"));
+		throw(new ConnectionError("no saved token for user: " + username));
 	    try {
 		AuthClient cl = new AuthClient((Config.authserv == null) ? Config.defserv : Config.authserv, Config.authport);
 		try {
 		    if((username = cl.trytoken(username, Utils.hex2byte(token))) == null)
-			throw(new RuntimeException("Authentication with saved token failed"));
+			throw(new ConnectionError("authentication with saved token failed"));
 		    cookie = cl.getcookie();
 		} finally {
 		    cl.close();
@@ -257,8 +269,11 @@ public class MainFrame extends java.awt.Frame implements Console.Directory {
 	try {
 	    synchronized(sess) {
 		while(sess.state != "") {
-		    if(sess.connfailed != 0)
-			throw(new RuntimeException(String.format("connection failure: %d", sess.connfailed)));
+		    if(sess.connfailed != 0) {
+			if(sess.connerror != null)
+			    throw(new ConnectionError(sess.connerror));
+			throw(new ConnectionError(String.format("connection failure: %d", sess.connfailed)));
+		    }
 		    try {
 			sess.wait();
 		    } catch(InterruptedException e) {
@@ -383,10 +398,16 @@ public class MainFrame extends java.awt.Frame implements Console.Directory {
 	}
 	setupres();
 	UI.Runner fun = null;
-	if(Config.servargs != null)
-	    fun = new RemoteUI(connect(Config.servargs));
+	if(Config.servargs != null) {
+	    try {
+		fun = new RemoteUI(connect(Config.servargs));
+	    } catch(ConnectionError e) {
+		System.err.println("hafen: " + e.getMessage());
+		System.exit(1);
+	    }
+	}
 	MainFrame f = new MainFrame(null);
-	if(Utils.getprefb("fullscreen", false))
+	if(Config.fullscreen)
 	    f.setfs();
 	f.run(fun);
 	dumplist(Resource.remote().loadwaited(), Config.loadwaited);

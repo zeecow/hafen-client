@@ -305,7 +305,7 @@ public class OCache implements Iterable<Gob> {
 			ol.sdt = copy;
 		    } else {
 			g.addol(nol = new Gob.Overlay(g, olid, res, sdt), false);
-			ol.remove();
+			ol.remove(false);
 		    }
 		}
 		if(nol != null)
@@ -315,7 +315,7 @@ public class OCache implements Iterable<Gob> {
 		    if(ol.spr instanceof Sprite.CDel)
 			((Sprite.CDel)ol.spr).delete();
 		    else
-			ol.remove();
+			ol.remove(false);
 		}
 	    }
 	    g.drawableUpdated();

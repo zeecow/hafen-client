@@ -404,8 +404,9 @@ public class Resource implements Serializable {
 	    }
 	}
 
-	public void boostprio(int prio) {
+	public boolean boostprio(int prio) {
 	    res.boostprio(prio);
+	    return(true);
 	}
     }
 
@@ -517,10 +518,8 @@ public class Resource implements Serializable {
 	    }
 
 	    public Resource get() {
-		if(!done) {
-		    boostprio(1);
+		if(!done)
 		    throw(new Loading(this));
-		}
 		if(error != null) {
 		    if(!found)
 			throw(new NoSuchResourceException(name, ver, error));
@@ -658,7 +657,7 @@ public class Resource implements Serializable {
 	    return(ret);
 	}
 
-	public Named load(String name, int ver) {return(load(name, ver, -5));}
+	public Named load(String name, int ver) {return(load(name, ver, 0));}
 	public Named load(String name) {return(load(name, -1));}
 
 	public Indir<Resource> dynres(long id) {

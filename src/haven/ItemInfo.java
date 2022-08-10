@@ -86,7 +86,7 @@ public abstract class ItemInfo {
     public interface SpriteOwner extends ResOwner {
 	GSprite sprite();
     }
-    
+
     public static class Raw {
 	public final Object[] data;
 	public final double time;
@@ -142,11 +142,11 @@ public abstract class ItemInfo {
 				    }));
 	}
     }
-    
+
     public ItemInfo(Owner owner) {
 	this.owner = owner;
     }
-    
+
     public static class Layout {
 	private final List<Tip> tips = new ArrayList<Tip>();
 	private final Map<ID, Tip> itab = new HashMap<ID, Tip>();
@@ -196,15 +196,15 @@ public abstract class ItemInfo {
 	}
 	public int order() {return(100);}
     }
-    
+
     public static class AdHoc extends Tip {
 	public final Text str;
-	
+
 	public AdHoc(Owner owner, String str) {
 	    super(owner);
 	    this.str = Text.render(str);
 	}
-	
+
 	public BufferedImage tipimg() {
 	    return(str.img);
 	}
@@ -231,7 +231,7 @@ public abstract class ItemInfo {
 	public Name(Owner owner, String str, String orig) {
 	    this(owner, Text.render(str), orig);
 	}
-	
+
 	public BufferedImage tipimg() {
 	    return(str.img);
 	}
@@ -243,6 +243,27 @@ public abstract class ItemInfo {
 		    public BufferedImage tipimg() {return(str.img);}
 		    public int order() {return(0);}
 		});
+	}
+
+	public static interface Dynamic {
+	    public String name();
+	}
+
+	public static class Default implements InfoFactory {
+	    public ItemInfo build(Owner owner, Object... args) {
+		if(owner instanceof SpriteOwner) {
+		    GSprite spr = ((SpriteOwner)owner).sprite();
+		    if(spr instanceof Dynamic)
+			return(new Name(owner, ((Dynamic)spr).name()));
+		}
+		if(!(owner instanceof ResOwner))
+		    return(null);
+		Resource res = ((ResOwner)owner).resource();
+		Resource.Tooltip tt = res.layer(Resource.tooltip);
+		if(tt == null)
+		    throw(new RuntimeException("Item resource " + res + " is missing default tooltip"));
+		return(new Name(owner, tt.t));
+	    }
 	}
     }
 
