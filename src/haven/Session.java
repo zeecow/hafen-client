@@ -134,10 +134,15 @@ public class Session implements Resource.Resolver {
 	    protected Resource res;
 		    
 	    public Resource get() {
-		if(resnm == null)
-		    throw(new LoadingIndir(CachedRes.this));
-		if(res == null)
-		    res = Resource.remote().load(resnm, resver, 0).get();
+		if(res == null) {
+		    synchronized(CachedRes.this) {
+			if(res == null) {
+			    if(resnm == null)
+				throw(new LoadingIndir(CachedRes.this));
+			    res = Resource.remote().load(resnm, resver, 0).get();
+			}
+		    }
+		}
 		return(res);
 	    }
 	
@@ -383,8 +388,6 @@ public class Session implements Resource.Resolver {
 			    clip = new Audio.VolAdjust(clip, vol);
 			Audio.play(clip);
 		    }, null);
-	    } else if(msg.type == RMessage.RMSG_CATTR) {
-		glob.cattr(msg);
 	    } else if(msg.type == RMessage.RMSG_MUSIC) {
 		String resnm = msg.string();
 		int resver = msg.uint16();

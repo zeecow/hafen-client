@@ -36,7 +36,6 @@ import haven.Composited.ED;
 public class Avaview extends PView implements DTarget{
     public static final Tex missing = Resource.loadtex("gfx/hud/equip/missing");
     public static final Coord dasz = missing.sz();
-    public Color color = Color.WHITE;
     public FColor clearcolor = FColor.BLACK;
     public long avagob;
     public Desc avadesc;
@@ -52,14 +51,17 @@ public class Avaview extends PView implements DTarget{
 	public Widget create(UI ui, Object[] args) {
 	    long avagob = -1;
 	    Coord sz = dasz;
+	    boolean inner = false;
 	    String camnm = "avacam";
 	    if(args[0] != null)
 		avagob = Utils.uint32((Integer)args[0]);
-	    if((args.length > 1) && (args[1] != null))
+	    if((args.length > 1) && (args[1] != null)) {
 		sz = UI.scale((Coord)args[1]);
+		inner = true;
+	    }
 	    if((args.length > 2) && (args[2] != null))
 		camnm = (String)args[2];
-	    return(new Avaview(sz, avagob, camnm));
+	    return(new ProxyFrame<>(new Avaview(sz, avagob, camnm), inner));
 	}
     }
 
@@ -84,8 +86,6 @@ public class Avaview extends PView implements DTarget{
 	    else
 		this.avagob = Utils.uint32((Integer)args[0]);
 	    this.avadesc = null;
-	} else if(msg == "col") {
-	    this.color = (Color)args[0];
 	} else if(msg == "pop") {
 	    pop(Desc.decode(ui.sess, args));
 	} else if(msg == "bg") {
@@ -270,10 +270,6 @@ public class Avaview extends PView implements DTarget{
 	    } catch(Loading e) {
 		g.image(missing, Coord.z, sz);
 	    }
-	}
-	if(color != null) {
-	    g.chcolor(color);
-	    Window.wbox.draw(g, Coord.z, sz);
 	}
     }
 

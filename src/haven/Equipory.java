@@ -150,7 +150,7 @@ public class Equipory extends Widget implements DTarget {
 		final FColor cc = new FColor(0, 0, 0, 0);
 		protected FColor clearcolor() {return(cc);}
 	    }, bgc);
-	ava.color = null;
+//	ava.color = null;
 
 	bonuses = add(new AttrBonusesWdg(isz.y), isz.x + 5, 0);
 	pack();
