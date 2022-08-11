@@ -140,7 +140,7 @@ public class ZeeResearch {
         List<String> allLines = null;
         try {
             Path path = Paths.get(System.getProperty("user.home"),fileName);
-            byte[] bytes = Files.readAllBytes(path);
+            //byte[] bytes = Files.readAllBytes(path);
             allLines = Files.readAllLines(path, StandardCharsets.UTF_8);
         }catch (NoSuchFileException e){
             println("NoSuchFileException > new file "+fileName+" ?");

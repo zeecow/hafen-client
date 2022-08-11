@@ -61,7 +61,7 @@ public class Elixir extends ItemInfo.Tip {
     }
 
 	public String getElixirStr(){
-		// returns ";attr,name,val;heal,name,val;wound,name,val;time,val"
+		// returns ";attr,name,val;heal,name,val[,repl,name];wound,name,val;time,val"
 		// ingrs prepended later ("ingr,i1,i2" )
 		String ret = "";
 		for(ItemInfo eff : effs){
@@ -74,6 +74,9 @@ public class Elixir extends ItemInfo.Tip {
 			else if (eff instanceof HealWound){
 				HealWound heal = ((HealWound) eff);
 				ret += ";heal,"+heal.res.get().basename()+","+heal.a;
+				if (heal.repl!=null && heal.repl.get()!=null && heal.res.get().basename()!=null){
+					ret += ",repl,"+heal.repl.get().basename();
+				}
 			}
 			else if (eff instanceof AddWound){
 				AddWound wound = ((AddWound) eff);
