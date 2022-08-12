@@ -645,11 +645,6 @@ public class ZeeConfig {
         long gobId = gob.id;
         String path = "";
 
-        //if gob is new, add to session gobs
-        if(mapGobSession.put(gobName,"") == null) {
-            //System.out.println(gobName+"  "+mapGobSession.size());
-        }
-
         if(isPlayer(gob)  &&  gobId != gameUI.map.player().id) {
             if(autoHearthOnStranger)
                 gameUI.act("travel","hearth");
@@ -2363,7 +2358,8 @@ public class ZeeConfig {
             ZeeConfig.applyGobSettingsAudio(ob);
             ZeeConfig.applyGobSettingsAggro(ob);
             ZeeConfig.applyGobSettingsHighlight(ob, ZeeConfig.getHighlightGobColor(ob));
-            //ZeeManagerMiner.checkNearBoulder(ob);
+            if (ob.resName!=null && !ob.resName.isBlank() && !mapGobSession.containsKey(ob.resName))
+                mapGobSession.put(ob.resName,"");
         }
     }
 
