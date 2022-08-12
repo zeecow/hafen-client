@@ -1,4 +1,5 @@
 $size[14]{$u{Update for 12.08.22:}
+  * merged loftar's changes
   * re-implemented icon categories for minimap icons settings
  
 $size[14]{$u{Update for 10.08.22:}
