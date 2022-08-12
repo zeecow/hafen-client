@@ -805,6 +805,8 @@ public class Resource implements Serializable {
 	    synchronized(Resource.class) {
 		if(_local == null) {
 		    Pool local = new Pool(new FileSource(Config.getFile("res").toPath()));
+		    local.add(new CustomizedJarSource("customized-remote"));
+		    local.add(new JarSource("res-preload"));
 		    local.add(new JarSource("res"));
 		    try {
 			if(Config.resdir != null)
@@ -826,7 +828,7 @@ public class Resource implements Serializable {
 	if(_remote == null) {
 	    synchronized(Resource.class) {
 		if(_remote == null) {
-		    Pool remote = new Pool(local(), new CustomizedJarSource("customized-remote"), new JarSource("res-preload"));
+		    Pool remote = new Pool(local());
 		    if(prscache != null)
 			remote.add(new CacheSource(prscache));
 		    _remote = remote;;
