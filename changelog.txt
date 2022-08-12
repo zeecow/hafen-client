@@ -1,3 +1,6 @@
+$size[14]{$u{Update for 12.08.22:}
+  * re-implemented icon categories for minimap icons settings
+ 
 $size[14]{$u{Update for 10.08.22:}
   * merged loftar's changes
   * icon categories for minimap are disabled for now
