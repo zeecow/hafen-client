@@ -26,7 +26,6 @@
 
 package haven;
 
-import java.awt.*;
 import java.util.*;
 import java.util.List;
 
@@ -677,8 +676,7 @@ public class MiniMap extends Widget {
 		    GobIcon icon = gob.getattr(GobIcon.class);
 		    if(icon != null) {
 			GobIcon.Setting conf = iconconf.get(icon.res.get());
-			//TODO: re-enable when re-implemented
-			if((conf != null) && conf.show /*&& GobIconSettings.GobCategory.categorize(conf).enabled()*/) {
+			if((conf != null) && conf.show && GobIconCategoryList.GobCategory.categorize(conf).enabled()) {
 			    DisplayIcon disp = pmap.remove(gob);
 			    if(disp == null)
 				disp = new DisplayIcon(icon, conf);

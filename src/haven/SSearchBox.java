@@ -139,6 +139,12 @@ public abstract class SSearchBox<I, W extends Widget> extends SListBox<I, W> {
 	    display(sel);
 	updinfo();
     }
+    
+    public void research() {
+	if(searching!=null) {
+	    search(searching);
+	}
+    }
 
     public void draw(GOut g) {
 	super.draw(g);

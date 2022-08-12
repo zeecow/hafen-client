@@ -32,6 +32,7 @@ import java.io.*;
 import java.nio.file.*;
 import java.awt.image.*;
 import java.awt.Color;
+import java.util.stream.Collectors;
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.*;
 
@@ -380,7 +381,9 @@ public class GobIcon extends GAttrib {
 	private final PackCont.LinPack cont;
 	private final IconList list;
 	private Widget setbox;
-
+	private final CheckBox toggleAll;
+	private GobIconCategoryList.GobCategory category = GobIconCategoryList.GobCategory.ALL;
+    
 	public static class Icon {
 	    public final Setting conf;
 	    public String name;
@@ -416,6 +419,7 @@ public class GobIcon extends GAttrib {
 	private static final int elh = elf.height() + UI.scale(2);
 	public class IconList extends SSearchBox<Icon, IconList.IconLine> {
 	    private List<Icon> ordered = Collections.emptyList();
+	    private List<Icon> categorized = Collections.emptyList();
 	    private Map<String, Setting> cur = null;
 	    private boolean reorder = false;
 
@@ -429,7 +433,7 @@ public class GobIcon extends GAttrib {
 		    Widget prev;
 		    prev = adda(new CheckBox("").state(() -> icon.conf.notify).set(andsave(val -> icon.conf.notify = val)).settip("Notify"),
 				sz.x - UI.scale(2) - (sz.y / 2), sz.y / 2, 0.5, 0.5);
-		    prev = adda(new CheckBox("").state(() -> icon.conf.show).set(andsave(val -> icon.conf.show = val)).settip("Display"),
+		    prev = adda(new CheckBox("").state(() -> icon.conf.show).set(andsave(val -> {icon.conf.show = val;updateAllCheckbox();})).settip("Display"),
 				prev.c.x - UI.scale(2) - (sz.y / 2), sz.y / 2, 0.5, 0.5);
 		    add(SListWidget.IconText.of(Coord.of(prev.c.x - UI.scale(2), sz.y), () -> item.conf.res.loadsaved(Resource.remote())), Coord.z);
 		}
@@ -439,7 +443,7 @@ public class GobIcon extends GAttrib {
 		return((icon.name != null) &&
 		       (icon.name.toLowerCase().indexOf(text.toLowerCase()) >= 0));
 	    }
-	    protected List<Icon> allitems() {return(ordered);}
+	    protected List<Icon> allitems() {return(categorized);}
 	    protected IconLine makeitem(Icon icon, int idx, Coord sz) {return(new IconLine(sz, icon));}
 
 	    public void tick(double dt) {
@@ -474,16 +478,28 @@ public class GobIcon extends GAttrib {
 				return(-1);
 			    return(a.name.compareTo(b.name));
 			});
+		    categorized = list.ordered.stream()
+			.filter(category::matches)
+			.collect(Collectors.toList());
+		    research();
+		    updateAllCheckbox();
 		}
 		super.tick(dt);
 	    }
-
+	    
+	    @Override
+	    public void search(String text) {
+		super.search(text);
+		updateAllCheckbox();
+	    }
+	    
 	    public boolean keydown(java.awt.event.KeyEvent ev) {
 		if(ev.getKeyCode() == java.awt.event.KeyEvent.VK_SPACE) {
 		    if(sel != null) {
 			sel.conf.show = !sel.conf.show;
 			if(save != null)
 			    save.run();
+			updateAllCheckbox();
 		    }
 		    return(true);
 		}
@@ -594,10 +610,32 @@ public class GobIcon extends GAttrib {
 	    super(Coord.z, "Icon settings");
 	    this.conf = conf;
 	    this.save = save;
-	    add(this.cont = new PackCont.LinPack.VPack(), Coord.z).margin(UI.scale(5)).packpar(true);
+	    PackCont.LinPack.VPack left = new PackCont.LinPack.VPack();
+	    PackCont.LinPack root;
+	    add(root = new PackCont.LinPack.HPack(), Coord.z).margin(UI.scale(5)).packpar(true);
+	    root.last(left, 0).margin(UI.scale(5)).packpar(true);
+	    root.last(new VRuler(UI.scale(500)), 0);
+	    root.last(this.cont = new PackCont.LinPack.VPack(), 0).margin(UI.scale(5)).packpar(true);
+	    toggleAll = cont.last(new CheckBox("Select All") {
+		@Override
+		public void changed(boolean val) {
+		    list.items().forEach(icon -> icon.conf.show = val);
+		    if(save != null)
+			save.run();
+		}}, 0);
 	    list = cont.last(new IconList(UI.scale(250, 500)), 0);
-	    cont.last(new HRuler(list.sz.x), 0);
-	    cont.last(new CheckBox("Notification on newly seen icons") {
+	    
+	    left.last(new GobIconCategoryList(UI.scale(250), 8, elh){
+		@Override
+		public void change(GobIconCategoryList.GobCategory item) {
+		    super.change(item);
+		    SettingsWindow.this.category = item;
+		    list.reorder = true;
+		}
+	    }, 0).change(GobIconCategoryList.GobCategory.ALL);
+	    
+	    left.last(new HRuler(list.sz.x), 0);
+	    left.last(new CheckBox("Notification on newly seen icons") {
 		    {this.a = conf.notify;}
 
 		    public void changed(boolean val) {
@@ -607,6 +645,19 @@ public class GobIcon extends GAttrib {
 		    }
 		}, UI.scale(5));
 	    cont.pack();
+	    left.pack();
+	    root.pack();
+	    updateAllCheckbox();
+	}
+    
+	private void updateAllCheckbox() {
+	    if(toggleAll == null) {
+		return;
+	    }
+	    List<? extends Icon> items = list != null ? list.items() : null;
+	    toggleAll.a = items != null 
+		&& !items.isEmpty() 
+		&& items.stream().allMatch(icon -> icon.conf.show);
 	}
     }
 
