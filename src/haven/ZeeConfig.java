@@ -145,7 +145,7 @@ public class ZeeConfig {
     public static boolean autoToggleGridLines = Utils.getprefb("autoToggleGridLines", true);
     public static boolean butcherMode = false;
     public static String butcherAutoList = Utils.getpref("butcherAutoList",DEF_BUTCH_AUTO_LIST);
-    public static boolean cattleRosterHeight = Utils.getprefb("cattleRosterHeight", false);
+    public static boolean cattleRosterHeight = Utils.getprefb("cattleRosterHeight", true);
     public static double cattleRosterHeightPercentage = Utils.getprefd("cattleRosterHeightPercentage", 1.0);
     public static List<String> craftHistoryList = initCraftHistory();
     public static int craftHistoryPos = -1;
@@ -883,13 +883,13 @@ public class ZeeConfig {
 
     public static void checkRemoteWidget(String type, Widget wdg) {
         //Cattle Roster
-        if(type.contains("rosters/") && ZeeConfig.cattleRosterHeightPercentage <1.0){
-            wdg.resize(wdg.sz.x, (int)(wdg.sz.y * ZeeConfig.cattleRosterHeightPercentage));//resize "window"
+        if(cattleRosterHeight && type.contains("rosters/") && cattleRosterHeightPercentage < 1.0){
+            wdg.resize(wdg.sz.x, (int)(wdg.sz.y * cattleRosterHeightPercentage));//resize "window"
             int y = -1;
             for (Widget w: wdg.children()) { //reposition buttons
                 if(w.getClass().getSimpleName().contentEquals("Button")){
                     if(y==-1) { //calculate once
-                        y = (int) (w.c.y * ZeeConfig.cattleRosterHeightPercentage) - (int)(w.sz.y*0.6);
+                        y = (int) (w.c.y * cattleRosterHeightPercentage) - (int)(w.sz.y*0.6);
                     }
                     w.c.y = y;
                 }
