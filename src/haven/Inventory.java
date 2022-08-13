@@ -218,7 +218,10 @@ public class Inventory extends Widget implements DTarget {
     }
     
     private static boolean isSame(String name, GSprite spr, GItem item) {
-	return item.resname().equals(name) && ((spr == item.spr()) || (spr != null && spr.same(item.spr())));
+	try {
+	    return item.resname().equals(name) && ((spr == item.spr()) || (spr != null && spr.same(item.spr())));
+	} catch (Loading ignored) {}
+	return false;
     }
     
     public int size() {
