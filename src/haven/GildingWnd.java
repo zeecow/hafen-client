@@ -190,11 +190,13 @@ public class GildingWnd extends WindowX {
 	if(gilding != null && !gilding.isEmpty() && slots != null && !slots.isEmpty()) {
 	    boolean isRing = target.name.get().contains("Ring");
 	    boolean isGem = gild.item.resname().contains("gems/gemstone");
-	    if(isRing && !isGem) {
-		ui.message("Only gems can be gilded onto rings!", GameUI.MsgType.ERROR);
-		result = false;
-	    } else {
-		result = true;
+	    result = isGem == isRing;
+	    if(!result) {
+		if(isRing) {
+		    ui.message("Only gems can be gilded onto rings!", GameUI.MsgType.ERROR);
+		} else {
+		    ui.message("Gems can only be gilded onto rings!", GameUI.MsgType.ERROR);
+		}
 	    }
 	}
 	if(result) {
