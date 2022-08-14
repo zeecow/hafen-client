@@ -96,6 +96,10 @@ public class ZeeManagerItemClick extends ZeeThread{
                 println("itemManager > only Belt and Inventory allowed (for now?)");
                 return;
             }
+            else if(isItemDrinkingVessel()) {
+                drinkFrom();
+                return;
+            }
             else if (!isItemHandEquipable()) {
                 // cancel manager and do nothing
                 return;
@@ -112,10 +116,8 @@ public class ZeeManagerItemClick extends ZeeThread{
                 return;
             }
 
-            if(isItemDrinkingVessel()) {
-                drinkFrom();
-            }
-            else if (isItemSack()) { // travellersack or bindle
+
+            if (isItemSack()) { // travellersack or bindle
 
                 if(!isItemWindowEquips()) {//send to equipory
 
