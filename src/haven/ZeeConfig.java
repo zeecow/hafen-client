@@ -206,7 +206,7 @@ public class ZeeConfig {
             "gabbro","corund","kyanite","mica","microlite","orthoclase","soapstone",
             "sodalite","olivine","alabaster","breccia","diabase","arkose",
             "diorite","slate","arkose","eclogite","jasper","greenschist","pegmatite",
-            "rhyolite","pumice"
+            "rhyolite","pumice","chert"
     ));
     public final static Set<String> mineablesOre = new HashSet<String>(Arrays.asList(
             "cassiterite","chalcopyrite","malachite","ilmenite","cinnabar",
@@ -580,10 +580,21 @@ public class ZeeConfig {
         return false;
     }
 
+    public static boolean isTreeLeaf(String name){
+        String[] list = {
+                "trees/maple","trees/conkertree","trees/mulberry"
+        };
+        for (int i = 0; i < list.length; i++) {
+            if(name.contains(list[i]))
+                return true;
+        }
+        return false;
+    }
+
     public static boolean isTreeToughBark(String name){
         String[] list = {
             "trees/linden","trees/birch","trees/wartybirch","trees/willow","trees/cedar",
-            "trees/elm","trees/juniper","trees/beech","trees/mulberry"
+            "trees/elm","trees/juniper","trees/beech","trees/mulberry","trees/wychelm"
         };
         for (int i = 0; i < list.length; i++) {
             if(name.contains(list[i]))
@@ -595,7 +606,7 @@ public class ZeeConfig {
     public static boolean isTreeBough(String name){
         String[] list = {
                 "trees/linden","trees/alder","trees/yew","trees/spruce",
-                "trees/elm","trees/fir","trees/sweetgum"
+                "trees/elm","trees/fir","trees/sweetgum","trees/grayalder"
         };
         for (int i = 0; i < list.length; i++) {
             if(name.contains(list[i]))
@@ -1610,7 +1621,7 @@ public class ZeeConfig {
                         +"Tub,Compost Bin,Extraction Press,Rack,Herbalist Table,Frame,"
                         +"Chicken Coop,Rabbit Hutch,Archery Target,Creel,Oven,Steel crucible,"
                         +"Cauldron,Pane mold,Kiln,Old Trunk,Old Stump,Smoke shed,Finery Forge,"
-                        +"Steelbox,Metal Cabinet,Tidepool,Quiver"
+                        +"Steelbox,Metal Cabinet,Tidepool,Quiver,Fireplace"
         ).split(",");
         for (String contName: containers) {
             if (window.cap.text.contains(contName)) {
@@ -2265,6 +2276,7 @@ public class ZeeConfig {
                     add(space+space+"bark");
                     add(space+space+"bough");
                     add(space+space+"fruit");
+                    add(space+space+"leaves");
                     add(space+space+"nuts");
             }};
             protected String listitem(int idx) {
@@ -2325,6 +2337,8 @@ public class ZeeConfig {
             filteredList.removeIf(entry -> !ZeeConfig.isTreeBough(entry.conf.res.name));
         else if(filter.equals("fruit"))
             filteredList.removeIf(entry -> !ZeeConfig.isTreeFruit(entry.conf.res.name));
+        else if(filter.equals("leaves"))
+            filteredList.removeIf(entry -> !ZeeConfig.isTreeLeaf(entry.conf.res.name));
         else if(filter.equals("nuts"))
             filteredList.removeIf(entry -> !ZeeConfig.isTreeNuts(entry.conf.res.name));
         else if(filter.equals("noob stuff"))

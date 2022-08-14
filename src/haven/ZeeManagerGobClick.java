@@ -38,7 +38,7 @@ public class ZeeManagerGobClick extends ZeeThread{
 
         clickDiffMs = clickEndMs - clickStartMs;
 
-        //println(clickDiffMs+"ms > "+gobName + (gob==null ? "" : " dist="+ZeeConfig.distanceToPlayer(gob)));
+        //println(clickDiffMs+"ms > "+gobName);// + (gob==null ? "" : " dist="+ZeeConfig.distanceToPlayer(gob)));
         //if (gob!=null) println(gobName + " poses = "+ZeeConfig.getGobPoses(gob));
 
         if (isLongMidClick()) {
@@ -1128,7 +1128,8 @@ public class ZeeManagerGobClick extends ZeeThread{
                 +"/table-rustic,/table-stone,/chair-rustic,/stonethrone,/royalthrone,"
                 +"/trough,curdingtub,/plow,/barrel,/still,log,/oldtrunk,chest,/anvil,"
                 +"/cupboard,/studydesk,/demijohn,/quern,/wreckingball-fold,/loom,/swheel,"
-                +"/ttub,/cheeserack,/archerytarget,/dreca,/glasspaneframe,/runestone";
+                +"/ttub,/cheeserack,/archerytarget,/dreca,/glasspaneframe,/runestone,"
+                +"/crate";
         return gobNameEndsWith(gobName,endList);
     }
 
