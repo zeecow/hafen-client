@@ -82,6 +82,8 @@ public class FlowerMenu extends Widget {
 
 	public boolean mousedown(Coord c, int button) {
 	    choose(this);
+		ZeeManagerStockpile.checkClickedPetal(this.name);
+		ZeeQuickOptionsWindow.clickedFlowerMenuPetal(this.name);
 	    return(true);
 	}
 
@@ -266,7 +268,6 @@ public class FlowerMenu extends Widget {
 	    wdgmsg("cl", -1);
 	} else {
 	    wdgmsg("cl", option.num, ui.modflags());
-		ZeeManagerStockpile.checkClickedPetal(option.name);
 	}
     }
 
@@ -286,10 +287,18 @@ public class FlowerMenu extends Widget {
 
 	//auto click the first match
 	private void autoClickPetal(){
+		if (!ZeeQuickOptionsWindow.autoPetalName.isBlank()) {
+			for (int i = 0; i < opts.length; i++) {
+				if (ZeeQuickOptionsWindow.autoPetalName.contentEquals(opts[i].text.text)) {
+					autochoose = opts[i];
+					return;
+				}
+			}
+		}
 		if(ZeeConfig.butcherMode) {
 			String[] list = ZeeConfig.butcherAutoList.split(",");
-			for (int i = 0; i < opts.length; i++) {
-				for (int j = 0; j < list.length; j++) {
+			for (int i = 0; i < opts.length; i++) {// for each menu option
+				for (int j = 0; j < list.length; j++) {// compare each name in saved list
 					if (list[j].contentEquals(opts[i].text.text)) {
 						autochoose = opts[i];
 						return;
@@ -299,8 +308,8 @@ public class FlowerMenu extends Widget {
 		}
     	if(ZeeConfig.autoClickMenuOption) {
 			String[] list = ZeeConfig.autoClickMenuOptionList.split(",");
-			for (int i = 0; i < opts.length; i++) {
-				for (int j = 0; j < list.length; j++) {
+			for (int i = 0; i < opts.length; i++) {// for each menu option
+				for (int j = 0; j < list.length; j++) {// compare each name in saved list
 					if (list[j].contentEquals(opts[i].text.text)) {
 						autochoose = opts[i];
 						return;
