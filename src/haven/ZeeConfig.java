@@ -103,10 +103,11 @@ public class ZeeConfig {
     public static Window windowEquipment,windowInvMain, toggleEquipsLastWindowClicked;
     public static Makewindow makeWindow;
     public static ZeeInvMainOptionsWdg invMainoptionsWdg;
-    public static ZeecowOptionsWindow zeecowOptions;
+    public static ZeeOptionsJFrame zeecowOptions;
     public static Button btnMkWndSearchInput, btnMkWndBack, btnMkWndFwd, btnMkWndDel;
     public static GobIcon.SettingsWindow.IconList iconList;
     public static ChatUI.Channel multiChat;
+    public static ZeeWindow quickOptionsWindow;
     private static Dropbox<String> iconListFilterBox;
     private static Inventory mainInv;
     public static Glob glob;
@@ -1108,7 +1109,7 @@ public class ZeeConfig {
             @Override
             public void click() {
                 if(zeecowOptions == null)
-                    zeecowOptions = new ZeecowOptionsWindow();
+                    zeecowOptions = new ZeeOptionsJFrame();
                 else
                     zeecowOptions.toFront();
                 main.getparent(OptWnd.class).hide();

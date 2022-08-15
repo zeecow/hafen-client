@@ -803,6 +803,7 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 	    	invwnd.hide();
 	    add(invwnd, Utils.getprefc("wndc-inv", new Coord(100, 100)));
 		ZeeConfig.initWindowInvMain();
+		ZeeQuickOptionsWindow.initWindow();
 	} else if(place == "equ") {
 	    equwnd = new Hidewnd(Coord.z, "Equipment");
 	    equwnd.add(child, Coord.z);

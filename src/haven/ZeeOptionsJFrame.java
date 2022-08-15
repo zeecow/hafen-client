@@ -11,7 +11,7 @@ import java.awt.event.ActionEvent;
 import java.util.*;
 import java.util.List;
 
-public class ZeecowOptionsWindow extends JFrame {
+public class ZeeOptionsJFrame extends JFrame {
     public GridBagConstraints c;
     public JTabbedPane tabbedPane, tabbedPaneGobs;
     public JPanel panelTabMisc, panelTabInterface, panelTabGobs, panelTabControls, panelTabMinimap, panelDetailsBottom, panelTabCateg, panelShapeIcons, panelShapeIconsSaveCancel;
@@ -25,7 +25,7 @@ public class ZeecowOptionsWindow extends JFrame {
     public static int TABGOB_SAVED = 1;
     public static int TABGOB_CATEGS = 2;
 
-    public ZeecowOptionsWindow(){
+    public ZeeOptionsJFrame(){
         super.setTitle("Zeecow Haven Options");
         setLocationRelativeTo(null);//center window
         setDefaultLookAndFeelDecorated(true);
@@ -335,13 +335,7 @@ public class ZeecowOptionsWindow extends JFrame {
             Utils.setprefb("alertOnPlayers",val);
         });
 
-        panelTabMisc.add(cbAutohearth = new JCheckBox("Auto-hearth on players"), c);
-        cbAutohearth.setSelected(ZeeConfig.autoHearthOnStranger);
-        cbAutohearth.addActionListener(actionEvent -> {
-            JCheckBox cb = (JCheckBox) actionEvent.getSource();
-            boolean val = ZeeConfig.autoHearthOnStranger = cb.isSelected();
-            Utils.setprefb("autoHearthOnStranger",val);
-        });
+        panelTabMisc.add(new ZeeOptionJCheckBox("Auto-hearth on players","autoHearthOnStranger"), c);
 
         panelTabMisc.add(cbAutoRunLogin = new JCheckBox("Auto-run on login"), c);
         cbAutoRunLogin.setSelected(ZeeConfig.autoRunLogin);
