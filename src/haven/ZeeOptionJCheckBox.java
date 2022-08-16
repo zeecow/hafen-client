@@ -5,6 +5,12 @@ import javax.swing.*;
 public class ZeeOptionJCheckBox extends JCheckBox {
     private final String optName;
     final String label;
+    boolean savePref = true;
+
+    public ZeeOptionJCheckBox(String label, String optName, boolean savePref) {
+        this(label,optName);
+        this.savePref = savePref;
+    }
 
     public ZeeOptionJCheckBox(String label, String optName) {
         super(label);
@@ -32,8 +38,10 @@ public class ZeeOptionJCheckBox extends JCheckBox {
 
     void setZeeConfigBoolean(boolean val) throws Exception {
         ZeeConfig.class.getDeclaredField(optName).setBoolean(ZeeConfig.class,val);
-        Utils.setprefb(optName, val);
-        ZeeConfig.println("setZeeConfigBoolean() > "+optName+" > "+getZeeConfigBoolean());
+        if (savePref) {
+            Utils.setprefb(optName, val);
+            ZeeConfig.println("setZeeConfigBoolean() > " + optName + " > " + getZeeConfigBoolean());
+        }
     }
 
     boolean getZeeConfigBoolean() throws Exception {

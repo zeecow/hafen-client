@@ -158,7 +158,7 @@ public class ZeeConfig {
     public static boolean dropHoldingItemAltKey = Utils.getprefb("dropHoldingItemAltKey", true);
     public static boolean dropMinedCurios = Utils.getprefb("dropMinedCurios", true);
     public static boolean dropMinedOre = Utils.getprefb("dropMinedOre", true);
-    public static boolean dropMinedSilverGold = Utils.getprefb("dropMinedOrePrecious", true);
+    public static boolean dropMinedOrePrecious = Utils.getprefb("dropMinedOrePrecious", true);
     public static boolean dropMinedStones = Utils.getprefb("dropMinedStones", true);
     public static boolean dropSeeds = false;
     public static boolean dropSoil = false;

@@ -71,100 +71,37 @@ public class ZeeOptionsJFrame extends JFrame {
         panelTabControls = new JPanel(new GridBagLayout());
         tabbedPane.addTab("Controls", panelTabControls);
 
-        panelTabControls.add(cbFreeGobPlacement = new JCheckBox("free gob placement"), c);
-        cbFreeGobPlacement.setSelected(ZeeConfig.freeGobPlacement);
-        cbFreeGobPlacement.addActionListener(actionEvent -> {
-            JCheckBox cb = (JCheckBox) actionEvent.getSource();
-            boolean val = ZeeConfig.freeGobPlacement = cb.isSelected();
-            Utils.setprefb("freeGobPlacement",val);
-        });
+        panelTabControls.add(new ZeeOptionJCheckBox("free gob placement","freeGobPlacement"),c);
 
-        panelTabControls.add(cbScrollTransferItems = new JCheckBox("scroll transfer items directly"), c);
-        cbScrollTransferItems.setSelected(ZeeConfig.scrollTransferItems);
-        cbScrollTransferItems.addActionListener(actionEvent -> {
-            JCheckBox cb = (JCheckBox) actionEvent.getSource();
-            boolean val = ZeeConfig.scrollTransferItems = cb.isSelected();
-            Utils.setprefb("scrollTransferItems",val);
-        });
+        panelTabControls.add(new ZeeOptionJCheckBox("scroll transfer items directly","scrollTransferItems"),c);
 
-        panelTabControls.add(cbCtrlClickMinimapContent = new JCheckBox("Ctrl+click to pan/resize minimap"), c);
-        cbCtrlClickMinimapContent.setSelected(ZeeConfig.ctrlClickMinimapContent);
-        cbCtrlClickMinimapContent.addActionListener(actionEvent -> {
-            JCheckBox cb = (JCheckBox) actionEvent.getSource();
-            boolean val = ZeeConfig.ctrlClickMinimapContent = cb.isSelected();
-            Utils.setprefb("ctrlClickMinimapContent",val);
-        });
+        panelTabControls.add(new ZeeOptionJCheckBox( "Ctrl+click to pan/resize minimap", "ctrlClickMinimapContent"),c);
 
-        panelTabControls.add(cbDropAltKeyOnly = new JCheckBox("Alt+click drops holding item"), c);
-        cbDropAltKeyOnly.setSelected(ZeeConfig.dropHoldingItemAltKey);
-        cbDropAltKeyOnly.addActionListener(actionEvent -> {
-            JCheckBox cb = (JCheckBox) actionEvent.getSource();
-            boolean val = ZeeConfig.dropHoldingItemAltKey = cb.isSelected();
-            Utils.setprefb("dropHoldingItemAltKey",val);
-        });
+        panelTabControls.add(new ZeeOptionJCheckBox( "Alt+click drops holding item", "dropHoldingItemAltKey"),c);
 
-        panelTabControls.add(cbKeyUpDownAudioControl = new JCheckBox("Key up/down controls volume"), c);
-        cbKeyUpDownAudioControl.setSelected(ZeeConfig.keyUpDownAudioControl);
-        cbKeyUpDownAudioControl.addActionListener(actionEvent -> {
-            JCheckBox cb = (JCheckBox) actionEvent.getSource();
-            boolean val = ZeeConfig.keyUpDownAudioControl = cb.isSelected();
-            Utils.setprefb("keyUpDownAudioControl",val);
-        });
+        panelTabControls.add(new ZeeOptionJCheckBox( "Key up/down controls volume", "keyUpDownAudioControl"),c);
 
-        panelTabControls.add(cbKeyBeltShiftTab = new JCheckBox("Shift+Tab toggles belt"), c);
-        cbKeyBeltShiftTab.setSelected(ZeeConfig.keyBeltShiftTab);
-        cbKeyBeltShiftTab.addActionListener(actionEvent -> {
-            JCheckBox cb = (JCheckBox) actionEvent.getSource();
-            boolean val = ZeeConfig.keyBeltShiftTab = cb.isSelected();
-            Utils.setprefb("keyBeltShiftTab",val);
-        });
+        panelTabControls.add(new ZeeOptionJCheckBox( "Shift+Tab toggles belt\"", "keyBeltShiftTab"),c);
 
-        panelTabControls.add(cbKeyCamSwitchShiftC = new JCheckBox("Shift+C switch cams"), c);
-        cbKeyCamSwitchShiftC.setSelected(ZeeConfig.keyCamSwitchShiftC);
-        cbKeyCamSwitchShiftC.addActionListener(actionEvent -> {
-            JCheckBox cb = (JCheckBox) actionEvent.getSource();
-            boolean val = ZeeConfig.keyCamSwitchShiftC = cb.isSelected();
-            Utils.setprefb("keyCamSwitchShiftC",val);
-        });
+        panelTabControls.add(new ZeeOptionJCheckBox( "Shift+C switch cams", "keyCamSwitchShiftC"),c);
 
-        panelTabControls.add(cbDrinkKey = new JCheckBox("Drink key ' (single quote) "), c);
-        cbDrinkKey.setSelected(ZeeConfig.drinkKey);
-        cbDrinkKey.addActionListener(actionEvent -> {
-            JCheckBox cb = (JCheckBox) actionEvent.getSource();
-            boolean val = ZeeConfig.drinkKey = cb.isSelected();
-            Utils.setprefb("drinkKey",val);
-        });
+        panelTabControls.add(new ZeeOptionJCheckBox( "Drink key ' (single quote) ", "drinkKey"),c);
     }
+
 
     private void buildTabMinimap() {
 
         panelTabMinimap = new JPanel(new GridBagLayout());
         tabbedPane.addTab("Minimap", panelTabMinimap);
 
-        panelTabMinimap.add(cbSlowMiniMap = new JCheckBox("Slower mini-map"), c);
-        cbSlowMiniMap.setSelected(ZeeConfig.slowMiniMap);
-        cbSlowMiniMap.addActionListener(actionEvent -> {
-            JCheckBox cb = (JCheckBox) actionEvent.getSource();
-            boolean val = ZeeConfig.slowMiniMap = cb.isSelected();
-            Utils.setprefb("slowMiniMap",val);
-        });
+        panelTabMinimap.add(new ZeeOptionJCheckBox( "Slower mini-map", "slowMiniMap"),c);
 
-        panelTabMinimap.add(cbShowIconsZoomOut = new JCheckBox("Show icons while zoomed out"), c);
-        cbShowIconsZoomOut.setSelected(ZeeConfig.showIconsZoomOut);
-        cbShowIconsZoomOut.addActionListener(actionEvent -> {
-            JCheckBox cb = (JCheckBox) actionEvent.getSource();
-            boolean val = ZeeConfig.showIconsZoomOut = cb.isSelected();
-            Utils.setprefb("showIconsZoomOut",val);
-        });
+        panelTabMinimap.add(new ZeeOptionJCheckBox( "Show icons while zoomed out", "showIconsZoomOut"),c);
+
 
         // checkbox shape icons
-        panelTabMinimap.add(cbShapeIcons = new JCheckBox("Show basic shape icons"), c);
-        cbShapeIcons.setSelected(ZeeConfig.shapeIcons);
+        panelTabMinimap.add(cbShapeIcons = new ZeeOptionJCheckBox( "Show basic shape icons", "shapeIcons"),c);
         cbShapeIcons.addActionListener(actionEvent -> {
-            JCheckBox cb = (JCheckBox) actionEvent.getSource();
-            boolean val = ZeeConfig.shapeIcons = cb.isSelected();
-            Utils.setprefb("shapeIcons",val);
-            comboShapeIcons.setEnabled(ZeeConfig.shapeIcons);
             comboShapeIcons.setSelectedIndex(0);
             if (panelShapeIcons!=null){
                 removePanelShape(actionEvent);
@@ -195,6 +132,7 @@ public class ZeeOptionsJFrame extends JFrame {
             repaint();
         });
     }
+
 
     private void previewShapeIcons(ActionEvent evt){
         String rule = ZeeManagerIcons.ShapeIconsOptPanel.getRule(this);
@@ -271,130 +209,39 @@ public class ZeeOptionsJFrame extends JFrame {
         panelTabMisc = new JPanel(new GridBagLayout());
         tabbedPane.addTab("Misc", panelTabMisc);
 
-        panelTabMisc.add(cbHideFxAnimations = new JCheckBox("hide some animations"), c);
-        cbHideFxAnimations.setSelected(ZeeConfig.hideFxAnimations);
-        cbHideFxAnimations.addActionListener(actionEvent -> {
-            JCheckBox cb = (JCheckBox) actionEvent.getSource();
-            boolean val = ZeeConfig.hideFxAnimations = cb.isSelected();
-            Utils.setprefb("hideFxAnimations",val);
-        });
+        panelTabMisc.add(new ZeeOptionJCheckBox( "hide some animations", "hideFxAnimations"),c);
 
-        panelTabMisc.add(cbHideFxSmoke = new JCheckBox("hide smoke effects"), c);
-        cbHideFxSmoke.setSelected(ZeeConfig.hideFxSmoke);
-        cbHideFxSmoke.addActionListener(actionEvent -> {
-            JCheckBox cb = (JCheckBox) actionEvent.getSource();
-            boolean val = ZeeConfig.hideFxSmoke = cb.isSelected();
-            Utils.setprefb("hideFxSmoke",val);
-        });
+        panelTabMisc.add(new ZeeOptionJCheckBox( "hide smoke effects", "hideFxSmoke"),c);
 
-        panelTabMisc.add(cbAutoChipMinedBoulder = new JCheckBox("Auto chip mined boulder"), c);
-        cbAutoChipMinedBoulder.setSelected(ZeeConfig.autoChipMinedBoulder);
-        cbAutoChipMinedBoulder.addActionListener(actionEvent -> {
-            JCheckBox cb = (JCheckBox) actionEvent.getSource();
-            boolean val = ZeeConfig.autoChipMinedBoulder = cb.isSelected();
-            Utils.setprefb("autoChipMinedBoulder",val);
-        });
+        panelTabMisc.add(new ZeeOptionJCheckBox( "Auto chip mined boulder", "autoChipMinedBoulder"),c);
 
-        panelTabMisc.add(cbDropMinedStone = new JCheckBox("Drop mined stones"), c);
-        cbDropMinedStone.setSelected(ZeeConfig.dropMinedStones);
-        cbDropMinedStone.addActionListener(actionEvent -> {
-            JCheckBox cb = (JCheckBox) actionEvent.getSource();
-            boolean val = ZeeConfig.dropMinedStones = cb.isSelected();
-            Utils.setprefb("dropMinedStones",val);
-        });
+        panelTabMisc.add(new ZeeOptionJCheckBox( "Drop mined stones", "dropMinedStones"),c);
 
-        panelTabMisc.add(cbDropMinedOre = new JCheckBox("Drop mined ore"), c);
-        cbDropMinedOre.setSelected(ZeeConfig.dropMinedOre);
-        cbDropMinedOre.addActionListener(actionEvent -> {
-            JCheckBox cb = (JCheckBox) actionEvent.getSource();
-            boolean val = ZeeConfig.dropMinedOre = cb.isSelected();
-            Utils.setprefb("dropMinedOre",val);
-        });
+        panelTabMisc.add(new ZeeOptionJCheckBox( "Drop mined ore", "dropMinedOre"),c);
 
-        panelTabMisc.add(cbDropMinedSilverGold = new JCheckBox("Drop mined silver/gold"), c);
-        cbDropMinedSilverGold.setSelected(ZeeConfig.dropMinedSilverGold);
-        cbDropMinedSilverGold.addActionListener(actionEvent -> {
-            JCheckBox cb = (JCheckBox) actionEvent.getSource();
-            boolean val = ZeeConfig.dropMinedSilverGold = cb.isSelected();
-            Utils.setprefb("dropMinedOrePrecious",val);
-        });
+        panelTabMisc.add(new ZeeOptionJCheckBox( "Drop mined silver/gold", "dropMinedOrePrecious"),c);
 
-        panelTabMisc.add(cbDropMinedCurios = new JCheckBox("Drop mined curios"), c);
-        cbDropMinedCurios.setSelected(ZeeConfig.dropMinedCurios);
-        cbDropMinedCurios.addActionListener(actionEvent -> {
-            JCheckBox cb = (JCheckBox) actionEvent.getSource();
-            boolean val = ZeeConfig.dropMinedCurios = cb.isSelected();
-            Utils.setprefb("dropMinedCurios",val);
-        });
+        panelTabMisc.add(new ZeeOptionJCheckBox( "Drop mined curios", "dropMinedCurios"),c);
 
-        panelTabMisc.add(cbAlertOnPlayers = new JCheckBox("Sound alert on players"), c);
-        cbAlertOnPlayers.setSelected(ZeeConfig.alertOnPlayers);
-        cbAlertOnPlayers.addActionListener(actionEvent -> {
-            JCheckBox cb = (JCheckBox) actionEvent.getSource();
-            boolean val = ZeeConfig.alertOnPlayers = cb.isSelected();
-            Utils.setprefb("alertOnPlayers",val);
-        });
+        panelTabMisc.add(new ZeeOptionJCheckBox( "Sound alert on players", "alertOnPlayers"),c);
 
         panelTabMisc.add(new ZeeOptionJCheckBox("Auto-hearth on players","autoHearthOnStranger"), c);
 
-        panelTabMisc.add(cbAutoRunLogin = new JCheckBox("Auto-run on login"), c);
-        cbAutoRunLogin.setSelected(ZeeConfig.autoRunLogin);
-        cbAutoRunLogin.addActionListener(actionEvent -> {
-            JCheckBox cb = (JCheckBox) actionEvent.getSource();
-            boolean val = ZeeConfig.autoRunLogin = cb.isSelected();
-            Utils.setprefb("autoRunLogin",val);
-        });
+        panelTabMisc.add(new ZeeOptionJCheckBox( "Auto-run on login", "autoRunLogin"),c);
 
-        panelTabMisc.add(cbSimpleHerbs = new JCheckBox("Simple herbs"), c);
-        cbSimpleHerbs.setSelected(ZeeConfig.simpleHerbs);
-        cbSimpleHerbs.addActionListener(actionEvent -> {
-            JCheckBox cb = (JCheckBox) actionEvent.getSource();
-            boolean val = ZeeConfig.simpleHerbs = cb.isSelected();
-            Utils.setprefb("simpleHerbs",val);
-        });
+        panelTabMisc.add(new ZeeOptionJCheckBox( "Simple herbs", "simpleHerbs"),c);
 
-        panelTabMisc.add(cbSimpleCrops = new JCheckBox("Simple crops (restart)"), c);
-        cbSimpleCrops.setSelected(ZeeConfig.simpleCrops);
-        cbSimpleCrops.addActionListener(actionEvent -> {
-            JCheckBox cb = (JCheckBox) actionEvent.getSource();
-            boolean val = ZeeConfig.simpleCrops = cb.isSelected();
-            Utils.setprefb("simpleCrops",val);
-        });
+        panelTabMisc.add(new ZeeOptionJCheckBox( "Simple crops (restart)", "simpleCrops"),c);
 
-        panelTabMisc.add(cbHighlightCropsReady = new JCheckBox("Highlight crops ready"), c);
-        cbHighlightCropsReady.setSelected(ZeeConfig.highlightCropsReady);
-        cbHighlightCropsReady.addActionListener(actionEvent -> {
-            JCheckBox cb = (JCheckBox) actionEvent.getSource();
-            boolean val = ZeeConfig.highlightCropsReady = cb.isSelected();
-            Utils.setprefb("highlightCropsReady",val);
-        });
+        panelTabMisc.add(new ZeeOptionJCheckBox( "Highlight crops ready", "highlightCropsReady"),c);
 
-        panelTabMisc.add(cbShowGrowingTreePercentage = new JCheckBox("Show growing tree %"), c);
-        cbShowGrowingTreePercentage.setSelected(ZeeConfig.showGrowingTreePercentage);
-        cbShowGrowingTreePercentage.addActionListener(actionEvent -> {
-            JCheckBox cb = (JCheckBox) actionEvent.getSource();
-            boolean val = ZeeConfig.showGrowingTreePercentage = cb.isSelected();
-            Utils.setprefb("showGrowingTreePercentage",val);
-        });
+        panelTabMisc.add(new ZeeOptionJCheckBox( "Show growing tree %", "showGrowingTreePercentage"),c);
 
-        panelTabMisc.add(cbTreeAnimation = new JCheckBox("Show tree animation"), c);
-        cbTreeAnimation.setSelected(ZeeConfig.treeAnimation);
-        cbTreeAnimation.addActionListener(actionEvent -> {
-            JCheckBox cb = (JCheckBox) actionEvent.getSource();
-            boolean val = ZeeConfig.treeAnimation = cb.isSelected();
-            Utils.setprefb("treeAnimation",val);
-        });
+        panelTabMisc.add(new ZeeOptionJCheckBox( "Show tree animation", "treeAnimation"),c);
 
         pan = new JPanel(new FlowLayout(FlowLayout.LEFT));
         panelTabMisc.add(pan,c);
-        pan.add(cbMiniTrees= new JCheckBox("Mini trees :3"), c);
-        cbMiniTrees.setSelected(ZeeConfig.miniTrees);
-        cbMiniTrees.addActionListener(actionEvent -> {
-            JCheckBox cb = (JCheckBox) actionEvent.getSource();
-            boolean val = ZeeConfig.miniTrees = cb.isSelected();
-            Utils.setprefb("miniTrees",val);
-            cmbMiniTreeSize.setEnabled(val);
-        });
+        pan.add(new ZeeOptionJCheckBox( "Mini trees", "miniTrees"),c);
 
         //mini trees size
         String[] perc = {"30%","40%","50%","60%","70%","80%"};
@@ -451,13 +298,7 @@ public class ZeeOptionsJFrame extends JFrame {
             }
         });
 
-        panelTabMisc.add(cbDebugWidgetMsgs= new JCheckBox("Debug widget msgs"), c);
-        cbDebugWidgetMsgs.setSelected(ZeeConfig.debugWidgetMsgs);
-        cbDebugWidgetMsgs.addActionListener(actionEvent -> {
-            JCheckBox cb = (JCheckBox) actionEvent.getSource();
-            boolean val = ZeeConfig.debugWidgetMsgs = cb.isSelected();
-            //no need to save pref, always start false
-        });
+        panelTabMisc.add(new ZeeOptionJCheckBox( "Debug widget msgs", "debugWidgetMsgs",false),c);
 
         panelTabMisc.add(cbDebugCodeRes= new JCheckBox("Debug code"), c);
         cbDebugCodeRes.setSelected(ZeeConfig.debugCodeRes);
@@ -468,6 +309,7 @@ public class ZeeOptionsJFrame extends JFrame {
         });
     }
 
+
     private void buildTabInterface() {
 
         JPanel pan;
@@ -475,13 +317,7 @@ public class ZeeOptionsJFrame extends JFrame {
         panelTabInterface = new JPanel(new GridBagLayout());
         tabbedPane.addTab("UI", panelTabInterface);
 
-        panelTabInterface.add(cbShowKinNames = new JCheckBox("Show kin names (hearthfire)"), c);
-        cbShowKinNames.setSelected(ZeeConfig.showKinNames);
-        cbShowKinNames.addActionListener(actionEvent -> {
-            JCheckBox cb = (JCheckBox) actionEvent.getSource();
-            boolean val = ZeeConfig.showKinNames = cb.isSelected();
-            Utils.setprefb("showKinNames",val);
-        });
+        panelTabInterface.add(new ZeeOptionJCheckBox( "Show kin names (hearthfire)", "showKinNames"),c);
 
         panelTabInterface.add(cbSimpleWindows = new JCheckBox("Solid color windows"), c);
         cbSimpleWindows.setEnabled(ZeeConfig.gameUI!=null);
@@ -524,114 +360,36 @@ public class ZeeOptionsJFrame extends JFrame {
             ZeeConfig.simpleWindowsUpdateAll();
         });
 
-        panelTabInterface.add(cbSimpleButtons = new JCheckBox("Simple buttons (logoff)"), c);
-        cbSimpleButtons.setSelected(ZeeConfig.simpleButtons);
-        cbSimpleButtons.addActionListener(actionEvent -> {
-            JCheckBox cb = (JCheckBox) actionEvent.getSource();
-            boolean val = ZeeConfig.simpleButtons = cb.isSelected();
-            Utils.setprefb("simpleButtons",val);
-        });
+        panelTabInterface.add(new ZeeOptionJCheckBox( "Simple buttons (logoff)", "simpleButtons"),c);
 
-        panelTabInterface.add(cbCompactEquipsWindow = new JCheckBox("Compact equip window(restart)"), c);
-        cbCompactEquipsWindow.setSelected(ZeeConfig.equiporyCompact);
-        cbCompactEquipsWindow.addActionListener(actionEvent -> {
-            JCheckBox cb = (JCheckBox) actionEvent.getSource();
-            boolean val = ZeeConfig.equiporyCompact = cb.isSelected();
-            Utils.setprefb("equiporyCompact",val);
-        });
+        panelTabInterface.add(new ZeeOptionJCheckBox( "Compact equip window(restart)", "equiporyCompact"),c);
 
-        panelTabInterface.add(cbBeltTogglesEquips = new JCheckBox("Auto toggle equips window"), c);
-        cbBeltTogglesEquips.setSelected(ZeeConfig.autoToggleEquips);
-        cbBeltTogglesEquips.addActionListener(actionEvent -> {
-            JCheckBox cb = (JCheckBox) actionEvent.getSource();
-            boolean val = ZeeConfig.autoToggleEquips = cb.isSelected();
-            Utils.setprefb("autoToggleEquips",val);
-        });
+        panelTabInterface.add(new ZeeOptionJCheckBox( "Auto toggle equips window", "autoToggleEquips"),c);
 
-        panelTabInterface.add(cbBeltTogglesEquipsReposition = new JCheckBox("Reposition toggled equips window"), c);
-        cbBeltTogglesEquipsReposition.setSelected(ZeeConfig.autoToggleEquipsReposition);
-        cbBeltTogglesEquipsReposition.addActionListener(actionEvent -> {
-            JCheckBox cb = (JCheckBox) actionEvent.getSource();
-            boolean val = ZeeConfig.autoToggleEquipsReposition = cb.isSelected();
-            Utils.setprefb("autoToggleEquipsReposition",val);
-        });
+        panelTabInterface.add(new ZeeOptionJCheckBox( "Reposition toggled equips window", "autoToggleEquipsReposition"),c);
 
-        panelTabInterface.add(cbShowEquipsLogin = new JCheckBox("Show equips at login"), c);
-        cbShowEquipsLogin.setSelected(ZeeConfig.showEquipsLogin);
-        cbShowEquipsLogin.addActionListener(actionEvent -> {
-            JCheckBox cb = (JCheckBox) actionEvent.getSource();
-            boolean val = ZeeConfig.showEquipsLogin = cb.isSelected();
-            Utils.setprefb("showEquipsLogin",val);
-        });
+        panelTabInterface.add(new ZeeOptionJCheckBox( "Show equips at login", "showEquipsLogin"),c);
 
-        panelTabInterface.add(cbMidclickEquipManager = new JCheckBox("Mid-click belt item to autoequip"), c);
-        cbMidclickEquipManager.setSelected(ZeeConfig.midclickEquipManager);
-        cbMidclickEquipManager.addActionListener(actionEvent -> {
-            JCheckBox cb = (JCheckBox) actionEvent.getSource();
-            boolean val = ZeeConfig.midclickEquipManager = cb.isSelected();
-            Utils.setprefb("midclickEquipManager",val);
-        });
+        panelTabInterface.add(new ZeeOptionJCheckBox( "Mid-click belt item to autoequip", "midclickEquipManager"),c);
 
-        panelTabInterface.add(cbShowInventoryLogin = new JCheckBox("Show inventory at login"), c);
-        cbShowInventoryLogin.setSelected(ZeeConfig.showInventoryLogin);
-        cbShowInventoryLogin.addActionListener(actionEvent -> {
-            JCheckBox cb = (JCheckBox) actionEvent.getSource();
-            boolean val = ZeeConfig.showInventoryLogin = cb.isSelected();
-            Utils.setprefb("showInventoryLogin",val);
-        });
+        panelTabInterface.add(new ZeeOptionJCheckBox( "Show inventory at login", "showInventoryLogin"),c);
 
-        panelTabInterface.add(cbShowBeltLogin = new JCheckBox("Show belt at login"), c);
-        cbShowBeltLogin.setSelected(ZeeConfig.autoOpenBelt);
-        cbShowBeltLogin.addActionListener(actionEvent -> {
-            JCheckBox cb = (JCheckBox) actionEvent.getSource();
-            boolean val = ZeeConfig.autoOpenBelt = cb.isSelected();
-            Utils.setprefb("autoOpenBelt",val);
-        });
+        panelTabInterface.add(new ZeeOptionJCheckBox( "Show belt at login", "autoOpenBelt"),c);
 
-        panelTabInterface.add(cbNotifyBuddyOnline = new JCheckBox("Notify when friends login"), c);
-        cbNotifyBuddyOnline.setSelected(ZeeConfig.notifyBuddyOnline);
-        cbNotifyBuddyOnline.addActionListener(actionEvent -> {
-            JCheckBox cb = (JCheckBox) actionEvent.getSource();
-            boolean val = ZeeConfig.notifyBuddyOnline = cb.isSelected();
-            Utils.setprefb("notifyBuddyOnline",val);
-        });
+        panelTabInterface.add(new ZeeOptionJCheckBox( "Notify when friends login", "notifyBuddyOnline"),c);
 
-        panelTabInterface.add(cbZoomOrthoExtended = new JCheckBox("Zoom extended for Ortho cam"), c);
-        cbZoomOrthoExtended.setSelected(ZeeConfig.zoomOrthoExtended);
-        cbZoomOrthoExtended.addActionListener(actionEvent -> {
-            JCheckBox cb = (JCheckBox) actionEvent.getSource();
-            boolean val = ZeeConfig.zoomOrthoExtended = cb.isSelected();
-            Utils.setprefb("zoomOrthoExtended",val);
-        });
+        panelTabInterface.add(new ZeeOptionJCheckBox( "Zoom extended for Ortho cam", "zoomOrthoExtended"),c);
 
-        panelTabInterface.add(cbActionSearchGlobal = new JCheckBox("Action search globally"), c);
-        cbActionSearchGlobal.setSelected(ZeeConfig.actionSearchGlobal);
-        cbActionSearchGlobal.addActionListener(actionEvent -> {
-            JCheckBox cb = (JCheckBox) actionEvent.getSource();
-            boolean val = ZeeConfig.actionSearchGlobal = cb.isSelected();
-            Utils.setprefb("actionSearchGlobal",val);
-        });
+        panelTabInterface.add(new ZeeOptionJCheckBox( "Action search globally", "actionSearchGlobal"),c);
 
-        panelTabInterface.add(cbRememberWindowsPos= new JCheckBox("Remember windows pos"), c);
-        cbRememberWindowsPos.setSelected(ZeeConfig.rememberWindowsPos);
-        cbRememberWindowsPos.addActionListener(actionEvent -> {
-            JCheckBox cb = (JCheckBox) actionEvent.getSource();
-            boolean val = ZeeConfig.rememberWindowsPos = cb.isSelected();
-            Utils.setprefb("rememberWindowsPos",val);
-        });
+        panelTabInterface.add(new ZeeOptionJCheckBox( "Remember windows pos", "rememberWindowsPos"),c);
 
         panelTabInterface.add(btnResetWindowsPos = new JButton("reset windows pos ("+ZeeConfig.mapWindowPos.size()+")"), c);
         btnResetWindowsPos.addActionListener(evt -> {
             resetWindowsPos();
         });
 
-        panelTabInterface.add(cbSortActionsByUse= new JCheckBox("Sort actions by uses"), c);
-        cbSortActionsByUse.setSelected(ZeeConfig.sortActionsByUses);
-        cbSortActionsByUse.addActionListener(actionEvent -> {
-            JCheckBox cb = (JCheckBox) actionEvent.getSource();
-            boolean val = ZeeConfig.sortActionsByUses = cb.isSelected();
-            Utils.setprefb("sortActionsByUses",val);
-        });
+        panelTabInterface.add(new ZeeOptionJCheckBox( "Sort actions by uses", "sortActionsByUses"),c);
 
         panelTabInterface.add(btnResetActionUses = new JButton("reset actions uses ("+ZeeConfig.mapActionUses.size()+")"), c);
         btnResetActionUses.addActionListener(evt -> {
@@ -658,13 +416,7 @@ public class ZeeOptionsJFrame extends JFrame {
             Utils.setprefd("cattleRosterHeightPercentage", d);
         });
 
-        panelTabInterface.add(cbAutoToggleGridLines = new JCheckBox("Auto-toggle grid lines"), c);
-        cbAutoToggleGridLines.setSelected(ZeeConfig.autoToggleGridLines);
-        cbAutoToggleGridLines.addActionListener(actionEvent -> {
-            JCheckBox cb = (JCheckBox) actionEvent.getSource();
-            boolean val = ZeeConfig.autoToggleGridLines = cb.isSelected();
-            Utils.setprefb("autoToggleGridLines",val);
-        });
+        panelTabInterface.add(new ZeeOptionJCheckBox( "Auto-toggle grid lines", "autoToggleGridLines"),c);
 
         pan = new JPanel(new FlowLayout(FlowLayout.LEFT));
         panelTabInterface.add(pan,c);
@@ -683,6 +435,7 @@ public class ZeeOptionsJFrame extends JFrame {
             ZeeConfig.newGridColor(color);
         });
     }
+
 
     private void buildTabGobs() {
 

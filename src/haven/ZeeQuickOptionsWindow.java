@@ -73,13 +73,13 @@ public class ZeeQuickOptionsWindow {
 
     private static void organizeItems() {
         int y = 0;
-        if (cbJOption!=null){
-            cbJOption.c = Coord.of(0,y);
-            y+=20;
-        }
         if (cbPetal!=null) {
             cbPetal.c = Coord.of(0,y);
-            y+=20;
+            y+=15;
+        }
+        if (cbJOption!=null){
+            cbJOption.c = Coord.of(0,y);
+            y+=15;
         }
     }
 
