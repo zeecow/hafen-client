@@ -298,7 +298,12 @@ public class ZeeOptionsJFrame extends JFrame {
             }
         });
 
-        panelTabMisc.add(new ZeeOptionJCheckBox( "Debug widget msgs", "debugWidgetMsgs",false),c);
+        panelTabMisc.add(cbDebugCodeRes= new JCheckBox("Debug widget msgs"), c);
+        cbDebugCodeRes.setSelected(ZeeConfig.debugWidgetMsgs);
+        cbDebugCodeRes.addActionListener(actionEvent -> {
+            JCheckBox cb = (JCheckBox) actionEvent.getSource();
+            ZeeConfig.debugWidgetMsgs = cb.isSelected();
+        });
 
         panelTabMisc.add(cbDebugCodeRes= new JCheckBox("Debug code"), c);
         cbDebugCodeRes.setSelected(ZeeConfig.debugCodeRes);

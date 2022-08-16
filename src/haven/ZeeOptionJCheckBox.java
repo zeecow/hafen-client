@@ -5,12 +5,6 @@ import javax.swing.*;
 public class ZeeOptionJCheckBox extends JCheckBox {
     private final String optName;
     final String label;
-    boolean savePref = true;
-
-    public ZeeOptionJCheckBox(String label, String optName, boolean savePref) {
-        this(label,optName);
-        this.savePref = savePref;
-    }
 
     public ZeeOptionJCheckBox(String label, String optName) {
         super(label);
@@ -28,7 +22,7 @@ public class ZeeOptionJCheckBox extends JCheckBox {
             boolean val = this.isSelected();
             try {
                 this.setZeeConfigBoolean(val);
-                ZeeQuickOptionsWindow.updateCheckBoxWidget(this);
+                ZeeQuickOptionsWindow.updateJCheckBoxWidget(optName,label);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -36,15 +30,21 @@ public class ZeeOptionJCheckBox extends JCheckBox {
 
     }
 
-    void setZeeConfigBoolean(boolean val) throws Exception {
+    static void setZeeConfigBoolean(boolean val, String optName) throws Exception {
         ZeeConfig.class.getDeclaredField(optName).setBoolean(ZeeConfig.class,val);
-        if (savePref) {
-            Utils.setprefb(optName, val);
-            ZeeConfig.println("setZeeConfigBoolean() > " + optName + " > " + getZeeConfigBoolean());
-        }
+        Utils.setprefb(optName, val);
+        ZeeConfig.println("setZeeConfigBoolean() > " + optName + " > " + getZeeConfigBoolean(optName));
+    }
+
+    void setZeeConfigBoolean(boolean val) throws Exception {
+        setZeeConfigBoolean(val,optName);
+    }
+
+    static  boolean getZeeConfigBoolean(String optName) throws Exception {
+        return ZeeConfig.class.getDeclaredField(optName).getBoolean(ZeeConfig.class);
     }
 
     boolean getZeeConfigBoolean() throws Exception {
-        return ZeeConfig.class.getDeclaredField(optName).getBoolean(ZeeConfig.class);
+        return getZeeConfigBoolean(optName);
     }
 }

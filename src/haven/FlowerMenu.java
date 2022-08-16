@@ -83,7 +83,7 @@ public class FlowerMenu extends Widget {
 	public boolean mousedown(Coord c, int button) {
 	    choose(this);
 		ZeeManagerStockpile.checkClickedPetal(this.name);
-		ZeeQuickOptionsWindow.clickedFlowerMenuPetal(this.name);
+		ZeeQuickOptionsWindow.updatePetalWidget(this.name);
 	    return(true);
 	}
 
