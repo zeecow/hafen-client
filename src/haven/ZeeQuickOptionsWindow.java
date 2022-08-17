@@ -35,7 +35,7 @@ public class ZeeQuickOptionsWindow {
         //add new config
         if (getConfigByLabel(cbLabel).isBlank()) { //avoid duplicate
             if (listConfigLabel.size() == 3) //max 3
-                listConfigLabel.remove(listConfigLabel.size()-1);
+                listConfigLabel.remove(0);
             listConfigLabel.add(0,new String[]{configName, cbLabel});
         }
 
