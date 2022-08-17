@@ -583,7 +583,7 @@ public class ZeeConfig {
 
     public static boolean isTreeLeaf(String name){
         String[] list = {
-                "trees/maple","trees/conkertree","trees/mulberry"
+                "trees/maple","trees/conkertree","trees/mulberry","trees/fig"
         };
         for (int i = 0; i < list.length; i++) {
             if(name.contains(list[i]))

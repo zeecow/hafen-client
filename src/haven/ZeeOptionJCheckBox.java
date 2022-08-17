@@ -33,7 +33,7 @@ public class ZeeOptionJCheckBox extends JCheckBox {
     static void setZeeConfigBoolean(boolean val, String optName) throws Exception {
         ZeeConfig.class.getDeclaredField(optName).setBoolean(ZeeConfig.class,val);
         Utils.setprefb(optName, val);
-        ZeeConfig.println("setZeeConfigBoolean() > " + optName + " > " + getZeeConfigBoolean(optName));
+        //ZeeConfig.println("setZeeConfigBoolean() > " + optName + " > " + getZeeConfigBoolean(optName));
     }
 
     void setZeeConfigBoolean(boolean val) throws Exception {

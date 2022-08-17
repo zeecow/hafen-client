@@ -104,10 +104,11 @@ public class Tree extends Sprite {
 		if (ZeeConfig.treeAnimation)
 	    	gob.setattr(new GobSvaj(gob));
 
-		if (ZeeConfig.miniTrees && !res.name.contains("/bushes/"))
-			gob.setattr(new TreeScale(gob, ZeeConfig.miniTreesSize / 100f));
-		else if(fscale != 1.0f)
+		if (ZeeConfig.miniTrees && !res.name.contains("/bushes/")) {
+			gob.setattr(new TreeScale(gob, fscale*(ZeeConfig.miniTreesSize/100f)));
+		}else if(fscale != 1.0f) {
 			gob.setattr(new TreeScale(gob, fscale));
+		}
 
 		if (fscale!=1.0f && ZeeConfig.showGrowingTreePercentage)
 			ZeeConfig.addGobText(gob,(String.format("%.0f",fscale*100)+"%"));

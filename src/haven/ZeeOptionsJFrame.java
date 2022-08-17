@@ -161,7 +161,6 @@ public class ZeeOptionsJFrame extends JFrame {
         ZeeConfig.shapeIconsList = newList;
         if(ZeeManagerIcons.mapRuleImg.containsKey(rule)){
             ZeeManagerIcons.mapRuleImg.remove(rule);
-            ZeeConfig.println("mapRuleImg size "+ZeeManagerIcons.mapRuleImg.size());
         }
 
         //update combo

@@ -44,7 +44,6 @@ public class ZeeManagerIcons {
 
             // store and return
             mapRuleImg.put(rules[i],retImg);
-            println("mapRuleImg size "+mapRuleImg.size());
             return retImg;
         }
         return null;

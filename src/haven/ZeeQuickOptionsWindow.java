@@ -2,6 +2,7 @@ package haven;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class ZeeQuickOptionsWindow {
@@ -11,6 +12,7 @@ public class ZeeQuickOptionsWindow {
     private static List<CheckBox> listJOptsWidgets = new ArrayList<>();
     static CheckBox cbPetal;
     static String autoPetalName = "";
+
 
     public static ZeeWindow getWindow() {
         if (window == null){
@@ -23,6 +25,7 @@ public class ZeeQuickOptionsWindow {
         return window;
     }
 
+
     public static void updateJCheckBoxWidget(String configName, String cbLabel) {
 
         // avoid crash
@@ -32,13 +35,12 @@ public class ZeeQuickOptionsWindow {
         //add new config
         if (getConfigByLabel(cbLabel).isBlank()) { //avoid duplicate
             if (listConfigLabel.size() == 3) //max 3
-                listConfigLabel.remove(0);
-            listConfigLabel.add(new String[]{configName, cbLabel});
+                listConfigLabel.remove(listConfigLabel.size()-1);
+            listConfigLabel.add(0,new String[]{configName, cbLabel});
         }
 
-        //TODO save pref to be loaded at initWindow()
+        //save pref to be loaded at initWindow()
         savePref();
-
 
         //remove all widgets
         for (int i = 0; i < listJOptsWidgets.size(); i++) {
@@ -62,7 +64,9 @@ public class ZeeQuickOptionsWindow {
                 public void set(boolean val) {
                     try {
                         //ZeeConfig.println(" set > configName: "+getConfigByLabel(lbl.text));
-                        ZeeOptionJCheckBox.setZeeConfigBoolean(val, getConfigByLabel(lbl.text));
+                        String configName = getConfigByLabel(lbl.text);
+                        ZeeOptionJCheckBox.setZeeConfigBoolean(val, configName);
+                        bumpCheckBox(configName);
                         a = val;
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -74,6 +78,19 @@ public class ZeeQuickOptionsWindow {
 
         repositionWidgets();
     }
+
+    // move checkbox up in the list, so it stays longer
+    private static void bumpCheckBox(String configName) {
+        for (int j = 0; j < listConfigLabel.size(); j++) {
+            if (listConfigLabel.get(j)[0].contentEquals(configName) && j<listConfigLabel.size()-1){
+                //ZeeConfig.println("bump "+j+"  "+(listConfigLabel.get(j)[1]));
+                Collections.swap(listConfigLabel,j,j+1);
+                updateJCheckBoxWidget(listConfigLabel.get(j)[0],listConfigLabel.get(j)[1]);
+                break;
+            }
+        }
+    }
+
 
     private static void savePref() {
         Utils.setpref("quickOptConfigLabel",ZeeConfig.serialize((Serializable) listConfigLabel));
@@ -87,13 +104,11 @@ public class ZeeQuickOptionsWindow {
         }
     }
 
+
     public static void initWindow() {
         loadPref();
-        //ZeeConfig.println("saved prefs = "+listConfigLabel.size());
-        for (int i = 0; i < listConfigLabel.size(); i++) {
-            updateJCheckBoxWidget(listConfigLabel.get(i)[0],listConfigLabel.get(i)[1]);
-        }
-        //TODO: add from saved listConfigLabel pref
+        if (listConfigLabel.size() > 0)
+            updateJCheckBoxWidget(listConfigLabel.get(0)[0],listConfigLabel.get(0)[1]);
     }
 
     private static String getConfigByLabel(String lbl) {
@@ -133,7 +148,7 @@ public class ZeeQuickOptionsWindow {
             cbPetal.c = Coord.of(0,y);
             y += 15;
         }
-        for (int i = 0; i < listJOptsWidgets.size(); i++) {
+        for (int i = listJOptsWidgets.size()-1; i >= 0 ; i--) {
             listJOptsWidgets.get(i).c = Coord.of(0,y);
             y += 15;
         }
