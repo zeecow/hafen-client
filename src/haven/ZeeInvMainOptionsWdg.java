@@ -98,7 +98,7 @@ public class ZeeInvMainOptionsWdg extends Widget {
                 a = val;
             }
         }, x, 15);
-        cbPiler.settip("pile helper");
+        cbPiler.settip("pile helper (mouse-click menu required)");
 
         add(labelCount = new Label(""), 0, 0);
         pack();

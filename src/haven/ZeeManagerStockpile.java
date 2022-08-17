@@ -120,16 +120,7 @@ public class ZeeManagerStockpile extends ZeeThread{
     private void startPilingGobSource() throws InterruptedException {
 
         //find pile
-        if(lastPetalName.equals("Pick leaf"))
-            gobPile = ZeeConfig.getClosestGob(ZeeConfig.findGobsByNameContains("stockpile-leaf"));
-        else if (lastPetalName.equals("Chop into blocks"))
-            gobPile = ZeeConfig.getClosestGob(ZeeConfig.findGobsByNameContains("stockpile-wblock"));
-        else if (lastPetalName.equals("Make boards"))
-            gobPile = ZeeConfig.getClosestGob(ZeeConfig.findGobsByNameContains("stockpile-board"));
-        else if (lastPetalName.equals("Chip stone"))
-            gobPile = ZeeConfig.getClosestGob(ZeeConfig.findGobsByNameContains("stockpile-stone"));
-        else if (lastPetalName.equals("Collect coal"))
-            gobPile = ZeeConfig.getClosestGob(ZeeConfig.findGobsByNameContains("stockpile-coal"));
+        gobPile = findPile();
 
         //mark gob pile and source
         ZeeConfig.addPlayerText("piling");
@@ -225,6 +216,20 @@ public class ZeeManagerStockpile extends ZeeThread{
         //pileAndExit();
     }
 
+    private static Gob findPile() {
+        if(lastPetalName.equals("Pick leaf"))
+            return ZeeConfig.getClosestGob(ZeeConfig.findGobsByNameContains("stockpile-leaf"));
+        else if (lastPetalName.equals("Chop into blocks"))
+            return ZeeConfig.getClosestGob(ZeeConfig.findGobsByNameContains("stockpile-wblock"));
+        else if (lastPetalName.equals("Make boards"))
+            return ZeeConfig.getClosestGob(ZeeConfig.findGobsByNameContains("stockpile-board"));
+        else if (lastPetalName.equals("Chip stone"))
+            return ZeeConfig.getClosestGob(ZeeConfig.findGobsByNameContains("stockpile-stone"));
+        else if (lastPetalName.equals("Collect coal"))
+            return ZeeConfig.getClosestGob(ZeeConfig.findGobsByNameContains("stockpile-coal"));
+        return null;
+    }
+
 
     private void startPilingTileSource() {
         println("startPilingTileSource > "+lastTileStoneSourceTileName);
@@ -260,8 +265,12 @@ public class ZeeManagerStockpile extends ZeeThread{
             public void run() {
                 try {
                     waitNotHoldingItem(5000);
-                    Gob closestPile = ZeeConfig.getClosestGobName("/stockpile-");
-                    checkShowWindow(closestPile.getres().name);
+                    Gob closestPile = findPile();
+                    if (closestPile==null) {
+                        ZeeConfig.msgError("closest pile of wrong type");
+                    }else {
+                        checkShowWindow(closestPile.getres().name);
+                    }
                 }catch (Exception e){
                     e.printStackTrace();
                 }
