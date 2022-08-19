@@ -663,13 +663,13 @@ public class ZeeConfig {
             if(alertOnPlayers){
                 String audio = mapCategoryAudio.get(CATEG_PVPANDSIEGE);
                 if(audio!=null && !audio.isEmpty())
-                    playAudio(audio);
+                    playAudioGobId(audio,gobId);
                 else
                     gameUI.error("player spotted");
             }
         }else if( (path = mapGobAudio.get(gobName)) != null){
             //if single gob alert is saved, play alert
-            ZeeConfig.playAudio(path);
+            playAudioGobId(path,gobId);
         }else {
             //for each category in mapCategoryGobs...
             for (String categ: mapCategoryGobs.keySet()){
@@ -679,7 +679,7 @@ public class ZeeConfig {
                 if(mapCategoryGobs.get(categ).contains(gobName)){
                     //play audio for category
                     path = mapCategoryAudio.get(categ);
-                    ZeeConfig.playAudio(path);
+                    playAudioGobId(path,gobId);
                 }
             }
         }
@@ -1449,6 +1449,30 @@ public class ZeeConfig {
             "5A,200,100",
             "200"
     };
+
+
+    private static final LinkedHashMap<Long,Long> mapGobidTimeplayed = new LinkedHashMap<Long,Long>(){
+        protected boolean removeEldestEntry(Map.Entry<Long, Long> eldest) {
+            return size() == 10;//limit map to size 10
+        }
+    };
+    private static void playAudioGobId(String filePath, long gobId) {
+        synchronized (mapGobidTimeplayed) {
+            Long lastMs = mapGobidTimeplayed.get(gobId);
+            //println("alert gob id = "+gobId+"  , lastms="+lastMs +" , mapsize="+mapGobidTimeplayed.size());
+            if (lastMs == null) {
+                playAudio(filePath);
+                mapGobidTimeplayed.put(gobId, ZeeThread.now());
+                return;
+            }
+            if (ZeeThread.now() - lastMs < 10000) { // same gob id waits 10s before playing again
+                //println("too soon ms");
+                return;
+            }
+            playAudio(filePath);
+            mapGobidTimeplayed.put(gobId, ZeeThread.now());
+        }
+    }
 
 
     private static double lasterrsfx = 0;
