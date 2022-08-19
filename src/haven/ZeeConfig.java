@@ -658,7 +658,7 @@ public class ZeeConfig {
         String path = "";
 
         if(isPlayer(gob)  &&  gobId != gameUI.map.player().id) {
-            if(autoHearthOnStranger)
+            if(autoHearthOnStranger && !playerHasAnyPose(POSE_PLAYER_TRAVELHOMEPOINT,POSE_PLAYER_TRAVELHOMESHRUG))
                 gameUI.act("travel","hearth");
             if(alertOnPlayers){
                 String audio = mapCategoryAudio.get(CATEG_PVPANDSIEGE);
