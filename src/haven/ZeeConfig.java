@@ -1453,7 +1453,7 @@ public class ZeeConfig {
 
     private static final LinkedHashMap<Long,Long> mapGobidTimeplayed = new LinkedHashMap<Long,Long>(){
         protected boolean removeEldestEntry(Map.Entry<Long, Long> eldest) {
-            return size() == 10;//limit map to size 10
+            return size() == 20;//limit map to size
         }
     };
     private static void playAudioGobId(String filePath, long gobId) {
