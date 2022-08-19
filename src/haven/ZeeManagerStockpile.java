@@ -266,9 +266,7 @@ public class ZeeManagerStockpile extends ZeeThread{
                 try {
                     waitNotHoldingItem(5000);
                     Gob closestPile = findPile();
-                    if (closestPile==null) {
-                        ZeeConfig.msgError("closest pile of wrong type");
-                    }else {
+                    if (closestPile!=null) {
                         checkShowWindow(closestPile.getres().name);
                     }
                 }catch (Exception e){
