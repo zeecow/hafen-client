@@ -110,7 +110,9 @@ public class ZeeManagerGobClick extends ZeeThread{
     public void run() {
         try {
             if (isLongMidClick()){
-                if (isRemovingAllTrees && isGobTree(gobName)) {
+                if (gobName.contentEquals("gfx/terobjs/bushes/reeds")) {
+                    clearReeds(gob);
+                } else if (isRemovingAllTrees && isGobTree(gobName)) {
                     scheduleRemoveTree(gob);
                 } else if (isDestroyingAllTreelogs && isGobTreeLog(gobName)) {
                     scheduleDestroyTreelog(gob);
@@ -174,6 +176,23 @@ public class ZeeManagerGobClick extends ZeeThread{
         }
     }
 
+    private void clearReeds(Gob reed) {
+        try{
+            ZeeConfig.addPlayerText("clearing");
+            do {
+                clickGobPetal(reed, "Clear");
+                // wait harvesting end, or cancel click returns false
+                if (!waitPlayerPoseNotInList(ZeeConfig.POSE_PLAYER_HARVESTING,ZeeConfig.POSE_PLAYER_DRINK))
+                    break;
+                sleep(PING_MS);
+                reed = ZeeConfig.getClosestGobName("gfx/terobjs/bushes/reeds");
+            }while(!ZeeConfig.isPlayerHoldingItem() && !ZeeConfig.isTaskCanceledByGroundClick());
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        ZeeConfig.removePlayerText();
+    }
+
     void dismountEquipCoracle(Coord2d coordMc){
         try {
             ZeeConfig.addPlayerText("coracling");
@@ -230,6 +249,10 @@ public class ZeeManagerGobClick extends ZeeThread{
                 sleep(PING_MS);
             }
 
+            if (ZeeConfig.isTaskCanceledByGroundClick()){
+                ZeeConfig.removePlayerText();
+                return;
+            }
 
             //drop coracle at shalow water or terrain
             WItem[] equips = ZeeManagerItemClick.getEquipory().children(WItem.class).toArray(new WItem[0]);
@@ -256,6 +279,10 @@ public class ZeeManagerGobClick extends ZeeThread{
                 //lift up coracle
                 liftGob(coracle);
                 sleep(PING_MS);
+                if (ZeeConfig.isTaskCanceledByGroundClick()){
+                    ZeeConfig.removePlayerText();
+                    return;
+                }
                 // place coracle at water tile
                 ZeeConfig.clickTile(ZeeConfig.coordToTile(waterMc),3);
                 waitPlayerIdlePose();
@@ -269,6 +296,10 @@ public class ZeeManagerGobClick extends ZeeThread{
                     //try to drop coracle torwards clicked water coord
                     ZeeConfig.clickCoord(pc.add(xsignal * 300, ysignal * 300), 3);
                     sleep(PING_MS*2);
+                    if (ZeeConfig.isTaskCanceledByGroundClick()){
+                        ZeeConfig.removePlayerText();
+                        return;
+                    }
                     if (ZeeConfig.distanceToPlayer(coracle)==0) {
                         println("failed dropping to deep water?");
                         ZeeConfig.removePlayerText();

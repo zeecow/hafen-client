@@ -251,7 +251,7 @@ public class ZeeManagerMiner extends ZeeThread{
         new ZeeThread(){
             public void run() {
                 buildBtn.click();
-                waitPlayerPoseNotInList(ZeeConfig.POSE_PLAYER_BUILD);
+                waitNotPlayerPose(ZeeConfig.POSE_PLAYER_BUILD);//waitPlayerPoseNotInList(ZeeConfig.POSE_PLAYER_BUILD);
                 ZeeConfig.removePlayerText();
 
                 //back to saved coord

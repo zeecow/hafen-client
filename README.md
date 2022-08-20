@@ -52,6 +52,7 @@ Client focusing on small helper tasks, many using mouse middle button, and other
    - show context menu for various objs (details below)
    - lift up obj 
    - take all from stockpile obj
+   - clear reeds until holding one
    - click "Man the helm" on Knarr/Snekkja obj
    - while holding item will try to store all on barrel obj
    - add/remove tree obj to "Remove all trees" ordered queue

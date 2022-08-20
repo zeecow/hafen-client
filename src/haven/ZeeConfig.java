@@ -75,9 +75,10 @@ public class ZeeConfig {
     public static final String POSE_PLAYER_CHOPTREE = "gfx/borka/treechop";
     public static final String POSE_PLAYER_DIGSHOVEL = "gfx/borka/shoveldig";
     public static final String POSE_PLAYER_DRINK = "gfx/borka/drinkan";
+    public static final String POSE_PLAYER_LIFT = "gfx/borka/banzai";
+    public static final String POSE_PLAYER_HARVESTING = "gfx/borka/harvesting";//reeds clearing
     public static final String POSE_PLAYER_PICK = "gfx/borka/pickan";
     public static final String POSE_PLAYER_PICKGROUND = "gfx/borka/pickaxeanspot";
-    public static final String POSE_PLAYER_LIFT = "gfx/borka/banzai";
     public static final String POSE_PLAYER_CARRYFLAT = "gfx/borka/carry-flat";//idle pickaxe
     public static final String POSE_PLAYER_TRAVELHOMESHRUG = "gfx/borka/pointconfused";
     public static final String POSE_PLAYER_TRAVELHOMEPOINT = "gfx/borka/pointhome";
@@ -662,8 +663,10 @@ public class ZeeConfig {
         String path = "";
 
         if(isPlayer(gob)  &&  gobId != gameUI.map.player().id) {
-            if(autoHearthOnStranger && !playerHasAnyPose(POSE_PLAYER_TRAVELHOMEPOINT,POSE_PLAYER_TRAVELHOMESHRUG))
-                gameUI.act("travel","hearth");
+            if(autoHearthOnStranger && !playerHasAnyPose(POSE_PLAYER_TRAVELHOMEPOINT,POSE_PLAYER_TRAVELHOMESHRUG)) {
+                ZeeConfig.lastMapViewClickButton = 1; // cancel click some tasks, hopefully
+                gameUI.act("travel", "hearth");
+            }
             if(alertOnPlayers){
                 String audio = mapCategoryAudio.get(CATEG_PVPANDSIEGE);
                 if(audio!=null && !audio.isEmpty())
