@@ -133,11 +133,16 @@ public class ZeeManagerGobClick extends ZeeThread{
                     else
                         itemActGob(gob,3);//ctrl+shift+rclick
                 } else if (isGroundClick){
-                    if (isWaterTile(coordMc))
-                        inspectWaterAt(coordMc);
-                    else if (ZeeConfig.isPlayerMountingHorse())
+                    if (isWaterTile(coordMc)) {
+                        if (ZeeManagerItemClick.isCoracleEquipped() && !ZeeConfig.isPlayerMountingHorse())
+                            dropMountCoracle(coordMc);
+                        else
+                            inspectWaterAt(coordMc);
+                    }else if (ZeeConfig.isPlayerMountingCoracle()) {
+                        dismountEquipCoracle(coordMc);
+                    }else if (ZeeConfig.isPlayerMountingHorse()) {
                         dismountHorse(coordMc);
-                    else if (ZeeConfig.isPlayerCarryingWheelbarrow()) {
+                    }else if (ZeeConfig.isPlayerCarryingWheelbarrow()) {
                         ZeeManagerStockpile.unloadWheelbarrowStockpileAtGround(coordMc.floor(posres));
                         if (ZeeConfig.autoToggleGridLines)
                             ZeeConfig.gameUI.map.showgrid(true);
@@ -167,6 +172,119 @@ public class ZeeManagerGobClick extends ZeeThread{
         catch (Exception e){
             e.printStackTrace();
         }
+    }
+
+    void dismountEquipCoracle(Coord2d coordMc){
+        try {
+            ZeeConfig.addPlayerText("coracling");
+            //move to shore
+            ZeeConfig.clickTile(ZeeConfig.coordToTile(coordMc),1);
+            waitPlayerPose(ZeeConfig.POSE_PLAYER_CORACLE_IDLE);
+            //dismount from coracle
+            ZeeConfig.clickTile(ZeeConfig.coordToTile(coordMc),1,UI.MOD_CTRL);
+            sleep(PING_MS*2);
+            if (ZeeConfig.isPlayerMountingCoracle()){
+                println("couldn't dismount coracle");
+                ZeeConfig.removePlayerText();
+                return;
+            }
+            //find coracle
+            Gob coracle = ZeeConfig.getClosestGobName("/coracle");
+            if (coracle == null) {
+                println("couldn't find gob coracle");
+                ZeeConfig.removePlayerText();
+                return;
+            }
+            //pickup coracle
+            clickGobPetal(coracle,"Pick up");
+            sleep(PING_MS*2);
+            if (!ZeeManagerItemClick.isCoracleEquipped()){
+                println("couldn't equip coracle");
+                ZeeConfig.removePlayerText();
+                return;
+            }
+            //move to clicked location
+            ZeeConfig.clickTile(ZeeConfig.coordToTile(coordMc),1);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        ZeeConfig.removePlayerText();
+    }
+
+    void dropMountCoracle(Coord2d waterMc) {
+        try {
+            ZeeConfig.addPlayerText("coracling");
+
+            //wait player reach water
+            Gob player = ZeeConfig.getPlayerGob();
+            long timeout = 5000;
+            ZeeConfig.clickTile(ZeeConfig.coordToTile(waterMc),1);
+            waitNotPlayerPose(ZeeConfig.POSE_PLAYER_IDLE);
+            while(!ZeeConfig.playerHasAnyPose(ZeeConfig.POSE_PLAYER_IDLE) && !isWaterTile(player.rc)){
+                if (timeout<=0){
+                    println("couldn't reach water tile");
+                    ZeeConfig.removePlayerText();
+                    return;
+                }
+                timeout -= PING_MS;
+                sleep(PING_MS);
+            }
+
+
+            //drop coracle at shalow water or terrain
+            WItem[] equips = ZeeManagerItemClick.getEquipory().children(WItem.class).toArray(new WItem[0]);
+            for (int i = 0; i < equips.length; i++) {
+                if (equips[i].item.res.get().name.endsWith("/coracle")) {
+                    equips[i].item.wdgmsg("drop", Coord.z);
+                    ZeeConfig.stopMovingEscKey();
+                    break;
+                }
+            }
+            waitNotPlayerPose(ZeeConfig.POSE_PLAYER_CORACLE_CAPE);
+
+
+            //find coracle gob
+            Gob coracle = ZeeConfig.getClosestGobName("/coracle");
+            if (coracle == null) {
+                println("couldn't find gob coracle");
+                ZeeConfig.removePlayerText();
+                return;
+            }
+
+            //if dropped tile is not water
+            if (!isWaterTile(ZeeConfig.getGobTile(coracle))){
+                //lift up coracle
+                liftGob(coracle);
+                sleep(PING_MS);
+                // place coracle at water tile
+                ZeeConfig.clickTile(ZeeConfig.coordToTile(waterMc),3);
+                waitPlayerIdlePose();
+                if (ZeeConfig.distanceToPlayer(coracle)==0){
+                    // player blocked by deep water tile
+                    Coord pc = ZeeConfig.getPlayerCoord();
+                    Coord subc = ZeeConfig.coordToTile(waterMc).sub(pc);
+                    int xsignal, ysignal;
+                    xsignal = subc.x >= 0 ? -1 : 1;
+                    ysignal = subc.y >= 0 ? -1 : 1;
+                    //try to drop coracle torwards clicked water coord
+                    ZeeConfig.clickCoord(pc.add(xsignal * 300, ysignal * 300), 3);
+                    sleep(PING_MS*2);
+                    if (ZeeConfig.distanceToPlayer(coracle)==0) {
+                        println("failed dropping to deep water?");
+                        ZeeConfig.removePlayerText();
+                        return;
+                    }
+                }
+            }
+
+            //mount coracle
+            clickGobPetal(coracle, "Into the blue yonder!");
+            waitPlayerPose(ZeeConfig.POSE_PLAYER_CORACLE_IDLE);
+
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        ZeeConfig.removePlayerText();
     }
 
     private void inspectWaterAt(Coord2d coordMc) {
@@ -207,7 +325,11 @@ public class ZeeManagerGobClick extends ZeeThread{
     }
 
     public static boolean isWaterTile(Coord2d coordMc) {
-        Tiler t = ZeeConfig.getTilerAt(coordMc);
+        return isWaterTile(coordMc.floor(MCache.tilesz));
+    }
+
+    public static boolean isWaterTile(Coord tile) {
+        Tiler t = ZeeConfig.getTilerAt(tile);
         return t!=null && t instanceof WaterTile;
     }
 
@@ -756,7 +878,7 @@ public class ZeeManagerGobClick extends ZeeThread{
                 ZeeConfig.msg("no wheelbarrow close 1");
             } else {
                 Coord pc = ZeeConfig.getPlayerCoord();
-                Coord subc = ZeeConfig.getCoordGob(horse).sub(pc);
+                Coord subc = ZeeConfig.getGobCoord(horse).sub(pc);
                 int xsignal, ysignal;
                 xsignal = subc.x >= 0 ? -1 : 1;//switch 1s to change direction relative to horse
                 ysignal = subc.y >= 0 ? -1 : 1;
@@ -785,7 +907,7 @@ public class ZeeManagerGobClick extends ZeeThread{
                 ZeeConfig.msg("no wheelbarrow close 2");
             } else {
                 Coord pc = ZeeConfig.getPlayerCoord();
-                Coord subc = ZeeConfig.getCoordGob(horse).sub(pc);
+                Coord subc = ZeeConfig.getGobCoord(horse).sub(pc);
                 int xsignal, ysignal;
                 xsignal = subc.x >= 0 ? -1 : 1;
                 ysignal = subc.y >= 0 ? -1 : 1;

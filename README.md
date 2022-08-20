@@ -26,14 +26,18 @@ Client focusing on small helper tasks, many using mouse middle button, and other
  - free gob placement
  - auto toggle gridlines 
  - rightclicking doors, cave, gate, wheelbarrow, stockpiles, horse, cart, will interact with these objects whenever possible
+ - Quick Options window show 3 latest used options, and auto-click for latest flowermenu
+ - default icon sound to "Bell 2" if empty
  - midclick Barter Stand "Buy" button to auto-buy  
  - midclick ground 
    - while holding item will move to location (simulates ctrl+click)
    - while inspecting icon active, will msg tile name
- - long midclick ground
+ - long midclick ground (LMC)
    - inspect water tile using inventory woodencup  
    - while mounting horse will try to dismount
    - while carrying wheelbarrow will try to(dismount and) unload stockpile at ground
+   - while coracle equipped, LMC water will try to drop and mount
+   - while coracle mounted, LMC ground will try to dismount and equip 
  - midclick object 
    - inspect object quality and show text
    - harvest 2 dreams from dreamcatch obj

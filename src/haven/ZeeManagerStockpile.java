@@ -440,7 +440,7 @@ public class ZeeManagerStockpile extends ZeeThread{
                 sleep(555);
             }
             Coord pc = ZeeConfig.getPlayerCoord();
-            Coord subc = ZeeConfig.getCoordGob(gobStockpile).sub(pc);
+            Coord subc = ZeeConfig.getGobCoord(gobStockpile).sub(pc);
             int xsignal, ysignal;
             xsignal = subc.x >= 0 ? 1 : -1;
             ysignal = subc.y >= 0 ? 1 : -1;

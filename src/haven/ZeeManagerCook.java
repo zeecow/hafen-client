@@ -1,8 +1,6 @@
 package haven;
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 public class ZeeManagerCook extends ZeeThread{
@@ -56,7 +54,7 @@ public class ZeeManagerCook extends ZeeThread{
                         if(!busy)
                             continue;
                         ZeeConfig.addPlayerText("fetch barrel");
-                        barrelCoord = ZeeConfig.getCoordGob(gobBarrel);
+                        barrelCoord = ZeeConfig.getGobCoord(gobBarrel);
                         ZeeManagerGobClick.liftGob(gobBarrel);
 
                         if(!busy)

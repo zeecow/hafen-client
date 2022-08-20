@@ -33,6 +33,10 @@ public class ZeeManagerItemClick extends ZeeThread{
         init(wItem);
     }
 
+    public static boolean isCoracleEquipped() {
+        return ZeeManagerItemClick.isItemEquipped("gfx/invobjs/small/coracle");
+    }
+
     private void init(WItem wItem) {
         equipory = ZeeConfig.windowEquipment.getchild(Equipory.class);
         leftHandItemName = (getEquipory().leftHand==null ? "" : getEquipory().leftHand.item.getres().name);

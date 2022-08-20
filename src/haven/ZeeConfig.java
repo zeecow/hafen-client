@@ -61,6 +61,10 @@ public class ZeeConfig {
     public static final String POSE_PLAYER_RIDING_TROT = "gfx/borka/riding-trot";//speed 2
     public static final String POSE_PLAYER_RIDING_GALLOP = "gfx/borka/riding-gallop";//speed 3
 
+    public static final String POSE_PLAYER_CORACLE_IDLE = "gfx/borka/coracleidle";
+    public static final String POSE_PLAYER_CORACLE_ROWAN = "gfx/borka/coraclerowan";
+    public static final String POSE_PLAYER_CORACLE_CAPE = "gfx/borka/coraclecape";
+
     public static final String POSE_PLAYER_IDLE = "gfx/borka/idle";
     public static final String POSE_PLAYER_WALK = "gfx/borka/walking";//speed 0, 1
     public static final String POSE_PLAYER_RUN = "gfx/borka/running";//speed 2, 3
@@ -2011,10 +2015,17 @@ public class ZeeConfig {
     }
 
     public static Coord getPlayerCoord(){
-        return getCoordGob(getPlayerGob());
+        return getGobCoord(getPlayerGob());
     }
     public static Coord getPlayerTile(){
-        return coordToTile(getPlayerGob().rc);
+        return getGobTile(getPlayerGob());
+    }
+
+    public static Coord getGobCoord(Gob gob){
+        return gob.rc.floor(OCache.posres);
+    }
+    public static Coord getGobTile(Gob gob){
+        return coordToTile(gob.rc);
     }
 
     // Returns 0-100
@@ -2200,7 +2211,7 @@ public class ZeeConfig {
     }
 
     public static void clickTile(Coord c, int btn, int mod) {
-        clickCoord(tileToCoord(c), btn);
+        clickCoord(tileToCoord(c), btn, mod);
     }
 
     public static void itemActTile(Coord coord) {
@@ -2216,10 +2227,6 @@ public class ZeeConfig {
         Coord center = a.ul.add(a.sz().div(2));
         //println("ul"+a.ul+"  br"+a.br+"  sz"+a.sz()+"  center"+center);
         return center;
-    }
-
-    public static Coord getCoordGob(Gob gob){
-        return gob.rc.floor(OCache.posres);
     }
 
     public static Coord coordToTile(Coord2d c) {
@@ -2525,6 +2532,8 @@ public class ZeeConfig {
     public static String getTileResName(Coord tileCoord) {
         int id = ZeeConfig.gameUI.ui.sess.glob.map.getTileSafe(tileCoord);
         Resource res = ZeeConfig.gameUI.ui.sess.glob.map.tilesetr(id);
+        if (res==null)
+            return "";
         return res.name;
     }
 
@@ -2600,5 +2609,9 @@ public class ZeeConfig {
     static long lastIconNotifySaveMs = ZeeThread.now();
     public static boolean allowIconNotifySave() {
         return ZeeThread.now() - lastIconNotifySaveMs > 1000;
+    }
+
+    public static boolean isPlayerMountingCoracle() {
+        return playerHasAnyPose(ZeeConfig.POSE_PLAYER_CORACLE_IDLE,ZeeConfig.POSE_PLAYER_CORACLE_ROWAN);
     }
 }
