@@ -20,7 +20,6 @@ public class ZeeManagerStockpile extends ZeeThread{
     public static boolean busy;
     static GameUI gameUI;
     static Inventory mainInv;
-    static boolean audioExit;
     public static String lastPetalName;
     public static Gob gobPile, gobSource;
     public static MapView.Plob lastGobPlaced;
@@ -33,7 +32,6 @@ public class ZeeManagerStockpile extends ZeeThread{
     public ZeeManagerStockpile(String task) {
         this.task = task;
         busy = true;
-        audioExit = true;
         gameUI = ZeeConfig.gameUI;
         mainInv = gameUI.maininv;
     }
@@ -139,13 +137,27 @@ public class ZeeManagerStockpile extends ZeeThread{
             return;
         }
 
+        // adjust timeout if chipping stone without pickaxe
+        int timeout = 3000;
+        if (lastPetalName.contentEquals("Chip stone")){
+            if (ZeeManagerItemClick.isItemEquipped("/pickaxe"))
+                timeout = 2000;
+            else
+                timeout = 5000;
+        }else if (lastPetalName.contentEquals("Chop into blocks")){
+            timeout = 1500;
+        }else if (lastPetalName.contentEquals("Pick leaf")){
+            timeout = 1500;
+        }
+
+
         while(busy) {
 
             // wait reaching source
             waitPlayerDistToGob(gobSource,15);
 
             // wait inv full
-            waitInvFullOrHoldingItem(mainInv, 3000);
+            waitInvFullOrHoldingItem(mainInv, timeout);
 
             // if not holding item
             if (!ZeeConfig.isPlayerHoldingItem()) {
@@ -365,7 +377,6 @@ public class ZeeManagerStockpile extends ZeeThread{
             windowManager = new ZeeWindow(new Coord(150, 60), "Stockpile manager") {
                 public void wdgmsg(String msg, Object... args) {
                     if (msg.equals("close")) {
-                        audioExit = false;
                         busy = false;
                         exitManager();
                     }else
@@ -403,8 +414,6 @@ public class ZeeManagerStockpile extends ZeeThread{
         ZeeConfig.removeGobText(gobPile);
         ZeeConfig.removeGobText(gobSource);
         gobPile = gobSource = null;
-        if (audioExit)
-            gameUI.msg("Pile manager ended.");
         windowManager.hide();
     }
 
