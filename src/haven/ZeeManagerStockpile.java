@@ -122,6 +122,11 @@ public class ZeeManagerStockpile extends ZeeThread{
         //find pile
         gobPile = findPile();
 
+        if(gobPile==null) {
+            println("pile null");
+            return;
+        }
+
         //mark gob pile and source
         ZeeConfig.addPlayerText("piling");
         ZeeConfig.addGobText(gobPile,"pile");
@@ -217,6 +222,8 @@ public class ZeeManagerStockpile extends ZeeThread{
     }
 
     private static Gob findPile() {
+        if (lastPetalName==null)
+            return null;
         if(lastPetalName.equals("Pick leaf"))
             return ZeeConfig.getClosestGob(ZeeConfig.findGobsByNameContains("stockpile-leaf"));
         else if (lastPetalName.equals("Chop into blocks"))
