@@ -2617,4 +2617,16 @@ public class ZeeConfig {
     public static boolean isPlayerMountingCoracle() {
         return playerHasAnyPose(ZeeConfig.POSE_PLAYER_CORACLE_IDLE,ZeeConfig.POSE_PLAYER_CORACLE_ROWAN);
     }
+
+    public static void combatStarted() {
+        lastMapViewClickButton = 1;//cancel click some tasks
+        if(ZeeManagerMiner.mining) {
+            ZeeConfig.println(">combat relations, cancel mining");
+            ZeeManagerMiner.stopMining();
+        }
+        if (ZeeManagerFarmer.busy){
+            ZeeConfig.println(">combat relations, cancel farming");
+            ZeeManagerFarmer.resetInitialState();
+        }
+    }
 }

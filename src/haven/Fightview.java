@@ -279,14 +279,7 @@ public class Fightview extends Widget {
 	current = rel;
 	layout();
 	updrel();
-	if(ZeeManagerMiner.mining) {
-		ZeeConfig.println(">combat relations, cancel mining");
-		ZeeManagerMiner.stopMining();
-	}
-	if (ZeeManagerFarmer.busy){
-		ZeeConfig.println(">combat relations, cancel farming");
-		ZeeManagerFarmer.resetInitialState();
-	}
+	ZeeConfig.combatStarted();
     }
     
     public void tick(double dt) {
