@@ -448,7 +448,7 @@ public class ZeeManagerStockpile extends ZeeThread{
             ZeeConfig.clickCoord(pc.add(xsignal * 500, ysignal * 500), 3);
             sleep(555);
             if (!ZeeConfig.isPlayerCarryingWheelbarrow()){
-                Gob wb = ZeeConfig.getClosestGobName("gfx/terobjs/vehicle/wheelbarrow");
+                Gob wb = ZeeConfig.getClosestGobByNameContains("gfx/terobjs/vehicle/wheelbarrow");
                 //activate wheelbarrow
                 ZeeManagerGobClick.gobClick(wb, 3);
                 sleep(PING_MS);
@@ -476,7 +476,7 @@ public class ZeeManagerStockpile extends ZeeThread{
             ZeeConfig.clickCoord(pc.add(xsignal*500,ysignal*500), 3);
             sleep(500);
             if (!ZeeConfig.isPlayerCarryingWheelbarrow()) {
-                Gob wb = ZeeConfig.getClosestGobName("gfx/terobjs/vehicle/wheelbarrow");
+                Gob wb = ZeeConfig.getClosestGobByNameContains("gfx/terobjs/vehicle/wheelbarrow");
                 //activate wheelbarrow
                 ZeeManagerGobClick.gobClick(wb, 3);
                 sleep(PING_MS);

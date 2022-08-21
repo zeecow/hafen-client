@@ -227,4 +227,24 @@ public class Equipory extends Widget implements DTarget {
     public boolean iteminteract(Coord cc, Coord ul) {
 	return(false);
     }
+
+
+	public void dropItemByNameContains(String nameContains) {
+		WItem[] equips = this.children(WItem.class).toArray(new WItem[0]);
+		for (int i = 0; i < equips.length; i++) {
+			if (equips[i].item.res.get().name.contains(nameContains)) {
+				equips[i].item.wdgmsg("drop", Coord.z);
+				break;
+			}
+		}
+	}
+
+	public void dropAllItemsByNameContains(String nameContains) {
+		WItem[] equips = this.children(WItem.class).toArray(new WItem[0]);
+		for (int i = 0; i < equips.length; i++) {
+			if (equips[i].item.res.get().name.contains(nameContains)) {
+				equips[i].item.wdgmsg("drop", Coord.z);
+			}
+		}
+	}
 }

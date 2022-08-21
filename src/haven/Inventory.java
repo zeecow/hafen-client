@@ -349,11 +349,7 @@ public class Inventory extends Widget implements DTarget {
 		return coords;
 	}
 
-	public void dropItemsByName(String name) {
-		for (WItem wItem : getItemsByNameOrNames(name)) {
-			wItem.item.wdgmsg("drop", Coord.z);
-		}
-	}
+
 
 	public static Double getQuality(GItem item) {
 		try {

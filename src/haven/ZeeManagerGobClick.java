@@ -185,7 +185,7 @@ public class ZeeManagerGobClick extends ZeeThread{
                 if (!waitPlayerPoseNotInList(ZeeConfig.POSE_PLAYER_HARVESTING,ZeeConfig.POSE_PLAYER_DRINK))
                     break;
                 sleep(PING_MS);
-                reed = ZeeConfig.getClosestGobName("gfx/terobjs/bushes/reeds");
+                reed = ZeeConfig.getClosestGobByNameContains("gfx/terobjs/bushes/reeds");
             }while(!ZeeConfig.isPlayerHoldingItem() && !ZeeConfig.isTaskCanceledByGroundClick());
         }catch (Exception e){
             e.printStackTrace();
@@ -208,7 +208,7 @@ public class ZeeManagerGobClick extends ZeeThread{
                 return;
             }
             //find coracle
-            Gob coracle = ZeeConfig.getClosestGobName("/coracle");
+            Gob coracle = ZeeConfig.getClosestGobByNameContains("/coracle");
             if (coracle == null) {
                 println("couldn't find gob coracle");
                 ZeeConfig.removePlayerText();
@@ -255,19 +255,13 @@ public class ZeeManagerGobClick extends ZeeThread{
             }
 
             //drop coracle at shalow water or terrain
-            WItem[] equips = ZeeManagerItemClick.getEquipory().children(WItem.class).toArray(new WItem[0]);
-            for (int i = 0; i < equips.length; i++) {
-                if (equips[i].item.res.get().name.endsWith("/coracle")) {
-                    equips[i].item.wdgmsg("drop", Coord.z);
-                    ZeeConfig.stopMovingEscKey();
-                    break;
-                }
-            }
+            ZeeManagerItemClick.getEquipory().dropItemByNameContains("gfx/invobjs/small/coracle");
+            ZeeConfig.stopMovingEscKey();
             waitNotPlayerPose(ZeeConfig.POSE_PLAYER_CORACLE_CAPE);
 
 
             //find coracle gob
-            Gob coracle = ZeeConfig.getClosestGobName("/coracle");
+            Gob coracle = ZeeConfig.getClosestGobByNameContains("/coracle");
             if (coracle == null) {
                 println("couldn't find gob coracle");
                 ZeeConfig.removePlayerText();
@@ -566,7 +560,7 @@ public class ZeeManagerGobClick extends ZeeThread{
     }
 
     public static void dismountHorse(Coord2d coordMc) {
-        Gob horse = ZeeConfig.getClosestGobName("gfx/kritter/horse/");
+        Gob horse = ZeeConfig.getClosestGobByNameContains("gfx/kritter/horse/");
         ZeeConfig.clickCoord(coordMc.floor(posres),1,UI.MOD_CTRL);
         waitPlayerDismounted(horse);
         if (!ZeeConfig.isPlayerMountingHorse()) {
@@ -756,7 +750,7 @@ public class ZeeManagerGobClick extends ZeeThread{
                         }
                     } else {
                         // destroy 3 or 5 same type treelogs
-                        treelog = ZeeConfig.getClosestGobName(treelogName);
+                        treelog = ZeeConfig.getClosestGobByNameContains(treelogName);
                     }
                 }else{
                     if (ZeeConfig.isTaskCanceledByGroundClick()) {
@@ -904,7 +898,7 @@ public class ZeeManagerGobClick extends ZeeThread{
         try{
             //waitNoFlowerMenu();
             ZeeConfig.addPlayerText("mounting");
-            Gob wb = ZeeConfig.getClosestGobName("gfx/terobjs/vehicle/wheelbarrow");
+            Gob wb = ZeeConfig.getClosestGobByNameContains("gfx/terobjs/vehicle/wheelbarrow");
             if (wb == null) {
                 ZeeConfig.msg("no wheelbarrow close 1");
             } else {
@@ -933,7 +927,7 @@ public class ZeeManagerGobClick extends ZeeThread{
         try {
             //waitNoFlowerMenu();
             ZeeConfig.addPlayerText("mounting");
-            Gob wb = ZeeConfig.getClosestGobName("gfx/terobjs/vehicle/wheelbarrow");
+            Gob wb = ZeeConfig.getClosestGobByNameContains("gfx/terobjs/vehicle/wheelbarrow");
             if (wb == null) {
                 ZeeConfig.msg("no wheelbarrow close 2");
             } else {
@@ -964,7 +958,7 @@ public class ZeeManagerGobClick extends ZeeThread{
         try {
             waitNoFlowerMenu();
             ZeeConfig.addPlayerText("storing");
-            Gob wb = ZeeConfig.getClosestGobName("gfx/terobjs/vehicle/wheelbarrow");
+            Gob wb = ZeeConfig.getClosestGobByNameContains("gfx/terobjs/vehicle/wheelbarrow");
             if (wb==null){
                 ZeeConfig.msg("no wheelbarrow close 3");
             }else {
@@ -991,7 +985,7 @@ public class ZeeManagerGobClick extends ZeeThread{
         try {
             waitNoFlowerMenu();
             ZeeConfig.addPlayerText("wheeling");
-            Gob wb = ZeeConfig.getClosestGobName("gfx/terobjs/vehicle/wheelbarrow");
+            Gob wb = ZeeConfig.getClosestGobByNameContains("gfx/terobjs/vehicle/wheelbarrow");
             if (wb==null){
                 ZeeConfig.msg("no wheelbarrow close 4");
             }else {
@@ -1107,10 +1101,60 @@ public class ZeeManagerGobClick extends ZeeThread{
         ZeeConfig.removePlayerText();
     }
 
-    public static void removeStump(Gob gob) {
+    public static void removeStump(Gob stump) throws InterruptedException {
+        boolean droppedBucket = false;
+
+        //move closer to stump
+        gobClick(stump,1);
+        sleep(PING_MS);
+        waitPlayerIdlePose();
+
+        //drop bucket if present
+        if (ZeeManagerItemClick.isItemEquipped("bucket")) {
+            if (ZeeConfig.getStamina() < 100) {
+                ZeeManagerItemClick.drinkFromBeltHandsInv();
+                sleep(PING_MS*2);
+                waitNotPlayerPose(ZeeConfig.POSE_PLAYER_DRINK);
+            }
+            ZeeManagerItemClick.getEquipory().dropItemByNameContains("/bucket");
+            droppedBucket = true;
+        }
+
+        //equip shovel
         ZeeManagerItemClick.equipBeltItem("shovel");
-        waitItemEquipped("shovel");
-        destroyGob(gob);
+        if (!waitItemEquipped("shovel")){
+            println("couldnt equip shovel ?");
+            return;
+        }
+        waitNotHoldingItem();//wait possible switched item go to belt?
+
+        //remove stump
+        destroyGob(stump);
+
+        //reequip bucket if dropped
+        if (droppedBucket){
+            waitPlayerPose(ZeeConfig.POSE_PLAYER_IDLE);
+            Gob bucket = ZeeConfig.getClosestGobByNameContains("/bucket");
+            if (bucket!=null){
+                if (ZeeManagerItemClick.pickupHandItem("shovel")) {
+                    if(ZeeManagerItemClick.dropHoldingItemToBeltOrInv()) {
+                        sleep(PING_MS);
+                        ZeeConfig.clickRemoveCursor();
+                        waitCursor(ZeeConfig.CURSOR_ARW);
+                        sleep(PING_MS);
+                        gobClick(bucket, 3);
+                        if (waitHoldingItem())
+                            ZeeManagerItemClick.equipEmptyHand();
+                        else
+                            println("couldnt pickup da bucket");
+                    }
+                }else {
+                    println("couldnt return shovel to belt?");
+                }
+            }else{
+                println("bucket gob not found");
+            }
+        }
     }
 
     public static void addItemsToGob(List<WItem> invItens, int num, Gob gob){

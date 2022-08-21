@@ -307,7 +307,7 @@ public class ZeeManagerMiner extends ZeeThread{
 
 
     public static Gob getBoulderCloseEnoughForChipping() {
-        Gob boulder = ZeeConfig.getClosestGobName("gfx/terobjs/bumlings/");
+        Gob boulder = ZeeConfig.getClosestGobByNameContains("gfx/terobjs/bumlings/");
         if (boulder!=null && ZeeConfig.distanceToPlayer(boulder) < DIST_BOULDER){
             return boulder;
         }

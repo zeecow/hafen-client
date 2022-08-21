@@ -157,7 +157,6 @@ public class ZeeManagerItemClick extends ZeeThread{
 
             }
             else if(isTwoHandedItem()) {//2 handed item
-
                 if(!isItemWindowEquips()) {
                     if(!isLeftHandEmpty() && isTwoHandedItem(leftHandItemName)) {
                         //switch 2handed item for another 2handed item
@@ -175,6 +174,7 @@ public class ZeeManagerItemClick extends ZeeThread{
                             equipLeftEmptyHand();
                         dropHoldingItemToBeltOrInv();
                     }else if(!isLeftHandEmpty() && !isRightHandEmpty()){
+                        println(4);
                         //switch 2handed item for 2 separate items
                         if (ZeeManagerItemClick.getInvBelt().getNumberOfFreeSlots() > 0) {
                             unequipLeftItem();//unequip 1st item
@@ -939,7 +939,7 @@ public class ZeeManagerItemClick extends ZeeThread{
         waitNotHoldingItem();
     }
 
-    private boolean equipEmptyHand() {
+    public static boolean equipEmptyHand() {
         if(isLeftHandEmpty())
             equipLeftEmptyHand();
         else if(isRightHandEmpty())
@@ -1081,11 +1081,11 @@ public class ZeeManagerItemClick extends ZeeThread{
         }
     }
 
-    public static boolean pickupHandItem(String name) {
+    public static boolean pickupHandItem(String nameContains) {
         try {
-            if(getLeftHandName().contains(name))
+            if(getLeftHandName().contains(nameContains))
                 return pickUpItem(getLeftHand());
-            else if(getRightHandName().contains(name))
+            else if(getRightHandName().contains(nameContains))
                 return pickUpItem(getRightHand());
         }catch (Exception e){
             e.printStackTrace();
@@ -1164,8 +1164,10 @@ public class ZeeManagerItemClick extends ZeeThread{
     }
 
     public static void equipBeltItem(String name) {
-        if(ZeeManagerItemClick.isItemInHandSlot(name))
+        if(ZeeManagerItemClick.isItemInHandSlot(name)) {
+            println("not equipping 2 items "+name);
             return;
+        }
         WItem item = ZeeManagerItemClick.getBeltWItem(name);
         if (item!=null)
             new ZeeManagerItemClick(item).start();//use equipManager logic
@@ -1312,7 +1314,8 @@ public class ZeeManagerItemClick extends ZeeThread{
                                 //ZeeManagerItemClick.waitPlayerPoseNotInList(ZeeConfig.POSE_PLAYER_DRINK);
                                 drank = true;
                             }
-                        }
+                        }else
+                            println("bucket hand null");
                     }
                 }catch (Exception e){
                     e.printStackTrace();

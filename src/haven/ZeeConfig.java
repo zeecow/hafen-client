@@ -1882,9 +1882,9 @@ public class ZeeConfig {
         }).collect(Collectors.toList());
     }
 
-    public static List<Gob> findGobsByNameContains(String name) {
+    public static List<Gob> findGobsByNameContains(String nameContains) {
         return ZeeConfig.gameUI.ui.sess.glob.oc.gobStream().filter(gob -> {
-            if(gob!=null && gob.getres()!=null && gob.getres().name.contains(name))
+            if(gob!=null && gob.getres()!=null && gob.getres().name.contains(nameContains))
                 return true;
             else
                 return false;
@@ -1953,7 +1953,7 @@ public class ZeeConfig {
 
     public static Gob getPlayerMountedHorse(){
         if (isPlayerMountingHorse())
-            return ZeeConfig.getClosestGobName("gfx/kritter/horse/");
+            return ZeeConfig.getClosestGobByNameContains("gfx/kritter/horse/");
         else
             return null;
     }
@@ -1965,7 +1965,7 @@ public class ZeeConfig {
     }
 
     public static Gob isPlayerSharingGobCoord(String gobNameContains){
-        Gob g = getClosestGobName(gobNameContains);
+        Gob g = getClosestGobByNameContains(gobNameContains);
         if (g==null) {
             return null;
         }
@@ -2423,8 +2423,8 @@ public class ZeeConfig {
         }
     }
 
-    public static Gob getClosestGobName(String name) {
-        return getClosestGob(findGobsByNameContains(name));
+    public static Gob getClosestGobByNameContains(String nameContains) {
+        return getClosestGob(findGobsByNameContains(nameContains));
     }
 
     public static Inventory getMainInventory() {
