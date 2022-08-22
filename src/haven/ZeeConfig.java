@@ -754,6 +754,8 @@ public class ZeeConfig {
                                 y = gameUI.sz.y - windowEquipment.sz.y;
                                 windowEquipment.c = new Coord(x,y);
                             }
+                            //reset last window, so next time equips open in regular place
+                            toggleEquipsLastWindowClicked = null;
                         }
                     }
                 } catch(Loading l) {
