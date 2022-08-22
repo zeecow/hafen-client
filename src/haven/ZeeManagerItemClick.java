@@ -174,7 +174,6 @@ public class ZeeManagerItemClick extends ZeeThread{
                             equipLeftEmptyHand();
                         dropHoldingItemToBeltOrInv();
                     }else if(!isLeftHandEmpty() && !isRightHandEmpty()){
-                        println(4);
                         //switch 2handed item for 2 separate items
                         if (ZeeManagerItemClick.getInvBelt().getNumberOfFreeSlots() > 0) {
                             unequipLeftItem();//unequip 1st item
@@ -1165,7 +1164,6 @@ public class ZeeManagerItemClick extends ZeeThread{
 
     public static void equipBeltItem(String name) {
         if(ZeeManagerItemClick.isItemInHandSlot(name)) {
-            println("not equipping 2 items "+name);
             return;
         }
         WItem item = ZeeManagerItemClick.getBeltWItem(name);

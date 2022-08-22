@@ -1898,6 +1898,7 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 			boolean M = (ev.getModifiersEx() & (KeyEvent.META_DOWN_MASK | KeyEvent.ALT_DOWN_MASK)) != 0;
 			if(M) {
 				curbelt = i;
+				this.lblCurBelt.settext(i+"/9");
 			} else {
 				keyact(i + (curbelt * 12));
 			}
