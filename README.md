@@ -38,6 +38,7 @@ Client focusing on small helper tasks, many using mouse middle button, and other
    - while carrying wheelbarrow will try to(dismount and) unload stockpile at ground
    - while coracle equipped, LMC water will try to drop and mount
    - while coracle mounted, LMC ground will try to dismount and equip 
+   - disembark dugout 
  - midclick object 
    - inspect object quality and show text
    - harvest 2 dreams from dreamcatch obj

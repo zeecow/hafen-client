@@ -64,6 +64,8 @@ public class ZeeConfig {
     public static final String POSE_PLAYER_CORACLE_IDLE = "gfx/borka/coracleidle";
     public static final String POSE_PLAYER_CORACLE_ROWAN = "gfx/borka/coraclerowan";
     public static final String POSE_PLAYER_CORACLE_CAPE = "gfx/borka/coraclecape";
+    public static final String POSE_PLAYER_DUGOUT_IDLE = "gfx/borka/dugoutidle";
+    public static final String POSE_PLAYER_DUGOUT_ROWAN = "gfx/borka/dugoutrowan";
 
     public static final String POSE_PLAYER_IDLE = "gfx/borka/idle";
     public static final String POSE_PLAYER_WALK = "gfx/borka/walking";//speed 0, 1
@@ -2618,6 +2620,10 @@ public class ZeeConfig {
 
     public static boolean isPlayerMountingCoracle() {
         return playerHasAnyPose(ZeeConfig.POSE_PLAYER_CORACLE_IDLE,ZeeConfig.POSE_PLAYER_CORACLE_ROWAN);
+    }
+
+    public static boolean isPlayerMountingDugout(){
+        return playerHasAnyPose(ZeeConfig.POSE_PLAYER_DUGOUT_IDLE,ZeeConfig.POSE_PLAYER_DUGOUT_ROWAN);
     }
 
     public static void combatStarted() {

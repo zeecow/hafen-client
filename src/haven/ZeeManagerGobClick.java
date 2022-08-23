@@ -135,15 +135,17 @@ public class ZeeManagerGobClick extends ZeeThread{
                     else
                         itemActGob(gob,3);//ctrl+shift+rclick
                 } else if (isGroundClick){
-                    if (isWaterTile(coordMc)) {
+                    if (ZeeConfig.isPlayerMountingHorse()) {
+                        dismountHorse(coordMc);
+                    }else if (isWaterTile(coordMc)) {
                         if (ZeeManagerItemClick.isCoracleEquipped() && !ZeeConfig.isPlayerMountingHorse())
-                            dropMountCoracle(coordMc);
+                            dropEmbarkCoracle(coordMc);
                         else
                             inspectWaterAt(coordMc);
                     }else if (ZeeConfig.isPlayerMountingCoracle()) {
-                        dismountEquipCoracle(coordMc);
-                    }else if (ZeeConfig.isPlayerMountingHorse()) {
-                        dismountHorse(coordMc);
+                        disembarkEquipCoracle(coordMc);
+                    }else if(ZeeConfig.isPlayerMountingDugout()) {
+                        disembarkBoat(coordMc);
                     }else if (ZeeConfig.isPlayerCarryingWheelbarrow()) {
                         ZeeManagerStockpile.unloadWheelbarrowStockpileAtGround(coordMc.floor(posres));
                         if (ZeeConfig.autoToggleGridLines)
@@ -193,13 +195,27 @@ public class ZeeManagerGobClick extends ZeeThread{
         ZeeConfig.removePlayerText();
     }
 
-    void dismountEquipCoracle(Coord2d coordMc){
+    void disembarkBoat(Coord2d mc){
+        try {
+            ZeeConfig.addPlayerText("boatin");
+            //move to shore
+            ZeeConfig.clickTile(ZeeConfig.coordToTile(coordMc), 1);
+            waitPlayerPoseNotInList(ZeeConfig.POSE_PLAYER_DUGOUT_ROWAN);//TODO add other boats
+            //disembark
+            ZeeConfig.clickTile(ZeeConfig.coordToTile(mc), 1, UI.MOD_CTRL);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        ZeeConfig.removePlayerText();
+    }
+
+    void disembarkEquipCoracle(Coord2d coordMc){
         try {
             ZeeConfig.addPlayerText("coracling");
             //move to shore
             ZeeConfig.clickTile(ZeeConfig.coordToTile(coordMc),1);
             waitPlayerPose(ZeeConfig.POSE_PLAYER_CORACLE_IDLE);
-            //dismount from coracle
+            //disembark
             ZeeConfig.clickTile(ZeeConfig.coordToTile(coordMc),1,UI.MOD_CTRL);
             sleep(PING_MS*2);
             if (ZeeConfig.isPlayerMountingCoracle()){
@@ -230,7 +246,7 @@ public class ZeeManagerGobClick extends ZeeThread{
         ZeeConfig.removePlayerText();
     }
 
-    void dropMountCoracle(Coord2d waterMc) {
+    void dropEmbarkCoracle(Coord2d waterMc) {
         try {
             ZeeConfig.addPlayerText("coracling");
 
