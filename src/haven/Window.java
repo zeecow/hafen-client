@@ -223,17 +223,22 @@ public class Window extends Widget implements DTarget {
     }
 
     private void resize2(Coord sz) {
-	asz = sz;
-	csz = asz.add(mrgn.mul(2));
-	wsz = csz.add(tlm).add(brm);
+	asz = sz;//usable size for content
+	csz = asz.add(mrgn.mul(2));//add margin around usable size
+	wsz = csz.add(tlm).add(brm);//usable size + margin + frame size
+	//tlo, rbo = top left offset, bottom right offset usually 0 always. Basically same job as tlm, brm
 	this.sz = wsz.add(tlo).add(rbo);
+	//top left coordinate of inner content area
 	ctl = tlo.add(tlm);
+	//Top left coordinate of where usable space starts after accounting for margin
 	atl = ctl.add(mrgn);
-	cmw = (cap == null) ? 0 : cap.sz().x;
+	// window title (cap)
+	cmw = (cap == null) ? 0 : cap.sz().x;//cap margin width?
 	cmw = Math.max(cmw, wsz.x / 4);
-	cptl = new Coord(ctl.x, tlo.y);
-	cpsz = tlo.add(cpo.x + cmw, cm.sz().y).sub(cptl);
+	cptl = new Coord(ctl.x, tlo.y);//cap top left
+	cpsz = tlo.add(cpo.x + cmw, cm.sz().y).sub(cptl);//cap size
 	cmw = cmw - (cl.sz().x - cpo.x) - UI.scale(5);
+	//Where the close button goes
 	cbtn.c = xlate(tlo.add(wsz.x - cbtn.sz.x, cbtn.sz.y), false);
 	for(Widget ch = child; ch != null; ch = ch.next)
 	    ch.presize();
