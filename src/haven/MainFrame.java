@@ -27,11 +27,14 @@
 package haven;
 
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.*;
-import java.nio.file.*;
-import java.util.*;
-import java.lang.reflect.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Collection;
+import java.util.Map;
+import java.util.TreeMap;
 
 public class MainFrame extends java.awt.Frame implements Console.Directory {
     final UIPanel p;
@@ -389,6 +392,10 @@ public class MainFrame extends java.awt.Frame implements Console.Directory {
 
     private static void main2(String[] args) {
 	Config.cmdline(args);
+	if (ZeeConfig.isThinClient){
+		ZeeConfig.runThinClient();
+		return;
+	}
 	try {
 	    javabughack();
 	} catch(InterruptedException e) {

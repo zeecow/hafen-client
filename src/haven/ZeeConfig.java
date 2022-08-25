@@ -177,6 +177,7 @@ public class ZeeConfig {
     public static boolean hideFxSmoke = Utils.getprefb("hideFxSmoke", true);
     public static boolean hideFxAnimations = Utils.getprefb("hideFxAnimations", true);
     public static boolean highlightCropsReady = Utils.getprefb("highlightCropsReady", true);
+    public static boolean isThinClient = false;
     public static boolean showGrowingTreePercentage = Utils.getprefb("showGrowingTreePercentage", true);
     public static boolean treeAnimation = Utils.getprefb("treeAnimation", false);
     public static boolean keyBeltShiftTab = Utils.getprefb("keyBeltShiftTab", true);
@@ -2636,5 +2637,13 @@ public class ZeeConfig {
             ZeeConfig.println(">combat relations, cancel farming");
             ZeeManagerFarmer.resetInitialState();
         }
+    }
+
+    /*
+        run with -t option:
+            "java -jar hafen.jar -t -U http://game.havenandhearth.com/res/ game.havenandhearth.com "
+     */
+    static void runThinClient() {
+        println("run thin client");
     }
 }

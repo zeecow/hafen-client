@@ -26,11 +26,13 @@
 
 package haven;
 
-import java.net.URL;
+import java.io.InputStream;
 import java.io.PrintStream;
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
+import java.nio.file.Path;
 import java.util.Properties;
-import java.io.*;
-import java.nio.file.*;
 
 public class Config {
     public static final Properties jarprops = getjarprops();
@@ -153,13 +155,16 @@ public class Config {
     }
 
     public static void cmdline(String[] args) {
-	PosixArgs opt = PosixArgs.getopt(args, "hdPGfU:r:A:u:C:p:");
+	PosixArgs opt = PosixArgs.getopt(args, "thdPGfU:r:A:u:C:p:");
 	if(opt == null) {
 	    usage(System.err);
 	    System.exit(1);
 	}
 	for(char c : opt.parsed()) {
 	    switch(c) {
+		case 't':
+		ZeeConfig.isThinClient = true;
+		break;
 	    case 'h':
 		usage(System.out);
 		System.exit(0);
