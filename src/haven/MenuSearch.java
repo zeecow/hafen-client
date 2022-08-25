@@ -1,10 +1,11 @@
 package haven;
 
-import java.util.*;
-import java.awt.image.BufferedImage;
-import java.awt.event.KeyEvent;
-import haven.MenuGrid.Pagina;
 import haven.MenuGrid.PagButton;
+import haven.MenuGrid.Pagina;
+
+import java.awt.event.KeyEvent;
+import java.awt.image.BufferedImage;
+import java.util.*;
 
 public class MenuSearch extends Window {
     public final MenuGrid menu;
@@ -62,8 +63,8 @@ public class MenuSearch extends Window {
     public MenuSearch(MenuGrid menu) {
 	super(Coord.z, "Action search");
 	this.menu = menu;
-	rls = add(new Results(UI.scale(250, 500)), Coord.z);
-	sbox = add(new TextEntry(UI.scale(250), "") {
+	rls = add(new Results(UI.scale(200, 250)), Coord.z);
+	sbox = add(new TextEntry(UI.scale(200), "") {
 		protected void changed() {
 		    refilter();
 		}
