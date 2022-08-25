@@ -26,24 +26,33 @@
 
 package haven;
 
-import java.util.*;
-import java.util.function.*;
-import java.io.*;
-import java.nio.file.*;
-import java.nio.channels.*;
-import java.awt.Color;
-import java.awt.event.KeyEvent;
-import java.awt.image.*;
+import haven.BuddyWnd.GroupSelector;
 import haven.MapFile.Marker;
 import haven.MapFile.PMarker;
 import haven.MapFile.SMarker;
-import haven.MiniMap.*;
-import haven.BuddyWnd.GroupSelector;
-import static haven.MCache.tilesz;
+import haven.MiniMap.Locator;
+import haven.MiniMap.MapLocator;
+import haven.MiniMap.MarkerID;
+import haven.MiniMap.SpecLocator;
+
+import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
+import java.awt.*;
+import java.awt.event.KeyEvent;
+import java.awt.image.BufferedImage;
+import java.awt.image.WritableRaster;
+import java.io.*;
+import java.nio.channels.Channels;
+import java.nio.channels.SeekableByteChannel;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.List;
+import java.util.*;
+import java.util.function.Predicate;
+
 import static haven.MCache.cmaps;
+import static haven.MCache.tilesz;
 import static haven.Utils.eq;
-import javax.swing.JFileChooser;
-import javax.swing.filechooser.*;
 
 public class MapWnd extends Window implements Console.Directory {
     public static final Resource markcurs = Resource.local().loadwait("gfx/hud/curs/flag");

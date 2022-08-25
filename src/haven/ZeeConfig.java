@@ -200,6 +200,7 @@ public class ZeeConfig {
     public static boolean sortActionsByUses = Utils.getprefb("sortActionsByUses", true);
     public static boolean rememberWindowsPos = Utils.getprefb("rememberWindowsPos", true);
     public static boolean zoomOrthoExtended = Utils.getprefb("zoomOrthoExtended", true);
+    public static boolean showInspectTooltip = false;
     public static boolean simpleWindows = Utils.getprefb("simpleWindows", true);
     public static int simpleWindowColorInt = Utils.getprefi("simpleWindowColorInt",ZeeConfig.colorToInt(DEF_SIMPLE_WINDOW_COLOR));
     public static boolean simpleWindowBorder = Utils.getprefb("simpleWindowBorder", true);
@@ -2600,17 +2601,16 @@ public class ZeeConfig {
         );
     }
 
-    public static void checkCursorToggleGridLines(String curs) {
-        if ( curs.contentEquals(CURSOR_HARVEST)
-            || curs.contentEquals(CURSOR_MINE)
-            || curs.contentEquals(CURSOR_DIG) )
-        {
-            gameUI.map.showgrid(true);
+    public static void checkNewCursorName(String curs) {
+        //ZeeConfig.println("new curs "+curs);
+        if (autoToggleGridLines) {
+            gameUI.map.showgrid(curs.contentEquals(CURSOR_HARVEST) || curs.contentEquals(CURSOR_MINE) || curs.contentEquals(CURSOR_DIG));
         }
+        showInspectTooltip = curs.contentEquals(CURSOR_INSPECT);
+        if (showInspectTooltip)
+            gameUI.map.inspect(gameUI.map.rootxlate(gameUI.map.ui.mc));
         else
-        {
-            gameUI.map.showgrid(false);
-        }
+            gameUI.map.ttip = null;
     }
 
     static long lastIconNotifySaveMs = ZeeThread.now();

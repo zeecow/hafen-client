@@ -1609,4 +1609,14 @@ public class ZeeManagerGobClick extends ZeeThread{
         }
         return ret;
     }
+
+    public static Gob getGobFromClickable(Clickable ci) {
+        if(ci instanceof Gob.GobClick) {
+            return ((Gob.GobClick) ci).gob;
+        } else if(ci instanceof Composited.CompositeClick) {
+            Gob.GobClick gi = ((Composited.CompositeClick) ci).gi;
+            return gi != null ? gi.gob : null;
+        }
+        return null;
+    }
 }

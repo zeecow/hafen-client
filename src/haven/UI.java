@@ -26,17 +26,14 @@
 
 package haven;
 
-import java.util.*;
-import java.awt.Font;
-import java.awt.GraphicsEnvironment;
-import java.awt.GraphicsDevice;
-import java.awt.DisplayMode;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseEvent;
-import java.awt.event.InputEvent;
-
 import haven.render.Environment;
 import haven.render.Render;
+
+import java.awt.*;
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
+import java.util.*;
 
 public class UI {
     public static int MOD_SHIFT = 1, MOD_CTRL = 2, MOD_META = 4, MOD_SUPER = 8;
@@ -344,8 +341,8 @@ public class UI {
 	} else {
 	    throw(new UIException("Uimsg to non-existent widget " + id, msg, args));
 	}
-	if (ZeeConfig.autoToggleGridLines && msg.contentEquals("curs") && args!=null && args.length>0) {
-		ZeeConfig.checkCursorToggleGridLines((String) args[0]);
+	if(msg.contentEquals("curs") && args!=null && args.length>0) {
+		ZeeConfig.checkNewCursorName((String) args[0]);
 	}
     }
 	

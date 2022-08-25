@@ -26,19 +26,21 @@
 
 package haven;
 
-import static haven.MCache.cmaps;
+import haven.MCache.OverlayInfo;
+import haven.render.*;
+import haven.render.sl.Type;
+import haven.render.sl.Uniform;
+
+import java.awt.*;
+import java.awt.event.KeyEvent;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.util.*;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
+
 import static haven.MCache.tilesz;
 import static haven.OCache.posres;
-import java.awt.Color;
-import java.awt.event.KeyEvent;
-import java.util.*;
-import java.util.function.*;
-import java.lang.ref.*;
-import java.lang.reflect.*;
-import haven.render.*;
-import haven.MCache.OverlayInfo;
-import haven.render.sl.Uniform;
-import haven.render.sl.Type;
 
 public class MapView extends PView implements DTarget, Console.Directory {
     public static boolean clickdb = false;
@@ -57,6 +59,7 @@ public class MapView extends PView implements DTarget, Console.Directory {
     public static double plobpgran = Utils.getprefd("plobpgran", 8);
     public static double plobagran = Utils.getprefd("plobagran", 16);
     private static final Map<String, Class<? extends Camera>> camtypes = new HashMap<String, Class<? extends Camera>>();
+	String ttip = null;
     
     public interface Delayed {
 	public void run(GOut g);
@@ -2025,6 +2028,9 @@ public class MapView extends PView implements DTarget, Console.Directory {
 		placing.new Adjust(c, ui.modflags()).run();
 	    }
 	}
+	if (ZeeConfig.showInspectTooltip){
+		inspect(c);
+	}
     }
     
     public boolean mouseup(Coord c, int button) {
@@ -2109,6 +2115,8 @@ public class MapView extends PView implements DTarget, Console.Directory {
 	if(selection != null) {
 	    if(selection.tt != null)
 		return(selection.tt);
+	}else if(ttip != null) {
+		return ttip;
 	}
 	return(super.tooltip(c, prev));
     }
@@ -2361,6 +2369,37 @@ public class MapView extends PView implements DTarget, Console.Directory {
 				ZeeManagerStockpile.checkWdgmsgPilePlacing();
 			else if (msg.equals("itemact"))
 				ZeeManagerStockpile.checkWdgmsgPileExists();
+		}
+	}
+
+	void inspect(Coord c) {
+		if(ZeeConfig.showInspectTooltip) {
+			new Hittest(c) {
+				@Override
+				protected void hit(Coord pc, Coord2d mc, ClickData inf) {
+					ttip = null;
+					if(inf != null) {
+						//ZeeConfig.println("inspect Gob "+c);
+						Gob gob = ZeeManagerGobClick.getGobFromClickable(inf.ci);
+						if(gob != null) {
+							ttip = gob.getres().name +"    ";//cursor == inspectCursor ? gob.resid() : gob.tooltip();
+						}
+					} else {
+						//ZeeConfig.println("inspect Tile "+c);
+						MCache mCache = ui.sess.glob.map;
+						int tile = mCache.gettile(mc.div(tilesz).floor());
+						Resource res = mCache.tilesetr(tile);
+						if(res != null) {
+							ttip = res.name + "    ";
+						}
+					}
+				}
+
+				@Override
+				protected void nohit(Coord pc) {
+					ttip = null;
+				}
+			}.run();
 		}
 	}
 }
