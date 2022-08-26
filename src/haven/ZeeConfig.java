@@ -1913,6 +1913,9 @@ public class ZeeConfig {
             if(clickb == 2) {
                 ZeeManagerGobClick.checkMidClickGob(pc, mc, clickGob, lastMapViewClickGobName);
             } else if (clickb==3 && gameUI.ui.modflags()==0){// no mod keys
+                //reset inspect tooltip
+                showInspectTooltip = false;
+                gameUI.map.ttip = null;
                 ZeeManagerGobClick.checkRightClickGob(pc, mc, clickGob, lastMapViewClickGobName);
             }
         }
@@ -2604,14 +2607,11 @@ public class ZeeConfig {
     }
 
     public static void checkNewCursorName(String curs) {
-        //ZeeConfig.println("new curs "+curs);
         if (autoToggleGridLines) {
             gameUI.map.showgrid(curs.contentEquals(CURSOR_HARVEST) || curs.contentEquals(CURSOR_MINE) || curs.contentEquals(CURSOR_DIG));
         }
         showInspectTooltip = curs.contentEquals(CURSOR_INSPECT);
-        if (showInspectTooltip)
-            gameUI.map.inspect(gameUI.map.rootxlate(gameUI.map.ui.mc));
-        else
+        if (!showInspectTooltip)
             gameUI.map.ttip = null;
     }
 

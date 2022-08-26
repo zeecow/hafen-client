@@ -1446,10 +1446,13 @@ public class ZeeManagerGobClick extends ZeeThread{
         waitPlayerDistToGob(gob,0);
     }
 
+    static boolean isMidclickInspecting = false; // used by inspect tooltip feature
     public static void inspectGob(Gob gob){
+        isMidclickInspecting = true;
         ZeeConfig.gameUI.menu.wdgmsg("act","inspect","0");
         gobClick(gob, 1);
         ZeeConfig.clickRemoveCursor();
+        isMidclickInspecting = false;
     }
 
     public static boolean isGobTrellisPlant(String gobName) {

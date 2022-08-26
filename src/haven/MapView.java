@@ -60,6 +60,7 @@ public class MapView extends PView implements DTarget, Console.Directory {
     public static double plobagran = Utils.getprefd("plobagran", 16);
     private static final Map<String, Class<? extends Camera>> camtypes = new HashMap<String, Class<? extends Camera>>();
 	String ttip = null;
+	long ttipGobId = -1;
     
     public interface Delayed {
 	public void run(GOut g);
@@ -2029,7 +2030,7 @@ public class MapView extends PView implements DTarget, Console.Directory {
 	    }
 	}
 	if (ZeeConfig.showInspectTooltip){
-		inspect(c);
+		inspectTooltip(c);
 	}
     }
     
@@ -2116,7 +2117,8 @@ public class MapView extends PView implements DTarget, Console.Directory {
 	    if(selection.tt != null)
 		return(selection.tt);
 	}else if(ttip != null) {
-		return ttip;
+		String t = RichText.Parser.quote(ttip);
+		return RichText.render(t, 1000);
 	}
 	return(super.tooltip(c, prev));
     }
@@ -2372,24 +2374,38 @@ public class MapView extends PView implements DTarget, Console.Directory {
 		}
 	}
 
-	void inspect(Coord c) {
-		if(ZeeConfig.showInspectTooltip) {
+	void inspectTooltip(Coord c) {
+		if(ZeeConfig.showInspectTooltip && !ZeeManagerGobClick.isMidclickInspecting) {
 			new Hittest(c) {
 				@Override
 				protected void hit(Coord pc, Coord2d mc, ClickData inf) {
-					ttip = null;
+					//ttip = null;
 					if(inf != null) {
 						//ZeeConfig.println("inspect Gob "+c);
 						Gob gob = ZeeManagerGobClick.getGobFromClickable(inf.ci);
-						if(gob != null) {
-							ttip = gob.getres().name +"    ";//cursor == inspectCursor ? gob.resid() : gob.tooltip();
+						if(gob != null  &&  gob.id != ttipGobId) {
+							ttipGobId = gob.id;
+							StringBuilder sb = new StringBuilder();
+							// res name
+							sb.append(gob.getres().name).append("    ");
+							// gob id
+							sb.append("\nId: ").append(ttipGobId).append("    ");
+							// gob poses
+							String poses = ZeeConfig.getGobPoses(gob);
+							if (!poses.isBlank()){
+								sb.append("\nPoses:\n");
+								sb.append("    ").append(poses.replace(",","    \n    "));
+								sb.append("    ");
+							}
+							ttip = sb.toString();
 						}
 					} else {
+						ttipGobId = -1;
 						//ZeeConfig.println("inspect Tile "+c);
 						MCache mCache = ui.sess.glob.map;
 						int tile = mCache.gettile(mc.div(tilesz).floor());
 						Resource res = mCache.tilesetr(tile);
-						if(res != null) {
+						if(res != null && ZeeConfig.showInspectTooltip) {
 							ttip = res.name + "    ";
 						}
 					}
