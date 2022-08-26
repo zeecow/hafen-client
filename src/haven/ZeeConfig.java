@@ -268,9 +268,10 @@ public class ZeeConfig {
             "gfx/kritter/lynx/lynx",
             "gfx/kritter/mammoth/mammoth",
             "gfx/kritter/moose/moose",
+            "gfx/kritter/rat/caverat",
             "gfx/kritter/troll/troll",
             "gfx/kritter/walrus/walrus",
-            "gfx/kritter/wildgoat/wildgoat",
+            "gfx/kritter/goat/wildgoat",
             "gfx/kritter/wolf/wolf",
             "gfx/kritter/wolverine/wolverine"
     ));
