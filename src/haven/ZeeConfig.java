@@ -1099,11 +1099,20 @@ public class ZeeConfig {
 
     private static Label[] windowTamedAnimalLabelValues(Window window, Label[] labels) {
         //HashMap<String,String> mapStatsNameValue = new HashMap<>();
-        Label[] vals = new Label[(labels.length/2)-1];//ignore "Born to" label
-        String name,val;
+        int labelsLength = labels.length;
+        for (int i = 0; i < labels.length; i++) {
+            if (labels[i].text.text.contains("Born to") || labels[i].text.text.contains("unbranded")){
+                labelsLength--;
+            }
+        }
+        Label[] vals = new Label[labelsLength/2];
         int j = 0;
-        for (int i = 2; i < labels.length; i++) { // skip fist 2 labels ("Born to" and "unbranded")
-            if( i % 2 == 1 ) { // if odd column == stat value
+        for (int i = 0; i < labels.length; i++) {
+            // skip fist labels "Born to" and "unbranded"
+            if (labels[i].text.text.contains("Born to") || labels[i].text.text.contains("unbranded"))
+                continue;
+            // detect digits
+            if(labels[i].text.text.matches("\\d+%?")){ // if( i % 2 == 1 ) {
                 vals[j++] = labels[i]; // label value
             }
         }
