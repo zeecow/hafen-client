@@ -178,6 +178,8 @@ public class ZeeConfig {
     public static boolean hideFxAnimations = Utils.getprefb("hideFxAnimations", true);
     public static boolean highlightCropsReady = Utils.getprefb("highlightCropsReady", true);
     public static boolean isThinClient = false;
+    public static boolean isRainLimited = Utils.getprefb("isRainLimited", false);
+    public static Integer rainLimitPerc = Utils.getprefi("rainLimitPerc", 50);
     public static boolean showGrowingTreePercentage = Utils.getprefb("showGrowingTreePercentage", true);
     public static boolean treeAnimation = Utils.getprefb("treeAnimation", false);
     public static boolean keyBeltShiftTab = Utils.getprefb("keyBeltShiftTab", true);

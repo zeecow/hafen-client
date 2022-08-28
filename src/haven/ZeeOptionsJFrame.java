@@ -8,6 +8,7 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.awt.event.MouseEvent;
 import java.util.*;
 import java.util.List;
 
@@ -17,7 +18,7 @@ public class ZeeOptionsJFrame extends JFrame {
     public JPanel panelTabMisc, panelTabInterface, panelTabGobs, panelTabControls, panelTabMinimap, panelDetailsBottom, panelTabCateg, panelShapeIcons, panelShapeIconsSaveCancel;
     public JCheckBox cbDropAltKeyOnly, cbShowKinNames, cbSimpleWindowBorder, cbSimpleButtons, cbSimpleWindows, cbFreeGobPlacement, cbScrollTransferItems, cbCtrlClickMinimapContent, cbShapeIcons, cbSlowMiniMap, cbHideFxAnimations, cbHideFxSmoke, cbAutoChipMinedBoulder, cbDropMinedStone, cbDropMinedOre, cbDropMinedSilverGold, cbDropMinedCurios, cbActionSearchGlobal, cbCompactEquipsWindow, cbBeltTogglesEquipsReposition, cbBeltTogglesEquips, cbAutoRunLogin, cbAutohearth, cbHighlightCropsReady, cbSimpleHerbs, cbSimpleCrops, cbTreeAnimation, cbShowGrowingTreePercentage, cbMiniTrees, cbKeyUpDownAudioControl, cbAlertOnPlayers,  cbShowInventoryLogin, cbShowBeltLogin, cbKeyBeltShiftTab, cbDrinkKey, cbDrinkAuto, cbKeyCamSwitchShiftC, cbShowIconsZoomOut, cbRememberWindowsPos, cbSortActionsByUse, cbDebugWidgetMsgs, cbDebugCodeRes, cbMidclickEquipManager, cbShowEquipsLogin, cbNotifyBuddyOnline, cbZoomOrthoExtended, cbCattleRosterHeight, cbAutoToggleGridLines;
     public JTextField tfAutoClickMenu, tfAggroRadiusTiles, tfButchermode, tfGobName, tfAudioPath, tfCategName, tfAudioPathCateg;
-    public JComboBox<String> cmbCattleRoster, cmbGobCategory, cmbMiniTreeSize, comboShapeIcons, cmbDrinkAutoValue;
+    public JComboBox<String> cmbCattleRoster, cmbGobCategory, cmbMiniTreeSize, cmbRainLimitPerc, comboShapeIcons, cmbDrinkAutoValue;
     public JList<String> listGobsTemp, listGobsSaved, listGobsCategories;
     public JButton btnRefresh, btnPrintState, btnResetGobs, btnAudioSave, btnAudioClear, btnAudioTest, btnRemGobFromCateg, btnGobColorAdd, btnCategoryColorAdd, btnGobColorRemove, btnCategoryColorRemove, btnResetCateg, btnAddCateg, btnRemoveCateg, btnResetWindowsPos, btnResetActionUses, btnSapeIconPreview, btnShapeIconSave, btnSapeIconDelete, btnSolidColorWindow, btnGridGolor;
     public JTextArea txtAreaDebug;
@@ -238,13 +239,17 @@ public class ZeeOptionsJFrame extends JFrame {
 
         panelTabMisc.add(new ZeeOptionJCheckBox( "Show tree animation", "treeAnimation"),c);
 
+        //mini trees
         pan = new JPanel(new FlowLayout(FlowLayout.LEFT));
         panelTabMisc.add(pan,c);
-        pan.add(new ZeeOptionJCheckBox( "Mini trees", "miniTrees"),c);
-
-        //mini trees size
-        String[] perc = {"30%","40%","50%","60%","70%","80%"};
-        pan.add(cmbMiniTreeSize = new JComboBox<String>(perc), c);
+        cmbMiniTreeSize = new JComboBox<String>(new String[]{"30%", "40%", "50%", "60%", "70%", "80%"});
+        pan.add(new ZeeOptionJCheckBox( "Mini trees", "miniTrees"){
+            protected void processMouseEvent(MouseEvent e) {
+                super.processMouseEvent(e);
+                cmbMiniTreeSize.setEnabled(ZeeConfig.miniTrees);
+            }
+        },c);
+        pan.add(cmbMiniTreeSize, c);
         cmbMiniTreeSize.setSelectedItem(ZeeConfig.miniTreesSize+"%");
         cmbMiniTreeSize.setEnabled(ZeeConfig.miniTrees);
         cmbMiniTreeSize.addActionListener(e -> {
@@ -252,6 +257,28 @@ public class ZeeOptionsJFrame extends JFrame {
             Integer num = ZeeConfig.miniTreesSize = Integer.parseInt(val);
             Utils.setprefi("miniTreesSize", num);
         });
+
+
+        //rain rate limit
+        pan = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        panelTabMisc.add(pan,c);
+        cmbRainLimitPerc = new JComboBox<String>(new String[]{"25%", "50%", "75%"});
+        pan.add(new ZeeOptionJCheckBox( "Rain rate limit", "isRainLimited"){
+            protected void processMouseEvent(MouseEvent e) {
+                super.processMouseEvent(e);
+                cmbRainLimitPerc.setEnabled(ZeeConfig.isRainLimited);
+            }
+        },c);
+        //rain rate limit %
+        pan.add(cmbRainLimitPerc, c);
+        cmbRainLimitPerc.setSelectedItem(ZeeConfig.rainLimitPerc+"%");
+        cmbRainLimitPerc.setEnabled(ZeeConfig.isRainLimited);
+        cmbRainLimitPerc.addActionListener(e -> {
+            String val = cmbRainLimitPerc.getSelectedItem().toString().split("%")[0];
+            Integer num = ZeeConfig.rainLimitPerc = Integer.parseInt(val);
+            Utils.setprefi("rainLimitPerc", num);
+        });
+
 
         //agro radius tiles
         pan = new JPanel(new FlowLayout(FlowLayout.LEFT));
