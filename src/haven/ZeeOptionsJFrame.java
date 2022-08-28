@@ -15,7 +15,7 @@ import java.util.List;
 public class ZeeOptionsJFrame extends JFrame {
     public GridBagConstraints c;
     public JTabbedPane tabbedPane, tabbedPaneGobs;
-    public JPanel panelTabMisc, panelTabInterface, panelTabGobs, panelTabControls, panelTabMinimap, panelDetailsBottom, panelTabCateg, panelShapeIcons, panelShapeIconsSaveCancel;
+    public JPanel panelTabAuto, panelTabMisc, panelTabInterface, panelTabGobs, panelTabControls, panelTabMinimap, panelDetailsBottom, panelTabCateg, panelShapeIcons, panelShapeIconsSaveCancel;
     public JCheckBox cbDropAltKeyOnly, cbShowKinNames, cbSimpleWindowBorder, cbSimpleButtons, cbSimpleWindows, cbFreeGobPlacement, cbScrollTransferItems, cbCtrlClickMinimapContent, cbShapeIcons, cbSlowMiniMap, cbHideFxAnimations, cbHideFxSmoke, cbAutoChipMinedBoulder, cbDropMinedStone, cbDropMinedOre, cbDropMinedSilverGold, cbDropMinedCurios, cbActionSearchGlobal, cbCompactEquipsWindow, cbBeltTogglesEquipsReposition, cbBeltTogglesEquips, cbAutoRunLogin, cbAutohearth, cbHighlightCropsReady, cbSimpleHerbs, cbSimpleCrops, cbTreeAnimation, cbShowGrowingTreePercentage, cbMiniTrees, cbKeyUpDownAudioControl, cbAlertOnPlayers,  cbShowInventoryLogin, cbShowBeltLogin, cbKeyBeltShiftTab, cbDrinkKey, cbDrinkAuto, cbKeyCamSwitchShiftC, cbShowIconsZoomOut, cbRememberWindowsPos, cbSortActionsByUse, cbDebugWidgetMsgs, cbDebugCodeRes, cbMidclickEquipManager, cbShowEquipsLogin, cbNotifyBuddyOnline, cbZoomOrthoExtended, cbCattleRosterHeight, cbAutoToggleGridLines;
     public JTextField tfAutoClickMenu, tfAggroRadiusTiles, tfButchermode, tfGobName, tfAudioPath, tfCategName, tfAudioPathCateg;
     public JComboBox<String> cmbCattleRoster, cmbGobCategory, cmbMiniTreeSize, cmbRainLimitPerc, comboShapeIcons, cmbDrinkAutoValue;
@@ -49,6 +49,8 @@ public class ZeeOptionsJFrame extends JFrame {
 
         tabbedPane = new JTabbedPane();
         getContentPane().add(tabbedPane);
+
+        buildTabAuto();
 
         buildTabMisc();
 
@@ -202,32 +204,71 @@ public class ZeeOptionsJFrame extends JFrame {
         repaint();
     }
 
+    private void buildTabAuto(){
+
+        panelTabAuto = new JPanel(new GridBagLayout());
+
+        tabbedPane.addTab("Auto", panelTabAuto);
+
+        panelTabAuto.add(new ZeeOptionJCheckBox( "Auto chip mined boulder", "autoChipMinedBoulder"),c);
+
+        panelTabAuto.add(new ZeeOptionJCheckBox( "Drop mined stones", "dropMinedStones"),c);
+
+        panelTabAuto.add(new ZeeOptionJCheckBox( "Drop mined ore", "dropMinedOre"),c);
+
+        panelTabAuto.add(new ZeeOptionJCheckBox( "Drop mined silver/gold", "dropMinedOrePrecious"),c);
+
+        panelTabAuto.add(new ZeeOptionJCheckBox( "Drop mined curios", "dropMinedCurios"),c);
+
+        panelTabAuto.add(new ZeeOptionJCheckBox( "Sound alert on players", "alertOnPlayers"),c);
+
+        panelTabAuto.add(new ZeeOptionJCheckBox("Auto-hearth on players","autoHearthOnStranger"), c);
+
+        panelTabAuto.add(new ZeeOptionJCheckBox( "Auto-run on login", "autoRunLogin"),c);
+
+        //auto click menu list
+        panelTabAuto.add(new JLabel("Automenu list:"), c);
+        panelTabAuto.add(tfAutoClickMenu = new JTextField("",5), c);
+        tfAutoClickMenu.setMaximumSize(new Dimension(Integer.MAX_VALUE, tfAutoClickMenu.getPreferredSize().height));
+        tfAutoClickMenu.setText(ZeeConfig.autoClickMenuOptionList);
+        tfAutoClickMenu.addActionListener(actionEvent -> {
+            String str = actionEvent.getActionCommand();
+            String[] strArr = str.split(",");
+            if(strArr!=null && strArr.length>0) {
+                ZeeConfig.autoClickMenuOptionList = str;
+                Utils.setpref("autoClickMenuOptionList",str.strip());
+            }
+        });
+
+        //butcher mode  list
+        panelTabAuto.add(new JLabel("Butchermode list:"), c);
+        panelTabAuto.add(tfButchermode= new JTextField("",5), c);
+        tfButchermode.setMaximumSize(new Dimension(Integer.MAX_VALUE, tfButchermode.getPreferredSize().height));
+        tfButchermode.setText(ZeeConfig.butcherAutoList);
+        tfButchermode.addActionListener(actionEvent -> {
+            String str = actionEvent.getActionCommand();
+            String[] strArr = str.split(",");
+            if(strArr!=null && strArr.length>0) {
+                ZeeConfig.butcherAutoList = str;
+                Utils.setpref("butcherAutoList",str.strip());
+            }
+        });
+    }
+
+
     private void buildTabMisc() {
 
         JPanel pan;
 
         panelTabMisc = new JPanel(new GridBagLayout());
+
         tabbedPane.addTab("Misc", panelTabMisc);
 
         panelTabMisc.add(new ZeeOptionJCheckBox( "hide some animations", "hideFxAnimations"),c);
 
         panelTabMisc.add(new ZeeOptionJCheckBox( "hide smoke effects", "hideFxSmoke"),c);
 
-        panelTabMisc.add(new ZeeOptionJCheckBox( "Auto chip mined boulder", "autoChipMinedBoulder"),c);
-
-        panelTabMisc.add(new ZeeOptionJCheckBox( "Drop mined stones", "dropMinedStones"),c);
-
-        panelTabMisc.add(new ZeeOptionJCheckBox( "Drop mined ore", "dropMinedOre"),c);
-
-        panelTabMisc.add(new ZeeOptionJCheckBox( "Drop mined silver/gold", "dropMinedOrePrecious"),c);
-
-        panelTabMisc.add(new ZeeOptionJCheckBox( "Drop mined curios", "dropMinedCurios"),c);
-
-        panelTabMisc.add(new ZeeOptionJCheckBox( "Sound alert on players", "alertOnPlayers"),c);
-
-        panelTabMisc.add(new ZeeOptionJCheckBox("Auto-hearth on players","autoHearthOnStranger"), c);
-
-        panelTabMisc.add(new ZeeOptionJCheckBox( "Auto-run on login", "autoRunLogin"),c);
+        panelTabMisc.add(new ZeeOptionJCheckBox( "hide flavor objects(restart)", "noFlavObjs"),c);
 
         panelTabMisc.add(new ZeeOptionJCheckBox( "Simple herbs", "simpleHerbs"),c);
 
@@ -259,10 +300,13 @@ public class ZeeOptionsJFrame extends JFrame {
         });
 
 
+        panelTabMisc.add(new ZeeOptionJCheckBox( "Hide Weather", "noWeather"),c);
+
+
         //rain rate limit
         pan = new JPanel(new FlowLayout(FlowLayout.LEFT));
         panelTabMisc.add(pan,c);
-        cmbRainLimitPerc = new JComboBox<String>(new String[]{"25%", "50%", "75%"});
+        cmbRainLimitPerc = new JComboBox<String>(new String[]{"5%","12%","25%", "50%", "75%"});
         pan.add(new ZeeOptionJCheckBox( "Rain rate limit", "isRainLimited"){
             protected void processMouseEvent(MouseEvent e) {
                 super.processMouseEvent(e);
@@ -296,33 +340,6 @@ public class ZeeOptionsJFrame extends JFrame {
             }
         });
 
-        //auto click menu list
-        panelTabMisc.add(new JLabel("Automenu list:"), c);
-        panelTabMisc.add(tfAutoClickMenu = new JTextField("",5), c);
-        tfAutoClickMenu.setMaximumSize(new Dimension(Integer.MAX_VALUE, tfAutoClickMenu.getPreferredSize().height));
-        tfAutoClickMenu.setText(ZeeConfig.autoClickMenuOptionList);
-        tfAutoClickMenu.addActionListener(actionEvent -> {
-            String str = actionEvent.getActionCommand();
-            String[] strArr = str.split(",");
-            if(strArr!=null && strArr.length>0) {
-                ZeeConfig.autoClickMenuOptionList = str;
-                Utils.setpref("autoClickMenuOptionList",str.strip());
-            }
-        });
-
-        //butcher mode  list
-        panelTabMisc.add(new JLabel("Butchermode list:"), c);
-        panelTabMisc.add(tfButchermode= new JTextField("",5), c);
-        tfButchermode.setMaximumSize(new Dimension(Integer.MAX_VALUE, tfButchermode.getPreferredSize().height));
-        tfButchermode.setText(ZeeConfig.butcherAutoList);
-        tfButchermode.addActionListener(actionEvent -> {
-            String str = actionEvent.getActionCommand();
-            String[] strArr = str.split(",");
-            if(strArr!=null && strArr.length>0) {
-                ZeeConfig.butcherAutoList = str;
-                Utils.setpref("butcherAutoList",str.strip());
-            }
-        });
 
         panelTabMisc.add(cbDebugCodeRes= new JCheckBox("Debug widget msgs"), c);
         cbDebugCodeRes.setSelected(ZeeConfig.debugWidgetMsgs);

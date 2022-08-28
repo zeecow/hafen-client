@@ -179,7 +179,7 @@ public class ZeeConfig {
     public static boolean highlightCropsReady = Utils.getprefb("highlightCropsReady", true);
     public static boolean isThinClient = false;
     public static boolean isRainLimited = Utils.getprefb("isRainLimited", false);
-    public static Integer rainLimitPerc = Utils.getprefi("rainLimitPerc", 50);
+    public static Integer rainLimitPerc = Utils.getprefi("rainLimitPerc", 25);
     public static boolean showGrowingTreePercentage = Utils.getprefb("showGrowingTreePercentage", true);
     public static boolean treeAnimation = Utils.getprefb("treeAnimation", false);
     public static boolean keyBeltShiftTab = Utils.getprefb("keyBeltShiftTab", true);
@@ -188,6 +188,8 @@ public class ZeeConfig {
     public static boolean midclickEquipManager = Utils.getprefb("midclickEquipManager", true);
     public static boolean miniTrees = Utils.getprefb("miniTrees", false);
     public static Integer miniTreesSize = Utils.getprefi("miniTreesSize", 50);
+    public static boolean noWeather = Utils.getprefb("noWeather", false);
+    public static boolean noFlavObjs = Utils.getprefb("noFlavObjs", true);
     public static boolean scrollTransferItems = Utils.getprefb("scrollTransferItems", true);
     public static boolean notifyBuddyOnline = Utils.getprefb("notifyBuddyOnline", false);
     public static boolean pilerMode = false;
