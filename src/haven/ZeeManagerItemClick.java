@@ -1123,6 +1123,26 @@ public class ZeeManagerItemClick extends ZeeThread{
         return false;
     }
 
+    public static WItem getEquippedItemNameContains(String nameContains) {
+        WItem[] items = getEquipory().children(WItem.class).toArray(new WItem[]{});
+        for (int i = 0; i < items.length; i++) {
+            if (items[i].item.getres().name.contains(nameContains)){
+                return items[i];
+            }
+        }
+        return null;
+    }
+
+    public static WItem getEquippedItemNameEndsWith(String nameEndsWith) {
+        WItem[] items = getEquipory().children(WItem.class).toArray(new WItem[]{});
+        for (int i = 0; i < items.length; i++) {
+            if (items[i].item.getres().name.endsWith(nameEndsWith)){
+                return items[i];
+            }
+        }
+        return null;
+    }
+
     public static boolean isItemInHandSlot(String name){
         try {
             /*

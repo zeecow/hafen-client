@@ -28,6 +28,8 @@ Client focusing on small helper tasks, many using mouse middle button, and other
  - rightclicking doors, cave, gate, wheelbarrow, stockpiles, horse, cart, will interact with these objects whenever possible
  - Quick Options window show 3 latest used options, and auto-click for latest flowermenu
  - default icon sound to "Bell 2" if empty
+ - inspect cursor tooltip with gob/tile info
+ - shift+tab toggles between belt, creel and basket
  - midclick Barter Stand "Buy" button to auto-buy  
  - midclick ground 
    - while holding item will move to location (simulates ctrl+click)

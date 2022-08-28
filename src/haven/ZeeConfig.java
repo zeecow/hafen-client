@@ -1332,7 +1332,7 @@ public class ZeeConfig {
                         setPlayerSpeed(PLAYER_SPEED_2);
 
                     if (autoOpenBelt)
-                        openBelt();
+                        clickOpenBelt();
 
                     Thread.sleep(1500);
 
@@ -1617,12 +1617,7 @@ public class ZeeConfig {
         }
         // Shift+Tab toggles Belt
         else if(ZeeConfig.keyBeltShiftTab && ev.getKeyCode()==KeyEvent.VK_TAB && ev.isShiftDown()){
-            Window belt = getWindow("Belt");
-            if( belt != null){
-                belt.getchild(Button.class).click();//click close button
-            }else {
-                openBelt();
-            }
+            tooggleWindowsBeltOrBasketCreel();
             return true;
         }
         // Shift+c alternate cams bad/ortho
@@ -1640,6 +1635,59 @@ public class ZeeConfig {
             return true;
         }
         return false;
+    }
+
+    private static boolean createdBasketWindow=false, createdCreelWindow=false;
+    private static void tooggleWindowsBeltOrBasketCreel() {
+
+        //toggle basket
+        Window basketWindow = getWindow("Basket");
+        if (basketWindow == null) {
+            WItem item = ZeeManagerItemClick.getEquippedItemNameEndsWith("/pickingbasket");
+            if (item != null) {
+                item.mousedown(Coord.z, 3); //create basket window
+                createdBasketWindow = true;
+            }else {
+                createdBasketWindow = false;
+            }
+        } else {
+            if (basketWindow.visible()) {
+                basketWindow.hide();
+            } else {
+                basketWindow.show();
+            }
+        }
+
+        //toggle creel
+        Window creelWindow = getWindow("Creel");
+        if (creelWindow == null) {
+            WItem item = ZeeManagerItemClick.getEquippedItemNameEndsWith("/creel");
+            if (item != null) {
+                item.mousedown(Coord.z, 3); //create creel window
+                createdCreelWindow = true;
+            }else{
+                createdCreelWindow = false;
+            }
+        } else {
+            if (creelWindow.visible()) {
+                creelWindow.hide();
+            } else {
+                creelWindow.show();
+            }
+        }
+
+        // toggle belt
+        Window beltWindow = getWindow("Belt");
+        if (beltWindow == null) {
+            clickOpenBelt();
+        } else {
+            if (!beltWindow.visible()) {
+                beltWindow.show();
+            } else if(!createdBasketWindow && !createdCreelWindow){
+                //only hide  belt if no basket/creel
+                beltWindow.hide();
+            }
+        }
     }
 
     public static Window getWindow(String name) {
@@ -1779,13 +1827,12 @@ public class ZeeConfig {
         ZeeQuickOptionsWindow.reset();
     }
 
-    public static void openBelt() {
-        windowEquipment.getchild(Equipory.class).children(WItem.class).forEach(witem -> {
-            if (witem.item.res.get().name.endsWith("belt")) {
-                witem.mousedown(Coord.z, 3);
-                ZeeManagerItemClick.invBelt = null;
-            }
-        });
+    public static void clickOpenBelt() {
+        WItem belt = ZeeManagerItemClick.getEquippedItemNameEndsWith("belt");
+        if (belt != null) {
+            belt.mousedown(Coord.z, 3);
+            ZeeManagerItemClick.invBelt = null;
+        }
     }
 
     public static void craftHistoryAdd(String msg, Object[] args) {
