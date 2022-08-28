@@ -2375,7 +2375,7 @@ public class MapView extends PView implements DTarget, Console.Directory {
 	}
 
 	void inspectTooltip(Coord c) {
-		if(ZeeConfig.showInspectTooltip && !ZeeManagerGobClick.isMidclickInspecting) {
+		if(ZeeConfig.showInspectTooltip && !ZeeManagerGobClick.isMidclickInspecting && ZeeConfig.getPlayerGob()!=null) {
 			new Hittest(c) {
 				@Override
 				protected void hit(Coord pc, Coord2d mc, ClickData inf) {

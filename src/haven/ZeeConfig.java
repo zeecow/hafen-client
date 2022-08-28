@@ -667,7 +667,7 @@ public class ZeeConfig {
         long gobId = gob.id;
         String path = "";
 
-        if(isPlayer(gob)  &&  gobId != gameUI.map.player().id) {
+        if(isPlayer(gob)  &&  gameUI.map.player()!=null && gameUI.map.player().id!=gobId) {
             if(autoHearthOnStranger && !playerHasAnyPose(POSE_PLAYER_TRAVELHOMEPOINT,POSE_PLAYER_TRAVELHOMESHRUG)) {
                 ZeeConfig.lastMapViewClickButton = 1; // cancel click some tasks, hopefully
                 gameUI.act("travel", "hearth");
