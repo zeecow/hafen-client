@@ -1488,6 +1488,7 @@ public class GameUI extends ConsoleHost implements Console.Directory {
     }
 
     public void resize(Coord sz) {
+	ZeeConfig.gameUIPrevSz = Coord.of(this.sz);
 	this.sz = sz;
 	chat.resize(sz.x - blpw - brpw);
 	chat.move(new Coord(blpw, sz.y));
@@ -1497,6 +1498,7 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 	    prog.move(sz.sub(prog.sz).mul(0.5, 0.35));
 	beltwdg.c = new Coord(blpw + UI.scale(10), sz.y - beltwdg.sz.y - UI.scale(5));
 	zeeHistWdg.c = beltwdg.c.add(10,0);
+	ZeeConfig.gameUIResized();
 	super.resize(sz);
     }
     

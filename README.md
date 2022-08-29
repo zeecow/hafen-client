@@ -109,3 +109,4 @@ other stuff:
  - mini trees
  - hide smoke and some animations
  - keybelt shortcuts navigation 
+ - reposition rightmost windows horiz. when game resize

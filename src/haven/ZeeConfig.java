@@ -1295,16 +1295,28 @@ public class ZeeConfig {
         Utils.setpref(MAP_ACTION_USES, serialize(mapActionUses));
     }
 
-    public static void windowChangedPos(Window window) {
+    static void windowChangedPos(Window window) {
+        saveWindowPos(window);
+    }
+
+    static void saveWindowPos(Window window) {
+
         if(!rememberWindowsPos || window==null)
             return;
-        String name = ((Window)window).cap.text;
+
+        String name = window.cap.text;
+
+        //igonore cases
         if( name==null || name.isEmpty()
-            || (autoToggleEquipsReposition && name.contentEquals("Equipement"))
-            || window instanceof MapWnd)
+                || (autoToggleEquipsReposition && name.contentEquals("Equipement"))
+                || window instanceof MapWnd)
             return;
+
+        // set craft window unique name
         if(isMakewindow(window))
             name = MAKE_WINDOW_NAME;
+
+        //save window pos
         mapWindowPos.put(name, new Coord(window.c));
         Utils.setpref(MAP_WND_POS, serialize(mapWindowPos));
     }
@@ -2706,5 +2718,26 @@ public class ZeeConfig {
      */
     static void runThinClient() {
         println("run thin client");
+    }
+
+    static Coord gameUIPrevSz;
+    static void gameUIResized() {
+        if (gameUIPrevSz.x==0 || gameUIPrevSz.y==0){
+            return;
+        }
+        Coord newSz = gameUI.sz;
+        Coord change = newSz.sub(gameUIPrevSz);
+        //ZeeConfig.println("from "+gameUIPrevSz+" to "+newSz+" change "+change);
+        Coord mid = gameUIPrevSz.div(2);//consider prev size mid.x as threshold
+        Set<Window> windows = getWindowsOpened();
+        windows.forEach( w -> {
+            // windows with x > mid.x are repositioned
+            if (w.c.x >= mid.x  &&  change.x!=0){
+                w.c.x += change.x;//positives and negatives
+                if(w.cap.text.contentEquals("Map") && mapWndLastPos!=null)
+                    mapWndLastPos.x += change.x;//expanded map auto align feature
+                // TODO save new pos? (not sure)
+            }
+        });
     }
 }
