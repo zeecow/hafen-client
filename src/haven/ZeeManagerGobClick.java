@@ -483,7 +483,7 @@ public class ZeeManagerGobClick extends ZeeThread{
     }
 
     static boolean isGobChair(String gobName) {
-        String list = "/chair-rustic,/stonethrone,/royalthrone";
+        String list = "/chair-rustic,/stonethrone,/royalthrone,/thatchedchair";
         return gobNameEndsWith(gobName,list);
     }
 

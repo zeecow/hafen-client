@@ -264,11 +264,11 @@ public class ZeeOptionsJFrame extends JFrame {
 
         tabbedPane.addTab("Misc", panelTabMisc);
 
-        panelTabMisc.add(new ZeeOptionJCheckBox( "hide some animations", "hideFxAnimations"),c);
+        panelTabMisc.add(new ZeeOptionJCheckBox( "Hide some animations", "hideFxAnimations"),c);
 
-        panelTabMisc.add(new ZeeOptionJCheckBox( "hide smoke effects", "hideFxSmoke"),c);
+        panelTabMisc.add(new ZeeOptionJCheckBox( "Hide smoke effects", "hideFxSmoke"),c);
 
-        panelTabMisc.add(new ZeeOptionJCheckBox( "hide flavor objects(restart)", "noFlavObjs"),c);
+        panelTabMisc.add(new ZeeOptionJCheckBox( "Hide flavor objects(restart)", "noFlavObjs"),c);
 
         panelTabMisc.add(new ZeeOptionJCheckBox( "Simple herbs", "simpleHerbs"),c);
 
@@ -300,7 +300,7 @@ public class ZeeOptionsJFrame extends JFrame {
         });
 
 
-        panelTabMisc.add(new ZeeOptionJCheckBox( "Hide Weather", "noWeather"),c);
+        panelTabMisc.add(new ZeeOptionJCheckBox( "Hide Weather(restart)", "noWeather"),c);
 
 
         //rain rate limit
