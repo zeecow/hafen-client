@@ -471,11 +471,11 @@ public class MapView extends PView implements DTarget, Console.Directory {
 		tangl = (float)(Math.PI * 0.5 * (Math.floor((tangl / (Math.PI * 0.5)) + 0.51) + 0.5));
 		return(true);
 	    } else if(kb_camin.key().match(ev)) {
-		chfield(tfield - 50);
-		return(true);
+		//chfield(tfield - 50);
+		return(false);//volume up
 	    } else if(kb_camout.key().match(ev)) {
-		chfield(tfield + 50);
-		return(true);
+		//chfield(tfield + 50);
+		return(false);//volume down
 	    } else if(kb_camreset.key().match(ev)) {
 		tangl = angl + (float)Utils.cangle(-(float)Math.PI * 0.25f - angl);
 		chfield((float)(100 * Math.sqrt(2)));
