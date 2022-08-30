@@ -80,6 +80,7 @@ public class Window extends Widget implements DTarget {
     private UI.Grab dm = null;
     private Coord doff;
     public boolean decohide = false;
+	public Coord prevAsz;
 
     @RName("wnd")
     public static class $_ implements Factory {
@@ -99,6 +100,7 @@ public class Window extends Widget implements DTarget {
 	cbtn = add(new Button(25,"x"));//big close button
 	chcap(cap);
 	resize2(sz);
+	this.prevAsz = Coord.of(sz);
 	setfocustab(true);
     }
 
@@ -126,16 +128,16 @@ public class Window extends Widget implements DTarget {
     }
 
 	public BufferedImage bgImgSimpleWindow = null;
-	public void drawbgcolor(GOut g, Color c) {
+	public void drawSimpleWindowBg(GOut g) {
 		if (bgImgSimpleWindow == null) {
-			bgImgSimpleWindow = ZeeManagerIcons.imgRect(wsz.x-34, wsz.y-54, c,ZeeConfig.simpleWindowBorder,0);
+			bgImgSimpleWindow = ZeeManagerIcons.imgRect(wsz.x-34, wsz.y-54, ZeeConfig.intToColor(ZeeConfig.simpleWindowColorInt),ZeeConfig.simpleWindowBorder,0);
 		}
 		g.image(bgImgSimpleWindow,tlm);
 	}
 
     protected void drawbg(GOut g) {
 	if (ZeeConfig.simpleWindows) {
-		drawbgcolor(g,ZeeConfig.intToColor(ZeeConfig.simpleWindowColorInt));
+		drawSimpleWindowBg(g);
 		return;
 	}
 	Coord bgc = new Coord();
@@ -246,6 +248,10 @@ public class Window extends Widget implements DTarget {
 
     public void resize(Coord sz) {
 	resize2(sz);
+	if (sz.compareTo(prevAsz) != 0){
+		prevAsz = Coord.of(asz);
+		bgImgSimpleWindow = null; // redraw bg img
+	}
     }
 
     public void decohide(boolean h) {
