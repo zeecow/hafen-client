@@ -821,10 +821,18 @@ public class ZeeConfig {
             ZeeManagerCook.pepperRecipeOpened(window);
         }
 
-        if (!windowTitle.contentEquals("Options"))
-            windowReposition(window,windowTitle);
+        if (gameUI!=null && !gameUI.sz.equals(0,0)){
+            windowApplySavedPosition(window, windowTitle);
+            windowFitView(window);
+        }
 
         windowModOrganizeButton(window, windowTitle);
+    }
+
+    private static void windowFitView(Window window) {
+        if (window.c.x + window.sz.x > gameUI.sz.x)
+            window.c.x = gameUI.sz.x - window.sz.x;
+        // TODO fit vertical when Window sz y is more precise
     }
 
     public static boolean isBuildWindow(Window window) {
@@ -986,7 +994,7 @@ public class ZeeConfig {
     }
 
 
-    private static void windowReposition(Window window, String windowTitle) {
+    private static void windowApplySavedPosition(Window window, String windowTitle) {
         Coord c;
         if(rememberWindowsPos && !(window instanceof MapWnd) ){
             if(isMakewindow(window)){
@@ -2735,16 +2743,19 @@ public class ZeeConfig {
         }
         Coord newSz = gameUI.sz;
         Coord change = newSz.sub(gameUIPrevSz);
-        //ZeeConfig.println("from "+gameUIPrevSz+" to "+newSz+" change "+change);
-        Coord mid = gameUIPrevSz.div(2);//consider prev size mid.x as threshold
+        //consider prev size mid.x as threshold
+        Coord mid = gameUIPrevSz.div(2);
         Set<Window> windows = getWindowsOpened();
         windows.forEach( w -> {
             // windows with x > mid.x are repositioned
             if (w.c.x >= mid.x  &&  change.x!=0){
-                w.c.x += change.x;//positives and negatives
+                //add positives or negatives changes
+                w.c.x += change.x;
+                // treat expanded map auto align feature
                 if(w.cap.text.contentEquals("Map") && mapWndLastPos!=null)
-                    mapWndLastPos.x += change.x;//expanded map auto align feature
-                // TODO save new pos? (not sure)
+                    mapWndLastPos.x += change.x;
+                // save pos
+                saveWindowPos(w);
             }
         });
     }
