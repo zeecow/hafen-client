@@ -449,8 +449,6 @@ public class ZeeManagerGobClick extends ZeeThread{
         else if ( isGobStockpile(gobName) && ZeeConfig.isPlayerCarryingWheelbarrow()){
             new ZeeThread() {
                 public void run() {
-                    if (ZeeConfig.isPlayerMountingHorse())
-                        dismountHorse(mc);
                     unloadWheelbarrowAtGob(gob);
                     if (ZeeConfig.autoToggleGridLines)
                         ZeeConfig.gameUI.map.showgrid(true);

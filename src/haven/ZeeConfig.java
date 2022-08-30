@@ -2287,6 +2287,14 @@ public class ZeeConfig {
         clickCoord(coord, btn, 0);
     }
 
+    static void moveToGobTile(Gob gob) {
+        moveToTile(getGobTile(gob));
+    }
+
+    static void moveToTile(Coord gobTile) {
+        clickTile(gobTile,1);
+    }
+
     public static void clickCoord(Coord coord, int btn, int mod) {
         gameUI.map.wdgmsg("click", ZeeConfig.getCenterScreenCoord(), coord, btn, mod);
     }
