@@ -26,16 +26,14 @@
 
 package haven;
 
+import haven.MapFile.*;
+
+import java.awt.*;
+import java.util.List;
 import java.util.*;
-import java.util.function.*;
-import java.awt.Color;
-import haven.MapFile.Segment;
-import haven.MapFile.DataGrid;
-import haven.MapFile.Grid;
-import haven.MapFile.GridInfo;
-import haven.MapFile.Marker;
-import haven.MapFile.PMarker;
-import haven.MapFile.SMarker;
+import java.util.function.Consumer;
+import java.util.function.Function;
+
 import static haven.MCache.cmaps;
 import static haven.MCache.tilesz;
 import static haven.OCache.posres;
@@ -57,6 +55,8 @@ public class MiniMap extends Widget {
     protected Segment dseg;
     protected int dlvl;
     protected Location dloc;
+	private String biome, ttip;
+
 
     public MiniMap(Coord sz, MapFile file) {
 	super(sz);
@@ -218,6 +218,14 @@ public class MiniMap extends Widget {
 	    }
 	}
 	icons = findicons(icons);
+	if(ZeeConfig.showInspectTooltip) {
+		Coord mc = rootxlate(ui.mc);
+		if(mc.isect(Coord.z, sz)) {
+			setBiome(xlate(mc));
+		} else {
+			setBiome(null);
+		}
+	}
     }
 
     public void center(Locator loc) {
@@ -759,6 +767,10 @@ public class MiniMap extends Widget {
     private DisplayIcon dsicon;
     private DisplayMarker dsmark;
     public boolean mousedown(Coord c, int button) {
+	if (button==3) {
+		ZeeConfig.showInspectTooltip = false;
+		biome = ttip = null;
+	}
 	dsloc = xlate(c);
 	if(dsloc != null) {
 	    dsicon = iconat(c);
@@ -835,8 +847,12 @@ public class MiniMap extends Widget {
 	    Coord tc = c.sub(sz.div(2)).mul(scalef()).add(dloc.tc);
 	    DisplayMarker mark = markerat(tc);
 	    if(mark != null) {
-		return(mark.tip);
+		return(RichText.render(mark.tip.text+"    "));
 	    }
+	}
+	if(ZeeConfig.showInspectTooltip && ttip!=null) {
+		String t = RichText.Parser.quote(ttip);
+		return RichText.render(t+"    ");
 	}
 	return(super.tooltip(c, prev));
     }
@@ -857,4 +873,39 @@ public class MiniMap extends Widget {
 			  0, -1);
 	}
     }
+
+	private void setBiome(Location loc) {
+		try {
+			String newbiome = biome;
+			if(loc == null) {
+				Gob player = ZeeConfig.gameUI.map.player();
+				if(player != null) {
+					MCache mCache = ui.sess.glob.map;
+					int tile = mCache.gettile(player.rc.div(tilesz).floor());
+					Resource res = mCache.tilesetr(tile);
+					if(res != null) {
+						newbiome = res.name;
+					}
+				}
+			} else {
+				MapFile map = loc.seg.file();
+				if(map.lock.readLock().tryLock()) {
+					try {
+						MapFile.Grid grid = loc.seg.grid(loc.tc.div(cmaps)).get();
+						if(grid != null) {
+							int tile = grid.gettile(loc.tc.mod(cmaps));
+							newbiome = grid.tilesets[tile].res.name;
+						}
+					} finally {
+						map.lock.readLock().unlock();
+					}
+				}
+			}
+			if(newbiome == null) {newbiome = "???";}
+			if(!newbiome.equals(biome)) {
+				biome = newbiome;
+				ttip = newbiome;
+			}
+		} catch (Loading ignored) {}
+	}
 }
