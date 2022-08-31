@@ -673,8 +673,7 @@ public class ZeeConfig {
 
         if(isPlayer(gob)  &&  gameUI.map.player()!=null && gameUI.map.player().id!=gobId) {
             if(autoHearthOnStranger && !playerHasAnyPose(POSE_PLAYER_TRAVELHOMEPOINT,POSE_PLAYER_TRAVELHOMESHRUG)) {
-                ZeeConfig.lastMapViewClickButton = 1; // cancel click some tasks, hopefully
-                gameUI.act("travel", "hearth");
+                autoHearth();
             }
             if(alertOnPlayers){
                 String audio = mapCategoryAudio.get(CATEG_PVPANDSIEGE);
@@ -698,6 +697,29 @@ public class ZeeConfig {
                     playAudioGobId(path,gobId);
                 }
             }
+        }
+    }
+
+    static void autoHearth() {
+        // cancel click some tasks, hopefully
+        lastMapViewClickButton = 1;
+
+        // unmount
+        if (isPlayerMountingHorse() && getMainInventory().countItemsByName("/rope") > 0) {
+            new ZeeThread() {
+                public void run() {
+                    try {
+                        unmountPlayerFromHorse(getPlayerCoord());
+                        sleep(777);//waitPose could fail if unmount failed
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    gameUI.act("travel", "hearth");
+                }
+            }.start();
+        }
+        else {
+            gameUI.act("travel", "hearth");
         }
     }
 
