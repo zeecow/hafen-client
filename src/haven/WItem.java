@@ -26,11 +26,12 @@
 
 package haven;
 
-import java.awt.Color;
-import java.awt.image.BufferedImage;
-import java.util.*;
-
 import haven.ItemInfo.AttrCache;
+
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.util.ArrayList;
+import java.util.List;
 
 import static haven.Inventory.sqsz;
 
@@ -58,6 +59,8 @@ public class WItem extends Widget implements DTarget {
 	Resource.Pagina pg = item.res.get().layer(Resource.pagina);
 	if(pg != null)
 	    img = ItemInfo.catimgs(0, img, RichText.render("\n" + pg.text, UI.scale(200)).img);
+	//long tooltip show item res name
+	img = ItemInfo.catimgs(0, img, RichText.renderf(Color.gray,"\n"+item.getres().name+"    ", UI.scale(200)).img);
 	return(img);
     }
 
