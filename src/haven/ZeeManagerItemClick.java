@@ -366,6 +366,7 @@ public class ZeeManagerItemClick extends ZeeThread{
             gfx/invobjs/woodsmansaxe
             gfx/invobjs/axe-m
             gfx/invobjs/butcherscleaver
+            gfx/invobjs/tinkersthrowingaxe
             gfx/invobjs/stoneaxe
          */
         if (isItemInHandSlot("woodsmansaxe"))
@@ -989,16 +990,14 @@ public class ZeeManagerItemClick extends ZeeThread{
         return isItemAxeChopTree(itemName);
     }
     public static boolean isItemAxeChopTree(String name) {
-        return name.endsWith("woodsmansaxe") || name.endsWith("axe-m") || name.endsWith("butcherscleaver") || name.endsWith("stoneaxe");
+        return name.endsWith("woodsmansaxe") || name.endsWith("axe-m") || name.endsWith("butcherscleaver") || name.endsWith("tinkersthrowingaxe") || name.endsWith("stoneaxe");
     }
 
     public static boolean isItemButchingTool(WItem wItem){
-        boolean ret = isItemButchingTool(wItem.item.getres().name);
-        //println("isItemButchingTool > "+ret+" > "+wItem.item.getres().name);
-        return ret;
+        return isItemButchingTool(wItem.item.getres().name);
     }
     public static boolean isItemButchingTool(String itemName){
-        String endlist = "woodsmansaxe,axe-m,butcherscleaver,stoneaxe,fyrdsword,hirdsword,bronzesword,b12axe,cutblade";
+        String endlist = "woodsmansaxe,axe-m,butcherscleaver,tinkersthrowingaxe,stoneaxe,fyrdsword,hirdsword,bronzesword,b12axe,cutblade";
         String[] arr = endlist.split(",");
         for (int i = 0; i < arr.length; i++) {
             if (itemName.endsWith(arr[i]))
@@ -1028,7 +1027,7 @@ public class ZeeManagerItemClick extends ZeeThread{
             // weapons tools
             "b12axe","boarspear","cutblade","fyrdsword","hirdsword","bronzesword","sling",
             "sledgehammer","huntersbow","rangersbow","roundshield",
-            "axe-m","woodsmansaxe","stoneaxe","butcherscleaver",
+            "axe-m","woodsmansaxe","stoneaxe","butcherscleaver","tinkersthrowingaxe",
             // tools equips
             "bonesaw","saw-m","scythe","pickaxe","shovel","smithshammer","shears",
             "travellerssack","bindle","bushpole","primrod","glassrod","dowsingrod",

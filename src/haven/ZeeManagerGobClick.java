@@ -421,7 +421,7 @@ public class ZeeManagerGobClick extends ZeeThread{
             }.start();
         }
         // while driving wheelbarrow: open gate, store wb on cart
-        else if (gobNameEndsWith(gobName,"cart,gate") && ZeeConfig.isPlayerDrivingWheelbarrow()){
+        else if (isGobInListEndsWith(gobName,"cart,gate") && ZeeConfig.isPlayerDrivingWheelbarrow()){
             new ZeeThread() {
                 public void run() {
                     if (isGobGate(gobName))
@@ -473,7 +473,7 @@ public class ZeeManagerGobClick extends ZeeThread{
 
     static boolean isGobRequireUmountHorse(String gobName) {
         return isGobHouseInnerDoor(gobName) || isGobHouse(gobName) || isGobChair(gobName)
-                || gobNameEndsWith(gobName,
+                || isGobInListEndsWith(gobName,
                     "/upstairs,/downstairs,/cavein,/caveout,/burrow,/igloo," +
                         "/wheelbarrow,/loom,/cauldron,/churn,/swheel,/ropewalk," +
                         "/meatgrinder,/potterswheel,/quern,/plow,/winepress"
@@ -482,7 +482,7 @@ public class ZeeManagerGobClick extends ZeeThread{
 
     static boolean isGobChair(String gobName) {
         String list = "/chair-rustic,/stonethrone,/royalthrone,/thatchedchair";
-        return gobNameEndsWith(gobName,list);
+        return isGobInListEndsWith(gobName,list);
     }
 
     public static boolean isGobHouseInnerDoor(String gobName){
@@ -491,7 +491,7 @@ public class ZeeManagerGobClick extends ZeeThread{
 
     public static boolean isGobHouse(String gobName) {
         String list = "/logcabin,/timberhouse,/stonestead,/stonemansion,/stonetower,/greathall,/windmill";
-        return gobNameEndsWith(gobName,list);
+        return isGobInListEndsWith(gobName,list);
     }
 
     private void scheduleDestroyTreelog(Gob treelog) {
@@ -1314,19 +1314,19 @@ public class ZeeManagerGobClick extends ZeeThread{
         if(isGobTree(gobName) || isGobBush(gobName) || isGobBoulder(gobName))
             return true;
         String list = "/meatgrinder,/potterswheel,/well,/dframe,/smokeshed,"
-                +"/smelter,/crucible,/steelcrucible,/fineryforge,/kiln,/tarkiln,/oven,"
+                +"/smelter,/primsmelter,/crucible,/steelcrucible,/fineryforge,/kiln,/tarkiln,/oven,"
                 +"/compostbin,/gardenpot,/beehive,/htable,/bed-sturdy,/boughbed,/alchemiststable,"
                 +"/gemwheel,/spark,/cauldron,/churn,/chair-rustic,"
                 +"/royalthrone,curdingtub,log,/still,/oldtrunk,/anvil,"
                 +"/loom,/swheel,knarr,snekkja,dock,/ropewalk,"
-                +"/ttub,/cheeserack,/dreca,/glasspaneframe";
-        return gobNameEndsWith(gobName, list);
+                +"/ttub,/cheeserack,/dreca,/glasspaneframe,/castingmold";
+        return isGobInListContains(gobName, list);
     }
 
 
     public static boolean isGobMineSupport(String gobName) {
         String list = "/minebeam,/column,/minesupport,/naturalminesupport,/towercap";
-        return gobNameEndsWith(gobName, list);
+        return isGobInListEndsWith(gobName, list);
     }
 
 
@@ -1341,7 +1341,7 @@ public class ZeeManagerGobClick extends ZeeThread{
                 +"/cupboard,/studydesk,/demijohn,/quern,/wreckingball-fold,/loom,/swheel,"
                 +"/ttub,/cheeserack,/archerytarget,/dreca,/glasspaneframe,/runestone,"
                 +"/crate";
-        return gobNameEndsWith(gobName,endList);
+        return isGobInListEndsWith(gobName,endList);
     }
 
     private static boolean isGobBoulder(String gobName) {
@@ -1454,11 +1454,11 @@ public class ZeeManagerGobClick extends ZeeThread{
     }
 
     public static boolean isGobTrellisPlant(String gobName) {
-        return gobNameEndsWith(gobName, "plants/wine,plants/hops,plants/pepper,plants/peas,plants/cucumber");
+        return isGobInListEndsWith(gobName, "plants/wine,plants/hops,plants/pepper,plants/peas,plants/cucumber");
     }
 
     public static boolean isGobCrop(String gobName){
-        return gobNameEndsWith(gobName,"plants/carrot,plants/beet,plants/yellowonion,plants/redonion,"
+        return isGobInListEndsWith(gobName,"plants/carrot,plants/beet,plants/yellowonion,plants/redonion,"
                 +"plants/leek,plants/lettuce,plants/pipeweed,plants/hemp,plants/flax,"
                 +"plants/turnip,plants/millet,plants/barley,plants/wheat,plants/poppy,"
                 +"plants/pumpkin,plants/fallowplant"
@@ -1467,10 +1467,21 @@ public class ZeeManagerGobClick extends ZeeThread{
 
     public static boolean isGobCookContainer(String gobName) {
         String containers ="cupboard,chest,crate,basket,box,coffer,cabinet";
-        return gobNameEndsWith(gobName,containers);
+        return isGobInListEndsWith(gobName,containers);
     }
 
-    private static boolean gobNameEndsWith(String gobName, String list) {
+
+    private static boolean isGobInListContains(String gobName, String list) {
+        String[] names = list.split(",");
+        for (int i = 0; i < names.length; i++) {
+            if (gobName.contains(names[i])){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static boolean isGobInListEndsWith(String gobName, String list) {
         String[] names = list.split(",");
         for (int i = 0; i < names.length; i++) {
             if (gobName.endsWith(names[i])){
@@ -1480,7 +1491,7 @@ public class ZeeManagerGobClick extends ZeeThread{
         return false;
     }
 
-    private boolean gobNameStartsWith(String gobName, String list) {
+    private boolean isGobInListStartsWith(String gobName, String list) {
         String[] names = list.split(",");
         for (int i = 0; i < names.length; i++) {
             if (gobName.startsWith(names[i])){
@@ -1553,7 +1564,7 @@ public class ZeeManagerGobClick extends ZeeThread{
     }
 
     private boolean isGobButchable(String gobName){
-        return gobNameEndsWith(
+        return isGobInListEndsWith(
             gobName,
             "/stallion,/mare,/foal,/hog,/sow,/piglet,"
             +"/billy,/nanny,/kid,/sheep,/lamb,/cattle,/calf,"
@@ -1565,11 +1576,11 @@ public class ZeeManagerGobClick extends ZeeThread{
     }
 
     public static boolean isGobHorse(String gobName) {
-        return gobNameEndsWith(gobName, "stallion,mare,horse");
+        return isGobInListEndsWith(gobName, "stallion,mare,horse");
     }
 
     private static boolean isGobFireSource(String gobName) {
-        return gobNameEndsWith(gobName,"brazier,pow,snowlantern,/bonfire");
+        return isGobInListEndsWith(gobName,"brazier,pow,snowlantern,/bonfire");
     }
 
     /**
