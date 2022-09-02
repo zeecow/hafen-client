@@ -2024,17 +2024,7 @@ public class ZeeConfig {
         // clicked ground
         else{
             if (clickb==1) {
-                // pile stones from tile source
-                if ( pilerMode && getCursorName().contentEquals(CURSOR_DIG) ) {
-                    String tileName = getTileResName(mc);
-                    if(isTileStoneSource(tileName)) {
-                        ZeeManagerStockpile.diggingStone = true;
-                        ZeeManagerStockpile.lastTileStoneSourceCoordMc = mc;
-                        ZeeManagerStockpile.lastTileStoneSourceTileName = tileName;
-                    } else
-                        ZeeManagerStockpile.diggingStone = false;
-                } else
-                    ZeeManagerStockpile.diggingStone = false;
+                ZeeManagerStockpile.checkTileSourcePiling(mc);
             }
             else if (clickb==2) {
                 if (isPlayerHoldingItem()) { //move while holding item
@@ -2664,16 +2654,6 @@ public class ZeeConfig {
         return getTileResName(mc.floor(MCache.tilesz));
     }
 
-    private static boolean isTileStoneSource(String tileResName) {
-        String[] list = "gfx/tiles/sandcliff,gfx/tiles/mountain".split(",");
-        //println(tileResName);
-        for (int i = 0; i < list.length; i++) {
-            if (list[i].contentEquals(tileResName))
-                return true;
-        }
-        return false;
-    }
-
     public static Color getComplementaryColor(Color bgColor) {
         return new Color(
             255-bgColor.getRed(),
@@ -2747,6 +2727,9 @@ public class ZeeConfig {
         if (ZeeManagerFarmer.busy){
             ZeeConfig.println(">combat relations, cancel farming");
             ZeeManagerFarmer.resetInitialState();
+        }
+        if(ZeeManagerStockpile.busy){
+            ZeeManagerStockpile.exitManager();
         }
     }
 

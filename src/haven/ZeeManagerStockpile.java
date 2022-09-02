@@ -13,8 +13,12 @@ public class ZeeManagerStockpile extends ZeeThread{
     public static final String STOCKPILE_BLOCK = "gfx/terobjs/stockpile-wblock";
     public static final String STOCKPILE_BOARD = "gfx/terobjs/stockpile-board";
     public static final String STOCKPILE_COAL = "gfx/terobjs/stockpile-coal";
+    public static final String STOCKPILE_SAND = "gfx/terobjs/stockpile-sand";
     public static final String STOCKPILE_STONE = "gfx/terobjs/stockpile-stone";
     public static final String BASENAME_MULB_LEAF = "leaf-mulberrytree";
+    public static final String GFX_TILES_BEACH = "gfx/tiles/beach";
+    public static final String GFX_TILES_SANDCLIFF = "gfx/tiles/sandcliff";
+    public static final String GFX_TILES_MOUNTAIN = "gfx/tiles/mountain";
 
     static ZeeWindow windowManager;
     public static boolean busy;
@@ -26,7 +30,7 @@ public class ZeeManagerStockpile extends ZeeThread{
     public static String lastGroundItemName;
     public static String lastTileStoneSourceTileName;
     public static Coord2d lastTileStoneSourceCoordMc;
-    public static boolean diggingStone;
+    public static boolean diggingTileSource;
     private final String task;
 
     public ZeeManagerStockpile(String task) {
@@ -234,6 +238,12 @@ public class ZeeManagerStockpile extends ZeeThread{
     }
 
     private static Gob findPile() {
+        if (diggingTileSource) {
+            if (lastTileStoneSourceTileName.contentEquals(GFX_TILES_BEACH))
+                return ZeeConfig.getClosestGob(ZeeConfig.findGobsByNameContains(STOCKPILE_SAND));
+            else
+                return ZeeConfig.getClosestGob(ZeeConfig.findGobsByNameContains(STOCKPILE_STONE));
+        }
         if (lastPetalName==null)
             return null;
         if(lastPetalName.equals("Pick leaf"))
@@ -251,13 +261,19 @@ public class ZeeManagerStockpile extends ZeeThread{
 
 
     private void startPilingTileSource() {
-        println("startPilingTileSource > "+lastTileStoneSourceTileName);
         try {
-            gobPile = ZeeConfig.getClosestGob(ZeeConfig.findGobsByNameContains("stockpile-stone"));
-            ZeeConfig.addPlayerText("dig");
+
+            if (lastTileStoneSourceTileName.contentEquals(GFX_TILES_BEACH))
+                gobPile = ZeeConfig.getClosestGob(ZeeConfig.findGobsByNameContains(STOCKPILE_SAND));
+            else // TODO check pickaxe?
+                gobPile = ZeeConfig.getClosestGob(ZeeConfig.findGobsByNameContains(STOCKPILE_STONE));
+
             ZeeConfig.addGobText(gobPile,"pile");
 
+            ZeeConfig.addPlayerText("dig");
+
             pileItems();
+
             while (busy){
 
                 //dig stone tile
@@ -272,6 +288,7 @@ public class ZeeManagerStockpile extends ZeeThread{
 
                 pileItems();
             }
+
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -314,7 +331,7 @@ public class ZeeManagerStockpile extends ZeeThread{
         boolean show = false;
         String task = "";
 
-        if ( diggingStone && pileGobName.equals(STOCKPILE_STONE) ) {
+        if ( diggingTileSource && (pileGobName.equals(STOCKPILE_STONE) || pileGobName.equals(STOCKPILE_SAND)) ) {
             show = true;
             task = TASK_PILE_TILE_SOURCE;
         }
@@ -511,4 +528,28 @@ public class ZeeManagerStockpile extends ZeeThread{
         }
         ZeeConfig.removePlayerText();
     }
+
+    static boolean isGroundTileSource(String tileResName) {
+        String[] list = new String[]{GFX_TILES_BEACH, GFX_TILES_SANDCLIFF , GFX_TILES_MOUNTAIN};
+        //println(tileResName);
+        for (int i = 0; i < list.length; i++) {
+            if (list[i].contentEquals(tileResName))
+                return true;
+        }
+        return false;
+    }
+
+    static void checkTileSourcePiling(Coord2d mc) {
+        if ( ZeeConfig.pilerMode && ZeeConfig.getCursorName().contentEquals(ZeeConfig.CURSOR_DIG) ) {
+            String tileName = ZeeConfig.getTileResName(mc);
+            if(ZeeManagerStockpile.isGroundTileSource(tileName)) {
+                ZeeManagerStockpile.diggingTileSource = true;
+                ZeeManagerStockpile.lastTileStoneSourceCoordMc = mc;
+                ZeeManagerStockpile.lastTileStoneSourceTileName = tileName;
+            } else
+                ZeeManagerStockpile.diggingTileSource = false;
+        } else
+            ZeeManagerStockpile.diggingTileSource = false;
+    }
+
 }
