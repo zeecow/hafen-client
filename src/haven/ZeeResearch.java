@@ -57,8 +57,8 @@ public class ZeeResearch {
                     // wait crafting finish, then check hsElixirStr
                     waitPlayerIdlePose();
                     long craftedMs = System.currentTimeMillis();
-                    sleep(PING_MS); //wait tooltip creation?
-                    if (hsElixirStrMs - craftedMs < 1000){
+                    sleep(1000); //wait tooltip creation?
+                    if (hsElixirStrMs - craftedMs < 1500){
                         if (hsElixirStr==null) {
                             ZeeConfig.println("elixir null (missing ingredients or jar is full)");
                         }else {
