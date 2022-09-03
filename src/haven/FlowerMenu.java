@@ -267,6 +267,9 @@ public class FlowerMenu extends Widget {
 	if(option == null) {
 	    wdgmsg("cl", -1);
 	} else {
+		if (!ZeeConfig.isPetalConfirmed(option.name)){
+			return;
+		}
 	    wdgmsg("cl", option.num, ui.modflags());
 	}
     }

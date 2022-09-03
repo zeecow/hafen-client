@@ -89,6 +89,7 @@ public class ZeeConfig {
     public static final String POSE_PLAYER_CARRY_PICKAXE = "gfx/borka/carry"; //same as wheelbarrow
     public static final String POSE_PLAYER_CARRY_SCYTHEARMS = "gfx/borka/scythearms";
 
+    public static final String DEF_CONFIRM_PETAL_LIST = "Empty,Swill";
     public static final String DEF_BUTCH_AUTO_LIST = "Break,Scale,Wring neck,Kill,Skin,Flay,Pluck,Clean,Butcher,Collect bones";
     public static final String DEF_AUTO_CLICK_MENU_LIST = "Pick,Harvest wax";
     public static final String DEF_SHAPEICON_LIST = "/vehicle/ 1,square 3 0 0,255 255 153;/horse/ 1,square 3 0 0,0 255 255;/knarr 2,boat 10 0 0,255 255 102;/snekkja 2,boat 8 0 0,255 255 102;/rowboat 2,boat 5 0 0,255 255 102;/dugout 2,boat 5 0 0,255 255 102";
@@ -155,6 +156,8 @@ public class ZeeConfig {
     public static String butcherAutoList = Utils.getpref("butcherAutoList",DEF_BUTCH_AUTO_LIST);
     public static boolean cattleRosterHeight = Utils.getprefb("cattleRosterHeight", true);
     public static double cattleRosterHeightPercentage = Utils.getprefd("cattleRosterHeightPercentage", 1.0);
+    public static boolean confirmPetal = Utils.getprefb("confirmPetal", true);
+    public static String confirmPetalList = Utils.getpref("confirmPetalList",DEF_CONFIRM_PETAL_LIST);
     public static List<String> craftHistoryList = initCraftHistory();
     public static int craftHistoryPos = -1;
     public static boolean isCraftHistoryNavigation = false;
@@ -2763,5 +2766,20 @@ public class ZeeConfig {
                 saveWindowPos(w);
             }
         });
+    }
+
+    public static boolean isPetalConfirmed(String name) {
+        if (confirmPetal) {
+            String[] list = confirmPetalList.split(",");
+            for (int i = 0; i < list.length; i++) {
+                if (name.contentEquals(list[i])) {
+                    if (!gameUI.ui.modctrl) {
+                        ZeeConfig.msgError("Ctrl+click to confirm "+list[i]);
+                        return false;
+                    }
+                }
+            }
+        }
+        return true;
     }
 }

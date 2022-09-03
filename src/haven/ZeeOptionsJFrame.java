@@ -17,7 +17,7 @@ public class ZeeOptionsJFrame extends JFrame {
     public JTabbedPane tabbedPane, tabbedPaneGobs;
     public JPanel panelTabAuto, panelTabMisc, panelTabInterface, panelTabGobs, panelTabControls, panelTabMinimap, panelDetailsBottom, panelTabCateg, panelShapeIcons, panelShapeIconsSaveCancel;
     public JCheckBox cbSimpleWindowBorder, cbSimpleWindows, cbShapeIcons, cbDebugCodeRes, cbCattleRosterHeight;
-    public JTextField tfAutoClickMenu, tfAggroRadiusTiles, tfButchermode, tfGobName, tfAudioPath, tfCategName, tfAudioPathCateg;
+    public JTextField tfConfirmPetal, tfAutoClickMenu, tfAggroRadiusTiles, tfButchermode, tfGobName, tfAudioPath, tfCategName, tfAudioPathCateg;
     public JComboBox<String> cmbCattleRoster, cmbGobCategory, cmbMiniTreeSize, cmbRainLimitPerc, comboShapeIcons;
     public JList<String> listGobsTemp, listGobsSaved, listGobsCategories;
     public JButton btnRefresh, btnPrintState, btnResetGobs, btnAudioSave, btnAudioClear, btnAudioTest, btnRemGobFromCateg, btnGobColorAdd, btnCategoryColorAdd, btnGobColorRemove, btnCategoryColorRemove, btnResetCateg, btnAddCateg, btnRemoveCateg, btnResetWindowsPos, btnResetActionUses, btnSapeIconPreview, btnShapeIconSave, btnSapeIconDelete, btnSolidColorWindow, btnGridGolor;
@@ -481,6 +481,22 @@ public class ZeeOptionsJFrame extends JFrame {
             ZeeConfig.gridColorInt = ZeeConfig.colorToInt(color);
             Utils.setprefi("gridColorInt",ZeeConfig.gridColorInt);
             ZeeConfig.newGridColor(color);
+        });
+
+
+        //confirm petal list
+        panelTabInterface.add(new ZeeOptionJCheckBox( "Ctrl+click Petal confirmation", "confirmPetal"),c);
+        panelTabInterface.add(new JLabel("Confirm petal list:"), c);
+        panelTabInterface.add(tfConfirmPetal= new JTextField("",5), c);
+        tfConfirmPetal.setMaximumSize(new Dimension(Integer.MAX_VALUE, tfConfirmPetal.getPreferredSize().height));
+        tfConfirmPetal.setText(ZeeConfig.confirmPetalList);
+        tfConfirmPetal.addActionListener(actionEvent -> {
+            String str = actionEvent.getActionCommand();
+            String[] strArr = str.split(",");
+            if(strArr!=null && strArr.length>0) {
+                ZeeConfig.confirmPetalList = str;
+                Utils.setpref("confirmPetalList",str.strip());
+            }
         });
     }
 
