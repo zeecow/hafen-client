@@ -30,6 +30,7 @@ Client focusing on small helper tasks, many using mouse middle button, and other
  - default icon sound to "Bell 2" if empty
  - inspect cursor tooltip containing gob/tile/minimap info
  - shift+tab toggles between belt, creel and basket
+ - option Ctrl+click petal confirmation list (default Empty, Swill)
  - midclick Barter Stand "Buy" button to auto-buy  
  - midclick ground 
    - while holding item will move to location (simulates ctrl+click)
