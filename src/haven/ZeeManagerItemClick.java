@@ -1052,7 +1052,7 @@ public class ZeeManagerItemClick extends ZeeThread{
     public static boolean isTwoHandedItem(String name) {
         String[] items = {"scythe","pickaxe","shovel","b12axe",
                 "boarspear","cutblade","sledgehammer", "mortarandpestle",
-                "huntersbow","rangersbow","dowsingrod"};
+                "huntersbow","rangersbow","dowsingrod", "diversweight"};
         for (int i = 0; i < items.length; i++) {
             if (name.contains(items[i])){
                 return true;
