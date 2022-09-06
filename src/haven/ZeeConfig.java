@@ -2518,6 +2518,9 @@ public class ZeeConfig {
                 loading.printStackTrace();
                 return;
             }
+            if (ob.resName.contentEquals("gfx/kritter/bat/bat") && ZeeManagerItemClick.isItemEquipped("/batcape")) {
+                return;
+            }
             ZeeConfig.applyGobSettingsAudio(ob);
             ZeeConfig.applyGobSettingsAggro(ob);
             ZeeConfig.applyGobSettingsHighlight(ob, ZeeConfig.getHighlightGobColor(ob));
@@ -2528,8 +2531,6 @@ public class ZeeConfig {
 
     private static void applyGobSettingsAggro(Gob gob) {
         if( mapCategoryGobs.get(CATEG_AGROCREATURES).contains(gob.resName)) {
-            if (gob.resName.contentEquals("gfx/kritter/bat/bat") && ZeeManagerItemClick.isItemEquipped("/batcape"))
-                return;
             //aggro radius
             if (ZeeConfig.aggroRadiusTiles > 0)
                 gob.addol(new Gob.Overlay(gob, new ZeeGobRadius(gob, null, ZeeConfig.aggroRadiusTiles * MCache.tilesz2.y), ZeeManagerGobClick.OVERLAY_ID_AGGRO));
