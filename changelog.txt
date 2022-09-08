@@ -1,3 +1,10 @@
+$size[14]{$u{Update for 08.09.22:}
+  * merged loftar's changes
+  * fixed flat cupboards
+  * fixed mine supports not showing radius
+  * do not warn about KO players (for some reason some dead players have knockout animation active, instead of dead)
+  * added auto marking of amber and flint washes
+ 
 $size[14]{$u{Update for 12.08.22:}
   * merged loftar's changes
   * re-implemented icon categories for minimap icons settings
