@@ -38,7 +38,7 @@ public class GobWarning extends GAttrib implements RenderTree.Node {
     }
     
     private static WarnTarget categorize(Gob gob) {
-	if(gob.is(GobTag.FOE) && !gob.is(GobTag.DEAD)) {
+	if(gob.is(GobTag.FOE) && !gob.anyOf(GobTag.DEAD, GobTag.KO)) {
 	    return player;
 	} else if(gob.is(GobTag.AGGRESSIVE) && !gob.anyOf(GobTag.DEAD, GobTag.KO)) {
 	    return animal;
