@@ -1,14 +1,16 @@
+/* Preprocessed source code */
+/* $use: gfx/fx/bprad */
+
 package haven.res.gfx.fx.msrad;
 
-import haven.*;
-import haven.render.Render;
-import haven.render.RenderTree;
-
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.Collection;
+import java.util.*;
+
+import haven.*;
+import haven.render.*;
 
 /* >spr: MSRad */
+@haven.FromResource(name = "gfx/fx/msrad", version = 14)
 public class MSRad extends Sprite {
     public static boolean show = false;
     public static Collection<MSRad> current = new WeakList<>();
