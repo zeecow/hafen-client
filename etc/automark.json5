@@ -4,6 +4,14 @@
       name: "Tarpit",
       res: "radar/tarpit"
     },
+    "gfx/terobjs/map/amberwash": {
+      name: "Amber Wash",
+      res: "radar/amberwash"
+    },
+    "gfx/terobjs/map/flintwash": {
+      name: "Flint Wash",
+      res: "radar/flintwash"
+    },
     "gfx/terobjs/minehole": {
       name: "Minehole",
       res: "radar/mine-hole"
