@@ -21,12 +21,12 @@
     </condition>
   </target>
 
-  <target name="buildinfo" depends="make-buildinfo" unless="buildinfo-unchanged">
+  <target name="buildinfo">
     <tstamp>
       <format property="version" pattern="dd.MM.yyyy HH:mm" />
     </tstamp>
     <echo message="Updating buildinfo" />
-    <echo file="build/classes/buildinfo" xml:space="default">
+    <echo file="build/classes/buildinfo">
       git-rev = ${git-rev}
       version = ${version}
     </echo>
