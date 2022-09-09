@@ -2397,8 +2397,7 @@ public class MapView extends PView implements DTarget, Console.Directory {
 							String poses = ZeeConfig.getGobPoses(gob);
 							if (!poses.isBlank()){
 								sb.append("\nPoses:\n");
-								sb.append("    ").append(poses.replace(",","    \n    "));
-								sb.append("    ");
+								sb.append("    ").append(poses.replace(",","\n    "));
 							}
 							ttip = sb.toString();
 						}
@@ -2409,7 +2408,7 @@ public class MapView extends PView implements DTarget, Console.Directory {
 						int tile = mCache.gettile(mc.div(tilesz).floor());
 						Resource res = mCache.tilesetr(tile);
 						if(res != null && ZeeConfig.showInspectTooltip) {
-							ttip = res.name + "    ";
+							ttip = res.name;
 						}
 					}
 				}

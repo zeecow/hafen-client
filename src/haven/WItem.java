@@ -60,7 +60,7 @@ public class WItem extends Widget implements DTarget {
 	if(pg != null)
 	    img = ItemInfo.catimgs(0, img, RichText.render("\n" + pg.text, UI.scale(200)).img);
 	//long tooltip show item res name
-	img = ItemInfo.catimgs(0, img, RichText.renderf(Color.gray,"\n"+item.getres().name+"    ", UI.scale(200)).img);
+	img = ItemInfo.catimgs(0, img, RichText.renderf(Color.gray,"\n"+item.getres().name, UI.scale(200)).img);
 	return(img);
     }
 

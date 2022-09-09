@@ -847,12 +847,12 @@ public class MiniMap extends Widget {
 	    Coord tc = c.sub(sz.div(2)).mul(scalef()).add(dloc.tc);
 	    DisplayMarker mark = markerat(tc);
 	    if(mark != null) {
-		return(RichText.render(mark.tip.text+"    "));
+		return(RichText.render(mark.tip.text));
 	    }
 	}
 	if(ZeeConfig.showInspectTooltip && ttip!=null) {
 		String t = RichText.Parser.quote(ttip);
-		return RichText.render(t+"    ");
+		return RichText.render(t);
 	}
 	return(super.tooltip(c, prev));
     }
