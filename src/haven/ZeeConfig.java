@@ -674,17 +674,23 @@ public class ZeeConfig {
         long gobId = gob.id;
         String path = "";
 
-        if(isPlayer(gob)  &&  gameUI.map.player()!=null && gameUI.map.player().id!=gobId) {
-            if(autoHearthOnStranger && !playerHasAnyPose(POSE_PLAYER_TRAVELHOMEPOINT,POSE_PLAYER_TRAVELHOMESHRUG)) {
-                autoHearth();
+        if(isPlayer(gob)  &&  gameUI.map.player()!=null) {
+            // other players
+            if (gameUI.map.player().id != gobId) {
+                if (autoHearthOnStranger && !playerHasAnyPose(POSE_PLAYER_TRAVELHOMEPOINT, POSE_PLAYER_TRAVELHOMESHRUG)) {
+                    autoHearth();
+                }
+                if (alertOnPlayers) {
+                    String audio = mapCategoryAudio.get(CATEG_PVPANDSIEGE);
+                    if (audio != null && !audio.isEmpty())
+                        playAudioGobId(audio, gobId);
+                    else
+                        gameUI.error("player spotted");
+                }
             }
-            if(alertOnPlayers){
-                String audio = mapCategoryAudio.get(CATEG_PVPANDSIEGE);
-                if(audio!=null && !audio.isEmpty())
-                    playAudioGobId(audio,gobId);
-                else
-                    gameUI.error("player spotted");
-            }
+            // user player
+            //else gob.addol(new ZeeGobBox(gob,Coord3f.of(12f,12f,0.5f),new Color(192, 0, 0, 128)));
+
         }else if( (path = mapGobAudio.get(gobName)) != null){
             //if single gob alert is saved, play alert
             playAudioGobId(path,gobId);
