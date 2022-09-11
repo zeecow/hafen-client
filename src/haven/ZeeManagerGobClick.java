@@ -1078,7 +1078,7 @@ public class ZeeManagerGobClick extends ZeeThread{
                 clickGobPetal(tree, "Chop");
                 currentRemovingTree = tree;
                 if (waitPlayerIdlePose() && !ZeeConfig.isTaskCanceledByGroundClick()) {//waitPlayerIdleFor(2)
-                    sleep(1500);//wait new stump loading
+                    sleep(2500);//wait new stump loading
                     Gob stump = ZeeConfig.getClosestGob(ZeeConfig.findGobsByNameEndsWith("stump"));
                     if (stump != null && ZeeConfig.distanceToPlayer(stump) < 25) {
                         ZeeConfig.addGobText(stump, "stump");
