@@ -89,10 +89,10 @@ public class ZeeConfig {
     public static final String POSE_PLAYER_CARRY_PICKAXE = "gfx/borka/carry"; //same as wheelbarrow
     public static final String POSE_PLAYER_CARRY_SCYTHEARMS = "gfx/borka/scythearms";
 
-    public static final String DEF_CONFIRM_PETAL_LIST = "Empty,Swill,Clean out,Renounce Lawspeaker,Become Lawspeaker";
+    public static final String DEF_CONFIRM_PETAL_LIST = "Empty,Swill,Clean out,Take possession,Renounce Lawspeaker,Become Lawspeaker";
     public static final String DEF_BUTCH_AUTO_LIST = "Break,Scale,Wring neck,Kill,Skin,Flay,Pluck,Clean,Butcher,Collect bones";
     public static final String DEF_AUTO_CLICK_MENU_LIST = "Pick,Harvest wax";
-    public static final String DEF_SHAPEICON_LIST = "/vehicle/ 1,square 3 0 0,255 255 153;/horse/ 1,square 3 0 0,0 255 255;/knarr 2,boat 10 0 0,255 255 102;/snekkja 2,boat 8 0 0,255 255 102;/rowboat 2,boat 5 0 0,255 255 102;/dugout 2,boat 5 0 0,255 255 102";
+    public static final String DEF_SHAPEICON_LIST = "/knarr 2,boat 10 0 0,255 255 102;/rowboat 2,boat 5 0 0,255 255 102;/dugout 2,boat 5 0 0,255 255 102;/horse/ 1,square 4 0 1,0 255 255;stalagoomba 1,diamond 10 1 0,255 255 0;/snekkja 2,boat 8 0 1,255 255 102;/cart 2,square 4 0 1,204 204 204;/wheelbarrow 2,square 4 0 1,204 204 255;/burrow 2,triangleDown 6 0 0,204 0 255;/minehole 2,triangleDown 6 0 0,255 0 204;/ladder 2,triangleUp 6 0 0,0 204 0";
     public static final Color DEF_SIMPLE_WINDOW_COLOR = new Color(55, 64, 32, 255);
     public static final Color DEF_GRID_COLOR = new Color(204, 204, 255, 45);
 
