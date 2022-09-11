@@ -485,8 +485,7 @@ public class ZeeOptionsJFrame extends JFrame {
 
 
         //confirm petal list
-        panelTabInterface.add(new ZeeOptionJCheckBox( "Ctrl+click Petal confirmation", "confirmPetal"),c);
-        panelTabInterface.add(new JLabel("Confirm petal list:"), c);
+        panelTabInterface.add(new ZeeOptionJCheckBox( "Ctrl+click confirm petal:", "confirmPetal"),c);
         panelTabInterface.add(tfConfirmPetal= new JTextField("",5), c);
         tfConfirmPetal.setMaximumSize(new Dimension(Integer.MAX_VALUE, tfConfirmPetal.getPreferredSize().height));
         tfConfirmPetal.setText(ZeeConfig.confirmPetalList);
