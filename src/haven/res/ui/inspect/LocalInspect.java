@@ -4,11 +4,10 @@ package haven.res.ui.inspect;
 import haven.*;
 
 /* >wdg: LocalInspect */
-@haven.FromResource(name = "ui/inspect", version = 1)
+@haven.FromResource(name = "ui/inspect", version = 2)
 public class LocalInspect extends Widget {
     public MapView mv;
     public Hover last = null, cur = null;
-    private UI.Grab grab;
 
     public static Widget mkwidget(UI ui, Object... args) {
 	return(new LocalInspect());
@@ -17,13 +16,11 @@ public class LocalInspect extends Widget {
     protected void added() {
 	super.added();
 	mv = getparent(GameUI.class).map;
-	grab = ui.grabmouse(this);
 	move(Coord.z);
 	resize(parent.sz);
     }
 
     public void destroy() {
-	grab.remove();
 	super.destroy();
     }
 
