@@ -227,7 +227,7 @@ public class ZeeConfig {
     ));
     public final static Set<String> mineablesOre = new HashSet<String>(Arrays.asList(
             "cassiterite","chalcopyrite","malachite","ilmenite","cinnabar",
-            "limonite","hematite","magnetite","leadglance","peacockore"
+            "limonite","hematite","magnetite","leadglance","peacockore","wineglance"
     ));
     public final static Set<String> mineablesOrePrecious = new HashSet<String>(Arrays.asList(
             "galena","argentite","hornsilver",
@@ -261,6 +261,7 @@ public class ZeeConfig {
         "gfx/terobjs/herbs/camomile",
         "gfx/terobjs/herbs/cavecoral",
         "gfx/terobjs/herbs/clay-cave",
+        "gfx/terobjs/map/cavepuddle",
         "gfx/terobjs/herbs/mandrake",
         "gfx/terobjs/herbs/seashell"
     ));
