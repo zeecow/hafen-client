@@ -689,7 +689,7 @@ public class ZeeManagerGobClick extends ZeeThread{
         new ZeeThread() {
             public void run() {
                 boolean butcherBackup = ZeeConfig.butcherMode;
-                ZeeConfig.butcherAutoList = ZeeConfig.DEF_BUTCH_AUTO_LIST;
+                ZeeConfig.butcherAutoList = ZeeConfig.DEF_LIST_BUTCH_AUTO;
                 try{
                     ZeeConfig.addPlayerText("autobutch");
                     ZeeConfig.lastMapViewClickButton = 2;//prepare for clickCancelTask()
@@ -868,7 +868,7 @@ public class ZeeManagerGobClick extends ZeeThread{
                     FlowerMenu fm = getFlowerMenu();
                     for (int i = 0; i < fm.opts.length; i++) {
                         //if animal gob has butch menu, means is dead
-                        if (ZeeConfig.DEF_BUTCH_AUTO_LIST.contains(fm.opts[i].name)){
+                        if (ZeeConfig.DEF_LIST_BUTCH_AUTO.contains(fm.opts[i].name)){
                             isGobDeadAnimal = true;
                             break;
                         }

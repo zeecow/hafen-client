@@ -523,7 +523,7 @@ public class ZeeManagerItemClick extends ZeeThread{
 
                     //adjust autobutch settings
                     ZeeConfig.butcherMode = true;
-                    ZeeConfig.butcherAutoList = ZeeConfig.DEF_BUTCH_AUTO_LIST;
+                    ZeeConfig.butcherAutoList = ZeeConfig.DEF_LIST_BUTCH_AUTO;
 
                     //start
                     WItem item = wItem;
@@ -595,7 +595,7 @@ public class ZeeManagerItemClick extends ZeeThread{
                 }
                 //restore settings
                 ZeeConfig.butcherMode = bmBackup;
-                ZeeConfig.butcherAutoList = Utils.getpref("butcherAutoList",ZeeConfig.DEF_AUTO_CLICK_MENU_LIST);
+                ZeeConfig.butcherAutoList = Utils.getpref("butcherAutoList",ZeeConfig.DEF_LIST_AUTO_CLICK_MENU);
                 ZeeConfig.removePlayerText();
             }
         }.start();

@@ -89,10 +89,11 @@ public class ZeeConfig {
     public static final String POSE_PLAYER_CARRY_PICKAXE = "gfx/borka/carry"; //same as wheelbarrow
     public static final String POSE_PLAYER_CARRY_SCYTHEARMS = "gfx/borka/scythearms";
 
-    public static final String DEF_CONFIRM_PETAL_LIST = "Empty,Swill,Clean out,Take possession,Renounce Lawspeaker,Become Lawspeaker";
-    public static final String DEF_BUTCH_AUTO_LIST = "Break,Scale,Wring neck,Kill,Skin,Flay,Pluck,Clean,Butcher,Collect bones";
-    public static final String DEF_AUTO_CLICK_MENU_LIST = "Pick,Harvest wax";
-    public static final String DEF_SHAPEICON_LIST = "/knarr 2,boat 10 0 0,255 255 102;/rowboat 2,boat 5 0 0,255 255 102;/dugout 2,boat 5 0 0,255 255 102;/horse/ 1,square 4 0 1,0 255 255;stalagoomba 1,diamond 10 1 0,255 255 0;/snekkja 2,boat 8 0 1,255 255 102;/cart 2,square 4 0 1,204 204 204;/wheelbarrow 2,square 4 0 1,204 204 255;/burrow 2,triangleDown 6 0 0,204 0 255;/minehole 2,triangleDown 6 0 0,255 0 204;/ladder 2,triangleUp 6 0 0,0 204 0";
+    public static final String DEF_LIST_BLOCK_AUDIO = "Leashed horse.;Tracking is now turned on.";
+    public static final String DEF_LIST_CONFIRM_PETAL = "Empty,Swill,Clean out,Take possession,Renounce Lawspeaker,Become Lawspeaker";
+    public static final String DEF_LIST_BUTCH_AUTO = "Break,Scale,Wring neck,Kill,Skin,Flay,Pluck,Clean,Butcher,Collect bones";
+    public static final String DEF_LIST_AUTO_CLICK_MENU = "Pick,Harvest wax";
+    public static final String DEF_LIST_SHAPEICON = "/knarr 2,boat 10 0 0,255 255 102;/rowboat 2,boat 5 0 0,255 255 102;/dugout 2,boat 5 0 0,255 255 102;/horse/ 1,square 4 0 1,0 255 255;stalagoomba 1,diamond 10 1 0,255 255 0;/snekkja 2,boat 8 0 1,255 255 102;/cart 2,square 4 0 1,204 204 204;/wheelbarrow 2,square 4 0 1,204 204 255;/burrow 2,triangleDown 6 0 0,204 0 255;/minehole 2,triangleDown 6 0 0,255 0 204;/ladder 2,triangleUp 6 0 0,0 204 0";
     public static final Color DEF_SIMPLE_WINDOW_COLOR = new Color(55, 64, 32, 255);
     public static final Color DEF_GRID_COLOR = new Color(204, 204, 255, 45);
 
@@ -145,19 +146,21 @@ public class ZeeConfig {
     public static boolean allowMidclickAutoBuy = false;
     public static boolean autoChipMinedBoulder = Utils.getprefb("autoChipMinedBoulder", true);
     public static boolean autoClickMenuOption = Utils.getprefb("autoClickMenuOption", true);
-    public static String autoClickMenuOptionList = Utils.getpref("autoClickMenuOptionList", DEF_AUTO_CLICK_MENU_LIST);
+    public static String autoClickMenuOptionList = Utils.getpref("autoClickMenuOptionList", DEF_LIST_AUTO_CLICK_MENU);
     public static boolean autoHearthOnStranger = Utils.getprefb("autoHearthOnStranger", true);
     public static boolean autoToggleEquips = Utils.getprefb("autoToggleEquips", true);
     public static boolean autoToggleEquipsReposition = Utils.getprefb("autoToggleEquipsReposition", true);
     public static boolean autoOpenBelt = Utils.getprefb("autoOpenBelt", true);
     public static boolean autoRunLogin = Utils.getprefb("autoRunLogin", true);
     public static boolean autoToggleGridLines = Utils.getprefb("autoToggleGridLines", true);
+    public static boolean blockAudioMsg = Utils.getprefb("blockAudioMsg", true);
+    public static String blockAudioMsgList = Utils.getpref("blockAudioMsgList",DEF_LIST_BLOCK_AUDIO);
     public static boolean butcherMode = false;
-    public static String butcherAutoList = Utils.getpref("butcherAutoList",DEF_BUTCH_AUTO_LIST);
+    public static String butcherAutoList = Utils.getpref("butcherAutoList", DEF_LIST_BUTCH_AUTO);
     public static boolean cattleRosterHeight = Utils.getprefb("cattleRosterHeight", true);
     public static double cattleRosterHeightPercentage = Utils.getprefd("cattleRosterHeightPercentage", 1.0);
     public static boolean confirmPetal = Utils.getprefb("confirmPetal", true);
-    public static String confirmPetalList = Utils.getpref("confirmPetalList",DEF_CONFIRM_PETAL_LIST);
+    public static String confirmPetalList = Utils.getpref("confirmPetalList", DEF_LIST_CONFIRM_PETAL);
     public static List<String> craftHistoryList = initCraftHistory();
     public static int craftHistoryPos = -1;
     public static boolean isCraftHistoryNavigation = false;
@@ -197,7 +200,7 @@ public class ZeeConfig {
     public static boolean notifyBuddyOnline = Utils.getprefb("notifyBuddyOnline", false);
     public static boolean pilerMode = false;
     public static boolean shapeIcons = Utils.getprefb("shapeIcons", false);
-    public static String shapeIconsList = Utils.getpref("shapeIconsList",DEF_SHAPEICON_LIST);
+    public static String shapeIconsList = Utils.getpref("shapeIconsList", DEF_LIST_SHAPEICON);
     public static boolean showInventoryLogin = Utils.getprefb("showInventoryLogin", true);
     public static boolean showIconsZoomOut = Utils.getprefb("showIconsZoomOut", true);
     public static boolean showEquipsLogin = Utils.getprefb("showEquipsLogin", false);
@@ -2789,5 +2792,15 @@ public class ZeeConfig {
             }
         }
         return true;
+    }
+
+
+    public static boolean isMsgAudioMuted(String msg) {
+        String[] arr = blockAudioMsgList.split(";");
+        for (int i = 0; i < arr.length; i++) {
+            if (arr[i].contains(msg.strip()))
+                return true;
+        }
+        return false;
     }
 }

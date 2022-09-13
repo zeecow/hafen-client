@@ -32,6 +32,7 @@ Client focusing on small helper tasks, many using mouse middle button, and other
  - shift+tab toggles between belt, creel and basket
  - option Ctrl+click petal confirmation list (default Empty, Swill)
  - midclick Barter Stand "Buy" button to auto-buy  
+ - Audio msg mute list
  - midclick ground 
    - while holding item will move to location (simulates ctrl+click)
    - while inspecting icon active, will msg tile name

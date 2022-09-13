@@ -1531,6 +1531,8 @@ public class GameUI extends ConsoleHost implements Console.Directory {
     private double lastmsgsfx = 0;
     public void msg(String msg) {
 	msg(msg, Color.WHITE, Color.WHITE);
+	if (ZeeConfig.blockAudioMsg && ZeeConfig.isMsgAudioMuted(msg))
+		return;
 	double now = Utils.rtime();
 	if(now - lastmsgsfx > 0.1) {
 	    ui.sfx(msgsfx);

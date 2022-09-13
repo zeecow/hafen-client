@@ -17,7 +17,7 @@ public class ZeeOptionsJFrame extends JFrame {
     public JTabbedPane tabbedPane, tabbedPaneGobs;
     public JPanel panelTabAuto, panelTabMisc, panelTabInterface, panelTabGobs, panelTabControls, panelTabMinimap, panelDetailsBottom, panelTabCateg, panelShapeIcons, panelShapeIconsSaveCancel;
     public JCheckBox cbSimpleWindowBorder, cbSimpleWindows, cbShapeIcons, cbDebugCodeRes, cbCattleRosterHeight;
-    public JTextField tfConfirmPetal, tfAutoClickMenu, tfAggroRadiusTiles, tfButchermode, tfGobName, tfAudioPath, tfCategName, tfAudioPathCateg;
+    public JTextField tfConfirmPetal, tfBlockAudioMsgs, tfAutoClickMenu, tfAggroRadiusTiles, tfButchermode, tfGobName, tfAudioPath, tfCategName, tfAudioPathCateg;
     public JComboBox<String> cmbCattleRoster, cmbGobCategory, cmbMiniTreeSize, cmbRainLimitPerc, comboShapeIcons;
     public JList<String> listGobsTemp, listGobsSaved, listGobsCategories;
     public JButton btnRefresh, btnPrintState, btnResetGobs, btnAudioSave, btnAudioClear, btnAudioTest, btnRemGobFromCateg, btnGobColorAdd, btnCategoryColorAdd, btnGobColorRemove, btnCategoryColorRemove, btnResetCateg, btnAddCateg, btnRemoveCateg, btnResetWindowsPos, btnResetActionUses, btnSapeIconPreview, btnShapeIconSave, btnSapeIconDelete, btnSolidColorWindow, btnGridGolor;
@@ -324,6 +324,24 @@ public class ZeeOptionsJFrame extends JFrame {
         });
 
 
+        panelTabMisc.add(new ZeeOptionJCheckBox( "Notify when friends login", "notifyBuddyOnline"),c);
+
+
+        // mute audio msg
+        panelTabMisc.add(new ZeeOptionJCheckBox( "Mute audio messages:", "blockAudioMsg"),c);
+        panelTabMisc.add(tfBlockAudioMsgs= new JTextField("",5), c);
+        tfBlockAudioMsgs.setMaximumSize(new Dimension(Integer.MAX_VALUE, tfBlockAudioMsgs.getPreferredSize().height));
+        tfBlockAudioMsgs.setText(ZeeConfig.blockAudioMsgList);
+        tfBlockAudioMsgs.addActionListener(actionEvent -> {
+            String str = actionEvent.getActionCommand();
+            String[] strArr = str.split(",");
+            if(strArr!=null && strArr.length>0) {
+                ZeeConfig.blockAudioMsgList = str;
+                Utils.setpref("blockAudioMsgList",str.strip());
+            }
+        });
+
+
         //agro radius tiles
         pan = new JPanel(new FlowLayout(FlowLayout.LEFT));
         panelTabMisc.add(pan,c);
@@ -423,8 +441,6 @@ public class ZeeOptionsJFrame extends JFrame {
         panelTabInterface.add(new ZeeOptionJCheckBox( "Show inventory at login", "showInventoryLogin"),c);
 
         panelTabInterface.add(new ZeeOptionJCheckBox( "Show belt at login", "autoOpenBelt"),c);
-
-        panelTabInterface.add(new ZeeOptionJCheckBox( "Notify when friends login", "notifyBuddyOnline"),c);
 
         panelTabInterface.add(new ZeeOptionJCheckBox( "Zoom extended for Ortho cam", "zoomOrthoExtended"),c);
 
