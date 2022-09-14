@@ -237,24 +237,42 @@ public class ZeeManagerIcons {
 
     static class ShapeIconsOptPanel extends JPanel{
 
-        static JComboBox nameCombo, shapeCombo;
+        static JComboBox comboAllRules, nameCombo, shapeCombo;
         static JTextField nameTF;
         static JPanel panelTop, panelCenter, panelBottom;
         static JSpinner jspIconSize;
-        static JButton btnGobColor;
+        static JButton btnGobColor,btnDrawOrderUp,btnDrawOrderDown;
         static JCheckBox cbBorder, cbShadow;
+        static JLabel lblDrawOrder;
 
-        public ShapeIconsOptPanel(JComboBox<String> comboRule){
+        public ShapeIconsOptPanel(JComboBox<String> comboAllRules){
+            this.comboAllRules = comboAllRules;
             this.setLayout(new BorderLayout());
             this.add(panelTop = new JPanel(new BorderLayout()), BorderLayout.NORTH);
             this.add(panelCenter = new JPanel(new BorderLayout()), BorderLayout.CENTER);
             this.add(panelBottom = new JPanel(new FlowLayout(FlowLayout.LEFT)), BorderLayout.SOUTH);
 
+            // draw order buttons
+            if(comboAllRules.getSelectedIndex()!=0) {
+                JPanel panUpDown = new JPanel(new FlowLayout(FlowLayout.LEFT));
+                panelTop.add(panUpDown, BorderLayout.NORTH);
+                panUpDown.add(lblDrawOrder = new JLabel("Draw order "));
+                panUpDown.add(btnDrawOrderUp = new JButton("up"));
+                btnDrawOrderUp.addActionListener(evt -> {
+                    moveDrawOrderUp();
+                });
+                panUpDown.add(btnDrawOrderDown = new JButton("down"));
+                btnDrawOrderDown.addActionListener(evt -> {
+                    moveDrawOrderDown();
+                });
+            }
+
+            // gob name and rule
             JPanel pan = new JPanel(new FlowLayout(FlowLayout.LEFT));
-            pan.add(new JLabel("Gob name"), BorderLayout.NORTH);
+            pan.add(new JLabel("Gob name"));
             pan.add(nameCombo = new JComboBox<>(new String[]{"startsWith", "contains", "endsWith"}));
-            panelTop.add(pan, BorderLayout.NORTH);
-            panelTop.add(nameTF = new JTextField(), BorderLayout.SOUTH);//gob query
+            panelTop.add(pan, BorderLayout.CENTER);
+            panelTop.add(nameTF = new JTextField(),BorderLayout.SOUTH);//gob query
             nameTF.setBorder(BorderFactory.createEmptyBorder(2, 5, 2, 5));
 
             // combo shape, size
@@ -270,11 +288,11 @@ public class ZeeManagerIcons {
 
             // checkbox border, shadow
             pan = new JPanel(new FlowLayout(FlowLayout.LEFT));
-            panelCenter.add(pan,BorderLayout.SOUTH);
+            panelCenter.add(pan,BorderLayout.CENTER);
             pan.add(cbBorder = new JCheckBox("border"));
             pan.add(cbShadow = new JCheckBox("shadow"));
 
-
+            // button icon color
             panelBottom.add(btnGobColor = new JButton("Icon color"));
             btnGobColor.addActionListener(evt->{
                 Color color = JColorChooser.showDialog(panelBottom, "Gob Highlight Color", null, false);
@@ -284,16 +302,85 @@ public class ZeeManagerIcons {
                 }
             });
 
-            if (comboRule.getSelectedIndex() > 0  &&  !comboRule.getSelectedItem().toString().isBlank())
-                fillData(comboRule.getSelectedItem().toString());
+            if (comboAllRules.getSelectedIndex() > 0  &&  !comboAllRules.getSelectedItem().toString().isBlank())
+                fillData(comboAllRules.getSelectedItem().toString(), comboAllRules.getSelectedIndex());
         }
 
-        private static void fillData(String selectedValue){
+        @SuppressWarnings("unchecked")
+        private void moveDrawOrderDown() {
+            int selIndex = comboAllRules.getSelectedIndex();
+            int size = comboAllRules.getModel().getSize() - 1;
+            if (selIndex <= 1) {
+                //println("already bottom");
+                return;
+            }
+            String temp;
+            String value = comboAllRules.getSelectedItem().toString();
+            String[] arr = ZeeConfig.shapeIconsList.split(";");
+            boolean rebuild = false;
+            for (int i = 0; i < arr.length; i++) {
+                if (arr[i].contentEquals(value) && i>0){
+                    temp = arr[i-1];
+                    arr[i-1] = arr[i];
+                    arr[i] = temp;
+                    rebuild = true;
+                    break;
+                }
+            }
+            if (rebuild) {
+                DefaultComboBoxModel<String> model = new DefaultComboBoxModel<>(arr);
+                model.insertElementAt(" ",0);
+                model.setSelectedItem(value);
+                comboAllRules.setModel(model);
+                lblDrawOrder.setText("Draw order " + (comboAllRules.getSelectedIndex()) + "/" + (comboAllRules.getModel().getSize()-1));
+                ZeeConfig.shapeIconsList = String.join(";",arr);
+                // save pref
+                Utils.setpref("shapeIconsList",ZeeConfig.shapeIconsList);
+                //println("save list > "+ZeeConfig.shapeIconsList);
+            }
+        }
+
+        @SuppressWarnings("unchecked")
+        private void moveDrawOrderUp() {
+            int selIndex = comboAllRules.getSelectedIndex();
+            int size = comboAllRules.getModel().getSize() - 1;
+            if (selIndex >= size) {
+                //println("already on top");
+                return;
+            }
+            String temp;
+            String value = comboAllRules.getSelectedItem().toString();
+            String[] arr = ZeeConfig.shapeIconsList.split(";");
+            boolean rebuild = false;
+            for (int i = 0; i < arr.length; i++) {
+                if (arr[i].contentEquals(value) && i<arr.length-1){
+                    temp = arr[i+1];
+                    arr[i+1] = arr[i];
+                    arr[i] = temp;
+                    rebuild = true;
+                    break;
+                }
+            }
+            if (rebuild) {
+                DefaultComboBoxModel<String> model = new DefaultComboBoxModel<>(arr);
+                model.insertElementAt(" ",0);
+                model.setSelectedItem(value);
+                comboAllRules.setModel(model);
+                lblDrawOrder.setText("Draw order " + (comboAllRules.getSelectedIndex()) + "/" + (comboAllRules.getModel().getSize()-1));
+                ZeeConfig.shapeIconsList = String.join(";",arr);
+                // save pref
+                Utils.setpref("shapeIconsList",ZeeConfig.shapeIconsList);
+                //println("save list > "+ZeeConfig.shapeIconsList);
+            }
+        }
+
+        private static void fillData(String selectedValue, int selectedIndex){
             //  "/horse/ 1,square 6 0 1,0 255 0"
             String[] arr = selectedValue.split(",");
             String[] arrGobName = arr[0].split(" ");
             String[] arrShape = arr[1].split(" ");
             String[] arrColor = arr[2].split(" ");
+            lblDrawOrder.setText("Draw order " + (selectedIndex) + "/" + (comboAllRules.getModel().getSize()-1));
             nameCombo.setSelectedIndex(Integer.parseInt(arrGobName[1]));
             nameTF.setText(arrGobName[0]);//gob query
             shapeCombo.setSelectedItem(arrShape[0]);//shape name
