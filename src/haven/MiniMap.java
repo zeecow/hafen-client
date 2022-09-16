@@ -56,6 +56,7 @@ public class MiniMap extends Widget {
     protected int dlvl;
     protected Location dloc;
 	private String biome, ttip;
+	static int scale = 1;
 
 
     public MiniMap(Coord sz, MapFile file) {
@@ -488,12 +489,12 @@ public class MiniMap extends Widget {
 	}
     }
 
-    private float scalef() {
-	return(UI.unscale((float)(1 << dlvl)));
+	private float scalef() {
+	return(UI.unscale((float)(1 << dlvl)) / scale);
     }
 
     public Coord st2c(Coord tc) {
-	return(UI.scale(tc.add(sessloc.tc).sub(dloc.tc).div(1 << dlvl)).add(sz.div(2)));
+	return(UI.scale(tc.add(sessloc.tc).sub(dloc.tc).div(1 << dlvl)).mul(scale).add(sz.div(2)));
     }
 
     public Coord p2c(Coord2d pc) {
@@ -538,7 +539,7 @@ public class MiniMap extends Widget {
 	try {
 	    Tex img = disp.img();
 	    if(img != null)
-		g.image(img, ul, UI.scale(img.sz()));
+		g.image(img, ul, UI.scale(img.sz()).mul(scale));
 	} catch(Loading l) {
 	}
     }
@@ -546,7 +547,7 @@ public class MiniMap extends Widget {
     public void drawmap(GOut g) {
 	Coord hsz = sz.div(2);
 	for(Coord c : dgext) {
-	    Coord ul = UI.scale(c.mul(cmaps)).sub(dloc.tc.div(scalef())).add(hsz);
+	    Coord ul = UI.scale(c.mul(cmaps).mul(scale)).sub(dloc.tc.div(scalef())).add(hsz);
 	    DisplayGrid disp = display[dgext.ri(c)];
 	    if(disp == null)
 		continue;
@@ -834,9 +835,15 @@ public class MiniMap extends Widget {
 
     public boolean mousewheel(Coord c, int amount) {
 	if(amount > 0) {
-	    if(allowzoomout())
-		zoomlevel = Math.min(zoomlevel + 1, dlvl + 1);
+		if(scale > 1) {
+			scale--;
+		}
+		else if(allowzoomout())
+			zoomlevel = Math.min(zoomlevel + 1, dlvl + 1);
 	} else {
+		if(zoomlevel == 0 && scale < 3) {
+			scale++;
+		}
 	    zoomlevel = Math.max(zoomlevel - 1, 0);
 	}
 	return(true);
