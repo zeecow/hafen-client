@@ -751,23 +751,40 @@ public class ZeeConfig {
 
     // make expanded map window fit screen
     private static Coord mapWndLastPos;
+    public static int mapWndMinHeightBackup=350, mapWndMinHeight=350;
     public static void windowMapCompact(MapWnd mapWnd, boolean compact) {
         if(compact && mapWnd.c.equals(0,0))//special startup condition?
             return;
         Coord screenSize = gameUI.map.sz;
-        Coord pos = mapWnd.c;
-        Coord size = mapWnd.sz;
+        // window expanded
         if(!compact){
-            //make expanded window fit horizontally
-            if(pos.x + size.x > screenSize.x){
-                mapWndLastPos = new Coord(mapWnd.c);
-                mapWnd.c = new Coord(screenSize.x - size.x, pos.y);
+            if (mapWnd.sz.y < mapWndMinHeight){
+                mapWndMinHeightBackup = mapWnd.view.sz.y;
+                mapWnd.resize(mapWnd.asz.x, mapWndMinHeight);
             }
-        }else{
-            //move compact window back to original pos
+            mapWndLastPos = new Coord(mapWnd.c);
+            // horizontal fit
+            if(mapWnd.c.x + mapWnd.sz.x > screenSize.x){
+                mapWnd.c = new Coord(screenSize.x - mapWnd.sz.x, mapWnd.c.y);
+            }
+            // vertical fit
+            if(mapWnd.c.y + mapWnd.sz.y > screenSize.y){
+                mapWnd.c = new Coord(mapWnd.c.x, screenSize.y - mapWnd.sz.y);
+            }else if(mapWnd.c.y < 0){
+                mapWnd.c = new Coord(mapWnd.c.x, 0);
+            }
+        }
+        // window compacted
+        else{
             if(mapWndLastPos!=null) {
+                // restore pos
                 mapWnd.c = mapWndLastPos;
                 mapWndLastPos = null;
+                //restore height
+                if (mapWndMinHeightBackup > 0) {
+                    int pad = 10;
+                    mapWnd.resize(mapWnd.asz.x, mapWndMinHeightBackup + pad);
+                }
             }
         }
     }

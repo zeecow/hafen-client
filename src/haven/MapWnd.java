@@ -203,6 +203,7 @@ public class MapWnd extends Window implements Console.Directory {
 	    if((button == 1) && (drag != null)) {
 		drag.remove();
 		drag = null;
+		ZeeConfig.mapWndMinHeightBackup = -1;
 		return(true);
 	    }
 	    return(super.mouseup(c, button));
