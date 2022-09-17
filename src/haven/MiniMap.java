@@ -657,6 +657,9 @@ public class MiniMap extends Widget {
     public void drawparts(GOut g){
 	drawmap(g);
 	drawmarkers(g);
+	boolean playerSegment = (sessloc != null) && ((curloc == null) || (sessloc.seg == curloc.seg));
+	if(playerSegment && scale > 1)
+		drawview(g);
 	if( (ZeeConfig.showIconsZoomOut && dlvl<=2) || dlvl == 0)
 	    drawicons(g);
 	drawparty(g);
@@ -914,5 +917,21 @@ public class MiniMap extends Widget {
 				ttip = newbiome;
 			}
 		} catch (Loading ignored) {}
+	}
+
+	public static final Coord VIEW_SZ = UI.scale(MCache.sgridsz.mul(9).div(tilesz.floor()));// view radius is 9x9 "server" grids
+	public static final Color VIEW_BG_COLOR = new Color(255, 255, 255, 40);
+
+	void drawview(GOut g) {
+		int zmult = 1 << zoomlevel;
+		Coord2d sgridsz = new Coord2d(MCache.sgridsz);
+		Gob player = ZeeConfig.getPlayerGob();
+		if(player != null) {
+			Coord rc = p2c(player.rc.floor(sgridsz).sub(4, 4).mul(sgridsz));
+			Coord viewsz = VIEW_SZ.div(zmult).mul(scale);
+			g.chcolor(VIEW_BG_COLOR);
+			g.frect(rc, viewsz);
+			g.chcolor();
+		}
 	}
 }

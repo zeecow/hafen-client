@@ -26,10 +26,14 @@
 
 package haven;
 
+import haven.render.NodeWrap;
+import haven.render.Render;
+import haven.render.RenderTree;
+
+import java.lang.ref.Reference;
+import java.lang.ref.SoftReference;
 import java.util.*;
-import java.util.function.*;
-import java.lang.ref.*;
-import haven.render.*;
+import java.util.function.Consumer;
 
 /* XXX: This whole file is a bit of a mess and could use a bit of a
  * rewrite some rainy day. Synchronization especially is quite hairy. */
@@ -39,6 +43,7 @@ public class MCache implements MapSource {
     public static final Coord cmaps = Coord.of(100, 100);
     public static final Coord cutsz = Coord.of(25, 25);
     public static final Coord cutn = cmaps.div(cutsz);
+	public static final Coord sgridsz = new Coord(100, 100);
     public final Resource.Spec[] nsets = new Resource.Spec[256];
     @SuppressWarnings("unchecked")
     private final Reference<Resource>[] sets = new Reference[256];
