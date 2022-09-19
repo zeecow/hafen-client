@@ -420,13 +420,13 @@ public class ZeeManagerGobClick extends ZeeThread{
                 }
             }.start();
         }
-        // while driving wheelbarrow: open gate, store wb on cart
-        else if (isGobInListEndsWith(gobName,"cart,gate") && ZeeConfig.isPlayerDrivingWheelbarrow()){
+        // while driving wheelbarrow: open gate, store wb 
+        else if (isGobInListEndsWith(gobName,"cart,rowboat,snekkja,knarr,wagon,gardenshed,gate") && ZeeConfig.isPlayerDrivingWheelbarrow()){
             new ZeeThread() {
                 public void run() {
                     if (isGobGate(gobName))
                         openGateWheelbarrow(gob);
-                    else if (gobName.endsWith("/cart"))
+                    else if (isGobInListEndsWith(gobName,"cart,rowboat,snekkja,knarr,wagon,gardenshed"))
                         liftAndStoreWheelbarrow(gob);
                 }
             }.start();
