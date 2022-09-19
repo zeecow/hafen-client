@@ -4,7 +4,7 @@ package haven.res.ui.inspect;
 import haven.*;
 
 /* >wdg: LocalInspect */
-@haven.FromResource(name = "ui/inspect", version = 2)
+@haven.FromResource(name = "ui/inspect", version = 3)
 public class LocalInspect extends Widget {
     public MapView mv;
     public Hover last = null, cur = null;
@@ -62,17 +62,18 @@ public class LocalInspect extends Widget {
 			return(name.t);
 		}
 	    }
-	    int tid = ui.sess.glob.map.gettile(mc.floor(MCache.tilesz));
-	    Resource tile = ui.sess.glob.map.tilesetr(tid);
-	    Resource.Tooltip name = tile.layer(Resource.tooltip);
-	    if(name != null)
-		return(name.t);
+	    if(mc != null) {
+		int tid = ui.sess.glob.map.gettile(mc.floor(MCache.tilesz));
+		Resource tile = ui.sess.glob.map.tilesetr(tid);
+		Resource.Tooltip name = tile.layer(Resource.tooltip);
+		if(name != null)
+		    return(name.t);
+	    }
 	    return(null);
 	}
     }
 
     public boolean active() {
-	//TODO figure out minimap tile name
 	return(false);
     }
 
