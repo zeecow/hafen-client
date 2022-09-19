@@ -401,7 +401,7 @@ public class ZeeManagerGobClick extends ZeeThread{
             }.start();
         }
         // clicked wheelbarrel
-        else if(gobName.endsWith("/wheelbarrow")){
+        else if(gobName.endsWith("/wheelbarrow")  && !ZeeConfig.isPlayerLiftingGob(gob)){
             new ZeeThread() {
                 public void run() {
                     try {
@@ -432,7 +432,7 @@ public class ZeeManagerGobClick extends ZeeThread{
             }.start();
         }
         // gob requires unmounting horse (rope in inventory)
-        else if (isGobRequireUmountHorse(gobName) && ZeeConfig.isPlayerMountingHorse()){
+        else if (isGobRequireUmountHorse(gobName) && ZeeConfig.isPlayerMountingHorse() && !ZeeConfig.isPlayerLiftingGob(gob)){
             if (ZeeConfig.getMainInventory().countItemsByName("/rope") > 0) {
                 new ZeeThread() {
                     public void run() {

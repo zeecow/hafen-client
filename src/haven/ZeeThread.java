@@ -435,7 +435,7 @@ public class ZeeThread  extends Thread{
         long timer = TIMEOUT_MS;
         try {
             while( timer > 0 ) {
-                if (ZeeConfig.isPlayerSharingGobCoord(mount)==null)
+                if (!ZeeConfig.isPlayerSharingGobCoord(mount))
                     break;
                 else
                     timer -= PING_MS;
@@ -445,7 +445,7 @@ public class ZeeThread  extends Thread{
             e.printStackTrace();
         }
         //println("waitPlayerDismounted ret "+!ZeeConfig.isPlayerSharingGobCoord(mount));
-        return ZeeConfig.isPlayerSharingGobCoord(mount)==null;
+        return !ZeeConfig.isPlayerSharingGobCoord(mount);
     }
 
 
@@ -454,7 +454,7 @@ public class ZeeThread  extends Thread{
         long timer = TIMEOUT_MS;
         try {
             while( timer > 0 ) {
-                if (ZeeConfig.isPlayerSharingGobCoord(mount)!=null)
+                if (ZeeConfig.isPlayerSharingGobCoord(mount))
                     break;
                 if(ZeeConfig.isPlayerMoving()){
                     timer = TIMEOUT_MS; //reset timer if player moving
@@ -467,7 +467,7 @@ public class ZeeThread  extends Thread{
             e.printStackTrace();
         }
         //println("waitPlayerMounted ret "+ZeeConfig.isPlayerSharingGobCoord(mount));
-        return ZeeConfig.isPlayerSharingGobCoord(mount)!=null;
+        return ZeeConfig.isPlayerSharingGobCoord(mount);
     }
 
 

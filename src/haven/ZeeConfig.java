@@ -2095,23 +2095,28 @@ public class ZeeConfig {
         return  isPlayerSharingGobCoord(gobNameContains);
     }
 
+    public static boolean isPlayerLiftingGob(Gob gob) {
+        if (!playerHasAnyPose(POSE_PLAYER_LIFT)) // not lifting anything
+            return false;
+        return  isPlayerSharingGobCoord(gob);
+    }
+
     public static Gob isPlayerSharingGobCoord(String gobNameContains){
         Gob g = getClosestGobByNameContains(gobNameContains);
         if (g==null) {
             return null;
         }
-        return isPlayerSharingGobCoord(g);
+        if(isPlayerSharingGobCoord(g))
+            return g;
+        return null;
     }
 
-    public static Gob isPlayerSharingGobCoord(Gob g){
+    public static boolean isPlayerSharingGobCoord(Gob g){
         if (g==null)
-            return null;
+            return false;
         double dist = distanceToPlayer(g);
         //println("dist2pl="+dist+"  g="+g.getc()+"  p="+getPlayerGob().getc());
-        if (dist == 0)
-            return g;
-        else
-            return null;
+        return (dist == 0);
     }
 
     public static Gob getClosestGob(List<Gob> gobs) {
