@@ -1361,7 +1361,7 @@ public class ZeeConfig {
 
     static void saveWindowPos(Window window) {
 
-        if(!rememberWindowsPos || window==null)
+        if(!rememberWindowsPos || window==null || isBuildWindow(window))
             return;
 
         String name = window.cap.text;
