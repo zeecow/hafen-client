@@ -120,8 +120,8 @@ public class ZeeManagerGobClick extends ZeeThread{
                             inspectWaterAt(coordMc);
                     }else if (ZeeConfig.isPlayerOnCoracle()) {
                         disembarkEquipCoracle(coordMc);
-                    }else if(ZeeConfig.isPlayerOnDugout()) {
-                        disembarkBoat(coordMc);
+                    }else if(ZeeConfig.isPlayerOnDugout()  || ZeeConfig.isPlayerOnRowboat()) {
+                        disembarkBoatAtShore(coordMc);
                     }else if(ZeeConfig.isPlayerMountingKicksled()){
                         disembarkVehicle(coordMc);
                     } else if (ZeeConfig.isPlayerCarryingWheelbarrow()) {
@@ -198,12 +198,16 @@ public class ZeeManagerGobClick extends ZeeThread{
         ZeeConfig.removePlayerText();
     }
 
-    void disembarkBoat(Coord2d mc){
+    void disembarkBoatAtShore(Coord2d mc){
         try {
             ZeeConfig.addPlayerText("boatin");
             //move to shore
             ZeeConfig.clickTile(ZeeConfig.coordToTile(coordMc), 1);
-            waitPlayerPoseNotInList(ZeeConfig.POSE_PLAYER_DUGOUT_ACTIVE);//TODO add other boats
+            waitPlayerPoseNotInList(
+                    ZeeConfig.POSE_PLAYER_DUGOUT_ACTIVE,
+                    ZeeConfig.POSE_PLAYER_ROWBOAT_ACTIVE,
+                    ZeeConfig.POSE_PLAYER_CORACLE_ACTIVE
+            );//TODO add snekkja, knarr?
             //disembark
             ZeeConfig.clickTile(ZeeConfig.coordToTile(mc), 1, UI.MOD_CTRL);
         }catch (Exception e){
@@ -233,16 +237,8 @@ public class ZeeManagerGobClick extends ZeeThread{
                 ZeeConfig.removePlayerText();
                 return;
             }
-            //pickup coracle
+            //try pickup coracle, if cape slot empty
             clickGobPetal(coracle,"Pick up");
-            sleep(PING_MS*2);
-            if (!ZeeManagerItemClick.isCoracleEquipped()){
-                println("couldn't equip coracle");
-                ZeeConfig.removePlayerText();
-                return;
-            }
-            //move to clicked location
-            ZeeConfig.clickTile(ZeeConfig.coordToTile(coordMc),1);
         }catch (Exception e){
             e.printStackTrace();
         }
