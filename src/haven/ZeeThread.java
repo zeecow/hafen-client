@@ -330,6 +330,44 @@ public class ZeeThread  extends Thread{
         return exit;
     }
 
+    public static boolean waitPlayerPoseNotInListTimeout(long timeoutMs, String... poseList) {
+        //println(">waitPlayerPoseNotInListTimeout");
+        String playerPoses = "";
+        boolean exit = false;
+        boolean poseInList = true;//assume pose is in list
+        long elapsedTimeMs = 0;
+        long sleepMs = PING_MS * 2;
+        try{
+            do{
+                sleep(sleepMs);
+                elapsedTimeMs += sleepMs;
+                if (elapsedTimeMs >= timeoutMs) {
+                    poseInList = true;//if timeout assume pose still in list
+                    break;
+                }
+                else {
+                    playerPoses = ZeeConfig.getPlayerPoses();
+                    exit = true;
+                    poseInList = false;
+                    for (int i = 0; i < poseList.length; i++) {
+                        //if contains pose, loop and sleep again
+                        if (playerPoses.contains(poseList[i])) {
+                            exit = false;
+                            poseInList = true;
+                            break;
+                        }
+                    }
+                    if (!poseInList)
+                        exit = true;
+                }
+            }while(!exit); // || ZeeConfig.isPlayerMoving()); // still necessary?
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        //println("waitPlayerPoseNotInListTimeout ret "+!poseInList);
+        return !poseInList;
+    }
+
     public static boolean waitNotPlayerPose(String poseName) {
         String poses = "";
         try{

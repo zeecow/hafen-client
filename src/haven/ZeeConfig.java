@@ -61,11 +61,16 @@ public class ZeeConfig {
     public static final String POSE_PLAYER_RIDING_TROT = "gfx/borka/riding-trot";//speed 2
     public static final String POSE_PLAYER_RIDING_GALLOP = "gfx/borka/riding-gallop";//speed 3
 
+    public static final String POSE_PLAYER_KICKSLED_IDLE = "gfx/borka/sparkan-idle";
+    public static final String POSE_PLAYER_KICKSLED_ACTIVE = "gfx/borka/sparkan-sparkan";
+
     public static final String POSE_PLAYER_CORACLE_IDLE = "gfx/borka/coracleidle";
-    public static final String POSE_PLAYER_CORACLE_ROWAN = "gfx/borka/coraclerowan";
+    public static final String POSE_PLAYER_CORACLE_ACTIVE = "gfx/borka/coraclerowan";
     public static final String POSE_PLAYER_CORACLE_CAPE = "gfx/borka/coraclecape";
     public static final String POSE_PLAYER_DUGOUT_IDLE = "gfx/borka/dugoutidle";
-    public static final String POSE_PLAYER_DUGOUT_ROWAN = "gfx/borka/dugoutrowan";
+    public static final String POSE_PLAYER_DUGOUT_ACTIVE = "gfx/borka/dugoutrowan";
+    public static final String POSE_PLAYER_ROWBOAT_IDLE = "gfx/borka/rowboat-d";
+    public static final String POSE_PLAYER_ROWBOAT_ACTIVE = "gfx/borka/rowing";
 
     public static final String POSE_PLAYER_IDLE = "gfx/borka/idle";
     public static final String POSE_PLAYER_WALK = "gfx/borka/walking";//speed 0, 1
@@ -88,6 +93,17 @@ public class ZeeConfig {
     public static final String POSE_PLAYER_DRIVE_WHEELBARROW = "gfx/borka/carry"; //same as pickaxe
     public static final String POSE_PLAYER_CARRY_PICKAXE = "gfx/borka/carry"; //same as wheelbarrow
     public static final String POSE_PLAYER_CARRY_SCYTHEARMS = "gfx/borka/scythearms";
+
+    public static final String TILE_WATER_FRESH_SHALLOW = "gfx/tiles/water";
+    public static final String TILE_WATER_FRESH_DEEP = "gfx/tiles/deep";
+    public static final String TILE_WATER_OCEAN_SHALLOW = "gfx/tiles/owater";
+    public static final String TILE_WATER_OCEAN_DEEP = "gfx/tiles/odeep";
+    public static final String TILE_WATER_OCEAN_DEEPER = "gfx/tiles/odeeper";
+
+    public static final String TILE_SWAMP = "gfx/tiles/swamp";
+    public static final String TILE_SWAMP_WATER = "gfx/tiles/swampwater";
+    public static final String TILE_SWAMP_BOG = "gfx/tiles/bog";
+    public static final String TILE_SWAMP_BOG_WATER = "gfx/tiles/bogwater";
 
     public static final String DEF_LIST_BLOCK_AUDIO = "Leashed horse.;Tracking is now turned on.";
     public static final String DEF_LIST_CONFIRM_PETAL = "Empty,Swill,Clean out,Take possession,Renounce Lawspeaker,Become Lawspeaker";
@@ -217,6 +233,7 @@ public class ZeeConfig {
     public static boolean simpleWindowBorder = Utils.getprefb("simpleWindowBorder", true);
     public static boolean simpleButtons = Utils.getprefb("simpleButtons", true);
     public static String windowShortMidclickTransferMode = "des";//default shortMidclick transfer descending
+    public static boolean liftVehicleBeforeTravelHearth = Utils.getprefb("liftVehicleBeforeTravelHearth", true);
 
 
     public final static Set<String> mineablesStone = new HashSet<String>(Arrays.asList(
@@ -2414,6 +2431,10 @@ public class ZeeConfig {
         return Arrays.toString(args);
     }
 
+    public static void println(int num) {
+        System.out.println(""+num);
+    }
+
     public static void println(String s) {
         System.out.println(s);
     }
@@ -2749,12 +2770,16 @@ public class ZeeConfig {
         return getPlayerPoses().contains("/sparkan");
     }
 
-    public static boolean isPlayerMountingCoracle() {
-        return playerHasAnyPose(ZeeConfig.POSE_PLAYER_CORACLE_IDLE,ZeeConfig.POSE_PLAYER_CORACLE_ROWAN);
+    public static boolean isPlayerOnCoracle() {
+        return playerHasAnyPose(ZeeConfig.POSE_PLAYER_CORACLE_IDLE,ZeeConfig.POSE_PLAYER_CORACLE_ACTIVE);
     }
 
-    public static boolean isPlayerMountingDugout(){
-        return playerHasAnyPose(ZeeConfig.POSE_PLAYER_DUGOUT_IDLE,ZeeConfig.POSE_PLAYER_DUGOUT_ROWAN);
+    public static boolean isPlayerOnDugout(){
+        return playerHasAnyPose(ZeeConfig.POSE_PLAYER_DUGOUT_IDLE,ZeeConfig.POSE_PLAYER_DUGOUT_ACTIVE);
+    }
+
+    public static boolean isPlayerOnRowboat(){
+        return playerHasAnyPose(ZeeConfig.POSE_PLAYER_ROWBOAT_IDLE,ZeeConfig.POSE_PLAYER_ROWBOAT_ACTIVE);
     }
 
     public static void combatStarted() {
@@ -2828,4 +2853,111 @@ public class ZeeConfig {
         }
         return false;
     }
+
+    static boolean liftVehicleBeforeTravelHearth(Object[] args) {
+        if (!liftVehicleBeforeTravelHearth)
+            return false;
+        if (args==null && args.length<1)
+            return false;
+        if(!strArgs(args).contains("travel, hearth"))
+            return false;
+
+        // unmount kicksled before travel hearth
+        if (isPlayerMountingKicksled()){
+            try {
+                new ZeeThread() {
+                    public void run() {
+                        ZeeManagerGobClick.disembarkVehicle(Coord2d.z);
+                        waitPlayerPoseNotInList(POSE_PLAYER_KICKSLED_IDLE, POSE_PLAYER_KICKSLED_ACTIVE);
+                        try {
+                            sleep(100);//lagalagalaga
+                            ZeeManagerGobClick.liftGob(getClosestGobByNameContains("vehicle/spark"));
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                        gameUI.act("travel","hearth");
+                    }
+                }.start();
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+        }
+        // disembark shalow water vehicle before travel hearth
+        else if (isPlayerTileShallowWaterOrSwamp()) {
+            Gob vehicle = null;
+            if (isPlayerOnDugout())
+                vehicle = getClosestGobByNameContains("vehicle/dugout");
+            else if (isPlayerOnRowboat())
+                vehicle = getClosestGobByNameContains("vehicle/rowboat");
+            else if (isPlayerOnCoracle())
+                vehicle = getClosestGobByNameContains("vehicle/coracle");
+            else
+                //player not in vehicle, returning false continues gameUI.wdgmsg()
+                return false;
+
+            try {
+                Gob finalVehicle = vehicle;//thanks, IntelliJ
+                new ZeeThread() {
+                    public void run() {
+                        ZeeManagerGobClick.disembarkVehicle(Coord2d.z);
+                        boolean playerDisembarked = waitPlayerPoseNotInListTimeout(1500,
+                                POSE_PLAYER_DUGOUT_ACTIVE, POSE_PLAYER_DUGOUT_IDLE,
+                                POSE_PLAYER_ROWBOAT_ACTIVE, POSE_PLAYER_ROWBOAT_IDLE,
+                                POSE_PLAYER_CORACLE_IDLE, POSE_PLAYER_CORACLE_ACTIVE
+                        );
+                        if(playerDisembarked) {
+                            try {
+                                sleep(100);//lagalagalaga
+                                ZeeManagerGobClick.liftGob(finalVehicle);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                            gameUI.act("travel","hearth");
+                        }
+                    }
+                }.start();
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+        }
+        else{
+            return false;
+        }
+
+        // thread already started, returning true skips gameUI.wdgmsg()
+        return true;
+    }
+
+
+    static boolean isPlayerTileWaterOrSwamp() {
+        List<String> names = Arrays.asList(
+                TILE_WATER_FRESH_DEEP , TILE_WATER_FRESH_SHALLOW ,
+                TILE_WATER_OCEAN_SHALLOW , TILE_WATER_OCEAN_DEEP , TILE_WATER_OCEAN_DEEPER ,
+                TILE_SWAMP , TILE_SWAMP_WATER ,
+                TILE_SWAMP_BOG , TILE_SWAMP_BOG_WATER
+        );
+
+        return names.contains(ZeeConfig.getTileResName(getPlayerTile()));
+    }
+
+    static boolean isPlayerTileShallowWaterOrSwamp() {
+        List<String> names = Arrays.asList(
+            TILE_WATER_FRESH_SHALLOW ,
+            TILE_WATER_OCEAN_SHALLOW ,
+            TILE_SWAMP , TILE_SWAMP_WATER ,
+            TILE_SWAMP_BOG , TILE_SWAMP_BOG_WATER
+        );
+
+        return names.contains(ZeeConfig.getTileResName(getPlayerTile()));
+    }
+
+    static boolean isPlayerTileDeepWater() {
+        List<String> names = Arrays.asList(
+                TILE_WATER_FRESH_DEEP ,
+                TILE_WATER_OCEAN_DEEP , TILE_WATER_OCEAN_DEEPER
+        );
+
+        return names.contains(ZeeConfig.getTileResName(getPlayerTile()));
+    }
+
 }

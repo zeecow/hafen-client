@@ -1272,6 +1272,9 @@ public class GameUI extends ConsoleHost implements Console.Directory {
     }
 
     public void wdgmsg(Widget sender, String msg, Object... args) {
+	if(ZeeConfig.liftVehicleBeforeTravelHearth(args)){
+		return;
+	}
 	if((sender == chrwdg) && (msg == "close")) {
 	    chrwdg.hide();
 	    return;

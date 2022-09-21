@@ -118,12 +118,12 @@ public class ZeeManagerGobClick extends ZeeThread{
                             dropEmbarkCoracle(coordMc);
                         else
                             inspectWaterAt(coordMc);
-                    }else if (ZeeConfig.isPlayerMountingCoracle()) {
+                    }else if (ZeeConfig.isPlayerOnCoracle()) {
                         disembarkEquipCoracle(coordMc);
-                    }else if(ZeeConfig.isPlayerMountingDugout()) {
+                    }else if(ZeeConfig.isPlayerOnDugout()) {
                         disembarkBoat(coordMc);
                     }else if(ZeeConfig.isPlayerMountingKicksled()){
-                        dismountVehicle(coordMc);
+                        disembarkVehicle(coordMc);
                     } else if (ZeeConfig.isPlayerCarryingWheelbarrow()) {
                         ZeeManagerStockpile.unloadWheelbarrowStockpileAtGround(coordMc.floor(posres));
                         if (ZeeConfig.autoToggleGridLines)
@@ -203,7 +203,7 @@ public class ZeeManagerGobClick extends ZeeThread{
             ZeeConfig.addPlayerText("boatin");
             //move to shore
             ZeeConfig.clickTile(ZeeConfig.coordToTile(coordMc), 1);
-            waitPlayerPoseNotInList(ZeeConfig.POSE_PLAYER_DUGOUT_ROWAN);//TODO add other boats
+            waitPlayerPoseNotInList(ZeeConfig.POSE_PLAYER_DUGOUT_ACTIVE);//TODO add other boats
             //disembark
             ZeeConfig.clickTile(ZeeConfig.coordToTile(mc), 1, UI.MOD_CTRL);
         }catch (Exception e){
@@ -221,7 +221,7 @@ public class ZeeManagerGobClick extends ZeeThread{
             //disembark
             ZeeConfig.clickTile(ZeeConfig.coordToTile(coordMc),1,UI.MOD_CTRL);
             sleep(PING_MS*2);
-            if (ZeeConfig.isPlayerMountingCoracle()){
+            if (ZeeConfig.isPlayerOnCoracle()){
                 println("couldn't dismount coracle");
                 ZeeConfig.removePlayerText();
                 return;
@@ -576,7 +576,7 @@ public class ZeeManagerGobClick extends ZeeThread{
         ZeeManagerStockpile.useWheelbarrowAtStockpile(gob);
     }
 
-    public static void dismountVehicle(Coord2d coordMc) {
+    public static void disembarkVehicle(Coord2d coordMc) {
         ZeeConfig.clickCoord(coordMc.floor(posres),1,UI.MOD_CTRL);
     }
 
