@@ -56,7 +56,7 @@ public class MiniMap extends Widget {
     protected int dlvl;
     protected Location dloc;
 	private String biome, ttip;
-	static int scale = 1;
+	static int scale = ZeeConfig.minimapScale;
 
 
     public MiniMap(Coord sz, MapFile file) {
@@ -840,12 +840,16 @@ public class MiniMap extends Widget {
 	if(amount > 0) {
 		if(scale > 1) {
 			scale--;
+			ZeeConfig.minimapScale = scale;
+			Utils.setprefi("minimapScale",scale);
 		}
 		else if(allowzoomout())
 			zoomlevel = Math.min(zoomlevel + 1, dlvl + 1);
 	} else {
 		if(zoomlevel == 0 && scale < 3) {
 			scale++;
+			ZeeConfig.minimapScale = scale;
+			Utils.setprefi("minimapScale",scale);
 		}
 	    zoomlevel = Math.max(zoomlevel - 1, 0);
 	}

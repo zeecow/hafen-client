@@ -234,6 +234,7 @@ public class ZeeConfig {
     public static boolean simpleButtons = Utils.getprefb("simpleButtons", true);
     public static String windowShortMidclickTransferMode = "des";//default shortMidclick transfer descending
     public static boolean liftVehicleBeforeTravelHearth = Utils.getprefb("liftVehicleBeforeTravelHearth", true);
+    public static int minimapScale = Utils.getprefi("minimapScale",1);
 
 
     public final static Set<String> mineablesStone = new HashSet<String>(Arrays.asList(
