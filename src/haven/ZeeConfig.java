@@ -2766,7 +2766,7 @@ public class ZeeConfig {
         return ZeeThread.now() - lastIconNotifySaveMs > 1000;
     }
 
-    public static boolean isPlayerMountingKicksled() {
+    public static boolean isPlayerDrivingingKicksled() {
         return getPlayerPoses().contains("/sparkan");
     }
 
@@ -2863,7 +2863,7 @@ public class ZeeConfig {
             return false;
 
         // unmount kicksled before travel hearth
-        if (isPlayerMountingKicksled()){
+        if (isPlayerDrivingingKicksled()){
             try {
                 new ZeeThread() {
                     public void run() {

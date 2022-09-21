@@ -33,6 +33,7 @@ Client focusing on small helper tasks, many using mouse middle button, and other
  - option Ctrl+click petal confirmation list (default Empty, Swill)
  - midclick Barter Stand "Buy" button to auto-buy  
  - Audio msg mute list
+ - lift vehicle before travel hearth
  - midclick ground 
    - while holding item will move to location (simulates ctrl+click)
    - while inspecting icon active, will msg tile name
@@ -42,7 +43,8 @@ Client focusing on small helper tasks, many using mouse middle button, and other
    - while carrying wheelbarrow will try to(dismount and) unload stockpile at ground
    - while coracle equipped, LMC water will try to drop and mount
    - while coracle mounted, LMC ground will try to dismount and equip 
-   - disembark dugout 
+   - disembark dugout, rowboat, coracle, kicksled
+   - activate snow clear area
  - midclick object 
    - inspect object quality and show text
    - harvest 2 dreams from dreamcatch obj
