@@ -25,7 +25,7 @@ Client focusing on small helper tasks, many using mouse middle button, and other
  - scroll transfer items directly (no shift)
  - free gob placement
  - auto toggle gridlines 
- - rightclicking doors, cave, gate, wheelbarrow, stockpiles, horse, cart, will interact with these objects whenever possible
+ - rightclick interactions involving various vehicles and workstations, entrances, containers
  - Quick Options window show 3 latest used options, and auto-click for latest flowermenu
  - default icon sound to "Bell 2" if empty
  - inspect cursor tooltip containing gob/tile/minimap info

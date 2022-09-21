@@ -477,9 +477,10 @@ public class ZeeManagerGobClick extends ZeeThread{
                 }
             }.start();
         }
-        // gob requires unmounting horse (rope in inventory)
-        else if (isGobRequireUmountHorse(gobName) && ZeeConfig.isPlayerMountingHorse() && !ZeeConfig.isPlayerLiftingGob(gob)){
-            if (ZeeConfig.getMainInventory().countItemsByName("/rope") > 0) {
+        // gob requires unmounting horse/kicksled
+        else if (isGobRequireDisembarkVehicle(gobName) && !ZeeConfig.isPlayerLiftingGob(gob)){
+            // unmount horse
+            if (ZeeConfig.isPlayerMountingHorse() && ZeeConfig.getMainInventory().countItemsByName("/rope") > 0) {
                 new ZeeThread() {
                     public void run() {
                         dismountHorse(mc);
@@ -487,6 +488,21 @@ public class ZeeManagerGobClick extends ZeeThread{
                             gobClick(gob,3,0,16);//gob's door?
                         else
                             gobClick(gob,3);
+                    }
+                }.start();
+            }
+            // disembark kicksled
+            else if(ZeeConfig.isPlayerDrivingingKicksled()){
+                new ZeeThread() {
+                    public void run() {
+                        try {
+                            disembarkVehicle(mc);
+                            waitPlayerPoseNotInList(ZeeConfig.POSE_PLAYER_KICKSLED_IDLE, ZeeConfig.POSE_PLAYER_KICKSLED_ACTIVE);
+                            sleep(100);//lagalagalaga
+                            gobClick(gob,3);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
                     }
                 }.start();
             }
@@ -517,7 +533,7 @@ public class ZeeManagerGobClick extends ZeeThread{
 
     }
 
-    static boolean isGobRequireUmountHorse(String gobName) {
+    static boolean isGobRequireDisembarkVehicle(String gobName) {
         return isGobHouseInnerDoor(gobName) || isGobHouse(gobName) || isGobChair(gobName)
                 || isGobInListEndsWith(gobName,
                     "/upstairs,/downstairs,/cavein,/caveout,/burrow,/igloo," +
