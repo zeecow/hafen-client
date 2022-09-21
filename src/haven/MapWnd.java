@@ -94,21 +94,21 @@ public class MapWnd extends Window implements Console.Directory {
 	view = viewf.add(new View(file));
 	recenter();
 	toolbar = add(new Widget(Coord.z));
-	toolbar.add(new Img(Resource.loadtex("gfx/hud/mmap/fgwdg")) {
-		public boolean mousedown(Coord c, int button) {
-		    if((button == 1) && checkhit(c)) {
-			MapWnd.this.drag(parentpos(MapWnd.this, c));
-			return(true);
-		    }
-		    return(super.mousedown(c, button));
-		}
-	    }, Coord.z);
+//	toolbar.add(new Img(Resource.loadtex("gfx/hud/mmap/fgwdg")) {
+//		public boolean mousedown(Coord c, int button) {
+//		    if((button == 1) && checkhit(c)) {
+//			MapWnd.this.drag(parentpos(MapWnd.this, c));
+//			return(true);
+//		    }
+//		    return(super.mousedown(c, button));
+//		}
+//	    }, Coord.z);
 	toolbar.add(new IButton("gfx/hud/mmap/home", "", "-d", "-h") {
 		{settip("Follow"); setgkey(kb_home);}
 		public void click() {
 		    recenter();
 		}
-	    }, Coord.z);
+	    }, Coord.of(0,3));
 	toolbar.add(new ICheckBox("gfx/hud/mmap/mark", "", "-d", "-h", "-dh"), Coord.z)
 	    .state(() -> domark).set(a -> domark = a)
 	    .settip("Add marker").setgkey(kb_mark);
@@ -693,7 +693,7 @@ public class MapWnd extends Window implements Console.Directory {
 	    tool.c = viewf.pos("ur").adds(10, 0);
 	}
 	view.resize(viewf.inner());
-	toolbar.c = viewf.c.add(0, viewf.sz.y - toolbar.sz.y).add(UI.scale(2), UI.scale(-2));
+	toolbar.c = viewf.c.add(0, -toolbar.sz.y+15).add(UI.scale(2), UI.scale(-2));
     }
 
     public void compact(boolean a) {
