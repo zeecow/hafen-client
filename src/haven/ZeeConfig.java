@@ -2042,7 +2042,7 @@ public class ZeeConfig {
             if (ZeeManagerCook.pepperRecipeOpen)
                 ZeeManagerCook.gobClicked(clickGob,lastMapViewClickGobName,clickb);
             if(clickb == 2) {
-                ZeeManagerGobClick.checkMidClickGob(pc, mc, clickGob, lastMapViewClickGobName);
+                ZeeManagerGobClick.checkMidClick(pc, mc, clickGob, lastMapViewClickGobName);
             } else if (clickb==3 && gameUI.ui.modflags()==0){// no mod keys
                 //reset inspect tooltip
                 showInspectTooltip = false;
@@ -2059,7 +2059,7 @@ public class ZeeConfig {
                 if (isPlayerHoldingItem()) { //move while holding item
                     clickCoord(mc.floor(posres), 1, 0);
                 }else
-                    ZeeManagerGobClick.checkMidClickGob(pc,mc,null,"");
+                    ZeeManagerGobClick.checkMidClick(pc,mc,null,"");
             }
         }
     }
@@ -2743,6 +2743,10 @@ public class ZeeConfig {
     static long lastIconNotifySaveMs = ZeeThread.now();
     public static boolean allowIconNotifySave() {
         return ZeeThread.now() - lastIconNotifySaveMs > 1000;
+    }
+
+    public static boolean isPlayerMountingKicksled() {
+        return getPlayerPoses().contains("/sparkan");
     }
 
     public static boolean isPlayerMountingCoracle() {

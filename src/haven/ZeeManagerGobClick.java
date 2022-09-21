@@ -34,7 +34,7 @@ public class ZeeManagerGobClick extends ZeeThread{
         ZeeConfig.getMainInventory();
     }
 
-    public static void checkMidClickGob(Coord pc, Coord2d mc, Gob gob, String gobName) {
+    public static void checkMidClick(Coord pc, Coord2d mc, Gob gob, String gobName) {
 
         clickDiffMs = clickEndMs - clickStartMs;
 
@@ -109,8 +109,28 @@ public class ZeeManagerGobClick extends ZeeThread{
 
     public void run() {
         try {
-            if (isLongMidClick()){
-                if (gobName.contentEquals("gfx/terobjs/bushes/reeds")) {
+            if (isLongMidClick()){//unnecessary check?
+                if (isGroundClick){
+                    if (ZeeConfig.isPlayerMountingHorse()) {
+                        dismountHorse(coordMc);
+                    }else if (isWaterTile(coordMc)) {
+                        if (ZeeManagerItemClick.isCoracleEquipped() && !ZeeConfig.isPlayerMountingHorse())
+                            dropEmbarkCoracle(coordMc);
+                        else
+                            inspectWaterAt(coordMc);
+                    }else if (ZeeConfig.isPlayerMountingCoracle()) {
+                        disembarkEquipCoracle(coordMc);
+                    }else if(ZeeConfig.isPlayerMountingDugout()) {
+                        disembarkBoat(coordMc);
+                    }else if(ZeeConfig.isPlayerMountingKicksled()){
+                        dismountVehicle(coordMc);
+                    } else if (ZeeConfig.isPlayerCarryingWheelbarrow()) {
+                        ZeeManagerStockpile.unloadWheelbarrowStockpileAtGround(coordMc.floor(posres));
+                        if (ZeeConfig.autoToggleGridLines)
+                            ZeeConfig.gameUI.map.showgrid(true);
+                    }
+                }
+                else if (gobName.contentEquals("gfx/terobjs/bushes/reeds")) {
                     clearReeds(gob);
                 } else if (isRemovingAllTrees && isGobTree(gobName)) {
                     scheduleRemoveTree(gob);
@@ -134,23 +154,6 @@ public class ZeeManagerGobClick extends ZeeThread{
                         itemActGob(gob,UI.MOD_SHIFT);//shift+rclick
                     else
                         itemActGob(gob,3);//ctrl+shift+rclick
-                } else if (isGroundClick){
-                    if (ZeeConfig.isPlayerMountingHorse()) {
-                        dismountHorse(coordMc);
-                    }else if (isWaterTile(coordMc)) {
-                        if (ZeeManagerItemClick.isCoracleEquipped() && !ZeeConfig.isPlayerMountingHorse())
-                            dropEmbarkCoracle(coordMc);
-                        else
-                            inspectWaterAt(coordMc);
-                    }else if (ZeeConfig.isPlayerMountingCoracle()) {
-                        disembarkEquipCoracle(coordMc);
-                    }else if(ZeeConfig.isPlayerMountingDugout()) {
-                        disembarkBoat(coordMc);
-                    }else if (ZeeConfig.isPlayerCarryingWheelbarrow()) {
-                        ZeeManagerStockpile.unloadWheelbarrowStockpileAtGround(coordMc.floor(posres));
-                        if (ZeeConfig.autoToggleGridLines)
-                            ZeeConfig.gameUI.map.showgrid(true);
-                    }
                 } else if (ZeeConfig.isPlayerCarryingWheelbarrow()) {
                     if (isGobHorse(gobName)) {
                         mountHorseCarryingWheelbarrow(gob);
@@ -571,6 +574,10 @@ public class ZeeManagerGobClick extends ZeeThread{
 
     private static void unloadWheelbarrowAtGob(Gob gob) {
         ZeeManagerStockpile.useWheelbarrowAtStockpile(gob);
+    }
+
+    public static void dismountVehicle(Coord2d coordMc) {
+        ZeeConfig.clickCoord(coordMc.floor(posres),1,UI.MOD_CTRL);
     }
 
     public static void dismountHorse(Coord2d coordMc) {
