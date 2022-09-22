@@ -239,7 +239,6 @@ public class ZeeThread  extends Thread{
         return waitGobIdleVelocityMs(ZeeConfig.getPlayerGob(), idleMs_min777);
     }
 
-    //TODO test
     public static boolean waitPlayerIdlePoseMs(long idleMs){
         if (ZeeConfig.isPlayerMountingHorse())
             return waitPlayerIdleMountedMs(idleMs);
@@ -266,9 +265,8 @@ public class ZeeThread  extends Thread{
         );
     }
 
-    //TODO test
     public static boolean waitPlayerIdleMountedMs(long idleMs) {
-        return waitPlayerPoseNotInListMs(
+        return waitPlayerPoseNotInListTimeout(
                 idleMs,
                 ZeeConfig.POSE_PLAYER_DRINK,
                 ZeeConfig.POSE_PLAYER_CHOPTREE,
@@ -278,31 +276,6 @@ public class ZeeThread  extends Thread{
         );
     }
 
-    public static boolean waitPlayerPoseNotInListMs(long idleMs, String ... poseList) {
-        println(">waitPlayerPoseNotInListMs");
-        String playerPoses = "";
-        long countMs = 0;
-        try{
-            do{
-                sleep(PING_MS);
-                countMs += PING_MS;
-                playerPoses = ZeeConfig.getPlayerPoses();
-                //println("   "+playerPoses);
-                for (int i = 0; i < poseList.length; i++) {
-                    //println("      "+poseList[i]);
-                    if (playerPoses.contains(poseList[i])){//if contains pose...
-                        //println("break");
-                        countMs = 0;
-                        break;//... break, loop and sleep again
-                    }
-                }
-            }while(countMs < idleMs || ZeeConfig.isPlayerMoving());
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-        println("waitPlayerPoseNotInListMs ret "+(countMs >= idleMs));
-        return countMs >= idleMs; //waited for idleMs
-    }
 
     public static boolean waitPlayerPoseNotInList(String ... poseList) {
         //println(">waitPlayerPosesContainsNone");
@@ -331,7 +304,7 @@ public class ZeeThread  extends Thread{
     }
 
     public static boolean waitPlayerPoseNotInListTimeout(long timeoutMs, String... poseList) {
-        println(">waitPlayerPoseNotInListTimeout");
+        //println(">waitPlayerPoseNotInListTimeout");
         String playerPoses = "";
         boolean exit = false;
         boolean poseInList = true;//assume pose is in list
@@ -364,7 +337,7 @@ public class ZeeThread  extends Thread{
         }catch (Exception e){
             e.printStackTrace();
         }
-        println("waitPlayerPoseNotInListTimeout ret "+!poseInList);
+        //println("waitPlayerPoseNotInListTimeout ret "+!poseInList);
         return !poseInList;
     }
 
