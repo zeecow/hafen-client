@@ -38,7 +38,7 @@ public class ZeeManagerGobClick extends ZeeThread{
 
         clickDiffMs = clickEndMs - clickStartMs;
 
-        //println(clickDiffMs+"ms > "+gobName);// + (gob==null ? "" : " dist="+ZeeConfig.distanceToPlayer(gob)));
+        //println(clickDiffMs+"ms > "+gobName + (gob==null ? "" : " dist="+ZeeConfig.distanceToPlayer(gob)));
         //if (gob!=null) println(gobName + " poses = "+ZeeConfig.getGobPoses(gob));
 
         if (isLongMidClick()) {
@@ -179,7 +179,7 @@ public class ZeeManagerGobClick extends ZeeThread{
                 }
                 // remove tree stump
                 else if (isGobTreeStump(gobName)) {
-                    removeStump(gob);
+                    removeStumpMaybe(gob);
                 }
                 // item act barrel
                 else if (ZeeConfig.isPlayerHoldingItem() && gobName.endsWith("/barrel")) {
@@ -1143,19 +1143,23 @@ public class ZeeManagerGobClick extends ZeeThread{
             waitNoFlowerMenu();
             ZeeManagerItemClick.equipAxeChopTree();
             ZeeConfig.lastMapViewClickButton = 2;//prepare for cancel click
+            Coord2d treeCoord;
             while (tree!=null && !ZeeConfig.isTaskCanceledByGroundClick()) {
+                //start chopping
                 clickGobPetal(tree, "Chop");
+                waitPlayerPose(ZeeConfig.POSE_PLAYER_CHOPTREE);
                 currentRemovingTree = tree;
+                treeCoord = new Coord2d(tree.rc.x, tree.rc.y);
+                //wait idle
                 if (waitPlayerIdlePose() && !ZeeConfig.isTaskCanceledByGroundClick()) {//waitPlayerIdleFor(2)
                     sleep(2500);//wait new stump loading
                     Gob stump = ZeeConfig.getClosestGob(ZeeConfig.findGobsByNameEndsWith("stump"));
-                    if (stump != null && ZeeConfig.distanceToPlayer(stump) < 25) {
+                    if (stump != null  &&  stump.rc.compareTo(treeCoord) == 0) {
                         ZeeConfig.addGobText(stump, "stump");
-                        removeStump(stump);
-                        //waitPlayerIdleFor(2);
+                        removeStumpMaybe(stump);
                         waitPlayerIdlePose();
                     } else {
-                        println("no stump close");
+                        println("stump not found");
                     }
                     if (isRemovingAllTrees) {
                         if (treesForRemoval!=null){
@@ -1184,13 +1188,15 @@ public class ZeeManagerGobClick extends ZeeThread{
         ZeeConfig.removePlayerText();
     }
 
-    public static void removeStump(Gob stump) throws InterruptedException {
+    public static boolean removeStumpMaybe(Gob stump) throws InterruptedException {
         boolean droppedBucket = false;
 
         //move closer to stump
         gobClick(stump,1);
-        sleep(PING_MS);
-        waitPlayerIdlePose();
+        if(!waitPlayerDistToGob(stump,25)){
+            println("couldn't get close to stump?");
+            return false;
+        }
 
         //drop bucket if present
         if (ZeeManagerItemClick.isItemEquipped("bucket")) {
@@ -1207,7 +1213,7 @@ public class ZeeManagerGobClick extends ZeeThread{
         ZeeManagerItemClick.equipBeltItem("shovel");
         if (!waitItemEquipped("shovel")){
             println("couldnt equip shovel ?");
-            return;
+            return false;
         }
         waitNotHoldingItem();//wait possible switched item go to belt?
 
@@ -1238,6 +1244,9 @@ public class ZeeManagerGobClick extends ZeeThread{
                 println("bucket gob not found");
             }
         }
+
+        // maybe stump was removed
+        return true;
     }
 
     public static void addItemsToGob(List<WItem> invItens, int num, Gob gob){
