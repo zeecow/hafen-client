@@ -2855,9 +2855,15 @@ public class ZeeConfig {
         return false;
     }
 
+    static boolean skipNextLiftVehicle = false;
     static boolean liftVehicleBeforeTravelHearth(Object[] args) {
         if (!liftVehicleBeforeTravelHearth)
             return false;
+        if (skipNextLiftVehicle){
+            //c-c-combo breaker
+            skipNextLiftVehicle = false;
+            return false;
+        }
         if (args==null && args.length<1)
             return false;
         if(!strArgs(args).contains("travel, hearth"))
@@ -2869,13 +2875,19 @@ public class ZeeConfig {
                 new ZeeThread() {
                     public void run() {
                         ZeeManagerGobClick.disembarkVehicle(Coord2d.z);
-                        waitPlayerPoseNotInList(POSE_PLAYER_KICKSLED_IDLE, POSE_PLAYER_KICKSLED_ACTIVE);
-                        try {
-                            sleep(100);//lagalagalaga
-                            ZeeManagerGobClick.liftGob(getClosestGobByNameContains("vehicle/spark"));
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
+                        //if disembark then liftup kicksled
+                        if(waitPlayerPoseNotInListTimeout(1000,POSE_PLAYER_KICKSLED_IDLE, POSE_PLAYER_KICKSLED_ACTIVE)){
+                            try {
+                                sleep(100);//lagalagalaga
+                                ZeeManagerGobClick.liftGob(getClosestGobByNameContains("vehicle/spark"));
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
                         }
+                        else
+                            skipNextLiftVehicle = true; // travel hearth without checking
+
+                        // travel hearth anyways
                         gameUI.act("travel","hearth");
                     }
                 }.start();
@@ -2906,6 +2918,7 @@ public class ZeeConfig {
                                 POSE_PLAYER_ROWBOAT_ACTIVE, POSE_PLAYER_ROWBOAT_IDLE,
                                 POSE_PLAYER_CORACLE_IDLE, POSE_PLAYER_CORACLE_ACTIVE
                         );
+                        // if disembarked then liftup vehicle
                         if(playerDisembarked) {
                             try {
                                 sleep(100);//lagalagalaga
@@ -2913,8 +2926,12 @@ public class ZeeConfig {
                             } catch (InterruptedException e) {
                                 e.printStackTrace();
                             }
-                            gameUI.act("travel","hearth");
                         }
+                        else
+                            skipNextLiftVehicle = true; // travel hearth without checking
+
+                        //travel hearth anyways
+                        gameUI.act("travel","hearth");
                     }
                 }.start();
             }catch (Exception e){

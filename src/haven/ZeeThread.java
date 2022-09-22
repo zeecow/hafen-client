@@ -331,7 +331,7 @@ public class ZeeThread  extends Thread{
     }
 
     public static boolean waitPlayerPoseNotInListTimeout(long timeoutMs, String... poseList) {
-        //println(">waitPlayerPoseNotInListTimeout");
+        println(">waitPlayerPoseNotInListTimeout");
         String playerPoses = "";
         boolean exit = false;
         boolean poseInList = true;//assume pose is in list
@@ -364,7 +364,7 @@ public class ZeeThread  extends Thread{
         }catch (Exception e){
             e.printStackTrace();
         }
-        //println("waitPlayerPoseNotInListTimeout ret "+!poseInList);
+        println("waitPlayerPoseNotInListTimeout ret "+!poseInList);
         return !poseInList;
     }
 
