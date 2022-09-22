@@ -123,7 +123,12 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 	    }
 	    if(local && (menu != null)) {
 		if(res != null) {
-		    MenuGrid.Pagina pag = menu.paginafor(slot.res);
+		    MenuGrid.Pagina pag;
+		    /* XXX: This is a hack. The pagina system needs to be remade. */
+		    if(res != null)
+			pag = menu.paginafor(res.indir());
+		    else
+			pag = menu.paginafor(slot.res);
 		    try {
 			MenuGrid.PagButton btn = pag.button();
 			menu.use(btn, iact, false);
@@ -1387,7 +1392,7 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 	    super(mapmenubg.sz());
 	    add(new MenuCheckBox("lbtn-claim", kb_claim, "Display personal claims"), 0, 0).changed(a -> toggleol("cplot", a));
 	    add(new MenuCheckBox("lbtn-vil", kb_vil, "Display village claims"), 0, 0).changed(a -> toggleol("vlg", a));
-	    add(new MenuCheckBox("lbtn-rlm", kb_rlm, "Display realms"), 0, 0).changed(a -> toggleol("realm", a));
+	    add(new MenuCheckBox("lbtn-rlm", kb_rlm, "Display provinces"), 0, 0).changed(a -> toggleol("prov", a));
 	    add(new MenuCheckBox("lbtn-map", kb_map, "Map")).state(() -> wndstate(mapfile)).click(() -> {
 		    togglewnd(mapfile);
 		    if(mapfile != null)
