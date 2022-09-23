@@ -659,8 +659,12 @@ public class ZeeManagerGobClick extends ZeeThread{
         ZeeManagerStockpile.useWheelbarrowAtStockpile(gob);
     }
 
+    public static void disembarkVehicle(Coord coordMc) {
+        ZeeConfig.clickCoord(coordMc,1,UI.MOD_CTRL);
+    }
+
     public static void disembarkVehicle(Coord2d coordMc) {
-        ZeeConfig.clickCoord(coordMc.floor(posres),1,UI.MOD_CTRL);
+        disembarkVehicle(coordMc.floor(posres));
     }
 
     public static void dismountHorse(Coord2d coordMc) {

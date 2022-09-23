@@ -468,13 +468,15 @@ public class ZeeManagerStockpile extends ZeeThread{
         try {
             ZeeConfig.addPlayerText("wheeling");
             Coord stockpileCoord = ZeeConfig.lastMapViewClickMc.floor(posres);
-            if (ZeeConfig.isPlayerMountingHorse()) {
+            if (ZeeConfig.isPlayerMountingHorse() || ZeeConfig.isPlayerDrivingingKicksled()) {
+                //move to stockpile
                 double dist = ZeeConfig.distanceToPlayer(gobStockpile);
                 if (dist > 100){
                     ZeeConfig.moveToGobTile(gobStockpile);
                     waitPlayerDistToGob(gobStockpile,90);
                 }
-                ZeeConfig.unmountPlayerFromHorse(stockpileCoord);
+                //disembark/unmount
+                ZeeManagerGobClick.disembarkVehicle(stockpileCoord);
                 sleep(999);
             }
             Coord pc = ZeeConfig.getPlayerCoord();
