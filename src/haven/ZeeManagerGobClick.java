@@ -453,14 +453,18 @@ public class ZeeManagerGobClick extends ZeeThread{
             new ZeeThread() {
                 public void run() {
                     try {
-                        //dismount horse
-                        if (ZeeConfig.isPlayerMountingHorse())
+                        if (ZeeConfig.isPlayerMountingHorse()) {
+                            //dismount horse
                             dismountHorse(mc);
-                        //disembark kicksled
-                        if (ZeeConfig.isPlayerDrivingingKicksled())
+                            //re-drive wheelbarrow
+                            gobClick(gob,3);
+                        }
+                        if (ZeeConfig.isPlayerDrivingingKicksled()) {
+                            //disembark kicksled
                             disembarkVehicle(mc);
-                        //click wheelbarrow
-                        gobClick(gob,3);
+                            //re-drive wheelbarrow
+                            gobClick(gob,3);
+                        }
                         //show gridline
                         if(ZeeConfig.autoToggleGridLines && waitPlayerPose(ZeeConfig.POSE_PLAYER_DRIVE_WHEELBARROW)){
                             ZeeConfig.gameUI.map.showgrid(true);
