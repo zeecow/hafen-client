@@ -520,7 +520,10 @@ public class ZeeManagerGobClick extends ZeeThread{
                             disembarkVehicle(mc);
                             waitPlayerPoseNotInList(ZeeConfig.POSE_PLAYER_KICKSLED_IDLE, ZeeConfig.POSE_PLAYER_KICKSLED_ACTIVE);
                             sleep(100);//lagalagalaga
-                            gobClick(gob,3);
+                            if (isGobHouse(gobName))
+                                gobClick(gob,3,0,16);//gob's door?
+                            else
+                                gobClick(gob,3);
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }
