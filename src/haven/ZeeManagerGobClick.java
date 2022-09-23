@@ -141,7 +141,7 @@ public class ZeeManagerGobClick extends ZeeThread{
                             ZeeConfig.gameUI.map.showgrid(true);
                     }
                     // clear snow area
-                    else if (ZeeConfig.getTileResName(coordMc).endsWith("/snow")){
+                    else if (ZeeConfig.getTileResName(coordMc).contains("tiles/snow")){
                         //haven.MapView@11460448 ; click ; [(629, 490), (1014904, 1060429), 3, 1]
                         ZeeConfig.clickCoord(coordMc.floor(posres),3,UI.MOD_SHIFT);
                     }
