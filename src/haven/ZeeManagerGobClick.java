@@ -210,8 +210,10 @@ public class ZeeManagerGobClick extends ZeeThread{
                     else if (isGobGate(gobName))
                         openGateWheelbarrow(gob);
                     // lift up wb and store in cart
-                    else if (gobName.endsWith("/cart"))
-                        liftAndStoreWheelbarrow(gob);
+                    else if (gobName.endsWith("/cart")) {
+                        Gob wb = ZeeConfig.getClosestGobByNameContains("/wheelbarrow");
+                        liftGobAndClickTarget(wb,gob);
+                    }
                 }
                 // drive ship
                 else if(gobName.endsWith("/knarr") || gobName.endsWith("/snekkja")) {
@@ -469,14 +471,26 @@ public class ZeeManagerGobClick extends ZeeThread{
                 }
             }.start();
         }
-        // while driving wheelbarrow: open gate, store wb 
-        else if (isGobInListEndsWith(gobName,"cart,rowboat,snekkja,knarr,wagon,gardenshed,gate") && ZeeConfig.isPlayerDrivingWheelbarrow()){
+        // while driving wheelbarrow: lift and click
+        else if (ZeeConfig.isPlayerDrivingWheelbarrow() &&
+                ( isGobInListEndsWith(gobName,"/cart,/rowboat,/snekkja,/knarr,/wagon,/spark,/gardenshed,/upstairs,/downstairs,/cellardoor,/minehole,/ladder,/cavein,/caveout,/burrow,/igloo,gate")
+                  || isGobHouse(gobName) || isGobHouseInnerDoor(gobName)))
+        {
             new ZeeThread() {
                 public void run() {
-                    if (isGobGate(gobName))
-                        openGateWheelbarrow(gob);
-                    else if (isGobInListEndsWith(gobName,"cart,rowboat,snekkja,knarr,wagon,gardenshed"))
-                        liftAndStoreWheelbarrow(gob);
+                    Gob wb = ZeeConfig.getClosestGobByNameContains("/wheelbarrow");
+                    if (isGobHouse(gobName)) {
+                        try {
+                            liftGob(wb);
+                            sleep(100);
+                            gobClick(gob, 3, 0, 16);//gob's door?
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    else{
+                        liftGobAndClickTarget(wb, gob);
+                    }
                 }
             }.start();
         }
@@ -1036,25 +1050,21 @@ public class ZeeManagerGobClick extends ZeeThread{
         ZeeConfig.removePlayerText();
     }
 
-    private static void liftAndStoreWheelbarrow(Gob gob){
-        Gob storage = gob;
+    private static void liftGobAndClickTarget(Gob liftGob, Gob target){
         try {
             waitNoFlowerMenu();
-            ZeeConfig.addPlayerText("storing");
-            Gob wb = ZeeConfig.getClosestGobByNameContains("gfx/terobjs/vehicle/wheelbarrow");
-            if (wb==null){
-                ZeeConfig.msg("no wheelbarrow close 3");
-            }else {
-                double dist;
-                ZeeConfig.clickRemoveCursor();//remove hand cursor
-                liftGob(wb);
-                dist = ZeeConfig.distanceToPlayer(wb);
-                if (dist==0) {
-                    gobClick(storage, 3);// click storage
-                    waitPlayerIdleVelocity();
-                }else{
-                    ZeeConfig.msg("wheelbarrow unreachable?");//impossible case?
-                }
+            ZeeConfig.addPlayerText("lift and click");
+            double dist;
+            //remove hand cursor
+            ZeeConfig.clickRemoveCursor();
+            liftGob(liftGob);
+            dist = ZeeConfig.distanceToPlayer(liftGob);
+            if (dist==0) {
+                // click target
+                gobClick(target, 3);
+                //waitPlayerIdleVelocity();
+            }else{
+                ZeeConfig.msg("couldnt lift gob?");//impossible case?
             }
         }catch (Exception e){
             e.printStackTrace();
