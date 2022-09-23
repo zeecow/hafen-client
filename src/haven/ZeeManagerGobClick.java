@@ -477,7 +477,7 @@ public class ZeeManagerGobClick extends ZeeThread{
         }
         // while driving wheelbarrow: lift and click
         else if (ZeeConfig.isPlayerDrivingWheelbarrow() &&
-                ( isGobInListEndsWith(gobName,"/cart,/rowboat,/snekkja,/knarr,/wagon,/spark,/gardenshed,/upstairs,/downstairs,/cellardoor,/minehole,/ladder,/cavein,/caveout,/burrow,/igloo,gate")
+                ( isGobInListEndsWith(gobName,"/cart,/rowboat,/snekkja,/knarr,/wagon,/spark,/gardenshed,/upstairs,/downstairs,/cellardoor,/cellarstairs,/minehole,/ladder,/cavein,/caveout,/burrow,/igloo,gate")
                   || isGobHouse(gobName) || isGobHouseInnerDoor(gobName)))
         {
             new ZeeThread() {
@@ -557,7 +557,7 @@ public class ZeeManagerGobClick extends ZeeThread{
     static boolean isGobRequireDisembarkVehicle(String gobName) {
         return isGobHouseInnerDoor(gobName) || isGobHouse(gobName) || isGobChair(gobName)
                 || isGobInListEndsWith(gobName,
-                    "/upstairs,/downstairs,/cavein,/caveout,/burrow,/igloo," +
+                    "/upstairs,/downstairs,/minehole,/ladder,/cavein,/caveout,/burrow,/igloo," +
                         "/wheelbarrow,/loom,/cauldron,/churn,/swheel,/ropewalk," +
                         "/meatgrinder,/potterswheel,/quern,/plow,/winepress"
                 );
