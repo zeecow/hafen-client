@@ -79,17 +79,17 @@ public class ZeeManagerIcons {
         return retImg;
     }
 
-    private static BufferedImage imgSquare(int side, Color c, boolean border, boolean shadow) {
+    public static BufferedImage imgSquare(int side, Color c, boolean border, boolean shadow) {
         return imgRect(side,side,c,border,shadow?1:0);
     }
 
-    private static BufferedImage imgCirle(int diameter, Color c, boolean border, boolean shadow) {
+    public static BufferedImage imgCirle(int diameter, Color c, boolean border, boolean shadow) {
         if (diameter < 5)
             diameter = 5;
         return imgOval(diameter,diameter,c,border,shadow?1:0);
     }
 
-    private static BufferedImage imgTriangleUp(int s, Color c, boolean border, boolean shadow) {
+    public static BufferedImage imgTriangleUp(int s, Color c, boolean border, boolean shadow) {
         return imgPolygon(s, s,
             new int[]{ s/2, 0, s}, // x points
             new int[]{ 0, s, s}, // y points
@@ -97,7 +97,7 @@ public class ZeeManagerIcons {
         );
     }
 
-    private static BufferedImage imgTriangleDown(int s, Color c, boolean border, boolean shadow) {
+    public static BufferedImage imgTriangleDown(int s, Color c, boolean border, boolean shadow) {
         return imgPolygon(s, s,
                 new int[]{ 0, s, s/2}, // x points
                 new int[]{ 0, 0, s}, // y points
@@ -105,7 +105,7 @@ public class ZeeManagerIcons {
         );
     }
 
-    private static BufferedImage imgDiamond(int s, Color c, boolean border, boolean shadow) {
+    public static BufferedImage imgDiamond(int s, Color c, boolean border, boolean shadow) {
         if (s % 2 > 0)
             s++; // only even works
         return imgPolygon(s, s,
@@ -115,7 +115,7 @@ public class ZeeManagerIcons {
         );
     }
 
-    private static BufferedImage imgBoat(int s, Color c, boolean border, boolean shadow) {
+    public static BufferedImage imgBoat(int s, Color c, boolean border, boolean shadow) {
         return imgPolygon(s*2, s,
                 new int[]{ 0, s, s-(s/4), s/4 }, // x points
                 new int[]{ s/2, s/2, s, s }, // y points
@@ -474,6 +474,22 @@ public class ZeeManagerIcons {
         for (int i = 0; i < testboat.length; i++) {
             g.image(testboat[i],Coord.of(50+(i*30), 250));
         }
+    }
+
+
+    static MiniMap.DisplayMarker latestFocusedMark;
+    static BufferedImage latestFocusedMarkBgImg = ZeeManagerIcons.imgCirle(20,Color.green,false,false);
+    public static void focusMarkExpandedMap(MiniMap.DisplayMarker mark) {
+        MapWnd map = ZeeConfig.gameUI.mapfile;
+        map.compact(false);
+        Utils.setprefb("compact-map", false);
+        map.focus(mark.m);
+        map.view.center(new MiniMap.SpecLocator(mark.m.seg, mark.m.tc));
+        if (ZeeManagerIcons.latestFocusedMark != null){
+            ZeeManagerIcons.latestFocusedMark.isListFocused = false;
+        }
+        mark.isListFocused = true;
+        latestFocusedMark = mark;
     }
 
     private static void println(String s) {

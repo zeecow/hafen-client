@@ -308,7 +308,12 @@ public class MapWnd extends Window implements Console.Directory {
 		    focus(mark.m);
 		    return(true);
 		}
-	    } else if(mark.m instanceof SMarker) {
+	    }
+		//midclick mark expands minimap and center mark
+		else if (button==2 && !press && decohide()) {
+			ZeeManagerIcons.focusMarkExpandedMap(mark);
+		}
+		else if(mark.m instanceof SMarker) {
 		Gob gob = MarkerID.find(ui.sess.glob.oc, ((SMarker)mark.m).oid);
 		if(gob != null)
 		    mvclick(mv, null, loc, gob, button);
@@ -630,6 +635,9 @@ public class MapWnd extends Window implements Console.Directory {
 	    change2(lm);
 	    if(lm != null)
 		view.center(new SpecLocator(lm.mark.seg, lm.mark.tc));
+		if (ZeeManagerIcons.latestFocusedMark!=null){
+			ZeeManagerIcons.latestFocusedMark.isListFocused = false;
+		}
 	}
 
 	public void change2(ListMarker lm) {
@@ -709,6 +717,9 @@ public class MapWnd extends Window implements Console.Directory {
 
     public void recenter() {
 	view.follow(player);
+	if (ZeeManagerIcons.latestFocusedMark!=null){
+		ZeeManagerIcons.latestFocusedMark.isListFocused = false;
+	}
     }
 
     public void focus(Marker m) {

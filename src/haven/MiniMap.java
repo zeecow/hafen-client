@@ -340,6 +340,7 @@ public class MiniMap extends Widget {
 	private Resource.Image img;
 	private Coord imgsz;
 	private Coord cc;
+	public boolean isListFocused = false;
 
 	static {
 	    Resource flag = Resource.local().loadwait("gfx/hud/mmap/flag");
@@ -358,6 +359,10 @@ public class MiniMap extends Widget {
 	public void draw(GOut g, Coord c) {
 	    if(m instanceof PMarker) {
 		Coord ul = c.sub(flagcc);
+		if (isListFocused){
+			g.image(ZeeManagerIcons.latestFocusedMarkBgImg,ul);
+			g.chcolor();
+		}
 		g.chcolor(((PMarker)m).color);
 		g.image(flagfg, ul);
 		g.chcolor();

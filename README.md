@@ -34,6 +34,7 @@ Client focusing on small helper tasks, many using mouse middle button, and other
  - midclick Barter Stand "Buy" button to auto-buy  
  - Audio msg mute list
  - lift vehicle before travel hearth
+ - midclick mark expands minimap, center mark, highlight mark
  - midclick ground 
    - while holding item will move to location (simulates ctrl+click)
    - while inspecting icon active, will msg tile name
