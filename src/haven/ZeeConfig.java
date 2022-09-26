@@ -248,7 +248,7 @@ public class ZeeConfig {
     ));
     public final static Set<String> mineablesOre = new HashSet<String>(Arrays.asList(
             "cassiterite","chalcopyrite","malachite","ilmenite","cinnabar",
-            "limonite","hematite","magnetite","leadglance","peacockore","wineglance"
+            "limonite","hematite","magnetite","leadglance","peacockore","cuprite"
     ));
     public final static Set<String> mineablesOrePrecious = new HashSet<String>(Arrays.asList(
             "galena","argentite","hornsilver",
