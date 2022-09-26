@@ -3,7 +3,9 @@ package haven;
 
 import haven.resutil.WaterTile;
 
+import java.awt.event.KeyEvent;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static haven.OCache.posres;
@@ -1729,5 +1731,43 @@ public class ZeeManagerGobClick extends ZeeThread{
             return gi != null ? gi.gob : null;
         }
         return null;
+    }
+
+    static List<String> listPickupGobNameContains = Arrays.asList(
+        "/terobjs/herbs/","/terobjs/items/"
+    );
+    public static void pickupClosestGob(KeyEvent ev) {
+
+        // find eligible gobs
+        List<Gob> gobs = ZeeConfig.findGobsByNameInList(listPickupGobNameContains);
+
+        //TODO consider max distance?
+
+        // calculate closest gob
+        double minDist=0, dist;
+        Gob closestGob = null;
+        for (int i = 0; i < gobs.size(); i++) {
+            dist = ZeeConfig.distanceToPlayer(gobs.get(i));
+            if (closestGob==null ||  dist < minDist){
+                minDist = dist;
+                closestGob = gobs.get(i);
+            }
+        }
+
+        if (closestGob!=null) {
+            // right click ground item
+            if (closestGob.getres().name.contains("/terobjs/items/")) {
+                gobClick(closestGob, 3);
+            }
+            // select pickup menu option
+            else {
+                Gob finalClosestGob = closestGob;
+                new ZeeThread(){
+                    public void run() {
+                        clickGobPetal(finalClosestGob,"Pick");
+                    }
+                }.start();
+            }
+        }
     }
 }

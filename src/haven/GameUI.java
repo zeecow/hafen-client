@@ -1423,9 +1423,9 @@ public class GameUI extends ConsoleHost implements Console.Directory {
     public static final KeyBinding kb_logout = KeyBinding.get("logout", KeyMatch.nil);
     public static final KeyBinding kb_switchchr = KeyBinding.get("logout-cs", KeyMatch.nil);
     public boolean globtype(char key, KeyEvent ev) {
-		if(ZeeConfig.matchKeyShortcut(ev)){
-			return true;
-		}
+	if(ZeeConfig.matchKeyShortcut(ev)){
+		return true;
+	}
 	if(key == ':') {
 	    entercmd();
 	    return(true);

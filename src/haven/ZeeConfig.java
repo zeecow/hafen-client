@@ -1685,9 +1685,15 @@ public class ZeeConfig {
 
         //println(ev.getKeyCode()+"  "+ev.getKeyChar());
 
+        // pickup closest gob, key "q"
+        if (ev.getKeyCode()==81) {
+            ZeeManagerGobClick.pickupClosestGob(ev);
+            return true;
+        }
         // key drink '
-        if (ZeeConfig.drinkKey && ev.getKeyCode()==222){
+        else if (ZeeConfig.drinkKey && ev.getKeyCode()==222){
             ZeeManagerItemClick.drinkFromBeltHandsInv();
+            return true;
         }
         // Arrow up/down changes audio volume
         else if (ZeeConfig.keyUpDownAudioControl && ev.getKeyCode()==KeyEvent.VK_UP){
@@ -2020,6 +2026,20 @@ public class ZeeConfig {
         System.out.println(gobs.size()+" > "+gobs.toString());
     }
 
+    public static List<Gob> findGobsByNameInList(List<String> list) {
+        return ZeeConfig.gameUI.ui.sess.glob.oc.gobStream().filter(gob -> {
+            if(gob!=null && gob.getres()!=null) {
+                for (int i = 0; i < list.size(); i++) {
+                    if (gob.getres().name.contains(list.get(i)))
+                        return true;
+                }
+                return false;
+            } else {
+                return false;
+            }
+        }).collect(Collectors.toList());
+    }
+
     public static List<Gob> findGobsByNameEndsWith(String name) {
         return ZeeConfig.gameUI.ui.sess.glob.oc.gobStream().filter(gob -> {
             if(gob!=null && gob.getres()!=null && gob.getres().name.endsWith(name))
@@ -2068,7 +2088,7 @@ public class ZeeConfig {
                 ZeeManagerGobClick.checkRightClickGob(pc, mc, clickGob, lastMapViewClickGobName);
             }
         }
-        // clicked ground (TODO not working for mining cursor)
+        // clicked ground
         else{
             if (clickb==1) {
                 ZeeManagerStockpile.checkTileSourcePiling(mc);
