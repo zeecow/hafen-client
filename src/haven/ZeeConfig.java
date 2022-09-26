@@ -1686,7 +1686,7 @@ public class ZeeConfig {
         //println(ev.getKeyCode()+"  "+ev.getKeyChar());
 
         // pickup closest gob, key "q"
-        if (ev.getKeyCode()==81) {
+        if (ev.getKeyCode()==81 && !isCombatActive()) {//TODO alternate key during combat?
             ZeeManagerGobClick.pickupClosestGob(ev);
             return true;
         }
@@ -2826,6 +2826,10 @@ public class ZeeConfig {
         if(ZeeManagerStockpile.busy){
             ZeeManagerStockpile.exitManager();
         }
+    }
+
+    static boolean isCombatActive(){
+        return ZeeConfig.gameUI.fv.current != null;
     }
 
     /*
