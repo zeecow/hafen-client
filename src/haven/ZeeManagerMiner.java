@@ -18,11 +18,14 @@ public class ZeeManagerMiner extends ZeeThread{
 
     public static void checkMiningSelection() {
 
-        // save mining start ms
-        if (isCursorMining)
-            miningAreaSelectedMs = ZeeThread.now();
-        else
+        // not mining
+        if (!isCursorMining){
             miningAreaSelectedMs = -1;
+            return;
+        }
+
+        // save mining start ms
+        miningAreaSelectedMs = ZeeThread.now();
 
         // skip if mining on horse
         if (ZeeConfig.isPlayerMountingHorse()){
