@@ -1734,7 +1734,7 @@ public class ZeeManagerGobClick extends ZeeThread{
     }
 
     static List<String> listPickupGobNameContains = Arrays.asList(
-        "/terobjs/herbs/","/terobjs/items/"
+        "/terobjs/herbs/","/terobjs/items/","/kritter/"
     );
     public static void pickupClosestGob(KeyEvent ev) {
 
@@ -1751,10 +1751,14 @@ public class ZeeManagerGobClick extends ZeeThread{
         for (int i = 0; i < gobs.size(); i++) {
             dist = ZeeConfig.distanceToPlayer(gobs.get(i));
             if (closestGob==null ||  dist < minDist){
+                if (dist==0 && gobs.get(i).getres().name.contains("/horse/"))
+                    continue;
                 minDist = dist;
                 closestGob = gobs.get(i);
             }
         }
+
+        println("closestGob == "+closestGob.getres().name);
 
         if (closestGob!=null) {
             // right click ground item
