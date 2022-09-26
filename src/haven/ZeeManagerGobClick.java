@@ -1738,6 +1738,8 @@ public class ZeeManagerGobClick extends ZeeThread{
     );
     public static void pickupClosestGob(KeyEvent ev) {
 
+        boolean shift = ev.isShiftDown();
+
         // find eligible gobs
         List<Gob> gobs = ZeeConfig.findGobsByNameInList(listPickupGobNameContains);
 
@@ -1757,7 +1759,10 @@ public class ZeeManagerGobClick extends ZeeThread{
         if (closestGob!=null) {
             // right click ground item
             if (closestGob.getres().name.contains("/terobjs/items/")) {
-                gobClick(closestGob, 3);
+                if (shift)
+                    gobClick(closestGob, 3, UI.MOD_SHIFT);
+                else
+                    gobClick(closestGob, 3);
             }
             // select pickup menu option
             else {
