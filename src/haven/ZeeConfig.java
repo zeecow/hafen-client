@@ -2068,7 +2068,7 @@ public class ZeeConfig {
                 ZeeManagerGobClick.checkRightClickGob(pc, mc, clickGob, lastMapViewClickGobName);
             }
         }
-        // clicked ground
+        // clicked ground (TODO not working for mining cursor)
         else{
             if (clickb==1) {
                 ZeeManagerStockpile.checkTileSourcePiling(mc);
@@ -2571,6 +2571,7 @@ public class ZeeConfig {
                 loading.printStackTrace();
                 return;
             }
+            // ignore bat if using batcape
             if (ob.resName.contentEquals("gfx/kritter/bat/bat") && ZeeManagerItemClick.isItemEquipped("/batcape")) {
                 return;
             }
@@ -2579,6 +2580,8 @@ public class ZeeConfig {
             ZeeConfig.applyGobSettingsHighlight(ob, ZeeConfig.getHighlightGobColor(ob));
             if (ob.resName!=null && !ob.resName.isBlank() && !mapGobSession.containsKey(ob.resName))
                 mapGobSession.put(ob.resName,"");
+            if (ZeeManagerMiner.isCursorMining && ZeeManagerMiner.isBoulder(ob))
+                ZeeManagerMiner.checkBoulderGobAdded(ob);
         }
     }
 
@@ -2754,9 +2757,16 @@ public class ZeeConfig {
     }
 
     public static void checkNewCursorName(String curs) {
+
+        // mining
+        ZeeManagerMiner.isCursorMining = curs.contentEquals(CURSOR_MINE);
+
+        // toggle grid lines
         if (autoToggleGridLines) {
-            gameUI.map.showgrid(curs.contentEquals(CURSOR_HARVEST) || curs.contentEquals(CURSOR_MINE) || curs.contentEquals(CURSOR_DIG));
+            gameUI.map.showgrid(curs.contentEquals(CURSOR_HARVEST) || ZeeManagerMiner.isCursorMining || curs.contentEquals(CURSOR_DIG));
         }
+
+        // inspect tooltips
         showInspectTooltip = curs.contentEquals(CURSOR_INSPECT);
         if (!showInspectTooltip)
             gameUI.map.ttip = null;

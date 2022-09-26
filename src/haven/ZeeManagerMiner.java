@@ -5,7 +5,10 @@ import java.util.List;
 
 public class ZeeManagerMiner extends ZeeThread{
 
-    private static final double DIST_BOULDER = 25;
+    private static final double MAX_DIST_BOULDER = 25;
+
+    public static boolean isCursorMining;
+    public static long miningAreaSelectedMs = -1;
     static boolean useOreForColumns = false;
     public static long lastDropItemMs = 0;
     public static boolean mining;
@@ -14,92 +17,98 @@ public class ZeeManagerMiner extends ZeeThread{
     static String listOreColumn = "leadglance,cassiterite,chalcopyrite,cinnabar,malachite";
 
     public static void checkMiningSelection() {
-        if (ZeeConfig.getCursorName().contentEquals(ZeeConfig.CURSOR_MINE)){
 
-            // skip if mining on horse
-            if (ZeeConfig.isPlayerMountingHorse()){
-                ZeeConfig.msgError("TROLL RISK: mining on horse");
-                return;
-            }
+        // save mining start ms
+        if (isCursorMining)
+            miningAreaSelectedMs = ZeeThread.now();
+        else
+            miningAreaSelectedMs = -1;
 
-            // if tunnel mining, show Helper Window
-            if (tunnelCheckbox && !tunneling && isTunnel(ZeeConfig.lastSavedOverlay.a.sz())){
-                tunneling = true;
-                tunnelHelperShowWindow();
-                tunnelHelperButtonAct.disable(true);
-            }
-
-            // wait player idle, if boulder close, chip it and resume mining
-            new ZeeThread(){
-                public void run() {
-                    try {
-                        if (isCombatActive())
-                            return;
-                        if (tunneling) {
-                            if (tunnelHelperStage == TUNNELHELPER_STAGE0_IDLE) {
-                                tunnelHelperSetStage(TUNNELHELPER_STAGE1_MINETUNNEL);
-                            }
-                            else if (tunnelHelperStage == TUNNELHELPER_STAGE2_WAITNEWCOLTILE){
-                                tunnelHelperSetStage(TUNNELHELPER_STAGE3_MINECOL);
-                            }
-                        }
-
-                        // wait mining stop
-                        waitPlayerPoseMs(ZeeConfig.POSE_PLAYER_IDLE, 1000);
-                        if (isCombatActive())
-                            return;
-
-                        // save player coord after mining new col tile
-                        if (tunneling && tunnelHelperStage == TUNNELHELPER_STAGE3_MINECOL){
-                            println("saved end coord");
-                            if (tunnelHelperEndCoord!=null)
-                                tunnelHelperEndCoordPrev = Coord.of(tunnelHelperEndCoord);
-                            tunnelHelperEndCoord = ZeeConfig.getPlayerCoord();
-                        }
-
-                        // check if boulder close
-                        if (!ZeeConfig.autoChipMinedBoulder)
-                            return;
-                        Gob boulder = getBoulderCloseEnoughForChipping();
-
-                        // no boulder, mining stopped
-                        if (boulder == null) {
-                            if (tunneling) {
-                                // finished mining tunnel
-                                if (tunnelHelperStage == TUNNELHELPER_STAGE1_MINETUNNEL) {
-                                    tunnelHelperSetStage(TUNNELHELPER_STAGE2_WAITNEWCOLTILE);
-                                    ZeeConfig.cursorChange(ZeeConfig.ACT_MINE);// prepare mining cursor
-                                    //ZeeConfig.addPlayerText("click new col tile");
-                                }
-                                // finished mining new col tile
-                                else if (tunnelHelperStage == TUNNELHELPER_STAGE3_MINECOL) {
-                                    tunnelHelperSetStage(TUNNELHELPER_STAGE4_PICKSTONE);
-                                    //ZeeConfig.removePlayerText();
-                                    tunnelHelperButtonAct.disable(false);
-                                    ZeeConfig.clickRemoveCursor();
-                                    waitCursor(ZeeConfig.CURSOR_ARW);
-                                    if (!tunnelHelperPickStonesManualClick){
-                                        tunnelHelperButtonAct.click();
-                                        tunnelHelperButtonAct.disable(true);
-                                    }
-                                }
-                            }
-                            return;
-                        }
-
-                        if (isCombatActive())
-                            return;
-
-                        // chip boulder
-                        taskChipBoulder(boulder);
-
-                    }catch (Exception e){
-                        e.printStackTrace();
-                        ZeeConfig.removePlayerText();
-                    }
-                }
-            }.start();
+        // skip if mining on horse
+        if (ZeeConfig.isPlayerMountingHorse()){
+            ZeeConfig.msgError("TROLL RISK: mining on horse");
+            return;
         }
+
+        // if tunnel mining, show Helper Window
+        if (tunnelCheckbox && !tunneling && isTunnel(ZeeConfig.lastSavedOverlay.a.sz())){
+            tunneling = true;
+            tunnelHelperShowWindow();
+            tunnelHelperButtonAct.disable(true);
+        }
+
+        // TODO remove commented code if unecessary, test it out
+
+        // wait player idle, if boulder close, chip it and resume mining
+//            new ZeeThread(){
+//                public void run() {
+//                    try {
+//                        if (isCombatActive())
+//                            return;
+//                        if (tunneling) {
+//                            if (tunnelHelperStage == TUNNELHELPER_STAGE0_IDLE) {
+//                                tunnelHelperSetStage(TUNNELHELPER_STAGE1_MINETUNNEL);
+//                            }
+//                            else if (tunnelHelperStage == TUNNELHELPER_STAGE2_WAITNEWCOLTILE){
+//                                tunnelHelperSetStage(TUNNELHELPER_STAGE3_MINECOL);
+//                            }
+//                        }
+//
+//                        // wait mining stop
+//                        waitPlayerPoseMs(ZeeConfig.POSE_PLAYER_IDLE, 1000);
+//                        if (isCombatActive())
+//                            return;
+//
+//                        // save player coord after mining new col tile
+//                        if (tunneling && tunnelHelperStage == TUNNELHELPER_STAGE3_MINECOL){
+//                            println("saved end coord");
+//                            if (tunnelHelperEndCoord!=null)
+//                                tunnelHelperEndCoordPrev = Coord.of(tunnelHelperEndCoord);
+//                            tunnelHelperEndCoord = ZeeConfig.getPlayerCoord();
+//                        }
+//
+//                        // check if boulder close
+//                        if (!ZeeConfig.autoChipMinedBoulder)
+//                            return;
+//                        Gob boulder = getBoulderCloseEnoughForChipping();
+//
+//                        // no boulder, mining stopped
+//                        if (boulder == null) {
+//                            if (tunneling) {
+//                                // finished mining tunnel
+//                                if (tunnelHelperStage == TUNNELHELPER_STAGE1_MINETUNNEL) {
+//                                    tunnelHelperSetStage(TUNNELHELPER_STAGE2_WAITNEWCOLTILE);
+//                                    ZeeConfig.cursorChange(ZeeConfig.ACT_MINE);// prepare mining cursor
+//                                    //ZeeConfig.addPlayerText("click new col tile");
+//                                }
+//                                // finished mining new col tile
+//                                else if (tunnelHelperStage == TUNNELHELPER_STAGE3_MINECOL) {
+//                                    tunnelHelperSetStage(TUNNELHELPER_STAGE4_PICKSTONE);
+//                                    //ZeeConfig.removePlayerText();
+//                                    tunnelHelperButtonAct.disable(false);
+//                                    ZeeConfig.clickRemoveCursor();
+//                                    waitCursor(ZeeConfig.CURSOR_ARW);
+//                                    if (!tunnelHelperPickStonesManualClick){
+//                                        tunnelHelperButtonAct.click();
+//                                        tunnelHelperButtonAct.disable(true);
+//                                    }
+//                                }
+//                            }
+//                            return;
+//                        }
+//
+//                        if (isCombatActive())
+//                            return;
+//
+//                        // chip boulder
+//                        taskChipBoulder(boulder);
+//
+//                    }catch (Exception e){
+//                        e.printStackTrace();
+//                        ZeeConfig.removePlayerText();
+//                    }
+//                }
+//            }.start();
     }
 
     static boolean tunnelCheckbox = false;
@@ -308,7 +317,7 @@ public class ZeeManagerMiner extends ZeeThread{
 
     public static Gob getBoulderCloseEnoughForChipping() {
         Gob boulder = ZeeConfig.getClosestGobByNameContains("gfx/terobjs/bumlings/");
-        if (boulder!=null && ZeeConfig.distanceToPlayer(boulder) < DIST_BOULDER){
+        if (boulder!=null && ZeeConfig.distanceToPlayer(boulder) < MAX_DIST_BOULDER){
             return boulder;
         }
         return null;
@@ -437,7 +446,7 @@ public class ZeeManagerMiner extends ZeeThread{
         if(waitPlayerIdlePose()){
             if (isCombatActive())
                 return;
-            //println("chip boulder done");
+            //resume mining
             ZeeConfig.gameUI.map.wdgmsg("sel", ZeeConfig.lastSavedOverlayStartCoord, ZeeConfig.lastSavedOverlayEndCoord, ZeeConfig.lastSavedOverlayModflags);
         }else{
             println("canceled chipping boulder?");
@@ -479,23 +488,40 @@ public class ZeeManagerMiner extends ZeeThread{
         }.start();
     }
 
-    public static boolean chipBoulder(Gob boulder) {
-        try {
-            //ZeeClickGobManager.gobClick(boulder, 3);
-            ZeeConfig.clickRemoveCursor();//remove mining cursor
-            if(!waitCursor(ZeeConfig.CURSOR_ARW)){
-                println(">chipBoulder couldn't change cursor to arrow");
-                return false;
+    public static void chipBoulderNewThread(Gob boulder) {
+        new ZeeThread(){
+            public void run() {
+                try {
+                    ZeeConfig.addPlayerText("bouldan");
+
+                    //remove mining cursor
+                    ZeeConfig.clickRemoveCursor();
+                    if(!waitCursor(ZeeConfig.CURSOR_ARW)){
+                        println(">chipBoulder couldn't change cursor to arrow");
+                        ZeeConfig.removePlayerText();
+                        return;
+                    }
+
+                    //chip boulder
+                    ZeeManagerGobClick.clickGobPetal(boulder, "Chip stone");
+                    waitNoFlowerMenu();
+
+                    //restore mining icon for autodrop
+                    ZeeConfig.cursorChange(ZeeConfig.ACT_MINE);
+
+                    //wait chipping and resume minig
+                    if(waitPlayerIdlePose()){
+                        //resume mining
+                        ZeeConfig.gameUI.map.wdgmsg("sel", ZeeConfig.lastSavedOverlayStartCoord, ZeeConfig.lastSavedOverlayEndCoord, ZeeConfig.lastSavedOverlayModflags);
+                    }
+
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+
+                ZeeConfig.removePlayerText();
             }
-            ZeeManagerGobClick.clickGobPetal(boulder, "Chip stone");//chip boulder
-            waitNoFlowerMenu();
-            ZeeConfig.cursorChange(ZeeConfig.ACT_MINE);//restore mining icon for autodrop
-            //return waitBoulderFinish(boulder);
-            return waitPlayerIdlePose();
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-        return false;
+        }.start();
     }
 
     // TODO delete if waitPlayerPoseIdle works
@@ -548,6 +574,25 @@ public class ZeeManagerMiner extends ZeeThread{
             (gob.getres().name.equals("gfx/terobjs/minebeam") ||
             gob.getres().name.equals("gfx/terobjs/column") ||
             gob.getres().name.equals("gfx/terobjs/minesupport"));
+    }
+
+    public static void checkBoulderGobAdded(Gob boulder) {
+
+        // check mining cursor
+        if (!isCursorMining)
+            return;
+
+        // new boulders only
+        long boulderSpawnMs = ZeeThread.now();
+        if (miningAreaSelectedMs < 0 || boulderSpawnMs < miningAreaSelectedMs)
+            return;
+
+        // discard distant boulders
+        double dist = ZeeConfig.distanceToPlayer(boulder);
+        if(dist > MAX_DIST_BOULDER)
+            return;
+
+        chipBoulderNewThread(boulder);
     }
 
     public static void println(String s) {
