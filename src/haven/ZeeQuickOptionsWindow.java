@@ -155,6 +155,8 @@ public class ZeeQuickOptionsWindow {
     }
 
     public static void reset() {
+        if (window!=null)
+            window.remove();
         window = null;
         cbPetal = null;
         listJOptsWidgets.clear();
