@@ -2026,11 +2026,12 @@ public class ZeeConfig {
         System.out.println(gobs.size()+" > "+gobs.toString());
     }
 
-    public static List<Gob> findGobsByNameInList(List<String> list) {
+    // pattern must match whole gob name
+    public static List<Gob> findGobsMatchingRegexpList(List<String> regexPatterns) {
         return ZeeConfig.gameUI.ui.sess.glob.oc.gobStream().filter(gob -> {
             if(gob!=null && gob.getres()!=null) {
-                for (int i = 0; i < list.size(); i++) {
-                    if (gob.getres().name.contains(list.get(i)))
+                for (int i = 0; i < regexPatterns.size(); i++) {
+                    if (gob.getres().name.matches(regexPatterns.get(i)))
                         return true;
                 }
                 return false;

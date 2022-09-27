@@ -1733,34 +1733,37 @@ public class ZeeManagerGobClick extends ZeeThread{
         return null;
     }
 
-    static List<String> listPickupGobNameContains = Arrays.asList(
-        "/terobjs/herbs/","/terobjs/items/","/kritter/"
+    // pattern must match whole gob name
+    static List<String> listPickupGobNamePatterns = Arrays.asList(
+        "gfx/terobjs/herbs/.+", "gfx/terobjs/items/.+", "gfx/kritter/.+"
     );
     public static void pickupClosestGob(KeyEvent ev) {
 
         boolean shift = ev.isShiftDown();
 
         // find eligible gobs
-        List<Gob> gobs = ZeeConfig.findGobsByNameInList(listPickupGobNameContains);
+        List<Gob> gobs = ZeeConfig.findGobsMatchingRegexpList(listPickupGobNamePatterns);
 
         //TODO consider max distance?
 
         // calculate closest gob
         double minDist=0, dist;
         Gob closestGob = null;
+        String name;
         for (int i = 0; i < gobs.size(); i++) {
             dist = ZeeConfig.distanceToPlayer(gobs.get(i));
+            name = gobs.get(i).getres().name;
             if (closestGob==null ||  dist < minDist){
-                if (dist==0 && gobs.get(i).getres().name.contains("/horse/"))
+                if (dist==0 && name.contains("/horse/"))
                     continue;
                 minDist = dist;
                 closestGob = gobs.get(i);
             }
         }
 
-        println("closestGob == "+closestGob.getres().name);
 
         if (closestGob!=null) {
+            println("closestGob == "+closestGob.getres().name);
             // right click ground item
             if (closestGob.getres().name.contains("/terobjs/items/")) {
                 if (shift)
