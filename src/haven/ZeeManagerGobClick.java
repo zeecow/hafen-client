@@ -6,6 +6,7 @@ import haven.resutil.WaterTile;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 
 import static haven.OCache.posres;
@@ -1743,14 +1744,40 @@ public class ZeeManagerGobClick extends ZeeThread{
     static List<String> listPickupGobNamePatterns = Arrays.asList(
         "gfx/terobjs/herbs/.+", "gfx/terobjs/items/.+", "gfx/kritter/.+"
     );
-    static List<String> listAlreadyPickedGobsCtrl = new ArrayList<>();
+    static List<Gob> listPickupGobsCtrl = new LinkedList<>();
+    static Gob pickupGobCtrlTarget = null;
+    static void pickupGobCtrlReleased(){
+        if (pickupGobCtrlTarget!=null){
+            ZeeConfig.println("pickup ctrl "+pickupGobCtrlTarget.getres().name);
+            // right click ground item
+            if (pickupGobCtrlTarget.getres().name.contains("/terobjs/items/")) {
+                gobClick(pickupGobCtrlTarget, 3);
+            }
+            // select pickup menu option
+            else {
+                Gob finalClosestGob = pickupGobCtrlTarget;
+                new ZeeThread(){
+                    public void run() {
+                        clickGobPetal(finalClosestGob,"Pick");
+                    }
+                }.start();
+            }
+            //cleanup
+            pickupGobCtrlTarget = null;
+            listPickupGobsCtrl.clear();
+            ZeeConfig.removePlayerText();
+        }
+    }
     public static void pickupClosestGob(KeyEvent ev) {
 
-        boolean shift = ev.isShiftDown();
+        boolean isShift = ev.isShiftDown();
+        boolean isCtrl = ev.isControlDown();
 
-        // ctrl+q picks next closest gob, no ctrl resets list
-        if (!ev.isControlDown())
-            listAlreadyPickedGobsCtrl.clear();
+        // ctrl+q cycles gob target until release
+        if (!isCtrl) {
+            listPickupGobsCtrl.clear();
+            pickupGobCtrlTarget = null;
+        }
 
         // find eligible gobs
         List<Gob> gobs = ZeeConfig.findGobsMatchingRegexpList(listPickupGobNamePatterns);
@@ -1768,20 +1795,33 @@ public class ZeeManagerGobClick extends ZeeThread{
                 //ignore mounted horse
                 if (dist==0 && name.contains("/horse/"))
                     continue;
-                //ctrl+q ignore already picked gobs
-                if (ev.isControlDown() && listAlreadyPickedGobsCtrl.contains(name))
+                //ctrl+q cycle gobs
+                if (isCtrl && listPickupGobsCtrl.contains(gobs.get(i)))
                     continue;
                 minDist = dist;
                 closestGob = gobs.get(i);
             }
         }
 
+        //ctrl+q cycle gobs
+        if (isCtrl){
+            // indicate next gob
+            if (closestGob!=null) {
+                //ZeeConfig.println("size "+listPickupGobsCtrl.size());
+                pickupGobCtrlTarget = closestGob;
+                listPickupGobsCtrl.add(closestGob);
+                ZeeConfig.addPlayerText("pickup " + pickupGobCtrlTarget.getres().basename());
+                return;
+            }
+        }
+
         // pickup closest gob
         if (closestGob!=null) {
             println("closestGob == "+closestGob.getres().name);
+            // ctrl+q cycle gob targets
             // right click ground item
             if (closestGob.getres().name.contains("/terobjs/items/")) {
-                if (shift)
+                if (isShift)
                     gobClick(closestGob, 3, UI.MOD_SHIFT);
                 else
                     gobClick(closestGob, 3);
@@ -1795,8 +1835,6 @@ public class ZeeManagerGobClick extends ZeeThread{
                     }
                 }.start();
             }
-            // save picked gob name for ctrl+q iteration
-            listAlreadyPickedGobsCtrl.add(closestGob.getres().name);
         }
     }
 }

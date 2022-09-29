@@ -1917,4 +1917,12 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 			return(true);
 		}
 	}
+
+	@Override
+	public boolean keyup(KeyEvent ev) {
+		if (ev.getKeyCode()==17){//ctrl
+			ZeeManagerGobClick.pickupGobCtrlReleased();
+		}
+		return super.keyup(ev);
+	}
 }
