@@ -1737,14 +1737,19 @@ public class ZeeManagerGobClick extends ZeeThread{
     static List<String> listPickupGobNamePatterns = Arrays.asList(
         "gfx/terobjs/herbs/.+", "gfx/terobjs/items/.+", "gfx/kritter/.+"
     );
+    static List<String> listAlreadyPickedGobsCtrl = new ArrayList<>();
     public static void pickupClosestGob(KeyEvent ev) {
 
         boolean shift = ev.isShiftDown();
 
+        // ctrl+q picks next closest gob, no ctrl resets list
+        if (!ev.isControlDown())
+            listAlreadyPickedGobsCtrl.clear();
+
         // find eligible gobs
         List<Gob> gobs = ZeeConfig.findGobsMatchingRegexpList(listPickupGobNamePatterns);
-
-        //TODO consider max distance?
+        if (gobs==null || gobs.size()==0)
+            return;
 
         // calculate closest gob
         double minDist=0, dist;
@@ -1754,14 +1759,18 @@ public class ZeeManagerGobClick extends ZeeThread{
             dist = ZeeConfig.distanceToPlayer(gobs.get(i));
             name = gobs.get(i).getres().name;
             if (closestGob==null ||  dist < minDist){
+                //ignore mounted horse
                 if (dist==0 && name.contains("/horse/"))
+                    continue;
+                //ctrl+q ignore already picked gobs
+                if (ev.isControlDown() && listAlreadyPickedGobsCtrl.contains(name))
                     continue;
                 minDist = dist;
                 closestGob = gobs.get(i);
             }
         }
 
-
+        // pickup closest gob
         if (closestGob!=null) {
             println("closestGob == "+closestGob.getres().name);
             // right click ground item
@@ -1780,6 +1789,8 @@ public class ZeeManagerGobClick extends ZeeThread{
                     }
                 }.start();
             }
+            // save picked gob name for ctrl+q iteration
+            listAlreadyPickedGobsCtrl.add(closestGob.getres().name);
         }
     }
 }

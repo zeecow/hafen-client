@@ -116,4 +116,5 @@ other stuff:
  - hide smoke and some animations
  - keybelt shortcuts navigation 
  - reposition rightmost windows horiz. when game resize
- - pickup key "q", drink key "'"
+ - drink key "'"
+ - pickup key "q", shift+q pickup all, ctrl+q pickup next closest
