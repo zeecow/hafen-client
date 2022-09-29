@@ -507,7 +507,7 @@ public class ZeeThread  extends Thread{
 
     public static boolean waitPlayerDismounted(Gob mount) {
         //println("waitPlayerDismounted");
-        long timer = TIMEOUT_MS;
+        long timer = 1000;
         try {
             while( timer > 0 ) {
                 if (!ZeeConfig.isPlayerSharingGobCoord(mount))

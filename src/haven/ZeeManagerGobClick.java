@@ -506,11 +506,12 @@ public class ZeeManagerGobClick extends ZeeThread{
             if (ZeeConfig.isPlayerMountingHorse() && !ZeeManagerGobClick.isGobInListEndsWith(gobName,"/ladder,/minehole") && ZeeConfig.getMainInventory().countItemsByName("/rope") > 0) {
                 new ZeeThread() {
                     public void run() {
-                        dismountHorse(mc);
-                        if (isGobHouse(gobName))
-                            gobClick(gob,3,0,16);//gob's door?
-                        else
-                            gobClick(gob,3);
+                        if(dismountHorse(mc)) {
+                            if (isGobHouse(gobName))
+                                gobClick(gob, 3, 0, 16);//gob's door?
+                            else
+                                gobClick(gob, 3);
+                        }
                     }
                 }.start();
             }
@@ -520,12 +521,13 @@ public class ZeeManagerGobClick extends ZeeThread{
                     public void run() {
                         try {
                             disembarkVehicle(mc);
-                            waitPlayerPoseNotInList(ZeeConfig.POSE_PLAYER_KICKSLED_IDLE, ZeeConfig.POSE_PLAYER_KICKSLED_ACTIVE);
-                            sleep(100);//lagalagalaga
-                            if (isGobHouse(gobName))
-                                gobClick(gob,3,0,16);//gob's door?
-                            else
-                                gobClick(gob,3);
+                            if(waitPlayerPoseNotInListTimeout(1000,ZeeConfig.POSE_PLAYER_KICKSLED_IDLE, ZeeConfig.POSE_PLAYER_KICKSLED_ACTIVE)) {
+                                sleep(100);//lagalagalaga
+                                if (isGobHouse(gobName))
+                                    gobClick(gob, 3, 0, 16);//gob's door?
+                                else
+                                    gobClick(gob, 3);
+                            }
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }
@@ -669,12 +671,16 @@ public class ZeeManagerGobClick extends ZeeThread{
         disembarkVehicle(coordMc.floor(posres));
     }
 
-    public static void dismountHorse(Coord2d coordMc) {
+    public static boolean dismountHorse(Coord2d coordMc) {
         Gob horse = ZeeConfig.getClosestGobByNameContains("gfx/kritter/horse/");
         ZeeConfig.clickCoord(coordMc.floor(posres),1,UI.MOD_CTRL);
-        waitPlayerDismounted(horse);
-        if (!ZeeConfig.isPlayerMountingHorse()) {
-            ZeeConfig.setPlayerSpeed(ZeeConfig.PLAYER_SPEED_2);
+        if(waitPlayerDismounted(horse)) {
+            if (!ZeeConfig.isPlayerMountingHorse()) {
+                ZeeConfig.setPlayerSpeed(ZeeConfig.PLAYER_SPEED_2);
+            }
+            return true;
+        }else{
+            return false;
         }
     }
 
