@@ -2615,6 +2615,8 @@ public class ZeeConfig {
     }
 
     public static Gob getClosestGobByNameContains(String nameContains) {
+        if (nameContains==null || nameContains.isBlank())
+            return null;
         return getClosestGob(findGobsByNameContains(nameContains));
     }
 

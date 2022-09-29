@@ -1744,39 +1744,18 @@ public class ZeeManagerGobClick extends ZeeThread{
     static List<String> listPickupGobNamePatterns = Arrays.asList(
         "gfx/terobjs/herbs/.+", "gfx/terobjs/items/.+", "gfx/kritter/.+"
     );
-    static List<Gob> listPickupGobsCtrl = new LinkedList<>();
-    static Gob pickupGobCtrlTarget = null;
-    static void pickupGobCtrlReleased(){
-        if (pickupGobCtrlTarget!=null){
-            ZeeConfig.println("pickup ctrl "+pickupGobCtrlTarget.getres().name);
-            // right click ground item
-            if (pickupGobCtrlTarget.getres().name.contains("/terobjs/items/")) {
-                gobClick(pickupGobCtrlTarget, 3);
-            }
-            // select pickup menu option
-            else {
-                Gob finalClosestGob = pickupGobCtrlTarget;
-                new ZeeThread(){
-                    public void run() {
-                        clickGobPetal(finalClosestGob,"Pick");
-                    }
-                }.start();
-            }
-            //cleanup
-            pickupGobCtrlTarget = null;
-            listPickupGobsCtrl.clear();
-            ZeeConfig.removePlayerText();
-        }
-    }
+    static List<String> listPickupGobsCtrl = new LinkedList<>();
+    static String pickupGobCtrlName = null, getPickupGobCtrlNamePrev;
+    static boolean pickupGobIsShiftDown;
     public static void pickupClosestGob(KeyEvent ev) {
 
-        boolean isShift = ev.isShiftDown();
         boolean isCtrl = ev.isControlDown();
+        pickupGobIsShiftDown = ev.isShiftDown();
 
         // ctrl+q cycles gob target until release
         if (!isCtrl) {
             listPickupGobsCtrl.clear();
-            pickupGobCtrlTarget = null;
+            pickupGobCtrlName = null;
         }
 
         // find eligible gobs
@@ -1791,12 +1770,12 @@ public class ZeeManagerGobClick extends ZeeThread{
         for (int i = 0; i < gobs.size(); i++) {
             dist = ZeeConfig.distanceToPlayer(gobs.get(i));
             name = gobs.get(i).getres().name;
-            if (closestGob==null ||  dist < minDist){
+            if (closestGob==null  ||  dist < minDist){
                 //ignore mounted horse
                 if (dist==0 && name.contains("/horse/"))
                     continue;
                 //ctrl+q cycle gobs
-                if (isCtrl && listPickupGobsCtrl.contains(gobs.get(i)))
+                if (isCtrl && listPickupGobsCtrl.contains(name))
                     continue;
                 minDist = dist;
                 closestGob = gobs.get(i);
@@ -1806,11 +1785,11 @@ public class ZeeManagerGobClick extends ZeeThread{
         //ctrl+q cycle gobs
         if (isCtrl){
             // indicate next gob
-            if (closestGob!=null) {
+            if (closestGob!=null && !listPickupGobsCtrl.contains(closestGob.getres().name)) {
                 //ZeeConfig.println("size "+listPickupGobsCtrl.size());
-                pickupGobCtrlTarget = closestGob;
-                listPickupGobsCtrl.add(closestGob);
-                ZeeConfig.addPlayerText("pickup " + pickupGobCtrlTarget.getres().basename());
+                pickupGobCtrlName = closestGob.getres().name;
+                listPickupGobsCtrl.add(pickupGobCtrlName);
+                ZeeConfig.addPlayerText("pickup " + pickupGobCtrlName.replaceAll("[^/]+/",""));
                 return;
             }
         }
@@ -1821,7 +1800,7 @@ public class ZeeManagerGobClick extends ZeeThread{
             // ctrl+q cycle gob targets
             // right click ground item
             if (closestGob.getres().name.contains("/terobjs/items/")) {
-                if (isShift)
+                if (pickupGobIsShiftDown)
                     gobClick(closestGob, 3, UI.MOD_SHIFT);
                 else
                     gobClick(closestGob, 3);
@@ -1835,6 +1814,40 @@ public class ZeeManagerGobClick extends ZeeThread{
                     }
                 }.start();
             }
+        }
+    }
+
+    static void pickupGobCtrlReleased(){
+        if (pickupGobCtrlName==null || pickupGobCtrlName.isBlank()) {
+            return;
+        }
+        Gob gobTarget = ZeeConfig.getClosestGobByNameContains(pickupGobCtrlName);
+        if (gobTarget==null){
+            println("ctrl gob target is null");
+            return;
+        }
+        if (pickupGobCtrlName !=null){
+            ZeeConfig.println("pickup ctrl "+ pickupGobCtrlName);
+            // right click ground item
+            if (pickupGobCtrlName.contains("/terobjs/items/")) {
+                if (pickupGobIsShiftDown)
+                    gobClick(gobTarget, 3, UI.MOD_SHIFT);
+                else
+                    gobClick(gobTarget, 3);
+            }
+            // select pickup menu option
+            else {
+                Gob finalClosestGob = gobTarget;
+                new ZeeThread(){
+                    public void run() {
+                        clickGobPetal(finalClosestGob,"Pick");
+                    }
+                }.start();
+            }
+            //cleanup
+            pickupGobCtrlName = null;
+            listPickupGobsCtrl.clear();
+            ZeeConfig.removePlayerText();
         }
     }
 }
