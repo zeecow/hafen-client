@@ -26,12 +26,13 @@
 
 package haven;
 
-import java.awt.Color;
-import java.awt.Font;
+import haven.Resource.AButton;
+
+import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.font.TextAttribute;
 import java.awt.image.BufferedImage;
-import haven.Resource.AButton;
+import java.util.List;
 import java.util.*;
 
 public class MenuGrid extends Widget implements KeyBinding.Bindable {
@@ -345,6 +346,7 @@ public class MenuGrid extends Widget implements KeyBinding.Bindable {
 	    recons = !cons(this.cur, cur);
 	    Collections.sort(cur, Comparator.comparing(PagButton::sortkey));
 	    this.curbtns = cur;
+		ZeeMouseoverActionMenu.menuGridButtons(cur);
 	    int i = curoff;
 	    for(int y = 0; y < gsz.y; y++) {
 		for(int x = 0; x < gsz.x; x++) {

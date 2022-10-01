@@ -288,7 +288,10 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 		public void click() {
 		    toggleSearchWindow();
 		}
-	    }, bg.c);
+		public void mousemove(Coord c) {
+			ZeeMouseoverActionMenu.mouseMoved(checkhit(c));
+		}
+	}, bg.c);
     }
 
     // used by Zeeconfig.searchInputMakeWnd

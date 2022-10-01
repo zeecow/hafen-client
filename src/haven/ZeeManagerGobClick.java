@@ -1170,8 +1170,11 @@ public class ZeeManagerGobClick extends ZeeThread{
             }else {
                 ZeeConfig.addPlayerText("removing tree & stump");
             }
+            println("debug removeTreeAndStump "+0);
             waitNoFlowerMenu();
+            println("debug removeTreeAndStump "+1);
             ZeeManagerItemClick.equipAxeChopTree();
+            println("debug removeTreeAndStump "+2);
             ZeeConfig.lastMapViewClickButton = 2;//prepare for cancel click
             Coord2d treeCoord;
             while (tree!=null && !ZeeConfig.isTaskCanceledByGroundClick()) {
@@ -1181,6 +1184,7 @@ public class ZeeManagerGobClick extends ZeeThread{
                 currentRemovingTree = tree;
                 treeCoord = new Coord2d(tree.rc.x, tree.rc.y);
                 //wait idle
+                println("debug removeTreeAndStump "+3);
                 if (waitPlayerIdlePose() && !ZeeConfig.isTaskCanceledByGroundClick()) {//waitPlayerIdleFor(2)
                     sleep(2500);//wait new stump loading
                     Gob stump = ZeeConfig.getClosestGob(ZeeConfig.findGobsByNameEndsWith("stump"));
@@ -1206,6 +1210,7 @@ public class ZeeManagerGobClick extends ZeeThread{
                     }
                     //println("next tree = "+tree);
                 }
+                println("debug removeTreeAndStump "+4);
             }
         } catch (Exception e) {
             e.printStackTrace();
