@@ -115,7 +115,7 @@ public class ZeeThread  extends Thread{
         return (ZeeConfig.gameUI.vhand != null);
     }
 
-    public static boolean waitItemEquipped(String name) {
+    public static boolean waitItemInHand(String name) {
         //println("waitItemEquipped > "+name);
         int max = (int) TIMEOUT_MS;
         try {
@@ -572,7 +572,7 @@ public class ZeeThread  extends Thread{
         //println("wait cursor "+name);
         int max = (int) TIMEOUT_MS*2;
         try {
-            while(max>0 && ZeeConfig.getCursorName()!=null && !ZeeConfig.getCursorName().equals(name)) {
+            while(max>0 && !ZeeConfig.getCursorName().equals(name)) {
                 max -= SLEEP_MS;
                 Thread.sleep(SLEEP_MS);
             }
@@ -707,7 +707,7 @@ public class ZeeThread  extends Thread{
     }
 
     public static boolean waitFlowerMenu() {
-        long max = 1000;
+        long max = TIMEOUT_MS;
         FlowerMenu fm = null;
         try {
             while(max>0 && (fm = ZeeConfig.gameUI.ui.root.getchild(FlowerMenu.class)) == null) {

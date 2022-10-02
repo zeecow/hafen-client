@@ -1170,21 +1170,20 @@ public class ZeeManagerGobClick extends ZeeThread{
             }else {
                 ZeeConfig.addPlayerText("removing tree & stump");
             }
-            println("debug removeTreeAndStump "+0);
             waitNoFlowerMenu();
-            println("debug removeTreeAndStump "+1);
             ZeeManagerItemClick.equipAxeChopTree();
-            println("debug removeTreeAndStump "+2);
             ZeeConfig.lastMapViewClickButton = 2;//prepare for cancel click
             Coord2d treeCoord;
             while (tree!=null && !ZeeConfig.isTaskCanceledByGroundClick()) {
                 //start chopping
-                clickGobPetal(tree, "Chop");
+                if(!clickGobPetal(tree, "Chop")){
+                    println("couldnt click tree petal \"Chop\"");
+                    break;
+                }
                 waitPlayerPose(ZeeConfig.POSE_PLAYER_CHOPTREE);
                 currentRemovingTree = tree;
                 treeCoord = new Coord2d(tree.rc.x, tree.rc.y);
                 //wait idle
-                println("debug removeTreeAndStump "+3);
                 if (waitPlayerIdlePose() && !ZeeConfig.isTaskCanceledByGroundClick()) {//waitPlayerIdleFor(2)
                     sleep(2500);//wait new stump loading
                     Gob stump = ZeeConfig.getClosestGob(ZeeConfig.findGobsByNameEndsWith("stump"));
@@ -1210,11 +1209,14 @@ public class ZeeManagerGobClick extends ZeeThread{
                     }
                     //println("next tree = "+tree);
                 }
-                println("debug removeTreeAndStump "+4);
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
+        exitRemoveAllTrees();
+    }
+
+    private static void exitRemoveAllTrees() {
         isRemovingAllTrees = false;
         currentRemovingTree = null;
         if (treesForRemoval!=null)
@@ -1246,7 +1248,7 @@ public class ZeeManagerGobClick extends ZeeThread{
 
         //equip shovel
         ZeeManagerItemClick.equipBeltItem("shovel");
-        if (!waitItemEquipped("shovel")){
+        if (!waitItemInHand("shovel")){
             println("couldnt equip shovel ?");
             return false;
         }
@@ -1549,7 +1551,7 @@ public class ZeeManagerGobClick extends ZeeThread{
     public static void liftGob(Gob gob) {
         if(isGobBush(gob.getres().name)) {
             ZeeManagerItemClick.equipBeltItem("shovel");
-            waitItemEquipped("shovel");
+            waitItemInHand("shovel");
         }
         ZeeConfig.gameUI.menu.wdgmsg("act", "carry","0");
         waitCursor(ZeeConfig.CURSOR_HAND);
@@ -1616,7 +1618,7 @@ public class ZeeManagerGobClick extends ZeeThread{
 
     public static boolean clickGobPetal(Gob gob, String petalName) {
         if (gob==null){
-            //println(">clickGobPetal gob null");
+            println(">clickGobPetal gob null");
             return false;
         }
         //make sure cursor is arrow before clicking gob
@@ -1625,12 +1627,21 @@ public class ZeeManagerGobClick extends ZeeThread{
             if (!waitCursor(ZeeConfig.CURSOR_ARW))
                 return false;
         }
+        //buffer time
+        try {
+            sleep(500);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+            return false;
+        }
+        //click gob
         gobClick(gob,3);
+        //click petal
         if(waitFlowerMenu()){
             choosePetal(getFlowerMenu(), petalName);
             return waitNoFlowerMenu();
         }else{
-            //println("clickGobPetal > no flower menu?");
+            println("clickGobPetal > no flower menu?");
             return false;
         }
     }

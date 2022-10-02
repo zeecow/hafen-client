@@ -374,14 +374,14 @@ public class ZeeManagerItemClick extends ZeeThread{
         WItem axe = getBeltWItem("woodsmansaxe");
         if (axe!=null){
             equipBeltItem("woodsmansaxe");
-            waitItemEquipped("woodsmansaxe");
+            waitItemInHand("woodsmansaxe");
         }else{
             if (isItemInHandSlot("axe-m"))
                 return;
             axe = getBeltWItem("axe-m");
             if (axe!=null){
                 equipBeltItem("axe-m");
-                waitItemEquipped("axe-m");
+                waitItemInHand("axe-m");
             }
         }
     }
