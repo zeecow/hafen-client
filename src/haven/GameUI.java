@@ -289,7 +289,7 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 		    toggleSearchWindow();
 		}
 		public void mousemove(Coord c) {
-			ZeeMouseoverActionMenu.mouseMoved(checkhit(c));
+			ZeeMouseoverActionMenu.mouseMoved(this,c);
 		}
 	}, bg.c);
     }
