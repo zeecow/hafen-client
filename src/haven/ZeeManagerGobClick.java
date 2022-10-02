@@ -1185,14 +1185,20 @@ public class ZeeManagerGobClick extends ZeeThread{
                 treeCoord = new Coord2d(tree.rc.x, tree.rc.y);
                 //wait idle
                 if (waitPlayerIdlePose() && !ZeeConfig.isTaskCanceledByGroundClick()) {//waitPlayerIdleFor(2)
-                    sleep(2500);//wait new stump loading
+                    sleep(2000);//wait new stump loading
                     Gob stump = ZeeConfig.getClosestGob(ZeeConfig.findGobsByNameEndsWith("stump"));
-                    if (stump != null  &&  stump.rc.compareTo(treeCoord) == 0) {
+                    if (stump != null) {
+                        //stump location doesnt match tree and there's no other stump close
+                        if (stump.rc.compareTo(treeCoord) != 0  &&  ZeeConfig.distanceToPlayer(stump) > 25){
+                            println("stump undecided");
+                            exitRemoveAllTrees();
+                            return;
+                        }
                         ZeeConfig.addGobText(stump, "stump");
                         removeStumpMaybe(stump);
                         waitPlayerIdlePose();
                     } else {
-                        println("stump not found");
+                        println("stump is null");
                     }
                     if (isRemovingAllTrees) {
                         if (treesForRemoval!=null){
