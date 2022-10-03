@@ -1172,6 +1172,7 @@ public class ZeeManagerGobClick extends ZeeThread{
             }
             waitNoFlowerMenu();
             ZeeManagerItemClick.equipAxeChopTree();
+            sleep(500);//fix lag problem
             ZeeConfig.lastMapViewClickButton = 2;//prepare for cancel click
             Coord2d treeCoord;
             while (tree!=null && !ZeeConfig.isTaskCanceledByGroundClick()) {
@@ -1630,15 +1631,9 @@ public class ZeeManagerGobClick extends ZeeThread{
         //make sure cursor is arrow before clicking gob
         if (!ZeeConfig.getCursorName().contentEquals(ZeeConfig.CURSOR_ARW)){
             ZeeConfig.clickRemoveCursor();
-            if (!waitCursor(ZeeConfig.CURSOR_ARW))
+            if (!waitCursor(ZeeConfig.CURSOR_ARW)) {
                 return false;
-        }
-        //buffer time
-        try {
-            sleep(500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-            return false;
+            }
         }
         //click gob
         gobClick(gob,3);
