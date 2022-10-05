@@ -1,0 +1,286 @@
+package haven;
+
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.util.*;
+import java.util.List;
+
+public class ZeeHoverMenu {
+
+    static MenuWidget rootMenu, latestMenu;
+    static boolean isMouseOver = false;
+    static int curMenuLevel;
+    static long mouseOutMs = -1;
+    private static boolean ignoreNextGridMenu;
+
+    public static void mouseMoved(GameUI.MenuButton menuButton, Coord c) {
+        if (menuButton.checkhit(c)) {
+            if (!isMouseOver) {
+                //println("root ismouseover true");
+                isMouseOver = true;
+                menuStart();
+            }
+        } else {
+            if (isMouseOver && !MenuWidget.hit) {
+                //println("root ismouseover false");
+                isMouseOver = false;
+            }
+        }
+    }
+
+    private static void menuStart() {
+        if (!isMouseOver || rootMenu !=null)
+            return;
+        new ZeeThread(){
+            public void run() {
+                int countMs = 0;
+                try {
+                    while (isMouseOver){
+                        if (countMs > 950)
+                            break;
+                        sleep(50);
+                        countMs += 50;
+                    }
+                    if (isMouseOver)
+                        menuStart2();
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+            }
+        }.start();
+    }
+
+
+    private static void menuStart2() {
+        if (rootMenu == null){
+            rootMenu = ZeeConfig.gameUI.add(new MenuWidget(null,null));
+        }
+    }
+
+    private static void setBottomRightCoord(Coord br, MenuWidget menu) {
+        int x = br.x - (menu.sz.x);
+        int y = br.y - menu.sz.y;
+        menu.c = Coord.of(x,y);
+    }
+
+    static List<MenuGrid.PagButton> curbtns;
+    static void menuGridChanged(Collection<MenuGrid.PagButton> curbtns) {
+        if (ignoreNextGridMenu){
+            ignoreNextGridMenu = false;
+            return;
+        }
+        if (rootMenu!=null && curbtns.size() > 0){
+            MenuGrid.Pagina curPag = ZeeConfig.gameUI.menu.cur;
+            // add new menu
+            ZeeConfig.gameUI.add(new MenuWidget(curPag,latestMenu));
+        }
+    }
+
+    static volatile boolean exiting = false;
+    public static void exitMenu(){
+        if (exiting)
+            return;
+        exiting = true;
+        println("exit");
+        mouseOutMs = -1;
+        curMenuLevel = -1;
+        isMouseOver = false;
+        MenuWidget tempMenu = null;
+        // destroy menus, from latest to root
+        int cont = 0;
+        while (latestMenu != null) {
+            tempMenu = latestMenu.parentMenu;
+            latestMenu.destroy();
+            latestMenu = tempMenu;
+            cont++;
+        }
+        println("destroyed "+cont+" menus");
+        rootMenu = null;
+        exiting = false;
+    }
+
+    public static void println(String s) {
+        System.out.println(s);
+    }
+
+
+    static boolean isButtonSubmenu(MenuGrid.PagButton button){
+        return button.info().size() == 0;
+    }
+
+    static class MenuWidget extends Widget{
+
+        private final MenuGrid.Pagina pagina;
+        List<MenuGrid.PagButton> btns;
+        BufferedImage bg;
+        static boolean hit;
+        static MenuGrid menuGrid;
+        int level;
+        MenuWidget parentMenu;
+
+        public MenuWidget(MenuGrid.Pagina pagina, MenuWidget parent){
+
+            menuGrid = ZeeConfig.gameUI.menu;
+
+            // set menu level
+            if (parent==null){
+                this.level = 0;
+            } else {
+                this.level = parent.level + 1;
+            }
+
+            // remove sibling menu
+            if (latestMenu!=null  &&  latestMenu.level>0  &&  parent!=null && parent.level==latestMenu.parentMenu.level){
+                println("destroy menu lvl "+latestMenu.level);
+                latestMenu.destroy();
+            }
+            latestMenu = this;
+            ZeeHoverMenu.curMenuLevel = level;
+            this.pagina = pagina;
+            this.parentMenu = parent;
+
+            //construct menu buttons
+            this.btns = new ArrayList<>();
+            if(!menuGrid.cons(pagina,btns)){
+                println("menuGrid.cons == false");
+            }
+            if (btns.size()==0) {
+                println("btns emptyyy");
+                return;
+            }
+
+            //sort buttons
+            Collections.sort(btns, Comparator.comparing(MenuGrid.PagButton::sortkey));
+
+            //build Menu lines
+            for (int i = 0; i < btns.size(); i++) {
+                this.add(new MenuLineWidget(btns.get(i), i, menuGrid, this.level));
+            }
+            this.pack();
+
+            //bg hover line
+            this.bg = ZeeManagerIcons.imgRect( this.sz.x, this.sz.y, ZeeConfig.intToColor(ZeeConfig.simpleWindowColorInt), ZeeConfig.simpleWindowBorder, 0);
+
+            //position menu
+            GameUI.Hidepanel brpanel = ZeeConfig.gameUI.brpanel;
+            Coord brc;
+            if (parentMenu==null)
+                brc = Coord.of(brpanel.c.x, ZeeConfig.gameUI.sz.y);
+            else
+                brc = Coord.of(parentMenu.c.x, parentMenu.c.y+this.sz.y);
+            println("add lvl"+this.level+" to "+brc);
+            setBottomRightCoord(brc,this);
+        }
+
+        public void draw(GOut g) {
+            g.image(this.bg,Coord.z);
+            super.draw(g);
+        }
+
+        public void mousemove(Coord c) {
+            hit = c.isect(Coord.z, this.sz);
+            if(!hit){
+                //println("out");
+                if (mouseOutMs == -1){
+                    mouseOutMs = ZeeThread.now();
+                }
+                if (rootMenu!=null && mouseOutMs!=-1 && ZeeThread.now()-mouseOutMs > 1000) {//1s outside to exit menu
+                    exitMenu();
+                    return;
+                }
+            }
+            else {
+                //println("in");
+                mouseOutMs = -1;
+            }
+            super.mousemove(c);
+        }
+    }
+
+    static class MenuLineWidget extends Widget{
+
+        final MenuGrid menuGrid;
+        IButton btn;
+        MenuGrid.Pagina pagina;
+        final int i, btnWidth, btnHeight;
+        boolean isHoverLine;
+        static BufferedImage bgHoverLine = ZeeManagerIcons.imgRect( 200, 32, Color.blue, false, 0);
+        Label label;
+        Coord lineTopRight;
+        int menuLevel;
+        long msHoverLine = -1;
+
+        public MenuLineWidget(MenuGrid.PagButton pagButton, int i, MenuGrid menuGrid, int level) {
+            this.pagina = pagButton.pag;
+            this.i =  i;
+            this.menuGrid = menuGrid;
+            this.menuLevel = level;
+
+            this.btn = new IButton(pagButton.img(),pagButton.img());
+            this.btnWidth = pagButton.img().getWidth();
+            this.btnHeight = pagButton.img().getHeight();
+            int x=0;
+            int y = i * this.btnHeight;
+            this.add(new IButton(pagButton.img(), pagButton.img()), Coord.of(x,y));
+            x += pagButton.img().getWidth();
+            this.add(label=new Label(pagButton.name()), Coord.of(x,y));
+            this.pack();
+            this.lineTopRight = Coord.of(0,y);
+        }
+
+        public void draw(GOut g) {
+            if (isHoverLine)
+                g.image(bgHoverLine, this.lineTopRight);
+            super.draw(g);
+        }
+
+        public void mousemove(Coord c) {
+//            if(curMenuLevel==this.menuLevel) {
+                int y = this.i * this.btnHeight;
+                if(c.y > y   &&  c.y < (y + this.btnHeight)
+                    && c.x > this.c.x && c.x < this.c.x+this.sz.x)
+                {
+                    isHoverLine = true;
+                    //open submenu buttons only
+                    if (!isButtonSubmenu(this.pagina.button()))
+                        return;
+                    if (msHoverLine==-1) {
+                        msHoverLine = ZeeThread.now();
+                    }
+                    // open new submenu
+                    else if (ZeeThread.now() - msHoverLine > 1000){
+                        isHoverLine = false;
+                        msHoverLine = -1;
+                        menuGrid.use(pagina.button(), new MenuGrid.Interaction(), false);
+                    }
+                }
+                else {
+                    isHoverLine = false;
+                    msHoverLine = -1;
+                }
+//            }
+//            else{
+//                isHoverLine = false;
+//                msHoverLine = -1;
+//            }
+            //super.mousemove(c);
+        }
+
+        public boolean mouseup(Coord c, int button) {
+            if(isHoverLine && !isButtonSubmenu(pagina.button())) {
+                // ignore next gridMenu due to reset
+                ZeeHoverMenu.ignoreNextGridMenu = true;
+                // click non submenu and reset gridMenu
+                menuGrid.use(pagina.button(), new MenuGrid.Interaction(), true);
+                //close open menus
+                exitMenu();
+                return true;
+            }
+            return false;
+        }
+
+        public boolean mousedown(Coord c, int button) {
+            return true;//grabs click?
+        }
+    }
+}

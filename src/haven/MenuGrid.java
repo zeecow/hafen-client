@@ -346,7 +346,7 @@ public class MenuGrid extends Widget implements KeyBinding.Bindable {
 	    recons = !cons(this.cur, cur);
 	    Collections.sort(cur, Comparator.comparing(PagButton::sortkey));
 	    this.curbtns = cur;
-		ZeeMouseoverActionMenu.menuGridButtons(curoff);
+		ZeeHoverMenu.menuGridChanged(curbtns);
 	    int i = curoff;
 	    for(int y = 0; y < gsz.y; y++) {
 		for(int x = 0; x < gsz.x; x++) {
