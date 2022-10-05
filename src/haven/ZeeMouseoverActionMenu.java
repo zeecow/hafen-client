@@ -2,30 +2,31 @@ package haven;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 import java.util.List;
 
 public class ZeeMouseoverActionMenu {
 
-    static Widget menu;
+    static Widget rootMenu;
     static boolean isMouseOver = false;
 
     public static void mouseMoved(GameUI.MenuButton menuButton, Coord c) {
         if (menuButton.checkhit(c)) {
             if (!isMouseOver) {
-                println("root ismouseover true");
+                //println("root ismouseover true");
                 isMouseOver = true;
                 menuStart();
             }
         } else {
             if (isMouseOver && !MenuWdgGroup.hit) {
-                println("root ismouseover false");
+                //println("root ismouseover false");
                 isMouseOver = false;
             }
         }
     }
 
     private static void menuStart() {
-        if (!isMouseOver || menu!=null)
+        if (!isMouseOver || rootMenu !=null)
             return;
         new ZeeThread(){
             public void run() {
@@ -48,8 +49,8 @@ public class ZeeMouseoverActionMenu {
 
 
     private static void menuStart2() {
-        if (menu==null){
-            menu = ZeeConfig.gameUI.add(new MenuWdgGroup(curbtns));
+        if (rootMenu ==null){
+            rootMenu = ZeeConfig.gameUI.add(new MenuWdgGroup(null));
         }
     }
 
@@ -60,14 +61,14 @@ public class ZeeMouseoverActionMenu {
     }
 
     static List<MenuGrid.PagButton> curbtns;
-    static void menuGridButtons(List<MenuGrid.PagButton> btns) {
-        curbtns = btns;
+    static void menuGridButtons(int curoff) {
+        //println("curoff = "+curoff);
     }
 
     public static void exitMenu(){
-        if (menu!=null) {
-            menu.destroy();
-            menu = null;
+        if (rootMenu !=null) {
+            rootMenu.destroy();
+            rootMenu = null;
             isMouseOver = false;
         }
     }
@@ -83,11 +84,25 @@ public class ZeeMouseoverActionMenu {
         List<MenuGrid.PagButton> btns;
         BufferedImage bg;
         static boolean hit;
+        static MenuGrid menuGrid;
 
-        public MenuWdgGroup(List<MenuGrid.PagButton> curbtns){
-            this.btns = curbtns;
-            for (int i = 0; i < curbtns.size(); i++) {
-                this.add(new MenuWdgLine(curbtns.get(i), i));
+        public MenuWdgGroup(MenuGrid.Pagina pagina){
+            menuGrid = ZeeConfig.gameUI.menu;
+            //root menu
+            if (pagina==null){
+                pagina = menuGrid.cur;
+            }
+            this.btns = new ArrayList<>();
+            if(!menuGrid.cons(pagina,btns)){
+                println("menuGrid.cons == false");
+            }
+            if (btns.size()==0) {
+                println("btns emptyyy");
+                return;
+            }
+            //fill buttons
+            for (int i = 0; i < btns.size(); i++) {
+                this.add(new MenuWdgLine(btns.get(i), i, menuGrid));
             }
             this.pack();
             this.bg = ZeeManagerIcons.imgRect( this.sz.x, this.sz.y, ZeeConfig.intToColor(ZeeConfig.simpleWindowColorInt), ZeeConfig.simpleWindowBorder, 0);
@@ -113,25 +128,29 @@ public class ZeeMouseoverActionMenu {
 
     static class MenuWdgLine extends Widget{
 
+        final MenuGrid menuGrid;
+        IButton btn;
+        MenuGrid.Pagina pagina;
         final int i, btnWidth, btnHeight;
-        MenuGrid.PagButton btn;
         boolean isHoverLine;
         static BufferedImage bgHoverLine = ZeeManagerIcons.imgRect( 200, 32, Color.blue, false, 0);
         Label label;
         Coord lineTopRight;
 
-        public MenuWdgLine(MenuGrid.PagButton btn, int i) {
-            this.btn = btn;
+        public MenuWdgLine(MenuGrid.PagButton pagButton, int i, MenuGrid menuGrid) {
+            this.btn = new IButton(pagButton.img(),pagButton.img());
+            this.pagina = pagButton.pag;
             this.i =  i;
-            this.btnWidth = btn.img().getWidth();
-            this.btnHeight = btn.img().getHeight();
+            this.btnWidth = pagButton.img().getWidth();
+            this.btnHeight = pagButton.img().getHeight();
             int x=0;
             int y = i * this.btnHeight;
-            this.add(new IButton(btn.img(), btn.img()), Coord.of(x,y));
-            x += btn.img().getWidth();
-            this.add(label=new Label(btn.name()), Coord.of(x,y));
+            this.add(new IButton(pagButton.img(), pagButton.img()), Coord.of(x,y));
+            x += pagButton.img().getWidth();
+            this.add(label=new Label(pagButton.name()), Coord.of(x,y));
             this.pack();
             this.lineTopRight = Coord.of(0,y);
+            this.menuGrid = menuGrid;
         }
 
         public void draw(GOut g) {
@@ -141,14 +160,27 @@ public class ZeeMouseoverActionMenu {
         }
 
         public void mousemove(Coord c) {
-            int y = this.i * this.btn.img().getHeight();
-            if( c.y > y   &&  c.y < (y + this.btn.img().getHeight()) ) {
+            int y = this.i * this.btnHeight;
+            if( c.y > y   &&  c.y < (y + this.btnHeight) ) {
                 isHoverLine = true;
                 //println(this.btn.name() + " " + c + " " + isHoverLine);
             }else{
                 isHoverLine = false;
             }
             //super.mousemove(c);
+        }
+
+        public boolean mouseup(Coord c, int button) {
+            if(isHoverLine) {
+                println("clicked "+pagina.button().name());
+                menuGrid.use(pagina.button(), new MenuGrid.Interaction(), false);
+                return true;
+            }
+            return false;
+        }
+
+        public boolean mousedown(Coord c, int button) {
+            return true;//grabs click?
         }
     }
 }

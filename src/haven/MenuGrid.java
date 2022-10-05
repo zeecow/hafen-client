@@ -291,7 +291,7 @@ public class MenuGrid extends Widget implements KeyBinding.Bindable {
 	}
     }
 
-    private boolean cons(Pagina p, Collection<PagButton> buf) {
+    boolean cons(Pagina p, Collection<PagButton> buf) {
 	Pagina[] cp = new Pagina[0];
 	Collection<Pagina> open, close = new HashSet<Pagina>();
 	synchronized(paginae) {
@@ -346,7 +346,7 @@ public class MenuGrid extends Widget implements KeyBinding.Bindable {
 	    recons = !cons(this.cur, cur);
 	    Collections.sort(cur, Comparator.comparing(PagButton::sortkey));
 	    this.curbtns = cur;
-		ZeeMouseoverActionMenu.menuGridButtons(cur);
+		ZeeMouseoverActionMenu.menuGridButtons(curoff);
 	    int i = curoff;
 	    for(int y = 0; y < gsz.y; y++) {
 		for(int x = 0; x < gsz.x; x++) {
