@@ -9,9 +9,9 @@ public class ZeeHoverMenu {
 
     static MenuWidget rootMenu, latestMenu;
     static boolean isMouseOver = false;
-    static int curMenuLevel;
     static long mouseOutMs = -1;
     private static boolean ignoreNextGridMenu;
+    private static int latestParentLevel;
 
     public static void mouseMoved(GameUI.MenuButton menuButton, Coord c) {
         if (menuButton.checkhit(c)) {
@@ -53,7 +53,8 @@ public class ZeeHoverMenu {
 
     private static void menuStart2() {
         if (rootMenu == null){
-            rootMenu = ZeeConfig.gameUI.add(new MenuWidget(null,null));
+            rootMenu = latestMenu = ZeeConfig.gameUI.add(new MenuWidget(null,null));
+            positionLatestMenu(rootMenu);
         }
     }
 
@@ -71,9 +72,32 @@ public class ZeeHoverMenu {
         }
         if (rootMenu!=null && curbtns.size() > 0){
             MenuGrid.Pagina curPag = ZeeConfig.gameUI.menu.cur;
-            // add new menu
-            ZeeConfig.gameUI.add(new MenuWidget(curPag,latestMenu));
+            // check new sibling menu
+            MenuWidget parentMenu;
+            if (latestMenu.parentMenu != null  &&  latestParentLevel == latestMenu.parentMenu.level) {
+                // new sibling
+                MenuWidget tempMenu = latestMenu.parentMenu;
+                latestMenu.destroy();
+                parentMenu = tempMenu;
+            } else {
+                parentMenu = latestMenu;
+            }
+            //add menu
+            latestMenu = ZeeConfig.gameUI.add(new MenuWidget(curPag,parentMenu));
+            positionLatestMenu(latestMenu);
         }
+    }
+
+    private static void positionLatestMenu(MenuWidget mnw) {
+        GameUI.Hidepanel brpanel = ZeeConfig.gameUI.brpanel;
+        Coord brc;
+        if (mnw.parentMenu==null) {
+            brc = Coord.of(brpanel.c.x, ZeeConfig.gameUI.sz.y);
+        }else{
+            brc = Coord.of(mnw.parentMenu.c.x, mnw.parentMenu.c.y + mnw.sz.y);
+        }
+        println("add lvl"+mnw.level+" to "+brc);
+        setBottomRightCoord(brc,mnw);
     }
 
     static volatile boolean exiting = false;
@@ -83,7 +107,6 @@ public class ZeeHoverMenu {
         exiting = true;
         println("exit");
         mouseOutMs = -1;
-        curMenuLevel = -1;
         isMouseOver = false;
         MenuWidget tempMenu = null;
         // destroy menus, from latest to root
@@ -121,6 +144,9 @@ public class ZeeHoverMenu {
         public MenuWidget(MenuGrid.Pagina pagina, MenuWidget parent){
 
             menuGrid = ZeeConfig.gameUI.menu;
+            //latestMenu = this;
+            this.pagina = pagina;
+            this.parentMenu = parent;
 
             // set menu level
             if (parent==null){
@@ -128,16 +154,7 @@ public class ZeeHoverMenu {
             } else {
                 this.level = parent.level + 1;
             }
-
-            // remove sibling menu
-            if (latestMenu!=null  &&  latestMenu.level>0  &&  parent!=null && parent.level==latestMenu.parentMenu.level){
-                println("destroy menu lvl "+latestMenu.level);
-                latestMenu.destroy();
-            }
-            latestMenu = this;
-            ZeeHoverMenu.curMenuLevel = level;
-            this.pagina = pagina;
-            this.parentMenu = parent;
+            println("MenuWidget() lvl "+this.level);
 
             //construct menu buttons
             this.btns = new ArrayList<>();
@@ -160,16 +177,6 @@ public class ZeeHoverMenu {
 
             //bg hover line
             this.bg = ZeeManagerIcons.imgRect( this.sz.x, this.sz.y, ZeeConfig.intToColor(ZeeConfig.simpleWindowColorInt), ZeeConfig.simpleWindowBorder, 0);
-
-            //position menu
-            GameUI.Hidepanel brpanel = ZeeConfig.gameUI.brpanel;
-            Coord brc;
-            if (parentMenu==null)
-                brc = Coord.of(brpanel.c.x, ZeeConfig.gameUI.sz.y);
-            else
-                brc = Coord.of(parentMenu.c.x, parentMenu.c.y+this.sz.y);
-            println("add lvl"+this.level+" to "+brc);
-            setBottomRightCoord(brc,this);
         }
 
         public void draw(GOut g) {
@@ -251,6 +258,7 @@ public class ZeeHoverMenu {
                     else if (ZeeThread.now() - msHoverLine > 1000){
                         isHoverLine = false;
                         msHoverLine = -1;
+                        ZeeHoverMenu.latestParentLevel = this.menuLevel;
                         menuGrid.use(pagina.button(), new MenuGrid.Interaction(), false);
                     }
                 }
