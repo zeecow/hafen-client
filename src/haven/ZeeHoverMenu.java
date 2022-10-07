@@ -131,8 +131,9 @@ public class ZeeHoverMenu {
     }
 
 
-    static boolean isButtonSubmenu(MenuGrid.PagButton button){
-        return button.info().size() == 0;
+    static boolean isButtonNotSubmenu(MenuGrid.PagButton button){
+        Resource.AButton ai = button.pag.act();
+        return (ai.ad.length != 0);
     }
 
     static class MenuWidget extends Widget{
@@ -263,7 +264,7 @@ public class ZeeHoverMenu {
             {
                 isHoverLine = true;
                 //open submenu buttons only
-                if (!isButtonSubmenu(this.pagina.button()))
+                if (isButtonNotSubmenu(this.pagina.button()))
                     return;
                 if (msHoverLine==-1) {
                     msHoverLine = ZeeThread.now();
@@ -284,7 +285,7 @@ public class ZeeHoverMenu {
         }
 
         public boolean mouseup(Coord c, int button) {
-            if(isHoverLine && !isButtonSubmenu(pagina.button())) {
+            if(isHoverLine && isButtonNotSubmenu(pagina.button())) {
                 // ignore next gridMenu due to reset
                 ZeeHoverMenu.ignoreNextGridMenu = true;
                 // click non submenu and reset gridMenu
