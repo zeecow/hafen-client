@@ -7,6 +7,10 @@ import java.util.List;
 
 public class ZeeHoverMenu {
 
+    static final int START_MENU_MS = 950;
+    static final long EXIT_MENU_MS = 1000;
+    static final long CHANGE_MENU_MS = 700;
+
     static MenuWidget rootMenu, latestMenu;
     static boolean isMouseOver = false;
     static long mouseOutMs = -1;
@@ -36,7 +40,7 @@ public class ZeeHoverMenu {
                 int countMs = 0;
                 try {
                     while (isMouseOver){
-                        if (countMs > 950)
+                        if (countMs > ZeeHoverMenu.START_MENU_MS)
                             break;
                         sleep(50);
                         countMs += 50;
@@ -191,7 +195,7 @@ public class ZeeHoverMenu {
                 if (mouseOutMs == -1){
                     mouseOutMs = ZeeThread.now();
                 }
-                if (rootMenu!=null && mouseOutMs!=-1 && ZeeThread.now()-mouseOutMs > 1000) {//1s outside to exit menu
+                if (rootMenu!=null && mouseOutMs!=-1 && ZeeThread.now()-mouseOutMs > ZeeHoverMenu.EXIT_MENU_MS) {//1s outside to exit menu
                     exitMenu();
                     return;
                 }
@@ -242,35 +246,29 @@ public class ZeeHoverMenu {
         }
 
         public void mousemove(Coord c) {
-//            if(curMenuLevel==this.menuLevel) {
-                int y = this.i * this.btnHeight;
-                if(c.y > y   &&  c.y < (y + this.btnHeight)
-                    && c.x > this.c.x && c.x < this.c.x+this.sz.x)
-                {
-                    isHoverLine = true;
-                    //open submenu buttons only
-                    if (!isButtonSubmenu(this.pagina.button()))
-                        return;
-                    if (msHoverLine==-1) {
-                        msHoverLine = ZeeThread.now();
-                    }
-                    // open new submenu
-                    else if (ZeeThread.now() - msHoverLine > 1000){
-                        isHoverLine = false;
-                        msHoverLine = -1;
-                        ZeeHoverMenu.latestParentLevel = this.menuLevel;
-                        menuGrid.use(pagina.button(), new MenuGrid.Interaction(), false);
-                    }
+            int y = this.i * this.btnHeight;
+            if(c.y > y   &&  c.y < (y + this.btnHeight)
+                && c.x > this.c.x && c.x < this.c.x+this.sz.x)
+            {
+                isHoverLine = true;
+                //open submenu buttons only
+                if (!isButtonSubmenu(this.pagina.button()))
+                    return;
+                if (msHoverLine==-1) {
+                    msHoverLine = ZeeThread.now();
                 }
-                else {
+                // open new submenu
+                else if (ZeeThread.now() - msHoverLine > ZeeHoverMenu.CHANGE_MENU_MS){
                     isHoverLine = false;
                     msHoverLine = -1;
+                    ZeeHoverMenu.latestParentLevel = this.menuLevel;
+                    menuGrid.use(pagina.button(), new MenuGrid.Interaction(), false);
                 }
-//            }
-//            else{
-//                isHoverLine = false;
-//                msHoverLine = -1;
-//            }
+            }
+            else {
+                isHoverLine = false;
+                msHoverLine = -1;
+            }
             //super.mousemove(c);
         }
 
