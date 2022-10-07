@@ -174,12 +174,23 @@ public class ZeeHoverMenu {
             Collections.sort(btns, Comparator.comparing(MenuGrid.PagButton::sortkey));
 
             //build Menu lines
+            MenuLineWidget line;
+            int lineWidth = 0;
             for (int i = 0; i < btns.size(); i++) {
-                this.add(new MenuLineWidget(btns.get(i), i, menuGrid, this.level));
+                line = this.add(new MenuLineWidget(btns.get(i), i, menuGrid, this.level));
+                if (line.sz.x > lineWidth)
+                    lineWidth = line.sz.x;
             }
             this.pack();
 
-            //bg hover line
+            //resize lines
+            for (MenuLineWidget menuLine : children(MenuLineWidget.class)) {
+                menuLine.resize(lineWidth,menuLine.sz.y);
+            }
+            //bg line hover
+            MenuLineWidget.bgHoverLine = ZeeManagerIcons.imgRect( lineWidth, btns.get(0).img().getHeight(), Color.blue, false, 0);
+
+            //bg menu img
             this.bg = ZeeManagerIcons.imgRect( this.sz.x, this.sz.y, ZeeConfig.intToColor(ZeeConfig.simpleWindowColorInt), ZeeConfig.simpleWindowBorder, 0);
         }
 
@@ -215,7 +226,7 @@ public class ZeeHoverMenu {
         MenuGrid.Pagina pagina;
         final int i, btnWidth, btnHeight;
         boolean isHoverLine;
-        static BufferedImage bgHoverLine = ZeeManagerIcons.imgRect( 200, 32, Color.blue, false, 0);
+        static BufferedImage bgHoverLine;
         Label label;
         Coord lineTopRight;
         int menuLevel;
