@@ -8,14 +8,15 @@ import java.util.List;
 public class ZeeHoverMenu {
 
     static final int START_MENU_MS = 950;
-    static final long EXIT_MENU_MS = 1000;
-    static final long CHANGE_MENU_MS = 700;
+    static final long EXIT_MENU_MS = 700;
+    static final long CHANGE_MENU_MS = 500;
 
     static MenuWidget rootMenu, latestMenu;
     static boolean isMouseOver = false;
     static long mouseOutMs = -1;
     private static boolean ignoreNextGridMenu;
     private static int latestParentLevel;
+    private static MenuLineWidget latestMenuLine;
 
     public static void mouseMoved(GameUI.MenuButton menuButton, Coord c) {
         if (menuButton.checkhit(c)) {
@@ -118,6 +119,7 @@ public class ZeeHoverMenu {
         println("exit");
         mouseOutMs = -1;
         isMouseOver = false;
+        latestMenuLine = null;
         MenuWidget tempMenu = null;
         // destroy menus, from latest to root
         int cont = 0;
@@ -128,7 +130,7 @@ public class ZeeHoverMenu {
             cont++;
         }
         println("destroyed "+cont+" menus");
-        rootMenu = null;
+        rootMenu = latestMenu = null;
         exiting = false;
     }
 
@@ -270,8 +272,14 @@ public class ZeeHoverMenu {
             {
                 isHoverLine = true;
                 //open submenu buttons only
-                if (isButtonNotSubmenu(this.pagina.button()))
+                if (isButtonNotSubmenu(this.pagina.button())) {
                     return;
+                }
+                //menu already opened
+                if (latestMenu!=null && latestMenuLine!=null && latestMenuLine.equals(this)) {
+                    return;
+                }
+                // first mousemove
                 if (msHoverLine==-1) {
                     msHoverLine = ZeeThread.now();
                 }
@@ -280,6 +288,7 @@ public class ZeeHoverMenu {
                     isHoverLine = false;
                     msHoverLine = -1;
                     ZeeHoverMenu.latestParentLevel = this.menuLevel;
+                    ZeeHoverMenu.latestMenuLine = MenuLineWidget.this;
                     menuGrid.use(pagina.button(), new MenuGrid.Interaction(), false);
                 }
             }
