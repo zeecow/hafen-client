@@ -98,7 +98,10 @@ public class ZeeHoverMenu {
         if (mnw.parentMenu==null) {
             brc = Coord.of(brpanel.c.x, ZeeConfig.gameUI.sz.y);
         }else{
-            brc = Coord.of(mnw.parentMenu.c.x, mnw.parentMenu.c.y + mnw.sz.y);
+            int y = mnw.parentMenu.c.y + mnw.sz.y;
+            if (y > ZeeConfig.gameUI.sz.y)
+                y = ZeeConfig.gameUI.sz.y;
+            brc = Coord.of(mnw.parentMenu.c.x, y);
         }
         println("add lvl"+mnw.level+" to "+brc);
         setBottomRightCoord(brc,mnw);
