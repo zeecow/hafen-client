@@ -153,6 +153,7 @@ public class ZeeHoverMenu {
         static MenuGrid menuGrid;
         int level;
         MenuWidget parentMenu;
+        BufferedImage bgHoverLine = ZeeManagerIcons.imgRect( 160, 32, Color.blue, false, 0);;
 
         public MenuWidget(MenuGrid.Pagina pagina, MenuWidget parent){
 
@@ -167,7 +168,7 @@ public class ZeeHoverMenu {
             } else {
                 this.level = parent.level + 1;
             }
-            println("MenuWidget() lvl "+this.level);
+            //println("MenuWidget() lvl "+this.level);
 
             //construct menu buttons
             this.btns = new ArrayList<>();
@@ -186,7 +187,7 @@ public class ZeeHoverMenu {
             MenuLineWidget line;
             int lineWidth = 0;
             for (int i = 0; i < btns.size(); i++) {
-                line = this.add(new MenuLineWidget(btns.get(i), i, menuGrid, this.level));
+                line = this.add(new MenuLineWidget(btns.get(i), i, menuGrid, this.level, this));
                 if (line.sz.x > lineWidth)
                     lineWidth = line.sz.x;
             }
@@ -197,7 +198,7 @@ public class ZeeHoverMenu {
                 menuLine.resize(lineWidth,menuLine.sz.y);
             }
             //bg line hover
-            MenuLineWidget.bgHoverLine = ZeeManagerIcons.imgRect( lineWidth, btns.get(0).img().getHeight(), Color.blue, false, 0);
+            bgHoverLine = ZeeManagerIcons.imgRect( lineWidth, btns.get(0).img().getHeight(), Color.blue, false, 0);
 
             //bg menu img
             this.bg = ZeeManagerIcons.imgRect( this.sz.x, this.sz.y, ZeeConfig.intToColor(ZeeConfig.simpleWindowColorInt), ZeeConfig.simpleWindowBorder, 0);
@@ -231,17 +232,18 @@ public class ZeeHoverMenu {
     static class MenuLineWidget extends Widget{
 
         final MenuGrid menuGrid;
+        final MenuWidget menuWidget;
         IButton btn;
         MenuGrid.Pagina pagina;
         final int i, btnWidth, btnHeight;
         boolean isHoverLine;
-        static BufferedImage bgHoverLine;
         Label label;
         Coord lineTopRight;
         int menuLevel;
         long msHoverLine = -1;
 
-        public MenuLineWidget(MenuGrid.PagButton pagButton, int i, MenuGrid menuGrid, int level) {
+        public MenuLineWidget(MenuGrid.PagButton pagButton, int i, MenuGrid menuGrid, int level, MenuWidget menuWidget) {
+            this.menuWidget = menuWidget;
             this.pagina = pagButton.pag;
             this.i =  i;
             this.menuGrid = menuGrid;
@@ -261,7 +263,7 @@ public class ZeeHoverMenu {
 
         public void draw(GOut g) {
             if (isHoverLine)
-                g.image(bgHoverLine, this.lineTopRight);
+                g.image(menuWidget.bgHoverLine, this.lineTopRight);
             super.draw(g);
         }
 

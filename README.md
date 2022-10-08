@@ -3,6 +3,7 @@
 Client focusing on small helper tasks, many using mouse middle button, and other stuff:
 
  - search actions globally
+ - hover menu on search actions button
  - sort actions by most used craft items
  - craft window buttons for ingredients and history
  - bigger close buttons
