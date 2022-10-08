@@ -76,13 +76,16 @@ public class ZeeHoverMenu {
         }
         if (rootMenu!=null && curbtns.size() > 0){
             MenuGrid.Pagina curPag = ZeeConfig.gameUI.menu.cur;
-            // check new sibling menu
+            // check for sibling menus
             MenuWidget parentMenu;
-            if (latestMenu.parentMenu != null  &&  latestParentLevel == latestMenu.parentMenu.level) {
-                // new sibling
-                MenuWidget tempMenu = latestMenu.parentMenu;
-                latestMenu.destroy();
-                parentMenu = tempMenu;
+            if (latestMenu.parentMenu != null  &&  latestParentLevel <= latestMenu.parentMenu.level) {
+                // menu replaces sibling tree
+                do {
+                    MenuWidget tempMenu = latestMenu.parentMenu;
+                    latestMenu.destroy();
+                    parentMenu = tempMenu;
+                    latestMenu = parentMenu;
+                } while(latestParentLevel < parentMenu.level);
             } else {
                 parentMenu = latestMenu;
             }
