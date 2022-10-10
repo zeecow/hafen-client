@@ -691,6 +691,16 @@ public class ZeeConfig {
         }
     }
 
+    static boolean skipGobDead(Gob gob){
+        if (!gob.checkGobDead) {//1st pass
+            gob.checkGobDead = true;
+            return true;
+        }else if(isGobDeadOrKnock(gob)){//2nd pass
+            return true;
+        }
+        return false;
+    }
+
     public static void applyGobSettingsAudio(Gob gob) {
         String gobName = gob.resName;
         long gobId = gob.id;
@@ -699,6 +709,12 @@ public class ZeeConfig {
         if(isPlayer(gob)  &&  gameUI.map.player()!=null) {
             // other players
             if (gameUI.map.player().id != gobId) {
+
+                //check player dead
+                if (skipGobDead(gob))
+                    return;
+
+                //player not dead
                 if (autoHearthOnStranger && !playerHasAnyPose(POSE_PLAYER_TRAVELHOMEPOINT, POSE_PLAYER_TRAVELHOMESHRUG)) {
                     autoHearth();
                 }
@@ -723,6 +739,13 @@ public class ZeeConfig {
                     continue;
                 //...check if gob is in category
                 if(mapCategoryGobs.get(categ).contains(gobName)){
+
+                    // check if aggressive gob is dead
+                    if (categ.contentEquals(CATEG_AGROCREATURES)){
+                        if (skipGobDead(gob))
+                            return;
+                    }
+
                     //play audio for category
                     path = mapCategoryAudio.get(categ);
                     playAudioGobId(path,gobId);
@@ -2584,6 +2607,19 @@ public class ZeeConfig {
         return null;
     }
 
+    // 1st gob.checkGobDead is set true in applyGobSettings()
+    // 2nd this method us called only on gobs with flag checkGobDead
+    public static void checkGobDeadDelayed(Gob ob){
+        //println("checkGobDead "+ob.getres().name);
+
+        //2nd pass  (1st pass in applyGobSettings)
+        applyGobSettingsAudio(ob);
+        applyGobSettingsAggro(ob);
+
+        //check only once
+        ob.checkGobDead = false;
+    }
+
     public static void applyGobSettings(Gob ob) {
         if(ob!=null && ob.getres()!=null) {
             try{
@@ -2596,9 +2632,9 @@ public class ZeeConfig {
             if (ob.resName.contentEquals("gfx/kritter/bat/bat") && ZeeManagerItemClick.isItemEquipped("/batcape")) {
                 return;
             }
-            ZeeConfig.applyGobSettingsAudio(ob);
-            ZeeConfig.applyGobSettingsAggro(ob);
-            ZeeConfig.applyGobSettingsHighlight(ob, ZeeConfig.getHighlightGobColor(ob));
+            applyGobSettingsAudio(ob);
+            applyGobSettingsAggro(ob);
+            applyGobSettingsHighlight(ob, getHighlightGobColor(ob));
             if (ob.resName!=null && !ob.resName.isBlank() && !mapGobSession.containsKey(ob.resName))
                 mapGobSession.put(ob.resName,"");
             if (ZeeManagerMiner.isCursorMining && ZeeManagerMiner.isBoulder(ob))
@@ -2609,9 +2645,22 @@ public class ZeeConfig {
     private static void applyGobSettingsAggro(Gob gob) {
         if( mapCategoryGobs.get(CATEG_AGROCREATURES).contains(gob.resName)) {
             //aggro radius
-            if (ZeeConfig.aggroRadiusTiles > 0)
+            if (skipGobDead(gob))
+                return;
+
+            if (ZeeConfig.aggroRadiusTiles>0)
                 gob.addol(new Gob.Overlay(gob, new ZeeGobRadius(gob, null, ZeeConfig.aggroRadiusTiles * MCache.tilesz2.y), ZeeManagerGobClick.OVERLAY_ID_AGGRO));
         }
+    }
+
+    public static boolean isGobDeadOrKnock(Gob gob){
+        if (gob==null)
+            return false;
+        String poses = getGobPoses(gob);
+        return poses.endsWith("knocked")
+                || poses.endsWith("knock")
+                || poses.endsWith("/dead") //bat
+                ;
     }
 
     public static Gob getClosestGobByNameContains(String nameContains) {

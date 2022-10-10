@@ -26,9 +26,10 @@
 
 package haven;
 
-import java.util.*;
-import java.util.function.*;
 import haven.render.*;
+
+import java.util.*;
+import java.util.function.Consumer;
 
 public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Skeleton.HasPose {
     public Coord2d rc;
@@ -173,7 +174,10 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Sk
 	updstate();
 	if(virtual && ols.isEmpty() && (getattr(Drawable.class) == null))
 	    glob.oc.remove(this);
+	if (checkGobDead)
+		ZeeConfig.checkGobDeadDelayed(this);
     }
+	volatile boolean checkGobDead = false;
 
     public void gtick(Render g) {
 	Drawable d = getattr(Drawable.class);
