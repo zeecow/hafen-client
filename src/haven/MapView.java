@@ -315,7 +315,60 @@ public class MapView extends PView implements DTarget, Console.Directory {
 	}
     }
     static {camtypes.put("bad", FreeCam.class);}
-    
+
+	public class LagCam extends Camera {
+		private float dist = 50.0f;
+		private float distprev = 50.0f;
+		private float elev = (float)Math.PI / 4.0f;
+		private float angl = 0.0f;
+		private float anglprev = 0.0f;
+		private Coord dragorig = null;
+		private float elevorig, anglorig;
+		private Coord3f cc, ccprev = getcc();
+		private float ccdiff = 16;
+
+		public void tick(double dt) {
+			cc = getcc();
+			cc.y = -cc.y;
+			ccdiff = cc.dist(ccprev);
+			//ZeeConfig.println("ccdiff "+ccdiff+" , dist "+dist);
+			if (angl!=anglprev || dist!=distprev || ccdiff > 15f + (dist/7)) {
+				view = haven.render.Camera.pointed(cc.add(0.0f, 0.0f, 15f), dist, elev, angl);
+				ccprev = cc;
+				distprev = dist;
+				anglprev = angl;
+			}
+		}
+
+		public float angle() {
+			return(angl);
+		}
+
+		public boolean click(Coord c) {
+			elevorig = elev;
+			anglorig = angl;
+			dragorig = c;
+			return(true);
+		}
+
+		public void drag(Coord c) {
+			elev = elevorig - ((float)(c.y - dragorig.y) / 100.0f);
+			if(elev < 0.0f) elev = 0.0f;
+			if(elev > (Math.PI / 2.0)) elev = (float)Math.PI / 2.0f;
+			angl = anglorig + ((float)(c.x - dragorig.x) / 100.0f);
+			angl = angl % ((float)Math.PI * 2.0f);
+		}
+
+		public boolean wheel(Coord c, int amount) {
+			float d = dist + (amount * 25);
+			if(d < 5)
+				d = 5;
+			dist = d;
+			return(true);
+		}
+	}
+	static {camtypes.put("lag", LagCam.class);}
+
     public class OrthoCam extends Camera {
 	public boolean exact = true;
 	protected float dist = 500.0f;
