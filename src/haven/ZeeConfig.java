@@ -891,7 +891,7 @@ public class ZeeConfig {
             ZeeManagerCook.pepperRecipeOpened(window);
         }
 
-        if (gameUI!=null && !gameUI.sz.equals(0,0)){
+        if (gameUI!=null && !gameUI.sz.equals(0,0) && !isBuildWindow(window)){
             windowApplySavedPosition(window, windowTitle);
             windowFitView(window);
         }
