@@ -222,6 +222,10 @@ public class ZeeManagerGobClick extends ZeeThread{
                 else if (isGobLiftable(gobName) || isGobBush(gobName)) {
                     liftGob(gob);
                 }
+                // gob stockpile area test
+                else if (ZeeManagerStockpile.isGobPileable(gob)){
+                    println("todo gobpile area");
+                }
             }
         }
         catch (Exception e){
