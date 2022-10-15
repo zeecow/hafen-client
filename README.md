@@ -38,6 +38,7 @@ Client focusing on small helper tasks, many using mouse middle button, and other
  - midclick mark expands minimap, center mark, highlight mark
  - new mark zooms map for precision 
  - Lag Camera (:cam lag)
+ - ctrl+q pickup gob window
  - midclick ground 
    - while holding item will move to location (simulates ctrl+click)
    - while inspecting icon active, will msg tile name
@@ -119,4 +120,4 @@ other stuff:
  - keybelt shortcuts navigation 
  - reposition rightmost windows horiz. when game resize
  - drink key "'"
- - pickup key "q", shift+q pickup all, ctrl+q pickup next closest
+ - pickup key "q", shift+q pickup all, ctrl+q pickup window

@@ -575,11 +575,20 @@ public class ZeeConfig {
         return false;
     }
 
-    public static boolean isKritter(String name){
+    static boolean isKritter(String name){
         return name.contains("/kritter/");
     }
 
-    public static boolean isBird(String name){
+    // TODO more precise using big animals names instead?
+    static boolean isKritterNotPickable(String resname) {
+//        if (!isKritter(resname))
+//            return true;
+        if(!isBug(resname) && !isSmallAnimal(resname))
+            return true;
+        return false;
+    }
+
+    static boolean isBird(String name){
         String[] list = {
             "rockdove","quail","/chick","/hen","/rooster","eagle","owl","magpie",
             "mallard","pelican","seagull","swan","ptarmigan","grouse"
@@ -3014,5 +3023,6 @@ public class ZeeConfig {
 
         return names.contains(ZeeConfig.getTileResName(getPlayerTile()));
     }
+
 
 }
