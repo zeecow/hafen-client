@@ -149,10 +149,6 @@ public class ZeeManagerGobClick extends ZeeThread{
                         ZeeConfig.clickCoord(coordMc.floor(posres),3,UI.MOD_SHIFT);
                     }
                 }
-                // clear reeds
-                else if (gobName.contentEquals("gfx/terobjs/bushes/reeds")) {
-                    clearReeds(gob);
-                }
                 // schedule tree removal
                 else if (isRemovingAllTrees && isGobTree(gobName)) {
                     scheduleRemoveTree(gob);
@@ -231,23 +227,6 @@ public class ZeeManagerGobClick extends ZeeThread{
         catch (Exception e){
             e.printStackTrace();
         }
-    }
-
-    private void clearReeds(Gob reed) {
-        try{
-            ZeeConfig.addPlayerText("clearing");
-            do {
-                clickGobPetal(reed, "Clear");
-                // wait harvesting end, or cancel click returns false
-                if (!waitPlayerPoseNotInList(ZeeConfig.POSE_PLAYER_HARVESTING,ZeeConfig.POSE_PLAYER_DRINK))
-                    break;
-                sleep(PING_MS);
-                reed = ZeeConfig.getClosestGobByNameContains("gfx/terobjs/bushes/reeds");
-            }while(!ZeeConfig.isPlayerHoldingItem() && !ZeeConfig.isTaskCanceledByGroundClick());
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-        ZeeConfig.removePlayerText();
     }
 
     void disembarkBoatAtShore(Coord2d mc){
