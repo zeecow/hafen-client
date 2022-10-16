@@ -25,17 +25,17 @@ public class ZeeManagerStockpile extends ZeeThread{
     static Map<String, String> mapItemPileRegex = Map.ofEntries(
             entry("gfx/terobjs/items/flaxfibre", "/stockpile-flaxfibre"),
             entry("gfx/terobjs/items/hempfibre", "/stockpile-hempfibre"),
-            entry("gfx/terobjs/items/nugget-", "/stockpile-nugget-metal"),
-            entry("gfx/terobjs/items/bar-","/stockpile-metal"),
-            entry("gfx/terobjs/items/cloth$", "/stockpile-cloth"),
-            entry("gfx/terobjs/items/rope$","/stockpile-rope"),
-            entry("gfx/terobjs/items/b?coal","/stockpile-coal"),
-            entry("gfx/terobjs/items/wblock-","/stockpile-wblock"),
-            entry("gfx/terobjs/items/board-","/stockpile-board"),
-            entry("gfx/terobjs/items/leaf-","/stockpile-leaf"),
-            entry("gfx/terobjs/items/bough-","/stockpile-bough"),
+            entry("gfx/terobjs/items/nugget-.+", "/stockpile-nugget-metal"),
+            entry("gfx/terobjs/items/bar-.+","/stockpile-metal"),
+            entry("gfx/terobjs/items/cloth", "/stockpile-cloth"),
+            entry("gfx/terobjs/items/rope","/stockpile-rope"),
+            entry("gfx/terobjs/items/(black)?coal","/stockpile-coal"),
+            entry("gfx/terobjs/items/wblock-.+","/stockpile-wblock"),
+            entry("gfx/terobjs/items/board-.+","/stockpile-board"),
+            entry("gfx/terobjs/items/leaf-.+","/stockpile-leaf"),
+            entry("gfx/terobjs/items/bough-.+","/stockpile-bough"),
             entry("gfx/terobjs/items/sand","/stockpile-sand"),
-            entry("gfx/terobjs/items/clay-","/stockpile-clay"),
+            entry("gfx/terobjs/items/clay-.+","/stockpile-clay"),
             entry("gfx/terobjs/items/cattail","/stockpile-cattailpart"),
             entry("gfx/terobjs/items/straw","/stockpile-straw"),
             entry("gfx/terobjs/items/petrifiedshell","/stockpile-petrifiedshell"),
@@ -53,15 +53,15 @@ public class ZeeManagerStockpile extends ZeeThread{
             entry("gfx/terobjs/items/bone","/stockpile-bone"),
             entry("gfx/terobjs/items/feather","/stockpile-feather"),
             //ores
-            entry("gfx/terobjs/items/*+ite","/stockpile-ore"),
+            entry("gfx/terobjs/items/.+ite","/stockpile-ore"),
             // stones, requires extra code for regular ones
-            entry("gfx/terobjs/items/slag$","/stockpile-stone"),
-            entry("gfx/terobjs/items/catgold$","/stockpile-stone"),
-            entry("gfx/terobjs/items/quarryartz$","/stockpile-stone"),
+            entry("gfx/terobjs/items/slag","/stockpile-stone"),
+            entry("gfx/terobjs/items/catgold","/stockpile-stone"),
+            entry("gfx/terobjs/items/quarryartz","/stockpile-stone"),
             // flowers, requires extra code for non poppy
             entry("gfx/terobjs/items/flower-poppy","/stockpile-poppy"),
             //soil
-            entry("gfx/terobjs/items/(mulch|soil|earthworm)$","/stockpile-soil"),
+            entry("gfx/terobjs/items/(mulch|soil|earthworm)","/stockpile-soil"),
             //trash pile
             entry("gfx/terobjs/items/(entrails|intestines)","/stockpile-trash")
     );
