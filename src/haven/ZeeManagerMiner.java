@@ -18,7 +18,12 @@ public class ZeeManagerMiner extends ZeeThread{
 
     public static void checkMiningSelection() {
 
-        // not mining
+        if (isChippingBoulder) {
+            println("chipping boulder,  skip check selection");
+            return;
+        }
+
+        // selection is not mining
         if (!isCursorMining){
             miningAreaSelectedMs = -1;
             return;
@@ -40,78 +45,71 @@ public class ZeeManagerMiner extends ZeeThread{
             tunnelHelperButtonAct.disable(true);
         }
 
-        // TODO remove commented code if unecessary, test it out
+        if(!tunneling)
+            return;
 
         // wait player idle, if boulder close, chip it and resume mining
-//            new ZeeThread(){
-//                public void run() {
-//                    try {
-//                        if (isCombatActive())
-//                            return;
-//                        if (tunneling) {
-//                            if (tunnelHelperStage == TUNNELHELPER_STAGE0_IDLE) {
-//                                tunnelHelperSetStage(TUNNELHELPER_STAGE1_MINETUNNEL);
-//                            }
-//                            else if (tunnelHelperStage == TUNNELHELPER_STAGE2_WAITNEWCOLTILE){
-//                                tunnelHelperSetStage(TUNNELHELPER_STAGE3_MINECOL);
-//                            }
-//                        }
-//
-//                        // wait mining stop
-//                        waitPlayerPoseMs(ZeeConfig.POSE_PLAYER_IDLE, 1000);
-//                        if (isCombatActive())
-//                            return;
-//
-//                        // save player coord after mining new col tile
-//                        if (tunneling && tunnelHelperStage == TUNNELHELPER_STAGE3_MINECOL){
-//                            println("saved end coord");
-//                            if (tunnelHelperEndCoord!=null)
-//                                tunnelHelperEndCoordPrev = Coord.of(tunnelHelperEndCoord);
-//                            tunnelHelperEndCoord = ZeeConfig.getPlayerCoord();
-//                        }
-//
-//                        // check if boulder close
-//                        if (!ZeeConfig.autoChipMinedBoulder)
-//                            return;
-//                        Gob boulder = getBoulderCloseEnoughForChipping();
-//
-//                        // no boulder, mining stopped
-//                        if (boulder == null) {
-//                            if (tunneling) {
-//                                // finished mining tunnel
-//                                if (tunnelHelperStage == TUNNELHELPER_STAGE1_MINETUNNEL) {
-//                                    tunnelHelperSetStage(TUNNELHELPER_STAGE2_WAITNEWCOLTILE);
-//                                    ZeeConfig.cursorChange(ZeeConfig.ACT_MINE);// prepare mining cursor
-//                                    //ZeeConfig.addPlayerText("click new col tile");
-//                                }
-//                                // finished mining new col tile
-//                                else if (tunnelHelperStage == TUNNELHELPER_STAGE3_MINECOL) {
-//                                    tunnelHelperSetStage(TUNNELHELPER_STAGE4_PICKSTONE);
-//                                    //ZeeConfig.removePlayerText();
-//                                    tunnelHelperButtonAct.disable(false);
-//                                    ZeeConfig.clickRemoveCursor();
-//                                    waitCursor(ZeeConfig.CURSOR_ARW);
-//                                    if (!tunnelHelperPickStonesManualClick){
-//                                        tunnelHelperButtonAct.click();
-//                                        tunnelHelperButtonAct.disable(true);
-//                                    }
-//                                }
-//                            }
-//                            return;
-//                        }
-//
-//                        if (isCombatActive())
-//                            return;
-//
-//                        // chip boulder
-//                        taskChipBoulder(boulder);
-//
-//                    }catch (Exception e){
-//                        e.printStackTrace();
-//                        ZeeConfig.removePlayerText();
-//                    }
-//                }
-//            }.start();
+            new ZeeThread(){
+                public void run() {
+                    try {
+                        if (isCombatActive())
+                            return;
+
+                        if (tunnelHelperStage == TUNNELHELPER_STAGE0_IDLE) {
+                            tunnelHelperSetStage(TUNNELHELPER_STAGE1_MINETUNNEL);
+                        }
+                        else if (tunnelHelperStage == TUNNELHELPER_STAGE2_WAITNEWCOLTILE){
+                            tunnelHelperSetStage(TUNNELHELPER_STAGE3_MINECOL);
+                        }
+
+                        // wait mining stop
+                        waitPlayerPoseMs(ZeeConfig.POSE_PLAYER_IDLE, 1500);
+                        if (!tunneling || isCombatActive())
+                            return;
+
+                        // save player coord after mining new col tile
+                        if (tunnelHelperStage == TUNNELHELPER_STAGE3_MINECOL) {
+                            println("saved end coord, pick stone?");
+                            if (tunnelHelperEndCoord != null)
+                                tunnelHelperEndCoordPrev = Coord.of(tunnelHelperEndCoord);
+                            tunnelHelperEndCoord = ZeeConfig.getPlayerCoord();
+                            //pick stone
+                            tunnelHelperSetStage(TUNNELHELPER_STAGE4_PICKSTONE);
+                            tunnelHelperButtonAct.disable(false);
+                            ZeeConfig.clickRemoveCursor();
+                            waitCursor(ZeeConfig.CURSOR_ARW);
+                            if (!tunnelHelperPickStonesManualClick) {
+                                tunnelHelperButtonAct.click();
+                                tunnelHelperButtonAct.disable(true);
+                            }
+                        } else {
+                            // finished mining tunnel
+                            if (tunnelHelperStage == TUNNELHELPER_STAGE1_MINETUNNEL) {
+                                tunnelHelperSetStage(TUNNELHELPER_STAGE2_WAITNEWCOLTILE);
+                                ZeeConfig.cursorChange(ZeeConfig.ACT_MINE);// prepare mining cursor
+                                //ZeeConfig.addPlayerText("click new col tile");
+                            }
+                            // finished mining new col tile
+                            else if (tunnelHelperStage == TUNNELHELPER_STAGE3_MINECOL) {
+                                //pick stone
+                                tunnelHelperSetStage(TUNNELHELPER_STAGE4_PICKSTONE);
+                                //ZeeConfig.removePlayerText();
+                                tunnelHelperButtonAct.disable(false);
+                                ZeeConfig.clickRemoveCursor();
+                                waitCursor(ZeeConfig.CURSOR_ARW);
+                                if (!tunnelHelperPickStonesManualClick) {
+                                    tunnelHelperButtonAct.click();
+                                    tunnelHelperButtonAct.disable(true);
+                                }
+                            }
+                        }
+
+                    }catch (Exception e){
+                        e.printStackTrace();
+                        ZeeConfig.removePlayerText();
+                    }
+                }
+            }.start();
     }
 
     static boolean tunnelCheckbox = false;
@@ -491,7 +489,9 @@ public class ZeeManagerMiner extends ZeeThread{
         }.start();
     }
 
+    static boolean isChippingBoulder;
     public static void chipBoulderNewThread(Gob boulder) {
+        isChippingBoulder = true;
         new ZeeThread(){
             public void run() {
                 try {
@@ -522,6 +522,7 @@ public class ZeeManagerMiner extends ZeeThread{
                     e.printStackTrace();
                 }
 
+                isChippingBoulder = false;
                 ZeeConfig.removePlayerText();
             }
         }.start();
