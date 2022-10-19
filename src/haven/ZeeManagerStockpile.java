@@ -11,16 +11,16 @@ public class ZeeManagerStockpile extends ZeeThread{
     static final String TASK_PILE_GROUND_ITEMS = "TASK_PILE_GROUND_ITEMS";
     static final String TASK_PILE_GOB_SOURCE = "TASK_PILE_GOB_SOURCE";
     static final String TASK_PILE_TILE_SOURCE = "TASK_PILE_TILE_SOURCE";
-    public static final String STOCKPILE_LEAF = "gfx/terobjs/stockpile-leaf";
-    public static final String STOCKPILE_BLOCK = "gfx/terobjs/stockpile-wblock";
-    public static final String STOCKPILE_BOARD = "gfx/terobjs/stockpile-board";
-    public static final String STOCKPILE_COAL = "gfx/terobjs/stockpile-coal";
-    public static final String STOCKPILE_SAND = "gfx/terobjs/stockpile-sand";
-    public static final String STOCKPILE_STONE = "gfx/terobjs/stockpile-stone";
-    public static final String BASENAME_MULB_LEAF = "leaf-mulberrytree";
-    public static final String GFX_TILES_BEACH = "gfx/tiles/beach";
-    public static final String GFX_TILES_SANDCLIFF = "gfx/tiles/sandcliff";
-    public static final String GFX_TILES_MOUNTAIN = "gfx/tiles/mountain";
+    static final String STOCKPILE_LEAF = "gfx/terobjs/stockpile-leaf";
+    static final String STOCKPILE_BLOCK = "gfx/terobjs/stockpile-wblock";
+    static final String STOCKPILE_BOARD = "gfx/terobjs/stockpile-board";
+    static final String STOCKPILE_COAL = "gfx/terobjs/stockpile-coal";
+    static final String STOCKPILE_SAND = "gfx/terobjs/stockpile-sand";
+    static final String STOCKPILE_STONE = "gfx/terobjs/stockpile-stone";
+    static final String BASENAME_MULB_LEAF = "leaf-mulberrytree";
+    static final String GFX_TILES_BEACH = "gfx/tiles/beach";
+    static final String GFX_TILES_SANDCLIFF = "gfx/tiles/sandcliff";
+    static final String GFX_TILES_MOUNTAIN = "gfx/tiles/mountain";
 
     static Map<String, String> mapItemPileRegex = Map.ofEntries(
             entry("gfx/(terobjs/items|invobjs)/flaxfibre", "/stockpile-flaxfibre"),
@@ -68,7 +68,6 @@ public class ZeeManagerStockpile extends ZeeThread{
 
     static ZeeWindow windowManager;
     public static boolean busy;
-    static GameUI gameUI;
     static Inventory mainInv;
     public static String lastPetalName;
     public static Gob gobPile, gobSource;
@@ -82,8 +81,7 @@ public class ZeeManagerStockpile extends ZeeThread{
     public ZeeManagerStockpile(String task) {
         this.task = task;
         busy = true;
-        gameUI = ZeeConfig.gameUI;
-        mainInv = gameUI.maininv;
+        mainInv = ZeeConfig.gameUI.maininv;
     }
 
     @Override
@@ -260,7 +258,7 @@ public class ZeeManagerStockpile extends ZeeThread{
 
                 if(!busy)
                     continue;
-                String itemName = gameUI.vhand.item.getres().name;
+                String itemName = ZeeConfig.gameUI.vhand.item.getres().name;
                 ZeeManagerGobClick.itemActGob(gobPile, UI.MOD_SHIFT);//right click stockpile
                 if(waitNotHoldingItem()) {
                     sleep(1000);
@@ -605,11 +603,102 @@ public class ZeeManagerStockpile extends ZeeThread{
         String[] keys = mapItemPileRegex.keySet().toArray(new String[0]);
         for (int i = 0; i < keys.length; i++) {
             if(resname.matches(keys[i])) {
-                println("isGobPileable true");
                 return true;
             }
         }
         println("isGobPileable false");
         return false;
+    }
+
+    static boolean selAreaPile;
+    static Gob selAreaPileGobItem;
+    static ZeeWindow selAreaWindow;
+    static void areaPilerWindow(Gob gobItem) {
+        String title = "Area piler";
+        Widget wdg;
+
+        selAreaPileGobItem = gobItem;
+
+        //remove prev windows
+        if (selAreaWindow!=null)
+            selAreaWindow.destroy();
+
+        //create new window
+        selAreaWindow = new ZeeWindow(Coord.of(330,170),title);
+
+        //button select area
+        wdg = selAreaWindow.add(new Button(UI.scale(120),"select items area"){
+            public void wdgmsg(String msg, Object... args) {
+                if (msg.contentEquals("activate")){
+                    ZeeConfig.addPlayerText("Select item's area");
+                    selAreaPile = true;
+                    //creates new MapView.Selector
+                    ZeeConfig.gameUI.map.uimsg("sel", 1);
+                }
+            }
+        });
+
+        //label instructions
+        wdg = selAreaWindow.add(new Label("Note: piles will be created outside area"),0,wdg.c.y+wdg.sz.y+7);
+
+        selAreaWindow.pack();
+        ZeeConfig.gameUI.add(selAreaWindow,300,300);
+    }
+
+    static void areaPilerStart() {
+        ZeeConfig.removePlayerText();
+        new ZeeThread(){
+            public void run() {
+                try{
+                    String itemGobName = selAreaPileGobItem.getres().name;
+                    Coord olStart, olEnd, gobCoord;
+                    olStart = ZeeConfig.lastSavedOverlayStartCoord;
+                    olEnd = ZeeConfig.lastSavedOverlayEndCoord;
+                    int minX,maxX,minY,maxY;
+                    minX = Math.min(olStart.x,olEnd.x);
+                    minY = Math.min(olStart.y,olEnd.y);
+                    maxX = Math.max(olStart.x,olEnd.x);
+                    maxY = Math.max(olStart.y,olEnd.y);
+
+                    //pickup items until idle
+                    List<Gob> gobs = ZeeConfig.findGobsByNameContains(itemGobName);
+                    int gobsInsideArea = 0;
+                    for (int i = 0; i < gobs.size(); i++) {
+                        gobCoord = ZeeConfig.getGobTile(gobs.get(i));
+                        if (gobCoord.x >= minX && gobCoord.x <= maxX && gobCoord.y >= minY && gobCoord.y <= maxY)
+                        {
+                            gobsInsideArea++;
+                        }
+                    }
+                    if (gobsInsideArea < gobs.size()){
+                        ZeeConfig.msgError("there are items outside selection");
+                    }
+                    ZeeManagerGobClick.gobClick(selAreaPileGobItem,3,UI.MOD_SHIFT);
+                    waitInvIdleMs(1000);
+
+                    // hold item at hand
+                    if (!ZeeConfig.isPlayerHoldingItem()){
+                        String itemInvName = "gfx/invobjs/"+selAreaPileGobItem.getres().basename();
+                        WItem witem = ZeeConfig.getMainInventory().getWItemsByName(itemInvName).get(0);
+                        ZeeManagerItemClick.pickUpItem(witem);
+                    }
+
+                    //create pile
+                    ZeeConfig.gameUI.map.wdgmsg("itemact", olStart, ZeeConfig.tileToCoord(olStart), 0);
+                    sleep(500);//wait virtual pile
+                    ZeeConfig.gameUI.map.wdgmsg("place",ZeeConfig.tileToCoord(olStart), 16384, 1, UI.MOD_SHIFT);
+
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+                //destroy area selection
+                selAreaPile = false;
+                ZeeConfig.gameUI.map.uimsg("sel",0);
+                ZeeConfig.resetTileSelection();
+                //close window
+                if (selAreaWindow!=null)
+                    selAreaWindow.destroy();
+            }
+        }.start();
     }
 }

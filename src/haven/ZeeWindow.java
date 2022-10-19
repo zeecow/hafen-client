@@ -2,8 +2,8 @@ package haven;
 
 public class ZeeWindow extends Window {
 
-    public ZeeWindow(Coord coord, String title) {
-        super(coord, title);
+    public ZeeWindow(Coord size, String title) {
+        super(size, title);
     }
 
     @Override

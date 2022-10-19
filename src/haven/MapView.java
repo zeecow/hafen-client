@@ -2259,7 +2259,7 @@ public class MapView extends PView implements DTarget, Console.Directory {
 		    Coord ec = mc.div(MCache.tilesz2);
 		    xl.mv = false;
 		    tt = null;
-			if(!ZeeConfig.farmerMode){
+			if(!ZeeConfig.farmerMode && !ZeeManagerStockpile.selAreaPile){
 				ol.destroy();
 			}else {
 				// farmermode preserve overlay, unless cancel button
@@ -2269,7 +2269,10 @@ public class MapView extends PView implements DTarget, Console.Directory {
 			}
 		    mgrab.remove();
 			ZeeConfig.saveTileSelection(new Coord(sc), new Coord(ec), modflags, ol);
-		    wdgmsg("sel", sc, ec, modflags);
+			if (ZeeManagerStockpile.selAreaPile)
+				ZeeManagerStockpile.areaPilerStart();
+			else
+		    	wdgmsg("sel", sc, ec, modflags);
 		    sc = null;
 		}
 		return(true);

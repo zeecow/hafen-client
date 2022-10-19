@@ -224,7 +224,7 @@ public class ZeeManagerGobClick extends ZeeThread{
                 }
                 // gob stockpile area test
                 else if (ZeeManagerStockpile.isGobPileable(gob)){
-                    println("todo gobpile area");
+                    ZeeManagerStockpile.areaPilerWindow(gob);
                 }
             }
         }
