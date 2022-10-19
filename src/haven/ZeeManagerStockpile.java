@@ -1,5 +1,6 @@
 package haven;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -634,6 +635,8 @@ public class ZeeManagerStockpile extends ZeeThread{
                     selAreaPile = true;
                     //creates new MapView.Selector
                     ZeeConfig.gameUI.map.uimsg("sel", 1);
+                    //show grid lines
+                    ZeeConfig.gameUI.map.showgrid(true);
                 }
             }
         });
@@ -646,59 +649,160 @@ public class ZeeManagerStockpile extends ZeeThread{
     }
 
     static void areaPilerStart() {
-        ZeeConfig.removePlayerText();
+        ZeeConfig.gameUI.map.showgrid(false);
         new ZeeThread(){
             public void run() {
                 try{
                     String itemGobName = selAreaPileGobItem.getres().name;
-                    Coord olStart, olEnd, gobCoord;
-                    olStart = ZeeConfig.lastSavedOverlayStartCoord;
-                    olEnd = ZeeConfig.lastSavedOverlayEndCoord;
-                    int minX,maxX,minY,maxY;
-                    minX = Math.min(olStart.x,olEnd.x);
-                    minY = Math.min(olStart.y,olEnd.y);
-                    maxX = Math.max(olStart.x,olEnd.x);
-                    maxY = Math.max(olStart.y,olEnd.y);
+                    String itemInvName = "gfx/invobjs/" + selAreaPileGobItem.getres().basename();
+                    Coord olStart = ZeeConfig.lastSavedOverlayStartCoord;
+                    Coord olEnd = ZeeConfig.lastSavedOverlayEndCoord;
+                    Gob latestPile = null;
 
-                    //pickup items until idle
-                    List<Gob> gobs = ZeeConfig.findGobsByNameContains(itemGobName);
-                    int gobsInsideArea = 0;
-                    for (int i = 0; i < gobs.size(); i++) {
-                        gobCoord = ZeeConfig.getGobTile(gobs.get(i));
-                        if (gobCoord.x >= minX && gobCoord.x <= maxX && gobCoord.y >= minY && gobCoord.y <= maxY)
-                        {
-                            gobsInsideArea++;
+                    // get border tiles for placing piles
+                    List<Coord> borderTiles = getPilesTiles(olStart,olEnd);
+                    if (borderTiles.size()==0){
+                        println("no pile tiles found");
+                        return;
+                    }
+
+                    // create pile(s) at border tiles
+                    while(borderTiles.size() > 0) {
+
+                        //pickup items until idle
+                        ZeeConfig.addPlayerText("pickup");
+                        Gob closestItem = ZeeConfig.getClosestGobByNameContains(itemGobName);
+                        if (closestItem==null){
+                            println("no more items to pile");
+                            ZeeConfig.removePlayerText();
+                            break;
+                        }
+                        ZeeManagerGobClick.gobClick(closestItem,3,UI.MOD_SHIFT);
+                        waitInvIdleMs(1000);
+
+                        //move to center tile before creating pile
+                        ZeeConfig.addPlayerText("centering");
+                        ZeeConfig.clickTile(ZeeConfig.getAreaCenterTile(ZeeConfig.lastSavedOverlay.a),1);
+                        waitPlayerIdleVelocity();
+
+                        // hold item at vhand
+                        if (!ZeeConfig.isPlayerHoldingItem()) {
+                            List<WItem> items = ZeeConfig.getMainInventory().getWItemsByName(itemInvName);
+                            if (items==null || items.size()==0){
+                                println("no more inventory items to pile");
+                                continue;
+                            }
+                            ZeeManagerItemClick.pickUpItem(items.get(0));
+                        }
+
+                        // use latest pile
+                        ZeeConfig.addPlayerText("piling");
+                        if (latestPile!=null){
+                            ZeeManagerGobClick.itemActGob(latestPile,UI.MOD_SHIFT);
+                            waitPlayerIdleVelocity();//wait approach pile
+                            sleep(500);//wait transf items
+                            List<WItem> invItems = ZeeConfig.getMainInventory().getWItemsByName(itemInvName);
+                            if (invItems!=null && invItems.size()>0){
+                                println("latest pile is full");
+                                latestPile = null;
+                                //continue;
+                            }
+                        }
+                        //create new pile
+                        else {
+
+                            //create virtual pile
+                            ZeeConfig.gameUI.map.wdgmsg("itemact", olStart, ZeeConfig.tileToCoord(olStart), 0);
+                            sleep(500);
+
+                            // try placing pile until run out of border tiles
+                            do {
+                                //get new tile
+                                if (borderTiles.isEmpty()) {
+                                    println("out of border tiles for placing piles");
+                                    break;
+                                }
+                                Coord coordNewPile = borderTiles.remove(0);
+
+                                //reserve space for big piles
+                                if (itemGobName.contains("/straw")) {
+                                    borderTiles.remove(0);
+                                    if (itemGobName.contains("/board-"))
+                                        borderTiles.remove(0);
+                                }
+
+                                //try placing pile
+                                Coord playerTile = ZeeConfig.getPlayerTile();
+                                ZeeConfig.gameUI.map.wdgmsg("place", ZeeConfig.tileToCoord(coordNewPile), 16384, 1, UI.MOD_SHIFT);
+                                waitPlayerIdleFor(1);
+
+                                //player didnt move? tile occupied, terrain not flat...
+                                if (playerTile.compareTo(ZeeConfig.getPlayerTile()) == 0){
+                                    println("tile can't be used for pile, trying next");
+                                }else{
+                                    //tile free, pile placed?
+                                    break;
+                                }
+
+                            }while (!borderTiles.isEmpty());
+
+                            if (borderTiles.isEmpty()) {
+                                println("out of tiles 2");
+                                break;
+                            }
+
+                            //update next pile
+                            if (latestPile!=null)
+                                ZeeConfig.removeGobText(latestPile);
+                            latestPile = ZeeConfig.getClosestGobByNameContains("/stockpile-");
+                            ZeeConfig.addGobText(latestPile,"pile");
                         }
                     }
-                    if (gobsInsideArea < gobs.size()){
-                        ZeeConfig.msgError("there are items outside selection");
-                    }
-                    ZeeManagerGobClick.gobClick(selAreaPileGobItem,3,UI.MOD_SHIFT);
-                    waitInvIdleMs(1000);
 
-                    // hold item at hand
-                    if (!ZeeConfig.isPlayerHoldingItem()){
-                        String itemInvName = "gfx/invobjs/"+selAreaPileGobItem.getres().basename();
-                        WItem witem = ZeeConfig.getMainInventory().getWItemsByName(itemInvName).get(0);
-                        ZeeManagerItemClick.pickUpItem(witem);
-                    }
-
-                    //create pile
-                    ZeeConfig.gameUI.map.wdgmsg("itemact", olStart, ZeeConfig.tileToCoord(olStart), 0);
-                    sleep(500);//wait virtual pile
-                    ZeeConfig.gameUI.map.wdgmsg("place",ZeeConfig.tileToCoord(olStart), 16384, 1, UI.MOD_SHIFT);
+                    ZeeConfig.removePlayerText();
+                    if (latestPile!=null)
+                        ZeeConfig.removeGobText(latestPile);
 
                 }catch (Exception e){
                     e.printStackTrace();
                 }
+
                 //destroy area selection
                 selAreaPile = false;
                 ZeeConfig.gameUI.map.uimsg("sel",0);
                 ZeeConfig.resetTileSelection();
+
                 //close window
                 if (selAreaWindow!=null)
                     selAreaWindow.destroy();
             }
         }.start();
+    }
+
+    static List<Coord> getPilesTiles(Coord olStart, Coord olEnd) {
+        List<Coord> listRowTiles = new ArrayList<>();
+        int minX,maxX,minY,maxY;
+        minX = Math.min(olStart.x,olEnd.x);
+        minY = Math.min(olStart.y,olEnd.y);
+        maxX = Math.max(olStart.x,olEnd.x);
+        maxY = Math.max(olStart.y,olEnd.y);
+        //top row tiles
+        for (int i = minX-1; i <= maxX+1; i++) {
+            listRowTiles.add(Coord.of(i,minY-1));
+        }
+        //bottom row tiles
+        for (int i = minX-1; i <= maxX+1; i++) {
+            listRowTiles.add(Coord.of(i,minY+1));
+        }
+        return listRowTiles;
+    }
+
+    static boolean isTileInsideArea(Coord gobCoord, Coord olStart, Coord olEnd) {
+        int minX,maxX,minY,maxY;
+        minX = Math.min(olStart.x,olEnd.x);
+        minY = Math.min(olStart.y,olEnd.y);
+        maxX = Math.max(olStart.x,olEnd.x);
+        maxY = Math.max(olStart.y,olEnd.y);
+        return (gobCoord.x >= minX && gobCoord.x <= maxX && gobCoord.y >= minY && gobCoord.y <= maxY);
     }
 }
