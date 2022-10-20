@@ -28,7 +28,7 @@ public class ZeeManagerStockpile extends ZeeThread{
             entry("gfx/(terobjs/items|invobjs)/hempfibre", "/stockpile-hempfibre"),
             entry("gfx/(terobjs/items|invobjs)/turnip", "/stockpile-turnip"),
             entry("gfx/(terobjs/items|invobjs)/carrot", "/stockpile-carrot"),
-            entry("gfx/(terobjs/items|invobjs)/beetroot", "/stockpile-beetroot"),
+            entry("gfx/(terobjs/items|invobjs)/beet", "/stockpile-beetroot"),
             entry("gfx/(terobjs/items|invobjs)/nugget-.+", "/stockpile-nugget-metal"),
             entry("gfx/(terobjs/items|invobjs)/bar-.+","/stockpile-metal"),
             entry("gfx/(terobjs/items|invobjs)/cloth", "/stockpile-cloth"),
@@ -67,7 +67,7 @@ public class ZeeManagerStockpile extends ZeeThread{
             //soil
             entry("gfx/(terobjs/items|invobjs)/(mulch|soil|earthworm)","/stockpile-soil"),
             //trash pile
-            entry("gfx/(terobjs/items|invobjs)/(entrails|intestines)","/stockpile-trash")
+            entry("gfx/(terobjs/items|invobjs)/(entrails|intestines|pumpkinflesh)","/stockpile-trash")
     );
 
     static ZeeWindow windowManager;
@@ -678,6 +678,11 @@ public class ZeeManagerStockpile extends ZeeThread{
                     String itemInvName = "gfx/invobjs/" + selAreaPileGobItem.getres().basename();
                     Coord olStart = ZeeConfig.lastSavedOverlayStartCoord;
                     Coord olEnd = ZeeConfig.lastSavedOverlayEndCoord;
+                    int minX,maxX,minY,maxY;
+                    minX = Math.min(olStart.x,olEnd.x);
+                    minY = Math.min(olStart.y,olEnd.y);
+                    maxX = Math.max(olStart.x,olEnd.x);
+                    maxY = Math.max(olStart.y,olEnd.y);
                     Gob latestPile = null;
 
                     // get border tiles for placing piles
@@ -736,9 +741,20 @@ public class ZeeManagerStockpile extends ZeeThread{
                         }
                         //create new pile
                         else {
+                            // get non farming tile (gfx/tiles/field)
+                            Coord nonFarmingTile = Coord.of(minX - 1, minY - 1);
+                            String tileResName;
+                            do{
+                                nonFarmingTile = nonFarmingTile.sub(1,1);
+                                tileResName = ZeeConfig.getTileResName(nonFarmingTile);
+                            }while(tileResName.contentEquals("gfx/tiles/field"));
+                            if (tileResName.isBlank()){
+                                println("blank tile");
+                                nonFarmingTile = borderTiles.get(0);
+                            }
 
-                            //create virtual pile
-                            ZeeConfig.gameUI.map.wdgmsg("itemact", olStart, ZeeConfig.tileToCoord(olStart), 0);
+                            //rclick nonfarming tile to create virtual pile
+                            ZeeConfig.gameUI.map.wdgmsg("itemact", nonFarmingTile, ZeeConfig.tileToCoord(nonFarmingTile), 0);
                             sleep(500);
 
                             // try placing pile until run out of border tiles
