@@ -463,9 +463,9 @@ public class ZeeConfig {
 
     //  gfx/invobjs/turnip , gfx/invobjs/seed-turnip
     public static boolean isItemCrop(String basename) {
-        String crops = "seed-turnip,seed-carrot,seed-flax,seed-hemp,seed-leek,seed-poppy,"
+        String crops = "beetroot,seed-turnip,turnip,seed-carrot,carrot,seed-flax,seed-hemp,seed-leek,leek,seed-poppy,"
             +"seed-pipeweed,seed-cucumber,seed-barley,seed-wheat,seed-millet,seed-lettuce,"
-            +"seed-pumpkin,beetroot";
+            +"seed-pumpkin";
         return crops.contains(basename);
     }
 

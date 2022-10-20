@@ -26,6 +26,9 @@ public class ZeeManagerStockpile extends ZeeThread{
     static Map<String, String> mapItemPileRegex = Map.ofEntries(
             entry("gfx/(terobjs/items|invobjs)/flaxfibre", "/stockpile-flaxfibre"),
             entry("gfx/(terobjs/items|invobjs)/hempfibre", "/stockpile-hempfibre"),
+            entry("gfx/(terobjs/items|invobjs)/turnip", "/stockpile-turnip"),
+            entry("gfx/(terobjs/items|invobjs)/carrot", "/stockpile-carrot"),
+            entry("gfx/(terobjs/items|invobjs)/beetroot", "/stockpile-beetroot"),
             entry("gfx/(terobjs/items|invobjs)/nugget-.+", "/stockpile-nugget-metal"),
             entry("gfx/(terobjs/items|invobjs)/bar-.+","/stockpile-metal"),
             entry("gfx/(terobjs/items|invobjs)/cloth", "/stockpile-cloth"),
@@ -625,7 +628,14 @@ public class ZeeManagerStockpile extends ZeeThread{
             selAreaWindow.destroy();
 
         //create new window
-        selAreaWindow = new ZeeWindow(Coord.of(330,170),title);
+        selAreaWindow = new ZeeWindow(Coord.of(330,170),title){
+            public void wdgmsg(String msg, Object... args) {
+                if (msg.contentEquals("close")){
+                    exitAreaPiler();
+                }
+                super.wdgmsg(msg, args);
+            }
+        };
 
         //button select area
         wdg = selAreaWindow.add(new Button(UI.scale(120),"select items area"){
@@ -648,9 +658,20 @@ public class ZeeManagerStockpile extends ZeeThread{
         ZeeConfig.gameUI.add(selAreaWindow,300,300);
     }
 
-    static void areaPilerStart() {
+    static void exitAreaPiler() {
+        selAreaPile = false;
+        ZeeConfig.resetTileSelection();
+        // TODO exit thread piler stop all activity and cleanup
+    }
+
+    static ZeeThread threadAreaPiler;
+    static ZeeThread areaPilerStart() {
+        if (selAreaPileGobItem==null){
+            println("areaPilerStart > selAreaPileGobItem null");
+            return null;
+        }
         ZeeConfig.gameUI.map.showgrid(false);
-        new ZeeThread(){
+        threadAreaPiler = new ZeeThread(){
             public void run() {
                 try{
                     String itemGobName = selAreaPileGobItem.getres().name;
@@ -667,7 +688,7 @@ public class ZeeManagerStockpile extends ZeeThread{
                     }
 
                     // create pile(s) at border tiles
-                    while(borderTiles.size() > 0) {
+                    while(selAreaPile && borderTiles.size() > 0) {
 
                         //pickup items until idle
                         ZeeConfig.addPlayerText("pickup");
@@ -679,6 +700,9 @@ public class ZeeManagerStockpile extends ZeeThread{
                         }
                         ZeeManagerGobClick.gobClick(closestItem,3,UI.MOD_SHIFT);
                         waitInvIdleMs(1000);
+                        if (!selAreaPile){//user closed piler window?
+                            break;
+                        }
 
                         //move to center tile before creating pile
                         ZeeConfig.addPlayerText("centering");
@@ -704,6 +728,8 @@ public class ZeeManagerStockpile extends ZeeThread{
                             List<WItem> invItems = ZeeConfig.getMainInventory().getWItemsByName(itemInvName);
                             if (invItems!=null && invItems.size()>0){
                                 println("latest pile is full");
+                                if (latestPile!=null)
+                                    ZeeConfig.removeGobText(latestPile);
                                 latestPile = null;
                                 //continue;
                             }
@@ -759,13 +785,14 @@ public class ZeeManagerStockpile extends ZeeThread{
                         }
                     }
 
-                    ZeeConfig.removePlayerText();
                     if (latestPile!=null)
                         ZeeConfig.removeGobText(latestPile);
 
                 }catch (Exception e){
                     e.printStackTrace();
                 }
+
+                ZeeConfig.removePlayerText();
 
                 //destroy area selection
                 selAreaPile = false;
@@ -776,7 +803,9 @@ public class ZeeManagerStockpile extends ZeeThread{
                 if (selAreaWindow!=null)
                     selAreaWindow.destroy();
             }
-        }.start();
+        };
+        threadAreaPiler.start();
+        return threadAreaPiler;
     }
 
     static List<Coord> getPilesTiles(Coord olStart, Coord olEnd) {

@@ -18,6 +18,7 @@ public class ZeeManagerFarmer extends ZeeThread{
     public static ZeeManagerFarmer manager;
 
     public static boolean farmerCbReplant = Utils.getprefb("farmerCbPlant",false);
+    public static boolean farmerCbPile = Utils.getprefb("farmerCbPile",false);
     public static int farmerTxtTilesBarrel = Utils.getprefi("farmerTxtTilesBarrel",27);
     public static TextEntry textEntryTilesBarrel;
     public static Gob farmerGobCrop;
@@ -50,7 +51,11 @@ public class ZeeManagerFarmer extends ZeeThread{
             ZeeConfig.resetTileSelection();
             ZeeConfig.autoHearthOnStranger = Utils.getprefb("autoHearthOnStranger", true);
             ZeeConfig.removeGobText(ZeeConfig.getPlayerGob());
-            manager.interrupt();
+            if (manager!=null)
+                manager.interrupt();
+
+            //piler
+            ZeeManagerStockpile.selAreaPile = false;
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -62,6 +67,8 @@ public class ZeeManagerFarmer extends ZeeThread{
      */
     private boolean updateSeedPileReference() {
         List<WItem> items = inv.getWItemsByName(gItemSeedBasename);
+        if (items==null || items.size()==0)
+            return false;
         int seeds;
         for (WItem item : items) {
             seeds = getSeedsAmount(item.item);
@@ -141,7 +148,7 @@ public class ZeeManagerFarmer extends ZeeThread{
             /*
                 planting stage
              */
-            if(ZeeManagerFarmer.farmerCbReplant) {
+            if(farmerCbReplant) {
                 isPlantingDone = false;
                 ZeeManagerItemClick.equipTwoSacks();
                 while (busy && !isPlantingDone) {
@@ -180,15 +187,56 @@ public class ZeeManagerFarmer extends ZeeThread{
                     }
                     //else restart plant loop
                 }
-
-                //final store barrel
-                storeSeedsInBarrel();
             }
+
+            //final store barrel
+            storeSeedsInBarrel();
+
+
+           /*
+                piling stage
+            */
+            if (farmerCbPile){
+                ZeeManagerStockpile.selAreaPile = true;
+                ZeeManagerStockpile.selAreaPileGobItem = getPileItemGob();
+                ZeeThread t = ZeeManagerStockpile.areaPilerStart();
+                if (t!=null)
+                    t.join();//wait pile thread finish
+            }
+
 
         }catch (Exception e){
             e.printStackTrace();
         }
         resetInitialState();
+    }
+
+    static Gob getPileItemGob() {
+        /*
+            TODO: include vegetables beyond seeds
+            seed-turnip,seed-carrot,seed-leek,seed-cucumber,
+            seed-pumpkin,beetroot"
+         */
+
+        String pileItemName = "";
+
+        if (lastItemSeedBasename.contains("seed-flax"))
+            pileItemName = "/flaxfibre";
+        else if (lastItemSeedBasename.contains("seed-hemp"))
+            pileItemName = "/hempfibre";
+        else if (lastItemSeedBasename.contains("seed-poppy"))
+            pileItemName = "/flower-poppy";
+        else if (lastItemSeedBasename.contains("seed-pipeweed"))
+            pileItemName = "/tobacco-fresh";
+        else if (lastItemSeedBasename.contains("seed-barley")
+                || lastItemSeedBasename.contains("seed-wheat")
+                || lastItemSeedBasename.contains("seed-millet"))
+            pileItemName = "/straw";
+        else if (lastItemSeedBasename.contains("seed-lettuce"))
+            pileItemName = "/lettuce";//TODO check lettuce-head name
+
+
+        return ZeeConfig.getClosestGobByNameContains(pileItemName);
     }
 
     private int getNumPlantableSeedPiles() {
@@ -407,7 +455,10 @@ public class ZeeManagerFarmer extends ZeeThread{
                 }
                 ZeeConfig.addPlayerText("storing");
                 ZeeConfig.addGobText(lastBarrel, getSeedNameAndQl());
-                updateSeedPileReference();
+                if (!updateSeedPileReference()) {
+                    println("storeSeedsInBarrel > updateSeedPileReference > false");
+                    return;
+                }
                 ZeeManagerItemClick.pickUpItem(wItem);
                 ZeeManagerGobClick.itemActGob(lastBarrel, UI.MOD_SHIFT);//store first seeds
                 waitPlayerDistToGob(lastBarrel,15);//wait reaching barrel
@@ -489,8 +540,8 @@ public class ZeeManagerFarmer extends ZeeThread{
             };
 
 
-            //checkbox plant
-            wdg = windowManager.add(new CheckBox("replant after harvest") {
+            //checkbox replant
+            wdg = windowManager.add(new CheckBox("replant") {
                 { a = ZeeManagerFarmer.farmerCbReplant;  }
                 public void set(boolean val) {
                     ZeeManagerFarmer.farmerCbReplant = val;
@@ -498,6 +549,17 @@ public class ZeeManagerFarmer extends ZeeThread{
                     Utils.setprefb("farmerCbPlant",val);
                 }
             }, 0, 7);
+
+
+            //checkbox create piles
+            wdg = windowManager.add(new CheckBox("create piles") {
+                { a = ZeeManagerFarmer.farmerCbPile;  }
+                public void set(boolean val) {
+                    ZeeManagerFarmer.farmerCbPile = val;
+                    a = val;
+                    Utils.setprefb("farmerCbPile",val);
+                }
+            }, wdg.c.x+wdg.sz.x+7, 7);
 
 
             // barrel tiles textEntry

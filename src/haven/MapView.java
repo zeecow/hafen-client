@@ -2269,7 +2269,8 @@ public class MapView extends PView implements DTarget, Console.Directory {
 			}
 		    mgrab.remove();
 			ZeeConfig.saveTileSelection(new Coord(sc), new Coord(ec), modflags, ol);
-			if (ZeeManagerStockpile.selAreaPile)
+			if (!ZeeConfig.farmerMode && ZeeManagerStockpile.selAreaPile)
+				// manual area piler
 				ZeeManagerStockpile.areaPilerStart();
 			else
 		    	wdgmsg("sel", sc, ec, modflags);
