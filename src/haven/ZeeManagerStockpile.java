@@ -47,6 +47,7 @@ public class ZeeManagerStockpile extends ZeeThread{
             entry("gfx/(terobjs/items|invobjs)/cucumber","/stockpile-cucumber"),
             entry("gfx/(terobjs/items|invobjs)/grapes","/stockpile-grapes"),
             entry("gfx/(terobjs/items|invobjs)/pumpkin","/stockpile-pumpkin"),
+            entry("gfx/(terobjs/items|invobjs)/lettucehead","/stockpile-lettuce"),
             entry("gfx/(terobjs/items|invobjs)/plum","/stockpile-plum"),
             entry("gfx/(terobjs/items|invobjs)/apple","/stockpile-apple"),
             entry("gfx/(terobjs/items|invobjs)/pear","/stockpile-pear"),
