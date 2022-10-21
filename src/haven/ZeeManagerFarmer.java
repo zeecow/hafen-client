@@ -1,7 +1,10 @@
 package haven;
 
 import java.awt.event.KeyEvent;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 public class ZeeManagerFarmer extends ZeeThread{
 
@@ -12,7 +15,6 @@ public class ZeeManagerFarmer extends ZeeThread{
     public static String gItemSeedBasename, lastItemSeedBasename;
     public static GItem gItem;
     public static WItem wItem;
-    public static Inventory inv;
     public static boolean isHarvestDone, isPlantingDone;
     public static Window windowManager;
     public static ZeeManagerFarmer manager;
@@ -34,8 +36,7 @@ public class ZeeManagerFarmer extends ZeeThread{
             ZeeConfig.removeGobText(lastBarrel);
         }
         lastItemSeedBasename = nameSeed;
-        inv = (Inventory) gItem.parent;
-        wItem = inv.getWItemByGItem(gItem);
+        wItem = ZeeConfig.getMainInventory().getWItemByGItem(gItem);
     }
 
     public void run(){
@@ -48,6 +49,7 @@ public class ZeeManagerFarmer extends ZeeThread{
             busy = false;
             isHarvestDone = true;
             isPlantingDone = true;
+            droppedSeeds = 0;
             ZeeConfig.resetTileSelection();
             ZeeConfig.autoHearthOnStranger = Utils.getprefb("autoHearthOnStranger", true);
             ZeeConfig.removeGobText(ZeeConfig.getPlayerGob());
@@ -65,8 +67,8 @@ public class ZeeManagerFarmer extends ZeeThread{
         Update seed-pile reference.
         Returns true if pile contains 5+ seeds, else returns false.
      */
-    private boolean updateSeedPileReference() {
-        List<WItem> items = inv.getWItemsByName(gItemSeedBasename);
+    private static boolean updateSeedPileReference() {
+        List<WItem> items = ZeeConfig.getMainInventory().getWItemsByName(gItemSeedBasename);
         if (items==null || items.size()==0)
             return false;
         int seeds;
@@ -120,7 +122,7 @@ public class ZeeManagerFarmer extends ZeeThread{
 
     private void startFarming() {
         ZeeConfig.autoHearthOnStranger = false;
-
+        mapSeedqlBarrel = new HashMap<>();
         try{
 
             /*
@@ -133,7 +135,7 @@ public class ZeeManagerFarmer extends ZeeThread{
                 //waitPlayerIdleFor(2);//already farming
                 waitPlayerIdleVelocityMs(999);
                 if(inventoryHasSeeds()) {
-                    storeSeedsInBarrel();
+                    storeSeedsBarrelByQlRecursive();
                     if(!isInventoryFull()) {
                         harvestPlants();
                     }else {
@@ -177,7 +179,7 @@ public class ZeeManagerFarmer extends ZeeThread{
                             int plantablePiles = getNumPlantableSeedPiles();
                             if (plantablePiles == 0) {
                                 println("no plantable piles, store and try again ");
-                                storeSeedsInBarrel(); //store and try planting one more time
+                                storeSeedsBarrelByQlRecursive(); //store and try planting one more time
                             }else{
                                 println("planting done, 1+ plantable seedpiles");
                                 isPlantingDone = true;
@@ -190,7 +192,7 @@ public class ZeeManagerFarmer extends ZeeThread{
             }
 
             //final store barrel
-            storeSeedsInBarrel();
+            storeSeedsBarrelByQlRecursive();
 
 
            /*
@@ -310,7 +312,7 @@ public class ZeeManagerFarmer extends ZeeThread{
     }
 
     public static boolean isInventoryFull() {
-        return inv.getNumberOfFreeSlots() == 0;
+        return ZeeConfig.getMainInventory().getNumberOfFreeSlots() == 0;
     }
 
     private boolean plantSeeds() {
@@ -382,11 +384,11 @@ public class ZeeManagerFarmer extends ZeeThread{
     }
 
     private boolean inventoryHasSeeds() {
-        return inv.getWItemsByName(gItemSeedBasename).size() > 0;
+        return ZeeConfig.getMainInventory().getWItemsByName(gItemSeedBasename).size() > 0;
     }
 
     private int getNumberOfSeedItems(){
-        return inv.getWItemsByName(gItemSeedBasename).size();
+        return ZeeConfig.getMainInventory().getWItemsByName(gItemSeedBasename).size();
     }
 
     public static List<Gob> getAccessibleBarrels() {
@@ -418,11 +420,44 @@ public class ZeeManagerFarmer extends ZeeThread{
         return false;
     }
 
-    private void storeSeedsInBarrel() {
+    //TODO remove
+    static Coord testCoordCenter;
+    public static void testStoringBarrelQl(Gob seedPile) {
+        new ZeeThread(){
+            public void run() {
+                try {
+                    mapSeedqlBarrel = new HashMap<>();
+                    testCoordCenter = ZeeConfig.getGobTile(seedPile);
+                    //pickup seed piles until idle
+                    ZeeManagerGobClick.gobClick(seedPile,3,UI.MOD_SHIFT);
+                    waitInvIdleMs(1000);
+                    //seed vars
+                    busy = true;
+                    wItem = ZeeConfig.getMainInventory().getWItemsByName("/seed-").get(0);
+                    gItem = wItem.item;
+                    gItemSeedBasename = gItem.getres().basename();
+                    //drop if holding item
+                    if (ZeeConfig.isPlayerHoldingItem()){
+                        ZeeConfig.gameUI.vhand.item.wdgmsg("drop", Coord.z);
+                        waitNotHoldingItem();
+                    }
+                    //store by ql
+                    storeSeedsBarrelByQlRecursive();
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+                ZeeConfig.removePlayerText();
+                busy = false;
+            }
+        }.start();
+    }
+
+    private static void storeSeedsBarrelByQlRecursive() {
         try {
             //move to area center before choosing barrel
             ZeeConfig.addPlayerText("centering");
-            ZeeConfig.clickTile(ZeeConfig.getAreaCenterTile(ZeeConfig.lastSavedOverlay.a),1);
+            ZeeConfig.clickTile(testCoordCenter,1);//TODO remove
+            //ZeeConfig.clickTile(ZeeConfig.getAreaCenterTile(ZeeConfig.lastSavedOverlay.a),1);
             waitPlayerIdleVelocity();//waitPlayerIdleFor(1);
             List<Gob> barrels = getAccessibleBarrels();
             if (barrels.size()==0) {
@@ -430,9 +465,10 @@ public class ZeeManagerFarmer extends ZeeThread{
                     no barrels, drop seeds
                  */
                 ZeeConfig.gameUI.msg("No empty barrels, lastBarrel null, dropping seeds.");
-                inv.dropItemsByName(gItemSeedBasename);
+                ZeeConfig.getMainInventory().dropItemsByName(gItemSeedBasename);
 
-            } else {
+            }
+            else {
                 /*
                     find barrel and store seeds
                  */
@@ -446,19 +482,24 @@ public class ZeeManagerFarmer extends ZeeThread{
                     }
                     return false;
                 });
-                //if (lastBarrel != null)
-                //    ZeeConfig.removeGobText(lastBarrel);
-                lastBarrel = ZeeConfig.getClosestGob(barrels);
-                if(lastBarrel==null){
+                int qlSeeds = dropLessCommonSeeds();
+                if (qlSeeds < 0){
+                    println("couldnt find inv seeds");
                     resetInitialState();
                     return;
                 }
-                ZeeConfig.addPlayerText("storing");
-                ZeeConfig.addGobText(lastBarrel, getSeedNameAndQl());
+                lastBarrel = getBarrelBySeedQl(qlSeeds,barrels);//ZeeConfig.getClosestGob(barrels);
+                if(lastBarrel==null){
+                    println("cant decide ql barrel");
+                    resetInitialState();
+                    return;
+                }
                 if (!updateSeedPileReference()) {
                     println("storeSeedsInBarrel > updateSeedPileReference > false");
                     return;
                 }
+                ZeeConfig.addPlayerText("storing");
+                ZeeConfig.addGobText(lastBarrel, getSeedNameAndQl());
                 ZeeManagerItemClick.pickUpItem(wItem);
                 ZeeManagerGobClick.itemActGob(lastBarrel, UI.MOD_SHIFT);//store first seeds
                 waitPlayerDistToGob(lastBarrel,15);//wait reaching barrel
@@ -469,6 +510,7 @@ public class ZeeManagerFarmer extends ZeeThread{
                     if(waitNotHoldingItem()) {
                         //all seeds stored
                         ZeeConfig.addGobText(lastBarrel, getSeedNameAndQl());
+                        mapSeedqlBarrel.put(qlSeeds,lastBarrel);
                     } else {
                         //still holding item?
                         if(ZeeConfig.distanceToPlayer(lastBarrel) > MIN_ACCESSIBLE_DIST){
@@ -483,11 +525,101 @@ public class ZeeManagerFarmer extends ZeeThread{
                 }else{
                     // all seeds stored
                     ZeeConfig.addGobText(lastBarrel, getSeedNameAndQl());
+                    mapSeedqlBarrel.put(qlSeeds,lastBarrel);
+                }
+            }
+
+            //pickup dropped low q seeds and recall storeSeedsInBarrel
+            if (droppedSeeds > 0 && busy){
+                Gob seedPile = ZeeConfig.getClosestGobByNameContains("/seeds");
+                if (seedPile!=null && ZeeConfig.distanceToPlayer(seedPile) < farmerTxtTilesBarrel * TILE_SIZE) {
+                    //pickup seed piles until idle
+                    ZeeManagerGobClick.gobClick(seedPile,3,UI.MOD_SHIFT);
+                    waitInvIdleMs(1000);
+                    //drop if holding item
+                    if (ZeeConfig.isPlayerHoldingItem()){
+                        ZeeConfig.gameUI.vhand.item.wdgmsg("drop", Coord.z);
+                        waitNotHoldingItem();
+                    }
+                    //recursive call
+                    println(" > recursive storeSeedsInBarrel");
+                    storeSeedsBarrelByQlRecursive();
                 }
             }
         }catch (Exception e){
             e.printStackTrace();
+            println("dropSeeds reset");
+            droppedSeeds = 0;
         }
+    }
+
+    static Map<Integer,Gob> mapSeedqlBarrel;
+    static int maxBarrelsQl = 4;
+    private static Gob getBarrelBySeedQl(int qlSeeds, List<Gob> barrels) {
+        println("qlSeeds "+qlSeeds+" , mapQlBarrel "+mapSeedqlBarrel.size());
+        Gob barrel = null;
+        // first barrel, get closest empty one
+        if (mapSeedqlBarrel.size()==0) {
+            println("000");
+            barrel = getClosestEmptyBarrel();
+        }
+        // ql barrel not found
+        else if(mapSeedqlBarrel.get(qlSeeds)==null) {
+            println("111");
+            if (mapSeedqlBarrel.size() <= maxBarrelsQl) {
+                barrel = getClosestEmptyBarrel();
+            } else {
+                // if max barrels reached, add lower seeds to lower barrel
+                barrel = mapSeedqlBarrel.entrySet().stream().sorted(Map.Entry.comparingByKey()).collect(Collectors.toList()).get(0).getValue();
+            }
+        }else{
+            println("222");
+            barrel = mapSeedqlBarrel.get(qlSeeds);
+        }
+        return barrel;
+    }
+
+    static Gob getClosestEmptyBarrel() {
+        List<Gob> barrels = ZeeConfig.findGobsByNameEndsWith("/barrel");
+        return ZeeConfig.getClosestGob(barrels.stream().filter(ZeeManagerFarmer::isBarrelEmpty).collect(Collectors.toList()));
+    }
+
+    static int droppedSeeds = 0;
+    private static int dropLessCommonSeeds() {
+        List<WItem> seedItems = ZeeConfig.getMainInventory().getWItemsByName(gItemSeedBasename);
+        if (seedItems.size()==0)
+            return -1;
+        //count quantity of items for each ql
+        Map<Integer,Integer> mapQlQuantity = new HashMap<>();
+        int ql;
+        for (int i = 0; i < seedItems.size(); i++) {
+            ql = Inventory.getQuality(seedItems.get(i).item).intValue();
+            if (!mapQlQuantity.containsKey(ql)){
+                mapQlQuantity.put(ql,1);//first item of "ql"
+            }else{
+                int quantity = mapQlQuantity.get(ql);
+                quantity++;
+                mapQlQuantity.put(ql,quantity);//increase "ql" count
+            }
+        }
+        //find most common ql
+        int qlKeeper = mapQlQuantity.keySet().iterator().next();
+        for (Map.Entry<Integer, Integer> entry : mapQlQuantity.entrySet()) {
+            if (qlKeeper != entry.getKey()){
+                if(entry.getValue() > mapQlQuantity.get(qlKeeper)){
+                    qlKeeper = entry.getKey();
+                }
+            }
+        }
+        //drop less common ones, keep most common only
+        droppedSeeds = 0;
+        for (WItem seedItem : seedItems) {
+            if (Inventory.getQuality(seedItem.item).intValue() != qlKeeper) {
+                seedItem.item.wdgmsg("drop", Coord.z);
+                droppedSeeds++;
+            }
+        }
+        return qlKeeper;
     }
 
     public static void markBarrelFull(Gob lastBarrel) {
@@ -504,7 +636,7 @@ public class ZeeManagerFarmer extends ZeeThread{
 
     public static String getSeedNameAndQl() {
         return gItemSeedBasename.replace("seed-","")
-                + " q"
+                + " "
                 + Inventory.getQuality(gItem).intValue();
     }
 

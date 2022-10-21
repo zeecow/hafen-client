@@ -222,9 +222,12 @@ public class ZeeManagerGobClick extends ZeeThread{
                 else if (isGobLiftable(gobName) || isGobBush(gobName)) {
                     liftGob(gob);
                 }
-                // gob stockpile area test
+                // gob item piler
                 else if (ZeeManagerStockpile.isGobPileable(gob)){
                     ZeeManagerStockpile.areaPilerWindow(gob);
+                }
+                else if(gobName.endsWith("/seeds")){//TODO remove
+                    ZeeManagerFarmer.testStoringBarrelQl(gob);
                 }
             }
         }
