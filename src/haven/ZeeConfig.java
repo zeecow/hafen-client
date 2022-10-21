@@ -3025,4 +3025,7 @@ public class ZeeConfig {
     }
 
 
+    public static void moveToAreaCenter(Area a) {
+        clickTile(ZeeConfig.getAreaCenterTile(a),1);
+    }
 }

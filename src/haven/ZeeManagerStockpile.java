@@ -639,10 +639,10 @@ public class ZeeManagerStockpile extends ZeeThread{
         };
 
         //button select area
-        wdg = selAreaWindow.add(new Button(UI.scale(120),"select items area"){
+        wdg = selAreaWindow.add(new Button(UI.scale(160),"select pile items area"){
             public void wdgmsg(String msg, Object... args) {
                 if (msg.contentEquals("activate")){
-                    ZeeConfig.addPlayerText("Select item's area");
+                    ZeeConfig.addPlayerText("Select pile items area");
                     selAreaPile = true;
                     //creates new MapView.Selector
                     ZeeConfig.gameUI.map.uimsg("sel", 1);
@@ -661,7 +661,10 @@ public class ZeeManagerStockpile extends ZeeThread{
 
     static void exitAreaPiler() {
         selAreaPile = false;
+        ZeeConfig.removePlayerText();
+        ZeeConfig.gameUI.map.uimsg("sel", 0);
         ZeeConfig.resetTileSelection();
+        ZeeConfig.gameUI.map.showgrid(false);
         // TODO exit thread piler stop all activity and cleanup
     }
 
@@ -693,15 +696,15 @@ public class ZeeManagerStockpile extends ZeeThread{
                         return;
                     }
 
+                    ZeeConfig.addPlayerText("pilan");
+
                     // create pile(s) at border tiles
                     while(selAreaPile && borderTiles.size() > 0) {
 
                         //pickup items until idle
-                        ZeeConfig.addPlayerText("pickup");
                         Gob closestItem = ZeeConfig.getClosestGobByNameContains(itemGobName);
                         if (closestItem==null){
                             println("no more items to pile");
-                            ZeeConfig.removePlayerText();
                             break;
                         }
                         ZeeManagerGobClick.gobClick(closestItem,3,UI.MOD_SHIFT);
@@ -711,8 +714,7 @@ public class ZeeManagerStockpile extends ZeeThread{
                         }
 
                         //move to center tile before creating pile
-                        ZeeConfig.addPlayerText("centering");
-                        ZeeConfig.clickTile(ZeeConfig.getAreaCenterTile(ZeeConfig.lastSavedOverlay.a),1);
+                        ZeeConfig.moveToAreaCenter(ZeeConfig.lastSavedOverlay.a);
                         waitPlayerIdleVelocity();
 
                         // hold item at vhand
@@ -726,7 +728,6 @@ public class ZeeManagerStockpile extends ZeeThread{
                         }
 
                         // use latest pile
-                        ZeeConfig.addPlayerText("piling");
                         if (latestPile!=null){
                             ZeeManagerGobClick.itemActGob(latestPile,UI.MOD_SHIFT);
                             waitPlayerIdleVelocity();//wait approach pile
@@ -740,54 +741,10 @@ public class ZeeManagerStockpile extends ZeeThread{
                                 //continue;
                             }
                         }
-                        //create new pile
+                        //new pile
                         else {
-                            // get non farming tile (gfx/tiles/field)
-                            Coord nonFarmingTile = Coord.of(minX - 1, minY - 1);
-                            String tileResName;
-                            do{
-                                nonFarmingTile = nonFarmingTile.sub(1,1);
-                                tileResName = ZeeConfig.getTileResName(nonFarmingTile);
-                            }while(tileResName.contentEquals("gfx/tiles/field"));
-                            if (tileResName.isBlank()){
-                                println("blank tile");
-                                nonFarmingTile = borderTiles.get(0);
-                            }
 
-                            //rclick nonfarming tile to create virtual pile
-                            ZeeConfig.gameUI.map.wdgmsg("itemact", nonFarmingTile, ZeeConfig.tileToCoord(nonFarmingTile), 0);
-                            sleep(500);
-
-                            // try placing pile until run out of border tiles
-                            do {
-                                //get new tile
-                                if (borderTiles.isEmpty()) {
-                                    println("out of border tiles for placing piles");
-                                    break;
-                                }
-                                Coord coordNewPile = borderTiles.remove(0);
-
-                                //reserve space for big piles
-                                if (itemGobName.contains("/straw")) {
-                                    borderTiles.remove(0);
-                                    if (itemGobName.contains("/board-"))
-                                        borderTiles.remove(0);
-                                }
-
-                                //try placing pile
-                                Coord playerTile = ZeeConfig.getPlayerTile();
-                                ZeeConfig.gameUI.map.wdgmsg("place", ZeeConfig.tileToCoord(coordNewPile), 16384, 1, UI.MOD_SHIFT);
-                                waitPlayerIdleFor(1);
-
-                                //player didnt move? tile occupied, terrain not flat...
-                                if (playerTile.compareTo(ZeeConfig.getPlayerTile()) == 0){
-                                    println("tile can't be used for pile, trying next");
-                                }else{
-                                    //tile free, pile placed?
-                                    break;
-                                }
-
-                            }while (!borderTiles.isEmpty());
+                            areaPilerCreateNewPile(borderTiles,itemGobName,minX,minY);
 
                             if (borderTiles.isEmpty()) {
                                 println("out of tiles 2");
@@ -802,14 +759,24 @@ public class ZeeManagerStockpile extends ZeeThread{
                         }
                     }
 
+                    // pile remaining inv items
+                    List<WItem> items = ZeeConfig.getMainInventory().getWItemsByName(itemInvName);
+                    if (items.size() > 0){
+                        ZeeConfig.moveToAreaCenter(ZeeConfig.lastSavedOverlay.a);
+                        waitPlayerIdleVelocity();
+                        ZeeManagerItemClick.pickUpItem(items.get(0));
+                        areaPilerCreateNewPile(borderTiles,itemGobName,minX,minY);
+                    }
+
+                    ZeeConfig.removePlayerText();
+
                     if (latestPile!=null)
                         ZeeConfig.removeGobText(latestPile);
 
                 }catch (Exception e){
                     e.printStackTrace();
+                    ZeeConfig.removePlayerText();
                 }
-
-                ZeeConfig.removePlayerText();
 
                 //destroy area selection
                 selAreaPile = false;
@@ -823,6 +790,59 @@ public class ZeeManagerStockpile extends ZeeThread{
         };
         threadAreaPiler.start();
         return threadAreaPiler;
+    }
+
+    private static void areaPilerCreateNewPile(List<Coord> borderTiles, String itemGobName, int minX, int minY) throws InterruptedException {
+        // get non farming tile (gfx/tiles/field)
+        Coord nonFarmingTile = Coord.of(minX - 1, minY - 1);
+        String tileResName;
+        do{
+            nonFarmingTile = nonFarmingTile.sub(1,1);
+            tileResName = ZeeConfig.getTileResName(nonFarmingTile);
+        }while(tileResName.contentEquals("gfx/tiles/field"));
+        if (tileResName.isBlank()){
+            println("blank tile");
+            nonFarmingTile = borderTiles.get(0);
+        }
+
+        //rclick nonfarming tile to create virtual pile
+        ZeeConfig.gameUI.map.wdgmsg("itemact", nonFarmingTile, ZeeConfig.tileToCoord(nonFarmingTile), 0);
+        sleep(500);
+
+        // try placing pile until run out of border tiles
+        areaPilerTryPlacingOnTiles(borderTiles,itemGobName);
+    }
+
+    private static void areaPilerTryPlacingOnTiles(List<Coord> borderTiles, String itemGobName) {
+        do {
+            //get new tile
+            if (borderTiles.isEmpty()) {
+                println("out of border tiles for placing piles");
+                break;
+            }
+            Coord coordNewPile = borderTiles.remove(0);
+
+            //reserve space for big piles
+            if (itemGobName.contains("/straw")) {
+                borderTiles.remove(0);
+                if (itemGobName.contains("/board-"))
+                    borderTiles.remove(0);
+            }
+
+            //try placing pile
+            Coord playerTile = ZeeConfig.getPlayerTile();
+            ZeeConfig.gameUI.map.wdgmsg("place", ZeeConfig.tileToCoord(coordNewPile), 16384, 1, UI.MOD_SHIFT);
+            waitPlayerIdleFor(1);
+
+            //player didnt move? tile occupied, terrain not flat...
+            if (playerTile.compareTo(ZeeConfig.getPlayerTile()) == 0){
+                println("tile can't be used for pile, trying next");
+            }else{
+                //tile free, pile placed?
+                break;
+            }
+
+        }while (!borderTiles.isEmpty());
     }
 
     static List<Coord> getPilesTiles(Coord olStart, Coord olEnd) {

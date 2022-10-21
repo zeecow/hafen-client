@@ -39,6 +39,8 @@ Client focusing on small helper tasks, many using mouse middle button, and other
  - new mark zooms map for precision 
  - Lag Camera (:cam lag)
  - ctrl+q pickup gob window
+ - area piler: create piles around selected area (long-midclick item)
+
  - midclick ground 
    - while holding item will move to location (simulates ctrl+click)
    - while inspecting icon active, will msg tile name
@@ -64,7 +66,6 @@ Client focusing on small helper tasks, many using mouse middle button, and other
    - show context menu for various objs (details below)
    - lift up obj 
    - take all from stockpile obj
-   - clear reeds until holding one
    - click "Man the helm" on Knarr/Snekkja obj
    - while holding item will try to store all on barrel obj
    - add/remove tree obj to "Remove all trees" ordered queue
@@ -73,6 +74,7 @@ Client focusing on small helper tasks, many using mouse middle button, and other
    - while driving wheelbarrow will lift it up and open gate obj
    - while driving wheelbarrow will lift it up and place on cart obj
    - while carrying/driving wheelbarrow will mount horse obj and lift wheelbarrow again
+   - show window for area piler
  - midclick item 
    - sort-transfer item ascending(?) 
    - pick-up all
