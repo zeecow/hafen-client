@@ -364,6 +364,10 @@ public class Inventory extends Widget implements DTarget {
 		return Double.valueOf(0);
 	}
 
+	public static Integer getQualityInt(GItem item) {
+		return (int) Math.round(getQuality(item));
+	}
+
 	public boolean isMainInv() {
 		if(mainInv == null){
 			Window w = this.getparent(Window.class);
