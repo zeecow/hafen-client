@@ -495,14 +495,18 @@ public class ZeeManagerFarmer extends ZeeThread{
                     resetInitialState();
                     return;
                 }
+                ZeeConfig.addPlayerText("storing ql "+qlSeeds);
+                sleep(1000);//wait inventory update
                 if (!updateSeedPileReference()) {
                     println("storeSeedsInBarrel > updateSeedPileReference > false");
                     return;
                 }
-                ZeeConfig.addPlayerText("storing ql "+qlSeeds);
-                sleep(PING_MS);//lag?
                 ZeeConfig.addGobText(lastBarrel, getSeedNameAndQl());
-                ZeeManagerItemClick.pickUpItem(wItem);
+                if(!ZeeManagerItemClick.pickUpItem(wItem)){
+                    println("couldn't pickup wItem ql "+Inventory.getQualityInt(wItem.item));
+                    resetInitialState();
+                    return;
+                }
                 sleep(PING_MS);//lag?
                 ZeeManagerGobClick.itemActGob(lastBarrel, UI.MOD_SHIFT);//store first seeds
                 sleep(PING_MS);//lag?
@@ -564,12 +568,10 @@ public class ZeeManagerFarmer extends ZeeThread{
         Gob barrel = null;
         // first barrel, get closest empty one
         if (mapSeedqlBarrel.size()==0) {
-            println("000");
             barrel = getClosestEmptyBarrel();
         }
         // ql barrel not found
         else if(mapSeedqlBarrel.get(qlSeeds)==null) {
-            println("111");
             //if max barrels not reached, get closest empty one
             if (mapSeedqlBarrel.size() < maxBarrelsQl) {
                 barrel = getClosestEmptyBarrel();
@@ -585,7 +587,6 @@ public class ZeeManagerFarmer extends ZeeThread{
                 barrel = lowestQlEntry.getValue();
             }
         }else{
-            println("222");
             barrel = mapSeedqlBarrel.get(qlSeeds);
         }
         return barrel;

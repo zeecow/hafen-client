@@ -226,9 +226,9 @@ public class ZeeManagerGobClick extends ZeeThread{
                 else if (ZeeManagerStockpile.isGobPileable(gob)){
                     ZeeManagerStockpile.areaPilerWindow(gob);
                 }
-                else if(gobName.endsWith("/seeds")){//TODO remove
-                    ZeeManagerFarmer.testStoringBarrelQl(gob);
-                }
+//                else if(gobName.endsWith("/seeds")){//TODO remove
+//                    ZeeManagerFarmer.testStoringBarrelQl(gob);
+//                }
             }
         }
         catch (Exception e){
