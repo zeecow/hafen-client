@@ -2318,12 +2318,22 @@ public class ZeeConfig {
     }
 
     public static int addGobText(Gob gob, String text, int r, int g, int b, int a, int height) {
-        removeGobText(gob);//cleanup previous text
-        Gob.Overlay gt = new Gob.Overlay(gob, new ZeeGobText(gob, text, new Color(r, g, b, a), height));
-        gameUI.ui.sess.glob.loader.defer(() -> {synchronized(gob) {
-            gob.addol(gt);
-        }}, null);
-        mapGobTextId.put(gob,gt.id);
+        Gob.Overlay gt = null;
+        try {
+            removeGobText(gob);//cleanup previous text
+            gt = new Gob.Overlay(gob, new ZeeGobText(gob, text, new Color(r, g, b, a), height));
+            Gob.Overlay finalGt = gt;
+            gameUI.ui.sess.glob.loader.defer(() -> {
+                synchronized (gob) {
+                    gob.addol(finalGt);
+                }
+            }, null);
+            mapGobTextId.put(gob, gt.id);
+        }catch (Exception e){
+            System.out.println("addGobText > "+e.getMessage());
+        }
+        if (gt==null)
+            return -1;
         return gt.id;
     }
 

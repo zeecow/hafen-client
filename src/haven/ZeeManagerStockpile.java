@@ -704,7 +704,6 @@ public class ZeeManagerStockpile extends ZeeThread{
                         //pickup items until idle
                         Gob closestItem = ZeeConfig.getClosestGobByNameContains(itemGobName);
                         if (closestItem==null){
-                            println("no more items to pile");
                             break;
                         }
                         ZeeManagerGobClick.gobClick(closestItem,3,UI.MOD_SHIFT);
@@ -762,6 +761,7 @@ public class ZeeManagerStockpile extends ZeeThread{
                     // pile remaining inv items
                     List<WItem> items = ZeeConfig.getMainInventory().getWItemsByName(itemInvName);
                     if (items.size() > 0){
+                        println("pile remaining inv items");
                         ZeeConfig.moveToAreaCenter(ZeeConfig.lastSavedOverlay.a);
                         waitPlayerIdleVelocity();
                         ZeeManagerItemClick.pickUpItem(items.get(0));
