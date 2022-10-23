@@ -23,7 +23,8 @@ public class ZeeManagerFarmer extends ZeeThread{
     public static boolean farmerCbReplant = Utils.getprefb("farmerCbPlant",false);
     public static boolean farmerCbPile = Utils.getprefb("farmerCbPile",false);
     public static int farmerTxtTilesBarrel = Utils.getprefi("farmerTxtTilesBarrel",27);
-    public static TextEntry textEntryTilesBarrel;
+    public static int farmerTxtQlSortingBarrels = Utils.getprefi("farmerTxtQlSortingBarrels",4);
+    public static TextEntry textEntryTilesBarrel, textEntryQlSortBarrels;
     public static Gob farmerGobCrop;
 
 
@@ -152,13 +153,19 @@ public class ZeeManagerFarmer extends ZeeThread{
                 planting stage
              */
             if(farmerCbReplant) {
-                isPlantingDone = false;
-                ZeeManagerItemClick.equipTwoSacks();
+                Gob highestBarrel = getHighestQlBarrel();
+                if (highestBarrel == null) {
+                    isPlantingDone = true;
+                    println("planting abort: cant find highest ql barrel");
+                }else {
+                    isPlantingDone = false;
+                    ZeeManagerItemClick.equipTwoSacks();
+                }
                 while (busy && !isPlantingDone) {
                     println("> planting loop");
                     if (getTotalSeedAmount() < 5) {
                         println("total seeds < 5, get from barrels");
-                        if (!getSeedsFromMultipleBarrels(gItemSeedBasename)) {
+                        if(!getSeedsFromBarrel(highestBarrel)){//if (!getSeedsFromMultipleBarrels(gItemSeedBasename)) {
                             println("planting done, out of seeds");
                             isPlantingDone = true;
                             break;
@@ -212,6 +219,17 @@ public class ZeeManagerFarmer extends ZeeThread{
             e.printStackTrace();
         }
         resetInitialState();
+    }
+
+    private Gob getHighestQlBarrel() {
+        if (mapSeedqlBarrel.size()==0)
+            return null;
+        Map.Entry<Integer, Gob> highest = mapSeedqlBarrel.entrySet().iterator().next();
+        for (Map.Entry<Integer, Gob> entry : mapSeedqlBarrel.entrySet()) {
+            if (entry.getKey() > highest.getKey())
+                highest = entry;
+        }
+        return highest.getValue();
     }
 
     static Gob getPileItemGob() {
@@ -483,12 +501,14 @@ public class ZeeManagerFarmer extends ZeeThread{
                     }
                     return false;
                 });
-                int qlSeeds = dropLowestQlSeeds();//dropLessCommonSeeds();
+                //drop lowest ql seeds, keep highest
+                int qlSeeds = dropLowestQlSeeds();
                 if (qlSeeds < 0){
                     println("couldnt find inv seeds");
                     resetInitialState();
                     return;
                 }
+                //get barrel for current seed ql
                 lastBarrel = getBarrelBySeedQl(qlSeeds,barrels);//ZeeConfig.getClosestGob(barrels);
                 if(lastBarrel==null){
                     println("cant decide ql barrel");
@@ -562,7 +582,6 @@ public class ZeeManagerFarmer extends ZeeThread{
     }
 
     static Map<Integer,Gob> mapSeedqlBarrel;
-    static int maxBarrelsQl = 3;
     private static Gob getBarrelBySeedQl(int qlSeeds, List<Gob> barrels) {
         println("qlSeeds "+qlSeeds+" , mapQlBarrel "+mapSeedqlBarrel.size()+" = "+ mapSeedqlBarrel.keySet());
         Gob barrel = null;
@@ -573,7 +592,7 @@ public class ZeeManagerFarmer extends ZeeThread{
         // ql barrel not found
         else if(mapSeedqlBarrel.get(qlSeeds)==null) {
             //if max barrels not reached, get closest empty one
-            if (mapSeedqlBarrel.size() < maxBarrelsQl) {
+            if (mapSeedqlBarrel.size() < farmerTxtQlSortingBarrels) {
                 barrel = getClosestEmptyBarrel();
             }
             // if max barrels reached, add lower seeds to lower barrel
@@ -701,7 +720,7 @@ public class ZeeManagerFarmer extends ZeeThread{
 
         if(windowManager ==null){
 
-            windowManager = new ZeeWindow(new Coord(280,90), "Seed Farming manager"){
+            windowManager = new ZeeWindow(new Coord(300,90), "Seed Farmer"){
                 @Override
                 public void wdgmsg(String msg, Object... args) {
                     if (msg=="close"){
@@ -714,7 +733,7 @@ public class ZeeManagerFarmer extends ZeeThread{
 
 
             //checkbox replant
-            wdg = windowManager.add(new CheckBox("replant") {
+            wdg = windowManager.add(new CheckBox("replant highest ql") {
                 { a = ZeeManagerFarmer.farmerCbReplant;  }
                 public void set(boolean val) {
                     ZeeManagerFarmer.farmerCbReplant = val;
@@ -725,19 +744,19 @@ public class ZeeManagerFarmer extends ZeeThread{
 
 
             //checkbox create piles
-            wdg = windowManager.add(new CheckBox("create piles") {
+            wdg = windowManager.add(new CheckBox("pile around selection") {
                 { a = ZeeManagerFarmer.farmerCbPile;  }
                 public void set(boolean val) {
                     ZeeManagerFarmer.farmerCbPile = val;
                     a = val;
                     Utils.setprefb("farmerCbPile",val);
                 }
-            }, wdg.c.x+wdg.sz.x+7, 7);
+            }, wdg.c.x+wdg.sz.x+17, 7);
 
 
-            // barrel tiles textEntry
-            wdg = windowManager.add(new Label("Max tiles to barrel: "), 0, 30);
-            ZeeManagerFarmer.textEntryTilesBarrel = new TextEntry(UI.scale(45),""+(int)(ZeeManagerFarmer.MAX_BARREL_DIST/MCache.tilesz.x)){
+            // ql sort barrels textEntry
+            wdg = windowManager.add(new Label("Ql sorting barrels: "), 0, 30);
+            textEntryQlSortBarrels = new TextEntry(UI.scale(45),""){
                 public boolean keydown(KeyEvent e) {
                     if(!Character.isDigit(e.getKeyChar()) && !ZeeConfig.isControlKey(e.getKeyCode()))
                         return false;
@@ -745,14 +764,34 @@ public class ZeeManagerFarmer extends ZeeThread{
                 }
                 public void changed(ReadLine buf) {
                     if(!buf.line().isEmpty()) {
-                        ZeeManagerFarmer.farmerTxtTilesBarrel = Integer.parseInt(buf.line());
-                        Utils.setprefi("farmerTxtTilesBarrel", ZeeManagerFarmer.farmerTxtTilesBarrel);
+                        farmerTxtQlSortingBarrels = Integer.parseInt(buf.line());
+                        Utils.setprefi("farmerTxtQlSortingBarrels", ZeeManagerFarmer.farmerTxtQlSortingBarrels);
                     }
                     super.changed(buf);
                 }
             };
-            wdg = windowManager.add(ZeeManagerFarmer.textEntryTilesBarrel, 95, 30-3);
-            ZeeManagerFarmer.textEntryTilesBarrel.settext(""+ ZeeManagerFarmer.farmerTxtTilesBarrel);
+            wdg = windowManager.add(ZeeManagerFarmer.textEntryQlSortBarrels, 95, 30-5);
+            textEntryQlSortBarrels.settext(""+ farmerTxtQlSortingBarrels);
+
+
+            // barrel tiles textEntry
+            wdg = windowManager.add(new Label("Max tiles to barrel: "), 0, 55);
+            textEntryTilesBarrel = new TextEntry(UI.scale(45),""+(int)(MAX_BARREL_DIST/MCache.tilesz.x)){
+                public boolean keydown(KeyEvent e) {
+                    if(!Character.isDigit(e.getKeyChar()) && !ZeeConfig.isControlKey(e.getKeyCode()))
+                        return false;
+                    return super.keydown(e);
+                }
+                public void changed(ReadLine buf) {
+                    if(!buf.line().isEmpty()) {
+                        farmerTxtTilesBarrel = Integer.parseInt(buf.line());
+                        Utils.setprefi("farmerTxtTilesBarrel", farmerTxtTilesBarrel);
+                    }
+                    super.changed(buf);
+                }
+            };
+            wdg = windowManager.add(textEntryTilesBarrel, 95, 55-5);
+            textEntryTilesBarrel.settext(""+ farmerTxtTilesBarrel);
 
 
             //barrel tiles test Button
@@ -761,28 +800,27 @@ public class ZeeManagerFarmer extends ZeeThread{
                     if (msg.equals("activate")){
                         try {
                             int tiles = Integer.parseInt(textEntryTilesBarrel.text().strip());
-                            ZeeManagerFarmer.testBarrelsTiles(false);
+                            testBarrelsTiles(false);
                         } catch (NumberFormatException e) {
                             ZeeConfig.msg("numbers only");
                         }
                     }
                 }
-            }, 145,30-4);
+            }, 145,53-5);
 
 
             //barrel tiles clear Button
             wdg = windowManager.add(new ZeeWindow.ZeeButton(UI.scale(45),"clear"){
                 public void wdgmsg(String msg, Object... args) {
                     if (msg.equals("activate")){
-                        ZeeManagerFarmer.testBarrelsTilesClear();
+                        testBarrelsTilesClear();
                     }
                 }
-            }, wdg.c.x+wdg.sz.x+5,30-4);
+            }, wdg.c.x+wdg.sz.x+5,53-5);
 
 
             //add bottom note
-            wdg = windowManager.add(new Label("No path-finding."), 0, 90-30);
-            wdg = windowManager.add(new Label("Remove field obstacles, surround with barrels."), 0, 90-15);
+            wdg = windowManager.add(new Label("No path-finding: clear field obstacles, surround with barrels"), 0, 95-15);
 
 
             //add window
