@@ -54,60 +54,86 @@ public class ZeeManagerGobClick extends ZeeThread{
             /*
                 short mid-clicks
              */
-            if(gob==null) {//ground clicks
-                if (ZeeConfig.getCursorName().contentEquals(ZeeConfig.CURSOR_INSPECT))
+
+            // ground clicks
+            if(gob==null) {
+                // inspect tile name
+                if (ZeeConfig.getCursorName().contentEquals(ZeeConfig.CURSOR_INSPECT)) {
                     ZeeConfig.msg(ZeeConfig.getTileResName(mc));
-            } else if (ZeeConfig.isPlayerHoldingItem()) {
+                }
+                // place all pile items
+                else if(ZeeManagerStockpile.lastPlob != null) {
+                    ZeeManagerGobClick.gobPlace(ZeeManagerStockpile.lastPlob,UI.MOD_SHIFT);
+                }
+            }
+            else if (ZeeConfig.isPlayerHoldingItem()) {
                 clickedGobHoldingItem(gob,gobName);
-            } else if (isGobTrellisPlant(gobName)) {
+            }
+            else if (isGobTrellisPlant(gobName)) {
                 new ZeeThread() {
                     public void run() {
                         harvestOneTrellis(gob);
                     }
                 }.start();
-            } else if (isGobGroundItem(gobName)) {
+            }
+            else if (isGobGroundItem(gobName)) {
                 gobClick(gob,3, UI.MOD_SHIFT);//pick up all items (shift + rclick)
                 if (ZeeConfig.pilerMode)
                     ZeeManagerStockpile.checkGroundItemClicked(gobName);
-            } else if (isGobFireSource(gobName)) {
+            }
+            else if (isGobFireSource(gobName)) {
                 new ZeeThread() {
                     public void run() {
                         if (pickupTorch())
                             itemActGob(gob,0);
                     }
                 }.start();
-            } else if (isGobHorse(gobName)) {
+            }
+            else if (isGobHorse(gobName)) {
                 new ZeeThread() {
                     public void run() {
                         mountHorse(gob);
                     }
                 }.start();
-            } else if (gobName.endsWith("/barrel")) {
+            }
+            else if (gobName.endsWith("/barrel")) {
                 if (barrelLabelOn)
                     ZeeManagerFarmer.testBarrelsTilesClear();
                 else
                     ZeeManagerFarmer.testBarrelsTiles(true);
                 barrelLabelOn = !barrelLabelOn;
-            } else if (gobName.endsWith("/dreca")) { // dream catcher
+            }
+            else if (gobName.endsWith("/dreca")) { // dream catcher
                 new ZeeThread() {
                     public void run() {
                         twoDreamsPlease(gob);
                     }
                 }.start();
-            } else if (isGobMineSupport(gobName)) {
+            }
+            else if (isGobMineSupport(gobName)) {
                 ZeeConfig.toggleMineSupport();
-            } else if(gobName.endsWith("/knarr") || gobName.endsWith("/snekkja")) {
+            }
+            else if(gobName.endsWith("/knarr") || gobName.endsWith("/snekkja")) {
                 new ZeeThread() {
                     public void run() {
                         clickGobPetal(gob,"Cargo");
                     }
                 }.start();
-            }else if(ZeeConfig.isAggressive(gobName)){
+            }
+            else if(ZeeConfig.isAggressive(gobName)){
                 toggleOverlayAggro(gob);
-            }else if (isInspectGob(gobName)) {
+            }
+            else if (isInspectGob(gobName)) {
                 inspectGob(gob);
             }
         }
+    }
+
+    public static void checkPlobUnplaced() {
+        if (ZeeConfig.autoToggleGridLines)
+            ZeeConfig.gameUI.map.showgrid(false);
+
+        ZeeManagerStockpile.lastPlob = null;
     }
 
     public void run() {
@@ -166,14 +192,25 @@ public class ZeeManagerGobClick extends ZeeThread{
                     if (!ZeeConfig.getCursorName().equals(ZeeConfig.CURSOR_HARVEST))
                         gobClick(gob, 3, UI.MOD_SHIFT);
                 }
-                // use wheelbarrow at stockpile
-                else if (isGobStockpile(gobName) && ZeeConfig.isPlayerCarryingWheelbarrow()) {
-                    ZeeManagerStockpile.useWheelbarrowAtStockpile(gob);
-                    if (ZeeConfig.autoToggleGridLines)
-                        ZeeConfig.gameUI.map.showgrid(true);
+                // stockpile + wheelbarrow
+                else if (isGobStockpile(gobName)) {
+                    // driving wheelbarrow = start piles mover
+                    if (ZeeConfig.isPlayerDrivingWheelbarrow()) {
+                        ZeeManagerStockpile.startPilesMover();
+                    }
+                    // carrying wheelbarrow = use wb on pile
+                    else if(ZeeConfig.isPlayerCarryingWheelbarrow()) {
+                        ZeeManagerStockpile.useWheelbarrowAtStockpile(gob);
+                        if (ZeeConfig.autoToggleGridLines)
+                            ZeeConfig.gameUI.map.showgrid(true);
+                    }
+                    //pickup all pile items
+                    else {
+                        gobClick(gob,3, UI.MOD_SHIFT);
+                    }
                 }
-                // pick up all dryingframe items
-                else if (isGobStockpile(gobName) || gobName.endsWith("/dframe")) {
+                // pickup all items: dframe
+                else if (gobName.endsWith("/dframe")) {
                     gobClick(gob,3, UI.MOD_SHIFT);
                 }
                 // remove tree stump
@@ -1712,6 +1749,11 @@ public class ZeeManagerGobClick extends ZeeThread{
 
     public static void gobClick(Gob g, int btn, int mod) {
         ZeeConfig.gameUI.map.wdgmsg("click", ZeeConfig.getCenterScreenCoord(), g.rc.floor(OCache.posres), btn, mod, 0, (int)g.id, g.rc.floor(OCache.posres), 0, -1);
+    }
+
+    public static void gobPlace(Gob g, int mod) {
+        //haven.MapView@84bca9 ; place ; [(-973312, -973312), 16384, 1, 1]
+        ZeeConfig.gameUI.map.wdgmsg("place", g.rc.floor(OCache.posres), 16384, 1, mod);
     }
 
     public static double distanceCoordGob(Coord2d c, Gob gob) {

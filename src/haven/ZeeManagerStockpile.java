@@ -72,21 +72,27 @@ public class ZeeManagerStockpile extends ZeeThread{
     );
 
     static ZeeWindow windowManager;
-    public static boolean busy;
+    static boolean busy;
     static Inventory mainInv;
-    public static String lastPetalName;
-    public static Gob gobPile, gobSource;
-    public static MapView.Plob lastGobPlaced;
-    public static String lastGroundItemName;
-    public static String lastTileStoneSourceTileName;
-    public static Coord2d lastTileStoneSourceCoordMc;
-    public static boolean diggingTileSource;
+    static String lastPetalName;
+    static Gob gobPile, gobSource;
+    static MapView.Plob lastPlob;
+    static long lastPlobMs;
+    static String lastGroundItemName;
+    static String lastTileStoneSourceTileName;
+    static Coord2d lastTileStoneSourceCoordMc;
+    static boolean diggingTileSource;
     private final String task;
 
     public ZeeManagerStockpile(String task) {
         this.task = task;
         busy = true;
         mainInv = ZeeConfig.gameUI.maininv;
+    }
+
+    public static void checkPlob(MapView.Plob plob) {
+        lastPlobMs = ZeeThread.now();
+        lastPlob = plob;
     }
 
     @Override
@@ -363,13 +369,13 @@ public class ZeeManagerStockpile extends ZeeThread{
 
     public static void checkWdgmsgPilePlacing() {
 
-        if (lastGobPlaced!=null && lastGobPlaced.getres()!=null && lastGobPlaced.getres().name.contains("/stockpile-")) {
+        if (lastPlob !=null && lastPlob.getres()!=null && lastPlob.getres().name.contains("/stockpile-")) {
             //lastGobPlacedMs = now();
             //println((now() - lastGroundItemNameMs)+" < "+5000);
             if (lastGroundItemName!=null && lastGroundItemName.endsWith(ZeeConfig.lastInvItemBaseName)  &&  now() - ZeeConfig.lastInvItemMs < 3000) {
                 showWindow(TASK_PILE_GROUND_ITEMS);
             } else {
-                String pileGobName = lastGobPlaced.getres().name;
+                String pileGobName = lastPlob.getres().name;
                 checkShowWindow(pileGobName);
             }
         }
@@ -870,5 +876,9 @@ public class ZeeManagerStockpile extends ZeeThread{
         maxX = Math.max(olStart.x,olEnd.x);
         maxY = Math.max(olStart.y,olEnd.y);
         return (gobCoord.x >= minX && gobCoord.x <= maxX && gobCoord.y >= minY && gobCoord.y <= maxY);
+    }
+
+    public static void startPilesMover() {
+        println("start piles mover");
     }
 }

@@ -1801,7 +1801,7 @@ public class MapView extends PView implements DTarget, Console.Directory {
 	    if(ui.mc.isect(rootpos(), sz))
 		new Adjust(ui.mc.sub(rootpos()), 0).run();
 	    this.slot = basic.add(this.placed);
-		ZeeManagerStockpile.lastGobPlaced = this;
+		ZeeManagerStockpile.checkPlob(this);
 	}
 
 	private class Adjust extends Maptest {
@@ -1840,7 +1840,7 @@ public class MapView extends PView implements DTarget, Console.Directory {
     public void uimsg(String msg, Object... args) {
 	if(msg == "place") {
 		if (ZeeConfig.autoToggleGridLines)
-			showgrid(true);
+			ZeeConfig.gameUI.map.showgrid(true);
 	    Loader.Future<Plob> placing = this.placing;
 	    if(placing != null) {
 		if(!placing.cancel()) {
@@ -1882,9 +1882,8 @@ public class MapView extends PView implements DTarget, Console.Directory {
 		});
 	} else if(msg == "unplace") {
 	    Loader.Future<Plob> placing = this.placing;
-		if (ZeeConfig.autoToggleGridLines)
-			showgrid(false);
 	    if(placing != null) {
+		ZeeManagerGobClick.checkPlobUnplaced();
 		if(!placing.cancel()) {
 		    Plob ob = placing.get();
 		    synchronized(ob) {
