@@ -579,12 +579,49 @@ public class ZeeConfig {
         return name.contains("/kritter/");
     }
 
-    // TODO more precise using big animals names instead?
     static boolean isKritterNotPickable(String resname) {
-//        if (!isKritter(resname))
-//            return true;
-        if(!isBug(resname) && !isSmallAnimal(resname))
-            return true;
+        String[] list = {
+            //wild
+            "gfx/kritter/badger/badger",
+            "gfx/kritter/bear/bear",
+            "gfx/kritter/boar/boar",
+            "gfx/kritter/caveangler/caveangler",
+            "gfx/kritter/lynx/lynx",
+            "gfx/kritter/mammoth/mammoth",
+            "gfx/kritter/moose/moose",
+            "gfx/kritter/rat/caverat",
+            "gfx/kritter/troll/troll",
+            "gfx/kritter/walrus/walrus",
+            "gfx/kritter/goat/wildgoat",
+            "gfx/kritter/wolf/wolf",
+            "gfx/kritter/wolverine/wolverine",
+            "gfx/kritter/cattle/aurochs/",
+            "gfx/kritter/sheep/mouflon",
+            "gfx/kritter/reddeer/",
+            "gfx/kritter/roedeer/",
+            "gfx/kritter/fox/",
+            "gfx/kritter/beaver",
+            "gfx/kritter/boreworm",
+            "gfx/kritter/cavelouse",
+            "gfx/kritter/ooze",
+            "gfx/kritter/otter",
+            "gfx/kritter/mammoth",
+            "/spermwhale",
+            "/orca",
+            //tamed
+            "gfx/kritter/horse/",
+            "gfx/kritter/goat/",
+            "gfx/kritter/sheep/",
+            "gfx/kritter/cattle/",
+            "gfx/kritter/pig/",
+            //misc
+            "gfx/kritter/midgeswarm/",
+            "gfx/kritter/ants/"
+        };
+        for (int i = 0; i < list.length; i++) {
+            if(resname.contains(list[i]))
+                return true;
+        }
         return false;
     }
 
