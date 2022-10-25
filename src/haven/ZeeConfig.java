@@ -575,8 +575,16 @@ public class ZeeConfig {
         return false;
     }
 
+    static boolean isKritter(Gob gob){
+        return isKritter(gob.getres().name);
+    }
+
     static boolean isKritter(String name){
         return name.contains("/kritter/");
+    }
+
+    static boolean isKritterNotPickable(Gob gob) {
+        return isKritterNotPickable(gob.getres().name);
     }
 
     static boolean isKritterNotPickable(String resname) {

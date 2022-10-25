@@ -1796,6 +1796,7 @@ public class ZeeManagerGobClick extends ZeeThread{
 
         // find eligible gobs
         List<Gob> gobs = ZeeConfig.findGobsMatchingRegexpList(listPickupGobNamePatterns);
+        gobs.removeIf(gob1 -> ZeeConfig.isKritter(gob1) && ZeeConfig.isKritterNotPickable(gob1));
         if (gobs==null || gobs.size()==0)
             return;
 
@@ -1813,9 +1814,6 @@ public class ZeeManagerGobClick extends ZeeThread{
             dist = ZeeConfig.distanceToPlayer(gobs.get(i));
             name = gobs.get(i).getres().name;
             if (closestGob==null  ||  dist < minDist){
-                //ignore mounted horse
-                if (dist==0 && name.contains("/horse/"))
-                    continue;
                 minDist = dist;
                 closestGob = gobs.get(i);
             }
