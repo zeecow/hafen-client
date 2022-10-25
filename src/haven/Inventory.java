@@ -187,7 +187,7 @@ public class Inventory extends Widget implements DTarget {
 					items.add(w);
 					continue;
 				}
-				if(w.item.res.get().name.contains(name)){
+				if(w.item.res.get().name.contentEquals(name)){
 					items.add(w);
 				}
 			}
