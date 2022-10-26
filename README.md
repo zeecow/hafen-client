@@ -40,6 +40,8 @@ Client focusing on small helper tasks, many using mouse middle button, and other
  - Lag Camera (:cam lag)
  - ctrl+q pickup gob window
  - area piler: create piles around selected area (long-midclick item)
+ - mining tile counter: long midclick mine ground or tiles to show window
+
 
  - midclick ground 
    - while holding item will move to location (simulates ctrl+click)
@@ -53,6 +55,7 @@ Client focusing on small helper tasks, many using mouse middle button, and other
    - while coracle mounted, LMC ground will try to dismount and equip 
    - disembark dugout, rowboat, coracle, kicksled
    - activate snow clear area
+   - show mining tile counter when click mine ground/tile
  - midclick object 
    - inspect object quality and show text
    - harvest 2 dreams from dreamcatch obj

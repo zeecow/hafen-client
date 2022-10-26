@@ -1,6 +1,7 @@
 package haven;
 
-import java.util.LinkedList;
+import java.awt.*;
+import java.util.*;
 import java.util.List;
 
 public class ZeeManagerMiner extends ZeeThread{
@@ -597,6 +598,84 @@ public class ZeeManagerMiner extends ZeeThread{
             return;
 
         chipBoulderNewThread(boulder);
+    }
+
+    static ZeeWindow windowTiles;
+    public static void tilesWindowCreate() {
+        if (windowTiles==null){
+            windowTiles = ZeeConfig.gameUI.add(new ZeeWindow(Coord.of(200,400),"Tiles"),300,300);
+            windowTiles.add(new Button(UI.scale(100),"refresh"){
+                public void wdgmsg(String msg, Object... args) {
+                    if (msg.contentEquals("activate")){
+                        tilesWindowRefresh();
+                    }
+                    //super.wdgmsg(msg, args);
+                }
+            });
+        }else{
+            windowTiles.show();
+        }
+        tilesWindowRefresh();
+    }
+
+    private static void tilesWindowRefresh() {
+        Glob g = ZeeConfig.gameUI.map.glob;
+        Gob player = ZeeConfig.gameUI.map.player();
+        if (player == null)
+            return;//TODO try counting tiles without player loaded?
+        Coord pltc = new Coord((int) player.getc().x / 11, (int) player.getc().y / 11);
+        HashMap<String,Integer> mapTileresCount= new HashMap<>();
+        for (int x = -44; x < 44; x++) {
+            for (int y = -44; y < 44; y++) {
+                int t = g.map.gettile(pltc.sub(x, y));
+                Resource res = g.map.tilesetr(t);
+                if (res == null)
+                    continue;
+                String name = res.name;
+                if (!name.contains("/rocks/")) //ignore non mineable tiles
+                    continue;
+                Integer count = mapTileresCount.get(name);
+                if (count==null)
+                    count = 1;
+                else
+                    count++;
+                //count tiles
+                mapTileresCount.put(name,count);
+            }
+        }
+        //remove old labels
+        for (Label l : windowTiles.children(Label.class)) {
+            l.destroy();
+        }
+        //sorted list
+        SortedSet<String> tiles = new TreeSet<String>(mapTileresCount.keySet());
+        //create new labels
+        int y = 30;
+        Label label;
+        String basename;
+        for (String tileName : tiles) {
+            basename = tileName.replaceAll("gfx/tiles/rocks/","");
+            label = new Label(basename+"   "+ mapTileresCount.get(tileName));
+            if (isStoneOre(basename))
+                label.setcolor(Color.yellow);
+            else if (isStoneOrePrecious(basename))
+                label.setcolor(Color.red);
+            windowTiles.add(label,0,y);
+            y += 17;
+        }
+        windowTiles.pack();
+    }
+
+    static boolean isStoneOre(String basename){
+        return ZeeConfig.mineablesOre.contains(basename);
+    }
+
+    static boolean isStoneNotOre(String basename){
+        return ZeeConfig.mineablesStone.contains(basename);
+    }
+
+    static boolean isStoneOrePrecious(String basename){
+        return ZeeConfig.mineablesOrePrecious.contains(basename);
     }
 
     public static void println(String s) {

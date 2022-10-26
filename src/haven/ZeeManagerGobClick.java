@@ -57,12 +57,8 @@ public class ZeeManagerGobClick extends ZeeThread{
 
             // ground clicks
             if(gob==null) {
-                // inspect tile name
-                if (ZeeConfig.getCursorName().contentEquals(ZeeConfig.CURSOR_INSPECT)) {
-                    ZeeConfig.msg(ZeeConfig.getTileResName(mc));
-                }
                 // place all pile items
-                else if(ZeeManagerStockpile.lastPlob != null) {
+                if(ZeeManagerStockpile.lastPlob != null) {
                     ZeeManagerGobClick.gobPlace(ZeeManagerStockpile.lastPlob,UI.MOD_SHIFT);
                 }
             }
@@ -138,7 +134,7 @@ public class ZeeManagerGobClick extends ZeeThread{
 
     public void run() {
         try {
-            if (isLongMidClick()){//unnecessary check?
+            if (isLongMidClick()){ //unnecessary check?
                 // clicked ground
                 if (isGroundClick){
                     //dismount horse
@@ -173,6 +169,13 @@ public class ZeeManagerGobClick extends ZeeThread{
                     else if (ZeeConfig.getTileResName(coordMc).contains("tiles/snow")){
                         //haven.MapView@11460448 ; click ; [(629, 490), (1014904, 1060429), 3, 1]
                         ZeeConfig.clickCoord(coordMc.floor(posres),3,UI.MOD_SHIFT);
+                    }
+                    else{
+                        // mining tiles window
+                        String tileName = ZeeConfig.getTileResName(coordMc);
+                        if (tileName.contentEquals("gfx/tiles/mine") || tileName.contains("/rocks/")) {
+                            ZeeManagerMiner.tilesWindowCreate();
+                        }
                     }
                 }
                 // schedule tree removal
