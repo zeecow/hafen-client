@@ -257,8 +257,12 @@ public class ZeeManagerFarmer extends ZeeThread{
                 || lastItemSeedBasename.contains("seed-wheat")
                 || lastItemSeedBasename.contains("seed-millet"))
             pileItemName = "/straw";
+        else if (lastItemSeedBasename.contains("seed-turnip"))
+            pileItemName = "/turnip";
+        else if (lastItemSeedBasename.contains("seed-carrot"))
+            pileItemName = "/carrot";
         else if (lastItemSeedBasename.contains("seed-lettuce"))
-            pileItemName = "/lettuce";//TODO check lettuce-head name
+            pileItemName = "/lettucehead";//TODO check lettuce-head name
 
 
         return ZeeConfig.getClosestGobByNameContains(pileItemName);
