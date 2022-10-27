@@ -606,6 +606,7 @@ public class ZeeConfig {
             "gfx/kritter/wolverine/wolverine",
             "gfx/kritter/cattle/aurochs/",
             "gfx/kritter/sheep/mouflon",
+            "gfx/kritter/reindeer/",
             "gfx/kritter/reddeer/",
             "gfx/kritter/roedeer/",
             "gfx/kritter/fox/",

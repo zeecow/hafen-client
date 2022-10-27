@@ -1747,7 +1747,8 @@ public class ZeeManagerGobClick extends ZeeThread{
             "/stallion,/mare,/foal,/hog,/sow,/piglet,"
             +"/billy,/nanny,/kid,/sheep,/lamb,/cattle,/calf,"
             +"/wildhorse,/aurochs,/mouflon,/wildgoat,"
-            +"/adder,/badger,/bear,/boar,/beaver,/deer,/reindeer,/reddeer,/fox,"
+            +"/adder,/badger,/bear,/boar,/beaver,/fox,"
+            +"/reindeer,/reddeer,/roedeer,"
             +"/greyseal,/otter,/caveangler,/boreworm,/caverat,"
             +"/lynx,/mammoth,/moose,/troll,/walrus,/wolf,/wolverine"
         );
