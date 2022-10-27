@@ -421,48 +421,6 @@ public class ZeeManagerMiner extends ZeeThread{
         return invItems.size();
     }
 
-    public static void taskChipBoulder(Gob gobBoulder) throws Exception {
-
-        if (!ZeeConfig.autoChipMinedBoulder)
-            return;
-
-        //println(">task chip_boulder on");
-        if (!tunneling)
-            ZeeConfig.addPlayerText("boulder");
-
-        //wait boulder loading/clickable
-        sleep(1000);
-        if (isCombatActive())
-            return;
-
-        //activate arrow cursor
-        ZeeConfig.clickRemoveCursor();
-        waitCursorName(ZeeConfig.CURSOR_ARW);
-
-        //select chip menu from boulder
-        if (isCombatActive())
-            return;
-        ZeeManagerGobClick.clickGobPetal(gobBoulder,"Chip stone");
-        sleep(100);
-
-        //restore mining icon for autodrop
-        ZeeConfig.cursorChange(ZeeConfig.ACT_MINE);
-
-        //wait chipping stop
-        if(waitPlayerIdlePose()){
-            if (isCombatActive())
-                return;
-            //resume mining
-            ZeeConfig.gameUI.map.wdgmsg("sel", ZeeConfig.lastSavedOverlayStartCoord, ZeeConfig.lastSavedOverlayEndCoord, ZeeConfig.lastSavedOverlayModflags);
-        }else{
-            println("canceled chipping boulder?");
-        }
-
-        //println(">task chip_boulder off");
-        if (!tunneling)
-            ZeeConfig.removePlayerText();
-    }
-
     public static void notifyColumn(Gob gob, float hp){
         if (!isMineSupport(gob))
             return;

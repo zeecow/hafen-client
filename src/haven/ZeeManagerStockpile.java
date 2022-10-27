@@ -78,7 +78,6 @@ public class ZeeManagerStockpile extends ZeeThread{
     static Gob gobPile, gobSource;
     static MapView.Plob lastPlob;
     static long lastPlobMs;
-    static String lastGroundItemName;
     static String lastTileStoneSourceTileName;
     static Coord2d lastTileStoneSourceCoordMc;
     static boolean diggingTileSource;
@@ -98,10 +97,7 @@ public class ZeeManagerStockpile extends ZeeThread{
     @Override
     public void run() {
         try{
-            if(task.contentEquals(TASK_PILE_GROUND_ITEMS)) {
-                startPilingGroundItems();
-            }
-            else if (task.contentEquals(TASK_PILE_GOB_SOURCE)){
+            if (task.contentEquals(TASK_PILE_GOB_SOURCE)){
                 startPilingGobSource();
             }
             else if (task.contentEquals(TASK_PILE_TILE_SOURCE)){
@@ -112,63 +108,6 @@ public class ZeeManagerStockpile extends ZeeThread{
         }
         busy = false;
         ZeeConfig.removeGobText(ZeeConfig.getPlayerGob());
-    }
-
-
-    public static void checkGroundItemClicked(String gobName) {
-        if (gobName.equals("gfx/terobjs/items/tobacco-fresh")) {
-            lastGroundItemName = gobName;
-        }
-    }
-
-
-    // gfx/invobjs/tobacco-fresh
-    // gfx/terobjs/items/tobacco-fresh
-    // gfx/terobjs/stockpile-pipeleaves
-    private void startPilingGroundItems() throws InterruptedException {
-
-        List<Gob> leaves;
-        Gob closestLeaf;
-        List<WItem> invLeaves;
-
-        if (lastGroundItemName.equals("gfx/terobjs/items/tobacco-fresh")){
-
-            gobPile = ZeeConfig.getClosestGob(ZeeConfig.findGobsByNameContains("stockpile-pipeleaves"));
-            ZeeConfig.removeGobText(gobPile);
-            ZeeConfig.addPlayerText("auto piling");
-            ZeeConfig.addGobText(gobPile,"pile",0,255,0,255,10);
-
-            invLeaves = mainInv.getWItemsByName("tobacco-fresh");
-            if(invLeaves.size()>0) {
-                ZeeManagerItemClick.pickUpItem(invLeaves.get(0));
-                ZeeManagerGobClick.itemActGob(gobPile, UI.MOD_SHIFT);
-                waitNotHoldingItem();
-            }
-
-            while (busy) {
-                leaves = ZeeConfig.findGobsByNameContains("gfx/terobjs/items/tobacco-fresh");
-                if(leaves.size()==0){
-                    exitManager();
-                    return;
-                }
-                closestLeaf = ZeeConfig.getClosestGob(leaves);
-                if (closestLeaf != null) {
-                    ZeeManagerGobClick.gobClick(closestLeaf, 3, UI.MOD_SHIFT);
-                    waitPlayerIdleFor(1);
-                    if (!ZeeConfig.isPlayerHoldingItem()) {
-                        invLeaves = mainInv.getWItemsByName("tobacco-fresh");
-                        ZeeManagerItemClick.pickUpItem(invLeaves.get(0));
-                    }
-                    ZeeManagerGobClick.itemActGob(gobPile, UI.MOD_SHIFT);
-                    waitPlayerIdleFor(1);
-                    if(ZeeConfig.isPlayerHoldingItem()){
-                        exitManager("pileGroundItems() > stockpile full");
-                    }
-                }else{
-                    exitManager("no close leaf");
-                }
-            }
-        }
     }
 
 
@@ -368,16 +307,9 @@ public class ZeeManagerStockpile extends ZeeThread{
     }
 
     public static void checkWdgmsgPilePlacing() {
-
         if (lastPlob !=null && lastPlob.getres()!=null && lastPlob.getres().name.contains("/stockpile-")) {
-            //lastGobPlacedMs = now();
-            //println((now() - lastGroundItemNameMs)+" < "+5000);
-            if (lastGroundItemName!=null && lastGroundItemName.endsWith(ZeeConfig.lastInvItemBaseName)  &&  now() - ZeeConfig.lastInvItemMs < 3000) {
-                showWindow(TASK_PILE_GROUND_ITEMS);
-            } else {
-                String pileGobName = lastPlob.getres().name;
-                checkShowWindow(pileGobName);
-            }
+            String pileGobName = lastPlob.getres().name;
+            checkShowWindow(pileGobName);
         }
     }
 

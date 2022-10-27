@@ -84,8 +84,6 @@ public class ZeeManagerGobClick extends ZeeThread{
             }
             else if (isGobGroundItem(gobName)) {
                 gobClick(gob,3, UI.MOD_SHIFT);//pick up all items (shift + rclick)
-                if (ZeeConfig.pilerMode)
-                    ZeeManagerStockpile.checkGroundItemClicked(gobName);
             }
             else if (isGobFireSource(gobName)) {
                 new ZeeThread() {
