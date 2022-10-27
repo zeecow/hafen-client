@@ -210,6 +210,7 @@ public class ZeeManagerFarmer extends ZeeThread{
                 piling stage
             */
             if (farmerCbPile){
+                ZeeManagerItemClick.equipTwoSacks();
                 ZeeManagerStockpile.selAreaPile = true;
                 ZeeManagerStockpile.selAreaPileGobItem = getPileItemGob();
                 ZeeThread t = ZeeManagerStockpile.areaPilerStart();
