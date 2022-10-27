@@ -1091,9 +1091,27 @@ public class ZeeManagerItemClick extends ZeeThread{
         return false;
     }
 
-    public static boolean pickUpInvItem(Inventory inv, String name) {
+    // pick up first item found in inventory, using names list
+    public static boolean pickUpInvItem(Inventory inv, String ... names) {
         try {
-            WItem witem = inv.getWItemsByName(name).get(0);
+            if (names==null || names.length==0) {
+                println("[ERROR] pickUpInvItem > names empty or null");
+                return false;
+            }
+            WItem witem = null;
+            List<WItem> list;
+            for (int i = 0; i < names.length; i++) {
+                list = inv.getWItemsByName(names[i]);
+                if (list.isEmpty())
+                    continue;
+                //found item with name[i]
+                witem = list.get(i);
+                break;
+            }
+            // found no item with listed names
+            if (witem==null)
+                return false;
+            // pickup found item
             return pickUpItem(witem);
         }catch (Exception e){
             return false;

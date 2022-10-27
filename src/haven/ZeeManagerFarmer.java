@@ -367,7 +367,7 @@ public class ZeeManagerFarmer extends ZeeThread{
         Gob g = ZeeConfig.getClosestGob(plants);
         if(g!=null) {
             ZeeManagerGobClick.gobClick(g, 3, UI.MOD_SHIFT);
-            return waitCursor(ZeeConfig.CURSOR_HARVEST);
+            return waitCursorName(ZeeConfig.CURSOR_HARVEST);
         }else {
             //println("no gobs to shift+click");
             return false;
@@ -378,7 +378,7 @@ public class ZeeManagerFarmer extends ZeeThread{
         //haven.GItem@3a68ee9c ; iact ; [(23, 16), 1]
         //println("activateCursorPlantGItem > "+gi+", seeds = "+getSeedsAmount(gi));
         ZeeManagerItemClick.gItemActCoord(gi, UI.MOD_SHIFT);
-        return waitCursor(ZeeConfig.CURSOR_HARVEST);
+        return waitCursorName(ZeeConfig.CURSOR_HARVEST);
     }
 
     private boolean inventoryHasSeeds() {

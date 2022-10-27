@@ -47,7 +47,7 @@ Client focusing on small helper tasks, many using mouse middle button, and other
    - while holding item will move to location (simulates ctrl+click)
    - while inspecting icon active, will msg tile name
    - place stockpile and all items
-   - dig ballclay if cursor dig
+   - dig multiple ballclay if cursor dig
  - long midclick ground (LMC)
    - inspect water tile using inventory woodencup  
    - while mounting horse will try to dismount
@@ -80,6 +80,7 @@ Client focusing on small helper tasks, many using mouse middle button, and other
    - while driving wheelbarrow will lift it up and place on cart obj
    - while carrying/driving wheelbarrow will mount horse obj and lift wheelbarrow again
    - show window for area piler
+   - pile all clay if clicked pile with cursor dig
  - midclick item 
    - sort-transfer item ascending(?) 
    - pick-up all

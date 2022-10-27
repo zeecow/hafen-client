@@ -66,9 +66,15 @@ public class ZeeManagerGobClick extends ZeeThread{
                     ZeeConfig.clickTile(ZeeConfig.coordToTile(mc),1,UI.MOD_SHIFT);
                 }
             }
+            // pile all clay if clicked pile with cursor dig
+            else if(ZeeConfig.isCursorName(ZeeConfig.CURSOR_DIG) && gobName.endsWith("/stockpile-clay")){
+                ZeeManagerGobClick.pileInvClayOnExistingPile(gob);
+            }
+            // click gob holding item
             else if (ZeeConfig.isPlayerHoldingItem()) {
                 clickedGobHoldingItem(gob,gobName);
             }
+            // harvest one trellis
             else if (isGobTrellisPlant(gobName)) {
                 new ZeeThread() {
                     public void run() {
@@ -127,6 +133,25 @@ public class ZeeManagerGobClick extends ZeeThread{
                 inspectGob(gob);
             }
         }
+    }
+
+    private static void pileInvClayOnExistingPile(Gob pileClay) {
+        new ZeeThread(){
+            public void run() {
+                try {
+                    Inventory inv = ZeeConfig.getMainInventory();
+                    // pickup inv clay (if player was holding item a generic method would already been called)
+                    if (ZeeManagerItemClick.pickUpInvItem(inv, "/clay-ball","/clay-acre")) {
+                        // pile clay
+                        itemActGob(pileClay,UI.MOD_SHIFT);
+                    } else {
+                        println("pile all clay > couldnt get clay from inv");
+                    }
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+            }
+        }.start();
     }
 
     public static void checkPlobUnplaced() {
@@ -1303,7 +1328,7 @@ public class ZeeManagerGobClick extends ZeeThread{
                     if(ZeeManagerItemClick.dropHoldingItemToBeltOrInv()) {
                         sleep(PING_MS);
                         ZeeConfig.clickRemoveCursor();
-                        waitCursor(ZeeConfig.CURSOR_ARW);
+                        waitCursorName(ZeeConfig.CURSOR_ARW);
                         sleep(PING_MS);
                         gobClick(bucket, 3);
                         if (waitHoldingItem())
@@ -1591,7 +1616,7 @@ public class ZeeManagerGobClick extends ZeeThread{
             waitItemInHand("shovel");
         }
         ZeeConfig.gameUI.menu.wdgmsg("act", "carry","0");
-        waitCursor(ZeeConfig.CURSOR_HAND);
+        waitCursorName(ZeeConfig.CURSOR_HAND);
         gobClick(gob,1);
         waitPlayerDistToGob(gob,0);
     }
@@ -1661,7 +1686,7 @@ public class ZeeManagerGobClick extends ZeeThread{
         //make sure cursor is arrow before clicking gob
         if (!ZeeConfig.getCursorName().contentEquals(ZeeConfig.CURSOR_ARW)){
             ZeeConfig.clickRemoveCursor();
-            if (!waitCursor(ZeeConfig.CURSOR_ARW)) {
+            if (!waitCursorName(ZeeConfig.CURSOR_ARW)) {
                 return false;
             }
         }
@@ -1691,7 +1716,7 @@ public class ZeeManagerGobClick extends ZeeThread{
         //select arrow cursor if necessary
         if (!ZeeConfig.getCursorName().contentEquals(ZeeConfig.CURSOR_ARW)) {
             ZeeConfig.clickRemoveCursor();
-            waitCursor(ZeeConfig.CURSOR_ARW);
+            waitCursorName(ZeeConfig.CURSOR_ARW);
         }
 
         //disable auto options before clicking gob

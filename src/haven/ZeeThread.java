@@ -568,7 +568,7 @@ public class ZeeThread  extends Thread{
     }
 
 
-    public static boolean waitCursor(String name) {
+    public static boolean waitCursorName(String name) {
         //println("wait cursor "+name);
         int max = (int) TIMEOUT_MS*2;
         try {

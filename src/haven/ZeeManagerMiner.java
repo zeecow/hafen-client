@@ -78,7 +78,7 @@ public class ZeeManagerMiner extends ZeeThread{
                             tunnelHelperSetStage(TUNNELHELPER_STAGE4_PICKSTONE);
                             tunnelHelperButtonAct.disable(false);
                             ZeeConfig.clickRemoveCursor();
-                            waitCursor(ZeeConfig.CURSOR_ARW);
+                            waitCursorName(ZeeConfig.CURSOR_ARW);
                             if (!tunnelHelperPickStonesManualClick) {
                                 tunnelHelperButtonAct.click();
                                 tunnelHelperButtonAct.disable(true);
@@ -97,7 +97,7 @@ public class ZeeManagerMiner extends ZeeThread{
                                 //ZeeConfig.removePlayerText();
                                 tunnelHelperButtonAct.disable(false);
                                 ZeeConfig.clickRemoveCursor();
-                                waitCursor(ZeeConfig.CURSOR_ARW);
+                                waitCursorName(ZeeConfig.CURSOR_ARW);
                                 if (!tunnelHelperPickStonesManualClick) {
                                     tunnelHelperButtonAct.click();
                                     tunnelHelperButtonAct.disable(true);
@@ -312,12 +312,12 @@ public class ZeeManagerMiner extends ZeeThread{
         mining = true;
         println("mine tiles  c1"+c1+"  c2"+c2);
         ZeeConfig.cursorChange(ZeeConfig.ACT_MINE);
-        waitCursor(ZeeConfig.CURSOR_MINE);
+        waitCursorName(ZeeConfig.CURSOR_MINE);
         ZeeConfig.gameUI.map.wdgmsg("sel", c1, c2, 0);
         //waitPlayerIdleFor(2);//minimum 2 sec
         waitPlayerIdlePose();
         ZeeConfig.clickRemoveCursor();
-        waitCursor(ZeeConfig.CURSOR_ARW);
+        waitCursorName(ZeeConfig.CURSOR_ARW);
     }
 
 
@@ -338,7 +338,7 @@ public class ZeeManagerMiner extends ZeeThread{
         // set arrow cursor
         if (!ZeeConfig.CURSOR_ARW.contentEquals(ZeeConfig.getCursorName())) {
             ZeeConfig.clickRemoveCursor();
-            waitCursor(ZeeConfig.CURSOR_ARW);
+            waitCursorName(ZeeConfig.CURSOR_ARW);
         }
 
         //check if inventory stones are enough
@@ -437,7 +437,7 @@ public class ZeeManagerMiner extends ZeeThread{
 
         //activate arrow cursor
         ZeeConfig.clickRemoveCursor();
-        waitCursor(ZeeConfig.CURSOR_ARW);
+        waitCursorName(ZeeConfig.CURSOR_ARW);
 
         //select chip menu from boulder
         if (isCombatActive())
@@ -478,7 +478,7 @@ public class ZeeManagerMiner extends ZeeThread{
                     println("stop mining");
                     ZeeConfig.msgError("stop mining");
                     ZeeConfig.clickRemoveCursor();
-                    waitCursor(ZeeConfig.CURSOR_ARW);
+                    waitCursorName(ZeeConfig.CURSOR_ARW);
                     ZeeConfig.stopMovingEscKey();
                     ZeeThread.staminaMonitorStop();//case stam monitor thread is running
                     if (manager != null)
@@ -504,7 +504,7 @@ public class ZeeManagerMiner extends ZeeThread{
 
                     //remove mining cursor
                     ZeeConfig.clickRemoveCursor();
-                    if(!waitCursor(ZeeConfig.CURSOR_ARW)){
+                    if(!waitCursorName(ZeeConfig.CURSOR_ARW)){
                         println(">chipBoulder couldn't change cursor to arrow");
                         ZeeConfig.removePlayerText();
                         return;
