@@ -47,6 +47,7 @@ Client focusing on small helper tasks, many using mouse middle button, and other
    - while holding item will move to location (simulates ctrl+click)
    - while inspecting icon active, will msg tile name
    - place stockpile and all items
+   - dig ballclay if cursor dig
  - long midclick ground (LMC)
    - inspect water tile using inventory woodencup  
    - while mounting horse will try to dismount

@@ -3084,4 +3084,19 @@ public class ZeeConfig {
     public static void moveToAreaCenter(Area a) {
         clickTile(ZeeConfig.getAreaCenterTile(a),1);
     }
+
+    public static boolean isCursorName(String name) {
+        return getCursorName().contentEquals(name);
+    }
+
+    public static boolean isTileNamed(Coord2d mc, String... names) {
+        if (names==null || names.length==0 || mc==null)
+            return false;
+        String tilename = getTileResName(mc);
+        for (String name : names) {
+            if (name.contentEquals(tilename))
+                return true;
+        }
+        return false;
+    }
 }
