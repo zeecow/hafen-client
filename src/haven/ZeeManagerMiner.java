@@ -8,7 +8,7 @@ public class ZeeManagerMiner extends ZeeThread{
 
     private static final double MAX_DIST_BOULDER = 25;
 
-    public static boolean isCursorMining;
+    //public static boolean isCursorMining;
     public static long miningAreaSelectedMs = -1;
     static boolean useOreForColumns = false;
     public static long lastDropItemMs = 0;
@@ -25,7 +25,7 @@ public class ZeeManagerMiner extends ZeeThread{
         }
 
         // selection is not mining
-        if (!isCursorMining){
+        if (!isCursorMining()){
             miningAreaSelectedMs = -1;
             return;
         }
@@ -111,6 +111,10 @@ public class ZeeManagerMiner extends ZeeThread{
                     }
                 }
             }.start();
+    }
+
+    static boolean isCursorMining() {
+        return ZeeConfig.getCursorName().contentEquals(ZeeConfig.CURSOR_MINE);
     }
 
     static boolean tunnelCheckbox = false;
@@ -584,7 +588,7 @@ public class ZeeManagerMiner extends ZeeThread{
     public static void checkBoulderGobAdded(Gob boulder) {
 
         // check mining cursor
-        if (!isCursorMining)
+        if (!isCursorMining())
             return;
 
         // new boulders only

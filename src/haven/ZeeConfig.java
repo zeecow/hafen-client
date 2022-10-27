@@ -125,6 +125,7 @@ public class ZeeConfig {
     public static MixColor MIXCOLOR_LIGHTBLUE = new MixColor(0, 255, 255, 200);
 
     public static GameUI gameUI;
+    private static String cursorName = CURSOR_ARW;
     public static Window windowEquipment,windowInvMain, toggleEquipsLastWindowClicked;
     public static Makewindow makeWindow;
     public static ZeeInvMainOptionsWdg invMainoptionsWdg;
@@ -1941,14 +1942,15 @@ public class ZeeConfig {
     }
 
     public static String getCursorName() {
-        try {
+        return cursorName;
+        /*try {
             synchronized(gameUI.map.ui) {
                 return gameUI.map.ui.getcurs(Coord.z).name;
             }
         } catch(Exception e) {
             e.printStackTrace();
             return "";
-        }
+        }*/
     }
 
     /**
@@ -2665,7 +2667,7 @@ public class ZeeConfig {
             ZeeConfig.applyGobSettingsHighlight(ob, ZeeConfig.getHighlightGobColor(ob));
             if (ob.resName!=null && !ob.resName.isBlank() && !mapGobSession.containsKey(ob.resName))
                 mapGobSession.put(ob.resName,"");
-            if (ZeeManagerMiner.isCursorMining && ZeeManagerMiner.isBoulder(ob))
+            if (ZeeManagerMiner.isCursorMining() && ZeeManagerMiner.isBoulder(ob))
                 ZeeManagerMiner.checkBoulderGobAdded(ob);
         }
     }
@@ -2845,12 +2847,11 @@ public class ZeeConfig {
 
     public static void checkNewCursorName(String curs) {
 
-        // mining
-        ZeeManagerMiner.isCursorMining = curs.contentEquals(CURSOR_MINE);
+        ZeeConfig.cursorName = curs;
 
         // toggle grid lines
         if (autoToggleGridLines) {
-            gameUI.map.showgrid(curs.contentEquals(CURSOR_HARVEST) || ZeeManagerMiner.isCursorMining || curs.contentEquals(CURSOR_DIG));
+            gameUI.map.showgrid(curs.contentEquals(CURSOR_HARVEST) || ZeeManagerMiner.isCursorMining() || curs.contentEquals(CURSOR_DIG));
         }
 
         // inspect tooltips
