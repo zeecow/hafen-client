@@ -2667,7 +2667,7 @@ public class ZeeConfig {
             ZeeConfig.applyGobSettingsHighlight(ob, ZeeConfig.getHighlightGobColor(ob));
             if (ob.resName!=null && !ob.resName.isBlank() && !mapGobSession.containsKey(ob.resName))
                 mapGobSession.put(ob.resName,"");
-            if (ZeeManagerMiner.isCursorMining() && ZeeManagerMiner.isBoulder(ob))
+            if (ZeeConfig.autoChipMinedBoulder && ZeeManagerMiner.isCursorMining() && ZeeManagerMiner.isBoulder(ob))
                 ZeeManagerMiner.checkBoulderGobAdded(ob);
         }
     }
