@@ -212,7 +212,7 @@ public class ZeeManagerFarmer extends ZeeThread{
             if (farmerCbPile){
                 ZeeManagerItemClick.equipTwoSacks();
                 ZeeManagerStockpile.selAreaPile = true;
-                ZeeManagerStockpile.selAreaPileGobItem = getPileItemGob();
+                ZeeManagerStockpile.selAreaPileGobItem = getPileGroundItemGob();
                 ZeeThread t = ZeeManagerStockpile.areaPilerStart();
                 if (t!=null)
                     t.join();//wait pile thread finish
@@ -236,7 +236,7 @@ public class ZeeManagerFarmer extends ZeeThread{
         return highest.getValue();
     }
 
-    static Gob getPileItemGob() {
+    static Gob getPileGroundItemGob() {
         /*
             TODO: include vegetables beyond seeds
             seed-turnip,seed-carrot,seed-leek,seed-cucumber,
@@ -246,23 +246,23 @@ public class ZeeManagerFarmer extends ZeeThread{
         String pileItemName = "";
 
         if (lastItemSeedBasename.contains("seed-flax"))
-            pileItemName = "/flaxfibre";
+            pileItemName = "gfx/terobjs/items/flaxfibre";
         else if (lastItemSeedBasename.contains("seed-hemp"))
-            pileItemName = "/hempfibre";
+            pileItemName = "gfx/terobjs/items/hempfibre";
         else if (lastItemSeedBasename.contains("seed-poppy"))
-            pileItemName = "/flower-poppy";
+            pileItemName = "gfx/terobjs/items/flower-poppy";
         else if (lastItemSeedBasename.contains("seed-pipeweed"))
-            pileItemName = "/tobacco-fresh";
+            pileItemName = "gfx/terobjs/items/tobacco-fresh";
         else if (lastItemSeedBasename.contains("seed-barley")
                 || lastItemSeedBasename.contains("seed-wheat")
                 || lastItemSeedBasename.contains("seed-millet"))
-            pileItemName = "/straw";
+            pileItemName = "gfx/terobjs/items/straw";
         else if (lastItemSeedBasename.contains("seed-turnip"))
-            pileItemName = "/turnip";
+            pileItemName = "gfx/terobjs/items/turnip";
         else if (lastItemSeedBasename.contains("seed-carrot"))
-            pileItemName = "/carrot";
+            pileItemName = "gfx/terobjs/items/carrot";
         else if (lastItemSeedBasename.contains("seed-lettuce"))
-            pileItemName = "/lettucehead";//TODO check lettuce-head name
+            pileItemName = "gfx/terobjs/items/lettucehead";//TODO check lettuce-head name
 
 
         return ZeeConfig.getClosestGobByNameContains(pileItemName);
