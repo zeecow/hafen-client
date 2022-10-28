@@ -252,8 +252,8 @@ public class ZeeConfig {
             "limonite","hematite","magnetite","leadglance","peacockore","cuprite"
     ));
     public final static Set<String> mineablesOrePrecious = new HashSet<String>(Arrays.asList(
-            "galena","argentite","hornsilver",
-            "petzite","sylvanite","nagyagite"
+            "galena","argentite","hornsilver", // silver
+            "petzite","sylvanite","nagyagite" // gold
     ));
     public final static Set<String> mineablesCurios = new HashSet<String>(Arrays.asList(
             "catgold","petrifiedshell","strangecrystal","quarryquartz"
@@ -1979,6 +1979,7 @@ public class ZeeConfig {
         ZeeManagerItemClick.equipory = null;
         ZeeManagerStockpile.windowManager = null;
         ZeeManagerMiner.tunnelHelperWindow = null;
+        ZeeManagerMiner.tilesMonitorCleanup();
         ZeeHistWdg.listHistButtons.clear();
         ZeeQuickOptionsWindow.reset();
     }
@@ -3097,6 +3098,15 @@ public class ZeeConfig {
         for (String name : names) {
             if (name.contentEquals(tilename))
                 return true;
+        }
+        return false;
+    }
+
+    static boolean tileCoordsChangedBy(Coord c1, Coord c2, int minChange) {
+        if ( Math.abs(Math.max(c1.x,c2.x)-Math.min(c1.x,c2.x)) > minChange
+            || Math.abs(Math.max(c1.y,c2.y)-Math.min(c1.y,c2.y)) > minChange)
+        {
+            return true;
         }
         return false;
     }

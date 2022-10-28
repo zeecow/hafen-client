@@ -562,29 +562,79 @@ public class ZeeManagerMiner extends ZeeThread{
         chipBoulderNewThread(boulder);
     }
 
-    static ZeeWindow windowTiles;
+    static ZeeWindow tilemonWindow;
+    static boolean tilemonAutoRefresh = false;
+    static ZeeThread tilemonAutoThread;
+    static CheckBox tilemonAutoCheckbox;
+    static Coord tilemonCurPlayerTile, tilemonLastWindowRefreshPlayerTile, tilemonLastPreciousCoord;
     public static void tilesWindowCreate() {
-        if (windowTiles==null){
-            windowTiles = ZeeConfig.gameUI.add(new ZeeWindow(Coord.of(200,400),"Tiles"),300,300);
-            windowTiles.add(new Button(UI.scale(100),"refresh"){
+        if (tilemonWindow == null){
+            //window
+            tilemonWindow = ZeeConfig.gameUI.add(new ZeeWindow(Coord.of(200,400),"Tiles"){
+                public void wdgmsg(String msg, Object... args) {
+                    if (msg.contains("close")){
+                        tilesMonitorCleanup();
+                    }
+                    //super.wdgmsg(msg, args);
+                }
+            },300,300);
+            //button refresh
+            tilemonWindow.add(new Button(UI.scale(60),"refresh"){
                 public void wdgmsg(String msg, Object... args) {
                     if (msg.contentEquals("activate")){
                         tilesWindowRefresh();
                     }
-                    //super.wdgmsg(msg, args);
                 }
             });
-        }else{
-            windowTiles.show();
+            //checkbox auto refresh
+            tilemonAutoCheckbox = tilemonWindow.add(new CheckBox("auto"){
+                public void set(boolean val) {
+                    tilemonAutoRefresh = val;
+                    a = val;
+                    if (tilemonAutoRefresh) {
+                        println("new thread auto refresh");
+                        tilemonAutoThread = new ZeeThread() {
+                            public void run() {
+                                tilemonLastWindowRefreshPlayerTile = tilemonCurPlayerTile = ZeeConfig.getPlayerTile();
+                                while(tilemonAutoRefresh){
+                                    try {
+                                        sleep(5000);
+                                        tilemonCurPlayerTile = ZeeConfig.getPlayerTile();
+                                        //refresh tiles window if player coord changed by 88 tiles
+                                        if(ZeeConfig.tileCoordsChangedBy(tilemonLastWindowRefreshPlayerTile,tilemonCurPlayerTile,88) )
+                                        {
+                                            println("calling auto refresh last="+ tilemonLastWindowRefreshPlayerTile +"  cur="+tilemonCurPlayerTile);
+                                            tilesWindowRefresh();
+                                            tilemonLastWindowRefreshPlayerTile = tilemonCurPlayerTile;
+                                        }
+                                    } catch (InterruptedException e) {
+                                        //e.printStackTrace();
+                                        tilemonAutoRefresh = false;
+                                        if (tilemonAutoCheckbox !=null)
+                                            tilemonAutoCheckbox.set(false);
+                                    }
+                                }
+                            }
+                        };
+                        tilemonAutoThread.start();
+                    }
+                    else {
+                        tilemonAutoThread.interrupt();
+                    }
+                }
+            },63,6);
         }
-        tilesWindowRefresh();
+        else{
+            tilemonWindow.show();
+        }
+        tilesWindowRefresh();//on window create
     }
 
     private static void tilesWindowRefresh() {
         Glob g = ZeeConfig.gameUI.map.glob;
         Gob player = ZeeConfig.gameUI.map.player();
         if (player == null)
-            return;//TODO try counting tiles without player loaded?
+            return;
         Coord pltc = new Coord((int) player.getc().x / 11, (int) player.getc().y / 11);
         HashMap<String,Integer> mapTileresCount= new HashMap<>();
         for (int x = -44; x < 44; x++) {
@@ -606,7 +656,7 @@ public class ZeeManagerMiner extends ZeeThread{
             }
         }
         //remove old labels
-        for (Label l : windowTiles.children(Label.class)) {
+        for (Label l : tilemonWindow.children(Label.class)) {
             l.destroy();
         }
         //sorted list
@@ -615,17 +665,45 @@ public class ZeeManagerMiner extends ZeeThread{
         int y = 30;
         Label label;
         String basename;
+        List<String> silverList = List.of("galena","argentite","hornsilver");
         for (String tileName : tiles) {
             basename = tileName.replaceAll("gfx/tiles/rocks/","");
             label = new Label(basename+"   "+ mapTileresCount.get(tileName));
-            if (isStoneOre(basename))
+            // label ore
+            if (isStoneOre(basename)) {
                 label.setcolor(Color.yellow);
-            else if (isStoneOrePrecious(basename))
+                label.settext(label.texts+"  (ore)");
+            }
+            // label silver/gold
+            else if (isStoneOrePrecious(basename)) {
+                // label color
                 label.setcolor(Color.red);
-            windowTiles.add(label,0,y);
+                // label text
+                if (silverList.contains(label.texts))
+                    label.settext(label.texts+"  (silver)");
+                else
+                    label.settext(label.texts+"  (gold)");
+                //alert precious ore if player tiles changed by  x
+                ZeeConfig.msg("Precious ore detected!");
+            }
+            tilemonWindow.add(label,0,y);
             y += 17;
         }
-        windowTiles.pack();
+        tilemonWindow.pack();
+    }
+
+    static void tilesMonitorCleanup() {
+        println("tilemonCleanup");
+        tilemonAutoRefresh = false;
+        tilemonLastWindowRefreshPlayerTile = tilemonCurPlayerTile = tilemonLastPreciousCoord = null;
+        if (tilemonWindow!=null) {
+            tilemonWindow.destroy();
+            tilemonWindow = null;
+        }
+        if (tilemonAutoThread !=null)
+            tilemonAutoThread.interrupt();
+        if (tilemonAutoCheckbox !=null)
+            tilemonAutoCheckbox.set(false);
     }
 
     static boolean isStoneOre(String basename){
