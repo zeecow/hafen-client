@@ -599,6 +599,8 @@ public class ZeeManagerMiner extends ZeeThread{
                                 while(tilemonAutoRefresh){
                                     try {
                                         sleep(5000);
+                                        if (ZeeConfig.getPlayerGob() == null)// player not loaded
+                                            continue;
                                         tilemonCurPlayerTile = ZeeConfig.getPlayerTile();
                                         //refresh tiles window if player coord changed by 88 tiles
                                         if(ZeeConfig.tileCoordsChangedBy(tilemonLastWindowRefreshPlayerTile,tilemonCurPlayerTile,88) )
