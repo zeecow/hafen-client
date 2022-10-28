@@ -696,16 +696,18 @@ public class ZeeManagerMiner extends ZeeThread{
 
     static void tilesMonitorCleanup() {
         println("tilemonCleanup");
-        tilemonAutoRefresh = false;
-        tilemonLastWindowRefreshPlayerTile = tilemonCurPlayerTile = tilemonLastPreciousCoord = null;
-        if (tilemonWindow!=null) {
-            tilemonWindow.destroy();
-            tilemonWindow = null;
+        try {
+            tilemonAutoRefresh = false;
+            tilemonLastWindowRefreshPlayerTile = tilemonCurPlayerTile = tilemonLastPreciousCoord = null;
+            if (tilemonWindow != null) {
+                tilemonWindow.destroy();
+                tilemonWindow = null;
+            }
+            if (tilemonAutoThread != null)
+                tilemonAutoThread.interrupt();
+        }catch (Exception e){
+            e.printStackTrace();
         }
-        if (tilemonAutoThread !=null)
-            tilemonAutoThread.interrupt();
-        if (tilemonAutoCheckbox !=null)
-            tilemonAutoCheckbox.set(false);
     }
 
     static boolean isStoneOre(String basename){
