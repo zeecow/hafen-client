@@ -1,13 +1,15 @@
 package haven;
 
-import java.io.File;
-import java.util.Arrays;
-import java.util.List;
-
+import javax.sound.midi.MidiChannel;
 import javax.sound.midi.MidiSystem;
 import javax.sound.midi.Synthesizer;
-import javax.sound.midi.MidiChannel;
 import javax.sound.sampled.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.Arrays;
+import java.util.List;
 
 public class ZeeSynth extends Thread{
 
@@ -34,6 +36,35 @@ public class ZeeSynth extends Thread{
 
     public ZeeSynth(String filePath) {
         this.filePath = filePath;
+    }
+
+    public static int textToSpeakLinuxFestival(String text) {
+
+        String lettersNumsSpaceOnly = text.replaceAll("[^a-zA-Z0-9\\s]","");
+        ZeeConfig.println("text = "+lettersNumsSpaceOnly);
+
+        try {
+            String cmd = "echo "+lettersNumsSpaceOnly+" | festival --tts";
+            final Process p = Runtime.getRuntime().exec(new String[]{"bash", "-l", "-c", cmd});
+            new Thread(new Runnable() {
+                public void run() {
+                    BufferedReader input = new BufferedReader(new InputStreamReader(p.getInputStream()));
+                    String line = null;
+
+                    try {
+                        while ((line = input.readLine()) != null)
+                            System.out.println(line);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }).start();
+            return p.waitFor();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return 0;
     }
 
     private void player(){
