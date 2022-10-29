@@ -41,6 +41,7 @@ Client focusing on small helper tasks, many using mouse middle button, and other
  - ctrl+q pickup gob window
  - area piler: create piles around selected area (long-midclick item)
  - mining tile counter: long midclick mine ground or tiles to show window
+ - main inventory checkboxes for midclick transfer modes: asc, desc, one, ql
 
 
  - midclick ground 
@@ -90,7 +91,6 @@ Client focusing on small helper tasks, many using mouse middle button, and other
  - long midclick item
    - sort-transfer item descending(?)
    - show context menu for various items (details below)
-   - sort-transfer inverse
    - equip fishing hook/lure and recast
    - equip two sack items from belt
  - long midclick context menus for objects

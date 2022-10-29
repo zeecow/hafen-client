@@ -132,6 +132,8 @@ public class ZeeInvMainOptionsWdg extends Widget {
         wdg.settip("midclick transfer ascending order");
         wdg = rg.add("one", new Coord(wdg.c.x+wdg.sz.x+padx, wdg.c.y));
         wdg.settip("midclick transfer one");
+        wdg = rg.add("ql", new Coord(wdg.c.x+wdg.sz.x+padx, wdg.c.y));
+        wdg.settip("midclick transfer by quality");
         rg.check(ZeeConfig.windowShortMidclickTransferMode);//default des
         //window.resize(window.contentsz().addy(-2));
         pack();

@@ -77,17 +77,24 @@ public class ZeeManagerItemClick extends ZeeThread{
                 return;
             }
 
-            // if not hand item, do sort-transfer
+            // if not hand item, do items special transfers
             if( isTransferWindowOpened() && !isItemWindowName("Belt")){
+                // long click sort transfer asc
                 if(isLongClick())
-                    wItem.wdgmsg("transfer-sort", wItem.item, true); // sort transfer asc
-                //short click
-                else  if(ZeeConfig.windowShortMidclickTransferMode.contentEquals("one"))
-                    wItem.item.wdgmsg("transfer", Coord.z);// transfer single item
+                    wItem.wdgmsg("transfer-sort", wItem.item, true);
+                //short clicks...
+                // ...transfer same quality items
+                else if(ZeeConfig.windowShortMidclickTransferMode.contentEquals("ql"))
+                    wItem.item.wdgmsg("transfer-ql", wItem.item, false);
+                // ...transfer single item
+                else if(ZeeConfig.windowShortMidclickTransferMode.contentEquals("one"))
+                    wItem.item.wdgmsg("transfer", Coord.z);
+                // ...sort transfer asc
                 else if(ZeeConfig.windowShortMidclickTransferMode.contentEquals("asc"))
-                    wItem.wdgmsg("transfer-sort", wItem.item, true);// sort transfer asc
+                    wItem.wdgmsg("transfer-sort", wItem.item, true);
+                // ...sort transfer des
                 else
-                    wItem.wdgmsg("transfer-sort", wItem.item, false);// sort transfer des
+                    wItem.wdgmsg("transfer-sort", wItem.item, false);
                 return;
             }
             else if(isItemWindowName("Inventory") && isItemPlantable())

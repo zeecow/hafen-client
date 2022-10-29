@@ -162,8 +162,12 @@ public class Inventory extends Widget implements DTarget {
 	@Override
 	public void wdgmsg(Widget sender, String msg, Object... args) {
 		if(msg.equals("transfer-sort")){
-			process( getSame( (GItem)args[0], (Boolean)args[1]), "transfer");
-		} else {
+			process( getSame( (GItem)args[0], (Boolean)args[1], false), "transfer");
+		}
+		else if(msg.equals("transfer-ql")){
+			process( getSame( (GItem)args[0], (Boolean)args[1], true), "transfer");
+		}
+		else {
 			super.wdgmsg(sender, msg, args);
 		}
 	}
@@ -174,11 +178,12 @@ public class Inventory extends Widget implements DTarget {
 		}
 	}
 
-	private List<WItem> getSame(GItem item, Boolean ascending) {
+	private List<WItem> getSame(GItem item, boolean ascending, boolean sameQl) {
 		String name = item.res.get().name;
 		List<WItem> items = new ArrayList<>();
 		WItem w;
 		boolean isFish = ZeeConfig.isFish(name);
+		double ql = Inventory.getQuality(item);
 		for(Widget wdg = lchild; wdg != null; wdg = wdg.prev) {
 			if(wdg.visible && wdg instanceof WItem) {
 				w = (WItem) wdg;
@@ -188,7 +193,10 @@ public class Inventory extends Widget implements DTarget {
 					continue;
 				}
 				if(w.item.res.get().name.contentEquals(name)){
-					items.add(w);
+					if (!sameQl)
+						items.add(w);
+					else if (ql == Inventory.getQuality(w.item))
+						items.add(w);
 				}
 			}
 		}
