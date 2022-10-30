@@ -2139,7 +2139,7 @@ public class ZeeConfig {
             if (ZeeManagerCook.pepperRecipeOpen)
                 ZeeManagerCook.gobClicked(clickGob,lastMapViewClickGobName,clickb);
             if(clickb == 2) {
-                ZeeManagerGobClick.checkMidClick(pc, mc, clickGob, lastMapViewClickGobName);
+                ZeeManagerGobClick.startMidClick(pc, mc, clickGob, lastMapViewClickGobName);
             } else if (clickb==3 && gameUI.ui.modflags()==0){// no mod keys
                 //reset inspect tooltip
                 showInspectTooltip = false;
@@ -2156,7 +2156,7 @@ public class ZeeConfig {
                 if (isPlayerHoldingItem()) { //move while holding item
                     clickCoord(mc.floor(posres), 1, 0);
                 }else
-                    ZeeManagerGobClick.checkMidClick(pc,mc,null,"");
+                    ZeeManagerGobClick.startMidClick(pc,mc,null,"");
             }
         }
     }

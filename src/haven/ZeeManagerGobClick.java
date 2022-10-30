@@ -13,48 +13,43 @@ import static haven.OCache.posres;
 
 public class ZeeManagerGobClick extends ZeeThread{
 
-    public static final int OVERLAY_ID_AGGRO = 1341;
+    static final int OVERLAY_ID_AGGRO = 1341;
 
-    Coord coordPc;
-    Coord2d coordMc;
-    Gob gob;
-    String gobName;
-    boolean isGroundClick;
+    static Coord coordPc;
+    static Coord2d coordMc;
+    static Gob gob;
+    static String gobName;
+    static boolean isGroundClick;
 
-    public static float camAngleStart, camAngleEnd, camAngleDiff;
-    public static long clickStartMs, clickEndMs, clickDiffMs;
-    public static boolean barrelLabelOn = false;
-    public static boolean isRemovingAllTrees, isDestroyingAllTreelogs;
+    static float camAngleStart, camAngleEnd, camAngleDiff;
+    static long clickStartMs, clickEndMs, clickDiffMs;
+    static boolean barrelLabelOn = false;
+    static boolean isRemovingAllTrees, isDestroyingAllTreelogs;
     private static ArrayList<Gob> treesForRemoval, treelogsForDestruction;
     private static Gob currentRemovingTree, currentDestroyingTreelog;
 
-    public ZeeManagerGobClick(Coord pc, Coord2d mc, Gob gobClicked) {
+    public static void startMidClick(Coord pc, Coord2d mc, Gob gobClicked, String gName) {
+
+        clickDiffMs = clickEndMs - clickStartMs;
         coordPc = pc;
         coordMc = mc;
         gob = gobClicked;
         isGroundClick = (gob==null);
         gobName = isGroundClick ? "" : gob.getres().name;
-        ZeeConfig.getMainInventory();
-    }
-
-    public static void checkMidClick(Coord pc, Coord2d mc, Gob gob, String gobName) {
-
-        clickDiffMs = clickEndMs - clickStartMs;
 
         //println(clickDiffMs+"ms > "+gobName + (gob==null ? "" : " dist="+ZeeConfig.distanceToPlayer(gob)));
         //if (gob!=null) println(gobName + " poses = "+ZeeConfig.getGobPoses(gob));
 
+        // long mid-clicks
         if (isLongMidClick()) {
-            /*
-                long mid-clicks
-             */
-            new ZeeManagerGobClick(pc,mc,gob).start();
+            new ZeeThread(){
+                public void run() {
+                    runLongMidClick();
+                }
+            }.start();
         }
+        // short mid-clicks
         else {
-            /*
-                short mid-clicks
-             */
-
             // ground clicks
             if(gob==null) {
                 // place all pile items
@@ -159,143 +154,138 @@ public class ZeeManagerGobClick extends ZeeThread{
         ZeeManagerStockpile.lastPlob = null;
     }
 
-    public void run() {
+    static void runLongMidClick() {
         try {
-            if (isLongMidClick()){ //unnecessary check?
-                // clicked ground
-                if (isGroundClick){
-                    //dismount horse
-                    if (ZeeConfig.isPlayerMountingHorse()) {
-                        dismountHorse(coordMc);
-                    }
-                    //clicked water
-                    else if (isWaterTile(coordMc)) {
-                        if (ZeeManagerItemClick.isCoracleEquipped() && !ZeeConfig.isPlayerMountingHorse())
-                            dropEmbarkCoracle(coordMc);
-                        else
-                            inspectWaterAt(coordMc);
-                    }
-                    //disembark water vehicles
-                    else if (ZeeConfig.isPlayerOnCoracle()) {
-                        disembarkEquipCoracle(coordMc);
-                    }
-                    else if(ZeeConfig.isPlayerOnDugout()  || ZeeConfig.isPlayerOnRowboat()) {
-                        disembarkBoatAtShore(coordMc);
-                    }
-                    //disembark kicksled
-                    else if(ZeeConfig.isPlayerDrivingingKicksled()){
-                        disembarkVehicle(coordMc);
-                    }
-                    //unload wheelbarrow at tile
-                    else if (ZeeConfig.isPlayerCarryingWheelbarrow()) {
-                        ZeeManagerStockpile.unloadWheelbarrowStockpileAtGround(coordMc.floor(posres));
-                        if (ZeeConfig.autoToggleGridLines)
-                            ZeeConfig.gameUI.map.showgrid(true);
-                    }
-                    // clear snow area
-                    else if (ZeeConfig.getTileResName(coordMc).contains("tiles/snow")){
-                        //haven.MapView@11460448 ; click ; [(629, 490), (1014904, 1060429), 3, 1]
-                        ZeeConfig.clickCoord(coordMc.floor(posres),3,UI.MOD_SHIFT);
-                    }
-                    else{
-                        // mining tiles window
-                        String tileName = ZeeConfig.getTileResName(coordMc);
-                        if (tileName.contentEquals("gfx/tiles/mine") || tileName.contains("/rocks/")) {
-                            ZeeManagerMiner.tilesWindowCreate();
-                        }
+            // clicked ground
+            if (isGroundClick){
+                //dismount horse
+                if (ZeeConfig.isPlayerMountingHorse()) {
+                    dismountHorse(coordMc);
+                }
+                //clicked water
+                else if (isWaterTile(coordMc)) {
+                    if (ZeeManagerItemClick.isCoracleEquipped() && !ZeeConfig.isPlayerMountingHorse())
+                        dropEmbarkCoracle(coordMc);
+                    else
+                        inspectWaterAt(coordMc);
+                }
+                //disembark water vehicles
+                else if (ZeeConfig.isPlayerOnCoracle()) {
+                    disembarkEquipCoracle(coordMc);
+                }
+                else if(ZeeConfig.isPlayerOnDugout()  || ZeeConfig.isPlayerOnRowboat()) {
+                    disembarkBoatAtShore(coordMc);
+                }
+                //disembark kicksled
+                else if(ZeeConfig.isPlayerDrivingingKicksled()){
+                    disembarkVehicle(coordMc);
+                }
+                //unload wheelbarrow at tile
+                else if (ZeeConfig.isPlayerCarryingWheelbarrow()) {
+                    ZeeManagerStockpile.unloadWheelbarrowStockpileAtGround(coordMc.floor(posres));
+                    if (ZeeConfig.autoToggleGridLines)
+                        ZeeConfig.gameUI.map.showgrid(true);
+                }
+                // clear snow area
+                else if (ZeeConfig.getTileResName(coordMc).contains("tiles/snow")){
+                    //haven.MapView@11460448 ; click ; [(629, 490), (1014904, 1060429), 3, 1]
+                    ZeeConfig.clickCoord(coordMc.floor(posres),3,UI.MOD_SHIFT);
+                }
+                else{
+                    // mining tiles window
+                    String tileName = ZeeConfig.getTileResName(coordMc);
+                    if (tileName.contentEquals("gfx/tiles/mine") || tileName.contains("/rocks/")) {
+                        ZeeManagerMiner.tilesWindowCreate();
                     }
                 }
-                // schedule tree removal
-                else if (isRemovingAllTrees && isGobTree(gobName)) {
-                    scheduleRemoveTree(gob);
-                }
-                // schedule treelog destruction
-                else if (isDestroyingAllTreelogs && isGobTreeLog(gobName)) {
-                    scheduleDestroyTreelog(gob);
-                }
-                // show ZeeFlowerMenu
-                else if (!isGroundClick && !ZeeConfig.isPlayerHoldingItem() && showGobFlowerMenu()) {
+            }
+            // schedule tree removal
+            else if (isRemovingAllTrees && isGobTree(gobName)) {
+                scheduleRemoveTree(gob);
+            }
+            // schedule treelog destruction
+            else if (isDestroyingAllTreelogs && isGobTreeLog(gobName)) {
+                scheduleDestroyTreelog(gob);
+            }
+            // show ZeeFlowerMenu
+            else if (!isGroundClick && !ZeeConfig.isPlayerHoldingItem() && showGobFlowerMenu()) {
 
+            }
+            // activate cursor harvest
+            else if (isGobCrop(gobName)) {
+                if (!ZeeConfig.getCursorName().equals(ZeeConfig.CURSOR_HARVEST))
+                    gobClick(gob, 3, UI.MOD_SHIFT);
+            }
+            // stockpile + wheelbarrow
+            else if (isGobStockpile(gobName)) {
+                // driving wheelbarrow = start piles mover
+                if (ZeeConfig.isPlayerDrivingWheelbarrow()) {
+                    ZeeManagerStockpile.startPilesMover();
                 }
-                // activate cursor harvest
-                else if (isGobCrop(gobName)) {
-                    if (!ZeeConfig.getCursorName().equals(ZeeConfig.CURSOR_HARVEST))
-                        gobClick(gob, 3, UI.MOD_SHIFT);
+                // carrying wheelbarrow = use wb on pile
+                else if(ZeeConfig.isPlayerCarryingWheelbarrow()) {
+                    ZeeManagerStockpile.useWheelbarrowAtStockpile(gob);
+                    if (ZeeConfig.autoToggleGridLines)
+                        ZeeConfig.gameUI.map.showgrid(true);
                 }
-                // stockpile + wheelbarrow
-                else if (isGobStockpile(gobName)) {
-                    // driving wheelbarrow = start piles mover
-                    if (ZeeConfig.isPlayerDrivingWheelbarrow()) {
-                        ZeeManagerStockpile.startPilesMover();
-                    }
-                    // carrying wheelbarrow = use wb on pile
-                    else if(ZeeConfig.isPlayerCarryingWheelbarrow()) {
-                        ZeeManagerStockpile.useWheelbarrowAtStockpile(gob);
-                        if (ZeeConfig.autoToggleGridLines)
-                            ZeeConfig.gameUI.map.showgrid(true);
-                    }
-                    //pickup all pile items
-                    else {
-                        gobClick(gob,3, UI.MOD_SHIFT);
-                    }
-                }
-                // pickup all items: dframe
-                else if (gobName.endsWith("/dframe")) {
+                //pickup all pile items
+                else {
                     gobClick(gob,3, UI.MOD_SHIFT);
                 }
-                // remove tree stump
-                else if (isGobTreeStump(gobName)) {
-                    removeStumpMaybe(gob);
+            }
+            // pickup all items: dframe
+            else if (gobName.endsWith("/dframe")) {
+                gobClick(gob,3, UI.MOD_SHIFT);
+            }
+            // remove tree stump
+            else if (isGobTreeStump(gobName)) {
+                removeStumpMaybe(gob);
+            }
+            // item act barrel
+            else if (ZeeConfig.isPlayerHoldingItem() && gobName.endsWith("/barrel")) {
+                if (ZeeManagerFarmer.isBarrelEmpty(gob))
+                    itemActGob(gob,UI.MOD_SHIFT);//shift+rclick
+                else
+                    itemActGob(gob,3);//ctrl+shift+rclick
+            }
+            // player lifting wheelbarrow
+            else if (ZeeConfig.isPlayerCarryingWheelbarrow()) {
+                // mount horse and liftup wb
+                if (isGobHorse(gobName)) {
+                    mountHorseCarryingWheelbarrow(gob);
                 }
-                // item act barrel
-                else if (ZeeConfig.isPlayerHoldingItem() && gobName.endsWith("/barrel")) {
-                    if (ZeeManagerFarmer.isBarrelEmpty(gob))
-                        itemActGob(gob,UI.MOD_SHIFT);//shift+rclick
-                    else
-                        itemActGob(gob,3);//ctrl+shift+rclick
+                // unload wb at gob
+                else {
+                    unloadWheelbarrowAtGob(gob);
+                    if (ZeeConfig.autoToggleGridLines)
+                        ZeeConfig.gameUI.map.showgrid(true);
                 }
-                // player lifting wheelbarrow
-                else if (ZeeConfig.isPlayerCarryingWheelbarrow()) {
-                    // mount horse and liftup wb
-                    if (isGobHorse(gobName)) {
-                        mountHorseCarryingWheelbarrow(gob);
-                    }
-                    // unload wb at gob
-                    else {
-                        unloadWheelbarrowAtGob(gob);
-                        if (ZeeConfig.autoToggleGridLines)
-                            ZeeConfig.gameUI.map.showgrid(true);
-                    }
+            }
+            // player driving wheelbarrow
+            else if (!gobName.endsWith("/wheelbarrow") && ZeeConfig.isPlayerDrivingWheelbarrow()) {
+                // mount horse and liftup wb
+                if (isGobHorse(gobName))
+                    mountHorseDrivingWheelbarrow(gob);
+                // lift up wb and open gate
+                else if (isGobGate(gobName))
+                    openGateWheelbarrow(gob);
+                // lift up wb and store in cart
+                else if (gobName.endsWith("/cart")) {
+                    Gob wb = ZeeConfig.getClosestGobByNameContains("/wheelbarrow");
+                    liftGobAndClickTarget(wb,gob);
                 }
-                // player driving wheelbarrow
-                else if (!gobName.endsWith("/wheelbarrow") && ZeeConfig.isPlayerDrivingWheelbarrow()) {
-                    // mount horse and liftup wb
-                    if (isGobHorse(gobName))
-                        mountHorseDrivingWheelbarrow(gob);
-                    // lift up wb and open gate
-                    else if (isGobGate(gobName))
-                        openGateWheelbarrow(gob);
-                    // lift up wb and store in cart
-                    else if (gobName.endsWith("/cart")) {
-                        Gob wb = ZeeConfig.getClosestGobByNameContains("/wheelbarrow");
-                        liftGobAndClickTarget(wb,gob);
-                    }
-                }
-                // drive ship
-                else if(gobName.endsWith("/knarr") || gobName.endsWith("/snekkja")) {
-                    clickGobPetal(gob,"Man the helm");
-                }
-                // lift up gob
-                else if (isGobLiftable(gobName) || isGobBush(gobName)) {
-                    liftGob(gob);
-                }
-                // gob item piler
-                else if (ZeeManagerStockpile.isGobPileable(gob)){
-                    ZeeManagerStockpile.areaPilerWindow(gob);
-                }
-//                else if(gobName.endsWith("/seeds")){//TODO remove
-//                    ZeeManagerFarmer.testStoringBarrelQl(gob);
-//                }
+            }
+            // drive ship
+            else if(gobName.endsWith("/knarr") || gobName.endsWith("/snekkja")) {
+                clickGobPetal(gob,"Man the helm");
+            }
+            // lift up gob
+            else if (isGobLiftable(gobName) || isGobBush(gobName)) {
+                liftGob(gob);
+            }
+            // gob item piler
+            else if (ZeeManagerStockpile.isGobPileable(gob)){
+                ZeeManagerStockpile.areaPilerWindow(gob);
             }
         }
         catch (Exception e){
@@ -303,7 +293,7 @@ public class ZeeManagerGobClick extends ZeeThread{
         }
     }
 
-    void disembarkBoatAtShore(Coord2d mc){
+    static void disembarkBoatAtShore(Coord2d mc){
         try {
             ZeeConfig.addPlayerText("boatin");
             //move to shore
@@ -321,7 +311,7 @@ public class ZeeManagerGobClick extends ZeeThread{
         ZeeConfig.removePlayerText();
     }
 
-    void disembarkEquipCoracle(Coord2d coordMc){
+    static void disembarkEquipCoracle(Coord2d coordMc){
         try {
             ZeeConfig.addPlayerText("coracling");
             //move to shore
@@ -350,7 +340,7 @@ public class ZeeManagerGobClick extends ZeeThread{
         ZeeConfig.removePlayerText();
     }
 
-    void dropEmbarkCoracle(Coord2d waterMc) {
+    static void dropEmbarkCoracle(Coord2d waterMc) {
         try {
             ZeeConfig.addPlayerText("coracling");
 
@@ -432,7 +422,7 @@ public class ZeeManagerGobClick extends ZeeThread{
         ZeeConfig.removePlayerText();
     }
 
-    private void inspectWaterAt(Coord2d coordMc) {
+    private static void inspectWaterAt(Coord2d coordMc) {
 
         // require wooden cup
         Inventory inv = ZeeConfig.getMainInventory();
@@ -638,7 +628,7 @@ public class ZeeManagerGobClick extends ZeeThread{
         return isGobInListEndsWith(gobName,list);
     }
 
-    private void scheduleDestroyTreelog(Gob treelog) {
+    private static void scheduleDestroyTreelog(Gob treelog) {
         if (treelogsForDestruction==null) {
             treelogsForDestruction = new ArrayList<Gob>();
         }
@@ -665,7 +655,7 @@ public class ZeeManagerGobClick extends ZeeThread{
     }
 
 
-    private void scheduleRemoveTree(Gob tree) {
+    private static void scheduleRemoveTree(Gob tree) {
         if (treesForRemoval==null) {
             treesForRemoval = new ArrayList<Gob>();
         }
@@ -955,7 +945,7 @@ public class ZeeManagerGobClick extends ZeeThread{
         return ZeeConfig.getClosestGob(list);
     }
 
-    private boolean showGobFlowerMenu(){
+    private static boolean showGobFlowerMenu(){
 
         boolean showMenu = true;
         ZeeFlowerMenu menu = null;
@@ -1057,7 +1047,7 @@ public class ZeeManagerGobClick extends ZeeThread{
         return false;
     }
 
-    private boolean isDestroyTreelog() {
+    private static boolean isDestroyTreelog() {
         if(isGobTreeLog(gobName) && ZeeManagerItemClick.isItemInHandSlot("bonesaw"))
             return true;
         return false;
@@ -1741,7 +1731,7 @@ public class ZeeManagerGobClick extends ZeeThread{
         return ret;
     }
 
-    private boolean isGobButchable(String gobName){
+    private static boolean isGobButchable(String gobName){
         return isGobInListEndsWith(
             gobName,
             "/stallion,/mare,/foal,/hog,/sow,/piglet,"
