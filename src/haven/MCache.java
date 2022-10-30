@@ -45,13 +45,13 @@ public class MCache implements MapSource {
     public static final Coord cutn = cmaps.div(cutsz);
 	public static final Coord sgridsz = new Coord(100, 100);
     private final Object setmon = new Object();
-    private Resource.Spec[] nsets = new Resource.Spec[0];
+    private Resource.Spec[] nsets = new Resource.Spec[16];
     @SuppressWarnings("unchecked")
-    private Reference<Resource>[] sets = new Reference[0];
+    private Reference<Resource>[] sets = new Reference[16];
     @SuppressWarnings("unchecked")
-    private Reference<Tileset>[] csets = new Reference[0];
+    private Reference<Tileset>[] csets = new Reference[16];
     @SuppressWarnings("unchecked")
-    private Reference<Tiler>[] tiles = new Reference[0];
+    private Reference<Tiler>[] tiles = new Reference[16];
     private final Waitable.Queue gridwait = new Waitable.Queue();
     Map<Coord, Request> req = new HashMap<Coord, Request>();
     Map<Coord, Grid> grids = new HashMap<Coord, Grid>();
