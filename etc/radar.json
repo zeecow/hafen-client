@@ -18,6 +18,7 @@
 
   {"match": "gfx/terobjs/pow[hearth]", "icon": "radar/hearthfire", "visible": true},
   {"match": "gfx/terobjs/items/gems/gemstone", "icon": "radar/gem", "visible": true},
+  {"match": "gfx/terobjs/map/cavepuddle", "icon": "gfx/invobjs/clay-cave", "visible": true},
   {"match": "gfx/terobjs/vehicle/wheelbarrow", "icon": "radar/wheelbarrow", "visible": true},
   {"match": "gfx/terobjs/vehicle/rowboat", "icon": "radar/rowboat", "visible": true},
   {"match": "gfx/terobjs/vehicle/snekkja", "icon": "radar/snekkja", "visible": true},
