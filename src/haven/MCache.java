@@ -40,8 +40,8 @@ public class MCache implements MapSource {
     public static final Coord cutsz = Coord.of(25, 25);
     public static final Coord cutn = cmaps.div(cutsz);
     public static final Coord sgridsz = new Coord(100, 100);
-    public final Resource.Spec[] nsets = new Resource.Spec[256];
     private final Object setmon = new Object();
+    public Resource.Spec[] nsets = new Resource.Spec[16];
     @SuppressWarnings("unchecked")
     private Reference<Resource>[] sets = new Reference[16];
     @SuppressWarnings("unchecked")

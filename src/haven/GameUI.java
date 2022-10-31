@@ -861,12 +861,6 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Message
 	studywnd.toggle();
     }
 
-    public void takeScreenshot() {
-	if(Config.screenurl != null) {
-	    Screenshooter.take(this, Config.screenurl);
-	}
-    }
-
     public void addcmeter(Widget meter) {
 	ulpanel.add(meter);
 	cmeters.add(meter);
@@ -1797,7 +1791,7 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Message
     }
     
     public void msg(String msg, Color color, boolean sfx) {
-	msg(msg, color, sfx ? msgsfx : null);
+	msg(msg, color, sfx ? RootWidget.msgsfx : null);
     }
     
     public void msg(String msg, Color color, Resource sfx) {
