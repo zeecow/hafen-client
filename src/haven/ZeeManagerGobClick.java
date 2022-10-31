@@ -192,10 +192,11 @@ public class ZeeManagerGobClick extends ZeeThread{
                     ZeeConfig.clickCoord(coordMc.floor(posres),3,UI.MOD_SHIFT);
                 }
                 else{
-                    // mining tiles window
+                    // start tiles monitor
                     String tileName = ZeeConfig.getTileResName(coordMc);
-                    if (tileName.contentEquals("gfx/tiles/mine") || tileName.contains("/rocks/")) {
-                        ZeeManagerMiner.tilesWindowCreate();
+                    if ( (tileName.contentEquals("gfx/tiles/mine") && !ZeeConfig.isPlayerInCellar())
+                         || tileName.contains("/rocks/") ) {
+                        ZeeManagerMiner.tileMonitorWindow();
                     }
                 }
             }

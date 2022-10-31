@@ -3110,4 +3110,11 @@ public class ZeeConfig {
         }
         return false;
     }
+
+    public static boolean isPlayerInCellar() {
+        List<Gob> cellarStairs = findGobsByNameEndsWith("arch/cellarstairs");
+        if (cellarStairs==null || cellarStairs.isEmpty())
+            return false;
+        return true;
+    }
 }

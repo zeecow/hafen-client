@@ -1,8 +1,8 @@
 package haven;
 
 import java.awt.*;
-import java.util.*;
 import java.util.List;
+import java.util.*;
 
 public class ZeeManagerMiner extends ZeeThread{
 
@@ -566,8 +566,10 @@ public class ZeeManagerMiner extends ZeeThread{
     static boolean tilemonAutoRefresh = false;
     static ZeeThread tilemonAutoThread;
     static CheckBox tilemonAutoCheckbox;
+    static Label tilemonLabelFindTile;
     static Coord tilemonCurPlayerTile, tilemonLastWindowRefreshPlayerTile, tilemonLastPreciousCoord;
-    public static void tilesWindowCreate() {
+    static String[] tilemonSearchNames = new String[]{};
+    public static void tileMonitorWindow() {
         if (tilemonWindow == null){
             //window
             tilemonWindow = ZeeConfig.gameUI.add(new ZeeWindow(Coord.of(200,400),"Tiles"){
@@ -625,6 +627,22 @@ public class ZeeManagerMiner extends ZeeThread{
                     }
                 }
             },63,6);
+            //wishlist search box
+            tilemonLabelFindTile = tilemonWindow.add(new Label("Find"),0,33);
+            TextEntry te = tilemonWindow.add(new TextEntry(UI.scale(80),""){
+                public void changed(ReadLine buf) {
+                    if(!buf.line().isEmpty()) {
+                        String names = buf.line();
+                        if (names.isBlank()) {
+                            tilemonSearchNames = new String[]{};
+                        }else {
+                            tilemonSearchNames = names.split(",");
+                        }
+                    }
+                    super.changed(buf);
+                }
+            },tilemonLabelFindTile.c.x+tilemonLabelFindTile.sz.x+5,30);
+            te.settip("tile name(s), comma separated");
         }
         else{
             tilemonWindow.show();
@@ -659,20 +677,27 @@ public class ZeeManagerMiner extends ZeeThread{
         }
         //remove old labels
         for (Label l : tilemonWindow.children(Label.class)) {
-            l.destroy();
+            if (!l.equals(tilemonLabelFindTile))
+                l.destroy();
         }
         //sorted list
         SortedSet<String> tiles = new TreeSet<String>(mapTileresCount.keySet());
         //create new labels
-        int y = 30;
+        int y = 50;
         Label label;
         String basename;
         List<String> silverList = List.of("galena","argentite","hornsilver");
         for (String tileName : tiles) {
             basename = tileName.replaceAll("gfx/tiles/rocks/","");
             label = new Label(basename+"   "+ mapTileresCount.get(tileName));
+            // find list
+            if (tilemonSearchNames.length>0 && List.of(tilemonSearchNames).contains(basename)){
+                label.setcolor(Color.green);
+                label.settext(label.texts+"  (found)");
+                ZeeConfig.msg("Found "+basename);
+            }
             // label ore
-            if (isStoneOre(basename)) {
+            else if (isStoneOre(basename)) {
                 label.setcolor(Color.yellow);
                 label.settext(label.texts+"  (ore)");
             }
