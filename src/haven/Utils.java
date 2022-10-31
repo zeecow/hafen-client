@@ -267,6 +267,7 @@ public class Utils {
 	}
     }
 
+    public static final Config.Variable<String> prefspec = Config.Variable.prop("haven.prefspec", "hafen");
     public static Preferences prefs() {
 	if(prefs == null) {
 	    synchronized(Utils.class) {
@@ -276,8 +277,8 @@ public class Utils {
 			prefs = new MapPrefs("haven", sysprefs);
 		    } else {
 			Preferences node = Preferences.userNodeForPackage(Utils.class);
-			if(Config.prefspec != null)
-			    node = node.node(Config.prefspec);
+			if(prefspec.get() != null)
+			    node = node.node(prefspec.get());
 			prefs = node;
 		    }
 		}
@@ -898,6 +899,13 @@ public class Utils {
 	public T run() throws IOException;
     }
 
+    /* XXX: Sometimes, the client is getting strange and weird OS
+     * errors on Windows. For example, file sharing violations are
+     * sometimes returned even though Java always opens
+     * RandomAccessFiles in non-exclusive mode, and other times,
+     * permission is spuriously denied. I've had zero luck in trying
+     * to find a root cause for these errors, so just assume the error
+     * is transient and retry. :P */
     public static <T> T ioretry(IOFunction<? extends T> task) throws IOException {
 	double[] retimes = {0.01, 0.1, 0.5, 1.0, 5.0};
 	Throwable last = null;
@@ -2024,6 +2032,14 @@ public class Utils {
 	else if(ah > bh)
 	    return(1);
 	return(0);
+    }
+
+    public static final Object formatter(String fmt, Object... args) {
+	return(new Object() {
+		public String toString() {
+		    return(String.format(fmt, args));
+		}
+	    });
     }
 
     public static final Comparator<Object> idcmp = new Comparator<Object>() {

@@ -24,31 +24,31 @@
  *  Boston, MA 02111-1307 USA
  */
 
-package haven;
+package haven.render.sl;
 
-import haven.render.*;
+public class UVec4Cons extends Expression {
+    public static final UVec4Cons z = new UVec4Cons(IntLiteral.z, IntLiteral.z, IntLiteral.z, IntLiteral.z);
+    public static final UVec4Cons u = new UVec4Cons(IntLiteral.u, IntLiteral.u, IntLiteral.u, IntLiteral.u);
+    public final Expression[] els;
 
-public class LocationCam extends Camera {
-    private final static Matrix4f base = makerot(new Matrix4f(), new Coord3f(0.0f, 0.0f, 1.0f), (float)(Math.PI / 2))
-	.mul1(makerot(new Matrix4f(), new Coord3f(0.0f, 1.0f, 0.0f), (float)(Math.PI / 2)));
-    public final Location.Chain loc;
-    private Matrix4f ll;
-    
-    /* Oh, Java. <3 */
-    private LocationCam(Location.Chain loc, Matrix4f lm) {
-	super(base.mul(rxinvert(lm)));
-	this.ll = lm;
-	this.loc = loc;
+    public UVec4Cons(Expression... els) {
+	if((els.length < 1) || (els.length > 4))
+	    throw(new RuntimeException("Invalid number of arguments for uvec4: " + els.length));
+	this.els = els;
     }
 
-    public LocationCam(Location.Chain loc) {
-	this(loc, loc.fin(Matrix4f.id));
+    public void walk(Walker w) {
+	for(Expression el : els)
+	    w.el(el);
     }
-    
-    public Matrix4f fin(Matrix4f p) {
-	Matrix4f lm = loc.fin(Matrix4f.id);
-	if(lm != ll)
-	    update(base.mul(rxinvert(ll = lm)));
-	return(super.fin(p));
+
+    public void output(Output out) {
+	out.write("uvec4(");
+	els[0].output(out);
+	for(int i = 1; i < els.length; i++) {
+	    out.write(", ");
+	    els[i].output(out);
+	}
+	out.write(")");
     }
 }

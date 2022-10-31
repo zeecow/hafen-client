@@ -559,6 +559,9 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Sk
 	}
     }
 
+    protected void obstate(Pipe buf) {
+    }
+
     private class GobState implements Pipe.Op {
 	final Pipe.Op mods;
 
@@ -580,6 +583,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Sk
 	    if(!virtual)
 		buf.prep(new GobClick(Gob.this));
 	    buf.prep(new TickList.Monitor(Gob.this));
+	    obstate(buf);
 	    if(mods != null)
 		buf.prep(mods);
 	}
@@ -700,6 +704,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Sk
     }
     
     private static final ClassResolver<Gob> ctxr = new ClassResolver<Gob>()
+	.add(Gob.class, g -> g)
 	.add(Glob.class, g -> g.glob)
 	.add(GameUI.class, g -> (g.glob.sess.ui != null) ? g.glob.sess.ui.gui : null)
 	.add(MapWnd2.class, g -> (g.glob.sess.ui != null && g.glob.sess.ui.gui != null) ? g.glob.sess.ui.gui.mapfile : null)
@@ -715,6 +720,13 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Sk
 	if(m == null)
 	    return(0);
 	return(m.getv());
+    }
+
+    public Collection<Location.Chain> getloc() {
+	Collection<Location.Chain> ret = new ArrayList<>(slots.size());
+	for(RenderTree.Slot slot : slots)
+	    ret.add(slot.state().get(Homo3D.loc));
+	return(ret);
     }
 
     public class Placed implements RenderTree.Node, TickList.Ticking, TickList.TickNode {

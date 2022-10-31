@@ -74,8 +74,11 @@ public class HSlider extends Widget {
 		a = 0;
 	    if(a > 1)
 		a = 1;
-	    val = (int)Math.round(a * (max - min)) + min;
-	    changed();
+	    int nval = (int)Math.round(a * (max - min)) + min;
+	    if(val != nval) {
+		val = nval;
+		changed();
+	    }
 	}
     }
     
@@ -86,11 +89,13 @@ public class HSlider extends Widget {
 	    return(false);
 	drag.remove();
 	drag = null;
+	fchanged();
 	released();
 	return(true);
     }
 
     public void changed() {}
+    public void fchanged() {}
     
     public void released() {}
     
