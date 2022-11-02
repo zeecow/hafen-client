@@ -192,7 +192,7 @@ public class ZeeConfig {
     public static boolean dropMinedStones = Utils.getprefb("dropMinedStones", true);
     public static boolean dropSeeds = false;
     public static boolean dropSoil = false;
-    public static boolean dropBoards = false;
+    public static boolean destroyingTreelogs = false;
     public static boolean equiporyCompact = Utils.getprefb("equiporyCompact", false);
     public static boolean farmerMode = false;
     public static boolean freeGobPlacement = Utils.getprefb("freeGobPlacement", true);

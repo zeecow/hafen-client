@@ -881,7 +881,7 @@ public class ZeeManagerGobClick extends ZeeThread{
                 isDestroyingAllTreelogs = true;
                 logs = 999;
             }
-            ZeeConfig.dropBoards = true;
+            ZeeConfig.destroyingTreelogs = true;
             ZeeConfig.lastMapViewClickButton = 2;//prepare for cancel click
             while ( logs > 0  &&  !ZeeConfig.isTaskCanceledByGroundClick() ) {
                 ZeeConfig.addPlayerText("treelogs "+logs);
@@ -926,7 +926,7 @@ public class ZeeManagerGobClick extends ZeeThread{
             e.printStackTrace();
         }
         isDestroyingAllTreelogs = false;
-        ZeeConfig.dropBoards = false;
+        ZeeConfig.destroyingTreelogs = false;
         currentDestroyingTreelog = null;
         if (treelogsForDestruction!=null)
             treelogsForDestruction.clear();

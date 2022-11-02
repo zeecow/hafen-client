@@ -165,24 +165,23 @@ public class GItem extends AWidget implements ItemInfo.SpriteOwner, GSprite.Owne
 	private void onSpriteCreated() {
 
 		String basename = this.resource().basename();
-		Resource curs = ui.root.getcurs(Coord.z);
 		ZeeConfig.lastInvItemBaseName = basename;
 		ZeeConfig.lastInvItemMs = ZeeThread.now();
 
-		if (curs != null && curs.name.equals(ZeeConfig.CURSOR_MINE)) {
-			//drop mined item
+		//drop mined items
+		if (ZeeConfig.getCursorName().equals(ZeeConfig.CURSOR_MINE)) {
 			ZeeManagerMiner.lastDropItemMs = System.currentTimeMillis();
 			if (ZeeConfig.dropMinedStones && ZeeManagerMiner.isStoneNotOre(basename) ||
-					ZeeConfig.dropMinedOre && ZeeManagerMiner.isStoneOre(basename) ||
-					ZeeConfig.dropMinedOrePrecious && ZeeManagerMiner.isStoneOrePrecious(basename) ||
-					ZeeConfig.dropMinedCurios && ZeeConfig.mineablesCurios.contains(basename) )
+				ZeeConfig.dropMinedOre && ZeeManagerMiner.isStoneOre(basename) ||
+				ZeeConfig.dropMinedOrePrecious && ZeeManagerMiner.isStoneOrePrecious(basename) ||
+				ZeeConfig.dropMinedCurios && ZeeConfig.mineablesCurios.contains(basename) )
 			{
 				this.wdgmsg("drop", Coord.z);
 			}
 		}
 		else if( ZeeConfig.farmerMode ) {
+			//drop non-seed crops
 			if(ZeeManagerFarmer.busy) {
-				//drop non-seed crops
 				if (!basename.startsWith("seed-") && ZeeConfig.isItemCrop(basename)) {
 					this.wdgmsg("drop", Coord.z);
 				}
@@ -201,20 +200,25 @@ public class GItem extends AWidget implements ItemInfo.SpriteOwner, GSprite.Owne
 				}
 			}
 		}
-		else if (ZeeConfig.dropBoards && basename.startsWith("board-")){
+		// drop boards if destroying logs
+		else if (ZeeConfig.destroyingTreelogs && basename.startsWith("board-")){
 			this.wdgmsg("drop", Coord.z);
 		}
+		//drop seeds
 		else if( ZeeConfig.dropSeeds && basename.startsWith("seed-") && this.parent instanceof Inventory){
-			//drop seeds
 			Inventory inv = (Inventory) this.parent;
 			if(inv.getNumberOfFreeSlots() < 3){
 				inv.dropItemsByName(basename);
 			}
 		}
+		//drop soil
 		else if( ZeeConfig.dropSoil && basename.startsWith("soil") && this.parent instanceof Inventory) {
-			//drop soil
 			Inventory inv = (Inventory) this.parent;
 			inv.dropItemsByName(basename);
+		}
+		// drop everglowing ember if piling coal
+		else if (ZeeConfig.pilerMode && ZeeManagerStockpile.lastPetalName.contentEquals("Collect coal") && basename.contentEquals("everglowingember")){
+			this.wdgmsg("drop", Coord.z);
 		}
 	}
 

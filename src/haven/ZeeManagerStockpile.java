@@ -148,13 +148,14 @@ public class ZeeManagerStockpile extends ZeeThread{
             timeout = 1500;
         }
 
-
         while(busy) {
 
             // wait reaching source
-            waitPlayerDistToGob(gobSource,15);
+            println("wait reach source");
+            waitPlayerIdleVelocityMs(1000);
 
             // wait inv full
+            println("wait inv full");
             waitInvFullOrHoldingItem(mainInv, timeout);
 
             // if not holding item
@@ -415,8 +416,10 @@ public class ZeeManagerStockpile extends ZeeThread{
         if (ZeeConfig.pilerMode)
             ZeeInvMainOptionsWdg.cbPiler.set(false);
         ZeeConfig.removePlayerText();
-        ZeeConfig.removeGobText(gobPile);
-        ZeeConfig.removeGobText(gobSource);
+        if (gobPile!=null)
+            ZeeConfig.removeGobText(gobPile);
+        if (gobSource!=null)
+            ZeeConfig.removeGobText(gobSource);
         gobPile = gobSource = null;
         windowManager.hide();
     }
