@@ -41,16 +41,6 @@ import java.util.function.Supplier;
 
 import static haven.MCache.tilesz;
 import static haven.OCache.posres;
-import java.awt.Color;
-import java.awt.event.KeyEvent;
-import java.util.*;
-import java.util.function.*;
-import java.lang.ref.*;
-import java.lang.reflect.*;
-import haven.render.*;
-import haven.MCache.OverlayInfo;
-import haven.render.sl.Uniform;
-import haven.render.sl.Type;
 
 public class MapView extends PView implements DTarget, Console.Directory {
     public static boolean clickdb = false;
