@@ -41,6 +41,16 @@ import java.util.function.Supplier;
 
 import static haven.MCache.tilesz;
 import static haven.OCache.posres;
+import java.awt.Color;
+import java.awt.event.KeyEvent;
+import java.util.*;
+import java.util.function.*;
+import java.lang.ref.*;
+import java.lang.reflect.*;
+import haven.render.*;
+import haven.MCache.OverlayInfo;
+import haven.render.sl.Uniform;
+import haven.render.sl.Type;
 
 public class MapView extends PView implements DTarget, Console.Directory {
     public static boolean clickdb = false;
@@ -61,7 +71,7 @@ public class MapView extends PView implements DTarget, Console.Directory {
     private static final Map<String, Class<? extends Camera>> camtypes = new HashMap<String, Class<? extends Camera>>();
 	String ttip = null;
 	long ttipGobId = -1;
-    
+
     public interface Delayed {
 	public void run(GOut g);
     }
@@ -1789,7 +1799,7 @@ public class MapView extends PView implements DTarget, Console.Directory {
 
 	public void adjust(Plob plob, Coord pc, Coord2d mc, int modflags) {
 	    Coord2d nc;
-	    if((modflags & 2) == 0  &&  !ZeeConfig.freeGobPlacement)
+	    if((modflags & UI.MOD_SHIFT) == 0 && !ZeeConfig.freeGobPlacement)
 		nc = mc.floor(tilesz).mul(tilesz).add(tilesz.div(2));
 	    else if(gran != null)
 		nc = mc.add(gran.div(2)).floor(gran).mul(gran);
@@ -1803,11 +1813,11 @@ public class MapView extends PView implements DTarget, Console.Directory {
 	}
 
 	public boolean rotate(Plob plob, int amount, int modflags) {
-	    if((modflags & 1) == 0 && !ZeeConfig.freeGobPlacement)
+	    if((modflags & (UI.MOD_CTRL | UI.MOD_SHIFT)) == 0  &&  !ZeeConfig.freeGobPlacement)
 		return(false);
 	    freerot = true;
 	    double na;
-	    if((modflags & 2) == 0)
+	    if((modflags & UI.MOD_SHIFT) == 0)
 		na = (Math.PI / 4) * Math.round((plob.a + (amount * Math.PI / 4)) / (Math.PI / 4));
 	    else
 		na = plob.a + amount * Math.PI / plobagran;
