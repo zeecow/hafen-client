@@ -9,13 +9,22 @@ import java.util.HashMap;
 import java.util.Objects;
 
 public class ZeeGobText extends Sprite implements RenderTree.Node, PView.Render2D {
-    private static final Text.Foundry font = new Text.Foundry(Text.mono.deriveFont(Font.BOLD, UI.scale(10))).aa(true);
+    private Text.Foundry font;
     private static final HashMap<CachedTexKey, CachedTexVal> texts = new HashMap<>();
 
     private static class CachedTexKey {
-        Color col;
+
+        Color col, colBorder;
         String text;
+
         CachedTexKey(String text, Color col) {
+            this.colBorder = null;
+            this.col = col;
+            this.text = text;
+        }
+
+        CachedTexKey(String text, Color col, Color colBorder) {
+            this.colBorder = colBorder;
             this.col = col;
             this.text = text;
         }
@@ -27,11 +36,18 @@ public class ZeeGobText extends Sprite implements RenderTree.Node, PView.Render2
             if(o == null || getClass() != o.getClass())
                 return false;
             CachedTexKey that = (CachedTexKey) o;
-            return Objects.equals(col, that.col) && Objects.equals(text, that.text);
+            boolean sameBorder = false;
+            if (colBorder==null && that.colBorder==null)
+                sameBorder = true;
+            else if(colBorder!=null && Objects.equals(colBorder,that.colBorder))
+                sameBorder = true;
+            return sameBorder && Objects.equals(col, that.col) && Objects.equals(text, that.text);
         }
 
         @Override
         public int hashCode() {
+            if (colBorder!=null)
+                return Objects.hash(colBorder, col, text);
             return Objects.hash(col, text);
         }
     }
@@ -47,20 +63,46 @@ public class ZeeGobText extends Sprite implements RenderTree.Node, PView.Render2
     public final String text;
     private Tex tex;
     private int zOfs;
-    private Color col;
+    private Color col, colBorder;
 
-    public ZeeGobText(Gob g, String text, Color col, int zOfs) {
+    public ZeeGobText(Gob g, String text, Color colText, Color colBorder, int zOfs, int styleBoldPlainItalic, int size, boolean antialias) {
         super(null, null);
+        this.font = new Text.Foundry(Text.serif.deriveFont(styleBoldPlainItalic, UI.scale(size))).aa(antialias);
         this.text = text;
-        this.tex = font.renderstroked(text, col, Color.BLACK).tex();
+        if (colBorder==null)
+            this.tex = font.render(text, colText).tex();
+        else
+            this.tex = font.renderstroked(text, colText, colBorder).tex();
         this.zOfs = zOfs;
-        this.col = col;
-        CachedTexVal ctv = texts.get(new CachedTexKey(text, col));
+        this.col = colText;
+        CachedTexKey key;
+        if(colBorder==null)
+            key = new CachedTexKey(text, colText);
+        else
+            key = new CachedTexKey(text, colText, colBorder);
+        CachedTexVal ctv = texts.get(key);
         if(ctv != null) {
             ctv.cnt++;
             this.tex = ctv.tex;
         } else {
-            texts.put(new CachedTexKey(text, col), new CachedTexVal(this.tex));
+            texts.put(key, new CachedTexVal(this.tex));
+        }
+    }
+
+    public ZeeGobText(Gob g, String text, Color col, int zOfs, int styleBoldPlainItalic, int size, boolean antialias) {
+        super(null, null);
+        this.text = text;
+        this.font = new Text.Foundry(Text.serif.deriveFont(styleBoldPlainItalic, UI.scale(size))).aa(antialias);
+        this.tex = font.renderstroked(text, col, Color.BLACK).tex();
+        this.zOfs = zOfs;
+        this.col = col;
+        CachedTexKey key = new CachedTexKey(text, col);
+        CachedTexVal ctv = texts.get(key);
+        if(ctv != null) {
+            ctv.cnt++;
+            this.tex = ctv.tex;
+        } else {
+            texts.put(key, new CachedTexVal(this.tex));
         }
     }
 

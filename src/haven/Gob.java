@@ -26,9 +26,10 @@
 
 package haven;
 
-import java.util.*;
-import java.util.function.*;
 import haven.render.*;
+
+import java.util.*;
+import java.util.function.Consumer;
 
 public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Skeleton.HasPose {
     public Coord2d rc;
@@ -45,6 +46,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Sk
     private final Collection<SetupMod> setupmods = new ArrayList<>();
     private final LinkedList<Runnable> deferred = new LinkedList<>();
     private Loader.Future<?> deferral = null;
+	public int totalDmgHp = 0;
 
     public static class Overlay implements RenderTree.Node {
 	public final int id;

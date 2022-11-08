@@ -2367,10 +2367,18 @@ public class ZeeConfig {
     }
 
     public static int addGobText(Gob gob, String text, int r, int g, int b, int a, int height) {
+        return addGobText( gob,
+                new ZeeGobText(gob, text, new Color(r, g, b, a), height, Font.BOLD,10,true)
+        );
+    }
+
+    public static int addGobText(Gob gob, ZeeGobText zeeGobText) {
+        if (gob==null || zeeGobText==null)
+            return -1;
         Gob.Overlay gt = null;
         try {
             removeGobText(gob);//cleanup previous text
-            gt = new Gob.Overlay(gob, new ZeeGobText(gob, text, new Color(r, g, b, a), height));
+            gt = new Gob.Overlay(gob, zeeGobText);
             Gob.Overlay finalGt = gt;
             gameUI.ui.sess.glob.loader.defer(() -> {
                 synchronized (gob) {
@@ -2389,14 +2397,18 @@ public class ZeeConfig {
     public static void removeGobText(Gob gob) {
         if(gob==null)
             return;
-        gameUI.ui.sess.glob.loader.defer(() -> {synchronized(gob) {
-            Integer id = mapGobTextId.get(gob);
-            if (id==null)
-                return;
-            Gob.Overlay ol = gob.findol(id);
-            if(ol!=null)
-                gob.findol(id).remove();
-        }}, null);
+        try{
+            gameUI.ui.sess.glob.loader.defer(() -> {synchronized(gob) {
+                Integer id = mapGobTextId.remove(gob);
+                if (id==null)
+                    return;
+                Gob.Overlay ol = gob.findol(id);
+                if(ol!=null)
+                    gob.findol(id).remove();
+            }}, null);
+        }catch (Exception e){
+            System.out.println("removeGobText > "+e.getMessage());
+        }
     }
 
     public static void addGobColor(Gob gob, int r, int g, int b, int a) {
@@ -3116,5 +3128,9 @@ public class ZeeConfig {
         if (cellarStairs==null || cellarStairs.isEmpty())
             return false;
         return true;
+    }
+
+    public static boolean isNumbersOnly(String str) {
+        return str!=null && str.chars().allMatch( Character::isDigit );
     }
 }

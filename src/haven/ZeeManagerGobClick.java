@@ -1686,7 +1686,7 @@ public class ZeeManagerGobClick extends ZeeThread{
             choosePetal(getFlowerMenu(), petalName);
             return waitNoFlowerMenu();
         }else{
-            println("clickGobPetal > no flower menu?");
+            //println("clickGobPetal > no flower menu?");
             return false;
         }
     }
@@ -1843,7 +1843,7 @@ public class ZeeManagerGobClick extends ZeeThread{
 
         // pickup closest gob
         if (closestGob!=null) {
-            println("closestGob == "+closestGob.getres().name);
+            //println("closestGob == "+closestGob.getres().name);
             // ctrl+q cycle gob targets
             // right click ground item
             if (closestGob.getres().name.contains("/terobjs/items/")) {
