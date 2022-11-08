@@ -677,7 +677,7 @@ public class ZeeManagerGobClick extends ZeeThread{
         ZeeConfig.removeGobText(tree);
         // update queue gob's texts
         for (int i = 0; i < treesForRemoval.size(); i++) {
-            ZeeConfig.addGobText(treesForRemoval.get(i),"rem "+(i+1));
+            ZeeConfig.addGobText(treesForRemoval.get(i),"rem"+(i+1));
         }
         return tree;
     }
@@ -1209,15 +1209,15 @@ public class ZeeManagerGobClick extends ZeeThread{
     public static void removeTreeAndStump(Gob tree, String petalName){
         try{
             if (petalName.contentEquals(ZeeFlowerMenu.STRPETAL_REMOVEALLTREES)) {
-                ZeeConfig.addPlayerText("removing all trees");
+                ZeeConfig.addPlayerText("rem trees");
                 isRemovingAllTrees = true;
             }else {
-                ZeeConfig.addPlayerText("removing tree & stump");
+                ZeeConfig.addPlayerText("rem tree&stump");
             }
+            ZeeConfig.lastMapViewClickButton = 2;//prepare for cancel click
             waitNoFlowerMenu();
             ZeeManagerItemClick.equipAxeChopTree();
             sleep(500);//fix lag problem
-            ZeeConfig.lastMapViewClickButton = 2;//prepare for cancel click
             Coord2d treeCoord;
             while (tree!=null && !ZeeConfig.isTaskCanceledByGroundClick()) {
                 //start chopping
@@ -1229,15 +1229,17 @@ public class ZeeManagerGobClick extends ZeeThread{
                 currentRemovingTree = tree;
                 treeCoord = new Coord2d(tree.rc.x, tree.rc.y);
                 //wait idle
-                if (waitPlayerIdlePose() && !ZeeConfig.isTaskCanceledByGroundClick()) {//waitPlayerIdleFor(2)
+                if (!ZeeConfig.isTaskCanceledByGroundClick() && waitPlayerIdlePose()) {//waitPlayerIdleFor(2)
                     sleep(2000);//wait new stump loading
+                    //check task canceled
+                    if(ZeeConfig.isTaskCanceledByGroundClick())
+                        break;
                     Gob stump = ZeeConfig.getClosestGob(ZeeConfig.findGobsByNameEndsWith("stump"));
                     if (stump != null) {
                         //stump location doesnt match tree and there's no other stump close
                         if (stump.rc.compareTo(treeCoord) != 0  &&  ZeeConfig.distanceToPlayer(stump) > 25){
                             println("stump undecided");
-                            exitRemoveAllTrees();
-                            return;
+                            break;
                         }
                         ZeeConfig.addGobText(stump, "stump");
                         removeStumpMaybe(stump);
@@ -1260,6 +1262,8 @@ public class ZeeManagerGobClick extends ZeeThread{
                     }
                     //println("next tree = "+tree);
                 }
+                else
+                    println("remtree > task canceled or !waitPlayerIdlePose");
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -1270,8 +1274,12 @@ public class ZeeManagerGobClick extends ZeeThread{
     private static void exitRemoveAllTrees() {
         isRemovingAllTrees = false;
         currentRemovingTree = null;
-        if (treesForRemoval!=null)
+        if (treesForRemoval!=null && treesForRemoval.size()>0) {
+            for (Gob tree : treesForRemoval) {
+                ZeeConfig.removeGobText(tree);
+            }
             treesForRemoval.clear();
+        }
         treesForRemoval = null;
         ZeeConfig.removePlayerText();
     }

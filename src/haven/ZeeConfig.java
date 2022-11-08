@@ -2377,7 +2377,7 @@ public class ZeeConfig {
             return -1;
         Gob.Overlay gt = null;
         try {
-            removeGobText(gob);//cleanup previous text
+            //removeGobText(gob);//cleanup previous text
             gt = new Gob.Overlay(gob, zeeGobText);
             Gob.Overlay finalGt = gt;
             gameUI.ui.sess.glob.loader.defer(() -> {
