@@ -2377,11 +2377,22 @@ public class ZeeConfig {
             return -1;
         Gob.Overlay gt = null;
         try {
-            //removeGobText(gob);//cleanup previous text
             gt = new Gob.Overlay(gob, zeeGobText);
             Gob.Overlay finalGt = gt;
             gameUI.ui.sess.glob.loader.defer(() -> {
                 synchronized (gob) {
+
+                    //cleanup previous text if present
+                    Integer id = mapGobTextId.get(gob);
+                    if (id!=null) {
+                        Gob.Overlay ol = gob.findol(id);
+                        if (ol != null) {
+                            ol.remove();
+                            mapGobTextId.remove(gob);
+                        }
+                    }
+
+                    //add new text overlay
                     gob.addol(finalGt);
                 }
             }, null);
@@ -2394,17 +2405,43 @@ public class ZeeConfig {
         return gt.id;
     }
 
+    public static void removeGobText(ArrayList<Gob> gobs) {
+        if(gobs==null || gobs.size()==0)
+            return;
+        try{
+            gameUI.ui.sess.glob.loader.defer(() -> {
+                for (Gob gob : gobs) {
+                    synchronized(gob) {
+                        Integer id = mapGobTextId.get(gob);
+                        if (id==null)
+                            return;
+                        Gob.Overlay ol = gob.findol(id);
+                        if (ol != null) {
+                            ol.remove();
+                            mapGobTextId.remove(gob);
+                        }
+                    }
+                }
+                gobs.clear();
+            }, null);
+        }catch (Exception e){
+            System.out.println("removeGobText > "+e.getMessage());
+        }
+    }
+
     public static void removeGobText(Gob gob) {
         if(gob==null)
             return;
         try{
             gameUI.ui.sess.glob.loader.defer(() -> {synchronized(gob) {
-                Integer id = mapGobTextId.remove(gob);
+                Integer id = mapGobTextId.get(gob);
                 if (id==null)
                     return;
                 Gob.Overlay ol = gob.findol(id);
-                if(ol!=null)
-                    gob.findol(id).remove();
+                if (ol != null) {
+                    ol.remove();
+                    mapGobTextId.remove(gob);
+                }
             }}, null);
         }catch (Exception e){
             System.out.println("removeGobText > "+e.getMessage());

@@ -664,7 +664,8 @@ public class ZeeManagerGobClick extends ZeeThread{
         if (treesForRemoval.contains(tree)) {
             // remove tree from queue
             removeScheduledTree(tree);
-        } else if (!currentRemovingTree.equals(tree)){
+        }
+        else if (currentRemovingTree!=null && !currentRemovingTree.equals(tree)){
             // add tree to queue
             treesForRemoval.add(tree);
             ZeeConfig.addGobText(tree,"rem "+treesForRemoval.size());
@@ -673,8 +674,8 @@ public class ZeeManagerGobClick extends ZeeThread{
 
     private static Gob removeScheduledTree(Gob tree) {
         // remove tree from queue
-        treesForRemoval.remove(tree);
         ZeeConfig.removeGobText(tree);
+        treesForRemoval.remove(tree);
         // update queue gob's texts
         for (int i = 0; i < treesForRemoval.size(); i++) {
             ZeeConfig.addGobText(treesForRemoval.get(i),"rem"+(i+1));
@@ -1274,13 +1275,11 @@ public class ZeeManagerGobClick extends ZeeThread{
     private static void exitRemoveAllTrees() {
         isRemovingAllTrees = false;
         currentRemovingTree = null;
-        if (treesForRemoval!=null && treesForRemoval.size()>0) {
-            for (Gob tree : treesForRemoval) {
-                ZeeConfig.removeGobText(tree);
-            }
-            treesForRemoval.clear();
+        if(treesForRemoval != null  &&  treesForRemoval.size() > 0) {
+            ZeeConfig.removeGobText(treesForRemoval);
+            //treesForRemoval.clear();
         }
-        treesForRemoval = null;
+        //treesForRemoval = null;
         ZeeConfig.removePlayerText();
     }
 
