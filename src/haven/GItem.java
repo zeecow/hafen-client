@@ -217,7 +217,7 @@ public class GItem extends AWidget implements ItemInfo.SpriteOwner, GSprite.Owne
 			inv.dropItemsByName(basename);
 		}
 		// drop everglowing ember if piling coal
-		else if (ZeeConfig.pilerMode && ZeeManagerStockpile.lastPetalName.contentEquals("Collect coal") && basename.contentEquals("everglowingember")){
+		else if (ZeeConfig.pilerMode && ZeeManagerStockpile.lastPetalName!=null && ZeeManagerStockpile.lastPetalName.contentEquals("Collect coal") && basename.contentEquals("everglowingember")){
 			this.wdgmsg("drop", Coord.z);
 		}
 	}
