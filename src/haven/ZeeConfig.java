@@ -2387,7 +2387,7 @@ public class ZeeConfig {
                     if (id!=null) {
                         Gob.Overlay ol = gob.findol(id);
                         if (ol != null) {
-                            ol.remove();
+                            ol.remove(false);
                             mapGobTextId.remove(gob);
                         }
                     }
@@ -2417,7 +2417,7 @@ public class ZeeConfig {
                             return;
                         Gob.Overlay ol = gob.findol(id);
                         if (ol != null) {
-                            ol.remove();
+                            ol.remove(false);
                             mapGobTextId.remove(gob);
                         }
                     }
@@ -2439,7 +2439,7 @@ public class ZeeConfig {
                     return;
                 Gob.Overlay ol = gob.findol(id);
                 if (ol != null) {
-                    ol.remove();
+                    ol.remove(false);
                     mapGobTextId.remove(gob);
                 }
             }}, null);
