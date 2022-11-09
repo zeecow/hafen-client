@@ -14,6 +14,7 @@ public class FloatText extends FloatSprite {
         checkDmgHpMaybe(owner,res,str,col);
     }
 
+    static final Text.Foundry defDmgFont = new Text.Foundry(Text.sans.deriveFont(Font.BOLD, UI.scale(18))).aa(true);
     private void checkDmgHpMaybe(Owner owner, Resource res, String str, Color col) {
         try {
             //ZeeConfig.println(owner.getClass().getName() + " , " + res + " , "+str+" , "+col);
@@ -24,7 +25,7 @@ public class FloatText extends FloatSprite {
                             Gob gob = (Gob) owner;
                             gob.totalDmgHp += Integer.parseInt(str);
                             String txt = "-" + gob.totalDmgHp;
-                            ZeeGobText zeeGobText = new ZeeGobText(gob,txt,Color.red,Color.white,5,Font.BOLD,18,true);
+                            ZeeGobText zeeGobText = new ZeeGobText(txt,Color.red,Color.black,5, defDmgFont);
                             ZeeConfig.addGobText(gob, zeeGobText);
                         }
                     }

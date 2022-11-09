@@ -65,14 +65,17 @@ public class ZeeGobText extends Sprite implements RenderTree.Node, PView.Render2
     private int zOfs;
     private Color col, colBorder;
 
-    public ZeeGobText(Gob g, String text, Color colText, Color colBorder, int zOfs, int styleBoldPlainItalic, int size, boolean antialias) {
+    public ZeeGobText( String text, Color colText, Color colBorder, int zOfs, Text.Foundry font) {
         super(null, null);
-        this.font = new Text.Foundry(Text.serif.deriveFont(styleBoldPlainItalic, UI.scale(size))).aa(antialias);
+        this.font = font;
         this.text = text;
-        if (colBorder==null)
+        if (colBorder==null) {
+            this.colBorder = null;
             this.tex = font.render(text, colText).tex();
-        else
+        } else {
+            this.colBorder = colBorder;
             this.tex = font.renderstroked(text, colText, colBorder).tex();
+        }
         this.zOfs = zOfs;
         this.col = colText;
         CachedTexKey key;
@@ -89,23 +92,6 @@ public class ZeeGobText extends Sprite implements RenderTree.Node, PView.Render2
         }
     }
 
-    public ZeeGobText(Gob g, String text, Color col, int zOfs, int styleBoldPlainItalic, int size, boolean antialias) {
-        super(null, null);
-        this.text = text;
-        this.font = new Text.Foundry(Text.serif.deriveFont(styleBoldPlainItalic, UI.scale(size))).aa(antialias);
-        this.tex = font.renderstroked(text, col, Color.BLACK).tex();
-        this.zOfs = zOfs;
-        this.col = col;
-        CachedTexKey key = new CachedTexKey(text, col);
-        CachedTexVal ctv = texts.get(key);
-        if(ctv != null) {
-            ctv.cnt++;
-            this.tex = ctv.tex;
-        } else {
-            texts.put(key, new CachedTexVal(this.tex));
-        }
-    }
-
     public void draw(GOut g, Pipe state) {
         Coord sc = Homo3D.obj2view(new Coord3f(0, 0, 6 + zOfs), state, Area.sized(g.sz())).round2();
         g.aimage(tex, sc, 0.5, 0.5);
@@ -113,9 +99,14 @@ public class ZeeGobText extends Sprite implements RenderTree.Node, PView.Render2
 
     @Override
     public void removed(RenderTree.Slot slot) {
-        CachedTexVal ctv = texts.get(new CachedTexKey(text, col));
+        CachedTexKey key;
+        if(colBorder==null)
+            key = new CachedTexKey(text, col);
+        else
+            key = new CachedTexKey(text, col, colBorder);
+        CachedTexVal ctv = texts.get(key);
         if(ctv != null && --ctv.cnt == 0) {
-            texts.remove(new CachedTexKey(text, col));
+            texts.remove(key);
         }
     }
 }

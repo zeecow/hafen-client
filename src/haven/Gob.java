@@ -249,6 +249,14 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Sk
 	return(null);
     }
 
+	public Overlay findol(Class<?> spriteClass) {
+		for(Overlay ol : ols) {
+			if(spriteClass.isInstance(ol.spr))
+				return(ol);
+		}
+		return(null);
+	}
+
     public void dispose() {
 	for(GAttrib a : attr.values())
 	    a.dispose();

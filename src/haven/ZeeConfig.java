@@ -323,7 +323,6 @@ public class ZeeConfig {
     public static HashMap<String, Color> mapGobColor = initMapGobColor();
     public static HashMap<String,Color> mapCategoryColor = initMapCategoryColor();
     public static HashMap<String,Coord> mapWindowPos = initMapWindowPos();
-    public static HashMap<Gob,Integer> mapGobTextId = new HashMap<Gob,Integer>();
 
 
     private static boolean isSpriteKind(Gob gob, String... kind) {
@@ -2366,15 +2365,16 @@ public class ZeeConfig {
         addGobText(g,s,0,255,0,255,height);
     }
 
-    public static int addGobText(Gob gob, String text, int r, int g, int b, int a, int height) {
-        return addGobText( gob,
-                new ZeeGobText(gob, text, new Color(r, g, b, a), height, Font.BOLD,10,true)
+    static final Text.Foundry defGobTextFont = new Text.Foundry(Text.sans.deriveFont(Font.PLAIN, UI.scale(9))).aa(false);
+    public static void addGobText(Gob gob, String text, int r, int g, int b, int a, int height) {
+        addGobText( gob,
+            new ZeeGobText(text, new Color(r, g, b, a), Color.black, height, defGobTextFont)
         );
     }
 
-    public static int addGobText(Gob gob, ZeeGobText zeeGobText) {
+    public static void addGobText(Gob gob, ZeeGobText zeeGobText) {
         if (gob==null || zeeGobText==null)
-            return -1;
+            return;
         Gob.Overlay gt = null;
         try {
             gt = new Gob.Overlay(gob, zeeGobText);
@@ -2383,26 +2383,18 @@ public class ZeeConfig {
                 synchronized (gob) {
 
                     //cleanup previous text if present
-                    Integer id = mapGobTextId.get(gob);
-                    if (id!=null) {
-                        Gob.Overlay ol = gob.findol(id);
-                        if (ol != null) {
-                            ol.remove(false);
-                            mapGobTextId.remove(gob);
-                        }
+                    Gob.Overlay ol = gob.findol(ZeeGobText.class);
+                    if (ol != null) {
+                        ol.remove(false);
                     }
 
                     //add new text overlay
                     gob.addol(finalGt);
                 }
             }, null);
-            mapGobTextId.put(gob, gt.id);
         }catch (Exception e){
             System.out.println("addGobText > "+e.getMessage());
         }
-        if (gt==null)
-            return -1;
-        return gt.id;
     }
 
     public static void removeGobText(ArrayList<Gob> gobs) {
@@ -2412,13 +2404,9 @@ public class ZeeConfig {
             gameUI.ui.sess.glob.loader.defer(() -> {
                 for (Gob gob : gobs) {
                     synchronized(gob) {
-                        Integer id = mapGobTextId.get(gob);
-                        if (id==null)
-                            return;
-                        Gob.Overlay ol = gob.findol(id);
+                        Gob.Overlay ol = gob.findol(ZeeGobText.class);
                         if (ol != null) {
                             ol.remove(false);
-                            mapGobTextId.remove(gob);
                         }
                     }
                 }
@@ -2434,13 +2422,9 @@ public class ZeeConfig {
             return;
         try{
             gameUI.ui.sess.glob.loader.defer(() -> {synchronized(gob) {
-                Integer id = mapGobTextId.get(gob);
-                if (id==null)
-                    return;
-                Gob.Overlay ol = gob.findol(id);
+                Gob.Overlay ol = gob.findol(ZeeGobText.class);
                 if (ol != null) {
                     ol.remove(false);
-                    mapGobTextId.remove(gob);
                 }
             }}, null);
         }catch (Exception e){
