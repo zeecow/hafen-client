@@ -1039,6 +1039,7 @@ public class ZeeManagerItemClick extends ZeeThread{
             "bonesaw","saw-m","scythe","pickaxe","shovel","smithshammer","shears",
             "travellerssack","bindle","bushpole","primrod","glassrod","dowsingrod",
             "fryingpan","lantern","torch","mortarandpestle","bucket","volvawand",
+            "diversweight",
             // instruments
             "flute","harmonica","bagpipe","drum"
         };
@@ -1057,11 +1058,12 @@ public class ZeeManagerItemClick extends ZeeThread{
         return isTwoHandedItem(w.item.getres().name);
     }
     public static boolean isTwoHandedItem(String name) {
+        String basename = name.replaceAll("[^/]+/","");
         String[] items = {"scythe","pickaxe","shovel","b12axe",
                 "boarspear","cutblade","sledgehammer", "mortarandpestle",
-                "huntersbow","rangersbow","dowsingrod", "diversweight"};
+                "huntersbow","rangersbow","dowsingrod", "glassrod", "diversweight"};
         for (int i = 0; i < items.length; i++) {
-            if (name.contains(items[i])){
+            if (basename.contains(items[i])){
                 return true;
             }
         }

@@ -469,20 +469,20 @@ public class ZeeConfig {
         return crops.contains(basename);
     }
 
-    public static boolean isBug(String name){
+    public static boolean isBug(String nameContains){
         String[] list = {
             "/silkmoth","/grasshopper","/ladybug","/dragonfly","/waterstrider","/firefly","/sandflea",
             "/cavemoth","/stagbeetle","/cavecentipede","/moonmoth","/monarchbutterfly","/items/grub",
             "/springbumblebee"
         };
         for (int i = 0; i < list.length; i++) {
-            if(name.contains(list[i]))
+            if(nameContains.contains(list[i]))
                 return true;
         }
         return false;
     }
 
-    public static boolean isAggressive(String name){
+    public static boolean isAggressive(String nameContains){
         String[] list = {
                "/adder","/sandflea","/boar/","/badger/","/bear/","/bat/","/boreworm/",
                 "/ooze/","/cavelouse/","/caveangler/","orca","/goldeneagle/","/lynx/",
@@ -490,17 +490,17 @@ public class ZeeConfig {
                 "/plo"
         };
         for (int i = 0; i < list.length; i++) {
-            if(name.contains(list[i]))
+            if(nameContains.contains(list[i]))
                 return true;
         }
         return false;
     }
 
-    public static boolean isFish(String name){
-        return name.contains("/fish-");
+    public static boolean isFish(String nameContains){
+        return nameContains.contains("/fish-");
     }
 
-    public static boolean isButchableSmallAnimal(String name){
+    public static boolean isButchableSmallAnimal(String nameContains){
         /*
         Kill > Pluck > Butch = "gfx/invobjs/meat"
             gfx/invobjs/rooster
@@ -517,13 +517,13 @@ public class ZeeConfig {
                 "-dead","-plucked","-cleaned","-clean"
         };
         for (int i = 0; i < endlist.length; i++) {
-            if(name.endsWith(endlist[i]) || isFish(name))
+            if(nameContains.contains(endlist[i]) || isFish(nameContains))
                 return true;
         }
         return false;
     }
 
-    public static boolean isSmallAnimal(String name){
+    public static boolean isSmallAnimal(String nameContains){
         /*
         private static final String[] CRITTERS = {
             "/rat/rat", "/swan", "/squirrel", "/silkmoth", "/frog/", "/rockdove", "/quail", "/toad", "/grasshopper",
@@ -542,15 +542,15 @@ public class ZeeConfig {
                 "/adder"
         };
         for (int i = 0; i < endlist.length; i++) {
-            if(name.endsWith(endlist[i]))
+            if(nameContains.contains(endlist[i]))
                 return true;
         }
         return false;
     }
 
-    private static boolean isIconsCategNoobies(String name) {
+    private static boolean isIconsCategNoobies(String nameContains) {
         String[] list = {
-                "/hen","/rooster","/rabbit","rabbit-doe","/rat/rat",
+                "/hen","/rooster","/rabbit","rabbit-doe","/rat/rat","squirrel",
                 "/grasshopper","/ladybug","/dragonfly","/waterstrider",
                 "/cavemoth","/items/grub","/springbumblebee",
                 "stingingnettle","taproot","cattail",
@@ -558,7 +558,7 @@ public class ZeeConfig {
                 "bloatedbolete","/chantrelles","/lorchel","parasol","yellowfoot"
         };
         for (int i = 0; i < list.length; i++) {
-            if(name.endsWith(list[i]))
+            if(nameContains.contains(list[i]))
                 return true;
         }
         return false;
