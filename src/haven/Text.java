@@ -27,10 +27,8 @@
 package haven;
 
 import java.awt.*;
-import java.awt.Graphics;
-import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
-import java.util.*;
+import java.util.ArrayList;
 
 public class Text implements Disposable {
     public static final Font serif = new Font("Serif", Font.PLAIN, 10);
@@ -46,7 +44,7 @@ public class Text implements Disposable {
     public static final Color white = Color.WHITE;
 	
     static {
-	std = new Foundry(sans, 10);
+	std = new Foundry(sans, 10).aa(false);
     }
 	
     public static class Line extends Text {
