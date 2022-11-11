@@ -26,9 +26,11 @@
 
 package haven;
 
-import java.awt.Color;
+import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Random;
 
 public class GItem extends AWidget implements ItemInfo.SpriteOwner, GSprite.Owner {
     public Indir<Resource> res;
@@ -78,6 +80,7 @@ public class GItem extends AWidget implements ItemInfo.SpriteOwner, GSprite.Owne
     }
 
     public interface NumberInfo extends OverlayInfo<Tex> {
+	public static final Text.Foundry font = new Text.Foundry(Text.sans.deriveFont(Font.PLAIN, UI.scale(10))).aa(false);
 	public int itemnum();
 	public default Color numcolor() {
 	    return(Color.WHITE);
@@ -92,8 +95,8 @@ public class GItem extends AWidget implements ItemInfo.SpriteOwner, GSprite.Owne
 	}
 
 	public static BufferedImage numrender(int num, Color col) {
-		//col = Color.white;
-	    return(Utils.outline2(Text.render(Integer.toString(num), col).img, Utils.contrast(col)));
+		return font.renderstroked(String.valueOf(Math.round(num)), Color.white, Color.black).img;
+	    //return(Utils.outline2(Text.render(Integer.toString(num), col).img, Utils.contrast(col)));
 	}
     }
 
