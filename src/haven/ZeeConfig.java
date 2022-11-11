@@ -1522,11 +1522,7 @@ public class ZeeConfig {
     public static void checkClassMod(String name, Class<?> qlass){
         try {
 
-            if(name.equals("haven.res.ui.tt.q.quality.Quality")) {
-                //Set Quality toggle on
-                qlass.getDeclaredField("show").setBoolean(qlass, true);
-            }
-            else if(name.equals("haven.res.gfx.fx.bprad.BPRad")){
+            if(name.equals("haven.res.gfx.fx.bprad.BPRad")){
                 //Change radius color
                 setFinalStatic( qlass.getDeclaredField("smat"),
                     new BaseColor(new Color(139, 139, 185, 48)) );
