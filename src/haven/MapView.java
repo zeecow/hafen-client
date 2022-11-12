@@ -504,7 +504,7 @@ public class MapView extends PView implements DTarget, Console.Directory {
 	}
 
 	private void chfield(float nf) {
-		float zoom = ZeeConfig.zoomOrthoExtended ? 4 : 8;
+		float zoom = 4;
 	    tfield = nf;
 	    tfield = Math.max(Math.min(tfield, sz.x * (float)Math.sqrt(2) / zoom), 50);
 	    if(tfield > 100)

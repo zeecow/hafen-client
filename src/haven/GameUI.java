@@ -807,8 +807,7 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Message
 		};
 	    invwnd.add(maininv = (Inventory)child, Coord.z);
 	    invwnd.pack();
-	    if(!ZeeConfig.showInventoryLogin)
-	    	invwnd.hide();
+		//invwnd.hide();
 	    add(invwnd, Utils.getprefc("wndc-inv", new Coord(100, 100)));
 		ZeeConfig.initWindowInvMain();
 		ZeeQuickOptionsWindow.initWindow();
@@ -816,8 +815,7 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Message
 	    equwnd = new Hidewnd(Coord.z, "Equipment");
 	    equwnd.add(child, Coord.z);
 	    equwnd.pack();
-		if(!ZeeConfig.showEquipsLogin)
-	    	equwnd.hide();
+		equwnd.hide();
 	    add(equwnd, Utils.getprefc("wndc-equ", new Coord(400, 10)));
 	} else if(place == "hand") {
 	    GItem g = add((GItem)child);

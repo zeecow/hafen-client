@@ -157,7 +157,6 @@ public class ZeeConfig {
     public static Coord lastUiClickCoord;
     public static Class<?> classMSRad;
 
-    public static boolean actionSearchGlobal = Utils.getprefb("actionSearchGlobal", true);
     public static int aggroRadiusTiles = Utils.getprefi("aggroRadiusTiles", 11);
     public static boolean alertOnPlayers = Utils.getprefb("alertOnPlayers", true);
     public static boolean allowMidclickAutoBuy = false;
@@ -166,8 +165,6 @@ public class ZeeConfig {
     public static String autoClickMenuOptionList = Utils.getpref("autoClickMenuOptionList", DEF_LIST_AUTO_CLICK_MENU);
     public static boolean autoHearthOnStranger = Utils.getprefb("autoHearthOnStranger", true);
     public static boolean autoToggleEquips = Utils.getprefb("autoToggleEquips", true);
-    public static boolean autoToggleEquipsReposition = Utils.getprefb("autoToggleEquipsReposition", true);
-    public static boolean autoOpenBelt = Utils.getprefb("autoOpenBelt", true);
     public static boolean autoRunLogin = Utils.getprefb("autoRunLogin", true);
     public static boolean autoToggleGridLines = Utils.getprefb("autoToggleGridLines", true);
     public static boolean blockAudioMsg = Utils.getprefb("blockAudioMsg", true);
@@ -208,7 +205,6 @@ public class ZeeConfig {
     public static boolean keyBeltShiftTab = Utils.getprefb("keyBeltShiftTab", true);
     public static boolean keyCamSwitchShiftC = Utils.getprefb("keyCamSwitchShiftC", true);
     public static boolean keyUpDownAudioControl = Utils.getprefb("keyUpDownAudioControl", true);
-    public static boolean midclickEquipManager = Utils.getprefb("midclickEquipManager", true);
     public static boolean miniTrees = Utils.getprefb("miniTrees", false);
     public static Integer miniTreesSize = Utils.getprefi("miniTreesSize", 50);
     public static boolean noWeather = Utils.getprefb("noWeather", false);
@@ -218,16 +214,13 @@ public class ZeeConfig {
     public static boolean pilerMode = false;
     public static boolean shapeIcons = Utils.getprefb("shapeIcons", false);
     public static String shapeIconsList = Utils.getpref("shapeIconsList", DEF_LIST_SHAPEICON);
-    public static boolean showInventoryLogin = Utils.getprefb("showInventoryLogin", true);
     public static boolean showIconsZoomOut = Utils.getprefb("showIconsZoomOut", true);
-    public static boolean showEquipsLogin = Utils.getprefb("showEquipsLogin", false);
     public static boolean showKinNames = Utils.getprefb("showKinNames", true);
     public static boolean simpleCrops = Utils.getprefb("simpleCrops", true);
     public static boolean simpleHerbs = Utils.getprefb("simpleHerbs", true);
     public static boolean slowMiniMap = Utils.getprefb("slowMiniMap", true);
     public static boolean sortActionsByUses = Utils.getprefb("sortActionsByUses", true);
     public static boolean rememberWindowsPos = Utils.getprefb("rememberWindowsPos", true);
-    public static boolean zoomOrthoExtended = Utils.getprefb("zoomOrthoExtended", true);
     public static boolean showInspectTooltip = false;
     public static boolean simpleWindows = Utils.getprefb("simpleWindows", true);
     public static int simpleWindowColorInt = Utils.getprefi("simpleWindowColorInt",ZeeConfig.colorToInt(DEF_SIMPLE_WINDOW_COLOR));
@@ -875,30 +868,12 @@ public class ZeeConfig {
                     Equipory.SlotInfo si = ItemInfo.find(Equipory.SlotInfo.class, gameUI.vhand.item.info());
                     if(si != null) {
                         windowEquipment.show();
-                        if (autoToggleEquipsReposition && toggleEquipsLastWindowClicked !=null) {
-                            int x,y;
-                            if (toggleEquipsLastWindowClicked.c.x > gameUI.sz.x/2)
-                                x = toggleEquipsLastWindowClicked.c.x - windowEquipment.sz.x;
-                            else
-                                x = toggleEquipsLastWindowClicked.c.x + toggleEquipsLastWindowClicked.sz.x;
-                            y = toggleEquipsLastWindowClicked.c.y;
-                            autoToggleEquipsBackupCoord = Coord.of(windowEquipment.c);
-                            windowEquipment.c = new Coord(x,y);
-                            if (windowEquipment.c.y + windowEquipment.sz.y >= gameUI.sz.y) {
-                                y = gameUI.sz.y - windowEquipment.sz.y;
-                                windowEquipment.c = new Coord(x,y);
-                            }
-                            //reset last window, so next time equips open in regular place
-                            toggleEquipsLastWindowClicked = null;
-                        }
                     }
                 } catch(Loading l) {
                 }
             }
         }else if(done){
             windowEquipment.hide();
-            if (autoToggleEquipsReposition && autoToggleEquipsBackupCoord!=null)
-                windowEquipment.c = autoToggleEquipsBackupCoord;
         }
     }
 
@@ -1440,8 +1415,7 @@ public class ZeeConfig {
         String name = window.cap.text;
 
         //igonore cases
-        if( name==null || name.isEmpty()
-                || (autoToggleEquipsReposition && name.contentEquals("Equipment")))
+        if( name==null || name.isEmpty() )
             return;
 
         // set craft window unique name
@@ -1479,8 +1453,7 @@ public class ZeeConfig {
                     if(autoRunLogin)
                         setPlayerSpeed(PLAYER_SPEED_2);
 
-                    if (autoOpenBelt)
-                        clickOpenBelt();
+                    clickOpenBelt();
 
                     Thread.sleep(1500);
 

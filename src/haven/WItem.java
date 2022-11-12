@@ -205,7 +205,7 @@ public class WItem extends Widget implements DTarget {
 
 	@Override
 	public boolean mouseup(Coord c, int btn) {
-		if (btn == 2 && ZeeConfig.midclickEquipManager) {
+		if (btn == 2) {
 			ZeeManagerItemClick.clickEndMs = System.currentTimeMillis();
 			new ZeeManagerItemClick(this,c).start();
 			return false;
@@ -218,7 +218,7 @@ public class WItem extends Widget implements DTarget {
 	public boolean mousedown(Coord c, int btn) {
 
 	// middle-click item starts equipManager
-	if(btn == 2 && ZeeConfig.midclickEquipManager) {
+	if(btn == 2) {
 		ZeeManagerItemClick.clickStartMs = System.currentTimeMillis();
 		return false;
 	}

@@ -84,7 +84,7 @@ public class ZeeOptionsJFrame extends JFrame {
 
         panelTabControls.add(new ZeeOptionJCheckBox( "Key up/down controls volume", "keyUpDownAudioControl"),c);
 
-        panelTabControls.add(new ZeeOptionJCheckBox( "Shift+Tab toggles belt\"", "keyBeltShiftTab"),c);
+        panelTabControls.add(new ZeeOptionJCheckBox( "Shift+Tab toggles belt", "keyBeltShiftTab"),c);
 
         panelTabControls.add(new ZeeOptionJCheckBox( "Shift+C switch cams", "keyCamSwitchShiftC"),c);
 
@@ -433,20 +433,6 @@ public class ZeeOptionsJFrame extends JFrame {
         panelTabInterface.add(new ZeeOptionJCheckBox( "Compact equip window(restart)", "equiporyCompact"),c);
 
         panelTabInterface.add(new ZeeOptionJCheckBox( "Auto toggle equips window", "autoToggleEquips"),c);
-
-        panelTabInterface.add(new ZeeOptionJCheckBox( "Reposition toggled equips window", "autoToggleEquipsReposition"),c);
-
-        panelTabInterface.add(new ZeeOptionJCheckBox( "Show equips at login", "showEquipsLogin"),c);
-
-        panelTabInterface.add(new ZeeOptionJCheckBox( "Mid-click belt item to autoequip", "midclickEquipManager"),c);
-
-        panelTabInterface.add(new ZeeOptionJCheckBox( "Show inventory at login", "showInventoryLogin"),c);
-
-        panelTabInterface.add(new ZeeOptionJCheckBox( "Show belt at login", "autoOpenBelt"),c);
-
-        panelTabInterface.add(new ZeeOptionJCheckBox( "Zoom extended for Ortho cam", "zoomOrthoExtended"),c);
-
-        panelTabInterface.add(new ZeeOptionJCheckBox( "Action search globally", "actionSearchGlobal"),c);
 
         panelTabInterface.add(new ZeeOptionJCheckBox( "Remember windows pos", "rememberWindowsPos"),c);
 
