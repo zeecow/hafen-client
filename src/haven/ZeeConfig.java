@@ -196,6 +196,7 @@ public class ZeeConfig {
     public static int gridColorInt = Utils.getprefi("gridColorInt",ZeeConfig.colorToInt(DEF_GRID_COLOR));
     public static boolean hideFxSmoke = Utils.getprefb("hideFxSmoke", true);
     public static boolean hideFxAnimations = Utils.getprefb("hideFxAnimations", true);
+    public static boolean hideCrops = Utils.getprefb("hideCrops", false);
     public static boolean highlightCropsReady = Utils.getprefb("highlightCropsReady", true);
     public static boolean isThinClient = false;
     public static boolean isRainLimited = Utils.getprefb("isRainLimited", false);
@@ -1726,7 +1727,7 @@ public class ZeeConfig {
                 Audio.setvolume(Double.parseDouble(String.format("%.1f", vol)) + 0.1);
             else if (vol < 1)
                 Audio.setvolume(1); // max 1
-            msg("volume "+Audio.volume);
+            msgLow("volume "+Audio.volume);
             return true;
         }
         else if (ZeeConfig.keyUpDownAudioControl && ev.getKeyCode()==KeyEvent.VK_DOWN){
@@ -1735,7 +1736,7 @@ public class ZeeConfig {
                 Audio.setvolume(Double.parseDouble(String.format("%.1f", vol)) - 0.1);
             else if (vol > 0)
                 Audio.setvolume(0); // min 0
-            msg("volume "+Audio.volume);
+            msgLow("volume "+Audio.volume);
             return true;
         }
         // Shift+Tab toggles Belt
@@ -1757,7 +1758,22 @@ public class ZeeConfig {
             }
             return true;
         }
+        // ctrl+h hide crops
+        else if (ev.getKeyCode()==KeyEvent.VK_H && ev.isControlDown()){
+            toggleHideCrops();
+            return true;
+        }
         return false;
+    }
+
+    private static void toggleHideCrops() {
+        hideCrops = !hideCrops;
+        Utils.setprefb("hideCrops",hideCrops);
+        ZeeQuickOptionsWindow.updateCheckboxNoBump("hideCrops",hideCrops);
+        if (hideCrops)
+            msgLow("hide crops");
+        else
+            msgLow("show crops");
     }
 
     private static boolean createdBasketWindow=false, createdCreelWindow=false;
@@ -2513,6 +2529,10 @@ public class ZeeConfig {
 
     public static void msg(String s) {
         gameUI.msg(s);
+    }
+
+    public static void msgLow(String s) {
+        gameUI.msgLow(s);
     }
 
     public static void msgError(String s) {

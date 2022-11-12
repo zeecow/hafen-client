@@ -111,10 +111,18 @@ public class ZeeQuickOptionsWindow {
             updateJCheckBoxWidget(listConfigLabel.get(0)[0],listConfigLabel.get(0)[1]);
     }
 
-    private static String getConfigByLabel(String lbl) {
+    static String getConfigByLabel(String lbl) {
         for (int i = 0; i < listConfigLabel.size(); i++) {
             if (listConfigLabel.get(i)[1].contentEquals(lbl))
                 return listConfigLabel.get(i)[0];
+        }
+        return "";
+    }
+
+    static String getLabelByConfig(String config) {
+        for (int i = 0; i < listConfigLabel.size(); i++) {
+            if (listConfigLabel.get(i)[0].contentEquals(config))
+                return listConfigLabel.get(i)[1];
         }
         return "";
     }
@@ -160,5 +168,18 @@ public class ZeeQuickOptionsWindow {
         window = null;
         cbPetal = null;
         listJOptsWidgets.clear();
+    }
+
+    static void updateCheckboxNoBump(String configName, boolean val) {
+        CheckBox checkBox;
+        String labelText;
+        for (int i = 0; i < listJOptsWidgets.size(); i++) {
+            checkBox = listJOptsWidgets.get(i);
+            labelText = checkBox.lbl.text;
+            if (getConfigByLabel(labelText).contentEquals(configName)){
+                checkBox.a = val;
+                return;
+            }
+        }
     }
 }

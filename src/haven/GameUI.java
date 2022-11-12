@@ -1546,6 +1546,17 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Message
 	    lastmsgsfx = now;
 	}
     }
+
+	public void msgLow(String msg) {
+		msg(msg, Color.WHITE, Color.WHITE);
+		if (ZeeConfig.blockAudioMsg && ZeeConfig.isMsgAudioMuted(msg))
+			return;
+		double now = Utils.rtime();
+		if(now - lastmsgsfx > 0.1) {
+			ui.sfx(RootWidget.msgsfxLow);
+			lastmsgsfx = now;
+		}
+	}
     
     public void act(String... args) {
 	wdgmsg("act", (Object[])args);

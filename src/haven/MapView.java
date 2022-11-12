@@ -614,6 +614,8 @@ public class MapView extends PView implements DTarget, Console.Directory {
 	RenderTree.Slot slot;
 
 	private void addgob(Gob ob) {
+		if (ZeeConfig.hideCrops && ob!=null && ob.getres()!=null && ZeeConfig.isGobCrop(ob.getres().name))
+			return;
 	    RenderTree.Slot slot = this.slot;
 	    if(slot == null)
 		return;

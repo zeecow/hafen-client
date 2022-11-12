@@ -34,6 +34,7 @@ public class RootWidget extends ConsoleHost implements UI.MessageWidget {
     public static final Text.Foundry msgfoundry = new Text.Foundry(Text.dfont, 14);
     public static final Resource errsfx = Resource.local().loadwait("sfx/error");
     public static final Resource msgsfx = Resource.local().loadwait("sfx/msg");
+	public static final Resource msgsfxLow = Resource.local().loadwait("sfx/hud/mmap/wood4");
     public boolean modtip = false;
     Profile guprof, grprof, ggprof;
     private Text lastmsg;

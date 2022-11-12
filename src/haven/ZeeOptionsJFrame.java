@@ -266,6 +266,8 @@ public class ZeeOptionsJFrame extends JFrame {
 
         tabbedPane.addTab("Misc", panelTabMisc);
 
+        panelTabMisc.add(new ZeeOptionJCheckBox( "Hide crops (ctrl+h)", "hideCrops"),c);
+
         panelTabMisc.add(new ZeeOptionJCheckBox( "Hide some animations", "hideFxAnimations"),c);
 
         panelTabMisc.add(new ZeeOptionJCheckBox( "Hide smoke effects", "hideFxSmoke"),c);
