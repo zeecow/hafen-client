@@ -127,10 +127,10 @@ public class Window extends Widget implements DTarget {
     public void cdraw(GOut g) {
     }
 
-	public BufferedImage bgImgSimpleWindow = null;
+	public Tex bgImgSimpleWindow = null;
 	public void drawSimpleWindowBg(GOut g) {
 		if (bgImgSimpleWindow == null) {
-			bgImgSimpleWindow = ZeeManagerIcons.imgRect(wsz.x-34, wsz.y-54, ZeeConfig.intToColor(ZeeConfig.simpleWindowColorInt),ZeeConfig.simpleWindowBorder,0);
+			bgImgSimpleWindow = new TexI(ZeeManagerIcons.imgRect(wsz.x-34, wsz.y-54, ZeeConfig.intToColor(ZeeConfig.simpleWindowColorInt),ZeeConfig.simpleWindowBorder,0));
 		}
 		g.image(bgImgSimpleWindow,tlm);
 	}
