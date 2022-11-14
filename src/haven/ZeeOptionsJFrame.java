@@ -430,6 +430,8 @@ public class ZeeOptionsJFrame extends JFrame {
             ZeeConfig.simpleWindowsUpdateAll();
         });
 
+        panelTabInterface.add(new ZeeOptionJCheckBox( "Auto hide inventory", "autoHideMainInvWindow"),c);
+
         panelTabInterface.add(new ZeeOptionJCheckBox( "Simple buttons (logoff)", "simpleButtons"),c);
 
         panelTabInterface.add(new ZeeOptionJCheckBox( "Compact equip window(restart)", "equiporyCompact"),c);

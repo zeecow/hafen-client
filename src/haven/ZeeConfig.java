@@ -206,6 +206,7 @@ public class ZeeConfig {
     public static boolean keyBeltShiftTab = Utils.getprefb("keyBeltShiftTab", true);
     public static boolean keyCamSwitchShiftC = Utils.getprefb("keyCamSwitchShiftC", true);
     public static boolean keyUpDownAudioControl = Utils.getprefb("keyUpDownAudioControl", true);
+    public static boolean autoHideMainInvWindow = Utils.getprefb("autoHideMainInvWindow", false);
     public static boolean miniTrees = Utils.getprefb("miniTrees", false);
     public static Integer miniTreesSize = Utils.getprefi("miniTreesSize", 50);
     public static boolean noWeather = Utils.getprefb("noWeather", false);
@@ -902,6 +903,7 @@ public class ZeeConfig {
         }
         else if(windowTitle.equals("Inventory")) {
             windowInvMain = window;
+            window.isAutoHideOn = true;
         }
         else if(windowTitle.equals("Barter Stand") && window.sz.x > 300){//avoid build window
             windowModBarterStand(window);

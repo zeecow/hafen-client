@@ -326,13 +326,60 @@ public class Window extends Widget implements DTarget {
 	return(true);
     }
 
+	boolean isAutoHideOn = false, isAutoHidden =false;
     public void mousemove(Coord c) {
 	if(dm != null) {
 	    this.c = this.c.add(c.add(doff.inv()));
 	} else {
+		if (this.isAutoHideOn && ZeeConfig.autoHideMainInvWindow) {
+			if (checkhit(c)){
+				if (this.isAutoHidden)
+					mouseOverToggleWinPos();
+			}else{
+				if (!this.isAutoHidden)
+					mouseOverToggleWinPos();
+			}
+		}
 	    super.mousemove(c);
 	}
     }
+
+	private void mouseOverToggleWinPos(){
+		Coord savedWinPos = ZeeConfig.mapWindowPos.get(this.cap.text);
+		if (savedWinPos==null){
+			ZeeConfig.println("123123 > no saved pos to restore");
+			return;
+		}
+		int halfScreen = ZeeConfig.gameUI.sz.x/2;
+		// restore pos: glue window horizontally
+		if (this.isAutoHidden) {
+			int newX;
+			if (c.x <= halfScreen)
+				newX = 0;
+			else
+				newX = ZeeConfig.gameUI.sz.x - this.asz.x;
+			// use saved y
+			c = Coord.of(newX, savedWinPos.y);
+			this.isAutoHidden = false;
+		}
+		// hide window horizontally
+		else {
+			// hide to the left
+			if (c.x <= halfScreen) {
+				int hiddenWidth = (int) (sz.x * 0.7);
+				int newX = - hiddenWidth;
+				c = Coord.of( newX, c.y);
+			}
+			// hide to the right
+			else{
+				int visibleWidth = (int) (sz.x * 0.3);
+				int newX = ZeeConfig.gameUI.sz.x - visibleWidth;
+				c = Coord.of( newX, c.y);
+			}
+			this.isAutoHidden = true;
+		}
+
+	}
 
     public void wdgmsg(Widget sender, String msg, Object... args) {
 	if(sender == cbtn) {
