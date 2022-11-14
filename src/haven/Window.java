@@ -326,7 +326,6 @@ public class Window extends Widget implements DTarget {
 	return(true);
     }
 
-	boolean isAutoHideOn = false, isAutoHidden =false;
     public void mousemove(Coord c) {
 	if(dm != null) {
 	    this.c = this.c.add(c.add(doff.inv()));
@@ -344,6 +343,7 @@ public class Window extends Widget implements DTarget {
 	}
     }
 
+	boolean isAutoHideOn = false, isAutoHidden =false;
 	private void mouseOverToggleWinPos(){
 		Coord savedWinPos = ZeeConfig.mapWindowPos.get(this.cap.text);
 		if (savedWinPos==null){
@@ -355,9 +355,9 @@ public class Window extends Widget implements DTarget {
 		if (this.isAutoHidden) {
 			int newX;
 			if (c.x <= halfScreen)
-				newX = 0;
+				newX = -tlm.x;
 			else
-				newX = ZeeConfig.gameUI.sz.x - this.asz.x;
+				newX = ZeeConfig.gameUI.sz.x - sz.x + tlm.x;
 			// use saved y
 			c = Coord.of(newX, savedWinPos.y);
 			this.isAutoHidden = false;
