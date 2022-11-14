@@ -61,7 +61,7 @@ public class ZeeManagerGobClick extends ZeeThread{
                     ZeeConfig.clickTile(ZeeConfig.coordToTile(mc),1,UI.MOD_SHIFT);
                 }
             }
-            // pile all clay if clicked pile with cursor dig
+            // pile all inventory clay
             else if(ZeeConfig.isCursorName(ZeeConfig.CURSOR_DIG) && gobName.endsWith("/stockpile-clay")){
                 ZeeManagerGobClick.pileInvClayOnExistingPile(gob);
             }
@@ -77,9 +77,11 @@ public class ZeeManagerGobClick extends ZeeThread{
                     }
                 }.start();
             }
+            // pick up all ground items
             else if (isGobGroundItem(gobName)) {
-                gobClick(gob,3, UI.MOD_SHIFT);//pick up all items (shift + rclick)
+                gobClick(gob,3, UI.MOD_SHIFT);//shift + rclick
             }
+            // light up torch
             else if (isGobFireSource(gobName)) {
                 new ZeeThread() {
                     public void run() {
@@ -88,6 +90,7 @@ public class ZeeManagerGobClick extends ZeeThread{
                     }
                 }.start();
             }
+            // mount horse
             else if (isGobHorse(gobName)) {
                 new ZeeThread() {
                     public void run() {
@@ -95,6 +98,7 @@ public class ZeeManagerGobClick extends ZeeThread{
                     }
                 }.start();
             }
+            // label all barrels
             else if (gobName.endsWith("/barrel")) {
                 if (barrelLabelOn)
                     ZeeManagerFarmer.testBarrelsTilesClear();
@@ -102,16 +106,23 @@ public class ZeeManagerGobClick extends ZeeThread{
                     ZeeManagerFarmer.testBarrelsTiles(true);
                 barrelLabelOn = !barrelLabelOn;
             }
-            else if (gobName.endsWith("/dreca")) { // dream catcher
+            // pick 2 dreams from catcher
+            else if (gobName.endsWith("/dreca")) {
                 new ZeeThread() {
                     public void run() {
                         twoDreamsPlease(gob);
                     }
                 }.start();
             }
+            //toggle mine support radius
             else if (isGobMineSupport(gobName)) {
                 ZeeConfig.toggleMineSupport();
             }
+            // open cauldron
+            else if(gobName.contains("/cauldron") && !ZeeConfig.isPlayerLiftingGob(gob)){
+                cauldronOpen();
+            }
+            // open ship cargo
             else if(gobName.endsWith("/knarr") || gobName.endsWith("/snekkja")) {
                 new ZeeThread() {
                     public void run() {
@@ -119,9 +130,11 @@ public class ZeeManagerGobClick extends ZeeThread{
                     }
                 }.start();
             }
+            // toggle aggressive gob radius
             else if(ZeeConfig.isAggressive(gobName)){
                 toggleOverlayAggro(gob);
             }
+            // inspect gob
             else if (isInspectGob(gobName)) {
                 inspectGob(gob);
             }
@@ -199,6 +212,10 @@ public class ZeeManagerGobClick extends ZeeThread{
                         ZeeManagerMiner.tileMonitorWindow();
                     }
                 }
+            }
+            // put out cauldron
+            else if(gobName.contains("/cauldron") && !ZeeConfig.isPlayerLiftingGob(gob)){
+                cauldronPutOut();
             }
             // schedule tree removal
             else if (isRemovingAllTrees && isGobTree(gobName)) {
@@ -290,6 +307,41 @@ public class ZeeManagerGobClick extends ZeeThread{
             }
         }
         catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    static void cauldronOpen() {
+        new ZeeThread(){
+            public void run() {
+                try {
+                    // dismount horse/kicksled
+                    if (ZeeConfig.isPlayerMountingHorse() || ZeeConfig.isPlayerDrivingingKicksled()) {
+                        Coord cauldronCoord = ZeeConfig.lastMapViewClickMc.floor(posres);
+                        ZeeManagerGobClick.disembarkVehicle(cauldronCoord);
+                        sleep(777);
+                    }
+                    // open cauldron
+                    clickGobPetal(gob,"Open");
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+            }
+        }.start();
+    }
+
+    static void cauldronPutOut() {
+        // no new thread needed, as long as caller already created one
+        try {
+            // dismount horse/kicksled
+            if (ZeeConfig.isPlayerMountingHorse() || ZeeConfig.isPlayerDrivingingKicksled()) {
+                Coord cauldronCoord = ZeeConfig.lastMapViewClickMc.floor(posres);
+                ZeeManagerGobClick.disembarkVehicle(cauldronCoord);
+                sleep(777);
+            }
+            // "put out" cauldron
+            clickGobPetal(gob,"Put out");
+        }catch (Exception e){
             e.printStackTrace();
         }
     }

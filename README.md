@@ -68,6 +68,7 @@ Client focusing on small helper tasks, many using mouse middle button, and other
    - toggle mine support radius 
    - toggle aggressive animal obj radius
    - while holding item will try to ctrl+click obj(containers,stockpiles)
+   - open cauldron
  - long midclick object
    - show context menu for various objs (details below)
    - lift up obj 
@@ -82,6 +83,7 @@ Client focusing on small helper tasks, many using mouse middle button, and other
    - while carrying/driving wheelbarrow will mount horse obj and lift wheelbarrow again
    - show window for area piler
    - pile all clay if clicked pile with cursor dig
+   - put out cauldron
  - midclick item 
    - sort-transfer item ascending(?) 
    - pick-up all

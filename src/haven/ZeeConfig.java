@@ -2170,6 +2170,10 @@ public class ZeeConfig {
             return null;
     }
 
+    public static boolean isPlayerLiftingGob() {
+        return playerHasAnyPose(POSE_PLAYER_LIFT);
+    }
+
     public static Gob isPlayerLiftingGob(String gobNameContains) {
         if (!playerHasAnyPose(POSE_PLAYER_LIFT)) // not lifting anything
             return null;
