@@ -333,10 +333,10 @@ public class Window extends Widget implements DTarget {
 		if (this.isAutoHideOn && ZeeConfig.autoHideMainInvWindow) {
 			if (checkhit(c)){
 				if (this.isAutoHidden)
-					mouseOverToggleWinPos();
+					autoHideToggleWinPos();
 			}else{
 				if (!this.isAutoHidden)
-					mouseOverToggleWinPos();
+					autoHideToggleWinPos();
 			}
 		}
 	    super.mousemove(c);
@@ -344,7 +344,7 @@ public class Window extends Widget implements DTarget {
     }
 
 	boolean isAutoHideOn = false, isAutoHidden =false;
-	private void mouseOverToggleWinPos(){
+	void autoHideToggleWinPos(){
 		Coord savedWinPos = ZeeConfig.mapWindowPos.get(this.cap.text);
 		if (savedWinPos==null){
 			ZeeConfig.println("123123 > no saved pos to restore");

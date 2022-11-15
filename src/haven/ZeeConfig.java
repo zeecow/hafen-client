@@ -3149,4 +3149,20 @@ public class ZeeConfig {
     public static boolean isNumbersOnly(String str) {
         return str!=null && str.chars().allMatch( Character::isDigit );
     }
+
+    public static void inventoryResized(Inventory inv) {
+
+        // repos main inv checkboxes
+        if (getMainInventory().equals(inv))
+            invMainoptionsWdg.reposition();
+
+        Window win = (Window)inv.getparent(Window.class);
+
+        // resize auto hide
+        if (autoHideMainInvWindow && win.isAutoHideOn)
+            win.autoHideToggleWinPos();
+
+        // resize window bg image
+        simpleWindowsResize(win);
+    }
 }

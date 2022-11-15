@@ -149,8 +149,7 @@ public class Inventory extends Widget implements DTarget {
 	if(msg == "sz") {
 	    isz = (Coord)args[0];
 	    resize(invsq.sz().add(UI.scale(new Coord(-1, -1))).mul(isz).add(UI.scale(new Coord(1, 1))));
-	    ZeeConfig.invMainoptionsWdg.reposition();
-		ZeeConfig.simpleWindowsResize((Window)this.getparent(Window.class));
+	    ZeeConfig.inventoryResized(this);
 	} else if(msg == "mode") {
 	    dropul = (((Integer)args[0]) == 0);
 	} else {
@@ -379,7 +378,7 @@ public class Inventory extends Widget implements DTarget {
 	public boolean isMainInv() {
 		if(mainInv == null){
 			Window w = this.getparent(Window.class);
-			if( w != null && w.cap.text.equalsIgnoreCase("Inventory"))
+			if( w != null && w.cap.text.contentEquals("Inventory"))
 				mainInv = Boolean.TRUE;
 			else
 				mainInv = Boolean.FALSE;
