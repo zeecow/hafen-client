@@ -51,28 +51,32 @@ public class ZeeQuickOptionsWindow {
 
         //add new widgets
         for (int i = 0; i < listConfigLabel.size(); i++) {
-            listJOptsWidgets.add(new CheckBox(listConfigLabel.get(i)[1]) {
-                {
-                    try {
+            CheckBox newcb = null;
+            try{
+                newcb = new CheckBox(listConfigLabel.get(i)[1]) {
+                    {
                         //ZeeConfig.println(" > configName: "+getConfigByLabel(lbl.text));
                         a = ZeeOptionJCheckBox.getZeeConfigBoolean(getConfigByLabel(lbl.text));
-                    } catch (Exception e) {
-                        e.printStackTrace();
                     }
-                }
 
-                public void set(boolean val) {
-                    try {
+                    public void set(boolean val) {
                         //ZeeConfig.println(" set > configName: "+getConfigByLabel(lbl.text));
                         String configName = getConfigByLabel(lbl.text);
                         ZeeOptionJCheckBox.setZeeConfigBoolean(val, configName);
                         bumpCheckBox(configName);
                         a = val;
-                    } catch (Exception e) {
-                        e.printStackTrace();
                     }
-                }
-            });
+                };
+            }catch (Exception e){
+                ZeeConfig.println("config \""+listConfigLabel.get(i)[1]+"\" not found? ");
+            }
+
+            // checkbox couldn't be created, skip to next
+            if (newcb==null)
+                continue;
+
+            // checkbox successfully created
+            listJOptsWidgets.add(newcb);
             getWindow().add(listJOptsWidgets.get(listJOptsWidgets.size() - 1));
         }
 

@@ -17,7 +17,7 @@ public class ZeeOptionsJFrame extends JFrame {
     public JTabbedPane tabbedPane, tabbedPaneGobs;
     public JPanel panelTabAuto, panelTabMisc, panelTabInterface, panelTabGobs, panelTabControls, panelTabMinimap, panelDetailsBottom, panelTabCateg, panelShapeIcons, panelShapeIconsSaveCancel;
     public JCheckBox cbSimpleWindowBorder, cbSimpleWindows, cbShapeIcons, cbDebugCodeRes, cbCattleRosterHeight;
-    public JTextField tfConfirmPetal, tfBlockAudioMsgs, tfAutoClickMenu, tfAggroRadiusTiles, tfButchermode, tfGobName, tfAudioPath, tfCategName, tfAudioPathCateg;
+    public JTextField tfAutoHideWindows, tfConfirmPetal, tfBlockAudioMsgs, tfAutoClickMenu, tfAggroRadiusTiles, tfButchermode, tfGobName, tfAudioPath, tfCategName, tfAudioPathCateg;
     public JComboBox<String> cmbCattleRoster, cmbGobCategory, cmbMiniTreeSize, cmbRainLimitPerc, comboShapeIcons;
     public JList<String> listGobsTemp, listGobsSaved, listGobsCategories;
     public JButton btnRefresh, btnPrintState, btnResetGobs, btnAudioSave, btnAudioClear, btnAudioTest, btnRemGobFromCateg, btnGobColorAdd, btnCategoryColorAdd, btnGobColorRemove, btnCategoryColorRemove, btnResetCateg, btnAddCateg, btnRemoveCateg, btnResetWindowsPos, btnResetActionUses, btnSapeIconPreview, btnShapeIconSave, btnSapeIconDelete, btnSolidColorWindow, btnGridGolor;
@@ -430,8 +430,6 @@ public class ZeeOptionsJFrame extends JFrame {
             ZeeConfig.simpleWindowsUpdateAll();
         });
 
-        panelTabInterface.add(new ZeeOptionJCheckBox( "Auto hide inventory", "autoHideMainInvWindow"),c);
-
         panelTabInterface.add(new ZeeOptionJCheckBox( "Simple buttons (logoff)", "simpleButtons"),c);
 
         panelTabInterface.add(new ZeeOptionJCheckBox( "Compact equip window(restart)", "equiporyCompact"),c);
@@ -503,6 +501,21 @@ public class ZeeOptionsJFrame extends JFrame {
             if(strArr!=null && strArr.length>0) {
                 ZeeConfig.confirmPetalList = str;
                 Utils.setpref("confirmPetalList",str.strip());
+            }
+        });
+
+
+        //auto hide windows
+        panelTabInterface.add(new ZeeOptionJCheckBox( "Auto hide windows", "autoHideWindows"),c);
+        panelTabInterface.add(tfAutoHideWindows= new JTextField("",5), c);
+        tfAutoHideWindows.setMaximumSize(new Dimension(Integer.MAX_VALUE, tfAutoHideWindows.getPreferredSize().height));
+        tfAutoHideWindows.setText(ZeeConfig.autoHideWindowsList);
+        tfAutoHideWindows.addActionListener(actionEvent -> {
+            String str = actionEvent.getActionCommand();
+            String[] strArr = str.split(",");
+            if(strArr!=null && strArr.length>0) {
+                ZeeConfig.autoHideWindowsList = str;
+                Utils.setpref("autoHideWindowsList",str.strip());
             }
         });
     }

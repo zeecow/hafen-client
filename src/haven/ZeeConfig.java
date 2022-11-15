@@ -107,6 +107,7 @@ public class ZeeConfig {
 
     public static final String DEF_LIST_BLOCK_AUDIO = "Leashed horse.;Tracking is now turned on.";
     public static final String DEF_LIST_CONFIRM_PETAL = "Empty,Swill,Clean out,Take possession,Renounce Lawspeaker,Become Lawspeaker";
+    public static final String DEF_LIST_AUTO_HIDE_WINDOWS = "Inventory,Character Sheet,Belt,Basket,Creel";
     public static final String DEF_LIST_BUTCH_AUTO = "Break,Scale,Wring neck,Kill,Skin,Flay,Pluck,Clean,Butcher,Collect bones";
     public static final String DEF_LIST_AUTO_CLICK_MENU = "Pick,Harvest wax";
     public static final String DEF_LIST_SHAPEICON = "stalagoomba 1,diamond 7 1 0,255 255 0;/amberwash 2,diamond 7 0 1,255 102 0;/cavepuddle 2,diamond 7 0 1,0 204 102;/ladder 2,triangleUp 5 0 1,0 204 102;/minehole 2,triangleDown 5 0 1,0 204 102;/burrow 2,triangleDown 6 0 1,204 0 255;/spark 2,square 4 0 1,102 102 255;/snekkja 2,square 4 0 1,255 255 102;/dugout 2,square 4 0 1,255 255 102;/wheelbarrow 2,square 4 0 1,0 255 255;/cart 2,square 4 0 1,0 153 255;/knarr 2,square 4 0 1,255 255 102;/rowboat 2,square 4 0 1,255 255 102;/horse/ 1,square 4 0 1,0 204 0";
@@ -206,7 +207,8 @@ public class ZeeConfig {
     public static boolean keyBeltShiftTab = Utils.getprefb("keyBeltShiftTab", true);
     public static boolean keyCamSwitchShiftC = Utils.getprefb("keyCamSwitchShiftC", true);
     public static boolean keyUpDownAudioControl = Utils.getprefb("keyUpDownAudioControl", true);
-    public static boolean autoHideMainInvWindow = Utils.getprefb("autoHideMainInvWindow", false);
+    public static boolean autoHideWindows = Utils.getprefb("autoHideWindows", false);
+    public static String autoHideWindowsList = Utils.getpref("autoHideWindowsList", DEF_LIST_AUTO_HIDE_WINDOWS);
     public static boolean miniTrees = Utils.getprefb("miniTrees", false);
     public static Integer miniTreesSize = Utils.getprefi("miniTreesSize", 50);
     public static boolean noWeather = Utils.getprefb("noWeather", false);
@@ -903,7 +905,6 @@ public class ZeeConfig {
         }
         else if(windowTitle.equals("Inventory")) {
             windowInvMain = window;
-            window.isAutoHideOn = true;
         }
         else if(windowTitle.equals("Barter Stand") && window.sz.x > 300){//avoid build window
             windowModBarterStand(window);
@@ -929,7 +930,31 @@ public class ZeeConfig {
             windowFitView(window);
         }
 
+        //order of call is important due to window.hasOrganizeButton
         windowModOrganizeButton(window, windowTitle);
+        windowModAutoHideButton(window,windowTitle);
+    }
+
+    private static void windowModAutoHideButton(Window window, String windowTitle) {
+        if (autoHideWindowsList.isBlank())
+            return;
+        boolean showButton = false;
+        for (String cap : ZeeConfig.autoHideWindowsList.split(",")) {
+            if (cap.strip().contentEquals(windowTitle)) {
+                showButton = true;
+                break;
+            }
+        }
+        if (!showButton)
+            return;
+        int pad = ZeeWindow.ZeeButton.BUTTON_SIZE;
+        if (window.hasOrganizeButton)
+            pad += 25;
+        window.buttonAutoHide = window.add(
+            new ZeeWindow.ZeeButton(ZeeWindow.ZeeButton.BUTTON_SIZE,ZeeWindow.ZeeButton.TEXT_AUTOHIDEWINDOW,"auto hide"),
+            window.cbtn.c.x - pad,
+            window.cbtn.c.y
+        );
     }
 
     private static void windowFitView(Window window) {
@@ -1115,17 +1140,17 @@ public class ZeeConfig {
         show organize button for duplicate windows
      */
     private static void windowModOrganizeButton(Window window, String windowTitle) {
-        String singleWindows = "Craft,Inventory,Character,Options,Kith & Kin,Equipment";
+        String singleWindows = "Craft,Inventory,Character Sheet,Options,Kith & Kin,Equipment";
         if(!singleWindows.contains(windowTitle)) { // avoid searching multiple Windows
             List<Window> wins= getWindows(windowTitle);
             if (wins.size() > 1) {
                 //add organize button
                 window.add(
-                        new ZeeWindow.ZeeButton(25,
-                                ZeeWindow.ZeeButton.TEXT_ORGANIZEWINDOWS),
-                        window.cbtn.c.x-25,
-                        window.cbtn.c.y
+                    new ZeeWindow.ZeeButton(25,ZeeWindow.ZeeButton.TEXT_ORGANIZEWINDOWS,"organize duplicates"),
+                    window.cbtn.c.x-25,
+                    window.cbtn.c.y
                 );
+                window.hasOrganizeButton = true;
             }
         }
     }
@@ -3158,11 +3183,28 @@ public class ZeeConfig {
 
         Window win = (Window)inv.getparent(Window.class);
 
-        // resize auto hide
-        if (autoHideMainInvWindow && win.isAutoHideOn)
+        // repos auto hiddden window
+        if (autoHideWindows && win.isAutoHideOn)
             win.autoHideToggleWinPos();
+
+        // repos autoHide button
+        if (win.buttonAutoHide != null){
+            int x = win.cbtn.c.x - ZeeWindow.ZeeButton.BUTTON_SIZE;
+            int y = win.cbtn.c.y;
+            win.buttonAutoHide.c = Coord.of(x,y);
+        }
 
         // resize window bg image
         simpleWindowsResize(win);
+    }
+
+    public static void inventoryPreResize(Inventory inv) {
+        Window win = (Window)inv.getparent(Window.class);
+
+        //repos buttons to not influence next inventory window resize
+        win.cbtn.c = Coord.of(0);
+        if (win.buttonAutoHide != null){
+            win.buttonAutoHide.c = Coord.of(0);
+        }
     }
 }

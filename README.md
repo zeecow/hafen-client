@@ -8,6 +8,7 @@ Client focusing on small helper tasks, many using mouse middle button, and other
  - craft window buttons for ingredients and history
  - bigger close buttons
  - button for auto-organizing duplicate windows
+ - button auto-hide windows 
  - simple window and buttons
  - compact equip window
  - auto toggle equip window

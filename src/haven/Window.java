@@ -97,7 +97,7 @@ public class Window extends Widget implements DTarget {
 	this.rbo = rbo;
 	this.mrgn = lg ? dlmrgn : dsmrgn;
 	//cbtn = add(new IButton(cbtni[0], cbtni[1], cbtni[2]));
-	cbtn = add(new Button(25,"x"));//big close button
+	cbtn = add(new ZeeWindow.ZeeButton(ZeeWindow.ZeeButton.BUTTON_SIZE, ZeeWindow.ZeeButton.TEXT_CLOSE));
 	chcap(cap);
 	resize2(sz);
 	this.prevAsz = Coord.of(sz);
@@ -330,7 +330,7 @@ public class Window extends Widget implements DTarget {
 	if(dm != null) {
 	    this.c = this.c.add(c.add(doff.inv()));
 	} else {
-		if (this.isAutoHideOn && ZeeConfig.autoHideMainInvWindow) {
+		if (this.isAutoHideOn && ZeeConfig.autoHideWindows) {
 			if (checkhit(c)){
 				if (this.isAutoHidden)
 					autoHideToggleWinPos();
@@ -344,6 +344,8 @@ public class Window extends Widget implements DTarget {
     }
 
 	boolean isAutoHideOn = false, isAutoHidden =false;
+	boolean hasOrganizeButton = false;
+	public ZeeWindow.ZeeButton buttonAutoHide = null;
 	void autoHideToggleWinPos(){
 		Coord savedWinPos = ZeeConfig.mapWindowPos.get(this.cap.text);
 		if (savedWinPos==null){

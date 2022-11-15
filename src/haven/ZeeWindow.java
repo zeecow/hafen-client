@@ -1,5 +1,7 @@
 package haven;
 
+import java.awt.*;
+
 public class ZeeWindow extends Window {
 
     public ZeeWindow(Coord size, String title) {
@@ -17,11 +19,20 @@ public class ZeeWindow extends Window {
     static class ZeeButton extends Button{
 
         public static final String TEXT_ORGANIZEWINDOWS = "↔";
+        public static final String TEXT_AUTOHIDEWINDOW = "ᐊ";
+        public static final String TEXT_CLOSE = "x";
+        public static final int BUTTON_SIZE = 25;
         String buttonText;
 
         public ZeeButton(int width, String title) {
             super(width,title);
             this.buttonText = title;
+        }
+
+        public ZeeButton(int width, String title, String tooltip) {
+            super(width,title);
+            this.buttonText = title;
+            this.settip(tooltip);
         }
 
         @Override
@@ -33,6 +44,18 @@ public class ZeeWindow extends Window {
                 if(buttonText.equals(TEXT_ORGANIZEWINDOWS)){
                     organizeDuplicateWindows(windowName);
                 }
+                //auto hide window
+                else if (buttonText.contentEquals(TEXT_AUTOHIDEWINDOW)){
+                    Window win = this.getparent(Window.class);
+                    win.isAutoHideOn = !win.isAutoHideOn;
+                    // highlihgt button
+                    if (win.isAutoHideOn)
+                        this.change(TEXT_AUTOHIDEWINDOW, new Color(0,200,0));
+                    else
+                        this.change(TEXT_AUTOHIDEWINDOW);
+                }
+                else
+                    super.wdgmsg(msg,args);
             }
         }
 

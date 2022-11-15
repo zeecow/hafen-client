@@ -148,6 +148,7 @@ public class Inventory extends Widget implements DTarget {
     public void uimsg(String msg, Object... args) {
 	if(msg == "sz") {
 	    isz = (Coord)args[0];
+		ZeeConfig.inventoryPreResize(this);
 	    resize(invsq.sz().add(UI.scale(new Coord(-1, -1))).mul(isz).add(UI.scale(new Coord(1, 1))));
 	    ZeeConfig.inventoryResized(this);
 	} else if(msg == "mode") {
