@@ -26,6 +26,7 @@ public class ZeeConfig {
     public static final String CATEG_RAREFORAGE = "Rare forageables";
     public static final String CATEG_LOCRES = "Localized resources";
     public static final String MAP_GOB_AUDIO = "mapGobSaved";
+    public static final String MAP_GOB_SPEECH = "mapGobSpeech";
     public static final String MAP_ANIMAL_FORMAT = "mapAnimalFormat";
     public static final String MAP_ANIMAL_FORMAT_PIG = "pig";
     public static final String MAP_ANIMAL_FORMAT_HORSE = "horse";
@@ -314,6 +315,7 @@ public class ZeeConfig {
     public static HashMap<String,String> mapGobSession = new HashMap<String,String>();
     public static HashMap<String, Set<String>> mapCategoryGobs = initMapCategoryGobs();//init categs first
     public static HashMap<String,String> mapGobAudio = initMapGobAudio();
+    public static HashMap<String,String> mapGobSpeech = initMapGobSpeech();
     public static HashMap<String,String> mapGobCategory = initMapGobCategory();
     public static HashMap<String,String> mapCategoryAudio = initMapCategoryAudio();
     public static HashMap<String,Integer> mapActionUses = initMapActionUses();
@@ -765,10 +767,13 @@ public class ZeeConfig {
             // user player
             //else gob.addol(new ZeeGobBox(gob,Coord3f.of(12f,12f,0.5f),new Color(192, 0, 0, 128)));
 
-        }else if( (path = mapGobAudio.get(gobName)) != null){
-            //if single gob alert is saved, play alert
+        }
+        //if single gob alert is saved, play alert
+        else if( (path = mapGobAudio.get(gobName)) != null){
             playAudioGobId(path,gobId);
-        }else {
+        }
+        // play category audio if gob applies
+        else {
             //for each category in mapCategoryGobs...
             for (String categ: mapCategoryGobs.keySet()){
                 if(categ==null || categ.isEmpty())
@@ -780,6 +785,12 @@ public class ZeeConfig {
                     playAudioGobId(path,gobId);
                 }
             }
+        }
+
+        // gob text to speech
+        String speech = null;
+        if( (speech = mapGobSpeech.get(gobName)) != null){
+            ZeeSynth.textToSpeakLinuxFestival(speech);
         }
     }
 
@@ -1319,6 +1330,15 @@ public class ZeeConfig {
             return ret;
         }else
             return (HashMap<String, Color>) deserialize(s);
+    }
+
+    @SuppressWarnings("unchecked")
+    public static HashMap<String, String> initMapGobSpeech() {
+        String s = Utils.getpref(MAP_GOB_SPEECH,"");
+        if (s.isEmpty())
+            return new HashMap<String,String> ();
+        else
+            return (HashMap<String, String>) deserialize(s);
     }
 
     @SuppressWarnings("unchecked")

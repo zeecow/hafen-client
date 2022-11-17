@@ -43,6 +43,7 @@ Client focusing on small helper tasks, many using mouse middle button, and other
  - area piler: create piles around selected area (long-midclick item)
  - mining tile counter: long midclick mine ground or tiles to show window
  - main inventory checkboxes for midclick transfer modes: asc, desc, one, ql
+ - gob monitor: highlight, play audio, text to speech (cmd festival)
 
 
  - midclick ground 

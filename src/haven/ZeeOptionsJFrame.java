@@ -17,7 +17,7 @@ public class ZeeOptionsJFrame extends JFrame {
     public JTabbedPane tabbedPane, tabbedPaneGobs;
     public JPanel panelTabAuto, panelTabMisc, panelTabInterface, panelTabGobs, panelTabControls, panelTabMinimap, panelDetailsBottom, panelTabCateg, panelShapeIcons, panelShapeIconsSaveCancel;
     public JCheckBox cbSimpleWindowBorder, cbSimpleWindows, cbShapeIcons, cbDebugCodeRes, cbCattleRosterHeight;
-    public JTextField tfAutoHideWindows, tfConfirmPetal, tfBlockAudioMsgs, tfAutoClickMenu, tfAggroRadiusTiles, tfButchermode, tfGobName, tfAudioPath, tfCategName, tfAudioPathCateg;
+    public JTextField tfAutoHideWindows, tfConfirmPetal, tfBlockAudioMsgs, tfAutoClickMenu, tfAggroRadiusTiles, tfButchermode, tfGobName, tfGobSpeech, tfAudioPath, tfCategName, tfAudioPathCateg;
     public JComboBox<String> cmbCattleRoster, cmbGobCategory, cmbMiniTreeSize, cmbRainLimitPerc, comboShapeIcons;
     public JList<String> listGobsTemp, listGobsSaved, listGobsCategories;
     public JButton btnRefresh, btnPrintState, btnResetGobs, btnAudioSave, btnAudioClear, btnAudioTest, btnRemGobFromCateg, btnGobColorAdd, btnCategoryColorAdd, btnGobColorRemove, btnCategoryColorRemove, btnResetCateg, btnAddCateg, btnRemoveCateg, btnResetWindowsPos, btnResetActionUses, btnSapeIconPreview, btnShapeIconSave, btnSapeIconDelete, btnSolidColorWindow, btnGridGolor;
@@ -565,6 +565,7 @@ public class ZeeOptionsJFrame extends JFrame {
 
 
         //panel gobs main buttons
+        //TODO move buttons up a container
         JPanel panelGobButtons = new JPanel(new FlowLayout());
         panelTabGobSess.add(panelGobButtons, c);
         panelGobButtons.add(btnRefresh = new JButton("refresh"));
@@ -650,6 +651,9 @@ public class ZeeOptionsJFrame extends JFrame {
         if(ZeeConfig.mapGobAudio.size() > 0) {
             set.addAll(ZeeConfig.mapGobAudio.keySet());
         }
+        if(ZeeConfig.mapGobSpeech.size() > 0) {
+            set.addAll(ZeeConfig.mapGobSpeech.keySet());
+        }
         if(ZeeConfig.mapGobCategory.size() > 0) {
             set.addAll(ZeeConfig.mapGobCategory.keySet());
         }
@@ -713,13 +717,20 @@ public class ZeeOptionsJFrame extends JFrame {
 
         panelDetailsBottom.removeAll();
 
-        //gob name
+
+        /*
+            Gob name
+        */
         JPanel panelGobName = new JPanel(new GridBagLayout());
         panelDetailsBottom.add(panelGobName, c);
         panelGobName.setBorder(BorderFactory.createTitledBorder("Gob"));
         panelGobName.add(tfGobName = new JTextField(list.getSelectedValue()), c);
         tfGobName.setMaximumSize(new Dimension(Integer.MAX_VALUE, tfGobName.getPreferredSize().height));
 
+
+        /*
+            Gob audio
+         */
         //audio file name
         JPanel panelGobAudio = new JPanel(new GridBagLayout());
         panelDetailsBottom.add(panelGobAudio, c);
@@ -730,7 +741,6 @@ public class ZeeOptionsJFrame extends JFrame {
             audioPath = "";
         panelGobAudio.add(tfAudioPath = new JTextField(audioPath), c);
         tfAudioPath.setMaximumSize(new Dimension(Integer.MAX_VALUE, tfAudioPath.getPreferredSize().height));
-
         //audio buttons
         JPanel panelAudioButtons;
         panelGobAudio.add(panelAudioButtons = new JPanel(new FlowLayout()), c);
@@ -742,32 +752,35 @@ public class ZeeOptionsJFrame extends JFrame {
         btnAudioTest.addActionListener(evt->{ audioTest(); });
 
 
-        //combo category
-        JPanel panelAddToCategory = new JPanel(new GridBagLayout());
-        panelDetailsBottom.add(panelAddToCategory, c);
-        panelAddToCategory.setBorder(BorderFactory.createTitledBorder("Category"));
-        panelAddToCategory.add(cmbGobCategory = new JComboBox<String>(ZeeConfig.mapCategoryGobs.keySet().toArray(new String[0])), c);
-        cmbGobCategory.setMaximumSize(new Dimension(Integer.MAX_VALUE, cmbGobCategory.getPreferredSize().height));
 
-        //init combo categ state
-        String categ = getCategoryByGobName(tfGobName.getText().strip());
-        if(categ!=null && !categ.isEmpty()) {
-            cmbGobCategory.setSelectedItem(categ);
-        }else {
-            cmbGobCategory.setSelectedIndex(-1);
-        }
+        /*
+            Gob text to speech
+         */
+        //speech file name
+        JPanel panelGobSpeech = new JPanel(new GridBagLayout());
+        panelDetailsBottom.add(panelGobSpeech, c);
+        panelGobSpeech.setBorder(BorderFactory.createTitledBorder("Text to Speech (festival)"));
+        panelGobSpeech.add(Box.createVerticalGlue());
+        String speech = ZeeConfig.mapGobSpeech.get(list.getSelectedValue());
+        if(speech==null)
+            speech = "";
+        panelGobSpeech.add(tfGobSpeech = new JTextField(speech), c);
+        tfGobSpeech.setMaximumSize(new Dimension(Integer.MAX_VALUE, tfGobSpeech.getPreferredSize().height));
+        //speech buttons
+        JPanel panelSpeechButtons;
+        panelGobSpeech.add(panelSpeechButtons = new JPanel(new FlowLayout()), c);
+        JButton btn = (JButton) panelSpeechButtons.add(new JButton("Test"));
+        btn.addActionListener(evt->{ speechTest(); });
+        btn = (JButton) panelSpeechButtons.add(new JButton("Save"));
+        btn.addActionListener(evt->{ speechSave(); });
+        btn = (JButton) panelSpeechButtons.add(new JButton("Clear"));
+        btn.addActionListener(evt->{ speechClear(); });
 
-        // add combo categ event listener
-        cmbGobCategory.addActionListener(evt->{
-            addGobToCategory();
-        });
-
-        //add button remove from categ
-        panelAddToCategory.add(btnRemGobFromCateg = new JButton("Clear"), c);
-        btnRemGobFromCateg.addActionListener(evt->{ removeGobFromCategory(); });
 
 
-        //Color highlight
+        /*
+            Gob color highlight
+        */
         //button
         JPanel panelHighlight = new JPanel(new GridBagLayout());
         panelDetailsBottom.add(panelHighlight, c);
@@ -790,6 +803,34 @@ public class ZeeOptionsJFrame extends JFrame {
         if(currentColor!=null){
             btnGobColorAdd.getParent().setBackground(currentColor);
         }
+
+
+
+        /*
+            Gob category
+         */
+        //combo category
+        JPanel panelAddToCategory = new JPanel(new GridBagLayout());
+        panelDetailsBottom.add(panelAddToCategory, c);
+        panelAddToCategory.setBorder(BorderFactory.createTitledBorder("Category"));
+        panelAddToCategory.add(cmbGobCategory = new JComboBox<String>(ZeeConfig.mapCategoryGobs.keySet().toArray(new String[0])), c);
+        cmbGobCategory.setMaximumSize(new Dimension(Integer.MAX_VALUE, cmbGobCategory.getPreferredSize().height));
+        //init combo categ state
+        String categ = getCategoryByGobName(tfGobName.getText().strip());
+        if(categ!=null && !categ.isEmpty()) {
+            cmbGobCategory.setSelectedItem(categ);
+        }else {
+            cmbGobCategory.setSelectedIndex(-1);
+        }
+        // add combo categ event listener
+        cmbGobCategory.addActionListener(evt->{
+            addGobToCategory();
+        });
+        //add button remove from categ
+        panelAddToCategory.add(btnRemGobFromCateg = new JButton("Clear"), c);
+        btnRemGobFromCateg.addActionListener(evt->{ removeGobFromCategory(); });
+
+
 
         pack();
     }
@@ -1040,6 +1081,62 @@ public class ZeeOptionsJFrame extends JFrame {
         }
     }
 
+
+    private void speechTest() {
+        String speech = tfGobSpeech.getText().strip();
+
+        if(speech.isBlank()){
+            JOptionPane.showMessageDialog(this,"speech text is blank");
+        }else{
+            try{
+                ZeeSynth.textToSpeakLinuxFestival(speech);
+            }catch (Exception e){
+                JOptionPane.showMessageDialog(this,e.getMessage());
+            }
+        }
+    }
+
+    private void speechSave() {
+        String speech = tfGobSpeech.getText().strip();
+
+        if(speech.isBlank()){
+            JOptionPane.showMessageDialog(this,"speech text is blank");
+            return;
+        }
+
+        //save speech for gob
+        ZeeConfig.mapGobSpeech.put(
+            tfGobName.getText().strip(),
+            speech
+        );
+        Utils.setpref(ZeeConfig.MAP_GOB_SPEECH, ZeeConfig.serialize(ZeeConfig.mapGobSpeech));
+
+        if(listGobsSaved!=null) {
+            listGobsSaved.clearSelection();
+            //list.updateUI();
+        }
+        panelDetailsBottom.removeAll();
+        panelTabGobs.validate();
+        buildTabGobs();
+    }
+
+    private void speechClear() {
+        if(JOptionPane.showConfirmDialog(this,"Clear speech settings?") != JOptionPane.OK_OPTION)
+            return;
+
+        //remove gob speech
+        String gobName = tfGobName.getText().strip();
+        if (!ZeeConfig.mapGobSpeech.containsKey(gobName)){
+            JOptionPane.showMessageDialog(this,"Gob has no speech set");
+            return;
+        }
+        ZeeConfig.mapGobSpeech.remove(gobName);
+        Utils.setpref(ZeeConfig.MAP_GOB_SPEECH, ZeeConfig.serialize(ZeeConfig.mapGobSpeech));
+
+        panelDetailsBottom.removeAll();
+        panelTabGobs.validate();
+        buildTabGobs();
+    }
 
     private void audioTest() {
         String path;

@@ -6,8 +6,8 @@ import javax.sound.midi.Synthesizer;
 import javax.sound.sampled.*;
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -38,33 +38,57 @@ public class ZeeSynth extends Thread{
         this.filePath = filePath;
     }
 
-    public static int textToSpeakLinuxFestival(String text) {
+    static boolean speechBusy = false;
+    static String speechLast = "";
+    static long speechLastMs = 0;
+    static List<String> speechQueue = new ArrayList<>();
+    public static void textToSpeakLinuxFestival(String text) {
 
-        String lettersNumsSpaceOnly = text.replaceAll("[^a-zA-Z0-9\\s]","");
-        ZeeConfig.println("text = "+lettersNumsSpaceOnly);
-
-        try {
-            String cmd = "echo "+lettersNumsSpaceOnly+" | festival --tts";
-            final Process p = Runtime.getRuntime().exec(new String[]{"bash", "-l", "-c", cmd});
-            new Thread(new Runnable() {
-                public void run() {
-                    BufferedReader input = new BufferedReader(new InputStreamReader(p.getInputStream()));
-                    String line = null;
-
-                    try {
-                        while ((line = input.readLine()) != null)
-                            System.out.println(line);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }).start();
-            return p.waitFor();
-        } catch (Exception e) {
-            e.printStackTrace();
+        // spam control
+        if (speechBusy){
+            // queue text if not already queued
+            if (!speechQueue.contains(text)) {
+                //ZeeConfig.println("speech queue > add "+speechQueue.size()+": " + text);
+                speechQueue.add(text);
+            }
+            return;
+        }
+        // allow repeated texts if more than X ms elapsed
+        else if (speechLast.contentEquals(text) && speechLastMs>0 && ZeeThread.now()-speechLastMs < 2000) {
+            return;
+        }
+        // text queued successfully
+        else {
+            //ZeeConfig.println("speech queue > add 1: " + text);
+            speechQueue.add(text);
         }
 
-        return 0;
+        // start speaking from queue
+        speechBusy = true;
+        new Thread(() -> {
+            try {
+                while (speechQueue.size() > 0) {
+                    String lettersNumsSpaceOnly = speechQueue.get(0).replaceAll("[^a-zA-Z0-9\\s,.!?\\-]", "");
+                    ZeeConfig.println("speaking: " + lettersNumsSpaceOnly);
+                    String cmd = "echo " + lettersNumsSpaceOnly + " | festival --tts";
+                    final Process p = Runtime.getRuntime().exec(new String[]{"bash", "-l", "-c", cmd});
+                    BufferedReader input = new BufferedReader(new InputStreamReader(p.getInputStream()));
+                    String line = null;
+                    while ((line = input.readLine()) != null)
+                        System.out.println(line);
+                    //wait command finish
+                    p.waitFor();
+                    //set flags after command finished
+                    speechLast = speechQueue.remove(0);
+                    speechLastMs = ZeeThread.now();
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            speechQueue.clear();
+            speechLast = "";
+            speechBusy = false;
+        }).start();
     }
 
     private void player(){
