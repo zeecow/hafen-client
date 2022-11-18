@@ -27,8 +27,6 @@
 package haven;
 
 import static java.lang.Math.PI;
-import java.awt.Graphics;
-import java.awt.image.BufferedImage;
 
 public class Cal extends Widget {
     public static final double hbr = UI.scale(20.0);
@@ -87,7 +85,9 @@ public class Cal extends Widget {
     public Object tooltip(Coord c, Widget prev) {
 	if(checkhit(c)) {
 	    Astronomy a = ui.sess.glob.ast;
-	    return(String.format("%s day of the %s month of the %s year", ord((int)Math.floor(a.md) + 1), ord((int)Math.floor(a.ym) + 1), ord((int)Math.floor(a.years) + 1)));
+		String cal = String.format("%s day of the %s month of the %s year", ord((int)Math.floor(a.md) + 1), ord((int)Math.floor(a.ym) + 1), ord((int)Math.floor(a.years) + 1));
+		String season = String.format("%s, day %d of %d", a.season(), a.scday + 1, a.season().length);
+		return(RichText.render(season + "\n" + cal, UI.scale(250)));
 	}
 	return(super.tooltip(c, prev));
     }

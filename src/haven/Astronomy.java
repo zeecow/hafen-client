@@ -26,7 +26,7 @@
 
 package haven;
 
-import java.awt.Color;
+import java.awt.*;
 
 public class Astronomy {
     public final double dt, mp, yt, sp, sd;
@@ -34,6 +34,7 @@ public class Astronomy {
     public final boolean night;
     public final Color mc;
     public final int is;
+	public final int scday;
 	
     public Astronomy(double dt, double mp, double yt, boolean night, Color mc, int is, double sp, double sd, double years, double ym, double md) {
 	this.dt = dt;
@@ -47,5 +48,18 @@ public class Astronomy {
 	this.years = years;
 	this.ym = ym;
 	this.md = md;
-    }
+	scday = (int) (season().length * sp);
+	}
+
+	public Season season() { return Season.values()[is]; }
+
+	enum Season {
+		Spring(30), Summer(105), Autumn(30), Winter(15);
+
+		public final int length;
+
+		Season(int length) {
+			this.length = length;
+		}
+	}
 }
