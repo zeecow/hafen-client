@@ -2,6 +2,8 @@
 /* $use: lib/globfx */
 /* $use: lib/env */
 
+package haven.res.gfx.fx.ismoke;
+
 import haven.*;
 import haven.render.*;
 import haven.render.sl.*;
@@ -13,8 +15,9 @@ import static haven.render.sl.Cons.*;
 import static haven.render.sl.Type.*;
 
 /* >spr: ISmoke */
-@haven.FromResource(name = "gfx/fx/ismoke", version = 104)
-public class ISmoke extends Sprite implements Rendered, Sprite.CDel {
+/* >rlink: ISmoke */
+@haven.FromResource(name = "gfx/fx/ismoke", version = 105)
+public class ISmoke extends Sprite implements Rendered, Sprite.CDel, TickList.TickNode, TickList.Ticking {
     static final VertexArray.Layout fmt =
 	new VertexArray.Layout(new VertexArray.Layout.Input(Homo3D.vertex,     new VectorFormat(3, NumberFormat.FLOAT32), 0,  0, 20),
 			       new VertexArray.Layout.Input(Homo3D.normal,     new VectorFormat(3, NumberFormat.SNORM8),  0, 12, 20),
@@ -28,7 +31,8 @@ public class ISmoke extends Sprite implements Rendered, Sprite.CDel {
     final Color col;
     final float sz, den, fadepow, initzv, life, srad;
     final List<RenderTree.Slot> slots = new ArrayList<>(1);
-    boolean spawn = !ZeeConfig.hideFxSmoke;
+    final Gob gob = (owner instanceof Gob) ? (Gob)owner : owner.context(Gob.class);
+    boolean spawn = !ZeeConfig.hideFxSmoke;;
 
     public ISmoke(Owner owner, Resource res, Message sdt) {
 	super(owner, res);
@@ -48,10 +52,32 @@ public class ISmoke extends Sprite implements Rendered, Sprite.CDel {
 	srad = sdt.uint8() / 10.0f;
     }
 
+    public ISmoke(Owner owner, Resource res, Object... args) {
+	super(owner, res);
+	new Throwable().printStackTrace();
+	int a = 0;
+	String fl = (String)args[a++];
+	mat = ((fl.indexOf('o') >= 0) ? res : Resource.classres(ISmoke.class)).layer(Material.Res.class, (Integer)args[a++]).get();
+	sz = ((Number)args[a++]).floatValue();
+	String locn = (String)args[a++];
+	if(locn.equals(""))
+	    loc = null;
+	else
+	    loc = owner.getres().layer(Skeleton.BoneOffset.class, locn).forpose(null).get();
+	col = (Color)args[a++];
+	den = ((Number)args[a++]).floatValue();
+	fadepow = ((Number)args[a++]).floatValue();
+	life = ((Number)args[a++]).floatValue();
+	float h = ((Number)args[a++]).floatValue();
+	initzv = h / life;
+	srad = ((Number)args[a++]).floatValue();
+    }
+
     float de = 0;
     public boolean tick(double ddt) {
-	if (!spawn)
-		return false;
+	return(!spawn && bollar.isEmpty());
+    }
+    public void autotick(double ddt) {
 	float dt = (float)ddt;
 	de += dt;
 	while(spawn && (de > 0.1)) {
@@ -60,19 +86,17 @@ public class ISmoke extends Sprite implements Rendered, Sprite.CDel {
 	    for(int i = 0; i < n; i++)
 		bollar.add(new Boll(Coord3f.o.sadd(0, rnd.nextFloat() * (float)Math.PI * 2, (float)Math.sqrt(rnd.nextFloat()) * srad)));
 	}
-	Coord3f nv = Environ.get(((Gob)owner).glob).wind().mul(0.4f);
-	nv = nv.rot(Coord3f.zu, (float)((Gob)owner).a);
+	Coord3f nv = Environ.get(gob.glob).wind().mul(0.4f);
+	nv = nv.rot(Coord3f.zu, (float)gob.a);
 	for(Iterator<Boll> i = bollar.iterator(); i.hasNext();) {
 	    Boll boll = i.next();
 	    if(boll.tick(dt, nv))
 		i.remove();
 	}
-	return(!spawn && bollar.isEmpty());
     }
+    public TickList.Ticking ticker() {return(this);}
 
-    public void gtick(Render g) {
-	if (!spawn)
-		return;
+    public void autogtick(Render g) {
 	updpos(g);
     }
 
