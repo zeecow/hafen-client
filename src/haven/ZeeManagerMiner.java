@@ -570,7 +570,9 @@ public class ZeeManagerMiner extends ZeeThread{
     static Coord tilemonCurPlayerTile, tilemonLastWindowRefreshPlayerTile, tilemonLastPreciousCoord;
     static String[] tilemonSearchNames = new String[]{};
     public static void tileMonitorWindow() {
+
         if (tilemonWindow == null){
+
             //window
             tilemonWindow = ZeeConfig.gameUI.add(new ZeeWindow(Coord.of(200,400),"Tiles"){
                 public void wdgmsg(String msg, Object... args) {
@@ -580,6 +582,7 @@ public class ZeeManagerMiner extends ZeeThread{
                     //super.wdgmsg(msg, args);
                 }
             },300,300);
+
             //button refresh
             tilemonWindow.add(new Button(UI.scale(60),"refresh"){
                 public void wdgmsg(String msg, Object... args) {
@@ -588,6 +591,7 @@ public class ZeeManagerMiner extends ZeeThread{
                     }
                 }
             });
+
             //checkbox auto refresh
             tilemonAutoCheckbox = tilemonWindow.add(new CheckBox("auto"){
                 public void set(boolean val) {
@@ -603,18 +607,17 @@ public class ZeeManagerMiner extends ZeeThread{
                                         sleep(5000);
                                         if (ZeeConfig.getPlayerGob() == null)// player not loaded
                                             continue;
-                                        tilemonCurPlayerTile = ZeeConfig.getPlayerTile();
-                                        //refresh tiles window if player coord changed by 88 tiles
-                                        if(ZeeConfig.tileCoordsChangedBy(tilemonLastWindowRefreshPlayerTile,tilemonCurPlayerTile,88) )
-                                        {
-                                            println("calling auto refresh last="+ tilemonLastWindowRefreshPlayerTile +"  cur="+tilemonCurPlayerTile);
+                                        if (tilemonAutoRefresh)
                                             tilesWindowRefresh();
-                                            tilemonLastWindowRefreshPlayerTile = tilemonCurPlayerTile;
-                                        }
                                     } catch (InterruptedException e) {
-                                        //e.printStackTrace();
+                                        //unchecked autorefresh
                                         tilemonAutoRefresh = false;
-                                        if (tilemonAutoCheckbox !=null)
+                                        if (tilemonAutoCheckbox != null)
+                                            tilemonAutoCheckbox.set(false);
+                                    } catch (Exception e){
+                                        e.printStackTrace();
+                                        tilemonAutoRefresh = false;
+                                        if (tilemonAutoCheckbox != null)
                                             tilemonAutoCheckbox.set(false);
                                     }
                                 }
@@ -627,6 +630,7 @@ public class ZeeManagerMiner extends ZeeThread{
                     }
                 }
             },63,6);
+
             //wishlist search box
             tilemonLabelFindTile = tilemonWindow.add(new Label("Find"),0,33);
             TextEntry te = tilemonWindow.add(new TextEntry(UI.scale(80),""){
@@ -647,9 +651,11 @@ public class ZeeManagerMiner extends ZeeThread{
         else{
             tilemonWindow.show();
         }
+
         tilesWindowRefresh();//on window create
     }
 
+    static long msLastTileMsg=0, msLastSilverMsg=0, msLastGoldMsg=0;
     private static void tilesWindowRefresh() {
         Glob g = ZeeConfig.gameUI.map.glob;
         Gob player = ZeeConfig.gameUI.map.player();
@@ -683,7 +689,7 @@ public class ZeeManagerMiner extends ZeeThread{
         //sorted list
         SortedSet<String> tiles = new TreeSet<String>(mapTileresCount.keySet());
         //create new labels
-        int y = 50;
+        int y = 55;
         Label label;
         String basename;
         List<String> silverList = List.of("galena","argentite","hornsilver");
@@ -693,8 +699,13 @@ public class ZeeManagerMiner extends ZeeThread{
             // find list
             if (tilemonSearchNames.length>0 && List.of(tilemonSearchNames).contains(basename)){
                 label.setcolor(Color.green);
-                label.settext(label.texts+"  (found)");
-                ZeeConfig.msg("Found "+basename);
+                label.settext(label.texts + "  (found)");
+                // 5min limit, TODO better way
+                if(ZeeThread.now() - msLastTileMsg > 1000*60*5) {
+                    msLastTileMsg = ZeeThread.now();
+                    ZeeConfig.msg("Found " + basename);
+                    ZeeSynth.textToSpeakLinuxFestival("Tile found");
+                }
             }
             // label ore
             else if (isStoneOre(basename)) {
@@ -706,15 +717,24 @@ public class ZeeManagerMiner extends ZeeThread{
                 // label color
                 label.setcolor(Color.red);
                 // label text
-                if (silverList.contains(label.texts))
-                    label.settext(label.texts+"  (silver)");
-                else
-                    label.settext(label.texts+"  (gold)");
-                //alert precious ore if player tiles changed by  x
-                ZeeConfig.msg("Precious ore detected!");
+                if (silverList.contains(label.texts)) {
+                    label.settext(label.texts + "  (silver)");
+                    // 5min limit, TODO find better way
+                    if(ZeeThread.now() - msLastSilverMsg > 1000*60*5) {
+                        ZeeConfig.msg("Silver ore found");
+                        ZeeSynth.textToSpeakLinuxFestival("Silver ore found");
+                    }
+                }else {
+                    label.settext(label.texts + "  (gold)");
+                    // 5min limit, TODO better way
+                    if(ZeeThread.now() - msLastGoldMsg > 1000*60*5) {
+                        ZeeConfig.msg("Gold ore found");
+                        ZeeSynth.textToSpeakLinuxFestival("Gold ore found");
+                    }
+                }
             }
             tilemonWindow.add(label,0,y);
-            y += 17;
+            y += 13;
         }
         tilemonWindow.pack();
     }
