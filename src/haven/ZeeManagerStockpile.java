@@ -664,7 +664,10 @@ public class ZeeManagerStockpile extends ZeeThread{
                                 println("no more inventory items to pile");
                                 continue;
                             }
-                            ZeeManagerItemClick.pickUpItem(items.get(0));
+                            if (!ZeeManagerItemClick.pickUpItem(items.get(0))){
+                                println("couldnt pickup item ..... 123");
+                                continue;
+                            }
                         }
 
                         // use latest pile
@@ -678,7 +681,6 @@ public class ZeeManagerStockpile extends ZeeThread{
                                 if (latestPile!=null)
                                     ZeeConfig.removeGobText(latestPile);
                                 latestPile = null;
-                                //continue;
                             }
                         }
                         //new pile
@@ -786,6 +788,7 @@ public class ZeeManagerStockpile extends ZeeThread{
         }while (!borderTiles.isEmpty());
     }
 
+    // FIXME second line of piles should not be parallel, but perpendicular
     static List<Coord> getPilesTiles(Coord olStart, Coord olEnd) {
         List<Coord> listRowTiles = new ArrayList<>();
         int minX,maxX,minY,maxY;
