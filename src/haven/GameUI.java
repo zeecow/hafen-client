@@ -1179,7 +1179,6 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Message
 	} else if(msg == "msg") {
 	    String text = (String)args[0];
 	    msg(text);
-		ZeeConfig.checkUiMsg(text);
 	} else if(msg == "prog") {
 	    if(args.length > 0) {
 		double p = ((Number)args[0]).doubleValue() / 100.0;
@@ -1519,6 +1518,7 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Message
 	msgtime = Utils.rtime();
 	lastmsg = msgfoundry.render(msg, color);
 	syslog.append(msg, logcol);
+	ZeeConfig.checkUiMsg(msg);
     }
 
     public void msg(String msg, Color color) {

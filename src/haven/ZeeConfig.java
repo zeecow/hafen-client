@@ -203,7 +203,7 @@ public class ZeeConfig {
     public static boolean isThinClient = false;
     public static boolean isRainLimited = Utils.getprefb("isRainLimited", false);
     public static Integer rainLimitPerc = Utils.getprefi("rainLimitPerc", 25);
-    public static boolean showGrowingTreePercentage = Utils.getprefb("showGrowingTreePercentage", true);
+    public static boolean showGrowingTreeScale = Utils.getprefb("showGrowingTreeScale", true);
     public static boolean treeAnimation = Utils.getprefb("treeAnimation", false);
     public static boolean keyBeltShiftTab = Utils.getprefb("keyBeltShiftTab", true);
     public static boolean keyCamSwitchShiftC = Utils.getprefb("keyCamSwitchShiftC", true);
@@ -227,6 +227,7 @@ public class ZeeConfig {
     public static boolean sortActionsByUses = Utils.getprefb("sortActionsByUses", true);
     public static boolean rememberWindowsPos = Utils.getprefb("rememberWindowsPos", true);
     public static boolean showInspectTooltip = false;
+    public static boolean isPlayerFeasting = false;
     public static boolean simpleWindows = Utils.getprefb("simpleWindows", true);
     public static int simpleWindowColorInt = Utils.getprefi("simpleWindowColorInt",ZeeConfig.colorToInt(DEF_SIMPLE_WINDOW_COLOR));
     public static boolean simpleWindowBorder = Utils.getprefb("simpleWindowBorder", true);
@@ -355,7 +356,7 @@ public class ZeeConfig {
     }
 
     public static MixColor getHighlightDrawableColor(Gob gob) {
-        if(gob==null)
+        if(gob==null || gob.getres()==null)
             return null;
 
         String gobName;
@@ -1949,18 +1950,30 @@ public class ZeeConfig {
      */
     public static void checkUiMsg(String text) {
         lastUIMsgMs = now = System.currentTimeMillis();
+
+        // inspect quality msg may come in two sequential lines/calls
         if(now - lastUiQualityMsgMs > 555) { //new message
             lastUiQualityMsgMs = now;
             uiMsgTextQuality = "";
             uiMsgTextBuffer = "";
         }
+        // add gob text ql
         if (text.contains("Quality")) {
             uiMsgTextQuality = text;
-            String ql = uiMsgTextQuality.replaceAll("[^0-9]", "");
+            String ql = uiMsgTextQuality.replaceAll("Quality: ","");
+            if (ql.contains("grown"))
+                ql = ql.replaceAll(",","q").replaceAll(" grown","");
             ZeeConfig.addGobText(ZeeConfig.lastMapViewClickGob, ql, 0,255,0,255,0);
-        }else if(uiMsgTextQuality!=null && !uiMsgTextQuality.isEmpty() && !text.contains("Memories")){
+        }
+        // show two line ql msg in one single line
+        else if(uiMsgTextQuality!=null && !uiMsgTextQuality.isEmpty() && !text.contains("Memories")){
             uiMsgTextBuffer += ", " + text;
             gameUI.msg(uiMsgTextQuality + uiMsgTextBuffer);
+        }
+
+        // feasting msg
+        if (isPlayerFeasting && text.startsWith("You gained ")){
+            ZeeManagerCook.feastingMsgStatGained(text);
         }
     }
 
@@ -2009,6 +2022,7 @@ public class ZeeConfig {
         ZeeManagerItemClick.invBelt = null;
         ZeeManagerItemClick.equipory = null;
         ZeeManagerStockpile.windowManager = null;
+        ZeeManagerCook.windowFeasting = null;
         ZeeManagerMiner.tunnelHelperWindow = null;
         ZeeManagerMiner.tilesMonitorCleanup();
         ZeeHistWdg.listHistButtons.clear();
@@ -2933,6 +2947,11 @@ public class ZeeConfig {
         showInspectTooltip = curs.contentEquals(CURSOR_INSPECT);
         if (!showInspectTooltip)
             gameUI.map.ttip = null;
+
+        //feast window
+        isPlayerFeasting = curs.contentEquals(CURSOR_EAT);
+        if(!isPlayerFeasting)
+            ZeeManagerCook.windowFeasting = null;
     }
 
     static long lastIconNotifySaveMs = ZeeThread.now();

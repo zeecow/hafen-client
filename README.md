@@ -44,7 +44,7 @@ Client focusing on small helper tasks, many using mouse middle button, and other
  - mining tile counter: long midclick mine ground or tiles to show window
  - main inventory checkboxes for midclick transfer modes: asc, desc, one, ql
  - gob monitor: highlight, play audio, text to speech (cmd festival)
-
+ - Feasting log window, count gains
 
  - midclick ground 
    - while holding item will move to location (simulates ctrl+click)

@@ -280,7 +280,7 @@ public class ZeeOptionsJFrame extends JFrame {
 
         panelTabMisc.add(new ZeeOptionJCheckBox( "Highlight crops ready", "highlightCropsReady"),c);
 
-        panelTabMisc.add(new ZeeOptionJCheckBox( "Show growing tree %", "showGrowingTreePercentage"),c);
+        panelTabMisc.add(new ZeeOptionJCheckBox( "Show growing tree scale", "showGrowingTreeScale"),c);
 
         panelTabMisc.add(new ZeeOptionJCheckBox( "Show tree animation", "treeAnimation"),c);
 

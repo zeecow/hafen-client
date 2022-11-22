@@ -1,5 +1,6 @@
 package haven;
 
+import java.awt.*;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -160,5 +161,55 @@ public class ZeeManagerCook extends ZeeThread{
             ZeeConfig.removeGobText(gobBarrel);
         if (gobsContainers.size()>0)
             gobsContainers.forEach(ZeeConfig::removeGobText);
+    }
+
+    static Window windowFeasting;
+    public static void feastingMsgStatGained(String msg) {
+
+        if (windowFeasting==null){
+            windowFeasting = new ZeeWindow(Coord.of(120,100),"Feasting Log");
+            ZeeConfig.gameUI.add(windowFeasting,300,300);
+            windowFeasting.add(new Label(" * * * * your noms * * * * "),0,0);
+        }
+
+        //stat name
+        String newStatName = msg.replaceAll("You gained ","").replaceAll("\\s\\+\\d.*$","").strip();
+
+        //stat gain
+        int newStatNum = Integer.parseInt(msg.replaceAll("[^\\d]+","").strip());
+
+        //println("name: "+newStatName+" , num: "+newStatNum);
+
+        //update existing stat label
+        int y = 0;
+        boolean labelExists = false;
+        for (Label label : windowFeasting.children(Label.class)) {
+            y += 13;
+            if (label.texts.contains("your noms"))
+                continue;
+            // update label color and text
+            if (label.texts.startsWith(newStatName)){
+                labelExists = true;
+                label.setcolor(Color.green);
+                int labelNum = Integer.parseInt(label.texts.replaceAll("[^\\d]+","").strip());
+                label.settext(newStatName+" +"+(labelNum+newStatNum));
+            }
+            // restore label color
+            else {
+                label.setcolor(Color.white);
+            }
+        }
+
+        //create new stat label
+        if (!labelExists){
+            windowFeasting.add(new Label(newStatName+" +"+newStatNum),0,y);
+            y += 13;
+        }
+
+        windowFeasting.pack();
+    }
+
+    public static void println(String s) {
+        System.out.println(s);
     }
 }

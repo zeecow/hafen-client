@@ -110,8 +110,9 @@ public class Tree extends Sprite {
 			gob.setattr(new TreeScale(gob, fscale));
 		}
 
-		if (fscale!=1.0f && ZeeConfig.showGrowingTreePercentage)
-			ZeeConfig.addGobText(gob,(String.format("%.0f",fscale*100)+"%"));
+		//TODO figure out tree growth from scale, if possible
+		if (fscale!=1.0f && ZeeConfig.showGrowingTreeScale)
+			ZeeConfig.addGobText(gob, String.valueOf(fscale).replaceAll("0.","."));
 	}
 	parts = mkparts(res, s, fl);
 	sel = s;
