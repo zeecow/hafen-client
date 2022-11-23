@@ -26,10 +26,10 @@
 
 package haven;
 
-import java.util.*;
-import java.awt.Font;
-import java.awt.Color;
+import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.util.List;
+import java.util.*;
 
 import static haven.Inventory.invsq;
 
@@ -144,11 +144,36 @@ public class Makewindow extends Widget {
     public Makewindow(String rcpnm) {
 	add(new Label("Input:"), new Coord(0, UI.scale(8)));
 	add(new Label("Result:"), new Coord(0, outy + UI.scale(8)));
+		add(ZeeConfig.btnMkWndSearchInput = new Button(UI.scale(85), "Search"), UI.scale(new Coord(360, 0))).action(() -> wdgmsg("mkWindowFindInputs", 0));
 	add(new Button(UI.scale(85), "Craft"), UI.scale(new Coord(265, 75))).action(() -> wdgmsg("make", 0)).setgkey(kb_make);
 	add(new Button(UI.scale(85), "Craft All"), UI.scale(new Coord(360, 75))).action(() -> wdgmsg("make", 1)).setgkey(kb_makeall);
 	pack();
 	this.rcpnm = rcpnm;
+	ZeeConfig.makeWindow = this;
+	ZeeConfig.actionUsed(rcpnm);
     }
+
+	int inputCount = 0;
+	public void wdgmsg(Widget sender, String msg, Object... args) {
+		if(msg.contentEquals("mkWindowFindInputs")){
+    		String nextInputName = ZeeManagerItemClick.getItemInfoName(inputs.get(inputCount).spec.info());
+			ZeeConfig.searchNextInputMakeWnd(nextInputName);
+			inputCount++;
+			if(inputCount >= inputs.size())
+				inputCount = 0;
+			ZeeConfig.btnMkWndSearchInput.change("Search "+(inputCount+1)+"/"+inputs.size());
+		} else if(msg.contentEquals("close")) {
+			if (ZeeManagerCook.pepperRecipeOpen) {
+				ZeeManagerCook.pepperRecipeOpen = false;
+				ZeeManagerCook.exitManager("craft window closed");
+			}
+			super.wdgmsg(sender, msg, args);
+		} else {
+			if (msg.contentEquals("make") && String.valueOf(args[0]).contentEquals("0"))
+				ZeeResearch.checkResearch(this.rcpnm);
+			super.wdgmsg(sender, msg, args);
+		}
+	}
 
     public void uimsg(String msg, Object... args) {
 	if(msg == "inpop") {
@@ -182,6 +207,8 @@ public class Makewindow extends Widget {
 			this.inputs = wdgs;
 		    }
 		}, null);
+		if(ZeeConfig.btnMkWndSearchInput != null)
+			ZeeConfig.btnMkWndSearchInput.change("Search "+1+"/"+inputs.size());
 	} else if(msg == "opop") {
 	    List<Spec> outputs = new ArrayList<Spec>();
 	    for(int i = 0; i < args.length;) {
@@ -348,6 +375,7 @@ public class Makewindow extends Widget {
     }
 
     public void draw(GOut g) {
+	double product = 1.0;
 	int x = 0;
 	if(!qmod.isEmpty()) {
 	    g.aimage(qmodl.tex(), new Coord(x, qmy + (qmodsz.y / 2)), 0, 0.5);
@@ -359,9 +387,20 @@ public class Makewindow extends Widget {
 		    Tex t = qmicon(qm);
 		    g.image(t, new Coord(x, qmy));
 		    x += t.sz().x + UI.scale(1);
+
+			//add stat(s) label(s)
+			x += 3;
+			Glob.CAttr stat = getparent(GameUI.class).chrwdg.findattr(qm.get().basename());
+			x += ZeeConfig.drawText(""+stat.comp, g, new Coord(x,qmy+5));
+			x += 7;
+			product = product * stat.comp;
 		} catch(Loading l) {
 		}
 	    }
+		//add softcap label
+		double softcap = Math.pow(product, 1.0 / qmod.size());//qmod is the list of stats used by item
+		x += 15;
+		x += ZeeConfig.drawText("Softcap:  "+(int)softcap, g, new Coord(x,qmy+5));
 	    x += UI.scale(25);
 	}
 	if(!tools.isEmpty()) {

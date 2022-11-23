@@ -70,9 +70,6 @@ public class MenuGrid extends Widget implements KeyBinding.Bindable {
 
 	public Interaction(int btn, int modflags) {
 	    this(btn, modflags, null, null);
-		if(btn==1){
-			ZeeConfig.isCraftHistoryNavigation = false;
-		}
 	}
 
 	public Interaction() {
@@ -614,11 +611,4 @@ public class MenuGrid extends Widget implements KeyBinding.Bindable {
 	PagButton h = bhit(cc);
 	return((h == null) ? null : h.bind);
     }
-
-	@Override
-	public void wdgmsg(String msg, Object... args) {
-		if (msg.contentEquals("act") && args[0].toString().contentEquals("craft"))
-			ZeeConfig.craftHistoryAdd(msg,args);
-		super.wdgmsg(msg, args);
-	}
 }

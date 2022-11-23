@@ -28,11 +28,11 @@ package haven;
 
 import haven.render.*;
 
-public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, EquipTarget, Skeleton.HasPose {
 import java.util.*;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
-public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Skeleton.HasPose {
+public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, EquipTarget, Skeleton.HasPose {
     public Coord2d rc;
     public double a;
     public boolean virtual = false;
