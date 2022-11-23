@@ -1565,7 +1565,7 @@ public class ZeeManagerGobClick extends ZeeThread{
                 +"/trough,curdingtub,/plow,/barrel,/still,log,/oldtrunk,chest,/anvil,"
                 +"/cupboard,/studydesk,/demijohn,/quern,/wreckingball-fold,/loom,/swheel,"
                 +"/ttub,/cheeserack,/archerytarget,/dreca,/glasspaneframe,/runestone,"
-                +"/crate,/foodtrough";
+                +"/foodtrough,woodbox,casket,basket,crate,chest";
         return isGobInListEndsWith(gobName,endList);
     }
 

@@ -1880,12 +1880,15 @@ public class ZeeConfig {
 
     public static boolean isWindowContainer(Window window) {
         String[] containers = (
-                "Knarr,Snekkja,Wagon,Cupboard,Chest,Table,Crate,Saddlebags,Basket,Box,"
-                        +"Furnace,Smelter,Desk,Trunk,Shed,Coffer,Packrack,Strongbox,Stockpile,"
-                        +"Tub,Compost Bin,Extraction Press,Rack,Herbalist Table,Frame,"
-                        +"Chicken Coop,Rabbit Hutch,Archery Target,Creel,Oven,Steel crucible,"
-                        +"Cauldron,Pane mold,Kiln,Old Trunk,Old Stump,Smoke shed,Finery Forge,"
-                        +"Steelbox,Metal Cabinet,Tidepool,Quiver,Fireplace"
+                //boxes
+                "Woodbox,Cupboard,Chest,Crate,Basket,Casket,Box,Coffer,Steelbox,Metal Cabinet,"
+                //misc
+                +"Knarr,Snekkja,Wagon,Table,Saddlebags,Basket,"
+                +"Furnace,Smelter,Desk,Trunk,Shed,Packrack,Strongbox,Stockpile,"
+                +"Tub,Compost Bin,Extraction Press,Rack,Herbalist Table,Frame,"
+                +"Chicken Coop,Rabbit Hutch,Archery Target,Creel,Oven,Steel crucible,"
+                +"Cauldron,Pane mold,Kiln,Old Trunk,Old Stump,Smoke shed,Finery Forge,"
+                +"Tidepool,Quiver,Fireplace"
         ).split(",");
         for (String contName: containers) {
             if (window.cap.text.contains(contName)) {
