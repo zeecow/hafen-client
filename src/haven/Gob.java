@@ -28,6 +28,7 @@ package haven;
 
 import haven.render.*;
 
+public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, EquipTarget, Skeleton.HasPose {
 import java.util.*;
 import java.util.function.Consumer;
 
@@ -83,7 +84,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Sk
 		this.spr = spr;
 	}
 
-		private void init() {
+	private void init() {
 	    if(spr == null) {
 		spr = Sprite.create(gob, res.get(), sdt);
 		if(added && (spr instanceof SetupMod))
@@ -343,7 +344,16 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Sk
 	setattr(attrclass(c), null);
     }
 
-    public void draw(GOut g) {}
+    public Supplier<? extends Pipe.Op> eqpoint(String nm, Message dat) {
+	for(GAttrib attr : this.attr.values()) {
+	    if(attr instanceof EquipTarget) {
+		Supplier<? extends Pipe.Op> ret = ((EquipTarget)attr).eqpoint(nm, dat);
+		if(ret != null)
+		    return(ret);
+	    }
+	}
+	return(null);
+    }
 
     public static class GobClick extends Clickable {
 	public final Gob gob;

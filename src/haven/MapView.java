@@ -57,7 +57,7 @@ public class MapView extends PView implements DTarget, Console.Directory {
     private Coord3f camoff = new Coord3f(Coord3f.o);
     public double shake = 0.0;
     public static double plobpgran = Utils.getprefd("plobpgran", 8);
-    public static double plobagran = Utils.getprefd("plobagran", 16);
+    public static double plobagran = Utils.getprefd("plobagran", 12);
     private static final Map<String, Class<? extends Camera>> camtypes = new HashMap<String, Class<? extends Camera>>();
 	String ttip = null;
 	long ttipGobId = -1;
@@ -1794,14 +1794,13 @@ public class MapView extends PView implements DTarget, Console.Directory {
 
     public static class StdPlace implements PlobAdjust {
 	boolean freerot = false;
-	Coord2d gran = (plobpgran == 0) ? null : new Coord2d(1.0 / plobpgran, 1.0 / plobpgran).mul(tilesz);
 
 	public void adjust(Plob plob, Coord pc, Coord2d mc, int modflags) {
 	    Coord2d nc;
 	    if((modflags & UI.MOD_SHIFT) == 0 && !ZeeConfig.freeGobPlacement)
 		nc = mc.floor(tilesz).mul(tilesz).add(tilesz.div(2));
-	    else if(gran != null)
-		nc = mc.add(gran.div(2)).floor(gran).mul(gran);
+	    else if(plobpgran > 0)
+		nc = mc.div(tilesz).mul(plobpgran).roundf().div(plobpgran).mul(tilesz);
 	    else
 		nc = mc;
 	    Gob pl = plob.mv().player();
