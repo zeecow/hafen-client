@@ -39,7 +39,7 @@ Client focusing on small helper tasks, many using mouse middle button, and other
  - midclick mark expands minimap, center mark, highlight mark
  - new mark zooms map for precision 
  - Lag Camera (:cam lag)
- - ctrl+q pickup gob window
+ - "ctrl+q" show window pickup gobs ("q" pick closest, "shift+q" pick all similar)
  - area piler: create piles around selected area (long-midclick item)
  - mining tile counter: long midclick mine ground or tiles to show window
  - main inventory checkboxes for midclick transfer modes: asc, desc, one, ql

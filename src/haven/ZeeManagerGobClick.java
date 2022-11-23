@@ -1943,6 +1943,7 @@ public class ZeeManagerGobClick extends ZeeThread{
         for (int i = 0; i < gobs.size(); i++) {
             int y = 0;
             String resname = gobs.get(i).getres().name;
+            String basename = gobs.get(i).getres().basename();
             //avoid duplicates
             if (listNamesAdded.contains(resname))
                 continue;
@@ -1950,20 +1951,21 @@ public class ZeeManagerGobClick extends ZeeThread{
             if (ZeeConfig.isKritter(resname) && ZeeConfig.isKritterNotPickable(resname))
                 continue;
             listNamesAdded.add(resname);
-            y = ((listNamesAdded.size()-1) * 30) - 3;
+            y = ((listNamesAdded.size()-1) * 30) + 5;
 
             //label gob name
-            wdg = winPickupGob.add(new Label(gobs.get(i).getres().basename()), 0, y);
+            wdg = winPickupGob.add(new Label(basename), 0, y);
 
             //button "pick" gob
             wdg = winPickupGob.add(
-                new ZeeWindow.ZeeButton(30, "pick"){
+                new ZeeWindow.ZeeButton(50, "pick one"){
                     public void wdgmsg(String msg, Object... args) {
                         if (msg.contentEquals("activate")){
-                            //filter gobs and sort by distance
-                            pickGobsFilterSort(gobs,buttonText);
                             //pickup closest matching
-                            gobClick(gobs.get(0),3);
+                            Gob closest = ZeeConfig.getClosestGobByNameContains("/"+basename);
+                            if (closest!=null) {
+                                gobClick(closest, 3);
+                            }
                             winPickupGob.wdgmsg("close");
                         }
                     }
@@ -1974,13 +1976,14 @@ public class ZeeManagerGobClick extends ZeeThread{
             //button pick "all" for terobjs
             if (gobs.get(i).getres().name.contains("/terobjs/")) {
                 winPickupGob.add(
-                        new ZeeWindow.ZeeButton(30, "all") {
+                        new ZeeWindow.ZeeButton(50, "pick all") {
                             public void wdgmsg(String msg, Object... args) {
                                 if (msg.contentEquals("activate")) {
-                                    //filter gobs and sort by distance
-                                    pickGobsFilterSort(gobs,buttonText);
                                     //pickup closest matching
-                                    gobClick(gobs.get(0), 3, UI.MOD_SHIFT);
+                                    Gob closest = ZeeConfig.getClosestGobByNameContains("/"+basename);
+                                    if (closest!=null) {
+                                        gobClick(closest, 3, UI.MOD_SHIFT);
+                                    }
                                     winPickupGob.wdgmsg("close");
                                 }
                             }
