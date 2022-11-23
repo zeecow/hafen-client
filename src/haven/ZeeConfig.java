@@ -3157,4 +3157,29 @@ public class ZeeConfig {
             win.buttonAutoHide.c = Coord.of(0);
         }
     }
+
+    // calculate next tile from origin to destination
+    public static Coord getNextTileTowards(Coord orig, Coord dest) {
+        int nextX, nextY;
+
+        if (orig.x < dest.x)
+            nextX = orig.x + 1;
+        else if (orig.x > dest.x)
+            nextX = orig.x - 1;
+        else
+            nextX = orig.x;
+
+        if (orig.y < dest.y)
+            nextY = orig.y + 1;
+        else if (orig.y > dest.y)
+            nextY = orig.y - 1;
+        else
+            nextY = orig.y;
+
+        Coord ret = Coord.of(nextX,nextY);
+
+        println("getNextTileTowards > orig"+orig+" dest"+dest+" = ret"+ret);
+
+        return ret;
+    }
 }

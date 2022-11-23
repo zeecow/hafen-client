@@ -177,7 +177,7 @@ public class ZeeManagerStockpile extends ZeeThread{
                     }
                     continue;
                 }
-                if(!busy)
+                if(!busy)//thread cancelled
                     continue;
                 WItem wItem = invItems.get(0);
                 String itemName = wItem.item.getres().name;
@@ -187,9 +187,44 @@ public class ZeeManagerStockpile extends ZeeThread{
                     ZeeManagerGobClick.itemActGob(gobPile, UI.MOD_SHIFT);
                     if (waitNotHoldingItem()) {//piling successfull
                         sleep(1000);//wait inv transfer to stockpile
-                        if (mainInv.getWItemsByName(itemName).size() > 0)
-                            exitManager("pile full (inv still has items)");
-                        if(!busy)
+                        if (mainInv.getWItemsByName(itemName).size() > 0) {
+                            // coal pile full, try creating 2nd pile
+                            if (lastPetalName.contentEquals("Collect coal")){
+                                ZeeManagerGobClick.gobClick(gobSource,1);//move towards tar kiln
+                                waitPlayerIdleVelocityMs(800);//wait idle
+                                //pickup coal from inv
+                                if (!ZeeConfig.isPlayerHoldingItem()){
+                                    if (ZeeManagerItemClick.pickUpInvItem(ZeeConfig.getMainInventory(),"/coal")) {
+                                        // right click to create virual pile
+                                        Coord newPileCoord = ZeeConfig.getNextTileTowards(ZeeConfig.getGobTile(gobPile),ZeeConfig.getPlayerTile());
+                                        ZeeConfig.gameUI.map.wdgmsg("itemact", newPileCoord, ZeeConfig.tileToCoord(newPileCoord), 0);
+                                        sleep(1000);
+
+                                        //try placing new pile
+                                        Coord playerTile = ZeeConfig.getPlayerTile();
+                                        Coord c = ZeeConfig.tileToCoord(newPileCoord);
+                                        ZeeConfig.gameUI.map.wdgmsg("place", c, 16384, 1, UI.MOD_SHIFT);
+                                        waitPlayerIdleFor(1);
+
+                                        // player didnt move = couldnt place new coal pile?
+                                        if (playerTile.compareTo(ZeeConfig.getPlayerTile()) == 0){
+                                            exitManager("couldnt create second coal pile");
+                                        }
+                                        // new coal pile created
+                                        else{
+                                            ZeeConfig.removeGobText(gobPile);
+                                            gobPile = ZeeConfig.getClosestGobByNameContains("/stockpile-coal");
+                                            ZeeConfig.addGobText(gobPile,"pile");
+                                        }
+                                    }
+                                }
+                            }
+                            // pile full, exit
+                            else {
+                                exitManager("pile full (inv still has items)");
+                            }
+                        }
+                        if(!busy)//thread cancelled
                             continue;
                         //try getting more from source
                         if( gobSource==null || !ZeeManagerGobClick.clickGobPetal(gobSource, lastPetalName) ){
