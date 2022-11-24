@@ -1274,7 +1274,7 @@ public class ZeeManagerItemClick extends ZeeThread{
         }catch (Exception e){
             e.printStackTrace();
         }
-        return(null);
+        return (double)-1;
     }
 
     public static ItemInfo.Contents getItemInfoContents(List<ItemInfo> info) {

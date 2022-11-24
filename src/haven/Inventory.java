@@ -179,28 +179,32 @@ public class Inventory extends Widget implements DTarget {
 	}
 
 	private List<WItem> getSame(GItem item, boolean ascending, boolean sameQl) {
-		String name = item.res.get().name;
 		List<WItem> items = new ArrayList<>();
-		WItem w;
-		boolean isFish = ZeeConfig.isFish(name);
-		double ql = Inventory.getQuality(item);
-		for(Widget wdg = lchild; wdg != null; wdg = wdg.prev) {
-			if(wdg.visible && wdg instanceof WItem) {
-				w = (WItem) wdg;
-				//consider all fish the same
-				if ( isFish && ZeeConfig.isFish(w.item.res.get().name)){
-					items.add(w);
-					continue;
-				}
-				if(w.item.res.get().name.contentEquals(name)){
-					if (!sameQl)
+		try {
+			String name = item.res.get().name;
+			boolean isFish = ZeeConfig.isFish(name);
+			double ql = Inventory.getQuality(item);
+			WItem w;
+			for (Widget wdg = lchild; wdg != null; wdg = wdg.prev) {
+				if (wdg.visible && wdg instanceof WItem) {
+					w = (WItem) wdg;
+					//consider all fish the same
+					if (isFish && ZeeConfig.isFish(w.item.res.get().name)) {
 						items.add(w);
-					else if (ql == Inventory.getQuality(w.item))
-						items.add(w);
+						continue;
+					}
+					if (w.item.res.get().name.contentEquals(name)) {
+						if (!sameQl)
+							items.add(w);
+						else if (ql == Inventory.getQuality(w.item))
+							items.add(w);
+					}
 				}
 			}
+			Collections.sort(items, ascending ? ITEM_COMPARATOR_ASC : ITEM_COMPARATOR_DESC);
+		}catch (Exception e){
+			e.printStackTrace();
 		}
-		Collections.sort(items, ascending ? ITEM_COMPARATOR_ASC : ITEM_COMPARATOR_DESC);
 		return items;
 	}
 
@@ -365,11 +369,12 @@ public class Inventory extends Widget implements DTarget {
 
 	public static Double getQuality(GItem item) {
 		try {
-			return(ZeeManagerItemClick.getItemInfoQuality(item.info()));
+			Double ret = ZeeManagerItemClick.getItemInfoQuality(item.info());
+			return ret;
 		} catch (Exception e) {
-			System.out.println(e.getMessage());
+			e.printStackTrace();
 		}
-		return Double.valueOf(0);
+		return (double) -1;
 	}
 
 	public static Integer getQualityInt(GItem item) {
