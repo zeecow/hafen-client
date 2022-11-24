@@ -1940,8 +1940,12 @@ public class ZeeManagerGobClick extends ZeeThread{
 
         //create window
         winPickupGob = new ZeeWindow(Coord.of(200,300),"pickup gobs");
+
+        winPickupGob.add(new Label("shift keeps window opened"),0,0);
+
+        // populate window with gob list
         for (int i = 0; i < gobs.size(); i++) {
-            int y = 0;
+            int y = 13;
             String resname = gobs.get(i).getres().name;
             String basename = gobs.get(i).getres().basename();
             //avoid duplicates
@@ -1951,14 +1955,11 @@ public class ZeeManagerGobClick extends ZeeThread{
             if (ZeeConfig.isKritter(resname) && ZeeConfig.isKritterNotPickable(resname))
                 continue;
             listNamesAdded.add(resname);
-            y = ((listNamesAdded.size()-1) * 30) + 5;
-
-            //label gob name
-            wdg = winPickupGob.add(new Label(basename), 0, y);
+            y += ((listNamesAdded.size()-1) * 33);
 
             //button "pick" gob
             wdg = winPickupGob.add(
-                new ZeeWindow.ZeeButton(50, "pick one"){
+                new ZeeWindow.ZeeButton(30, "one"){
                     public void wdgmsg(String msg, Object... args) {
                         if (msg.contentEquals("activate")){
                             //pickup closest matching
@@ -1966,32 +1967,40 @@ public class ZeeManagerGobClick extends ZeeThread{
                             if (closest!=null) {
                                 gobClick(closest, 3);
                             }
-                            winPickupGob.wdgmsg("close");
+                            if (!ui.modshift)
+                                winPickupGob.wdgmsg("close");
                         }
                     }
                 },
-                wdg.c.x+wdg.sz.x+10,y
+                0,y
             );
 
-            //button pick "all" for terobjs
-            if (gobs.get(i).getres().name.contains("/terobjs/")) {
-                winPickupGob.add(
-                        new ZeeWindow.ZeeButton(50, "pick all") {
-                            public void wdgmsg(String msg, Object... args) {
-                                if (msg.contentEquals("activate")) {
-                                    //pickup closest matching
-                                    Gob closest = ZeeConfig.getClosestGobByNameContains("/"+basename);
-                                    if (closest!=null) {
-                                        gobClick(closest, 3, UI.MOD_SHIFT);
-                                    }
-                                    winPickupGob.wdgmsg("close");
+            //button pick "all"
+            wdg = winPickupGob.add(
+                    new ZeeWindow.ZeeButton(30, "all") {
+                        public void wdgmsg(String msg, Object... args) {
+                            if (msg.contentEquals("activate")) {
+                                //pickup closest matching
+                                Gob closest = ZeeConfig.getClosestGobByNameContains("/"+basename);
+                                if (closest!=null) {
+                                    gobClick(closest, 3, UI.MOD_SHIFT);
                                 }
+                                if (!ui.modshift)
+                                    winPickupGob.wdgmsg("close");
                             }
-                        },
-                        wdg.c.x+wdg.sz.x + 10, y
-                );
+                        }
+                    },
+                    wdg.c.x+wdg.sz.x + 10, y
+            );
+            if (!resname.contains("/terobjs/")) {// disable if not a terobj
+                ((Button)wdg).disable(true);
             }
+
+            //label gob name
+            wdg = winPickupGob.add(new Label(basename,CharWnd.attrf), wdg.c.x+wdg.sz.x + 10, y);
         }
+
+
         winPickupGob.pack();
         ZeeConfig.gameUI.add(winPickupGob);
     }
