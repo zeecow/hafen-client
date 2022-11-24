@@ -184,7 +184,7 @@ public class ZeeManagerCook extends ZeeThread{
         int y = 0;
         boolean labelExists = false;
         for (Label label : windowFeasting.children(Label.class)) {
-            y += 13;
+            y += 17;
             if (label.texts.contains("your noms"))
                 continue;
             // update label color and text
@@ -202,8 +202,10 @@ public class ZeeManagerCook extends ZeeThread{
 
         //create new stat label
         if (!labelExists){
-            windowFeasting.add(new Label(newStatName+" +"+newStatNum),0,y);
-            y += 13;
+            Label l = new Label(newStatName+" +"+newStatNum, CharWnd.attrf);
+            l.setcolor(Color.green);
+            windowFeasting.add(l,0,y);
+            y += 17;
         }
 
         windowFeasting.pack();
