@@ -597,6 +597,7 @@ public class ZeeManagerGobClick extends ZeeThread{
                 }
             }.start();
         }
+        //
         // gob requires unmounting horse/kicksled
         else if (isGobRequireDisembarkVehicle(gobName) && !ZeeConfig.isPlayerLiftingGob(gob)){
             // unmount horse
@@ -659,12 +660,21 @@ public class ZeeManagerGobClick extends ZeeThread{
     }
 
     static boolean isGobRequireDisembarkVehicle(String gobName) {
-        return isGobHouseInnerDoor(gobName) || isGobHouse(gobName) || isGobChair(gobName)
-                || isGobInListEndsWith(gobName,
-                    "/upstairs,/downstairs,/minehole,/ladder,/cavein,/caveout,/burrow,/igloo," +
-                        "/wheelbarrow,/loom,/cauldron,/churn,/swheel,/ropewalk," +
-                        "/meatgrinder,/potterswheel,/quern,/plow,/winepress"
-                );
+        if(isGobHouseInnerDoor(gobName) || isGobHouse(gobName) || isGobChair(gobName)
+            || isGobInListEndsWith(gobName,
+                "/upstairs,/downstairs,/minehole,/ladder,/cavein,/caveout,/burrow,/igloo," +
+                    "/wheelbarrow,/loom,/churn,/swheel,/ropewalk," +
+                    "/meatgrinder,/potterswheel,/quern,/plow,/winepress"
+            )
+        ){
+            return true;
+        }
+
+        // avoid dismouting when transfering to cauldron
+        if (gobName.contains("cauldron") && !ZeeConfig.isPlayerLiftingGob())
+            return true;
+
+        return false;
     }
 
     static boolean isGobChair(String gobName) {
