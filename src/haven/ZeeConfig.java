@@ -3185,4 +3185,11 @@ public class ZeeConfig {
 
         return ret;
     }
+
+    public static double doubleRound2(double val){
+        val = val*100;
+        val = Math.round(val);
+        val = val /100;
+        return val;
+    }
 }

@@ -26,11 +26,14 @@
 
 package haven;
 
-import java.util.*;
-import java.util.function.*;
-import java.lang.reflect.*;
+import haven.resutil.FoodInfo;
+
+import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.awt.Graphics;
+import java.util.List;
+import java.util.*;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 public abstract class ItemInfo {
     public final Owner owner;
@@ -321,6 +324,8 @@ public abstract class ItemInfo {
 	    if(ii instanceof Tip) {
 		Tip tip = (Tip)ii;
 		l.add(tip);
+		if (tip instanceof FoodInfo)
+			ZeeManagerCook.checkFoodTip(info);
 	    }
 	}
 	if(l.tips.size() < 1)

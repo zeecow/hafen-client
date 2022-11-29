@@ -1,7 +1,11 @@
 package haven;
 
+import haven.res.ui.tt.q.quality.Quality;
+import haven.resutil.FoodInfo;
+
 import java.awt.*;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 public class ZeeManagerCook extends ZeeThread{
@@ -209,6 +213,40 @@ public class ZeeManagerCook extends ZeeThread{
         }
 
         windowFeasting.pack();
+    }
+
+
+    public static void checkFoodTip(List<ItemInfo> info) {
+
+        println("==========food tip===========");
+        for(ItemInfo ii : info) {
+            // food name
+            if(ii instanceof ItemInfo.Name) {
+                println("name: "+((ItemInfo.Name)ii).str.text );
+            }
+            // food quality
+            else if(ii instanceof Quality){
+                println("quality: "+ZeeConfig.doubleRound2(((Quality)ii).q));
+            }
+            // food ingredient
+            else if (ii.getClass().getName().contentEquals("Ingredient")){
+                try {
+                    String ingrName = (String) ii.getClass().getDeclaredField("name").get(ii);
+                    double ingrVal = (double) ii.getClass().getDeclaredField("val").get(ii);
+                    println("ingredient: "+ingrName+"  "+((int)ingrVal*100)+"%");
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+            // food events
+            else if (ii instanceof FoodInfo){
+                FoodInfo fi = (FoodInfo) ii;
+                for (int i = 0; i < fi.evs.length; i++) {
+                    println("  event: " + fi.evs[i].ev.nm + " : "+ ZeeConfig.doubleRound2(fi.evs[i].a));
+                }
+            }
+        }
+        println("");
     }
 
     public static void println(String s) {
