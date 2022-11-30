@@ -1,5 +1,8 @@
 package haven;
 
+import haven.res.ui.tt.q.quality.Quality;
+import haven.resutil.FoodInfo;
+
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -12,6 +15,7 @@ import java.util.List;
 public class ZeeResearch {
 
     private static final String FILE_NAME_HERBALSWILL = "haven_research_herbalswill.txt";
+    private static final String FILE_NAME_FOOD = "haven_research_food.txt";
     public static String hsElixirStr;
     public static long hsElixirStrMs;
     static List<WItem> hsItemsUsed;
@@ -109,6 +113,108 @@ public class ZeeResearch {
         }
         return entryExists;
     }
+
+
+    public static void checkFoodTip(List<ItemInfo> info) {
+
+        String line = "";
+        String name="", ql="", ingreds="", events="";
+
+        for(ItemInfo ii : info) {
+            // food name
+            if(ii instanceof ItemInfo.Name) {
+                name = ((ItemInfo.Name)ii).str.text + ";";
+            }
+            // food quality
+            else if(ii instanceof Quality){
+                ql = String.valueOf(ZeeConfig.doubleRound2(((Quality)ii).q)) + ";";
+            }
+            // food ingredient
+            else if (ii.getClass().getName().contentEquals("Ingredient")){
+                try {
+                    String ingrName = (String) ii.getClass().getDeclaredField("name").get(ii);
+                    double ingrVal = (double) ii.getClass().getDeclaredField("val").get(ii);
+                    ingreds += "igr," + ingrName + "," + ingrVal + ";";
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+            // food events
+            else if (ii instanceof FoodInfo){
+                FoodInfo fi = (FoodInfo) ii;
+                for (int i = 0; i < fi.evs.length; i++) {
+                    events += "evt,"+fi.evs[i].ev.nm + "," + ZeeConfig.doubleRound2(fi.evs[i].a) + ";";
+                }
+            }
+        }
+
+        line = name + ql + ingreds + events;
+
+        foodSaveEntry(line);
+    }
+
+    private static void foodSaveEntry(String entry) {
+        // entry format "name;ql;ingreds;events;"
+        if (foodEntryExists(entry)){
+            println("food entry already exist > "+entry);
+            return;
+        }
+        writeLineToFile(entry,FILE_NAME_FOOD);
+        println("saved "+FILE_NAME_FOOD+" > "+entry);
+    }
+
+
+    // full entry format "name;ql;ingreds;events;"
+    // key forming fields: "name;ingreds;" (defines unique value)
+    // ingreds format: "igr,[name],[perc];"
+    private static boolean foodEntryExists(String entry) {
+
+        List<String> lines = readAllLinesFromFile(FILE_NAME_FOOD);
+        if (lines==null)
+            return false;
+        String[] entryArr = entry.split(";");
+        String entryName = entryArr[0];
+        String[] arrLine;
+        String line;
+        boolean entryExists = false;
+
+        //check all lines from file
+        for (int i = 0; i < lines.size(); i++) {
+
+            //skip empty lines
+            if (lines.get(i).isBlank())
+                continue;
+
+            //line to array
+            line = lines.get(i);
+            arrLine = line.split(";");
+
+            //check same name
+            if (!arrLine[0].contentEquals(entryName)){
+                continue;
+            }
+
+            //check same ingredients (or no ingredients)
+            boolean ingredsMatch = true;
+            for (int j = 0; j < entryArr.length; j++) {
+                //skip non ingredient entries
+                if (!entryArr[j].contains("igr,"))
+                    continue;
+                //ingredient not present, match is false
+                if (!line.contains(entryArr[j])){
+                    ingredsMatch = false;
+                    break;
+                }
+            }
+            if (ingredsMatch){
+                entryExists = true;
+                break;
+            }
+        }
+        return entryExists;
+    }
+
+
 
     private static String newLine;
     private static synchronized void writeLineToFile(String line, String fileName)  {

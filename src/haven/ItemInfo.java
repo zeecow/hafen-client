@@ -325,7 +325,7 @@ public abstract class ItemInfo {
 		Tip tip = (Tip)ii;
 		l.add(tip);
 		if (tip instanceof FoodInfo)
-			ZeeManagerCook.checkFoodTip(info);
+			ZeeResearch.checkFoodTip(info);
 	    }
 	}
 	if(l.tips.size() < 1)
