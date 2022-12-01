@@ -4,15 +4,22 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
+import javax.swing.table.TableRowSorter;
 import java.awt.*;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.regex.Pattern;
 
 public class ZeeJTable extends JFrame {
 
     private static ZeeJTable instanceFood, instanceSwill;
     String filename;
+
+    TableRowSorter<DefaultTableModel> tableRowSorter;
+    JTextField tfFilter;
 
     static ZeeJTable getTableFood(){
         if(instanceFood == null) {
@@ -51,16 +58,17 @@ public class ZeeJTable extends JFrame {
     }
 
     private void setContents() {
-        if (this.filename.contentEquals(ZeeResearch.FILE_NAME_FOOD))
-            fillTableFood();
-        else if (this.filename.contentEquals(ZeeResearch.FILE_NAME_HERBALSWILL))
-            fillTableSwill();
+        if (this.filename.contentEquals(ZeeResearch.FILE_NAME_FOOD)) {
+            buildTableFood();
+        }else if (this.filename.contentEquals(ZeeResearch.FILE_NAME_HERBALSWILL)) {
+            buildTableSwill();
+        }
     }
 
 
     // file line format "name;ql;[ingreds;][events;]"
     // ingreds format: "igr,[name],[perc];"
-    private void fillTableFood() {
+    private void buildTableFood() {
 
         //table headers
         DefaultTableModel tableModel = new DefaultTableModel();
@@ -124,24 +132,49 @@ public class ZeeJTable extends JFrame {
             tableModel.addRow(lineRow.split(";"));
         }
 
-        //build table
+        // build table
         JTable table = new JTable(tableModel);
         table.setFont(new Font("Serif", Font.PLAIN, 11));
+        // table filter
+        tableRowSorter = new TableRowSorter<DefaultTableModel>(tableModel);
+        table.setRowSorter(tableRowSorter);
+        tfFilter = new JTextField();
+        this.add(tfFilter, BorderLayout.NORTH);
+        tfFilter.addKeyListener(new KeyAdapter() {
+            public void keyReleased(KeyEvent evt) {
+                String txt = tfFilter.getText();
+                if (txt.length()==0 || txt.isBlank() || evt.getKeyCode()==KeyEvent.VK_ESCAPE){
+                    tfFilter.setText("");
+                    tableRowSorter.setRowFilter(null);
+                    return;
+                }
+                try{
+                    String treatedText = txt.strip();
+                    treatedText = Pattern.quote(treatedText); // normal text search
+                    treatedText = "(?i)" + treatedText; // case insensitive
+                    RowFilter<DefaultTableModel, Object> rowFilter = RowFilter.regexFilter(treatedText);
+                    tableRowSorter.setRowFilter(rowFilter);
+                } catch (java.util.regex.PatternSyntaxException exc) {
+                    println(exc.getMessage());
+                }
+            }
+        });
+        // table columns
         TableColumnModel tcm = table.getColumnModel();
         TableColumn tc = tcm.getColumn(0);
         tc.setMaxWidth(200);
         tc = tcm.getColumn(1);
         tc.setMaxWidth(50);
-        table.setAutoCreateRowSorter(true);
+        //add table
         JScrollPane scrollPane = new JScrollPane(table);
-        this.add(scrollPane);
+        this.add(scrollPane,BorderLayout.CENTER);
     }
 
     private void println(String s) {
         System.out.println(s);
     }
 
-    private void fillTableSwill() {
+    private void buildTableSwill() {
     }
 
     @Override
