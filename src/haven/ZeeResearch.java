@@ -14,8 +14,8 @@ import java.util.List;
 
 public class ZeeResearch {
 
-    private static final String FILE_NAME_HERBALSWILL = "haven_research_herbalswill.txt";
-    private static final String FILE_NAME_FOOD = "haven_research_food.txt";
+    static final String FILE_NAME_HERBALSWILL = "haven_research_herbalswill.txt";
+    static final String FILE_NAME_FOOD = "haven_research_food.txt";
     public static String hsElixirStr;
     public static long hsElixirStrMs;
     static List<WItem> hsItemsUsed;
@@ -143,7 +143,7 @@ public class ZeeResearch {
             else if (ii instanceof FoodInfo){
                 FoodInfo fi = (FoodInfo) ii;
                 for (int i = 0; i < fi.evs.length; i++) {
-                    events += "evt,"+fi.evs[i].ev.nm + "," + ZeeConfig.doubleRound2(fi.evs[i].a) + ";";
+                    events += "evt,"+getShortEventName(fi.evs[i].ev.nm) + "," + ZeeConfig.doubleRound2(fi.evs[i].a) + ";";
                 }
             }
         }
@@ -151,6 +151,11 @@ public class ZeeResearch {
         line = name + ql + ingreds + events;
 
         foodSaveEntry(line);
+    }
+
+    private static String getShortEventName(String nm) {
+        String plus = nm.replaceAll("^[^\\+]+","");
+        return nm.toUpperCase().substring(0,3) + plus;
     }
 
     private static void foodSaveEntry(String entry) {
@@ -242,14 +247,14 @@ public class ZeeResearch {
             }
         }
     }
-    private static synchronized List<String> readAllLinesFromFile(String fileName){
+    static synchronized List<String> readAllLinesFromFile(String fileName){
         List<String> allLines = null;
         try {
             Path path = Paths.get(System.getProperty("user.home"),fileName);
             //byte[] bytes = Files.readAllBytes(path);
             allLines = Files.readAllLines(path, StandardCharsets.UTF_8);
         }catch (NoSuchFileException e){
-            println("NoSuchFileException > new file "+fileName+" ?");
+            println("research > readAllLinesFromFile > new file "+fileName+" ?");
         }catch (IOException e){
             e.printStackTrace();
         }

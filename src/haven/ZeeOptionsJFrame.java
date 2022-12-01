@@ -8,6 +8,7 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.*;
 import java.util.List;
@@ -363,6 +364,7 @@ public class ZeeOptionsJFrame extends JFrame {
         });
 
 
+        // debug wdgmsg
         panelTabMisc.add(cbDebugCodeRes= new JCheckBox("Debug widget msgs"), c);
         cbDebugCodeRes.setSelected(ZeeConfig.debugWidgetMsgs);
         cbDebugCodeRes.addActionListener(actionEvent -> {
@@ -370,12 +372,30 @@ public class ZeeOptionsJFrame extends JFrame {
             ZeeConfig.debugWidgetMsgs = cb.isSelected();
         });
 
+        //debug code
         panelTabMisc.add(cbDebugCodeRes= new JCheckBox("Debug code"), c);
         cbDebugCodeRes.setSelected(ZeeConfig.debugCodeRes);
         cbDebugCodeRes.addActionListener(actionEvent -> {
             JCheckBox cb = (JCheckBox) actionEvent.getSource();
             boolean val = ZeeConfig.debugCodeRes = cb.isSelected();
             Utils.setprefb("debugCodeRes",val);
+        });
+
+        //buttons table food, alchemy
+        JPanel jpTables = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        JButton b;
+        panelTabMisc.add(jpTables);
+        jpTables.add(b = new JButton("Table Food"));
+        b.addMouseListener(new MouseAdapter() {
+            public void mouseReleased(MouseEvent e) {
+                ZeeJTable.getTableFood();
+            }
+        });
+        jpTables.add(b = new JButton("Table Swill"));
+        b.addMouseListener(new MouseAdapter() {
+            public void mouseReleased(MouseEvent e) {
+                ZeeJTable.getTableSwill();
+            }
         });
     }
 
