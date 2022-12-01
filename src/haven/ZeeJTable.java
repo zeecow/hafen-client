@@ -2,6 +2,9 @@ package haven;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableColumn;
+import javax.swing.table.TableColumnModel;
+import java.awt.*;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
@@ -41,8 +44,9 @@ public class ZeeJTable extends JFrame {
         setLocationRelativeTo(null);//center window
         setDefaultLookAndFeelDecorated(true);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        this.setSize(800,400);
         setContents();
-        pack();
+        //pack();
         setVisible(true);
     }
 
@@ -122,6 +126,12 @@ public class ZeeJTable extends JFrame {
 
         //build table
         JTable table = new JTable(tableModel);
+        table.setFont(new Font("Serif", Font.PLAIN, 11));
+        TableColumnModel tcm = table.getColumnModel();
+        TableColumn tc = tcm.getColumn(0);
+        tc.setMaxWidth(200);
+        tc = tcm.getColumn(1);
+        tc.setMaxWidth(50);
         table.setAutoCreateRowSorter(true);
         JScrollPane scrollPane = new JScrollPane(table);
         this.add(scrollPane);
