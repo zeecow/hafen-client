@@ -229,6 +229,8 @@ public class ZeeOptionsJFrame extends JFrame {
 
         panelTabAuto.add(new ZeeOptionJCheckBox( "Auto-run on login", "autoRunLogin"),c);
 
+        panelTabAuto.add(new ZeeOptionJCheckBox( "Research food tips", "researchFoodTips"),c);
+
         //auto click menu list
         panelTabAuto.add(new JLabel("Automenu list:"), c);
         panelTabAuto.add(tfAutoClickMenu = new JTextField("",5), c);

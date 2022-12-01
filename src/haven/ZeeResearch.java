@@ -19,6 +19,7 @@ public class ZeeResearch {
     public static String hsElixirStr;
     public static long hsElixirStrMs;
     static List<WItem> hsItemsUsed;
+    private static List<String> listSkipSavingFood;
 
     public static void checkResearch(String recipe) {
         if(recipe.contentEquals("Herbal Swill")) {
@@ -119,6 +120,7 @@ public class ZeeResearch {
 
         String line = "";
         String name="", ql="", ingreds="", events="";
+        int ingredsFound = 0;
 
         for(ItemInfo ii : info) {
             // food name
@@ -131,6 +133,7 @@ public class ZeeResearch {
             }
             // food ingredient
             else if (ii.getClass().getName().contentEquals("Ingredient")){
+                ingredsFound++;
                 try {
                     String ingrName = (String) ii.getClass().getDeclaredField("name").get(ii);
                     double ingrVal = (double) ii.getClass().getDeclaredField("val").get(ii);
@@ -148,9 +151,22 @@ public class ZeeResearch {
             }
         }
 
-        line = name + ql + ingreds + events;
+        // avoid reading disk multiple times for same item type
+        if (ingredsFound == 0){
+            if (listSkipSavingFood==null) {
+                listSkipSavingFood = new ArrayList<>();
+            } else if(listSkipSavingFood.contains(name)){
+                return;
+            }
+            listSkipSavingFood.add(name);
+        }
+        // else { TODO expand to multiple ingredients }
 
+
+        //save line
+        line = name + ql + ingreds + events;
         foodSaveEntry(line);
+
     }
 
     private static String getShortEventName(String nm) {
