@@ -81,6 +81,7 @@ public class ZeeManagerStockpile extends ZeeThread{
     static String lastTileStoneSourceTileName;
     static Coord2d lastTileStoneSourceCoordMc;
     static boolean diggingTileSource;
+    static Gob lastTreelogSawed, lastTreelogChopped;
     private final String task;
 
     public ZeeManagerStockpile(String task) {
@@ -402,8 +403,10 @@ public class ZeeManagerStockpile extends ZeeThread{
             }
         }else if(petalName.equals("Chop into blocks")){
             gobSource = ZeeConfig.lastMapViewClickGob;
+            lastTreelogChopped = ZeeConfig.lastMapViewClickGob;
         }else if(petalName.equals("Make boards")){
             gobSource = ZeeConfig.lastMapViewClickGob;
+            lastTreelogSawed = ZeeConfig.lastMapViewClickGob;
         }else if(petalName.equals("Chip stone")){
             gobSource = ZeeConfig.lastMapViewClickGob;
         }else if(petalName.equals("Collect coal")){

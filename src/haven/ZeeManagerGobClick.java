@@ -61,6 +61,10 @@ public class ZeeManagerGobClick extends ZeeThread{
                     ZeeConfig.clickTile(ZeeConfig.coordToTile(mc),1,UI.MOD_SHIFT);
                 }
             }
+            // pile all inventory board
+            else if(gobName.endsWith("/stockpile-board") && ZeeConfig.playerHasAnyPose(ZeeConfig.POSE_PLAYER_SAW)){
+                ZeeManagerGobClick.pileInvBoardOnExistingPileAndSawMore(gob);
+            }
             // pile all inventory clay
             else if(ZeeConfig.isCursorName(ZeeConfig.CURSOR_DIG) && gobName.endsWith("/stockpile-clay")){
                 ZeeManagerGobClick.pileInvClayOnExistingPile(gob);
@@ -139,6 +143,31 @@ public class ZeeManagerGobClick extends ZeeThread{
                 inspectGob(gob);
             }
         }
+    }
+
+    private static void pileInvBoardOnExistingPileAndSawMore(Gob pileBoard) {
+        new ZeeThread(){
+            public void run() {
+                try {
+                    Inventory inv = ZeeConfig.getMainInventory();
+                    // pickup inv board (if player was holding item a generic method would already been called)
+                    if (ZeeManagerItemClick.pickUpInvItem(inv, "/board-")) {
+                        // pile board
+                        itemActGob(pileBoard,UI.MOD_SHIFT);
+                        //wait piling
+                        if(waitNotHoldingItem()){
+                            // try make boards
+                            if (ZeeManagerStockpile.lastTreelogSawed!=null)
+                                clickGobPetal(ZeeManagerStockpile.lastTreelogSawed,"Make boards");
+                        }
+                    } else {
+                        println("pile all board > couldnt get board from inv");
+                    }
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+            }
+        }.start();
     }
 
     private static void pileInvClayOnExistingPile(Gob pileClay) {
