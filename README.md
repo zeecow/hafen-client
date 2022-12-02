@@ -134,3 +134,4 @@ other stuff:
  - reposition rightmost windows horiz. when game resize
  - drink key "'"
  - pickup key "q", shift+q pickup all, ctrl+q pickup window
+ - Ctrl + right click to confirm remove shortcut 

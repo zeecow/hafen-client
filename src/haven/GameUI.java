@@ -172,8 +172,12 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Message
 	    if(slot != -1) {
 		if(button == 1)
 		    act(slot, new MenuGrid.Interaction(1, ui.modflags()));
-		if(button == 3)
-		    GameUI.this.wdgmsg("setbelt", slot, null);
+		if(button == 3) {
+			if (ui.modctrl)
+				GameUI.this.wdgmsg("setbelt", slot, null);
+			else
+				ZeeConfig.msgError("Ctrl + right click to confirm remove shortcut ");
+		}
 		return(true);
 	    }
 	    return(super.mousedown(c, button));
