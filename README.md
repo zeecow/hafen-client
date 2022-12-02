@@ -85,7 +85,7 @@ Client focusing on small helper tasks, many using mouse middle button, and other
    - while carrying/driving wheelbarrow will mount horse obj and lift wheelbarrow again
    - show window for area piler
    - pile all clay if clicked pile with cursor dig
-   - pile all board if clicked pile while sawing, try sawing again
+   - pile inv board/block/stone if clicked pile while working, then try getting more items
    - put out cauldron
  - midclick item 
    - sort-transfer item ascending(?) 

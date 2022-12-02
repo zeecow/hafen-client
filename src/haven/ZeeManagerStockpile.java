@@ -81,7 +81,8 @@ public class ZeeManagerStockpile extends ZeeThread{
     static String lastTileStoneSourceTileName;
     static Coord2d lastTileStoneSourceCoordMc;
     static boolean diggingTileSource;
-    static Gob lastTreelogSawed, lastTreelogChopped;
+    static Gob lastTreelogSawed, lastTreelogChopped, lastBoulderChipped;
+    static String lastBoulderChippedStoneName;
     private final String task;
 
     public ZeeManagerStockpile(String task) {
@@ -409,6 +410,8 @@ public class ZeeManagerStockpile extends ZeeThread{
             lastTreelogSawed = ZeeConfig.lastMapViewClickGob;
         }else if(petalName.equals("Chip stone")){
             gobSource = ZeeConfig.lastMapViewClickGob;
+            lastBoulderChipped = ZeeConfig.lastMapViewClickGob;
+            lastBoulderChippedStoneName = lastBoulderChipped.getres().basename().replaceAll("\\d$","");
         }else if(petalName.equals("Collect coal")){
             gobSource = ZeeConfig.lastMapViewClickGob;
         }
@@ -852,6 +855,101 @@ public class ZeeManagerStockpile extends ZeeThread{
         maxX = Math.max(olStart.x,olEnd.x);
         maxY = Math.max(olStart.y,olEnd.y);
         return (gobCoord.x >= minX && gobCoord.x <= maxX && gobCoord.y >= minY && gobCoord.y <= maxY);
+    }
+
+
+    public static void pileInvStonesAndChipMore(Gob existingPile) {
+        new ZeeThread(){
+            public void run() {
+                try {
+                    Inventory inv = ZeeConfig.getMainInventory();
+                    // pickup inv stone (if player was holding item a generic method would already been called)
+                    if (ZeeManagerItemClick.pickUpInvItem(inv, lastBoulderChippedStoneName)) {
+                        // pile stone
+                        ZeeManagerGobClick.itemActGob(existingPile,UI.MOD_SHIFT);
+                        //wait piling
+                        if(waitNotHoldingItem()){
+                            // try make stone
+                            if (lastBoulderChipped!=null)
+                                ZeeManagerGobClick.clickGobPetal(lastBoulderChipped,"Chip stone");
+                        }
+                    } else {
+                        println("pile all block > couldnt get block from inv");
+                    }
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+            }
+        }.start();
+    }
+
+    public static void pileInvBlocksAndChopMore(Gob existingPile) {
+        new ZeeThread(){
+            public void run() {
+                try {
+                    Inventory inv = ZeeConfig.getMainInventory();
+                    // pickup inv block (if player was holding item a generic method would already been called)
+                    if (ZeeManagerItemClick.pickUpInvItem(inv, "/wblock-")) {
+                        // pile block
+                        ZeeManagerGobClick.itemActGob(existingPile,UI.MOD_SHIFT);
+                        //wait piling
+                        if(waitNotHoldingItem()){
+                            // try make block
+                            if (lastTreelogChopped!=null)
+                                ZeeManagerGobClick.clickGobPetal(lastTreelogChopped,"Chop into blocks");
+                        }
+                    } else {
+                        println("pile all block > couldnt get block from inv");
+                    }
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+            }
+        }.start();
+    }
+
+    static void pileInvBoardsSawMore(Gob existingPile) {
+        new ZeeThread(){
+            public void run() {
+                try {
+                    Inventory inv = ZeeConfig.getMainInventory();
+                    // pickup inv board (if player was holding item a generic method would already been called)
+                    if (ZeeManagerItemClick.pickUpInvItem(inv, "/board-")) {
+                        // pile board
+                        ZeeManagerGobClick.itemActGob(existingPile,UI.MOD_SHIFT);
+                        //wait piling
+                        if(waitNotHoldingItem()){
+                            // try make boards
+                            if (lastTreelogSawed!=null)
+                                ZeeManagerGobClick.clickGobPetal(lastTreelogSawed,"Make boards");
+                        }
+                    } else {
+                        println("pile all board > couldnt get board from inv");
+                    }
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+            }
+        }.start();
+    }
+
+    static void pileInvClays(Gob existingPile) {
+        new ZeeThread(){
+            public void run() {
+                try {
+                    Inventory inv = ZeeConfig.getMainInventory();
+                    // pickup inv clay (if player was holding item a generic method would already been called)
+                    if (ZeeManagerItemClick.pickUpInvItem(inv, "/clay-ball","/clay-acre")) {
+                        // pile clay
+                        ZeeManagerGobClick.itemActGob(existingPile,UI.MOD_SHIFT);
+                    } else {
+                        println("pile all clay > couldnt get clay from inv");
+                    }
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+            }
+        }.start();
     }
 
     public static void startPilesMover() {

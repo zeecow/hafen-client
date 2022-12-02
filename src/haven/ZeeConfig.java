@@ -79,13 +79,14 @@ public class ZeeConfig {
     public static final String POSE_PLAYER_BUTCH = "gfx/borka/butcher";
     public static final String POSE_PLAYER_BUILD = "gfx/borka/buildan";
     public static final String POSE_PLAYER_SAW = "gfx/borka/sawing";
+    public static final String POSE_PLAYER_CHIPPINGSTONE = "gfx/borka/chipping";//no pickaxe
     public static final String POSE_PLAYER_CHOPBLOCK = "gfx/borka/choppan";
     public static final String POSE_PLAYER_CHOPTREE = "gfx/borka/treechop";
     public static final String POSE_PLAYER_DIGSHOVEL = "gfx/borka/shoveldig";
     public static final String POSE_PLAYER_DRINK = "gfx/borka/drinkan";
     public static final String POSE_PLAYER_LIFT = "gfx/borka/banzai";
     public static final String POSE_PLAYER_HARVESTING = "gfx/borka/harvesting";//reeds clearing
-    public static final String POSE_PLAYER_PICK = "gfx/borka/pickan";
+    public static final String POSE_PLAYER_PICK = "gfx/borka/pickan";//pickaxe mining, chipping
     public static final String POSE_PLAYER_PICKGROUND = "gfx/borka/pickaxeanspot";
     public static final String POSE_PLAYER_CARRYFLAT = "gfx/borka/carry-flat";//idle pickaxe
     public static final String POSE_PLAYER_TRAVELHOMESHRUG = "gfx/borka/pointconfused";
