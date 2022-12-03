@@ -61,26 +61,23 @@ public class ZeeManagerGobClick extends ZeeThread{
                     ZeeConfig.clickTile(ZeeConfig.coordToTile(mc),1,UI.MOD_SHIFT);
                 }
             }
-            // pile inv items and try getting more
-            else if (gobName.contains("/stockpile-")) {
-                // boards
-                if (gobName.endsWith("/stockpile-board") && ZeeConfig.playerHasAnyPose(ZeeConfig.POSE_PLAYER_SAW)) {
-                    ZeeManagerStockpile.pileInvBoardsSawMore(gob);
-                }
-                // blocks
-                else if (gobName.endsWith("/stockpile-wblock") && ZeeConfig.playerHasAnyPose(ZeeConfig.POSE_PLAYER_CHOPBLOCK)) {
-                    ZeeManagerStockpile.pileInvBlocksAndChopMore(gob);
-                }
-                // stones
-                else if (gobName.endsWith("/stockpile-stone") && ZeeConfig.playerHasAnyPose(ZeeConfig.POSE_PLAYER_PICK, ZeeConfig.POSE_PLAYER_CHIPPINGSTONE)) {
-                    ZeeManagerStockpile.pileInvStonesAndChipMore(gob);
-                }
+            // pile inv boards and try sawing more boards
+            if (gobName.endsWith("/stockpile-board") && ZeeConfig.playerHasAnyPose(ZeeConfig.POSE_PLAYER_SAW)) {
+                ZeeManagerStockpile.pileInvBoardsSawMore(gob);
             }
-            // pile all inventory clay
-            else if(ZeeConfig.isCursorName(ZeeConfig.CURSOR_DIG) && gobName.endsWith("/stockpile-clay")){
+            // pile inv blocks and try choppin more blocks
+            else if (gobName.endsWith("/stockpile-wblock") && ZeeConfig.playerHasAnyPose(ZeeConfig.POSE_PLAYER_CHOPBLOCK)) {
+                ZeeManagerStockpile.pileInvBlocksAndChopMore(gob);
+            }
+            // pile inv stones and try chipping more stones
+            else if (gobName.endsWith("/stockpile-stone") && ZeeConfig.playerHasAnyPose(ZeeConfig.POSE_PLAYER_PICK, ZeeConfig.POSE_PLAYER_CHIPPINGSTONE)) {
+                ZeeManagerStockpile.pileInvStonesAndChipMore(gob);
+            }
+            // pile inv clay
+            else if(gobName.endsWith("/stockpile-clay") && ZeeConfig.isCursorName(ZeeConfig.CURSOR_DIG)){
                 ZeeManagerStockpile.pileInvClays(gob);
             }
-            // click gob holding item
+            // click gob holding item (pile, etc)
             else if (ZeeConfig.isPlayerHoldingItem()) {
                 clickedGobHoldingItem(gob,gobName);
             }
