@@ -101,7 +101,7 @@ public class ZeeJTable extends JFrame {
             for (int j = 0; j <arrLine.length; j++) {
                 if (arrLine[j].startsWith("igr,")){
                     arrIgr = arrLine[j].split(",");
-                    lineRow += arrIgr[1] + " " + (((int)Double.parseDouble(arrIgr[2]))*100) + "% , ";
+                    lineRow += arrIgr[1] + " " + ((int)(Double.parseDouble(arrIgr[2])*100)) + "% , ";
                 }
             }
             if (lineRow.endsWith(", ")) { //trim ingreds
