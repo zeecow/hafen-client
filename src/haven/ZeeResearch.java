@@ -131,12 +131,12 @@ public class ZeeResearch {
             else if(ii instanceof Quality){
                 ql = String.valueOf(ZeeConfig.doubleRound2(((Quality)ii).q)) + ";";
             }
-            // food ingredient
-            else if (ii.getClass().getName().contentEquals("Ingredient")){
+            // food ingredient and smoke
+            else if (ii.getClass().getName().contentEquals("Ingredient") || ii.getClass().getName().contentEquals("Smoke")){
                 ingredsFound++;
                 try {
                     String ingrName = (String) ii.getClass().getDeclaredField("name").get(ii);
-                    double ingrVal = (double) ii.getClass().getDeclaredField("val").get(ii);
+                    double ingrVal = ZeeConfig.doubleRound2((Double) ii.getClass().getDeclaredField("val").get(ii));
                     ingreds += "igr," + ingrName + "," + ingrVal + ";";
                 } catch (Exception e) {
                     e.printStackTrace();
