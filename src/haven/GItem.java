@@ -95,7 +95,7 @@ public class GItem extends AWidget implements ItemInfo.SpriteOwner, GSprite.Owne
 	}
 
 	public static BufferedImage numrender(int num, Color col) {
-		return font.renderstroked(String.valueOf(Math.round(num)), Color.white, Color.black).img;
+		return font.renderstroked(String.valueOf(Math.round(num)), col, Color.black).img;
 	    //return(Utils.outline2(Text.render(Integer.toString(num), col).img, Utils.contrast(col)));
 	}
     }
