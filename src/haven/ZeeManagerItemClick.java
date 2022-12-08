@@ -834,8 +834,8 @@ public class ZeeManagerItemClick extends ZeeThread{
     private boolean isShield() {
         return isShield(itemName);
     }
-    private boolean isShield(String name) {
-        return name.contains("roundshield");
+    public static boolean isShield(String name) {
+        return name.endsWith("/roundshield");
     }
 
     public static boolean dropHoldingItemToBeltOrInv() {

@@ -191,6 +191,7 @@ public class ZeeConfig {
     public static boolean dropSoil = false;
     public static boolean destroyingTreelogs = false;
     public static boolean equiporyCompact = Utils.getprefb("equiporyCompact", false);
+    public static boolean equipShieldOnCombat = Utils.getprefb("equipShieldOnCombat", true);
     public static boolean farmerMode = false;
     public static boolean freeGobPlacement = Utils.getprefb("freeGobPlacement", true);
     public static int gridColorInt = Utils.getprefi("gridColorInt",ZeeConfig.colorToInt(DEF_GRID_COLOR));
@@ -2893,17 +2894,23 @@ public class ZeeConfig {
 
     public static void combatStarted() {
         lastMapViewClickButton = 1;//cancel click some tasks
+        //stop mining
         if(ZeeManagerMiner.mining) {
             ZeeConfig.println(">combat relations, cancel mining");
             ZeeManagerMiner.stopMining();
         }
+        //stop farming
         if (ZeeManagerFarmer.busy){
             ZeeConfig.println(">combat relations, cancel farming");
             ZeeManagerFarmer.resetInitialState();
         }
+        //stop piler
         if(ZeeManagerStockpile.busy){
             ZeeManagerStockpile.exitManager();
         }
+        //equip roundshield
+        if (ZeeConfig.equipShieldOnCombat)
+            ZeeManagerItemClick.equipBeltItem("/roundshield");
     }
 
     static boolean isCombatActive(){
