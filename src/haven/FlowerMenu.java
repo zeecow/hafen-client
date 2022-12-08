@@ -230,7 +230,15 @@ public class FlowerMenu extends Widget {
 	return(true);
     }
 
-    public void uimsg(String msg, Object... args) {
+	@Override
+	public boolean mouseup(Coord c, int button) {
+		// activate menu on mouseup
+		if (button==3)
+			return mousedown(c,button);
+		return false;
+	}
+
+	public void uimsg(String msg, Object... args) {
 	if(msg == "cancel") {
 	    new Cancel();
 	    mg.remove();

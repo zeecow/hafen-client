@@ -2093,7 +2093,45 @@ public class MapView extends PView implements DTarget, Console.Directory {
 	    if(((Camera)camera).click(c)) {
 		camdrag = ui.grabmouse(this);
 		ZeeManagerGobClick.camAngleStart = camera.angle();
+		ZeeManagerGobClick.clickEndMs = 0;
 		ZeeManagerGobClick.clickStartMs = System.currentTimeMillis();
+		new ZeeThread(){
+			public void run() {
+				long timeout = ZeeManagerGobClick.LONG_CLICK_MS;
+				while(timeout>0){
+					try {
+						timeout -= 33;
+						sleep(33);
+						// camera dragged, cancel click
+						if (camera.angle() - ZeeManagerGobClick.camAngleStart != 0) {
+							//ZeeConfig.println("camera dragged");
+							return;
+						}
+						// short click
+						if (ZeeManagerGobClick.clickEndMs > ZeeManagerGobClick.clickStartMs) {
+							//ZeeConfig.println("short click ");
+							new Click(c, button).run();
+							return;
+						}
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+				}
+				// start long click before mouseup,
+				// so it shows menu that works onmouseup
+				if (timeout <= 0){
+					//stop dragging camera
+					if(camdrag != null) {
+						camera.release();
+						camdrag.remove();
+						camdrag = null;
+					}
+					ZeeManagerGobClick.clickEndMs = ZeeThread.now();
+					//start midclick gob manager at Click.hit()
+					new Click(c, button).run();
+				}
+			}
+		}.start();
 	    }
 	} else if((placing_l != null) && placing_l.done()) {
 	    Plob placing = placing_l.get();
@@ -2129,14 +2167,14 @@ public class MapView extends PView implements DTarget, Console.Directory {
 		camera.release();
 		camdrag.remove();
 		camdrag = null;
-		ZeeManagerGobClick.camAngleEnd = camera.angle();
+//		ZeeManagerGobClick.camAngleEnd = camera.angle();
 		ZeeManagerGobClick.clickEndMs = System.currentTimeMillis();
 	    }
-		ZeeManagerGobClick.camAngleDiff = ZeeManagerGobClick.camAngleEnd - ZeeManagerGobClick.camAngleStart;
-		if(ZeeManagerGobClick.camAngleDiff == 0.0) {//avoid dragclicks
-			//start midclick gob manager at Click.hit()
-			new Click(c, button).run();
-		}
+//		ZeeManagerGobClick.camAngleDiff = ZeeManagerGobClick.camAngleEnd - ZeeManagerGobClick.camAngleStart;
+//		if(ZeeManagerGobClick.camAngleDiff == 0.0) {//avoid dragclicks
+//			//start midclick gob manager at Click.hit()
+//			new Click(c, button).run();
+//		}
 	} else if(grab != null) {
 	    grab.mmouseup(c, button);
 	}

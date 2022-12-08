@@ -66,4 +66,11 @@ public class ZeeFlowerMenu extends FlowerMenu{
         else
             uimsg("cancel");
     }
+
+    @Override
+    public boolean mouseup(Coord c, int button) {
+        if (button==2)
+            return super.mousedown(c, button);
+        return false;
+    }
 }
