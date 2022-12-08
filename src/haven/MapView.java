@@ -565,7 +565,7 @@ public class MapView extends PView implements DTarget, Console.Directory {
 	//show claims by default, buttons updated in ZeeConfig
 	enol("cplot");
 	enol("vlg");
-	enol("realm");
+	enol("prov");
 	ZeeConfig.glob = glob;
     }
     
