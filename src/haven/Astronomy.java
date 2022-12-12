@@ -35,6 +35,16 @@ public class Astronomy {
     public final Color mc;
     public final int is;
 	public final int scday;
+	public static final String[] moonPhases = {
+			"New Moon",
+			"Waxing Crescent",
+			"First Quarter",
+			"Waxing Gibbous",
+			"Full Moon",
+			"Waning Gibbous",
+			"Last Quarter",
+			"Waning Crescent"
+	};
 	
     public Astronomy(double dt, double mp, double yt, boolean night, Color mc, int is, double sp, double sd, double years, double ym, double md) {
 	this.dt = dt;

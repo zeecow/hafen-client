@@ -194,6 +194,7 @@ public class ZeeConfig {
     public static boolean equipShieldOnCombat = Utils.getprefb("equipShieldOnCombat", true);
     public static boolean farmerMode = false;
     public static boolean freeGobPlacement = Utils.getprefb("freeGobPlacement", true);
+    public static boolean fishMoonXpAlert = Utils.getprefb("fishMoonXpAlert", true);
     public static int gridColorInt = Utils.getprefi("gridColorInt",ZeeConfig.colorToInt(DEF_GRID_COLOR));
     public static boolean hideFxSmoke = Utils.getprefb("hideFxSmoke", true);
     public static boolean hideFxAnimations = Utils.getprefb("hideFxAnimations", true);
@@ -905,6 +906,21 @@ public class ZeeConfig {
         invMainoptionsWdg.addWindowTransferOptions();
 
         windowInvMain.pack();
+
+        checkFishMoonXpAlert();
+    }
+
+    // Fish Moon XP alert
+    private static boolean fishMoonAlertDone = false;
+    private static void checkFishMoonXpAlert() {
+        if (fishMoonXpAlert && !fishMoonAlertDone) {
+            Astronomy a = gameUI.ui.sess.glob.ast;
+            int moonPhaseIndex = (int) Math.round(a.mp * (double) Cal.moon.f.length) % Cal.moon.f.length;
+            if (a.moonPhases[moonPhaseIndex].toLowerCase().contains("full moon")) {
+                fishMoonAlertDone = true;
+                Cal.fishMoonShowText = true;
+            }
+        }
     }
 
 
@@ -2011,6 +2027,8 @@ public class ZeeConfig {
         ZeeManagerStockpile.windowManager = null;
         ZeeManagerCook.windowFeasting = null;
         ZeeManagerMiner.tunnelHelperWindow = null;
+        fishMoonAlertDone = false;
+        Cal.fishMoonShowText = false;
         ZeeManagerMiner.tilesMonitorCleanup();
         ZeeHistWdg.listHistButtons.clear();
         ZeeQuickOptionsWindow.reset();

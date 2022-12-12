@@ -41,6 +41,7 @@ Client focusing on small helper tasks, many using mouse middle button, and other
 - main inventory checkboxes for midclick transfer modes: asc, desc, one, ql
 - gob monitor: highlight, play audio, text to speech (cmd festival)
 - Feasting log window, count gains
+- Option "Fish Moon XP" show text over calendar 
 - (unfinished) hover menu on search actions button 
 - (unfinished) Lag Camera (:cam lag)
 
