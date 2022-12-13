@@ -485,7 +485,7 @@ public class ZeeManagerIcons {
 
 
     static MiniMap.DisplayMarker latestFocusedMark;
-    static BufferedImage latestFocusedMarkBgImg = ZeeManagerIcons.imgCirle(20,Color.green,false,false);
+    static BufferedImage latestFocusedMarkBgImg = ZeeManagerIcons.imgCirle(20,Color.magenta,false,false);
     public static void focusMarkExpandedMap(MiniMap.DisplayMarker mark) {
         MapWnd map = ZeeConfig.gameUI.mapfile;
         map.compact(false);
