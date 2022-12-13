@@ -42,6 +42,7 @@ Client focusing on small helper tasks, many using mouse middle button, and other
 - gob monitor: highlight, play audio, text to speech (cmd festival)
 - Feasting log window, count gains
 - Option "Fish Moon XP" show text over calendar 
+- Scroll text entry fuel for kiln, oven, smelter
 - (unfinished) hover menu on search actions button 
 - (unfinished) Lag Camera (:cam lag)
 

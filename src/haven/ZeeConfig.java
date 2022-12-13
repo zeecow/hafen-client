@@ -1009,7 +1009,12 @@ public class ZeeConfig {
         windowFuelTargetGob = lastMapViewClickGob;
 
         if (windowTitle.contentEquals("Oven")) {
-            window.add(te=new TextEntry(txtsz,"4"), 0, y);
+            window.add(te=new TextEntry(txtsz,"4"){
+                public boolean mousewheel(Coord c, int amount) {
+                    settext(ZeeConfig.getTextEntryNextScrollNumber(text(),amount));
+                    return true;
+                }
+            }, 0, y);
             window.add(btn=new Button(UI.scale(btnsz),"branch"){
                 public void wdgmsg(String msg, Object... args) {
                     if (msg.contentEquals("activate"))
@@ -1024,7 +1029,12 @@ public class ZeeConfig {
             },x+btn.sz.x,y);
         }
         else if (windowTitle.contentEquals("Kiln")) {
-            window.add(te=new TextEntry(txtsz,"1"), 0, y);
+            window.add(te=new TextEntry(txtsz,"1"){
+                public boolean mousewheel(Coord c, int amount) {
+                    settext(ZeeConfig.getTextEntryNextScrollNumber(text(),amount));
+                    return true;
+                }
+            }, 0, y);
             window.add(btn=new Button(UI.scale(btnsz),"branch"){
                 public void wdgmsg(String msg, Object... args) {
                     if (msg.contentEquals("activate"))
@@ -1039,7 +1049,12 @@ public class ZeeConfig {
             },x+btn.sz.x,y);
         }
         else if ( windowTitle.contains("Smelter") ){
-            window.add(te=new TextEntry(txtsz,"9"), 0, y);
+            window.add(te=new TextEntry(txtsz,"9"){
+                public boolean mousewheel(Coord c, int amount) {
+                    settext(ZeeConfig.getTextEntryNextScrollNumber(text(),amount));
+                    return true;
+                }
+            }, 0, y);
             window.add(btn=new Button(UI.scale(btnsz),"coal"){
                 public void wdgmsg(String msg, Object... args) {
                     if (msg.contentEquals("activate"))
@@ -1049,6 +1064,17 @@ public class ZeeConfig {
         }
 
         window.pack();
+    }
+
+    private static String getTextEntryNextScrollNumber(String text, int amount) {
+        int num = Integer.parseInt(text);
+        if (amount < 0)
+            num++;
+        else if (amount > 0)
+            num--;
+        if (num < 1)
+            num = 1;
+        return String.valueOf(num);
     }
 
     private static void windowAddFuel(String txtNum, String fuelName, Gob g) {
