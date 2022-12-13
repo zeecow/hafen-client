@@ -501,7 +501,10 @@ public class ZeeManagerGobClick extends ZeeThread{
         Coord cupSlot = ZeeManagerItemClick.dropHoldingItemToInvAndRetCoord(inv);
         if (cupSlot!=null) {
             cup = inv.getItemBySlotCoord(cupSlot);
+            boolean confirmPetalBackup = ZeeConfig.confirmPetal;
+            ZeeConfig.confirmPetal = false;//temp disable confirm petal
             ZeeManagerItemClick.clickItemPetal(cup, "Empty");
+            ZeeConfig.confirmPetal = confirmPetalBackup;
         }
     }
 
