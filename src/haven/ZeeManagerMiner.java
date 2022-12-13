@@ -717,15 +717,15 @@ public class ZeeManagerMiner extends ZeeThread{
                 // label color
                 label.setcolor(Color.red);
                 // label text
-                if (silverList.contains(label.texts)) {
-                    label.settext(label.texts + "  (silver)");
+                if (silverList.contains(basename)) {
+                    label.settext(basename + "  (silver)");
                     // 5min limit, TODO find better way
                     if(ZeeThread.now() - msLastSilverMsg > 1000*60*5) {
                         ZeeConfig.msg("Silver ore found");
                         ZeeSynth.textToSpeakLinuxFestival("Silver ore found");
                     }
                 }else {
-                    label.settext(label.texts + "  (gold)");
+                    label.settext(basename + "  (gold)");
                     // 5min limit, TODO better way
                     if(ZeeThread.now() - msLastGoldMsg > 1000*60*5) {
                         ZeeConfig.msg("Gold ore found");
