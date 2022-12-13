@@ -1242,7 +1242,7 @@ public class ZeeManagerItemClick extends ZeeThread{
         ItemInfo.Contents contents = getItemInfoContents(item.item.info());
         if (contents!=null && contents.sub!=null) {
             String name = getItemInfoName(contents.sub);
-            double ql = getItemInfoQuality(contents.sub);
+            int ql = getItemInfoQuality(contents.sub).intValue();
             msg += name.replaceAll(".+ of ","");// 0.45 l of Water
             msg += " q" + ql;
         }else

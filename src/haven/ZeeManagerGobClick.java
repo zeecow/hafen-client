@@ -487,6 +487,7 @@ public class ZeeManagerGobClick extends ZeeThread{
         // show msg
         String msg = ZeeManagerItemClick.getHoldingItemContentsNameQl();
         ZeeConfig.msgLow(msg);
+        ZeeSynth.textToSpeakLinuxFestival(msg.replaceAll("\\D",""));
         new ZeeThread(){
             public void run() {
                 ZeeConfig.addPlayerText(msg);
