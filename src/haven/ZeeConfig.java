@@ -1196,12 +1196,13 @@ public class ZeeConfig {
     private static void windowModOrganizeButton(Window window, String windowTitle) {
         String singleWindows = "Craft,Inventory,Character Sheet,Options,Kith & Kin,Equipment";
         if(!singleWindows.contains(windowTitle)) { // avoid searching multiple Windows
-            List<Window> wins= getWindows(windowTitle);
+            List<Window> wins = getWindows(windowTitle);
             if (wins.size() > 1) {
                 //add organize button
+                int pad = ZeeWindow.ZeeButton.BUTTON_SIZE;
                 window.add(
-                    new ZeeWindow.ZeeButton(25,ZeeWindow.ZeeButton.TEXT_ORGANIZEWINDOWS,"organize duplicates"),
-                    window.cbtn.c.x-25,
+                    new ZeeWindow.ZeeButton(pad,ZeeWindow.ZeeButton.TEXT_ORGANIZEWINDOWS,"organize duplicates"),
+                    window.cbtn.c.x-pad,
                     window.cbtn.c.y
                 );
                 window.hasOrganizeButton = true;

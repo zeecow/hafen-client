@@ -243,7 +243,7 @@ public class Window extends Widget implements DTarget {
 	cpsz = tlo.add(cpo.x + cmw, cm.sz().y).sub(cptl);//cap size
 	cmw = cmw - (cl.sz().x - cpo.x) - UI.scale(5);
 	//Where the close button goes
-	cbtn.c = xlate(tlo.add(wsz.x - cbtn.sz.x, cbtn.sz.y), false);
+	cbtn.c = xlate(tlo.add(wsz.x - cbtn.sz.x, cbtn.sz.y-5), false);
 	for(Widget ch = child; ch != null; ch = ch.next)
 	    ch.presize();
     }

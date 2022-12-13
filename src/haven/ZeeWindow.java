@@ -21,7 +21,7 @@ public class ZeeWindow extends Window {
         public static final String TEXT_ORGANIZEWINDOWS = "↔";
         public static final String TEXT_AUTOHIDEWINDOW = "ᐊ";
         public static final String TEXT_CLOSE = "x";
-        public static final int BUTTON_SIZE = 25;
+        public static final int BUTTON_SIZE = 20;
         String buttonText;
 
         public ZeeButton(int width, String title) {
