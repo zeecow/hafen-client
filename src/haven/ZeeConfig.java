@@ -108,7 +108,7 @@ public class ZeeConfig {
     public static final String TILE_SWAMP_BOG_WATER = "gfx/tiles/bogwater";
 
     public static final String DEF_LIST_BLOCK_AUDIO = "Leashed horse.;Tracking is now turned on.";
-    public static final String DEF_LIST_CONFIRM_PETAL = "Empty,Swill,Clean out,Take possession,Renounce Lawspeaker,Become Lawspeaker";
+    public static final String DEF_LIST_CONFIRM_PETAL = "Slaughter,Castrate,Empty,Swill,Clean out,Take possession,Renounce Lawspeaker,Become Lawspeaker";
     public static final String DEF_LIST_AUTO_HIDE_WINDOWS = "Inventory,Character Sheet,Belt,Basket,Creel";
     public static final String DEF_LIST_BUTCH_AUTO = "Break,Scale,Wring neck,Kill,Skin,Flay,Pluck,Clean,Butcher,Collect bones";
     public static final String DEF_LIST_AUTO_CLICK_MENU = "Pick,Harvest wax";
