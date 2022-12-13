@@ -474,7 +474,7 @@ public class ZeeManagerGobClick extends ZeeThread{
         Inventory inv = ZeeConfig.getMainInventory();
         List<WItem> cups = inv.getWItemsByName("/woodencup");
         if (cups==null || cups.size()==0){
-            ZeeConfig.msg("need woodencup to inspect water");
+            ZeeConfig.msgError("need woodencup to inspect water");
             return;
         }
 
@@ -486,7 +486,7 @@ public class ZeeManagerGobClick extends ZeeThread{
 
         // show msg
         String msg = ZeeManagerItemClick.getHoldingItemContentsNameQl();
-        ZeeConfig.msg(msg);
+        ZeeConfig.msgLow(msg);
         new ZeeThread(){
             public void run() {
                 ZeeConfig.addPlayerText(msg);
