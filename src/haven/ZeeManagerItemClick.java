@@ -1292,8 +1292,8 @@ public class ZeeManagerItemClick extends ZeeThread{
 
     static boolean drinkThreadWorking = false;
     public static void drinkFromBeltHandsInv() {
-        if (drinkThreadWorking) {
-            println("drink thread working");
+        if (drinkThreadWorking || ZeeConfig.isPlayerDrinkingPose()) {
+            println("already drinking");
             return;
         }
         new ZeeThread(){
@@ -1317,8 +1317,8 @@ public class ZeeManagerItemClick extends ZeeThread{
                                     if(clickItemPetal(beltItems[i], "Drink")) {
                                         //ZeeManagerItemClick.waitPlayerPoseNotInList(ZeeConfig.POSE_PLAYER_DRINK);
                                         drank = true;
+                                        break;
                                     }
-                                    break;
                                 }
                             }
                         }
@@ -1338,8 +1338,8 @@ public class ZeeManagerItemClick extends ZeeThread{
                                     if (clickItemPetal(invItems[i], "Drink")) {
                                         //ZeeManagerItemClick.waitPlayerPoseNotInList(ZeeConfig.POSE_PLAYER_DRINK);
                                         drank = true;
+                                        break;
                                     }
-                                    break;
                                 }
                             }
                         }
