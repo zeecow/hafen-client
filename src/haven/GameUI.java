@@ -1532,6 +1532,9 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Message
     private double lasterrsfx = 0;
     public void error(String msg) {
 	msg(msg, new Color(192, 0, 0), new Color(255, 0, 0));
+	// mute stockpile full msgs while area piler is working
+	if (ZeeManagerStockpile.selAreaPile && msg.contains("stockpile is already full"))
+		return;
 	double now = Utils.rtime();
 	if(now - lasterrsfx > 0.1) {
 	    ui.sfx(RootWidget.errsfx);

@@ -2052,6 +2052,7 @@ public class ZeeConfig {
         ZeeManagerItemClick.invBelt = null;
         ZeeManagerItemClick.equipory = null;
         ZeeManagerStockpile.windowManager = null;
+        ZeeManagerStockpile.selAreaPile = false;
         ZeeManagerCook.windowFeasting = null;
         ZeeManagerMiner.tunnelHelperWindow = null;
         fishMoonAlertDone = false;

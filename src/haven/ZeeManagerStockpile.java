@@ -684,21 +684,28 @@ public class ZeeManagerStockpile extends ZeeThread{
                     while(selAreaPile && borderTiles.size() > 0) {
 
                         //pickup items until idle
-                        Gob closestItem = ZeeConfig.getClosestGobByNameContains(itemGobName);
-                        if (closestItem==null){
-                            break;
-                        }
-                        ZeeManagerGobClick.gobClick(closestItem,3,UI.MOD_SHIFT);
-                        waitInvIdleMs(1000);
-                        if (!selAreaPile){//user closed piler window?
-                            break;
+                        if (!ZeeConfig.isPlayerHoldingItem()) {
+                            Gob closestItem = ZeeConfig.getClosestGobByNameContains(itemGobName);
+                            if (closestItem == null) {
+                                break;
+                            }
+                            //click closest item
+                            ZeeManagerGobClick.gobClick(closestItem, 3, UI.MOD_SHIFT);
+                            //wait approaching item
+                            waitPlayerIdleVelocity();
+                            //pickup itemns until inventory idle
+                            waitInvIdleMs(1000);
+                            //check if user closed piler window
+                            if (!selAreaPile) {
+                                break;
+                            }
                         }
 
                         //move to center tile before creating pile
                         ZeeConfig.moveToAreaCenter(ZeeConfig.lastSavedOverlay.a);
                         waitPlayerIdleVelocity();
 
-                        // hold item at vhand
+                        // pickup inv item
                         if (!ZeeConfig.isPlayerHoldingItem()) {
                             List<WItem> items = ZeeConfig.getMainInventory().getWItemsByName(itemInvName);
                             if (items==null || items.size()==0){
