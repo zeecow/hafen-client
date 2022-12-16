@@ -92,9 +92,18 @@ public class Cal extends Widget {
 	    Astronomy a = ui.sess.glob.ast;
 		int mp = (int)Math.round(a.mp * (double)moon.f.length) % moon.f.length;
 		String cal = String.format("%s day of the %s month of the %s year", ord((int)Math.floor(a.md) + 1), ord((int)Math.floor(a.ym) + 1), ord((int)Math.floor(a.years) + 1));
-		String season = String.format("%s, day %d of %d", a.season(), a.scday + 1, a.season().length);
+		String season = String.format("Season: %s, day %d of %d", a.season(), a.scday + 1, a.season().length);
+		String forageables = "Forage: ";
+		if (a.season().name().contains("Spring"))
+			forageables += "Camomile, Chiming Bluebell, Coltsfoot, Marsh-Mallow";
+		else if (a.season().name().contains("Summer"))
+			forageables += "Strawberry";
+		else if (a.season().name().contains("Autumn"))
+			forageables += "B.Trumpets, L.Caps, Morels, Parasol, Aut.Leaf, RubyBol.";
+		else if (a.season().name().contains("Winter"))
+			forageables += "Sleighbell, Snowtop, Snowflakes, Wintergreen";
 		String moon = String.format("Moon: %s",Astronomy.moonPhases[mp]);
-		return(RichText.render(season + "\n" + moon + "\n" + cal, UI.scale(250)));
+		return(RichText.render(season + "\n" + forageables + "\n" + moon + "\n" + cal, UI.scale(250)));
 	}
 	return(super.tooltip(c, prev));
     }
