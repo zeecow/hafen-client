@@ -26,10 +26,14 @@
 
 package haven;
 
-import java.util.*;
-import java.nio.*;
 import haven.render.*;
 import haven.render.sl.*;
+
+import java.nio.ShortBuffer;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Random;
+
 import static haven.render.sl.Cons.*;
 import static haven.render.sl.Type.*;
 
@@ -39,6 +43,8 @@ public class MeshAnim extends State {
 	.instanced(new Instancable<Animated>() {
 		final Instancer<Animated> nil = Instancer.dummy();
 		public Instancer<Animated> instid(Animated st) {
+			if (ZeeConfig.hideFxAnimations)
+				return  nil;
 		    return((st == null) ? nil : st.anim.instancer);
 		}
 	    });
