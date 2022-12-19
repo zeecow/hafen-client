@@ -199,6 +199,7 @@ public class ZeeConfig {
     public static boolean hideFxSmoke = Utils.getprefb("hideFxSmoke", true);
     public static boolean hideFxAnimations = Utils.getprefb("hideFxAnimations", true);
     public static boolean hideCrops = Utils.getprefb("hideCrops", false);
+    public static boolean hideTileTransitions = Utils.getprefb("hideTileTransitions", true);
     public static boolean highlightCropsReady = Utils.getprefb("highlightCropsReady", true);
     public static boolean isThinClient = false;
     public static boolean isRainLimited = Utils.getprefb("isRainLimited", false);

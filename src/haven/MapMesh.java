@@ -26,15 +26,16 @@
 
 package haven;
 
-import static haven.MCache.tilesz;
-import java.util.*;
-import java.awt.Color;
+import haven.Surface.MeshVertex;
+import haven.Surface.Vertex;
+import haven.render.*;
+import haven.render.Rendered.Order;
+
 import java.nio.FloatBuffer;
 import java.nio.ShortBuffer;
-import haven.render.*;
-import haven.Surface.Vertex;
-import haven.Surface.MeshVertex;
-import haven.render.Rendered.Order;
+import java.util.*;
+
+import static haven.MCache.tilesz;
 
 public class MapMesh implements RenderTree.Node, Disposable {
     public final Coord ul, sz;
@@ -309,7 +310,8 @@ public class MapMesh implements RenderTree.Node, Disposable {
 		Coord gc = c.add(ul);
 		long ns = rnd.nextLong();
 		mc.tiler(mc.gettile(gc)).lay(m, rnd, c, gc);
-		dotrans(m, rnd, c, gc);
+		if (!ZeeConfig.hideTileTransitions)
+			dotrans(m, rnd, c, gc);
 		rnd.setSeed(ns);
 	    }
 	}
