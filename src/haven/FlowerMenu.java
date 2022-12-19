@@ -233,7 +233,7 @@ public class FlowerMenu extends Widget {
 	@Override
 	public boolean mouseup(Coord c, int button) {
 		// activate menu on mouseup
-		if (button==3)
+		if (button==3 && anims.isEmpty())
 			return mousedown(c,button);
 		return false;
 	}
