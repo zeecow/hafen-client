@@ -2089,12 +2089,13 @@ public class MapView extends PView implements DTarget, Console.Directory {
     public boolean mousedown(Coord c, int button) {
 	parent.setfocus(this);
 	Loader.Future<Plob> placing_l = this.placing;
+	ZeeManagerGobClick.lastClickMouseUpMs = 0;
+	ZeeManagerGobClick.lastClickMouseDownMs = System.currentTimeMillis();
+	ZeeManagerGobClick.lastClickMouseButton = button;
 	if(button == 2) {
 	    if(((Camera)camera).click(c)) {
 		camdrag = ui.grabmouse(this);
 		ZeeManagerGobClick.camAngleStart = camera.angle();
-		ZeeManagerGobClick.clickEndMs = 0;
-		ZeeManagerGobClick.clickStartMs = System.currentTimeMillis();
 		new ZeeThread(){
 			public void run() {
 				long timeout = ZeeManagerGobClick.LONG_CLICK_MS;
@@ -2108,7 +2109,7 @@ public class MapView extends PView implements DTarget, Console.Directory {
 							return;
 						}
 						// short click
-						if (ZeeManagerGobClick.clickEndMs > ZeeManagerGobClick.clickStartMs) {
+						if (ZeeManagerGobClick.lastClickMouseUpMs > ZeeManagerGobClick.lastClickMouseDownMs) {
 							//ZeeConfig.println("short click ");
 							new Click(c, button).run();
 							return;
@@ -2126,7 +2127,7 @@ public class MapView extends PView implements DTarget, Console.Directory {
 						camdrag.remove();
 						camdrag = null;
 					}
-					ZeeManagerGobClick.clickEndMs = ZeeThread.now();
+					ZeeManagerGobClick.lastClickMouseUpMs = ZeeThread.now();
 					//start midclick gob manager at Click.hit()
 					new Click(c, button).run();
 				}
@@ -2162,19 +2163,14 @@ public class MapView extends PView implements DTarget, Console.Directory {
     }
     
     public boolean mouseup(Coord c, int button) {
+	ZeeManagerGobClick.lastClickMouseUpMs = System.currentTimeMillis();
+	ZeeManagerGobClick.lastClickMouseButton = button;
 	if(button == 2) {
 	    if(camdrag != null) {
 		camera.release();
 		camdrag.remove();
 		camdrag = null;
-//		ZeeManagerGobClick.camAngleEnd = camera.angle();
-		ZeeManagerGobClick.clickEndMs = System.currentTimeMillis();
 	    }
-//		ZeeManagerGobClick.camAngleDiff = ZeeManagerGobClick.camAngleEnd - ZeeManagerGobClick.camAngleStart;
-//		if(ZeeManagerGobClick.camAngleDiff == 0.0) {//avoid dragclicks
-//			//start midclick gob manager at Click.hit()
-//			new Click(c, button).run();
-//		}
 	} else if(grab != null) {
 	    grab.mmouseup(c, button);
 	}

@@ -233,8 +233,12 @@ public class FlowerMenu extends Widget {
 	@Override
 	public boolean mouseup(Coord c, int button) {
 		// activate menu on mouseup
-		if (button==3 && anims.isEmpty())
-			return mousedown(c,button);
+		if (button==3)
+			// avoid clicking during menu animation
+			if (ZeeThread.now() - ZeeManagerGobClick.lastClickMouseDownMs > 500) //500ms
+				return mousedown(c,button);
+			else
+				ZeeConfig.println("ignore early mouseup (TODO remove)");
 		return false;
 	}
 

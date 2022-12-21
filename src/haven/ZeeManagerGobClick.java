@@ -22,7 +22,8 @@ public class ZeeManagerGobClick extends ZeeThread{
     static boolean isGroundClick;
 
     static float camAngleStart, camAngleEnd, camAngleDiff;
-    static long clickStartMs, clickEndMs, clickDiffMs;
+    static long lastClickMouseDownMs, lastClickMouseUpMs, lastClickDiffMs;
+    static int lastClickMouseButton;
     static boolean barrelLabelOn = false;
     static boolean isRemovingAllTrees, isDestroyingAllTreelogs;
     private static ArrayList<Gob> treesForRemoval, treelogsForDestruction;
@@ -30,7 +31,7 @@ public class ZeeManagerGobClick extends ZeeThread{
 
     public static void startMidClick(Coord pc, Coord2d mc, Gob gobClicked, String gName) {
 
-        clickDiffMs = clickEndMs - clickStartMs;
+        lastClickDiffMs = lastClickMouseUpMs - lastClickMouseDownMs;
         coordPc = pc;
         coordMc = mc;
         gob = gobClicked;
@@ -1535,11 +1536,11 @@ public class ZeeManagerGobClick extends ZeeThread{
     }
 
     public static boolean isLongMidClick() {
-        return clickDiffMs >= LONG_CLICK_MS;
+        return lastClickDiffMs >= LONG_CLICK_MS;
     }
 
     public static boolean isShortMidClick() {
-        return clickDiffMs < LONG_CLICK_MS;
+        return lastClickDiffMs < LONG_CLICK_MS;
     }
 
     private static boolean isInspectGob(String gobName){
