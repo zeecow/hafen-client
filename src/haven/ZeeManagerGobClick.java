@@ -1064,6 +1064,7 @@ public class ZeeManagerGobClick extends ZeeThread{
     }
 
     static boolean isGobDeadAnimal;
+
     private boolean isGobBigDeadAnimal_thread() {
         try{
             ZeeThread zt = new ZeeThread() {
@@ -2036,5 +2037,9 @@ public class ZeeManagerGobClick extends ZeeThread{
         });
     }
 
+
+    public static boolean isMouseUp() {
+        return lastClickMouseDownMs < lastClickMouseUpMs;
+    }
 
 }

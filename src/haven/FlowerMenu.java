@@ -235,10 +235,9 @@ public class FlowerMenu extends Widget {
 		// activate menu on mouseup
 		if (button==3)
 			// avoid clicking during menu animation
-			if (ZeeThread.now() - ZeeManagerGobClick.lastClickMouseDownMs > 500) //500ms
-				return mousedown(c,button);
-			else
-				ZeeConfig.println("ignore early mouseup (TODO remove)");
+			if (ZeeThread.now() - ZeeManagerGobClick.lastClickMouseDownMs > 500) { //500ms
+				return mousedown(c, button);
+			}
 		return false;
 	}
 
@@ -321,7 +320,7 @@ public class FlowerMenu extends Widget {
 				}
 			}
 		}
-    	if(ZeeConfig.autoClickMenuOption) {
+    	if(ZeeConfig.autoClickMenuOption && ZeeManagerGobClick.isMouseUp()) {
 			String[] list = ZeeConfig.autoClickMenuOptionList.split(",");
 			for (int i = 0; i < opts.length; i++) {// for each menu option
 				for (int j = 0; j < list.length; j++) {// compare each name in saved list
