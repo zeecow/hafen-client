@@ -568,9 +568,9 @@ public class ZeeManagerItemClick extends ZeeThread{
                             //get next dead animal for butching
                             List<WItem> items;
                             if (ZeeConfig.isFish(firstItemName))
-                                items = inv.getWItemsByName("/fish-"); //consider all fish the same
+                                items = inv.getWItemsByNameContains("/fish-"); //consider all fish the same
                             else
-                                items = inv.getWItemsByName(firstItemName);
+                                items = inv.getWItemsByNameContains(firstItemName);
 
                             if (items.size() == 0){
                                 //no more items to butch
@@ -1081,7 +1081,7 @@ public class ZeeManagerItemClick extends ZeeThread{
 
     public static boolean pickupBeltItem(String name) {
         try {
-            WItem witem = getInvBelt().getWItemsByName(name).get(0);
+            WItem witem = getInvBelt().getWItemsByNameContains(name).get(0);
             return pickUpItem(witem);
         }catch (Exception e){
             return false;
@@ -1110,7 +1110,7 @@ public class ZeeManagerItemClick extends ZeeThread{
             WItem witem = null;
             List<WItem> list;
             for (int i = 0; i < names.length; i++) {
-                list = inv.getWItemsByName(names[i]);
+                list = inv.getWItemsByNameContains(names[i]);
                 if (list.isEmpty())
                     continue;
                 //found item with name[i]
@@ -1127,9 +1127,9 @@ public class ZeeManagerItemClick extends ZeeThread{
         }
     }
 
-    public static WItem getBeltWItem(String name) {
+    public static WItem getBeltWItem(String nameContains) {
         try {
-            WItem witem = getInvBelt().getWItemsByName(name).get(0);
+            WItem witem = getInvBelt().getWItemsByNameContains(nameContains).get(0);
             return witem;
         }catch (Exception e){
             return null;

@@ -74,7 +74,7 @@ public class ZeeManagerFarmer extends ZeeThread{
         Returns true if pile contains 5+ seeds, else returns false.
      */
     private static boolean updateSeedPileReference() {
-        List<WItem> items = ZeeConfig.getMainInventory().getWItemsByName(gItemSeedBasename);
+        List<WItem> items = ZeeConfig.getMainInventory().getWItemsByNameContains(gItemSeedBasename);
         if (items==null || items.size()==0)
             return false;
         int seeds;
@@ -271,7 +271,7 @@ public class ZeeManagerFarmer extends ZeeThread{
     }
 
     private int getNumPlantableSeedPiles() {
-        List<WItem> plantablePiles = ZeeConfig.getMainInventory().getWItemsByName(gItemSeedBasename);
+        List<WItem> plantablePiles = ZeeConfig.getMainInventory().getWItemsByNameContains(gItemSeedBasename);
         plantablePiles.removeIf(w -> (getSeedsAmount(w.item) < 5));
         return plantablePiles.size();
     }
@@ -353,7 +353,7 @@ public class ZeeManagerFarmer extends ZeeThread{
 
     public static int getInvTotalSeedAmount(){
         int ret = 0;
-        WItem[] arr = ZeeConfig.getMainInventory().getWItemsByName(gItemSeedBasename).toArray(new WItem[0]);
+        WItem[] arr = ZeeConfig.getMainInventory().getWItemsByNameContains(gItemSeedBasename).toArray(new WItem[0]);
         for (int i = 0; i < arr.length ; i++) {
             ret += getSeedsAmount(arr[i].item);
         }
@@ -389,11 +389,11 @@ public class ZeeManagerFarmer extends ZeeThread{
     }
 
     private boolean inventoryHasSeeds() {
-        return ZeeConfig.getMainInventory().getWItemsByName(gItemSeedBasename).size() > 0;
+        return ZeeConfig.getMainInventory().getWItemsByNameContains(gItemSeedBasename).size() > 0;
     }
 
     private int getNumberOfSeedItems(){
-        return ZeeConfig.getMainInventory().getWItemsByName(gItemSeedBasename).size();
+        return ZeeConfig.getMainInventory().getWItemsByNameContains(gItemSeedBasename).size();
     }
 
     public static List<Gob> getAccessibleBarrels() {
@@ -438,7 +438,7 @@ public class ZeeManagerFarmer extends ZeeThread{
                     waitInvIdleMs(777);
                     //seed vars
                     busy = true;
-                    wItem = ZeeConfig.getMainInventory().getWItemsByName("/seed-").get(0);
+                    wItem = ZeeConfig.getMainInventory().getWItemsByNameContains("/seed-").get(0);
                     gItem = wItem.item;
                     gItemSeedBasename = gItem.getres().basename();
                     //drop if holding item
@@ -467,7 +467,7 @@ public class ZeeManagerFarmer extends ZeeThread{
                     no barrels, drop seeds
                  */
                 ZeeConfig.gameUI.msg("No empty barrels, lastBarrel null, dropping seeds.");
-                ZeeConfig.getMainInventory().dropItemsByName(gItemSeedBasename);
+                ZeeConfig.getMainInventory().dropItemsByNameEndsWith(gItemSeedBasename);
 
             }
             else {
@@ -607,7 +607,7 @@ public class ZeeManagerFarmer extends ZeeThread{
 
     static int droppedSeeds = 0;
     private static int dropLowestQlSeeds(){
-        List<WItem> seedItems = ZeeConfig.getMainInventory().getWItemsByName(gItemSeedBasename);
+        List<WItem> seedItems = ZeeConfig.getMainInventory().getWItemsByNameContains(gItemSeedBasename);
         if (seedItems.size()==0)
             return -1;
 
@@ -635,7 +635,7 @@ public class ZeeManagerFarmer extends ZeeThread{
     }
 
     private static int dropLessCommonSeeds() {
-        List<WItem> seedItems = ZeeConfig.getMainInventory().getWItemsByName(gItemSeedBasename);
+        List<WItem> seedItems = ZeeConfig.getMainInventory().getWItemsByNameContains(gItemSeedBasename);
         if (seedItems.size()==0)
             return -1;
         //count quantity of items for each ql

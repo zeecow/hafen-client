@@ -164,11 +164,11 @@ public class ZeeManagerStockpile extends ZeeThread{
             if (!ZeeConfig.isPlayerHoldingItem()) {
                 List<WItem> invItems;
                 if (lastPetalName.equals("Make boards"))
-                    invItems = mainInv.getWItemsByName("gfx/invobjs/board-");//avoid spiral curio
+                    invItems = mainInv.getWItemsByNameContains("gfx/invobjs/board-");//avoid spiral curio
                 else if (lastPetalName.equals("Chop into blocks"))
-                    invItems = mainInv.getWItemsByName("gfx/invobjs/wblock-");//avoid splinter curio
+                    invItems = mainInv.getWItemsByNameContains("gfx/invobjs/wblock-");//avoid splinter curio
                 else
-                    invItems = mainInv.getWItemsByName(ZeeConfig.lastInvItemBaseName);//get last inv item without checking
+                    invItems = mainInv.getWItemsByNameContains(ZeeConfig.lastInvItemBaseName);//get last inv item without checking
                 if(invItems.size()==0) {
                     //no inventory items, try getting more from source
                     if(!busy)
@@ -189,7 +189,7 @@ public class ZeeManagerStockpile extends ZeeThread{
                     ZeeManagerGobClick.itemActGob(gobPile, UI.MOD_SHIFT);
                     if (waitNotHoldingItem()) {//piling successfull
                         sleep(1000);//wait inv transfer to stockpile
-                        if (mainInv.getWItemsByName(itemName).size() > 0) {
+                        if (mainInv.getWItemsByNameContains(itemName).size() > 0) {
                             // coal pile full, try creating 2nd pile
                             if (lastPetalName.contentEquals("Collect coal")){
                                 ZeeManagerGobClick.gobClick(gobSource,1);//move towards tar kiln
@@ -251,7 +251,7 @@ public class ZeeManagerStockpile extends ZeeThread{
                 if(waitNotHoldingItem()) {
                     sleep(1000);
                     //check if pile full
-                    if (mainInv.getWItemsByName(itemName).size() > 0)
+                    if (mainInv.getWItemsByNameContains(itemName).size() > 0)
                         exitManager("pile full (inv still has items) 2");
                     if (!busy)
                         continue;
@@ -471,7 +471,7 @@ public class ZeeManagerStockpile extends ZeeThread{
         waitNoFlowerMenu();
         // if not holding item, pickup from inventory
         if (!ZeeConfig.isPlayerHoldingItem()) {
-            List<WItem> invItems = mainInv.getWItemsByName(ZeeConfig.lastInvItemBaseName);
+            List<WItem> invItems = mainInv.getWItemsByNameContains(ZeeConfig.lastInvItemBaseName);
             if(invItems.size()==0) {
                 return;//inv has no more items
             }
@@ -707,7 +707,7 @@ public class ZeeManagerStockpile extends ZeeThread{
 
                         // pickup inv item
                         if (!ZeeConfig.isPlayerHoldingItem()) {
-                            List<WItem> items = ZeeConfig.getMainInventory().getWItemsByName(itemInvName);
+                            List<WItem> items = ZeeConfig.getMainInventory().getWItemsByNameContains(itemInvName);
                             if (items==null || items.size()==0){
                                 println("no more inventory items to pile");
                                 continue;
@@ -723,7 +723,7 @@ public class ZeeManagerStockpile extends ZeeThread{
                             ZeeManagerGobClick.itemActGob(latestPile,UI.MOD_SHIFT);
                             waitPlayerIdleVelocity();//wait approach pile
                             sleep(500);//wait transf items
-                            List<WItem> invItems = ZeeConfig.getMainInventory().getWItemsByName(itemInvName);
+                            List<WItem> invItems = ZeeConfig.getMainInventory().getWItemsByNameContains(itemInvName);
                             if (invItems!=null && invItems.size()>0){
                                 println("latest pile is full");
                                 if (latestPile!=null)
@@ -750,7 +750,7 @@ public class ZeeManagerStockpile extends ZeeThread{
                     }
 
                     // pile remaining inv items
-                    List<WItem> items = ZeeConfig.getMainInventory().getWItemsByName(itemInvName);
+                    List<WItem> items = ZeeConfig.getMainInventory().getWItemsByNameContains(itemInvName);
                     if (items.size() > 0){
                         println("pile remaining inv items");
                         ZeeConfig.moveToAreaCenter(ZeeConfig.lastSavedOverlay.a);

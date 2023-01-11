@@ -237,15 +237,22 @@ public class Inventory extends Widget implements DTarget {
 		return count;
 	}
 
-	// FIXME: collect() may throw NullException if filter finds a null
-	public List<WItem> getWItemsByName(String nameEndsWith) {
+	// FIXME: collect() may throw NullException if filter finds a null?
+	public List<WItem> getWItemsByNameContains(String nameContains) {
+		return this.children(WItem.class)
+				.stream()
+				.filter( wItem -> wItem.item.getres().name.contains(nameContains) )
+				.collect(Collectors.toList());
+	}
+
+	public List<WItem> getWItemsByNameEndsWith(String nameEndsWith) {
 		return this.children(WItem.class)
 				.stream()
 				.filter( wItem -> wItem.item.getres().name.endsWith(nameEndsWith) )
 				.collect(Collectors.toList());
 	}
 
-	public List<WItem> getItemsByNameOrNames(String... namesEndsWith) {
+	public List<WItem> getItemsByNameOrNamesEndsWith(String... namesEndsWith) {
 		List<WItem> items = new ArrayList<WItem>();
 		for (Widget wdg = child; wdg != null; wdg = wdg.next) {
 			if (wdg instanceof WItem) {
@@ -259,9 +266,6 @@ public class Inventory extends Widget implements DTarget {
 			}
 		}
 		return items;
-	}
-	public static List<WItem> getItemsByNameOrNames(Inventory inv, String... names) {
-    	return inv.getItemsByNameOrNames(names);
 	}
 
 	public int getNumberOfFreeSlots() {
@@ -377,10 +381,10 @@ public class Inventory extends Widget implements DTarget {
 		return coords;
 	}
 
-	public void dropItemsByName(String name) {
-		List<WItem> items = getItemsByNameOrNames(name);
+	public void dropItemsByNameEndsWith(String nameEndsWith) {
+		List<WItem> items = getItemsByNameOrNamesEndsWith(nameEndsWith);
 		if (items.size()==0){
-			ZeeConfig.println("Inventory > dropItemsByName > no item found with name = "+name);
+			ZeeConfig.println("Inventory > dropItemsByName > no item found with name = "+nameEndsWith);
 			return;
 		}
 		WItem item = items.get(0);

@@ -1089,7 +1089,7 @@ public class ZeeConfig {
                 msgError("Fuel target not found");
                 return;
             }
-            List<WItem> items = getMainInventory().getWItemsByName(fuelName);
+            List<WItem> items = getMainInventory().getWItemsByNameContains(fuelName);
             ZeeManagerGobClick.addItemsToGob(items,num,g);
         }catch (NumberFormatException e){
             ZeeConfig.msg(e.getMessage());

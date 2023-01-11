@@ -211,13 +211,13 @@ public class GItem extends AWidget implements ItemInfo.SpriteOwner, GSprite.Owne
 		else if( ZeeConfig.dropSeeds && basename.startsWith("seed-") && this.parent instanceof Inventory){
 			Inventory inv = (Inventory) this.parent;
 			if(inv.getNumberOfFreeSlots() < 3){
-				inv.dropItemsByName(basename);
+				inv.dropItemsByNameEndsWith(basename);
 			}
 		}
 		//drop soil
 		else if( ZeeConfig.dropSoil && basename.startsWith("soil") && this.parent instanceof Inventory) {
 			Inventory inv = (Inventory) this.parent;
-			inv.dropItemsByName(basename);
+			inv.dropItemsByNameEndsWith(basename);
 		}
 		// drop everglowing ember if piling coal
 		else if (ZeeConfig.pilerMode && ZeeManagerStockpile.lastPetalName!=null && ZeeManagerStockpile.lastPetalName.contentEquals("Collect coal") && basename.contentEquals("everglowingember")){

@@ -473,7 +473,7 @@ public class ZeeManagerGobClick extends ZeeThread{
 
         // require wooden cup
         Inventory inv = ZeeConfig.getMainInventory();
-        List<WItem> cups = inv.getWItemsByName("/woodencup");
+        List<WItem> cups = inv.getWItemsByNameContains("/woodencup");
         if (cups==null || cups.size()==0){
             ZeeConfig.msgError("need woodencup to inspect water");
             return;
@@ -1451,7 +1451,7 @@ public class ZeeManagerGobClick extends ZeeThread{
             /*
                 fuel oven with 4 branches
              */
-           List<WItem> branches = ZeeConfig.getMainInventory().getWItemsByName("branch");
+           List<WItem> branches = ZeeConfig.getMainInventory().getWItemsByNameContains("branch");
            if(branches.size() < 4){
                ZeeConfig.gameUI.msg("Need 4 branches to fuel oven");
                return;
@@ -1483,7 +1483,7 @@ public class ZeeManagerGobClick extends ZeeThread{
             if (petalName.equals(ZeeFlowerMenu.STRPETAL_ADD9COAL))
                 num = 9;
             final int numCoal = num;
-            List<WItem> coal = ZeeConfig.getMainInventory().getWItemsByName("coal");
+            List<WItem> coal = ZeeConfig.getMainInventory().getWItemsByNameContains("coal");
             if(coal.size() < numCoal){
                 ZeeConfig.gameUI.msg("Need "+numCoal+" coal to fuel smelter");
                 return;
