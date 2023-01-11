@@ -238,20 +238,20 @@ public class Inventory extends Widget implements DTarget {
 	}
 
 	// FIXME: collect() may throw NullException if filter finds a null
-	public List<WItem> getWItemsByName(String name) {
+	public List<WItem> getWItemsByName(String nameEndsWith) {
 		return this.children(WItem.class)
 				.stream()
-				.filter( wItem -> wItem.item.getres().name.contains(name) )
+				.filter( wItem -> wItem.item.getres().name.endsWith(nameEndsWith) )
 				.collect(Collectors.toList());
 	}
 
-	public List<WItem> getItemsByNameOrNames(String... names) {
+	public List<WItem> getItemsByNameOrNames(String... namesEndsWith) {
 		List<WItem> items = new ArrayList<WItem>();
 		for (Widget wdg = child; wdg != null; wdg = wdg.next) {
 			if (wdg instanceof WItem) {
 				String wdgname = ((WItem) wdg).item.getres().name;
-				for (String name : names) {
-					if (wdgname.contains(name)) {
+				for (String name : namesEndsWith) {
+					if (wdgname.endsWith(name)) {
 						items.add((WItem) wdg);
 						break;
 					}
@@ -378,9 +378,15 @@ public class Inventory extends Widget implements DTarget {
 	}
 
 	public void dropItemsByName(String name) {
-		for (WItem wItem : getItemsByNameOrNames(name)) {
-			wItem.item.wdgmsg("drop", Coord.z);
+		List<WItem> items = getItemsByNameOrNames(name);
+		if (items.size()==0){
+			ZeeConfig.println("Inventory > dropItemsByName > no item found with name = "+name);
+			return;
 		}
+		WItem item = items.get(0);
+		Coord itemCoord = ZeeManagerItemClick.getWItemCoord(item);
+		// haven.GItem@65523a95 ; drop ; [(28, 28), -1]
+		item.item.wdgmsg("drop",itemCoord,-1);
 	}
 
 	public static Double getQuality(GItem item) {
