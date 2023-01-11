@@ -61,6 +61,8 @@ public class ZeeManagerFarmer extends ZeeThread{
             //piler
             ZeeManagerStockpile.selAreaPile = false;
 
+            //TODO test emptying seed barrels queue? (mapQlBarrel)
+
             ZeeConfig.removePlayerText();
         }catch (Exception e){
             e.printStackTrace();

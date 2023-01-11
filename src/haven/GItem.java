@@ -183,10 +183,10 @@ public class GItem extends AWidget implements ItemInfo.SpriteOwner, GSprite.Owne
 			}
 		}
 		else if( ZeeConfig.farmerMode ) {
-			//drop non-seed crops
-			if(ZeeManagerFarmer.busy) {
+			//drop all non-seed crops at once
+			if(ZeeManagerFarmer.busy && !ZeeManagerStockpile.selAreaPile) {
 				if (!basename.startsWith("seed-") && ZeeConfig.isItemCrop(basename)) {
-					this.wdgmsg("drop", Coord.z);
+					this.wdgmsg("drop", c, -1);//TODO c should be witem coord?
 				}
 			}
 			else if(basename.startsWith("seed-") && this.parent instanceof Inventory) {
