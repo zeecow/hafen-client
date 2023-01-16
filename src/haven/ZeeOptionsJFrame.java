@@ -1144,7 +1144,8 @@ public class ZeeOptionsJFrame extends JFrame {
             //list.updateUI();
         }
         panelDetailsBottom.removeAll();
-        panelTabGobs.validate();
+        panelTabGobs.revalidate();
+        panelTabGobs.repaint();
         buildTabGobs();
     }
 
@@ -1162,7 +1163,8 @@ public class ZeeOptionsJFrame extends JFrame {
         Utils.setpref(ZeeConfig.MAP_GOB_SPEECH, ZeeConfig.serialize(ZeeConfig.mapGobSpeech));
 
         panelDetailsBottom.removeAll();
-        panelTabGobs.validate();
+        panelTabGobs.revalidate();
+        panelTabGobs.repaint();
         buildTabGobs();
     }
 
