@@ -221,12 +221,12 @@ public class ZeeResearch {
 
             //check same ingredients (or no ingredients)
             boolean ingredsMatch = true;
-            for (int j = 0; j < entryArr.length; j++) {
+            for (int j = 0; j < arrLine.length; j++) {
                 //skip non ingredient entries
-                if (!entryArr[j].contains("igr,"))
+                if (!arrLine[j].contains("igr,"))
                     continue;
                 //ingredient not present, match is false
-                if (!line.contains(entryArr[j])){
+                if (!entry.contains(arrLine[j])){
                     ingredsMatch = false;
                     break;
                 }
