@@ -26,56 +26,11 @@
 
 package haven;
 
-import java.util.*;
-import java.awt.Color;
+import haven.render.*;
+import java.util.function.*;
 
-public class Party {
-    public Map<Long, Member> memb = Collections.emptyMap();
-    public Member leader = null;
-    private final Glob glob;
-    private int mseq = 0;
+public interface EquipTarget {
+    public final Supplier<Pipe.Op> nil = () -> Pipe.Op.nil;
 
-    public Party(Glob glob) {
-	this.glob = glob;
-    }
-
-    public class Member {
-	public final long gobid;
-	public final int seq;
-	private Coord2d c = null;
-	private double ma = Math.random() * Math.PI * 2;
-	private double oa = Double.NaN;
-	public Color col = Color.BLACK;
-
-	public Member(long gobid) {
-	    this.gobid = gobid;
-	    this.seq = mseq++;
-	}
-
-	public Gob getgob() {
-	    return(glob.oc.getgob(gobid));
-	}
-
-	public Coord2d getc() {
-	    Gob gob;
-	    try {
-		if((gob = getgob()) != null) {
-		    this.oa = gob.a;
-		    return(new Coord2d(gob.getc()));
-		}
-	    } catch(Loading e) {}
-	    this.oa = Double.NaN;
-	    return(c);
-	}
-
-	void setc(Coord2d c) {
-	    if((this.c != null) && (c != null))
-		ma = this.c.angle(c);
-	    this.c = c;
-	}
-
-	public double geta() {
-	    return(Double.isNaN(oa) ? ma : oa);
-	}
-    }
+    public Supplier<? extends Pipe.Op> eqpoint(String nm, Message dat);
 }

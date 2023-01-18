@@ -27,6 +27,8 @@
 package haven;
 
 import java.util.*;
+import java.util.function.*;
+import java.lang.reflect.*;
 import java.util.stream.Collectors;
 
 import haven.render.*;
@@ -35,7 +37,7 @@ import haven.Skeleton.PoseMod;
 import static haven.Composited.ED;
 import static haven.Composited.MD;
 
-public class Composite extends Drawable {
+public class Composite extends Drawable implements EquipTarget {
     public final static float ipollen = 0.2f;
     public final Indir<Resource> base;
     public final Composited comp;
@@ -151,6 +153,10 @@ public class Composite extends Drawable {
     
     public Pose getpose() {
 	return(comp.pose);
+    }
+
+    public Supplier<Pipe.Op> eqpoint(String nm, Message dat) {
+	return(comp.eqpoint(nm, dat));
     }
     
     public void chposes(Collection<ResData> poses, boolean interp) {

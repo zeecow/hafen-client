@@ -1024,9 +1024,9 @@ public class Widget {
 	resize(a.sz());
     }
 
-    public void resize(int x, int y) {
-	resize(Coord.of(x, y));
-    }
+    public void resize(int x, int y) {resize(Coord.of(x, y));}
+    public void resizew(int w) {resize(w, sz.y);}
+    public void resizeh(int h) {resize(sz.x, h);}
 
     public void cresize(Widget ch) {
     }
@@ -1512,13 +1512,13 @@ public class Widget {
 
     public abstract class Anim {
 	public Anim() {
-	    synchronized(ui) {
+	    synchronized((ui == null) ? this : ui) {
 		nanims.add(this);
 	    }
 	}
 
 	public void clear() {
-	    synchronized(ui) {
+	    synchronized((ui == null) ? this : ui) {
 		nanims.remove(this);
 		anims.remove(this);
 	    }
