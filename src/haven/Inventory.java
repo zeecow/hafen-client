@@ -41,6 +41,7 @@ public class Inventory extends Widget implements DTarget {
     public ExtInventory ext;
     Action0 dropsCallback;
     public Coord isz;
+    public int cachedSize = -1;
     public boolean[] sqmask = null;
     public static final Comparator<WItem> ITEM_COMPARATOR_ASC = new Comparator<WItem>() {
 	@Override
@@ -177,6 +178,7 @@ public class Inventory extends Widget implements DTarget {
 	    isz = (Coord)args[0];
 	    resize(invsq.sz().add(UI.scale(new Coord(-1, -1))).mul(isz).add(UI.scale(new Coord(1, 1))));
 	    sqmask = null;
+	    cachedSize = -1;
 	} else if(msg == "mask") {
 	    boolean[] nmask;
 	    if(args[0] == null) {
@@ -188,6 +190,7 @@ public class Inventory extends Widget implements DTarget {
 		    nmask[i] = (raw[i >> 3] & (1 << (i & 7))) != 0;
 	    }
 	    this.sqmask = nmask;
+	    cachedSize = -1;
 	} else if(msg == "mode") {
 	    dropul = (((Integer)args[0]) == 0);
 	} else {
@@ -241,7 +244,18 @@ public class Inventory extends Widget implements DTarget {
     }
     
     public int size() {
-	return isz.x * isz.y;
+	if(cachedSize >= 0) {return cachedSize;}
+	
+	if(sqmask == null) {
+	    cachedSize = isz.x * isz.y;
+	} else {
+	    cachedSize = 0;
+	    for (boolean b : sqmask) {
+		if(!b) {cachedSize++;}
+	    }
+	}
+	
+	return cachedSize;
     }
     
     public int filled() {

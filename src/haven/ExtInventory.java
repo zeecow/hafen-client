@@ -221,11 +221,12 @@ public class ExtInventory extends Widget {
     
     @Override
     public void uimsg(String msg, Object... args) {
-	if(msg.equals("sz") || msg.equals("mode")) {
+	boolean mask = msg.equals("mask");
+	if(mask || msg.equals("sz") || msg.equals("mode")) {
 	    int szx = inv.sz.x;
 	    int szy = inv.sz.y;
 	    inv.uimsg(msg, args);
-	    if((szx != inv.sz.x) || (szy != inv.sz.y)) {
+	    if((szx != inv.sz.x) || (szy != inv.sz.y) || mask) {
 		updateLayout();
 	    }
 	} else {
