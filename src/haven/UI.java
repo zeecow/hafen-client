@@ -26,6 +26,7 @@
 
 package haven;
 
+import haven.rx.Reactor;
 import me.ender.WindowDetector;
 
 import java.awt.*;
@@ -384,6 +385,7 @@ public class UI {
     }
 
     public void msg(String msg) {
+	Reactor.IMSG.onNext(msg);
 	MessageWidget h = MessageWidget.find(root);
 	if(h != null)
 	    h.msg(msg);
