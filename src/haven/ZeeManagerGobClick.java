@@ -877,10 +877,8 @@ public class ZeeManagerGobClick extends ZeeThread{
                     gobClick(gob, 3, UI.MOD_SHIFT);
             }
         }
-        else if (isBarrelTakeAll(gob)) {
-            if (petalName.equals(ZeeFlowerMenu.STRPETAL_BARRELTAKEALL)) {
-                barrelTakeAllSeeds(gob);
-            }
+        else if (petalName.equals(ZeeFlowerMenu.STRPETAL_BARRELTAKEALL)) {
+            barrelTakeAllSeeds(gob);
         }
         else if ( petalName.equals(ZeeFlowerMenu.STRPETAL_DESTROYTREELOG3)
             || petalName.equals(ZeeFlowerMenu.STRPETAL_DESTROYTREELOG5)
@@ -1615,44 +1613,7 @@ public class ZeeManagerGobClick extends ZeeThread{
     }
 
     public static void barrelTakeAllSeeds(Gob gob){
-        try{
-            // shift+rclick last barrel
-            ZeeManagerGobClick.gobClick(gob, 3, UI.MOD_SHIFT);
-
-            //wait getting to the barrel
-            waitPlayerIdleFor(1);
-
-            if (ZeeConfig.distanceToPlayer(gob) > ZeeManagerFarmer.MIN_ACCESSIBLE_DIST) {
-                ZeeConfig.msg("barrel unreachable");
-                return;
-            }
-
-            ZeeConfig.addPlayerText("taking contents...");
-
-            while (!ZeeManagerGobClick.isBarrelEmpty(gob) && !isInventoryFull()) {
-                ZeeManagerGobClick.gobClick(gob, 3, UI.MOD_SHIFT);
-                Thread.sleep(PING_MS);
-                if (ZeeConfig.isTaskCanceledByGroundClick())
-                    break;
-            }
-
-            //if holding seed, store in barrel
-            waitHoldingItem();
-            ZeeManagerGobClick.itemActGob(gob, 0);
-
-            if (isInventoryFull())
-                ZeeConfig.msg("Inventory full");
-            else if (!ZeeConfig.isTaskCanceledByGroundClick())
-                ZeeConfig.msg("Took everything");
-
-        }catch(Exception e){
-            e.printStackTrace();
-        }
-        ZeeConfig.removePlayerText();
-    }
-
-    private void barrelTakeAllSeeds() {
-        barrelTakeAllSeeds(gob);
+        ZeeManagerGobClick.gobClick(gob, 3, UI.MOD_CTRL_SHIFT);
     }
 
     public static boolean isInventoryFull() {

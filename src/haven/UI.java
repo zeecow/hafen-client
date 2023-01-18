@@ -36,7 +36,7 @@ import java.awt.event.MouseEvent;
 import java.util.*;
 
 public class UI {
-    public static int MOD_SHIFT = KeyMatch.S, MOD_CTRL = KeyMatch.C, MOD_META = KeyMatch.M, MOD_SUPER = KeyMatch.SUPER;
+    public static int MOD_SHIFT = KeyMatch.S, MOD_CTRL = KeyMatch.C, MOD_META = KeyMatch.M, MOD_SUPER = KeyMatch.SUPER, MOD_CTRL_SHIFT = 3;
     public RootWidget root;
     private final LinkedList<Grab> keygrab = new LinkedList<Grab>(), mousegrab = new LinkedList<Grab>();
     private final Map<Integer, Widget> widgets = new TreeMap<Integer, Widget>();
