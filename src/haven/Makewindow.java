@@ -348,13 +348,24 @@ public class Makewindow extends Widget {
 	    x += qmodl.sz().x + UI.scale(5);
 	    x = Math.max(x, xoff);
 	    qmx = x;
+	    int count = 0;
+	    double product = 1.0;
 	    for(Indir<Resource> qm : qmod) {
 		try {
 		    Tex t = qmicon(qm);
 		    g.image(t, new Coord(x, qmy));
 		    x += t.sz().x + UI.scale(1);
+		    
+		    Glob.CAttr attr = ui.gui.chrwdg.findattr(qm.get().basename());
+		    if(attr != null) {
+			count++;
+			product = product * attr.comp;
+		    }
 		} catch(Loading l) {
 		}
+	    }
+	    if(count > 0) {
+		x += drawSoftcap(g, new Coord(x, qmy), product, count);
 	    }
 	    x += UI.scale(25);
 	}
