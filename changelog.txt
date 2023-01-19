@@ -1,3 +1,7 @@
+$size[14]{$u{Update for 19.01.23:}
+  * fixed missing softcap on craft window
+  * fixed hitboxes not showing for some objects
+ 
 $size[14]{$u{Update for 18.01.23:}
   * merged loftar's changes
   * fixed buff icons for swimming/tracking/criminal toggles not showing
