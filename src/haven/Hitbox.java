@@ -7,8 +7,6 @@ import java.util.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static haven.Sprite.*;
-
 public class Hitbox extends SlottedNode implements Rendered {
     private static final VertexArray.Layout LAYOUT = new VertexArray.Layout(new VertexArray.Layout.Input(Homo3D.vertex, new VectorFormat(3, NumberFormat.FLOAT32), 0, 0, 12));
     private Model model;
@@ -114,18 +112,6 @@ public class Hitbox extends SlottedNode implements Rendered {
 			box.add(new Coord3f(neg.ac.x, -neg.bc.y, Z));
 		    
 			polygons.add(box);
-		    }
-		}
-	    
-		Collection<Resource.Obst> obsts = res.layers(Resource.Obst.class);
-		if(obsts != null) {
-		    for (Resource.Obst obstacle : obsts) {
-			if("build".equals(obstacle.id)) {continue;}
-			for (Coord2d[] polygon : obstacle.polygons) {
-			    polygons.add(Arrays.stream(polygon)
-				.map(coord2d -> new Coord3f(MCache.tilesz2.x * (float) coord2d.x, -MCache.tilesz2.y * (float) coord2d.y, Z))
-				.collect(Collectors.toList()));
-			}
 		    }
 		}
 	    

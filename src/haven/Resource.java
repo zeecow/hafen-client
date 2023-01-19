@@ -1190,37 +1190,6 @@ public class Resource implements Serializable {
 	public void init() {}
     }
     
-    @LayerName("obst")
-    public class Obst extends Layer {
-	final int version;
-	final String id;
-	public final List<Coord2d[]> polygons;
-	
-	public Obst(Message msg) {
-	    version = msg.int8();
-	    if(version >= 2) {
-		id = msg.string();
-	    } else {
-		id = "";
-	    }
-	    int polygonCount = msg.int8();
-	    polygons = new LinkedList<>();
-	    int[] polygonSizes = new int[polygonCount];
-	    for (int i = 0; i < polygonCount; i++) {
-		polygonSizes[i] = msg.int8();
-	    }
-	    for (int i = 0; i < polygonCount; i++) {
-		int points = polygonSizes[i];
-		Coord2d[] polygon = new Coord2d[points];
-		for (int j = 0; j < points; j++) {
-		    polygon[j] = new Coord2d(msg.float16(), msg.float16());
-		}
-		polygons.add(polygon);
-	    }
-	}
-	
-	public void init() {}
-    }
 
     @LayerName("props")
     public class Props extends Layer {
