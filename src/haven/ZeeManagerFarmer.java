@@ -291,12 +291,26 @@ public class ZeeManagerFarmer extends ZeeThread{
             return false;
         }
 
-        //take all barrel seeds
-        ZeeManagerGobClick.gobClick(barrel, 3, UI.MOD_CTRL_SHIFT);
+        // TODO use only gobClick when bug is fixed
+        // https://www.havenandhearth.com/forum/viewtopic.php?f=47&t=74122
+        if (ZeeConfig.takeAllSeedsWdgMsg) {
+            //take all barrel seeds
+            ZeeManagerGobClick.gobClick(barrel, 3, UI.MOD_CTRL_SHIFT);
+            //wait inventory update
+            sleep(PING_MS * 2);
+        }
+        else {
+            while(!isBarrelEmpty(barrel) && !isInventoryFull()){
+                ZeeManagerGobClick.gobClick(barrel, 3, UI.MOD_SHIFT);
+                Thread.sleep(PING_MS*2);
+            }
+            if(waitHoldingItem(4000)) {//store remaining holding item
+                ZeeManagerGobClick.itemActGob(barrel, 0);
+                Thread.sleep(1000);
+            }
+            ZeeConfig.removePlayerText();
+        }
 
-        //wait inventory update
-        sleep(PING_MS*2);
-        ZeeConfig.removePlayerText();
 
         //return total inv seeds
         return getInvTotalSeedAmount() >= 5;
