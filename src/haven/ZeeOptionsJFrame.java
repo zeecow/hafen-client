@@ -271,6 +271,10 @@ public class ZeeOptionsJFrame extends JFrame {
 
         tabbedPane.addTab("Misc", panelTabMisc);
 
+        // TODO remove this when bug is fixed
+        // https://www.havenandhearth.com/forum/viewtopic.php?f=47&t=74122
+        panelTabMisc.add(new ZeeOptionJCheckBox( "use broken take all seeds", "takeAllSeedsWdgMsg"),c);
+
         panelTabMisc.add(new ZeeOptionJCheckBox( "Fish Moon Xp alert", "fishMoonXpAlert"),c);
 
         panelTabMisc.add(new ZeeOptionJCheckBox( "Hide crops (ctrl+h)", "hideCrops"),c);
