@@ -345,7 +345,7 @@ public class ZeeOptionsJFrame extends JFrame {
 
 
         // mute audio msg
-        panelTabMisc.add(new ZeeOptionJCheckBox( "Mute audio messages:", "blockAudioMsg"),c);
+        panelTabMisc.add(new ZeeOptionJCheckBox( "Mute audio messages (use ;)", "blockAudioMsg"),c);
         panelTabMisc.add(tfBlockAudioMsgs= new JTextField("",5), c);
         tfBlockAudioMsgs.setMaximumSize(new Dimension(Integer.MAX_VALUE, tfBlockAudioMsgs.getPreferredSize().height));
         tfBlockAudioMsgs.setText(ZeeConfig.blockAudioMsgList);

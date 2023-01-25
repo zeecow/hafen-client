@@ -1532,6 +1532,8 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Message
     private double lasterrsfx = 0;
     public void error(String msg) {
 	msg(msg, new Color(192, 0, 0), new Color(255, 0, 0));
+	if (ZeeConfig.blockAudioMsg && ZeeConfig.isMsgAudioMuted(msg))
+		return;
 	// mute stockpile msgs while area piler is working
 	if ( ZeeManagerStockpile.selAreaPile &&
 			(msg.contains("stockpile is already full") || msg.contains("site is occupied")) )

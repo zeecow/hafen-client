@@ -3018,7 +3018,7 @@ public class ZeeConfig {
     public static boolean isMsgAudioMuted(String msg) {
         String[] arr = blockAudioMsgList.split(";");
         for (int i = 0; i < arr.length; i++) {
-            if (arr[i].contains(msg.strip()))
+            if (msg.strip().contains(arr[i].strip()))
                 return true;
         }
         return false;
