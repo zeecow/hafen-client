@@ -289,7 +289,8 @@ public class ZeeConfig {
         "gfx/terobjs/herbs/clay-cave",
         "gfx/terobjs/map/cavepuddle",
         "gfx/terobjs/herbs/mandrake",
-        "gfx/terobjs/herbs/seashell"
+        "gfx/terobjs/herbs/seashell",
+        "gfx/kritter/stalagoomba/stalagoomba"
     ));
     public final static Set<String> aggressiveGobs = new HashSet<String>(Arrays.asList(
             "gfx/kritter/adder/adder",
