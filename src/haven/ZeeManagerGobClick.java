@@ -1542,10 +1542,10 @@ public class ZeeManagerGobClick extends ZeeThread{
         return lastClickDiffMs < LONG_CLICK_MS;
     }
 
-    private static boolean isInspectGob(String gobName){
+    public static boolean isInspectGob(String gobName){
         if(isGobTree(gobName) || isGobBush(gobName) || isGobBoulder(gobName))
             return true;
-        String list = "/meatgrinder,/potterswheel,/well,/dframe,/smokeshed,"
+        String list = "/meatgrinder,/potterswheel,/well,/dframe,/smokeshed,/winepress,"
                 +"/smelter,/primsmelter,/crucible,/steelcrucible,/fineryforge,/kiln,/tarkiln,/oven,"
                 +"/compostbin,/gardenpot,/beehive,/htable,/bed-sturdy,/boughbed,/alchemiststable,"
                 +"/gemwheel,/spark,/cauldron,/churn,/chair-rustic,"
