@@ -30,7 +30,8 @@ Client focusing on small helper tasks, many using mouse middle button, and other
 - inspect cursor tooltip containing gob/tile/minimap info
 - shift+tab toggles between belt, creel and basket
 - option Ctrl+click petal confirmation list (default Empty, Swill)
-- midclick Barter Stand "Buy" button to auto-buy  
+- Barter Stand "allow mid-click auto-buy" checkbox
+- Barter Stand button return branches to closest wooden chest
 - Audio msg mute list
 - lift vehicle before travel hearth
 - midclick mark expands minimap, center mark, highlight mark

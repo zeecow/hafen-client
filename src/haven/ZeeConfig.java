@@ -1174,7 +1174,46 @@ public class ZeeConfig {
             public void changed(boolean val) {
                 ZeeConfig.allowMidclickAutoBuy = val;
             }
-        },0,410);
+        },0,400);
+
+
+        //button return branches
+        Widget btn = window.add(new Button(UI.scale(120),"return branches"){
+            public void click() {
+                //cehck inv branches
+                List<WItem> branches = getMainInventory().getWItemsByNameContains("/branch");
+                if (branches.size() == 0){
+                    msgError("no branches to return");
+                    return;
+                }
+                //check wooden chests
+                Gob woodenChest = getClosestGob(findGobsByNameEndsWith("terobjs/chest"));
+                double chestDistance = distanceToPlayer(woodenChest);
+                if (woodenChest==null || chestDistance > 18){
+                    msgError("no wooden chests close enough");
+                    return;
+                }
+                //if chest already open, do transfer
+                List openWindows = getWindows("Chest");
+                if (openWindows.size() == 1) {
+                    branches.get(0).item.wdgmsg("transfer",Coord.z,-1);
+                    return;
+                }
+                //open chest and do transfer
+                new ZeeThread(){
+                    public void run() {
+                        try {
+                            ZeeManagerGobClick.gobClick(woodenChest, 3);
+                            waitPlayerIdleFor(1);
+                            branches.get(0).item.wdgmsg("transfer",Coord.z,-1);
+                        }catch (Exception e){
+                            e.printStackTrace();
+                        }
+                    }
+                }.start();
+            }
+        },0,413);
+        btn.settip("return branches to closest wooden chest");
 
 
         window.resize(260,440);
