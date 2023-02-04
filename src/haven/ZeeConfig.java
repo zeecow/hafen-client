@@ -1938,7 +1938,7 @@ public class ZeeConfig {
                 +"Tub,Compost Bin,Extraction Press,Rack,Herbalist Table,Frame,"
                 +"Chicken Coop,Rabbit Hutch,Archery Target,Creel,Oven,Steel crucible,"
                 +"Cauldron,Pane mold,Kiln,Old Trunk,Old Stump,Smoke shed,Finery Forge,"
-                +"Tidepool,Quiver,Fireplace"
+                +"Tidepool,Quiver,Fireplace,Bundle"
         ).split(",");
         for (String contName: containers) {
             if (window.cap.text.contains(contName)) {
