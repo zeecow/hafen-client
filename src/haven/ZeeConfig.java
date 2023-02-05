@@ -1189,7 +1189,7 @@ public class ZeeConfig {
                 //check wooden chests
                 Gob woodenChest = getClosestGob(findGobsByNameEndsWith("terobjs/chest"));
                 double chestDistance = distanceToPlayer(woodenChest);
-                if (woodenChest==null || chestDistance > 18){
+                if (woodenChest==null || chestDistance > 25){
                     msgError("no wooden chests close enough");
                     return;
                 }
