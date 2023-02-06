@@ -1204,7 +1204,10 @@ public class ZeeConfig {
                     public void run() {
                         try {
                             ZeeManagerGobClick.gobClick(woodenChest, 3);
-                            waitPlayerIdleFor(1);
+                            if (!waitWindowOpened("Chest")){
+                                msgError("timeout waiting window opened");
+                                return;
+                            }
                             branches.get(0).item.wdgmsg("transfer",Coord.z,-1);
                         }catch (Exception e){
                             e.printStackTrace();

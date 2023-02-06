@@ -795,6 +795,24 @@ public class ZeeThread  extends Thread{
         return (timeoutMs <= 0);
     }
 
+    static boolean waitWindowOpened(String windowName){
+        if (ZeeConfig.getWindow(windowName)!=null) {
+            //println("waitWindowOpened > already opened");
+            return true;
+        }
+        long timeoutMs = 3000;
+        try{
+            while(timeoutMs>0 && ZeeConfig.getWindow(windowName)==null){
+                timeoutMs -= 50;
+                Thread.sleep(50);
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        //println("waitWindowOpened > timeoutMs="+timeoutMs);
+        return timeoutMs > 0;
+    }
+
     public static boolean waitGobRemovedOrCancelClick(Gob gob){
         try{
             //println("waitGobRemoved > enter loop");
