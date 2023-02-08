@@ -515,12 +515,15 @@ public class ZeeConfig {
             gfx/invobjs/chicken-cleaned, gfx/invobjs/adder-clean
             gfx/invobjs/meat
          */
+        // skip hides ("/squirrelhide")
+        if (nameContains.endsWith("hide"))
+            return false;
         String[] endlist = {
-                "rockdove","quail","/hen","/rooster","magpie", // "/crab"
-                "mallard","seagull","ptarmigan","grouse",
-                "/squirrel","/hedgehog","/bogturtle",
-                "/rabbit-buck","-doe","/adder","/mole",
-                "-dead","-plucked","-cleaned","-clean"
+            "rockdove","quail","/hen","/rooster","magpie", // "/crab"
+            "mallard","seagull","ptarmigan","grouse",
+            "/squirrel","/hedgehog","/bogturtle",
+            "/rabbit-buck","-doe","/adder","/mole",
+            "-dead","-plucked","-cleaned","-clean"
         };
         for (int i = 0; i < endlist.length; i++) {
             if(nameContains.contains(endlist[i]) || isFish(nameContains))
