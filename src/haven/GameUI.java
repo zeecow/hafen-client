@@ -73,6 +73,7 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Message
     public Bufflist buffs;
 
     private static final OwnerContext.ClassResolver<BeltSlot> beltctxr = new OwnerContext.ClassResolver<BeltSlot>()
+	.add(GameUI.class, slot -> slot.wdg())
 	.add(Glob.class, slot -> slot.wdg().ui.sess.glob)
 	.add(Session.class, slot -> slot.wdg().ui.sess);
     public class BeltSlot implements GSprite.Owner {
@@ -819,7 +820,7 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Message
 	    equwnd = new Hidewnd(Coord.z, "Equipment");
 	    equwnd.add(child, Coord.z);
 	    equwnd.pack();
-		equwnd.hide();
+	    equwnd.hide();
 	    add(equwnd, Utils.getprefc("wndc-equ", new Coord(400, 10)));
 	} else if(place == "hand") {
 	    GItem g = add((GItem)child);
@@ -1233,7 +1234,7 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Message
 		help.res = res;
 	} else if(msg == "map-mark") {
 	    long gobid = Utils.uint32((Integer)args[0]);
-	    long oid = (Long)args[1];
+	    long oid = ((Number)args[1]).longValue();
 	    Indir<Resource> res = ui.sess.getres((Integer)args[2]);
 	    String nm = (String)args[3];
 	    if(mapfile != null)
@@ -1501,7 +1502,7 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Message
 
     public void resize(Coord sz) {
 	ZeeConfig.gameUIPrevSz = Coord.of(this.sz);
-	this.sz = sz;
+	super.resize(sz);
 	chat.resize(sz.x - blpw - brpw);
 	chat.move(new Coord(blpw, sz.y));
 	if(map != null)
@@ -1511,7 +1512,6 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Message
 	beltwdg.c = new Coord(blpw + UI.scale(10), sz.y - beltwdg.sz.y - UI.scale(5));
 	zeeHistWdg.c = beltwdg.c.add(10,0);
 	ZeeConfig.gameUIResized();
-	super.resize(sz);
     }
     
     public void presize() {
@@ -1567,7 +1567,7 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Message
 			lastmsgsfx = now;
 		}
 	}
-    
+
     public void act(String... args) {
 	wdgmsg("act", (Object[])args);
     }
@@ -1723,7 +1723,7 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Message
 	    return(true);
 	}
     }
-
+    
     {
 	beltwdg = add(new ZeeBelt());
 	zeeHistWdg = add(new ZeeHistWdg());

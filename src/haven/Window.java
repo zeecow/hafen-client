@@ -202,7 +202,7 @@ public class Window extends Widget implements DTarget {
 	    drawbg(g);
 	cdraw(g.reclip(atl, asz));
 	if(!decohide)
-		drawframe(g);
+	    drawframe(g);
     }
 
     public void draw(GOut g) {
@@ -344,6 +344,11 @@ public class Window extends Widget implements DTarget {
 	    super.mousemove(c);
 	}
     }
+
+	public boolean mousehover(Coord c) {
+		super.mousehover(c);
+		return(true);
+	}
 
 	boolean isAutoHideOn = false, isAutoHidden =false;
 	boolean hasOrganizeButton = false;
