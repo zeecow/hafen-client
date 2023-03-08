@@ -194,7 +194,18 @@ public class GItem extends AWidget implements ItemInfo.SpriteOwner, GSprite.Owne
 	if(!content.empty() && !content.q.isEmpty()) {
 	    return content.q;
 	}
-	return new QualityList(ItemInfo.findall(QualityList.classname, info));
+	if(contents != null) {
+	    List<QualityList.Quality> qualities = new LinkedList<>();
+	    for (WItem item : contents.children(WItem.class)) {
+		QualityList list = item.itemq.get();
+		if(list == null || list.isEmpty()) {continue;}
+		qualities.add(list.single());
+	    }
+	    if(!qualities.isEmpty()) {
+		return new QualityList(new QualityList(qualities).single(QualityList.SingleType.Average));
+	    }
+	}
+	return QualityList.make(ItemInfo.findall(QualityList.classname, info));
     }));
     
     public final ItemInfo.AttrCache<Float> quantity = new ItemInfo.AttrCache<>(this::info, ItemInfo.AttrCache.cache(info -> {
