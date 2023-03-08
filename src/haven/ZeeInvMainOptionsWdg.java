@@ -149,6 +149,7 @@ public class ZeeInvMainOptionsWdg extends Widget {
     public void reposition() {
         repositionLabelCount();
         repositionTransferOptions();
+        this.parent.pack();
     }
 
     public void repositionLabelCount() {
