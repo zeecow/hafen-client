@@ -36,8 +36,7 @@ public class EquipProxy extends DraggableWidget implements DTarget2 {
 		boolean wasNull = w.contents == null;
 		boolean hovered = w.mousehover(Coord.z);
 		if(hovered && wasNull && (w.item.contents != null) && (w.contentswnd == null)) {
-		    //TODO: improve positioning - currently it is placed at the end of the proxy widget, not at the actual proxied slot
-		    w.hovering_pos = parentpos(parent, sz.sub(5, 5).sub(WItem.Contents.hovermarg));
+		    w.hovering_pos = parentpos(parent, sqroff(c).add(1, 1).mul(sqsz).sub(5, 5).sub(WItem.Contents.hovermarg));
 		}
 		return hovered;
 	    }
