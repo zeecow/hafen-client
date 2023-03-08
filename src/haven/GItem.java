@@ -43,6 +43,10 @@ public class GItem extends AWidget implements ItemInfo.SpriteOwner, GSprite.Owne
     public int meter = 0;
     public long meterUpdated = 0; //last time meter was updated, ms 
     public int num = -1;
+    public Widget contents = null;
+    public String contentsnm = null;
+    public Object contentsid = null;
+    public int infoseq;
     private GSprite spr;
     private ItemInfo.Raw rawinfo;
     private List<ItemInfo> info = Collections.emptyList();
@@ -148,6 +152,7 @@ public class GItem extends AWidget implements ItemInfo.SpriteOwner, GSprite.Owne
     }
     public Resource getres() {return(res.get());}
     private static final OwnerContext.ClassResolver<GItem> ctxr = new OwnerContext.ClassResolver<GItem>()
+	.add(GItem.class, wdg -> wdg)
 	.add(Glob.class, wdg -> wdg.ui.sess.glob)
 	.add(Session.class, wdg -> wdg.ui.sess);
     public <T> T context(Class<T> cl) {return(ctxr.context(cl, this));}
@@ -174,9 +179,11 @@ public class GItem extends AWidget implements ItemInfo.SpriteOwner, GSprite.Owne
     }
 
     public void tick(double dt) {
+	super.tick(dt);
 	GSprite spr = spr();
 	if(spr != null)
 	    spr.tick(dt);
+	updcontinfo();
 	testMatch();
     }
     
@@ -261,9 +268,15 @@ public class GItem extends AWidget implements ItemInfo.SpriteOwner, GSprite.Owne
     }
 
     public List<ItemInfo> info() {
-	if(info == null)
-	    info = ItemInfo.buildinfo(this, rawinfo);
-	return(info);
+	if(this.info == null) {
+	    List<ItemInfo> info = ItemInfo.buildinfo(this, rawinfo);
+	    addcontinfo(info);
+	    Resource.Pagina pg = res.get().layer(Resource.pagina);
+	    if(pg != null)
+		info.add(new ItemInfo.Pagina(this, pg.text));
+	    this.info = info;
+	}
+	return(this.info);
     }
 
     public Resource resource() {
@@ -288,12 +301,100 @@ public class GItem extends AWidget implements ItemInfo.SpriteOwner, GSprite.Owne
 	} else if(name == "tt") {
 	    info = null;
 	    rawinfo = new ItemInfo.Raw(args);
+	    infoseq++;
 	    filtered = 0;
 	    meterUpdated = System.currentTimeMillis();
 	    if(sendttupdate){wdgmsg("ttupdate");}
 	} else if(name == "meter") {
 	    meterUpdated = System.currentTimeMillis();	    
 	    meter = (int)((Number)args[0]).doubleValue();
+	}
+    }
+
+    public void addchild(Widget child, Object... args) {
+	/* XXX: Update this to use a checkable args[0] once a
+	 * reasonable majority of clients can be expected to not crash
+	 * on that. */
+	if(true || ((String)args[0]).equals("contents")) {
+	    contents = add(child);
+	    contentsnm = (String)args[1];
+	    contentsid = null;
+	    if(args.length > 2)
+		contentsid = args[2];
+	}
+    }
+
+    public void cdestroy(Widget w) {
+	super.cdestroy(w);
+	if(w == contents) {
+	    contents = null;
+	    contentsid = null;
+	}
+    }
+
+    public static interface ContentsInfo {
+	public void propagate(List<ItemInfo> buf, ItemInfo.Owner outer);
+    }
+
+    /* XXX: Please remove me some time, some day, when custom clients
+     * can be expected to have merged ContentsInfo. */
+    private static void propagate(ItemInfo inf, List<ItemInfo> buf, ItemInfo.Owner outer) {
+	try {
+	    java.lang.reflect.Method mth = inf.getClass().getMethod("propagate", List.class, ItemInfo.Owner.class);
+	    Utils.invoke(mth, inf, buf, outer);
+	} catch(NoSuchMethodException e) {
+	}
+    }
+
+    private int lastcontseq;
+    private List<Pair<GItem, Integer>> lastcontinfo = null;
+    private void updcontinfo() {
+	if(info == null)
+	    return;
+	Widget contents = this.contents;
+	if(contents != null) {
+	    boolean upd = false;
+	    if((lastcontinfo == null) || (lastcontseq != contents.childseq)) {
+		lastcontinfo = new ArrayList<>();
+		for(Widget ch : contents.children()) {
+		    if(ch instanceof GItem) {
+			GItem item = (GItem)ch;
+			lastcontinfo.add(new Pair<>(item, item.infoseq));
+		    }
+		}
+		lastcontseq = contents.childseq;
+		upd = true;
+	    } else {
+		for(ListIterator<Pair<GItem, Integer>> i = lastcontinfo.listIterator(); i.hasNext();) {
+		    Pair<GItem, Integer> ch = i.next();
+		    if(ch.b != ch.a.infoseq) {
+			i.set(new Pair<>(ch.a, ch.a.infoseq));
+			upd = true;
+		    }
+		}
+	    }
+	    if(upd) {
+		info = null;
+		infoseq++;
+	    }
+	} else {
+	    lastcontinfo = null;
+	}
+    }
+
+    private void addcontinfo(List<ItemInfo> buf) {
+	Widget contents = this.contents;
+	if(contents != null) {
+	    for(Widget ch : contents.children()) {
+		if(ch instanceof GItem) {
+		    for(ItemInfo inf : ((GItem)ch).info()) {
+			if(inf instanceof ContentsInfo)
+			    ((ContentsInfo)inf).propagate(buf, this);
+			else
+			    propagate(inf, buf, this);
+		    }
+		}
+	    }
 	}
     }
     

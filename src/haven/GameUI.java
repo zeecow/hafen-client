@@ -110,6 +110,7 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Message
     };
 
     private static final OwnerContext.ClassResolver<BeltSlot> beltctxr = new OwnerContext.ClassResolver<BeltSlot>()
+	.add(GameUI.class, slot -> slot.wdg())
 	.add(Glob.class, slot -> slot.wdg().ui.sess.glob)
 	.add(Session.class, slot -> slot.wdg().ui.sess);
     public class BeltSlot implements GSprite.Owner {
@@ -1496,7 +1497,7 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Message
 		help.res = res;
 	} else if(msg == "map-mark") {
 	    long gobid = Utils.uint32((Integer)args[0]);
-	    long oid = (Long)args[1];
+	    long oid = ((Number)args[1]).longValue();
 	    Indir<Resource> res = ui.sess.getres((Integer)args[2]);
 	    String nm = (String)args[3];
 	    if(mapfile != null)
@@ -1750,7 +1751,7 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Message
     }
 
     public void resize(Coord sz) {
-	this.sz = sz;
+	super.resize(sz);
 	chat.resize(sz.x - blpw - brpw);
 	chat.move(new Coord(blpw, sz.y));
 	if(map != null)
@@ -1758,7 +1759,6 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Message
 	if(prog != null)
 	    prog.move(sz.sub(prog.sz).mul(0.5, 0.35));
 	beltwdg.c = new Coord(blpw + UI.scale(10), sz.y - beltwdg.sz.y - UI.scale(5));
-	super.resize(sz);
     }
     
     public void presize() {
