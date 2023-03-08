@@ -9,12 +9,12 @@ public class EquipProxy extends DraggableWidget implements DTarget2 {
     public static final Color BG_COLOR = new Color(91, 128, 51, 202);
     private Equipory.SLOTS[] slots;
     
-    public EquipProxy(Equipory.SLOTS ...slots) {
+    public EquipProxy(Equipory.SLOTS... slots) {
 	super("EquipProxy");
 	setSlots(slots);
     }
     
-    public void setSlots(Equipory.SLOTS ...slots) {
+    public void setSlots(Equipory.SLOTS... slots) {
 	this.slots = slots;
 	sz = invsz(new Coord(slots.length, 1));
     }
@@ -128,7 +128,7 @@ public class EquipProxy extends DraggableWidget implements DTarget2 {
     }
     
     private void activate(int i, int button) {
-        Coord mc = ui.mc;
+	Coord mc = ui.mc;
 	Coord c = sqoff(new Coord(i, 0)).add(rootpos());
 	ui.mousedown(c, button);
 	ui.mouseup(c, button);
