@@ -695,6 +695,29 @@ public class WItem extends Widget implements DTarget2 {
 	    }
 	}
     }
+    
+    public void toggleContents() {
+	if(this.item.contents == null || this.ui == null) {
+	    return;
+	}
+	WItem.ContentsWindow wnd;
+	if(this.contentswnd instanceof WItem.ContentsWindow) {
+	    wnd = (WItem.ContentsWindow) this.contentswnd;
+	    if(!wnd.invdest) {
+		wnd.wdgmsg("close");
+	    }
+	} else if(this.contents != null && !this.contents.invdest) {
+	    WItem.Contents cont = this.contents;
+	    cont.inv.unlink();
+	    this.contentswnd = item.ui.gui.add(new WItem.ContentsWindow(this, cont.inv), Coord.z);
+	    cont.invdest = true;
+	    cont.destroy();
+	    this.contents = null;
+	} else {
+	    this.item.contents.unlink();
+	    this.contentswnd = this.ui.gui.add(new WItem.ContentsWindow(this, this.item.contents), Coord.z);
+	}
+    }
 
     public static class ContentsWindow extends Window {
 	public final WItem cont;
