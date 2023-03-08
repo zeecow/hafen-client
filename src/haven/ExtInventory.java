@@ -45,6 +45,11 @@ public class ExtInventory extends Widget {
 	inv.ext = this;
 	extension = new Extension();
 	chb_repeat.settip("$b{Toggle repeat mode}\nApply any menu action to\nall items in the group.", true);
+	chb_show
+	    .rclick(this::toggleInventory)
+	    .changed(this::setVisibility)
+	    .settip("LClick to toggle extra info\nRClick to hide inventory when info is visible\nTapping ALT toggles between displaying quality, name and info", true);
+    
 	Composer composer = new Composer(extension).hmrgn(margin).vmrgn(margin);
 	grouping = new Dropbox<Grouping>(UI.scale(75), 5, UI.scale(16)) {
 	    {bgcolor = new Color(16, 16, 16, 128);}
@@ -118,24 +123,41 @@ public class ExtInventory extends Widget {
     }
     
     @Override
-    protected void added() {
-	wnd = getparent(WindowX.class);
+    public void unlink() {
+	if(chb_show.parent != null) {
+	    chb_show.unlink();
+	}
 	if(wnd != null) {
+	    wnd.remtwdg(chb_show);
+	}
+	super.unlink();
+    }
+    
+    @Override
+    protected void added() {
+	wnd = null;//just in case
+	Window tmp;
+	//do not try to add if we are in small floaty contents widget 
+	if(getparent(Contents.class) == null
+	    //or in the item
+	    && !(parent instanceof GItem)
+	    //or if we have no window parent, 
+	    && (tmp = getparent(Window.class)) != null
+	    //or it is not WindowX for some reason
+	    && tmp instanceof WindowX) {
+	
+	    wnd = (WindowX) tmp;
 	    disabled = disabled || needDisableExtraInventory(wnd.caption());
 	    boolean vis = !disabled && wnd.cfg.getValue(CFG_SHOW, false);
 	    showInv = wnd.cfg.getValue(CFG_INV, true);
 	    if(!disabled) {
 		chb_show.a = vis;
-		wnd.addtwdg(wnd.add(chb_show)
-		    .rclick(this::toggleInventory)
-		    .changed(this::setVisibility)
-		    .settip("LClick to toggle extra info\nRClick to hide inventory when info is visible\nTapping ALT toggles between displaying quality, name and info", true)
-		);
+		wnd.addtwdg(wnd.add(chb_show));
 		grouping.sel = Grouping.valueOf(wnd.cfg.getValue(CFG_GROUP, Grouping.NONE.name()));
 		needUpdate = true;
 	    }
-	    hideExtension();
 	}
+	hideExtension();
     }
     
     private void setVisibility(boolean v) {
@@ -161,6 +183,11 @@ public class ExtInventory extends Widget {
     
     private void updateLayout() {
 	inv.visible = showInv || !extension.visible;
+    
+	if(wnd == null) {
+	    pack();
+	    return;
+	}
 	
 	int szx = 0;
 	int szy = inv.pos("br").y;
