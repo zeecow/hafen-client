@@ -28,9 +28,8 @@ package haven;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.util.Collections;
 import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 public class GItem extends AWidget implements ItemInfo.SpriteOwner, GSprite.Owner {
     public Indir<Resource> res;
