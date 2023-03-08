@@ -174,7 +174,8 @@ public class WItem extends Widget implements DTarget2 {
     
     public final AttrCache<QualityList> itemq;
     
-    public final AttrCache<Pair<String, String>> study = new AttrCache<>(this::info, AttrCache.map1(Curiosity.class, curio -> curio::remainingTip));
+    //explicitly added type to be sure IDE is not confused
+    public final AttrCache<Pair<String, String>> study = new AttrCache<Pair<String, String>>(this::info, AttrCache.map1(Curiosity.class, curio -> curio::remainingTip));
     
     public final AttrCache<Tex> heurnum = new AttrCache<Tex>(this::info, AttrCache.cache(info -> {
 	String num = ItemInfo.getCount(info);
