@@ -695,8 +695,6 @@ public class WItem extends Widget implements DTarget2 {
 	}
     }
 
-}
-
     public static class ContentsWindow extends Window {
 	public final WItem cont;
 	public final Widget inv;
