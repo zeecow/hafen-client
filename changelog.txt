@@ -1,3 +1,7 @@
+$size[14]{$u{Update for 08.03.23:}
+  * merged loftar's code
+  * added average quality of items to stacks
+ 
 $size[14]{$u{Update for 19.01.23:}
   * fixed missing softcap on craft window
   * fixed hitboxes not showing for some objects
