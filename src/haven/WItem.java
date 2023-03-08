@@ -52,6 +52,7 @@ public class WItem extends Widget implements DTarget2 {
     public Contents contents;
     public Window contentswnd;
     private boolean hovering = false;
+    public Coord hovering_pos = null;
     private Resource cspr = null;
     private Message csdt = Message.nil;
     private final List<Action3<WItem, Coord, Integer>> rClickListeners = new LinkedList<>();
@@ -291,6 +292,9 @@ public class WItem extends Widget implements DTarget2 {
 		    }
 		    item.contents.unlink();
 		    contents = cont.add(new Contents(this, item.contents), parentpos(cont, sz.sub(5, 5).sub(Contents.hovermarg)));
+		    if(hovering_pos != null) {
+			contents.c = hovering_pos;
+		    }
 		}
 	    }
 	} else {
@@ -300,6 +304,7 @@ public class WItem extends Widget implements DTarget2 {
 	    }
 	}
 	hovering = false;
+	hovering_pos = null;
 	checkDrop();
     }
 
