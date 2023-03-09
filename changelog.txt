@@ -1,3 +1,6 @@
+$size[14]{$u{Update for 09.03.23:}
+  * fixed auto-drink not detecting drinks in belts
+ 
 $size[14]{$u{Update for 08.03.23:}
   * merged loftar's code
   * added average quality of items to stacks
