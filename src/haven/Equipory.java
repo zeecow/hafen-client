@@ -175,11 +175,6 @@ public class Equipory extends Widget implements DTarget {
 			wdg.onRClick((item, c, flags) -> {
 			    item.toggleContents();
 			});
-			if(g.contents instanceof Inventory) {
-			    wdg.ui.gui.beltinv = (Inventory) g.contents;
-			} else {
-			    wdg.ui.gui.beltinv = null;
-			}
 		    }
 		}
 	    }
@@ -206,12 +201,8 @@ public class Equipory extends Widget implements DTarget {
 	    for(WItem v : wmap.remove(i)) {
 		ui.destroy(v);
 		for(int s = 0; s < slots.length; s++) {
-		    if(slots[s] == v) {
-			if(s == SLOTS.BELT.idx) {
-			    ui.gui.beltinv = null;
-			}
+		    if(slots[s] == v)
 			slots[s] = null;
-		    }
 		}
 	    }
 	    bonuses.update(slots);

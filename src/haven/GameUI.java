@@ -67,7 +67,6 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Message
     public Window invwnd, equwnd, srchwnd, iconwnd;
     private CraftWindow makewnd;
     public ExtInventory maininv;
-    public Inventory beltinv;
     public Equipory equipory;
     public CharWnd chrwdg;
     public MapWnd2 mapfile;

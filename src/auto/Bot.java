@@ -298,7 +298,16 @@ public class Bot implements Defer.Callable<Void> {
     }
     
     private static Supplier<List<WItem>> BELT(GameUI gui) {
-	return () -> items(gui.beltinv);
+	return () -> {
+	    Equipory e = gui.equipory;
+	    if(e != null) {
+		WItem w = e.slots[Equipory.SLOTS.BELT.idx];
+		if(w != null) {
+		    return items(Inventory.fromWidget(w.item.contents));
+		}
+	    }
+	    return new LinkedList<>();
+	};
     }
     
     private static Supplier<List<WItem>> HANDS(GameUI gui) {

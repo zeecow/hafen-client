@@ -369,4 +369,14 @@ public class Inventory extends Widget implements DTarget {
     public void forEachItem(BiConsumer<GItem, WItem> consumer) {
 	wmap.forEach(consumer);
     }
+    
+    public static Inventory fromWidget(Widget wdg) {
+	if(wdg instanceof Inventory) {
+	    return (Inventory) wdg;
+	}
+	if(wdg instanceof ExtInventory) {
+	    return ((ExtInventory) wdg).inv;
+	}
+	return null;
+    }
 }
