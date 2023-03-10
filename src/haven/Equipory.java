@@ -173,7 +173,7 @@ public class Equipory extends Widget implements DTarget {
 		    slots[ep] = wdg;
 		    if(ep == SLOTS.BELT.idx) {
 			wdg.onRClick((item, c, flags) -> {
-			    item.toggleContents();
+			    g.showcontwnd(g.contentswnd == null);
 			});
 		    }
 		}

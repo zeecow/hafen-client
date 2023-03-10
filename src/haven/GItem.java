@@ -48,6 +48,7 @@ public class GItem extends AWidget implements ItemInfo.SpriteOwner, GSprite.Owne
     public Object contentsid = null;
     public int infoseq;
     public Widget hovering;
+    public Coord hovering_pos;
     private GSprite spr;
     private ItemInfo.Raw rawinfo;
     private List<ItemInfo> info = Collections.emptyList();
@@ -475,6 +476,9 @@ public class GItem extends AWidget implements ItemInfo.SpriteOwner, GSprite.Owne
 		    }
 		    this.contents.unlink();
 		    contentswdg = cont.add(new Contents(this, this.contents), hovering.parentpos(cont, hovering.sz.sub(UI.scale(5, 5)).sub(Contents.hovermarg)));
+		    if(hovering_pos != null) {
+			contentswdg.c = hovering_pos;
+		    }
 		}
 	    }
 	} else {
@@ -484,6 +488,7 @@ public class GItem extends AWidget implements ItemInfo.SpriteOwner, GSprite.Owne
 	    }
 	}
 	hovering = null;
+	hovering_pos = null;
     }
 
     public void showcontwnd(boolean show) {
@@ -625,7 +630,7 @@ public class GItem extends AWidget implements ItemInfo.SpriteOwner, GSprite.Owne
 	}
     }
 
-    public static class ContentsWindow extends Window {
+    public static class ContentsWindow extends WindowX {
 	public final GItem cont;
 	public final Widget inv;
 	private boolean invdest;

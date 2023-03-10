@@ -370,13 +370,4 @@ public class Inventory extends Widget implements DTarget {
 	wmap.forEach(consumer);
     }
     
-    public static Inventory fromWidget(Widget wdg) {
-	if(wdg instanceof Inventory) {
-	    return (Inventory) wdg;
-	}
-	if(wdg instanceof ExtInventory) {
-	    return ((ExtInventory) wdg).inv;
-	}
-	return null;
-    }
 }

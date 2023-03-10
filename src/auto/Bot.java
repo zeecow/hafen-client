@@ -247,11 +247,8 @@ public class Bot implements Defer.Callable<Void> {
 	synchronized (waiter) { waiter.notifyAll(); }
     }
     
-    private static List<WItem> items(Inventory inv) {
-	return inv != null ? inv.children().stream()
-	    .filter(widget -> widget instanceof WItem)
-	    .map(widget -> (WItem) widget)
-	    .collect(Collectors.toList()) : new LinkedList<>();
+    private static List<WItem> items(Widget inv) {
+	return inv != null ? new ArrayList<>(inv.children(WItem.class)) : new LinkedList<>();
     }
     
     private static Optional<WItem> findFirstThatContains(String what, Collection<Supplier<List<WItem>>> where) {
@@ -303,7 +300,7 @@ public class Bot implements Defer.Callable<Void> {
 	    if(e != null) {
 		WItem w = e.slots[Equipory.SLOTS.BELT.idx];
 		if(w != null) {
-		    return items(Inventory.fromWidget(w.item.contents));
+		    return items(w.item.contents);
 		}
 	    }
 	    return new LinkedList<>();

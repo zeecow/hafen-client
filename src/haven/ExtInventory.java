@@ -138,9 +138,9 @@ public class ExtInventory extends Widget {
 	wnd = null;//just in case
 	Window tmp;
 	//do not try to add if we are in small floaty contents widget 
-	if(!(parent instanceof Contents)
+	if(!(parent instanceof GItem.Contents)
 	    //or in the contents window
-	    && !(parent instanceof ContentsWindow)
+	    && !(parent instanceof GItem.ContentsWindow)
 	    //or in the item
 	    && !(parent instanceof GItem)
 	    //or if we have no window parent, 
