@@ -294,7 +294,7 @@ public class Bot implements Defer.Callable<Void> {
     
     
     private static Supplier<List<WItem>> INVENTORY(GameUI gui) {
-	return () -> items(gui.maininv.inv);
+	return () -> items(gui.maininv);
     }
     
     private static Supplier<List<WItem>> BELT(GameUI gui) {

@@ -66,7 +66,8 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Message
     private double msgtime;
     public Window invwnd, equwnd, srchwnd, iconwnd;
     private CraftWindow makewnd;
-    public ExtInventory maininv;
+    public Inventory maininv;
+    public ExtInventory maininvext;
     public Equipory equipory;
     public CharWnd chrwdg;
     public MapWnd2 mapfile;
@@ -1049,10 +1050,11 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Message
 			pack();
 		    }
 		};
-	    invwnd.add(maininv = (ExtInventory)child, Coord.z);
+	    invwnd.add(maininvext = (ExtInventory)child, Coord.z);
 	    invwnd.pack();
 	    invwnd.hide();
-	    maininv.inv.enableDrops();
+	    maininv = maininvext.inv;
+	    maininv.enableDrops();
 	    add(invwnd, Utils.getprefc("wndc-inv", new Coord(100, 100)));
 	} else if(place == "equ") {
 	    equwnd = new Hidewnd(Coord.z, "Equipment");
