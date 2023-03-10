@@ -49,10 +49,6 @@ public class WItem extends Widget implements DTarget2 {
     public static final Color MATCH_COLOR = new Color(255, 32, 255, 255);
     public Coord lsz = new Coord(1, 1);
     public final GItem item;
-    public Contents contents;
-    public Window contentswnd;
-    private boolean hovering = false;
-    public Coord hovering_pos = null;
     private Resource cspr = null;
     private Message csdt = Message.nil;
     private final List<Action3<WItem, Coord, Integer>> rClickListeners = new LinkedList<>();
@@ -265,46 +261,6 @@ public class WItem extends Widget implements DTarget2 {
 	    resize(sz);
 	    lspr = spr;
 	}
-	if(lcont != item.contents) {
-	    if((item.contents != null) && (item.contentsid != null) && (contents == null) && (contentswnd == null)) {
-		Coord c = Utils.getprefc(String.format("cont-wndc/%s", item.contentsid), null);
-		if(c != null) {
-		    item.contents.unlink();
-		    contentswnd = contparent().add(new ContentsWindow(this, item.contents), c);
-		}
-	    }
-	    lcont = item.contents;
-	}
-	if(hovering) {
-	    if(contents == null) {
-		if((item.contents != null) && (contentswnd == null)) {
-		    Widget cont = contparent();
-		    ckparent: for(Widget prev : cont.children()) {
-			if(prev instanceof Contents) {
-			    for(Widget p = parent; p != null; p = p.parent) {
-				if(p == prev)
-				    break ckparent;
-				if(p instanceof Contents)
-				    break;
-			    }
-			    return;
-			}
-		    }
-		    item.contents.unlink();
-		    contents = cont.add(new Contents(this, item.contents), parentpos(cont, sz.sub(5, 5).sub(Contents.hovermarg)));
-		    if(hovering_pos != null) {
-			contents.c = hovering_pos;
-		    }
-		}
-	    }
-	} else {
-	    if((contents != null) && !contents.hovering && !contents.hasmore()) {
-		contents.reqdestroy();
-		contents = null;
-	    }
-	}
-	hovering = false;
-	hovering_pos = null;
 	checkDrop();
     }
 
@@ -554,139 +510,14 @@ public class WItem extends Widget implements DTarget2 {
 
     public boolean mousehover(Coord c) {
 	if(item.contents != null) {
-	    hovering = true;
+	    item.hovering = this;
 	    return(true);
 	}
 	return(super.mousehover(c));
     }
-
-    public void destroy() {
-	if(contents != null) {
-	    contents.reqdestroy();
-	    contents = null;
-	}
-	if(contentswnd != null) {
-	    contentswnd.reqdestroy();
-	    contentswnd = null;
-	}
-	super.destroy();
-    }
-
-    public static class Contents extends Widget {
-	public static final Coord hovermarg = UI.scale(8, 8);
-	public static final Tex bg = Window.bg;
-	public static final IBox obox = Window.wbox;
-	public final WItem cont;
-	public final Widget inv;
-	private boolean invdest, hovering;
-	private UI.Grab dm = null;
-	private Coord doff;
-
-	public Contents(WItem cont, Widget inv) {
-	    z(90);
-	    this.cont = cont;
-	    /* XXX? This whole movement of the inv widget between
-	     * various parents is kind of weird, but it's not
-	     * obviously incorrect either. A proxy widget was tried,
-	     * but that was even worse, due to rootpos and similar
-	     * things being unavoidable wrong. */
-	    this.inv = add(inv, hovermarg.add(obox.ctloff()));
-	    this.tick(0);
-	}
-
-	public void draw(GOut g) {
-	    Coord bgc = new Coord();
-	    Coord ctl = hovermarg.add(obox.btloff());
-	    Coord cbr = sz.sub(obox.cisz()).add(ctl);
-	    for(bgc.y = ctl.y; bgc.y < cbr.y; bgc.y += bg.sz().y) {
-		for(bgc.x = ctl.x; bgc.x < cbr.x; bgc.x += bg.sz().x)
-		    g.image(bg, bgc, ctl, cbr);
-	    }
-	    obox.draw(g, hovermarg, sz.sub(hovermarg));
-	    super.draw(g);
-	}
-
-	public void tick(double dt) {
-	    super.tick(dt);
-	    resize(inv.c.add(inv.sz).add(obox.btloff()));
-	    hovering = false;
-	}
-
-	public void destroy() {
-	    if(!invdest) {
-		inv.unlink();
-		cont.item.add(inv);
-	    }
-	    super.destroy();
-	}
-
-	public boolean hasmore() {
-	    for(WItem item : children(WItem.class)) {
-		if(item.contents != null)
-		    return(true);
-	    }
-	    return(false);
-	}
-
-	public void cdestroy(Widget w) {
-	    super.cdestroy(w);
-	    if(w == inv) {
-		cont.item.cdestroy(w);
-		invdest = true;
-		this.destroy();
-		cont.contents = null;
-	    }
-	}
-
-	public boolean mousedown(Coord c, int btn) {
-	    if(super.mousedown(c, btn))
-		return(true);
-	    if(btn == 1) {
-		dm = ui.grabmouse(this);
-		doff = c;
-		return(true);
-	    }
-	    return(false);
-	}
-
-	public boolean mouseup(Coord c, int btn) {
-	    if((dm != null) && (btn == 1)) {
-		dm.remove();
-		dm = null;
-		return(true);
-	    }
-	    return(super.mouseup(c, btn));
-	}
-
-	public void mousemove(Coord c) {
-	    if(dm != null) {
-		if(c.dist(doff) > 10) {
-		    dm.remove();
-		    dm = null;
-		    Coord off = inv.c;
-		    inv.unlink();
-		    ContentsWindow wnd = new ContentsWindow(cont, inv);
-		    off = off.sub(wnd.xlate(wnd.inv.c, true));
-		    cont.contentswnd = parent.add(wnd, this.c.add(off));
-		    wnd.drag(doff.sub(off));
-		    invdest = true;
-		    destroy();
-		    cont.contents = null;
-		}
-	    } else {
-		super.mousemove(c);
-	    }
-	}
-
-	public boolean mousehover(Coord c) {
-	    super.mousehover(c);
-	    hovering = true;
-	    return(true);
-	}
-    }
     
     public void tryDrop() {
-        checkDrop = true;
+	checkDrop = true;
     }
     
     private void checkDrop() {
@@ -697,88 +528,6 @@ public class WItem extends Widget implements DTarget2 {
 		if((!item.matches || !CFG.AUTO_DROP_RESPECT_FILTER.get()) && ItemAutoDrop.needDrop(name)) {
 		    item.drop();
 		}
-	    }
-	}
-    }
-    
-    public void toggleContents() {
-	if(this.item.contents == null || this.ui == null) {
-	    return;
-	}
-	WItem.ContentsWindow wnd;
-	if(this.contentswnd instanceof WItem.ContentsWindow) {
-	    wnd = (WItem.ContentsWindow) this.contentswnd;
-	    if(!wnd.invdest) {
-		wnd.wdgmsg("close");
-	    }
-	} else if(this.contents != null && !this.contents.invdest) {
-	    WItem.Contents cont = this.contents;
-	    cont.inv.unlink();
-	    this.contentswnd = item.ui.gui.add(new WItem.ContentsWindow(this, cont.inv), Coord.z);
-	    cont.invdest = true;
-	    cont.destroy();
-	    this.contents = null;
-	} else {
-	    this.item.contents.unlink();
-	    this.contentswnd = this.ui.gui.add(new WItem.ContentsWindow(this, this.item.contents), Coord.z);
-	}
-    }
-
-    public static class ContentsWindow extends WindowX {
-	public final WItem cont;
-	public final Widget inv;
-	private boolean invdest;
-	private Coord psz = null;
-	private Object id;
-
-	public ContentsWindow(WItem cont, Widget inv) {
-	    super(Coord.z, cont.item.contentsnm);
-	    this.cont = cont;
-	    this.inv = add(inv, Coord.z);
-	    this.id = cont.item.contentsid;
-	    this.tick(0);
-	}
-
-	private Coord lc = null;
-	public void tick(double dt) {
-	    if(cont.item.contents != inv) {
-		destroy();
-		cont.contentswnd = null;
-		return;
-	    }
-	    super.tick(dt);
-	    if(!Utils.eq(inv.sz, psz))
-		resize(inv.c.add(psz = inv.sz));
-	    if(!Utils.eq(lc, this.c) && (cont.item.contentsid != null))
-		Utils.setprefc(String.format("cont-wndc/%s", cont.item.contentsid), lc = this.c);
-	}
-
-	public void wdgmsg(Widget sender, String msg, Object... args) {
-	    if((sender == this) && (msg == "close")) {
-		reqdestroy();
-		cont.contentswnd = null;
-		if(cont.item.contentsid != null)
-		    Utils.setprefc(String.format("cont-wndc/%s", cont.item.contentsid), null);
-	    } else {
-		super.wdgmsg(sender, msg, args);
-	    }
-	}
-
-	public void destroy() {
-	    if(!invdest) {
-		inv.unlink();
-		cont.item.add(inv);
-	    }
-	    super.destroy();
-	}
-
-	public void cdestroy(Widget w) {
-	    super.cdestroy(w);
-	    if(w == inv) {
-		cont.item.cdestroy(w);
-		invdest = true;
-		this.destroy();
-		cont.contentswnd = null;
 	    }
 	}
     }
