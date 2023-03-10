@@ -1,5 +1,8 @@
 $size[14]{$u{Update for 10.03.23:}
+  * merged loftar's code
   * fixed crash when using mouse wheel inside stack inventory
+  * added option (UI->Require SHIFT to show stack inventory) to show hover inventory of stacks only if SHIFT is pressed. Off by default.
+  * added option (UI->Unpack stacks in extra inventory) to treat stacked items as if unstacked for the extra inventory's list. On by default.
  
 $size[14]{$u{Update for 09.03.23:}
   * fixed auto-drink not detecting drinks in belts
