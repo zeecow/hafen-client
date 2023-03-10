@@ -599,7 +599,7 @@ public class ZeeManagerGobClick extends ZeeThread{
         // gob requires unmounting horse/kicksled
         else if (isGobRequireDisembarkVehicle(gobName) && !ZeeConfig.isPlayerLiftingGob(gob)){
             // unmount horse
-            if (ZeeConfig.isPlayerMountingHorse() && !ZeeManagerGobClick.isGobInListEndsWith(gobName,"/ladder,/minehole") && ZeeConfig.getMainInventory().countItemsByName("/rope") > 0) {
+            if (ZeeConfig.isPlayerMountingHorse() && !ZeeManagerGobClick.isGobInListEndsWith(gobName,"/ladder,/minehole") && ZeeConfig.getMainInventory().countItemsByNameContains("/rope") > 0) {
                 new ZeeThread() {
                     public void run() {
                         if(dismountHorse(mc)) {

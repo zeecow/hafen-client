@@ -131,7 +131,7 @@ public class Inventory extends Widget implements DTarget {
 	    GItem i = (GItem)w;
 	    ui.destroy(wmap.remove(i));
 		if(isMainInv())
-			ZeeConfig.removeInvItem(i);
+			ZeeConfig.invCounterUpdate(i);
 	}
     }
     
@@ -224,13 +224,18 @@ public class Inventory extends Widget implements DTarget {
 		return items;
 	}
 
-	public int countItemsByName(String name){
+	public int countItemsByNameContains(String nameContains){
     	int count = 0;
+		GItem gItem;
 		for (Widget wdg = child; wdg != null; wdg = wdg.next) {
 			if (wdg instanceof WItem) {
-				String wdgname = ((WItem) wdg).item.res.get().name;
-				if (wdgname.contains(name)) {
-					count++;
+				gItem = ((WItem) wdg).item;
+				String wdgname = gItem.res.get().name;
+				if (wdgname.contains(nameContains)) {
+					if (ZeeManagerItemClick.isStackItemPlaceholder(gItem))
+						count += ZeeManagerItemClick.getItemInfoAmount(gItem.info());
+					else
+						count++;
 				}
 			}
 		}

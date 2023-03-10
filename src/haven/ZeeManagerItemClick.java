@@ -37,6 +37,17 @@ public class ZeeManagerItemClick extends ZeeThread{
         return ZeeManagerItemClick.isItemEquipped("gfx/invobjs/small/coracle");
     }
 
+    public static boolean isStackItemPlaceholder(GItem i) {
+        try {
+            // consider stack if it has Amount info
+            if (getItemInfoByClass(i.info(), GItem.Amount.class) != null)
+                return true;
+        }catch (Exception e){
+            //catch info() not ready
+        }
+        return false;
+    }
+
     private void init(WItem wItem) {
         equipory = ZeeConfig.windowEquipment.getchild(Equipory.class);
         leftHandItemName = (getEquipory().leftHand==null ? "" : getEquipory().leftHand.item.getres().name);
@@ -653,7 +664,7 @@ public class ZeeManagerItemClick extends ZeeThread{
         Inventory inv = getItemInventory(wItem);
 
         if (ZeeConfig.isFish(itemName)) {
-            if (inv.countItemsByName("/fish-") > 1){
+            if (inv.countItemsByNameContains("/fish-") > 1){
                 opts.add(ZeeFlowerMenu.STRPETAL_AUTO_BUTCH_ALL);
                 if (isTransferWindowOpened()) {
                     opts.add(ZeeFlowerMenu.STRPETAL_TRANSFER_ASC);
@@ -667,7 +678,7 @@ public class ZeeManagerItemClick extends ZeeThread{
         }
         else if (ZeeConfig.isButchableSmallAnimal(itemName)) {
             opts.add(ZeeFlowerMenu.STRPETAL_AUTO_BUTCH);
-            if (inv.countItemsByName(itemName) > 1){
+            if (inv.countItemsByNameContains(itemName) > 1){
                 opts.add(ZeeFlowerMenu.STRPETAL_AUTO_BUTCH_ALL);
             }
             if (isTransferWindowOpened()) {
@@ -1254,8 +1265,34 @@ public class ZeeManagerItemClick extends ZeeThread{
     public static String getItemInfoName(List<ItemInfo> info) {
         try {
             for (ItemInfo v : info) {
-                if (v.getClass().getSimpleName().equals("Name")) {
-                    return ((Text)v.getClass().getField("str").get(v)).text;
+                if (v instanceof ItemInfo.Name) {
+                    return ((ItemInfo.Name)v).str.text;
+                }
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return(null);
+    }
+
+    public static int getItemInfoAmount(List<ItemInfo> info) {
+        try {
+            for (ItemInfo v : info) {
+                if (v instanceof GItem.Amount) {
+                    return ((GItem.Amount)v).itemnum();
+                }
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
+    public static ItemInfo getItemInfoByClass(List<ItemInfo> info, Class tClass) {
+        try {
+            for (ItemInfo v : info) {
+                if (v.getClass().getName().contentEquals(tClass.getName())) {
+                    return v;
                 }
             }
         }catch (Exception e){

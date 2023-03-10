@@ -158,7 +158,7 @@ public class GItem extends AWidget implements ItemInfo.SpriteOwner, GSprite.Owne
 				itemCounted = true;
 				Window w = this.getparent(Window.class);
 				if(w!=null && w.cap.text.equalsIgnoreCase("Inventory"))
-					ZeeConfig.addInvItem(this);
+					ZeeConfig.invCounterUpdate(this);
 			}
 	    } catch(Loading l) {
 	    }

@@ -809,7 +809,7 @@ public class ZeeConfig {
         lastMapViewClickButton = 1;
 
         // unmount
-        if (isPlayerMountingHorse() && getMainInventory().countItemsByName("/rope") > 0) {
+        if (isPlayerMountingHorse() && getMainInventory().countItemsByNameContains("/rope") > 0) {
             new ZeeThread() {
                 public void run() {
                     try {
@@ -1796,34 +1796,13 @@ public class ZeeConfig {
         }
     }
 
-    public static HashMap<String,Integer> mapInvItemNameCount = new HashMap<String,Integer>();
-    public static void addInvItem(GItem i) {
+    public static void invCounterUpdate(GItem i) {
         try {
             String itemName = i.getres().name;
-            Integer count = countInvItems(itemName);
-            count++;
-            mapInvItemNameCount.put(itemName, count);
+            Integer count = getMainInventory().countItemsByNameContains(itemName);
             invMainoptionsWdg.updateLabelCount(itemName,count);
         }catch (Resource.Loading e){
         }
-    }
-    public static void removeInvItem(GItem i) {
-        try{
-            String itemName = i.getres().name;
-            Integer count = countInvItems(itemName);
-            count--;
-            if(count < 0)
-                count = 0;
-            mapInvItemNameCount.put(itemName, count);
-            invMainoptionsWdg.updateLabelCount(itemName,count);
-        }catch (Resource.Loading e){
-        }
-    }
-    private static Integer countInvItems(String itemName){
-        Integer count = mapInvItemNameCount.get(itemName);
-        if(count==null)
-            count = 0;
-        return count;
     }
 
     public static void searchNextInputMakeWnd(String inputName) {
