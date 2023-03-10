@@ -275,16 +275,7 @@ public class ExtInventory extends Widget {
 	if(needUpdate && extension.visible && waitUpdate <= 0) {
 	    needUpdate = false;
 	    SortedMap<ItemType, List<WItem>> groups = new TreeMap<>();
-	    inv.forEachItem((g, w) -> {
-		try {
-		    Double quality = quality(w, grouping.sel);
-		    ItemType type = new ItemType(w, quality);
-		    if(type.loading) {needUpdate = true;}
-		    groups.computeIfAbsent(type, k -> new ArrayList<>()).add(w);
-		} catch (Loading ignored) {
-		    needUpdate = true;
-		}
-	    });
+	    inv.forEachItem((g, w) -> processItem(groups, w));
 	    this.groups = groups;
 	    list.changed();
 	}
@@ -303,6 +294,22 @@ public class ExtInventory extends Widget {
 	    }
 	}
 	super.tick(dt);
+    }
+    
+    private void processItem(SortedMap<ItemType, List<WItem>> groups, WItem witem) {
+	try {
+	    Widget winv = witem.item.contents;
+	    if(winv != null) {
+		winv.children(WItem.class).forEach((w) -> processItem(groups, w));
+	    } else {
+		Double quality = quality(witem, grouping.sel);
+		ItemType type = new ItemType(witem, quality);
+		if(type.loading) {needUpdate = true;}
+		groups.computeIfAbsent(type, k -> new ArrayList<>()).add(witem);
+	    }
+	} catch (Loading ignored) {
+	    needUpdate = true;
+	}
     }
     
     private static String name(WItem item) {
