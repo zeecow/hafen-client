@@ -299,7 +299,7 @@ public class ExtInventory extends Widget {
     private void processItem(SortedMap<ItemType, List<WItem>> groups, WItem witem) {
 	try {
 	    Widget winv = witem.item.contents;
-	    if(winv != null) {
+	    if(winv != null && CFG.UI_STACK_EXT_INV_UNPACK.get()) {
 		winv.children(WItem.class).forEach((w) -> processItem(groups, w));
 	    } else {
 		Double quality = quality(witem, grouping.sel);

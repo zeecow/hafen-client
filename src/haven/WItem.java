@@ -509,7 +509,7 @@ public class WItem extends Widget implements DTarget2 {
     }
 
     public boolean mousehover(Coord c) {
-	if(item.contents != null) {
+	if(item.contents != null && (!CFG.UI_STACK_SUB_INV_ON_SHIFT.get() || ui.modshift)) {
 	    item.hovering = this;
 	    return(true);
 	}
