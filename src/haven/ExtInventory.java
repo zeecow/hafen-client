@@ -24,6 +24,8 @@ public class ExtInventory extends Widget {
     private static final String CFG_SHOW = "ext.show";
     private static final String CFG_INV = "ext.inv";
     private static final String[] TYPES = new String[]{"Quality", "Name", "Info"};
+    //TODO: remove name as it is not really needed
+    private static final List<Widget> INVENTORIES = new LinkedList<>();
     private static final Set<String> EXCLUDES = Collections.unmodifiableSet(new HashSet<>(Arrays.asList("Steelbox", "Pouch", "Frame", "Tub", "Fireplace", "Rack", "Pane mold", "Table", "Purse")));
     public final Inventory inv;
     private final ItemGroupList list;
@@ -124,6 +126,7 @@ public class ExtInventory extends Widget {
     
     @Override
     public void unlink() {
+	remInventory(this);
 	if(chb_show.parent != null) {
 	    chb_show.unlink();
 	}
@@ -135,6 +138,7 @@ public class ExtInventory extends Widget {
     
     @Override
     protected void added() {
+	addInventory(this);
 	wnd = null;//just in case
 	Window tmp;
 	//do not try to add if we are in small floaty contents widget 
@@ -509,11 +513,18 @@ public class ExtInventory extends Widget {
 
 	@Override
 	public boolean mousedown(Coord c, int button) {
-	    if(ui.modshift && (button == 1 || button == 3)) {
-		process(items, "transfer", ui.modmeta, button == 3);
+	    boolean properButton = button == 1 || button == 3;
+	    boolean reverse = button == 3;
+	    if(ui.modshift && properButton) {
+		Object[] args = extInventory.getTransferTargets();
+		if(args == null) {
+		    process(items, ui.modmeta, reverse, "transfer", sqsz.div(2), 1);
+		} else {
+		    process(items, ui.modmeta, reverse, "invxf2", args);
+		}
 		return true;
-	    } else if(ui.modctrl && (button == 1 || button == 3)) {
-		process(items, "drop", ui.modmeta, button == 3);
+	    } else if(ui.modctrl && properButton) {
+		process(items, ui.modmeta, reverse, "drop", sqsz.div(2), 1);
 		return true;
 	    } else {
 		WItem item = items.get(0);
@@ -524,7 +535,7 @@ public class ExtInventory extends Widget {
 	    return (false);
 	}
     
-	private static void process(final List<WItem> items, String action, boolean all, boolean reverse) {
+	private static void process(final List<WItem> items, boolean all, boolean reverse, String action, Object... args) {
 	    if(reverse) {
 		items.sort(ExtInventory::byReverseQuality);
 	    } else {
@@ -533,12 +544,12 @@ public class ExtInventory extends Widget {
 	    if(!all) {
 		WItem item = items.get(0);
 		if(!item.disposed()) {
-		    item.item.wdgmsg(action, sqsz.div(2), 1);
+		    item.item.wdgmsg(action, args);
 		}
 	    } else {
 		for (WItem item : items) {
 		    if(!item.disposed()) {
-			item.item.wdgmsg(action, sqsz.div(2), 1);
+			item.item.wdgmsg(action, args);
 		    }
 		}
 	    }
@@ -658,6 +669,46 @@ public class ExtInventory extends Widget {
 	} else {
 	    return null;
 	}
+    }
+    public static void addInventory(Widget ext) {
+	WindowX wnd = ext.getparent(WindowX.class);
+	if(wnd == null) {return;}
+	String name = wnd.cfgName(wnd.caption()).toLowerCase();
+	if(name.contains("inventory")
+	    || name.contains("character sheet")
+	    || name.contains("equipment")
+	    || name.contains("study")) {
+	    return;
+	}
+	INVENTORIES.add(ext);
+    }
+    
+    public static void remInventory(Widget ext) {
+	for (int i = 0; i < INVENTORIES.size(); i++) {
+	    if(INVENTORIES.get(i) == ext) {
+		INVENTORIES.remove(i);
+		return;
+	    }
+	}
+    }
+    
+    //TODO: should we sort inventories based on z-order of windows?
+    private Object[] getTransferTargets() {
+	//use default transfer logic if transferring not from main inventory
+	if(inv != ui.gui.maininv) {
+	    return null;
+	}
+	if(INVENTORIES.isEmpty()) {
+	    return null;
+	}
+	Object[] args = new Object[2 + INVENTORIES.size()];
+	int i = 0;
+	args[i++] = 0; //flags
+	args[i++] = 1; //how many to transfer
+	for (Widget wdg : INVENTORIES) {
+	    args[i++] = wdg.wdgid();
+	}
+	return args;
     }
     
     enum Grouping {
