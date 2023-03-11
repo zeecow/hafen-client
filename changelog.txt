@@ -1,3 +1,6 @@
+$size[14]{$u{Update for 11.03.23:}
+  * improved mass transfer of items through extra inventory
+ 
 $size[14]{$u{Update for 10.03.23:}
   * merged loftar's code
   * fixed crash when using mouse wheel inside stack inventory
