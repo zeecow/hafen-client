@@ -173,6 +173,7 @@ public class ZeeConfig {
     public static boolean blockAudioMsg = Utils.getprefb("blockAudioMsg", true);
     public static String blockAudioMsgList = Utils.getpref("blockAudioMsgList",DEF_LIST_BLOCK_AUDIO);
     public static boolean butcherMode = false;
+    public static boolean autoUndoStack = false;
     public static String butcherAutoList = Utils.getpref("butcherAutoList", DEF_LIST_BUTCH_AUTO);
     public static boolean cattleRosterHeight = Utils.getprefb("cattleRosterHeight", true);
     public static double cattleRosterHeightPercentage = Utils.getprefd("cattleRosterHeightPercentage", 1.0);

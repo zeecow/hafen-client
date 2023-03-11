@@ -1405,4 +1405,23 @@ public class ZeeManagerItemClick extends ZeeThread{
             }
         }.start();
     }
+
+    public static void undoStack(GItem i) {
+        try {
+            Inventory inv = i.getparent(Inventory.class);
+            if (!inv.isMainInv())
+                return;
+            if (inv.getNumberOfFreeSlots() <= 3)
+                return;
+            String name = i.getres().name;
+            for (WItem wItem : ZeeConfig.getMainInventory().getWItemsByNameContains(name)) {
+                if (getItemInfoAmount(wItem.item.info()) >= 3) {
+                    gItemActCoord(wItem.item,3);
+                    return;
+                }
+            }
+        }catch (Exception e){
+            //e.printStackTrace();
+        }
+    }
 }
