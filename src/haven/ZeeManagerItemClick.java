@@ -33,21 +33,6 @@ public class ZeeManagerItemClick extends ZeeThread{
         init(wItem);
     }
 
-    public static boolean isCoracleEquipped() {
-        return ZeeManagerItemClick.isItemEquipped("gfx/invobjs/small/coracle");
-    }
-
-    public static boolean isStackItemPlaceholder(GItem i) {
-        try {
-            // consider stack if it has Amount info
-            if (getItemInfoByClass(i.info(), GItem.Amount.class) != null)
-                return true;
-        }catch (Exception e){
-            //catch info() not ready
-        }
-        return false;
-    }
-
     private void init(WItem wItem) {
         equipory = ZeeConfig.windowEquipment.getchild(Equipory.class);
         leftHandItemName = (getEquipory().leftHand==null ? "" : getEquipory().leftHand.item.getres().name);
@@ -71,6 +56,17 @@ public class ZeeManagerItemClick extends ZeeThread{
 
         try{
 
+            // undo stack if not transfer
+            if( !isTransferWindowOpened() && isStackItemPlaceholder(wItem.item)){
+                if (!isLongClick()){
+                    undoStack(wItem.item);
+                    return;
+                }else{
+                    undoMultipleStacks(wItem.item);
+                    return;
+                }
+            }
+
             // item context menu
             if(showItemFlowerMenu()){
                 return;
@@ -79,12 +75,6 @@ public class ZeeManagerItemClick extends ZeeThread{
             // fishing
             if (isLongClick() && isFishingItem()) {
                 equipFishingItem();
-                return;
-            }
-
-            //cheese-tray
-            if (isCheeseTrayFill()){
-                fillUpCheeseTray();
                 return;
             }
 
@@ -322,19 +312,6 @@ public class ZeeManagerItemClick extends ZeeThread{
             //throw new RuntimeException(e);
             e.printStackTrace();
         }
-    }
-
-    private void fillUpCheeseTray() throws InterruptedException {
-        // shift+click cheesetray 4 times
-        for (int i = 0; i <4; i++) {
-            itemAct(wItem, UI.MOD_SHIFT);
-            sleep(PING_MS);
-        }
-    }
-
-    private boolean isCheeseTrayFill() {
-        return itemName.contains("/cheesetray")
-            && getHoldingItemName().contains("/curd");
     }
 
 
@@ -1406,22 +1383,46 @@ public class ZeeManagerItemClick extends ZeeThread{
         }.start();
     }
 
+    public static boolean isCoracleEquipped() {
+        return ZeeManagerItemClick.isItemEquipped("gfx/invobjs/small/coracle");
+    }
+
+    public static boolean isStackItemPlaceholder(GItem i) {
+        try {
+            // consider stack if it has Amount info
+            if (getItemInfoByClass(i.info(), GItem.Amount.class) != null)
+                return true;
+        }catch (Exception e){
+            //catch info() not ready
+        }
+        return false;
+    }
+
     public static void undoStack(GItem i) {
         try {
-            Inventory inv = i.getparent(Inventory.class);
-            if (!inv.isMainInv())
-                return;
-            if (inv.getNumberOfFreeSlots() <= 3)
-                return;
-            String name = i.getres().name;
-            for (WItem wItem : ZeeConfig.getMainInventory().getWItemsByNameContains(name)) {
-                if (getItemInfoAmount(wItem.item.info()) >= 3) {
-                    gItemActCoord(wItem.item,3);
-                    return;
-                }
-            }
+            gItemActCoord(i,3);
         }catch (Exception e){
             //e.printStackTrace();
         }
+    }
+
+    public static void undoMultipleStacks(GItem item) {
+        new Thread(){
+            public void run() {
+                try {
+                    Inventory inv = item.getparent(Inventory.class);
+                    List<WItem> stacks = inv.getItemsByInfoClass(GItem.Amount.class.getName());
+                    for (WItem stack : stacks) {
+                        undoStack(stack.item);
+                        sleep(PING_MS);
+                        if (inv.getNumberOfFreeSlots() < 3)
+                            break;
+                    }
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+                println("done");
+            }
+        }.start();
     }
 }

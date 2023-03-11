@@ -160,7 +160,7 @@ public class GItem extends AWidget implements ItemInfo.SpriteOwner, GSprite.Owne
 				if(w!=null && w.cap.text.equalsIgnoreCase("Inventory")) {
 					ZeeConfig.invCounterUpdate(this);
 					if (ZeeConfig.autoUndoStack && ZeeManagerItemClick.isStackItemPlaceholder(this)){
-						ZeeManagerItemClick.gItemActCoord(this,3);
+						ZeeManagerItemClick.undoStack(this);
 					}
 				}
 			}
