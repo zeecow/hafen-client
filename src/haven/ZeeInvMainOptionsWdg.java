@@ -2,8 +2,8 @@ package haven;
 
 public class ZeeInvMainOptionsWdg extends Widget {
 
-    Label labelDrop, labelCount;
-    public static CheckBox cbSeeds, cbSoil, cbButcher, cbAutoUnstack, cbPiler, cbAutomenu, cbTunnel, cbDrink;
+    Label labelCount;
+    public static CheckBox cbSeeds, cbSoil, cbButcher, cbPiler, cbAutomenu, cbTunnel, cbDrink;
     Widget invSlots;
 
     public ZeeInvMainOptionsWdg(String windowCap) {
@@ -43,20 +43,6 @@ public class ZeeInvMainOptionsWdg extends Widget {
             }
         }, x, 0);
         cbButcher.settip("auto menu butch list");
-
-        x += cbButcher.sz.x + 5;
-
-        add(cbAutoUnstack = new CheckBox("us") {
-            {
-                a = ZeeConfig.autoUndoStack;
-            }
-
-            public void set(boolean val) {
-                ZeeConfig.autoUndoStack = val;
-                a = val;
-            }
-        }, x, 0);
-        cbAutoUnstack.settip("auto undo stacks");
 
         x = 0;
 

@@ -159,9 +159,6 @@ public class GItem extends AWidget implements ItemInfo.SpriteOwner, GSprite.Owne
 				Inventory inv = this.getparent(Inventory.class);
 				if(inv!=null && inv.isMainInv()) {
 					ZeeConfig.invCounterUpdate(this);
-					if (ZeeConfig.autoUndoStack && ZeeManagerItemClick.isStackItemPlaceholder(this)){
-						ZeeManagerItemClick.undoStack(this);
-					}
 				}
 			}
 	    } catch(Loading l) {
