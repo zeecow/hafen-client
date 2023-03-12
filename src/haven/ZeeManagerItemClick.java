@@ -1428,9 +1428,11 @@ public class ZeeManagerItemClick extends ZeeThread{
             public void run() {
                 try {
                     Inventory inv = item.getparent(Inventory.class);
-                    List<WItem> stacks = inv.getItemsByInfoClass(GItem.Amount.class.getName());
-                    for (WItem stack : stacks) {
-                        undoStack(stack.item);
+                    List<WItem> invItems = inv.getWItemsByNameEndsWith(item.getres().name);
+                    for (WItem wItem : invItems) {
+                        if (!isStackItemPlaceholder(wItem.item))
+                            continue;
+                        undoStack(wItem.item);
                         sleep(PING_MS);
                         if (inv.getNumberOfFreeSlots() < 3)
                             break;

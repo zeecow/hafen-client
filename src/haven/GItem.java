@@ -156,8 +156,8 @@ public class GItem extends AWidget implements ItemInfo.SpriteOwner, GSprite.Owne
 			}
 			if(!itemCounted){
 				itemCounted = true;
-				Window w = this.getparent(Window.class);
-				if(w!=null && w.cap.text.equalsIgnoreCase("Inventory")) {
+				Inventory inv = this.getparent(Inventory.class);
+				if(inv!=null && inv.isMainInv()) {
 					ZeeConfig.invCounterUpdate(this);
 					if (ZeeConfig.autoUndoStack && ZeeManagerItemClick.isStackItemPlaceholder(this)){
 						ZeeManagerItemClick.undoStack(this);
