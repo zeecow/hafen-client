@@ -1406,11 +1406,12 @@ public class ZeeManagerItemClick extends ZeeThread{
 
     public static boolean isStackItemPlaceholder(GItem i) {
         try {
-            // consider stack if it has Amount info
-            if (getItemInfoByClass(i.info(), GItem.Amount.class) != null)
+            if (i.getres().basename().startsWith("seed-"))
+                return false;
+            if (getItemInfoAmount(i.info()) > 0)
                 return true;
         }catch (Exception e){
-            //catch info() not ready
+            e.getMessage();
         }
         return false;
     }
