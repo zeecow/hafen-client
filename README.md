@@ -94,13 +94,15 @@ Client focusing on small helper tasks, many using mouse middle button, and other
   - quick-equip from belt
   - seed-planting cursor
   - while holding cheese-curd will fill up cheese-tray item
-  - undo stack item (ctrl+shift+rclick) if transfer not available 
+  - undo stack item (ctrl+shift+rclick) if transfer not available
+  - create single stack when hold and midclick same item type
 - long midclick item
   - sort-transfer item descending(?)
   - show context menu for various items (details below)
   - equip fishing hook/lure and recast
   - equip two sack items from belt
   - undo multiple stack items if transfer not available
+  - create multiple stacks when hold and midclick same item type
 - long midclick context menus for objects
   - auto butch dead animal objs
   - start seed farmer for crop objs: harvest, store and replant seeds (no pathfinding)

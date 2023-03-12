@@ -56,13 +56,15 @@ public class ZeeManagerItemClick extends ZeeThread{
 
         try{
 
-            // undo stack if not transfer
-            if( !isTransferWindowOpened() && isStackItemPlaceholder(wItem.item)){
-                if (!isLongClick()){
-                    undoStack(wItem.item);
-                    return;
-                }else{
-                    undoMultipleStacks(wItem.item);
+            // stack items
+            if (ZeeConfig.isPlayerHoldingItem()){
+                if (itemName.contentEquals(getHoldingItem().item.getres().name)){
+                    // create multiple stacks
+                    if (isLongClick())
+                        gItemAct(wItem.item,3);
+                    // create one stack
+                    else
+                        gItemAct(wItem.item,1);
                     return;
                 }
             }
@@ -79,24 +81,39 @@ public class ZeeManagerItemClick extends ZeeThread{
             }
 
             // if not hand item, do items special transfers
-            if( isTransferWindowOpened() && !isItemWindowName("Belt")){
-                // long click sort transfer asc
-                if(isLongClick())
-                    wItem.wdgmsg("transfer-sort", wItem.item, true);
-                //short clicks...
-                // ...transfer same quality items
-                else if(ZeeConfig.windowShortMidclickTransferMode.contentEquals("ql"))
-                    wItem.item.wdgmsg("transfer-ql", wItem.item, false);
-                // ...transfer single item
-                else if(ZeeConfig.windowShortMidclickTransferMode.contentEquals("one"))
-                    wItem.item.wdgmsg("transfer", Coord.z);
-                // ...sort transfer asc
-                else if(ZeeConfig.windowShortMidclickTransferMode.contentEquals("asc"))
-                    wItem.wdgmsg("transfer-sort", wItem.item, true);
-                // ...sort transfer des
-                else
-                    wItem.wdgmsg("transfer-sort", wItem.item, false);
-                return;
+            if( isTransferWindowOpened() ){
+                if(!isItemWindowName("Belt")) {
+                    // long click sort transfer asc
+                    if (isLongClick())
+                        wItem.wdgmsg("transfer-sort", wItem.item, true);
+                    //short clicks...
+                    // ...transfer same quality items
+                    else if (ZeeConfig.windowShortMidclickTransferMode.contentEquals("ql"))
+                        wItem.item.wdgmsg("transfer-ql", wItem.item, false);
+                    // ...transfer single item
+                    else if (ZeeConfig.windowShortMidclickTransferMode.contentEquals("one"))
+                        wItem.item.wdgmsg("transfer", Coord.z);
+                    // ...sort transfer asc
+                    else if (ZeeConfig.windowShortMidclickTransferMode.contentEquals("asc"))
+                        wItem.wdgmsg("transfer-sort", wItem.item, true);
+                    // ...sort transfer des
+                    else
+                        wItem.wdgmsg("transfer-sort", wItem.item, false);
+                    return;
+                }
+            }
+            // undo stack if no transfer available
+            else if(isStackItemPlaceholder(wItem.item)){
+                //undo one stack
+                if (!isLongClick()){
+                    undoStack(wItem.item);
+                    return;
+                }
+                //undo multiple stacks
+                else{
+                    undoMultipleStacks(wItem.item);
+                    return;
+                }
             }
             else if(isItemWindowName("Inventory") && isItemPlantable())
             {
@@ -1421,7 +1438,6 @@ public class ZeeManagerItemClick extends ZeeThread{
                 }catch (Exception e){
                     e.printStackTrace();
                 }
-                println("done");
             }
         }.start();
     }
