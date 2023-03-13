@@ -113,10 +113,16 @@ public class ZeeInvMainOptionsWdg extends Widget {
     }
 
     void addWindowTransferOptions() {
-        Inventory inv = ZeeConfig.getMainInventory();
-        Window window = inv.getparent(Window.class);
 
+        Inventory inv = ZeeConfig.getMainInventory();
         if (inv == null) {
+            ZeeConfig.println("addWindowTransferOptions > inv null");
+            return;
+        }
+
+        Window window = inv.getparent(Window.class);
+        if (window==null) {
+            ZeeConfig.println("addWindowTransferOptions > window null");
             return;
         }
 
