@@ -1579,7 +1579,7 @@ public class ZeeConfig {
                     if(autoRunLogin)
                         setPlayerSpeed(PLAYER_SPEED_2);
 
-                    clickOpenBelt();
+                    //clickOpenBelt();
 
                     Thread.sleep(1500);
 
