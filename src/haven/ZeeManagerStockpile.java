@@ -409,9 +409,13 @@ public class ZeeManagerStockpile extends ZeeThread{
             gobSource = ZeeConfig.lastMapViewClickGob;
             lastTreelogSawed = ZeeConfig.lastMapViewClickGob;
         }else if(petalName.equals("Chip stone")){
-            gobSource = ZeeConfig.lastMapViewClickGob;
-            lastBoulderChipped = ZeeConfig.lastMapViewClickGob;
-            lastBoulderChippedStoneName = lastBoulderChipped.getres().basename().replaceAll("\\d$","");
+            try {
+                gobSource = ZeeConfig.lastMapViewClickGob;
+                lastBoulderChipped = ZeeConfig.lastMapViewClickGob;
+                lastBoulderChippedStoneName = lastBoulderChipped.getres().basename().replaceAll("\\d$", "");
+            }catch (Exception e){
+                e.printStackTrace();//auto-chip while lifting object?
+            }
         }else if(petalName.equals("Collect coal")){
             gobSource = ZeeConfig.lastMapViewClickGob;
         }
