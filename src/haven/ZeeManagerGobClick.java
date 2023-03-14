@@ -1613,50 +1613,7 @@ public class ZeeManagerGobClick extends ZeeThread{
     }
 
     public static void barrelTakeAllSeeds(Gob gob){
-
-        if (ZeeConfig.takeAllSeedsWdgMsg) {
-            // TODO use only this gobClick when bug is fixed
-            // https://www.havenandhearth.com/forum/viewtopic.php?f=47&t=74122
-            ZeeManagerGobClick.gobClick(gob, 3, UI.MOD_CTRL_SHIFT);
-        }
-        else {
-            // TODO remove this when bug is fixed
-            // https://www.havenandhearth.com/forum/viewtopic.php?f=47&t=74122
-            try {
-                // shift+rclick last barrel
-                ZeeManagerGobClick.gobClick(gob, 3, UI.MOD_SHIFT);
-
-                //wait getting to the barrel
-                waitPlayerIdleFor(1);
-
-                if (ZeeConfig.distanceToPlayer(gob) > ZeeManagerFarmer.MIN_ACCESSIBLE_DIST) {
-                    ZeeConfig.msg("barrel unreachable");
-                    return;
-                }
-
-                ZeeConfig.addPlayerText("taking contents...");
-
-                while (!ZeeManagerGobClick.isBarrelEmpty(gob) && !isInventoryFull()) {
-                    ZeeManagerGobClick.gobClick(gob, 3, UI.MOD_SHIFT);
-                    Thread.sleep(PING_MS);
-                    if (ZeeConfig.isTaskCanceledByGroundClick())
-                        break;
-                }
-
-                //if holding seed, store in barrel
-                waitHoldingItem();
-                ZeeManagerGobClick.itemActGob(gob, 0);
-
-                if (isInventoryFull())
-                    ZeeConfig.msg("Inventory full");
-                else if (!ZeeConfig.isTaskCanceledByGroundClick())
-                    ZeeConfig.msg("Took everything");
-
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            ZeeConfig.removePlayerText();
-        }
+        ZeeManagerGobClick.gobClick(gob, 3, UI.MOD_CTRL_SHIFT);
     }
 
     private void barrelTakeAllSeeds() {

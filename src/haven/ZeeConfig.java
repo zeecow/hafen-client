@@ -237,9 +237,6 @@ public class ZeeConfig {
     public static boolean liftVehicleBeforeTravelHearth = Utils.getprefb("liftVehicleBeforeTravelHearth", true);
     public static int minimapScale = Utils.getprefi("minimapScale",1);
     public static boolean researchFoodTips = Utils.getprefb("researchFoodTips", true);
-    // TODO remove this when bug is fixed
-    // https://www.havenandhearth.com/forum/viewtopic.php?f=47&t=74122
-    public static boolean takeAllSeedsWdgMsg = Utils.getprefb("takeAllSeedsWdgMsg", false);
 
 
     public final static Set<String> mineablesStone = new HashSet<String>(Arrays.asList(
