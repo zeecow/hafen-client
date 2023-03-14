@@ -1,3 +1,6 @@
+$size[14]{$u{Update for 14.03.23:}
+  * fixed crash on right-clicking belt in some circumstances by using loftar's implementation
+ 
 $size[14]{$u{Update for 11.03.23:}
   * improved mass transfer of items through extra inventory
  
