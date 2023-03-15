@@ -799,6 +799,8 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Message
 	    }
 	} else if(place == "menu") {
 	    menu = (MenuGrid)brpanel.add(child, menugridc);
+		ZeeConfig.resetCharVariables();
+		ZeeQuickOptionsWindow.initWindow();
 	    ZeeConfig.initToggles();
 	} else if(place == "fight") {
 	    fv = urpanel.add((Fightview)child, 0, 0);
@@ -815,7 +817,6 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Message
 		//invwnd.hide();
 	    add(invwnd, Utils.getprefc("wndc-inv", new Coord(100, 100)));
 		ZeeConfig.initWindowInvMain();
-		ZeeQuickOptionsWindow.initWindow();
 	} else if(place == "equ") {
 	    equwnd = new Hidewnd(Coord.z, "Equipment");
 	    equwnd.add(child, Coord.z);

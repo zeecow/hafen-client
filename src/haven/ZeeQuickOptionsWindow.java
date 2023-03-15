@@ -110,9 +110,11 @@ public class ZeeQuickOptionsWindow {
 
 
     public static void initWindow() {
+        reset();
         loadPref();
-        if (listConfigLabel.size() > 0)
-            updateJCheckBoxWidget(listConfigLabel.get(0)[0],listConfigLabel.get(0)[1]);
+        if (listConfigLabel.size() > 0) {
+            updateJCheckBoxWidget(listConfigLabel.get(0)[0], listConfigLabel.get(0)[1]);
+        }
     }
 
     static String getConfigByLabel(String lbl) {
@@ -167,6 +169,7 @@ public class ZeeQuickOptionsWindow {
     }
 
     public static void reset() {
+        ZeeConfig.println("reset quick windows");
         if (window!=null)
             window.remove();
         window = null;

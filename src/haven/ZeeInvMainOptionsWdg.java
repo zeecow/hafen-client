@@ -3,7 +3,7 @@ package haven;
 public class ZeeInvMainOptionsWdg extends Widget {
 
     Label labelCount;
-    public static CheckBox cbSeeds, cbSoil, cbButcher, cbPiler, cbAutomenu, cbTunnel, cbDrink;
+    public static CheckBox cbSeeds, cbSoil, cbButcher, cbAutoStack, cbPiler, cbAutomenu, cbTunnel, cbDrink;
     Widget invSlots;
 
     public ZeeInvMainOptionsWdg(String windowCap) {
@@ -43,6 +43,20 @@ public class ZeeInvMainOptionsWdg extends Widget {
             }
         }, x, 0);
         cbButcher.settip("auto menu butch list");
+
+        x += cbButcher.sz.x + 5;
+
+        add(cbAutoStack = new CheckBox("stk") {
+            {
+                a = ZeeConfig.autoStack;
+            }
+
+            public void set(boolean val) {
+                ZeeConfig.autoStack = val;
+                a = val;
+            }
+        }, x, 0);
+        cbAutoStack.settip("auto stack items");
 
         x = 0;
 
@@ -120,8 +134,8 @@ public class ZeeInvMainOptionsWdg extends Widget {
             return;
         }
 
-        Window window = inv.getparent(Window.class);
-        if (window==null) {
+        Window window = ZeeConfig.getWindow("Inventory");
+        if (window == null) {
             ZeeConfig.println("addWindowTransferOptions > window null");
             return;
         }

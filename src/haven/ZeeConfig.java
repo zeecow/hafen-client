@@ -136,7 +136,6 @@ public class ZeeConfig {
     public static Button btnMkWndSearchInput;
     public static GobIcon.SettingsWindow.IconList iconList;
     public static ChatUI.Channel multiChat;
-    public static ZeeWindow quickOptionsWindow;
     private static Dropbox<String> iconListFilterBox;
     private static Inventory mainInv;
     public static Glob glob;
@@ -173,6 +172,7 @@ public class ZeeConfig {
     public static boolean blockAudioMsg = Utils.getprefb("blockAudioMsg", true);
     public static String blockAudioMsgList = Utils.getpref("blockAudioMsgList",DEF_LIST_BLOCK_AUDIO);
     public static boolean butcherMode = false;
+    public static boolean autoStack = false;
     public static String butcherAutoList = Utils.getpref("butcherAutoList", DEF_LIST_BUTCH_AUTO);
     public static boolean cattleRosterHeight = Utils.getprefb("cattleRosterHeight", true);
     public static double cattleRosterHeightPercentage = Utils.getprefd("cattleRosterHeightPercentage", 1.0);
@@ -202,6 +202,7 @@ public class ZeeConfig {
     public static boolean hideTileTransitions = Utils.getprefb("hideTileTransitions", true);
     public static boolean highlightCropsReady = Utils.getprefb("highlightCropsReady", true);
     public static boolean isThinClient = false;
+    public static boolean autoTrackScents = Utils.getprefb("autoTrackScents", true);
     public static boolean isRainLimited = Utils.getprefb("isRainLimited", false);
     public static Integer rainLimitPerc = Utils.getprefi("rainLimitPerc", 25);
     public static boolean showGrowingTreeScale = Utils.getprefb("showGrowingTreeScale", true);
@@ -1566,29 +1567,24 @@ public class ZeeConfig {
     }
 
 
-    public static boolean initTrackingDone = false;
-    //public static boolean initSiegeDone = false;
     public static void initToggles() {
         new Thread(new Runnable() {
             public void run() {
                 try {
 
+                    println("initToggles");
+
+                    Thread.sleep(1000);
+
                     if(autoRunLogin)
                         setPlayerSpeed(PLAYER_SPEED_2);
 
-                    //clickOpenBelt();
+                    Thread.sleep(1000);
 
-                    Thread.sleep(1500);
-
-                    if(!initTrackingDone) {
+                    if(autoTrackScents) {
                         gameUI.menu.wdgmsg("act", "tracking");
-                        initTrackingDone = true;
                     }
-                    /*Thread.sleep(1500);
-                    if(!initSiegeDone) {
-                        gameUI.menu.wdgmsg("act", "siegeptr");//unnecessary?
-                        initSiegeDone = true;
-                    }*/
+
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -2066,14 +2062,14 @@ public class ZeeConfig {
         gameUI.menu.wdgmsg("act", action);
     }
 
-    public static void checkCharSelection(String msg) {
-        if(msg.equalsIgnoreCase("play")){
-            ZeeConfig.resetCharSelected();
-        }
-    }
+//    public static void checkCharSelection(String msg) {
+//        if(msg.equalsIgnoreCase("play")){
+//            ZeeConfig.resetCharSelected();
+//        }
+//    }
 
     //reset state
-    public static void resetCharSelected() {
+    public static void resetCharVariables() {
         mainInv = null;
         ZeeManagerItemClick.invBelt = null;
         ZeeManagerItemClick.equipory = null;
@@ -2085,7 +2081,6 @@ public class ZeeConfig {
         Cal.fishMoonShowText = false;
         ZeeManagerMiner.tilesMonitorCleanup();
         ZeeHistWdg.listHistButtons.clear();
-        ZeeQuickOptionsWindow.reset();
     }
 
     public static void clickOpenBelt() {

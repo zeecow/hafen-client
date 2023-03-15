@@ -221,6 +221,10 @@ public class ZeeOptionsJFrame extends JFrame {
 
         panelTabAuto.add(new ZeeOptionJCheckBox( "Drop mined curios", "dropMinedCurios"),c);
 
+        panelTabAuto.add(new ZeeOptionJCheckBox( "Auto-run on login", "autoRunLogin"),c);
+
+        panelTabAuto.add(new ZeeOptionJCheckBox( "Auto-track scents", "autoTrackScents"),c);
+
         panelTabAuto.add(new ZeeOptionJCheckBox( "Sound alert on player sight", "alertOnPlayers"),c);
 
         panelTabAuto.add(new ZeeOptionJCheckBox("Travel hearth on player sight","autoHearthOnStranger"), c);
@@ -229,7 +233,6 @@ public class ZeeOptionsJFrame extends JFrame {
 
         panelTabAuto.add(new ZeeOptionJCheckBox("Lift vehicle before travel hearth","liftVehicleBeforeTravelHearth"), c);
 
-        panelTabAuto.add(new ZeeOptionJCheckBox( "Auto-run on login", "autoRunLogin"),c);
 
         panelTabAuto.add(new ZeeOptionJCheckBox( "Research food tips", "researchFoodTips"),c);
 
