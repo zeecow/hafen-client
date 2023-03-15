@@ -1571,6 +1571,7 @@ public class ZeeConfig {
     }
 
 
+    private static boolean alreadyTrackingScents = false;
     public static void initToggles() {
         new Thread(new Runnable() {
             public void run() {
@@ -1604,8 +1605,10 @@ public class ZeeConfig {
 
                     // auto track scents
                     Thread.sleep(1000);
-                    if(autoTrackScents) {
+                    if(autoTrackScents && !alreadyTrackingScents) {
                         gameUI.menu.wdgmsg("act", "tracking");
+                        //tracking for all characters
+                        alreadyTrackingScents = true;
                     }
 
                 } catch (InterruptedException e) {
