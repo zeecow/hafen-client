@@ -107,7 +107,7 @@ public class ZeeConfig {
     public static final String TILE_SWAMP_BOG = "gfx/tiles/bog";
     public static final String TILE_SWAMP_BOG_WATER = "gfx/tiles/bogwater";
 
-    public static final String DEF_LIST_BLOCK_AUDIO = "Leashed horse.;Tracking is now turned on.";
+    public static final String DEF_LIST_BLOCK_AUDIO = "Leashed horse.;Tracking is now turned on.;Stacking is now turned on.;Stacking is now turned off.";
     public static final String DEF_LIST_CONFIRM_PETAL = "Empty,Swill,Clean out,Slaughter,Castrate,Unmoor,Take possession,Renounce Lawspeaker,Become Lawspeaker";
     public static final String DEF_LIST_AUTO_HIDE_WINDOWS = "Inventory,Character Sheet,Belt,Basket,Creel,Cattle Roster,Quiver";
     public static final String DEF_LIST_BUTCH_AUTO = "Break,Scale,Wring neck,Kill,Skin,Flay,Pluck,Clean,Butcher,Collect bones";
@@ -141,7 +141,7 @@ public class ZeeConfig {
     public static Glob glob;
 
     public static String playingAudio = null;
-    public static String uiMsgTextQuality, uiMsgTextBuffer;
+    public static String lastUiMsg, uiMsgTextQuality, uiMsgTextBuffer;
     public static long now, lastUiQualityMsgMs=0, lastUIMsgMs, lastHafenWarningMs=0;
     public static Object[] lastMapViewClickArgs;
     public static Gob lastMapViewClickGob;
@@ -172,7 +172,7 @@ public class ZeeConfig {
     public static boolean blockAudioMsg = Utils.getprefb("blockAudioMsg", true);
     public static String blockAudioMsgList = Utils.getpref("blockAudioMsgList",DEF_LIST_BLOCK_AUDIO);
     public static boolean butcherMode = false;
-    public static boolean autoStack = false;
+    public static boolean autoStack = false;//set at initToggles()
     public static String butcherAutoList = Utils.getpref("butcherAutoList", DEF_LIST_BUTCH_AUTO);
     public static boolean cattleRosterHeight = Utils.getprefb("cattleRosterHeight", true);
     public static double cattleRosterHeightPercentage = Utils.getprefd("cattleRosterHeightPercentage", 1.0);
@@ -901,11 +901,12 @@ public class ZeeConfig {
     }
 
     public static void initWindowInvMain() {
+
         //add options interface
         windowInvMain.add(invMainoptionsWdg = new ZeeInvMainOptionsWdg("Inventory"));
 
         //change slots position
-        Widget invSlots = windowInvMain.getchild(Inventory.class);
+        Inventory invSlots = windowInvMain.getchild(Inventory.class);
         invSlots.c = new Coord(0,30);
 
         // add radio buttons for transfer options
@@ -914,6 +915,9 @@ public class ZeeConfig {
         windowInvMain.pack();
 
         checkFishMoonXpAlert();
+
+        // fix switching chars with different inv sizes?
+        inventoryResized(invSlots);
     }
 
     // Fish Moon XP alert
@@ -1574,13 +1578,32 @@ public class ZeeConfig {
 
                     println("initToggles");
 
+                    // discover autostack checkbox value
+                    toggleAutostack();//toggle autostack
                     Thread.sleep(1000);
+                    if (lastUiMsg!=null){
+                        //autostack was off
+                        if (lastUiMsg.contains("Stacking is now turned on.")){
+                            autoStack = false;
+                        }
+                        //autostack was on
+                        else if (lastUiMsg.contains("Stacking is now turned off.")){
+                            autoStack = true;
+                        }
+                        // set checkbox value
+                        ZeeInvMainOptionsWdg.cbAutoStack.a = autoStack;
+                    }
+                    toggleAutostack();//reset to original value
 
+
+                    // auto run speed
+                    Thread.sleep(1000);
                     if(autoRunLogin)
                         setPlayerSpeed(PLAYER_SPEED_2);
 
-                    Thread.sleep(1000);
 
+                    // auto track scents
+                    Thread.sleep(1000);
                     if(autoTrackScents) {
                         gameUI.menu.wdgmsg("act", "tracking");
                     }
@@ -2002,6 +2025,7 @@ public class ZeeConfig {
      */
     public static void checkUiMsg(String text) {
         lastUIMsgMs = now = System.currentTimeMillis();
+        lastUiMsg = text;
 
         // inspect quality msg may come in two sequential lines/calls
         if(now - lastUiQualityMsgMs > 555) { //new message
@@ -2009,6 +2033,7 @@ public class ZeeConfig {
             uiMsgTextQuality = "";
             uiMsgTextBuffer = "";
         }
+
         // add gob text ql
         if (text.contains("Quality")) {
             uiMsgTextQuality = text;
@@ -3207,8 +3232,7 @@ public class ZeeConfig {
     public static void inventoryResized(Inventory inv) {
 
         // repos main inv checkboxes
-        if (getMainInventory().equals(inv))
-            invMainoptionsWdg.reposition();
+        invMainoptionsWdg.reposition();
 
         Window win = (Window)inv.getparent(Window.class);
 
@@ -3235,6 +3259,8 @@ public class ZeeConfig {
         if (win.buttonAutoHide != null){
             win.buttonAutoHide.c = Coord.of(0);
         }
+
+
     }
 
     // calculate next tile from origin to destination
@@ -3267,5 +3293,9 @@ public class ZeeConfig {
         val = Math.round(val);
         val = val /100;
         return val;
+    }
+
+    public static void toggleAutostack() {
+        gameUI.menu.wdgmsg("act", "itemcomb", 0);
     }
 }

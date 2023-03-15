@@ -47,13 +47,10 @@ public class ZeeInvMainOptionsWdg extends Widget {
         x += cbButcher.sz.x + 5;
 
         add(cbAutoStack = new CheckBox("stk") {
-            {
-                a = ZeeConfig.autoStack;
-            }
-
             public void set(boolean val) {
                 ZeeConfig.autoStack = val;
                 a = val;
+                ZeeConfig.toggleAutostack();
             }
         }, x, 0);
         cbAutoStack.settip("auto stack items");

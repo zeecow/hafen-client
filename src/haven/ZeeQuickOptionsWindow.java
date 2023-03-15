@@ -169,7 +169,6 @@ public class ZeeQuickOptionsWindow {
     }
 
     public static void reset() {
-        ZeeConfig.println("reset quick windows");
         if (window!=null)
             window.remove();
         window = null;
