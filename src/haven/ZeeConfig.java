@@ -107,7 +107,7 @@ public class ZeeConfig {
     public static final String TILE_SWAMP_BOG = "gfx/tiles/bog";
     public static final String TILE_SWAMP_BOG_WATER = "gfx/tiles/bogwater";
 
-    public static final String DEF_LIST_BLOCK_AUDIO = "Leashed horse.;Tracking is now turned on.;Stacking is now turned on.;Stacking is now turned off.";
+    public static final String DEF_LIST_MUTE_AUDIO = "Leashed horse.;Tracking is now turned;Stacking is now turned;must be empty to be unequipped";
     public static final String DEF_LIST_CONFIRM_PETAL = "Empty,Swill,Clean out,Slaughter,Castrate,Unmoor,Take possession,Renounce Lawspeaker,Become Lawspeaker";
     public static final String DEF_LIST_AUTO_HIDE_WINDOWS = "Inventory,Character Sheet,Belt,Basket,Creel,Cattle Roster,Quiver";
     public static final String DEF_LIST_BUTCH_AUTO = "Break,Scale,Wring neck,Kill,Skin,Flay,Pluck,Clean,Butcher,Collect bones";
@@ -170,7 +170,7 @@ public class ZeeConfig {
     public static boolean autoRunLogin = Utils.getprefb("autoRunLogin", true);
     public static boolean autoToggleGridLines = Utils.getprefb("autoToggleGridLines", true);
     public static boolean blockAudioMsg = Utils.getprefb("blockAudioMsg", true);
-    public static String blockAudioMsgList = Utils.getpref("blockAudioMsgList",DEF_LIST_BLOCK_AUDIO);
+    public static String blockAudioMsgList = Utils.getpref("blockAudioMsgList", DEF_LIST_MUTE_AUDIO);
     public static boolean butcherMode = false;
     public static boolean autoStack = false;//set at initToggles()
     public static String butcherAutoList = Utils.getpref("butcherAutoList", DEF_LIST_BUTCH_AUTO);
