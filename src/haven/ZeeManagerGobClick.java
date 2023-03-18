@@ -1852,40 +1852,49 @@ public class ZeeManagerGobClick extends ZeeThread{
         // find eligible gobs
         List<Gob> gobs = ZeeConfig.findGobsMatchingRegexpList(listPickupGobNamePatterns);
         gobs.removeIf(gob1 -> ZeeConfig.isKritter(gob1) && ZeeConfig.isKritterNotPickable(gob1));
+
         if (gobs==null || gobs.size()==0)
             return;
 
-        // Ctrl+q shows window
+        // Ctrl+q shows window pickup gob
         if(ev.isControlDown()){
             toggleWindowPickupGob(gobs);
             return;
         }
 
         // calculate closest gob
-        double minDist=0, dist;
-        Gob closestGob = null;
+        double minDist=99999, dist, minDistKritter=99999;
+        Gob closestGob=null, closestKritter=null;
         String name;
         for (int i = 0; i < gobs.size(); i++) {
             dist = ZeeConfig.distanceToPlayer(gobs.get(i));
             name = gobs.get(i).getres().name;
-            if (closestGob==null  ||  dist < minDist){
+            // prioritize kritter
+            if (name.contains("/kritter/")){
+                if (closestKritter==null || (dist < minDistKritter && dist<88)){
+                    minDistKritter = dist;
+                    closestKritter = gobs.get(i);
+                }
+            }
+            // other gobs
+            else if (closestGob==null  ||  dist < minDist){
                 minDist = dist;
                 closestGob = gobs.get(i);
             }
         }
 
         // pickup closest gob
+        if (closestKritter !=null )
+            closestGob = closestKritter;
         if (closestGob!=null) {
-            //println("closestGob == "+closestGob.getres().name);
-            // ctrl+q cycle gob targets
-            // right click ground item
-            if (closestGob.getres().name.contains("/terobjs/items/")) {
+            // right click gob
+            if (minDistKritter < minDist || closestGob.getres().name.contains("/terobjs/items/")) {
                 if (pickupGobIsShiftDown)
                     gobClick(closestGob, 3, UI.MOD_SHIFT);
                 else
                     gobClick(closestGob, 3);
             }
-            // select pickup menu option
+            // select "Pick" menu option
             else {
                 Gob finalClosestGob = closestGob;
                 new ZeeThread(){
