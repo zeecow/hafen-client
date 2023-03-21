@@ -1863,32 +1863,27 @@ public class ZeeManagerGobClick extends ZeeThread{
         }
 
         // calculate closest gob
-        double minDist=99999, dist, minDistKritter=99999;
-        Gob closestGob=null, closestKritter=null;
+        double minDist=99999, dist;
+        Gob closestGob=null;
         String name;
         for (int i = 0; i < gobs.size(); i++) {
             dist = ZeeConfig.distanceToPlayer(gobs.get(i));
             name = gobs.get(i).getres().name;
-            // prioritize kritter
-            if (name.contains("/kritter/")){
-                if (closestKritter==null || (dist < minDistKritter && dist<88)){
-                    minDistKritter = dist;
-                    closestKritter = gobs.get(i);
-                }
-            }
-            // other gobs
-            else if (closestGob==null  ||  dist < minDist){
+            if ( closestGob==null
+                || (name.contains("/kritter/") && dist < 88)
+                ||  dist < minDist )
+            {
                 minDist = dist;
                 closestGob = gobs.get(i);
             }
         }
 
         // pickup closest gob
-        if (closestKritter !=null )
-            closestGob = closestKritter;
         if (closestGob!=null) {
             // right click gob
-            if (minDistKritter < minDist || closestGob.getres().name.contains("/terobjs/items/")) {
+            if ( closestGob.getres().name.contains("/kritter/")
+                || closestGob.getres().name.contains("/terobjs/items/"))
+            {
                 if (pickupGobIsShiftDown)
                     gobClick(closestGob, 3, UI.MOD_SHIFT);
                 else
