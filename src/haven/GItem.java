@@ -475,7 +475,7 @@ public class GItem extends AWidget implements ItemInfo.SpriteOwner, GSprite.Owne
 			}
 		    }
 		    this.contents.unlink();
-		    contentswdg = cont.add(new Contents(this, this.contents), hovering.parentpos(cont, hovering.sz.sub(UI.scale(5, 5)).sub(Contents.hovermarg)));
+		    contentswdg = cont.add(new Contents(this, this.contents), hovering.parentpos(cont, hovering.sz.sub(Contents.overlap).sub(Contents.hovermarg)));
 		    if(hovering_pos != null) {
 			contentswdg.c = hovering_pos;
 		    }
@@ -498,7 +498,7 @@ public class GItem extends AWidget implements ItemInfo.SpriteOwner, GSprite.Owne
 	    if(this.contentsid != null)
 		wc = Utils.getprefc(String.format("cont-wndc/%s", this.contentsid), null);
 	    if(wc == null)
-		wc = cont.rootxlate(ui.mc).add(UI.scale(5, 5));
+		wc = cont.rootxlate(ui.mc).add(Contents.overlap);
 	    contents.unlink();
 	    if(contentswdg != null) {
 		contentswdg.invdest = true;
@@ -514,11 +514,13 @@ public class GItem extends AWidget implements ItemInfo.SpriteOwner, GSprite.Owne
 	} else if(!show && (contentswnd != null)) {
 	    contentswnd.reqdestroy();
 	    contentswnd = null;
+	    Utils.setprefb(String.format("cont-wndvis/%s", this.contentsid), false);
 	}
     }
 
     public static class Contents extends Widget {
-	public static final Coord hovermarg = UI.scale(8, 8);
+	public static final Coord hovermarg = UI.scale(12, 12);
+	public static final Coord overlap = UI.scale(2, 2);
 	public static final Tex bg = Window.bg;
 	public static final IBox obox = Window.wbox;
 	public final GItem cont;
@@ -583,13 +585,19 @@ public class GItem extends AWidget implements ItemInfo.SpriteOwner, GSprite.Owne
 	    }
 	}
 
+	public boolean checkhit(Coord c) {
+	    return((c.x >= hovermarg.x) && (c.y >= hovermarg.y));
+	}
+
 	public boolean mousedown(Coord c, int btn) {
 	    if(super.mousedown(c, btn))
 		return(true);
-	    if(btn == 1) {
-		dm = ui.grabmouse(this);
-		doff = c;
-		return(true);
+	    if(checkhit(c)) {
+		if(btn == 1) {
+		    dm = ui.grabmouse(this);
+		    doff = c;
+		    return(true);
+		}
 	    }
 	    return(false);
 	}
