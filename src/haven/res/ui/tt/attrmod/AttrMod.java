@@ -2,12 +2,15 @@
 package haven.res.ui.tt.attrmod;
 
 import haven.*;
-import static haven.PUtils.*;
-import java.util.*;
+
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
+import java.util.Collection;
+
+import static haven.PUtils.convolvedown;
 
 /* >tt: AttrMod$Fac */
-@haven.FromResource(name = "ui/tt/attrmod", version = 6)
+@haven.FromResource(name = "ui/tt/attrmod", version = 10)
 public class AttrMod extends ItemInfo.Tip {
     public final Collection<Mod> mods;
 
@@ -24,12 +27,16 @@ public class AttrMod extends ItemInfo.Tip {
     }
 
     public static class Fac implements InfoFactory {
-	public ItemInfo build(Owner owner, Object... args) {
+	public ItemInfo build(Owner owner, Raw raw, Object... args) {
 	    Resource.Resolver rr = owner.context(Resource.Resolver.class);
 	    Collection<Mod> mods = new ArrayList<Mod>();
 	    for(int a = 1; a < args.length; a += 2)
 		mods.add(new Mod(rr.getres((Integer)args[a]).get(), (Integer)args[a + 1]));
 	    return(new AttrMod(owner, mods));
+	}
+
+	public ItemInfo build(Owner owner, Object... args) {
+	    return(null);
 	}
     }
 
