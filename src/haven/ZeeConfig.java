@@ -1976,6 +1976,7 @@ public class ZeeConfig {
         String[] containers = (
                 //boxes
                 "Woodbox,Cupboard,Chest,Crate,Basket,Casket,Box,Coffer,Steelbox,Metal Cabinet,"
+                +"Urn,Pot,"
                 //misc
                 +"Knarr,Snekkja,Wagon,Table,Saddlebags,Basket,"
                 +"Furnace,Smelter,Desk,Trunk,Shed,Packrack,Strongbox,Stockpile,"
