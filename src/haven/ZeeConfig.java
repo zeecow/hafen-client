@@ -562,7 +562,7 @@ public class ZeeConfig {
                 "/cavemoth","/items/grub","/springbumblebee",
                 "stingingnettle","taproot","cattail",
                 "clover","snapdragon","/windweed",
-                "bloatedbolete","/chantrelles","/lorchel","parasol","yellowfoot"
+                "bloatedbolete","chantrelle","/lorchel","parasol","yellowfoot"
         };
         for (int i = 0; i < list.length; i++) {
             if(nameContains.contains(list[i]))
@@ -671,8 +671,9 @@ public class ZeeConfig {
     }
 
     public static boolean isMushroom(String name){
+        println(name);
         String[] list = {
-            "bolete","truffle","trumpet","cavelantern","chantrelles","/lorchel","fairy","blewit",
+            "bolete","truffle","trumpet","cavelantern","chantrelle","/lorchel","fairy","blewit",
             "puffball","indigo","parasol","snowtop","yellowfoot"
         };
         for (int i = 0; i < list.length; i++) {
