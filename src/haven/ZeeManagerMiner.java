@@ -708,12 +708,12 @@ public class ZeeManagerMiner extends ZeeThread{
                 }
             }
             // label ore
-            else if (isStoneOre(basename)) {
+            else if (isRegularOre(basename)) {
                 label.setcolor(Color.yellow);
                 label.settext(label.texts+"  (ore)");
             }
             // label silver/gold
-            else if (isStoneOrePrecious(basename)) {
+            else if (isPreciousOre(basename)) {
                 // label color
                 label.setcolor(Color.red);
                 // label text
@@ -755,7 +755,7 @@ public class ZeeManagerMiner extends ZeeThread{
         }
     }
 
-    static boolean isStoneOre(String basename){
+    static boolean isRegularOre(String basename){
         return ZeeConfig.mineablesOre.contains(basename);
     }
 
@@ -763,7 +763,7 @@ public class ZeeManagerMiner extends ZeeThread{
         return ZeeConfig.mineablesStone.contains(basename);
     }
 
-    static boolean isStoneOrePrecious(String basename){
+    static boolean isPreciousOre(String basename){
         return ZeeConfig.mineablesOrePrecious.contains(basename);
     }
 

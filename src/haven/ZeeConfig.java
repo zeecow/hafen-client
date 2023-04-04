@@ -230,6 +230,7 @@ public class ZeeConfig {
     public static boolean rememberWindowsPos = Utils.getprefb("rememberWindowsPos", true);
     public static boolean showInspectTooltip = false;
     public static boolean isPlayerFeasting = false;
+    public static boolean isPlayerCursorMining = false;
     public static boolean simpleWindows = Utils.getprefb("simpleWindows", true);
     public static int simpleWindowColorInt = Utils.getprefi("simpleWindowColorInt",ZeeConfig.colorToInt(DEF_SIMPLE_WINDOW_COLOR));
     public static boolean simpleWindowBorder = Utils.getprefb("simpleWindowBorder", true);
@@ -2952,6 +2953,8 @@ public class ZeeConfig {
 
         ZeeConfig.cursorName = curs;
 
+        isPlayerCursorMining = curs.contentEquals(CURSOR_MINE);
+
         // toggle grid lines
         if (autoToggleGridLines) {
             gameUI.map.showgrid(curs.contentEquals(CURSOR_HARVEST) || ZeeManagerMiner.isCursorMining() || curs.contentEquals(CURSOR_DIG));
@@ -3303,4 +3306,18 @@ public class ZeeConfig {
     public static void toggleAutostack() {
         gameUI.menu.wdgmsg("act", "itemcomb", 0);
     }
+
+    static HashMap<String,Integer> mapMiningLogNameQl = new HashMap<>();
+    public static void checkMiningLogHighestQl(GItem gItem, String basename) {
+        Integer newQl = Inventory.getQualityInt(gItem);
+        Integer oldQl = mapMiningLogNameQl.get(basename);
+        if (oldQl==null || newQl > oldQl) {
+            mapMiningLogNameQl.put(basename, newQl);
+            List sorted = mapMiningLogNameQl.entrySet().stream()
+                    .sorted((k1, k2) -> -k1.getValue().compareTo(k2.getValue()))
+                    .collect(Collectors.toList());
+            println("miningQl("+mapMiningLogNameQl.size() +") > "+ sorted.toString());
+        }
+    }
+
 }
