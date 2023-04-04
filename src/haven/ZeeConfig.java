@@ -3307,17 +3307,4 @@ public class ZeeConfig {
         gameUI.menu.wdgmsg("act", "itemcomb", 0);
     }
 
-    static HashMap<String,Integer> mapMiningLogNameQl = new HashMap<>();
-    public static void checkMiningLogHighestQl(GItem gItem, String basename) {
-        Integer newQl = Inventory.getQualityInt(gItem);
-        Integer oldQl = mapMiningLogNameQl.get(basename);
-        if (oldQl==null || newQl > oldQl) {
-            mapMiningLogNameQl.put(basename, newQl);
-            List sorted = mapMiningLogNameQl.entrySet().stream()
-                    .sorted((k1, k2) -> -k1.getValue().compareTo(k2.getValue()))
-                    .collect(Collectors.toList());
-            println("miningQl("+mapMiningLogNameQl.size() +") > "+ sorted.toString());
-        }
-    }
-
 }

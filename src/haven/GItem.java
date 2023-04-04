@@ -179,7 +179,7 @@ public class GItem extends AWidget implements ItemInfo.SpriteOwner, GSprite.Owne
 
 		//drop mined items
 		if (ZeeConfig.isPlayerCursorMining) {
-			ZeeConfig.checkMiningLogHighestQl(this,basename);
+			ZeeManagerMiner.checkMiningLogHighestQl(this,basename);
 			if (ZeeConfig.dropMinedStones && ZeeManagerMiner.isStoneNotOre(basename) ||
 				ZeeConfig.dropMinedOre && ZeeManagerMiner.isRegularOre(basename) ||
 				ZeeConfig.dropMinedOrePrecious && ZeeManagerMiner.isPreciousOre(basename) ||

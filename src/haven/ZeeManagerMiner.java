@@ -3,6 +3,7 @@ package haven;
 import java.awt.*;
 import java.util.List;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class ZeeManagerMiner extends ZeeThread{
 
@@ -725,7 +726,7 @@ public class ZeeManagerMiner extends ZeeThread{
                         ZeeConfig.msg("Silver ore found");
                         ZeeSynth.textToSpeakLinuxFestival("Silver ore found");
                     }
-                }else {
+                } else {
                     label.settext(basename + "  (gold)");
                     // 5min limit, TODO better way
                     if(ZeeThread.now() - msLastGoldMsg > 1000*60*5) {
@@ -738,6 +739,24 @@ public class ZeeManagerMiner extends ZeeThread{
             tilemonWindow.add(label,0,y);
             y += 13;
         }
+
+
+        /*
+            append mining ql log
+         */
+        label = new Label("=== top 5 ql ===");
+        label.setcolor(Color.green);
+        tilemonWindow.add(label,0,y);
+        List<Map.Entry<String,Integer>> miningLog = getSortedMiningLog();
+        for (int i = 0; i < miningLog.size(); i++) {
+            if (i < 5) {//limit list size
+                y += 13;
+                label = new Label(miningLog.get(i).getKey()+" q"+miningLog.get(i).getValue());
+                tilemonWindow.add(label,0,y);
+            }else
+                break;
+        }
+
         tilemonWindow.pack();
     }
 
@@ -767,6 +786,24 @@ public class ZeeManagerMiner extends ZeeThread{
 
     static boolean isPreciousOre(String basename){
         return ZeeConfig.mineablesOrePrecious.contains(basename);
+    }
+
+    static HashMap<String,Integer> mapMiningLogNameQl = new HashMap<>();
+    static void checkMiningLogHighestQl(GItem gItem, String basename) {
+        if (!isStoneNotOre(basename) && !isPreciousOre(basename)
+            && !isRegularOre(basename) && !ZeeConfig.mineablesCurios.contains(basename))
+            return;
+        Integer newQl = Inventory.getQualityInt(gItem);
+        Integer oldQl = mapMiningLogNameQl.get(basename);
+        if (oldQl==null || newQl > oldQl) {
+            mapMiningLogNameQl.put(basename, newQl);
+            println("miningQl("+mapMiningLogNameQl.size() +") > "+ getSortedMiningLog().toString());
+        }
+    }
+    static List<Map.Entry<String,Integer>> getSortedMiningLog() {
+        return mapMiningLogNameQl.entrySet().stream()
+                .sorted((k1, k2) -> -k1.getValue().compareTo(k2.getValue()))
+                .collect(Collectors.toList());
     }
 
     public static void println(String s) {
