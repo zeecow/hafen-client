@@ -721,6 +721,7 @@ public class ZeeManagerMiner extends ZeeThread{
                     label.settext(basename + "  (silver)");
                     // 5min limit, TODO find better way
                     if(ZeeThread.now() - msLastSilverMsg > 1000*60*5) {
+                        msLastSilverMsg = ZeeThread.now();
                         ZeeConfig.msg("Silver ore found");
                         ZeeSynth.textToSpeakLinuxFestival("Silver ore found");
                     }
@@ -728,6 +729,7 @@ public class ZeeManagerMiner extends ZeeThread{
                     label.settext(basename + "  (gold)");
                     // 5min limit, TODO better way
                     if(ZeeThread.now() - msLastGoldMsg > 1000*60*5) {
+                        msLastGoldMsg = ZeeThread.now();
                         ZeeConfig.msg("Gold ore found");
                         ZeeSynth.textToSpeakLinuxFestival("Gold ore found");
                     }
