@@ -218,15 +218,22 @@ public class ZeeResearch {
             if (!arrLine[0].contentEquals(entryName)){
                 continue;
             }
+            //println("check "+ arrLine[0]);
 
             //check same ingredients (or no ingredients)
             boolean ingredsMatch = true;
-            for (int j = 0; j < arrLine.length; j++) {
-                //skip non ingredient entries
+            for (int j = 1; j < arrLine.length; j++) {
+                //skip entries without ingredient
+                // TODO consider case
+                //  "Buttered Leeks;85.0;evt,WIL+2,8.75;evt,CON+1,8.75;"
+                //  "Buttered Leeks;78.07;igr,Goatsmilk,1.0;evt,WIL+2,6.29;evt,CON+1,6.29;evt,DEX+1,5.87;"
+                // if no-IGR is saved first, then others with IGR are being ignored
+                // only works now if IGR items are saved first
                 if (!arrLine[j].contains("igr,"))
                     continue;
                 //ingredient not present, match is false
                 if (!entry.contains(arrLine[j])){
+                    //println(entry +" !contains "+arrLine[j]);
                     ingredsMatch = false;
                     break;
                 }
