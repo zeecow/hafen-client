@@ -63,7 +63,7 @@ Client focusing on small helper tasks, many using mouse middle button, and other
   - show mining tile counter when click mine ground/tile
 - midclick object 
   - inspect object quality and show text
-  - harvest 2 dreams from dreamcatch obj
+  - harvest 2 dreams from dreamcatch objects closeby
   - Giddyup! if obj is horse
   - lightup torch on firesource obj
   - open "Cargo" on Knarr/Snekkja obj

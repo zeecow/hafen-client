@@ -38,7 +38,7 @@ public class ZeeManagerGobClick extends ZeeThread{
         isGroundClick = (gob==null);
         gobName = isGroundClick ? "" : gob.getres().name;
 
-        //println(clickDiffMs+"ms > "+gobName + (gob==null ? "" : " dist="+ZeeConfig.distanceToPlayer(gob)));
+        //println(lastClickDiffMs+"ms > "+gobName + (gob==null ? "" : " dist="+ZeeConfig.distanceToPlayer(gob)));
         //if (gob!=null) println(gobName + " poses = "+ZeeConfig.getGobPoses(gob));
 
         // long mid-clicks
@@ -119,13 +119,9 @@ public class ZeeManagerGobClick extends ZeeThread{
                     ZeeManagerFarmer.testBarrelsTiles(true);
                 barrelLabelOn = !barrelLabelOn;
             }
-            // pick 2 dreams from catcher
+            // pick  dreams from catchers closeby
             else if (gobName.endsWith("/dreca")) {
-                new ZeeThread() {
-                    public void run() {
-                        twoDreamsPlease(gob);
-                    }
-                }.start();
+                pickAllDreamsCloseBy(gob);
             }
             //toggle mine support radius
             else if (isGobMineSupport(gobName)) {
@@ -809,13 +805,54 @@ public class ZeeManagerGobClick extends ZeeThread{
             gobClick(gob,3,0); // try ctrl+click simulation
     }
 
-    private static void twoDreamsPlease(Gob gob) {
-        if(clickGobPetal(gob,"Harvest")) {
-            waitPlayerDistToGob(gob,15);
+    private static void pickAllDreamsCloseBy(Gob catcher1){
+        new Thread(){
+            public void run() {
+
+                try{
+                    ZeeConfig.addPlayerText("dreaming");
+
+                    //prepare for clickCancelTask()
+                    ZeeConfig.lastMapViewClickButton = 2;
+
+                    //pick dreams from 1st catcher
+                    pickDreamsFromCatcher(catcher1);
+                    sleep(100);
+
+                    //try picking from other catchers closeby
+                    List<Gob> catchers = ZeeConfig.findGobsByNameEndsWith("/dreca");
+                    catchers.removeIf(dreca -> ZeeConfig.distanceToPlayer(dreca) > 40);
+                    Gob dc;
+                    for (int i = 0; i < catchers.size(); i++) {
+                        dc = catchers.get(i);
+                        //cancel click
+                        if (ZeeConfig.isTaskCanceledByGroundClick())
+                            break;
+                        //skip 1st catcher
+                        if(dc.equals(catcher1))
+                            continue;
+                        pickDreamsFromCatcher(dc);
+                        sleep(100);
+                    }
+
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+
+                ZeeConfig.removePlayerText();
+            }
+        }.start();
+    }
+
+    private static void pickDreamsFromCatcher(Gob dreamCatcher) {
+        ZeeConfig.addGobText(dreamCatcher,"target");
+        if(clickGobPetal(dreamCatcher,"Harvest")) {
+            waitPlayerDistToGob(dreamCatcher,15);
             waitNoFlowerMenu();
-            if(clickGobPetal(gob,"Harvest"))
+            if(clickGobPetal(dreamCatcher,"Harvest"))
                 waitNoFlowerMenu();
         }
+        ZeeConfig.removeGobText(dreamCatcher);
     }
 
     public static boolean pickupTorch() {
