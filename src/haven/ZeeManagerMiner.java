@@ -744,12 +744,12 @@ public class ZeeManagerMiner extends ZeeThread{
         /*
             append mining ql log
          */
-        label = new Label("=== top 5 ql ===");
+        label = new Label("=== top 10 ql ===");
         label.setcolor(Color.green);
         tilemonWindow.add(label,0,y);
         List<Map.Entry<String,Integer>> miningLog = getSortedMiningLog();
         for (int i = 0; i < miningLog.size(); i++) {
-            if (i < 5) {//limit list size
+            if (i < 10) {//limit list size
                 y += 13;
                 label = new Label(miningLog.get(i).getKey()+" q"+miningLog.get(i).getValue());
                 tilemonWindow.add(label,0,y);
