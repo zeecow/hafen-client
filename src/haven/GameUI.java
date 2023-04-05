@@ -292,6 +292,7 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Message
 	brpanel.add(new MenuButton("csearch", kb_srch, "Search actions...") {
 		public void click() {
 		    toggleSearchWindow();
+			ZeeHoverMenu.checkExitClickedSearch();
 		}
 		public void mousemove(Coord c) {
 			ZeeHoverMenu.mouseMoved(this,c);

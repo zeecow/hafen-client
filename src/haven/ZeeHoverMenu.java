@@ -8,9 +8,8 @@ import java.util.List;
 
 public class ZeeHoverMenu {
 
-    static final int START_MENU_MS = 950;
-    static final long EXIT_MENU_MS = 700;
-    static final long CHANGE_MENU_MS = 500;
+    static final int START_MENU_MS = 700;
+    static final long CHANGE_MENU_MS = 350;
 
     static MenuWidget rootMenu, latestMenu;
     static boolean isMouseOver = false;
@@ -61,6 +60,7 @@ public class ZeeHoverMenu {
         if (rootMenu == null){
             rootMenu = latestMenu = ZeeConfig.gameUI.add(new MenuWidget(null,null));
             positionLatestMenu(rootMenu);
+            rootMenu.setfocusctl(true);//for esc exit
         }
     }
 
@@ -131,6 +131,7 @@ public class ZeeHoverMenu {
             cont++;
         }
         println("destroyed "+cont+" menus");
+        resetMenuGrid();
         rootMenu = latestMenu = null;
         exiting = false;
     }
@@ -299,13 +300,24 @@ public class ZeeHoverMenu {
         }
     }
 
-    public static boolean checkExitEsc(KeyEvent evt) {
+    static boolean checkExitEsc(KeyEvent evt) {
         if (evt.getKeyCode()==KeyEvent.VK_ESCAPE){
             if (rootMenu!=null && !exiting) {
-                exitMenu("esc exit hovermenu");
+                exitMenu("exit hovermenu ESC");
                 return true;
             }
         }
         return false;
+    }
+
+    static void checkExitClickedSearch() {
+        if (rootMenu!=null && !exiting) {
+            exitMenu("exit hovermenu button clicked");
+        }
+    }
+
+    static void resetMenuGrid(){
+        ZeeHoverMenu.ignoreNextGridMenu = true;
+        ZeeConfig.gameUI.menu.change(null);
     }
 }
