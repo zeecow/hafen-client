@@ -1,6 +1,7 @@
 package haven;
 
 import java.awt.*;
+import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 import java.util.*;
 import java.util.List;
@@ -112,11 +113,11 @@ public class ZeeHoverMenu {
     }
 
     static volatile boolean exiting = false;
-    public static void exitMenu(){
+    public static void exitMenu(String msg){
         if (exiting)
             return;
         exiting = true;
-        println("exit");
+        println("exit "+(msg!=null && !msg.isEmpty() ? " > "+msg : ""));
         mouseOutMs = -1;
         isMouseOver = false;
         latestMenuLine = null;
@@ -147,13 +148,14 @@ public class ZeeHoverMenu {
     static class MenuWidget extends Widget{
 
         private final MenuGrid.Pagina pagina;
+        MenuLineWidget lineSelected;
         List<MenuGrid.PagButton> btns;
         BufferedImage bg;
         static boolean hit;
         static MenuGrid menuGrid;
         int level;
         MenuWidget parentMenu;
-        BufferedImage bgHoverLine = ZeeManagerIcons.imgRect( 160, 32, Color.blue, false, 0);;
+        BufferedImage bgHoverLine = ZeeManagerIcons.imgRect( 160, 32, Color.blue, false, 0);
 
         public MenuWidget(MenuGrid.Pagina pagina, MenuWidget parent){
 
@@ -208,25 +210,6 @@ public class ZeeHoverMenu {
             g.image(this.bg,Coord.z);
             super.draw(g);
         }
-
-        public void mousemove(Coord c) {
-            hit = c.isect(Coord.z, this.sz);
-            if(!hit){
-                //println("out");
-                if (mouseOutMs == -1){
-                    mouseOutMs = ZeeThread.now();
-                }
-                if (rootMenu!=null && mouseOutMs!=-1 && ZeeThread.now()-mouseOutMs > ZeeHoverMenu.EXIT_MENU_MS) {//1s outside to exit menu
-                    exitMenu();
-                    return;
-                }
-            }
-            else {
-                //println("in");
-                mouseOutMs = -1;
-            }
-            super.mousemove(c);
-        }
     }
 
     static class MenuLineWidget extends Widget{
@@ -236,7 +219,6 @@ public class ZeeHoverMenu {
         IButton btn;
         MenuGrid.Pagina pagina;
         final int i, btnWidth, btnHeight;
-        boolean isHoverLine;
         Label label;
         Coord lineTopRight;
         int menuLevel;
@@ -262,24 +244,25 @@ public class ZeeHoverMenu {
         }
 
         public void draw(GOut g) {
-            if (isHoverLine)
+            if (this.equals(menuWidget.lineSelected))
                 g.image(menuWidget.bgHoverLine, this.lineTopRight);
             super.draw(g);
         }
 
-        public void mousemove(Coord c) {
+        public boolean mousehover(Coord c) {
             int y = this.i * this.btnHeight;
             if(c.y > y   &&  c.y < (y + this.btnHeight)
                 && c.x > this.c.x && c.x < this.c.x+this.sz.x)
             {
-                isHoverLine = true;
+                //println(this.pagina.button().name() + "" + c.toString());
+                menuWidget.lineSelected = this;
                 //open submenu buttons only
                 if (isButtonNotSubmenu(this.pagina.button())) {
-                    return;
+                    return true;
                 }
                 //menu already opened
                 if (latestMenu!=null && latestMenuLine!=null && latestMenuLine.equals(this)) {
-                    return;
+                    return true;
                 }
                 // first mousemove
                 if (msHoverLine==-1) {
@@ -287,28 +270,25 @@ public class ZeeHoverMenu {
                 }
                 // open new submenu
                 else if (ZeeThread.now() - msHoverLine > ZeeHoverMenu.CHANGE_MENU_MS){
-                    isHoverLine = false;
+                    //isHoverLine = false;
                     msHoverLine = -1;
                     ZeeHoverMenu.latestParentLevel = this.menuLevel;
                     ZeeHoverMenu.latestMenuLine = MenuLineWidget.this;
                     menuGrid.use(pagina.button(), new MenuGrid.Interaction(), false);
                 }
+                return true;
             }
-            else {
-                isHoverLine = false;
-                msHoverLine = -1;
-            }
-            //super.mousemove(c);
+            return false;
         }
 
         public boolean mouseup(Coord c, int button) {
-            if(isHoverLine && isButtonNotSubmenu(pagina.button())) {
+            if(this.equals(menuWidget.lineSelected) && isButtonNotSubmenu(pagina.button())) {
                 // ignore next gridMenu due to reset
                 ZeeHoverMenu.ignoreNextGridMenu = true;
                 // click non submenu and reset gridMenu
                 menuGrid.use(pagina.button(), new MenuGrid.Interaction(), true);
                 //close open menus
-                exitMenu();
+                exitMenu("mouseup line "+pagina.button().name());
                 return true;
             }
             return false;
@@ -317,5 +297,15 @@ public class ZeeHoverMenu {
         public boolean mousedown(Coord c, int button) {
             return true;//grabs click?
         }
+    }
+
+    public static boolean checkExitEsc(KeyEvent evt) {
+        if (evt.getKeyCode()==KeyEvent.VK_ESCAPE){
+            if (rootMenu!=null && !exiting) {
+                exitMenu("esc exit hovermenu");
+                return true;
+            }
+        }
+        return false;
     }
 }

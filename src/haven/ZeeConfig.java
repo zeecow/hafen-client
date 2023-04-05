@@ -1835,8 +1835,12 @@ public class ZeeConfig {
 
         //println(ev.getKeyCode()+"  "+ev.getKeyChar());
 
+        //exit actions hovermenu
+        if(ZeeHoverMenu.checkExitEsc(ev)) {
+            return true;
+        }
         // pickup closest gob, key "q"
-        if (ev.getKeyCode()==81 && !isCombatActive()) {//TODO alternate key during combat?
+        else if (ev.getKeyCode()==81 && !isCombatActive()) {//TODO alternate key during combat?
             ZeeManagerGobClick.pickupClosestGob(ev);
             return true;
         }
