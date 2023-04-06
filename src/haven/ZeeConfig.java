@@ -3311,28 +3311,32 @@ public class ZeeConfig {
         gameUI.menu.wdgmsg("act", "itemcomb", 0);
     }
 
-    static Coord compactMapSizeScale1=Coord.of(150,150),
-            compactMapSizeScale2=Coord.of(220,220),
-            compactMapSizeScale3=Coord.of(280,280),
-            prevSize;
+    static Coord
+        compactMapSizeScale1 = Utils.getprefc("compactMapSizeScale1",Coord.of(150,150)),
+        compactMapSizeScale2 = Utils.getprefc("compactMapSizeScale2",Coord.of(200,200)),
+        compactMapSizeScale3 = Utils.getprefc("compactMapSizeScale3",Coord.of(250,250)),
+        prevSize;
     static void minimapCompactResized(Coord sz, Frame viewf) {
         if (!isMiniMapCompacted())
             return;
-        if (MiniMap.scale==1 && prevScale>1){
+        if (MiniMap.scale==1 && gameUI.mapfile.view.zoomlevel==0){
             compactMapSizeScale1 = sz;
+            Utils.setprefc("compactMapSizeScale1",sz);
         }
         else if (MiniMap.scale==2){
             compactMapSizeScale2 = sz;
+            Utils.setprefc("compactMapSizeScale2",sz);
         }
         else if (MiniMap.scale==3){
             compactMapSizeScale3 = sz;
+            Utils.setprefc("compactMapSizeScale3",sz);
         }
     }
     static int prevScale=-1;
     static void minimapCompactZoomChanged(int scale) {
         if (!isMiniMapCompacted())
             return;
-        if (scale==1 && prevScale>1 && compactMapSizeScale1!=null){
+        if (scale==1 && prevScale>1){
             prevSize = gameUI.mapfile.viewf.sz;
             gameUI.mapfile.resize(compactMapSizeScale1);
             prevScale = scale;
