@@ -64,7 +64,7 @@ public class MapWnd extends Window implements Console.Directory {
     public MarkerConfig markcfg = MarkerConfig.showall, cmarkers = null;
     private final Locator player;
     private final Widget toolbar;
-    private final Frame viewf;
+    final Frame viewf;
     private GroupSelector colsel;
     private Button mremove;
     private Predicate<Marker> mflt = pmarkers;
@@ -208,6 +208,7 @@ public class MapWnd extends Window implements Console.Directory {
 		drag.remove();
 		drag = null;
 		ZeeConfig.mapWndMinHeightBackup = -1;
+		ZeeConfig.minimapCompactResized(sz,viewf);
 		return(true);
 	    }
 	    return(super.mouseup(c, button));

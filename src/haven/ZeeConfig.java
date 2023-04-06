@@ -3311,4 +3311,59 @@ public class ZeeConfig {
         gameUI.menu.wdgmsg("act", "itemcomb", 0);
     }
 
+    static Coord compactMapSizeScale1=Coord.of(150,150),
+            compactMapSizeScale2=Coord.of(220,220),
+            compactMapSizeScale3=Coord.of(280,280),
+            prevSize;
+    static void minimapCompactResized(Coord sz, Frame viewf) {
+        if (!isMiniMapCompacted())
+            return;
+        if (MiniMap.scale==1 && prevScale>1){
+            compactMapSizeScale1 = sz;
+        }
+        else if (MiniMap.scale==2){
+            compactMapSizeScale2 = sz;
+        }
+        else if (MiniMap.scale==3){
+            compactMapSizeScale3 = sz;
+        }
+    }
+    static int prevScale=-1;
+    static void minimapCompactZoomChanged(int scale) {
+        if (!isMiniMapCompacted())
+            return;
+        if (scale==1 && prevScale>1 && compactMapSizeScale1!=null){
+            prevSize = gameUI.mapfile.viewf.sz;
+            gameUI.mapfile.resize(compactMapSizeScale1);
+            prevScale = scale;
+            minimapCompactReposition();
+        }
+        else if (scale==2 && compactMapSizeScale2!=null){
+            prevSize = gameUI.mapfile.viewf.sz;
+            gameUI.mapfile.resize(compactMapSizeScale2);
+            prevScale = scale;
+            minimapCompactReposition();
+        }
+        else if (scale==3 && compactMapSizeScale3!=null){
+            prevSize = gameUI.mapfile.viewf.sz;
+            gameUI.mapfile.resize(compactMapSizeScale3);
+            prevScale = scale;
+            minimapCompactReposition();
+        }
+    }
+    static void minimapCompactReposition() {
+        MapWnd map = gameUI.mapfile;
+
+        // adjust x pos if out of screen, or if on the right side of screen
+        if ( map.c.x + map.viewf.sz.x > gameUI.sz.x  ||  map.c.x > gameUI.sz.x/2)
+            map.c.x = gameUI.sz.x - map.viewf.sz.x - (map.mrgn.x*2) ;
+
+        // adjust y pos only if map is bellow middle screen
+        if (prevSize!=null && map.c.y + map.viewf.sz.y > gameUI.sz.y/2)
+            map.c.y -= map.viewf.sz.y - prevSize.y;
+    }
+
+    static boolean isMiniMapCompacted(){
+        return !gameUI.mapfile.tool.visible();
+    }
 }

@@ -848,6 +848,7 @@ public class MiniMap extends Widget {
 			scale--;
 			ZeeConfig.minimapScale = scale;
 			Utils.setprefi("minimapScale",scale);
+			ZeeConfig.minimapCompactZoomChanged(scale);
 		}
 		else if(allowzoomout())
 			zoomlevel = Math.min(zoomlevel + 1, dlvl + 1);
@@ -856,6 +857,7 @@ public class MiniMap extends Widget {
 			scale++;
 			ZeeConfig.minimapScale = scale;
 			Utils.setprefi("minimapScale",scale);
+			ZeeConfig.minimapCompactZoomChanged(scale);
 		}
 	    zoomlevel = Math.max(zoomlevel - 1, 0);
 	}
