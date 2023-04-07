@@ -72,6 +72,7 @@ Client focusing on small helper tasks, many using mouse middle button, and other
   - toggle aggressive animal obj radius
   - while holding item will try to ctrl+click obj(containers,stockpiles)
   - open cauldron
+  - place lifted treelog next to clicked treelog(perpendicular only) 
 - long midclick object
   - show context menu for various objs (details below)
   - lift up obj 

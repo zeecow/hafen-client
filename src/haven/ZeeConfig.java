@@ -4,6 +4,7 @@ import haven.render.*;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
+import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 import java.awt.image.RenderedImage;
@@ -3369,5 +3370,18 @@ public class ZeeConfig {
 
     static boolean isMiniMapCompacted(){
         return !gameUI.mapfile.tool.visible();
+    }
+
+    public static void simulateClickJava(int buttonMask) {
+        try {
+            Robot robot = new Robot();
+            // mouse move
+            //robot.mouseMove(x,y);// x,y are cordinates
+            // Simulate a mouse click
+            robot.mousePress(buttonMask);
+            robot.mouseRelease(buttonMask);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 }

@@ -3,6 +3,7 @@ package haven;
 
 import haven.resutil.WaterTile;
 
+import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -62,8 +63,12 @@ public class ZeeManagerGobClick extends ZeeThread{
                     ZeeConfig.clickTile(ZeeConfig.coordToTile(mc),1,UI.MOD_SHIFT);
                 }
             }
+            // place lifted treelog next to clicked one
+            if ( isGobTreeLog(gobName) && ZeeConfig.isPlayerLiftingGob("gfx/terobjs/trees/")!=null){
+                placeTreelogNextTo(gob);
+            }
             // pile inv boards and try sawing more boards
-            if (gobName.endsWith("/stockpile-board") && ZeeConfig.playerHasAnyPose(ZeeConfig.POSE_PLAYER_SAW)) {
+            else if (gobName.endsWith("/stockpile-board") && ZeeConfig.playerHasAnyPose(ZeeConfig.POSE_PLAYER_SAW)) {
                 ZeeManagerStockpile.pileInvBoardsSawMore(gob);
             }
             // pile inv blocks and try choppin more blocks
@@ -148,6 +153,61 @@ public class ZeeManagerGobClick extends ZeeThread{
                 inspectGob(gob);
             }
         }
+    }
+
+    // place treelog next to other
+    // TODO ignore mousemove
+    // TODO currently only works if player is perpendicular to treeLogGround
+    // TODO may break depending on coords signal change
+    private static void placeTreelogNextTo(Gob treeLogGround) {
+        new Thread() {
+            public void run() {
+                try {
+
+                    ZeeConfig.addPlayerText("placing");
+
+                    Gob liftedTreelog = ZeeConfig.isPlayerLiftingGob("gfx/terobjs/trees/");
+                    if (liftedTreelog==null){
+                        ZeeConfig.msgError("placeTreelogNextTo > couldn't find lifted treelog");
+                        ZeeConfig.removePlayerText();
+                        return;
+                    }
+                    //println(liftedTreelog.rc +" "+liftedTreelog.a+"  ,  "+treeLogGround.rc+" "+treeLogGround.a);
+
+                    // right click lifted treelog to create plob
+                    gobClick(liftedTreelog,3);
+                    sleep(500);
+
+                    // adjust plob angle, postition and place it
+                    if (ZeeManagerStockpile.lastPlob==null){
+                        ZeeConfig.msgError("placeTreelogNextTo > couldn't find last plob");
+                        ZeeConfig.removePlayerText();
+                        return;
+                    }
+                    Coord2d playerrc = ZeeConfig.getPlayerGob().rc;
+                    Coord2d newrc = Coord2d.of(treeLogGround.rc.x, treeLogGround.rc.y);
+                    if (Math.abs(treeLogGround.rc.x - playerrc.x) > Math.abs(treeLogGround.rc.y - playerrc.y)){
+                        if (treeLogGround.rc.x > playerrc.x)
+                            newrc.x -= 4.125;
+                        else
+                            newrc.x += 4.125;
+                    }else{
+                        if (treeLogGround.rc.y > playerrc.y)
+                            newrc.y -= 4.125;
+                        else
+                            newrc.y += 4.125;
+                    }
+                    ZeeManagerStockpile.lastPlob.move(newrc, treeLogGround.a);
+                    sleep(150);
+                    ZeeConfig.simulateClickJava(InputEvent.BUTTON1_DOWN_MASK);
+                    waitNotPlayerPose(ZeeConfig.POSE_PLAYER_LIFT);
+
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+                ZeeConfig.removePlayerText();
+            }
+        }.start();
     }
 
     public static void checkPlobUnplaced() {
