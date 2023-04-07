@@ -467,7 +467,7 @@ public class UI {
     }
 
     public void mousehover(Coord c) {
-	root.mousehover(c);
+	root.mousehover(c, true);
     }
 
     public void setmousepos(Coord c) {

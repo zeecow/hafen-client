@@ -345,10 +345,10 @@ public class Window extends Widget implements DTarget {
 	}
     }
 
-	public boolean mousehover(Coord c) {
-		super.mousehover(c);
-		return(true);
-	}
+    public boolean mousehover(Coord c, boolean hovering) {
+	super.mousehover(c, hovering);
+	return(hovering);
+    }
 
 	boolean isAutoHideOn = false, isAutoHidden =false;
 	boolean hasOrganizeButton = false;

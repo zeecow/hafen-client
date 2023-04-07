@@ -211,7 +211,7 @@ public class WItem extends Widget implements DTarget {
 		return super.mouseup(c, btn);
 	}
 
-	public boolean mousedown(Coord c, int btn) {
+    public boolean mousedown(Coord c, int btn) {
 
 	// middle-click item starts equipManager
 	if(btn == 2) {
@@ -220,7 +220,7 @@ public class WItem extends Widget implements DTarget {
 	}
 
 	// sort transfer
-    if(ui.modmeta && !ui.modshift && !ui.modctrl && !item.res.get().basename().contains("gemstone")){
+	if(ui.modmeta && !ui.modshift && !ui.modctrl && !item.res.get().basename().contains("gemstone")){
 		if(btn==1) {
 			wdgmsg("transfer-sort", item, false);
 		}else if(btn==3) {
@@ -262,11 +262,12 @@ public class WItem extends Widget implements DTarget {
 		return c.div(33);
 	}
 
-    public boolean mousehover(Coord c) {
-	if(item.contents != null) {
-	    item.hovering = this;
-	    return(true);
+	public boolean mousehover(Coord c, boolean on) {
+		boolean ret = super.mousehover(c, on);
+		if(on && (item.contents != null)) {
+			item.hovering(this);
+			return(true);
+		}
+		return(ret);
 	}
-	return(super.mousehover(c));
-    }
 }

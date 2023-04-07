@@ -40,7 +40,8 @@ public class GItem extends AWidget implements ItemInfo.SpriteOwner, GSprite.Owne
     public String contentsnm = null;
     public Object contentsid = null;
     public int infoseq;
-    public Widget hovering;
+    private Widget hovering;
+    private boolean hoverset;
     private GSprite spr;
     private ItemInfo.Raw rawinfo;
     private List<ItemInfo> info = Collections.emptyList();
@@ -142,8 +143,6 @@ public class GItem extends AWidget implements ItemInfo.SpriteOwner, GSprite.Owne
 	.add(Glob.class, wdg -> wdg.ui.sess.glob)
 	.add(Session.class, wdg -> wdg.ui.sess);
     public <T> T context(Class<T> cl) {return(ctxr.context(cl, this));}
-    @Deprecated
-    public Glob glob() {return(ui.sess.glob);}
 
     public GSprite spr() {
 	GSprite spr = this.spr;
@@ -395,6 +394,11 @@ public class GItem extends AWidget implements ItemInfo.SpriteOwner, GSprite.Owne
 	super.destroy();
     }
 
+    public void hovering(Widget hovering) {
+	this.hovering = hovering;
+	this.hoverset = true;
+    }
+
     private Widget lcont = null;
     public Contents contentswdg;
     public Window contentswnd;
@@ -435,7 +439,9 @@ public class GItem extends AWidget implements ItemInfo.SpriteOwner, GSprite.Owne
 		contentswdg = null;
 	    }
 	}
-	hovering = null;
+	if(!hoverset)
+	    hovering = null;
+	hoverset = false;
     }
 
     public void showcontwnd(boolean show) {
@@ -503,7 +509,6 @@ public class GItem extends AWidget implements ItemInfo.SpriteOwner, GSprite.Owne
 	public void tick(double dt) {
 	    super.tick(dt);
 	    resize(inv.c.add(inv.sz).add(obox.btloff()));
-	    hovering = false;
 	}
 
 	public void destroy() {
@@ -578,10 +583,10 @@ public class GItem extends AWidget implements ItemInfo.SpriteOwner, GSprite.Owne
 	    }
 	}
 
-	public boolean mousehover(Coord c) {
-	    super.mousehover(c);
-	    hovering = true;
-	    return(true);
+	public boolean mousehover(Coord c, boolean on) {
+	    super.mousehover(c, hovering);
+	    hovering = on;
+	    return(on);
 	}
     }
 
