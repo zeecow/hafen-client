@@ -157,7 +157,6 @@ public class ZeeManagerGobClick extends ZeeThread{
     }
 
     // place treelog next to other
-    // TODO ignore mousemove
     // TODO currently only works if player is perpendicular to treeLogGround
     // TODO may break depending on coords signal change
     private static void placeTreelogNextTo(Gob treeLogGround) {
@@ -199,8 +198,8 @@ public class ZeeManagerGobClick extends ZeeThread{
                             newrc.y += 4.125;
                     }
                     ZeeManagerStockpile.lastPlob.move(newrc, treeLogGround.a);
-                    //sleep(50);
-                    ZeeConfig.simulateClickJava(InputEvent.BUTTON1_DOWN_MASK);
+                    // 16384 , 32768
+                    ZeeConfig.gameUI.map.wdgmsg("place", ZeeManagerStockpile.lastPlob.rc.floor(OCache.posres), 32768, 1, 0);
                     waitNotPlayerPose(ZeeConfig.POSE_PLAYER_LIFT);
 
                 }catch (Exception e){
