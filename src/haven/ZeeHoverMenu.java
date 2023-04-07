@@ -250,7 +250,7 @@ public class ZeeHoverMenu {
             super.draw(g);
         }
 
-        public boolean mousehover(Coord c) {
+        public boolean mousehover(Coord c, boolean hovering) {
             int y = this.i * this.btnHeight;
             if(c.y > y   &&  c.y < (y + this.btnHeight)
                 && c.x > this.c.x && c.x < this.c.x+this.sz.x)
