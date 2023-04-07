@@ -3372,12 +3372,20 @@ public class ZeeConfig {
         return !gameUI.mapfile.tool.visible();
     }
 
+    public static void simulateClickJava(int buttonMask, Point clickLocation) {
+        try {
+            Robot robot = new Robot();
+            robot.mouseMove(clickLocation.x, clickLocation.y);
+            robot.mousePress(buttonMask);
+            robot.mouseRelease(buttonMask);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
     public static void simulateClickJava(int buttonMask) {
         try {
             Robot robot = new Robot();
-            // mouse move
-            //robot.mouseMove(x,y);// x,y are cordinates
-            // Simulate a mouse click
             robot.mousePress(buttonMask);
             robot.mouseRelease(buttonMask);
         }catch (Exception e){

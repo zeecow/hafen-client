@@ -3,6 +3,7 @@ package haven;
 
 import haven.resutil.WaterTile;
 
+import java.awt.*;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
@@ -198,7 +199,7 @@ public class ZeeManagerGobClick extends ZeeThread{
                             newrc.y += 4.125;
                     }
                     ZeeManagerStockpile.lastPlob.move(newrc, treeLogGround.a);
-                    sleep(150);
+                    //sleep(50);
                     ZeeConfig.simulateClickJava(InputEvent.BUTTON1_DOWN_MASK);
                     waitNotPlayerPose(ZeeConfig.POSE_PLAYER_LIFT);
 
