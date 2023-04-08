@@ -40,7 +40,7 @@ public class ZeeConfig {
     public static final String MAP_CATEGORY_GOBS = "mapCategoryGobs2";
     public static final String MAP_ACTION_USES = "mapActionUses2";
     public static final String MAP_GOB_COLOR = "mapGobSettings2";
-    public static final String MAP_WND_POS = "mapWindowPos2";
+    public static final String MAP_WND_POS = "mapWindowPos3";
     public static final String MAKE_WINDOW_NAME = "Makewindow";
 
     public static final String CURSOR_ARW = "gfx/hud/curs/arw";//cursor
@@ -852,7 +852,8 @@ public class ZeeConfig {
         if(!compact){
             if (mapWnd.sz.y < mapWndMinHeight){
                 mapWndMinHeightBackup = mapWnd.view.sz.y;
-                mapWnd.resize(mapWnd.asz.x, mapWndMinHeight);
+                //mapWnd.resize(mapWnd.asz.x, mapWndMinHeight);
+                mapWnd.resize(mapWnd.sz.x, mapWndMinHeight);
             }
             mapWndLastPos = new Coord(mapWnd.c);
             // horizontal fit
@@ -875,7 +876,8 @@ public class ZeeConfig {
                 //restore height
                 if (mapWndMinHeightBackup > 0) {
                     int pad = 10;
-                    mapWnd.resize(mapWnd.asz.x, mapWndMinHeightBackup + pad);
+                    //mapWnd.resize(mapWnd.asz.x, mapWndMinHeightBackup + pad);
+                    mapWnd.resize(mapWnd.sz.x, mapWndMinHeightBackup + pad);
                 }
             }
         }
@@ -939,7 +941,7 @@ public class ZeeConfig {
 
     public static void windowAdded(Window window) {
 
-        String windowTitle = window.cap.text;
+        String windowTitle = window.cap;
 
         if(windowTitle.equals("Equipment")) {
             windowEquipment = window;
@@ -991,10 +993,11 @@ public class ZeeConfig {
         int pad = ZeeWindow.ZeeButton.BUTTON_SIZE;
         if (window.hasOrganizeButton)
             pad += 25;
+        //TODO uncomment
         window.buttonAutoHide = window.add(
             new ZeeWindow.ZeeButton(ZeeWindow.ZeeButton.BUTTON_SIZE,ZeeWindow.ZeeButton.TEXT_AUTOHIDEWINDOW,"auto hide"),
-            window.cbtn.c.x - pad,
-            window.cbtn.c.y
+            window.deco.c.x - pad,
+            ((Window.DefaultDeco)window.deco).cbtn.c.y
         );
     }
 
@@ -1255,11 +1258,12 @@ public class ZeeConfig {
             if (wins.size() > 1) {
                 //add organize button
                 int pad = ZeeWindow.ZeeButton.BUTTON_SIZE;
-                window.add(
-                    new ZeeWindow.ZeeButton(pad,ZeeWindow.ZeeButton.TEXT_ORGANIZEWINDOWS,"organize duplicates"),
-                    window.cbtn.c.x-pad,
-                    window.cbtn.c.y
-                );
+                //TODO uncomment
+//                window.add(
+//                    new ZeeWindow.ZeeButton(pad,ZeeWindow.ZeeButton.TEXT_ORGANIZEWINDOWS,"organize duplicates"),
+//                    window.cbtn.c.x-pad,
+//                    window.cbtn.c.y
+//                );
                 window.hasOrganizeButton = true;
             }
         }
@@ -1543,7 +1547,7 @@ public class ZeeConfig {
         if(!rememberWindowsPos || window==null || isBuildWindow(window))
             return;
 
-        String name = window.cap.text;
+        String name = window.cap;
 
         //igonore cases
         if( name==null || name.isEmpty() )
@@ -1962,7 +1966,7 @@ public class ZeeConfig {
     public static Window getWindow(String name) {
         Set<Window> windows = gameUI.children(Window.class);
         for(Window w : windows) {
-            if(w.cap.text.equalsIgnoreCase(name)){
+            if(w.cap.equalsIgnoreCase(name)){
                 return w;
             }
         }
@@ -1993,7 +1997,7 @@ public class ZeeConfig {
                 +"Tidepool,Quiver,Fireplace,Bundle"
         ).split(",");
         for (String contName: containers) {
-            if (window.cap.text.contains(contName)) {
+            if (window.cap.contains(contName)) {
                 return true;
             }
         }
@@ -2023,7 +2027,7 @@ public class ZeeConfig {
             return ret;
         Set<Window> windows = gameUI.children(Window.class);
         for(Window w : windows) {
-            if(w.cap.text.equalsIgnoreCase(name)){
+            if(w.cap.equalsIgnoreCase(name)){
                 ret.add(w);
             }
         }
@@ -2837,7 +2841,7 @@ public class ZeeConfig {
     public static void midclickButtonWidget(Button button) {
         if (button.text.text.contentEquals("Buy")){
             Window w = button.getparent(Window.class);
-            if (w==null || !w.cap.text.contentEquals("Barter Stand"))
+            if (w==null || !w.cap.contentEquals("Barter Stand"))
                 return;
             if (!ZeeConfig.allowMidclickAutoBuy){
                 ZeeConfig.msg("Click bottom checkbox to allow auto-buy");
@@ -3046,7 +3050,7 @@ public class ZeeConfig {
                 //add positives or negatives changes
                 w.c.x += change.x;
                 // treat expanded map auto align feature
-                if(w.cap.text.contentEquals("Map") && mapWndLastPos!=null)
+                if(w.cap.contentEquals("Map") && mapWndLastPos!=null)
                     mapWndLastPos.x += change.x;
                 // save pos
                 saveWindowPos(w);
@@ -3255,9 +3259,10 @@ public class ZeeConfig {
 
         // repos autoHide button
         if (win.buttonAutoHide != null){
-            int x = win.cbtn.c.x - ZeeWindow.ZeeButton.BUTTON_SIZE;
-            int y = win.cbtn.c.y;
-            win.buttonAutoHide.c = Coord.of(x,y);
+            //TODO uncomment
+//            int x = win.cbtn.c.x - ZeeWindow.ZeeButton.BUTTON_SIZE;
+//            int y = win.cbtn.c.y;
+//            win.buttonAutoHide.c = Coord.of(x,y);
         }
 
         // resize window bg image
@@ -3268,12 +3273,11 @@ public class ZeeConfig {
         Window win = (Window)inv.getparent(Window.class);
 
         //repos buttons to not influence next inventory window resize
-        win.cbtn.c = Coord.of(0);
+        //TODO uncomment
+        //win.cbtn.c = Coord.of(0);
         if (win.buttonAutoHide != null){
             win.buttonAutoHide.c = Coord.of(0);
         }
-
-
     }
 
     // calculate next tile from origin to destination
@@ -3361,7 +3365,7 @@ public class ZeeConfig {
 
         // adjust x pos if out of screen, or if on the right side of screen
         if ( map.c.x + map.viewf.sz.x > gameUI.sz.x  ||  map.c.x > gameUI.sz.x/2)
-            map.c.x = gameUI.sz.x - map.viewf.sz.x - (map.mrgn.x*2) ;
+            map.c.x = gameUI.sz.x - map.viewf.sz.x - (10*2) ;//mrgn*2
 
         // adjust y pos only if map is bellow middle screen
         if (prevSize!=null && map.c.y + map.viewf.sz.y > gameUI.sz.y/2)

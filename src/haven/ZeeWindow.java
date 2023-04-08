@@ -37,7 +37,7 @@ public class ZeeWindow extends Window {
 
         @Override
         public void wdgmsg(String msg, Object... args) {
-            String windowName = this.getparent(Window.class).cap.text;
+            String windowName = this.getparent(Window.class).cap;
             //ZeeConfig.println(windowName+" > "+ buttonText +" > "+msg);
             if(msg.equals("activate")){
                 //organize duplicate windows
@@ -63,7 +63,7 @@ public class ZeeWindow extends Window {
 
             Window[] wins = ZeeConfig.getWindows(windowName).toArray(new Window[0]);
             Coord ui = ZeeConfig.gameUI.sz;
-            Coord wsz = wins[0].wsz;
+            Coord wsz = wins[0].sz;//wsz
             Window w;
             int x,y,row,col;
 

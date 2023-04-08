@@ -40,7 +40,7 @@ public class ZeeManagerItemClick extends ZeeThread{
         try{
             itemName = wItem.item.getres().name;//clicked item, started manager
             itemBasename = wItem.item.getres().basename();
-            itemSourceWindow = wItem.getparent(Window.class).cap.text;//save source window name before pickup
+            itemSourceWindow = wItem.getparent(Window.class).cap;//save source window name before pickup
         }catch (NullPointerException e){
             //error caused by midClicking again before task ending
             cancelManager = true;
@@ -858,7 +858,7 @@ public class ZeeManagerItemClick extends ZeeThread{
         if(!ZeeConfig.isPlayerHoldingItem() || inv==null)
             return false;
         try{
-            String windowTitle = inv.getparent(Window.class).cap.text;
+            String windowTitle = inv.getparent(Window.class).cap;
             if (windowTitle.contentEquals("Belt")){
                 List<Coord> freeSlots = inv.getFreeSlots();
                 if (freeSlots.size()==0)

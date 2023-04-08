@@ -415,7 +415,7 @@ public class Inventory extends Widget implements DTarget {
 	public boolean isMainInv() {
 		if(mainInv == null){
 			Window w = this.getparent(Window.class);
-			if( w != null && w.cap.text.contentEquals("Inventory"))
+			if( w != null && w.cap.contentEquals("Inventory"))
 				mainInv = Boolean.TRUE;
 			else
 				mainInv = Boolean.FALSE;

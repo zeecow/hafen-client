@@ -81,6 +81,7 @@ public class Window extends Widget implements DTarget {
     public boolean decohide = false;
     public boolean large = false;
 	public Coord prevAsz;
+	public Tex bgImgSimpleWindow = null;
 
     @RName("wnd")
     public static class $_ implements Factory {
@@ -98,7 +99,6 @@ public class Window extends Widget implements DTarget {
 	this.large = lg;
 	setfocustab(true);
 	chdeco(defdeco ? makedeco() : deco);
-	//cbtn = add(new ZeeWindow.ZeeButton(ZeeWindow.ZeeButton.BUTTON_SIZE, ZeeWindow.ZeeButton.TEXT_CLOSE));
     }
 
     public Window(Coord sz, String cap, boolean lg, Deco deco) {
@@ -184,6 +184,7 @@ public class Window extends Widget implements DTarget {
 	public DefaultDeco(boolean lg) {
 	    this.lg = lg;
 	    cbtn = add(new IButton(cbtni[0], cbtni[1], cbtni[2])).action(() -> parent.wdgmsg("close"));
+		//cbtn = add(new ZeeWindow.ZeeButton(ZeeWindow.ZeeButton.BUTTON_SIZE, ZeeWindow.ZeeButton.TEXT_CLOSE));
 	}
 	public DefaultDeco() {this(false);}
 
@@ -211,13 +212,13 @@ public class Window extends Widget implements DTarget {
 	    ((Window)parent).cdraw(g);
 	}
 
-		public Tex bgImgSimpleWindow = null;
-		public void drawSimpleWindowBg(GOut g) {
-			if (bgImgSimpleWindow == null) {
-				bgImgSimpleWindow = new TexI(ZeeManagerIcons.imgRect(wsz.x-34, wsz.y-54, ZeeConfig.intToColor(ZeeConfig.simpleWindowColorInt),ZeeConfig.simpleWindowBorder,0));
-			}
-			g.image(bgImgSimpleWindow,tlm);
-		}
+	public void drawSimpleWindowBg(GOut g) {
+		//TODO uncomment
+//		if (bgImgSimpleWindow == null) {
+//			bgImgSimpleWindow = new TexI(ZeeManagerIcons.imgRect(wsz.x-34, wsz.y-54, ZeeConfig.intToColor(ZeeConfig.simpleWindowColorInt),ZeeConfig.simpleWindowBorder,0));
+//		}
+//		g.image(bgImgSimpleWindow,tlm);
+	}
 
 	protected void drawbg(GOut g) {
 		if (ZeeConfig.simpleWindows) {
@@ -377,7 +378,7 @@ public class Window extends Widget implements DTarget {
 
     public void resize(Coord sz) {
 	resize2(sz);
-	if (sz.compareTo(prevAsz) != 0){
+	if (prevAsz!=null && sz.compareTo(prevAsz) != 0){
 		//TODO uncomment
 		//prevAsz = Coord.of(asz);
 		//bgImgSimpleWindow = null; // redraw bg img
@@ -474,7 +475,7 @@ public class Window extends Widget implements DTarget {
 	boolean hasOrganizeButton = false;
 	public ZeeWindow.ZeeButton buttonAutoHide = null;
 	void autoHideToggleWinPos(){
-		Coord savedWinPos = ZeeConfig.mapWindowPos.get(this.cap.text);
+		Coord savedWinPos = ZeeConfig.mapWindowPos.get(this.cap);
 		if (savedWinPos==null){
 			ZeeConfig.println("123123 > no saved pos to restore");
 			return;
@@ -509,14 +510,6 @@ public class Window extends Widget implements DTarget {
 		}
 
 	}
-
-    public void wdgmsg(Widget sender, String msg, Object... args) {
-	if(sender == cbtn) {
-	    wdgmsg("close");
-	} else {
-	    super.wdgmsg(sender, msg, args);
-	}
-    }
 
     public boolean keydown(java.awt.event.KeyEvent ev) {
 	if(super.keydown(ev))
