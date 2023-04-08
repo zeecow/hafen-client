@@ -842,45 +842,51 @@ public class ZeeConfig {
     }
 
     // make expanded map window fit screen
-    private static Coord mapWndLastPos;
-    public static int mapWndMinHeightBackup=350, mapWndMinHeight=350;
+    static Coord mapWndLastPos, mapWndLastSz;
+    static int mapWndMinHeightBackup=350, mapWndMinHeight=350;
     public static void windowMapCompact(MapWnd mapWnd, boolean compact) {
+
         if(compact && mapWnd.c.equals(0,0))//special startup condition?
             return;
         Coord screenSize = gameUI.map.sz;
+
+        Window.DefaultDeco deco = (Window.DefaultDeco) mapWnd.deco;
+
         // window expanded
         if(!compact){
-            if (mapWnd.sz.y < mapWndMinHeight){
+            if (deco.sz.y < mapWndMinHeight){
                 mapWndMinHeightBackup = mapWnd.view.sz.y;
-                //mapWnd.resize(mapWnd.asz.x, mapWndMinHeight);
-                mapWnd.resize(mapWnd.sz.x, mapWndMinHeight);
+                mapWnd.resize(deco.sz.x, mapWndMinHeight);
             }
             mapWndLastPos = new Coord(mapWnd.c);
             // horizontal fit
-            if(mapWnd.c.x + mapWnd.sz.x > screenSize.x){
-                mapWnd.c = new Coord(screenSize.x - mapWnd.sz.x, mapWnd.c.y);
+            if(mapWnd.c.x + deco.sz.x > screenSize.x){
+                mapWnd.c = new Coord(screenSize.x - deco.sz.x, mapWnd.c.y);
             }
             // vertical fit
-            if(mapWnd.c.y + mapWnd.sz.y > screenSize.y){
-                mapWnd.c = new Coord(mapWnd.c.x, screenSize.y - mapWnd.sz.y);
+            if(mapWnd.c.y + deco.sz.y > screenSize.y){
+                mapWnd.c = new Coord(mapWnd.c.x, screenSize.y - deco.sz.y);
             }else if(mapWnd.c.y < 0){
                 mapWnd.c = new Coord(mapWnd.c.x, 0);
             }
         }
+
         // window compacted
         else{
             if(mapWndLastPos!=null) {
                 // restore pos
-                mapWnd.c = mapWndLastPos;
+                //TODO figure out margins
+                mapWnd.c = mapWndLastPos.add(41,44);
                 mapWndLastPos = null;
                 //restore height
                 if (mapWndMinHeightBackup > 0) {
                     int pad = 10;
-                    //mapWnd.resize(mapWnd.asz.x, mapWndMinHeightBackup + pad);
-                    mapWnd.resize(mapWnd.sz.x, mapWndMinHeightBackup + pad);
+                    //TODO use prev compact size
+                    mapWnd.resize(150,150);
                 }
             }
         }
+
     }
 
 
@@ -3365,10 +3371,10 @@ public class ZeeConfig {
 
         // adjust x pos if out of screen, or if on the right side of screen
         if ( map.c.x + map.viewf.sz.x > gameUI.sz.x  ||  map.c.x > gameUI.sz.x/2)
-            map.c.x = gameUI.sz.x - map.viewf.sz.x - (10*2) ;//mrgn*2
+            map.c.x = gameUI.sz.x - map.viewf.sz.x ;
 
         // adjust y pos only if map is bellow middle screen
-        if (prevSize!=null && map.c.y + map.viewf.sz.y > gameUI.sz.y/2)
+        if (prevSize!=null && map.c.y > gameUI.sz.y/2)
             map.c.y -= map.viewf.sz.y - prevSize.y;
     }
 

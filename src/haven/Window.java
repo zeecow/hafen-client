@@ -240,11 +240,6 @@ public class Window extends Widget implements DTarget {
 	}
 
 	protected void drawframe(GOut g) {
-		if (ZeeConfig.simpleWindows && cap!=null) {
-			//TODO uncomment
-			g.image(cap.tex(), new Coord(tlm.x, cpo.y));//draw window title
-			return;
-		}
 		Window wnd = (Window)parent;
 	    if((cap == null) || (cap.text != wnd.cap)) {
 		cap = (wnd.cap == null) ? null : cf.render(wnd.cap);
@@ -254,6 +249,11 @@ public class Window extends Widget implements DTarget {
 		cpsz = Coord.of(cpo.x + cmw, cm.sz().y).sub(cptl);
 		cmw = cmw - (cl.sz().x - cpo.x) - UI.scale(5);
 	    }
+		if (ZeeConfig.simpleWindows) {
+			//TODO uncomment
+			g.image(cap.tex(), new Coord(tlm.x, cpo.y));//draw window title
+			return;
+		}
 	    if(dragsize)
 		g.image(sizer, ca.br.sub(sizer.sz()));
 	    Coord mdo, cbr;
