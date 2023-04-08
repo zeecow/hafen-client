@@ -110,7 +110,7 @@ public class ZeeConfig {
 
     public static final String DEF_LIST_MUTE_AUDIO = "Leashed horse.;Tracking is now turned;Stacking is now turned;must be empty to be unequipped";
     public static final String DEF_LIST_CONFIRM_PETAL = "Empty,Swill,Clean out,Slaughter,Castrate,Unmoor,Take possession,Renounce Lawspeaker,Become Lawspeaker";
-    public static final String DEF_LIST_AUTO_HIDE_WINDOWS = "Inventory,Character Sheet,Belt,Basket,Creel,Cattle Roster,Quiver";
+    public static final String DEF_LIST_AUTO_HIDE_WINDOWS = "Inventory,Character Sheet,Basket,Creel,Cattle Roster,Quiver";
     public static final String DEF_LIST_BUTCH_AUTO = "Break,Scale,Wring neck,Kill,Skin,Flay,Pluck,Clean,Butcher,Collect bones";
     public static final String DEF_LIST_AUTO_CLICK_MENU = "Pick,Harvest wax";
     public static final String DEF_LIST_SHAPEICON = "stalagoomba 1,diamond 7 1 0,255 255 0;/amberwash 2,diamond 7 0 1,255 102 0;/cavepuddle 2,diamond 7 0 1,0 204 102;/ladder 2,triangleUp 5 0 1,0 204 102;/minehole 2,triangleDown 5 0 1,0 204 102;/burrow 2,triangleDown 6 0 1,204 0 255;/spark 2,square 4 0 1,102 102 255;/snekkja 2,square 4 0 1,255 255 102;/dugout 2,square 4 0 1,255 255 102;/wheelbarrow 2,square 4 0 1,0 255 255;/cart 2,square 4 0 1,0 153 255;/knarr 2,square 4 0 1,255 255 102;/rowboat 2,square 4 0 1,255 255 102;/horse/ 1,square 4 0 1,0 204 0;items/arrow 2,triangleUp 5 0 1,102 255 204;milestone-stone-e 2,diamond 4 0 1,255 255 255;milestone-wood-e 2,diamond 4 0 1,255 255 255;/fishingnet 2,diamond 4 0 1,153 153 153;wonders/wellspring 1,diamond 5 0 1,0 255 255;/map/starshard 2,diamond 7 0 1,255 255 0";
@@ -941,7 +941,7 @@ public class ZeeConfig {
 
     public static void windowAdded(Window window) {
 
-        String windowTitle = window.cap;
+        String windowTitle = window.cap.strip();
 
         if(windowTitle.equals("Equipment")) {
             windowEquipment = window;
@@ -983,7 +983,7 @@ public class ZeeConfig {
             return;
         boolean showButton = false;
         for (String cap : ZeeConfig.autoHideWindowsList.split(",")) {
-            if (cap.strip().contentEquals(windowTitle.strip())) {
+            if (cap.contentEquals(windowTitle)) {
                 showButton = true;
                 break;
             }
@@ -994,9 +994,9 @@ public class ZeeConfig {
         if (window.hasOrganizeButton)
             pad += 25;
         //TODO uncomment
-        window.buttonAutoHide = window.add(
+        window.buttonAutoHide = ((Window.DefaultDeco)window.deco).add(
             new ZeeWindow.ZeeButton(ZeeWindow.ZeeButton.BUTTON_SIZE,ZeeWindow.ZeeButton.TEXT_AUTOHIDEWINDOW,"auto hide"),
-            window.deco.c.x - pad,
+            ((Window.DefaultDeco)window.deco).cbtn.c.x - pad,
             ((Window.DefaultDeco)window.deco).cbtn.c.y
         );
     }
@@ -1259,11 +1259,11 @@ public class ZeeConfig {
                 //add organize button
                 int pad = ZeeWindow.ZeeButton.BUTTON_SIZE;
                 //TODO uncomment
-//                window.add(
-//                    new ZeeWindow.ZeeButton(pad,ZeeWindow.ZeeButton.TEXT_ORGANIZEWINDOWS,"organize duplicates"),
-//                    window.cbtn.c.x-pad,
-//                    window.cbtn.c.y
-//                );
+                ((Window.DefaultDeco)window.deco).add(
+                    new ZeeWindow.ZeeButton(pad,ZeeWindow.ZeeButton.TEXT_ORGANIZEWINDOWS,"organize duplicates"),
+                        ((Window.DefaultDeco)window.deco).cbtn.c.x - pad,
+                        ((Window.DefaultDeco)window.deco).cbtn.c.y
+                );
                 window.hasOrganizeButton = true;
             }
         }
@@ -2938,7 +2938,7 @@ public class ZeeConfig {
 
     public static void simpleWindowsResize(Window w) {
         if (w != null)
-            w.bgImgSimpleWindow = null;
+            ((Window.DefaultDeco)w.deco).bgImgSimpleWindow = null;
     }
 
     public static boolean hideAnimation(Resource res) {
@@ -3260,9 +3260,9 @@ public class ZeeConfig {
         // repos autoHide button
         if (win.buttonAutoHide != null){
             //TODO uncomment
-//            int x = win.cbtn.c.x - ZeeWindow.ZeeButton.BUTTON_SIZE;
-//            int y = win.cbtn.c.y;
-//            win.buttonAutoHide.c = Coord.of(x,y);
+            int x = ((Window.DefaultDeco)win.deco).cbtn.c.x - ZeeWindow.ZeeButton.BUTTON_SIZE;
+            int y = ((Window.DefaultDeco)win.deco).cbtn.c.y;
+            win.buttonAutoHide.c = Coord.of(x,y);
         }
 
         // resize window bg image
@@ -3274,7 +3274,7 @@ public class ZeeConfig {
 
         //repos buttons to not influence next inventory window resize
         //TODO uncomment
-        //win.cbtn.c = Coord.of(0);
+        ((Window.DefaultDeco)win.deco).cbtn.c = Coord.of(0);
         if (win.buttonAutoHide != null){
             win.buttonAutoHide.c = Coord.of(0);
         }

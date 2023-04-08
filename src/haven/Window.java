@@ -81,7 +81,6 @@ public class Window extends Widget implements DTarget {
     public boolean decohide = false;
     public boolean large = false;
 	public Coord prevAsz;
-	public Tex bgImgSimpleWindow = null;
 
     @RName("wnd")
     public static class $_ implements Factory {
@@ -174,17 +173,18 @@ public class Window extends Widget implements DTarget {
 
     public static class DefaultDeco extends DragDeco {
 	public final boolean lg;
-	public final IButton cbtn;
+	public final Button cbtn;
 	public boolean dragsize;
 	public Area aa, ca;
 	public Coord cptl = Coord.z, cpsz = Coord.z;
 	public int cmw;
 	public Text cap = null;
+	public Tex bgImgSimpleWindow = null;
 
 	public DefaultDeco(boolean lg) {
 	    this.lg = lg;
-	    cbtn = add(new IButton(cbtni[0], cbtni[1], cbtni[2])).action(() -> parent.wdgmsg("close"));
-		//cbtn = add(new ZeeWindow.ZeeButton(ZeeWindow.ZeeButton.BUTTON_SIZE, ZeeWindow.ZeeButton.TEXT_CLOSE));
+	    //cbtn = add(new IButton(cbtni[0], cbtni[1], cbtni[2])).action(() -> parent.wdgmsg("close"));
+		cbtn = add(new ZeeWindow.ZeeButton(ZeeWindow.ZeeButton.BUTTON_SIZE, ZeeWindow.ZeeButton.TEXT_CLOSE).action(() -> parent.wdgmsg("close")));
 	}
 	public DefaultDeco() {this(false);}
 
@@ -201,7 +201,7 @@ public class Window extends Widget implements DTarget {
 	    resize(wsz);
 	    ca = Area.sized(tlm, csz);
 	    aa = Area.sized(ca.ul.add(mrgn), asz);
-	    cbtn.c = Coord.of(sz.x - cbtn.sz.x, 0);
+	    cbtn.c = Coord.of(sz.x - cbtn.sz.x, (int) (cbtn.sz.y * 0.7));
 	}
 
 	public Area contarea() {
@@ -214,16 +214,16 @@ public class Window extends Widget implements DTarget {
 
 	public void drawSimpleWindowBg(GOut g) {
 		//TODO uncomment
-//		if (bgImgSimpleWindow == null) {
-//			bgImgSimpleWindow = new TexI(ZeeManagerIcons.imgRect(wsz.x-34, wsz.y-54, ZeeConfig.intToColor(ZeeConfig.simpleWindowColorInt),ZeeConfig.simpleWindowBorder,0));
-//		}
-//		g.image(bgImgSimpleWindow,tlm);
+		if (bgImgSimpleWindow == null) {
+			bgImgSimpleWindow = new TexI(ZeeManagerIcons.imgRect(ca.sz().x, ca.sz().y, ZeeConfig.intToColor(ZeeConfig.simpleWindowColorInt),ZeeConfig.simpleWindowBorder,0));
+		}
+		g.image(bgImgSimpleWindow,tlm);
 	}
 
 	protected void drawbg(GOut g) {
 		if (ZeeConfig.simpleWindows) {
 			//TODO uncomment
-			//drawSimpleWindowBg(g);
+			drawSimpleWindowBg(g);
 			return;
 		}
 		Coord bgc = new Coord();
@@ -240,9 +240,9 @@ public class Window extends Widget implements DTarget {
 	}
 
 	protected void drawframe(GOut g) {
-		if (ZeeConfig.simpleWindows) {
+		if (ZeeConfig.simpleWindows && cap!=null) {
 			//TODO uncomment
-			//g.image(cap.tex(), new Coord(tlm.x, cpo.y));//draw window title
+			g.image(cap.tex(), new Coord(tlm.x, cpo.y));//draw window title
 			return;
 		}
 		Window wnd = (Window)parent;
@@ -380,8 +380,8 @@ public class Window extends Widget implements DTarget {
 	resize2(sz);
 	if (prevAsz!=null && sz.compareTo(prevAsz) != 0){
 		//TODO uncomment
-		//prevAsz = Coord.of(asz);
-		//bgImgSimpleWindow = null; // redraw bg img
+		prevAsz = Coord.of(((DefaultDeco)deco).aa.sz());
+		((DefaultDeco)deco).bgImgSimpleWindow = null; // redraw bg img
 	}
     }
 
