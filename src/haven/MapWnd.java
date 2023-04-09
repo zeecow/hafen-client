@@ -315,7 +315,7 @@ public class MapWnd extends Window implements Console.Directory {
 		}
 	    }
 		//midclick mark expands minimap and center mark
-		else if (button==2 && !press && decohide()) {
+		else if (button==2 && !press && compact()) {
 			ZeeManagerIcons.focusMarkExpandedMap(mark);
 		}
 		else if(mark.m instanceof SMarker) {
