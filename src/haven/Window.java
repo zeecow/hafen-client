@@ -80,7 +80,6 @@ public class Window extends Widget implements DTarget {
     private Coord doff;
     public boolean decohide = false;
     public boolean large = false;
-	public Coord prevAsz;
 
     @RName("wnd")
     public static class $_ implements Factory {
@@ -180,6 +179,7 @@ public class Window extends Widget implements DTarget {
 	public int cmw;
 	public Text cap = null;
 	public Tex bgImgSimpleWindow = null;
+	public Coord prevCaSz = Coord.of(0);
 
 	public DefaultDeco(boolean lg) {
 	    this.lg = lg;
@@ -202,6 +202,10 @@ public class Window extends Widget implements DTarget {
 	    ca = Area.sized(tlm, csz);
 	    aa = Area.sized(ca.ul.add(mrgn), asz);
 	    cbtn.c = Coord.of(sz.x - cbtn.sz.x, (int) (cbtn.sz.y * 0.7));
+		if (prevCaSz !=null && ca.sz().compareTo(prevCaSz) != 0){
+			prevCaSz = Coord.of(ca.sz());
+			bgImgSimpleWindow = null; // redraw bg img
+		}
 	}
 
 	public Area contarea() {
@@ -378,11 +382,6 @@ public class Window extends Widget implements DTarget {
 
     public void resize(Coord sz) {
 	resize2(sz);
-	if (prevAsz!=null && sz.compareTo(prevAsz) != 0){
-		//TODO uncomment
-		prevAsz = Coord.of(((DefaultDeco)deco).aa.sz());
-		((DefaultDeco)deco).bgImgSimpleWindow = null; // redraw bg img
-	}
     }
 
     @Deprecated
