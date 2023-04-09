@@ -793,11 +793,15 @@ public class ZeeManagerMiner extends ZeeThread{
         if (!isStoneNotOre(basename) && !isPreciousOre(basename)
             && !isRegularOre(basename) && !ZeeConfig.mineablesCurios.contains(basename))
             return;
-        Integer newQl = Inventory.getQualityInt(gItem);
-        Integer oldQl = mapMiningLogNameQl.get(basename);
-        if (oldQl==null || newQl > oldQl) {
-            mapMiningLogNameQl.put(basename, newQl);
-            println("miningQl("+mapMiningLogNameQl.size() +") > "+ getSortedMiningLog().toString());
+        try {
+            Integer newQl = Inventory.getQualityInt(gItem);
+            Integer oldQl = mapMiningLogNameQl.get(basename);
+            if (oldQl == null || newQl > oldQl) {
+                mapMiningLogNameQl.put(basename, newQl);
+                println("miningQl(" + mapMiningLogNameQl.size() + ") > " + getSortedMiningLog().toString());
+            }
+        }catch (Loading l){
+            println(basename+"  spr not loaded yet?");
         }
     }
     static List<Map.Entry<String,Integer>> getSortedMiningLog() {
