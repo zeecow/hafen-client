@@ -226,7 +226,6 @@ public class Window extends Widget implements DTarget {
 
 	protected void drawbg(GOut g) {
 		if (ZeeConfig.simpleWindows) {
-			//TODO uncomment
 			drawSimpleWindowBg(g);
 			return;
 		}
@@ -254,7 +253,6 @@ public class Window extends Widget implements DTarget {
 		cmw = cmw - (cl.sz().x - cpo.x) - UI.scale(5);
 	    }
 		if (ZeeConfig.simpleWindows) {
-			//TODO uncomment
 			g.image(cap.tex(), new Coord(tlm.x, cpo.y));//draw window title
 			return;
 		}

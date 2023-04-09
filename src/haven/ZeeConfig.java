@@ -854,18 +854,19 @@ public class ZeeConfig {
 
         // window expanded
         if(!compact){
-            if (deco.sz.y < mapWndMinHeight){
+            if (deco.ca.sz().y < mapWndMinHeight){
                 mapWndMinHeightBackup = mapWnd.view.sz.y;
-                mapWnd.resize(deco.sz.x, mapWndMinHeight);
+                mapWnd.resize(deco.ca.sz().x, mapWndMinHeight);
             }
+            // used when gameUI resize
             mapWndLastPos = new Coord(mapWnd.c);
             // horizontal fit
-            if(mapWnd.c.x + deco.sz.x > screenSize.x){
-                mapWnd.c = new Coord(screenSize.x - deco.sz.x, mapWnd.c.y);
+            if(mapWnd.c.x + deco.ca.sz().x > screenSize.x){
+                mapWnd.c = new Coord(screenSize.x - deco.ca.sz().x, mapWnd.c.y);
             }
             // vertical fit
-            if(mapWnd.c.y + deco.sz.y > screenSize.y){
-                mapWnd.c = new Coord(mapWnd.c.x, screenSize.y - deco.sz.y);
+            if(mapWnd.c.y + deco.ca.sz().y > screenSize.y){
+                mapWnd.c = new Coord(mapWnd.c.x, screenSize.y - deco.ca.sz().y);
             }else if(mapWnd.c.y < 0){
                 mapWnd.c = new Coord(mapWnd.c.x, 0);
             }
@@ -873,18 +874,18 @@ public class ZeeConfig {
 
         // window compacted
         else{
-            if(mapWndLastPos!=null) {
-                // restore pos
-                //TODO figure out margins
-                mapWnd.c = mapWndLastPos.add(41,44);
-                mapWndLastPos = null;
-                //restore height
-                if (mapWndMinHeightBackup > 0) {
-                    int pad = 10;
-                    //TODO use prev compact size
-                    mapWnd.resize(150,150);
-                }
+            if(MiniMap.scale==1){
+                gameUI.mapfile.resize(compactMapSizeScale1);
+            }else if(MiniMap.scale==2){
+                gameUI.mapfile.resize(compactMapSizeScale2);
+            }else if(MiniMap.scale==3){
+                gameUI.mapfile.resize(compactMapSizeScale3);
             }
+            //from minimapCompactReposition();
+            MapWnd map = gameUI.mapfile;
+            // adjust x pos if out of screen, or if on the right side of screen
+            if ( map.c.x + map.viewf.sz.x > gameUI.sz.x  ||  map.c.x > gameUI.sz.x/2)
+                map.c.x = gameUI.sz.x - map.viewf.sz.x ;
         }
 
     }
