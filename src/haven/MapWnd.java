@@ -108,8 +108,8 @@ public class MapWnd extends Window implements Console.Directory {
 		public void click() {
 		    recenter();
 		}
-	    }, Coord.of(0,3));
-	toolbar.add(new ICheckBox("gfx/hud/mmap/mark", "", "-d", "-h", "-dh"), Coord.z)
+	}, Coord.of(0,3));
+	toolbar.add(new ICheckBox("gfx/hud/mmap/mark", "", "-d", "-h", "-dh"))
 	    .state(() -> domark)
 		.set(a -> {
 			domark = a;
@@ -709,7 +709,8 @@ public class MapWnd extends Window implements Console.Directory {
 	    tool.c = viewf.pos("ur").adds(10, 0);
 	}
 	view.resize(viewf.inner());
-	toolbar.c = viewf.c.add(0, -toolbar.sz.y+15).add(UI.scale(2), UI.scale(-2));
+	//toolbar.c = viewf.c.add(0, viewf.sz.y - toolbar.sz.y).add(UI.scale(2), UI.scale(-2));
+	toolbar.c = viewf.c.add(0, -toolbar.sz.y +21).add(UI.scale(2), UI.scale(-2));
     }
 
     private boolean compact() {
