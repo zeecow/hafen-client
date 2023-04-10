@@ -79,8 +79,6 @@ public class ZeeOptionsJFrame extends JFrame {
 
         panelTabControls.add(new ZeeOptionJCheckBox("scroll transfer items directly","scrollTransferItems"),c);
 
-        panelTabControls.add(new ZeeOptionJCheckBox( "Ctrl+click to pan/resize minimap", "ctrlClickMinimapContent"),c);
-
         panelTabControls.add(new ZeeOptionJCheckBox( "Alt+click drops holding item", "dropHoldingItemAltKey"),c);
 
         panelTabControls.add(new ZeeOptionJCheckBox( "Key up/down controls volume", "keyUpDownAudioControl"),c);

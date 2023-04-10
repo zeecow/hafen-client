@@ -116,6 +116,7 @@ public class ZeeConfig {
     public static final String DEF_LIST_SHAPEICON = "stalagoomba 1,diamond 7 1 0,255 255 0;/amberwash 2,diamond 7 0 1,255 102 0;/cavepuddle 2,diamond 7 0 1,0 204 102;/ladder 2,triangleUp 5 0 1,0 204 102;/minehole 2,triangleDown 5 0 1,0 204 102;/burrow 2,triangleDown 6 0 1,204 0 255;/spark 2,square 4 0 1,102 102 255;/snekkja 2,square 4 0 1,255 255 102;/dugout 2,square 4 0 1,255 255 102;/wheelbarrow 2,square 4 0 1,0 255 255;/cart 2,square 4 0 1,0 153 255;/knarr 2,square 4 0 1,255 255 102;/rowboat 2,square 4 0 1,255 255 102;/horse/ 1,square 4 0 1,0 204 0;items/arrow 2,triangleUp 5 0 1,102 255 204;milestone-stone-e 2,diamond 4 0 1,255 255 255;milestone-wood-e 2,diamond 4 0 1,255 255 255;/fishingnet 2,diamond 4 0 1,153 153 153;wonders/wellspring 1,diamond 5 0 1,0 255 255;/map/starshard 2,diamond 7 0 1,255 255 0";
     public static final Color DEF_SIMPLE_WINDOW_COLOR = new Color(55, 64, 32, 255);
     public static final Color DEF_GRID_COLOR = new Color(204, 204, 255, 45);
+    public static final int MINIMAP_DRAG_BUTTON = 3;
 
     public static final int PLAYER_SPEED_0 = 0;
     public static final int PLAYER_SPEED_1 = 1;
@@ -179,7 +180,6 @@ public class ZeeConfig {
     public static double cattleRosterHeightPercentage = Utils.getprefd("cattleRosterHeightPercentage", 1.0);
     public static boolean confirmPetal = Utils.getprefb("confirmPetal", true);
     public static String confirmPetalList = Utils.getpref("confirmPetalList", DEF_LIST_CONFIRM_PETAL);
-    public static boolean ctrlClickMinimapContent = Utils.getprefb("ctrlClickMinimapContent", true);
     public static boolean debugWidgetMsgs = false;//disabled by default
     public static boolean debugCodeRes = Utils.getprefb("debugCodeRes", false);
     public static boolean drinkKey = Utils.getprefb("drinkKey", true);

@@ -3,6 +3,7 @@
 Client focusing on small helper tasks, many using mouse middle button, and other stuff:
 
 - flowermenu works onmouseup 
+- minimap drags with button 3
 - search actions globally
 - sort actions by most used craft items
 - craft window buttons for ingredients and history
@@ -44,7 +45,7 @@ Client focusing on small helper tasks, many using mouse middle button, and other
 - Feasting log window, count gains
 - Option "Fish Moon XP" show text over calendar 
 - Scroll text entry fuel for kiln, oven, smelter
-- (unfinished) hover menu on search actions button 
+- hover menu on search actions button 
 - (unfinished) Lag Camera (:cam lag)
 
 - midclick ground 

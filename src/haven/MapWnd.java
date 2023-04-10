@@ -192,8 +192,6 @@ public class MapWnd extends Window implements Console.Directory {
 	}
 
 	public void mousemove(Coord c) {
-		if(ZeeConfig.ctrlClickMinimapContent && !ui.modctrl)
-			return;//only drag/resize with Ctrl
 	    if(drag != null) {
 		Coord nsz = parentpos(MapWnd.this, c).add(dragc);
 		nsz.x = Math.max(nsz.x, UI.scale(150));

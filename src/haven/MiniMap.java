@@ -770,7 +770,7 @@ public class MiniMap extends Widget {
     private boolean dragging;
     private Coord dsc, dmc;
     public boolean dragp(int button) {
-	return(button == 1);
+	return(button == ZeeConfig.MINIMAP_DRAG_BUTTON);
     }
 
     private Location dsloc;
@@ -823,7 +823,7 @@ public class MiniMap extends Widget {
     }
 
     public boolean mouseup(Coord c, int button) {
-	if((drag != null) && (button == 1)) {
+	if((drag != null) && (button == ZeeConfig.MINIMAP_DRAG_BUTTON)) {
 	    drag.remove();
 	    drag = null;
 	}
