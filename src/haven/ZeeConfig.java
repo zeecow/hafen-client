@@ -1996,12 +1996,12 @@ public class ZeeConfig {
                 "Woodbox,Cupboard,Chest,Crate,Basket,Casket,Box,Coffer,Steelbox,Metal Cabinet,"
                 +"Urn,Pot,"
                 //misc
-                +"Knarr,Snekkja,Wagon,Table,Saddlebags,Basket,"
+                +"Knarr,Snekkja,Wagon,Table,Saddlebags,"
                 +"Furnace,Smelter,Desk,Trunk,Shed,Packrack,Strongbox,Stockpile,"
                 +"Tub,Compost Bin,Extraction Press,Rack,Herbalist Table,Frame,"
-                +"Chicken Coop,Rabbit Hutch,Archery Target,Creel,Oven,Steel crucible,"
+                +"Chicken Coop,Rabbit Hutch,Archery Target,Oven,Steel crucible,"
                 +"Cauldron,Pane mold,Kiln,Old Trunk,Old Stump,Smoke shed,Finery Forge,"
-                +"Tidepool,Quiver,Fireplace,Bundle"
+                +"Tidepool,Fireplace,Quiver,Creel"
         ).split(",");
         for (String contName: containers) {
             if (window.cap.contains(contName)) {

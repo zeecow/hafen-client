@@ -80,8 +80,22 @@ public class ZeeManagerItemClick extends ZeeThread{
                 return;
             }
 
+
+            // undo stack if no transfer available
+            else if(isStackTransferable(wItem.item)){
+                //undo one stack
+                if (!isLongClick()){
+                    undoStack(wItem.item);
+                    return;
+                }
+                //undo multiple stacks
+                else{
+                    undoMultipleStacks(wItem.item);
+                    return;
+                }
+            }
             // if not hand item, do items special transfers
-            if( isTransferWindowOpened() ){
+            else if( isTransferWindowOpened() ){
                 if(!isItemWindowName("Belt")) {
                     // long click sort transfer asc
                     if (isLongClick())
@@ -102,22 +116,9 @@ public class ZeeManagerItemClick extends ZeeThread{
                     return;
                 }
             }
-            // undo stack if no transfer available
-            else if(isStackItemPlaceholder(wItem.item)){
-                //undo one stack
-                if (!isLongClick()){
-                    undoStack(wItem.item);
-                    return;
-                }
-                //undo multiple stacks
-                else{
-                    undoMultipleStacks(wItem.item);
-                    return;
-                }
-            }
+            //activate farming area cursor
             else if(isItemWindowName("Inventory") && isItemPlantable())
             {
-                //activate farming area cursor
                 itemActCoord(wItem,UI.MOD_SHIFT);
                 return;
             }
@@ -770,10 +771,30 @@ public class ZeeManagerItemClick extends ZeeThread{
         return clickDiffMs > LONG_CLICK_MS;
     }
 
-    private boolean isTransferWindowOpened() {
+    static boolean isTransferWindowOpened() {
         List<Window> list = ZeeConfig.getContainersWindows();
         println("isTransferWindowOpened > "+list.size()+" windows > "+list.stream().map(window -> window.cap).collect(Collectors.joining(" , ")));
         return list.size() > 0;
+    }
+
+    static boolean isTransferWindowOpened(List<String> excludeWindowsNamed) {
+        List<Window> openWindows = ZeeConfig.getContainersWindows();
+        int openWinCount = openWindows.size();
+        for (Window window : openWindows) {
+            for (String exclude : excludeWindowsNamed) {
+                if (window.cap.contentEquals(exclude))
+                    openWinCount--;//exclude window from counting
+            }
+        }
+        println("isTransferWindowOpened > openWinCount > "+openWinCount);
+        return openWinCount > 0;
+    }
+
+    static boolean isStackTransferable(GItem item){
+        // check if is stack item
+        if (!isStackItemPlaceholder(item))
+            return false;
+        return !isTransferWindowOpened(List.of("Quiver","Creel","Basket"));
     }
 
     private void drinkFrom() {
