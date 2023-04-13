@@ -14,8 +14,8 @@ public class ZeeManagerItemClick extends ZeeThread{
     private Coord coord;
     String itemName;
     String itemBasename;
-    String leftHandItemName, rightHandItemName, itemSourceWindow;
-    boolean cancelManager = false;
+    String leftHandItemName, rightHandItemName;
+    boolean cancelManagerBecauseException = false;
     public static Equipory equipory;
     static Inventory invBelt = null;
     public static long clickStartMs, clickEndMs, clickDiffMs;
@@ -34,16 +34,15 @@ public class ZeeManagerItemClick extends ZeeThread{
     }
 
     private void init(WItem wItem) {
-        equipory = ZeeConfig.windowEquipment.getchild(Equipory.class);
-        leftHandItemName = (getEquipory().leftHand==null ? "" : getEquipory().leftHand.item.getres().name);
-        rightHandItemName = (getEquipory().rightHand==null ? "" : getEquipory().rightHand.item.getres().name);
         try{
+            equipory = ZeeConfig.windowEquipment.getchild(Equipory.class);
+            leftHandItemName = (getEquipory().leftHand==null ? "" : getEquipory().leftHand.item.getres().name);
+            rightHandItemName = (getEquipory().rightHand==null ? "" : getEquipory().rightHand.item.getres().name);
             itemName = wItem.item.getres().name;//clicked item, started manager
             itemBasename = wItem.item.getres().basename();
-            itemSourceWindow = wItem.getparent(Window.class).cap;//save source window name before pickup
-        }catch (NullPointerException e){
-            //error caused by midClicking again before task ending
-            cancelManager = true;
+        }catch (Exception e){
+            cancelManagerBecauseException = true;
+            println("click manager init exception "+e.getCause());
         }
         //println(itemName +"  "+ getWItemCoord(wItem));//+"  "+ZeeConfig.getCursorName());
     }
@@ -51,7 +50,7 @@ public class ZeeManagerItemClick extends ZeeThread{
     @Override
     public void run() {
 
-        if(cancelManager)
+        if(cancelManagerBecauseException)
             return;
 
         try{
@@ -82,7 +81,7 @@ public class ZeeManagerItemClick extends ZeeThread{
 
 
             // undo stack if no transfer available
-            else if(!isStackTransferable(wItem.item)){
+            if( isStackItemPlaceholder(wItem.item)  &&  !isStackTransferable(wItem.item)){
                 //undo one stack
                 if (!isLongClick()){
                     undoStack(wItem.item);
@@ -786,14 +785,10 @@ public class ZeeManagerItemClick extends ZeeThread{
                     openWinCount--;//exclude window from counting
             }
         }
-        println("isTransferWindowOpened > openWinCount > "+openWinCount);
         return openWinCount > 0;
     }
 
     static boolean isStackTransferable(GItem item){
-        // check if is stack item
-        if (!isStackItemPlaceholder(item))
-            return false;
         // check if trasnfer window is open, except quiver, creel, ...
         return isTransferWindowOpened(List.of("Quiver","Creel","Basket"));
     }
@@ -939,7 +934,7 @@ public class ZeeManagerItemClick extends ZeeThread{
     }
 
     private boolean isItemWindowName(String windowName){
-        return (itemSourceWindow.equalsIgnoreCase(windowName));
+        return (wItem.getparent(Window.class).cap.equalsIgnoreCase(windowName));
     }
     private boolean isItemWindowBelt() {
         return isItemWindowName("Belt");

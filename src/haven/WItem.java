@@ -26,11 +26,6 @@
 
 package haven;
 
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.image.BufferedImage;
-import java.util.*;
-import java.util.function.*;
 import haven.ItemInfo.AttrCache;
 
 import java.awt.*;
@@ -201,7 +196,8 @@ public class WItem extends Widget implements DTarget {
 
 	@Override
 	public boolean mouseup(Coord c, int btn) {
-		if (btn == 2) {
+		// ignore calls by other classes other than WItem
+		if (btn == 2  &&  this.getClass().getSimpleName().contentEquals("WItem")) {
 			ZeeManagerItemClick.clickEndMs = System.currentTimeMillis();
 			new ZeeManagerItemClick(this,c).start();
 			return false;
