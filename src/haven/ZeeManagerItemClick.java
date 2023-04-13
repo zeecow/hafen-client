@@ -82,7 +82,7 @@ public class ZeeManagerItemClick extends ZeeThread{
 
 
             // undo stack if no transfer available
-            else if(isStackTransferable(wItem.item)){
+            else if(!isStackTransferable(wItem.item)){
                 //undo one stack
                 if (!isLongClick()){
                     undoStack(wItem.item);
@@ -794,7 +794,8 @@ public class ZeeManagerItemClick extends ZeeThread{
         // check if is stack item
         if (!isStackItemPlaceholder(item))
             return false;
-        return !isTransferWindowOpened(List.of("Quiver","Creel","Basket"));
+        // check if trasnfer window is open, except quiver, creel, ...
+        return isTransferWindowOpened(List.of("Quiver","Creel","Basket"));
     }
 
     private void drinkFrom() {
