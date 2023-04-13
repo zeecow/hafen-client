@@ -65,7 +65,7 @@ public class ZeeManagerGobClick extends ZeeThread{
                 }
             }
             // place lifted treelog next to clicked one
-            if ( isGobTreeLog(gobName) && ZeeConfig.isPlayerLiftingGob("gfx/terobjs/trees/")!=null){
+            if ( isGobTreeLog(gobName) && ZeeConfig.isPlayerLiftingGob("gfx/terobjs/trees/")!=null && !ZeeConfig.isPlayerLiftingGob(gob)){
                 placeTreelogNextTo(gob);
             }
             // pile inv boards and try sawing more boards
@@ -197,9 +197,11 @@ public class ZeeManagerGobClick extends ZeeThread{
                         else
                             newrc.y += 4.125;
                     }
+                    // position plob
                     ZeeManagerStockpile.lastPlob.move(newrc, treeLogGround.a);
-                    // 16384 , 32768
-                    ZeeConfig.gameUI.map.wdgmsg("place", ZeeManagerStockpile.lastPlob.rc.floor(OCache.posres), 32768, 1, 0);
+
+                    // place treelog and wait
+                    gobPlace(ZeeManagerStockpile.lastPlob,0);
                     waitNotPlayerPose(ZeeConfig.POSE_PLAYER_LIFT);
 
                 }catch (Exception e){
@@ -1899,16 +1901,15 @@ public class ZeeManagerGobClick extends ZeeThread{
         ZeeConfig.gameUI.map.wdgmsg("click", ZeeConfig.getCenterScreenCoord(), g.rc.floor(OCache.posres), btn, 0, 0, (int)g.id, g.rc.floor(OCache.posres), 0, -1);
     }
 
-    public static void gobClick(Gob g, int btn, int mod) {
+    static void gobClick(Gob g, int btn, int mod) {
         ZeeConfig.gameUI.map.wdgmsg("click", ZeeConfig.getCenterScreenCoord(), g.rc.floor(OCache.posres), btn, mod, 0, (int)g.id, g.rc.floor(OCache.posres), 0, -1);
     }
 
-    public static void gobPlace(Gob g, int mod) {
-        //haven.MapView@84bca9 ; place ; [(-973312, -973312), 16384, 1, 1]
-        ZeeConfig.gameUI.map.wdgmsg("place", g.rc.floor(OCache.posres), 16384, 1, mod);
+    static void gobPlace(Gob g, int mod) {
+        ZeeConfig.gameUI.map.wdgmsg("place", g.rc.floor(posres), (int) Math.round(g.a * 32768 / Math.PI), 1, 0);
     }
 
-    public static double distanceCoordGob(Coord2d c, Gob gob) {
+    static double distanceCoordGob(Coord2d c, Gob gob) {
         return c.dist(gob.rc);
     }
 
