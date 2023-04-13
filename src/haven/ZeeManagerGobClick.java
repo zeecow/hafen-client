@@ -1906,7 +1906,7 @@ public class ZeeManagerGobClick extends ZeeThread{
     }
 
     static void gobPlace(Gob g, int mod) {
-        ZeeConfig.gameUI.map.wdgmsg("place", g.rc.floor(posres), (int) Math.round(g.a * 32768 / Math.PI), 1, 0);
+        ZeeConfig.gameUI.map.wdgmsg("place", g.rc.floor(posres), (int) Math.round(g.a * 32768 / Math.PI), 1, mod);
     }
 
     static double distanceCoordGob(Coord2d c, Gob gob) {

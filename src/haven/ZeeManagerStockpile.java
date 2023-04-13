@@ -197,7 +197,7 @@ public class ZeeManagerStockpile extends ZeeThread{
                                 //pickup coal from inv
                                 if (!ZeeConfig.isPlayerHoldingItem()){
                                     if (ZeeManagerItemClick.pickUpInvItem(ZeeConfig.getMainInventory(),"/coal")) {
-                                        // right click to create virual pile
+                                        // right click to create virtual pile(lastPlob)
                                         Coord newPileCoord = ZeeConfig.getNextTileTowards(ZeeConfig.getGobTile(gobPile),ZeeConfig.getPlayerTile());
                                         ZeeConfig.gameUI.map.wdgmsg("itemact", newPileCoord, ZeeConfig.tileToCoord(newPileCoord), 0);
                                         sleep(1000);
@@ -205,7 +205,8 @@ public class ZeeManagerStockpile extends ZeeThread{
                                         //try placing new pile
                                         Coord playerTile = ZeeConfig.getPlayerTile();
                                         Coord c = ZeeConfig.tileToCoord(newPileCoord);
-                                        ZeeConfig.gameUI.map.wdgmsg("place", c, 16384, 1, UI.MOD_SHIFT);
+                                        //ZeeConfig.gameUI.map.wdgmsg("place", c, 16384, 1, UI.MOD_SHIFT);
+                                        ZeeManagerGobClick.gobPlace(lastPlob,UI.MOD_SHIFT);
                                         waitPlayerIdleFor(1);
 
                                         // player didnt move = couldnt place new coal pile?
@@ -826,7 +827,8 @@ public class ZeeManagerStockpile extends ZeeThread{
 
             //try placing pile
             Coord playerTile = ZeeConfig.getPlayerTile();
-            ZeeConfig.gameUI.map.wdgmsg("place", ZeeConfig.tileToCoord(coordNewPile), 16384, 1, UI.MOD_SHIFT);
+            //ZeeConfig.gameUI.map.wdgmsg("place", ZeeConfig.tileToCoord(coordNewPile), 16384, 1, UI.MOD_SHIFT);
+            ZeeManagerGobClick.gobPlace(lastPlob, UI.MOD_SHIFT);
             waitPlayerIdleFor(1);
 
             //player didnt move? tile occupied, terrain not flat...
