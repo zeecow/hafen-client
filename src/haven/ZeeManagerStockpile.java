@@ -827,8 +827,7 @@ public class ZeeManagerStockpile extends ZeeThread{
 
             //try placing pile
             Coord playerTile = ZeeConfig.getPlayerTile();
-            //ZeeConfig.gameUI.map.wdgmsg("place", ZeeConfig.tileToCoord(coordNewPile), 16384, 1, UI.MOD_SHIFT);
-            ZeeManagerGobClick.gobPlace(lastPlob, UI.MOD_SHIFT);
+            ZeeManagerGobClick.gobPlace(lastPlob, ZeeConfig.tileToCoord(coordNewPile), UI.MOD_SHIFT);
             waitPlayerIdleFor(1);
 
             //player didnt move? tile occupied, terrain not flat...
