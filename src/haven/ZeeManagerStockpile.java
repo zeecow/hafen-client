@@ -205,8 +205,7 @@ public class ZeeManagerStockpile extends ZeeThread{
                                         //try placing new pile
                                         Coord playerTile = ZeeConfig.getPlayerTile();
                                         Coord c = ZeeConfig.tileToCoord(newPileCoord);
-                                        //ZeeConfig.gameUI.map.wdgmsg("place", c, 16384, 1, UI.MOD_SHIFT);
-                                        ZeeManagerGobClick.gobPlace(lastPlob,UI.MOD_SHIFT);
+                                        ZeeManagerGobClick.gobPlace(lastPlob,c,UI.MOD_SHIFT);
                                         waitPlayerIdleFor(1);
 
                                         // player didnt move = couldnt place new coal pile?
