@@ -452,9 +452,10 @@ public class ZeeManagerStockpile extends ZeeThread{
     }
 
     public static void exitManager(String msg) {
-        exitManager();
         println(msg);
+        exitManager();
     }
+
     public static void exitManager() {
         busy = false;
         ZeeConfig.stopMovingEscKey();
@@ -466,7 +467,10 @@ public class ZeeManagerStockpile extends ZeeThread{
         if (gobSource!=null)
             ZeeConfig.removeGobText(gobSource);
         gobPile = gobSource = null;
-        windowManager.hide();
+
+        //TODO check for window.visible in isTransferOpen
+        windowManager.reqdestroy();
+        windowManager = null;
     }
 
 

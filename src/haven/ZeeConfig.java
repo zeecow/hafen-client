@@ -2017,7 +2017,7 @@ public class ZeeConfig {
             return ret;
         Set<Window> windows = gameUI.children(Window.class);
         for(Window w : windows) {
-            if(isWindowContainer(w)){
+            if(isWindowContainer(w)  &&  w.visible()){
                 ret.add(w);
             }
         }
