@@ -1586,11 +1586,11 @@ public class ZeeConfig {
 
 
     private static boolean alreadyTrackingScents = false;
+    static boolean initiatedToggles;
     public static void initToggles() {
         new Thread(new Runnable() {
             public void run() {
                 try {
-
                     println("initToggles");
 
                     // discover autostack checkbox value
@@ -1847,21 +1847,26 @@ public class ZeeConfig {
 
         //println(ev.getKeyCode()+"  "+ev.getKeyChar());
 
-        //exit actions hovermenu
-        if(ZeeHoverMenu.checkExitEsc(ev)) {
+        //repeater window (ctrl+r)
+        if (ev.isControlDown() && ev.getKeyCode()==KeyEvent.VK_R){
+            ZeeManagerRepeat.toggleWindow();
             return true;
         }
-        // pickup closest gob, key "q"
+        //exit actions hovermenu (esc)
+        else if(ZeeHoverMenu.checkExitEsc(ev)) {
+            return true;
+        }
+        // pickup closest gob (q)
         else if (ev.getKeyCode()==81 && !isCombatActive()) {//TODO alternate key during combat?
             ZeeManagerGobClick.pickupClosestGob(ev);
             return true;
         }
-        // key drink '
+        // key drink (')
         else if (ZeeConfig.drinkKey && ev.getKeyCode()==222){
             ZeeManagerItemClick.drinkFromBeltHandsInv();
             return true;
         }
-        // Arrow up/down changes audio volume
+        // volume up (arrow)
         else if (ZeeConfig.keyUpDownAudioControl && ev.getKeyCode()==KeyEvent.VK_UP){
             double vol = Audio.volume;
             if (vol < 0.9)
@@ -1871,6 +1876,7 @@ public class ZeeConfig {
             msgLow("volume "+Audio.volume);
             return true;
         }
+        // volume down (arrow)
         else if (ZeeConfig.keyUpDownAudioControl && ev.getKeyCode()==KeyEvent.VK_DOWN){
             double vol = Audio.volume;
             if (vol > 0.1)
@@ -1880,12 +1886,12 @@ public class ZeeConfig {
             msgLow("volume "+Audio.volume);
             return true;
         }
-        // Shift+Tab toggles Belt
+        // Belt toggle (Shift+Tab)
         else if(ZeeConfig.keyBeltShiftTab && ev.getKeyCode()==KeyEvent.VK_TAB && ev.isShiftDown()){
             tooggleWindowsBeltOrBasketCreel();
             return true;
         }
-        // Shift+c alternate cams bad/ortho
+        // alternate cams bad/ortho (Shift+c)
         else if(ZeeConfig.keyCamSwitchShiftC && ev.getKeyCode()==KeyEvent.VK_C && ev.isShiftDown()){
             String cam = gameUI.map.camera.getClass().getSimpleName();
             try {
@@ -1899,7 +1905,7 @@ public class ZeeConfig {
             }
             return true;
         }
-        // ctrl+h hide crops
+        // show/hide crops (ctrl+h)
         else if (ev.getKeyCode()==KeyEvent.VK_H && ev.isControlDown()){
             toggleHideCrops();
             return true;
@@ -2116,7 +2122,7 @@ public class ZeeConfig {
 //    }
 
     //reset state
-    public static void resetCharVariables() {
+    public static void resetCharacterVariables() {
         mainInv = null;
         ZeeManagerItemClick.invBelt = null;
         ZeeManagerItemClick.equipory = null;
@@ -2128,6 +2134,7 @@ public class ZeeConfig {
         Cal.fishMoonShowText = false;
         ZeeManagerMiner.tilesMonitorCleanup();
         ZeeHistWdg.listHistButtons.clear();
+        ZeeManagerRepeat.exitManager();
     }
 
     public static void clickOpenBelt() {
@@ -3024,6 +3031,9 @@ public class ZeeConfig {
         if(ZeeManagerStockpile.busy){
             ZeeManagerStockpile.exitManager();
         }
+        //stop repeater
+        if (ZeeManagerRepeat.isActive())
+            ZeeManagerRepeat.exitManager();
         //equip roundshield
         if (ZeeConfig.equipShieldOnCombat && !ZeeManagerItemClick.isItemEquipped("huntersbow") && !ZeeManagerItemClick.isItemEquipped("rangersbow"))
             ZeeManagerItemClick.equipBeltItem("/roundshield");

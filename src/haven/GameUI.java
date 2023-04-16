@@ -800,7 +800,7 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Message
 	    }
 	} else if(place == "menu") {
 	    menu = (MenuGrid)brpanel.add(child, menugridc);
-		ZeeConfig.resetCharVariables();
+		ZeeConfig.resetCharacterVariables();
 		ZeeQuickOptionsWindow.initWindow();
 	    ZeeConfig.initToggles();
 	} else if(place == "fight") {
