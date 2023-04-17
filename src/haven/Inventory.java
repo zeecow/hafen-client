@@ -177,10 +177,10 @@ public class Inventory extends Widget implements DTarget {
 
 	@Override
 	public void wdgmsg(Widget sender, String msg, Object... args) {
-		if(msg.equals("transfer-sort")){
+		if(msg.equals("transfer-sort") && lastSender==null){
 			process( getSame( (GItem)args[0], (Boolean)args[1], false), "transfer");
 		}
-		else if(msg.equals("transfer-ql")){
+		else if(msg.equals("transfer-ql") && lastSender==null){
 			process( getSame( (GItem)args[0], (Boolean)args[1], true), "transfer");
 		}
 		else {
@@ -188,10 +188,20 @@ public class Inventory extends Widget implements DTarget {
 		}
 	}
 
+	Widget lastSender = null;
 	private void process(List<WItem> items, String action) {
+
+		//avoid infinite loop when transfering multiple items to full stockpile
+		if (lastSender!=null)
+			return;
+
+		// transfer items
 		for (WItem item : items){
 			item.item.wdgmsg(action, Coord.z);
 		}
+
+		//avoid infinite loop when transfering multiple items to full stockpile
+		lastSender = null;
 	}
 
 	private List<WItem> getSame(GItem item, boolean ascending, boolean sameQl) {
