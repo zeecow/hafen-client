@@ -2010,7 +2010,7 @@ public class ZeeConfig {
                 +"Tidepool,Fireplace,Quiver,Creel"
         ).split(",");
         for (String contName: containers) {
-            if (window.cap.contains(contName)) {
+            if ( !isMakewindow(window) && window.cap.contentEquals(contName) ) {
                 return true;
             }
         }
@@ -2023,7 +2023,7 @@ public class ZeeConfig {
             return ret;
         Set<Window> windows = gameUI.children(Window.class);
         for(Window w : windows) {
-            if(isWindowContainer(w)  &&  w.visible()){
+            if( w.visible() && isWindowContainer(w) ){
                 ret.add(w);
             }
         }
