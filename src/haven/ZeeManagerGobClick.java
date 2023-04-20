@@ -1506,7 +1506,6 @@ public class ZeeManagerGobClick extends ZeeThread{
         new ZeeThread(){
             public void run() {
                 try{
-                    ZeeConfig.addPlayerText("adding");
                     if(invItens.size() < num){
                         ZeeConfig.msgError("Need "+num+" item(s)");
                         return;
@@ -1514,6 +1513,7 @@ public class ZeeManagerGobClick extends ZeeThread{
                     boolean exit = false;
                     int added = 0;
                     ZeeConfig.lastMapViewClickButton = 2;//prepare for cancel click
+                    ZeeConfig.addPlayerText("adding");
                     while(  !ZeeConfig.isTaskCanceledByGroundClick()
                             && !exit
                             && added < num
@@ -1533,11 +1533,11 @@ public class ZeeManagerGobClick extends ZeeThread{
                             exit = true;
                         }
                     }
-                    ZeeConfig.removePlayerText();
                     ZeeConfig.addGobTextTempMs(gob,"Added "+added+" item(s)",3000);
                 }catch (Exception e){
                     e.printStackTrace();
                 }
+                ZeeConfig.removePlayerText();
             }
         }.start();
     }

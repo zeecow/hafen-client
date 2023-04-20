@@ -1111,7 +1111,12 @@ public class ZeeConfig {
                 msgError("Fuel target not found");
                 return;
             }
+            //get all fuel items
             List<WItem> items = getMainInventory().getWItemsByNameContains(fuelName);
+            //ignore stack placeholder
+            items.removeIf(wItem -> ZeeManagerItemClick.isStackItemPlaceholder(wItem.item));
+            //add items
+            //TODO get items from stack
             ZeeManagerGobClick.addItemsToGob(items,num,g);
         }catch (NumberFormatException e){
             ZeeConfig.msg(e.getMessage());
