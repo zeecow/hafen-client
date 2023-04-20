@@ -44,6 +44,9 @@ public class ZeeSynth extends Thread{
     static List<String> speechQueue = new ArrayList<>();
     public static void textToSpeakLinuxFestival(String text) {
 
+        if (text==null || text.isEmpty())
+            return;
+
         // spam control
         if (speechBusy){
             // queue text if not already queued

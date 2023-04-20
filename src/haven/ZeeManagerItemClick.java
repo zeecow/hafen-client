@@ -1269,8 +1269,10 @@ public class ZeeManagerItemClick extends ZeeThread{
             int ql = getItemInfoQuality(contents.sub).intValue();
             msg += name.replaceAll(".+ of ","");// 0.45 l of Water
             msg += " q" + ql;
-        }else
+        }else {
             println("contents null? try picking  up item first");
+            msg = "error";
+        }
         //println("msg = "+msg);
         return msg;
     }
