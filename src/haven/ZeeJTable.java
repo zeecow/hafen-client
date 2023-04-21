@@ -97,7 +97,10 @@ public class ZeeJTable extends JFrame {
             //ql
             lineRow += arrLine[1] + ";";
 
-            //ingreds
+
+            /*
+                ingreds
+            */
             for (int j = 0; j <arrLine.length; j++) {
                 if (arrLine[j].startsWith("igr,")){
                     arrIgr = arrLine[j].split(",");
@@ -112,19 +115,45 @@ public class ZeeJTable extends JFrame {
             }
 
 
-            //events
+            /*
+                food events (FEPs)
+            */
             for (int j = 0; j <arrLine.length; j++) {
                 if (arrLine[j].startsWith("evt,")){
                     arrEvt = arrLine[j].split(",");
-                    lineRow += arrEvt[1] + " " + arrEvt[2] + ", ";
+                    lineRow += arrEvt[1] + " " + arrEvt[2] + ",";
                 }
             }
-            if (lineRow.endsWith(", ")) { //trim events
+            //trim events
+            if (lineRow.endsWith(", ")) {
                 lineRow = lineRow.replaceAll(", $", ";");
             }
-            else{ // no events?, empty col
+            // no events?, empty col
+            else{
                 lineRow += ";";
             }
+            //sort FEPs by highest number
+            String[] arrLineRow = lineRow.split(";");
+            String[] arrFeps = arrLineRow[arrLineRow.length-1].split(",");
+            String fepJ, fepK, temp;
+            //println("before = "+ Arrays.toString(arrFeps));
+            for (int j = 0; j < arrFeps.length-1; j++) {
+                for (int k = j+1; k < arrFeps.length; k++) {
+                    // extract "9.9" from "INT+2 9.9"
+                    fepJ = arrFeps[j].replaceAll("[\\^\\S]+\\s", "");
+                    fepK = arrFeps[k].replaceAll("[\\^\\S]+\\s", "");
+                    // switch highest fep to front
+                    if (Double.parseDouble(fepK) > Double.parseDouble(fepJ)) {
+                        //println("    "+arrFeps[j]+" > "+arrFeps[k]);
+                        temp = arrFeps[j];
+                        arrFeps[j] = arrFeps[k].trim();
+                        arrFeps[k] = temp.trim();
+                    }
+                }
+            }
+            //println("after = "+ Arrays.toString(arrFeps));
+            arrLineRow[arrLineRow.length-1] = String.join(",",arrFeps).trim().replaceAll(",",", ");
+            lineRow = String.join(";",arrLineRow);
 
 
             //add formatted line to jtable
