@@ -2010,7 +2010,7 @@ public class ZeeConfig {
                 +"Tidepool,Fireplace,Quiver,Creel"
         ).split(",");
         for (String contName: containers) {
-            if ( !isMakewindow(window) && window.cap.contentEquals(contName) ) {
+            if ( !isMakewindow(window) && window.cap.contains(contName) ) {
                 return true;
             }
         }
