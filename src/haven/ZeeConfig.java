@@ -1852,13 +1852,8 @@ public class ZeeConfig {
 
         //println(ev.getKeyCode()+"  "+ev.getKeyChar());
 
-        //repeater window (ctrl+r)
-        if (ev.isControlDown() && ev.getKeyCode()==KeyEvent.VK_R){
-            ZeeManagerRepeat.toggleWindow();
-            return true;
-        }
         //exit actions hovermenu (esc)
-        else if(ZeeHoverMenu.checkExitEsc(ev)) {
+        if(ZeeHoverMenu.checkExitEsc(ev)) {
             return true;
         }
         // pickup closest gob (q)
@@ -2139,7 +2134,6 @@ public class ZeeConfig {
         Cal.fishMoonShowText = false;
         ZeeManagerMiner.tilesMonitorCleanup();
         ZeeHistWdg.listHistButtons.clear();
-        ZeeManagerRepeat.exitManager();
     }
 
     public static void clickOpenBelt() {
@@ -3036,9 +3030,6 @@ public class ZeeConfig {
         if(ZeeManagerStockpile.busy){
             ZeeManagerStockpile.exitManager();
         }
-        //stop repeater
-        if (ZeeManagerRepeat.isActive())
-            ZeeManagerRepeat.exitManager();
         //equip roundshield
         if (ZeeConfig.equipShieldOnCombat && !ZeeManagerItemClick.isItemEquipped("huntersbow") && !ZeeManagerItemClick.isItemEquipped("rangersbow"))
             ZeeManagerItemClick.equipBeltItem("/roundshield");
