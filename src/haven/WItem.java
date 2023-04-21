@@ -102,8 +102,10 @@ public class WItem extends Widget implements DTarget {
 		    shorttip = new ShortTip(info);
 		return(shorttip);
 	    } else {
-		if(longtip == null)
-		    longtip = new LongTip(info);
+		if(longtip == null) {
+			info.add(new ItemInfo.AdHoc(this.item, this.item.getres().name));
+			longtip = new LongTip(info);
+		}
 		return(longtip);
 	    }
 	} catch(Loading e) {
