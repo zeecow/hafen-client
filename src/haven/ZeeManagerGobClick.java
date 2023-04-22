@@ -1162,6 +1162,64 @@ public class ZeeManagerGobClick extends ZeeThread{
 
     static boolean isGobDeadAnimal;
 
+    @SuppressWarnings("unchecked")
+    public static void labelGobBarrelCistern(Window window) {
+        new Thread(){
+            public void run() {
+                try{
+
+                    sleep(250);//wait window build
+                    if (window.children()==null) {
+                        println("labelGobByContents > window.children null");
+                        return;
+                    }
+
+                    window.children().forEach(w1 -> {
+                        if (w1.getClass().getSimpleName().contentEquals("RelCont")){
+                            w1.children().forEach(w2 -> {
+                                if (w2.getClass().getSimpleName().contentEquals("TipLabel")){
+
+                                    try {
+                                        // get window info
+                                        List<ItemInfo> info = (List<ItemInfo>) w2.getClass().getDeclaredField("info").get(w2);
+
+                                        // get name
+                                        String name = ZeeManagerItemClick.getItemInfoName(info);
+                                        if(name==null || name.isBlank()) {
+                                            //println("labelGobByContents > iteminfo name not found");
+                                            return;
+                                        }
+
+                                        // reduce "15 l of Cowsmilk" to "Cowsmilk"
+                                        String gobText = name.replaceAll("[\\^\\S]+\\s+[\\^\\S]+\\s+of\\s+","");
+
+                                        // get quality
+                                        Double ql = ZeeManagerItemClick.getItemInfoQuality(info);
+                                        if(ql > 0) {
+                                            gobText += " q" + ql.intValue();
+                                        }
+
+                                        // label gob "name q"
+                                        // TODO create variable lastClickedBarrelCIstern to avoid rare mislabeling
+                                        ZeeConfig.addGobText(ZeeConfig.lastMapViewClickGob, gobText);
+
+                                    } catch (IllegalAccessException e) {
+                                        e.printStackTrace();
+                                    } catch (NoSuchFieldException e) {
+                                        e.printStackTrace();
+                                    }
+                                    return;
+                                }
+                            });
+                        }
+                    });
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }.start();
+    }
+
     private boolean isGobBigDeadAnimal_thread() {
         try{
             ZeeThread zt = new ZeeThread() {

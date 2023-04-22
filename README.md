@@ -46,6 +46,7 @@ Client focusing on small helper tasks, many using mouse middle button, and other
 - Option "Fish Moon XP" show text over calendar 
 - Scroll text entry fuel for kiln, oven, smelter
 - hover menu on search actions button 
+- auto-label gob Barrel/Cistern when it's window is opened
 - (unfinished) Lag Camera (:cam lag)
 
 - midclick ground 

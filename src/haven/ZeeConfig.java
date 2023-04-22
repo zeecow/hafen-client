@@ -4,7 +4,6 @@ import haven.render.*;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
-import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 import java.awt.image.RenderedImage;
@@ -950,13 +949,16 @@ public class ZeeConfig {
 
         String windowTitle = window.cap.strip();
 
-        if(windowTitle.equals("Equipment")) {
+        if(windowTitle.contentEquals("Barrel") || windowTitle.contentEquals("Cistern")) {
+            ZeeManagerGobClick.labelGobBarrelCistern(window);
+        }
+        else if(windowTitle.contentEquals("Equipment")) {
             windowEquipment = window;
         }
-        else if(windowTitle.equals("Inventory")) {
+        else if(windowTitle.contentEquals("Inventory")) {
             windowInvMain = window;
         }
-        else if(windowTitle.equals("Barter Stand") && window.sz.x > 300){//avoid build window
+        else if(windowTitle.contentEquals("Barter Stand") && window.sz.x > 300){//avoid build window
             windowModBarterStand(window);
         }
         else if(isWindowAnimalStats(windowTitle)){
