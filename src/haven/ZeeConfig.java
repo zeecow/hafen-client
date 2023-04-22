@@ -219,6 +219,8 @@ public class ZeeConfig {
     public static boolean scrollTransferItems = Utils.getprefb("scrollTransferItems", true);
     public static boolean notifyBuddyOnline = Utils.getprefb("notifyBuddyOnline", false);
     public static boolean pilerMode = false;
+    public static boolean pickupGobWindowKeepOpen = Utils.getprefb("pickupGobWindowKeepOpen", true);
+    public static boolean pickupGobWindowAutoRefresh = Utils.getprefb("pickupGobWindowAutoRefresh", false);
     public static boolean shapeIcons = Utils.getprefb("shapeIcons", false);
     public static String shapeIconsList = Utils.getpref("shapeIconsList", DEF_LIST_SHAPEICON);
     public static boolean showIconsZoomOut = Utils.getprefb("showIconsZoomOut", true);
@@ -1010,10 +1012,17 @@ public class ZeeConfig {
         );
     }
 
-    private static void windowFitView(Window window) {
+    static void windowFitView(Window window) {
         if (window.c.x + window.sz.x > gameUI.sz.x)
             window.c.x = gameUI.sz.x - window.sz.x;
         // TODO fit vertical when Window sz y is more precise
+    }
+
+    static void windowGlueToBorder(Window window){
+        if (window.c.x < 0)
+            window.c.x = 0;
+        else if( gameUI.sz.x - (window.c.x + window.sz.x)  <  window.sz.x )
+            window.c.x = gameUI.sz.x - window.sz.x;
     }
 
     public static boolean isBuildWindow(Window window) {
@@ -1859,9 +1868,18 @@ public class ZeeConfig {
             return true;
         }
         // pickup closest gob (q)
-        else if (ev.getKeyCode()==81 && !isCombatActive()) {//TODO alternate key during combat?
-            ZeeManagerGobClick.pickupClosestGob(ev);
-            return true;
+        else if (ev.getKeyCode()==81) {
+            // Ctrl+q shows window pickup gob
+            if(ev.isControlDown()){
+                ZeeManagerGobClick.toggleWindowPickupGob();
+                return true;
+            }
+            // simple q press pickup closest gob, if no combat
+            else if(!isCombatActive()) {
+                ZeeManagerGobClick.pickupClosestGob(ev);
+                return true;
+            }
+            return false;
         }
         // key drink (')
         else if (ZeeConfig.drinkKey && ev.getKeyCode()==222){

@@ -2016,12 +2016,6 @@ public class ZeeManagerGobClick extends ZeeThread{
         if (gobs==null || gobs.size()==0)
             return;
 
-        // Ctrl+q shows window pickup gob
-        if(ev.isControlDown()){
-            toggleWindowPickupGob(gobs);
-            return;
-        }
-
         // calculate closest gob
         double minDist=99999, dist;
         Gob closestGob=null;
@@ -2062,40 +2056,77 @@ public class ZeeManagerGobClick extends ZeeThread{
     }
 
     static ZeeWindow winPickupGob;
-    private static void toggleWindowPickupGob(List<Gob> gobs) {
+    static void toggleWindowPickupGob() {
+
+        // find eligible gobs
+        List<Gob> gobs = ZeeConfig.findGobsMatchingRegexpList(listPickupGobNamePatterns);
+        gobs.removeIf(gob1 -> ZeeConfig.isKritter(gob1) && ZeeConfig.isKritterNotPickable(gob1));
+
         Widget wdg = null;
         List<String> listNamesAdded = new ArrayList<>();
-        if (gobs==null || gobs.size()==0)
-            return;
 
         // toggle window off
         if (winPickupGob!=null){
             winPickupGob.destroy();
             winPickupGob = null;
             listNamesAdded.clear();
-            //return;
         }
 
         //create window
         winPickupGob = new ZeeWindow(Coord.of(200,300),"pickup gobs");
 
-        winPickupGob.add(new Label("shift keeps window opened"),0,0);
+        //checkbox keep window open
+        wdg = winPickupGob.add( new CheckBox("keep window open"){
+            {
+                a = ZeeConfig.pickupGobWindowKeepOpen;
+            }
+            public void set(boolean val) {
+                ZeeConfig.pickupGobWindowKeepOpen = val;
+                a = val;
+            }
+        }, 0, 0 );
+
+
+        //button refresh
+        wdg = winPickupGob.add(new ZeeWindow.ZeeButton(60,"refresh"){
+            public void wdgmsg(String msg, Object... args) {
+                if (msg.contentEquals("activate")){
+                    toggleWindowPickupGob();
+                }
+            }
+        }, 0, wdg.c.y + wdg.sz.y + 5);
+        wdg = winPickupGob.add(new Label("(ctrl+q)"), wdg.c.x + wdg.sz.x + 5 , wdg.c.y + 5);
+
+
+        // add window, exit if no gobs
+        winPickupGob.pack();
+        ZeeConfig.gameUI.add(winPickupGob);
+        ZeeConfig.windowFitView(winPickupGob);
+        ZeeConfig.windowGlueToBorder(winPickupGob);
+        if (gobs==null || gobs.size()==0)
+            return;
+
 
         // populate window with gob list
+        int y = wdg.c.y + wdg.sz.y + 15;
         for (int i = 0; i < gobs.size(); i++) {
-            int y = 13;
+
             String resname = gobs.get(i).getres().name;
             String basename = gobs.get(i).getres().basename();
+
             //avoid duplicates
             if (listNamesAdded.contains(resname))
                 continue;
+
             //avoid big kritters
             if (ZeeConfig.isKritter(resname) && ZeeConfig.isKritterNotPickable(resname))
                 continue;
-            listNamesAdded.add(resname);
-            y += ((listNamesAdded.size()-1) * 33);
 
-            //button "pick" gob
+            // calc y position
+            listNamesAdded.add(resname);
+            y += ((listNamesAdded.size()-1) * 18);
+
+            // add button "pick" single gob
             wdg = winPickupGob.add(
                 new ZeeWindow.ZeeButton(30, "one"){
                     public void wdgmsg(String msg, Object... args) {
@@ -2105,7 +2136,7 @@ public class ZeeManagerGobClick extends ZeeThread{
                             if (closest!=null) {
                                 gobClick(closest, 3);
                             }
-                            if (!ui.modshift)
+                            if (!ZeeConfig.pickupGobWindowKeepOpen)
                                 winPickupGob.wdgmsg("close");
                         }
                     }
@@ -2113,7 +2144,7 @@ public class ZeeManagerGobClick extends ZeeThread{
                 0,y
             );
 
-            //button pick "all"
+            // add button pick "all"
             wdg = winPickupGob.add(
                     new ZeeWindow.ZeeButton(30, "all") {
                         public void wdgmsg(String msg, Object... args) {
@@ -2123,24 +2154,25 @@ public class ZeeManagerGobClick extends ZeeThread{
                                 if (closest!=null) {
                                     gobClick(closest, 3, UI.MOD_SHIFT);
                                 }
-                                if (!ui.modshift)
+                                if (!ZeeConfig.pickupGobWindowKeepOpen)
                                     winPickupGob.wdgmsg("close");
                             }
                         }
                     },
-                    wdg.c.x+wdg.sz.x + 10, y
+                    wdg.c.x + wdg.sz.x, y
             );
-            if (!resname.contains("/terobjs/")) {// disable if not a terobj
+            if (!resname.contains("/terobjs/")) {
+                // disable button all if not a terobj
                 ((Button)wdg).disable(true);
             }
 
-            //label gob name
-            wdg = winPickupGob.add(new Label(basename,CharWnd.attrf), wdg.c.x+wdg.sz.x + 10, y);
+            // add label gob name
+            wdg = winPickupGob.add(new Label(basename), wdg.c.x+wdg.sz.x+3, y + 5);
         }
 
-
         winPickupGob.pack();
-        ZeeConfig.gameUI.add(winPickupGob);
+        ZeeConfig.windowFitView(winPickupGob);
+        ZeeConfig.windowGlueToBorder(winPickupGob);
     }
 
     private static void pickGobsFilterSort(List<Gob> gobs, String gobBaseName) {

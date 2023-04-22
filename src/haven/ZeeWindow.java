@@ -12,7 +12,7 @@ public class ZeeWindow extends Window {
     public void wdgmsg(String msg, Object... args) {
         //ZeeConfig.println(this.getClass().getSimpleName()+" > "+msg);
         if(msg.equals("close")){
-            hide();
+            reqdestroy();
         }
     }
 
