@@ -2011,7 +2011,10 @@ public class ZeeManagerGobClick extends ZeeThread{
 
         // find eligible gobs
         List<Gob> gobs = ZeeConfig.findGobsMatchingRegexpList(listPickupGobNamePatterns);
-        gobs.removeIf(gob1 -> ZeeConfig.isKritter(gob1) && ZeeConfig.isKritterNotPickable(gob1));
+        gobs.removeIf(gob1 ->
+            (ZeeConfig.isKritter(gob1) && ZeeConfig.isKritterNotPickable(gob1))
+            || gob1.getres().name.contentEquals("gfx/terobjs/herbs/leafpile")
+        );
 
         if (gobs==null || gobs.size()==0)
             return;
@@ -2060,7 +2063,10 @@ public class ZeeManagerGobClick extends ZeeThread{
 
         // find eligible gobs
         List<Gob> gobs = ZeeConfig.findGobsMatchingRegexpList(listPickupGobNamePatterns);
-        gobs.removeIf(gob1 -> ZeeConfig.isKritter(gob1) && ZeeConfig.isKritterNotPickable(gob1));
+        gobs.removeIf(gob1 ->
+            (ZeeConfig.isKritter(gob1) && ZeeConfig.isKritterNotPickable(gob1))
+            || gob1.getres().name.contentEquals("gfx/terobjs/herbs/leafpile")
+        );
 
         Widget wdg = null;
         List<String> listNamesAdded = new ArrayList<>();
@@ -2122,9 +2128,8 @@ public class ZeeManagerGobClick extends ZeeThread{
             if (ZeeConfig.isKritter(resname) && ZeeConfig.isKritterNotPickable(resname))
                 continue;
 
-            // calc y position
+            // avoid duplicate names
             listNamesAdded.add(resname);
-            y += ((listNamesAdded.size()-1) * 18);
 
             // add button "pick" single gob
             wdg = winPickupGob.add(
@@ -2168,6 +2173,8 @@ public class ZeeManagerGobClick extends ZeeThread{
 
             // add label gob name
             wdg = winPickupGob.add(new Label(basename), wdg.c.x+wdg.sz.x+3, y + 5);
+
+            y += 23;
         }
 
         winPickupGob.pack();

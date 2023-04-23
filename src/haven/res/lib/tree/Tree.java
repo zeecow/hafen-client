@@ -139,7 +139,7 @@ public class Tree extends Sprite {
     private Random lrand;
     private double lrate;
     public boolean tick(double dt) {
-	leaves: if(leaves != null) {
+	leaves: if(leaves != null && ZeeConfig.treeAnimation) {
 	    if(lrand == null) {
 		lrand = new Random();
 		if(lrand.nextInt(2) == 0) {
