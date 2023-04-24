@@ -1186,7 +1186,8 @@ public class ZeeManagerGobClick extends ZeeThread{
                                         // get name
                                         String name = ZeeManagerItemClick.getItemInfoName(info);
                                         if(name==null || name.isBlank()) {
-                                            //println("labelGobByContents > iteminfo name not found");
+                                            // empty gob, remove text
+                                            ZeeConfig.removeGobText(ZeeConfig.lastMapViewClickGob);
                                             return;
                                         }
 
