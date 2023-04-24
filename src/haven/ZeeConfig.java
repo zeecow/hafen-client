@@ -95,6 +95,8 @@ public class ZeeConfig {
     public static final String POSE_PLAYER_DRIVE_WHEELBARROW = "gfx/borka/carry"; //same as pickaxe
     public static final String POSE_PLAYER_CARRY_PICKAXE = "gfx/borka/carry"; //same as wheelbarrow
     public static final String POSE_PLAYER_CARRY_SCYTHEARMS = "gfx/borka/scythearms";
+    public static final String POSE_PLAYER_PRESSINGWINE = "gfx/borka/winepressan";
+    public static final String POSE_PLAYER_PRESSINGWINE_IDLE = "gfx/borka/winepress-idle";
 
     public static final String TILE_WATER_FRESH_SHALLOW = "gfx/tiles/water";
     public static final String TILE_WATER_FRESH_DEEP = "gfx/tiles/deep";
@@ -969,6 +971,22 @@ public class ZeeConfig {
         else if (windowTitle.contentEquals("Oven") || windowTitle.contentEquals("Kiln") || windowTitle.contains("Smelter")){
             if (!isBuildWindow(window))
                 windowAddFuelGUI(window,windowTitle);
+        }
+        else if(windowTitle.contentEquals("Extraction Press")) {
+            if (!isBuildWindow(window)) {
+                Button btnPress = getButtonNamed(window,"Press");
+                if (btnPress==null){
+                    println("addWindow > winepress button not found");
+                } else {
+                    window.add(new Button(UI.scale(60), "auto") {
+                        public void wdgmsg(String msg, Object... args) {
+                            if (msg.contentEquals("activate")) {
+                                ZeeManagerGobClick.autoPressWine(window);
+                            }
+                        }
+                    }, btnPress.c.x + btnPress.sz.x + 5 , btnPress.c.y);
+                }
+            }
         }
         else if (ZeeManagerMiner.tunnelHelperStage == ZeeManagerMiner.TUNNELHELPER_STAGE5_BUILDCOL && windowTitle.contentEquals("Stone Column")){
             ZeeManagerMiner.tunnelHelperBuildColumn(window);

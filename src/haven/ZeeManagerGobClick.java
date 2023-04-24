@@ -1684,6 +1684,105 @@ public class ZeeManagerGobClick extends ZeeThread{
         }
     }
 
+    static boolean isAutoPressan = false;
+    static void autoPressWine(Window window) {
+
+        if (isAutoPressan) {
+            println("already pressan");
+            return;
+        }
+        isAutoPressan = true;
+
+        new Thread(){
+
+            public void run() {
+
+                try {
+                    //  "/grapes"  "seed-grape"
+                    ZeeConfig.addPlayerText("pressan");
+                    Button btnPress = ZeeConfig.getButtonNamed(window,"Press");
+                    Inventory invPress = window.getchild(Inventory.class);
+                    Inventory invPlayer = ZeeConfig.getMainInventory();
+                    List<WItem> playerGrapes = invPlayer.getWItemsByNameEndsWith("/grapes");
+                    List<WItem> pressGrapes = invPress.getWItemsByNameEndsWith("/grapes");
+                    List<WItem> pressSeeds = invPress.getWItemsByNameEndsWith("/seed-grape");
+
+                    if (pressGrapes.size()==0){
+                        if (playerGrapes.size() > 0) {
+                            playerGrapes.get(0).item.wdgmsg("transfer", Coord.z, -1);
+                        }else{
+                            exitAutoWinepress("no grapes to start pressing");
+                            return;
+                        }
+                    }
+
+                    //while idle pressing pose
+                    while(ZeeConfig.getPlayerPoses().contains(ZeeConfig.POSE_PLAYER_PRESSINGWINE_IDLE)){
+
+                        //start pressing
+                        println("pressing");
+                        btnPress.click();
+                        sleep(PING_MS);
+
+                        //wait stop pressing
+                        waitPlayerPoseNotInList(ZeeConfig.POSE_PLAYER_PRESSINGWINE, ZeeConfig.POSE_PLAYER_DRINK);
+                        sleep(PING_MS);
+
+                        //exit if player left winepress
+                        if (!ZeeConfig.getPlayerPoses().contains(ZeeConfig.POSE_PLAYER_PRESSINGWINE_IDLE)){
+                            exitAutoWinepress("player left winepress");
+                            return;
+                        }
+
+                        playerGrapes = invPlayer.getWItemsByNameEndsWith("/grapes");
+                        pressGrapes = invPress.getWItemsByNameEndsWith("/grapes");
+                        pressSeeds = invPress.getWItemsByNameEndsWith("/seed-grape");
+
+                        if (pressGrapes.size() > 0){
+                            exitAutoWinepress("press still has grapes, grapejuice full?");
+                            return;
+                        }
+
+                        if(pressSeeds.size() > 0){
+                            if (invPlayer.getNumberOfFreeSlots() == 0){
+                                exitAutoWinepress("player inv full, cant switch winepress contents");
+                                return;
+                            }
+                            println("press has only seeds, try refilling?");
+
+                            //transfer seeds to player
+                            pressSeeds.get(0).item.wdgmsg("transfer",Coord.z,-1);
+                            sleep(PING_MS);
+
+                            //transfer grapes to press
+                            if (playerGrapes.size() == 0){
+                                exitAutoWinepress("out of grapes to press");
+                                return;
+                            }
+                            playerGrapes.get(0).item.wdgmsg("transfer",Coord.z,-1);
+
+                            // restart pressing on next loop...
+                        }
+                    }
+
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+
+                //exit
+                exitAutoWinepress("ok");
+            }
+
+        }.start();
+
+    }
+
+    static void exitAutoWinepress(String msg) {
+        println("exit autowine > "+msg);
+        ZeeConfig.removePlayerText();
+        isAutoPressan = false;
+    }
+
     public static boolean isGobStockpile(String gobName) {
         return gobName.startsWith("gfx/terobjs/stockpile");
     }
