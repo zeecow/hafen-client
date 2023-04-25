@@ -58,6 +58,7 @@ public class Charlist extends Widget {
 	    .action(() -> scroll(1));
 	sau.hide(); sad.hide();
 	resize(new Coord(bg.sz().x, sad.c.y + sad.sz.y));
+	ZeeConfig.charNamesList = new ArrayList<>();
     }
 
     public static class Char {
@@ -151,6 +152,8 @@ public class Charlist extends Widget {
 	    }
 	    list.scrollval((int)Math.round(scrollval = nv));
 	}
+	if(!ZeeConfig.charNameAutoLogin.isEmpty())
+		ZeeConfig.charListAutoLoginCheck(Charlist.this);
 	super.tick(dt);
     }
 
@@ -173,6 +176,7 @@ public class Charlist extends Widget {
     public void uimsg(String msg, Object... args) {
 	if(msg == "add") {
 	    Char c = new Char((String)args[0]);
+		ZeeConfig.charListAdd(c.name);
 	    if(args.length > 1) {
 		Object[] rawdesc = (Object[])args[1];
 		Collection<ResData> poses = new ArrayList<>();

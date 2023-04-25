@@ -518,8 +518,8 @@ public class ZeeConfig {
             gfx/invobjs/chicken-cleaned, gfx/invobjs/adder-clean
             gfx/invobjs/meat
          */
-        // skip hides ("/squirrelhide")
-        if (nameContains.endsWith("hide"))
+        // skip cases ("/squirrelhide", "squirreltail")
+        if (nameContains.endsWith("hide") || nameContains.endsWith("squirreltail"))
             return false;
         String[] endlist = {
             "rockdove","quail","/hen","/rooster","magpie", // "/crab"
@@ -1626,6 +1626,10 @@ public class ZeeConfig {
             public void run() {
                 try {
                     println("initToggles");
+
+                    // show char switch window
+                    if (charSwitchKeepWindow)
+                        charSwitchWindow();
 
                     // discover autostack checkbox value
                     toggleAutostack();//toggle autostack
@@ -3438,13 +3442,87 @@ public class ZeeConfig {
         }
     }
 
-    public static void simulateClickJava(int buttonMask) {
+    static void simulateClickJava(int buttonMask) {
         try {
             Robot robot = new Robot();
             robot.mousePress(buttonMask);
             robot.mouseRelease(buttonMask);
         }catch (Exception e){
             e.printStackTrace();
+        }
+    }
+
+    static List<String> charNamesList;
+    static String charNameAutoLogin = "";
+    static boolean charSwitchKeepWindow = Utils.getprefb("charSwitchKeepWindow",false);
+    static long charSwitchLastMs = 0;
+    static void charListAdd(String name) {
+        //println("add "+name);
+        charNamesList.add(name);
+    }
+
+    static void charSwitchWindow(){
+        Window win = getWindow("Switch char");
+        if (win!=null){
+            win.reqdestroy();
+            win = null;
+        }
+        win = new ZeeWindow(Coord.of(200,300),"Switch char");
+        int y=0;
+        win.add(new CheckBox("keep window"){
+            {a = charSwitchKeepWindow;}
+            public void set(boolean val) {
+                a = val;
+                charSwitchKeepWindow = a;
+                Utils.setprefb("charSwitchKeepWindow",charSwitchKeepWindow);
+            }
+        },0,y);
+        y += 25;
+        win.add(new Button(120,"Switch Screen"){
+            public void wdgmsg(String msg, Object... args) {
+                if (msg.contentEquals("activate")){
+                    gameUI.act("lo", "cs");
+                    getWindow("Switch char").reqdestroy();
+                }
+            }
+        },0,y);
+        y += 35;
+        win.add(new Label("Switch to:"),0,y);
+        y += 15;
+        // chars list
+        for (String charName : charNamesList) {
+            win.add(new Button(120,charName){
+                public void wdgmsg(String msg, Object... args) {
+                    if (msg.contentEquals("activate")){
+                        charNameAutoLogin = charName;
+                        gameUI.act("lo", "cs");
+                        charSwitchLastMs = ZeeThread.now();
+                        //getWindow("Switch char").reqdestroy();
+                    }
+                }
+            },0,y);
+            y += 25;
+        }
+        win.pack();
+        gameUI.add(win, gameUI.sz.div(2).sub(win.sz.div(2)));
+        gameUI.opts.wdgmsg("close");
+    }
+
+    public static void charListAutoLoginCheck(Charlist charlist) {
+        // cancel auto login by timeout (TODO test other ways)
+        long logoutMs = ZeeThread.now() - charSwitchLastMs;
+        if (logoutMs > 5700){
+            println("auto login timed out by "+logoutMs+" ms");
+            charNameAutoLogin = "";
+            charSwitchKeepWindow = false;
+            Utils.setprefb("charSwitchKeepWindow",false);
+            return;
+        }
+        // auto login
+        if (!charNameAutoLogin.isEmpty() && charlist.ui != null){
+            println("autologin " + charNameAutoLogin);
+            charlist.wdgmsg("play", charNameAutoLogin);
+            charNameAutoLogin = "";
         }
     }
 }
