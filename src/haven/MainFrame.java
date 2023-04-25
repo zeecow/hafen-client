@@ -195,6 +195,7 @@ public class MainFrame extends java.awt.Frame implements Console.Directory {
 	setVisible(true);
 	addWindowListener(new WindowAdapter() {
 		public void windowClosing(WindowEvent e) {
+			ZeeSess.charSwitchCancelAutologin("window closing");
 		    mt.interrupt();
 		}
 

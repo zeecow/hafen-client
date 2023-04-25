@@ -723,7 +723,7 @@ public class OptWnd extends Window {
 	if(gopts) {
 	    y = main.add(new Button(UI.scale(200), "Switch character", false).action(() -> {
 			//getparent(GameUI.class).act("lo", "cs");
-			ZeeConfig.charSwitchWindow();
+			ZeeSess.charSwitchCreateWindow();
 	    }), 0, y).pos("bl").adds(0, 5).y;
 	    y = main.add(new Button(UI.scale(200), "Log out", false).action(() -> {
 			getparent(GameUI.class).act("lo");

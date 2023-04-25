@@ -397,7 +397,9 @@ public class ZeeManagerStockpile extends ZeeThread{
 
     public static void checkClickedPetal(String petalName) {
         lastPetalName = petalName;
-        if (petalName.equals("Pick leaf")) {
+        if (petalName.contentEquals("Sleep")) {
+            ZeeSess.charSwitchCancelAutologin("char slept");
+        }else if (petalName.equals("Pick leaf")) {
             if (ZeeConfig.lastMapViewClickGobName.equals("gfx/terobjs/trees/mulberry")
                 || ZeeConfig.lastMapViewClickGobName.equals("gfx/terobjs/trees/laurel")) {
                 gobSource = ZeeConfig.lastMapViewClickGob;

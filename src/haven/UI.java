@@ -104,12 +104,14 @@ public class UI {
 	{
 	    setcmd("q", new Command() {
 		    public void run(Console cons, String[] args) {
+			ZeeSess.charSwitchCancelAutologin("cmd q");
 			HackThread.tg().interrupt();
 		    }
 		});
 	    setcmd("lo", new Command() {
 		    public void run(Console cons, String[] args) {
 			sess.close();
+			ZeeSess.charSwitchCancelAutologin("cmd lo");
 		    }
 		});
 	    setcmd("gl", new Command() {
