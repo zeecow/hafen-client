@@ -75,6 +75,8 @@ public class ZeeManagerIcons {
             retImg = imgDiamond(size,c,border,shadow);
         else if (ruleShape[0].contentEquals("boat"))
             retImg = imgBoat(size,c,border,shadow);
+        else if (ruleShape[0].contentEquals("star"))
+            retImg = imgStar4(size,c,border,shadow);
 
         return retImg;
     }
@@ -148,7 +150,7 @@ public class ZeeManagerIcons {
         return ret;
     }
 
-    public static BufferedImage imgOval(int w, int h, Color c, boolean border, int shadow) {
+    static BufferedImage imgOval(int w, int h, Color c, boolean border, int shadow) {
         int type = BufferedImage.TYPE_INT_ARGB;
         BufferedImage ret = new BufferedImage(w+shadow, h+shadow, type);
         Graphics2D g2d = ret.createGraphics();
@@ -173,10 +175,30 @@ public class ZeeManagerIcons {
         return ret;
     }
 
-    public static BufferedImage imgPolygon(int w, int h, int[] xPoints, int[] yPoints, int points, Color c, boolean border, int shadow) {
+    static BufferedImage imgStar4(int size, Color c, boolean border, boolean shadow){
+        int s = size;
+        int s2 = s/2;
+        int s4 = s2/4;
+        return imgPolygon(
+            size,
+            size,
+            new int[]{  0, s2-s4, s2, s2+s4,   s, s2+s4,  s2, s2-s4}, // x points
+            new int[]{ s2, s2-s4,  0, s2-s4,  s2, s2+s4,   s, s2+s4}, // y points
+            8,
+            c,
+            border,
+            (shadow ? 1 : 0)
+        );
+    }
+
+    // 0,0 = top left ; w,h = bottom right
+    static BufferedImage imgPolygon(int w, int h, int[] xPoints, int[] yPoints, int points, Color c, boolean border, int shadow) {
         int type = BufferedImage.TYPE_INT_ARGB;
         BufferedImage ret = new BufferedImage(w+shadow+1, h+shadow+1, type);
         Graphics2D g2d = ret.createGraphics();
+
+        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        g2d.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
 
         // draw shadow
         if (shadow > 0) {
@@ -286,7 +308,7 @@ public class ZeeManagerIcons {
             pan = new JPanel(new FlowLayout(FlowLayout.LEFT));
             panelCenter.add(pan,BorderLayout.NORTH);
             pan.add(new JLabel("Icon:"));
-            pan.add(shapeCombo = new JComboBox<>(new String[]{"boat","circle","diamond","square", "triangleUp", "triangleDown"}));
+            pan.add(shapeCombo = new JComboBox<>(new String[]{"boat","circle","diamond","square", "star","triangleUp", "triangleDown"}));
             SpinnerNumberModel model = new SpinnerNumberModel(3, 3, 10, 1);
             jspIconSize = new JSpinner(model);
             jspIconSize.setBorder(BorderFactory.createEmptyBorder(2, 5, 2, 5));
