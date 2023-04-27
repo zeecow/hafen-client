@@ -26,11 +26,13 @@
 
 package haven;
 
-import java.util.*;
-import java.lang.annotation.*;
-import java.lang.reflect.*;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+import java.util.*;
 
 public class Widget {
     public UI ui;
@@ -701,6 +703,10 @@ public class Widget {
     }
 	
     public void wdgmsg(String msg, Object... args) {
+	if(ZeeConfig.confirmPetal && !ui.modctrl && msg.contentEquals("empty") && this.getClass().getSimpleName().contentEquals("Grainslot")){
+		ZeeConfig.msgError("Ctrl + click to confirm emptying");
+		return;
+	}
 	wdgmsg(this, msg, args);
     }
 	
