@@ -772,7 +772,7 @@ public class ZeeManagerItemClick extends ZeeThread{
 
     static boolean isTransferWindowOpened() {
         List<Window> list = ZeeConfig.getContainersWindows();
-        println("isTransferWindowOpened > "+list.size()+" windows > "+list.stream().map(window -> window.cap).collect(Collectors.joining(" , ")));
+        //println("isTransferWindowOpened > "+list.size()+" windows > "+list.stream().map(window -> window.cap).collect(Collectors.joining(" , ")));
         return list.size() > 0;
     }
 

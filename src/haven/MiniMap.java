@@ -29,6 +29,7 @@ package haven;
 import haven.MapFile.*;
 
 import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.util.List;
 import java.util.*;
 import java.util.function.Consumer;
@@ -353,20 +354,27 @@ public class MiniMap extends Widget {
 	    this.m = marker;
 	    this.tip = Text.render(m.nm);
 	    if(marker instanceof PMarker)
-		this.hit = Area.sized(flagcc.inv(), UI.scale(flagbg.sz));
+			this.hit = Area.sized(starMarkCc.inv(), UI.scale(Coord.of(starMark.getWidth())));
+		//this.hit = Area.sized(flagcc.inv(), UI.scale(flagbg.sz));
 	}
 
+	static BufferedImage starMark = ZeeManagerIcons.imgStar4(10,Color.white,false,true);
+	static Coord starMarkCc = UI.scale(Coord.of(starMark.getWidth()));
 	public void draw(GOut g, Coord c) {
 	    if(m instanceof PMarker) {
-		Coord ul = c.sub(flagcc);
+		//Coord ul = c.sub(flagcc);
+		Coord ul = c.sub(starMarkCc);
 		if (isListFocused){
-			g.image(ZeeManagerIcons.latestFocusedMarkBgImg,ul);
+			g.image(ZeeManagerIcons.latestFocusedMarkBgImg,ul.sub(1,1));
 			g.chcolor();
 		}
 		g.chcolor(((PMarker)m).color);
-		g.image(flagfg, ul);
+		g.image(starMark,ul);
 		g.chcolor();
-		g.image(flagbg, ul);
+//		g.chcolor(((PMarker)m).color);
+//		g.image(flagfg, ul);
+//		g.chcolor();
+//		g.image(flagbg, ul);
 	    } else if(m instanceof SMarker) {
 		SMarker sm = (SMarker)m;
 		try {
