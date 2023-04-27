@@ -241,4 +241,15 @@ public class Button extends SIWidget {
 	}
 	return(false);
     }
+
+	@Override
+	public void wdgmsg(String msg, Object... args) {
+		if (ZeeConfig.confirmPetal && msg.contentEquals("activate") && !ui.modctrl){
+			if(text.text.contentEquals("Empty") || text.text.contentEquals("Empty out")) {
+				ZeeConfig.msgError("Ctrl + click button to confirm");
+				return;
+			}
+		}
+		super.wdgmsg(msg, args);
+	}
 }
