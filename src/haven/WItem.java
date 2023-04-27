@@ -189,6 +189,8 @@ public class WItem extends Widget implements DTarget {
 		g.chcolor(255, 255, 255, 64);
 		Coord half = sz.div(2);
 		g.prect(half, half.inv(), half, meter * Math.PI * 2);
+		g.chcolor(Color.BLACK);
+		g.text(String.format("%.2f", meter).replaceAll("0.","."),half.sub(Coord.of(5)));
 		g.chcolor();
 	    }
 	} else {
