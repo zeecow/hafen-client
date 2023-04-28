@@ -103,7 +103,15 @@ public class WItem extends Widget implements DTarget {
 		return(shorttip);
 	    } else {
 		if(longtip == null) {
+			// add blank line
+			info.add(new ItemInfo.AdHoc(this.item, ""));
+			// add res name
 			info.add(new ItemInfo.AdHoc(this.item, this.item.getres().name));
+			// add meter %
+			Double meter = (item.meter > 0) ? Double.valueOf(item.meter / 100.0) : itemmeter.get();
+			if((meter != null) && (meter > 0)) {
+				info.add(new ItemInfo.AdHoc(this.item, (int) (meter * 100) +"% done"));
+			}
 			longtip = new LongTip(info);
 		}
 		return(longtip);
@@ -189,9 +197,11 @@ public class WItem extends Widget implements DTarget {
 		g.chcolor(255, 255, 255, 64);
 		Coord half = sz.div(2);
 		g.prect(half, half.inv(), half, meter * Math.PI * 2);
-		g.chcolor(Color.BLACK);
-		g.text(String.format("%.2f", meter).replaceAll("0.","."),half.sub(Coord.of(5)));
 		g.chcolor();
+		g.image(
+			GItem.NumberInfo.font.render((int) (meter * 100) +"%",Color.lightGray).tex(),
+			Coord.of(-1,half.y+6)
+		);
 	    }
 	} else {
 	    g.image(missing.layer(Resource.imgc).tex(), Coord.z, sz);
