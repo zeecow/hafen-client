@@ -412,7 +412,7 @@ public class ZeeConfig {
     public static MixColor getHighlightGobColor(Gob gob) {
 
         //get Type and name
-        String gobName = gob.resName;
+        String gobName = gob.getres().name;
         String categ;
         Color c;
 
@@ -760,7 +760,7 @@ public class ZeeConfig {
     }
 
     public static void applyGobSettingsAudio(Gob gob) {
-        String gobName = gob.resName;
+        String gobName = gob.getres().name;
         long gobId = gob.id;
         String path = "";
 
@@ -2820,28 +2820,22 @@ public class ZeeConfig {
 
     public static void applyGobSettings(Gob ob) {
         if(ob!=null && ob.getres()!=null) {
-            try{
-                ob.resName = ob.getres().name;
-            }catch (Resource.Loading loading){
-                loading.printStackTrace();
-                return;
-            }
             // ignore bat if using batcape
-            if (ob.resName.contentEquals("gfx/kritter/bat/bat") && ZeeManagerItemClick.isItemEquipped("/batcape")) {
+            if (ob.getres().name.contentEquals("gfx/kritter/bat/bat") && ZeeManagerItemClick.isItemEquipped("/batcape")) {
                 return;
             }
             ZeeConfig.applyGobSettingsAudio(ob);
             ZeeConfig.applyGobSettingsAggro(ob);
             ZeeConfig.applyGobSettingsHighlight(ob, ZeeConfig.getHighlightGobColor(ob));
-            if (ob.resName!=null && !ob.resName.isBlank() && !mapGobSession.containsKey(ob.resName))
-                mapGobSession.put(ob.resName,"");
+            if (ob.getres().name!=null && ob.getres().name!=null && !ob.getres().name.isBlank() && !mapGobSession.containsKey(ob.getres().name))
+                mapGobSession.put(ob.getres().name,"");
             if (ZeeConfig.autoChipMinedBoulder && ZeeManagerMiner.isCursorMining() && ZeeManagerMiner.isBoulder(ob))
                 ZeeManagerMiner.checkBoulderGobAdded(ob);
         }
     }
 
     private static void applyGobSettingsAggro(Gob gob) {
-        if( mapCategoryGobs.get(CATEG_AGROCREATURES).contains(gob.resName)) {
+        if( mapCategoryGobs.get(CATEG_AGROCREATURES).contains(gob.getres().name)) {
             //aggro radius
             if (ZeeConfig.aggroRadiusTiles > 0)
                 gob.addol(new Gob.Overlay(gob, new ZeeGobRadius(gob, null, ZeeConfig.aggroRadiusTiles * MCache.tilesz2.y), ZeeManagerGobClick.OVERLAY_ID_AGGRO));

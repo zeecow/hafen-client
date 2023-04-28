@@ -36,7 +36,6 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
     public Coord2d rc;
     public double a;
     public boolean virtual = false;
-	public String resName = "";
 	int clprio = 0;
     public long id;
     public boolean removed = false;
