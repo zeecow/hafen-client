@@ -804,7 +804,7 @@ public class MiniMap extends Widget {
 	    dsicon = null;
 	    dsmark = null;
 	}
-	if(dragp(button)) {
+	if(dragp(button) && dsicon==null) {
 	    Location loc = curloc;
 	    if((drag == null) && (loc != null)) {
 		drag = ui.grabmouse(this);
@@ -834,6 +834,13 @@ public class MiniMap extends Widget {
 	if((drag != null) && (button == ZeeConfig.MINIMAP_DRAG_BUTTON)) {
 	    drag.remove();
 	    drag = null;
+	}
+	if(dsicon != iconat(c)){
+		dsloc = null;
+		dsicon = null;
+		dsmark = null;
+		dragging = false;
+		return(super.mouseup(c, button));
 	}
 	release: if(!dragging && (dsloc != null)) {
 	    if((dsicon != null) && clickicon(dsicon, dsloc, button, false))
