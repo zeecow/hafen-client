@@ -201,7 +201,7 @@ public class Window extends Widget implements DTarget {
 	    resize(wsz);
 	    ca = Area.sized(tlm, csz);
 	    aa = Area.sized(ca.ul.add(mrgn), asz);
-	    cbtn.c = Coord.of(sz.x - cbtn.sz.x, (int) (cbtn.sz.y * 0.7));
+	    cbtn.c = Coord.of(sz.x - cbtn.sz.x - 5, cbtn.sz.y);
 		if (prevCaSz !=null && ca.sz().compareTo(prevCaSz) != 0){
 			prevCaSz = Coord.of(ca.sz());
 			bgImgSimpleWindow = null; // redraw bg img
@@ -253,7 +253,7 @@ public class Window extends Widget implements DTarget {
 		cmw = cmw - (cl.sz().x - cpo.x) - UI.scale(5);
 	    }
 		if (ZeeConfig.simpleWindows) {
-			g.image(cap.tex(), new Coord(tlm.x, cpo.y));//draw window title
+			g.image(cap.tex(), new Coord(tlm.x, cpo.y+4));//draw window title
 			return;
 		}
 	    if(dragsize)

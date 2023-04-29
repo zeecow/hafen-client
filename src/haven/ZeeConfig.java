@@ -1300,10 +1300,11 @@ public class ZeeConfig {
                 //add organize button
                 int pad = ZeeWindow.ZeeButton.BUTTON_SIZE;
                 //TODO uncomment
-                ((Window.DefaultDeco)window.deco).add(
+                Window.DefaultDeco deco = ((Window.DefaultDeco)window.deco);
+                deco.add(
                     new ZeeWindow.ZeeButton(pad,ZeeWindow.ZeeButton.TEXT_ORGANIZEWINDOWS,"organize duplicates"),
-                        ((Window.DefaultDeco)window.deco).cbtn.c.x - pad,
-                        ((Window.DefaultDeco)window.deco).cbtn.c.y
+                        deco.cbtn.c.x - pad,
+                        deco.cbtn.c.y
                 );
                 window.hasOrganizeButton = true;
             }
