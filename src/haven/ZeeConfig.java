@@ -1625,7 +1625,7 @@ public class ZeeConfig {
         new Thread(new Runnable() {
             public void run() {
                 try {
-                    println("initToggles");
+                    println("init toggles > "+ZeeSess.charSwitchCurPlayingChar);
 
                     // show char switch window
                     if (ZeeSess.charSwitchKeepWindow)

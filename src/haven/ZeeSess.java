@@ -17,9 +17,8 @@ public class ZeeSess {
 
     static void charSwitchAddName(String name, String username) {
 
-        // reset char list if start of session (TODO test multiclient)
+        // reset char list if start of session
         if (!username.contentEquals(charSwitchLastUser)){
-            println("charSwitchAddName > new session > "+username);
             charSwitchNamesList = new ArrayList<>();
         }
 
@@ -71,10 +70,7 @@ public class ZeeSess {
 
         // chars list
         for (String charName : charSwitchNamesList) {
-            // current char needs no button
-            if (charName.contentEquals(charSwitchCurPlayingChar))
-                continue;
-            win.add(new Button(120,charName){
+            Button btn = win.add(new Button(120,charName){
                 public void wdgmsg(String msg, Object... args) {
                     if (msg.contentEquals("activate")){
                         charSwitchNextName = charName;
@@ -84,6 +80,9 @@ public class ZeeSess {
                     }
                 }
             },0,y);
+            // disable current char btn
+            if (charName.contentEquals(charSwitchCurPlayingChar))
+                btn.disable(true);
             y += 25;
         }
 
@@ -120,5 +119,11 @@ public class ZeeSess {
 
     static void println(String s) {
         System.out.println(s);
+    }
+
+    public static void charSwitchStartPlaying(String charName) {
+        charSwitchCurPlayingChar = charName;
+        charSwitchNamesList.remove(charName);
+        charSwitchNamesList.add(0,charName);
     }
 }

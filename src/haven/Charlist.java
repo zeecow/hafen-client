@@ -252,7 +252,7 @@ public class Charlist extends Widget {
 	@Override
 	public void wdgmsg(String msg, Object... args) {
 		if (msg.contentEquals("play")){
-			ZeeSess.charSwitchCurPlayingChar = (String)args[0];
+			ZeeSess.charSwitchStartPlaying((String)args[0]);
 		}
 		super.wdgmsg(msg, args);
 	}
