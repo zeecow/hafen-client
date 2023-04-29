@@ -47,6 +47,7 @@ Client focusing on small helper tasks, many using mouse middle button, and other
 - Scroll text entry fuel for kiln, oven, smelter
 - hover menu on search actions button 
 - auto-label gob Barrel/Cistern when it's window is opened
+- option midclick icon stoat aggro 
 - (unfinished) Lag Camera (:cam lag)
 
 - midclick ground 

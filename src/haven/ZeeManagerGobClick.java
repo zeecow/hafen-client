@@ -3,8 +3,6 @@ package haven;
 
 import haven.resutil.WaterTile;
 
-import java.awt.*;
-import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -1219,6 +1217,20 @@ public class ZeeManagerGobClick extends ZeeThread{
                 }
             }
         }.start();
+    }
+
+    static void midclickMinimapGobicon(Gob gob) {
+        try {
+            if (ZeeConfig.midclickIconStoatAggro && gob.getres().name.contains("/stoat")) {
+                ZeeConfig.cursorChange(ZeeConfig.ACT_AGGRO);
+                gobClick(gob, 1);
+                if (ZeeConfig.isPlayerMountingHorse()) {
+                    ZeeConfig.setPlayerSpeed(ZeeConfig.PLAYER_SPEED_3);
+                }
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     private boolean isGobBigDeadAnimal_thread() {
