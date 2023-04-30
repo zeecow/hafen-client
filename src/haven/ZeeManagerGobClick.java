@@ -1224,6 +1224,7 @@ public class ZeeManagerGobClick extends ZeeThread{
             if (ZeeConfig.midclickIconStoatAggro && gob.getres().name.contains("/stoat")) {
                 ZeeConfig.cursorChange(ZeeConfig.ACT_AGGRO);
                 gobClick(gob, 1);
+                ZeeConfig.clickRemoveCursor();
                 if (ZeeConfig.isPlayerMountingHorse()) {
                     ZeeConfig.setPlayerSpeed(ZeeConfig.PLAYER_SPEED_3);
                 }
