@@ -17,7 +17,7 @@ public class ZeeOptionsJFrame extends JFrame {
     public GridBagConstraints c;
     public JTabbedPane tabbedPane, tabbedPaneGobs;
     public JPanel panelTabAuto, panelTabMisc, panelTabInterface, panelTabGobs, panelTabControls, panelTabMinimap, panelDetailsBottom, panelTabCateg, panelShapeIcons, panelShapeIconsSaveCancel;
-    public JCheckBox cbSimpleWindowBorder, cbSimpleWindows, cbShapeIcons, cbDebugWdgMsg, cbDebugCodeRes, cbCattleRosterHeight, cbMidclickIconStoatAggro;
+    public JCheckBox cbSimpleWindowBorder, cbSimpleWindows, cbShapeIcons, cbDebugWdgMsg, cbDebugCodeRes, cbCattleRosterHeight;
     public JTextField tfAutoHideWindows, tfConfirmPetal, tfBlockAudioMsgs, tfAutoClickMenu, tfAggroRadiusTiles, tfButchermode, tfGobName, tfGobSpeech, tfAudioPath, tfCategName, tfAudioPathCateg;
     public JComboBox<String> cmbCattleRoster, cmbGobCategory, cmbMiniTreeSize, cmbRainLimitPerc, comboShapeIcons;
     public JList<String> listGobsTemp, listGobsSaved, listGobsCategories;
@@ -209,7 +209,7 @@ public class ZeeOptionsJFrame extends JFrame {
 
         tabbedPane.addTab("Auto", panelTabAuto);
 
-        panelTabAuto.add(new ZeeOptionJCheckBox( "Midclick icon aggro stoat", "midclickIconStoatAggro"),c);
+        panelTabAuto.add(new ZeeOptionJCheckBox( "Midclick icon aggro stoat", "clickIconStoatAggro"),c);
 
         panelTabAuto.add(new ZeeOptionJCheckBox( "Auto chip mined boulder", "autoChipMinedBoulder"),c);
 

@@ -327,8 +327,8 @@ public class MapWnd extends Window implements Console.Directory {
 	public boolean clickicon(DisplayIcon icon, Location loc, int button, boolean press) {
 	    if(!press && !domark) {
 		mvclick(mv, null, loc, icon.gob, button);
-		if(button==2)
-			ZeeManagerGobClick.midclickMinimapGobicon(icon.gob);
+		if(button==2 || button==3)
+			ZeeManagerGobClick.clickedMinimapGobicon(icon.gob,button);
 		return(true);
 	    }
 	    return(false);

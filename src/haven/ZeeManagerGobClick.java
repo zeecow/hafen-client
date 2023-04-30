@@ -1219,15 +1219,16 @@ public class ZeeManagerGobClick extends ZeeThread{
         }.start();
     }
 
-    static void midclickMinimapGobicon(Gob gob) {
+    static void clickedMinimapGobicon(Gob gob, int button2or3) {
         try {
-            if (ZeeConfig.midclickIconStoatAggro && gob.getres().name.contains("/stoat")) {
+            if (ZeeConfig.clickIconStoatAggro && button2or3==3 && gob.getres().name.contains("/stoat")) {
+                if(!ZeeConfig.isPlayerMountingHorse())
+                    return;
                 ZeeConfig.cursorChange(ZeeConfig.ACT_AGGRO);
                 gobClick(gob, 1);
                 ZeeConfig.clickRemoveCursor();
-                if (ZeeConfig.isPlayerMountingHorse()) {
-                    ZeeConfig.setPlayerSpeed(ZeeConfig.PLAYER_SPEED_3);
-                }
+                ZeeConfig.setPlayerSpeed(ZeeConfig.PLAYER_SPEED_3);
+                ZeeSynth.textToSpeakLinuxFestival("get");
             }
         }catch (Exception e){
             e.printStackTrace();

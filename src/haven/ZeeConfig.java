@@ -165,7 +165,7 @@ public class ZeeConfig {
     public static int aggroRadiusTiles = Utils.getprefi("aggroRadiusTiles", 11);
     public static boolean alertOnPlayers = Utils.getprefb("alertOnPlayers", true);
     public static boolean allowMidclickAutoBuy = false;
-    public static boolean midclickIconStoatAggro = Utils.getprefb("midclickIconStoatAggro", true);
+    public static boolean clickIconStoatAggro = Utils.getprefb("clickIconStoatAggro", true);
     public static boolean autoChipMinedBoulder = Utils.getprefb("autoChipMinedBoulder", true);
     public static boolean autoClickMenuOption = Utils.getprefb("autoClickMenuOption", true);
     public static String autoClickMenuOptionList = Utils.getpref("autoClickMenuOptionList", DEF_LIST_AUTO_CLICK_MENU);
