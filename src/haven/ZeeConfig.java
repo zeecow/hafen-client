@@ -1262,6 +1262,8 @@ public class ZeeConfig {
                                 return;
                             }
                             branches.get(0).item.wdgmsg("transfer",Coord.z,-1);
+                            sleep(500);
+                            getWindow("Chest").wdgmsg("close");
                         }catch (Exception e){
                             e.printStackTrace();
                         }
