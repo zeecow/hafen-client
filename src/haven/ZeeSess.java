@@ -40,7 +40,7 @@ public class ZeeSess {
         }
         win = new ZeeWindow(Coord.of(200,300), WINTITLE);
 
-        int y = 0;
+        int y = 5;
 
         win.add(new CheckBox("keep window"){
             {a = charSwitchKeepWindow;}
@@ -51,7 +51,7 @@ public class ZeeSess {
             }
         },0,y);
 
-        y += 20;
+        y += 17;
 
         win.add(new Button(120,"Switch Screen"){
             public void wdgmsg(String msg, Object... args) {
@@ -64,19 +64,20 @@ public class ZeeSess {
 
         y += 35;
 
-        win.add(new Label("Switch to:"),0,y);
+        win.add(new Label("Play char:"),0,y);
 
         y += 15;
 
         // chars list
+        Scrollport scroll = win.add(new Scrollport(new Coord(140, 155)), 0, y);
+        y = 0;// inside scrollport
         for (String charName : charSwitchNamesList) {
-            Button btn = win.add(new Button(120,charName){
+            Button btn = scroll.cont.add(new Button(120,charName){
                 public void wdgmsg(String msg, Object... args) {
                     if (msg.contentEquals("activate")){
                         charSwitchNextName = charName;
                         ZeeConfig.gameUI.act("lo", "cs");
                         charSwitchLastMs = ZeeThread.now();
-                        //getWindow("Switch char").reqdestroy();
                     }
                 }
             },0,y);
@@ -86,6 +87,8 @@ public class ZeeSess {
             y += 25;
         }
 
+        scroll.cont.pack();
+        //scroll.pack();
         win.pack();
         ZeeConfig.gameUI.add(win, ZeeConfig.gameUI.sz.div(2).sub(win.sz.div(2)));
         ZeeConfig.gameUI.opts.wdgmsg("close");
