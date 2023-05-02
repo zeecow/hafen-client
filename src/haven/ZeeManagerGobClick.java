@@ -588,12 +588,12 @@ public class ZeeManagerGobClick extends ZeeThread{
                         sleep(555);
                         String barrelName = ZeeConfig.getBarrelOverlayBasename(gob);
                         if (!barrelName.isEmpty())
-                            ZeeConfig.addGobTextTemp(gob, barrelName);
+                            ZeeConfig.addGobText(gob, barrelName);
                         Gob carryingBarrel = ZeeConfig.isPlayerLiftingGob("/barrel");
                         if (carryingBarrel!=null) {
                             barrelName = ZeeConfig.getBarrelOverlayBasename(carryingBarrel);
                             if (!barrelName.isEmpty())
-                                ZeeConfig.addGobTextTemp(carryingBarrel, barrelName);
+                                ZeeConfig.addGobText(carryingBarrel, barrelName);
                         }
                     } catch (Exception e) {
                         e.printStackTrace();

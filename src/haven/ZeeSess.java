@@ -87,8 +87,6 @@ public class ZeeSess {
             y += 25;
         }
 
-        scroll.cont.pack();
-        //scroll.pack();
         win.pack();
         ZeeConfig.gameUI.add(win, ZeeConfig.gameUI.sz.div(2).sub(win.sz.div(2)));
         ZeeConfig.gameUI.opts.wdgmsg("close");
