@@ -998,6 +998,9 @@ public class ZeeConfig {
         if(windowTitle.contentEquals("Boil Pepper Drupes")){
             ZeeManagerCook.pepperRecipeOpened(window);
         }
+        else if (windowTitle.contentEquals("Bug Collection")){
+            ZeeManagerItemClick.bugColRecipeOpened(window);
+        }
 
         if (gameUI!=null && !gameUI.sz.equals(0,0) && !isBuildWindow(window)){
             windowApplySavedPosition(window, windowTitle);
@@ -1145,7 +1148,7 @@ public class ZeeConfig {
             //get all fuel items
             List<WItem> items = getMainInventory().getWItemsByNameContains(fuelName);
             //ignore stack placeholder
-            items.removeIf(wItem -> ZeeManagerItemClick.isStackItemPlaceholder(wItem.item));
+            items.removeIf(wItem -> ZeeManagerItemClick.isStackPagina(wItem.item));
             //add items
             //TODO get items from stack
             ZeeManagerGobClick.addItemsToGob(items,num,g);

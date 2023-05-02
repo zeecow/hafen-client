@@ -112,7 +112,7 @@ public class ZeeManagerCook extends ZeeThread{
 
         if (clickb==3 && gobName.contains("cauldron")){
             gobCauldron = gob;
-        } else if (clickb==3 && ZeeManagerGobClick.isGobCookContainer(gobName)){
+        } else if (clickb==3 && ZeeManagerGobClick.isGobCraftingContainer(gobName)){
             //double distCauldron = ZeeConfig.distanceToPlayer(gobCauldron);
             //println("dist cauldron " + distCauldron);
             //if (distCauldron < 7) // 6.9812401343731

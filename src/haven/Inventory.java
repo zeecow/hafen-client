@@ -232,7 +232,7 @@ public class Inventory extends Widget implements DTarget {
 				gItem = ((WItem) wdg).item;
 				String wdgname = gItem.res.get().name;
 				if (wdgname.contains(nameContains)) {
-					if (ZeeManagerItemClick.isStackItemPlaceholder(gItem))
+					if (ZeeManagerItemClick.isStackPagina(gItem))
 						count += ZeeManagerItemClick.getItemInfoAmount(gItem.info());
 					else
 						count++;

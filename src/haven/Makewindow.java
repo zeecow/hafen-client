@@ -154,6 +154,7 @@ public class Makewindow extends Widget {
 
 	int inputCount = 0;
 	public void wdgmsg(Widget sender, String msg, Object... args) {
+
 		if(msg.contentEquals("mkWindowFindInputs")){
     		String nextInputName = ZeeManagerItemClick.getItemInfoName(inputs.get(inputCount).spec.info());
 			ZeeConfig.searchNextInputMakeWnd(nextInputName);
@@ -161,15 +162,23 @@ public class Makewindow extends Widget {
 			if(inputCount >= inputs.size())
 				inputCount = 0;
 			ZeeConfig.btnMkWndSearchInput.change("Search "+(inputCount+1)+"/"+inputs.size());
-		} else if(msg.contentEquals("close")) {
+		}
+		else if(msg.contentEquals("close")) {
 			if (ZeeManagerCook.pepperRecipeOpen) {
 				ZeeManagerCook.pepperRecipeOpen = false;
 				ZeeManagerCook.exitManager("craft window closed");
 			}
+			if(ZeeManagerItemClick.bugColRecipeOpen) {
+				ZeeManagerItemClick.bugColWindowClosed();
+			}
 			super.wdgmsg(sender, msg, args);
-		} else {
-			if (msg.contentEquals("make") && String.valueOf(args[0]).contentEquals("0"))
+		}
+		else {
+			if (msg.contentEquals("make") && String.valueOf(args[0]).contentEquals("0")) {
+				// 0 = craft ,  1 = craft all
 				ZeeResearch.checkResearch(this.rcpnm);
+				ZeeManagerItemClick.bugColCraftBtnClicked(this.rcpnm);
+			}
 			super.wdgmsg(sender, msg, args);
 		}
 	}

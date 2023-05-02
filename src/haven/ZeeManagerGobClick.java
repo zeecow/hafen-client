@@ -629,6 +629,11 @@ public class ZeeManagerGobClick extends ZeeThread{
 
     public static void checkRightClickGob(Coord pc, Coord2d mc, Gob gob, String gobName) {
 
+        // bugCollectionAuto label bug containers and wood pile
+        if (ZeeManagerItemClick.bugColRecipeOpen){
+            ZeeManagerItemClick.bugColGobClicked(gob);
+        }
+
         // label harvested plant ql
         if (gobName.endsWith("plants/wine") || gobName.endsWith("plants/hops") || gobName.endsWith("plants/pepper"))
         {
@@ -715,7 +720,6 @@ public class ZeeManagerGobClick extends ZeeThread{
                 }
             }.start();
         }
-        //
         // gob requires unmounting horse/kicksled
         else if (isGobRequireDisembarkVehicle(gobName) && !ZeeConfig.isPlayerLiftingGob(gob)){
             // unmount horse
@@ -1999,7 +2003,7 @@ public class ZeeManagerGobClick extends ZeeThread{
         );
     }
 
-    public static boolean isGobCookContainer(String gobName) {
+    public static boolean isGobCraftingContainer(String gobName) {
         String containers ="cupboard,chest,crate,basket,box,coffer,cabinet";
         return isGobInListEndsWith(gobName,containers);
     }
