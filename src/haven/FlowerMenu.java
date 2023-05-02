@@ -84,6 +84,7 @@ public class FlowerMenu extends Widget {
 	    choose(this);
 		ZeeManagerStockpile.checkClickedPetal(this.name);
 		ZeeQuickOptionsWindow.updatePetalWidget(this.name);
+		ZeeManagerGobClick.labelHarvestedPlant(this.name);
 	    return(true);
 	}
 
@@ -294,6 +295,7 @@ public class FlowerMenu extends Widget {
 	public void tick(double dt) {
 		if(autochoose!=null){
 			choose(autochoose);
+			ZeeManagerGobClick.labelHarvestedPlant(autochoose.name);
 			autochoose = null;
 		}
 		super.tick(dt);

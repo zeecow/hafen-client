@@ -1193,14 +1193,14 @@ public class ZeeManagerItemClick extends ZeeThread{
         return null;
     }
 
-    public static boolean isItemInHandSlot(String name){
+    public static boolean isItemInHandSlot(String nameContains){
         try {
             /*
             Equipory eq = ZeeConfig.windowEquipment.getchild(Equipory.class);
             return eq.leftHand.item.getres().name.contains(name)
                     || eq.rightHand.item.getres().name.contains(name);
              */
-            return getLeftHandName().contains(name) || getRightHandName().contains(name);
+            return getLeftHandName().contains(nameContains) || getRightHandName().contains(nameContains);
         }catch (Exception e){
             return false;
         }

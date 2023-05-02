@@ -157,7 +157,8 @@ public class ZeeConfig {
     public static int lastSavedOverlayModflags;
     public static long lastSavedOverlayMs;
     public static MCache.Overlay lastSavedOverlay;
-    public static String lastInvItemBaseName;
+    public static GItem lastInvItem;
+    public static String lastInvItemBaseName, lastInvItemName;
     public static long lastInvItemMs;
     public static Coord lastUiClickCoord;
     public static Class<?> classMSRad;

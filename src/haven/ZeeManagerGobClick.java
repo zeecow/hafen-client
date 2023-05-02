@@ -576,7 +576,71 @@ public class ZeeManagerGobClick extends ZeeThread{
     }
 
 
+    static boolean clickedPlantGobForLabelingQl = false;
+    static void labelHarvestedPlant(String clickedPetal){
+
+        if ( !clickedPlantGobForLabelingQl || !clickedPetal.contentEquals("Harvest"))
+            return;
+
+        if(ZeeConfig.getMainInventory().getNumberOfFreeSlots() == 0){
+            println("labelHarvestedPlant > inv full");
+            return;
+        }
+
+        if( ZeeConfig.lastInvItemMs > ZeeConfig.lastMapViewClickMs &&
+            !ZeeConfig.lastInvItemName.endsWith("plants/wine") &&
+            !ZeeConfig.lastInvItemName.endsWith("plants/hops") &&
+            !ZeeConfig.lastInvItemName.endsWith("plants/pepper"))
+        {
+            println("labelHarvestedPlant > invalid lastInvItem name ("+ZeeConfig.lastInvItemName+")");
+            return;
+        }
+
+        new Thread(){
+            public void run() {
+                try{
+                    //wait inventory harvested item
+                    long t1 = ZeeThread.now();
+                    long timeout = 1000;//1sec
+                    while(timeout > 0 && ZeeConfig.lastInvItemMs < t1){
+                        sleep(100);
+                        timeout -= 100;
+                    }
+                    //inv item received
+                    if (timeout > 0){
+                        if (ZeeManagerItemClick.isItemEquipped("/scythe")){
+                            println("labelHarvestedPlant > cancel labeling due to scythe equipped");
+                            clickedPlantGobForLabelingQl = false;
+                            return;
+                        }
+                        Inventory inv = ZeeConfig.getMainInventory();
+                        ZeeConfig.addGobText(
+                            ZeeConfig.lastMapViewClickGob,
+                            Inventory.getQualityInt(ZeeConfig.lastInvItem).toString()
+                        );
+                    }
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+            }
+        }.start();
+
+    }
+
     public static void checkRightClickGob(Coord pc, Coord2d mc, Gob gob, String gobName) {
+
+        // label harvested plant ql
+        if (gobName.endsWith("plants/wine") || gobName.endsWith("plants/hops") || gobName.endsWith("plants/pepper"))
+        {
+            //WItem scythe = ZeeManagerItemClick.getBeltWItem("/scythe");
+            if (ZeeManagerItemClick.isItemInHandSlot("/scythe")){
+                println("not labeling single plant due to scythe equipped");
+                clickedPlantGobForLabelingQl = false;
+            }
+            else {
+                clickedPlantGobForLabelingQl = true;
+            }
+        }
 
         // click barrel transfer
         if (gobName.endsWith("/barrel") && ZeeConfig.getPlayerPoses().contains(ZeeConfig.POSE_PLAYER_LIFT)) {

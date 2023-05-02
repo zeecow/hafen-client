@@ -46,8 +46,7 @@ public class GItem extends AWidget implements ItemInfo.SpriteOwner, GSprite.Owne
     private GSprite spr;
     private ItemInfo.Raw rawinfo;
     private List<ItemInfo> info = Collections.emptyList();
-	private boolean itemDropped = false;
-	private boolean itemCounted = false;
+	private boolean itemChecked = false;
 
     @RName("item")
     public static class $_ implements Factory {
@@ -150,16 +149,9 @@ public class GItem extends AWidget implements ItemInfo.SpriteOwner, GSprite.Owne
 	if(spr == null) {
 	    try {
 			spr = this.spr = GSprite.create(this, res.get(), sdt.clone());
-			if (!itemDropped) {
-				itemDropped = true;
-				onSpriteCreated();
-			}
-			if(!itemCounted){
-				itemCounted = true;
-				Inventory inv = this.getparent(Inventory.class);
-				if(inv!=null && inv.isMainInv()) {
-					ZeeConfig.invCounterUpdate(this);
-				}
+			if (!itemChecked) {
+				itemChecked = true;
+				checkItem();
 			}
 	    } catch(Loading l) {
 	    }
@@ -171,11 +163,17 @@ public class GItem extends AWidget implements ItemInfo.SpriteOwner, GSprite.Owne
 	/*
 		check item for dropping and other actions
 	 */
-	private void onSpriteCreated() {
+	private void checkItem() {
 
-		String basename = this.resource().basename();
-		ZeeConfig.lastInvItemBaseName = basename;
-		ZeeConfig.lastInvItemMs = ZeeThread.now();
+		String basename = getres().basename();
+		Inventory inv = this.getparent(Inventory.class);
+		if(inv!=null && inv.isMainInv()) {
+			ZeeConfig.lastInvItem = this;
+			ZeeConfig.lastInvItemName = getres().name;
+			ZeeConfig.lastInvItemBaseName = basename;
+			ZeeConfig.lastInvItemMs = ZeeThread.now();
+			ZeeConfig.invCounterUpdate(this);
+		}
 
 		//drop mined items
 		if (ZeeConfig.isPlayerCursorMining) {
@@ -216,14 +214,14 @@ public class GItem extends AWidget implements ItemInfo.SpriteOwner, GSprite.Owne
 		}
 		//drop seeds
 		else if( ZeeConfig.dropSeeds && basename.startsWith("seed-") && this.parent instanceof Inventory){
-			Inventory inv = (Inventory) this.parent;
+			//Inventory inv = (Inventory) this.parent;
 			if(inv.getNumberOfFreeSlots() < 3){
 				inv.dropItemsByNameEndsWith(basename);
 			}
 		}
 		//drop soil
 		else if( ZeeConfig.dropSoil && basename.startsWith("soil") && this.parent instanceof Inventory) {
-			Inventory inv = (Inventory) this.parent;
+			//Inventory inv = (Inventory) this.parent;
 			inv.dropItemsByNameEndsWith(basename);
 		}
 		// drop everglowing ember if piling coal
