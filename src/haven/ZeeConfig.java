@@ -1148,7 +1148,7 @@ public class ZeeConfig {
             //get all fuel items
             List<WItem> items = getMainInventory().getWItemsByNameContains(fuelName);
             //ignore stack placeholder
-            items.removeIf(wItem -> ZeeManagerItemClick.isStackPagina(wItem.item));
+            items.removeIf(wItem -> ZeeManagerItemClick.isStackPagina(wItem.item)==1);
             //add items
             //TODO get items from stack
             ZeeManagerGobClick.addItemsToGob(items,num,g);

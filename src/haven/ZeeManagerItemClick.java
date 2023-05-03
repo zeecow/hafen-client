@@ -134,7 +134,7 @@ public class ZeeManagerItemClick extends ZeeThread{
                             do {
                                 sleep(PING_MS);
                                 try {
-                                    bugsFound.removeIf(wItem1 -> isStackPagina(wItem1.item));
+                                    bugsFound.removeIf(wItem1 -> isStackPagina(wItem1.item)==1);
                                 } catch (Loading loading) {
                                     waitSprite = true;
                                     continue;
@@ -254,7 +254,7 @@ public class ZeeManagerItemClick extends ZeeThread{
 
 
             // undo stack if no transfer available
-            if( isStackPagina(wItem.item)  &&  !isStackTransferable(wItem.item)){
+            if( isStackPagina(wItem.item)==1  &&  !isStackTransferable(wItem.item)){
                 //undo one stack
                 if (!isLongClick()){
                     undoStack(wItem.item);
@@ -1611,11 +1611,15 @@ public class ZeeManagerItemClick extends ZeeThread{
         return ZeeManagerItemClick.isItemEquipped("gfx/invobjs/small/coracle");
     }
 
-    public static boolean isStackPagina(GItem i) throws Loading {
-        return getItemInfoByClassSimpleName(
-            i.info(),
-            "KeyPagina"
-        ) != null;
+    public static int isStackPagina(GItem i) throws Loading {
+        try {
+            if (getItemInfoByClassSimpleName(i.info(),"KeyPagina") != null)
+                return 1;// stack it is
+            else
+                return -1;// not a stack
+        }catch (Exception e){
+        }
+        return 0;//not sure
     }
 
     public static void undoStack(GItem i) {
@@ -1633,7 +1637,7 @@ public class ZeeManagerItemClick extends ZeeThread{
                     Inventory inv = item.getparent(Inventory.class);
                     List<WItem> invItems = inv.getWItemsByNameEndsWith(item.getres().name);
                     for (WItem wItem : invItems) {
-                        if (isStackPagina(wItem.item))
+                        if (isStackPagina(wItem.item)==1)
                             continue;
                         undoStack(wItem.item);
                         sleep(PING_MS);
