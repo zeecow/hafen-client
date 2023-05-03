@@ -699,7 +699,45 @@ public class ZeeManagerItemClick extends ZeeThread{
     }
 
 
+    private static void autoButchFish(WItem wItem, boolean butchAll) {
+        new Thread(){
+            public void run() {
+                try{
+
+                    if (!butchAll){
+                        clickItemPetal(wItem,"Butcher");
+                        return;
+                    }
+
+                    ZeeConfig.addPlayerText("autobutch");
+                    Inventory inv = wItem.getparent(Inventory.class);
+                    List<WItem> allFish = inv.getWItemsByNameContains("gfx/invobjs/fish-");
+                    for (WItem fish : allFish) {
+                        clickItemPetal(fish,"Butcher");
+                        sleep(PING_MS*2);
+                        if (inv.getNumberOfFreeSlots() == 0) {
+                            break;
+                        }
+                    }
+
+                    //remaining item?
+                    allFish = inv.getWItemsByNameContains("gfx/invobjs/fish-");
+                    if (allFish.size()>0 && inv.getNumberOfFreeSlots()>0)
+                        clickItemPetal(allFish.get(0),"Butcher");
+
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+                ZeeConfig.removePlayerText();
+            }
+        }.start();
+    }
+
     private static void autoButch(WItem wItem, boolean butchAll) {
+        if (ZeeConfig.isFish(wItem.item.getres().name)){
+            autoButchFish(wItem,butchAll);
+            return;
+        }
         new ZeeThread() {
             public void run() {
                 boolean bmBackup = ZeeConfig.butcherMode;
@@ -743,23 +781,25 @@ public class ZeeManagerItemClick extends ZeeThread{
                                 sleep(PING_MS);
                             }
 
-                            //get next dead animal for butching
+                            //get next dead/live animal for butching
                             List<WItem> items;
-                            if (ZeeConfig.isFish(firstItemName))
-                                items = inv.getWItemsByNameContains("/fish-"); //consider all fish the same
+                            if (firstItemName.contains("/rabbit-"))
+                                items = inv.getWItemsByNameContains("gfx/invobjs/rabbit-");
+                            else if (firstItemName.endsWith("/hen") || firstItemName.endsWith("/rooster"))
+                                items = inv.getItemsByNameOrNamesEndsWith("/hen","/rooster");
                             else
                                 items = inv.getWItemsByNameContains(firstItemName);
 
                             if (items.size() == 0){
                                 //no more items to butch
-                                //println("no more items");
+                                println("no more items");
                                 break;
                             }else{
-                                //update next dead animal vars
+                                //update next dead/live animal vars
                                 item = items.get(0);
                                 itemName = getWItemName(item);
                                 itemSlotCoord = getWItemCoord(item);
-                                //println("next item > "+itemName);
+                                println("next item > "+itemName);
                             }
                         }
                     }
