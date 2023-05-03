@@ -134,7 +134,7 @@ public class ZeeManagerItemClick extends ZeeThread{
                             do {
                                 sleep(PING_MS);
                                 try {
-                                    bugsFound.removeIf(wItem1 -> isStackPagina(wItem1.item)==1);
+                                    bugsFound.removeIf(wItem1 -> isStackPagina(wItem1.item));
                                 } catch (Loading loading) {
                                     waitSprite = true;
                                     continue;
@@ -254,7 +254,7 @@ public class ZeeManagerItemClick extends ZeeThread{
 
 
             // undo stack if no transfer available
-            if( isStackPagina(wItem.item)==1  &&  !isStackTransferable(wItem.item)){
+            if( isStackPagina(wItem.item)  &&  !isStackTransferable(wItem.item)){
                 //undo one stack
                 if (!isLongClick()){
                     undoStack(wItem.item);
@@ -884,14 +884,25 @@ public class ZeeManagerItemClick extends ZeeThread{
                 menu = new ZeeFlowerMenu(wItem, opts.toArray(String[]::new));
         }
         else if (ZeeConfig.isButchableSmallAnimal(itemName)) {
+
             opts.add(ZeeFlowerMenu.STRPETAL_AUTO_BUTCH);
-            if (inv.countItemsByNameContains(itemName) > 1){
+
+            int items;
+            if (itemName.endsWith("/hen") || itemName.endsWith("/rooster"))
+                items = inv.getItemsByNameOrNamesEndsWith("/hen","/rooster").size();
+            else if ((itemName.endsWith("/rabbit-buck") || itemName.endsWith("/rabbit-doe")))
+                items = inv.getItemsByNameOrNamesEndsWith("/rabbit-buck","/rabbit-doe").size();
+            else
+                items = inv.countItemsByNameContains(itemName);
+
+            if (items > 1){
                 opts.add(ZeeFlowerMenu.STRPETAL_AUTO_BUTCH_ALL);
             }
             if (isTransferWindowOpened()) {
                 opts.add(ZeeFlowerMenu.STRPETAL_TRANSFER_ASC);
                 opts.add(ZeeFlowerMenu.STRPETAL_TRANSFER_DESC);
             }
+
             menu = new ZeeFlowerMenu(wItem, opts.toArray(String[]::new));
         }
         else if(itemName.endsWith("silkcocoon") || itemName.endsWith("chrysalis")){
@@ -1511,7 +1522,7 @@ public class ZeeManagerItemClick extends ZeeThread{
                 }
             }
         }catch (Exception e){
-            e.printStackTrace();
+            println(e.getMessage());
         }
         return 0;
     }
@@ -1651,15 +1662,16 @@ public class ZeeManagerItemClick extends ZeeThread{
         return ZeeManagerItemClick.isItemEquipped("gfx/invobjs/small/coracle");
     }
 
-    public static int isStackPagina(GItem i) throws Loading {
+    public static boolean isStackPagina(GItem i) throws Loading {
         try {
-            if (getItemInfoByClassSimpleName(i.info(),"KeyPagina") != null)
-                return 1;// stack it is
-            else
-                return -1;// not a stack
+            if (i.getres().basename().startsWith("seed-"))
+                return false;
+            if (getItemInfoAmount(i.info()) > 0)
+                return true;
         }catch (Exception e){
+            e.getMessage();
         }
-        return 0;//not sure
+        return false;
     }
 
     public static void undoStack(GItem i) {
@@ -1677,7 +1689,7 @@ public class ZeeManagerItemClick extends ZeeThread{
                     Inventory inv = item.getparent(Inventory.class);
                     List<WItem> invItems = inv.getWItemsByNameEndsWith(item.getres().name);
                     for (WItem wItem : invItems) {
-                        if (isStackPagina(wItem.item)==1)
+                        if (!isStackPagina(wItem.item))
                             continue;
                         undoStack(wItem.item);
                         sleep(PING_MS);
