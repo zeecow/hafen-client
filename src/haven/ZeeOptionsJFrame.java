@@ -274,6 +274,24 @@ public class ZeeOptionsJFrame extends JFrame {
 
         tabbedPane.addTab("Misc", panelTabMisc);
 
+        //buttons table food, alchemy
+        JPanel jpTables = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        JButton b;
+        panelTabMisc.add(jpTables,c);
+        jpTables.add(b = new JButton("Table Food"));
+        b.addMouseListener(new MouseAdapter() {
+            public void mouseReleased(MouseEvent e) {
+                ZeeJTable.getTableFood();
+            }
+        });
+        jpTables.add(b = new JButton("Table Swill"));
+        b.addMouseListener(new MouseAdapter() {
+            public void mouseReleased(MouseEvent e) {
+                ZeeJTable.getTableSwill();
+            }
+        });
+
+
         panelTabMisc.add(new ZeeOptionJCheckBox( "Fish Moon Xp alert", "fishMoonXpAlert"),c);
 
         panelTabMisc.add(new ZeeOptionJCheckBox( "Hide crops (ctrl+h)", "hideCrops"),c);
@@ -392,22 +410,6 @@ public class ZeeOptionsJFrame extends JFrame {
             Utils.setprefb("debugCodeRes",val);
         });
 
-        //buttons table food, alchemy
-        JPanel jpTables = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        JButton b;
-        panelTabMisc.add(jpTables);
-        jpTables.add(b = new JButton("Table Food"));
-        b.addMouseListener(new MouseAdapter() {
-            public void mouseReleased(MouseEvent e) {
-                ZeeJTable.getTableFood();
-            }
-        });
-        jpTables.add(b = new JButton("Table Swill"));
-        b.addMouseListener(new MouseAdapter() {
-            public void mouseReleased(MouseEvent e) {
-                ZeeJTable.getTableSwill();
-            }
-        });
     }
 
 

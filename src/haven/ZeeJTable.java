@@ -151,6 +151,28 @@ public class ZeeJTable extends JFrame {
                     }
                 }
             }
+            // round feps, format
+            int totalFep = 0;
+            for (int j = 0; j < arrFeps.length; j++) {
+                // extract "9.9" from "INT+2 9.9"
+                fepJ = arrFeps[j].replaceAll("[\\^\\S]+\\s", "");
+                int round = (int) Math.rint(Double.parseDouble(fepJ));
+                totalFep += round;
+                // "INT+2 9.9" to "INT2 = 10"
+                arrFeps[j] = arrFeps[j]
+                    .replaceAll("[\\^\\S]+$","" + (round == 0 ? fepJ : round))
+                    .replaceAll("\\s"," = ")
+                ;
+            }
+            //add each fep percentage
+            for (int j = 0; j < arrFeps.length; j++) {
+                // extract "10" from "INT2 = 10"
+                fepJ = arrFeps[j].replaceAll("[\\^\\S]+\\s", "");
+                // from "INT2 = 10" to "INT2 = 10 (5%)"
+                double perc = (Double.parseDouble(fepJ) / totalFep) * 100;
+                //println( perc+" = "+ Math.rint(Double.parseDouble(fepJ)) +" / "+totalFep +"  * 100");
+                arrFeps[j] += " ("+String.format("%.0f", perc)+"%)";
+            }
             //println("after = "+ Arrays.toString(arrFeps));
             arrLineRow[arrLineRow.length-1] = String.join(",",arrFeps).trim().replaceAll(",",", ");
             lineRow = String.join(";",arrLineRow);
@@ -161,10 +183,12 @@ public class ZeeJTable extends JFrame {
             tableModel.addRow(lineRow.split(";"));
         }
 
-        // build table
+
+        // build jtable
         JTable table = new JTable(tableModel);
         table.setFont(new Font("Serif", Font.PLAIN, 11));
-        // table filter
+
+        // add jtable filter
         tableRowSorter = new TableRowSorter<DefaultTableModel>(tableModel);
         table.setRowSorter(tableRowSorter);
         tfFilter = new JTextField();
