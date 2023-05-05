@@ -956,7 +956,10 @@ public class ZeeConfig {
 
         String windowTitle = window.cap.strip();
 
-        if(windowTitle.contentEquals("Barrel") || windowTitle.contentEquals("Cistern")) {
+        if (windowTitle.contentEquals("Cattle Roster")) {
+            windowModCattleRoster(window);
+        }
+        else if(windowTitle.contentEquals("Barrel") || windowTitle.contentEquals("Cistern")) {
             ZeeManagerGobClick.labelGobBarrelCistern(window);
         }
         else if(windowTitle.contentEquals("Equipment")) {
@@ -1011,6 +1014,87 @@ public class ZeeConfig {
         //order of call is important due to window.hasOrganizeButton
         windowModOrganizeButton(window, windowTitle);
         windowModAutoHideButton(window,windowTitle);
+    }
+
+    private static void windowModCattleRoster(Window window) {
+
+        //Cattle Roster, called for each animal type
+        if(cattleRosterHeight  && cattleRosterHeightPercentage < 1.0){
+
+            new ZeeThread() {
+                public void run() {
+
+                    // wait remote widgets
+                    try{
+                        Field f = window.getClass().getDeclaredField("rmseq");
+                        int rmseq = (int) f.get(window);
+                        int lastRmSeq = rmseq;
+                        long lastRmSeqMs = now();
+                        //wait rmseq stop for 1sec
+                        do{
+                            sleep(PING_MS);
+                            rmseq = (int) f.get(window);
+                            if (rmseq != lastRmSeq) {
+                                lastRmSeq = rmseq;
+                                lastRmSeqMs = now();
+                            }
+                        }while(now() - lastRmSeqMs < PING_MS);
+                    }catch(Exception e){
+                        e.printStackTrace();
+                    }
+
+                    int headerHeight = UI.scale(40);
+
+                    //reize CattleRosters (HorseRoster, PigHorser, ...)
+                    window.children().forEach(roster -> {
+
+                        // RosterWindow > HorseRoster(CattleRoster)
+                        if (roster.getClass().getSimpleName().endsWith("Roster")) {
+                            try {
+
+                                // roster resize
+                                roster.resize(roster.sz.x, (int)(roster.sz.y * cattleRosterHeightPercentage));
+
+                                // buttons reposition
+                                final int[] btnHeight = new int[1];
+                                roster.children(Button.class).forEach(button -> {
+                                    btnHeight[0] = button.sz.y;
+                                    button.c.y = (int) ((button.c.y * cattleRosterHeightPercentage) - (button.sz.y*0.6));
+                                });
+
+                                //entrycont resize
+                                Field f = roster.getClass().getSuperclass().getDeclaredField("entrycont");
+                                Widget entrycont = (Widget) f.get(roster);
+                                entrycont.resize(entrycont.sz.x, (int)(entrycont.sz.y * cattleRosterHeightPercentage)  - (btnHeight[0]*2));
+
+                                //scrollbar resize
+                                f = roster.getClass().getSuperclass().getDeclaredField("sb");
+                                Scrollbar sb = (Scrollbar) f.get(roster);
+                                sb.max = (int) (sb.max * cattleRosterHeightPercentage) + btnHeight[0] ;
+                                sb.resize((int) (sb.sz.y * cattleRosterHeightPercentage) + btnHeight[0]);
+
+                                // flag dirty
+                                f = roster.getClass().getSuperclass().getDeclaredField("dirty");
+                                f.setAccessible(true);
+                                f.setBoolean(roster,true);
+
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    });
+
+                    // animal type buttons reposition
+                    window.children(IButton.class).forEach(button -> {
+                        button.c.y = (int) (button.c.y * cattleRosterHeightPercentage);
+                    });
+
+                    window.resize(window.sz.x, (int)(window.sz.y * cattleRosterHeightPercentage));
+                    window.pack();
+                }
+            }.start();
+
+        }
     }
 
     private static void windowModAutoHideButton(Window window, String windowTitle) {
@@ -1160,19 +1244,29 @@ public class ZeeConfig {
 
 
     public static void checkRemoteWidget(String type, Widget wdg) {
-        //Cattle Roster
-        if(cattleRosterHeight && type.contains("rosters/") && cattleRosterHeightPercentage < 1.0){
-            wdg.resize(wdg.sz.x, (int)(wdg.sz.y * cattleRosterHeightPercentage));//resize "window"
-            int y = -1;
-            for (Widget w: wdg.children()) { //reposition buttons
-                if(w.getClass().getSimpleName().contentEquals("Button")){
-                    if(y==-1) { //calculate once
-                        y = (int) (w.c.y * cattleRosterHeightPercentage) - (int)(w.sz.y*0.6);
-                    }
-                    w.c.y = y;
-                }
-            }
-        }
+        //Cattle Roster, called for each animal type
+//        if(cattleRosterHeight && type.contains("rosters/") && cattleRosterHeightPercentage < 1.0){
+//
+//            //resize "window"
+//            wdg.resize(wdg.sz.x, (int)(wdg.sz.y * cattleRosterHeightPercentage));
+//
+//            int y = -1;
+//            for (Widget w: wdg.children()) {
+//                //reposition buttons
+//                if(w.getClass().getSimpleName().contentEquals("Button")){
+//                    if(y==-1) { //calculate once
+//                        y = (int) (w.c.y * cattleRosterHeightPercentage) - (int)(w.sz.y*0.6);
+//                    }
+//                    w.c.y = y;
+//                }
+//                //resize scrollbar and entrycont
+//                else if(w instanceof Scrollbar){
+//                    Scrollbar sb = (Scrollbar) w;
+//                    sb.resize(sb.sz.x, (int)(sb.sz.y * cattleRosterHeightPercentage));
+//                    println(type+" > scrollbar > val="+sb.val+" max="+sb.max);
+//                }
+//            }
+//        }
     }
 
 

@@ -257,6 +257,7 @@ public class ZeeManagerGobClick extends ZeeThread{
                 else{
                     // start tiles monitor
                     String tileName = ZeeConfig.getTileResName(coordMc);
+                    // "wildcavern" "shadehollow" "warmdepth" "lushcave" "gleamgrotto"
                     if ( (tileName.contentEquals("gfx/tiles/mine") && !ZeeConfig.isPlayerInCellar())
                          || tileName.contains("/rocks/") ) {
                         ZeeManagerMiner.tileMonitorWindow();

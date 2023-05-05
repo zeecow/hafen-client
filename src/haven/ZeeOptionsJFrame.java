@@ -492,7 +492,7 @@ public class ZeeOptionsJFrame extends JFrame {
             Utils.setprefb("cattleRosterHeight",val);
             cmbCattleRoster.setEnabled(val);
         });
-        String[] perc = {"30%","40%","50%","60%","70%","80%","90%","100%"};
+        String[] perc = {"20%","30%","40%","50%","60%","70%","80%","90%","100%"};
         panelTabInterface.add(cmbCattleRoster = new JComboBox<String>(perc), c);
         cmbCattleRoster.setMaximumSize(new Dimension(Integer.MAX_VALUE, cmbCattleRoster.getPreferredSize().height));
         cmbCattleRoster.setSelectedItem(((int)(ZeeConfig.cattleRosterHeightPercentage*100))+"%");
