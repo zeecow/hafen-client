@@ -520,8 +520,9 @@ public class ZeeConfig {
             gfx/invobjs/chicken-cleaned, gfx/invobjs/adder-clean
             gfx/invobjs/meat
          */
-        // skip cases ("/squirrelhide", "squirreltail")
-        if (nameContains.endsWith("hide") || nameContains.endsWith("squirreltail"))
+        // skip cases ("/squirrelhide", "squirrelhide-blood", "squirreltail")
+        if (nameContains.endsWith("hide") || nameContains.endsWith("-blood")
+            || nameContains.endsWith("squirreltail"))
             return false;
         String[] endlist = {
             "rockdove","quail","/hen","/rooster","magpie", // "/crab"

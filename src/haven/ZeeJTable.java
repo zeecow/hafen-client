@@ -171,7 +171,8 @@ public class ZeeJTable extends JFrame {
                 // from "INT2 = 10" to "INT2 = 10 (5%)"
                 double perc = (Double.parseDouble(fepJ) / totalFep) * 100;
                 //println( perc+" = "+ Math.rint(Double.parseDouble(fepJ)) +" / "+totalFep +"  * 100");
-                arrFeps[j] += " ("+String.format("%.0f", perc)+"%)";
+                if (perc < 100)
+                    arrFeps[j] += " ("+String.format("%.0f", perc)+"%)";
             }
             //println("after = "+ Arrays.toString(arrFeps));
             arrLineRow[arrLineRow.length-1] = String.join(",",arrFeps).trim().replaceAll(",",", ");
