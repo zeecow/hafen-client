@@ -3548,4 +3548,8 @@ public class ZeeConfig {
             e.printStackTrace();
         }
     }
+
+    static boolean isCaveTile(String tileName) {
+        return List.of("gfx/tiles/wildcavern","gfx/tiles/shadehollow", "gfx/tiles/warmdepth", "gfx/tiles/lushcave", "gfx/tiles/gleamgrotto", "gfx/tiles/mine").contains(tileName);
+    }
 }
