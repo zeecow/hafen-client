@@ -49,6 +49,7 @@ public class ZeeManagerFarmer extends ZeeThread{
     public static void resetInitialState() {
         println("seedFarmer exit > resetInitialState");
         try {
+            ZeeConfig.farmerMode = false;
             busy = false;
             isHarvestDone = true;
             isPlantingDone = true;
@@ -62,7 +63,6 @@ public class ZeeManagerFarmer extends ZeeThread{
             ZeeManagerStockpile.selAreaPile = false;
 
             //TODO test emptying seed barrels queue? (mapQlBarrel)
-
             ZeeConfig.removePlayerText();
         }catch (Exception e){
             e.printStackTrace();
@@ -665,10 +665,12 @@ public class ZeeManagerFarmer extends ZeeThread{
                 @Override
                 public void wdgmsg(String msg, Object... args) {
                     if (msg=="close"){
-                        ZeeConfig.farmerMode = false;
+                        //ZeeConfig.farmerMode = false;
                         resetInitialState();
+                        windowManager = null;
+                        this.reqdestroy();
                     }
-                    super.wdgmsg(msg, args);
+                    //super.wdgmsg(msg, args);
                 }
             };
 

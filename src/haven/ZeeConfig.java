@@ -2279,6 +2279,16 @@ public class ZeeConfig {
         Cal.fishMoonShowText = false;
         ZeeManagerMiner.tilesMonitorCleanup();
         ZeeHistWdg.listHistButtons.clear();
+
+        if(ZeeManagerFarmer.windowManager!=null){
+            try {
+                ZeeManagerFarmer.windowManager.reqdestroy();
+                ZeeManagerFarmer.windowManager = null;
+                ZeeManagerFarmer.resetInitialState();
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+        }
     }
 
     public static void clickOpenBelt() {
