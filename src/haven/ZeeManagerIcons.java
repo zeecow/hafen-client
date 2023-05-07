@@ -1,15 +1,37 @@
 package haven;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import java.util.Base64;
+
 public class ZeeManagerIcons {
+
     static List<Gob> gobs = new ArrayList<>();
     static HashMap<String,BufferedImage> mapRuleImg = new HashMap<String,BufferedImage>();
+
+
+    public static final Cursor cursorArrow = Cursor.getDefaultCursor();
+    public static final Cursor cursorMine = Toolkit.getDefaultToolkit().createCustomCursor(TexI.mkbuf(new Coord(1, 1)), new java.awt.Point(), "");
+
+    public static BufferedImage getImgFromBase64(String data){
+        //String data = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAPAAAADwCAYAAAA+VemSAAAgAEl...==';
+        try {
+            String base64Image = data.split(",")[1];
+            byte[] imageBytes = Base64.getDecoder().decode(base64Image);
+            return ImageIO.read(new ByteArrayInputStream(imageBytes));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 
     public static BufferedImage getIconImage(Gob gob) {
 

@@ -26,11 +26,16 @@
 
 package haven;
 
-import java.util.*;
-import haven.render.*;
-import haven.render.gl.*;
-import java.awt.Toolkit;
 import haven.JOGLPanel.SyncMode;
+import haven.render.FragColor;
+import haven.render.FrameInfo;
+import haven.render.Pipe;
+import haven.render.State;
+import haven.render.gl.*;
+
+import java.awt.*;
+import java.util.Map;
+import java.util.TreeMap;
 
 public interface GLPanel extends UIPanel, UI.Context {
     public GLEnvironment env();
@@ -227,6 +232,12 @@ public interface GLPanel extends UIPanel, UI.Context {
 	    synchronized(ui) {
 		curs = ui.getcurs(ui.mc);
 	    }
+		// use system arrow pointer
+		if(curs!=null && curs!=lastcursor && curs.name.contentEquals(ZeeConfig.CURSOR_ARW)) {
+			lastcursor = null;
+			p.setCursor(Cursor.getDefaultCursor());
+			return;
+		}
 	    if(cursmode == "awt") {
 		if(curs != lastcursor) {
 		    try {
