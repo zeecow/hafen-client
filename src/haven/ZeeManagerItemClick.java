@@ -105,7 +105,10 @@ public class ZeeManagerItemClick extends ZeeThread{
                     //close any containers to use only inventory bugs
                     List<Window> openContainerWindows = ZeeConfig.getContainersWindows();
                     println("closing containers = "+openContainerWindows.size());
-                    openContainerWindows.forEach(Widget::reqdestroy);
+                    openContainerWindows.forEach(window -> {
+                        window.reqdestroy();
+                        waitWindowClosed(window.cap);
+                    });
                     openContainerWindows.clear();
                     sleep(PING_MS);
 
@@ -154,9 +157,12 @@ public class ZeeManagerItemClick extends ZeeThread{
                             break;
                         }
 
-                        //close container
+                        //close container(s)
                         openContainerWindows = ZeeConfig.getContainersWindows();
-                        openContainerWindows.forEach(Window::reqdestroy);
+                        openContainerWindows.forEach(window -> {
+                            window.reqdestroy();
+                            waitWindowClosed(window.cap);
+                        });
                         openContainerWindows.clear();
                         sleep(PING_MS);
                     }
