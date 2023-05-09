@@ -630,8 +630,8 @@ public class ZeeManagerGobClick extends ZeeThread{
     public static void checkRightClickGob(Coord pc, Coord2d mc, Gob gob, String gobName) {
 
         // bugCollectionAuto label bug containers and wood pile
-        if (ZeeManagerItemClick.bugColRecipeOpen){
-            ZeeManagerItemClick.bugColGobClicked(gob);
+        if (ZeeManagerCraft.bugColRecipeOpen){
+            ZeeManagerCraft.bugColGobClicked(gob);
         }
 
         // label harvested plant ql

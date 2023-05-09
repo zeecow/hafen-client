@@ -999,11 +999,13 @@ public class ZeeConfig {
         }
 
         // Craft window
-        if(windowTitle.contentEquals("Boil Pepper Drupes")){
-            ZeeManagerCook.pepperRecipeOpened(window);
-        }
-        else if (windowTitle.contentEquals("Bug Collection")){
-            ZeeManagerItemClick.bugColRecipeOpened(window);
+        if(isMakewindow(window)) {
+            //bug collection
+            if (!ZeeManagerCraft.bugColRecipeOpen && windowTitle.contentEquals("Bug Collection")) {
+                ZeeManagerCraft.bugColRecipeOpened(window);
+            } else if (ZeeManagerCraft.bugColRecipeOpen) {
+                ZeeManagerCraft.bugColWindowClosed();
+            }
         }
 
         if (gameUI!=null && !gameUI.sz.equals(0,0) && !isBuildWindow(window)){
@@ -2223,14 +2225,12 @@ public class ZeeConfig {
 
         // feasting msg
         if (isPlayerFeasting && text.startsWith("You gained ")){
-            ZeeManagerCook.feastingMsgStatGained(text);
+            ZeeManagerCraft.feastingMsgStatGained(text);
         }
     }
 
     public static void checkUiErr(String text){
         lastUIMsgMs = System.currentTimeMillis();
-        if (ZeeManagerCook.busy && ZeeManagerCook.pepperRecipeOpen && text.contains("You do not have all the ingredients."))
-            ZeeManagerCook.exitManager(text);
 
         if (ZeeManagerStockpile.busy && text.contains("That stockpile is already full."))
             ZeeManagerStockpile.exitManager("checkUiErr() > pile is full");
@@ -2273,7 +2273,7 @@ public class ZeeConfig {
         ZeeManagerItemClick.equipory = null;
         ZeeManagerStockpile.windowManager = null;
         ZeeManagerStockpile.selAreaPile = false;
-        ZeeManagerCook.windowFeasting = null;
+        ZeeManagerCraft.windowFeasting = null;
         ZeeManagerMiner.tunnelHelperWindow = null;
         fishMoonAlertDone = false;
         Cal.fishMoonShowText = false;
@@ -2373,8 +2373,6 @@ public class ZeeConfig {
         // clicked gob object
         if(clickGob!=null) {
             lastMapViewClickGobName = clickGob.getres().name;
-            if (ZeeManagerCook.pepperRecipeOpen)
-                ZeeManagerCook.gobClicked(clickGob,lastMapViewClickGobName,clickb);
             if(clickb == 2) {
                 ZeeManagerGobClick.startMidClick(pc, mc, clickGob, lastMapViewClickGobName);
             } else if (clickb==3 && gameUI.ui.modflags()==0){// no mod keys
@@ -3139,7 +3137,7 @@ public class ZeeConfig {
         //feast window
         isPlayerFeasting = curs.contentEquals(CURSOR_EAT);
         if(!isPlayerFeasting)
-            ZeeManagerCook.windowFeasting = null;
+            ZeeManagerCraft.windowFeasting = null;
     }
 
     static long lastIconNotifySaveMs = ZeeThread.now();
