@@ -164,16 +164,19 @@ public class Makewindow extends Widget {
 			ZeeConfig.btnMkWndSearchInput.change("Search "+(inputCount+1)+"/"+inputs.size());
 		}
 		else if(msg.contentEquals("close")) {
-			if(ZeeManagerCraft.bugColRecipeOpen) {
+			if(ZeeManagerCraft.bugColRecipeOpen)
 				ZeeManagerCraft.bugColWindowClosed();
-			}
+			if (ZeeManagerCraft.clothRecipeOpen)
+				ZeeManagerCraft.clothWindowClosed();
 			super.wdgmsg(sender, msg, args);
 		}
 		else {
-			if (msg.contentEquals("make") && String.valueOf(args[0]).contentEquals("0")) {
+			if (msg.contentEquals("make")) {
 				// 0 = craft ,  1 = craft all
-				ZeeResearch.checkResearch(this.rcpnm);
-				ZeeManagerCraft.bugColCraftBtnClicked(this.rcpnm);
+				if(String.valueOf(args[0]).contentEquals("0")) {
+					ZeeResearch.checkResearch(this.rcpnm);
+					ZeeManagerCraft.bugColCraftBtnClicked();
+				}
 			}
 			super.wdgmsg(sender, msg, args);
 		}

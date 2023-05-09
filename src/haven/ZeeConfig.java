@@ -97,6 +97,8 @@ public class ZeeConfig {
     public static final String POSE_PLAYER_CARRY_SCYTHEARMS = "gfx/borka/scythearms";
     public static final String POSE_PLAYER_PRESSINGWINE = "gfx/borka/winepressan";
     public static final String POSE_PLAYER_PRESSINGWINE_IDLE = "gfx/borka/winepress-idle";
+    public static final String POSE_PLAYER_LOOM_IDLE = "gfx/borka/loomsit";
+    public static final String POSE_PLAYER_LOOM_WEAVING = "gfx/borka/weaving";
 
     public static final String TILE_WATER_FRESH_SHALLOW = "gfx/tiles/water";
     public static final String TILE_WATER_FRESH_DEEP = "gfx/tiles/deep";
@@ -1000,11 +1002,21 @@ public class ZeeConfig {
 
         // Craft window
         if(isMakewindow(window)) {
-            //bug collection
-            if (!ZeeManagerCraft.bugColRecipeOpen && windowTitle.contentEquals("Bug Collection")) {
-                ZeeManagerCraft.bugColRecipeOpened(window);
-            } else if (ZeeManagerCraft.bugColRecipeOpen) {
-                ZeeManagerCraft.bugColWindowClosed();
+            // bug collection
+            if(windowTitle.contentEquals("Bug Collection")) {
+                if (!ZeeManagerCraft.bugColRecipeOpen)
+                    ZeeManagerCraft.bugColRecipeOpened(window);
+            }
+            // cloths
+            else if( List.of("Linen Cloth","Hemp Cloth").contains(windowTitle) ) {
+                if (!ZeeManagerCraft.clothRecipeOpen)
+                    ZeeManagerCraft.clothRecipeOpened(window);
+            }
+            else{
+                if (ZeeManagerCraft.bugColRecipeOpen)
+                    ZeeManagerCraft.bugColWindowClosed();
+                else if (ZeeManagerCraft.clothRecipeOpen)
+                    ZeeManagerCraft.clothWindowClosed();
             }
         }
 
@@ -2672,6 +2684,12 @@ public class ZeeConfig {
         }
     }
 
+    public static void addGobColor(Gob gob, Color c) {
+        if(gob==null)
+            return;
+        addGobColor(gob,c.getRed(),c.getGreen(),c.getBlue(),c.getAlpha());
+    }
+
     public static void addGobColor(Gob gob, int r, int g, int b, int a) {
         if(gob==null)
             return;
@@ -3558,6 +3576,6 @@ public class ZeeConfig {
     }
 
     static boolean isCaveTile(String tileName) {
-        return List.of("gfx/tiles/wildcavern","gfx/tiles/shadehollow", "gfx/tiles/warmdepth", "gfx/tiles/lushcave", "gfx/tiles/gleamgrotto", "gfx/tiles/mine").contains(tileName);
+        return List.of("gfx/tiles/wildcavern","gfx/tiles/shadehollow", "gfx/tiles/warmdepth", "gfx/tiles/lushcave", "gfx/tiles/gleamgrotto", "gfx/tiles/deepcave", "gfx/tiles/mine").contains(tileName);
     }
 }

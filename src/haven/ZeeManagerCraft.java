@@ -95,7 +95,7 @@ public class ZeeManagerCraft extends ZeeThread{
         window.add(bugColAutoBtn,360,45);
         //autoBtn.disable(!bugCollectionReady());
     }
-    public static void bugColCraftBtnClicked(String recipeName) {
+    public static void bugColCraftBtnClicked() {
         if (!bugColRecipeOpen || bugColBusy)
             return;
 
@@ -238,6 +238,143 @@ public class ZeeManagerCraft extends ZeeThread{
         }
         ZeeConfig.removeGobText(bugColWoodPile);
         bugColWoodPile = null;
+    }
+
+
+    /*
+        CLOTH: linen, hemp
+     */
+    static boolean clothRecipeOpen=false, clothBusy=false;
+    static Button clothAutoBtn;
+    static Window clothCraftWindow;
+    static String clothItemName = null, clothStockPileName = null;
+    public static void clothRecipeOpened(Window window) {
+        println("clothRecipeOpened");
+        clothRecipeOpen = true;
+        clothAutoBtn = new ZeeWindow.ZeeButton(UI.scale(85),"auto"){
+            public void wdgmsg(String msg, Object... args) {
+                if (msg.equals("activate")){
+                    if (clothBusy)
+                        return;
+                    if (window.cap.contains("Linen") && ZeeConfig.getMainInventory().countItemsByNameContains("/flaxfibre") < 5){
+                        ZeeConfig.msgError("not enough inventory flax fibre");
+                        return;
+                    }
+                    if (window.cap.contains("Hemp") && ZeeConfig.getMainInventory().countItemsByNameContains("/hempfibre") < 6){
+                        ZeeConfig.msgError("not enough inventory hemp fibre");
+                        return;
+                    }
+                    if (!ZeeConfig.playerHasAnyPose(ZeeConfig.POSE_PLAYER_LOOM_IDLE)){
+                        ZeeConfig.msgError("must sit on a loom");
+                        return;
+                    }
+                    clothStart(window);
+                }
+            }
+        };
+        clothAutoBtn.settip("use closest fiber piles until inventory full");
+        window.add(clothAutoBtn,360,45);
+    }
+    private static void clothStart(Window window) {
+        new Thread(){
+            public void run() {
+                try {
+                    // stockpile-hempfibre, flaxfibre
+                    clothBusy = true;
+                    ZeeConfig.addPlayerText("weaving");
+                    if (window.cap.contains("Hemp Cloth")){
+                        clothItemName = "hempfibre";
+                        clothStockPileName = "stockpile-hempfibre";
+                    } else if(window.cap.contains("Linen Cloth")){
+                        clothItemName = "flaxfibre";
+                        clothStockPileName = "stockpile-flaxfibre";
+                    } else{
+                        clothExit("unkown type cloth");
+                        return;
+                    }
+                    // highlight stockpiles
+                    ZeeConfig.findGobsByNameEndsWith(clothStockPileName).forEach(gob -> {
+                        if (ZeeConfig.distanceToPlayer(gob) <= 5*TILE_SIZE){
+                            ZeeConfig.addGobColor(gob,Color.green);
+                        }
+                    });
+                    // start craft loop
+                    while(clothBusy)
+                    {
+                        Gob loom = ZeeConfig.getClosestGobByNameContains("gfx/terobjs/loom");
+                        Inventory inv = ZeeConfig.getMainInventory();
+                        int invFibreNum, invSlotsFree;
+
+                        // click "Craft All" button
+                        ZeeConfig.getButtonNamed(window,"Craft All").click();
+                        sleep(PING_MS);
+                        //wait loom idle
+                        if(!waitPlayerPose(ZeeConfig.POSE_PLAYER_LOOM_IDLE)){
+                            println("craftmanager > click canceled");
+                            clothExit("");
+                            return;
+                        }
+                        //update inv info
+                        invFibreNum = inv.countItemsByNameContains(clothItemName);
+                        invSlotsFree = inv.getNumberOfFreeSlots();
+                        //check player tired
+                        if (clothItemName.contains("flax") && invFibreNum >= 5
+                            || clothItemName.contains("hemp") && invFibreNum >= 6)
+                        {
+                            clothExit("not enough energy to craft");
+                            return;
+                        }
+                        //check inv space
+                        if ( (clothItemName.contains("flax") && invSlotsFree < 5-invFibreNum)
+                            || (clothItemName.contains("hemp") && invSlotsFree < 6-invFibreNum) )
+                        {
+                            clothExit("inventory full");
+                            return;
+                        }
+                        //get more fibre from closest stockpile
+                        if (invFibreNum < 6)
+                        {
+                            Gob closestPile = ZeeConfig.getClosestGobByNameContains(clothStockPileName);
+                            // out of fibres stockpile
+                            if (ZeeConfig.distanceToPlayer(closestPile) > 5*TILE_SIZE ){
+                                clothExit("no stockpile close enough");
+                                return;
+                            }
+                            //pickup fibres from stockpile
+                            ZeeManagerGobClick.gobClick(closestPile,3,UI.MOD_SHIFT);
+                            if(!waitPlayerIdleFor(1)){
+                                clothExit("couldn't reach stockpile");
+                                return;
+                            }
+                            //return to loom
+                            ZeeManagerGobClick.gobClick(loom,3);
+                            if (!waitPlayerPose(ZeeConfig.POSE_PLAYER_LOOM_IDLE)){
+                                clothExit("couldnt return to loom");
+                                return;
+                            }
+                        }
+                        // restart crafting loop
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                clothExit("fin");
+            }
+        }.start();
+    }
+    public static void clothWindowClosed() {
+        clothRecipeOpen = false;
+        if (clothBusy)
+            clothExit("window closed");
+    }
+    static void clothExit(String msg){
+        if (!msg.isEmpty()) {
+            println("cloth > "+msg);
+            ZeeConfig.msgError(msg);
+        }
+        clothBusy = false;
+        ZeeConfig.removePlayerText();
+        ZeeConfig.findGobsByNameEndsWith(clothStockPileName).forEach(ZeeConfig::removeGobColor);
     }
 
 

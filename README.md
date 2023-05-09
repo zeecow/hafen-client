@@ -48,6 +48,10 @@ Client focusing on small helper tasks, many using mouse middle button, and other
 - hover menu on search actions button 
 - auto-label gob Barrel/Cistern when it's window is opened
 - option right-click stoat icon to aggro 
+- auto craft helper: cloth linen/hemp, bug collection
+  - use closest fibre pile until inv full
+- auto press wine from inventtory 
+  - switch seeds and press until it stops 
 - (unfinished) Lag Camera (:cam lag)
 
 - midclick ground 
