@@ -581,6 +581,7 @@ public class ZeeManagerGobClick extends ZeeThread{
 
 
     static boolean clickedPlantGobForLabelingQl = false;
+    static Gob plantGobForLabelingQl;
     static void labelHarvestedPlant(String clickedPetal){
 
         if ( !clickedPlantGobForLabelingQl || !clickedPetal.contentEquals("Harvest"))
@@ -600,32 +601,45 @@ public class ZeeManagerGobClick extends ZeeThread{
             return;
         }
 
+        //save plant gob
+        plantGobForLabelingQl = ZeeConfig.lastMapViewClickGob;
+
         new Thread(){
             public void run() {
                 try{
-                    //wait inventory harvested item
+                    ZeeConfig.addPlayerText("inspect ql");
                     long t1 = ZeeThread.now();
-                    long timeout = 1000;//1sec
-                    while(timeout > 0 && ZeeConfig.lastInvItemMs < t1){
-                        sleep(100);
-                        timeout -= 100;
-                    }
-                    //inv item received
-                    if (timeout > 0){
+                    //wait approaching plant
+                    if(waitPlayerIdlePose()) {
+                        //wait inventory harvested item
+                        long timeout = 1000;//1sec
+                        while(timeout > 0 && ZeeConfig.lastInvItemMs < t1){
+                            sleep(100);
+                            timeout -= 100;
+                        }
+                        // scythe not allowed
                         if (ZeeManagerItemClick.isItemEquipped("/scythe")){
                             println("labelHarvestedPlant > cancel labeling due to scythe equipped");
                             clickedPlantGobForLabelingQl = false;
+                            ZeeConfig.removePlayerText();
                             return;
                         }
+                        //label plant
                         Inventory inv = ZeeConfig.getMainInventory();
                         ZeeConfig.addGobText(
                             ZeeConfig.lastMapViewClickGob,
                             Inventory.getQualityInt(ZeeConfig.lastInvItem).toString()
                         );
+                    }else{
+                        // idle pose failed, cancel click?
+                        println("labelHarvestedPlant > failed waiting player idle pose");
+                        clickedPlantGobForLabelingQl = false;
                     }
                 }catch (Exception e){
                     e.printStackTrace();
                 }
+                clickedPlantGobForLabelingQl = false;
+                ZeeConfig.removePlayerText();
             }
         }.start();
 
