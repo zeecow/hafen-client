@@ -263,6 +263,10 @@ public class ZeeManagerGobClick extends ZeeThread{
                     }
                 }
             }
+            // non-ground clicks
+            else if(ZeeConfig.isPlayer(gob)){
+                windowTestCoords();
+            }
             // put out cauldron
             else if(gobName.contains("/cauldron") && !ZeeConfig.isPlayerLiftingGob(gob)){
                 cauldronPutOut();
@@ -2385,6 +2389,96 @@ public class ZeeManagerGobClick extends ZeeThread{
                 return 1; // greater than
             return 0; // equal
         });
+    }
+
+
+    private static void windowTestCoords() {
+        String name = "test coordss123";
+        Window win = ZeeConfig.getWindow(name);
+        if(win!=null){
+            win.reqdestroy();
+        }
+        win = ZeeConfig.gameUI.add(new Window(Coord.of(225,100),name){
+            public void wdgmsg(String msg, Object... args) {
+                if (msg.contentEquals("close"))
+                    this.reqdestroy();
+            }
+        });
+        int x = win.csz().x;
+        int y = win.csz().y;
+
+        //up
+        win.add(new Button(60,"up"){
+            public void wdgmsg(String msg, Object... args) {
+                if (msg.contentEquals("activate")){
+                    windowTestCoordsMove(this);
+                }
+            }
+        }, (int)(x*0.37),0);
+        //down
+        win.add(new Button(60,"down"){
+            public void wdgmsg(String msg, Object... args) {
+                if (msg.contentEquals("activate")){
+                    windowTestCoordsMove(this);
+                }
+            }
+        }, (int)(x*0.37),(int)(y*0.80));
+        //left
+        win.add(new Button(60,"left"){
+            public void wdgmsg(String msg, Object... args) {
+                if (msg.contentEquals("activate")){
+                    windowTestCoordsMove(this);
+                }
+            }
+        }, 0,(int)(y*0.40));
+        //right
+        win.add(new Button(60,"right"){
+            public void wdgmsg(String msg, Object... args) {
+                if (msg.contentEquals("activate")){
+                    windowTestCoordsMove(this);
+                }
+            }
+        }, (int)(x*0.75),(int)(y*0.40));
+        //center
+        win.add(new Button(60,"center"){
+            public void wdgmsg(String msg, Object... args) {
+                if (msg.contentEquals("activate")){
+                    windowTestCoordsMove(this);
+                }
+            }
+        }, (int)(x*0.37),(int)(y*0.40));
+    }
+
+    static void windowTestCoordsMove(Button button){
+        new Thread(){
+            public void run() {
+                try {
+                    Coord c1 = ZeeConfig.getPlayerTile();
+                    Coord c2 = Coord.of(c1);
+                    println(button.text.text+" ... ");
+                    switch (button.text.text){
+                        case "up":
+                            c2 = c1.sub(0,1);
+                            break;
+                        case "down":
+                            c2 = c1.add(0,1);
+                            break;
+                        case "left":
+                            c2 = c1.sub(1,0);
+                            break;
+                        case "right":
+                            c2 = c1.add(1,0);
+                            break;
+                    }
+                    println("    moveTo "+c2);
+                    ZeeConfig.moveToTile(c2);
+                    waitPlayerIdlePose();
+                    println("    final "+ZeeConfig.getPlayerTile());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }.start();
     }
 
 
