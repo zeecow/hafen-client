@@ -342,12 +342,18 @@ public class ZeeThread  extends Thread{
 
 
     public static boolean waitPlayerPoseNotInList(String ... poseList) {
-        //println(">waitPlayerPosesContainsNone");
+        println(">waitPlayerPoseNotInList");
         String playerPoses = "";
         boolean exit = false;
         try{
+            ZeeConfig.lastMapViewClickButton = 2;//prepare for cancel click
             do{
                 sleep(PING_MS*2);
+                exit = ZeeConfig.isTaskCanceledByGroundClick();
+                if(exit) {
+                    println("    canceled by click");
+                    break;
+                }
                 playerPoses = ZeeConfig.getPlayerPoses();
                 //println("   "+playerPoses);
                 exit = true;
@@ -359,11 +365,11 @@ public class ZeeThread  extends Thread{
                         break;//... break, loop and sleep again
                     }
                 }
-            }while(!exit || ZeeConfig.isPlayerMoving());
+            }while(!exit);//ZeeConfig.isPlayerMoving() );
         }catch (Exception e){
             e.printStackTrace();
         }
-        //println("waitPlayerPosesContainsNone ret "+exit);
+        println("waitPlayerPoseNotInList  exit="+exit + "  cancel="+ZeeConfig.isTaskCanceledByGroundClick());
         return exit;
     }
 

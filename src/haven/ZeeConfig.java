@@ -148,6 +148,7 @@ public class ZeeConfig {
     private static Dropbox<String> iconListFilterBox;
     private static Inventory mainInv;
     public static Glob glob;
+    public static boolean keepMapViewOverlay;
 
     public static String playingAudio = null;
     public static String lastUiMsg, uiMsgTextQuality, uiMsgTextBuffer;
@@ -2330,6 +2331,7 @@ public class ZeeConfig {
         if(lastSavedOverlay !=null)
             lastSavedOverlay.destroy();
         lastSavedOverlayMs = 0;
+        ZeeConfig.keepMapViewOverlay = false;
     }
 
     public static void printGobs(){
@@ -2798,12 +2800,12 @@ public class ZeeConfig {
     static Coord adjustPositiveTile(Coord tile){
         // adjust positive tile coords (TODO test more)
         if(tile.x > 0 || tile.y > 0) {
-            //println("adjust tile > before " + tile);
+            println("adjust tile > before " + tile);
             if (tile.x > 0)
                 tile.x += 1;
             if (tile.y > 0)
                 tile.y += 1;
-            //println("              after " + tile);
+            println("              after " + tile);
         }
         return tile;
     }
@@ -3022,11 +3024,37 @@ public class ZeeConfig {
         return ols.get(0).replace("gfx/terobjs/barrel-","");
     }
 
-    public static Coord getTileFartherToPlayer(Coord c1, Coord c2) {
+    public static Coord getTileFurtherFromPlayer(Area area) {
+        Coord p = getPlayerTile();
+        Coord further = Coord.of(area.ul);
+        //println("player "+p);
+        //check player dist from all area tiles
+        for (Coord newTile : area) {
+            //println("    "+further+" "+ p.dist(further)+" < "+p.dist(newTile)+" "+ newTile);
+            if (p.dist(further) < p.dist(newTile)) {
+                further = newTile;
+                //println("        further = "+further);
+            }
+        }
+        return further;
+    }
+
+    public static Coord getTileFurtherFromPlayer(Coord c1, Coord c2) {
         Coord p = getPlayerTile();
         if (p.dist(c1) > p.dist(c2))
             return c1;
         return c2;
+    }
+
+    public static Coord getTileCloserToPlayer(Area area) {
+        Coord p = getPlayerTile();
+        Coord closest = area.ul;
+        //check player dist from all area tiles
+        for (Coord tile : area) {
+            if (p.dist(closest) < p.dist(tile))
+                closest = tile;
+        }
+        return closest;
     }
 
     public static Coord getTileCloserToPlayer(Coord c1, Coord c2) {

@@ -289,52 +289,124 @@ public class ZeeManagerStockpile extends ZeeThread{
     }
 
 
-    // add piles to Area until area full
+    // add piles to Area until area full (
     static boolean selTileSourcePile = false;
     static Coord2d tileSourceCoord;
+    static String tileSourceName;
+    static Gob tileSourceGobPile;
     static void tileSourceWaitSelection(Coord2d coordMc){
         try {
+
+            tileSourceName = ZeeConfig.getTileResName(coordMc);
+
+            //check for pickaxe
+            if (tileSourceName.contentEquals(ZeeConfig.TILE_MOUNTAIN)){
+                if (!ZeeManagerItemClick.isItemEquipped("/pickaxe")){
+                    if (ZeeManagerItemClick.getBeltWItem("/pickaxe")==null){
+                        ZeeConfig.msgError("pickaxe required");
+                        return;
+                    }
+                }
+            }
+
             selTileSourcePile = true;
-            ZeeConfig.addPlayerText("Select area for piles");
             tileSourceCoord = Coord2d.of(coordMc.x, coordMc.y);
+            ZeeConfig.addPlayerText("Select area for piles");
+
             // wait area selection
             ZeeConfig.gameUI.map.uimsg("sel", 1); //MapView.Selector
             ZeeConfig.gameUI.map.showgrid(true);
+            ZeeConfig.keepMapViewOverlay = true;
+
         }catch (Exception e){
-            e.printStackTrace();
+            tileSourceExit("wait selection failed: "+e.getMessage());
         }
-        selTileSourcePile = false;
-        ZeeConfig.removePlayerText();
     }
     static void tileSourceAreaPilerStart(){
         new Thread(){
             public void run() {
                 try {
                     ZeeConfig.addPlayerText("areapilan");
-                    // dig icon
-                    ZeeConfig.cursorChange(ZeeConfig.ACT_DIG);
-                    if(!waitCursorName(ZeeConfig.CURSOR_DIG)) {
-                        tileSourceExit("no cursor dig");
-                        return;
+                    while(selTileSourcePile) {
+                        // dig icon
+                        ZeeConfig.cursorChange(ZeeConfig.ACT_DIG);
+                        if (!waitCursorName(ZeeConfig.CURSOR_DIG)) {
+                            tileSourceExit("no cursor dig");
+                            return;
+                        }
+                        // click tile source
+                        ZeeConfig.clickCoord(tileSourceCoord.floor(posres), 1);
+                        sleep(PING_MS);
+                        // wait idle pose
+                        if (!waitPlayerIdlePose()) {
+                            tileSourceExit("cancel click?");
+                            return;
+                        }
+                        if (!ZeeConfig.isPlayerHoldingItem()){
+                            tileSourceExit("should be holding item");
+                            return;
+                        }
+                        // pile area
+                        tileSourcePileLogic();
                     }
-                    // click tile source
-                    ZeeConfig.clickCoord(lastTileStoneSourceCoordMc.floor(posres),1);
-                    //wait digging animation, if fails = no pickaxe ?
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-                tileSourceExit("");
+                tileSourceExit("the end");
             }
         }.start();
     }
+    private static void tileSourcePileLogic() throws Exception {
+
+        Inventory inv = ZeeConfig.getMainInventory();
+        Coord playerTile = ZeeConfig.getPlayerTile();
+
+        // add to existing pile
+        if (tileSourceGobPile!=null){
+            ZeeManagerGobClick.itemActGob(tileSourceGobPile, UI.MOD_SHIFT);
+            waitPlayerIdlePose();
+        }
+        // create new pile
+        else {
+            Area area = ZeeConfig.lastSavedOverlay.a;
+            Coord further = ZeeConfig.getTileFurtherFromPlayer(area);
+
+            //create virtual pile
+            ZeeConfig.gameUI.map.wdgmsg("itemact", further, ZeeConfig.tileToCoord(further), 0);
+            sleep(500);
+
+            //try placing pile
+            ZeeManagerGobClick.gobPlace(lastPlob, ZeeConfig.tileToCoord(further), UI.MOD_SHIFT);
+            waitPlayerIdleFor(1);
+        }
+
+        // player didnt move? tile occupied, terrain not flat, pile was already full?
+        if (playerTile.compareTo(ZeeConfig.getPlayerTile()) == 0){
+            tileSourceExit("player didnt move, tile unavailable or pile was already full");
+        }
+        // inv items remaining, pile just filled up? (TODO ignore rare item curios )
+        else if(inv.countItemsByNameContains(ZeeConfig.lastInvItemName) > 0) {
+            tileSourceExit("inv items remaining, pile just filled up?");
+        }
+        // pile placed?
+        else{
+            println("pile placed? back to digging");
+            ZeeConfig.removeGobText(tileSourceGobPile);
+            // TODO confirm pile coord(treestump removal code)
+            tileSourceGobPile = ZeeConfig.getClosestGobByNameContains("/stockpile-");
+            ZeeConfig.addGobText(tileSourceGobPile,"pile");
+        }
+    }
     private static void tileSourceExit(String msg) {
-        if (!msg.isBlank())
-            println(msg);
+        println(msg);
         selTileSourcePile = false;
         ZeeConfig.removePlayerText();
         ZeeConfig.gameUI.map.uimsg("sel", 0);
         ZeeConfig.resetTileSelection();
         ZeeConfig.gameUI.map.showgrid(false);
+        if (tileSourceGobPile!=null)
+            ZeeConfig.removeGobText(tileSourceGobPile);
+        tileSourceGobPile = null;
     }
 
 
@@ -687,6 +759,7 @@ public class ZeeManagerStockpile extends ZeeThread{
                     ZeeConfig.gameUI.map.uimsg("sel", 1);
                     //show grid lines
                     ZeeConfig.gameUI.map.showgrid(true);
+                    ZeeConfig.keepMapViewOverlay = true;
                 }
             }
         });

@@ -2345,7 +2345,8 @@ public class MapView extends PView implements DTarget, Console.Directory {
 		    Coord ec = mc.div(MCache.tilesz2);
 		    xl.mv = false;
 		    tt = null;
-			if(!ZeeConfig.farmerMode && !ZeeManagerStockpile.selAreaPile){
+			//if(!ZeeConfig.farmerMode && !ZeeManagerStockpile.selAreaPile){
+			if(!ZeeConfig.keepMapViewOverlay){
 				ol.destroy();
 			}else {
 				// farmermode preserve overlay, unless cancel button
