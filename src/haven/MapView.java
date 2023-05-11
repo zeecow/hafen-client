@@ -2346,7 +2346,7 @@ public class MapView extends PView implements DTarget, Console.Directory {
 		    xl.mv = false;
 		    tt = null;
 			//if(!ZeeConfig.farmerMode && !ZeeManagerStockpile.selAreaPile){
-			if(!ZeeConfig.keepMapViewOverlay){
+			if(!ZeeConfig.farmerMode && !ZeeConfig.keepMapViewOverlay){
 				ol.destroy();
 			}else {
 				// farmermode preserve overlay, unless cancel button
@@ -2356,13 +2356,12 @@ public class MapView extends PView implements DTarget, Console.Directory {
 			}
 		    mgrab.remove();
 			ZeeConfig.saveTileSelection(new Coord(sc), new Coord(ec), modflags, ol);
-			if (!ZeeConfig.farmerMode) {
-				if (ZeeManagerStockpile.selAreaPile)
-					ZeeManagerStockpile.areaPilerStart();
-				else if(ZeeManagerStockpile.selTileSourcePile)
-					ZeeManagerStockpile.tileSourceAreaPilerStart();
-			}else
-		    	wdgmsg("sel", sc, ec, modflags);
+			if (ZeeManagerStockpile.selAreaPile && !ZeeConfig.farmerMode)
+				ZeeManagerStockpile.areaPilerStart();
+			else if(ZeeManagerStockpile.selTileSourcePile && !ZeeConfig.farmerMode)
+				ZeeManagerStockpile.tileSourceAreaPilerStart();
+			else
+				wdgmsg("sel", sc, ec, modflags);
 		    sc = null;
 		}
 		return(true);
