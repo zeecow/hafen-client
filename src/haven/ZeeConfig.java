@@ -2751,12 +2751,12 @@ public class ZeeConfig {
         gameUI.map.wdgmsg("click", ZeeConfig.getCenterScreenCoord(), coord, btn, mod);
     }
 
-    public static void clickTile(Coord c, int btn) {
-        clickCoord(tileToCoord(c), btn, 0);
+    public static void clickTile(Coord tile, int btn) {
+        clickTile(tile, btn, 0);
     }
 
-    public static void clickTile(Coord c, int btn, int mod) {
-        clickCoord(tileToCoord(c), btn, mod);
+    public static void clickTile(Coord tile, int btn, int mod) {
+        clickCoord(tileToCoord(tile), btn, mod);
     }
 
     public static void itemActTile(Coord coord) {
@@ -2782,10 +2782,26 @@ public class ZeeConfig {
     }
 
     public static Coord tileToCoord(Coord tile){
-        // 0x1.0p-10 = 1/1024 = 0.0009765625 in base 10
-        //1023,5
-        return tile.mul(1023.45);//TODO find better way
-        //return tile.mul(Double.parseDouble(ZeeManagerMiner.txtTest.text()));
+        double mult;
+        //TODO find better way
+        if(tile.x > 0 || tile.y > 0)
+            mult = 1023.5;
+        else
+            mult = 1023.45;
+        return adjustPositiveTile(tile).mul(mult);
+    }
+
+    static Coord adjustPositiveTile(Coord tile){
+        // adjust positive tile coords (TODO test more)
+        if(tile.x > 0 || tile.y > 0) {
+            //println("adjust tile > before " + tile);
+            if (tile.x > 0)
+                tile.x += 1;
+            if (tile.y > 0)
+                tile.y += 1;
+            //println("              after " + tile);
+        }
+        return tile;
     }
 
     public static Coord getCenterScreenCoord(GameUI ui) {
