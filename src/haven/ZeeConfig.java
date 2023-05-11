@@ -100,16 +100,20 @@ public class ZeeConfig {
     public static final String POSE_PLAYER_LOOM_IDLE = "gfx/borka/loomsit";
     public static final String POSE_PLAYER_LOOM_WEAVING = "gfx/borka/weaving";
 
-    public static final String TILE_WATER_FRESH_SHALLOW = "gfx/tiles/water";
-    public static final String TILE_WATER_FRESH_DEEP = "gfx/tiles/deep";
-    public static final String TILE_WATER_OCEAN_SHALLOW = "gfx/tiles/owater";
-    public static final String TILE_WATER_OCEAN_DEEP = "gfx/tiles/odeep";
-    public static final String TILE_WATER_OCEAN_DEEPER = "gfx/tiles/odeeper";
+    static final String TILE_WATER_FRESH_SHALLOW = "gfx/tiles/water";
+    static final String TILE_WATER_FRESH_DEEP = "gfx/tiles/deep";
+    static final String TILE_WATER_OCEAN_SHALLOW = "gfx/tiles/owater";
+    static final String TILE_WATER_OCEAN_DEEP = "gfx/tiles/odeep";
+    static final String TILE_WATER_OCEAN_DEEPER = "gfx/tiles/odeeper";
 
-    public static final String TILE_SWAMP = "gfx/tiles/swamp";
-    public static final String TILE_SWAMP_WATER = "gfx/tiles/swampwater";
-    public static final String TILE_SWAMP_BOG = "gfx/tiles/bog";
-    public static final String TILE_SWAMP_BOG_WATER = "gfx/tiles/bogwater";
+    static final String TILE_SWAMP = "gfx/tiles/swamp";
+    static final String TILE_SWAMP_WATER = "gfx/tiles/swampwater";
+    static final String TILE_SWAMP_BOG = "gfx/tiles/bog";
+    static final String TILE_SWAMP_BOG_WATER = "gfx/tiles/bogwater";
+
+    static final String TILE_BEACH = "gfx/tiles/beach";
+    static final String TILE_SANDCLIFF = "gfx/tiles/sandcliff";
+    static final String TILE_MOUNTAIN = "gfx/tiles/mountain";
 
     public static final String DEF_LIST_MUTE_AUDIO = "Leashed horse.;Tracking is now turned;Stacking is now turned;must be empty to be unequipped";
     public static final String DEF_LIST_CONFIRM_PETAL = "Empty,Swill,Clean out,Slaughter,Castrate,Unmoor,Take possession,Renounce Lawspeaker,Become Lawspeaker";

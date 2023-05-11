@@ -19,9 +19,6 @@ public class ZeeManagerStockpile extends ZeeThread{
     static final String STOCKPILE_SAND = "gfx/terobjs/stockpile-sand";
     static final String STOCKPILE_STONE = "gfx/terobjs/stockpile-stone";
     static final String BASENAME_MULB_LEAF = "leaf-mulberrytree";
-    static final String GFX_TILES_BEACH = "gfx/tiles/beach";
-    static final String GFX_TILES_SANDCLIFF = "gfx/tiles/sandcliff";
-    static final String GFX_TILES_MOUNTAIN = "gfx/tiles/mountain";
 
     static Map<String, String> mapItemPileRegex = Map.ofEntries(
             entry("gfx/(terobjs/items|invobjs)/flaxfibre", "/stockpile-flaxfibre"),
@@ -271,7 +268,7 @@ public class ZeeManagerStockpile extends ZeeThread{
 
     private static Gob findPile() {
         if (diggingTileSource) {
-            if (lastTileStoneSourceTileName.contentEquals(GFX_TILES_BEACH))
+            if (lastTileStoneSourceTileName.contentEquals(ZeeConfig.TILE_BEACH))
                 return ZeeConfig.getClosestGob(ZeeConfig.findGobsByNameContains(STOCKPILE_SAND));
             else
                 return ZeeConfig.getClosestGob(ZeeConfig.findGobsByNameContains(STOCKPILE_STONE));
@@ -292,10 +289,60 @@ public class ZeeManagerStockpile extends ZeeThread{
     }
 
 
-    private void startPilingTileSource() {
+    // add piles to Area until area full
+    static boolean selTileSourcePile = false;
+    static Coord2d tileSourceCoord;
+    static void tileSourceWaitSelection(Coord2d coordMc){
+        try {
+            selTileSourcePile = true;
+            ZeeConfig.addPlayerText("Select area for piles");
+            tileSourceCoord = Coord2d.of(coordMc.x, coordMc.y);
+            // wait area selection
+            ZeeConfig.gameUI.map.uimsg("sel", 1); //MapView.Selector
+            ZeeConfig.gameUI.map.showgrid(true);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        selTileSourcePile = false;
+        ZeeConfig.removePlayerText();
+    }
+    static void tileSourceAreaPilerStart(){
+        new Thread(){
+            public void run() {
+                try {
+                    ZeeConfig.addPlayerText("areapilan");
+                    // dig icon
+                    ZeeConfig.cursorChange(ZeeConfig.ACT_DIG);
+                    if(!waitCursorName(ZeeConfig.CURSOR_DIG)) {
+                        tileSourceExit("no cursor dig");
+                        return;
+                    }
+                    // click tile source
+                    ZeeConfig.clickCoord(lastTileStoneSourceCoordMc.floor(posres),1);
+                    //wait digging animation, if fails = no pickaxe ?
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                tileSourceExit("");
+            }
+        }.start();
+    }
+    private static void tileSourceExit(String msg) {
+        if (!msg.isBlank())
+            println(msg);
+        selTileSourcePile = false;
+        ZeeConfig.removePlayerText();
+        ZeeConfig.gameUI.map.uimsg("sel", 0);
+        ZeeConfig.resetTileSelection();
+        ZeeConfig.gameUI.map.showgrid(false);
+    }
+
+
+    // single pile
+    static void startPilingTileSource() {
         try {
 
-            if (lastTileStoneSourceTileName.contentEquals(GFX_TILES_BEACH))
+            if (lastTileStoneSourceTileName.contentEquals(ZeeConfig.TILE_BEACH))
                 gobPile = ZeeConfig.getClosestGob(ZeeConfig.findGobsByNameContains(STOCKPILE_SAND));
             else // TODO check pickaxe?
                 gobPile = ZeeConfig.getClosestGob(ZeeConfig.findGobsByNameContains(STOCKPILE_STONE));
@@ -476,7 +523,7 @@ public class ZeeManagerStockpile extends ZeeThread{
     }
 
 
-    private void pileItems() throws InterruptedException {
+    private static void pileItems() throws InterruptedException {
         ZeeConfig.cancelFlowerMenu();
         waitNoFlowerMenu();
         // if not holding item, pickup from inventory
@@ -573,7 +620,7 @@ public class ZeeManagerStockpile extends ZeeThread{
     }
 
     static boolean isGroundTileSource(String tileResName) {
-        String[] list = new String[]{GFX_TILES_BEACH, GFX_TILES_SANDCLIFF , GFX_TILES_MOUNTAIN};
+        String[] list = new String[]{ZeeConfig.TILE_BEACH, ZeeConfig.TILE_SANDCLIFF, ZeeConfig.TILE_MOUNTAIN};
         //println(tileResName);
         for (int i = 0; i < list.length; i++) {
             if (list[i].contentEquals(tileResName))

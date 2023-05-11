@@ -254,8 +254,12 @@ public class ZeeManagerGobClick extends ZeeThread{
                     //haven.MapView@11460448 ; click ; [(629, 490), (1014904, 1060429), 3, 1]
                     ZeeConfig.clickCoord(coordMc.floor(posres),3,UI.MOD_SHIFT);
                 }
+                // pile area from source tile
+                else if (ZeeConfig.isTileNamed(coordMc,ZeeConfig.TILE_MOUNTAIN,ZeeConfig.TILE_BEACH,ZeeConfig.TILE_SANDCLIFF)) {
+                    ZeeManagerStockpile.tileSourceWaitSelection(coordMc);
+                }
                 else{
-                    // start tiles monitor
+                    // start mining tiles monitor
                     String tileName = ZeeConfig.getTileResName(coordMc);
                     if ( ( ZeeConfig.isCaveTile(tileName) && !ZeeConfig.isPlayerInCellar())
                          || tileName.contains("/rocks/") ) {
