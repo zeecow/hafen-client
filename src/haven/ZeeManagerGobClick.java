@@ -634,7 +634,8 @@ public class ZeeManagerGobClick extends ZeeThread{
                             ZeeConfig.lastMapViewClickGob,
                             Inventory.getQualityInt(ZeeConfig.lastInvItem).toString()
                         );
-                    }else{
+                    }
+                    else{
                         // idle pose failed, cancel click?
                         println("labelHarvestedPlant > failed waiting player idle pose");
                         clickedPlantGobForLabelingQl = false;
@@ -1243,9 +1244,13 @@ public class ZeeManagerGobClick extends ZeeThread{
     }
 
     public static boolean isGobKnocked(Gob gob){
-        String poses = ZeeConfig.getGobPoses(gob);
+        List<String> poses = ZeeConfig.getGobPoses(gob);
         //println("isGobKnocked > "+poses);
-        return poses.contains("/knock") || poses.endsWith("-knock");
+        for (String pose : poses) {
+            if (pose.contains("/knock") || pose.endsWith("-knock"))
+                return true;
+        }
+        return false;
     }
 
     static boolean isGobDeadAnimal;

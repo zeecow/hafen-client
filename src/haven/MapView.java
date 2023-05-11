@@ -36,6 +36,7 @@ import java.awt.event.KeyEvent;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
+import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -2520,10 +2521,12 @@ public class MapView extends PView implements DTarget, Console.Directory {
 							// gob id
 							sb.append("\nId: ").append(ttipGobId).append("    ");
 							// gob poses
-							String poses = ZeeConfig.getGobPoses(gob);
-							if (!poses.isBlank()){
-								sb.append("\nPoses:\n");
-								sb.append("    ").append(poses.replace(",","\n    "));
+							List<String> poses = ZeeConfig.getGobPoses(gob);
+							if (!poses.isEmpty()){
+								sb.append("\nPoses:");
+								for (String p : poses) {
+									sb.append("\n"+p);
+								}
 							}
 							ttip = sb.toString();
 						}

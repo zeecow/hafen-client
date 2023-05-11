@@ -2428,8 +2428,11 @@ public class ZeeConfig {
     }
 
     public static boolean isPlayerMountingHorse() {
-        return getPlayerPoses().contains("gfx/borka/riding");
-        //return isPlayerSharingGobCoord("gfx/kritter/horse/");
+        for (String playerPose : getPlayerPoses()) {
+            if (playerPose.startsWith("gfx/borka/riding"))
+                return true;
+        }
+        return false;
     }
 
     public static Gob getPlayerMountedHorse(){
@@ -3081,7 +3084,7 @@ public class ZeeConfig {
         return Inventory.getQuality(item.item);
     }
 
-    public static String getPlayerPoses() {
+    public static List<String> getPlayerPoses() {
         return getGobPoses(getPlayerGob());
     }
 
@@ -3090,19 +3093,16 @@ public class ZeeConfig {
     }
 
     public static boolean gobHasAnyPose(Gob gob, String ... wantedPoses){
-        String[] gobPoses = getGobPoses(gob).split(",");
+        List<String> gobPoses = getGobPoses(gob);
         for (int i = 0; i < wantedPoses.length; i++) {
-            for (int j = 0; j < gobPoses.length; j++) {
-                if (gobPoses[j].contentEquals(wantedPoses[i])) {
-                    return true;
-                }
-            }
+            if (gobPoses.contains(wantedPoses[i]))
+                return true;
         }
         return false;
     }
 
-    public static String getGobPoses(Gob gob) {
-        String ret = "";
+    public static List<String> getGobPoses(Gob gob) {
+        List<String> ret = new ArrayList<>();
         if (gob==null)
             return ret;
         Drawable d = gob.getattr(Drawable.class);
@@ -3110,14 +3110,12 @@ public class ZeeConfig {
             Composite comp = (Composite) d;
             for (ResData rd : comp.prevposes) {
                 try {
-                    ret += rd.res.get().name + ",";
+                    ret.add(rd.res.get().name);
                 } catch (Loading l) {
                 }
             }
         }
-        if (ret.endsWith(","))
-            ret = ret.substring(0,ret.length() - 1);
-        return ret.strip();
+        return ret;
     }
 
     public static Tiler getTilerAt(Coord2d coordMc) {
@@ -3212,7 +3210,11 @@ public class ZeeConfig {
     }
 
     public static boolean isPlayerDrivingingKicksled() {
-        return getPlayerPoses().contains("/sparkan");
+        for (String playerPose : getPlayerPoses()) {
+            if (playerPose.contains("/sparkan"))
+                return true;
+        }
+        return false;
     }
 
     public static boolean isPlayerOnCoracle() {

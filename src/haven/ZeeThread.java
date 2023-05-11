@@ -1,5 +1,8 @@
 package haven;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class ZeeThread  extends Thread{
 
     static final long SLEEP_MS = 50;
@@ -248,14 +251,22 @@ public class ZeeThread  extends Thread{
 
 
     public static boolean waitPlayerIdlePose(){
-        if (ZeeConfig.isPlayerMountingHorse() || ZeeConfig.isPlayerDrivingingKicksled())
-            return waitPlayerIdleOnHorseKicksled();
-        else
+        // player mounting horse
+        if (ZeeConfig.isPlayerMountingHorse()) {
+            return waitPlayerPose(ZeeConfig.POSE_PLAYER_RIDING_IDLE);
+        }
+        // player on kicksled
+        else if (ZeeConfig.isPlayerDrivingingKicksled()) {
+            return waitPlayerIdleOnKicksled();
+        }
+        // player on foot?
+        else {
             return waitPlayerPose(ZeeConfig.POSE_PLAYER_IDLE);
+        }
     }
 
     //TODO add more active poses
-    public static boolean waitPlayerIdleOnHorseKicksled() {
+    public static boolean waitPlayerIdleOnKicksled() {
         return waitPlayerPoseNotInList(
                 ZeeConfig.POSE_PLAYER_DRINK,
                 ZeeConfig.POSE_PLAYER_CHOPTREE,
@@ -279,7 +290,7 @@ public class ZeeThread  extends Thread{
 
     public static boolean waitPlayerPoseInList(String ... poseList) {
         println(">waitPlayerPoseInList");
-        String playerPoses = "";
+        List<String> playerPoses;
         boolean exit = false;
         try{
             do{
@@ -304,7 +315,7 @@ public class ZeeThread  extends Thread{
     // TODO test
     public static boolean waitPlayerPoseInListTimeout(long timeoutMs, String... poseList) {
         //println(">waitPlayerPoseInListTimeout");
-        String playerPoses = "";
+        List<String> playerPoses;
         boolean exit = false;
         boolean poseInList = false;//assume pose is in list
         long elapsedTimeMs = 0;
@@ -341,9 +352,9 @@ public class ZeeThread  extends Thread{
     }
 
 
-    public static boolean waitPlayerPoseNotInList(String ... poseList) {
+    public static boolean waitPlayerPoseNotInList(String ... forbiddenPoses) {
         println(">waitPlayerPoseNotInList");
-        String playerPoses = "";
+        List<String> currentPoses;
         boolean exit = false;
         try{
             ZeeConfig.lastMapViewClickButton = 2;//prepare for cancel click
@@ -354,13 +365,13 @@ public class ZeeThread  extends Thread{
                     println("    canceled by click");
                     break;
                 }
-                playerPoses = ZeeConfig.getPlayerPoses();
+                currentPoses = ZeeConfig.getPlayerPoses();
                 //println("   "+playerPoses);
                 exit = true;
-                for (int i = 0; i < poseList.length; i++) {
-                    //println("      "+poseList[i]);
-                    if (playerPoses.contains(poseList[i])){//if contains pose...
-                        //println("break");
+                for (int i = 0; i < forbiddenPoses.length; i++) {
+                    println("      "+forbiddenPoses[i]);
+                    if (currentPoses.contains(forbiddenPoses[i])){//if contains pose...
+                        println("         break");
                         exit = false;
                         break;//... break, loop and sleep again
                     }
@@ -375,7 +386,7 @@ public class ZeeThread  extends Thread{
 
     public static boolean waitPlayerPoseNotInListTimeout(long timeoutMs, String... poseList) {
         //println(">waitPlayerPoseNotInListTimeout");
-        String playerPoses = "";
+        List<String> playerPoses;
         boolean exit = false;
         boolean poseInList = true;//assume pose is in list
         long elapsedTimeMs = 0;
@@ -412,7 +423,7 @@ public class ZeeThread  extends Thread{
     }
 
     public static boolean waitNotPlayerPose(String poseName) {
-        String poses = "";
+        List<String> poses = new ArrayList<>();
         try{
             ZeeConfig.lastMapViewClickButton = 2;//prepare for cancel click
             do{
@@ -429,27 +440,32 @@ public class ZeeThread  extends Thread{
         return !poses.contains(poseName);
     }
 
-    public static boolean waitPlayerPose(String poseName) {
-        String poses = "";
+    public static boolean waitGobPose(Gob gob, String poseName) {
+        //println("waitGobPose > start");
+        List<String> poses = new ArrayList<>();
         try{
             ZeeConfig.lastMapViewClickButton = 2;//prepare for cancel click
             do{
-                //println("waitPlayerPose > "+poses);
+                //println("waitGobPose > "+poses);
                 sleep(PING_MS*2);
             } while (
-                !(poses = ZeeConfig.getPlayerPoses()).contains(poseName)
-                && !ZeeConfig.isTaskCanceledByGroundClick()
+                    !(poses = ZeeConfig.getGobPoses(gob)).contains(poseName)
+                            && !ZeeConfig.isTaskCanceledByGroundClick()
             );
         }catch (Exception e){
             e.printStackTrace();
         }
-        //println("waitPlayerPose > "+(poses.contains(poseName))+" "+poseName);
+        //println("      return "+(poses.contains(poseName))+" "+poseName);
         return poses.contains(poseName);
+    }
+
+    public static boolean waitPlayerPose(String poseName) {
+        return waitGobPose(ZeeConfig.getPlayerGob(),poseName);
     }
 
     public static boolean waitPlayerPoseMs(String poseName, long idleMs) {
         //println("waitPlayerPoseMs ");
-        String poses = "";
+        List<String> poses = new ArrayList<>();
         long countMs = 0;
         try{
             while( countMs < idleMs ){
