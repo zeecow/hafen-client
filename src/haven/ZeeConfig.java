@@ -1358,14 +1358,14 @@ public class ZeeConfig {
                     return;
                 }
                 //check wooden chests
-                Gob woodenChest = getClosestGob(findGobsByNameEndsWith("terobjs/chest"));
+                Gob woodenChest = getClosestGob(findGobsByNameEndsWith("/chest","/largechest"));
                 double chestDistance = distanceToPlayer(woodenChest);
                 if (woodenChest==null || chestDistance > 25){
                     msgError("no wooden chests close enough");
                     return;
                 }
                 //if chest already open, do transfer
-                List openWindows = getWindows("Chest");
+                List openWindows = getWindowsNameEndsWith("Chest");
                 if (openWindows.size() == 1) {
                     branches.get(0).item.wdgmsg("transfer",Coord.z,-1);
                     return;
@@ -1375,13 +1375,13 @@ public class ZeeConfig {
                     public void run() {
                         try {
                             ZeeManagerGobClick.gobClick(woodenChest, 3);
-                            if (!waitWindowOpened("Chest")){
+                            if (!waitWindowOpenedNameEndsWith("Chest")){
                                 msgError("timeout waiting window opened");
                                 return;
                             }
                             branches.get(0).item.wdgmsg("transfer",Coord.z,-1);
                             sleep(500);
-                            getWindow("Chest").wdgmsg("close");
+                            getWindowsNameEndsWith("Chest").get(0).wdgmsg("close");
                         }catch (Exception e){
                             e.printStackTrace();
                         }
@@ -2211,6 +2211,19 @@ public class ZeeConfig {
         return ret;
     }
 
+    public static List<Window> getWindowsNameEndsWith(String nameEndsWith) {
+        List<Window> ret = new ArrayList<>();
+        if(gameUI==null)
+            return ret;
+        Set<Window> windows = gameUI.children(Window.class);
+        for(Window w : windows) {
+            if(w.cap.strip().endsWith(nameEndsWith)){
+                ret.add(w);
+            }
+        }
+        return ret;
+    }
+
     /*
         - compile multi-line messages into single-line
         - show text ql above gob
@@ -2354,30 +2367,43 @@ public class ZeeConfig {
         }).collect(Collectors.toList());
     }
 
-    public static List<Gob> findGobsByNameEndsWith(String name) {
+    public static List<Gob> findGobsByNameEndsWith(String ... names) {
         return ZeeConfig.gameUI.ui.sess.glob.oc.gobStream().filter(gob -> {
-            if(gob!=null && gob.getres()!=null && gob.getres().name.endsWith(name))
-                return true;
-            else
-                return false;
+            for (String n : names) {
+                if(gob!=null && gob.getres()!=null && gob.getres().name.endsWith(n))
+                    return true;
+            }
+            return false;
         }).collect(Collectors.toList());
     }
 
-    public static List<Gob> findGobsByNameStartsWith(String name) {
+    public static List<Gob> findGobsByNameStartsWith(String ... names) {
         return ZeeConfig.gameUI.ui.sess.glob.oc.gobStream().filter(gob -> {
-            if(gob!=null && gob.getres()!=null && gob.getres().name.startsWith(name))
-                return true;
-            else
-                return false;
+            for (String n : names) {
+                if(gob!=null && gob.getres()!=null && gob.getres().name.startsWith(n))
+                    return true;
+            }
+            return false;
         }).collect(Collectors.toList());
     }
 
-    public static List<Gob> findGobsByNameContains(String nameContains) {
+    public static List<Gob> findGobsByNameContains(String ... names) {
         return ZeeConfig.gameUI.ui.sess.glob.oc.gobStream().filter(gob -> {
-            if(gob!=null && gob.getres()!=null && gob.getres().name.contains(nameContains))
-                return true;
-            else
-                return false;
+            for (String n : names) {
+                if(gob!=null && gob.getres()!=null && gob.getres().name.endsWith(n))
+                    return true;
+            }
+            return false;
+        }).collect(Collectors.toList());
+    }
+
+    public static List<Gob> findGobsByNameEquals(String ... names) {
+        return ZeeConfig.gameUI.ui.sess.glob.oc.gobStream().filter(gob -> {
+            for (String n : names) {
+                if(gob!=null && gob.getres()!=null && gob.getres().name.contentEquals(n))
+                    return true;
+            }
+            return false;
         }).collect(Collectors.toList());
     }
 
