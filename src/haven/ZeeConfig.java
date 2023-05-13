@@ -2390,7 +2390,7 @@ public class ZeeConfig {
     public static List<Gob> findGobsByNameContains(String ... names) {
         return ZeeConfig.gameUI.ui.sess.glob.oc.gobStream().filter(gob -> {
             for (String n : names) {
-                if(gob!=null && gob.getres()!=null && gob.getres().name.endsWith(n))
+                if(gob!=null && gob.getres()!=null && gob.getres().name.contains(n))
                     return true;
             }
             return false;
