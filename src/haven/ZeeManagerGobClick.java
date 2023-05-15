@@ -219,7 +219,9 @@ public class ZeeManagerGobClick extends ZeeThread{
 
     static void runLongMidClick() {
         try {
-            // clicked ground
+            /*
+                ground clicks
+             */
             if (isGroundClick){
                 //dismount horse
                 if (ZeeConfig.isPlayerMountingHorse()) {
@@ -258,19 +260,10 @@ public class ZeeManagerGobClick extends ZeeThread{
                 else if (ZeeConfig.isTileNamed(coordMc,ZeeConfig.TILE_MOUNTAIN,ZeeConfig.TILE_BEACH,ZeeConfig.TILE_SANDCLIFF)) {
                     ZeeManagerStockpile.tileSourceWaitSelection(coordMc);
                 }
-                else{
-                    // start mining tiles monitor
-                    String tileName = ZeeConfig.getTileResName(coordMc);
-                    if ( ( ZeeConfig.isCaveTile(tileName) && !ZeeConfig.isPlayerInCellar())
-                         || tileName.contains("/rocks/") ) {
-                        ZeeManagerMiner.tileMonitorWindow();
-                    }
-                }
             }
-            // non-ground clicks
-            else if(ZeeConfig.isPlayer(gob)){
-                windowTestCoords();
-            }
+            /*
+                non-ground clicks
+            */
             // put out cauldron
             else if(gobName.contains("/cauldron") && !ZeeConfig.isPlayerLiftingGob(gob)){
                 cauldronPutOut();
@@ -1022,7 +1015,13 @@ public class ZeeManagerGobClick extends ZeeThread{
 
         String gobName = gob.getres().name;
 
-        if (petalName.contentEquals(ZeeFlowerMenu.STRPETAL_AUTOBUTCH_BIGDEADANIMAL)){
+        if (petalName.contentEquals(ZeeFlowerMenu.STRPETAL_MINETILES))
+            ZeeManagerMiner.tileMonitorWindow();
+        else if(petalName.contentEquals(ZeeFlowerMenu.STRPETAL_SWITCHCHAR))
+            ZeeSess.charSwitchCreateWindow();
+        else if(petalName.contentEquals(ZeeFlowerMenu.STRPETAL_TESTCOORDS))
+            windowTestCoords();
+        else if (petalName.contentEquals(ZeeFlowerMenu.STRPETAL_AUTOBUTCH_BIGDEADANIMAL)){
             autoButchBigDeadAnimal(gob);
         }
         else if (petalName.contentEquals(ZeeFlowerMenu.STRPETAL_LIFTUPGOB)){
@@ -1199,7 +1198,10 @@ public class ZeeManagerGobClick extends ZeeThread{
         ZeeFlowerMenu menu = null;
         ArrayList<String> opts;//petals array
 
-        if (isGobButchable(gobName) && isGobKnocked(gob)) {
+        if(ZeeConfig.isPlayer(gob)) {
+            menu = new ZeeFlowerMenu(gob, ZeeFlowerMenu.STRPETAL_SWITCHCHAR, ZeeFlowerMenu.STRPETAL_TESTCOORDS, ZeeFlowerMenu.STRPETAL_MINETILES);
+        }
+        else if (isGobButchable(gobName) && isGobKnocked(gob)) {
             menu = new ZeeFlowerMenu(gob, ZeeFlowerMenu.STRPETAL_AUTOBUTCH_BIGDEADANIMAL, ZeeFlowerMenu.STRPETAL_LIFTUPGOB);
         }
         else if(gobName.endsWith("terobjs/oven")){

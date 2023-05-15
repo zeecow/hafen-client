@@ -39,7 +39,6 @@ Client focusing on small helper tasks, many using mouse middle button, and other
 - new mark zooms map for precision
 - "ctrl+q" show window pickup gobs ("q" pick closest, "shift+q" pick all similar)
 - area piler: create piles around selected area (long-midclick item)
-- mining tile counter: long midclick mine ground or tiles to show window
 - main inventory checkboxes for midclick transfer modes: asc, desc, one, ql
 - gob monitor: highlight, play audio, text to speech (cmd festival)
 - Feasting log window, count gains
@@ -67,7 +66,6 @@ Client focusing on small helper tasks, many using mouse middle button, and other
   - while coracle mounted, LMC ground will try to dismount and equip 
   - disembark dugout, rowboat, coracle, kicksled
   - activate snow clear area
-  - show mining tile counter when click mine ground/tile
 - midclick object 
   - inspect object quality and show text
   - harvest 2 dreams from dreamcatch objects closeby
@@ -120,6 +118,10 @@ Client focusing on small helper tasks, many using mouse middle button, and other
   - remove tree and stump 
   - remove trellis plant(s)
   - destroy multiple treelogs (if bonesaw is equipped)
+  - player context menu
+    - switch char 
+    - mine tiles window
+    - test coords
 - long midclick context menus for items
   - auto butch dead animal items
   - kill all cocoon items
