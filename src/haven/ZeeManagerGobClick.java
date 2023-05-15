@@ -1015,7 +1015,7 @@ public class ZeeManagerGobClick extends ZeeThread{
 
         String gobName = gob.getres().name;
 
-        if (petalName.contentEquals(ZeeFlowerMenu.STRPETAL_MINETILES))
+        if (petalName.contentEquals(ZeeFlowerMenu.STRPETAL_TILEMONITOR))
             ZeeManagerMiner.tileMonitorWindow();
         else if(petalName.contentEquals(ZeeFlowerMenu.STRPETAL_SWITCHCHAR))
             ZeeSess.charSwitchCreateWindow();
@@ -1199,7 +1199,12 @@ public class ZeeManagerGobClick extends ZeeThread{
         ArrayList<String> opts;//petals array
 
         if(ZeeConfig.isPlayer(gob)) {
-            menu = new ZeeFlowerMenu(gob, ZeeFlowerMenu.STRPETAL_SWITCHCHAR, ZeeFlowerMenu.STRPETAL_TESTCOORDS, ZeeFlowerMenu.STRPETAL_MINETILES);
+            opts = new ArrayList<String>();
+            opts.add(ZeeFlowerMenu.STRPETAL_SWITCHCHAR);
+            opts.add(ZeeFlowerMenu.STRPETAL_TESTCOORDS);
+            if (ZeeConfig.isCaveTile(ZeeConfig.getPlayerTileName()))
+                opts.add(ZeeFlowerMenu.STRPETAL_TILEMONITOR);
+            menu = new ZeeFlowerMenu(gob, opts.toArray(String[]::new));
         }
         else if (isGobButchable(gobName) && isGobKnocked(gob)) {
             menu = new ZeeFlowerMenu(gob, ZeeFlowerMenu.STRPETAL_AUTOBUTCH_BIGDEADANIMAL, ZeeFlowerMenu.STRPETAL_LIFTUPGOB);

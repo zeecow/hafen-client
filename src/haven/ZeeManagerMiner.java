@@ -575,7 +575,7 @@ public class ZeeManagerMiner extends ZeeThread{
         if (tilemonWindow == null){
 
             //window
-            tilemonWindow = ZeeConfig.gameUI.add(new ZeeWindow(Coord.of(200,400),"Tiles"){
+            tilemonWindow = ZeeConfig.gameUI.add(new ZeeWindow(Coord.of(200,400),"Tile monitor"){
                 public void wdgmsg(String msg, Object... args) {
                     if (msg.contains("close")){
                         tilesMonitorCleanup();

@@ -3677,6 +3677,13 @@ public class ZeeConfig {
     }
 
     static boolean isCaveTile(String tileName) {
+        // ignore tile "/mine" if player in a cellar (may break if used without player)
+        if (ZeeConfig.findGobsByNameEndsWith("/cellarstairs").size() > 0)
+            return false;
         return List.of("gfx/tiles/wildcavern","gfx/tiles/shadehollow", "gfx/tiles/warmdepth", "gfx/tiles/lushcave", "gfx/tiles/gleamgrotto", "gfx/tiles/deepcave", "gfx/tiles/mine").contains(tileName);
+    }
+
+    public static String getPlayerTileName() {
+        return getTileResName(getPlayerTile());
     }
 }
