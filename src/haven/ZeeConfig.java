@@ -2303,6 +2303,7 @@ public class ZeeConfig {
 
     //reset state
     public static void resetCharacterVariables() {
+        println("resetCharacterVariables ");
         mainInv = null;
         ZeeManagerItemClick.invBelt = null;
         ZeeManagerItemClick.equipory = null;
@@ -2310,8 +2311,6 @@ public class ZeeConfig {
         ZeeManagerStockpile.selAreaPile = false;
         ZeeManagerCraft.windowFeasting = null;
         ZeeManagerMiner.tunnelHelperWindow = null;
-        fishMoonAlertDone = false;
-        Cal.fishMoonShowText = false;
         ZeeManagerMiner.tilesMonitorCleanup();
         ZeeHistWdg.listHistButtons.clear();
 
