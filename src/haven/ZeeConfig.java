@@ -2829,12 +2829,12 @@ public class ZeeConfig {
     static Coord adjustPositiveTile(Coord tile){
         // adjust positive tile coords (TODO test more)
         if(tile.x > 0 || tile.y > 0) {
-            println("adjust tile > before " + tile);
+            //println("adjust tile > before " + tile);
             if (tile.x > 0)
                 tile.x += 1;
             if (tile.y > 0)
                 tile.y += 1;
-            println("              after " + tile);
+            //println("              after " + tile);
         }
         return tile;
     }
@@ -3061,6 +3061,27 @@ public class ZeeConfig {
         for (Coord newTile : area) {
             //println("    "+further+" "+ p.dist(further)+" < "+p.dist(newTile)+" "+ newTile);
             if (p.dist(further) < p.dist(newTile)) {
+                further = newTile;
+                //println("        further = "+further);
+            }
+        }
+        return further;
+    }
+
+    public static Coord getTileFurtherFromPlayer(Area area, List<Coord> skipTiles) {
+        if (area.area() == skipTiles.size()) {
+            println("getTileFurtherFromPlayer > all tiles used");
+            return null;
+        }
+        Coord p = getPlayerTile();
+        Coord further = null;
+        //println("player "+p);
+        //check player dist from all area tiles
+        for (Coord newTile : area) {
+            if (skipTiles.contains(newTile))
+                continue;
+            //println("    "+further+" "+ p.dist(further)+" < "+p.dist(newTile)+" "+ newTile);
+            if ( further==null || p.dist(further) < p.dist(newTile)) {
                 further = newTile;
                 //println("        further = "+further);
             }

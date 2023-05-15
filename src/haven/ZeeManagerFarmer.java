@@ -215,7 +215,7 @@ public class ZeeManagerFarmer extends ZeeThread{
                 ZeeManagerItemClick.equipTwoSacks();
                 ZeeManagerStockpile.selAreaPile = true;
                 ZeeManagerStockpile.selAreaPileGobItem = getPileGroundItemGob();
-                ZeeThread t = ZeeManagerStockpile.areaPilerStart();
+                ZeeThread t = ZeeManagerStockpile.farmPilerStart();
                 if (t!=null)
                     t.join();//wait pile thread finish
             }

@@ -779,15 +779,150 @@ public class ZeeManagerStockpile extends ZeeThread{
         ZeeConfig.gameUI.map.showgrid(false);
         // TODO exit thread piler stop all activity and cleanup
     }
+    static void exitAreaPiler(String msg){
+        println(msg);
+        exitAreaPiler();
+    }
 
-    static ZeeThread threadAreaPiler;
-    static ZeeThread areaPilerStart() {
+
+    static void areaPilerStart(){
+        if (selAreaPileGobItem==null){
+            println("areaPilerStart > selAreaPileGobItem null");
+            return;
+        }
+        new ZeeThread(){
+            public void run() {
+                try {
+                    String itemGobName = selAreaPileGobItem.getres().name;
+                    String itemInvName = "gfx/invobjs/" + selAreaPileGobItem.getres().basename();
+                    Gob latestPile = null;
+                    Area area = ZeeConfig.lastSavedOverlay.a;
+                    List<Coord> usedTiles = new ArrayList<>();
+                    Coord playerOrigin = ZeeConfig.getPlayerTile();
+
+
+                    ZeeConfig.addPlayerText("pilan");
+
+                    // create pile(s) until area full
+                    ZeeConfig.lastMapViewClickButton = 2;//prepare cancel
+                    while(selAreaPile && !ZeeConfig.isTaskCanceledByGroundClick()) {
+
+                        //pickup ground items until idle
+                        if (!ZeeConfig.isPlayerHoldingItem()) {
+                            Gob closestItem = ZeeConfig.getClosestGobByNameContains(itemGobName);
+                            if (closestItem != null) {
+                                //click closest item
+                                ZeeManagerGobClick.gobClick(closestItem, 3, UI.MOD_SHIFT);
+                                //wait approaching item
+                                waitPlayerIdleVelocity();
+                                //pickup itemns until inventory idle
+                                waitInvIdleMs(1000);
+                                //check if user closed piler window
+                                if (!selAreaPile || ZeeConfig.isTaskCanceledByGroundClick()) {
+                                    exitAreaPiler("canceled");
+                                    return;
+                                }
+                            }
+                            // no ground items, check inventory remaining items
+                            else{
+                                List<WItem> items = ZeeConfig.getMainInventory().getWItemsByNameContains(itemInvName);
+                                if (items==null || items.size()==0){
+                                    exitAreaPiler("no more inventory items to pile");
+                                    return;
+                                }
+                                //pickup item from inv
+                                if (!ZeeManagerItemClick.pickUpItem(items.get(0))){
+                                    println("couldnt pickup item ..... 123");
+                                    continue;
+                                }
+                            }
+                        }
+
+                        //move to origin tile before creating pile
+                        ZeeConfig.clickTile(playerOrigin,1);
+                        waitPlayerIdleVelocity();
+
+                        // pickup inv item
+//                        if (!ZeeConfig.isPlayerHoldingItem()) {
+//                            List<WItem> items = ZeeConfig.getMainInventory().getWItemsByNameContains(itemInvName);
+//                            if (items==null || items.size()==0){
+//                                println("no more inventory items to pile");
+//                                continue;
+//                            }
+//                            if (!ZeeManagerItemClick.pickUpItem(items.get(0))){
+//                                println("couldnt pickup item ..... 123");
+//                                continue;
+//                            }
+//                        }
+
+                        // use latest pile
+                        if (latestPile!=null){
+                            ZeeManagerGobClick.itemActGob(latestPile,UI.MOD_SHIFT);
+                            waitPlayerIdleVelocity();//wait approach pile
+                            sleep(500);//wait transf items
+                            List<WItem> invItems = ZeeConfig.getMainInventory().getWItemsByNameContains(itemInvName);
+                            if (invItems!=null && invItems.size()>0){
+                                println("latest pile is full");
+                                if (latestPile!=null)
+                                    ZeeConfig.removeGobText(latestPile);
+                                latestPile = null;
+                            }
+                        }
+                        //new pile
+                        else {
+
+                            //get further tile from player
+                            Coord furtherTile = ZeeConfig.getTileFurtherFromPlayer(area,usedTiles);
+
+                            //create virtual pile
+                            ZeeConfig.gameUI.map.wdgmsg("itemact", furtherTile, ZeeConfig.tileToCoord(furtherTile), 0);
+                            sleep(500);
+
+                            //try placing pile
+                            Coord playerTile = ZeeConfig.getPlayerTile();
+                            ZeeManagerGobClick.gobPlace(lastPlob, ZeeConfig.tileToCoord(furtherTile), UI.MOD_SHIFT);
+                            waitPlayerIdleFor(1);
+
+
+                            //player didnt move = tile occupied, terrain not flat?
+                            if (playerTile.compareTo(ZeeConfig.getPlayerTile()) == 0){
+                                println("tile can't be used for pile, trying next 2");
+                                usedTiles.add(furtherTile);
+                                continue;
+                            }
+
+                            //update used tiles
+                            if (area.area()==usedTiles.size()) {
+                                exitAreaPiler("out of tiles 2");
+                                return;
+                            }
+                            usedTiles.add(furtherTile);
+
+                            //update next pile
+                            if (latestPile!=null)
+                                ZeeConfig.removeGobText(latestPile);
+                            latestPile = ZeeConfig.getClosestGobByNameContains("/stockpile-");
+                            ZeeConfig.addGobText(latestPile,"pile");
+                        }
+                    }
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                exitAreaPiler("fin");
+            }
+        }.start();
+    }
+
+
+    static ZeeThread threadFarmPiler;
+    static ZeeThread farmPilerStart() {
         if (selAreaPileGobItem==null){
             println("areaPilerStart > selAreaPileGobItem null");
             return null;
         }
         ZeeConfig.gameUI.map.showgrid(false);
-        threadAreaPiler = new ZeeThread(){
+        threadFarmPiler = new ZeeThread(){
             public void run() {
                 try{
                     String itemGobName = selAreaPileGobItem.getres().name;
@@ -909,8 +1044,8 @@ public class ZeeManagerStockpile extends ZeeThread{
                     selAreaWindow.destroy();
             }
         };
-        threadAreaPiler.start();
-        return threadAreaPiler;
+        threadFarmPiler.start();
+        return threadFarmPiler;
     }
 
     private static void areaPilerCreateNewPile(List<Coord> borderTiles, String itemGobName, int minX, int minY) throws InterruptedException {
