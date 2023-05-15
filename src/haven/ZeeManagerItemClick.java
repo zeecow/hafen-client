@@ -562,6 +562,19 @@ public class ZeeManagerItemClick extends ZeeThread{
         }.start();
     }
 
+    private static void autoButchExit(String msg){
+        println("auto butch > "+msg);
+        autoButchExit();
+    }
+
+    private static void autoButchExit(){
+        //restore settings
+        ZeeConfig.butcherMode = autoButchModeBackup;
+        ZeeConfig.butcherAutoList = Utils.getpref("butcherAutoList",ZeeConfig.DEF_LIST_AUTO_CLICK_MENU);
+        ZeeConfig.removePlayerText();
+    }
+
+    static boolean autoButchModeBackup;
     private static void autoButch(WItem wItem, boolean butchAll) {
         if (ZeeConfig.isFish(wItem.item.getres().name)){
             autoButchFish(wItem,butchAll);
@@ -569,11 +582,11 @@ public class ZeeManagerItemClick extends ZeeThread{
         }
         new ZeeThread() {
             public void run() {
-                boolean bmBackup = ZeeConfig.butcherMode;
                 try {
                     ZeeConfig.addPlayerText("autobutch");
 
                     //adjust autobutch settings
+                    autoButchModeBackup = ZeeConfig.butcherMode;
                     ZeeConfig.butcherMode = true;
                     ZeeConfig.butcherAutoList = ZeeConfig.DEF_LIST_BUTCH_AUTO;
 
@@ -592,6 +605,10 @@ public class ZeeManagerItemClick extends ZeeThread{
                         itemActCoord(item);
                         while (changeMs > ZeeConfig.lastInvItemMs) {
                             sleep(PING_MS);
+                            if (ZeeConfig.isTaskCanceledByGroundClick()) {
+                                autoButchExit("click canceled 1");
+                                return;
+                            }
                         }
 
                         // get next stage item, ends with "-dead", "-plucked", "-clean" or "-cleaned"
@@ -608,6 +625,10 @@ public class ZeeManagerItemClick extends ZeeThread{
                             itemActCoord(item);
                             while (changeMs > ZeeConfig.lastInvItemMs) {
                                 sleep(PING_MS);
+                                if (ZeeConfig.isTaskCanceledByGroundClick()) {
+                                    autoButchExit("click canceled 2");
+                                    return;
+                                }
                             }
 
                             //get next dead/live animal for butching
@@ -619,10 +640,13 @@ public class ZeeManagerItemClick extends ZeeThread{
                             else
                                 items = inv.getWItemsByNameContains(firstItemName);
 
+                            //filter animal hides
+                            items.removeIf(wItem1->ZeeConfig.isAnimalHideTailEtc(wItem1.item.getres().name));
+
                             if (items.size() == 0){
                                 //no more items to butch
-                                println("no more items");
-                                break;
+                                autoButchExit("no more items");
+                                return;
                             }else{
                                 //update next dead/live animal vars
                                 item = items.get(0);
@@ -634,23 +658,20 @@ public class ZeeManagerItemClick extends ZeeThread{
                     }
 
                     //single butch animal last action
-                    if (!ZeeConfig.isTaskCanceledByGroundClick() && !butchAll && (itemName.endsWith("-clean") || itemName.endsWith("-cleaned"))) {
-                        //println("last butch > " + itemName);
-                        changeMs = now();
-                        itemActCoord(item);
-                        while (changeMs > ZeeConfig.lastInvItemMs) {
-                            sleep(PING_MS);
-                        }
-                    }
+//                    if (!ZeeConfig.isTaskCanceledByGroundClick() && !butchAll && (itemName.endsWith("-clean") || itemName.endsWith("-cleaned"))) {
+//                        //println("last butch > " + itemName);
+//                        changeMs = now();
+//                        itemActCoord(item);
+//                        while (changeMs > ZeeConfig.lastInvItemMs) {
+//                            sleep(PING_MS);
+//                        }
+//                    }
 
 
                 }catch (Exception e){
                     e.printStackTrace();
                 }
-                //restore settings
-                ZeeConfig.butcherMode = bmBackup;
-                ZeeConfig.butcherAutoList = Utils.getpref("butcherAutoList",ZeeConfig.DEF_LIST_AUTO_CLICK_MENU);
-                ZeeConfig.removePlayerText();
+                autoButchExit("done");
             }
         }.start();
     }

@@ -518,6 +518,12 @@ public class ZeeConfig {
         return nameContains.contains("/fish-");
     }
 
+    static boolean isAnimalHideTailEtc(String name){
+        return name.endsWith("hide")
+                || name.endsWith("-blood")
+                || name.endsWith("squirreltail");
+    }
+
     public static boolean isButchableSmallAnimal(String nameContains){
         /*
         Kill > Pluck > Butch = "gfx/invobjs/meat"
@@ -528,8 +534,7 @@ public class ZeeConfig {
             gfx/invobjs/meat
          */
         // skip cases ("/squirrelhide", "squirrelhide-blood", "squirreltail")
-        if (nameContains.endsWith("hide") || nameContains.endsWith("-blood")
-            || nameContains.endsWith("squirreltail"))
+        if (isAnimalHideTailEtc(nameContains))
             return false;
         String[] endlist = {
             "rockdove","quail","/hen","/rooster","magpie", // "/crab"
