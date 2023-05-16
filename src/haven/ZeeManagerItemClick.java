@@ -658,14 +658,14 @@ public class ZeeManagerItemClick extends ZeeThread{
                     }
 
                     //single butch animal last action
-//                    if (!ZeeConfig.isTaskCanceledByGroundClick() && !butchAll && (itemName.endsWith("-clean") || itemName.endsWith("-cleaned"))) {
-//                        //println("last butch > " + itemName);
-//                        changeMs = now();
-//                        itemActCoord(item);
-//                        while (changeMs > ZeeConfig.lastInvItemMs) {
-//                            sleep(PING_MS);
-//                        }
-//                    }
+                    if (!ZeeConfig.isTaskCanceledByGroundClick() && !butchAll && (itemName.endsWith("-clean") || itemName.endsWith("-cleaned"))) {
+                        //println("last butch > " + itemName);
+                        changeMs = now();
+                        itemActCoord(item);
+                        while (changeMs > ZeeConfig.lastInvItemMs) {
+                            sleep(PING_MS);
+                        }
+                    }
 
 
                 }catch (Exception e){
