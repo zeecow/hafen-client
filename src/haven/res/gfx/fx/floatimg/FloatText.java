@@ -14,7 +14,7 @@ public class FloatText extends FloatSprite {
         checkDmgHpMaybe(owner,res,str,col);
     }
 
-    static final Text.Foundry defDmgFont = new Text.Foundry(Text.sans.deriveFont(Font.BOLD, UI.scale(18))).aa(true);
+    static final Text.Foundry defDmgFont = new Text.Foundry(Text.sans.deriveFont(Font.PLAIN, UI.scale(14))).aa(true);
     private void checkDmgHpMaybe(Owner owner, Resource res, String str, Color col) {
         try {
             //ZeeConfig.println(owner.getClass().getName() + " , " + res + " , "+str+" , "+col);
