@@ -1540,7 +1540,7 @@ public class ZeeManagerGobClick extends ZeeThread{
         ZeeConfig.removeGobText(closestPlant);
     }
 
-    public static void removeTreeAndStump(Gob tree, String petalName){
+    static void removeTreeAndStump(Gob tree, String petalName){
         try{
             if (petalName.contentEquals(ZeeFlowerMenu.STRPETAL_REMOVEALLTREES)) {
                 ZeeConfig.addPlayerText("rem trees");
@@ -1549,37 +1549,47 @@ public class ZeeManagerGobClick extends ZeeThread{
                 ZeeConfig.addPlayerText("rem tree&stump");
             }
             ZeeConfig.lastMapViewClickButton = 2;//prepare for cancel click
-            waitNoFlowerMenu();
+            if(!waitNoFlowerMenu()){
+                println("remtree > failed waiting no flowemenu");
+                exitRemoveAllTrees();
+                return;
+            }
             ZeeManagerItemClick.equipAxeChopTree();
             sleep(500);//fix lag problem
             Coord2d treeCoord;
             while (tree!=null && !ZeeConfig.isTaskCanceledByGroundClick()) {
                 //start chopping
                 if(!clickGobPetal(tree, "Chop")){
-                    println("couldnt click tree petal \"Chop\"");
+                    println("remtree > couldnt click tree petal \"Chop\"");
                     break;
                 }
-                waitPlayerPose(ZeeConfig.POSE_PLAYER_CHOPTREE);
+                if(!waitPlayerPose(ZeeConfig.POSE_PLAYER_CHOPTREE)){
+                    println("remtree > failed waiting pose choptree");
+                    break;
+                }
                 currentRemovingTree = tree;
                 treeCoord = new Coord2d(tree.rc.x, tree.rc.y);
                 //wait idle
-                if (!ZeeConfig.isTaskCanceledByGroundClick() && waitPlayerIdlePose()) {//waitPlayerIdleFor(2)
-                    sleep(2000);//wait new stump loading
+                if (!ZeeConfig.isTaskCanceledByGroundClick() && waitPlayerIdlePose()) {
+                    //wait new stump loading
+                    sleep(2000);
                     //check task canceled
-                    if(ZeeConfig.isTaskCanceledByGroundClick())
+                    if(ZeeConfig.isTaskCanceledByGroundClick()) {
+                        println("remtree > click canceled");
                         break;
+                    }
                     Gob stump = ZeeConfig.getClosestGob(ZeeConfig.findGobsByNameEndsWith("stump"));
                     if (stump != null) {
                         //stump location doesnt match tree and there's no other stump close
                         if (stump.rc.compareTo(treeCoord) != 0  &&  ZeeConfig.distanceToPlayer(stump) > 25){
-                            println("stump undecided");
+                            println("remtree > stump undecided");
                             break;
                         }
                         ZeeConfig.addGobText(stump, "stump");
                         removeStumpMaybe(stump);
                         waitPlayerIdlePose();
                     } else {
-                        println("stump is null");
+                        println("remtree > stump is null");
                     }
                     if (isRemovingAllTrees) {
                         if (treesForRemoval!=null){

@@ -251,13 +251,9 @@ public class ZeeThread  extends Thread{
 
 
     public static boolean waitPlayerIdlePose(){
-        // player mounting horse
-        if (ZeeConfig.isPlayerMountingHorse()) {
-            return waitPlayerPose(ZeeConfig.POSE_PLAYER_RIDING_IDLE);
-        }
-        // player on kicksled
-        else if (ZeeConfig.isPlayerDrivingingKicksled()) {
-            return waitPlayerIdleOnKicksled();
+        // player mounting horse or kicksled
+        if (ZeeConfig.isPlayerMountingHorse() || ZeeConfig.isPlayerDrivingingKicksled()) {
+            return waitPlayerIdleOnHorseOrKicksled();
         }
         // player on foot?
         else {
@@ -266,13 +262,18 @@ public class ZeeThread  extends Thread{
     }
 
     //TODO add more active poses
-    public static boolean waitPlayerIdleOnKicksled() {
+    public static boolean waitPlayerIdleOnHorseOrKicksled() {
         return waitPlayerPoseNotInList(
                 ZeeConfig.POSE_PLAYER_DRINK,
                 ZeeConfig.POSE_PLAYER_CHOPTREE,
                 ZeeConfig.POSE_PLAYER_DIGSHOVEL,
                 ZeeConfig.POSE_PLAYER_PICK,
-                ZeeConfig.POSE_PLAYER_SAW
+                ZeeConfig.POSE_PLAYER_SAW,
+                ZeeConfig.POSE_PLAYER_CHIPPINGSTONE,
+                ZeeConfig.POSE_PLAYER_BUILD,
+                ZeeConfig.POSE_PLAYER_BUTCH,
+                ZeeConfig.POSE_PLAYER_HARVESTING,
+                ZeeConfig.POSE_PLAYER_PICKGROUND
         );
     }
 
@@ -353,7 +354,7 @@ public class ZeeThread  extends Thread{
 
 
     public static boolean waitPlayerPoseNotInList(String ... forbiddenPoses) {
-        println(">waitPlayerPoseNotInList");
+        //println(">waitPlayerPoseNotInList");
         List<String> currentPoses;
         boolean exit = false;
         try{
@@ -362,16 +363,16 @@ public class ZeeThread  extends Thread{
                 sleep(PING_MS*2);
                 exit = ZeeConfig.isTaskCanceledByGroundClick();
                 if(exit) {
-                    println("    canceled by click");
+                    //println("    canceled by click");
                     break;
                 }
                 currentPoses = ZeeConfig.getPlayerPoses();
                 //println("   "+playerPoses);
                 exit = true;
                 for (int i = 0; i < forbiddenPoses.length; i++) {
-                    println("      "+forbiddenPoses[i]);
+                    //println("      "+forbiddenPoses[i]);
                     if (currentPoses.contains(forbiddenPoses[i])){//if contains pose...
-                        println("         break");
+                        //println("         break");
                         exit = false;
                         break;//... break, loop and sleep again
                     }
@@ -380,7 +381,7 @@ public class ZeeThread  extends Thread{
         }catch (Exception e){
             e.printStackTrace();
         }
-        println("waitPlayerPoseNotInList  exit="+exit + "  cancel="+ZeeConfig.isTaskCanceledByGroundClick());
+        //println("waitPlayerPoseNotInList  exit="+exit + "  cancel="+ZeeConfig.isTaskCanceledByGroundClick());
         return exit;
     }
 
@@ -440,7 +441,7 @@ public class ZeeThread  extends Thread{
         return !poses.contains(poseName);
     }
 
-    public static boolean waitGobPose(Gob gob, String poseName) {
+    static boolean waitGobPose(Gob gob, String poseName) {
         //println("waitGobPose > start");
         List<String> poses = new ArrayList<>();
         try{
@@ -449,14 +450,38 @@ public class ZeeThread  extends Thread{
                 //println("waitGobPose > "+poses);
                 sleep(PING_MS*2);
             } while (
-                    !(poses = ZeeConfig.getGobPoses(gob)).contains(poseName)
-                            && !ZeeConfig.isTaskCanceledByGroundClick()
+                !(poses = ZeeConfig.getGobPoses(gob)).contains(poseName)
+                && !ZeeConfig.isTaskCanceledByGroundClick()
             );
         }catch (Exception e){
             e.printStackTrace();
         }
         //println("      return "+(poses.contains(poseName))+" "+poseName);
         return poses.contains(poseName);
+    }
+
+    static boolean waitGobOnlyPose(Gob gob, String singlePoseName) {
+        //println("waitGobOnlyPose > start");
+        List<String> poses = new ArrayList<>();
+        try{
+            ZeeConfig.lastMapViewClickButton = 2;//prepare for cancel click
+            do{
+                //println("waitGobOnlyPose > "+singlePoseName);
+                sleep(PING_MS*2);
+            } while (
+                !(poses = ZeeConfig.getGobPoses(gob)).contains(singlePoseName)
+                && poses.size() != 1
+                && !ZeeConfig.isTaskCanceledByGroundClick()
+            );
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        //println("      return "+(poses.contains(singlePoseName))+" "+singlePoseName);
+        return poses.size()==1 && poses.contains(singlePoseName);
+    }
+
+    public static boolean waitPlayerOnlyPose(String singlePoseName) {
+        return waitGobOnlyPose(ZeeConfig.getPlayerGob(),singlePoseName);
     }
 
     public static boolean waitPlayerPose(String poseName) {
