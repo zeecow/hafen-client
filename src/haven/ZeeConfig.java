@@ -864,10 +864,15 @@ public class ZeeConfig {
     static int mapWndMinHeightBackup=350, mapWndMinHeight=350;
     public static void windowMapCompact(MapWnd mapWnd, boolean compact) {
 
-        if(compact && mapWnd.c.equals(0,0))//special startup condition?
+        // TODO better way
+        if(compact && mapWnd.c.equals(0,0)) {
+            //println("special startup condition?");
             return;
-        Coord screenSize = gameUI.map.sz;
+        }
 
+        toggleMinimapResizeButtons(mapWnd,compact);
+
+        Coord screenSize = gameUI.map.sz;
         Window.DefaultDeco deco = (Window.DefaultDeco) mapWnd.deco;
 
         // window expanded
@@ -906,6 +911,64 @@ public class ZeeConfig {
                 map.c.x = gameUI.sz.x - map.viewf.sz.x ;
         }
 
+    }
+
+    static Widget wdgMapResizeBtns;
+    static void reposMapResizeBtns(){
+        wdgMapResizeBtns.c = Coord.of(0,gameUI.mapfile.sz.y-23);
+    }
+    private static void toggleMinimapResizeButtons(MapWnd mapWnd, boolean compact) {
+
+        // hide map resize buttons
+        if (!compact && wdgMapResizeBtns!=null){
+            wdgMapResizeBtns.reqdestroy();
+            wdgMapResizeBtns = null;
+        }
+
+        // show map resize buttons
+        else if (compact){
+
+            wdgMapResizeBtns = mapWnd.add(new Widget(Coord.z),0,0);
+            reposMapResizeBtns();
+
+            // button horizontal
+            Button button = wdgMapResizeBtns.add(new Button(20,"↔"){
+                public boolean mousedown(Coord c, int button) {
+                    int change=25;
+                    if (button==3)
+                        change *= -1;
+                    minimapPrevSize = Coord.of(gameUI.mapfile.viewf.sz);
+                    gameUI.mapfile.resize(minimapPrevSize.add(change,0));
+                    minimapCompactResizedMouseup();
+                    minimapCompactReposition();
+                    return true;
+                }
+                public boolean mouseup(Coord c, int button) {
+                    return false;
+                }
+            },Coord.z);
+            button.settip("left/right click");
+
+            // button vertical
+            button = wdgMapResizeBtns.add(new Button(20,"↕"){
+                public boolean mousedown(Coord c, int button) {
+                    int change=25;
+                    if (button==3)
+                        change *= -1;
+                    minimapPrevSize = Coord.of(gameUI.mapfile.viewf.sz);
+                    gameUI.mapfile.resize(minimapPrevSize.add(0,change));
+                    minimapCompactResizedMouseup();
+                    minimapCompactReposition();
+                    return true;
+                }
+                public boolean mouseup(Coord c, int button) {
+                    return false;
+                }
+            },Coord.z.add(20,0));
+            button.settip("left/right click");
+
+            wdgMapResizeBtns.pack();
+        }
     }
 
 
@@ -1753,6 +1816,9 @@ public class ZeeConfig {
             public void run() {
                 try {
                     println("init toggles > "+ZeeSess.charSwitchCurPlayingChar);
+
+                    // add minimap resize buttons
+                    toggleMinimapResizeButtons(gameUI.mapfile,isMiniMapCompacted());
 
                     // show char switch window
                     if (ZeeSess.charSwitchKeepWindow)
@@ -3599,10 +3665,12 @@ public class ZeeConfig {
         compactMapSizeScale1 = Utils.getprefc("compactMapSizeScale1",Coord.of(150,150)),
         compactMapSizeScale2 = Utils.getprefc("compactMapSizeScale2",Coord.of(200,200)),
         compactMapSizeScale3 = Utils.getprefc("compactMapSizeScale3",Coord.of(250,250)),
-        prevSize;
-    static void minimapCompactResized(Coord sz, Frame viewf) {
+        minimapPrevSize;
+    static void minimapCompactResizedMouseup() {
         if (!isMiniMapCompacted())
             return;
+        reposMapResizeBtns();
+        Coord sz = gameUI.mapfile.sz;
         if (MiniMap.scale==1 && gameUI.mapfile.view.zoomlevel==0){
             compactMapSizeScale1 = sz;
             Utils.setprefc("compactMapSizeScale1",sz);
@@ -3621,19 +3689,19 @@ public class ZeeConfig {
         if (!isMiniMapCompacted())
             return;
         if (scale==1 && prevScale>1){
-            prevSize = gameUI.mapfile.viewf.sz;
+            minimapPrevSize = Coord.of(gameUI.mapfile.viewf.sz);
             gameUI.mapfile.resize(compactMapSizeScale1);
             prevScale = scale;
             minimapCompactReposition();
         }
         else if (scale==2 && compactMapSizeScale2!=null){
-            prevSize = gameUI.mapfile.viewf.sz;
+            minimapPrevSize = Coord.of(gameUI.mapfile.viewf.sz);
             gameUI.mapfile.resize(compactMapSizeScale2);
             prevScale = scale;
             minimapCompactReposition();
         }
         else if (scale==3 && compactMapSizeScale3!=null){
-            prevSize = gameUI.mapfile.viewf.sz;
+            minimapPrevSize = Coord.of(gameUI.mapfile.viewf.sz);
             gameUI.mapfile.resize(compactMapSizeScale3);
             prevScale = scale;
             minimapCompactReposition();
@@ -3646,9 +3714,12 @@ public class ZeeConfig {
         if ( map.c.x + map.viewf.sz.x > gameUI.sz.x  ||  map.c.x > gameUI.sz.x/2)
             map.c.x = gameUI.sz.x - map.viewf.sz.x ;
 
-        // adjust y pos only if map is bellow middle screen
-        if (prevSize!=null && map.c.y > gameUI.sz.y/2)
-            map.c.y -= map.viewf.sz.y - prevSize.y;
+        // adjust y pos only if map is bellow limit
+        if (minimapPrevSize!=null && map.c.y > gameUI.sz.y/3)
+            map.c.y -= map.viewf.sz.y - minimapPrevSize.y;
+
+        // minimap resize buttons
+        reposMapResizeBtns();
     }
 
     static boolean isMiniMapCompacted(){

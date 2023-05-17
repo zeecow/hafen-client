@@ -206,7 +206,7 @@ public class MapWnd extends Window implements Console.Directory {
 		drag.remove();
 		drag = null;
 		ZeeConfig.mapWndMinHeightBackup = -1;
-		ZeeConfig.minimapCompactResized(sz,viewf);
+		ZeeConfig.minimapCompactResizedMouseup();
 		return(true);
 	    }
 	    return(super.mouseup(c, button));
