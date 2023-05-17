@@ -7,6 +7,8 @@ import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static haven.OCache.posres;
@@ -1263,7 +1265,7 @@ public class ZeeManagerGobClick extends ZeeThread{
     static boolean isGobDeadAnimal;
 
     @SuppressWarnings("unchecked")
-    public static void labelGobBarrelCistern(Window window) {
+    public static void labelGobByContents(Window window) {
         new Thread(){
             public void run() {
                 try{
@@ -1291,13 +1293,20 @@ public class ZeeManagerGobClick extends ZeeThread{
                                             return;
                                         }
 
-                                        // reduce "15 l of Cowsmilk" to "Cowsmilk"
-                                        String gobText = name.replaceAll("[\\^\\S]+\\s+[\\^\\S]+\\s+of\\s+","");
+                                        // (15.45) (l) of (Cave Slime)
+                                        Pattern pattern = Pattern.compile("(\\d+\\.?+\\d+)\\s+(\\S+) of ([\\S\\s]+)$");//.compile("(.*?)(\\d+)(.*)");
+                                        Matcher matcher = pattern.matcher(name);
+                                        matcher.find();
+                                        String quantity = String.format("%.0f",Math.rint(Double.parseDouble(matcher.group(1))));
+                                        String metric = matcher.group(2);
+                                        String substance = matcher.group(3).replaceAll("\\s+","");
+
+                                        String gobText = quantity + metric + " " + substance;
 
                                         // get quality
                                         Double ql = ZeeManagerItemClick.getItemInfoQuality(info);
                                         if(ql > 0) {
-                                            gobText += " q" + ql.intValue();
+                                            gobText += ql.intValue();
                                         }
 
                                         // label gob "name q"
