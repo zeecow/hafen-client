@@ -1212,7 +1212,7 @@ public class ZeeManagerGobClick extends ZeeThread{
                 opts.add(ZeeFlowerMenu.STRPETAL_TILEMONITOR);
             menu = new ZeeFlowerMenu(gob, opts.toArray(String[]::new));
         }
-        else if (isGobTamedAnimal(gobName)) {
+        else if (isGobTamedAnimal(gobName) && !isGobKnocked(gob)) {
             menu = new ZeeFlowerMenu(gob, ZeeFlowerMenu.STRPETAL_OPENCATTLEROSTER, ZeeFlowerMenu.STRPETAL_MEMORIZEAREANIMALS);
         }
         else if (isGobButchable(gobName) && isGobKnocked(gob)) {
