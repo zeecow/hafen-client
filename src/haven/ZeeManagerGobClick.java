@@ -1017,7 +1017,11 @@ public class ZeeManagerGobClick extends ZeeThread{
 
         String gobName = gob.getres().name;
 
-        if (petalName.contentEquals(ZeeFlowerMenu.STRPETAL_TILEMONITOR))
+        if (petalName.contentEquals(ZeeFlowerMenu.STRPETAL_OPENCATTLEROSTER))
+            ZeeConfig.gameUI.menu.wdgmsg("act","croster");
+        else if (petalName.contentEquals(ZeeFlowerMenu.STRPETAL_MEMORIZEAREANIMALS))
+            ZeeConfig.gameUI.menu.wdgmsg("act","croster","a");
+        else if (petalName.contentEquals(ZeeFlowerMenu.STRPETAL_TILEMONITOR))
             ZeeManagerMiner.tileMonitorWindow();
         else if(petalName.contentEquals(ZeeFlowerMenu.STRPETAL_SWITCHCHAR))
             ZeeSess.charSwitchCreateWindow();
@@ -1207,6 +1211,9 @@ public class ZeeManagerGobClick extends ZeeThread{
             if (ZeeConfig.isCaveTile(ZeeConfig.getPlayerTileName()))
                 opts.add(ZeeFlowerMenu.STRPETAL_TILEMONITOR);
             menu = new ZeeFlowerMenu(gob, opts.toArray(String[]::new));
+        }
+        else if (isGobTamedAnimal(gobName)) {
+            menu = new ZeeFlowerMenu(gob, ZeeFlowerMenu.STRPETAL_OPENCATTLEROSTER, ZeeFlowerMenu.STRPETAL_MEMORIZEAREANIMALS);
         }
         else if (isGobButchable(gobName) && isGobKnocked(gob)) {
             menu = new ZeeFlowerMenu(gob, ZeeFlowerMenu.STRPETAL_AUTOBUTCH_BIGDEADANIMAL, ZeeFlowerMenu.STRPETAL_LIFTUPGOB);
@@ -2157,7 +2164,15 @@ public class ZeeManagerGobClick extends ZeeThread{
         return ret;
     }
 
-    private static boolean isGobButchable(String gobName){
+    static boolean isGobTamedAnimal(String gobName){
+        return isGobInListEndsWith(
+                gobName,
+                "/stallion,/mare,/foal,/hog,/sow,/piglet,"
+                    +"/billy,/nanny,/kid,/sheep,/lamb,/cattle,/calf,"
+        );
+    }
+
+    static boolean isGobButchable(String gobName){
         return isGobInListEndsWith(
             gobName,
             "/stallion,/mare,/foal,/hog,/sow,/piglet,"
@@ -2170,11 +2185,11 @@ public class ZeeManagerGobClick extends ZeeThread{
         );
     }
 
-    public static boolean isGobHorse(String gobName) {
+    static boolean isGobHorse(String gobName) {
         return isGobInListEndsWith(gobName, "stallion,mare,horse");
     }
 
-    private static boolean isGobFireSource(String gobName) {
+    static boolean isGobFireSource(String gobName) {
         return isGobInListEndsWith(gobName,"brazier,pow,snowlantern,/bonfire");
     }
 

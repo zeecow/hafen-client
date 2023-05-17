@@ -45,7 +45,7 @@ Client focusing on small helper tasks, many using mouse middle button, and other
 - Option "Fish Moon XP" show text over calendar 
 - Scroll text entry fuel for kiln, oven, smelter
 - hover menu on search actions button 
-- auto-label gob Barrel/Cistern when it's window is opened
+- auto-label gob Barrel/Cistern/Demijohn when it's window is opened
 - option right-click stoat icon to aggro 
 - auto craft helper: cloth linen/hemp, bug collection
   - use closest fibre pile until inv full
@@ -122,6 +122,9 @@ Client focusing on small helper tasks, many using mouse middle button, and other
     - switch char 
     - mine tiles window
     - test coords
+  - tamed animal context menu
+    - open cattle roster
+    - memorize area
 - long midclick context menus for items
   - auto butch dead animal items
   - kill all cocoon items
