@@ -870,8 +870,6 @@ public class ZeeConfig {
             return;
         }
 
-        toggleMinimapResizeButtons(mapWnd,compact);
-
         Coord screenSize = gameUI.map.sz;
         Window.DefaultDeco deco = (Window.DefaultDeco) mapWnd.deco;
 
@@ -911,11 +909,16 @@ public class ZeeConfig {
                 map.c.x = gameUI.sz.x - map.viewf.sz.x ;
         }
 
+
+        // show/hide minimap resize btns
+        toggleMinimapResizeButtons(mapWnd,compact);
+
     }
 
     static Widget wdgMapResizeBtns;
     static void reposMapResizeBtns(){
-        wdgMapResizeBtns.c = Coord.of(0,gameUI.mapfile.sz.y-23);
+        if (wdgMapResizeBtns!=null)
+            wdgMapResizeBtns.c = Coord.of(0,gameUI.mapfile.sz.y-23);
     }
     private static void toggleMinimapResizeButtons(MapWnd mapWnd, boolean compact) {
 
