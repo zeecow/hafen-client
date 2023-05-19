@@ -763,7 +763,7 @@ public class ZeeManagerItemClick extends ZeeThread{
             }
             menu = new ZeeFlowerMenu(wItem, opts.toArray(String[]::new));
         }
-        else if (isItemWindowTable() && ZeeConfig.getCursorName().equals(ZeeConfig.CURSOR_EAT)){
+        else if (ZeeConfig.getCursorName().equals(ZeeConfig.CURSOR_EAT)){
             menu = new ZeeFlowerMenu(wItem, ZeeFlowerMenu.STRPETAL_EATALL);
         }
         else{
