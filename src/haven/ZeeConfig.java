@@ -1827,29 +1827,10 @@ public class ZeeConfig {
                     if (ZeeSess.charSwitchKeepWindow)
                         ZeeSess.charSwitchCreateWindow();
 
-                    // discover autostack checkbox value
-                    toggleAutostack();//toggle autostack
-                    Thread.sleep(1000);
-                    if (lastUiMsg!=null){
-                        //autostack was off
-                        if (lastUiMsg.contains("Stacking is now turned on.")){
-                            autoStack = false;
-                        }
-                        //autostack was on
-                        else if (lastUiMsg.contains("Stacking is now turned off.")){
-                            autoStack = true;
-                        }
-                        // set checkbox value
-                        ZeeInvMainOptionsWdg.cbAutoStack.a = autoStack;
-                    }
-                    toggleAutostack();//reset to original value
-
-
                     // auto run speed
                     Thread.sleep(1000);
                     if(autoRunLogin)
                         setPlayerSpeed(PLAYER_SPEED_2);
-
 
                     // auto track scents
                     Thread.sleep(1000);
@@ -1858,6 +1839,25 @@ public class ZeeConfig {
                         //tracking for all characters
                         alreadyTrackingScents = true;
                     }
+
+                    // discover autostack checkbox value
+                    //TODO waitUiMsg
+                    toggleAutostack();//toggle autostack
+                    Thread.sleep(1000);
+                    if (lastUiMsg!=null){
+                        //autostack was off
+                        if (lastUiMsg.contains("Stacking is now turned on.")){
+                            ZeeInvMainOptionsWdg.cbAutoStack.a = autoStack = false;
+                        }
+                        //autostack was on
+                        else if (lastUiMsg.contains("Stacking is now turned off.")){
+                            ZeeInvMainOptionsWdg.cbAutoStack.a = autoStack = true;
+                        }
+                        else {
+                            println("couldn't determine stacking option value");
+                        }
+                    }
+                    toggleAutostack();//reset to original value
 
                 } catch (InterruptedException e) {
                     e.printStackTrace();
