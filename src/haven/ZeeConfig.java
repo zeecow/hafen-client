@@ -821,6 +821,9 @@ public class ZeeConfig {
         if( (speech = mapGobSpeech.get(gobName)) != null){
             ZeeSynth.textToSpeakLinuxFestival(speech);
         }
+        if (gobName.startsWith("gfx/terobjs/dng/")){//TODO specify names
+            ZeeSynth.textToSpeakLinuxFestival("dungeon");
+        }
     }
 
     static void autoHearth() {
