@@ -653,16 +653,10 @@ public class ZeeManagerGobClick extends ZeeThread{
         }
 
         // label harvested plant ql
-        if (gobName.endsWith("plants/wine") || gobName.endsWith("plants/hops") || gobName.endsWith("plants/pepper"))
-        {
-            //WItem scythe = ZeeManagerItemClick.getBeltWItem("/scythe");
-            if (ZeeManagerItemClick.isItemInHandSlot("/scythe")){
-                println("not labeling single plant due to scythe equipped");
-                clickedPlantGobForLabelingQl = false;
-            }
-            else {
-                clickedPlantGobForLabelingQl = true;
-            }
+        clickedPlantGobForLabelingQl = gobName.endsWith("plants/wine") || gobName.endsWith("plants/hops") || gobName.endsWith("plants/pepper");
+        if(clickedPlantGobForLabelingQl && ZeeManagerItemClick.isItemInHandSlot("/scythe")) {
+            println("not labeling single plant due to scythe equipped");
+            clickedPlantGobForLabelingQl = false;
         }
 
         // click barrel transfer
