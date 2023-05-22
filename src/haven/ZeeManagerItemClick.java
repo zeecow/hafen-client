@@ -1552,4 +1552,89 @@ public class ZeeManagerItemClick extends ZeeThread{
             }
         }.start();
     }
+
+    static boolean isTwoHandedItemEquippable(String beltItemNameContains) {
+
+        Inventory invBelt = getInvBelt();
+        if (invBelt.countItemsByNameContains(beltItemNameContains) == 0)
+            return false;
+
+        //int freeHands = getFreeHandsCount();
+        int freeBeltSlots = invBelt.getNumberOfFreeSlots();
+        int handItems = getHandItemsCount();
+
+        if (freeBeltSlots==0 && handItems==2)
+            return false;
+
+        if (cannotUnequipSack()){
+            return false;
+        }
+
+        // items is equippable, maybe
+        return true;
+    }
+
+
+    // TODO check mixed bindle/sack
+    static boolean cannotUnequipSack() {
+
+        Inventory mainInv = ZeeConfig.getMainInventory();
+
+        // bindles
+        if (getRightHandName().endsWith("/bindle")){
+            // bindle in rightHand, check if last row occupied
+            for (WItem item : mainInv.children(WItem.class)) {
+                //println("    "+item.item.getres().basename()+" >  c"+item.c.div(33) +"  sz"+ item.sz.div(33) +"  invsz"+ mainInv.isz);
+                if (item.c.div(33).x + item.sz.div(33).x == mainInv.isz.x){
+                    println("last row occupied, can't unnequip bindle");
+                    return true;
+                }
+            }
+        } else if (getLeftHandName().endsWith("/bindle")){
+            // bindle in leftHand, check if last col occupied
+            for (WItem item : mainInv.children(WItem.class)) {
+                //println("    "+item.item.getres().basename()+" >  c"+item.c.div(33) +"  sz"+ item.sz.div(33) +"  invsz"+ mainInv.isz);
+                if (item.c.div(33).y + item.sz.div(33).y == mainInv.isz.y){
+                    println("last col occupied, can't unnequip bindle");
+                    return true;
+                }
+            }
+        }
+
+        //traveller sacks
+        else if(getLeftHandName().endsWith("travellerssack") || getRightHandName().endsWith("travellerssack")){
+            // check if last row or last col is occupied
+            for (WItem item : mainInv.children(WItem.class)) {
+                //println("    "+item.item.getres().basename()+" >  c"+item.c.div(33) +"  sz"+ item.sz.div(33) +"  invsz"+ mainInv.isz);
+                if (item.c.div(33).y + item.sz.div(33).y == mainInv.isz.y || item.c.div(33).x + item.sz.div(33).x == mainInv.isz.x){
+                    println("last col/row occupied, can't unnequip traveller sack");
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    static int getHandItemsCount(){
+        int handItems = 0;
+        if (!getLeftHandName().isBlank())
+            handItems++;
+        if (!getRightHandName().isBlank())
+            handItems++;
+        // two handed item
+        if (handItems==2 && getLeftHandName().contentEquals(getRightHandName()))
+            handItems--;
+        return handItems;
+    }
+
+    static int getFreeHandsCount(){
+        int free = 0;
+        if (getLeftHandName().isBlank())
+            free++;
+        if (getRightHandName().isBlank())
+            free++;
+        return free;
+    }
+
 }
