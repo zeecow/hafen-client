@@ -3225,15 +3225,19 @@ public class ZeeConfig {
         List<String> ret = new ArrayList<>();
         if (gob==null)
             return ret;
-        Drawable d = gob.getattr(Drawable.class);
-        if (d instanceof Composite) {
-            Composite comp = (Composite) d;
-            for (ResData rd : comp.prevposes) {
-                try {
-                    ret.add(rd.res.get().name);
-                } catch (Loading l) {
+        try {
+            Drawable d = gob.getattr(Drawable.class);
+            if (d instanceof Composite) {
+                Composite comp = (Composite) d;
+                for (ResData rd : comp.prevposes) {
+                    try {
+                        ret.add(rd.res.get().name);
+                    } catch (Loading l) {
+                    }
                 }
             }
+        }catch (Exception e){
+            e.printStackTrace();
         }
         return ret;
     }
