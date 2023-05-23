@@ -67,6 +67,7 @@ public class ZeeQuickOptionsWindow {
                         a = val;
                     }
                 };
+                newcb.settip("hold shift = no bump");
             }catch (Exception e){
                 ZeeConfig.println("config \""+listConfigLabel.get(i)[1]+"\" not found? ");
             }
@@ -83,8 +84,13 @@ public class ZeeQuickOptionsWindow {
         repositionWidgets();
     }
 
-    // move checkbox up in the list, so it stays longer
     private static void bumpCheckBox(String configName) {
+
+        // no bump if shift pressed
+        if (ZeeConfig.gameUI.ui.modshift)
+            return;
+
+        // move checkbox up in the list, so it stays longer
         for (int j = 0; j < listConfigLabel.size(); j++) {
             if (listConfigLabel.get(j)[0].contentEquals(configName) && j<listConfigLabel.size()-1){
                 //ZeeConfig.println("bump "+j+"  "+(listConfigLabel.get(j)[1]));
