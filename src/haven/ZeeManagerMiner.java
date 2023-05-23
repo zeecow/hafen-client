@@ -564,6 +564,7 @@ public class ZeeManagerMiner extends ZeeThread{
     }
 
     static ZeeWindow tilemonWindow;
+    static Scrollport tilemonScrollport;
     static boolean tilemonAutoRefresh = false;
     static ZeeThread tilemonAutoThread;
     static CheckBox tilemonAutoCheckbox;
@@ -648,6 +649,10 @@ public class ZeeManagerMiner extends ZeeThread{
                 }
             },tilemonLabelFindTile.c.x+tilemonLabelFindTile.sz.x+5,30);
             te.settip("tile name(s), comma separated");
+
+            // scrollport for tiles
+            tilemonScrollport = tilemonWindow.add(new Scrollport(new Coord(120, 200)), 0, 55);
+
         }
         else{
             tilemonWindow.show();
@@ -690,7 +695,7 @@ public class ZeeManagerMiner extends ZeeThread{
         //sorted list
         SortedSet<String> tiles = new TreeSet<String>(mapTileresCount.keySet());
         //create new labels
-        int y = 55;
+        int y = 0;
         Label label;
         String basename;
         List<String> silverList = List.of("galena","argentite","hornsilver");
@@ -736,7 +741,8 @@ public class ZeeManagerMiner extends ZeeThread{
                     }
                 }
             }
-            tilemonWindow.add(label,0,y);
+            //tilemonWindow.add(label,0,y);
+            tilemonScrollport.cont.add(label,0,y);
             y += 13;
         }
 
@@ -744,7 +750,8 @@ public class ZeeManagerMiner extends ZeeThread{
         /*
             append mining ql log
          */
-        label = new Label("=== top 10 ql ===");
+        y = tilemonScrollport.c.y + tilemonScrollport.sz.y + 5;
+        label = new Label("==== top 10 ql ====");
         label.setcolor(Color.green);
         tilemonWindow.add(label,0,y);
         List<Map.Entry<String,Integer>> miningLog = getSortedMiningLog();
