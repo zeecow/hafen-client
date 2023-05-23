@@ -1559,16 +1559,13 @@ public class ZeeManagerItemClick extends ZeeThread{
         if (invBelt.countItemsByNameContains(beltItemNameContains) == 0)
             return false;
 
-        //int freeHands = getFreeHandsCount();
+        if (cannotUnequipSack())
+            return false;
+
         int freeBeltSlots = invBelt.getNumberOfFreeSlots();
         int handItems = getHandItemsCount();
-
         if (freeBeltSlots==0 && handItems==2)
             return false;
-
-        if (cannotUnequipSack()){
-            return false;
-        }
 
         // items is equippable, maybe
         return true;
