@@ -54,7 +54,7 @@ public class MapView extends PView implements DTarget, Console.Directory {
     public Camera camera = restorecam();
     private Loader.Future<Plob> placing = null;
     private Grabber grab;
-    private Selector selection;
+    Selector selection;
     private Coord3f camoff = new Coord3f(Coord3f.o);
     public double shake = 0.0;
     public static double plobpgran = Utils.getprefd("plobpgran", 8);
@@ -2302,7 +2302,7 @@ public class MapView extends PView implements DTarget, Console.Directory {
 
 	    public Material mat() {return(mat);}
 	};
-    private class Selector implements Grabber {
+    class Selector implements Grabber {
 	Coord sc;
 	MCache.Overlay ol;
 	UI.Grab mgrab;
@@ -2310,7 +2310,7 @@ public class MapView extends PView implements DTarget, Console.Directory {
 	Text tt;
 	final GrabXL xl = new GrabXL(this) {
 		public boolean mmousedown(Coord cc, int button) {
-		    if(button != 1)
+		    if(button != 1 && !ZeeManagerGobClick.quickFarmSelection)
 			return(false);
 		    return(super.mmousedown(cc, button));
 		}
@@ -2331,7 +2331,10 @@ public class MapView extends PView implements DTarget, Console.Directory {
 		    ol.destroy();
 		    mgrab.remove();
 		}
-		sc = mc.div(MCache.tilesz2);
+		if (ZeeManagerGobClick.quickFarmSelection)
+			sc = mc;
+		else
+			sc = mc.div(MCache.tilesz2);
 		modflags = ui.modflags();
 		xl.mv = true;
 		mgrab = ui.grabmouse(MapView.this);

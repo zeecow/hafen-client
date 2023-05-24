@@ -627,7 +627,7 @@ public class ZeeThread  extends Thread{
             e.printStackTrace();
         }
         //println("wait cursor "+name+" = "+ZeeConfig.getCursorName().equals(name));
-        return ZeeConfig.getCursorName().equals(name);
+        return ZeeConfig.getCursorName().contentEquals(name);
     }
 
     public static boolean waitRes(GItem g) {

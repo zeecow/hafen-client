@@ -4,6 +4,7 @@ Client focusing on small helper tasks, many using mouse middle button, and other
 
 - flowermenu works onmouseup 
 - minimap drags with button 3
+- area farm selection holding button 3
 - search actions globally
 - sort actions by most used craft items
 - craft window buttons for ingredients and history

@@ -645,7 +645,50 @@ public class ZeeManagerGobClick extends ZeeThread{
 
     }
 
-    public static void checkRightClickGob(Coord pc, Coord2d mc, Gob gob, String gobName) {
+    static boolean activateHarvestGob(Gob cropGob){
+        if (cropGob==null)
+            return false;
+        gobClick(cropGob, 3, UI.MOD_SHIFT);
+        return waitCursorName(ZeeConfig.CURSOR_HARVEST);
+    }
+
+    static boolean quickFarmSelection = false;
+    static void checkRightClickGob(Coord pc, Coord2d mc, Gob gob, String gobName) {
+
+        //long click starts harvest selection
+        if(isGobCrop(gobName)){
+            new ZeeThread(){
+                public void run() {
+                    try {
+                        //TODO waitMouseUp
+                        long startMs = lastClickMouseDownMs;
+                        while(now() - startMs < LONG_CLICK_MS) {
+                            sleep(50);
+                        }
+                        //mouse still down
+                        if(lastClickMouseUpMs < startMs){
+                            sleep(PING_MS);
+                            if (getFlowerMenu()!=null){
+                                ZeeConfig.cancelFlowerMenu();
+                                waitNoFlowerMenu();
+                            }
+                            quickFarmSelection = true;
+                            if (activateHarvestGob(gob)) {
+                                //creates new MapView.Selector
+                                ZeeConfig.gameUI.map.uimsg("sel", 1);
+                                sleep(555);
+                                boolean ret = ZeeConfig.gameUI.map.selection.mmousedown(ZeeConfig.getGobTile(gob),1);
+                            }else{
+                                println("coundt activate harvest gob");
+                            }
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    quickFarmSelection = false;
+                }
+            }.start();
+        }
 
         // bugCollectionAuto label bug containers and wood pile
         if (ZeeManagerCraft.bugColRecipeOpen){

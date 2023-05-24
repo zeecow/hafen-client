@@ -365,8 +365,7 @@ public class ZeeManagerFarmer extends ZeeThread{
         }
         Gob g = ZeeConfig.getClosestGob(plants);
         if(g!=null) {
-            ZeeManagerGobClick.gobClick(g, 3, UI.MOD_SHIFT);
-            return waitCursorName(ZeeConfig.CURSOR_HARVEST);
+            return ZeeManagerGobClick.activateHarvestGob(g);
         }else {
             //println("no gobs to shift+click");
             return false;

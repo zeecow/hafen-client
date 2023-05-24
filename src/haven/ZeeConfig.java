@@ -2344,15 +2344,15 @@ public class ZeeConfig {
     }
 
     public static String getCursorName() {
-        return cursorName;
-        /*try {
+        //return cursorName;//too slow for quick farming selection
+        try {
             synchronized(gameUI.map.ui) {
                 return gameUI.map.ui.getcurs(Coord.z).name;
             }
         } catch(Exception e) {
             e.printStackTrace();
             return "";
-        }*/
+        }
     }
 
     /**
