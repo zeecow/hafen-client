@@ -402,8 +402,8 @@ public class Inventory extends Widget implements DTarget {
 		try {
 			Double ret = ZeeManagerItemClick.getItemInfoQuality(item.info());
 			return ret;
-		} catch (Exception e) {
-			e.printStackTrace();
+		} catch (Loading e) {
+			//ZeeConfig.println("Inventory.getQuality > "+e.getMessage());
 		}
 		return (double) -1;
 	}
