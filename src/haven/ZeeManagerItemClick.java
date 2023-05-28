@@ -714,6 +714,9 @@ public class ZeeManagerItemClick extends ZeeThread{
         if (!isLongClick())
             return false;
 
+        if (isStackPagina(wItem.item))
+            return false;
+
         boolean showMenu = true;
         ZeeFlowerMenu menu = null;
 
