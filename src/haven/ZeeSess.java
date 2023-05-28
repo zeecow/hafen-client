@@ -5,7 +5,7 @@ import java.util.List;
 
 public class ZeeSess {
 
-    static final String WINTITLE = "Switch char";
+    static final String WINTITLE = "Switch Char";
 
     static boolean charSwitchKeepWindow = Utils.getprefb("charSwitchKeepWindow",false);
 

@@ -117,7 +117,7 @@ public class ZeeConfig {
 
     public static final String DEF_LIST_MUTE_AUDIO = "Leashed horse.;Tracking is now turned;Stacking is now turned;must be empty to be unequipped";
     public static final String DEF_LIST_CONFIRM_PETAL = "Empty,Swill,Clean out,Slaughter,Castrate,Unmoor,Take possession,Renounce Lawspeaker,Become Lawspeaker";
-    public static final String DEF_LIST_AUTO_HIDE_WINDOWS = "Inventory,Character Sheet,Basket,Creel,Cattle Roster,Quiver";
+    public static final String DEF_LIST_HOVER_HIDE_WINDOWS = "Inventory,Character Sheet,Basket,Creel,Cattle Roster,Quiver,Pickup Gobs,Tile Monitor,Switch Char";
     public static final String DEF_LIST_BUTCH_AUTO = "Break,Scale,Wring neck,Kill,Skin,Flay,Pluck,Clean,Butcher,Collect bones";
     public static final String DEF_LIST_AUTO_CLICK_MENU = "Pick,Harvest wax";
     public static final String DEF_LIST_SHAPEICON = "stalagoomba 1,diamond 7 1 0,255 255 0;/amberwash 2,diamond 7 0 1,255 102 0;/cavepuddle 2,diamond 7 0 1,0 204 102;/ladder 2,triangleUp 5 0 1,0 204 102;/minehole 2,triangleDown 5 0 1,0 204 102;/burrow 2,triangleDown 6 0 1,204 0 255;/spark 2,square 4 0 1,102 102 255;/snekkja 2,square 4 0 1,255 255 102;/dugout 2,square 4 0 1,255 255 102;/wheelbarrow 2,square 4 0 1,0 255 255;/cart 2,square 4 0 1,0 153 255;/knarr 2,square 4 0 1,255 255 102;/rowboat 2,square 4 0 1,255 255 102;/horse/ 1,square 4 0 1,0 204 0;items/arrow 2,triangleUp 5 0 1,102 255 204;milestone-stone-e 2,diamond 4 0 1,255 255 255;milestone-wood-e 2,diamond 4 0 1,255 255 255;/fishingnet 2,diamond 4 0 1,153 153 153;wonders/wellspring 1,diamond 5 0 1,0 255 255;/map/starshard 2,diamond 7 0 1,255 255 0";
@@ -222,7 +222,7 @@ public class ZeeConfig {
     public static boolean keyCamSwitchShiftC = Utils.getprefb("keyCamSwitchShiftC", true);
     public static boolean keyUpDownAudioControl = Utils.getprefb("keyUpDownAudioControl", true);
     public static boolean autoHideWindows = Utils.getprefb("autoHideWindows", false);
-    public static String autoHideWindowsList = Utils.getpref("autoHideWindowsList", DEF_LIST_AUTO_HIDE_WINDOWS);
+    public static String hoverHideWindowsList = Utils.getpref("hoverHideWindowsList", DEF_LIST_HOVER_HIDE_WINDOWS);
     public static boolean miniTrees = Utils.getprefb("miniTrees", false);
     public static Integer miniTreesSize = Utils.getprefi("miniTreesSize", 50);
     public static boolean noWeather = Utils.getprefb("noWeather", false);
@@ -1191,10 +1191,10 @@ public class ZeeConfig {
     }
 
     private static void windowModAutoHideButton(Window window, String windowTitle) {
-        if (autoHideWindowsList.isBlank())
+        if (hoverHideWindowsList.isBlank())
             return;
         boolean showButton = false;
-        for (String cap : ZeeConfig.autoHideWindowsList.split(",")) {
+        for (String cap : ZeeConfig.hoverHideWindowsList.split(",")) {
             if (cap.contentEquals(windowTitle)) {
                 showButton = true;
                 break;

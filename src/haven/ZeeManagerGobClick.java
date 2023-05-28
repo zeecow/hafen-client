@@ -2372,7 +2372,7 @@ public class ZeeManagerGobClick extends ZeeThread{
         }
 
         //create window
-        winPickupGob = new ZeeWindow(Coord.of(200,300),"pickup gobs");
+        winPickupGob = new ZeeWindow(Coord.of(200,300),"Pickup Gobs");
 
         //checkbox keep window open
         wdg = winPickupGob.add( new CheckBox("keep window open"){
