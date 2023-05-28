@@ -2366,7 +2366,7 @@ public class ZeeManagerGobClick extends ZeeThread{
 
         // toggle window off
         if (winPickupGob!=null){
-            winPickupGob.destroy();
+            winPickupGob.reqdestroy();
             winPickupGob = null;
             listNamesAdded.clear();
         }
@@ -2396,6 +2396,10 @@ public class ZeeManagerGobClick extends ZeeThread{
         }, 0, wdg.c.y + wdg.sz.y + 5);
         wdg = winPickupGob.add(new Label("(ctrl+q)"), wdg.c.x + wdg.sz.x + 5 , wdg.c.y + 5);
 
+        //scroll port
+        int y = wdg.c.y + wdg.sz.y + 15;
+        Scrollport scrollport = winPickupGob.add(new Scrollport(new Coord(130, 200)), 0, y);
+
 
         // add window, exit if no gobs
         winPickupGob.pack();
@@ -2407,7 +2411,7 @@ public class ZeeManagerGobClick extends ZeeThread{
 
 
         // populate window with gob list
-        int y = wdg.c.y + wdg.sz.y + 15;
+        y = 0;//inside port
         for (int i = 0; i < gobs.size(); i++) {
 
             String resname = gobs.get(i).getres().name;
@@ -2425,7 +2429,7 @@ public class ZeeManagerGobClick extends ZeeThread{
             listNamesAdded.add(resname);
 
             // add button "pick" single gob
-            wdg = winPickupGob.add(
+            wdg = scrollport.cont.add(
                 new ZeeWindow.ZeeButton(30, "one"){
                     public void wdgmsg(String msg, Object... args) {
                         if (msg.contentEquals("activate")){
@@ -2443,7 +2447,7 @@ public class ZeeManagerGobClick extends ZeeThread{
             );
 
             // add button pick "all"
-            wdg = winPickupGob.add(
+            wdg = scrollport.cont.add(
                     new ZeeWindow.ZeeButton(30, "all") {
                         public void wdgmsg(String msg, Object... args) {
                             if (msg.contentEquals("activate")) {
@@ -2465,7 +2469,7 @@ public class ZeeManagerGobClick extends ZeeThread{
             }
 
             // add label gob name
-            wdg = winPickupGob.add(new Label(basename), wdg.c.x+wdg.sz.x+3, y + 5);
+            wdg = scrollport.cont.add(new Label(basename), wdg.c.x+wdg.sz.x+3, y + 5);
 
             y += 23;
         }
