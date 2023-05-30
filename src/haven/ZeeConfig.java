@@ -21,84 +21,84 @@ import static haven.OCache.posres;
 
 
 public class ZeeConfig {
-    public static final String CATEG_PVPANDSIEGE = "PVP and siege";
-    public static final String CATEG_AGROCREATURES = "Agressive creatures";
-    public static final String CATEG_RAREFORAGE = "Rare forageables";
-    public static final String CATEG_LOCRES = "Localized resources";
-    public static final String MAP_GOB_AUDIO = "mapGobSaved";
-    public static final String MAP_GOB_SPEECH = "mapGobSpeech";
-    public static final String MAP_ANIMAL_FORMAT = "mapAnimalFormat";
-    public static final String MAP_ANIMAL_FORMAT_PIG = "pig";
-    public static final String MAP_ANIMAL_FORMAT_HORSE = "horse";
-    public static final String MAP_ANIMAL_FORMAT_CATTLE = "cattle";
-    public static final String MAP_ANIMAL_FORMAT_GOAT = "goat";
-    public static final String MAP_ANIMAL_FORMAT_SHEEP = "sheep";
-    public static final String MAP_GOB_CATEGORY = "mapGobCategory2";
-    public static final String MAP_CATEGORY_AUDIO = "mapCategoryAudio2";
-    public static final String MAP_CATEGORY_COLOR = "mapCategoryColor2";
-    public static final String MAP_CATEGORY_GOBS = "mapCategoryGobs2";
-    public static final String MAP_ACTION_USES = "mapActionUses2";
-    public static final String MAP_GOB_COLOR = "mapGobSettings2";
-    public static final String MAP_WND_POS = "mapWindowPos3";
-    public static final String MAKE_WINDOW_NAME = "Makewindow";
+    static final String CATEG_PVPANDSIEGE = "PVP and siege";
+    static final String CATEG_AGROCREATURES = "Agressive creatures";
+    static final String CATEG_RAREFORAGE = "Rare forageables";
+    static final String CATEG_LOCRES = "Localized resources";
+    static final String MAP_GOB_AUDIO = "mapGobSaved";
+    static final String MAP_GOB_SPEECH = "mapGobSpeech";
+    static final String MAP_ANIMAL_FORMAT = "mapAnimalFormat";
+    static final String MAP_ANIMAL_FORMAT_PIG = "pig";
+    static final String MAP_ANIMAL_FORMAT_HORSE = "horse";
+    static final String MAP_ANIMAL_FORMAT_CATTLE = "cattle";
+    static final String MAP_ANIMAL_FORMAT_GOAT = "goat";
+    static final String MAP_ANIMAL_FORMAT_SHEEP = "sheep";
+    static final String MAP_GOB_CATEGORY = "mapGobCategory2";
+    static final String MAP_CATEGORY_AUDIO = "mapCategoryAudio2";
+    static final String MAP_CATEGORY_COLOR = "mapCategoryColor2";
+    static final String MAP_CATEGORY_GOBS = "mapCategoryGobs2";
+    static final String MAP_ACTION_USES = "mapActionUses2";
+    static final String MAP_GOB_COLOR = "mapGobSettings2";
+    static final String MAP_WND_POS = "mapWindowPos3";
+    static final String MAKE_WINDOW_NAME = "Makewindow";
 
-    public static final String CURSOR_ARW = "gfx/hud/curs/arw";//cursor
-    public static final String CURSOR_ATK = "gfx/hud/curs/atk";
-    public static final String CURSOR_EAT = "gfx/hud/curs/eat";//feast
-    public static final String CURSOR_DIG = "gfx/hud/curs/dig";
-    public static final String CURSOR_HAND = "gfx/hud/curs/hand";//push,lift
-    public static final String CURSOR_HARVEST = "gfx/hud/curs/harvest";
-    public static final String CURSOR_MINE = "gfx/hud/curs/mine";//destroy
-    public static final String CURSOR_SHOOT = "gfx/hud/curs/shoot";
-    public static final String CURSOR_INSPECT = "gfx/hud/curs/study";
+    static final String CURSOR_ARW = "gfx/hud/curs/arw";//cursor
+    static final String CURSOR_ATK = "gfx/hud/curs/atk";
+    static final String CURSOR_EAT = "gfx/hud/curs/eat";//feast
+    static final String CURSOR_DIG = "gfx/hud/curs/dig";
+    static final String CURSOR_HAND = "gfx/hud/curs/hand";//push,lift
+    static final String CURSOR_HARVEST = "gfx/hud/curs/harvest";
+    static final String CURSOR_MINE = "gfx/hud/curs/mine";//destroy
+    static final String CURSOR_SHOOT = "gfx/hud/curs/shoot";
+    static final String CURSOR_INSPECT = "gfx/hud/curs/study";
 
-    public static final String POSE_HORSE_IDLE = "gfx/kritter/horse/idle";
-    public static final String POSE_HORSE_WALKING = "gfx/kritter/horse/walking";//speed 0
-    public static final String POSE_HORSE_PACE = "gfx/kritter/horse/pace";//speed 1
-    public static final String POSE_HORSE_TROT = "gfx/kritter/horse/trot";//speed 2
-    public static final String POSE_HORSE_GALLOP = "gfx/kritter/horse/gallop";//speed 3
+    static final String POSE_HORSE_IDLE = "gfx/kritter/horse/idle";
+    static final String POSE_HORSE_WALKING = "gfx/kritter/horse/walking";//speed 0
+    static final String POSE_HORSE_PACE = "gfx/kritter/horse/pace";//speed 1
+    static final String POSE_HORSE_TROT = "gfx/kritter/horse/trot";//speed 2
+    static final String POSE_HORSE_GALLOP = "gfx/kritter/horse/gallop";//speed 3
 
-    public static final String POSE_PLAYER_RIDING_IDLE = "gfx/borka/riding-idle";//speed 0, 1
-    public static final String POSE_PLAYER_RIDING_TROT = "gfx/borka/riding-trot";//speed 2
-    public static final String POSE_PLAYER_RIDING_GALLOP = "gfx/borka/riding-gallop";//speed 3
+    static final String POSE_PLAYER_RIDING_IDLE = "gfx/borka/riding-idle";//speed 0, 1
+    static final String POSE_PLAYER_RIDING_TROT = "gfx/borka/riding-trot";//speed 2
+    static final String POSE_PLAYER_RIDING_GALLOP = "gfx/borka/riding-gallop";//speed 3
 
-    public static final String POSE_PLAYER_KICKSLED_IDLE = "gfx/borka/sparkan-idle";
-    public static final String POSE_PLAYER_KICKSLED_ACTIVE = "gfx/borka/sparkan-sparkan";
+    static final String POSE_PLAYER_KICKSLED_IDLE = "gfx/borka/sparkan-idle";
+    static final String POSE_PLAYER_KICKSLED_ACTIVE = "gfx/borka/sparkan-sparkan";
 
-    public static final String POSE_PLAYER_CORACLE_IDLE = "gfx/borka/coracleidle";
-    public static final String POSE_PLAYER_CORACLE_ACTIVE = "gfx/borka/coraclerowan";
-    public static final String POSE_PLAYER_CORACLE_CAPE = "gfx/borka/coraclecape";
-    public static final String POSE_PLAYER_DUGOUT_IDLE = "gfx/borka/dugoutidle";
-    public static final String POSE_PLAYER_DUGOUT_ACTIVE = "gfx/borka/dugoutrowan";
-    public static final String POSE_PLAYER_ROWBOAT_IDLE = "gfx/borka/rowboat-d";
-    public static final String POSE_PLAYER_ROWBOAT_ACTIVE = "gfx/borka/rowing";
+    static final String POSE_PLAYER_CORACLE_IDLE = "gfx/borka/coracleidle";
+    static final String POSE_PLAYER_CORACLE_ACTIVE = "gfx/borka/coraclerowan";
+    static final String POSE_PLAYER_CORACLE_CAPE = "gfx/borka/coraclecape";
+    static final String POSE_PLAYER_DUGOUT_IDLE = "gfx/borka/dugoutidle";
+    static final String POSE_PLAYER_DUGOUT_ACTIVE = "gfx/borka/dugoutrowan";
+    static final String POSE_PLAYER_ROWBOAT_IDLE = "gfx/borka/rowboat-d";
+    static final String POSE_PLAYER_ROWBOAT_ACTIVE = "gfx/borka/rowing";
 
-    public static final String POSE_PLAYER_IDLE = "gfx/borka/idle";
-    public static final String POSE_PLAYER_WALK = "gfx/borka/walking";//speed 0, 1
-    public static final String POSE_PLAYER_RUN = "gfx/borka/running";//speed 2, 3
-    public static final String POSE_PLAYER_BUTCH = "gfx/borka/butcher";
-    public static final String POSE_PLAYER_BUILD = "gfx/borka/buildan";
-    public static final String POSE_PLAYER_SAW = "gfx/borka/sawing";
-    public static final String POSE_PLAYER_CHIPPINGSTONE = "gfx/borka/chipping";//no pickaxe
-    public static final String POSE_PLAYER_CHOPBLOCK = "gfx/borka/choppan";
-    public static final String POSE_PLAYER_CHOPTREE = "gfx/borka/treechop";
-    public static final String POSE_PLAYER_DIGSHOVEL = "gfx/borka/shoveldig";
-    public static final String POSE_PLAYER_DRINK = "gfx/borka/drinkan";
-    public static final String POSE_PLAYER_LIFT = "gfx/borka/banzai";
-    public static final String POSE_PLAYER_HARVESTING = "gfx/borka/harvesting";//reeds clearing
-    public static final String POSE_PLAYER_PICK = "gfx/borka/pickan";//pickaxe mining, chipping
-    public static final String POSE_PLAYER_PICKGROUND = "gfx/borka/pickaxeanspot";
-    public static final String POSE_PLAYER_CARRYFLAT = "gfx/borka/carry-flat";//idle pickaxe
-    public static final String POSE_PLAYER_TRAVELHOMESHRUG = "gfx/borka/pointconfused";
-    public static final String POSE_PLAYER_TRAVELHOMEPOINT = "gfx/borka/pointhome";
-    public static final String POSE_PLAYER_THINK = "gfx/borka/thinkan";
-    public static final String POSE_PLAYER_DRIVE_WHEELBARROW = "gfx/borka/carry"; //same as pickaxe
-    public static final String POSE_PLAYER_CARRY_PICKAXE = "gfx/borka/carry"; //same as wheelbarrow
-    public static final String POSE_PLAYER_CARRY_SCYTHEARMS = "gfx/borka/scythearms";
-    public static final String POSE_PLAYER_PRESSINGWINE = "gfx/borka/winepressan";
-    public static final String POSE_PLAYER_PRESSINGWINE_IDLE = "gfx/borka/winepress-idle";
-    public static final String POSE_PLAYER_LOOM_IDLE = "gfx/borka/loomsit";
-    public static final String POSE_PLAYER_LOOM_WEAVING = "gfx/borka/weaving";
+    static final String POSE_PLAYER_IDLE = "gfx/borka/idle";
+    static final String POSE_PLAYER_WALK = "gfx/borka/walking";//speed 0, 1
+    static final String POSE_PLAYER_RUN = "gfx/borka/running";//speed 2, 3
+    static final String POSE_PLAYER_BUTCH = "gfx/borka/butcher";
+    static final String POSE_PLAYER_BUILD = "gfx/borka/buildan";
+    static final String POSE_PLAYER_SAW = "gfx/borka/sawing";
+    static final String POSE_PLAYER_CHIPPINGSTONE = "gfx/borka/chipping";//no pickaxe
+    static final String POSE_PLAYER_CHOPBLOCK = "gfx/borka/choppan";
+    static final String POSE_PLAYER_CHOPTREE = "gfx/borka/treechop";
+    static final String POSE_PLAYER_DIGSHOVEL = "gfx/borka/shoveldig";
+    static final String POSE_PLAYER_DRINK = "gfx/borka/drinkan";
+    static final String POSE_PLAYER_LIFT = "gfx/borka/banzai";
+    static final String POSE_PLAYER_HARVESTING = "gfx/borka/harvesting";//reeds clearing
+    static final String POSE_PLAYER_PICK = "gfx/borka/pickan";//pickaxe mining, chipping
+    static final String POSE_PLAYER_PICKGROUND = "gfx/borka/pickaxeanspot";
+    static final String POSE_PLAYER_CARRYFLAT = "gfx/borka/carry-flat";//idle pickaxe
+    static final String POSE_PLAYER_TRAVELHOMESHRUG = "gfx/borka/pointconfused";
+    static final String POSE_PLAYER_TRAVELHOMEPOINT = "gfx/borka/pointhome";
+    static final String POSE_PLAYER_THINK = "gfx/borka/thinkan";
+    static final String POSE_PLAYER_DRIVE_WHEELBARROW = "gfx/borka/carry"; //same as pickaxe
+    static final String POSE_PLAYER_CARRY_PICKAXE = "gfx/borka/carry"; //same as wheelbarrow
+    static final String POSE_PLAYER_CARRY_SCYTHEARMS = "gfx/borka/scythearms";
+    static final String POSE_PLAYER_PRESSINGWINE = "gfx/borka/winepressan";
+    static final String POSE_PLAYER_PRESSINGWINE_IDLE = "gfx/borka/winepress-idle";
+    static final String POSE_PLAYER_LOOM_IDLE = "gfx/borka/loomsit";
+    static final String POSE_PLAYER_LOOM_WEAVING = "gfx/borka/weaving";
 
     static final String TILE_WATER_FRESH_SHALLOW = "gfx/tiles/water";
     static final String TILE_WATER_FRESH_DEEP = "gfx/tiles/deep";
@@ -115,143 +115,144 @@ public class ZeeConfig {
     static final String TILE_SANDCLIFF = "gfx/tiles/sandcliff";
     static final String TILE_MOUNTAIN = "gfx/tiles/mountain";
 
-    public static final String DEF_LIST_MUTE_AUDIO = "Leashed horse.;Tracking is now turned;Stacking is now turned;must be empty to be unequipped";
-    public static final String DEF_LIST_CONFIRM_PETAL = "Empty,Swill,Clean out,Slaughter,Castrate,Unmoor,Take possession,Renounce Lawspeaker,Become Lawspeaker";
-    public static final String DEF_LIST_HOVER_HIDE_WINDOWS = "Inventory,Character Sheet,Basket,Creel,Cattle Roster,Quiver,Pickup Gobs,Tile Monitor,Switch Char";
-    public static final String DEF_LIST_BUTCH_AUTO = "Break,Scale,Wring neck,Kill,Skin,Flay,Pluck,Clean,Butcher,Collect bones";
-    public static final String DEF_LIST_AUTO_CLICK_MENU = "Pick,Harvest wax";
-    public static final String DEF_LIST_SHAPEICON = "stalagoomba 1,diamond 7 1 0,255 255 0;/amberwash 2,diamond 7 0 1,255 102 0;/cavepuddle 2,diamond 7 0 1,0 204 102;/ladder 2,triangleUp 5 0 1,0 204 102;/minehole 2,triangleDown 5 0 1,0 204 102;/burrow 2,triangleDown 6 0 1,204 0 255;/spark 2,square 4 0 1,102 102 255;/snekkja 2,square 4 0 1,255 255 102;/dugout 2,square 4 0 1,255 255 102;/wheelbarrow 2,square 4 0 1,0 255 255;/cart 2,square 4 0 1,0 153 255;/knarr 2,square 4 0 1,255 255 102;/rowboat 2,square 4 0 1,255 255 102;/horse/ 1,square 4 0 1,0 204 0;items/arrow 2,triangleUp 5 0 1,102 255 204;milestone-stone-e 2,diamond 4 0 1,255 255 255;milestone-wood-e 2,diamond 4 0 1,255 255 255;/fishingnet 2,diamond 4 0 1,153 153 153;wonders/wellspring 1,diamond 5 0 1,0 255 255;/map/starshard 2,diamond 7 0 1,255 255 0";
-    public static final Color DEF_SIMPLE_WINDOW_COLOR = new Color(55, 64, 32, 255);
-    public static final Color DEF_GRID_COLOR = new Color(204, 204, 255, 45);
-    public static final int MINIMAP_DRAG_BUTTON = 3;
+    static final String DEF_LIST_MUTE_AUDIO = "Leashed horse.;Tracking is now turned;Stacking is now turned;must be empty to be unequipped";
+    static final String DEF_LIST_CONFIRM_PETAL = "Empty,Swill,Clean out,Slaughter,Castrate,Unmoor,Take possession,Renounce Lawspeaker,Become Lawspeaker";
+    static final String DEF_LIST_HOVER_HIDE_WINDOWS = "Inventory,Character Sheet,Basket,Creel,Cattle Roster,Quiver,Pickup Gobs,Tile Monitor,Switch Char";
+    static final String DEF_LIST_BUTCH_AUTO = "Break,Scale,Wring neck,Kill,Skin,Flay,Pluck,Clean,Butcher,Collect bones";
+    static final String DEF_LIST_AUTO_CLICK_MENU = "Pick,Harvest wax";
+    static final String DEF_LIST_SHAPEICON = "stalagoomba 1,diamond 7 1 0,255 255 0;/amberwash 2,diamond 7 0 1,255 102 0;/cavepuddle 2,diamond 7 0 1,0 204 102;/ladder 2,triangleUp 5 0 1,0 204 102;/minehole 2,triangleDown 5 0 1,0 204 102;/burrow 2,triangleDown 6 0 1,204 0 255;/spark 2,square 4 0 1,102 102 255;/snekkja 2,square 4 0 1,255 255 102;/dugout 2,square 4 0 1,255 255 102;/wheelbarrow 2,square 4 0 1,0 255 255;/cart 2,square 4 0 1,0 153 255;/knarr 2,square 4 0 1,255 255 102;/rowboat 2,square 4 0 1,255 255 102;/horse/ 1,square 4 0 1,0 204 0;items/arrow 2,triangleUp 5 0 1,102 255 204;milestone-stone-e 2,diamond 4 0 1,255 255 255;milestone-wood-e 2,diamond 4 0 1,255 255 255;/fishingnet 2,diamond 4 0 1,153 153 153;wonders/wellspring 1,diamond 5 0 1,0 255 255;/map/starshard 2,diamond 7 0 1,255 255 0";
+    static final Color DEF_SIMPLE_WINDOW_COLOR = new Color(55, 64, 32, 255);
+    static final Color DEF_GRID_COLOR = new Color(204, 204, 255, 45);
+    static final int MINIMAP_DRAG_BUTTON = 3;
 
-    public static final int PLAYER_SPEED_0 = 0;
-    public static final int PLAYER_SPEED_1 = 1;
-    public static final int PLAYER_SPEED_2 = 2;
-    public static final int PLAYER_SPEED_3 = 3;
+    static final int PLAYER_SPEED_0 = 0;
+    static final int PLAYER_SPEED_1 = 1;
+    static final int PLAYER_SPEED_2 = 2;
+    static final int PLAYER_SPEED_3 = 3;
 
-    public static MixColor MIXCOLOR_RED = new MixColor(255,0,0,200);
-    public static MixColor MIXCOLOR_ORANGE = new MixColor(255,128,0,200);
-    public static MixColor MIXCOLOR_YELLOW = new MixColor(255,255,0,200);
-    public static MixColor MIXCOLOR_MAGENTA= new MixColor(255,0,255,200);
-    public static MixColor MIXCOLOR_LIGHTBLUE = new MixColor(0, 255, 255, 200);
+    static MixColor MIXCOLOR_RED = new MixColor(255,0,0,200);
+    static MixColor MIXCOLOR_ORANGE = new MixColor(255,128,0,200);
+    static MixColor MIXCOLOR_YELLOW = new MixColor(255,255,0,200);
+    static MixColor MIXCOLOR_MAGENTA= new MixColor(255,0,255,200);
+    static MixColor MIXCOLOR_LIGHTBLUE = new MixColor(0, 255, 255, 200);
 
-    public static GameUI gameUI;
+    static GameUI gameUI;
     private static String cursorName = CURSOR_ARW;
-    public static Window windowEquipment,windowInvMain, toggleEquipsLastWindowClicked;
-    public static Makewindow makeWindow;
-    public static ZeeInvMainOptionsWdg invMainoptionsWdg;
-    public static ZeeOptionsJFrame zeecowOptions;
-    public static Button btnMkWndSearchInput;
-    public static GobIcon.SettingsWindow.IconList iconList;
-    public static ChatUI.Channel multiChat;
+    static Window windowEquipment,windowInvMain, toggleEquipsLastWindowClicked;
+    static Makewindow makeWindow;
+    static ZeeInvMainOptionsWdg invMainoptionsWdg;
+    static ZeeOptionsJFrame zeecowOptions;
+    static Button btnMkWndSearchInput;
+    static GobIcon.SettingsWindow.IconList iconList;
+    static ChatUI.Channel multiChat;
     private static Dropbox<String> iconListFilterBox;
     private static Inventory mainInv;
-    public static Glob glob;
-    public static boolean keepMapViewOverlay;
+    static Glob glob;
+    static boolean keepMapViewOverlay;
 
-    public static String playingAudio = null;
-    public static String lastUiMsg, uiMsgTextQuality, uiMsgTextBuffer;
-    public static long now, lastUiQualityMsgMs=0, lastUIMsgMs, lastHafenWarningMs=0;
-    public static Object[] lastMapViewClickArgs;
-    public static Gob lastMapViewClickGob;
-    public static String lastMapViewClickGobName;
-    public static Coord lastMapViewClickPc;
-    public static Coord2d lastMapViewClickMc;
-    public static int lastMapViewClickButton;
-    public static long lastMapViewClickMs;
-    public static Coord lastSavedOverlayStartCoord, lastSavedOverlayEndCoord;
-    public static int lastSavedOverlayModflags;
-    public static long lastSavedOverlayMs;
-    public static MCache.Overlay lastSavedOverlay;
-    public static GItem lastInvItem;
-    public static String lastInvItemBaseName, lastInvItemName;
-    public static long lastInvItemMs;
-    public static Coord lastUiClickCoord;
-    public static Class<?> classMSRad;
+    static String playingAudio = null;
+    static String lastUiMsg, uiMsgTextQuality, uiMsgTextBuffer;
+    static long now, lastUiQualityMsgMs=0, lastUIMsgMs, lastHafenWarningMs=0;
+    static Object[] lastMapViewClickArgs;
+    static Gob lastMapViewClickGob;
+    static String lastMapViewClickGobName;
+    static Coord lastMapViewClickPc;
+    static Coord2d lastMapViewClickMc;
+    static int lastMapViewClickButton;
+    static long lastMapViewClickMs;
+    static Coord lastSavedOverlayStartCoord, lastSavedOverlayEndCoord;
+    static int lastSavedOverlayModflags;
+    static long lastSavedOverlayMs;
+    static MCache.Overlay lastSavedOverlay;
+    static GItem lastInvItem;
+    static String lastInvItemBaseName, lastInvItemName;
+    static long lastInvItemMs;
+    static Coord lastUiClickCoord;
+    static Class<?> classMSRad;
 
-    public static int aggroRadiusTiles = Utils.getprefi("aggroRadiusTiles", 11);
-    public static boolean alertOnPlayers = Utils.getprefb("alertOnPlayers", true);
-    public static boolean allowMidclickAutoBuy = false;
-    public static boolean clickIconStoatAggro = Utils.getprefb("clickIconStoatAggro", true);
-    public static boolean autoChipMinedBoulder = Utils.getprefb("autoChipMinedBoulder", true);
-    public static boolean autoClickMenuOption = Utils.getprefb("autoClickMenuOption", true);
-    public static String autoClickMenuOptionList = Utils.getpref("autoClickMenuOptionList", DEF_LIST_AUTO_CLICK_MENU);
-    public static boolean autoHearthOnStranger = Utils.getprefb("autoHearthOnStranger", true);
-    public static boolean autoToggleEquips = Utils.getprefb("autoToggleEquips", true);
-    public static boolean autoRunLogin = Utils.getprefb("autoRunLogin", true);
-    public static boolean autoToggleGridLines = Utils.getprefb("autoToggleGridLines", true);
-    public static boolean blockAudioMsg = Utils.getprefb("blockAudioMsg", true);
-    public static String blockAudioMsgList = Utils.getpref("blockAudioMsgList", DEF_LIST_MUTE_AUDIO);
-    public static boolean butcherMode = false;
-    public static boolean autoStack = false;//set at initToggles()
-    public static String butcherAutoList = Utils.getpref("butcherAutoList", DEF_LIST_BUTCH_AUTO);
-    public static boolean cattleRosterHeight = Utils.getprefb("cattleRosterHeight", true);
-    public static double cattleRosterHeightPercentage = Utils.getprefd("cattleRosterHeightPercentage", 1.0);
-    public static boolean confirmPetal = Utils.getprefb("confirmPetal", true);
-    public static String confirmPetalList = Utils.getpref("confirmPetalList", DEF_LIST_CONFIRM_PETAL);
-    public static boolean debugWidgetMsgs = false;//disabled by default
-    public static boolean debugCodeRes = Utils.getprefb("debugCodeRes", false);
-    public static boolean drinkKey = Utils.getprefb("drinkKey", true);
-    public static boolean dropHoldingItemAltKey = Utils.getprefb("dropHoldingItemAltKey", true);
-    public static boolean dropMinedCurios = Utils.getprefb("dropMinedCurios", true);
-    public static boolean dropMinedOre = Utils.getprefb("dropMinedOre", true);
-    public static boolean dropMinedOrePrecious = Utils.getprefb("dropMinedOrePrecious", true);
-    public static boolean dropMinedStones = Utils.getprefb("dropMinedStones", true);
-    public static boolean dropSeeds = false;
-    public static boolean dropSoil = false;
-    public static boolean destroyingTreelogs = false;
-    public static boolean equiporyCompact = Utils.getprefb("equiporyCompact", false);
-    public static boolean equipShieldOnCombat = Utils.getprefb("equipShieldOnCombat", true);
-    public static boolean farmerMode = false;
-    public static boolean freeGobPlacement = Utils.getprefb("freeGobPlacement", true);
-    public static boolean fishMoonXpAlert = Utils.getprefb("fishMoonXpAlert", true);
-    public static int gridColorInt = Utils.getprefi("gridColorInt",ZeeConfig.colorToInt(DEF_GRID_COLOR));
+    static int aggroRadiusTiles = Utils.getprefi("aggroRadiusTiles", 11);
+    static boolean alertOnPlayers = Utils.getprefb("alertOnPlayers", true);
+    static boolean allowMidclickAutoBuy = false;
+    static boolean clickIconStoatAggro = Utils.getprefb("clickIconStoatAggro", true);
+    static boolean autoChipMinedBoulder = Utils.getprefb("autoChipMinedBoulder", true);
+    static boolean autoClickMenuOption = Utils.getprefb("autoClickMenuOption", true);
+    static String autoClickMenuOptionList = Utils.getpref("autoClickMenuOptionList", DEF_LIST_AUTO_CLICK_MENU);
+    static boolean autoHearthOnStranger = Utils.getprefb("autoHearthOnStranger", true);
+    static boolean autoToggleEquips = Utils.getprefb("autoToggleEquips", true);
+    static boolean autoRunLogin = Utils.getprefb("autoRunLogin", true);
+    static boolean autoToggleGridLines = Utils.getprefb("autoToggleGridLines", true);
+    static boolean blockAudioMsg = Utils.getprefb("blockAudioMsg", true);
+    static String blockAudioMsgList = Utils.getpref("blockAudioMsgList", DEF_LIST_MUTE_AUDIO);
+    static boolean butcherMode = false;
+    static boolean autoStack = false;//set at initToggles()
+    static String butcherAutoList = Utils.getpref("butcherAutoList", DEF_LIST_BUTCH_AUTO);
+    static boolean cattleRosterHeight = Utils.getprefb("cattleRosterHeight", true);
+    static double cattleRosterHeightPercentage = Utils.getprefd("cattleRosterHeightPercentage", 1.0);
+    static boolean confirmPetal = Utils.getprefb("confirmPetal", true);
+    static String confirmPetalList = Utils.getpref("confirmPetalList", DEF_LIST_CONFIRM_PETAL);
+    static boolean debugWidgetMsgs = false;//disabled by default
+    static boolean debugCodeRes = Utils.getprefb("debugCodeRes", false);
+    static boolean drinkKey = Utils.getprefb("drinkKey", true);
+    static boolean dropHoldingItemAltKey = Utils.getprefb("dropHoldingItemAltKey", true);
+    static boolean dropMinedCurios = Utils.getprefb("dropMinedCurios", true);
+    static boolean dropMinedOre = Utils.getprefb("dropMinedOre", true);
+    static boolean dropMinedOrePrecious = Utils.getprefb("dropMinedOrePrecious", true);
+    static boolean dropMinedStones = Utils.getprefb("dropMinedStones", true);
+    static boolean dropSeeds = false;
+    static boolean dropSoil = false;
+    static boolean destroyingTreelogs = false;
+    static boolean equiporyCompact = Utils.getprefb("equiporyCompact", false);
+    static boolean equipShieldOnCombat = Utils.getprefb("equipShieldOnCombat", true);
+    static boolean farmerMode = false;
+    static boolean freeGobPlacement = Utils.getprefb("freeGobPlacement", true);
+    static boolean fishMoonXpAlert = Utils.getprefb("fishMoonXpAlert", true);
+    static int gridColorInt = Utils.getprefi("gridColorInt",ZeeConfig.colorToInt(DEF_GRID_COLOR));
     public static boolean hideFxSmoke = Utils.getprefb("hideFxSmoke", true);
     public static boolean hideFxAnimations = Utils.getprefb("hideFxAnimations", true);
-    public static boolean hideCrops = Utils.getprefb("hideCrops", false);
-    public static boolean hideTileTransitions = Utils.getprefb("hideTileTransitions", true);
-    public static boolean highlightCropsReady = Utils.getprefb("highlightCropsReady", true);
-    public static boolean isThinClient = false;
-    public static boolean autoTrackScents = Utils.getprefb("autoTrackScents", true);
+    static boolean hideCrops = Utils.getprefb("hideCrops", false);
+    static boolean hideTileTransitions = Utils.getprefb("hideTileTransitions", true);
+    static boolean highlightCropsReady = Utils.getprefb("highlightCropsReady", true);
+    static boolean isThinClient = false;
+    static boolean autoTrackScents = Utils.getprefb("autoTrackScents", true);
     public static boolean isRainLimited = Utils.getprefb("isRainLimited", false);
     public static Integer rainLimitPerc = Utils.getprefi("rainLimitPerc", 25);
     public static boolean showGrowingTreeScale = Utils.getprefb("showGrowingTreeScale", true);
     public static boolean treeAnimation = Utils.getprefb("treeAnimation", false);
-    public static boolean keyBeltShiftTab = Utils.getprefb("keyBeltShiftTab", true);
-    public static boolean keyCamSwitchShiftC = Utils.getprefb("keyCamSwitchShiftC", true);
-    public static boolean keyUpDownAudioControl = Utils.getprefb("keyUpDownAudioControl", true);
-    public static boolean autoHideWindows = Utils.getprefb("autoHideWindows", false);
-    public static String hoverHideWindowsList = Utils.getpref("hoverHideWindowsList", DEF_LIST_HOVER_HIDE_WINDOWS);
+    static boolean keyBeltShiftTab = Utils.getprefb("keyBeltShiftTab", true);
+    static boolean keyCamSwitchShiftC = Utils.getprefb("keyCamSwitchShiftC", true);
+    static boolean keyUpDownAudioControl = Utils.getprefb("keyUpDownAudioControl", true);
+    static boolean autoHideWindows = Utils.getprefb("autoHideWindows", false);
+    static String hoverHideWindowsList = Utils.getpref("hoverHideWindowsList", DEF_LIST_HOVER_HIDE_WINDOWS);
     public static boolean miniTrees = Utils.getprefb("miniTrees", false);
     public static Integer miniTreesSize = Utils.getprefi("miniTreesSize", 50);
-    public static boolean noWeather = Utils.getprefb("noWeather", false);
-    public static boolean noFlavObjs = Utils.getprefb("noFlavObjs", true);
-    public static boolean scrollTransferItems = Utils.getprefb("scrollTransferItems", true);
-    public static boolean notifyBuddyOnline = Utils.getprefb("notifyBuddyOnline", false);
-    public static boolean pilerMode = false;
-    public static boolean pickupGobWindowKeepOpen = Utils.getprefb("pickupGobWindowKeepOpen", true);
-    public static boolean pickupGobWindowAutoRefresh = Utils.getprefb("pickupGobWindowAutoRefresh", false);
-    public static boolean shapeIcons = Utils.getprefb("shapeIcons", false);
-    public static String shapeIconsList = Utils.getpref("shapeIconsList", DEF_LIST_SHAPEICON);
-    public static boolean showIconsZoomOut = Utils.getprefb("showIconsZoomOut", true);
-    public static boolean showKinNames = Utils.getprefb("showKinNames", true);
+    static boolean noWeather = Utils.getprefb("noWeather", false);
+    static boolean noFlavObjs = Utils.getprefb("noFlavObjs", true);
+    static boolean scrollTransferItems = Utils.getprefb("scrollTransferItems", true);
+    static boolean notifyBuddyOnline = Utils.getprefb("notifyBuddyOnline", false);
+    static boolean pilerMode = false;
+    static boolean pickupGobWindowKeepOpen = Utils.getprefb("pickupGobWindowKeepOpen", true);
+    static boolean pickupGobWindowAutoRefresh = Utils.getprefb("pickupGobWindowAutoRefresh", false);
+    static boolean shapeIcons = Utils.getprefb("shapeIcons", false);
+    static String shapeIconsList = Utils.getpref("shapeIconsList", DEF_LIST_SHAPEICON);
+    static boolean showIconsZoomOut = Utils.getprefb("showIconsZoomOut", true);
+    static boolean showKinNames = Utils.getprefb("showKinNames", true);
     public static boolean simpleCrops = Utils.getprefb("simpleCrops", true);
     public static boolean simpleHerbs = Utils.getprefb("simpleHerbs", true);
-    public static boolean slowMiniMap = Utils.getprefb("slowMiniMap", true);
-    public static boolean sortActionsByUses = Utils.getprefb("sortActionsByUses", true);
-    public static boolean rememberWindowsPos = Utils.getprefb("rememberWindowsPos", true);
-    public static boolean showInspectTooltip = false;
-    public static boolean isPlayerFeasting = false;
-    public static boolean isPlayerCursorMining = false;
-    public static boolean simpleWindows = Utils.getprefb("simpleWindows", true);
-    public static int simpleWindowColorInt = Utils.getprefi("simpleWindowColorInt",ZeeConfig.colorToInt(DEF_SIMPLE_WINDOW_COLOR));
-    public static boolean simpleWindowBorder = Utils.getprefb("simpleWindowBorder", true);
-    public static boolean simpleButtons = Utils.getprefb("simpleButtons", true);
-    public static String windowShortMidclickTransferMode = "des";//default shortMidclick transfer descending
-    public static boolean liftVehicleBeforeTravelHearth = Utils.getprefb("liftVehicleBeforeTravelHearth", true);
-    public static int minimapScale = Utils.getprefi("minimapScale",1);
-    public static boolean researchFoodTips = Utils.getprefb("researchFoodTips", true);
+    static boolean slowMiniMap = Utils.getprefb("slowMiniMap", true);
+    static boolean sortActionsByUses = Utils.getprefb("sortActionsByUses", true);
+    static boolean rememberWindowsPos = Utils.getprefb("rememberWindowsPos", true);
+    static boolean showInspectTooltip = false;
+    static boolean isPlayerFeasting = false;
+    static boolean isPlayerCursorMining = false;
+    static boolean simpleWindows = Utils.getprefb("simpleWindows", true);
+    static int simpleWindowColorInt = Utils.getprefi("simpleWindowColorInt",ZeeConfig.colorToInt(DEF_SIMPLE_WINDOW_COLOR));
+    static boolean simpleWindowBorder = Utils.getprefb("simpleWindowBorder", true);
+    static boolean simpleButtons = Utils.getprefb("simpleButtons", true);
+    static String windowShortMidclickTransferMode = "des";//default shortMidclick transfer descending
+    static boolean liftVehicleBeforeTravelHearth = Utils.getprefb("liftVehicleBeforeTravelHearth", true);
+    static int minimapScale = Utils.getprefi("minimapScale",1);
+    static boolean researchFoodTips = Utils.getprefb("researchFoodTips", true);
+    static boolean closeTamedAnimalWindowAfterNaming = Utils.getprefb("closeTamedAnimalWindowAfterNaming", true);
 
 
     public final static Set<String> mineablesStone = new HashSet<String>(Arrays.asList(
@@ -330,17 +331,17 @@ public class ZeeConfig {
     ));
 
 
-    public static HashMap<String,String> mapTamedAnimalNameFormat = initMapTamedAnimals();
-    public static HashMap<String,String> mapGobSession = new HashMap<String,String>();
-    public static HashMap<String, Set<String>> mapCategoryGobs = initMapCategoryGobs();//init categs first
-    public static HashMap<String,String> mapGobAudio = initMapGobAudio();
-    public static HashMap<String,String> mapGobSpeech = initMapGobSpeech();
-    public static HashMap<String,String> mapGobCategory = initMapGobCategory();
-    public static HashMap<String,String> mapCategoryAudio = initMapCategoryAudio();
-    public static HashMap<String,Integer> mapActionUses = initMapActionUses();
-    public static HashMap<String, Color> mapGobColor = initMapGobColor();
-    public static HashMap<String,Color> mapCategoryColor = initMapCategoryColor();
-    public static HashMap<String,Coord> mapWindowPos = initMapWindowPos();
+    static HashMap<String,String> mapTamedAnimalNameFormat = initMapTamedAnimals();
+    static HashMap<String,String> mapGobSession = new HashMap<String,String>();
+    static HashMap<String, Set<String>> mapCategoryGobs = initMapCategoryGobs();//init categs first
+    static HashMap<String,String> mapGobAudio = initMapGobAudio();
+    static HashMap<String,String> mapGobSpeech = initMapGobSpeech();
+    static HashMap<String,String> mapGobCategory = initMapGobCategory();
+    static HashMap<String,String> mapCategoryAudio = initMapCategoryAudio();
+    static HashMap<String,Integer> mapActionUses = initMapActionUses();
+    static HashMap<String, Color> mapGobColor = initMapGobColor();
+    static HashMap<String,Color> mapCategoryColor = initMapCategoryColor();
+    static HashMap<String,Coord> mapWindowPos = initMapWindowPos();
 
 
     private static boolean isSpriteKind(Gob gob, String... kind) {
@@ -1524,20 +1525,43 @@ public class ZeeConfig {
         0, breedY+20);
 
         // button name
-        window.add(new ZeeWindow.ZeeButton(UI.scale(45),"name"){
+        Widget btn = window.add(new ZeeWindow.ZeeButton(UI.scale(45),"name"){
             public void wdgmsg(String msg, Object... args) {
                 if (msg.equals("activate")){
-                    String nameFormat = textEntryBottom.text();
-                    String animalName = nameFormat;
-                    for (int i = 0; i < vals.length; i++) {
-                        animalName = animalName.replace("["+i+"]", vals[i].texts.replace("%",""));
-                    }
-                    animalName = animalName.replace("[MF]",windowTamedAnimalGetGender(windowTitle));
-                    textEntryTop.settext(animalName);
-                    windowTamedAnimalUpdateFormat(windowTitle, nameFormat);
+                    new Thread(){
+                        public void run() {
+                            try {
+                                String nameFormat = textEntryBottom.text();
+                                String animalName = nameFormat;
+                                for (int i = 0; i < vals.length; i++) {
+                                    animalName = animalName.replace("[" + i + "]", vals[i].texts.replace("%", ""));
+                                }
+                                animalName = animalName.replace("[MF]", windowTamedAnimalGetGender(windowTitle));
+                                textEntryTop.settext(animalName);
+                                windowTamedAnimalUpdateFormat(windowTitle, nameFormat);
+                                //set name and close window
+                                textEntryTop.activate(animalName);
+                                if (ZeeConfig.closeTamedAnimalWindowAfterNaming){
+                                    sleep(555);
+                                    ((Window.DefaultDeco)window.deco).cbtn.click();
+                                }
+                            }catch (Exception e){
+                                e.printStackTrace();
+                            }
+                        }
+                    }.start();
                 }
             }
-        }, textEntryBottom.sz.x+3, breedY+20);
+        }, textEntryBottom.sz.x+3, breedY+18);
+
+        // autoclose checkbox
+        window.add(new CheckBox("close"){
+            {a = closeTamedAnimalWindowAfterNaming;}
+            public void changed(boolean val) {
+                a = closeTamedAnimalWindowAfterNaming = val;
+                Utils.setprefb("closeTamedAnimalWindowAfterNaming",a);
+            }
+        },btn.c.x, btn.c.y-15);
 
         window.pack();
     }
@@ -2350,9 +2374,9 @@ public class ZeeConfig {
                 return gameUI.map.ui.getcurs(Coord.z).name;
             }
         } catch(Exception e) {
-            e.printStackTrace();
-            return "";
+            println("getCursorName > "+e.getMessage());
         }
+        return "";
     }
 
     /**
