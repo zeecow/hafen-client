@@ -695,10 +695,12 @@ public class ZeeManagerMiner extends ZeeThread{
         //sorted list
         SortedSet<String> tiles = new TreeSet<String>(mapTileresCount.keySet());
         //create new labels
-        int y = 0;
         Label label;
         String basename;
         List<String> silverList = List.of("galena","argentite","hornsilver");
+        List<Label> foundList = new ArrayList<>();
+        List<Label> oreList = new ArrayList<>();
+        List<Label> tilesList = new ArrayList<>();
         for (String tileName : tiles) {
             basename = tileName.replaceAll("gfx/tiles/rocks/","");
             label = new Label(basename+"   "+ mapTileresCount.get(tileName));
@@ -712,11 +714,15 @@ public class ZeeManagerMiner extends ZeeThread{
                     ZeeConfig.msg("Found " + basename);
                     ZeeSynth.textToSpeakLinuxFestival("Tile found");
                 }
+                //add found tile to the top
+                foundList.add(0,label);
             }
             // label ore
             else if (isRegularOre(basename)) {
                 label.setcolor(Color.yellow);
                 label.settext(label.texts+"  (ore)");
+                //add ore tile to the top
+                oreList.add(0,label);
             }
             // label silver/gold
             else if (isPreciousOre(basename)) {
@@ -740,9 +746,29 @@ public class ZeeManagerMiner extends ZeeThread{
                         ZeeSynth.textToSpeakLinuxFestival("Gold ore found");
                     }
                 }
+                //add precious ore to the top
+                oreList.add(0,label);
             }
-            //tilemonWindow.add(label,0,y);
-            tilemonScrollport.cont.add(label,0,y);
+            else{
+                //add regular tile to the end
+                tilesList.add(label);
+            }
+        }
+
+
+        // add ordered labels
+        int y = 0;
+        for (Label lbl : foundList) {
+            tilemonScrollport.cont.add(lbl,0,y);
+            y += 13;
+        }
+        oreList.sort(Comparator.comparing(label2 -> label2.texts));
+        for (Label lbl : oreList) {
+            tilemonScrollport.cont.add(lbl,0,y);
+            y += 13;
+        }
+        for (Label lbl : tilesList) {
+            tilemonScrollport.cont.add(lbl,0,y);
             y += 13;
         }
 
