@@ -27,18 +27,16 @@
 package haven;
 
 import java.awt.*;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
+import java.awt.event.*;
 import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.Collection;
-import java.util.Map;
-import java.util.TreeMap;
+import java.nio.file.*;
+import java.util.*;
+import java.lang.reflect.*;
 
 public class MainFrame extends java.awt.Frame implements Console.Directory {
     public static final Config.Variable<Boolean> initfullscreen = Config.Variable.propb("haven.fullscreen", false);
     public static final Config.Variable<String> renderer = Config.Variable.prop("haven.renderer", "jogl");
+    public static final Config.Variable<Boolean> status = Config.Variable.propb("haven.status", false);
     final UIPanel p;
     private final ThreadGroup g;
     private Thread mt;
@@ -424,12 +422,18 @@ public class MainFrame extends java.awt.Frame implements Console.Directory {
 	javax.imageio.spi.IIORegistry.getDefaultInstance();
     }
 
+    public static void status(String state) {
+	if(status.get())
+	    System.out.println("hafen:status:" + state);
+    }
+
     private static void main2(String[] args) {
 	Config.cmdline(args);
 	if (ZeeConfig.isThinClient){
 		ZeeConfig.runThinClient();
 		return;
 	}
+	status("start");
 	try {
 	    javabughack();
 	} catch(InterruptedException e) {
@@ -446,10 +450,12 @@ public class MainFrame extends java.awt.Frame implements Console.Directory {
 	    }
 	}
 	MainFrame f = new MainFrame(null);
+	status("visible");
 	if(initfullscreen.get())
 	    f.setfs();
 	f.run(fun);
 	resdump();
+	status("exit");
 	System.exit(0);
     }
     
