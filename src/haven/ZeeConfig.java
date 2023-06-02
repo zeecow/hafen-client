@@ -2109,8 +2109,14 @@ public class ZeeConfig {
 
         //println(ev.getKeyCode()+"  "+ev.getKeyChar());
 
+        // fast zoom
+        if (ev.getKeyCode()==KeyEvent.VK_PAGE_DOWN) {
+            return gameUI.map.camera.wheel(Coord.z,10);
+        }else if (ev.getKeyCode()==KeyEvent.VK_PAGE_UP) {
+            return gameUI.map.camera.wheel(Coord.z,-10);
+        }
         //exit actions hovermenu (esc)
-        if(ZeeHoverMenu.checkExitEsc(ev)) {
+        else if(ZeeHoverMenu.checkExitEsc(ev)) {
             return true;
         }
         // pickup closest gob (q)
