@@ -726,7 +726,7 @@ public class ZeeManagerStockpile extends ZeeThread{
         return false;
     }
 
-    static boolean selAreaPile;
+    static boolean selAreaPile, selArea2PileInside=false;
     static Gob selAreaPileGobItem;
     static ZeeWindow selAreaWindow;
     static void areaPilerWindow(Gob gobItem) {
@@ -740,7 +740,7 @@ public class ZeeManagerStockpile extends ZeeThread{
             selAreaWindow.destroy();
 
         //create new window
-        selAreaWindow = new ZeeWindow(Coord.of(330,170),title){
+        selAreaWindow = new ZeeWindow(Coord.of(330,230),title){
             public void wdgmsg(String msg, Object... args) {
                 if (msg.contentEquals("close")){
                     exitAreaPiler();
@@ -749,20 +749,39 @@ public class ZeeManagerStockpile extends ZeeThread{
             }
         };
 
-        //button select area
-        wdg = selAreaWindow.add(new Button(UI.scale(160),"select pile items area"){
+        //button pile around area
+        wdg = selAreaWindow.add(new Button(UI.scale(160),"pile around area"){
             public void wdgmsg(String msg, Object... args) {
                 if (msg.contentEquals("activate")){
-                    ZeeConfig.addPlayerText("Select pile items area");
+                    ZeeConfig.addPlayerText("Select area pile around");
                     selAreaPile = true;
                     //creates new MapView.Selector
                     ZeeConfig.gameUI.map.uimsg("sel", 1);
                     //show grid lines
                     ZeeConfig.gameUI.map.showgrid(true);
                     ZeeConfig.keepMapViewOverlay = true;
+                    //pile inside flag
+                    selArea2PileInside = false;
                 }
             }
         });
+
+        //button pile inside area
+        wdg = selAreaWindow.add(new Button(UI.scale(180),"pile inside area(broken)"){
+            public void wdgmsg(String msg, Object... args) {
+                if (msg.contentEquals("activate")){
+                    ZeeConfig.addPlayerText("Select area pile inside");
+                    selAreaPile = true;
+                    //creates new MapView.Selector
+                    ZeeConfig.gameUI.map.uimsg("sel", 1);
+                    //show grid lines
+                    ZeeConfig.gameUI.map.showgrid(true);
+                    ZeeConfig.keepMapViewOverlay = true;
+                    //pile inside flag
+                    selArea2PileInside = true;
+                }
+            }
+        }, 0, wdg.c.y+wdg.sz.y);
 
         //label instructions
         wdg = selAreaWindow.add(new Label("Note: piles will be created outside area"),0,wdg.c.y+wdg.sz.y+7);
@@ -785,11 +804,16 @@ public class ZeeManagerStockpile extends ZeeThread{
     }
 
 
-    static void areaPilerStart(){
+    static void areaPileInsideStart(){
+
+        //pile inside flag
+        selArea2PileInside = false;
+
         if (selAreaPileGobItem==null){
             println("areaPilerStart > selAreaPileGobItem null");
             return;
         }
+
         new ZeeThread(){
             public void run() {
                 try {
@@ -916,7 +940,7 @@ public class ZeeManagerStockpile extends ZeeThread{
 
 
     static ZeeThread threadFarmPiler;
-    static ZeeThread farmPilerStart() {
+    static ZeeThread areaPileAroundStart() {
         if (selAreaPileGobItem==null){
             println("areaPilerStart > selAreaPileGobItem null");
             return null;

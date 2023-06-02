@@ -2360,12 +2360,16 @@ public class MapView extends PView implements DTarget, Console.Directory {
 			}
 		    mgrab.remove();
 			ZeeConfig.saveTileSelection(new Coord(sc), new Coord(ec), modflags, ol);
-			if (ZeeManagerStockpile.selAreaPile && !ZeeConfig.farmerMode)
-				ZeeManagerStockpile.areaPilerStart();
-			else if(ZeeManagerStockpile.selTileSourcePile && !ZeeConfig.farmerMode)
+			if (ZeeManagerStockpile.selAreaPile && !ZeeConfig.farmerMode) {
+				if (ZeeManagerStockpile.selArea2PileInside)
+					ZeeManagerStockpile.areaPileInsideStart();
+				else
+					ZeeManagerStockpile.areaPileAroundStart();
+			}else if(ZeeManagerStockpile.selTileSourcePile && !ZeeConfig.farmerMode) {
 				ZeeManagerStockpile.tileSourceAreaPilerStart();
-			else
+			}else {
 				wdgmsg("sel", sc, ec, modflags);
+			}
 		    sc = null;
 		}
 		return(true);
