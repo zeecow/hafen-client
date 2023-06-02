@@ -378,6 +378,28 @@ public class ZeeManagerCraft extends ZeeThread{
     }
 
 
+    static void ropeWalkingGetStringsAndCraft(Gob stringPile) {
+        if (!ZeeConfig.playerHasAnyPose(ZeeConfig.POSE_PLAYER_ROPE_WALKING))
+            return;
+        new Thread(){
+            public void run() {
+                try {
+                    Gob ropewalk = ZeeConfig.getClosestGobByNameContains("gfx/terobjs/ropewalk");
+                    ZeeConfig.addPlayerText("get strings");
+                    ZeeManagerGobClick.gobClick(stringPile,3,UI.MOD_SHIFT);
+                    waitPlayerIdlePose();
+                    ZeeManagerGobClick.gobClick(ropewalk,3);
+                    waitPlayerIdlePose();
+                    Window craftWindow = ZeeConfig.getWindow("Rope");
+                    ZeeConfig.getButtonNamed(craftWindow,"Craft All").click();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                ZeeConfig.removePlayerText();
+            }
+        }.start();
+    }
+
 
     public static void println(String s) {
         System.out.println(s);

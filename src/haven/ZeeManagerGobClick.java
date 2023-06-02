@@ -84,6 +84,10 @@ public class ZeeManagerGobClick extends ZeeThread{
             else if(gobName.endsWith("/stockpile-clay") && ZeeConfig.isCursorName(ZeeConfig.CURSOR_DIG)){
                 ZeeManagerStockpile.pileInvClays(gob);
             }
+            // if crating ropes, midclick fibre pile to get more strings and craft again
+            else if(gobName.endsWith("/stockpile-flaxfibre") || gobName.endsWith("/stockpile-hempfibre")){
+                ZeeManagerCraft.ropeWalkingGetStringsAndCraft(gob);
+            }
             // click gob holding item (pile, etc)
             else if (ZeeConfig.isPlayerHoldingItem()) {
                 clickedGobHoldingItem(gob,gobName);

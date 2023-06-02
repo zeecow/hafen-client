@@ -99,6 +99,7 @@ public class ZeeConfig {
     static final String POSE_PLAYER_PRESSINGWINE_IDLE = "gfx/borka/winepress-idle";
     static final String POSE_PLAYER_LOOM_IDLE = "gfx/borka/loomsit";
     static final String POSE_PLAYER_LOOM_WEAVING = "gfx/borka/weaving";
+    static final String POSE_PLAYER_ROPE_WALKING = "gfx/borka/ropewalking";
 
     static final String TILE_WATER_FRESH_SHALLOW = "gfx/tiles/water";
     static final String TILE_WATER_FRESH_DEEP = "gfx/tiles/deep";

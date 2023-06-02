@@ -79,6 +79,7 @@ Client focusing on small helper tasks, many using mouse middle button, and other
   - while holding item will try to ctrl+click obj(containers,stockpiles)
   - open cauldron
   - place lifted treelog next to clicked treelog(perpendicular only) 
+  - while crafting rope, midclicking fibre piles will get fibres and "Craft All" again
 - long midclick object
   - show context menu for various objs (details below)
   - lift up obj 
