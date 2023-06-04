@@ -612,6 +612,7 @@ public class ZeeManagerItemClick extends ZeeThread{
                         }
 
                         // get next stage item, ends with "-dead", "-plucked", "-clean" or "-cleaned"
+                        sleep(PING_MS);//wait inv update?
                         item = inv.getItemBySlotCoord(itemSlotCoord);//TODO empty slot may change 1-slot-item position
                         itemName = getWItemName(item);
                         //println("next item > "+itemName);
@@ -632,6 +633,7 @@ public class ZeeManagerItemClick extends ZeeThread{
                             }
 
                             //get next dead/live animal for butching
+                            sleep(PING_MS);//wait inv update?
                             List<WItem> items;
                             if (firstItemName.contains("/rabbit-"))
                                 items = inv.getWItemsByNameContains("gfx/invobjs/rabbit-");
