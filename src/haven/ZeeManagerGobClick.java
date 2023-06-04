@@ -100,9 +100,12 @@ public class ZeeManagerGobClick extends ZeeThread{
                     }
                 }.start();
             }
-            // pick up all ground items
+            // pick up all ground items (except when placing stockpile)
             else if (isGobGroundItem(gobName)) {
-                gobClick(gob,3, UI.MOD_SHIFT);//shift + rclick
+                if(ZeeManagerStockpile.lastPlob!=null)
+                    ZeeConfig.msgLow("click ground to place stockpile");
+                else
+                    gobClick(gob,3, UI.MOD_SHIFT);//shift + rclick
             }
             // light up torch
             else if (isGobFireSource(gobName)) {
