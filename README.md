@@ -53,7 +53,9 @@ Client focusing on small helper tasks, many using mouse middle button, and other
 - auto press wine from inventtory 
   - switch seeds and press until it stops 
 - (unfinished) Lag Camera (:cam lag)
-- fast zoom keys PageDown/PageUp
+- zooming
+  - keys PageDown/PageUp = fast zoom
+  - right click player and drag up/down
 
 - midclick ground 
   - while holding item will move to location (simulates ctrl+click)

@@ -2147,6 +2147,9 @@ public class MapView extends PView implements DTarget, Console.Directory {
     }
     
     public void mousemove(Coord c) {
+	if (ZeeManagerGobClick.isRightClickZooming){
+		ZeeManagerGobClick.rightClickZoom(c);
+	}
 	if(grab != null)
 	    grab.mmousemove(c);
 	Loader.Future<Plob> placing_l = this.placing;
@@ -2166,6 +2169,8 @@ public class MapView extends PView implements DTarget, Console.Directory {
     public boolean mouseup(Coord c, int button) {
 	ZeeManagerGobClick.lastClickMouseUpMs = System.currentTimeMillis();
 	ZeeManagerGobClick.lastClickMouseButton = button;
+	if (button == 3)
+		ZeeManagerGobClick.isRightClickZooming = false;
 	if(button == 2) {
 	    if(camdrag != null) {
 		camera.release();

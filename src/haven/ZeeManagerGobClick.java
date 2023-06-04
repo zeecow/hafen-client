@@ -662,6 +662,8 @@ public class ZeeManagerGobClick extends ZeeThread{
     static boolean quickFarmSelection = false;
     static void checkRightClickGob(Coord pc, Coord2d mc, Gob gob, String gobName) {
 
+        startRightClickZooming(gob, pc);
+
         //long click starts harvest selection
         if(isGobCrop(gobName)){
             new ZeeThread(){
@@ -847,6 +849,28 @@ public class ZeeManagerGobClick extends ZeeThread{
             }.start();
         }
 
+    }
+
+    static boolean isRightClickZooming = false;
+    static int rClickZoomLastY;
+    private static void startRightClickZooming(Gob g, Coord pc) {
+        rClickZoomLastY = pc.y;
+        // start watching if clicked center box of 50x50
+        //if ( Math.abs(rcguisz.x - pc.x) < 50  &&  Math.abs(rcguisz.y - pc.y) < 50){
+        if(g.id == ZeeConfig.gameUI.plid){//clicked player?
+            isRightClickZooming = true;
+        }else{
+            isRightClickZooming = false;
+        }
+    }
+    static void rightClickZoom(Coord pc){
+        if(pc.y < rClickZoomLastY){
+            ZeeConfig.gameUI.map.camera.wheel(pc,-2);
+        }
+        else if(pc.y > rClickZoomLastY){
+            ZeeConfig.gameUI.map.camera.wheel(pc,2);
+        }
+        rClickZoomLastY = pc.y;
     }
 
     static boolean isGobRequireDisembarkVehicle(String gobName) {
