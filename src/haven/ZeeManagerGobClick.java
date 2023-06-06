@@ -67,7 +67,7 @@ public class ZeeManagerGobClick extends ZeeThread{
             }
             //barterstand
             if (gobName.endsWith("barterstand")){
-                ZeeManagerGobClick.barterstandFindWindow();
+                ZeeManagerGobClick.barterstandSearchWindow();
             }
             // place lifted treelog next to clicked one
             else if ( isGobTreeLog(gobName) && ZeeConfig.isPlayerLiftingGob("gfx/terobjs/trees/")!=null && !ZeeConfig.isPlayerLiftingGob(gob)){
@@ -169,22 +169,66 @@ public class ZeeManagerGobClick extends ZeeThread{
     }
 
 
-    static void addTextBarterStand(Gob ob) {
-        if (barterFindText != null) {
-            String text = String.valueOf(barterFindText);
-            List<String> items = getBarterstandItems(ob);
-            for (String item : items) {
-                if (item.contains(text)){
-                    ZeeConfig.addGobText(ob, item);
-                    return;
-                }
+
+    static void barterSearchUpdateGobs() {
+        List<Gob> stands = ZeeConfig.findGobsByNameEndsWith("/barterstand");
+        if (stands.size()==0)
+            return;
+        ZeeConfig.removeGobText((ArrayList<Gob>) stands);
+        for (Gob stand : stands) {
+            synchronized (stand) {
+                addTextBarterStand(stand);
             }
         }
     }
+    static void addTextBarterStand(Gob ob) {
 
+        if (!barterSearchOpen)
+            return;
+
+        List<String> foundItems = new ArrayList<>();
+        List<String> barterItems = getBarterstandItems(ob);
+
+        // checkboxes "ore", "stone"
+        if (barterFindCheckOre || barterFindCheckStone) {
+            for (String barterItem : barterItems) {
+                // found generic "stone"
+                if (barterFindCheckStone && !foundItems.contains("stone") && ZeeConfig.mineablesStone.contains(barterItem)) {
+                    foundItems.add("stone");
+                }
+                // found generic "ore"
+                if (barterFindCheckOre && !foundItems.contains("ore") && (ZeeConfig.mineablesOre.contains(barterItem) || ZeeConfig.mineablesOrePrecious.contains(barterItem))) {
+                    foundItems.add("ore");
+                }
+            }
+        }
+
+        // keywords from text area
+        if (barterFindText != null) {
+            String[] arrKeywords = barterFindText.strip().split(" ");
+            for (String keyword : arrKeywords) {
+                for (String barterItem : barterItems) {
+                    // found specific keyword
+                    if (barterItem.contains(keyword) && !foundItems.contains(barterItem))
+                    {
+                        foundItems.add(barterItem);
+                    }
+                }
+            }
+        }
+
+        //add found names to barterstand
+        if (foundItems.size() > 0){
+            ZeeConfig.addGobText(ob, foundItems.toString());
+        }
+    }
     static String barterFindText;
-    static void barterstandFindWindow() {
+    static boolean barterSearchOpen = false;
+    static boolean barterFindCheckStone = false;
+    static boolean barterFindCheckOre = false;
+    static void barterstandSearchWindow() {
 
+        Widget wdg;
         String title = "Find Stand Item";
 
         Window win = ZeeConfig.getWindow(title);
@@ -198,6 +242,7 @@ public class ZeeManagerGobClick extends ZeeThread{
             new Window(Coord.of(120,70),title){
                 public void wdgmsg(String msg, Object... args) {
                     if (msg.contentEquals("close")){
+                        barterSearchOpen = false;
                         barterFindText = null;
                         for (Gob stand : ZeeConfig.findGobsByNameEndsWith("/barterstand")) {
                             ZeeConfig.removeGobText(stand);
@@ -208,28 +253,41 @@ public class ZeeManagerGobClick extends ZeeThread{
             },
             300,300
         );
+        barterSearchOpen = true;
+
+        //label
+        wdg = win.add(new Label("keywords (space sep.)"));
 
         //text entry
-        win.add(new TextEntry(UI.scale(130),""){
+        wdg = win.add(new TextEntry(UI.scale(130),""){
             public void activate(String text) {
                 // update barterstand labels
-                List<Gob> stands = (ArrayList<Gob>) ZeeConfig.findGobsByNameEndsWith("/barterstand");
-                for (Gob stand : stands) {
-                    synchronized (stand) {
-                        ZeeConfig.removeGobText(stand);
-                        addTextBarterStand(stand);
-                    }
-                }
+                barterSearchUpdateGobs();
             }
             public boolean keyup(KeyEvent ev) {
                 barterFindText = this.text();
                 return true;
             }
-        });
+        },0,wdg.c.y+wdg.sz.y);
+
+        //checkbox stones
+        wdg = win.add(new CheckBox("stone"){
+            public void changed(boolean val) {
+                barterFindCheckStone = val;
+                barterSearchUpdateGobs();
+            }
+        },0,wdg.c.y+wdg.sz.y+5);
+
+        //checkbox ore
+        wdg = win.add(new CheckBox("ore"){
+            public void changed(boolean val) {
+                barterFindCheckOre = val;
+                barterSearchUpdateGobs();
+            }
+        },wdg.c.x+wdg.sz.x+5,wdg.c.y);
 
         win.pack();
     }
-
     static List<String> getBarterstandItems(Gob barterStand) {
         List<String> ret = new ArrayList<>();
         for (Gob.Overlay ol : barterStand.ols) {
@@ -246,6 +304,7 @@ public class ZeeManagerGobClick extends ZeeThread{
         }
         return ret;
     }
+
 
     // place treelog next to other
     // TODO currently only works if player is perpendicular to treeLogGround

@@ -2415,6 +2415,7 @@ public class ZeeConfig {
         ZeeManagerCraft.windowFeasting = null;
         ZeeManagerMiner.tunnelHelperWindow = null;
         ZeeManagerGobClick.barterFindText = null;
+        ZeeManagerGobClick.barterSearchOpen = false;
         ZeeManagerMiner.tilesMonitorCleanup();
         ZeeHistWdg.listHistButtons.clear();
 
@@ -3120,7 +3121,7 @@ public class ZeeConfig {
             if (ZeeConfig.autoChipMinedBoulder && ZeeManagerMiner.isCursorMining() && ZeeManagerMiner.isBoulder(ob))
                 ZeeManagerMiner.checkBoulderGobAdded(ob);
             //barter stand item finder
-            if (ob.getres().name.endsWith("/barterstand")){
+            if (ZeeManagerGobClick.barterSearchOpen && ob.getres().name.endsWith("/barterstand")){
                 ZeeManagerGobClick.addTextBarterStand(ob);
             }
         }
