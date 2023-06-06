@@ -172,11 +172,16 @@ public class ZeeManagerGobClick extends ZeeThread{
 
     static void barterSearchUpdateGobs() {
         List<Gob> stands = ZeeConfig.findGobsByNameEndsWith("/barterstand");
-        if (stands.size()==0)
+        if (stands.size() == 0)
             return;
-        ZeeConfig.removeGobText((ArrayList<Gob>) stands);
         for (Gob stand : stands) {
             synchronized (stand) {
+                //remove barterstand text
+                Gob.Overlay ol = stand.findol(ZeeGobText.class);
+                if (ol != null) {
+                    ol.remove(false);
+                }
+                //add barter text
                 addTextBarterStand(stand);
             }
         }
@@ -204,7 +209,7 @@ public class ZeeManagerGobClick extends ZeeThread{
         }
 
         // keywords from text area
-        if (barterFindText != null) {
+        if (barterFindText != null && !barterFindText.strip().isBlank()) {
             String[] arrKeywords = barterFindText.strip().split(" ");
             for (String keyword : arrKeywords) {
                 for (String barterItem : barterItems) {
