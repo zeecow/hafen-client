@@ -4,6 +4,7 @@ package haven;
 import haven.resutil.WaterTile;
 
 import java.awt.event.KeyEvent;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -64,8 +65,12 @@ public class ZeeManagerGobClick extends ZeeThread{
                     ZeeConfig.clickTile(ZeeConfig.coordToTile(mc),1,UI.MOD_SHIFT);
                 }
             }
+            //barterstand
+            if (gobName.endsWith("barterstand")){
+                ZeeManagerGobClick.barterstandFindWindow();
+            }
             // place lifted treelog next to clicked one
-            if ( isGobTreeLog(gobName) && ZeeConfig.isPlayerLiftingGob("gfx/terobjs/trees/")!=null && !ZeeConfig.isPlayerLiftingGob(gob)){
+            else if ( isGobTreeLog(gobName) && ZeeConfig.isPlayerLiftingGob("gfx/terobjs/trees/")!=null && !ZeeConfig.isPlayerLiftingGob(gob)){
                 placeTreelogNextTo(gob);
             }
             // pile inv boards and try sawing more boards
@@ -161,6 +166,81 @@ public class ZeeManagerGobClick extends ZeeThread{
                 inspectGob(gob);
             }
         }
+    }
+
+
+    static void addTextBarterStand(Gob ob) {
+        if (barterFindText != null) {
+            String text = String.valueOf(barterFindText);
+            List<String> items = getBarterstandItems(ob);
+            for (String item : items) {
+                if (item.contains(text)){
+                    ZeeConfig.addGobText(ob, item);
+                    return;
+                }
+            }
+        }
+    }
+
+    static String barterFindText;
+    static void barterstandFindWindow() {
+
+        String title = "Find Stand Item";
+
+        Window win = ZeeConfig.getWindow(title);
+        if (win != null){
+            win.reqdestroy();
+            win = null;
+        }
+
+        //create window
+        win = ZeeConfig.gameUI.add(
+            new Window(Coord.of(120,70),title){
+                public void wdgmsg(String msg, Object... args) {
+                    if (msg.contentEquals("close")){
+                        barterFindText = null;
+                    }
+                }
+            },
+            300,300
+        );
+
+        //text entry
+        win.add(new TextEntry(UI.scale(130),""){
+            public void activate(String text) {
+                // update barterstand labels
+                List<Gob> stands = (ArrayList<Gob>) ZeeConfig.findGobsByNameEndsWith("/barterstand");
+                for (Gob stand : stands) {
+                    synchronized (stand) {
+                        ZeeConfig.removeGobText(stand);
+                        addTextBarterStand(stand);
+                    }
+                }
+            }
+            public boolean keyup(KeyEvent ev) {
+                barterFindText = this.text();
+                return true;
+            }
+        });
+
+        win.pack();
+    }
+
+    static List<String> getBarterstandItems(Gob barterStand) {
+        List<String> ret = new ArrayList<>();
+        for (Gob.Overlay ol : barterStand.ols) {
+            if(ol.spr.getClass().getName().contentEquals("Equed")) {
+                try {
+                    Field f = ol.spr.getClass().getDeclaredField("espr");
+                    f.setAccessible(true);
+                    Sprite espr = (Sprite) f.get(ol.spr);
+                    ret.add(espr.res.basename());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return ret;
     }
 
     // place treelog next to other

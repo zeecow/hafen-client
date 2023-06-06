@@ -2405,8 +2405,8 @@ public class ZeeConfig {
 //    }
 
     //reset state
-    public static void resetCharacterVariables() {
-        println("resetCharacterVariables ");
+    public static void initCharacterVariables() {
+        println("initCharacterVariables ");
         mainInv = null;
         ZeeManagerItemClick.invBelt = null;
         ZeeManagerItemClick.equipory = null;
@@ -2414,6 +2414,7 @@ public class ZeeConfig {
         ZeeManagerStockpile.selAreaPile = false;
         ZeeManagerCraft.windowFeasting = null;
         ZeeManagerMiner.tunnelHelperWindow = null;
+        ZeeManagerGobClick.barterFindText = null;
         ZeeManagerMiner.tilesMonitorCleanup();
         ZeeHistWdg.listHistButtons.clear();
 
@@ -3118,6 +3119,10 @@ public class ZeeConfig {
                 mapGobSession.put(ob.getres().name,"");
             if (ZeeConfig.autoChipMinedBoulder && ZeeManagerMiner.isCursorMining() && ZeeManagerMiner.isBoulder(ob))
                 ZeeManagerMiner.checkBoulderGobAdded(ob);
+            //barter stand item finder
+            if (ob.getres().name.endsWith("/barterstand")){
+                ZeeManagerGobClick.addTextBarterStand(ob);
+            }
         }
     }
 

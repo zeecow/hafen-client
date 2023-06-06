@@ -26,9 +26,11 @@
 
 package haven;
 
-import java.util.*;
-import java.util.function.*;
-import haven.render.*;
+import haven.render.Pipe;
+import haven.render.Render;
+import haven.render.RenderTree;
+
+import java.util.function.Supplier;
 
 public class ResDrawable extends Drawable implements EquipTarget {
     public final Indir<Resource> res;
@@ -106,8 +108,8 @@ public class ResDrawable extends Drawable implements EquipTarget {
 	    } else if((d == null) || (d.res != res) || !d.sdt.equals(sdt)) {
 		g.setattr(new ResDrawable(g, res, sdt));
 	    }
-        if (ZeeConfig.highlightCropsReady)
-            ZeeConfig.applyGobSettingsHighlight(g, ZeeConfig.getHighlightDrawableColor(g));
+		if (ZeeConfig.highlightCropsReady)
+			ZeeConfig.applyGobSettingsHighlight(g, ZeeConfig.getHighlightDrawableColor(g));
 	}
     }
 }
