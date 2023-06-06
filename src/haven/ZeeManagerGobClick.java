@@ -199,6 +199,10 @@ public class ZeeManagerGobClick extends ZeeThread{
                 public void wdgmsg(String msg, Object... args) {
                     if (msg.contentEquals("close")){
                         barterFindText = null;
+                        for (Gob stand : ZeeConfig.findGobsByNameEndsWith("/barterstand")) {
+                            ZeeConfig.removeGobText(stand);
+                        }
+                        this.reqdestroy();
                     }
                 }
             },
