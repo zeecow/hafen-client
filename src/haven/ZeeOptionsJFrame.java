@@ -586,21 +586,21 @@ public class ZeeOptionsJFrame extends JFrame {
 
 
         //subtab gobs session list
-        if(ZeeConfig.mapGobSession.size() > 0) {
-            SortedSet<String> keys = new TreeSet<String>(ZeeConfig.mapGobSession.keySet());
-            listGobsTemp = new JList<String>(keys.toArray(new String[0]));
-        }else {
-            listGobsTemp = new JList<String>();
-        }
-        JPanel panelTabGobSess = new JPanel(new GridBagLayout());
-        panelTabGobSess.add(new JScrollPane(listGobsTemp), c);
-        tabbedPaneGobs.addTab("Session("+ZeeConfig.mapGobSession.size()+")", panelTabGobSess);
+//        if(ZeeConfig.mapGobSession.size() > 0) {
+//            SortedSet<String> keys = new TreeSet<String>(ZeeConfig.mapGobSession.keySet());
+//            listGobsTemp = new JList<String>(keys.toArray(new String[0]));
+//        }else {
+//            listGobsTemp = new JList<String>();
+//        }
+//        JPanel panelTabGobSess = new JPanel(new GridBagLayout());
+//        panelTabGobSess.add(new JScrollPane(listGobsTemp), c);
+//        tabbedPaneGobs.addTab("Session("+ZeeConfig.mapGobSession.size()+")", panelTabGobSess);
 
 
         //panel gobs main buttons
         //TODO move buttons up a container
         JPanel panelGobButtons = new JPanel(new FlowLayout());
-        panelTabGobSess.add(panelGobButtons, c);
+        //panelTabGobSess.add(panelGobButtons, c);
         panelGobButtons.add(btnRefresh = new JButton("refresh"));
         btnRefresh.addActionListener(evt -> {
             buildTabGobs();

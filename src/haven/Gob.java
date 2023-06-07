@@ -380,7 +380,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 	    glob.oc.remove(this);
     }
 
-	boolean gobReady = false;
+	boolean gobWaitingSettings = false;
     public void gtick(Render g) {
 	Drawable d = getattr(Drawable.class);
 	if(d != null)
@@ -389,8 +389,9 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 	    if(ol.spr != null)
 		ol.spr.gtick(g);
 	}
-	if (!gobReady)
-		gobReady = true;
+	if (!gobWaitingSettings) {
+		gobWaitingSettings = true;
+	}
     }
 
     void removed() {

@@ -32,7 +32,6 @@ public class ZeeManagerGobClick extends ZeeThread{
     private static ArrayList<Gob> treesForRemoval, treelogsForDestruction;
     private static Gob currentRemovingTree, currentDestroyingTreelog;
     static boolean remountClosestHorse;
-    static long remountClosestHorseId;
 
     public static void startMidClick(Coord pc, Coord2d mc, Gob gobClicked, String gName) {
 
@@ -948,7 +947,6 @@ public class ZeeManagerGobClick extends ZeeThread{
                     public void run() {
                         if(dismountHorse(mc)) {
                             ZeeManagerGobClick.remountClosestHorse = true;
-                            ZeeManagerGobClick.remountClosestHorseId = gob.id;
                             if (isGobHouse(gobName)) {
                                 gobClick(gob, 3, 0, 16);//gob's door?
                             }else {
@@ -1496,7 +1494,7 @@ public class ZeeManagerGobClick extends ZeeThread{
         return false;
     }
 
-    static boolean isGobDeadAnimal;
+    private static boolean isGobDeadAnimal;
 
     @SuppressWarnings("unchecked")
     public static void labelGobByContents(Window window) {
@@ -1578,6 +1576,23 @@ public class ZeeManagerGobClick extends ZeeThread{
         }catch (Exception e){
             e.printStackTrace();
         }
+    }
+
+    static void remountHorse() {
+        ZeeManagerGobClick.remountClosestHorse = false;
+        new ZeeThread(){
+            public void run() {
+                try {
+                    ZeeConfig.addPlayerText("mounting");
+                    //TODO wait longer if multiple horses around?
+                    Gob closestHorse = ZeeConfig.getClosestGob(ZeeConfig.findGobsByNameEndsWith("/mare","/stallion"));
+                    ZeeManagerGobClick.clickGobPetal(closestHorse, "Giddyup!");
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                ZeeConfig.removePlayerText();
+            }
+        }.start();
     }
 
     private boolean isGobBigDeadAnimal_thread() {
@@ -2345,7 +2360,7 @@ public class ZeeManagerGobClick extends ZeeThread{
             choosePetal(getFlowerMenu(), petalName);
             return waitNoFlowerMenu();
         }else{
-            println("clickGobPetal > no flower menu?");
+            //println("clickGobPetal > no flower menu?");
             return false;
         }
     }
@@ -2779,6 +2794,10 @@ public class ZeeManagerGobClick extends ZeeThread{
 
     public static boolean isMouseUp() {
         return lastClickMouseDownMs < lastClickMouseUpMs;
+    }
+
+    static boolean isGobDeadOrKO(Gob gob) {
+        return ZeeConfig.gobHasAnyPoseEndsWith(gob,"/dead","/knock");
     }
 
 }

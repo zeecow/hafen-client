@@ -299,6 +299,7 @@ public interface GLPanel extends UIPanel, UI.Context {
 		for(Object line : Debug.framestats)
 		    FastText.aprint(g, new Coord(10, y -= dy), 0, 1, String.valueOf(line));
 	    }
+		FastText.aprintf(g, new Coord(10, y -= dy), 0, 1, "zeecowdbg: %s", ZeeConfig.drawstatsDebugStr);
 	}
 
 	private StreamOut streamout = null;

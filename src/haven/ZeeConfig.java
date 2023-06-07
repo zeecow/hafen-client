@@ -170,6 +170,7 @@ public class ZeeConfig {
     static long lastInvItemMs;
     static Coord lastUiClickCoord;
     static Class<?> classMSRad;
+    static String drawstatsDebugStr = "";
 
     static int aggroRadiusTiles = Utils.getprefi("aggroRadiusTiles", 11);
     static boolean alertOnPlayers = Utils.getprefb("alertOnPlayers", true);
@@ -333,7 +334,7 @@ public class ZeeConfig {
 
 
     static HashMap<String,String> mapTamedAnimalNameFormat = initMapTamedAnimals();
-    static HashMap<String,String> mapGobSession = new HashMap<String,String>();
+    //static HashMap<String,String> mapGobSession = new HashMap<String,String>();
     static HashMap<String, Set<String>> mapCategoryGobs = initMapCategoryGobs();//init categs first
     static HashMap<String,String> mapGobAudio = initMapGobAudio();
     static HashMap<String,String> mapGobSpeech = initMapGobSpeech();
@@ -781,13 +782,13 @@ public class ZeeConfig {
         long gobId = gob.id;
         String path = "";
 
-        if(isPlayer(gob)  &&  gameUI.map.player()!=null) {
+        if(isPlayer(gob)  &&  gameUI!=null && gameUI.map.player()!=null) {
             // other players
             if (gameUI.map.player().id != gobId) {
                 if (autoHearthOnStranger && !playerHasAnyPose(POSE_PLAYER_TRAVELHOMEPOINT, POSE_PLAYER_TRAVELHOMESHRUG)) {
                     autoHearth();
                 }
-                if (alertOnPlayers) {
+                if (alertOnPlayers && !ZeeManagerGobClick.isGobDeadOrKO(gob)) {
                     String audio = mapCategoryAudio.get(CATEG_PVPANDSIEGE);
                     if (audio != null && !audio.isEmpty())
                         playAudioGobId(audio, gobId);
@@ -811,9 +812,12 @@ public class ZeeConfig {
                     continue;
                 //...check if gob is in category
                 if(mapCategoryGobs.get(categ).contains(gobName)){
+                    // skip aggressive audio if gob dead of KO
+                    if (categ.contentEquals(CATEG_AGROCREATURES) && ZeeManagerGobClick.isGobDeadOrKO(gob))
+                        continue;
                     //play audio for category
                     path = mapCategoryAudio.get(categ);
-                    playAudioGobId(path,gobId);
+                    playAudioGobId(path, gobId);
                 }
             }
         }
@@ -3108,49 +3112,93 @@ public class ZeeConfig {
         return null;
     }
 
-    public static void applyGobSettings(Gob ob) {
-        if(ob!=null && ob.getres()!=null) {
-            ob.gobReady = false;
-            // ignore bat if using batcape
-            if (ob.getres().name.contentEquals("gfx/kritter/bat/bat") && ZeeManagerItemClick.isItemEquipped("/batcape")) {
-                return;
+    static Queue<Gob> gobsWaiting = new LinkedList<>();
+    static ZeeThread gobConsumer = new ZeeThread(){
+        public void run() {
+            try {
+                println("thread gob consumer");
+                while (true){
+                    synchronized (gobConsumer) {
+                        if (gobsWaiting.isEmpty()) {
+                            this.wait();
+                        } else {
+                            consumeGobSettings();
+                        }
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
             }
+        }
+    };
+    static {
+        gobConsumer.start();
+    }
+    static int contNoRes = 0;
+    static void consumeGobSettings(){
+
+        Gob ob = null;
+
+        try {
+
+            // remove gob from queue
+            synchronized (gobsWaiting) {
+                ob = gobsWaiting.remove();
+                // return to queue if gob not ready for settings
+                if (!ob.gobWaitingSettings){
+                    gobsWaiting.add(ob);
+                    return;
+                }
+                //already rendered? transient res?
+                if (ob.getres()==null) {
+                    contNoRes++;
+                    return;
+                }
+                drawstatsDebugStr = " queueSz "+gobsWaiting.size()+" , contNoRes "+contNoRes;
+            }
+
+            // audio alerts
             ZeeConfig.applyGobSettingsAudio(ob);
+
+            // aggro radius
             ZeeConfig.applyGobSettingsAggro(ob);
+
+            // highlight gob color
             ZeeConfig.applyGobSettingsHighlight(ob, ZeeConfig.getHighlightGobColor(ob));
-            if (ob.getres().name!=null && ob.getres().name!=null && !ob.getres().name.isBlank() && !mapGobSession.containsKey(ob.getres().name))
-                mapGobSession.put(ob.getres().name,"");
+
+            // save gob name //TODO remove mapGobSession related code
+            //if (ob.getres().name!=null && ob.getres().name!=null && !ob.getres().name.isBlank() && !mapGobSession.containsKey(ob.getres().name))
+            //mapGobSession.put(ob.getres().name,"");
+
+            // auto boulder option (maybe remove)
             if (ZeeConfig.autoChipMinedBoulder && ZeeManagerMiner.isCursorMining() && ZeeManagerMiner.isBoulder(ob))
                 ZeeManagerMiner.checkBoulderGobAdded(ob);
-            //remount closest horse
-            if (ZeeManagerGobClick.remountClosestHorse && ZeeManagerGobClick.isGobHorse(ob.getres().name)){
-                ZeeManagerGobClick.remountClosestHorse = false;
-                new ZeeThread(){
-                    public void run() {
-                        try {
-                            addPlayerText("mounting");
-                            while(!ob.gobReady) {
-                               sleep(PING_MS);
-                            }
-                            //TODO wait longer if multiple horses around?
-                            Gob closestHorse = getClosestGob(findGobsByNameEndsWith("/mare","/stallion"));
-                            ZeeManagerGobClick.clickGobPetal(closestHorse, "Giddyup!");
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                        removePlayerText();
-                    }
-                }.start();
+
+            // remount closest horse
+            if (ZeeManagerGobClick.remountClosestHorse && ZeeManagerGobClick.isGobHorse(ob.getres().name)) {
+                ZeeManagerGobClick.remountHorse();
             }
-            //barter stand item finder
-            if (ZeeManagerGobClick.barterSearchOpen && ob.getres().name.endsWith("/barterstand")){
+
+            // barter stand item search labels
+            if (ZeeManagerGobClick.barterSearchOpen && ob.getres().name.endsWith("/barterstand")) {
                 ZeeManagerGobClick.addTextBarterStand(ob);
+            }
+
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+    static void queueGobSettings(Gob ob) {
+        if(ob != null){// && ob.getres()!=null) {
+            synchronized (gobConsumer) {
+                gobsWaiting.add(ob);
+                gobConsumer.notify();
             }
         }
     }
 
     private static void applyGobSettingsAggro(Gob gob) {
-        if( mapCategoryGobs.get(CATEG_AGROCREATURES).contains(gob.getres().name)) {
+        if( mapCategoryGobs.get(CATEG_AGROCREATURES).contains(gob.getres().name) && !ZeeManagerGobClick.isGobDeadOrKO(gob)) {
             //aggro radius
             if (ZeeConfig.aggroRadiusTiles > 0)
                 gob.addol(new Gob.Overlay(gob, new ZeeGobRadius(gob, null, ZeeConfig.aggroRadiusTiles * MCache.tilesz2.y), ZeeManagerGobClick.OVERLAY_ID_AGGRO));
@@ -3283,6 +3331,17 @@ public class ZeeConfig {
         return false;
     }
 
+    public static boolean gobHasAnyPoseEndsWith(Gob gob, String ... wantedPosesEndsWith){
+        List<String> gobPoses = getGobPoses(gob);
+        for (int i = 0; i < wantedPosesEndsWith.length; i++) {
+            for (String pose : gobPoses) {
+                if (pose.endsWith(wantedPosesEndsWith[i]))
+                    return true;
+            }
+        }
+        return false;
+    }
+
     public static List<String> getGobPoses(Gob gob) {
         List<String> ret = new ArrayList<>();
         if (gob==null)
@@ -3299,7 +3358,7 @@ public class ZeeConfig {
                 }
             }
         }catch (Exception e){
-            e.printStackTrace();
+            println("getGobPoses > "+e.getMessage()+"  ,  gobReady="+gob.gobWaitingSettings);
         }
         return ret;
     }
