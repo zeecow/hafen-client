@@ -2416,6 +2416,7 @@ public class ZeeConfig {
         ZeeManagerMiner.tunnelHelperWindow = null;
         ZeeManagerGobClick.barterFindText = null;
         ZeeManagerGobClick.barterSearchOpen = false;
+        ZeeManagerGobClick.remountClosestHorse = false;
         ZeeManagerMiner.tilesMonitorCleanup();
         ZeeHistWdg.listHistButtons.clear();
 
@@ -3109,6 +3110,7 @@ public class ZeeConfig {
 
     public static void applyGobSettings(Gob ob) {
         if(ob!=null && ob.getres()!=null) {
+            ob.gobReady = false;
             // ignore bat if using batcape
             if (ob.getres().name.contentEquals("gfx/kritter/bat/bat") && ZeeManagerItemClick.isItemEquipped("/batcape")) {
                 return;
@@ -3120,6 +3122,26 @@ public class ZeeConfig {
                 mapGobSession.put(ob.getres().name,"");
             if (ZeeConfig.autoChipMinedBoulder && ZeeManagerMiner.isCursorMining() && ZeeManagerMiner.isBoulder(ob))
                 ZeeManagerMiner.checkBoulderGobAdded(ob);
+            //remount closest horse
+            if (ZeeManagerGobClick.remountClosestHorse && ZeeManagerGobClick.isGobHorse(ob.getres().name)){
+                ZeeManagerGobClick.remountClosestHorse = false;
+                new ZeeThread(){
+                    public void run() {
+                        try {
+                            addPlayerText("mounting");
+                            while(!ob.gobReady) {
+                               sleep(PING_MS);
+                            }
+                            //TODO wait longer if multiple horses around?
+                            Gob closestHorse = getClosestGob(findGobsByNameEndsWith("/mare","/stallion"));
+                            ZeeManagerGobClick.clickGobPetal(closestHorse, "Giddyup!");
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                        removePlayerText();
+                    }
+                }.start();
+            }
             //barter stand item finder
             if (ZeeManagerGobClick.barterSearchOpen && ob.getres().name.endsWith("/barterstand")){
                 ZeeManagerGobClick.addTextBarterStand(ob);
