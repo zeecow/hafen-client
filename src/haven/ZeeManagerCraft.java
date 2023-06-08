@@ -379,8 +379,8 @@ public class ZeeManagerCraft extends ZeeThread{
 
 
     static void ropeWalkingGetStringsAndCraft(Gob stringPile) {
-        if (!ZeeConfig.playerHasAnyPose(ZeeConfig.POSE_PLAYER_ROPE_WALKING))
-            return;
+        //if (!ZeeConfig.playerHasAnyPose(ZeeConfig.POSE_PLAYER_ROPE_WALKING))
+            //return;
         new Thread(){
             public void run() {
                 try {
