@@ -271,7 +271,8 @@ public interface GLPanel extends UIPanel, UI.Context {
 	private long prevfree = 0, framealloc = 0;
 	@SuppressWarnings("deprecation")
 	private void drawstats(UI ui, GOut g, GLRender buf) {
-	    int y = g.sz().y - UI.scale(190), dy = FastText.h;
+	    int y = g.sz().y - UI.scale(100), dy = FastText.h;
+		FastText.aprintf(g, new Coord(10, y -= dy), 0, 1, "zeecow-dbg: %s", ZeeConfig.drawstatsDebugStr);
 	    FastText.aprintf(g, new Coord(10, y -= dy), 0, 1, "FPS: %d (%d%%, %d%% idle, latency %d)", fps, (int)(uidle * 100.0), (int)(ridle * 100.0), framelag);
 	    Runtime rt = Runtime.getRuntime();
 	    long free = rt.freeMemory(), total = rt.totalMemory();
@@ -299,7 +300,6 @@ public interface GLPanel extends UIPanel, UI.Context {
 		for(Object line : Debug.framestats)
 		    FastText.aprint(g, new Coord(10, y -= dy), 0, 1, String.valueOf(line));
 	    }
-		FastText.aprintf(g, new Coord(10, y -= dy), 0, 1, "zeecowdbg: %s", ZeeConfig.drawstatsDebugStr);
 	}
 
 	private StreamOut streamout = null;

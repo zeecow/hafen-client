@@ -3134,7 +3134,7 @@ public class ZeeConfig {
     static {
         gobConsumer.start();
     }
-    static int contNoRes = 0;
+    static int contNoRes = 0, contReQueued = 0;
     static void consumeGobSettings(){
 
         Gob ob = null;
@@ -3146,6 +3146,7 @@ public class ZeeConfig {
                 ob = gobsWaiting.remove();
                 // return to queue if gob not ready for settings
                 if (!ob.gobWaitingSettings){
+                    contReQueued++;
                     gobsWaiting.add(ob);
                     return;
                 }
@@ -3154,7 +3155,7 @@ public class ZeeConfig {
                     contNoRes++;
                     return;
                 }
-                drawstatsDebugStr = " queueSz "+gobsWaiting.size()+" , contNoRes "+contNoRes;
+                drawstatsDebugStr = String.format("queue %d , cont-nores %d , cont-requeue %d",gobsWaiting.size(), contNoRes, contReQueued);
             }
 
             // audio alerts
