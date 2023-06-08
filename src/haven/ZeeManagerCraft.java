@@ -245,13 +245,11 @@ public class ZeeManagerCraft extends ZeeThread{
         CLOTH: linen, hemp
      */
     static boolean clothRecipeOpen=false, clothBusy=false;
-    static Button clothAutoBtn;
-    static Window clothCraftWindow;
     static String clothItemName = null, clothStockPileName = null;
     public static void clothRecipeOpened(Window window) {
         println("clothRecipeOpened");
         clothRecipeOpen = true;
-        clothAutoBtn = new ZeeWindow.ZeeButton(UI.scale(85),"auto"){
+        Button clothAutoBtn = new ZeeWindow.ZeeButton(UI.scale(85),"auto"){
             public void wdgmsg(String msg, Object... args) {
                 if (msg.equals("activate")){
                     if (clothBusy)
@@ -378,26 +376,146 @@ public class ZeeManagerCraft extends ZeeThread{
     }
 
 
-    static void ropeWalkingGetStringsAndCraft(Gob stringPile) {
-        //if (!ZeeConfig.playerHasAnyPose(ZeeConfig.POSE_PLAYER_ROPE_WALKING))
-            //return;
-        new Thread(){
+    /*
+        Rope making
+     */
+    static boolean ropeRecipeOpen = false;
+    static boolean ropeBusy = false;
+    static void ropeRecipeOpened(Window window) {
+        println("ropeRecipeOpened");
+        ropeRecipeOpen = true;
+        Button ropeAutoBtn = new ZeeWindow.ZeeButton(UI.scale(85),"auto"){
+            public void wdgmsg(String msg, Object... args) {
+                if (msg.equals("activate")){
+                    if (ropeBusy)
+                        return;
+                    ropeStart(window);
+                }
+            }
+        };
+        ropeAutoBtn.settip("use closest fiber piles until inventory full");
+        window.add(ropeAutoBtn,360,45);
+    }
+    public static void ropeWindowClosed() {
+        ropeRecipeOpen = false;
+        if (ropeBusy)
+            ropeExit("window closed");
+    }
+    static void ropeStart(Window window){
+        new ZeeThread(){
             public void run() {
                 try {
-                    Gob ropewalk = ZeeConfig.getClosestGobByNameContains("gfx/terobjs/ropewalk");
-                    ZeeConfig.addPlayerText("get strings");
-                    ZeeManagerGobClick.gobClick(stringPile,3,UI.MOD_SHIFT);
-                    waitPlayerIdlePose();
-                    ZeeManagerGobClick.gobClick(ropewalk,3);
-                    waitPlayerIdlePose();
-                    Window craftWindow = ZeeConfig.getWindow("Rope");
-                    ZeeConfig.getButtonNamed(craftWindow,"Craft All").click();
+
+                    int tilesMaxDist = 6;
+
+                    // highlight piles in range
+                    List<Gob> piles = ZeeConfig.findGobsByNameEndsWith("/stockpile-flaxfibre","/stockpile-hempfibre");
+                    piles.removeIf(gob -> {
+                        if (ZeeConfig.distanceToPlayer(gob) > tilesMaxDist*TILE_SIZE)
+                            return true;
+                        return false;
+                    });
+                    piles.forEach(gob -> {
+                        if (ZeeConfig.distanceToPlayer(gob) <= tilesMaxDist*TILE_SIZE){
+                            ZeeConfig.addGobColor(gob,Color.green);
+                        }
+                    });
+
+
+                    // find closest pile
+                    Gob closestPile = ZeeConfig.getClosestGob(piles);
+                    if (closestPile!=null){
+                        ZeeConfig.addGobText(closestPile,"next");
+                    }
+
+                    ropeBusy = true;
+                    ZeeConfig.lastMapViewClickButton = 2;//prepare cancel click
+
+                    do{
+                        ZeeConfig.addPlayerText("craftan");
+
+                        // missing 10 strings
+                        if(ZeeConfig.getMainInventory().getItemsSelectedForCrafting().size() < 10){
+                            if (closestPile==null){
+                                ZeeConfig.msgError("out of strings");
+                                ropeExit("out of strings");
+                                return;
+                            }
+                            //fetch strings from closest pile and craft again
+                            if(!ropeFetchStringsAndCraft(closestPile)){
+                                ZeeConfig.msgError("couldnt fetch more strings");
+                                ropeExit("couldnt fetch more strings");
+                                return;
+                            }
+                            //mark next pile
+                            closestPile = ZeeConfig.getClosestGob(piles);
+                            if (closestPile!=null){
+                                ZeeConfig.addGobText(closestPile,"next");
+                            }
+                        }
+
+                        //click craft all
+                        ZeeConfig.addPlayerText("craftan");
+                        ZeeConfig.getButtonNamed(window,"Craft All").click();
+                        ZeeConfig.lastMapViewClickButton = 2;//prepare cancel click
+                        sleep(PING_MS);
+
+                        //wait crafting end
+                        waitPlayerPoseNotInList(ZeeConfig.POSE_PLAYER_DRINK,ZeeConfig.POSE_PLAYER_ROPE_WALKING);
+
+                    }while(ropeBusy && !ZeeConfig.isTaskCanceledByGroundClick());
+
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-                ZeeConfig.removePlayerText();
+                ropeExit("fin");
             }
         }.start();
+    }
+    static void ropeExit(String msg){
+        ropeBusy = false;
+        if (!msg.isEmpty()) {
+            println("rope > "+msg);
+            ZeeConfig.msgError(msg);
+        }
+        ZeeConfig.removePlayerText();
+        ZeeConfig.findGobsByNameEndsWith("/stockpile-flaxfibre","/stockpile-hempfibre").forEach(gob -> {
+            ZeeConfig.removeGobColor(gob);
+            ZeeConfig.removeGobText(gob);
+        });
+    }
+    static boolean ropeFetchStringsAndCraft(Gob stringPile) {
+        try {
+            ZeeConfig.addPlayerText("get strings");
+            Gob ropewalk = ZeeConfig.getClosestGobByNameContains("gfx/terobjs/ropewalk");
+            ZeeManagerGobClick.gobClick(stringPile,3,UI.MOD_SHIFT);
+            waitPlayerIdlePose();
+            ZeeManagerGobClick.gobClick(ropewalk,3);
+            waitPlayerIdlePose();
+            if (ZeeConfig.getMainInventory().getItemsSelectedForCrafting().size() < 10){
+                ZeeConfig.removePlayerText();
+                return false;
+            }
+            Window craftWindow = ZeeConfig.getWindow("Rope");
+            ZeeConfig.getButtonNamed(craftWindow,"Craft All").click();
+            ZeeConfig.removePlayerText();
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        ZeeConfig.removePlayerText();
+        return false;
+    }
+
+
+
+    static void craftWindowClosed() {
+        if(bugColRecipeOpen)
+            bugColWindowClosed();
+        if(clothRecipeOpen)
+            clothWindowClosed();
+        if(ropeRecipeOpen)
+            ropeWindowClosed();
     }
 
 

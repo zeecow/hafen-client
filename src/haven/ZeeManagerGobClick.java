@@ -92,7 +92,11 @@ public class ZeeManagerGobClick extends ZeeThread{
             }
             // if crating ropes, midclick fibre pile to get more strings and craft again
             else if((gobName.endsWith("/stockpile-flaxfibre") || gobName.endsWith("/stockpile-hempfibre")) && ZeeConfig.playerHasAnyPose(ZeeConfig.POSE_PLAYER_ROPE_WALKING)){
-                ZeeManagerCraft.ropeWalkingGetStringsAndCraft(gob);
+                new ZeeThread() {
+                    public void run() {
+                        ZeeManagerCraft.ropeFetchStringsAndCraft(gob);
+                    }
+                }.start();
             }
             // click gob holding item (pile, etc)
             else if (ZeeConfig.isPlayerHoldingItem()) {

@@ -1097,11 +1097,18 @@ public class ZeeConfig {
                 if (!ZeeManagerCraft.clothRecipeOpen)
                     ZeeManagerCraft.clothRecipeOpened(window);
             }
+            // rope
+            else if (windowTitle.contentEquals("Rope")) {
+                if (!ZeeManagerCraft.ropeRecipeOpen)
+                    ZeeManagerCraft.ropeRecipeOpened(window);
+            }
             else{
                 if (ZeeManagerCraft.bugColRecipeOpen)
                     ZeeManagerCraft.bugColWindowClosed();
                 else if (ZeeManagerCraft.clothRecipeOpen)
                     ZeeManagerCraft.clothWindowClosed();
+                else if (ZeeManagerCraft.ropeRecipeOpen)
+                    ZeeManagerCraft.ropeWindowClosed();
             }
         }
 

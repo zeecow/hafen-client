@@ -164,10 +164,7 @@ public class Makewindow extends Widget {
 			ZeeConfig.btnMkWndSearchInput.change("Search "+(inputCount+1)+"/"+inputs.size());
 		}
 		else if(msg.contentEquals("close")) {
-			if(ZeeManagerCraft.bugColRecipeOpen)
-				ZeeManagerCraft.bugColWindowClosed();
-			if (ZeeManagerCraft.clothRecipeOpen)
-				ZeeManagerCraft.clothWindowClosed();
+			ZeeManagerCraft.craftWindowClosed();
 			super.wdgmsg(sender, msg, args);
 		}
 		else {
