@@ -570,8 +570,8 @@ public class ZeeOptionsJFrame extends JFrame {
         tabbedPaneGobs.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent changeEvent) {
                 try {
-                    if(listGobsTemp!=null && listGobsTemp.isValid())
-                        listGobsTemp.clearSelection();
+//                    if(listGobsTemp!=null && listGobsTemp.isValid())
+//                        listGobsTemp.clearSelection();
                     if(listGobsSaved!=null && listGobsSaved.isValid())
                         listGobsSaved.clearSelection();
                     if(listGobsCategories!=null && listGobsCategories.isValid())
@@ -615,14 +615,14 @@ public class ZeeOptionsJFrame extends JFrame {
         });
 
 
-        listGobsTemp.addListSelectionListener(new ListSelectionListener() {
-            @Override
-            public void valueChanged(ListSelectionEvent evt) {
-                if(evt.getValueIsAdjusting() || tabbedPaneGobs.getSelectedIndex()!=TABGOB_SESSION)
-                    return;
-                updatePanelDetails();
-            }
-        });
+//        listGobsTemp.addListSelectionListener(new ListSelectionListener() {
+//            @Override
+//            public void valueChanged(ListSelectionEvent evt) {
+//                if(evt.getValueIsAdjusting() || tabbedPaneGobs.getSelectedIndex()!=TABGOB_SESSION)
+//                    return;
+//                updatePanelDetails();
+//            }
+//        });
 
 
         //subtab gobs saved list
@@ -742,9 +742,10 @@ public class ZeeOptionsJFrame extends JFrame {
 
         //build gob details(saved and session)
         JList<String> list = null;
-        if(tabbedPaneGobs.getSelectedIndex()==TABGOB_SESSION) {
-            list = listGobsTemp;
-        }else if(tabbedPaneGobs.getSelectedIndex()==TABGOB_SAVED) {
+//        if(tabbedPaneGobs.getSelectedIndex()==TABGOB_SESSION) {
+//            list = listGobsTemp;
+//        }else
+            if(tabbedPaneGobs.getSelectedIndex()==TABGOB_SAVED) {
             list = listGobsSaved;
         }
 
