@@ -3121,8 +3121,11 @@ public class ZeeConfig {
                     synchronized (gobConsumer) {
                         if (gobsWaiting.isEmpty()) {
                             this.wait();
-                        } else {
+                        } else if (gobsWaiting.peek().isGobWaitingSettings){
                             consumeGobSettings();
+                        } else{
+                            //send to the end of que queue
+                            gobsWaiting.offer(gobsWaiting.poll());
                         }
                     }
                 }
@@ -3134,7 +3137,7 @@ public class ZeeConfig {
     static {
         gobConsumer.start();
     }
-    static int contNoRes = 0, contReQueued = 0;
+    static int contNoRes = 0, contRemovals=0;
     static void consumeGobSettings(){
 
         Gob ob = null;
@@ -3144,18 +3147,13 @@ public class ZeeConfig {
             // remove gob from queue
             synchronized (gobsWaiting) {
                 ob = gobsWaiting.remove();
-                // return to queue if gob not ready for settings
-                if (!ob.gobWaitingSettings){
-                    contReQueued++;
-                    gobsWaiting.add(ob);
-                    return;
-                }
+                contRemovals++;
                 //already rendered? transient res?
                 if (ob.getres()==null) {
                     contNoRes++;
                     return;
                 }
-                drawstatsDebugStr = String.format("queue %d , cont-nores %d , cont-requeue %d",gobsWaiting.size(), contNoRes, contReQueued);
+                drawstatsDebugStr = String.format("queue %d , cont-nores %d , cont-rems %d",gobsWaiting.size(), contNoRes, contRemovals);
             }
 
             // audio alerts
@@ -3359,7 +3357,7 @@ public class ZeeConfig {
                 }
             }
         }catch (Exception e){
-            println("getGobPoses > "+e.getMessage()+"  ,  gobReady="+gob.gobWaitingSettings);
+            println("getGobPoses > "+e.getMessage()+"  ,  gobReady="+gob.isGobWaitingSettings);
         }
         return ret;
     }
