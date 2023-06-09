@@ -570,8 +570,8 @@ public class ZeeOptionsJFrame extends JFrame {
         tabbedPaneGobs.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent changeEvent) {
                 try {
-//                    if(listGobsTemp!=null && listGobsTemp.isValid())
-//                        listGobsTemp.clearSelection();
+                    if(listGobsTemp!=null && listGobsTemp.isValid())
+                        listGobsTemp.clearSelection();
                     if(listGobsSaved!=null && listGobsSaved.isValid())
                         listGobsSaved.clearSelection();
                     if(listGobsCategories!=null && listGobsCategories.isValid())
@@ -586,21 +586,25 @@ public class ZeeOptionsJFrame extends JFrame {
 
 
         //subtab gobs session list
-//        if(ZeeConfig.mapGobSession.size() > 0) {
-//            SortedSet<String> keys = new TreeSet<String>(ZeeConfig.mapGobSession.keySet());
-//            listGobsTemp = new JList<String>(keys.toArray(new String[0]));
-//        }else {
-//            listGobsTemp = new JList<String>();
-//        }
-//        JPanel panelTabGobSess = new JPanel(new GridBagLayout());
-//        panelTabGobSess.add(new JScrollPane(listGobsTemp), c);
-//        tabbedPaneGobs.addTab("Session("+ZeeConfig.mapGobSession.size()+")", panelTabGobSess);
+        if(ZeeConfig.listGobsSession.size() > 0) {
+            listGobsTemp = new JList<String>();
+            DefaultListModel listModel = new DefaultListModel();
+            for (int i = 0; i < ZeeConfig.listGobsSession.size(); i++){
+                listModel.addElement(ZeeConfig.listGobsSession.get(i));
+            }
+            listGobsTemp.setModel(listModel);
+        }else {
+            listGobsTemp = new JList<String>();
+        }
+        JPanel panelTabGobSess = new JPanel(new GridBagLayout());
+        panelTabGobSess.add(new JScrollPane(listGobsTemp), c);
+        tabbedPaneGobs.addTab("Session("+ZeeConfig.listGobsSession.size()+")", panelTabGobSess);
 
 
         //panel gobs main buttons
         //TODO move buttons up a container
         JPanel panelGobButtons = new JPanel(new FlowLayout());
-        //panelTabGobSess.add(panelGobButtons, c);
+        panelTabGobSess.add(panelGobButtons, c);
         panelGobButtons.add(btnRefresh = new JButton("refresh"));
         btnRefresh.addActionListener(evt -> {
             buildTabGobs();
@@ -615,14 +619,14 @@ public class ZeeOptionsJFrame extends JFrame {
         });
 
 
-//        listGobsTemp.addListSelectionListener(new ListSelectionListener() {
-//            @Override
-//            public void valueChanged(ListSelectionEvent evt) {
-//                if(evt.getValueIsAdjusting() || tabbedPaneGobs.getSelectedIndex()!=TABGOB_SESSION)
-//                    return;
-//                updatePanelDetails();
-//            }
-//        });
+        listGobsTemp.addListSelectionListener(new ListSelectionListener() {
+            @Override
+            public void valueChanged(ListSelectionEvent evt) {
+                if(evt.getValueIsAdjusting() || tabbedPaneGobs.getSelectedIndex()!=TABGOB_SESSION)
+                    return;
+                updatePanelDetails();
+            }
+        });
 
 
         //subtab gobs saved list
@@ -742,10 +746,9 @@ public class ZeeOptionsJFrame extends JFrame {
 
         //build gob details(saved and session)
         JList<String> list = null;
-//        if(tabbedPaneGobs.getSelectedIndex()==TABGOB_SESSION) {
-//            list = listGobsTemp;
-//        }else
-            if(tabbedPaneGobs.getSelectedIndex()==TABGOB_SAVED) {
+        if(tabbedPaneGobs.getSelectedIndex()==TABGOB_SESSION) {
+            list = listGobsTemp;
+        }else if(tabbedPaneGobs.getSelectedIndex()==TABGOB_SAVED) {
             list = listGobsSaved;
         }
 

@@ -333,8 +333,9 @@ public class ZeeConfig {
     ));
 
 
+    static List<String> listGobsSession = new ArrayList<>();
+
     static HashMap<String,String> mapTamedAnimalNameFormat = initMapTamedAnimals();
-    //static HashMap<String,String> mapGobSession = new HashMap<String,String>();
     static HashMap<String, Set<String>> mapCategoryGobs = initMapCategoryGobs();//init categs first
     static HashMap<String,String> mapGobAudio = initMapGobAudio();
     static HashMap<String,String> mapGobSpeech = initMapGobSpeech();
@@ -3154,7 +3155,7 @@ public class ZeeConfig {
 
         try {
 
-            drawstatsDebugStr = String.format("queue %d , cont-rems %d , nores %s", gobsWaiting.size(), contRemovals);
+            drawstatsDebugStr = String.format("queue %d , cont-rems %d", gobsWaiting.size(), contRemovals);
 
             // audio alerts
             ZeeConfig.applyGobSettingsAudio(ob);
@@ -3164,10 +3165,6 @@ public class ZeeConfig {
 
             // highlight gob color
             ZeeConfig.applyGobSettingsHighlight(ob, ZeeConfig.getHighlightGobColor(ob));
-
-            // save gob name //TODO remove mapGobSession related code
-            //if (ob.getres().name!=null && ob.getres().name!=null && !ob.getres().name.isBlank() && !mapGobSession.containsKey(ob.getres().name))
-            //mapGobSession.put(ob.getres().name,"");
 
             // auto boulder option (maybe remove)
             if (ZeeConfig.autoChipMinedBoulder && ZeeManagerMiner.isCursorMining() && ZeeManagerMiner.isBoulder(ob))
@@ -3181,6 +3178,11 @@ public class ZeeConfig {
             // barter stand item search labels
             if (ZeeManagerGobClick.barterSearchOpen && ob.getres().name.endsWith("/barterstand")) {
                 ZeeManagerGobClick.addTextBarterStand(ob);
+            }
+
+            // save gob name
+            if (ob.getres().name!=null && !ob.getres().name.isBlank() && !listGobsSession.contains(ob.getres().name)) {
+                listGobsSession.add(ob.getres().name);
             }
 
         }catch (Exception e){
