@@ -587,12 +587,7 @@ public class ZeeOptionsJFrame extends JFrame {
 
         //subtab gobs session list
         if(ZeeConfig.listGobsSession.size() > 0) {
-            listGobsTemp = new JList<String>();
-            DefaultListModel listModel = new DefaultListModel();
-            for (int i = 0; i < ZeeConfig.listGobsSession.size(); i++){
-                listModel.addElement(ZeeConfig.listGobsSession.get(i));
-            }
-            listGobsTemp.setModel(listModel);
+            listGobsTemp = new JList<String>( ZeeConfig.listGobsSession.toArray(new String[0]));
         }else {
             listGobsTemp = new JList<String>();
         }
