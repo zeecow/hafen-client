@@ -71,10 +71,21 @@ public class ZeeManagerMiner extends ZeeThread{
 
                         // save player coord after mining new col tile
                         if (tunnelHelperStage == TUNNELHELPER_STAGE3_MINECOL) {
-                            println("saved end coord, pick stone?");
+
+                            println("save end coord ");
                             if (tunnelHelperEndCoord != null)
                                 tunnelHelperEndCoordPrev = Coord.of(tunnelHelperEndCoord);
                             tunnelHelperEndCoord = ZeeConfig.getPlayerCoord();
+
+                            println("wait mined tile boulder");
+                            sleep(1000);
+                            Gob boulder = ZeeConfig.getClosestGob(getBoulders());
+                            if (boulder!=null){
+                                chipBoulder(boulder);
+                                ZeeConfig.clickCoord(tunnelHelperEndCoord,1);
+                                waitPlayerIdlePose();
+                            }
+
                             //pick stone
                             tunnelHelperSetStage(TUNNELHELPER_STAGE4_PICKSTONE);
                             tunnelHelperButtonAct.disable(false);
@@ -322,8 +333,14 @@ public class ZeeManagerMiner extends ZeeThread{
     }
 
 
-    public static Gob getBoulderCloseEnoughForChipping() {
-        Gob boulder = ZeeConfig.getClosestGobByNameContains("gfx/terobjs/bumlings/");
+    static List<Gob> getBoulders(){
+        List<Gob> boulders = ZeeConfig.findGobsByNameStartsWith("gfx/terobjs/bumlings/");
+        boulders.removeIf(gob -> !isBoulder(gob));//remove cave in boulders
+        return boulders;
+    }
+
+    static Gob getBoulderCloseEnoughForChipping() {
+        Gob boulder = ZeeConfig.getClosestGob(getBoulders());
         if (boulder!=null && ZeeConfig.distanceToPlayer(boulder) < MAX_DIST_BOULDER){
             return boulder;
         }
@@ -454,33 +471,16 @@ public class ZeeManagerMiner extends ZeeThread{
     }
 
     static boolean isChippingBoulder;
-    public static void chipBoulderNewThread(Gob boulder) {
+    static void chipBoulderAndResumeMining(Gob boulder) {
         isChippingBoulder = true;
         new ZeeThread(){
             public void run() {
                 try {
-                    ZeeConfig.addPlayerText("bouldan");
 
-                    //remove mining cursor
-                    ZeeConfig.clickRemoveCursor();
-                    if(!waitCursorName(ZeeConfig.CURSOR_ARW)){
-                        println(">chipBoulder couldn't change cursor to arrow");
-                        ZeeConfig.removePlayerText();
-                        return;
-                    }
+                    chipBoulder(boulder);
 
-                    //chip boulder
-                    ZeeManagerGobClick.clickGobPetal(boulder, "Chip stone");
-                    waitNoFlowerMenu();
-
-                    //restore mining icon for autodrop
-                    ZeeConfig.cursorChange(ZeeConfig.ACT_MINE);
-
-                    //wait chipping and resume minig
-                    if(waitPlayerIdlePose()){
-                        //resume mining
-                        ZeeConfig.gameUI.map.wdgmsg("sel", ZeeConfig.lastSavedOverlayStartCoord, ZeeConfig.lastSavedOverlayEndCoord, ZeeConfig.lastSavedOverlayModflags);
-                    }
+                    //resume mining
+                    ZeeConfig.gameUI.map.wdgmsg("sel", ZeeConfig.lastSavedOverlayStartCoord, ZeeConfig.lastSavedOverlayEndCoord, ZeeConfig.lastSavedOverlayModflags);
 
                 }catch (Exception e){
                     e.printStackTrace();
@@ -490,6 +490,37 @@ public class ZeeManagerMiner extends ZeeThread{
                 ZeeConfig.removePlayerText();
             }
         }.start();
+    }
+
+    static void chipBoulder(Gob boulder) {
+        isChippingBoulder = true;
+        try {
+            ZeeConfig.addPlayerText("bouldan");
+
+            //remove mining cursor
+            ZeeConfig.clickRemoveCursor();
+            if(!waitCursorName(ZeeConfig.CURSOR_ARW)){
+                println(">chipBoulder couldn't change cursor to arrow");
+                ZeeConfig.removePlayerText();
+                return;
+            }
+
+            //chip boulder
+            ZeeManagerGobClick.clickGobPetal(boulder, "Chip stone");
+            waitNoFlowerMenu();
+
+            //restore mining icon for autodrop
+            ZeeConfig.cursorChange(ZeeConfig.ACT_MINE);
+
+            //wait chipping
+            waitPlayerIdlePose();
+
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
+        isChippingBoulder = false;
+        ZeeConfig.removePlayerText();
     }
 
     // TODO delete if waitPlayerPoseIdle works
@@ -560,7 +591,7 @@ public class ZeeManagerMiner extends ZeeThread{
         if(dist > MAX_DIST_BOULDER)
             return;
 
-        chipBoulderNewThread(boulder);
+        chipBoulderAndResumeMining(boulder);
     }
 
     static ZeeWindow tilemonWindow;
