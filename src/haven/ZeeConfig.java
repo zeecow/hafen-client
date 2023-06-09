@@ -3119,49 +3119,42 @@ public class ZeeConfig {
         return null;
     }
 
-    static Queue<Gob> gobsWaiting = new LinkedList<>();
+    static List<Gob> gobsWaiting = new ArrayList<>();
     static ZeeThread gobConsumer = new ZeeThread(){
         public void run() {
-            try {
-                println("thread gob consumer");
-                while (true){
-                    synchronized (gobConsumer) {
-                        if (gobsWaiting.isEmpty()) {
+            println("thread gob consumer");
+            while (true){
+                synchronized (gobConsumer) {
+                    // queue empty = wait next gob arrival
+                    if (gobsWaiting.isEmpty()) {
+                        try {
                             this.wait();
-                        } else if (gobsWaiting.peek().isGobWaitingSettings){
-                            consumeGobSettings();
-                        } else{
-                            //send to the end of que queue
-                            gobsWaiting.offer(gobsWaiting.poll());
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    // check all gobs
+                    for (int i = gobsWaiting.size()-1; i >= 0; i--) {
+                        Gob g = gobsWaiting.get(i);
+                        if (g.isGobWaitingSettings){
+                            gobsWaiting.remove(g);
+                            contRemovals++;
+                            consumeGobSettings(g);
                         }
                     }
                 }
-            } catch (Exception e) {
-                e.printStackTrace();
             }
         }
     };
     static {
         gobConsumer.start();
     }
-    static int contNoRes = 0, contRemovals=0;
-    static void consumeGobSettings(){
-
-        Gob ob = null;
+    static int contRemovals=0;
+    static void consumeGobSettings(Gob ob){
 
         try {
 
-            // remove gob from queue
-            synchronized (gobsWaiting) {
-                ob = gobsWaiting.remove();
-                contRemovals++;
-                //already rendered? transient res?
-                if (ob.getres()==null) {
-                    contNoRes++;
-                    return;
-                }
-                drawstatsDebugStr = String.format("queue %d , cont-nores %d , cont-rems %d",gobsWaiting.size(), contNoRes, contRemovals);
-            }
+            drawstatsDebugStr = String.format("queue %d , cont-rems %d , nores %s", gobsWaiting.size(), contRemovals);
 
             // audio alerts
             ZeeConfig.applyGobSettingsAudio(ob);
@@ -3195,9 +3188,9 @@ public class ZeeConfig {
         }
     }
     static void queueGobSettings(Gob ob) {
-        if(ob != null){// && ob.getres()!=null) {
+        if(ob != null && ob.getres()!=null) {
             synchronized (gobConsumer) {
-                gobsWaiting.add(ob);
+                gobsWaiting.add(0,ob);
                 gobConsumer.notify();
             }
         }
