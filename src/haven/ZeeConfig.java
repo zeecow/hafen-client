@@ -12,8 +12,11 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
 import java.util.List;
+import java.util.Queue;
+import java.util.*;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
@@ -3120,7 +3123,7 @@ public class ZeeConfig {
         return null;
     }
 
-    static List<Gob> gobsWaiting = new ArrayList<>();
+    static Queue<Gob> gobsWaiting = new ConcurrentLinkedQueue<>();
     static ZeeThread gobConsumer = new ZeeThread(){
         public void run() {
             println("thread gob consumer");
@@ -3135,14 +3138,16 @@ public class ZeeConfig {
                         }
                     }
                     // check all gobs
-                    for (int i = gobsWaiting.size()-1; i >= 0; i--) {
-                        Gob g = gobsWaiting.get(i);
+                    //for (int i = gobsWaiting.size()-1; i >= 0; i--) {
+                        Gob g = gobsWaiting.remove();
                         if (g.isGobWaitingSettings){
-                            gobsWaiting.remove(g);
                             contRemovals++;
                             consumeGobSettings(g);
+                        }else{
+                            gobsWaiting.add(g);
+                            requeued++;
                         }
-                    }
+                    //}
                 }
             }
         }
@@ -3150,18 +3155,32 @@ public class ZeeConfig {
     static {
         gobConsumer.start();
     }
-    static int contRemovals=0;
+    static void queueGobSettings(Gob ob) {
+        if(ob != null && ob.getres()!=null) {
+            synchronized (gobConsumer) {
+                gobsWaiting.add(ob);
+                gobConsumer.notify();
+            }
+        }
+    }
+    static int contRemovals = 0;
+    static long requeued = 0;
     static void consumeGobSettings(Gob ob){
 
         try {
 
-            drawstatsDebugStr = String.format("queue %d , cont-rems %d", gobsWaiting.size(), contRemovals);
+            drawstatsDebugStr = String.format("queue %d , rems %d, requd %d", gobsWaiting.size(), contRemovals, requeued);
 
-            // audio alerts
-            ZeeConfig.applyGobSettingsAudio(ob);
+            // ignore bat if using batcape
+            if (!ob.getres().name.contentEquals("gfx/kritter/bat/bat") || !ZeeManagerItemClick.isItemEquipped("/batcape")) {
 
-            // aggro radius
-            ZeeConfig.applyGobSettingsAggro(ob);
+                // audio alerts
+                ZeeConfig.applyGobSettingsAudio(ob);
+
+                // aggro radius
+                ZeeConfig.applyGobSettingsAggro(ob);
+
+            }
 
             // highlight gob color
             ZeeConfig.applyGobSettingsHighlight(ob, ZeeConfig.getHighlightGobColor(ob));
@@ -3187,14 +3206,6 @@ public class ZeeConfig {
 
         }catch (Exception e){
             e.printStackTrace();
-        }
-    }
-    static void queueGobSettings(Gob ob) {
-        if(ob != null && ob.getres()!=null) {
-            synchronized (gobConsumer) {
-                gobsWaiting.add(0,ob);
-                gobConsumer.notify();
-            }
         }
     }
 
