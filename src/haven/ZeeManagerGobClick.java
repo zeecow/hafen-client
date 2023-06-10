@@ -1589,14 +1589,10 @@ public class ZeeManagerGobClick extends ZeeThread{
         ZeeManagerGobClick.remountClosestHorse = false;
         new ZeeThread(){
             public void run() {
+
                 int countNotReady = 0;
                 ZeeConfig.addPlayerText("mounting");
-
-                //mute leash sound
-                boolean backupBlockAudio = ZeeConfig.blockAudioMsg;
-                String backupBlockAudioList = ZeeConfig.blockAudioMsgList;
-                ZeeConfig.blockAudioMsg = true;
-                ZeeConfig.blockAudioMsgList += ";Your leash broke.";
+                ZeeConfig.muteAudioMsg("Your leash broke.");
 
                 do {
 
@@ -1622,10 +1618,7 @@ public class ZeeManagerGobClick extends ZeeThread{
 
                 }while(countNotReady > 0  &&  countNotReady < 5);
 
-                // undo mute leash sound
-                ZeeConfig.blockAudioMsg = backupBlockAudio;
-                ZeeConfig.blockAudioMsgList = backupBlockAudioList;
-
+                ZeeConfig.restoreMutedAudioMsg();
                 ZeeConfig.removePlayerText();
             }
         }.start();

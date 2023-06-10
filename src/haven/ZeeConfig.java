@@ -3891,4 +3891,24 @@ public class ZeeConfig {
     public static String getPlayerTileName() {
         return getTileResName(getPlayerTile());
     }
+
+    private static boolean backupBlockAudio;
+    private static String backupBlockAudioList = null;
+    public static void muteAudioMsg(String msg) {
+        backupBlockAudio = blockAudioMsg;
+        backupBlockAudioList = blockAudioMsgList;
+        blockAudioMsg = true;
+        if (!blockAudioMsgList.isBlank())
+            blockAudioMsgList += ";";
+        blockAudioMsgList += "Your leash broke.";
+    }
+    public static void restoreMutedAudioMsg() {
+        if (backupBlockAudioList==null){
+            println("restoreMutedAudioMsg > backup list missing (call muteAudioMsg first)");
+            return;
+        }
+        blockAudioMsg = backupBlockAudio;
+        blockAudioMsgList = backupBlockAudioList;
+        backupBlockAudioList = null;
+    }
 }
