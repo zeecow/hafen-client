@@ -1591,8 +1591,8 @@ public class ZeeManagerGobClick extends ZeeThread{
             public void run() {
 
                 int countNotReady = 0;
+                double backupAudio = Audio.volume;
                 ZeeConfig.addPlayerText("mounting");
-                ZeeConfig.muteAudioMsg("Your leash broke.");
 
                 do {
 
@@ -1604,10 +1604,19 @@ public class ZeeManagerGobClick extends ZeeThread{
                             sleep(1000);
                         }
 
-                        //TODO wait longer if multiple horses around?
+                        //find horse //TODO wait longer if multiple horses around?
                         Gob closestHorse = ZeeConfig.getClosestGob(ZeeConfig.findGobsByNameEndsWith("/mare", "/stallion"));
+
+                        //mute volume (msg method doesnt work)
+                        Audio.setvolume(0);
+
+                        //mount horse
                         ZeeManagerGobClick.clickGobPetal(closestHorse, "Giddyup!");
                         countNotReady = 0;//exit success?
+
+                        // wait player mounting pose
+                        waitPlayerPose(ZeeConfig.POSE_PLAYER_RIDING_IDLE);
+                        sleep(500);
 
                     } catch (Defer.NotDoneException e) {
                         countNotReady++;//sleep before next try
@@ -1618,7 +1627,9 @@ public class ZeeManagerGobClick extends ZeeThread{
 
                 }while(countNotReady > 0  &&  countNotReady < 5);
 
-                ZeeConfig.restoreMutedAudioMsg();
+                //restore volume (msg method doesnt work)
+                Audio.setvolume(backupAudio);
+
                 ZeeConfig.removePlayerText();
             }
         }.start();

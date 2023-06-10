@@ -2118,7 +2118,7 @@ public class ZeeConfig {
         searchWindow.sbox.settext(inputName);
     }
 
-    public static boolean matchKeyShortcut(KeyEvent ev) {
+    public static boolean checkKeyPressed(KeyEvent ev) {
 
         //println(ev.getKeyCode()+"  "+ev.getKeyChar());
 
@@ -3894,13 +3894,23 @@ public class ZeeConfig {
 
     private static boolean backupBlockAudio;
     private static String backupBlockAudioList = null;
-    public static void muteAudioMsg(String msg) {
+    public static void muteAudioMsg(String ... msgs) {
+        //backup settings for restoreMutedAudioMsg()
         backupBlockAudio = blockAudioMsg;
         backupBlockAudioList = blockAudioMsgList;
+
         blockAudioMsg = true;
-        if (!blockAudioMsgList.isBlank())
+        if(!blockAudioMsgList.endsWith(";")){
             blockAudioMsgList += ";";
-        blockAudioMsgList += "Your leash broke.";
+        }
+        for (String m : msgs) {
+            blockAudioMsgList += m + ";";
+        }
+
+        //remove last ";"
+        blockAudioMsgList = blockAudioMsgList.replaceFirst(";$","");
+
+        println("[TEMP] "+blockAudioMsgList);
     }
     public static void restoreMutedAudioMsg() {
         if (backupBlockAudioList==null){
@@ -3910,5 +3920,6 @@ public class ZeeConfig {
         blockAudioMsg = backupBlockAudio;
         blockAudioMsgList = backupBlockAudioList;
         backupBlockAudioList = null;
+        println("[DEF] "+blockAudioMsgList);
     }
 }

@@ -460,6 +460,21 @@ public class ZeeThread  extends Thread{
         return poses.contains(poseName);
     }
 
+    static boolean waitGobPoseNoCancelClick(Gob gob, String poseName) {
+        //println("waitGobPoseNoCancelClick > start");
+        List<String> poses = new ArrayList<>();
+        try{
+            do{
+                //println("waitGobPoseNoCancelClick > "+poses);
+                sleep(PING_MS*2);
+            } while (!(poses = ZeeConfig.getGobPoses(gob)).contains(poseName));
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        //println("      return "+(poses.contains(poseName))+" "+poseName);
+        return poses.contains(poseName);
+    }
+
     static boolean waitGobOnlyPose(Gob gob, String singlePoseName) {
         //println("waitGobOnlyPose > start");
         List<String> poses = new ArrayList<>();
@@ -486,6 +501,10 @@ public class ZeeThread  extends Thread{
 
     public static boolean waitPlayerPose(String poseName) {
         return waitGobPose(ZeeConfig.getPlayerGob(),poseName);
+    }
+
+    public static boolean waitPlayerPoseNoCancelClick(String poseName) {
+        return waitGobPoseNoCancelClick(ZeeConfig.getPlayerGob(),poseName);
     }
 
     public static boolean waitPlayerPoseMs(String poseName, long idleMs) {
