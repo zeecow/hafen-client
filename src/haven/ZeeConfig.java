@@ -173,7 +173,6 @@ public class ZeeConfig {
     static long lastInvItemMs;
     static Coord lastUiClickCoord;
     static Class<?> classMSRad;
-    static String drawstatsDebugStr = "";
 
     static int aggroRadiusTiles = Utils.getprefi("aggroRadiusTiles", 11);
     static boolean alertOnPlayers = Utils.getprefb("alertOnPlayers", true);
@@ -3145,7 +3144,6 @@ public class ZeeConfig {
                             consumeGobSettings(g);
                         }else{
                             gobsWaiting.add(g);
-                            requeued++;
                         }
                     //}
                 }
@@ -3163,13 +3161,10 @@ public class ZeeConfig {
             }
         }
     }
-    static int contRemovals = 0;
-    static long requeued = 0;
+    static int contRemovals = 0;//GLPanel.drawstats()
     static void consumeGobSettings(Gob ob){
 
         try {
-
-            drawstatsDebugStr = String.format("queue %d , rems %d, requd %d", gobsWaiting.size(), contRemovals, requeued);
 
             // ignore bat if using batcape
             if (!ob.getres().name.contentEquals("gfx/kritter/bat/bat") || !ZeeManagerItemClick.isItemEquipped("/batcape")) {
