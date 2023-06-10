@@ -36,7 +36,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
     public Coord2d rc;
     public double a;
     public boolean virtual = false;
-	int clprio = 0;
+    int clprio = 0;
     public long id;
     public boolean removed = false;
     public final Glob glob;
@@ -48,6 +48,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
     private final LinkedList<Runnable> deferred = new LinkedList<>();
     private Loader.Future<?> deferral = null;
 	public int totalDmgHp = 0;
+	public long requeued = 0;
 
     public static class Overlay implements RenderTree.Node {
 	public final int id;

@@ -18,7 +18,7 @@ public class ZeeOptionsJFrame extends JFrame {
     public JTabbedPane tabbedPane, tabbedPaneGobs;
     public JPanel panelTabAuto, panelTabMisc, panelTabInterface, panelTabGobs, panelTabControls, panelTabMinimap, panelDetailsBottom, panelTabCateg, panelShapeIcons, panelShapeIconsSaveCancel;
     public JCheckBox cbSimpleWindowBorder, cbSimpleWindows, cbShapeIcons, cbDebugWdgMsg, cbDebugCodeRes, cbCattleRosterHeight;
-    public JTextField tfAutoHideWindows, tfConfirmPetal, tfBlockAudioMsgs, tfAutoClickMenu, tfAggroRadiusTiles, tfButchermode, tfGobName, tfGobSpeech, tfAudioPath, tfCategName, tfAudioPathCateg;
+    public JTextField tfAutoHideWindows, tfConfirmPetal, tfBlockAudioMsgs, tfAutoClickMenu, tfAggroRadiusTiles, tfButchermode, tfGobName, tfGobSpeech, tfAudioPath, tfCategName, tfAudioPathCateg, tfGobMaxRequeues;
     public JComboBox<String> cmbCattleRoster, cmbGobCategory, cmbMiniTreeSize, cmbRainLimitPerc, comboShapeIcons;
     public JList<String> listGobsTemp, listGobsSaved, listGobsCategories;
     public JButton btnRefresh, btnPrintState, btnResetGobs, btnAudioSave, btnAudioClear, btnAudioTest, btnRemGobFromCateg, btnGobColorAdd, btnCategoryColorAdd, btnGobColorRemove, btnCategoryColorRemove, btnResetCateg, btnAddCateg, btnRemoveCateg, btnResetWindowsPos, btnResetActionUses, btnSapeIconPreview, btnShapeIconSave, btnSapeIconDelete, btnSolidColorWindow, btnGridGolor;
@@ -389,6 +389,23 @@ public class ZeeOptionsJFrame extends JFrame {
             if(str!=null && str.chars().allMatch(Character::isDigit)) {
                 ZeeConfig.aggroRadiusTiles = Integer.parseInt(str);
                 Utils.setpref("aggroRadiusTiles",str);
+            }
+        });
+
+
+        //Gob max requeues
+        pan = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        panelTabMisc.add(pan,c);
+        pan.add(new JLabel("Gob max requeues (def "+ZeeConfig.DEF_GOB_MAX_REQUEUE+")"));
+        pan.add(tfGobMaxRequeues = new JTextField("",5));
+        //tfGobMaxRequeues.setMaximumSize(new Dimension(Integer.MAX_VALUE, tfGobMaxRequeues.getPreferredSize().height));
+        tfGobMaxRequeues.setText(""+ZeeConfig.gobMaxRequeues);
+        tfGobMaxRequeues.addActionListener(actionEvent -> {
+            String str = actionEvent.getActionCommand();
+            str = str.strip();
+            if(str!=null && str.chars().allMatch(Character::isDigit)) {
+                ZeeConfig.gobMaxRequeues = Integer.parseInt(str);
+                Utils.setpref("gobMaxRequeues",str);
             }
         });
 

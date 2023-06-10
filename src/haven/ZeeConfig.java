@@ -127,6 +127,7 @@ public class ZeeConfig {
     static final Color DEF_SIMPLE_WINDOW_COLOR = new Color(55, 64, 32, 255);
     static final Color DEF_GRID_COLOR = new Color(204, 204, 255, 45);
     static final int MINIMAP_DRAG_BUTTON = 3;
+    static final int DEF_GOB_MAX_REQUEUE = 100000;
 
     static final int PLAYER_SPEED_0 = 0;
     static final int PLAYER_SPEED_1 = 1;
@@ -256,7 +257,7 @@ public class ZeeConfig {
     static int minimapScale = Utils.getprefi("minimapScale",1);
     static boolean researchFoodTips = Utils.getprefb("researchFoodTips", true);
     static boolean closeTamedAnimalWindowAfterNaming = Utils.getprefb("closeTamedAnimalWindowAfterNaming", true);
-
+    static int gobMaxRequeues = Utils.getprefi("gobMaxRequeues",DEF_GOB_MAX_REQUEUE);
 
     public final static Set<String> mineablesStone = new HashSet<String>(Arrays.asList(
             "stone","gneiss","basalt","dolomite","feldspar","flint",
@@ -3135,16 +3136,26 @@ public class ZeeConfig {
                             e.printStackTrace();
                         }
                     }
-                    // check all gobs
-                    //for (int i = gobsWaiting.size()-1; i >= 0; i--) {
-                        Gob g = gobsWaiting.remove();
-                        if (g.isGobWaitingSettings){
-                            contRemovals++;
+                    // remove gob from queue
+                    Gob g = gobsWaiting.remove();
+                    synchronized (g) {
+                        if (g.isGobWaitingSettings) {
+                            // apply gob settings
+                            countRemovals++;
                             consumeGobSettings(g);
-                        }else{
-                            gobsWaiting.add(g);
+                        } else {
+                            // requeue gob up to a few times
+                            if (g.requeued < ZeeConfig.gobMaxRequeues) { //TODO test other numbers
+                                g.requeued++;
+                                gobsWaiting.add(g);
+                            }
+                            // drop gob from queue eventually
+                            else {
+                                g.requeued = 0;
+                                countDrops++;
+                            }
                         }
-                    //}
+                    }
                 }
             }
         }
@@ -3160,7 +3171,7 @@ public class ZeeConfig {
             }
         }
     }
-    static int contRemovals = 0;//GLPanel.drawstats()
+    static long countRemovals =0, countDrops =0;//GLPanel.drawstats()
     static void consumeGobSettings(Gob ob){
 
         try {
