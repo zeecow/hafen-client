@@ -362,7 +362,7 @@ public class ZeeManagerGobClick extends ZeeThread{
 
                     // place treelog and wait
                     gobPlace(ZeeManagerStockpile.lastPlob,0);
-                    waitNotPlayerPose(ZeeConfig.POSE_PLAYER_LIFT);
+                    waitNotPlayerPose(ZeeConfig.POSE_PLAYER_LIFTING);
 
                 }catch (Exception e){
                     e.printStackTrace();
@@ -871,7 +871,7 @@ public class ZeeManagerGobClick extends ZeeThread{
         }
 
         // click barrel transfer
-        if (gobName.endsWith("/barrel") && ZeeConfig.getPlayerPoses().contains(ZeeConfig.POSE_PLAYER_LIFT)) {
+        if (gobName.endsWith("/barrel") && ZeeConfig.getPlayerPoses().contains(ZeeConfig.POSE_PLAYER_LIFTING)) {
             new ZeeThread() {
                 public void run() {
                     try {
@@ -950,7 +950,10 @@ public class ZeeManagerGobClick extends ZeeThread{
                 new ZeeThread() {
                     public void run() {
                         if(dismountHorse(mc)) {
-                            ZeeManagerGobClick.remountClosestHorse = true;
+                            //schedule auto remount horse, if player not lifting object
+                            if (!ZeeConfig.playerHasAnyPose(ZeeConfig.POSE_PLAYER_LIFTING)) {
+                                ZeeManagerGobClick.remountClosestHorse = true;
+                            }
                             if (isGobHouse(gobName)) {
                                 gobClick(gob, 3, 0, 16);//gob's door?
                             }else {

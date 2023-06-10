@@ -16,7 +16,6 @@ import java.util.List;
 import java.util.Queue;
 import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
@@ -87,7 +86,7 @@ public class ZeeConfig {
     static final String POSE_PLAYER_CHOPTREE = "gfx/borka/treechop";
     static final String POSE_PLAYER_DIGSHOVEL = "gfx/borka/shoveldig";
     static final String POSE_PLAYER_DRINK = "gfx/borka/drinkan";
-    static final String POSE_PLAYER_LIFT = "gfx/borka/banzai";
+    static final String POSE_PLAYER_LIFTING = "gfx/borka/banzai";
     static final String POSE_PLAYER_HARVESTING = "gfx/borka/harvesting";//reeds clearing
     static final String POSE_PLAYER_PICK = "gfx/borka/pickan";//pickaxe mining, chipping
     static final String POSE_PLAYER_PICKGROUND = "gfx/borka/pickaxeanspot";
@@ -2593,17 +2592,17 @@ public class ZeeConfig {
     }
 
     public static boolean isPlayerLiftingGob() {
-        return playerHasAnyPose(POSE_PLAYER_LIFT);
+        return playerHasAnyPose(POSE_PLAYER_LIFTING);
     }
 
     public static Gob isPlayerLiftingGob(String gobNameContains) {
-        if (!playerHasAnyPose(POSE_PLAYER_LIFT)) // not lifting anything
+        if (!playerHasAnyPose(POSE_PLAYER_LIFTING)) // not lifting anything
             return null;
         return  isPlayerSharingGobCoord(gobNameContains);
     }
 
     public static boolean isPlayerLiftingGob(Gob gob) {
-        if (!playerHasAnyPose(POSE_PLAYER_LIFT)) // not lifting anything
+        if (!playerHasAnyPose(POSE_PLAYER_LIFTING)) // not lifting anything
             return false;
         return  isPlayerSharingGobCoord(gob);
     }
