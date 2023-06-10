@@ -362,7 +362,7 @@ public class ZeeManagerGobClick extends ZeeThread{
 
                     // place treelog and wait
                     gobPlace(ZeeManagerStockpile.lastPlob,0);
-                    waitNotPlayerPose(ZeeConfig.POSE_PLAYER_LIFT);
+                    waitNotPlayerPose(ZeeConfig.POSE_PLAYER_LIFTING);
 
                 }catch (Exception e){
                     e.printStackTrace();
@@ -871,7 +871,7 @@ public class ZeeManagerGobClick extends ZeeThread{
         }
 
         // click barrel transfer
-        if (gobName.endsWith("/barrel") && ZeeConfig.getPlayerPoses().contains(ZeeConfig.POSE_PLAYER_LIFT)) {
+        if (gobName.endsWith("/barrel") && ZeeConfig.getPlayerPoses().contains(ZeeConfig.POSE_PLAYER_LIFTING)) {
             new ZeeThread() {
                 public void run() {
                     try {
@@ -950,7 +950,10 @@ public class ZeeManagerGobClick extends ZeeThread{
                 new ZeeThread() {
                     public void run() {
                         if(dismountHorse(mc)) {
-                            ZeeManagerGobClick.remountClosestHorse = true;
+                            //schedule auto remount horse, if player not lifting object
+                            if (!ZeeConfig.playerHasAnyPose(ZeeConfig.POSE_PLAYER_LIFTING)) {
+                                ZeeManagerGobClick.remountClosestHorse = true;
+                            }
                             if (isGobHouse(gobName)) {
                                 gobClick(gob, 3, 0, 16);//gob's door?
                             }else {
@@ -1586,14 +1589,43 @@ public class ZeeManagerGobClick extends ZeeThread{
         ZeeManagerGobClick.remountClosestHorse = false;
         new ZeeThread(){
             public void run() {
-                try {
-                    ZeeConfig.addPlayerText("mounting");
-                    //TODO wait longer if multiple horses around?
-                    Gob closestHorse = ZeeConfig.getClosestGob(ZeeConfig.findGobsByNameEndsWith("/mare","/stallion"));
-                    ZeeManagerGobClick.clickGobPetal(closestHorse, "Giddyup!");
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+                int countNotReady = 0;
+                ZeeConfig.addPlayerText("mounting");
+
+                //mute leash sound
+                boolean backupBlockAudio = ZeeConfig.blockAudioMsg;
+                String backupBlockAudioList = ZeeConfig.blockAudioMsgList;
+                ZeeConfig.blockAudioMsg = true;
+                ZeeConfig.blockAudioMsgList += ";Your leash broke.";
+
+                do {
+
+                    try {
+
+                        //map wasnt ready, sleep and retry
+                        if (countNotReady>0) {
+                            println("remount horse not ready, sleep 1sec");
+                            sleep(1000);
+                        }
+
+                        //TODO wait longer if multiple horses around?
+                        Gob closestHorse = ZeeConfig.getClosestGob(ZeeConfig.findGobsByNameEndsWith("/mare", "/stallion"));
+                        ZeeManagerGobClick.clickGobPetal(closestHorse, "Giddyup!");
+                        countNotReady = 0;//exit success?
+
+                    } catch (Defer.NotDoneException e) {
+                        countNotReady++;//sleep before next try
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        countNotReady = 0;//exit fail?
+                    }
+
+                }while(countNotReady > 0  &&  countNotReady < 5);
+
+                // undo mute leash sound
+                ZeeConfig.blockAudioMsg = backupBlockAudio;
+                ZeeConfig.blockAudioMsgList = backupBlockAudioList;
+
                 ZeeConfig.removePlayerText();
             }
         }.start();
