@@ -127,7 +127,7 @@ public class ZeeConfig {
     static final Color DEF_SIMPLE_WINDOW_COLOR = new Color(55, 64, 32, 255);
     static final Color DEF_GRID_COLOR = new Color(204, 204, 255, 45);
     static final int MINIMAP_DRAG_BUTTON = 3;
-    static final int DEF_GOB_MAX_REQUEUE = 100000;
+    static final int DEF_GOB_MAX_REQUEUE = 500000;
 
     static final int PLAYER_SPEED_0 = 0;
     static final int PLAYER_SPEED_1 = 1;
@@ -3171,10 +3171,20 @@ public class ZeeConfig {
             }
         }
     }
-    static long countRemovals =0, countDrops =0;//GLPanel.drawstats()
+    static long countRemovals=0, countDrops=0, maxReqs=0, minReqs=100;//GLPanel.drawstats()
+    static String maxReqstr="" , minReqstr="";
     static void consumeGobSettings(Gob ob){
 
         try {
+
+            if (ob.requeued > maxReqs) {
+                maxReqs = ob.requeued;
+                maxReqstr = ob.getres().name;
+            }else if (ob.requeued < minReqs){
+                minReqs = ob.requeued;
+                minReqstr = ob.getres().name;
+            }
+
 
             // ignore bat if using batcape
             if (!ob.getres().name.contentEquals("gfx/kritter/bat/bat") || !ZeeManagerItemClick.isItemEquipped("/batcape")) {
