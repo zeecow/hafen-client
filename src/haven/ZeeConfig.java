@@ -3171,8 +3171,8 @@ public class ZeeConfig {
             }
         }
     }
-    static long countRemovals=0, countDrops=0, maxReqs=0, minReqs=100;//GLPanel.drawstats()
-    static String maxReqstr="" , minReqstr="";
+    static long countRemovals=0, countDrops=0, maxReqs=0;//GLPanel.drawstats()
+    static String maxReqstr="";
     static void consumeGobSettings(Gob ob){
 
         try {
@@ -3180,9 +3180,6 @@ public class ZeeConfig {
             if (ob.requeued > maxReqs) {
                 maxReqs = ob.requeued;
                 maxReqstr = ob.getres().name;
-            }else if (ob.requeued < minReqs){
-                minReqs = ob.requeued;
-                minReqstr = ob.getres().name;
             }
 
 
