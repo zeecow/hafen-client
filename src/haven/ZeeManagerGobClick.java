@@ -818,7 +818,7 @@ public class ZeeManagerGobClick extends ZeeThread{
         startRightClickZooming(gob, pc);
 
         //long click starts harvest selection
-        if(isGobCrop(gobName)){
+        if(isGobHarvestable(gobName)){
             new ZeeThread(){
                 public void run() {
                     try {
@@ -2343,6 +2343,10 @@ public class ZeeManagerGobClick extends ZeeThread{
                 +"plants/turnip,plants/millet,plants/barley,plants/wheat,plants/poppy,"
                 +"plants/pumpkin,plants/fallowplant"
         );
+    }
+
+    static boolean isGobHarvestable(String gobName){
+        return isGobCrop(gobName) || isGobTrellisPlant(gobName);
     }
 
     public static boolean isGobCraftingContainer(String gobName) {
