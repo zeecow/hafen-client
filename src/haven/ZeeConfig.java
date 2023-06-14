@@ -398,7 +398,7 @@ public class ZeeConfig {
         if(highlightCropsReady && isGobCrop(gobName)) {
             //System.out.printf(" CROP \n");
             if (isCropMaxStage(gob))
-                return MIXCOLOR_LIGHTBLUE;
+                return MIXCOLOR_MAGENTA;
         }
         //else System.out.printf(" NOPE \n");
 

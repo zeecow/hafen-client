@@ -818,7 +818,7 @@ public class ZeeManagerGobClick extends ZeeThread{
         startRightClickZooming(gob, pc);
 
         //long click starts harvest selection
-        if(isGobCrop(gobName)){
+        if(isGobHarvestable(gobName)){
             new ZeeThread(){
                 public void run() {
                     try {
@@ -1016,7 +1016,8 @@ public class ZeeManagerGobClick extends ZeeThread{
         // start watching if clicked center box of 50x50
         //if ( Math.abs(rcguisz.x - pc.x) < 50  &&  Math.abs(rcguisz.y - pc.y) < 50){
         if(g.id == ZeeConfig.gameUI.plid){//clicked player?
-            isRightClickZooming = true;
+            if (ZeeConfig.gameUI.map.camdrag == null) // if not dragging camera starts zoom
+                isRightClickZooming = true;
         }else{
             isRightClickZooming = false;
         }
@@ -2343,6 +2344,10 @@ public class ZeeManagerGobClick extends ZeeThread{
                 +"plants/turnip,plants/millet,plants/barley,plants/wheat,plants/poppy,"
                 +"plants/pumpkin,plants/fallowplant"
         );
+    }
+
+    static boolean isGobHarvestable(String name) {
+        return isGobCrop(name) || isGobTrellisPlant(name);
     }
 
     public static boolean isGobCraftingContainer(String gobName) {
