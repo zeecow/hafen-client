@@ -1036,7 +1036,7 @@ public class ZeeManagerGobClick extends ZeeThread{
             || isGobInListEndsWith(gobName,
                 "/upstairs,/downstairs,/minehole,/ladder,/cavein,/caveout,/burrow,/igloo," +
                     "/wheelbarrow,/loom,/churn,/swheel,/ropewalk," +
-                    "/meatgrinder,/potterswheel,/quern,/plow,/winepress"
+                    "/meatgrinder,/potterswheel,/quern,/plow,/winepress,/hookah"
             )
         ){
             return true;
