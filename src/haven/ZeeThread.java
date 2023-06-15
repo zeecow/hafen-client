@@ -950,9 +950,11 @@ public class ZeeThread  extends Thread{
         for(FlowerMenu.Petal p : menu.opts) {
             if(p.name.equals(petalName)) {
                 try {
-                    menu.choose(p);
-                    menu.destroy();
-                    return true;
+                    synchronized (menu) {
+                        menu.choose(p);
+                        menu.destroy();
+                        return true;
+                    }
                 } catch(Exception e) {
                     e.printStackTrace();
                 }
