@@ -256,7 +256,7 @@ public class ZeeManagerIcons {
     }
 
     public static void drawIcons(GOut g, MiniMap.Location sessloc, MiniMap.Location dloc, int dlvl, Coord sz) {
-        if( (ZeeConfig.showIconsZoomOut && dlvl>2) || dlvl != 0)
+        if( !ZeeConfig.showIconsZoomOut  ||  dlvl > 2 )
             return;
         if((sessloc == null) || (dloc == null) || (dloc.seg != sessloc.seg))
             return;
