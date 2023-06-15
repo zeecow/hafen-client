@@ -2563,7 +2563,7 @@ public class ZeeManagerGobClick extends ZeeThread{
             dist = ZeeConfig.distanceToPlayer(gobs.get(i));
             name = gobs.get(i).getres().name;
             if ( closestGob==null
-                || (name.contains("/kritter/") && dist < 88)
+                || ((name.contains("/kritter/") || name.contentEquals("gfx/terobjs/grub")) && dist < 88)
                 ||  dist < minDist )
             {
                 minDist = dist;
