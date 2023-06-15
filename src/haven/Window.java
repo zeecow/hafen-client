@@ -219,7 +219,7 @@ public class Window extends Widget implements DTarget {
 	public void drawSimpleWindowBg(GOut g) {
 		//TODO uncomment
 		if (bgImgSimpleWindow == null) {
-			bgImgSimpleWindow = new TexI(ZeeManagerIcons.imgRect(ca.sz().x, ca.sz().y, ZeeConfig.intToColor(ZeeConfig.simpleWindowColorInt),ZeeConfig.simpleWindowBorder,0));
+			bgImgSimpleWindow = new TexI(ZeeManagerIcons.imgRect(ca.sz().x, ca.sz().y, ZeeConfig.intToColor(ZeeConfig.simpleWindowColorInt),ZeeConfig.simpleWindowBorder,0,false));
 		}
 		g.image(bgImgSimpleWindow,tlm);
 	}

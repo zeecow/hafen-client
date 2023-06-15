@@ -1817,7 +1817,7 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Message
 	private static final BufferedImage zeeBeltBg = ZeeManagerIcons.imgPolygon(
 			450, 37, new int[] {0,375,375,450,450, 0}, // x points
 			new int[] {0,  0, 12, 12, 37,37}, // y points
-			6, ZeeConfig.intToColor(ZeeConfig.simpleWindowColorInt), ZeeConfig.simpleWindowBorder,0
+			6, ZeeConfig.intToColor(ZeeConfig.simpleWindowColorInt), ZeeConfig.simpleWindowBorder,0, false
 	);
 
 	public class ZeeBelt extends Belt {

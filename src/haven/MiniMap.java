@@ -353,23 +353,26 @@ public class MiniMap extends Widget {
 	public DisplayMarker(Marker marker) {
 	    this.m = marker;
 	    this.tip = Text.render(m.nm);
-	    if(marker instanceof PMarker)
-			this.hit = Area.sized(starMarkCc.inv(), UI.scale(Coord.of(starMark.getWidth())));
-		//this.hit = Area.sized(flagcc.inv(), UI.scale(flagbg.sz));
+	    if(marker instanceof PMarker) {
+			// replace minimap mark for something smaller
+			this.hit = Area.sized(minimapMarkImgCc.inv(), UI.scale(Coord.of(minimapMarkImg.getWidth())));
+			//this.hit = Area.sized(flagcc.inv(), UI.scale(flagbg.sz));
+		}
 	}
 
-	static BufferedImage starMark = ZeeManagerIcons.imgStar4(10,Color.white,false,true);
-	static Coord starMarkCc = UI.scale(Coord.of(starMark.getWidth()));
+	// minimap mark replacement
+	static BufferedImage minimapMarkImg = ZeeManagerIcons.imgStar4(7,Color.white,false,false,false);
+	static Coord minimapMarkImgCc = UI.scale(Coord.of(minimapMarkImg.getWidth()));
 	public void draw(GOut g, Coord c) {
 	    if(m instanceof PMarker) {
 		//Coord ul = c.sub(flagcc);
-		Coord ul = c.sub(starMarkCc);
+		Coord ul = c.sub(minimapMarkImgCc);
 		if (isListFocused){
 			g.image(ZeeManagerIcons.latestFocusedMarkBgImg,ul.sub(1,1));
 			g.chcolor();
 		}
 		g.chcolor(((PMarker)m).color);
-		g.image(starMark,ul);
+		g.image(minimapMarkImg,ul);
 		g.chcolor();
 //		g.chcolor(((PMarker)m).color);
 //		g.image(flagfg, ul);

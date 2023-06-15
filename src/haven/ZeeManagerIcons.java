@@ -80,77 +80,82 @@ public class ZeeManagerIcons {
         ruleColor = ruleArr[2].split(" ");
         Color c = new Color( Integer.parseInt(ruleColor[0]), Integer.parseInt(ruleColor[1]), Integer.parseInt(ruleColor[2]));
 
-        // generate image ("/horse/ 1,square 6 0 1,0 255 0")
+        // generate image ("/horse/ 1,square 6 0 1 0,0 255 0")
         ruleShape = ruleArr[1].split(" ");
         int size = Integer.parseInt(ruleShape[1]);
         boolean border = !ruleShape[2].contentEquals("0");
         boolean shadow = !ruleShape[3].contentEquals("0");
+        boolean antiAliasing = !ruleShape[4].contentEquals("0");
         if (ruleShape[0].contentEquals("circle"))
-            retImg = imgCirle(size,c,border,shadow);
+            retImg = imgCirle(size,c,border,shadow,antiAliasing);
         else if (ruleShape[0].contentEquals("square"))
-            retImg = imgSquare(size,c,border,shadow);
+            retImg = imgSquare(size,c,border,shadow,antiAliasing);
         else if (ruleShape[0].contentEquals("triangleUp"))
-            retImg = imgTriangleUp(size,c,border,shadow);
+            retImg = imgTriangleUp(size,c,border,shadow,antiAliasing);
         else if (ruleShape[0].contentEquals("triangleDown"))
-            retImg = imgTriangleDown(size,c,border,shadow);
+            retImg = imgTriangleDown(size,c,border,shadow,antiAliasing);
         else if (ruleShape[0].contentEquals("diamond"))
-            retImg = imgDiamond(size,c,border,shadow);
+            retImg = imgDiamond(size,c,border,shadow,antiAliasing);
         else if (ruleShape[0].contentEquals("boat"))
-            retImg = imgBoat(size,c,border,shadow);
+            retImg = imgBoat(size,c,border,shadow,antiAliasing);
         else if (ruleShape[0].contentEquals("star"))
-            retImg = imgStar4(size,c,border,shadow);
+            retImg = imgStar4(size,c,border,shadow,antiAliasing);
 
         return retImg;
     }
 
-    public static BufferedImage imgSquare(int side, Color c, boolean border, boolean shadow) {
-        return imgRect(side,side,c,border,shadow?1:0);
+    public static BufferedImage imgSquare(int side, Color c, boolean border, boolean shadow,boolean antiAliasing) {
+        return imgRect(side,side,c,border,shadow?1:0,antiAliasing);
     }
 
-    public static BufferedImage imgCirle(int diameter, Color c, boolean border, boolean shadow) {
+    public static BufferedImage imgCirle(int diameter, Color c, boolean border, boolean shadow, boolean antiAliasing) {
         if (diameter < 5)
             diameter = 5;
-        return imgOval(diameter,diameter,c,border,shadow?1:0);
+        return imgOval(diameter,diameter,c,border,shadow?1:0,antiAliasing);
     }
 
-    public static BufferedImage imgTriangleUp(int s, Color c, boolean border, boolean shadow) {
+    public static BufferedImage imgTriangleUp(int s, Color c, boolean border, boolean shadow, boolean antiAliasing) {
         return imgPolygon(s, s,
             new int[]{ s/2, 0, s}, // x points
             new int[]{ 0, s, s}, // y points
-            3, c, border, shadow?1:0
+            3, c, border, shadow?1:0, antiAliasing
         );
     }
 
-    public static BufferedImage imgTriangleDown(int s, Color c, boolean border, boolean shadow) {
+    public static BufferedImage imgTriangleDown(int s, Color c, boolean border, boolean shadow, boolean antiAliasing) {
         return imgPolygon(s, s,
                 new int[]{ 0, s, s/2}, // x points
                 new int[]{ 0, 0, s}, // y points
-                3, c, border, shadow?1:0
+                3, c, border, shadow?1:0, antiAliasing
         );
     }
 
-    public static BufferedImage imgDiamond(int s, Color c, boolean border, boolean shadow) {
+    public static BufferedImage imgDiamond(int s, Color c, boolean border, boolean shadow, boolean antiAliasing) {
         if (s % 2 > 0)
             s++; // only even works
         return imgPolygon(s, s,
             new int[]{ s/2, 0, s/2, s }, // x points
             new int[]{ 0, s/2, s, s/2 }, // y points
-            4, c, border, shadow?1:0
+            4, c, border, shadow?1:0, antiAliasing
         );
     }
 
-    public static BufferedImage imgBoat(int s, Color c, boolean border, boolean shadow) {
+    public static BufferedImage imgBoat(int s, Color c, boolean border, boolean shadow, boolean antiAliasing) {
         return imgPolygon(s*2, s,
                 new int[]{ 0, s, s-(s/4), s/4 }, // x points
                 new int[]{ s/2, s/2, s, s }, // y points
-                4, c, border, shadow?1:0
+                4, c, border, shadow?1:0, antiAliasing
         );
     }
 
-    public static BufferedImage imgRect(int w, int h, Color c, boolean border, int shadow) {
+    public static BufferedImage imgRect(int w, int h, Color c, boolean border, int shadow, boolean antiAliasing) {
         int type = BufferedImage.TYPE_INT_ARGB;
         BufferedImage ret = new BufferedImage(w+shadow, h+shadow, type);
         Graphics2D g2d = ret.createGraphics();
+
+        if(antiAliasing)
+            g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        g2d.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
 
         // draw shadow
         if (shadow > 0){
@@ -172,10 +177,14 @@ public class ZeeManagerIcons {
         return ret;
     }
 
-    static BufferedImage imgOval(int w, int h, Color c, boolean border, int shadow) {
+    static BufferedImage imgOval(int w, int h, Color c, boolean border, int shadow, boolean antiAliasing) {
         int type = BufferedImage.TYPE_INT_ARGB;
         BufferedImage ret = new BufferedImage(w+shadow, h+shadow, type);
         Graphics2D g2d = ret.createGraphics();
+
+        if(antiAliasing)
+            g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        g2d.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
 
         // drawfill shadow
         if (shadow > 0){
@@ -197,7 +206,7 @@ public class ZeeManagerIcons {
         return ret;
     }
 
-    static BufferedImage imgStar4(int size, Color c, boolean border, boolean shadow){
+    static BufferedImage imgStar4(int size, Color c, boolean border, boolean shadow, boolean antiAliasing){
         int s = size;
         int s2 = s/2;
         int s4 = s2/4;
@@ -209,17 +218,19 @@ public class ZeeManagerIcons {
             8,
             c,
             border,
-            (shadow ? 1 : 0)
+            (shadow ? 1 : 0),
+            antiAliasing
         );
     }
 
     // 0,0 = top left ; w,h = bottom right
-    static BufferedImage imgPolygon(int w, int h, int[] xPoints, int[] yPoints, int points, Color c, boolean border, int shadow) {
+    static BufferedImage imgPolygon(int w, int h, int[] xPoints, int[] yPoints, int points, Color c, boolean border, int shadow, boolean antiAliasing) {
         int type = BufferedImage.TYPE_INT_ARGB;
         BufferedImage ret = new BufferedImage(w+shadow+1, h+shadow+1, type);
         Graphics2D g2d = ret.createGraphics();
 
-        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        if(antiAliasing)
+            g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         g2d.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
 
         // draw shadow
@@ -293,7 +304,7 @@ public class ZeeManagerIcons {
         static JPanel panelTop, panelCenter, panelBottom;
         static JSpinner jspIconSize;
         static JButton btnGobColor,btnDrawOrderUp,btnDrawOrderDown;
-        static JCheckBox cbBorder, cbShadow;
+        static JCheckBox cbBorder, cbShadow, cbAntiAliasing;
         static JLabel lblDrawOrder;
 
         public ShapeIconsOptPanel(JComboBox<String> comboAllRules){
@@ -342,6 +353,7 @@ public class ZeeManagerIcons {
             panelCenter.add(pan,BorderLayout.CENTER);
             pan.add(cbBorder = new JCheckBox("border"));
             pan.add(cbShadow = new JCheckBox("shadow"));
+            pan.add(cbAntiAliasing = new JCheckBox("anti-aliasing"));
 
             // button icon color
             panelBottom.add(btnGobColor = new JButton("Icon color"));
@@ -438,6 +450,7 @@ public class ZeeManagerIcons {
             int shapeSize = Integer.parseInt(arrShape[1]);
             cbBorder.setSelected(!arrShape[2].contentEquals("0"));
             cbShadow.setSelected(!arrShape[3].contentEquals("0"));
+            cbAntiAliasing.setSelected(!arrShape[4].contentEquals("0"));
             jspIconSize.setValue(shapeSize);//shape size
             Color c = new Color(Integer.parseInt(arrColor[0]),Integer.parseInt(arrColor[1]),Integer.parseInt(arrColor[2]));
             btnGobColor.setBackground(c);
@@ -451,8 +464,9 @@ public class ZeeManagerIcons {
             }
             String border = cbBorder.isSelected() ? "1" : "0";
             String shadow = cbShadow.isSelected() ? "1" : "0";
+            String antiAliasing = cbAntiAliasing.isSelected() ? "1" : "0";
             String rule =  nameTF.getText() +" "+ nameCombo.getSelectedIndex() +","+
-                shapeCombo.getSelectedItem().toString() +" "+ jspIconSize.getValue() +" "+ border +" "+ shadow +","+
+                shapeCombo.getSelectedItem().toString() +" "+ jspIconSize.getValue() +" "+ border +" "+ shadow +" "+ antiAliasing +","+
                 btnGobColor.getBackground().getRed() +" "+
                 btnGobColor.getBackground().getGreen() +" "+
                 btnGobColor.getBackground().getBlue();
@@ -476,7 +490,7 @@ public class ZeeManagerIcons {
         if (testcircle ==null) {
             testcircle = new BufferedImage[5];
             for (int i = 0; i < 5; i++) {
-                testcircle[i] = ZeeManagerIcons.imgCirle(10-i, Color.BLUE, false, true);
+                testcircle[i] = ZeeManagerIcons.imgCirle(10-i, Color.BLUE, false, true,false);
             }
         }
         for (int i = 0; i < testcircle.length; i++) {
@@ -486,7 +500,7 @@ public class ZeeManagerIcons {
         if (testtriangleup ==null) {
             testtriangleup = new BufferedImage[5];
             for (int i = 0; i < 5; i++) {
-                testtriangleup[i] = ZeeManagerIcons.imgTriangleUp(10-i, Color.BLUE, false, true);
+                testtriangleup[i] = ZeeManagerIcons.imgTriangleUp(10-i, Color.BLUE, false, true,false);
             }
         }
         for (int i = 0; i < testtriangleup.length; i++) {
@@ -497,7 +511,7 @@ public class ZeeManagerIcons {
         if (testtriangledown ==null) {
             testtriangledown = new BufferedImage[5];
             for (int i = 0; i < 5; i++) {
-                testtriangledown[i] = ZeeManagerIcons.imgTriangleDown(10-i, Color.BLUE, false, true);
+                testtriangledown[i] = ZeeManagerIcons.imgTriangleDown(10-i, Color.BLUE, false, true,false);
             }
         }
         for (int i = 0; i < testtriangledown.length; i++) {
@@ -508,7 +522,7 @@ public class ZeeManagerIcons {
         if (testdiamond ==null) {
             testdiamond = new BufferedImage[5];
             for (int i = 0; i < 5; i++) {
-                testdiamond[i] = ZeeManagerIcons.imgDiamond(10-i, Color.BLUE, false, true);
+                testdiamond[i] = ZeeManagerIcons.imgDiamond(10-i, Color.BLUE, false, true,false);
             }
         }
         for (int i = 0; i < testdiamond.length; i++) {
@@ -519,7 +533,7 @@ public class ZeeManagerIcons {
         if (testboat ==null) {
             testboat = new BufferedImage[5];
             for (int i = 0; i < 5; i++) {
-                testboat[i] = ZeeManagerIcons.imgBoat(10-i, Color.BLUE, false, true);
+                testboat[i] = ZeeManagerIcons.imgBoat(10-i, Color.BLUE, false, true,false);
             }
         }
         for (int i = 0; i < testboat.length; i++) {
@@ -529,7 +543,7 @@ public class ZeeManagerIcons {
 
 
     static MiniMap.DisplayMarker latestFocusedMark;
-    static BufferedImage latestFocusedMarkBgImg = ZeeManagerIcons.imgCirle(MiniMap.DisplayMarker.starMark.getWidth()+1,Color.black,false,false);
+    static BufferedImage latestFocusedMarkBgImg = ZeeManagerIcons.imgCirle(MiniMap.DisplayMarker.minimapMarkImg.getWidth()+1,Color.black,false,false,false);
     public static void focusMarkExpandedMap(MiniMap.DisplayMarker mark) {
         MapWnd map = ZeeConfig.gameUI.mapfile;
         map.compact(false);

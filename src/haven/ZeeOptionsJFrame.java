@@ -126,7 +126,7 @@ public class ZeeOptionsJFrame extends JFrame {
             panelTabMinimap.add(panelShapeIconsSaveCancel = new JPanel(new FlowLayout(FlowLayout.LEFT)),c);
             panelShapeIconsSaveCancel.add(btnSapeIconPreview = new JButton("Preview"));
             btnSapeIconPreview.addActionListener(this::previewShapeIcons);
-            panelShapeIconsSaveCancel.add(btnShapeIconSave = new JButton("Save"));
+            panelShapeIconsSaveCancel.add(btnShapeIconSave = new JButton("Save as new"));
             btnShapeIconSave.addActionListener(this::saveShapeIcons);
             panelShapeIconsSaveCancel.add(btnSapeIconDelete = new JButton("Delete"));
             btnSapeIconDelete.addActionListener(this::deleteShapeIcons);

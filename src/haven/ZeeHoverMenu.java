@@ -156,7 +156,7 @@ public class ZeeHoverMenu {
         static MenuGrid menuGrid;
         int level;
         MenuWidget parentMenu;
-        BufferedImage bgHoverLine = ZeeManagerIcons.imgRect( 160, 32, Color.blue, false, 0);
+        BufferedImage bgHoverLine = ZeeManagerIcons.imgRect( 160, 32, Color.blue, false, 0,false);
 
         public MenuWidget(MenuGrid.Pagina pagina, MenuWidget parent){
 
@@ -201,10 +201,10 @@ public class ZeeHoverMenu {
                 menuLine.resize(lineWidth,menuLine.sz.y);
             }
             //bg line hover
-            bgHoverLine = ZeeManagerIcons.imgRect( lineWidth, btns.get(0).img().getHeight(), Color.blue, false, 0);
+            bgHoverLine = ZeeManagerIcons.imgRect( lineWidth, btns.get(0).img().getHeight(), Color.blue, false, 0,false);
 
             //bg menu img
-            this.bg = ZeeManagerIcons.imgRect( this.sz.x, this.sz.y, ZeeConfig.intToColor(ZeeConfig.simpleWindowColorInt), ZeeConfig.simpleWindowBorder, 0);
+            this.bg = ZeeManagerIcons.imgRect( this.sz.x, this.sz.y, ZeeConfig.intToColor(ZeeConfig.simpleWindowColorInt), ZeeConfig.simpleWindowBorder, 0,false);
         }
 
         public void draw(GOut g) {
