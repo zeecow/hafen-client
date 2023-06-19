@@ -557,6 +557,34 @@ public class ZeeManagerIcons {
         latestFocusedMark = mark;
     }
 
+
+    public static BufferedImage getSolidColorTile(BufferedImage tileImg) {
+        Color color = getAverageColorFromImage(tileImg,0,0,tileImg.getWidth(),tileImg.getHeight());
+        BufferedImage ret = new BufferedImage(tileImg.getWidth(),tileImg.getHeight(),BufferedImage.TYPE_INT_ARGB);
+        Graphics2D graphics = ret.createGraphics();
+        graphics.setColor ( color );
+        graphics.fillRect ( 0, 0, ret.getWidth(), ret.getHeight() );
+        return ret;
+    }
+    static Color getAverageColorFromImage(BufferedImage image, int upperLeftX, int upperLeftY, int width,
+                                          int height) {
+        int x1 = upperLeftX + width;
+        int y1 = upperLeftY + height;
+        long sumr = 0, sumg = 0, sumb = 0;
+        for (int x = upperLeftX; x < x1; x++) {
+            for (int y = upperLeftY; y < y1; y++) {
+                Color pixel = new Color(image.getRGB(x, y));
+                sumr += pixel.getRed();
+                sumg += pixel.getGreen();
+                sumb += pixel.getBlue();
+            }
+        }
+        int num = width * height;
+        return new Color( (int) (sumr / num), (int) (sumg / num), (int) (sumb / num));
+    }
+
+
+
     private static void println(String s) {
         ZeeConfig.println(s);
     }

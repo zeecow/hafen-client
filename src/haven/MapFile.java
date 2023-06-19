@@ -26,15 +26,23 @@
 
 package haven;
 
-import java.util.*;
-import java.util.concurrent.locks.*;
-import java.util.function.Function;
-import java.io.*;
-import java.awt.Color;
+import haven.Defer.Future;
+import haven.render.BaseColor;
+import haven.render.BufPipe;
+
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.awt.image.WritableRaster;
-import haven.render.*;
-import haven.Defer.Future;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.List;
+import java.util.*;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.function.Function;
+
 import static haven.MCache.cmaps;
 
 public class MapFile {
@@ -437,7 +445,8 @@ public class MapFile {
 		if(r != null) {
 		    Resource.Image ir = r.layer(Resource.imgc);
 		    if(ir != null) {
-			texes[t] = ir.img;
+			//texes[t] = ir.img;
+			texes[t] = ZeeManagerIcons.getSolidColorTile(ir.img);
 		    }
 		}
 		cached[t] = true;

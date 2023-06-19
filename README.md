@@ -4,7 +4,7 @@ Client focusing on small helper tasks, many using mouse middle button, and other
 
 Controls
 --------
-- flowermenu works on mouse up
+- flowermenu also works on mouse up
 - minimap drags with button 3
 - right click crop and drag mouse to start harvest area selection
 - keys up/down control volume
@@ -115,7 +115,7 @@ LongMidClick Flowemenu for Window Items
 
 Random Features
 ---------------
-
+- minimap solid colors
 - search actions works globally, instead of current menu
 - sort actions by most used craft items (size limited for now)
 - craft window's search ingredients button
