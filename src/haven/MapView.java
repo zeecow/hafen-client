@@ -563,10 +563,13 @@ public class MapView extends PView implements DTarget, Console.Directory {
 	this.clickmap = new ClickMap();
 	clmaptree.add(clickmap);
 	setcanfocus(true);
-	//show claims by default, buttons updated in ZeeConfig
-	enol("cplot");
-	enol("vlg");
-	enol("prov");
+	// buttons updated in ZeeConfig.updateMapOverlayButtonState()
+	if (ZeeConfig.showOverlayPclaim)
+		enol("cplot");
+	if (ZeeConfig.showOverlayVclaim)
+		enol("vlg");
+	if (ZeeConfig.showOverlayProv)
+		enol("prov");
 	ZeeConfig.glob = glob;
     }
     

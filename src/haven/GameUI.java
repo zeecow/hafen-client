@@ -1353,7 +1353,7 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Message
 	    super("gfx/hud/" + base, "", "-d", "-h", "-dh");
 	    setgkey(gkey);
 	    settip(tooltip);
-		ZeeConfig.checkShowClaimsButtonState(this, base);
+		ZeeConfig.updateMapOverlayButtonState(this, base);
 	}
     }
 
@@ -1392,6 +1392,7 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Message
 		    map.enol(tag);
 		else
 		    map.disol(tag);
+		ZeeConfig.updateMapOverlayPrefs(tag,a);
 	    }
 	}
 

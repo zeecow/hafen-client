@@ -260,6 +260,9 @@ public class ZeeConfig {
     static int gobMaxRequeues = Utils.getprefi("gobMaxRequeues",DEF_GOB_MAX_REQUEUE);
     static boolean minimapSolidColor = Utils.getprefb("minimapSolidColor",true);
     static boolean terrainSolidColor = Utils.getprefb("terrainSolidColor",false);
+    public static boolean showOverlayPclaim = Utils.getprefb("showOverlayPclaim",true);
+    public static boolean showOverlayVclaim = Utils.getprefb("showOverlayVclaim",true);
+    public static boolean showOverlayProv = Utils.getprefb("showOverlayProv",true);
 
     public final static Set<String> mineablesStone = new HashSet<String>(Arrays.asList(
             "stone","gneiss","basalt","dolomite","feldspar","flint",
@@ -861,17 +864,6 @@ public class ZeeConfig {
     }
 
 
-    // updates buttons for showing claims
-    // MapView() constructor enable overlays using enol()
-    public static void checkShowClaimsButtonState(GameUI.MenuCheckBox menuCheckBox, String base) {
-        if(base.contains("lbtn-claim")) {
-            menuCheckBox.click();
-        }else if(base.contains("lbtn-vil")) {
-            menuCheckBox.click();
-        }else if(base.contains("lbtn-rlm")){
-            menuCheckBox.click();
-        }
-    }
 
     // make expanded map window fit screen
     static Coord mapWndLastPos, mapWndLastSz;
@@ -3941,5 +3933,30 @@ public class ZeeConfig {
         blockAudioMsgList = backupBlockAudioList;
         backupBlockAudioList = null;
         println("[DEF] "+blockAudioMsgList);
+    }
+
+
+    // MapView() constructor enable teh overlays with enol()
+    public static void updateMapOverlayButtonState(GameUI.MenuCheckBox menuCheckBox, String base) {
+        if(base.contentEquals("lbtn-claim") && showOverlayPclaim) {
+            menuCheckBox.click();
+        }else if(base.contentEquals("lbtn-vil") && showOverlayVclaim) {
+            menuCheckBox.click();
+        }else if(base.contentEquals("lbtn-rlm") && showOverlayProv){
+            menuCheckBox.click();
+        }
+    }
+
+    public static void updateMapOverlayPrefs(String tag, boolean a) {
+        if(tag.contentEquals("cplot") ) {
+            showOverlayPclaim = a;
+            Utils.setprefb("showOverlayPclaim",showOverlayPclaim);
+        }else if(tag.contentEquals("vlg")) {
+            showOverlayVclaim = a;
+            Utils.setprefb("showOverlayVclaim",showOverlayVclaim);
+        }else if(tag.contentEquals("prov")){
+            showOverlayProv = a;
+            Utils.setprefb("showOverlayProv",showOverlayProv);
+        }
     }
 }
