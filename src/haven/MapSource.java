@@ -45,8 +45,10 @@ public interface MapSource {
 	    Resource.Image ir = r.layer(Resource.imgc);
 	    if(ir == null)
 		return(null);
-	    //img = ir.img;
-		img = ZeeManagerIcons.getSolidColorTile(ir.img);
+		if (ZeeConfig.minimapSolidColor)
+			img = ZeeManagerIcons.getSolidColorTile(ir.img);//minimap zommed out
+		else
+			img = ir.img;
 	    texes[t] = img;
 	}
 	return(img);

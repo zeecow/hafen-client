@@ -445,8 +445,10 @@ public class MapFile {
 		if(r != null) {
 		    Resource.Image ir = r.layer(Resource.imgc);
 		    if(ir != null) {
-			//texes[t] = ir.img;
-			texes[t] = ZeeManagerIcons.getSolidColorTile(ir.img);
+				if (ZeeConfig.minimapSolidColor)
+					texes[t] = ZeeManagerIcons.getSolidColorTile(ir.img);
+				else
+					texes[t] = ir.img;
 		    }
 		}
 		cached[t] = true;

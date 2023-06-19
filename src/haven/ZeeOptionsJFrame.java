@@ -96,7 +96,9 @@ public class ZeeOptionsJFrame extends JFrame {
         panelTabMinimap = new JPanel(new GridBagLayout());
         tabbedPane.addTab("Minimap", panelTabMinimap);
 
-        panelTabMinimap.add(new ZeeOptionJCheckBox( "Slower mini-map", "slowMiniMap"),c);
+        panelTabMinimap.add(new ZeeOptionJCheckBox( "Solid colors map", "minimapSolidColor"),c);
+
+        panelTabMinimap.add(new ZeeOptionJCheckBox( "Slower map", "slowMiniMap"),c);
 
         panelTabMinimap.add(new ZeeOptionJCheckBox( "Show icons while zoomed out", "showIconsZoomOut"),c);
 
@@ -209,7 +211,7 @@ public class ZeeOptionsJFrame extends JFrame {
 
         tabbedPane.addTab("Auto", panelTabAuto);
 
-        panelTabAuto.add(new ZeeOptionJCheckBox( "Midclick icon aggro stoat", "clickIconStoatAggro"),c);
+        panelTabAuto.add(new ZeeOptionJCheckBox( "Right-click aggro stoat", "clickIconStoatAggro"),c);
 
         panelTabAuto.add(new ZeeOptionJCheckBox( "Auto chip mined boulder", "autoChipMinedBoulder"),c);
 
@@ -291,6 +293,8 @@ public class ZeeOptionsJFrame extends JFrame {
             }
         });
 
+
+        panelTabMisc.add(new ZeeOptionJCheckBox( "Solid color terrain (restart)", "terrainSolidColor"),c);
 
         panelTabMisc.add(new ZeeOptionJCheckBox( "Fish Moon Xp alert", "fishMoonXpAlert"),c);
 

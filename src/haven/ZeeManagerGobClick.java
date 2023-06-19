@@ -1569,9 +1569,9 @@ public class ZeeManagerGobClick extends ZeeThread{
         }.start();
     }
 
-    static void clickedMinimapGobicon(Gob gob, int button2or3) {
+    static void clickedMinimapGobicon(Gob gob, int btn) {
         try {
-            if (ZeeConfig.clickIconStoatAggro && button2or3==3 && gob.getres().name.contains("/stoat")) {
+            if (ZeeConfig.clickIconStoatAggro && btn==3 && gob.getres().name.contains("/stoat")) {
                 if(!ZeeConfig.isPlayerMountingHorse())
                     return;
                 ZeeConfig.cursorChange(ZeeConfig.ACT_AGGRO);

@@ -258,6 +258,8 @@ public class ZeeConfig {
     static boolean researchFoodTips = Utils.getprefb("researchFoodTips", true);
     static boolean closeTamedAnimalWindowAfterNaming = Utils.getprefb("closeTamedAnimalWindowAfterNaming", true);
     static int gobMaxRequeues = Utils.getprefi("gobMaxRequeues",DEF_GOB_MAX_REQUEUE);
+    static boolean minimapSolidColor = Utils.getprefb("minimapSolidColor",true);
+    static boolean terrainSolidColor = Utils.getprefb("terrainSolidColor",false);
 
     public final static Set<String> mineablesStone = new HashSet<String>(Arrays.asList(
             "stone","gneiss","basalt","dolomite","feldspar","flint",

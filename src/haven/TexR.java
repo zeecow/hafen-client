@@ -26,14 +26,17 @@
 
 package haven;
 
-import java.util.*;
-import java.awt.Graphics;
-import java.awt.image.*;
-import java.io.*;
-import java.security.*;
-import haven.Defer.Future;
-import haven.render.*;
-import static haven.render.Texture.Filter.*;
+import haven.render.Texture;
+
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.awt.image.Raster;
+import java.awt.image.WritableRaster;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+
+import static haven.render.Texture.Filter.LINEAR;
+import static haven.render.Texture.Filter.NEAREST;
 
 @Resource.LayerName("tex")
 public class TexR extends Resource.Layer implements Resource.IDLayer<Integer> {
@@ -124,7 +127,12 @@ public class TexR extends Resource.Layer implements Resource.IDLayer<Integer> {
 
 	private BufferedImage rd(final byte[] data) {
 	    try {
-		return(Resource.readimage(new ByteArrayInputStream(data)));
+			BufferedImage ret = Resource.readimage(new ByteArrayInputStream(data));
+			if(ZeeConfig.terrainSolidColor && getres().name.startsWith("gfx/tiles/")){
+				//ZeeConfig.println(getres().name);
+				return ZeeManagerIcons.getSolidColorTile(ret);
+			}
+		return(ret);
 	    } catch(IOException e) {
 		throw(new RuntimeException("Invalid image data in " + getres().name, e));
 	    }
