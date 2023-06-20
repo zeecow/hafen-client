@@ -128,7 +128,7 @@ public class TexR extends Resource.Layer implements Resource.IDLayer<Integer> {
 	private BufferedImage rd(final byte[] data) {
 	    try {
 			BufferedImage ret = Resource.readimage(new ByteArrayInputStream(data));
-			if(ZeeConfig.terrainSolidColor && getres().name.startsWith("gfx/tiles/")){
+			if(ZeeConfig.terrainSolidColor && getres().name.startsWith("gfx/tiles/") && !getres().name.endsWith("/caveout") && !getres().name.endsWith("/stranglevine")){
 				//ZeeConfig.println(getres().name);
 				return ZeeManagerIcons.getSolidColorTile(ret);
 			}
