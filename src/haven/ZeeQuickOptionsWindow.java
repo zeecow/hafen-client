@@ -8,21 +8,28 @@ import java.util.List;
 public class ZeeQuickOptionsWindow {
 
     private static ZeeWindow window;
+    private static Scrollport scrollport;
     private static List<String[]> listConfigLabel = new ArrayList<>();
     private static List<CheckBox> listJOptsWidgets = new ArrayList<>();
     static CheckBox cbPetal;
     static String autoPetalName = "";
 
 
-    public static ZeeWindow getWindow() {
+    static ZeeWindow getWindow() {
         if (window == null){
-            window = new ZeeWindow(Coord.of(155,60),"Quick options");
+            window = new ZeeWindow(Coord.of(170,80),"Quick options");
+            scrollport = window.add(new Scrollport(Coord.of(155,65)),0,21);
             ZeeConfig.gameUI.add(window,Coord.of(ZeeConfig.gameUI.sz.x/2,0));
         }
         else{
             window.show();
         }
         return window;
+    }
+
+    static Scrollport getScrollport(){
+        getWindow();
+        return scrollport;
     }
 
 
@@ -34,7 +41,7 @@ public class ZeeQuickOptionsWindow {
 
         //add new config
         if (getConfigByLabel(cbLabel).isBlank()) { //avoid duplicate
-            if (listConfigLabel.size() == 3) //max 3
+            if (listConfigLabel.size() == 10) //max checkboxes
                 listConfigLabel.remove(0);
             listConfigLabel.add(0,new String[]{configName, cbLabel});
         }
@@ -78,10 +85,13 @@ public class ZeeQuickOptionsWindow {
 
             // checkbox successfully created
             listJOptsWidgets.add(newcb);
-            getWindow().add(listJOptsWidgets.get(listJOptsWidgets.size() - 1));
+
+            //add cb to scrollport, bottom to top
+            getScrollport().cont.add( newcb, 0, ((listConfigLabel.size()-1)-i) * 15);
         }
 
-        repositionWidgets();
+        window.pack();
+        //repositionWidgets();
     }
 
     private static void bumpCheckBox(String configName) {
@@ -158,16 +168,12 @@ public class ZeeQuickOptionsWindow {
                     autoPetalName = "";
             }
         };
-        getWindow().add(cbPetal);
-        repositionWidgets();
+        getWindow().add(cbPetal,0,2);
+        //repositionWidgets();
     }
 
     private static void repositionWidgets() {
         int y = 0;
-        if (cbPetal!=null) {
-            cbPetal.c = Coord.of(0,y);
-            y += 15;
-        }
         for (int i = listJOptsWidgets.size()-1; i >= 0 ; i--) {
             listJOptsWidgets.get(i).c = Coord.of(0,y);
             y += 15;
