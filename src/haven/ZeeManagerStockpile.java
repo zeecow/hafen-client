@@ -767,7 +767,7 @@ public class ZeeManagerStockpile extends ZeeThread{
         });
 
         //button pile inside area
-        wdg = selAreaWindow.add(new Button(UI.scale(180),"pile inside area(broken)"){
+        wdg = selAreaWindow.add(new Button(UI.scale(200),"pile inside area(test)"){
             public void wdgmsg(String msg, Object... args) {
                 if (msg.contentEquals("activate")){
                     ZeeConfig.addPlayerText("Select area pile inside");
@@ -825,7 +825,7 @@ public class ZeeManagerStockpile extends ZeeThread{
                     Coord playerOrigin = ZeeConfig.getPlayerTile();
 
 
-                    ZeeConfig.addPlayerText("pilan");
+                    ZeeConfig.addPlayerText("pilan "+ZeeConfig.getPlayerTile());
 
                     // create pile(s) until area full
                     ZeeConfig.lastMapViewClickButton = 2;//prepare cancel
@@ -867,19 +867,20 @@ public class ZeeManagerStockpile extends ZeeThread{
                         waitPlayerIdleVelocity();
 
                         // pickup inv item
-//                        if (!ZeeConfig.isPlayerHoldingItem()) {
-//                            List<WItem> items = ZeeConfig.getMainInventory().getWItemsByNameContains(itemInvName);
-//                            if (items==null || items.size()==0){
-//                                println("no more inventory items to pile");
-//                                continue;
-//                            }
-//                            if (!ZeeManagerItemClick.pickUpItem(items.get(0))){
-//                                println("couldnt pickup item ..... 123");
-//                                continue;
-//                            }
-//                        }
+                        if (!ZeeConfig.isPlayerHoldingItem()) {
+                            List<WItem> items = ZeeConfig.getMainInventory().getWItemsByNameContains(itemInvName);
+                            if (items==null || items.size()==0){
+                                println("no more inventory items to pile");
+                                continue;
+                            }
+                            if (!ZeeManagerItemClick.pickUpItem(items.get(0))){
+                                println("couldnt pickup item ..... 123");
+                                continue;
+                            }
+                        }
 
                         // use latest pile
+                        latestPile = null;//TODO remove test line
                         if (latestPile!=null){
                             ZeeManagerGobClick.itemActGob(latestPile,UI.MOD_SHIFT);
                             waitPlayerIdleVelocity();//wait approach pile
@@ -897,6 +898,10 @@ public class ZeeManagerStockpile extends ZeeThread{
 
                             //get further tile from player
                             Coord furtherTile = ZeeConfig.getTileFurtherFromPlayer(area,usedTiles);
+                            if (furtherTile==null){
+                                exitAreaPiler("out of tiles to place pile?");
+                                return;
+                            }
 
                             //create virtual pile
                             ZeeConfig.gameUI.map.wdgmsg("itemact", furtherTile, ZeeConfig.tileToCoord(furtherTile), 0);
@@ -904,13 +909,13 @@ public class ZeeManagerStockpile extends ZeeThread{
 
                             //try placing pile
                             Coord playerTile = ZeeConfig.getPlayerTile();
-                            ZeeManagerGobClick.gobPlace(lastPlob, ZeeConfig.tileToCoord(furtherTile), UI.MOD_SHIFT);
+                            ZeeManagerGobClick.gobPlace(lastPlob, ZeeConfig.tileToCoord(furtherTile), 0);//TODO uncomment test // UI.MOD_SHIFT);
                             waitPlayerIdleFor(1);
 
 
                             //player didnt move = tile occupied, terrain not flat?
                             if (playerTile.compareTo(ZeeConfig.getPlayerTile()) == 0){
-                                println("tile can't be used for pile, trying next 2");
+                                println("tile can't be used for pile, trying next (II)");
                                 usedTiles.add(furtherTile);
                                 continue;
                             }
