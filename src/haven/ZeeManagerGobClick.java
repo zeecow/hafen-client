@@ -1038,7 +1038,7 @@ public class ZeeManagerGobClick extends ZeeThread{
         String gobName = gob.getres().name;
         if( isGobHouseInnerDoor(gobName) ||
                 isGobHouse(gobName) ||
-                isGobChair(gobName) ||
+                isGobSittingFurniture(gobName) ||
                 isGobInListEndsWith(gobName,"/upstairs,/downstairs,/minehole,"+
                 "/ladder,/cavein,/caveout,/burrow,/igloo," +
                 "/wheelbarrow,/loom,/churn,/swheel,/ropewalk," +
@@ -1055,9 +1055,13 @@ public class ZeeManagerGobClick extends ZeeThread{
         return false;
     }
 
-    static boolean isGobChair(String gobName) {
-        String list = "/chair-rustic,/stonethrone,/royalthrone,/thatchedchair";
-        return isGobInListEndsWith(gobName,list);
+    static boolean isGobSittingFurniture(String gobName) {
+        if ( gobName.contains("/furn/") &&
+            isGobInListContains(gobName,"throne,chair,sofa,stool,bench") )
+            return true;
+        if ( gobName.contains("rockinghorse") )
+            return true;
+        return false;
     }
 
     public static boolean isGobHouseInnerDoor(String gobName){
