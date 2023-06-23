@@ -67,7 +67,7 @@ public class ZeeManagerGobClick extends ZeeThread{
                 }
             }
             //barterstand
-            if (gobName.endsWith("barterstand")){
+            else if (gobName.endsWith("barterstand")){
                 ZeeManagerGobClick.barterstandSearchWindow();
             }
             // place lifted treelog next to clicked one
@@ -167,7 +167,7 @@ public class ZeeManagerGobClick extends ZeeThread{
                 toggleOverlayAggro(gob);
             }
             // inspect gob
-            else {//TODO test blind inspecting
+            else {
                 inspectGob(gob);
             }
         }
@@ -2322,6 +2322,10 @@ public class ZeeManagerGobClick extends ZeeThread{
 
     static boolean isMidclickInspecting = false; // used by inspect tooltip feature
     public static void inspectGob(Gob gob){
+        if (gob==null) {
+            println("inspectGob > gob null");
+            return;
+        }
         new ZeeThread(){
             @Override
             public void run() {
