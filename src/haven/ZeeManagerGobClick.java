@@ -167,7 +167,7 @@ public class ZeeManagerGobClick extends ZeeThread{
                 toggleOverlayAggro(gob);
             }
             // inspect gob
-            else if (isInspectGob(gobName)) {
+            else {//TODO test blind inspecting
                 inspectGob(gob);
             }
         }
@@ -2233,19 +2233,6 @@ public class ZeeManagerGobClick extends ZeeThread{
         return lastClickDiffMs < LONG_CLICK_MS;
     }
 
-    public static boolean isInspectGob(String gobName){
-        if(isGobTree(gobName) || isGobBush(gobName) || isGobBoulder(gobName))
-            return true;
-        String list = "/meatgrinder,/potterswheel,/well,/dframe,/smokeshed,/winepress,"
-                +"/smelter,/primsmelter,/crucible,/steelcrucible,/fineryforge,/kiln,/tarkiln,/oven,"
-                +"/compostbin,/gardenpot,/beehive,/htable,/bed-sturdy,/boughbed,/alchemiststable,"
-                +"/gemwheel,/spark,/cauldron,/churn,/chair-rustic,"
-                +"/royalthrone,curdingtub,log,/still,/oldtrunk,/anvil,"
-                +"/loom,/swheel,knarr,snekkja,dock,/ropewalk,"
-                +"/ttub,/cheeserack,/dreca,/glasspaneframe,/castingmold";
-        return isGobInListContains(gobName, list);
-    }
-
 
     public static boolean isGobMineSupport(String gobName) {
         String list = "/minebeam,/column,/minesupport,/naturalminesupport,/towercap";
@@ -2335,11 +2322,21 @@ public class ZeeManagerGobClick extends ZeeThread{
 
     static boolean isMidclickInspecting = false; // used by inspect tooltip feature
     public static void inspectGob(Gob gob){
-        isMidclickInspecting = true;
-        ZeeConfig.gameUI.menu.wdgmsg("act","inspect","0");
-        gobClick(gob, 1);
-        ZeeConfig.clickRemoveCursor();
-        isMidclickInspecting = false;
+        new ZeeThread(){
+            @Override
+            public void run() {
+                try {
+                    isMidclickInspecting = true;
+                    ZeeConfig.gameUI.menu.wdgmsg("act","inspect","0");
+                    gobClick(gob, 1);
+                    sleep(PING_MS);
+                    ZeeConfig.clickRemoveCursor();
+                    isMidclickInspecting = false;
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }.start();
     }
 
     public static boolean isGobTrellisPlant(String gobName) {
