@@ -2254,12 +2254,11 @@ public class ZeeManagerGobClick extends ZeeThread{
 
 
     private static boolean isGobLiftable(String gobName) {
-        if(isGobBoulder(gobName))
+        if(isGobBoulder(gobName) || isGobSittingFurniture(gobName) || gobName.contains("/table-"))
             return true;
         String endList = "/meatgrinder,/potterswheel,/iconsign,/rowboat,/dugout,/wheelbarrow,"
                 +"/compostbin,/gardenpot,/beehive,/htable,/bed-sturdy,/boughbed,/alchemiststable,"
                 +"/gemwheel,/ancestralshrine,/spark,/cauldron,/churn,/wardrobe,"
-                +"/table-rustic,/table-stone,/chair-rustic,/stonethrone,/royalthrone,"
                 +"/trough,curdingtub,/plow,/barrel,/still,log,/oldtrunk,chest,/anvil,"
                 +"/cupboard,/studydesk,/demijohn,/quern,/wreckingball-fold,/loom,/swheel,"
                 +"/ttub,/cheeserack,/archerytarget,/dreca,/glasspaneframe,/runestone,"
