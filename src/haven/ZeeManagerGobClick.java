@@ -943,20 +943,23 @@ public class ZeeManagerGobClick extends ZeeThread{
                 }
             }.start();
         }
-        // gob requires unmounting horse/kicksled
-        else if (isGobRequireDisembarkVehicle(gobName) && !ZeeConfig.isPlayerLiftingGob(gob)){
+        // gob requires unmounting horse/kicksled (if not lifting gob itself)
+        else if (isGobRequireDisembarkVehicle(gob) && !ZeeConfig.isPlayerLiftingGob(gob)){
             // unmount horse
             if (ZeeConfig.isPlayerMountingHorse() && !ZeeManagerGobClick.isGobInListEndsWith(gobName,"/ladder,/minehole") && ZeeConfig.getMainInventory().countItemsByNameContains("/rope") > 0) {
                 new ZeeThread() {
                     public void run() {
                         if(dismountHorse(mc)) {
-                            //schedule auto remount horse, if player not lifting object
+                            //  schedule auto remount horse if not lifting
                             if (!ZeeConfig.playerHasAnyPose(ZeeConfig.POSE_PLAYER_LIFTING)) {
                                 ZeeManagerGobClick.remountClosestHorse = true;
                             }
+                            // entering a house
                             if (isGobHouse(gobName)) {
                                 gobClick(gob, 3, 0, 16);//gob's door?
-                            }else {
+                            }
+                            // entering a non-house (cave, mine, cellar, ladder)
+                            else {
                                 gobClick(gob, 3);
                             }
                         }
@@ -1031,13 +1034,16 @@ public class ZeeManagerGobClick extends ZeeThread{
         rClickZoomLastY = pc.y;
     }
 
-    static boolean isGobRequireDisembarkVehicle(String gobName) {
-        if(isGobHouseInnerDoor(gobName) || isGobHouse(gobName) || isGobChair(gobName)
-            || isGobInListEndsWith(gobName,
-                "/upstairs,/downstairs,/minehole,/ladder,/cavein,/caveout,/burrow,/igloo," +
-                    "/wheelbarrow,/loom,/churn,/swheel,/ropewalk," +
-                    "/meatgrinder,/potterswheel,/quern,/plow,/winepress,/hookah"
-            )
+    static boolean isGobRequireDisembarkVehicle(Gob gob) {
+        String gobName = gob.getres().name;
+        if( isGobHouseInnerDoor(gobName) ||
+                isGobHouse(gobName) ||
+                isGobChair(gobName) ||
+                isGobInListEndsWith(gobName,"/upstairs,/downstairs,/minehole,"+
+                "/ladder,/cavein,/caveout,/burrow,/igloo," +
+                "/wheelbarrow,/loom,/churn,/swheel,/ropewalk," +
+                "/meatgrinder,/potterswheel,/quern,/plow,/winepress,/hookah") ||
+                (gobName.endsWith("/cellardoor") && ZeeConfig.distanceToPlayer(gob) > TILE_SIZE*1)
         ){
             return true;
         }
