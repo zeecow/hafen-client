@@ -3456,10 +3456,17 @@ public class ZeeConfig {
             gameUI.map.showgrid(curs.contentEquals(CURSOR_HARVEST) || ZeeManagerMiner.isCursorMining() || curs.contentEquals(CURSOR_DIG));
         }
 
-        // inspect tooltips
+        // inspect cursor
         showInspectTooltip = curs.contentEquals(CURSOR_INSPECT);
-        if (!showInspectTooltip)
+        if (!showInspectTooltip) {
+            //disable tooltips
             gameUI.map.ttip = null;
+        }else{
+            // label gob build preview
+            Gob gobBuildPreview = ZeeManagerStockpile.lastPlob;
+            if (gobBuildPreview!=null && gobBuildPreview.getres()!=null)
+                addGobText(gobBuildPreview,gobBuildPreview.getres().name);
+        }
 
         //feast window
         isPlayerFeasting = curs.contentEquals(CURSOR_EAT);
