@@ -2540,7 +2540,14 @@ public class MapView extends PView implements DTarget, Console.Directory {
 							if (!poses.isEmpty()){
 								sb.append("\nPoses:");
 								for (String p : poses) {
-									sb.append("\n"+p);
+									sb.append("\n   "+p);
+								}
+							}
+							// gob overlays
+							if (!gob.ols.isEmpty()) {
+								sb.append("\nOverlays:");
+								for (String ol : ZeeManagerGobClick.getOverlayNames(gob)) {
+									sb.append("\n   "+ol);
 								}
 							}
 							ttip = sb.toString();
