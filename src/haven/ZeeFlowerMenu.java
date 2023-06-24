@@ -24,11 +24,12 @@ public class ZeeFlowerMenu extends FlowerMenu{
     static final String STRPETAL_AUTO_BUTCH_ALL = "Auto-butch all";
     static final String STRPETAL_AUTOBUTCH_BIGDEADANIMAL = "Auto-butch";
     static final String STRPETAL_INSPECT = "Inspect";
-    static final String STRPETAL_SWITCHCHAR = "Switch Char";
-    static final String STRPETAL_TESTCOORDS = "Test Coords";
-    static final String STRPETAL_TILEMONITOR = "Tile Monitor";
-    static final String STRPETAL_OPENCATTLEROSTER = "Open Roster";
-    static final String STRPETAL_MEMORIZEAREANIMALS = "Memorize Area";
+    static final String STRPETAL_SWITCHCHAR = "Switch char";
+    static final String STRPETAL_CLEARGOBTEXTS = "Clear gobs texts";
+    static final String STRPETAL_TESTCOORDS = "Test coords";
+    static final String STRPETAL_TILEMONITOR = "Tile monitor";
+    static final String STRPETAL_OPENCATTLEROSTER = "Open roster";
+    static final String STRPETAL_MEMORIZEAREANIMALS = "Memorize area";
 
     private final Gob gob;
     private final WItem wItem;
