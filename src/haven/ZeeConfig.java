@@ -498,15 +498,17 @@ public class ZeeConfig {
         return crops.contains(basename);
     }
 
-    public static boolean isBug(String nameContains){
-        String[] list = {
-            "/silkmoth","/grasshopper","/ladybug","/dragonfly","/waterstrider","/firefly","/sandflea",
-            "/cavemoth","/stagbeetle","/cavecentipede","/moonmoth","/monarchbutterfly","/items/grub",
-            "/springbumblebee"
-        };
-        for (int i = 0; i < list.length; i++) {
-            if(nameContains.contains(list[i]))
+    public static boolean isBug(String resName){
+        List<String> l = List.of(
+            "/silkmoth", "/grasshopper", "/ladybug", "/dragonfly",
+            "/waterstrider", "/firefly", "/sandflea",
+            "/cavemoth", "/stagbeetle", "/cavecentipede", "/moonmoth",
+            "/monarchbutterfly", "/grub","/springbumblebee"
+        );
+        for (String s : l) {
+            if(resName.endsWith(s)) {
                 return true;
+            }
         }
         return false;
     }
@@ -2468,6 +2470,16 @@ public class ZeeConfig {
     public static void printGobs(){
         List<String> gobs = ZeeConfig.gameUI.ui.sess.glob.oc.gobStream().map(gob -> gob.getres().name).collect(Collectors.toList());
         System.out.println(gobs.size()+" > "+gobs.toString());
+    }
+
+    static List<Gob> getAllGobs(){
+        return ZeeConfig.gameUI.ui.sess.glob.oc.gobStream().filter(gob -> {
+            if(gob!=null && gob.getres()!=null) {
+                return true;
+            } else {
+                return false;
+            }
+        }).collect(Collectors.toList());
     }
 
     // pattern must match whole gob name

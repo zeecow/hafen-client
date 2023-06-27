@@ -2565,44 +2565,50 @@ public class ZeeManagerGobClick extends ZeeThread{
     }
 
     // pattern must match whole gob name
-    static List<String> listPickupGobNamePatterns = Arrays.asList(
-        "gfx/terobjs/herbs/.+", "gfx/terobjs/items/.+", "gfx/kritter/.+"
-    );
     static boolean pickupGobIsShiftDown;
+    static boolean picking = false;
     public static void pickupClosestGob(KeyEvent ev) {
+
+        picking = true;
 
         pickupGobIsShiftDown = ev.isShiftDown();
 
         // find eligible gobs
-        List<Gob> gobs = ZeeConfig.findGobsMatchingRegexpList(listPickupGobNamePatterns);
-        gobs.removeIf(gob1 ->
-            (ZeeConfig.isKritter(gob1) && ZeeConfig.isKritterNotPickable(gob1))
-            || gob1.getres().name.contentEquals("gfx/terobjs/herbs/leafpile")
-        );
+        List<Gob> gobs = findPickupGobs();
 
-        if (gobs==null || gobs.size()==0)
+        if (gobs==null || gobs.size()==0) {
+            picking = false;
             return;
+        }
 
         // calculate closest gob
         double minDist=99999, dist;
         Gob closestGob=null;
         String name;
         for (int i = 0; i < gobs.size(); i++) {
-            dist = ZeeConfig.distanceToPlayer(gobs.get(i));
-            name = gobs.get(i).getres().name;
-            if ( closestGob==null
-                || ((name.contains("/kritter/") || name.contentEquals("gfx/terobjs/grub")) && dist < 88)
-                ||  dist < minDist )
-            {
+            Gob g = gobs.get(i);
+            dist = ZeeConfig.distanceToPlayer(g);
+            name = g.getres().name;
+            if ( closestGob == null ){
                 minDist = dist;
-                closestGob = gobs.get(i);
+                closestGob = g;
+            }
+            else if( (g.pickupPriority = (( ZeeConfig.isBug(name) || name.contains("/kritter/")) && dist < 88)) || dist < minDist)
+            {
+                // prev closest gob had priority
+                if (closestGob.pickupPriority && !g.pickupPriority){
+                    continue;
+                }
+                minDist = dist;
+                closestGob = g;
             }
         }
 
         // pickup closest gob
         if (closestGob!=null) {
             // right click gob
-            if ( closestGob.getres().name.contains("/kritter/")
+            if ( ZeeConfig.isBug(closestGob.getres().name)
+                || closestGob.getres().name.contains("/kritter/")
                 || closestGob.getres().name.contains("/terobjs/items/"))
             {
                 if (pickupGobIsShiftDown)
@@ -2620,17 +2626,38 @@ public class ZeeManagerGobClick extends ZeeThread{
                 }.start();
             }
         }
+
+        picking = false;
+    }
+
+    private static List<Gob> findPickupGobs() {
+        List<Gob> gobs = ZeeConfig.getAllGobs();
+        gobs.removeIf(gob1 ->{
+            String name = gob1.getres().name;
+            //dont remove items or bugs
+            if (name.contains("/items/") || ZeeConfig.isBug(name))
+                return false;
+            // kritters
+            if ( name.contains("/kritter/")) {
+                if ( ZeeConfig.isKritterNotPickable(name) )
+                    return true; // remove non pickable kritter
+                else
+                    return false;
+            }
+            //remove leafpile
+            if ( name.contentEquals("gfx/terobjs/herbs/leafpile") )
+                return true;
+            //remove all else
+            return true;
+        });
+        return gobs;
     }
 
     static ZeeWindow winPickupGob;
     static void toggleWindowPickupGob() {
 
         // find eligible gobs
-        List<Gob> gobs = ZeeConfig.findGobsMatchingRegexpList(listPickupGobNamePatterns);
-        gobs.removeIf(gob1 ->
-            (ZeeConfig.isKritter(gob1) && ZeeConfig.isKritterNotPickable(gob1))
-            || gob1.getres().name.contentEquals("gfx/terobjs/herbs/leafpile")
-        );
+        List<Gob> gobs = findPickupGobs();
 
         Widget wdg = null;
         List<String> listNamesAdded = new ArrayList<>();

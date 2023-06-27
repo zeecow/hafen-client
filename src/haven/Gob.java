@@ -49,6 +49,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
     private Loader.Future<?> deferral = null;
 	public int totalDmgHp = 0;
 	public long requeued = 0;
+	public boolean pickupPriority = false;
 
     public static class Overlay implements RenderTree.Node {
 	public final int id;
