@@ -3192,16 +3192,15 @@ public class ZeeConfig {
             ZeeConfig.applyGobSettingsHighlight(ob, ZeeConfig.getHighlightGobColor(ob));
 
             // auto boulder option (maybe remove)
-            if (ZeeConfig.autoChipMinedBoulder && ZeeManagerMiner.isCursorMining() && ZeeManagerMiner.isBoulder(ob))
+            if (ZeeConfig.autoChipMinedBoulder && ZeeManagerMiner.isCursorMining() && ZeeManagerMiner.isBoulder(ob)) {
                 ZeeManagerMiner.checkBoulderGobAdded(ob);
-
+            }
             // remount closest horse
-            if (ZeeManagerGobClick.remountClosestHorse && ZeeManagerGobClick.isGobHorse(ob.getres().name)) {
+            else if (ZeeManagerGobClick.remountClosestHorse && ZeeManagerGobClick.isGobHorse(ob.getres().name)) {
                 ZeeManagerGobClick.remountHorse();
             }
-
             // barter stand item search labels
-            if (ZeeManagerGobClick.barterSearchOpen && ob.getres().name.endsWith("/barterstand")) {
+            else if (ZeeManagerGobClick.barterSearchOpen && ob.getres().name.endsWith("/barterstand")) {
                 ZeeManagerGobClick.addTextBarterStand(ob);
             }
 
@@ -3216,10 +3215,15 @@ public class ZeeConfig {
     }
 
     private static void applyGobSettingsAggro(Gob gob) {
+        // aggro categ radius
         if( mapCategoryGobs.get(CATEG_AGROCREATURES).contains(gob.getres().name) && !ZeeManagerGobClick.isGobDeadOrKO(gob)) {
-            //aggro radius
-            if (ZeeConfig.aggroRadiusTiles > 0)
+            if (ZeeConfig.aggroRadiusTiles > 0) {
                 gob.addol(new Gob.Overlay(gob, new ZeeGobRadius(gob, null, ZeeConfig.aggroRadiusTiles * MCache.tilesz2.y), ZeeManagerGobClick.OVERLAY_ID_AGGRO));
+            }
+        }
+        //looserock radius 7
+        else if(gob.getres().name.contentEquals("gfx/terobjs/looserock")){
+            gob.addol(new Gob.Overlay(gob, new ZeeGobRadius(gob, null, 7 * MCache.tilesz2.y), ZeeManagerGobClick.OVERLAY_ID_AGGRO));
         }
     }
 
