@@ -1042,7 +1042,11 @@ public class ZeeConfig {
 
         String windowTitle = window.cap.strip();
 
-        if (windowTitle.contentEquals("Cattle Roster")) {
+        if (windowTitle.contentEquals("Belt")) {
+            ZeeManagerItemClick.invBelt = null;
+            ZeeManagerItemClick.getInvBelt();
+        }
+        else if (windowTitle.contentEquals("Cattle Roster")) {
             windowModCattleRoster(window);
         }
         else if(List.of("Barrel","Cistern","Demijohn").contains(windowTitle)) {
