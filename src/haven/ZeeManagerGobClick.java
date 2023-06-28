@@ -2634,8 +2634,8 @@ public class ZeeManagerGobClick extends ZeeThread{
         List<Gob> gobs = ZeeConfig.getAllGobs();
         gobs.removeIf(gob1 ->{
             String name = gob1.getres().name;
-            //dont remove items or bugs
-            if (name.contains("/items/") || ZeeConfig.isBug(name))
+            //dont remove items, herbs, bugs
+            if (name.contains("/items/") || name.contains("/herbs/") || ZeeConfig.isBug(name))
                 return false;
             // kritters
             if ( name.contains("/kritter/")) {
