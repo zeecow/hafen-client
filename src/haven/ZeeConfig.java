@@ -1049,7 +1049,7 @@ public class ZeeConfig {
         else if (windowTitle.contentEquals("Cattle Roster")) {
             windowModCattleRoster(window);
         }
-        else if(List.of("Barrel","Cistern","Demijohn").contains(windowTitle)) {
+        else if(List.of("Barrel","Cistern","Demijohn","Food trough").contains(windowTitle)) {
             ZeeManagerGobClick.labelGobByContents(window);
         }
         else if(windowTitle.contentEquals("Equipment")) {
