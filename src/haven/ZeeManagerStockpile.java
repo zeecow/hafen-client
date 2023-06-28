@@ -1095,7 +1095,11 @@ public class ZeeManagerStockpile extends ZeeThread{
 
         //rclick nonfarming tile to create virtual pile
         ZeeConfig.gameUI.map.wdgmsg("itemact", nonFarmingTile, ZeeConfig.tileToCoord(nonFarmingTile), 0);
-        sleep(500);
+        sleep(777);
+        if (lastPlob==null){
+            println("areaPilerCreateNewPile > couldn't create virtual pile");
+            return;
+        }
 
         // try placing pile until run out of border tiles
         areaPilerTryPlacingOnTiles(borderTiles,itemGobName);
