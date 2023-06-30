@@ -649,18 +649,19 @@ public class ZeeThread  extends Thread{
         return ZeeConfig.getCursorName().contentEquals(name);
     }
 
-    public static boolean waitRes(GItem g) {
-        println("wait res gitem ");
+    public static boolean waitItemRes(GItem g) {
+        if (g==null)
+            return false;
         int max = (int) TIMEOUT_MS;
         try {
-            while(max>0 && (g==null || g.resource()==null || g.resource().basename()==null)) {
+            while(max>0 && g.getres()==null) {
                 max -= SLEEP_MS;
                 Thread.sleep(SLEEP_MS);
             }
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        return (g!=null && g.resource()!=null && g.resource().basename()!=null);
+        return (g.getres() != null);
     }
 
 

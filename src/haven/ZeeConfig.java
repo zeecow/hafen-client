@@ -1042,7 +1042,9 @@ public class ZeeConfig {
 
         String windowTitle = window.cap.strip();
 
-        if (windowTitle.contentEquals("Belt")) {
+        if(windowTitle.contentEquals("Rack")) {
+            ZeeManagerItemClick.checkCheeseTray(window);
+        }else if (windowTitle.contentEquals("Belt")) {
             ZeeManagerItemClick.invBelt = null;
             ZeeManagerItemClick.getInvBelt();
         }
@@ -1090,8 +1092,14 @@ public class ZeeConfig {
 
         // Craft window
         if(isMakewindow(window)) {
+            // cheese tray
+            if(windowTitle.contentEquals("Cheese Tray")){
+                if (!ZeeManagerItemClick.lastCheeseProgress.isEmpty()){
+                    window.add(new Label("Last seen: "+ZeeManagerItemClick.lastCheeseProgress),120,0);
+                }
+            }
             // bug collection
-            if(windowTitle.contentEquals("Bug Collection")) {
+            else if(windowTitle.contentEquals("Bug Collection")) {
                 if (!ZeeManagerCraft.bugColRecipeOpen)
                     ZeeManagerCraft.bugColRecipeOpened(window);
             }

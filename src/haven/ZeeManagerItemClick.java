@@ -1639,4 +1639,27 @@ public class ZeeManagerItemClick extends ZeeThread{
         return free;
     }
 
+    static String lastCheeseProgress = Utils.getpref("cheeseTrayLog","");
+    public static void checkCheeseTray(Window window) {
+        new ZeeThread(){
+            public void run() {
+                try {
+                    sleep(500);
+                    Inventory inv = window.getchild(Inventory.class);
+                    inv.getWItemsByNameContains("cheesetray").forEach(wItem1 -> {
+                        Double meter = (wItem1.item.meter > 0) ? Double.valueOf(wItem1.item.meter / 100.0) : wItem1.itemmeter.get();
+                        if (meter!=null) {
+                            String perc = ((int) (meter * 100)) + "%";
+                            String cheeseName = getItemContentsName(wItem1);
+                            lastCheeseProgress = cheeseName + " " + perc;
+                            Utils.setpref("cheeseTrayLog", lastCheeseProgress);
+                        }
+                    });
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }.start();
+    }
+
 }
