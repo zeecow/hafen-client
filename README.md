@@ -173,4 +173,5 @@ Random Features
 - hide smoke and some animations
 - keybelt shortcuts navigation
 - reposition rightmost windows horiz. when game resize
+- CheeseTray recipe show progress of recently opened CheeseRack 
  

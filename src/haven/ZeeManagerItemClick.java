@@ -1,6 +1,7 @@
 package haven;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -1639,22 +1640,65 @@ public class ZeeManagerItemClick extends ZeeThread{
         return free;
     }
 
-    static String lastCheeseProgress = Utils.getpref("cheeseTrayLog","");
+    static ArrayList<String> cheeseProgressList = initCheeseProgressList();
+    private static ArrayList<String> initCheeseProgressList() {
+        if (cheeseProgressList==null)
+            cheeseProgressList = new ArrayList<>();
+        cheeseProgressList.addAll(Utils.getprefsl("cheeseProgressList",new String[]{}));
+        return cheeseProgressList;
+    }
     public static void checkCheeseTray(Window window) {
         new ZeeThread(){
             public void run() {
                 try {
                     sleep(500);
                     Inventory inv = window.getchild(Inventory.class);
-                    inv.getWItemsByNameContains("cheesetray").forEach(wItem1 -> {
-                        Double meter = (wItem1.item.meter > 0) ? Double.valueOf(wItem1.item.meter / 100.0) : wItem1.itemmeter.get();
-                        if (meter!=null) {
-                            String perc = ((int) (meter * 100)) + "%";
-                            String cheeseName = getItemContentsName(wItem1);
-                            lastCheeseProgress = cheeseName + " " + perc;
-                            Utils.setpref("cheeseTrayLog", lastCheeseProgress);
+                    List<WItem> cheesetrayList = inv.getWItemsByNameContains("cheesetray");
+                    if (cheesetrayList.isEmpty())
+                        return;
+                    WItem firstCheesetray = cheesetrayList.get(0);
+                    Double meter = (firstCheesetray.item.meter > 0) ? Double.valueOf(firstCheesetray.item.meter / 100.0) : firstCheesetray.itemmeter.get();
+                    // cheese is progressing
+                    if (meter!=null) {
+                        String newCheesePerc = ((int) (meter * 100)) + "%";
+                        String newCheeseName = getItemContentsName(firstCheesetray);
+                        String newCheeseLocation = "";
+                        if (!ZeeConfig.findGobsByNameEndsWith("/cellarstairs").isEmpty())
+                            newCheeseLocation = "cellar";
+                        else if (!ZeeConfig.findGobsByNameEndsWith("/upstairs","/downstairs").isEmpty())
+                            newCheeseLocation = "cabin";
+                        else if (ZeeConfig.getPlayerTileName().endsWith("/mine"))
+                            newCheeseLocation = "mines";
+                        else
+                            newCheeseLocation = "outside";
+
+                        //save prefs
+                        String newCheeseDateMs = String.valueOf(ZeeThread.now());
+                        boolean saveNewCheese = true;
+                        List<String> removeList = new ArrayList<>();
+                        for (String cheese : cheeseProgressList) {
+                            // format "cheesename,progress,location,cheeseDateMs"
+                            String[] arr = cheese.split(",");
+                            // dont save cheese with same name & location
+                            if (newCheeseName.contentEquals(arr[0]) && newCheeseLocation.contentEquals(arr[2])) {
+                                saveNewCheese = false;
+                            }
+                            //remove old cheese
+                            long now = new Date().getTime();
+                            long oldCheeseDate = Long.parseLong(arr[3]);
+                            if( now - oldCheeseDate >= (1000*60*60*24*2)){ //2 days
+                                removeList.add(cheese);
+                            }
                         }
-                    });
+                        // remove old cheese
+                        cheeseProgressList.removeAll(removeList);
+                        // save new cheese
+                        if (saveNewCheese) {
+                            cheeseProgressList.add(newCheeseName+","+newCheesePerc+","+newCheeseLocation+","+newCheeseDateMs);
+                            //cheeseProgressList = cheeseName + "," + perc + ","+location+","+lastCheeseDateMs;
+                            Utils.setprefsl("cheeseProgressList", cheeseProgressList);
+                        }
+                    }
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

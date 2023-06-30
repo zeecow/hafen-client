@@ -1330,14 +1330,16 @@ public class ZeeManagerGobClick extends ZeeThread{
 
     static void clearAllGobsTexts() {
         try {
-            ZeeConfig.gameUI.ui.sess.glob.oc.forEach(gob -> {
-                synchronized(gob) {
-                    Gob.Overlay ol = gob.findol(ZeeGobText.class);
-                    if (ol != null) {
-                        ol.remove(false);
+            synchronized (ZeeConfig.gameUI.ui.sess.glob.oc) {
+                ZeeConfig.gameUI.ui.sess.glob.oc.forEach(gob -> {
+                    synchronized (gob) {
+                        Gob.Overlay ol = gob.findol(ZeeGobText.class);
+                        if (ol != null) {
+                            ol.remove(false);
+                        }
                     }
-                }
-            });
+                });
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
