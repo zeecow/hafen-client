@@ -2200,7 +2200,7 @@ public boolean mousedown(Coord c, int button) {
 	if (button == 3)
 		ZeeManagerGobClick.isRightClickZooming = false;
 	// stop left-click camera drag
-	if (button==1){
+	if (button==1 && grab==null){
 		leftClickDragging = false;
 		if (camdrag!=null) {
 			camera.release();
