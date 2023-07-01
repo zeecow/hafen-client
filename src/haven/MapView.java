@@ -2214,7 +2214,8 @@ public boolean mousedown(Coord c, int button) {
 		camdrag.remove();
 		camdrag = null;
 	    }
-	} else if(grab != null) {
+	}
+	if(grab != null) {
 	    grab.mmouseup(c, button);
 	}
 	return(true);
