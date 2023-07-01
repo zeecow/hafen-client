@@ -2076,10 +2076,6 @@ public class MapView extends PView implements DTarget, Console.Directory {
 				clickGob = ((Gob.GobClick) inf.ci).gob;
 			}
 		}
-		// lclick starts dragging camera
-		if(clickb==1) {
-			camdrag = ui.grabmouse(MapView.this);
-		}
 	    wdgmsg("click", args);
 		ZeeConfig.checkMapClicked(clickb,pc,mc,args,clickGob);
 	}
@@ -2100,6 +2096,7 @@ public boolean mousedown(Coord c, int button) {
 	ZeeManagerGobClick.lastClickMouseUpMs = 0;
 	ZeeManagerGobClick.lastClickMouseDownMs = System.currentTimeMillis();
 	ZeeManagerGobClick.lastClickMouseButton = button;
+	leftClickDragging = false;
 	if(button == 2) {
 	    if(((Camera)camera).click(c)) {
 		camdrag = ui.grabmouse(this);
@@ -2154,6 +2151,9 @@ public boolean mousedown(Coord c, int button) {
 	else if(button==1) {
 		if(((Camera)camera).click(c)) {
 			new Click(c, button).run();//Click.hit()
+			// lclick starts dragging camera
+			camdrag = ui.grabmouse(MapView.this);
+			//ZeeConfig.println("mousedown >  grabmouse btn1");
 		}
 	}
 	else {
@@ -2171,7 +2171,7 @@ public boolean mousedown(Coord c, int button) {
 	    grab.mmousemove(c);
 	Loader.Future<Plob> placing_l = this.placing;
 	if( camdrag != null ) {
-		if ( ZeeManagerGobClick.lastClickMouseButton != 1 ) {
+		if ( ZeeManagerGobClick.lastClickMouseButton == 2 ) {
 			((Camera) camera).drag(c);
 		}
 		// already left-click dragging
@@ -2179,7 +2179,9 @@ public boolean mousedown(Coord c, int button) {
 			((Camera) camera).drag(c);
 		}
 		// start left-click dragging if enough time elapsed
-		else if ( System.currentTimeMillis() - ZeeManagerGobClick.lastClickMouseDownMs > 200){
+		else if (ZeeManagerGobClick.lastClickMouseDownMs > ZeeManagerGobClick.lastClickMouseUpMs &&
+				System.currentTimeMillis() - ZeeManagerGobClick.lastClickMouseDownMs > 200)
+		{
 			leftClickDragging = true;//save some calcs
 			((Camera) camera).drag(c);
 		}
@@ -2200,12 +2202,16 @@ public boolean mousedown(Coord c, int button) {
 	if (button == 3)
 		ZeeManagerGobClick.isRightClickZooming = false;
 	// stop left-click camera drag
-	if (button==1 && grab==null){
+	if (button==1){
 		leftClickDragging = false;
 		if (camdrag!=null) {
 			camera.release();
 			camdrag.remove();
 			camdrag = null;
+			//ZeeConfig.println("mouseup btn1 release");
+		}
+		else if(grab != null) {
+			grab.mmouseup(c, button);
 		}
 	}
 	else if(button == 2) {
@@ -2215,7 +2221,7 @@ public boolean mousedown(Coord c, int button) {
 		camdrag = null;
 	    }
 	}
-	if(grab != null) {
+	else if(grab != null) {
 	    grab.mmouseup(c, button);
 	}
 	return(true);
