@@ -1672,33 +1672,43 @@ public class ZeeManagerItemClick extends ZeeThread{
                         else
                             newCheeseLocation = "outside";
 
-                        //save prefs
-                        String newCheeseDateMs = String.valueOf(ZeeThread.now());
-                        boolean saveNewCheese = true;
+                        // add/update saved cheese
+                        String newCheeseDateMs = String.valueOf(new Date().getTime());
+                        boolean isNewCheese = true;
                         List<String> removeList = new ArrayList<>();
-                        for (String cheese : cheeseProgressList) {
+                        for (int i = 0; i < cheeseProgressList.size(); i++) {
+
                             // format "cheesename,progress,location,cheeseDateMs"
-                            String[] arr = cheese.split(",");
-                            // dont save cheese with same name & location
+                            String[] arr = cheeseProgressList.get(i).split(",");
+
+                            // cheese already in list (name+location) //TODO improve identification
                             if (newCheeseName.contentEquals(arr[0]) && newCheeseLocation.contentEquals(arr[2])) {
-                                saveNewCheese = false;
+                                isNewCheese = false;
+                                // update existing cheese percentage
+                                arr[1] = newCheesePerc;
+                                cheeseProgressList.set(i, String.join(",", arr));
                             }
-                            //remove old cheese
+                            // remove old cheese later
                             long now = new Date().getTime();
                             long oldCheeseDate = Long.parseLong(arr[3]);
                             if( now - oldCheeseDate >= (1000*60*60*24*2)){ //2 days
-                                removeList.add(cheese);
+                                removeList.add(cheeseProgressList.get(i));
                             }
                         }
+
                         // remove old cheese
                         cheeseProgressList.removeAll(removeList);
-                        // save new cheese
-                        if (saveNewCheese) {
+
+                        // add new cheese
+                        if (isNewCheese) {
                             cheeseProgressList.add(newCheeseName+","+newCheesePerc+","+newCheeseLocation+","+newCheeseDateMs);
-                            //cheeseProgressList = cheeseName + "," + perc + ","+location+","+lastCheeseDateMs;
-                            Utils.setprefsl("cheeseProgressList", cheeseProgressList);
                         }
+
+                        // save pref
+                        Utils.setprefsl("cheeseProgressList", cheeseProgressList);
+
                     }
+
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
