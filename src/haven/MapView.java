@@ -2076,6 +2076,10 @@ public class MapView extends PView implements DTarget, Console.Directory {
 				clickGob = ((Gob.GobClick) inf.ci).gob;
 			}
 		}
+		// lclick starts dragging camera
+		if(clickb==1) {
+			camdrag = ui.grabmouse(MapView.this);
+		}
 	    wdgmsg("click", args);
 		ZeeConfig.checkMapClicked(clickb,pc,mc,args,clickGob);
 	}
@@ -2089,8 +2093,8 @@ public class MapView extends PView implements DTarget, Console.Directory {
 	if(this.grab == grab)
 	    this.grab = null;
     }
-    
-    public boolean mousedown(Coord c, int button) {
+
+public boolean mousedown(Coord c, int button) {
 	parent.setfocus(this);
 	Loader.Future<Plob> placing_l = this.placing;
 	ZeeManagerGobClick.lastClickMouseUpMs = 0;
@@ -2138,17 +2142,27 @@ public class MapView extends PView implements DTarget, Console.Directory {
 			}
 		}.start();
 	    }
-	} else if((placing_l != null) && placing_l.done()) {
+	}
+	else if((placing_l != null) && placing_l.done()) {
 	    Plob placing = placing_l.get();
 	    if(placing.lastmc != null)
 		wdgmsg("place", placing.rc.floor(posres), (int)Math.round(placing.a * 32768 / Math.PI), button, ui.modflags());
-	} else if((grab != null) && grab.mmousedown(c, button)) {
-	} else {
+	}
+	// left-click drags camera until mouseup()
+	else if(button==1) {
+		if(((Camera)camera).click(c)) {
+			new Click(c, button).run();//Click.hit()
+		}
+	}
+	else if((grab != null) && grab.mmousedown(c, button)) {
+	}
+	else {
 	    new Click(c, button).run();
 	}
 	return(true);
     }
-    
+
+	static boolean leftClickDragging = false;
     public void mousemove(Coord c) {
 	if (ZeeManagerGobClick.isRightClickZooming){
 		ZeeManagerGobClick.rightClickZoom(c);
@@ -2156,8 +2170,19 @@ public class MapView extends PView implements DTarget, Console.Directory {
 	if(grab != null)
 	    grab.mmousemove(c);
 	Loader.Future<Plob> placing_l = this.placing;
-	if(camdrag != null) {
-	    ((Camera)camera).drag(c);
+	if( camdrag != null ) {
+		if ( ZeeManagerGobClick.lastClickMouseButton != 1 ) {
+			((Camera) camera).drag(c);
+		}
+		// already left-click dragging
+		else if ( leftClickDragging ) {
+			((Camera) camera).drag(c);
+		}
+		// start left-click dragging if enough time elapsed
+		else if ( System.currentTimeMillis() - ZeeManagerGobClick.lastClickMouseDownMs > 200){
+			leftClickDragging = true;//save some calcs
+			((Camera) camera).drag(c);
+		}
 	} else if((placing_l != null) && placing_l.done()) {
 	    Plob placing = placing_l.get();
 	    if((placing.lastmc == null) || !placing.lastmc.equals(c)) {
@@ -2174,7 +2199,16 @@ public class MapView extends PView implements DTarget, Console.Directory {
 	ZeeManagerGobClick.lastClickMouseButton = button;
 	if (button == 3)
 		ZeeManagerGobClick.isRightClickZooming = false;
-	if(button == 2) {
+	// stop left-click camera drag
+	if (button==1){
+		leftClickDragging = false;
+		if (camdrag!=null) {
+			camera.release();
+			camdrag.remove();
+			camdrag = null;
+		}
+	}
+	else if(button == 2) {
 	    if(camdrag != null) {
 		camera.release();
 		camdrag.remove();

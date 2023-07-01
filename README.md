@@ -6,9 +6,10 @@ Controls
 --------
 - flowermenu also works on mouse up
 - minimap drags with button 3
-- right click crop and drag mouse to start harvest area selection
+- right click crop and drag also starts harvest area selection (slow)
 - keys up/down control volume
 - quick zoom with PageUp/PageDown, or Rclick player and drag
+- camera drag also works by holding left-click (move player + drag camera)   
 - shift+c alternates cams ortho/free
 - mousewheel scroll transfer items directly (no shift required)
 - Ctrl+click to confirm actions (Empty, Swill, Slaughter, etc)
