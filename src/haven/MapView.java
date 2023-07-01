@@ -2148,13 +2148,13 @@ public boolean mousedown(Coord c, int button) {
 	    if(placing.lastmc != null)
 		wdgmsg("place", placing.rc.floor(posres), (int)Math.round(placing.a * 32768 / Math.PI), button, ui.modflags());
 	}
+	else if((grab != null) && grab.mmousedown(c, button)) {
+	}
 	// left-click drags camera until mouseup()
 	else if(button==1) {
 		if(((Camera)camera).click(c)) {
 			new Click(c, button).run();//Click.hit()
 		}
-	}
-	else if((grab != null) && grab.mmousedown(c, button)) {
 	}
 	else {
 	    new Click(c, button).run();
