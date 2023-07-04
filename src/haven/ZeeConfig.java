@@ -2798,6 +2798,10 @@ public class ZeeConfig {
         addGobText(g,s,0,255,0,255,5);
     }
 
+    public static void addGobText(Gob g, String s, Color c){
+        addGobText(g,s,c.getRed(),c.getGreen(),c.getBlue(),c.getAlpha(),5);
+    }
+
     public static void addGobText(Gob g, String s, int height){
         addGobText(g,s,0,255,0,255,height);
     }
@@ -3236,6 +3240,14 @@ public class ZeeConfig {
                 ZeeManagerGobClick.addTextBarterStand(ob);
             }
 
+            //gob health
+            GobHealth healf = ob.getattr(GobHealth.class);
+            if (healf!=null && healf.hp < 1){
+                Color c = Color.lightGray;
+                String s = String.valueOf(healf.hp).replaceFirst("0.", ".");
+                ZeeConfig.addGobText(ob,s,c);
+            }
+
             // save gob name
             if (ob.getres().name!=null && !ob.getres().name.isBlank() && !listGobsSession.contains(ob.getres().name)) {
                 listGobsSession.add(ob.getres().name);
@@ -3244,6 +3256,8 @@ public class ZeeConfig {
         }catch (Exception e){
             e.printStackTrace();
         }
+
+        ob.settingsConsumed = true;
     }
 
     private static void applyGobSettingsAggro(Gob gob) {

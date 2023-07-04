@@ -439,13 +439,6 @@ public class ZeeManagerMiner extends ZeeThread{
         return invItems.size();
     }
 
-    public static void notifyColumn(Gob gob, float hp){
-        if (!isMineSupport(gob))
-            return;
-        ZeeConfig.addGobText(gob,(hp*100)+"%");
-        //stopMining();
-    }
-
     public static void stopMining() {
         new ZeeThread(){
             public void run() {

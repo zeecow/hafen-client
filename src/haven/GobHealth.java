@@ -28,6 +28,8 @@ package haven;
 
 import haven.render.*;
 
+import java.awt.*;
+
 public class GobHealth extends GAttrib implements Gob.SetupMod {
     public final float hp;
     public final MixColor fx;
@@ -41,12 +43,16 @@ public class GobHealth extends GAttrib implements Gob.SetupMod {
             this.fx = ZeeConfig.MIXCOLOR_YELLOW;
         }else if(hp==.50) {
             this.fx = ZeeConfig.MIXCOLOR_ORANGE;
-            if (ZeeManagerMiner.mining)
-                ZeeManagerMiner.notifyColumn(g,hp);
         }else {
             this.fx = ZeeConfig.MIXCOLOR_RED;
-            if (ZeeManagerMiner.mining)
-                ZeeManagerMiner.notifyColumn(g,hp);
+        }
+
+        synchronized (g){
+            if ( g.settingsConsumed  &&  hp < 1 ) {
+                Color c = Color.lightGray;
+                String s = String.valueOf(hp).replaceFirst("0.", ".");
+                ZeeConfig.addGobText(g,s,c);
+            }
         }
     }
     
