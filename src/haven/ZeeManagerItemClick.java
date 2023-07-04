@@ -1,8 +1,10 @@
 package haven;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /*
@@ -1675,7 +1677,6 @@ public class ZeeManagerItemClick extends ZeeThread{
                         // add/update saved cheese
                         String newCheeseDateMs = String.valueOf(new Date().getTime());
                         boolean isNewCheese = true;
-                        List<String> removeList = new ArrayList<>();
                         for (int i = 0; i < cheeseProgressList.size(); i++) {
 
                             // format "cheesename,progress,location,cheeseDateMs"
@@ -1688,16 +1689,7 @@ public class ZeeManagerItemClick extends ZeeThread{
                                 arr[1] = newCheesePerc;
                                 cheeseProgressList.set(i, String.join(",", arr));
                             }
-                            // remove old cheese later
-                            long now = new Date().getTime();
-                            long oldCheeseDate = Long.parseLong(arr[3]);
-                            if( now - oldCheeseDate >= (1000*60*60*24*2)){ //2 days
-                                removeList.add(cheeseProgressList.get(i));
-                            }
                         }
-
-                        // remove old cheese
-                        cheeseProgressList.removeAll(removeList);
 
                         // add new cheese
                         if (isNewCheese) {
@@ -1714,6 +1706,52 @@ public class ZeeManagerItemClick extends ZeeThread{
                 }
             }
         }.start();
+    }
+    static void cheeseTrayMakeWindow(Window window){
+        if (!ZeeManagerItemClick.cheeseProgressList.isEmpty()){
+            List<String> allCheese = ZeeManagerItemClick.cheeseProgressList;
+            List<String> removeList = new ArrayList<>();
+            for (int i = 0; i < allCheese.size(); i++) {
+                // format "cheesename,progress,location,cheeseDateMs"
+                String[] arr = allCheese.get(i).split(",");
+                long timeElapsed = new Date().getTime() - Long.parseLong(arr[3]);
+                boolean rem = false;
+                if(timeElapsed >= (86400000*2)) { // remove 2 days old cheese
+                    rem = true;
+                    removeList.add(allCheese.get(i));
+                }
+                int labelY = (i*13)-10;
+                window.add(new Label((rem?"[removed] ":"")+arr[0]+" , "+arr[1]+" , "+arr[2]+" , "+getDurationXUnitsAgo(timeElapsed)),100,labelY);
+            }
+            if (!removeList.isEmpty()) {
+                allCheese.removeAll(removeList);
+                Utils.setprefsl("cheeseProgressList", ZeeManagerItemClick.cheeseProgressList);
+            }
+        }
+    }
+    static String getDurationXUnitsAgo(long durationMs) {
+        final List<Long> times = Arrays.asList(
+                TimeUnit.DAYS.toMillis(365),
+                TimeUnit.DAYS.toMillis(30),
+                TimeUnit.DAYS.toMillis(1),
+                TimeUnit.HOURS.toMillis(1),
+                TimeUnit.MINUTES.toMillis(1),
+                TimeUnit.SECONDS.toMillis(1) );
+        final List<String> timesString = Arrays.asList("yr","mt","day","hr","min","sec");
+
+        StringBuffer res = new StringBuffer();
+        for(int i=0;i< times.size(); i++) {
+            Long current = times.get(i);
+            long temp = durationMs/current;
+            if(temp>0) {
+                res.append(temp).append(" ").append( timesString.get(i) ).append(temp != 1 ? "s" : "").append(" ago");
+                break;
+            }
+        }
+        if("".equals(res.toString()))
+            return "0 secs ago";
+        else
+            return res.toString();
     }
 
 }

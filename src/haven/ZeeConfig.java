@@ -1095,16 +1095,7 @@ public class ZeeConfig {
         if(isMakewindow(window)) {
             // cheese tray
             if(windowTitle.contentEquals("Cheese Tray")){
-                if (!ZeeManagerItemClick.cheeseProgressList.isEmpty()){
-                    List<String> allCheese = ZeeManagerItemClick.cheeseProgressList;
-                    for (int i = 0; i < allCheese.size(); i++) {
-                        // format "cheesename,progress,location,cheeseDateMs"
-                        String[] arr = allCheese.get(i).split(",");
-                        long timeElapsed = new Date().getTime() - new Long(arr[3]);
-                        int labelY = (i*13)-10;
-                        window.add(new Label(arr[0]+" , "+arr[1]+" , "+arr[2]+" , "+getDurationXUnitsAgo(timeElapsed)),100,labelY);
-                    }
-                }
+                ZeeManagerItemClick.cheeseTrayMakeWindow(window);
             }
             // bug collection
             else if(windowTitle.contentEquals("Bug Collection")) {
@@ -4015,30 +4006,5 @@ public class ZeeConfig {
             showOverlayProv = a;
             Utils.setprefb("showOverlayProv",showOverlayProv);
         }
-    }
-
-    public static String getDurationXUnitsAgo(long durationMs) {
-        final List<Long> times = Arrays.asList(
-                TimeUnit.DAYS.toMillis(365),
-                TimeUnit.DAYS.toMillis(30),
-                TimeUnit.DAYS.toMillis(1),
-                TimeUnit.HOURS.toMillis(1),
-                TimeUnit.MINUTES.toMillis(1),
-                TimeUnit.SECONDS.toMillis(1) );
-        final List<String> timesString = Arrays.asList("yr","mt","day","hr","min","sec");
-
-        StringBuffer res = new StringBuffer();
-        for(int i=0;i< times.size(); i++) {
-            Long current = times.get(i);
-            long temp = durationMs/current;
-            if(temp>0) {
-                res.append(temp).append(" ").append( timesString.get(i) ).append(temp != 1 ? "s" : "").append(" ago");
-                break;
-            }
-        }
-        if("".equals(res.toString()))
-            return "0 secs ago";
-        else
-            return res.toString();
     }
 }
