@@ -1,37 +1,55 @@
 package haven;
 
-import java.util.LinkedList;
-import java.util.List;
+import java.util.ArrayList;
+import java.util.Collections;
 
 public class ZeeHistWdg extends Widget{
 
-    final static List<MenuGrid.PagButton> listHistButtons = new LinkedList<MenuGrid.PagButton>();
-    final static int numItems = 10;
+    static ArrayList<String> arrNames = new ArrayList<>();
+    static ArrayList<MenuGrid.PagButton> arrBtns = new ArrayList<MenuGrid.PagButton>();
+    final static int maxHist = 10;
     final static int xpad = 2;
 
     ZeeHistWdg(){
-        super( Coord.of( (MenuGrid.bgsz.x+ xpad) * numItems, MenuGrid.bgsz.y ) );
+        super( Coord.of( (MenuGrid.bgsz.x+ xpad) * maxHist, MenuGrid.bgsz.y ) );
     }
 
     static void checkMenuHistory(MenuGrid.PagButton pagButton, Object[] args) {
-        if (listHistButtons.contains(pagButton) ||
-            (args!=null &&
-            !String.valueOf(args[0]).contentEquals("bp") &&
-            !String.valueOf(args[0]).contentEquals("craft")))
-        {
+        //button already in history
+        if (arrNames.contains(pagButton.name())){
+            //bump used button if possible
+            int ibtn = arrNames.indexOf(pagButton.name());
+            if (ibtn < arrNames.size()-1){
+                Collections.swap(arrNames,ibtn,ibtn+1);
+                Collections.swap(arrBtns,ibtn,ibtn+1);
+            }
             return;
         }
-        if(listHistButtons.size() == numItems)
-            listHistButtons.remove(0);
-        listHistButtons.add(pagButton);
+        // unnecessary check?
+        if (args!=null && args.length!=2 && args.length!=3) {
+            return;
+        }
+        //remove oldest button
+        if(arrNames.size() == maxHist) {
+            arrNames.remove(0);
+            arrBtns.remove(0);
+        }
+        // add new button to hist
+        arrNames.add(0,pagButton.name());
+        arrBtns.add(0,pagButton);
+    }
+
+    public static void clearHistory() {
+        arrBtns.clear();
+        arrNames.clear();
     }
 
     public void draw(GOut g) {
         Coord c = Coord.z;
-        for (int i = 0; i < numItems; i++) {
+        for (int i = 0; i < maxHist; i++) {
             g.image(MenuGrid.bg,c);
-            if ( i < listHistButtons.size()) {
-                g.image(listHistButtons.get(i).img(), c);
+            if ( i < arrBtns.size()) {
+                g.image(arrBtns.get(i).img(), c);
             }
             c = c.add(MenuGrid.bgsz.x+ xpad,0);
         }
@@ -56,10 +74,15 @@ public class ZeeHistWdg extends Widget{
     }
 
     private MenuGrid.PagButton bhit(Coord c) {
-        int buttonIndex = c.div(MenuGrid.bgsz.x+xpad).x;
+        int ibtn = c.div(MenuGrid.bgsz.x+xpad).x;
         MenuGrid.PagButton ret = null;
-        if (listHistButtons.size() > buttonIndex) {
-            ret = listHistButtons.get(buttonIndex);
+        if (arrBtns.size() > ibtn) {
+            ret = arrBtns.get(ibtn);
+            //bump used button if possible
+            if (ibtn < arrNames.size()-1){
+                Collections.swap(arrNames,ibtn,ibtn+1);
+                Collections.swap(arrBtns,ibtn,ibtn+1);
+            }
         }
         //ZeeConfig.println(c + " " + buttonIndex + " " + ret);
         return ret;
