@@ -26,10 +26,16 @@
 
 package haven;
 
+import haven.render.Pipe;
+import haven.render.Render;
+import haven.render.State;
+import haven.render.sl.Expression;
+import haven.render.sl.ShaderMacro;
+import haven.render.sl.Type;
+import haven.render.sl.Uniform;
+
+import java.awt.*;
 import java.util.*;
-import java.awt.Color;
-import haven.render.*;
-import haven.render.sl.*;
 
 public class Glob {
     public final OCache oc = new OCache(this);
@@ -42,6 +48,7 @@ public class Glob {
     public Color lightamb = null, lightdif = null, lightspc = null;
     public Color olightamb = null, olightdif = null, olightspc = null;
     public Color tlightamb = null, tlightdif = null, tlightspc = null;
+	public Color blightamb = null, blightdif = null, blightspc = null;
     public double lightang = 0.0, lightelev = 0.0;
     public double olightang = 0.0, olightelev = 0.0;
     public double tlightang = 0.0, tlightelev = 0.0;
@@ -214,9 +221,9 @@ public class Glob {
 			olightelev = lightelev;
 			lchange = 0;
 		    } else {
-			lightamb = tlightamb;
-			lightdif = tlightdif;
-			lightspc = tlightspc;
+			blightamb = lightamb = tlightamb;
+			blightdif = lightdif = tlightdif;
+			blightspc = lightspc = tlightspc;
 			lightang = tlightang;
 			lightelev = tlightelev;
 			lchange = -1;

@@ -24,8 +24,9 @@ public class ZeeFlowerMenu extends FlowerMenu{
     static final String STRPETAL_AUTO_BUTCH_ALL = "Auto-butch all";
     static final String STRPETAL_AUTOBUTCH_BIGDEADANIMAL = "Auto-butch";
     static final String STRPETAL_INSPECT = "Inspect";
-    static final String STRPETAL_SWITCHCHAR = "Switch char";
+    static final String STRPETAL_BRIGHTNESS = "Brightness";
     static final String STRPETAL_CLEARGOBTEXTS = "Clear gobs texts";
+    static final String STRPETAL_SWITCHCHAR = "Switch char";
     static final String STRPETAL_TESTCOORDS = "Test coords";
     static final String STRPETAL_TILEMONITOR = "Tile monitor";
     static final String STRPETAL_OPENCATTLEROSTER = "Open roster";

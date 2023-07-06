@@ -3,10 +3,10 @@ package haven;
 
 import haven.resutil.WaterTile;
 
+import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -1271,6 +1271,8 @@ public class ZeeManagerGobClick extends ZeeThread{
             windowTestCoords();
         else if(petalName.contentEquals(ZeeFlowerMenu.STRPETAL_CLEARGOBTEXTS))
             clearAllGobsTexts();
+        else if(petalName.contentEquals(ZeeFlowerMenu.STRPETAL_BRIGHTNESS))
+            windowBrightness();
         else if (petalName.contentEquals(ZeeFlowerMenu.STRPETAL_AUTOBUTCH_BIGDEADANIMAL)){
             autoButchBigDeadAnimal(gob);
         }
@@ -1467,6 +1469,7 @@ public class ZeeManagerGobClick extends ZeeThread{
 
         if(ZeeConfig.isPlayer(gob)) {
             opts = new ArrayList<String>();
+            opts.add(ZeeFlowerMenu.STRPETAL_BRIGHTNESS);
             opts.add(ZeeFlowerMenu.STRPETAL_SWITCHCHAR);
             opts.add(ZeeFlowerMenu.STRPETAL_CLEARGOBTEXTS);
             opts.add(ZeeFlowerMenu.STRPETAL_TESTCOORDS);
@@ -2800,6 +2803,58 @@ public class ZeeManagerGobClick extends ZeeThread{
                 return 1; // greater than
             return 0; // equal
         });
+    }
+
+    private static void windowBrightness() {
+        String name = "Brightness";
+        Window win = ZeeConfig.getWindow(name);
+        if(win!=null){
+            win.reqdestroy();
+        }
+        win = ZeeConfig.gameUI.add(new Window(Coord.of(225,100),name){
+            public void wdgmsg(String msg, Object... args) {
+                if (msg.contentEquals("close"))
+                    this.reqdestroy();
+            }
+        },200,200);
+
+        //darker
+        Widget wdg = win.add(new Button(60,"darker"){
+            public void wdgmsg(String msg, Object... args) {
+                if (msg.contentEquals("activate")){
+                    //darker
+                    ui.sess.glob.blightamb = ui.sess.glob.blightamb.darker();
+                    ui.sess.glob.blightdif = ui.sess.glob.blightdif.darker();
+                    ui.sess.glob.blightspc = ui.sess.glob.blightspc.darker();
+                }
+            }
+        }, 0,0);
+
+        //brighter
+        wdg = win.add(new Button(60,"brighter"){
+            public void wdgmsg(String msg, Object... args) {
+                if (msg.contentEquals("activate")){
+                    //brighter
+                    ui.sess.glob.blightamb = ui.sess.glob.blightamb.brighter();
+                    ui.sess.glob.blightdif = ui.sess.glob.blightdif.brighter();
+                    ui.sess.glob.blightspc = ui.sess.glob.blightspc.brighter();
+                }
+            }
+        }, wdg.c.x+wdg.sz.x+7,0);
+
+        //reset
+        win.add(new Button(60,"reset"){
+            public void wdgmsg(String msg, Object... args) {
+                if (msg.contentEquals("activate")){
+                    //reset
+                    ui.sess.glob.blightamb = ui.sess.glob.lightamb;
+                    ui.sess.glob.blightdif = ui.sess.glob.lightdif;
+                    ui.sess.glob.blightspc = ui.sess.glob.lightspc;
+                }
+            }
+        }, 0,wdg.c.y+wdg.sz.y+7);
+
+        win.pack();
     }
 
 
