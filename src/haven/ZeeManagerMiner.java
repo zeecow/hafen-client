@@ -675,7 +675,7 @@ public class ZeeManagerMiner extends ZeeThread{
             te.settip("tile name(s), comma separated");
 
             // scrollport for tiles
-            tilemonScrollport = tilemonWindow.add(new Scrollport(new Coord(120, 200)), 0, 55);
+            tilemonScrollport = tilemonWindow.add(new Scrollport(new Coord(120, 110)), 0, 55);
 
         }
         else{
