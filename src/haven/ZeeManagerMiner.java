@@ -80,7 +80,7 @@ public class ZeeManagerMiner extends ZeeThread{
                             println("wait mined tile boulder");
                             sleep(1000);
                             Gob boulder = ZeeConfig.getClosestGob(getBoulders());
-                            if (boulder!=null){
+                            if (boulder!=null && ZeeConfig.distanceToPlayer(boulder) < TILE_SIZE*2){
                                 chipBoulder(boulder);
                                 ZeeConfig.clickCoord(tunnelHelperEndCoord,1);
                                 waitPlayerIdlePose();
