@@ -246,6 +246,7 @@ public class ZeeManagerCraft extends ZeeThread{
      */
     static boolean clothRecipeOpen=false, clothBusy=false;
     static String clothItemName = null, clothStockPileName = null;
+    static int clothFibrePilesDist = 5;
     public static void clothRecipeOpened(Window window) {
         println("clothRecipeOpened");
         clothRecipeOpen = true;
@@ -254,32 +255,11 @@ public class ZeeManagerCraft extends ZeeThread{
                 if (msg.equals("activate")){
                     if (clothBusy)
                         return;
-                    if (window.cap.contains("Linen") && ZeeConfig.getMainInventory().countItemsByNameContains("/flaxfibre") < 5){
-                        ZeeConfig.msgError("not enough inventory flax fibre");
-                        return;
-                    }
-                    if (window.cap.contains("Hemp") && ZeeConfig.getMainInventory().countItemsByNameContains("/hempfibre") < 6){
-                        ZeeConfig.msgError("not enough inventory hemp fibre");
-                        return;
-                    }
                     if (!ZeeConfig.playerHasAnyPose(ZeeConfig.POSE_PLAYER_LOOM_IDLE)){
                         ZeeConfig.msgError("must sit on a loom");
                         return;
                     }
-                    clothStart(window);
-                }
-            }
-        };
-        clothAutoBtn.settip("use closest fiber piles until inventory full");
-        window.add(clothAutoBtn,360,45);
-    }
-    private static void clothStart(Window window) {
-        new Thread(){
-            public void run() {
-                try {
-                    // stockpile-hempfibre, flaxfibre
-                    clothBusy = true;
-                    ZeeConfig.addPlayerText("weaving");
+                    //set cloth names
                     if (window.cap.contains("Hemp Cloth")){
                         clothItemName = "hempfibre";
                         clothStockPileName = "stockpile-hempfibre";
@@ -290,12 +270,29 @@ public class ZeeManagerCraft extends ZeeThread{
                         clothExit("unkown type cloth");
                         return;
                     }
-                    // highlight stockpiles
-                    ZeeConfig.findGobsByNameEndsWith(clothStockPileName).forEach(gob -> {
-                        if (ZeeConfig.distanceToPlayer(gob) <= 5*TILE_SIZE){
-                            ZeeConfig.addGobColor(gob,Color.green);
-                        }
-                    });
+                    // label stockpiles
+                    List<Gob> piles = ZeeConfig.findGobsByNameEndsWith(clothStockPileName);
+                    piles.removeIf(gob -> ZeeConfig.distanceToPlayer(gob) > clothFibrePilesDist*TILE_SIZE);
+                    if(piles.isEmpty()){
+                        ZeeConfig.msgError("no fibre piles close");
+                        return;
+                    }
+                    piles.forEach(gob -> ZeeConfig.addGobText(gob,"pile"));
+
+                    clothStart(window);
+                }
+            }
+        };
+        clothAutoBtn.settip("use closest fiber piles until inventory full");
+        window.add(clothAutoBtn,360,45);
+    }
+    private static void clothStart(Window window) {
+        new ZeeThread(){
+            public void run() {
+                try {
+                    // stockpile-hempfibre, flaxfibre
+                    clothBusy = true;
+                    ZeeConfig.addPlayerText("weaving");
                     // start craft loop
                     while(clothBusy)
                     {
@@ -334,7 +331,7 @@ public class ZeeManagerCraft extends ZeeThread{
                         {
                             Gob closestPile = ZeeConfig.getClosestGobByNameContains(clothStockPileName);
                             // out of fibres stockpile
-                            if (ZeeConfig.distanceToPlayer(closestPile) > 5*TILE_SIZE ){
+                            if (ZeeConfig.distanceToPlayer(closestPile) > clothFibrePilesDist*TILE_SIZE ){
                                 clothExit("no stockpile close enough");
                                 return;
                             }
@@ -372,7 +369,7 @@ public class ZeeManagerCraft extends ZeeThread{
         }
         clothBusy = false;
         ZeeConfig.removePlayerText();
-        ZeeConfig.findGobsByNameEndsWith(clothStockPileName).forEach(ZeeConfig::removeGobColor);
+        ZeeConfig.removeGobText((ArrayList<Gob>) ZeeConfig.findGobsByNameEndsWith(clothStockPileName));
     }
 
 
