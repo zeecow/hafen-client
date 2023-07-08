@@ -560,16 +560,16 @@ public class ZeeOptionsJFrame extends JFrame {
 
 
         //auto hide windows
-        panelTabInterface.add(new ZeeOptionJCheckBox( "Auto hide windows", "autoHideWindows"),c);
+        panelTabInterface.add(new ZeeOptionJCheckBox( "Show auto-hide window button", "autoHideWindows"),c);
         panelTabInterface.add(tfAutoHideWindows= new JTextField("",5), c);
         tfAutoHideWindows.setMaximumSize(new Dimension(Integer.MAX_VALUE, tfAutoHideWindows.getPreferredSize().height));
-        tfAutoHideWindows.setText(ZeeConfig.hoverHideWindowsList);
+        tfAutoHideWindows.setText(ZeeConfig.listWindowsAddHideButton);
         tfAutoHideWindows.addActionListener(actionEvent -> {
             String str = actionEvent.getActionCommand();
             String[] strArr = str.split(",");
             if(strArr!=null && strArr.length>0) {
-                ZeeConfig.hoverHideWindowsList = str;
-                Utils.setpref("autoHideWindowsList",str.strip());
+                ZeeConfig.listWindowsAddHideButton = str;
+                Utils.setpref("listWindowsAddHideButton",str.strip());
             }
         });
     }

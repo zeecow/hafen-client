@@ -49,10 +49,13 @@ public class ZeeWindow extends Window {
                     Window win = this.getparent(Window.class);
                     win.isAutoHideOn = !win.isAutoHideOn;
                     // highlihgt button
-                    if (win.isAutoHideOn)
+                    if (win.isAutoHideOn){
                         this.change(TEXT_AUTOHIDEWINDOW, new Color(0,200,0));
-                    else
+                        ZeeConfig.listAutoHideWindows.add(win.cap);
+                    }else {
                         this.change(TEXT_AUTOHIDEWINDOW);
+                        ZeeConfig.listAutoHideWindows.remove(win.cap);
+                    }
                 }
                 else
                     super.wdgmsg(msg,args);

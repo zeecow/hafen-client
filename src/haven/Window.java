@@ -453,10 +453,10 @@ public class Window extends Widget implements DTarget {
 		if (this.isAutoHideOn && ZeeConfig.autoHideWindows) {
 			if (checkhit(c)){
 				if (this.isAutoHidden)
-					autoHideToggleWinPos();
+					autoHideToggleWinPos();//show window
 			}else{
 				if (!this.isAutoHidden)
-					autoHideToggleWinPos();
+					autoHideToggleWinPos();//hide window
 			}
 		}
 	    super.mousemove(c);

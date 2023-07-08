@@ -120,7 +120,7 @@ public class ZeeConfig {
 
     static final String DEF_LIST_MUTE_AUDIO = "Leashed horse.;Tracking is now turned;Stacking is now turned;must be empty to be unequipped";
     static final String DEF_LIST_CONFIRM_PETAL = "Empty,Swill,Clean out,Slaughter,Castrate,Unmoor,Take possession,Renounce Lawspeaker,Become Lawspeaker";
-    static final String DEF_LIST_HOVER_HIDE_WINDOWS = "Inventory,Character Sheet,Basket,Creel,Cattle Roster,Quiver,Pickup Gobs,Tile Monitor,Switch Char";
+    static final String DEF_LIST_WINDOWS_ADD_HIDE_BUTTON = "Inventory,Character Sheet,Basket,Creel,Cattle Roster,Quiver,Pickup Gobs,Tile Monitor,Switch Char";
     static final String DEF_LIST_BUTCH_AUTO = "Break,Scale,Wring neck,Kill,Skin,Flay,Pluck,Clean,Butcher,Collect bones";
     static final String DEF_LIST_AUTO_CLICK_MENU = "Pick,Harvest wax";
     static final String DEF_LIST_SHAPEICON = "stalagoomba 1,diamond 7 1 0 0,255 255 0;/amberwash 2,diamond 7 0 1 1,255 102 0;/cavepuddle 2,diamond 7 0 1 1,0 204 102;/ladder 2,triangleUp 5 0 1 1,0 204 102;/minehole 2,triangleDown 5 0 1 1,0 204 102;/burrow 2,triangleDown 6 0 1 1,204 0 255;/spark 2,square 4 0 1 0,102 102 255;/snekkja 2,square 4 0 1 0,255 255 102;/dugout 2,square 4 0 1 0,255 255 102;/wheelbarrow 2,square 4 0 1 0,0 255 255;/cart 2,square 4 0 1 0,0 153 255;/knarr 2,square 4 0 1 0,255 255 102;/rowboat 2,square 4 0 1 0,255 255 102;/horse/ 1,square 4 0 1 0,0 204 0;items/arrow 2,triangleUp 5 0 1 1,102 255 204;milestone-stone-e 2,diamond 4 0 1 1,255 255 255;milestone-wood-e 2,diamond 4 0 1 1,255 255 255;/fishingnet 2,diamond 4 0 1 1,153 153 153;wonders/wellspring 1,diamond 5 0 1 1,0 255 255;/map/starshard 2,diamond 7 0 1 1,255 255 0";
@@ -173,6 +173,7 @@ public class ZeeConfig {
     static long lastInvItemMs;
     static Coord lastUiClickCoord;
     static Class<?> classMSRad;
+    static List<String> listAutoHideWindows = new ArrayList<>();
 
     static int aggroRadiusTiles = Utils.getprefi("aggroRadiusTiles", 11);
     static boolean alertOnPlayers = Utils.getprefb("alertOnPlayers", true);
@@ -226,7 +227,7 @@ public class ZeeConfig {
     static boolean keyCamSwitchShiftC = Utils.getprefb("keyCamSwitchShiftC", true);
     static boolean keyUpDownAudioControl = Utils.getprefb("keyUpDownAudioControl", true);
     static boolean autoHideWindows = Utils.getprefb("autoHideWindows", false);
-    static String hoverHideWindowsList = Utils.getpref("hoverHideWindowsList", DEF_LIST_HOVER_HIDE_WINDOWS);
+    static String listWindowsAddHideButton = Utils.getpref("listWindowsAddHideButton", DEF_LIST_WINDOWS_ADD_HIDE_BUTTON);
     public static boolean miniTrees = Utils.getprefb("miniTrees", false);
     public static Integer miniTreesSize = Utils.getprefi("miniTreesSize", 50);
     static boolean noWeather = Utils.getprefb("noWeather", false);
@@ -1042,34 +1043,45 @@ public class ZeeConfig {
 
         String windowTitle = window.cap.strip();
 
+        //cheesetray
         if(windowTitle.contentEquals("Rack")) {
             ZeeManagerItemClick.checkCheeseTray(window);
-        }else if (windowTitle.contentEquals("Belt")) {
+        }
+        //belt
+        else if (windowTitle.contentEquals("Belt")) {
             ZeeManagerItemClick.invBelt = null;
             ZeeManagerItemClick.getInvBelt();
         }
+        //tamed animals manager
         else if (windowTitle.contentEquals("Cattle Roster")) {
             windowModCattleRoster(window);
         }
+        // autolabel contents
         else if(List.of("Barrel","Cistern","Demijohn","Food trough").contains(windowTitle)) {
             ZeeManagerGobClick.labelGobByContents(window);
         }
+        //equips
         else if(windowTitle.contentEquals("Equipment")) {
             windowEquipment = window;
         }
+        //main inventory
         else if(windowTitle.contentEquals("Inventory")) {
             windowInvMain = window;
         }
+        //barter stand
         else if(windowTitle.contentEquals("Barter Stand") && window.sz.x > 300){//avoid build window
             windowModBarterStand(window);
         }
+        //mod tamed animal window
         else if(isWindowAnimalStats(windowTitle)){
             windowModAnimalStats(window, windowTitle);
         }
+        // auto fuel
         else if (windowTitle.contentEquals("Oven") || windowTitle.contentEquals("Kiln") || windowTitle.contains("Smelter")){
             if (!isBuildWindow(window))
                 windowAddFuelGUI(window,windowTitle);
         }
+        // auto press
         else if(windowTitle.contentEquals("Extraction Press")) {
             if (!isBuildWindow(window)) {
                 Button btnPress = getButtonNamed(window,"Press");
@@ -1086,6 +1098,7 @@ public class ZeeConfig {
                 }
             }
         }
+        //tunnel helper
         else if (ZeeManagerMiner.tunnelHelperStage == ZeeManagerMiner.TUNNELHELPER_STAGE5_BUILDCOL && windowTitle.contentEquals("Stone Column")){
             ZeeManagerMiner.tunnelHelperBuildColumn(window);
         }
@@ -1213,10 +1226,10 @@ public class ZeeConfig {
     }
 
     private static void windowModAutoHideButton(Window window, String windowTitle) {
-        if (hoverHideWindowsList.isBlank())
+        if (listWindowsAddHideButton.isBlank())
             return;
         boolean showButton = false;
-        for (String cap : ZeeConfig.hoverHideWindowsList.split(",")) {
+        for (String cap : ZeeConfig.listWindowsAddHideButton.split(",")) {
             if (cap.contentEquals(windowTitle)) {
                 showButton = true;
                 break;
@@ -1227,12 +1240,18 @@ public class ZeeConfig {
         int pad = ZeeWindow.ZeeButton.BUTTON_SIZE;
         if (window.hasOrganizeButton)
             pad += 25;
-        //TODO uncomment
+        //create autohide button
         window.buttonAutoHide = ((Window.DefaultDeco)window.deco).add(
             new ZeeWindow.ZeeButton(ZeeWindow.ZeeButton.BUTTON_SIZE,ZeeWindow.ZeeButton.TEXT_AUTOHIDEWINDOW,"auto hide"),
             ((Window.DefaultDeco)window.deco).cbtn.c.x - pad,
             ((Window.DefaultDeco)window.deco).cbtn.c.y
         );
+        //autohide window is active throughout user session
+        if (listAutoHideWindows.contains(window.cap)){
+            window.isAutoHideOn = true;
+            window.buttonAutoHide.change(ZeeWindow.ZeeButton.TEXT_AUTOHIDEWINDOW, new Color(0,200,0));
+            window.autoHideToggleWinPos();
+        }
     }
 
     static void windowFitView(Window window) {
