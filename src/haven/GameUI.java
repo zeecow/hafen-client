@@ -1535,9 +1535,10 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Message
     private double lasterrsfx = 0;
     public void error(String msg) {
 	msg(msg, new Color(192, 0, 0), new Color(255, 0, 0));
+	// block audio
 	if (ZeeConfig.blockAudioMsg && ZeeConfig.isMsgAudioMuted(msg))
 		return;
-	// mute stockpile msgs while area piler is working
+	// temp mute stockpile msgs while area piler is working
 	if ( ZeeManagerStockpile.selAreaPile &&
 			(msg.contains("stockpile is already full") || msg.contains("site is occupied")) )
 		return;
@@ -1551,6 +1552,7 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Message
     private double lastmsgsfx = 0;
     public void msg(String msg) {
 	msg(msg, Color.WHITE, Color.WHITE);
+	//block audio
 	if (ZeeConfig.blockAudioMsg && ZeeConfig.isMsgAudioMuted(msg))
 		return;
 	double now = Utils.rtime();
@@ -1560,8 +1562,8 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Message
 	}
     }
 
-	public void msgLow(String msg) {
-		msg(msg, Color.WHITE, Color.WHITE);
+	public void msgLowSound(String msg) {
+		msg(msg,Color.WHITE);
 		if (ZeeConfig.blockAudioMsg && ZeeConfig.isMsgAudioMuted(msg))
 			return;
 		double now = Utils.rtime();

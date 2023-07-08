@@ -1469,9 +1469,9 @@ public class ZeeManagerGobClick extends ZeeThread{
 
         if(ZeeConfig.isPlayer(gob)) {
             opts = new ArrayList<String>();
-            opts.add(ZeeFlowerMenu.STRPETAL_BRIGHTNESS);
             opts.add(ZeeFlowerMenu.STRPETAL_SWITCHCHAR);
             opts.add(ZeeFlowerMenu.STRPETAL_CLEARGOBTEXTS);
+            opts.add(ZeeFlowerMenu.STRPETAL_BRIGHTNESS);
             opts.add(ZeeFlowerMenu.STRPETAL_TESTCOORDS);
             if (ZeeConfig.isCaveTile(ZeeConfig.getPlayerTileName()))
                 opts.add(ZeeFlowerMenu.STRPETAL_TILEMONITOR);
@@ -2819,44 +2819,80 @@ public class ZeeManagerGobClick extends ZeeThread{
         },200,200);
 
         //darker
-        Widget wdg = win.add(new Button(60,"darker"){
+        Widget wdg = win.add(new Button(60,"dark"){
             public void wdgmsg(String msg, Object... args) {
                 if (msg.contentEquals("activate")){
-                    //darker
-                    ui.sess.glob.blightamb = ui.sess.glob.blightamb.darker();
-                    ui.sess.glob.blightdif = ui.sess.glob.blightdif.darker();
-                    ui.sess.glob.blightspc = ui.sess.glob.blightspc.darker();
+                    brightnessDown();
                 }
             }
         }, 0,0);
+        wdg.settip("key: left");
 
         //brighter
-        wdg = win.add(new Button(60,"brighter"){
+        wdg = win.add(new Button(60,"bright"){
             public void wdgmsg(String msg, Object... args) {
                 if (msg.contentEquals("activate")){
-                    //brighter
-                    ui.sess.glob.blightamb = ui.sess.glob.blightamb.brighter();
-                    ui.sess.glob.blightdif = ui.sess.glob.blightdif.brighter();
-                    ui.sess.glob.blightspc = ui.sess.glob.blightspc.brighter();
+                    brightnessUp();
                 }
             }
         }, wdg.c.x+wdg.sz.x+7,0);
+        wdg.settip("key: right");
 
         //reset
-        win.add(new Button(60,"reset"){
+        wdg = win.add(new Button(60,"reset"){
             public void wdgmsg(String msg, Object... args) {
                 if (msg.contentEquals("activate")){
-                    //reset
-                    ui.sess.glob.blightamb = ui.sess.glob.lightamb;
-                    ui.sess.glob.blightdif = ui.sess.glob.lightdif;
-                    ui.sess.glob.blightspc = ui.sess.glob.lightspc;
+                    brightnessReset();
                 }
             }
         }, 0,wdg.c.y+wdg.sz.y+7);
+        wdg.settip("key: home");
 
         win.pack();
     }
 
+    static boolean brightnessReset() {
+        Glob glob = ZeeConfig.gameUI.ui.sess.glob;
+        glob.blightamb = glob.lightamb;
+        glob.blightdif = glob.lightdif;
+        glob.blightspc = glob.lightspc;
+        ZeeConfig.msgLow("amblight "+glob.blightamb.getRed());
+        return true;
+    }
+
+    static boolean brightnessDown() {
+        Glob glob = ZeeConfig.gameUI.ui.sess.glob;
+        glob.blightamb = colorStep(glob.blightamb,-15);
+        glob.blightdif = colorStep(glob.blightdif,-15);
+        glob.blightspc = colorStep(glob.blightspc,-15);
+        ZeeConfig.msgLow("amblight "+glob.blightamb.getRed());
+        return true;
+    }
+
+    static boolean brightnessUp() {
+        Glob glob = ZeeConfig.gameUI.ui.sess.glob;
+        glob.blightamb = colorStep(glob.blightamb,15);
+        glob.blightdif = colorStep(glob.blightdif,15);
+        glob.blightspc = colorStep(glob.blightspc,15);
+        ZeeConfig.msgLow("amblight "+glob.blightamb.getRed());
+        return true;
+    }
+
+    private static Color colorStep(Color c, int step) {
+        int red, green, blue;
+        if (step < 0) {
+            //reduce colors by step
+            red = Math.max((int) ((double) c.getRed() + step), 0);
+            green = Math.max((int) ((double) c.getGreen() + step), 0);
+            blue = Math.max((int) ((double) c.getBlue() + step), 0);
+        }else{
+            //increase colors by step
+            red = Math.min((int) ((double) c.getRed() + step), 255);
+            green = Math.min((int) ((double) c.getGreen() + step), 255);
+            blue = Math.min((int) ((double) c.getBlue() + step), 255);
+        }
+        return new Color(red,green,blue,c.getAlpha());
+    }
 
     private static void windowTestCoords() {
         String name = "test coordss123";

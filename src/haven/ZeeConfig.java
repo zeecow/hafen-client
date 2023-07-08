@@ -2129,8 +2129,16 @@ public class ZeeConfig {
 
         //println(ev.getKeyCode()+"  "+ev.getKeyChar());
 
+        //brightness
+        if (ev.getKeyCode()==KeyEvent.VK_RIGHT) {
+            return ZeeManagerGobClick.brightnessUp();
+        }else if(ev.getKeyCode()==KeyEvent.VK_LEFT) {
+            return ZeeManagerGobClick.brightnessDown();
+        }else if(ev.getKeyCode()==KeyEvent.VK_HOME) {
+            return ZeeManagerGobClick.brightnessReset();
+        }
         // fast zoom
-        if (ev.getKeyCode()==KeyEvent.VK_PAGE_DOWN) {
+        else if (ev.getKeyCode()==KeyEvent.VK_PAGE_DOWN) {
             return gameUI.map.camera.wheel(Coord.z,10);
         }else if (ev.getKeyCode()==KeyEvent.VK_PAGE_UP) {
             return gameUI.map.camera.wheel(Coord.z,-10);
@@ -2162,20 +2170,20 @@ public class ZeeConfig {
         else if (ZeeConfig.keyUpDownAudioControl && ev.getKeyCode()==KeyEvent.VK_UP){
             double vol = Audio.volume;
             if (vol < 0.9)
-                Audio.setvolume(Double.parseDouble(String.format("%.1f", vol)) + 0.1);
+                Audio.setvolume(Double.parseDouble(String.format("%.1f", vol)) + 0.1d);
             else if (vol < 1)
                 Audio.setvolume(1); // max 1
-            msgLow("volume "+Audio.volume);
+            msgLow("volume "+String.format("%.1f", Audio.volume));
             return true;
         }
         // volume down (arrow)
         else if (ZeeConfig.keyUpDownAudioControl && ev.getKeyCode()==KeyEvent.VK_DOWN){
             double vol = Audio.volume;
             if (vol > 0.1)
-                Audio.setvolume(Double.parseDouble(String.format("%.1f", vol)) - 0.1);
+                Audio.setvolume(Double.parseDouble(String.format("%.1f", vol)) - 0.1d);
             else if (vol > 0)
                 Audio.setvolume(0); // min 0
-            msgLow("volume "+Audio.volume);
+            msgLow("volume "+String.format("%.1f", Audio.volume));
             return true;
         }
         // Belt toggle (Shift+Tab)
@@ -3000,11 +3008,11 @@ public class ZeeConfig {
     }
 
     public static void msgLow(String s) {
-        gameUI.msgLow(s);
+        gameUI.msgLowSound(s);
     }
 
-    public static void msgError(String s) {
-        gameUI.error(s);
+    public static void msgError(String msg) {
+        gameUI.error(msg);
     }
 
     public static String strArgs(Object... args){
