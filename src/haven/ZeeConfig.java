@@ -189,7 +189,7 @@ public class ZeeConfig {
     static boolean blockAudioMsg = Utils.getprefb("blockAudioMsg", true);
     static String blockAudioMsgList = Utils.getpref("blockAudioMsgList", DEF_LIST_MUTE_AUDIO);
     static boolean butcherMode = false;
-    static boolean autoStack = false;//set at initToggles()
+    static boolean autoStack = false;//set at checkUiMsg()
     static String butcherAutoList = Utils.getpref("butcherAutoList", DEF_LIST_BUTCH_AUTO);
     static boolean cattleRosterHeight = Utils.getprefb("cattleRosterHeight", true);
     static double cattleRosterHeightPercentage = Utils.getprefd("cattleRosterHeightPercentage", 1.0);
@@ -1882,7 +1882,7 @@ public class ZeeConfig {
     private static boolean alreadyTrackingScents = false;
     static boolean initiatedToggles;
     public static void initToggles() {
-        new Thread(new Runnable() {
+        new ZeeThread(){
             public void run() {
                 try {
                     println("init toggles > "+ZeeSess.charSwitchCurPlayingChar);
@@ -1894,43 +1894,30 @@ public class ZeeConfig {
                     if (ZeeSess.charSwitchKeepWindow)
                         ZeeSess.charSwitchCreateWindow();
 
+                    // discover autostack checkbox value (1/2)
+                    toggleAutostack();//wait checkUiMsg() set checkbox value
+
                     // auto run speed
-                    Thread.sleep(1000);
+                    sleep(1000);
                     if(autoRunLogin)
                         setPlayerSpeed(PLAYER_SPEED_2);
 
+                    // discover autostack checkbox value (2/2)
+                    toggleAutostack();//reset to original value
+
                     // auto track scents
-                    Thread.sleep(1000);
+                    sleep(1000);
                     if(autoTrackScents && !alreadyTrackingScents) {
                         gameUI.menu.wdgmsg("act", "tracking");
                         //tracking for all characters
                         alreadyTrackingScents = true;
                     }
 
-                    // discover autostack checkbox value
-                    //TODO waitUiMsg
-                    toggleAutostack();//toggle autostack
-                    Thread.sleep(1000);
-                    if (lastUiMsg!=null){
-                        //autostack was off
-                        if (lastUiMsg.contains("Stacking is now turned on.")){
-                            ZeeInvMainOptionsWdg.cbAutoStack.a = autoStack = false;
-                        }
-                        //autostack was on
-                        else if (lastUiMsg.contains("Stacking is now turned off.")){
-                            ZeeInvMainOptionsWdg.cbAutoStack.a = autoStack = true;
-                        }
-                        else {
-                            println("couldn't determine stacking option value");
-                        }
-                    }
-                    toggleAutostack();//reset to original value
-
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
             }
-        }).start();
+        }.start();
     }
 
     public static int getPlayerSpeed() {
@@ -2411,6 +2398,16 @@ public class ZeeConfig {
         // feasting msg
         if (isPlayerFeasting && text.startsWith("You gained ")){
             ZeeManagerCraft.feastingMsgStatGained(text);
+        }
+        //autostack checkbox on
+        else if (text.contains("Stacking is now turned on.")){
+            if(ZeeInvMainOptionsWdg.cbAutoStack.a != true)
+                ZeeInvMainOptionsWdg.cbAutoStack.a = autoStack = true;
+        }
+        //autostack checkbox off
+        else if (text.contains("Stacking is now turned off.")) {
+            if(ZeeInvMainOptionsWdg.cbAutoStack.a != false)
+                ZeeInvMainOptionsWdg.cbAutoStack.a = autoStack = false;
         }
     }
 
