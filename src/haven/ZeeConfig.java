@@ -264,6 +264,7 @@ public class ZeeConfig {
     public static boolean showOverlayPclaim = Utils.getprefb("showOverlayPclaim",true);
     public static boolean showOverlayVclaim = Utils.getprefb("showOverlayVclaim",true);
     public static boolean showOverlayProv = Utils.getprefb("showOverlayProv",true);
+    static boolean showHitbox;
 
     public final static Set<String> mineablesStone = new HashSet<String>(Arrays.asList(
             "stone","gneiss","basalt","dolomite","feldspar","flint",
@@ -2213,7 +2214,9 @@ public class ZeeConfig {
         }
         // show/hide crops (ctrl+h)
         else if (ev.getKeyCode()==KeyEvent.VK_H && ev.isControlDown()){
-            toggleHideCrops();
+            //toggleHideCrops();
+            //ZeeManagerGobClick.windowGobHitboxAndVisibility();
+            ZeeHitbox.toggle();
             return true;
         }
         return false;
@@ -2508,7 +2511,7 @@ public class ZeeConfig {
 
     static List<Gob> getAllGobs(){
         return ZeeConfig.gameUI.ui.sess.glob.oc.gobStream().filter(gob -> {
-            if(gob!=null && gob.getres()!=null) {
+            if(gob!=null && !gob.virtual && gob.getres()!=null) {
                 return true;
             } else {
                 return false;
@@ -3208,7 +3211,7 @@ public class ZeeConfig {
         gobConsumer.start();
     }
     static void queueGobSettings(Gob ob) {
-        if(ob != null && ob.getres()!=null) {
+        if(ob != null && !ob.virtual && ob.getres()!=null) {
             synchronized (gobConsumer) {
                 gobsWaiting.add(ob);
                 gobConsumer.notify();
@@ -3260,6 +3263,15 @@ public class ZeeConfig {
                 Color c = Color.lightGray;
                 String s = String.valueOf(healf.hp).replaceFirst("0.", ".");
                 ZeeConfig.addGobText(ob,s,c);
+            }
+
+            //hitbox
+            if (ZeeConfig.showHitbox) {
+                ZeeHitbox hitbox = ZeeHitbox.forGob(ob);
+                if (hitbox != null) {
+                    ob.hitbox = new ZeeHidingGobSprite<>(ob, hitbox);
+                    ob.addol(ob.hitbox);
+                }
             }
 
             // save gob name

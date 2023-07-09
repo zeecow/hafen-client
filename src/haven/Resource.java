@@ -26,18 +26,29 @@
 
 package haven;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.*;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.annotation.*;
-import java.util.*;
-import java.util.function.*;
-import java.util.regex.*;
 import java.net.*;
-import java.io.*;
-import java.nio.file.*;
-import java.security.*;
-import javax.imageio.*;
-import java.awt.image.BufferedImage;
+import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
+import java.nio.file.Path;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
+import java.security.PrivilegedActionException;
+import java.security.PrivilegedExceptionAction;
+import java.util.*;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Resource implements Serializable {
     public static final Config.Variable<URL> resurl = Config.Variable.propu("haven.resurl", "");
@@ -1135,11 +1146,14 @@ public class Resource implements Serializable {
     @LayerName("neg")
     public class Neg extends Layer {
 	public Coord cc;
+	public Coord ac, bc;
 	public Coord[][] ep;
 		
 	public Neg(Message buf) {
 	    cc = cdec(buf);
-	    buf.skip(12);
+		ac = cdec(buf);
+		bc = cdec(buf);
+		buf.skip(4);//buf.skip(12);
 	    ep = new Coord[8][0];
 	    int en = buf.uint8();
 	    for(int i = 0; i < en; i++) {

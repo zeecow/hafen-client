@@ -32,6 +32,8 @@ import haven.render.RenderTree;
 
 import java.util.function.Supplier;
 
+import static haven.Sprite.decnum;
+
 public class ResDrawable extends Drawable implements EquipTarget {
     public final Indir<Resource> res;
     public final Sprite spr;
@@ -112,4 +114,12 @@ public class ResDrawable extends Drawable implements EquipTarget {
 			ZeeConfig.applyGobSettingsHighlight(g, ZeeConfig.getHighlightDrawableColor(g));
 	}
     }
+
+	public int sdtnum() {
+		if (sdt != null) {
+			Message msg = sdt.clone();
+			return msg.eom() ? 0xffff000 : decnum(msg);
+		}
+		return 0;
+	}
 }

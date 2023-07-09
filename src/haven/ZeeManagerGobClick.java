@@ -1668,6 +1668,64 @@ public class ZeeManagerGobClick extends ZeeThread{
         }.start();
     }
 
+    static String gobVisNames;
+    static boolean gobVisHitbox, gobVisHidden;
+    static void windowGobHitboxAndVisibility() {
+        Widget wdg;
+        String title = "Gob visibility";
+
+        Window win = ZeeConfig.getWindow(title);
+        if (win != null){
+            win.reqdestroy();
+            win = null;
+        }
+
+        //create window
+        win = ZeeConfig.gameUI.add(
+                new Window(Coord.of(120,70),title){
+                    public void wdgmsg(String msg, Object... args) {
+                        if (msg.contentEquals("close")){
+                            this.reqdestroy();
+                        }
+                    }
+                },
+                300,300
+        );
+
+        //label
+        wdg = win.add(new Label("gob name contains (space sep.)"));
+
+        //text entry
+        wdg = win.add(new TextEntry(UI.scale(130),""){
+            public void activate(String text) {
+                // update barterstand labels
+                barterSearchUpdateGobs();
+            }
+            public boolean keyup(KeyEvent ev) {
+                gobVisNames = this.text();
+                return true;
+            }
+        },0,wdg.c.y+wdg.sz.y);
+
+        //checkbox hitbox
+        wdg = win.add(new CheckBox("hitbox"){
+            public void changed(boolean val) {
+                gobVisHitbox = val;
+                //barterSearchUpdateGobs();
+            }
+        },0,wdg.c.y+wdg.sz.y+5);
+
+        //checkbox ore
+        wdg = win.add(new CheckBox("hidden"){
+            public void changed(boolean val) {
+                gobVisHidden = val;
+                //barterSearchUpdateGobs();
+            }
+        },wdg.c.x+wdg.sz.x+5,wdg.c.y);
+
+        win.pack();
+    }
+
     private boolean isGobBigDeadAnimal_thread() {
         try{
             ZeeThread zt = new ZeeThread() {

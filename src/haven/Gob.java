@@ -36,7 +36,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
     public Coord2d rc;
     public double a;
     public boolean virtual = false;
-    int clprio = 0;
+	int clprio = 0;
     public long id;
     public boolean removed = false;
     public final Glob glob;
@@ -51,8 +51,10 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 	public long requeued = 0;
 	public boolean settingsConsumed = false;
 	public boolean pickupPriority = false;
+	public Drawable drawable;
+	public ZeeHidingGobSprite<ZeeHitbox> hitbox;
 
-    public static class Overlay implements RenderTree.Node {
+	public static class Overlay implements RenderTree.Node {
 	public final int id;
 	public final Gob gob;
 	public final Indir<Resource> res;
@@ -381,6 +383,10 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 	updstate();
 	if(virtual && ols.isEmpty() && (getattr(Drawable.class) == null))
 	    glob.oc.remove(this);
+	//TODO test ctick or gtick
+	if (!isGobWaitingSettings) {
+		isGobWaitingSettings = true;
+	}
     }
 
 	boolean isGobWaitingSettings = false;
@@ -391,9 +397,6 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 	for(Overlay ol : ols) {
 	    if(ol.spr != null)
 		ol.spr.gtick(g);
-	}
-	if (!isGobWaitingSettings) {
-		isGobWaitingSettings = true;
 	}
     }
 
@@ -892,4 +895,14 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 	public TickList.Ticking ticker() {return(this);}
     }
     public final Placed placed = new Placed();
+
+	//Useful for getting stage information or model type
+	public int sdt() {
+		Drawable d = drawable;
+		if(d instanceof ResDrawable) {
+			ResDrawable dw = (ResDrawable) d;
+			return dw.sdtnum();
+		}
+		return 0;
+	}
 }
