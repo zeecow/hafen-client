@@ -190,23 +190,7 @@ public class ZeeHitbox extends ZeeSlottedNode implements Rendered {
         List<Gob> gobs = ZeeConfig.getAllGobs();
 
         for (Gob gob : gobs) {
-            synchronized (gob){
-                if(ZeeConfig.showHitbox) {
-                    if (gob.hitbox != null) {
-                        if (!gob.hitbox.show(true)) {
-                            gob.hitbox.fx.updateState();
-                        }
-                    } else if (!gob.virtual || gob instanceof MapView.Plob) {
-                        ZeeHitbox hitbox = ZeeHitbox.forGob(gob);
-                        if (hitbox != null) {
-                            gob.hitbox = new ZeeHidingGobSprite<>(gob, hitbox);
-                            gob.addol(gob.hitbox);
-                        }
-                    }
-                }else if(gob.hitbox != null) {
-                    gob.hitbox.show(false);
-                }
-            }
+            gob.showHitBox();
         }
     }
 }

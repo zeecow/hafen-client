@@ -905,4 +905,48 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 		}
 		return 0;
 	}
+
+	void showHitBox() {
+//		if (show) {
+//			ZeeHitbox hitbox = ZeeHitbox.forGob(this);
+//			if (hitbox != null) {
+//				this.hitbox = new ZeeHidingGobSprite<>(this, hitbox);
+//				this.addol(this.hitbox);
+//			}
+//		}
+		synchronized (this){
+			String gobName = this.getres().name;
+			boolean hideGob = ZeeConfig.isTree(gobName) || gobName.contentEquals("gfx/terobjs/arch/palisadeseg");
+			Drawable d = this.getattr(Drawable.class);
+			if(ZeeConfig.showHitbox) {
+				//hide hitbox
+				if (this.hitbox != null) {
+					if (!this.hitbox.show(true)) {
+						this.hitbox.fx.updateState();
+					}
+				}
+				else if (!this.virtual || this instanceof MapView.Plob) {
+					ZeeHitbox hitbox = ZeeHitbox.forGob(this);
+					if (hitbox != null) {
+						this.hitbox = new ZeeHidingGobSprite<>(this, hitbox);
+						this.addol(this.hitbox);
+					}
+				}
+				//hide gob
+				if(hideGob && d!=null && d.slots != null) {
+					ArrayList<RenderTree.Slot> tmpSlots = new ArrayList<>(d.slots);
+					ZeeConfig.gameUI.ui.sess.glob.loader.defer(() -> RUtils.multirem(tmpSlots), null);
+				}
+			}
+			else if(this.hitbox != null) {
+				//show hitbox
+				this.hitbox.show(false);
+				//show gob
+				if(hideGob) {
+					ArrayList<RenderTree.Slot> tmpSlots = new ArrayList<>(this.slots);
+					ZeeConfig.gameUI.ui.sess.glob.loader.defer(() -> RUtils.multiadd(tmpSlots,d), null);
+				}
+			}
+		}
+	}
 }

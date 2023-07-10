@@ -3266,13 +3266,7 @@ public class ZeeConfig {
             }
 
             //hitbox
-            if (ZeeConfig.showHitbox) {
-                ZeeHitbox hitbox = ZeeHitbox.forGob(ob);
-                if (hitbox != null) {
-                    ob.hitbox = new ZeeHidingGobSprite<>(ob, hitbox);
-                    ob.addol(ob.hitbox);
-                }
-            }
+            ob.showHitBox();
 
             // save gob name
             if (ob.getres().name!=null && !ob.getres().name.isBlank() && !listGobsSession.contains(ob.getres().name)) {
