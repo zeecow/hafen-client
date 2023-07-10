@@ -264,7 +264,8 @@ public class ZeeConfig {
     public static boolean showOverlayPclaim = Utils.getprefb("showOverlayPclaim",true);
     public static boolean showOverlayVclaim = Utils.getprefb("showOverlayVclaim",true);
     public static boolean showOverlayProv = Utils.getprefb("showOverlayProv",true);
-    static boolean showHitbox;
+    static boolean showHitbox = false;
+    static boolean hideTreesAndPalisegs = false;
 
     public final static Set<String> mineablesStone = new HashSet<String>(Arrays.asList(
             "stone","gneiss","basalt","dolomite","feldspar","flint",
@@ -2212,12 +2213,19 @@ public class ZeeConfig {
             }
             return true;
         }
-        // show/hide crops (ctrl+h)
-        else if (ev.getKeyCode()==KeyEvent.VK_H && ev.isControlDown()){
-            //toggleHideCrops();
+        // toggle hitbox, hidden gobs
+        else if (ev.getKeyCode()==KeyEvent.VK_H){
             //ZeeManagerGobClick.windowGobHitboxAndVisibility();
-            ZeeHitbox.toggle();
-            return true;
+            if(ev.isControlDown()) {
+                hideTreesAndPalisegs = !hideTreesAndPalisegs;
+                ZeeManagerGobClick.toggleModels();
+                return true;
+            }
+            else if (ev.isShiftDown()){
+                showHitbox = !showHitbox;
+                ZeeManagerGobClick.toggleHitbox();
+                return true;
+            }
         }
         return false;
     }
@@ -3266,7 +3274,8 @@ public class ZeeConfig {
             }
 
             //hitbox
-            ob.showHitBox();
+            ob.toggleHitbox();
+            ob.toggleModel();
 
             // save gob name
             if (ob.getres().name!=null && !ob.getres().name.isBlank() && !listGobsSession.contains(ob.getres().name)) {

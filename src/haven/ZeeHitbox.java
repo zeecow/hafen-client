@@ -179,18 +179,4 @@ public class ZeeHitbox extends ZeeSlottedNode implements Rendered {
         }
         return res;
     }
-
-    public static void toggle() {
-        ZeeConfig.showHitbox = !ZeeConfig.showHitbox;
-        if (ZeeConfig.showHitbox)
-            ZeeConfig.msgLow("show hitbox");
-        else
-            ZeeConfig.msgLow("hide hitbox");
-
-        List<Gob> gobs = ZeeConfig.getAllGobs();
-
-        for (Gob gob : gobs) {
-            gob.showHitBox();
-        }
-    }
 }

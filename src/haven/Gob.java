@@ -906,46 +906,59 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 		return 0;
 	}
 
-	void showHitBox() {
-//		if (show) {
-//			ZeeHitbox hitbox = ZeeHitbox.forGob(this);
-//			if (hitbox != null) {
-//				this.hitbox = new ZeeHidingGobSprite<>(this, hitbox);
-//				this.addol(this.hitbox);
-//			}
-//		}
+	void toggleModel(){
 		synchronized (this){
 			String gobName = this.getres().name;
-			boolean hideGob = ZeeConfig.isTree(gobName) || gobName.contentEquals("gfx/terobjs/arch/palisadeseg");
+			boolean isGobHidable = ZeeConfig.isTree(gobName) || gobName.contentEquals("gfx/terobjs/arch/palisadeseg");
 			Drawable d = this.getattr(Drawable.class);
-			if(ZeeConfig.showHitbox) {
-				//hide hitbox
-				if (this.hitbox != null) {
-					if (!this.hitbox.show(true)) {
-						this.hitbox.fx.updateState();
-					}
-				}
-				else if (!this.virtual || this instanceof MapView.Plob) {
-					ZeeHitbox hitbox = ZeeHitbox.forGob(this);
-					if (hitbox != null) {
-						this.hitbox = new ZeeHidingGobSprite<>(this, hitbox);
-						this.addol(this.hitbox);
-					}
-				}
-				//hide gob
-				if(hideGob && d!=null && d.slots != null) {
+			//hide gob model
+			if(ZeeConfig.hideTreesAndPalisegs && isGobHidable) {
+				if(d!=null && d.slots != null) {
 					ArrayList<RenderTree.Slot> tmpSlots = new ArrayList<>(d.slots);
 					ZeeConfig.gameUI.ui.sess.glob.loader.defer(() -> RUtils.multirem(tmpSlots), null);
 				}
+				//always show hitbox when hiding model
+				showHitBox();
 			}
-			else if(this.hitbox != null) {
-				//show hitbox
-				this.hitbox.show(false);
-				//show gob
-				if(hideGob) {
-					ArrayList<RenderTree.Slot> tmpSlots = new ArrayList<>(this.slots);
-					ZeeConfig.gameUI.ui.sess.glob.loader.defer(() -> RUtils.multiadd(tmpSlots,d), null);
-				}
+			//show gob model
+			else if(!ZeeConfig.hideTreesAndPalisegs && isGobHidable) {
+				ArrayList<RenderTree.Slot> tmpSlots = new ArrayList<>(this.slots);
+				ZeeConfig.gameUI.ui.sess.glob.loader.defer(() -> RUtils.multiadd(tmpSlots,d), null);
+				// hide hitbox if setting permits
+				if (!ZeeConfig.showHitbox)
+					hideHitBox();
+			}
+		}
+	}
+
+	void toggleHitbox() {
+		synchronized (this){
+			if(ZeeConfig.showHitbox)
+				showHitBox();
+			else
+				hideHitBox();
+		}
+	}
+
+	void hideHitBox() {
+		if(this.hitbox != null) {
+			this.hitbox.show(false);
+		}
+	}
+
+	void showHitBox() {
+		//show hitbox
+		if (this.hitbox != null) {
+			if (!this.hitbox.show(true)) {
+				this.hitbox.fx.updateState();
+			}
+		}
+		//create hitbox
+		else if (!this.virtual || this instanceof MapView.Plob) {
+			ZeeHitbox hitbox = ZeeHitbox.forGob(this);
+			if (hitbox != null) {
+				this.hitbox = new ZeeHidingGobSprite<>(this, hitbox);
+				this.addol(this.hitbox);
 			}
 		}
 	}

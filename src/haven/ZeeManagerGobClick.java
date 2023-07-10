@@ -3050,4 +3050,30 @@ public class ZeeManagerGobClick extends ZeeThread{
         return ZeeConfig.gobHasAnyPoseEndsWith(gob,"/dead","/knock");
     }
 
+    static void toggleHitbox() {
+        if (ZeeConfig.showHitbox)
+            ZeeConfig.msgLow("show hitbox");
+        else
+            ZeeConfig.msgLow("hide hitbox");
+
+        List<Gob> gobs = ZeeConfig.getAllGobs();
+
+        for (Gob gob : gobs) {
+            gob.toggleHitbox();
+        }
+    }
+
+    static void toggleModels() {
+        if (ZeeConfig.hideTreesAndPalisegs)
+            ZeeConfig.msgLow("hide trees/palisegs");
+        else
+            ZeeConfig.msgLow("show trees/palisegs");
+
+        List<Gob> gobs = ZeeConfig.getAllGobs();
+
+        for (Gob gob : gobs) {
+            gob.toggleModel();
+        }
+    }
+
 }
