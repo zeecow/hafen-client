@@ -16,12 +16,12 @@ public class ZeeHitbox extends ZeeSlottedNode implements Rendered {
     private static final Color SOLID_COLOR = new Color(139, 139, 185, 255);
     private static final Color PASSABLE_COLOR = new Color(105, 207, 124, 255);
     private static final float PASSABLE_WIDTH = 1.5f;
-    private static final float SOLID_WIDTH = 3f;
+//    private static final float SOLID_WIDTH = 0f;
     private static final Pipe.Op TOP = Pipe.Op.compose(Rendered.last, States.Depthtest.none, States.maskdepth);
-    private static final Pipe.Op SOLID = Pipe.Op.compose(new BaseColor(SOLID_COLOR), new States.LineWidth(SOLID_WIDTH));
+    private static final Pipe.Op SOLID = Pipe.Op.compose(new BaseColor(SOLID_COLOR));
     private static final Pipe.Op PASSABLE = Pipe.Op.compose(new BaseColor(PASSABLE_COLOR), new States.LineWidth(PASSABLE_WIDTH));
-    private static final Pipe.Op SOLID_TOP = Pipe.Op.compose(SOLID, TOP);
-    private static final Pipe.Op PASSABLE_TOP = Pipe.Op.compose(PASSABLE, TOP);
+//    private static final Pipe.Op SOLID_TOP = Pipe.Op.compose(SOLID, TOP);
+//    private static final Pipe.Op PASSABLE_TOP = Pipe.Op.compose(PASSABLE, TOP);
     private Pipe.Op state = SOLID;
 
     private ZeeHitbox(Gob gob) {
