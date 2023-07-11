@@ -32,6 +32,7 @@ import haven.render.RenderTree;
 
 import java.lang.ref.Reference;
 import java.lang.ref.SoftReference;
+import java.lang.ref.WeakReference;
 import java.util.*;
 import java.util.function.Consumer;
 
@@ -1182,28 +1183,12 @@ public class MCache implements MapSource {
 	}
     }
 
-	public int getTileSafe(Coord tc) {
-		final Optional<Grid> grid = getGridTo(tc);
-		if (grid.isPresent()) {
-			final Grid g = grid.get();
+	public int getTileee(Coord tc) {
+		Grid g = getgridt(tc);
+		if (g != null) {
 			return g.gettile(tc.sub(g.ul));
 		} else {
 			return 0;
-		}
-	}
-	public Optional<Grid> getGridTo(Coord tc) {
-		return (getGridOpt(tc.div(cmaps)));
-	}
-	public Optional<Grid> getGridOpt(final Coord gc) {
-		synchronized (grids) {
-			if ((cached == null) || !cached.gc.equals(gc)) {
-				cached = grids.get(gc);
-				if (cached == null) {
-					request(gc);
-					return Optional.empty();
-				}
-			}
-			return Optional.of(cached);
 		}
 	}
 }

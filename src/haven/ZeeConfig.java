@@ -2935,13 +2935,6 @@ public class ZeeConfig {
         // sends escape key to root ui
         gameUI.ui.root.wdgmsg("gk", 27);
     }
-
-    public static void getPlayerTileType(){
-        int id = gameUI.ui.sess.glob.map.getTileSafe(getPlayerGob().rc.floor(MCache.tilesz));
-        Tiler tl = gameUI.ui.sess.glob.map.tiler(id);
-        Resource res = gameUI.ui.sess.glob.map.tilesetr(id);
-        println("id="+id+" , tl="+tl.getClass().getSimpleName()+" , res="+res.name);
-    }
     public static List<String> bogtype = new ArrayList<>(Arrays.asList("gfx/tiles/bog", "gfx/tiles/bogwater", "gfx/tiles/fen", "gfx/tiles/fenwater", "gfx/tiles/swamp", "gfx/tiles/swampwater", "", ""));
 
 
@@ -3465,13 +3458,13 @@ public class ZeeConfig {
     }
 
     public static Tiler getTilerAt(Coord tile) {
-        int id = ZeeConfig.gameUI.ui.sess.glob.map.getTileSafe(tile);
+        int id = ZeeConfig.gameUI.ui.sess.glob.map.getTileee(tile);
         Tiler tl = ZeeConfig.gameUI.ui.sess.glob.map.tiler(id);
         return tl;
     }
 
     public static String getTileResName(Coord tileCoord) {
-        int id = ZeeConfig.gameUI.ui.sess.glob.map.getTileSafe(tileCoord);
+        int id = ZeeConfig.gameUI.ui.sess.glob.map.getTileee(tileCoord);
         Resource res = ZeeConfig.gameUI.ui.sess.glob.map.tilesetr(id);
         if (res==null)
             return "";
