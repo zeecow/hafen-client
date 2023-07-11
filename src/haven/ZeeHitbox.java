@@ -13,7 +13,7 @@ public class ZeeHitbox extends ZeeSlottedNode implements Rendered {
     private final Gob gob;
     private static final Map<Resource, Model> MODEL_CACHE = new HashMap<>();
     private static final float Z = 0.1f;
-    private static final Color SOLID_COLOR = new Color(178, 71, 178, 255);
+    private static final Color SOLID_COLOR = new Color(139, 139, 185, 255);
     private static final Color PASSABLE_COLOR = new Color(105, 207, 124, 255);
     private static final float PASSABLE_WIDTH = 1.5f;
     private static final float SOLID_WIDTH = 3f;
@@ -131,15 +131,15 @@ public class ZeeHitbox extends ZeeSlottedNode implements Rendered {
                 if(!polygons.isEmpty()) {
                     List<Float> vertices = new LinkedList<>();
 
-                    for (List<Coord3f> polygon : polygons) {
-                        addLoopedVertices(vertices, polygon);
-                    }
+                    //ZeeConfig.println(res.name);
+                    //ZeeConfig.println("   polygons.get(0) size "+polygons.get(0).size());
+                    addTriangles(vertices, polygons.get(0));
 
                     float[] data = convert(vertices);
                     VertexArray.Buffer vbo = new VertexArray.Buffer(data.length * 4, DataBuffer.Usage.STATIC, DataBuffer.Filler.of(data));
                     VertexArray va = new VertexArray(LAYOUT, vbo);
 
-                    model = new Model(Model.Mode.LINES, va, null);
+                    model = new Model(Model.Mode.TRIANGLE_STRIP, va, null);
 
                     MODEL_CACHE.put(res, model);
                 }
@@ -157,14 +157,25 @@ public class ZeeHitbox extends ZeeSlottedNode implements Rendered {
         return ret;
     }
 
-    private static void addLoopedVertices(List<Float> target, List<Coord3f> vertices) {
+    private static void addTriangles(List<Float> target, List<Coord3f> vertices) {
         int n = vertices.size();
-        for (int i = 0; i < n; i++) {
-            Coord3f a = vertices.get(i);
-            Coord3f b = vertices.get((i + 1) % n);
+        Coord3f a, b, c;
+        //int triangles = 0;
+        int i=0;
+        // all triangles starting at "a"
+        // triangles = abc,acd      (2 triangles, 4-sided-polygon)
+        //             abc,acd,ade  (3 triangles, 5-side-polygon)
+        a = vertices.get(0);
+        do{
+            b = vertices.get(i + 1);
+            c = vertices.get(i + 2);
             Collections.addAll(target, a.x, a.y, a.z);
             Collections.addAll(target, b.x, b.y, b.z);
-        }
+            Collections.addAll(target, c.x, c.y, c.z);
+            //triangles++;
+            i++;
+        }while(i < n-2);
+        //ZeeConfig.println("      triangles = "+triangles);
     }
 
     private static Resource getResource(Gob gob) {
