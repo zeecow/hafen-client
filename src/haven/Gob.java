@@ -49,7 +49,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
     private Loader.Future<?> deferral = null;
 	public int totalDmgHp = 0;
 	public long requeued = 0;
-	public boolean settingsConsumed = false;
+	public boolean settingsApplied = false;
 	public boolean pickupPriority = false;
 	public Drawable drawable;
 	public ZeeHidingGobSprite<ZeeHitbox> hitbox;

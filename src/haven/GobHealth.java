@@ -39,6 +39,8 @@ public class GobHealth extends GAttrib implements Gob.SetupMod {
         this.hp = hp;
         if(hp==1) {
             this.fx = null;
+            if (g.settingsApplied)
+                ZeeConfig.removeGobText(g);
         }else if(hp==.75) {
             this.fx = ZeeConfig.MIXCOLOR_YELLOW;
         }else if(hp==.50) {
@@ -48,7 +50,7 @@ public class GobHealth extends GAttrib implements Gob.SetupMod {
         }
 
         synchronized (g){
-            if ( g.settingsConsumed  &&  hp < 1 ) {
+            if ( g.settingsApplied &&  hp < 1 ) {
                 Color c = Color.lightGray;
                 String s = String.valueOf(hp).replaceFirst("0.", ".");
                 ZeeConfig.addGobText(g,s,c);

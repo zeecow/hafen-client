@@ -3279,7 +3279,7 @@ public class ZeeConfig {
             e.printStackTrace();
         }
 
-        ob.settingsConsumed = true;
+        ob.settingsApplied = true;
     }
 
     private static void applyGobSettingsAggro(Gob gob) {
