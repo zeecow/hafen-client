@@ -987,7 +987,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 
 	void toggleModel(){
 		synchronized (this){
-			try {
+
 				String gobName = this.getres().name;
 				boolean isGobHidable = ZeeConfig.isTree(gobName) || gobName.contentEquals("gfx/terobjs/arch/palisadeseg");
 				Drawable d = this.getattr(Drawable.class);
@@ -995,7 +995,13 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 				if (ZeeConfig.hideTreesAndPalisegs && isGobHidable) {
 					if (d != null && d.slots != null) {
 						ArrayList<RenderTree.Slot> tmpSlots = new ArrayList<>(d.slots);
-						ZeeConfig.gameUI.ui.sess.glob.loader.defer(() -> RUtils.multirem(tmpSlots), null);
+						ZeeConfig.gameUI.ui.sess.glob.loader.defer(() -> {
+							try{
+								RUtils.multirem(tmpSlots);
+							}catch (Exception e){
+								ZeeConfig.println("toggleModel > "+e.getMessage());
+							}
+						}, null);
 					}
 					//always show hitbox when hiding model
 					showHitBox();
@@ -1003,14 +1009,18 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 				//show gob model
 				else if (!ZeeConfig.hideTreesAndPalisegs && isGobHidable) {
 					ArrayList<RenderTree.Slot> tmpSlots = new ArrayList<>(this.slots);
-					ZeeConfig.gameUI.ui.sess.glob.loader.defer(() -> RUtils.multiadd(tmpSlots, d), null);
+					ZeeConfig.gameUI.ui.sess.glob.loader.defer(() -> {
+						try{
+							RUtils.multiadd(tmpSlots, d);
+						}catch (Exception e){
+							ZeeConfig.println("toggleModel > "+e.getMessage());
+						}
+					}, null);
 					// hide hitbox if setting permits
 					if (!ZeeConfig.showHitbox)
 						hideHitBox();
 				}
-			}catch (Exception e){
-				ZeeConfig.println("toggleModel > "+e.getMessage());
-			}
+
 		}
 	}
 
