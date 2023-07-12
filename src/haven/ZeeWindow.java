@@ -51,11 +51,14 @@ public class ZeeWindow extends Window {
                     // highlihgt button
                     if (win.isAutoHideOn){
                         this.change(TEXT_AUTOHIDEWINDOW, new Color(0,200,0));
-                        ZeeConfig.listAutoHideWindows.add(win.cap);
+                        if(!ZeeConfig.listAutoHideWindowsActive.contains(win.cap))
+                            ZeeConfig.listAutoHideWindowsActive.add(win.cap);
                     }else {
                         this.change(TEXT_AUTOHIDEWINDOW);
-                        ZeeConfig.listAutoHideWindows.remove(win.cap);
+                        ZeeConfig.listAutoHideWindowsActive.remove(win.cap);
                     }
+                    //save active authide windows
+                    Utils.setprefsl("listAutoHideWindowsActive",ZeeConfig.listAutoHideWindowsActive);
                 }
                 else
                     super.wdgmsg(msg,args);

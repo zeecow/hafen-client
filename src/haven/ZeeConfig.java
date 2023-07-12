@@ -173,7 +173,7 @@ public class ZeeConfig {
     static long lastInvItemMs;
     static Coord lastUiClickCoord;
     static Class<?> classMSRad;
-    static List<String> listAutoHideWindows = new ArrayList<>();
+    static List<String> listAutoHideWindowsActive = new ArrayList<>(Utils.getprefsl("listAutoHideWindowsActive",new String[]{}));
 
     static int aggroRadiusTiles = Utils.getprefi("aggroRadiusTiles", 11);
     static boolean alertOnPlayers = Utils.getprefb("alertOnPlayers", true);
@@ -265,7 +265,7 @@ public class ZeeConfig {
     public static boolean showOverlayVclaim = Utils.getprefb("showOverlayVclaim",true);
     public static boolean showOverlayProv = Utils.getprefb("showOverlayProv",true);
     static boolean showHitbox = false;
-    static boolean hideTreesAndPalisegs = false;
+    static boolean hideTreesAndPalisegs = Utils.getprefb("hideTreesAndPalisegs",false);
 
     public final static Set<String> mineablesStone = new HashSet<String>(Arrays.asList(
             "stone","gneiss","basalt","dolomite","feldspar","flint",
@@ -1249,7 +1249,7 @@ public class ZeeConfig {
             ((Window.DefaultDeco)window.deco).cbtn.c.y
         );
         //autohide window is active throughout user session
-        if (listAutoHideWindows.contains(window.cap)){
+        if (listAutoHideWindowsActive.contains(window.cap)){
             window.isAutoHideOn = true;
             window.buttonAutoHide.change(ZeeWindow.ZeeButton.TEXT_AUTOHIDEWINDOW, new Color(0,200,0));
             window.autoHideToggleWinPos();
@@ -2218,6 +2218,7 @@ public class ZeeConfig {
             //ZeeManagerGobClick.windowGobHitboxAndVisibility();
             if(ev.isControlDown()) {
                 hideTreesAndPalisegs = !hideTreesAndPalisegs;
+                Utils.setprefb("hideTreesAndPalisegs",hideTreesAndPalisegs);
                 ZeeManagerGobClick.toggleModels();
                 return true;
             }

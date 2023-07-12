@@ -1642,13 +1642,7 @@ public class ZeeManagerItemClick extends ZeeThread{
         return free;
     }
 
-    static ArrayList<String> cheeseProgressList = initCheeseProgressList();
-    private static ArrayList<String> initCheeseProgressList() {
-        if (cheeseProgressList==null)
-            cheeseProgressList = new ArrayList<>();
-        cheeseProgressList.addAll(Utils.getprefsl("cheeseProgressList",new String[]{}));
-        return cheeseProgressList;
-    }
+    static List<String> cheeseProgressList = new ArrayList<>(Utils.getprefsl("cheeseProgressList",new String[]{}));
     public static void checkCheeseTray(Window window) {
         new ZeeThread(){
             public void run() {
