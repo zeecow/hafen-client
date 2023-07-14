@@ -1849,13 +1849,14 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Message
 				}
 
 				public void click() {
-					if(chat.targeth == 0) {
-						chat.sresize(chat.savedh);
-						setfocus(chat);
-					} else {
-						chat.sresize(0);
-					}
-					Utils.setprefb("chatvis", chat.targeth != 0);
+					ZeeConfig.println("//TODO uncomment click() \"hb-btn-chat\"");
+//					if(chat.targeth == 0) {
+//						chat.resizeh(chat.savedh);
+//						setfocus(chat);
+//					} else {
+//						chat.sresize(0);
+//					}
+//					Utils.setprefb("chatvis", chat.targeth != 0);
 				}
 
 				public void draw(GOut g) {
