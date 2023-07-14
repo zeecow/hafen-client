@@ -1165,7 +1165,7 @@ public class ZeeManagerGobClick extends ZeeThread{
         Gob horse = ZeeConfig.getClosestGobByNameContains("gfx/kritter/horse/");
         ZeeConfig.clickCoord(coordMc.floor(posres),1,UI.MOD_CTRL);
         if(waitPlayerDismounted(horse)) {
-            if (!ZeeConfig.isPlayerMountingHorse()) {
+            if (ZeeConfig.autoRunLogin && !ZeeConfig.isPlayerMountingHorse()) {
                 ZeeConfig.setPlayerSpeed(ZeeConfig.PLAYER_SPEED_2);
             }
             return true;
@@ -1178,11 +1178,8 @@ public class ZeeManagerGobClick extends ZeeThread{
         int playerSpeed = ZeeConfig.getPlayerSpeed();
         clickGobPetal(horse,"Giddyup!");
         waitPlayerMounted(horse);
-        if (ZeeConfig.isPlayerMountingHorse()) {
-            if (playerSpeed <= ZeeConfig.PLAYER_SPEED_1)
-                ZeeConfig.setPlayerSpeed(ZeeConfig.PLAYER_SPEED_1);//min auto horse speed
-            else
-                ZeeConfig.setPlayerSpeed(ZeeConfig.PLAYER_SPEED_2);//max auto horse speed
+        if (ZeeConfig.autoRunLogin && ZeeConfig.isPlayerMountingHorse()) {
+            ZeeConfig.setPlayerSpeed(ZeeConfig.PLAYER_SPEED_2);
         }
     }
 
