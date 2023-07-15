@@ -2122,7 +2122,7 @@ public class ZeeConfig {
     public static void invCounterUpdate(GItem i) {
         try {
             String itemName = i.getres().name;
-            Integer count = getMainInventory().countItemsByNameContains(itemName);
+            Integer count = getMainInventory().countItemsByNameEquals(itemName);
             invMainoptionsWdg.updateLabelCount(itemName,count);
         }catch (Resource.Loading e){
         }

@@ -242,6 +242,24 @@ public class Inventory extends Widget implements DTarget {
 		return count;
 	}
 
+	public int countItemsByNameEquals(String nameEquals){
+		int count = 0;
+		GItem gItem;
+		for (Widget wdg = child; wdg != null; wdg = wdg.next) {
+			if (wdg instanceof WItem) {
+				gItem = ((WItem) wdg).item;
+				String wdgname = gItem.res.get().name;
+				if (wdgname.contentEquals(nameEquals)) {
+					if (ZeeManagerItemClick.isStackPagina(gItem))
+						count += ZeeManagerItemClick.getItemInfoAmount(gItem.info());
+					else
+						count++;
+				}
+			}
+		}
+		return count;
+	}
+
 	// FIXME: collect() may throw NullException if filter finds a null?
 	public List<WItem> getWItemsByNameContains(String nameContains) {
 		return this.children(WItem.class)
