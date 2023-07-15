@@ -1191,27 +1191,58 @@ public class ZeeManagerStockpile extends ZeeThread{
         }.start();
     }
 
-    public static void pileInvBlocksAndChopMore(Gob existingPile) {
+    public static void quickPileBlocks(Gob existingPile) {
         new ZeeThread(){
             public void run() {
                 try {
                     Inventory inv = ZeeConfig.getMainInventory();
-                    // pickup inv block (if player was holding item a generic method would already been called)
-                    if (ZeeManagerItemClick.pickUpInvItem(inv, "/wblock-")) {
-                        // pile block
-                        ZeeManagerGobClick.itemActGob(existingPile,UI.MOD_SHIFT);
-                        //wait piling
-                        if(waitNotHoldingItem()){
-                            // try make block
-                            if (lastTreelogChopped!=null)
-                                ZeeManagerGobClick.clickGobPetal(lastTreelogChopped,"Chop into blocks");
+                    ZeeConfig.lastMapViewClickButton = 2;//prepare cancel click
+                    ZeeConfig.addPlayerText("pilan");
+                    do {
+                        ZeeConfig.stopMovingEscKey();
+                        // pickup inv block (if player was holding item other method would be called)
+                        if (ZeeManagerItemClick.pickUpInvItem(inv, "/wblock-")) {
+                            // pile block
+                            ZeeManagerGobClick.itemActGob(existingPile, UI.MOD_SHIFT);
+                            //wait piling
+                            if (waitNotHoldingItem()) {
+                                if (lastTreelogChopped == null ) {
+                                    println("pilan blocks > treelog null");
+                                    break;
+                                }
+                                sleep(500);//wait transfer
+                                // pile full
+                                if(inv.countItemsByNameContains("/wblock-") > 0){
+                                    println("pilan blocks > pile full");
+                                    break;
+                                }
+                                // chop blocks
+                                if (!ZeeManagerGobClick.clickGobPetal(lastTreelogChopped, "Chop into blocks")) {
+                                    println("pilan blocks > done");
+                                    break;
+                                }
+                                // wait inventory full with 2 freeslots
+                                if(waitInvFull(inv,4)){
+                                    // pile holding item
+                                    if (ZeeConfig.isPlayerHoldingItem()){
+                                        ZeeManagerGobClick.itemActGob(existingPile,0);
+                                        waitNotHoldingItem();
+                                    }
+                                }
+                            }
+                            else{
+                                println("pilan blocks > pile full, player didnt move");
+                                break;
+                            }
+                        } else {
+                            println("pilan blocks > couldnt get block from inv");
+                            break;
                         }
-                    } else {
-                        println("pile all block > couldnt get block from inv");
-                    }
+                    }while(!ZeeConfig.isTaskCanceledByGroundClick());
                 }catch (Exception e){
                     e.printStackTrace();
                 }
+                ZeeConfig.removePlayerText();
             }
         }.start();
     }

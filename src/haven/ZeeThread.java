@@ -686,6 +686,26 @@ public class ZeeThread  extends Thread{
         }
         return inv.getNumberOfFreeSlots() == 0;
     }
+    public static boolean waitInvFull(Inventory inv, int freeSlots) {
+        //println("wait inv full");
+        int timer = (int) TIMEOUT_MS;
+        try {
+            lastInvFreeSlots = invFreeSlots = inv.getNumberOfFreeSlots();
+            while( timer > 0  &&  (invFreeSlots = inv.getNumberOfFreeSlots()) > freeSlots ) {
+                if(lastInvFreeSlots != invFreeSlots) {
+                    // reset timer if free slots changed
+                    timer = (int) TIMEOUT_MS;
+                    lastInvFreeSlots = invFreeSlots;
+                }else {
+                    timer -= SLEEP_MS;
+                }
+                Thread.sleep(SLEEP_MS);
+            }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        return inv.getNumberOfFreeSlots() <= freeSlots;
+    }
 
     public static boolean waitInvFreeSlotsIdle() {
         return waitInvFreeSlotsIdleSec(2);//TODO use 3 if necessary
