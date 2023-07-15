@@ -76,7 +76,7 @@ public class ZeeManagerGobClick extends ZeeThread{
             }
             // pile inv boards and try sawing more boards
             else if (gobName.endsWith("/stockpile-board") && ZeeConfig.playerHasAnyPose(ZeeConfig.POSE_PLAYER_SAW)) {
-                ZeeManagerStockpile.pileInvBoardsSawMore(gob);
+                ZeeManagerStockpile.quickPileBoards(gob);
             }
             // pile inv blocks and try choppin more blocks
             else if (gobName.endsWith("/stockpile-wblock") && ZeeConfig.playerHasAnyPose(ZeeConfig.POSE_PLAYER_CHOPBLOCK)) {
