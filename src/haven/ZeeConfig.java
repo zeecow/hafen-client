@@ -3191,7 +3191,7 @@ public class ZeeConfig {
                         if (g.isGobWaitingSettings) {
                             // apply gob settings
                             countRemovals++;
-                            consumeGobSettings(g);
+                            applyGobSettings(g);
                         } else {
                             // requeue gob up to a few times
                             if (g.requeued < ZeeConfig.gobMaxRequeues) { //TODO test other numbers
@@ -3222,7 +3222,7 @@ public class ZeeConfig {
     }
     static long countRemovals=0, countDrops=0, maxReqs=0;//GLPanel.drawstats()
     static String maxReqstr="";
-    static void consumeGobSettings(Gob ob){
+    static void applyGobSettings(Gob ob){
 
         try {
 
