@@ -86,9 +86,17 @@ public class Speedget extends Widget {
 	    cur = (Integer)args[0];
 	else if(msg == "max")
 	    max = (Integer)args[0];
+	// if speed was auto-reduced from 2, set it back
+	if (ZeeConfig.autoRunLogin && !wasSpeedSelectedByUser && msg.contentEquals("cur") && cur<=2) {
+		//ZeeConfig.println("reset speed");
+		wdgmsg(this,"set", 2);
+	}
+	wasSpeedSelectedByUser = false;
     }
 
+	static boolean wasSpeedSelectedByUser = false;
     public void set(int s) {
+	wasSpeedSelectedByUser = true;
 	wdgmsg("set", s);
     }
 

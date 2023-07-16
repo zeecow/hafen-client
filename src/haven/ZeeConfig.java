@@ -129,10 +129,10 @@ public class ZeeConfig {
     static final int MINIMAP_DRAG_BUTTON = 3;
     static final int DEF_GOB_MAX_REQUEUE = 500000;
 
-    static final int PLAYER_SPEED_0 = 0;
-    static final int PLAYER_SPEED_1 = 1;
-    static final int PLAYER_SPEED_2 = 2;
-    static final int PLAYER_SPEED_3 = 3;
+    static final int PLAYER_SPEED_CRAWL = 0;
+    static final int PLAYER_SPEED_WALK = 1;
+    static final int PLAYER_SPEED_RUN = 2;
+    static final int PLAYER_SPEED_SPRINT = 3;
 
     static MixColor MIXCOLOR_RED = new MixColor(255,0,0,200);
     static MixColor MIXCOLOR_ORANGE = new MixColor(255,128,0,200);
@@ -1902,7 +1902,7 @@ public class ZeeConfig {
                     // auto run speed
                     sleep(1000);
                     if(autoRunLogin)
-                        setPlayerSpeed(PLAYER_SPEED_2);
+                        setPlayerSpeed(PLAYER_SPEED_RUN);
 
                     // discover autostack checkbox value (2/2)
                     toggleAutostack();//reset to original value

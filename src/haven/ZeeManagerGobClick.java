@@ -1165,8 +1165,8 @@ public class ZeeManagerGobClick extends ZeeThread{
         Gob horse = ZeeConfig.getClosestGobByNameContains("gfx/kritter/horse/");
         ZeeConfig.clickCoord(coordMc.floor(posres),1,UI.MOD_CTRL);
         if(waitPlayerDismounted(horse)) {
-            if (ZeeConfig.autoRunLogin && !ZeeConfig.isPlayerMountingHorse()) {
-                ZeeConfig.setPlayerSpeed(ZeeConfig.PLAYER_SPEED_2);
+            if (ZeeConfig.autoRunLogin && !ZeeConfig.isPlayerMountingHorse() && ZeeConfig.getPlayerSpeed() != ZeeConfig.PLAYER_SPEED_RUN) {
+                ZeeConfig.setPlayerSpeed(ZeeConfig.PLAYER_SPEED_RUN);
             }
             return true;
         }else{
@@ -1178,8 +1178,8 @@ public class ZeeManagerGobClick extends ZeeThread{
         int playerSpeed = ZeeConfig.getPlayerSpeed();
         clickGobPetal(horse,"Giddyup!");
         waitPlayerMounted(horse);
-        if (ZeeConfig.autoRunLogin && ZeeConfig.isPlayerMountingHorse()) {
-            ZeeConfig.setPlayerSpeed(ZeeConfig.PLAYER_SPEED_2);
+        if (ZeeConfig.autoRunLogin && ZeeConfig.isPlayerMountingHorse() && ZeeConfig.getPlayerSpeed() != ZeeConfig.PLAYER_SPEED_RUN) {
+            ZeeConfig.setPlayerSpeed(ZeeConfig.PLAYER_SPEED_RUN);
         }
     }
 
@@ -1607,7 +1607,7 @@ public class ZeeManagerGobClick extends ZeeThread{
                 ZeeConfig.cursorChange(ZeeConfig.ACT_AGGRO);
                 gobClick(gob, 1);
                 ZeeConfig.clickRemoveCursor();
-                ZeeConfig.setPlayerSpeed(ZeeConfig.PLAYER_SPEED_3);
+                ZeeConfig.setPlayerSpeed(ZeeConfig.PLAYER_SPEED_SPRINT);
                 ZeeSynth.textToSpeakLinuxFestival("get");
             }
         }catch (Exception e){
