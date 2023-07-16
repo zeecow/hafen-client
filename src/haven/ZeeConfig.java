@@ -1021,7 +1021,7 @@ public class ZeeConfig {
 
         windowInvMain.pack();
 
-        checkFishMoonXpAlert();
+        initCalendar();
 
         // fix switching chars with different inv sizes?
         inventoryResized(invSlots);
@@ -1029,13 +1029,27 @@ public class ZeeConfig {
 
     // Fish Moon XP alert
     private static boolean fishMoonAlertDone = false;
-    private static void checkFishMoonXpAlert() {
+    private static void initCalendar() {
+        Astronomy a = gameUI.ui.sess.glob.ast;
+        int moonPhaseIndex = (int) Math.round(a.mp * (double) Cal.moon.f.length) % Cal.moon.f.length;
+        //fish moon xp alert
         if (fishMoonXpAlert && !fishMoonAlertDone) {
-            Astronomy a = gameUI.ui.sess.glob.ast;
-            int moonPhaseIndex = (int) Math.round(a.mp * (double) Cal.moon.f.length) % Cal.moon.f.length;
             if (a.moonPhases[moonPhaseIndex].toLowerCase().contains("full moon")) {
                 fishMoonAlertDone = true;
+                Cal.fishMoonTex = CharWnd.attrf.render("Fish Moon XP").tex();
+                Cal.fishMoonCoord = Coord.z.add(10,0);
                 Cal.fishMoonShowText = true;
+            }
+        }
+        // winter countdown
+        if ( a.season().name().contains("Autumn")){
+            //int nextIndex = (a.season().ordinal()+1) % Astronomy.Season.values().length;
+            //Astronomy.Season nextSeason = Astronomy.Season.values()[nextIndex];
+            int days = a.season().length - (a.scday + 1);
+            if (days <= 5) {
+                Cal.winterCountdownTex = CharWnd.attrf.render(days + "d to Winter").tex();
+                Cal.winterCountdownCoord = Coord.z.add(5, 56);
+                Cal.winterCountdownShow = true;
             }
         }
     }

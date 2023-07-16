@@ -49,9 +49,9 @@ public class Cal extends Widget {
 	super(bg.sz());
     }
 
-	static final Tex fishMoonTex = CharWnd.attrf.render("Fish Moon XP").tex();
-	static boolean fishMoonShowText = false;
-	static Coord fishMoonCoord = Coord.z.add(10,55);
+	static Tex fishMoonTex, winterCountdownTex;
+	static boolean fishMoonShowText=false, winterCountdownShow=false;
+	static Coord fishMoonCoord, winterCountdownCoord;
     public void draw(GOut g) {
 	Astronomy a = ui.sess.glob.ast;
 	long now = System.currentTimeMillis();
@@ -69,6 +69,8 @@ public class Cal extends Widget {
 	g.image(bg, Coord.z);
 	if (fishMoonShowText)
 		g.image(fishMoonTex,fishMoonCoord);
+	if (winterCountdownShow)
+		g.image(winterCountdownTex,winterCountdownCoord);
     }
 
     public boolean checkhit(Coord c) {
