@@ -13,7 +13,7 @@ Controls
 - camera drag also works by holding left-click (move player + drag camera)   
 - shift+c alternates cams ortho/free
 - shift+h toggle hitboxes
-- ctrl+h toggle trees/palisegs
+- ctrl+h toggle trees/palisegs/crops
 - mousewheel scroll transfer items directly (no shift required)
 - Ctrl+click to confirm actions (Empty, Swill, Slaughter, etc)
 - Ctrl+Rclick confirm remove shortcut

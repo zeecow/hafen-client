@@ -265,7 +265,7 @@ public class ZeeConfig {
     public static boolean showOverlayVclaim = Utils.getprefb("showOverlayVclaim",true);
     public static boolean showOverlayProv = Utils.getprefb("showOverlayProv",true);
     static boolean showHitbox = false;
-    static boolean hideTreesAndPalisegs = Utils.getprefb("hideTreesAndPalisegs",false);
+    static boolean hideTreesPalisCrops = Utils.getprefb("hideTreesAndPalisegs",false);
 
     public final static Set<String> mineablesStone = new HashSet<String>(Arrays.asList(
             "stone","gneiss","basalt","dolomite","feldspar","flint",
@@ -2231,8 +2231,8 @@ public class ZeeConfig {
         else if (ev.getKeyCode()==KeyEvent.VK_H){
             //ZeeManagerGobClick.windowGobHitboxAndVisibility();
             if(ev.isControlDown()) {
-                hideTreesAndPalisegs = !hideTreesAndPalisegs;
-                Utils.setprefb("hideTreesAndPalisegs",hideTreesAndPalisegs);
+                hideTreesPalisCrops = !hideTreesPalisCrops;
+                Utils.setprefb("hideTreesAndPalisegs", hideTreesPalisCrops);
                 ZeeManagerGobClick.toggleModels();
                 return true;
             }

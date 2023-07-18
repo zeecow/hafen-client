@@ -3061,7 +3061,7 @@ public class ZeeManagerGobClick extends ZeeThread{
     }
 
     static void toggleModels() {
-        if (ZeeConfig.hideTreesAndPalisegs)
+        if (ZeeConfig.hideTreesPalisCrops)
             ZeeConfig.msgLow("hide trees/palisegs");
         else
             ZeeConfig.msgLow("show trees/palisegs");
