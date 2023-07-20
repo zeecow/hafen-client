@@ -3061,13 +3061,21 @@ public class ZeeManagerGobClick extends ZeeThread{
     }
 
     static void toggleModels() {
+
+        //ZeeConfig.hideTreesPalisCrops = !ZeeConfig.hideTreesPalisCrops;
+
         if (ZeeConfig.hideTreesPalisCrops)
-            ZeeConfig.msgLow("hide trees/palisegs");
+            ZeeConfig.msgLow("hide trees/pali/crops");
         else
-            ZeeConfig.msgLow("show trees/palisegs");
+            ZeeConfig.msgLow("show trees/pali/crops");
 
+        Utils.setprefb("hideTreesPalisCrops", ZeeConfig.hideTreesPalisCrops);
+
+        ZeeQuickOptionsWindow.updateCheckboxNoBump("hideTreesPalisCrops",ZeeConfig.hideTreesPalisCrops);
+
+        // toggle gob models
         List<Gob> gobs = ZeeConfig.getAllGobs();
-
+        //ZeeConfig.println("toggling "+gobs.size()+" models = "+ZeeConfig.hideTreesPalisCrops);
         for (Gob gob : gobs) {
             gob.toggleModel();
         }

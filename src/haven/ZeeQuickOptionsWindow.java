@@ -67,11 +67,11 @@ public class ZeeQuickOptionsWindow {
                     }
 
                     public void set(boolean val) {
+                        a = val;
                         //ZeeConfig.println(" set > configName: "+getConfigByLabel(lbl.text));
                         String configName = getConfigByLabel(lbl.text);
                         ZeeOptionJCheckBox.setZeeConfigBoolean(val, configName);
                         bumpCheckBox(configName);
-                        a = val;
                     }
                 };
                 newcb.settip("hold shift = no bump");

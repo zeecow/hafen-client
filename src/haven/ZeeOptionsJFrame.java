@@ -298,7 +298,7 @@ public class ZeeOptionsJFrame extends JFrame {
 
         panelTabMisc.add(new ZeeOptionJCheckBox( "Fish Moon Xp alert", "fishMoonXpAlert"),c);
 
-        panelTabMisc.add(new ZeeOptionJCheckBox( "Hide crops (ctrl+h)", "hideCrops"),c);
+        panelTabMisc.add(new ZeeOptionJCheckBox( "Hide treePaliCrop(ctrl+h)", "hideTreesPalisCrops"),c);
 
         panelTabMisc.add(new ZeeOptionJCheckBox( "Hide some animations", "hideFxAnimations"),c);
 

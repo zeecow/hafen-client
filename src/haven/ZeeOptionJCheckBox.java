@@ -31,13 +31,27 @@ public class ZeeOptionJCheckBox extends JCheckBox {
     }
 
     static void setZeeConfigBoolean(boolean val, String optName) {
+
+        // save config
         try {
             ZeeConfig.class.getDeclaredField(optName).setBoolean(ZeeConfig.class,val);
             Utils.setprefb(optName, val);
+            //ZeeConfig.println("setZeeConfigBoolean() > " + optName + " > " + getZeeConfigBoolean(optName));
         } catch (Exception e){
             e.printStackTrace();
         }
-        //ZeeConfig.println("setZeeConfigBoolean() > " + optName + " > " + getZeeConfigBoolean(optName));
+
+        // check for runnable
+        try {
+            Runnable r = (Runnable) ZeeConfig.class.getDeclaredField(optName+"Runnable").get(ZeeConfig.class);
+            r.run();
+        } catch (NoSuchFieldException e){
+            // no runnable
+        } catch (NullPointerException e){
+            // no runnable
+        } catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     void setZeeConfigBoolean(boolean val) throws Exception {

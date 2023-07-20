@@ -214,7 +214,6 @@ public class ZeeConfig {
     static int gridColorInt = Utils.getprefi("gridColorInt",ZeeConfig.colorToInt(DEF_GRID_COLOR));
     public static boolean hideFxSmoke = Utils.getprefb("hideFxSmoke", true);
     public static boolean hideFxAnimations = Utils.getprefb("hideFxAnimations", true);
-    static boolean hideCrops = Utils.getprefb("hideCrops", false);
     static boolean hideTileTransitions = Utils.getprefb("hideTileTransitions", true);
     static boolean highlightCropsReady = Utils.getprefb("highlightCropsReady", true);
     static boolean isThinClient = false;
@@ -265,7 +264,8 @@ public class ZeeConfig {
     public static boolean showOverlayVclaim = Utils.getprefb("showOverlayVclaim",true);
     public static boolean showOverlayProv = Utils.getprefb("showOverlayProv",true);
     static boolean showHitbox = false;
-    static boolean hideTreesPalisCrops = Utils.getprefb("hideTreesAndPalisegs",false);
+    static boolean hideTreesPalisCrops = Utils.getprefb("hideTreesPalisCrops",false);
+    static Runnable hideTreesPalisCropsRunnable = () -> ZeeManagerGobClick.toggleModels();
 
     public final static Set<String> mineablesStone = new HashSet<String>(Arrays.asList(
             "stone","gneiss","basalt","dolomite","feldspar","flint",
@@ -2229,10 +2229,8 @@ public class ZeeConfig {
         }
         // toggle hitbox, hidden gobs
         else if (ev.getKeyCode()==KeyEvent.VK_H){
-            //ZeeManagerGobClick.windowGobHitboxAndVisibility();
             if(ev.isControlDown()) {
-                hideTreesPalisCrops = !hideTreesPalisCrops;
-                Utils.setprefb("hideTreesAndPalisegs", hideTreesPalisCrops);
+                ZeeConfig.hideTreesPalisCrops = !ZeeConfig.hideTreesPalisCrops;
                 ZeeManagerGobClick.toggleModels();
                 return true;
             }
@@ -2243,16 +2241,6 @@ public class ZeeConfig {
             }
         }
         return false;
-    }
-
-    private static void toggleHideCrops() {
-        hideCrops = !hideCrops;
-        Utils.setprefb("hideCrops",hideCrops);
-        ZeeQuickOptionsWindow.updateCheckboxNoBump("hideCrops",hideCrops);
-        if (hideCrops)
-            msgLow("hide crops");
-        else
-            msgLow("show crops");
     }
 
     private static boolean createdBasketWindow=false, createdCreelWindow=false;
