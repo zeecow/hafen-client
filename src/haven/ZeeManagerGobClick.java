@@ -1941,14 +1941,15 @@ public class ZeeManagerGobClick extends ZeeThread{
                 return;
             }
             ZeeManagerItemClick.equipAxeChopTree();
-            sleep(500);//fix lag problem
             Coord2d treeCoord;
             while (tree!=null && !ZeeConfig.isTaskCanceledByGroundClick()) {
+                sleep(500);//safe wait
                 //start chopping
                 if(!clickGobPetal(tree, "Chop")){
                     println("remtree > couldnt click tree petal \"Chop\"");
                     break;
                 }
+                sleep(500);//safe wait
                 if(!waitPlayerPose(ZeeConfig.POSE_PLAYER_CHOPTREE)){
                     println("remtree > failed waiting pose choptree");
                     break;
