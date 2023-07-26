@@ -673,9 +673,11 @@ public class MiniMap extends Widget {
 
     public void drawparts(GOut g){
 	drawmap(g);
-	boolean playerSegment = (sessloc != null) && ((curloc == null) || (sessloc.seg == curloc.seg));
-	if(playerSegment && scale > 1)
-		drawview(g);
+	if (scale > 1) {
+		boolean playerSegment = (sessloc != null) && ((curloc == null) || (sessloc.seg == curloc.seg));
+		if (playerSegment)
+			drawview(g);
+	}
 	drawmarkers(g);
 	if( (ZeeConfig.showIconsZoomOut && dlvl<=2) || dlvl == 0)
 	    drawicons(g);
