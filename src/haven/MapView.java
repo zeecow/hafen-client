@@ -2575,6 +2575,13 @@ public boolean mousedown(Coord c, int button) {
 									sb.append("\n   "+ol);
 								}
 							}
+							//gob attrs
+							if (!gob.attr.isEmpty()) {
+								sb.append("\nAttrs:");
+								for (GAttrib a : gob.attr.values()) {
+									sb.append("\n   "+a.getClass().getSimpleName());
+								}
+							}
 							ttip = sb.toString();
 						}
 					} else {
