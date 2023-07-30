@@ -30,6 +30,7 @@ public class ZeeManagerFarmer extends ZeeThread{
 
     public ZeeManagerFarmer(GItem g, String nameSeed) {
         busy = true;
+        ZeeConfig.farmerMode = true;
         gItem = g;
         gItemSeedBasename = nameSeed;// "seed-turnip"
         if(!nameSeed.equals(lastItemSeedBasename)) {
@@ -49,7 +50,6 @@ public class ZeeManagerFarmer extends ZeeThread{
     public static void resetInitialState() {
         println("seedFarmer exit > resetInitialState");
         try {
-            ZeeConfig.farmerMode = false;
             busy = false;
             isHarvestDone = true;
             isPlantingDone = true;
@@ -656,7 +656,6 @@ public class ZeeManagerFarmer extends ZeeThread{
     public static void showWindow(Gob gobCrop) {
         Widget wdg;
         ZeeManagerFarmer.farmerGobCrop = gobCrop;
-        ZeeConfig.farmerMode = true;
 
         if(windowManager ==null){
 

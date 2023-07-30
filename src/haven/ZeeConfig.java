@@ -2478,6 +2478,7 @@ public class ZeeConfig {
         ZeeManagerMiner.tilesMonitorCleanup();
         ZeeHistWdg.clearHistory();
 
+        ZeeConfig.farmerMode = false;
         if(ZeeManagerFarmer.windowManager!=null){
             try {
                 ZeeManagerFarmer.windowManager.reqdestroy();
