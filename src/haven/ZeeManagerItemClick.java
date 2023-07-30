@@ -1612,7 +1612,7 @@ public class ZeeManagerItemClick extends ZeeThread{
             for (WItem item : mainInv.children(WItem.class)) {
                 //println("    "+item.item.getres().basename()+" >  c"+item.c.div(33) +"  sz"+ item.sz.div(33) +"  invsz"+ mainInv.isz);
                 if (item.c.div(33).y + item.sz.div(33).y == mainInv.isz.y || item.c.div(33).x + item.sz.div(33).x == mainInv.isz.x){
-                    println("last col/row occupied, can't unnequip traveller sack");
+                    //println("last col/row occupied, can't unnequip traveller sack");
                     return true;
                 }
             }

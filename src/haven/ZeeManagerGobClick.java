@@ -763,7 +763,7 @@ public class ZeeManagerGobClick extends ZeeThread{
         //save plant gob
         plantGobForLabelingQl = ZeeConfig.lastMapViewClickGob;
 
-        new Thread(){
+        new ZeeThread(){
             public void run() {
                 try{
                     ZeeConfig.addPlayerText("inspect ql");
@@ -771,10 +771,16 @@ public class ZeeManagerGobClick extends ZeeThread{
                     //wait approaching plant
                     if(waitPlayerIdlePose()) {
                         //wait inventory harvested item
-                        long timeout = 1000;//1sec
-                        while(timeout > 0 && ZeeConfig.lastInvItemMs < t1){
-                            sleep(100);
-                            timeout -= 100;
+                        ZeeConfig.lastMapViewClickButton = 2; // prepare cancel click
+                        while(ZeeConfig.lastInvItemMs < t1 && !ZeeConfig.isTaskCanceledByGroundClick()){
+                            sleep(PING_MS);
+                        }
+                        //timeout?
+                        if (ZeeConfig.isTaskCanceledByGroundClick()){
+                            println("label plant canceled by click");
+                            clickedPlantGobForLabelingQl = false;
+                            ZeeConfig.removePlayerText();
+                            return;
                         }
                         // scythe not allowed
                         if (ZeeManagerItemClick.isItemEquipped("/scythe")){
@@ -861,11 +867,11 @@ public class ZeeManagerGobClick extends ZeeThread{
         clickedPlantGobForLabelingQl = gobName.endsWith("plants/wine") || gobName.endsWith("plants/hops") || gobName.endsWith("plants/pepper");
         if(clickedPlantGobForLabelingQl) {
             if (ZeeManagerItemClick.isItemInHandSlot("/scythe")) {
-                println("cancel labeling plant > scythe already equipped");
+                //println("cancel labeling plant > scythe already equipped");
                 clickedPlantGobForLabelingQl = false;
             }
             else if(ZeeManagerItemClick.isTwoHandedItemEquippable("/scythe")){
-                println("cancel labeling plant > scythe equippable");
+                //println("cancel labeling plant > scythe equippable");
                 clickedPlantGobForLabelingQl = false;
             }
         }
