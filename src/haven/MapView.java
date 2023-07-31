@@ -526,11 +526,11 @@ public class MapView extends PView implements DTarget, Console.Directory {
 //		chfield(tfield + 50);
 //		return(false);
 //	    } else
-		if(kb_camreset.key().match(ev)) {
-		tangl = angl + (float)Utils.cangle(-(float)Math.PI * 0.25f - angl);
-		chfield((float)(100 * Math.sqrt(2)));
-		return(true);
-	    }
+//		if(kb_camreset.key().match(ev)) {
+//		tangl = angl + (float)Utils.cangle(-(float)Math.PI * 0.25f - angl);
+//		chfield((float)(100 * Math.sqrt(2)));
+//		return(true);
+//	    }
 	    return(false);
 	}
     }
