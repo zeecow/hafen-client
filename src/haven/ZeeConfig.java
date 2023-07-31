@@ -795,23 +795,18 @@ public class ZeeConfig {
         long gobId = gob.id;
         String path = "";
 
-        if(isPlayer(gob)  &&  gameUI!=null && gameUI.map.player()!=null) {
-            // other players
-            if (gameUI.map.player().id != gobId) {
-                if (autoHearthOnStranger && !playerHasAnyPose(POSE_PLAYER_TRAVELHOMEPOINT, POSE_PLAYER_TRAVELHOMESHRUG)) {
-                    autoHearth();
-                }
-                if (alertOnPlayers && !ZeeManagerGobClick.isGobDeadOrKO(gob)) {
-                    String audio = mapCategoryAudio.get(CATEG_PVPANDSIEGE);
-                    if (audio != null && !audio.isEmpty())
-                        playAudioGobId(audio, gobId);
-                    else
-                        gameUI.error("player spotted");
-                }
+        // other players
+        if (gob.isOtherPlayer) {
+            if (autoHearthOnStranger && !playerHasAnyPose(POSE_PLAYER_TRAVELHOMEPOINT, POSE_PLAYER_TRAVELHOMESHRUG)) {
+                autoHearth();
             }
-            // user player
-            //else gob.addol(new ZeeGobBox(gob,Coord3f.of(12f,12f,0.5f),new Color(192, 0, 0, 128)));
-
+            if (alertOnPlayers && !ZeeManagerGobClick.isGobDeadOrKO(gob)) {
+                String audio = mapCategoryAudio.get(CATEG_PVPANDSIEGE);
+                if (audio != null && !audio.isEmpty())
+                    playAudioGobId(audio, gobId);
+                else
+                    gameUI.error("player spotted");
+            }
         }
         //if single gob alert is saved, play alert
         else if( (path = mapGobAudio.get(gobName)) != null){
@@ -2157,7 +2152,7 @@ public class ZeeConfig {
         }else if(ev.getKeyCode()==KeyEvent.VK_LEFT) {
             return ZeeManagerGobClick.brightnessDown();
         }else if(ev.getKeyCode()==KeyEvent.VK_HOME) {
-            return ZeeManagerGobClick.brightnessReset();
+            return ZeeManagerGobClick.brightnessDefault();
         }
         // fast zoom
         else if (ev.getKeyCode()==KeyEvent.VK_PAGE_DOWN) {
@@ -3233,6 +3228,20 @@ public class ZeeConfig {
                 maxReqstr = ob.getres().name;
             }
 
+            // player gobs
+            if(isPlayer(ob) && gameUI!=null && gameUI.map.player()!=null) {
+                // main player
+                if (gameUI.map.player().id == ob.id) {
+                    ob.isMainPlayer = true;
+                    ZeeManagerGobClick.brightnessMapLoad();
+                    //println("main player");
+                }
+                // others
+                else {
+                    ob.isOtherPlayer = true;
+                    //println("other player");
+                }
+            }
 
             // ignore bat if using batcape
             if (!ob.getres().name.contentEquals("gfx/kritter/bat/bat") || !ZeeManagerItemClick.isItemEquipped("/batcape")) {

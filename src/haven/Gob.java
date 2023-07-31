@@ -53,6 +53,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 	public boolean pickupPriority = false;
 	public Drawable drawable;
 	public ZeeHidingGobSprite<ZeeHitbox> hitbox;
+	boolean isMainPlayer=false, isOtherPlayer=false;
 
 	public static class Overlay implements RenderTree.Node {
 	public final int id;

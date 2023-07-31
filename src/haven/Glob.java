@@ -48,7 +48,7 @@ public class Glob {
     public Color lightamb = null, lightdif = null, lightspc = null;
     public Color olightamb = null, olightdif = null, olightspc = null;
     public Color tlightamb = null, tlightdif = null, tlightspc = null;
-	public Color blightamb = null, blightdif = null, blightspc = null;
+	public Color blightamb = null;
     public double lightang = 0.0, lightelev = 0.0;
     public double olightang = 0.0, olightelev = 0.0;
     public double tlightang = 0.0, tlightelev = 0.0;
@@ -222,8 +222,8 @@ public class Glob {
 			lchange = 0;
 		    } else {
 			blightamb = lightamb = tlightamb;
-			blightdif = lightdif = tlightdif;
-			blightspc = lightspc = tlightspc;
+			lightdif = tlightdif;
+			lightspc = tlightspc;
 			lightang = tlightang;
 			lightelev = tlightelev;
 			lchange = -1;

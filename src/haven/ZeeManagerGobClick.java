@@ -2904,7 +2904,7 @@ public class ZeeManagerGobClick extends ZeeThread{
         wdg = win.add(new Button(60,"reset"){
             public void wdgmsg(String msg, Object... args) {
                 if (msg.contentEquals("activate")){
-                    brightnessReset();
+                    brightnessDefault();
                 }
             }
         }, 0,wdg.c.y+wdg.sz.y+7);
@@ -2913,20 +2913,18 @@ public class ZeeManagerGobClick extends ZeeThread{
         win.pack();
     }
 
-    static boolean brightnessReset() {
+    static boolean brightnessDefault() {
         Glob glob = ZeeConfig.gameUI.ui.sess.glob;
         glob.blightamb = glob.lightamb;
-        glob.blightdif = glob.lightdif;
-        glob.blightspc = glob.lightspc;
-        ZeeConfig.msgLow("amblight "+glob.blightamb.getRed());
+        Utils.setprefi("blightamb",1);
+        ZeeConfig.msgLow("amblight default "+glob.blightamb.getRed());
         return true;
     }
 
     static boolean brightnessDown() {
         Glob glob = ZeeConfig.gameUI.ui.sess.glob;
         glob.blightamb = colorStep(glob.blightamb,-15);
-        glob.blightdif = colorStep(glob.blightdif,-15);
-        glob.blightspc = colorStep(glob.blightspc,-15);
+        Utils.setprefi("blightamb",ZeeConfig.colorToInt(glob.blightamb));
         ZeeConfig.msgLow("amblight "+glob.blightamb.getRed());
         return true;
     }
@@ -2934,8 +2932,7 @@ public class ZeeManagerGobClick extends ZeeThread{
     static boolean brightnessUp() {
         Glob glob = ZeeConfig.gameUI.ui.sess.glob;
         glob.blightamb = colorStep(glob.blightamb,15);
-        glob.blightdif = colorStep(glob.blightdif,15);
-        glob.blightspc = colorStep(glob.blightspc,15);
+        Utils.setprefi("blightamb",ZeeConfig.colorToInt(glob.blightamb));
         ZeeConfig.msgLow("amblight "+glob.blightamb.getRed());
         return true;
     }
@@ -2954,6 +2951,15 @@ public class ZeeManagerGobClick extends ZeeThread{
             blue = Math.min((int) ((double) c.getBlue() + step), 255);
         }
         return new Color(red,green,blue,c.getAlpha());
+    }
+
+    static void brightnessMapLoad() {
+        Glob glob = ZeeConfig.gameUI.ui.sess.glob;
+
+        int intColor = Utils.getprefi("blightamb",1);
+        if (intColor < 0) {
+            glob.blightamb = ZeeConfig.intToColor(intColor);
+        }
     }
 
     private static void windowTestCoords() {
