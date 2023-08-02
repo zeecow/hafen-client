@@ -26,14 +26,20 @@
 
 package haven;
 
+import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.BufferedInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.Serializable;
+import java.nio.file.FileSystemException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.List;
 import java.util.*;
-import java.util.function.*;
-import java.io.*;
-import java.nio.file.*;
-import java.awt.image.*;
-import java.awt.Color;
-import javax.swing.JFileChooser;
-import javax.swing.filechooser.*;
+import java.util.function.Consumer;
 
 public class GobIcon extends GAttrib {
     private static final int size = UI.scale(20);
@@ -431,7 +437,12 @@ public class GobIcon extends GAttrib {
 	    public boolean keydown(java.awt.event.KeyEvent ev) {
 		if(ev.getKeyCode() == java.awt.event.KeyEvent.VK_SPACE) {
 		    if(sel != null) {
-			sel.conf.show = !sel.conf.show;
+			// shift+space toggles notify checkbox
+			if (ev.isShiftDown())
+				sel.conf.notify = !sel.conf.notify;
+			// space toggles display checkbox
+			else
+				sel.conf.show = !sel.conf.show;
 			if(save != null)
 			    save.run();
 		    }

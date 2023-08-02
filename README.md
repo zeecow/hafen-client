@@ -23,6 +23,7 @@ Controls
 - pickup key "q", shift+q pickup all, ctrl+q pickup window
 - drink key '
 - auto-dismount horse when clicking workstations, houses, auto-mount too (rope required)
+- Icon Settings: shift+space toggles notify checkbox
 
 
 
