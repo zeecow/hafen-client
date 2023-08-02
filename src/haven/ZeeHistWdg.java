@@ -25,10 +25,6 @@ public class ZeeHistWdg extends Widget{
             }
             return;
         }
-        // unnecessary check?
-        if (args!=null && args.length!=2 && args.length!=3) {
-            return;
-        }
         //remove oldest button
         if(arrNames.size() == maxHist) {
             arrNames.remove(0);
