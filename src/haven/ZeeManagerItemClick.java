@@ -1681,6 +1681,8 @@ public class ZeeManagerItemClick extends ZeeThread{
                                 isNewCheese = false;
                                 // update existing cheese percentage
                                 arr[1] = newCheesePerc;
+                                // reset last seen date
+                                arr[3] = newCheeseDateMs;
                                 cheeseProgressList.set(i, String.join(",", arr));
                             }
                         }
@@ -1725,13 +1727,14 @@ public class ZeeManagerItemClick extends ZeeThread{
     }
     static String getDurationXUnitsAgo(long durationMs) {
         final List<Long> times = Arrays.asList(
-                TimeUnit.DAYS.toMillis(365),
-                TimeUnit.DAYS.toMillis(30),
-                TimeUnit.DAYS.toMillis(1),
-                TimeUnit.HOURS.toMillis(1),
-                TimeUnit.MINUTES.toMillis(1),
-                TimeUnit.SECONDS.toMillis(1) );
-        final List<String> timesString = Arrays.asList("yr","mt","day","hr","min","sec");
+                //TimeUnit.DAYS.toMillis(365),   // 1year ms
+                //TimeUnit.DAYS.toMillis(30),    // 1month ms
+                //TimeUnit.DAYS.toMillis(1),     // 1day ms
+                TimeUnit.HOURS.toMillis(1),    // 1hour ms
+                TimeUnit.MINUTES.toMillis(1),  // 1min ms
+                TimeUnit.SECONDS.toMillis(1) );// 1sec ms
+        //final List<String> timesString = Arrays.asList("yr","mt","day","hr","min","sec");
+        final List<String> timesString = Arrays.asList("hr","min","sec");
 
         StringBuffer res = new StringBuffer();
         for(int i=0;i< times.size(); i++) {
