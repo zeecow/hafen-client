@@ -62,29 +62,41 @@ public class ZeeHistWdg extends Widget{
     }
 
     public boolean mouseup(Coord c, int button) {
-        MenuGrid.PagButton btn = bhit(c);
-        if((button == 1 && btn!=null)) {
+        if (button != 1)
+            return false;
+        int ibtn = buttonIndex(c);
+        if (ibtn < 0)
+            return false;
+        MenuGrid.PagButton btn = arrBtns.get(ibtn);
+        if(btn != null) {
             // from PagButton.use()
             Object[] args = Utils.extend(new Object[0], btn.res.flayer(Resource.action).ad);
             args = Utils.extend(args, Integer.valueOf(btn.pag.scm.ui.modflags()));
             btn.pag.scm.wdgmsg("act", args);
-            return true;
-        }
-        return false;
-    }
-
-    private MenuGrid.PagButton bhit(Coord c) {
-        int ibtn = c.div(MenuGrid.bgsz.x+xpad).x;
-        MenuGrid.PagButton ret = null;
-        if (arrBtns.size() > ibtn) {
-            ret = arrBtns.get(ibtn);
             //bump used button if possible
             if (ibtn < arrNames.size()-1){
                 Collections.swap(arrNames,ibtn,ibtn+1);
                 Collections.swap(arrBtns,ibtn,ibtn+1);
             }
+            return true;
         }
-        //ZeeConfig.println(c + " " + buttonIndex + " " + ret);
-        return ret;
+        return false;
+    }
+
+    private int buttonIndex(Coord c) {
+        int ibtn = c.div(MenuGrid.bgsz.x+xpad).x;
+        if (arrBtns.size() > ibtn) {
+            return ibtn;
+        }
+        return -1;
+    }
+
+    @Override
+    public Object tooltip(Coord c, Widget prev) {
+        int ibtn = buttonIndex(c);
+        if (ibtn < 0)
+            return null;
+        MenuGrid.PagButton btn = arrBtns.get(ibtn);
+        return btn.name();
     }
 }
