@@ -1706,22 +1706,38 @@ public class ZeeManagerItemClick extends ZeeThread{
     static void cheeseTrayMakeWindow(Window window){
         if (!ZeeManagerItemClick.cheeseProgressList.isEmpty()){
             List<String> allCheese = ZeeManagerItemClick.cheeseProgressList;
-            List<String> removeList = new ArrayList<>();
+            int buttonsX = 0 , buttonsY = 0;
+            Label lbl;
             for (int i = 0; i < allCheese.size(); i++) {
                 // format "cheesename,progress,location,cheeseDateMs"
                 String[] arr = allCheese.get(i).split(",");
                 long timeElapsed = new Date().getTime() - Long.parseLong(arr[3]);
-                boolean rem = false;
-                if(timeElapsed >= (86400000*2)) { // remove 2 days old cheese
-                    rem = true;
-                    removeList.add(allCheese.get(i));
-                }
                 int labelY = (i*13)-10;
-                window.add(new Label((rem?"[removed] ":"")+arr[0]+" , "+arr[1]+" , "+arr[2]+" , "+getDurationXUnitsAgo(timeElapsed)),100,labelY);
-            }
-            if (!removeList.isEmpty()) {
-                allCheese.removeAll(removeList);
-                Utils.setprefsl("cheeseProgressList", ZeeManagerItemClick.cheeseProgressList);
+                // add cheese label
+                lbl = window.add(new Label("["+i+"] "+arr[0]+" , "+arr[1]+" , "+arr[2]+" , "+getDurationXUnitsAgo(timeElapsed)),85,labelY);
+                if ( i == 0 ){
+                    buttonsX = lbl.c.x + lbl.sz.x;
+                    buttonsY = labelY;
+                }
+                // add remove button
+                window.add(new ZeeWindow.ZeeButton(15,""+i,"remove "+arr[0]){
+                    public void wdgmsg(String msg, Object... args) {
+                        if (msg.contentEquals("activate")){
+                            if (!ui.modctrl){
+                                ZeeConfig.msgError("Ctrl+click to confirm remove");
+                                return;
+                            }
+                            //remove cheese
+                            String cheeseNameToRemove = ((KeyboundTip)this.tooltip).base.replace("remove ","");
+                            if(ZeeManagerItemClick.cheeseProgressList.removeIf(s -> s.startsWith(cheeseNameToRemove))) {
+                                Utils.setprefsl("cheeseProgressList", ZeeManagerItemClick.cheeseProgressList);
+                                ZeeConfig.gameUI.menu.wdgmsg("act","craft","cheesetray",0);
+                            }else{
+                                println("couldnt remove cheese "+cheeseNameToRemove);
+                            }
+                        }
+                    }
+                }, buttonsX+7, buttonsY-5);
             }
         }
     }
