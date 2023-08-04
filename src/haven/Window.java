@@ -471,7 +471,7 @@ public class Window extends Widget implements DTarget {
 	boolean isAutoHideOn = false, isAutoHidden =false;
 	boolean hasOrganizeButton = false;
 	public ZeeWindow.ZeeButton buttonAutoHide = null;
-	boolean isHideAnimating = false;
+	boolean isAutoHideWaiting = false;
 	void autoHideToggleWinPos(){
 		Coord savedWinPos = ZeeConfig.mapWindowPos.get(this.cap);
 		if (savedWinPos==null){
@@ -489,39 +489,40 @@ public class Window extends Widget implements DTarget {
 			// use saved y
 			c = Coord.of(newX, savedWinPos.y);
 			isAutoHidden = false;
-			isHideAnimating = false;//cancel possible hide animation
+			isAutoHideWaiting = false;//cancel possible hide animation
 		}
-		// hide window horizontally (slowly)
+		// hide window horizontally
 		else {
 			// hide to the left
 			if (c.x <= halfScreen) {
-				int hiddenWidth = (int) (sz.x * 0.7);
+				int hiddenWidth = (int) (sz.x - 100);
+				if (hiddenWidth <= sz.x/2)
+					hiddenWidth = (int) (sz.x * 0.7);
 				int newX = - hiddenWidth;
-				// no animation
-				if (!ZeeConfig.hideWindowAnimation){
+				// no delay
+				if (!ZeeConfig.autoHideWindowDelay){
 					c.x = newX;
 				}
-				// hide animation
+				// delay
 				else {
-					isHideAnimating = true;
+					isAutoHideWaiting = true;
 					new Thread() {
 						public void run() {
 							long msStart = ZeeThread.now();
 							try {
-								int animDurationMs = ZeeConfig.msHideWindowAnimation;
-								int stepPixels = 5;
-								long sleepStep = animDurationMs / (hiddenWidth / stepPixels);
-								while (isHideAnimating && c.x > newX) {
-									c.x -= stepPixels;
-									sleep(sleepStep);
+								int timeout = ZeeConfig.autoHideWindowDelayMs;
+								int step = timeout/10;
+								while(isAutoHideWaiting && timeout > 0){
+									sleep(step);
+									timeout -= step;
 								}
 							} catch (Exception e) {
 								e.printStackTrace();
 							}
-							if (isHideAnimating)//if hide animation not canceled, set final pos
+							//set final pos
+							if (isAutoHideWaiting)
 								c.x = newX;
-							isHideAnimating = false;
-							//ZeeConfig.println("animation duration = " + (ZeeThread.now() - msStart));
+							isAutoHideWaiting = false;
 						}
 					}.start();
 				}

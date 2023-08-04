@@ -16,7 +16,7 @@ public class ZeeOptionsJFrame extends JFrame {
     public JTabbedPane tabbedPane, tabbedPaneGobs;
     public JPanel panelTabAuto, panelTabMisc, panelTabInterface, panelTabGobs, panelTabControls, panelTabMinimap, panelDetailsBottom, panelTabCateg, panelShapeIcons, panelShapeIconsSaveCancel;
     public JCheckBox cbSimpleWindowBorder, cbSimpleWindows, cbShapeIcons, cbDebugWdgMsg, cbDebugCodeRes, cbCattleRosterHeight;
-    public JTextField tfAutoHideWindows, tfMsHideWindowAnimation, tfConfirmPetal, tfBlockAudioMsgs, tfAutoClickMenu, tfAggroRadiusTiles, tfButchermode, tfGobName, tfGobSpeech, tfAudioPath, tfCategName, tfAudioPathCateg, tfGobMaxRequeues;
+    public JTextField tfAutoHideWindows, tfAutoHideWindowDelayMs, tfConfirmPetal, tfBlockAudioMsgs, tfAutoClickMenu, tfAggroRadiusTiles, tfButchermode, tfGobName, tfGobSpeech, tfAudioPath, tfCategName, tfAudioPathCateg, tfGobMaxRequeues;
     public JComboBox<String> cmbCattleRoster, cmbGobCategory, cmbMiniTreeSize, cmbRainLimitPerc, comboShapeIcons;
     public JList<String> listGobsTemp, listGobsSaved, listGobsCategories;
     public JButton btnRefresh, btnPrintState, btnResetGobs, btnAudioSave, btnAudioClear, btnAudioTest, btnRemGobFromCateg, btnGobColorAdd, btnCategoryColorAdd, btnGobColorRemove, btnCategoryColorRemove, btnResetCateg, btnAddCateg, btnRemoveCateg, btnResetWindowsPos, btnResetActionUses, btnSapeIconPreview, btnShapeIconSave, btnSapeIconDelete, btnSolidColorWindow, btnGridGolor;
@@ -557,7 +557,7 @@ public class ZeeOptionsJFrame extends JFrame {
         });
 
 
-        //auto hide windows
+        //auto hide windows list
         panelTabInterface.add(new ZeeOptionJCheckBox( "Show auto-hide window button", "autoHideWindows"),c);
         panelTabInterface.add(tfAutoHideWindows= new JTextField("",5), c);
         tfAutoHideWindows.setMaximumSize(new Dimension(Integer.MAX_VALUE, tfAutoHideWindows.getPreferredSize().height));
@@ -571,9 +571,9 @@ public class ZeeOptionsJFrame extends JFrame {
             }
         });
 
-        // auto hide animation
-        panelTabInterface.add(new ZeeOptionJCheckBox( "Auto-hide animation (ms)", "hideWindowAnimation"),c);
-        panelTabInterface.add(tfMsHideWindowAnimation = new JTextField("",5){
+        // auto hide delay ms
+        panelTabInterface.add(new ZeeOptionJCheckBox( "Auto-hide win delay (ms)", "autoHideWindowDelay"),c);
+        panelTabInterface.add(tfAutoHideWindowDelayMs = new JTextField("",5){
             @Override
             protected void processKeyEvent(KeyEvent e) {
                 if (Character.isDigit(e.getKeyChar()) ||
@@ -585,11 +585,11 @@ public class ZeeOptionsJFrame extends JFrame {
                 }
             }
         }, c);
-        tfMsHideWindowAnimation.setMaximumSize(new Dimension(Integer.MAX_VALUE, tfMsHideWindowAnimation.getPreferredSize().height));
-        tfMsHideWindowAnimation.setText(""+ZeeConfig.msHideWindowAnimation);
-        tfMsHideWindowAnimation.addActionListener(evt -> {
-            ZeeConfig.msHideWindowAnimation = Integer.parseInt(evt.getActionCommand().strip());
-            Utils.setprefi("msHideWindowAnimation", ZeeConfig.msHideWindowAnimation);
+        tfAutoHideWindowDelayMs.setMaximumSize(new Dimension(Integer.MAX_VALUE, tfAutoHideWindowDelayMs.getPreferredSize().height));
+        tfAutoHideWindowDelayMs.setText(""+ZeeConfig.autoHideWindowDelayMs);
+        tfAutoHideWindowDelayMs.addActionListener(evt -> {
+            ZeeConfig.autoHideWindowDelayMs = Integer.parseInt(evt.getActionCommand().strip());
+            Utils.setprefi("autoHideWindowDelayMs", ZeeConfig.autoHideWindowDelayMs);
         });
     }
 
