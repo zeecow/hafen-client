@@ -471,6 +471,7 @@ public class Window extends Widget implements DTarget {
 	boolean isAutoHideOn = false, isAutoHidden =false;
 	boolean hasOrganizeButton = false;
 	public ZeeWindow.ZeeButton buttonAutoHide = null;
+	boolean isHideAnimating = false;
 	void autoHideToggleWinPos(){
 		Coord savedWinPos = ZeeConfig.mapWindowPos.get(this.cap);
 		if (savedWinPos==null){
@@ -479,7 +480,7 @@ public class Window extends Widget implements DTarget {
 		}
 		int halfScreen = ZeeConfig.gameUI.sz.x/2;
 		// restore pos: glue window horizontally
-		if (this.isAutoHidden) {
+		if (isAutoHidden) {
 			int newX;
 			if (c.x <= halfScreen)
 				newX = -tlm.x;
@@ -487,15 +488,43 @@ public class Window extends Widget implements DTarget {
 				newX = ZeeConfig.gameUI.sz.x - sz.x + tlm.x;
 			// use saved y
 			c = Coord.of(newX, savedWinPos.y);
-			this.isAutoHidden = false;
+			isAutoHidden = false;
+			isHideAnimating = false;//cancel possible hide animation
 		}
-		// hide window horizontally
+		// hide window horizontally (slowly)
 		else {
 			// hide to the left
 			if (c.x <= halfScreen) {
 				int hiddenWidth = (int) (sz.x * 0.7);
 				int newX = - hiddenWidth;
-				c = Coord.of( newX, c.y);
+				// no animation
+				if (!ZeeConfig.hideWindowAnimation){
+					c.x = newX;
+				}
+				// hide animation
+				else {
+					isHideAnimating = true;
+					new Thread() {
+						public void run() {
+							long msStart = ZeeThread.now();
+							try {
+								int animDurationMs = ZeeConfig.msHideWindowAnimation;
+								int stepPixels = 5;
+								long sleepStep = animDurationMs / (hiddenWidth / stepPixels);
+								while (isHideAnimating && c.x > newX) {
+									c.x -= stepPixels;
+									sleep(sleepStep);
+								}
+							} catch (Exception e) {
+								e.printStackTrace();
+							}
+							if (isHideAnimating)//if hide animation not canceled, set final pos
+								c.x = newX;
+							isHideAnimating = false;
+							//ZeeConfig.println("animation duration = " + (ZeeThread.now() - msStart));
+						}
+					}.start();
+				}
 			}
 			// hide to the right
 			else{
@@ -503,9 +532,8 @@ public class Window extends Widget implements DTarget {
 				int newX = ZeeConfig.gameUI.sz.x - visibleWidth;
 				c = Coord.of( newX, c.y);
 			}
-			this.isAutoHidden = true;
+			isAutoHidden = true;
 		}
-
 	}
 
     public boolean keydown(java.awt.event.KeyEvent ev) {

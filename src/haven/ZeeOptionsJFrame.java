@@ -7,18 +7,16 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.util.*;
+import java.awt.event.*;
 import java.util.List;
+import java.util.*;
 
 public class ZeeOptionsJFrame extends JFrame {
     public GridBagConstraints c;
     public JTabbedPane tabbedPane, tabbedPaneGobs;
     public JPanel panelTabAuto, panelTabMisc, panelTabInterface, panelTabGobs, panelTabControls, panelTabMinimap, panelDetailsBottom, panelTabCateg, panelShapeIcons, panelShapeIconsSaveCancel;
     public JCheckBox cbSimpleWindowBorder, cbSimpleWindows, cbShapeIcons, cbDebugWdgMsg, cbDebugCodeRes, cbCattleRosterHeight;
-    public JTextField tfAutoHideWindows, tfConfirmPetal, tfBlockAudioMsgs, tfAutoClickMenu, tfAggroRadiusTiles, tfButchermode, tfGobName, tfGobSpeech, tfAudioPath, tfCategName, tfAudioPathCateg, tfGobMaxRequeues;
+    public JTextField tfAutoHideWindows, tfMsHideWindowAnimation, tfConfirmPetal, tfBlockAudioMsgs, tfAutoClickMenu, tfAggroRadiusTiles, tfButchermode, tfGobName, tfGobSpeech, tfAudioPath, tfCategName, tfAudioPathCateg, tfGobMaxRequeues;
     public JComboBox<String> cmbCattleRoster, cmbGobCategory, cmbMiniTreeSize, cmbRainLimitPerc, comboShapeIcons;
     public JList<String> listGobsTemp, listGobsSaved, listGobsCategories;
     public JButton btnRefresh, btnPrintState, btnResetGobs, btnAudioSave, btnAudioClear, btnAudioTest, btnRemGobFromCateg, btnGobColorAdd, btnCategoryColorAdd, btnGobColorRemove, btnCategoryColorRemove, btnResetCateg, btnAddCateg, btnRemoveCateg, btnResetWindowsPos, btnResetActionUses, btnSapeIconPreview, btnShapeIconSave, btnSapeIconDelete, btnSolidColorWindow, btnGridGolor;
@@ -571,6 +569,27 @@ public class ZeeOptionsJFrame extends JFrame {
                 ZeeConfig.listWindowsAddHideButton = str;
                 Utils.setpref("listWindowsAddHideButton",str.strip());
             }
+        });
+
+        // auto hide animation
+        panelTabInterface.add(new ZeeOptionJCheckBox( "Auto-hide animation (ms)", "hideWindowAnimation"),c);
+        panelTabInterface.add(tfMsHideWindowAnimation = new JTextField("",5){
+            @Override
+            protected void processKeyEvent(KeyEvent e) {
+                if (Character.isDigit(e.getKeyChar()) ||
+                        e.getKeyCode()==KeyEvent.VK_ENTER ||
+                        e.getKeyCode()==KeyEvent.VK_BACK_SPACE ||
+                        e.getKeyCode()==KeyEvent.VK_DELETE )
+                {
+                    super.processKeyEvent(e);
+                }
+            }
+        }, c);
+        tfMsHideWindowAnimation.setMaximumSize(new Dimension(Integer.MAX_VALUE, tfMsHideWindowAnimation.getPreferredSize().height));
+        tfMsHideWindowAnimation.setText(""+ZeeConfig.msHideWindowAnimation);
+        tfMsHideWindowAnimation.addActionListener(evt -> {
+            ZeeConfig.msHideWindowAnimation = Integer.parseInt(evt.getActionCommand().strip());
+            Utils.setprefi("msHideWindowAnimation", ZeeConfig.msHideWindowAnimation);
         });
     }
 

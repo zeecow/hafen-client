@@ -266,6 +266,8 @@ public class ZeeConfig {
     static boolean showHitbox = false;
     static boolean hideTreesPalisCrops = Utils.getprefb("hideTreesPalisCrops",false);
     static Runnable hideTreesPalisCropsRunnable = () -> ZeeManagerGobClick.toggleModels();
+    public static boolean hideWindowAnimation = Utils.getprefb("hideWindowAnimation",false);
+    public static int msHideWindowAnimation = Utils.getprefi("msHideWindowAnimation",1500);
 
     public final static Set<String> mineablesStone = new HashSet<String>(Arrays.asList(
             "stone","gneiss","basalt","dolomite","feldspar","flint",
