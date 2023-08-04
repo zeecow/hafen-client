@@ -8,7 +8,6 @@ import java.util.List;
 
 public class ZeeHoverMenu {
 
-    static final int START_MENU_MS = 700;
     static final long CHANGE_MENU_MS = 350;
 
     static MenuWidget rootMenu, latestMenu;
@@ -18,45 +17,8 @@ public class ZeeHoverMenu {
     private static int latestParentLevel;
     private static MenuLineWidget latestMenuLine;
 
-    public static void mouseMoved(GameUI.MenuButton menuButton, Coord c) {
-        if (menuButton.checkhit(c)) {
-            if (!isMouseOver) {
-                //println("root ismouseover true");
-                isMouseOver = true;
-                menuStart();
-            }
-        } else {
-            if (isMouseOver && !MenuWidget.hit) {
-                //println("root ismouseover false");
-                isMouseOver = false;
-            }
-        }
-    }
 
-    private static void menuStart() {
-        if (!isMouseOver || rootMenu !=null)
-            return;
-        new ZeeThread(){
-            public void run() {
-                int countMs = 0;
-                try {
-                    while (isMouseOver){
-                        if (countMs > ZeeHoverMenu.START_MENU_MS)
-                            break;
-                        sleep(50);
-                        countMs += 50;
-                    }
-                    if (isMouseOver)
-                        menuStart2();
-                }catch (Exception e){
-                    e.printStackTrace();
-                }
-            }
-        }.start();
-    }
-
-
-    private static void menuStart2() {
+    static void menuStart() {
         if (rootMenu == null){
             rootMenu = latestMenu = ZeeConfig.gameUI.add(new MenuWidget(null,null));
             positionLatestMenu(rootMenu);
@@ -70,7 +32,6 @@ public class ZeeHoverMenu {
         menu.c = Coord.of(x,y);
     }
 
-    static List<MenuGrid.PagButton> curbtns;
     static void menuGridChanged(Collection<MenuGrid.PagButton> curbtns) {
         if (ignoreNextGridMenu){
             ignoreNextGridMenu = false;
@@ -108,7 +69,7 @@ public class ZeeHoverMenu {
                 y = ZeeConfig.gameUI.sz.y;
             brc = Coord.of(mnw.parentMenu.c.x, y);
         }
-        println("add lvl"+mnw.level+" to "+brc);
+        //println("add lvl"+mnw.level+" to "+brc);
         setBottomRightCoord(brc,mnw);
     }
 
@@ -117,7 +78,8 @@ public class ZeeHoverMenu {
         if (exiting)
             return;
         exiting = true;
-        println("exit "+(msg!=null && !msg.isEmpty() ? " > "+msg : ""));
+        if (!msg.isBlank())
+            println("exit "+(msg!=null && !msg.isEmpty() ? " > "+msg : ""));
         mouseOutMs = -1;
         isMouseOver = false;
         latestMenuLine = null;
@@ -152,7 +114,6 @@ public class ZeeHoverMenu {
         MenuLineWidget lineSelected;
         List<MenuGrid.PagButton> btns;
         BufferedImage bg;
-        static boolean hit;
         static MenuGrid menuGrid;
         int level;
         MenuWidget parentMenu;
@@ -310,9 +271,9 @@ public class ZeeHoverMenu {
         return false;
     }
 
-    static void checkExitClickedSearch() {
+    static void exitIfMenuExists() {
         if (rootMenu!=null && !exiting) {
-            exitMenu("exit hovermenu button clicked");
+            exitMenu("");
         }
     }
 

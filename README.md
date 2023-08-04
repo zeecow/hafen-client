@@ -24,6 +24,7 @@ Controls
 - drink key '
 - auto-dismount horse when clicking workstations, houses, auto-mount too (rope required)
 - Icon Settings: shift+space toggles notify checkbox
+- right-click-hold Search Actions Button to start a hover menu 
 
 
 
@@ -155,7 +156,7 @@ Random Features
 - Feasting log window, count gains
 - Option "Fish Moon XP" show text over calendar
 - Scroll text entry fuel for kiln, oven, smelter
-- hover menu on search actions button
+- hover menu on search actions button (hold right-click)
 - auto-label gob Barrel/Cistern/Demijohn when it's window is opened
 - auto craft helper: cloth linen/hemp, rope, bug collection
   - use closest fibre pile until inv full

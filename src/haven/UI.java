@@ -461,6 +461,8 @@ public class UI {
 	root.mouseup(c, button);
 	if (button==2)
 		ZeeConfig.lastUiClickCoord = c;
+	else if (button==3)
+		ZeeHoverMenu.exitIfMenuExists();
     }
 	
     public void mousemove(MouseEvent ev, Coord c) {
