@@ -529,9 +529,37 @@ public class Window extends Widget implements DTarget {
 			}
 			// hide to the right
 			else{
-				int visibleWidth = (int) (sz.x * 0.3);
+				int visibleWidth = (int) (sz.x - 100);
+				if (visibleWidth >= sz.x/2)
+					visibleWidth = (int) (sz.x * 0.25);
 				int newX = ZeeConfig.gameUI.sz.x - visibleWidth;
-				c = Coord.of( newX, c.y);
+				// no delay
+				if (!ZeeConfig.autoHideWindowDelay){
+					c.x = newX;
+				}
+				// delay
+				else {
+					isAutoHideWaiting = true;
+					new Thread() {
+						public void run() {
+							long msStart = ZeeThread.now();
+							try {
+								int timeout = ZeeConfig.autoHideWindowDelayMs;
+								int step = timeout/10;
+								while(isAutoHideWaiting && timeout > 0){
+									sleep(step);
+									timeout -= step;
+								}
+							} catch (Exception e) {
+								e.printStackTrace();
+							}
+							//set final pos
+							if (isAutoHideWaiting)
+								c.x = newX;
+							isAutoHideWaiting = false;
+						}
+					}.start();
+				}
 			}
 			isAutoHidden = true;
 		}
