@@ -468,7 +468,7 @@ public class Window extends Widget implements DTarget {
 	return(hovering);
     }
 
-	boolean isAutoHideOn = false, isAutoHidden =false;
+	boolean isAutoHideOn = false, isAutoHideFast = false, isAutoHidden =false;
 	boolean hasOrganizeButton = false;
 	public ZeeWindow.ZeeButton buttonAutoHide = null;
 	boolean isAutoHideWaiting = false;
@@ -500,7 +500,7 @@ public class Window extends Widget implements DTarget {
 					hiddenWidth = (int) (sz.x * 0.7);
 				int newX = - hiddenWidth;
 				// no delay
-				if (!ZeeConfig.autoHideWindowDelay){
+				if (!ZeeConfig.autoHideWindowDelay || isAutoHideFast){
 					c.x = newX;
 				}
 				// delay
@@ -534,7 +534,7 @@ public class Window extends Widget implements DTarget {
 					visibleWidth = (int) (sz.x * 0.25);
 				int newX = ZeeConfig.gameUI.sz.x - visibleWidth;
 				// no delay
-				if (!ZeeConfig.autoHideWindowDelay){
+				if (!ZeeConfig.autoHideWindowDelay || isAutoHideFast){
 					c.x = newX;
 				}
 				// delay

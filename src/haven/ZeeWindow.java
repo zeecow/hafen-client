@@ -19,7 +19,9 @@ public class ZeeWindow extends Window {
     static class ZeeButton extends Button{
 
         public static final String TEXT_ORGANIZEWINDOWS = "↔";
+        //"◀" "⊲" "◁" "ᐊ"
         public static final String TEXT_AUTOHIDEWINDOW = "ᐊ";
+        public static final String TEXT_AUTOHIDEWINDOW_FAST = "◀";
         public static final String TEXT_CLOSE = "x";
         public static final int BUTTON_SIZE = 20;
         String buttonText;
@@ -45,19 +47,31 @@ public class ZeeWindow extends Window {
                     organizeDuplicateWindows(windowName);
                 }
                 //auto hide window
-                else if (buttonText.contentEquals(TEXT_AUTOHIDEWINDOW)){
+                else if (buttonText.contentEquals(TEXT_AUTOHIDEWINDOW) || buttonText.contentEquals(TEXT_AUTOHIDEWINDOW_FAST)){
                     Window win = this.getparent(Window.class);
-                    win.isAutoHideOn = !win.isAutoHideOn;
-                    // highlihgt button
-                    if (win.isAutoHideOn){
+                    if (!win.isAutoHideOn){
+                        // delay mode
+                        win.isAutoHideOn = true;
+                        win.isAutoHideFast = false;
                         this.change(TEXT_AUTOHIDEWINDOW, new Color(0,200,0));
                         if(!ZeeConfig.listAutoHideWindowsActive.contains(win.cap))
                             ZeeConfig.listAutoHideWindowsActive.add(win.cap);
-                    }else {
-                        this.change(TEXT_AUTOHIDEWINDOW);
-                        ZeeConfig.listAutoHideWindowsActive.remove(win.cap);
                     }
-                    //save active authide windows
+                    else {
+                        // fast mode
+                        if (!win.isAutoHideFast){
+                            win.isAutoHideFast = true;
+                            this.change(TEXT_AUTOHIDEWINDOW_FAST, new Color(0,200,0));
+                        }
+                        // off
+                        else{
+                            win.isAutoHideOn = false;
+                            win.isAutoHideFast = false;
+                            this.change(TEXT_AUTOHIDEWINDOW);
+                            ZeeConfig.listAutoHideWindowsActive.remove(win.cap);
+                        }
+                    }
+                    //save active autohide windows
                     Utils.setprefsl("listAutoHideWindowsActive",ZeeConfig.listAutoHideWindowsActive);
                 }
                 else
