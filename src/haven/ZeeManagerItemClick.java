@@ -1737,7 +1737,7 @@ public class ZeeManagerItemClick extends ZeeThread{
                             }
                         }
                     }
-                }, buttonsX+7, buttonsY-5);
+                }, buttonsX+7+(i*18), buttonsY-5);
             }
         }
     }

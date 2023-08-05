@@ -173,7 +173,6 @@ public class ZeeConfig {
     static long lastInvItemMs;
     static Coord lastUiClickCoord;
     static Class<?> classMSRad;
-    static List<String> listAutoHideWindowsActive = new ArrayList<>(Utils.getprefsl("listAutoHideWindowsActive",new String[]{}));
 
     static int aggroRadiusTiles = Utils.getprefi("aggroRadiusTiles", 11);
     static boolean alertOnPlayers = Utils.getprefb("alertOnPlayers", true);
@@ -227,6 +226,7 @@ public class ZeeConfig {
     static boolean keyUpDownAudioControl = Utils.getprefb("keyUpDownAudioControl", true);
     static boolean autoHideWindows = Utils.getprefb("autoHideWindows", false);
     static String listWindowsAddHideButton = Utils.getpref("listWindowsAddHideButton", DEF_LIST_WINDOWS_ADD_HIDE_BUTTON);
+    static List<String> listAutoHideWindowsActive = new ArrayList<>(Utils.getprefsl("listAutoHideWindowsActive",new String[]{}));
     public static boolean miniTrees = Utils.getprefb("miniTrees", false);
     public static Integer miniTreesSize = Utils.getprefi("miniTreesSize", 50);
     static boolean noWeather = Utils.getprefb("noWeather", false);
