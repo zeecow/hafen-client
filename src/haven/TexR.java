@@ -34,6 +34,8 @@ import java.awt.image.Raster;
 import java.awt.image.WritableRaster;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static haven.render.Texture.Filter.LINEAR;
 import static haven.render.Texture.Filter.NEAREST;
@@ -127,11 +129,19 @@ public class TexR extends Resource.Layer implements Resource.IDLayer<Integer> {
 
 	private BufferedImage rd(final byte[] data) {
 	    try {
-			BufferedImage ret = Resource.readimage(new ByteArrayInputStream(data));
-			if(ZeeConfig.terrainSolidColor && getres().name.startsWith("gfx/tiles/") && !getres().name.endsWith("/caveout") && !getres().name.endsWith("/stranglevine")){
-				//ZeeConfig.println(getres().name);
+		BufferedImage ret = Resource.readimage(new ByteArrayInputStream(data));
+		if ( ZeeConfig.pavingSolidColor ){
+			Matcher m = Pattern.compile("gfx/tiles/paving/[^-]+-tex$").matcher(getres().name);
+			if (m.find()) {
 				return ZeeManagerIcons.getSolidColorTile(ret);
 			}
+		}
+		if( ZeeConfig.terrainSolidColor ){
+			Matcher m = Pattern.compile("gfx/tiles/[^/-]+-tex$").matcher(getres().name);
+			if (m.find()) {
+				return ZeeManagerIcons.getSolidColorTile(ret);
+			}
+		}
 		return(ret);
 	    } catch(IOException e) {
 		throw(new RuntimeException("Invalid image data in " + getres().name, e));

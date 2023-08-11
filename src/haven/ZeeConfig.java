@@ -260,6 +260,7 @@ public class ZeeConfig {
     static int gobMaxRequeues = Utils.getprefi("gobMaxRequeues",DEF_GOB_MAX_REQUEUE);
     static boolean minimapSolidColor = Utils.getprefb("minimapSolidColor",true);
     static boolean terrainSolidColor = Utils.getprefb("terrainSolidColor",false);
+    static boolean pavingSolidColor = Utils.getprefb("pavingSolidColor",false);
     public static boolean showOverlayPclaim = Utils.getprefb("showOverlayPclaim",true);
     public static boolean showOverlayVclaim = Utils.getprefb("showOverlayVclaim",true);
     public static boolean showOverlayProv = Utils.getprefb("showOverlayProv",true);

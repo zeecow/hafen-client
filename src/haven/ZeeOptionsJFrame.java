@@ -86,6 +86,20 @@ public class ZeeOptionsJFrame extends JFrame {
         panelTabControls.add(new ZeeOptionJCheckBox( "Shift+C switch cams", "keyCamSwitchShiftC"),c);
 
         panelTabControls.add(new ZeeOptionJCheckBox( "Drink key ' (single quote) ", "drinkKey"),c);
+
+        //confirm petal list
+        panelTabControls.add(new ZeeOptionJCheckBox( "Ctrl+click confirm petal:", "confirmPetal"),c);
+        panelTabControls.add(tfConfirmPetal= new JTextField("",5), c);
+        tfConfirmPetal.setMaximumSize(new Dimension(Integer.MAX_VALUE, tfConfirmPetal.getPreferredSize().height));
+        tfConfirmPetal.setText(ZeeConfig.confirmPetalList);
+        tfConfirmPetal.addActionListener(actionEvent -> {
+            String str = actionEvent.getActionCommand();
+            String[] strArr = str.split(",");
+            if(strArr!=null && strArr.length>0) {
+                ZeeConfig.confirmPetalList = str;
+                Utils.setpref("confirmPetalList",str.strip());
+            }
+        });
     }
 
 
@@ -294,7 +308,7 @@ public class ZeeOptionsJFrame extends JFrame {
 
         panelTabMisc.add(new ZeeOptionJCheckBox( "Solid color terrain (restart)", "terrainSolidColor"),c);
 
-        panelTabMisc.add(new ZeeOptionJCheckBox( "Fish Moon Xp alert", "fishMoonXpAlert"),c);
+        panelTabMisc.add(new ZeeOptionJCheckBox( "Solid color paving (restart)", "pavingSolidColor"),c);
 
         panelTabMisc.add(new ZeeOptionJCheckBox( "Hide treePaliCrop(ctrl+h)", "hideTreesPalisCrops"),c);
 
@@ -360,24 +374,6 @@ public class ZeeOptionsJFrame extends JFrame {
         });
 
 
-        panelTabMisc.add(new ZeeOptionJCheckBox( "Notify when friends login", "notifyBuddyOnline"),c);
-
-
-        // mute audio msg
-        panelTabMisc.add(new ZeeOptionJCheckBox( "Mute audio messages (use ;)", "blockAudioMsg"),c);
-        panelTabMisc.add(tfBlockAudioMsgs= new JTextField("",5), c);
-        tfBlockAudioMsgs.setMaximumSize(new Dimension(Integer.MAX_VALUE, tfBlockAudioMsgs.getPreferredSize().height));
-        tfBlockAudioMsgs.setText(ZeeConfig.blockAudioMsgList);
-        tfBlockAudioMsgs.addActionListener(actionEvent -> {
-            String str = actionEvent.getActionCommand();
-            String[] strArr = str.split(",");
-            if(strArr!=null && strArr.length>0) {
-                ZeeConfig.blockAudioMsgList = str;
-                Utils.setpref("blockAudioMsgList",str.strip());
-            }
-        });
-
-
         //agro radius tiles
         pan = new JPanel(new FlowLayout(FlowLayout.LEFT));
         panelTabMisc.add(pan,c);
@@ -438,6 +434,8 @@ public class ZeeOptionsJFrame extends JFrame {
 
         panelTabInterface = new JPanel(new GridBagLayout());
         tabbedPane.addTab("UI", panelTabInterface);
+
+        panelTabInterface.add(new ZeeOptionJCheckBox( "Fish Moon Xp alert", "fishMoonXpAlert"),c);
 
         panelTabInterface.add(new ZeeOptionJCheckBox( "Show kin names (hearthfire)", "showKinNames"),c);
 
@@ -541,22 +539,6 @@ public class ZeeOptionsJFrame extends JFrame {
             ZeeConfig.newGridColor(color);
         });
 
-
-        //confirm petal list
-        panelTabInterface.add(new ZeeOptionJCheckBox( "Ctrl+click confirm petal:", "confirmPetal"),c);
-        panelTabInterface.add(tfConfirmPetal= new JTextField("",5), c);
-        tfConfirmPetal.setMaximumSize(new Dimension(Integer.MAX_VALUE, tfConfirmPetal.getPreferredSize().height));
-        tfConfirmPetal.setText(ZeeConfig.confirmPetalList);
-        tfConfirmPetal.addActionListener(actionEvent -> {
-            String str = actionEvent.getActionCommand();
-            String[] strArr = str.split(",");
-            if(strArr!=null && strArr.length>0) {
-                ZeeConfig.confirmPetalList = str;
-                Utils.setpref("confirmPetalList",str.strip());
-            }
-        });
-
-
         //auto hide windows list
         panelTabInterface.add(new ZeeOptionJCheckBox( "Show auto-hide window button", "autoHideWindows"),c);
         panelTabInterface.add(tfAutoHideWindows= new JTextField("",5), c);
@@ -590,6 +572,23 @@ public class ZeeOptionsJFrame extends JFrame {
         tfAutoHideWindowDelayMs.addActionListener(evt -> {
             ZeeConfig.autoHideWindowDelayMs = Integer.parseInt(evt.getActionCommand().strip());
             Utils.setprefi("autoHideWindowDelayMs", ZeeConfig.autoHideWindowDelayMs);
+        });
+
+        // notify buddies
+        panelTabInterface.add(new ZeeOptionJCheckBox( "Notify when friends login", "notifyBuddyOnline"),c);
+
+        // mute audio msg
+        panelTabInterface.add(new ZeeOptionJCheckBox( "Mute audio messages (use ;)", "blockAudioMsg"),c);
+        panelTabInterface.add(tfBlockAudioMsgs= new JTextField("",5), c);
+        tfBlockAudioMsgs.setMaximumSize(new Dimension(Integer.MAX_VALUE, tfBlockAudioMsgs.getPreferredSize().height));
+        tfBlockAudioMsgs.setText(ZeeConfig.blockAudioMsgList);
+        tfBlockAudioMsgs.addActionListener(actionEvent -> {
+            String str = actionEvent.getActionCommand();
+            String[] strArr = str.split(",");
+            if(strArr!=null && strArr.length>0) {
+                ZeeConfig.blockAudioMsgList = str;
+                Utils.setpref("blockAudioMsgList",str.strip());
+            }
         });
     }
 
