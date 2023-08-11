@@ -64,7 +64,8 @@ public class ZeeHoverMenu {
         if (mnw.parentMenu==null) {
             brc = Coord.of(brpanel.c.x, ZeeConfig.gameUI.sz.y);
         }else{
-            int y = mnw.parentMenu.c.y + mnw.sz.y;
+            int parentLineY = mnw.parentMenu.lineSelected.i * mnw.parentMenu.lineSelected.btnHeight;
+            int y = mnw.parentMenu.c.y + parentLineY + mnw.sz.y;
             if (y > ZeeConfig.gameUI.sz.y)
                 y = ZeeConfig.gameUI.sz.y;
             brc = Coord.of(mnw.parentMenu.c.x, y);
