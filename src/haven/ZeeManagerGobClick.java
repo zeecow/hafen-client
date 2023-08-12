@@ -66,9 +66,13 @@ public class ZeeManagerGobClick extends ZeeThread{
                     ZeeConfig.clickTile(ZeeConfig.coordToTile(mc),1,UI.MOD_SHIFT);
                 }
             }
+            // pick quicksilver from smelter
+            else if (gobName.endsWith("/smelter") && ZeeConfig.isPlayerHoldingItem()){
+                ZeeManagerItemClick.getQuicksilverFromSmelter(gob);
+            }
             //barterstand
             else if (gobName.endsWith("barterstand")){
-                ZeeManagerGobClick.barterstandSearchWindow();
+                barterstandSearchWindow();
             }
             // place lifted treelog next to clicked one
             else if ( isGobTreeLog(gobName) && ZeeConfig.isPlayerLiftingGob("gfx/terobjs/trees/")!=null && !ZeeConfig.isPlayerLiftingGob(gob)){
@@ -1727,6 +1731,48 @@ public class ZeeManagerGobClick extends ZeeThread{
         },wdg.c.x+wdg.sz.x+5,wdg.c.y);
 
         win.pack();
+    }
+
+    static boolean pickingIrrlight = false;
+    public static void autoPickIrrlight() {
+        if (pickingIrrlight) {
+            println("already picking irrlight");
+            return;
+        }
+        new ZeeThread(){
+            public void run() {
+                try {
+                    // guess working station
+                    Gob workingStation = ZeeConfig.getClosestGob(ZeeConfig.findGobsByNameEndsWith("/crucible","/anvil"));
+
+                    // try picking irrlight
+                    ZeeConfig.addPlayerText("irrlight!");
+                    pickingIrrlight = true;
+                    ZeeConfig.lastMapViewClickButton = 2;
+                    while (pickingIrrlight && !ZeeConfig.isTaskCanceledByGroundClick()) {
+                        Gob irrlight = ZeeConfig.getClosestGobByNameContains("/irrbloss");
+                        if (irrlight==null) {
+                            break;
+                        }
+                        gobClick(irrlight,3);
+                        waitPlayerIdlePose();
+                    }
+
+                    //try crafting again
+                    if (workingStation != null){
+                        gobClick(workingStation,3);
+                        waitPlayerIdlePose();
+                        sleep(PING_MS);
+                        ZeeConfig.getButtonNamed((Window) ZeeConfig.makeWindow.parent,"Craft All").click();
+                    }
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                pickingIrrlight = false;
+                ZeeConfig.removePlayerText();
+            }
+        }.start();
     }
 
     private boolean isGobBigDeadAnimal_thread() {

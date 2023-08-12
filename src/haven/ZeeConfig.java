@@ -192,6 +192,7 @@ public class ZeeConfig {
     static boolean autoToggleEquips = Utils.getprefb("autoToggleEquips", true);
     static boolean autoRunLogin = Utils.getprefb("autoRunLogin", true);
     static boolean autoToggleGridLines = Utils.getprefb("autoToggleGridLines", true);
+    static boolean autoPickIrrlight = false;
     static boolean blockAudioMsg = Utils.getprefb("blockAudioMsg", true);
     static String blockAudioMsgList = Utils.getpref("blockAudioMsgList", DEF_LIST_MUTE_AUDIO);
     static boolean butcherMode = false;
@@ -1153,6 +1154,9 @@ public class ZeeConfig {
                 else if (ZeeManagerCraft.ropeRecipeOpen)
                     ZeeManagerCraft.ropeWindowClosed();
             }
+
+            // checkbox auto pick irrlight
+            makeWindowAddIrrlightCheckbox(window);
         }
 
         if (gameUI!=null && !gameUI.sz.equals(0,0) && !isBuildWindow(window)){
@@ -1163,6 +1167,45 @@ public class ZeeConfig {
         //order of call is important due to window.hasOrganizeButton
         windowModOrganizeButton(window, windowTitle);
         windowModAutoHideButton(window,windowTitle);
+    }
+
+    private static void makeWindowAddIrrlightCheckbox(Window window) {
+        new ZeeThread(){
+            public void run() {
+                try {
+                    // find tools icons
+                    sleep(500);//wait res loading
+                    List<Indir<Resource>> list = window.getchild(Makewindow.class).tools;
+                    boolean addCheckbox = false;
+                    for (Indir<Resource> tool : list) {
+                        String name = tool.get().name;
+                        if(name.endsWith("/crucible") || name.endsWith("/smithshammer")) {
+                            addCheckbox = true;
+                            break;
+                        }
+                    }
+
+                    // add checkbox if tools icons were present
+                    if (addCheckbox){
+                        Widget wdg = window.add(new CheckBox("get irrlight"){
+                            {a = ZeeConfig.autoPickIrrlight;}
+                            public void changed(boolean val) {
+                                ZeeConfig.autoPickIrrlight = val;
+                                super.changed(val);
+                            }
+                        },360,45);
+                        wdg.settip("pick Irrlight and try crafting again");
+                    }
+                    // disable autopick if no tools icons
+                    else{
+                        autoPickIrrlight = false;
+                    }
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }.start();
     }
 
     private static void windowModCattleRoster(Window window) {
@@ -2311,6 +2354,16 @@ public class ZeeConfig {
         return null;
     }
 
+    public static Window getWindowNameContains(String nameContains) {
+        Set<Window> windows = gameUI.children(Window.class);
+        for(Window w : windows) {
+            if(w.cap.contains(nameContains)){
+                return w;
+            }
+        }
+        return null;
+    }
+
     public static Button getButtonNamed(Window win, String name) {
         Set<Button> buttons = win.children(Button.class);
         for(Button b : buttons) {
@@ -2480,6 +2533,7 @@ public class ZeeConfig {
         ZeeManagerGobClick.barterFindText = null;
         ZeeManagerGobClick.barterSearchOpen = false;
         ZeeManagerGobClick.remountClosestHorse = false;
+        autoPickIrrlight = false;
         ZeeManagerMiner.tilesMonitorCleanup();
         ZeeHistWdg.clearHistory();
 
@@ -3277,6 +3331,10 @@ public class ZeeConfig {
             // barter stand item search labels
             else if (ZeeManagerGobClick.barterSearchOpen && ob.getres().name.endsWith("/barterstand")) {
                 ZeeManagerGobClick.addTextBarterStand(ob);
+            }
+            // auto pick irrlight
+            else if (autoPickIrrlight && ob.getres().name.endsWith("/irrbloss")) {
+                ZeeManagerGobClick.autoPickIrrlight();
             }
 
             //gob health

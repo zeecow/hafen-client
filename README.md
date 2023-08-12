@@ -24,7 +24,7 @@ Controls
 - drink key '
 - auto-dismount horse when clicking workstations, houses, auto-mount too (rope required)
 - Icon Settings: shift+space toggles notify checkbox
-- right-click-hold Search Actions Button to start a hover menu 
+- right-click-hold Search Actions Button to start a hover menu
 
 
 
@@ -60,6 +60,7 @@ Midclick Ground Object
 - place lifted treelog next to clicked treelog(perpendicular only)
 - while crafting rope, midclicking fibre piles will get fibres and "Craft All" again
 - midclick barterstand to open search window
+- midclick smelter holding bucket to collect all quicksilver
 
 Long Midclick Ground Object
 - show context menu for various objs (details below)
@@ -180,4 +181,5 @@ Random Features
 - keybelt shortcuts navigation
 - reposition rightmost windows horiz. when game resize
 - CheeseTray recipe show progress of recently opened CheeseRack 
+- try auto pick irrlight and craft again (craft window checkbox)
  

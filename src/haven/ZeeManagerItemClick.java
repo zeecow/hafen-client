@@ -36,6 +36,87 @@ public class ZeeManagerItemClick extends ZeeThread{
         init(wItem);
     }
 
+    //called on midclick smelter holding a bucket
+    static void getQuicksilverFromSmelter(Gob smelter) {
+
+        WItem bucket = ZeeManagerItemClick.getHoldingItem();
+
+        if (bucket==null){
+            println("holding item null");
+            return;
+        }
+
+        if (bucket.item.getres().name.contains("/bucket")){
+
+            // check bucket contents
+            String contents = ZeeManagerItemClick.getItemContentsName(bucket);
+            if ( contents.contains("10.00 l of Quicksilver") ||
+                    (!contents.isBlank() && !contents.contains("Quicksilver")) )
+            {
+                println("cant pick quicksilver with this bucket");
+                return;
+            }
+
+            // open smelter
+            new ZeeThread(){
+                public void run() {
+                    try {
+
+                        ZeeConfig.addPlayerText("get quicksilver");
+
+                        //close any open smelters
+                        List<Window> openSmeltWins = ZeeConfig.getWindowsNameEndsWith("Smelter");
+                        if (openSmeltWins.size() > 0){
+                            for (Window openWin : openSmeltWins) {
+                                String cap = openWin.cap;
+                                openWin.wdgmsg("close");
+                                waitWindowClosed(cap);
+                            }
+                        }
+
+                        // ctrl + rclick smelter
+                        ZeeManagerGobClick.gobClick(smelter,3,0);
+
+                        if (!waitPlayerDistToGob(smelter,35)){
+                            println("failed approaching smelter");
+                            ZeeConfig.removePlayerText();
+                            return;
+                        }
+
+                        if(!waitWindowOpenedNameContains("Smelter")){
+                            println("failed waiting smelter window");
+                            ZeeConfig.removePlayerText();
+                            return;
+                        }
+
+                        Window win = ZeeConfig.getWindowNameContains("Smelter");
+                        if (win == null){
+                            println("couldnt get smelter window");
+                            ZeeConfig.removePlayerText();
+                            return;
+                        }
+
+                        Inventory inv = win.getchild(Inventory.class);
+                        List<WItem> list = inv.getWItemsByNameEndsWith("/mercury");
+                        if (list.size() > 0) {
+                            for (WItem quicksilver : list) {
+                                ZeeManagerItemClick.itemAct(quicksilver,0);
+                                sleep(PING_MS);
+                            }
+                        }
+                        else{
+                            println("no quicksilver found");
+                        }
+
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    ZeeConfig.removePlayerText();
+                }
+            }.start();
+        }
+    }
+
     private void init(WItem wItem) {
         try{
             equipory = ZeeConfig.windowEquipment.getchild(Equipory.class);
