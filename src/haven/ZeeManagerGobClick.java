@@ -66,9 +66,13 @@ public class ZeeManagerGobClick extends ZeeThread{
                     ZeeConfig.clickTile(ZeeConfig.coordToTile(mc),1,UI.MOD_SHIFT);
                 }
             }
+            // pick quicksilver from smelter
+            else if (gobName.endsWith("/smelter") && ZeeConfig.isPlayerHoldingItem()){
+                ZeeManagerItemClick.getQuicksilverFromSmelter(gob);
+            }
             //barterstand
             else if (gobName.endsWith("barterstand")){
-                ZeeManagerGobClick.barterstandSearchWindow();
+                barterstandSearchWindow();
             }
             // place lifted treelog next to clicked one
             else if ( isGobTreeLog(gobName) && ZeeConfig.isPlayerLiftingGob("gfx/terobjs/trees/")!=null && !ZeeConfig.isPlayerLiftingGob(gob)){

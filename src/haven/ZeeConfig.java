@@ -2311,6 +2311,16 @@ public class ZeeConfig {
         return null;
     }
 
+    public static Window getWindowNameContains(String nameContains) {
+        Set<Window> windows = gameUI.children(Window.class);
+        for(Window w : windows) {
+            if(w.cap.contains(nameContains)){
+                return w;
+            }
+        }
+        return null;
+    }
+
     public static Button getButtonNamed(Window win, String name) {
         Set<Button> buttons = win.children(Button.class);
         for(Button b : buttons) {
