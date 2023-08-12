@@ -2916,7 +2916,7 @@ public class ZeeManagerGobClick extends ZeeThread{
     static boolean brightnessDefault() {
         Glob glob = ZeeConfig.gameUI.ui.sess.glob;
         glob.blightamb = glob.lightamb;
-        Utils.setprefi("blightamb",1);
+        Utils.setprefi(getLightPrefName(), 1);
         ZeeConfig.msgLow("amblight default "+glob.blightamb.getRed());
         return true;
     }
@@ -2924,7 +2924,7 @@ public class ZeeManagerGobClick extends ZeeThread{
     static boolean brightnessDown() {
         Glob glob = ZeeConfig.gameUI.ui.sess.glob;
         glob.blightamb = colorStep(glob.blightamb,-15);
-        Utils.setprefi("blightamb",ZeeConfig.colorToInt(glob.blightamb));
+        Utils.setprefi(getLightPrefName(), ZeeConfig.colorToInt(glob.blightamb));
         ZeeConfig.msgLow("amblight "+glob.blightamb.getRed());
         return true;
     }
@@ -2932,7 +2932,7 @@ public class ZeeManagerGobClick extends ZeeThread{
     static boolean brightnessUp() {
         Glob glob = ZeeConfig.gameUI.ui.sess.glob;
         glob.blightamb = colorStep(glob.blightamb,15);
-        Utils.setprefi("blightamb",ZeeConfig.colorToInt(glob.blightamb));
+        Utils.setprefi(getLightPrefName(), ZeeConfig.colorToInt(glob.blightamb));
         ZeeConfig.msgLow("amblight "+glob.blightamb.getRed());
         return true;
     }
@@ -2956,10 +2956,25 @@ public class ZeeManagerGobClick extends ZeeThread{
     static void brightnessMapLoad() {
         Glob glob = ZeeConfig.gameUI.ui.sess.glob;
 
-        int intColor = Utils.getprefi("blightamb",1);
+        // save player location
+        if (glob.blightamb.getRed() == ZeeConfig.DEF_LIGHT_CELLAR)
+            ZeeConfig.playerLocation = ZeeConfig.LOCATION_CELLAR;
+        else if (glob.blightamb.getRed() == ZeeConfig.DEF_LIGHT_CABIN)
+            ZeeConfig.playerLocation = ZeeConfig.LOCATION_CABIN;
+        else if (glob.blightamb.getRed() == ZeeConfig.DEF_LIGHT_CAVEMINES)
+            ZeeConfig.playerLocation = ZeeConfig.LOCATION_CAVEMINES;
+        else
+            ZeeConfig.playerLocation = ZeeConfig.LOCATION_OUTSIDE;
+
+        // restore saved brightness
+        int intColor = Utils.getprefi(getLightPrefName(),1);
         if (intColor < 0) {
             glob.blightamb = ZeeConfig.intToColor(intColor);
         }
+    }
+
+    private static String getLightPrefName() {
+        return "blightamb_" + ZeeConfig.playerLocation;
     }
 
     private static void windowTestCoords() {

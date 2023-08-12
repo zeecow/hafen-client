@@ -1659,14 +1659,18 @@ public class ZeeManagerItemClick extends ZeeThread{
                         String newCheesePerc = ((int) (meter * 100)) + "%";
                         String newCheeseName = getItemContentsName(firstCheesetray);
                         String newCheeseLocation = "";
-                        if (!ZeeConfig.findGobsByNameEndsWith("/cellarstairs").isEmpty())
+                        if (ZeeConfig.playerLocation == ZeeConfig.LOCATION_CELLAR)
                             newCheeseLocation = "cellar";
-                        else if (!ZeeConfig.findGobsByNameEndsWith("/upstairs","/downstairs").isEmpty())
+                        else if (ZeeConfig.playerLocation == ZeeConfig.LOCATION_CABIN )
                             newCheeseLocation = "cabin";
-                        else if (ZeeConfig.getPlayerTileName().endsWith("/mine"))
+                        else if (ZeeConfig.playerLocation == ZeeConfig.LOCATION_CAVEMINES)
                             newCheeseLocation = "mines";
-                        else
+                        else if(ZeeConfig.playerLocation == ZeeConfig.LOCATION_OUTSIDE)
                             newCheeseLocation = "outside";
+                        else {
+                            println("checkCheeseTray > couldnt determine player location");
+                            return;
+                        }
 
                         // add/update saved cheese
                         String newCheeseDateMs = String.valueOf(new Date().getTime());

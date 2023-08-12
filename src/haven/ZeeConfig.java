@@ -134,6 +134,13 @@ public class ZeeConfig {
     static final int PLAYER_SPEED_RUN = 2;
     static final int PLAYER_SPEED_SPRINT = 3;
 
+    static final int LOCATION_UNDEFINED = -1;
+    static final int LOCATION_OUTSIDE = 0;
+    static final int LOCATION_CELLAR = 1, DEF_LIGHT_CELLAR = 32;
+    static final int LOCATION_CABIN = 2, DEF_LIGHT_CABIN = 144;
+    static final int LOCATION_CAVEMINES = 3, DEF_LIGHT_CAVEMINES = 48;
+    static int playerLocation = -1;
+
     static MixColor MIXCOLOR_RED = new MixColor(255,0,0,200);
     static MixColor MIXCOLOR_ORANGE = new MixColor(255,128,0,200);
     static MixColor MIXCOLOR_YELLOW = new MixColor(255,255,0,200);
@@ -3236,13 +3243,12 @@ public class ZeeConfig {
                 // main player
                 if (gameUI.map.player().id == ob.id) {
                     ob.isMainPlayer = true;
+                    // restore saved brightness
                     ZeeManagerGobClick.brightnessMapLoad();
-                    //println("main player");
                 }
                 // others
                 else {
                     ob.isOtherPlayer = true;
-                    //println("other player");
                 }
             }
 
