@@ -1748,7 +1748,7 @@ public class ZeeManagerGobClick extends ZeeThread{
                     // try picking irrlight
                     ZeeConfig.addPlayerText("irrlight!");
                     pickingIrrlight = true;
-                    ZeeConfig.lastMapViewClickButton = 2;
+                    ZeeConfig.lastMapViewClickButton = 2;//prepare cancel click
                     while (pickingIrrlight && !ZeeConfig.isTaskCanceledByGroundClick()) {
                         Gob irrlight = ZeeConfig.getClosestGobByNameContains("/irrbloss");
                         if (irrlight==null) {
@@ -1759,7 +1759,7 @@ public class ZeeManagerGobClick extends ZeeThread{
                     }
 
                     //try crafting again
-                    if (workingStation != null){
+                    if (workingStation!=null && !ZeeConfig.isTaskCanceledByGroundClick()){
                         gobClick(workingStation,3);
                         waitPlayerIdlePose();
                         sleep(PING_MS);
