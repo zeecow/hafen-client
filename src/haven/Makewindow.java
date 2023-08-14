@@ -41,6 +41,8 @@ public class Makewindow extends Widget {
     public List<Input> inputs = Collections.emptyList();
     public List<SpecWidget> outputs = Collections.emptyList();
     public List<Indir<Resource>> qmod = Collections.emptyList();
+	public HashMap<String,Integer> qmodMapNameStat = new HashMap<String,Integer>();
+	public HashMap<String,Integer> qmodMapNameSzX = new HashMap<String,Integer>();
     public List<Indir<Resource>> tools = new ArrayList<>();;
     private final int xoff = UI.scale(45), qmy = UI.scale(38), outy = UI.scale(65);
 
@@ -248,6 +250,11 @@ public class Makewindow extends Widget {
 	    for(Object arg : args)
 		qmod.add(ui.sess.getres((Integer)arg));
 	    this.qmod = qmod;
+		// find char stats for softcap calculation
+		for (Indir<Resource> qm : this.qmod) {
+			Glob.CAttr stat = ZeeConfig.gameUI.chrwdg.findattr(qm.get().basename());
+			qmodMapNameStat.put( qm.get().name, stat.comp );
+		}
 	} else if(msg == "tool") {
 	    tools.add(ui.sess.getres((Integer)args[0]));
 	} else if(msg == "inprcps") {
@@ -374,16 +381,23 @@ public class Makewindow extends Widget {
 	    qmx = x;
 	    for(Indir<Resource> qm : qmod) {
 		try {
+			// drawicon
 		    Tex t = qmicon(qm);
 		    g.image(t, new Coord(x, qmy));
 		    x += t.sz().x + UI.scale(1);
 
-			//add stat(s) label(s)
-			x += 3;
-			Glob.CAttr stat = getparent(GameUI.class).chrwdg.findattr(qm.get().basename());
-			x += ZeeConfig.drawText(""+stat.comp, g, new Coord(x,qmy+5));
-			x += 7;
-			product = product * stat.comp;
+			// add stat label
+			int pad1=3, pad2=7;
+			x += pad1;
+			int stat = qmodMapNameStat.get(qm.get().name);
+			int statSzX = ZeeConfig.drawText(""+stat, g, new Coord(x,qmy+5));
+			statSzX += UI.scale(1);
+			x += statSzX;
+			qmodMapNameSzX.put(qm.get().name, statSzX + pad1 + pad2);
+			x += pad2;
+
+			product = product * stat;
+
 		} catch(Loading l) {
 		}
 	    }
@@ -420,7 +434,12 @@ public class Makewindow extends Widget {
 	    try {
 		for(Indir<Resource> qm : qmod) {
 		    Coord tsz = qmicon(qm).sz();
-		    if(mc.isect(c, tsz))
+
+			//consider stats numbers size
+			int statPad = qmodMapNameSzX.get(qm.get().name);
+			tsz = tsz.add(statPad,0);
+
+			if(mc.isect(c, tsz))
 			return(qm.get().flayer(Resource.tooltip).t);
 		    c = c.add(tsz.x + UI.scale(1), 0);
 		}
