@@ -250,7 +250,7 @@ public class Makewindow extends Widget {
 	    for(Object arg : args)
 		qmod.add(ui.sess.getres((Integer)arg));
 	    this.qmod = qmod;
-		ZeeConfig.updMakewindowQmodStat();
+		ZeeConfig.updMakewindowStats();
 	} else if(msg == "tool") {
 	    tools.add(ui.sess.getres((Integer)args[0]));
 	} else if(msg == "inprcps") {

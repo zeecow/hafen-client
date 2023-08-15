@@ -4119,7 +4119,7 @@ public class ZeeConfig {
         }
     }
 
-    public static void updMakewindowQmodStat() {
+    public static void updMakewindowStats() {
         if (ZeeConfig.makeWindow==null)
             return;
         // char stats for softcap calculation

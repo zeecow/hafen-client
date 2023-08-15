@@ -122,7 +122,7 @@ public class ZeeManagerGobClick extends ZeeThread{
                     gobClick(gob,3, UI.MOD_SHIFT);//shift + rclick
             }
             // light up torch
-            else if (isGobFireSource(gobName)) {
+            else if (isGobFireSource(gob)) {
                 new ZeeThread() {
                     public void run() {
                         if (pickupTorch())
@@ -2616,8 +2616,12 @@ public class ZeeManagerGobClick extends ZeeThread{
         return isGobInListEndsWith(gobName, "stallion,mare,horse");
     }
 
-    static boolean isGobFireSource(String gobName) {
-        return isGobInListEndsWith(gobName,"brazier,pow,snowlantern,/bonfire");
+    static boolean isGobFireSource(Gob gob) {
+        String gobName = gob.getres().name;
+        if ( isGobInListEndsWith(gobName,"/brazier,/snowlantern,/pow,/bonfire") )
+            if (getOverlayNames(gob).contains("gfx/fx/flight"))
+                return true;
+        return false;
     }
 
     /**
