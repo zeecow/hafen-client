@@ -242,18 +242,15 @@ public class ZeeThread  extends Thread{
         return waitGobIdleVelocityMs(ZeeConfig.getPlayerGob(), idleMs_min777);
     }
 
-    public static boolean waitPlayerIdlePoseMs(long idleMs){
-        if (ZeeConfig.isPlayerMountingHorse())
-            return waitPlayerIdleMountedMs(idleMs);
-        else
-            return waitPlayerPoseInListTimeout(idleMs, ZeeConfig.POSE_PLAYER_IDLE, ZeeConfig.POSE_PLAYER_KICKSLED_IDLE);
-    }
-
 
     public static boolean waitPlayerIdlePose(){
         // player mounting horse or kicksled
-        if (ZeeConfig.isPlayerMountingHorse() || ZeeConfig.isPlayerDrivingingKicksled()) {
-            return waitPlayerIdleOnHorseOrKicksled();
+        if (ZeeConfig.isPlayerMountingHorse()) {
+            //wait horse idle and player non active
+            return waitGobPose(ZeeConfig.getPlayerMountedHorse(), ZeeConfig.POSE_HORSE_IDLE) &&
+                    waitPlayerNonActivePose();
+        }else if (ZeeConfig.isPlayerDrivingingKicksled()){
+            return waitPlayerIdleOnKicksled();
         }
         // player on foot?
         else {
@@ -261,8 +258,16 @@ public class ZeeThread  extends Thread{
         }
     }
 
-    //TODO add more active poses
-    public static boolean waitPlayerIdleOnHorseOrKicksled() {
+    public static boolean waitPlayerIdleOnKicksled() {
+        Gob k = ZeeConfig.getClosestGobByNameContains("vehicle/spark");
+        if (k==null){
+            println("no kicksled found");
+            return false;
+        }
+        return waitGobIdleVelocity(k);
+    }
+
+    public static boolean waitPlayerNonActivePose(){
         return waitPlayerPoseNotInList(
                 ZeeConfig.POSE_PLAYER_DRINK,
                 ZeeConfig.POSE_PLAYER_CHOPTREE,
@@ -275,81 +280,6 @@ public class ZeeThread  extends Thread{
                 ZeeConfig.POSE_PLAYER_HARVESTING,
                 ZeeConfig.POSE_PLAYER_PICKGROUND
         );
-    }
-
-    public static boolean waitPlayerIdleMountedMs(long idleMs) {
-        return waitPlayerPoseNotInListTimeout(
-                idleMs,
-                ZeeConfig.POSE_PLAYER_DRINK,
-                ZeeConfig.POSE_PLAYER_CHOPTREE,
-                ZeeConfig.POSE_PLAYER_DIGSHOVEL,
-                ZeeConfig.POSE_PLAYER_PICK,
-                ZeeConfig.POSE_PLAYER_SAW
-        );
-    }
-
-
-    public static boolean waitPlayerPoseInList(String ... poseList) {
-        println(">waitPlayerPoseInList");
-        List<String> playerPoses;
-        boolean exit = false;
-        try{
-            do{
-                sleep(PING_MS*2);
-                playerPoses = ZeeConfig.getPlayerPoses();
-                exit = false;
-                for (int i = 0; i < poseList.length; i++) {
-                    if (playerPoses.contains(poseList[i])){
-                        println(poseList[i]+" > "+playerPoses);
-                        exit = true;
-                        break;
-                    }
-                }
-            }while(!exit);
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-        println("waitPlayerPoseInList ret "+exit);
-        return exit;
-    }
-
-    // TODO test
-    public static boolean waitPlayerPoseInListTimeout(long timeoutMs, String... poseList) {
-        //println(">waitPlayerPoseInListTimeout");
-        List<String> playerPoses;
-        boolean exit = false;
-        boolean poseInList = false;//assume pose is in list
-        long elapsedTimeMs = 0;
-        long sleepMs = PING_MS * 2;
-        try{
-            do{
-                sleep(sleepMs);
-                elapsedTimeMs += sleepMs;
-                if (elapsedTimeMs >= timeoutMs) {
-                    poseInList = false;//if timeout assume pose not in list
-                    break;
-                }
-                else {
-                    playerPoses = ZeeConfig.getPlayerPoses();
-                    exit = false;
-                    poseInList = false;
-                    for (int i = 0; i < poseList.length; i++) {
-                        //if contains pose then break and return true
-                        if (playerPoses.contains(poseList[i])) {
-                            exit = true;
-                            poseInList = true;
-                            break;
-                        }
-                    }
-                    if (poseInList)
-                        exit = true;
-                }
-            }while(!exit);
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-        //println("waitPlayerPoseInListTimeout ret "+poseInList);
-        return poseInList;
     }
 
 
