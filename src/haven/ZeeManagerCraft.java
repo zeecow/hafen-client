@@ -507,6 +507,7 @@ public class ZeeManagerCraft extends ZeeThread{
 
 
     static void craftWindowClosed() {
+        ZeeConfig.makeWindow = null;
         if(bugColRecipeOpen)
             bugColWindowClosed();
         if(clothRecipeOpen)

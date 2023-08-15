@@ -250,11 +250,7 @@ public class Makewindow extends Widget {
 	    for(Object arg : args)
 		qmod.add(ui.sess.getres((Integer)arg));
 	    this.qmod = qmod;
-		// find char stats for softcap calculation
-		for (Indir<Resource> qm : this.qmod) {
-			Glob.CAttr stat = ZeeConfig.gameUI.chrwdg.findattr(qm.get().basename());
-			qmodMapNameStat.put( qm.get().name, stat.comp );
-		}
+		ZeeConfig.updMakewindowQmodStat();
 	} else if(msg == "tool") {
 	    tools.add(ui.sess.getres((Integer)args[0]));
 	} else if(msg == "inprcps") {

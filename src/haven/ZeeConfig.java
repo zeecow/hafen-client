@@ -2534,6 +2534,7 @@ public class ZeeConfig {
         ZeeManagerGobClick.barterSearchOpen = false;
         ZeeManagerGobClick.remountClosestHorse = false;
         autoPickIrrlight = false;
+        makeWindow = null;
         ZeeManagerMiner.tilesMonitorCleanup();
         ZeeHistWdg.clearHistory();
 
@@ -4115,6 +4116,16 @@ public class ZeeConfig {
         }else if(tag.contentEquals("prov")){
             showOverlayProv = a;
             Utils.setprefb("showOverlayProv",showOverlayProv);
+        }
+    }
+
+    public static void updMakewindowQmodStat() {
+        if (ZeeConfig.makeWindow==null)
+            return;
+        // char stats for softcap calculation
+        for (Indir<Resource> qm : ZeeConfig.makeWindow.qmod) {
+            Glob.CAttr stat = ZeeConfig.gameUI.chrwdg.findattr(qm.get().basename());
+            ZeeConfig.makeWindow.qmodMapNameStat.put( qm.get().name, stat.comp );
         }
     }
 }
