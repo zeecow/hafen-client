@@ -532,6 +532,7 @@ public class GItem extends AWidget implements ItemInfo.SpriteOwner, GSprite.Owne
 		}
 		chstate("hover");
 		move(hover.parentpos(parent, hover.sz.sub(overlap).sub(HoverDeco.hovermarg)));
+		ZeeConfig.stackWindowAdded(this);
 	    }
 	}
 

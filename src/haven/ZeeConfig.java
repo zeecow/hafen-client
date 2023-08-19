@@ -4128,4 +4128,14 @@ public class ZeeConfig {
             ZeeConfig.makeWindow.qmodMapNameStat.put( qm.get().name, stat.comp );
         }
     }
+
+    static void stackWindowAdded(GItem.ContentsWindow cw) {
+        // reposition stack window if out of screen
+        if(cw.c.x + cw.sz.x >= gameUI.sz.x){
+            cw.c = cw.c.sub(cw.sz.x + GItem.HoverDeco.hovermarg.x, 0);
+        }
+        if(cw.c.y + cw.sz.y >= gameUI.sz.y){
+            cw.c = cw.c.sub(0, cw.sz.y + GItem.HoverDeco.hovermarg.y);
+        }
+    }
 }
