@@ -13,12 +13,13 @@ public class ZeeHitbox extends ZeeSlottedNode implements Rendered {
     private final Gob gob;
     private static final Map<Resource, Model> MODEL_CACHE = new HashMap<>();
     private static final float Z = 0.1f;
-    private static final Color SOLID_COLOR = new Color(139, 139, 185, 255);
+    static Color DEF_HITBOX_COLOR = new Color(0, 0, 192, 255);
+    static Color hitBoxColor = ZeeConfig.intToColor(Utils.getprefi("hitBoxColor",ZeeConfig.colorToInt(DEF_HITBOX_COLOR)));
     private static final Color PASSABLE_COLOR = new Color(105, 207, 124, 255);
     private static final float PASSABLE_WIDTH = 1.5f;
 //    private static final float SOLID_WIDTH = 0f;
     private static final Pipe.Op TOP = Pipe.Op.compose(Rendered.last, States.Depthtest.none, States.maskdepth);
-    private static final Pipe.Op SOLID = Pipe.Op.compose(new BaseColor(SOLID_COLOR));
+    static Pipe.Op SOLID = Pipe.Op.compose(new BaseColor(hitBoxColor));
     private static final Pipe.Op PASSABLE = Pipe.Op.compose(new BaseColor(PASSABLE_COLOR), new States.LineWidth(PASSABLE_WIDTH));
 //    private static final Pipe.Op SOLID_TOP = Pipe.Op.compose(SOLID, TOP);
 //    private static final Pipe.Op PASSABLE_TOP = Pipe.Op.compose(PASSABLE, TOP);
@@ -189,5 +190,16 @@ public class ZeeHitbox extends ZeeSlottedNode implements Rendered {
             }
         }
         return res;
+    }
+
+    public static void updateHitboxColor() {
+        SOLID = Pipe.Op.compose(new BaseColor(hitBoxColor));
+        if (ZeeConfig.hideTreesPalisCrops || ZeeConfig.showHitbox){
+            List<Gob> gobs = ZeeConfig.getAllGobs();
+            for (Gob gob : gobs) {
+                if (gob.hitbox!=null)
+                    gob.hitbox.fx.updateState();
+            }
+        }
     }
 }
