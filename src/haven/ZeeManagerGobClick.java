@@ -2969,6 +2969,7 @@ public class ZeeManagerGobClick extends ZeeThread{
         glob.blightamb = glob.lightamb;
         Utils.setprefi(getLightPrefName(), 1);
         ZeeConfig.msgLow("amblight default "+glob.blightamb.getRed());
+        brightnessMsg(true);
         return true;
     }
 
@@ -2976,16 +2977,36 @@ public class ZeeManagerGobClick extends ZeeThread{
         Glob glob = ZeeConfig.gameUI.ui.sess.glob;
         glob.blightamb = colorStep(glob.blightamb,-15);
         Utils.setprefi(getLightPrefName(), ZeeConfig.colorToInt(glob.blightamb));
-        ZeeConfig.msgLow("amblight "+glob.blightamb.getRed());
+        brightnessMsg(false);
         return true;
     }
+
 
     static boolean brightnessUp() {
         Glob glob = ZeeConfig.gameUI.ui.sess.glob;
         glob.blightamb = colorStep(glob.blightamb,15);
         Utils.setprefi(getLightPrefName(), ZeeConfig.colorToInt(glob.blightamb));
-        ZeeConfig.msgLow("amblight "+glob.blightamb.getRed());
+        brightnessMsg(false);
         return true;
+    }
+
+    private static void brightnessMsg(boolean defLight) {
+        String msg = "";
+        if (defLight) {
+            msg = "default light ";
+        }
+        else {
+            if (ZeeConfig.playerLocation == ZeeConfig.LOCATION_OUTSIDE)
+                msg = "outside light ";
+            else if (ZeeConfig.playerLocation == ZeeConfig.LOCATION_CELLAR)
+                msg = "cellar light ";
+            else if (ZeeConfig.playerLocation == ZeeConfig.LOCATION_CABIN)
+                msg = "cabin light ";
+            else if (ZeeConfig.playerLocation == ZeeConfig.LOCATION_UNDERGROUND)
+                msg = "underground light ";
+        }
+        Glob glob = ZeeConfig.gameUI.ui.sess.glob;
+        ZeeConfig.msgLow(msg + glob.blightamb.getRed());
     }
 
     private static Color colorStep(Color c, int step) {
@@ -3012,8 +3033,8 @@ public class ZeeManagerGobClick extends ZeeThread{
             ZeeConfig.playerLocation = ZeeConfig.LOCATION_CELLAR;
         else if (glob.blightamb.getRed() == ZeeConfig.DEF_LIGHT_CABIN)
             ZeeConfig.playerLocation = ZeeConfig.LOCATION_CABIN;
-        else if (glob.blightamb.getRed() == ZeeConfig.DEF_LIGHT_CAVEMINES)
-            ZeeConfig.playerLocation = ZeeConfig.LOCATION_CAVEMINES;
+        else if (glob.blightamb.getRed() == ZeeConfig.DEF_LIGHT_UNDERGROUND)
+            ZeeConfig.playerLocation = ZeeConfig.LOCATION_UNDERGROUND;
         else
             ZeeConfig.playerLocation = ZeeConfig.LOCATION_OUTSIDE;
 

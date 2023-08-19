@@ -138,7 +138,7 @@ public class ZeeConfig {
     static final int LOCATION_OUTSIDE = 0;
     static final int LOCATION_CELLAR = 1, DEF_LIGHT_CELLAR = 32;
     static final int LOCATION_CABIN = 2, DEF_LIGHT_CABIN = 144;
-    static final int LOCATION_CAVEMINES = 3, DEF_LIGHT_CAVEMINES = 48;
+    static final int LOCATION_UNDERGROUND = 3, DEF_LIGHT_UNDERGROUND = 48;
     static int playerLocation = -1;
 
     static MixColor MIXCOLOR_RED = new MixColor(255,0,0,200);

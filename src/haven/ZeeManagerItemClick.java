@@ -1747,7 +1747,7 @@ public class ZeeManagerItemClick extends ZeeThread{
                             newCheeseLocation = "cellar";
                         else if (ZeeConfig.playerLocation == ZeeConfig.LOCATION_CABIN )
                             newCheeseLocation = "cabin";
-                        else if (ZeeConfig.playerLocation == ZeeConfig.LOCATION_CAVEMINES)
+                        else if (ZeeConfig.playerLocation == ZeeConfig.LOCATION_UNDERGROUND)
                             newCheeseLocation = "mines";
                         else if(ZeeConfig.playerLocation == ZeeConfig.LOCATION_OUTSIDE)
                             newCheeseLocation = "outside";
