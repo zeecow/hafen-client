@@ -98,6 +98,7 @@ public class ISBox extends Widget implements DTarget {
 	    wdgmsg("xfer2", -1, flags);
 	if(amount > 0)
 	    wdgmsg("xfer2", 1, flags);
+    ZeeManagerItemClick.playFeedbackSound();
 	return(true);
     }
     

@@ -150,6 +150,7 @@ public class ZeeManagerItemClick extends ZeeThread{
                     // create one stack
                     else
                         gItemAct(wItem.item,1);
+                    playFeedbackSound();
                     return;
                 }
             }
@@ -198,6 +199,7 @@ public class ZeeManagerItemClick extends ZeeThread{
                     // ...sort transfer des
                     else
                         wItem.wdgmsg("transfer-sort", wItem.item, false);
+                    playFeedbackSound();
                     return;
                 }
             }
@@ -1616,6 +1618,7 @@ public class ZeeManagerItemClick extends ZeeThread{
     public static void undoStack(GItem i) {
         try {
             gItemActCoord(i,3);
+            playFeedbackSound();
         }catch (Exception e){
             //e.printStackTrace();
         }
@@ -1852,4 +1855,8 @@ public class ZeeManagerItemClick extends ZeeThread{
             return res.toString();
     }
 
+    public static final Resource resSoundWood2 = Resource.local().loadwait("sfx/hud/mmap/wood2");
+    public static void playFeedbackSound() {
+        ZeeConfig.gameUI.ui.sfx(resSoundWood2);
+    }
 }

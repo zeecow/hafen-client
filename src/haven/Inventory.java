@@ -107,10 +107,11 @@ public class Inventory extends Widget implements DTarget {
 	if(ui.modshift || ZeeConfig.scrollTransferItems) {
 	    Inventory minv = getparent(GameUI.class).maininv;
 	    if(minv != this) {
-		if(amount < 0)
-		    wdgmsg("invxf", minv.wdgid(), 1);
-		else if(amount > 0)
-		    minv.wdgmsg("invxf", this.wdgid(), 1);
+			if(amount < 0)
+				wdgmsg("invxf", minv.wdgid(), 1);
+			else if(amount > 0)
+				minv.wdgmsg("invxf", this.wdgid(), 1);
+			ZeeManagerItemClick.playFeedbackSound();
 	    }
 	}
 	return(true);

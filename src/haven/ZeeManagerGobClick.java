@@ -466,6 +466,7 @@ public class ZeeManagerGobClick extends ZeeThread{
                 //pickup all pile items
                 else {
                     gobClick(gob,3, UI.MOD_SHIFT);
+                    ZeeManagerItemClick.playFeedbackSound();
                 }
             }
             // pickup all items: dframe
