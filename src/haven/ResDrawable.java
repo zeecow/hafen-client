@@ -120,6 +120,7 @@ public class ResDrawable extends Drawable implements EquipTarget {
 	    }
 		if (ZeeConfig.highlightCropsReady)
 			ZeeConfig.applyGobSettingsHighlight(g, ZeeConfig.getHighlightDrawableColor(g));
+		ZeeConfig.addGobTagsByResName(g);
 	}
     }
 

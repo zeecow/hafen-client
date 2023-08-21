@@ -2582,6 +2582,19 @@ public boolean mousedown(Coord c, int button) {
 									sb.append("\n   "+a.getClass().getSimpleName());
 								}
 							}
+							// gob tags
+							if (!gob.tags.isEmpty()){
+								sb.append("\nTags:\n");
+								int cont = 0;
+								for (Gob.Tag tag : gob.tags) {
+									cont++;
+									if (cont==3){
+										sb.append("\n   ");
+										cont = 0;
+									}
+									sb.append("   "+tag);
+								}
+							}
 							ttip = sb.toString();
 						}
 					} else {

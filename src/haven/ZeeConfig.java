@@ -807,7 +807,7 @@ public class ZeeConfig {
         String path = "";
 
         // other players
-        if (gob.isOtherPlayer) {
+        if (gob.tags.contains(Gob.Tag.PLAYER_OTHER)) {
             if (autoHearthOnStranger && !playerHasAnyPose(POSE_PLAYER_TRAVELHOMEPOINT, POSE_PLAYER_TRAVELHOMESHRUG)) {
                 autoHearth();
             }
@@ -3293,18 +3293,11 @@ public class ZeeConfig {
                 maxReqstr = ob.getres().name;
             }
 
-            // player gobs
-            if(isPlayer(ob) && gameUI!=null && gameUI.map.player()!=null) {
-                // main player
-                if (gameUI.map.player().id == ob.id) {
-                    ob.isMainPlayer = true;
-                    // restore saved brightness
-                    ZeeManagerGobClick.brightnessMapLoad();
-                }
-                // others
-                else {
-                    ob.isOtherPlayer = true;
-                }
+            addGobTagsAdvanced(ob);
+
+            // brightness
+            if(ob.tags.contains(Gob.Tag.PLAYER_MAIN)) {
+                ZeeManagerGobClick.brightnessMapLoad();
             }
 
             // ignore bat if using batcape
@@ -3360,6 +3353,24 @@ public class ZeeConfig {
         }
 
         ob.settingsApplied = true;
+    }
+
+    static void addGobTagsByResName(Gob gob) {
+        String gobName = gob.getres().name;
+        if (isTree(gobName)) {
+            gob.tags.add(Gob.Tag.TREE);
+        }
+    }
+
+    static void addGobTagsAdvanced(Gob gob) {
+        String gobName = gob.getres().name;
+        if(isPlayer(gob) && gameUI!=null && gameUI.map.player()!=null) {
+            gob.tags.add(Gob.Tag.PLAYER);
+            if (gameUI.map.player().id == gob.id)
+                gob.tags.add(Gob.Tag.PLAYER_MAIN);
+            else
+                gob.tags.add(Gob.Tag.PLAYER_OTHER);
+        }
     }
 
     private static void applyGobSettingsAggro(Gob gob) {

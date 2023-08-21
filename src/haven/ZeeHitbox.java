@@ -16,8 +16,8 @@ public class ZeeHitbox extends ZeeSlottedNode implements Rendered {
     static Color DEF_HITBOX_COLOR = new Color(0, 153, 153, 255);
     static Color hitBoxColor = ZeeConfig.intToColor(Utils.getprefi("hitBoxColor",ZeeConfig.colorToInt(DEF_HITBOX_COLOR)));
     private static final Pipe.Op TOP = Pipe.Op.compose(Rendered.last, States.Depthtest.none, States.maskdepth);
-    static Pipe.Op SOLID = Pipe.Op.compose(new BaseColor(hitBoxColor));
-    private static final Pipe.Op SOLID_TOP = Pipe.Op.compose(SOLID, TOP);
+    private static Pipe.Op SOLID = Pipe.Op.compose(new BaseColor(hitBoxColor));
+    private static final Pipe.Op SOLID_VISIBLE = Pipe.Op.compose(SOLID, TOP);
     private Pipe.Op state = SOLID;
 
     private ZeeHitbox(Gob gob) {
@@ -49,7 +49,7 @@ public class ZeeHitbox extends ZeeSlottedNode implements Rendered {
 
     public void updateState() {
         if(model != null && slots != null) {
-            Pipe.Op newState = SOLID_TOP;
+            Pipe.Op newState = forceHitboxVisibility() ? SOLID_VISIBLE : SOLID;
             try {
                 Model m = getModel(gob);
                 if(m != null && m != model) {
@@ -64,6 +64,14 @@ public class ZeeHitbox extends ZeeSlottedNode implements Rendered {
                 }
             }
         }
+    }
+
+    private boolean forceHitboxVisibility(){
+        if (ZeeConfig.showHitbox)
+            return true;
+        if (gob.tags.contains(Gob.Tag.TREE))
+            return true;
+        return false;
     }
 
     private boolean passable() {

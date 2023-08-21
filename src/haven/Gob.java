@@ -53,7 +53,6 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 	public boolean pickupPriority = false;
 	public Drawable drawable;
 	public ZeeHidingGobSprite<ZeeHitbox> hitbox;
-	boolean isMainPlayer=false, isOtherPlayer=false;
 
 	public static class Overlay implements RenderTree.Node {
 	public final int id;
@@ -457,7 +456,6 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 	updstate();
 	if(virtual && ols.isEmpty() && (getattr(Drawable.class) == null))
 	    glob.oc.remove(this);
-	//TODO test ctick or gtick
 	if (!isGobWaitingSettings) {
 		isGobWaitingSettings = true;
 	}
@@ -1064,5 +1062,13 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 				this.addol(this.hitbox);
 			}
 		}
+	}
+
+	public HashSet<Tag> tags = new HashSet<>();
+	enum Tag {
+		BUSH,
+		PLAYER, PLAYER_MAIN, PLAYER_OTHER,
+		POSE_KO,
+		TREE, VEHICLE
 	}
 }
