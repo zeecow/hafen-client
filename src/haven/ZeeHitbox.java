@@ -13,16 +13,11 @@ public class ZeeHitbox extends ZeeSlottedNode implements Rendered {
     private final Gob gob;
     private static final Map<Resource, Model> MODEL_CACHE = new HashMap<>();
     private static final float Z = 0.1f;
-    static Color DEF_HITBOX_COLOR = new Color(0, 0, 192, 255);
+    static Color DEF_HITBOX_COLOR = new Color(0, 153, 153, 255);
     static Color hitBoxColor = ZeeConfig.intToColor(Utils.getprefi("hitBoxColor",ZeeConfig.colorToInt(DEF_HITBOX_COLOR)));
-    private static final Color PASSABLE_COLOR = new Color(105, 207, 124, 255);
-    private static final float PASSABLE_WIDTH = 1.5f;
-//    private static final float SOLID_WIDTH = 0f;
     private static final Pipe.Op TOP = Pipe.Op.compose(Rendered.last, States.Depthtest.none, States.maskdepth);
     static Pipe.Op SOLID = Pipe.Op.compose(new BaseColor(hitBoxColor));
-    private static final Pipe.Op PASSABLE = Pipe.Op.compose(new BaseColor(PASSABLE_COLOR), new States.LineWidth(PASSABLE_WIDTH));
-//    private static final Pipe.Op SOLID_TOP = Pipe.Op.compose(SOLID, TOP);
-//    private static final Pipe.Op PASSABLE_TOP = Pipe.Op.compose(PASSABLE, TOP);
+    private static final Pipe.Op SOLID_TOP = Pipe.Op.compose(SOLID, TOP);
     private Pipe.Op state = SOLID;
 
     private ZeeHitbox(Gob gob) {
@@ -54,9 +49,7 @@ public class ZeeHitbox extends ZeeSlottedNode implements Rendered {
 
     public void updateState() {
         if(model != null && slots != null) {
-            boolean top = false;//CFG.DISPLAY_GOB_HITBOX_TOP.get();
-            //Pipe.Op newState = passable() ? (top ? PASSABLE_TOP : PASSABLE) : (top ? SOLID_TOP : SOLID);
-            Pipe.Op newState = passable() ? PASSABLE : SOLID;
+            Pipe.Op newState = SOLID_TOP;
             try {
                 Model m = getModel(gob);
                 if(m != null && m != model) {
