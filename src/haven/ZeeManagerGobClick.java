@@ -1080,7 +1080,7 @@ public class ZeeManagerGobClick extends ZeeThread{
     }
 
     public static boolean isGobHouse(String gobName) {
-        String list = "/logcabin,/timberhouse,/stonestead,/stonemansion,/stonetower,/greathall,/windmill";
+        String list = "/logcabin,/timberhouse,/stonestead,/stonemansion,/stonetower,/greathall,/windmill,/greenhouse,/igloo,/primitivetent";
         return isGobInListEndsWith(gobName,list);
     }
 
