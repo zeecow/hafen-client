@@ -3248,7 +3248,14 @@ public class ZeeConfig {
                         }
                     }
                     // remove gob from queue
-                    Gob g = gobsWaiting.remove();
+                    Gob g = null;
+                    try{
+                        g = gobsWaiting.remove();
+                    }catch (Exception e){
+                        e.printStackTrace();
+                        continue;
+                    }
+                    // process gob
                     synchronized (g) {
                         if (g.isGobWaitingSettings) {
                             // apply gob settings
