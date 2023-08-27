@@ -256,6 +256,11 @@ public class FlowerMenu extends Widget {
 
     public void draw(GOut g) {
 	super.draw(g, false);
+		if(autochoose!=null){
+			choose(autochoose);
+			ZeeManagerGobClick.labelHarvestedPlant(autochoose.name);
+			autochoose = null;
+		}
     }
 
     public boolean keydown(java.awt.event.KeyEvent ev) {
@@ -293,11 +298,6 @@ public class FlowerMenu extends Widget {
 
 	@Override
 	public void tick(double dt) {
-		if(autochoose!=null){
-			choose(autochoose);
-			ZeeManagerGobClick.labelHarvestedPlant(autochoose.name);
-			autochoose = null;
-		}
 		super.tick(dt);
 	}
 
