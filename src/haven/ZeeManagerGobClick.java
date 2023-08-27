@@ -2598,8 +2598,9 @@ public class ZeeManagerGobClick extends ZeeThread{
             +"/wildhorse,/aurochs,/mouflon,/wildgoat,"
             +"/adder,/badger,/bear,/boar,/beaver,/fox,"
             +"/reindeer,/reddeer,/roedeer,"
-            +"/greyseal,/otter,/caveangler,/boreworm,/caverat,"
-            +"/lynx,/mammoth,/moose,/troll,/walrus,/wolf,/wolverine"
+            +"/grayseal,/otter,"
+            +"/lynx,/mammoth,/moose,/troll,/walrus,/wolf,/wolverine,"
+            +"/caveangler,/boreworm,/caverat,/cavelouse"
         );
     }
 
