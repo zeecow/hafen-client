@@ -1485,10 +1485,10 @@ public class ZeeManagerGobClick extends ZeeThread{
                 opts.add(ZeeFlowerMenu.STRPETAL_TILEMONITOR);
             menu = new ZeeFlowerMenu(gob, opts.toArray(String[]::new));
         }
-        else if (isGobTamedAnimal(gobName) && !isGobKnocked(gob)) {
+        else if (isGobTamedAnimal(gobName) && !isGobDeadOrKO(gob)) {
             menu = new ZeeFlowerMenu(gob, ZeeFlowerMenu.STRPETAL_OPENCATTLEROSTER, ZeeFlowerMenu.STRPETAL_MEMORIZEAREANIMALS);
         }
-        else if (isGobButchable(gobName) && isGobKnocked(gob)) {
+        else if (isGobButchable(gobName) && isGobDeadOrKO(gob)) {
             menu = new ZeeFlowerMenu(gob, ZeeFlowerMenu.STRPETAL_AUTOBUTCH_BIGDEADANIMAL, ZeeFlowerMenu.STRPETAL_LIFTUPGOB);
         }
         else if(gobName.endsWith("terobjs/oven")){
@@ -1530,16 +1530,6 @@ public class ZeeManagerGobClick extends ZeeThread{
         }
 
         return showMenu;
-    }
-
-    public static boolean isGobKnocked(Gob gob){
-        List<String> poses = ZeeConfig.getGobPoses(gob);
-        //println("isGobKnocked > "+poses);
-        for (String pose : poses) {
-            if (pose.contains("/knock") || pose.endsWith("-knock"))
-                return true;
-        }
-        return false;
     }
 
     private static boolean isGobDeadAnimal;
@@ -3144,7 +3134,7 @@ public class ZeeManagerGobClick extends ZeeThread{
     }
 
     static boolean isGobDeadOrKO(Gob gob) {
-        return ZeeConfig.gobHasAnyPoseEndsWith(gob,"/dead","/knock");
+        return ZeeConfig.gobHasAnyPoseEndsWith(gob,"/dead","/knock","-knock","/waterdead");
     }
 
     static void toggleHitbox() {
