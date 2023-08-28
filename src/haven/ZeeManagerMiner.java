@@ -262,9 +262,9 @@ public class ZeeManagerMiner extends ZeeThread{
 
     public static boolean isTunnel(Coord sz) {
         int minSize = 9;
-        if (sz.x==1 && sz.y>=minSize)
+        if ( (sz.x==1 || sz.x==2) && sz.y>=minSize)
             return true;
-        if (sz.y==1 && sz.x>=minSize)
+        if ((sz.y==1 || sz.y==2) && sz.x>=minSize)
             return true;
         return false;
     }
