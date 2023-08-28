@@ -725,6 +725,13 @@ public class ZeeManagerStockpile extends ZeeThread{
                 return true;
             }
         }
+        String basename = gob.getres().basename();
+        if (ZeeConfig.mineablesStone.contains(basename))
+            return true;
+        if (ZeeConfig.mineablesOre.contains(basename))
+            return true;
+        if (ZeeConfig.mineablesOrePrecious.contains(basename))
+            return true;
         println("isGobPileable false");
         return false;
     }
