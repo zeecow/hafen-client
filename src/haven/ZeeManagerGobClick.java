@@ -1727,18 +1727,22 @@ public class ZeeManagerGobClick extends ZeeThread{
     static boolean pickingIrrlight = false;
     public static void autoPickIrrlight() {
         if (pickingIrrlight) {
-            println("already picking irrlight");
+            // avoid being called multiple times by gob consumer
+            //println("already picking irrlight");
             return;
         }
+        pickingIrrlight = true;
         new ZeeThread(){
             public void run() {
                 try {
                     // guess working station
                     Gob workingStation = ZeeConfig.getClosestGob(ZeeConfig.findGobsByNameEndsWith("/crucible","/anvil"));
 
+                    // set max speed
+                    ZeeConfig.setPlayerSpeed(ZeeConfig.PLAYER_SPEED_SPRINT);
+
                     // try picking irrlight
                     ZeeConfig.addPlayerText("irrlight!");
-                    pickingIrrlight = true;
                     ZeeConfig.lastMapViewClickButton = 2;//prepare cancel click
                     while (pickingIrrlight && !ZeeConfig.isTaskCanceledByGroundClick()) {
                         Gob irrlight = ZeeConfig.getClosestGobByNameContains("/irrbloss");
@@ -1755,6 +1759,8 @@ public class ZeeManagerGobClick extends ZeeThread{
                         waitPlayerIdlePose();
                         sleep(PING_MS);
                         ZeeConfig.getButtonNamed((Window) ZeeConfig.makeWindow.parent,"Craft All").click();
+                        //drink while crafting
+                        ZeeManagerItemClick.drinkFromBeltHandsInv();
                     }
 
                 } catch (Exception e) {
