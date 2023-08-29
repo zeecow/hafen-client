@@ -2305,6 +2305,7 @@ public class CharWnd extends Window {
 		    dqst.remove(id);
 		}
 	    }
+		ZeeConfig.checkQuestsUimsg();
 	} else {
 	    super.uimsg(nm, args);
 	}

@@ -4156,4 +4156,18 @@ public class ZeeConfig {
             cw.c = cw.c.sub(0, cw.sz.y + GItem.HoverDeco.hovermarg.y);
         }
     }
+
+    public static void checkQuestsUimsg() {
+        // quests counter
+        for (Tabs.TabButton tabButton : gameUI.chrwdg.children(Tabs.TabButton.class)) {
+            // current quests button
+            if (tabButton.text.text.contentEquals("Current")){
+                tabButton.change("Current "+gameUI.chrwdg.cqst.quests.size());
+            }
+            // completed quests button
+            else if (tabButton.text.text.contentEquals("Completed")){
+                tabButton.change("Completed "+gameUI.chrwdg.dqst.quests.size());
+            }
+        }
+    }
 }
