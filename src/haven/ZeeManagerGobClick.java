@@ -3141,7 +3141,7 @@ public class ZeeManagerGobClick extends ZeeThread{
     }
 
     static boolean isGobDeadOrKO(Gob gob) {
-        return ZeeConfig.gobHasAnyPoseEndsWith(gob,"/dead","/knock","-knock","/waterdead");
+        return ZeeConfig.gobHasAnyPoseEndsWith(gob,"/dead","/knock","-knock","/knock-kid","/waterdead");
     }
 
     static void toggleHitbox() {
