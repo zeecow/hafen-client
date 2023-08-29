@@ -593,8 +593,10 @@ public class ZeeManagerStockpile extends ZeeThread{
         gobPile = gobSource = null;
 
         //TODO check for window.visible in isTransferOpen
-        windowManager.reqdestroy();
-        windowManager = null;
+        if (windowManager!=null) {
+            windowManager.reqdestroy();
+            windowManager = null;
+        }
     }
 
 
