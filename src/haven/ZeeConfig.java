@@ -3530,6 +3530,17 @@ public class ZeeConfig {
         return false;
     }
 
+    public static boolean gobHasAnyPoseContains(Gob gob, String ... wantedPosesContains){
+        List<String> gobPoses = getGobPoses(gob);
+        for (int i = 0; i < wantedPosesContains.length; i++) {
+            for (String pose : gobPoses) {
+                if (pose.contains(wantedPosesContains[i]))
+                    return true;
+            }
+        }
+        return false;
+    }
+
     public static List<String> getGobPoses(Gob gob) {
         List<String> ret = new ArrayList<>();
         if (gob==null)
