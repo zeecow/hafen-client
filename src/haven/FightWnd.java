@@ -689,22 +689,22 @@ public class FightWnd extends Widget {
 	    saves[i] = unused;
 
 	Widget p;
-	info = add(new ImageInfoBox(UI.scale(new Coord(223, 160))), UI.scale(new Coord(5, 35)).add(wbox.btloff()));
+	info = add(new ImageInfoBox(UI.scale(new Coord(223, 160))), UI.scale(new Coord(5, 25)).add(wbox.btloff()));
 	Frame.around(this, Collections.singletonList(info));
 
-	add(CharWnd.settip(new Img(CharWnd.catf.render("Martial Arts & Combat Schools").tex()), "gfx/hud/chr/tips/combat"), 0, 0);
-	actlist = add(new Actions(UI.scale(250, 160)), UI.scale(new Coord(245, 35)).add(wbox.btloff()));
+	add(CharWnd.settip(new Img(CharWnd.attrf.render("Martial Arts & Combat Schools").tex()), "gfx/hud/chr/tips/combat"), 0, 0);
+	actlist = add(new Actions(UI.scale(250, 160)), UI.scale(new Coord(245, 25)).add(wbox.btloff()));
 	Frame.around(this, Collections.singletonList(actlist));
 
-	p = add(new BView(), UI.scale(5, 208));
+	p = add(new BView(), UI.scale(5, 198));
 	count = add(new Label(""), p.pos("ur").adds(10, 0));
 
-	savelist = add(new Savelist(UI.scale(370), 3), p.pos("bl").adds(0, 2).add(wbox.btloff()));
-	p = Frame.around(this, Collections.singletonList(savelist));
+	savelist = add(new Savelist(UI.scale(370), 3), p.pos("bl").adds(0, 0).add(wbox.btloff()));
+	//p = Frame.around(this, Collections.singletonList(savelist));
 	p = add(new Button(UI.scale(110), "Load", false).action(() -> {
 		    load(savelist.sel);
 		    use(savelist.sel);
-	}), p.pos("ur").adds(10, 0));
+	}), p.pos("ur").adds(10, 10));
 	p = add(new Button(UI.scale(110), "Save", false).action(() -> {
 		    if(savelist.sel < 0) {
 			getparent(GameUI.class).error("No save entry selected.");
@@ -712,7 +712,7 @@ public class FightWnd extends Widget {
 			save(savelist.sel);
 			use(savelist.sel);
 		    }
-	}), p.pos("bl").adds(0, 2));
+	}), p.pos("bl").adds(0, 8));
 	pack();
     }
 

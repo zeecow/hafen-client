@@ -45,13 +45,13 @@ public class CharWnd extends Window {
     public static final RichText.Foundry ifnd = new RichText.Foundry(Resource.remote(), java.awt.font.TextAttribute.FAMILY, "SansSerif", java.awt.font.TextAttribute.SIZE, UI.scale(9)).aa(true);
     public static final Text.Furnace catf = new BlurFurn(new TexFurn(new Text.Foundry(Text.fraktur, 25).aa(true), Window.ctex), UI.scale(3), UI.scale(2), new Color(96, 48, 0));
     public static final Text.Furnace failf = new BlurFurn(new TexFurn(new Text.Foundry(Text.fraktur, 25).aa(true), Resource.loadimg("gfx/hud/fontred")), UI.scale(3), UI.scale(2), new Color(96, 48, 0));
-    public static final Text.Foundry attrf =  new Text.Foundry(Text.serif, 16).aa(false);//new Text.Foundry(Text.fraktur, 18).aa(true);
+    public static final Text.Foundry attrf =  new Text.Foundry(Text.serif, 14).aa(false);//new Text.Foundry(Text.fraktur, 18).aa(true);
     public static final Color debuff = new Color(255, 128, 128);
     public static final Color buff = new Color(128, 255, 128);
     public static final Color tbuff = new Color(128, 128, 255);
     public static final Color every = new Color(255, 255, 255, 16), other = new Color(255, 255, 255, 32);
     public static final int width = UI.scale(255);
-    public static final int height = UI.scale(260);
+    public static final int height = UI.scale(230);
     public static final int margin1 = UI.scale(5);
     public static final int margin2 = 2 * margin1;
     public static final int margin3 = 2 * margin2;
@@ -1864,11 +1864,11 @@ public class CharWnd extends Window {
     public CharWnd(Glob glob) {
 	super(UI.scale(new Coord(300, 290)), "Character Sheet");
 
-	final Tabs tabs = new Tabs(new Coord(15, 10), Coord.z, this);
+	final Tabs tabs = new Tabs(new Coord(15, 0), Coord.z, this);
         Tabs.Tab battr = tabs.add();
         {
 	    Widget prev;
-	    prev = battr.add(settip(new Img(catf.render("Base Attributes").tex()), "gfx/hud/chr/tips/base"), Coord.z);
+	    prev = battr.add(settip(new Img(attrf.render("Base Attributes").tex()), "gfx/hud/chr/tips/base"), Coord.z);
 	    base = new ArrayList<>();
 	    Attr aw;
 	    base.add(aw = battr.add(new Attr(glob, "str", every), prev.pos("bl").adds(5, 0).add(wbox.btloff())));
@@ -1881,20 +1881,20 @@ public class CharWnd extends Window {
 	    base.add(aw = battr.add(new Attr(glob, "wil", other), aw.pos("bl")));
 	    base.add(aw = battr.add(new Attr(glob, "psy", every), aw.pos("bl")));
 	    prev = Frame.around(battr, base);
-	    prev = battr.add(settip(new Img(catf.render("Food Event Points").tex()), "gfx/hud/chr/tips/fep"), prev.pos("bl").x(0).adds(0, 10));
-	    feps = battr.add(new FoodMeter(), prev.pos("bl").adds(5, 2));
+	    prev = battr.add(settip(new Img(attrf.render("Food Event Points").tex()), "gfx/hud/chr/tips/fep"), prev.pos("bl").x(0).adds(0, 0));
+	    feps = battr.add(new FoodMeter(), prev.pos("bl").adds(5, 0));
 
-	    prev = battr.add(settip(new Img(catf.render("Food Satiations").tex()), "gfx/hud/chr/tips/constip"), width, 0);
+	    prev = battr.add(settip(new Img(attrf.render("Food Satiations").tex()), "gfx/hud/chr/tips/constip"), width, 0);
 	    cons = battr.add(new Constipations(attrw, base.size()), prev.pos("bl").adds(5, 0).add(wbox.btloff()));
 	    prev = Frame.around(battr, Collections.singletonList(cons));
-	    prev = battr.add(settip(new Img(catf.render("Hunger Level").tex()), "gfx/hud/chr/tips/hunger"), prev.pos("bl").x(width).adds(0, 10));
-	    glut = battr.add(new GlutMeter(), prev.pos("bl").adds(5, 2));
+	    prev = battr.add(settip(new Img(attrf.render("Hunger Level").tex()), "gfx/hud/chr/tips/hunger"), prev.pos("bl").x(width).adds(0, 0));
+	    glut = battr.add(new GlutMeter(), prev.pos("bl").adds(5, 0));
         }
 
         sattr = tabs.add();
 	{
 	    Widget prev;
-	    prev = sattr.add(settip(new Img(catf.render("Abilities").tex()), "gfx/hud/chr/tips/sattr"), Coord.z);
+	    prev = sattr.add(settip(new Img(attrf.render("Abilities").tex()), "gfx/hud/chr/tips/sattr"), Coord.z);
 	    skill = new ArrayList<>();
 	    SAttr aw;
 	    skill.add(aw = sattr.add(new SAttr(glob, "unarmed", every), prev.pos("bl").adds(5, 0).add(wbox.btloff())));
@@ -1912,7 +1912,7 @@ public class CharWnd extends Window {
 	    skill.add(aw = sattr.add(new SAttr(glob, "lore", every), aw.pos("bl")));
 	    Widget lframe = Frame.around(sattr, skill);
 
-	    prev = sattr.add(settip(new Img(catf.render("Study Report").tex()), "gfx/hud/chr/tips/study"), width, 0);
+	    prev = sattr.add(settip(new Img(attrf.render("Study Report").tex()), "gfx/hud/chr/tips/study"), width, 0);
 	    studyc = prev.pos("bl").adds(5, 0);
 	    Widget bframe = sattr.adda(new Frame(new Coord(attrw, UI.scale(105)), true), prev.pos("bl").adds(5, 0).x, lframe.pos("br").y, 0.0, 1.0);
 	    int rx = bframe.pos("iur").subs(10, 0).x;
@@ -1942,12 +1942,12 @@ public class CharWnd extends Window {
         {
 	    Widget prev;
 
-	    prev = skills.add(settip(new Img(catf.render("Lore & Skills").tex()), "gfx/hud/chr/tips/skills"), Coord.z);
+	    prev = skills.add(settip(new Img(attrf.render("Lore & Skills").tex()), "gfx/hud/chr/tips/skills"), Coord.z);
 	    LoadingTextBox info = skills.add(new LoadingTextBox(new Coord(attrw, height), "", ifnd), prev.pos("bl").adds(5, 0).add(wbox.btloff()));
 	    info.bg = new Color(0, 0, 0, 128);
 	    Frame.around(skills, Collections.singletonList(info));
 
-	    prev = skills.add(new Img(catf.render("Entries").tex()), width, 0);
+	    prev = skills.add(new Img(attrf.render("Entries").tex()), width, 0);
 	    Tabs lists = new Tabs(prev.pos("bl").adds(5, 0), new Coord(attrw + wbox.bisz().x, 0), skills);
 	    int gh = UI.scale(241);
 	    Tabs.Tab sktab = lists.add();
@@ -2025,7 +2025,7 @@ public class CharWnd extends Window {
 	    Widget prev;
 
 	    wounds = tabs.add();
-	    prev = wounds.add(settip(new Img(catf.render("Health & Wounds").tex()), "gfx/hud/chr/tips/wounds"), 0, 0);
+	    prev = wounds.add(settip(new Img(attrf.render("Health & Wounds").tex()), "gfx/hud/chr/tips/wounds"), 0, 0);
 	    this.wounds = wounds.add(new WoundList(attrw, 12), prev.pos("bl").x(width + margin1).add(wbox.btloff()));
 	    Frame.around(wounds, Collections.singletonList(this.wounds));
 	    woundbox = wounds.add(new Widget(new Coord(attrw, this.wounds.sz.y)) {
@@ -2049,8 +2049,8 @@ public class CharWnd extends Window {
 	    Widget prev;
 
 	    quests = tabs.add();
-	    prev = quests.add(settip(new Img(catf.render("Quest Log").tex()), "gfx/hud/chr/tips/quests"), new Coord(0, 0));
-	    questbox = quests.add(new Widget(new Coord(attrw, height)) {
+	    prev = quests.add(settip(new Img(attrf.render("Quest Log").tex()), "gfx/hud/chr/tips/quests"), new Coord(0, 0));
+	    questbox = quests.add(new Widget(new Coord(attrw, height-30)) {
 		    public void draw(GOut g) {
 			g.chcolor(0, 0, 0, 128);
 			g.frect(Coord.z, sz);
@@ -2111,7 +2111,7 @@ public class CharWnd extends Window {
 
 	    fgt = tabs.add();
 
-	    this.addhl(new Coord(tabs.c.x, tabs.c.y + tabs.sz.y + margin2), tabs.sz.x,
+	    this.addhl(new Coord(tabs.c.x, tabs.c.y + tabs.sz.y), tabs.sz.x,
 		new TB("battr", battr, "Base Attributes"),
 		new TB("sattr", sattr, "Abilities"),
 		new TB("skill", skills, "Lore & Skills"),
@@ -2121,7 +2121,7 @@ public class CharWnd extends Window {
 	    );
 	}
 
-	resize(contentsz().add(UI.scale(15, 10)));
+	resize(contentsz().add(UI.scale(5, 0)));
     }
 
     public void addchild(Widget child, Object... args) {
