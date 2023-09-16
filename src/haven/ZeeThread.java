@@ -267,19 +267,20 @@ public class ZeeThread  extends Thread{
         return waitGobIdleVelocity(k);
     }
 
+    static public String[] arrayPlayerActivePoses = new String[]{
+            ZeeConfig.POSE_PLAYER_DRINK,
+            ZeeConfig.POSE_PLAYER_CHOPTREE,
+            ZeeConfig.POSE_PLAYER_DIGSHOVEL,
+            ZeeConfig.POSE_PLAYER_PICK,
+            ZeeConfig.POSE_PLAYER_SAW,
+            ZeeConfig.POSE_PLAYER_CHIPPINGSTONE,
+            ZeeConfig.POSE_PLAYER_BUILD,
+            ZeeConfig.POSE_PLAYER_BUTCH,
+            ZeeConfig.POSE_PLAYER_HARVESTING,
+            ZeeConfig.POSE_PLAYER_PICKGROUND
+    };
     public static boolean waitPlayerNonActivePose(){
-        return waitPlayerPoseNotInList(
-                ZeeConfig.POSE_PLAYER_DRINK,
-                ZeeConfig.POSE_PLAYER_CHOPTREE,
-                ZeeConfig.POSE_PLAYER_DIGSHOVEL,
-                ZeeConfig.POSE_PLAYER_PICK,
-                ZeeConfig.POSE_PLAYER_SAW,
-                ZeeConfig.POSE_PLAYER_CHIPPINGSTONE,
-                ZeeConfig.POSE_PLAYER_BUILD,
-                ZeeConfig.POSE_PLAYER_BUTCH,
-                ZeeConfig.POSE_PLAYER_HARVESTING,
-                ZeeConfig.POSE_PLAYER_PICKGROUND
-        );
+        return waitPlayerPoseNotInList(arrayPlayerActivePoses);
     }
 
 
@@ -542,25 +543,37 @@ public class ZeeThread  extends Thread{
     }
 
 
-    public static boolean waitPlayerIdleOrHoldingItem(int idleSeconds) {
-        //println("waitPlayerIdleFor "+idleSeconds+"s");
-        staminaMonitorStart();
-        long timer = idleSeconds * 1000;
+    public static boolean waitPlayerIdleOrHoldingItem() {
+        //println("waitPlayerIdleOrHoldingItem");
+        boolean pidle = false;
         try {
-            while( timer > 0  &&  !ZeeConfig.isPlayerHoldingItem()) {
-                if(stamChangeSec!=0 || ZeeConfig.isPlayerMoving()){
-                    timer = idleSeconds * 1000; //reset timer if player moving or stamina changing
-                }else {
-                    timer -= SLEEP_MS;
+            ZeeConfig.prepareTaskCanceledByGroundClick();
+            while( !ZeeConfig.isTaskCanceledByGroundClick()  &&  !ZeeConfig.isPlayerHoldingItem()) {
+                Thread.sleep(PING_MS);
+                // is mounted player idle
+                if (ZeeConfig.isPlayerMountingHorse()){
+                    //horse idle
+                    if (ZeeConfig.gobHasAnyPose(ZeeConfig.getPlayerMountedHorse(), ZeeConfig.POSE_HORSE_IDLE)){
+                        //player non active
+                        if (!ZeeConfig.playerHasAnyPose(arrayPlayerActivePoses)){
+                            pidle = true;
+                            break;
+                        }
+                    }
                 }
-                Thread.sleep(SLEEP_MS);
+                // non mounted player idle
+                else{
+                    if (ZeeConfig.playerHasAnyPose(ZeeConfig.POSE_PLAYER_IDLE)){
+                        pidle = true;
+                        break;
+                    }
+                }
             }
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        staminaMonitorStop();
-        //println("waitPlayerIdleFor ret "+(timer<=0));
-        return timer <= 0  ||  ZeeConfig.isPlayerHoldingItem();
+        //println("waitPlayerIdleOrHoldingItem ret "+(pidle || ZeeConfig.isPlayerHoldingItem()));
+        return  pidle || ZeeConfig.isPlayerHoldingItem();
     }
 
 

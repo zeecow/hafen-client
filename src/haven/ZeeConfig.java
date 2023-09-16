@@ -3122,6 +3122,9 @@ public class ZeeConfig {
         //cancel if clicked right/left button
         return lastMapViewClickButton != 2;
     }
+    public static void prepareTaskCanceledByGroundClick() {
+        ZeeConfig.lastMapViewClickButton = 2;
+    }
 
     public static Widget getIconFilterWidget(){
 

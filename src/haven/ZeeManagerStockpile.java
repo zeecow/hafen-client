@@ -1281,13 +1281,18 @@ public class ZeeManagerStockpile extends ZeeThread{
                                     println("pilan board > pile full");
                                     break;
                                 }
-                                // chop blocks
+                                // make board
                                 if (!ZeeManagerGobClick.clickGobPetal(lastTreelogSawed, "Make boards")) {
                                     println("pilan board > done");
                                     break;
                                 }
-                                // wait inventory full with 2 freeslots
-                                if(waitInvFullOrHoldingItem(inv,3000)){
+                                // wait start sawing board
+                                if (!waitPlayerPose(ZeeConfig.POSE_PLAYER_SAW)){
+                                    println("pilan board > couldn't make board?");
+                                    break;
+                                }
+                                // wait inventory full
+                                if(waitPlayerIdleOrHoldingItem()){
                                     // pile holding item
                                     if (ZeeConfig.isPlayerHoldingItem()){
                                         ZeeManagerGobClick.itemActGob(existingPile,0);
