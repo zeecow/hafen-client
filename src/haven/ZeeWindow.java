@@ -52,16 +52,21 @@ public class ZeeWindow extends Window {
                     if (!win.isAutoHideOn){
                         // delay mode
                         win.isAutoHideOn = true;
-                        win.isAutoHideFast = false;
-                        this.change(TEXT_AUTOHIDEWINDOW, new Color(0,200,0));
                         if(!ZeeConfig.listAutoHideWindowsActive.contains(win.cap))
                             ZeeConfig.listAutoHideWindowsActive.add(win.cap);
+
+                        win.isAutoHideFast = false;
+                        ZeeConfig.listAutoHideWindowsActiveFast.remove(win.cap);
+
+                        this.change(TEXT_AUTOHIDEWINDOW, new Color(0,200,0));
                     }
                     else {
                         // fast mode
                         if (!win.isAutoHideFast){
                             win.isAutoHideFast = true;
                             this.change(TEXT_AUTOHIDEWINDOW_FAST, new Color(0,200,0));
+                            if(!ZeeConfig.listAutoHideWindowsActiveFast.contains(win.cap))
+                                ZeeConfig.listAutoHideWindowsActiveFast.add(win.cap);
                         }
                         // off
                         else{
@@ -69,10 +74,12 @@ public class ZeeWindow extends Window {
                             win.isAutoHideFast = false;
                             this.change(TEXT_AUTOHIDEWINDOW);
                             ZeeConfig.listAutoHideWindowsActive.remove(win.cap);
+                            ZeeConfig.listAutoHideWindowsActiveFast.remove(win.cap);
                         }
                     }
-                    //save active autohide windows
+                    //save prefs
                     Utils.setprefsl("listAutoHideWindowsActive",ZeeConfig.listAutoHideWindowsActive);
+                    Utils.setprefsl("listAutoHideWindowsActiveFast",ZeeConfig.listAutoHideWindowsActiveFast);
                 }
                 else
                     super.wdgmsg(msg,args);

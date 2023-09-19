@@ -235,6 +235,7 @@ public class ZeeConfig {
     static boolean autoHideWindows = Utils.getprefb("autoHideWindows", false);
     static String listWindowsAddHideButton = Utils.getpref("listWindowsAddHideButton", DEF_LIST_WINDOWS_ADD_HIDE_BUTTON);
     static List<String> listAutoHideWindowsActive = new ArrayList<>(Utils.getprefsl("listAutoHideWindowsActive",new String[]{}));
+    static List<String> listAutoHideWindowsActiveFast = new ArrayList<>(Utils.getprefsl("listAutoHideWindowsActiveFast",new String[]{}));
     public static boolean miniTrees = Utils.getprefb("miniTrees", false);
     public static Integer miniTreesSize = Utils.getprefi("miniTreesSize", 50);
     static boolean noWeather = Utils.getprefb("noWeather", false);
@@ -1313,7 +1314,12 @@ public class ZeeConfig {
         //autohide window is active throughout user session
         if (listAutoHideWindowsActive.contains(window.cap)){
             window.isAutoHideOn = true;
-            window.buttonAutoHide.change(ZeeWindow.ZeeButton.TEXT_AUTOHIDEWINDOW, new Color(0,200,0));
+            String buttonText = ZeeWindow.ZeeButton.TEXT_AUTOHIDEWINDOW;
+            if (listAutoHideWindowsActiveFast.contains(window.cap)){
+                window.isAutoHideFast = true;
+                buttonText = ZeeWindow.ZeeButton.TEXT_AUTOHIDEWINDOW_FAST;
+            }
+            window.buttonAutoHide.change(buttonText, new Color(0,200,0));
             window.autoHideToggleWinPos();
         }
     }
