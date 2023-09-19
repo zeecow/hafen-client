@@ -75,6 +75,8 @@ public class ZeeWindow extends Window {
                             this.change(TEXT_AUTOHIDEWINDOW);
                             ZeeConfig.listAutoHideWindowsActive.remove(win.cap);
                             ZeeConfig.listAutoHideWindowsActiveFast.remove(win.cap);
+                            ZeeConfig.windowFitView(win);
+                            ZeeConfig.saveWindowPos(win);
                         }
                     }
                     //save prefs
