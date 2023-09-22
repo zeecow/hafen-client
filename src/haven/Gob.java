@@ -984,13 +984,17 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 		return 0;
 	}
 
+	private static final List<String> listHideWallNames = List.of(
+		"gfx/terobjs/arch/palisadeseg", "gfx/terobjs/arch/palisadecp",
+		"gfx/terobjs/arch/drystonewallseg", "gfx/terobjs/arch/drystonewallcp",
+		"gfx/terobjs/arch/poleseg", "gfx/terobjs/arch/polecp"
+	);
 	void toggleModel(){
 		synchronized (this){
 
 			String gobName = this.getres().name;
 			if( !ZeeConfig.isTree(gobName) &&
-				!gobName.contentEquals("gfx/terobjs/arch/palisadeseg") &&
-				!gobName.contentEquals("gfx/terobjs/arch/palisadecp") &&
+				!listHideWallNames.contains(gobName)  &&
 				!ZeeConfig.isGobCrop(gobName))
 			{
 				return;

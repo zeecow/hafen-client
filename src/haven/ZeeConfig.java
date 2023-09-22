@@ -507,14 +507,14 @@ public class ZeeConfig {
 
     //  gfx/invobjs/turnip , gfx/invobjs/seed-turnip
     public static boolean isItemCrop(String basename) {
-        String crops = "beetroot,seed-turnip,turnip,seed-carrot,carrot,seed-flax,seed-hemp,seed-leek,leek,seed-poppy,"
+        final String crops = "beetroot,seed-turnip,turnip,seed-carrot,carrot,seed-flax,seed-hemp,seed-leek,leek,seed-poppy,"
             +"seed-pipeweed,seed-cucumber,seed-barley,seed-wheat,seed-millet,seed-lettuce,"
             +"seed-pumpkin";
         return crops.contains(basename);
     }
 
     public static boolean isBug(String resName){
-        List<String> l = List.of(
+        final List<String> l = List.of(
             "/silkmoth", "/grasshopper", "/ladybug", "/dragonfly",
             "/waterstrider", "/firefly", "/sandflea",
             "/cavemoth", "/stagbeetle", "/cavecentipede", "/moonmoth",
@@ -529,7 +529,7 @@ public class ZeeConfig {
     }
 
     public static boolean isAggressive(String nameContains){
-        String[] list = {
+        final String[] list = {
                "/adder","/sandflea","/boar/","/badger/","/bear/","/bat/","/boreworm/",
                 "/ooze/","/cavelouse/","/caveangler/","orca","/goldeneagle/","/lynx/",
                 "/mammoth/","/moose/","/troll/","/walrus/","/goat/","/wolf/","/wolverine/",
@@ -553,18 +553,10 @@ public class ZeeConfig {
     }
 
     public static boolean isButchableSmallAnimal(String nameContains){
-        /*
-        Kill > Pluck > Butch = "gfx/invobjs/meat"
-            gfx/invobjs/rooster
-            gfx/invobjs/rooster-dead
-            gfx/invobjs/chicken-plucked
-            gfx/invobjs/chicken-cleaned, gfx/invobjs/adder-clean
-            gfx/invobjs/meat
-         */
         // skip cases ("/squirrelhide", "squirrelhide-blood", "squirreltail")
         if (isAnimalHideTailEtc(nameContains))
             return false;
-        String[] endlist = {
+        final String[] endlist = {
             "rockdove","quail","/hen","/rooster","magpie", // "/crab"
             "mallard","seagull","ptarmigan","grouse",
             "/squirrel","/hedgehog","/bogturtle",
@@ -579,16 +571,7 @@ public class ZeeConfig {
     }
 
     public static boolean isSmallAnimal(String nameContains){
-        /*
-        private static final String[] CRITTERS = {
-            "/rat/rat", "/swan", "/squirrel", "/silkmoth", "/frog/", "/rockdove", "/quail", "/toad", "/grasshopper",
-            "/ladybug", "/forestsnail", "/dragonfly", "/forestlizard", "/waterstrider", "/firefly", "/sandflea",
-            "/rabbit", "/crab/", "/cavemoth", "/hedgehog", "/stagbeetle", "jellyfish", "/mallard", "/chick","/hen",
-            "/rooster", "/irrbloss",
-            "/cavecentipede", "/bogturtle", "/moonmoth", "/monarchbutterfly", "/items/grub", "/springbumblebee"
-        };
-         */
-        String[] endlist = {
+        final String[] endlist = {
                 "rockdove","quail","/hen","/rooster","magpie",
                 "mallard","seagull","ptarmigan","grouse",
                 "/rat/rat","/squirrel","/hedgehog","/bogturtle",
@@ -604,7 +587,7 @@ public class ZeeConfig {
     }
 
     private static boolean isIconsCategNoobies(String nameContains) {
-        String[] list = {
+        final String[] list = {
                 "/hen","/rooster","/rabbit","rabbit-doe","/rat/rat","squirrel",
                 "/grasshopper","/ladybug","/dragonfly","/waterstrider",
                 "/cavemoth","/items/grub","/springbumblebee",
@@ -620,7 +603,7 @@ public class ZeeConfig {
     }
 
     public static boolean isString(String name){
-        String[] list = {
+        final String[] list = {
             "stingingnettle","taproot","cattail"
         };
         for (int i = 0; i < list.length; i++) {
@@ -643,7 +626,7 @@ public class ZeeConfig {
     }
 
     static boolean isKritterNotPickable(String resname) {
-        String[] list = {
+        final String[] list = {
             //wild
             "gfx/kritter/badger/badger",
             "gfx/kritter/bear/bear",
@@ -690,7 +673,7 @@ public class ZeeConfig {
     }
 
     static boolean isBird(String name){
-        String[] list = {
+        final String[] list = {
             "rockdove","quail","/chick","/hen","/rooster","eagle","owl","magpie",
             "mallard","pelican","seagull","swan","ptarmigan","grouse"
         };
@@ -706,7 +689,7 @@ public class ZeeConfig {
     }
 
     public static boolean isFlower(String name){
-        String[] list = {
+        final String[] list = {
             "bloodstern","camomile","cavebulb","chimingbluebell","clover","coltsfoot","dandelion",
             "edelweiss","frogscrown","heartsease","marshmallow","stingingnettle","thornythistle",
             "yarrow","snapdragon","wintergreen"
@@ -719,8 +702,7 @@ public class ZeeConfig {
     }
 
     public static boolean isMushroom(String name){
-        println(name);
-        String[] list = {
+        final String[] list = {
             "bolete","truffle","trumpet","cavelantern","chantrelle","/lorchel","fairy","blewit",
             "puffball","indigo","parasol","snowtop","yellowfoot"
         };
@@ -732,7 +714,7 @@ public class ZeeConfig {
     }
 
     public static boolean isTreeLeaf(String name){
-        String[] list = {
+        final String[] list = {
                 "trees/maple","trees/conkertree","trees/mulberry","trees/fig"
         };
         for (int i = 0; i < list.length; i++) {
@@ -743,7 +725,7 @@ public class ZeeConfig {
     }
 
     public static boolean isTreeToughBark(String name){
-        String[] list = {
+        final String[] list = {
             "trees/linden","trees/birch","trees/wartybirch","trees/willow","trees/cedar",
             "trees/elm","trees/juniper","trees/beech","trees/mulberry","trees/wychelm"
         };
@@ -755,7 +737,7 @@ public class ZeeConfig {
     }
 
     public static boolean isTreeBough(String name){
-        String[] list = {
+        final String[] list = {
                 "trees/linden","trees/alder","trees/yew","trees/spruce",
                 "trees/elm","trees/fir","trees/sweetgum","trees/grayalder"
         };
@@ -767,7 +749,7 @@ public class ZeeConfig {
     }
 
     public static boolean isTreeFruit(String name){
-        String[] list = {
+        final String[] list = {
             "trees/cherrie","trees/fig","trees/lemon","trees/medlar","trees/mulberry",
             "trees/pear","trees/persimmon","trees/plum","trees/quince","trees/apple",
             "trees/sorb"
@@ -780,7 +762,7 @@ public class ZeeConfig {
     }
 
     public static boolean isTreeNuts(String name){
-        String[] list = {
+        final String[] list = {
             "trees/almond","trees/beech","trees/chestnut","trees/hazel",
             "trees/walnut","trees/carob","trees/king","trees/oak",
             "bushes/witherstand"
@@ -1448,29 +1430,7 @@ public class ZeeConfig {
 
 
     public static void checkRemoteWidget(String type, Widget wdg) {
-        //Cattle Roster, called for each animal type
-//        if(cattleRosterHeight && type.contains("rosters/") && cattleRosterHeightPercentage < 1.0){
-//
-//            //resize "window"
-//            wdg.resize(wdg.sz.x, (int)(wdg.sz.y * cattleRosterHeightPercentage));
-//
-//            int y = -1;
-//            for (Widget w: wdg.children()) {
-//                //reposition buttons
-//                if(w.getClass().getSimpleName().contentEquals("Button")){
-//                    if(y==-1) { //calculate once
-//                        y = (int) (w.c.y * cattleRosterHeightPercentage) - (int)(w.sz.y*0.6);
-//                    }
-//                    w.c.y = y;
-//                }
-//                //resize scrollbar and entrycont
-//                else if(w instanceof Scrollbar){
-//                    Scrollbar sb = (Scrollbar) w;
-//                    sb.resize(sb.sz.x, (int)(sb.sz.y * cattleRosterHeightPercentage));
-//                    println(type+" > scrollbar > val="+sb.val+" max="+sb.max);
-//                }
-//            }
-//        }
+
     }
 
 
@@ -1599,7 +1559,7 @@ public class ZeeConfig {
         show organize button for duplicate windows
      */
     private static void windowModOrganizeButton(Window window, String windowTitle) {
-        String singleWindows = "Craft,Inventory,Character Sheet,Options,Kith & Kin,Equipment";
+        final String singleWindows = "Craft,Inventory,Character Sheet,Options,Kith & Kin,Equipment";
         if(!singleWindows.contains(windowTitle)) { // avoid searching multiple Windows
             List<Window> wins = getWindows(windowTitle);
             if (wins.size() > 1) {
@@ -1717,8 +1677,8 @@ public class ZeeConfig {
     }
 
     private static String windowTamedAnimalGetGender(String animal) {
-        String male = "Hog,Bull,Stallion,Billy,Ram";
-        String gender = male.contains(animal) ? "M" : "F";
+        final String male = "Hog,Bull,Stallion,Billy,Ram";
+        final String gender = male.contains(animal) ? "M" : "F";
         return gender;
     }
 
@@ -1745,7 +1705,7 @@ public class ZeeConfig {
     }
 
     public static boolean isWindowAnimalStats(String windowTitle) {
-        String list = "Sow,Hog,Cow,Bull,Stallion,Mare,Nanny,Billy,Ewe,Ram";
+        final String list = "Sow,Hog,Cow,Bull,Stallion,Mare,Nanny,Billy,Ewe,Ram";
         return list.contains(windowTitle);
     }
 
@@ -2066,7 +2026,7 @@ public class ZeeConfig {
 
     //"note, duration_ms, volume_from0to127",
     //"rest_ms",
-    public static String[] midiJawsTheme = new String[]{
+    public static final String[] midiJawsTheme = new String[]{
             "200",//avoid stuttering
             "2F#,500,100", "100", "2G,250,120",
             "700",
@@ -2080,7 +2040,7 @@ public class ZeeConfig {
             "2F#,200,120",
             "200"//avoid cuts
     };
-    public static String[] midiUfoThirdKind = new String[]{
+    public static final String[] midiUfoThirdKind = new String[]{
             "200",
             "5D,300,100",
             "5E,300,120",
@@ -2089,7 +2049,7 @@ public class ZeeConfig {
             "4G,1000,90",
             "200"
     };
-    public static String[] midiBeethoven5th = new String[]{
+    public static final String[] midiBeethoven5th = new String[]{
             "200",
             "3G,100,120","50",
             "3G,100,120","50",
@@ -2097,7 +2057,7 @@ public class ZeeConfig {
             "3D#,1000,120",
             "200"
     };
-    public static String[] midiWoodPecker= new String[]{
+    public static final String[] midiWoodPecker= new String[]{
             "200",
             "5C,80,80","50",
             "5F,80,90","50",
@@ -2381,7 +2341,7 @@ public class ZeeConfig {
     }
 
     public static boolean isWindowContainer(Window window) {
-        String[] containers = (
+        final String[] containers = (
                 //boxes
                 "Woodbox,Cupboard,Chest,Crate,Basket,Casket,Box,Coffer,Steelbox,Metal Cabinet,"
                 +"Urn,Pot,"
@@ -2520,11 +2480,6 @@ public class ZeeConfig {
         gameUI.menu.wdgmsg("act", action);
     }
 
-//    public static void checkCharSelection(String msg) {
-//        if(msg.equalsIgnoreCase("play")){
-//            ZeeConfig.resetCharSelected();
-//        }
-//    }
 
     //reset state
     public static void initCharacterVariables() {
@@ -3004,7 +2959,6 @@ public class ZeeConfig {
         // sends escape key to root ui
         gameUI.ui.root.wdgmsg("gk", 27);
     }
-    public static List<String> bogtype = new ArrayList<>(Arrays.asList("gfx/tiles/bog", "gfx/tiles/bogwater", "gfx/tiles/fen", "gfx/tiles/fenwater", "gfx/tiles/swamp", "gfx/tiles/swampwater", "", ""));
 
 
     public static void clickRemoveCursor(){
@@ -3864,7 +3818,7 @@ public class ZeeConfig {
 
 
     static boolean isPlayerTileWaterOrSwamp() {
-        List<String> names = Arrays.asList(
+        final List<String> names = Arrays.asList(
                 TILE_WATER_FRESH_DEEP , TILE_WATER_FRESH_SHALLOW ,
                 TILE_WATER_OCEAN_SHALLOW , TILE_WATER_OCEAN_DEEP , TILE_WATER_OCEAN_DEEPER ,
                 TILE_SWAMP , TILE_SWAMP_WATER ,
@@ -3875,7 +3829,7 @@ public class ZeeConfig {
     }
 
     static boolean isPlayerTileShallowWaterOrSwamp() {
-        List<String> names = Arrays.asList(
+        final List<String> names = Arrays.asList(
             TILE_WATER_FRESH_SHALLOW ,
             TILE_WATER_OCEAN_SHALLOW ,
             TILE_SWAMP , TILE_SWAMP_WATER ,
@@ -3886,7 +3840,7 @@ public class ZeeConfig {
     }
 
     static boolean isPlayerTileDeepWater() {
-        List<String> names = Arrays.asList(
+        final List<String> names = Arrays.asList(
                 TILE_WATER_FRESH_DEEP ,
                 TILE_WATER_OCEAN_DEEP , TILE_WATER_OCEAN_DEEPER
         );
@@ -3924,7 +3878,7 @@ public class ZeeConfig {
     }
 
     public static boolean isPlayerInCellar() {
-        List<Gob> cellarStairs = findGobsByNameEndsWith("arch/cellarstairs");
+        final List<Gob> cellarStairs = findGobsByNameEndsWith("arch/cellarstairs");
         if (cellarStairs==null || cellarStairs.isEmpty())
             return false;
         return true;
