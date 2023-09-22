@@ -2454,19 +2454,20 @@ public class ZeeManagerGobClick extends ZeeThread{
             println("inspectGob > gob null");
             return;
         }
+        isMidclickInspecting = true;
         new ZeeThread(){
             @Override
             public void run() {
                 try {
-                    isMidclickInspecting = true;
                     ZeeConfig.gameUI.menu.wdgmsg("act","inspect","0");
+                    sleep(50);
                     gobClick(gob, 1);
-                    sleep(PING_MS);
+                    sleep(50);
                     ZeeConfig.clickRemoveCursor();
-                    isMidclickInspecting = false;
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
+                isMidclickInspecting = false;
             }
         }.start();
     }
