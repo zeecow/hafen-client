@@ -1256,6 +1256,67 @@ public class ZeeManagerStockpile extends ZeeThread{
         }.start();
     }
 
+    public static void quickPileSand(Gob existingPile) {
+        new ZeeThread(){
+            public void run() {
+                try {
+                    Inventory inv = ZeeConfig.getMainInventory();
+                    ZeeConfig.lastMapViewClickButton = 2;//prepare cancel click
+                    ZeeConfig.addPlayerText("pilan");
+                    do {
+                        ZeeConfig.stopMovingEscKey();
+                        // pickup inv sand (if player was holding item other method would be called)
+                        if (ZeeManagerItemClick.pickUpInvItem(inv, "/sand")) {
+                            // pile sand
+                            ZeeManagerGobClick.itemActGob(existingPile, UI.MOD_SHIFT);
+                            //wait piling
+                            if (waitNotHoldingItem()) {
+                                sleep(500);//wait transfer
+                                // pile full
+                                if(inv.countItemsByNameEquals("gfx/invobjs/sand") > 0){
+                                    println("pilan sand > pile full");
+                                    break;
+                                }
+                                // dig icon
+                                ZeeConfig.cursorChange(ZeeConfig.ACT_DIG);
+                                if (!waitCursorName(ZeeConfig.CURSOR_DIG)) {
+                                    println("pilan sand > no cursor dig");
+                                    return;
+                                }
+                                // click sand
+                                ZeeConfig.clickCoord(ZeeConfig.lastMapViewClickMcPrev.floor(posres), 1);
+                                sleep(PING_MS);
+                                // wait approaching tile
+                                if(!waitGobIdleVelocity(ZeeConfig.getPlayerGob())){
+                                    println("pilan sand > failed wait idle velocity");
+                                    return;
+                                }
+                                // wait inventory full with x freeslots
+                                if(waitInvFull(inv,4)){
+                                    // pile holding item
+                                    if (ZeeConfig.isPlayerHoldingItem()){
+                                        ZeeManagerGobClick.itemActGob(existingPile,0);
+                                        waitNotHoldingItem();
+                                    }
+                                }
+                            }
+                            else{
+                                println("pilan sand > pile full, player didnt move");
+                                break;
+                            }
+                        } else {
+                            println("pilan sand > couldnt get item from inv");
+                            break;
+                        }
+                    }while(!ZeeConfig.isTaskCanceledByGroundClick());
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+                ZeeConfig.removePlayerText();
+            }
+        }.start();
+    }
+
     static void quickPileBoards(Gob existingPile) {
         new ZeeThread(){
             public void run() {

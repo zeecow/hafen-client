@@ -86,6 +86,10 @@ public class ZeeManagerGobClick extends ZeeThread{
             else if (gobName.endsWith("/stockpile-wblock") && ZeeConfig.playerHasAnyPose(ZeeConfig.POSE_PLAYER_CHOPBLOCK)) {
                 ZeeManagerStockpile.quickPileBlocks(gob);
             }
+            // pile inv sand and get more
+            else if (gobName.endsWith("/stockpile-sand") && ZeeConfig.playerHasAnyPose(ZeeConfig.POSE_PLAYER_DIG,ZeeConfig.POSE_PLAYER_DIGSHOVEL)) {
+                ZeeManagerStockpile.quickPileSand(gob);
+            }
             // pile inv stones and try chipping more stones
             else if (gobName.endsWith("/stockpile-stone") && ZeeConfig.playerHasAnyPose(ZeeConfig.POSE_PLAYER_PICK, ZeeConfig.POSE_PLAYER_CHIPPINGSTONE)) {
                 ZeeManagerStockpile.pileInvStonesAndChipMore(gob);

@@ -85,6 +85,7 @@ public class ZeeConfig {
     static final String POSE_PLAYER_CHOPBLOCK = "gfx/borka/choppan";
     static final String POSE_PLAYER_CHOPTREE = "gfx/borka/treechop";
     static final String POSE_PLAYER_DIGSHOVEL = "gfx/borka/shoveldig";
+    static final String POSE_PLAYER_DIG = "gfx/borka/dig";
     static final String POSE_PLAYER_DRINK = "gfx/borka/drinkan";
     static final String POSE_PLAYER_LIFTING = "gfx/borka/banzai";
     static final String POSE_PLAYER_HARVESTING = "gfx/borka/harvesting";//reeds clearing
@@ -167,8 +168,8 @@ public class ZeeConfig {
     static Object[] lastMapViewClickArgs;
     static Gob lastMapViewClickGob;
     static String lastMapViewClickGobName;
-    static Coord lastMapViewClickPc;
-    static Coord2d lastMapViewClickMc;
+    static Coord lastMapViewClickPc, lastMapViewClickPcPrev;
+    static Coord2d lastMapViewClickMc, lastMapViewClickMcPrev;
     static int lastMapViewClickButton;
     static long lastMapViewClickMs;
     static Coord lastSavedOverlayStartCoord, lastSavedOverlayEndCoord;
@@ -2608,6 +2609,8 @@ public class ZeeConfig {
 
     public static void checkMapClicked(int clickb, Coord pc, Coord2d mc, Object[] args, Gob clickGob) {
         lastMapViewClickButton = clickb;
+        lastMapViewClickPcPrev = lastMapViewClickPc;
+        lastMapViewClickMcPrev = lastMapViewClickMc;
         lastMapViewClickPc = pc;
         lastMapViewClickMc = mc;
         lastMapViewClickArgs = args;
