@@ -162,7 +162,7 @@ public class ZeeManagerItemClick extends ZeeThread{
 
             // fishing
             if (isLongClick() && isFishingItem()) {
-                equipFishingItem();
+                switchFishingEquips();
                 return;
             }
 
@@ -493,28 +493,31 @@ public class ZeeManagerItemClick extends ZeeThread{
         return ret;
     }
 
-    private void equipFishingItem() {
-        //   gfx/invobjs/small/primrod-h
-        //   gfx/invobjs/small/bushpole-l
-        /*
-            haven.MenuGrid@35e8b5d9 ; act ; [fish, 0]
-            haven.GameUI@3692df36 ; focus ; [8]
-            haven.MapView@6c6f1998 ; click ; [(711, 519), (1067680, 1019086), 1, 0, 0, 156122677, (1068567, 1021959), 0, -1]
-         */
+    private void switchFishingEquips() {
+
+        ZeeConfig.addPlayerText("switch");
+
         try {
+
+            Inventory invCreelOrMain = wItem.getparent(Inventory.class);
+
+            // equip lure on primrod
             if (itemName.contains("lure-")){
-                // equip lure on primrod
                 if(getLeftHandName().contains("/primrod") || getRightHandName().contains("/primrod")){
                     if(pickUpItem()){
-                        equiporyItemAct("/primrod");
-                        Thread.sleep(PING_MS / 2);
-                        wItem.getparent(Inventory.class).wdgmsg("drop", wItem.c.div(33));
+                        equiporyItemAct("/primrod");//equip holding item
+                        playFeedbackSound();
+                        Thread.sleep(500);
+                        invCreelOrMain.wdgmsg("drop", wItem.c.div(33));//return switched item
+                        playFeedbackSound();
                     }
                 } else {
                     ZeeConfig.gameUI.error("no fish rod equipped");
+                    return;
                 }
-            } else {
-                //equip hook or line
+            }
+            //equip hook or line
+            else {
                 String rodName = "";
                 if(getLeftHandName().contains("/primrod") || getRightHandName().contains("/primrod")) {
                     rodName = "/primrod";
@@ -525,19 +528,23 @@ public class ZeeManagerItemClick extends ZeeThread{
                     return;
                 }
                 if(pickUpItem()){
-                    equiporyItemAct(rodName);
-                    Thread.sleep(PING_MS / 2);
-                    wItem.getparent(Inventory.class).wdgmsg("drop", wItem.c.div(33));
+                    equiporyItemAct(rodName);//equip holding item
+                    playFeedbackSound();
+                    Thread.sleep(500);
+                    invCreelOrMain.wdgmsg("drop", wItem.c.div(33));//return switched item
+                    playFeedbackSound();
                 }
             }
 
             // click fishing spot again
-            Thread.sleep(PING_MS / 2);
+            Thread.sleep(500);
             ZeeConfig.gameUI.map.wdgmsg("click", ZeeConfig.lastMapViewClickArgs);
 
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+
+        ZeeConfig.removePlayerText();
     }
 
     private boolean isFishingItem() {
