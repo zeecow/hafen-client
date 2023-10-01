@@ -96,6 +96,75 @@ public class ZeeManagerStockpile extends ZeeThread{
             ZeeConfig.addGobText(plob,plob.getres().name);
     }
 
+    public static void pileInvBoardsAndMakeMore(Gob existingPile) {
+        new ZeeThread(){
+            public void run() {
+                try{
+                    Inventory inv = ZeeConfig.getMainInventory();
+                    ZeeConfig.stopMovingEscKey();
+                    // pickup inv board (if player was holding item other method would be called)
+                    if (ZeeManagerItemClick.pickUpInvItem(inv, "/board-")) {
+                        // pile board
+                        ZeeManagerGobClick.itemActGob(existingPile, UI.MOD_SHIFT);
+                        //wait piling
+                        if (waitNotHoldingItem()) {
+                            //make board again
+                            ZeeManagerGobClick.clickGobPetal(lastTreelogSawed, "Make boards");
+                        }
+                    }
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+            }
+        }.start();
+    }
+
+    public static void pileInvBlocksAndMakeMore(Gob existingPile) {
+        new ZeeThread(){
+            public void run() {
+                try{
+                    Inventory inv = ZeeConfig.getMainInventory();
+                    ZeeConfig.stopMovingEscKey();
+                    // pickup inv block (if player was holding item other method would be called)
+                    if (ZeeManagerItemClick.pickUpInvItem(inv, "/wblock-")) {
+                        // pile block
+                        ZeeManagerGobClick.itemActGob(existingPile, UI.MOD_SHIFT);
+                        //wait piling
+                        if (waitNotHoldingItem()) {
+                            //make blocks again
+                            ZeeManagerGobClick.clickGobPetal(lastTreelogChopped, "Chop into blocks");
+                        }
+                    }
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+            }
+        }.start();
+    }
+
+    public static void pileInvSandAndDigMore(Gob existingPile) {
+        new ZeeThread(){
+            public void run() {
+                try{
+                    Inventory inv = ZeeConfig.getMainInventory();
+                    ZeeConfig.stopMovingEscKey();
+                    // pickup inv sand (if player was holding item other method would be called)
+                    if (ZeeManagerItemClick.pickUpInvItem(inv, "/sand")) {
+                        // pile sand
+                        ZeeManagerGobClick.itemActGob(existingPile, UI.MOD_SHIFT);
+                        //wait piling
+                        if (waitNotHoldingItem()) {
+                            //dig sand again
+                            ZeeConfig.clickCoord(ZeeConfig.lastMapViewClickMcPrev.floor(posres), 1);
+                        }
+                    }
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+            }
+        }.start();
+    }
+
     @Override
     public void run() {
         try{
@@ -1191,7 +1260,7 @@ public class ZeeManagerStockpile extends ZeeThread{
                                 ZeeManagerGobClick.clickGobPetal(lastBoulderChipped,"Chip stone");
                         }
                     } else {
-                        println("pile all block > couldnt get block from inv");
+                        println("pile all stones > couldnt get stone from inv");
                     }
                 }catch (Exception e){
                     e.printStackTrace();

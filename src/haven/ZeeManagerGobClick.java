@@ -78,17 +78,17 @@ public class ZeeManagerGobClick extends ZeeThread{
             else if ( isGobTreeLog(gobName) && ZeeConfig.isPlayerLiftingGob("gfx/terobjs/trees/")!=null && !ZeeConfig.isPlayerLiftingGob(gob)){
                 placeTreelogNextTo(gob);
             }
-            // pile boards
+            // pile boards once and dig more
             else if (gobName.endsWith("/stockpile-board") && ZeeConfig.playerHasAnyPose(ZeeConfig.POSE_PLAYER_SAW)) {
-                ZeeManagerStockpile.pileBoardsFromTreelog(gob);
+                ZeeManagerStockpile.pileInvBoardsAndMakeMore(gob);
             }
-            // pile blocks
+            // pile blocks once and chop more
             else if (gobName.endsWith("/stockpile-wblock") && ZeeConfig.playerHasAnyPose(ZeeConfig.POSE_PLAYER_CHOPBLOCK)) {
-                ZeeManagerStockpile.pileBlocksFromTreelog(gob);
+                ZeeManagerStockpile.pileInvBlocksAndMakeMore(gob);
             }
-            // pile sand
+            // pile sand once and dig more
             else if (gobName.endsWith("/stockpile-sand") && ZeeConfig.playerHasAnyPose(ZeeConfig.POSE_PLAYER_DIG,ZeeConfig.POSE_PLAYER_DIGSHOVEL)) {
-                ZeeManagerStockpile.pileSandFromSandTile(gob);
+                ZeeManagerStockpile.pileInvSandAndDigMore(gob);
             }
             // pile inv stones and try chipping more stones
             else if (gobName.endsWith("/stockpile-stone") && ZeeConfig.playerHasAnyPose(ZeeConfig.POSE_PLAYER_PICK, ZeeConfig.POSE_PLAYER_CHIPPINGSTONE)) {
@@ -434,6 +434,18 @@ public class ZeeManagerGobClick extends ZeeThread{
             /*
                 non-ground clicks
             */
+            // pile boards from treelog
+            else if (gobName.endsWith("/stockpile-board") && ZeeConfig.playerHasAnyPose(ZeeConfig.POSE_PLAYER_SAW)) {
+                ZeeManagerStockpile.pileBoardsFromTreelog(gob);
+            }
+            // pile blocks from treelog
+            else if (gobName.endsWith("/stockpile-wblock") && ZeeConfig.playerHasAnyPose(ZeeConfig.POSE_PLAYER_CHOPBLOCK)) {
+                ZeeManagerStockpile.pileBlocksFromTreelog(gob);
+            }
+            // pile sand from tile
+            else if (gobName.endsWith("/stockpile-sand") && ZeeConfig.playerHasAnyPose(ZeeConfig.POSE_PLAYER_DIG,ZeeConfig.POSE_PLAYER_DIGSHOVEL)) {
+                ZeeManagerStockpile.pileSandFromSandTile(gob);
+            }
             // put out cauldron
             else if(gobName.contains("/cauldron") && !ZeeConfig.isPlayerLiftingGob(gob)){
                 cauldronPutOut();

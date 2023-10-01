@@ -61,6 +61,7 @@ Midclick Ground Object
 - while crafting rope, midclicking fibre piles will get fibres and "Craft All" again
 - midclick barterstand to open search window
 - midclick smelter holding bucket to collect all quicksilver
+- midclick stockpile while making block/board/sand will pile inv items and try acquire more
 
 Long Midclick Ground Object
 - show context menu for various objs (details below)
@@ -76,7 +77,7 @@ Long Midclick Ground Object
 - while carrying/driving wheelbarrow will mount horse obj and lift wheelbarrow again
 - show window for area piler
 - pile all clay if clicked pile with cursor dig
-- pile inv board/block/stone if clicked pile while working, then try getting more items
+- longmidclick stockpile while making block/board/sand will try pile items until pile full or object consumed
 - put out cauldron
 
 Midclick Window Item
