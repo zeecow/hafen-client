@@ -78,17 +78,17 @@ public class ZeeManagerGobClick extends ZeeThread{
             else if ( isGobTreeLog(gobName) && ZeeConfig.isPlayerLiftingGob("gfx/terobjs/trees/")!=null && !ZeeConfig.isPlayerLiftingGob(gob)){
                 placeTreelogNextTo(gob);
             }
-            // pile inv boards and try sawing more boards
+            // pile boards
             else if (gobName.endsWith("/stockpile-board") && ZeeConfig.playerHasAnyPose(ZeeConfig.POSE_PLAYER_SAW)) {
-                ZeeManagerStockpile.quickPileBoards(gob);
+                ZeeManagerStockpile.pileBoardsFromTreelog(gob);
             }
-            // pile inv blocks and try choppin more blocks
+            // pile blocks
             else if (gobName.endsWith("/stockpile-wblock") && ZeeConfig.playerHasAnyPose(ZeeConfig.POSE_PLAYER_CHOPBLOCK)) {
-                ZeeManagerStockpile.quickPileBlocks(gob);
+                ZeeManagerStockpile.pileBlocksFromTreelog(gob);
             }
-            // pile inv sand and get more
+            // pile sand
             else if (gobName.endsWith("/stockpile-sand") && ZeeConfig.playerHasAnyPose(ZeeConfig.POSE_PLAYER_DIG,ZeeConfig.POSE_PLAYER_DIGSHOVEL)) {
-                ZeeManagerStockpile.quickPileSand(gob);
+                ZeeManagerStockpile.pileSandFromSandTile(gob);
             }
             // pile inv stones and try chipping more stones
             else if (gobName.endsWith("/stockpile-stone") && ZeeConfig.playerHasAnyPose(ZeeConfig.POSE_PLAYER_PICK, ZeeConfig.POSE_PLAYER_CHIPPINGSTONE)) {

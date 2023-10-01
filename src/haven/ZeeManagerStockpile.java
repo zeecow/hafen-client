@@ -1200,7 +1200,7 @@ public class ZeeManagerStockpile extends ZeeThread{
         }.start();
     }
 
-    public static void quickPileBlocks(Gob existingPile) {
+    public static void pileBlocksFromTreelog(Gob existingPile) {
         new ZeeThread(){
             public void run() {
                 try {
@@ -1230,8 +1230,13 @@ public class ZeeManagerStockpile extends ZeeThread{
                                     println("pilan blocks > done");
                                     break;
                                 }
-                                // wait inventory full with 2 freeslots
-                                if(waitInvFull(inv,4)){
+                                // wait start chopping
+                                if (!waitPlayerPose(ZeeConfig.POSE_PLAYER_CHOPBLOCK)){
+                                    println("pilan blocks > couldn't chop blocks?");
+                                    break;
+                                }
+                                // wait inventory full or player idle
+                                if(waitPlayerIdleOrHoldingItem()){
                                     // pile holding item
                                     if (ZeeConfig.isPlayerHoldingItem()){
                                         ZeeManagerGobClick.itemActGob(existingPile,0);
@@ -1256,7 +1261,7 @@ public class ZeeManagerStockpile extends ZeeThread{
         }.start();
     }
 
-    public static void quickPileSand(Gob existingPile) {
+    public static void pileSandFromSandTile(Gob existingPile) {
         new ZeeThread(){
             public void run() {
                 try {
@@ -1317,7 +1322,7 @@ public class ZeeManagerStockpile extends ZeeThread{
         }.start();
     }
 
-    static void quickPileBoards(Gob existingPile) {
+    static void pileBoardsFromTreelog(Gob existingPile) {
         new ZeeThread(){
             public void run() {
                 try {
