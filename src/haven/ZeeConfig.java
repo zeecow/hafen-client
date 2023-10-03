@@ -157,7 +157,7 @@ public class ZeeConfig {
     static Button btnMkWndSearchInput;
     static GobIcon.SettingsWindow.IconList iconList;
     static ChatUI.Channel multiChat;
-    private static Dropbox<String> iconListFilterBox;
+    private static Widget iconListFilterBox;
     private static Inventory mainInv;
     static Glob glob;
     static boolean keepMapViewOverlay;
@@ -572,16 +572,21 @@ public class ZeeConfig {
     }
 
     public static boolean isSmallAnimal(String nameContains){
-        final String[] endlist = {
+        final String[] endList = {"/toad"};//TODO bring more to this list
+        for (int i = 0; i < endList.length; i++) {
+            if(nameContains.endsWith(endList[i]))
+                return true;
+        }
+        final String[] containsList = {
                 "rockdove","quail","/hen","/rooster","magpie",
                 "mallard","seagull","ptarmigan","grouse",
                 "/rat/rat","/squirrel","/hedgehog","/bogturtle",
                 "/rabbit-buck","rabbit-doe","/crab","/jellyfish",
-                "/frog","/toad","/forestlizard","snail",
+                "/frog","/forestlizard","snail",
                 "/adder"
         };
-        for (int i = 0; i < endlist.length; i++) {
-            if(nameContains.contains(endlist[i]))
+        for (int i = 0; i < containsList.length; i++) {
+            if(nameContains.contains(containsList[i]))
                 return true;
         }
         return false;
@@ -605,7 +610,7 @@ public class ZeeConfig {
 
     public static boolean isString(String name){
         final String[] list = {
-            "stingingnettle","taproot","cattail"
+            "stingingnettle","taproot","cattail","toadflax"
         };
         for (int i = 0; i < list.length; i++) {
             if(name.contains(list[i]))
@@ -3089,59 +3094,132 @@ public class ZeeConfig {
         ZeeConfig.lastMapViewClickButton = 2;
     }
 
+
+    private static boolean iconListBusyCheckingAll = false;
+    private static Button iconListButtonAll, iconListButtonNone;
     public static Widget getIconFilterWidget(){
 
         if (iconListFilterBox != null) {
+            iconListButtonAll.disable(true);
+            iconListButtonNone.disable(true);
             return iconListFilterBox;
         }
 
-        iconListFilterBox =  new Dropbox<String>(110,14,20) {
-            String space = "     ";
-            private final List<String> filters = new ArrayList<String>() {{
-                add(space+"all");
-                add(space+"aggressive");
-                add(space+"birds");
-                add(space+"bugs");
-                add(space+"bushes");
-                add(space+"flowers");
-                add(space+"herbs");
-                add(space+"kritters");
-                add(space+"mushrooms");
-                add(space+"noob stuff");
-                add(space+"small animals");
-                add(space+"string");
-                add(space+"trees");
+        iconListFilterBox =  new Widget(Coord.of(220,25));
+
+        iconListFilterBox.add(
+            new Dropbox<String>(110,14,20) {
+                String space = "     ";
+                private final List<String> filters = new ArrayList<String>() {{
+                    add(space+"all");
+                    add(space+"aggressive");
+                    add(space+"birds");
+                    add(space+"bugs");
+                    add(space+"bushes");
+                    add(space+"flowers");
+                    add(space+"herbs");
+                    add(space+"kritters");
+                    add(space+"mushrooms");
+                    add(space+"noob stuff");
+                    add(space+"small animals");
+                    add(space+"string");
+                    add(space+"trees");
                     add(space+space+"bark");
                     add(space+space+"bough");
                     add(space+space+"fruit");
                     add(space+space+"leaves");
                     add(space+space+"nuts");
-            }};
-            protected String listitem(int idx) {
-                return(filters.get(idx));
-            }
-            protected int listitems() {
-                return(filters.size());
-            }
-            protected void drawitem(GOut g, String name, int idx) {
-                g.atext(name, Coord.of(0, g.sz().y / 2), 0.0, 0.5);
-            }
-            public void change(String filter) {
-                super.change(filter);
-                iconList.cur = null;
-                iconList.initOrdered();
-                filter = filter.strip();//remove formatting spaces
-                if(!filter.equalsIgnoreCase("all")) {
-                    iconList.ordered = getIconsFiltered(filter, iconList.ordered);
+                }};
+                protected String listitem(int idx) {
+                    return(filters.get(idx));
+                }
+                protected int listitems() {
+                    return(filters.size());
+                }
+                protected void drawitem(GOut g, String name, int idx) {
+                    g.atext(name, Coord.of(0, g.sz().y / 2), 0.0, 0.5);
+                }
+                public void change(String filter) {
+                    super.change(filter);
+                    iconList.cur = null;
+                    iconList.initOrdered();
+                    filter = filter.strip();//remove formatting spaces
+                    if (filter.equalsIgnoreCase("all")) {
+                        iconListButtonAll.disable(true);
+                        iconListButtonNone.disable(true);
+                    }else{
+                        iconListButtonAll.disable(false);
+                        iconListButtonNone.disable(false);
+                        iconList.ordered = getIconsFiltered(filter, iconList.ordered);
+                    }
+                }
+                public void dispose() {
+                    super.dispose();
+                    this.sel = "";
                 }
             }
-            public void dispose() {
-                super.dispose();
-                this.sel = "";
+        ,0,0);
+
+        iconListFilterBox.add(new Label("check:"),120,7);
+
+        iconListFilterBox.add(iconListButtonAll = new Button(30,"all"){
+            public void wdgmsg(String msg, Object... args) {
+                if (msg.contentEquals("activate")){
+                    iconListToggleAll(true);
+                }
             }
-        };
+        },150,0);
+
+        iconListFilterBox.add(iconListButtonNone = new Button(40,"none"){
+            public void wdgmsg(String msg, Object... args) {
+                if (msg.contentEquals("activate")){
+                    iconListToggleAll(false);
+                }
+            }
+        },180,0);
+
+        iconListButtonAll.disable(true);
+        iconListButtonNone.disable(true);
+
+        //iconListFilterBox.pack();
 
         return iconListFilterBox;
+    }
+
+    private static void iconListToggleAll(boolean newVal){
+        if (iconListBusyCheckingAll){
+            println("icon list busy checking all");
+            return;
+        }
+        iconListBusyCheckingAll = true;
+        new ZeeThread(){
+            public void run() {
+                try{
+                    List<CheckBox> cbs = new ArrayList<CheckBox>();
+                    cbs.addAll(iconList.children(CheckBox.class));
+                    cbs.removeIf(checkBox -> {
+                        Widget.KeyboundTip tip = (Widget.KeyboundTip) checkBox.tooltip;
+                        if (tip.base.contentEquals("Display"))
+                            return false;
+                        return true;
+                    });
+                    ZeeConfig.addPlayerText("checking "+cbs.size());
+                    int changed = 0;
+                    for (CheckBox cb : cbs) {
+                        if (cb.state() != newVal) {
+                            cb.set(newVal);
+                            changed++;
+                            sleep(50);
+                        }
+                    }
+                    msgLow("set "+changed+" / "+cbs.size()+" checkboxes to "+newVal);
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+                iconListBusyCheckingAll = false;
+                ZeeConfig.removePlayerText();
+            }
+        }.start();
     }
 
 

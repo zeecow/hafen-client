@@ -78,4 +78,9 @@ public class CheckBox extends ACheckBox {
 	}
 	return(super.mousedown(c, button));
     }
+
+	public void setLabel(String lbl) {
+		this.lbl = (lbl.length() > 0) ? Text.std.render(lbl, java.awt.Color.WHITE) : null;
+		sz = Coord.of(box.sz().x + UI.scale(5) + this.lbl.sz().x, Math.max(box.sz().y, this.lbl.sz().y));
+	}
 }
