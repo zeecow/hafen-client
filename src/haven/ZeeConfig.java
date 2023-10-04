@@ -279,6 +279,7 @@ public class ZeeConfig {
     static Runnable hideTreesPalisCropsRunnable = () -> ZeeManagerGobClick.toggleModels();
     public static boolean autoHideWindowDelay = Utils.getprefb("autoHideWindowDelay",true);
     public static int autoHideWindowDelayMs = Utils.getprefi("autoHideWindowDelayMs",1000);
+    public static boolean showGobPointer = Utils.getprefb("showGobPointer",false);
 
     public final static Set<String> mineablesStone = new HashSet<String>(Arrays.asList(
             "stone","gneiss","basalt","dolomite","feldspar","flint",
@@ -3304,7 +3305,10 @@ public class ZeeConfig {
                         if (g.isGobWaitingSettings) {
                             // apply gob settings
                             countRemovals++;
-                            applyGobSettings(g);
+                            Gob finalG = g;
+                            gameUI.ui.sess.glob.loader.defer(() -> {
+                                applyGobSettings(finalG);
+                            },null);
                         } else {
                             // requeue gob up to a few times
                             if (g.requeued < ZeeConfig.gobMaxRequeues) { //TODO test other numbers
@@ -3397,6 +3401,15 @@ public class ZeeConfig {
             // save gob name
             if (ob.getres().name!=null && !ob.getres().name.isBlank() && !listGobsSession.contains(ob.getres().name)) {
                 listGobsSession.add(ob.getres().name);
+            }
+
+            // gob pointer
+            if (ZeeConfig.showGobPointer && ob.findol(ZeePointer.class)==null) {
+                MiniMap.DisplayIcon displayIcon = gameUI.mmap.iconByGobName(ob.getres().name);
+                if (displayIcon != null) {
+                    //println("display icon " + displayIcon.icon.res.get().name);
+                    ob.addol(new Gob.Overlay(ob, new ZeePointer(ob, displayIcon.icon.res)));
+                }
             }
 
         }catch (Exception e){

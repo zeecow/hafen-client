@@ -732,6 +732,18 @@ public class MiniMap extends Widget {
 	return(null);
     }
 
+	public DisplayIcon iconByGobName(String name) {
+		for(ListIterator<DisplayIcon> it = icons.listIterator(icons.size()); it.hasPrevious();) {
+			DisplayIcon disp = it.previous();
+//			GobIcon.Image img = disp.img;
+//			if((disp.sc != null) && c.isect(disp.sc.sub(img.cc), img.tex.sz()) && !filter(disp))
+//				return(disp);
+			if (disp.gob.getres().name.contentEquals(name))
+				return  disp;
+		}
+		return(null);
+	}
+
     public DisplayMarker findmarker(long id) {
 	for(DisplayGrid dgrid : display) {
 	    if(dgrid == null)
