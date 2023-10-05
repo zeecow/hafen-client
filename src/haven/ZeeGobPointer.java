@@ -7,7 +7,7 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 
 
-public class ZeePointer extends Sprite implements RenderTree.Node, PView.Render2D {
+public class ZeeGobPointer extends Sprite implements RenderTree.Node, PView.Render2D {
     public static final BaseColor col = new BaseColor(new Color(241, 227, 157, 255));
     public Indir<Resource> icon;
     public Coord2d tc;
@@ -17,7 +17,7 @@ public class ZeePointer extends Sprite implements RenderTree.Node, PView.Render2
     private Tex licon;
     public Gob gob;
 
-    public ZeePointer(Gob gob, Indir<Resource> icon) {
+    public ZeeGobPointer(Gob gob, Indir<Resource> icon) {
         super(null,null);//super(gob, icon.get());
         this.icon = icon;
         this.gob = gob;

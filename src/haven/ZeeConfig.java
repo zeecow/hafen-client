@@ -2895,7 +2895,6 @@ public class ZeeConfig {
             System.out.println("addGobText > "+e.getMessage());
         }
     }
-
     public static void removeGobText(ArrayList<Gob> gobs) {
         if(gobs==null || gobs.size()==0)
             return;
@@ -2915,7 +2914,6 @@ public class ZeeConfig {
             System.out.println("removeGobText > "+e.getMessage());
         }
     }
-
     public static void removeGobText(Gob gob) {
         if(gob==null)
             return;
@@ -2928,6 +2926,46 @@ public class ZeeConfig {
             }}, null);
         }catch (Exception e){
             System.out.println("removeGobText > "+e.getMessage());
+        }
+    }
+
+
+    public static void addGobPointer(Gob gob, ZeeGobPointer gobPointer) {
+        if (gob==null || gobPointer==null)
+            return;
+        Gob.Overlay gt = null;
+        try {
+            gt = new Gob.Overlay(gob, gobPointer);
+            Gob.Overlay finalGt = gt;
+            gameUI.ui.sess.glob.loader.defer(() -> {
+                synchronized (gob) {
+
+                    //cleanup previous pointer if present
+                    Gob.Overlay ol = gob.findol(ZeeGobPointer.class);
+                    if (ol != null) {
+                        ol.remove(false);
+                    }
+
+                    //add new pointer overlay
+                    gob.addol(finalGt);
+                }
+            }, null);
+        }catch (Exception e){
+            System.out.println("addGobPointer > "+e.getMessage());
+        }
+    }
+    public static void removeGobPointer(Gob gob) {
+        if(gob==null)
+            return;
+        try{
+            gameUI.ui.sess.glob.loader.defer(() -> {synchronized(gob) {
+                Gob.Overlay ol = gob.findol(ZeeGobPointer.class);
+                if (ol != null) {
+                    ol.remove(false);
+                }
+            }}, null);
+        }catch (Exception e){
+            System.out.println("removeGobPointer > "+e.getMessage());
         }
     }
 
@@ -3404,11 +3442,11 @@ public class ZeeConfig {
             }
 
             // gob pointer
-            if (ZeeConfig.showGobPointer && ob.findol(ZeePointer.class)==null) {
+            if (ZeeConfig.showGobPointer && ob.findol(ZeeGobPointer.class)==null) {
                 MiniMap.DisplayIcon displayIcon = gameUI.mmap.iconByGobName(ob.getres().name);
                 if (displayIcon != null) {
                     //println("display icon " + displayIcon.icon.res.get().name);
-                    ob.addol(new Gob.Overlay(ob, new ZeePointer(ob, displayIcon.icon.res)));
+                    ob.addol(new Gob.Overlay(ob, new ZeeGobPointer(ob, displayIcon.icon.res)));
                 }
             }
 
