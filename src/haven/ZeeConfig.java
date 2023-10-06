@@ -280,6 +280,7 @@ public class ZeeConfig {
     public static boolean autoHideWindowDelay = Utils.getprefb("autoHideWindowDelay",true);
     public static int autoHideWindowDelayMs = Utils.getprefi("autoHideWindowDelayMs",1000);
     public static boolean showGobPointer = Utils.getprefb("showGobPointer",false);
+    public static boolean showGobRadar = Utils.getprefb("showGobRadar",false);
 
     public final static Set<String> mineablesStone = new HashSet<String>(Arrays.asList(
             "stone","gneiss","basalt","dolomite","feldspar","flint",
@@ -3388,9 +3389,14 @@ public class ZeeConfig {
 
             addGobTagsAdvanced(ob);
 
-            // brightness
+            // main player settings
             if(ob.tags.contains(Gob.Tag.PLAYER_MAIN)) {
+                // brightness
                 ZeeManagerGobClick.brightnessMapLoad();
+                // gob icon radar
+                if (ZeeConfig.showGobPointer && ZeeConfig.showGobRadar) {
+                    ob.addol(ZeeGobPointer.gobRadar = new ZeeGobRadar(ob, Coord3f.of(10, 10, 5), new Color(240, 0, 253, 90)));
+                }
             }
 
             // ignore bat if using batcape

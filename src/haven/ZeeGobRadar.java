@@ -11,13 +11,13 @@ import haven.render.RenderTree.Slot;
 import java.awt.*;
 import java.nio.FloatBuffer;
 
-public class ZeeGobBox extends Sprite {
+public class ZeeGobRadar extends Sprite {
     static Op smat;
     final VertexData posa;
     final VertexBuf vbuf;
     final Model smod;
 
-    public ZeeGobBox(Gob gob, Coord3f dimension, Color c) {
+    public ZeeGobRadar(Gob gob, Coord3f dimension, Color c) {
         super(gob,null);
         smat = new BaseColor(c);
         // https://lwjglgamedev.gitbooks.io/3d-game-development-with-lwjgl/content/chapter07/chapter7.html
@@ -35,18 +35,18 @@ public class ZeeGobBox extends Sprite {
 
     private short[] getIndicesRectangle() {
         return new short[] {
-                // Front face
+                // top face
                 0, 1, 3, 3, 1, 2,
-                // Top Face
-                4, 0, 3, 5, 4, 3,
-                // Right face
-                3, 2, 7, 5, 3, 7,
-                // Left face
-                6, 1, 0, 6, 0, 4,
-                // Bottom face
-                2, 1, 6, 2, 6, 7,
-                // Back face
-                7, 6, 4, 7, 4, 5,
+                // front face
+                // 4, 0, 3, 5, 4, 3,
+                // ? face
+                //3, 2, 7, 5, 3, 7,
+                // ? face
+                //6, 1, 0, 6, 0, 4,
+                // ? face
+                //2, 1, 6, 2, 6, 7,
+                // ? face
+                //7, 6, 4, 7, 4, 5,
         };
     }
 

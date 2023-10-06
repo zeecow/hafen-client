@@ -110,6 +110,8 @@ public class ZeeOptionsJFrame extends JFrame {
 
         panelTabMinimap.add(new ZeeOptionJCheckBox( "Show gob pointer", "showGobPointer"),c);
 
+        panelTabMinimap.add(new ZeeOptionJCheckBox( "Show gob radar", "showGobRadar"),c);
+
         panelTabMinimap.add(new ZeeOptionJCheckBox( "Solid colors map", "minimapSolidColor"),c);
 
         panelTabMinimap.add(new ZeeOptionJCheckBox( "Slower map", "slowMiniMap"),c);

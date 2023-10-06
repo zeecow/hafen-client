@@ -676,10 +676,11 @@ public class MiniMap extends Widget {
 	}
     }
 
+	boolean playerSegment;
     public void drawparts(GOut g){
 	drawmap(g);
 	if (scale > 1) {
-		boolean playerSegment = (sessloc != null) && ((curloc == null) || (sessloc.seg == curloc.seg));
+		playerSegment = (sessloc != null) && ((curloc == null) || (sessloc.seg == curloc.seg));
 		if (playerSegment)
 			drawview(g);
 	}

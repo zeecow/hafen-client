@@ -11,6 +11,7 @@ import java.util.HashMap;
 public class ZeeGobPointer extends Sprite implements RenderTree.Node, PView.Render2D {
 
     static final HashMap<String, Tex> mapGobPointer = new HashMap<>();
+    public static ZeeGobRadar gobRadar;
     Coord2d tc;
     long gobid = -1;
     Tex tex;
@@ -24,7 +25,11 @@ public class ZeeGobPointer extends Sprite implements RenderTree.Node, PView.Rend
     }
 
     public void draw(GOut g, Pipe state){
-        Coord sc = Homo3D.obj2view(new Coord3f(0, 0, 10), state, Area.sized(g.sz())).round2();
+        Coord sc;
+        if (gobRadar!=null && gob.hasPointer && ZeeConfig.gameUI.mmap.playerSegment)
+            sc = Homo3D.obj2view(new Coord3f(0, 0, 10), state, Area.sized(Coord.of(10))).round2();//ZeeConfig.gameUI.mmap.p2c(gob.rc);
+        else
+            sc = Homo3D.obj2view(new Coord3f(0, 0, 10), state, Area.sized(g.sz())).round2();
         try {
             if(tex == null) {
                 tex = mapGobPointer.get(gob.getres().name);
