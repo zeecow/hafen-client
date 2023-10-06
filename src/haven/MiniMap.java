@@ -265,7 +265,7 @@ public class MiniMap extends Widget {
 		if (ZeeConfig.showGobPointer && !gob.hasPointer) {
 			gob.hasPointer = true;
 			Tex pointer = ZeeGobPointer.mapGobPointer.put(gob.getres().name, img.tex);
-			gob.addol(new Gob.Overlay(gob, new ZeeGobPointer(gob, pointer)));
+			gob.addol(new ZeeGobPointer(gob, pointer));
 		}
 	}
 
