@@ -3441,12 +3441,10 @@ public class ZeeConfig {
                 listGobsSession.add(ob.getres().name);
             }
 
-            // gob pointer
-            if (ZeeConfig.showGobPointer && ob.findol(ZeeGobPointer.class)==null) {
-                MiniMap.DisplayIcon displayIcon = gameUI.mmap.iconByGobName(ob.getres().name);
-                if (displayIcon != null) {
-                    //println("display icon " + displayIcon.icon.res.get().name);
-                    ob.addol(new Gob.Overlay(ob, new ZeeGobPointer(ob, displayIcon.icon.res)));
+            // remove unwanted gob pointers added by DisplayMarker()
+            if (ZeeConfig.showGobPointer && ob.hasPointer) {
+                if (ob.tags.contains(Gob.Tag.PLAYER_MAIN)){
+                    removeGobPointer(ob);
                 }
             }
 

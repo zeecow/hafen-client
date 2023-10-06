@@ -262,6 +262,11 @@ public class MiniMap extends Widget {
 	    this.stime = Utils.rtime();
 	    if(this.notify = conf.notify)
 		this.snotify = conf.notification();
+		if (ZeeConfig.showGobPointer && !gob.hasPointer) {
+			gob.hasPointer = true;
+			Tex pointer = ZeeGobPointer.mapGobPointer.put(gob.getres().name, img.tex);
+			gob.addol(new Gob.Overlay(gob, new ZeeGobPointer(gob, pointer)));
+		}
 	}
 
 	public void update(Coord2d rc, double ang) {

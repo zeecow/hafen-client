@@ -36,7 +36,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
     public Coord2d rc;
     public double a;
     public boolean virtual = false;
-	int clprio = 0;
+    int clprio = 0;
     public long id;
     public boolean removed = false;
     public final Glob glob;
@@ -53,6 +53,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 	public boolean pickupPriority = false;
 	public Drawable drawable;
 	public ZeeHidingGobSprite<ZeeHitbox> hitbox;
+	public boolean hasPointer;
 
 	public static class Overlay implements RenderTree.Node {
 	public final int id;
