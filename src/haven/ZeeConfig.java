@@ -3053,7 +3053,7 @@ public class ZeeConfig {
     }
 
     public static Coord coordToTile(Coord2d c) {
-        return c.div(11, 11).floor();
+        return c.div(MCache.tilesz).floor();
     }
     public static Coord coordToTile(Coord c) {
         return c.div(MCache.tilesz2);
