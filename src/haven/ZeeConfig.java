@@ -712,7 +712,7 @@ public class ZeeConfig {
     public static boolean isMushroom(String name){
         final String[] list = {
             "bolete","truffle","trumpet","cavelantern","chantrelle","/lorchel","fairy","blewit",
-            "puffball","indigo","parasol","snowtop","yellowfoot"
+            "puffball","indigo","parasol","snowtop","yellowfoot", "herbs/stalagoom", "oystermushroom"
         };
         for (int i = 0; i < list.length; i++) {
             if(name.contains(list[i]))
