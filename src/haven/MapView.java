@@ -2567,6 +2567,11 @@ public boolean mousedown(Coord c, int button) {
 								.append(Float.toString(c3f.x)).append(", ")
 								.append(Float.toString(c3f.y)).append(", ")
 								.append(Float.toString(c3f.z)).append(")    ");
+							sb.append("\ndist: ")
+								.append(gob.rc.dist(ZeeConfig.getPlayerGob().rc)).append("    ");
+							sb.append("\ntile: ")
+								.append("\n    target: "+ZeeConfig.getGobTile(gob)).append("    ")
+								.append("\n    player: "+ZeeConfig.getPlayerTile()).append("    ");
 							// gob poses
 							List<String> poses = ZeeConfig.getGobPoses(gob);
 							if (!poses.isEmpty()){
