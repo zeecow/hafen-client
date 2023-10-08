@@ -685,20 +685,9 @@ public class ZeeThread  extends Thread{
     public static boolean waitInvIdleMs(long idleMs) {
         //println("waitInvIdleMs "+idleMs);
         long timeElapsed = 0;
-        long timeout = 5000;
-        long startingMs;
         try {
-            //wait first item, timeout 5s
-            ZeeConfig.lastInvItemMs = 0;
-            startingMs = now();
-            while (timeout >= 0  &&  startingMs > ZeeConfig.lastInvItemMs){
-                Thread.sleep(SLEEP_MS);
-                timeout -= SLEEP_MS;
-            }
-            if (timeout <= 0){
-                println("waitInvIdleMs timeout");
-                return false;
-            }
+            //wait approaching item
+            waitPlayerIdleVelocity();
             // wait inventory idle for idleMs
             while( (timeElapsed = now()-ZeeConfig.lastInvItemMs) < idleMs ) {
                 Thread.sleep(SLEEP_MS);
