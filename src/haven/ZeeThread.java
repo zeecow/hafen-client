@@ -687,11 +687,14 @@ public class ZeeThread  extends Thread{
         long timeElapsed = 0;
         try {
             //wait approaching item
-            waitPlayerIdleVelocity();
-            // wait inventory idle for idleMs
-            while( (timeElapsed = now()-ZeeConfig.lastInvItemMs) < idleMs ) {
-                Thread.sleep(SLEEP_MS);
+            if(waitPlayerIdleFor(1)) {
+                // wait inventory idle for idleMs
+                while ((timeElapsed = now() - ZeeConfig.lastInvItemMs) < idleMs) {
+                    Thread.sleep(SLEEP_MS);
+                }
             }
+            else
+                println("waitInvIdleMs > failed player idle");
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
