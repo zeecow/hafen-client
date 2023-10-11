@@ -2506,8 +2506,6 @@ public class ZeeConfig {
         makeWindow = null;
         ZeeManagerMiner.tilesMonitorCleanup();
         ZeeHistWdg.clearHistory();
-        ZeeManagerGobClick.newCharDiscGobsDone = null;
-        ZeeManagerGobClick.newCharDiscItemsFound = null;
 
         if(ZeeManagerFarmer.windowManager!=null){
             try {
