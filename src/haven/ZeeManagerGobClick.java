@@ -6,7 +6,7 @@ import haven.resutil.WaterTile;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.lang.reflect.Field;
-import java.util.ArrayList;
+import java.util.*;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -1295,8 +1295,8 @@ public class ZeeManagerGobClick extends ZeeThread{
             windowTestCoords();
         else if(petalName.contentEquals(ZeeFlowerMenu.STRPETAL_CLEARGOBTEXTS))
             clearAllGobsTexts();
-        else if(petalName.contentEquals(ZeeFlowerMenu.STRPETAL_BRIGHTNESS))
-            windowBrightness();
+        else if(petalName.contentEquals(ZeeFlowerMenu.STRPETAL_NEWCHARDISCOVERER))
+            windowNewCharDiscoverer();
         else if (petalName.contentEquals(ZeeFlowerMenu.STRPETAL_AUTOBUTCH_BIGDEADANIMAL)){
             autoButchBigDeadAnimal(gob);
         }
@@ -1495,7 +1495,7 @@ public class ZeeManagerGobClick extends ZeeThread{
             opts = new ArrayList<String>();
             opts.add(ZeeFlowerMenu.STRPETAL_SWITCHCHAR);
             opts.add(ZeeFlowerMenu.STRPETAL_CLEARGOBTEXTS);
-            opts.add(ZeeFlowerMenu.STRPETAL_BRIGHTNESS);
+            opts.add(ZeeFlowerMenu.STRPETAL_NEWCHARDISCOVERER);
             opts.add(ZeeFlowerMenu.STRPETAL_TESTCOORDS);
             if (ZeeConfig.isCaveTile(ZeeConfig.getPlayerTileName()))
                 opts.add(ZeeFlowerMenu.STRPETAL_TILEMONITOR);
@@ -2932,50 +2932,181 @@ public class ZeeManagerGobClick extends ZeeThread{
         });
     }
 
-    private static void windowBrightness() {
-        String name = "Brightness";
+    private static void windowNewCharDiscoverer() {
+        String name = ZeeFlowerMenu.STRPETAL_NEWCHARDISCOVERER;
         Window win = ZeeConfig.getWindow(name);
         if(win!=null){
             win.reqdestroy();
         }
-        win = ZeeConfig.gameUI.add(new Window(Coord.of(225,100),name){
+        win = ZeeConfig.gameUI.add(new Window(Coord.of(110,60),name){
             public void wdgmsg(String msg, Object... args) {
                 if (msg.contentEquals("close"))
                     this.reqdestroy();
             }
         },200,200);
 
-        //darker
-        Widget wdg = win.add(new Button(60,"dark"){
+        // discover button
+        Widget wdg = win.add(new Button(60,"discover"){
             public void wdgmsg(String msg, Object... args) {
                 if (msg.contentEquals("activate")){
-                    brightnessDown();
+                    this.disable(true);
+                    newCharDiscovererStart(this);
                 }
             }
         }, 0,0);
-        wdg.settip("key: left");
+        wdg.settip("discover something");
 
-        //brighter
-        wdg = win.add(new Button(60,"bright"){
-            public void wdgmsg(String msg, Object... args) {
-                if (msg.contentEquals("activate")){
-                    brightnessUp();
+        //win.pack();
+    }
+
+    static List<String> newCharDiscGobsDone, newCharDiscItemsFound;
+    private static void newCharDiscovererStart(Button button) {
+        if (newCharDiscGobsDone==null) {
+            newCharDiscGobsDone = new ArrayList<>();
+            newCharDiscItemsFound = new ArrayList<>();
+        }
+        new ZeeThread(){
+            public void run() {
+                try {
+                    ZeeConfig.addPlayerText("discovering");
+                    List<Gob> allGobs = ZeeConfig.getAllGobs();
+                    allGobs.removeIf(gob1 -> {
+                        String gobName = gob1.getres().name;
+                        if (newCharDiscGobsDone.contains(gobName))
+                            return true;
+                        if (isGobBoulder(gobName)
+                            || isGobBush(gobName)
+                            || isGobTree(gobName))
+                        {
+                            return false;
+                        }
+                        return true;
+                    });
+                    //sort gobs by closest to player
+                    Collections.sort(allGobs, new Comparator<Gob>() {
+                        public int compare(Gob g1, Gob g2) {
+                            double dist1 = ZeeConfig.distanceToPlayer(g1);
+                            double dist2 = ZeeConfig.distanceToPlayer(g2);
+                            if (dist1 < dist2)
+                                return -1;
+                            if (dist1 > dist2)
+                                return 1;
+                            return 0;
+                        }
+                    });
+                    ZeeConfig.prepareTaskCanceledByGroundClick();
+                    while(!ZeeConfig.isTaskCanceledByGroundClick() && !allGobs.isEmpty()) {
+                        Gob closestGob = allGobs.remove(0);
+                        String gobName = closestGob.getres().name;
+                        if (newCharDiscGobsDone.contains(gobName))
+                            continue;
+                        if(newCharDiscClickAllPetals(closestGob)) {
+                            newCharDiscGobsDone.add(gobName);
+                            println(newCharDiscGobsDone.toString());
+                            println(newCharDiscItemsFound.toString());
+                        }
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                ZeeConfig.removePlayerText();
+                button.disable(false);
+            }
+        }.start();
+    }
+
+    private static boolean newCharDiscClickAllPetals(Gob gob) {
+        String gobName = gob.getres().name;
+        if (isGobBoulder(gobName)){
+            gobClick(gob,3);
+            println("click "+gobName);
+            if (!waitFlowerMenu()){
+                println("newCharDisc waitFlowerMenu failed");
+                return false;
+            }
+            FlowerMenu menu = getFlowerMenu();
+            if(choosePetal(menu,"Chip stone")){
+                return newCharDiscWaitInvItem();
+            }
+        }
+        else if(isGobBush(gobName)){
+            gobClick(gob,3);
+            println("click "+gobName);
+            if (!waitFlowerMenu()){
+                println("newCharDisc waitFlowerMenu failed");
+                return false;
+            }
+            FlowerMenu menu = getFlowerMenu();
+            if(choosePetalNameStartsWith(menu,"Pick")){
+                return newCharDiscWaitInvItem();
+            }
+        }
+        else if(isGobTree(gobName)){
+            boolean clickedAllPetals = true;
+            gobClick(gob,3);
+            println("click "+gobName);
+            if (!waitFlowerMenu()){
+                println("newCharDisc waitFlowerMenu failed");
+                return false;
+            }
+            FlowerMenu menu = getFlowerMenu();
+            int numPetals = menu.opts.length;
+            if (numPetals==1)
+                return false;
+            for( int i = 0; i < numPetals; i++ ) {
+                if (!newCharDiscItemsFound.contains("branch")) {
+                    if (choosePetal(menu, "Take branch")) {
+                        //ZeeConfig.stopMovingEscKey();
+                        if (!newCharDiscWaitInvItem())
+                            clickedAllPetals = false;
+                    }
+                } else if (ZeeConfig.isTreeToughBark(gobName) && !newCharDiscItemsFound.contains("toughbark")) {
+                    if(choosePetal(menu, "Take bark")) {
+                        //ZeeConfig.stopMovingEscKey();
+                        if (!newCharDiscWaitInvItem())
+                            clickedAllPetals = false;
+                    }
+                } else if (!ZeeConfig.isTreeToughBark(gobName) && !newCharDiscItemsFound.contains("bark")) {
+                    if(choosePetal(menu, "Take bark")) {
+                        //ZeeConfig.stopMovingEscKey();
+                        if (!newCharDiscWaitInvItem())
+                            clickedAllPetals = false;
+                    }
+                } else if (ZeeConfig.isTreeBough(gobName)) {
+                    if(choosePetal(menu, "Take bough")) {
+                        //ZeeConfig.stopMovingEscKey();
+                        if (!newCharDiscWaitInvItem())
+                            clickedAllPetals = false;
+                    }
+                } else if (ZeeConfig.isTreeLeaf(gobName)) {
+                    if(choosePetal(menu, "Pick leaf")) {
+                        //ZeeConfig.stopMovingEscKey();
+                        if (!newCharDiscWaitInvItem())
+                            clickedAllPetals = false;
+                    }
+                } else {
+                    // pick last tree petal (seed, fruit, oak...)
+                    if(choosePetal(menu, numPetals)) {
+                        //ZeeConfig.stopMovingEscKey();
+                        if (!newCharDiscWaitInvItem())
+                            clickedAllPetals = false;
+                    }
                 }
             }
-        }, wdg.c.x+wdg.sz.x+7,0);
-        wdg.settip("key: right");
 
-        //reset
-        wdg = win.add(new Button(60,"reset"){
-            public void wdgmsg(String msg, Object... args) {
-                if (msg.contentEquals("activate")){
-                    brightnessDefault();
-                }
-            }
-        }, 0,wdg.c.y+wdg.sz.y+7);
-        wdg.settip("key: home");
+            return clickedAllPetals;
+        }
+        return false;
+    }
 
-        win.pack();
+    private static boolean  newCharDiscWaitInvItem() {
+        if (waitNextInvItem()) {
+            String itemName = ZeeConfig.lastInvItemBaseName;
+            if (!newCharDiscItemsFound.contains(itemName))
+                newCharDiscItemsFound.add(itemName);
+            return true;
+        }
+        return false;
     }
 
     static boolean brightnessDefault() {

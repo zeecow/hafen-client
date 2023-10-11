@@ -607,6 +607,20 @@ public class ZeeThread  extends Thread{
         return (g.getres() != null);
     }
 
+    public static boolean waitNextInvItem(){
+        long startMs = now();
+        long timeout = 15000;
+        while (startMs > ZeeConfig.lastInvItemMs && timeout > 0){
+            try {
+                sleep(50);
+                timeout -= 50;
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+        return (startMs <= ZeeConfig.lastInvItemMs);
+    }
+
 
     static int invFreeSlots, lastInvFreeSlots;
     public static boolean waitInvFull(Inventory inv) {
@@ -920,9 +934,40 @@ public class ZeeThread  extends Thread{
         return ZeeConfig.gameUI.ui.root.getchild(FlowerMenu.class);
     }
 
+    public static boolean choosePetal(FlowerMenu menu, int petalIndex) {
+        try {
+            synchronized (menu) {
+                menu.choose(menu.opts[petalIndex]);
+                menu.destroy();
+                return true;
+            }
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
     public static boolean choosePetal(FlowerMenu menu, String petalName) {
         for(FlowerMenu.Petal p : menu.opts) {
             if(p.name.equals(petalName)) {
+                try {
+                    synchronized (menu) {
+                        menu.choose(p);
+                        menu.destroy();
+                        return true;
+                    }
+                } catch(Exception e) {
+                    e.printStackTrace();
+                }
+                return false;
+            }
+        }
+        return false;
+    }
+
+    public static boolean choosePetalNameStartsWith(FlowerMenu menu, String petalNameStartsWith) {
+        for(FlowerMenu.Petal p : menu.opts) {
+            if(p.name.startsWith(petalNameStartsWith)) {
                 try {
                     synchronized (menu) {
                         menu.choose(p);
