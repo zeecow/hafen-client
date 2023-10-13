@@ -142,11 +142,11 @@ public class ZeeConfig {
     static final int LOCATION_UNDERGROUND = 3, DEF_LIGHT_UNDERGROUND = 48;
     static int playerLocation = -1;
 
-    static MixColor MIXCOLOR_RED = new MixColor(255,0,0,200);
-    static MixColor MIXCOLOR_ORANGE = new MixColor(255,128,0,200);
-    static MixColor MIXCOLOR_YELLOW = new MixColor(255,255,0,200);
-    static MixColor MIXCOLOR_MAGENTA= new MixColor(255,0,255,200);
-    static MixColor MIXCOLOR_LIGHTBLUE = new MixColor(0, 255, 255, 200);
+    static Color COLOR_RED = new Color(255,0,0,200);
+    static Color COLOR_ORANGE = new Color(255,128,0,200);
+    static Color COLOR_YELLOW = new Color(255,255,0,200);
+    static Color COLOR_MAGENTA = new Color(255,0,255,200);
+    static Color COLOR_LIGHTBLUE = new Color(0, 255, 255, 200);
 
     static GameUI gameUI;
     private static String cursorName = CURSOR_ARW;
@@ -421,7 +421,7 @@ public class ZeeConfig {
         if(highlightCropsReady && isGobCrop(gobName)) {
             //System.out.printf(" CROP \n");
             if (isCropMaxStage(gob))
-                return MIXCOLOR_LIGHTBLUE;
+                return new MixColor(COLOR_LIGHTBLUE);
         }
         //else System.out.printf(" NOPE \n");
 
@@ -463,7 +463,7 @@ public class ZeeConfig {
             c = mapCategoryColor.get(categ);
             if(c==null) {
                 //set default categ color if empty
-                c = ZeeConfig.MIXCOLOR_YELLOW.color();
+                c = ZeeConfig.COLOR_YELLOW;
                 ZeeConfig.mapCategoryColor.put(categ, c);
             }
             return new MixColor(c.getRed(),c.getGreen(),c.getBlue(),c.getAlpha());
@@ -1768,7 +1768,7 @@ public class ZeeConfig {
         String s = Utils.getpref(MAP_CATEGORY_COLOR,"");
         if (s.isEmpty()) {
             HashMap<String, Color> ret = new HashMap<String, Color>();
-            ret.put(CATEG_AGROCREATURES, MIXCOLOR_YELLOW.color());
+            ret.put(CATEG_AGROCREATURES, COLOR_YELLOW);
             return ret;
         }else
             return (HashMap<String, Color>) deserialize(s);
