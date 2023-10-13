@@ -243,7 +243,7 @@ public class Window extends Widget implements DTarget {
 	}
 
 	protected void drawframe(GOut g) {
-		Window wnd = (Window)parent;
+	    Window wnd = (Window)parent;
 	    if((cap == null) || (cap.text != wnd.cap)) {
 		cap = (wnd.cap == null) ? null : cf.render(wnd.cap);
 		cmw = (cap == null) ? 0 : cap.sz().x;
@@ -342,7 +342,7 @@ public class Window extends Widget implements DTarget {
     public Coord contentsz() {
 	Coord max = new Coord(0, 0);
 	for(Widget wdg = child; wdg != null; wdg = wdg.next) {
-		if(wdg == deco)//if(wdg == cbtn)
+	    if(wdg == deco)
 		continue;
 	    if(!wdg.visible)
 		continue;
