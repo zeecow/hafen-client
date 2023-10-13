@@ -9,7 +9,7 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 
 /* >tt: Quality */
-@haven.FromResource(name = "ui/tt/q/quality", version = 25)
+@haven.FromResource(name = "ui/tt/q/quality", version = 26)
 public class Quality extends QBuff implements GItem.OverlayInfo<Tex> {
     public static boolean show = Utils.getprefb("qtoggle", true);
     static final BufferedImage fakeicon = ZeeManagerIcons.imgDiamond(5,Color.cyan,false,false,false);

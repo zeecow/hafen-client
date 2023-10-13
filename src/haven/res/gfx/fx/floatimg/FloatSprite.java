@@ -5,7 +5,7 @@ import haven.*;
 import haven.render.Homo3D;
 import haven.render.Pipe;
 
-@haven.FromResource(name = "gfx/fx/floatimg", version = 3)
+@haven.FromResource(name = "gfx/fx/floatimg", version = 4)
 public class FloatSprite extends Sprite implements PView.Render2D {
     public final double tm;
     final Tex tex;
@@ -20,7 +20,7 @@ public class FloatSprite extends Sprite implements PView.Render2D {
 	super(owner, res);
 	this.tex = tex;
 	this.tm = tm;
-	this.sy = place((Gob)owner, tex.sz().y);
+	this.sy = place(owner.context(Gob.class), tex.sz().y);
     }
     
     private static int place(Gob gob, int h) {
