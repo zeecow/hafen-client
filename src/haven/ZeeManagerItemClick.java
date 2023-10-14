@@ -1,5 +1,7 @@
 package haven;
 
+import haven.res.ui.stackinv.ItemStack;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -1163,6 +1165,9 @@ public class ZeeManagerItemClick extends ZeeThread{
         return pickUpItem(wItem);
     }
     public static boolean pickUpItem(WItem wItem) {
+        if (wItem.item.contents==null){
+
+        }
         wItem.item.wdgmsg("take", new Coord(wItem.sz.x / 2, wItem.sz.y / 2));
         return waitHoldingItem();
     }
@@ -1311,6 +1316,11 @@ public class ZeeManagerItemClick extends ZeeThread{
                     continue;
                 //found item with name[i]
                 witem = list.get(i);
+                // if is a stack, select from it
+                if (witem.item.contents!=null){
+                    ItemStack itemStack = (ItemStack) witem.item.contents;
+                    witem = itemStack.wmap.values().iterator().next();
+                }
                 break;
             }
             // found no item with listed names
@@ -1319,8 +1329,9 @@ public class ZeeManagerItemClick extends ZeeThread{
             // pickup found item
             return pickUpItem(witem);
         }catch (Exception e){
-            return false;
+            e.printStackTrace();
         }
+        return false;
     }
 
     public static WItem getBeltWItem(String nameContains) {
