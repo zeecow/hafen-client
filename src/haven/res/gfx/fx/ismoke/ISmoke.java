@@ -16,7 +16,7 @@ import static haven.render.sl.Type.*;
 
 /* >spr: ISmoke */
 /* >rlink: ISmoke */
-@haven.FromResource(name = "gfx/fx/ismoke", version = 105)
+@haven.FromResource(name = "gfx/fx/ismoke", version = 106)
 public class ISmoke extends Sprite implements Rendered, Sprite.CDel, TickList.TickNode, TickList.Ticking {
     static final VertexArray.Layout fmt =
 	new VertexArray.Layout(new VertexArray.Layout.Input(Homo3D.vertex,     new VectorFormat(3, NumberFormat.FLOAT32), 0,  0, 20),
@@ -32,7 +32,7 @@ public class ISmoke extends Sprite implements Rendered, Sprite.CDel, TickList.Ti
     final float sz, den, fadepow, initzv, life, srad;
     final List<RenderTree.Slot> slots = new ArrayList<>(1);
     final Gob gob = (owner instanceof Gob) ? (Gob)owner : owner.context(Gob.class);
-    boolean spawn = !ZeeConfig.hideFxSmoke;;
+    boolean spawn = !ZeeConfig.hideFxSmoke;
 
     public ISmoke(Owner owner, Resource res, Message sdt) {
 	super(owner, res);
@@ -42,7 +42,7 @@ public class ISmoke extends Sprite implements Rendered, Sprite.CDel, TickList.Ti
 	if(locn.equals(""))
 	    loc = null;
 	else
-	    loc = owner.getres().layer(Skeleton.BoneOffset.class, locn).forpose(null).get();
+	    loc = owner.getres().layer(Skeleton.BoneOffset.class, locn).from(null).get();
 	col = Utils.col16(sdt.uint16());
 	den = sdt.uint8();
 	fadepow = sdt.uint8() / 10.0f;
@@ -63,7 +63,7 @@ public class ISmoke extends Sprite implements Rendered, Sprite.CDel, TickList.Ti
 	if(locn.equals(""))
 	    loc = null;
 	else
-	    loc = owner.getres().layer(Skeleton.BoneOffset.class, locn).forpose(null).get();
+	    loc = owner.getres().layer(Skeleton.BoneOffset.class, locn).from(null).get();
 	col = (Color)args[a++];
 	den = ((Number)args[a++]).floatValue();
 	fadepow = ((Number)args[a++]).floatValue();
