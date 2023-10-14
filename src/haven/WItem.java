@@ -27,7 +27,6 @@
 package haven;
 
 import haven.ItemInfo.AttrCache;
-import haven.res.ui.stackinv.ItemStack;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -112,11 +111,6 @@ public class WItem extends Widget implements DTarget {
 			Double meter = (item.meter > 0) ? Double.valueOf(item.meter / 100.0) : itemmeter.get();
 			if((meter != null) && (meter > 0)) {
 				info.add(new ItemInfo.AdHoc(this.item, (int) (meter * 100) +"% done"));
-			}
-			// stack debug
-			if (this.item.contents!=null) {
-				ItemStack itemStack = (ItemStack) this.item.contents;
-				info.add(new ItemInfo.AdHoc(this.item, "contents: wmap " +itemStack.wmap.size()+" , order "+itemStack.order.size()));
 			}
 			longtip = new LongTip(info);
 		}
