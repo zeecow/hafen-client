@@ -2408,7 +2408,7 @@ public class ZeeManagerGobClick extends ZeeThread{
     }
 
     public static boolean isGobTree(String gobName) {
-        return gobName.startsWith("gfx/terobjs/trees/") && !gobName.endsWith("log") && !gobName.endsWith("stump") && !gobName.endsWith("oldtrunk");
+        return gobName.startsWith("gfx/terobjs/trees/") && !gobName.endsWith("log") && !gobName.endsWith("stump") && !gobName.endsWith("oldtrunk") && !gobName.startsWith("gfx/terobjs/trees/driftwood");
     }
 
     public static boolean isGobTreeLog(String gobName){

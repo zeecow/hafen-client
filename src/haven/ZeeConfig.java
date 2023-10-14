@@ -505,7 +505,7 @@ public class ZeeConfig {
     }
 
     public static boolean isGobCrop(String gobName) {
-        return gobName.startsWith("gfx/terobjs/plants/") && !gobName.endsWith("trellis");
+        return gobName.startsWith("gfx/terobjs/plants/") && !gobName.endsWith("trellis") && !gobName.startsWith("gfx/terobjs/plants/wild");
     }
 
     //  gfx/invobjs/turnip , gfx/invobjs/seed-turnip
