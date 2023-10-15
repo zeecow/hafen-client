@@ -3400,18 +3400,24 @@ public class ZeeConfig {
 
                 if (ZeeConfig.showGobPointer ) {
 
-                    // remove gob pointer after 1sec
-                    new ZeeThread(){
-                        public void run() {
-                            try {
-                                sleep(1000);
-                                if (ob.hasPointer)
-                                    removeGobPointer(ob);
-                            } catch (Exception e) {
-                                e.printStackTrace();
+                    // remove player pointer
+                    if (ob.hasPointer) {
+                        removeGobPointer(ob);
+                    }
+                    else {
+                        // remove player pointer after delay
+                        new ZeeThread() {
+                            public void run() {
+                                try {
+                                    sleep(500);
+                                    if (ob.hasPointer)
+                                        removeGobPointer(ob);
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
                             }
-                        }
-                    }.start();
+                        }.start();
+                    }
 
                     // gob radar (broken)
                     if (ZeeConfig.showGobRadar)
