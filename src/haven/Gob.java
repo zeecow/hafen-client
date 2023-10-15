@@ -1074,9 +1074,12 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 
 	public HashSet<Tag> tags = new HashSet<>();
 	enum Tag {
-		BUSH,
 		PLAYER, PLAYER_MAIN, PLAYER_OTHER,
 		POSE_KO,
-		TREE, VEHICLE
+		BUSH, CROP, TREE,
+		BUG, BIRD,
+		SMALL_ANIMAL,
+		AGGRESSIVE,
+		VEHICLE;
 	}
 }

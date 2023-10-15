@@ -505,7 +505,11 @@ public class ZeeConfig {
     }
 
     public static boolean isGobCrop(String gobName) {
-        return gobName.startsWith("gfx/terobjs/plants/") && !gobName.endsWith("trellis") && !gobName.startsWith("gfx/terobjs/plants/wild");
+        return gobName.startsWith("gfx/terobjs/plants/") && !gobName.endsWith("trellis") && !isGobWildCrop(gobName);
+    }
+
+    public static boolean isGobWildCrop(String gobName) {
+        return gobName.startsWith("gfx/terobjs/plants/") && (gobName.contains("/wild") || gobName.contains("/stringgrass") || gobName.contains("/cereal"));
     }
 
     //  gfx/invobjs/turnip , gfx/invobjs/seed-turnip
@@ -573,10 +577,10 @@ public class ZeeConfig {
         return false;
     }
 
-    public static boolean isSmallAnimal(String nameContains){
+    public static boolean isSmallAnimal(String nameFull){
         final String[] endList = {"/toad"};//TODO bring more to this list
         for (int i = 0; i < endList.length; i++) {
-            if(nameContains.endsWith(endList[i]))
+            if(nameFull.endsWith(endList[i]))
                 return true;
         }
         final String[] containsList = {
@@ -588,7 +592,7 @@ public class ZeeConfig {
                 "/adder"
         };
         for (int i = 0; i < containsList.length; i++) {
-            if(nameContains.contains(containsList[i]))
+            if(nameFull.contains(containsList[i]))
                 return true;
         }
         return false;
@@ -3391,11 +3395,20 @@ public class ZeeConfig {
 
             // main player settings
             if(ob.tags.contains(Gob.Tag.PLAYER_MAIN)) {
-                // brightness
+
+                // map brightness
                 ZeeManagerGobClick.brightnessMapLoad();
-                // gob icon radar
-                if (ZeeConfig.showGobPointer && ZeeConfig.showGobRadar) {
-                    ob.addol(ZeeGobPointer.gobRadar = new ZeeGobRadar(ob, Coord3f.of(10, 10, 5), new Color(240, 0, 253, 90)));
+
+                // pointer and radar
+                if (ZeeConfig.showGobPointer) {
+                    // remove main player pointer
+                    if (ob.hasPointer){
+                        removeGobPointer(ob);
+                    }
+                    // radar (broken)
+                    if (ZeeConfig.showGobRadar) {
+                        ob.addol(ZeeGobPointer.gobRadar = new ZeeGobRadar(ob, Coord3f.of(10, 10, 5), new Color(240, 0, 253, 90)));
+                    }
                 }
             }
 
@@ -3447,13 +3460,6 @@ public class ZeeConfig {
                 listGobsSession.add(ob.getres().name);
             }
 
-            // remove unwanted gob pointers added by DisplayMarker()
-            if (ZeeConfig.showGobPointer && ob.hasPointer) {
-                if (ob.tags.contains(Gob.Tag.PLAYER_MAIN)){
-                    removeGobPointer(ob);
-                }
-            }
-
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -3465,6 +3471,24 @@ public class ZeeConfig {
         String gobName = gob.getres().name;
         if (isTree(gobName)) {
             gob.tags.add(Gob.Tag.TREE);
+        }
+        else if (isBush(gobName)){
+            gob.tags.add(Gob.Tag.BUSH);
+        }
+        else if (isGobCrop(gobName)){
+            gob.tags.add(Gob.Tag.CROP);
+        }
+        else if (isBug(gobName)){
+            gob.tags.add(Gob.Tag.BUG);
+        }
+        else if (isBird(gobName)){
+            gob.tags.add(Gob.Tag.BIRD);
+        }
+        else if (isSmallAnimal(gobName)){
+            gob.tags.add(Gob.Tag.SMALL_ANIMAL);
+        }
+        else if (isAggressive(gobName)){
+            gob.tags.add(Gob.Tag.AGGRESSIVE);
         }
     }
 
