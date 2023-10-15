@@ -2934,7 +2934,6 @@ public class ZeeConfig {
         }
     }
 
-
     public static void addGobPointer(Gob gob, ZeeGobPointer gobPointer) {
         if (gob==null || gobPointer==null)
             return;
@@ -3399,16 +3398,24 @@ public class ZeeConfig {
                 // map brightness
                 ZeeManagerGobClick.brightnessMapLoad();
 
-                // pointer and radar
-                if (ZeeConfig.showGobPointer) {
-                    // remove main player pointer
-                    if (ob.hasPointer){
-                        removeGobPointer(ob);
-                    }
-                    // radar (broken)
-                    if (ZeeConfig.showGobRadar) {
+                if (ZeeConfig.showGobPointer ) {
+
+                    // remove gob pointer after 1sec
+                    new ZeeThread(){
+                        public void run() {
+                            try {
+                                sleep(1000);
+                                if (ob.hasPointer)
+                                    removeGobPointer(ob);
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }.start();
+
+                    // gob radar (broken)
+                    if (ZeeConfig.showGobRadar)
                         ob.addol(ZeeGobPointer.gobRadar = new ZeeGobRadar(ob, Coord3f.of(10, 10, 5), new Color(240, 0, 253, 90)));
-                    }
                 }
             }
 
