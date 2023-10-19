@@ -233,7 +233,7 @@ public class Inventory extends Widget implements DTarget {
 				gItem = ((WItem) wdg).item;
 				String wdgname = gItem.res.get().name;
 				if (wdgname.contains(nameContains)) {
-					if (ZeeManagerItemClick.isStackPagina(gItem))
+					if (ZeeManagerItemClick.isStackByAmount(gItem))
 						count += ZeeManagerItemClick.getItemInfoAmount(gItem.info());
 					else
 						count++;
@@ -251,7 +251,7 @@ public class Inventory extends Widget implements DTarget {
 				gItem = ((WItem) wdg).item;
 				String wdgname = gItem.res.get().name;
 				if (wdgname.contentEquals(nameEquals)) {
-					if (ZeeManagerItemClick.isStackPagina(gItem))
+					if (ZeeManagerItemClick.isStackByAmount(gItem))
 						count += ZeeManagerItemClick.getItemInfoAmount(gItem.info());
 					else
 						count++;

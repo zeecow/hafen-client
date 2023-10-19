@@ -62,6 +62,7 @@ Midclick Ground Object
 - midclick barterstand to open search window
 - midclick smelter holding bucket to collect all quicksilver
 - midclick stockpile while making block/board/sand will pile inv items and try acquire more
+- midclick animal holding clover to follow and feed it when close enough
 
 Long Midclick Ground Object
 - show context menu for various objs (details below)

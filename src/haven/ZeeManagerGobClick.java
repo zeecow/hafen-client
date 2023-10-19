@@ -66,6 +66,10 @@ public class ZeeManagerGobClick extends ZeeThread{
                     ZeeConfig.clickTile(ZeeConfig.coordToTile(mc),1,UI.MOD_SHIFT);
                 }
             }
+            // feed clover to wild animal
+            else if (checkCloverFeeding(gob)) {
+                feedClover(gob);
+            }
             // pick quicksilver from smelter
             else if (gobName.endsWith("/smelter") && ZeeConfig.isPlayerHoldingItem()){
                 ZeeManagerItemClick.getQuicksilverFromSmelter(gob);
@@ -380,6 +384,72 @@ public class ZeeManagerGobClick extends ZeeThread{
         }.start();
     }
 
+    private static boolean checkCloverFeeding(Gob animal) {
+
+        if (ZeeManagerItemClick.getHoldingItem()==null) {
+            println("checkCloverFeeding > holding item null");
+            return false;
+        }
+
+        GItem holditem = ZeeManagerItemClick.getHoldingItem().item;
+
+        if (ZeeManagerItemClick.isStackByKeyPagina(holditem)) {
+            println("checkCloverFeeding > holding stack");
+            return false;
+        }
+
+        if (holditem!=null && holditem.getres().name.endsWith("/clover")){
+            List<String> endList = List.of("/cattle", "/sheep","/horse","/boar","/wildgoat");
+            for (String s : endList) {
+                if (animal.getres().name.endsWith(s))
+                    return true;
+            }
+        }else{
+            println("checkCloverFeeding > item null or name wrong");
+        }
+
+        println("checkCloverFeeding > ret false");
+        return false;
+    }
+
+    private static void feedClover(Gob animal){
+        if (animal==null) {
+            println("feedClover > animal gob null");
+            return;
+        }
+        new ZeeThread(){
+            public void run() {
+                try {
+                    ZeeConfig.addPlayerText("clovering");
+                    double dist = ZeeConfig.distanceToPlayer(animal);
+
+                    prepareCancelClick();
+
+                    //click animal location until distance close enough
+                    while (dist > 50 && !isCancelClick()){
+                        ZeeConfig.clickCoord(ZeeConfig.getGobCoord(animal),1);
+                        prepareCancelClick();
+                        sleep(777);
+                        dist = ZeeConfig.distanceToPlayer(animal);
+                    }
+
+                    //println("dist "+dist);
+
+                    // try feeding clover
+                    if (!isCancelClick()) {
+                        //println("final click");
+                        itemActGob(animal, 0);
+                    }
+                    //else println("final click canceled");
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                ZeeConfig.removePlayerText();
+            }
+        }.start();
+    }
+
     public static void checkPlobUnplaced() {
         if (ZeeConfig.autoToggleGridLines)
             ZeeConfig.gameUI.map.showgrid(false);
@@ -646,7 +716,7 @@ public class ZeeManagerGobClick extends ZeeThread{
                 sleep(PING_MS);
             }
 
-            if (ZeeConfig.isTaskCanceledByGroundClick()){
+            if (ZeeConfig.isCancelClick()){
                 ZeeConfig.removePlayerText();
                 return;
             }
@@ -670,7 +740,7 @@ public class ZeeManagerGobClick extends ZeeThread{
                 //lift up coracle
                 liftGob(coracle);
                 sleep(PING_MS);
-                if (ZeeConfig.isTaskCanceledByGroundClick()){
+                if (ZeeConfig.isCancelClick()){
                     ZeeConfig.removePlayerText();
                     return;
                 }
@@ -687,7 +757,7 @@ public class ZeeManagerGobClick extends ZeeThread{
                     //try to drop coracle torwards clicked water coord
                     ZeeConfig.clickCoord(pc.add(xsignal * 300, ysignal * 300), 3);
                     sleep(PING_MS*2);
-                    if (ZeeConfig.isTaskCanceledByGroundClick()){
+                    if (ZeeConfig.isCancelClick()){
                         ZeeConfig.removePlayerText();
                         return;
                     }
@@ -793,11 +863,11 @@ public class ZeeManagerGobClick extends ZeeThread{
                     if(waitPlayerIdlePose()) {
                         //wait inventory harvested item
                         ZeeConfig.lastMapViewClickButton = 2; // prepare cancel click
-                        while(ZeeConfig.lastInvItemMs < t1 && !ZeeConfig.isTaskCanceledByGroundClick()){
+                        while(ZeeConfig.lastInvItemMs < t1 && !ZeeConfig.isCancelClick()){
                             sleep(PING_MS);
                         }
                         //timeout?
-                        if (ZeeConfig.isTaskCanceledByGroundClick()){
+                        if (ZeeConfig.isCancelClick()){
                             println("label plant canceled by click");
                             clickedPlantGobForLabelingQl = false;
                             ZeeConfig.removePlayerText();
@@ -1238,7 +1308,7 @@ public class ZeeManagerGobClick extends ZeeThread{
                     for (int i = 0; i < catchers.size(); i++) {
                         dc = catchers.get(i);
                         //cancel click
-                        if (ZeeConfig.isTaskCanceledByGroundClick())
+                        if (ZeeConfig.isCancelClick())
                             break;
                         //skip 1st catcher
                         if(dc.equals(catcher1))
@@ -1377,7 +1447,7 @@ public class ZeeManagerGobClick extends ZeeThread{
                 try{
                     ZeeConfig.addPlayerText("autobutch");
                     ZeeConfig.lastMapViewClickButton = 2;//prepare for clickCancelTask()
-                    while (!ZeeConfig.isTaskCanceledByGroundClick() && gobExistsBecauseFlowermenu(deadAnimal)) {
+                    while (!ZeeConfig.isCancelClick() && gobExistsBecauseFlowermenu(deadAnimal)) {
 
                         //prepare settings
                         ZeeConfig.lastInvItemMs = 0;
@@ -1420,7 +1490,7 @@ public class ZeeManagerGobClick extends ZeeThread{
             }
             ZeeConfig.destroyingTreelogs = true;
             ZeeConfig.lastMapViewClickButton = 2;//prepare for cancel click
-            while ( logs > 0  &&  !ZeeConfig.isTaskCanceledByGroundClick() ) {
+            while ( logs > 0  &&  !ZeeConfig.isCancelClick() ) {
                 ZeeConfig.addPlayerText("treelogs "+logs);
                 if (!clickGobPetal(treelog,"Make boards")){
                     println("can't click treelog = "+treelog);
@@ -1430,7 +1500,7 @@ public class ZeeManagerGobClick extends ZeeThread{
                 }
                 currentDestroyingTreelog = treelog;
                 waitPlayerIdlePose();
-                if (!ZeeConfig.isTaskCanceledByGroundClick()){
+                if (!ZeeConfig.isCancelClick()){
                     logs--;
                     if (isDestroyingAllTreelogs){
                         // destroy all, treelog queue is present
@@ -1451,7 +1521,7 @@ public class ZeeManagerGobClick extends ZeeThread{
                         treelog = ZeeConfig.getClosestGobByNameContains(treelogName);
                     }
                 }else{
-                    if (ZeeConfig.isTaskCanceledByGroundClick()) {
+                    if (ZeeConfig.isCancelClick()) {
                         ZeeConfig.msg("destroy treelog canceled by click");
                         println("destroy treelog canceled by click");
                     }else
@@ -1757,7 +1827,7 @@ public class ZeeManagerGobClick extends ZeeThread{
                     // try picking irrlight
                     ZeeConfig.addPlayerText("irrlight!");
                     ZeeConfig.lastMapViewClickButton = 2;//prepare cancel click
-                    while (pickingIrrlight && !ZeeConfig.isTaskCanceledByGroundClick()) {
+                    while (pickingIrrlight && !ZeeConfig.isCancelClick()) {
                         Gob irrlight = ZeeConfig.getClosestGobByNameContains("/irrbloss");
                         if (irrlight==null) {
                             break;
@@ -1767,7 +1837,7 @@ public class ZeeManagerGobClick extends ZeeThread{
                     }
 
                     //try crafting again
-                    if (workingStation!=null && !ZeeConfig.isTaskCanceledByGroundClick()){
+                    if (workingStation!=null && !ZeeConfig.isCancelClick()){
                         gobClick(workingStation,3);
                         waitPlayerIdlePose();
                         sleep(PING_MS);
@@ -1968,7 +2038,7 @@ public class ZeeManagerGobClick extends ZeeThread{
             closestPlant = firstPlant;
             double dist;
             do{
-                if (ZeeConfig.isTaskCanceledByGroundClick()) {
+                if (ZeeConfig.isCancelClick()) {
                     // cancel if clicked right/left button
                     println("cancel click");
                     break;
@@ -2004,7 +2074,7 @@ public class ZeeManagerGobClick extends ZeeThread{
             }
             ZeeManagerItemClick.equipAxeChopTree();
             Coord2d treeCoord;
-            while (tree!=null && !ZeeConfig.isTaskCanceledByGroundClick()) {
+            while (tree!=null && !ZeeConfig.isCancelClick()) {
                 sleep(500);//safe wait
                 //start chopping
                 if(!clickGobPetal(tree, "Chop")){
@@ -2019,11 +2089,11 @@ public class ZeeManagerGobClick extends ZeeThread{
                 currentRemovingTree = tree;
                 treeCoord = new Coord2d(tree.rc.x, tree.rc.y);
                 //wait idle
-                if (!ZeeConfig.isTaskCanceledByGroundClick() && waitPlayerIdlePose()) {
+                if (!ZeeConfig.isCancelClick() && waitPlayerIdlePose()) {
                     //wait new stump loading
                     sleep(2000);
                     //check task canceled
-                    if(ZeeConfig.isTaskCanceledByGroundClick()) {
+                    if(ZeeConfig.isCancelClick()) {
                         println("remtree > click canceled");
                         break;
                     }
@@ -2148,7 +2218,7 @@ public class ZeeManagerGobClick extends ZeeThread{
                     int added = 0;
                     ZeeConfig.lastMapViewClickButton = 2;//prepare for cancel click
                     ZeeConfig.addPlayerText("adding");
-                    while(  !ZeeConfig.isTaskCanceledByGroundClick()
+                    while(  !ZeeConfig.isCancelClick()
                             && !exit
                             && added < num
                             && invItens.size() > 0)

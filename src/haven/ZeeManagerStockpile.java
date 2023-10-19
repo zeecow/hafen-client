@@ -916,7 +916,7 @@ public class ZeeManagerStockpile extends ZeeThread{
 
                     // create pile(s) until area full
                     ZeeConfig.lastMapViewClickButton = 2;//prepare cancel
-                    while(selAreaPile && !ZeeConfig.isTaskCanceledByGroundClick()) {
+                    while(selAreaPile && !ZeeConfig.isCancelClick()) {
 
                         //pickup ground items until idle
                         if (!ZeeConfig.isPlayerHoldingItem()) {
@@ -927,7 +927,7 @@ public class ZeeManagerStockpile extends ZeeThread{
                                 //pickup itemns until inventory idle
                                 waitInvIdleMs(1000);
                                 //check if user closed piler window
-                                if (!selAreaPile || ZeeConfig.isTaskCanceledByGroundClick()) {
+                                if (!selAreaPile || ZeeConfig.isCancelClick()) {
                                     exitAreaPiler("canceled");
                                     return;
                                 }
@@ -1334,7 +1334,7 @@ public class ZeeManagerStockpile extends ZeeThread{
                             println("pilan blocks > couldnt get block from inv");
                             break;
                         }
-                    }while(!ZeeConfig.isTaskCanceledByGroundClick());
+                    }while(!ZeeConfig.isCancelClick());
                 }catch (Exception e){
                     e.printStackTrace();
                 }
@@ -1395,7 +1395,7 @@ public class ZeeManagerStockpile extends ZeeThread{
                             println("pilan sand > couldnt get item from inv");
                             break;
                         }
-                    }while(!ZeeConfig.isTaskCanceledByGroundClick());
+                    }while(!ZeeConfig.isCancelClick());
                 }catch (Exception e){
                     e.printStackTrace();
                 }
@@ -1456,7 +1456,7 @@ public class ZeeManagerStockpile extends ZeeThread{
                             println("pilan board > couldnt get board from inv");
                             break;
                         }
-                    }while(!ZeeConfig.isTaskCanceledByGroundClick());
+                    }while(!ZeeConfig.isCancelClick());
                 }catch (Exception e){
                     e.printStackTrace();
                 }

@@ -1431,7 +1431,7 @@ public class ZeeConfig {
             //get all fuel items
             List<WItem> items = getMainInventory().getWItemsByNameContains(fuelName);
             //ignore stack placeholder
-            items.removeIf(wItem -> ZeeManagerItemClick.isStackPagina(wItem.item));
+            items.removeIf(wItem -> ZeeManagerItemClick.isStackByAmount(wItem.item));
             //add items
             //TODO get items from stack
             ZeeManagerGobClick.addItemsToGob(items,num,g);
@@ -3129,11 +3129,11 @@ public class ZeeConfig {
         return gob==null || gameUI.ui.sess.glob.oc.getgob(gob.id)==null;
     }
 
-    public static boolean isTaskCanceledByGroundClick() {
+    public static boolean isCancelClick() {
         //cancel if clicked right/left button
         return lastMapViewClickButton != 2;
     }
-    public static void prepareTaskCanceledByGroundClick() {
+    public static void prepareCancelClick() {
         ZeeConfig.lastMapViewClickButton = 2;
     }
 

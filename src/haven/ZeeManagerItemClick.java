@@ -170,7 +170,7 @@ public class ZeeManagerItemClick extends ZeeThread{
 
 
             // undo stack if no transfer available
-            if( isStackPagina(wItem.item)  &&  !isStackTransferable(wItem.item)){
+            if( isStackByAmount(wItem.item)  &&  !isStackTransferable(wItem.item)){
                 //undo one stack
                 if (!isLongClick()){
                     undoStack(wItem.item);
@@ -693,14 +693,14 @@ public class ZeeManagerItemClick extends ZeeThread{
                     String firstItemName = itemName;
                     long changeMs;
                     ZeeConfig.lastMapViewClickButton = 2;//prepare for cancel click
-                    while (!ZeeConfig.isTaskCanceledByGroundClick() && (!(itemName.endsWith("-clean") || itemName.endsWith("-cleaned"))) ){
+                    while (!ZeeConfig.isCancelClick() && (!(itemName.endsWith("-clean") || itemName.endsWith("-cleaned"))) ){
 
                         //butch item and wait inventory changes
                         changeMs = now();
                         itemActCoord(item);
                         while (changeMs > ZeeConfig.lastInvItemMs) {
                             sleep(PING_MS);
-                            if (ZeeConfig.isTaskCanceledByGroundClick()) {
+                            if (ZeeConfig.isCancelClick()) {
                                 autoButchExit("click canceled 1");
                                 return;
                             }
@@ -721,7 +721,7 @@ public class ZeeManagerItemClick extends ZeeThread{
                             itemActCoord(item);
                             while (changeMs > ZeeConfig.lastInvItemMs) {
                                 sleep(PING_MS);
-                                if (ZeeConfig.isTaskCanceledByGroundClick()) {
+                                if (ZeeConfig.isCancelClick()) {
                                     autoButchExit("click canceled 2");
                                     return;
                                 }
@@ -755,7 +755,7 @@ public class ZeeManagerItemClick extends ZeeThread{
                     }
 
                     //single butch animal last action
-                    if (!ZeeConfig.isTaskCanceledByGroundClick() && !butchAll && (itemName.endsWith("-clean") || itemName.endsWith("-cleaned"))) {
+                    if (!ZeeConfig.isCancelClick() && !butchAll && (itemName.endsWith("-clean") || itemName.endsWith("-cleaned"))) {
                         //println("last butch > " + itemName);
                         changeMs = now();
                         itemActCoord(item);
@@ -811,7 +811,7 @@ public class ZeeManagerItemClick extends ZeeThread{
         if (!isLongClick())
             return false;
 
-        if (isStackPagina(wItem.item))
+        if (isStackByAmount(wItem.item))
             return false;
 
         boolean showMenu = true;
@@ -896,7 +896,7 @@ public class ZeeManagerItemClick extends ZeeThread{
         int countNoMenu = 0;
         for (WItem w: items) {
             try {
-                if (ZeeConfig.isTaskCanceledByGroundClick()) {
+                if (ZeeConfig.isCancelClick()) {
                     //ZeeClickGobManager.resetClickPetal();
                     ZeeConfig.removeGobText(ZeeConfig.getPlayerGob());
                     return itemsClicked;
@@ -1621,14 +1621,29 @@ public class ZeeManagerItemClick extends ZeeThread{
         return ZeeManagerItemClick.isItemEquipped("gfx/invobjs/small/coracle");
     }
 
-    public static boolean isStackPagina(GItem i) throws Loading {
+    public static boolean isStackByAmount(GItem i) throws Loading {
         try {
             if (i.getres().basename().startsWith("seed-"))
                 return false;
             if (getItemInfoAmount(i.info()) > 0)
                 return true;
+        }catch(Loading l){
+        } catch(Exception e){
+            println("isStackByAmount > "+e.getMessage());
+        }
+        return false;
+    }
+
+    public static boolean isStackByKeyPagina(GItem i) throws Loading {
+        try {
+            if (i.getres().basename().startsWith("seed-"))
+                return false;
+            List<ItemInfo> info = i.info();
+            if (getItemInfoByClassSimpleName(info,"KeyPagina")!=null
+                    && getItemInfoAmount(info) > 0)
+                return true;
         }catch (Exception e){
-            e.getMessage();
+            e.printStackTrace();
         }
         return false;
     }
@@ -1649,7 +1664,7 @@ public class ZeeManagerItemClick extends ZeeThread{
                     Inventory inv = item.getparent(Inventory.class);
                     List<WItem> invItems = inv.getWItemsByNameEndsWith(item.getres().name);
                     for (WItem wItem : invItems) {
-                        if (!isStackPagina(wItem.item))
+                        if (!isStackByAmount(wItem.item))
                             continue;
                         undoStack(wItem.item);
                         sleep(PING_MS);

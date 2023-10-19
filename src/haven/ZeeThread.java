@@ -292,7 +292,7 @@ public class ZeeThread  extends Thread{
             ZeeConfig.lastMapViewClickButton = 2;//prepare for cancel click
             do{
                 sleep(PING_MS*2);
-                exit = ZeeConfig.isTaskCanceledByGroundClick();
+                exit = ZeeConfig.isCancelClick();
                 if(exit) {
                     //println("    canceled by click");
                     break;
@@ -363,7 +363,7 @@ public class ZeeThread  extends Thread{
                 sleep(PING_MS*2);
             } while (
                 (poses = ZeeConfig.getPlayerPoses()).contains(poseName)
-                && !ZeeConfig.isTaskCanceledByGroundClick()
+                && !ZeeConfig.isCancelClick()
             );
         }catch (Exception e){
             e.printStackTrace();
@@ -382,7 +382,7 @@ public class ZeeThread  extends Thread{
                 sleep(PING_MS*2);
             } while (
                 !(poses = ZeeConfig.getGobPoses(gob)).contains(poseName)
-                && !ZeeConfig.isTaskCanceledByGroundClick()
+                && !ZeeConfig.isCancelClick()
             );
         }catch (Exception e){
             e.printStackTrace();
@@ -417,7 +417,7 @@ public class ZeeThread  extends Thread{
             } while (
                 !(poses = ZeeConfig.getGobPoses(gob)).contains(singlePoseName)
                 && poses.size() != 1
-                && !ZeeConfig.isTaskCanceledByGroundClick()
+                && !ZeeConfig.isCancelClick()
             );
         }catch (Exception e){
             e.printStackTrace();
@@ -547,8 +547,8 @@ public class ZeeThread  extends Thread{
         //println("waitPlayerIdleOrHoldingItem");
         boolean pidle = false;
         try {
-            ZeeConfig.prepareTaskCanceledByGroundClick();
-            while( !ZeeConfig.isTaskCanceledByGroundClick()  &&  !ZeeConfig.isPlayerHoldingItem()) {
+            ZeeConfig.prepareCancelClick();
+            while( !ZeeConfig.isCancelClick()  &&  !ZeeConfig.isPlayerHoldingItem()) {
                 Thread.sleep(PING_MS);
                 // is mounted player idle
                 if (ZeeConfig.isPlayerMountingHorse()){
@@ -906,7 +906,7 @@ public class ZeeThread  extends Thread{
     public static boolean waitGobRemovedOrCancelClick(Gob gob){
         try{
             //println("waitGobRemoved > enter loop");
-            while(!ZeeConfig.isGobRemoved(gob) && !ZeeConfig.isTaskCanceledByGroundClick()){
+            while(!ZeeConfig.isGobRemoved(gob) && !ZeeConfig.isCancelClick()){
                 Thread.sleep(1000);
             }
         }catch (Exception e){
@@ -1011,6 +1011,13 @@ public class ZeeThread  extends Thread{
 
     static long now() {
         return System.currentTimeMillis();
+    }
+
+    public static boolean isCancelClick() {
+        return ZeeConfig.isCancelClick();
+    }
+    public static void prepareCancelClick() {
+        ZeeConfig.prepareCancelClick();
     }
 
     public static void println(String s) {

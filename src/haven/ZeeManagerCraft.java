@@ -154,7 +154,7 @@ public class ZeeManagerCraft extends ZeeThread{
                             do {
                                 sleep(PING_MS);
                                 try {
-                                    bugsFound.removeIf(wItem1 -> ZeeManagerItemClick.isStackPagina(wItem1.item));
+                                    bugsFound.removeIf(wItem1 -> ZeeManagerItemClick.isStackByAmount(wItem1.item));
                                 } catch (Loading loading) {
                                     waitSprite = true;
                                     continue;
@@ -460,7 +460,7 @@ public class ZeeManagerCraft extends ZeeThread{
                         //wait crafting end
                         waitPlayerPoseNotInList(ZeeConfig.POSE_PLAYER_DRINK,ZeeConfig.POSE_PLAYER_ROPE_WALKING);
 
-                    }while(ropeBusy && !ZeeConfig.isTaskCanceledByGroundClick());
+                    }while(ropeBusy && !ZeeConfig.isCancelClick());
 
                 } catch (Exception e) {
                     e.printStackTrace();

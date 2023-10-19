@@ -520,7 +520,7 @@ public class ZeeManagerMiner extends ZeeThread{
     private static boolean waitBoulderFinish(Gob boulder) {
         try {
             ZeeConfig.lastMapViewClickButton = 2;
-            while (!ZeeConfig.isTaskCanceledByGroundClick() && ZeeManagerGobClick.findGobById(boulder.id) != null) {
+            while (!ZeeConfig.isCancelClick() && ZeeManagerGobClick.findGobById(boulder.id) != null) {
                 //println("gob still exist > "+ZeeClickGobManager.findGobById(boulder.id));
                 Thread.sleep(PING_MS);//sleep 1s
             }
