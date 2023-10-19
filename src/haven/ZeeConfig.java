@@ -120,7 +120,7 @@ public class ZeeConfig {
     static final String TILE_MOUNTAIN = "gfx/tiles/mountain";
 
     static final String DEF_LIST_MUTE_AUDIO = "Leashed horse.;Tracking is now turned;Stacking is now turned;must be empty to be unequipped";
-    static final String DEF_LIST_CONFIRM_PETAL = "Empty,Swill,Clean out,Slaughter,Castrate,Unmoor,Take possession,Renounce Lawspeaker,Become Lawspeaker";
+    static final String DEF_LIST_CONFIRM_PETAL = "Empty,Swill,Clean out,Slaughter,Castrate,Unmoor,Take possession,Renounce Lawspeaker,Become Lawspeaker,Pull hair";
     static final String DEF_LIST_WINDOWS_ADD_HIDE_BUTTON = "Inventory,Character Sheet,Basket,Creel,Cattle Roster,Quiver,Pickup Gobs,Tile Monitor,Switch Char";
     static final String DEF_LIST_BUTCH_AUTO = "Break,Scale,Wring neck,Kill,Skin,Flay,Pluck,Clean,Butcher,Collect bones";
     static final String DEF_LIST_AUTO_CLICK_MENU = "Pick,Harvest wax";
