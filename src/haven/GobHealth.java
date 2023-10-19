@@ -26,10 +26,12 @@
 
 package haven;
 
-import java.awt.Color;
-import java.util.Random;
-import haven.render.*;
+import haven.render.MixColor;
+import haven.render.Pipe;
 import haven.resutil.CrackTex;
+
+import java.awt.*;
+import java.util.Random;
 
 public class GobHealth extends GAttrib implements Gob.SetupMod {
     public final float hp;
@@ -50,10 +52,17 @@ public class GobHealth extends GAttrib implements Gob.SetupMod {
 	    this.fx = null;
 	}
 	synchronized (g){
-		if ( g.settingsApplied &&  hp < 1 ) {
-			Color c = Color.lightGray;
-			String s = String.valueOf(hp).replaceFirst("0.", ".");
-			ZeeConfig.addGobText(g,s,c);
+		if ( g.settingsApplied ) {
+			// add gob label
+			if (hp < 1) {
+				Color c = Color.lightGray;
+				String s = String.valueOf(hp).replaceFirst("0.", ".");
+				ZeeConfig.addGobText(g, s, c);
+			}
+			// remove gob label
+			else {
+				ZeeConfig.removeGobText(g);
+			}
 		}
 	}
     }
