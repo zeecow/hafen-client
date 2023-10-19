@@ -509,7 +509,14 @@ public class ZeeConfig {
     }
 
     public static boolean isGobWildCrop(String gobName) {
-        return gobName.startsWith("gfx/terobjs/plants/") && (gobName.contains("/wild") || gobName.contains("/stringgrass") || gobName.contains("/cereal"));
+        return gobName.startsWith("gfx/terobjs/plants/") &&
+                (
+                        gobName.contains("/wild") ||
+                        gobName.contains("/stringgrass") ||
+                        gobName.contains("/cereal") ||
+                        gobName.contains("/gourd") ||
+                        gobName.contains("/tuber")
+                );
     }
 
     //  gfx/invobjs/turnip , gfx/invobjs/seed-turnip
