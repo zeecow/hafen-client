@@ -3728,7 +3728,7 @@ public class ZeeConfig {
                 }
             }
         }catch (Exception e){
-            println("getGobPoses > "+e.getMessage()+"  ,  gobReady="+gob.isGobWaitingSettings);
+            //println("getGobPoses > "+e.getMessage()+"  ,  gobReady="+gob.isGobWaitingSettings);
         }
         return ret;
     }
