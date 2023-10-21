@@ -368,12 +368,9 @@ public class GobIcon extends GAttrib {
 								if (icon.conf.resns==null) {
 									// default "Bell 2"
 									icon.conf.resns = NotificationSetting.builtin.get(1).res;
-									if(save!=null && ZeeConfig.allowIconNotifySave()) {
+									if(save!=null) {
 										save.run();
-										ZeeConfig.lastIconNotifySaveMs = ZeeThread.now();
-										ZeeConfig.println("saved "+icon.conf.resns);
-									}else
-										ZeeConfig.println("not saved "+icon.conf.resns);
+									}
 								}
 								list.change(icon);//select icon line
 							}

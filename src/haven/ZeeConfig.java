@@ -3825,11 +3825,6 @@ public class ZeeConfig {
             ZeeManagerCraft.windowFeasting = null;
     }
 
-    static long lastIconNotifySaveMs = ZeeThread.now();
-    public static boolean allowIconNotifySave() {
-        return ZeeThread.now() - lastIconNotifySaveMs > 1000;
-    }
-
     public static boolean isPlayerDrivingingKicksled() {
         for (String playerPose : getPlayerPoses()) {
             if (playerPose.contains("/sparkan"))
