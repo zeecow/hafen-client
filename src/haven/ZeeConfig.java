@@ -622,6 +622,26 @@ public class ZeeConfig {
         return false;
     }
 
+    public static boolean isScent(String name){
+      if(name.contains("odorof"))
+                return true;
+        return false;
+    }
+
+    public static boolean isSpice(String name){
+        final String[] list = {
+            "kvann", "chives", "dill","thyme","sage",
+            "laurel","juniper",
+            "ambergris",
+            "truffle"
+        };
+        for (int i = 0; i < list.length; i++) {
+            if(name.contains(list[i]))
+                return true;
+        }
+        return false;
+    }
+
     public static boolean isString(String name){
         final String[] list = {
             "stingingnettle","taproot","cattail","toadflax"
@@ -3173,6 +3193,8 @@ public class ZeeConfig {
                     add(space+"mushrooms");
                     add(space+"noob stuff");
                     add(space+"small animals");
+                    add(space+"scents");
+                    add(space+"spices");
                     add(space+"string");
                     add(space+"trees");
                     add(space+space+"bark");
@@ -3292,6 +3314,10 @@ public class ZeeConfig {
             filteredList.removeIf(entry -> !ZeeConfig.isHerb(entry.conf.res.name));
         else if(filter.equals("mushrooms"))
             filteredList.removeIf(entry -> !ZeeConfig.isMushroom(entry.conf.res.name));
+        else if(filter.equals("scents"))
+            filteredList.removeIf(entry -> !ZeeConfig.isScent(entry.conf.res.name));
+        else if(filter.equals("spices"))
+            filteredList.removeIf(entry -> !ZeeConfig.isSpice(entry.conf.res.name));
         else if(filter.equals("string"))
             filteredList.removeIf(entry -> !ZeeConfig.isString(entry.conf.res.name));
         else if(filter.equals("kritters"))
