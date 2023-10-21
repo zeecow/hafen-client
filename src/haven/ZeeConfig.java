@@ -543,15 +543,22 @@ public class ZeeConfig {
         return false;
     }
 
+    public static boolean isAggressiveIconName(String iconName){
+        if (iconName.endsWith("/plo"))
+            return true;
+        if (isAggressive(iconName))
+            return true;
+        return false;
+    }
+
     public static boolean isAggressive(String nameContains){
-        final String[] list = {
+        final List<String> listContains = List.of(
                "/adder","/sandflea","/boar/","/badger/","/bear/","/bat/","/boreworm/",
                 "/ooze/","/cavelouse/","/caveangler/","orca","/goldeneagle/","/lynx/",
-                "/mammoth/","/moose/","/troll/","/walrus/","/goat/","/wolf/","/wolverine/",
-                "/plo"
-        };
-        for (int i = 0; i < list.length; i++) {
-            if(nameContains.contains(list[i]))
+                "/mammoth/","/moose/","/troll/","/walrus/","/goat/","/wolf/","/wolverine/"
+        );
+        for (String listName : listContains) {
+            if (nameContains.contains(listName))
                 return true;
         }
         return false;
@@ -3345,7 +3352,7 @@ public class ZeeConfig {
         else if(filter.equals("small animals"))
             filteredList.removeIf(entry -> !ZeeConfig.isSmallAnimal(entry.conf.res.name));
         else if(filter.equals("aggressive"))
-            filteredList.removeIf(entry -> !ZeeConfig.isAggressive(entry.conf.res.name));
+            filteredList.removeIf(entry -> !ZeeConfig.isAggressiveIconName(entry.conf.res.name));
 
         //println("pos "+filteredList.size());
         return filteredList;
