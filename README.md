@@ -37,6 +37,7 @@ Midclick Ground
 - while inspecting icon active, will msg tile name
 - place stockpile and all items
 - dig multiple ballclay if cursor dig
+- while driving plow will queue coords 
 
 Long Midclick Ground (LMC)
 - inspect water tile using inventory woodencup

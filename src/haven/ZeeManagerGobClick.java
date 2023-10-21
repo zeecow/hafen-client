@@ -220,12 +220,18 @@ public class ZeeManagerGobClick extends ZeeThread{
                         prepareCancelClick();
                         while(!isCancelClick()){
                             sleep(1000);
+                            if (isCancelClick()){
+                                println("plow queue cancel clicked");
+                                break;
+                            }
                             //wait plow stops moving
                             if (getGAttrNames(plow).contains("LinMove")){
+                                //println("plow lin move");
                                 continue;
                             }
                             //wait player stop walking and drinking
                             if (ZeeConfig.playerHasAnyPose(ZeeConfig.POSE_PLAYER_WALK,ZeeConfig.POSE_PLAYER_DRINK)){
+                                //println("player walk/drink");
                                 continue;
                             }
                             // click next coord
@@ -233,6 +239,10 @@ public class ZeeManagerGobClick extends ZeeThread{
                                 Coord2d nextCoord = plowQueueCoords.remove(0);
                                 ZeeConfig.clickCoord(nextCoord.floor(posres),1);
                                 prepareCancelClick();
+                                //drink
+                                if (ZeeConfig.getStamina() < 100) {
+                                    ZeeManagerItemClick.drinkFromBeltHandsInv();
+                                }
                                 ZeeConfig.addPlayerText("plow q "+ plowQueueCoords.size());
                             }
                             else {
