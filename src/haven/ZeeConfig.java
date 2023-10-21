@@ -623,8 +623,9 @@ public class ZeeConfig {
     }
 
     public static boolean isScent(String name){
-      if(name.contains("odorof"))
-                return true;
+        if(name.contains("clue-")) {
+            return true;
+        }
         return false;
     }
 
