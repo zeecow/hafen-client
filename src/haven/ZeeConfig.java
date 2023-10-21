@@ -2539,6 +2539,7 @@ public class ZeeConfig {
         makeWindow = null;
         ZeeManagerMiner.tilesMonitorCleanup();
         ZeeHistWdg.clearHistory();
+        ZeeManagerGobClick.plowQueueReset();
 
         if(ZeeManagerFarmer.windowManager!=null){
             try {
@@ -2693,6 +2694,10 @@ public class ZeeConfig {
 
     public static boolean isPlayerDrivingWheelbarrow() {
         return playerHasAnyPose(POSE_PLAYER_DRIVE_WHEELBARROW) && getCursorName().contentEquals(CURSOR_HAND);
+    }
+
+    public static boolean isPlayerDrivingPlow() {
+        return playerHasAnyPose(POSE_PLAYER_DRIVE_WHEELBARROW) && getCursorName().contentEquals(CURSOR_DIG);
     }
 
     public static boolean isPlayerMountingHorse() {
@@ -3568,6 +3573,18 @@ public class ZeeConfig {
         if (nameContains==null || nameContains.isBlank())
             return null;
         return getClosestGob(findGobsByNameContains(nameContains));
+    }
+
+    public static Gob getClosestGobByNameEnds(String nameEdns) {
+        if (nameEdns==null || nameEdns.isBlank())
+            return null;
+        return getClosestGob(findGobsByNameEndsWith(nameEdns));
+    }
+
+    public static Gob getClosestGobByNameStarts(String nameStarts) {
+        if (nameStarts==null || nameStarts.isBlank())
+            return null;
+        return getClosestGob(findGobsByNameStartsWith(nameStarts));
     }
 
     public static Inventory getMainInventory() {

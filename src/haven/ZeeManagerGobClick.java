@@ -65,6 +65,10 @@ public class ZeeManagerGobClick extends ZeeThread{
                 else if(ZeeConfig.isCursorName(ZeeConfig.CURSOR_DIG) && ZeeConfig.isTileNamed(mc, ZeeConfig.TILE_WATER_FRESH_SHALLOW,ZeeConfig.TILE_WATER_OCEAN_SHALLOW)){
                     ZeeConfig.clickTile(ZeeConfig.coordToTile(mc),1,UI.MOD_SHIFT);
                 }
+                // queue plowing
+                else if(ZeeConfig.isPlayerDrivingPlow()){
+                    plowQueueAddCoord(coordMc,coordPc);
+                }
             }
             // feed clover to wild animal
             else if (checkCloverFeeding(gob)) {
@@ -185,6 +189,76 @@ public class ZeeManagerGobClick extends ZeeThread{
         }
     }
 
+    private static List<Coord2d> plowQueueCoords = null;
+    private static ZeeThread plowQueueThread = null;
+    private static void plowQueueAddCoord(Coord2d coordMc, Coord coordPc) {
+
+        // find plow
+        Gob plow = ZeeConfig.getClosestGobByNameEnds("/plow");
+        if (plow==null){
+            println("no plow found");
+            return;
+        }
+
+        // queue new plow coord
+        if (plowQueueCoords ==null){
+            plowQueueCoords = new ArrayList<>();
+        }
+        if (plowQueueCoords.contains(coordMc)){
+            println("plow coord already queued");
+            return;
+        }
+        plowQueueCoords.add(coordMc);
+
+        ZeeConfig.addPlayerText("plow q "+ plowQueueCoords.size());
+
+        //starts thread
+        if (plowQueueThread == null) {
+            plowQueueThread = new ZeeThread(){
+                public void run() {
+                    try {
+                        prepareCancelClick();
+                        while(!isCancelClick()){
+                            sleep(1000);
+                            //wait plow stops moving
+                            if (getGAttrNames(plow).contains("LinMove")){
+                                continue;
+                            }
+                            //wait player stop walking and drinking
+                            if (ZeeConfig.playerHasAnyPose(ZeeConfig.POSE_PLAYER_WALK,ZeeConfig.POSE_PLAYER_DRINK)){
+                                continue;
+                            }
+                            // click next coord
+                            if (!plowQueueCoords.isEmpty()){
+                                Coord2d nextCoord = plowQueueCoords.remove(0);
+                                ZeeConfig.clickCoord(nextCoord.floor(posres),1);
+                                prepareCancelClick();
+                                ZeeConfig.addPlayerText("plow q "+ plowQueueCoords.size());
+                            }
+                            else {
+                                println("plow queue ended");
+                                break;
+                            }
+                        }
+                    } catch (InterruptedException e) {
+                        println("thread queue plow interrupted");
+                    } catch (Exception e){
+                        e.printStackTrace();
+                    }
+                    ZeeConfig.removePlayerText();
+                    plowQueueReset();
+                }
+            };
+        }
+        if (!plowQueueThread.isAlive()) {
+            plowQueueThread.start();
+        }
+    }
+
+    static void plowQueueReset(){
+        plowQueueCoords = null;
+        plowQueueThread = null;
+    }
 
 
     static void barterSearchUpdateGobs() {
@@ -2749,6 +2823,15 @@ public class ZeeManagerGobClick extends ZeeThread{
         for (Gob.Overlay ol : gob.ols) {
             if(ol.res != null)
                 ret.add(ol.res.get().name);
+        }
+        return ret;
+    }
+
+    public static List<String> getGAttrNames(Gob gob) {
+        List<String> ret = new ArrayList<>();
+        Collection<GAttrib> attrs = gob.attr.values();
+        for (GAttrib attr : attrs) {
+            ret.add(attr.getClass().getSimpleName());
         }
         return ret;
     }
