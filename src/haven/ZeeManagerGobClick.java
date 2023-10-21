@@ -387,14 +387,14 @@ public class ZeeManagerGobClick extends ZeeThread{
     private static boolean checkCloverFeeding(Gob animal) {
 
         if (ZeeManagerItemClick.getHoldingItem()==null) {
-            println("checkCloverFeeding > holding item null");
+            //println("checkCloverFeeding > holding item null");
             return false;
         }
 
         GItem holditem = ZeeManagerItemClick.getHoldingItem().item;
 
         if (ZeeManagerItemClick.isStackByKeyPagina(holditem)) {
-            println("checkCloverFeeding > holding stack");
+            //println("checkCloverFeeding > holding stack");
             return false;
         }
 
@@ -405,16 +405,16 @@ public class ZeeManagerGobClick extends ZeeThread{
                     return true;
             }
         }else{
-            println("checkCloverFeeding > item null or name wrong");
+            //println("checkCloverFeeding > item null or name wrong");
         }
 
-        println("checkCloverFeeding > ret false");
+        //println("checkCloverFeeding > ret false");
         return false;
     }
 
     private static void feedClover(Gob animal){
         if (animal==null) {
-            println("feedClover > animal gob null");
+            //println("feedClover > animal gob null");
             return;
         }
         new ZeeThread(){
