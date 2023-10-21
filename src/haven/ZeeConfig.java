@@ -203,6 +203,7 @@ public class ZeeConfig {
     static double cattleRosterHeightPercentage = Utils.getprefd("cattleRosterHeightPercentage", 1.0);
     static boolean confirmPetal = Utils.getprefb("confirmPetal", true);
     static String confirmPetalList = Utils.getpref("confirmPetalList", DEF_LIST_CONFIRM_PETAL);
+    public static boolean confirmThrowingAxeOrSpear = Utils.getprefb("confirmThrowingAxeOrSpear", true);
     static boolean debugWidgetMsgs = false;//disabled by default
     static boolean debugCodeRes = Utils.getprefb("debugCodeRes", false);
     static boolean drinkKey = Utils.getprefb("drinkKey", true);

@@ -16,6 +16,7 @@ Controls
 - ctrl+h toggle trees/palisegs/crops
 - mousewheel scroll transfer items directly (no shift required)
 - Ctrl+click to confirm actions (Empty, Swill, Slaughter, etc)
+- Ctrl confirm throwing axe/spear
 - Ctrl+Rclick confirm remove shortcut
 - Alt+click to drop holding item
 - shift+tab toggles between belt, creel and basket (probably outdated)

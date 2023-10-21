@@ -1343,12 +1343,14 @@ public class ZeeManagerItemClick extends ZeeThread{
         }
     }
 
-    public static boolean isItemEquipped(String nameContains){
+    public static boolean isItemEquipped(String ... nameContains){
         try {
             GItem items[] = getEquipory().wmap.keySet().toArray(new GItem[]{});
             for (int i = 0; i < items.length; i++) {
-                if (items[i].getres().name.contains(nameContains))
-                    return true;
+                for (int j = 0; j < nameContains.length; j++) {
+                    if (items[i].getres().name.contains(nameContains[j]))
+                        return true;
+                }
             }
         }catch (Exception e){
             e.printStackTrace();

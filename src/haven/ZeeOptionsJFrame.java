@@ -87,6 +87,9 @@ public class ZeeOptionsJFrame extends JFrame {
 
         panelTabControls.add(new ZeeOptionJCheckBox( "Drink key ' (single quote) ", "drinkKey"),c);
 
+        // confirmThrowingAxeOrSpear
+        panelTabControls.add(new ZeeOptionJCheckBox("Ctrl confirm throwing axe/spear","confirmThrowingAxeOrSpear"),c);
+
         //confirm petal list
         panelTabControls.add(new ZeeOptionJCheckBox( "Ctrl+click confirm petal:", "confirmPetal"),c);
         panelTabControls.add(tfConfirmPetal= new JTextField("",5), c);
