@@ -209,7 +209,7 @@ public class ZeeManagerGobClick extends ZeeThread{
             return;
         }
         plowQueueCoords.add(coordMc);
-
+        ZeeManagerItemClick.playFeedbackSound();
         ZeeConfig.addPlayerText("plow q "+ plowQueueCoords.size());
 
         //starts thread
