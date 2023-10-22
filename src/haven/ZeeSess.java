@@ -38,7 +38,7 @@ public class ZeeSess {
             win.reqdestroy();
             win = null;
         }
-        win = new ZeeWindow(Coord.of(200,300), WINTITLE);
+        win = new ZeeWindow(Coord.of(160,200), WINTITLE);
 
         int y = 5;
 
@@ -69,7 +69,7 @@ public class ZeeSess {
         y += 15;
 
         // chars list
-        Scrollport scroll = win.add(new Scrollport(new Coord(140, 155)), 0, y);
+        Scrollport scroll = win.add(new Scrollport(new Coord(140, 80)), 0, y);
         y = 0;// inside scrollport
         for (String charName : charSwitchNamesList) {
             Button btn = scroll.cont.add(new Button(120,charName){
