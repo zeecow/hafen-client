@@ -2,6 +2,9 @@ package haven;
 
 public class ZeeFlowerMenu extends FlowerMenu{
 
+    static final String STRPETAL_CRAFT_FIREBRAND = "Craft firebrand";
+    static final String STRPETAL_CRAFT_PYRITE = "Craft pyrite spark";
+    static final String STRPETAL_BUILD_PYRE = "Build pyre";
     static final String STRPETAL_ADD12COAL = "Add 12 coal";
     static final String STRPETAL_ADD9COAL = "Add 9 coal";
     static final String STRPETAL_ADD4BRANCH = "Add 4 branch";
@@ -33,6 +36,7 @@ public class ZeeFlowerMenu extends FlowerMenu{
 
     private final Gob gob;
     private final WItem wItem;
+    private final Coord2d coordMc;
 
     /*
     haven.FlowerMenu@367eed1e ; cl ; [0, 0]
@@ -42,12 +46,21 @@ public class ZeeFlowerMenu extends FlowerMenu{
         super(opts);
         this.gob = gob;
         this.wItem = null;
+        this.coordMc = null;
     }
 
     public ZeeFlowerMenu(WItem wItem, String ... opts) {
         super(opts);
         this.gob = null;
         this.wItem = wItem;
+        this.coordMc = null;
+    }
+
+    public ZeeFlowerMenu(Coord2d coordMc, String ... opts) {
+        super(opts);
+        this.gob = null;
+        this.wItem = null;
+        this.coordMc = coordMc;
     }
 
     @Override
@@ -60,8 +73,12 @@ public class ZeeFlowerMenu extends FlowerMenu{
                     try{
                         if (gob != null) {
                             ZeeManagerGobClick.gobZeeMenuClicked(gob, petalName);
-                        } else if (wItem != null) {
+                        }
+                        else if (wItem != null) {
                             ZeeManagerItemClick.itemZeeMenuClicked(wItem, petalName);
+                        }
+                        else {
+                            ZeeManagerGobClick.groundZeeMenuClicked(coordMc, petalName);
                         }
                     }catch(Exception e){
                         e.printStackTrace();

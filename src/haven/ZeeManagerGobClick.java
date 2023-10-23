@@ -553,10 +553,7 @@ public class ZeeManagerGobClick extends ZeeThread{
                 }
                 //clicked water
                 else if (isWaterTile(coordMc)) {
-                    if (ZeeManagerItemClick.isCoracleEquipped() && !ZeeConfig.isPlayerMountingHorse())
-                        dropEmbarkCoracle(coordMc);
-                    else
-                        inspectWaterAt(coordMc);
+                    showGobFlowerMenu();
                 }
                 //disembark water vehicles
                 else if (ZeeConfig.isPlayerOnCoracle()) {
@@ -580,9 +577,8 @@ public class ZeeManagerGobClick extends ZeeThread{
                     //haven.MapView@11460448 ; click ; [(629, 490), (1014904, 1060429), 3, 1]
                     ZeeConfig.clickCoord(coordMc.floor(posres),3,UI.MOD_SHIFT);
                 }
-                // pile area from source tile
-                else if (ZeeConfig.isTileNamed(coordMc,ZeeConfig.TILE_MOUNTAIN,ZeeConfig.TILE_BEACH,ZeeConfig.TILE_SANDCLIFF)) {
-                    ZeeManagerStockpile.tileSourceWaitSelection(coordMc);
+                else{
+                    showGobFlowerMenu();
                 }
             }
             /*
@@ -1433,6 +1429,22 @@ public class ZeeManagerGobClick extends ZeeThread{
     }
 
 
+    public static void groundZeeMenuClicked(Coord2d coordMc, String petalName){
+
+        if (petalName.contentEquals("dig"))
+            ZeeConfig.gameUI.menu.wdgmsg("act","dig","0");
+        else if (petalName.contentEquals("mine"))
+            ZeeConfig.gameUI.menu.wdgmsg("act","mine","0");
+        else if (petalName.contentEquals("survey"))
+            ZeeConfig.gameUI.menu.wdgmsg("act","survey","0");
+        else if (petalName.contentEquals("fish"))
+            ZeeConfig.gameUI.menu.wdgmsg("act","fish","0");
+        else if (petalName.contentEquals("inspect cup"))
+            inspectWaterAt(coordMc);
+        else if(petalName.contentEquals("embark coracle"))
+            dropEmbarkCoracle(coordMc);
+    }
+
     public static void gobZeeMenuClicked(Gob gob, String petalName){
 
         String gobName = gob.getres().name;
@@ -1500,6 +1512,15 @@ public class ZeeManagerGobClick extends ZeeThread{
             || petalName.contentEquals(ZeeFlowerMenu.STRPETAL_DESTROYALL))
         {
             destroyTreelogs(gob,petalName);
+        }
+        else if(petalName.contentEquals(ZeeFlowerMenu.STRPETAL_BUILD_PYRE)){
+            ZeeConfig.gameUI.menu.wdgmsg("act","bp","bpyre",0);
+        }
+        else if(petalName.contentEquals(ZeeFlowerMenu.STRPETAL_CRAFT_FIREBRAND)){
+            ZeeConfig.gameUI.menu.wdgmsg("act","craft","firebrand",0);
+        }
+        else if(petalName.contentEquals(ZeeFlowerMenu.STRPETAL_CRAFT_PYRITE)){
+            ZeeConfig.gameUI.menu.wdgmsg("act","craft","pyritespark",0);
         }
         else{
             println("chooseGobFlowerMenu > unkown case");
@@ -1643,7 +1664,24 @@ public class ZeeManagerGobClick extends ZeeThread{
         ZeeFlowerMenu menu = null;
         ArrayList<String> opts;//petals array
 
-        if(ZeeConfig.isPlayer(gob)) {
+        if (isGroundClick) {
+            if (isWaterTile(coordMc)) {
+                opts = new ArrayList<String>();
+                if (ZeeConfig.isTileNamed(coordMc,ZeeConfig.TILE_WATER_FRESH_SHALLOW,ZeeConfig.TILE_WATER_OCEAN_SHALLOW)) {
+                    opts.add("dig");
+                }
+                opts.add("fish");
+                opts.add("inspect cup");
+                if (ZeeManagerItemClick.isCoracleEquipped() && !ZeeConfig.isPlayerMountingHorse()) {
+                    opts.add("embark coracle");
+                }
+                menu = new ZeeFlowerMenu(coordMc, opts.toArray(String[]::new));
+            }
+            else{
+                menu = new ZeeFlowerMenu(coordMc, "dig", "mine");
+            }
+        }
+        else if(ZeeConfig.isPlayer(gob)) {
             opts = new ArrayList<String>();
             opts.add(ZeeFlowerMenu.STRPETAL_SWITCHCHAR);
             opts.add(ZeeFlowerMenu.STRPETAL_CLEARGOBTEXTS);
@@ -1687,7 +1725,17 @@ public class ZeeManagerGobClick extends ZeeThread{
                 ZeeFlowerMenu.STRPETAL_DESTROYTREELOG5,
                 ZeeFlowerMenu.STRPETAL_DESTROYALL
             );
-        }else{
+        }
+        else if (gobName.endsWith("/wildbeehive")) {
+            menu = new ZeeFlowerMenu( gob, ZeeFlowerMenu.STRPETAL_BUILD_PYRE);
+        }
+        else if (isGobFireTarget(gob)) {
+            menu = new ZeeFlowerMenu( gob,
+                ZeeFlowerMenu.STRPETAL_CRAFT_FIREBRAND,
+                ZeeFlowerMenu.STRPETAL_CRAFT_PYRITE
+            );
+        }
+        else{
             showMenu = false;
             //println("showGobFlowerMenu() > unkown case");
         }
@@ -2786,6 +2834,14 @@ public class ZeeManagerGobClick extends ZeeThread{
         String gobName = gob.getres().name;
         if ( isGobInListEndsWith(gobName,"/brazier,/snowlantern,/pow,/bonfire") )
             if (getOverlayNames(gob).contains("gfx/fx/flight"))
+                return true;
+        return false;
+    }
+
+    static boolean isGobFireTarget(Gob gob) {
+        String gobName = gob.getres().name;
+        if ( isGobInListEndsWith(gobName,"/brazier,/snowlantern,/pow,/bonfire,/bpyre") )
+            if (!getOverlayNames(gob).contains("gfx/fx/flight"))
                 return true;
         return false;
     }
