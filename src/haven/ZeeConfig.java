@@ -3445,14 +3445,18 @@ public class ZeeConfig {
                 // map brightness
                 ZeeManagerGobClick.brightnessMapLoad();
 
-                if (ZeeConfig.showGobPointer ) {
+                // remount closest horse
+                if (ZeeManagerGobClick.remountClosestHorse) {
+                    ZeeManagerGobClick.remountHorse();
+                }
 
+                if (ZeeConfig.showGobPointer ) {
                     // remove player pointer
                     if (ob.hasPointer) {
                         removeGobPointer(ob);
                     }
                     else {
-                        // remove player pointer after delay
+                        // delayed remove player pointer
                         new ZeeThread() {
                             public void run() {
                                 try {
@@ -3489,10 +3493,6 @@ public class ZeeConfig {
             // auto boulder option (maybe remove)
             if (ZeeConfig.autoChipMinedBoulder && ZeeManagerMiner.isCursorMining() && ZeeManagerMiner.isBoulder(ob)) {
                 ZeeManagerMiner.checkBoulderGobAdded(ob);
-            }
-            // remount closest horse
-            else if (ZeeManagerGobClick.remountClosestHorse && ZeeManagerGobClick.isGobHorse(ob.getres().name)) {
-                ZeeManagerGobClick.remountHorse();
             }
             // barter stand item search labels
             else if (ZeeManagerGobClick.barterSearchOpen && ob.getres().name.endsWith("/barterstand")) {

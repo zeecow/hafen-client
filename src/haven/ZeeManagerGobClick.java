@@ -1127,10 +1127,6 @@ public class ZeeManagerGobClick extends ZeeThread{
                 new ZeeThread() {
                     public void run() {
                         if(dismountHorse(mc)) {
-                            //  schedule auto remount horse if not lifting
-                            if (!ZeeConfig.playerHasAnyPose(ZeeConfig.POSE_PLAYER_LIFTING)) {
-                                ZeeManagerGobClick.remountClosestHorse = true;
-                            }
                             // entering a house
                             if (isGobHouse(gobName)) {
                                 gobClick(gob, 3, 0, 16);//gob's door?
@@ -1138,6 +1134,10 @@ public class ZeeManagerGobClick extends ZeeThread{
                             // entering a non-house (cave, mine, cellar, ladder)
                             else {
                                 gobClick(gob, 3);
+                            }
+                            //  schedule auto remount
+                            if (isGobAmbientPassage(gob) && !ZeeConfig.playerHasAnyPose(ZeeConfig.POSE_PLAYER_LIFTING)) {
+                                ZeeManagerGobClick.remountClosestHorse = true;
                             }
                         }
                     }
@@ -1211,23 +1211,43 @@ public class ZeeManagerGobClick extends ZeeThread{
         rClickZoomLastY = pc.y;
     }
 
-    static boolean isGobRequireDisembarkVehicle(Gob gob) {
+    static boolean isGobAmbientPassage(Gob gob){
         String gobName = gob.getres().name;
         if( isGobHouseInnerDoor(gobName) ||
-                isGobHouse(gobName) ||
-                isGobSittingFurniture(gobName) ||
-                isGobInListEndsWith(gobName,"/upstairs,/downstairs,/minehole,"+
-                "/ladder,/cavein,/caveout,/burrow,/igloo," +
-                "/wheelbarrow,/loom,/churn,/swheel,/ropewalk," +
-                "/meatgrinder,/potterswheel,/quern,/plow,/winepress,/hookah") ||
-                (gobName.endsWith("/cellardoor") && ZeeConfig.distanceToPlayer(gob) > TILE_SIZE*1)
-        ){
+            isGobHouse(gobName) ||
+            isGobInListEndsWith(gobName,"/upstairs,/downstairs,/minehole,"+
+                    "/ladder,/cavein,/caveout,/burrow,/igloo,/cellardoor") )
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    static boolean isGobRequireDisembarkVehicle(Gob gob) {
+
+        String gobName = gob.getres().name;
+
+        if ( gobName.endsWith("/cellardoor") && ZeeConfig.distanceToPlayer(gob) > TILE_SIZE*1 ){
+            return true;
+        }
+
+        if (isGobAmbientPassage(gob) && !gobName.endsWith("/cellardoor")){
+            return true;
+        }
+
+        if( isGobSittingFurniture(gobName)) {
+            return true;
+        }
+
+        if(isGobInListEndsWith(gobName,"/wheelbarrow,/loom,/churn,/swheel,/ropewalk,/meatgrinder,/potterswheel,/quern,/plow,/winepress,/hookah")){
             return true;
         }
 
         // avoid dismouting when transfering to cauldron
-        if (gobName.contains("cauldron") && !ZeeConfig.isPlayerLiftingGob())
+        if (gobName.contains("cauldron") && !ZeeConfig.isPlayerLiftingGob()) {
             return true;
+        }
 
         return false;
     }
@@ -1835,47 +1855,32 @@ public class ZeeManagerGobClick extends ZeeThread{
         ZeeManagerGobClick.remountClosestHorse = false;
         new ZeeThread(){
             public void run() {
-
                 int countNotReady = 0;
                 double backupAudio = Audio.volume;
                 ZeeConfig.addPlayerText("mounting");
+                try {
+                    //wait horse gob loading
+                    sleep(500);
 
-                do {
+                    //find horse
+                    Gob closestHorse = ZeeConfig.getClosestGob(ZeeConfig.findGobsByNameEndsWith("/mare", "/stallion"));
 
-                    try {
+                    //mute volume (msg method doesnt work)
+                    Audio.setvolume(0);
 
-                        //map wasnt ready, sleep and retry
-                        if (countNotReady>0) {
-                            println("remount horse not ready, sleep 1sec");
-                            sleep(1000);
-                        }
+                    //mount horse
+                    ZeeManagerGobClick.clickGobPetal(closestHorse, "Giddyup!");
+                    countNotReady = 0;//exit success?
 
-                        //find horse //TODO wait longer if multiple horses around?
-                        Gob closestHorse = ZeeConfig.getClosestGob(ZeeConfig.findGobsByNameEndsWith("/mare", "/stallion"));
+                    // wait player mounting pose
+                    waitPlayerPose(ZeeConfig.POSE_PLAYER_RIDING_IDLE);
+                    sleep(500);
 
-                        //mute volume (msg method doesnt work)
-                        Audio.setvolume(0);
-
-                        //mount horse
-                        ZeeManagerGobClick.clickGobPetal(closestHorse, "Giddyup!");
-                        countNotReady = 0;//exit success?
-
-                        // wait player mounting pose
-                        waitPlayerPose(ZeeConfig.POSE_PLAYER_RIDING_IDLE);
-                        sleep(500);
-
-                    } catch (Defer.NotDoneException e) {
-                        countNotReady++;//sleep before next try
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                        countNotReady = 0;//exit fail?
-                    }
-
-                }while(countNotReady > 0  &&  countNotReady < 5);
-
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
                 //restore volume (msg method doesnt work)
                 Audio.setvolume(backupAudio);
-
                 ZeeConfig.removePlayerText();
             }
         }.start();

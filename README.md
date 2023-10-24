@@ -40,13 +40,15 @@ Midclick Ground
 - while driving plow will queue coords 
 
 Long Midclick Ground (LMC)
-- inspect water tile using inventory woodencup
 - while mounting horse will try to dismount
 - while carrying wheelbarrow will try to(dismount and) unload stockpile at ground
 - while coracle equipped, LMC water will try to drop and mount
 - while coracle mounted, LMC ground will try to dismount and equip
 - disembark dugout, rowboat, coracle, kicksled
 - activate snow clear area
+- show flowermenu for
+  - inspect water tile using inventory woodencup
+  - actions fish, dig, mine
 
 Midclick Ground Object
 - inspect object quality and show text
@@ -116,6 +118,8 @@ LongMidClick Flowemenu for Ground Objects
 - tamed animal context menu
   - open cattle roster
   - memorize area
+- wildbeehive shows build pyre
+- lightable objects shows craft firebrand, pyrite spark
 
 LongMidClick Flowemenu for Window Items
 - auto butch dead animal items
