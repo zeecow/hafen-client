@@ -1463,6 +1463,8 @@ public class ZeeManagerGobClick extends ZeeThread{
             inspectWaterAt(coordMc);
         else if(petalName.contentEquals("embark coracle"))
             dropEmbarkCoracle(coordMc);
+        else if(petalName.contentEquals( "build road"))
+            ZeeConfig.gameUI.menu.wdgmsg("act","bp","woodendstone","0");
     }
 
     public static void gobZeeMenuClicked(Gob gob, String petalName){
@@ -1541,6 +1543,12 @@ public class ZeeManagerGobClick extends ZeeThread{
         }
         else if(petalName.contentEquals(ZeeFlowerMenu.STRPETAL_CRAFT_PYRITE)){
             ZeeConfig.gameUI.menu.wdgmsg("act","craft","pyritespark",0);
+        }
+        else if(petalName.contentEquals("wave")){
+            ZeeConfig.gameUI.menu.wdgmsg("act","pose","wave",0);
+        }
+        else if(petalName.contentEquals("laugh")){
+            ZeeConfig.gameUI.menu.wdgmsg("act","pose","lol",0);
         }
         else{
             println("chooseGobFlowerMenu > unkown case");
@@ -1686,11 +1694,13 @@ public class ZeeManagerGobClick extends ZeeThread{
 
         if (isGroundClick) {
             if (isWaterTile(coordMc)) {
+                boolean isShallowWater = ZeeConfig.isTileNamed(coordMc,ZeeConfig.TILE_WATER_FRESH_SHALLOW,ZeeConfig.TILE_WATER_OCEAN_SHALLOW);
                 opts = new ArrayList<String>();
-                if (ZeeConfig.isTileNamed(coordMc,ZeeConfig.TILE_WATER_FRESH_SHALLOW,ZeeConfig.TILE_WATER_OCEAN_SHALLOW)) {
+                if (isShallowWater)
                     opts.add("dig");
-                }
                 opts.add("fish");
+                if (isShallowWater)
+                    opts.add("build road");
                 opts.add("inspect cup");
                 if (ZeeManagerItemClick.isCoracleEquipped() && !ZeeConfig.isPlayerMountingHorse()) {
                     opts.add("embark coracle");
@@ -1701,11 +1711,13 @@ public class ZeeManagerGobClick extends ZeeThread{
                 menu = new ZeeFlowerMenu(coordMc, "dig", "mine");
             }
         }
-        else if(ZeeConfig.isPlayer(gob)) {
+        else if(gob.tags.contains(Gob.Tag.PLAYER_MAIN)) {
             opts = new ArrayList<String>();
             opts.add(ZeeFlowerMenu.STRPETAL_SWITCHCHAR);
             opts.add(ZeeFlowerMenu.STRPETAL_CLEARGOBTEXTS);
             opts.add(ZeeFlowerMenu.STRPETAL_TESTCOORDS);
+            opts.add("wave");
+            opts.add("laugh");
             if (ZeeConfig.isCaveTile(ZeeConfig.getPlayerTileName()))
                 opts.add(ZeeFlowerMenu.STRPETAL_TILEMONITOR);
             menu = new ZeeFlowerMenu(gob, opts.toArray(String[]::new));
