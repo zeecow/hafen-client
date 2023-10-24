@@ -402,7 +402,7 @@ public class ZeeManagerFarmer extends ZeeThread{
 
     public static boolean isBarrelMarkedInaccessible(Gob barrel) {
         ZeeGobColor c = barrel.getattr(ZeeGobColor.class);
-        if(c!=null && c.color.color().getRed()==1) {
+        if(c!=null && c.color.getRed()==1) {
             return true;
         }
         return false;
@@ -427,7 +427,7 @@ public class ZeeManagerFarmer extends ZeeThread{
                  */
                 barrels.removeIf(b -> {
                     ZeeGobColor c = b.getattr(ZeeGobColor.class);
-                    if(c!=null && c.color.color().getBlue()==1) {
+                    if(c!=null && c.color.getBlue()==1) {
                         return true;//remove possible marked full(blue) barrels
                     }
                     if (!isBarrelEmpty(b) && !isBarrelSameSeeds(b, gItemSeedBasename)){

@@ -3027,7 +3027,7 @@ public class ZeeConfig {
             if(gob.getattr(ZeeGobColor.class) != null) {
                 gob.delattr(ZeeGobColor.class);
             }
-            gob.setattr(new ZeeGobColor(gob, new MixColor(r, g, b, a)));
+            gob.setattr(new ZeeGobColor(gob, new Color(r, g, b, a)));
         }}, null);
     }
 
