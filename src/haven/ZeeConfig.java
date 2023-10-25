@@ -114,6 +114,8 @@ public class ZeeConfig {
     static final String TILE_SWAMP_WATER = "gfx/tiles/swampwater";
     static final String TILE_SWAMP_BOG = "gfx/tiles/bog";
     static final String TILE_SWAMP_BOG_WATER = "gfx/tiles/bogwater";
+    static final String TILE_SWAMP_FEN = "gfx/tiles/fen";
+    static final String TILE_SWAMP_FEN_WATER = "gfx/tiles/fenwater";
 
     static final String TILE_BEACH = "gfx/tiles/beach";
     static final String TILE_SANDCLIFF = "gfx/tiles/sandcliff";
@@ -4049,7 +4051,8 @@ public class ZeeConfig {
                 TILE_WATER_FRESH_DEEP , TILE_WATER_FRESH_SHALLOW ,
                 TILE_WATER_OCEAN_SHALLOW , TILE_WATER_OCEAN_DEEP , TILE_WATER_OCEAN_DEEPER ,
                 TILE_SWAMP , TILE_SWAMP_WATER ,
-                TILE_SWAMP_BOG , TILE_SWAMP_BOG_WATER
+                TILE_SWAMP_BOG , TILE_SWAMP_BOG_WATER,
+                TILE_SWAMP_FEN , TILE_SWAMP_FEN_WATER
         );
 
         return names.contains(ZeeConfig.getTileResName(getPlayerTile()));
@@ -4060,7 +4063,8 @@ public class ZeeConfig {
             TILE_WATER_FRESH_SHALLOW ,
             TILE_WATER_OCEAN_SHALLOW ,
             TILE_SWAMP , TILE_SWAMP_WATER ,
-            TILE_SWAMP_BOG , TILE_SWAMP_BOG_WATER
+            TILE_SWAMP_BOG , TILE_SWAMP_BOG_WATER,
+            TILE_SWAMP_FEN , TILE_SWAMP_FEN_WATER
         );
 
         return names.contains(ZeeConfig.getTileResName(getPlayerTile()));
