@@ -276,7 +276,7 @@ public class Inventory extends Widget implements DTarget {
 				.collect(Collectors.toList());
 	}
 
-	public List<WItem> getItemsByNameOrNamesEndsWith(String... namesEndsWith) {
+	public List<WItem> getItemsByNameEnd(String... namesEndsWith) {
 		List<WItem> items = new ArrayList<WItem>();
 		for (Widget wdg = child; wdg != null; wdg = wdg.next) {
 			if (wdg instanceof WItem) {
@@ -406,7 +406,7 @@ public class Inventory extends Widget implements DTarget {
 	}
 
 	public void dropItemsByNameEndsWith(String nameEndsWith) {
-		List<WItem> items = getItemsByNameOrNamesEndsWith(nameEndsWith);
+		List<WItem> items = getItemsByNameEnd(nameEndsWith);
 		if (items.size()==0){
 			ZeeConfig.println("Inventory > dropItemsByName > no item found with name = "+nameEndsWith);
 			return;

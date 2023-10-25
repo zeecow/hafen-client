@@ -733,7 +733,7 @@ public class ZeeManagerItemClick extends ZeeThread{
                             if (firstItemName.contains("/rabbit-"))
                                 items = inv.getWItemsByNameContains("gfx/invobjs/rabbit-");
                             else if (firstItemName.endsWith("/hen") || firstItemName.endsWith("/rooster"))
-                                items = inv.getItemsByNameOrNamesEndsWith("/hen","/rooster");
+                                items = inv.getItemsByNameEnd("/hen","/rooster");
                             else
                                 items = inv.getWItemsByNameContains(firstItemName);
 
@@ -839,9 +839,9 @@ public class ZeeManagerItemClick extends ZeeThread{
 
             int items;
             if (itemName.endsWith("/hen") || itemName.endsWith("/rooster"))
-                items = inv.getItemsByNameOrNamesEndsWith("/hen","/rooster").size();
+                items = inv.getItemsByNameEnd("/hen","/rooster").size();
             else if ((itemName.endsWith("/rabbit-buck") || itemName.endsWith("/rabbit-doe")))
-                items = inv.getItemsByNameOrNamesEndsWith("/rabbit-buck","/rabbit-doe").size();
+                items = inv.getItemsByNameEnd("/rabbit-buck","/rabbit-doe").size();
             else
                 items = inv.countItemsByNameContains(itemName);
 
