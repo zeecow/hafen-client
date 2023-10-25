@@ -48,6 +48,7 @@ Long Midclick Ground (LMC)
 - activate snow clear area
 - show flowermenu for
   - inspect water tile using inventory woodencup
+  - build road
   - actions fish, dig, mine
 
 Midclick Ground Object
@@ -115,11 +116,14 @@ LongMidClick Flowemenu for Ground Objects
   - switch char
   - mine tiles window
   - test coords
+  - emote wave, laugh
+  - clear gob texts
 - tamed animal context menu
   - open cattle roster
   - memorize area
 - wildbeehive shows build pyre
 - lightable objects shows craft firebrand, pyrite spark
+- crucible smelts
 
 LongMidClick Flowemenu for Window Items
 - auto butch dead animal items

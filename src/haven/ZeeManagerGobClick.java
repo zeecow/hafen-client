@@ -1550,6 +1550,12 @@ public class ZeeManagerGobClick extends ZeeThread{
         else if(petalName.contentEquals("laugh")){
             ZeeConfig.gameUI.menu.wdgmsg("act","pose","lol",0);
         }
+        else if(petalName.contentEquals("smelt nuggets")){
+            ZeeConfig.gameUI.menu.wdgmsg("act","craft","nuggify",0);
+        }
+        else if(petalName.contentEquals("smelt bar")){
+            ZeeConfig.gameUI.menu.wdgmsg("act","craft","denuggify",0);
+        }
         else{
             println("chooseGobFlowerMenu > unkown case");
         }
@@ -1766,6 +1772,9 @@ public class ZeeManagerGobClick extends ZeeThread{
                 ZeeFlowerMenu.STRPETAL_CRAFT_FIREBRAND,
                 ZeeFlowerMenu.STRPETAL_CRAFT_PYRITE
             );
+        }
+        else if(gobName.endsWith("terobjs/crucible")){
+            menu = new ZeeFlowerMenu(gob,"smelt nuggets","smelt bar");
         }
         else{
             showMenu = false;
