@@ -420,7 +420,7 @@ public class ZeeManagerCraft extends ZeeThread{
 
 
                     // find closest pile
-                    Gob closestPile = ZeeConfig.getClosestGob(piles);
+                    Gob closestPile = ZeeConfig.getClosestGobToPlayer(piles);
                     if (closestPile!=null){
                         ZeeConfig.addGobText(closestPile,"next");
                     }
@@ -445,7 +445,7 @@ public class ZeeManagerCraft extends ZeeThread{
                                 return;
                             }
                             //mark next pile
-                            closestPile = ZeeConfig.getClosestGob(piles);
+                            closestPile = ZeeConfig.getClosestGobToPlayer(piles);
                             if (closestPile!=null){
                                 ZeeConfig.addGobText(closestPile,"next");
                             }

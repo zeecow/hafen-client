@@ -1556,9 +1556,84 @@ public class ZeeManagerGobClick extends ZeeThread{
         else if(petalName.contentEquals("smelt bar")){
             ZeeConfig.gameUI.menu.wdgmsg("act","craft","denuggify",0);
         }
+        else if(petalName.contentEquals("get XP from well")){
+            getXpFromWell(gob);
+        }
         else{
             println("chooseGobFlowerMenu > unkown case");
         }
+    }
+
+    private static void getXpFromWell(Gob well) {
+
+        if (well == null ){
+            ZeeConfig.msgError("need a well");
+            return;
+        }
+
+        Gob barrel = ZeeConfig.getClosestGobByNameEnds(well,"/barrel");
+        if (barrel == null ){
+            ZeeConfig.msgError("need a barrel");
+            return;
+        }
+
+        if (!isBarrelEmpty(barrel)){
+            ZeeConfig.msgError("closest barrel to well is not empty");
+            return;
+        }
+
+        if (ZeeConfig.distanceBetweenGobs(well,barrel) > TILE_SIZE*3){
+            ZeeConfig.msgError("barrel too distant from well");
+            return;
+        }
+
+        new ZeeThread(){
+            public void run() {
+                boolean backupConfirmPetal = ZeeConfig.confirmPetal;
+                try {
+                    ZeeConfig.addPlayerText("getting xp");
+                    Coord barrelCoord = ZeeConfig.getGobCoord(barrel);
+                    //lift barrel
+                    if(liftGob(barrel)){
+                        // click well
+                        gobClick(well,3);
+                        if(waitPlayerIdlePose() && waitNoHourglass()) {
+                            //return barrel
+                            ZeeConfig.clickCoord(barrelCoord, 3);
+                            if (waitPlayerPoseNotInList(ZeeConfig.POSE_PLAYER_LIFTING)){
+                                //empty barrel
+                                gobClick(barrel,3);
+                                if(waitWindowOpened("Barrel")){
+                                    Set<Button> buttons = ZeeConfig.getWindow("Barrel").children(Button.class);
+                                    if (buttons!=null && !buttons.isEmpty()){
+                                        for (Button button : buttons) {
+                                            if (button.text.text.contentEquals("Empty")){
+                                                ZeeConfig.confirmPetal = false;
+                                                button.click();
+                                            }
+                                        }
+                                    }else {
+                                        println("getXpFromWell > couldnt find barrel's empty button");
+                                    }
+                                }else {
+                                    println("getXpFromWell > couldnt open barrel");
+                                }
+                            }else{
+                                println("getXpFromWell > couldnt drop barrel");
+                            }
+                        }else{
+                            println("getXpFromWell > couldnt reach the well ?");
+                        }
+                    }else{
+                        println("getXpFromWell > couldnt lift barrel");
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                ZeeConfig.confirmPetal = backupConfirmPetal;
+                ZeeConfig.removePlayerText();
+            }
+        }.start();
     }
 
     static void clearAllGobsTexts() {
@@ -1628,7 +1703,7 @@ public class ZeeManagerGobClick extends ZeeThread{
                 logs = 999;
             }
             ZeeConfig.destroyingTreelogs = true;
-            ZeeConfig.lastMapViewClickButton = 2;//prepare for cancel click
+            prepareCancelClick();
             while ( logs > 0  &&  !ZeeConfig.isCancelClick() ) {
                 ZeeConfig.addPlayerText("treelogs "+logs);
                 if (!clickGobPetal(treelog,"Make boards")){
@@ -1683,13 +1758,13 @@ public class ZeeManagerGobClick extends ZeeThread{
     public static Gob getClosestTree() {
         List<Gob> list = ZeeConfig.findGobsByNameContains("/trees/");
         list.removeIf(gob1 -> !isGobTree(gob1.getres().name));
-        return ZeeConfig.getClosestGob(list);
+        return ZeeConfig.getClosestGobToPlayer(list);
     }
 
     public static Gob getClosestTreeLog() {
         List<Gob> list = ZeeConfig.findGobsByNameContains("/trees/");
         list.removeIf(gob1 -> !isGobTreeLog(gob1.getres().name));
-        return ZeeConfig.getClosestGob(list);
+        return ZeeConfig.getClosestGobToPlayer(list);
     }
 
     private static boolean showGobFlowerMenu(){
@@ -1775,6 +1850,9 @@ public class ZeeManagerGobClick extends ZeeThread{
         }
         else if(gobName.endsWith("terobjs/crucible")){
             menu = new ZeeFlowerMenu(gob,"smelt nuggets","smelt bar");
+        }
+        else if (gobName.endsWith("/well")) {
+            menu = new ZeeFlowerMenu( gob, "get XP from well");
         }
         else{
             showMenu = false;
@@ -1884,7 +1962,7 @@ public class ZeeManagerGobClick extends ZeeThread{
                     sleep(500);
 
                     //find horse
-                    Gob closestHorse = ZeeConfig.getClosestGob(ZeeConfig.findGobsByNameEndsWith("/mare", "/stallion"));
+                    Gob closestHorse = ZeeConfig.getClosestGobToPlayer(ZeeConfig.findGobsByNameEndsWith("/mare", "/stallion"));
 
                     //mute volume (msg method doesnt work)
                     Audio.setvolume(0);
@@ -1977,7 +2055,7 @@ public class ZeeManagerGobClick extends ZeeThread{
             public void run() {
                 try {
                     // guess working station
-                    Gob workingStation = ZeeConfig.getClosestGob(ZeeConfig.findGobsByNameEndsWith("/crucible","/anvil"));
+                    Gob workingStation = ZeeConfig.getClosestGobToPlayer(ZeeConfig.findGobsByNameEndsWith("/crucible","/anvil"));
 
                     // set max speed
                     ZeeConfig.setPlayerSpeed(ZeeConfig.PLAYER_SPEED_SPRINT);
@@ -2205,7 +2283,7 @@ public class ZeeManagerGobClick extends ZeeThread{
                 destroyGob(closestPlant);
                 if(!waitGobRemovedOrCancelClick(closestPlant))
                     break;
-                closestPlant = ZeeConfig.getClosestGob(ZeeConfig.findGobsByNameContains(gobName));
+                closestPlant = ZeeConfig.getClosestGobToPlayer(ZeeConfig.findGobsByNameContains(gobName));
                 dist = ZeeConfig.distanceToPlayer(closestPlant);
                 //println("dist "+dist);
             }while(dist < 25);
@@ -2224,7 +2302,7 @@ public class ZeeManagerGobClick extends ZeeThread{
             }else {
                 ZeeConfig.addPlayerText("rem tree&stump");
             }
-            ZeeConfig.lastMapViewClickButton = 2;//prepare for cancel click
+            prepareCancelClick();
             if(!waitNoFlowerMenu()){
                 println("remtree > failed waiting no flowemenu");
                 exitRemoveAllTrees();
@@ -2255,7 +2333,7 @@ public class ZeeManagerGobClick extends ZeeThread{
                         println("remtree > click canceled");
                         break;
                     }
-                    Gob stump = ZeeConfig.getClosestGob(ZeeConfig.findGobsByNameEndsWith("stump"));
+                    Gob stump = ZeeConfig.getClosestGobToPlayer(ZeeConfig.findGobsByNameEndsWith("stump"));
                     if (stump != null) {
                         //stump location doesnt match tree and there's no other stump close
                         if (stump.rc.compareTo(treeCoord) != 0  &&  ZeeConfig.distanceToPlayer(stump) > 25){
@@ -2374,7 +2452,7 @@ public class ZeeManagerGobClick extends ZeeThread{
                     }
                     boolean exit = false;
                     int added = 0;
-                    ZeeConfig.lastMapViewClickButton = 2;//prepare for cancel click
+                    prepareCancelClick();
                     ZeeConfig.addPlayerText("adding");
                     while(  !ZeeConfig.isCancelClick()
                             && !exit
@@ -2678,7 +2756,7 @@ public class ZeeManagerGobClick extends ZeeThread{
         destroyGob(gob);
     }
 
-    public static void liftGob(Gob gob) {
+    public static boolean liftGob(Gob gob) {
         if(isGobBush(gob.getres().name)) {
             ZeeManagerItemClick.equipBeltItem("shovel");
             waitItemInHand("shovel");
@@ -2686,7 +2764,7 @@ public class ZeeManagerGobClick extends ZeeThread{
         ZeeConfig.gameUI.menu.wdgmsg("act", "carry","0");
         waitCursorName(ZeeConfig.CURSOR_HAND);
         gobClick(gob,1);
-        waitPlayerDistToGob(gob,0);
+        return waitPlayerPose(ZeeConfig.POSE_PLAYER_LIFTING);
     }
 
     static boolean isMidclickInspecting = false; // used by inspect tooltip feature

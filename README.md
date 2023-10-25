@@ -123,7 +123,8 @@ LongMidClick Flowemenu for Ground Objects
   - memorize area
 - wildbeehive shows build pyre
 - lightable objects shows craft firebrand, pyrite spark
-- crucible smelts
+- crucible smelt nuggets, bar
+- get xp from well
 
 LongMidClick Flowemenu for Window Items
 - auto butch dead animal items

@@ -79,7 +79,7 @@ public class ZeeManagerMiner extends ZeeThread{
 
                             println("wait mined tile boulder");
                             sleep(1000);
-                            Gob boulder = ZeeConfig.getClosestGob(getBoulders());
+                            Gob boulder = ZeeConfig.getClosestGobToPlayer(getBoulders());
                             if (boulder!=null && ZeeConfig.distanceToPlayer(boulder) < TILE_SIZE*2){
                                 chipBoulder(boulder);
                                 ZeeConfig.clickCoord(tunnelHelperEndCoord,1);
@@ -340,7 +340,7 @@ public class ZeeManagerMiner extends ZeeThread{
     }
 
     static Gob getBoulderCloseEnoughForChipping() {
-        Gob boulder = ZeeConfig.getClosestGob(getBoulders());
+        Gob boulder = ZeeConfig.getClosestGobToPlayer(getBoulders());
         if (boulder!=null && ZeeConfig.distanceToPlayer(boulder) < MAX_DIST_BOULDER){
             return boulder;
         }
@@ -395,7 +395,7 @@ public class ZeeManagerMiner extends ZeeThread{
             });
             if (terobjs.size() == 0)
                 break; //no stones to pick, end loop
-            closestStone = ZeeConfig.getClosestGob(terobjs);
+            closestStone = ZeeConfig.getClosestGobToPlayer(terobjs);
             if (closestStone == null)
                 continue; // picked all stone type, try other stones
             if (ZeeConfig.distanceToPlayer(closestStone) > 11*TILE_SIZE){

@@ -972,6 +972,7 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Message
 	public double prog;
 	private TexI curi;
 	private String tip;
+	private Coord labelCoord;
 
 	public Progress(double prog) {
 	    super(progt.f[0][0].ssz);
@@ -992,10 +993,14 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Message
 	    int dec = Math.max(0, (int)Math.round(-Math.log10(d)) - 2);
 	    this.tip = String.format("%." + dec + "f%%", prog * 100);
 	    this.prog = prog;
+
+		this.labelCoord = curi.sz().div(2).sub(10,10);
 	}
 
 	public void draw(GOut g) {
 	    g.image(curi, Coord.z);
+		//show %
+		g.text(this.tip, this.labelCoord);
 	}
 
 	public boolean checkhit(Coord c) {

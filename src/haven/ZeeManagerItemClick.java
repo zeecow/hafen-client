@@ -692,7 +692,7 @@ public class ZeeManagerItemClick extends ZeeThread{
                     String itemName = getWItemName(item);
                     String firstItemName = itemName;
                     long changeMs;
-                    ZeeConfig.lastMapViewClickButton = 2;//prepare for cancel click
+                    prepareCancelClick();
                     while (!ZeeConfig.isCancelClick() && (!(itemName.endsWith("-clean") || itemName.endsWith("-cleaned"))) ){
 
                         //butch item and wait inventory changes

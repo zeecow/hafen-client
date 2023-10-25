@@ -342,22 +342,22 @@ public class ZeeManagerStockpile extends ZeeThread{
     private static Gob findPile() {
         if (diggingTileSource) {
             if (lastTileStoneSourceTileName.contentEquals(ZeeConfig.TILE_BEACH))
-                return ZeeConfig.getClosestGob(ZeeConfig.findGobsByNameContains(STOCKPILE_SAND));
+                return ZeeConfig.getClosestGobToPlayer(ZeeConfig.findGobsByNameContains(STOCKPILE_SAND));
             else
-                return ZeeConfig.getClosestGob(ZeeConfig.findGobsByNameContains(STOCKPILE_STONE));
+                return ZeeConfig.getClosestGobToPlayer(ZeeConfig.findGobsByNameContains(STOCKPILE_STONE));
         }
         if (lastPetalName==null)
             return null;
         if(lastPetalName.equals("Pick leaf"))
-            return ZeeConfig.getClosestGob(ZeeConfig.findGobsByNameContains("stockpile-leaf"));
+            return ZeeConfig.getClosestGobToPlayer(ZeeConfig.findGobsByNameContains("stockpile-leaf"));
         else if (lastPetalName.equals("Chop into blocks"))
-            return ZeeConfig.getClosestGob(ZeeConfig.findGobsByNameContains("stockpile-wblock"));
+            return ZeeConfig.getClosestGobToPlayer(ZeeConfig.findGobsByNameContains("stockpile-wblock"));
         else if (lastPetalName.equals("Make boards"))
-            return ZeeConfig.getClosestGob(ZeeConfig.findGobsByNameContains("stockpile-board"));
+            return ZeeConfig.getClosestGobToPlayer(ZeeConfig.findGobsByNameContains("stockpile-board"));
         else if (lastPetalName.equals("Chip stone"))
-            return ZeeConfig.getClosestGob(ZeeConfig.findGobsByNameContains("stockpile-stone"));
+            return ZeeConfig.getClosestGobToPlayer(ZeeConfig.findGobsByNameContains("stockpile-stone"));
         else if (lastPetalName.equals("Collect coal"))
-            return ZeeConfig.getClosestGob(ZeeConfig.findGobsByNameContains("stockpile-coal"));
+            return ZeeConfig.getClosestGobToPlayer(ZeeConfig.findGobsByNameContains("stockpile-coal"));
         return null;
     }
 
@@ -488,9 +488,9 @@ public class ZeeManagerStockpile extends ZeeThread{
         try {
 
             if (lastTileStoneSourceTileName.contentEquals(ZeeConfig.TILE_BEACH))
-                gobPile = ZeeConfig.getClosestGob(ZeeConfig.findGobsByNameContains(STOCKPILE_SAND));
+                gobPile = ZeeConfig.getClosestGobToPlayer(ZeeConfig.findGobsByNameContains(STOCKPILE_SAND));
             else // TODO check pickaxe?
-                gobPile = ZeeConfig.getClosestGob(ZeeConfig.findGobsByNameContains(STOCKPILE_STONE));
+                gobPile = ZeeConfig.getClosestGobToPlayer(ZeeConfig.findGobsByNameContains(STOCKPILE_STONE));
 
             ZeeConfig.addGobText(gobPile,"pile");
 

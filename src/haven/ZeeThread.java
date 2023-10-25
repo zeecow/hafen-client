@@ -289,7 +289,7 @@ public class ZeeThread  extends Thread{
         List<String> currentPoses;
         boolean exit = false;
         try{
-            ZeeConfig.lastMapViewClickButton = 2;//prepare for cancel click
+            prepareCancelClick();
             do{
                 sleep(PING_MS*2);
                 exit = ZeeConfig.isCancelClick();
@@ -357,7 +357,7 @@ public class ZeeThread  extends Thread{
     public static boolean waitNotPlayerPose(String poseName) {
         List<String> poses = new ArrayList<>();
         try{
-            ZeeConfig.lastMapViewClickButton = 2;//prepare for cancel click
+            prepareCancelClick();
             do{
                 //println("waitNotPlayerPose > "+poses);
                 sleep(PING_MS*2);
@@ -376,7 +376,7 @@ public class ZeeThread  extends Thread{
         //println("waitGobPose > start");
         List<String> poses = new ArrayList<>();
         try{
-            ZeeConfig.lastMapViewClickButton = 2;//prepare for cancel click
+            prepareCancelClick();
             do{
                 //println("waitGobPose > "+poses);
                 sleep(PING_MS*2);
@@ -410,7 +410,7 @@ public class ZeeThread  extends Thread{
         //println("waitGobOnlyPose > start");
         List<String> poses = new ArrayList<>();
         try{
-            ZeeConfig.lastMapViewClickButton = 2;//prepare for cancel click
+            prepareCancelClick();
             do{
                 //println("waitGobOnlyPose > "+singlePoseName);
                 sleep(PING_MS*2);
@@ -867,22 +867,36 @@ public class ZeeThread  extends Thread{
         return timeoutMs > 0;
     }
 
+    static boolean waitNoHourglass(){
+        println("waitNoHourglass");
+        try {
+            prepareCancelClick();
+            while(!isCancelClick() && ZeeConfig.getUiProgressHourglassWidget() != null){
+                sleep(50);
+            }
+            sleep(50);//ui lag?
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        println("    ret "+(ZeeConfig.getUiProgressHourglassWidget() == null));
+        return ZeeConfig.getUiProgressHourglassWidget() == null;
+    }
+
     static boolean waitWindowOpened(String windowName){
         if (ZeeConfig.getWindow(windowName)!=null) {
             //println("waitWindowOpened > already opened");
             return true;
         }
-        long timeoutMs = 3000;
         try{
-            while(timeoutMs>0 && ZeeConfig.getWindow(windowName)==null){
-                timeoutMs -= 50;
+            prepareCancelClick();
+            while(!isCancelClick() && ZeeConfig.getWindow(windowName)==null){
                 Thread.sleep(50);
             }
         }catch (Exception e){
             e.printStackTrace();
         }
-        //println("waitWindowOpened > timeoutMs="+timeoutMs);
-        return timeoutMs > 0;
+        //println("waitWindowOpened > "+(!isCancelClick()));
+        return !isCancelClick();
     }
 
     static boolean waitWindowOpenedNameContains(String windowNameContains){

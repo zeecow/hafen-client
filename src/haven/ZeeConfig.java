@@ -1553,7 +1553,7 @@ public class ZeeConfig {
                     return;
                 }
                 //check wooden chests
-                Gob woodenChest = getClosestGob(findGobsByNameEndsWith("/chest","/largechest"));
+                Gob woodenChest = getClosestGobToPlayer(findGobsByNameEndsWith("/chest","/largechest"));
                 double chestDistance = distanceToPlayer(woodenChest);
                 if (woodenChest==null || chestDistance > 25){
                     msgError("no wooden chests close enough");
@@ -2758,14 +2758,18 @@ public class ZeeConfig {
         return (dist == 0);
     }
 
-    public static Gob getClosestGob(List<Gob> gobs) {
-        if(gobs==null || gobs.size()==0)
+    public static Gob getClosestGobToPlayer(List<Gob> gobs) {
+        return getClosestGob(getPlayerGob(),gobs);
+    }
+
+    public static Gob getClosestGob(Gob refGob, List<Gob> gobs) {
+        if(gobs==null || gobs.size()==0 || refGob==null)
             return null;
         Gob closestGob = gobs.get(0);
-        double closestDist = distanceToPlayer(closestGob);
+        double closestDist = distanceBetweenGobs(refGob,closestGob);
         double dist;
         for (Gob g : gobs) {
-            dist = distanceToPlayer(g);
+            dist = distanceBetweenGobs(refGob,g);
             if (dist < closestDist) {
                 closestGob = g;
                 closestDist = dist;
@@ -2775,7 +2779,11 @@ public class ZeeConfig {
     }
 
     public static double distanceToPlayer(Gob gob) {
-        return ZeeConfig.getPlayerGob().getc().dist(gob.getc());//TODO use rc if necessary
+        return ZeeConfig.getPlayerGob().getc().dist(gob.getc());
+    }
+
+    public static double distanceBetweenGobs(Gob gob1, Gob gob2) {
+        return gob1.getc().dist(gob2.getc());
     }
 
     public static int getPlantStage(Gob g){
@@ -2838,10 +2846,6 @@ public class ZeeConfig {
             );
     }
 
-    public static boolean isPlayerDrinking(){
-        return getHourglass() > -1;
-    }
-
     public static boolean isPlayerDrinkingPose(){
         return getPlayerPoses().contains(POSE_PLAYER_DRINK);
     }
@@ -2854,10 +2858,8 @@ public class ZeeConfig {
      * Returns value of hourglass, -1 = no hourglass, else the value between 0.0 and 1.0
      * @return value of hourglass
      */
-    public static double getHourglass() {
-        if (gameUI.prog==null)
-            return -777;
-        return gameUI.prog.prog;
+    public static GameUI.Progress getUiProgressHourglassWidget() {
+        return gameUI.prog;
     }
 
     public static void addPlayerText(String s) {
@@ -3578,22 +3580,37 @@ public class ZeeConfig {
         }
     }
 
+    public static Gob getClosestGobByNameContains(Gob gobRef, String nameContains) {
+        if (nameContains==null || nameContains.isBlank())
+            return null;
+        return getClosestGob(gobRef, findGobsByNameContains(nameContains));
+    }
     public static Gob getClosestGobByNameContains(String nameContains) {
         if (nameContains==null || nameContains.isBlank())
             return null;
-        return getClosestGob(findGobsByNameContains(nameContains));
+        return getClosestGobToPlayer(findGobsByNameContains(nameContains));
     }
 
+    public static Gob getClosestGobByNameEnds(Gob gobRef, String nameEdns) {
+        if (nameEdns==null || nameEdns.isBlank())
+            return null;
+        return getClosestGob(gobRef, findGobsByNameEndsWith(nameEdns));
+    }
     public static Gob getClosestGobByNameEnds(String nameEdns) {
         if (nameEdns==null || nameEdns.isBlank())
             return null;
-        return getClosestGob(findGobsByNameEndsWith(nameEdns));
+        return getClosestGobToPlayer(findGobsByNameEndsWith(nameEdns));
     }
 
+    public static Gob getClosestGobByNameStarts(Gob gobRef, String nameStarts) {
+        if (nameStarts==null || nameStarts.isBlank())
+            return null;
+        return getClosestGob(gobRef, findGobsByNameStartsWith(nameStarts));
+    }
     public static Gob getClosestGobByNameStarts(String nameStarts) {
         if (nameStarts==null || nameStarts.isBlank())
             return null;
-        return getClosestGob(findGobsByNameStartsWith(nameStarts));
+        return getClosestGobToPlayer(findGobsByNameStartsWith(nameStarts));
     }
 
     public static Inventory getMainInventory() {

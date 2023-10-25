@@ -363,7 +363,7 @@ public class ZeeManagerFarmer extends ZeeThread{
             //println("no plants to click");
             return false;
         }
-        Gob g = ZeeConfig.getClosestGob(plants);
+        Gob g = ZeeConfig.getClosestGobToPlayer(plants);
         if(g!=null) {
             return ZeeManagerGobClick.activateHarvestGob(g);
         }else {
@@ -553,7 +553,7 @@ public class ZeeManagerFarmer extends ZeeThread{
 
     static Gob getClosestEmptyBarrel() {
         List<Gob> barrels = ZeeConfig.findGobsByNameEndsWith("/barrel");
-        return ZeeConfig.getClosestGob(barrels.stream().filter(ZeeManagerFarmer::isBarrelEmpty).collect(Collectors.toList()));
+        return ZeeConfig.getClosestGobToPlayer(barrels.stream().filter(ZeeManagerFarmer::isBarrelEmpty).collect(Collectors.toList()));
     }
 
     static int droppedSeeds = 0;
