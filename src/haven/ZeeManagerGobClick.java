@@ -990,8 +990,16 @@ public class ZeeManagerGobClick extends ZeeThread{
     }
 
     static boolean quickFarmSelection = false;
+    static Gob gobAutoLabel;
     static void checkRightClickGob(Coord pc, Coord2d mc, Gob gob, String gobName) {
 
+        //gob to be labeled when window contents open
+        if (List.of("barrel","cistern","demijohn","foodtrough").contains(gob.getres().basename()))
+            gobAutoLabel = gob;
+        else
+            gobAutoLabel = null;
+
+        // zoom if player gob
         startRightClickZooming(gob, pc);
 
         //long click starts harvest selection
@@ -1875,6 +1883,12 @@ public class ZeeManagerGobClick extends ZeeThread{
                 try{
 
                     sleep(250);//wait window build
+
+                    if (gobAutoLabel==null){
+                        println("labelGobByContents > gob not eligible");
+                        return;
+                    }
+
                     if (window.children()==null) {
                         println("labelGobByContents > window.children null");
                         return;

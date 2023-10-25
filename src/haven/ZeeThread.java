@@ -868,7 +868,7 @@ public class ZeeThread  extends Thread{
     }
 
     static boolean waitNoHourglass(){
-        println("waitNoHourglass");
+        //println("waitNoHourglass");
         try {
             prepareCancelClick();
             while(!isCancelClick() && ZeeConfig.getUiProgressHourglassWidget() != null){
@@ -878,7 +878,7 @@ public class ZeeThread  extends Thread{
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        println("    ret "+(ZeeConfig.getUiProgressHourglassWidget() == null));
+        //println("    ret "+(ZeeConfig.getUiProgressHourglassWidget() == null));
         return ZeeConfig.getUiProgressHourglassWidget() == null;
     }
 
