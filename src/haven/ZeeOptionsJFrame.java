@@ -81,8 +81,6 @@ public class ZeeOptionsJFrame extends JFrame {
 
         panelTabControls.add(new ZeeOptionJCheckBox( "Key up/down controls volume", "keyUpDownAudioControl"),c);
 
-        panelTabControls.add(new ZeeOptionJCheckBox( "Shift+Tab toggles belt", "keyBeltShiftTab"),c);
-
         panelTabControls.add(new ZeeOptionJCheckBox( "Shift+C switch cams", "keyCamSwitchShiftC"),c);
 
         panelTabControls.add(new ZeeOptionJCheckBox( "Drink key ' (single quote) ", "drinkKey"),c);

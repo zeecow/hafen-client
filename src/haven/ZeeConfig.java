@@ -233,7 +233,6 @@ public class ZeeConfig {
     public static Integer rainLimitPerc = Utils.getprefi("rainLimitPerc", 25);
     public static boolean showGrowingTreeScale = Utils.getprefb("showGrowingTreeScale", true);
     public static boolean treeAnimation = Utils.getprefb("treeAnimation", false);
-    static boolean keyBeltShiftTab = Utils.getprefb("keyBeltShiftTab", true);
     static boolean keyCamSwitchShiftC = Utils.getprefb("keyCamSwitchShiftC", true);
     static boolean keyUpDownAudioControl = Utils.getprefb("keyUpDownAudioControl", true);
     static boolean autoHideWindows = Utils.getprefb("autoHideWindows", false);
@@ -2272,11 +2271,6 @@ public class ZeeConfig {
             msgLow("volume "+String.format("%.1f", Audio.volume));
             return true;
         }
-        // Belt toggle (Shift+Tab)
-        else if(ZeeConfig.keyBeltShiftTab && ev.getKeyCode()==KeyEvent.VK_TAB && ev.isShiftDown()){
-            tooggleWindowsBeltOrBasketCreel();
-            return true;
-        }
         // alternate cams bad/ortho (Shift+c)
         else if(ZeeConfig.keyCamSwitchShiftC && ev.getKeyCode()==KeyEvent.VK_C && ev.isShiftDown()){
             String cam = gameUI.map.camera.getClass().getSimpleName();
@@ -2305,59 +2299,6 @@ public class ZeeConfig {
             }
         }
         return false;
-    }
-
-    private static boolean createdBasketWindow=false, createdCreelWindow=false;
-    private static void tooggleWindowsBeltOrBasketCreel() {
-
-        //toggle basket
-        Window basketWindow = getWindow("Basket");
-        if (basketWindow == null) {
-            WItem item = ZeeManagerItemClick.getEquippedItemNameEndsWith("/pickingbasket");
-            if (item != null) {
-                item.mousedown(Coord.z, 3); //create basket window
-                createdBasketWindow = true;
-            }else {
-                createdBasketWindow = false;
-            }
-        } else {
-            if (basketWindow.visible()) {
-                basketWindow.hide();
-            } else {
-                basketWindow.show();
-            }
-        }
-
-        //toggle creel
-        Window creelWindow = getWindow("Creel");
-        if (creelWindow == null) {
-            WItem item = ZeeManagerItemClick.getEquippedItemNameEndsWith("/creel");
-            if (item != null) {
-                item.mousedown(Coord.z, 3); //create creel window
-                createdCreelWindow = true;
-            }else{
-                createdCreelWindow = false;
-            }
-        } else {
-            if (creelWindow.visible()) {
-                creelWindow.hide();
-            } else {
-                creelWindow.show();
-            }
-        }
-
-        // toggle belt
-        Window beltWindow = getWindow("Belt");
-        if (beltWindow == null) {
-            clickOpenBelt();
-        } else {
-            if (!beltWindow.visible()) {
-                beltWindow.show();
-            } else if(!createdBasketWindow && !createdCreelWindow){
-                //only hide  belt if no basket/creel
-                beltWindow.hide();
-            }
-        }
     }
 
     public static Window getWindow(String name) {
@@ -2401,7 +2342,7 @@ public class ZeeConfig {
                 +"Tub,Compost Bin,Extraction Press,Rack,Herbalist Table,Frame,"
                 +"Chicken Coop,Rabbit Hutch,Archery Target,Oven,Steel crucible,"
                 +"Cauldron,Pane mold,Kiln,Old Trunk,Old Stump,Smoke shed,Finery Forge,"
-                +"Tidepool,Fireplace,Quiver,Creel"
+                +"Tidepool,Fireplace,Quiver,Creel,Cache,Hidden Hollow"
         ).split(",");
         for (String contName: containers) {
             if ( !isMakewindow(window) && window.cap.contains(contName) ) {

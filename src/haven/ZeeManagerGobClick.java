@@ -994,7 +994,7 @@ public class ZeeManagerGobClick extends ZeeThread{
     static void checkRightClickGob(Coord pc, Coord2d mc, Gob gob, String gobName) {
 
         //gob to be labeled when window contents open
-        if (List.of("barrel","cistern","demijohn","foodtrough").contains(gob.getres().basename()))
+        if (List.of("barrel","cistern","demijohn","trough").contains(gob.getres().basename()))
             gobAutoLabel = gob;
         else
             gobAutoLabel = null;
