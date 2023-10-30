@@ -1,10 +1,11 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="hafen" type="JarApplication">
     <option name="JAR_PATH" value="$PROJECT_DIR$/build/hafen.jar" />
-    <option name="VM_PARAMETERS" value="-Xms512m -Xmx2048m -Dsun.java2d.uiScale.enabled=false -Dhaven.mapbase=http://game.havenandhearth.com/java/ -Dhaven.resurl=https://game.havenandhearth.com/res/ -Dhaven.screenurl=http://game.havenandhearth.com/mt/ss -Dhaven.cachebase=http://game.havenandhearth.com/render/" />
+    <option name="VM_PARAMETERS" value="-Xms512m -Xmx2048m -Dsun.java2d.uiScale.enabled=false -Dhaven.mapbase=http://game.havenandhearth.com/java/ -Dhaven.resurl=https://game.havenandhearth.com/res/ -Dhaven.screenurl=http://game.havenandhearth.com/mt/ss -Dhaven.cachebase=http://game.havenandhearth.com/render/ --add-exports java.base/java.lang=ALL-UNNAMED --add-exports java.desktop/sun.awt=ALL-UNNAMED --add-exports java.desktop/sun.java2d=ALL-UNNAMED" />
     <option name="PROGRAM_PARAMETERS" value="-U https://game.havenandhearth.com/res/ game.havenandhearth.com" />
-    <option name="WORKING_DIRECTORY" value="C:\Ender\workspace\hafen\build" />
-    <option name="ALTERNATIVE_JRE_PATH" />
+    <option name="WORKING_DIRECTORY" value="F:\GIT\hafen-client-ender" />
+    <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="true" />
+    <option name="ALTERNATIVE_JRE_PATH" value="14" />
     <RunnerSettings RunnerId="Basic" />
     <RunnerSettings RunnerId="JarDebug">
       <option name="DEBUG_PORT" value="" />
