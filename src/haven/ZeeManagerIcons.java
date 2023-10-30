@@ -546,17 +546,23 @@ public class ZeeManagerIcons {
     static BufferedImage latestFocusedMarkBgImg = ZeeManagerIcons.imgCirle(MiniMap.DisplayMarker.minimapMarkImg.getWidth()+1,Color.black,false,false,false);
     public static void focusMarkExpandedMap(MiniMap.DisplayMarker mark) {
         MapWnd map = ZeeConfig.gameUI.mapfile;
+        //expand map
         map.compact(false);
         Utils.setprefb("compact-map", false);
+        //select mark from list
         map.focus(mark.m);
+        //center mark on mapview
         map.view.center(new MiniMap.SpecLocator(mark.m.seg, mark.m.tc));
+        //??
         if (ZeeManagerIcons.latestMidclickMark != null){
             ZeeManagerIcons.latestMidclickMark.isListFocused = false;
         }
         mark.isListFocused = true;
         latestMidclickMark = mark;
-        // set focus name textbox
-        map.tool.setfocus(map.tool.namesel);
+        // focus name textbox
+        if (map.tool!=null && map.tool.namesel!=null) {
+            map.tool.setfocus(map.tool.namesel);
+        }
     }
 
 
