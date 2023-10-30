@@ -646,7 +646,6 @@ public class MapWnd extends Window implements Console.Directory {
 		if (ZeeManagerIcons.latestMidclickMark !=null){
 			ZeeManagerIcons.latestMidclickMark.isListFocused = false;
 			// set focus name textbox
-			ZeeConfig.println("mark selected for editing");
 			tool.setfocus(tool.namesel);
 		}
 	}
@@ -675,8 +674,10 @@ public class MapWnd extends Window implements Console.Directory {
 				view.file.update(mark);
 				commit();
 				change2(null);
-				//recenter player when mark name entered
+				// recenter player when mark name entered
 				recenter();
+				// compact map when mark name entered
+				compact(true);
 			    }
 			});
 		}
