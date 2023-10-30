@@ -3435,6 +3435,11 @@ public class ZeeConfig {
 
             }
 
+            // mine ladder radius
+            if (ob.getres().name.contentEquals("gfx/terobjs/ladder")){
+                ob.addol(new Gob.Overlay(ob, new ZeeGobRadius(ob, null, 9 * MCache.tilesz2.y,new Color(139, 139, 185, 48)), -1));
+            }
+
             // highlight gob color
             ZeeConfig.applyGobSettingsHighlight(ob, ZeeConfig.getHighlightGobColor(ob));
 

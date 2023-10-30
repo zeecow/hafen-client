@@ -1,30 +1,27 @@
 package haven;
 
-import haven.render.BaseColor;
-import haven.render.DataBuffer;
-import haven.render.Environment;
-import haven.render.FillBuffer;
-import haven.render.Location;
-import haven.render.Model;
+import haven.render.*;
 import haven.render.Model.Indices;
-import haven.render.NumberFormat;
-import haven.render.Pipe;
-import haven.render.Render;
-import haven.render.RenderTree;
-import haven.render.Rendered;
-import haven.render.States;
 
-import java.nio.*;
+import java.awt.*;
+import java.nio.FloatBuffer;
+import java.nio.ShortBuffer;
 
 /* class BPRad */
 public class ZeeGobRadius extends Sprite {
-    static final Pipe.Op smat = new BaseColor(new java.awt.Color(255, 0, 0, 77));
-    static final Pipe.Op emat = Pipe.Op.compose(new BaseColor(new java.awt.Color(255, 0, 0)), new States.LineWidth(1));
+    static Pipe.Op smat = new BaseColor(new java.awt.Color(255, 0, 0, 77));
+    static Pipe.Op emat = Pipe.Op.compose(new BaseColor(new java.awt.Color(255, 0, 0)), new States.LineWidth(1));
     final VertexBuf.VertexData posa;
     final VertexBuf vbuf;
     final Model smod, emod;
     private Coord2d lc;
     float[] barda;
+
+    public ZeeGobRadius(Owner owner, Resource res, float r, Color color) {
+        this(owner,res,r);
+        smat = new BaseColor(color);
+        emat = Pipe.Op.compose(smat, new States.LineWidth(1));
+    }
 
     public ZeeGobRadius(Owner owner, Resource res, float r) {
         super(owner, res);
