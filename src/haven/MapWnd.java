@@ -218,7 +218,7 @@ public class MapWnd extends Window implements Console.Directory {
 	public final MarkerList list;
 	private final Frame listf;
 	private final Button pmbtn, smbtn, nobtn, tobtn, mebtn, mibtn;
-	private TextEntry namesel;
+	TextEntry namesel;
 
 	private Toolbox() {
 	    super(UI.scale(200, 200));
@@ -643,8 +643,11 @@ public class MapWnd extends Window implements Console.Directory {
 	    change2(lm);
 	    if(lm != null)
 		view.center(new SpecLocator(lm.mark.seg, lm.mark.tc));
-		if (ZeeManagerIcons.latestFocusedMark!=null){
-			ZeeManagerIcons.latestFocusedMark.isListFocused = false;
+		if (ZeeManagerIcons.latestMidclickMark !=null){
+			ZeeManagerIcons.latestMidclickMark.isListFocused = false;
+			// set focus name textbox
+			ZeeConfig.println("mark selected for editing");
+			tool.setfocus(tool.namesel);
 		}
 	}
 
@@ -733,8 +736,8 @@ public class MapWnd extends Window implements Console.Directory {
 
     public void recenter() {
 	view.follow(player);
-	if (ZeeManagerIcons.latestFocusedMark!=null){
-		ZeeManagerIcons.latestFocusedMark.isListFocused = false;
+	if (ZeeManagerIcons.latestMidclickMark !=null){
+		ZeeManagerIcons.latestMidclickMark.isListFocused = false;
 	}
     }
 
