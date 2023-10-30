@@ -956,6 +956,9 @@ public class ZeeConfig {
             // adjust x pos if out of screen, or if on the right side of screen
             if ( map.c.x + map.viewf.sz.x > gameUI.sz.x  ||  map.c.x > gameUI.sz.x/2)
                 map.c.x = gameUI.sz.x - map.viewf.sz.x ;
+
+            //recenter player when map compacts
+            mapWnd.recenter();
         }
 
 
