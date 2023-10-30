@@ -90,6 +90,7 @@ public class ZeeConfig {
     static final String POSE_PLAYER_LIFTING = "gfx/borka/banzai";
     static final String POSE_PLAYER_HARVESTING = "gfx/borka/harvesting";//reeds clearing
     static final String POSE_PLAYER_PICK = "gfx/borka/pickan";//pickaxe mining, chipping
+    static final String POSE_PLAYER_BUSHPICK = "gfx/borka/bushpickan";//collect coal, pick bush
     static final String POSE_PLAYER_PICKGROUND = "gfx/borka/pickaxeanspot";
     static final String POSE_PLAYER_CARRYFLAT = "gfx/borka/carry-flat";//idle pickaxe
     static final String POSE_PLAYER_TRAVELHOMESHRUG = "gfx/borka/pointconfused";

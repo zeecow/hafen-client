@@ -79,7 +79,7 @@ public class ZeeManagerStockpile extends ZeeThread{
     static String lastTileStoneSourceTileName;
     static Coord2d lastTileStoneSourceCoordMc;
     static boolean diggingTileSource;
-    static Gob lastTreelogSawed, lastTreelogChopped, lastBoulderChipped;
+    static Gob lastTreelogSawed, lastTreelogChopped, lastBoulderChipped, lastTarkilnCollected;
     static String lastBoulderChippedStoneName;
     private final String task;
 
@@ -612,6 +612,7 @@ public class ZeeManagerStockpile extends ZeeThread{
             }
         }else if(petalName.equals("Collect coal")){
             gobSource = ZeeConfig.lastMapViewClickGob;
+            lastTarkilnCollected = ZeeConfig.lastMapViewClickGob;
         }
     }
 
@@ -1256,6 +1257,29 @@ public class ZeeManagerStockpile extends ZeeThread{
         return (gobCoord.x >= minX && gobCoord.x <= maxX && gobCoord.y >= minY && gobCoord.y <= maxY);
     }
 
+    public static void pileInvCoalAndCollectMore(Gob existingPile) {
+        new ZeeThread(){
+            public void run() {
+                try {
+                    Inventory inv = ZeeConfig.getMainInventory();
+                    // pickup inv stone (if player was holding item a generic method would already been called)
+                    if (ZeeManagerItemClick.pickUpInvItem(inv, "coal")) {
+                        // pile coal
+                        ZeeManagerGobClick.itemActGob(existingPile,UI.MOD_SHIFT);
+                        //wait piling
+                        if(waitNotHoldingItem()){
+                            // try collecting more
+                            ZeeManagerGobClick.clickGobPetal(lastTarkilnCollected,"Collect coal");
+                        }
+                    } else {
+                        println("pile inv coal > couldnt get coal from inv");
+                    }
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+            }
+        }.start();
+    }
 
     public static void pileInvStonesAndChipMore(Gob existingPile) {
         new ZeeThread(){
