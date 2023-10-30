@@ -672,6 +672,8 @@ public class MapWnd extends Window implements Console.Directory {
 				view.file.update(mark);
 				commit();
 				change2(null);
+				//recenter player when mark name entered
+				recenter();
 			    }
 			});
 		}
