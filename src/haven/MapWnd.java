@@ -217,7 +217,7 @@ public class MapWnd extends Window implements Console.Directory {
     public class Toolbox extends Widget {
 	public final MarkerList list;
 	private final Frame listf;
-	private final Button pmbtn, smbtn, nobtn, tobtn, mebtn, mibtn;
+	final Button pmbtn, smbtn, nobtn, tobtn, mebtn, mibtn;
 	TextEntry namesel;
 
 	private Toolbox() {
@@ -306,16 +306,15 @@ public class MapWnd extends Window implements Console.Directory {
 	}
 
 	public boolean clickmarker(DisplayMarker mark, Location loc, int button, boolean press) {
+		if (!press) {
+			ZeeManagerIcons.markClickedSelectListOrExpand(mark, button, compact());
+		}
 	    if(button == 1) {
 		if(!compact() && !press && !domark) {
 		    focus(mark.m);
 		    return(true);
 		}
 	    }
-		//midclick mark expands minimap and center mark
-		else if (button==2 && !press && compact()) {
-			ZeeManagerIcons.focusMarkExpandedMap(mark);
-		}
 		else if(mark.m instanceof SMarker) {
 		Gob gob = MarkerID.find(ui.sess.glob.oc, mark.m);
 		if(gob != null)

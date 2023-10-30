@@ -544,24 +544,62 @@ public class ZeeManagerIcons {
 
     static MiniMap.DisplayMarker latestMidclickMark;
     static BufferedImage latestFocusedMarkBgImg = ZeeManagerIcons.imgCirle(MiniMap.DisplayMarker.minimapMarkImg.getWidth()+1,Color.black,false,false,false);
-    public static void focusMarkExpandedMap(MiniMap.DisplayMarker mark) {
+    public static void markClickedSelectListOrExpand(MiniMap.DisplayMarker mark, int button, boolean mapCompact) {
+
+        if (button==3)
+            return;
+        if (mapCompact && button!=2)
+            return;
+
+        new ZeeThread(){
+            public void run() {
+                //println("focusMarkExpandedMap > start");
+                try {
+                    MapWnd map = ZeeConfig.gameUI.mapfile;
+
+                    if (button == 2 && mapCompact) {
+                        //expand map
+                        map.compact(false);
+                        Utils.setprefb("compact-map", false);
+                        sleep(PING_MS);
+                    }
+
+                    //switch marker list
+                    selectProperList(mark.m);
+                    sleep(PING_MS);
+
+                    //select mark from list
+                    map.focus(mark.m);
+
+                    //center mark on the map
+                    map.view.center(new MiniMap.SpecLocator(mark.m.seg, mark.m.tc));
+
+                    //??
+                    if (ZeeManagerIcons.latestMidclickMark != null){
+                        ZeeManagerIcons.latestMidclickMark.isListFocused = false;
+                    }
+                    mark.isListFocused = true;
+                    latestMidclickMark = mark;
+
+                    // focus name textbox
+                    if (map.tool!=null && map.tool.namesel!=null) {
+                        map.tool.setfocus(map.tool.namesel);
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                //println("focusMarkExpandedMap > end");
+            }
+        }.start();
+    }
+    static void selectProperList(MapFile.Marker m){
+        println("selectProperList "+m.getClass().getSimpleName());
         MapWnd map = ZeeConfig.gameUI.mapfile;
-        //expand map
-        map.compact(false);
-        Utils.setprefb("compact-map", false);
-        //select mark from list
-        map.focus(mark.m);
-        //center mark on mapview
-        map.view.center(new MiniMap.SpecLocator(mark.m.seg, mark.m.tc));
-        //??
-        if (ZeeManagerIcons.latestMidclickMark != null){
-            ZeeManagerIcons.latestMidclickMark.isListFocused = false;
+        if (m.getClass().getSimpleName().contentEquals("SMarker")){
+            map.tool.smbtn.click();
         }
-        mark.isListFocused = true;
-        latestMidclickMark = mark;
-        // focus name textbox
-        if (map.tool!=null && map.tool.namesel!=null) {
-            map.tool.setfocus(map.tool.namesel);
+        else if (m.getClass().getSimpleName().contentEquals("PMarker")){
+            map.tool.pmbtn.click();
         }
     }
 
