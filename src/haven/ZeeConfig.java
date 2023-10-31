@@ -2012,13 +2012,58 @@ public class ZeeConfig {
     }
 
     public static void toggleMineSupport() {
-        try {
-            Field field = classMSRad.getDeclaredField("show");
-            Method method = classMSRad.getMethod("show",boolean.class);
-            //field.setBoolean(classMSRad, !field.getBoolean(classMSRad));
-            method.invoke(classMSRad, !field.getBoolean(classMSRad));
-        }catch (Exception e){
-            e.printStackTrace();
+
+        // toggle mine support radius
+        if (classMSRad!=null) {
+            try {
+                Field field = classMSRad.getDeclaredField("show");
+                Method method = classMSRad.getMethod("show", boolean.class);
+                //field.setBoolean(classMSRad, !field.getBoolean(classMSRad));
+                method.invoke(classMSRad, !field.getBoolean(classMSRad));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        // toggle mine ladder radius
+        List<Gob> ladders = findGobsByNameEndsWith("terobjs/ladder");
+        if (!ladders.isEmpty()){
+            for (Gob ladder : ladders) {
+                Gob.Overlay radius = ladder.findol(ZeeGobRadius.class);
+                if (radius!=null){
+                    radius.remove();
+                }else{
+                    ladder.addol(new Gob.Overlay(ladder, new ZeeGobRadius(ladder, null, ZeeGobRadius.RADIUS_MINE_LADDER_SUPPORT,new Color(139, 139, 185, 48)), -1));
+                }
+            }
+        }
+    }
+
+    static void toggleRadiusBeeskep(){
+        List<Gob> beeskeps = findGobsByNameEndsWith("/beehive");
+        if (!beeskeps.isEmpty()){
+            for (Gob skep : beeskeps) {
+                Gob.Overlay radius = skep.findol(ZeeGobRadius.class);
+                if (radius!=null){
+                    radius.remove();
+                }else{
+                    skep.addol(new Gob.Overlay(skep, new ZeeGobRadius(skep, null, ZeeGobRadius.RADIUS_BEESKEP,new Color(139, 139, 185, 48)), -1));
+                }
+            }
+        }
+    }
+
+    static void toggleRadiusFoodtrough(){
+        List<Gob> foodtroughs = findGobsByNameEndsWith("/trough");
+        if (!foodtroughs.isEmpty()){
+            for (Gob troughs : foodtroughs) {
+                Gob.Overlay radius = troughs.findol(ZeeGobRadius.class);
+                if (radius!=null){
+                    radius.remove();
+                }else{
+                    troughs.addol(new Gob.Overlay(troughs, new ZeeGobRadius(troughs, null, ZeeGobRadius.RADIUS_FOOD_THROUGH,new Color(139, 139, 185, 48)), -1));
+                }
+            }
         }
     }
 
@@ -3434,11 +3479,6 @@ public class ZeeConfig {
                 // aggro radius
                 ZeeConfig.applyGobSettingsAggro(ob);
 
-            }
-
-            // mine ladder radius
-            if (ob.getres().name.contentEquals("gfx/terobjs/ladder")){
-                ob.addol(new Gob.Overlay(ob, new ZeeGobRadius(ob, null, 9 * MCache.tilesz2.y,new Color(139, 139, 185, 48)), -1));
             }
 
             // highlight gob color

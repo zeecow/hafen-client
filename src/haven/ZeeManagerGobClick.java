@@ -167,8 +167,16 @@ public class ZeeManagerGobClick extends ZeeThread{
                 pickAllDreamsCloseBy(gob);
             }
             //toggle mine support radius
-            else if (isGobMineSupport(gobName)) {
+            else if (isGobMineSupport(gobName) || gobName.endsWith("/ladder")) {
                 ZeeConfig.toggleMineSupport();
+            }
+            //toggle beeskep radius
+            else if (gobName.endsWith("/beehive")) {
+                ZeeConfig.toggleRadiusBeeskep();
+            }
+            //toggle foodtrough radius
+            else if (gobName.endsWith("/trough")) {
+                ZeeConfig.toggleRadiusFoodtrough();
             }
             // open cauldron
             else if(gobName.contains("/cauldron") && !ZeeConfig.isPlayerLiftingGob(gob)){
@@ -2714,7 +2722,7 @@ public class ZeeManagerGobClick extends ZeeThread{
                 +"/trough,curdingtub,/plow,/barrel,/still,log,/oldtrunk,chest,/anvil,"
                 +"/cupboard,/studydesk,/demijohn,/quern,/wreckingball-fold,/loom,/swheel,"
                 +"/ttub,/cheeserack,/archerytarget,/dreca,/glasspaneframe,/runestone,"
-                +"/foodtrough,woodbox,casket,basket,crate,chest";
+                +"woodbox,casket,basket,crate,chest";
         return isGobInListEndsWith(gobName,endList);
     }
 

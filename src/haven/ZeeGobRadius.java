@@ -9,6 +9,11 @@ import java.nio.ShortBuffer;
 
 /* class BPRad */
 public class ZeeGobRadius extends Sprite {
+
+    static final int RADIUS_BEESKEP = 13 * MCache.tilesz2.y;
+    static final int RADIUS_FOOD_THROUGH = 18 * MCache.tilesz2.y;
+    static final int RADIUS_MINE_LADDER_SUPPORT = 9 * MCache.tilesz2.y;
+
     static Pipe.Op smat = new BaseColor(new java.awt.Color(255, 0, 0, 77));
     static Pipe.Op emat = Pipe.Op.compose(new BaseColor(new java.awt.Color(255, 0, 0)), new States.LineWidth(1));
     final VertexBuf.VertexData posa;
