@@ -582,9 +582,9 @@ public class ZeeManagerIcons {
                     latestMidclickMark = mark;
 
                     // focus name textbox
-                    if (map.tool!=null && map.tool.namesel!=null) {
-                        map.tool.setfocus(map.tool.namesel);
-                    }
+//                    if (map.tool!=null && map.tool.namesel!=null) {
+//                        map.tool.setfocus(map.tool.namesel);
+//                    }
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -593,7 +593,6 @@ public class ZeeManagerIcons {
         }.start();
     }
     static void selectProperList(MapFile.Marker m){
-        println("selectProperList "+m.getClass().getSimpleName());
         MapWnd map = ZeeConfig.gameUI.mapfile;
         if (m.getClass().getSimpleName().contentEquals("SMarker")){
             map.tool.smbtn.click();

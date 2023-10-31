@@ -644,8 +644,6 @@ public class MapWnd extends Window implements Console.Directory {
 		view.center(new SpecLocator(lm.mark.seg, lm.mark.tc));
 		if (ZeeManagerIcons.latestMidclickMark !=null){
 			ZeeManagerIcons.latestMidclickMark.isListFocused = false;
-			// set focus name textbox
-			tool.setfocus(tool.namesel);
 		}
 	}
 
