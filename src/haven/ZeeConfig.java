@@ -232,7 +232,6 @@ public class ZeeConfig {
     static boolean autoTrackScents = Utils.getprefb("autoTrackScents", true);
     public static boolean isRainLimited = Utils.getprefb("isRainLimited", false);
     public static Integer rainLimitPerc = Utils.getprefi("rainLimitPerc", 25);
-    public static boolean showGrowingTreeScale = Utils.getprefb("showGrowingTreeScale", true);
     public static boolean treeAnimation = Utils.getprefb("treeAnimation", false);
     static boolean keyCamSwitchShiftC = Utils.getprefb("keyCamSwitchShiftC", true);
     static boolean keyUpDownAudioControl = Utils.getprefb("keyUpDownAudioControl", true);
@@ -278,12 +277,16 @@ public class ZeeConfig {
     public static boolean showOverlayVclaim = Utils.getprefb("showOverlayVclaim",true);
     public static boolean showOverlayProv = Utils.getprefb("showOverlayProv",true);
     static boolean showHitbox = false;
-    static boolean hideTreesPalisCrops = Utils.getprefb("hideTreesPalisCrops",false);
-    static Runnable hideTreesPalisCropsRunnable = () -> ZeeManagerGobClick.toggleModels();
     public static boolean autoHideWindowDelay = Utils.getprefb("autoHideWindowDelay",true);
     public static int autoHideWindowDelayMs = Utils.getprefi("autoHideWindowDelayMs",1000);
     public static boolean showGobPointer = Utils.getprefb("showGobPointer",false);
     public static boolean showGobRadar = Utils.getprefb("showGobRadar",false);
+
+    static boolean hideTreesPalisCrops = Utils.getprefb("hideTreesPalisCrops",false);
+    static Runnable hideTreesPalisCropsRunnable = () -> ZeeManagerGobClick.toggleModels();
+
+    public static boolean showGrowingTreeScale = Utils.getprefb("showGrowingTreeScale", true);
+    static Runnable showGrowingTreeScaleRunnable = () -> ZeeManagerGobClick.toggleAllTreeGrowthTexts();
 
     public final static Set<String> mineablesStone = new HashSet<String>(Arrays.asList(
             "stone","gneiss","basalt","dolomite","feldspar","flint",
@@ -2337,6 +2340,7 @@ public class ZeeConfig {
         // toggle hitbox, hidden gobs
         else if (ev.getKeyCode()==KeyEvent.VK_H){
             if(ev.isControlDown()) {
+                // variable toggled outside function because QuickOptions runnable
                 ZeeConfig.hideTreesPalisCrops = !ZeeConfig.hideTreesPalisCrops;
                 ZeeManagerGobClick.toggleModels();
                 return true;

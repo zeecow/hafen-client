@@ -1529,6 +1529,8 @@ public class ZeeManagerGobClick extends ZeeThread{
         }
         // toggle tree growth
         else if(petalName.contentEquals(ZeeFlowerMenu.STRPETAL_TOGGLEGROWTHTEXTS)){
+            // variable toggled outside function because QuickOptions runnable
+            ZeeConfig.showGrowingTreeScale = !ZeeConfig.showGrowingTreeScale;
             toggleAllTreeGrowthTexts();
         }
         // remove tree & stump
@@ -1589,6 +1591,11 @@ public class ZeeManagerGobClick extends ZeeThread{
     static void toggleAllTreeGrowthTexts() {
         try {
 
+            if (!ZeeConfig.showGrowingTreeScale)
+                ZeeConfig.msgLow("hide trees growth ");
+            else
+                ZeeConfig.msgLow("show trees growth ");
+
             // find trees and bushes
             List<Gob> gobs = ZeeConfig.getAllGobs();
             gobs.removeIf(gob1 -> {
@@ -1599,7 +1606,7 @@ public class ZeeManagerGobClick extends ZeeThread{
             });
 
             // toggle off
-            if (ZeeConfig.showGrowingTreeScale) {
+            if (!ZeeConfig.showGrowingTreeScale) {
                 ZeeConfig.removeGobText((ArrayList<Gob>) gobs);
             }
             // toggle on
@@ -1610,9 +1617,10 @@ public class ZeeManagerGobClick extends ZeeThread{
                 }
             }
 
-            //toggle variable
-            ZeeConfig.showGrowingTreeScale = !ZeeConfig.showGrowingTreeScale;
             Utils.setprefb("showGrowingTreeScale",ZeeConfig.showGrowingTreeScale);
+
+            // quick options window
+            ZeeQuickOptionsWindow.updateCheckboxNoBump("showGrowingTreeScale",ZeeConfig.showGrowingTreeScale);
 
         }catch (Exception e){
             e.printStackTrace();
