@@ -849,7 +849,7 @@ public class ZeeConfig {
                 if (audio != null && !audio.isEmpty())
                     playAudioGobId(audio, gobId);
                 else
-                    gameUI.error("player spotted");
+                    gameUI.msg("player spotted",RootWidget.msgsfxPlayer, Color.yellow);
             }
         }
         //if single gob alert is saved, play alert
@@ -3137,7 +3137,7 @@ public class ZeeConfig {
     }
 
     public static void msgLow(String s) {
-        gameUI.msgLowSound(s);
+        gameUI.msg(s,RootWidget.msgsfxLow,Color.white);
     }
 
     public static void msgError(String msg) {

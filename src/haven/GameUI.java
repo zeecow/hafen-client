@@ -1581,13 +1581,13 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Message
 	}
     }
 
-	public void msgLowSound(String msg) {
-		msg(msg,Color.WHITE);
+	public void msg(String msg, Resource sound, Color color) {
+		msg(msg,color);
 		if (ZeeConfig.blockAudioMsg && ZeeConfig.isMsgAudioMuted(msg))
 			return;
 		double now = Utils.rtime();
 		if(now - lastmsgsfx > 0.1) {
-			ui.sfx(RootWidget.msgsfxLow);
+			ui.sfx(sound);
 			lastmsgsfx = now;
 		}
 	}

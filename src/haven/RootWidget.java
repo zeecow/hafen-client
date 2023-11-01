@@ -35,6 +35,7 @@ public class RootWidget extends ConsoleHost implements UI.MessageWidget {
     public static final Resource errsfx = Resource.local().loadwait("sfx/error");
     public static final Resource msgsfx = Resource.local().loadwait("sfx/msg");
 	public static final Resource msgsfxLow = Resource.local().loadwait("sfx/hud/mmap/wood4");
+	public static final Resource msgsfxPlayer = Resource.local().loadwait("sfx/hud/mmap/bell1");
     public boolean modtip = false;
     Profile guprof, grprof, ggprof;
     private Text lastmsg;
