@@ -1527,15 +1527,17 @@ public class ZeeManagerGobClick extends ZeeThread{
                     gobClick(gob, 3, UI.MOD_SHIFT);
             }
         }
-        else if(isGobTree(gobName)){
-            if (petalName.contentEquals(ZeeFlowerMenu.STRPETAL_REMOVETREEANDSTUMP)
-                || petalName.contentEquals(ZeeFlowerMenu.STRPETAL_REMOVEALLTREES))
-            {
-                removeTreeAndStump(gob, petalName);
-            }
-            else if (petalName.contentEquals(ZeeFlowerMenu.STRPETAL_INSPECT)) {//towercap case
-                inspectGob(gob);
-            }
+        // toggle tree growth
+        else if(petalName.contentEquals(ZeeFlowerMenu.STRPETAL_TOGGLEGROWTHTEXTS)){
+            toggleAllTreeGrowthTexts();
+        }
+        // remove tree & stump
+        else if (petalName.contentEquals(ZeeFlowerMenu.STRPETAL_REMOVETREEANDSTUMP) || petalName.contentEquals(ZeeFlowerMenu.STRPETAL_REMOVEALLTREES)) {
+            removeTreeAndStump(gob, petalName);
+        }
+        // ispect towercap tree
+        else if(petalName.contentEquals(ZeeFlowerMenu.STRPETAL_INSPECT) && isGobTree(gobName)){
+            inspectGob(gob);
         }
         else if (isGobCrop(gobName)) {
             if (petalName.equals(ZeeFlowerMenu.STRPETAL_SEEDFARMER)) {
@@ -1581,6 +1583,39 @@ public class ZeeManagerGobClick extends ZeeThread{
         }
         else{
             println("chooseGobFlowerMenu > unkown case");
+        }
+    }
+
+    static void toggleAllTreeGrowthTexts() {
+        try {
+
+            // find trees and bushes
+            List<Gob> gobs = ZeeConfig.getAllGobs();
+            gobs.removeIf(gob1 -> {
+                String name = gob1.getres().name;
+                if (!isGobTree(name) && !isGobBush(name))
+                    return true;
+                return false;
+            });
+
+            // toggle off
+            if (ZeeConfig.showGrowingTreeScale) {
+                ZeeConfig.removeGobText((ArrayList<Gob>) gobs);
+            }
+            // toggle on
+            else {
+                for (Gob g : gobs) {
+                    if (g.treeGrowthText != null && !g.treeGrowthText.isBlank())
+                        ZeeConfig.addGobText(g, g.treeGrowthText);
+                }
+            }
+
+            //toggle variable
+            ZeeConfig.showGrowingTreeScale = !ZeeConfig.showGrowingTreeScale;
+            Utils.setprefb("showGrowingTreeScale",ZeeConfig.showGrowingTreeScale);
+
+        }catch (Exception e){
+            e.printStackTrace();
         }
     }
 
@@ -1842,6 +1877,7 @@ public class ZeeManagerGobClick extends ZeeThread{
             opts = new ArrayList<String>();
             opts.add(ZeeFlowerMenu.STRPETAL_REMOVETREEANDSTUMP);
             opts.add(ZeeFlowerMenu.STRPETAL_REMOVEALLTREES);
+            opts.add(ZeeFlowerMenu.STRPETAL_TOGGLEGROWTHTEXTS);
             if (gobName.endsWith("/towercap"))
                 opts.add(ZeeFlowerMenu.STRPETAL_INSPECT);
             menu = new ZeeFlowerMenu(gob, opts.toArray(String[]::new));
