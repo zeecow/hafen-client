@@ -450,7 +450,7 @@ public class Window extends Widget implements DTarget {
 	if(dm != null) {
 	    this.c = this.c.add(c.add(doff.inv()));
 	} else {
-		if (this.isAutoHideOn && ZeeConfig.autoHideWindows) {
+		if (this.isAutoHideOn && ZeeConfig.autoHideWindows && !(this.deco instanceof GItem.HoverDeco)) {
 			if (checkhit(c)){
 				if (this.isAutoHidden)
 					autoHideToggleWinPos();//show window
