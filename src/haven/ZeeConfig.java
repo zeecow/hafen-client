@@ -1100,9 +1100,17 @@ public class ZeeConfig {
     }
 
 
-    public static void windowAdded(Window window) {
+    public static void windowAdded(Window window, String test) {
+
+        window.zeeWinAdded = true;
 
         String windowTitle = window.cap.strip();
+
+        if (windowTitle.contentEquals("Stack"))
+            return;
+
+        //println(test+" > "+windowTitle);
+        //println("    deco "+window.deco);
 
         //cheesetray
         if(windowTitle.contentEquals("Rack")) {
@@ -1196,6 +1204,7 @@ public class ZeeConfig {
 
             // checkbox auto pick irrlight
             makeWindowAddIrrlightCheckbox(window);
+
         }
 
         if (gameUI!=null && !gameUI.sz.equals(0,0) && !isBuildWindow(window)){

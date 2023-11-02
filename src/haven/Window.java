@@ -80,8 +80,9 @@ public class Window extends Widget implements DTarget {
     private Coord doff;
     public boolean decohide = false;
     public boolean large = false;
+	public boolean zeeWinAdded = false;
 
-    @RName("wnd")
+	@RName("wnd")
     public static class $_ implements Factory {
 	public Widget create(UI ui, Object[] args) {
 	    Coord sz = UI.scale((Coord)args[0]);
@@ -117,7 +118,7 @@ public class Window extends Widget implements DTarget {
 
     protected void added() {
 	parent.setfocus(this);
-	ZeeConfig.windowAdded(this);
+	ZeeConfig.windowAdded(this,"added()");
     }
 
     public void chcap(String cap) {
@@ -143,6 +144,8 @@ public class Window extends Widget implements DTarget {
 	this.c = this.c.add(coff);
 	if(dm != null)
 	    this.doff = this.doff.sub(coff);
+	if (zeeWinAdded && this.deco!=null && (this.deco instanceof DefaultDeco))
+		ZeeConfig.windowAdded(this,"chdeco()");
     }
 
     public static abstract class Deco extends Widget {
