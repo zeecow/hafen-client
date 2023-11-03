@@ -3161,7 +3161,7 @@ public class ZeeManagerGobClick extends ZeeThread{
                 return false;
             // kritters
             if ( name.contains("/kritter/")) {
-                if ( ZeeConfig.isKritterNotPickable(name) )
+                if ( ZeeConfig.isKritterNotPickable(gob1) )
                     return true; // remove non pickable kritter
                 else
                     return false;
@@ -3242,7 +3242,7 @@ public class ZeeManagerGobClick extends ZeeThread{
                 continue;
 
             //avoid big kritters
-            if (ZeeConfig.isKritter(resname) && ZeeConfig.isKritterNotPickable(resname))
+            if (ZeeConfig.isKritter(resname) && ZeeConfig.isKritterNotPickable(gobs.get(i)))
                 continue;
 
             // avoid duplicate names
@@ -3306,7 +3306,7 @@ public class ZeeManagerGobClick extends ZeeThread{
             if (!gob1.getres().basename().contentEquals(gobBaseName))
                 return false;
             //avoid big kritters
-            if (ZeeConfig.isKritter(gob1.getres().name) && ZeeConfig.isKritterNotPickable(gob1.getres().name))
+            if (ZeeConfig.isKritter(gob1.getres().name) && ZeeConfig.isKritterNotPickable(gob1))
                 return false;
             return true;
         })

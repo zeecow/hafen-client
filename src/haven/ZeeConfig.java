@@ -674,11 +674,9 @@ public class ZeeConfig {
         return name.contains("/kritter/");
     }
 
-    static boolean isKritterNotPickable(Gob gob) {
-        return isKritterNotPickable(gob.getres().name);
-    }
+    static boolean isKritterNotPickable(Gob kritter) {
+        String resname = kritter.getres().name;
 
-    static boolean isKritterNotPickable(String resname) {
         final String[] list = {
             //wild
             "gfx/kritter/badger/badger",
