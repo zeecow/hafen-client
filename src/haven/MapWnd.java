@@ -307,7 +307,7 @@ public class MapWnd extends Window implements Console.Directory {
 
 	public boolean clickmarker(DisplayMarker mark, Location loc, int button, boolean press) {
 		if (!press) {
-			ZeeManagerIcons.markClickedSelectListOrExpand(mark, button, compact());
+			ZeeManagerIcons.checkMarkClicked(mark, button, compact());
 		}
 	    if(button == 1) {
 		if(!compact() && !press && !domark) {
@@ -671,10 +671,13 @@ public class MapWnd extends Window implements Console.Directory {
 				view.file.update(mark);
 				commit();
 				change2(null);
+
 				// recenter player when mark name entered
 				recenter();
+
 				// compact map when mark name entered
 				compact(true);
+				Utils.setprefb("compact-map", true);
 			    }
 			});
 		}
@@ -717,7 +720,7 @@ public class MapWnd extends Window implements Console.Directory {
 	toolbar.c = viewf.c.add(0, -toolbar.sz.y +21).add(UI.scale(2), UI.scale(-2));
     }
 
-    private boolean compact() {
+    boolean compact() {
 	return(deco == null);
     }
 

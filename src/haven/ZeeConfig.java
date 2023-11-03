@@ -926,11 +926,11 @@ public class ZeeConfig {
     static int mapWndMinHeightBackup=350, mapWndMinHeight=350;
     public static void windowMapCompact(MapWnd mapWnd, boolean compact) {
 
-        // TODO better way
-        if(compact && mapWnd.c.equals(0,0)) {
-            //println("special startup condition?");
+        if(gameUI==null || gameUI.mapfile==null) {
+            println("windowMapCompact > gameUI "+gameUI+" , mapfile "+gameUI.mapfile);
             return;
         }
+        println("windowMapCompact > "+compact);
 
         Coord screenSize = gameUI.map.sz;
         Window.DefaultDeco deco = (Window.DefaultDeco) mapWnd.deco;

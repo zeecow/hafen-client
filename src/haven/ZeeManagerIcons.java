@@ -544,7 +544,7 @@ public class ZeeManagerIcons {
 
     static MiniMap.DisplayMarker latestMidclickMark;
     static BufferedImage latestFocusedMarkBgImg = ZeeManagerIcons.imgCirle(MiniMap.DisplayMarker.minimapMarkImg.getWidth()+1,Color.black,false,false,false);
-    public static void markClickedSelectListOrExpand(MiniMap.DisplayMarker mark, int button, boolean mapCompact) {
+    public static void checkMarkClicked(MiniMap.DisplayMarker mark, int button, boolean mapCompact) {
 
         if (button==3)
             return;
@@ -553,18 +553,17 @@ public class ZeeManagerIcons {
 
         new ZeeThread(){
             public void run() {
-                //println("focusMarkExpandedMap > start");
                 try {
                     MapWnd map = ZeeConfig.gameUI.mapfile;
 
+                    //expand map
                     if (button == 2 && mapCompact) {
-                        //expand map
                         map.compact(false);
                         Utils.setprefb("compact-map", false);
                         sleep(PING_MS);
                     }
 
-                    //switch marker list
+                    // select proper mark list
                     selectProperList(mark.m);
                     sleep(PING_MS);
 
@@ -581,14 +580,9 @@ public class ZeeManagerIcons {
                     mark.isListFocused = true;
                     latestMidclickMark = mark;
 
-                    // focus name textbox
-//                    if (map.tool!=null && map.tool.namesel!=null) {
-//                        map.tool.setfocus(map.tool.namesel);
-//                    }
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-                //println("focusMarkExpandedMap > end");
             }
         }.start();
     }
