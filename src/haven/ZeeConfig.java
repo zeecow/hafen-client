@@ -720,6 +720,17 @@ public class ZeeConfig {
             if(resname.contains(list[i]))
                 return true;
         }
+
+        final List<String> listKO = List.of(
+                "gfx/kritter/bat/bat",
+                "gfx/kritter/stoat/stoat"
+        );
+        for (String kri : listKO) {
+            if (resname.contentEquals(kri) && !ZeeManagerGobClick.isGobDeadOrKO(kritter)){
+                return true;
+            }
+        }
+
         return false;
     }
 
