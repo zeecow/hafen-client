@@ -270,6 +270,7 @@ public class ZeeThread  extends Thread{
     static public String[] arrayPlayerActivePoses = new String[]{
             ZeeConfig.POSE_PLAYER_DRINK,
             ZeeConfig.POSE_PLAYER_CHOPTREE,
+            ZeeConfig.POSE_PLAYER_CHOPBLOCK,
             ZeeConfig.POSE_PLAYER_DIGSHOVEL,
             ZeeConfig.POSE_PLAYER_PICK,
             ZeeConfig.POSE_PLAYER_SAW,
@@ -277,7 +278,8 @@ public class ZeeThread  extends Thread{
             ZeeConfig.POSE_PLAYER_BUILD,
             ZeeConfig.POSE_PLAYER_BUTCH,
             ZeeConfig.POSE_PLAYER_HARVESTING,
-            ZeeConfig.POSE_PLAYER_PICKGROUND
+            ZeeConfig.POSE_PLAYER_PICKGROUND,
+            ZeeConfig.POSE_PLAYER_BUSHPICK
     };
     public static boolean waitPlayerNonActivePose(){
         return waitPlayerPoseNotInList(arrayPlayerActivePoses);

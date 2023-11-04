@@ -1305,14 +1305,16 @@ public class ZeeManagerItemClick extends ZeeThread{
                 println("[ERROR] pickUpInvItem > names empty or null");
                 return false;
             }
-            WItem witem = null;
+            WItem witem=null;
             List<WItem> list;
             for (int i = 0; i < names.length; i++) {
                 list = inv.getWItemsByNameContains(names[i]);
-                if (list.isEmpty())
+                if (list.isEmpty()) {
+                    witem = null;
                     continue;
+                }
                 //found item with name[i]
-                witem = list.get(i);
+                witem = list.get(0);
                 // if is a stack, select from it
                 if (witem.item.contents!=null){
                     ItemStack itemStack = (ItemStack) witem.item.contents;
@@ -1321,8 +1323,10 @@ public class ZeeManagerItemClick extends ZeeThread{
                 break;
             }
             // found no item with listed names
-            if (witem==null)
+            if (witem==null) {
+                println("found no item with listed names");
                 return false;
+            }
             // pickup found item
             return pickUpItem(witem);
         }catch (Exception e){
