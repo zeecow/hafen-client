@@ -2034,7 +2034,7 @@ public class ZeeManagerGobClick extends ZeeThread{
                 ZeeConfig.addPlayerText("mounting");
                 try {
                     //wait horse gob loading
-                    sleep(500);
+                    sleep(333);
 
                     //find horse
                     Gob closestHorse = ZeeConfig.getClosestGobToPlayer(ZeeConfig.findGobsByNameEndsWith("/mare", "/stallion"));
@@ -2164,6 +2164,32 @@ public class ZeeManagerGobClick extends ZeeThread{
                 ZeeConfig.removePlayerText();
             }
         }.start();
+    }
+
+
+    public static boolean isGobSmoking(Gob gob){
+        return getOverlayNames(gob).contains("gfx/fx/ismoke");
+    }
+
+    public static boolean isGobSmokeProducer(String gobName) {
+        return List.of(
+            "gfx/terobjs/kiln",
+            "gfx/terobjs/tarkiln",
+            "gfx/terobjs/oven",
+            "gfx/terobjs/smokeshed",
+            "gfx/terobjs/steelcrucible",
+            "gfx/terobjs/smelter",
+            "gfx/terobjs/furnace",
+            "gfx/terobjs/primsmelter",
+            "gfx/terobjs/minepyre",
+            "gfx/terobjs/bpyre",
+            "gfx/terobjs/villageidol"
+        ).contains(gobName);
+    }
+
+    public static boolean isGobIdol(String gobName) {
+        return gobName.contentEquals("gfx/terobjs/pclaim")
+                || gobName.contentEquals("gfx/terobjs/villageidol");
     }
 
     private boolean isGobBigDeadAnimal_thread() {
@@ -2986,8 +3012,7 @@ public class ZeeManagerGobClick extends ZeeThread{
     static boolean isGobTamedAnimal(String gobName){
         return isGobInListEndsWith(
                 gobName,
-                "/stallion,/mare,/foal,/hog,/sow,/piglet,"
-                    +"/billy,/nanny,/kid,/sheep,/lamb,/cattle,/calf,"
+                "/stallion,/mare,/foal,/hog,/sow,/piglet,/billy,/nanny,/kid,/sheep,/lamb,/cattle,/calf"
         );
     }
 
@@ -3526,10 +3551,8 @@ public class ZeeManagerGobClick extends ZeeThread{
 
     static void toggleModels() {
 
-        // hide gob temp window
-        if (ZeeConfig.hideGobs){
-            showWinHideGobs();
-        }
+        // hide gob window
+        showWinHideGobs();
 
         if (ZeeConfig.hideGobs)
             ZeeConfig.msgLow("hide trees/pali/crops");
@@ -3548,15 +3571,20 @@ public class ZeeManagerGobClick extends ZeeThread{
     }
 
     static Window winHideGobs = null;
-    static boolean hideGobHouses = Utils.getprefb("hideGobHouses",false);
     static boolean hideGobWalls = Utils.getprefb("hideGobWalls",true);
     static boolean hideGobCrops = Utils.getprefb("hideGobCrops",true);
     static boolean hideGobTrees = Utils.getprefb("hideGobTrees",true);
+    static boolean hideGobHouses = Utils.getprefb("hideGobHouses",false);
+    static boolean hideGobIdols = Utils.getprefb("hideGobIdols",false);
+    static boolean hideGobTamedAnimals = Utils.getprefb("hideGobTamedAnimals",false);
+    static boolean hideGobSmokers = Utils.getprefb("hideGobSmokers",false);
     static long winHideGobLastInteractionMs;
+    private static Label winHideGobLabelClosing;
     private static void showWinHideGobs() {
 
         if (winHideGobs != null) {
-            println("win toggle models already open");
+            //println("win toggle models already open");
+            winHideGobLastInteractionMs = now();
             return;
         }
 
@@ -3574,46 +3602,75 @@ public class ZeeManagerGobClick extends ZeeThread{
         );
 
         Widget wdg;
-
-        // houses
-        wdg = winHideGobs.add(new CheckBox("houses"){
-            { a = ZeeManagerGobClick.hideGobHouses;}
-            public void set(boolean a) {
-                super.set(a);
-                hideGobHouses = a;
-                winHideGobLastInteractionMs = now();
-            }
-        },0,0);
+        int xpad = 5, ypad = 2;
 
         // walls
         wdg = winHideGobs.add(new CheckBox("walls"){
-            { a = ZeeManagerGobClick.hideGobWalls;}
+            { a = hideGobWalls;}
             public void set(boolean a) {
                 super.set(a);
-                ZeeManagerGobClick.hideGobWalls = a;
-                ZeeManagerGobClick.winHideGobLastInteractionMs = now();
+                Utils.setprefb("hideGobWalls", (hideGobWalls = a));
+                winHideGobLastInteractionMs = now();
             }
-        }, wdg.c.x+wdg.sz.x,0);
-
+        }, 0,0);
         // crops
         wdg = winHideGobs.add(new CheckBox("crops"){
-            { a = ZeeManagerGobClick.hideGobCrops;}
+            { a = hideGobCrops;}
             public void set(boolean a) {
                 super.set(a);
-                ZeeManagerGobClick.hideGobCrops = a;
-                ZeeManagerGobClick.winHideGobLastInteractionMs = now();
+                Utils.setprefb("hideGobCrops", (hideGobCrops = a));
+                winHideGobLastInteractionMs = now();
             }
-        }, wdg.c.x+wdg.sz.x,0);
-
+        }, wdg.c.x+wdg.sz.x+xpad,0);
         // trees
         wdg = winHideGobs.add(new CheckBox("trees"){
-            { a = ZeeManagerGobClick.hideGobTrees;}
+            { a = hideGobTrees;}
             public void set(boolean a) {
                 super.set(a);
                 ZeeManagerGobClick.hideGobTrees = a;
                 ZeeManagerGobClick.winHideGobLastInteractionMs = now();
             }
-        }, wdg.c.x+wdg.sz.x,0);
+        }, wdg.c.x+wdg.sz.x+xpad,0);
+
+        // houses
+        wdg = winHideGobs.add(new CheckBox("houses"){
+            { a = hideGobHouses;}
+            public void set(boolean a) {
+                super.set(a);
+                Utils.setprefb("hideGobHouses", (hideGobHouses = a));
+                winHideGobLastInteractionMs = now();
+            }
+        },0,wdg.c.y+wdg.sz.y+ypad);
+        // idols
+        wdg = winHideGobs.add(new CheckBox("idols"){
+            { a = hideGobIdols;}
+            public void set(boolean a) {
+                super.set(a);
+                Utils.setprefb("hideGobIdols", (hideGobIdols = a));
+                winHideGobLastInteractionMs = now();
+            }
+        },wdg.c.x+wdg.sz.x+xpad,wdg.c.y);
+        // tamed animals
+        wdg = winHideGobs.add(new CheckBox("tamed"){
+            { a = hideGobTamedAnimals;}
+            public void set(boolean a) {
+                super.set(a);
+                Utils.setprefb("hideGobTamedAnimals", (hideGobTamedAnimals = a));
+                winHideGobLastInteractionMs = now();
+            }
+        },wdg.c.x+wdg.sz.x+xpad,wdg.c.y);
+        // smokers
+        wdg = winHideGobs.add(new CheckBox("smokers"){
+            { a = hideGobSmokers;}
+            public void set(boolean a) {
+                super.set(a);
+                Utils.setprefb("hideGobSmokers", (hideGobSmokers = a));
+                winHideGobLastInteractionMs = now();
+            }
+        },wdg.c.x+wdg.sz.x+xpad,wdg.c.y);
+
+        // label countdown auto close
+        winHideGobLabelClosing = winHideGobs.add(new Label(""),0,wdg.c.y+wdg.sz.y+ypad);
 
         winHideGobs.pack();
 
@@ -3622,18 +3679,26 @@ public class ZeeManagerGobClick extends ZeeThread{
             public void run() {
                 //println("winHideGobs auto-close start");
                 try {
-                    int timeoutMs = 5000;
-                    winHideGobLastInteractionMs = now();
-                    do {
-                        sleep(500);
-                    } while( winHideGobs != null
-                            && now() - ZeeManagerGobClick.winHideGobLastInteractionMs < timeoutMs
-                    );
-                    if (winHideGobs!=null) {
-                        winHideGobs.reqdestroy();
-                        winHideGobs = null;
+                    synchronized (winHideGobs) {
+                        final int timeoutMs = 5000;
+                        long idleMs = 0;
+                        winHideGobLastInteractionMs = now();
+                        winHideGobLabelClosing.settext("autoclose " + (timeoutMs - idleMs) / 1000 + "s");
+                        do {
+                            sleep(1000);
+                            idleMs = now() - ZeeManagerGobClick.winHideGobLastInteractionMs;
+                            if (idleMs < timeoutMs) {
+                                winHideGobLabelClosing.settext("autoclose " + (timeoutMs - idleMs) / 1000 + "s");
+                            } else {
+                                break;
+                            }
+                        } while (winHideGobs != null);
+                        if (winHideGobs != null) {
+                            winHideGobs.reqdestroy();
+                            winHideGobs = null;
+                        }
+                        //println("    window destroyed");
                     }
-                    //println("    window destroyed");
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -3643,15 +3708,20 @@ public class ZeeManagerGobClick extends ZeeThread{
     }
 
     static boolean isHideGob(Gob gob){
-        String gobName = gob.getres().name;
         if (ZeeConfig.hideGobs){
-            if (hideGobTrees && gob.tags.contains(Gob.Tag.TREE))
+            if (gob.tags.contains(Gob.Tag.TREE) && hideGobTrees)
                 return true;
-            if (hideGobWalls && gob.tags.contains(Gob.Tag.WALL))
+            if (gob.tags.contains(Gob.Tag.WALL) && hideGobWalls)
                 return true;
-            if (hideGobCrops && gob.tags.contains(Gob.Tag.CROP))
+            if (gob.tags.contains(Gob.Tag.CROP) && hideGobCrops)
                 return true;
-            if (hideGobHouses && gob.tags.contains(Gob.Tag.HOUSE))
+            if (gob.tags.contains(Gob.Tag.HOUSE) && hideGobHouses)
+                return true;
+            if (gob.tags.contains(Gob.Tag.TAMED_ANIMAL) && hideGobTamedAnimals)
+                return true;
+            if (gob.tags.contains(Gob.Tag.IDOL) && hideGobIdols)
+                return true;
+            if (gob.tags.contains(Gob.Tag.SMOKE_PRODUCER) && hideGobSmokers)
                 return true;
         }
         return false;

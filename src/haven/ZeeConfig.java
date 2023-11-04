@@ -2616,13 +2616,18 @@ public class ZeeConfig {
     }
 
     static List<Gob> getAllGobs(){
-        return ZeeConfig.gameUI.ui.sess.glob.oc.gobStream().filter(gob -> {
-            if(gob!=null && !gob.virtual && gob.getres()!=null) {
-                return true;
-            } else {
-                return false;
-            }
-        }).collect(Collectors.toList());
+        try {
+            return ZeeConfig.gameUI.ui.sess.glob.oc.gobStream().filter(gob -> {
+                if (gob != null && !gob.virtual && gob.getres() != null) {
+                    return true;
+                } else {
+                    return false;
+                }
+            }).collect(Collectors.toList());
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return null;
     }
 
     // pattern must match whole gob name
@@ -3559,34 +3564,41 @@ public class ZeeConfig {
         if (isTree(gobName)) {
             gob.tags.add(Gob.Tag.TREE);
         }
-        else if(ZeeManagerGobClick.isGobWall(gobName)){
-            gob.tags.add(Gob.Tag.WALL);
-        }
-        else if (isBush(gobName)){
+        if (isBush(gobName)){
             gob.tags.add(Gob.Tag.BUSH);
         }
-        else if (isGobCrop(gobName)){
+        if (isGobCrop(gobName)){
             gob.tags.add(Gob.Tag.CROP);
         }
-        else if (ZeeManagerGobClick.isGobHouse(gobName)){
-            gob.tags.add(Gob.Tag.HOUSE);
-        }
-        else if (isBug(gobName)){
+        if (isBug(gobName)){
             gob.tags.add(Gob.Tag.BUG);
         }
-        else if (isBird(gobName)){
+        if (isBird(gobName)){
             gob.tags.add(Gob.Tag.BIRD);
         }
-        else if (isSmallAnimal(gobName)){
+        if (isSmallAnimal(gobName)){
             gob.tags.add(Gob.Tag.SMALL_ANIMAL);
         }
-        else if (isAggressive(gobName)){
+        if (isAggressive(gobName)){
             gob.tags.add(Gob.Tag.AGGRESSIVE);
+        }
+        if(ZeeManagerGobClick.isGobWall(gobName)){
+            gob.tags.add(Gob.Tag.WALL);
+        }
+        if (ZeeManagerGobClick.isGobHouse(gobName)){
+            gob.tags.add(Gob.Tag.HOUSE);
+        }
+        if (ZeeManagerGobClick.isGobSmokeProducer(gobName)){
+            gob.tags.add(Gob.Tag.SMOKE_PRODUCER);
+        }
+        if(ZeeManagerGobClick.isGobIdol(gobName)){
+            gob.tags.add(Gob.Tag.IDOL);
         }
     }
 
     static void addGobTagsAdvanced(Gob gob) {
         String gobName = gob.getres().name;
+        // players
         if(isPlayer(gob) && gameUI!=null && gameUI.map.player()!=null) {
             gob.tags.add(Gob.Tag.PLAYER);
             if (gameUI.map.player().id == gob.id)
@@ -3594,6 +3606,18 @@ public class ZeeConfig {
             else
                 gob.tags.add(Gob.Tag.PLAYER_OTHER);
         }
+        //tamed animals
+        if (ZeeManagerGobClick.isGobTamedAnimal(gobName)){
+            gob.tags.add(Gob.Tag.TAMED_ANIMAL);
+        }
+    }
+
+    static boolean gobHasAttr(Gob gob, String gAttrClassName) {
+        return ZeeManagerGobClick.getGAttrNames(gob).contains(gAttrClassName);
+    }
+
+    static boolean gobHasOverlay(Gob gob, String overlayResName) {
+        return ZeeManagerGobClick.getOverlayNames(gob).contains(overlayResName);
     }
 
     private static void applyGobSettingsAggro(Gob gob) {

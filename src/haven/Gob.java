@@ -997,8 +997,11 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 			if( !ZeeConfig.isTree(gobName) &&
 				!ZeeManagerGobClick.isGobWall(gobName)  &&
 				!ZeeConfig.isGobCrop(gobName) &&
-				!ZeeManagerGobClick.isGobHouse(gobName))
-			{
+				!ZeeManagerGobClick.isGobHouse(gobName) &&
+				!ZeeManagerGobClick.isGobSmokeProducer(gobName) &&
+				!ZeeManagerGobClick.isGobTamedAnimal(gobName) &&
+				!ZeeManagerGobClick.isGobIdol(gobName)
+			){
 				return;
 			}
 
@@ -1023,19 +1026,11 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 			else {
 				ArrayList<RenderTree.Slot> tmpSlots = new ArrayList<>(this.slots);
 				ZeeConfig.gameUI.ui.sess.glob.loader.defer(() -> {
-					int retries = 0;
-					boolean retry;
-					do {
-						retry = false;
-						try {
-							RUtils.multiadd(tmpSlots, d);
-						} catch (Defer.NotDoneException e) {
-							retries++;
-							retry = true;
-						}
-					} while(retry);
-					if(retries > 0 )
-						ZeeConfig.println(gobName+" retries "+retries);
+					try{
+						RUtils.multiadd(tmpSlots,d);
+					}catch (Exception e){
+						ZeeConfig.println("toggleModel show > "+e.getClass().getName()+" , "+e.getMessage());
+					}
 				}, null);
 				// hide hitbox if setting permits
 				if (!ZeeConfig.showHitbox)
@@ -1085,9 +1080,9 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 		PLAYER, PLAYER_MAIN, PLAYER_OTHER,
 		POSE_KO,
 		BUSH, CROP, TREE,
-		BUG, BIRD,
-		SMALL_ANIMAL,
+		BUG, BIRD, SMALL_ANIMAL, TAMED_ANIMAL,
 		AGGRESSIVE,
-		VEHICLE, WALL, HOUSE;
+		VEHICLE, WALL, HOUSE,
+		IDOL, SMOKE_PRODUCER;
 	}
 }
