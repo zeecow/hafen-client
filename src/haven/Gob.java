@@ -1013,7 +1013,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 						try{
 							RUtils.multirem(tmpSlots);
 						}catch (Exception e){
-							ZeeConfig.println("toggleModel > "+e.getMessage());
+							ZeeConfig.println("toggleModel hide > "+e.getClass().getName()+" , "+e.getMessage());
 						}
 					}, null);
 				}
@@ -1024,11 +1024,19 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 			else {
 				ArrayList<RenderTree.Slot> tmpSlots = new ArrayList<>(this.slots);
 				ZeeConfig.gameUI.ui.sess.glob.loader.defer(() -> {
-					try{
-						RUtils.multiadd(tmpSlots, d);
-					}catch (Exception e){
-						ZeeConfig.println("toggleModel > "+e.getMessage());
-					}
+					int retries = 0;
+					boolean retry;
+					do {
+						retry = false;
+						try {
+							RUtils.multiadd(tmpSlots, d);
+						} catch (Defer.NotDoneException e) {
+							retries++;
+							retry = true;
+						}
+					} while(retry);
+					if(retries > 0 )
+						ZeeConfig.println(gobName+" retries "+retries);
 				}, null);
 				// hide hitbox if setting permits
 				if (!ZeeConfig.showHitbox)
