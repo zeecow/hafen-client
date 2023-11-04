@@ -315,7 +315,7 @@ public class ZeeOptionsJFrame extends JFrame {
 
         panelTabMisc.add(new ZeeOptionJCheckBox( "Solid color paving (restart)", "pavingSolidColor"),c);
 
-        panelTabMisc.add(new ZeeOptionJCheckBox( "Hide treePaliCrop(ctrl+h)", "hideTreesPalisCrops"),c);
+        panelTabMisc.add(new ZeeOptionJCheckBox( "Hide Gobs", "hideGobs"),c);
 
         panelTabMisc.add(new ZeeOptionJCheckBox( "Hide some animations", "hideFxAnimations"),c);
 

@@ -989,24 +989,23 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 		return 0;
 	}
 
-	private static final List<String> listHideWallNames = List.of(
-		"gfx/terobjs/arch/palisadeseg", "gfx/terobjs/arch/palisadecp",
-		"gfx/terobjs/arch/drystonewallseg", "gfx/terobjs/arch/drystonewallcp",
-		"gfx/terobjs/arch/poleseg", "gfx/terobjs/arch/polecp"
-	);
 	void toggleModel(){
 		synchronized (this){
 
 			String gobName = this.getres().name;
+
 			if( !ZeeConfig.isTree(gobName) &&
-				!listHideWallNames.contains(gobName)  &&
-				!ZeeConfig.isGobCrop(gobName))
+				!ZeeManagerGobClick.isGobWall(gobName)  &&
+				!ZeeConfig.isGobCrop(gobName) &&
+				!ZeeManagerGobClick.isGobHouse(gobName))
 			{
 				return;
 			}
+
 			Drawable d = this.getattr(Drawable.class);
-			//hide gob model
-			if (ZeeConfig.hideTreesPalisCrops) {
+
+			//hide gob
+			if (ZeeManagerGobClick.isHideGob(this)) {
 				if (d != null && d.slots != null) {
 					ArrayList<RenderTree.Slot> tmpSlots = new ArrayList<>(d.slots);
 					ZeeConfig.gameUI.ui.sess.glob.loader.defer(() -> {
@@ -1020,7 +1019,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 				//always show hitbox when hiding model
 				showHitBox();
 			}
-			//show gob model
+			//show gob
 			else {
 				ArrayList<RenderTree.Slot> tmpSlots = new ArrayList<>(this.slots);
 				ZeeConfig.gameUI.ui.sess.glob.loader.defer(() -> {
@@ -1089,6 +1088,6 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 		BUG, BIRD,
 		SMALL_ANIMAL,
 		AGGRESSIVE,
-		VEHICLE;
+		VEHICLE, WALL, HOUSE;
 	}
 }

@@ -195,7 +195,7 @@ public class ZeeHitbox extends ZeeSlottedNode implements Rendered {
 
     public static void updateHitboxColor() {
         SOLID = Pipe.Op.compose(new BaseColor(hitBoxColor));
-        if (ZeeConfig.hideTreesPalisCrops || ZeeConfig.showHitbox){
+        if (ZeeConfig.hideGobs || ZeeConfig.showHitbox){
             List<Gob> gobs = ZeeConfig.getAllGobs();
             for (Gob gob : gobs) {
                 if (gob.hitbox!=null)

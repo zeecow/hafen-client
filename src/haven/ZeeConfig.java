@@ -282,8 +282,8 @@ public class ZeeConfig {
     public static boolean showGobPointer = Utils.getprefb("showGobPointer",false);
     public static boolean showGobRadar = Utils.getprefb("showGobRadar",false);
 
-    static boolean hideTreesPalisCrops = Utils.getprefb("hideTreesPalisCrops",false);
-    static Runnable hideTreesPalisCropsRunnable = () -> ZeeManagerGobClick.toggleModels();
+    static boolean hideGobs = Utils.getprefb("hideGobs",false);
+    static Runnable hideGobsRunnable = () -> ZeeManagerGobClick.toggleModels();
 
     public static boolean showGrowingTreeScale = Utils.getprefb("showGrowingTreeScale", true);
     static Runnable showGrowingTreeScaleRunnable = () -> ZeeManagerGobClick.toggleAllTreeGrowthTexts();
@@ -2357,12 +2357,14 @@ public class ZeeConfig {
         }
         // toggle hitbox, hidden gobs
         else if (ev.getKeyCode()==KeyEvent.VK_H){
+            // toggle models
             if(ev.isControlDown()) {
                 // variable toggled outside function because QuickOptions runnable
-                ZeeConfig.hideTreesPalisCrops = !ZeeConfig.hideTreesPalisCrops;
+                ZeeConfig.hideGobs = !ZeeConfig.hideGobs;
                 ZeeManagerGobClick.toggleModels();
                 return true;
             }
+            // toggle hitboxes
             else if (ev.isShiftDown()){
                 showHitbox = !showHitbox;
                 ZeeManagerGobClick.toggleHitbox();
@@ -2561,6 +2563,15 @@ public class ZeeConfig {
         ZeeManagerMiner.tilesMonitorCleanup();
         ZeeHistWdg.clearHistory();
         ZeeManagerGobClick.plowQueueReset();
+
+        if (ZeeManagerGobClick.winHideGobs!=null){
+            try{
+                ZeeManagerGobClick.winHideGobs.reqdestroy();
+                ZeeManagerGobClick.winHideGobs = null;
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+        }
 
         if(ZeeManagerFarmer.windowManager!=null){
             try {
@@ -3548,11 +3559,17 @@ public class ZeeConfig {
         if (isTree(gobName)) {
             gob.tags.add(Gob.Tag.TREE);
         }
+        else if(ZeeManagerGobClick.isGobWall(gobName)){
+            gob.tags.add(Gob.Tag.WALL);
+        }
         else if (isBush(gobName)){
             gob.tags.add(Gob.Tag.BUSH);
         }
         else if (isGobCrop(gobName)){
             gob.tags.add(Gob.Tag.CROP);
+        }
+        else if (ZeeManagerGobClick.isGobHouse(gobName)){
+            gob.tags.add(Gob.Tag.HOUSE);
         }
         else if (isBug(gobName)){
             gob.tags.add(Gob.Tag.BUG);

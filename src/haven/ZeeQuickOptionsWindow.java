@@ -76,7 +76,10 @@ public class ZeeQuickOptionsWindow {
                 };
                 newcb.settip("hold shift = no bump");
             }catch (Exception e){
-                ZeeConfig.println("config \""+listConfigLabel.get(i)[1]+"\" not found? ");
+                ZeeConfig.println("deleting missing config \""+listConfigLabel.get(i)[1]);
+                listConfigLabel.remove(i);
+                savePref();
+                newcb = null;
             }
 
             // checkbox couldn't be created, skip to next
