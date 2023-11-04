@@ -1354,7 +1354,8 @@ public class ZeeManagerStockpile extends ZeeThread{
                                 println("pilan blocks > pile full, player didnt move");
                                 break;
                             }
-                        } else {
+                        }
+                        else {
                             println("pilan blocks > couldnt get block from inv");
                             break;
                         }

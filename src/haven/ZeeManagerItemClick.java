@@ -1165,9 +1165,6 @@ public class ZeeManagerItemClick extends ZeeThread{
         return pickUpItem(wItem);
     }
     public static boolean pickUpItem(WItem wItem) {
-        if (wItem.item.contents==null){
-
-        }
         wItem.item.wdgmsg("take", new Coord(wItem.sz.x / 2, wItem.sz.y / 2));
         return waitHoldingItem();
     }
