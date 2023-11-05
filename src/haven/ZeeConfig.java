@@ -283,7 +283,7 @@ public class ZeeConfig {
     public static boolean showGobRadar = Utils.getprefb("showGobRadar",false);
 
     static boolean hideGobs = Utils.getprefb("hideGobs",false);
-    static Runnable hideGobsRunnable = () -> ZeeManagerGobClick.toggleModels();
+    static Runnable hideGobsRunnable = () -> ZeeManagerGobClick.toggleModelsAllGobs();
 
     public static boolean showGrowingTreeScale = Utils.getprefb("showGrowingTreeScale", true);
     static Runnable showGrowingTreeScaleRunnable = () -> ZeeManagerGobClick.toggleAllTreeGrowthTexts();
@@ -2361,7 +2361,7 @@ public class ZeeConfig {
             if(ev.isControlDown()) {
                 // variable toggled outside function because QuickOptions runnable
                 ZeeConfig.hideGobs = !ZeeConfig.hideGobs;
-                ZeeManagerGobClick.toggleModels();
+                ZeeManagerGobClick.toggleModelsAllGobs();
                 return true;
             }
             // toggle hitboxes
@@ -2616,18 +2616,13 @@ public class ZeeConfig {
     }
 
     static List<Gob> getAllGobs(){
-        try {
-            return ZeeConfig.gameUI.ui.sess.glob.oc.gobStream().filter(gob -> {
-                if (gob != null && !gob.virtual && gob.getres() != null) {
-                    return true;
-                } else {
-                    return false;
-                }
-            }).collect(Collectors.toList());
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-        return null;
+        return ZeeConfig.gameUI.ui.sess.glob.oc.gobStream().filter(gob -> {
+            if (gob != null && !gob.virtual && gob.getres() != null) {
+                return true;
+            } else {
+                return false;
+            }
+        }).collect(Collectors.toList());
     }
 
     // pattern must match whole gob name
@@ -3607,8 +3602,8 @@ public class ZeeConfig {
                 gob.tags.add(Gob.Tag.PLAYER_OTHER);
         }
         //tamed animals
-        if (ZeeManagerGobClick.isGobTamedAnimal(gobName)){
-            gob.tags.add(Gob.Tag.TAMED_ANIMAL);
+        if (ZeeManagerGobClick.isGobTamedAnimalOrAurochEtc(gobName)){
+            gob.tags.add(Gob.Tag.TAMED_ANIMAL_OR_AUROCH_ETC);
         }
     }
 

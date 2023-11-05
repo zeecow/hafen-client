@@ -1871,7 +1871,7 @@ public class ZeeManagerGobClick extends ZeeThread{
                 opts.add(ZeeFlowerMenu.STRPETAL_TILEMONITOR);
             menu = new ZeeFlowerMenu(gob, opts.toArray(String[]::new));
         }
-        else if (isGobTamedAnimal(gobName) && !isGobDeadOrKO(gob)) {
+        else if (isGobTamedAnimalOrAurochEtc(gobName) && !isGobDeadOrKO(gob)) {
             menu = new ZeeFlowerMenu(gob, ZeeFlowerMenu.STRPETAL_OPENCATTLEROSTER, ZeeFlowerMenu.STRPETAL_MEMORIZEAREANIMALS);
         }
         else if (isGobButchable(gobName) && isGobDeadOrKO(gob)) {
@@ -3009,7 +3009,7 @@ public class ZeeManagerGobClick extends ZeeThread{
         return ret;
     }
 
-    static boolean isGobTamedAnimal(String gobName){
+    static boolean isGobTamedAnimalOrAurochEtc(String gobName){
         return isGobInListEndsWith(
                 gobName,
                 "/stallion,/mare,/foal,/hog,/sow,/piglet,/billy,/nanny,/kid,/sheep,/lamb,/cattle,/calf"
@@ -3549,7 +3549,7 @@ public class ZeeManagerGobClick extends ZeeThread{
         }
     }
 
-    static void toggleModels() {
+    static void toggleModelsAllGobs() {
 
         // hide gob window
         showWinHideGobs();
@@ -3563,9 +3563,11 @@ public class ZeeManagerGobClick extends ZeeThread{
 
         ZeeQuickOptionsWindow.updateCheckboxNoBump("hideGobs",ZeeConfig.hideGobs);
 
-        // toggle gob models
-        List<Gob> gobs = ZeeConfig.getAllGobs();
-        for (Gob gob : gobs) {
+        toggleModelsInList(ZeeConfig.getAllGobs());
+    }
+
+    private static void toggleModelsInList(List<Gob> listGobs) {
+        for (Gob gob : listGobs) {
             gob.toggleModel();
         }
     }
@@ -3577,7 +3579,7 @@ public class ZeeManagerGobClick extends ZeeThread{
     static boolean hideGobHouses = Utils.getprefb("hideGobHouses",false);
     static boolean hideGobIdols = Utils.getprefb("hideGobIdols",false);
     static boolean hideGobTamedAnimals = Utils.getprefb("hideGobTamedAnimals",false);
-    static boolean hideGobSmokers = Utils.getprefb("hideGobSmokers",false);
+    static boolean hideGobSmokeProducers = Utils.getprefb("hideGobSmokers",false);
     static long winHideGobLastInteractionMs;
     private static Label winHideGobLabelClosing;
     private static void showWinHideGobs() {
@@ -3611,6 +3613,7 @@ public class ZeeManagerGobClick extends ZeeThread{
                 super.set(a);
                 Utils.setprefb("hideGobWalls", (hideGobWalls = a));
                 winHideGobLastInteractionMs = now();
+                toggleModelsInList(getGobsByTags(Gob.Tag.WALL));
             }
         }, 0,0);
         // crops
@@ -3620,6 +3623,7 @@ public class ZeeManagerGobClick extends ZeeThread{
                 super.set(a);
                 Utils.setprefb("hideGobCrops", (hideGobCrops = a));
                 winHideGobLastInteractionMs = now();
+                toggleModelsInList(getGobsByTags(Gob.Tag.CROP));
             }
         }, wdg.c.x+wdg.sz.x+xpad,0);
         // trees
@@ -3629,6 +3633,7 @@ public class ZeeManagerGobClick extends ZeeThread{
                 super.set(a);
                 ZeeManagerGobClick.hideGobTrees = a;
                 ZeeManagerGobClick.winHideGobLastInteractionMs = now();
+                toggleModelsInList(getGobsByTags(Gob.Tag.TREE));
             }
         }, wdg.c.x+wdg.sz.x+xpad,0);
 
@@ -3639,6 +3644,7 @@ public class ZeeManagerGobClick extends ZeeThread{
                 super.set(a);
                 Utils.setprefb("hideGobHouses", (hideGobHouses = a));
                 winHideGobLastInteractionMs = now();
+                toggleModelsInList(getGobsByTags(Gob.Tag.HOUSE));
             }
         },0,wdg.c.y+wdg.sz.y+ypad);
         // idols
@@ -3648,6 +3654,7 @@ public class ZeeManagerGobClick extends ZeeThread{
                 super.set(a);
                 Utils.setprefb("hideGobIdols", (hideGobIdols = a));
                 winHideGobLastInteractionMs = now();
+                toggleModelsInList(getGobsByTags(Gob.Tag.IDOL));
             }
         },wdg.c.x+wdg.sz.x+xpad,wdg.c.y);
         // tamed animals
@@ -3657,15 +3664,17 @@ public class ZeeManagerGobClick extends ZeeThread{
                 super.set(a);
                 Utils.setprefb("hideGobTamedAnimals", (hideGobTamedAnimals = a));
                 winHideGobLastInteractionMs = now();
+                toggleModelsInList(getGobsByTags(Gob.Tag.TAMED_ANIMAL_OR_AUROCH_ETC));
             }
         },wdg.c.x+wdg.sz.x+xpad,wdg.c.y);
         // smokers
         wdg = winHideGobs.add(new CheckBox("smokers"){
-            { a = hideGobSmokers;}
+            { a = hideGobSmokeProducers;}
             public void set(boolean a) {
                 super.set(a);
-                Utils.setprefb("hideGobSmokers", (hideGobSmokers = a));
+                Utils.setprefb("hideGobSmokers", (hideGobSmokeProducers = a));
                 winHideGobLastInteractionMs = now();
+                toggleModelsInList(getGobsByTags(Gob.Tag.SMOKE_PRODUCER));
             }
         },wdg.c.x+wdg.sz.x+xpad,wdg.c.y);
 
@@ -3707,6 +3716,18 @@ public class ZeeManagerGobClick extends ZeeThread{
         }.start();
     }
 
+    private static List<Gob> getGobsByTags(Gob.Tag ... tags) {
+        List<Gob> ret = ZeeConfig.getAllGobs();
+        ret.removeIf(gob1 -> {
+            for (Gob.Tag tag : tags) {
+                if (gob1.tags.contains(tag))
+                    return false;
+            }
+            return true;
+        });
+        return ret;
+    }
+
     static boolean isHideGob(Gob gob){
         if (ZeeConfig.hideGobs){
             if (gob.tags.contains(Gob.Tag.TREE) && hideGobTrees)
@@ -3717,11 +3738,11 @@ public class ZeeManagerGobClick extends ZeeThread{
                 return true;
             if (gob.tags.contains(Gob.Tag.HOUSE) && hideGobHouses)
                 return true;
-            if (gob.tags.contains(Gob.Tag.TAMED_ANIMAL) && hideGobTamedAnimals)
+            if (gob.tags.contains(Gob.Tag.TAMED_ANIMAL_OR_AUROCH_ETC) && hideGobTamedAnimals)
                 return true;
             if (gob.tags.contains(Gob.Tag.IDOL) && hideGobIdols)
                 return true;
-            if (gob.tags.contains(Gob.Tag.SMOKE_PRODUCER) && hideGobSmokers)
+            if (gob.tags.contains(Gob.Tag.SMOKE_PRODUCER) && hideGobSmokeProducers)
                 return true;
         }
         return false;

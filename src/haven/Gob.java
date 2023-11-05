@@ -999,7 +999,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 				!ZeeConfig.isGobCrop(gobName) &&
 				!ZeeManagerGobClick.isGobHouse(gobName) &&
 				!ZeeManagerGobClick.isGobSmokeProducer(gobName) &&
-				!ZeeManagerGobClick.isGobTamedAnimal(gobName) &&
+				!ZeeManagerGobClick.isGobTamedAnimalOrAurochEtc(gobName) &&
 				!ZeeManagerGobClick.isGobIdol(gobName)
 			){
 				return;
@@ -1080,7 +1080,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 		PLAYER, PLAYER_MAIN, PLAYER_OTHER,
 		POSE_KO,
 		BUSH, CROP, TREE,
-		BUG, BIRD, SMALL_ANIMAL, TAMED_ANIMAL,
+		BUG, BIRD, SMALL_ANIMAL, TAMED_ANIMAL_OR_AUROCH_ETC,
 		AGGRESSIVE,
 		VEHICLE, WALL, HOUSE,
 		IDOL, SMOKE_PRODUCER;
