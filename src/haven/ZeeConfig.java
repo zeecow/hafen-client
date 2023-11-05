@@ -2789,10 +2789,14 @@ public class ZeeConfig {
         if(gobs==null || gobs.size()==0 || refGob==null)
             return null;
         Gob closestGob = gobs.get(0);
-        double closestDist = distanceBetweenGobs(refGob,closestGob);
-        double dist;
+        Float closestDist = distanceBetweenGobs(refGob, closestGob);
+        if (closestDist==null)
+            return null;
+        Float dist;
         for (Gob g : gobs) {
             dist = distanceBetweenGobs(refGob,g);
+            if (dist==null)
+                continue;//return null?
             if (dist < closestDist) {
                 closestGob = g;
                 closestDist = dist;
@@ -2805,8 +2809,12 @@ public class ZeeConfig {
         return ZeeConfig.getPlayerGob().getc().dist(gob.getc());
     }
 
-    public static double distanceBetweenGobs(Gob gob1, Gob gob2) {
-        return gob1.getc().dist(gob2.getc());
+    public static Float distanceBetweenGobs(Gob gob1, Gob gob2) {
+        try {
+            return gob1.getc().dist(gob2.getc());
+        }catch (Defer.NotDoneException e){
+            return null;
+        }
     }
 
     public static int getPlantStage(Gob g){

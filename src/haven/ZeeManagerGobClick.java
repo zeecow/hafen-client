@@ -1655,7 +1655,12 @@ public class ZeeManagerGobClick extends ZeeThread{
             return;
         }
 
-        if (ZeeConfig.distanceBetweenGobs(well,barrel) > TILE_SIZE*3){
+        Float dist = ZeeConfig.distanceBetweenGobs(well,barrel);
+        if (dist==null){
+            ZeeConfig.msgError("getXpFromWell > gob not ready");
+            return;
+        }
+        if ( dist > TILE_SIZE*3){
             ZeeConfig.msgError("barrel too distant from well");
             return;
         }
