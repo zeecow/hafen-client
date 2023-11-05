@@ -1015,9 +1015,8 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 					ZeeConfig.gameUI.ui.sess.glob.loader.defer(() -> {
 						try{
 							RUtils.multirem(tmpSlots);
-						}
-						catch (Defer.NotDoneException ignored) {	}
-						catch (Exception e){
+						} catch (Defer.NotDoneException | RenderTree.SlotRemoved ignored) {
+						} catch (Exception e){
 							ZeeConfig.println("toggleModel hide > "+e.getClass().getName()+" , "+e.getMessage());
 						}
 					}, null);
