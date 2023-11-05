@@ -3439,23 +3439,33 @@ public class ZeeManagerGobClick extends ZeeThread{
     }
 
     static void brightnessMapLoad() {
-        Glob glob = ZeeConfig.gameUI.ui.sess.glob;
+        new ZeeThread(){
+            public void run() {
+                try {
+                    sleep(PING_MS);
 
-        // save player location
-        if (glob.blightamb.getRed() == ZeeConfig.DEF_LIGHT_CELLAR)
-            ZeeConfig.playerLocation = ZeeConfig.LOCATION_CELLAR;
-        else if (glob.blightamb.getRed() == ZeeConfig.DEF_LIGHT_CABIN)
-            ZeeConfig.playerLocation = ZeeConfig.LOCATION_CABIN;
-        else if (glob.blightamb.getRed() == ZeeConfig.DEF_LIGHT_UNDERGROUND)
-            ZeeConfig.playerLocation = ZeeConfig.LOCATION_UNDERGROUND;
-        else
-            ZeeConfig.playerLocation = ZeeConfig.LOCATION_OUTSIDE;
+                    Glob glob = ZeeConfig.gameUI.ui.sess.glob;
 
-        // restore saved brightness
-        int intColor = Utils.getprefi(getLightPrefName(),1);
-        if (intColor < 0) {
-            glob.blightamb = ZeeConfig.intToColor(intColor);
-        }
+                    // save player location
+                    if (glob.blightamb.getRed() == ZeeConfig.DEF_LIGHT_CELLAR)
+                        ZeeConfig.playerLocation = ZeeConfig.LOCATION_CELLAR;
+                    else if (glob.blightamb.getRed() == ZeeConfig.DEF_LIGHT_CABIN)
+                        ZeeConfig.playerLocation = ZeeConfig.LOCATION_CABIN;
+                    else if (glob.blightamb.getRed() == ZeeConfig.DEF_LIGHT_UNDERGROUND)
+                        ZeeConfig.playerLocation = ZeeConfig.LOCATION_UNDERGROUND;
+                    else
+                        ZeeConfig.playerLocation = ZeeConfig.LOCATION_OUTSIDE;
+
+                    // restore saved brightness
+                    int intColor = Utils.getprefi(getLightPrefName(),1);
+                    if (intColor < 0) {
+                        glob.blightamb = ZeeConfig.intToColor(intColor);
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }.start();
     }
 
     private static String getLightPrefName() {
