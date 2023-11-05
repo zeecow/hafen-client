@@ -1943,6 +1943,30 @@ public class ZeeManagerGobClick extends ZeeThread{
                 "Craft tubermash"
             );
         }
+        else if (gobName.endsWith("/ropewalk")) {
+            menu = new ZeeFlowerMenu( gob,"Craft rope" );
+        }
+        else if (gobName.endsWith("/swheel")) {
+            menu = new ZeeFlowerMenu( gob,
+                    ZeeFlowerMenu.STRPETAL_LIFTUPGOB,
+                    "Craft yarn"
+            );
+        }
+        else if (gobName.endsWith("/loom")) {
+            menu = new ZeeFlowerMenu( gob,
+                    ZeeFlowerMenu.STRPETAL_LIFTUPGOB,
+                    "Craft hempcloth",
+                    "Craft linencloth",
+                    "Craft woolcloth"
+            );
+        }
+        else if (gobName.endsWith("/quern")) {
+            menu = new ZeeFlowerMenu( gob,
+                    ZeeFlowerMenu.STRPETAL_LIFTUPGOB,
+                    "Craft flour",
+                    "Craft girst"
+            );
+        }
         else{
             showMenu = false;
             //println("showGobFlowerMenu() > unkown case");
