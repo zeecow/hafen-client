@@ -3552,7 +3552,7 @@ public class ZeeManagerGobClick extends ZeeThread{
     static void toggleModelsAllGobs() {
 
         // hide gob window
-        showWinHideGobs();
+        //showWinHideGobs(); //todo uncomment if fix concurrent expection
 
         if (ZeeConfig.hideGobs)
             ZeeConfig.msgLow("hide trees/pali/crops");
@@ -3736,14 +3736,15 @@ public class ZeeManagerGobClick extends ZeeThread{
                 return true;
             if (gob.tags.contains(Gob.Tag.CROP) && hideGobCrops)
                 return true;
-            if (gob.tags.contains(Gob.Tag.HOUSE) && hideGobHouses)
-                return true;
-            if (gob.tags.contains(Gob.Tag.TAMED_ANIMAL_OR_AUROCH_ETC) && hideGobTamedAnimals)
-                return true;
-            if (gob.tags.contains(Gob.Tag.IDOL) && hideGobIdols)
-                return true;
-            if (gob.tags.contains(Gob.Tag.SMOKE_PRODUCER) && hideGobSmokeProducers)
-                return true;
+            //todo uncomment if fix concurrent exception
+//            if (gob.tags.contains(Gob.Tag.HOUSE) && hideGobHouses)
+//                return true;
+//            if (gob.tags.contains(Gob.Tag.TAMED_ANIMAL_OR_AUROCH_ETC) && hideGobTamedAnimals)
+//                return true;
+//            if (gob.tags.contains(Gob.Tag.IDOL) && hideGobIdols)
+//                return true;
+//            if (gob.tags.contains(Gob.Tag.SMOKE_PRODUCER) && hideGobSmokeProducers)
+//                return true;
         }
         return false;
     }

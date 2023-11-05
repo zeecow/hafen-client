@@ -996,11 +996,12 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 
 			if( !ZeeConfig.isTree(gobName) &&
 				!ZeeManagerGobClick.isGobWall(gobName)  &&
-				!ZeeConfig.isGobCrop(gobName) &&
-				!ZeeManagerGobClick.isGobHouse(gobName) &&
-				!ZeeManagerGobClick.isGobSmokeProducer(gobName) &&
-				!ZeeManagerGobClick.isGobTamedAnimalOrAurochEtc(gobName) &&
-				!ZeeManagerGobClick.isGobIdol(gobName)
+				!ZeeConfig.isGobCrop(gobName)
+				//todo uncomment if fix concurrent exception
+//				!ZeeManagerGobClick.isGobHouse(gobName) &&
+//				!ZeeManagerGobClick.isGobSmokeProducer(gobName) &&
+//				!ZeeManagerGobClick.isGobTamedAnimalOrAurochEtc(gobName) &&
+//				!ZeeManagerGobClick.isGobIdol(gobName)
 			){
 				return;
 			}
