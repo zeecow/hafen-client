@@ -2796,7 +2796,7 @@ public class ZeeConfig {
         for (Gob g : gobs) {
             dist = distanceBetweenGobs(refGob,g);
             if (dist==null)
-                continue;//return null?
+                return null;//TODO contine instead?
             if (dist < closestDist) {
                 closestGob = g;
                 closestDist = dist;

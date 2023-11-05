@@ -2053,11 +2053,15 @@ public class ZeeManagerGobClick extends ZeeThread{
                 double backupAudio = Audio.volume;
                 ZeeConfig.addPlayerText("mounting");
                 try {
-                    //wait horse gob loading
-                    sleep(333);
 
-                    //find horse
-                    Gob closestHorse = ZeeConfig.getClosestGobToPlayer(ZeeConfig.findGobsByNameEndsWith("/mare", "/stallion"));
+                    // wait horse spawn a few seconds
+                    Gob closestHorse = null;
+                    int timeoutMs = 5000;
+                    while(closestHorse==null && timeoutMs > 0) {
+                        sleep(PING_MS);
+                        timeoutMs -= PING_MS;
+                        closestHorse = ZeeConfig.getClosestGobToPlayer(ZeeConfig.findGobsByNameEndsWith("/mare", "/stallion"));
+                    }
 
                     //mute volume (msg method doesnt work)
                     Audio.setvolume(0);
