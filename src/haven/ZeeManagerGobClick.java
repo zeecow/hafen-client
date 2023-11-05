@@ -3552,12 +3552,12 @@ public class ZeeManagerGobClick extends ZeeThread{
     static void toggleModelsAllGobs() {
 
         // hide gob window
-        //showWinHideGobs(); //todo uncomment if fix concurrent expection
+        showWinHideGobs();
 
         if (ZeeConfig.hideGobs)
-            ZeeConfig.msgLow("hide trees/pali/crops");
+            ZeeConfig.msgLow("hide gobs");
         else
-            ZeeConfig.msgLow("show trees/pali/crops");
+            ZeeConfig.msgLow("show gobs");
 
         Utils.setprefb("hideGobs", ZeeConfig.hideGobs);
 
@@ -3576,10 +3576,11 @@ public class ZeeManagerGobClick extends ZeeThread{
     static boolean hideGobWalls = Utils.getprefb("hideGobWalls",true);
     static boolean hideGobCrops = Utils.getprefb("hideGobCrops",true);
     static boolean hideGobTrees = Utils.getprefb("hideGobTrees",true);
-    static boolean hideGobHouses = Utils.getprefb("hideGobHouses",false);
-    static boolean hideGobIdols = Utils.getprefb("hideGobIdols",false);
-    static boolean hideGobTamedAnimals = Utils.getprefb("hideGobTamedAnimals",false);
-    static boolean hideGobSmokeProducers = Utils.getprefb("hideGobSmokers",false);
+    // todo uncomment when fix
+//    static boolean hideGobHouses = Utils.getprefb("hideGobHouses",false);
+//    static boolean hideGobIdols = Utils.getprefb("hideGobIdols",false);
+//    static boolean hideGobTamedAnimals = Utils.getprefb("hideGobTamedAnimals",false);
+//    static boolean hideGobSmokeProducers = Utils.getprefb("hideGobSmokers",false);
     static long winHideGobLastInteractionMs;
     private static Label winHideGobLabelClosing;
     private static void showWinHideGobs() {
@@ -3637,46 +3638,47 @@ public class ZeeManagerGobClick extends ZeeThread{
             }
         }, wdg.c.x+wdg.sz.x+xpad,0);
 
+        // todo uncomment when fix
         // houses
-        wdg = winHideGobs.add(new CheckBox("houses"){
-            { a = hideGobHouses;}
-            public void set(boolean a) {
-                super.set(a);
-                Utils.setprefb("hideGobHouses", (hideGobHouses = a));
-                winHideGobLastInteractionMs = now();
-                toggleModelsInList(getGobsByTags(Gob.Tag.HOUSE));
-            }
-        },0,wdg.c.y+wdg.sz.y+ypad);
-        // idols
-        wdg = winHideGobs.add(new CheckBox("idols"){
-            { a = hideGobIdols;}
-            public void set(boolean a) {
-                super.set(a);
-                Utils.setprefb("hideGobIdols", (hideGobIdols = a));
-                winHideGobLastInteractionMs = now();
-                toggleModelsInList(getGobsByTags(Gob.Tag.IDOL));
-            }
-        },wdg.c.x+wdg.sz.x+xpad,wdg.c.y);
-        // tamed animals
-        wdg = winHideGobs.add(new CheckBox("tamed"){
-            { a = hideGobTamedAnimals;}
-            public void set(boolean a) {
-                super.set(a);
-                Utils.setprefb("hideGobTamedAnimals", (hideGobTamedAnimals = a));
-                winHideGobLastInteractionMs = now();
-                toggleModelsInList(getGobsByTags(Gob.Tag.TAMED_ANIMAL_OR_AUROCH_ETC));
-            }
-        },wdg.c.x+wdg.sz.x+xpad,wdg.c.y);
-        // smokers
-        wdg = winHideGobs.add(new CheckBox("smokers"){
-            { a = hideGobSmokeProducers;}
-            public void set(boolean a) {
-                super.set(a);
-                Utils.setprefb("hideGobSmokers", (hideGobSmokeProducers = a));
-                winHideGobLastInteractionMs = now();
-                toggleModelsInList(getGobsByTags(Gob.Tag.SMOKE_PRODUCER));
-            }
-        },wdg.c.x+wdg.sz.x+xpad,wdg.c.y);
+//        wdg = winHideGobs.add(new CheckBox("houses"){
+//            { a = hideGobHouses;}
+//            public void set(boolean a) {
+//                super.set(a);
+//                Utils.setprefb("hideGobHouses", (hideGobHouses = a));
+//                winHideGobLastInteractionMs = now();
+//                toggleModelsInList(getGobsByTags(Gob.Tag.HOUSE));
+//            }
+//        },0,wdg.c.y+wdg.sz.y+ypad);
+//        // idols
+//        wdg = winHideGobs.add(new CheckBox("idols"){
+//            { a = hideGobIdols;}
+//            public void set(boolean a) {
+//                super.set(a);
+//                Utils.setprefb("hideGobIdols", (hideGobIdols = a));
+//                winHideGobLastInteractionMs = now();
+//                toggleModelsInList(getGobsByTags(Gob.Tag.IDOL));
+//            }
+//        },wdg.c.x+wdg.sz.x+xpad,wdg.c.y);
+//        // tamed animals
+//        wdg = winHideGobs.add(new CheckBox("tamed"){
+//            { a = hideGobTamedAnimals;}
+//            public void set(boolean a) {
+//                super.set(a);
+//                Utils.setprefb("hideGobTamedAnimals", (hideGobTamedAnimals = a));
+//                winHideGobLastInteractionMs = now();
+//                toggleModelsInList(getGobsByTags(Gob.Tag.TAMED_ANIMAL_OR_AUROCH_ETC));
+//            }
+//        },wdg.c.x+wdg.sz.x+xpad,wdg.c.y);
+//        // smokers
+//        wdg = winHideGobs.add(new CheckBox("smokers"){
+//            { a = hideGobSmokeProducers;}
+//            public void set(boolean a) {
+//                super.set(a);
+//                Utils.setprefb("hideGobSmokers", (hideGobSmokeProducers = a));
+//                winHideGobLastInteractionMs = now();
+//                toggleModelsInList(getGobsByTags(Gob.Tag.SMOKE_PRODUCER));
+//            }
+//        },wdg.c.x+wdg.sz.x+xpad,wdg.c.y);
 
         // label countdown auto close
         winHideGobLabelClosing = winHideGobs.add(new Label(""),0,wdg.c.y+wdg.sz.y+ypad);
