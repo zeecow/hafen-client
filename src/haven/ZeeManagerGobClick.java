@@ -1564,29 +1564,34 @@ public class ZeeManagerGobClick extends ZeeThread{
         {
             destroyTreelogs(gob,petalName);
         }
-        else if(petalName.contentEquals(ZeeFlowerMenu.STRPETAL_BUILD_PYRE)){
-            ZeeConfig.gameUI.menu.wdgmsg("act","bp","bpyre",0);
-        }
-        else if(petalName.contentEquals(ZeeFlowerMenu.STRPETAL_CRAFT_FIREBRAND)){
-            ZeeConfig.gameUI.menu.wdgmsg("act","craft","firebrand",0);
-        }
-        else if(petalName.contentEquals(ZeeFlowerMenu.STRPETAL_CRAFT_PYRITE)){
-            ZeeConfig.gameUI.menu.wdgmsg("act","craft","pyritespark",0);
-        }
         else if(petalName.contentEquals("wave")){
             ZeeConfig.gameUI.menu.wdgmsg("act","pose","wave",0);
         }
         else if(petalName.contentEquals("laugh")){
             ZeeConfig.gameUI.menu.wdgmsg("act","pose","lol",0);
         }
-        else if(petalName.contentEquals("smelt nuggets")){
-            ZeeConfig.gameUI.menu.wdgmsg("act","craft","nuggify",0);
-        }
-        else if(petalName.contentEquals("smelt bar")){
-            ZeeConfig.gameUI.menu.wdgmsg("act","craft","denuggify",0);
-        }
         else if(petalName.contentEquals("get XP from well")){
             getXpFromWell(gob);
+        }
+        // generic "Build [argName]"
+        else if(petalName.startsWith("Build ")){
+            String[] arr = petalName.split(" ");
+            if (arr==null)
+                println("context menu > build > arr null");
+            else if (arr.length < 2)
+                println("context menu > build >  arr length too short");
+            else
+                ZeeConfig.gameUI.menu.wdgmsg("act","bp",arr[1],0);
+        }
+        // generic "Craft [argName]"
+        else if(petalName.startsWith("Craft ")){
+            String[] arr = petalName.split(" ");
+            if (arr==null)
+                println("context menu > craft > arr null");
+            else if (arr.length < 2)
+                println("context menu > craft > arr length too short");
+            else
+                ZeeConfig.gameUI.menu.wdgmsg("act","craft",arr[1],0);
         }
         else{
             println("chooseGobFlowerMenu > unkown case");
@@ -1908,20 +1913,30 @@ public class ZeeManagerGobClick extends ZeeThread{
                 ZeeFlowerMenu.STRPETAL_DESTROYALL
             );
         }
+        else if (gobName.endsWith("/well")) {
+            menu = new ZeeFlowerMenu( gob, "get XP from well");
+        }
         else if (gobName.endsWith("/wildbeehive")) {
-            menu = new ZeeFlowerMenu( gob, ZeeFlowerMenu.STRPETAL_BUILD_PYRE);
+            menu = new ZeeFlowerMenu( gob, "Build bpyre");
         }
         else if (isGobFireTarget(gob)) {
             menu = new ZeeFlowerMenu( gob,
-                ZeeFlowerMenu.STRPETAL_CRAFT_FIREBRAND,
-                ZeeFlowerMenu.STRPETAL_CRAFT_PYRITE
+                "Craft firebrand",
+                "Craft pyritespark"
             );
         }
         else if(gobName.endsWith("terobjs/crucible")){
-            menu = new ZeeFlowerMenu(gob,"smelt nuggets","smelt bar");
+            menu = new ZeeFlowerMenu(gob,
+                "Craft nuggify",
+                "Craft denuggify"
+            );
         }
-        else if (gobName.endsWith("/well")) {
-            menu = new ZeeFlowerMenu( gob, "get XP from well");
+        else if (gobName.endsWith("/churn")) {
+            menu = new ZeeFlowerMenu( gob,
+                ZeeFlowerMenu.STRPETAL_LIFTUPGOB,
+                "Craft butter",
+                "Craft tubermash"
+            );
         }
         else{
             showMenu = false;

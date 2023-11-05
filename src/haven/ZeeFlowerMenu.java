@@ -2,9 +2,6 @@ package haven;
 
 public class ZeeFlowerMenu extends FlowerMenu{
 
-    static final String STRPETAL_CRAFT_FIREBRAND = "Craft firebrand";
-    static final String STRPETAL_CRAFT_PYRITE = "Craft pyrite spark";
-    static final String STRPETAL_BUILD_PYRE = "Build pyre";
     static final String STRPETAL_ADD12COAL = "Add 12 coal";
     static final String STRPETAL_ADD9COAL = "Add 9 coal";
     static final String STRPETAL_ADD4BRANCH = "Add 4 branch";
@@ -38,10 +35,6 @@ public class ZeeFlowerMenu extends FlowerMenu{
     private final Gob gob;
     private final WItem wItem;
     private final Coord2d coordMc;
-
-    /*
-    haven.FlowerMenu@367eed1e ; cl ; [0, 0]
-     */
 
     public ZeeFlowerMenu(Gob gob, String ... opts) {
         super(opts);
