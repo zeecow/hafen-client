@@ -204,6 +204,7 @@ public class ZeeConfig {
     static String butcherAutoList = Utils.getpref("butcherAutoList", DEF_LIST_BUTCH_AUTO);
     static boolean cattleRosterHeight = Utils.getprefb("cattleRosterHeight", true);
     static double cattleRosterHeightPercentage = Utils.getprefd("cattleRosterHeightPercentage", 1.0);
+    static boolean confirmPetalEatReduceFoodEff = Utils.getprefb("confirmPetalEatReduceFoodEff", true);
     static boolean confirmPetal = Utils.getprefb("confirmPetal", true);
     static String confirmPetalList = Utils.getpref("confirmPetalList", DEF_LIST_CONFIRM_PETAL);
     public static boolean confirmThrowingAxeOrSpear = Utils.getprefb("confirmThrowingAxeOrSpear", true);
@@ -4009,12 +4010,24 @@ public class ZeeConfig {
     }
 
     public static boolean isPetalConfirmed(String name) {
+
+        // confirm petal Eat, to preserve Food Efficacy
+        if (confirmPetalEatReduceFoodEff && name.contentEquals("Eat")){
+            if (getMeterEnergy() >= 80){
+                if (!gameUI.ui.modctrl) {
+                    ZeeConfig.msgError("Ctrl+click to confirm reducing Food Efficacy");
+                    return false;
+                }
+            }
+        }
+
+        // confirm petal list
         if (confirmPetal) {
             String[] list = confirmPetalList.split(",");
             for (int i = 0; i < list.length; i++) {
                 if (name.contentEquals(list[i])) {
                     if (!gameUI.ui.modctrl) {
-                        ZeeConfig.msgError("Ctrl+click to confirm "+list[i]);
+                        ZeeConfig.msgError("Ctrl+click to confirm " + list[i]);
                         return false;
                     }
                 }
