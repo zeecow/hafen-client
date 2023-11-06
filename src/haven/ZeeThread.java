@@ -19,9 +19,9 @@ public class ZeeThread  extends Thread{
                 double lastStam;
                 try {
                     while (true) {
-                        lastStam = ZeeConfig.getStamina();
+                        lastStam = ZeeConfig.getMeterStamina();
                         sleep(1000);
-                        stamChangeSec = ZeeConfig.getStamina() - lastStam ;
+                        stamChangeSec = ZeeConfig.getMeterStamina() - lastStam ;
                         //println("stam/sec  "+stamChangeSec+"    lastStam "+lastStam);
                     }
                 }catch (InterruptedException ie){
@@ -793,7 +793,7 @@ public class ZeeThread  extends Thread{
         long timeoutMs = playerIdleMs;
         double lastStam, stam, absChange;
         try {
-            stam = lastStam = ZeeConfig.getStamina();
+            stam = lastStam = ZeeConfig.getMeterStamina();
             while(timeoutMs > 0) {
                 absChange = Math.abs(lastStam - stam);
                 //println(""+absChange);
@@ -803,7 +803,7 @@ public class ZeeThread  extends Thread{
                     timeoutMs -= threadSleepMs;
                 Thread.sleep(threadSleepMs);
                 lastStam = stam;
-                stam = ZeeConfig.getStamina();
+                stam = ZeeConfig.getMeterStamina();
             }
         } catch (InterruptedException e) {
             e.printStackTrace();
@@ -816,7 +816,7 @@ public class ZeeThread  extends Thread{
         long timeoutMs = idleMs;
         double lastStam, stam;
         try {
-            stam = lastStam = ZeeConfig.getStamina();
+            stam = lastStam = ZeeConfig.getMeterStamina();
             while(timeoutMs > 0) {
                 if(Math.abs(lastStam - stam) > 1) // if stamina changed...
                     timeoutMs = idleMs; // ...restore timeout
@@ -824,7 +824,7 @@ public class ZeeThread  extends Thread{
                     timeoutMs -= PING_MS;
                 Thread.sleep(PING_MS);
                 lastStam = stam;
-                stam = ZeeConfig.getStamina();
+                stam = ZeeConfig.getMeterStamina();
             }
         } catch (InterruptedException e) {
             e.printStackTrace();

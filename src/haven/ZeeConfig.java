@@ -2846,8 +2846,14 @@ public class ZeeConfig {
     }
 
     // Returns 0-100
-    public static double getStamina() {
+    public static double getMeterStamina() {
         return (100 * gameUI.getmeter("stam", 0).a);
+    }
+    public static double getMeterHp() {
+        return (100 * gameUI.getmeter("hp", 0).a);
+    }
+    public static double getMeterEnergy() {
+        return (100 * gameUI.getmeter("nrj", 0).a);
     }
 
     public static boolean isPlayerMoving() {
@@ -4416,7 +4422,7 @@ public class ZeeConfig {
     }
 
     static void checkCharWndAttrs(Object ... args){
-        println(strArgs(args));
+        //println(strArgs(args));
         updMakewindowStats();
     }
 

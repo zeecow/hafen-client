@@ -879,6 +879,7 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Message
 	} else if(place == "party") {
 	    add(child, portrait.pos("bl").adds(0, 10));
 	} else if(place == "meter") {
+		ZeeConfig.println(ZeeConfig.strArgs(args));
 	    int x = (meters.size() % 3) * (IMeter.fsz.x + UI.scale(5));
 	    int y = (meters.size() / 3) * (IMeter.fsz.y + UI.scale(2));
 	    ulpanel.add(child, portrait.c.x + portrait.sz.x + UI.scale(10) + x, portrait.c.y + y);

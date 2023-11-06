@@ -252,7 +252,7 @@ public class ZeeManagerGobClick extends ZeeThread{
                                 ZeeConfig.clickCoord(nextCoord.floor(posres),1);
                                 prepareCancelClick();
                                 //drink
-                                if (ZeeConfig.getStamina() < 100) {
+                                if (ZeeConfig.getMeterStamina() < 100) {
                                     ZeeManagerItemClick.drinkFromBeltHandsInv();
                                 }
                                 ZeeConfig.addPlayerText("plow q "+ plowQueueCoords.size());
@@ -2542,7 +2542,7 @@ public class ZeeManagerGobClick extends ZeeThread{
 
         //drop bucket if present
         if (ZeeManagerItemClick.isItemEquipped("bucket")) {
-            if (ZeeConfig.getStamina() < 100) {
+            if (ZeeConfig.getMeterStamina() < 100) {
                 ZeeManagerItemClick.drinkFromBeltHandsInv();
                 sleep(PING_MS*2);
                 waitNotPlayerPose(ZeeConfig.POSE_PLAYER_DRINK);
