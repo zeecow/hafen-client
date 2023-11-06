@@ -2205,7 +2205,7 @@ public class CharWnd extends Window {
 		int comp = (Integer)args[a++];
 		ui.sess.glob.cattr(attr, base, comp);
 	    }
-		ZeeConfig.updMakewindowStats();
+		ZeeConfig.checkCharWndAttrs(args);
 	} else if(nm == "exp") {
 	    exp = ((Number)args[0]).intValue();
 	}else if(nm == "enc") {

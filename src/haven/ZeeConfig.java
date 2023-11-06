@@ -4415,6 +4415,11 @@ public class ZeeConfig {
         }
     }
 
+    static void checkCharWndAttrs(Object ... args){
+        println(strArgs(args));
+        updMakewindowStats();
+    }
+
     public static void updMakewindowStats() {
         if (ZeeConfig.makeWindow==null)
             return;
