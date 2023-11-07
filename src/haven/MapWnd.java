@@ -110,11 +110,7 @@ public class MapWnd extends Window implements Console.Directory {
 		}
 	}, Coord.of(0,3));
 	toolbar.add(new ICheckBox("gfx/hud/mmap/mark", "", "-d", "-h", "-dh"))
-	    .state(() -> domark)
-		.set(a -> {
-			domark = a;
-			ZeeManagerIcons.minimapNewMarkZoom(true);
-		})
+		.state(() -> domark).set(a -> domark = a)
 	    .settip("Add marker").setgkey(kb_mark);
 	toolbar.add(new ICheckBox("gfx/hud/mmap/hmark", "", "-d", "-h", "-dh"))
 	    .state(() -> Utils.eq(markcfg, MarkerConfig.hideall)).click(() -> {
@@ -339,7 +335,6 @@ public class MapWnd extends Window implements Console.Directory {
 		file.add(nm);
 		focus(nm);
 		domark = false;
-		ZeeManagerIcons.minimapNewMarkZoom(false);
 		return(true);
 	    }
 	    if(!press && (sessloc != null) && (loc.seg == sessloc.seg)) {
@@ -352,7 +347,6 @@ public class MapWnd extends Window implements Console.Directory {
 	public boolean mousedown(Coord c, int button) {
 	    if(domark && (button == 3)) {
 		domark = false;
-		ZeeManagerIcons.minimapNewMarkZoom(false);
 		return(true);
 	    }
 	    super.mousedown(c, button);

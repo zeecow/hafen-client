@@ -290,13 +290,6 @@ public class ZeeManagerIcons {
         gobs.clear();
     }
 
-    public static void minimapNewMarkZoom(boolean zoom) {
-        if (zoom)
-            MiniMap.scale = 3; // zoom in for precision
-        else
-            MiniMap.scale = ZeeConfig.minimapScale; // restore default zoom (canceled new mark)
-    }
-
     static class ShapeIconsOptPanel extends JPanel{
 
         static JComboBox comboAllRules, nameCombo, shapeCombo;
