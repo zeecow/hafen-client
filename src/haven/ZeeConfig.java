@@ -3534,7 +3534,7 @@ public class ZeeConfig {
                 }
             }
             // mine ladder radius
-            else if(ob.tags.contains(Gob.Tag.MINE_SUPPORT)) {
+            else if(ob.getres().name.endsWith("terobjs/ladder")) {
                 toggleMineLadderRadius(ob);
             }
 
