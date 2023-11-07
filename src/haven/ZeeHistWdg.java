@@ -5,6 +5,7 @@ import java.util.Collections;
 
 public class ZeeHistWdg extends Widget{
 
+    public static boolean ignoreNextMenuMsg;
     static ArrayList<String> arrNames = new ArrayList<>();
     static ArrayList<MenuGrid.PagButton> arrBtns = new ArrayList<MenuGrid.PagButton>();
     final static int maxHist = 10;

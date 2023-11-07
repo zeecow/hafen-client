@@ -4495,4 +4495,17 @@ public class ZeeConfig {
             }
         }
     }
+
+    static MenuGrid.PagButton getMenuButton(String wdgmsgArgName) {
+        synchronized (gameUI.menu.paginae) {
+            for (MenuGrid.Pagina pagina : gameUI.menu.paginae) {
+                String buttonName = pagina.res().basename();
+                if (buttonName.contentEquals(wdgmsgArgName)) {
+                    //ZeeConfig.println("found button for " + recipeName);
+                    return pagina.button();
+                }
+            }
+        }
+        return null;
+    }
 }

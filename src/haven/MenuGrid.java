@@ -114,6 +114,7 @@ public class MenuGrid extends Widget implements KeyBinding.Bindable {
 		if(iact.click != null)
 		    args = Utils.extend(args, iact.click.clickargs());
 	    }
+		ZeeHistWdg.ignoreNextMenuMsg = true;
 	    pag.scm.wdgmsg("act", args);
 		ZeeHistWdg.checkMenuHistory(this,args);
 	}
@@ -613,6 +614,7 @@ public class MenuGrid extends Widget implements KeyBinding.Bindable {
 
 	@Override
 	public void wdgmsg(String msg, Object... args) {
+
 		if (ZeeConfig.confirmThrowingAxeOrSpear) {
 			if (msg.contentEquals("act") && ZeeConfig.strArgs(args).startsWith("[shoot")) {
 				//check belt before item is equipped
@@ -631,6 +633,30 @@ public class MenuGrid extends Widget implements KeyBinding.Bindable {
 				}
 			}
 		}
+
+		// let Menu.use() add to history
+		if (ZeeHistWdg.ignoreNextMenuMsg){
+			ZeeConfig.println("ignoring > "+msg+" "+ZeeConfig.strArgs(args));
+			super.wdgmsg(msg, args);
+			ZeeHistWdg.ignoreNextMenuMsg = false;
+			return;
+		}
+		// find button and add manually to history
+		else if (args!=null && args.length>0) {
+			String arg0 = (String) args[0];
+			final List<String> skipList = List.of("itemcomb", "tracking");
+			if (!skipList.contains(arg0) && arg0.contentEquals("craft")) {
+				ZeeConfig.println("adding manually > "+msg+" "+ZeeConfig.strArgs(args));
+				// wdgmsg arg name
+				String recipeName = (String) args[1];
+				// find menugrid button
+				PagButton pagButton = ZeeConfig.getMenuButton(recipeName);
+				if (pagButton!=null) {
+					ZeeHistWdg.checkMenuHistory(pagButton, args);
+				}
+			}
+		}
+
 		super.wdgmsg(msg, args);
 	}
 }
