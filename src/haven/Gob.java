@@ -1087,6 +1087,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 		BUG, BIRD, SMALL_ANIMAL, TAMED_ANIMAL_OR_AUROCH_ETC,
 		AGGRESSIVE,
 		VEHICLE, WALL, HOUSE,
-		IDOL, SMOKE_PRODUCER;
+		IDOL, SMOKE_PRODUCER,
+		MINE_SUPPORT;
 	}
 }

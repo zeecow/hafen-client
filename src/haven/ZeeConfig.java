@@ -2033,31 +2033,47 @@ public class ZeeConfig {
         gameUI.ulpanel.getchild(Speedget.class).set(spd);
     }
 
+
+    static boolean showMineSupport = false;
     public static void toggleMineSupport() {
 
+        showMineSupport = !showMineSupport;
+
         // toggle mine support radius
+        // TODO replace with wdgmsg
         if (classMSRad!=null) {
             try {
                 Field field = classMSRad.getDeclaredField("show");
                 Method method = classMSRad.getMethod("show", boolean.class);
                 //field.setBoolean(classMSRad, !field.getBoolean(classMSRad));
-                method.invoke(classMSRad, !field.getBoolean(classMSRad));
+                //method.invoke(classMSRad, !field.getBoolean(classMSRad));
+                method.invoke(classMSRad, showMineSupport);
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
 
-        // toggle mine ladder radius
+
         List<Gob> ladders = findGobsByNameEndsWith("terobjs/ladder");
-        if (!ladders.isEmpty()){
+        if (!ladders.isEmpty()) {
             for (Gob ladder : ladders) {
-                Gob.Overlay radius = ladder.findol(ZeeGobRadius.class);
-                if (radius!=null){
-                    radius.remove();
-                }else{
-                    ladder.addol(new Gob.Overlay(ladder, new ZeeGobRadius(ladder, null, ZeeGobRadius.RADIUS_MINE_LADDER_SUPPORT,new Color(139, 139, 185, 48)), -1));
-                }
+                toggleMineLadderRadius(ladder);
             }
+        }
+    }
+
+    static void toggleMineLadderRadius(Gob ladder) {
+        //remove ladder radius
+        if (!showMineSupport){
+            Gob.Overlay radius = ladder.findol(ZeeGobRadius.class);
+            if (radius==null)
+                println("ladder radius not found");
+            else
+                radius.remove();
+        }
+        //add ladder radius
+        else {
+            ladder.addol(new Gob.Overlay(ladder, new ZeeGobRadius(ladder, null, ZeeGobRadius.RADIUS_MINE_LADDER_SUPPORT,new Color(139, 139, 185, 48)), -1));
         }
     }
 
@@ -3517,8 +3533,12 @@ public class ZeeConfig {
                         ob.addol(ZeeGobPointer.gobRadar = new ZeeGobRadar(ob, Coord3f.of(10, 10, 5), new Color(240, 0, 253, 90)));
                 }
             }
+            // mine ladder radius
+            else if(ob.tags.contains(Gob.Tag.MINE_SUPPORT)) {
+                toggleMineLadderRadius(ob);
+            }
 
-            // ignore bat if using batcape
+            // apply settings audio/aggro  (ignore bat if using batcape)
             if (!ob.getres().name.contentEquals("gfx/kritter/bat/bat") || !ZeeManagerItemClick.isItemEquipped("/batcape")) {
 
                 // audio alerts
@@ -3603,6 +3623,9 @@ public class ZeeConfig {
         }
         if(ZeeManagerGobClick.isGobIdol(gobName)){
             gob.tags.add(Gob.Tag.IDOL);
+        }
+        if(ZeeManagerGobClick.isGobMineSupport(gobName) || gobName.endsWith("/ladder")){
+            gob.tags.add(Gob.Tag.MINE_SUPPORT);
         }
     }
 
