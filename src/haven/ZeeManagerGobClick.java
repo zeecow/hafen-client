@@ -3247,6 +3247,9 @@ public class ZeeManagerGobClick extends ZeeThread{
             //remove leafpile
             if ( name.contentEquals("gfx/terobjs/herbs/leafpile") )
                 return true;
+            //remove wildbeehive
+            if ( name.endsWith("/wildbeehive") )
+                return true;
             //remove all else
             return true;
         });
