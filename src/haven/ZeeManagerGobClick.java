@@ -122,13 +122,18 @@ public class ZeeManagerGobClick extends ZeeThread{
             else if (ZeeConfig.isPlayerHoldingItem()) {
                 clickedGobHoldingItem(gob,gobName);
             }
-            // harvest one trellis
+            // harvest one trellis withouth scythe
             else if (isGobTrellisPlant(gobName)) {
                 new ZeeThread() {
                     public void run() {
-                        harvestOneTrellis(gob);
+                        harvestOneTrellisWithoutScythe(gob);
                     }
                 }.start();
+            }
+            // activate harvest area if non-trellis crop
+            else if (isGobCrop(gobName)){
+                if (!ZeeConfig.getCursorName().equals(ZeeConfig.CURSOR_HARVEST))
+                    gobClick(gob, 3, UI.MOD_SHIFT);
             }
             // pick up all ground items (except when placing stockpile)
             else if (isGobGroundItem(gobName)) {
@@ -2702,14 +2707,18 @@ public class ZeeManagerGobClick extends ZeeThread{
         return false;
     }
 
-    private static void harvestOneTrellis(Gob gob) {
+    private static void harvestOneTrellisWithoutScythe(Gob gob) {
+        //hold scythe for user unequip it
         if(ZeeManagerItemClick.pickupBeltItem("scythe")){
-            //hold scythe for user unequip it
-        }else if(ZeeManagerItemClick.getLeftHandName().endsWith("scythe")){
-            //hold scythe for user unequip it
+
+        }
+        //hold scythe for user unequip it
+        else if(ZeeManagerItemClick.getLeftHandName().endsWith("scythe")){
             ZeeManagerItemClick.unequipLeftItem();
-        }else{
-            //no scythe around, just harvest
+        }
+        //no scythe, just harvest
+        // TODO test harvest while holding scythe in vhand
+        else{
             clickGobPetal(gob,"Harvest");
         }
     }

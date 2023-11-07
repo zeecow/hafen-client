@@ -29,7 +29,7 @@ Controls
 
 
 
-Midclick interactions (probabaly incomplete)
+Midclick interactions (incomplete)
 -------------------------------------------
 
 Midclick Ground
@@ -68,6 +68,7 @@ Midclick Ground Object
 - midclick smelter holding bucket to collect all quicksilver
 - midclick stockpile while making block/board/sand will pile inv items and try acquire more
 - midclick animal holding clover to follow and feed it when close enough
+- midclick crop activate area harvest 
 
 Long Midclick Ground Object
 - show context menu for various objs (details below)
