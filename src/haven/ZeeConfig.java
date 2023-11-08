@@ -715,13 +715,15 @@ public class ZeeConfig {
             "gfx/kritter/pig/",
             //misc
             "gfx/kritter/midgeswarm/",
-            "gfx/kritter/ants/"
+            "gfx/kritter/ants/",
+            "gfx/kritter/wildbeehive"
         };
         for (int i = 0; i < list.length; i++) {
             if(resname.contains(list[i]))
                 return true;
         }
 
+        // kritters pickable when KO only
         final List<String> listKO = List.of(
                 "gfx/kritter/bat/bat",
                 "gfx/kritter/stoat/stoat"
@@ -730,6 +732,12 @@ public class ZeeConfig {
             if (resname.contentEquals(kri) && !ZeeManagerGobClick.isGobDeadOrKO(kritter)){
                 return true;
             }
+        }
+
+        // giant toad questgivers not pickable
+        if ( resname.endsWith("/toad") ) {
+            if (ZeeManagerGobClick.getGAttrNames(kritter).contains("ObScale"))
+                return true;
         }
 
         return false;

@@ -3248,16 +3248,14 @@ public class ZeeManagerGobClick extends ZeeThread{
                 return false;
             // kritters
             if ( name.contains("/kritter/")) {
+                // remove non pickable kritter
                 if ( ZeeConfig.isKritterNotPickable(gob1) )
-                    return true; // remove non pickable kritter
+                    return true;
                 else
                     return false;
             }
             //remove leafpile
             if ( name.contentEquals("gfx/terobjs/herbs/leafpile") )
-                return true;
-            //remove wildbeehive
-            if ( name.endsWith("/wildbeehive") )
                 return true;
             //remove all else
             return true;
