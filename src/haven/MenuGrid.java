@@ -636,9 +636,9 @@ public class MenuGrid extends Widget implements KeyBinding.Bindable {
 
 		// let Menu.use() add to history
 		if (ZeeHistWdg.ignoreNextMenuMsg){
-			ZeeConfig.println("ignoring > "+msg+" "+ZeeConfig.strArgs(args));
-			super.wdgmsg(msg, args);
 			ZeeHistWdg.ignoreNextMenuMsg = false;
+			//ZeeConfig.println("ignoring > "+msg+" "+ZeeConfig.strArgs(args));
+			super.wdgmsg(msg, args);
 			return;
 		}
 		// find button and add manually to history
@@ -652,6 +652,7 @@ public class MenuGrid extends Widget implements KeyBinding.Bindable {
 				// find menugrid button
 				PagButton pagButton = ZeeConfig.getMenuButton(recipeName);
 				if (pagButton!=null) {
+					//pagButton.pag.scm.wdgmsg("act", args);
 					ZeeHistWdg.checkMenuHistory(pagButton, args);
 				}
 			}

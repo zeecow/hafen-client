@@ -15,6 +15,10 @@ public class ZeeHistWdg extends Widget{
         super( Coord.of( (MenuGrid.bgsz.x+ xpad) * maxHist, MenuGrid.bgsz.y ) );
     }
 
+    static void println(String msg){
+        ZeeConfig.println(msg);
+    }
+
     static void checkMenuHistory(MenuGrid.PagButton pagButton, Object[] args) {
         //button already in history
         if (arrNames.contains(pagButton.name())){
@@ -62,13 +66,15 @@ public class ZeeHistWdg extends Widget{
         if (button != 1)
             return false;
         int ibtn = buttonIndex(c);
-        if (ibtn < 0)
+        if (ibtn < 0) {
             return false;
+        }
         MenuGrid.PagButton btn = arrBtns.get(ibtn);
         if(btn != null) {
             // from PagButton.use()
             Object[] args = Utils.extend(new Object[0], btn.res.flayer(Resource.action).ad);
             args = Utils.extend(args, Integer.valueOf(btn.pag.scm.ui.modflags()));
+            ignoreNextMenuMsg = true;
             btn.pag.scm.wdgmsg("act", args);
             //bump used button if possible
             if (ibtn < arrNames.size()-1){
