@@ -716,7 +716,7 @@ public class ZeeConfig {
             //misc
             "gfx/kritter/midgeswarm/",
             "gfx/kritter/ants/",
-            "gfx/kritter/wildbeehive"
+            "gfx/kritter/wildbees/"
         };
         for (int i = 0; i < list.length; i++) {
             if(resname.contains(list[i]))
