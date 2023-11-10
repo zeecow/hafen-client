@@ -1460,7 +1460,7 @@ public class ZeeManagerStockpile extends ZeeThread{
                                     break;
                                 }
                                 // wait start sawing board
-                                if (!waitPlayerPose(ZeeConfig.POSE_PLAYER_SAW)){
+                                if (!waitPlayerPose(ZeeConfig.POSE_PLAYER_SAWING)){
                                     println("pilan board > couldn't make board?");
                                     break;
                                 }

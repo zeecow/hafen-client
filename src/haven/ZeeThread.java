@@ -273,7 +273,7 @@ public class ZeeThread  extends Thread{
             ZeeConfig.POSE_PLAYER_CHOPBLOCK,
             ZeeConfig.POSE_PLAYER_DIGSHOVEL,
             ZeeConfig.POSE_PLAYER_PICK,
-            ZeeConfig.POSE_PLAYER_SAW,
+            ZeeConfig.POSE_PLAYER_SAWING,
             ZeeConfig.POSE_PLAYER_CHIPPINGSTONE,
             ZeeConfig.POSE_PLAYER_BUILD,
             ZeeConfig.POSE_PLAYER_BUTCH,
@@ -882,6 +882,24 @@ public class ZeeThread  extends Thread{
         }
         //println("    ret "+(ZeeConfig.getUiProgressHourglassWidget() == null));
         return ZeeConfig.getUiProgressHourglassWidget() == null;
+    }
+
+    static Window waitWindowBuildOpened(){
+        if (ZeeConfig.getWindowBuild()!=null) {
+            //println("waitWindowBuildOpened > already opened");
+            return null;
+        }
+        Window ret = null;
+        try{
+            prepareCancelClick();
+            while(!isCancelClick() && (ret=ZeeConfig.getWindowBuild())==null){
+                Thread.sleep(PING_MS);
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        //println("waitWindowBuildOpened > "+ret);
+        return ret;
     }
 
     static boolean waitWindowOpened(String windowName){

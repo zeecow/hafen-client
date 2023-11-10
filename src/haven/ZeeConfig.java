@@ -80,7 +80,7 @@ public class ZeeConfig {
     static final String POSE_PLAYER_RUN = "gfx/borka/running";//speed 2, 3
     static final String POSE_PLAYER_BUTCH = "gfx/borka/butcher";
     static final String POSE_PLAYER_BUILD = "gfx/borka/buildan";
-    static final String POSE_PLAYER_SAW = "gfx/borka/sawing";
+    static final String POSE_PLAYER_SAWING = "gfx/borka/sawing";
     static final String POSE_PLAYER_CHIPPINGSTONE = "gfx/borka/chipping";//no pickaxe
     static final String POSE_PLAYER_CHOPBLOCK = "gfx/borka/choppan";
     static final String POSE_PLAYER_CHOPTREE = "gfx/borka/treechop";
@@ -2397,6 +2397,14 @@ public class ZeeConfig {
             }
         }
         return false;
+    }
+
+    public static Window getWindowBuild() {
+        for (Window window : getWindowsOpened()) {
+            if (isBuildWindow(window))
+                return window;
+        }
+        return null;
     }
 
     public static Window getWindow(String name) {

@@ -86,8 +86,17 @@ public class ZeeManagerGobClick extends ZeeThread{
             else if ( isGobTreeLog(gobName) && ZeeConfig.isPlayerLiftingGob("gfx/terobjs/trees/")!=null && !ZeeConfig.isPlayerLiftingGob(gob)){
                 placeTreelogNextTo(gob);
             }
-            // pile boards once and dig more
-            else if (gobName.endsWith("/stockpile-board") && ZeeConfig.playerHasAnyPose(ZeeConfig.POSE_PLAYER_SAW)) {
+            // build obj and get more blocks/boards
+            else if (gobName.contentEquals("gfx/terobjs/consobj")) {
+                if (ZeeConfig.playerHasAnyPose(ZeeConfig.POSE_PLAYER_CHOPBLOCK)){
+                    buildObjAndChopMoreBlocks(gob,ZeeManagerStockpile.lastTreelogChopped);
+                }
+                else if (ZeeConfig.playerHasAnyPose(ZeeConfig.POSE_PLAYER_SAWING)){
+                    buildObjAndMakeMoreBoards(gob,ZeeManagerStockpile.lastTreelogSawed);
+                }
+            }
+            // pile boards once and make more
+            else if (gobName.endsWith("/stockpile-board") && ZeeConfig.playerHasAnyPose(ZeeConfig.POSE_PLAYER_SAWING)) {
                 ZeeManagerStockpile.pileInvBoardsAndMakeMore(gob);
             }
             // pile blocks once and chop more
@@ -205,6 +214,85 @@ public class ZeeManagerGobClick extends ZeeThread{
             }
         }
     }
+
+    private static void buildObjAndChopMoreBlocks(Gob consObj, Gob treeLog) {
+        new ZeeThread() {
+            public void run() {
+
+                if (consObj==null){
+                    println("consObj null");
+                    return;
+                }
+
+                //click build obj
+                gobClick(consObj,3);
+
+                //wait build window
+                Window buildWindow = waitWindowBuildOpened();
+                if(buildWindow==null){
+                    println("coundn't wait build window");
+                    return;
+                }
+
+                //click build butotn
+                Button buildBtn = ZeeConfig.getButtonNamed(buildWindow,"Build");
+                if (buildBtn==null) {
+                    println("ZeeConfig.windowAdded() > no button for building column");
+                    return;
+                }
+                buildBtn.click();
+
+                if (treeLog==null){
+                    println("tree log null");
+                    return;
+                }
+
+                //wait build and chop more
+                ZeeManagerGobClick.waitPlayerPoseNotInList(ZeeConfig.POSE_PLAYER_BUILD,ZeeConfig.POSE_PLAYER_DRINK);
+                clickGobPetal(treeLog,"Chop into blocks");
+            }
+        }.start();
+    }
+
+    private static void buildObjAndMakeMoreBoards(Gob consObj, Gob treeLog) {
+        new ZeeThread() {
+            public void run() {
+
+                if (consObj==null){
+                    println("consObj null");
+                    return;
+                }
+
+                //click build obj
+                gobClick(consObj,3);
+
+                //wait build window
+                Window buildWindow = waitWindowBuildOpened();
+                if(buildWindow==null){
+                    println("coundn't wait build window");
+                    return;
+                }
+
+                //click build butotn
+                Button buildBtn = ZeeConfig.getButtonNamed(buildWindow,"Build");
+                if (buildBtn==null) {
+                    println("ZeeConfig.windowAdded() > no button for building column");
+                    return;
+                }
+                buildBtn.click();
+
+                if (treeLog==null){
+                    println("tree log null");
+                    return;
+                }
+
+                //wait build and saw more
+                ZeeManagerGobClick.waitPlayerPoseNotInList(ZeeConfig.POSE_PLAYER_BUILD,ZeeConfig.POSE_PLAYER_DRINK);
+                clickGobPetal(treeLog,"Make boards");
+            }
+        }.start();
+    }
+
 
     private static List<Coord2d> plowQueueCoords = null;
     private static ZeeThread plowQueueThread = null;
@@ -602,7 +690,7 @@ public class ZeeManagerGobClick extends ZeeThread{
                 non-ground clicks
             */
             // pile boards from treelog
-            else if (gobName.endsWith("/stockpile-board") && ZeeConfig.playerHasAnyPose(ZeeConfig.POSE_PLAYER_SAW)) {
+            else if (gobName.endsWith("/stockpile-board") && ZeeConfig.playerHasAnyPose(ZeeConfig.POSE_PLAYER_SAWING)) {
                 ZeeManagerStockpile.pileBoardsFromTreelog(gob);
             }
             // pile blocks from treelog
