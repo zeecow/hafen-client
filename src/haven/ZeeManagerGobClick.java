@@ -2026,7 +2026,8 @@ public class ZeeManagerGobClick extends ZeeThread{
         else if(gobName.endsWith("terobjs/crucible")){
             menu = new ZeeFlowerMenu(gob,
                 "Craft nuggify",
-                "Craft denuggify"
+                "Craft denuggify",
+                "Craft bronze"
             );
         }
         else if (gobName.endsWith("/churn")) {
