@@ -2346,7 +2346,7 @@ public class ZeeManagerGobClick extends ZeeThread{
             listQueuedTreeChop = new ArrayList<>();
 
         listQueuedTreeChop.add(tree);
-        ZeeConfig.addGobText(tree,""+listQueuedTreeChop.size());
+        queueChopTreeUpdLabels();
 
 
         if(threadChopTree==null) {
@@ -2356,7 +2356,8 @@ public class ZeeManagerGobClick extends ZeeThread{
                     try {
                         ZeeConfig.addPlayerText("queue " + listQueuedTreeChop.size());
                         prepareCancelClick();
-                        while (!isCancelClick()) {
+                        //only cancel click by button 1
+                        while (ZeeConfig.lastMapViewClickButton != 1) {
                             sleep(1000);
                             if (ZeeConfig.playerHasAnyPose(ZeeConfig.POSE_PLAYER_DRINK, ZeeConfig.POSE_PLAYER_CHOPTREE)) {
                                 continue;
@@ -2373,7 +2374,11 @@ public class ZeeManagerGobClick extends ZeeThread{
                                 println("queueChopTree > next tree null");
                                 break;
                             }
-                            ZeeConfig.addPlayerText("queue " + listQueuedTreeChop.size());
+
+                            //update labels
+                            ZeeConfig.removeGobText(nexTree);
+                            queueChopTreeUpdLabels();
+
                             clickGobPetal(nexTree,"Chop");
                             prepareCancelClick();
                         }
@@ -2382,19 +2387,29 @@ public class ZeeManagerGobClick extends ZeeThread{
                     }
                     ZeeConfig.removePlayerText();
                     println("chop thread end");
+                    chopTreeReset();
                 }
             };
-        }
-        if (!threadChopTree.isAlive()) {
-            threadChopTree.start();
-        }else{
-            println("thread alive");
+            if (threadChopTree!=null)
+                threadChopTree.start();
         }
     }
 
     static void chopTreeReset(){
+        if (listQueuedTreeChop!=null && !listQueuedTreeChop.isEmpty()){
+            ZeeConfig.removeGobText((ArrayList<Gob>) listQueuedTreeChop);
+        }
         listQueuedTreeChop = null;
         threadChopTree = null;
+    }
+
+    static void queueChopTreeUpdLabels(){
+        if(listQueuedTreeChop!=null && !listQueuedTreeChop.isEmpty()) {
+            for (int i = 0; i < listQueuedTreeChop.size(); i++) {
+                ZeeConfig.addGobText(listQueuedTreeChop.get(i), "" + (i+1));
+            }
+            ZeeConfig.addPlayerText("queue " + listQueuedTreeChop.size());
+        }
     }
 
     private boolean isGobBigDeadAnimal_thread() {
