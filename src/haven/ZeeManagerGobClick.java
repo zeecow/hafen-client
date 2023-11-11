@@ -2027,7 +2027,7 @@ public class ZeeManagerGobClick extends ZeeThread{
             menu = new ZeeFlowerMenu(gob,
                 "Craft nuggify",
                 "Craft denuggify",
-                "Craft bronze"
+                "Craft bronzebar"
             );
         }
         else if (gobName.endsWith("/churn")) {
