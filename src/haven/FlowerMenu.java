@@ -287,6 +287,11 @@ public class FlowerMenu extends Widget {
 		if (!ZeeConfig.isPetalConfirmed(option.name)){
 			return;
 		}
+		if (option.name.contentEquals("Chop") && ZeeConfig.playerHasAnyPose(ZeeConfig.POSE_PLAYER_CHOPTREE)){
+			ZeeManagerGobClick.queueChopTree();
+			wdgmsg("cl", -1);
+			return;
+		}
 	    wdgmsg("cl", option.num, ui.modflags());
 	}
     }

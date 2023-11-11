@@ -2334,6 +2334,69 @@ public class ZeeManagerGobClick extends ZeeThread{
                 || gobName.contentEquals("gfx/terobjs/villageidol");
     }
 
+    private static List<Gob> listQueuedTreeChop = null;
+    private static ZeeThread threadChopTree = null;
+    static void queueChopTree() {
+        Gob tree = ZeeConfig.lastMapViewClickGob;
+        if (tree==null){
+            println("queueChopTree > tree null");
+            return;
+        }
+        if (listQueuedTreeChop==null)
+            listQueuedTreeChop = new ArrayList<>();
+
+        listQueuedTreeChop.add(tree);
+        ZeeConfig.addGobText(tree,""+listQueuedTreeChop.size());
+
+
+        if(threadChopTree==null) {
+            threadChopTree = new ZeeThread() {
+                public void run() {
+                    println("chop thread start");
+                    try {
+                        ZeeConfig.addPlayerText("queue " + listQueuedTreeChop.size());
+                        prepareCancelClick();
+                        while (!isCancelClick()) {
+                            sleep(1000);
+                            if (ZeeConfig.playerHasAnyPose(ZeeConfig.POSE_PLAYER_DRINK, ZeeConfig.POSE_PLAYER_CHOPTREE)) {
+                                continue;
+                            }
+                            if (ZeeConfig.gobHasAttr(ZeeConfig.getPlayerGob(),"LinMove")){
+                                continue;
+                            }
+                            if (listQueuedTreeChop.isEmpty()) {
+                                println("queueChopTree > empty list");
+                                break;
+                            }
+                            Gob nexTree = listQueuedTreeChop.remove(0);
+                            if (nexTree == null) {
+                                println("queueChopTree > next tree null");
+                                break;
+                            }
+                            ZeeConfig.addPlayerText("queue " + listQueuedTreeChop.size());
+                            clickGobPetal(nexTree,"Chop");
+                            prepareCancelClick();
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    ZeeConfig.removePlayerText();
+                    println("chop thread end");
+                }
+            };
+        }
+        if (!threadChopTree.isAlive()) {
+            threadChopTree.start();
+        }else{
+            println("thread alive");
+        }
+    }
+
+    static void chopTreeReset(){
+        listQueuedTreeChop = null;
+        threadChopTree = null;
+    }
+
     private boolean isGobBigDeadAnimal_thread() {
         try{
             ZeeThread zt = new ZeeThread() {

@@ -2593,6 +2593,7 @@ public class ZeeConfig {
         ZeeManagerMiner.tilesMonitorCleanup();
         ZeeHistWdg.clearHistory();
         ZeeManagerGobClick.plowQueueReset();
+        ZeeManagerGobClick.chopTreeReset();
 
         if (ZeeManagerGobClick.winHideGobs!=null){
             try{
