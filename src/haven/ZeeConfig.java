@@ -936,10 +936,9 @@ public class ZeeConfig {
     public static void windowMapCompact(MapWnd mapWnd, boolean compact) {
 
         if(gameUI==null || gameUI.mapfile==null) {
-            println("windowMapCompact > gameUI "+gameUI+" , mapfile "+gameUI.mapfile);
+            //println("windowMapCompact > gameUI "+gameUI+" , mapfile "+gameUI.mapfile);
             return;
         }
-        println("windowMapCompact > "+compact);
 
         Coord screenSize = gameUI.map.sz;
         Window.DefaultDeco deco = (Window.DefaultDeco) mapWnd.deco;
@@ -2074,9 +2073,7 @@ public class ZeeConfig {
         //remove ladder radius
         if (!showMineSupport){
             Gob.Overlay radius = ladder.findol(ZeeGobRadius.class);
-            if (radius==null)
-                println("ladder radius not found");
-            else
+            if (radius!=null)
                 radius.remove();
         }
         //add ladder radius

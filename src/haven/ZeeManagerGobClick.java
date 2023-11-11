@@ -237,7 +237,7 @@ public class ZeeManagerGobClick extends ZeeThread{
                 //click build butotn
                 Button buildBtn = ZeeConfig.getButtonNamed(buildWindow,"Build");
                 if (buildBtn==null) {
-                    println("ZeeConfig.windowAdded() > no button for building column");
+                    println("couldn't find build button");
                     return;
                 }
                 buildBtn.click();
@@ -276,7 +276,7 @@ public class ZeeManagerGobClick extends ZeeThread{
                 //click build butotn
                 Button buildBtn = ZeeConfig.getButtonNamed(buildWindow,"Build");
                 if (buildBtn==null) {
-                    println("ZeeConfig.windowAdded() > no button for building column");
+                    println("couldn't find build button");
                     return;
                 }
                 buildBtn.click();
