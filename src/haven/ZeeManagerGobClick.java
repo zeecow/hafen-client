@@ -2383,6 +2383,10 @@ public class ZeeManagerGobClick extends ZeeThread{
                         //only cancel click by button 1
                         while (!isCancelClick()) {
                             sleep(1000);
+                            if (isCancelClick()) {
+                                println("queueChipStone > cancel click");
+                                break;
+                            }
                             if (ZeeConfig.playerHasAnyPose(ZeeConfig.POSE_PLAYER_DRINK, ZeeConfig.POSE_PLAYER_CHIPPINGSTONE,ZeeConfig.POSE_PLAYER_PICK)) {
                                 continue;
                             }
@@ -2425,6 +2429,7 @@ public class ZeeManagerGobClick extends ZeeThread{
     static void chipStoneReset(){
         if (listQueuedChipStone!=null && !listQueuedChipStone.isEmpty()){
             ZeeConfig.removeGobText((ArrayList<Gob>) listQueuedChipStone);
+            //listQueuedChipStone.clear();
         }
         listQueuedChipStone = null;
         threadChipStone = null;
@@ -2464,6 +2469,10 @@ public class ZeeManagerGobClick extends ZeeThread{
                         //only cancel click by button 1
                         while (!isCancelClick()) {
                             sleep(1000);
+                            if (isCancelClick()) {
+                                println("queueChopTree > cancel click");
+                                break;
+                            }
                             if (ZeeConfig.playerHasAnyPose(ZeeConfig.POSE_PLAYER_DRINK, ZeeConfig.POSE_PLAYER_CHOPTREE)) {
                                 continue;
                             }
@@ -2502,6 +2511,7 @@ public class ZeeManagerGobClick extends ZeeThread{
     static void chopTreeReset(){
         if (listQueuedTreeChop!=null && !listQueuedTreeChop.isEmpty()){
             ZeeConfig.removeGobText((ArrayList<Gob>) listQueuedTreeChop);
+            //listQueuedTreeChop.clear();
         }
         listQueuedTreeChop = null;
         threadChopTree = null;
