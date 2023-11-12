@@ -71,6 +71,7 @@ Midclick Ground Object
 - midclick crop activate area harvest 
 - midclick construction obj while chopping/sawing will build and get more mats
 - midclick chop tree petal while chopping will add to queue
+- midclick chip stone petal while chipping will add to queue
 
 Long Midclick Ground Object
 - show context menu for various objs (details below)

@@ -2594,6 +2594,7 @@ public class ZeeConfig {
         ZeeHistWdg.clearHistory();
         ZeeManagerGobClick.plowQueueReset();
         ZeeManagerGobClick.chopTreeReset();
+        ZeeManagerGobClick.chipStoneReset();
 
         if (ZeeManagerGobClick.winHideGobs!=null){
             try{

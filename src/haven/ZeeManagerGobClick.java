@@ -2334,6 +2334,87 @@ public class ZeeManagerGobClick extends ZeeThread{
                 || gobName.contentEquals("gfx/terobjs/villageidol");
     }
 
+
+    private static List<Gob> listQueuedChipStone = null;
+    private static ZeeThread threadChipStone = null;
+    static void queueChipStone() {
+        Gob boulder = ZeeConfig.lastMapViewClickGob;
+        if (boulder==null){
+            println("queueChipStone > boulder null");
+            return;
+        }
+        if (listQueuedChipStone==null)
+            listQueuedChipStone = new ArrayList<>();
+
+        listQueuedChipStone.add(boulder);
+        queueChipStoneUpdLabels();
+
+        if(threadChipStone==null) {
+            threadChipStone = new ZeeThread() {
+                public void run() {
+                    println("chipstone thread start");
+                    try {
+                        ZeeConfig.addPlayerText("queue " + listQueuedChipStone.size());
+                        prepareCancelClick();
+                        //only cancel click by button 1
+                        while (ZeeConfig.lastMapViewClickButton != 1) {
+                            sleep(1000);
+                            if (ZeeConfig.playerHasAnyPose(ZeeConfig.POSE_PLAYER_DRINK, ZeeConfig.POSE_PLAYER_CHIPPINGSTONE,ZeeConfig.POSE_PLAYER_PICK)) {
+                                continue;
+                            }
+                            if (ZeeConfig.gobHasAttr(ZeeConfig.getPlayerGob(),"LinMove")){
+                                continue;
+                            }
+                            if (listQueuedChipStone.isEmpty()) {
+                                println("queueChipStone > empty list");
+                                break;
+                            }
+                            Gob nextBoulder = listQueuedChipStone.remove(0);
+                            if (nextBoulder == null) {
+                                println("queueChipStone > next boulder null");
+                                break;
+                            }
+
+                            //update labels
+                            ZeeConfig.removeGobText(nextBoulder);
+                            queueChipStoneUpdLabels();
+
+                            if (ZeeConfig.isPlayerHoldingItem()){
+                                ZeeManagerItemClick.getHoldingItem().item.wdgmsg("drop", Coord.z);
+                                waitNotHoldingItem();
+                            }
+                            clickGobPetal(nextBoulder,"Chip stone");
+                            prepareCancelClick();
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    ZeeConfig.removePlayerText();
+                    println("chipstone thread end");
+                    chipStoneReset();
+                }
+            };
+            if (threadChipStone!=null)
+                threadChipStone.start();
+        }
+    }
+    static void chipStoneReset(){
+        if (listQueuedChipStone!=null && !listQueuedChipStone.isEmpty()){
+            ZeeConfig.removeGobText((ArrayList<Gob>) listQueuedChipStone);
+        }
+        listQueuedChipStone = null;
+        threadChipStone = null;
+    }
+    static void queueChipStoneUpdLabels(){
+        if(listQueuedChipStone!=null && !listQueuedChipStone.isEmpty()) {
+            for (int i = 0; i < listQueuedChipStone.size(); i++) {
+                ZeeConfig.addGobText(listQueuedChipStone.get(i), "" + (i+1));
+            }
+            ZeeConfig.addPlayerText("queue " + listQueuedChipStone.size());
+        }
+    }
+
+
     private static List<Gob> listQueuedTreeChop = null;
     private static ZeeThread threadChopTree = null;
     static void queueChopTree() {
@@ -2394,7 +2475,6 @@ public class ZeeManagerGobClick extends ZeeThread{
                 threadChopTree.start();
         }
     }
-
     static void chopTreeReset(){
         if (listQueuedTreeChop!=null && !listQueuedTreeChop.isEmpty()){
             ZeeConfig.removeGobText((ArrayList<Gob>) listQueuedTreeChop);
@@ -2402,7 +2482,6 @@ public class ZeeManagerGobClick extends ZeeThread{
         listQueuedTreeChop = null;
         threadChopTree = null;
     }
-
     static void queueChopTreeUpdLabels(){
         if(listQueuedTreeChop!=null && !listQueuedTreeChop.isEmpty()) {
             for (int i = 0; i < listQueuedTreeChop.size(); i++) {
@@ -2411,6 +2490,7 @@ public class ZeeManagerGobClick extends ZeeThread{
             ZeeConfig.addPlayerText("queue " + listQueuedTreeChop.size());
         }
     }
+
 
     private boolean isGobBigDeadAnimal_thread() {
         try{

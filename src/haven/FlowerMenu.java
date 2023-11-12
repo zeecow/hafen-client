@@ -57,6 +57,7 @@ public class FlowerMenu extends Widget {
 	public int num;
 	private Text text;
 	private double a = 1;
+	int mouseDownButton = -1;
 
 	public Petal(String name) {
 	    super(Coord.z);
@@ -81,6 +82,7 @@ public class FlowerMenu extends Widget {
 	}
 
 	public boolean mousedown(Coord c, int button) {
+		mouseDownButton = button;
 	    choose(this);
 		ZeeManagerStockpile.checkClickedPetal(this.name);
 		ZeeQuickOptionsWindow.updatePetalWidget(this.name);
@@ -287,12 +289,22 @@ public class FlowerMenu extends Widget {
 		if (!ZeeConfig.isPetalConfirmed(option.name)){
 			return;
 		}
-		if (option.name.contentEquals("Chop")
-				&& ZeeConfig.playerHasAnyPose(ZeeConfig.POSE_PLAYER_CHOPTREE, ZeeConfig.POSE_PLAYER_DRINK) )
+		if (option.mouseDownButton==2)
 		{
-			ZeeManagerGobClick.queueChopTree();
-			wdgmsg("cl", -1);
-			return;
+			if (option.name.contentEquals("Chop")
+				&& ZeeConfig.playerHasAnyPose(ZeeConfig.POSE_PLAYER_CHOPTREE, ZeeConfig.POSE_PLAYER_DRINK))
+			{
+				ZeeManagerGobClick.queueChopTree();
+				wdgmsg("cl", -1);
+				return;
+			}
+			if (option.name.contentEquals("Chip stone")
+				&& ZeeConfig.playerHasAnyPose(ZeeConfig.POSE_PLAYER_CHIPPINGSTONE, ZeeConfig.POSE_PLAYER_DRINK, ZeeConfig.POSE_PLAYER_PICK))
+			{
+				ZeeManagerGobClick.queueChipStone();
+				wdgmsg("cl", -1);
+				return;
+			}
 		}
 	    wdgmsg("cl", option.num, ui.modflags());
 	}
