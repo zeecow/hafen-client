@@ -289,23 +289,6 @@ public class FlowerMenu extends Widget {
 		if (!ZeeConfig.isPetalConfirmed(option.name)){
 			return;
 		}
-		if (option.mouseDownButton==2)
-		{
-			if (option.name.contentEquals("Chop")
-				&& ZeeConfig.playerHasAnyPose(ZeeConfig.POSE_PLAYER_CHOPTREE, ZeeConfig.POSE_PLAYER_DRINK))
-			{
-				ZeeManagerGobClick.queueChopTree();
-				wdgmsg("cl", -1);
-				return;
-			}
-			if (option.name.contentEquals("Chip stone")
-				&& ZeeConfig.playerHasAnyPose(ZeeConfig.POSE_PLAYER_CHIPPINGSTONE, ZeeConfig.POSE_PLAYER_DRINK, ZeeConfig.POSE_PLAYER_PICK))
-			{
-				ZeeManagerGobClick.queueChipStone();
-				wdgmsg("cl", -1);
-				return;
-			}
-		}
 	    wdgmsg("cl", option.num, ui.modflags());
 	}
     }

@@ -8,7 +8,7 @@ public class ZeeFlowerMenu extends FlowerMenu{
     static final String STRPETAL_REMOVEPLANT = "Remove plant";
     static final String STRPETAL_REMOVEALLPLANTS = "Remove all plants";
     static final String STRPETAL_REMOVETREEANDSTUMP = "Remove tree & stump";
-    static final String STRPETAL_REMOVEALLTREES = "Remove all trees";
+    static final String STRPETAL_REMOVEALLTREES = "Remove all tree&stumps";
     static final String STRPETAL_TOGGLEGROWTHTEXTS = "Toggle growth texts";
     static final String STRPETAL_BARRELTAKEALL = "Take all";
     static final String STRPETAL_CURSORHARVEST = "Harvest area";

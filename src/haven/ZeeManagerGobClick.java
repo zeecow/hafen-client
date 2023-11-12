@@ -1635,6 +1635,14 @@ public class ZeeManagerGobClick extends ZeeThread{
         else if (petalName.contentEquals(ZeeFlowerMenu.STRPETAL_REMOVETREEANDSTUMP) || petalName.contentEquals(ZeeFlowerMenu.STRPETAL_REMOVEALLTREES)) {
             removeTreeAndStump(gob, petalName);
         }
+        //queue chop tree
+        else if(petalName.contentEquals("Queue chopping")){
+            ZeeManagerGobClick.queueChopTree();
+        }
+        //queue chip stone
+        else if(petalName.contentEquals("Queue chipping")){
+            ZeeManagerGobClick.queueChipStone();
+        }
         // ispect towercap tree
         else if(petalName.contentEquals(ZeeFlowerMenu.STRPETAL_INSPECT) && isGobTree(gobName)){
             inspectGob(gob);
@@ -1986,18 +1994,34 @@ public class ZeeManagerGobClick extends ZeeThread{
         else if(gobName.endsWith("terobjs/smelter")){
             menu = new ZeeFlowerMenu(gob,ZeeFlowerMenu.STRPETAL_ADD9COAL, ZeeFlowerMenu.STRPETAL_ADD12COAL);
         }
+        // trellis plant
         else if (isGobTrellisPlant(gobName)){
             menu = new ZeeFlowerMenu(gob,ZeeFlowerMenu.STRPETAL_REMOVEPLANT, ZeeFlowerMenu.STRPETAL_REMOVEALLPLANTS,ZeeFlowerMenu.STRPETAL_CURSORHARVEST);
         }
+        // tree
         else if (isGobTree(gobName)){
             opts = new ArrayList<String>();
-            opts.add(ZeeFlowerMenu.STRPETAL_REMOVETREEANDSTUMP);
-            opts.add(ZeeFlowerMenu.STRPETAL_REMOVEALLTREES);
-            opts.add(ZeeFlowerMenu.STRPETAL_TOGGLEGROWTHTEXTS);
             if (gobName.endsWith("/towercap"))
                 opts.add(ZeeFlowerMenu.STRPETAL_INSPECT);
+            opts.add(ZeeFlowerMenu.STRPETAL_TOGGLEGROWTHTEXTS);
+            opts.add(ZeeFlowerMenu.STRPETAL_REMOVETREEANDSTUMP);
+            opts.add(ZeeFlowerMenu.STRPETAL_REMOVEALLTREES);
+            if (ZeeConfig.playerHasAnyPose(ZeeConfig.POSE_PLAYER_CHOPTREE, ZeeConfig.POSE_PLAYER_DRINK)){
+                opts.add("Queue chopping");
+            }
             menu = new ZeeFlowerMenu(gob, opts.toArray(String[]::new));
         }
+        // boulder
+        else if (isGobBoulder(gobName)){
+            opts = new ArrayList<String>();
+            opts.add(ZeeFlowerMenu.STRPETAL_LIFTUPGOB);
+            opts.add(ZeeFlowerMenu.STRPETAL_INSPECT);
+            if (ZeeConfig.playerHasAnyPose(ZeeConfig.POSE_PLAYER_CHIPPINGSTONE, ZeeConfig.POSE_PLAYER_DRINK, ZeeConfig.POSE_PLAYER_PICK)){
+                opts.add("Queue chipping");
+            }
+            menu = new ZeeFlowerMenu(gob, opts.toArray(String[]::new));
+        }
+        // crop
         else if (isGobCrop(gobName)) {
             menu = new ZeeFlowerMenu(gob,ZeeFlowerMenu.STRPETAL_SEEDFARMER, ZeeFlowerMenu.STRPETAL_CURSORHARVEST);
         }
@@ -2357,7 +2381,7 @@ public class ZeeManagerGobClick extends ZeeThread{
                         ZeeConfig.addPlayerText("queue " + listQueuedChipStone.size());
                         prepareCancelClick();
                         //only cancel click by button 1
-                        while (ZeeConfig.lastMapViewClickButton != 1) {
+                        while (!isCancelClick()) {
                             sleep(1000);
                             if (ZeeConfig.playerHasAnyPose(ZeeConfig.POSE_PLAYER_DRINK, ZeeConfig.POSE_PLAYER_CHIPPINGSTONE,ZeeConfig.POSE_PLAYER_PICK)) {
                                 continue;
@@ -2438,7 +2462,7 @@ public class ZeeManagerGobClick extends ZeeThread{
                         ZeeConfig.addPlayerText("queue " + listQueuedTreeChop.size());
                         prepareCancelClick();
                         //only cancel click by button 1
-                        while (ZeeConfig.lastMapViewClickButton != 1) {
+                        while (!isCancelClick()) {
                             sleep(1000);
                             if (ZeeConfig.playerHasAnyPose(ZeeConfig.POSE_PLAYER_DRINK, ZeeConfig.POSE_PLAYER_CHOPTREE)) {
                                 continue;

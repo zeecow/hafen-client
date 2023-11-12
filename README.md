@@ -70,8 +70,6 @@ Midclick Ground Object
 - midclick animal holding clover to follow and feed it when close enough
 - midclick crop activate area harvest 
 - midclick construction obj while chopping/sawing will build and get more mats
-- midclick chop tree petal while chopping will add to queue
-- midclick chip stone petal while chipping will add to queue
 
 Long Midclick Ground Object
 - show context menu for various objs (details below)
@@ -129,6 +127,8 @@ LongMidClick Flowemenu for Ground Objects
 - lightable objects shows craft firebrand, pyrite spark
 - crucible smelt nuggets, bar
 - get xp from well
+- queue chop tree while already chopping/drinking
+- queue chip boulder while already chipping/drinking
 
 LongMidClick Flowemenu for Window Items
 - auto butch dead animal items
