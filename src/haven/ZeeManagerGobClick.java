@@ -744,10 +744,6 @@ public class ZeeManagerGobClick extends ZeeThread{
             else if (gobName.endsWith("/dframe")) {
                 gobClick(gob,3, UI.MOD_SHIFT);
             }
-            // remove tree stump
-            else if (isGobTreeStump(gobName)) {
-                removeStumpMaybe(gob);
-            }
             // item act barrel
             else if (ZeeConfig.isPlayerHoldingItem() && gobName.endsWith("/barrel")) {
                 if (ZeeManagerFarmer.isBarrelEmpty(gob))
@@ -1647,6 +1643,7 @@ public class ZeeManagerGobClick extends ZeeThread{
         else if(petalName.contentEquals(ZeeFlowerMenu.STRPETAL_INSPECT) && isGobTree(gobName)){
             inspectGob(gob);
         }
+        // crop
         else if (isGobCrop(gobName)) {
             if (petalName.equals(ZeeFlowerMenu.STRPETAL_SEEDFARMER)) {
                 ZeeManagerFarmer.showWindow(gob);
@@ -1654,6 +1651,21 @@ public class ZeeManagerGobClick extends ZeeThread{
             else if (petalName.equals(ZeeFlowerMenu.STRPETAL_CURSORHARVEST)) {
                 if (!ZeeConfig.getCursorName().equals(ZeeConfig.CURSOR_HARVEST))
                     gobClick(gob, 3, UI.MOD_SHIFT);
+            }
+        }
+        // tree stump
+        else if (isGobTreeStump(gobName)){
+            // shovel stump
+            if (petalName.contentEquals("Shovel stump")) {
+                try {
+                    removeStumpMaybe(gob);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+            // queue shovel stump
+            else{
+                queueShovelStump();
             }
         }
         else if (petalName.equals(ZeeFlowerMenu.STRPETAL_BARRELTAKEALL)) {
@@ -2024,6 +2036,17 @@ public class ZeeManagerGobClick extends ZeeThread{
         // crop
         else if (isGobCrop(gobName)) {
             menu = new ZeeFlowerMenu(gob,ZeeFlowerMenu.STRPETAL_SEEDFARMER, ZeeFlowerMenu.STRPETAL_CURSORHARVEST);
+        }
+        // tree stump
+        else if(isGobTreeStump(gobName)){
+            // shovel stump
+            if (!ZeeConfig.playerHasAnyPose(ZeeConfig.POSE_PLAYER_DRINK,ZeeConfig.POSE_PLAYER_DIGSHOVEL)) {
+                menu = new ZeeFlowerMenu(gob, "Shovel stump");
+            }
+            //queue shovel stump
+            else {
+                menu = new ZeeFlowerMenu(gob, "Queue shovel stump");
+            }
         }
         else if (isBarrelTakeAll(gob)) {
             menu = new ZeeFlowerMenu(gob,ZeeFlowerMenu.STRPETAL_BARRELTAKEALL, ZeeFlowerMenu.STRPETAL_LIFTUPGOB);
@@ -2522,6 +2545,87 @@ public class ZeeManagerGobClick extends ZeeThread{
                 ZeeConfig.addGobText(listQueuedTreeChop.get(i), "" + (i+1));
             }
             ZeeConfig.addPlayerText("queue " + listQueuedTreeChop.size());
+        }
+    }
+
+
+
+    private static List<Gob> queuedStumps = null;
+    private static ZeeThread threadShovelStumps = null;
+    static void queueShovelStump() {
+        Gob stump = ZeeConfig.lastMapViewClickGob;
+        if (stump==null){
+            println("queuedStumps > stump null");
+            return;
+        }
+        if (queuedStumps==null)
+            queuedStumps = new ArrayList<>();
+
+        queuedStumps.add(stump);
+        queueStumpsUpdLabels();
+
+
+        if(threadShovelStumps==null) {
+            threadShovelStumps = new ZeeThread() {
+                public void run() {
+                    println("shovel stump thread start");
+                    try {
+                        ZeeConfig.addPlayerText("queue " + queuedStumps.size());
+                        prepareCancelClick();
+                        while (!isCancelClick()) {
+                            sleep(1000);
+                            if (isCancelClick()) {
+                                println("queuedStumps > cancel click");
+                                break;
+                            }
+                            if (ZeeConfig.playerHasAnyPose(ZeeConfig.POSE_PLAYER_DRINK, ZeeConfig.POSE_PLAYER_DIGSHOVEL)) {
+                                continue;
+                            }
+                            if (ZeeConfig.gobHasAttr(ZeeConfig.getPlayerGob(),"LinMove")){
+                                continue;
+                            }
+                            if (queuedStumps.isEmpty()) {
+                                println("queuedStumps > empty list");
+                                break;
+                            }
+                            Gob nextStump = queuedStumps.remove(0);
+                            if (nextStump == null) {
+                                println("queuedStumps > next stump null");
+                                break;
+                            }
+
+                            //update labels
+                            ZeeConfig.removeGobText(nextStump);
+                            queueStumpsUpdLabels();
+
+                            removeStumpMaybe(nextStump);
+                            prepareCancelClick();
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    ZeeConfig.removePlayerText();
+                    println("shovel stump thread end");
+                    queueStumpsReset();
+                }
+            };
+            if (threadShovelStumps!=null)
+                threadShovelStumps.start();
+        }
+    }
+    static void queueStumpsReset(){
+        if (queuedStumps!=null && !queuedStumps.isEmpty()){
+            ZeeConfig.removeGobText((ArrayList<Gob>) queuedStumps);
+        }
+        queuedStumps = null;
+        threadShovelStumps = null;
+    }
+    static void queueStumpsUpdLabels(){
+        if(queuedStumps!=null && !queuedStumps.isEmpty()) {
+            for (int i = 0; i < queuedStumps.size(); i++) {
+                ZeeConfig.addGobText(queuedStumps.get(i), "" + (i+1));
+            }
+            ZeeConfig.addPlayerText("queue " + queuedStumps.size());
         }
     }
 

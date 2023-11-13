@@ -129,6 +129,7 @@ LongMidClick Flowemenu for Ground Objects
 - get xp from well
 - queue chop tree while already chopping/drinking
 - queue chip boulder while already chipping/drinking
+- queue shovel stump while already shoveling/drinking
 
 LongMidClick Flowemenu for Window Items
 - auto butch dead animal items
