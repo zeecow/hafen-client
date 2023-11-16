@@ -1616,8 +1616,9 @@ public class ZeeManagerItemClick extends ZeeThread{
                             println("bucket hand null");
                     }
 
-                    // drink 1 gulp and click move again
-                    if (drank && ZeeConfig.playerHasAttr("LinMove")){
+                    // drink 1 gulp and resume move without drinking
+                    // (except when holding shift)
+                    if (drank && !ZeeConfig.gameUI.ui.modshift && ZeeConfig.playerHasAttr("LinMove")){
                         Coord2d destCoord = Coord2d.of(ZeeConfig.lastMapViewClickMc.x,ZeeConfig.lastMapViewClickMc.y);
                         double stam2 = ZeeConfig.getMeterStamina();
                         double stamGains = 0;

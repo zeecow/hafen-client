@@ -23,6 +23,7 @@ Controls
 - right-click Stoat's icon to aggro on max speed (option available)
 - pickup key "q", shift+q pickup all, ctrl+q pickup window
 - drink key '
+  - if moving will drink and move, except when shift is hold
 - auto-dismount horse when clicking workstations, houses, auto-mount too (rope required)
 - Icon Settings: shift+space toggles notify checkbox
 - right-click-hold Search Actions Button to start a hover menu
