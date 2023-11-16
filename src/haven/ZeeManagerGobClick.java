@@ -2128,7 +2128,7 @@ public class ZeeManagerGobClick extends ZeeThread{
             public void run() {
                 try{
 
-                    sleep(250);//wait window build
+                    sleep(PING_MS);//wait window build
 
                     if (gobAutoLabel==null){
                         println("labelGobByContents > gob not eligible");
@@ -2158,7 +2158,7 @@ public class ZeeManagerGobClick extends ZeeThread{
                                         }
 
                                         // (15.45) (l) of (Cave Slime)
-                                        Pattern pattern = Pattern.compile("(\\d+\\.?+\\d+)\\s+(\\S+) of ([\\S\\s]+)$");//.compile("(.*?)(\\d+)(.*)");
+                                        Pattern pattern = Pattern.compile("(\\d+\\.?+\\d*)\\s+(\\S+) of ([\\S\\s]+)$");//.compile("(.*?)(\\d+)(.*)");
                                         Matcher matcher = pattern.matcher(name);
                                         matcher.find();
                                         String quantity = String.format("%.0f",Math.rint(Double.parseDouble(matcher.group(1))));
