@@ -26,9 +26,6 @@
 
 package haven;
 
-import java.util.Iterator;
-import static java.lang.Math.PI;
-
 public class Coord2d implements Comparable<Coord2d>, java.io.Serializable {
     public double x, y;
     public static final Coord2d z = new Coord2d(0, 0);
@@ -78,6 +75,14 @@ public class Coord2d implements Comparable<Coord2d>, java.io.Serializable {
 	if(c.x < x) return(-1);
 	if(c.y > y) return(1);
 	return(0);
+    }
+
+    public int compareToFixMaybe(Coord2d c) {
+        if(c.y < y) return(-1);
+        if(c.y > y) return(1);
+        if(c.x < x) return(-1);
+        if(c.x > x) return(1);
+        return(0);
     }
 
     public Coord2d add(double X, double Y) {

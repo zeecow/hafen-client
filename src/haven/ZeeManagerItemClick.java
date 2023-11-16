@@ -1543,16 +1543,19 @@ public class ZeeManagerItemClick extends ZeeThread{
 
     static boolean drinkThreadWorking = false;
     public static void drinkFromBeltHandsInv() {
+
         if (drinkThreadWorking || ZeeConfig.isPlayerDrinkingPose()) {
             println("already drinking");
             return;
         }
+
         new ZeeThread(){
             public void run() {
+                drinkThreadWorking = true;
                 boolean drank = false;
+                Inventory inv;
                 try {
-                    Inventory inv;
-                    drinkThreadWorking = true;
+                    double stam1 = ZeeConfig.getMeterStamina();
 
                     // drink from belt
                     if (!drank && (inv = getInvBelt()) != null) {
@@ -1612,6 +1615,28 @@ public class ZeeManagerItemClick extends ZeeThread{
                         }else
                             println("bucket hand null");
                     }
+
+                    // drink 1 gulp and click move again
+                    if (drank && ZeeConfig.playerHasAttr("LinMove")){
+                        Coord2d destCoord = Coord2d.of(ZeeConfig.lastMapViewClickMc.x,ZeeConfig.lastMapViewClickMc.y);
+                        double stam2 = ZeeConfig.getMeterStamina();
+                        double stamGains = 0;
+                        double stamGulp = 10;
+                        if (stam2 + stamGulp < 100) {
+                            //println("stam1 = " + stam1 + "  ,  stam2 " + stam2 );
+                            do {
+                                sleep(50);
+                                stam2 = ZeeConfig.getMeterStamina();
+                                stamGains = stam2 - stam1;
+                            } while (stamGains < stamGulp);
+                            println("gulp > stam  "+stam2+" ,  gains " + stamGains);
+                            // click destination coord again if didn't change
+                            if (destCoord.compareToFixMaybe(ZeeConfig.lastMapViewClickMc)==0){
+                                ZeeConfig.clickCoord(destCoord.floor(OCache.posres),1);
+                            }
+                        }
+                    }
+
                 }catch (Exception e){
                     e.printStackTrace();
                 }

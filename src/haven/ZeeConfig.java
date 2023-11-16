@@ -3660,12 +3660,19 @@ public class ZeeConfig {
         }
     }
 
+
     static boolean gobHasAttr(Gob gob, String gAttrClassName) {
         return ZeeManagerGobClick.getGAttrNames(gob).contains(gAttrClassName);
     }
-
     static boolean gobHasOverlay(Gob gob, String overlayResName) {
         return ZeeManagerGobClick.getOverlayNames(gob).contains(overlayResName);
+    }
+
+    static boolean playerHasAttr(String gAttrClassName) {
+        return ZeeManagerGobClick.getGAttrNames(getPlayerGob()).contains(gAttrClassName);
+    }
+    static boolean playerHasOverlay(String overlayResName) {
+        return ZeeManagerGobClick.getOverlayNames(getPlayerGob()).contains(overlayResName);
     }
 
     private static void applyGobSettingsAggro(Gob gob) {
