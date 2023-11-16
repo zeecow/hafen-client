@@ -746,7 +746,7 @@ public class ZeeConfig {
     static boolean isBird(String name){
         final String[] list = {
             "rockdove","quail","/chick","/hen","/rooster","eagle","owl","magpie",
-            "mallard","pelican","seagull","swan","ptarmigan","grouse"
+            "mallard","pelican","seagull","swan","ptarmigan","grouse","bullfinch"
         };
         for (int i = 0; i < list.length; i++) {
             if(name.contains(list[i]))
