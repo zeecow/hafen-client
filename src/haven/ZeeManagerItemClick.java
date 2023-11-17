@@ -1625,11 +1625,12 @@ public class ZeeManagerItemClick extends ZeeThread{
                         double stamGulp = 10;
                         if (stam2 + stamGulp < 100) {
                             //println("stam1 = " + stam1 + "  ,  stam2 " + stam2 );
+                            prepareCancelClick();
                             do {
                                 sleep(50);
                                 stam2 = ZeeConfig.getMeterStamina();
                                 stamGains = stam2 - stam1;
-                            } while (stamGains < stamGulp);
+                            } while (!isCancelClick() && stamGains < stamGulp);
                             println("gulp > stam  "+stam2+" ,  gains " + stamGains);
                             // click destination coord again if didn't change
                             if (destCoord.compareToFixMaybe(ZeeConfig.lastMapViewClickMc)==0){
