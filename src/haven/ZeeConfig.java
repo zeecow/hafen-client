@@ -1641,21 +1641,24 @@ public class ZeeConfig {
         show organize button for duplicate windows
      */
     private static void windowModOrganizeButton(Window window, String windowTitle) {
-        final String singleWindows = "Craft,Inventory,Character Sheet,Options,Kith & Kin,Equipment";
+        final String singleWindows = "Craft,Inventory,Character Sheet,Options,Kith & Kin,Equipment,Map";
         if(!singleWindows.contains(windowTitle)) { // avoid searching multiple Windows
             List<Window> wins = getWindows(windowTitle);
-            if (wins.size() > 1) {
-                //add organize button
-                int pad = ZeeWindow.ZeeButton.BUTTON_SIZE;
-                //TODO uncomment
-                Window.DefaultDeco deco = ((Window.DefaultDeco)window.deco);
-                deco.add(
-                    new ZeeWindow.ZeeButton(pad,ZeeWindow.ZeeButton.TEXT_ORGANIZEWINDOWS,"organize duplicates"),
-                        deco.cbtn.c.x - pad,
-                        deco.cbtn.c.y
-                );
-                window.hasOrganizeButton = true;
+            wins.removeIf(w -> isMakewindow(w));
+            if (wins.size() <= 1)
+                return;
+            Window.DefaultDeco deco = ((Window.DefaultDeco)window.deco);
+            if (deco==null){
+                println("no deco "+windowTitle);
+                return;
             }
+            int pad = ZeeWindow.ZeeButton.BUTTON_SIZE;
+            deco.add(
+                    new ZeeWindow.ZeeButton(pad,ZeeWindow.ZeeButton.TEXT_ORGANIZEWINDOWS,"organize duplicates"),
+                    deco.cbtn.c.x - pad,
+                    deco.cbtn.c.y
+            );
+            window.hasOrganizeButton = true;
         }
     }
 
