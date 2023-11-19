@@ -208,6 +208,12 @@ public class ZeeManagerGobClick extends ZeeThread{
             else if(ZeeConfig.isAggressive(gobName)){
                 toggleOverlayAggro(gob);
             }
+            // try picking from cart's first slot (arg 2)
+            else if (gobName.endsWith("/cart")){
+                if (!ZeeConfig.playerHasAnyPose(ZeeConfig.POSE_PLAYER_LIFTING)) {
+                    gobClick(gob, 3, 0, 2);
+                }
+            }
             // inspect gob
             else {
                 inspectGob(gob);

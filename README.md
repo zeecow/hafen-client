@@ -71,6 +71,7 @@ Midclick Ground Object
 - midclick animal holding clover to follow and feed it when close enough
 - midclick crop activate area harvest 
 - midclick construction obj while chopping/sawing will build and get more mats
+- midclick cart try picking first slot
 
 Long Midclick Ground Object
 - show context menu for various objs (details below)
