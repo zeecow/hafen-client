@@ -142,6 +142,7 @@ LongMidClick Flowemenu for Window Items
 
 Random Features
 ---------------
+- option midi radio folder for playing when cellar/cabin    
 - solid colors option: minimap, terrain
 - search actions works globally, instead of current menu
 - sort actions by most used craft items (size limited for now)

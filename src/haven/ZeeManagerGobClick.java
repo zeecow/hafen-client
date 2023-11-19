@@ -3886,6 +3886,18 @@ public class ZeeManagerGobClick extends ZeeThread{
                     if (intColor < 0) {
                         glob.blightamb = ZeeConfig.intToColor(intColor);
                     }
+
+                    // midi radio
+                    if(ZeeConfig.playMidiRadio){
+                        if(ZeeConfig.playerLocation == ZeeConfig.LOCATION_CABIN || ZeeConfig.playerLocation == ZeeConfig.LOCATION_CELLAR) {
+                            ZeeMidiRadio.playRandomMidi();
+                        }else{
+                            ZeeMidiRadio.stopPlayingMidi();
+                        }
+                    }else{
+                        ZeeMidiRadio.stopPlayingMidi(); // case changed setting
+                    }
+
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

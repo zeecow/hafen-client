@@ -7,19 +7,23 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.io.File;
 import java.util.List;
 import java.util.*;
 
 public class ZeeOptionsJFrame extends JFrame {
     public GridBagConstraints c;
     public JTabbedPane tabbedPane, tabbedPaneGobs;
-    public JPanel panelTabAuto, panelTabMisc, panelTabInterface, panelTabGobs, panelTabControls, panelTabMinimap, panelDetailsBottom, panelTabCateg, panelShapeIcons, panelShapeIconsSaveCancel;
-    public JCheckBox cbSimpleWindowBorder, cbSimpleWindows, cbShapeIcons, cbDebugWdgMsg, cbDebugCodeRes, cbCattleRosterHeight;
+    public JPanel panelTabAuto, panelTabMisc, panelTabInterface, panelTabAudio, panelTabGobs, panelTabControls, panelTabMinimap, panelDetailsBottom, panelTabCateg, panelShapeIcons, panelShapeIconsSaveCancel;
+    public JCheckBox cbSimpleWindowBorder, cbSimpleWindows, cbShapeIcons, cbDebugWdgMsg, cbDebugCodeRes, cbCattleRosterHeight,cbMidiRadio;
     public JTextField tfAutoHideWindows, tfAutoHideWindowDelayMs, tfConfirmPetal, tfBlockAudioMsgs, tfAutoClickMenu, tfAggroRadiusTiles, tfButchermode, tfGobName, tfGobSpeech, tfAudioPath, tfCategName, tfAudioPathCateg, tfGobMaxRequeues;
     public JComboBox<String> cmbCattleRoster, cmbGobCategory, cmbMiniTreeSize, cmbRainLimitPerc, comboShapeIcons;
     public JList<String> listGobsTemp, listGobsSaved, listGobsCategories;
-    public JButton btnRefresh, btnPrintState, btnResetGobs, btnAudioSave, btnAudioClear, btnAudioTest, btnRemGobFromCateg, btnGobColorAdd, btnCategoryColorAdd, btnGobColorRemove, btnCategoryColorRemove, btnResetCateg, btnAddCateg, btnRemoveCateg, btnResetWindowsPos, btnResetActionUses, btnSapeIconPreview, btnShapeIconSave, btnSapeIconDelete, btnSolidColorWindow, btnGridColor, btnHitboxColor;
+    public JButton btnRefresh, btnPrintState, btnResetGobs, btnAudioSave, btnAudioClear, btnAudioTest, btnRemGobFromCateg, btnGobColorAdd, btnCategoryColorAdd, btnGobColorRemove, btnCategoryColorRemove, btnResetCateg, btnAddCateg, btnRemoveCateg, btnResetWindowsPos, btnResetActionUses, btnSapeIconPreview, btnShapeIconSave, btnShapeIconDelete, btnSolidColorWindow, btnGridColor, btnHitboxColor, btnSelMidiFolder;
     public JTextArea txtAreaDebug;
     public static int TABGOB_SESSION = 0;
     public static int TABGOB_SAVED = 1;
@@ -54,6 +58,8 @@ public class ZeeOptionsJFrame extends JFrame {
         buildTabMisc();
 
         buildTabInterface();
+
+        buildTabAudio();
 
         buildTabControls();
 
@@ -150,8 +156,8 @@ public class ZeeOptionsJFrame extends JFrame {
             btnSapeIconPreview.addActionListener(this::previewShapeIcons);
             panelShapeIconsSaveCancel.add(btnShapeIconSave = new JButton("Save as new"));
             btnShapeIconSave.addActionListener(this::saveShapeIcons);
-            panelShapeIconsSaveCancel.add(btnSapeIconDelete = new JButton("Delete"));
-            btnSapeIconDelete.addActionListener(this::deleteShapeIcons);
+            panelShapeIconsSaveCancel.add(btnShapeIconDelete = new JButton("Delete"));
+            btnShapeIconDelete.addActionListener(this::deleteShapeIcons);
             pack();
             repaint();
         });
@@ -436,6 +442,7 @@ public class ZeeOptionsJFrame extends JFrame {
     }
 
 
+
     private void buildTabInterface() {
 
         JPanel pan;
@@ -599,12 +606,21 @@ public class ZeeOptionsJFrame extends JFrame {
             Utils.setprefi("autoHideWindowDelayMs", ZeeConfig.autoHideWindowDelayMs);
         });
 
+    }
+
+
+    private void buildTabAudio(){
+
+        panelTabAudio = new JPanel(new GridBagLayout());
+
+        tabbedPane.addTab("Audio", panelTabAudio);
+
         // notify buddies
-        panelTabInterface.add(new ZeeOptionJCheckBox( "Notify when friends login", "notifyBuddyOnline"),c);
+        panelTabAudio.add(new ZeeOptionJCheckBox( "Notify when friends login", "notifyBuddyOnline"),c);
 
         // mute audio msg
-        panelTabInterface.add(new ZeeOptionJCheckBox( "Mute audio messages (use ;)", "blockAudioMsg"),c);
-        panelTabInterface.add(tfBlockAudioMsgs= new JTextField("",5), c);
+        panelTabAudio.add(new ZeeOptionJCheckBox( "Mute audio messages (use ;)", "blockAudioMsg"),c);
+        panelTabAudio.add(tfBlockAudioMsgs= new JTextField("",5), c);
         tfBlockAudioMsgs.setMaximumSize(new Dimension(Integer.MAX_VALUE, tfBlockAudioMsgs.getPreferredSize().height));
         tfBlockAudioMsgs.setText(ZeeConfig.blockAudioMsgList);
         tfBlockAudioMsgs.addActionListener(actionEvent -> {
@@ -615,6 +631,43 @@ public class ZeeOptionsJFrame extends JFrame {
                 Utils.setpref("blockAudioMsgList",str.strip());
             }
         });
+
+        // midi radio
+        panelTabAudio.add(cbMidiRadio = new ZeeOptionJCheckBox( "Play midi radio", "playMidiRadio"),c);
+        cbMidiRadio.addActionListener(actionEvent -> {
+            btnSelMidiFolder.setEnabled(cbMidiRadio.isSelected());
+        });
+        panelTabAudio.add(btnSelMidiFolder = new JButton("select midi folder"),c);
+        btnSelMidiFolder.setEnabled(cbMidiRadio.isSelected());
+        btnSelMidiFolder.addActionListener(evt -> {
+            JFileChooser f = new JFileChooser();
+            f.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+            f.setAcceptAllFileFilterUsed(false);
+            if (f.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
+                if (f.getCurrentDirectory() != null) {
+
+                    // read path
+                    String path = f.getSelectedFile().getAbsolutePath();
+
+                    //check for midi files
+                    File dir = new File(path);
+                    File[] files = dir.listFiles((dir1, name) -> (name.toLowerCase().endsWith(".mid") || name.toLowerCase().endsWith(".midi")));
+                    if (files==null || files.length==0){
+                        JOptionPane.showMessageDialog(null,"no midi file in that folder");
+                        return;
+                    }
+
+                    // set midi folder path
+                    ZeeConfig.println("set midi directory: " + path);
+                    ZeeMidiRadio.pathFolder = path;
+                    Utils.setpref("midiRadioPath",ZeeMidiRadio.pathFolder);
+                }
+
+            }else{
+                ZeeConfig.println("canceled midi path");
+            }
+        });
+
     }
 
 
