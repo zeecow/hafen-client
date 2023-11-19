@@ -282,7 +282,9 @@ public class ZeeConfig {
     public static int autoHideWindowDelayMs = Utils.getprefi("autoHideWindowDelayMs",1000);
     public static boolean showGobPointer = Utils.getprefb("showGobPointer",false);
     public static boolean showGobRadar = Utils.getprefb("showGobRadar",false);
+
     public static boolean playMidiRadio = Utils.getprefb("playMidiRadio",false);
+    static Runnable playMidiRadioRunnable = () -> ZeeMidiRadio.toggleRadio();
 
     static boolean hideGobs = Utils.getprefb("hideGobs",false);
     static Runnable hideGobsRunnable = () -> ZeeManagerGobClick.toggleModelsAllGobs();

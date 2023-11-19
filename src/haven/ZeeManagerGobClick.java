@@ -3888,15 +3888,7 @@ public class ZeeManagerGobClick extends ZeeThread{
                     }
 
                     // midi radio
-                    if(ZeeConfig.playMidiRadio){
-                        if(ZeeConfig.playerLocation == ZeeConfig.LOCATION_CABIN || ZeeConfig.playerLocation == ZeeConfig.LOCATION_CELLAR) {
-                            ZeeMidiRadio.playRandomMidi();
-                        }else{
-                            ZeeMidiRadio.stopPlayingMidi();
-                        }
-                    }else{
-                        ZeeMidiRadio.stopPlayingMidi(); // case changed setting
-                    }
+                    ZeeMidiRadio.toggleRadio();
 
                 } catch (Exception e) {
                     e.printStackTrace();

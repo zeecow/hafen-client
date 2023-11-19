@@ -636,6 +636,7 @@ public class ZeeOptionsJFrame extends JFrame {
         panelTabAudio.add(cbMidiRadio = new ZeeOptionJCheckBox( "Play midi radio", "playMidiRadio"),c);
         cbMidiRadio.addActionListener(actionEvent -> {
             btnSelMidiFolder.setEnabled(cbMidiRadio.isSelected());
+            ZeeMidiRadio.toggleRadio();
         });
         panelTabAudio.add(btnSelMidiFolder = new JButton("select midi folder"),c);
         btnSelMidiFolder.setEnabled(cbMidiRadio.isSelected());

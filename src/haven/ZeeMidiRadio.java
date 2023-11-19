@@ -14,7 +14,7 @@ public class ZeeMidiRadio {
     static void playRandomMidi(){
 
         if (sequencer!=null && sequencer.isRunning()){
-            ZeeConfig.println("already playing midi");
+            //ZeeConfig.println("already playing midi");
             return;
         }
 
@@ -59,11 +59,11 @@ public class ZeeMidiRadio {
         try {
             if (sequencer!=null) {
                 if (sequencer.isRunning()) {
-                    ZeeConfig.println("midi stop");
+                    //ZeeConfig.println("midi stop");
                     sequencer.stop();
                 }
                 if (sequencer.isOpen()) {
-                    ZeeConfig.println("midi close");
+                    //ZeeConfig.println("midi close");
                     sequencer.close();
                 }
             }
@@ -72,4 +72,18 @@ public class ZeeMidiRadio {
         }
     }
 
+    public static void toggleRadio() {
+        //radio on
+        if(ZeeConfig.playMidiRadio){
+            if(ZeeConfig.playerLocation == ZeeConfig.LOCATION_CABIN || ZeeConfig.playerLocation == ZeeConfig.LOCATION_CELLAR) {
+                ZeeMidiRadio.playRandomMidi();
+            }else{
+                ZeeMidiRadio.stopPlayingMidi();
+            }
+        }
+        //radio off
+        else{
+            ZeeMidiRadio.stopPlayingMidi();
+        }
+    }
 }
