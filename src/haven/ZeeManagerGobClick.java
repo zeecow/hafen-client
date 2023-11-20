@@ -508,7 +508,7 @@ public class ZeeManagerGobClick extends ZeeThread{
     static List<String> getBarterstandItems(Gob barterStand) {
         List<String> ret = new ArrayList<>();
         for (Gob.Overlay ol : barterStand.ols) {
-            if(ol.spr.getClass().getName().contentEquals("Equed")) {
+            if(ol.spr.getClass().getName().contentEquals("haven.res.gfx.fx.eq.Equed")) {
                 try {
                     Field f = ol.spr.getClass().getDeclaredField("espr");
                     f.setAccessible(true);
