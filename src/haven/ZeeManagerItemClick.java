@@ -1549,6 +1549,8 @@ public class ZeeManagerItemClick extends ZeeThread{
             return;
         }
 
+        boolean shift = ZeeConfig.gameUI.ui.modshift;
+
         new ZeeThread(){
             public void run() {
                 drinkThreadWorking = true;
@@ -1616,9 +1618,9 @@ public class ZeeManagerItemClick extends ZeeThread{
                             println("bucket hand null");
                     }
 
-                    // drink 1 gulp and resume move without drinking
-                    // (except when holding shift)
-                    if (drank && !ZeeConfig.gameUI.ui.modshift && ZeeConfig.playerHasAttr("LinMove")){
+                    // if shift down drink 1 gulp and click target coord again
+                    // TODO consider minimap, gob clicks
+                    if (drank && shift && ZeeConfig.playerHasAttr("LinMove")){
                         Coord2d destCoord = Coord2d.of(ZeeConfig.lastMapViewClickMc.x,ZeeConfig.lastMapViewClickMc.y);
                         double stam2 = ZeeConfig.getMeterStamina();
                         double stamGains = 0;
