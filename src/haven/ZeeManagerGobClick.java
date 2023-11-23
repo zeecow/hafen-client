@@ -1101,7 +1101,7 @@ public class ZeeManagerGobClick extends ZeeThread{
     static void checkRightClickGob(Coord pc, Coord2d mc, Gob gob, String gobName) {
 
         //gob to be labeled when window contents open
-        if (List.of("barrel","cistern","demijohn","trough").contains(gob.getres().basename()))
+        if (autoLabelGobsBasename.contains(gob.getres().basename()))
             gobAutoLabel = gob;
         else
             gobAutoLabel = null;
@@ -2128,6 +2128,9 @@ public class ZeeManagerGobClick extends ZeeThread{
 
     private static boolean isGobDeadAnimal;
 
+    static final List<String> autoLabelGobsBasename = List.of("barrel","cistern","demijohn","trough","oven","cauldron","fineryforge","smelter","smokeshed","rabbithutch","chickencoop","kiln");
+    static final List<String> autoLabelWincapContainers = List.of("Barrel","Cistern","Demijohn","Food trough");
+    static final List<String> autoLabelWincapVmeters = List.of("Cauldron","Oven","Ore Smelter","Finery Forge","Smoke shed","Rabbit Hutch","Chicken Coop","Oven","Kiln");
     @SuppressWarnings("unchecked")
     public static void labelGobByContents(Window window) {
         new Thread(){
@@ -2146,6 +2149,24 @@ public class ZeeManagerGobClick extends ZeeThread{
                         return;
                     }
 
+                    // label vertical meters
+                    if (autoLabelWincapVmeters.contains(window.cap))
+                    {
+                        Set<VMeter> vmeter = window.children(VMeter.class);
+                        if (vmeter==null || vmeter.isEmpty()){
+                            println("no vmeter for label fuel > "+window.cap);
+                        }else{
+                            String lblText =  "";
+                            for (VMeter vm : vmeter) {
+                                lblText +=  vm.meters.get(0).a + "   ";
+                            }
+                            lblText = lblText.strip().replaceAll("0\\.",".");
+                            ZeeConfig.addGobText(gobAutoLabel, lblText);
+                        }
+                        return;
+                    }
+
+                    // label container substance name and quantity
                     window.children().forEach(w1 -> {
                         if (w1.getClass().getSimpleName().contentEquals("RelCont")){
                             w1.children().forEach(w2 -> {
@@ -2181,7 +2202,7 @@ public class ZeeManagerGobClick extends ZeeThread{
 
                                         // label gob "name q"
                                         // TODO create variable lastClickedBarrelCIstern to avoid rare mislabeling
-                                        ZeeConfig.addGobText(ZeeConfig.lastMapViewClickGob, gobText);
+                                        ZeeConfig.addGobText(gobAutoLabel, gobText);
 
                                     } catch (IllegalAccessException e) {
                                         e.printStackTrace();

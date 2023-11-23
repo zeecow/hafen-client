@@ -748,11 +748,18 @@ public class ZeeConfig {
 
     static boolean isBird(String name){
         final String[] list = {
-            "rockdove","quail","/chick","/hen","/rooster","eagle","owl","magpie",
+            "rockdove","quail","eagle","owl","magpie",
             "mallard","pelican","seagull","swan","ptarmigan","grouse","bullfinch"
         };
         for (int i = 0; i < list.length; i++) {
             if(name.contains(list[i]))
+                return true;
+        }
+        final String[] listEnds = {
+            "/chick","/hen","/rooster"
+        };
+        for (int i = 0; i < list.length; i++) {
+            if(name.endsWith(list[i]))
                 return true;
         }
         return false;
@@ -1146,7 +1153,7 @@ public class ZeeConfig {
             windowModCattleRoster(window);
         }
         // autolabel contents
-        else if(List.of("Barrel","Cistern","Demijohn","Food trough").contains(windowTitle)) {
+        else if(ZeeManagerGobClick.autoLabelWincapContainers.contains(windowTitle) || ZeeManagerGobClick.autoLabelWincapVmeters.contains(windowTitle) ) {
             ZeeManagerGobClick.labelGobByContents(window);
         }
         //equips
