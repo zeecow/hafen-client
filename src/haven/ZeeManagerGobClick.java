@@ -6,8 +6,12 @@ import haven.resutil.WaterTile;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.lang.reflect.Field;
-import java.util.*;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -2158,7 +2162,8 @@ public class ZeeManagerGobClick extends ZeeThread{
                         }else{
                             String lblText =  "";
                             for (VMeter vm : vmeter) {
-                                lblText +=  vm.meters.get(0).a + "   ";
+                                double twoDecimals = new BigDecimal(vm.meters.get(0).a).setScale(2, RoundingMode.HALF_UP).doubleValue();
+                                lblText += twoDecimals + "   ";
                             }
                             lblText = lblText.strip().replaceAll("0\\.",".");
                             ZeeConfig.addGobText(gobAutoLabel, lblText);

@@ -1154,7 +1154,14 @@ public class ZeeConfig {
         }
         // autolabel contents
         else if(ZeeManagerGobClick.autoLabelWincapContainers.contains(windowTitle) || ZeeManagerGobClick.autoLabelWincapVmeters.contains(windowTitle) ) {
-            ZeeManagerGobClick.labelGobByContents(window);
+            if (!isBuildWindow(window)) {
+                // add window fuel UI
+                if (List.of("Oven", "Kiln", "Ore Smelter").contains(windowTitle)) {
+                    windowAddFuelGUI(window, windowTitle);
+                }
+                // label gob
+                ZeeManagerGobClick.labelGobByContents(window);
+            }
         }
         //equips
         else if(windowTitle.contentEquals("Equipment")) {
@@ -1171,11 +1178,6 @@ public class ZeeConfig {
         //mod tamed animal window
         else if(isWindowAnimalStats(windowTitle)){
             windowModAnimalStats(window, windowTitle);
-        }
-        // auto fuel
-        else if (windowTitle.contentEquals("Oven") || windowTitle.contentEquals("Kiln") || windowTitle.contains("Smelter")){
-            if (!isBuildWindow(window))
-                windowAddFuelGUI(window,windowTitle);
         }
         // auto press
         else if(windowTitle.contentEquals("Extraction Press")) {
