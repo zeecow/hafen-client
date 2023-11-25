@@ -282,6 +282,7 @@ public class ZeeConfig {
     public static int autoHideWindowDelayMs = Utils.getprefi("autoHideWindowDelayMs",1000);
     public static boolean showGobPointer = Utils.getprefb("showGobPointer",false);
     public static boolean showGobRadar = Utils.getprefb("showGobRadar",false);
+    static boolean autocloseXpWindow = Utils.getprefb("autocloseXpWindow",true);
 
     public static boolean playMidiRadio = Utils.getprefb("playMidiRadio",false);
     static Runnable playMidiRadioRunnable = () -> ZeeMidiRadio.toggleRadio();
@@ -1128,6 +1129,8 @@ public class ZeeConfig {
 
 
     public static void windowAdded(Window window, String test) {
+        //println(test+" > "+windowTitle);
+        //println("    deco "+window.deco);
 
         window.zeeWinAdded = true;
 
@@ -1135,9 +1138,6 @@ public class ZeeConfig {
 
         if (windowTitle.contentEquals("Stack"))
             return;
-
-        //println(test+" > "+windowTitle);
-        //println("    deco "+window.deco);
 
         //cheesetray
         if(windowTitle.contentEquals("Rack")) {
@@ -1200,6 +1200,11 @@ public class ZeeConfig {
         else if (ZeeManagerMiner.tunnelHelperStage == ZeeManagerMiner.TUNNELHELPER_STAGE5_BUILDCOL && windowTitle.contentEquals("Stone Column")){
             ZeeManagerMiner.tunnelHelperBuildColumn(window);
         }
+        // xp window
+        else if (isWindowXpEvent(window)){
+            modXpEventWindow(window);
+            return;
+        }
 
         // Craft window
         if(isMakewindow(window)) {
@@ -1244,6 +1249,56 @@ public class ZeeConfig {
         //order of call is important due to window.hasOrganizeButton
         windowModOrganizeButton(window, windowTitle);
         windowModAutoHideButton(window,windowTitle);
+    }
+
+    private static void modXpEventWindow(Window window) {
+
+        //move bottom right, after necessary delay
+        new ZeeThread(){
+            public void run() {
+                try {
+                    sleep(500);
+                    Coord newPos = Coord.of(gameUI.sz.sub(window.sz));
+                    window.move(newPos);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }.start();
+
+        //add checkbox
+        CheckBox cb;
+        window.add(cb = new CheckBox("autoclose"){
+            {a = autocloseXpWindow;}
+            public void set(boolean a) {
+                autocloseXpWindow = a;
+                Utils.setprefb("autocloseXpWindow",a);
+            }
+        },0,0);
+
+        //autoclose
+        if (autocloseXpWindow) {
+            new ZeeThread() {
+                public void run() {
+                    try {
+                        long timeout = 5000;
+                        do {
+                            cb.setLabel("autoclose " + (timeout / 1000) + "s");
+                            sleep(1000);
+                            timeout -= 1000;
+                        } while (timeout > 0);
+                        getButtonNamed(window, "Okay!").click();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            }.start();
+        }
+    }
+
+    static boolean isWindowXpEvent(Window window) {
+        return window.cap.contains("Hey, listen!");
+        //return getButtonNamed(window,"Okay!") != null;
     }
 
     private static void makeWindowAddIrrlightCheckbox(Window window) {
@@ -1991,11 +2046,7 @@ public class ZeeConfig {
     }
 
     public static boolean isMakewindow(Window window) {
-        for (Button b: window.children(Button.class)) {
-            if(b.text.text.contentEquals("Craft All"))
-                return true;
-        }
-        return false;
+        return getButtonNamed(window,"Craft All") != null;
     }
 
     public static int drawText(String text, GOut g, Coord p) {
