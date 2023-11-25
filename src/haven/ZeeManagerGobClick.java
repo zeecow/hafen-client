@@ -8,10 +8,8 @@ import java.awt.event.KeyEvent;
 import java.lang.reflect.Field;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.ArrayList;
-import java.util.Collection;
+import java.util.*;
 import java.util.List;
-import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -2134,7 +2132,15 @@ public class ZeeManagerGobClick extends ZeeThread{
 
     static final List<String> autoLabelGobsBasename = List.of("barrel","cistern","demijohn","trough","oven","cauldron","fineryforge","smelter","smokeshed","rabbithutch","chickencoop","kiln");
     static final List<String> autoLabelWincapContainers = List.of("Barrel","Cistern","Demijohn","Food trough");
-    static final List<String> autoLabelWincapVmeters = List.of("Cauldron","Oven","Ore Smelter","Finery Forge","Smoke shed","Rabbit Hutch","Chicken Coop","Oven","Kiln");
+    static final List<String> autoLabelWincapVmeters = List.of("Cauldron","Oven","Ore Smelter","Finery Forge","Smoke shed","Rabbit Hutch","Chicken Coop","Kiln");
+    static final Map<String,Integer> mapWincapMaxfuel = Map.of(
+        "Oven",30,
+        "Ore Smelter",30,
+        "Finery Forge",15,
+        "Smoke shed",10,
+        "Kiln",30,
+        "Stack Furnace",30
+    );
     @SuppressWarnings("unchecked")
     public static void labelGobByContents(Window window) {
         new Thread(){
@@ -2161,12 +2167,34 @@ public class ZeeManagerGobClick extends ZeeThread{
                             println("no vmeter for label fuel > "+window.cap);
                         }else{
                             String lblText =  "";
-                            for (VMeter vm : vmeter) {
-                                double twoDecimals = new BigDecimal(vm.meters.get(0).a).setScale(2, RoundingMode.HALF_UP).doubleValue();
-                                lblText += twoDecimals + "   ";
+
+                            // fuel units: branches, coal, etc
+                            if (mapWincapMaxfuel.keySet().contains(window.cap)){
+                                Map<String,Integer> mapWincapMaxfuel = new HashMap<>();
+                                int max = ZeeManagerGobClick.mapWincapMaxfuel.get(window.cap);
+                                for (VMeter vm : vmeter) {
+                                    LayerMeter.Meter meter = vm.meters.get(0);
+                                    int fuelUnits = (int) Math.ceil(meter.a * max);
+                                    lblText += fuelUnits + "/" + max;
+                                }
+                                ZeeConfig.addGobText(gobAutoLabel, lblText);
                             }
-                            lblText = lblText.strip().replaceAll("0\\.",".");
-                            ZeeConfig.addGobText(gobAutoLabel, lblText);
+                            // perc% water, swill, etc
+                            else {
+                                Color c = Color.green;
+                                for (VMeter vm : vmeter) {
+                                    LayerMeter.Meter meter = vm.meters.get(0);
+                                    double twoDecimals = new BigDecimal(meter.a).setScale(2, RoundingMode.HALF_UP).doubleValue();
+                                    if (twoDecimals < .3)
+                                        c = Color.red;
+                                    else if (twoDecimals < .8)
+                                        c = Color.yellow;
+
+                                    lblText += twoDecimals + "   ";
+                                }
+                                lblText = lblText.strip().replaceAll("0\\.",".");
+                                ZeeConfig.addGobText(gobAutoLabel, lblText, c);
+                            }
                         }
                         return;
                     }
