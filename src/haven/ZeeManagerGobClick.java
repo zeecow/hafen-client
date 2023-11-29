@@ -1979,8 +1979,6 @@ public class ZeeManagerGobClick extends ZeeThread{
                 if (isShallowWater)
                     opts.add("dig");
                 opts.add("fish");
-                if (isShallowWater)
-                    opts.add("build road");
                 opts.add("inspect cup");
                 if (ZeeManagerItemClick.isCoracleEquipped() && !ZeeConfig.isPlayerMountingHorse()) {
                     opts.add("embark coracle");
