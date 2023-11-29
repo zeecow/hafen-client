@@ -1988,6 +1988,8 @@ public class ZeeManagerGobClick extends ZeeThread{
             else if(!ZeeConfig.isPlobActive()){
                 menu = new ZeeFlowerMenu(coordMc, "dig", "mine");
             }
+            else
+                showMenu = false;
         }
         else if(gob.tags.contains(Gob.Tag.PLAYER_MAIN)) {
             opts = new ArrayList<String>();
@@ -2120,6 +2122,10 @@ public class ZeeManagerGobClick extends ZeeThread{
         }
 
         if (showMenu) {
+            if (menu==null){
+                println("showGobFlowerMenu > menu is null");
+                return false;
+            }
             ZeeConfig.gameUI.ui.root.add(menu, coordPc);
         }
 
