@@ -2149,31 +2149,44 @@ public class ZeeConfig {
         }
     }
 
+    static boolean showRadiusBeeskep = false;
     static void toggleRadiusBeeskep(){
+        showRadiusBeeskep = ! showRadiusBeeskep;
         List<Gob> beeskeps = findGobsByNameEndsWith("/beehive");
         if (!beeskeps.isEmpty()){
             for (Gob skep : beeskeps) {
-                Gob.Overlay radius = skep.findol(ZeeGobRadius.class);
-                if (radius!=null){
-                    radius.remove();
-                }else{
-                    skep.addol(new Gob.Overlay(skep, new ZeeGobRadius(skep, null, ZeeGobRadius.RADIUS_BEESKEP,new Color(139, 139, 185, 48)), -1));
-                }
+                toggleRadiusBeeskep(skep);
             }
         }
     }
 
+    static void toggleRadiusBeeskep(Gob skep) {
+        if (!showRadiusBeeskep){
+            Gob.Overlay radius = skep.findol(ZeeGobRadius.class);
+            if (radius!=null)
+                radius.remove();
+        }else{
+            skep.addol(new Gob.Overlay(skep, new ZeeGobRadius(skep, null, ZeeGobRadius.RADIUS_BEESKEP,new Color(139, 139, 185, 48)), -1));
+        }
+    }
+
+    static boolean showRadiusFoodtrough = false;
     static void toggleRadiusFoodtrough(){
+        showRadiusFoodtrough = ! showRadiusFoodtrough;
         List<Gob> foodtroughs = findGobsByNameEndsWith("/trough");
         if (!foodtroughs.isEmpty()){
-            for (Gob troughs : foodtroughs) {
-                Gob.Overlay radius = troughs.findol(ZeeGobRadius.class);
-                if (radius!=null){
-                    radius.remove();
-                }else{
-                    troughs.addol(new Gob.Overlay(troughs, new ZeeGobRadius(troughs, null, ZeeGobRadius.RADIUS_FOOD_THROUGH,new Color(139, 139, 185, 48)), -1));
-                }
+            for (Gob t : foodtroughs) {
+                toggleRadiusFoodtrough(t);
             }
+        }
+    }
+    static void toggleRadiusFoodtrough(Gob trough) {
+        if (!showRadiusFoodtrough){
+            Gob.Overlay radius = trough.findol(ZeeGobRadius.class);
+            if (radius!=null)
+                radius.remove();
+        }else{
+            trough.addol(new Gob.Overlay(trough, new ZeeGobRadius(trough, null, ZeeGobRadius.RADIUS_FOOD_THROUGH,new Color(139, 139, 185, 48)), -1));
         }
     }
 
@@ -3615,10 +3628,19 @@ public class ZeeConfig {
                         ob.addol(ZeeGobPointer.gobRadar = new ZeeGobRadar(ob, Coord3f.of(10, 10, 5), new Color(240, 0, 253, 90)));
                 }
             }
-            // mine ladder radius
+            // radius ladder
             else if(ob.getres().name.endsWith("terobjs/ladder")) {
                 toggleMineLadderRadius(ob);
             }
+            // radius beeskep
+            else if(ob.getres().name.endsWith("terobjs/beehive")) {
+                toggleRadiusBeeskep(ob);
+            }
+            // radius trough
+            else if(ob.getres().name.endsWith("terobjs/trough")) {
+                toggleRadiusFoodtrough(ob);
+            }
+
 
             // apply settings audio/aggro  (ignore bat if using batcape)
             if (!ob.getres().name.contentEquals("gfx/kritter/bat/bat") || !ZeeManagerItemClick.isItemEquipped("/batcape")) {
@@ -4607,5 +4629,9 @@ public class ZeeConfig {
             case LOCATION_UNDEFINED: return "undefined";
         }
         return "wtf";
+    }
+
+    public static boolean isPlobActive() {
+        return ZeeManagerStockpile.lastPlob != null;
     }
 }

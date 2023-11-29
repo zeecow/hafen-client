@@ -1985,7 +1985,7 @@ public class ZeeManagerGobClick extends ZeeThread{
                 }
                 menu = new ZeeFlowerMenu(coordMc, opts.toArray(String[]::new));
             }
-            else{
+            else if(!ZeeConfig.isPlobActive()){
                 menu = new ZeeFlowerMenu(coordMc, "dig", "mine");
             }
         }
