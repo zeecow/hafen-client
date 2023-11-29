@@ -37,7 +37,7 @@ public class ZeeMidiRadio {
 
             // open default sequencer
             sequencer = MidiSystem.getSequencer();
-            stopPlayingMidi();
+            stopPlayingMidi("open seq");
             sequencer.open();
 
             // create midi stream
@@ -56,14 +56,19 @@ public class ZeeMidiRadio {
     }
 
     static void stopPlayingMidi(){
+        stopPlayingMidi("");
+    }
+
+    static void stopPlayingMidi(String src){
+        //ZeeConfig.println("stopPlayingMidi > "+src);
         try {
             if (sequencer!=null) {
                 if (sequencer.isRunning()) {
-                    //ZeeConfig.println("midi stop");
+                    //ZeeConfig.println("   midi stop");
                     sequencer.stop();
                 }
                 if (sequencer.isOpen()) {
-                    //ZeeConfig.println("midi close");
+                    //ZeeConfig.println("   midi close");
                     sequencer.close();
                 }
             }
@@ -78,12 +83,12 @@ public class ZeeMidiRadio {
             if(ZeeConfig.playerLocation == ZeeConfig.LOCATION_CABIN || ZeeConfig.playerLocation == ZeeConfig.LOCATION_CELLAR) {
                 ZeeMidiRadio.playRandomMidi();
             }else{
-                ZeeMidiRadio.stopPlayingMidi();
+                ZeeMidiRadio.stopPlayingMidi("location "+ZeeConfig.getPlayerLocationName());
             }
         }
         //radio off
         else{
-            ZeeMidiRadio.stopPlayingMidi();
+            ZeeMidiRadio.stopPlayingMidi("toggle off");
         }
     }
 }

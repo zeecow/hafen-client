@@ -26,10 +26,9 @@
 
 package haven;
 
-import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.util.*;
 import java.awt.event.KeyEvent;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class LoginScreen extends Widget {
@@ -56,6 +55,7 @@ public class LoginScreen extends Widget {
 	optbtn = adda(new Button(UI.scale(100), "Options"), pos("cbl").add(10, -10), 0, 1);
 	optbtn.setgkey(GameUI.kb_opt);
 	adda(login = new Credbox(), bgc.adds(0, 10), 0.5, 0.0).hide();
+	ZeeMidiRadio.stopPlayingMidi("login");
     }
 
     public static final KeyBinding kb_savtoken = KeyBinding.get("login/savtoken", KeyMatch.forchar('R', KeyMatch.M));

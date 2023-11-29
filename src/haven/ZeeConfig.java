@@ -143,7 +143,7 @@ public class ZeeConfig {
     static final int LOCATION_CELLAR = 1, DEF_LIGHT_CELLAR = 32;
     static final int LOCATION_CABIN = 2, DEF_LIGHT_CABIN = 144;
     static final int LOCATION_UNDERGROUND = 3, DEF_LIGHT_UNDERGROUND = 48;
-    static int playerLocation = -1;
+    static int playerLocation = LOCATION_UNDEFINED;
 
     static Color COLOR_RED = new Color(255,0,0,200);
     static Color COLOR_ORANGE = new Color(255,128,0,200);
@@ -4595,5 +4595,16 @@ public class ZeeConfig {
             }
         }
         return null;
+    }
+
+    public static String getPlayerLocationName() {
+        switch (playerLocation){
+            case LOCATION_CABIN: return "cabin";
+            case LOCATION_CELLAR: return "cellar";
+            case LOCATION_UNDERGROUND: return "undeground";
+            case LOCATION_OUTSIDE: return "outside";
+            case LOCATION_UNDEFINED: return "undefined";
+        }
+        return "wtf";
     }
 }
