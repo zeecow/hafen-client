@@ -1287,7 +1287,8 @@ public class ZeeConfig {
                             sleep(1000);
                             timeout -= 1000;
                         } while (timeout > 0);
-                        getButtonNamed(window, "Okay!").click();
+                        if (autocloseXpWindow)//may be unchecked since thread start
+                            getButtonNamed(window, "Okay!").click();
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
