@@ -1139,6 +1139,9 @@ public class ZeeConfig {
         if (windowTitle.contentEquals("Stack"))
             return;
 
+        if (isBuildWindow(window))
+            return;
+
         //cheesetray
         if(windowTitle.contentEquals("Rack")) {
             ZeeManagerItemClick.checkCheeseTray(window);
@@ -1154,14 +1157,12 @@ public class ZeeConfig {
         }
         // autolabel contents
         else if(ZeeManagerGobClick.autoLabelWincapContainers.contains(windowTitle) || ZeeManagerGobClick.autoLabelWincapVmeters.contains(windowTitle) ) {
-            if (!isBuildWindow(window)) {
-                // add window fuel UI
-                if (List.of("Oven", "Kiln", "Ore Smelter").contains(windowTitle)) {
-                    windowAddFuelGUI(window, windowTitle);
-                }
-                // label gob
-                ZeeManagerGobClick.labelGobByContents(window);
+            // add window fuel UI
+            if (List.of("Oven", "Kiln", "Ore Smelter").contains(windowTitle)) {
+                windowAddFuelGUI(window, windowTitle);
             }
+            // label gob
+            ZeeManagerGobClick.labelGobByContents(window);
         }
         //equips
         else if(windowTitle.contentEquals("Equipment")) {
@@ -1172,7 +1173,7 @@ public class ZeeConfig {
             windowInvMain = window;
         }
         //barter stand
-        else if(windowTitle.contentEquals("Barter Stand") && window.sz.x > 300){//avoid build window
+        else if(windowTitle.contentEquals("Barter Stand")){
             windowModBarterStand(window);
         }
         //mod tamed animal window
@@ -1181,19 +1182,17 @@ public class ZeeConfig {
         }
         // auto press
         else if(windowTitle.contentEquals("Extraction Press")) {
-            if (!isBuildWindow(window)) {
-                Button btnPress = getButtonNamed(window,"Press");
-                if (btnPress==null){
-                    println("addWindow > winepress button not found");
-                } else {
-                    window.add(new Button(UI.scale(60), "auto") {
-                        public void wdgmsg(String msg, Object... args) {
-                            if (msg.contentEquals("activate")) {
-                                ZeeManagerGobClick.autoPressWine(window);
-                            }
+            Button btnPress = getButtonNamed(window,"Press");
+            if (btnPress==null){
+                println("addWindow > winepress button not found");
+            } else {
+                window.add(new Button(UI.scale(60), "auto") {
+                    public void wdgmsg(String msg, Object... args) {
+                        if (msg.contentEquals("activate")) {
+                            ZeeManagerGobClick.autoPressWine(window);
                         }
-                    }, btnPress.c.x + btnPress.sz.x + 5 , btnPress.c.y);
-                }
+                    }
+                }, btnPress.c.x + btnPress.sz.x + 5 , btnPress.c.y);
             }
         }
         //tunnel helper
@@ -1241,7 +1240,7 @@ public class ZeeConfig {
 
         }
 
-        if (gameUI!=null && !gameUI.sz.equals(0,0) && !isBuildWindow(window)){
+        if (gameUI!=null && !gameUI.sz.equals(0,0)){
             windowApplySavedPosition(window, windowTitle);
             windowFitView(window);
         }
