@@ -2134,9 +2134,9 @@ public class ZeeManagerGobClick extends ZeeThread{
 
     private static boolean isGobDeadAnimal;
 
-    static final List<String> autoLabelGobsBasename = List.of("barrel","cistern","demijohn","trough","oven","cauldron","fineryforge","smelter","smokeshed","rabbithutch","chickencoop","kiln");
+    static final List<String> autoLabelGobsBasename = List.of("barrel","cistern","demijohn","trough","oven","cauldron","fineryforge","smelter","smokeshed","rabbithutch","chickencoop","kiln","curdingtub");
     static final List<String> autoLabelWincapContainers = List.of("Barrel","Cistern","Demijohn","Food trough");
-    static final List<String> autoLabelWincapVmeters = List.of("Cauldron","Oven","Ore Smelter","Finery Forge","Smoke shed","Rabbit Hutch","Chicken Coop","Kiln");
+    static final List<String> autoLabelWincapVmeters = List.of("Cauldron","Oven","Ore Smelter","Finery Forge","Smoke shed","Rabbit Hutch","Chicken Coop","Kiln","Curding Tub");
     static final Map<String,Integer> mapWincapMaxfuel = Map.of(
         "Oven",30,
         "Ore Smelter",30,
