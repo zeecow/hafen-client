@@ -1701,15 +1701,15 @@ public class ZeeConfig {
     private static boolean barterAutoDisRunning = false;
     private static void barterAutoDisableStacking() {
         if (barterAutoDisRunning){
-            println("barterAutoDisRunning = switched stands?");
+            //println("barterAutoDisRunning = switched stands?");
             return;
         }
         if (!barterAutoDisableStacking){
-            println("auto disable stackng is off");
+            //println("auto disable stackng is off");
             return;
         }
         if (!autoStack){
-            println("stackng is already off");
+            //println("stackng is already off");
             return;
         }
         new ZeeThread(){
@@ -1718,9 +1718,10 @@ public class ZeeConfig {
                 try {
                     Gob player = getPlayerGob();
                     Coord2d rc = Coord2d.of(player.rc.x,player.rc.y);
-                    println("auto disable stacking start");
+                    //println("auto disable stacking start");
                     //disable stacking
                     toggleAutostack();
+                    addPlayerText("stacking off");
                     //wait player move
                     do{
                         sleep(PING_MS);
@@ -1728,7 +1729,6 @@ public class ZeeConfig {
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-                println("auto disable stacking end");
                 //enable stacking
                 toggleAutostack();
                 removePlayerText();
