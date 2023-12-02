@@ -187,7 +187,8 @@ public class ZeeConfig {
 
     static int aggroRadiusTiles = Utils.getprefi("aggroRadiusTiles", 11);
     static boolean alertOnPlayers = Utils.getprefb("alertOnPlayers", true);
-    static boolean allowMidclickAutoBuy = false;
+    static boolean barterStandMidclickAutoBuy = false;
+    static boolean barterAutoDisableStacking = Utils.getprefb("barterStandStackingOff",true);
     static boolean clickIconStoatAggro = Utils.getprefb("clickIconStoatAggro", true);
     static boolean autoChipMinedBoulder = Utils.getprefb("autoChipMinedBoulder", true);
     static boolean autoClickMenuOption = Utils.getprefb("autoClickMenuOption", true);
@@ -1633,14 +1634,22 @@ public class ZeeConfig {
             }
         });
 
-        // auto-buy checkbox
-        ZeeConfig.allowMidclickAutoBuy = false;
-        window.add(new CheckBox("allow midclick auto-buy"){
+        // checkbox auto-buy
+        barterStandMidclickAutoBuy = false;
+        Widget wdg = window.add(new CheckBox("midclick auto-buy"){
             public void changed(boolean val) {
-                ZeeConfig.allowMidclickAutoBuy = val;
+                barterStandMidclickAutoBuy = val;
             }
         },0,400);
 
+        // checkbox stacking off
+        wdg = window.add(new CheckBox("auto-disable stacking"){
+            { a = barterAutoDisableStacking; }
+            public void changed(boolean val) {
+                barterAutoDisableStacking = val;
+            }
+        },0,wdg.c.y+wdg.sz.y);
+        barterAutoDisableStacking();
 
         //button return branches
         Widget btn = window.add(new Button(UI.scale(120),"return branches"){
@@ -1682,11 +1691,50 @@ public class ZeeConfig {
                     }
                 }.start();
             }
-        },0,413);
+        },0,wdg.c.y+wdg.sz.y+3);
         btn.settip("return branches to closest wooden chest");
 
 
-        window.resize(260,440);
+        window.resize(260,btn.c.y+btn.sz.y);
+    }
+
+    private static boolean barterAutoDisRunning = false;
+    private static void barterAutoDisableStacking() {
+        if (barterAutoDisRunning){
+            println("barterAutoDisRunning = switched stands?");
+            return;
+        }
+        if (!barterAutoDisableStacking){
+            println("auto disable stackng is off");
+            return;
+        }
+        if (!autoStack){
+            println("stackng is already off");
+            return;
+        }
+        new ZeeThread(){
+            public void run() {
+                barterAutoDisRunning = true;
+                try {
+                    Gob player = getPlayerGob();
+                    Coord2d rc = Coord2d.of(player.rc.x,player.rc.y);
+                    println("auto disable stacking start");
+                    //disable stacking
+                    toggleAutostack();
+                    //wait player move
+                    do{
+                        sleep(PING_MS);
+                    }while(rc.compareToFixMaybe(player.rc)==0);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                println("auto disable stacking end");
+                //enable stacking
+                toggleAutostack();
+                removePlayerText();
+                barterAutoDisRunning = false;
+            }
+        }.start();
     }
 
 
@@ -3900,7 +3948,7 @@ public class ZeeConfig {
             Window w = button.getparent(Window.class);
             if (w==null || !w.cap.contentEquals("Barter Stand"))
                 return;
-            if (!ZeeConfig.allowMidclickAutoBuy){
+            if (!ZeeConfig.barterStandMidclickAutoBuy){
                 ZeeConfig.msg("Click bottom checkbox to allow auto-buy");
                 return;
             }
