@@ -27,6 +27,7 @@
 package haven;
 
 import java.util.*;
+import java.awt.AWTException;
 import java.awt.EventQueue;
 import java.awt.Robot;
 import java.awt.Point;
@@ -36,33 +37,21 @@ import haven.render.States;
 import haven.render.gl.*;
 import haven.render.lwjgl.*;
 import haven.JOGLPanel.SyncMode;
-import static org.lwjgl.opengl.GL30.*;
 
 public class LWJGLPanel extends AWTGLCanvas implements GLPanel, Console.Directory {
+    private static final int[][] glversions = {
+	{4, 6}, {4, 5}, {4, 4}, {4, 3}, {4, 2}, {4, 1}, {4, 0},
+	{3, 3}, {3, 2},
+    };
     private static final boolean dumpbgl = true;
     private LWJGLEnvironment env = null;
+    private boolean aswap;
     private Area shape;
     private Pipe base, wnd;
     private final Loop main = new Loop(this);
 
-    private static GLData mkcaps() {
-	GLData caps = new GLData();
-	/* XXX? Technically, I'd like to explicitly request a Core
-	 * profile, but on Windows, AWTGLCanvas then also forces me to
-	 * request a specific OpenGL version, while I'd like to have
-	 * the latest. Checking the specs, however, a Core profile
-	 * should be the default if nothing else is specified, so
-	 * perhaps this is fine?
-
-	caps.profile = GLData.Profile.CORE;
-	caps.majorVersion = 3;
-	caps.minorVersion = 3;
-	*/
-	return(caps);
-    }
-
     public LWJGLPanel() {
-	super(mkcaps());
+	super();
 	base = new BufPipe();
 	base.prep(new FragColor<>(FragColor.defcolor)).prep(new DepthBuffer<>(DepthBuffer.defdepth));
 	base.prep(FragColor.blend(new BlendMode()));
@@ -72,6 +61,23 @@ public class LWJGLPanel extends AWTGLCanvas implements GLPanel, Console.Director
 
     public void initGL() {}
     public void paintGL() {}
+
+    protected ContextData createContext() throws AWTException {
+	for(int[] ver : glversions) {
+	    GLData caps = new GLData();
+	    caps.majorVersion = ver[0];
+	    caps.minorVersion = ver[1];
+	    caps.profile = GLData.Profile.CORE;
+	    try {
+		return(createContext(caps));
+	    } catch(AWTException e) {
+		/* Try next */
+	    }
+	}
+	/* Try to get whatever and see if LWJGLEnvironment considers
+	 * that to pass muster. */
+	return(createContext(new GLData()));
+    }
 
     private final haven.error.ErrorHandler errh = haven.error.ErrorHandler.find();
     private void setenv(LWJGLEnvironment env) {
@@ -94,9 +100,16 @@ public class LWJGLPanel extends AWTGLCanvas implements GLPanel, Console.Director
     public Area shape() {return(shape);}
     public Pipe basestate() {return(wnd);}
 
+    private boolean iswap() {
+	return(main.ui.gprefs.vsync.val);
+    }
+
     public void glswap(GL gl) {
+	boolean iswap = iswap();
 	if(main.gldebug)
 	    GLException.checkfor(gl, null);
+	if(iswap != aswap)
+	    setSwapInterval((aswap = iswap) ? 1 : 0);
 	swapBuffers();
 	if(main.gldebug)
 	    GLException.checkfor(gl, null);
@@ -105,6 +118,10 @@ public class LWJGLPanel extends AWTGLCanvas implements GLPanel, Console.Director
     private void reshape(Area shape) {
 	this.shape = shape;
 	this.wnd = base.copy().prep(new States.Viewport(shape)).prep(new Ortho2D(shape));
+    }
+
+    private void initgl() {
+	setSwapInterval((aswap = iswap()) ? 1 : 0);
     }
 
     private void awtrun(Runnable task) throws InterruptedException {
@@ -127,7 +144,8 @@ public class LWJGLPanel extends AWTGLCanvas implements GLPanel, Console.Director
 	    glrun(() -> {
 		    org.lwjgl.opengl.GL.createCapabilities();
 		    synchronized(this) {
-			setenv(new LWJGLEnvironment(effective, this.shape));
+			setenv(new LWJGLEnvironment(this.shape));
+			initgl();
 			notifyAll();
 		    }
 		});
