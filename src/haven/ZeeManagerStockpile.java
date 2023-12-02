@@ -1381,6 +1381,8 @@ public class ZeeManagerStockpile extends ZeeThread{
                         if (ZeeManagerItemClick.pickUpInvItem(inv, "/sand")) {
                             // pile sand
                             ZeeManagerGobClick.itemActGob(existingPile, UI.MOD_SHIFT);
+                            sleep(500);
+                            waitPlayerIdlePose();
                             //wait piling
                             if (waitNotHoldingItem()) {
                                 sleep(500);//wait transfer
