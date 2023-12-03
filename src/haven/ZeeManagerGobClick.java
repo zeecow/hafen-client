@@ -2021,11 +2021,11 @@ public class ZeeManagerGobClick extends ZeeThread{
         // tree
         else if (isGobTree(gobName)){
             opts = new ArrayList<String>();
-            if (gobName.endsWith("/towercap"))
-                opts.add(ZeeFlowerMenu.STRPETAL_INSPECT);
-            opts.add(ZeeFlowerMenu.STRPETAL_TOGGLEGROWTHTEXTS);
             opts.add(ZeeFlowerMenu.STRPETAL_REMOVETREEANDSTUMP);
             opts.add(ZeeFlowerMenu.STRPETAL_REMOVEALLTREES);
+            opts.add(ZeeFlowerMenu.STRPETAL_TOGGLEGROWTHTEXTS);
+            if (gobName.endsWith("/towercap"))
+                opts.add(ZeeFlowerMenu.STRPETAL_INSPECT);
             if (ZeeConfig.playerHasAnyPose(ZeeConfig.POSE_PLAYER_CHOPTREE, ZeeConfig.POSE_PLAYER_DRINK)){
                 opts.add("Queue chopping");
             }
