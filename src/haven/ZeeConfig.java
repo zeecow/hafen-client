@@ -1212,9 +1212,6 @@ public class ZeeConfig {
         // Craft window
         if(isMakewindow(window)) {
 
-            // use same widow title for all craft windows
-            windowTitle = WINDOW_NAME_CRAFT;
-
             // cheese tray
             if(windowTitle.contentEquals("Cheese Tray")){
                 ZeeManagerItemClick.cheeseTrayMakeWindow(window);
@@ -1246,6 +1243,8 @@ public class ZeeConfig {
             // checkbox auto pick irrlight
             makeWindowAddIrrlightCheckbox(window);
 
+            // use same widow title for all craft windows
+            windowTitle = WINDOW_NAME_CRAFT;
         }
 
         if (gameUI!=null && !gameUI.sz.equals(0,0)){
