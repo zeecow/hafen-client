@@ -1264,11 +1264,9 @@ public class ZeeConfig {
         new ZeeThread(){
             public void run() {
                 try {
-                    sleep(500);
-                    Coord newPos = Coord.of(
-                        gameUI.menu.c.x - window.sz.x,
-                        gameUI.zeeHistWdg.c.y-window.sz.y
-                    );
+                    sleep(PING_MS);
+                    Coord newPos = Coord.of(gameUI.sz.sub(window.sz));
+                    newPos = newPos.add(-gameUI.menu.sz.x,-MenuGrid.bgsz.y);
                     window.move(newPos);
                 } catch (Exception e) {
                     e.printStackTrace();
