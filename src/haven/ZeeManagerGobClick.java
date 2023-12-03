@@ -1593,8 +1593,8 @@ public class ZeeManagerGobClick extends ZeeThread{
 
         String gobName = gob.getres().name;
 
-        if (petalName.contentEquals(ZeeFlowerMenu.STRPETAL_OPENCATTLEROSTER))
-            ZeeConfig.gameUI.menu.wdgmsg("act","croster");
+        if (petalName.contentEquals(ZeeFlowerMenu.STRPETAL_TOGGLE_CATTLEROSTER))
+            ZeeConfig.getMenuButton("croster").use(new MenuGrid.Interaction(1, ZeeConfig.gameUI.ui.modflags()));
         else if (petalName.contentEquals(ZeeFlowerMenu.STRPETAL_MEMORIZEAREANIMALS))
             ZeeConfig.gameUI.menu.wdgmsg("act","croster","a");
         else if (petalName.contentEquals(ZeeFlowerMenu.STRPETAL_TILEMONITOR))
@@ -2003,7 +2003,7 @@ public class ZeeManagerGobClick extends ZeeThread{
             menu = new ZeeFlowerMenu(gob, opts.toArray(String[]::new));
         }
         else if (isGobTamedAnimalOrAurochEtc(gobName) && !isGobDeadOrKO(gob)) {
-            menu = new ZeeFlowerMenu(gob, ZeeFlowerMenu.STRPETAL_OPENCATTLEROSTER, ZeeFlowerMenu.STRPETAL_MEMORIZEAREANIMALS);
+            menu = new ZeeFlowerMenu(gob, ZeeFlowerMenu.STRPETAL_TOGGLE_CATTLEROSTER, ZeeFlowerMenu.STRPETAL_MEMORIZEAREANIMALS);
         }
         else if (isGobButchable(gobName) && isGobDeadOrKO(gob)) {
             menu = new ZeeFlowerMenu(gob, ZeeFlowerMenu.STRPETAL_AUTOBUTCH_BIGDEADANIMAL, ZeeFlowerMenu.STRPETAL_LIFTUPGOB);

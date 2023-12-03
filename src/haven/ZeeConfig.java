@@ -1358,19 +1358,7 @@ public class ZeeConfig {
 
                     // wait remote widgets
                     try{
-                        Field f = window.getClass().getDeclaredField("rmseq");
-                        int rmseq = (int) f.get(window);
-                        int lastRmSeq = rmseq;
-                        long lastRmSeqMs = now();
-                        //wait rmseq stop for 1sec
-                        do{
-                            sleep(PING_MS);
-                            rmseq = (int) f.get(window);
-                            if (rmseq != lastRmSeq) {
-                                lastRmSeq = rmseq;
-                                lastRmSeqMs = now();
-                            }
-                        }while(now() - lastRmSeqMs < PING_MS);
+                        sleep(1000);
                     }catch(Exception e){
                         e.printStackTrace();
                     }
@@ -1416,7 +1404,7 @@ public class ZeeConfig {
                         }
                     });
 
-                    // animal type buttons reposition
+                    // animal type buttons
                     window.children(IButton.class).forEach(button -> {
                         button.c.y = (int) (button.c.y * cattleRosterHeightPercentage);
                     });
