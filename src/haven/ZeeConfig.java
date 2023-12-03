@@ -42,7 +42,8 @@ public class ZeeConfig {
     static final String MAP_ACTION_USES = "mapActionUses2";
     static final String MAP_GOB_COLOR = "mapGobSettings2";
     static final String MAP_WND_POS = "mapWindowPos3";
-    static final String MAKE_WINDOW_NAME = "Makewindow";
+    static final String WINDOW_NAME_CRAFT = "Makewindow";
+    static final String WINDOW_NAME_XPEVT = "XpEvtWindow";
 
     static final String CURSOR_ARW = "gfx/hud/curs/arw";//cursor
     static final String CURSOR_ATK = "gfx/hud/curs/atk";
@@ -1202,12 +1203,18 @@ public class ZeeConfig {
         }
         // xp window
         else if (isWindowXpEvent(window)){
+            // use same widow title for all xpevt windows
+            windowTitle = WINDOW_NAME_XPEVT;
             modXpEventWindow(window);
             return;
         }
 
         // Craft window
         if(isMakewindow(window)) {
+
+            // use same widow title for all craft windows
+            windowTitle = WINDOW_NAME_CRAFT;
+
             // cheese tray
             if(windowTitle.contentEquals("Cheese Tray")){
                 ZeeManagerItemClick.cheeseTrayMakeWindow(window);
@@ -1258,7 +1265,10 @@ public class ZeeConfig {
             public void run() {
                 try {
                     sleep(500);
-                    Coord newPos = Coord.of(gameUI.sz.sub(window.sz));
+                    Coord newPos = Coord.of(
+                        gameUI.menu.c.x - window.sz.x,
+                        gameUI.zeeHistWdg.c.y-window.sz.y
+                    );
                     window.move(newPos);
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -1770,9 +1780,6 @@ public class ZeeConfig {
     private static void windowApplySavedPosition(Window window, String windowTitle) {
         Coord c;
         if(rememberWindowsPos && !(window instanceof MapWnd) ){
-            if(isMakewindow(window)){
-                windowTitle = MAKE_WINDOW_NAME;
-            }
             //use saved position window
             if (mapWindowPos!=null && (c = mapWindowPos.get(windowTitle)) != null) {
                 window.c = c;
@@ -2115,7 +2122,7 @@ public class ZeeConfig {
 
         // set craft window unique name
         if(isMakewindow(window))
-            name = MAKE_WINDOW_NAME;
+            name = WINDOW_NAME_CRAFT;
 
         //save window pos
         mapWindowPos.put(name, new Coord(window.c));
