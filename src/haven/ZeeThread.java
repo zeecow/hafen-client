@@ -267,22 +267,8 @@ public class ZeeThread  extends Thread{
         return waitGobIdleVelocity(k);
     }
 
-    static public String[] arrayPlayerActivePoses = new String[]{
-            ZeeConfig.POSE_PLAYER_DRINK,
-            ZeeConfig.POSE_PLAYER_CHOPTREE,
-            ZeeConfig.POSE_PLAYER_CHOPBLOCK,
-            ZeeConfig.POSE_PLAYER_DIGSHOVEL,
-            ZeeConfig.POSE_PLAYER_PICK,
-            ZeeConfig.POSE_PLAYER_SAWING,
-            ZeeConfig.POSE_PLAYER_CHIPPINGSTONE,
-            ZeeConfig.POSE_PLAYER_BUILD,
-            ZeeConfig.POSE_PLAYER_BUTCH,
-            ZeeConfig.POSE_PLAYER_HARVESTING,
-            ZeeConfig.POSE_PLAYER_PICKGROUND,
-            ZeeConfig.POSE_PLAYER_BUSHPICK
-    };
     public static boolean waitPlayerNonActivePose(){
-        return waitPlayerPoseNotInList(arrayPlayerActivePoses);
+        return waitPlayerPoseNotInList(ZeeConfig.arrayPlayerActivePoses);
     }
 
 
@@ -557,7 +543,7 @@ public class ZeeThread  extends Thread{
                     //horse idle
                     if (ZeeConfig.gobHasAnyPose(ZeeConfig.getPlayerMountedHorse(), ZeeConfig.POSE_HORSE_IDLE)){
                         //player non active
-                        if (!ZeeConfig.playerHasAnyPose(arrayPlayerActivePoses)){
+                        if (!ZeeConfig.playerHasAnyPose(ZeeConfig.arrayPlayerActivePoses)){
                             pidle = true;
                             break;
                         }

@@ -1701,40 +1701,69 @@ public class ZeeConfig {
     private static boolean barterAutoDisRunning = false;
     private static void barterAutoDisableStacking() {
         if (barterAutoDisRunning){
-            //println("barterAutoDisRunning = switched stands?");
+            println("stacking off switched stands?");
             return;
         }
         if (!barterAutoDisableStacking){
-            //println("auto disable stackng is off");
+            println("auto disable stackng is off");
             return;
         }
         if (!autoStack){
-            //println("stackng is already off");
+            println("stackng is already off");
             return;
         }
         new ZeeThread(){
             public void run() {
+                //println("auto disable stacking start");
                 barterAutoDisRunning = true;
                 try {
-                    Gob player = getPlayerGob();
-                    Coord2d rc = Coord2d.of(player.rc.x,player.rc.y);
-                    //println("auto disable stacking start");
-                    //disable stacking
-                    toggleAutostack();
+                    //disable stacking if necessary
+                    if (autoStack)
+                        toggleAutostack();
                     addPlayerText("stacking off");
-                    //wait player move
+                    //wait barter window close
                     do{
-                        sleep(PING_MS);
-                    }while(rc.compareToFixMaybe(player.rc)==0);
+                        sleep(500);
+                    }while(getWindow("Barter Stand")!=null || !isPlayerIdlePose());
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
                 //enable stacking
-                toggleAutostack();
+                if (!autoStack)
+                    toggleAutostack();
+                //println("auto disable stacking end");
                 removePlayerText();
                 barterAutoDisRunning = false;
             }
         }.start();
+    }
+
+    static boolean isPlayerIdlePose() {
+        if (ZeeConfig.isPlayerMountingHorse()) {
+            return gobHasAnyPose(getPlayerMountedHorse(), POSE_HORSE_IDLE) &&
+                    !isPlayerActivePose();
+        }
+        else {
+            return playerHasAnyPose(POSE_PLAYER_IDLE,POSE_PLAYER_KICKSLED_IDLE);
+        }
+    }
+
+    static public String[] arrayPlayerActivePoses = new String[]{
+            ZeeConfig.POSE_PLAYER_DRINK,
+            ZeeConfig.POSE_PLAYER_CHOPTREE,
+            ZeeConfig.POSE_PLAYER_CHOPBLOCK,
+            ZeeConfig.POSE_PLAYER_DIGSHOVEL,
+            ZeeConfig.POSE_PLAYER_PICK,
+            ZeeConfig.POSE_PLAYER_SAWING,
+            ZeeConfig.POSE_PLAYER_CHIPPINGSTONE,
+            ZeeConfig.POSE_PLAYER_BUILD,
+            ZeeConfig.POSE_PLAYER_BUTCH,
+            ZeeConfig.POSE_PLAYER_HARVESTING,
+            ZeeConfig.POSE_PLAYER_PICKGROUND,
+            ZeeConfig.POSE_PLAYER_BUSHPICK
+    };
+    static boolean isPlayerActivePose() {
+        return playerHasAnyPose(arrayPlayerActivePoses);
     }
 
 
