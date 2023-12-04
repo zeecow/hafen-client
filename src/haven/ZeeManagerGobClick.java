@@ -2186,16 +2186,18 @@ public class ZeeManagerGobClick extends ZeeThread{
                             // perc% water, swill, etc
                             else {
                                 Color c = Color.green;
+                                double lowestVmeter = -1;
                                 for (VMeter vm : vmeter) {
                                     LayerMeter.Meter meter = vm.meters.get(0);
                                     double twoDecimals = new BigDecimal(meter.a).setScale(2, RoundingMode.HALF_UP).doubleValue();
-                                    if (twoDecimals < .3)
-                                        c = Color.red;
-                                    else if (twoDecimals < .8)
-                                        c = Color.yellow;
-
+                                    if(lowestVmeter == -1  ||  twoDecimals < lowestVmeter)
+                                        lowestVmeter = twoDecimals;
                                     lblText += twoDecimals + "   ";
                                 }
+                                if (lowestVmeter < .3)
+                                    c = Color.red;
+                                else if (lowestVmeter < .8)
+                                    c = Color.yellow;
                                 lblText = lblText.strip().replaceAll("0\\.",".");
                                 ZeeConfig.addGobText(gobAutoLabel, lblText, c);
                             }
