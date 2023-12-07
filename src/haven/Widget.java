@@ -703,11 +703,38 @@ public class Widget {
     }
 	
     public void wdgmsg(String msg, Object... args) {
-	if(ZeeConfig.confirmPetal && !ui.modctrl && msg.contentEquals("empty") && this.getClass().getSimpleName().contentEquals("Grainslot")){
-		ZeeConfig.msgError("Ctrl + click to confirm emptying");
-		return;
-	}
-	wdgmsg(this, msg, args);
+
+		// ctrl click to confirm
+		if(ZeeConfig.confirmPetal && !ui.modctrl){
+			boolean blockAction = false;
+
+			// regular buttons
+			if(this instanceof Button && msg.contentEquals("activate")) {
+				Button btn = (Button) this;
+				if (ZeeConfig.DEF_LIST_CONFIRM_BUTTON.contains(btn.text.text)) {
+					blockAction = true;
+				}
+			}
+
+			// grainslot empty buttons
+			else if (this.getClass().getSimpleName().contentEquals("Grainslot") && msg.contentEquals("empty")) {
+				blockAction = true;
+			}
+
+			// credo "Abandon ..." buttons
+			else if (this instanceof CharWnd.Quest.DefaultBox && msg.contentEquals("opt")){
+				if (args!=null && List.of("rm","credoq").contains((String)args[0]))
+					blockAction = true;
+			}
+
+			if (blockAction){
+				ZeeConfig.msgError("Ctrl + click to confirm");
+				return;
+			}
+		}
+
+		// action allowed
+		wdgmsg(this, msg, args);
     }
 	
     public void wdgmsg(Widget sender, String msg, Object... args) {

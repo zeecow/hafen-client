@@ -26,9 +26,7 @@
 
 package haven;
 
-import java.awt.Graphics;
-import java.awt.Color;
-import java.awt.Font;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 
 public class Button extends SIWidget {
@@ -241,15 +239,4 @@ public class Button extends SIWidget {
 	}
 	return(false);
     }
-
-	@Override
-	public void wdgmsg(String msg, Object... args) {
-		if (ZeeConfig.confirmPetal && msg.contentEquals("activate") && !ui.modctrl){
-			if(text.text.contentEquals("Empty") || text.text.contentEquals("Empty out")) {
-				ZeeConfig.msgError("Ctrl + click button to confirm");
-				return;
-			}
-		}
-		super.wdgmsg(msg, args);
-	}
 }
