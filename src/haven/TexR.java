@@ -130,16 +130,26 @@ public class TexR extends Resource.Layer implements Resource.IDLayer<Integer> {
 	private BufferedImage rd(final byte[] data) {
 	    try {
 		BufferedImage ret = Resource.readimage(new ByteArrayInputStream(data));
-		if ( ZeeConfig.pavingSolidColor ){
-			Matcher m = Pattern.compile("gfx/tiles/paving/[^-]+-tex$").matcher(getres().name);
-			if (m.find()) {
-				return ZeeManagerIcons.getSolidColorTile(ret);
+		String tileName = getres().name;
+		boolean theTexIsLava = false;
+		for (String ignore : ZeeConfig.solidColorIgnoreTiles) {
+			if (tileName.contains(ignore)) {
+				theTexIsLava = true;
+				break;
 			}
 		}
-		if( ZeeConfig.terrainSolidColor ){
-			Matcher m = Pattern.compile("gfx/tiles/[^/-]+-tex$").matcher(getres().name);
-			if (m.find()) {
-				return ZeeManagerIcons.getSolidColorTile(ret);
+		if (!theTexIsLava) {
+			if (ZeeConfig.pavingSolidColor) {
+				Matcher m = Pattern.compile("gfx/tiles/paving/[^-]+-tex$").matcher(tileName);
+				if (m.find()) {
+					return ZeeManagerIcons.getSolidColorTile(ret);
+				}
+			}
+			if (ZeeConfig.terrainSolidColor) {
+				Matcher m = Pattern.compile("gfx/tiles/[^/-]+-tex$").matcher(tileName);
+				if (m.find()) {
+					return ZeeManagerIcons.getSolidColorTile(ret);
+				}
 			}
 		}
 		return(ret);
