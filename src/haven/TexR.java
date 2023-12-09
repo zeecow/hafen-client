@@ -131,14 +131,8 @@ public class TexR extends Resource.Layer implements Resource.IDLayer<Integer> {
 	    try {
 		BufferedImage ret = Resource.readimage(new ByteArrayInputStream(data));
 		String tileName = getres().name;
-		boolean theTexIsLava = false;
-		for (String ignore : ZeeConfig.solidColorIgnoreTiles) {
-			if (tileName.contains(ignore)) {
-				theTexIsLava = true;
-				break;
-			}
-		}
-		if (!theTexIsLava) {
+		if (!tileName.contains("/lava") && tileName.startsWith("gfx/tiles/")) {
+			//ZeeConfig.println(tileName);
 			if (ZeeConfig.pavingSolidColor) {
 				Matcher m = Pattern.compile("gfx/tiles/paving/[^-]+-tex$").matcher(tileName);
 				if (m.find()) {

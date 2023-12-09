@@ -277,7 +277,6 @@ public class ZeeConfig {
     static boolean minimapSolidColor = Utils.getprefb("minimapSolidColor",true);
     static boolean terrainSolidColor = Utils.getprefb("terrainSolidColor",false);
     static boolean pavingSolidColor = Utils.getprefb("pavingSolidColor",false);
-    static final List<String> solidColorIgnoreTiles = List.of("/lava");
     public static boolean showOverlayPclaim = Utils.getprefb("showOverlayPclaim",true);
     public static boolean showOverlayVclaim = Utils.getprefb("showOverlayVclaim",true);
     public static boolean showOverlayProv = Utils.getprefb("showOverlayProv",true);
