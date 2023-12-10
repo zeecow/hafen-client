@@ -1031,7 +1031,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 					try{
 						RUtils.multiadd(tmpSlots,d);
 					}
-					catch (Defer.NotDoneException ignored) {	}
+					catch (Defer.NotDoneException  | RenderTree.SlotRemoved ignored) {	}
 					catch (Exception e){
 						ZeeConfig.println("toggleModel show > "+e.getClass().getName()+" , "+e.getMessage());
 					}
