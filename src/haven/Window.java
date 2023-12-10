@@ -412,10 +412,15 @@ public class Window extends Widget implements DTarget {
     public Coord xlate(Coord c, boolean in) {
 	if(deco == null)
 	    return(c);
-	if(in)
-	    return(c.add(deco.contarea().ul));
-	else
-	    return(c.sub(deco.contarea().ul));
+	try {
+		if (in)
+			return (c.add(deco.contarea().ul));
+		else
+			return (c.sub(deco.contarea().ul));
+	}catch (NullPointerException e){
+		e.printStackTrace();
+	}
+	return Coord.z;
     }
 
     public void drag(Coord off) {
