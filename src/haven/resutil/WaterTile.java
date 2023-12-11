@@ -26,24 +26,26 @@
 
 package haven.resutil;
 
-import java.util.*;
-import java.awt.image.BufferedImage;
-import java.awt.Color;
 import haven.*;
-import haven.render.*;
-import haven.render.sl.*;
 import haven.MapMesh.Scan;
-import haven.Surface.Vertex;
 import haven.Surface.MeshVertex;
+import haven.Surface.Vertex;
+import haven.render.*;
 import haven.render.TextureCube.SamplerCube;
-import static haven.render.sl.Cons.*;
+import haven.render.sl.*;
+
+import java.awt.*;
+import java.util.Random;
+
 import static haven.Coord.upcw;
+import static haven.render.sl.Cons.*;
 
 public class WaterTile extends Tiler {
     public final int depth;
     public final Tiler.MCons bottom;
+	private final boolean isDeepOcean;
 
-    public static class FlowData {
+	public static class FlowData {
 	public static final float[] nxpcw, nypcw;
 	public static final int I = 10;
 	public final float[] xv, yv;
@@ -546,6 +548,7 @@ public class WaterTile extends Tiler {
 	public static final Expression mfogcolor = mul(col3(fogcolor), pick(fref(idx(ProgramContext.gl_LightSource.ref(), MapView.amblight.ref()), "diffuse"), "rgb"));
 	*/
 	public static final Expression mfogcolor = col3(fogcolor);
+	final Expression cfogcolor;
 	public static Function rgbmix = new Function.Def(Type.VEC4) {{
 	    Expression a = param(PDir.IN, Type.VEC4).ref();
 	    Expression b = param(PDir.IN, Type.VEC3).ref();
@@ -559,18 +562,26 @@ public class WaterTile extends Tiler {
 		}
 	    };
 
-	private final ShaderMacro shader = prog -> {
-	    FragColor.fragcol(prog.fctx).mod(in -> rgbmix.call(in, mfogcolor, min(div(fragd.ref(), l(maxdepth)), l(1.0))), 1000);
-	};
+	private final ShaderMacro shader;
 
 	private BottomFog() {
-	    super(Slot.Type.DRAW);
+		this(mfogcolor);
+	}
+
+	private BottomFog(Expression fogcolor) {
+		super(Slot.Type.DRAW);
+		this.cfogcolor = fogcolor;
+		shader = prog -> {
+			FragColor.fragcol(prog.fctx).mod(in -> rgbmix.call(in, fogcolor, min(div(fragd.ref(), l(maxdepth)), l(1.0))), 1000);
+		};
 	}
 
 	public ShaderMacro shader() {return(shader);}
     }
     public static final BottomFog waterfog = new BottomFog();
+	public static final BottomFog deepfog = new BottomFog(col3(new Color(0, 8, 32)));
     private static final Pipe.Op botmat = Pipe.Op.compose(waterfog, new States.DepthBias(4, 4));
+	private static final Pipe.Op deepmat = Pipe.Op.compose(deepfog, new States.DepthBias(4, 4));
 
     public static class ObFog extends State implements InstanceBatch.AttribState {
 	public static final Slot<ObFog> slot = new Slot<>(State.Slot.Type.DRAW, ObFog.class)
@@ -634,14 +645,15 @@ public class WaterTile extends Tiler {
 		    bottom = (Tiler.MCons)b;
 		}
 	    }
-	    return(new WaterTile(id, bottom, depth));
+	    return(new WaterTile(id, set.getres().name, bottom, depth));
 	}
     }
 
-    public WaterTile(int id, Tiler.MCons bottom, int depth) {
+    public WaterTile(int id, String name, Tiler.MCons bottom, int depth) {
 	super(id);
 	this.bottom = bottom;
 	this.depth = depth;
+	this.isDeepOcean = name.equals("gfx/tiles/odeeper");
     }
 
     public void lay(MapMesh m, Random rnd, Coord lc, Coord gc) {
@@ -684,7 +696,7 @@ public class WaterTile extends Tiler {
 
 	Bottom b = m.data(Bottom.id);
 	MPart bd = MPart.splitquad(lc, gc, b.fortilea(lc), ms.split[ms.ts.o(lc)]);
-	bd.mat = botmat;
+	bd.mat = isDeepOcean ? deepmat : botmat;
 	bottom.faces(m, bd);
     }
 
@@ -696,7 +708,7 @@ public class WaterTile extends Tiler {
 		MapMesh.MapSurface ms = m.data(MapMesh.gnd);
 		Bottom b = m.data(Bottom.id);
 		MPart d = MPart.splitquad(lc, gc, b.fortilea(lc), ms.split[ms.ts.o(lc)]);
-		d.mat = botmat;
+		d.mat = isDeepOcean ? deepmat : botmat;
 		((CTrans)bottom).tcons(z, bmask, cmask).faces(m, d);
 	    }
 	} else {
