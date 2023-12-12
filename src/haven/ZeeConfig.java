@@ -1142,8 +1142,13 @@ public class ZeeConfig {
         if (windowTitle.contentEquals("Stack"))
             return;
 
-        if (isBuildWindow(window))
+        if (isBuildWindow(window)) {
+            //tunnel helper
+            if (ZeeManagerMiner.tunnelHelperStage == ZeeManagerMiner.TUNNELHELPER_STAGE5_BUILDCOL && windowTitle.contentEquals("Stone Column")){
+                ZeeManagerMiner.tunnelHelperBuildColumn(window);
+            }
             return;
+        }
 
         //cheesetray
         if(windowTitle.contentEquals("Rack")) {
@@ -1197,10 +1202,6 @@ public class ZeeConfig {
                     }
                 }, btnPress.c.x + btnPress.sz.x + 5 , btnPress.c.y);
             }
-        }
-        //tunnel helper
-        else if (ZeeManagerMiner.tunnelHelperStage == ZeeManagerMiner.TUNNELHELPER_STAGE5_BUILDCOL && windowTitle.contentEquals("Stone Column")){
-            ZeeManagerMiner.tunnelHelperBuildColumn(window);
         }
         // xp window
         else if (isWindowXpEvent(window)){
