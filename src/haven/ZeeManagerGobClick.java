@@ -88,6 +88,12 @@ public class ZeeManagerGobClick extends ZeeThread{
             else if ( isGobTreeLog(gobName) && ZeeConfig.isPlayerLiftingGob("gfx/terobjs/trees/")!=null && !ZeeConfig.isPlayerLiftingGob(gob)){
                 placeTreelogNextTo(gob);
             }
+            // start Gob Placer if target has same name as lifted gob
+            else if(ZeeConfig.isPlayerLiftingGob(gobName)!=null){
+                // lifted gob itself not a valid target
+                if (!ZeeConfig.isPlayerLiftingGob(gob))
+                    windowGobPlacer(gob, ZeeConfig.isPlayerLiftingGob(gobName));
+            }
             // build obj and get more blocks/boards
             else if (gobName.contentEquals("gfx/terobjs/consobj")) {
                 if (ZeeConfig.playerHasAnyPose(ZeeConfig.POSE_PLAYER_CHOPBLOCK)){
@@ -222,6 +228,145 @@ public class ZeeManagerGobClick extends ZeeThread{
             }
         }
     }
+
+    static HashMap<String,Double> mapGobPlacerNameDist = mapGobPlacerInit();
+    static Label gobPlacerLblDist;
+    static Button gobPlacerBtnClear;
+    static String gobPlacerWinTitle = "Gob placer";
+    private static long goPlacerWindowTimeout = -1;
+    private static void windowGobPlacer(Gob groundGob, Gob liftedGob) {
+        Widget wdg;
+
+        Window win = ZeeConfig.getWindow(gobPlacerWinTitle);
+        if (win != null){
+            win.reqdestroy();
+            win = null;
+        }
+
+        String liftedGobName = liftedGob.getres().name;
+
+        //create window
+        win = ZeeConfig.gameUI.add(
+                new Window(Coord.of(200,70),gobPlacerWinTitle){
+                    public void wdgmsg(String msg, Object... args) {
+                        if (msg.contentEquals("close")){
+                            this.reqdestroy();
+                        }
+                    }
+                },
+                ZeeConfig.gameUI.sz.div(2)
+        );
+
+        // label gob name
+        wdg = win.add(new Label(liftedGobName));
+
+        // label saved gob dist
+        wdg = gobPlacerLblDist = win.add(new Label(""),wdg.c.add(0,wdg.sz.y+2));
+
+        // button clear saved dist
+        wdg = gobPlacerBtnClear = win.add(new Button(120,"clear saved dist"){
+            public void wdgmsg(String msg, Object... args) {
+                //super.wdgmsg(msg, args);
+                if (msg.contentEquals("activate")){
+                    mapGobPlacerNameDist.remove(liftedGobName);
+                    Utils.setpref("mapGobPlacerNameDist", ZeeConfig.serialize(mapGobPlacerNameDist));
+                    //println("removing "+liftedGobName+" , mapsize "+mapGobPlacerNameDist.size());
+                    //close window
+                    goPlacerWindowTimeout = -1;
+                }
+            }
+        },wdg.c.add(0,wdg.sz.y+2));
+
+
+        // find saved gob dist
+        Double dist = mapGobPlacerNameDist.get(liftedGobName);
+
+        // apply saved gob dist
+        if (dist!=null){
+            // window lbl dist
+            gobPlacerLblDist.settext("saved dist: "+dist);
+            placeLiftedGobNextTo(liftedGob,groundGob,dist);
+            gobPlacerWindowTimeout();
+        }
+        // wait new gob dist and save it
+        else{
+            gobPlacerBtnClear.disable(true);
+            gobPlacerLblDist.settext("waiting new gob placement");
+            // wait user place liftedGob and save distance between ground and lifted gobs
+            new ZeeThread(){
+                public void run() {
+                    try {
+
+                        //wait player place gob
+                        gobClick(liftedGob,3);//create plob
+                        ZeeConfig.addPlayerText("waiting placing");
+                        while(ZeeConfig.isPlayerLiftingPose()) {
+                            sleep(500);
+                        }
+
+                        //save gob dist
+                        double dist = groundGob.rc.dist(liftedGob.rc);
+                        mapGobPlacerNameDist.put(liftedGobName,dist);
+                        Utils.setpref("mapGobPlacerNameDist", ZeeConfig.serialize(mapGobPlacerNameDist));
+                        //println("gobPlacer > "+dist+" , "+liftedGobName+" , mapsize "+mapGobPlacerNameDist.size());
+
+                        // window lbl dist
+                        gobPlacerLblDist.settext("saved dist: "+dist);
+
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
+                    ZeeConfig.removePlayerText();
+                    gobPlacerBtnClear.disable(false);
+                    gobPlacerWindowTimeout();
+                }
+            }.start();
+        }
+    }
+
+    private static void gobPlacerWindowTimeout(){
+
+        // reset timeout if already running
+        if (goPlacerWindowTimeout > -1){
+            goPlacerWindowTimeout = 7000;
+            //println("gobplacer reset window timeout");
+            return;
+        }
+
+        //start timeout
+        new ZeeThread(){
+            public void run() {
+                try {
+                    String lbltxt = gobPlacerLblDist.texts;
+                    goPlacerWindowTimeout = 7000;
+                    while (goPlacerWindowTimeout > 0){
+                        gobPlacerLblDist.settext(lbltxt + " ("+((int) goPlacerWindowTimeout /1000)+"s)");
+                        sleep(1000);
+                        goPlacerWindowTimeout -= 1000;
+                    }
+                    Window win = ZeeConfig.getWindow(gobPlacerWinTitle);
+                    if ( win != null){
+                        win.reqdestroy();
+                        win = null;
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                goPlacerWindowTimeout = -1;
+            }
+        }.start();
+    }
+
+    public static HashMap<String, Double> mapGobPlacerInit() {
+        String s = Utils.getpref("mapGobPlacerNameDist","");
+        if (s.isEmpty())
+            return new HashMap<String,Double> ();
+        else
+            return (HashMap<String, Double>) ZeeConfig.deserialize(s);
+    }
+
+
 
     private static void buildObjAndChopMoreBlocks(Gob consObj, Gob treeLog) {
         new ZeeThread() {
@@ -580,6 +725,54 @@ public class ZeeManagerGobClick extends ZeeThread{
             }
         }.start();
     }
+
+
+    private static void placeLiftedGobNextTo(Gob liftedGob, Gob groundGob, double dist) {
+        new Thread() {
+            public void run() {
+                try {
+
+                    ZeeConfig.addPlayerText("placing");
+
+                    // right click lifted gob to create plob
+                    gobClick(liftedGob,3);
+                    sleep(500);
+
+                    // adjust plob angle, postition and place it
+                    if (ZeeManagerStockpile.lastPlob==null){
+                        ZeeConfig.msgError("placeLiftedGobNextTo > couldn't find last plob");
+                        ZeeConfig.removePlayerText();
+                        return;
+                    }
+                    Coord2d playerrc = ZeeConfig.getPlayerGob().rc;
+                    Coord2d newrc = Coord2d.of(groundGob.rc.x, groundGob.rc.y);
+                    if (Math.abs(groundGob.rc.x - playerrc.x) > Math.abs(groundGob.rc.y - playerrc.y)){
+                        if (groundGob.rc.x > playerrc.x)
+                            newrc.x -= dist;
+                        else
+                            newrc.x += dist;
+                    }else{
+                        if (groundGob.rc.y > playerrc.y)
+                            newrc.y -= dist;
+                        else
+                            newrc.y += dist;
+                    }
+
+                    // position plob
+                    ZeeManagerStockpile.lastPlob.move(newrc, groundGob.a);
+
+                    // place gob and wait
+                    gobPlace(ZeeManagerStockpile.lastPlob,0);
+                    waitNotPlayerPose(ZeeConfig.POSE_PLAYER_LIFTING);
+
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+                ZeeConfig.removePlayerText();
+            }
+        }.start();
+    }
+
 
     private static boolean checkCloverFeeding(Gob animal) {
 
@@ -1362,7 +1555,7 @@ public class ZeeManagerGobClick extends ZeeThread{
         }
 
         // avoid dismouting when transfering to cauldron
-        if (gobName.contains("cauldron") && !ZeeConfig.isPlayerLiftingGob()) {
+        if (gobName.contains("cauldron") && !ZeeConfig.isPlayerLiftingPose()) {
             return true;
         }
 

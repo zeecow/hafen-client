@@ -72,6 +72,7 @@ Midclick Ground Object
 - midclick crop activate area harvest 
 - midclick construction obj while chopping/sawing will build and get more mats
 - midclick cart try picking first slot
+- gob placer: midclick gob while lifting gob of same name will try to place next to it and save distance per gob name (temp window to clear distance)
 
 Long Midclick Ground Object
 - show context menu for various objs (details below)

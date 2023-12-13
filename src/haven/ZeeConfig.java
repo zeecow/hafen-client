@@ -2929,7 +2929,7 @@ public class ZeeConfig {
             return null;
     }
 
-    public static boolean isPlayerLiftingGob() {
+    public static boolean isPlayerLiftingPose() {
         return playerHasAnyPose(POSE_PLAYER_LIFTING);
     }
 
