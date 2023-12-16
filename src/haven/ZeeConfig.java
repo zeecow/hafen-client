@@ -3665,38 +3665,44 @@ public class ZeeConfig {
             // main player settings
             if(ob.tags.contains(Gob.Tag.PLAYER_MAIN)) {
 
-                // map brightness
-                ZeeManagerGobClick.brightnessMapLoad();
+                //main player loading thread
+                new ZeeThread(){
+                    public void run() {
+                        try {
 
-                // remount closest horse
-                if (ZeeManagerGobClick.remountClosestHorse) {
-                    ZeeManagerGobClick.remountHorse();
-                }
+                            sleep(500);
 
-                if (ZeeConfig.showGobPointer ) {
-                    // remove player pointer
-                    if (ob.hasPointer) {
-                        removeGobPointer(ob);
-                    }
-                    else {
-                        // delayed remove player pointer
-                        new ZeeThread() {
-                            public void run() {
-                                try {
+                            // map brightness
+                            ZeeManagerGobClick.brightnessMapLoad();
+
+                            // remount closest horse
+                            if (ZeeManagerGobClick.remountClosestHorse) {
+                                ZeeManagerGobClick.remountHorse();
+                            }
+
+                            if (ZeeConfig.showGobPointer ) {
+                                // remove player pointer
+                                if (ob.hasPointer) {
+                                    removeGobPointer(ob);
+                                }
+                                else {
+                                    // delayed remove player pointer
                                     sleep(500);
                                     if (ob.hasPointer)
                                         removeGobPointer(ob);
-                                } catch (Exception e) {
-                                    e.printStackTrace();
+                                }
+
+                                // gob radar (broken)
+                                if (ZeeConfig.showGobRadar) {
+                                    ob.addol(ZeeGobPointer.gobRadar = new ZeeGobRadar(ob, Coord3f.of(10, 10, 5), new Color(240, 0, 253, 90)));
                                 }
                             }
-                        }.start();
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
                     }
+                }.start();
 
-                    // gob radar (broken)
-                    if (ZeeConfig.showGobRadar)
-                        ob.addol(ZeeGobPointer.gobRadar = new ZeeGobRadar(ob, Coord3f.of(10, 10, 5), new Color(240, 0, 253, 90)));
-                }
             }
             // radius ladder
             else if(ob.getres().name.endsWith("terobjs/ladder")) {

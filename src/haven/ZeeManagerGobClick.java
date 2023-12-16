@@ -4117,40 +4117,29 @@ public class ZeeManagerGobClick extends ZeeThread{
     }
 
     static void brightnessMapLoad() {
-        new ZeeThread(){
-            public void run() {
-                try {
-                    sleep(PING_MS);
+        Glob glob = ZeeConfig.gameUI.ui.sess.glob;
 
-                    Glob glob = ZeeConfig.gameUI.ui.sess.glob;
+        // save player location
+        if (glob.blightamb.getRed() == ZeeConfig.DEF_LIGHT_CELLAR)
+            ZeeConfig.playerLocation = ZeeConfig.LOCATION_CELLAR;
+            // cabins incompatible with blightamb detection? use gobs isntead
+        else if(!ZeeConfig.findGobsByNameEndsWith("/downstairs","/upstairs","/logcabin-door","/timberhouse-door").isEmpty())
+            ZeeConfig.playerLocation = ZeeConfig.LOCATION_CABIN;
+        else if (glob.blightamb.getRed() == ZeeConfig.DEF_LIGHT_UNDERGROUND)
+            ZeeConfig.playerLocation = ZeeConfig.LOCATION_UNDERGROUND;
+        else
+            ZeeConfig.playerLocation = ZeeConfig.LOCATION_OUTSIDE;
+        //println("set player location to "+ZeeConfig.getPlayerLocationName());
 
-                    // save player location
-                    if (glob.blightamb.getRed() == ZeeConfig.DEF_LIGHT_CELLAR)
-                        ZeeConfig.playerLocation = ZeeConfig.LOCATION_CELLAR;
-                    // cabins incompatible with blightamb detection? use gobs isntead
-                    else if(!ZeeConfig.findGobsByNameEndsWith("/downstairs","/upstairs","/logcabin-door","/timberhouse-door").isEmpty())
-                        ZeeConfig.playerLocation = ZeeConfig.LOCATION_CABIN;
-                    else if (glob.blightamb.getRed() == ZeeConfig.DEF_LIGHT_UNDERGROUND)
-                        ZeeConfig.playerLocation = ZeeConfig.LOCATION_UNDERGROUND;
-                    else
-                        ZeeConfig.playerLocation = ZeeConfig.LOCATION_OUTSIDE;
-                    //println("set player location to "+ZeeConfig.getPlayerLocationName());
+        // restore saved brightness
+        int intColor = Utils.getprefi(getLightPrefName(),1);
+        if (intColor < 0) {
+            glob.blightamb = ZeeConfig.intToColor(intColor);
+            //println("set blightamb to "+glob.blightamb+" , "+intColor);
+        }
 
-                    // restore saved brightness
-                    int intColor = Utils.getprefi(getLightPrefName(),1);
-                    if (intColor < 0) {
-                        glob.blightamb = ZeeConfig.intToColor(intColor);
-                        //println("set blightamb to "+glob.blightamb+" , "+intColor);
-                    }
-
-                    // midi radio
-                    ZeeMidiRadio.toggleRadio();
-
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        }.start();
+        // midi radio
+        ZeeMidiRadio.toggleRadio();
     }
 
     private static String getLightPrefName() {
