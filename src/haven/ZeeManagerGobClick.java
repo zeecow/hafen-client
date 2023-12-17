@@ -2052,20 +2052,35 @@ public class ZeeManagerGobClick extends ZeeThread{
                 ZeeConfig.butcherAutoList = ZeeConfig.DEF_LIST_BUTCH_AUTO;
                 try{
                     ZeeConfig.addPlayerText("autobutch");
-                    ZeeConfig.lastMapViewClickButton = 2;//prepare for clickCancelTask()
-                    while (!ZeeConfig.isCancelClick() && gobExistsBecauseFlowermenu(deadAnimal)) {
 
-                        //prepare settings
-                        ZeeConfig.lastInvItemMs = 0;
-                        ZeeConfig.butcherMode = true;
-                        ZeeConfig.autoClickMenuOption = false;
-
-                        //click gob
-                        gobClick(deadAnimal,3);
-
-                        //wait not butching
-                        waitNotPlayerPose(ZeeConfig.POSE_PLAYER_BUTCH);
+                    //wait start butching
+                    ZeeConfig.lastInvItemMs = 0;
+                    ZeeConfig.butcherMode = true;
+                    ZeeConfig.autoClickMenuOption = false;
+                    gobClick(deadAnimal,3);
+                    prepareCancelClick();
+                    while(!isCancelClick() && !ZeeConfig.playerHasAnyPose(ZeeConfig.POSE_PLAYER_BUTCH)){
+                        sleep(500);
                     }
+
+                    if (!isCancelClick()) {
+                        // loop butching stages
+                        while (!isCancelClick() && gobExistsBecauseFlowermenu(deadAnimal)) {
+
+                            //prepare settings
+                            ZeeConfig.lastInvItemMs = 0;
+                            ZeeConfig.butcherMode = true;
+                            ZeeConfig.autoClickMenuOption = false;
+
+                            //click gob
+                            gobClick(deadAnimal, 3);
+
+                            //wait not butching
+                            sleep(500);//pose lag?
+                            waitNotPlayerPose(ZeeConfig.POSE_PLAYER_BUTCH);
+                        }
+                    }
+
                 }catch (Exception e){
                     e.printStackTrace();
                 }
