@@ -358,6 +358,8 @@ public class ZeeManagerGobClick extends ZeeThread{
         }.start();
     }
 
+
+    @SuppressWarnings("unchecked")
     public static HashMap<String, Double> mapGobPlacerInit() {
         String s = Utils.getpref("mapGobPlacerNameDist","");
         if (s.isEmpty())
@@ -852,7 +854,7 @@ public class ZeeManagerGobClick extends ZeeThread{
             /*
                 ground clicks
              */
-            if (isGroundClick){
+            if (isGroundClick && !ZeeConfig.isCombatActive()){
                 //dismount horse
                 if (ZeeConfig.isPlayerMountingHorse()) {
                     dismountHorse(coordMc);
@@ -1770,6 +1772,10 @@ public class ZeeManagerGobClick extends ZeeThread{
             ZeeConfig.gameUI.menu.wdgmsg("act","dig","0");
         else if (petalName.contentEquals("mine"))
             ZeeConfig.gameUI.menu.wdgmsg("act","mine","0");
+        else if (petalName.contentEquals("plow"))
+            ZeeConfig.gameUI.menu.wdgmsg("act","pave","field","0");
+        else if (petalName.contentEquals("stomp"))
+            ZeeConfig.gameUI.menu.wdgmsg("act","pave","stomp","0");
         else if (petalName.contentEquals("survey"))
             ZeeConfig.gameUI.menu.wdgmsg("act","survey","0");
         else if (petalName.contentEquals("fish"))
@@ -2194,7 +2200,7 @@ public class ZeeManagerGobClick extends ZeeThread{
                 menu = new ZeeFlowerMenu(coordMc, opts.toArray(String[]::new));
             }
             else if(!ZeeConfig.isPlobActive()){
-                menu = new ZeeFlowerMenu(coordMc, "dig", "mine");
+                menu = new ZeeFlowerMenu(coordMc, "dig", "mine", "plow","stomp");
             }
             else
                 showMenu = false;
@@ -2203,9 +2209,7 @@ public class ZeeManagerGobClick extends ZeeThread{
             opts = new ArrayList<String>();
             opts.add(ZeeFlowerMenu.STRPETAL_SWITCHCHAR);
             opts.add(ZeeFlowerMenu.STRPETAL_CLEARGOBTEXTS);
-            opts.add(ZeeFlowerMenu.STRPETAL_TESTCOORDS);
-            opts.add("wave");
-            opts.add("laugh");
+            //opts.add(ZeeFlowerMenu.STRPETAL_TESTCOORDS);
             if (ZeeConfig.isCaveTile(ZeeConfig.getPlayerTileName()))
                 opts.add(ZeeFlowerMenu.STRPETAL_TILEMONITOR);
             menu = new ZeeFlowerMenu(gob, opts.toArray(String[]::new));
