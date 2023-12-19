@@ -297,12 +297,21 @@ public class Inventory extends Widget implements DTarget {
 	}
 
 	public int getNumberOfFreeSlots() {
-		int feespace = isz.x * isz.y;
-		for (Widget wdg = child; wdg != null; wdg = wdg.next) {
-			if (wdg instanceof WItem)
-				feespace -= (wdg.sz.x * wdg.sz.y) / (sqsz.x * sqsz.y);
+		int invSlots = isz.x * isz.y;
+		if (sqmask!=null){
+			for(int i = 0; i < isz.x * isz.y; i++) {
+				if(sqmask[i])
+					invSlots--;
+			}
 		}
-		return feespace;
+		for (Widget wdg = child; wdg != null; wdg = wdg.next) {
+			if (wdg instanceof WItem) {
+				//ZeeConfig.println(invSlots+" -  "+((WItem) wdg).item.getres().name);
+				invSlots -= ((wdg.sz.x * wdg.sz.y) / (sqsz.x * sqsz.y));// (66, 33) / (33,33)
+				//ZeeConfig.println("      = "+invSlots);
+			}
+		}
+		return invSlots;
 	}
 
 	public static int getNumberOfFreeSlots(Inventory inv) {

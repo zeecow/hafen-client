@@ -214,7 +214,7 @@ public class GItem extends AWidget implements ItemInfo.SpriteOwner, GSprite.Owne
 		}
 		//drop seeds
 		else if( ZeeConfig.dropSeeds && basename.startsWith("seed-") && this.parent instanceof Inventory){
-			if (inv!=null)
+			if (inv!=null && inv.isMainInv() && inv.getNumberOfFreeSlots() < 6)
 				inv.dropItemsByNameEndsWith(basename);
 		}
 		//drop soil
