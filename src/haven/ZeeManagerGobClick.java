@@ -216,10 +216,10 @@ public class ZeeManagerGobClick extends ZeeThread{
             else if(ZeeConfig.isAggressive(gobName)){
                 toggleOverlayAggro(gob);
             }
-            // try picking from cart's first slot (arg 2)
+            // toggle cart if not lifting (avoid picking cart slot when zoomedout)
             else if (gobName.endsWith("/cart")){
                 if (!ZeeConfig.playerHasAnyPose(ZeeConfig.POSE_PLAYER_LIFTING)) {
-                    gobClick(gob, 3, 0, 2);
+                    gobClick(gob, 3);
                 }
             }
             // inspect gob
@@ -984,6 +984,12 @@ public class ZeeManagerGobClick extends ZeeThread{
             // drive ship
             else if(gobName.endsWith("/knarr") || gobName.endsWith("/snekkja")) {
                 clickGobPetal(gob,"Man the helm");
+            }
+            // try picking from cart's first slot (arg 2), if empty will toggle cart
+            else if (gobName.endsWith("/cart")){
+                if (!ZeeConfig.playerHasAnyPose(ZeeConfig.POSE_PLAYER_LIFTING)) {
+                    gobClick(gob, 3, 0, 2);
+                }
             }
             // lift up gob
             else if (isGobLiftable(gobName) || isGobBush(gobName)) {
