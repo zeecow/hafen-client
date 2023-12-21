@@ -26,8 +26,10 @@
 
 package haven;
 
-import java.util.*;
-import haven.render.*;
+import haven.render.RenderTree;
+
+import java.util.Collection;
+import java.util.LinkedList;
 
 public class AnimSprite extends Sprite {
     private final RenderTree.Node[] parts;
@@ -35,7 +37,7 @@ public class AnimSprite extends Sprite {
 
     public static final Factory fact = new Factory() {
 	    public Sprite create(Owner owner, Resource res, Message sdt) {
-		if(res.layer(MeshAnim.Res.class) == null  ||  (ZeeConfig.hideFxAnimations && ZeeConfig.hideAnimation(res)) )
+		if(res.layer(MeshAnim.Res.class) == null)
 		    return(null);
 		return(new AnimSprite(owner, res, sdt) {
 			public String toString() {

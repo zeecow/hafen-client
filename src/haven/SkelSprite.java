@@ -26,11 +26,13 @@
 
 package haven;
 
-import java.util.*;
-import java.util.function.*;
-import haven.render.*;
 import haven.Skeleton.Pose;
 import haven.Skeleton.PoseMod;
+import haven.render.*;
+
+import java.util.*;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 public class SkelSprite extends Sprite implements Sprite.CUpd, EquipTarget, Skeleton.HasPose, Skeleton.ModOwner {
     public static final Pipe.Op
@@ -54,7 +56,7 @@ public class SkelSprite extends Sprite implements Sprite.CUpd, EquipTarget, Skel
     
     public static final Factory fact = new Factory() {
 	    public Sprite create(Owner owner, Resource res, Message sdt) {
-		if(res.layer(Skeleton.Res.class) == null  ||  (ZeeConfig.hideFxAnimations && ZeeConfig.hideAnimation(res)) )
+		if( res.layer(Skeleton.Res.class) == null )
 		    return(null);
 		return(new SkelSprite(owner, res, sdt) {
 			public String toString() {

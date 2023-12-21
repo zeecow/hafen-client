@@ -229,7 +229,7 @@ public class ZeeConfig {
     static boolean fishMoonXpAlert = Utils.getprefb("fishMoonXpAlert", true);
     static int gridColorInt = Utils.getprefi("gridColorInt",ZeeConfig.colorToInt(DEF_GRID_COLOR));
     public static boolean hideFxSmoke = Utils.getprefb("hideFxSmoke", true);
-    public static boolean hideFxAnimations = Utils.getprefb("hideFxAnimations", true);
+    //public static boolean hideFxAnimations = Utils.getprefb("hideFxAnimations", true);
     static boolean hideTileTransitions = Utils.getprefb("hideTileTransitions", true);
     static boolean highlightCropsReady = Utils.getprefb("highlightCropsReady", true);
     static boolean isThinClient = false;
@@ -4097,10 +4097,11 @@ public class ZeeConfig {
     }
 
     public static boolean hideAnimation(Resource res) {
-        if (res!=null && "/chimingbluebell,/saptap,/brazierflame,/stockpile-trash,/beehive,/cigar,/dreca".contains(res.basename())) {
+        final String blocklist = "/chimingbluebell,/saptap,/brazierflame,/stockpile-trash,/beehive,/cigar,/dreca,/boostspeed,";
+        if (res!=null && blocklist.contains(res.basename())) {
             return true;
         }
-        //ZeeConfig.println("res " + (res!=null?res.name:"null"));
+        ZeeConfig.println("res " + (res!=null?res.basename():"null"));
         return false;
     }
 
