@@ -43,8 +43,8 @@ public class MeshAnim extends State {
 	.instanced(new Instancable<Animated>() {
 		final Instancer<Animated> nil = Instancer.dummy();
 		public Instancer<Animated> instid(Animated st) {
-//			if (ZeeConfig.hideFxAnimations)
-//				return  nil;
+			if (ZeeConfig.hideFxAnimations)
+				return  nil;
 		    return((st == null) ? nil : st.anim.instancer);
 		}
 	    });
