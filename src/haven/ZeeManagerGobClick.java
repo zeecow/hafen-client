@@ -5,6 +5,7 @@ import haven.resutil.WaterTile;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
 import java.lang.reflect.Field;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -14,6 +15,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import static haven.MCache.tilesz;
 import static haven.OCache.posres;
 
 public class ZeeManagerGobClick extends ZeeThread{
@@ -152,12 +154,16 @@ public class ZeeManagerGobClick extends ZeeThread{
                 if (!ZeeConfig.getCursorName().equals(ZeeConfig.CURSOR_HARVEST))
                     gobClick(gob, 3, UI.MOD_SHIFT);
             }
-            // pick up all ground items (except when placing stockpile)
             else if (isGobGroundItem(gobName)) {
-                if(ZeeManagerStockpile.lastPlob!=null)
-                    ZeeConfig.msgLow("click ground to place stockpile");
-                else
-                    gobClick(gob,3, UI.MOD_SHIFT);//shift + rclick
+                // place stockpile at gob coord
+                if(ZeeConfig.isPlobActive()) {
+                    MapView.Plob plob = ZeeManagerStockpile.lastPlob;
+                    gobPlace(plob, ZeeConfig.tileToCoord(ZeeConfig.coordToTile(gob.rc)), UI.MOD_SHIFT);
+                }
+                // pick up all ground items
+                else {
+                    gobClick(gob, 3, UI.MOD_SHIFT);//shift + rclick
+                }
             }
             // light up torch
             else if (isGobFireSource(gob)) {
