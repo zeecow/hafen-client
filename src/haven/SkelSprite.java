@@ -54,7 +54,7 @@ public class SkelSprite extends Sprite implements Sprite.CUpd, EquipTarget, Skel
     
     public static final Factory fact = new Factory() {
 	    public Sprite create(Owner owner, Resource res, Message sdt) {
-		if(res.layer(Skeleton.Res.class) == null  ||  (ZeeConfig.hideFxAnimations && ZeeConfig.hideAnimation(res)) )
+		if(res.layer(Skeleton.Res.class) == null  ||  (ZeeConfig.stopSomeAnimations && ZeeConfig.stopSpriteAnimation(res)) )
 		    return(null);
 		return(new SkelSprite(owner, res, sdt) {
 			public String toString() {

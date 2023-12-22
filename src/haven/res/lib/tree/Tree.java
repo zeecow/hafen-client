@@ -124,7 +124,7 @@ public class Tree extends Sprite {
 	}
 	parts = mkparts(res, s, fl);
 	sel = s;
-	if (ZeeConfig.hideFxAnimations)
+	if (ZeeConfig.stopSomeAnimations)
 		this.leaves = null;
     }
 
