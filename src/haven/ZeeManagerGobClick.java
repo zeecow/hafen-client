@@ -791,7 +791,7 @@ public class ZeeManagerGobClick extends ZeeThread{
         }
 
         if (holditem!=null && holditem.getres().name.endsWith("/clover")){
-            List<String> endList = List.of("/cattle", "/sheep","/horse","/boar","/wildgoat");
+            List<String> endList = List.of("/cattle", "/sheep","/horse","/boar","/wildgoat","/reindeer");
             for (String s : endList) {
                 if (animal.getres().name.endsWith(s))
                     return true;
