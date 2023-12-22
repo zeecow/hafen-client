@@ -1365,8 +1365,12 @@ public class ZeeManagerGobClick extends ZeeThread{
             }
         }
 
-        // click barrel transfer
-        if (gobName.endsWith("/barrel") && ZeeConfig.getPlayerPoses().contains(ZeeConfig.POSE_PLAYER_LIFTING)) {
+        // entering a house
+        if (isGobHouse(gobName) && !ZeeConfig.isPlayerMountingHorse()) {
+            gobClick(gob, 3, 0, 16);//gob's door?
+        }
+        // click barrel transfer, label by contents
+        else if (gobName.endsWith("/barrel") && ZeeConfig.getPlayerPoses().contains(ZeeConfig.POSE_PLAYER_LIFTING)) {
             new ZeeThread() {
                 public void run() {
                     try {
