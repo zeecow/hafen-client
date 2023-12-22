@@ -37,7 +37,7 @@ public class AnimSprite extends Sprite {
 
     public static final Factory fact = new Factory() {
 	    public Sprite create(Owner owner, Resource res, Message sdt) {
-		if(res.layer(MeshAnim.Res.class) == null  ||  (ZeeConfig.stopSomeAnimations && ZeeConfig.stopSpriteAnimation(res)) )
+		if(res.layer(MeshAnim.Res.class) == null)
 		    return(null);
 		return(new AnimSprite(owner, res, sdt) {
 			public String toString() {

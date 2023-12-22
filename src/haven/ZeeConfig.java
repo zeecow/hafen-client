@@ -4096,8 +4096,8 @@ public class ZeeConfig {
             ((Window.DefaultDeco)w.deco).bgImgSimpleWindow = null;
     }
 
-    public static boolean stopSpriteAnimation(Resource res) {
-        final String blocklist = "/chimingbluebell,/saptap,/brazierflame,/stockpile-trash,/beehive,/cigar,/dreca,/boostspeed,/visflag";
+    public static boolean stopResAnimation(Resource res) {
+        final String blocklist = "/chimingbluebell,/saptap,/brazierflame,/stockpile-trash,/beehive,/cigar,/dreca,/boostspeed,/visflag,/villageidol,/pow";
         if (res!=null && blocklist.contains(res.basename())) {
             //ZeeConfig.println("hide " + res.name);
             return true;

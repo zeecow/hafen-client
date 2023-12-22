@@ -49,8 +49,9 @@ public class MeshAnim extends State {
     public final Frame[] frames;
     public final float len;
     public final int minv, maxv;
+	private boolean freeze;
 
-    public MeshAnim(Frame[] frames, float len) {
+	public MeshAnim(Frame[] frames, float len) {
 	this.frames = frames;
 	this.len = len;
 	int min = -1, max = -1;
@@ -293,6 +294,8 @@ public class MeshAnim extends State {
 	}
 
 	public boolean tick(float dt) {
+		if (freeze)
+			return false;
 	    boolean rv = false;
 	    ftm += dt;
 	    while(true) {
@@ -337,6 +340,8 @@ public class MeshAnim extends State {
 	}
 
 	public boolean tick(float dt) {
+		if (freeze)
+			return false;
 	    fp += dt;
 	    if(fp >= fl) {
 		fp -= fl;
@@ -469,6 +474,12 @@ public class MeshAnim extends State {
 		    frames.add(new Frame(tm, idx, pos, nrm));
 		}
 		a = new MeshAnim(frames.toArray(new Frame[0]), len);
+
+		if (ZeeConfig.stopSomeAnimations && ZeeConfig.stopResAnimation(res))
+			a.freeze = true;
+		else
+			a.freeze = false;
+
 	    } else {
 		throw(new Resource.LoadException("Invalid meshanim format version: " + ver, res));
 	    }
