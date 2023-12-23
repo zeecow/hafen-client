@@ -1908,7 +1908,7 @@ public class ZeeManagerGobClick extends ZeeThread{
             getXpFromWell(gob);
         }
         // gob house label cupboards
-        else if (petalName.contentEquals("label cupboards")){
+        else if (petalName.contentEquals(ZeeCupboardLabeler.STR_MENUPETAL)){
             ZeeCupboardLabeler.addHouse(gob);
         }
         // generic "Build [argName]"
@@ -2347,7 +2347,7 @@ public class ZeeManagerGobClick extends ZeeThread{
             );
         }
         else if(isGobHouse(gobName)){
-            menu = new ZeeFlowerMenu(gob,"label cupboards");
+            menu = new ZeeFlowerMenu(gob,ZeeCupboardLabeler.STR_MENUPETAL);
         }
         else{
             showMenu = false;

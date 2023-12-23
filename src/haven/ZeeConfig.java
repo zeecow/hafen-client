@@ -2745,6 +2745,7 @@ public class ZeeConfig {
         ZeeManagerGobClick.plowQueueReset();
         ZeeManagerGobClick.chopTreeReset();
         ZeeManagerGobClick.chipStoneReset();
+        ZeeCupboardLabeler.exitCupbLblr();
 
         if (ZeeManagerGobClick.winHideGobs!=null){
             try{
