@@ -5,7 +5,6 @@ import haven.resutil.WaterTile;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
-import java.awt.event.MouseEvent;
 import java.lang.reflect.Field;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -15,7 +14,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import static haven.MCache.tilesz;
 import static haven.OCache.posres;
 
 public class ZeeManagerGobClick extends ZeeThread{
@@ -1909,6 +1907,10 @@ public class ZeeManagerGobClick extends ZeeThread{
         else if(petalName.contentEquals("get XP from well")){
             getXpFromWell(gob);
         }
+        // gob house label cupboards
+        else if (petalName.contentEquals("label cupboards")){
+            ZeeCupboardLabeler.addHouse(gob);
+        }
         // generic "Build [argName]"
         else if(petalName.startsWith("Build ")){
             String[] arr = petalName.split(" ");
@@ -2343,6 +2345,9 @@ public class ZeeManagerGobClick extends ZeeThread{
                     "Craft flour",
                     "Craft girst"
             );
+        }
+        else if(isGobHouse(gobName)){
+            menu = new ZeeFlowerMenu(gob,"label cupboards");
         }
         else{
             showMenu = false;
