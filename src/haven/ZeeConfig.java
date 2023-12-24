@@ -223,7 +223,7 @@ public class ZeeConfig {
     static boolean dropSoil = false;
     static boolean destroyingTreelogs = false;
     static boolean equiporyCompact = Utils.getprefb("equiporyCompact", false);
-    static boolean equipShieldOnCombat = Utils.getprefb("equipShieldOnCombat", true);
+    static boolean equipShieldOnCombat = Utils.getprefb("equipShieldOnCombat", false);
     static boolean farmerMode = false;
     static boolean freeGobPlacement = Utils.getprefb("freeGobPlacement", true);
     static boolean fishMoonXpAlert = Utils.getprefb("fishMoonXpAlert", true);
@@ -4182,7 +4182,7 @@ public class ZeeConfig {
             ZeeManagerStockpile.exitManager();
         }
         //equip roundshield
-        if (ZeeConfig.equipShieldOnCombat && !ZeeManagerItemClick.isItemEquipped("huntersbow") && !ZeeManagerItemClick.isItemEquipped("rangersbow"))
+        if (ZeeConfig.equipShieldOnCombat && !ZeeManagerItemClick.isItemEquipped("huntersbow","rangersbow"))
             ZeeManagerItemClick.equipBeltItem("/roundshield");
     }
 
