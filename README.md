@@ -4,7 +4,7 @@ Client focusing on small helper tasks, many using mouse middle button, and other
 
 Controls
 --------
-- flowermenu also works on mouse up
+- gob flowermenu also works on mouse up
 - minimap drags with button 3
 - right click crop and drag also starts harvest area selection (slow)
 - keys up/down controls volume
@@ -28,7 +28,10 @@ Controls
   - auto-dismount horse (if inventory rope)
 - right-click workstations to auto dismount (if inventory rope)
 - Icon Settings: shift+space toggles notify checkbox
-- right-click-hold Search Actions Button to start a hover menu
+- Search Actions single click 
+  - left-click-hold search button shows Actions window, and select item on mouse up 
+  - right-click-hold search button to start a hover menu
+
 
 
 
