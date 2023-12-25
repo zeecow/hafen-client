@@ -440,8 +440,10 @@ public class Makewindow extends Widget {
 			return(qm.get().flayer(Resource.tooltip).t);
 		    c = c.add(tsz.x + UI.scale(1), 0);
 		}
-	    } catch(Loading l) {
-	    }
+	    } catch(Loading ignored) {
+	    } catch(Exception e){
+			e.printStackTrace();
+		}
 	}
 	if(!tools.isEmpty()) {
 	    c = new Coord(toolx, qmy);
@@ -452,8 +454,10 @@ public class Makewindow extends Widget {
 			return(tool.get().flayer(Resource.tooltip).t);
 		    c = c.add(tsz.x + UI.scale(1), 0);
 		}
-	    } catch(Loading l) {
-	    }
+	    } catch(Loading ignored) {
+	    } catch(Exception e){
+			e.printStackTrace();
+		}
 	}
 	return(super.tooltip(mc, prev));
     }
