@@ -287,6 +287,9 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Message
     public static final KeyBinding kb_srch = KeyBinding.get("scm-srch", KeyMatch.forchar('Z', KeyMatch.C));
     private void menubuttons(Widget bg) {
 	brpanel.add(new MenuButton("csearch", kb_srch, "Search actions...(hold r-click for menu)") {
+		public void click() {
+			toggleSearchWindow();
+		}
 		public boolean mousedown(Coord c, int button) {
 			ZeeHoverMenu.exitIfMenuExists();
 			if (button==3){
