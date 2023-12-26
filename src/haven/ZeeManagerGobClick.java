@@ -1907,10 +1907,6 @@ public class ZeeManagerGobClick extends ZeeThread{
         else if(petalName.contentEquals("get XP from well")){
             getXpFromWell(gob);
         }
-        // gob house label cupboards
-        else if (petalName.contentEquals(ZeeCupboardLabeler.STR_MENUPETAL)){
-            ZeeCupboardLabeler.addHouse(gob);
-        }
         // generic "Build [argName]"
         else if(petalName.startsWith("Build ")){
             String[] arr = petalName.split(" ");
@@ -2345,9 +2341,6 @@ public class ZeeManagerGobClick extends ZeeThread{
                     "Craft flour",
                     "Craft girst"
             );
-        }
-        else if(isGobHouse(gobName)){
-            menu = new ZeeFlowerMenu(gob,ZeeCupboardLabeler.STR_MENUPETAL);
         }
         else{
             showMenu = false;
@@ -4161,7 +4154,7 @@ public class ZeeManagerGobClick extends ZeeThread{
         return new Color(red,green,blue,c.getAlpha());
     }
 
-    static void brightnessMapLoad() {
+    static void initPlayerLocation() {
         Glob glob = ZeeConfig.gameUI.ui.sess.glob;
 
         // save player location
@@ -4177,14 +4170,23 @@ public class ZeeManagerGobClick extends ZeeThread{
         //println("set player location to "+ZeeConfig.getPlayerLocationName());
 
         // restore saved brightness
-        int intColor = Utils.getprefi(getLightPrefName(),1);
-        if (intColor < 0) {
-            glob.blightamb = ZeeConfig.intToColor(intColor);
-            //println("set blightamb to "+glob.blightamb+" , "+intColor);
-        }
+        restoreSavedBrightness();
 
         // midi radio
         ZeeMidiRadio.toggleRadio();
+
+        // cupboard labeler
+        if (ZeeConfig.playerLocation==ZeeConfig.LOCATION_CABIN || ZeeConfig.playerLocation==ZeeConfig.LOCATION_CELLAR){
+            ZeeCupboardLabeler.checkInterior();
+        }
+    }
+
+    private static void restoreSavedBrightness() {
+        int intColor = Utils.getprefi(getLightPrefName(),1);
+        if (intColor < 0) {
+            ZeeConfig.gameUI.ui.sess.glob.blightamb = ZeeConfig.intToColor(intColor);
+            //println("set blightamb to "+glob.blightamb+" , "+intColor);
+        }
     }
 
     private static String getLightPrefName() {

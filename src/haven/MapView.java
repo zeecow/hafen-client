@@ -2534,8 +2534,17 @@ public boolean mousedown(Coord c, int button) {
 	@Override
 	public void wdgmsg(String msg, Object... args) {
 		super.wdgmsg(msg, args);
+
+		// check enter house
+		if (msg.contentEquals("click")){
+			ZeeCupboardLabeler.checkHouseClick();
+		}
+
+		// mine selection
 		if (msg.contentEquals("sel"))
 			ZeeManagerMiner.checkMiningSelection();
+
+		// piler
 		if (ZeeConfig.pilerMode) {
 			if (msg.equals("place"))
 				ZeeManagerStockpile.checkWdgmsgPilePlacing();

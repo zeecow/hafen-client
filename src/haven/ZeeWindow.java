@@ -8,6 +8,10 @@ public class ZeeWindow extends Window {
         super(size, title);
     }
 
+    public static Coord posBelow(Widget wdg, int padX, int padY) {
+        return Coord.of(wdg.c.x + padX, wdg.c.y + wdg.sz.y + padY);
+    }
+
     @Override
     public void wdgmsg(String msg, Object... args) {
         //ZeeConfig.println(this.getClass().getSimpleName()+" > "+msg);

@@ -2886,6 +2886,7 @@ public class ZeeConfig {
         }
         // clicked ground
         else{
+            lastMapViewClickGobName = "";
             if (clickb==1) {
                 ZeeManagerStockpile.checkTileSourcePiling(mc);
             }
@@ -3673,8 +3674,8 @@ public class ZeeConfig {
 
                             sleep(500);
 
-                            // map brightness
-                            ZeeManagerGobClick.brightnessMapLoad();
+                            // location based settings
+                            ZeeManagerGobClick.initPlayerLocation();
 
                             // remount closest horse
                             if (ZeeManagerGobClick.remountClosestHorse) {
