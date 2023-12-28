@@ -17,6 +17,8 @@ import java.util.Queue;
 import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static haven.OCache.posres;
@@ -2905,7 +2907,7 @@ public class ZeeConfig {
     }
 
     public static boolean isPlayerCarryingWheelbarrow() {
-        return isPlayerLiftingGob("/wheelbarrow") != null;
+        return isPlayerLiftingGobNamecontains("/wheelbarrow") != null;
     }
 
     public static boolean isPlayerDrivingWheelbarrow() {
@@ -2935,7 +2937,7 @@ public class ZeeConfig {
         return playerHasAnyPose(POSE_PLAYER_LIFTING);
     }
 
-    public static Gob isPlayerLiftingGob(String gobNameContains) {
+    public static Gob isPlayerLiftingGobNamecontains(String gobNameContains) {
         if (!playerHasAnyPose(POSE_PLAYER_LIFTING)) // not lifting anything
             return null;
         return  isPlayerSharingGobCoord(gobNameContains);
@@ -4713,5 +4715,18 @@ public class ZeeConfig {
 
     public static boolean isPlobActive() {
         return ZeeManagerStockpile.lastPlob != null;
+    }
+
+    public static String getRegexGroup(String liftedGobName, String regex, int groupIndexStartsAt1
+    ) {
+        try {
+            Pattern pattern = Pattern.compile(regex);
+            Matcher matcher = pattern.matcher(liftedGobName);
+            matcher.find();
+            return matcher.group(groupIndexStartsAt1);
+        }catch (Exception e){
+            println("getRegexGroup > "+e.getMessage());
+        }
+        return "";
     }
 }

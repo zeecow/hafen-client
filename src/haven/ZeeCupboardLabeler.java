@@ -91,9 +91,6 @@ public class ZeeCupboardLabeler {
                 @SuppressWarnings("unchecked")
                 Map<Integer, Material> mats = (Map<Integer, Material>) f.get(attr);
                 for (Material m : mats.values()) {
-
-                    //Pattern pattern0 = Pattern.compile("(\\d+\\.?+\\d*)\\s+(\\S+) of ([\\S\\s]+)$");
-                    //.compile("(.*?)(\\d+)(.*)");
                     Pattern pattern = Pattern.compile("\\/([a-z]+)\\(");
                     Matcher matcher = pattern.matcher(m.states.toString());
                     matcher.find();

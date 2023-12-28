@@ -85,14 +85,37 @@ public class ZeeManagerGobClick extends ZeeThread{
                 barterstandSearchWindow();
             }
             // place lifted treelog next to clicked one
-            else if ( isGobTreeLog(gobName) && ZeeConfig.isPlayerLiftingGob("gfx/terobjs/trees/")!=null && !ZeeConfig.isPlayerLiftingGob(gob)){
+            else if ( isGobTreeLog(gobName) && ZeeConfig.isPlayerLiftingGobNamecontains("gfx/terobjs/trees/")!=null && !ZeeConfig.isPlayerLiftingGob(gob))
+            {
                 placeTreelogNextTo(gob);
             }
-            // start Gob Placer if target has same name as lifted gob
-            else if(ZeeConfig.isPlayerLiftingGob(gobName)!=null){
-                // lifted gob itself not a valid target
-                if (!ZeeConfig.isPlayerLiftingGob(gob))
-                    windowGobPlacer(gob, ZeeConfig.isPlayerLiftingGob(gobName));
+            // start Gob Placer (if lifting same name gob, or boulder)
+            else if(!ZeeConfig.isPlayerLiftingGob(gob) && (ZeeConfig.isPlayerLiftingGobNamecontains(gobName)!=null  || ZeeConfig.isPlayerLiftingGobNamecontains("gfx/terobjs/bumlings/")!=null))
+            {
+                Gob liftedGob = ZeeConfig.isPlayerLiftingGobNamecontains(gobName);
+                Gob groundGob = gob;
+                String groundGobName = gobName;
+                // check if lifting any boulder
+                if (liftedGob==null){
+                    liftedGob = ZeeConfig.isPlayerLiftingGobNamecontains("gfx/terobjs/bumlings/");
+                    if (liftedGob!=null && groundGobName.startsWith("gfx/terobjs/bumlings/")) {
+                        String liftedGobName = liftedGob.getres().name;
+                        String liftedBoulderSize = ZeeConfig.getRegexGroup(liftedGobName, "(\\d)$", 1);
+                        String groundBoulderSize = ZeeConfig.getRegexGroup(groundGobName, "(\\d)$", 1);
+                        if (!liftedBoulderSize.isBlank() && liftedBoulderSize.contentEquals(groundBoulderSize)) {
+                            windowGobPlacer(gob, liftedGob);
+                        } else {
+                            println("gob placer > boulder size dont match > " + liftedBoulderSize + " != " + groundBoulderSize);
+                        }
+                    } else {
+                        println("gob placer canceled, was expecting 2 boulders");
+                    }
+                }
+                // non-boulder gobs
+                else{
+                    //println("non boulder gob");
+                    windowGobPlacer(gob, liftedGob);
+                }
             }
             // build obj and get more blocks/boards
             else if (gobName.contentEquals("gfx/terobjs/consobj")) {
@@ -249,6 +272,16 @@ public class ZeeManagerGobClick extends ZeeThread{
 
         String liftedGobName = liftedGob.getres().name;
 
+        // rename boulders to boulder0 or boulder1, the only liftable sizes
+        if(isGobBoulder(liftedGobName)){
+            String boulderSize = ZeeConfig.getRegexGroup(liftedGobName,"(\\d)$",1);
+            if (!List.of("0","1").contains(boulderSize)) {
+                println("lifted boulder size unknown");
+                return;
+            }
+            liftedGobName = "boulder"+boulderSize;
+        }
+
         //create window
         win = ZeeConfig.gameUI.add(
                 new Window(Coord.of(200,70),gobPlacerWinTitle){
@@ -268,11 +301,12 @@ public class ZeeManagerGobClick extends ZeeThread{
         wdg = gobPlacerLblDist = win.add(new Label(""),wdg.c.add(0,wdg.sz.y+2));
 
         // button clear saved dist
+        String finalLiftedGobName = liftedGobName;
         wdg = gobPlacerBtnClear = win.add(new Button(120,"clear saved dist"){
             public void wdgmsg(String msg, Object... args) {
                 //super.wdgmsg(msg, args);
                 if (msg.contentEquals("activate")){
-                    mapGobPlacerNameDist.remove(liftedGobName);
+                    mapGobPlacerNameDist.remove(finalLiftedGobName);
                     Utils.setpref("mapGobPlacerNameDist", ZeeConfig.serialize(mapGobPlacerNameDist));
                     //println("removing "+liftedGobName+" , mapsize "+mapGobPlacerNameDist.size());
                     //close window
@@ -297,6 +331,7 @@ public class ZeeManagerGobClick extends ZeeThread{
             gobPlacerBtnClear.disable(true);
             gobPlacerLblDist.settext("waiting new gob placement");
             // wait user place liftedGob and save distance between ground and lifted gobs
+            String finalLiftedGobName1 = liftedGobName;
             new ZeeThread(){
                 public void run() {
                     try {
@@ -310,7 +345,7 @@ public class ZeeManagerGobClick extends ZeeThread{
 
                         //save gob dist
                         double dist = groundGob.rc.dist(liftedGob.rc);
-                        mapGobPlacerNameDist.put(liftedGobName,dist);
+                        mapGobPlacerNameDist.put(finalLiftedGobName1,dist);
                         Utils.setpref("mapGobPlacerNameDist", ZeeConfig.serialize(mapGobPlacerNameDist));
                         //println("gobPlacer > "+dist+" , "+liftedGobName+" , mapsize "+mapGobPlacerNameDist.size());
 
@@ -686,7 +721,7 @@ public class ZeeManagerGobClick extends ZeeThread{
 
                     ZeeConfig.addPlayerText("placing");
 
-                    Gob liftedTreelog = ZeeConfig.isPlayerLiftingGob("gfx/terobjs/trees/");
+                    Gob liftedTreelog = ZeeConfig.isPlayerLiftingGobNamecontains("gfx/terobjs/trees/");
                     if (liftedTreelog==null){
                         ZeeConfig.msgError("placeTreelogNextTo > couldn't find lifted treelog");
                         ZeeConfig.removePlayerText();
@@ -1384,7 +1419,7 @@ public class ZeeManagerGobClick extends ZeeThread{
                         String barrelName = ZeeConfig.getBarrelOverlayBasename(gob);
                         if (!barrelName.isEmpty())
                             ZeeConfig.addGobText(gob, barrelName);
-                        Gob carryingBarrel = ZeeConfig.isPlayerLiftingGob("/barrel");
+                        Gob carryingBarrel = ZeeConfig.isPlayerLiftingGobNamecontains("/barrel");
                         if (carryingBarrel!=null) {
                             barrelName = ZeeConfig.getBarrelOverlayBasename(carryingBarrel);
                             if (!barrelName.isEmpty())
