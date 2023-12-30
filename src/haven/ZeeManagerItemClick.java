@@ -163,8 +163,8 @@ public class ZeeManagerItemClick extends ZeeThread{
             }
 
             // fishing
-            if (isLongClick() && isFishingItem()) {
-                switchFishingEquips();
+            if (isLongClick() && ZeeFishing.isFishingItem(itemName)) {
+                ZeeFishing.switchFishingEquips(wItem,itemName);
                 return;
             }
 
@@ -493,70 +493,6 @@ public class ZeeManagerItemClick extends ZeeThread{
         if (ret==null)
             ret = getBeltWItem("bindle");
         return ret;
-    }
-
-    private void switchFishingEquips() {
-
-        ZeeConfig.addPlayerText("switch");
-
-        try {
-
-            Inventory invCreelOrMain = wItem.getparent(Inventory.class);
-
-            // equip lure on primrod
-            if (itemName.contains("lure-")){
-                if(getLeftHandName().contains("/primrod") || getRightHandName().contains("/primrod")){
-                    if(pickUpItem()){
-                        equiporyItemAct("/primrod");//equip holding item
-                        playFeedbackSound();
-                        Thread.sleep(500);
-                        invCreelOrMain.wdgmsg("drop", wItem.c.div(33));//return switched item
-                        playFeedbackSound();
-                    }
-                } else {
-                    ZeeConfig.gameUI.error("no fish rod equipped");
-                    return;
-                }
-            }
-            //equip hook or line
-            else {
-                String rodName = "";
-                if(getLeftHandName().contains("/primrod") || getRightHandName().contains("/primrod")) {
-                    rodName = "/primrod";
-                } else if(getLeftHandName().contains("/bushpole") || getRightHandName().contains("/bushpole")){
-                    rodName = "/bushpole";
-                } else {
-                    ZeeConfig.gameUI.error("no fish pole equipped");
-                    return;
-                }
-                if(pickUpItem()){
-                    equiporyItemAct(rodName);//equip holding item
-                    playFeedbackSound();
-                    Thread.sleep(500);
-                    invCreelOrMain.wdgmsg("drop", wItem.c.div(33));//return switched item
-                    playFeedbackSound();
-                }
-            }
-
-            // click fishing spot again
-            Thread.sleep(500);
-            ZeeConfig.gameUI.map.wdgmsg("click", ZeeConfig.lastMapViewClickArgs);
-
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
-        ZeeConfig.removePlayerText();
-    }
-
-    private boolean isFishingItem() {
-        String[] items = {"fline-","hook-","lure-","chitinhook"};
-        for (int i = 0; i < items.length; i++) {
-            if (itemName.contains(items[i])){
-                return true;
-            }
-        }
-        return false;
     }
 
     public String getHoldingItemName() {

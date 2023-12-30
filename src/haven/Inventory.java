@@ -273,6 +273,22 @@ public class Inventory extends Widget implements DTarget {
 				.collect(Collectors.toList());
 	}
 
+	public List<WItem> getWItemsByNameContains(String... nameContains) {
+		List<WItem> items = new ArrayList<WItem>();
+		for (Widget wdg = child; wdg != null; wdg = wdg.next) {
+			if (wdg instanceof WItem) {
+				String wdgname = ((WItem) wdg).item.getres().name;
+				for (String name : nameContains) {
+					if (wdgname.contains(name)) {
+						items.add((WItem) wdg);
+						break;
+					}
+				}
+			}
+		}
+		return items;
+	}
+
 	public List<WItem> getWItemsByNameEndsWith(String nameEndsWith) {
 		return this.children(WItem.class)
 				.stream()

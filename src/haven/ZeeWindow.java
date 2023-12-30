@@ -9,7 +9,15 @@ public class ZeeWindow extends Window {
     }
 
     public static Coord posBelow(Widget wdg, int padX, int padY) {
+        if (wdg==null)
+            return Coord.z;
         return Coord.of(wdg.c.x + padX, wdg.c.y + wdg.sz.y + padY);
+    }
+
+    public static Coord posRight(Widget wdg, int padX, int y) {
+        if (wdg==null)
+            return Coord.z;
+        return Coord.of(wdg.c.x + wdg.sz.x + padX, y);
     }
 
     @Override

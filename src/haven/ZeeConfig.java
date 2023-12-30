@@ -56,6 +56,7 @@ public class ZeeConfig {
     static final String CURSOR_MINE = "gfx/hud/curs/mine";//destroy
     static final String CURSOR_SHOOT = "gfx/hud/curs/shoot";
     static final String CURSOR_INSPECT = "gfx/hud/curs/study";
+    static final String CURSOR_FISH = "gfx/hud/curs/fish";
 
     static final String POSE_HORSE_IDLE = "gfx/kritter/horse/idle";
     static final String POSE_HORSE_WALKING = "gfx/kritter/horse/walking";//speed 0
@@ -4143,6 +4144,12 @@ public class ZeeConfig {
         isPlayerFeasting = curs.contentEquals(CURSOR_EAT);
         if(!isPlayerFeasting)
             ZeeManagerCraft.windowFeasting = null;
+
+
+        // fishing window
+        if(curs.contentEquals(CURSOR_FISH)){
+            ZeeFishing.buildWindow();
+        }
     }
 
     public static boolean isPlayerDrivingingKicksled() {
@@ -4725,5 +4732,14 @@ public class ZeeConfig {
             println("getRegexGroup > "+e.getMessage());
         }
         return "";
+    }
+
+    public static Inventory getWindowsInventory(String windowName) {
+        Window win = ZeeConfig.getWindow(windowName);
+        if (win!=null){
+            Inventory inv = win.getchild(Inventory.class);
+            return inv;
+        }
+        return null;
     }
 }
