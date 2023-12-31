@@ -1864,7 +1864,7 @@ public class ZeeConfig {
 
         if(animal.equals("Hog") || animal.equals("Sow"))
             ret = mapTamedAnimalNameFormat.get(MAP_ANIMAL_FORMAT_PIG);
-        else if(animal.equals("Bull") || animal.equals("Cow"))
+        else if(animal.equals("Bull") || animal.equals("Cow") || animal.contains("Reindeer"))
             ret = mapTamedAnimalNameFormat.get(MAP_ANIMAL_FORMAT_CATTLE);
         else if(animal.equals("Stallion") || animal.equals("Mare"))
             ret = mapTamedAnimalNameFormat.get(MAP_ANIMAL_FORMAT_HORSE);
@@ -1928,7 +1928,7 @@ public class ZeeConfig {
     }
 
     public static boolean isWindowAnimalStats(String windowTitle) {
-        final String list = "Sow,Hog,Cow,Bull,Stallion,Mare,Nanny,Billy,Ewe,Ram";
+        final String list = "Sow,Hog,Cow,Bull,Stallion,Mare,Nanny,Billy,Ewe,Ram,Reindeer Doe";
         return list.contains(windowTitle);
     }
 
