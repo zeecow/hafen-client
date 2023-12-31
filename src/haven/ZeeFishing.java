@@ -79,7 +79,6 @@ public class ZeeFishing {
         ZeeConfig.removePlayerText();
     }
 
-
     public static void buildWindow() {
 
         String winName = "Fishing helper";
@@ -117,7 +116,7 @@ public class ZeeFishing {
                 wdg = win.add(new Button((int) (fitem.length()*letterW*.9), fitem) {
                     public void wdgmsg(String msg, Object... args) {
                         if (msg.contentEquals("activate")) {
-                            buttonChangeItem(finalFitem);
+                            buttonChangeItem(finalFitem,this);
                         }
                     }
                 }, ZeeWindow.posRight(wdg, 2, y));
@@ -135,7 +134,7 @@ public class ZeeFishing {
                 wdg = win.add(new Button((int) (fitem.length()*letterW*.9), fitem) {
                     public void wdgmsg(String msg, Object... args) {
                         if (msg.contentEquals("activate")) {
-                            buttonChangeItem(finalFitem);
+                            buttonChangeItem(finalFitem,this);
                         }
                     }
                 }, ZeeWindow.posRight(wdg, 2, y));
@@ -153,7 +152,7 @@ public class ZeeFishing {
                 wdg = win.add(new Button((int) (fitem.length()*letterW*.9), fitem) {
                     public void wdgmsg(String msg, Object... args) {
                         if (msg.contentEquals("activate")) {
-                            buttonChangeItem(finalFitem);
+                            buttonChangeItem(finalFitem,this);
                         }
                     }
                 }, ZeeWindow.posRight(wdg, 2, y));
@@ -163,7 +162,30 @@ public class ZeeFishing {
         win.pack();
     }
 
-    private static void buttonChangeItem(String fishItemName) {
+    static Button btnLure, btnLine, btnHook;
+    private static void buttonChangeItem(String fishItemName, Button btn) {
+
+        // disable buttons to indicate used items
+        if (fishItemName.startsWith("lure-")) {
+            if (btnLure!=null)
+                btnLure.disable(false);
+            btnLure = btn;
+            btnLure.disable(true);
+        }
+        else if (fishItemName.startsWith("fline-")) {
+            if (btnLine!=null)
+                btnLine.disable(false);
+            btnLine = btn;
+            btnLine.disable(true);
+        }
+        else if (fishItemName.startsWith("hook-") || fishItemName.startsWith("chitinhook")) {
+            if (btnHook!=null)
+                btnHook.disable(false);
+            btnHook = btn;
+            btnHook.disable(true);
+        }
+
+        // switch fish item
         new ZeeThread(){
             public void run() {
                 try {
