@@ -1203,6 +1203,10 @@ public class ZeeConfig {
                 }, btnPress.c.x + btnPress.sz.x + 5 , btnPress.c.y);
             }
         }
+        //fishing
+        else if(windowTitle.contains("This is bait")){
+            ZeeFishing.checkFishWindow(window);
+        }
         // xp window
         else if (isWindowXpEvent(window)){
             // use same widow title for all xpevt windows

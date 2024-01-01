@@ -1,5 +1,6 @@
 package haven;
 
+import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -8,6 +9,9 @@ public class ZeeFishing {
 
     final static String POSE_FISH_IDLE = "gfx/borka/fishidle";
     final static String POSE_FISH_REELING1 = "gfx/borka/napp1";
+
+    static boolean autoFish = false;
+    static int autoFishAbove = 70;
 
     public static boolean isFishingItem(String itemName) {
         String[] items = {"fline-","hook-","lure-","chitinhook"};
@@ -79,6 +83,8 @@ public class ZeeFishing {
         ZeeConfig.removePlayerText();
     }
 
+
+    static TextEntry textEntryAutoFish;
     public static void buildWindow() {
 
         String winName = "Fishing helper";
@@ -159,6 +165,48 @@ public class ZeeFishing {
             }
         }
 
+        y += wdg.sz.y + 3;
+
+        // auto fish checkbox
+        wdg = win.add(new CheckBox("Auto fish above %"){
+            { a = autoFish; }
+            public void changed(boolean val) {
+                autoFish = val;
+                if (textEntryAutoFish!=null)
+                    textEntryAutoFish.setcanfocus(!autoFish);
+            }
+        }, 0 , wdg.c.y+wdg.sz.y+2);
+        //autofish textentry
+        wdg = win.add(textEntryAutoFish = new TextEntry(UI.scale(50),""+autoFishAbove){
+            public boolean keydown(KeyEvent e) {
+                if(!Character.isDigit(e.getKeyChar()) && !ZeeConfig.isControlKey(e.getKeyCode()))
+                    return false;
+                return super.keydown(e);
+            }
+            public void changed(ReadLine buf) {
+                if (buf.empty()) {
+                    super.changed(buf);
+                    println("empty");
+                    return;
+                }
+                try {
+                    int num = Integer.parseInt(buf.line());
+                    if (num < 0)
+                        this.settext("0");
+                    else if (num > 100)
+                        this.settext("100");
+                    else {
+                        autoFishAbove = num;
+                        println("autofish set to "+num);
+                        buf.setline(""+num);
+                        super.changed(buf);
+                    }
+                }catch (Exception e){
+                    println("changed exception > "+e.getMessage());
+                }
+            }
+        },ZeeWindow.posRight(wdg, 2, y));
+
         win.pack();
     }
 
@@ -232,5 +280,33 @@ public class ZeeFishing {
 
     static void println(String msg){
         ZeeConfig.println(msg);
+    }
+
+    public static void checkFishWindow(Window win) {
+        if (autoFish) {
+            int count = 0;
+            Button btn = null;
+            Label lbl;
+            for (Widget child : win.children()) {
+                if (child instanceof Button) {
+                    count = 0;
+                    btn = (Button) child;
+                } else if (child instanceof Label) {
+                    count++;
+                    if (count == 6) {
+                        lbl = (Label) child;
+                        int num = Integer.parseInt(lbl.texts.replaceAll("[^0-9]", ""));
+                        if (num >= autoFishAbove) {
+                            println("clicking > "+lbl.texts);
+                            if (btn!=null)
+                                btn.click();
+                            else
+                                println("btn null");
+                            return;
+                        }
+                    }
+                }
+            }
+        }
     }
 }
