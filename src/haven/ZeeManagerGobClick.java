@@ -3786,14 +3786,14 @@ public class ZeeManagerGobClick extends ZeeThread{
     static boolean isGobTamedAnimalOrAurochEtc(String gobName){
         return isGobInListEndsWith(
                 gobName,
-                "/stallion,/mare,/foal,/hog,/sow,/piglet,/billy,/nanny,/kid,/sheep,/lamb,/cattle,/calf,/teimdeercow"
+                "/stallion,/mare,/foal,/hog,/sow,/piglet,/billy,/nanny,/kid,/sheep,/lamb,/cattle,/calf,/teimdeercow,/teimdeerbull"
         );
     }
 
     static boolean isGobButchable(String gobName){
         return isGobInListEndsWith(
             gobName,
-            "/stallion,/mare,/foal,/hog,/sow,/piglet,"
+            "/stallion,/mare,/foal,/hog,/sow,/piglet,/teimdeercow,/teimdeerbull,"
             +"/billy,/nanny,/kid,/sheep,/lamb,/cattle,/calf,"
             +"/wildhorse,/aurochs,/mouflon,/wildgoat,"
             +"/adder,/badger,/bear,/boar,/beaver,/fox,"

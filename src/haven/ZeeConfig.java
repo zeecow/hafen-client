@@ -1904,7 +1904,7 @@ public class ZeeConfig {
     }
 
     private static String windowTamedAnimalGetGender(String animal) {
-        final String male = "Hog,Bull,Stallion,Billy,Ram";
+        final String male = "Hog,Bull,Stallion,Billy,Ram,Buck";
         final String gender = male.contains(animal) ? "M" : "F";
         return gender;
     }
@@ -1932,7 +1932,7 @@ public class ZeeConfig {
     }
 
     public static boolean isWindowAnimalStats(String windowTitle) {
-        final String list = "Sow,Hog,Cow,Bull,Stallion,Mare,Nanny,Billy,Ewe,Ram,Reindeer Doe";
+        final String list = "Sow,Hog,Cow,Bull,Stallion,Mare,Nanny,Billy,Ewe,Ram,Reindeer Doe,Reindeer Buck";
         return list.contains(windowTitle);
     }
 
