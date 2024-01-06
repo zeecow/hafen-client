@@ -1,5 +1,6 @@
 package haven;
 
+import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.List;
@@ -10,8 +11,9 @@ public class ZeeFishing {
     final static String POSE_FISH_IDLE = "gfx/borka/fishidle";
     final static String POSE_FISH_REELING1 = "gfx/borka/napp1";
 
-    static boolean autoFish = false;
+    static boolean autoFish = false, avoidInvoluntaryFishing = true;
     static int autoFishAbove = 70;
+    static String fishNameAlert = "";
 
     public static boolean isFishingItem(String itemName) {
         String[] items = {"fline-","hook-","lure-","chitinhook"};
@@ -24,6 +26,9 @@ public class ZeeFishing {
     }
 
     static void switchFishingEquips(WItem wItem, String itemName) {
+
+        //cancel recastThread()
+        ZeeConfig.lastMapViewClickButton = 1;
 
         boolean isFishPose = ZeeConfig.playerHasAnyPose(POSE_FISH_IDLE,POSE_FISH_REELING1);
 
@@ -84,7 +89,7 @@ public class ZeeFishing {
     }
 
 
-    static TextEntry textEntryAutoFish;
+    static TextEntry textEntryAutoFish, textEntryFishAlert;
     public static void buildWindow() {
 
         String winName = "Fishing helper";
@@ -126,6 +131,12 @@ public class ZeeFishing {
                         }
                     }
                 }, ZeeWindow.posRight(wdg, 2, y));
+                //highlight prev selected buttons
+                Button newBtn = (Button) wdg;
+                if (prevLure.contentEquals(newBtn.text.text)) {
+                    btnLure = newBtn;
+                    highlightButton(newBtn);
+                }
             }
         }
 
@@ -144,6 +155,12 @@ public class ZeeFishing {
                         }
                     }
                 }, ZeeWindow.posRight(wdg, 2, y));
+                //highlight prev selected buttons
+                Button newBtn = (Button) wdg;
+                if (prevLine.contentEquals(newBtn.text.text)) {
+                    btnLine = newBtn;
+                    highlightButton(newBtn);
+                }
             }
         }
 
@@ -162,10 +179,26 @@ public class ZeeFishing {
                         }
                     }
                 }, ZeeWindow.posRight(wdg, 2, y));
+                //highlight prev selected buttons
+                Button newBtn = (Button) wdg;
+                if (prevHook.contentEquals(newBtn.text.text)) {
+                    btnHook = newBtn;
+                    highlightButton(newBtn);
+                }
             }
         }
 
         y += wdg.sz.y + 3;
+
+
+        // alert fish name
+        wdg = win.add(new Label("Alert on fish: "),0,y);
+        wdg = win.add(textEntryFishAlert= new TextEntry(UI.scale(100),""+ fishNameAlert){
+            public void activate(String text) {
+                fishNameAlert = text.strip();
+            }
+        },ZeeWindow.posRight(wdg,2,y));
+
 
         // auto fish checkbox
         wdg = win.add(new CheckBox("Auto fish above %"){
@@ -175,7 +208,7 @@ public class ZeeFishing {
                 if (textEntryAutoFish!=null)
                     textEntryAutoFish.setcanfocus(!autoFish);
             }
-        }, 0 , wdg.c.y+wdg.sz.y+2);
+        }, ZeeWindow.posRight(wdg,7,y));
         //autofish textentry
         wdg = win.add(textEntryAutoFish = new TextEntry(UI.scale(50),""+autoFishAbove){
             public boolean keydown(KeyEvent e) {
@@ -207,30 +240,52 @@ public class ZeeFishing {
             }
         },ZeeWindow.posRight(wdg, 2, y));
 
+
+        y += wdg.sz.y + 3;
+
+
+        // alert fish name
+        wdg = win.add(new CheckBox("Avoid involuntary fishing by recasting"){
+            {a = avoidInvoluntaryFishing;}
+            public void changed(boolean val) {
+                //super.changed(val);
+                avoidInvoluntaryFishing = val;
+            }
+        },0,y);
+
         win.pack();
+
+    }
+
+    private static void highlightButton(Button btn) {
+        btn.change(btn.text.text, Color.blue);
     }
 
     static Button btnLure, btnLine, btnHook;
+    static String prevLure="", prevLine="", prevHook="";
     private static void buttonChangeItem(String fishItemName, Button btn) {
 
         // disable buttons to indicate used items
         if (fishItemName.startsWith("lure-")) {
             if (btnLure!=null)
-                btnLure.disable(false);
+                restoreButton(btnLure);
             btnLure = btn;
-            btnLure.disable(true);
+            highlightButton(btnLure);
+            prevLure = btnLure.text.text;
         }
         else if (fishItemName.startsWith("fline-")) {
             if (btnLine!=null)
-                btnLine.disable(false);
+                restoreButton(btnLine);
             btnLine = btn;
-            btnLine.disable(true);
+            highlightButton(btnLine);
+            prevLine = btnLine.text.text;
         }
         else if (fishItemName.startsWith("hook-") || fishItemName.startsWith("chitinhook")) {
             if (btnHook!=null)
-                btnHook.disable(false);
+                restoreButton(btnHook);
             btnHook = btn;
-            btnHook.disable(true);
+            highlightButton(btnHook);
+            prevHook = btnHook.text.text;
         }
 
         // switch fish item
@@ -260,6 +315,10 @@ public class ZeeFishing {
         }.start();
     }
 
+    private static void restoreButton(Button btn) {
+        btn.change(btn.text.text);
+    }
+
     static List<String> getFishItemsAvailable() {
 
         List<WItem> ret = ZeeConfig.getMainInventory().getWItemsByNameContains("fline-", "hook-", "lure-", "chitinhook");
@@ -283,18 +342,35 @@ public class ZeeFishing {
     }
 
     public static void checkFishWindow(Window win) {
-        if (autoFish) {
-            int count = 0;
+
+        if (avoidInvoluntaryFishing){
+            recastThread();
+        }
+
+        if (autoFish || !fishNameAlert.isBlank()) {
+            boolean alertDone = false;
+            int lblCol = 0;
             Button btn = null;
             Label lbl;
             for (Widget child : win.children()) {
                 if (child instanceof Button) {
-                    count = 0;
+                    lblCol = 0;
                     btn = (Button) child;
                 } else if (child instanceof Label) {
-                    count++;
-                    if (count == 6) {
-                        lbl = (Label) child;
+
+                    lbl = (Label) child;
+
+                    //check fish alert
+                    if (!alertDone && !fishNameAlert.isBlank() && lbl.texts.endsWith(":")){
+                        if(lbl.texts.toLowerCase().contains(fishNameAlert.toLowerCase())){
+                            alertDone = true;
+                            ZeeSynth.textToSpeakLinuxFestival("fish found");
+                        }
+                    }
+
+                    // check autofish
+                    lblCol++;
+                    if (lblCol == 6) {
                         int num = Integer.parseInt(lbl.texts.replaceAll("[^0-9]", ""));
                         if (num >= autoFishAbove) {
                             println("clicking > "+lbl.texts);
@@ -308,5 +384,38 @@ public class ZeeFishing {
                 }
             }
         }
+    }
+
+    static boolean recastingOn = false;
+    private static void recastThread() {
+        if (recastingOn){
+            println("recasting thread already running");
+            return;
+        }
+        recastingOn = true;
+        new ZeeThread(){
+            public void run() {
+                try {
+                    long timeout = 4;
+                    prepareCancelClick();
+                    do {
+                        ZeeConfig.addPlayerText("recasting " + timeout);
+                        sleep(1000);
+                        timeout--;
+                    }while(timeout > 0 && !isCancelClick());
+                    if (!isCancelClick())
+                        ZeeConfig.gameUI.map.wdgmsg("click", ZeeConfig.lastMapViewClickArgs);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                recastingOn = false;
+                ZeeConfig.removePlayerText();
+            }
+        }.start();
+    }
+
+    static void exit(){
+        prevLure = ""; prevLine = ""; prevHook = "";
+        btnLure = btnLine = btnHook = null;
     }
 }
