@@ -197,7 +197,9 @@ public class ZeeFishing {
             public void activate(String text) {
                 fishNameAlert = text.strip();
             }
-        },ZeeWindow.posRight(wdg,2,y));
+        },ZeeWindow.posRight(wdg,2,y));;
+        textEntryFishAlert.setcanfocus(false);
+        textEntryFishAlert.setfocustab(false);
 
 
         // auto fish checkbox
@@ -239,6 +241,8 @@ public class ZeeFishing {
                 }
             }
         },ZeeWindow.posRight(wdg, 2, y));
+        textEntryAutoFish.setcanfocus(false);
+        textEntryAutoFish.setfocustab(false);
 
 
         y += wdg.sz.y + 3;
@@ -347,43 +351,52 @@ public class ZeeFishing {
             recastThread();
         }
 
-        if (autoFish || !fishNameAlert.isBlank()) {
-            boolean alertDone = false;
-            int lblCol = 0;
-            Button btn = null;
-            Label lbl;
-            for (Widget child : win.children()) {
-                if (child instanceof Button) {
-                    lblCol = 0;
-                    btn = (Button) child;
-                } else if (child instanceof Label) {
+        List<Widget> widgets = win.children();
 
-                    lbl = (Label) child;
-
-                    //check fish alert
-                    if (!alertDone && !fishNameAlert.isBlank() && lbl.texts.endsWith(":")){
-                        if(lbl.texts.toLowerCase().contains(fishNameAlert.toLowerCase())){
-                            alertDone = true;
+        // fish name alert
+        if (!fishNameAlert.isBlank()){
+            for (Widget widget : widgets) {
+                if (widget instanceof Label) {
+                    Label lbl = (Label) widget;
+                    if (lbl.texts.endsWith(":")) {
+                        if (lbl.texts.toLowerCase().contains(fishNameAlert.toLowerCase())) {
+                            lbl.setcolor(Color.green);
                             ZeeSynth.textToSpeakLinuxFestival("fish found");
-                        }
-                    }
-
-                    // check autofish
-                    lblCol++;
-                    if (lblCol == 6) {
-                        int num = Integer.parseInt(lbl.texts.replaceAll("[^0-9]", ""));
-                        if (num >= autoFishAbove) {
-                            println("clicking > "+lbl.texts);
-                            if (btn!=null)
-                                btn.click();
-                            else
-                                println("btn null");
-                            return;
+                            break;
                         }
                     }
                 }
             }
         }
+
+        // autofish above %
+        if(autoFish) {
+            int lblCol = 0;
+            Button btn = null;
+            Label lbl;
+            for (Widget widget : widgets) {
+                if (widget instanceof Button) {
+                    lblCol = 0;
+                    btn = (Button) widget;
+                } else if (widget instanceof Label) {
+                    lbl = (Label) widget;
+                    lblCol++;
+                    //println(lblCol+" = "+lbl.texts);
+                    if (lblCol == 6) {
+                        int num = Integer.parseInt(lbl.texts.replaceAll("[^0-9]", ""));
+                        if (num >= autoFishAbove) {
+                            println("autofish > " + lbl.texts);
+                            if (btn != null)
+                                btn.click();
+                            else
+                                println("btn null");
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
     }
 
     static boolean recastingOn = false;
