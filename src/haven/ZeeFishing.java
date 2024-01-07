@@ -2,7 +2,7 @@ package haven;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
-import java.util.ArrayList;
+import java.util.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -11,7 +11,10 @@ public class ZeeFishing {
     final static String POSE_FISH_IDLE = "gfx/borka/fishidle";
     final static String POSE_FISH_REELING1 = "gfx/borka/napp1";
 
-    static boolean autoFish = false, avoidInvoluntaryFishing = true;
+    static boolean
+            autoFish = false,
+            avoidInvoluntaryFishing = true,
+            reorderFishList = false;
     static int autoFishAbove = 70;
     static String fishNameAlert = "";
 
@@ -194,10 +197,15 @@ public class ZeeFishing {
         // alert fish name
         wdg = win.add(new Label("Alert on fish: "),0,y);
         wdg = win.add(textEntryFishAlert= new TextEntry(UI.scale(100),""+ fishNameAlert){
-            public void activate(String text) {
-                fishNameAlert = text.strip();
+            public void changed(ReadLine buf) {
+                if (buf.empty())
+                    fishNameAlert = "";
+                else
+                    fishNameAlert = buf.line();
             }
         },ZeeWindow.posRight(wdg,2,y));
+        textEntryFishAlert.setcanfocus(false);
+        textEntryFishAlert.setfocustab(false);
 
 
         // auto fish checkbox
@@ -205,8 +213,10 @@ public class ZeeFishing {
             { a = autoFish; }
             public void changed(boolean val) {
                 autoFish = val;
-                if (textEntryAutoFish!=null)
+                if (textEntryAutoFish!=null) {
+                    textEntryAutoFish.show(autoFish);
                     textEntryAutoFish.setcanfocus(!autoFish);
+                }
             }
         }, ZeeWindow.posRight(wdg,7,y));
         //autofish textentry
@@ -219,7 +229,7 @@ public class ZeeFishing {
             public void changed(ReadLine buf) {
                 if (buf.empty()) {
                     super.changed(buf);
-                    println("empty");
+                    //println("empty");
                     return;
                 }
                 try {
@@ -230,7 +240,7 @@ public class ZeeFishing {
                         this.settext("100");
                     else {
                         autoFishAbove = num;
-                        println("autofish set to "+num);
+                        //println("autofish set to "+num);
                         buf.setline(""+num);
                         super.changed(buf);
                     }
@@ -239,19 +249,33 @@ public class ZeeFishing {
                 }
             }
         },ZeeWindow.posRight(wdg, 2, y));
+        textEntryAutoFish.setcanfocus(false);
+        textEntryAutoFish.setfocustab(false);
+        textEntryAutoFish.show(autoFish);
 
 
         y += wdg.sz.y + 3;
 
 
         // alert fish name
-        wdg = win.add(new CheckBox("Avoid involuntary fishing by recasting"){
+        wdg = win.add(new CheckBox("Recast before idle fishing"){
             {a = avoidInvoluntaryFishing;}
             public void changed(boolean val) {
                 //super.changed(val);
                 avoidInvoluntaryFishing = val;
             }
         },0,y);
+
+
+        // order fish by % chance
+//        wdg = win.add(new CheckBox("Order fish by %"){
+//            {a = reorderFishList;}
+//            public void changed(boolean val) {
+//                //super.changed(val);
+//                reorderFishList = val;
+//            }
+//        },ZeeWindow.posRight(wdg,5,y));
+
 
         win.pack();
 
@@ -347,39 +371,126 @@ public class ZeeFishing {
             recastThread();
         }
 
-        if (autoFish || !fishNameAlert.isBlank()) {
-            boolean alertDone = false;
-            int lblCol = 0;
-            Button btn = null;
-            Label lbl;
-            for (Widget child : win.children()) {
-                if (child instanceof Button) {
-                    lblCol = 0;
-                    btn = (Button) child;
-                } else if (child instanceof Label) {
+        List<Widget> widgets = win.children();
 
-                    lbl = (Label) child;
+        // collect buttons and labels
+        HashMap<Button,List<Label>> mapButtonLabels = new HashMap<>();
+        Button key = null;
+        List<Label> list = null;
+        for (Widget widget : widgets) {
+            if (widget instanceof Button) {
+                key = (Button) widget;
+                if (key!=null){
+                    list = new ArrayList<>();
+                    mapButtonLabels.put(key, list);
+                }
+            } else if (widget instanceof Label ) {
+                if (key!=null && list!=null){
+                    list.add((Label) widget);
+                }
+            }
+        }
+//        mapButtonLabels.forEach((keyBtn,listLabels) -> {
+//            StringBuilder sb = new StringBuilder();
+//            for (Label lbl : listLabels) {
+//                sb.append(lbl.texts);
+//                sb.append("  ");
+//            }
+//            println(sb.toString());
+//        });
+        if (mapButtonLabels.size()==0){
+            println("fishing > couldnt build map button labels");
+            return;
+        }
 
-                    //check fish alert
-                    if (!alertDone && !fishNameAlert.isBlank() && lbl.texts.endsWith(":")){
-                        if(lbl.texts.toLowerCase().contains(fishNameAlert.toLowerCase())){
-                            alertDone = true;
-                            ZeeSynth.textToSpeakLinuxFestival("fish found");
+
+        // fish name alert
+        if (!fishNameAlert.isBlank()){
+            for (Map.Entry<Button, List<Label>> buttonListEntry : mapButtonLabels.entrySet()) {
+                List<Label> lbls = buttonListEntry.getValue();
+                for (Label lbl : lbls) {
+                    // search "fishname:"
+                    if (lbl.texts.toLowerCase().contentEquals(fishNameAlert.toLowerCase()+":")){
+                        //highlight row's labels
+                        for (Label rowLbl : lbls) {
+                            rowLbl.setcolor(Color.cyan);
                         }
+                        // text2speak percentage
+                        String percChance = lbls.get(lbls.size()-1).texts;
+                        ZeeSynth.textToSpeakLinuxFestival(percChance + " percent");
+                        break;
                     }
+                }
+            }
+        }
 
-                    // check autofish
-                    lblCol++;
-                    if (lblCol == 6) {
-                        int num = Integer.parseInt(lbl.texts.replaceAll("[^0-9]", ""));
-                        if (num >= autoFishAbove) {
-                            println("clicking > "+lbl.texts);
-                            if (btn!=null)
-                                btn.click();
-                            else
-                                println("btn null");
-                            return;
-                        }
+
+        // autofish above %
+        if(autoFish) {
+            for (Map.Entry<Button, List<Label>> buttonListEntry : mapButtonLabels.entrySet()) {
+                List<Label> lbls = buttonListEntry.getValue();
+                String perc = lbls.get(lbls.size()-1).texts;
+                int num = Integer.parseInt(perc.replaceAll("[^0-9]", ""));
+                if (num >= autoFishAbove) {
+                    println("autofish > " + perc);
+                    Button btn = buttonListEntry.getKey();
+                    if (btn != null) {
+                        btn.click();
+                        return;
+                    }else {
+                        println("btn null");
+                    }
+                    break;
+                }
+            }
+        }
+
+
+        // reoreder fish list by chance %
+//        if (reorderFishList && mapButtonLabels.size() > 0){
+//            println("TODO reorder fish list");
+//            new ZeeThread(){
+//                public void run() {
+//                    try {
+//                        sleep(1000);
+//                        reorderFishListByPercChance(mapButtonLabels);
+//                    } catch (Exception e) {
+//                        e.printStackTrace();
+//                    }
+//                }
+//            }.start();
+//        }
+    }
+
+    private static void reorderFishListByPercChance(HashMap<Button, List<Label>> mapButtonLabels) {
+
+        ArrayList<Map.Entry<Button, List<Label>>> arrWidgets = new ArrayList<>(mapButtonLabels.entrySet());
+
+        println("size "+arrWidgets.size());
+
+        for (int row1 = 0; row1 < arrWidgets.size()-1; row1++) {
+            List<Label> list1 = arrWidgets.get(row1).getValue();
+            Label percLabel1 = list1.get(list1.size()-1);
+            int y1 = percLabel1.c.y;
+            int perc1 = Integer.parseInt(percLabel1.texts.replaceAll("[^0-9]", ""));
+            for (int row2 = 1; row2 < arrWidgets.size(); row2++) {
+                List<Label> list2 = arrWidgets.get(row2).getValue();
+                Label percLabel2 = list2.get(list2.size()-1);
+                int y2 = percLabel2.c.y;
+                int perc2 = Integer.parseInt(percLabel2.texts.replaceAll("[^0-9]", ""));
+                // switch all widgets Coords.y
+                println("    "+perc2+" > "+perc1);
+                if (perc2 > perc1){
+                    println("        switch!");
+                    //change coords row1
+                    arrWidgets.get(row1).getKey().c.y = y2;
+                    for (Label label : arrWidgets.get(row1).getValue()) {
+                        label.c.y = y2;
+                    }
+                    //change coords row2
+                    arrWidgets.get(row2).getKey().c.y = y1;
+                    for (Label label : arrWidgets.get(row2).getValue()) {
+                        label.c.y = y1;
                     }
                 }
             }

@@ -4152,7 +4152,7 @@ public class ZeeConfig {
 
 
         // fishing window
-        if(curs.contentEquals(CURSOR_FISH)){
+        if(curs.contentEquals(CURSOR_FISH) && ZeeManagerItemClick.isItemEquipped("/primrod")){
             ZeeFishing.buildWindow();
         }
     }
