@@ -559,6 +559,18 @@ public class ZeeConfig {
         return false;
     }
 
+    public static boolean isDungeonIconName(String iconName){
+        //todo: ant dungeon
+        final List<String> listContains = List.of(
+                "/batcave","/beaverdam","/badgerden","/wolfslair","/beehive"
+        );
+        for (String listName : listContains) {
+            if (iconName.endsWith(listName))
+                return true;
+        }
+        return false;
+    }
+
     public static boolean isAggressiveIconName(String iconName){
         if (iconName.endsWith("/plo"))
             return true;
@@ -624,22 +636,6 @@ public class ZeeConfig {
         };
         for (int i = 0; i < containsList.length; i++) {
             if(nameFull.contains(containsList[i]))
-                return true;
-        }
-        return false;
-    }
-
-    private static boolean isIconsCategNoobies(String nameContains) {
-        final String[] list = {
-                "/hen","/rooster","/rabbit","rabbit-doe","/rat/rat","squirrel",
-                "/grasshopper","/ladybug","/dragonfly","/waterstrider",
-                "/cavemoth","/items/grub","/springbumblebee",
-                "stingingnettle","taproot","cattail",
-                "clover","snapdragon","/windweed",
-                "bloatedbolete","chantrelle","/lorchel","parasol","yellowfoot"
-        };
-        for (int i = 0; i < list.length; i++) {
-            if(nameContains.contains(list[i]))
                 return true;
         }
         return false;
@@ -3430,11 +3426,11 @@ public class ZeeConfig {
                     add(space+"birds");
                     add(space+"bugs");
                     add(space+"bushes");
+                    add(space+"dungeon");
                     add(space+"flowers");
                     add(space+"herbs");
                     add(space+"kritters");
                     add(space+"mushrooms");
-                    add(space+"noob stuff");
                     add(space+"small animals");
                     add(space+"scents");
                     add(space+"spices");
@@ -3577,12 +3573,12 @@ public class ZeeConfig {
             filteredList.removeIf(entry -> !ZeeConfig.isTreeLeaf(entry.conf.res.name));
         else if(filter.equals("nuts"))
             filteredList.removeIf(entry -> !ZeeConfig.isTreeNuts(entry.conf.res.name));
-        else if(filter.equals("noob stuff"))
-            filteredList.removeIf(entry -> !ZeeConfig.isIconsCategNoobies(entry.conf.res.name));
         else if(filter.equals("small animals"))
             filteredList.removeIf(entry -> !ZeeConfig.isSmallAnimal(entry.conf.res.name));
         else if(filter.equals("aggressive"))
             filteredList.removeIf(entry -> !ZeeConfig.isAggressiveIconName(entry.conf.res.name));
+        else if(filter.equals("dungeon"))
+            filteredList.removeIf(entry -> !ZeeConfig.isDungeonIconName(entry.conf.res.name));
 
         //println("pos "+filteredList.size());
         return filteredList;
