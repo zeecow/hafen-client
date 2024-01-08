@@ -609,6 +609,21 @@ public class ZeeThread  extends Thread{
         return (startMs <= ZeeConfig.lastInvItemMs);
     }
 
+    public static GItem waitInvItemOrCancelClick(){
+        long startMs = now();
+        prepareCancelClick();
+        try {
+            while ( !isCancelClick()  &&  startMs > ZeeConfig.lastInvItemMs) {
+                sleep(50);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        if (isCancelClick())
+            return null;
+        return ZeeConfig.lastInvItem;
+    }
+
 
     static int invFreeSlots, lastInvFreeSlots;
     public static boolean waitInvFull(Inventory inv) {

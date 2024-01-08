@@ -3989,7 +3989,11 @@ public class ZeeConfig {
     }
 
     public static double getItemQuality(WItem item) {
-        return Inventory.getQuality(item.item);
+       return getItemQuality(item.item);
+    }
+
+    public static double getItemQuality(GItem item) {
+        return Inventory.getQuality(item);
     }
 
     public static List<String> getPlayerPoses() {

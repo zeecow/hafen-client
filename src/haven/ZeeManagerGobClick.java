@@ -1208,6 +1208,49 @@ public class ZeeManagerGobClick extends ZeeThread{
         ZeeConfig.removePlayerText();
     }
 
+    private static void inspectClayAt(Coord2d cmc) {
+        new ZeeThread(){
+            public void run() {
+                // disable autostack for clay inspection
+                boolean prevAutostack = ZeeConfig.autoStack;
+                if (ZeeConfig.autoStack) {
+                    ZeeConfig.toggleAutostack();
+                }
+
+                try {
+
+                    // dig icon
+                    ZeeConfig.cursorChange(ZeeConfig.ACT_DIG);
+                    if (!waitCursorName(ZeeConfig.CURSOR_DIG))
+                        throw new Exception("couldn't activate dig cursor");
+
+                    // click tile source
+                    ZeeConfig.clickCoord(cmc.floor(posres), 1);
+                    sleep(PING_MS);
+
+                    // wait inv clay
+                    GItem gItem = waitInvItemOrCancelClick();
+                    if (gItem==null)
+                        throw  new Exception("wait inv item: cancel click?");
+                    String itemName = gItem.getres().name;
+                    if (!itemName.contains("/clay-"))
+                        throw  new Exception("inv item is not clay");
+
+                    //speak ql
+                    int ql = (int) ZeeConfig.getItemQuality(gItem);
+                    ZeeSynth.textToSpeakLinuxFestival("clay "+ql);
+
+                } catch (Exception e) {
+                    println("inspectClayAt > "+e.getMessage());
+                }
+
+                //restore autostack
+                if (prevAutostack && !ZeeConfig.autoStack)
+                    ZeeConfig.toggleAutostack();
+            }
+        }.start();
+    }
+
     private static void inspectWaterAt(Coord2d coordMc) {
 
         // require wooden cup
@@ -1829,8 +1872,10 @@ public class ZeeManagerGobClick extends ZeeThread{
             ZeeConfig.gameUI.menu.wdgmsg("act","survey","0");
         else if (petalName.contentEquals("fish"))
             ZeeConfig.gameUI.menu.wdgmsg("act","fish","0");
-        else if (petalName.contentEquals("inspect cup"))
+        else if (petalName.contentEquals("inspect water"))
             inspectWaterAt(coordMc);
+        else if (petalName.contentEquals("inspect clay"))
+            inspectClayAt(coordMc);
         else if(petalName.contentEquals("embark coracle"))
             dropEmbarkCoracle(coordMc);
         else if(petalName.contentEquals( "build road"))
@@ -2242,7 +2287,9 @@ public class ZeeManagerGobClick extends ZeeThread{
                 if (isShallowWater)
                     opts.add("dig");
                 opts.add("fish");
-                opts.add("inspect cup");
+                if (isShallowWater)
+                    opts.add("inspect clay");
+                opts.add("inspect water");
                 if (ZeeManagerItemClick.isCoracleEquipped() && !ZeeConfig.isPlayerMountingHorse()) {
                     opts.add("embark coracle");
                 }
