@@ -198,6 +198,7 @@ public class ZeeFishing {
         wdg = win.add(new Label("Alert on fish: "),0,y);
         wdg = win.add(textEntryFishAlert= new TextEntry(UI.scale(100),""+ fishNameAlert){
             public void changed(ReadLine buf) {
+                super.changed(buf);
                 if (buf.empty())
                     fishNameAlert = "";
                 else
