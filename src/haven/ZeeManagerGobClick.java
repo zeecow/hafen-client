@@ -899,14 +899,14 @@ public class ZeeManagerGobClick extends ZeeThread{
                     dismountHorse(coordMc);
                 }
                 //clicked water
-                else if (isWaterTile(coordMc)) {
+                else if (isTileInspectQl(coordMc)) {
                     showGobFlowerMenu();
                 }
                 //disembark water vehicles
                 else if (ZeeConfig.isPlayerOnCoracle()) {
                     disembarkEquipCoracle(coordMc);
                 }
-                else if(ZeeConfig.isPlayerOnDugout()  || ZeeConfig.isPlayerOnRowboat()) {
+                else if(ZeeConfig.gobHasAnyPoseContains(ZeeConfig.getPlayerGob(),"/coracle","/dugout","borka/row","/snekkja","/knarr")) {
                     disembarkBoatAtShore(coordMc);
                 }
                 //disembark kicksled
@@ -1044,6 +1044,16 @@ public class ZeeManagerGobClick extends ZeeThread{
         }
     }
 
+    private static boolean isTileInspectQl(Coord2d coordMc) {
+        if (isWaterTile(coordMc))
+            return true;
+        String resName = ZeeConfig.getTileResName(coordMc);
+        println(resName);
+        if (resName.contentEquals(ZeeConfig.TILE_BEACH) || resName.contains("tiles/dirt"))
+            return true;
+        return false;
+    }
+
     static void cauldronOpen() {
         new ZeeThread(){
             public void run() {
@@ -1084,15 +1094,13 @@ public class ZeeManagerGobClick extends ZeeThread{
             ZeeConfig.addPlayerText("boatin");
             //move to shore
             ZeeConfig.clickTile(ZeeConfig.coordToTile(coordMc), 1);
-            waitPlayerPoseNotInList(
-                    ZeeConfig.POSE_PLAYER_DUGOUT_ACTIVE,
-                    ZeeConfig.POSE_PLAYER_ROWBOAT_ACTIVE,
-                    ZeeConfig.POSE_PLAYER_CORACLE_ACTIVE
-            );//TODO add snekkja, knarr?
+            if (!waitPlayerIdleRc()){
+                throw new Exception("failed waiting idle rc");
+            }
             //disembark
             ZeeConfig.clickTile(ZeeConfig.coordToTile(mc), 1, UI.MOD_CTRL);
         }catch (Exception e){
-            e.printStackTrace();
+            println("disembarkBoatAtShore > "+e.getMessage());
         }
         ZeeConfig.removePlayerText();
     }
@@ -1208,6 +1216,59 @@ public class ZeeManagerGobClick extends ZeeThread{
         ZeeConfig.removePlayerText();
     }
 
+    private static void inspectSandAt(Coord2d cmc) {
+        new ZeeThread(){
+            public void run() {
+                // disable autostack for sand inspection
+                //boolean prevAutostack = ZeeConfig.autoStack;
+                //if (ZeeConfig.autoStack) {
+                    //ZeeConfig.toggleAutostack();
+                //}
+
+                try {
+
+                    //disembark boats
+                    if (ZeeConfig.isPlayerPoseOnAnyShip()){
+                        disembarkBoatAtShore(cmc);
+                    }
+
+                    // dig icon
+                    ZeeConfig.cursorChange(ZeeConfig.ACT_DIG);
+                    if (!waitCursorName(ZeeConfig.CURSOR_DIG))
+                        throw new Exception("couldn't activate dig cursor");
+
+                    // click tile source
+                    ZeeConfig.clickCoord(cmc.floor(posres), 1);
+                    sleep(PING_MS);
+
+                    // wait inv clay
+                    GItem gItem = waitInvItemOrCancelClick();
+                    if (gItem==null)
+                        throw  new Exception("wait inv item: cancel click?");
+                    String itemName = gItem.getres().name;
+                    if (!itemName.contains("/sand"))
+                        throw  new Exception("inv item is not sand");
+
+                    // stop digging, remove cursor
+                    ZeeConfig.stopMovingEscKey();
+                    ZeeConfig.clickRemoveCursor();
+
+                    //speak ql
+                    int ql = (int) ZeeConfig.getItemQuality(gItem);
+                    ZeeSynth.textToSpeakLinuxFestival("sand "+ql);
+
+
+                } catch (Exception e) {
+                    println("inspectSandAt > "+e.getMessage());
+                }
+
+                //restore autostack
+                //if (prevAutostack && !ZeeConfig.autoStack)
+                    //ZeeConfig.toggleAutostack();
+            }
+        }.start();
+    }
+
     private static void inspectClayAt(Coord2d cmc) {
         new ZeeThread(){
             public void run() {
@@ -1218,6 +1279,11 @@ public class ZeeManagerGobClick extends ZeeThread{
                 }
 
                 try {
+
+                    // disembark acreclay
+                    if (!isWaterTile(cmc) && ZeeConfig.isPlayerPoseOnAnyShip()){
+                        disembarkBoatAtShore(cmc);
+                    }
 
                     // dig icon
                     ZeeConfig.cursorChange(ZeeConfig.ACT_DIG);
@@ -1235,6 +1301,10 @@ public class ZeeManagerGobClick extends ZeeThread{
                     String itemName = gItem.getres().name;
                     if (!itemName.contains("/clay-"))
                         throw  new Exception("inv item is not clay");
+
+                    // stop digging, remove cursor
+                    ZeeConfig.stopMovingEscKey();
+                    ZeeConfig.clickRemoveCursor();
 
                     //speak ql
                     int ql = (int) ZeeConfig.getItemQuality(gItem);
@@ -1876,6 +1946,10 @@ public class ZeeManagerGobClick extends ZeeThread{
             inspectWaterAt(coordMc);
         else if (petalName.contentEquals("inspect clay"))
             inspectClayAt(coordMc);
+        else if (petalName.contentEquals("inspect sand"))
+            inspectSandAt(coordMc);
+        else if (petalName.contentEquals("disembark"))
+            disembarkBoatAtShore(coordMc);
         else if(petalName.contentEquals("embark coracle"))
             dropEmbarkCoracle(coordMc);
         else if(petalName.contentEquals( "build road"))
@@ -2293,6 +2367,20 @@ public class ZeeManagerGobClick extends ZeeThread{
                 if (ZeeManagerItemClick.isCoracleEquipped() && !ZeeConfig.isPlayerMountingHorse()) {
                     opts.add("embark coracle");
                 }
+                menu = new ZeeFlowerMenu(coordMc, opts.toArray(String[]::new));
+            }
+            else if(ZeeConfig.getTileResName(coordMc).contains("tiles/beach")) {
+                opts = new ArrayList<String>();
+                if (ZeeConfig.isPlayerPoseOnAnyShip())
+                    opts.add("disembark");
+                opts.add("inspect sand");
+                menu = new ZeeFlowerMenu(coordMc, opts.toArray(String[]::new));
+            }
+            else if(ZeeConfig.getTileResName(coordMc).contains("tiles/dirt")) {
+                opts = new ArrayList<String>();
+                if (ZeeConfig.isPlayerPoseOnAnyShip())
+                    opts.add("disembark");
+                opts.add("inspect clay");
                 menu = new ZeeFlowerMenu(coordMc, opts.toArray(String[]::new));
             }
             else if(!ZeeConfig.isPlobActive()){

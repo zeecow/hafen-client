@@ -4747,4 +4747,15 @@ public class ZeeConfig {
         }
         return null;
     }
+
+    public static boolean isPlayerPoseOnAnyShip() {
+        final List<String> navPoses = List.of("borka/row","/coracle","/dugout","/snekkja","/knarr");
+        for (String playerPose : getPlayerPoses()) {
+            for (String navPose : navPoses) {
+                if (playerPose.contains(navPose))
+                    return true;
+            }
+        }
+        return false;
+    }
 }

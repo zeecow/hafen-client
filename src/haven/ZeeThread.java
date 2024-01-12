@@ -193,6 +193,22 @@ public class ZeeThread  extends Thread{
         return ret;
     }
 
+    public static boolean waitPlayerIdleRc(){
+        Gob player = ZeeConfig.getPlayerGob();
+        Coord2d prev = null;
+        boolean idle = false;
+        try {
+            do {
+                prev = Coord2d.of(player.rc.x,player.rc.y);
+                sleep(500);
+            } while (player.rc.compareTo(prev) != 0);
+            idle = true;
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return idle;
+    }
+
     public static boolean waitPlayerIdleVelocity() {
         return waitGobIdleVelocity(ZeeConfig.getPlayerGob());
     }
@@ -271,6 +287,39 @@ public class ZeeThread  extends Thread{
         return waitPlayerPoseNotInList(ZeeConfig.arrayPlayerActivePoses);
     }
 
+    public static boolean waitPlayerPoseNotContains(String ... forbiddenPoseNameContains) {
+        //println(">waitPlayerPoseNotContains");
+        List<String> currentPoses;
+        boolean exit = false;
+        try{
+            prepareCancelClick();
+            do{
+                sleep(PING_MS*2);
+                exit = isCancelClick();
+                if(exit) {
+                    //println("    canceled by click");
+                    break;
+                }
+                currentPoses = ZeeConfig.getPlayerPoses();
+                //println("   "+playerPoses);
+                exit = true;
+                for (int i = 0; i < forbiddenPoseNameContains.length; i++) {
+                    for (String currentPose : currentPoses) {
+                        //println("      "+forbiddenPoseNameContains[i]);
+                        if (currentPose.contains(forbiddenPoseNameContains[i])){//if contains pose...
+                            //println("         break");
+                            exit = false;
+                            break;//... break, loop and sleep again
+                        }
+                    }
+                }
+            }while(!exit);//ZeeConfig.isPlayerMoving() );
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        //println("waitPlayerPoseNotContains  exit="+exit + "  cancel="+isCancelClick());
+        return exit;
+    }
 
     public static boolean waitPlayerPoseNotInList(String ... forbiddenPoses) {
         //println(">waitPlayerPoseNotInList");
