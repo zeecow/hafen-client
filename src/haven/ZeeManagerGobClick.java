@@ -1048,7 +1048,7 @@ public class ZeeManagerGobClick extends ZeeThread{
         if (isWaterTile(coordMc))
             return true;
         String resName = ZeeConfig.getTileResName(coordMc);
-        println(resName);
+        //println(resName);
         if (resName.contentEquals(ZeeConfig.TILE_BEACH) || resName.contains("tiles/dirt"))
             return true;
         return false;
