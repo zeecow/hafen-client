@@ -628,6 +628,7 @@ public class ZeeManagerItemClick extends ZeeThread{
                     String itemName = getWItemName(item);
                     String firstItemName = itemName;
                     long changeMs;
+                    final long sleepMs = 500;
                     prepareCancelClick();
                     while (!ZeeConfig.isCancelClick() && (!(itemName.endsWith("-clean") || itemName.endsWith("-cleaned"))) ){
 
@@ -635,7 +636,7 @@ public class ZeeManagerItemClick extends ZeeThread{
                         changeMs = now();
                         itemActCoord(item);
                         while (changeMs > ZeeConfig.lastInvItemMs) {
-                            sleep(PING_MS);
+                            sleep(sleepMs);
                             if (ZeeConfig.isCancelClick()) {
                                 autoButchExit("click canceled 1");
                                 return;
@@ -643,7 +644,7 @@ public class ZeeManagerItemClick extends ZeeThread{
                         }
 
                         // get next stage item, ends with "-dead", "-plucked", "-clean" or "-cleaned"
-                        sleep(PING_MS);//wait inv update?
+                        sleep(sleepMs);//wait inv update?
                         item = inv.getItemBySlotCoord(itemSlotCoord);//TODO empty slot may change 1-slot-item position
                         itemName = getWItemName(item);
                         //println("next item > "+itemName);
@@ -656,7 +657,7 @@ public class ZeeManagerItemClick extends ZeeThread{
                             changeMs = now();
                             itemActCoord(item);
                             while (changeMs > ZeeConfig.lastInvItemMs) {
-                                sleep(PING_MS);
+                                sleep(sleepMs);
                                 if (ZeeConfig.isCancelClick()) {
                                     autoButchExit("click canceled 2");
                                     return;
@@ -664,7 +665,7 @@ public class ZeeManagerItemClick extends ZeeThread{
                             }
 
                             //get next dead/live animal for butching
-                            sleep(PING_MS);//wait inv update?
+                            sleep(sleepMs);//wait inv update?
                             List<WItem> items;
                             if (firstItemName.contains("/rabbit-"))
                                 items = inv.getWItemsByNameContains("gfx/invobjs/rabbit-");
@@ -695,9 +696,9 @@ public class ZeeManagerItemClick extends ZeeThread{
                         //println("last butch > " + itemName);
                         changeMs = now();
                         itemActCoord(item);
-                        while (changeMs > ZeeConfig.lastInvItemMs) {
-                            sleep(PING_MS);
-                        }
+                        //while (changeMs > ZeeConfig.lastInvItemMs) {
+                        //    sleep(sleepMs);
+                        //}
                     }
 
 
