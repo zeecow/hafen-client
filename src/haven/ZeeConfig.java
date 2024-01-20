@@ -571,6 +571,20 @@ public class ZeeConfig {
         return false;
     }
 
+    public static boolean isLocResMapIconName(String iconName){
+        final List<String> listContains = List.of(
+                "/amberwash","abyssalchasm","geyser","guanopile","headwaters"
+                ,"woodheart","icespire","irminsul","hiddenhollow","woodheart"
+                ,"jotunmussel","algaeblob","lilypadlotus","monolith","crystalpatch"
+                ,"saltbasin","spawningbed","watervortex","tarpit","irminsul"
+        );
+        for (String listName : listContains) {
+            if (iconName.endsWith(listName))
+                return true;
+        }
+        return false;
+    }
+
     public static boolean isAggressiveIconName(String iconName){
         if (iconName.endsWith("/plo"))
             return true;
@@ -583,7 +597,8 @@ public class ZeeConfig {
         final List<String> listContains = List.of(
                "/adder","/sandflea","/boar/","/badger/","/bear/","/bat/","/boreworm/",
                 "/ooze/","/cavelouse/","/caveangler/","orca","/goldeneagle/","/lynx/",
-                "/mammoth/","/moose/","/troll/","/walrus/","/goat/","/wolf/","/wolverine/"
+                "/mammoth/","/moose/","/troll/","/walrus/","/goat/","/wolf/","/wolverine/",
+                "spermwhale"
         );
         for (String listName : listContains) {
             if (nameContains.contains(listName))
@@ -788,7 +803,8 @@ public class ZeeConfig {
     public static boolean isMushroom(String name){
         final String[] list = {
             "bolete","truffle","trumpet","cavelantern","chantrelle","/lorchel","fairy","blewit",
-            "puffball","indigo","parasol","snowtop","yellowfoot", "herbs/stalagoom", "oystermushroom"
+            "puffball","indigo","parasol","snowtop","yellowfoot", "herbs/stalagoom",
+            "oystermushroom", "/champignon-"
         };
         for (int i = 0; i < list.length; i++) {
             if(name.contains(list[i]))
@@ -3430,6 +3446,7 @@ public class ZeeConfig {
                     add(space+"flowers");
                     add(space+"herbs");
                     add(space+"kritters");
+                    add(space+"locres and map");
                     add(space+"mushrooms");
                     add(space+"small animals");
                     add(space+"scents");
@@ -3579,6 +3596,8 @@ public class ZeeConfig {
             filteredList.removeIf(entry -> !ZeeConfig.isAggressiveIconName(entry.conf.res.name));
         else if(filter.equals("dungeon"))
             filteredList.removeIf(entry -> !ZeeConfig.isDungeonIconName(entry.conf.res.name));
+        else if(filter.equals("locres and map"))
+            filteredList.removeIf(entry -> !ZeeConfig.isLocResMapIconName(entry.conf.res.name));
 
         //println("pos "+filteredList.size());
         return filteredList;

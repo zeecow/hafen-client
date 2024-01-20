@@ -512,7 +512,7 @@ public class GobIcon extends GAttrib {
 		    setbox = null;
 		}
 		if(icon != null) {
-			//ZeeConfig.println(icon.conf.res.name);
+			ZeeConfig.println(icon.conf.res.name);
 		    setbox = cont.after(new IconSettings(sz.x - UI.scale(10), icon.conf), list, UI.scale(5));
 		}
 	    }
