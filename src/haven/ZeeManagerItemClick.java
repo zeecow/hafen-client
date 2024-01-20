@@ -1158,7 +1158,7 @@ public class ZeeManagerItemClick extends ZeeThread{
         String list = "seed-barley,seed-carrot,carrot,seed-cucumber,seed-flax,"
                 +"seed-grape,seed-hemp,seed-leek,leek,seed-lettuce,seed-millet,"
                 +"seed-pipeweed,seed-poppy,seed-pumpkin,seed-wheat,seed-turnip,turnip,"
-                +"seed-wheat,seed-barley,beetroot,yellowonion,redonion,peapod";
+                +"seed-wheat,seed-barley,beetroot,yellowonion,redonion,peapod,peppercorn";
         name = name.replace("gfx/invobjs/","");
         return list.contains(name);
     }
