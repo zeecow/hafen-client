@@ -3097,11 +3097,11 @@ public class ZeeManagerGobClick extends ZeeThread{
             ZeeThread zt = new ZeeThread() {
                 public void run() {
                     gobClick(gob, 3);
-                    if (!waitFlowerMenu()) {//no menu detected
+                    FlowerMenu fm = waitFlowerMenu();
+                    if (fm==null) {//no menu detected
                         isGobDeadAnimal = false;
                         return;
                     }
-                    FlowerMenu fm = getFlowerMenu();
                     for (int i = 0; i < fm.opts.length; i++) {
                         //if animal gob has butch menu, means is dead
                         if (ZeeConfig.DEF_LIST_BUTCH_AUTO.contains(fm.opts[i].name)){
@@ -3868,8 +3868,9 @@ public class ZeeManagerGobClick extends ZeeThread{
         //click gob
         gobClick(gob,3);
         //click petal
-        if(waitFlowerMenu()){
-            choosePetal(getFlowerMenu(), petalName);
+        FlowerMenu fm = waitFlowerMenu();
+        if(fm!=null){
+            choosePetal(fm, petalName);
             return waitNoFlowerMenu();
         }else{
             //println("clickGobPetal > no flower menu?");
@@ -3901,7 +3902,8 @@ public class ZeeManagerGobClick extends ZeeThread{
 
         //click gob and wait menu
         gobClick(gob, 3);
-        if (waitFlowerMenu()) {
+        FlowerMenu fm = waitFlowerMenu();
+        if (fm!=null) {
             // menu opened means gob exist
             ZeeConfig.cancelFlowerMenu();
             waitNoFlowerMenu();

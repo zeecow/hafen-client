@@ -521,11 +521,11 @@ public class ZeeManagerItemClick extends ZeeThread{
         }
         else if(petalName.equals(ZeeFlowerMenu.STRPETAL_AUTO_BUTCH))
         {
-            autoButch(wItem,false);
+            autoButch(wItem);
         }
         else if(petalName.equals(ZeeFlowerMenu.STRPETAL_AUTO_BUTCH_ALL))
         {
-            autoButch(wItem,true);
+            autoButchAll(wItem);
         }
         else if(petalName.equals(ZeeFlowerMenu.STRPETAL_KILLALL))
         {
@@ -599,16 +599,12 @@ public class ZeeManagerItemClick extends ZeeThread{
     }
 
     private static void autoButchExit(){
-        //restore settings
-        ZeeConfig.butcherMode = autoButchModeBackup;
-        ZeeConfig.butcherAutoList = Utils.getpref("butcherAutoList",ZeeConfig.DEF_LIST_AUTO_CLICK_MENU);
         ZeeConfig.removePlayerText();
     }
 
-    static boolean autoButchModeBackup;
-    private static void autoButch(WItem wItem, boolean butchAll) {
+    private static void autoButch(WItem wItem) {
         if (ZeeConfig.isFish(wItem.item.getres().name)){
-            autoButchFish(wItem,butchAll);
+            autoButchFish(wItem,false);
             return;
         }
         new ZeeThread() {
@@ -616,56 +612,78 @@ public class ZeeManagerItemClick extends ZeeThread{
                 try {
                     ZeeConfig.addPlayerText("autobutch");
 
-                    //adjust autobutch settings
-                    autoButchModeBackup = ZeeConfig.butcherMode;
-                    ZeeConfig.butcherMode = true;
-                    ZeeConfig.butcherAutoList = ZeeConfig.DEF_LIST_BUTCH_AUTO;
-
                     //start
                     WItem item = wItem;
                     Inventory inv = getItemInventory(item);
                     Coord itemSlotCoord = getWItemCoord(item);
                     String itemName = getWItemName(item);
-                    String firstItemName = itemName;
-                    long changeMs;
-                    final long sleepMs = 500;
-                    prepareCancelClick();
-                    while (!ZeeConfig.isCancelClick() && (!(itemName.endsWith("-clean") || itemName.endsWith("-cleaned"))) ){
+                    final long sleepMs = 333;
 
-                        //butch item and wait inventory changes
-                        changeMs = now();
-                        itemActCoord(item);
-                        while (changeMs > ZeeConfig.lastInvItemMs) {
-                            sleep(sleepMs);
-                            if (ZeeConfig.isCancelClick()) {
-                                autoButchExit("click canceled 1");
-                                return;
-                            }
-                        }
+                    prepareCancelClick();
+
+                    while (!isCancelClick() && item!=null && (!(itemName.endsWith("-clean") || itemName.endsWith("-cleaned"))) ){
+                        //click first menu petal
+                        clickItemPetal(item,0);
+                        sleep(sleepMs);
 
                         // get next stage item, ends with "-dead", "-plucked", "-clean" or "-cleaned"
-                        sleep(sleepMs);//wait inv update?
                         item = inv.getItemBySlotCoord(itemSlotCoord);//TODO empty slot may change 1-slot-item position
                         itemName = getWItemName(item);
-                        //println("next item > "+itemName);
+                    }
+
+                    // last item click
+                    if (!isCancelClick() && item!=null && (itemName.endsWith("-clean") || itemName.endsWith("-cleaned"))) {
+                        println("last butch > " + itemName);
+                        clickItemPetal(item,0);
+                    }
+
+
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+                autoButchExit("done");
+            }
+        }.start();
+    }
+
+    private static void autoButchAll(WItem wItem) {
+        if (ZeeConfig.isFish(wItem.item.getres().name)){
+            autoButchFish(wItem,true);
+            return;
+        }
+        new ZeeThread() {
+            public void run() {
+                try {
+                    ZeeConfig.addPlayerText("autobutch");
+
+                    WItem item = wItem;
+                    Inventory inv = getItemInventory(item);
+                    Coord itemSlotCoord = getWItemCoord(item);
+                    String itemName = getWItemName(item);
+                    String firstItemName = itemName;
+                    final long sleepMs = 333;
+
+                    prepareCancelClick();
+
+                    while (!isCancelClick() && item!=null && (!(itemName.endsWith("-clean") || itemName.endsWith("-cleaned"))) ){
+
+                        //click first menu petal
+                        clickItemPetal(item,0);
+                        sleep(sleepMs);
+
+                        // get next stage item, ends with "-dead", "-plucked", "-clean" or "-cleaned"
+                        item = inv.getItemBySlotCoord(itemSlotCoord);//TODO empty slot may change 1-slot-item position
+                        itemName = getWItemName(item);
 
                         //if butch is over("-clean"), prepare next "butch all" item
-                        if (butchAll && (itemName.endsWith("-clean") || itemName.endsWith("-cleaned"))){
+                        if (item!=null && (itemName.endsWith("-clean") || itemName.endsWith("-cleaned"))){
 
                             //butch "-clean" item and wait inventory changes
                             //println("last butch 2> "+itemName);
-                            changeMs = now();
-                            itemActCoord(item);
-                            while (changeMs > ZeeConfig.lastInvItemMs) {
-                                sleep(sleepMs);
-                                if (ZeeConfig.isCancelClick()) {
-                                    autoButchExit("click canceled 2");
-                                    return;
-                                }
-                            }
+                            clickItemPetal(item,0);
+                            sleep(sleepMs);
 
                             //get next dead/live animal for butching
-                            sleep(sleepMs);//wait inv update?
                             List<WItem> items;
                             if (firstItemName.contains("/rabbit-"))
                                 items = inv.getWItemsByNameContains("gfx/invobjs/rabbit-");
@@ -691,14 +709,10 @@ public class ZeeManagerItemClick extends ZeeThread{
                         }
                     }
 
-                    //single butch animal last action
-                    if (!ZeeConfig.isCancelClick() && !butchAll && (itemName.endsWith("-clean") || itemName.endsWith("-cleaned"))) {
-                        //println("last butch > " + itemName);
-                        changeMs = now();
-                        itemActCoord(item);
-                        //while (changeMs > ZeeConfig.lastInvItemMs) {
-                        //    sleep(sleepMs);
-                        //}
+                    // last item click
+                    if (!isCancelClick() && item!=null && (itemName.endsWith("-clean") || itemName.endsWith("-cleaned"))) {
+                        println("last butch > " + itemName);
+                        clickItemPetal(item,0);
                     }
 
 
@@ -839,8 +853,9 @@ public class ZeeManagerItemClick extends ZeeThread{
                     return itemsClicked;
                 }
                 itemActCoord(w);
-                if(waitFlowerMenu()){
-                    choosePetal(getFlowerMenu(), petalName);
+                FlowerMenu fm = waitFlowerMenu();
+                if(fm!=null){
+                    choosePetal(fm, petalName);
                     itemsClicked++;
                 }else{
                     countNoMenu++;
@@ -912,13 +927,31 @@ public class ZeeManagerItemClick extends ZeeThread{
 
     public static boolean clickItemPetal(WItem wItem, String petalName) {
         if (wItem==null){
-            println(">clickItemPetal wItem null");
+            println(">clickItemPetal wItem null, petal "+petalName);
             return false;
         }
         itemActCoord(wItem);
-        if(waitFlowerMenu()){
+        FlowerMenu fm = waitFlowerMenu();
+        if(fm!=null){
             //println("clickItemPetal > flower menu");
-            choosePetal(getFlowerMenu(), petalName);
+            choosePetal(fm, petalName);
+            return waitNoFlowerMenu();
+        }else{
+            //println("clickItemPetal > no flower menu");
+            return false;
+        }
+    }
+
+    public static boolean clickItemPetal(WItem wItem, int petal) {
+        if (wItem==null){
+            println(">clickItemPetal wItem null , petal "+petal);
+            return false;
+        }
+        itemActCoord(wItem);
+        FlowerMenu fm = waitFlowerMenu();
+        if(fm!=null){
+            //println("clickItemPetal > flower menu");
+            choosePetal(fm, petal);
             return waitNoFlowerMenu();
         }else{
             //println("clickItemPetal > no flower menu");

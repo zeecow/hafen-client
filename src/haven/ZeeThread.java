@@ -794,19 +794,20 @@ public class ZeeThread  extends Thread{
         return inv.getNumberOfFreeSlots() == 0;
     }
 
-    public static boolean waitFlowerMenu() {
+    public static FlowerMenu waitFlowerMenu() {
         long max = TIMEOUT_MS;
         FlowerMenu fm = null;
         try {
             while(max>0 && (fm = ZeeConfig.gameUI.ui.root.getchild(FlowerMenu.class)) == null) {
                 max -= SLEEP_MS;
-                Thread.sleep(SLEEP_MS);
+                sleep(SLEEP_MS);
             }
+            sleep(SLEEP_MS);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
         //println("wait flowermenu = "+fm);
-        return (fm != null);
+        return fm;
     }
 
     public static boolean waitMapClick(){
