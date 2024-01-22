@@ -55,6 +55,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 	public ZeeHidingGobSprite<ZeeHitbox> hitbox;
 	public boolean hasPointer;
 	public String treeGrowthText;
+	public boolean smokeHighlight;
 
 	public static class Overlay implements RenderTree.Node {
 	public final int id;

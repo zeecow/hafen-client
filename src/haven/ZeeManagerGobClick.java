@@ -3091,6 +3091,23 @@ public class ZeeManagerGobClick extends ZeeThread{
         }
     }
 
+    public static void checkSmoke(Gob gob, String i) {
+        if (ZeeConfig.hideFxSmoke){
+            gob.smokeHighlight = true;
+            //highlight already loaded gob (ugly)
+            if (gob.settingsApplied){
+                highlightGobSmoking(gob);
+            }
+        }else{
+            gob.smokeHighlight = false;
+        }
+    }
+    public static void highlightGobSmoking(Gob gob){
+        if (gob.getres().name.endsWith("villageidol"))
+            return;
+        ZeeConfig.addGobColor(gob,0,255,0,180);
+    }
+
 
     private boolean isGobBigDeadAnimal_thread() {
         try{

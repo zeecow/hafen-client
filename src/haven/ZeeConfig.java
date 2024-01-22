@@ -3754,6 +3754,11 @@ public class ZeeConfig {
             // highlight gob color
             ZeeConfig.applyGobSettingsHighlight(ob, ZeeConfig.getHighlightGobColor(ob));
 
+            // smoking gob highlight
+            if (ob.smokeHighlight){
+                ZeeManagerGobClick.highlightGobSmoking(ob);
+            }
+
             // auto boulder option (maybe remove)
             if (ZeeConfig.autoChipMinedBoulder && ZeeManagerMiner.isCursorMining() && ZeeManagerMiner.isBoulder(ob)) {
                 ZeeManagerMiner.checkBoulderGobAdded(ob);
