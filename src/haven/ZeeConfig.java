@@ -2761,8 +2761,10 @@ public class ZeeConfig {
         ZeeManagerGobClick.plowQueueReset();
         ZeeManagerGobClick.chopTreeReset();
         ZeeManagerGobClick.chipStoneReset();
-        ZeeCupboardLabeler.exitCupbLblr();
         ZeeFishing.exit();
+
+        ZeeCupboardLabeler.reset();
+        ZeeCupboardLabeler.isActive = false;
 
         if (ZeeManagerGobClick.winHideGobs!=null){
             try{

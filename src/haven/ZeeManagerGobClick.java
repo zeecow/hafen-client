@@ -57,202 +57,212 @@ public class ZeeManagerGobClick extends ZeeThread{
         }
         // short mid-clicks
         else {
-            // ground clicks
-            if(gob==null) {
-                // place all pile items
-                if(ZeeManagerStockpile.lastPlob != null) {
-                    ZeeManagerGobClick.gobPlace(ZeeManagerStockpile.lastPlob,UI.MOD_SHIFT);
-                }
-                // dig ballclay if cursor dig
-                else if(ZeeConfig.isCursorName(ZeeConfig.CURSOR_DIG) && ZeeConfig.isTileNamed(mc, ZeeConfig.TILE_WATER_FRESH_SHALLOW,ZeeConfig.TILE_WATER_OCEAN_SHALLOW)){
-                    ZeeConfig.clickTile(ZeeConfig.coordToTile(mc),1,UI.MOD_SHIFT);
-                }
-                // queue plowing
-                else if(ZeeConfig.isPlayerDrivingPlow()){
-                    plowQueueAddCoord(coordMc,coordPc);
-                }
+            shortMidClick();
+        }
+    }
+
+    private static void shortMidClick() {
+
+        // ground clicks
+        if(gob==null) {
+
+            // place all pile items
+            if(ZeeManagerStockpile.lastPlob != null) {
+                ZeeManagerGobClick.gobPlace(ZeeManagerStockpile.lastPlob,UI.MOD_SHIFT);
             }
-            // feed clover to wild animal
-            else if (checkCloverFeeding(gob)) {
-                feedClover(gob);
+            // dig ballclay if cursor dig
+            else if(ZeeConfig.isCursorName(ZeeConfig.CURSOR_DIG) && ZeeConfig.isTileNamed(coordMc, ZeeConfig.TILE_WATER_FRESH_SHALLOW,ZeeConfig.TILE_WATER_OCEAN_SHALLOW)){
+                ZeeConfig.clickTile(ZeeConfig.coordToTile(coordMc),1,UI.MOD_SHIFT);
             }
-            // pick quicksilver from smelter
-            else if (gobName.endsWith("/smelter") && ZeeConfig.isPlayerHoldingItem()){
-                ZeeManagerItemClick.getQuicksilverFromSmelter(gob);
+            // queue plowing
+            else if(ZeeConfig.isPlayerDrivingPlow()){
+                plowQueueAddCoord(coordMc,coordPc);
             }
-            //barterstand
-            else if (gobName.endsWith("barterstand")){
-                barterstandSearchWindow();
-            }
-            // place lifted treelog next to clicked one
-            else if ( isGobTreeLog(gobName) && ZeeConfig.isPlayerLiftingGobNamecontains("gfx/terobjs/trees/")!=null && !ZeeConfig.isPlayerLiftingGob(gob))
-            {
-                placeTreelogNextTo(gob);
-            }
-            // start Gob Placer (if lifting same name gob, or boulder)
-            else if(!ZeeConfig.isPlayerLiftingGob(gob) && (ZeeConfig.isPlayerLiftingGobNamecontains(gobName)!=null  || ZeeConfig.isPlayerLiftingGobNamecontains("gfx/terobjs/bumlings/")!=null))
-            {
-                Gob liftedGob = ZeeConfig.isPlayerLiftingGobNamecontains(gobName);
-                Gob groundGob = gob;
-                String groundGobName = gobName;
-                // check if lifting any boulder
-                if (liftedGob==null){
-                    liftedGob = ZeeConfig.isPlayerLiftingGobNamecontains("gfx/terobjs/bumlings/");
-                    if (liftedGob!=null && groundGobName.startsWith("gfx/terobjs/bumlings/")) {
-                        String liftedGobName = liftedGob.getres().name;
-                        String liftedBoulderSize = ZeeConfig.getRegexGroup(liftedGobName, "(\\d)$", 1);
-                        String groundBoulderSize = ZeeConfig.getRegexGroup(groundGobName, "(\\d)$", 1);
-                        if (!liftedBoulderSize.isBlank() && liftedBoulderSize.contentEquals(groundBoulderSize)) {
-                            windowGobPlacer(gob, liftedGob);
-                        } else {
-                            println("gob placer > boulder size dont match > " + liftedBoulderSize + " != " + groundBoulderSize);
-                        }
+        }
+        // feed clover to wild animal
+        else if (checkCloverFeeding(gob)) {
+            feedClover(gob);
+        }
+        // pick quicksilver from smelter
+        else if (gobName.endsWith("/smelter") && ZeeConfig.isPlayerHoldingItem()){
+            ZeeManagerItemClick.getQuicksilverFromSmelter(gob);
+        }
+        //barterstand
+        else if (gobName.endsWith("barterstand")){
+            barterstandSearchWindow();
+        }
+        // place lifted treelog next to clicked one
+        else if ( isGobTreeLog(gobName) && ZeeConfig.isPlayerLiftingGobNamecontains("gfx/terobjs/trees/")!=null && !ZeeConfig.isPlayerLiftingGob(gob))
+        {
+            placeTreelogNextTo(gob);
+        }
+        // start Gob Placer (if lifting same name gob, or boulder)
+        else if(!ZeeConfig.isPlayerLiftingGob(gob) && (ZeeConfig.isPlayerLiftingGobNamecontains(gobName)!=null  || ZeeConfig.isPlayerLiftingGobNamecontains("gfx/terobjs/bumlings/")!=null))
+        {
+            Gob liftedGob = ZeeConfig.isPlayerLiftingGobNamecontains(gobName);
+            Gob groundGob = gob;
+            String groundGobName = gobName;
+            // check if lifting any boulder
+            if (liftedGob==null){
+                liftedGob = ZeeConfig.isPlayerLiftingGobNamecontains("gfx/terobjs/bumlings/");
+                if (liftedGob!=null && groundGobName.startsWith("gfx/terobjs/bumlings/")) {
+                    String liftedGobName = liftedGob.getres().name;
+                    String liftedBoulderSize = ZeeConfig.getRegexGroup(liftedGobName, "(\\d)$", 1);
+                    String groundBoulderSize = ZeeConfig.getRegexGroup(groundGobName, "(\\d)$", 1);
+                    if (!liftedBoulderSize.isBlank() && liftedBoulderSize.contentEquals(groundBoulderSize)) {
+                        windowGobPlacer(gob, liftedGob);
                     } else {
-                        println("gob placer canceled, was expecting 2 boulders");
+                        println("gob placer > boulder size dont match > " + liftedBoulderSize + " != " + groundBoulderSize);
                     }
-                }
-                // non-boulder gobs
-                else{
-                    //println("non boulder gob");
-                    windowGobPlacer(gob, liftedGob);
+                } else {
+                    println("gob placer canceled, was expecting 2 boulders");
                 }
             }
-            // build obj and get more blocks/boards
-            else if (gobName.contentEquals("gfx/terobjs/consobj")) {
-                if (ZeeConfig.playerHasAnyPose(ZeeConfig.POSE_PLAYER_CHOPBLOCK)){
-                    buildObjAndChopMoreBlocks(gob,ZeeManagerStockpile.lastTreelogChopped);
+            // non-boulder gobs
+            else{
+                //println("non boulder gob");
+                windowGobPlacer(gob, liftedGob);
+            }
+        }
+        // build obj and get more blocks/boards
+        else if (gobName.contentEquals("gfx/terobjs/consobj")) {
+            if (ZeeConfig.playerHasAnyPose(ZeeConfig.POSE_PLAYER_CHOPBLOCK)){
+                buildObjAndChopMoreBlocks(gob,ZeeManagerStockpile.lastTreelogChopped);
+            }
+            else if (ZeeConfig.playerHasAnyPose(ZeeConfig.POSE_PLAYER_SAWING)){
+                buildObjAndMakeMoreBoards(gob,ZeeManagerStockpile.lastTreelogSawed);
+            }
+        }
+        // pile boards once and make more
+        else if (gobName.endsWith("/stockpile-board") && ZeeConfig.playerHasAnyPose(ZeeConfig.POSE_PLAYER_SAWING)) {
+            ZeeManagerStockpile.pileInvBoardsAndMakeMore(gob);
+        }
+        // pile blocks once and chop more
+        else if (gobName.endsWith("/stockpile-wblock") && ZeeConfig.playerHasAnyPose(ZeeConfig.POSE_PLAYER_CHOPBLOCK)) {
+            ZeeManagerStockpile.pileInvBlocksAndMakeMore(gob);
+        }
+        // pile sand once and dig more
+        else if (gobName.endsWith("/stockpile-sand") && ZeeConfig.playerHasAnyPose(ZeeConfig.POSE_PLAYER_DIG,ZeeConfig.POSE_PLAYER_DIGSHOVEL)) {
+            ZeeManagerStockpile.pileInvSandAndDigMore(gob);
+        }
+        // pile inv stones and try chipping more stones
+        else if (gobName.endsWith("/stockpile-stone") && ZeeConfig.playerHasAnyPose(ZeeConfig.POSE_PLAYER_PICK, ZeeConfig.POSE_PLAYER_CHIPPINGSTONE)) {
+            ZeeManagerStockpile.pileInvStonesAndChipMore(gob);
+        }
+        // pile inv coal and try collecting more
+        else if (gobName.endsWith("/stockpile-coal") && ZeeConfig.playerHasAnyPose(ZeeConfig.POSE_PLAYER_BUSHPICK)) {
+            ZeeManagerStockpile.pileInvCoalAndCollectMore(gob);
+        }
+        // pile inv clay
+        else if(gobName.endsWith("/stockpile-clay") && ZeeConfig.isCursorName(ZeeConfig.CURSOR_DIG)){
+            ZeeManagerStockpile.pileInvClays(gob);
+        }
+        // if crating ropes, midclick fibre pile to get more strings and craft again
+        else if((gobName.endsWith("/stockpile-flaxfibre") || gobName.endsWith("/stockpile-hempfibre")) && ZeeConfig.playerHasAnyPose(ZeeConfig.POSE_PLAYER_ROPE_WALKING)){
+            new ZeeThread() {
+                public void run() {
+                    ZeeManagerCraft.ropeFetchStringsAndCraft(gob);
                 }
-                else if (ZeeConfig.playerHasAnyPose(ZeeConfig.POSE_PLAYER_SAWING)){
-                    buildObjAndMakeMoreBoards(gob,ZeeManagerStockpile.lastTreelogSawed);
+            }.start();
+        }
+        // click gob holding item (pile, etc)
+        else if (ZeeConfig.isPlayerHoldingItem()) {
+            clickedGobHoldingItem(gob,gobName);
+        }
+        // harvest one trellis withouth scythe
+        else if (isGobTrellisPlant(gobName)) {
+            new ZeeThread() {
+                public void run() {
+                    harvestOneTrellisWithoutScythe(gob);
                 }
+            }.start();
+        }
+        // activate harvest area if non-trellis crop
+        else if (isGobCrop(gobName)){
+            if (!ZeeConfig.getCursorName().equals(ZeeConfig.CURSOR_HARVEST))
+                gobClick(gob, 3, UI.MOD_SHIFT);
+        }
+        else if (isGobGroundItem(gobName)) {
+            // place stockpile at gob coord
+            if(ZeeConfig.isPlobActive()) {
+                MapView.Plob plob = ZeeManagerStockpile.lastPlob;
+                gobPlace(plob, ZeeConfig.tileToCoord(ZeeConfig.coordToTile(gob.rc)), UI.MOD_SHIFT);
             }
-            // pile boards once and make more
-            else if (gobName.endsWith("/stockpile-board") && ZeeConfig.playerHasAnyPose(ZeeConfig.POSE_PLAYER_SAWING)) {
-                ZeeManagerStockpile.pileInvBoardsAndMakeMore(gob);
-            }
-            // pile blocks once and chop more
-            else if (gobName.endsWith("/stockpile-wblock") && ZeeConfig.playerHasAnyPose(ZeeConfig.POSE_PLAYER_CHOPBLOCK)) {
-                ZeeManagerStockpile.pileInvBlocksAndMakeMore(gob);
-            }
-            // pile sand once and dig more
-            else if (gobName.endsWith("/stockpile-sand") && ZeeConfig.playerHasAnyPose(ZeeConfig.POSE_PLAYER_DIG,ZeeConfig.POSE_PLAYER_DIGSHOVEL)) {
-                ZeeManagerStockpile.pileInvSandAndDigMore(gob);
-            }
-            // pile inv stones and try chipping more stones
-            else if (gobName.endsWith("/stockpile-stone") && ZeeConfig.playerHasAnyPose(ZeeConfig.POSE_PLAYER_PICK, ZeeConfig.POSE_PLAYER_CHIPPINGSTONE)) {
-                ZeeManagerStockpile.pileInvStonesAndChipMore(gob);
-            }
-            // pile inv coal and try collecting more
-            else if (gobName.endsWith("/stockpile-coal") && ZeeConfig.playerHasAnyPose(ZeeConfig.POSE_PLAYER_BUSHPICK)) {
-                ZeeManagerStockpile.pileInvCoalAndCollectMore(gob);
-            }
-            // pile inv clay
-            else if(gobName.endsWith("/stockpile-clay") && ZeeConfig.isCursorName(ZeeConfig.CURSOR_DIG)){
-                ZeeManagerStockpile.pileInvClays(gob);
-            }
-            // if crating ropes, midclick fibre pile to get more strings and craft again
-            else if((gobName.endsWith("/stockpile-flaxfibre") || gobName.endsWith("/stockpile-hempfibre")) && ZeeConfig.playerHasAnyPose(ZeeConfig.POSE_PLAYER_ROPE_WALKING)){
-                new ZeeThread() {
-                    public void run() {
-                        ZeeManagerCraft.ropeFetchStringsAndCraft(gob);
-                    }
-                }.start();
-            }
-            // click gob holding item (pile, etc)
-            else if (ZeeConfig.isPlayerHoldingItem()) {
-                clickedGobHoldingItem(gob,gobName);
-            }
-            // harvest one trellis withouth scythe
-            else if (isGobTrellisPlant(gobName)) {
-                new ZeeThread() {
-                    public void run() {
-                        harvestOneTrellisWithoutScythe(gob);
-                    }
-                }.start();
-            }
-            // activate harvest area if non-trellis crop
-            else if (isGobCrop(gobName)){
-                if (!ZeeConfig.getCursorName().equals(ZeeConfig.CURSOR_HARVEST))
-                    gobClick(gob, 3, UI.MOD_SHIFT);
-            }
-            else if (isGobGroundItem(gobName)) {
-                // place stockpile at gob coord
-                if(ZeeConfig.isPlobActive()) {
-                    MapView.Plob plob = ZeeManagerStockpile.lastPlob;
-                    gobPlace(plob, ZeeConfig.tileToCoord(ZeeConfig.coordToTile(gob.rc)), UI.MOD_SHIFT);
-                }
-                // pick up all ground items
-                else {
-                    gobClick(gob, 3, UI.MOD_SHIFT);//shift + rclick
-                }
-            }
-            // light up torch
-            else if (isGobFireSource(gob)) {
-                new ZeeThread() {
-                    public void run() {
-                        if (pickupTorch())
-                            itemActGob(gob,0);
-                    }
-                }.start();
-            }
-            // mount horse
-            else if (isGobHorse(gobName)) {
-                new ZeeThread() {
-                    public void run() {
-                        mountHorse(gob);
-                    }
-                }.start();
-            }
-            // label all barrels
-            else if (gobName.endsWith("/barrel")) {
-                if (barrelLabelOn)
-                    ZeeManagerFarmer.testBarrelsTilesClear();
-                else
-                    ZeeManagerFarmer.testBarrelsTiles(true);
-                barrelLabelOn = !barrelLabelOn;
-            }
-            // pick  dreams from catchers closeby
-            else if (gobName.endsWith("/dreca")) {
-                pickAllDreamsCloseBy(gob);
-            }
-            //toggle mine support radius
-            else if (isGobMineSupport(gobName) || gobName.endsWith("/ladder")) {
-                ZeeConfig.toggleMineSupport();
-            }
-            //toggle beeskep radius
-            else if (gobName.endsWith("/beehive")) {
-                ZeeConfig.toggleRadiusBeeskep();
-            }
-            //toggle foodtrough radius
-            else if (gobName.endsWith("/trough")) {
-                ZeeConfig.toggleRadiusFoodtrough();
-            }
-            // open cauldron
-            else if(gobName.contains("/cauldron") && !ZeeConfig.isPlayerLiftingGob(gob)){
-                cauldronOpen();
-            }
-            // open ship cargo
-            else if(gobName.endsWith("/knarr") || gobName.endsWith("/snekkja")) {
-                new ZeeThread() {
-                    public void run() {
-                        clickGobPetal(gob,"Cargo");
-                    }
-                }.start();
-            }
-            // toggle aggressive gob radius
-            else if(ZeeConfig.isAggressive(gobName)){
-                toggleOverlayAggro(gob);
-            }
-            // toggle cart if not lifting (avoid picking cart slot when zoomedout)
-            else if (gobName.endsWith("/cart")){
-                if (!ZeeConfig.playerHasAnyPose(ZeeConfig.POSE_PLAYER_LIFTING)) {
-                    gobClick(gob, 3);
-                }
-            }
-            // inspect gob
+            // pick up all ground items
             else {
-                inspectGob(gob);
+                gobClick(gob, 3, UI.MOD_SHIFT);//shift + rclick
             }
+        }
+        // light up torch
+        else if (isGobFireSource(gob)) {
+            new ZeeThread() {
+                public void run() {
+                    if (pickupTorch())
+                        itemActGob(gob,0);
+                }
+            }.start();
+        }
+        // mount horse
+        else if (isGobHorse(gobName)) {
+            new ZeeThread() {
+                public void run() {
+                    mountHorse(gob);
+                }
+            }.start();
+        }
+        // label all barrels
+        else if (gobName.endsWith("/barrel")) {
+            if (barrelLabelOn)
+                ZeeManagerFarmer.testBarrelsTilesClear();
+            else
+                ZeeManagerFarmer.testBarrelsTiles(true);
+            barrelLabelOn = !barrelLabelOn;
+        }
+        // pick  dreams from catchers closeby
+        else if (gobName.endsWith("/dreca")) {
+            pickAllDreamsCloseBy(gob);
+        }
+        //toggle mine support radius
+        else if (isGobMineSupport(gobName) || gobName.endsWith("/ladder")) {
+            ZeeConfig.toggleMineSupport();
+        }
+        //toggle beeskep radius
+        else if (gobName.endsWith("/beehive")) {
+            ZeeConfig.toggleRadiusBeeskep();
+        }
+        //toggle foodtrough radius
+        else if (gobName.endsWith("/trough")) {
+            ZeeConfig.toggleRadiusFoodtrough();
+        }
+        // open cauldron
+        else if(gobName.contains("/cauldron") && !ZeeConfig.isPlayerLiftingGob(gob)){
+            cauldronOpen();
+        }
+        // open ship cargo
+        else if(gobName.endsWith("/knarr") || gobName.endsWith("/snekkja")) {
+            new ZeeThread() {
+                public void run() {
+                    clickGobPetal(gob,"Cargo");
+                }
+            }.start();
+        }
+        // toggle aggressive gob radius
+        else if(ZeeConfig.isAggressive(gobName)){
+            toggleOverlayAggro(gob);
+        }
+        // toggle cart if not lifting (avoid picking cart slot when zoomedout)
+        else if (gobName.endsWith("/cart")){
+            if (!ZeeConfig.playerHasAnyPose(ZeeConfig.POSE_PLAYER_LIFTING)) {
+                gobClick(gob, 3);
+            }
+        }
+        // cupboard labeler
+        else if(gobName.endsWith("/cupboard")){
+            ZeeCupboardLabeler.toggle();
+        }
+        // inspect gob
+        else {
+            inspectGob(gob);
         }
     }
 
@@ -4365,9 +4375,7 @@ public class ZeeManagerGobClick extends ZeeThread{
         ZeeMidiRadio.toggleRadio();
 
         // cupboard labeler
-        if (ZeeConfig.playerLocation==ZeeConfig.LOCATION_CABIN || ZeeConfig.playerLocation==ZeeConfig.LOCATION_CELLAR){
-            ZeeCupboardLabeler.checkInterior();
-        }
+        ZeeCupboardLabeler.checkInterior();
     }
 
     private static void restoreSavedBrightness() {

@@ -12,7 +12,7 @@ public class ZeeCupboardLabeler {
 
     static Window win;
     static HashMap<String,List<Interior>> mapHouseInteriors = new HashMap<>();
-    static String clickedDoorHouseId = "";
+    static String lastHouseId = "";
     static int cabinLevel = -1;
 
     static String generateHouseId(Gob house){
@@ -30,50 +30,57 @@ public class ZeeCupboardLabeler {
         return houseId;
     }
 
-//    static void showWindow() {
-//        Widget wdg;
-//        String title = "Cupboard labeler";
-//
-//        win = ZeeConfig.getWindow(title);
-//        if (win != null){
-//            win.reqdestroy();
-//            win = null;
-//        }
-//
-//        //create window
-//        win = ZeeConfig.gameUI.add(
-//                new Window(Coord.of(120,70),title){
-//                    public void wdgmsg(String msg, Object... args) {
-//                        if (msg.contentEquals("close")){
-//                            exitCupbLblr();
-//                            this.reqdestroy();
-//                        }
-//                    }
-//                },
-//                ZeeConfig.gameUI.sz.div(2)
-//        );
-//
-//        wdg = win.add(new Label(clickedDoorHouseId),0,0);
-//
-//        wdg = win.add(new Label("Interiors: "+mapHouseInteriors.size()), ZeeWindow.posBelow(wdg,0,3));
-//
-//        wdg = win.add(new Button(60,"delete"){
-//            public void wdgmsg(String msg, Object... args) {
-//                if (msg.contentEquals("activate")){
-//                    if (clickedDoorHouseId !=null) {
-//                        mapHouseInteriors.remove(clickedDoorHouseId);
-//                        win.wdgmsg("close");
-//                    }
-//                }
-//            }
-//        },ZeeWindow.posBelow(wdg,0,3));
-//
-//        win.pack();
-//    }
+    static void showWindow() {
 
-    static void exitCupbLblr() {
-        clickedDoorHouseId = "";
+        Widget wdg;
+        String title = "Cupboard labeler";
+
+        win = ZeeConfig.getWindow(title);
+        if (win != null){
+            win.reqdestroy();
+            win = null;
+        }
+
+        //create window
+        win = ZeeConfig.gameUI.add(
+                new Window(Coord.of(120,70),title){
+                    public void wdgmsg(String msg, Object... args) {
+                        if (msg.contentEquals("close")){
+                            reset();
+                            this.reqdestroy();
+                        }
+                    }
+                },
+                ZeeConfig.gameUI.sz.div(2)
+        );
+
+        wdg = win.add(new Label(lastHouseId),0,0);
+
+        wdg = win.add(new Label(getInteriorId()), ZeeWindow.posBelow(wdg,0,3));
+
+        wdg = win.add(new Label("Interiors: "+mapHouseInteriors.size()), ZeeWindow.posBelow(wdg,0,3));
+
+        wdg = win.add(new Button(60,"delete"){
+            public void wdgmsg(String msg, Object... args) {
+                if (msg.contentEquals("activate")){
+                    if (lastHouseId !=null && !lastHouseId.isBlank()) {
+                        mapHouseInteriors.remove(lastHouseId);
+                        win.wdgmsg("close");
+                    }
+                }
+            }
+        },ZeeWindow.posBelow(wdg,0,3));
+
+        win.pack();
+    }
+
+    static void reset() {
+        //println("reset cupboard lblr");
+        lastHouseId = "";
         cabinLevel = -1;
+        if (win!=null)
+            win.reqdestroy();
+        win = null;
     }
 
     private static List<String> getHouseMatsBasenames(Gob house) {
@@ -114,32 +121,55 @@ public class ZeeCupboardLabeler {
 
         Gob g = ZeeConfig.lastMapViewClickGob;
         if(g!=null && ZeeManagerGobClick.isGobHouse(g.getres().name)){
-            clickedDoorHouseId = generateHouseId(g);
+            lastHouseId = generateHouseId(g);
+            cabinLevel = 1;
         }else{
-            clickedDoorHouseId = "";
+            lastHouseId = "";
+            cabinLevel = -1;
         }
-        cabinLevel = -1;
     }
 
     public static void checkInterior() {
-        if (!clickedDoorHouseId.isBlank()) {
-            println(clickedDoorHouseId);
-            println("    "+generateInteriorId());
+        if (!isActive)
+            return;
+        // player inside building
+        if (ZeeConfig.playerLocation==ZeeConfig.LOCATION_CABIN || ZeeConfig.playerLocation==ZeeConfig.LOCATION_CELLAR) {
+            if (!lastHouseId.isBlank()) {
+                generateInteriorId();
+                //println(lastHouseId);
+                //println("    " + getInteriorId());
+                showWindow();
+            }else{
+                reset();
+            }
+        }
+        // player left building
+        else{
+            reset();
         }
     }
 
-    private static String generateInteriorId() {
+    private static String getInteriorId(){
+        if (cabinLevel == -1){
+            return "";
+        }
         String loc = ZeeConfig.getPlayerLocationName();
         if (ZeeConfig.playerLocation==ZeeConfig.LOCATION_CELLAR) {
-            cabinLevel = - 1;
             return loc;
         }
-        if (!ZeeConfig.findGobsByNameEndsWith("-door").isEmpty()) {
+        return loc + cabinLevel;
+    }
+
+    private static void generateInteriorId() {
+        String loc = ZeeConfig.getPlayerLocationName();
+        if (ZeeConfig.playerLocation==ZeeConfig.LOCATION_CELLAR) {
             cabinLevel = 0;
+        }
+        if (!ZeeConfig.findGobsByNameEndsWith("-door").isEmpty()) {
+            cabinLevel = 1;
         }else{
             cabinLevel++;
         }
-        return loc + cabinLevel;
     }
 
     static void debug(String msg){
@@ -147,6 +177,20 @@ public class ZeeCupboardLabeler {
     }
     static void println(String msg){
         ZeeConfig.println(msg);
+    }
+
+    static boolean isActive = false;
+    public static void toggle() {
+        if (ZeeCupboardLabeler.lastHouseId.isBlank()){
+            ZeeConfig.msgError("unknown building");
+            return;
+        }
+        isActive = !isActive;
+        if (isActive) {
+            showWindow();
+        }else{
+            reset();
+        }
     }
 
     private static class Interior {
