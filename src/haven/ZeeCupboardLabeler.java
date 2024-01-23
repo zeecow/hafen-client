@@ -11,6 +11,7 @@ import java.util.regex.Pattern;
 public class ZeeCupboardLabeler {
 
     static Window win;
+    static String winTitle = "Cupboard labeler";
     static HashMap<String,List<Interior>> mapHouseInteriors = new HashMap<>();
     static String lastHouseId = "";
     static int cabinLevel = -1;
@@ -30,20 +31,23 @@ public class ZeeCupboardLabeler {
         return houseId;
     }
 
-    static void showWindow() {
-
-        Widget wdg;
-        String title = "Cupboard labeler";
-
-        win = ZeeConfig.getWindow(title);
+    private static void hideWindow() {
+        win = ZeeConfig.getWindow(winTitle);
         if (win != null){
             win.reqdestroy();
             win = null;
         }
+    }
+
+    static void showWindow() {
+
+        hideWindow();
+
+        Widget wdg;
 
         //create window
         win = ZeeConfig.gameUI.add(
-                new Window(Coord.of(120,70),title){
+                new Window(Coord.of(120,70), winTitle){
                     public void wdgmsg(String msg, Object... args) {
                         if (msg.contentEquals("close")){
                             reset();
@@ -183,13 +187,14 @@ public class ZeeCupboardLabeler {
     public static void toggle() {
         if (ZeeCupboardLabeler.lastHouseId.isBlank()){
             ZeeConfig.msgError("unknown building");
+            isActive = false;
             return;
         }
         isActive = !isActive;
         if (isActive) {
             showWindow();
         }else{
-            reset();
+            hideWindow();
         }
     }
 
