@@ -260,10 +260,38 @@ public class ZeeManagerGobClick extends ZeeThread{
         else if(gobName.endsWith("/cupboard")){
             ZeeCupboardLabeler.toggle();
         }
+        // schedule auto remount if midclick gob passage
+        else if (isGobRequireDisembarkVehicle(gob) && !ZeeConfig.isPlayerLiftingGob(gob)){
+            // unmount horse
+            if (ZeeConfig.isPlayerMountingHorse() && !ZeeManagerGobClick.isGobInListEndsWith(gobName,"/ladder,/minehole") && ZeeConfig.getMainInventory().countItemsByNameContains("/rope") > 0)
+            {
+                ZeeManagerGobClick.remountClosestHorse = true;
+                dismountHorseAndClickGob(coordMc);
+            }
+            //else{
+            //    gobClick(gob,3);
+            //}
+        }
+        // midclick cellar stairs on a horse (simulate click for convenience)
+        else if(gobName.endsWith("/cellarstairs") && ZeeConfig.isPlayerMountingHorse()){
+            gobClick(gob,3);
+        }
         // inspect gob
         else {
             inspectGob(gob);
         }
+    }
+
+    private static boolean isScheduleRemount() {
+        if ( isGobAmbientPassage(gob) &&
+                !ZeeConfig.playerHasAnyPose(ZeeConfig.POSE_PLAYER_LIFTING) &&
+                ZeeConfig.isPlayerMountingHorse() &&
+                !ZeeManagerGobClick.isGobInListEndsWith(gobName,"/ladder,/minehole") &&
+                ZeeConfig.getMainInventory().countItemsByNameContains("/rope") > 0)
+        {
+            return true;
+        }
+        return false;
     }
 
     static HashMap<String,Double> mapGobPlacerNameDist = mapGobPlacerInit();
@@ -1463,7 +1491,12 @@ public class ZeeManagerGobClick extends ZeeThread{
 
     static boolean quickFarmSelection = false;
     static Gob gobAutoLabel;
-    static void checkRightClickGob(Coord pc, Coord2d mc, Gob gob, String gobName) {
+    static void checkRightClickGob(Coord pc, Coord2d mc, Gob gobClicked, String gobName) {
+
+        coordPc = pc;
+        coordMc = mc;
+        gob = gobClicked;
+        gobName = gob.getres().name;
 
         //gob to be labeled when window contents open
         if (autoLabelGobsBasename.contains(gob.getres().basename()))
@@ -1586,10 +1619,11 @@ public class ZeeManagerGobClick extends ZeeThread{
                 ( isGobInListEndsWith(gobName,"/cart,/rowboat,/snekkja,/knarr,/wagon,/spark,/gardenshed,/upstairs,/downstairs,/cellardoor,/cellarstairs,/minehole,/ladder,/cavein,/caveout,/burrow,/igloo,gate")
                   || isGobHouse(gobName) || isGobHouseInnerDoor(gobName)))
         {
+            String finalGobName = gobName;
             new ZeeThread() {
                 public void run() {
                     Gob wb = ZeeConfig.getClosestGobByNameContains("/wheelbarrow");
-                    if (isGobHouse(gobName)) {
+                    if (isGobHouse(finalGobName)) {
                         try {
                             liftGob(wb);
                             sleep(100);
@@ -1608,34 +1642,18 @@ public class ZeeManagerGobClick extends ZeeThread{
         else if (isGobRequireDisembarkVehicle(gob) && !ZeeConfig.isPlayerLiftingGob(gob)){
             // unmount horse
             if (ZeeConfig.isPlayerMountingHorse() && !ZeeManagerGobClick.isGobInListEndsWith(gobName,"/ladder,/minehole") && ZeeConfig.getMainInventory().countItemsByNameContains("/rope") > 0) {
-                new ZeeThread() {
-                    public void run() {
-                        if(dismountHorse(mc)) {
-                            // entering a house
-                            if (isGobHouse(gobName)) {
-                                gobClick(gob, 3, 0, 16);//gob's door?
-                            }
-                            // entering a non-house (cave, mine, cellar, ladder)
-                            else {
-                                gobClick(gob, 3);
-                            }
-                            //  schedule auto remount
-                            if (isGobAmbientPassage(gob) && !ZeeConfig.playerHasAnyPose(ZeeConfig.POSE_PLAYER_LIFTING)) {
-                                ZeeManagerGobClick.remountClosestHorse = true;
-                            }
-                        }
-                    }
-                }.start();
+                dismountHorseAndClickGob(mc);
             }
             // disembark kicksled
             else if(ZeeConfig.isPlayerDrivingingKicksled()){
+                String finalGobName1 = gobName;
                 new ZeeThread() {
                     public void run() {
                         try {
                             disembarkVehicle(mc);
                             if(waitPlayerPoseNotInListTimeout(1000,ZeeConfig.POSE_PLAYER_KICKSLED_IDLE, ZeeConfig.POSE_PLAYER_KICKSLED_ACTIVE)) {
                                 sleep(100);//lagalagalaga
-                                if (isGobHouse(gobName))
+                                if (isGobHouse(finalGobName1))
                                     gobClick(gob, 3, 0, 16);//gob's door?
                                 else
                                     gobClick(gob, 3);
@@ -1671,6 +1689,23 @@ public class ZeeManagerGobClick extends ZeeThread{
             }.start();
         }
 
+    }
+
+    private static void dismountHorseAndClickGob(Coord2d mc) {
+        new ZeeThread() {
+            public void run() {
+                if(dismountHorse(mc)) {
+                    // entering a house
+                    if (isGobHouse(gobName)) {
+                        gobClick(gob, 3, 0, 16);//gob's door?
+                    }
+                    // entering a non-house (cave, cellar, stairs)
+                    else {
+                        gobClick(gob, 3);
+                    }
+                }
+            }
+        }.start();
     }
 
     static boolean isRightClickZooming = false;

@@ -24,8 +24,9 @@ Controls
 - pickup key "q", shift+q pickup all, ctrl+q pickup window
 - drink key '
   - shift drink will drink 1 gulp and click ground coord again (no map, gobs)
-- rightclick house gob to enter it
-  - auto-dismount horse (if inventory rope)
+- click building/passage gob to enter it
+  - dismount horse if rope in inventory
+  - schedule remount if midclick isntead of rightclick
 - right-click workstations to auto dismount (if inventory rope)
 - Icon Settings: shift+space toggles notify checkbox
 - Search Actions single click 
