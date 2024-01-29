@@ -266,6 +266,7 @@ public class ZeeManagerGobClick extends ZeeThread{
             if (ZeeConfig.isPlayerMountingHorse() && !ZeeManagerGobClick.isGobInListEndsWith(gobName,"/ladder,/minehole") && ZeeConfig.getMainInventory().countItemsByNameContains("/rope") > 0)
             {
                 ZeeManagerGobClick.remountClosestHorse = true;
+                ZeeConfig.addPlayerText("remount");
                 dismountHorseAndClickGob(coordMc);
             }
             //else{
@@ -1491,12 +1492,12 @@ public class ZeeManagerGobClick extends ZeeThread{
 
     static boolean quickFarmSelection = false;
     static Gob gobAutoLabel;
-    static void checkRightClickGob(Coord pc, Coord2d mc, Gob gobClicked, String gobName) {
+    static void checkRightClickGob(Coord pc, Coord2d mc, Gob gobClicked, String name) {
 
         coordPc = pc;
         coordMc = mc;
         gob = gobClicked;
-        gobName = gob.getres().name;
+        gobName = name;
 
         //gob to be labeled when window contents open
         if (autoLabelGobsBasename.contains(gob.getres().basename()))
