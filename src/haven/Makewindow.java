@@ -167,7 +167,7 @@ public class Makewindow extends Widget {
 		}
 		else if(msg.contentEquals("close")) {
 			ZeeManagerCraft.craftWindowClosed();
-			ZeeConfig.autoPickIrrlight = false;
+			ZeeManagerGobClick.autoPickIrrlightExit();
 			super.wdgmsg(sender, msg, args);
 		}
 		else {

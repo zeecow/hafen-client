@@ -2815,14 +2815,15 @@ public class ZeeManagerGobClick extends ZeeThread{
         win.pack();
     }
 
-    static boolean pickingIrrlight = false;
+    static boolean autoPickIrrlight = false;
+    static boolean alreadyPickingIrrlight = false;
     public static void autoPickIrrlight() {
-        if (pickingIrrlight) {
+        if (alreadyPickingIrrlight) {
             // avoid being called multiple times by gob consumer
             //println("already picking irrlight");
             return;
         }
-        pickingIrrlight = true;
+        alreadyPickingIrrlight = true;
         new ZeeThread(){
             public void run() {
                 try {
@@ -2834,8 +2835,8 @@ public class ZeeManagerGobClick extends ZeeThread{
 
                     // try picking irrlight
                     ZeeConfig.addPlayerText("irrlight!");
-                    ZeeConfig.lastMapViewClickButton = 2;//prepare cancel click
-                    while (pickingIrrlight && !ZeeConfig.isCancelClick()) {
+                    prepareCancelClick();
+                    while (alreadyPickingIrrlight && !isCancelClick()) {
                         Gob irrlight = ZeeConfig.getClosestGobByNameContains("/irrbloss");
                         if (irrlight==null) {
                             break;
@@ -2857,10 +2858,15 @@ public class ZeeManagerGobClick extends ZeeThread{
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-                pickingIrrlight = false;
+                alreadyPickingIrrlight = false;
                 ZeeConfig.removePlayerText();
             }
         }.start();
+    }
+
+    public static void autoPickIrrlightExit() {
+        autoPickIrrlight = false;
+        alreadyPickingIrrlight = false;
     }
 
 

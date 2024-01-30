@@ -202,7 +202,6 @@ public class ZeeConfig {
     static boolean autoToggleEquips = Utils.getprefb("autoToggleEquips", true);
     static boolean autoRunLogin = Utils.getprefb("autoRunLogin", true);
     static boolean autoToggleGridLines = Utils.getprefb("autoToggleGridLines", true);
-    static boolean autoPickIrrlight = false;
     static boolean blockAudioMsg = Utils.getprefb("blockAudioMsg", true);
     static String blockAudioMsgList = Utils.getpref("blockAudioMsgList", DEF_LIST_MUTE_AUDIO);
     static boolean butcherMode = false;
@@ -1346,9 +1345,9 @@ public class ZeeConfig {
                     // add checkbox if tools icons were present
                     if (addCheckbox){
                         Widget wdg = window.add(new CheckBox("get irrlight"){
-                            {a = ZeeConfig.autoPickIrrlight;}
+                            {a = ZeeManagerGobClick.autoPickIrrlight;}
                             public void changed(boolean val) {
-                                ZeeConfig.autoPickIrrlight = val;
+                                ZeeManagerGobClick.autoPickIrrlight = val;
                                 super.changed(val);
                             }
                         },360,45);
@@ -1356,7 +1355,7 @@ public class ZeeConfig {
                     }
                     // disable autopick if no tools icons
                     else{
-                        autoPickIrrlight = false;
+                        ZeeManagerGobClick.autoPickIrrlightExit();
                     }
 
                 } catch (Exception e) {
@@ -2754,7 +2753,7 @@ public class ZeeConfig {
         ZeeManagerGobClick.barterFindText = null;
         ZeeManagerGobClick.barterSearchOpen = false;
         ZeeManagerGobClick.remountClosestHorse = false;
-        autoPickIrrlight = false;
+        ZeeManagerGobClick.autoPickIrrlightExit();
         makeWindow = null;
         ZeeManagerMiner.tilesMonitorCleanup();
         ZeeHistWdg.clearHistory();
@@ -3770,7 +3769,7 @@ public class ZeeConfig {
                 ZeeManagerGobClick.addTextBarterStand(ob);
             }
             // auto pick irrlight
-            else if (autoPickIrrlight && ob.getres().name.endsWith("/irrbloss")) {
+            else if (ZeeManagerGobClick.autoPickIrrlight && ob.getres().name.endsWith("/irrbloss")) {
                 ZeeManagerGobClick.autoPickIrrlight();
             }
 
