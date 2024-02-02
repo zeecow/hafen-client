@@ -261,17 +261,14 @@ public class ZeeManagerGobClick extends ZeeThread{
             ZeeCupboardLabeler.toggle();
         }
         // schedule auto remount if midclick gob passage
-        else if (isGobRequireDisembarkVehicle(gob) && !ZeeConfig.isPlayerLiftingGob(gob)){
+        else if ( isGobAmbientPassage(gob) && !ZeeConfig.isPlayerLiftingGob(gob)){
             // unmount horse
-            if (ZeeConfig.isPlayerMountingHorse() && !ZeeManagerGobClick.isGobInListEndsWith(gobName,"/ladder,/minehole") && ZeeConfig.getMainInventory().countItemsByNameContains("/rope") > 0)
+            if (ZeeConfig.isPlayerMountingHorse() && !isGobInListEndsWith(gobName,"/ladder,/minehole") && ZeeConfig.getMainInventory().countItemsByNameContains("/rope") > 0)
             {
                 ZeeManagerGobClick.remountClosestHorse = true;
                 ZeeConfig.addPlayerText("remount");
                 dismountHorseAndClickGob(coordMc);
             }
-            //else{
-            //    gobClick(gob,3);
-            //}
         }
         // midclick cellar stairs on a horse (simulate click for convenience)
         else if(gobName.endsWith("/cellarstairs") && ZeeConfig.isPlayerMountingHorse()){
