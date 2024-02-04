@@ -1420,12 +1420,12 @@ public class ZeeManagerGobClick extends ZeeThread{
             return;
         }
 
-        if( ZeeConfig.lastInvItemMs > ZeeConfig.lastMapViewClickMs &&
-            !ZeeConfig.lastInvItemName.endsWith("plants/wine") &&
-            !ZeeConfig.lastInvItemName.endsWith("plants/hops") &&
-            !ZeeConfig.lastInvItemName.endsWith("plants/pepper"))
+        if( ZeeConfig.lastInvItemCreatedMs > ZeeConfig.lastMapViewClickMs &&
+            !ZeeConfig.lastInvItemCreatedName.endsWith("plants/wine") &&
+            !ZeeConfig.lastInvItemCreatedName.endsWith("plants/hops") &&
+            !ZeeConfig.lastInvItemCreatedName.endsWith("plants/pepper"))
         {
-            println("labelHarvestedPlant > invalid lastInvItem name ("+ZeeConfig.lastInvItemName+")");
+            println("labelHarvestedPlant > invalid lastInvItem name ("+ZeeConfig.lastInvItemCreatedName +")");
             return;
         }
 
@@ -1441,7 +1441,7 @@ public class ZeeManagerGobClick extends ZeeThread{
                     if(waitPlayerIdlePose()) {
                         //wait inventory harvested item
                         ZeeConfig.lastMapViewClickButton = 2; // prepare cancel click
-                        while(ZeeConfig.lastInvItemMs < t1 && !ZeeConfig.isCancelClick()){
+                        while(ZeeConfig.lastInvItemCreatedMs < t1 && !ZeeConfig.isCancelClick()){
                             sleep(PING_MS);
                         }
                         //timeout?
@@ -1462,7 +1462,7 @@ public class ZeeManagerGobClick extends ZeeThread{
                         Inventory inv = ZeeConfig.getMainInventory();
                         ZeeConfig.addGobText(
                             ZeeConfig.lastMapViewClickGob,
-                            Inventory.getQualityInt(ZeeConfig.lastInvItem).toString()
+                            Inventory.getQualityInt(ZeeConfig.lastInvItemCreated).toString()
                         );
                     }
                     else{
@@ -2271,7 +2271,7 @@ public class ZeeManagerGobClick extends ZeeThread{
                     ZeeConfig.addPlayerText("autobutch");
 
                     //wait start butching
-                    ZeeConfig.lastInvItemMs = 0;
+                    ZeeConfig.lastInvItemCreatedMs = 0;
                     ZeeConfig.butcherMode = true;
                     ZeeConfig.autoClickMenuOption = false;
                     gobClick(deadAnimal,3);
@@ -2285,7 +2285,7 @@ public class ZeeManagerGobClick extends ZeeThread{
                         while (!isCancelClick() && gobExistsBecauseFlowermenu(deadAnimal)) {
 
                             //prepare settings
-                            ZeeConfig.lastInvItemMs = 0;
+                            ZeeConfig.lastInvItemCreatedMs = 0;
                             ZeeConfig.butcherMode = true;
                             ZeeConfig.autoClickMenuOption = false;
 

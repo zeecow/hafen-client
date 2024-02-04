@@ -184,9 +184,9 @@ public class ZeeConfig {
     static int lastSavedOverlayModflags;
     static long lastSavedOverlayMs;
     static MCache.Overlay lastSavedOverlay;
-    static GItem lastInvItem;
-    static String lastInvItemBaseName, lastInvItemName;
-    static long lastInvItemMs;
+    static GItem lastInvItemCreated;
+    static String lastInvItemCreatedBaseName, lastInvItemCreatedName;
+    static long lastInvItemCreatedMs;
     static Coord lastUiClickCoord;
     static Class<?> classMSRad;
 
@@ -2753,6 +2753,7 @@ public class ZeeConfig {
         ZeeManagerGobClick.barterFindText = null;
         ZeeManagerGobClick.barterSearchOpen = false;
         ZeeManagerGobClick.remountClosestHorse = false;
+        ZeeManagerItemClick.clickingAllItemsPetals = false;
         ZeeManagerGobClick.autoPickIrrlightExit();
         makeWindow = null;
         ZeeManagerMiner.tilesMonitorCleanup();

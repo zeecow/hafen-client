@@ -168,10 +168,10 @@ public class GItem extends AWidget implements ItemInfo.SpriteOwner, GSprite.Owne
 		String basename = getres().basename();
 		Inventory inv = this.getparent(Inventory.class);
 		if(inv!=null && inv.isMainInv()) {
-			ZeeConfig.lastInvItem = this;
-			ZeeConfig.lastInvItemName = getres().name;
-			ZeeConfig.lastInvItemBaseName = basename;
-			ZeeConfig.lastInvItemMs = ZeeThread.now();
+			ZeeConfig.lastInvItemCreated = this;
+			ZeeConfig.lastInvItemCreatedName = getres().name;
+			ZeeConfig.lastInvItemCreatedBaseName = basename;
+			ZeeConfig.lastInvItemCreatedMs = ZeeThread.now();
 			ZeeConfig.invCounterUpdate(this);
 		}
 

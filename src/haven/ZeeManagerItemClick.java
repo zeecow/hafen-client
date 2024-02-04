@@ -25,6 +25,10 @@ public class ZeeManagerItemClick extends ZeeThread{
     static Inventory invBelt = null;
     public static long clickStartMs, clickEndMs, clickDiffMs;
 
+    static WItem lastItemClicked;
+    static long lastItemClickedMs;
+    static int lastItemClickedButton;
+
     public ZeeManagerItemClick(WItem wItem, Coord c) {
         clickDiffMs = clickEndMs - clickStartMs;
         this.wItem = wItem;
@@ -117,6 +121,81 @@ public class ZeeManagerItemClick extends ZeeThread{
                 }
             }.start();
         }
+    }
+
+    public static void showWindowClickAllItemPetals(String petalName) {
+
+        WItem itemClickAll = ZeeManagerItemClick.lastItemClicked;
+        if (itemClickAll==null){
+            println("checkClickAllItems > item null");
+            return;
+        }
+
+        String wtName = itemClickAll.item.getres().name;
+
+        // flowermenu belongs to witem and not gob
+        if (isFlowerMenuFromWItem()) {
+
+            Inventory inv = itemClickAll.getparent(Inventory.class);
+            if (inv==null){
+                println("checkClickAllItems > inv null");
+                return;
+            }
+
+
+            //show window click all items
+            String winTitle = "Click all items";
+            Window win = ZeeConfig.getWindow(winTitle);
+            if (win != null) {
+                win.reqdestroy();
+            }
+            win = ZeeConfig.gameUI.add(
+                new Window(Coord.of(120,70),winTitle){
+                    public void wdgmsg(String msg, Object... args) {
+                        if (msg.contentEquals("close")){
+                            this.reqdestroy();
+                        }
+                    }
+                },ZeeConfig.gameUI.sz.div(2)
+            );
+            Widget wdg;
+            wdg = win.add(new Label("item: "+wtName),0,0);
+            wdg = win.add(new Label("petal: "+petalName),0,15);
+            Window finalWin = win;
+            wdg = win.add(new Button(100,"click all"){
+                public void wdgmsg(String msg, Object... args) {
+                    if (msg.contentEquals("activate")){
+                        if (!ui.modctrl){
+                            ZeeConfig.msgError("ctrl+click to confirm");
+                            return;
+                        }
+                        // click all items petals
+                        List<WItem> invItems = inv.getWItemsByNameEndsWith(wtName);
+                        if (invItems.size() > 2){
+                            new ZeeThread(){
+                                public void run() {
+                                    try {
+                                        finalWin.reqdestroy();
+                                        clickAllItemsPetal(invItems,petalName);
+                                    } catch (Exception e) {
+                                        e.printStackTrace();
+                                    }
+                                }
+                            }.start();
+                        }
+                    }
+                }
+            },0,30);
+
+            win.pack();
+        }
+        else{
+            println("checkClickAllItems > gob petal = "+petalName);
+        }
+    }
+
+    static boolean isFlowerMenuFromWItem() {
+        return (ZeeManagerItemClick.lastItemClickedMs > ZeeConfig.lastMapViewClickMs);
     }
 
     private void init(WItem wItem) {
@@ -821,7 +900,13 @@ public class ZeeManagerItemClick extends ZeeThread{
         }
     }
 
+    static boolean clickingAllItemsPetals = false;
     public static int clickAllItemsPetal(List<WItem> items, String petalName) {
+        if (clickingAllItemsPetals){
+            println("alredy clicking all items petal = "+petalName);
+            return 0;
+        }
+        clickingAllItemsPetals = true;
         ZeeConfig.addGobText(ZeeConfig.getPlayerGob(),"clicking "+items.size()+" items",0,255,255,255,10);
         int itemsClicked = 0;
         ZeeConfig.lastMapViewClickButton = 2; // setup for clickCancelTask()
@@ -831,6 +916,7 @@ public class ZeeManagerItemClick extends ZeeThread{
                 if (ZeeConfig.isCancelClick()) {
                     //ZeeClickGobManager.resetClickPetal();
                     ZeeConfig.removeGobText(ZeeConfig.getPlayerGob());
+                    clickingAllItemsPetals = false;
                     return itemsClicked;
                 }
                 itemActCoord(w);
@@ -846,10 +932,12 @@ public class ZeeManagerItemClick extends ZeeThread{
                 e.printStackTrace();
                 //ZeeClickGobManager.resetClickPetal();
                 ZeeConfig.removeGobText(ZeeConfig.getPlayerGob());
+                clickingAllItemsPetals = false;
                 return itemsClicked;
             }
         }
         ZeeConfig.removeGobText(ZeeConfig.getPlayerGob());
+        clickingAllItemsPetals = false;
         return itemsClicked;
     }
 

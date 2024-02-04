@@ -211,12 +211,19 @@ public class WItem extends Widget implements DTarget {
 
 	@Override
 	public boolean mouseup(Coord c, int btn) {
+		boolean isReallyWItem = this.getClass().getSimpleName().contentEquals("WItem");
+		if (isReallyWItem){
+			ZeeManagerItemClick.lastItemClickedMs = ZeeThread.now();
+			ZeeManagerItemClick.lastItemClicked = this;
+			ZeeManagerItemClick.lastItemClickedButton = btn;
+		}
 		// ignore calls by other classes other than WItem
-		if (btn == 2  &&  this.getClass().getSimpleName().contentEquals("WItem")) {
+		if (btn == 2 && isReallyWItem) {
 			ZeeManagerItemClick.clickEndMs = System.currentTimeMillis();
 			new ZeeManagerItemClick(this,c).start();
 			return false;
-		}else if (btn==3 && ui.modshift && ZeeConfig.farmerMode) {
+		}
+		if (btn==3 && ui.modshift && ZeeConfig.farmerMode) {
 			ZeeConfig.println("> disabling farmer mode, start with harvesting instead of planting");
 		}
 		return super.mouseup(c, btn);

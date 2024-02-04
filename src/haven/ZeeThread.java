@@ -647,7 +647,7 @@ public class ZeeThread  extends Thread{
     public static boolean waitNextInvItem(){
         long startMs = now();
         long timeout = 15000;
-        while (startMs > ZeeConfig.lastInvItemMs && timeout > 0){
+        while (startMs > ZeeConfig.lastInvItemCreatedMs && timeout > 0){
             try {
                 sleep(50);
                 timeout -= 50;
@@ -655,14 +655,14 @@ public class ZeeThread  extends Thread{
                 e.printStackTrace();
             }
         }
-        return (startMs <= ZeeConfig.lastInvItemMs);
+        return (startMs <= ZeeConfig.lastInvItemCreatedMs);
     }
 
     public static GItem waitInvItemOrCancelClick(){
         long startMs = now();
         prepareCancelClick();
         try {
-            while ( !isCancelClick()  &&  startMs > ZeeConfig.lastInvItemMs) {
+            while ( !isCancelClick()  &&  startMs > ZeeConfig.lastInvItemCreatedMs) {
                 sleep(50);
             }
         } catch (Exception e) {
@@ -670,7 +670,7 @@ public class ZeeThread  extends Thread{
         }
         if (isCancelClick())
             return null;
-        return ZeeConfig.lastInvItem;
+        return ZeeConfig.lastInvItemCreated;
     }
 
 
@@ -755,7 +755,7 @@ public class ZeeThread  extends Thread{
             //wait approaching item
             if(waitPlayerIdleFor(1)) {
                 // wait inventory idle for idleMs
-                while ((timeElapsed = now() - ZeeConfig.lastInvItemMs) < idleMs) {
+                while ((timeElapsed = now() - ZeeConfig.lastInvItemCreatedMs) < idleMs) {
                     Thread.sleep(SLEEP_MS);
                 }
             }

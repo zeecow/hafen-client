@@ -87,6 +87,9 @@ public class FlowerMenu extends Widget {
 		ZeeManagerStockpile.checkClickedPetal(this.name);
 		ZeeQuickOptionsWindow.updatePetalWidget(this.name);
 		ZeeManagerGobClick.labelHarvestedPlant(this.name);
+		if (button==2){
+			ZeeManagerItemClick.showWindowClickAllItemPetals(this.name);
+		}
 	    return(true);
 	}
 
@@ -236,11 +239,12 @@ public class FlowerMenu extends Widget {
 	@Override
 	public boolean mouseup(Coord c, int button) {
 		// activate menu on mouseup
-		if (button==3)
+		if (button==3) {
 			// avoid clicking during menu animation
 			if (ZeeThread.now() - ZeeManagerGobClick.lastClickMouseDownMs > 500) { //500ms
 				return mousedown(c, button);
 			}
+		}
 		return false;
 	}
 
