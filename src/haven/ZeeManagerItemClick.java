@@ -558,55 +558,26 @@ public class ZeeManagerItemClick extends ZeeThread{
         }
     }
 
-
-    private static void autoButchFish(WItem wItem, boolean butchAll) {
-        new Thread(){
-            public void run() {
-                try{
-
-                    if (!butchAll){
-                        clickItemPetal(wItem,"Butcher");
-                        return;
-                    }
-
-                    ZeeConfig.addPlayerText("autobutch");
-                    Inventory inv = wItem.getparent(Inventory.class);
-                    List<WItem> allFish = inv.getWItemsByNameContains("gfx/invobjs/fish-");
-                    for (WItem fish : allFish) {
-                        clickItemPetal(fish,"Butcher");
-                        sleep(PING_MS*2);
-                        if (inv.getNumberOfFreeSlots() == 0) {
-                            break;
-                        }
-                    }
-
-                    //remaining item?
-                    allFish = inv.getWItemsByNameContains("gfx/invobjs/fish-");
-                    if (allFish.size()>0 && inv.getNumberOfFreeSlots()>0)
-                        clickItemPetal(allFish.get(0),"Butcher");
-
-                }catch (Exception e){
-                    e.printStackTrace();
-                }
-                ZeeConfig.removePlayerText();
-            }
-        }.start();
-    }
-
     private static void autoButchExit(String msg){
         println("auto butch > "+msg);
         autoButchExit();
     }
 
     private static void autoButchExit(){
+        autoButching = false;
         ZeeConfig.removePlayerText();
     }
 
+    private static boolean autoButching = false;
     private static void autoButch(WItem wItem) {
-        if (ZeeConfig.isFish(wItem.item.getres().name)){
-            autoButchFish(wItem,false);
+
+        // fix method being called twice for some unknown reason
+        if (autoButching){
+            //println("autoButch > already busy");
             return;
         }
+        autoButching = true;
+
         new ZeeThread() {
             public void run() {
                 try {
@@ -617,18 +588,20 @@ public class ZeeManagerItemClick extends ZeeThread{
                     Inventory inv = getItemInventory(item);
                     Coord itemSlotCoord = getWItemCoord(item);
                     String itemName = getWItemName(item);
-                    final long sleepMs = 333;
+                    final long sleepMs = 500;
 
                     prepareCancelClick();
 
                     while (!isCancelClick() && item!=null && (!(itemName.endsWith("-clean") || itemName.endsWith("-cleaned"))) ){
                         //click first menu petal
-                        clickItemPetal(item,0);
-                        sleep(sleepMs);
-
-                        // get next stage item, ends with "-dead", "-plucked", "-clean" or "-cleaned"
-                        item = inv.getItemBySlotCoord(itemSlotCoord);//TODO empty slot may change 1-slot-item position
-                        itemName = getWItemName(item);
+                        if (clickItemPetal(item,0)) {
+                            sleep(sleepMs);
+                            // get next stage item, ends with "-dead", "-plucked", "-clean" or "-cleaned"
+                            item = inv.getItemBySlotCoord(itemSlotCoord);//TODO empty slot may change 1-slot-item position
+                            itemName = getWItemName(item);
+                        }else{
+                            throw new Exception("couldn't auto-click item "+itemName);
+                        }
                     }
 
                     // last item click
@@ -637,9 +610,8 @@ public class ZeeManagerItemClick extends ZeeThread{
                         clickItemPetal(item,0);
                     }
 
-
                 }catch (Exception e){
-                    e.printStackTrace();
+                    println("autoButch exception > "+e.getMessage());
                 }
                 autoButchExit("done");
             }
@@ -647,10 +619,14 @@ public class ZeeManagerItemClick extends ZeeThread{
     }
 
     private static void autoButchAll(WItem wItem) {
-        if (ZeeConfig.isFish(wItem.item.getres().name)){
-            autoButchFish(wItem,true);
+
+        // fix method being called twice for some unknown reason
+        if (autoButching){
+            //println("autoButch > already busy");
             return;
         }
+        autoButching = true;
+
         new ZeeThread() {
             public void run() {
                 try {
@@ -661,50 +637,55 @@ public class ZeeManagerItemClick extends ZeeThread{
                     Coord itemSlotCoord = getWItemCoord(item);
                     String itemName = getWItemName(item);
                     String firstItemName = itemName;
-                    final long sleepMs = 333;
+                    final long sleepMs = 500;
 
                     prepareCancelClick();
 
                     while (!isCancelClick() && item!=null && (!(itemName.endsWith("-clean") || itemName.endsWith("-cleaned"))) ){
 
                         //click first menu petal
-                        clickItemPetal(item,0);
-                        sleep(sleepMs);
-
-                        // get next stage item, ends with "-dead", "-plucked", "-clean" or "-cleaned"
-                        item = inv.getItemBySlotCoord(itemSlotCoord);//TODO empty slot may change 1-slot-item position
-                        itemName = getWItemName(item);
+                        if (clickItemPetal(item,0)) {
+                            sleep(sleepMs);
+                            // get next stage item, ends with "-dead", "-plucked", "-clean" or "-cleaned"
+                            item = inv.getItemBySlotCoord(itemSlotCoord);//TODO empty slot may change 1-slot-item position
+                            itemName = getWItemName(item);
+                        }else{
+                            throw new Exception("failed autoclick 1 "+itemName);
+                        }
 
                         //if butch is over("-clean"), prepare next "butch all" item
                         if (item!=null && (itemName.endsWith("-clean") || itemName.endsWith("-cleaned"))){
 
                             //butch "-clean" item and wait inventory changes
                             //println("last butch 2> "+itemName);
-                            clickItemPetal(item,0);
-                            sleep(sleepMs);
+                            if(clickItemPetal(item,0)){
+                                sleep(sleepMs);
 
-                            //get next dead/live animal for butching
-                            List<WItem> items;
-                            if (firstItemName.contains("/rabbit-"))
-                                items = inv.getWItemsByNameContains("gfx/invobjs/rabbit-");
-                            else if (firstItemName.endsWith("/hen") || firstItemName.endsWith("/rooster"))
-                                items = inv.getItemsByNameEnd("/hen","/rooster");
-                            else
-                                items = inv.getWItemsByNameContains(firstItemName);
+                                //get next dead/live animal for butching
+                                List<WItem> items;
+                                if (firstItemName.contains("/rabbit-"))
+                                    items = inv.getWItemsByNameContains("gfx/invobjs/rabbit-");
+                                else if (firstItemName.endsWith("/hen") || firstItemName.endsWith("/rooster"))
+                                    items = inv.getItemsByNameEnd("/hen","/rooster");
+                                else
+                                    items = inv.getWItemsByNameContains(firstItemName);
 
-                            //filter animal hides
-                            items.removeIf(wItem1->ZeeConfig.isAnimalHideTailEtc(wItem1.item.getres().name));
+                                //filter animal hides
+                                items.removeIf(wItem1->ZeeConfig.isAnimalHideTailEtc(wItem1.item.getres().name));
 
-                            if (items.size() == 0){
-                                //no more items to butch
-                                autoButchExit("no more items");
-                                return;
+                                if (items.size() == 0){
+                                    //no more items to butch
+                                    autoButchExit("no more items");
+                                    return;
+                                }else{
+                                    //update next dead/live animal vars
+                                    item = items.get(0);
+                                    itemName = getWItemName(item);
+                                    itemSlotCoord = getWItemCoord(item);
+                                    println("next item > "+itemName);
+                                }
                             }else{
-                                //update next dead/live animal vars
-                                item = items.get(0);
-                                itemName = getWItemName(item);
-                                itemSlotCoord = getWItemCoord(item);
-                                println("next item > "+itemName);
+                                throw new Exception("failed autoclick 2 "+itemName);
                             }
                         }
                     }
@@ -717,7 +698,7 @@ public class ZeeManagerItemClick extends ZeeThread{
 
 
                 }catch (Exception e){
-                    e.printStackTrace();
+                    println("autoButchAll exception > "+e.getMessage());
                 }
                 autoButchExit("done");
             }
