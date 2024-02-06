@@ -80,6 +80,7 @@ public class ZeeCupboardLabeler {
 
     static void reset() {
         //println("reset cupboard lblr");
+        isActive = false;
         lastHouseId = "";
         cabinLevel = -1;
         if (win!=null)
