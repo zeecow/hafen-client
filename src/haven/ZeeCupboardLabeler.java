@@ -102,7 +102,8 @@ public class ZeeCupboardLabeler {
                 @SuppressWarnings("unchecked")
                 Map<Integer, Material> mats = (Map<Integer, Material>) f.get(attr);
                 for (Material m : mats.values()) {
-                    Pattern pattern = Pattern.compile("\\/([a-z]+)\\(");
+                    //println(m.states.toString());
+                    Pattern pattern = Pattern.compile("\\/([a-z\\-]+)\\(");
                     Matcher matcher = pattern.matcher(m.states.toString());
                     matcher.find();
                     String basename = matcher.group(1);
@@ -112,6 +113,9 @@ public class ZeeCupboardLabeler {
             }
         } catch (NoSuchFieldException | IllegalAccessException e) {
             e.printStackTrace();
+        } catch (IllegalStateException e){
+            println("getHouseMatsBasenames > "+e.getMessage());
+            return new ArrayList<>();
         }
         return basenames;
     }
@@ -124,7 +128,11 @@ public class ZeeCupboardLabeler {
         }
 
         Gob g = ZeeConfig.lastMapViewClickGob;
-        if(g!=null && ZeeManagerGobClick.isGobHouse(g.getres().name)){
+        String houseName = null;
+        if (g!=null)
+            houseName = g.getres().name;
+        if(g!=null && ZeeManagerGobClick.isGobHouse(houseName) && !houseName.endsWith("windmill") && !houseName.endsWith("stonetower")){
+            //TODO cabin levels for windmill, stonetower
             lastHouseId = generateHouseId(g);
             cabinLevel = 1;
         }else{
