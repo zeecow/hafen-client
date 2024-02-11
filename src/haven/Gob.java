@@ -32,7 +32,7 @@ import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, EquipTarget, Skeleton.HasPose {
+public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, EquipTarget {
     public Coord2d rc;
     public double a;
     public boolean virtual = false;
@@ -63,7 +63,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 	public final Indir<Resource> res;
 	public MessageBuf sdt;
 	public Sprite spr;
-	public boolean delign = false;
+	public boolean delign = false, old = false;
 	private Collection<RenderTree.Slot> slots = null;
 	private boolean added = false;
 
@@ -94,6 +94,8 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 	private void init() {
 	    if(spr == null) {
 		spr = Sprite.create(gob, res.get(), sdt);
+		if(old)
+		    spr.age();
 		if(added && (spr instanceof SetupMod))
 		    gob.setupmods.add((SetupMod)spr);
 	    }
@@ -128,10 +130,20 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 	    }
 	    remove0();
 	    gob.ols.remove(this);
+	    removed();
 	}
 
 	public void remove() {
 	    remove(true);
+	}
+
+	protected void removed() {
+	}
+
+	public boolean tick(double dt) {
+	    if(spr == null)
+		return(false);
+	    return(spr.tick(dt));
 	}
 
 	public void added(RenderTree.Slot slot) {
@@ -449,7 +461,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 		    ol.init();
 		} catch(Loading e) {}
 	    } else {
-		boolean done = ol.spr.tick(dt);
+		boolean done = ol.tick(dt);
 		if((!ol.delign || (ol.spr instanceof Sprite.CDel)) && done) {
 		    ol.remove0();
 		    i.remove();
@@ -804,13 +816,6 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 	Drawable d = getattr(Drawable.class);
 	if(d != null)
 	    return(d.getres());
-	return(null);
-    }
-
-    public Skeleton.Pose getpose() {
-	Drawable d = getattr(Drawable.class);
-	if(d != null)
-	    return(d.getpose());
 	return(null);
     }
 

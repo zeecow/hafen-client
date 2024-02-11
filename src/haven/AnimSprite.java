@@ -49,7 +49,7 @@ public class AnimSprite extends Sprite {
 
     private AnimSprite(Owner owner, Resource res, Message sdt) {
 	super(owner, res);
-	int mask = sdt.eom()?0xffff0000:decnum(sdt);
+	int mask = sdt.eom() ? 0xffff0000 : decnum(sdt);
 	Collection<MeshAnim.Animation> anims = new LinkedList<>();
 	for(MeshAnim.Res ar : res.layers(MeshAnim.Res.class)) {
 	    if((ar.id < 0) || (((1 << ar.id) & mask) != 0))
@@ -90,5 +90,10 @@ public class AnimSprite extends Sprite {
 	for(MeshAnim.Animation anim : anims)
 	    ret = ret | anim.tick(dt);
 	return(ret);
+    }
+
+    public void age() {
+	for(MeshAnim.Animation anim : anims)
+	    anim.age();
     }
 }

@@ -34,7 +34,7 @@ import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-public class SkelSprite extends Sprite implements Sprite.CUpd, EquipTarget, Skeleton.HasPose, Skeleton.ModOwner {
+public class SkelSprite extends Sprite implements Sprite.CUpd, EquipTarget, Skeleton.ModOwner {
     public static final Pipe.Op
 	rigid = new BaseColor(FColor.GREEN),
 	morphed = new BaseColor(FColor.RED),
@@ -76,7 +76,15 @@ public class SkelSprite extends Sprite implements Sprite.CUpd, EquipTarget, Skel
 	    skel = null;
 	    pose = null;
 	}
-	update(fl, true);
+	update(fl);
+    }
+
+    private static final OwnerContext.ClassResolver<SkelSprite> ctxr = new OwnerContext.ClassResolver<SkelSprite>()
+	.add(SkelSprite.class, spr -> spr);
+    public class RecOwner extends Sprite.RecOwner {
+	public <T> T context(Class<T> cl) {
+	    return(OwnerContext.orparent(cl, ctxr.context(cl, SkelSprite.this, false), owner));
+	}
     }
 
     public SkelSprite(Owner owner, Resource res) {
@@ -95,9 +103,7 @@ public class SkelSprite extends Sprite implements Sprite.CUpd, EquipTarget, Skel
     }
 
     public <T> T context(Class<T> cl) {
-	if(owner == null)
-	    throw(new NoContext(cl));
-	return(owner.context(cl));
+	return(OwnerContext.orparent(cl, ctxr.context(cl, this, false), owner));
     }
     public Collection<Location.Chain> getloc() {
 	Collection<Location.Chain> ret = new ArrayList<>(slots.size());
@@ -199,54 +205,58 @@ public class SkelSprite extends Sprite implements Sprite.CUpd, EquipTarget, Skel
 	pose.gbuild();
     }
 
+    private static final Map<MeshAnim.Res, MeshAnim.Animation> nomaids = new HashMap<>();
+    private Map<MeshAnim.Res, MeshAnim.Animation> maids = nomaids;
     private void chmanims(int mask) {
 	Collection<MeshAnim.Animation> anims = new LinkedList<>();
+	Map<MeshAnim.Res, MeshAnim.Animation> newids = new HashMap<>();
 	for(MeshAnim.Res ar : res.layers(MeshAnim.Res.class)) {
-	    if((ar.id < 0) || (((1 << ar.id) & mask) != 0))
-		anims.add(ar.make());
+	    if((ar.id < 0) || (((1 << ar.id) & mask) != 0)) {
+		MeshAnim.Animation anim = maids.get(ar);
+		if(anim == null)
+		    anim = ar.make();
+		newids.put(ar, anim);
+		anims.add(anim);
+	    }
 	}
 	this.manims = anims.toArray(new MeshAnim.Animation[0]);
+	if(newids.isEmpty())
+	    newids = nomaids;
+	this.maids = newids;
     }
 
-    private Map<Skeleton.ResPose, PoseMod> modids = new HashMap<Skeleton.ResPose, PoseMod>();
-    private void chposes(int mask, boolean old) {
-	if(!old) {
-	    this.oldpose = skel.new Pose(pose);
-	    this.ipold = 1.0f;
-	}
+    private static final Map<Skeleton.ResPose, PoseMod> initmodids = new HashMap<>();
+    private Map<Skeleton.ResPose, PoseMod> modids = initmodids;
+    private void chposes(int mask) {
 	Collection<PoseMod> poses = new LinkedList<PoseMod>();
 	stat = true;
-	Map<Skeleton.ResPose, PoseMod> newids = new HashMap<Skeleton.ResPose, PoseMod>();
+	Map<Skeleton.ResPose, PoseMod> newids = new HashMap<>();
 	for(Skeleton.ResPose p : res.layers(Skeleton.ResPose.class)) {
 	    if((p.id < 0) || ((mask & (1 << p.id)) != 0)) {
-		Skeleton.PoseMod mod;
-		if((mod = modids.get(p)) == null) {
+		Skeleton.PoseMod mod = modids.get(p);
+		if(mod == null)
 		    mod = p.forskel(this, skel, p.defmode);
-		    if(old)
-			mod.age();
-		}
-		if(p.id >= 0)
-		    newids.put(p, mod);
+		newids.put(p, mod);
 		if(!mod.stat())
 		    stat = false;
 		poses.add(mod);
 	    }
 	}
 	this.mods = poses.toArray(new PoseMod[0]);
+	if((modids != initmodids) && !modids.equals(newids)) {
+	    this.oldpose = skel.new Pose(pose);
+	    this.ipold = 1.0f;
+	}
 	this.modids = newids;
 	rebuild();
     }
 
-    private void update(int fl, boolean old) {
+    public void update(int fl) {
 	chmanims(fl);
 	if(skel != null)
-	    chposes(fl, old);
+	    chposes(fl);
 	chparts(fl);
 	this.curfl = fl;
-    }
-
-    public void update(int fl) {
-	update(fl, false);
     }
 
     public void update() {
@@ -267,6 +277,15 @@ public class SkelSprite extends Sprite implements Sprite.CUpd, EquipTarget, Skel
 	slots.remove(slot);
     }
     
+    public void age() {
+	for(PoseMod mod : mods)
+	    mod.age();
+	for(MeshAnim.Animation anim : manims)
+	    anim.age();
+	this.ipold = 0.0f;
+	this.oldpose = null;
+    }
+
     public boolean tick(double ddt) {
 	float dt = (float)ddt;
 	if(!stat || (ipold > 0)) {
@@ -297,15 +316,13 @@ public class SkelSprite extends Sprite implements Sprite.CUpd, EquipTarget, Skel
 	    gpart.accept(g);
     }
 
-    public Pose getpose() {
-	return(pose);
-    }
-
     public Supplier<Pipe.Op> eqpoint(String nm, Message dat) {
 	Skeleton.BoneOffset bo = res.layer(Skeleton.BoneOffset.class, nm);
 	if(bo != null)
 	    return(bo.from(pose));
-	return(pose.eqpoint(nm, dat));
+	if(pose != null)
+	    return(pose.eqpoint(nm, dat));
+	return(null);
     }
 
     static {
