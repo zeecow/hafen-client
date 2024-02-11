@@ -5,7 +5,7 @@ import haven.*;
 import haven.resutil.*;
 import java.util.*;
 
-@haven.FromResource(name = "lib/plants", version = 9)
+@haven.FromResource(name = "lib/plants", version = 10)
 public class TrellisPlant implements Sprite.Factory {
     public final int num;
 
@@ -25,7 +25,7 @@ public class TrellisPlant implements Sprite.Factory {
     }
 
     public Sprite create(Sprite.Owner owner, Resource res, Message sdt) {
-	double a = ((Gob)owner).a;
+	double a = ((owner instanceof Gob) ? (Gob)owner : owner.context(Gob.class)).a;
 	float ac = (float)Math.cos(a), as = -(float)Math.sin(a);
 	int st = sdt.uint8();
 	ArrayList<FastMesh.MeshRes> var = new ArrayList<FastMesh.MeshRes>();

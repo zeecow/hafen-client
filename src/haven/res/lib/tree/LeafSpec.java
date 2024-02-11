@@ -5,14 +5,13 @@
 
 package haven.res.lib.tree;
 
-import haven.*;
-import haven.render.*;
-import haven.res.lib.leaves.*;
-import haven.res.lib.svaj.*;
-import java.util.*;
+import haven.FastMesh;
+import haven.Material;
 
-@haven.FromResource(name = "lib/tree", version = 14)
+@haven.FromResource(name = "lib/tree", version = 15)
 public class LeafSpec {
     public FastMesh mesh;
     public Material[] mat;
 }
+
+/* >spr: Factory */

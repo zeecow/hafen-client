@@ -5,13 +5,11 @@
 
 package haven.res.lib.tree;
 
-import haven.*;
-import haven.render.*;
-import haven.res.lib.leaves.*;
-import haven.res.lib.svaj.*;
-import java.util.*;
+import haven.Coord3f;
+import haven.Material;
+import haven.res.lib.leaves.FallingLeaves;
 
-@haven.FromResource(name = "lib/tree", version = 14)
+@haven.FromResource(name = "lib/tree", version = 15)
 public class StdLeaf extends FallingLeaves.Leaf {
     public final Material m;
 

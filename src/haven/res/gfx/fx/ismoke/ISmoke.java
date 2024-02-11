@@ -16,8 +16,9 @@ import static haven.render.sl.Type.*;
 
 /* >spr: ISmoke */
 /* >rlink: ISmoke */
-@haven.FromResource(name = "gfx/fx/ismoke", version = 106)
+@haven.FromResource(name = "gfx/fx/ismoke", version = 107)
 public class ISmoke extends Sprite implements Rendered, Sprite.CDel, TickList.TickNode, TickList.Ticking {
+    static final double agestep = 0.1, maxstep = 0.25;
     static final VertexArray.Layout fmt =
 	new VertexArray.Layout(new VertexArray.Layout.Input(Homo3D.vertex,     new VectorFormat(3, NumberFormat.FLOAT32), 0,  0, 20),
 			       new VertexArray.Layout.Input(Homo3D.normal,     new VectorFormat(3, NumberFormat.SNORM8),  0, 12, 20),
@@ -80,7 +81,7 @@ public class ISmoke extends Sprite implements Rendered, Sprite.CDel, TickList.Ti
 	return(!spawn && bollar.isEmpty());
     }
     public void autotick(double ddt) {
-	float dt = (float)ddt;
+	float dt = (float)Math.min(ddt, maxstep);
 	de += dt;
 	while(spawn && (de > 0.1)) {
 	    de -= 0.1;
@@ -221,5 +222,10 @@ public class ISmoke extends Sprite implements Rendered, Sprite.CDel, TickList.Ti
 
     public void delete() {
 	spawn = false;
+    }
+
+    public void age() {
+	for(double t = 0.0; t < life; t += agestep)
+	    autotick(agestep);
     }
 }

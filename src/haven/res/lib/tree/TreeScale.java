@@ -5,13 +5,12 @@
 
 package haven.res.lib.tree;
 
-import haven.*;
-import haven.render.*;
-import haven.res.lib.leaves.*;
-import haven.res.lib.svaj.*;
-import java.util.*;
+import haven.GAttrib;
+import haven.Gob;
+import haven.render.Location;
+import haven.render.Pipe;
 
-@haven.FromResource(name = "lib/tree", version = 14)
+@haven.FromResource(name = "lib/tree", version = 15)
 public class TreeScale extends GAttrib implements Gob.SetupMod {
     public final float scale;
     public final Location mod;

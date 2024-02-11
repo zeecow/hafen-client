@@ -6,12 +6,11 @@
 package haven.res.lib.tree;
 
 import haven.*;
-import haven.render.*;
-import haven.res.lib.leaves.*;
-import haven.res.lib.svaj.*;
-import java.util.*;
 
-@haven.FromResource(name = "lib/tree", version = 14)
+import java.util.ArrayList;
+import java.util.Collection;
+
+@haven.FromResource(name = "lib/tree", version = 15)
 public class Factory implements Sprite.Factory {
     public LeafSpec leaves = null;
 

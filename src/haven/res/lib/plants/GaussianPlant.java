@@ -5,7 +5,7 @@ import haven.*;
 import haven.resutil.*;
 import java.util.*;
 
-@haven.FromResource(name = "lib/plants", version = 9)
+@haven.FromResource(name = "lib/plants", version = 10)
 public class GaussianPlant implements Sprite.Factory {
     public final int numl, numh;
     public final float r;
