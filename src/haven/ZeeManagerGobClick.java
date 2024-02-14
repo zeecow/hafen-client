@@ -1558,8 +1558,12 @@ public class ZeeManagerGobClick extends ZeeThread{
             }
         }
 
+        //cupboard labeler
+        if(ZeeCupboardLabeler.isActive && gobName.endsWith("/cupboard")){
+            ZeeCupboardLabeler.lastCupboardClicked = gob;
+        }
         // entering a house
-        if (isGobHouse(gobName) && !ZeeConfig.isPlayerMountingHorse()) {
+        else if (isGobHouse(gobName) && !ZeeConfig.isPlayerMountingHorse()) {
             gobClick(gob, 3, 0, 16);//gob's door?
         }
         // click barrel transfer, label by contents

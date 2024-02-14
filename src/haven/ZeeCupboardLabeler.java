@@ -10,11 +10,16 @@ import java.util.regex.Pattern;
 
 public class ZeeCupboardLabeler {
 
+    public static final int CABIN_LEVEL_UNKOWN = -1;
+    public static final int CABIN_LEVEL_CELLAR = 0;
+    public static final int CABIN_LEVEL_ENTRANCE = 1;
+    public static Gob lastCupboardClicked;
     static Window win;
     static String winTitle = "Cupboard labeler";
     static HashMap<String,List<Interior>> mapHouseInteriors = new HashMap<>();
     static String lastHouseId = "";
-    static int cabinLevel = -1;
+    static Interior lastInterior = null;
+    static int lastCabinLevel = CABIN_LEVEL_UNKOWN;
 
     static String generateHouseId(Gob house){
         List<String> mats = getHouseMatsBasenames(house);
@@ -23,8 +28,8 @@ public class ZeeCupboardLabeler {
             return"";
         }
         String houseId = house.getres().basename() + "@" + ZeeConfig.getPlayerLocationName()+"+";
-        for (int i = 0; i < mats.size(); i++) {
-            if (i!=0)
+        for (int i = CABIN_LEVEL_CELLAR; i < mats.size(); i++) {
+            if (i!= CABIN_LEVEL_CELLAR)
                 houseId += ",";
             houseId += mats.get(i);
         }
@@ -58,11 +63,11 @@ public class ZeeCupboardLabeler {
                 ZeeConfig.gameUI.sz.div(2)
         );
 
-        wdg = win.add(new Label(lastHouseId),0,0);
+        wdg = win.add(new Label(lastHouseId), CABIN_LEVEL_CELLAR, CABIN_LEVEL_CELLAR);
 
-        wdg = win.add(new Label(getInteriorId()), ZeeWindow.posBelow(wdg,0,3));
+        wdg = win.add(new Label(generateInteriorId()), ZeeWindow.posBelow(wdg, CABIN_LEVEL_CELLAR,3));
 
-        wdg = win.add(new Label("Interiors: "+mapHouseInteriors.size()), ZeeWindow.posBelow(wdg,0,3));
+        wdg = win.add(new Label("Interiors: "+mapHouseInteriors.size()), ZeeWindow.posBelow(wdg, CABIN_LEVEL_CELLAR,3));
 
         wdg = win.add(new Button(60,"delete"){
             public void wdgmsg(String msg, Object... args) {
@@ -73,7 +78,7 @@ public class ZeeCupboardLabeler {
                     }
                 }
             }
-        },ZeeWindow.posBelow(wdg,0,3));
+        },ZeeWindow.posBelow(wdg, CABIN_LEVEL_CELLAR,3));
 
         win.pack();
     }
@@ -82,7 +87,9 @@ public class ZeeCupboardLabeler {
         //println("reset cupboard lblr");
         isActive = false;
         lastHouseId = "";
-        cabinLevel = -1;
+        lastInterior = null;
+        lastCupboardClicked = null;
+        lastCabinLevel = CABIN_LEVEL_UNKOWN;
         if (win!=null)
             win.reqdestroy();
         win = null;
@@ -135,10 +142,10 @@ public class ZeeCupboardLabeler {
         if(g!=null && ZeeManagerGobClick.isGobHouse(houseName) && !houseName.endsWith("windmill") && !houseName.endsWith("stonetower")){
             //TODO cabin levels for windmill, stonetower
             lastHouseId = generateHouseId(g);
-            cabinLevel = 1;
+            lastCabinLevel = 1;
         }else{
             lastHouseId = "";
-            cabinLevel = -1;
+            lastCabinLevel = CABIN_LEVEL_UNKOWN;
         }
     }
 
@@ -148,9 +155,7 @@ public class ZeeCupboardLabeler {
         // player inside building
         if (ZeeConfig.playerLocation==ZeeConfig.LOCATION_CABIN || ZeeConfig.playerLocation==ZeeConfig.LOCATION_CELLAR) {
             if (!lastHouseId.isBlank()) {
-                generateInteriorId();
-                //println(lastHouseId);
-                //println("    " + getInteriorId());
+                initHouseInterior();
                 showWindow();
             }else{
                 reset();
@@ -162,28 +167,52 @@ public class ZeeCupboardLabeler {
         }
     }
 
-    private static String getInteriorId(){
-        if (cabinLevel == -1){
+    private static String generateInteriorId(){
+        if (lastCabinLevel == CABIN_LEVEL_UNKOWN){
             return "";
         }
         String loc = ZeeConfig.getPlayerLocationName();
         if (ZeeConfig.playerLocation==ZeeConfig.LOCATION_CELLAR) {
             return loc;
         }
-        return loc + cabinLevel;
+        return loc + lastCabinLevel;
     }
 
-    private static void generateInteriorId() {
-        String loc = ZeeConfig.getPlayerLocationName();
+    private static void initHouseInterior() {
         if (ZeeConfig.playerLocation==ZeeConfig.LOCATION_CELLAR) {
-            cabinLevel = 0;
+            lastCabinLevel = CABIN_LEVEL_CELLAR;
+        } else if (!ZeeConfig.findGobsByNameEndsWith("-door").isEmpty()) {
+            lastCabinLevel = CABIN_LEVEL_ENTRANCE;
+        } else{
+            lastCabinLevel++;
         }
-        if (!ZeeConfig.findGobsByNameEndsWith("-door").isEmpty()) {
-            cabinLevel = 1;
-        }else{
-            cabinLevel++;
+        Interior interior = getCurrentInterior();
+        if (interior==null){
+            println("interior not found");
+            return;
         }
+        lastInterior = interior;
     }
+
+    private static Interior getCurrentInterior() {
+        String intId = generateInteriorId();
+        if (intId.isBlank()){
+            println("int id is blank");
+            return null;
+        }
+        List<Interior> interiors = mapHouseInteriors.get(lastHouseId);
+        if (interiors==null){
+            println("interiors list is empty");
+            return null;
+        }
+        for (Interior interior : interiors) {
+            if (interior.id.contentEquals(intId)){
+                return interior;
+            }
+        }
+        return null;
+    }
+
 
     static void debug(String msg){
         println("ZeeInteriorTracker > "+msg);
@@ -207,35 +236,61 @@ public class ZeeCupboardLabeler {
         }
     }
 
+    public static void checkCupboardContents(Window window) {
+        if (window==null){
+            println("cupboard window null");
+            return;
+        }
+        Inventory inv = window.getchild(Inventory.class);
+        if (inv==null){
+            println("cupboard inventory null");
+            return;
+        }
+        HashMap<String, Integer> map = inv.getMapItemNameCount();
+        println(map.toString());
+    }
+
     private static class Interior {
 
         // ex: "cellar" "cabin+door" "cabin+stairs" //TODO: Great Hall, Tower
         String id;
+        Gob gobRef;
         List<Cupboard> cups;
 
         public Interior(){
-            String loc = ZeeConfig.getPlayerLocationName();
-            id = loc;
+
+            id = generateInteriorId();
             cups = new ArrayList<>();
-            List<Gob> gobs = ZeeConfig.findGobsByNameEndsWith("-door","cellarstairs","upstairs","downstairs");
-            for (Gob g : gobs) {
-                String basename = g.getres().basename();
-                if (basename.endsWith("-door")){
-                    id += "0";
-                }
+
+            if (lastCabinLevel==CABIN_LEVEL_CELLAR)
+                gobRef = ZeeConfig.getClosestGobByNameEnds("/cellarstairs");
+            else if (lastCabinLevel==CABIN_LEVEL_ENTRANCE)
+                gobRef = ZeeConfig.getClosestGobByNameEnds("-door");
+            else
+                gobRef = ZeeConfig.getClosestGobByNameEnds("downstairs");
+
+            if (gobRef==null){
+                println("new Interior has no gobRef");
             }
-            List<Gob> cupboards = ZeeConfig.findGobsByNameEndsWith("/cupboard");
-            for (Gob g : cupboards) {
-                cups.add(new Cupboard(ZeeConfig.distanceToPlayer(g)));
-            }
+//            else {
+//                List<Gob> cupboards = ZeeConfig.findGobsByNameEndsWith("/cupboard");
+//                for (Gob cupb : cupboards) {
+//                    Float dist = ZeeConfig.distanceBetweenGobs(cupb, gobRef);
+//                    if (dist==null){
+//                        println("gobRef distance null");
+//                        break;
+//                    }
+//                    cups.add(new Cupboard(dist));
+//                }
+//            }
         }
 
         private class Cupboard {
-            double distToPlayer;
+            double distToGobRef;
             String mostCommonItemBasename;
 
-            public Cupboard(double distanceToPlayer) {
-                distToPlayer = distanceToPlayer;
+            public Cupboard(double distRef) {
+                distToGobRef = distRef;
                 mostCommonItemBasename = "?";
             }
         }

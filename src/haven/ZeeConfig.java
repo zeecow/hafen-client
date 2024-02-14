@@ -1161,8 +1161,12 @@ public class ZeeConfig {
             return;
         }
 
+        //cupboard
+        if (ZeeCupboardLabeler.isActive && windowTitle.contentEquals("Cupboard")){
+            ZeeCupboardLabeler.checkCupboardContents(window);
+        }
         //cheesetray
-        if(windowTitle.contentEquals("Rack")) {
+        else if(windowTitle.contentEquals("Rack")) {
             ZeeManagerItemClick.checkCheeseTray(window);
         }
         //belt
