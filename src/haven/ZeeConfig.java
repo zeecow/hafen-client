@@ -2234,7 +2234,7 @@ public class ZeeConfig {
         }
         //add ladder radius
         else {
-            ladder.addol(new Gob.Overlay(ladder, new ZeeGobRadius(ladder, null, ZeeGobRadius.RADIUS_MINE_LADDER_SUPPORT,new Color(139, 139, 185, 48)), -1));
+            ladder.addol(new Gob.Overlay(ladder, new ZeeGobRadius(ladder, null, ZeeGobRadius.RADIUS_MINE_LADDER_SUPPORT,new Color(139, 139, 185, 48))));
         }
     }
 
@@ -2255,7 +2255,7 @@ public class ZeeConfig {
             if (radius!=null)
                 radius.remove();
         }else{
-            skep.addol(new Gob.Overlay(skep, new ZeeGobRadius(skep, null, ZeeGobRadius.RADIUS_BEESKEP,new Color(139, 139, 185, 48)), -1));
+            skep.addol(new Gob.Overlay(skep, new ZeeGobRadius(skep, null, ZeeGobRadius.RADIUS_BEESKEP,new Color(139, 139, 185, 48))));
         }
     }
 
@@ -2275,7 +2275,7 @@ public class ZeeConfig {
             if (radius!=null)
                 radius.remove();
         }else{
-            trough.addol(new Gob.Overlay(trough, new ZeeGobRadius(trough, null, ZeeGobRadius.RADIUS_FOOD_THROUGH,new Color(139, 139, 185, 48)), -1));
+            trough.addol(new Gob.Overlay(trough, new ZeeGobRadius(trough, null, ZeeGobRadius.RADIUS_FOOD_THROUGH,new Color(139, 139, 185, 48))));
         }
     }
 
@@ -3877,12 +3877,12 @@ public class ZeeConfig {
         // aggro categ radius
         if( mapCategoryGobs.get(CATEG_AGROCREATURES).contains(gob.getres().name) && !ZeeManagerGobClick.isGobDeadOrKO(gob)) {
             if (ZeeConfig.aggroRadiusTiles > 0) {
-                gob.addol(new Gob.Overlay(gob, new ZeeGobRadius(gob, null, ZeeConfig.aggroRadiusTiles * MCache.tilesz2.y), ZeeManagerGobClick.OVERLAY_ID_AGGRO));
+                gob.addol(new Gob.Overlay(gob, new ZeeGobRadius(gob, null, ZeeConfig.aggroRadiusTiles * MCache.tilesz2.y)));
             }
         }
         //looserock radius 7
         else if(gob.getres().name.contentEquals("gfx/terobjs/looserock")){
-            gob.addol(new Gob.Overlay(gob, new ZeeGobRadius(gob, null, 7 * MCache.tilesz2.y), ZeeManagerGobClick.OVERLAY_ID_AGGRO));
+            gob.addol(new Gob.Overlay(gob, new ZeeGobRadius(gob, null, 7 * MCache.tilesz2.y)));
         }
     }
 
@@ -4719,11 +4719,11 @@ public class ZeeConfig {
         for (Tabs.TabButton tabButton : gameUI.chrwdg.children(Tabs.TabButton.class)) {
             // current quests button
             if (tabButton.text.text.contentEquals("Current")){
-                tabButton.change("Current "+gameUI.chrwdg.cqst.quests.size());
+                tabButton.change("Current "+gameUI.chrwdg.quest.cqst.quests.size());
             }
             // completed quests button
             else if (tabButton.text.text.contentEquals("Completed")){
-                tabButton.change("Completed "+gameUI.chrwdg.dqst.quests.size());
+                tabButton.change("Completed "+gameUI.chrwdg.quest.dqst.quests.size());
             }
         }
     }

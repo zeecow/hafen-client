@@ -1866,7 +1866,7 @@ public class ZeeManagerGobClick extends ZeeThread{
             //add all aggro radius
             ZeeConfig.findGobsByNameStartsWith("gfx/kritter/").forEach(gob1 -> {
                 if (ZeeConfig.isAggressive(gob1.getres().name)) {
-                    gob1.addol(new Gob.Overlay(gob1, new ZeeGobRadius(gob1, null, ZeeConfig.aggroRadiusTiles * MCache.tilesz2.y), ZeeManagerGobClick.OVERLAY_ID_AGGRO));
+                    gob1.addol(new Gob.Overlay(gob1, new ZeeGobRadius(gob1, null, ZeeConfig.aggroRadiusTiles * MCache.tilesz2.y)));
                 }
             });
         }
@@ -4072,8 +4072,8 @@ public class ZeeManagerGobClick extends ZeeThread{
     public static List<String> getOverlayNames(Gob gob) {
         List<String> ret = new ArrayList<>();
         for (Gob.Overlay ol : gob.ols) {
-            if(ol.res != null)
-                ret.add(ol.res.get().name);
+            if(ol.spr.res != null)
+                ret.add(ol.spr.res.name);
         }
         return ret;
     }

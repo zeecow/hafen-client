@@ -724,7 +724,7 @@ public class Widget {
 			}
 
 			// credo "Abandon ..." buttons
-			else if (this instanceof CharWnd.Quest.DefaultBox && msg.contentEquals("opt")){
+			else if (this instanceof QuestWnd.Quest.DefaultBox && msg.contentEquals("opt")){
 				if (args!=null && List.of("rm","credoq").contains((String)args[0]))
 					blockAction = true;
 			}

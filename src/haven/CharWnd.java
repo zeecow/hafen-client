@@ -26,14 +26,12 @@
 
 package haven;
 
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.image.BufferedImage;
-import java.util.*;
-import java.util.function.*;
-import haven.resutil.FoodInfo;
-import haven.resutil.Curiosity;
-import static haven.PUtils.*;
+import java.awt.*;
+import java.util.function.Function;
+import java.util.function.Supplier;
+
+import static haven.PUtils.BlurFurn;
+import static haven.PUtils.TexFurn;
 
 public class CharWnd extends Window {
     public static final RichText.Foundry ifnd = new RichText.Foundry(Resource.remote(), java.awt.font.TextAttribute.FAMILY, "SansSerif", java.awt.font.TextAttribute.SIZE, UI.scale(9)).aa(true);
@@ -261,12 +259,12 @@ public class CharWnd extends Window {
     }
 
 	public Glob.CAttr findattr(String name) {
-		for (SAttr skill : this.skill) {
+		for (SAttrWnd.SAttr skill : sattr.attrs) {
 			if(name.equals(skill.attr.nm)) {
 				return skill.attr;
 			}
 		}
-		for (Attr stat : base) {
+		for (BAttrWnd.Attr stat : battr.attrs) {
 			if(name.equals(stat.attr.nm)) {
 				return stat.attr;
 			}
