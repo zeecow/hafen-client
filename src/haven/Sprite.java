@@ -47,7 +47,7 @@ public abstract class Sprite implements RenderTree.Node {
 
     public interface Owner extends OwnerContext {
 	public Random mkrandoom();
-	public Resource getres();
+	@Deprecated public Resource getres();
     }
 
     public class RecOwner implements Owner {
@@ -84,6 +84,10 @@ public abstract class Sprite implements RenderTree.Node {
     @Resource.PublishedCode(name = "spr", instancer = FactMaker.class)
     public interface Factory {
 	public Sprite create(Owner owner, Resource res, Message sdt);
+    }
+
+    public interface Mill<S extends Sprite> {
+	public S create(Owner owner);
     }
 
     public static class ResourceException extends RuntimeException {
