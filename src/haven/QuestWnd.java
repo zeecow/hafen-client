@@ -627,7 +627,7 @@ public class QuestWnd extends Widget {
     public QuestWnd() {
 	Widget prev;
 
-	prev = add(CharWnd.settip(new Img(catf.render("Quest Log").tex()), "gfx/hud/chr/tips/quests"), new Coord(0, 0));
+	prev = add(CharWnd.settip(new Img(attrf.render("Quest Log").tex()), "gfx/hud/chr/tips/quests"), new Coord(0, 0));
 	questbox = add(new Widget(new Coord(attrw, height)) {
 		public void draw(GOut g) {
 		    g.chcolor(0, 0, 0, 128);

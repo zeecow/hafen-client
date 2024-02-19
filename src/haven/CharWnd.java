@@ -45,7 +45,7 @@ public class CharWnd extends Window {
     public static final Color tbuff = new Color(128, 128, 255);
     public static final Color every = new Color(255, 255, 255, 16), other = new Color(255, 255, 255, 32);
     public static final int width = UI.scale(255);
-    public static final int height = UI.scale(260);
+    public static final int height = UI.scale(230);
     public final BAttrWnd battr;
     public final SAttrWnd sattr;
     public final SkillWnd skill;
