@@ -4418,7 +4418,8 @@ public class ZeeManagerGobClick extends ZeeThread{
         ZeeMidiRadio.toggleRadio();
 
         // cupboard labeler
-        ZeeCupboardLabeler.checkInterior();
+        if (ZeeCupboardLabeler.isActive)
+            ZeeCupboardLabeler.checkInterior();
     }
 
     private static void restoreSavedBrightness() {

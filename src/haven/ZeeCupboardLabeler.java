@@ -55,6 +55,8 @@ public class ZeeCupboardLabeler {
                 new Window(Coord.of(120,70), winTitle){
                     public void wdgmsg(String msg, Object... args) {
                         if (msg.contentEquals("close")){
+                            if (lastInterior!=null)
+                                lastInterior.removeCupLabels();
                             reset();
                             this.reqdestroy();
                         }
@@ -150,8 +152,6 @@ public class ZeeCupboardLabeler {
     }
 
     public static void checkInterior() {
-        if (!isActive)
-            return;
         // player inside building
         if (ZeeConfig.playerLocation==ZeeConfig.LOCATION_CABIN || ZeeConfig.playerLocation==ZeeConfig.LOCATION_CELLAR) {
             if (!lastHouseId.isBlank()) {
@@ -192,6 +192,7 @@ public class ZeeCupboardLabeler {
             return;
         }
         lastInterior = interior;
+        lastInterior.toggleCupboardLabels();
     }
 
     private static Interior getCurrentInterior() {
@@ -200,17 +201,25 @@ public class ZeeCupboardLabeler {
             println("int id is blank");
             return null;
         }
+
+        // generate interiors list
         List<Interior> interiors = mapHouseInteriors.get(lastHouseId);
         if (interiors==null){
-            println("interiors list is empty");
-            return null;
+            interiors = new ArrayList<>();
+            mapHouseInteriors.put(lastHouseId,interiors);
         }
+
+        // found interior
         for (Interior interior : interiors) {
             if (interior.id.contentEquals(intId)){
                 return interior;
             }
         }
-        return null;
+
+        // generate interior on demand
+        lastInterior = new Interior();
+        interiors.add(lastInterior);
+        return lastInterior;
     }
 
 
@@ -234,6 +243,8 @@ public class ZeeCupboardLabeler {
         }else{
             hideWindow();
         }
+        if (lastInterior!=null)
+            lastInterior.toggleCupboardLabels();
     }
 
     public static void checkCupboardContents(Window window) {
@@ -246,19 +257,29 @@ public class ZeeCupboardLabeler {
             println("cupboard inventory null");
             return;
         }
-        HashMap<String, Integer> map = inv.getMapItemNameCount();
-        println(map.toString());
+        new ZeeThread(){
+            public void run() {
+                try {
+                    sleep(333);
+                    HashMap<String, Integer> map = inv.getMapItemNameCount();
+                    //println(map.toString());
+                    if (lastInterior==null){
+                        lastInterior = getCurrentInterior();
+                    }
+                    lastInterior.updateCupboard(lastCupboardClicked,map);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }.start();
     }
 
     private static class Interior {
-
-        // ex: "cellar" "cabin+door" "cabin+stairs" //TODO: Great Hall, Tower
         String id;
         Gob gobRef;
         List<Cupboard> cups;
 
         public Interior(){
-
             id = generateInteriorId();
             cups = new ArrayList<>();
 
@@ -272,26 +293,82 @@ public class ZeeCupboardLabeler {
             if (gobRef==null){
                 println("new Interior has no gobRef");
             }
-//            else {
-//                List<Gob> cupboards = ZeeConfig.findGobsByNameEndsWith("/cupboard");
-//                for (Gob cupb : cupboards) {
-//                    Float dist = ZeeConfig.distanceBetweenGobs(cupb, gobRef);
-//                    if (dist==null){
-//                        println("gobRef distance null");
-//                        break;
-//                    }
-//                    cups.add(new Cupboard(dist));
-//                }
-//            }
+        }
+
+        public Cupboard getCupboard(double distCupToRef){
+            for (Cupboard cup : cups) {
+                if (cup.distToGobRef == distCupToRef)
+                    return cup;
+            }
+            return null;
+        }
+
+        void removeCupLabels(){
+            List<Gob> cupGobs = ZeeConfig.findGobsByNameEndsWith("/cupboard");
+            ZeeConfig.removeGobText(gobRef);
+            ZeeConfig.removeGobText((ArrayList<Gob>) cupGobs);
+        }
+
+        void addCupLabels(){
+            ZeeConfig.addGobText(gobRef,"ref");
+            List<Gob> cupGobs = ZeeConfig.findGobsByNameEndsWith("/cupboard");
+            for (Gob cupGob : cupGobs) {
+                Float dist = ZeeConfig.distanceBetweenGobs(cupGob, this.gobRef);
+                if (dist == null) {
+                    println("labelCupboard > cupboard dist null");
+                    continue;
+                }
+                for (Cupboard cup : this.cups) {
+                    if (dist == cup.distToGobRef) {
+                        ZeeConfig.addGobText(cupGob, cup.mostCommonItemBasename);
+                    }
+                }
+            }
+        }
+
+        void toggleCupboardLabels() {
+            if (!isActive){
+                this.removeCupLabels();
+            } else {
+                this.addCupLabels();
+            }
+        }
+
+        void updateCupboard(Gob gobCup, HashMap<String, Integer> mapItemNameCount) {
+            // find most common item
+            String mostCommonItem = mapItemNameCount.entrySet().iterator().next().getKey();
+            for (Map.Entry<String, Integer> entry : mapItemNameCount.entrySet()) {
+                int countItems = mapItemNameCount.get(mostCommonItem);
+                if (countItems < entry.getValue()){
+                    mostCommonItem = entry.getKey();
+                }
+            }
+
+            // update cupboard and label gob
+            Float dist = ZeeConfig.distanceBetweenGobs(gobCup, this.gobRef);
+            if (dist==null){
+                println("updateCupboard > dist not found");
+                ZeeConfig.addGobText(gobCup,"noDist?");
+            } else {
+                Cupboard cupboard = this.getCupboard(dist);
+                if (cupboard==null){
+                    println("updateCupboard > new cupboard > "+mostCommonItem);
+                    cupboard = new Cupboard(dist,mostCommonItem);
+                    this.cups.add(cupboard);
+                } else {
+                    cupboard.mostCommonItemBasename = mostCommonItem;
+                }
+                ZeeConfig.addGobText(gobCup, mostCommonItem);
+            }
         }
 
         private class Cupboard {
             double distToGobRef;
             String mostCommonItemBasename;
 
-            public Cupboard(double distRef) {
-                distToGobRef = distRef;
-                mostCommonItemBasename = "?";
+            public Cupboard(double distRef, String itemName) {
+                this.distToGobRef = distRef;
+                this.mostCommonItemBasename = itemName;
             }
         }
     }

@@ -253,7 +253,7 @@ public class Inventory extends Widget implements DTarget {
 		for (Widget wdg = child; wdg != null; wdg = wdg.next) {
 			if (wdg instanceof WItem) {
 				gItem = ((WItem) wdg).item;
-				String wdgname = gItem.res.get().name;
+				String wdgname = gItem.res.get().basename();
 				Integer count = map.get(wdgname);
 				if (count==null)
 					count = 1;
