@@ -20,7 +20,10 @@ public class GrowingPlant implements Sprite.Factory {
     }
 
     public GrowingPlant(Resource res, Object[] args) {
-	this.num = (((Number)args[0]).intValue());
+	if (ZeeConfig.simpleCrops)
+		this.num = 1;
+	else
+		this.num = (((Number)args[0]).intValue());
 	ArrayList<ArrayList<RenderTree.Node>> var = new ArrayList<>();
 	for(FastMesh.MeshRes mr : res.layers(FastMesh.MeshRes.class)) {
 	    int st = mr.id / 10;
