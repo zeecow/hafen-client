@@ -26,13 +26,14 @@
 
 package haven;
 
-import haven.ItemInfo.AttrCache;
-
-import java.awt.*;
+import java.util.*;
+import java.util.function.*;
+import haven.render.*;
+import java.awt.Color;
+import java.awt.Graphics;
 import java.awt.image.BufferedImage;
-import java.util.ArrayList;
-import java.util.List;
-
+import haven.ItemInfo.AttrCache;
+import static haven.ItemInfo.find;
 import static haven.Inventory.sqsz;
 
 public class WItem extends Widget implements DTarget {
@@ -122,26 +123,23 @@ public class WItem extends Widget implements DTarget {
     }
 
     private List<ItemInfo> info() {return(item.info());}
-    public final AttrCache<Color> olcol = new AttrCache<>(this::info, info -> {
-	    ArrayList<GItem.ColorInfo> ols = new ArrayList<>();
+    public final AttrCache<Pipe.Op> rstate = new AttrCache<>(this::info, info -> {
+	    ArrayList<GItem.RStateInfo> ols = new ArrayList<>();
 	    for(ItemInfo inf : info) {
-		if(inf instanceof GItem.ColorInfo)
-		    ols.add((GItem.ColorInfo)inf);
+		if(inf instanceof GItem.RStateInfo)
+		    ols.add((GItem.RStateInfo)inf);
 	    }
 	    if(ols.size() == 0)
 		return(() -> null);
-	    if(ols.size() == 1)
-		return(ols.get(0)::olcol);
-	    ols.trimToSize();
-	    return(() -> {
-		    Color ret = null;
-		    for(GItem.ColorInfo ci : ols) {
-			Color c = ci.olcol();
-			if(c != null)
-			    ret = (ret == null) ? c : Utils.preblend(ret, c);
-		    }
-		    return(ret);
-		});
+	    if(ols.size() == 1) {
+		Pipe.Op op = ols.get(0).rstate();
+		return(() -> op);
+	    }
+	    Pipe.Op[] ops = new Pipe.Op[ols.size()];
+	    for(int i = 0; i < ops.length; i++)
+		ops[i] = ols.get(0).rstate();
+	    Pipe.Op cmp = Pipe.Op.compose(ops);
+	    return(() -> cmp);
 	});
     public final AttrCache<GItem.InfoOverlay<?>[]> itemols = new AttrCache<>(this::info, info -> {
 	    ArrayList<GItem.InfoOverlay<?>> buf = new ArrayList<>();
@@ -183,8 +181,8 @@ public class WItem extends Widget implements DTarget {
 	if(spr != null) {
 	    Coord sz = spr.sz();
 	    g.defstate();
-	    if(olcol.get() != null)
-		g.usestate(new ColorMask(olcol.get()));
+	    if(rstate.get() != null)
+		g.usestate(rstate.get());
 	    drawmain(g, spr);
 	    g.defstate();
 	    GItem.InfoOverlay<?>[] ols = itemols.get();
@@ -276,10 +274,6 @@ public class WItem extends Widget implements DTarget {
 	return(true);
     }
 
-	public Coord getInvSlotCoord() {
-		return c.div(33);
-	}
-
 	public boolean mousehover(Coord c, boolean on) {
 		boolean ret = super.mousehover(c, on);
 		if(on && (item.contents != null)) {
@@ -287,5 +281,9 @@ public class WItem extends Widget implements DTarget {
 			return(true);
 		}
 		return(ret);
+	}
+
+	public Coord getInvSlotCoord() {
+		return c.div(33);
 	}
 }

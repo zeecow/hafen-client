@@ -43,6 +43,13 @@ public class SAttrWnd extends Widget {
     private CharWnd chr;
     private int scost;
 
+    @RName("sattr")
+    public static class $_ implements Factory {
+	public Widget create(UI ui, Object[] args) {
+	    return(new SAttrWnd(ui.sess.glob));
+	}
+    }
+
     public class SAttr extends Widget {
 	public final String nm;
 	public final Text rnm;
@@ -237,7 +244,6 @@ public class SAttrWnd extends Widget {
 	pack();
     }
 
-    public static final Collection<String> children = Arrays.asList("study");
     public void addchild(Widget child, Object... args) {
 	String place = (args[0] instanceof String) ? (((String)args[0]).intern()) : null;
 	if(place == "study") {
@@ -250,6 +256,4 @@ public class SAttrWnd extends Widget {
 	    super.addchild(child, args);
 	}
     }
-
-    public static final Collection<String> msgs = Arrays.asList();
 }

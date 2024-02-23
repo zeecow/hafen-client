@@ -26,17 +26,52 @@
 
 package haven;
 
-public class AWidget extends Widget {
-    public AWidget() {
-	super(Coord.z);
-	hide();
+import java.awt.Graphics;
+import java.awt.image.BufferedImage;
+
+public class AnimGSprite extends GSprite implements GSprite.ImageSprite {
+    public final Resource.Anim anim;
+    public final Resource.Image ref;
+    private int f, ft;
+
+    public static final Factory fact = new Factory() {
+	    public GSprite create(Owner owner, Resource res, Message sdt) {
+		Resource.Anim anim = res.layer(Resource.animc);
+		if(anim != null)
+		    return(new AnimGSprite(owner, anim));
+		return(null);
+	    }
+	};
+
+    public AnimGSprite(Owner owner, Resource.Anim anim) {
+	super(owner);
+	this.anim = anim;
+	this.ref = anim.f[0][0];
     }
 
-    public void addchild(Widget child, Object... args) {
-	if((args.length > 0) && (args[0] == null)) {
-	    add(child);
-	} else {
-	    new UI.UIWarning("unknown abstract widget child " + child + " added to " + this, null, args).issue();
+    public void draw(GOut g) {
+	for(Resource.Image img : anim.f[f])
+	    g.image(img, Coord.z);
+    }
+
+    public Coord sz() {
+	return(ref.ssz);
+    }
+
+    public BufferedImage image() {
+	BufferedImage ret = TexI.mkbuf(ref.ssz);
+	Graphics g = ret.getGraphics();
+	for(Resource.Image img : anim.f[0])
+	    g.drawImage(img.scaled(), img.so.x, img.so.y, null);
+	g.dispose();
+	return(ret);
+    }
+
+    public void tick(double dt) {
+	ft += Math.round(dt * 1000);
+	while(ft > anim.d) {
+	    f = (f + 1) % anim.f.length;
+	    ft -= anim.d;
 	}
     }
 }
