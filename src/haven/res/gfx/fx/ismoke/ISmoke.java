@@ -16,7 +16,7 @@ import static haven.render.sl.Type.*;
 
 /* >spr: ISmoke */
 /* >rlink: ISmoke */
-@haven.FromResource(name = "gfx/fx/ismoke", version = 107)
+@haven.FromResource(name = "gfx/fx/ismoke", version = 108)
 public class ISmoke extends Sprite implements Rendered, Sprite.CDel, TickList.TickNode, TickList.Ticking {
     static final double agestep = 0.1, maxstep = 0.25;
     static final VertexArray.Layout fmt =
@@ -35,6 +35,16 @@ public class ISmoke extends Sprite implements Rendered, Sprite.CDel, TickList.Ti
     final Gob gob = (owner instanceof Gob) ? (Gob)owner : owner.context(Gob.class);
     boolean spawn = !ZeeConfig.hideFxSmoke;
 
+    public static Resource ctxres(Owner owner) {
+	Gob gob = owner.context(Gob.class);
+	if(gob == null)
+	    throw(new RuntimeException("no context resource for owner " + owner));
+	Drawable d = gob.getattr(Drawable.class);
+	if(d == null)
+	    throw(new RuntimeException("no drawable on object " +gob));
+	return(d.getres());
+    }
+
     public ISmoke(Owner owner, Resource res, Message sdt) {
 	super(owner, res);
 	mat = res.layer(Material.Res.class, sdt.uint8()).get();
@@ -43,7 +53,7 @@ public class ISmoke extends Sprite implements Rendered, Sprite.CDel, TickList.Ti
 	if(locn.equals(""))
 	    loc = null;
 	else
-	    loc = owner.getres().layer(Skeleton.BoneOffset.class, locn).from(null).get();
+	    loc = ctxres(owner).layer(Skeleton.BoneOffset.class, locn).from(null).get();
 	col = Utils.col16(sdt.uint16());
 	den = sdt.uint8();
 	fadepow = sdt.uint8() / 10.0f;
@@ -65,7 +75,7 @@ public class ISmoke extends Sprite implements Rendered, Sprite.CDel, TickList.Ti
 	if(locn.equals(""))
 	    loc = null;
 	else
-	    loc = owner.getres().layer(Skeleton.BoneOffset.class, locn).from(null).get();
+	    loc = res.layer(Skeleton.BoneOffset.class, locn).from(null).get();
 	col = (Color)args[a++];
 	den = ((Number)args[a++]).floatValue();
 	fadepow = ((Number)args[a++]).floatValue();
