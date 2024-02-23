@@ -189,6 +189,7 @@ public class Glob {
 	    stimefac = (stimefac * (1 - f)) + (utimefac * f);
 	}
 	this.sgtime = sgtime;
+	ZeeTimer.checkServerMsg((long) (1000 * sgtime));
     }
 
     public String gtimestats() {

@@ -2017,6 +2017,8 @@ public class ZeeManagerGobClick extends ZeeThread{
             ZeeSess.charSwitchCreateWindow();
         else if(petalName.contentEquals(ZeeFlowerMenu.STRPETAL_TESTCOORDS))
             windowTestCoords();
+        else if(petalName.contentEquals("Timers"))
+            ZeeTimer.showWindow();
         else if(petalName.contentEquals(ZeeFlowerMenu.STRPETAL_CLEARGOBTEXTS))
             clearAllGobsTexts();
         else if (petalName.contentEquals(ZeeFlowerMenu.STRPETAL_AUTOBUTCH_BIGDEADANIMAL)){
@@ -2441,6 +2443,7 @@ public class ZeeManagerGobClick extends ZeeThread{
             opts.add(ZeeFlowerMenu.STRPETAL_SWITCHCHAR);
             opts.add(ZeeFlowerMenu.STRPETAL_CLEARGOBTEXTS);
             //opts.add(ZeeFlowerMenu.STRPETAL_TESTCOORDS);
+            opts.add("Timers");
             if (ZeeConfig.isCaveTile(ZeeConfig.getPlayerTileName()))
                 opts.add(ZeeFlowerMenu.STRPETAL_TILEMONITOR);
             menu = new ZeeFlowerMenu(gob, opts.toArray(String[]::new));
