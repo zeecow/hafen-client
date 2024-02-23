@@ -12,18 +12,20 @@ public class ZeeTimer {
     private static long server;
     private static long local;
 
-    private static List<Timer> listTimers = initPrefs();
+    private static List<Timer> listTimers;// = initPrefs();
 
     // start  =  server + SERVER_RATIO * (now - local)
     // finish date  =  duration + local - (server - start) / SERVER_RATIO
     // remaining  =  duration - now + local - (server - start) / SERVER_RATIO
 
 
-    public static void checkServerMsg(long time) {
-        server = time;
+    public static void checkServerMsg(long newTime) {
+        long elapsedServer = (long) ((newTime - server) / SERVER_RATIO);
+        long elapsedLocal = ZeeThread.now() - local;
+        server = newTime;
         local = ZeeThread.now();
-        println("server "+time+" , local "+local);
-        checkTimers();
+        //println("elapsed  server = "+elapsedServer+" , local = "+elapsedLocal);
+        //checkTimers();
     }
 
     private static void checkTimers() {
