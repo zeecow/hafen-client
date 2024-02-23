@@ -105,7 +105,7 @@ public class ZeeHoverMenu {
 
 
     static boolean isButtonNotSubmenu(MenuGrid.PagButton button){
-        Resource.AButton ai = button.pag.act();
+        Resource.AButton ai = button.act();
         return (ai.ad.length != 0);
     }
 

@@ -189,9 +189,6 @@ public class ZeeManagerItemClick extends ZeeThread{
 
             win.pack();
         }
-        else{
-            println("checkClickAllItems > gob petal = "+petalName);
-        }
     }
 
     static boolean isFlowerMenuFromWItem() {

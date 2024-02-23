@@ -26,11 +26,12 @@
 
 package haven;
 
-import java.util.*;
-import haven.render.*;
-import java.awt.Color;
-import java.awt.Graphics;
+import haven.render.Pipe;
+
+import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.util.List;
+import java.util.*;
 
 public class GItem extends AWidget implements ItemInfo.SpriteOwner, GSprite.Owner {
     public Indir<Resource> res;

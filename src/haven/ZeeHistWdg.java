@@ -50,7 +50,8 @@ public class ZeeHistWdg extends Widget{
         for (int i = 0; i < maxHist; i++) {
             g.image(MenuGrid.bg,c);
             if ( i < arrBtns.size()) {
-                g.image(arrBtns.get(i).img(), c);
+                //g.image(arrBtns.get(i).img(), c);
+                g.image(arrBtns.get(i).getres().flayer(Resource.Image.class), c);
             }
             c = c.add(MenuGrid.bgsz.x+ xpad,0);
         }

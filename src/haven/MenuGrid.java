@@ -26,15 +26,16 @@
 
 package haven;
 
-import java.util.*;
-import haven.render.*;
-import java.awt.Color;
-import java.awt.Font;
+import haven.ItemInfo.AttrCache;
+import haven.Resource.AButton;
+import haven.render.Pipe;
+
+import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.font.TextAttribute;
 import java.awt.image.BufferedImage;
-import haven.Resource.AButton;
-import haven.ItemInfo.AttrCache;
+import java.util.List;
+import java.util.*;
 
 public class MenuGrid extends Widget implements KeyBinding.Bindable {
     public final static Tex bg = Inventory.invsq;
@@ -392,7 +393,7 @@ public class MenuGrid extends Widget implements KeyBinding.Bindable {
 	}
     }
 
-    private boolean cons(Pagina p, Collection<PagButton> buf) {
+    boolean cons(Pagina p, Collection<PagButton> buf) {
 	Pagina[] cp = new Pagina[0];
 	Collection<Pagina> open, close = new HashSet<Pagina>();
 	synchronized(paginae) {

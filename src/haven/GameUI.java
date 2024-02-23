@@ -1997,7 +1997,7 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Message
 				g.image(invsq, beltc(i));//g.image(invsq, beltc(i).addy( -1 * (((numbelts-1)/2) * invsq.sz().y)) );
 				try {
 					if(belt[slot] != null) {
-						belt[slot].spr().draw( g.reclip(
+						belt[slot].draw( g.reclip(
 							c.add( UI.scale(1), UI.scale(1) ),
 							invsq.sz().sub( UI.scale(2), UI.scale(2) )
 						) );
