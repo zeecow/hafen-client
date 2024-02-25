@@ -37,21 +37,21 @@ public abstract class ACheckBox extends Widget {
     public Supplier<Boolean> state = () -> this.a;
     public ACheckBox state(Supplier<Boolean> state) {this.state = state; return(this);}
     public boolean state() {
-        return(state.get());
+	return(state.get());
     }
 
     public Consumer<Boolean> changed = a -> {
-        if(canactivate)
-            wdgmsg("ch", a ? 1 : 0);
+	if(canactivate)
+	    wdgmsg("ch", a ? 1 : 0);
     };
     public ACheckBox changed(Consumer<Boolean> changed) {this.changed = changed; return(this);}
     public void changed(boolean val) {changed.accept(val);}
 
     public Consumer<Boolean> set = a -> {
-        if(this.a != a) {
-            this.a = a;
-            changed(a);
-        }
+	if(this.a != a) {
+	    this.a = a;
+	    changed(a);
+	}
     };
     public ACheckBox set(Consumer<Boolean> set) {this.set = set; return(this);}
     public void set(boolean a) {set.accept(a);}
@@ -61,15 +61,15 @@ public abstract class ACheckBox extends Widget {
     public void click() {click.run();}
 
     public boolean gkeytype(java.awt.event.KeyEvent ev) {
-        click();
-        return(true);
+	click();
+	return(true);
     }
 
     public void uimsg(String msg, Object... args) {
-        if(msg == "ch") {
-            this.a = ((Integer)args[0]) != 0;
-        } else {
-            super.uimsg(msg, args);
-        }
+	if(msg == "ch") {
+	    this.a = Utils.bv(args[0]);
+	} else {
+	    super.uimsg(msg, args);
+	}
     }
 }

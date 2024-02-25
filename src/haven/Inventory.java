@@ -173,7 +173,7 @@ public class Inventory extends Widget implements DTarget {
 	    }
 	    this.sqmask = nmask;
 	} else if(msg == "mode") {
-	    dropul = (((Integer)args[0]) == 0);
+	    dropul = !Utils.bv(args[0]);
 	} else {
 	    super.uimsg(msg, args);
 	}
