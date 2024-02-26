@@ -4700,6 +4700,10 @@ public class ZeeConfig {
         // char stats for softcap calculation
         for (Indir<Resource> qm : ZeeConfig.makeWindow.qmod) {
             Glob.CAttr stat = ZeeConfig.gameUI.chrwdg.findattr(qm.get().basename());
+            if (stat==null){
+                println("updMakewindowStats > stat null");
+                return;
+            }
             ZeeConfig.makeWindow.qmodMapNameStat.put( qm.get().name, stat.comp );
         }
     }
