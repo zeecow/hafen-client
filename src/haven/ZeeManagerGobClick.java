@@ -2624,7 +2624,7 @@ public class ZeeManagerGobClick extends ZeeThread{
                                 int max = ZeeManagerGobClick.mapWincapMaxfuel.get(window.cap);
                                 for (VMeter vm : vmeter) {
                                     LayerMeter.Meter meter = vm.meters.get(0);
-                                    int fuelUnits = (int) Math.ceil(meter.a * max);
+                                    int fuelUnits = (int) Math.round(meter.a * max);
                                     lblText += fuelUnits + "/" + max;
                                 }
                                 ZeeConfig.addGobText(gobAutoLabel, lblText);
