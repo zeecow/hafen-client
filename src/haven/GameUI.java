@@ -1616,6 +1616,8 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Message
 
     public void msg(String msg, Color color, Audio.Clip sfx) {
 	msg(msg, color);
+	if(ZeeConfig.muteAudioMsg(msg))
+		return;
 	ui.sfxrl(sfx);
     }
 

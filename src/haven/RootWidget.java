@@ -141,6 +141,8 @@ public class RootWidget extends ConsoleHost implements UI.MessageWidget {
 
     public void msg(String msg, Color color, Audio.Clip sfx) {
 	msg(msg, color);
+	if(ZeeConfig.muteAudioMsg(msg))
+		return;
 	ui.sfxrl(sfx);
     }
 

@@ -4633,35 +4633,13 @@ public class ZeeConfig {
         return getTileResName(getPlayerTile());
     }
 
-    private static boolean backupBlockAudio;
-    private static String backupBlockAudioList = null;
-    public static void muteAudioMsg(String ... msgs) {
-        //backup settings for restoreMutedAudioMsg()
-        backupBlockAudio = blockAudioMsg;
-        backupBlockAudioList = blockAudioMsgList;
-
-        blockAudioMsg = true;
-        if(!blockAudioMsgList.endsWith(";")){
-            blockAudioMsgList += ";";
-        }
-        for (String m : msgs) {
-            blockAudioMsgList += m + ";";
-        }
-
-        //remove last ";"
-        blockAudioMsgList = blockAudioMsgList.replaceFirst(";$","");
-
-        println("[TEMP] "+blockAudioMsgList);
-    }
-    public static void restoreMutedAudioMsg() {
-        if (backupBlockAudioList==null){
-            println("restoreMutedAudioMsg > backup list missing (call muteAudioMsg first)");
-            return;
-        }
-        blockAudioMsg = backupBlockAudio;
-        blockAudioMsgList = backupBlockAudioList;
-        backupBlockAudioList = null;
-        println("[DEF] "+blockAudioMsgList);
+    public static boolean muteAudioMsg(String msg) {
+        if (ZeeConfig.blockAudioMsg && ZeeConfig.isMsgAudioMuted(msg))
+            return true;
+        if ( ZeeManagerStockpile.selAreaPile &&
+                (msg.contains("stockpile is already full") || msg.contains("site is occupied")) )
+            return true;
+        return false;
     }
 
 
