@@ -35,7 +35,6 @@ import java.awt.image.WritableRaster;
 import static haven.Inventory.invsq;
 
 public class GameUI extends ConsoleHost implements Console.Directory, UI.MessageWidget {
-    public static final Text.Foundry msgfoundry = RootWidget.msgfoundry;
     private static final int blpw = UI.scale(142), brpw = UI.scale(142);
     public final String chrid, genus;
     public final long plid;
@@ -203,15 +202,15 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Message
 	public boolean mousedown(Coord c, int button) {
 	    int slot = beltslot(c);
 	    if(slot != -1) {
-		if(button == 1)
-		    act(slot, new MenuGrid.Interaction(1, ui.modflags()));
-		if(button == 3) {
-			if (ui.modctrl)
-				GameUI.this.wdgmsg("setbelt", slot, null);
-			else
-				ZeeConfig.msgError("Ctrl + right click to confirm remove shortcut ");
-		}
-		return(true);
+			if(button == 1)
+				act(slot, new MenuGrid.Interaction(1, ui.modflags()));
+			if(button == 3) {
+				if (ui.modctrl)
+					GameUI.this.wdgmsg("setbelt", slot, null);
+				else
+					ZeeConfig.msgError("Ctrl + right click to confirm remove shortcut ");
+			}
+			return(true);
 	    }
 	    return(super.mousedown(c, button));
 	}
@@ -347,8 +346,8 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Message
 	}, bg.c);
     }
 
-    // used by Zeeconfig.searchInputMakeWnd
-    public MenuSearch toggleSearchWindow(){
+	// used by Zeeconfig.searchInputMakeWnd
+	public MenuSearch toggleSearchWindow(){
 		if(menu == null)
 			return null;
 		if(srchwnd == null) {
@@ -1236,11 +1235,11 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Message
     public void uimsg(String msg, Object... args) {
 	if(msg == "err") {
 	    String err = (String)args[0];
-	    error(err);
+	    ui.error(err);
 		ZeeConfig.checkUiErr(err);
 	} else if(msg == "msg") {
 	    String text = (String)args[0];
-	    msg(text);
+	    ui.msg(text);
 	} else if(msg == "prog") {
 	    if(args.length > 0) {
 		double p = Utils.dv(args[0]) / 100.0;
@@ -1342,7 +1341,7 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Message
 			    Resource lres = Resource.remote().load(res.name, res.ver).get();
 			    Resource.Tooltip tip = lres.layer(Resource.tooltip);
 			    if(tip != null)
-				msg(String.format("%s added to list of seen icons.", tip.t));
+				ui.msg(String.format("%s added to list of seen icons.", tip.t));
 			}, (Supplier<Object>)() -> null);
 		}
 	    } else if(args[1] instanceof Object[]) {
@@ -1606,7 +1605,7 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Message
     
     public void msg(String msg, Color color, Color logcol) {
 	msgtime = Utils.rtime();
-	lastmsg = msgfoundry.render(msg, color);
+	lastmsg = RootWidget.msgfoundry.render(msg, color);
 	syslog.append(msg, logcol);
 	ZeeConfig.checkUiMsg(msg);
     }
@@ -1615,47 +1614,15 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Message
 	msg(msg, color, color);
     }
 
-    private double lasterrsfx = 0;
+    public void msg(String msg, Color color, Audio.Clip sfx) {
+	msg(msg, color);
+	ui.sfxrl(sfx);
+    }
+
     public void error(String msg) {
-	msg(msg, new Color(192, 0, 0), new Color(255, 0, 0));
-	// block audio
-	if (ZeeConfig.blockAudioMsg && ZeeConfig.isMsgAudioMuted(msg))
-		return;
-	// temp mute stockpile msgs while area piler is working
-	if ( ZeeManagerStockpile.selAreaPile &&
-			(msg.contains("stockpile is already full") || msg.contains("site is occupied")) )
-		return;
-	double now = Utils.rtime();
-	if(now - lasterrsfx > 0.1) {
-	    ui.sfx(RootWidget.errsfx);
-	    lasterrsfx = now;
-	}
+	ui.error(msg);
     }
-
-    private double lastmsgsfx = 0;
-    public void msg(String msg) {
-	msg(msg, Color.WHITE, Color.WHITE);
-	//block audio
-	if (ZeeConfig.blockAudioMsg && ZeeConfig.isMsgAudioMuted(msg))
-		return;
-	double now = Utils.rtime();
-	if(now - lastmsgsfx > 0.1) {
-	    ui.sfx(RootWidget.msgsfx);
-	    lastmsgsfx = now;
-	}
-    }
-
-	public void msg(String msg, Resource sound, Color color) {
-		msg(msg,color);
-		if (ZeeConfig.blockAudioMsg && ZeeConfig.isMsgAudioMuted(msg))
-			return;
-		double now = Utils.rtime();
-		if(now - lastmsgsfx > 0.1) {
-			ui.sfx(sound);
-			lastmsgsfx = now;
-		}
-	}
-
+    
     public void act(String... args) {
 	wdgmsg("act", (Object[])args);
     }

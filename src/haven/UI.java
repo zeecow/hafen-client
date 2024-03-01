@@ -31,6 +31,7 @@ import java.awt.Font;
 import java.awt.GraphicsEnvironment;
 import java.awt.GraphicsDevice;
 import java.awt.DisplayMode;
+import java.awt.Color;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.InputEvent;
@@ -649,10 +650,9 @@ public class UI {
     public void uimsg(int id, String msg, Object... args) {
 	submitcmd(new Command(new UiMessage(id, msg, args)).dep(id, true));
     }
-	
+
     public static interface MessageWidget {
-	public void msg(String msg);
-	public void error(String msg);
+	public void msg(String msg, Color color, Audio.Clip sfx);
 
 	public static MessageWidget find(Widget w) {
 	    for(Widget ch = w.child; ch != null; ch = ch.next) {
@@ -666,16 +666,20 @@ public class UI {
 	}
     }
 
-    public void error(String msg) {
+    public void msg(String msg, Color color, Audio.Clip sfx) {
+	if(color == null)
+	    color = Color.WHITE;
 	MessageWidget h = MessageWidget.find(root);
 	if(h != null)
-	    h.error(msg);
+	    h.msg(msg, color, sfx);
+    }
+
+    public void error(String msg) {
+	msg(msg, new Color(192, 0, 0), errsfx);
     }
 
     public void msg(String msg) {
-	MessageWidget h = MessageWidget.find(root);
-	if(h != null)
-	    h.msg(msg);
+	msg(msg, Color.WHITE, msgsfx);
     }
 
     private void setmods(InputEvent ev) {
@@ -816,8 +820,25 @@ public class UI {
     public void sfx(Audio.CS clip) {
 	audio.aui.add(clip);
     }
+    public void sfx(Audio.Clip clip) {
+	sfx(clip.stream());
+    }
     public void sfx(Resource clip) {
 	sfx(Audio.fromres(clip));
+    }
+
+    public static final Audio.Clip errsfx = Audio.resclip(Resource.local().loadwait("sfx/error"));
+    public static final Audio.Clip msgsfx = Audio.resclip(Resource.local().loadwait("sfx/msg"));
+    public final Map<Audio.Clip, Double> lastmsgsfx = new HashMap<>();
+    public void sfxrl(Audio.Clip clip) {
+	if(clip != null) {
+	    double now = Utils.rtime();
+	    Double last = lastmsgsfx.get(clip);
+	    if((last == null) || (now - last > 0.1)) {
+		sfx(clip);
+		lastmsgsfx.put(clip, now);
+	    }
+	}
     }
 
     public static double scale(double v) {
