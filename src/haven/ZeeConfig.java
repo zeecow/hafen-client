@@ -898,7 +898,7 @@ public class ZeeConfig {
                 if (audio != null && !audio.isEmpty())
                     playAudioGobId(audio, gobId);
                 else
-                    gameUI.msg("player spotted",RootWidget.msgsfxPlayer, Color.yellow);
+                    gameUI.ui.msg("player spotted",Color.yellow,ZeeSynth.msgsfxPlayer);
             }
         }
         //if single gob alert is saved, play alert
@@ -2693,7 +2693,7 @@ public class ZeeConfig {
         // show two line ql msg in one single line
         else if(uiMsgTextQuality!=null && !uiMsgTextQuality.isEmpty() && !text.contains("Memories")){
             uiMsgTextBuffer += ", " + text;
-            gameUI.msg(uiMsgTextQuality + uiMsgTextBuffer);
+            gameUI.ui.msg(uiMsgTextQuality + uiMsgTextBuffer);
         }
 
         // feasting msg
@@ -3387,11 +3387,11 @@ public class ZeeConfig {
     }
 
     public static void msg(String s) {
-        gameUI.msg(s);
+        gameUI.ui.msg(s);
     }
 
     public static void msgLow(String s) {
-        gameUI.msg(s,RootWidget.msgsfxLow,Color.white);
+        gameUI.ui.msg(s,Color.white,ZeeSynth.msgsfxLow);
     }
 
     public static void msgError(String msg) {

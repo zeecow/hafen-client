@@ -13,6 +13,11 @@ import java.util.List;
 
 public class ZeeSynth extends Thread{
 
+    public static final Resource errsfx = Resource.local().loadwait("sfx/error");
+    public static final Resource msgsfx = Resource.local().loadwait("sfx/msg");
+    public static final Audio.Clip msgsfxLow = Audio.resclip(Resource.local().loadwait("sfx/hud/mmap/wood4"));
+    public static final Audio.Clip msgsfxPlayer = Audio.resclip(Resource.local().loadwait("sfx/hud/mmap/bell1"));
+
     private static List<String> midiNotes = Arrays.asList("C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B");
     private static MidiChannel[] midiChannels;
     private static int midiVolume = 80; // between 0 et 127

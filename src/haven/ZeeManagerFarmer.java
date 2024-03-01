@@ -417,7 +417,7 @@ public class ZeeManagerFarmer extends ZeeThread{
                 /*
                     no barrels, drop seeds
                  */
-                ZeeConfig.gameUI.msg("No empty barrels, lastBarrel null, dropping seeds.");
+                ZeeConfig.gameUI.ui.msg("No empty barrels, lastBarrel null, dropping seeds.");
                 ZeeConfig.getMainInventory().dropItemsByNameEndsWith(gItemSeedBasename);
 
             }

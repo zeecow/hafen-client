@@ -612,7 +612,7 @@ public class ZeeManagerItemClick extends ZeeThread{
                     List<WItem> items = inv.children(WItem.class).stream()
                             .filter(wItem1 -> wItem1.item.getres().name.endsWith("silkcocoon") || wItem1.item.getres().name.endsWith("chrysalis"))
                             .collect(Collectors.toList());
-                    ZeeConfig.gameUI.msg(clickAllItemsPetal(items, "Kill") + " cocoons clicked");
+                    ZeeConfig.gameUI.ui.msg(clickAllItemsPetal(items, "Kill") + " cocoons clicked");
                 }
             }
         }
@@ -625,7 +625,7 @@ public class ZeeManagerItemClick extends ZeeThread{
                         .filter(wItem1 -> wItem1.item.getres().name.equals(itemName))
                         .collect(Collectors.toList());
                 takeAllInvItems(inv, items);
-                ZeeConfig.gameUI.msg(items.size() + " noms");
+                ZeeConfig.gameUI.ui.msg(items.size() + " noms");
             }
         }
         else
@@ -893,7 +893,7 @@ public class ZeeManagerItemClick extends ZeeThread{
             }
         }catch (Exception e){
             e.printStackTrace();
-            ZeeConfig.gameUI.msg("takeAllInvItems: "+e.getMessage());
+            ZeeConfig.gameUI.ui.msg("takeAllInvItems: "+e.getMessage());
         }
     }
 

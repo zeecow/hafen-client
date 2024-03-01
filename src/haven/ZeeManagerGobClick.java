@@ -3564,7 +3564,7 @@ public class ZeeManagerGobClick extends ZeeThread{
              */
            List<WItem> branches = ZeeConfig.getMainInventory().getWItemsByNameContains("branch");
            if(branches.size() < 4){
-               ZeeConfig.gameUI.msg("Need 4 branches to fuel oven");
+               ZeeConfig.gameUI.ui.msg("Need 4 branches to fuel oven");
                return;
            }
            boolean exit = false;
@@ -3576,15 +3576,15 @@ public class ZeeManagerGobClick extends ZeeThread{
                        branches.remove(0);
                        added++;
                    }else{
-                       ZeeConfig.gameUI.msg("Couldn't right click oven");
+                       ZeeConfig.gameUI.ui.msg("Couldn't right click oven");
                        exit = true;
                    }
                }else {
-                   ZeeConfig.gameUI.msg("Couldn't pickup branch");
+                   ZeeConfig.gameUI.ui.msg("Couldn't pickup branch");
                    exit = true;
                }
            }
-           ZeeConfig.gameUI.msg("Added "+added+" branches");
+           ZeeConfig.gameUI.ui.msg("Added "+added+" branches");
         }
         else if(gobName.endsWith("smelter")){
             /*
@@ -3596,7 +3596,7 @@ public class ZeeManagerGobClick extends ZeeThread{
             final int numCoal = num;
             List<WItem> coal = ZeeConfig.getMainInventory().getWItemsByNameContains("coal");
             if(coal.size() < numCoal){
-                ZeeConfig.gameUI.msg("Need "+numCoal+" coal to fuel smelter");
+                ZeeConfig.gameUI.ui.msg("Need "+numCoal+" coal to fuel smelter");
                 return;
             }
             boolean exit = false;
@@ -3608,15 +3608,15 @@ public class ZeeManagerGobClick extends ZeeThread{
                         coal.remove(0);
                         added++;
                     }else{
-                        ZeeConfig.gameUI.msg("Couldn't right click smelter");
+                        ZeeConfig.gameUI.ui.msg("Couldn't right click smelter");
                         exit = true;
                     }
                 }else {
-                    ZeeConfig.gameUI.msg("Couldn't pickup coal");
+                    ZeeConfig.gameUI.ui.msg("Couldn't pickup coal");
                     exit = true;
                 }
             }
-            ZeeConfig.gameUI.msg("Added "+added+" coal");
+            ZeeConfig.gameUI.ui.msg("Added "+added+" coal");
         }
     }
 
