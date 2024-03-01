@@ -3666,9 +3666,6 @@ public class ZeeConfig {
             }
         }
     };
-    static {
-        gobConsumer.start();
-    }
     static void queueGobSettings(Gob ob) {
         if(ob != null && !ob.virtual && ob.getres()!=null) {
             synchronized (gobConsumer) {

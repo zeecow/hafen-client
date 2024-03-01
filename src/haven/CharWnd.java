@@ -45,7 +45,7 @@ public class CharWnd extends Window {
     public static final Color tbuff = new Color(128, 128, 255);
     public static final Color every = new Color(255, 255, 255, 16), other = new Color(255, 255, 255, 32);
     public static final int width = UI.scale(255);
-    public static final int height = UI.scale(230);
+    public static final int height = UI.scale(260);
     public BAttrWnd battr;
     public SAttrWnd sattr;
     public SkillWnd skill;
@@ -198,7 +198,7 @@ public class CharWnd extends Window {
     public CharWnd(Glob glob) {
 	super(UI.scale(new Coord(300, 290)), "Character Sheet");
 
-	Tabs tabs = new Tabs(new Coord(15, 10), UI.scale(506, 315), this);
+	Tabs tabs = new Tabs(new Coord(5, 5), UI.scale(506, 315), this);
         battrtab = tabs.add();
         sattrtab = tabs.add();
 	skilltab = tabs.add();
@@ -230,7 +230,7 @@ public class CharWnd extends Window {
 		}
 	    }
 
-	    this.addhl(new Coord(tabs.c.x, tabs.c.y + tabs.sz.y + UI.scale(10)), tabs.sz.x,
+	    this.addhl(new Coord(tabs.c.x, tabs.c.y + tabs.sz.y + UI.scale(10) - 30), tabs.sz.x,
 		new TB("battr", battrtab, "Base Attributes"),
 		new TB("sattr", sattrtab, "Abilities"),
 		new TB("skill", skilltab, "Lore & Skills"),
