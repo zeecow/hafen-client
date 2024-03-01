@@ -312,7 +312,6 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Message
 	zerg = add(new Zergwnd(), Utils.getprefc("wndc-zerg", UI.scale(new Coord(187, 50))));
 	zerg.hide();
 	ZeeConfig.gameUI = this;
-	ZeeConfig.gobConsumer.start();
     }
 
     protected void attached() {
