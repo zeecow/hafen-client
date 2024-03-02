@@ -84,7 +84,7 @@ public class FlowerMenu extends Widget {
 	public boolean mousedown(Coord c, int button) {
 		mouseDownButton = button;
 	    choose(this);
-		ZeeManagerStockpile.checkClickedPetal(this.name);
+		ZeeManagerStockpile.checkChoosenPetal(this.name);
 		ZeeQuickOptionsWindow.updatePetalWidget(this.name);
 		ZeeManagerGobClick.labelHarvestedPlant(this.name);
 		if (button==2){
@@ -275,6 +275,7 @@ public class FlowerMenu extends Widget {
 	    int opt = (key == '0')?10:(key - '1');
 	    if(opt < opts.length) {
 		choose(opts[opt]);
+		ZeeManagerStockpile.checkChoosenPetal(opts[opt].name);
 		kg.remove();
 	    }
 	    return(true);

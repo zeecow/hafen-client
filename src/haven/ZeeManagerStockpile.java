@@ -587,7 +587,7 @@ public class ZeeManagerStockpile extends ZeeThread{
             showWindow(task);
     }
 
-    public static void checkClickedPetal(String petalName) {
+    public static void checkChoosenPetal(String petalName) {
         lastPetalName = petalName;
         if (petalName.contentEquals("Sleep")) {
             ZeeSess.charSwitchCancelAutologin("char slept");

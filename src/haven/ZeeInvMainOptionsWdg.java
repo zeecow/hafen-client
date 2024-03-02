@@ -107,8 +107,6 @@ public class ZeeInvMainOptionsWdg extends Widget {
             public void set(boolean val) {
                 ZeeConfig.pilerMode = val;
                 a = val;
-                if (val)
-                    ZeeConfig.msg("piler note: select petal by mouseclick");
             }
         }, x, 15);
         cbPiler.settip("pile helper (mouse-click menu required)");
