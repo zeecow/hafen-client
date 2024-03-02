@@ -3625,7 +3625,7 @@ public class ZeeConfig {
             while (true){
                 synchronized (gobConsumer) {
                     // queue empty = wait next gob arrival
-                    if (gobsWaiting.isEmpty() || ZeeConfig.gameUI==null) {
+                    if (ZeeConfig.gameUI==null || gobsWaiting.isEmpty()) {
                         try {
                             this.wait();
                         } catch (InterruptedException e) {
