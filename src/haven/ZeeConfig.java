@@ -3642,7 +3642,7 @@ public class ZeeConfig {
                     }
                     // process gob
                     synchronized (g) {
-                        if (g.isGobWaitingSettings) {
+                        if (g.isGobWaitingSettings && gameUI!=null) {
                             // apply gob settings
                             countRemovals++;
                             Gob finalG = g;
