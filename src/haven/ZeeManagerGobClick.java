@@ -234,6 +234,10 @@ public class ZeeManagerGobClick extends ZeeThread{
         else if (gobName.endsWith("/trough")) {
             ZeeConfig.toggleRadiusFoodtrough();
         }
+        // toggle aggressive gob radius
+        else if(ZeeConfig.isAggressive(gobName)){
+            toggleOverlayAggro(gob);
+        }
         // open cauldron
         else if(gobName.contains("/cauldron") && !ZeeConfig.isPlayerLiftingGob(gob)){
             cauldronOpen();
@@ -245,10 +249,6 @@ public class ZeeManagerGobClick extends ZeeThread{
                     clickGobPetal(gob,"Cargo");
                 }
             }.start();
-        }
-        // toggle aggressive gob radius
-        else if(ZeeConfig.isAggressive(gobName)){
-            toggleOverlayAggro(gob);
         }
         // toggle cart if not lifting (avoid picking cart slot when zoomedout)
         else if (gobName.endsWith("/cart")){
@@ -1850,26 +1850,15 @@ public class ZeeManagerGobClick extends ZeeThread{
         return tree;
     }
 
-    private static void toggleOverlayAggro(Gob gob) {
-        Gob.Overlay ol = gob.findol(OVERLAY_ID_AGGRO);
-        if (ol!=null) {
-            //remove all aggro radius
-            ZeeConfig.findGobsByNameStartsWith("gfx/kritter/").forEach(gob1 -> {
-                if (ZeeConfig.isAggressive(gob1.getres().name)) {
-                    Gob.Overlay ol1 = gob1.findol(OVERLAY_ID_AGGRO);
-                    if (ol1!=null)
-                        ol1.remove();
-                }
-            });
-        }
-        else if (ZeeConfig.aggroRadiusTiles > 0) {
-            //add all aggro radius
-            ZeeConfig.findGobsByNameStartsWith("gfx/kritter/").forEach(gob1 -> {
-                if (ZeeConfig.isAggressive(gob1.getres().name)) {
-                    gob1.addol(new Gob.Overlay(gob1, new ZeeGobRadius(gob1, null, ZeeConfig.aggroRadiusTiles * MCache.tilesz2.y)));
-                }
-            });
-        }
+    static void toggleOverlayAggro(Gob gob) {
+        ZeeConfig.findGobsByNameEquals(gob.getres().name).forEach(aggroGob -> {
+            Gob.Overlay radius = aggroGob.findol(ZeeGobRadius.class);
+            if (radius!=null){
+                radius.remove();
+            }else{
+                aggroGob.addol(new Gob.Overlay(gob, new ZeeGobRadius(gob, null, ZeeConfig.aggroRadiusTiles * MCache.tilesz2.y,new Color(139, 139, 185, 48))));
+            }
+        });
     }
 
     private static void unloadWheelbarrowAtGob(Gob gob) {
