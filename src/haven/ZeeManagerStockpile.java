@@ -1356,7 +1356,16 @@ public class ZeeManagerStockpile extends ZeeThread{
                             }
                         }
                         else {
-                            println("pilan blocks > couldnt get block from inv");
+                            println("pilan blocks > couldnt get block from inv, trying again");
+                            // chop blocks
+                            if (!ZeeManagerGobClick.clickGobPetal(lastTreelogChopped, "Chop into blocks")) {
+                                println("pilan blocks > done");
+                                break;
+                            }
+                            GItem item = waitInvItemOrCancelClick();
+                            if (item!=null && (item.getres().name.contains("wblock-") || item.getres().name.endsWith("cruelsplinter"))){
+                                continue;
+                            }
                             break;
                         }
                     }while(!ZeeConfig.isCancelClick());
@@ -1480,7 +1489,15 @@ public class ZeeManagerStockpile extends ZeeThread{
                                 break;
                             }
                         } else {
-                            println("pilan board > couldnt get board from inv");
+                            println("pilan board > couldnt get board from inv, trying again");
+                            if (!ZeeManagerGobClick.clickGobPetal(lastTreelogSawed, "Make boards")) {
+                                println("pilan boards > done");
+                                break;
+                            }
+                            GItem item = waitInvItemOrCancelClick();
+                            if (item!=null && (item.getres().name.contains("board-") || item.getres().name.endsWith("woodshaving"))){
+                                continue;
+                            }
                             break;
                         }
                     }while(!ZeeConfig.isCancelClick());

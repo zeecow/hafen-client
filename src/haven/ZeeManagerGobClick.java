@@ -49,6 +49,8 @@ public class ZeeManagerGobClick extends ZeeThread{
 
         // long mid-clicks
         if (isLongMidClick()) {
+            if (ZeeConfig.isCombatActive())
+                return;
             new ZeeThread(){
                 public void run() {
                     runLongMidClick();
@@ -933,9 +935,13 @@ public class ZeeManagerGobClick extends ZeeThread{
             /*
                 ground clicks
              */
-            if (isGroundClick && !ZeeConfig.isCombatActive()){
+            if (isGroundClick){
+                // place pile and start autopiling
+                if(ZeeConfig.isPlobActive()){
+                    placePileAndAuto();
+                }
                 //dismount horse
-                if (ZeeConfig.isPlayerMountingHorse()) {
+                else if (ZeeConfig.isPlayerMountingHorse()) {
                     dismountHorse(coordMc);
                 }
                 //clicked water
@@ -1081,6 +1087,43 @@ public class ZeeManagerGobClick extends ZeeThread{
         }
         catch (Exception e){
             e.printStackTrace();
+        }
+    }
+
+    private static void placePileAndAuto() {
+
+        MapView.Plob plob = ZeeManagerStockpile.lastPlob;
+        String pileName = plob.getres().name;
+
+        if(pileName.endsWith("stockpile-wblock") && ZeeManagerStockpile.lastTreelogChopped!=null)
+        {
+            Coord2d pileCoord = new Coord2d(plob.rc.x, plob.rc.y);
+            ZeeManagerGobClick.gobPlace(plob,0);
+            if(waitPlayerIdlePose()) {
+                Gob newPile = ZeeConfig.findGobByNameAndCoord("stockpile-wblock", pileCoord);
+                if (newPile==null){
+                    println("place and autopile > new pile undecided");
+                }else {
+                    ZeeManagerStockpile.pileBlocksFromTreelog(newPile);
+                }
+            }else{
+                println("place and autopile > failed waiting idle pose?");
+            }
+        }
+        else if(pileName.endsWith("stockpile-board") && ZeeManagerStockpile.lastTreelogSawed!=null)
+        {
+            Coord2d pileCoord = new Coord2d(plob.rc.x, plob.rc.y);
+            ZeeManagerGobClick.gobPlace(plob,0);
+            if(waitPlayerIdlePose()) {
+                Gob newPile = ZeeConfig.findGobByNameAndCoord("stockpile-board", pileCoord);
+                if (newPile==null){
+                    println("place and autopile > new pile undecided");
+                }else {
+                    ZeeManagerStockpile.pileBoardsFromTreelog(newPile);
+                }
+            }else{
+                println("place and autopile > failed waiting idle pose?");
+            }
         }
     }
 

@@ -58,6 +58,7 @@ Long Midclick Ground (LMC)
   - inspect water tile using inventory woodencup
   - build road
   - actions fish, dig, mine
+- place pile and start autopiling for blocks, boards
 
 Midclick Ground Object
 - inspect object quality and show text

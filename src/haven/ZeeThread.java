@@ -65,6 +65,18 @@ public class ZeeThread  extends Thread{
         return ret;
     }
 
+    public static boolean waitNotHoldingItemOrCancelClick() {
+        try {
+            prepareCancelClick();
+            while(!isCancelClick() && ZeeConfig.gameUI.vhand!=null) {
+                Thread.sleep(SLEEP_MS);
+            }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        return (ZeeConfig.gameUI.vhand == null);
+    }
+
     public static boolean waitNotHoldingItem() {
         long max = TIMEOUT_MS;
         try {

@@ -4770,4 +4770,18 @@ public class ZeeConfig {
         }
         return false;
     }
+
+    static Gob findGobByNameAndCoord(String nameEndsWith, Coord2d coord) {
+        try {
+            List<Gob> gobs = findGobsByNameEndsWith(nameEndsWith);
+            for (Gob gob : gobs) {
+                if (gob.rc.compareTo(coord)==0){
+                    return gob;
+                }
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return null;
+    }
 }
