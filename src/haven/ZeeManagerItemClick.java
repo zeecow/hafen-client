@@ -171,7 +171,7 @@ public class ZeeManagerItemClick extends ZeeThread{
                         }
                         // click all items petals
                         List<WItem> invItems = inv.getWItemsByNameEndsWith(wtName);
-                        if (invItems.size() > 2){
+                        if (invItems.size() > 0){
                             new ZeeThread(){
                                 public void run() {
                                     try {
