@@ -9,7 +9,7 @@ import java.awt.image.BufferedImage;
 import static haven.PUtils.blurmask2;
 import static haven.PUtils.rasterimg;
 
-@haven.FromResource(name = "gfx/fx/floatimg", version = 4)
+@haven.FromResource(name = "gfx/fx/floatimg", version = 5)
 public class FloatText extends FloatSprite {
     public static final Text.Foundry fnd = new Text.Foundry(Text.sans.deriveFont(Font.BOLD, UI.scale(12f))).aa(true);
 

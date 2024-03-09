@@ -7,7 +7,7 @@ import haven.Sprite;
 
 import java.awt.*;
 
-@haven.FromResource(name = "gfx/fx/floatimg", version = 4)
+@haven.FromResource(name = "gfx/fx/floatimg", version = 5)
 public class Score implements Sprite.Factory {
     private static int dup(int nibble) {
 	return((nibble << 4) | nibble);
