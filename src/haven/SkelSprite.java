@@ -34,7 +34,7 @@ import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-public class SkelSprite extends Sprite implements Sprite.CUpd, EquipTarget, Sprite.Owner, Skeleton.ModOwner {
+public class SkelSprite extends Sprite implements Sprite.CUpd, EquipTarget, Sprite.Owner, Skeleton.ModOwner, RandomSource {
     public static final Pipe.Op
 	rigid = new BaseColor(FColor.GREEN),
 	morphed = new BaseColor(FColor.RED),

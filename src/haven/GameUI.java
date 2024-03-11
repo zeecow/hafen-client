@@ -86,7 +86,7 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Message
 	.add(GameUI.class, slot -> slot.wdg())
 	.add(Glob.class, slot -> slot.wdg().ui.sess.glob)
 	.add(Session.class, slot -> slot.wdg().ui.sess);
-    public class ResBeltSlot extends BeltSlot implements GSprite.Owner {
+    public class ResBeltSlot extends BeltSlot implements GSprite.Owner, RandomSource {
 	public final ResData rdt;
 
 	public ResBeltSlot(int idx, ResData rdt) {
@@ -233,7 +233,7 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Message
 		    MenuGrid.Pagina pag = (MenuGrid.Pagina)thing;
 		    try {
 			if(pag.id instanceof Indir)
-			    GameUI.this.wdgmsg("setbelt", slot, pag.res().name);
+			    GameUI.this.wdgmsg("setbelt", slot, "res", pag.res().name);
 			else
 			    GameUI.this.wdgmsg("setbelt", slot, "pag", pag.id);
 		    } catch(Loading l) {

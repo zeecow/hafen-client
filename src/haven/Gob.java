@@ -30,11 +30,7 @@ import java.util.*;
 import java.util.function.*;
 import haven.render.*;
 
-import java.util.*;
-import java.util.function.Consumer;
-import java.util.function.Supplier;
-
-public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, EquipTarget {
+public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, EquipTarget, RandomSource {
     public Coord2d rc;
     public double a;
     public boolean virtual = false;

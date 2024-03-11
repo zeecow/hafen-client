@@ -26,16 +26,15 @@
 
 package haven;
 
-import haven.ItemInfo.AttrCache;
-import haven.Resource.AButton;
-import haven.render.Pipe;
-
-import java.awt.*;
+import java.util.*;
+import haven.render.*;
+import java.awt.Color;
+import java.awt.Font;
 import java.awt.event.KeyEvent;
 import java.awt.font.TextAttribute;
 import java.awt.image.BufferedImage;
-import java.util.List;
-import java.util.*;
+import haven.Resource.AButton;
+import haven.ItemInfo.AttrCache;
 
 public class MenuGrid extends Widget implements KeyBinding.Bindable {
     public final static Tex bg = Inventory.invsq;
@@ -52,7 +51,7 @@ public class MenuGrid extends Widget implements KeyBinding.Bindable {
     private int curoff = 0;
     private boolean recons = true, showkeys = false;
     private double fstart;
-
+	
     @RName("scm")
     public static class $_ implements Factory {
 	public Widget create(UI ui, Object[] args) {
@@ -125,7 +124,7 @@ public class MenuGrid extends Widget implements KeyBinding.Bindable {
 	}
     }
 
-    public static class PagButton implements ItemInfo.Owner, GSprite.Owner {
+    public static class PagButton implements ItemInfo.Owner, GSprite.Owner, RandomSource {
 	public final Pagina pag;
 	public final Resource res;
 	public final KeyBinding bind;
@@ -181,17 +180,12 @@ public class MenuGrid extends Widget implements KeyBinding.Bindable {
 		if(iact.click != null)
 		    eact = Utils.extend(eact, iact.click.clickargs());
 	    }
-	    AButton act = act();
-	    if((act != null) && (act.ad.length > 0)) {
-		ZeeHistWdg.ignoreNextMenuMsg = true;
-		pag.scm.wdgmsg("act", Utils.extend(Utils.extend(new Object[0], act().ad), eact));
-		ZeeHistWdg.checkMenuHistory(this,eact);
-	    } else {
-		if(pag.id instanceof Indir)
-		    Warning.warn("tried to use resource-indexed pagina by id: " + res);
-		else
-		    pag.scm.wdgmsg("use", Utils.extend(new Object[] {pag.id}, eact));
-	    }
+	    if(pag.id instanceof Indir) {
+			ZeeHistWdg.ignoreNextMenuMsg = true;
+			pag.scm.wdgmsg("act", Utils.extend(Utils.extend(new Object[0], act().ad), eact));
+			ZeeHistWdg.checkMenuHistory(this,eact);
+		}else
+		pag.scm.wdgmsg("use", Utils.extend(new Object[] {pag.id}, eact));
 	}
 	public void tick(double dt) {
 	    if(spr != null)

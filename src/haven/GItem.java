@@ -33,7 +33,7 @@ import java.awt.image.BufferedImage;
 import java.util.List;
 import java.util.*;
 
-public class GItem extends AWidget implements ItemInfo.SpriteOwner, GSprite.Owner {
+public class GItem extends AWidget implements ItemInfo.SpriteOwner, GSprite.Owner, RandomSource {
     public Indir<Resource> res;
     public MessageBuf sdt;
     public int meter = 0;
