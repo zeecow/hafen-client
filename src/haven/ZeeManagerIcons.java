@@ -7,10 +7,9 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
-
-import java.util.Base64;
 
 public class ZeeManagerIcons {
 
@@ -288,6 +287,17 @@ public class ZeeManagerIcons {
 
     public static void clearQueue() {
         gobs.clear();
+    }
+
+    public static BufferedImage resizeBufferedImage(BufferedImage original, int w, int h) {
+        BufferedImage resized = new BufferedImage(w, h, original.getType());
+        Graphics2D g = resized.createGraphics();
+        g.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
+                RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+        g.drawImage(original, 0, 0, w, h, 0, 0, original.getWidth(),
+                original.getHeight(), null);
+        g.dispose();
+        return resized;
     }
 
     static class ShapeIconsOptPanel extends JPanel{

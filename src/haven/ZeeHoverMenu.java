@@ -93,7 +93,7 @@ public class ZeeHoverMenu {
             latestMenu = tempMenu;
             cont++;
         }
-        println("destroyed "+cont+" menus");
+        //println("destroyed "+cont+" menus");
         resetMenuGrid();
         rootMenu = latestMenu = null;
         exiting = false;
@@ -194,13 +194,16 @@ public class ZeeHoverMenu {
             this.menuGrid = menuGrid;
             this.menuLevel = level;
 
-            this.btn = new IButton(pagButton.img(),pagButton.img());
-            this.btnWidth = pagButton.img().getWidth();
-            this.btnHeight = pagButton.img().getHeight();
+            // arrBtns.get(i).getres().flayer(Resource.Image.class)
+            BufferedImage img = pagButton.getres().flayer(Resource.Image.class).img;
+            img = ZeeManagerIcons.resizeBufferedImage(img,MenuGrid.bgsz.x,MenuGrid.bgsz.y);
+            this.btn = new IButton(img, img);
+            this.btnWidth = img.getWidth();
+            this.btnHeight = img.getHeight();
             int x=0;
             int y = i * this.btnHeight;
-            this.add(new IButton(pagButton.img(), pagButton.img()), Coord.of(x,y));
-            x += pagButton.img().getWidth();
+            this.add(new IButton(img, img), Coord.of(x,y));
+            x += img.getWidth();
             this.add(label=new Label(pagButton.name()), Coord.of(x,y));
             this.pack();
             this.lineTopRight = Coord.of(0,y);
@@ -251,7 +254,7 @@ public class ZeeHoverMenu {
                 // click non submenu and reset gridMenu
                 menuGrid.use(pagina.button(), new MenuGrid.Interaction(), true);
                 //close open menus
-                exitMenu("mouseup line "+pagina.button().name());
+                //exitMenu("mouseup line "+pagina.button().name());
                 return true;
             }
             return false;
