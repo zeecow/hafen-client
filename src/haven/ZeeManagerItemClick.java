@@ -1834,6 +1834,10 @@ public class ZeeManagerItemClick extends ZeeThread{
                 try {
                     sleep(500);
                     Inventory inv = window.getchild(Inventory.class);
+                    if (inv==null) {
+                        println("checkCheeseTray > inv null");
+                        return;
+                    }
                     List<WItem> cheesetrayList = inv.getWItemsByNameContains("cheesetray");
                     if (cheesetrayList.isEmpty())
                         return;

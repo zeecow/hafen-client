@@ -110,7 +110,7 @@ public class ZeeManagerFarmer extends ZeeThread{
                 if (!ZeeManagerGobClick.isBarrelEmpty(gob)) {
                     ZeeConfig.addGobText(gob, ZeeConfig.getBarrelOverlayBasename(gob));
                 }
-                ZeeConfig.addGobColor(gob, 0, 255, 0, 255);
+                ZeeConfig.addGobColor(gob, 0, 153, 0, 255);
             }
         });
     }

@@ -242,7 +242,7 @@ public class ZeeManagerGobClick extends ZeeThread{
         }
         // toggle aggressive gob radius
         else if(gobName.endsWith("cheeserack")){
-            toggleCheeserack();
+            ZeeConfig.toggleCheeserack();
         }
         // open cauldron
         else if(gobName.contains("/cauldron") && !ZeeConfig.isPlayerLiftingGob(gob)){
@@ -1895,33 +1895,6 @@ public class ZeeManagerGobClick extends ZeeThread{
             ZeeConfig.addGobText(treesForRemoval.get(i),"rem"+(i+1));
         }
         return tree;
-    }
-
-    static boolean highlightCheeserack = false;
-    static void toggleCheeserack(){
-        highlightCheeserack = !highlightCheeserack;
-        List<Gob> racks = ZeeConfig.findGobsByNameEndsWith("/cheeserack");
-        if (!racks.isEmpty()){
-            for (Gob r : racks) {
-                toggleCheeserack(r);
-            }
-        }
-    }
-    static void toggleCheeserack(Gob cheeserack){
-        if (highlightCheeserack){
-            List<String> ols = getOverlayNames(cheeserack);
-            boolean hasTray = false;
-            for (String ol : ols) {
-                if (ol.contains("gfx/fx/eq")) {
-                    hasTray = true;
-                    break;
-                }
-            }
-            if (hasTray)
-                ZeeConfig.addGobColor(cheeserack, Color.green);
-        }else {
-            ZeeConfig.removeGobColor(cheeserack);
-        }
     }
 
     static void toggleOverlayAggro(Gob gob) {

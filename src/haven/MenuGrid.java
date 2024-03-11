@@ -730,8 +730,8 @@ public class MenuGrid extends Widget implements KeyBinding.Bindable {
 			return;
 		}
 		// find button and add manually to history
-		else if (args!=null && args.length>0) {
-			ZeeConfig.println(ZeeConfig.strArgs(args));
+//		else if (args!=null && args.length>0) {
+//			ZeeConfig.println(ZeeConfig.strArgs(args));
 //			String arg0 = (String) args[0];
 //			final List<String> skipList = List.of("itemcomb", "tracking");
 //			if (!skipList.contains(arg0) && arg0.contentEquals("craft")) {
@@ -745,7 +745,7 @@ public class MenuGrid extends Widget implements KeyBinding.Bindable {
 //					ZeeHistWdg.checkMenuHistory(pagButton, args);
 //				}
 //			}
-		}
+//		}
 
 		super.wdgmsg(msg, args);
 	}

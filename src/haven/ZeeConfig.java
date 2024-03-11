@@ -2279,6 +2279,37 @@ public class ZeeConfig {
         }
     }
 
+
+    static boolean highlightCheeserack = false;
+    static void toggleCheeserack(){
+        highlightCheeserack = !highlightCheeserack;
+        List<Gob> racks = ZeeConfig.findGobsByNameEndsWith("/cheeserack");
+        if (!racks.isEmpty()){
+            for (Gob r : racks) {
+                toggleCheeserack(r);
+            }
+        }
+    }
+    static void toggleCheeserack(Gob cheeserack){
+        if (highlightCheeserack){
+            List<String> ols = ZeeManagerGobClick.getOverlayNames(cheeserack);
+            int trays = 0;
+            for (String ol : ols) {
+                if (ol.contains("gfx/fx/eq")) {
+                    trays++;
+                }
+            }
+            if (trays==0)
+                return;
+            if (trays==3)
+                ZeeConfig.addGobColor(cheeserack, Color.green.darker());
+            else
+                ZeeConfig.addGobColor(cheeserack, Color.orange);
+        }else {
+            ZeeConfig.removeGobColor(cheeserack);
+        }
+    }
+
     public static void checkClassMod(String name, Class<?> qlass){
         try {
 
@@ -3158,7 +3189,7 @@ public class ZeeConfig {
         addGobText(g,s,0,255,0,255,height);
     }
 
-    static final Text.Foundry defGobTextFont = new Text.Foundry(Text.sans.deriveFont(Font.PLAIN, UI.scale(9))).aa(false);
+    static final Text.Foundry defGobTextFont = new Text.Foundry(Text.sans.deriveFont(Font.PLAIN, UI.scale(11))).aa(false);
     public static void addGobText(Gob gob, String text, int r, int g, int b, int a, int height) {
         addGobText( gob,
             new ZeeGobText(text, new Color(r, g, b, a), Color.black, height, defGobTextFont)
@@ -3690,6 +3721,8 @@ public class ZeeConfig {
 
             addGobTagsAdvanced(ob);
 
+            String gobName = ob.getres().name;;
+
             // main player settings
             if(ob.tags.contains(Gob.Tag.PLAYER_MAIN)) {
 
@@ -3733,16 +3766,20 @@ public class ZeeConfig {
 
             }
             // radius ladder
-            else if(ob.getres().name.endsWith("terobjs/ladder")) {
+            else if(showMineSupport && gobName.endsWith("terobjs/ladder")) {
                 toggleMineLadderRadius(ob);
             }
             // radius beeskep
-            else if(ob.getres().name.endsWith("terobjs/beehive")) {
+            else if(showRadiusBeeskep && gobName.endsWith("terobjs/beehive")) {
                 toggleRadiusBeeskep(ob);
             }
             // radius trough
-            else if(ob.getres().name.endsWith("terobjs/trough")) {
+            else if(showRadiusFoodtrough && gobName.endsWith("terobjs/trough")) {
                 toggleRadiusFoodtrough(ob);
+            }
+            // cheeserack color
+            else if(highlightCheeserack && gobName.endsWith("cheeserack")){
+                toggleCheeserack(ob);
             }
 
 
