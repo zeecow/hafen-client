@@ -26,15 +26,16 @@
 
 package haven;
 
-import java.util.*;
-import haven.render.*;
-import java.awt.Color;
-import java.awt.Font;
+import haven.ItemInfo.AttrCache;
+import haven.Resource.AButton;
+import haven.render.Pipe;
+
+import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.font.TextAttribute;
 import java.awt.image.BufferedImage;
-import haven.Resource.AButton;
-import haven.ItemInfo.AttrCache;
+import java.util.List;
+import java.util.*;
 
 public class MenuGrid extends Widget implements KeyBinding.Bindable {
     public final static Tex bg = Inventory.invsq;
@@ -730,19 +731,20 @@ public class MenuGrid extends Widget implements KeyBinding.Bindable {
 		}
 		// find button and add manually to history
 		else if (args!=null && args.length>0) {
-			String arg0 = (String) args[0];
-			final List<String> skipList = List.of("itemcomb", "tracking");
-			if (!skipList.contains(arg0) && arg0.contentEquals("craft")) {
-				ZeeConfig.println("adding manually > "+msg+" "+ZeeConfig.strArgs(args));
-				// wdgmsg arg name
-				String recipeName = (String) args[1];
-				// find menugrid button
-				PagButton pagButton = ZeeConfig.getMenuButton(recipeName);
-				if (pagButton!=null) {
-					//pagButton.pag.scm.wdgmsg("act", args);
-					ZeeHistWdg.checkMenuHistory(pagButton, args);
-				}
-			}
+			ZeeConfig.println(ZeeConfig.strArgs(args));
+//			String arg0 = (String) args[0];
+//			final List<String> skipList = List.of("itemcomb", "tracking");
+//			if (!skipList.contains(arg0) && arg0.contentEquals("craft")) {
+//				ZeeConfig.println("adding manually > "+msg+" "+ZeeConfig.strArgs(args));
+//				// wdgmsg arg name
+//				String recipeName = (String) args[1];
+//				// find menugrid button
+//				PagButton pagButton = ZeeConfig.getMenuButton(recipeName);
+//				if (pagButton!=null) {
+//					//pagButton.pag.scm.wdgmsg("act", args);
+//					ZeeHistWdg.checkMenuHistory(pagButton, args);
+//				}
+//			}
 		}
 
 		super.wdgmsg(msg, args);
