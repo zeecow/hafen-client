@@ -26,15 +26,18 @@
 
 package haven;
 
-import haven.MapFile.*;
-
-import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.util.List;
+import haven.render.*;
 import java.util.*;
-import java.util.function.Consumer;
-import java.util.function.Function;
-
+import java.util.function.*;
+import java.awt.Color;
+import java.awt.image.BufferedImage;
+import haven.MapFile.Segment;
+import haven.MapFile.DataGrid;
+import haven.MapFile.Grid;
+import haven.MapFile.GridInfo;
+import haven.MapFile.Marker;
+import haven.MapFile.PMarker;
+import haven.MapFile.SMarker;
 import static haven.MCache.cmaps;
 import static haven.MCache.tilesz;
 import static haven.OCache.posres;
@@ -42,7 +45,7 @@ import static haven.OCache.posres;
 public class MiniMap extends Widget {
     public static final Tex bg = Resource.loadtex("gfx/hud/mmap/ptex");
     public static final Tex nomap = Resource.loadtex("gfx/hud/mmap/nomap");
-    public static final Tex plp = ((TexI)Resource.loadtex("gfx/hud/mmap/plp")).filter(haven.render.Texture.Filter.LINEAR);
+    public static final Tex plp = ((TexI)Resource.loadtex("gfx/hud/mmap/plp")).filter(Texture.Filter.LINEAR);
     public final MapFile file;
     public Location curloc;
     public Location sessloc;
@@ -194,14 +197,7 @@ public class MiniMap extends Widget {
     }
 
     private Locator sesslocator;
-	double dtCount = 0;
     public void tick(double dt) {
-	if (ZeeConfig.slowMiniMap) {
-		dtCount += dt;
-		if (dtCount < 0.3)
-			return;
-		dtCount = 0;
-	}
 	if(setloc != null) {
 	    try {
 		Location loc = resolve(setloc);
@@ -240,34 +236,50 @@ public class MiniMap extends Widget {
 	follow = true;
     }
 
+    public static class Scale2D implements Pipe.Op {
+	public final Coord cc;
+	public final float f;
+
+	public Scale2D(Coord cc, float f) {
+	    this.cc = cc;
+	    this.f = f;
+	}
+
+	public void apply(Pipe buf) {
+	    Ortho2D st = (Ortho2D)buf.get(States.vxf);
+	    float w = st.r - st.l, h = st.b - st.u;
+	    buf.prep(new Ortho2D(cc.x + ((st.l - cc.x) / f), cc.y + ((st.u - cc.y) / f),
+				 cc.x + ((st.r - cc.x) / f), cc.y + ((st.b - cc.y) / f)));
+	}
+    }
+
     public static final Color notifcol = new Color(255, 128, 0, 255);
     public class DisplayIcon {
-	public final GobIcon icon;
+	public final GobIcon attr;
 	public final Gob gob;
-	public final GobIcon.Image img;
+	public final GobIcon.Icon icon;
 	public final GobIcon.Setting conf;
 	public Coord2d rc = null;
 	public Coord sc = null;
 	public double ang = 0.0;
-	public Color col = Color.WHITE;
 	public int z;
 	public double stime;
 	public boolean notify;
 	private Consumer<UI> snotify;
 	private boolean markchecked;
 
-	public DisplayIcon(GobIcon icon, GobIcon.Setting conf) {
-	    this.icon = icon;
-	    this.gob = icon.gob;
-	    this.img = icon.img();
-	    this.z = this.img.z;
+	public DisplayIcon(GobIcon attr, GobIcon.Setting conf) {
+	    this.attr = attr;
+	    this.gob = attr.gob;
+	    this.icon = attr.icon();
+	    this.z = icon.z();
 	    this.stime = Utils.rtime();
 	    this.conf = conf;
 	    if(this.notify = conf.notify)
 		this.snotify = conf.notification();
 		if (ZeeConfig.showGobPointer && !gob.hasPointer) {
 			gob.hasPointer = true;
-			Tex pointer = ZeeGobPointer.mapGobPointer.put(gob.getres().name, img.tex);
+			Tex pointer = ZeeGobPointer.mapGobPointer.put(gob.getres().name, icon.res.flayer(Resource.Image.class).tex());
 			gob.addol(new ZeeGobPointer(gob, pointer));
 		}
 	}
@@ -285,14 +297,7 @@ public class MiniMap extends Widget {
 	}
 
 	public void draw(GOut g) {
-	    if(col != null)
-		g.chcolor(col);
-	    else
-		g.chcolor();
-	    if(!img.rot)
-		g.image(img.tex, sc.sub(img.cc));
-	    else
-		g.rotimage(img.tex, sc, img.cc, -ang + img.ao);
+	    icon.draw(g, sc);
 	    if(notify) {
 		double t = (Utils.rtime() - stime) * 1.0;
 		if(t > 1) {
@@ -301,9 +306,9 @@ public class MiniMap extends Widget {
 		    double f = 1.0 + (Math.pow(Math.sin(t * Math.PI * 1.5), 2) * 1.0);
 		    double a = (t < 0.5) ? 0.5 : (0.5 - (t - 0.5));
 		    g.usestate(new ColorMask(notifcol));
+		    g.usestate(new Scale2D(sc.add(g.tx), (float)f));
 		    g.chcolor(255, 255, 255, (int)Math.round(255 * a));
-		    if(!img.rot)
-			g.image(img.tex, sc.sub(img.cc.mul(f)), img.tex.sz().mul(f));
+		    icon.draw(g, sc);
 		    g.defstate();
 		}
 	    }
@@ -610,19 +615,16 @@ public class MiniMap extends Widget {
 	    for(Gob gob : oc) {
 		try {
 		    GobIcon icon = gob.getattr(GobIcon.class);
-		    if(icon != null) {
-			GobIcon.Setting conf = iconconf.get(icon.res.get());
-			if((conf != null) && conf.show) {
-			    DisplayIcon disp = pmap.remove(gob);
-			    if(disp == null)
-				disp = new DisplayIcon(icon, conf);
-			    disp.update(gob.rc, gob.a);
-			    KinInfo kin = gob.getattr(KinInfo.class);
-			    if((kin != null) && (kin.group < BuddyWnd.gc.length))
-				disp.col = BuddyWnd.gc[kin.group];
-			    ret.add(disp);
-			}
-		    }else if (ZeeConfig.shapeIcons) {
+			if(icon != null) {
+				GobIcon.Setting conf = iconconf.get(icon.icon());
+				if((conf != null) && conf.show) {
+					DisplayIcon disp = pmap.remove(gob);
+					if(disp == null)
+					disp = new DisplayIcon(icon, conf);
+					disp.update(gob.rc, gob.a);
+					ret.add(disp);
+				}
+		    } else if (ZeeConfig.shapeIcons) {
 				ZeeManagerIcons.addQueue(gob);
 			}
 		} catch(Loading l) {}
@@ -734,8 +736,7 @@ public class MiniMap extends Widget {
     public DisplayIcon iconat(Coord c) {
 	for(ListIterator<DisplayIcon> it = icons.listIterator(icons.size()); it.hasPrevious();) {
 	    DisplayIcon disp = it.previous();
-	    GobIcon.Image img = disp.img;
-	    if((disp.sc != null) && c.isect(disp.sc.sub(img.cc), img.tex.sz()) && !filter(disp))
+	    if((disp.sc != null) && disp.icon.checkhit(c.sub(disp.sc)) && !filter(disp))
 		return(disp);
 	}
 	return(null);
@@ -782,8 +783,8 @@ public class MiniMap extends Widget {
 	    try {
 		if(icon.markchecked)
 		    continue;
-		GobIcon.Image img = icon.icon.img();
-		if(!icon.conf.getmarkablep()) {
+		GobIcon.Icon micon = icon.icon;
+		if(!icon.conf.getmarkablep() || !(micon instanceof GobIcon.ImageIcon)) {
 		    icon.markchecked = true;
 		    continue;
 		}
@@ -797,11 +798,11 @@ public class MiniMap extends Widget {
 		    if(info == null)
 			continue;
 		    Coord sc = tc.add(info.sc.sub(obg.gc).mul(cmaps));
-		    SMarker prev = file.smarker(img.res.name, info.seg, sc);
+		    SMarker prev = file.smarker(micon.res.name, info.seg, sc);
 		    if(prev == null) {
 			if(icon.conf.getmarkp()) {
-			    Resource.Tooltip tt = img.res.flayer(Resource.tooltip);
-			    mid = new SMarker(info.seg, sc, tt.t, 0, new Resource.Spec(Resource.remote(), img.res.name, img.res.ver));
+			    Resource.Tooltip tt = micon.res.flayer(Resource.tooltip);
+			    mid = new SMarker(info.seg, sc, tt.t, 0, new Resource.Spec(Resource.remote(), micon.res.name, micon.res.ver));
 			    file.add(mid);
 			} else {
 			    mid = null;
@@ -908,7 +909,7 @@ public class MiniMap extends Widget {
 	    drag.remove();
 	    drag = null;
 	}
-	if(dsicon != iconat(c)){
+	if(dsicon != iconat(c)){ //TODO remove if?
 		dsloc = null;
 		dsicon = null;
 		dsmark = null;
