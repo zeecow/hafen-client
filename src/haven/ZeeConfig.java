@@ -3589,9 +3589,9 @@ public class ZeeConfig {
     }
 
 
-    public static List<GobIcon.SettingsWindow.Icon> getIconsFiltered(String filter, List<GobIcon.SettingsWindow.Icon> listOrdered) {
+    public static List<GobIcon.SettingsWindow.ListIcon> getIconsFiltered(String filter, List<GobIcon.SettingsWindow.ListIcon> listOrdered) {
 
-        ArrayList<GobIcon.SettingsWindow.Icon> filteredList = new ArrayList<>(listOrdered);
+        ArrayList<GobIcon.SettingsWindow.ListIcon> filteredList = new ArrayList<>(listOrdered);
 
         //println("pre "+filteredList.size());
 

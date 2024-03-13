@@ -26,14 +26,18 @@
 
 package haven;
 
-import java.util.*;
-import java.util.function.*;
+import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
+import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.io.*;
-import java.nio.file.*;
-import java.awt.image.*;
-import java.awt.Color;
-import javax.swing.JFileChooser;
-import javax.swing.filechooser.*;
+import java.nio.file.FileSystemException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.List;
+import java.util.Queue;
+import java.util.*;
+import java.util.function.Consumer;
 
 public class GobIcon extends GAttrib {
     private static final int size = UI.scale(20);
@@ -709,8 +713,8 @@ public class GobIcon extends GAttrib {
 	private static final Text.Foundry elf = CharWnd.attrf;
 	private static final int elh = elf.height() + UI.scale(2);
 	public class IconList extends SSearchBox<ListIcon, IconList.IconLine> {
-	    private List<ListIcon> ordered = Collections.emptyList();
-	    private Map<Setting.ID, Setting> cur = null;
+	    List<ListIcon> ordered = Collections.emptyList();
+	    Map<Setting.ID, Setting> cur = null;
 
 	    private IconList(Coord sz) {
 		super(sz, elh);
@@ -729,9 +733,7 @@ public class GobIcon extends GAttrib {
 								if (icon.conf.resns==null) {
 									// default "Bell 2"
 									icon.conf.resns = NotificationSetting.builtin.get(1).res;
-									if(save!=null) {
-										save.run();
-									}
+									conf.dsave();
 								}
 								list.change(icon);//select icon line
 							}
@@ -753,7 +755,12 @@ public class GobIcon extends GAttrib {
 	    protected IconLine makeitem(ListIcon icon, int idx, Coord sz) {return(new IconLine(sz, icon));}
 
 	    public void tick(double dt) {
-		Map<Setting.ID, Setting> cur = this.cur;
+		initOrdered();
+		super.tick(dt);
+	    }
+
+		public void initOrdered(){
+			Map<Setting.ID, Setting> cur = this.cur;
 		if(cur != conf.settings) {
 		    cur = conf.settings;
 		    ArrayList<ListIcon> ordered = new ArrayList<>(cur.size());
@@ -770,8 +777,7 @@ public class GobIcon extends GAttrib {
 			    return(0);
 			});
 		}
-		super.tick(dt);
-	    }
+		}
 
 	    public boolean keydown(java.awt.event.KeyEvent ev) {
 		if(ev.getKeyCode() == java.awt.event.KeyEvent.VK_SPACE) {
