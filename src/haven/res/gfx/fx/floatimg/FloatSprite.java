@@ -5,25 +5,25 @@ import haven.*;
 import haven.render.Homo3D;
 import haven.render.Pipe;
 
-@haven.FromResource(name = "gfx/fx/floatimg", version = 5)
+@haven.FromResource(name = "gfx/fx/floatimg", version = 6)
 public class FloatSprite extends Sprite implements PView.Render2D {
     public static final double floaty = UI.scale(10.0);
     public final double tm;
     final Tex tex;
     final int sy;
     double a = 0;
-    
+
     public int cury() {
 	return(sy - (int)(floaty * a));
     }
-    
+
     public FloatSprite(Owner owner, Resource res, Tex tex, int tm) {
 	super(owner, res);
 	this.tex = tex;
 	this.tm = tm;
 	this.sy = place(owner.context(Gob.class), tex.sz().y);
     }
-    
+
     private static int place(Gob gob, int h) {
 	int y = 0;
 	trying: while(true) {
@@ -42,7 +42,7 @@ public class FloatSprite extends Sprite implements PView.Render2D {
 	    return(y);
 	}
     }
-    
+
     public void draw(GOut g, Pipe state) {
 	Coord sc = Homo3D.obj2view(Coord3f.o, state, Area.sized(Coord.z, g.sz())).round2();
 	if(sc == null)
@@ -60,7 +60,7 @@ public class FloatSprite extends Sprite implements PView.Render2D {
 	g.image(tex, sc.add(c));
 	g.chcolor();
     }
-    
+
     public boolean tick(double dt) {
 	a += dt / tm;
 	return(a >= 1);
