@@ -3784,8 +3784,10 @@ public class ZeeConfig {
             }
             // hide hearthfire names
             else if(!showKinNames && gobName.endsWith("/terobjs/pow")){
-                if (gobHasAttr(ob,"Buddy")){
-                    ob.delattr(Buddy.class);
+                synchronized (ob) {
+                    if (gobHasAttr(ob, "Buddy")) {
+                        ob.delattr(Buddy.class);
+                    }
                 }
             }
 
