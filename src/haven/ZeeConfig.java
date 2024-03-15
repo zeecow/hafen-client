@@ -1,6 +1,7 @@
 package haven;
 
 import haven.render.*;
+import haven.res.ui.obj.buddy.Buddy;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -3766,20 +3767,26 @@ public class ZeeConfig {
 
             }
             // radius ladder
-            else if(showMineSupport && gobName.endsWith("terobjs/ladder")) {
+            else if(showMineSupport && gobName.endsWith("/terobjs/ladder")) {
                 toggleMineLadderRadius(ob);
             }
             // radius beeskep
-            else if(showRadiusBeeskep && gobName.endsWith("terobjs/beehive")) {
+            else if(showRadiusBeeskep && gobName.endsWith("/terobjs/beehive")) {
                 toggleRadiusBeeskep(ob);
             }
             // radius trough
-            else if(showRadiusFoodtrough && gobName.endsWith("terobjs/trough")) {
+            else if(showRadiusFoodtrough && gobName.endsWith("/terobjs/trough")) {
                 toggleRadiusFoodtrough(ob);
             }
             // cheeserack color
-            else if(highlightCheeserack && gobName.endsWith("cheeserack")){
+            else if(highlightCheeserack && gobName.endsWith("/terobjs/cheeserack")){
                 toggleCheeserack(ob);
+            }
+            // hide hearthfire names
+            else if(!showKinNames && gobName.endsWith("/terobjs/pow")){
+                if (gobHasAttr(ob,"Buddy")){
+                    ob.delattr(Buddy.class);
+                }
             }
 
 
