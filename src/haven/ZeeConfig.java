@@ -258,7 +258,7 @@ public class ZeeConfig {
     static boolean shapeIcons = Utils.getprefb("shapeIcons", false);
     static String shapeIconsList = Utils.getpref("shapeIconsList", DEF_LIST_SHAPEICON);
     static boolean showIconsZoomOut = Utils.getprefb("showIconsZoomOut", true);
-    static boolean showKinNames = Utils.getprefb("showKinNames", true);
+    public static boolean showKinNames = Utils.getprefb("showKinNames", true);
     public static boolean simpleCrops = Utils.getprefb("simpleCrops", true);
     public static boolean simpleHerbs = Utils.getprefb("simpleHerbs", true);
     static boolean slowMiniMap = Utils.getprefb("slowMiniMap", true);
@@ -3781,14 +3781,6 @@ public class ZeeConfig {
             // cheeserack color
             else if(highlightCheeserack && gobName.endsWith("/terobjs/cheeserack")){
                 toggleCheeserack(ob);
-            }
-            // hide hearthfire names
-            else if(!showKinNames && gobName.endsWith("/terobjs/pow")){
-                synchronized (ob) {
-                    if (gobHasAttr(ob, "Buddy")) {
-                        ob.delattr(Buddy.class);
-                    }
-                }
             }
 
 

@@ -23,7 +23,7 @@ public class Buddy extends GAttrib implements InfoPart {
 
     public static void parse(Gob gob, Message dat) {
 	int fl = dat.uint8();
-	if((fl & 1) != 0)
+	if((fl & 1) != 0 && ZeeConfig.showKinNames)
 	    gob.setattr(new Buddy(gob, dat.int32()));
 	else
 	    gob.delattr(Buddy.class);
