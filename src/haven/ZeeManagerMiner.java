@@ -40,6 +40,11 @@ public class ZeeManagerMiner extends ZeeThread{
             return;
         }
 
+        // show tile monitor if area bigger than 1 tile
+        if (tilemonWindow==null && ZeeConfig.lastSavedOverlay.a.sz().compareTo(Coord.of(1)) != 0){
+            tileMonitorWindow();
+        }
+
         // if tunnel mining, show Helper Window
         if (tunnelCheckbox && !tunneling && isTunnel(ZeeConfig.lastSavedOverlay.a.sz())){
             tunneling = true;
@@ -651,11 +656,13 @@ public class ZeeManagerMiner extends ZeeThread{
                         };
                         tilemonAutoThread.start();
                     }
-                    else {
+                    else if (tilemonAutoThread!=null && !tilemonAutoThread.isInterrupted()){
                         tilemonAutoThread.interrupt();
                     }
                 }
             },63,6);
+
+
 
             //wishlist search box
             tilemonLabelFindTile = tilemonWindow.add(new Label("Find"),0,33);
@@ -677,6 +684,8 @@ public class ZeeManagerMiner extends ZeeThread{
             // scrollport for tiles
             tilemonScrollport = tilemonWindow.add(new Scrollport(new Coord(120, 110)), 0, 55);
 
+            // set auto refresh on
+            tilemonAutoCheckbox.click();
         }
         else{
             tilemonWindow.show();
