@@ -6,7 +6,7 @@ import haven.render.*;
 import java.util.*;
 import java.awt.Color;
 
-@haven.FromResource(name = "ui/obj/buddy", version = 2)
+@haven.FromResource(name = "ui/obj/buddy", version = 3)
 public class Info extends GAttrib implements RenderTree.Node, PView.Render2D {
     public final List<InfoPart> parts = new ArrayList<>();
     private Tex rend = null;
@@ -25,12 +25,14 @@ public class Info extends GAttrib implements RenderTree.Node, PView.Render2D {
 	    CompImage cmp = new CompImage();
 	    dirty = false;
 	    auto = false;
-	    for(InfoPart part : parts) {
-		try {
-		    part.draw(cmp, ctx);
-		    auto |= part.auto();
-		} catch(Loading l) {
-		    dirty = true;
+	    synchronized(parts) {
+		for(InfoPart part : parts) {
+		    try {
+			part.draw(cmp, ctx);
+			auto |= part.auto();
+		    } catch(Loading l) {
+			dirty = true;
+		    }
 		}
 	    }
 	    rend = cmp.sz.equals(Coord.z) ? null : new TexI(cmp.compose());
@@ -71,14 +73,18 @@ public class Info extends GAttrib implements RenderTree.Node, PView.Render2D {
 	Info info = gob.getattr(Info.class);
 	if(info == null)
 	    gob.setattr(info = new Info(gob));
-	info.parts.add(part);
-	Collections.sort(info.parts, Comparator.comparing(InfoPart::order));
+	synchronized(info.parts) {
+	    info.parts.add(part);
+	    Collections.sort(info.parts, Comparator.comparing(InfoPart::order));
+	}
 	info.dirty();
 	return(info);
     }
 
     public void remove(InfoPart part) {
-	parts.remove(part);
+	synchronized(parts) {
+	    parts.remove(part);
+	}
 	dirty();
     }
 }
