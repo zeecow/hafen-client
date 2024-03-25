@@ -26,14 +26,14 @@
 
 package haven;
 
-import java.util.*;
-import java.util.function.*;
-import haven.render.*;
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.image.BufferedImage;
 import haven.ItemInfo.AttrCache;
-import static haven.ItemInfo.find;
+import haven.render.Pipe;
+
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.util.ArrayList;
+import java.util.List;
+
 import static haven.Inventory.sqsz;
 
 public class WItem extends Widget implements DTarget {
@@ -229,40 +229,41 @@ public class WItem extends Widget implements DTarget {
 
     public boolean mousedown(Coord c, int btn) {
 
-	// middle-click item starts equipManager
-	if(btn == 2) {
-		ZeeManagerItemClick.clickStartMs = System.currentTimeMillis();
-		return false;
-	}
-
-	// sort transfer
-	if(ui.modmeta && !ui.modshift && !ui.modctrl && !item.res.get().basename().contains("gemstone")){
-		if(btn==1) {
-			wdgmsg("transfer-sort", item, false);
-		}else if(btn==3) {
-			wdgmsg("transfer-sort", item, true);
-		}else {
+		// middle-click item starts equipManager
+		if(btn == 2) {
+			ZeeManagerItemClick.clickStartMs = System.currentTimeMillis();
 			return false;
 		}
-		return true;
-	}
 
-	if(btn == 1) {
-	    if(ui.modshift) {
-		int n = ui.modctrl ? -1 : 1;
-		item.wdgmsg("transfer", c, n);
-	    } else if(ui.modctrl) {
-		int n = ui.modmeta ? -1 : 1;
-		item.wdgmsg("drop", c, n);
-	    } else {
-		item.wdgmsg("take", c);
-	    }
-	    return(true);
-	} else if(btn == 3) {
-	    item.wdgmsg("iact", c, ui.modflags());
-	    return(true);
-	}
-	return(false);
+		// sort transfer
+		if(ui.modmeta && !ui.modshift && !ui.modctrl && !item.res.get().basename().contains("gemstone")){
+			if(btn==1) {
+				wdgmsg("transfer-sort", item, false);
+			}else if(btn==3) {
+				wdgmsg("transfer-sort", item, true);
+			}else {
+				return false;
+			}
+			return true;
+		}
+
+		if(btn == 1) {
+			if(ui.modshift) {
+			int n = ui.modctrl ? -1 : 1;
+			item.wdgmsg("transfer", c, n);
+			} else if(ui.modctrl) {
+			int n = ui.modmeta ? -1 : 1;
+			item.wdgmsg("drop", c, n);
+			} else {
+			item.wdgmsg("take", c);
+			}
+			return(true);
+		} else if(btn == 3) {
+			item.wdgmsg("iact", c, ui.modflags());
+			return(true);
+		}
+
+		return(false);
     }
 
     public boolean drop(Coord cc, Coord ul) {

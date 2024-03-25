@@ -219,8 +219,9 @@ public class ZeeManagerItemClick extends ZeeThread{
 
         try{
 
-            // stack items
             if (ZeeConfig.isPlayerHoldingItem()){
+
+                // stack items
                 if (itemName.contentEquals(getHoldingItem().item.getres().name)){
                     // create multiple stacks
                     if (isLongClick())
@@ -233,8 +234,12 @@ public class ZeeManagerItemClick extends ZeeThread{
                 }
             }
 
-            // item context menu
+            // show item context menu
             if(showItemFlowerMenu()){
+                return;
+            }
+            // cancel if holding item and no item context menu
+            else if (ZeeConfig.isPlayerHoldingItem()){
                 return;
             }
 
@@ -497,6 +502,49 @@ public class ZeeManagerItemClick extends ZeeThread{
         }
     }
 
+    private static void fillCheesetrays(WItem tray) {
+        new ZeeThread(){
+            public void run() {
+                try {
+                    ZeeConfig.addPlayerText("curding");
+
+                    String curdName = getHoldingItem().item.getres().name;
+                    Inventory mainInv = ZeeConfig.getMainInventory();
+                    Inventory trayInv = tray.getparent(Inventory.class);
+                    int invCurds = mainInv.countItemsByNameEquals(curdName);
+                    List<WItem> freeTrays = trayInv.getItemsByNameEnd("/cheesetray");
+
+                    while(invCurds > 0 && freeTrays.size() > 0){
+
+                        // add holding curd to tray until filled or no more curds
+                        freeTrays.get(0).item.wdgmsg("itemact",UI.MOD_CTRL_SHIFT);
+                        playFeedbackSound();
+
+                        // wait transfers
+                        sleep(555);
+
+                        // if not holding curd try pickup more
+                        if (!ZeeConfig.isPlayerHoldingItem()){
+                            // if cant pickup inv curd, then job is done
+                            if(!pickUpInvItem(mainInv,curdName)){
+                                ZeeConfig.msg("all curds used");
+                                break;
+                            }
+                        }
+                        // if still holding curd next loop will check for empty trays
+
+                        invCurds = mainInv.countItemsByNameEquals(curdName);
+                        freeTrays = trayInv.getItemsByNameEnd("/cheesetray");
+                    }
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                ZeeConfig.removePlayerText();
+            }
+        }.start();
+    }
+
 
     private static void equipTwoSacks(WItem sack){
         if (sack!=null) {
@@ -627,6 +675,9 @@ public class ZeeManagerItemClick extends ZeeThread{
                 takeAllInvItems(inv, items);
                 ZeeConfig.gameUI.ui.msg(items.size() + " noms");
             }
+        }
+        else if(petalName.contentEquals("fill all trays")){
+            fillCheesetrays(wItem);
         }
         else
         {
@@ -873,6 +924,13 @@ public class ZeeManagerItemClick extends ZeeThread{
         }
         else if (ZeeConfig.getCursorName().equals(ZeeConfig.CURSOR_EAT)){
             menu = new ZeeFlowerMenu(wItem, ZeeFlowerMenu.STRPETAL_EATALL);
+        }
+        // fill cheese trays
+        else if(itemName.endsWith("/cheesetray") && getHoldingItemName().contains("/curd-")){
+            opts.add("fill all trays");
+            opts.add(ZeeFlowerMenu.STRPETAL_TRANSFER_ASC);
+            opts.add(ZeeFlowerMenu.STRPETAL_TRANSFER_DESC);
+            menu = new ZeeFlowerMenu(wItem, opts.toArray(String[]::new));
         }
         else{
             showMenu = false;

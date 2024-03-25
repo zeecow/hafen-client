@@ -116,7 +116,7 @@ Long Midclick Window Item
 - undo multiple stack items if transfer not available
 - create multiple stacks when hold and midclick same item type
 
-LongMidClick Flowemenu for Ground Objects
+LongMidClick Flowermenu for Ground Objects
 - auto butch dead animal objs
 - start seed farmer for crop objs: harvest, store and replant seeds (no pathfinding)
 - harvest area for crop objs: activate harvest icon (shift+click)
@@ -142,11 +142,12 @@ LongMidClick Flowemenu for Ground Objects
 - queue chip boulder while already chipping/drinking
 - queue shovel stump while already shoveling/drinking
 
-LongMidClick Flowemenu for Window Items
+LongMidClick Flowermenu for Window Items
 - auto butch dead animal items
 - kill all cocoon items
 - feast all food items(requires table)
 - transfer sort items (asc/desc)
+- fill all cheesetrays if holding curd
 
 
 Random Features
