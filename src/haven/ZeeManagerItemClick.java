@@ -1088,7 +1088,7 @@ public class ZeeManagerItemClick extends ZeeThread{
         return isItemDrinkingVessel(itemName);
     }
     public static boolean isItemDrinkingVessel(String name) {
-        String[] items = {"waterskin","bucket-","kuksa","woodencup","glassjug","waterflask","tankard","metalmug","winebottle","wineglass"};
+        String[] items = {"waterskin","bucket-","kuksa","woodencup","glassjug","waterflask","tankard","metalmug","winebottle","wineglass","leafcup-full"};
         for (int i = 0; i < items.length; i++) {
             if (name.contains(items[i])){
                 return true;
