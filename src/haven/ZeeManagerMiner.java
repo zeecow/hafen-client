@@ -813,6 +813,24 @@ public class ZeeManagerMiner extends ZeeThread{
         label = new Label("==== top 10 ql ====");
         label.setcolor(Color.green);
         tilemonWindow.add(label,0,y);
+        y += 10;
+        tilemonWindow.add((new CheckBox("spk"){
+            {a = hiQlSpeak;}
+            public void set(boolean val) {
+                Utils.setprefb("hiQlSpeak", val);
+                hiQlSpeak = val;
+                a = val;
+            }
+        }).settip("speak highest ql"),0,y);
+        tilemonWindow.add((new CheckBox("txt"){
+            {a = hiQlText;}
+            public void set(boolean val) {
+                Utils.setprefb("hiQlText", val);
+                hiQlText = val;
+                a = val;
+            }
+        }).settip("text highest ql"),37,y);
+        y += 3;
         List<Map.Entry<String,Integer>> miningLog = getSortedMiningLog();
         for (int i = 0; i < miningLog.size(); i++) {
             if (i < 10) {//limit list size
@@ -855,6 +873,9 @@ public class ZeeManagerMiner extends ZeeThread{
     }
 
     static HashMap<String,Integer> mapMiningLogNameQl = new HashMap<>();
+    static int highestQl=0;
+    static boolean hiQlSpeak = Utils.getprefb("hiQlSpeak",true);
+    static boolean hiQlText = Utils.getprefb("hiQlText",true);
     static void checkMiningLogHighestQl(GItem gItem, String basename) {
         if (!isStoneNotOre(basename) && !isPreciousOre(basename)
             && !isRegularOre(basename) && !ZeeConfig.mineablesCurios.contains(basename))
@@ -865,6 +886,17 @@ public class ZeeManagerMiner extends ZeeThread{
             if (oldQl == null || newQl > oldQl) {
                 mapMiningLogNameQl.put(basename, newQl);
                 println("miningQl(" + mapMiningLogNameQl.size() + ") > " + getSortedMiningLog().toString());
+                // highest ql
+                if (highestQl < newQl){
+                    highestQl = newQl;
+                    // alert ql if tilemonitor is open
+                    if (tilemonWindow!=null) {
+                        if (hiQlSpeak)
+                            ZeeSynth.textToSpeakLinuxFestival("" + highestQl);
+                        if (hiQlText)
+                            ZeeConfig.addPlayerText(basename + " q" + highestQl);
+                    }
+                }
             }
         }catch (Loading l){
             println(basename+"  spr not loaded yet?");
