@@ -609,6 +609,7 @@ public class ZeeManagerMiner extends ZeeThread{
                 public void wdgmsg(String msg, Object... args) {
                     if (msg.contains("close")){
                         tilesMonitorCleanup();
+                        ZeeConfig.removePlayerText();
                     }
                     //super.wdgmsg(msg, args);
                 }
@@ -813,7 +814,7 @@ public class ZeeManagerMiner extends ZeeThread{
         label = new Label("==== top 10 ql ====");
         label.setcolor(Color.green);
         tilemonWindow.add(label,0,y);
-        y += 10;
+        y += 13;
         tilemonWindow.add((new CheckBox("spk"){
             {a = hiQlSpeak;}
             public void set(boolean val) {
@@ -829,7 +830,7 @@ public class ZeeManagerMiner extends ZeeThread{
                 hiQlText = val;
                 a = val;
             }
-        }).settip("text highest ql"),37,y);
+        }).settip("text highest ql"),40,y);
         y += 3;
         List<Map.Entry<String,Integer>> miningLog = getSortedMiningLog();
         for (int i = 0; i < miningLog.size(); i++) {
@@ -894,7 +895,7 @@ public class ZeeManagerMiner extends ZeeThread{
                         if (hiQlSpeak)
                             ZeeSynth.textToSpeakLinuxFestival("" + highestQl);
                         if (hiQlText)
-                            ZeeConfig.addPlayerText(basename + " q" + highestQl);
+                            ZeeConfig.addPlayerText("q" + highestQl);
                     }
                 }
             }
