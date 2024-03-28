@@ -2055,8 +2055,8 @@ public class ZeeManagerGobClick extends ZeeThread{
             windowTestCoords();
         else if(petalName.contentEquals("Timers"))
             ZeeTimer.showWindow();
-        else if(petalName.contentEquals(ZeeFlowerMenu.STRPETAL_CLEARGOBTEXTS))
-            clearAllGobsTexts();
+        else if(petalName.contentEquals(ZeeFlowerMenu.STRPETAL_CLEARGOBTEXTSPOINTERS))
+            clearAllGobsTextsAndPointers();
         else if (petalName.contentEquals(ZeeFlowerMenu.STRPETAL_AUTOBUTCH_BIGDEADANIMAL)){
             autoButchBigDeadAnimal(gob);
         }
@@ -2287,12 +2287,16 @@ public class ZeeManagerGobClick extends ZeeThread{
         }.start();
     }
 
-    static void clearAllGobsTexts() {
+    static void clearAllGobsTextsAndPointers() {
         try {
             synchronized (ZeeConfig.gameUI.ui.sess.glob.oc) {
                 ZeeConfig.gameUI.ui.sess.glob.oc.forEach(gob -> {
                     synchronized (gob) {
                         Gob.Overlay ol = gob.findol(ZeeGobText.class);
+                        if (ol != null) {
+                            ol.remove(false);
+                        }
+                        ol = gob.findol(ZeeGobPointer.class);
                         if (ol != null) {
                             ol.remove(false);
                         }
@@ -2477,7 +2481,7 @@ public class ZeeManagerGobClick extends ZeeThread{
         else if(gob.tags.contains(Gob.Tag.PLAYER_MAIN)) {
             opts = new ArrayList<String>();
             opts.add(ZeeFlowerMenu.STRPETAL_SWITCHCHAR);
-            opts.add(ZeeFlowerMenu.STRPETAL_CLEARGOBTEXTS);
+            opts.add(ZeeFlowerMenu.STRPETAL_CLEARGOBTEXTSPOINTERS);
             //opts.add(ZeeFlowerMenu.STRPETAL_TESTCOORDS);
             opts.add("Timers");
             if (ZeeConfig.isCaveTile(ZeeConfig.getPlayerTileName()))
