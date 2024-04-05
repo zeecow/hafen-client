@@ -111,14 +111,7 @@ public class ZeeInvMainOptionsWdg extends Widget {
         }, x, 15);
         cbPiler.settip("pile helper (mouse-click menu required)");
 
-        add(labelCount = new Label(""), 0, 0);
         pack();
-    }
-
-    public void updateLabelCount(String itemName, Integer count) {
-        //update counter text
-        labelCount.settext( itemName.replaceAll(".+/","")+ "(" + count +")");
-        repositionLabelCount();
     }
 
     void addWindowTransferOptions() {
@@ -162,16 +155,9 @@ public class ZeeInvMainOptionsWdg extends Widget {
     }
 
     public void reposition() {
-        repositionLabelCount();
+        ZeeConfig.getMainInventory().repositionLabelCount();
         repositionTransferOptions();
-        this.parent.pack();
+        this.getparent(Window.class).pack();
     }
 
-    public void repositionLabelCount() {
-        //position counter at bottom right
-        int x = invSlots.sz.x - labelCount.sz.x;
-        int y = invSlots.sz.y + 20;
-        labelCount.c = new Coord(x, y);
-        pack();
-    }
 }

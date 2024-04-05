@@ -2492,8 +2492,21 @@ public class ZeeConfig {
     public static void invCounterUpdate(GItem i) {
         try {
             String itemName = i.getres().name;
-            Integer count = getMainInventory().countItemsByNameEquals(itemName);
-            invMainoptionsWdg.updateLabelCount(itemName,count);
+            Inventory inv = i.getparent(Inventory.class);
+            if (inv!=null) {
+                if (inv.labelCount==null) {
+                    Window win = inv.getparent(Window.class);
+                    //skip belt and small invs
+                    if (win.cap.contentEquals("Belt") || inv.isz.x * inv.isz.y < 25)
+                        return;
+                    win.add(inv.labelCount = new Label(""), 0, 0);
+                    inv.labelCount.setcolor(Color.cyan);
+                }
+                Integer count = inv.countItemsByNameEquals(itemName);
+                //update counter text
+                inv.labelCount.settext(itemName.replaceAll(".+/", "") + "(" + count + ")");
+                inv.repositionLabelCount();//only when main inv resizes?
+            }
         }catch (Resource.Loading e){
         }
     }

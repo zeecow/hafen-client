@@ -186,7 +186,7 @@ public class GItem extends AWidget implements ItemInfo.SpriteOwner, GSprite.Owne
 			ZeeConfig.lastInvItemCreatedName = getres().name;
 			ZeeConfig.lastInvItemCreatedBaseName = basename;
 			ZeeConfig.lastInvItemCreatedMs = ZeeThread.now();
-			ZeeConfig.invCounterUpdate(this);
+			//ZeeConfig.invCounterUpdate(this);
 		}
 
 		//drop mined items

@@ -37,7 +37,7 @@ public class Inventory extends Widget implements DTarget {
     public boolean dropul = true;
     public Coord isz;
     public boolean[] sqmask = null;
-    Map<GItem, WItem> wmap = new HashMap<GItem, WItem>();
+	Map<GItem, WItem> wmap = new HashMap<GItem, WItem>();
 	public static final Comparator<WItem> ITEM_COMPARATOR_ASC = new Comparator<WItem>() {
 		@Override
 		public int compare(WItem o1, WItem o2) {
@@ -135,7 +135,7 @@ public class Inventory extends Widget implements DTarget {
 	if(w instanceof GItem) {
 	    GItem i = (GItem)w;
 	    ui.destroy(wmap.remove(i));
-		if(isMainInv())
+		if(labelCount!=null)
 			ZeeConfig.invCounterUpdate(i);
 	}
     }
@@ -553,5 +553,18 @@ public class Inventory extends Widget implements DTarget {
 			}
 		}
 		return ret;
+	}
+
+	public Label labelCount = null;
+	public void repositionLabelCount() {
+		if (labelCount==null)
+			return;
+		Window win = this.getparent(Window.class);
+		Coord br = this.area().br;
+		labelCount.c = new Coord(
+				br.x - labelCount.sz.x,
+				br.y - 3
+		);
+		//win.pack();
 	}
 }
