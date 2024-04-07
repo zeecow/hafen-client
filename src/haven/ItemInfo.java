@@ -26,8 +26,6 @@
 
 package haven;
 
-import haven.resutil.FoodInfo;
-
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.List;
@@ -321,8 +319,6 @@ public abstract class ItemInfo {
 	    if(ii instanceof Tip) {
 		Tip tip = (Tip)ii;
 		l.add(tip);
-		if (ZeeConfig.researchFoodTips && tip instanceof FoodInfo)
-			ZeeResearch.checkFoodTip(info);
 	    }
 	}
 	if(l.tips.size() < 1)

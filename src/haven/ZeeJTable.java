@@ -86,10 +86,20 @@ public class ZeeJTable extends JFrame {
         String[] arrLine, arrIgr, arrEvt;
         String lineRow;
         for (int i = 0; i < lines.size(); i++) {
+
             line = lines.get(i);
-            if (line.isBlank())
+
+            if (line.isBlank()) {
+                println("blank line");
                 continue;
+            }
+
             arrLine = line.split(";");
+
+            if (!line.contains("evt,")){
+                println("no evts for "+arrLine[0]);
+                continue;
+            }
 
             //name
             lineRow = arrLine[0] + ";";
@@ -125,12 +135,14 @@ public class ZeeJTable extends JFrame {
                 }
             }
             //trim events
-            if (lineRow.endsWith(", ")) {
-                lineRow = lineRow.replaceAll(", $", ";");
+            lineRow = lineRow.trim();
+            if (lineRow.endsWith(",")) {
+                lineRow = lineRow.replaceAll(",$", ";");
             }
-            // no events?, empty col
+            // no idea
             else{
                 lineRow += ";";
+                println(arrLine[0]+" >?> "+lineRow);
             }
             //sort FEPs by highest number
             String[] arrLineRow = lineRow.split(";");

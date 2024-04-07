@@ -88,6 +88,9 @@ public class FoodInfo extends ItemInfo.Tip {
 		efi = catimgsh(5, efi, RichText.render(String.format("$i{($col[192,192,255]{%d%%} chance)}", (int)Math.round(efs[i].p * 100)), 0).img);
 	    imgs.add(efi);
 	}
+	if (ZeeConfig.researchFoodTips) {
+		ZeeResearch.checkFoodTip(owner.info());
+	}
 	return(catimgs(0, imgs.toArray(new BufferedImage[0])));
     }
 }

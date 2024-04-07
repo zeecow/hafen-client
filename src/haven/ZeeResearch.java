@@ -3,13 +3,17 @@ package haven;
 import haven.res.ui.tt.q.quality.Quality;
 import haven.resutil.FoodInfo;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class ZeeResearch {
@@ -19,7 +23,7 @@ public class ZeeResearch {
     public static String hsElixirStr;
     public static long hsElixirStrMs;
     static List<WItem> hsItemsUsed;
-    private static List<String> listSkipSavingFood;
+    private static List<String> listSkipFoodIds;
 
     public static void checkResearch(String recipe) {
         if(recipe.contentEquals("Herbal Swill")) {
@@ -132,7 +136,7 @@ public class ZeeResearch {
                 ql = String.valueOf(ZeeConfig.doubleRound2(((Quality)ii).q)) + ";";
             }
             // food ingredient and smoke
-            else if (ii.getClass().getName().contentEquals("Ingredient") || ii.getClass().getName().contentEquals("Smoke")){
+            else if (ii.getClass().getSimpleName().contentEquals("Ingredient") || ii.getClass().getSimpleName().contentEquals("Smoke")){
                 ingredsFound++;
                 try {
                     String ingrName = (String) ii.getClass().getDeclaredField("name").get(ii);
@@ -150,18 +154,6 @@ public class ZeeResearch {
                 }
             }
         }
-
-        // avoid reading disk multiple times for same item type
-        if (ingredsFound == 0){
-            if (listSkipSavingFood==null) {
-                listSkipSavingFood = new ArrayList<>();
-            } else if(listSkipSavingFood.contains(name)){
-                return;
-            }
-            listSkipSavingFood.add(name);
-        }
-        // else { TODO expand to multiple ingredients }
-
 
         //save line
         if (!name.isBlank() && !ql.isBlank()) {
@@ -181,7 +173,6 @@ public class ZeeResearch {
     private static void foodSaveEntry(String entry) {
         // entry format "name;ql;ingreds;events;"
         if (foodEntryExists(entry)){
-            println("food entry already exist > "+entry);
             return;
         }
         writeLineToFile(entry,FILE_NAME_FOOD);
@@ -194,58 +185,60 @@ public class ZeeResearch {
     // ingreds format: "igr,[name],[perc];"
     private static boolean foodEntryExists(String entry) {
 
+        String newFoodId = getFoodIdFromLine(entry);
+
+        // skip reading disk if possible
+        if (listSkipFoodIds == null) {
+            listSkipFoodIds = new ArrayList<>();
+        } else if (listSkipFoodIds.contains(newFoodId)) {
+            return true;
+        }
+
+        // read lines from file
         List<String> lines = readAllLinesFromFile(FILE_NAME_FOOD);
         if (lines==null)
             return false;
-        String[] entryArr = entry.split(";");
-        String entryName = entryArr[0];
-        String[] arrLine;
-        String line;
-        boolean entryExists = false;
-
-        //check all lines from file
         for (int i = 0; i < lines.size(); i++) {
-
             //skip empty lines
             if (lines.get(i).isBlank())
                 continue;
-
-            //line to array
-            line = lines.get(i);
-            arrLine = line.split(";");
-
-            //check same name
-            if (!arrLine[0].contentEquals(entryName)){
-                continue;
-            }
-            //println("check "+ arrLine[0]);
-
-            //check same ingredients (or no ingredients)
-            boolean ingredsMatch = true;
-            for (int j = 1; j < arrLine.length; j++) {
-                //skip entries without ingredient
-                // TODO consider case
-                //  "Buttered Leeks;85.0;evt,WIL+2,8.75;evt,CON+1,8.75;"
-                //  "Buttered Leeks;78.07;igr,Goatsmilk,1.0;evt,WIL+2,6.29;evt,CON+1,6.29;evt,DEX+1,5.87;"
-                // if no-IGR is saved first, then others with IGR are being ignored
-                // only works now if IGR items are saved first
-                if (!arrLine[j].contains("igr,"))
-                    continue;
-                //ingredient not present, match is false
-                if (!entry.contains(arrLine[j])){
-                    //println(entry +" !contains "+arrLine[j]);
-                    ingredsMatch = false;
-                    break;
-                }
-            }
-            if (ingredsMatch){
-                entryExists = true;
-                break;
+            // found same foodId
+            if (newFoodId.contentEquals(getFoodIdFromLine(lines.get(i)))){
+                listSkipFoodIds.add(newFoodId);
+                return true;
             }
         }
-        return entryExists;
+
+        // foodId not found
+        return false;
     }
 
+    private static String getFoodIdFromLine(String line) {
+
+        // foodId format: "foodName[,igrName]"
+        String foodId = "";
+
+        // entry format "name;ql;ingreds;events;"
+        String[] arr0 = line.split(";");
+
+        for (int i = 0; i < arr0.length; i++) {
+            // food name
+            if (i==0){
+                foodId += arr0[0];
+            }
+            // extract igrName from : "igr,[name],[perc];"
+            else if (arr0[i].startsWith("igr,")){
+                String igrName = arr0[i].split(",")[1];
+                foodId += "," + igrName;
+            }
+        }
+
+        // sort foodId alphabetically
+        String[] arr = foodId.split(",");
+        Arrays.sort(arr);
+
+        return String.join(",",arr);
+    }
 
 
     private static String newLine;

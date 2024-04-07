@@ -274,7 +274,7 @@ public class ZeeConfig {
     static String windowShortMidclickTransferMode = "des";//default shortMidclick transfer descending
     static boolean liftVehicleBeforeTravelHearth = Utils.getprefb("liftVehicleBeforeTravelHearth", true);
     static int minimapScale = Utils.getprefi("minimapScale",1);
-    static boolean researchFoodTips = Utils.getprefb("researchFoodTips", true);
+    public static boolean researchFoodTips = Utils.getprefb("researchFoodTips", true);
     static boolean closeTamedAnimalWindowAfterNaming = Utils.getprefb("closeTamedAnimalWindowAfterNaming", true);
     static int gobMaxRequeues = Utils.getprefi("gobMaxRequeues",DEF_GOB_MAX_REQUEUE);
     static boolean minimapSolidColor = Utils.getprefb("minimapSolidColor",true);
