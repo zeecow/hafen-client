@@ -56,7 +56,7 @@ public class ZeeCupboardLabeler {
                     public void wdgmsg(String msg, Object... args) {
                         if (msg.contentEquals("close")){
                             if (lastInterior!=null)
-                                lastInterior.removeCupLabels();
+                                lastInterior.removeCupIcons();
                             reset();
                             this.reqdestroy();
                         }
@@ -151,19 +151,21 @@ public class ZeeCupboardLabeler {
         }
     }
 
-    public static void checkInterior() {
+    public static void checkPlayerLocation() {
         // player inside building
         if (ZeeConfig.playerLocation==ZeeConfig.LOCATION_CABIN || ZeeConfig.playerLocation==ZeeConfig.LOCATION_CELLAR) {
             if (!lastHouseId.isBlank()) {
                 initHouseInterior();
                 showWindow();
-            }else{
+            } else {
                 reset();
             }
         }
         // player left building
         else{
-            reset();
+            if (win!=null)
+                win.reqdestroy();
+            win = null;
         }
     }
 
@@ -262,6 +264,10 @@ public class ZeeCupboardLabeler {
                 try {
                     sleep(333);
                     HashMap<String, Integer> map = inv.getMapItemNameCount();
+                    if (map.isEmpty()) {
+                        println("empty cupboard");
+                        return;
+                    }
                     //println(map.toString());
                     if (lastInterior==null){
                         lastInterior = getCurrentInterior();
@@ -303,38 +309,63 @@ public class ZeeCupboardLabeler {
             return null;
         }
 
-        void removeCupLabels(){
+        void removeCupIcons(){
             List<Gob> cupGobs = ZeeConfig.findGobsByNameEndsWith("/cupboard");
             ZeeConfig.removeGobText(gobRef);
-            ZeeConfig.removeGobText((ArrayList<Gob>) cupGobs);
-        }
-
-        void addCupLabels(){
-            ZeeConfig.addGobText(gobRef,"ref");
-            List<Gob> cupGobs = ZeeConfig.findGobsByNameEndsWith("/cupboard");
-            for (Gob cupGob : cupGobs) {
-                Float dist = ZeeConfig.distanceBetweenGobs(cupGob, this.gobRef);
-                if (dist == null) {
-                    println("labelCupboard > cupboard dist null");
-                    continue;
-                }
-                for (Cupboard cup : this.cups) {
-                    if (dist == cup.distToGobRef) {
-                        ZeeConfig.addGobText(cupGob, cup.mostCommonItemBasename);
+            for (Gob cg : cupGobs) {
+                synchronized (cg) {
+                    Gob.Overlay ol = cg.findol(ZeeGobPointer.class);
+                    if (ol != null) {
+                        ol.remove(false);
                     }
                 }
             }
         }
 
+        void addCupIcons(){
+            try {
+                ZeeConfig.addGobText(gobRef, "ref");
+                List<Gob> cupGobs = ZeeConfig.findGobsByNameEndsWith("/cupboard");
+                for (Gob gobCup : cupGobs) {
+                    Float dist = ZeeConfig.distanceBetweenGobs(gobCup, this.gobRef);
+                    if (dist == null) {
+                        println("labelCupboard > cupboard dist null");
+                        continue;
+                    }
+                    for (Cupboard cup : this.cups) {
+                        if (dist == cup.distToGobRef) {
+                            try {
+                                Tex tex = Resource.remote().loadwait(cup.itemResName).flayer(Resource.Image.class).tex();
+                                gobCup.addol(new ZeeGobPointer(gobCup, tex, true));
+                                gobCup.hasPointer = true;
+                            }catch (Resource.NoSuchLayerException e) {
+                                println("cuplbl > "+e.getMessage());
+                            }catch (Exception e){
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+                }
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+        }
+
         void toggleCupboardLabels() {
             if (!isActive){
-                this.removeCupLabels();
+                this.removeCupIcons();
             } else {
-                this.addCupLabels();
+                this.addCupIcons();
             }
         }
 
         void updateCupboard(Gob gobCup, HashMap<String, Integer> mapItemNameCount) {
+
+            if (mapItemNameCount.isEmpty()) {
+                println("empty cupboard 2");
+                return;
+            }
+
             // find most common item
             String mostCommonItem = mapItemNameCount.entrySet().iterator().next().getKey();
             for (Map.Entry<String, Integer> entry : mapItemNameCount.entrySet()) {
@@ -356,19 +387,27 @@ public class ZeeCupboardLabeler {
                     cupboard = new Cupboard(dist,mostCommonItem);
                     this.cups.add(cupboard);
                 } else {
-                    cupboard.mostCommonItemBasename = mostCommonItem;
+                    cupboard.itemResName = mostCommonItem;
                 }
-                ZeeConfig.addGobText(gobCup, mostCommonItem);
+                try {
+                    Tex tex = Resource.remote().loadwait(mostCommonItem).flayer(Resource.Image.class).tex();
+                    gobCup.addol(new ZeeGobPointer(gobCup, tex, true));
+                    gobCup.hasPointer = true;
+                }catch (Resource.NoSuchLayerException e) {
+                    println("cuplbl > "+e.getMessage());
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
             }
         }
 
         private class Cupboard {
             double distToGobRef;
-            String mostCommonItemBasename;
+            String itemResName;
 
             public Cupboard(double distRef, String itemName) {
                 this.distToGobRef = distRef;
-                this.mostCommonItemBasename = itemName;
+                this.itemResName = itemName;
             }
         }
     }

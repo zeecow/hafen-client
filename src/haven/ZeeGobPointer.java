@@ -13,6 +13,7 @@ public class ZeeGobPointer extends Sprite implements RenderTree.Node, PView.Rend
     static final TexI bgTexTriangle = new TexI(ZeeManagerIcons.imgTriangleDown(10, Color.CYAN,false,false,true));
     static final TexI bgTexCircle = new TexI(ZeeManagerIcons.imgSquare(20, Color.CYAN,false,false,true));
     static ZeeGobRadar gobRadar;
+    private boolean rawIcon;
     Coord2d tc;
     long gobid = -1;
     Tex iconTex;
@@ -22,7 +23,13 @@ public class ZeeGobPointer extends Sprite implements RenderTree.Node, PView.Rend
         super(gob,null);//super(gob, icon.get());
         this.iconTex = tex;
         this.gob = gob;
+        this.rawIcon = false;
         update(gob.rc,gob.id);
+    }
+
+    public ZeeGobPointer(Gob gobCup, Tex tex, boolean rawIcon) {
+        this(gobCup,tex);
+        this.rawIcon = rawIcon;
     }
 
     public void draw(GOut g, Pipe state){
@@ -35,9 +42,13 @@ public class ZeeGobPointer extends Sprite implements RenderTree.Node, PView.Rend
             if(iconTex == null) {
                 iconTex = mapGobPointer.get(gob.getres().name);
             }
-            g.aimage(bgTexTriangle, sc, -0.5, -1.5);
-            g.image(bgTexCircle, sc);
-            g.image(iconTex, sc, bgTexCircle.sz);
+            if (rawIcon) {
+                g.image(iconTex, sc);
+            } else {
+                g.aimage(bgTexTriangle, sc, -0.5, -1.5);
+                g.image(bgTexCircle, sc);
+                g.image(iconTex, sc, bgTexCircle.sz);
+            }
         } catch(Loading l) {
             ZeeConfig.println("ZeePointer.draw > "+l.getMessage());
         }

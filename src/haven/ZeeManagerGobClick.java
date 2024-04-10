@@ -4463,7 +4463,7 @@ public class ZeeManagerGobClick extends ZeeThread{
 
         // cupboard labeler
         if (ZeeCupboardLabeler.isActive)
-            ZeeCupboardLabeler.checkInterior();
+            ZeeCupboardLabeler.checkPlayerLocation();
     }
 
     private static void restoreSavedBrightness() {

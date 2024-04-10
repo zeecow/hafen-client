@@ -3762,7 +3762,7 @@ public class ZeeConfig {
                                 }
                                 else {
                                     // delayed remove player pointer
-                                    sleep(500);
+                                    sleep(555);
                                     if (ob.hasPointer)
                                         removeGobPointer(ob);
                                 }
