@@ -280,7 +280,6 @@ public class ZeeCupboardLabeler {
                     sleep(333);
                     HashMap<String, Integer> mapItemQantity = inv.getMapItemNameCount();
                     if (mapItemQantity.isEmpty()) {
-                        println("empty cupboard");
                         return;
                     }
                     //println(map.toString());
@@ -297,28 +296,16 @@ public class ZeeCupboardLabeler {
 
     private static class Interior {
         String id;
-        Gob gobRef;
         List<Cupboard> cups;
 
         public Interior(){
             id = generateInteriorId();
             cups = new ArrayList<>();
-
-            if (lastCabinLevel==CABIN_LEVEL_CELLAR)
-                gobRef = ZeeConfig.getClosestGobByNameEnds("/cellarstairs");
-            else if (lastCabinLevel==CABIN_LEVEL_ENTRANCE)
-                gobRef = ZeeConfig.getClosestGobByNameEnds("-door");
-            else
-                gobRef = ZeeConfig.getClosestGobByNameEnds("downstairs");
-
-            if (gobRef==null){
-                println("new Interior has no gobRef");
-            }
         }
 
-        public Cupboard getCupboard(double distCupToRef, Coord2d rc){
+        public Cupboard getCupboard(Coord2d rc){
             for (Cupboard cup : cups) {
-                if (cup.distToGobRef == distCupToRef  &&  cup.rc.compareToFixMaybe(rc) == 0)
+                if (cup.rc.compareToFixMaybe(rc) == 0)
                     return cup;
             }
             return null;
@@ -326,7 +313,6 @@ public class ZeeCupboardLabeler {
 
         void removeCupIcons(){
             List<Gob> cupGobs = ZeeConfig.findGobsByNameEndsWith("/cupboard");
-            ZeeConfig.removeGobText(gobRef);
             for (Gob cg : cupGobs) {
                 synchronized (cg) {
                     Gob.Overlay ol = cg.findol(ZeeGobPointer.class);
@@ -339,15 +325,9 @@ public class ZeeCupboardLabeler {
 
         void addCupIcons(){
             try {
-                ZeeConfig.addGobText(gobRef, "ref");
                 List<Gob> cupGobs = ZeeConfig.findGobsByNameEndsWith("/cupboard");
                 for (Gob gobCup : cupGobs) {
-                    Float dist = ZeeConfig.distanceBetweenGobs(gobCup, this.gobRef);
-                    if (dist == null) {
-                        println("labelCupboard > cupboard dist null");
-                        continue;
-                    }
-                    Cupboard cup = getCupboard(dist, gobCup.rc);
+                    Cupboard cup = getCupboard(gobCup.rc);
                     if (cup!=null){
                         try {
                             Tex tex = Resource.remote().loadwait(cup.itemResName).flayer(Resource.Image.class).tex();
@@ -376,7 +356,6 @@ public class ZeeCupboardLabeler {
         void updateCupboard(Gob gobCup, HashMap<String, Integer> mapItemNameCount) {
 
             if (mapItemNameCount.isEmpty()) {
-                println("empty cupboard 2");
                 return;
             }
 
@@ -390,42 +369,33 @@ public class ZeeCupboardLabeler {
             }
 
             // update cupboard and label gob
-            Float dist = ZeeConfig.distanceBetweenGobs(gobCup, this.gobRef);
-            if (dist==null){
-                println("updateCupboard > dist not found");
-                ZeeConfig.addGobText(gobCup,"noDist?");
+            Cupboard cupboard = this.getCupboard(gobCup.rc);
+            if (cupboard==null){
+                cupboard = new Cupboard(mostCommonItem,gobCup.rc);
+                this.cups.add(cupboard);
             } else {
-                Cupboard cupboard = this.getCupboard(dist,gobCup.rc);
-                if (cupboard==null){
-                    println("updateCupboard > new cupboard > "+mostCommonItem);
-                    cupboard = new Cupboard(dist,mostCommonItem,gobCup.rc);
-                    this.cups.add(cupboard);
-                } else {
-                    cupboard.itemResName = mostCommonItem;
-                }
+                cupboard.itemResName = mostCommonItem;
+            }
 
-                // label cupboard
-                try {
-                    Tex tex = Resource.remote().loadwait(mostCommonItem).flayer(Resource.Image.class).tex();
-                    gobCup.addol(new ZeeGobPointer(gobCup, tex, true));
-                    gobCup.hasPointer = true;
-                    //update window
-                    showWindow();
-                }catch (Resource.NoSuchLayerException e) {
-                    println("cuplbl > "+e.getMessage());
-                }catch (Exception e){
-                    e.printStackTrace();
-                }
+            // label cupboard
+            try {
+                Tex tex = Resource.remote().loadwait(mostCommonItem).flayer(Resource.Image.class).tex();
+                gobCup.addol(new ZeeGobPointer(gobCup, tex, true));
+                gobCup.hasPointer = true;
+                //update window
+                showWindow();
+            }catch (Resource.NoSuchLayerException e) {
+                println("cuplbl > "+e.getMessage());
+            }catch (Exception e){
+                e.printStackTrace();
             }
         }
 
         private class Cupboard {
-            double distToGobRef;
             String itemResName;
             Coord2d rc;
 
-            public Cupboard(double distRef, String itemName, Coord2d rc) {
-                this.distToGobRef = distRef;
+            public Cupboard(String itemName, Coord2d rc) {
                 this.itemResName = itemName;
                 this.rc = Coord2d.of(rc.x,rc.y);
             }
