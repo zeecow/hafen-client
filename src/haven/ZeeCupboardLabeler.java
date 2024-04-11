@@ -36,7 +36,7 @@ public class ZeeCupboardLabeler {
         return houseId;
     }
 
-    private static void hideWindow() {
+    private static void destroyWindow() {
         win = ZeeConfig.getWindow(winTitle);
         if (win != null){
             win.reqdestroy();
@@ -46,7 +46,7 @@ public class ZeeCupboardLabeler {
 
     static void showWindow() {
 
-        hideWindow();
+        destroyWindow();
 
         Widget wdg;
 
@@ -65,24 +65,36 @@ public class ZeeCupboardLabeler {
                 ZeeConfig.gameUI.sz.div(2)
         );
 
-        wdg = win.add(new Label(lastHouseId), CABIN_LEVEL_CELLAR, CABIN_LEVEL_CELLAR);
+        wdg = win.add(new Label(lastHouseId.substring(0,lastHouseId.indexOf(",")) + "..."), CABIN_LEVEL_CELLAR, CABIN_LEVEL_CELLAR);
 
-        wdg = win.add(new Label(generateInteriorId()), ZeeWindow.posBelow(wdg, CABIN_LEVEL_CELLAR,3));
+        Interior inter = getCurrentInterior();
+        wdg = win.add(new Label(inter.id+" , cups "+inter.cups.size()), ZeeWindow.posBelow(wdg, CABIN_LEVEL_CELLAR,3));
 
-        wdg = win.add(new Label("Interiors: "+mapHouseInteriors.size()), ZeeWindow.posBelow(wdg, CABIN_LEVEL_CELLAR,3));
+        wdg = win.add(new Label("mapHouseInteriors: "+mapHouseInteriors.size()), ZeeWindow.posBelow(wdg, CABIN_LEVEL_CELLAR,3));
 
-        wdg = win.add(new Button(60,"delete"){
+        wdg = win.add(new Button(100,"delete house"){
             public void wdgmsg(String msg, Object... args) {
                 if (msg.contentEquals("activate")){
-                    if (lastHouseId !=null && !lastHouseId.isBlank()) {
-                        mapHouseInteriors.remove(lastHouseId);
-                        win.wdgmsg("close");
-                    }
+                    deleteHouse();
                 }
             }
         },ZeeWindow.posBelow(wdg, CABIN_LEVEL_CELLAR,3));
 
         win.pack();
+    }
+
+    private static void deleteHouse() {
+        if (lastHouseId !=null && !lastHouseId.isBlank()) {
+            if (lastInterior!=null && isActive){
+                lastInterior.removeCupIcons();
+            }
+            mapHouseInteriors.remove(lastHouseId);
+            lastHouseId = "";
+            if (win!=null) {
+                win.reqdestroy();
+                win = null;
+            }
+        }
     }
 
     static void reset() {
@@ -154,6 +166,9 @@ public class ZeeCupboardLabeler {
     public static void checkPlayerLocation() {
         // player inside building
         if (ZeeConfig.playerLocation==ZeeConfig.LOCATION_CABIN || ZeeConfig.playerLocation==ZeeConfig.LOCATION_CELLAR) {
+            Area area = ZeeConfig.gameUI.map.area();
+            //println("area "+area.toString());
+            //println("   int "+area.area()+" , rsz "+area.rsz());
             if (!lastHouseId.isBlank()) {
                 initHouseInterior();
                 showWindow();
@@ -194,7 +209,7 @@ public class ZeeCupboardLabeler {
             return;
         }
         lastInterior = interior;
-        lastInterior.toggleCupboardLabels();
+        lastInterior.toggleIcons();
     }
 
     private static Interior getCurrentInterior() {
@@ -243,10 +258,10 @@ public class ZeeCupboardLabeler {
         if (isActive) {
             showWindow();
         }else{
-            hideWindow();
+            destroyWindow();
         }
         if (lastInterior!=null)
-            lastInterior.toggleCupboardLabels();
+            lastInterior.toggleIcons();
     }
 
     public static void checkCupboardContents(Window window) {
@@ -263,8 +278,8 @@ public class ZeeCupboardLabeler {
             public void run() {
                 try {
                     sleep(333);
-                    HashMap<String, Integer> map = inv.getMapItemNameCount();
-                    if (map.isEmpty()) {
+                    HashMap<String, Integer> mapItemQantity = inv.getMapItemNameCount();
+                    if (mapItemQantity.isEmpty()) {
                         println("empty cupboard");
                         return;
                     }
@@ -272,7 +287,7 @@ public class ZeeCupboardLabeler {
                     if (lastInterior==null){
                         lastInterior = getCurrentInterior();
                     }
-                    lastInterior.updateCupboard(lastCupboardClicked,map);
+                    lastInterior.updateCupboard(lastCupboardClicked,mapItemQantity);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -301,9 +316,9 @@ public class ZeeCupboardLabeler {
             }
         }
 
-        public Cupboard getCupboard(double distCupToRef){
+        public Cupboard getCupboard(double distCupToRef, Coord2d rc){
             for (Cupboard cup : cups) {
-                if (cup.distToGobRef == distCupToRef)
+                if (cup.distToGobRef == distCupToRef  &&  cup.rc.compareToFixMaybe(rc) == 0)
                     return cup;
             }
             return null;
@@ -332,17 +347,16 @@ public class ZeeCupboardLabeler {
                         println("labelCupboard > cupboard dist null");
                         continue;
                     }
-                    for (Cupboard cup : this.cups) {
-                        if (dist == cup.distToGobRef) {
-                            try {
-                                Tex tex = Resource.remote().loadwait(cup.itemResName).flayer(Resource.Image.class).tex();
-                                gobCup.addol(new ZeeGobPointer(gobCup, tex, true));
-                                gobCup.hasPointer = true;
-                            }catch (Resource.NoSuchLayerException e) {
-                                println("cuplbl > "+e.getMessage());
-                            }catch (Exception e){
-                                e.printStackTrace();
-                            }
+                    Cupboard cup = getCupboard(dist, gobCup.rc);
+                    if (cup!=null){
+                        try {
+                            Tex tex = Resource.remote().loadwait(cup.itemResName).flayer(Resource.Image.class).tex();
+                            gobCup.addol(new ZeeGobPointer(gobCup, tex, true));
+                            gobCup.hasPointer = true;
+                        }catch (Resource.NoSuchLayerException e) {
+                            println("cuplbl > "+e.getMessage());
+                        }catch (Exception e){
+                            e.printStackTrace();
                         }
                     }
                 }
@@ -351,7 +365,7 @@ public class ZeeCupboardLabeler {
             }
         }
 
-        void toggleCupboardLabels() {
+        void toggleIcons() {
             if (!isActive){
                 this.removeCupIcons();
             } else {
@@ -381,18 +395,22 @@ public class ZeeCupboardLabeler {
                 println("updateCupboard > dist not found");
                 ZeeConfig.addGobText(gobCup,"noDist?");
             } else {
-                Cupboard cupboard = this.getCupboard(dist);
+                Cupboard cupboard = this.getCupboard(dist,gobCup.rc);
                 if (cupboard==null){
                     println("updateCupboard > new cupboard > "+mostCommonItem);
-                    cupboard = new Cupboard(dist,mostCommonItem);
+                    cupboard = new Cupboard(dist,mostCommonItem,gobCup.rc);
                     this.cups.add(cupboard);
                 } else {
                     cupboard.itemResName = mostCommonItem;
                 }
+
+                // label cupboard
                 try {
                     Tex tex = Resource.remote().loadwait(mostCommonItem).flayer(Resource.Image.class).tex();
                     gobCup.addol(new ZeeGobPointer(gobCup, tex, true));
                     gobCup.hasPointer = true;
+                    //update window
+                    showWindow();
                 }catch (Resource.NoSuchLayerException e) {
                     println("cuplbl > "+e.getMessage());
                 }catch (Exception e){
@@ -404,10 +422,12 @@ public class ZeeCupboardLabeler {
         private class Cupboard {
             double distToGobRef;
             String itemResName;
+            Coord2d rc;
 
-            public Cupboard(double distRef, String itemName) {
+            public Cupboard(double distRef, String itemName, Coord2d rc) {
                 this.distToGobRef = distRef;
                 this.itemResName = itemName;
+                this.rc = Coord2d.of(rc.x,rc.y);
             }
         }
     }
