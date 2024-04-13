@@ -185,9 +185,9 @@ public class ZeeConfig {
     static int lastSavedOverlayModflags;
     static long lastSavedOverlayMs;
     static MCache.Overlay lastSavedOverlay;
-    static GItem lastInvItemCreated;
-    static String lastInvItemCreatedBaseName, lastInvItemCreatedName;
-    static long lastInvItemCreatedMs;
+    static GItem lastInvGItemCreated;
+    static String lastInvGItemCreatedBaseName, lastInvGItemCreatedName;
+    static long lastInvGItemCreatedMs;
     static Coord lastUiClickCoord;
     static Class<?> classMSRad;
 

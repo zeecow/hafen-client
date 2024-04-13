@@ -146,10 +146,6 @@ public class WItem extends Widget implements DTarget {
 	    for(ItemInfo inf : info) {
 		if(inf instanceof GItem.OverlayInfo)
 		    buf.add(GItem.InfoOverlay.create((GItem.OverlayInfo<?>)inf));
-			GItem gItem = ((GItem)inf.owner);
-			if (gItem.contentsnm==null) {//skip count if stack placeholder
-				ZeeConfig.invCounterUpdate(gItem);
-			}
 	    }
 	    GItem.InfoOverlay<?>[] ret = buf.toArray(new GItem.InfoOverlay<?>[0]);
 	    return(() -> ret);

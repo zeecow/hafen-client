@@ -466,10 +466,28 @@ public class Inventory extends Widget implements DTarget {
 		item.item.wdgmsg("drop",itemCoord,-1);
 	}
 
-	public static Double getQuality(GItem item) {
+
+	static Double getAvgStackQuality(GItem stackPlaceholder){
+		if (stackPlaceholder.contents==null)//not a stack
+			return getQuality(stackPlaceholder);
+		List<Double> listQl = new ArrayList<>();
+		for (WItem wItem : stackPlaceholder.contents.children(WItem.class)) {
+			Double ql = ZeeManagerItemClick.getItemInfoQuality(wItem.item.info());
+			listQl.add(ql);
+		}
+		if (listQl.isEmpty()) {
+			return (double) -1;
+		}
+		double total = listQl.stream().mapToDouble(aDouble -> aDouble).sum();
+		return total/listQl.size();
+	}
+
+	static Double getQuality(GItem item) {
 		try {
-			Double ret = ZeeManagerItemClick.getItemInfoQuality(item.info());
-			return ret;
+			if (item.contents!=null){
+				return getAvgStackQuality(item);
+			}
+			return ZeeManagerItemClick.getItemInfoQuality(item.info());
 		} catch (Loading e) {
 			//ZeeConfig.println("Inventory.getQuality > "+e.getMessage());
 		}

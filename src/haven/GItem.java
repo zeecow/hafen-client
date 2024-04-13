@@ -48,7 +48,7 @@ public class GItem extends AWidget implements ItemInfo.SpriteOwner, GSprite.Owne
     private GSprite spr;
     private ItemInfo.Raw rawinfo;
     private List<ItemInfo> info = Collections.emptyList();
-	private boolean itemChecked = false;
+	boolean itemChecked = false;
 
     @RName("item")
     public static class $_ implements Factory {
@@ -165,82 +165,13 @@ public class GItem extends AWidget implements ItemInfo.SpriteOwner, GSprite.Owne
 			spr = this.spr = GSprite.create(this, res.get(), sdt.clone());
 			if (!itemChecked) {
 				itemChecked = true;
-				checkItem();
+				ZeeManagerItemClick.checkGItem(this);
 			}
 	    } catch(Loading l) {
 	    }
 	}
 	return(spr);
     }
-
-
-	/*
-		check item for dropping and other actions
-	 */
-	private void checkItem() {
-
-		String basename = getres().basename();
-		Inventory inv = this.getparent(Inventory.class);
-		if(inv!=null && inv.isMainInv()) {
-			ZeeConfig.lastInvItemCreated = this;
-			ZeeConfig.lastInvItemCreatedName = getres().name;
-			ZeeConfig.lastInvItemCreatedBaseName = basename;
-			ZeeConfig.lastInvItemCreatedMs = ZeeThread.now();
-			//ZeeConfig.invCounterUpdate(this);
-		}
-
-		//drop mined items
-		if (ZeeConfig.isPlayerCursorMining) {
-			ZeeManagerMiner.checkMiningLogHighestQl(this,basename);
-			if (ZeeConfig.dropMinedStones && ZeeManagerMiner.isStoneNotOre(basename) ||
-				ZeeConfig.dropMinedOre && ZeeManagerMiner.isRegularOre(basename) ||
-				ZeeConfig.dropMinedOrePrecious && ZeeManagerMiner.isPreciousOre(basename) ||
-				ZeeConfig.dropMinedCurios && ZeeConfig.mineablesCurios.contains(basename) )
-			{
-				ZeeManagerMiner.lastDropItemMs = System.currentTimeMillis();
-				this.wdgmsg("drop", Coord.z);
-			}
-		}
-		else if( ZeeConfig.farmerMode ) {
-			//drop all non-seed crops at once
-			if(ZeeManagerFarmer.busy && !ZeeManagerStockpile.selAreaPile) {
-				if (!basename.startsWith("seed-") && ZeeConfig.isItemCrop(basename)) {
-					this.wdgmsg("drop", c, -1);//TODO c should be witem coord?
-				}
-			}
-			else if(basename.startsWith("seed-") && this.parent instanceof Inventory) {
-				//farmermode not busy
-				if (ZeeConfig.lastSavedOverlayEndCoord == null) {
-					//cancel farmermode
-					ZeeConfig.println("seedfarmer > no tile selection, reset initial state");
-					//ZeeConfig.farmerMode = false; //TODO test
-					ZeeManagerFarmer.resetInitialState();
-				}
-				else {
-					//start farmermode
-					new ZeeManagerFarmer(this, basename).start();
-				}
-			}
-		}
-		// drop boards if destroying logs
-		else if (ZeeConfig.destroyingTreelogs && basename.startsWith("board-")){
-			this.wdgmsg("drop", Coord.z);
-		}
-		//drop seeds
-		else if( ZeeConfig.dropSeeds && basename.startsWith("seed-") && this.parent instanceof Inventory){
-			if (inv!=null && inv.isMainInv() && inv.getNumberOfFreeSlots() < 6)
-				inv.dropItemsByNameEndsWith(basename);
-		}
-		//drop soil
-		else if( ZeeConfig.dropSoil && basename.startsWith("soil") && this.parent instanceof Inventory) {
-			if (inv!=null)
-				inv.dropItemsByNameEndsWith(basename);
-		}
-		// drop everglowing ember if piling coal
-		else if (ZeeConfig.pilerMode && ZeeManagerStockpile.lastPetalName!=null && ZeeManagerStockpile.lastPetalName.contentEquals("Collect coal") && basename.contentEquals("everglowingember")){
-			this.wdgmsg("drop", Coord.z);
-		}
-	}
 
     public void tick(double dt) {
 	super.tick(dt);

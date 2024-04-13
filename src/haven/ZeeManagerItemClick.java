@@ -195,6 +195,73 @@ public class ZeeManagerItemClick extends ZeeThread{
         return (ZeeManagerItemClick.lastItemClickedMs > ZeeConfig.lastMapViewClickMs);
     }
 
+    static void checkGItem(GItem gItem) {
+
+        if (gItem.contents!=null)
+            return;
+
+        String basename = gItem.getres().basename();
+        Inventory inv = gItem.getparent(Inventory.class);
+        if(inv!=null && inv.isMainInv()) {
+            ZeeConfig.lastInvGItemCreated = gItem;
+            ZeeConfig.lastInvGItemCreatedName = gItem.getres().name;
+            ZeeConfig.lastInvGItemCreatedBaseName = basename;
+            ZeeConfig.lastInvGItemCreatedMs = ZeeThread.now();
+        }
+
+        //drop mined items
+        if (ZeeConfig.isPlayerCursorMining) {
+            ZeeManagerMiner.checkMiningLogHighestQl(gItem,basename);
+            if (ZeeConfig.dropMinedStones && ZeeManagerMiner.isStoneNotOre(basename) ||
+                    ZeeConfig.dropMinedOre && ZeeManagerMiner.isRegularOre(basename) ||
+                    ZeeConfig.dropMinedOrePrecious && ZeeManagerMiner.isPreciousOre(basename) ||
+                    ZeeConfig.dropMinedCurios && ZeeConfig.mineablesCurios.contains(basename) )
+            {
+                ZeeManagerMiner.lastDropItemMs = System.currentTimeMillis();
+                gItem.wdgmsg("drop", Coord.z);
+            }
+        }
+        else if( ZeeConfig.farmerMode ) {
+            //drop all non-seed crops at once
+            if(ZeeManagerFarmer.busy && !ZeeManagerStockpile.selAreaPile) {
+                if (!basename.startsWith("seed-") && ZeeConfig.isItemCrop(basename)) {
+                    gItem.wdgmsg("drop", gItem.c, -1);//TODO c should be witem coord?
+                }
+            }
+            else if(basename.startsWith("seed-") && gItem.parent instanceof Inventory) {
+                //farmermode not busy
+                if (ZeeConfig.lastSavedOverlayEndCoord == null) {
+                    //cancel farmermode
+                    ZeeConfig.println("seedfarmer > no tile selection, reset initial state");
+                    //ZeeConfig.farmerMode = false; //TODO test
+                    ZeeManagerFarmer.resetInitialState();
+                }
+                else {
+                    //start farmermode
+                    new ZeeManagerFarmer(gItem, basename).start();
+                }
+            }
+        }
+        // drop boards if destroying logs
+        else if (ZeeConfig.destroyingTreelogs && basename.startsWith("board-")){
+            gItem.wdgmsg("drop", Coord.z);
+        }
+        //drop seeds
+        else if( ZeeConfig.dropSeeds && basename.startsWith("seed-") && gItem.parent instanceof Inventory){
+            if (inv!=null && inv.isMainInv() && inv.getNumberOfFreeSlots() < 6)
+                inv.dropItemsByNameEndsWith(basename);
+        }
+        //drop soil
+        else if( ZeeConfig.dropSoil && basename.startsWith("soil") && gItem.parent instanceof Inventory) {
+            if (inv!=null)
+                inv.dropItemsByNameEndsWith(basename);
+        }
+        // drop everglowing ember if piling coal
+        else if (ZeeConfig.pilerMode && ZeeManagerStockpile.lastPetalName!=null && ZeeManagerStockpile.lastPetalName.contentEquals("Collect coal") && basename.contentEquals("everglowingember")){
+            gItem.wdgmsg("drop", Coord.z);
+        }
+    }
+
     private void init(WItem wItem) {
         try{
             equipory = ZeeConfig.windowEquipment.getchild(Equipory.class);

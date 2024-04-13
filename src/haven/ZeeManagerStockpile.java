@@ -238,7 +238,7 @@ public class ZeeManagerStockpile extends ZeeThread{
                 else if (lastPetalName.equals("Chop into blocks"))
                     invItems = mainInv.getWItemsByNameContains("gfx/invobjs/wblock-");//avoid splinter curio
                 else
-                    invItems = mainInv.getWItemsByNameContains(ZeeConfig.lastInvItemCreatedBaseName);//get last inv item without checking
+                    invItems = mainInv.getWItemsByNameContains(ZeeConfig.lastInvGItemCreatedBaseName);//get last inv item without checking
                 if(invItems.size()==0) {
                     //no inventory items, try getting more from source
                     if(!busy)
@@ -458,7 +458,7 @@ public class ZeeManagerStockpile extends ZeeThread{
             tileSourceExit("player didnt move, tile unavailable or pile was already full");
         }
         // inv items remaining, pile just filled up? (TODO ignore rare item curios )
-        else if(inv.countItemsByNameContains(ZeeConfig.lastInvItemCreatedName) > 0) {
+        else if(inv.countItemsByNameContains(ZeeConfig.lastInvGItemCreatedName) > 0) {
             tileSourceExit("inv items remaining, pile just filled up?");
         }
         // pile placed?
@@ -555,26 +555,26 @@ public class ZeeManagerStockpile extends ZeeThread{
         else if ( lastPetalName == null || gobSource == null ){
             show = false;
         }
-        else if (now() - ZeeConfig.lastInvItemCreatedMs > 3000){ //3s
+        else if (now() - ZeeConfig.lastInvGItemCreatedMs > 3000){ //3s
             show = false; // time limit to avoid late unwanted window popup
         }
-        else if (pileGobName.equals(STOCKPILE_LEAF) && ZeeConfig.lastInvItemCreatedBaseName.contentEquals(BASENAME_MULB_LEAF)){
+        else if (pileGobName.equals(STOCKPILE_LEAF) && ZeeConfig.lastInvGItemCreatedBaseName.contentEquals(BASENAME_MULB_LEAF)){
             show = true;
             task = TASK_PILE_GOB_SOURCE;
         }
-        else if (pileGobName.equals(STOCKPILE_LEAF) && ZeeConfig.lastInvItemCreatedBaseName.contentEquals("leaf-laurel")){
+        else if (pileGobName.equals(STOCKPILE_LEAF) && ZeeConfig.lastInvGItemCreatedBaseName.contentEquals("leaf-laurel")){
             show = true;
             task = TASK_PILE_GOB_SOURCE;
         }
-        else if (pileGobName.equals(STOCKPILE_BLOCK) && ZeeConfig.lastInvItemCreatedBaseName.startsWith("wblock-")){
+        else if (pileGobName.equals(STOCKPILE_BLOCK) && ZeeConfig.lastInvGItemCreatedBaseName.startsWith("wblock-")){
             show = true;
             task = TASK_PILE_GOB_SOURCE;
         }
-        else if (pileGobName.equals(STOCKPILE_BOARD) && ZeeConfig.lastInvItemCreatedBaseName.contains("board-")){
+        else if (pileGobName.equals(STOCKPILE_BOARD) && ZeeConfig.lastInvGItemCreatedBaseName.contains("board-")){
             show = true;
             task = TASK_PILE_GOB_SOURCE;
         }
-        else if (pileGobName.equals(STOCKPILE_COAL) && ZeeConfig.lastInvItemCreatedBaseName.contentEquals("coal")){
+        else if (pileGobName.equals(STOCKPILE_COAL) && ZeeConfig.lastInvGItemCreatedBaseName.contentEquals("coal")){
             show = true;
             task = TASK_PILE_GOB_SOURCE;
         }
@@ -676,7 +676,7 @@ public class ZeeManagerStockpile extends ZeeThread{
         waitNoFlowerMenu();
         // if not holding item, pickup from inventory
         if (!ZeeConfig.isPlayerHoldingItem()) {
-            List<WItem> invItems = mainInv.getWItemsByNameContains(ZeeConfig.lastInvItemCreatedBaseName);
+            List<WItem> invItems = mainInv.getWItemsByNameContains(ZeeConfig.lastInvGItemCreatedBaseName);
             if(invItems.size()==0) {
                 return;//inv has no more items
             }
