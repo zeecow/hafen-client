@@ -434,14 +434,18 @@ public class ZeeManagerMiner extends ZeeThread{
     }
 
     private static int pickStonesInvCount() {
-        List<WItem> invItems = new LinkedList<>(ZeeConfig.getMainInventory().children(WItem.class));
-        invItems.removeIf(item -> {
-            String name = item.item.getres().basename();
-            if (useOreForColumns && listOreColumn.contains(name))
-                return false;
-            return !ZeeConfig.mineablesStone.contains(name);
-        });
-        return invItems.size();
+        HashMap<String, Integer> mapItemCount = ZeeConfig.getMainInventory().getMapItemNameCount();
+        int ret = 0;
+        for (Map.Entry<String, Integer> entry : mapItemCount.entrySet()) {
+
+            String basename = entry.getKey().replace("gfx/invobjs/","");
+
+            if (useOreForColumns && listOreColumn.contains(basename))
+                ret += entry.getValue();
+            else if (ZeeConfig.mineablesStone.contains(basename))
+                ret += entry.getValue();
+        }
+        return ret;
     }
 
     public static void stopMining() {
