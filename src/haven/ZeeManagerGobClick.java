@@ -3908,6 +3908,8 @@ public class ZeeManagerGobClick extends ZeeThread{
                     gobClick(gob, 1);
                     sleep(50);
                     ZeeConfig.clickRemoveCursor();
+                    sleep(50);
+                    ZeeConfig.gameUI.map.ttip = null;
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
