@@ -159,9 +159,8 @@ public class ZeeResearch {
         if (!name.isBlank() && !ql.isBlank()) {
             line = name + ql + ingreds + events;
             foodSaveEntry(line);
-        }else{
-            println("research > checkFoodTip > name or ql is blank");
         }
+        //else println("research > checkFoodTip > name or ql is blank");
 
     }
 
