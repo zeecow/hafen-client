@@ -2622,10 +2622,11 @@ public class ZeeManagerGobClick extends ZeeThread{
 
     static final List<String> autoLabelGobsBasename = List.of("barrel","cistern","demijohn","trough","oven","cauldron","fineryforge","smelter","steelcrucible","smokeshed","rabbithutch","chickencoop","kiln","curdingtub");
     static final List<String> autoLabelWincapContainers = List.of("Barrel","Cistern","Demijohn","Food trough");
-    static final List<String> autoLabelWincapVmeters = List.of("Cauldron","Oven","Ore Smelter","Finery Forge","Steelbox","Smoke shed","Rabbit Hutch","Chicken Coop","Kiln","Curding Tub");
+    static final List<String> autoLabelWincapVmeters = List.of("Cauldron","Oven","Ore Smelter","Smith's Smelter","Finery Forge","Steelbox","Smoke shed","Rabbit Hutch","Chicken Coop","Kiln","Curding Tub");
     static final Map<String,Integer> mapWincapMaxfuel = Map.of(
         "Oven",30,
         "Ore Smelter",30,
+        "Smith's Smelter",30,
         "Finery Forge",15,
         "Smoke shed",10,
         "Kiln",30,
