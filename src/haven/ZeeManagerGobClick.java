@@ -2973,7 +2973,7 @@ public class ZeeManagerGobClick extends ZeeThread{
                             if (ZeeConfig.playerHasAnyPose(ZeeConfig.POSE_PLAYER_DRINK, ZeeConfig.POSE_PLAYER_CHIPPINGSTONE,ZeeConfig.POSE_PLAYER_PICK)) {
                                 continue;
                             }
-                            if (ZeeConfig.gobHasAttr(ZeeConfig.getPlayerGob(),"LinMove")){
+                            if (ZeeConfig.isPlayerMovingByAttrLinMove()){
                                 continue;
                             }
                             if (listQueuedChipStone.isEmpty()) {
@@ -3059,7 +3059,7 @@ public class ZeeManagerGobClick extends ZeeThread{
                             if (ZeeConfig.playerHasAnyPose(ZeeConfig.POSE_PLAYER_DRINK, ZeeConfig.POSE_PLAYER_CHOPTREE)) {
                                 continue;
                             }
-                            if (ZeeConfig.gobHasAttr(ZeeConfig.getPlayerGob(),"LinMove")){
+                            if (ZeeConfig.isPlayerMovingByAttrLinMove()){
                                 continue;
                             }
                             if (listQueuedTreeChop.isEmpty()) {
@@ -3141,7 +3141,7 @@ public class ZeeManagerGobClick extends ZeeThread{
                             if (ZeeConfig.playerHasAnyPose(ZeeConfig.POSE_PLAYER_DRINK, ZeeConfig.POSE_PLAYER_DIGSHOVEL)) {
                                 continue;
                             }
-                            if (ZeeConfig.gobHasAttr(ZeeConfig.getPlayerGob(),"LinMove")){
+                            if (ZeeConfig.isPlayerMovingByAttrLinMove()){
                                 continue;
                             }
                             if (queuedStumps.isEmpty()) {

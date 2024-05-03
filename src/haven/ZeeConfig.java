@@ -3113,6 +3113,14 @@ public class ZeeConfig {
         return ( mov!=null && mov.getv()>0);
     }
 
+    static boolean isPlayerMovingByAttrLinMove(){
+        if (isPlayerMountingHorse()){
+            return gobHasAttr(getPlayerMountedHorse(),"LinMove");
+        }else{
+            return gobHasAttr(getPlayerGob(),"LinMove");
+        }
+    }
+
     public static boolean isPlayerPoseDrinkOrMove(Gob mountedHorse){
 
         if (isPlayerDrinkingPose())
@@ -3910,8 +3918,13 @@ public class ZeeConfig {
     }
 
 
-    static boolean gobHasAttr(Gob gob, String gAttrClassName) {
-        return ZeeManagerGobClick.getGAttrNames(gob).contains(gAttrClassName);
+    static boolean gobHasAttr(Gob gob, String ... gAttrClassNames) {
+        List<String> gobAttrs = ZeeManagerGobClick.getGAttrNames(gob);
+        for (String attrName : gAttrClassNames) {
+            if(gobAttrs.contains(attrName))
+                return true;
+        }
+        return false;
     }
     static boolean gobHasOverlay(Gob gob, String overlayResName) {
         return ZeeManagerGobClick.getOverlayNames(gob).contains(overlayResName);
