@@ -1032,7 +1032,7 @@ public class ZeeManagerItemClick extends ZeeThread{
             return 0;
         }
         clickingAllItemsPetals = true;
-        ZeeConfig.addGobText(ZeeConfig.getPlayerGob(),"clicking "+items.size()+" items",0,255,255,255,10);
+        ZeeConfig.addPlayerText("clicking "+items.size()+" items");
         int itemsClicked = 0;
         ZeeConfig.lastMapViewClickButton = 2; // setup for clickCancelTask()
         int countNoMenu = 0;
@@ -1061,7 +1061,7 @@ public class ZeeManagerItemClick extends ZeeThread{
                 return itemsClicked;
             }
         }
-        ZeeConfig.removeGobText(ZeeConfig.getPlayerGob());
+        ZeeConfig.removePlayerText();
         clickingAllItemsPetals = false;
         return itemsClicked;
     }

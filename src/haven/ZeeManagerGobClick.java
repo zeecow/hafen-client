@@ -2103,6 +2103,13 @@ public class ZeeManagerGobClick extends ZeeThread{
         else if(petalName.contentEquals(ZeeFlowerMenu.STRPETAL_INSPECT) && isGobTree(gobName)){
             inspectGob(gob);
         }
+        // harvested pumpkins
+        else if(gobName.endsWith("/items/pumpkin")){
+            if (petalName.contentEquals("Slice all pumpkins"))
+                ZeeManagerFarmer.sliceAllHarvestedPumpkins(gob);
+            else if(petalName.contentEquals("Show piler window"))
+                ZeeManagerStockpile.areaPilerWindow(gob);
+        }
         // crop
         else if (isGobCrop(gobName)) {
             if (petalName.equals(ZeeFlowerMenu.STRPETAL_SEEDFARMER)) {
@@ -2526,6 +2533,10 @@ public class ZeeManagerGobClick extends ZeeThread{
                 opts.add("Queue chipping");
             }
             menu = new ZeeFlowerMenu(gob, opts.toArray(String[]::new));
+        }
+        // harvested pumpkin
+        else if(gobName.endsWith("/items/pumpkin")){
+            menu = new ZeeFlowerMenu(gob, "Slice all pumpkins", "Show piler window");
         }
         // crop
         else if (isGobCrop(gobName)) {

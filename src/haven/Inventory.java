@@ -247,6 +247,24 @@ public class Inventory extends Widget implements DTarget {
 		return count;
 	}
 
+	public int countItemsByNameEndsWith(String nameEndsWith){
+		int count = 0;
+		GItem gItem;
+		for (Widget wdg = child; wdg != null; wdg = wdg.next) {
+			if (wdg instanceof WItem) {
+				gItem = ((WItem) wdg).item;
+				String wdgname = gItem.res.get().name;
+				if (wdgname.endsWith(nameEndsWith)) {
+					if (ZeeManagerItemClick.isStackByAmount(gItem))
+						count += ZeeManagerItemClick.getItemInfoAmount(gItem.info());
+					else
+						count++;
+				}
+			}
+		}
+		return count;
+	}
+
 	public HashMap<String,Integer> getMapItemNameCount(){
 		HashMap<String, Integer> map = new HashMap<>();
 		GItem gItem;

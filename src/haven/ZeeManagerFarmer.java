@@ -126,6 +126,74 @@ public class ZeeManagerFarmer extends ZeeThread{
         });
     }
 
+    static void sliceAllHarvestedPumpkins(Gob pumpkin){
+        new ZeeThread(){
+            public void run() {
+                final Gob[] nextPump = {pumpkin};
+                try {
+                    ZeeConfig.addPlayerText("pumpking");
+                    Inventory mainInv = ZeeConfig.getMainInventory();
+                    prepareCancelClick();
+                    do {
+
+                        //pick ground pumpkins
+                        ZeeManagerGobClick.gobClick(nextPump[0], 3, UI.MOD_SHIFT);
+                        if (!waitPlayerIdleLinMove()) {//waitInvIdle
+                            println("error waiting picking pumpkins");
+                            break;
+                        }
+
+                        //drop if holding pumpkin
+                        if (ZeeConfig.isPlayerHoldingItem()){
+                            ZeeConfig.gameUI.vhand.item.wdgmsg("drop", Coord.z);
+                            if(!waitNotHoldingItem()){
+                                println("couldnt drop hand pumpking?");
+                                break;
+                            }
+                        }
+
+                        List<WItem> invPumps = mainInv.getWItemsByNameEndsWith("/pumpkin");
+                        if (invPumps.isEmpty()){
+                            println("no pumpkins in inventory?");
+                            break;
+                        }
+
+                        //slice inv pumps
+                        int slicedPumps = ZeeManagerItemClick.clickAllItemsPetal(invPumps,"Slice");
+                        if (slicedPumps==0)
+                            println("no sliced pumpkins?");
+                        else
+                            println(slicedPumps+" pumpkins sliced");
+                        ZeeConfig.addPlayerText("pumpking");//restore text
+
+                        //wait inv update
+                        sleep(500);
+
+                        //drop seeds
+                        mainInv.dropItemsByNameEndsWith("/seed-pumpkin");
+
+                        //drop pumpkinflesh
+                        mainInv.dropItemsByNameEndsWith("/pumpkinflesh");
+
+                        //define next ground pumpkin
+                        Gob next = ZeeConfig.getClosestGobByNameEnds("/items/pumpkin");
+                        if (next==null){
+                            println("pumpkins done");
+                            break;
+                        }
+                        nextPump[0] = next;
+
+                    } while(!isCancelClick());
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+                ZeeConfig.removePlayerText();
+            }
+        }.start();
+    }
+
     private void startFarming() {
         ZeeConfig.autoHearthOnStranger = false;
         mapSeedqlBarrel = new HashMap<>();

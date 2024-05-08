@@ -271,6 +271,17 @@ public class ZeeThread  extends Thread{
     }
 
 
+    public static boolean waitPlayerIdleLinMove(){
+        try {
+            do {
+                sleep(555);
+            }while (ZeeConfig.isPlayerMovingByAttrLinMove());
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return !ZeeConfig.isPlayerMovingByAttrLinMove();
+    }
+
     public static boolean waitPlayerIdlePose(){
         // player mounting horse or kicksled
         if (ZeeConfig.isPlayerMountingHorse()) {
