@@ -1034,8 +1034,8 @@ public class ZeeManagerItemClick extends ZeeThread{
         clickingAllItemsPetals = true;
         ZeeConfig.addPlayerText("clicking "+items.size()+" items");
         int itemsClicked = 0;
-        ZeeConfig.lastMapViewClickButton = 2; // setup for clickCancelTask()
         int countNoMenu = 0;
+        prepareCancelClick();
         for (WItem w: items) {
             try {
                 if (ZeeConfig.isCancelClick()) {
@@ -1049,6 +1049,7 @@ public class ZeeManagerItemClick extends ZeeThread{
                 if(fm!=null){
                     choosePetal(fm, petalName);
                     itemsClicked++;
+                    sleep(100);//delay
                 }else{
                     countNoMenu++;
                     println("clickAllItemsPetal > no flowermenu "+countNoMenu+"/"+items.size());

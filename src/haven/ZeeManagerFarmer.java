@@ -138,7 +138,8 @@ public class ZeeManagerFarmer extends ZeeThread{
 
                         //pick ground pumpkins
                         ZeeManagerGobClick.gobClick(nextPump[0], 3, UI.MOD_SHIFT);
-                        if (!waitPlayerIdleLinMove()) {//waitInvIdle
+                        waitPlayerIdleLinMove();
+                        if (!waitInvIdleMs(777)) {//waitInvIdle
                             println("error waiting picking pumpkins");
                             break;
                         }
@@ -162,8 +163,6 @@ public class ZeeManagerFarmer extends ZeeThread{
                         int slicedPumps = ZeeManagerItemClick.clickAllItemsPetal(invPumps,"Slice");
                         if (slicedPumps==0)
                             println("no sliced pumpkins?");
-                        else
-                            println(slicedPumps+" pumpkins sliced");
                         ZeeConfig.addPlayerText("pumpking");//restore text
 
                         //wait inv update
