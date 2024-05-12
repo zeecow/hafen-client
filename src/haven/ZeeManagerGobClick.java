@@ -240,9 +240,13 @@ public class ZeeManagerGobClick extends ZeeThread{
         else if(ZeeConfig.isAggressive(gobName)){
             toggleOverlayAggro(gob);
         }
-        // toggle aggressive gob radius
+        // toggle cheeserack
         else if(gobName.endsWith("cheeserack")){
             ZeeConfig.toggleCheeserack();
+        }
+        // toggle gardenpot
+        else if(gobName.endsWith("gardenpot")){
+            ZeeConfig.toggleGardenpots();
         }
         // open cauldron
         else if(gobName.contains("/cauldron") && !ZeeConfig.isPlayerLiftingGob(gob)){

@@ -2285,10 +2285,8 @@ public class ZeeConfig {
     static void toggleCheeserack(){
         highlightCheeserack = !highlightCheeserack;
         List<Gob> racks = ZeeConfig.findGobsByNameEndsWith("/cheeserack");
-        if (!racks.isEmpty()){
-            for (Gob r : racks) {
-                toggleCheeserack(r);
-            }
+        for (Gob r : racks) {
+            toggleCheeserack(r);
         }
     }
     static void toggleCheeserack(Gob cheeserack){
@@ -2310,6 +2308,33 @@ public class ZeeConfig {
             ZeeConfig.removeGobColor(cheeserack);
         }
     }
+
+
+    static boolean highlightGardenpot = false;
+    static void toggleGardenpots(){
+        highlightGardenpot = !highlightGardenpot;
+        List<Gob> pots = ZeeConfig.findGobsByNameEndsWith("/gardenpot");
+        for (Gob p : pots) {
+            toggleGardenpot(p);
+        }
+    }
+    static void toggleGardenpot(Gob pot){
+        if (highlightGardenpot){
+            List<String> ols = ZeeManagerGobClick.getOverlayNames(pot);
+            int plants = 0;
+            for (String ol : ols) {
+                if (ol.contains("gfx/fx/eq")) {
+                    plants++;
+                }
+            }
+            if (plants < 2)
+                return;
+            ZeeConfig.addGobColor(pot, Color.green.darker());
+        }else {
+            ZeeConfig.removeGobColor(pot);
+        }
+    }
+
 
     public static void checkClassMod(String name, Class<?> qlass){
         try {
@@ -3802,6 +3827,10 @@ public class ZeeConfig {
             // cheeserack color
             else if(highlightCheeserack && gobName.endsWith("/terobjs/cheeserack")){
                 toggleCheeserack(ob);
+            }
+            // gardenpot color
+            else if(highlightGardenpot && gobName.endsWith("/terobjs/gardenpot")){
+                toggleGardenpot(ob);
             }
 
 
