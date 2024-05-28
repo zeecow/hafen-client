@@ -26,18 +26,19 @@
 
 package haven.resutil;
 
-import java.util.*;
-import java.awt.image.BufferedImage;
-import java.awt.Color;
 import haven.*;
-import haven.render.*;
-import haven.render.sl.*;
 import haven.MapMesh.Scan;
-import haven.Surface.Vertex;
 import haven.Surface.MeshVertex;
+import haven.Surface.Vertex;
+import haven.render.*;
 import haven.render.TextureCube.SamplerCube;
-import static haven.render.sl.Cons.*;
+import haven.render.sl.*;
+
+import java.awt.*;
+import java.util.Random;
+
 import static haven.Coord.upcw;
+import static haven.render.sl.Cons.*;
 
 public class WaterTile extends Tiler {
     public final int depth;
@@ -561,9 +562,7 @@ public class WaterTile extends Tiler {
 		}
 	    };
 
-	private final ShaderMacro shader = prog -> {
-	    FragColor.fragcol(prog.fctx).mod(in -> rgbmix.call(in, mfogcolor, min(div(fragd.ref(), l(maxdepth)), l(1.0))), 1000);
-	};
+	private final ShaderMacro shader;
 
 	private BottomFog() {
 		this(mfogcolor);
