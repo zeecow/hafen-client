@@ -108,19 +108,9 @@ public class Bootstrap implements UI.Receiver, UI.Runner {
     private static String mangleuser(String user) {
 	if(user.length() <= 32)
 	    return(user);
-	/* Mange name because Java pref names have a somewhat
+	/* Mangle name because Java pref names have a somewhat
 	 * ridiculously short limit. */
-	return(Utils.byte2hex(Utils.splice(Utils.sha256sum(user.getBytes(Utils.utf8)), 0, 16)));
-    }
-
-    private void transtoken() {
-	/* XXX: Transitory, remove when appropriate. */
-	String oldtoken = getpref("savedtoken", "");
-	String tokenname = getpref("tokenname", "");
-	if((oldtoken.length() == 64) && (tokenname.length() > 0)) {
-	    setpref("savedtoken-" + tokenname, oldtoken);
-	    setpref("savedtoken", "");
-	}
+	return(Utils.byte2hex(Digest.hash(Digest.MD5, user.getBytes(Utils.utf8))));
     }
 
     public static byte[] gettoken(String user, String hostname) {
@@ -174,7 +164,6 @@ public class Bootstrap implements UI.Receiver, UI.Runner {
 	ui.newwidgetp(1, ($1, $2) -> new LoginScreen(hostname), 0, new Object[] {Coord.z});
 	String loginname = getpref("loginname", "");
 	boolean savepw = false;
-	transtoken();
 	String authserver = (authserv.get() == null) ? hostname : authserv.get();
 	int authport = Bootstrap.authport.get();
 	Session sess;

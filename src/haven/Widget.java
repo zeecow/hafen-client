@@ -803,7 +803,7 @@ public class Widget {
 
     public boolean mousedown(Coord c, int button) {
 	for(Widget wdg = lchild; wdg != null; wdg = wdg.prev) {
-	    if(!wdg.visible)
+	    if(!wdg.visible())
 		continue;
 	    Coord cc = xlate(wdg.c, true);
 	    if(c.isect(cc, wdg.sz)) {
@@ -817,7 +817,7 @@ public class Widget {
 	
     public boolean mouseup(Coord c, int button) {
 	for(Widget wdg = lchild; wdg != null; wdg = wdg.prev) {
-	    if(!wdg.visible)
+	    if(!wdg.visible())
 		continue;
 	    Coord cc = xlate(wdg.c, true);
 	    if(c.isect(cc, wdg.sz)) {
@@ -831,7 +831,7 @@ public class Widget {
 	
     public boolean mousewheel(Coord c, int amount) {
 	for(Widget wdg = lchild; wdg != null; wdg = wdg.prev) {
-	    if(!wdg.visible)
+	    if(!wdg.visible())
 		continue;
 	    Coord cc = xlate(wdg.c, true);
 	    if(c.isect(cc, wdg.sz)) {
@@ -845,7 +845,7 @@ public class Widget {
 	
     public void mousemove(Coord c) {
 	for(Widget wdg = lchild; wdg != null; wdg = wdg.prev) {
-	    if(!wdg.visible)
+	    if(!wdg.visible())
 		continue;
 	    Coord cc = xlate(wdg.c, true);
 	    wdg.mousemove(c.add(cc.inv()));
@@ -856,7 +856,7 @@ public class Widget {
 	boolean ret = false;
 	for(Widget wdg = lchild; wdg != null; wdg = wdg.prev) {
 	    boolean ch = hovering;
-	    if(!wdg.visible)
+	    if(!wdg.visible())
 		ch = false;
 	    Coord cc = xlate(wdg.c, true);
 	    boolean inside = c.isect(cc, wdg.sz);
@@ -962,7 +962,7 @@ public class Widget {
 	    }
 	} else {
 	    for(Widget wdg = child; wdg != null; wdg = wdg.next) {
-		if(wdg.visible) {
+		if(wdg.visible()) {
 		    if(wdg.keydown(ev))
 			return(true);
 		}
@@ -982,7 +982,7 @@ public class Widget {
 	    }
 	} else {
 	    for(Widget wdg = child; wdg != null; wdg = wdg.next) {
-		if(wdg.visible) {
+		if(wdg.visible()) {
 		    if(wdg.keyup(ev))	
 			return(true);
 		}
@@ -1332,7 +1332,7 @@ public class Widget {
 	Resource ret;
 		
 	for(Widget wdg = lchild; wdg != null; wdg = wdg.prev) {
-	    if(!wdg.visible)
+	    if(!wdg.visible())
 		continue;
 	    Coord cc = xlate(wdg.c, true);
 	    if(c.isect(cc, wdg.sz)) {
@@ -1449,7 +1449,7 @@ public class Widget {
 	    return(tooltip);
 	}
 	for(Widget wdg = lchild; wdg != null; wdg = wdg.prev) {
-	    if(!wdg.visible)
+	    if(!wdg.visible())
 		continue;
 	    Coord cc = xlate(wdg.c, true);
 	    if(c.isect(cc, wdg.sz)) {

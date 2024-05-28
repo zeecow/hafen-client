@@ -26,26 +26,25 @@
 
 package haven.resutil;
 
+import java.util.*;
+import java.awt.image.BufferedImage;
+import java.awt.Color;
 import haven.*;
-import haven.MapMesh.Scan;
-import haven.Surface.MeshVertex;
-import haven.Surface.Vertex;
 import haven.render.*;
-import haven.render.TextureCube.SamplerCube;
 import haven.render.sl.*;
-
-import java.awt.*;
-import java.util.Random;
-
-import static haven.Coord.upcw;
+import haven.MapMesh.Scan;
+import haven.Surface.Vertex;
+import haven.Surface.MeshVertex;
+import haven.render.TextureCube.SamplerCube;
 import static haven.render.sl.Cons.*;
+import static haven.Coord.upcw;
 
 public class WaterTile extends Tiler {
     public final int depth;
     public final Tiler.MCons bottom;
 	private final boolean isDeepOcean;
 
-	public static class FlowData {
+    public static class FlowData {
 	public static final float[] nxpcw, nypcw;
 	public static final int I = 10;
 	public final float[] xv, yv;
@@ -562,7 +561,9 @@ public class WaterTile extends Tiler {
 		}
 	    };
 
-	private final ShaderMacro shader;
+	private final ShaderMacro shader = prog -> {
+	    FragColor.fragcol(prog.fctx).mod(in -> rgbmix.call(in, mfogcolor, min(div(fragd.ref(), l(maxdepth)), l(1.0))), 1000);
+	};
 
 	private BottomFog() {
 		this(mfogcolor);

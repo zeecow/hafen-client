@@ -53,7 +53,7 @@ public class ItemDrag extends WItem {
 		return(true);
 	}
 	for(Widget wdg = w.lchild; wdg != null; wdg = wdg.prev) {
-	    if((wdg == this) || !wdg.visible)
+	    if((wdg == this) || !wdg.visible())
 		continue;
 	    Coord cc = w.xlate(wdg.c, true);
 	    if(c.isect(cc, wdg.sz)) {
@@ -70,7 +70,7 @@ public class ItemDrag extends WItem {
 		return(true);
 	}
 	for(Widget wdg = w.lchild; wdg != null; wdg = wdg.prev) {
-	    if((wdg == this) || !wdg.visible)
+	    if((wdg == this) || !wdg.visible())
 		continue;
 	    Coord cc = w.xlate(wdg.c, true);
 	    if(c.isect(cc, wdg.sz)) {
