@@ -27,10 +27,12 @@
 package haven;
 
 import haven.render.*;
-import java.util.function.*;
-import java.awt.Color;
+
+import java.awt.*;
 import java.awt.image.BufferedImage;
-import static haven.PUtils.*;
+
+import static haven.PUtils.blurmask2;
+import static haven.PUtils.rasterimg;
 
 public class Window extends Widget implements DTarget {
     public static final Pipe.Op bgblend = FragColor.blend.nil;
@@ -238,11 +240,11 @@ public class Window extends Widget implements DTarget {
 	}
 
 	protected void drawbg(GOut g) {
-	    g.usestate(bgblend);
 		if (ZeeConfig.simpleWindows) {
 			drawSimpleWindowBg(g);
 			return;
 		}
+	    g.usestate(bgblend);
 	    Coord bgc = new Coord();
 	    for(bgc.y = ca.ul.y; bgc.y < ca.br.y; bgc.y += bg.sz().y) {
 		for(bgc.x = ca.ul.x; bgc.x < ca.br.x; bgc.x += bg.sz().x)
