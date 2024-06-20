@@ -2281,13 +2281,14 @@ public class ZeeConfig {
     }
 
 
-    static boolean highlightCheeserack = Utils.getprefb("highlightCheeserack",false);
-    static void toggleCheeserack(){
+    static boolean highlightCheeserack = Utils.getprefb("highlightCheeserack",true);
+    static void toggleAllCheeserack(){
         highlightCheeserack = !highlightCheeserack;
         List<Gob> racks = ZeeConfig.findGobsByNameEndsWith("/cheeserack");
         for (Gob r : racks) {
             toggleCheeserack(r);
         }
+        Utils.setprefb("highlightCheeserack",highlightCheeserack);
         msgLow("highlight racks "+(highlightCheeserack?"enabled":"disabled"));
     }
     static void toggleCheeserack(Gob cheeserack){
@@ -2312,12 +2313,13 @@ public class ZeeConfig {
 
 
     static boolean highlightGardenpot = Utils.getprefb("highlightGardenpot",true);
-    static void toggleGardenpots(){
+    static void toggleAllGardenpots(){
         highlightGardenpot = !highlightGardenpot;
         List<Gob> pots = ZeeConfig.findGobsByNameEndsWith("/gardenpot");
         for (Gob p : pots) {
             toggleGardenpot(p);
         }
+        Utils.setprefb("highlightGardenpot",highlightGardenpot);
         msgLow("highlight pots "+(highlightGardenpot?"enabled":"disabled"));
     }
     static void toggleGardenpot(Gob pot){

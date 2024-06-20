@@ -242,11 +242,11 @@ public class ZeeManagerGobClick extends ZeeThread{
         }
         // toggle cheeserack
         else if(gobName.endsWith("cheeserack")){
-            ZeeConfig.toggleCheeserack();
+            ZeeConfig.toggleAllCheeserack();
         }
         // toggle gardenpot
         else if(gobName.endsWith("gardenpot")){
-            ZeeConfig.toggleGardenpots();
+            ZeeConfig.toggleAllGardenpots();
         }
         // open cauldron
         else if(gobName.contains("/cauldron") && !ZeeConfig.isPlayerLiftingGob(gob)){
