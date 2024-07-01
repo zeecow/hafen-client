@@ -1466,6 +1466,11 @@ public class ChatUI extends Widget {
 	    sel.resize(new Coord(this.sz.x - marg.x - sel.c.x, this.sz.y - sel.c.y));
     }
 
+    public void presize() {
+	if(sz.y > parent.sz.y - UI.scale(100))
+	    hresize(Math.max(UI.scale(minh), parent.sz.y - UI.scale(100)));
+    }
+
     public boolean targetshow = false;
     public void sshow(boolean show) {
 	clearanims(Spring.class);
@@ -1475,6 +1480,7 @@ public class ChatUI extends Widget {
 
     public void hresize(int h) {
 	clearanims(Spring.class);
+	resize(sz.x, h);
     }
 
     public void resize(int w) {
@@ -1546,7 +1552,7 @@ public class ChatUI extends Widget {
 
     public void mousemove(Coord c) {
 	if(dm != null) {
-	    resize(sz.x, Math.max(UI.scale(minh), sz.y + doff.y - c.y));
+	    resize(sz.x, Math.max(UI.scale(minh), Math.min(parent.sz.y - UI.scale(100), sz.y + doff.y - c.y)));
 	} else {
 	    super.mousemove(c);
 	}
