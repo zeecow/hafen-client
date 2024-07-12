@@ -65,7 +65,9 @@ public class ZeeManagerGobClick extends ZeeThread{
 
     private static void shortMidClick() {
 
-        // ground clicks
+        /*
+            ground clicks
+         */
         if(gob==null) {
 
             // place all pile items
@@ -80,6 +82,29 @@ public class ZeeManagerGobClick extends ZeeThread{
             else if(ZeeConfig.isPlayerDrivingPlow()){
                 plowQueueAddCoord(coordMc,coordPc);
             }
+        }
+        /*
+            gob clicks
+         */
+        // schedule tree removal
+        else if (isRemovingAllTrees && isGobTree(gobName)) {
+            scheduleRemoveTree(gob);
+        }
+        // schedule treelog destruction
+        else if (isDestroyingAllTreelogs && isGobTreeLog(gobName)) {
+            scheduleDestroyTreelog(gob);
+        }
+        //queue chop tree/bush by animation
+        else if(ZeeConfig.playerHasAnyPose(ZeeConfig.POSE_PLAYER_CHOPTREE) && (isGobTree(gobName) || isGobBush(gobName)) ){
+            ZeeManagerGobClick.queueChopTreeBush(gob);
+        }
+        //queue chip stone by animation
+        else if(ZeeConfig.playerHasAnyPose(ZeeConfig.POSE_PLAYER_CHIPPINGSTONE) && isGobBoulder(gobName)){
+            ZeeManagerGobClick.queueChipStone(gob);
+        }
+        //queue remove stump by animation
+        else if(ZeeConfig.playerHasAnyPose(ZeeConfig.POSE_PLAYER_DIGSHOVEL) && isGobTreeStump(gobName)){
+            ZeeManagerGobClick.queueShovelStump(gob);
         }
         // feed clover to wild animal
         else if (checkCloverFeeding(gob)) {
@@ -937,7 +962,7 @@ public class ZeeManagerGobClick extends ZeeThread{
     static void runLongMidClick() {
         try {
             /*
-                ground clicks
+                ground clicked
              */
             if (isGroundClick){
                 // place pile and start autopiling
@@ -979,8 +1004,12 @@ public class ZeeManagerGobClick extends ZeeThread{
                 }
             }
             /*
-                non-ground clicks
+                gob clicked
             */
+            // stump removal
+            else if(isGobTreeStump(gobName)){
+                removeStumpMaybe(gob);
+            }
             // pile boards from treelog
             else if (gobName.endsWith("/stockpile-board") && ZeeConfig.playerHasAnyPose(ZeeConfig.POSE_PLAYER_SAWING)) {
                 ZeeManagerStockpile.pileBoardsFromTreelog(gob);
@@ -996,14 +1025,6 @@ public class ZeeManagerGobClick extends ZeeThread{
             // put out cauldron
             else if(gobName.contains("/cauldron") && !ZeeConfig.isPlayerLiftingGob(gob)){
                 cauldronPutOut();
-            }
-            // schedule tree removal
-            else if (isRemovingAllTrees && isGobTree(gobName)) {
-                scheduleRemoveTree(gob);
-            }
-            // schedule treelog destruction
-            else if (isDestroyingAllTreelogs && isGobTreeLog(gobName)) {
-                scheduleDestroyTreelog(gob);
             }
             // show ZeeFlowerMenu
             else if (!isGroundClick && !ZeeConfig.isPlayerHoldingItem() && showGobFlowerMenu()) {
@@ -2095,14 +2116,6 @@ public class ZeeManagerGobClick extends ZeeThread{
         else if (petalName.contentEquals(ZeeFlowerMenu.STRPETAL_REMOVETREEANDSTUMP) || petalName.contentEquals(ZeeFlowerMenu.STRPETAL_REMOVEALLTREES)) {
             removeTreeAndStump(gob, petalName);
         }
-        //queue chop tree
-        else if(petalName.contentEquals("Queue chopping")){
-            ZeeManagerGobClick.queueChopTree();
-        }
-        //queue chip stone
-        else if(petalName.contentEquals("Queue chipping")){
-            ZeeManagerGobClick.queueChipStone();
-        }
         // ispect towercap tree
         else if(petalName.contentEquals(ZeeFlowerMenu.STRPETAL_INSPECT) && isGobTree(gobName)){
             inspectGob(gob);
@@ -2122,21 +2135,6 @@ public class ZeeManagerGobClick extends ZeeThread{
             else if (petalName.equals(ZeeFlowerMenu.STRPETAL_CURSORHARVEST)) {
                 if (!ZeeConfig.getCursorName().equals(ZeeConfig.CURSOR_HARVEST))
                     gobClick(gob, 3, UI.MOD_SHIFT);
-            }
-        }
-        // tree stump
-        else if (isGobTreeStump(gobName)){
-            // shovel stump
-            if (petalName.contentEquals("Shovel stump")) {
-                try {
-                    removeStumpMaybe(gob);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-            // queue shovel stump
-            else{
-                queueShovelStump();
             }
         }
         else if (petalName.equals(ZeeFlowerMenu.STRPETAL_BARRELTAKEALL)) {
@@ -2523,9 +2521,6 @@ public class ZeeManagerGobClick extends ZeeThread{
             opts.add(ZeeFlowerMenu.STRPETAL_TOGGLEGROWTHTEXTS);
             if (gobName.endsWith("/towercap"))
                 opts.add(ZeeFlowerMenu.STRPETAL_INSPECT);
-            if (ZeeConfig.playerHasAnyPose(ZeeConfig.POSE_PLAYER_CHOPTREE, ZeeConfig.POSE_PLAYER_DRINK)){
-                opts.add("Queue chopping");
-            }
             menu = new ZeeFlowerMenu(gob, opts.toArray(String[]::new));
         }
         // boulder
@@ -2533,9 +2528,6 @@ public class ZeeManagerGobClick extends ZeeThread{
             opts = new ArrayList<String>();
             opts.add(ZeeFlowerMenu.STRPETAL_LIFTUPGOB);
             opts.add(ZeeFlowerMenu.STRPETAL_INSPECT);
-            if (ZeeConfig.playerHasAnyPose(ZeeConfig.POSE_PLAYER_CHIPPINGSTONE, ZeeConfig.POSE_PLAYER_DRINK, ZeeConfig.POSE_PLAYER_PICK)){
-                opts.add("Queue chipping");
-            }
             menu = new ZeeFlowerMenu(gob, opts.toArray(String[]::new));
         }
         // harvested pumpkin
@@ -2545,17 +2537,6 @@ public class ZeeManagerGobClick extends ZeeThread{
         // crop
         else if (isGobCrop(gobName)) {
             menu = new ZeeFlowerMenu(gob,ZeeFlowerMenu.STRPETAL_SEEDFARMER, ZeeFlowerMenu.STRPETAL_CURSORHARVEST);
-        }
-        // tree stump
-        else if(isGobTreeStump(gobName)){
-            // shovel stump
-            if (!ZeeConfig.playerHasAnyPose(ZeeConfig.POSE_PLAYER_DRINK,ZeeConfig.POSE_PLAYER_DIGSHOVEL)) {
-                menu = new ZeeFlowerMenu(gob, "Shovel stump");
-            }
-            //queue shovel stump
-            else {
-                menu = new ZeeFlowerMenu(gob, "Queue shovel stump");
-            }
         }
         else if (isBarrelTakeAll(gob)) {
             menu = new ZeeFlowerMenu(gob,ZeeFlowerMenu.STRPETAL_BARRELTAKEALL, ZeeFlowerMenu.STRPETAL_LIFTUPGOB);
@@ -2959,15 +2940,22 @@ public class ZeeManagerGobClick extends ZeeThread{
 
     private static List<Gob> listQueuedChipStone = null;
     private static ZeeThread threadChipStone = null;
-    static void queueChipStone() {
-        Gob boulder = ZeeConfig.lastMapViewClickGob;
+    static void queueChipStone(Gob boulder) {
+
         if (boulder==null){
             println("queueChipStone > boulder null");
             return;
         }
-        if (listQueuedChipStone==null)
+        if (listQueuedChipStone==null) {
             listQueuedChipStone = new ArrayList<>();
-
+        }
+        // add or remove boulder
+        else if (listQueuedChipStone.contains(boulder)){
+            listQueuedChipStone.remove(boulder);
+            ZeeConfig.removeGobText(boulder);
+            queueChipStoneUpdLabels();
+            return;
+        }
         listQueuedChipStone.add(boulder);
         queueChipStoneUpdLabels();
 
@@ -3044,15 +3032,21 @@ public class ZeeManagerGobClick extends ZeeThread{
 
     private static List<Gob> listQueuedTreeChop = null;
     private static ZeeThread threadChopTree = null;
-    static void queueChopTree() {
-        Gob tree = ZeeConfig.lastMapViewClickGob;
+    static void queueChopTreeBush(Gob tree) {
         if (tree==null){
             println("queueChopTree > tree null");
             return;
         }
-        if (listQueuedTreeChop==null)
+        if (listQueuedTreeChop==null) {
             listQueuedTreeChop = new ArrayList<>();
-
+        }
+        // add or remove tree
+        else if (listQueuedTreeChop.contains(tree)){
+            listQueuedTreeChop.remove(tree);
+            ZeeConfig.removeGobText(tree);
+            queueChopTreeUpdLabels();
+            return;
+        }
         listQueuedTreeChop.add(tree);
         queueChopTreeUpdLabels();
 
@@ -3127,15 +3121,20 @@ public class ZeeManagerGobClick extends ZeeThread{
 
     private static List<Gob> queuedStumps = null;
     private static ZeeThread threadShovelStumps = null;
-    static void queueShovelStump() {
-        Gob stump = ZeeConfig.lastMapViewClickGob;
+    static void queueShovelStump(Gob stump) {
         if (stump==null){
             println("queuedStumps > stump null");
             return;
         }
-        if (queuedStumps==null)
+        if (queuedStumps==null) {
             queuedStumps = new ArrayList<>();
-
+        }
+        else if(queuedStumps.contains(stump)){
+            queuedStumps.remove(stump);
+            ZeeConfig.removeGobText(stump);
+            queueStumpsUpdLabels();
+            return;
+        }
         queuedStumps.add(stump);
         queueStumpsUpdLabels();
 

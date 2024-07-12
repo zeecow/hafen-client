@@ -33,6 +33,7 @@ Controls
   - left-click-hold search button shows Actions window, and select item on mouse up 
   - right-click-hold search button to start a hover menu
 - mid-click item menu to start auto click window
+- mid-click queue tree/bush/boulder/log/stump for repeating some activities
 
 
 
@@ -81,6 +82,7 @@ Midclick Ground Object
 - midclick construction obj while chopping/sawing will build and get more mats
 - midclick cart try picking first slot
 - gob placer: midclick gob while lifting gob of same name will try to place next to it and save distance per gob name (temp window to clear distance)
+- queue tree/bush/boulder/log/stump for repeating chop/chip/destroy
 
 Long Midclick Ground Object
 - show context menu for various objs (details below)
@@ -138,9 +140,6 @@ LongMidClick Flowermenu for Ground Objects
 - lightable objects shows craft firebrand, pyrite spark
 - crucible smelt nuggets, bar
 - get xp from well
-- queue chop tree while already chopping/drinking
-- queue chip boulder while already chipping/drinking
-- queue shovel stump while already shoveling/drinking
 
 LongMidClick Flowermenu for Window Items
 - auto butch dead animal items
