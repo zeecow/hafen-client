@@ -86,13 +86,17 @@ public class ZeeManagerGobClick extends ZeeThread{
         /*
             gob clicks
          */
-        // schedule tree removal
+        // queue remove tree and stump
         else if (isRemovingAllTrees && isGobTree(gobName)) {
             scheduleRemoveTree(gob);
         }
-        // schedule treelog destruction
+        // queue treelog destruction
         else if (isDestroyingAllTreelogs && isGobTreeLog(gobName)) {
             scheduleDestroyTreelog(gob);
+        }
+        // queue butch animal
+        else if(isAutoButchingBigAnimal && isGobDeadOrKO(gob)){
+            queueButchAnimal(gob);
         }
         //queue chop tree/bush by animation
         else if(ZeeConfig.playerHasAnyPose(ZeeConfig.POSE_PLAYER_CHOPTREE) && (isGobTree(gobName) || isGobBush(gobName)) ){
@@ -2317,12 +2321,14 @@ public class ZeeManagerGobClick extends ZeeThread{
         }
     }
 
+    static boolean isAutoButchingBigAnimal = false;
     public static void autoButchBigDeadAnimal(Gob deadAnimal) {
         new ZeeThread() {
             public void run() {
                 boolean butcherBackup = ZeeConfig.butcherMode;
                 ZeeConfig.butcherAutoList = ZeeConfig.DEF_LIST_BUTCH_AUTO;
                 try{
+                    isAutoButchingBigAnimal = true;
                     ZeeConfig.addPlayerText("autobutch");
 
                     //wait start butching
@@ -2359,6 +2365,10 @@ public class ZeeManagerGobClick extends ZeeThread{
                 ZeeConfig.butcherMode = butcherBackup;
                 ZeeConfig.autoClickMenuOption = Utils.getprefb("autoClickMenuOption", true);
                 ZeeConfig.removePlayerText();
+                isAutoButchingBigAnimal = false;
+
+                // check for butch queue
+                queueButchNext();
             }
         }.start();
     }
@@ -3202,6 +3212,63 @@ public class ZeeManagerGobClick extends ZeeThread{
             ZeeConfig.addPlayerText("queue " + queuedStumps.size());
         }
     }
+
+
+    private static List<Gob> listQueuedButch = null;
+    static void queueButchAnimal(Gob animal) {
+        if (animal==null){
+            println("listQueuedButch > animal null");
+            return;
+        }
+        if (listQueuedButch==null) {
+            listQueuedButch = new ArrayList<>();
+        }
+        // add or remove animal
+        else if (listQueuedButch.contains(animal)){
+            listQueuedButch.remove(animal);
+            ZeeConfig.removeGobText(animal);
+            queueButchUpdLabels();
+            return;
+        }
+        listQueuedButch.add(animal);
+        queueButchUpdLabels();
+    }
+    static void queueButchNext(){
+        if (listQueuedButch!=null){
+            if (isCancelClick()){
+                println("queueButchNext > cancel click");
+                queueButchReset();
+                return;
+            }
+            if (!listQueuedButch.isEmpty()){
+                Gob nextButch = listQueuedButch.remove(0);
+                println("queueButchNext > "+listQueuedButch.size()+" to go");
+                autoButchBigDeadAnimal(nextButch);
+                return;
+            }else{
+                println("queueButchNext > done");
+                queueButchReset();
+            }
+        }else{
+            println("queueButchNext > list null");
+        }
+    }
+    static void queueButchReset(){
+        if (listQueuedButch!=null && !listQueuedButch.isEmpty()){
+            ZeeConfig.removeGobText((ArrayList<Gob>) listQueuedButch);
+        }
+        listQueuedButch = null;
+    }
+    static void queueButchUpdLabels(){
+        if(listQueuedButch!=null && !listQueuedButch.isEmpty()) {
+            for (int i = 0; i < listQueuedButch.size(); i++) {
+                ZeeConfig.addGobText(listQueuedButch.get(i), "" + (i+1));
+            }
+            ZeeConfig.addPlayerText("queue " + listQueuedButch.size());
+        }
+    }
+
+
 
     public static void checkSmoke(Gob gob, String i) {
         if (ZeeConfig.hideFxSmoke){

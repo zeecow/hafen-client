@@ -33,7 +33,7 @@ Controls
   - left-click-hold search button shows Actions window, and select item on mouse up 
   - right-click-hold search button to start a hover menu
 - mid-click item menu to start auto click window
-- mid-click queue tree/bush/boulder/log/stump for repeating some activities
+- mid-click tree/bush/boulder/log/stump/animal queue for next chop/chip/destroy/butch (not all cases)  
 
 
 
@@ -82,7 +82,7 @@ Midclick Ground Object
 - midclick construction obj while chopping/sawing will build and get more mats
 - midclick cart try picking first slot
 - gob placer: midclick gob while lifting gob of same name will try to place next to it and save distance per gob name (temp window to clear distance)
-- queue tree/bush/boulder/log/stump for repeating chop/chip/destroy
+- queue tree/bush/boulder/log/stump/animal for repeating chop/chip/destroy/butch
 
 Long Midclick Ground Object
 - show context menu for various objs (details below)
