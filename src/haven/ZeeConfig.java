@@ -1,7 +1,6 @@
 package haven;
 
 import haven.render.*;
-import haven.res.ui.obj.buddy.Buddy;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -2837,7 +2836,7 @@ public class ZeeConfig {
         ZeeManagerMiner.tilesMonitorCleanup();
         ZeeHistWdg.clearHistory();
         ZeeManagerGobClick.plowQueueReset();
-        ZeeManagerGobClick.chopTreeReset();
+        ZeeManagerTrees.chopTreeReset();
         ZeeManagerGobClick.chipStoneReset();
         ZeeFishing.exit();
 
