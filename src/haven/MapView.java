@@ -2555,6 +2555,9 @@ public boolean mousedown(Coord c, int button) {
 			else if (msg.equals("itemact"))
 				ZeeManagerStockpile.checkWdgmsgPileExists();
 		}
+
+		if (ZeeConfig.treeloganize)
+			ZeeManagerTrees.treeloganizerCheckPlacing(msg);
 	}
 
 	void inspectTooltip(Coord c) {

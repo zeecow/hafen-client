@@ -223,6 +223,7 @@ public class ZeeConfig {
     static boolean dropMinedStones = Utils.getprefb("dropMinedStones", true);
     static boolean dropSeeds = false;
     static boolean dropSoil = false;
+    static boolean treeloganize = false;
     static boolean destroyingTreelogs = false;
     static boolean equiporyCompact = Utils.getprefb("equiporyCompact", false);
     static boolean equipShieldOnCombat = Utils.getprefb("equipShieldOnCombat", false);
@@ -2839,6 +2840,7 @@ public class ZeeConfig {
         ZeeManagerTrees.chopTreeReset();
         ZeeManagerGobClick.chipStoneReset();
         ZeeFishing.exit();
+        ZeeManagerTrees.treeloganizerExit("");
 
         ZeeCupboardLabeler.reset();
         ZeeCupboardLabeler.isActive = false;
@@ -2971,6 +2973,8 @@ public class ZeeConfig {
         // clicked gob object
         if(clickGob!=null) {
             lastMapViewClickGobName = clickGob.getres().name;
+            if(treeloganize)
+                ZeeManagerTrees.checkTreelogClicked();
             if(clickb == 2) {
                 ZeeManagerGobClick.startMidClick(pc, mc, clickGob, lastMapViewClickGobName);
             } else if (clickb==3 && gameUI.ui.modflags()==0){// no mod keys
@@ -3066,8 +3070,14 @@ public class ZeeConfig {
     }
 
     public static Gob getClosestGob(Gob refGob, List<Gob> gobs) {
-        if(gobs==null || gobs.size()==0 || refGob==null)
+        if(gobs==null || refGob==null)
             return null;
+
+        // avoid comparing refGob to itself
+        gobs.removeIf(gob1 -> refGob.equals(gob1));
+        if (gobs.size()==0)
+            return null;
+
         Gob closestGob = gobs.get(0);
         Float closestDist = distanceBetweenGobs(refGob, closestGob);
         if (closestDist==null)

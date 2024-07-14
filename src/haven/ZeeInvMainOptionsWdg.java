@@ -3,7 +3,7 @@ package haven;
 public class ZeeInvMainOptionsWdg extends Widget {
 
     Label labelCount;
-    public static CheckBox cbSeeds, cbSoil, cbButcher, cbAutoStack, cbPiler, cbAutomenu, cbTunnel, cbDrink;
+    public static CheckBox cbSeeds, cbTreeloganize, cbSoil, cbButcher, cbAutoStack, cbPiler, cbAutomenu, cbTunnel, cbDrink;
     Widget invSlots;
 
     public ZeeInvMainOptionsWdg(String windowCap) {
@@ -71,19 +71,33 @@ public class ZeeInvMainOptionsWdg extends Widget {
 
         x += cbSeeds.sz.x + 5;
 
-        add(cbSoil = new CheckBox("sl") {
+        add(cbTreeloganize = new CheckBox("tl") {
             {
-                a = ZeeConfig.dropSoil;
+                a = ZeeConfig.treeloganize;
             }
 
             public void set(boolean val) {
-                ZeeConfig.dropSoil = val;
+                ZeeConfig.treeloganize = val;
                 a = val;
             }
         }, x, 15);
-        cbSoil.settip("drop soil");
+        cbTreeloganize.settip("organize treelogs");
 
-        x += cbSoil.sz.x + 5;
+        x += cbTreeloganize.sz.x + 5;
+
+//        add(cbSoil = new CheckBox("sl") {
+//            {
+//                a = ZeeConfig.dropSoil;
+//            }
+//
+//            public void set(boolean val) {
+//                ZeeConfig.dropSoil = val;
+//                a = val;
+//            }
+//        }, x, 15);
+//        cbSoil.settip("drop soil");
+//
+//        x += cbSoil.sz.x + 5;
 
         add(cbTunnel = new CheckBox("tn") {
             {

@@ -464,4 +464,133 @@ public class ZeeManagerTrees {
         // maybe stump was removed
         return true;
     }
+
+
+
+
+    static void checkTreelogClicked() {
+        if (ZeeConfig.lastMapViewClickButton == 1){
+            if (  ZeeManagerGobClick.isGobTreeLog(ZeeConfig.lastMapViewClickGobName) ){
+                treeloganizerGobName = ZeeConfig.lastMapViewClickGobName;
+                treeloganizerWaitLift(ZeeConfig.lastMapViewClickGob);
+            }
+        }
+    }
+    static Gob treeloganizerLogCur, treeloganizerLogNext, treeloganizerLogPlaced;
+    static String treeloganizerGobName;
+    static void treeloganizerWaitLift(Gob treelog){
+        println("waiting treelog lift");
+        if (treelog==null) {
+            treeloganizerExit("treeLogWaitLift > treelog null");
+            return;
+        }
+        new ZeeThread(){
+            public void run() {
+                try {
+                    ZeeConfig.addPlayerText("lift");
+                    treeloganizerLogCur = treelog;
+
+                    //define next log before lifting current log
+                    treeloganizerNamesClear();
+                    treeloganizerLogNext = ZeeConfig.getClosestGobByNameContains(treeloganizerLogCur, treeloganizerLogCur.getres().name);
+                    if (treeloganizerLogNext==null){
+                        treeloganizerExit("   treeloganizer > no similar treelogs?");
+                        return;
+                    }
+                    treeloganizerNamesUpd();
+
+                    // next treelog distance to current must be 4.125 (before lifting)
+                    double distNext = ZeeConfig.distanceBetweenGobs(treeloganizerLogCur, treeloganizerLogNext);
+                    if (distNext != 4.125){
+                        println("treeloganizer > last one?");
+                        treeloganizerNamesClear();
+                        treeloganizerLogNext = null;
+                        treeloganizerNamesUpd();
+                    }
+
+                    //wait log lifted
+                    if (!waitPlayerPose(ZeeConfig.POSE_PLAYER_LIFTING)){
+                        treeloganizerExit("   treeLogWaitLift > couldnt lift treelog?");
+                        return;
+                    }
+                    sleep(500);
+                    ZeeConfig.removePlayerText();
+                    ZeeConfig.addGobText(treeloganizerLogNext, "next");
+
+                    // if placed log exists, place next to it
+                    if (treeloganizerLogPlaced != null){
+                        placeTreelogNextTo(treeloganizerLogPlaced);
+                    }
+                    else{
+                        treeloganizerNamesClear();
+                        treeloganizerLogCur = treeloganizerLogNext;
+                        treeloganizerLogPlaced = treeloganizerLogCur;
+                        treeloganizerNamesUpd();
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    treeloganizerExit(e.getMessage());
+                }
+            }
+        }.start();
+    }
+    public static void treeloganizerCheckPlacing(String msg) {
+        println("waiting treelog place");
+        new ZeeThread(){
+            public void run() {
+                try {
+                    //wait placing log
+                    ZeeConfig.addPlayerText("place");
+                    if (!waitPlayerPoseNotInList(ZeeConfig.POSE_PLAYER_LIFTING)){
+                        treeloganizerExit("   treeLogCheckPlacing > couldnt place treelog?");
+                        return;
+                    }
+                    sleep(500);
+
+                    // update log placed for next iteration
+                    treeloganizerNamesClear();
+                    treeloganizerLogPlaced = ZeeConfig.getClosestGobByNameEnds(treeloganizerGobName);
+                    treeloganizerNamesUpd();
+
+                    //if next log exist, lift it to start cycle again
+                    if (treeloganizerLogNext!=null){
+                        //Gob lift = treeloganizerLogNext;
+                        //treeloganizerLogNext = null;
+                        //ZeeManagerGobClick.liftGob(lift);
+                        ZeeManagerGobClick.liftGob(treeloganizerLogNext);
+                    }else{
+                        treeloganizerExit("treeloganizer done");
+                    }
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    treeloganizerExit(e.getMessage());
+                }
+            }
+        }.start();
+    }
+    private static void treeloganizerNamesUpd() {
+        ZeeConfig.addGobText(treeloganizerLogPlaced,"placed");
+        ZeeConfig.addGobText(treeloganizerLogCur,"cur");
+        ZeeConfig.addGobText(treeloganizerLogNext,"next");
+    }
+    private static void treeloganizerNamesClear() {
+        ZeeConfig.removeGobText(treeloganizerLogPlaced);
+        ZeeConfig.removeGobText(treeloganizerLogCur);
+        ZeeConfig.removeGobText(treeloganizerLogNext);
+    }
+    static void treeloganizerExit(String msg) {
+        if (!msg.isEmpty())
+            println(msg);
+        treeloganizerNamesClear();
+        ZeeConfig.removePlayerText();
+        treeloganizerLogCur = treeloganizerLogPlaced = treeloganizerLogNext = null;
+        treeloganizerGobName = "";
+    }
+
+
+
+    static void println(String msg){
+        ZeeConfig.println(msg);
+    }
 }
