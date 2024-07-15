@@ -212,4 +212,4 @@ Random Features
 - reposition rightmost windows horiz. when game resize
 - CheeseTray recipe show progress of recently opened CheeseRack 
 - try auto pick irrlight and craft again (craft window checkbox)
- 
+- move adjacent treelogs (mainInv checkbox)

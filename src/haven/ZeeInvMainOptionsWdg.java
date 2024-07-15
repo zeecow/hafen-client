@@ -71,20 +71,6 @@ public class ZeeInvMainOptionsWdg extends Widget {
 
         x += cbSeeds.sz.x + 5;
 
-        add(cbTreeloganize = new CheckBox("tl") {
-            {
-                a = ZeeConfig.treeloganize;
-            }
-
-            public void set(boolean val) {
-                ZeeConfig.treeloganize = val;
-                a = val;
-            }
-        }, x, 15);
-        cbTreeloganize.settip("organize treelogs");
-
-        x += cbTreeloganize.sz.x + 5;
-
 //        add(cbSoil = new CheckBox("sl") {
 //            {
 //                a = ZeeConfig.dropSoil;
@@ -124,6 +110,22 @@ public class ZeeInvMainOptionsWdg extends Widget {
             }
         }, x, 15);
         cbPiler.settip("pile helper (mouse-click menu required)");
+
+        x += cbPiler.sz.x + 5;
+
+        add(cbTreeloganize = new CheckBox("tl") {
+            {
+                a = ZeeConfig.treeloganize;
+            }
+
+            public void set(boolean val) {
+                ZeeConfig.treeloganize = val;
+                a = val;
+                if (!ZeeConfig.treeloganize && ZeeManagerTrees.treeloganizerWorking)
+                    ZeeManagerTrees.treeloganizerExit("checkbox off");
+            }
+        }, x, 15);
+        cbTreeloganize.settip("move adjacent treelogs");
 
         pack();
     }

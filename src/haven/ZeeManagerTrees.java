@@ -25,12 +25,14 @@ public class ZeeManagerTrees {
             public void run() {
                 try {
 
-                    ZeeConfig.addPlayerText("placing");
+                    if (!treeloganizerWorking)
+                        ZeeConfig.addPlayerText("placing");
 
                     Gob liftedTreelog = ZeeConfig.isPlayerLiftingGobNamecontains("gfx/terobjs/trees/");
                     if (liftedTreelog==null){
                         ZeeConfig.msgError("placeTreelogNextTo > couldn't find lifted treelog");
-                        ZeeConfig.removePlayerText();
+                        if (!treeloganizerWorking)
+                            ZeeConfig.removePlayerText();
                         return;
                     }
                     //println(liftedTreelog.rc +" "+liftedTreelog.a+"  ,  "+treeLogGround.rc+" "+treeLogGround.a);
@@ -42,7 +44,8 @@ public class ZeeManagerTrees {
                     // adjust plob angle, postition and place it
                     if (ZeeManagerStockpile.lastPlob==null){
                         ZeeConfig.msgError("placeTreelogNextTo > couldn't find last plob");
-                        ZeeConfig.removePlayerText();
+                        if (!treeloganizerWorking)
+                            ZeeConfig.removePlayerText();
                         return;
                     }
                     Coord2d playerrc = ZeeConfig.getPlayerGob().rc;
@@ -68,7 +71,8 @@ public class ZeeManagerTrees {
                 }catch (Exception e){
                     e.printStackTrace();
                 }
-                ZeeConfig.removePlayerText();
+                if (!treeloganizerWorking)
+                    ZeeConfig.removePlayerText();
             }
         }.start();
     }
@@ -467,125 +471,101 @@ public class ZeeManagerTrees {
 
 
 
-
-    static void checkTreelogClicked() {
-        if (ZeeConfig.lastMapViewClickButton == 1){
-            if (  ZeeManagerGobClick.isGobTreeLog(ZeeConfig.lastMapViewClickGobName) ){
-                treeloganizerGobName = ZeeConfig.lastMapViewClickGobName;
-                treeloganizerWaitLift(ZeeConfig.lastMapViewClickGob);
-            }
-        }
-    }
-    static Gob treeloganizerLogCur, treeloganizerLogNext, treeloganizerLogPlaced;
-    static String treeloganizerGobName;
-    static void treeloganizerWaitLift(Gob treelog){
-        println("waiting treelog lift");
-        if (treelog==null) {
-            treeloganizerExit("treeLogWaitLift > treelog null");
+    // treeloganizer
+    //      moves adjacent treelogs by a distance
+    //      canceled by disabling mainInv "tl" checkbox
+    static boolean treeloganizerWorking = false;
+    static void treeloganizerCheckLift() {
+        if (!ZeeManagerGobClick.isGobTreeLog(ZeeConfig.lastMapViewClickGobName)) {
             return;
         }
-        new ZeeThread(){
+        new ZeeThread() {
             public void run() {
+                treeloganizerWorking = true;
                 try {
-                    ZeeConfig.addPlayerText("lift");
-                    treeloganizerLogCur = treelog;
+                    ZeeConfig.addPlayerText("treeloganize");
+                    Gob treelogBoutToBeLifted = ZeeConfig.lastMapViewClickGob,
+                            treelogNext=null,
+                            treelogLastPlaced=null;
+                    double dist;
+                    String treelogName = treelogBoutToBeLifted.getres().name;
 
-                    //define next log before lifting current log
-                    treeloganizerNamesClear();
-                    treeloganizerLogNext = ZeeConfig.getClosestGobByNameContains(treeloganizerLogCur, treeloganizerLogCur.getres().name);
-                    if (treeloganizerLogNext==null){
-                        treeloganizerExit("   treeloganizer > no similar treelogs?");
+                    //find next treelog
+                    treelogNext = ZeeConfig.getClosestGobByNameEnds(treelogBoutToBeLifted, treelogName);
+                    if (treelogNext==null){
+                        treeloganizerExit("no next treelogs");
                         return;
                     }
-                    treeloganizerNamesUpd();
 
-                    // next treelog distance to current must be 4.125 (before lifting)
-                    double distNext = ZeeConfig.distanceBetweenGobs(treeloganizerLogCur, treeloganizerLogNext);
-                    if (distNext != 4.125){
-                        println("treeloganizer > last one?");
-                        treeloganizerNamesClear();
-                        treeloganizerLogNext = null;
-                        treeloganizerNamesUpd();
-                    }
-
-                    //wait log lifted
-                    if (!waitPlayerPose(ZeeConfig.POSE_PLAYER_LIFTING)){
-                        treeloganizerExit("   treeLogWaitLift > couldnt lift treelog?");
+                    // no next treelogs close enough
+                    dist = ZeeConfig.distanceBetweenGobs(treelogBoutToBeLifted, treelogNext);
+                    if (dist > 4.2) {
+                        treeloganizerExit("next treelog too far: "+dist);
                         return;
                     }
-                    sleep(500);
-                    ZeeConfig.removePlayerText();
-                    ZeeConfig.addGobText(treeloganizerLogNext, "next");
 
-                    // if placed log exists, place next to it
-                    if (treeloganizerLogPlaced != null){
-                        placeTreelogNextTo(treeloganizerLogPlaced);
+                    //wait lifting first treelog
+                    if (!waitPlayerPose(ZeeConfig.POSE_PLAYER_LIFTING)) {
+                        treeloganizerExit("couldn't lift treelog? 1");
+                        return;
                     }
-                    else{
-                        treeloganizerNamesClear();
-                        treeloganizerLogCur = treeloganizerLogNext;
-                        treeloganizerLogPlaced = treeloganizerLogCur;
-                        treeloganizerNamesUpd();
+
+                    //wait placing first treelog (cancel by unckecking mainInv "tl")
+                    while (ZeeConfig.treeloganize && ZeeConfig.playerHasAnyPose(ZeeConfig.POSE_PLAYER_LIFTING)) {
+                        sleep(500);
                     }
+                    if (!ZeeConfig.treeloganize){
+                        treeloganizerExit("canceled by user");
+                        return;
+                    }
+
+                    // move all neighbour treelogs
+                    while(treelogNext!=null) {
+                        //update next treelogs
+                        treelogLastPlaced = treelogBoutToBeLifted;
+                        treelogBoutToBeLifted = treelogNext;
+                        treelogNext = ZeeConfig.getClosestGobByNameContains(treelogBoutToBeLifted, treelogName);
+                        dist = ZeeConfig.distanceBetweenGobs(treelogBoutToBeLifted, treelogNext);
+                        // only move neighbour treelogs
+                        if (dist > 4.2) {
+                            println("placing last treelog 2");
+                            treelogNext = null;
+                        }
+                        //lift log
+                        if(!ZeeManagerGobClick.liftGob(treelogBoutToBeLifted)){
+                            treeloganizerExit("couldnt lift treelog? 2");
+                            return;
+                        }
+                        //place log
+                        placeTreelogNextTo(treelogLastPlaced);
+                        if (!waitPlayerPoseNotInList(ZeeConfig.POSE_PLAYER_LIFTING)) {
+                            treeloganizerExit("couldn't place treelog? 2");
+                            return;
+                        }
+                    }
+
+                    treeloganizerExit("done");
+
                 } catch (Exception e) {
-                    e.printStackTrace();
                     treeloganizerExit(e.getMessage());
+                    e.printStackTrace();
                 }
             }
         }.start();
     }
-    public static void treeloganizerCheckPlacing(String msg) {
-        println("waiting treelog place");
-        new ZeeThread(){
-            public void run() {
-                try {
-                    //wait placing log
-                    ZeeConfig.addPlayerText("place");
-                    if (!waitPlayerPoseNotInList(ZeeConfig.POSE_PLAYER_LIFTING)){
-                        treeloganizerExit("   treeLogCheckPlacing > couldnt place treelog?");
-                        return;
-                    }
-                    sleep(500);
-
-                    // update log placed for next iteration
-                    treeloganizerNamesClear();
-                    treeloganizerLogPlaced = ZeeConfig.getClosestGobByNameEnds(treeloganizerGobName);
-                    treeloganizerNamesUpd();
-
-                    //if next log exist, lift it to start cycle again
-                    if (treeloganizerLogNext!=null){
-                        //Gob lift = treeloganizerLogNext;
-                        //treeloganizerLogNext = null;
-                        //ZeeManagerGobClick.liftGob(lift);
-                        ZeeManagerGobClick.liftGob(treeloganizerLogNext);
-                    }else{
-                        treeloganizerExit("treeloganizer done");
-                    }
-
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    treeloganizerExit(e.getMessage());
-                }
+    static void treeloganizerExit(String msg){
+        if (!msg.isEmpty()) {
+            println("treeloganizer > " + msg);
+            ZeeConfig.removePlayerText();
+        }
+        treeloganizerWorking = false;
+        if (ZeeConfig.treeloganize){
+            try {
+                ZeeInvMainOptionsWdg.cbTreeloganize.set(false);
+            }catch (Exception e){
+                println("treeloganizerExit > "+e.getMessage());
             }
-        }.start();
-    }
-    private static void treeloganizerNamesUpd() {
-        ZeeConfig.addGobText(treeloganizerLogPlaced,"placed");
-        ZeeConfig.addGobText(treeloganizerLogCur,"cur");
-        ZeeConfig.addGobText(treeloganizerLogNext,"next");
-    }
-    private static void treeloganizerNamesClear() {
-        ZeeConfig.removeGobText(treeloganizerLogPlaced);
-        ZeeConfig.removeGobText(treeloganizerLogCur);
-        ZeeConfig.removeGobText(treeloganizerLogNext);
-    }
-    static void treeloganizerExit(String msg) {
-        if (!msg.isEmpty())
-            println(msg);
-        treeloganizerNamesClear();
-        ZeeConfig.removePlayerText();
-        treeloganizerLogCur = treeloganizerLogPlaced = treeloganizerLogNext = null;
-        treeloganizerGobName = "";
+        }
     }
 
 

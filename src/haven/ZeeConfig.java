@@ -2973,11 +2973,12 @@ public class ZeeConfig {
         // clicked gob object
         if(clickGob!=null) {
             lastMapViewClickGobName = clickGob.getres().name;
-            if(treeloganize)
-                ZeeManagerTrees.checkTreelogClicked();
+            if(treeloganize && clickb==1 && !ZeeManagerTrees.treeloganizerWorking) {
+                ZeeManagerTrees.treeloganizerCheckLift();
+            }
             if(clickb == 2) {
                 ZeeManagerGobClick.startMidClick(pc, mc, clickGob, lastMapViewClickGobName);
-            } else if (clickb==3 && gameUI.ui.modflags()==0){// no mod keys
+            } else if (clickb==3 && gameUI.ui.modflags()==0){
                 //reset inspect tooltip
                 showInspectTooltip = false;
                 gameUI.map.ttip = null;
