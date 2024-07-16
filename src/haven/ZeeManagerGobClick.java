@@ -3516,6 +3516,8 @@ public class ZeeManagerGobClick extends ZeeThread{
         ZeeConfig.gameUI.menu.wdgmsg("act", "carry","0");
         waitCursorName(ZeeConfig.CURSOR_HAND);
         gobClick(gob,1);
+        if(ZeeConfig.treeloganize && !ZeeManagerTrees.treeloganizerWorking)
+            ZeeManagerTrees.treeloganizerCheckLift();
         return waitPlayerPose(ZeeConfig.POSE_PLAYER_LIFTING);
     }
 
