@@ -520,7 +520,7 @@ public class ZeeManagerTrees {
                     }
 
                     // move all neighbour treelogs
-                    while(treelogNext!=null) {
+                    while(ZeeConfig.treeloganize && treelogNext!=null) {
                         //update next treelogs
                         treelogLastPlaced = treelogBoutToBeLifted;
                         treelogBoutToBeLifted = treelogNext;
@@ -528,7 +528,7 @@ public class ZeeManagerTrees {
                         dist = ZeeConfig.distanceBetweenGobs(treelogBoutToBeLifted, treelogNext);
                         // only move neighbour treelogs
                         if (dist > 4.2) {
-                            println("placing last treelog 2");
+                            //println("placing last treelog 2");
                             treelogNext = null;
                         }
                         //lift log
@@ -536,6 +536,8 @@ public class ZeeManagerTrees {
                             treeloganizerExit("couldnt lift treelog? 2");
                             return;
                         }
+                        if (!ZeeConfig.treeloganize)
+                            break;
                         //place log
                         placeTreelogNextTo(treelogLastPlaced);
                         if (!waitPlayerPoseNotInList(ZeeConfig.POSE_PLAYER_LIFTING)) {
@@ -544,7 +546,11 @@ public class ZeeManagerTrees {
                         }
                     }
 
-                    treeloganizerExit("done");
+                    if (!ZeeConfig.treeloganize){
+                        treeloganizerExit("canceled by user");
+                    }else {
+                        treeloganizerExit("done");
+                    }
 
                 } catch (Exception e) {
                     treeloganizerExit(e.getMessage());
