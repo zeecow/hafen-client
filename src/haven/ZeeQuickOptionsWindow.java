@@ -162,7 +162,8 @@ public class ZeeQuickOptionsWindow {
         if (cbPetal !=null) {
             cbPetal.remove();
         }
-        cbPetal = new CheckBox("auto-click \""+name+"\""){
+        String nameShort = name.substring(0, Math.min( 15, name.length()));
+        cbPetal = new CheckBox("auto \""+nameShort+"...\""){
             public void set(boolean val) {
                 a = val;
                 if (val)
