@@ -20,14 +20,15 @@ Controls
 - Ctrl+Rclick confirm remove shortcut
 - Alt+click to drop holding item
 - shift+tab toggles between belt, creel and basket (probably outdated)
-- right-click Stoat's icon to aggro on max speed (option available)
+- rclick Stoat's icon to aggro on max speed (option available)
 - pickup key "q", shift+q pickup all, ctrl+q pickup window
 - drink key '
   - shift drink will drink 1 gulp and click ground coord again (no map, gobs)
 - click building/passage gob to enter it
   - dismount horse if rope in inventory
-  - schedule remount if midclick isntead of rightclick
-- right-click workstations to auto dismount (if inventory rope)
+  - schedule remount if mclick instead of rclick
+- rclick tree tries collecting sap with lifted barrel
+- rclick workstations to auto dismount (if inventory rope)
 - Icon Settings: shift+space toggles notify checkbox
 - Search Actions single click 
   - left-click-hold search button shows Actions window, and select item on mouse up 

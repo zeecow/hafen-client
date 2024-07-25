@@ -1706,7 +1706,34 @@ public class ZeeManagerGobClick extends ZeeThread{
                 }
             }.start();
         }
+        // rclick tree tries collecting sap with lifted barrel
+        else if (ZeeConfig.isPlayerLiftingGobNamecontains("gfx/terobjs/barrel")!=null && isGobInListEndsWith(gobName,"/trees/birch,/trees/maple,/trees/terebinth")){
+            collectTreeSapUsingBarrel(gob);
+        }
+    }
 
+    private static void collectTreeSapUsingBarrel(Gob tree) {
+        List<Gob.Overlay> saps = getGobOverlaysByName(tree, "gfx/terobjs/saptap");
+        if (saps.isEmpty()){
+            ZeeConfig.println("no saptap attached");
+            return;
+        }
+        new ZeeThread(){
+            public void run() {
+                try {
+                    ZeeConfig.addPlayerText("saptap");
+                    Gob.Overlay ol = saps.get(0);
+                    gobClickOverlay(tree,3,0,ol.id);
+                    prepareCancelClick();
+                    if (!waitPlayerIdlePose()){
+                        println("couldn't wait saptap?");
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                ZeeConfig.removePlayerText();
+            }
+        }.start();
     }
 
     private static void dismountHorseAndClickGob(Coord2d mc) {
@@ -3720,6 +3747,10 @@ public class ZeeManagerGobClick extends ZeeThread{
         ZeeConfig.gameUI.map.wdgmsg("itemact", Coord.z, g.rc.floor(OCache.posres), mod, 0, (int) g.id, g.rc.floor(OCache.posres), 0, -1);
     }
 
+    public static void gobClickOverlay(Gob g, int btn, int mod, int overlayId) {
+        ZeeConfig.gameUI.map.wdgmsg("click", ZeeConfig.getCenterScreenCoord(), g.rc.floor(OCache.posres), btn, mod, 1, (int)g.id, g.rc.floor(OCache.posres), overlayId, 1);
+    }
+
     public static void gobClick(Gob g, int btn, int mod, int x) {
         ZeeConfig.gameUI.map.wdgmsg("click", ZeeConfig.getCenterScreenCoord(), g.rc.floor(OCache.posres), btn, mod, 0, (int)g.id, g.rc.floor(OCache.posres), 0, x);
     }
@@ -3755,6 +3786,15 @@ public class ZeeManagerGobClick extends ZeeThread{
         for (Gob.Overlay ol : gob.ols) {
             if(ol.spr.res != null)
                 ret.add(ol.spr.res.name);
+        }
+        return ret;
+    }
+
+    static List<Gob.Overlay> getGobOverlaysByName(Gob gob, String name){
+        List<Gob.Overlay> ret = new ArrayList<>();
+        for (Gob.Overlay ol : gob.ols) {
+            if(ol.spr.res != null  &&  ol.spr.res.name.contentEquals(name))
+                ret.add(ol);
         }
         return ret;
     }
