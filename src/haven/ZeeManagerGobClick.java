@@ -2473,13 +2473,18 @@ public class ZeeManagerGobClick extends ZeeThread{
                             // fuel units: branches, coal, etc
                             if (mapWincapMaxfuel.keySet().contains(window.cap)){
                                 Map<String,Integer> mapWincapMaxfuel = new HashMap<>();
-                                int max = ZeeManagerGobClick.mapWincapMaxfuel.get(window.cap);
+                                int currentFuel=0, maxFuel = ZeeManagerGobClick.mapWincapMaxfuel.get(window.cap);
                                 for (VMeter vm : vmeter) {
                                     LayerMeter.Meter meter = vm.meters.get(0);
-                                    int fuelUnits = (int) Math.round(meter.a * max);
-                                    lblText += fuelUnits + "/" + max;
+                                    currentFuel = (int) Math.round(meter.a * maxFuel);
+                                    lblText += currentFuel + "/" + maxFuel;
                                 }
-                                ZeeConfig.addGobText(gobAutoLabel, lblText);
+                                Color color = Color.green;
+                                if (currentFuel == 0)
+                                    color = Color.red;
+                                else if (currentFuel < maxFuel)
+                                    color = Color.orange;
+                                ZeeConfig.addGobText(gobAutoLabel, lblText,color);
                             }
                             // perc% water, swill, etc
                             else {
