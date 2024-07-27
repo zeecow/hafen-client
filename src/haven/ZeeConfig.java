@@ -289,6 +289,7 @@ public class ZeeConfig {
     public static boolean showGobPointer = Utils.getprefb("showGobPointer",false);
     public static boolean showGobRadar = Utils.getprefb("showGobRadar",false);
     static boolean autocloseXpWindow = Utils.getprefb("autocloseXpWindow",true);
+    static boolean isBuildAndDrink = Utils.getprefb("isBuildAndDrink",true);
 
     public static boolean playMidiRadio = Utils.getprefb("playMidiRadio",false);
     static Runnable playMidiRadioRunnable = () -> ZeeMidiRadio.toggleRadio();
@@ -1159,6 +1160,17 @@ public class ZeeConfig {
             if (ZeeManagerMiner.tunnelHelperStage == ZeeManagerMiner.TUNNELHELPER_STAGE5_BUILDCOL && windowTitle.contentEquals("Stone Column")){
                 ZeeManagerMiner.tunnelHelperBuildColumn(window);
             }
+            // build and drink
+            Button btn = getButtonNamed(window, "Build");
+            CheckBox cb = window.add(new CheckBox("and drink"){
+                {a = isBuildAndDrink;}
+                public void changed(boolean val) {
+                    super.changed(val);
+                    isBuildAndDrink = val;
+                    Utils.setprefb("isBuildAndDrink",isBuildAndDrink);
+                }
+            }, btn.sz.x+5, btn.c.y+5);
+            cb.settip("build and drink if stamina low enough");
             return;
         }
 

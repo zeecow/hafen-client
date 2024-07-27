@@ -214,3 +214,4 @@ Random Features
 - CheeseTray recipe show progress of recently opened CheeseRack 
 - try auto pick irrlight and craft again (craft window checkbox)
 - move adjacent treelogs (mainInv checkbox)
+- checkbox build and drink, if stamina low enough

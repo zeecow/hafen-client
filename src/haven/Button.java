@@ -241,4 +241,28 @@ public class Button extends SIWidget {
 	}
 	return(false);
     }
+
+	@Override
+	public void wdgmsg(String msg, Object... args) {
+		super.wdgmsg(msg, args);
+		if (msg.contentEquals("activate")){
+			// build and drink if stamina low enough
+			if (ZeeConfig.isBuildAndDrink && this.text.text.contentEquals("Build")) {
+				if (ZeeConfig.getMeterStamina() > 85)
+					return;
+				new ZeeThread() {
+					public void run() {
+						try {
+							sleep(PING_MS);
+							if (ZeeConfig.playerHasAnyPose(ZeeConfig.POSE_PLAYER_BUILD)) {
+								ZeeManagerItemClick.drinkFromBeltHandsInv();
+							}
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+					}
+				}.start();
+			}
+		}
+	}
 }
