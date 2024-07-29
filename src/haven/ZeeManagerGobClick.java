@@ -2086,12 +2086,15 @@ public class ZeeManagerGobClick extends ZeeThread{
         }
         // crop
         else if (isGobCrop(gobName)) {
-            if (petalName.equals(ZeeFlowerMenu.STRPETAL_SEEDFARMER)) {
-                ZeeManagerFarmer.showWindow(gob);
+            if (petalName.contentEquals(ZeeFlowerMenu.STRPETAL_SEEDFARMER)) {
+                ZeeManagerFarmer.showSeedFarmerWindow(gob);
             }
-            else if (petalName.equals(ZeeFlowerMenu.STRPETAL_CURSORHARVEST)) {
+            else if (petalName.contentEquals(ZeeFlowerMenu.STRPETAL_CURSORHARVEST)) {
                 if (!ZeeConfig.getCursorName().equals(ZeeConfig.CURSOR_HARVEST))
                     gobClick(gob, 3, UI.MOD_SHIFT);
+            }
+            else if(petalName.contentEquals(ZeeFlowerMenu.STRPETAL_FARMAWAY)){
+                ZeeManagerFarmer.farmAway(gob);
             }
         }
         else if (petalName.equals(ZeeFlowerMenu.STRPETAL_BARRELTAKEALL)) {
@@ -2416,7 +2419,12 @@ public class ZeeManagerGobClick extends ZeeThread{
         }
         // crop
         else if (isGobCrop(gobName)) {
-            menu = new ZeeFlowerMenu(gob,ZeeFlowerMenu.STRPETAL_SEEDFARMER, ZeeFlowerMenu.STRPETAL_CURSORHARVEST);
+            opts = new ArrayList<String>();
+            opts.add(ZeeFlowerMenu.STRPETAL_SEEDFARMER);
+            opts.add(ZeeFlowerMenu.STRPETAL_CURSORHARVEST);
+            if (ZeeConfig.isCropStageHarvestable(gob))
+                opts.add(ZeeFlowerMenu.STRPETAL_FARMAWAY);
+            menu = new ZeeFlowerMenu(gob, opts.toArray(String[]::new));
         }
         else if (isBarrelTakeAll(gob)) {
             menu = new ZeeFlowerMenu(gob,ZeeFlowerMenu.STRPETAL_BARRELTAKEALL, ZeeFlowerMenu.STRPETAL_LIFTUPGOB);

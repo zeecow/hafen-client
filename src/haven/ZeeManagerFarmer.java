@@ -1,9 +1,7 @@
 package haven;
 
 import java.awt.event.KeyEvent;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class ZeeManagerFarmer extends ZeeThread{
@@ -720,7 +718,7 @@ public class ZeeManagerFarmer extends ZeeThread{
         }
     }
 
-    public static void showWindow(Gob gobCrop) {
+    public static void showSeedFarmerWindow(Gob gobCrop) {
         Widget wdg;
         ZeeManagerFarmer.farmerGobCrop = gobCrop;
         ZeeConfig.farmerMode = true;
@@ -840,4 +838,144 @@ public class ZeeManagerFarmer extends ZeeThread{
         }
     }
 
+
+
+    private static Window farmAwayWin;
+    private static boolean farmAwayDrop = Utils.getprefb("farmAwayDrop",false);
+    private static boolean farmAwayCollect = Utils.getprefb("farmAwayCollect",true);
+    private static boolean farmAwayOn = false;
+    public static void farmAway(Gob crop) {
+
+        //create window
+        String winName = "Farm Away";
+        farmAwayWin = ZeeConfig.getWindow(winName);
+        if (farmAwayWin==null){
+            farmAwayWin = ZeeConfig.gameUI.add(
+                new Window(Coord.of(150,60), winName){
+                    public void wdgmsg(String msg, Object... args) {
+                        if (msg.contentEquals("close")){
+                            farmAwayExit("");
+                            this.reqdestroy();
+                        }
+                    }
+                }, ZeeConfig.gameUI.sz.div(2)
+            );
+        }
+        int x=0, y=3;
+        Widget widget = farmAwayWin.add(new CheckBox("drop"){
+            {a = farmAwayDrop;}
+            public void changed(boolean val) {
+                super.changed(val);
+                farmAwayDrop = val;
+                Utils.setprefb("farmAwayDrop",farmAwayDrop);
+            }
+        },x,y);
+        y += widget.sz.y;
+        widget = farmAwayWin.add(new CheckBox("stack"){
+            {a = ZeeConfig.autoStack;}
+            public void changed(boolean val) {
+                super.changed(val);
+                if (val != ZeeConfig.autoStack)
+                    ZeeInvMainOptionsWdg.cbAutoStack.click();
+            }
+        },x,y);
+        y += widget.sz.y;
+        widget = farmAwayWin.add(new CheckBox("collect"){
+            {a = farmAwayCollect;}
+            public void changed(boolean val) {
+                super.changed(val);
+                farmAwayCollect = val;
+                Utils.setprefb("farmAwayCollect",farmAwayCollect);
+            }
+        },x,y);
+
+        // start farming
+        new ZeeThread(){
+            public void run() {
+                try {
+                    farmAwayOn = true;
+                    Gob nextCrop = crop;
+                    int minCropStage = ZeeConfig.getPlantStage(nextCrop);
+                    String cropName = crop.getres().name;
+                    Inventory inv = ZeeConfig.getMainInventory();
+
+                    // farm
+                    ZeeConfig.addPlayerText("farm");
+                    do{
+                        ZeeManagerGobClick.gobClick(nextCrop,3);
+                        prepareCancelClick();
+                        GItem newItem = waitInvItemOrCancelClick();
+                        //drop
+                        if(farmAwayDrop && newItem != null)
+                            inv.dropItemsByNameEndsWith(newItem.getres().name);
+                        nextCrop = getClosestCropAboveMinStage(cropName,minCropStage);
+                    }while(farmAwayOn && !isCancelClick() && nextCrop!=null);
+
+                    //collect subproducts
+                    ZeeConfig.addPlayerText("collect");
+                    List<String> subprods = new ArrayList<>();
+                    if (farmAwayOn && !isCancelClick()){
+                        if (cropName.endsWith("/poppy"))
+                            subprods.addAll(List.of("/flower-poppy","/poppypod"));
+                        else if (cropName.endsWith("/flax"))
+                            subprods.add("/flaxfibre");
+                        else if (cropName.endsWith("/hemp"))
+                            subprods.add("/hempfibre");
+                        else if (cropName.endsWith("/beet"))
+                            subprods.add("/beetleaves");
+                        else if (cropName.endsWith("/lettuce"))
+                            subprods.add("/lettucehead");
+                        else if (cropName.endsWith("/pipeweed"))
+                            subprods.add("/tobacco-fresh");
+                        else if (cropName.endsWith("/pumpkin"))
+                            subprods.add("/pumpkin");
+                        else if (cropName.endsWith("/barley") || cropName.endsWith("/wheat") || cropName.endsWith("/millet"))
+                            subprods.add("/straw");
+                        for (String subprod : subprods) {
+                            Gob closestSubprod = ZeeConfig.getClosestGobByNameEnds("gfx/terobjs/items"+subprod);
+                            // pick all
+                            ZeeManagerGobClick.gobClick(closestSubprod,3,UI.MOD_SHIFT);
+                            prepareCancelClick();
+                            waitPlayerIdleLinMove();
+                            if (isCancelClick())
+                                break;
+                        }
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                farmAwayOn = false;
+                ZeeConfig.removePlayerText();
+            }
+        }.start();
+    }
+    private static void farmAwayExit(String s) {
+        if (!s.isBlank())
+            println(s);
+        farmAwayOn = false;
+        if (farmAwayWin!=null)
+            farmAwayWin.reqdestroy();
+        farmAwayWin = null;
+    }
+
+
+    public static Gob getClosestCropAboveMinStage(String cropName, int minCropStage) {
+
+        List<Gob> gobs = ZeeConfig.findGobsByNameEndsWith(cropName);
+        gobs.removeIf(g1 -> ZeeConfig.getPlantStage(g1) < minCropStage);
+        if (gobs.size()==0)
+            return null;
+
+        Gob closestGob = gobs.remove(0);
+        double closestDist = ZeeConfig.distanceToPlayer(closestGob);
+        double dist;
+        for (Gob g : gobs) {
+            dist = ZeeConfig.distanceToPlayer(g);
+            if (dist < closestDist) {
+                closestGob = g;
+                closestDist = dist;
+            }
+        }
+        return closestGob;
+    }
 }

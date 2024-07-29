@@ -12,7 +12,8 @@ public class ZeeFlowerMenu extends FlowerMenu{
     static final String STRPETAL_TOGGLEGROWTHTEXTS = "Toggle growth texts";
     static final String STRPETAL_BARRELTAKEALL = "Take all";
     static final String STRPETAL_CURSORHARVEST = "Harvest area";
-    static final String STRPETAL_SEEDFARMER = "Start Seed Farmer";
+    static final String STRPETAL_SEEDFARMER = "Seed Farmer";
+    static final String STRPETAL_FARMAWAY = "Farm Away";
     static final String STRPETAL_KILLALL = "Kill all";
     static final String STRPETAL_EATALL = "Eat all";
     static final String STRPETAL_LIFTUPGOB = "Lift up";

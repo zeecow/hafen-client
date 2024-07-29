@@ -447,15 +447,52 @@ public class ZeeConfig {
         return null;
     }
 
-    public static boolean isCropMaxStage(Gob gob) {
+    static final Map<String,Integer> mapCropMinStageHarvest = Map.ofEntries(
+        Map.entry("gfx/terobjs/plants/turnip",1),
+        Map.entry("gfx/terobjs/plants/carrot",1),
+        Map.entry("gfx/terobjs/plants/beet",3),
+        Map.entry("gfx/terobjs/plants/poppy",4),
+        Map.entry("gfx/terobjs/plants/lettuce",4),
+        Map.entry("gfx/terobjs/plants/pumpkin",5),
+        Map.entry("gfx/terobjs/plants/redonion",3),
+        Map.entry("gfx/terobjs/plants/yellowonion",3),
+        Map.entry("gfx/terobjs/plants/leek",2),
+        Map.entry("gfx/terobjs/plants/hemp",3),
+        Map.entry("gfx/terobjs/plants/flax",4),
+        Map.entry("gfx/terobjs/plants/barley",3),
+        Map.entry("gfx/terobjs/plants/wheat",3),
+        Map.entry("gfx/terobjs/plants/millet",3),
+        Map.entry("gfx/terobjs/plants/pipeweed",4)
+    );
+    public static boolean isCropStageHarvestable(Gob crop) {
         boolean ret = false;
         int maxStage = 0;
-        for (FastMesh.MeshRes layer : gob.getres().layers(FastMesh.MeshRes.class)) {
+        for (FastMesh.MeshRes layer : crop.getres().layers(FastMesh.MeshRes.class)) {
             if(layer.id / 10 > maxStage) {
                 maxStage = layer.id / 10;
             }
         }
-        Message data = getDrawableData(gob);
+        Message data = getDrawableData(crop);
+        if(data != null) {
+            int stage = data.uint8();
+            if(stage > maxStage)
+                stage = maxStage;
+            if(stage >= mapCropMinStageHarvest.get(crop.getres().name))
+                ret = true;
+            //println(crop.getres().name+" stage "+stage);
+        }
+        return ret;
+    }
+
+    public static boolean isCropMaxStage(Gob crop) {
+        boolean ret = false;
+        int maxStage = 0;
+        for (FastMesh.MeshRes layer : crop.getres().layers(FastMesh.MeshRes.class)) {
+            if(layer.id / 10 > maxStage) {
+                maxStage = layer.id / 10;
+            }
+        }
+        Message data = getDrawableData(crop);
         if(data != null) {
             int stage = data.uint8();
             if(stage > maxStage)
