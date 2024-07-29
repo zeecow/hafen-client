@@ -1160,7 +1160,7 @@ public class ZeeConfig {
             if (ZeeManagerMiner.tunnelHelperStage == ZeeManagerMiner.TUNNELHELPER_STAGE5_BUILDCOL && windowTitle.contentEquals("Stone Column")){
                 ZeeManagerMiner.tunnelHelperBuildColumn(window);
             }
-            // build and drink
+            // build and drink checkbox
             Button btn = getButtonNamed(window, "Build");
             CheckBox cb = window.add(new CheckBox("and drink"){
                 {a = isBuildAndDrink;}

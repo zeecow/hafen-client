@@ -9,7 +9,7 @@ public class ZeeManagerMiner extends ZeeThread{
 
     private static final double MAX_DIST_BOULDER = 25;
 
-    //public static boolean isCursorMining;
+    static boolean isBuildAndDrinkBackup, restoreBuildAndDrink;
     public static long miningAreaSelectedMs = -1;
     static boolean useOreForColumns = false;
     public static long lastDropItemMs = 0;
@@ -149,6 +149,12 @@ public class ZeeManagerMiner extends ZeeThread{
     static final int TUNNELHELPER_STAGE4_PICKSTONE = 4;
     static final int TUNNELHELPER_STAGE5_BUILDCOL = 5;
     private static void tunnelHelperShowWindow() {
+
+        // backup buildAndDrink
+        restoreBuildAndDrink = true;
+        isBuildAndDrinkBackup = ZeeConfig.isBuildAndDrink;
+        ZeeConfig.isBuildAndDrink = false;
+
         if (tunnelHelperWindow == null) {
             Widget wdg;
 
@@ -256,6 +262,10 @@ public class ZeeManagerMiner extends ZeeThread{
         mining = false;
         tunneling = false;
         tunnelHelperEndCoord = tunnelHelperEndCoordPrev = null;
+        if (restoreBuildAndDrink) {
+            ZeeConfig.isBuildAndDrink = isBuildAndDrinkBackup;
+            restoreBuildAndDrink = false;
+        }
         tunnelHelperSetStage(TUNNELHELPER_STAGE0_IDLE);
         ZeeConfig.removePlayerText();
         if (tunnelHelperWindow !=null)
