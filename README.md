@@ -23,7 +23,7 @@ Controls
 - rclick Stoat's icon to aggro on max speed (option available)
 - pickup key "q", shift+q pickup all, ctrl+q pickup window
 - drink key '
-  - shift drink will drink 1 gulp and click ground coord again (no map, gobs)
+  - shift drink will drink 1 gulp and click ground again (missing gob/minimap clicks)
 - click building/passage gob to enter it
   - dismount horse if rope in inventory
   - schedule remount if mclick instead of rclick
@@ -39,7 +39,7 @@ Controls
 
 
 
-Midclick interactions (incomplete)
+Midclick interactions (incomplete/outdated)
 -------------------------------------------
 
 Midclick Ground
@@ -101,6 +101,7 @@ Long Midclick Ground Object
 - pile all clay if clicked pile with cursor dig
 - longmidclick stockpile while making block/board/sand will try pile items until pile full or object consumed
 - put out cauldron
+- longMidClick barrel while stirring to refill cauldron and click "craft all" again
 
 Midclick Window Item
 - sort-transfer item ascending(?)

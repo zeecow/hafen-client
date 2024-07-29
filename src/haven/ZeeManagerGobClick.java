@@ -1001,6 +1001,10 @@ public class ZeeManagerGobClick extends ZeeThread{
             else if (gobName.endsWith("/dframe")) {
                 gobClick(gob,3, UI.MOD_SHIFT);
             }
+            // refill cauldron and craft all
+            else if(gobName.endsWith("/barrel") && ZeeConfig.playerHasAnyPose(ZeeConfig.POSE_PLAYER_STIR)){
+                refillCauldronAndCraftAll(gob);
+            }
             // item act barrel
             else if (ZeeConfig.isPlayerHoldingItem() && gobName.endsWith("/barrel")) {
                 if (ZeeManagerFarmer.isBarrelEmpty(gob))
@@ -1057,6 +1061,41 @@ public class ZeeManagerGobClick extends ZeeThread{
         catch (Exception e){
             e.printStackTrace();
         }
+    }
+
+    static void refillCauldronAndCraftAll(Gob barrel) {
+        new ZeeThread(){
+            public void run() {
+                try {
+                    ZeeConfig.addPlayerText("refil");
+                    Gob cauldron = ZeeConfig.getClosestGobByNameContains("/cauldron");
+                    Coord barrelCoord = ZeeConfig.getGobCoord(barrel);
+                    //lift barrel
+                    if(cauldron!=null && liftGob(barrel)){
+                        //barrel click cauldron
+                        gobClick(cauldron,3);
+                        if (waitPlayerIdleLinMove()){
+                            //return barrel
+                            ZeeConfig.clickCoord(barrelCoord,3);
+                            if (ZeeConfig.isPlayerMountingHorse())
+                                return;
+                            if (waitPlayerPoseNotInList(ZeeConfig.POSE_PLAYER_LIFTING)){
+                                //reopen cauldron
+                                if (clickGobPetal(cauldron,"Open")){
+                                    if (waitWindowOpened("Cauldron")) {
+                                        //click "craft all" button
+                                        ZeeConfig.getButtonNamed((Window) ZeeConfig.makeWindow.parent, "Craft All").click();
+                                    }
+                                }
+                            }
+                        }
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                ZeeConfig.removePlayerText();
+            }
+        }.start();
     }
 
     private static void placePileAndAuto() {
