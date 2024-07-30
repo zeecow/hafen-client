@@ -904,17 +904,22 @@ public class ZeeManagerFarmer extends ZeeThread{
                     do{
                         ZeeManagerGobClick.gobClick(nextCrop,3);
                         prepareCancelClick();
-                        GItem newItem = waitInvItemOrCancelClick();
+                        sleep(PING_MS);
+                        waitPlayerIdleLinMove();
                         //drop
-                        if(farmAwayDrop && newItem != null)
-                            inv.dropItemsByNameEndsWith(newItem.getres().name);
+                        if(farmAwayDrop)
+                            inv.dropItemsByNameEndsWith(ZeeConfig.lastInvGItemCreatedName);
                         nextCrop = getClosestCropAboveMinStage(cropName,minCropStage);
+                        if (nextCrop==null)
+                            break;
+                        double dist = ZeeConfig.distanceToPlayer(nextCrop);
+                        if (dist > TILE_SIZE*7)
+                            break;
                     }while(farmAwayOn && !isCancelClick() && nextCrop!=null);
 
                     //collect subproducts
-                    ZeeConfig.addPlayerText("collect");
-                    List<String> subprods = new ArrayList<>();
                     if (farmAwayOn && !isCancelClick()){
+                        List<String> subprods = new ArrayList<>();
                         if (cropName.endsWith("/poppy"))
                             subprods.addAll(List.of("/flower-poppy","/poppypod"));
                         else if (cropName.endsWith("/flax"))
@@ -931,14 +936,16 @@ public class ZeeManagerFarmer extends ZeeThread{
                             subprods.add("/pumpkin");
                         else if (cropName.endsWith("/barley") || cropName.endsWith("/wheat") || cropName.endsWith("/millet"))
                             subprods.add("/straw");
+                        if (!subprods.isEmpty())
+                            ZeeConfig.addPlayerText("collect");
                         for (String subprod : subprods) {
                             Gob closestSubprod = ZeeConfig.getClosestGobByNameEnds("gfx/terobjs/items"+subprod);
-                            // pick all
-                            ZeeManagerGobClick.gobClick(closestSubprod,3,UI.MOD_SHIFT);
+                            ZeeManagerGobClick.gobClick(closestSubprod,3,UI.MOD_SHIFT); // pick all
                             prepareCancelClick();
-                            waitPlayerIdleLinMove();
+                            waitInvItemOrCancelClick();
                             if (isCancelClick())
                                 break;
+                            waitPlayerIdleLinMove();
                         }
                     }
                 } catch (Exception e) {
@@ -977,5 +984,61 @@ public class ZeeManagerFarmer extends ZeeThread{
             }
         }
         return closestGob;
+    }
+
+    static final Map<String,Integer> mapCropMinStageHarvest = Map.ofEntries(
+            Map.entry("gfx/terobjs/plants/turnip",1),
+            Map.entry("gfx/terobjs/plants/carrot",1),
+            Map.entry("gfx/terobjs/plants/beet",3),
+            Map.entry("gfx/terobjs/plants/poppy",4),
+            Map.entry("gfx/terobjs/plants/lettuce",4),
+            Map.entry("gfx/terobjs/plants/pumpkin",5),
+            Map.entry("gfx/terobjs/plants/redonion",3),
+            Map.entry("gfx/terobjs/plants/yellowonion",3),
+            Map.entry("gfx/terobjs/plants/leek",2),
+            Map.entry("gfx/terobjs/plants/hemp",3),
+            Map.entry("gfx/terobjs/plants/flax",3),
+            Map.entry("gfx/terobjs/plants/barley",3),
+            Map.entry("gfx/terobjs/plants/wheat",3),
+            Map.entry("gfx/terobjs/plants/millet",3),
+            Map.entry("gfx/terobjs/plants/pipeweed",4)
+    );
+    public static boolean isCropStageHarvestable(Gob crop) {
+        boolean ret = false;
+        int maxStage = 0;
+        for (FastMesh.MeshRes layer : crop.getres().layers(FastMesh.MeshRes.class)) {
+            if(layer.id / 10 > maxStage) {
+                maxStage = layer.id / 10;
+            }
+        }
+        Message data = ZeeConfig.getDrawableData(crop);
+        if(data != null) {
+            int stage = data.uint8();
+            if(stage > maxStage)
+                stage = maxStage;
+            if(stage >= mapCropMinStageHarvest.get(crop.getres().name))
+                ret = true;
+            //println(crop.getres().name+" stage "+stage);
+        }
+        return ret;
+    }
+
+    public static boolean isCropMaxStage(Gob crop) {
+        boolean ret = false;
+        int maxStage = 0;
+        for (FastMesh.MeshRes layer : crop.getres().layers(FastMesh.MeshRes.class)) {
+            if(layer.id / 10 > maxStage) {
+                maxStage = layer.id / 10;
+            }
+        }
+        Message data = ZeeConfig.getDrawableData(crop);
+        if(data != null) {
+            int stage = data.uint8();
+            if(stage > maxStage)
+                stage = maxStage;
+            if(stage==maxStage)
+                ret = true;
+        }
+        return ret;
     }
 }

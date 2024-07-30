@@ -2422,7 +2422,7 @@ public class ZeeManagerGobClick extends ZeeThread{
             opts = new ArrayList<String>();
             opts.add(ZeeFlowerMenu.STRPETAL_SEEDFARMER);
             opts.add(ZeeFlowerMenu.STRPETAL_CURSORHARVEST);
-            if (ZeeConfig.isCropStageHarvestable(gob))
+            if (ZeeManagerFarmer.isCropStageHarvestable(gob))
                 opts.add(ZeeFlowerMenu.STRPETAL_FARMAWAY);
             menu = new ZeeFlowerMenu(gob, opts.toArray(String[]::new));
         }
