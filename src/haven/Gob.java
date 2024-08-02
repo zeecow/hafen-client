@@ -47,15 +47,17 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
     private final Collection<SetupMod> setupmods = new ArrayList<>();
     private final LinkedList<Runnable> deferred = new LinkedList<>();
     private Loader.Future<?> deferral = null;
+
 	public int totalDmgHp = 0;
-	public long requeued = 0;
-	public boolean settingsApplied = false;
-	public boolean pickupPriority = false;
-	public Drawable drawable;
-	public ZeeHidingGobSprite<ZeeHitbox> hitbox;
-	public boolean hasPointer;
+	long requeued = 0;
+	boolean settingsApplied = false;
+	boolean pickupPriority = false;
+	Drawable drawable;
+	ZeeHidingGobSprite<ZeeHitbox> hitbox;
+	boolean hasPointer;
 	public String treeGrowthText;
-	public boolean smokeHighlight;
+	boolean smokeHighlight;
+	int equedOverlays = 0;
 
     public static class Overlay implements RenderTree.Node {
 	public final int id;

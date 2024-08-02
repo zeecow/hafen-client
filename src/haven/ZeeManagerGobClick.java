@@ -4516,72 +4516,42 @@ public class ZeeManagerGobClick extends ZeeThread{
 
     public static void checkOverlayEquedAdded(Sprite.Owner owner, Resource res) {
         if (!(owner instanceof Gob) ) {
-            println("not a gob");
             return;
         }
-        Gob gob = (Gob) owner;
-        if (!gob.removed && gob.settingsApplied) {
-            // cheeseracks
-            if (gob.getres().name.endsWith("terobjs/cheeserack")){
-                new ZeeThread(){
-                    public void run() {
-                        synchronized (gob) {
-                            List<String> ols = ZeeManagerGobClick.getOverlayNames(gob);
-                            int trays = 0;
-                            for (String ol : ols) {
-                                if (ol.contains("gfx/fx/eq")) {
-                                    trays++;
-                                }
-                            }
-                            //println("trays " + trays);
-                            if (trays == 0)
-                                return;
-                            if (trays == 3)
-                                ZeeConfig.addGobColor(gob, Color.green.darker());
-                            else
-                                ZeeConfig.addGobColor(gob, Color.orange);
-                        }
-                    }
-                }.start();
+        Gob gob1 = (Gob) owner;
+        if (!gob1.removed && gob1.settingsApplied) {
+            synchronized (gob1) {
+                gob1.equedOverlays++;
+                // cheeseracks
+                if (gob1.getres().name.endsWith("terobjs/cheeserack")){
+                    if (gob1.equedOverlays == 3)
+                        ZeeConfig.addGobColor(gob1, Color.green.darker());
+                    else
+                        ZeeConfig.addGobColor(gob1, Color.orange);
+                }
             }
         }
     }
+
     public static void checkOverlayRemoved(Gob gob, Sprite spr) {
         if (!gob.removed && gob.settingsApplied) {
-            if (spr!=null && spr.res!=null) {
-                if(spr.res.name.contentEquals("gfx/fx/eq")) {
-
+            if (spr!=null && spr.res!=null && spr.res.name.contentEquals("gfx/fx/eq")) {
+                synchronized (gob) {
+                    gob.equedOverlays--;
                     // gardenpot
-                    if (gob.getres().name.endsWith("terobjs/gardenpot")) {
-                        if (ZeeConfig.gobHasOverlay(gob, "gfx/fx/eq"))// wait last overlay
-                            return;
+                    if (gob.getres().name.endsWith("terobjs/gardenpot") && gob.equedOverlays==0) {
                         ZeeConfig.removeGobColor(gob);
                     }
-
                     // cheeserack
-                    else if (gob.getres().name.endsWith("terobjs/cheeserack")){
-                        new ZeeThread(){
-                            public void run() {
-                                synchronized (gob) {
-                                    List<String> ols = ZeeManagerGobClick.getOverlayNames(gob);
-                                    int trays = 0;
-                                    for (String ol : ols) {
-                                        if (ol.contains("gfx/fx/eq")) {
-                                            trays++;
-                                        }
-                                    }
-                                    //println("trays " + trays);
-                                    if (trays == 2)//removed 3rd tray
-                                        ZeeConfig.addGobColor(gob, Color.orange);
-                                    else if (trays == 0)
-                                        ZeeConfig.removeGobColor(gob);//removed last tray
-                                }
-                            }
-                        }.start();
-
+                    else if (gob.getres().name.endsWith("terobjs/cheeserack")) {
+                        if (gob.equedOverlays == 2)//removed 3rd tray
+                            ZeeConfig.addGobColor(gob, Color.orange);
+                        else if (gob.equedOverlays == 0)//removed last tray
+                            ZeeConfig.removeGobColor(gob);
                     }
                 }
             }
         }
     }
+
 }
