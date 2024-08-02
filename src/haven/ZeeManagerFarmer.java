@@ -843,6 +843,8 @@ public class ZeeManagerFarmer extends ZeeThread{
     private static Window farmAwayWin;
     private static boolean farmAwayDrop = Utils.getprefb("farmAwayDrop",false);
     private static boolean farmAwayCollect = Utils.getprefb("farmAwayCollect",true);
+    private static boolean farmAwayEquipSacksPumpkin = Utils.getprefb("farmAwayEquipSacksPumpkin",true);
+    private static boolean farmAwayEquipSacksNonPumpkin = Utils.getprefb("farmAwayEquipSacksNonPumpkin",false);
     private static boolean farmAwayOn = false;
     public static void farmAway(Gob crop) {
 
@@ -851,7 +853,7 @@ public class ZeeManagerFarmer extends ZeeThread{
         farmAwayWin = ZeeConfig.getWindow(winName);
         if (farmAwayWin==null){
             farmAwayWin = ZeeConfig.gameUI.add(
-                new Window(Coord.of(150,60), winName){
+                new Window(Coord.of(70,140), winName){
                     public void wdgmsg(String msg, Object... args) {
                         if (msg.contentEquals("close")){
                             farmAwayExit("");
@@ -861,7 +863,7 @@ public class ZeeManagerFarmer extends ZeeThread{
                 }, ZeeConfig.gameUI.sz.div(2)
             );
         }
-        int x=0, y=3;
+        int x=0, y=3, padY=2;
         Widget widget = farmAwayWin.add(new CheckBox("drop"){
             {a = farmAwayDrop;}
             public void changed(boolean val) {
@@ -870,7 +872,7 @@ public class ZeeManagerFarmer extends ZeeThread{
                 Utils.setprefb("farmAwayDrop",farmAwayDrop);
             }
         },x,y);
-        y += widget.sz.y;
+        y += widget.sz.y + padY;
         widget = farmAwayWin.add(new CheckBox("stack"){
             {a = ZeeConfig.autoStack;}
             public void changed(boolean val) {
@@ -879,7 +881,7 @@ public class ZeeManagerFarmer extends ZeeThread{
                     ZeeInvMainOptionsWdg.cbAutoStack.click();
             }
         },x,y);
-        y += widget.sz.y;
+        y += widget.sz.y + padY;
         widget = farmAwayWin.add(new CheckBox("collect"){
             {a = farmAwayCollect;}
             public void changed(boolean val) {
@@ -888,6 +890,30 @@ public class ZeeManagerFarmer extends ZeeThread{
                 Utils.setprefb("farmAwayCollect",farmAwayCollect);
             }
         },x,y);
+        y += widget.sz.y + padY;
+        widget = farmAwayWin.add(new Label("equip sacks"),x,y);
+        y += widget.sz.y + padY;
+        widget = farmAwayWin.add(new CheckBox("pumpkin"){
+            {a = farmAwayEquipSacksPumpkin;}
+            public void changed(boolean val) {
+                super.changed(val);
+                farmAwayEquipSacksPumpkin = val;
+                Utils.setprefb("farmAwayEquipSacksPumpkin", farmAwayEquipSacksPumpkin);
+            }
+        },x+7,y);
+        y += widget.sz.y + padY;
+        widget = farmAwayWin.add(new CheckBox("non-pumpkin"){
+            {a = farmAwayEquipSacksNonPumpkin;}
+            public void changed(boolean val) {
+                super.changed(val);
+                farmAwayEquipSacksNonPumpkin = val;
+                Utils.setprefb("farmAwayEquipSacksNonPumpkin", farmAwayEquipSacksNonPumpkin);
+            }
+        },x+7,y);
+
+        farmAwayWin.pack();
+
+        //farmAwayEquipSacksNonPumpkin
 
         // start farming
         new ZeeThread(){
@@ -938,13 +964,22 @@ public class ZeeManagerFarmer extends ZeeThread{
                             subprods.add("/straw");
                         if (!subprods.isEmpty())
                             ZeeConfig.addPlayerText("collect");
+                        //equip sacks
+                        if (farmAwayEquipSacksPumpkin && subprods.contains("/pumpkin"))
+                            ZeeManagerItemClick.equipTwoSacks();
+                        else if(farmAwayEquipSacksNonPumpkin && !subprods.isEmpty())
+                            ZeeManagerItemClick.equipTwoSacks();
+                        //collect subprods
                         for (String subprod : subprods) {
                             Gob closestSubprod = ZeeConfig.getClosestGobByNameEnds("gfx/terobjs/items"+subprod);
+                            // click closest item
                             ZeeManagerGobClick.gobClick(closestSubprod,3,UI.MOD_SHIFT); // pick all
                             prepareCancelClick();
+                            // wait first item acquired
                             waitInvItemOrCancelClick();
                             if (isCancelClick())
                                 break;
+                            // wait other items
                             waitPlayerIdleLinMove();
                         }
                     }
@@ -992,7 +1027,7 @@ public class ZeeManagerFarmer extends ZeeThread{
             Map.entry("gfx/terobjs/plants/beet",3),
             Map.entry("gfx/terobjs/plants/poppy",4),
             Map.entry("gfx/terobjs/plants/lettuce",4),
-            Map.entry("gfx/terobjs/plants/pumpkin",5),
+            Map.entry("gfx/terobjs/plants/pumpkin",4),
             Map.entry("gfx/terobjs/plants/redonion",3),
             Map.entry("gfx/terobjs/plants/yellowonion",3),
             Map.entry("gfx/terobjs/plants/leek",2),
