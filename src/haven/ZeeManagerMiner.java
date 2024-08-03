@@ -350,7 +350,7 @@ public class ZeeManagerMiner extends ZeeThread{
 
     static List<Gob> getBoulders(){
         List<Gob> boulders = ZeeConfig.findGobsByNameStartsWith("gfx/terobjs/bumlings/");
-        boulders.removeIf(gob -> !isBoulder(gob));//remove cave in boulders
+        boulders.removeIf(gob -> !ZeeManagerGobClick.isGobBoulder(gob.getres().name));//remove cave in boulders
         return boulders;
     }
 
@@ -570,21 +570,6 @@ public class ZeeManagerMiner extends ZeeThread{
         }else{
             return true;
         }
-    }
-
-    public static boolean isBoulder(Gob gob) {
-        return (gob!=null &&
-                gob.getres()!=null &&
-                gob.getres().name.startsWith("gfx/terobjs/bumlings/") &&
-                !gob.getres().name.startsWith("gfx/terobjs/bumlings/ras") // cave-in boulder
-        );
-    }
-
-    public static boolean isMineSupport(Gob gob) {
-        return gob!=null && gob.getres()!=null &&
-            (gob.getres().name.equals("gfx/terobjs/minebeam") ||
-            gob.getres().name.equals("gfx/terobjs/column") ||
-            gob.getres().name.equals("gfx/terobjs/minesupport"));
     }
 
     public static void checkBoulderGobAdded(Gob boulder) {

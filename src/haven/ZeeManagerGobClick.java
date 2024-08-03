@@ -2035,8 +2035,10 @@ public class ZeeManagerGobClick extends ZeeThread{
             ZeeSess.charSwitchCreateWindow();
         else if(petalName.contentEquals(ZeeFlowerMenu.STRPETAL_TESTCOORDS))
             windowTestCoords();
-        else if(petalName.contentEquals("Timers"))
-            ZeeTimer.showWindow();
+//        else if(petalName.contentEquals(ZeeFlowerMenu.STRPETAL_TIMERS))
+//            ZeeTimer.showWindow();
+        else if(petalName.contentEquals(ZeeFlowerMenu.STRPETAL_AUTODISCOVERY))
+            ZeeResearch.autoDiscovery();
         else if(petalName.contentEquals(ZeeFlowerMenu.STRPETAL_CLEARGOBTEXTSPOINTERS))
             clearAllGobsTextsAndPointers();
         else if (petalName.contentEquals(ZeeFlowerMenu.STRPETAL_AUTOBUTCH_BIGDEADANIMAL)){
@@ -2375,7 +2377,8 @@ public class ZeeManagerGobClick extends ZeeThread{
             opts.add(ZeeFlowerMenu.STRPETAL_SWITCHCHAR);
             opts.add(ZeeFlowerMenu.STRPETAL_CLEARGOBTEXTSPOINTERS);
             //opts.add(ZeeFlowerMenu.STRPETAL_TESTCOORDS);
-            opts.add("Timers");
+            //opts.add(ZeeFlowerMenu.STRPETAL_TIMERS);
+            opts.add(ZeeFlowerMenu.STRPETAL_AUTODISCOVERY);
             if (ZeeConfig.isCaveTile(ZeeConfig.getPlayerTileName()))
                 opts.add(ZeeFlowerMenu.STRPETAL_TILEMONITOR);
             menu = new ZeeFlowerMenu(gob, opts.toArray(String[]::new));
@@ -3066,6 +3069,10 @@ public class ZeeManagerGobClick extends ZeeThread{
         ZeeConfig.addGobColor(gob,0,255,0,180);
     }
 
+    public static String getBoulderNameNoSize(String name) {
+        return name.replaceAll("\\d$", "");
+    }
+
 
     private boolean isGobBigDeadAnimal_thread() {
         try{
@@ -3526,9 +3533,9 @@ public class ZeeManagerGobClick extends ZeeThread{
         return isGobInListEndsWith(gobName,endList);
     }
 
-    private static boolean isGobBoulder(String gobName) {
+    public static boolean isGobBoulder(String gobName) {
         return gobName.startsWith("gfx/terobjs/bumlings/") &&
-               !gobName.startsWith("gfx/terobjs/bumlings/ras");
+                !gobName.startsWith("gfx/terobjs/bumlings/ras");
     }
 
     public static boolean isGobBush(String gobName) {

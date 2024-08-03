@@ -578,7 +578,7 @@ public class ZeeManagerStockpile extends ZeeThread{
             show = true;
             task = TASK_PILE_GOB_SOURCE;
         }
-        else if (pileGobName.equals(STOCKPILE_STONE) && ZeeManagerMiner.isBoulder(gobSource)){
+        else if (pileGobName.equals(STOCKPILE_STONE) && ZeeManagerGobClick.isGobBoulder(gobSource.getres().name)){
             show = true;
             task = TASK_PILE_GOB_SOURCE;
         }

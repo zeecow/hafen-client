@@ -280,6 +280,155 @@ public class ZeeResearch {
         return allLines;
     }
 
+
+    public static void autoDiscovery() {
+
+        new ZeeThread(){
+            public void run() {
+                List<String> gobsDiscovered = new ArrayList<>();
+                boolean branchDiscovered=false;
+                try {
+                    if (!waitNoFlowerMenu()){
+                        autoDiscoveryExit("couldnt wait no flowerMenu?");
+                        return;
+                    }
+                    ZeeConfig.addPlayerText("discovery");
+                    do{
+                        // select next gob
+                        List<Gob> gobs = ZeeConfig.getAllGobs();
+                        gobs.removeIf(gob -> {
+                            String name = gob.getres().name;
+                            if (gobsDiscovered.contains(name))
+                                return true;
+                            if (ZeeManagerGobClick.isGobTree(name))
+                                return false;
+                            if (ZeeManagerGobClick.isGobBush(name))
+                                return false;
+                            if (ZeeManagerGobClick.isGobBoulder(name) && !gobsDiscovered.contains(ZeeManagerGobClick.getBoulderNameNoSize(name)))
+                                return false;
+                            return true;
+                        });
+                        Gob closestGob = ZeeConfig.getClosestGob(ZeeConfig.getPlayerGob(),gobs);
+                        gobs.remove(closestGob);
+                        String gobName = closestGob.getres().name;
+
+                        // boulder
+                        if (ZeeManagerGobClick.isGobBoulder(gobName) && !gobsDiscovered.contains(gobName)){
+                            ZeeManagerGobClick.clickGobPetal(closestGob,"Chip stone");
+                            GItem stone = waitInvItemOrCancelClick();
+                            if (stone==null) {
+                                autoDiscoveryExit("wait boulder stone canceled?");
+                                return;
+                            }
+                            stone.wdgmsg("drop",Coord.z);
+                            if (stone.getres().name.contains("/catgold")){
+                                stone = waitInvItemOrCancelClick();//try again
+                            }
+                            ZeeConfig.stopMovingEscKey();
+                            gobsDiscovered.add(ZeeManagerGobClick.getBoulderNameNoSize(gobName));
+                            println("discovered boulder "+ZeeManagerGobClick.getBoulderNameNoSize(gobName));
+                        }
+
+                        // bush
+                        else if (ZeeManagerGobClick.isGobBush(gobName) && !gobsDiscovered.contains(gobName)){
+                            ZeeManagerGobClick.gobClick(closestGob,3);
+                            FlowerMenu fm = waitFlowerMenu();
+                            if (fm==null || fm.opts.length==0){
+                                autoDiscoveryExit("no bush flowermenu ? "+gobName);
+                                return;
+                            }
+                            // petals to be clicked
+                            List<String> petalNames = new ArrayList<>();
+                            for (int i = 0; i < fm.opts.length; i++) {
+                                FlowerMenu.Petal petal = fm.opts[i];
+                                if (petal.name.contentEquals("Chop"))
+                                    continue;
+                                petalNames.add(petal.name);
+                            }
+                            // click petal seed, leave for teabush
+                            int countItems = 0;
+                            for (String petalName : petalNames) {
+                                ZeeManagerGobClick.clickGobPetal(closestGob,petalName);
+                                GItem item = waitInvItemOrCancelClick();
+                                if (item==null){
+                                    autoDiscoveryExit("wait bush item canceled?");
+                                    return;
+                                }
+                                item.wdgmsg("drop",Coord.z);
+                                countItems++;
+                            }
+                            if (countItems==2 && gobName.endsWith("/teabush")) {
+                                gobsDiscovered.add(gobName);
+                                println("discovered teabush ");
+                            }
+                            else if(countItems==1) {
+                                gobsDiscovered.add(gobName);
+                                println("discovered bush "+gobName);
+                            }
+                        }
+
+                        // trees
+                        else if (ZeeManagerGobClick.isGobTree(gobName) && !gobsDiscovered.contains(gobName)){
+
+                            ZeeManagerGobClick.gobClick(closestGob,3);
+                            FlowerMenu fm = waitFlowerMenu();
+                            if (fm==null || fm.opts.length==0){
+                                println("no tree flowermenu ? "+gobName);
+                                continue;
+                            }
+                            // petals to be clicked
+                            List<String> petalNames = new ArrayList<>();
+                            for (int i = 0; i < fm.opts.length; i++) {
+                                FlowerMenu.Petal petal = fm.opts[i];
+                                if (petal.name.contentEquals("Chop"))
+                                    continue;
+                                petalNames.add(petal.name);
+                            }
+                            // click petals for items
+                            int countItems = 0;
+                            for (String petalName : petalNames) {
+                                ZeeManagerGobClick.clickGobPetal(closestGob,petalName);
+                                GItem item = waitInvItemOrCancelClick();
+                                if (item==null){
+                                    autoDiscoveryExit("wait tree item canceled?");
+                                    return;
+                                }
+                                String name = item.getres().name;
+                                if (name.contains("branch") || name.endsWith("/bark") ||
+                                        name.contains("bough") || name.contains("leave") ||
+                                        name.contains("seed") || name.contains("nut") ||
+                                        name.contains("cone") )
+                                {
+                                    item.wdgmsg("drop", Coord.z);
+                                }
+                                else if (ZeeConfig.getMainInventory().getNumberOfFreeSlots() < 6) {
+                                    item.wdgmsg("drop", Coord.z);
+                                }
+                                countItems++;
+                            }
+                            if (countItems > 2) { // branch, bark, ...
+                                //TODO categorize trees by petals count
+                                gobsDiscovered.add(gobName);
+                                println("discovered tree "+gobName);
+                            }
+                        }
+
+                    }while(!isCancelClick());
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                autoDiscoveryExit("done , total gobs = "+gobsDiscovered.size());
+            }
+        }.start();
+    }
+
+    static void autoDiscoveryExit(String s) {
+        println("autoDiscovery > "+s);
+        ZeeConfig.removePlayerText();
+    }
+
+
     private static void println(String s) {
         System.out.println(s);
     }

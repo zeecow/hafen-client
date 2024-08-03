@@ -766,8 +766,8 @@ public class ZeeConfig {
         return false;
     }
 
-    public static boolean isHerb(String name){
-        return name.contains("/herbs/");
+    public static boolean isHerb(String resName){
+        return resName.contains("/herbs/");
     }
 
     public static boolean isFlower(String name){
@@ -3864,15 +3864,15 @@ public class ZeeConfig {
             }
 
             // auto boulder option (maybe remove)
-            if (ZeeConfig.autoChipMinedBoulder && ZeeManagerMiner.isCursorMining() && ZeeManagerMiner.isBoulder(ob)) {
+            if (ZeeConfig.autoChipMinedBoulder && ZeeManagerMiner.isCursorMining() && ZeeManagerGobClick.isGobBoulder(gobName)) {
                 ZeeManagerMiner.checkBoulderGobAdded(ob);
             }
             // barter stand item search labels
-            else if (ZeeManagerGobClick.barterSearchOpen && ob.getres().name.endsWith("/barterstand")) {
+            else if (ZeeManagerGobClick.barterSearchOpen && gobName.endsWith("/barterstand")) {
                 ZeeManagerGobClick.addTextBarterStand(ob);
             }
             // auto pick irrlight
-            else if (ZeeManagerGobClick.autoPickIrrlight && ob.getres().name.endsWith("/irrbloss")) {
+            else if (ZeeManagerGobClick.autoPickIrrlight && gobName.endsWith("/irrbloss")) {
                 ZeeManagerGobClick.autoPickIrrlight();
             }
 
@@ -3889,8 +3889,8 @@ public class ZeeConfig {
             ob.toggleModel();
 
             // save gob name
-            if (ob.getres().name!=null && !ob.getres().name.isBlank() && !listGobsSession.contains(ob.getres().name)) {
-                listGobsSession.add(ob.getres().name);
+            if (gobName!=null && !gobName.isBlank() && !listGobsSession.contains(gobName)) {
+                listGobsSession.add(gobName);
             }
 
         }catch (Exception e){
