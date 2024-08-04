@@ -851,8 +851,10 @@ public class ZeeManagerFarmer extends ZeeThread{
         //create window
         String winName = "Farm Away";
         farmAwayWin = ZeeConfig.getWindow(winName);
-        if (farmAwayWin==null){
-            farmAwayWin = ZeeConfig.gameUI.add(
+        if (farmAwayWin != null) {
+            farmAwayWin.reqdestroy();
+        }
+        farmAwayWin = ZeeConfig.gameUI.add(
                 new Window(Coord.of(70,140), winName){
                     public void wdgmsg(String msg, Object... args) {
                         if (msg.contentEquals("close")){
@@ -861,8 +863,7 @@ public class ZeeManagerFarmer extends ZeeThread{
                         }
                     }
                 }, ZeeConfig.gameUI.sz.div(2)
-            );
-        }
+        );
         int x=0, y=3, padY=2;
         Widget widget = farmAwayWin.add(new CheckBox("drop"){
             {a = farmAwayDrop;}

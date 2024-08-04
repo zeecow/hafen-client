@@ -1412,47 +1412,6 @@ public class ZeeManagerGobClick extends ZeeThread{
         }.start();
     }
 
-    private static void inspectWaterAt(Coord2d coordMc) {
-
-        // require wooden cup
-        Inventory inv = ZeeConfig.getMainInventory();
-        List<WItem> cups = inv.getWItemsByNameContains("/woodencup");
-        if (cups==null || cups.size()==0){
-            ZeeConfig.msgError("need woodencup to inspect water");
-            return;
-        }
-
-        // pickup inv cup, click water, return cup
-        WItem cup = cups.get(0);
-        ZeeManagerItemClick.pickUpItem(cup);
-        ZeeConfig.itemActTile(coordMc.floor(posres));
-        waitPlayerIdleFor(1);
-
-        // show msg
-        String msg = ZeeManagerItemClick.getHoldingItemContentsNameQl();
-        ZeeConfig.msgLow(msg);
-        ZeeSynth.textToSpeakLinuxFestival(msg.replaceAll("\\D",""));
-        new ZeeThread(){
-            public void run() {
-                ZeeConfig.addPlayerText(msg);
-                // wait click before removing player text
-                waitMapClick();
-                ZeeConfig.removePlayerText();
-            }
-        }.start();
-        //haven.ChatUI$MultiChat@dd1ed65 ; msg ; ["hello world"]
-
-        //empty cup
-        Coord cupSlot = ZeeManagerItemClick.dropHoldingItemToInvAndRetCoord(inv);
-        if (cupSlot!=null) {
-            cup = inv.getItemBySlotCoord(cupSlot);
-            boolean confirmPetalBackup = ZeeConfig.confirmPetal;
-            ZeeConfig.confirmPetal = false;//temp disable confirm petal
-            ZeeManagerItemClick.clickItemPetal(cup, "Empty");
-            ZeeConfig.confirmPetal = confirmPetalBackup;
-        }
-    }
-
     public static boolean isWaterTile(Coord2d coordMc) {
         return isWaterTile(coordMc.floor(MCache.tilesz));
     }
@@ -2008,7 +1967,7 @@ public class ZeeManagerGobClick extends ZeeThread{
         else if (petalName.contentEquals("fish"))
             ZeeConfig.gameUI.menu.wdgmsg("act","fish","0");
         else if (petalName.contentEquals("inspect water"))
-            inspectWaterAt(coordMc);
+            ZeeResearch.inspectWaterWindow(coordMc);
         else if (petalName.contentEquals("inspect clay"))
             inspectClayAt(coordMc);
         else if (petalName.contentEquals("inspect sand"))

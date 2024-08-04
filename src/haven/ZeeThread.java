@@ -825,7 +825,7 @@ public class ZeeThread  extends Thread{
                 max -= SLEEP_MS;
                 sleep(SLEEP_MS);
             }
-            sleep(SLEEP_MS);
+            sleep(PING_MS);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -855,6 +855,7 @@ public class ZeeThread  extends Thread{
                 max -= SLEEP_MS;
                 Thread.sleep(SLEEP_MS);
             }
+            sleep(PING_MS);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -1121,10 +1122,13 @@ public class ZeeThread  extends Thread{
         return System.currentTimeMillis();
     }
 
-    public static boolean isCancelClick() {
+    static boolean isCancelClick() {
         return ZeeConfig.isCancelClick();
     }
-    public static void prepareCancelClick() {
+    static void setCancelClick() {
+        ZeeConfig.setCancelClick();
+    }
+    static void prepareCancelClick() {
         ZeeConfig.prepareCancelClick();
     }
 

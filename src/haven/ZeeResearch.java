@@ -14,7 +14,10 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+
+import static haven.OCache.posres;
 
 public class ZeeResearch {
 
@@ -422,10 +425,187 @@ public class ZeeResearch {
             }
         }.start();
     }
-
     static void autoDiscoveryExit(String s) {
         println("autoDiscovery > "+s);
         ZeeConfig.removePlayerText();
+    }
+
+
+
+    private static Coord2d inspectWaterCoordBefore;
+    static List<String> inspectWaterQls;
+    static Window inspectWaterWin;
+    static boolean inspectWaterSpeakQl = Utils.getprefb("inspectWaterSpeakQl",true);
+    static Coord2d inspectWaterNextCoord;
+    static boolean inspectWaterActive = false;
+    static void inspectWaterWindow(Coord2d coordMc) {
+
+        // require wooden cup
+        Inventory inv = ZeeConfig.getMainInventory();
+        List<WItem> cups = inv.getWItemsByNameContains("/woodencup");
+        if (cups == null || cups.size() == 0) {
+            ZeeConfig.msgError("need woodencup to inspect water");
+            return;
+        }
+
+        // build window
+        String winTitle = "Inspect water";
+        Widget wdg;
+        inspectWaterWin = ZeeConfig.getWindow(winTitle);
+        if (inspectWaterWin == null) {
+            inspectWaterWin = ZeeConfig.gameUI.add(new Window(Coord.of(100, 140), winTitle) {
+                public void wdgmsg(String msg, Object... args) {
+                    if (msg.contentEquals("close")) {
+                        inspectWaterActive = false;
+                        ZeeConfig.setCancelClick();
+                        this.reqdestroy();
+                    }
+                }
+            }, ZeeConfig.gameUI.sz.div(3));
+            wdg = inspectWaterWin.add(new CheckBox("speak"){
+                {a= inspectWaterSpeakQl;}
+                public void changed(boolean val) {
+                    super.changed(val);
+                    ZeeResearch.inspectWaterSpeakQl = val;
+                    Utils.setprefb("inspectWaterSpeakQl",val);
+                }
+            },0,0);
+            wdg = inspectWaterWin.add(new Button(40, "next") {
+                public void wdgmsg(String msg, Object... args) {
+                    if (msg.contentEquals("activate")) {
+                        // next inspect coord in line
+                        Gob player = ZeeConfig.getPlayerGob();
+                        Coord2d coordNow = Coord2d.of(player.rc.x, player.rc.y);
+                        inspectWaterNextCoord = coordNow.add(coordNow.sub(inspectWaterCoordBefore));
+                        inspectWaterAt(false);
+                    }
+                }
+            },0,13);
+            wdg = inspectWaterWin.add(new Button(40, "auto") {
+                public void wdgmsg(String msg, Object... args) {
+                    if (msg.contentEquals("activate")) {
+                        // auto inspect
+
+                        Gob player = ZeeConfig.getPlayerGob();
+                        Coord2d coordNow = Coord2d.of(player.rc.x, player.rc.y);
+                        inspectWaterNextCoord = coordNow.add(coordNow.sub(inspectWaterCoordBefore));
+                        inspectWaterAt(true);
+                    }
+                }
+            },wdg.c.x+wdg.sz.x+2,13);
+        }
+
+        // start inspecting
+        if (inspectWaterQls == null)
+            inspectWaterQls = new ArrayList<>();
+        inspectWaterNextCoord = coordMc;
+        inspectWaterAt(false);
+    }
+    static void inspectWaterAt(boolean autoInspectWater) {
+
+        if (inspectWaterNextCoord==null){
+            println("next coord null");
+            return;
+        }
+
+        if (inspectWaterActive){
+            println("inspect water already active");
+            return;
+        }
+        inspectWaterActive = true;
+
+        new ZeeThread(){
+            public void run() {
+                try {
+                    ZeeConfig.addPlayerText("inspecting");
+                    do {
+                        // pickup inv cup
+                        Inventory inv = ZeeConfig.getMainInventory();
+                        List<WItem> cups = inv.getWItemsByNameContains("/woodencup");
+                        if (cups==null || cups.size()==0){
+                            ZeeConfig.msgError("need woodencup to inspect water");
+                            inspectWaterActive = false;
+                            return;
+                        }
+                        WItem cup = cups.get(0);
+                        ZeeManagerItemClick.pickUpItem(cup);
+
+                        // click water
+                        Gob player = ZeeConfig.getPlayerGob();
+                        inspectWaterCoordBefore = Coord2d.of(player.rc.x, player.rc.y);
+                        ZeeConfig.itemActTile(inspectWaterNextCoord.floor(posres));
+                        prepareCancelClick();
+                        ZeeThread.waitPlayerIdleFor(1);
+                        if (isCancelClick()) {
+                            println("inspect water cancel click");
+                            break;
+                        }
+                        Coord2d coordNow = Coord2d.of(player.rc.x, player.rc.y);
+                        inspectWaterNextCoord = coordNow.add(coordNow.sub(inspectWaterCoordBefore));
+
+                        // read cup contents, register water quality
+                        String msg = ZeeManagerItemClick.getHoldingItemContentsNameQl();
+                        ZeeConfig.msgLow(msg);
+                        String ql = msg.replaceAll("\\D", "");
+                        if (inspectWaterSpeakQl)
+                            ZeeSynth.textToSpeakLinuxFestival(ql);
+                        inspectWaterAddQl(ql);
+
+                        //return cup, empty cup
+                        Coord cupSlot = ZeeManagerItemClick.dropHoldingItemToInvAndRetCoord(inv);
+                        if (cupSlot != null) {
+                            cup = inv.getItemBySlotCoord(cupSlot);
+                            boolean confirmPetalBackup = ZeeConfig.confirmPetal;
+                            ZeeConfig.confirmPetal = false;//temp disable confirm petal
+                            boolean emptied = ZeeManagerItemClick.clickItemPetal(cup, "Empty");
+                            ZeeConfig.confirmPetal = confirmPetalBackup;
+                            if (!emptied){
+                                println("couldnt empty cup?");
+                                break;
+                            }
+                            // give time for user cancel click
+                            sleep(1500);
+                        }
+                        else{
+                            println("couldnt detect cup slot?");
+                            break;
+                        }
+
+                    }while(autoInspectWater && inspectWaterActive && !isCancelClick());
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                inspectWaterActive = false;
+                ZeeConfig.removePlayerText();
+            }
+        }.start();
+    }
+    private static void inspectWaterAddQl(String ql) {
+        try {
+            if (inspectWaterQls.contains(ql))
+                return;
+            inspectWaterQls.add(ql);
+            Collections.sort(inspectWaterQls);
+            for (Label label : inspectWaterWin.children(Label.class)) {
+                label.remove();
+            }
+            Button btn = ZeeConfig.getButtonNamed(inspectWaterWin, "next");
+            int y = btn.c.y + btn.sz.y + 5;
+            for (int i = inspectWaterQls.size()-1; i >= 0; i--) {
+                inspectWaterWin.add(new Label(inspectWaterQls.get(i)),0,y);
+                y += 13;
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+    public static void inspectWaterClear() {
+        if (inspectWaterQls != null)
+            inspectWaterQls.clear();
+        inspectWaterWin = null;
+        inspectWaterActive = false;
+        inspectWaterNextCoord = null;
     }
 
 

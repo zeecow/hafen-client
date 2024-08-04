@@ -2837,6 +2837,7 @@ public class ZeeConfig {
         ZeeManagerGobClick.chipStoneReset();
         ZeeFishing.exit();
         ZeeManagerTrees.treeloganizerExit("");
+        ZeeResearch.inspectWaterClear();
 
         ZeeCupboardLabeler.reset();
         ZeeCupboardLabeler.isActive = false;
@@ -3506,11 +3507,15 @@ public class ZeeConfig {
         return gob==null || gameUI.ui.sess.glob.oc.getgob(gob.id)==null;
     }
 
-    public static boolean isCancelClick() {
+    static boolean isCancelClick() {
         //cancel if clicked right/left button
         return lastMapViewClickButton != 2;
     }
-    public static void prepareCancelClick() {
+    static void setCancelClick() {
+        //cancel if clicked right/left button
+        lastMapViewClickButton = 1;
+    }
+    static void prepareCancelClick() {
         ZeeConfig.lastMapViewClickButton = 2;
     }
 
