@@ -825,12 +825,27 @@ public class ZeeThread  extends Thread{
                 max -= SLEEP_MS;
                 sleep(SLEEP_MS);
             }
-            sleep(PING_MS);
+            sleep(SLEEP_MS);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
         //println("wait flowermenu = "+fm);
         return fm;
+    }
+
+    public static boolean waitNoFlowerMenu() {
+        int max = (int) TIMEOUT_MS;
+        FlowerMenu fm = null;
+        try {
+            while(max>0 && (fm = ZeeConfig.gameUI.ui.root.getchild(FlowerMenu.class)) != null) {
+                max -= SLEEP_MS;
+                Thread.sleep(SLEEP_MS);
+            }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        //println("wait no flowermenu = "+fm);
+        return (fm == null);
     }
 
     public static boolean waitMapClick(){
@@ -845,22 +860,6 @@ public class ZeeThread  extends Thread{
             }
         }
         return true;
-    }
-
-    public static boolean waitNoFlowerMenu() {
-        int max = (int) TIMEOUT_MS;
-        FlowerMenu fm = null;
-        try {
-            while(max>0 && (fm = ZeeConfig.gameUI.ui.root.getchild(FlowerMenu.class)) != null) {
-                max -= SLEEP_MS;
-                Thread.sleep(SLEEP_MS);
-            }
-            sleep(PING_MS);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        //println("wait no flowermenu = "+fm);
-        return (fm == null);
     }
 
     //  parameters combination may vary depending on player task
