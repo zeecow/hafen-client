@@ -3,6 +3,7 @@ package haven;
 import haven.res.ui.tt.q.quality.Quality;
 import haven.resutil.FoodInfo;
 
+import java.awt.*;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -14,7 +15,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 import static haven.OCache.posres;
@@ -433,11 +433,14 @@ public class ZeeResearch {
 
 
     private static Coord2d inspectWaterCoordBefore;
-    static List<String> inspectWaterQls;
+    static List<Integer> inspectWaterQls;
     static Window inspectWaterWin;
     static boolean inspectWaterSpeakQl = Utils.getprefb("inspectWaterSpeakQl",true);
+    static boolean inspectWaterAuto = false;
+    static boolean inspectWaterSkip = false;
     static Coord2d inspectWaterNextCoord;
     static boolean inspectWaterActive = false;
+    static int inspectWaterHighestQl = -1;
     static void inspectWaterWindow(Coord2d coordMc) {
 
         // require wooden cup
@@ -477,31 +480,36 @@ public class ZeeResearch {
                         Gob player = ZeeConfig.getPlayerGob();
                         Coord2d coordNow = Coord2d.of(player.rc.x, player.rc.y);
                         inspectWaterNextCoord = coordNow.add(coordNow.sub(inspectWaterCoordBefore));
-                        inspectWaterAt(false);
+                        inspectWaterAt();
                     }
                 }
-            },0,13);
-            wdg = inspectWaterWin.add(new Button(40, "auto") {
-                public void wdgmsg(String msg, Object... args) {
-                    if (msg.contentEquals("activate")) {
-                        // auto inspect
-
-                        Gob player = ZeeConfig.getPlayerGob();
-                        Coord2d coordNow = Coord2d.of(player.rc.x, player.rc.y);
-                        inspectWaterNextCoord = coordNow.add(coordNow.sub(inspectWaterCoordBefore));
-                        inspectWaterAt(true);
-                    }
+            },0,20);
+            wdg = inspectWaterWin.add(new CheckBox("auto") {
+                public void changed(boolean val) {
+                    inspectWaterAuto = val;
                 }
-            },wdg.c.x+wdg.sz.x+2,13);
+            },wdg.c.x+wdg.sz.x+2,wdg.c.y);
+            wdg.settip("auto inspect forward");
+            wdg = inspectWaterWin.add(new CheckBox("skip") {
+                public void changed(boolean val) {
+                    inspectWaterSkip = val;
+                }
+            },wdg.c.x,wdg.c.y+wdg.sz.y);
+            wdg.settip("skip every other inspect");
         }
 
         // start inspecting
         if (inspectWaterQls == null)
             inspectWaterQls = new ArrayList<>();
         inspectWaterNextCoord = coordMc;
-        inspectWaterAt(false);
+        inspectWaterAt();
     }
-    static void inspectWaterAt(boolean autoInspectWater) {
+    static void inspectWaterAt() {
+
+        if (ZeeConfig.getMainInventory().countItemsByNameEndsWith("/woodencup")==0){
+            ZeeConfig.msgError("need woodencup to inspect water");
+            return;
+        }
 
         if (inspectWaterNextCoord==null){
             println("next coord null");
@@ -514,11 +522,38 @@ public class ZeeResearch {
         }
         inspectWaterActive = true;
 
+        if (inspectWaterHighestQl == -1)
+            inspectWaterHighestQl = 0;
+
         new ZeeThread(){
             public void run() {
                 try {
                     ZeeConfig.addPlayerText("inspecting");
+                    boolean skippedPrev = false;
                     do {
+                        // approach target tile
+                        prepareCancelClick();
+                        Gob player = ZeeConfig.getPlayerGob();
+                        inspectWaterCoordBefore = Coord2d.of(player.rc.x, player.rc.y);
+                        ZeeConfig.clickCoord(inspectWaterNextCoord.floor(posres),1);
+                        ZeeThread.waitPlayerIdleFor(1);
+                        if (isCancelClick()) {
+                            println("inspect water cancel click");
+                            break;
+                        }
+
+                        // skip every other inspect
+                        if(inspectWaterSkip && inspectWaterAuto){
+                            if(!skippedPrev) {
+                                Coord2d coordNow = Coord2d.of(player.rc.x, player.rc.y);
+                                inspectWaterNextCoord = coordNow.add(coordNow.sub(inspectWaterCoordBefore));
+                                skippedPrev = true;
+                                continue;
+                            }else{
+                                skippedPrev = false;
+                            }
+                        }
+
                         // pickup inv cup
                         Inventory inv = ZeeConfig.getMainInventory();
                         List<WItem> cups = inv.getWItemsByNameContains("/woodencup");
@@ -530,9 +565,7 @@ public class ZeeResearch {
                         WItem cup = cups.get(0);
                         ZeeManagerItemClick.pickUpItem(cup);
 
-                        // click water
-                        Gob player = ZeeConfig.getPlayerGob();
-                        inspectWaterCoordBefore = Coord2d.of(player.rc.x, player.rc.y);
+                        // collect tile water, calc next coord
                         ZeeConfig.itemActTile(inspectWaterNextCoord.floor(posres));
                         prepareCancelClick();
                         ZeeThread.waitPlayerIdleFor(1);
@@ -546,9 +579,7 @@ public class ZeeResearch {
                         // read cup contents, register water quality
                         String msg = ZeeManagerItemClick.getHoldingItemContentsNameQl();
                         ZeeConfig.msgLow(msg);
-                        String ql = msg.replaceAll("\\D", "");
-                        if (inspectWaterSpeakQl)
-                            ZeeSynth.textToSpeakLinuxFestival(ql);
+                        Integer ql = Integer.valueOf(msg.replaceAll("\\D", ""));
                         inspectWaterAddQl(ql);
 
                         //return cup, empty cup
@@ -563,15 +594,13 @@ public class ZeeResearch {
                                 println("couldnt empty cup?");
                                 break;
                             }
-                            // give time for user cancel click
-                            sleep(1500);
                         }
                         else{
                             println("couldnt detect cup slot?");
                             break;
                         }
 
-                    }while(autoInspectWater && inspectWaterActive && !isCancelClick());
+                    }while(inspectWaterAuto && inspectWaterActive && !isCancelClick());
 
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -581,20 +610,35 @@ public class ZeeResearch {
             }
         }.start();
     }
-    private static void inspectWaterAddQl(String ql) {
+    private static void inspectWaterAddQl(Integer ql) {
         try {
             if (inspectWaterQls.contains(ql))
                 return;
+            if (ql <= inspectWaterHighestQl)
+                return;
+            inspectWaterHighestQl = ql;
             inspectWaterQls.add(ql);
-            Collections.sort(inspectWaterQls);
+            if (inspectWaterSpeakQl)
+                ZeeSynth.textToSpeakLinuxFestival(""+ql);
             for (Label label : inspectWaterWin.children(Label.class)) {
                 label.remove();
             }
             Button btn = ZeeConfig.getButtonNamed(inspectWaterWin, "next");
-            int y = btn.c.y + btn.sz.y + 5;
-            for (int i = inspectWaterQls.size()-1; i >= 0; i--) {
-                inspectWaterWin.add(new Label(inspectWaterQls.get(i)),0,y);
-                y += 13;
+            int y = btn.c.y + btn.sz.y + 10;
+            Label lbl = inspectWaterWin.add(new Label("highest "+inspectWaterHighestQl),0,y);
+            lbl.setcolor(Color.green);
+            y += 17;
+            int x=0, row=3;
+            for (int i = 0; i < inspectWaterQls.size(); i++) {
+                inspectWaterWin.add(new Label(""+inspectWaterQls.get(i)),x,y);
+                if (row==0) {
+                    row = 3;
+                    x = 0;
+                    y += 13;
+                }else{
+                    row--;
+                    x += 25;
+                }
             }
         }catch (Exception e){
             e.printStackTrace();
@@ -606,6 +650,9 @@ public class ZeeResearch {
         inspectWaterWin = null;
         inspectWaterActive = false;
         inspectWaterNextCoord = null;
+        inspectWaterHighestQl = -1;
+        inspectWaterAuto = false;
+        inspectWaterSkip = false;
     }
 
 
