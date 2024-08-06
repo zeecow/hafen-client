@@ -612,14 +612,14 @@ public class ZeeResearch {
     }
     private static void inspectWaterAddQl(Integer ql) {
         try {
+            if (inspectWaterSpeakQl && !inspectWaterAuto)
+                ZeeSynth.textToSpeakLinuxFestival(""+ql);
             if (inspectWaterQls.contains(ql))
                 return;
             if (ql <= inspectWaterHighestQl)
                 return;
             inspectWaterHighestQl = ql;
             inspectWaterQls.add(ql);
-            if (inspectWaterSpeakQl)
-                ZeeSynth.textToSpeakLinuxFestival(""+ql);
             for (Label label : inspectWaterWin.children(Label.class)) {
                 label.remove();
             }
