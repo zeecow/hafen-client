@@ -1310,16 +1310,12 @@ public class ZeeManagerGobClick extends ZeeThread{
     private static void inspectSandAt(Coord2d cmc) {
         new ZeeThread(){
             public void run() {
-                // disable autostack for sand inspection
-                //boolean prevAutostack = ZeeConfig.autoStack;
-                //if (ZeeConfig.autoStack) {
-                    //ZeeConfig.toggleAutostack();
-                //}
-
+                Gob gobShip = null;
                 try {
 
                     //disembark boats
-                    if (ZeeConfig.isPlayerPoseOnAnyShip()){
+                    gobShip = ZeeConfig.getPlayerShip();
+                    if (gobShip!=null){
                         disembarkBoatAtShore(cmc);
                     }
 
@@ -1348,14 +1344,18 @@ public class ZeeManagerGobClick extends ZeeThread{
                     int ql = (int) ZeeConfig.getItemQuality(gItem);
                     ZeeSynth.textToSpeakLinuxFestival("sand "+ql);
 
+                    //drop item
+                    gItem.wdgmsg("drop",Coord.z);
 
                 } catch (Exception e) {
                     println("inspectSandAt > "+e.getMessage());
                 }
 
-                //restore autostack
-                //if (prevAutostack && !ZeeConfig.autoStack)
-                    //ZeeConfig.toggleAutostack();
+                //reembark ship
+                if (gobShip!=null){
+                    clickGobPetal(gobShip,0);
+                }
+
             }
         }.start();
     }
@@ -1400,6 +1400,9 @@ public class ZeeManagerGobClick extends ZeeThread{
                     //speak ql
                     int ql = (int) ZeeConfig.getItemQuality(gItem);
                     ZeeSynth.textToSpeakLinuxFestival("clay "+ql);
+
+                    //drop clay
+                    gItem.wdgmsg("drop",Coord.z);
 
                 } catch (Exception e) {
                     println("inspectClayAt > "+e.getMessage());
@@ -3644,7 +3647,32 @@ public class ZeeManagerGobClick extends ZeeThread{
         return false;
     }
 
-    public static boolean clickGobPetal(Gob gob, String petalName) {
+    static boolean clickGobPetal(Gob gob, int petalIndex) {
+        if (gob==null){
+            println(">clickGobPetal gob null");
+            return false;
+        }
+        //make sure cursor is arrow before clicking gob
+        if (!ZeeConfig.getCursorName().contentEquals(ZeeConfig.CURSOR_ARW)){
+            ZeeConfig.clickRemoveCursor();
+            if (!waitCursorName(ZeeConfig.CURSOR_ARW)) {
+                return false;
+            }
+        }
+        //click gob
+        gobClick(gob,3);
+        //click petal
+        FlowerMenu fm = waitFlowerMenu();
+        if(fm!=null){
+            choosePetal(fm, petalIndex);
+            return waitNoFlowerMenu();
+        }else{
+            //println("clickGobPetal > no flower menu?");
+            return false;
+        }
+    }
+
+    static boolean clickGobPetal(Gob gob, String petalName) {
         if (gob==null){
             println(">clickGobPetal gob null");
             return false;

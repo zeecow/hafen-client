@@ -4910,6 +4910,23 @@ public class ZeeConfig {
         return false;
     }
 
+    //todo getPlayerVehicle
+    public static Gob getPlayerShip() {
+        for (String pose : getPlayerPoses()) {
+            if (pose.contains("borka/row"))
+                return getClosestGobByNameEnds("vehicle/rowboat");
+            if (pose.contains("/coracle"))
+                return getClosestGobByNameEnds("vehicle/coracle");
+            if (pose.contains("/dugout"))
+                return getClosestGobByNameEnds("vehicle/dugout");
+            if (pose.contains("/snekkja"))
+                return getClosestGobByNameEnds("vehicle/snekkja");
+            if (pose.contains("/knarr"))
+                return getClosestGobByNameEnds("vehicle/snekkja");
+        }
+        return null;
+    }
+
     static Gob findGobByNameAndCoord(String nameEndsWith, Coord2d coord) {
         try {
             List<Gob> gobs = findGobsByNameEndsWith(nameEndsWith);
