@@ -1314,7 +1314,7 @@ public class ZeeManagerGobClick extends ZeeThread{
                 try {
 
                     //disembark boats
-                    gobShip = ZeeConfig.getPlayerShip();
+                    gobShip = ZeeConfig.getPlayerFollowTarget();
                     if (gobShip!=null){
                         disembarkBoatAtShore(cmc);
                     }
@@ -3847,6 +3847,15 @@ public class ZeeManagerGobClick extends ZeeThread{
             ret.add(attr.getClass().getSimpleName());
         }
         return ret;
+    }
+
+    public static GAttrib getGAttrByClassSimpleName(Gob gob, String attrSimpleName) {
+        Collection<GAttrib> attrs = gob.attr.values();
+        for (GAttrib attr : attrs) {
+            if(attr.getClass().getSimpleName().contentEquals(attrSimpleName))
+                return attr;
+        }
+        return null;
     }
 
     public static Gob getGobFromClickable(Clickable ci) {
