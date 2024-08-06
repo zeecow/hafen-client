@@ -4126,23 +4126,36 @@ public class ZeeConfig {
         }
     }
 
-    public static double getItemQuality(WItem item) {
+    static double getItemQuality(WItem item) {
        return getItemQuality(item.item);
     }
 
-    public static double getItemQuality(GItem item) {
+    static double getItemQuality(GItem item) {
         return Inventory.getQuality(item);
     }
 
-    public static List<String> getPlayerPoses() {
+    static List<String> getPlayerPoses() {
         return getGobPoses(getPlayerGob());
     }
 
-    public static boolean playerHasAnyPose(String ... poses){
+    static boolean playerPosesNameContains(String partialName) {
+        return gobPosesNameContains(getPlayerGob(),partialName);
+    }
+
+    static boolean gobPosesNameContains(Gob gob, String partialName) {
+        List<String> poses = getGobPoses(gob);
+        for (String pose : poses) {
+            if (pose.contains(partialName))
+                return true;
+        }
+        return false;
+    }
+
+    static boolean playerHasAnyPose(String ... poses){
         return gobHasAnyPose(getPlayerGob(),poses);
     }
 
-    public static boolean gobHasAnyPose(Gob gob, String ... wantedPoses){
+    static boolean gobHasAnyPose(Gob gob, String ... wantedPoses){
         List<String> gobPoses = getGobPoses(gob);
         for (int i = 0; i < wantedPoses.length; i++) {
             if (gobPoses.contains(wantedPoses[i]))
@@ -4151,7 +4164,7 @@ public class ZeeConfig {
         return false;
     }
 
-    public static boolean gobHasAnyPoseEndsWith(Gob gob, String ... wantedPosesEndsWith){
+    static boolean gobHasAnyPoseEndsWith(Gob gob, String ... wantedPosesEndsWith){
         List<String> gobPoses = getGobPoses(gob);
         for (int i = 0; i < wantedPosesEndsWith.length; i++) {
             for (String pose : gobPoses) {
@@ -4162,7 +4175,7 @@ public class ZeeConfig {
         return false;
     }
 
-    public static boolean gobHasAnyPoseContains(Gob gob, String ... wantedPosesContains){
+    static boolean gobHasAnyPoseContains(Gob gob, String ... wantedPosesContains){
         List<String> gobPoses = getGobPoses(gob);
         for (int i = 0; i < wantedPosesContains.length; i++) {
             for (String pose : gobPoses) {
@@ -4173,7 +4186,7 @@ public class ZeeConfig {
         return false;
     }
 
-    public static List<String> getGobPoses(Gob gob) {
+    static List<String> getGobPoses(Gob gob) {
         List<String> ret = new ArrayList<>();
         if (gob==null)
             return ret;
@@ -4194,17 +4207,17 @@ public class ZeeConfig {
         return ret;
     }
 
-    public static Tiler getTilerAt(Coord2d coordMc) {
+    static Tiler getTilerAt(Coord2d coordMc) {
         return getTilerAt(coordMc.floor(MCache.tilesz));
     }
 
-    public static Tiler getTilerAt(Coord tile) {
+    static Tiler getTilerAt(Coord tile) {
         int id = ZeeConfig.gameUI.ui.sess.glob.map.getTileee(tile);
         Tiler tl = ZeeConfig.gameUI.ui.sess.glob.map.tiler(id);
         return tl;
     }
 
-    public static String getTileResName(Coord tileCoord) {
+    static String getTileResName(Coord tileCoord) {
         int id = ZeeConfig.gameUI.ui.sess.glob.map.getTileee(tileCoord);
         Resource res = ZeeConfig.gameUI.ui.sess.glob.map.tilesetr(id);
         if (res==null)
@@ -4212,11 +4225,11 @@ public class ZeeConfig {
         return res.name;
     }
 
-    public static String getTileResName(Coord2d mc) {
+    static String getTileResName(Coord2d mc) {
         return getTileResName(mc.floor(MCache.tilesz));
     }
 
-    public static Color getComplementaryColor(Color bgColor) {
+    static Color getComplementaryColor(Color bgColor) {
         return new Color(
             255-bgColor.getRed(),
             255-bgColor.getGreen(),
@@ -4224,24 +4237,24 @@ public class ZeeConfig {
         );
     }
 
-    public static Color intToColor(int rgb){
+    static Color intToColor(int rgb){
         return new Color(rgb,true);
     }
 
-    public static int colorToInt(Color c){
+    static int colorToInt(Color c){
         return c.getRGB();
     }
 
-    public static void simpleWindowsUpdateAll() {
+    static void simpleWindowsUpdateAll() {
         gameUI.children(Window.class).forEach(ZeeConfig::simpleWindowsResize);
     }
 
-    public static void simpleWindowsResize(Window w) {
+    static void simpleWindowsResize(Window w) {
         if (w != null)
             ((Window.DefaultDeco)w.deco).bgImgSimpleWindow = null;
     }
 
-    public static boolean stopResAnimation(Resource res) {
+    static boolean stopResAnimation(Resource res) {
         final String blocklist = "/chimingbluebell,/saptap,/brazierflame,/stockpile-trash,/beehive,/cigar,/dreca,/boostspeed,/visflag,/villageidol,/pow";
         if (res!=null && blocklist.contains(res.basename())) {
             //ZeeConfig.println("hide " + res.name);
@@ -4251,7 +4264,7 @@ public class ZeeConfig {
         return false;
     }
 
-    public static void newGridColor(Color newColor) {
+    static void newGridColor(Color newColor) {
         MapView.gridmat = new Material(
                 new BaseColor(newColor),
                 States.maskdepth,
@@ -4260,7 +4273,7 @@ public class ZeeConfig {
         );
     }
 
-    public static void checkNewCursorName(String curs) {
+    static void checkNewCursorName(String curs) {
 
         ZeeConfig.cursorName = curs;
 
@@ -4295,7 +4308,7 @@ public class ZeeConfig {
         }
     }
 
-    public static boolean isPlayerDrivingingKicksled() {
+    static boolean isPlayerDrivingingKicksled() {
         for (String playerPose : getPlayerPoses()) {
             if (playerPose.contains("/sparkan"))
                 return true;
@@ -4303,19 +4316,37 @@ public class ZeeConfig {
         return false;
     }
 
-    public static boolean isPlayerOnCoracle() {
+    static boolean isPlayerOnKnarr() {
+        List<String> poses = getPlayerPoses();
+        for (String pose : poses) {
+            if (pose.contains("/knarrman"))
+                return true;
+        }
+        return false;
+    }
+
+    static boolean isPlayerOnSnekkja() {
+        List<String> poses = getPlayerPoses();
+        for (String pose : poses) {
+            if (pose.contains("/snekkjaman"))
+                return true;
+        }
+        return false;
+    }
+
+    static boolean isPlayerOnCoracle() {
         return playerHasAnyPose(ZeeConfig.POSE_PLAYER_CORACLE_IDLE,ZeeConfig.POSE_PLAYER_CORACLE_ACTIVE);
     }
 
-    public static boolean isPlayerOnDugout(){
+    static boolean isPlayerOnDugout(){
         return playerHasAnyPose(ZeeConfig.POSE_PLAYER_DUGOUT_IDLE,ZeeConfig.POSE_PLAYER_DUGOUT_ACTIVE);
     }
 
-    public static boolean isPlayerOnRowboat(){
+    static boolean isPlayerOnRowboat(){
         return playerHasAnyPose(ZeeConfig.POSE_PLAYER_ROWBOAT_IDLE,ZeeConfig.POSE_PLAYER_ROWBOAT_ACTIVE);
     }
 
-    public static void combatStarted() {
+    static void combatStarted() {
         lastMapViewClickButton = 1;//cancel click some tasks
         //stop mining
         if(ZeeManagerMiner.mining) {
@@ -4372,7 +4403,7 @@ public class ZeeConfig {
         });
     }
 
-    public static boolean isPetalConfirmed(String name) {
+    static boolean isPetalConfirmed(String name) {
 
         // confirm petal Eat, to preserve Food Efficacy
         if (confirmPetalEatReduceFoodEff && name.contentEquals("Eat")){
@@ -4400,7 +4431,7 @@ public class ZeeConfig {
     }
 
 
-    public static boolean isMsgAudioMuted(String msg) {
+    static boolean isMsgAudioMuted(String msg) {
         String[] arr = blockAudioMsgList.split(";");
         for (int i = 0; i < arr.length; i++) {
             if (msg.strip().contains(arr[i].strip()))
@@ -4535,15 +4566,15 @@ public class ZeeConfig {
     }
 
 
-    public static void moveToAreaCenter(Area a) {
+    static void moveToAreaCenter(Area a) {
         clickTile(ZeeConfig.getAreaCenterTile(a),1);
     }
 
-    public static boolean isCursorName(String name) {
+    static boolean isCursorName(String name) {
         return getCursorName().contentEquals(name);
     }
 
-    public static boolean isTileNamed(Coord2d mc, String... names) {
+    static boolean isTileNamed(Coord2d mc, String... names) {
         if (names==null || names.length==0 || mc==null)
             return false;
         String tilename = getTileResName(mc);
@@ -4563,18 +4594,18 @@ public class ZeeConfig {
         return false;
     }
 
-    public static boolean isPlayerInCellar() {
+    static boolean isPlayerInCellar() {
         final List<Gob> cellarStairs = findGobsByNameEndsWith("arch/cellarstairs");
         if (cellarStairs==null || cellarStairs.isEmpty())
             return false;
         return true;
     }
 
-    public static boolean isNumbersOnly(String str) {
+    static boolean isNumbersOnly(String str) {
         return str!=null && str.chars().allMatch( Character::isDigit );
     }
 
-    public static void inventoryResized(Inventory inv) {
+    static void inventoryResized(Inventory inv) {
 
         // repos main inv checkboxes
         invMainoptionsWdg.reposition();
@@ -4597,7 +4628,7 @@ public class ZeeConfig {
         simpleWindowsResize(win);
     }
 
-    public static void inventoryPreResize(Inventory inv) {
+    static void inventoryPreResize(Inventory inv) {
         Window win = (Window)inv.getparent(Window.class);
 
         //repos buttons to not influence next inventory window resize
@@ -4609,7 +4640,7 @@ public class ZeeConfig {
     }
 
     // calculate next tile from origin to destination
-    public static Coord getNextTileTowards(Coord orig, Coord dest) {
+    static Coord getNextTileTowards(Coord orig, Coord dest) {
         int nextX, nextY;
 
         if (orig.x < dest.x)
@@ -4633,14 +4664,14 @@ public class ZeeConfig {
         return ret;
     }
 
-    public static double doubleRound2(double val){
+    static double doubleRound2(double val){
         val = val*100;
         val = Math.round(val);
         val = val /100;
         return val;
     }
 
-    public static void toggleAutostack() {
+    static void toggleAutostack() {
         gameUI.menu.wdgmsg("act", "itemcomb", 0);
     }
 
@@ -4709,7 +4740,7 @@ public class ZeeConfig {
         return !gameUI.mapfile.tool.visible();
     }
 
-    public static void simulateClickJava(int buttonMask, Point clickLocation) {
+    static void simulateClickJava(int buttonMask, Point clickLocation) {
         try {
             Robot robot = new Robot();
             robot.mouseMove(clickLocation.x, clickLocation.y);

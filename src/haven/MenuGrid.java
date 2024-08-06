@@ -703,23 +703,38 @@ public class MenuGrid extends Widget implements KeyBinding.Bindable {
 	@Override
 	public void wdgmsg(String msg, Object... args) {
 
-		if (ZeeConfig.confirmThrowingAxeOrSpear) {
-			if (msg.contentEquals("act") && ZeeConfig.strArgs(args).startsWith("[shoot")) {
-				//check belt before item is equipped
-				if (ZeeManagerItemClick.getInvBelt().getItemsByNameEnd("tinkersthrowingaxe", "spear").size() > 0){
-					if (!ui.modctrl) {
-						ZeeConfig.msgError("Ctrl shoot to confirm throw, or disable option");
-						return;
-					}
+		if (msg.contentEquals("act")){
+
+			String strArgs = ZeeConfig.strArgs(args);
+
+			// confirm travel hearth on knarr/snekkja
+			if (!ZeeConfig.autoHearthOnStranger && strArgs.contains("travel") && strArgs.contains("hearth") && !ui.modctrl) {
+				if (ZeeConfig.isPlayerOnKnarr() || ZeeConfig.isPlayerOnSnekkja()) {
+					ZeeConfig.msgError("Ctrl click to confirm leaving ship behind");
+					return;
 				}
-				//check hands items
-				if (ZeeManagerItemClick.isItemEquipped("tinkersthrowingaxe", "spear")) {
-					if (!ui.modctrl) {
-						ZeeConfig.msgError("Ctrl shoot to confirm throw, or disable option");
-						return;
+			}
+
+			// confirm shooting axe, spear
+			if (ZeeConfig.confirmThrowingAxeOrSpear) {
+				if (strArgs.startsWith("[shoot")) {
+					//check belt before item is equipped
+					if (ZeeManagerItemClick.getInvBelt().getItemsByNameEnd("tinkersthrowingaxe", "spear").size() > 0){
+						if (!ui.modctrl) {
+							ZeeConfig.msgError("Ctrl shoot to confirm throw, or disable option");
+							return;
+						}
+					}
+					//check hands items
+					if (ZeeManagerItemClick.isItemEquipped("tinkersthrowingaxe", "spear")) {
+						if (!ui.modctrl) {
+							ZeeConfig.msgError("Ctrl shoot to confirm throw, or disable option");
+							return;
+						}
 					}
 				}
 			}
+
 		}
 
 		// let Menu.use() add to history
@@ -729,23 +744,6 @@ public class MenuGrid extends Widget implements KeyBinding.Bindable {
 			super.wdgmsg(msg, args);
 			return;
 		}
-		// find button and add manually to history
-//		else if (args!=null && args.length>0) {
-//			ZeeConfig.println(ZeeConfig.strArgs(args));
-//			String arg0 = (String) args[0];
-//			final List<String> skipList = List.of("itemcomb", "tracking");
-//			if (!skipList.contains(arg0) && arg0.contentEquals("craft")) {
-//				ZeeConfig.println("adding manually > "+msg+" "+ZeeConfig.strArgs(args));
-//				// wdgmsg arg name
-//				String recipeName = (String) args[1];
-//				// find menugrid button
-//				PagButton pagButton = ZeeConfig.getMenuButton(recipeName);
-//				if (pagButton!=null) {
-//					//pagButton.pag.scm.wdgmsg("act", args);
-//					ZeeHistWdg.checkMenuHistory(pagButton, args);
-//				}
-//			}
-//		}
 
 		super.wdgmsg(msg, args);
 	}
