@@ -3961,6 +3961,19 @@ public class ZeeConfig {
         }
     }
 
+    static GAttrib getPlayerAttr(String classSimpleName){
+        return getGobAttr(getPlayerGob(),classSimpleName);
+    }
+    static GAttrib getGobAttr(Gob gob, String classSimpleName){
+        return ZeeManagerGobClick.getGAttrByClassSimpleName(gob,classSimpleName);
+    }
+
+    static GAttrib getPlayerAttr(Class glass){
+        return getGobAttr(getPlayerGob(),glass);
+    }
+    static GAttrib getGobAttr(Gob gob, Class glass){
+        return ZeeManagerGobClick.getGAttrByClassSimpleName(gob,glass.getSimpleName());
+    }
 
     static boolean gobHasAttr(Gob gob, String ... gAttrClassNames) {
         List<String> gobAttrs = ZeeManagerGobClick.getGAttrNames(gob);
@@ -4601,7 +4614,7 @@ public class ZeeConfig {
         return true;
     }
 
-    static boolean isNumbersOnly(String str) {
+    public static boolean isNumbersOnly(String str) {
         return str!=null && str.chars().allMatch( Character::isDigit );
     }
 
@@ -4910,19 +4923,13 @@ public class ZeeConfig {
         return false;
     }
 
-    //todo getPlayerVehicle
-    public static Gob getPlayerShip() {
-        for (String pose : getPlayerPoses()) {
-            if (pose.contains("borka/row"))
-                return getClosestGobByNameEnds("vehicle/rowboat");
-            if (pose.contains("/coracle"))
-                return getClosestGobByNameEnds("vehicle/coracle");
-            if (pose.contains("/dugout"))
-                return getClosestGobByNameEnds("vehicle/dugout");
-            if (pose.contains("/snekkja"))
-                return getClosestGobByNameEnds("vehicle/snekkja");
-            if (pose.contains("/knarr"))
-                return getClosestGobByNameEnds("vehicle/snekkja");
+    public static Gob getPlayerFollowTarget() {
+        Following following = (Following) getPlayerAttr(Following.class);
+        if (following!=null){
+            Gob target = getPlayerGob().glob.oc.getgob(following.tgt);
+            if (target!=null) {
+                return target;
+            }
         }
         return null;
     }

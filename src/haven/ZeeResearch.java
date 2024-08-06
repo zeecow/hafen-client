@@ -455,54 +455,81 @@ public class ZeeResearch {
         String winTitle = "Inspect water";
         Widget wdg;
         inspectWaterWin = ZeeConfig.getWindow(winTitle);
-        if (inspectWaterWin == null) {
-            inspectWaterWin = ZeeConfig.gameUI.add(new Window(Coord.of(100, 140), winTitle) {
-                public void wdgmsg(String msg, Object... args) {
-                    if (msg.contentEquals("close")) {
-                        inspectWaterActive = false;
-                        ZeeConfig.setCancelClick();
-                        this.reqdestroy();
-                    }
-                }
-            }, ZeeConfig.gameUI.sz.div(3));
-            wdg = inspectWaterWin.add(new CheckBox("speak"){
-                {a= inspectWaterSpeakQl;}
-                public void changed(boolean val) {
-                    super.changed(val);
-                    ZeeResearch.inspectWaterSpeakQl = val;
-                    Utils.setprefb("inspectWaterSpeakQl",val);
-                }
-            },0,0);
-            wdg = inspectWaterWin.add(new Button(40, "next") {
-                public void wdgmsg(String msg, Object... args) {
-                    if (msg.contentEquals("activate")) {
-                        // next inspect coord in line
-                        Gob player = ZeeConfig.getPlayerGob();
-                        Coord2d coordNow = Coord2d.of(player.rc.x, player.rc.y);
-                        inspectWaterNextCoord = coordNow.add(coordNow.sub(inspectWaterCoordBefore));
-                        inspectWaterAt();
-                    }
-                }
-            },0,20);
-            wdg = inspectWaterWin.add(new CheckBox("auto") {
-                public void changed(boolean val) {
-                    inspectWaterAuto = val;
-                }
-            },wdg.c.x+wdg.sz.x+2,wdg.c.y);
-            wdg.settip("auto inspect forward");
-            wdg = inspectWaterWin.add(new CheckBox("skip") {
-                public void changed(boolean val) {
-                    inspectWaterSkip = val;
-                }
-            },wdg.c.x,wdg.c.y+wdg.sz.y);
-            wdg.settip("skip every other inspect");
+        if (inspectWaterWin != null) {
+            inspectWaterWin.reqdestroy();
         }
+        inspectWaterWin = ZeeConfig.gameUI.add(new Window(Coord.of(100, 140), winTitle) {
+            public void wdgmsg(String msg, Object... args) {
+                if (msg.contentEquals("close")) {
+                    inspectWaterActive = false;
+                    ZeeConfig.setCancelClick();
+                    this.reqdestroy();
+                }
+            }
+        }, ZeeConfig.gameUI.sz.div(3));
+        wdg = inspectWaterWin.add(new CheckBox("speak"){
+            {a= inspectWaterSpeakQl;}
+            public void changed(boolean val) {
+                super.changed(val);
+                ZeeResearch.inspectWaterSpeakQl = val;
+                Utils.setprefb("inspectWaterSpeakQl",val);
+            }
+        },0,0);
+        wdg = inspectWaterWin.add(new Button(40, "next") {
+            public void wdgmsg(String msg, Object... args) {
+                if (msg.contentEquals("activate")) {
+                    // next inspect coord in line
+                    Gob player = ZeeConfig.getPlayerGob();
+                    Coord2d coordNow = Coord2d.of(player.rc.x, player.rc.y);
+                    inspectWaterNextCoord = coordNow.add(coordNow.sub(inspectWaterCoordBefore));
+                    inspectWaterAt();
+                }
+            }
+        },0,20);
+        wdg = inspectWaterWin.add(new CheckBox("auto") {
+            {a= inspectWaterAuto;}
+            public void changed(boolean val) {
+                inspectWaterAuto = val;
+            }
+        },wdg.c.x+wdg.sz.x+2,wdg.c.y);
+        wdg.settip("auto inspect forward");
+        wdg = inspectWaterWin.add(new CheckBox("skip") {
+            {a= inspectWaterSkip;}
+            public void changed(boolean val) {
+                inspectWaterSkip = val;
+            }
+        },wdg.c.x,wdg.c.y+wdg.sz.y);
+        wdg.settip("skip every other inspect");
 
         // start inspecting
         if (inspectWaterQls == null)
             inspectWaterQls = new ArrayList<>();
+        else
+            inspectWaterUpdLabels();
         inspectWaterNextCoord = coordMc;
         inspectWaterAt();
+    }
+    private static void inspectWaterUpdLabels() {
+        for (Label label : inspectWaterWin.children(Label.class)) {
+            label.remove();
+        }
+        Button btn = ZeeConfig.getButtonNamed(inspectWaterWin, "next");
+        int y = btn.c.y + btn.sz.y + 10;
+        Label lbl = inspectWaterWin.add(new Label("highest "+inspectWaterHighestQl),0,y);
+        lbl.setcolor(Color.green);
+        y += 17;
+        int x=0, row=3;
+        for (int i = 0; i < inspectWaterQls.size(); i++) {
+            inspectWaterWin.add(new Label(""+inspectWaterQls.get(i)),x,y);
+            if (row==0) {
+                row = 3;
+                x = 0;
+                y += 13;
+            }else{
+                row--;
+                x += 25;
+            }
+        }
     }
     static void inspectWaterAt() {
 
@@ -620,26 +647,9 @@ public class ZeeResearch {
                 return;
             inspectWaterHighestQl = ql;
             inspectWaterQls.add(ql);
-            for (Label label : inspectWaterWin.children(Label.class)) {
-                label.remove();
-            }
-            Button btn = ZeeConfig.getButtonNamed(inspectWaterWin, "next");
-            int y = btn.c.y + btn.sz.y + 10;
-            Label lbl = inspectWaterWin.add(new Label("highest "+inspectWaterHighestQl),0,y);
-            lbl.setcolor(Color.green);
-            y += 17;
-            int x=0, row=3;
-            for (int i = 0; i < inspectWaterQls.size(); i++) {
-                inspectWaterWin.add(new Label(""+inspectWaterQls.get(i)),x,y);
-                if (row==0) {
-                    row = 3;
-                    x = 0;
-                    y += 13;
-                }else{
-                    row--;
-                    x += 25;
-                }
-            }
+            if (inspectWaterSpeakQl && inspectWaterAuto)
+                ZeeSynth.textToSpeakLinuxFestival(""+ql);
+            inspectWaterUpdLabels();
         }catch (Exception e){
             e.printStackTrace();
         }
