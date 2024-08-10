@@ -2521,8 +2521,9 @@ public class ZeeConfig {
             if (inv!=null) {
                 if (inv.labelCount==null) {
                     Window win = inv.getparent(Window.class);
+                    String cap = win.cap;
                     //skip belt and small invs
-                    if (win.cap.contentEquals("Belt") || inv.isz.x * inv.isz.y < 25)
+                    if (cap.contentEquals("Belt") || (!cap.contentEquals("Inventory") && inv.isz.x * inv.isz.y < 25))
                         return;
                     win.add(inv.labelCount = new Label(""), 0, 0);
                     inv.labelCount.setcolor(Color.cyan);
