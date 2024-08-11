@@ -216,6 +216,26 @@ public class ZeeManagerGobClick extends ZeeThread{
                 MapView.Plob plob = ZeeManagerStockpile.lastPlob;
                 gobPlace(plob, ZeeConfig.tileToCoord(ZeeConfig.coordToTile(gob.rc)), UI.MOD_SHIFT);
             }
+            // equip ground bucket if no belt(noob char?)
+            else if (gobName.contains("/bucket") && ZeeManagerItemClick.getInvBelt()==null && !ZeeConfig.isPlayerHoldingItem()){
+                new ZeeThread(){
+                    public void run() {
+                        try {
+                            gobClick(gob,3);
+                            waitHoldingItem();
+                            if(ZeeManagerItemClick.isAnyHandEmpty()) {
+                                ZeeManagerItemClick.equipEmptyHand();
+                            }else {
+                                ZeeManagerItemClick.equipLeftOccupiedHand();
+                                sleep(PING_MS);
+                                ZeeManagerItemClick.dropHoldingItemToInv(ZeeConfig.getMainInventory());
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }.start();
+            }
             // pick up all ground items
             else {
                 gobClick(gob, 3, UI.MOD_SHIFT);//shift + rclick

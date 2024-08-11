@@ -29,6 +29,8 @@ public class ZeeManagerItemClick extends ZeeThread{
     static long lastItemClickedMs;
     static int lastItemClickedButton;
 
+    static boolean droppedBucket;
+
     public ZeeManagerItemClick(WItem wItem, Coord c) {
         clickDiffMs = clickEndMs - clickStartMs;
         this.wItem = wItem;
@@ -265,6 +267,10 @@ public class ZeeManagerItemClick extends ZeeThread{
         ZeeConfig.invCounterUpdate(gItem);
     }
 
+    static boolean isAnyHandEmpty() {
+        return ZeeManagerItemClick.isLeftHandEmpty() || ZeeManagerItemClick.isRightHandEmpty();
+    }
+
     private void init(WItem wItem) {
         try{
             equipory = ZeeConfig.windowEquipment.getchild(Equipory.class);
@@ -377,15 +383,16 @@ public class ZeeManagerItemClick extends ZeeThread{
 
 
             //check for windows belt/equips ?
-            if(ZeeConfig.getWindow("Belt")==null){
-                ZeeConfig.gameUI.error("no belt window");
-                return;
-            }
+//            if(ZeeConfig.getWindow("Belt")==null){
+//                ZeeConfig.gameUI.error("no belt window");
+//                return;
+//            }
             if(ZeeConfig.getWindow("Equipment")==null){
                 ZeeConfig.gameUI.error("no equips window");
                 return;
             }
 
+            invBelt = getInvBelt();
 
             if (isItemSack()) { // travellersack or bindle
 
@@ -424,13 +431,29 @@ public class ZeeManagerItemClick extends ZeeThread{
             }
             else if(isTwoHandedItem()) {//2 handed item
                 if(!isItemWindowEquips()) {
+                    //switch 2handed item for bucket, if no belt (noob char)
+                    if (invBelt==null && isItemEquipped("/bucket")) {
+                        if (ZeeConfig.isPlayerTileDeepWater()){//deep water cancel drop
+                            ZeeConfig.msgError("not dropping bucket in deep water");
+                            return;
+                        }
+                        if (pickupHandItem("/bucket")) {
+                            getHoldingItem().item.wdgmsg("drop", Coord.z);
+                            droppedBucket = true;
+                            println("dropbucket true");
+                        }
+                    }else{
+                        droppedBucket = false;
+                        println("dropbucket false");
+                    }
+                    //switch 2handed item for another 2handed item
                     if(!isLeftHandEmpty() && isTwoHandedItem(leftHandItemName)) {
-                        //switch 2handed item for another 2handed item
                         pickUpItem();
                         equipLeftOccupiedHand();
                         dropHoldingItemToBeltOrInv();
-                    }else if(isLeftHandEmpty() || isRightHandEmpty()) {
-                        //switch for 2handed item for 1handed equipped, or none equipped
+                    }
+                    //switch 2handed item for 1handed equipped, or none equipped
+                    else if(isLeftHandEmpty() || isRightHandEmpty()) {
                         pickUpItem();
                         if(!isLeftHandEmpty())
                             equipLeftOccupiedHand();
@@ -439,9 +462,10 @@ public class ZeeManagerItemClick extends ZeeThread{
                         else
                             equipLeftEmptyHand();
                         dropHoldingItemToBeltOrInv();
-                    }else if(!isLeftHandEmpty() && !isRightHandEmpty()){
-                        //switch 2handed item for 2 separate items
-                        if (ZeeManagerItemClick.getInvBelt().getNumberOfFreeSlots() > 0) {
+                    }
+                    //switch 2handed item for 2 separate items
+                    else if(!isLeftHandEmpty() && !isRightHandEmpty()){
+                        if (invBelt!=null && invBelt.getNumberOfFreeSlots() > 0) {
                             unequipLeftItem();//unequip 1st item
                             if(dropHoldingItemToBeltOrInv()){
                                 pickUpItem();
@@ -452,7 +476,7 @@ public class ZeeManagerItemClick extends ZeeThread{
                     }
                 }
                 else if(isItemWindowEquips()) {
-                    if (ZeeManagerItemClick.getInvBelt().getNumberOfFreeSlots() > 0) {
+                    if (invBelt!=null && invBelt.getNumberOfFreeSlots() > 0) {
                         //send to belt if possible
                         pickUpItem();
                         dropHoldingItemToBeltOrInv();
@@ -1204,8 +1228,8 @@ public class ZeeManagerItemClick extends ZeeThread{
     public static boolean dropHoldingItemToBeltOrInv() {
         Inventory inv;
         if(ZeeConfig.getWindow("Belt")==null){
-            return false;
-            //inv = ZeeConfig.getMainInventory(); // TODO fix fitting item to inventory
+            //return false;
+            inv = ZeeConfig.getMainInventory(); // TODO fix fitting item to inventory
         }else{
             inv = ZeeManagerItemClick.getInvBelt();
         }
@@ -1225,30 +1249,30 @@ public class ZeeManagerItemClick extends ZeeThread{
                 inv.wdgmsg("drop", c);
                 return waitNotHoldingItem();
             }
-            else {
-                List<Coord> freeSlots = inv.getFreeSlots();
-                if (freeSlots.size()==0)
-                    return false;//inv full
-                Coord c = freeSlots.get(0);
-                inv.wdgmsg("drop", c);
-                return waitNotHoldingItem();
-            }
-//            else if(windowTitle.contentEquals("Inventory")){
-                //no belt, drop to inv area
-//                WItem holdingItem = getHoldingItem();
-//                Coord itemSize = holdingItem.sz.div(Inventory.sqsz);
-//                Coord topLeftSlot = inv.getFreeSlotAreaSized(itemSize.x,itemSize.y);
-//                if (topLeftSlot==null) {
-//                    //println("dropHoldingItemToInv > topLeftSlot null");
-//                    return false;
-//                }
-//                inv.wdgmsg("drop",topLeftSlot);
-//                sleep(PING_MS*4);
-//                return !ZeeConfig.isPlayerHoldingItem();//waitHoldingItemChanged();//waitNotHoldingItem();
-//            }
 //            else {
-//                ZeeConfig.println("dropHoldingItemToInv > "+windowTitle);
+//                List<Coord> freeSlots = inv.getFreeSlots();
+//                if (freeSlots.size()==0)
+//                    return false;//inv full
+//                Coord c = freeSlots.get(0);
+//                inv.wdgmsg("drop", c);
+//                return waitNotHoldingItem();
 //            }
+            else if(windowTitle.contentEquals("Inventory")){
+                //no belt, drop to inv area
+                WItem holdingItem = getHoldingItem();
+                Coord itemSize = holdingItem.sz.div(Inventory.sqsz);
+                Coord topLeftSlot = inv.getFreeSlotAreaSized(itemSize.x,itemSize.y);
+                if (topLeftSlot==null) {
+                    println("dropHoldingItemToInv > topLeftSlot null");
+                    return false;
+                }
+                inv.wdgmsg("drop",topLeftSlot);
+                sleep(PING_MS*4);
+                return !ZeeConfig.isPlayerHoldingItem();//waitHoldingItemChanged();//waitNotHoldingItem();
+            }
+            else {
+                ZeeConfig.println("dropHoldingItemToInv > "+windowTitle);
+            }
         }catch (Exception e){
             e.printStackTrace();
         }
