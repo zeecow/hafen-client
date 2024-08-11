@@ -84,7 +84,7 @@ public class ZeeManagerGobClick extends ZeeThread{
             gob clicks
          */
         // queue remove tree and stump
-        else if (ZeeManagerTrees.isRemovingAllTrees && isGobTree(gobName)) {
+        else if (ZeeManagerTrees.isRemovingTreesAndStumps && isGobTree(gobName)) {
             ZeeManagerTrees.scheduleRemoveTree(gob);
         }
         // queue treelog destruction
@@ -96,7 +96,7 @@ public class ZeeManagerGobClick extends ZeeThread{
             queueButchAnimal(gob);
         }
         //queue chop tree/bush by animation
-        else if(ZeeConfig.playerHasAnyPose(ZeeConfig.POSE_PLAYER_CHOPTREE) && (isGobTree(gobName) || isGobBush(gobName)) ){
+        else if(!ZeeManagerTrees.isRemovingTreesAndStumps && ZeeConfig.playerHasAnyPose(ZeeConfig.POSE_PLAYER_CHOPTREE) && (isGobTree(gobName) || isGobBush(gobName)) ){
             ZeeManagerGobClick.queueChopTreeBush(gob);
         }
         //queue chip stone by animation
@@ -2054,7 +2054,7 @@ public class ZeeManagerGobClick extends ZeeThread{
             toggleAllTreeGrowthTexts();
         }
         // remove tree & stump
-        else if (petalName.contentEquals(ZeeFlowerMenu.STRPETAL_REMOVETREEANDSTUMP) || petalName.contentEquals(ZeeFlowerMenu.STRPETAL_REMOVEALLTREES)) {
+        else if (petalName.contentEquals(ZeeFlowerMenu.STRPETAL_REMOVETREEANDSTUMP)) {
             ZeeManagerTrees.removeTreeAndStump(gob, petalName);
         }
         // ispect towercap tree
@@ -2385,7 +2385,6 @@ public class ZeeManagerGobClick extends ZeeThread{
         else if (isGobTree(gobName)){
             opts = new ArrayList<String>();
             opts.add(ZeeFlowerMenu.STRPETAL_REMOVETREEANDSTUMP);
-            opts.add(ZeeFlowerMenu.STRPETAL_REMOVEALLTREES);
             opts.add(ZeeFlowerMenu.STRPETAL_TOGGLEGROWTHTEXTS);
             if (gobName.endsWith("/towercap"))
                 opts.add(ZeeFlowerMenu.STRPETAL_INSPECT);
@@ -3578,7 +3577,7 @@ public class ZeeManagerGobClick extends ZeeThread{
 
     public static boolean liftGob(Gob gob) {
         if(isGobBush(gob.getres().name)) {
-            ZeeManagerItemClick.equipBeltItem("shovel");
+            ZeeManagerItemClick.equipBeltOrInvItem("shovel");
             waitItemInHand("shovel");
         }
         ZeeConfig.gameUI.menu.wdgmsg("act", "carry","0");

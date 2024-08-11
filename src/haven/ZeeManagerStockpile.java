@@ -375,7 +375,7 @@ public class ZeeManagerStockpile extends ZeeThread{
             //check for pickaxe
             if (tileSourceName.contentEquals(ZeeConfig.TILE_MOUNTAIN)){
                 if (!ZeeManagerItemClick.isItemEquipped("/pickaxe")){
-                    if (ZeeManagerItemClick.getBeltWItem("/pickaxe")==null){
+                    if (ZeeManagerItemClick.getBeltOrInvWItem("/pickaxe")==null){
                         ZeeConfig.msgError("pickaxe required");
                         return;
                     }

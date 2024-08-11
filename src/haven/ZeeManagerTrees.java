@@ -5,7 +5,7 @@ import java.util.List;
 
 public class ZeeManagerTrees {
 
-    static boolean isRemovingAllTrees;
+    static boolean isRemovingTreesAndStumps;
     static boolean isDestroyingAllTreelogs;
     static boolean hideGobTrees = Utils.getprefb("hideGobTrees",true);
     private static ArrayList<Gob> treesForRemoval;
@@ -323,12 +323,8 @@ public class ZeeManagerTrees {
 
     static void removeTreeAndStump(Gob tree, String petalName){
         try{
-            if (petalName.contentEquals(ZeeFlowerMenu.STRPETAL_REMOVEALLTREES)) {
-                ZeeConfig.addPlayerText("rem trees");
-                isRemovingAllTrees = true;
-            }else {
-                ZeeConfig.addPlayerText("rem tree&stump");
-            }
+            isRemovingTreesAndStumps = true;
+            ZeeConfig.addPlayerText("rem tree&stump");
             ZeeThread.prepareCancelClick();
             if(!ZeeThread.waitNoFlowerMenu()){
                 ZeeThread.println("remtree > failed waiting no flowemenu");
@@ -373,15 +369,12 @@ public class ZeeManagerTrees {
                     } else {
                         ZeeThread.println("remtree > stump is null");
                     }
-                    if (isRemovingAllTrees) {
-                        if (treesForRemoval!=null){
-                            if (treesForRemoval.size()>0)
+                    if (isRemovingTreesAndStumps) {
+                        if (treesForRemoval!=null) {
+                            if (treesForRemoval.size() > 0)
                                 tree = removeScheduledTree(treesForRemoval.remove(0));
                             else
                                 tree = null; // stop removing trees if queue was consumed
-                        }else{
-                            // remove all trees until player blocked or something
-                            tree = getClosestTree();
                         }
                     }else {
                         tree = null;
@@ -398,7 +391,7 @@ public class ZeeManagerTrees {
     }
 
     private static void exitRemoveAllTrees() {
-        isRemovingAllTrees = false;
+        isRemovingTreesAndStumps = false;
         currentRemovingTree = null;
         if(treesForRemoval != null  &&  treesForRemoval.size() > 0) {
             ZeeConfig.removeGobText(treesForRemoval);
@@ -430,7 +423,7 @@ public class ZeeManagerTrees {
         }
 
         //equip shovel
-        ZeeManagerItemClick.equipBeltItem("shovel");
+        ZeeManagerItemClick.equipBeltOrInvItem("shovel");
         if (!ZeeThread.waitItemInHand("shovel")){
             ZeeThread.println("couldnt equip shovel ?");
             return false;

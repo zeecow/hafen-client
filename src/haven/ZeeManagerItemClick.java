@@ -682,34 +682,24 @@ public class ZeeManagerItemClick extends ZeeThread{
     }
 
     public static void equipAxeChopTree() {
-        /*
-            gfx/invobjs/woodsmansaxe
-            gfx/invobjs/axe-m
-            gfx/invobjs/butcherscleaver
-            gfx/invobjs/tinkersthrowingaxe
-            gfx/invobjs/stoneaxe
-         */
-        if (isItemInHandSlot("woodsmansaxe"))
-            return;
-        WItem axe = getBeltWItem("woodsmansaxe");
-        if (axe!=null){
-            equipBeltItem("woodsmansaxe");
-            waitItemInHand("woodsmansaxe");
-        }else{
-            if (isItemInHandSlot("axe-m"))
+        //TODO add other names
+        final String[] axeName = new String[]{"woodsmansaxe","axe-m","butcherscleaver","tinkersthrowingaxe","stoneaxe"};
+        for (int i = 0; i < axeName.length; i++) {
+            if (isItemInHandSlot(axeName[i]))
                 return;
-            axe = getBeltWItem("axe-m");
+            WItem axe = getBeltOrInvWItem(axeName[i]);
             if (axe!=null){
-                equipBeltItem("axe-m");
-                waitItemInHand("axe-m");
+                equipBeltOrInvItem(axeName[i]);
+                waitItemInHand(axeName[i]);
+                return;
             }
         }
     }
 
     public static WItem getSackFromBelt() {
-        WItem ret = getBeltWItem("travellerssack");
+        WItem ret = getBeltOrInvWItem("travellerssack");
         if (ret==null)
-            ret = getBeltWItem("bindle");
+            ret = getBeltOrInvWItem("bindle");
         return ret;
     }
 
@@ -1465,6 +1455,9 @@ public class ZeeManagerItemClick extends ZeeThread{
         }
         return  invBelt;
     }
+    public static Inventory getMainInv(){
+        return ZeeConfig.getMainInventory();
+    }
 
     public static boolean pickupBeltItem(String name) {
         try {
@@ -1524,9 +1517,16 @@ public class ZeeManagerItemClick extends ZeeThread{
         return false;
     }
 
-    public static WItem getBeltWItem(String nameContains) {
+    public static WItem getBeltOrInvWItem(String nameContains) {
         try {
-            WItem witem = getInvBelt().getWItemsByNameContains(nameContains).get(0);
+            WItem witem;
+            // belt
+            if (getInvBelt()!=null) {
+                witem = getInvBelt().getWItemsByNameContains(nameContains).get(0);
+                return witem;
+            }
+            // no belt
+            witem = getMainInv().getWItemsByNameContains(nameContains).get(0);
             return witem;
         }catch (Exception e){
             return null;
@@ -1607,15 +1607,22 @@ public class ZeeManagerItemClick extends ZeeThread{
             return getEquipory().rightHand.item.getres().name;
     }
 
-    public static void equipBeltItem(String name) {
+    public static void equipBeltOrInvItem(String name) {
         if(ZeeManagerItemClick.isItemInHandSlot(name)) {
             return;
         }
-        WItem item = ZeeManagerItemClick.getBeltWItem(name);
-        if (item!=null)
-            new ZeeManagerItemClick(item).start();//use equipManager logic
-        else
-            println("itemManager.equipBeltItem() > item '"+name+"' not found");
+        WItem item = ZeeManagerItemClick.getBeltOrInvWItem(name);
+        if (item!=null) {
+            try {
+                //use equipManager logic
+                Thread t = new ZeeManagerItemClick(item);
+                t.start();
+                t.join();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }else
+            println("itemManager.equipBeltOrInvItem() > item '"+name+"' not found");
     }
 
     public static WItem getHoldingItem(){

@@ -4378,7 +4378,7 @@ public class ZeeConfig {
         }
         //equip roundshield
         if (ZeeConfig.equipShieldOnCombat && !ZeeManagerItemClick.isItemEquipped("huntersbow","rangersbow"))
-            ZeeManagerItemClick.equipBeltItem("/roundshield");
+            ZeeManagerItemClick.equipBeltOrInvItem("/roundshield");
     }
 
     static boolean isCombatActive(){
