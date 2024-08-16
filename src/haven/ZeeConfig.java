@@ -225,7 +225,6 @@ public class ZeeConfig {
     static boolean dropSeeds = false;
     static boolean dropSoil = false;
     static boolean treeloganize = false;
-    static boolean destroyingTreelogs = false;
     static boolean equiporyCompact = Utils.getprefb("equiporyCompact", false);
     static boolean equipShieldOnCombat = Utils.getprefb("equipShieldOnCombat", false);
     static boolean farmerMode = false;
@@ -3150,7 +3149,14 @@ public class ZeeConfig {
         return ( mov!=null && mov.getv()>0);
     }
 
+    static boolean isPlayerDrinkingOrLinMoving(){
+        if (isPlayerDrinkingPose())
+            return true;
+        return isPlayerMovingByAttrLinMove();
+    }
+
     static boolean isPlayerMovingByAttrLinMove(){
+        // TODO add other vehicles
         if (isPlayerMountingHorse()){
             return gobHasAttr(getPlayerMountedHorse(),"LinMove");
         }else{

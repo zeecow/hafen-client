@@ -6,12 +6,9 @@ import java.util.List;
 public class ZeeManagerTrees {
 
     static boolean isRemovingTreesAndStumps;
-    static boolean isDestroyingAllTreelogs;
     static boolean hideGobTrees = Utils.getprefb("hideGobTrees",true);
     private static ArrayList<Gob> treesForRemoval;
-    private static ArrayList<Gob> treelogsForDestruction;
     private static Gob currentRemovingTree;
-    private static Gob currentDestroyingTreelog;
     static List<Gob> listQueuedTreeChop = null;
     static ZeeThread threadChopTree = null;
     private static List<Gob> queuedStumps = null;
@@ -77,32 +74,6 @@ public class ZeeManagerTrees {
         }.start();
     }
 
-    static void scheduleDestroyTreelog(Gob treelog) {
-        if (treelogsForDestruction==null) {
-            treelogsForDestruction = new ArrayList<Gob>();
-        }
-
-        if (treelogsForDestruction.contains(treelog)) {
-            // remove treelog from queue
-            removeScheduledTreelog(treelog);
-        } else if (!currentDestroyingTreelog.equals(treelog)){
-            // add treelog to queue
-            treelogsForDestruction.add(treelog);
-            ZeeConfig.addGobText(treelog,"des "+treelogsForDestruction.size());
-        }
-    }
-
-    private static Gob removeScheduledTreelog(Gob treelog) {
-        // remove treelog from queue
-        treelogsForDestruction.remove(treelog);
-        ZeeConfig.removeGobText(treelog);
-        // update queue gob's texts
-        for (int i = 0; i < treelogsForDestruction.size(); i++) {
-            ZeeConfig.addGobText(treelogsForDestruction.get(i),"des "+(i+1));
-        }
-        return treelog;
-    }
-
     static void scheduleRemoveTree(Gob tree) {
         if (treesForRemoval==null) {
             treesForRemoval = new ArrayList<Gob>();
@@ -130,87 +101,98 @@ public class ZeeManagerTrees {
         return tree;
     }
 
-    static void destroyTreelogs(Gob firstTreelog, String petalName) {
+    private static Gob currentDestroyingTreelog;
+    private static ArrayList<Gob> treelogsDestroyQueue;
+    static boolean isDestroyingTreelogs;
+    static void destroyTreelogs(Gob firstTreelog) {
         if (!ZeeManagerItemClick.isItemInHandSlot("/bonesaw") || ZeeManagerItemClick.isItemInHandSlot("/saw-m")){
             ZeeConfig.msg("need bone saw equipped, no metal saw");
             return;
         }
         Gob treelog = firstTreelog;
-        int logs = 2;
+        Gob treelogNext = getClosestTreeLog(treelog);
         try {
+            isDestroyingTreelogs = true;
             ZeeThread.waitNoFlowerMenu();
             String treelogName = treelog.getres().name;
-            if (petalName.equals(ZeeFlowerMenu.STRPETAL_DESTROYTREELOG3)) {
-                logs = 3;
-            } else if (petalName.equals(ZeeFlowerMenu.STRPETAL_DESTROYTREELOG5)) {
-                logs = 5;
-            } else if (petalName.equals(ZeeFlowerMenu.STRPETAL_DESTROYALL)) {
-                isDestroyingAllTreelogs = true;
-                logs = 999;
-            }
-            ZeeConfig.destroyingTreelogs = true;
+            ZeeConfig.addPlayerText("treelogs");
             ZeeThread.prepareCancelClick();
-            while ( logs > 0  &&  !ZeeConfig.isCancelClick() ) {
-                ZeeConfig.addPlayerText("treelogs "+logs);
+            while ( treelog!=null && !ZeeConfig.isCancelClick() ) {
+
+                // click menu make boards
                 if (!ZeeManagerGobClick.clickGobPetal(treelog,"Make boards")){
-                    ZeeThread.println("can't click treelog = "+treelog);
-                    logs = -1;
-                    currentDestroyingTreelog = null;
-                    continue;
+                    ZeeThread.println("can't click treelog");
+                    break;
                 }
                 currentDestroyingTreelog = treelog;
-                ZeeThread.waitPlayerIdlePose();
+
+                // wait treelog destroyed
+                do{
+                    Thread.sleep(555);
+                }while(ZeeConfig.isPlayerDrinkingOrLinMoving() || ZeeConfig.playerHasAnyPose(ZeeConfig.POSE_PLAYER_SAWING));
+
                 if (!ZeeConfig.isCancelClick()){
-                    logs--;
-                    if (isDestroyingAllTreelogs){
-                        // destroy all, treelog queue is present
-                        if (treelogsForDestruction != null) {
-                            if (treelogsForDestruction.size() > 0) {
-                                treelog = removeScheduledTreelog(treelogsForDestruction.remove(0));
-                            } else {
-                                //stop destroying when queue consumed
-                                ZeeThread.println("logs -1, treelogsForDestruction empty");
-                                logs = -1;
-                            }
-                        }else{
-                            // destroy all, no treelog queue
-                            treelog = getClosestTreeLog();
+                    // treelog queue present
+                    if (treelogsDestroyQueue != null) {
+                        if (treelogsDestroyQueue.size() > 0) {
+                            treelog = removeScheduledTreelog(treelogsDestroyQueue.remove(0));
+                            ZeeConfig.addPlayerText("treelogs "+ treelogsDestroyQueue.size());
+                        } else {
+                            //stop destroying when queue consumed
+                            ZeeThread.println("treelogsDestroyQueue empty");
                         }
-                    } else {
-                        // destroy 3 or 5 same type treelogs
-                        treelog = ZeeConfig.getClosestGobByNameContains(treelogName);
+                    }
+                    // no treelog queue (destroy all)
+                    else{
+                        treelog = treelogNext;
+                        treelogNext = getClosestTreeLog(treelog);
                     }
                 }else{
-                    if (ZeeConfig.isCancelClick()) {
-                        ZeeConfig.msg("destroy treelog canceled by click");
-                        ZeeThread.println("destroy treelog canceled by click");
-                    }else
-                        ZeeThread.println("destreelog canceled by gobHasFlowermenu?");
-                    logs = -1;
+                    ZeeThread.println("destroy treelog canceled by click");
                 }
             }
         }catch (Exception e){
             e.printStackTrace();
         }
-        isDestroyingAllTreelogs = false;
-        ZeeConfig.destroyingTreelogs = false;
+        isDestroyingTreelogs = false;
         currentDestroyingTreelog = null;
-        if (treelogsForDestruction!=null)
-            treelogsForDestruction.clear();
-        treelogsForDestruction = null;
+        if (treelogsDestroyQueue!=null && !treelogsDestroyQueue.isEmpty()) {
+            for (Gob tree : treelogsDestroyQueue) {
+                ZeeConfig.removeGobText(tree);
+            }
+            treelogsDestroyQueue.clear();
+        }
+        treelogsDestroyQueue = null;
         ZeeConfig.removePlayerText();
     }
+    static void scheduleDestroyTreelog(Gob treelog) {
+        if (treelogsDestroyQueue ==null) {
+            treelogsDestroyQueue = new ArrayList<Gob>();
+        }
 
-    public static Gob getClosestTree() {
-        List<Gob> list = ZeeConfig.findGobsByNameContains("/trees/");
-        list.removeIf(gob1 -> !ZeeManagerGobClick.isGobTree(gob1.getres().name));
-        return ZeeConfig.getClosestGobToPlayer(list);
+        if (treelogsDestroyQueue.contains(treelog)) {
+            // remove treelog from queue
+            removeScheduledTreelog(treelog);
+        } else if (!currentDestroyingTreelog.equals(treelog)){
+            // add treelog to queue
+            treelogsDestroyQueue.add(treelog);
+            ZeeConfig.addGobText(treelog,""+ treelogsDestroyQueue.size());
+        }
     }
-
-    public static Gob getClosestTreeLog() {
+    private static Gob removeScheduledTreelog(Gob treelog) {
+        // remove treelog from queue
+        treelogsDestroyQueue.remove(treelog);
+        ZeeConfig.removeGobText(treelog);
+        // update queue gob's texts
+        for (int i = 0; i < treelogsDestroyQueue.size(); i++) {
+            ZeeConfig.addGobText(treelogsDestroyQueue.get(i),""+(i+1));
+        }
+        return treelog;
+    }
+    public static Gob getClosestTreeLog(Gob ref) {
         List<Gob> list = ZeeConfig.findGobsByNameContains("/trees/");
         list.removeIf(gob1 -> !ZeeManagerGobClick.isGobTreeLog(gob1.getres().name));
-        return ZeeConfig.getClosestGobToPlayer(list);
+        return ZeeConfig.getClosestGob(ref,list);
     }
 
     static void chopTreeReset(){

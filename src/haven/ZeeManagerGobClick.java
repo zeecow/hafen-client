@@ -88,7 +88,7 @@ public class ZeeManagerGobClick extends ZeeThread{
             ZeeManagerTrees.scheduleRemoveTree(gob);
         }
         // queue treelog destruction
-        else if (ZeeManagerTrees.isDestroyingAllTreelogs && isGobTreeLog(gobName)) {
+        else if (ZeeManagerTrees.isDestroyingTreelogs && isGobTreeLog(gobName)) {
             ZeeManagerTrees.scheduleDestroyTreelog(gob);
         }
         // queue butch animal
@@ -2084,11 +2084,9 @@ public class ZeeManagerGobClick extends ZeeThread{
         else if (petalName.equals(ZeeFlowerMenu.STRPETAL_BARRELTAKEALL)) {
             barrelTakeAllSeeds(gob);
         }
-        else if ( petalName.equals(ZeeFlowerMenu.STRPETAL_DESTROYTREELOG3)
-            || petalName.equals(ZeeFlowerMenu.STRPETAL_DESTROYTREELOG5)
-            || petalName.contentEquals(ZeeFlowerMenu.STRPETAL_DESTROYALL))
+        else if ( petalName.contentEquals(ZeeFlowerMenu.STRPETAL_DESTROYTREELOGS))
         {
-            ZeeManagerTrees.destroyTreelogs(gob,petalName);
+            ZeeManagerTrees.destroyTreelogs(gob);
         }
         else if(petalName.contentEquals("wave")){
             ZeeConfig.gameUI.menu.wdgmsg("act","pose","wave",0);
@@ -2414,10 +2412,9 @@ public class ZeeManagerGobClick extends ZeeThread{
             menu = new ZeeFlowerMenu(gob,ZeeFlowerMenu.STRPETAL_BARRELTAKEALL, ZeeFlowerMenu.STRPETAL_LIFTUPGOB);
         }
         else if (ZeeManagerTrees.isDestroyTreelog()) {
-            menu = new ZeeFlowerMenu( gob, ZeeFlowerMenu.STRPETAL_LIFTUPGOB,
-                ZeeFlowerMenu.STRPETAL_DESTROYTREELOG3,
-                ZeeFlowerMenu.STRPETAL_DESTROYTREELOG5,
-                ZeeFlowerMenu.STRPETAL_DESTROYALL
+            menu = new ZeeFlowerMenu( gob,
+                ZeeFlowerMenu.STRPETAL_LIFTUPGOB,
+                ZeeFlowerMenu.STRPETAL_DESTROYTREELOGS
             );
         }
         else if (gobName.endsWith("/well")) {

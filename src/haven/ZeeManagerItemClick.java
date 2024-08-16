@@ -245,7 +245,7 @@ public class ZeeManagerItemClick extends ZeeThread{
             }
         }
         // drop boards if destroying logs
-        else if (ZeeConfig.destroyingTreelogs && basename.startsWith("board-")){
+        else if (ZeeManagerTrees.isDestroyingTreelogs && basename.startsWith("board-")){
             gItem.wdgmsg("drop", Coord.z);
         }
         //drop seeds
