@@ -297,11 +297,6 @@ public class ZeeManagerTrees {
         }
     }
 
-    static boolean isDestroyTreelog() {
-        if(ZeeManagerGobClick.isGobTreeLog(ZeeManagerGobClick.gobName) && ZeeManagerItemClick.isItemInHandSlot("bonesaw"))
-            return true;
-        return false;
-    }
 
     static void removeTreeAndStump(Gob tree, String petalName){
         try{
@@ -458,7 +453,7 @@ public class ZeeManagerTrees {
             public void run() {
                 treeloganizerWorking = true;
                 try {
-                    ZeeConfig.addPlayerText("treeloganize");
+                    ZeeConfig.addPlayerText("moving");
                     Gob treelogBoutToBeLifted = ZeeConfig.lastMapViewClickGob,
                             treelogNext=null,
                             treelogLastPlaced=null;
@@ -540,13 +535,6 @@ public class ZeeManagerTrees {
             ZeeConfig.removePlayerText();
         }
         treeloganizerWorking = false;
-        if (ZeeConfig.treeloganize){
-            try {
-                ZeeInvMainOptionsWdg.cbTreeloganize.set(false);
-            }catch (Exception e){
-                println("treeloganizerExit > "+e.getMessage());
-            }
-        }
     }
 
 

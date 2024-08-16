@@ -16,7 +16,8 @@ public class ZeeFlowerMenu extends FlowerMenu{
     static final String STRPETAL_KILLALL = "Kill all";
     static final String STRPETAL_EATALL = "Eat all";
     static final String STRPETAL_LIFTUPGOB = "Lift up";
-    static final String STRPETAL_DESTROYTREELOGS = "Destroy treelogs";
+    static final String STRPETAL_DESTROY_TREELOGS = "Destroy treelogs";
+    static final String STRPETAL_TREELOGANIZE = "Move adjacent logs";
     static final String STRPETAL_TRANSFER_ASC = "Transfer ASC";
     static final String STRPETAL_TRANSFER_DESC = "Transfer DESC";
     static final String STRPETAL_AUTO_BUTCH = "Auto-butch";
@@ -27,7 +28,6 @@ public class ZeeFlowerMenu extends FlowerMenu{
     static final String STRPETAL_SWITCHCHAR = "Switch char";
     static final String STRPETAL_TESTCOORDS = "Test coords";
     static final String STRPETAL_TILEMONITOR = "Tile monitor";
-    static final String STRPETAL_TIMERS = "Timers";
     static final String STRPETAL_AUTODISCOVERY = "Auto discovery";
     static final String STRPETAL_TOGGLE_CATTLEROSTER = "Toggle roster";
     static final String STRPETAL_MEMORIZEAREANIMALS = "Memorize area";

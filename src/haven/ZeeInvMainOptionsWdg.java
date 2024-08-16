@@ -2,8 +2,7 @@ package haven;
 
 public class ZeeInvMainOptionsWdg extends Widget {
 
-    Label labelCount;
-    public static CheckBox cbSeeds, cbTreeloganize, cbSoil, cbButcher, cbAutoStack, cbPiler, cbAutomenu, cbTunnel, cbDrink;
+    public static CheckBox cbSeeds, cbButcher, cbAutoStack, cbPiler, cbAutomenu, cbTunnel;
     Widget invSlots;
 
     public ZeeInvMainOptionsWdg(String windowCap) {
@@ -112,20 +111,6 @@ public class ZeeInvMainOptionsWdg extends Widget {
         cbPiler.settip("pile helper (mouse-click menu required)");
 
         x += cbPiler.sz.x + 5;
-
-        add(cbTreeloganize = new CheckBox("tl") {
-            {
-                a = ZeeConfig.treeloganize;
-            }
-
-            public void set(boolean val) {
-                ZeeConfig.treeloganize = val;
-                a = val;
-                if (!ZeeConfig.treeloganize && ZeeManagerTrees.treeloganizerWorking)
-                    ZeeManagerTrees.treeloganizerExit("checkbox off");
-            }
-        }, x, 15);
-        cbTreeloganize.settip("move adjacent treelogs");
 
         pack();
     }

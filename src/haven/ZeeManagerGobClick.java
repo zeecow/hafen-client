@@ -2084,9 +2084,17 @@ public class ZeeManagerGobClick extends ZeeThread{
         else if (petalName.equals(ZeeFlowerMenu.STRPETAL_BARRELTAKEALL)) {
             barrelTakeAllSeeds(gob);
         }
-        else if ( petalName.contentEquals(ZeeFlowerMenu.STRPETAL_DESTROYTREELOGS))
-        {
+        else if ( petalName.contentEquals(ZeeFlowerMenu.STRPETAL_DESTROY_TREELOGS)) {
             ZeeManagerTrees.destroyTreelogs(gob);
+        }
+        else if ( petalName.contentEquals(ZeeFlowerMenu.STRPETAL_TREELOGANIZE)) {
+            ZeeConfig.treeloganize = true;
+            liftGob(gob);
+            if (!waitPlayerPose(ZeeConfig.POSE_PLAYER_LIFTING)){
+                ZeeManagerTrees.treeloganizerExit("couldnt lift treelog");
+            }else{
+                ZeeConfig.addPlayerText("wait placing");
+            }
         }
         else if(petalName.contentEquals("wave")){
             ZeeConfig.gameUI.menu.wdgmsg("act","pose","wave",0);
@@ -2356,8 +2364,6 @@ public class ZeeManagerGobClick extends ZeeThread{
             opts = new ArrayList<String>();
             opts.add(ZeeFlowerMenu.STRPETAL_SWITCHCHAR);
             opts.add(ZeeFlowerMenu.STRPETAL_CLEARGOBTEXTSPOINTERS);
-            //opts.add(ZeeFlowerMenu.STRPETAL_TESTCOORDS);
-            //opts.add(ZeeFlowerMenu.STRPETAL_TIMERS);
             opts.add(ZeeFlowerMenu.STRPETAL_AUTODISCOVERY);
             if (ZeeConfig.isCaveTile(ZeeConfig.getPlayerTileName()))
                 opts.add(ZeeFlowerMenu.STRPETAL_TILEMONITOR);
@@ -2411,11 +2417,15 @@ public class ZeeManagerGobClick extends ZeeThread{
         else if (isBarrelTakeAll(gob)) {
             menu = new ZeeFlowerMenu(gob,ZeeFlowerMenu.STRPETAL_BARRELTAKEALL, ZeeFlowerMenu.STRPETAL_LIFTUPGOB);
         }
-        else if (ZeeManagerTrees.isDestroyTreelog()) {
-            menu = new ZeeFlowerMenu( gob,
-                ZeeFlowerMenu.STRPETAL_LIFTUPGOB,
-                ZeeFlowerMenu.STRPETAL_DESTROYTREELOGS
-            );
+        // tree logs
+        else if (isGobTreeLog(ZeeManagerGobClick.gobName)) {
+            opts = new ArrayList<String>();
+            opts.add(ZeeFlowerMenu.STRPETAL_LIFTUPGOB);
+            opts.add(ZeeFlowerMenu.STRPETAL_TREELOGANIZE);
+            if (ZeeManagerItemClick.isItemInHandSlot("bonesaw")) {
+                opts.add(ZeeFlowerMenu.STRPETAL_DESTROY_TREELOGS);
+            }
+            menu = new ZeeFlowerMenu(gob, opts.toArray(String[]::new));
         }
         else if (gobName.endsWith("/well")) {
             menu = new ZeeFlowerMenu( gob, "get XP from well");
