@@ -50,6 +50,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 
 	public int totalDmgHp = 0;
 	long requeued = 0;
+	boolean isGobWaitingSettings = false;
 	boolean settingsApplied = false;
 	boolean pickupPriority = false;
 	Drawable drawable;
@@ -471,12 +472,10 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 	updstate();
 	if(virtual && ols.isEmpty() && (getattr(Drawable.class) == null))
 	    glob.oc.remove(this);
-	if (!isGobWaitingSettings) {
+	if (!settingsApplied && !isGobWaitingSettings)
 		isGobWaitingSettings = true;
-	}
     }
 
-	boolean isGobWaitingSettings = false;
     public void gtick(Render g) {
 	Drawable d = getattr(Drawable.class);
 	if(d != null)

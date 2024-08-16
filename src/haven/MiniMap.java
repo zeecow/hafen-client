@@ -26,18 +26,19 @@
 
 package haven;
 
-import haven.render.*;
-import java.util.*;
-import java.util.function.*;
-import java.awt.Color;
+import haven.MapFile.*;
+import haven.render.Ortho2D;
+import haven.render.Pipe;
+import haven.render.States;
+import haven.render.Texture;
+
+import java.awt.*;
 import java.awt.image.BufferedImage;
-import haven.MapFile.Segment;
-import haven.MapFile.DataGrid;
-import haven.MapFile.Grid;
-import haven.MapFile.GridInfo;
-import haven.MapFile.Marker;
-import haven.MapFile.PMarker;
-import haven.MapFile.SMarker;
+import java.util.List;
+import java.util.*;
+import java.util.function.Consumer;
+import java.util.function.Function;
+
 import static haven.MCache.cmaps;
 import static haven.MCache.tilesz;
 import static haven.OCache.posres;
@@ -277,7 +278,7 @@ public class MiniMap extends Widget {
 	    this.conf = conf;
 	    if(this.notify = conf.notify)
 		this.snotify = conf.notification();
-		if (ZeeConfig.showGobPointer && !gob.hasPointer) {
+		if (ZeeConfig.showGobPointer && !gob.hasPointer && !ZeeConfig.isPlayerMain(gob)) {
 			gob.hasPointer = true;
 			Tex pointer = ZeeGobPointer.mapGobPointer.put(gob.getres().name, icon.res.flayer(Resource.Image.class).tex());
 			gob.addol(new ZeeGobPointer(gob, pointer));

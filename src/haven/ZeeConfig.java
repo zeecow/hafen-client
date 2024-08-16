@@ -490,9 +490,12 @@ public class ZeeConfig {
             return false;
     }
 
-    public static boolean isPlayer(Gob gob) {
+    static boolean isPlayer(Gob gob) {
         boolean isMannequim = (gob.getattr(GobHealth.class) != null);// mannequim object has health attr
         return gob.getres().name.startsWith("gfx/borka/body") && !isMannequim;
+    }
+    static boolean isPlayerMain(Gob gob) {
+        return gameUI!=null && gameUI.map.player().id==gob.id;
     }
 
     public static boolean isTree(String gobName) {
@@ -3810,29 +3813,20 @@ public class ZeeConfig {
                                 ZeeManagerGobClick.remountHorse();
                             }
 
-                            if (ZeeConfig.showGobPointer ) {
-                                // remove player pointer
-                                if (ob.hasPointer) {
-                                    removeGobPointer(ob);
-                                }
-                                else {
-                                    // delayed remove player pointer
-                                    sleep(555);
-                                    if (ob.hasPointer)
-                                        removeGobPointer(ob);
-                                }
-
-                                // gob radar (broken)
-                                if (ZeeConfig.showGobRadar) {
-                                    ob.addol(ZeeGobPointer.gobRadar = new ZeeGobRadar(ob, Coord3f.of(10, 10, 5), new Color(240, 0, 253, 90)));
-                                }
+                            // gob radar (broken)
+                            if (ZeeConfig.showGobRadar) {
+                                ob.addol(ZeeGobPointer.gobRadar = new ZeeGobRadar(ob, Coord3f.of(10, 10, 5), new Color(240, 0, 253, 90)));
                             }
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
+
+                        ob.settingsApplied = true;
+
                     }
                 }.start();
 
+                return;
             }
             // radius ladder
             else if(showMineSupport && gobName.endsWith("/terobjs/ladder")) {
