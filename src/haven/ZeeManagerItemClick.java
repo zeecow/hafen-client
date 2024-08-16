@@ -440,11 +440,9 @@ public class ZeeManagerItemClick extends ZeeThread{
                         if (pickupHandItem("/bucket")) {
                             getHoldingItem().item.wdgmsg("drop", Coord.z);
                             droppedBucket = true;
-                            println("dropbucket true");
                         }
                     }else{
                         droppedBucket = false;
-                        println("dropbucket false");
                     }
                     //switch 2handed item for another 2handed item
                     if(!isLeftHandEmpty() && isTwoHandedItem(leftHandItemName)) {
