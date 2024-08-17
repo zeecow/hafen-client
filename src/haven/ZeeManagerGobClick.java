@@ -100,7 +100,7 @@ public class ZeeManagerGobClick extends ZeeThread{
             ZeeManagerGobClick.queueChopTreeBush(gob);
         }
         //queue chip stone by animation
-        else if(ZeeConfig.playerHasAnyPose(ZeeConfig.POSE_PLAYER_CHIPPINGSTONE) && isGobBoulder(gobName)){
+        else if(ZeeConfig.playerHasAnyPose(ZeeConfig.POSE_PLAYER_CHIPPINGSTONE,ZeeConfig.POSE_PLAYER_PICK) && isGobBoulder(gobName)){
             ZeeManagerGobClick.queueChipStone(gob);
         }
         //queue remove stump by animation
