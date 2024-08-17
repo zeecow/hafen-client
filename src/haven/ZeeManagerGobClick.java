@@ -2846,7 +2846,6 @@ public class ZeeManagerGobClick extends ZeeThread{
         if(threadChipStone==null) {
             threadChipStone = new ZeeThread() {
                 public void run() {
-                    println("chipstone thread start");
                     try {
                         ZeeConfig.addPlayerText("queue " + listQueuedChipStone.size());
                         prepareCancelClick();
@@ -2888,7 +2887,6 @@ public class ZeeManagerGobClick extends ZeeThread{
                         e.printStackTrace();
                     }
                     ZeeConfig.removePlayerText();
-                    println("chipstone thread end");
                     chipStoneReset();
                 }
             };
