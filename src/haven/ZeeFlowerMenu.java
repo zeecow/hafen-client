@@ -29,6 +29,7 @@ public class ZeeFlowerMenu extends FlowerMenu{
     static final String STRPETAL_TESTCOORDS = "Test coords";
     static final String STRPETAL_TILEMONITOR = "Tile monitor";
     static final String STRPETAL_AUTODISCOVERY = "Auto discovery";
+    static final String STRPETAL_TASKBUILDER = "Task builder";
     static final String STRPETAL_TOGGLE_CATTLEROSTER = "Toggle roster";
     static final String STRPETAL_MEMORIZEAREANIMALS = "Memorize area";
 

@@ -38,6 +38,11 @@ public class ZeeWindow extends Window {
         public static final int BUTTON_SIZE = 20;
         String buttonText;
 
+        public ZeeButton(String title) {
+            super(10*title.length(),title);
+            this.buttonText = title;
+        }
+
         public ZeeButton(int width, String title) {
             super(width,title);
             this.buttonText = title;

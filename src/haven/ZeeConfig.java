@@ -3497,18 +3497,6 @@ public class ZeeConfig {
         gameUI.error(msg);
     }
 
-    public static String strArgs(Object... args){
-        return Arrays.toString(args);
-    }
-
-    public static void println(int num) {
-        System.out.println(""+num);
-    }
-
-    public static void println(String s) {
-        System.out.println(s);
-    }
-
     public static boolean isControlKey(int keyCode) {
         return keyCode==KeyEvent.VK_RIGHT || keyCode==KeyEvent.VK_LEFT || keyCode==KeyEvent.VK_BACK_SPACE || keyCode==KeyEvent.VK_DELETE || keyCode==KeyEvent.VK_HOME || keyCode==KeyEvent.VK_END || keyCode==KeyEvent.VK_SPACE;
     }
@@ -4947,5 +4935,17 @@ public class ZeeConfig {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public static String strArgs(Object... args){
+        return Arrays.toString(args);
+    }
+
+    public static void println(int num) {
+        System.out.println(""+num);
+    }
+
+    public static void println(String s) {
+        System.out.println(s);
     }
 }
