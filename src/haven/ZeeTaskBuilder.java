@@ -1,20 +1,22 @@
 package haven;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class ZeeTaskBuilder {
 
-    static List<String> btnames = List.of("if","while");
-    static Widget taskPanel;
-    static Window winTaskBuilder;
+    static String winName = "Task Builder";
+    static Dropbox<String> dropbox;
+    static int x=0, y=0, tokensY;
+
     static void showWindow(){
 
-        String winName = "Task Builder";
-        winTaskBuilder = ZeeConfig.getWindow(winName);
-        if (winTaskBuilder != null) {
-            winTaskBuilder.reqdestroy();
+        // create window
+        Window temp = ZeeConfig.getWindow(winName);
+        if ( temp != null) {
+            temp.reqdestroy();
         }
-        winTaskBuilder = ZeeConfig.gameUI.add(
+        ZeeConfig.gameUI.add(
                 new Window(Coord.of(240,140), winName){
                     public void wdgmsg(String msg, Object... args) {
                         if (msg.contentEquals("close")){
@@ -25,43 +27,116 @@ public class ZeeTaskBuilder {
                 }, ZeeConfig.gameUI.sz.div(2)
         );
 
-        int x=0, y=0;
-        Widget wdg = null;
-        for (String btname : btnames) {
-            wdg = winTaskBuilder.add(new ZeeWindow.ZeeButton(btname){
-                public void wdgmsg(String msg, Object... args) {
-                    if (msg.contentEquals("activate")){
-                        appendToTaskPanel(new Label(this.text.text));
-                    }
-                }
-            },x,y);
-            x += wdg.sz.x;
-            if ( wdg.c.x + wdg.sz.x >= (winTaskBuilder.sz.x * .85))
-                y += wdg.sz.y;
-        }
+        winAppend(new Label("* rclick remove btns"));
+        x = 0;
+        y += 15;
 
-        taskPanel = new Widget();
-        winTaskBuilder.add(taskPanel, 0,y + wdg.sz.y);
+        // dropbox
+        winAppend( dropbox = new Dropbox<String>(110, 14, 20) {
+                String space = "     ";
+                private final List<String> filters = new ArrayList<String>() {{
+                    add(space + "gob");
+                    add(space + "item");
+                    add(space + "tile");
+                    add(space + "window");
+                    add(space + "nameStarts");
+                    add(space + "nameContains");
+                    add(space + "nameEnds");
+                    add(space + "lift");
+                    add(space + "click");
+                }};
+                protected String listitem(int idx) {
+                    return (filters.get(idx));
+                }
+                protected int listitems() {
+                    return (filters.size());
+                }
+                protected void drawitem(GOut g, String name, int idx) {
+                    g.atext(name, Coord.of(0, g.sz().y / 2), 0.0, 0.5);
+                }
+                public void change(String filter) {
+                    super.change(filter);
+                    addTokenButton(filter.strip());
+                }
+                public void dispose() {
+                    super.dispose();
+                    this.sel = "";
+                }
+            }
+        );
+
+        // ctrl buttons
+        winAppend(new ZeeWindow.ZeeButton("test"){
+            public void wdgmsg(String msg, Object... args) {
+                if (msg.contentEquals("activate")){
+                    ZeeConfig.msg("test");
+                }
+            }
+        });
+
+        x = 0;
+        y += 25;
+        tokensY = y;
     }
 
-    static void appendToTaskPanel(Widget newWdg){
-        if (taskPanel==null){
-            println("taskPanel null");
-            return;
+
+    static List<ZeeButtonRemovable> listAppended;
+    private static Widget winAppend(Widget w) {
+        Window win = ZeeConfig.getWindow(winName);
+        if (win == null) {
+            return null;
         }
-        Widget bottomWdg = null;
-        for (Widget child : taskPanel.children()) {
-            if (bottomWdg==null)
-                bottomWdg = child;
-            else if (child.c.y > bottomWdg.c.y)
-                bottomWdg = child;
+        Widget ret = win.add(w,x,y);
+        x += ret.sz.x + 3;
+        if ( ret.c.x + ret.sz.x >= (win.sz.x * .80)) {
+            y += ret.sz.y + 3;
+            x = 0;
         }
-        if (bottomWdg==null)
-            taskPanel.add(newWdg,0,0);
-        else
-            taskPanel.add(newWdg,0,bottomWdg.c.y+bottomWdg.sz.y);
-        taskPanel.pack();
-        winTaskBuilder.pack();
+        //config wdg
+        if (w instanceof ZeeButtonRemovable) {
+            if (listAppended == null)
+                listAppended = new ArrayList<>();
+            if (!listAppended.contains(w))
+                listAppended.add((ZeeButtonRemovable) ret);
+        }
+        return ret;
+    }
+
+    private static void addTokenButton(String s) {
+        winAppend(
+            new ZeeButtonRemovable(s){
+                public void wdgmsg(String msg, Object... args) {
+                    if (msg.contentEquals("activate")){
+                        println(this.buttonText);
+                    }
+                }
+            }
+        );
+    }
+
+    private static void updateRemovables() {
+        for (ZeeButtonRemovable w0 : listAppended) {
+            w0.remove();
+        }
+        x=0;
+        y=tokensY;
+        for (ZeeButtonRemovable w1 : listAppended) {
+            winAppend(w1);
+        }
+    }
+
+    private static class ZeeButtonRemovable extends ZeeWindow.ZeeButton {
+        public ZeeButtonRemovable(String btnName) {
+            super(btnName);
+        }
+        public boolean mouseup(Coord c, int button) {
+            if (button!=3)
+                return super.mouseup(c,button);
+            this.remove();// rclick remove widget
+            listAppended.remove(this);
+            ZeeTaskBuilder.updateRemovables();
+            return false;
+        }
     }
 
     public static void println(String s) {
