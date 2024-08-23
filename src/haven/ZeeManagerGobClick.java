@@ -2017,8 +2017,8 @@ public class ZeeManagerGobClick extends ZeeThread{
             ZeeSess.charSwitchCreateWindow();
         else if(petalName.contentEquals(ZeeFlowerMenu.STRPETAL_TESTCOORDS))
             windowTestCoords();
-        else if(petalName.contentEquals(ZeeFlowerMenu.STRPETAL_TASKBUILDER))
-            ZeeTaskBuilder.showWindow();
+//        else if(petalName.contentEquals(ZeeFlowerMenu.STRPETAL_TASKBUILDER))
+//            ZeeTaskBuilder.showWindow();
         else if(petalName.contentEquals(ZeeFlowerMenu.STRPETAL_AUTODISCOVERY))
             ZeeResearch.autoDiscovery();
         else if(petalName.contentEquals(ZeeFlowerMenu.STRPETAL_CLEARGOBTEXTSPOINTERS))
@@ -2365,7 +2365,7 @@ public class ZeeManagerGobClick extends ZeeThread{
             opts.add(ZeeFlowerMenu.STRPETAL_SWITCHCHAR);
             opts.add(ZeeFlowerMenu.STRPETAL_CLEARGOBTEXTSPOINTERS);
             opts.add(ZeeFlowerMenu.STRPETAL_AUTODISCOVERY);
-            opts.add(ZeeFlowerMenu.STRPETAL_TASKBUILDER);
+            //opts.add(ZeeFlowerMenu.STRPETAL_TASKBUILDER);
             if (ZeeConfig.isCaveTile(ZeeConfig.getPlayerTileName()))
                 opts.add(ZeeFlowerMenu.STRPETAL_TILEMONITOR);
             menu = new ZeeFlowerMenu(gob, opts.toArray(String[]::new));
