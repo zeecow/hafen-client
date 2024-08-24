@@ -6,7 +6,6 @@ Controls
 --------
 - gob flowermenu also works on mouse up
 - minimap drags with button 3
-- right click crop and drag also starts harvest area selection (slow)
 - keys up/down controls volume
 - keys left/right controls ambient light (home key resets light)
 - quick zoom with PageUp/PageDown, or Rclick player and drag
@@ -101,7 +100,8 @@ Long Midclick Ground Object
 - pile all clay if clicked pile with cursor dig
 - longmidclick stockpile while making block/board/sand will try pile items until pile full or object consumed
 - put out cauldron
-- longMidClick barrel while stirring to refill cauldron and click "craft all" again
+- longMidClick barrel while stirring to refill cauldron and click "craft all" again 
+  - tries reopening aux containers before crafting again
 
 Midclick Window Item
 - sort-transfer item ascending(?)
@@ -167,7 +167,7 @@ Random Features
 - tamed animal name generator, using animal's stats
 - auto-pile helper for mulberry leaves, woodblocks, boards, coal, ground stones
 - seed-farmer manager: no pathfinding, buggy (ctrlLongMidClick crop)
-- cook manager: auto cook pepper and refill cauldron until barrel is empty(no pathfinding)
+- cook manager: auto cook pepper and refill cauldron until barrel is empty(no pathfinding,old,buggy feature)
 - icon list categs
 - shaped icons options
 - label trasfering barrels

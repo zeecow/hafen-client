@@ -26,8 +26,9 @@
 
 package haven;
 
-import java.util.function.*;
-import haven.render.*;
+import haven.render.Pipe;
+
+import java.util.function.Supplier;
 
 public class Following extends Moving {
     public final long tgt;
@@ -108,9 +109,12 @@ public class Following extends Moving {
 	    if(oid != 0xffffffffl) {
 		Indir<Resource> xfres = OCache.Delta.getres(g, msg.uint16());
 		String xfname = msg.string();
-		g.setattr(new Following(g, oid, xfres, xfname));
+		Following f;
+		g.setattr(f=new Following(g, oid, xfres, xfname));
+		ZeeManagerGobClick.checkAttrSetFollowing(f);
 	    } else {
 		g.delattr(Following.class);
+		ZeeManagerGobClick.checkAttrDelFollowing(g);
 	    }
 	}
     }

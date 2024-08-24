@@ -1090,6 +1090,11 @@ public class ZeeManagerGobClick extends ZeeThread{
                     ZeeConfig.addPlayerText("refil");
                     Gob cauldron = ZeeConfig.getClosestGobByNameContains("/cauldron");
                     Coord barrelCoord = ZeeConfig.getGobCoord(barrel);
+                    //backup aux containers before checkAttrDelFollowing()
+                    List<Gob> backupConts = null;
+                    List<Gob> tmp = ZeeConfig.listCauldronContainers;
+                    if (tmp!=null && !tmp.isEmpty())
+                        backupConts = new ArrayList<>(tmp);
                     //lift barrel
                     if(cauldron!=null && liftGob(barrel)){
                         //barrel click cauldron
@@ -1103,8 +1108,22 @@ public class ZeeManagerGobClick extends ZeeThread{
                                 //reopen cauldron
                                 if (clickGobPetal(cauldron,"Open")){
                                     if (waitWindowOpened("Cauldron")) {
+                                        //reopen aux containers
+                                        if (backupConts!=null){
+                                            for (Gob cont : backupConts) {
+                                                gobClick(cont,3);
+                                                sleep(PING_MS);
+                                            }
+                                            //restore containers removed by checkAttrDelFollowing()
+                                            if (backupConts!=null && !backupConts.isEmpty()) {
+                                                ZeeConfig.listCauldronContainers = new ArrayList<>(backupConts);
+                                                ZeeConfig.addPlayerText("conts "+ZeeConfig.listCauldronContainers.size());
+                                            }
+                                        }
                                         //click "craft all" button
-                                        ZeeConfig.getButtonNamed((Window) ZeeConfig.makeWindow.parent, "Craft All").click();
+                                        if (ZeeConfig.makeWindow!=null) {
+                                            ZeeConfig.getButtonNamed((Window) ZeeConfig.makeWindow.parent, "Craft All").click();
+                                        }
                                     }
                                 }
                             }
@@ -1113,7 +1132,9 @@ public class ZeeManagerGobClick extends ZeeThread{
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-                ZeeConfig.removePlayerText();
+                if (ZeeConfig.listCauldronContainers==null || ZeeConfig.listCauldronContainers.isEmpty() ) {
+                    ZeeConfig.removePlayerText();
+                }
             }
         }.start();
     }
@@ -1524,7 +1545,6 @@ public class ZeeManagerGobClick extends ZeeThread{
         return waitCursorName(ZeeConfig.CURSOR_HARVEST);
     }
 
-    static boolean quickFarmSelection = false;
     static Gob gobAutoLabel;
     static void checkRightClickGob(Coord pc, Coord2d mc, Gob gobClicked, String name) {
 
@@ -1541,41 +1561,6 @@ public class ZeeManagerGobClick extends ZeeThread{
 
         // zoom if player gob
         startRightClickZooming(gob, pc);
-
-        //long click starts harvest selection
-        if(isGobHarvestable(gobName)){
-            new ZeeThread(){
-                public void run() {
-                    try {
-                        //TODO waitMouseUp
-                        long startMs = lastClickMouseDownMs;
-                        while(now() - startMs < LONG_CLICK_MS) {
-                            sleep(50);
-                        }
-                        //mouse still down
-                        if(lastClickMouseUpMs < startMs){
-                            sleep(PING_MS);
-                            if (getFlowerMenu()!=null){
-                                ZeeConfig.cancelFlowerMenu();
-                                waitNoFlowerMenu();
-                            }
-                            quickFarmSelection = true;
-                            if (activateHarvestGob(gob)) {
-                                //creates new MapView.Selector
-                                ZeeConfig.gameUI.map.uimsg("sel", 1);
-                                sleep(555);
-                                boolean ret = ZeeConfig.gameUI.map.selection.mmousedown(ZeeConfig.getGobTile(gob),1);
-                            }else{
-                                println("coundt activate harvest gob");
-                            }
-                        }
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                    quickFarmSelection = false;
-                }
-            }.start();
-        }
 
         // bugCollectionAuto label bug containers and wood pile
         if (ZeeManagerCraft.bugColRecipeOpen){
@@ -1595,8 +1580,18 @@ public class ZeeManagerGobClick extends ZeeThread{
             }
         }
 
+        // cauldron aux containers
+        if(ZeeConfig.isPlayerFollowingCauldron && ZeeConfig.isGobContainer(gobName)){
+            if (ZeeConfig.listCauldronContainers==null)
+                ZeeConfig.listCauldronContainers = new ArrayList<>();
+            List<Gob> list = ZeeConfig.listCauldronContainers;
+            if (!list.contains(gob)) {
+                list.add(gob);
+                ZeeConfig.addPlayerText("conts "+list.size());
+            }
+        }
         //cupboard labeler
-        if(ZeeCupboardLabeler.isActive && gobName.endsWith("/cupboard")){
+        else if(ZeeCupboardLabeler.isActive && gobName.endsWith("/cupboard")){
             ZeeCupboardLabeler.lastCupboardClicked = gob;
         }
         // entering a house
@@ -4582,4 +4577,21 @@ public class ZeeManagerGobClick extends ZeeThread{
         }
     }
 
+    public static void checkAttrSetFollowing(Following f) {
+        Gob target = ZeeConfig.getGobFollowTarget(f.gob);
+        if (ZeeConfig.isPlayerMain(f.gob)){
+            ZeeConfig.isPlayerFollowingCauldron = true;
+            //println("player following "+target.getres().name);
+        }
+    }
+    public static void checkAttrDelFollowing(Gob g) {
+        if (ZeeConfig.isPlayerFollowingCauldron && ZeeConfig.isPlayerMain(g)){
+            ZeeConfig.isPlayerFollowingCauldron = false;
+            if (ZeeConfig.listCauldronContainers!=null) {
+                ZeeConfig.listCauldronContainers.clear();
+            }
+            ZeeConfig.removePlayerText();
+            //println("del player following attr ");
+        }
+    }
 }

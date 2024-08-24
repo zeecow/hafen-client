@@ -290,6 +290,8 @@ public class ZeeConfig {
     public static boolean showGobRadar = Utils.getprefb("showGobRadar",false);
     static boolean autocloseXpWindow = Utils.getprefb("autocloseXpWindow",true);
     static boolean isBuildAndDrink = Utils.getprefb("isBuildAndDrink",true);
+    static boolean isPlayerFollowingCauldron = false;
+    static List<Gob> listCauldronContainers = null;
 
     public static boolean playMidiRadio = Utils.getprefb("playMidiRadio",false);
     static Runnable playMidiRadioRunnable = () -> ZeeMidiRadio.toggleRadio();
@@ -508,6 +510,19 @@ public class ZeeConfig {
 
     public static boolean isGobCrop(String gobName) {
         return gobName.startsWith("gfx/terobjs/plants/") && !gobName.endsWith("trellis") && !isGobWildCrop(gobName);
+    }
+
+    public static boolean isGobContainer(String gobName){
+        final List<String> l = List.of(
+            "woodbox","cupboard","chest","crate","basket","casket",
+            "box","coffer","steelbox","metalcabinet","urn","pot","strongbox"
+        );
+        for (String s : l) {
+            if(gobName.endsWith("/"+s)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public static boolean isGobWildCrop(String gobName) {
@@ -2680,10 +2695,10 @@ public class ZeeConfig {
         final String[] containers = (
                 //boxes
                 "Woodbox,Cupboard,Chest,Crate,Basket,Casket,Box,Coffer,Steelbox,Metal Cabinet,"
-                +"Urn,Pot,"
+                +"Urn,Pot,Strongbox,"
                 //misc
                 +"Knarr,Snekkja,Wagon,Table,Saddlebags,"
-                +"Furnace,Smelter,Desk,Trunk,Shed,Packrack,Strongbox,Stockpile,"
+                +"Furnace,Smelter,Desk,Trunk,Shed,Packrack,Stockpile,"
                 +"Tub,Compost Bin,Extraction Press,Rack,Herbalist Table,Frame,"
                 +"Chicken Coop,Rabbit Hutch,Archery Target,Oven,Steel crucible,"
                 +"Cauldron,Pane mold,Kiln,Old Trunk,Old Stump,Smoke shed,Finery Forge,"
@@ -2831,6 +2846,9 @@ public class ZeeConfig {
         ZeeManagerGobClick.barterSearchOpen = false;
         ZeeManagerGobClick.remountClosestHorse = false;
         ZeeManagerItemClick.clickingAllItemsPetals = false;
+        isPlayerFollowingCauldron = false;
+        if (listCauldronContainers!=null)
+            listCauldronContainers.clear();
         ZeeManagerGobClick.autoPickIrrlightExit();
         makeWindow = null;
         ZeeManagerMiner.tilesMonitorCleanup();
@@ -4913,7 +4931,10 @@ public class ZeeConfig {
     }
 
     public static Gob getPlayerFollowTarget() {
-        Following following = (Following) getPlayerAttr(Following.class);
+        return getGobFollowTarget(getPlayerGob());
+    }
+    public static Gob getGobFollowTarget(Gob g) {
+        Following following = (Following) getGobAttr(g,Following.class);
         if (following!=null){
             Gob target = getPlayerGob().glob.oc.getgob(following.tgt);
             if (target!=null) {

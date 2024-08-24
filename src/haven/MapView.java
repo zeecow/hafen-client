@@ -2339,7 +2339,7 @@ public boolean mousedown(Coord c, int button) {
 
 	    public Material mat() {return(mat);}
 	};
-    class Selector implements Grabber {
+    private class Selector implements Grabber {
 	Coord sc;
 	MCache.Overlay ol;
 	UI.Grab mgrab;
@@ -2347,7 +2347,7 @@ public boolean mousedown(Coord c, int button) {
 	Text tt;
 	final GrabXL xl = new GrabXL(this) {
 		public boolean mmousedown(Coord cc, int button) {
-		    if(button != 1 && !ZeeManagerGobClick.quickFarmSelection)
+		    if(button != 1)
 			return(false);
 		    return(super.mmousedown(cc, button));
 		}
@@ -2368,10 +2368,7 @@ public boolean mousedown(Coord c, int button) {
 		    ol.destroy();
 		    mgrab.remove();
 		}
-		if (ZeeManagerGobClick.quickFarmSelection)
-			sc = mc;
-		else
-			sc = mc.div(MCache.tilesz2);
+		sc = mc.div(MCache.tilesz2);
 		modflags = ui.modflags();
 		xl.mv = true;
 		mgrab = ui.grabmouse(MapView.this);
