@@ -4578,6 +4578,8 @@ public class ZeeManagerGobClick extends ZeeThread{
     }
 
     public static void checkAttrSetFollowing(Following f) {
+        if (ZeeConfig.gameUI==null)
+            return;
         Gob target = ZeeConfig.getGobFollowTarget(f.gob);
         if (ZeeConfig.isPlayerMain(f.gob)){
             ZeeConfig.isPlayerFollowingCauldron = true;
@@ -4585,6 +4587,8 @@ public class ZeeManagerGobClick extends ZeeThread{
         }
     }
     public static void checkAttrDelFollowing(Gob g) {
+        if (ZeeConfig.gameUI==null)
+            return;
         if (ZeeConfig.isPlayerFollowingCauldron && ZeeConfig.isPlayerMain(g)){
             ZeeConfig.isPlayerFollowingCauldron = false;
             if (ZeeConfig.listCauldronContainers!=null) {

@@ -4934,12 +4934,18 @@ public class ZeeConfig {
         return getGobFollowTarget(getPlayerGob());
     }
     public static Gob getGobFollowTarget(Gob g) {
-        Following following = (Following) getGobAttr(g,Following.class);
-        if (following!=null){
-            Gob target = getPlayerGob().glob.oc.getgob(following.tgt);
-            if (target!=null) {
-                return target;
+        if (ZeeConfig.gameUI==null)
+            return null;
+        try {
+            Following following = (Following) getGobAttr(g, Following.class);
+            if (following != null) {
+                Gob target = ZeeConfig.gameUI.ui.sess.glob.oc.getgob(following.tgt);
+                if (target != null) {
+                    return target;
+                }
             }
+        }catch (Exception e){
+            e.printStackTrace();
         }
         return null;
     }
