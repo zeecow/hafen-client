@@ -4580,10 +4580,12 @@ public class ZeeManagerGobClick extends ZeeThread{
     public static void checkAttrSetFollowing(Following f) {
         if (ZeeConfig.gameUI==null)
             return;
-        Gob target = ZeeConfig.getGobFollowTarget(f.gob);
         if (ZeeConfig.isPlayerMain(f.gob)){
-            ZeeConfig.isPlayerFollowingCauldron = true;
-            //println("player following "+target.getres().name);
+            Gob target = ZeeConfig.getGobFollowTarget(f.gob);
+            if (target.getres().name.contains("cauldron")) {
+                ZeeConfig.isPlayerFollowingCauldron = true;
+                //println("player following " + target.getres().name);
+            }
         }
     }
     public static void checkAttrDelFollowing(Gob g) {
