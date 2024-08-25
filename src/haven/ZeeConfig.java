@@ -497,7 +497,11 @@ public class ZeeConfig {
         return gob.getres().name.startsWith("gfx/borka/body") && !isMannequim;
     }
     static boolean isPlayerMain(Gob gob) {
-        return gameUI!=null && gameUI.map.player().id==gob.id;
+        Gob pl = gameUI.map.player();
+        if (pl == null){
+            return false;
+        }
+        return pl.id == gob.id;
     }
 
     public static boolean isTree(String gobName) {
