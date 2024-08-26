@@ -2087,8 +2087,6 @@ public class ZeeManagerGobClick extends ZeeThread{
             liftGob(gob);
             if (!waitPlayerPose(ZeeConfig.POSE_PLAYER_LIFTING)){
                 ZeeManagerTrees.treeloganizerExit("couldnt lift treelog");
-            }else{
-                ZeeConfig.addPlayerText("wait placing");
             }
         }
         else if(petalName.contentEquals("wave")){

@@ -453,7 +453,6 @@ public class ZeeManagerTrees {
             public void run() {
                 treeloganizerWorking = true;
                 try {
-                    ZeeConfig.addPlayerText("moving");
                     Gob treelogBoutToBeLifted = ZeeConfig.lastMapViewClickGob,
                             treelogNext=null,
                             treelogLastPlaced=null;
@@ -480,7 +479,8 @@ public class ZeeManagerTrees {
                         return;
                     }
 
-                    //wait placing first treelog (cancel by unckecking mainInv "tl")
+                    //wait placing first treelog
+                    ZeeConfig.addPlayerText("wait placing");
                     while (ZeeConfig.treeloganize && ZeeConfig.playerHasAnyPose(ZeeConfig.POSE_PLAYER_LIFTING)) {
                         sleep(500);
                     }
@@ -490,13 +490,14 @@ public class ZeeManagerTrees {
                     }
 
                     // move all neighbour treelogs
+                    ZeeConfig.addPlayerText("moving");
                     while(ZeeConfig.treeloganize && treelogNext!=null) {
                         //update next treelogs
                         treelogLastPlaced = treelogBoutToBeLifted;
                         treelogBoutToBeLifted = treelogNext;
                         treelogNext = ZeeConfig.getClosestGobByNameContains(treelogBoutToBeLifted, treelogName);
                         dist = ZeeConfig.distanceBetweenGobs(treelogBoutToBeLifted, treelogNext);
-                        // only move neighbour treelogs
+                        // only move neighbour treelogs, last one to move
                         if (dist > 4.2) {
                             //println("placing last treelog 2");
                             treelogNext = null;
@@ -530,11 +531,12 @@ public class ZeeManagerTrees {
         }.start();
     }
     static void treeloganizerExit(String msg){
+        ZeeConfig.treeloganize = false;
+        treeloganizerWorking = false;
         if (!msg.isEmpty()) {
             println("treeloganizer > " + msg);
             ZeeConfig.removePlayerText();
         }
-        treeloganizerWorking = false;
     }
 
 
