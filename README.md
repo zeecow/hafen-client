@@ -149,6 +149,7 @@ LongMidClick Flowermenu for Window Items
 - feast all food items(requires table)
 - transfer sort items (asc/desc)
 - fill all cheesetrays if holding curd
+- bind water items to last shortcut bar
 
 
 Random Features

@@ -311,7 +311,7 @@ public class ZeeManagerItemClick extends ZeeThread{
             }
 
             // show item context menu
-            if(showItemFlowerMenu()){
+            if(showMenuLongClick()){
                 return;
             }
             // cancel if holding item and no item context menu
@@ -761,6 +761,52 @@ public class ZeeManagerItemClick extends ZeeThread{
         else if(petalName.contentEquals("fill all trays")){
             fillCheesetrays(wItem);
         }
+        else if(petalName.contentEquals(ZeeFlowerMenu.STRPETAL_BINDWATER)){
+            new ZeeThread(){
+                public void run() {
+                    try {
+                        Inventory inv = getItemInventory(wItem);
+                        List<WItem> items = inv.getWItemsByNameEndsWith(itemName);
+                        // bind items to shotcut bar 9/9
+                        //      from last slot(117) to first slot(108)
+                        int i;
+                        for (i=117; i>=108 && !items.isEmpty(); i--){
+                            ZeeConfig.addPlayerText("set belt "+items.size());
+                            WItem it = items.remove(0);
+                            if(pickUpItem(it)) {
+                                ZeeConfig.gameUI.wdgmsg("setbelt", i, 0);
+                                sleep(333);
+                                if(!dropHoldingItemToInv(inv)){
+                                    println("couldnt return item to inv");
+                                    ZeeConfig.removePlayerText();
+                                    return;
+                                }
+                            }
+                        }
+                        // bind water bucket if slot available
+                        if (i > 108){
+                            WItem bucket = getEquippedItemNameEndsWith("/bucket-water");
+                            println("bucket = "+bucket);
+                            if (bucket != null){
+                                ZeeConfig.addPlayerText("set bucket");
+                                if(pickUpItem(bucket)) {
+                                    ZeeConfig.gameUI.wdgmsg("setbelt", i, 0);
+                                    sleep(333);
+                                    if(!equipEmptyHand()){
+                                        println("couldnt return bucket to hand");
+                                        ZeeConfig.removePlayerText();
+                                        return;
+                                    }
+                                }
+                            }
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    ZeeConfig.removePlayerText();
+                }
+            }.start();
+        }
         else
         {
             println("chooseItemFlowerMenu > unknown case");
@@ -947,7 +993,7 @@ public class ZeeManagerItemClick extends ZeeThread{
     }
 
 
-    public boolean showItemFlowerMenu(){
+    public boolean showMenuLongClick(){
 
         if (!isLongClick())
             return false;
@@ -961,7 +1007,12 @@ public class ZeeManagerItemClick extends ZeeThread{
         ArrayList<String> opts = new ArrayList<String>();//petals array
         Inventory inv = getItemInventory(wItem);
 
-        if (ZeeConfig.isFish(itemName)) {
+        //bind water to shortcuts
+        if (isItemDrinkingVessel(itemName)){
+            menu = new ZeeFlowerMenu(wItem, ZeeFlowerMenu.STRPETAL_BINDWATER);
+        }
+        // todo fish fix
+        else if (ZeeConfig.isFish(itemName)) {
             if (inv.countItemsByNameContains("/fish-") > 1){
                 opts.add(ZeeFlowerMenu.STRPETAL_AUTO_BUTCH_ALL);
                 if (isTransferWindowOpened()) {

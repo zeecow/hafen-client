@@ -32,6 +32,7 @@ public class ZeeFlowerMenu extends FlowerMenu{
     //static final String STRPETAL_TASKBUILDER = "Task builder";
     static final String STRPETAL_TOGGLE_CATTLEROSTER = "Toggle roster";
     static final String STRPETAL_MEMORIZEAREANIMALS = "Memorize area";
+    static final String STRPETAL_BINDWATER = "Bind water items";
 
     private final Gob gob;
     private final WItem wItem;
