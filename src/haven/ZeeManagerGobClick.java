@@ -1022,7 +1022,7 @@ public class ZeeManagerGobClick extends ZeeThread{
                 gobClick(gob,3, UI.MOD_SHIFT);
             }
             // refill cauldron and craft all
-            else if(gobName.endsWith("/barrel") && ZeeConfig.playerHasAnyPose(ZeeConfig.POSE_PLAYER_STIR)){
+            else if(ZeeConfig.isPlayerFollowingCauldron && gobName.endsWith("/barrel")){
                 refillCauldronAndCraftAll(gob);
             }
             // item act barrel
