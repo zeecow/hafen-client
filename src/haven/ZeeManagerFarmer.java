@@ -41,11 +41,14 @@ public class ZeeManagerFarmer extends ZeeThread{
 
     public void run(){
         manager = this;
-        startFarming();
+        startSeedFarming();
     }
 
-    public static void resetInitialState() {
-        println("seedFarmer exit > resetInitialState");
+    public static void exitSeedFarmer(String msg) {
+        println("exitSeedFarmer > "+msg);
+        exitSeedFarmer();
+    }
+    public static void exitSeedFarmer() {
         try {
             ZeeConfig.farmerMode = false;
             busy = false;
@@ -54,17 +57,24 @@ public class ZeeManagerFarmer extends ZeeThread{
             droppedSeeds = 0;
             ZeeConfig.resetTileSelection();
             ZeeConfig.autoHearthOnStranger = Utils.getprefb("autoHearthOnStranger", true);
-            if (manager!=null)
-                manager.interrupt();
 
             //piler
             ZeeManagerStockpile.selAreaPile = false;
 
+            if(windowManager!=null){
+                windowManager.reqdestroy();
+                windowManager = null;
+            }
+
+            if (manager!=null)
+                manager.interrupt();
+
             //TODO test emptying seed barrels queue? (mapQlBarrel)
-            ZeeConfig.removePlayerText();
+
         }catch (Exception e){
             e.printStackTrace();
         }
+        ZeeConfig.removePlayerText();
     }
 
     /*
@@ -191,7 +201,7 @@ public class ZeeManagerFarmer extends ZeeThread{
         }.start();
     }
 
-    private void startFarming() {
+    private void startSeedFarming() {
         ZeeConfig.autoHearthOnStranger = false;
         mapSeedqlBarrel = new HashMap<>();
         try{
@@ -289,7 +299,7 @@ public class ZeeManagerFarmer extends ZeeThread{
         }catch (Exception e){
             e.printStackTrace();
         }
-        resetInitialState();
+        exitSeedFarmer("done");
     }
 
     private Gob getHighestQlBarrel() {
@@ -510,8 +520,7 @@ public class ZeeManagerFarmer extends ZeeThread{
                 //get barrel for current seed ql
                 lastBarrel = getBarrelBySeedQl(qlSeeds,barrels);//ZeeConfig.getClosestGob(barrels);
                 if(lastBarrel==null){
-                    println("cant decide ql barrel");
-                    resetInitialState();
+                    exitSeedFarmer("cant decide ql barrel");
                     return;
                 }
                 ZeeConfig.addPlayerText("storing ql "+qlSeeds);
@@ -522,8 +531,7 @@ public class ZeeManagerFarmer extends ZeeThread{
                 }
                 ZeeConfig.addGobText(lastBarrel, getSeedNameAndQl());
                 if(!ZeeManagerItemClick.pickUpItem(wItem)){
-                    println("couldn't pickup wItem ql "+Inventory.getQualityInt(wItem.item));
-                    resetInitialState();
+                    exitSeedFarmer("couldn't pickup wItem ql "+Inventory.getQualityInt(wItem.item));
                     return;
                 }
                 sleep(PING_MS);//lag?
@@ -726,15 +734,12 @@ public class ZeeManagerFarmer extends ZeeThread{
         if(windowManager ==null){
 
             windowManager = new ZeeWindow(new Coord(300,90), "Seed Farmer"){
-                @Override
                 public void wdgmsg(String msg, Object... args) {
                     if (msg=="close"){
-                        //ZeeConfig.farmerMode = false;
-                        resetInitialState();
+                        exitSeedFarmer();
                         windowManager = null;
                         this.reqdestroy();
                     }
-                    //super.wdgmsg(msg, args);
                 }
             };
 

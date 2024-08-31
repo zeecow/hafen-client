@@ -2877,15 +2877,7 @@ public class ZeeConfig {
             }
         }
 
-        if(ZeeManagerFarmer.windowManager!=null){
-            try {
-                ZeeManagerFarmer.windowManager.reqdestroy();
-                ZeeManagerFarmer.windowManager = null;
-                ZeeManagerFarmer.resetInitialState();
-            }catch (Exception e){
-                e.printStackTrace();
-            }
-        }
+        ZeeManagerFarmer.exitSeedFarmer();
     }
 
     public static void clickOpenBelt() {
@@ -4381,7 +4373,7 @@ public class ZeeConfig {
         //stop farming
         if (ZeeManagerFarmer.busy){
             ZeeConfig.println(">combat relations, cancel farming");
-            ZeeManagerFarmer.resetInitialState();
+            ZeeManagerFarmer.exitSeedFarmer();
         }
         //stop piler
         if(ZeeManagerStockpile.busy){

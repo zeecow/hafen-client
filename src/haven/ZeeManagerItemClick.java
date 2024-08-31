@@ -236,7 +236,7 @@ public class ZeeManagerItemClick extends ZeeThread{
                     //cancel farmermode
                     ZeeConfig.println("seedfarmer > no tile selection, reset initial state");
                     //ZeeConfig.farmerMode = false; //TODO test
-                    ZeeManagerFarmer.resetInitialState();
+                    ZeeManagerFarmer.exitSeedFarmer();
                 }
                 else {
                     //start farmermode
