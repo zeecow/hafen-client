@@ -33,7 +33,8 @@ Controls
   - left-click-hold search button shows Actions window, and select item on mouse up 
   - right-click-hold search button to start a hover menu
 - mid-click item menu to start auto click window
-- mid-click tree/bush/boulder/log/stump/animal queue for next chop/chip/destroy/butch (not all cases)  
+- mid-click tree/bush/boulder/log/stump/animal queue for next chop/chip/destroy/butch (not all cases)
+- hold shift for long tooltips  
 
 
 

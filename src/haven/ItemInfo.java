@@ -337,6 +337,8 @@ public abstract class ItemInfo {
 	}
 	if(l.tips.size() < 1)
 	    return(null);
+	//add help text "[shift]"
+	l.add(new AdHoc(l.tips.get(0).owner,"[shift]"));
 	return(l.render());
     }
 
