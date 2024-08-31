@@ -336,7 +336,8 @@ public class ZeeConfig {
             "gfx/terobjs/crystalpatch",
             "gfx/terobjs/fairystone",
             "gfx/terobjs/lilypadlotus",
-            "gfx/terobjs/algaeblob"
+            "gfx/terobjs/algaeblob",
+            "gfx/terobjs/watervortex"
     ));
     public final static Set<String> rareForageables = new HashSet<String>(Arrays.asList(
         "gfx/terobjs/herbs/flotsam",
