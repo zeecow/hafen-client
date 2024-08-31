@@ -1851,7 +1851,7 @@ public class ZeeManagerGobClick extends ZeeThread{
     }
 
     public static boolean isGobWall(String gobName) {
-        final String walls = "/palisadeseg,/palisadecp,/drystonewallseg,/drystonewallcp,/poleseg,/polecp";
+        final String walls = "/palisadeseg,/palisadecp,/drystonewallseg,/drystonewallcp,/poleseg,/polecp,/brickwallseg,/brickwallcp";
         return isGobInListEndsWith(gobName,walls);
     }
 
