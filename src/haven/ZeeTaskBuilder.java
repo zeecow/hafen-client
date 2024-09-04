@@ -139,6 +139,40 @@ public class ZeeTaskBuilder {
         }
     }
 
+    public static void runCmdZ(String[] args) {
+        try{
+            String s = "";
+            for (int i = 1; i < args.length; i++) {
+                s += args[i].toLowerCase();
+            }
+            println("z > "+s);
+            if (s.isBlank() || s.endsWith("-h") || s.endsWith("--help")){
+                println("z  [cmd]");
+                println("   cl      clear gob text and pointers ");
+                println("   clt     clear gob texts");
+                println("   clp     clear gob pointers");
+                println("   clc     clear gob colors");
+                return;
+            }
+            s = s.replaceAll("^z\\s+","").strip();
+            if (s.contentEquals("cl")){
+                ZeeManagerGobClick.clearGobsTextsAndPointers();
+            }
+            else if (s.contains("clt")){
+                ZeeManagerGobClick.clearGobsTexts();
+            }
+            else if (s.contains("clp")){
+                ZeeManagerGobClick.clearGobsPointers();
+            }
+            else if (s.contains("clc")){
+                ZeeManagerGobClick.clearGobsColors();
+            }
+
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
     public static void println(String s) {
         System.out.println(s);
     }

@@ -2017,7 +2017,7 @@ public class ZeeManagerGobClick extends ZeeThread{
         else if(petalName.contentEquals(ZeeFlowerMenu.STRPETAL_AUTODISCOVERY))
             ZeeResearch.autoDiscovery();
         else if(petalName.contentEquals(ZeeFlowerMenu.STRPETAL_CLEARGOBTEXTSPOINTERS))
-            clearAllGobsTextsAndPointers();
+            clearGobsTextsAndPointers();
         else if (petalName.contentEquals(ZeeFlowerMenu.STRPETAL_AUTOBUTCH_BIGDEADANIMAL)){
             autoButchBigDeadAnimal(gob);
         }
@@ -2239,7 +2239,55 @@ public class ZeeManagerGobClick extends ZeeThread{
         }.start();
     }
 
-    static void clearAllGobsTextsAndPointers() {
+    static void clearGobsTexts() {
+        try {
+            synchronized (ZeeConfig.gameUI.ui.sess.glob.oc) {
+                ZeeConfig.gameUI.ui.sess.glob.oc.forEach(gob -> {
+                    synchronized (gob) {
+                        Gob.Overlay ol = gob.findol(ZeeGobText.class);
+                        if (ol != null) {
+                            ol.remove(false);
+                        }
+                    }
+                });
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    static void clearGobsPointers() {
+        try {
+            synchronized (ZeeConfig.gameUI.ui.sess.glob.oc) {
+                ZeeConfig.gameUI.ui.sess.glob.oc.forEach(gob -> {
+                    synchronized (gob) {
+                        Gob.Overlay ol = gob.findol(ZeeGobPointer.class);
+                        if (ol != null) {
+                            ol.remove(false);
+                        }
+                    }
+                });
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    static void clearGobsColors() {
+        try {
+            synchronized (ZeeConfig.gameUI.ui.sess.glob.oc) {
+                ZeeConfig.gameUI.ui.sess.glob.oc.forEach(gob -> {
+                    synchronized (gob) {
+                        Gob.Overlay ol = gob.findol(ZeeGobColor.class);
+                        if (ol != null) {
+                            ol.remove(false);
+                        }
+                    }
+                });
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    static void clearGobsTextsAndPointers() {
         try {
             synchronized (ZeeConfig.gameUI.ui.sess.glob.oc) {
                 ZeeConfig.gameUI.ui.sess.glob.oc.forEach(gob -> {
