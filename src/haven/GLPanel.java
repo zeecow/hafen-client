@@ -549,14 +549,9 @@ public interface GLPanel extends UIPanel, UI.Context {
 			}
 		    }
 		});
-		Console.setscmd("z", new Console.Command() {
+		Console.setscmd("zeecow", new Console.Command() {
 			public void run(Console cons, String[] args) {
-				ZeeTaskBuilder.runCmdZ(args);
-			}
-		});
-		Console.setscmd("Z", new Console.Command() {
-			public void run(Console cons, String[] args) {
-				ZeeTaskBuilder.runCmdZ(args);
+				ZeeConsole.runCmdZeecow(args);
 			}
 		});
 	}
