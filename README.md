@@ -35,6 +35,7 @@ Controls
 - mid-click item menu to start auto click window
 - mid-click tree/bush/boulder/log/stump/animal queue for next chop/chip/destroy/butch (not all cases)
 - hold shift for long tooltips  
+- type ":zeecow" for small interactive commands with gobs and future stuff 
 
 
 
