@@ -2921,6 +2921,16 @@ public class ZeeConfig {
         }).collect(Collectors.toList());
     }
 
+    static List<Gob> findGobsByNameRegexMatch(String pattern){
+        return ZeeConfig.gameUI.ui.sess.glob.oc.gobStream().filter(gob -> {
+            if(gob!=null && gob.getres()!=null) {
+                return ZeeConfig.getRegexMatcher(gob.getres().name,pattern).find();
+            } else {
+                return false;
+            }
+        }).collect(Collectors.toList());
+    }
+
     // pattern must match whole gob name
     public static List<Gob> findGobsMatchingRegexpList(List<String> regexPatterns) {
         return ZeeConfig.gameUI.ui.sess.glob.oc.gobStream().filter(gob -> {
@@ -4894,17 +4904,27 @@ public class ZeeConfig {
         return ZeeManagerStockpile.lastPlob != null;
     }
 
-    public static String getRegexGroup(String liftedGobName, String regex, int groupIndexStartsAt1
+    public static String getRegexGroup(String targetString, String regex, int groupIndexStartsAt1
     ) {
         try {
             Pattern pattern = Pattern.compile(regex);
-            Matcher matcher = pattern.matcher(liftedGobName);
+            Matcher matcher = pattern.matcher(targetString);
             matcher.find();
             return matcher.group(groupIndexStartsAt1);
         }catch (Exception e){
             println("getRegexGroup > "+e.getMessage());
         }
         return "";
+    }
+
+    static Matcher getRegexMatcher(String target, String regex){
+        try {
+            Pattern pattern = Pattern.compile(regex);
+            return pattern.matcher(target);
+        }catch (Exception e){
+            println("getRegexMatcher > "+e.getMessage());
+        }
+        return null;
     }
 
     public static Inventory getWindowsInventory(String windowName) {

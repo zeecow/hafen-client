@@ -1,14 +1,17 @@
 package haven;
 
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 public class ZeeConsole {
 
     static Object lastCmdResults;
+    static ArrayList<String> helpLines;
 
     public static void runCmdZeecow(String[] args) {
+        initHelp();
         try{
             String cmd = "";
 
@@ -18,20 +21,12 @@ public class ZeeConsole {
             cmd.trim();
             println("zeecow > ("+cmd+")");
             if (cmd.isBlank() || cmd.endsWith("-h") || cmd.endsWith("--help")){
-                println("zeecow  cmd  [ | cmd] ");
-                println("   goball      select all gobs");
-                println("   gobne []    select gobs which name ends with []");
-                println("   gobns []    select gobs which name starts with []");
-                println("   gobnc []    select gobs which name contains []");
-                println("   goblbl      label selected gobs");
-                println("   addt []     add text[] to all/sel gobs");
-                println("   addc []     add hexcolor[] to all/sel gobs");
-                println("   clg [tpc]   clear gobs [t]exts, [c]olors, [p]ointers");
-                println("example");
-                println("   \"gobnc plants | clg c\"");
-                println("       select crops gobs (gobnc plants)");
-                println("       with selection do (|)");
-                println("       clear gob color (clg c)");
+                //print help in terminal
+                for (String line : helpLines) {
+                    println(line);
+                }
+                //show window help
+                showHelpWindow();
                 return;
             }
 
@@ -49,6 +44,52 @@ public class ZeeConsole {
         }
     }
 
+    private static void initHelp() {
+        if (helpLines==null){
+            helpLines = new ArrayList<>();
+            helpLines.add("zeecow  cmd  [ | cmd ] ");
+            helpLines.add("   goball      select all gobs");
+            helpLines.add("   gobne []    select gobs which name ends with []");
+            helpLines.add("   gobns []    select gobs which name starts with []");
+            helpLines.add("   gobnc []    select gobs which name contains []");
+            helpLines.add("   gobfind []  select/highlight gobs matching [], regex capable");
+            helpLines.add("   goblbl      label selected gobs with basenames");
+            helpLines.add("   addt []     add text[] to all/sel gobs");
+            helpLines.add("   addc []     add hexcolor[] to all/sel gobs");
+            helpLines.add("   clg         clear gobs text/color/pointer");
+            helpLines.add("   clg [tpc]   clear gobs [t]ext, [c]olor, [p]ointer");
+            helpLines.add("   say []      text2speak parameter or last results (requires LinuxFestival)");
+            helpLines.add("example");
+            helpLines.add("   \"gobnc plants | clg c\"");
+            helpLines.add("       select crops gobs (gobnc plants)");
+            helpLines.add("       with selection do (|)");
+            helpLines.add("       clear gob color (clg c)");
+        }
+    }
+
+    private static void showHelpWindow() {
+        String winName = ":zeecow cmds";
+        Window win = ZeeConfig.getWindow(winName);
+        if (win!=null){
+            win.reqdestroy();
+        }
+        win = ZeeConfig.gameUI.add(
+            new Window(Coord.of(200,200),winName){
+                public void wdgmsg(String msg, Object... args) {
+                    if (msg.contentEquals("close")){
+                        this.reqdestroy();
+                    }
+                }
+            },
+            ZeeConfig.gameUI.sz.div(3)
+        );
+        int y=0;
+        for (String lines : helpLines) {
+            win.add(new Label(lines),0,15*y++);
+        }
+        win.pack();
+    }
+
     private static Object runSmallestCmd(String[] arr) {
         println("   smallestCmd "+arr.length);
         println("       "+ Arrays.toString(arr));
@@ -59,39 +100,53 @@ public class ZeeConsole {
         }
         else if (cmd.contentEquals("gobne")){
             if (arr.length < 2){
-                println("gobne missing parameter");
+                ZeeConfig.msgError("gobne missing parameter");
                 return null;
             }
             ret = ZeeConfig.findGobsByNameEndsWith(arr[1]);
         }
         else if (cmd.contentEquals("gobns")){
             if (arr.length < 2){
-                println("gobns missing parameter");
+                ZeeConfig.msgError("gobns missing parameter");
                 return null;
             }
             ret = ZeeConfig.findGobsByNameStartsWith(arr[1]);
         }
         else if (cmd.contentEquals("gobnc")){
             if (arr.length < 2){
-                println("gobnc missing parameter");
+                ZeeConfig.msgError("gobnc missing parameter");
                 return null;
             }
             ret = ZeeConfig.findGobsByNameContains(arr[1]);
+        }
+        else if (cmd.contentEquals("gobfind")){
+            if (arr.length < 2){
+                ZeeConfig.msgError("gobfind missing parameter");
+                return null;
+            }
+            ret = ZeeConfig.findGobsByNameRegexMatch(arr[1]);
+            List<Gob> gobsfound = (List<Gob>) ret;
+            for (Gob gob : gobsfound) {
+                synchronized (gob){
+                    ZeeConfig.addGobText(gob,"▼");
+                    ZeeConfig.addGobColor(gob,Color.magenta);
+                }
+            }
         }
         else if (cmd.contentEquals("goblbl")){
             ret = labelGobsBasename();
         }
         else if (cmd.contains("clg")){
             boolean rt = false, rp = false, rc = false;
+            boolean clearAll = false;
             if (arr.length < 2){
-                println("clg missing parameter");
-                return null;
+                clearAll = true;
             }
-            if (arr[1].contains("t"))
+            if (clearAll || arr[1].contains("t"))
                 rt = clearGobsTexts();
-            if (arr[1].contains("p"))
+            if (clearAll || arr[1].contains("p"))
                 rp = clearGobsPointers();
-            if (arr[1].contains("c"))
+            if (clearAll || arr[1].contains("c"))
                 rc = clearGobsColors();
             ret = rt && rp && rc;
         }
@@ -100,6 +155,36 @@ public class ZeeConsole {
         }
         else if (cmd.contains("addc")){
             ret = addColorToGobs(arr[1]);
+        }
+        else if (cmd.contentEquals("say")){
+            // say without parameter
+            if (arr.length < 2){
+                // requires lastCmdResults, show help
+                if (lastCmdResults==null){
+                    ZeeConfig.msgError("\"say\" is missing parameter");
+                    showHelpWindow();
+                }
+                // say lastCmdResults
+                else {
+                    String text;
+                    if (lastCmdResults instanceof List)
+                        text = "list size "+((List<?>) lastCmdResults).size();
+                    else if (lastCmdResults instanceof Boolean)
+                        text = "result is "+ (Boolean) lastCmdResults;
+                    else
+                        text = "result is unknown";
+                    ZeeSynth.textToSpeakLinuxFestival(text);
+                }
+            }
+            // say parameter(arr[1]) has priority over lastCmdResults
+            else{
+                ZeeSynth.textToSpeakLinuxFestival(arr[1]);
+            }
+        }
+        else {
+            ZeeConfig.msgError("unknown \""+cmd+"\"");
+            println("cmd unknown \""+cmd+"\"");
+            showHelpWindow();
         }
         //println("      returning "+ret);
         return ret;
