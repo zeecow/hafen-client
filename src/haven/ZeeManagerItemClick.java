@@ -301,10 +301,10 @@ public class ZeeManagerItemClick extends ZeeThread{
                 if (itemName.contentEquals(getHoldingItem().item.getres().name)){
                     // create multiple stacks
                     if (isLongClick())
-                        gItemAct(wItem.item,3);
+                        gItemAct(wItem.item,UI.MOD_CTRL_SHIFT);
                     // create one stack
                     else
-                        gItemAct(wItem.item,1);
+                        gItemAct(wItem.item,UI.MOD_SHIFT);
                     playFeedbackSound();
                     return;
                 }
@@ -1896,6 +1896,10 @@ public class ZeeManagerItemClick extends ZeeThread{
 
     public static boolean isCoracleEquipped() {
         return ZeeManagerItemClick.isItemEquipped("gfx/invobjs/small/coracle");
+    }
+
+    public static boolean isStackByContent(GItem item) {
+        return item.contents!=null;
     }
 
     public static boolean isStackByAmount(GItem i) throws Loading {

@@ -34,10 +34,26 @@ public class ZeeConsole {
 
             String[] arrPipes = cmd.split("\\|");
             println("arrPipes = "+arrPipes.length);
-            lastCmdResults = null;
-            for (int i = 0; i < arrPipes.length; i++) {
-                lastCmdResults = runSmallestCmd(arrPipes[i].trim().split("\\s+"));
-            }
+            new ZeeThread(){
+                public void run() {
+                    try {
+                        lastCmdResults = null;
+                        for (int i = 0; i < arrPipes.length; i++) {
+                            long ms = ZeeThread.now();
+                            lastCmdResults = runSmallestCmd(arrPipes[i].trim().split("\\s+"));
+                            println(
+                                    "lastCmdResults = "
+                                            + (lastCmdResults==null?"null":lastCmdResults.getClass().getSimpleName())
+                                            + (lastCmdResults instanceof List? " ("+((List<?>) lastCmdResults).get(0)+") " : "")
+                                            + " , ms = "
+                                            +((long)ZeeThread.now() - ms)
+                            );
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            }.start();
 
         }catch (Exception e){
             e.printStackTrace();
@@ -62,6 +78,7 @@ public class ZeeConsole {
             helpLines.add("======== win items ========");
             helpLines.add("   win []     select windows named []");
             helpLines.add("   item []    select items named []");
+            helpLines.add("   stack      stack selected window(s) item(s) ");
             helpLines.add("======== misc ========");
             helpLines.add("   count       msg counting last cmd results");
             helpLines.add("   say []      text2speak parameter or last cmd results (requires LinuxFestival)");
@@ -91,10 +108,10 @@ public class ZeeConsole {
         win.pack();
     }
 
+    @SuppressWarnings("unchecked")
     private static Object runSmallestCmd(String[] arr) {
 
-        println("   smallestCmd "+arr.length);
-        println("       "+ Arrays.toString(arr));
+        println("   smallestCmd "+Arrays.toString(arr));
         String cmd = arr[0];
         Object ret = null;
 
@@ -179,12 +196,10 @@ public class ZeeConsole {
             ret = ZeeConfig.getWindows(arr[1]);
         }
         else if (cmd.contentEquals("item")){
-            if (arr.length < 2){
-                ZeeConfig.msgError("item parameter missing");
-                showHelpWindow();
-                return null;
-            }
-            ret = selectWindowsItems(arr[1]);
+            ret = selectWindowsItems(arr);
+        }
+        else if (cmd.contentEquals("stack")){
+            ret = stackItems();
         }
 
         /*
@@ -239,14 +254,60 @@ public class ZeeConsole {
         return ret;
     }
 
-    private static List<WItem> selectWindowsItems(String itemNameContains) {
+    private static Boolean stackItems() {
+
+        if (!(lastCmdResults instanceof List) || (((List) lastCmdResults).isEmpty())){
+            ZeeConfig.msgError("no items selected");
+            println("no items selected");
+            showHelpWindow();
+            return false;
+        }
+
         try {
-            List<Window> wins = (List<Window>) lastCmdResults;
-            if (wins==null || wins.isEmpty())
+            List<WItem> wItems = (List<WItem>) lastCmdResults;
+            String itemName = wItems.get(0).item.getres().name;
+            List<WItem> itemsToStack = new ArrayList<>();
+            int countStacks = 0;
+            for (WItem wItem : wItems) {
+                // stack single items
+                if (!ZeeManagerItemClick.isStackByContent(wItem.item)) {
+                    itemsToStack.add(wItem);
+                    if (itemsToStack.size() == 2) {
+                        // pickup item 0
+                        if (!ZeeManagerItemClick.pickUpItem(itemsToStack.get(0))) {
+                            println("couldnt pickup itemToStack 0");
+                            return false;
+                        }
+                        // ctrl+shift+rclick item 1
+                        ZeeManagerItemClick.itemAct(itemsToStack.get(1), UI.MOD_CTRL_SHIFT);
+                        return true;//todo more items
+                    }
+                } else
+                    countStacks++;
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    private static List<WItem> selectWindowsItems(String[] arr) {
+        try {
+            if (!(lastCmdResults instanceof List) || ((List<?>) lastCmdResults).isEmpty()){
+                ZeeConfig.msgError("no windows selected");
+                showHelpWindow();
                 return null;
+            }
+            if (arr.length < 2){
+                ZeeConfig.msgError("item parameter missing");
+                showHelpWindow();
+                return null;
+            }
+            List<Window> wins = (List<Window>) lastCmdResults;
             List<WItem> ret = new ArrayList<>();
             for (Window win : wins) {
-                ret.addAll(ZeeConfig.getWindowsInventory(win).getWItemsByNameContains(itemNameContains));
+                ret.addAll(ZeeConfig.getWindowsInventory(win).getWItemsByNameContains(arr[1]));
             }
             return ret;
         }catch (Exception e){
