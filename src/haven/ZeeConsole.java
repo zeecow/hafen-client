@@ -19,7 +19,7 @@ public class ZeeConsole {
                 cmd += " " + args[i].toLowerCase();
             }
             cmd.trim();
-            println("zeecow > ("+cmd+")");
+            println("zeecow > ("+cmd+" )");
             if (cmd.isBlank() || cmd.endsWith("-h") || cmd.endsWith("--help")){
                 //print help in terminal
                 for (String line : helpLines) {
@@ -32,7 +32,7 @@ public class ZeeConsole {
 
             cmd = cmd.replaceAll("^zeecow\\s+","");
 
-            String[] arrPipes = cmd.split("\\|");
+            String[] arrPipes = cmd.split(",");
             println("arrPipes = "+arrPipes.length);
             new ZeeThread(){
                 public void run() {
@@ -63,7 +63,7 @@ public class ZeeConsole {
     private static void initHelp() {
         if (helpLines==null){
             helpLines = new ArrayList<>();
-            helpLines.add(":zeecow  cmd1 | cmd2 | ... ");
+            helpLines.add(":zeecow  cmd1 , cmd2 , ... ");
             helpLines.add("======== gob ========");
             helpLines.add("   goball      select all gobs");
             helpLines.add("   gobne []    select gobs which name ends with []");
@@ -78,7 +78,7 @@ public class ZeeConsole {
             helpLines.add("======== win items ========");
             helpLines.add("   win []     select windows named []");
             helpLines.add("   item []    select items named []");
-            helpLines.add("   stack      stack selected window(s) item(s) ");
+            helpLines.add("   stack      stack selected windows/items ");
             helpLines.add("======== misc ========");
             helpLines.add("   count       msg counting last cmd results");
             helpLines.add("   say []      text2speak parameter or last cmd results (requires LinuxFestival)");
@@ -199,7 +199,9 @@ public class ZeeConsole {
             ret = selectWindowsItems(arr);
         }
         else if (cmd.contentEquals("stack")){
-            ret = stackItems();
+            ZeeConfig.addPlayerText("stackin");
+            ret = stack();
+            ZeeConfig.removePlayerText();
         }
 
         /*
@@ -254,7 +256,7 @@ public class ZeeConsole {
         return ret;
     }
 
-    private static Boolean stackItems() {
+    private static Boolean stack() {
 
         if (!(lastCmdResults instanceof List) || (((List) lastCmdResults).isEmpty())){
             ZeeConfig.msgError("no items selected");
@@ -263,11 +265,67 @@ public class ZeeConsole {
             return false;
         }
 
+        Object first  = ((List<?>) lastCmdResults).get(0);
+        if (first instanceof Window)
+            return stackWindowsContents();
+        else if (first instanceof WItem)
+            return stackItemsSelected();
+        else {
+            println("stack > unknown selection");
+            return false;
+        }
+    }
+
+    private static Boolean stackWindowsContents() {
+        try {
+            List<Window> windows = (List<Window>) lastCmdResults;
+            for (Window window : windows) {
+                Inventory inv = ZeeConfig.getWindowsInventory(window);
+                WItem[] invItems = inv.children(WItem.class).toArray(new WItem[0]);
+                List<String> names = new ArrayList<>();
+                // collect items names
+                for (WItem item : invItems) {
+                    if (names.contains(item.item.getres().name))
+                        continue;
+                    names.add(item.item.getres().name);
+                }
+                // stack items by name
+                for (String name : names) {
+                    List<WItem> namedItems = inv.getWItemsByNameEndsWith(name);
+                    for (int i = 0; i < namedItems.size()-1; i++) {
+                        // skip stacks
+                        if (ZeeManagerItemClick.isStackByContent(namedItems.get(i).item))
+                            continue;
+                        for (int j = i+1; j < namedItems.size(); j++) {
+                            // skip stacks
+                            if (ZeeManagerItemClick.isStackByContent(namedItems.get(j).item))
+                                continue;
+                            println("stacking "+name);
+                            // pickup item i
+                            if (!ZeeManagerItemClick.pickUpItem(namedItems.get(i))) {
+                                println("couldnt pickup itemToStack 0");
+                                return false;
+                            }
+                            // stack all on item j
+                            ZeeManagerItemClick.itemAct(namedItems.get(j), UI.MOD_CTRL_SHIFT);
+                            Thread.sleep(333);
+                            // next item name
+                            i = j = namedItems.size() + 1;
+                        }
+                    }
+                }
+            }
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    private static Boolean stackItemsSelected() {
         try {
             List<WItem> wItems = (List<WItem>) lastCmdResults;
-            String itemName = wItems.get(0).item.getres().name;
             List<WItem> itemsToStack = new ArrayList<>();
-            int countStacks = 0;
             for (WItem wItem : wItems) {
                 // stack single items
                 if (!ZeeManagerItemClick.isStackByContent(wItem.item)) {
@@ -282,8 +340,7 @@ public class ZeeConsole {
                         ZeeManagerItemClick.itemAct(itemsToStack.get(1), UI.MOD_CTRL_SHIFT);
                         return true;//todo more items
                     }
-                } else
-                    countStacks++;
+                }
             }
 
         } catch (Exception e) {

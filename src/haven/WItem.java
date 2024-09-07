@@ -104,11 +104,11 @@ public class WItem extends Widget implements DTarget {
 		return(shorttip);
 	    } else {
 		if(longtip == null) {
-			// add blank line
+			// blank line
 			info.add(new ItemInfo.AdHoc(this.item, ""));
-			// add res name
+			// res name
 			info.add(new ItemInfo.AdHoc(this.item, this.item.getres().name));
-			// add meter %
+			// meter %
 			Double meter = (item.meter > 0) ? Double.valueOf(item.meter / 100.0) : itemmeter.get();
 			if((meter != null) && (meter > 0)) {
 				info.add(new ItemInfo.AdHoc(this.item, (int) (meter * 100) +"% done"));
