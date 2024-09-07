@@ -47,7 +47,8 @@ public class ZeeConsole {
     private static void initHelp() {
         if (helpLines==null){
             helpLines = new ArrayList<>();
-            helpLines.add("zeecow  cmd  [ | cmd ] ");
+            helpLines.add(":zeecow  cmd1 | cmd2 | ... ");
+            helpLines.add("======== gob ========");
             helpLines.add("   goball      select all gobs");
             helpLines.add("   gobne []    select gobs which name ends with []");
             helpLines.add("   gobns []    select gobs which name starts with []");
@@ -58,12 +59,12 @@ public class ZeeConsole {
             helpLines.add("   addc []     add hexcolor[] to all/sel gobs");
             helpLines.add("   clg         clear gobs text/color/pointer");
             helpLines.add("   clg [tpc]   clear gobs [t]ext, [c]olor, [p]ointer");
-            helpLines.add("   say []      text2speak parameter or last results (requires LinuxFestival)");
-            helpLines.add("example");
-            helpLines.add("   \"gobnc plants | clg c\"");
-            helpLines.add("       select crops gobs (gobnc plants)");
-            helpLines.add("       with selection do (|)");
-            helpLines.add("       clear gob color (clg c)");
+            helpLines.add("======== win items ========");
+            helpLines.add("   win []     select windows named []");
+            helpLines.add("   item []    select items named []");
+            helpLines.add("======== misc ========");
+            helpLines.add("   count       msg counting last cmd results");
+            helpLines.add("   say []      text2speak parameter or last cmd results (requires LinuxFestival)");
         }
     }
 
@@ -91,16 +92,22 @@ public class ZeeConsole {
     }
 
     private static Object runSmallestCmd(String[] arr) {
+
         println("   smallestCmd "+arr.length);
         println("       "+ Arrays.toString(arr));
         String cmd = arr[0];
         Object ret = null;
+
+        /*
+            gobs cmds
+         */
         if (cmd.contentEquals("goball")){
             ret = ZeeConfig.getAllGobs();
         }
         else if (cmd.contentEquals("gobne")){
             if (arr.length < 2){
                 ZeeConfig.msgError("gobne missing parameter");
+                showHelpWindow();
                 return null;
             }
             ret = ZeeConfig.findGobsByNameEndsWith(arr[1]);
@@ -108,6 +115,7 @@ public class ZeeConsole {
         else if (cmd.contentEquals("gobns")){
             if (arr.length < 2){
                 ZeeConfig.msgError("gobns missing parameter");
+                showHelpWindow();
                 return null;
             }
             ret = ZeeConfig.findGobsByNameStartsWith(arr[1]);
@@ -115,6 +123,7 @@ public class ZeeConsole {
         else if (cmd.contentEquals("gobnc")){
             if (arr.length < 2){
                 ZeeConfig.msgError("gobnc missing parameter");
+                showHelpWindow();
                 return null;
             }
             ret = ZeeConfig.findGobsByNameContains(arr[1]);
@@ -122,6 +131,7 @@ public class ZeeConsole {
         else if (cmd.contentEquals("gobfind")){
             if (arr.length < 2){
                 ZeeConfig.msgError("gobfind missing parameter");
+                showHelpWindow();
                 return null;
             }
             ret = ZeeConfig.findGobsByNameRegexMatch(arr[1]);
@@ -136,7 +146,7 @@ public class ZeeConsole {
         else if (cmd.contentEquals("goblbl")){
             ret = labelGobsBasename();
         }
-        else if (cmd.contains("clg")){
+        else if (cmd.contentEquals("clg")){
             boolean rt = false, rp = false, rc = false;
             boolean clearAll = false;
             if (arr.length < 2){
@@ -150,11 +160,50 @@ public class ZeeConsole {
                 rc = clearGobsColors();
             ret = rt && rp && rc;
         }
-        else if (cmd.contains("addt")){
+        else if (cmd.contentEquals("addt")){
             ret = addTextToGobs(arr[1]);
         }
-        else if (cmd.contains("addc")){
+        else if (cmd.contentEquals("addc")){
             ret = addColorToGobs(arr[1]);
+        }
+
+        /*
+            windows items cmds
+         */
+        else if (cmd.contentEquals("win")){
+            if (arr.length < 2){
+                ZeeConfig.msgError("win parameter missing");
+                showHelpWindow();
+                return null;
+            }
+            ret = ZeeConfig.getWindows(arr[1]);
+        }
+        else if (cmd.contentEquals("item")){
+            if (arr.length < 2){
+                ZeeConfig.msgError("item parameter missing");
+                showHelpWindow();
+                return null;
+            }
+            ret = selectWindowsItems(arr[1]);
+        }
+
+        /*
+            misc cmds
+         */
+        else if (cmd.contentEquals("count")){
+            if (lastCmdResults==null){
+                ZeeConfig.msgError("nothing to print");
+                return null;
+            }
+            String text = "";
+            if (lastCmdResults instanceof List){
+                text = "list size "+((List<?>) lastCmdResults).size();
+                ZeeConfig.msgLow(text);
+            }else{
+                text = "no list to count";
+                ZeeConfig.msgError(text);
+            }
+            ret = text;
         }
         else if (cmd.contentEquals("say")){
             // say without parameter
@@ -169,10 +218,8 @@ public class ZeeConsole {
                     String text;
                     if (lastCmdResults instanceof List)
                         text = "list size "+((List<?>) lastCmdResults).size();
-                    else if (lastCmdResults instanceof Boolean)
-                        text = "result is "+ (Boolean) lastCmdResults;
                     else
-                        text = "result is unknown";
+                        text = String.valueOf(lastCmdResults);
                     ZeeSynth.textToSpeakLinuxFestival(text);
                 }
             }
@@ -181,13 +228,31 @@ public class ZeeConsole {
                 ZeeSynth.textToSpeakLinuxFestival(arr[1]);
             }
         }
+
+        // unknown cmd
         else {
             ZeeConfig.msgError("unknown \""+cmd+"\"");
             println("cmd unknown \""+cmd+"\"");
             showHelpWindow();
         }
-        //println("      returning "+ret);
+
         return ret;
+    }
+
+    private static List<WItem> selectWindowsItems(String itemNameContains) {
+        try {
+            List<Window> wins = (List<Window>) lastCmdResults;
+            if (wins==null || wins.isEmpty())
+                return null;
+            List<WItem> ret = new ArrayList<>();
+            for (Window win : wins) {
+                ret.addAll(ZeeConfig.getWindowsInventory(win).getWItemsByNameContains(itemNameContains));
+            }
+            return ret;
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return null;
     }
 
     private static Boolean addColorToGobs(String hexColor) {

@@ -319,7 +319,7 @@ public class ZeeFishing {
                 try {
                     WItem wItem = null;
                     List<WItem> list;
-                    Inventory invCreel = ZeeConfig.getWindowsInventory("Creel");
+                    Inventory invCreel = ZeeConfig.getUniqueWindowsInventory("Creel");
                     if (invCreel!=null){
                         list = invCreel.getItemsByNameEnd(fishItemName);
                         if (!list.isEmpty())

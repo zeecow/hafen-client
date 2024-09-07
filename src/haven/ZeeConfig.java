@@ -4927,12 +4927,16 @@ public class ZeeConfig {
         return null;
     }
 
-    public static Inventory getWindowsInventory(String windowName) {
-        Window win = ZeeConfig.getWindow(windowName);
-        if (win!=null){
-            Inventory inv = win.getchild(Inventory.class);
-            return inv;
-        }
+    public static Inventory getUniqueWindowsInventory(String uniqueWindowName) {
+        Window win = ZeeConfig.getWindow(uniqueWindowName);
+        if (win!=null)
+            return win.getchild(Inventory.class);
+        return null;
+    }
+
+    public static Inventory getWindowsInventory(Window win) {
+        if (win!=null)
+            return win.getchild(Inventory.class);
         return null;
     }
 
