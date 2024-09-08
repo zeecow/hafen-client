@@ -107,7 +107,7 @@ public class WItem extends Widget implements DTarget {
 			// blank line
 			info.add(new ItemInfo.AdHoc(this.item, ""));
 			// res name
-			info.add(new ItemInfo.AdHoc(this.item, this.item.getres().name));
+			info.add(new ItemInfo.AdHoc(this.item, this.item.resource().name));
 			// meter %
 			Double meter = (item.meter > 0) ? Double.valueOf(item.meter / 100.0) : itemmeter.get();
 			if((meter != null) && (meter > 0)) {

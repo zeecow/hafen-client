@@ -1,9 +1,12 @@
 package haven;
 
+import haven.res.gfx.invobjs.meat.Meat;
+
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class ZeeConsole {
 
@@ -282,16 +285,19 @@ public class ZeeConsole {
         }
 
         Object first  = ((List<?>) lastCmdResults).get(0);
-        if (first instanceof Window)
+        if (first instanceof Window) {
             return stackWindowsContents();
-        else if (first instanceof WItem)
+        }
+        else if (first instanceof WItem) {
             return stackItemsSelected();
+        }
         else {
             println("stack > unknown selection");
             return false;
         }
     }
 
+    @SuppressWarnings("unchecked")
     private static Boolean stackWindowsContents() {
         try {
             List<Window> windows = (List<Window>) lastCmdResults;
@@ -299,13 +305,23 @@ public class ZeeConsole {
                 Inventory inv = ZeeConfig.getWindowsInventory(window);
                 WItem[] invItems = inv.children(WItem.class).toArray(new WItem[0]);
                 List<String> names = new ArrayList<>();
+                List<String> meatNames = new ArrayList<>();
                 // collect items names
                 for (WItem item : invItems) {
-                    if (names.contains(item.item.getres().name))
+                    String itemName = item.item.getres().name;
+                    // special case for meat items
+                    if (itemName.endsWith("/meat")){
+                        String meatName = ZeeManagerItemClick.getMeatName(item.item);
+                        if (!meatNames.contains(meatName))
+                            meatNames.add(meatName);
                         continue;
-                    names.add(item.item.getres().name);
+                    }
+                    // regular item names
+                    if (names.contains(itemName))
+                        continue;
+                    names.add(itemName);
                 }
-                // stack items by name
+                // stack regular items by name
                 for (String name : names) {
                     List<WItem> namedItems = inv.getWItemsByNameEndsWith(name);
                     for (int i = 0; i < namedItems.size()-1; i++) {
@@ -316,17 +332,40 @@ public class ZeeConsole {
                             // skip stacks
                             if (ZeeManagerItemClick.isStackByContent(namedItems.get(j).item))
                                 continue;
-                            println("stacking "+name);
                             // pickup item i
                             if (!ZeeManagerItemClick.pickUpItem(namedItems.get(i))) {
-                                println("couldnt pickup itemToStack 0");
+                                println("couldnt pickup namedItem");
                                 return false;
                             }
                             // stack all on item j
                             ZeeManagerItemClick.itemAct(namedItems.get(j), UI.MOD_CTRL_SHIFT);
-                            Thread.sleep(333);
+                            Thread.sleep(250);
                             // next item name
                             i = j = namedItems.size() + 1;
+                        }
+                    }
+                }
+                //stack meat items
+                for (String meatName : meatNames) {
+                    List<WItem> meatItems = inv.getWItemsByMeatName(meatName);
+                    for (int i = 0; i < meatItems.size(); i++) {
+                        // skip stacks
+                        if (ZeeManagerItemClick.isStackByContent(meatItems.get(i).item))
+                            continue;
+                        for (int j = i+1; j < meatItems.size(); j++) {
+                            // skip stacks
+                            if (ZeeManagerItemClick.isStackByContent(meatItems.get(j).item))
+                                continue;
+                            // pickup item i
+                            if (!ZeeManagerItemClick.pickUpItem(meatItems.get(i))) {
+                                println("couldnt pickup meatItem");
+                                return false;
+                            }
+                            // stack all on item j
+                            ZeeManagerItemClick.itemAct(meatItems.get(j), UI.MOD_CTRL_SHIFT);
+                            Thread.sleep(250);
+                            // next item name
+                            i = j = meatItems.size() + 1;
                         }
                     }
                 }
@@ -338,33 +377,95 @@ public class ZeeConsole {
         return false;
     }
 
+    @SuppressWarnings("unchecked")
     private static Boolean stackItemsSelected() {
+        /*
+         TODO fix multiple windows or remove stackItemsSelected
+         */
         try {
-            List<WItem> wItems = (List<WItem>) lastCmdResults;
-            List<WItem> itemsToStack = new ArrayList<>();
-            for (WItem wItem : wItems) {
-                // stack single items
-                if (!ZeeManagerItemClick.isStackByContent(wItem.item)) {
-                    itemsToStack.add(wItem);
-                    if (itemsToStack.size() == 2) {
-                        // pickup item 0
-                        if (!ZeeManagerItemClick.pickUpItem(itemsToStack.get(0))) {
-                            println("couldnt pickup itemToStack 0");
+            List<WItem> selectedItems = (List<WItem>) lastCmdResults;
+            //List<WItem> itemsToStack = new ArrayList<>();
+            List<String> names = new ArrayList<>();
+            List<String> meatNames = new ArrayList<>();
+
+            // collect items names
+            for (WItem item : selectedItems) {
+                String itemName = item.item.getres().name;
+                // special case for meat items
+                if (itemName.endsWith("/meat")){
+                    String meatName = ZeeManagerItemClick.getMeatName(item.item);
+                    if (!meatNames.contains(meatName))
+                        meatNames.add(meatName);
+                    continue;
+                }
+                // regular item names
+                if (names.contains(itemName))
+                    continue;
+                names.add(itemName);
+            }
+
+            // stack regular items by name
+            for (String name : names) {
+                List<WItem> namedItems = selectedItems.stream().filter(wItem -> wItem.item.getres().name.contentEquals(name)).collect(Collectors.toList());
+                for (int i = 0; i < namedItems.size()-1; i++) {
+                    // skip stacks
+                    if (ZeeManagerItemClick.isStackByContent(namedItems.get(i).item))
+                        continue;
+                    for (int j = i+1; j < namedItems.size(); j++) {
+                        // skip stacks
+                        if (ZeeManagerItemClick.isStackByContent(namedItems.get(j).item))
+                            continue;
+                        // pickup item i
+                        if (!ZeeManagerItemClick.pickUpItem(namedItems.get(i))) {
+                            println("couldnt pickup namedItem");
                             return false;
                         }
-                        // ctrl+shift+rclick item 1
-                        ZeeManagerItemClick.itemAct(itemsToStack.get(1), UI.MOD_CTRL_SHIFT);
-                        return true;//todo more items
+                        // stack all on item j
+                        ZeeManagerItemClick.itemAct(namedItems.get(j), UI.MOD_CTRL_SHIFT);
+                        Thread.sleep(250);
+                        // next item name
+                        i = j = namedItems.size() + 1;
                     }
                 }
             }
 
+            //stack meat items
+            for (String meatName : meatNames) {
+                List<WItem> meatItems = selectedItems.stream().filter(wItem -> {
+                    GSprite spr = wItem.item.spr();
+                    if(spr instanceof Meat && ((Meat)spr).name().contentEquals(meatName)){
+                        return true;
+                    }
+                    return false;
+                }).collect(Collectors.toList());
+                for (int i = 0; i < meatItems.size(); i++) {
+                    // skip stacks
+                    if (ZeeManagerItemClick.isStackByContent(meatItems.get(i).item))
+                        continue;
+                    for (int j = i+1; j < meatItems.size(); j++) {
+                        // skip stacks
+                        if (ZeeManagerItemClick.isStackByContent(meatItems.get(j).item))
+                            continue;
+                        // pickup item i
+                        if (!ZeeManagerItemClick.pickUpItem(meatItems.get(i))) {
+                            println("couldnt pickup meatItem");
+                            return false;
+                        }
+                        // stack all on item j
+                        ZeeManagerItemClick.itemAct(meatItems.get(j), UI.MOD_CTRL_SHIFT);
+                        Thread.sleep(250);
+                        // next item name
+                        i = j = meatItems.size() + 1;
+                    }
+                }
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
         return false;
     }
 
+    @SuppressWarnings("unchecked")
     private static List<WItem> selectWindowsItems(String[] arr) {
         try {
             if (!(lastCmdResults instanceof List) || ((List<?>) lastCmdResults).isEmpty()){

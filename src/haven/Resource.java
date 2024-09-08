@@ -35,14 +35,11 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.net.*;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
-import java.security.PrivilegedActionException;
-import java.security.PrivilegedExceptionAction;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -1596,8 +1593,11 @@ public class Resource implements Serializable {
 	}
 
 	public void init() {
-	    for(Code c : layers(Code.class))
-		clmap.put(c.name, c);
+	    for(Code c : layers(Code.class)) {
+			clmap.put(c.name, c);
+			if (ZeeConfig.debugCodeRes)
+				ZeeConfig.println(c.name);
+		}
 	}
 
 	public ClassLoader loader() {

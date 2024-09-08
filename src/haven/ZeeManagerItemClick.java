@@ -1,5 +1,6 @@
 package haven;
 
+import haven.res.gfx.invobjs.meat.Meat;
 import haven.res.ui.stackinv.ItemStack;
 
 import java.util.ArrayList;
@@ -269,6 +270,14 @@ public class ZeeManagerItemClick extends ZeeThread{
 
     static boolean isAnyHandEmpty() {
         return ZeeManagerItemClick.isLeftHandEmpty() || ZeeManagerItemClick.isRightHandEmpty();
+    }
+
+    public static String getMeatName(GItem item) {
+        GSprite gs = item.spr();
+        if (gs instanceof Meat){
+            return ((Meat)gs).name();
+        }
+        return "";
     }
 
     private void init(WItem wItem) {
@@ -1758,6 +1767,18 @@ public class ZeeManagerItemClick extends ZeeThread{
             e.printStackTrace();
         }
         return(null);
+    }
+
+    public static List<String> getItemInfoClasses(List<ItemInfo> info) {
+        List<String> ret = new ArrayList<>();
+        try {
+            for (ItemInfo v : info) {
+                ret.add(v.getClass().getName());
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return(ret);
     }
 
     public static Double getItemInfoQuality(List<ItemInfo> info) {

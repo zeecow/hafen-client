@@ -26,6 +26,8 @@
 
 package haven;
 
+import haven.res.gfx.invobjs.meat.Meat;
+
 import java.util.*;
 import java.awt.image.WritableRaster;
 import java.util.stream.Collectors;
@@ -325,6 +327,19 @@ public class Inventory extends Widget implements DTarget {
 			}
 		}
 		return items;
+	}
+
+	public List<WItem> getWItemsByMeatName(String meatName) {
+		return this.children(WItem.class)
+				.stream()
+				.filter( wItem -> {
+					GSprite spr = wItem.item.spr();
+					if(spr instanceof Meat && ((Meat)spr).name().contentEquals(meatName)){
+						return true;
+					}
+					return false;
+				})
+				.collect(Collectors.toList());
 	}
 
 	public List<WItem> getWItemsByNameEndsWith(String nameEndsWith) {
