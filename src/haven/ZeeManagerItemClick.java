@@ -1,6 +1,5 @@
 package haven;
 
-import haven.res.gfx.invobjs.meat.Meat;
 import haven.res.ui.stackinv.ItemStack;
 
 import java.util.ArrayList;
@@ -270,14 +269,6 @@ public class ZeeManagerItemClick extends ZeeThread{
 
     static boolean isAnyHandEmpty() {
         return ZeeManagerItemClick.isLeftHandEmpty() || ZeeManagerItemClick.isRightHandEmpty();
-    }
-
-    public static String getMeatName(GItem item) {
-        GSprite gs = item.spr();
-        if (gs instanceof Meat){
-            return ((Meat)gs).name();
-        }
-        return "";
     }
 
     private void init(WItem wItem) {
@@ -1725,9 +1716,9 @@ public class ZeeManagerItemClick extends ZeeThread{
                 }
             }
         }catch (Exception e){
-            e.printStackTrace();
+            println("getItemInfoName > "+e.getMessage());
         }
-        return(null);
+        return("");
     }
 
     public static int getItemInfoAmount(List<ItemInfo> info) {
@@ -1738,7 +1729,7 @@ public class ZeeManagerItemClick extends ZeeThread{
                 }
             }
         }catch (Exception e){
-            println(e.getMessage());
+            println("getItemInfoAmount > "+e.getMessage());
         }
         return 0;
     }

@@ -26,10 +26,8 @@
 
 package haven;
 
-import haven.res.gfx.invobjs.meat.Meat;
-
-import java.util.*;
 import java.awt.image.WritableRaster;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class Inventory extends Widget implements DTarget {
@@ -329,16 +327,16 @@ public class Inventory extends Widget implements DTarget {
 		return items;
 	}
 
-	public List<WItem> getWItemsByMeatName(String meatName) {
+	public List<WItem> getWItemsByInfoNameContains(String nameContains) {
 		return this.children(WItem.class)
 				.stream()
-				.filter( wItem -> {
-					GSprite spr = wItem.item.spr();
-					if(spr instanceof Meat && ((Meat)spr).name().contentEquals(meatName)){
-						return true;
-					}
-					return false;
-				})
+				.filter( wItem -> ZeeManagerItemClick.getItemInfoName(wItem.item.info()).toLowerCase().contains(nameContains.toLowerCase()))
+				.collect(Collectors.toList());
+	}
+	public List<WItem> getWItemsByInfoNameEquals(String nameEquals) {
+		return this.children(WItem.class)
+				.stream()
+				.filter( wItem -> ZeeManagerItemClick.getItemInfoName(wItem.item.info()).toLowerCase().contentEquals(nameEquals.toLowerCase()))
 				.collect(Collectors.toList());
 	}
 
