@@ -82,6 +82,8 @@ public class ZeeConsole {
             helpLines.add("======== misc ========");
             helpLines.add("   count       msg counting last cmd results");
             helpLines.add("   say []      text2speak parameter or last cmd results (requires LinuxFestival)");
+            helpLines.add("   reslocal    print local res names to terminal");
+            helpLines.add("   resmote     print remote res names to terminal");
         }
     }
 
@@ -202,6 +204,20 @@ public class ZeeConsole {
             ZeeConfig.addPlayerText("stackin");
             ret = stack();
             ZeeConfig.removePlayerText();
+        }
+        else if (cmd.contentEquals("reslocal")){
+            println("=======local cached=======");
+            for (Resource res : Resource.local().cached()) {
+                println(res.name);
+            }
+            ret = true;
+        }
+        else if (cmd.contentEquals("resmote")){
+            println("=======remote cached=======");
+            for (Resource res : Resource.remote().cached()) {
+                println(res.name);
+            }
+            ret = true;
         }
 
         /*
