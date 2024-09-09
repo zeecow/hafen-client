@@ -199,22 +199,28 @@ public class Inventory extends Widget implements DTarget {
 		}
 	}
 
-	private List<WItem> getSame(GItem item, boolean ascending, boolean sameQl) {
+	private List<WItem> getSame(GItem clickedItem, boolean ascending, boolean sameQl) {
 		List<WItem> items = new ArrayList<>();
 		try {
-			String name = item.res.get().name;
-			boolean isFish = ZeeConfig.isFish(name);
-			double ql = Inventory.getQuality(item);
-			WItem w;
+			double ql = sameQl ? Inventory.getQuality(clickedItem) : -1;
+			String clickedName = clickedItem.getres().name;
+			String clickedInfoName = ZeeManagerItemClick.getItemInfoName(clickedItem.info()).replace(", stack of","");
+			boolean isGemstone = clickedName.endsWith("/gemstone");
+			if (isGemstone)
+				clickedInfoName = clickedInfoName.replaceAll("^(\\S+\\s+){2}","");//simple gemstone name
+			boolean useInfoName = isGemstone || clickedName.endsWith("/meat");
+			if (useInfoName)
+				clickedName = clickedInfoName;
 			for (Widget wdg = lchild; wdg != null; wdg = wdg.prev) {
 				if (wdg.visible && wdg instanceof WItem) {
-					w = (WItem) wdg;
-					//consider all fish the same
-					if (isFish && ZeeConfig.isFish(w.item.res.get().name)) {
-						items.add(w);
-						continue;
+					WItem w = (WItem) wdg;
+					String wName = w.item.getres().name;
+					if(useInfoName) {
+						wName = ZeeManagerItemClick.getItemInfoName(w.item.info()).replace(", stack of", "");
+						if (isGemstone && w.item.getres().name.endsWith("/gemstone"))
+							wName = wName.replaceAll("^(\\S+\\s+){2}","");//simple gemstone name
 					}
-					if (w.item.res.get().name.contentEquals(name)) {
+					if ( wName.contentEquals(clickedName) ) {
 						if (!sameQl)
 							items.add(w);
 						else if (ql == Inventory.getQuality(w.item))
