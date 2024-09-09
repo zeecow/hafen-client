@@ -1563,7 +1563,7 @@ public class ZeeManagerGobClick extends ZeeThread{
         startRightClickZooming(gob, pc);
 
         // bugCollectionAuto label bug containers and wood pile
-        if (ZeeManagerCraft.bugColRecipeOpen){
+        if (ZeeManagerCraft.bugColRecipeOpen && !ZeeManagerCraft.bugColBusy){
             ZeeManagerCraft.bugColGobClicked(gob);
         }
 

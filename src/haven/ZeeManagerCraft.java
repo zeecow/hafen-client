@@ -70,9 +70,11 @@ public class ZeeManagerCraft extends ZeeThread{
      */
     static boolean bugColRecipeOpen, bugColBusy;
     static Button bugColAutoBtn;
+    static Gob bugColWoodPile;
+    static List<Gob> bugColContainers;
     static void bugColRecipeOpened(Window window) {
         bugColRecipeOpen = true;
-        bugColAutoBtn = new ZeeWindow.ZeeButton(UI.scale(85),"another 1"){
+        bugColAutoBtn = new ZeeWindow.ZeeButton(UI.scale(85),"auto"){
             public void wdgmsg(String msg, Object... args) {
                 if (msg.equals("activate")){
                     if (bugColBusy)
@@ -102,7 +104,7 @@ public class ZeeManagerCraft extends ZeeThread{
         // save bug names for auto craft
         java.util.List<WItem> bugs = ZeeConfig.getMainInventory().getItemsSelectedForCrafting();
         if (bugs.size() < 6){
-            ZeeConfig.msgError("requires 6 inventory bugs");
+            bugColExit("requires 6 inventory bugs");
             return;
         }
         bugColBugNames = bugs.stream().map(wItem1 -> wItem1.item.getres().name).collect(Collectors.toList());
@@ -117,10 +119,10 @@ public class ZeeManagerCraft extends ZeeThread{
             public void run() {
                 try{
                     bugColBusy = true;
-                    ZeeConfig.addPlayerText("Collecting");
+                    ZeeConfig.addPlayerText("debug");
 
                     //close any containers to use only inventory bugs
-                    java.util.List<Window> openContainerWindows = ZeeConfig.getContainersWindows();
+                    List<Window> openContainerWindows = ZeeConfig.getContainersWindows(false);
                     println("closing containers = "+openContainerWindows.size());
                     openContainerWindows.forEach(window -> {
                         window.reqdestroy();
@@ -129,73 +131,82 @@ public class ZeeManagerCraft extends ZeeThread{
                     openContainerWindows.clear();
                     sleep(PING_MS);
 
+                    do {
+                        prepareCancelClick();
+                        //get 6 bugs from containers
+                        int bugsAcquired = 0;
+                        for (Gob gobContainer : bugColContainers) {
 
-                    //TODO TEST THIS
-                    //get 6 bugs from containers
-                    int bugsAcquired = 0;
-                    for (Gob gobContainer : bugColContainers) {
+                            //open container
+                            ZeeManagerGobClick.gobClick(gobContainer, 3);
+                            prepareCancelClick();
+                            waitWindowOpened(gobContainer.getres().basename());//TODO more containers
+                            sleep(333);
 
-                        //open container
-                        ZeeManagerGobClick.gobClick(gobContainer,3);
-                        waitWindowOpened(gobContainer.getres().basename());//TODO more containers
-                        sleep(PING_MS);
+                            //search container bugs
+                            openContainerWindows = ZeeConfig.getContainersWindows(false);
+                            if (openContainerWindows.isEmpty()) {
+                                bugColExit("open containers not found");
+                                return;
+                            }
+                            Inventory invCont = openContainerWindows.get(0).getchild(Inventory.class);
+                            for (int i = bugsAcquired; i < bugColBugNames.size(); i++) {
+                                String bugName = bugColBugNames.get(i);
+                                List<WItem> bugsFound = invCont.getWItemsByNameContains(bugName);
+                                boolean waitSprite = false;
+                                do {
+                                    sleep(PING_MS);
+                                    try {
+                                        bugsFound.removeIf(wItem1 -> ZeeManagerItemClick.isStackByAmount(wItem1.item));
+                                    } catch (Loading loading) {
+                                        waitSprite = true;
+                                        continue;
+                                    }
+                                    waitSprite = false;
+                                } while (waitSprite);
+                                if (bugsFound.size() > 0) {
+                                    //transfer 1 bug to main inv and search next bugName
+                                    bugsFound.get(0).item.wdgmsg("transfer", Coord.z, UI.MOD_SHIFT);
+                                    sleep(PING_MS);
+                                    bugsAcquired++;
+                                }
+                            }
 
-                        //search container bugs
-                        openContainerWindows = ZeeConfig.getContainersWindows();
-                        if (openContainerWindows==null || openContainerWindows.size()==0){
-                            bugColExit("open containers not found");
+                            //6 bugs found, stop searching containers
+                            if (bugsAcquired == 6) {
+                                break;
+                            }
+
+                            //close container(s)
+                            openContainerWindows = ZeeConfig.getContainersWindows(false);
+                            openContainerWindows.forEach(window -> {
+                                window.reqdestroy();
+                                waitWindowClosed(window.cap);
+                            });
+                            openContainerWindows.clear();
+                            sleep(333);
+                        }
+
+                        // searched all containers && not enough bugs
+                        if (bugsAcquired < 6) {
+                            bugColExit("not enough bugs");
                             return;
                         }
-                        Inventory invCont = openContainerWindows.get(0).getchild(Inventory.class);
-                        for (int i=bugsAcquired; i<bugColBugNames.size(); i++) {
-                            String bugName = bugColBugNames.get(i);
-                            java.util.List<WItem> bugsFound = invCont.getWItemsByNameContains(bugName);
-                            boolean waitSprite = false;
-                            do {
-                                sleep(PING_MS);
-                                try {
-                                    bugsFound.removeIf(wItem1 -> ZeeManagerItemClick.isStackByAmount(wItem1.item));
-                                } catch (Loading loading) {
-                                    waitSprite = true;
-                                    continue;
-                                }
-                                waitSprite = false;
-                            }while(waitSprite);
-                            if (bugsFound.size() > 0){
-                                //transfer 1 bug to main inv and search next bugName
-                                bugsFound.get(0).item.wdgmsg("transfer",Coord.z,UI.MOD_SHIFT);
-                                sleep(PING_MS);
-                                bugsAcquired++;
-                            }
+
+                        //open wood pile
+                        ZeeManagerGobClick.gobClick(bugColWoodPile, 3);
+                        prepareCancelClick();
+                        waitWindowOpened("Stockpile");
+
+                        // click Craft btn
+                        ZeeConfig.getButtonNamed(ZeeConfig.getWindow("Bug Collection"), "Craft").click();
+                        sleep(150);
+                        if (!waitPlayerPoseNotInList(ZeeConfig.POSE_PLAYER_CRAFT)) {
+                            bugColExit("couldn't wait bug craft animation?");
+                            return;
                         }
 
-                        //6 bugs found, stop searching containers
-                        if (bugsAcquired == 6){
-                            break;
-                        }
-
-                        //close container(s)
-                        openContainerWindows = ZeeConfig.getContainersWindows();
-                        openContainerWindows.forEach(window -> {
-                            window.reqdestroy();
-                            waitWindowClosed(window.cap);
-                        });
-                        openContainerWindows.clear();
-                        sleep(PING_MS);
-                    }
-
-                    // searched all containers && not enough bugs
-                    if (bugsAcquired<6){
-                        bugColExit("not enough bugs");
-                        return;
-                    }
-
-                    //open wood pile
-                    ZeeManagerGobClick.gobClick(bugColWoodPile,3);
-                    waitWindowOpened("Stockpile");
-
-                    // click Craft btn
-                    ZeeConfig.getButtonNamed(ZeeConfig.getWindow("Bug Collection"),"Craft").click();
+                    }while(bugColBusy && !isCancelClick());
 
                 }catch (Exception e){
                     e.printStackTrace();
@@ -205,16 +216,6 @@ public class ZeeManagerCraft extends ZeeThread{
             }
         }.start();
     }
-    static void bugColExit(String msg){
-        if (!msg.isEmpty()) {
-            println("bugCol > "+msg);
-            ZeeConfig.msgError(msg);
-        }
-        bugColBusy = false;
-        ZeeConfig.removePlayerText();
-    }
-    static Gob bugColWoodPile;
-    static List<Gob> bugColContainers;
     public static void bugColGobClicked(Gob gob) {
         // bug container
         if (ZeeManagerGobClick.isGobCraftingContainer(gob.getres().name)){
@@ -230,15 +231,28 @@ public class ZeeManagerCraft extends ZeeThread{
             bugColWoodPile = gob;
         }
     }
-    public static void bugColWindowClosed() {
+    public static void bugColRecipeClosed() {
         bugColRecipeOpen = false;
-        if (bugColContainers!=null) {
-            bugColContainers.forEach(ZeeConfig::removeGobText);
-            bugColContainers.clear();
-        }
-        ZeeConfig.removeGobText(bugColWoodPile);
-        bugColWoodPile = null;
+        if (bugColBusy)
+            bugColExit("recipe closed");
     }
+    static void bugColExit(String msg){
+        if (bugColBusy) {
+            bugColBusy = false;
+            if (!msg.isEmpty()) {
+                println("bugCol > " + msg);
+                ZeeConfig.msgLow(msg);
+            }
+            ZeeConfig.removePlayerText();
+            if (bugColContainers != null) {
+                bugColContainers.forEach(ZeeConfig::removeGobText);
+                bugColContainers.clear();
+            }
+            ZeeConfig.removeGobText(bugColWoodPile);
+            bugColWoodPile = null;
+        }
+    }
+
 
 
     /*
@@ -509,7 +523,7 @@ public class ZeeManagerCraft extends ZeeThread{
     static void craftWindowClosed() {
         ZeeConfig.makeWindow = null;
         if(bugColRecipeOpen)
-            bugColWindowClosed();
+            bugColRecipeClosed();
         if(clothRecipeOpen)
             clothWindowClosed();
         if(ropeRecipeOpen)

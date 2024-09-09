@@ -42,7 +42,7 @@ public class ZeeResearch {
                 try{
                     // detected selected items
                     List<WItem> selectedItems = new ArrayList<WItem>();
-                    List<Window> windows = ZeeConfig.getContainersWindows();
+                    List<Window> windows = ZeeConfig.getContainersWindows(false);
                     Window invWindow = ZeeConfig.getWindow("Inventory");
                     if (invWindow!=null)
                         windows.add(invWindow);
@@ -462,7 +462,7 @@ public class ZeeResearch {
             public void wdgmsg(String msg, Object... args) {
                 if (msg.contentEquals("close")) {
                     inspectWaterActive = false;
-                    ZeeConfig.setCancelClick();
+                    ZeeConfig.simulateCancelClick();
                     this.reqdestroy();
                 }
             }

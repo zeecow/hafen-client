@@ -89,6 +89,7 @@ public class ZeeConfig {
     static final String POSE_PLAYER_CHIPPINGSTONE = "gfx/borka/chipping";//no pickaxe
     static final String POSE_PLAYER_CHOPBLOCK = "gfx/borka/choppan";
     static final String POSE_PLAYER_CHOPTREE = "gfx/borka/treechop";
+    static final String POSE_PLAYER_CRAFT = "gfx/borka/craftan";
     static final String POSE_PLAYER_DIGSHOVEL = "gfx/borka/shoveldig";
     static final String POSE_PLAYER_DIG = "gfx/borka/dig";
     static final String POSE_PLAYER_DRINK = "gfx/borka/drinkan";
@@ -1256,7 +1257,7 @@ public class ZeeConfig {
             }
             // bug collection
             else if(windowTitle.contentEquals("Bug Collection")) {
-                if (!ZeeManagerCraft.bugColRecipeOpen)
+                if (!ZeeManagerCraft.bugColRecipeOpen && !ZeeManagerCraft.bugColBusy)
                     ZeeManagerCraft.bugColRecipeOpened(window);
             }
             // cloths
@@ -1271,7 +1272,7 @@ public class ZeeConfig {
             }
             else{
                 if (ZeeManagerCraft.bugColRecipeOpen)
-                    ZeeManagerCraft.bugColWindowClosed();
+                    ZeeManagerCraft.bugColRecipeClosed();
                 else if (ZeeManagerCraft.clothRecipeOpen)
                     ZeeManagerCraft.clothWindowClosed();
                 else if (ZeeManagerCraft.ropeRecipeOpen)
@@ -2703,7 +2704,7 @@ public class ZeeConfig {
                 +"Urn,Pot,Strongbox,"
                 //misc
                 +"Knarr,Snekkja,Wagon,Table,Saddlebags,"
-                +"Furnace,Smelter,Desk,Trunk,Shed,Packrack,Stockpile,"
+                +"Furnace,Smelter,Desk,Trunk,Shed,Packrack,"
                 +"Tub,Compost Bin,Extraction Press,Rack,Herbalist Table,Frame,"
                 +"Chicken Coop,Rabbit Hutch,Archery Target,Oven,Steel crucible,"
                 +"Cauldron,Pane mold,Kiln,Old Trunk,Old Stump,Smoke shed,Finery Forge,"
@@ -2717,13 +2718,13 @@ public class ZeeConfig {
         return false;
     }
 
-    public static List<Window> getContainersWindows() {
+    public static List<Window> getContainersWindows(boolean considerStockpileContainer) {
         List<Window> ret = new ArrayList<>();
         if(gameUI==null)
             return ret;
         Set<Window> windows = gameUI.children(Window.class);
         for(Window w : windows) {
-            if( w.visible() && isWindowContainer(w) ){
+            if( w.visible() && (isWindowContainer(w) || (considerStockpileContainer && w.cap.contains("Stockpile")))){
                 ret.add(w);
             }
         }
@@ -2878,6 +2879,7 @@ public class ZeeConfig {
         }
 
         ZeeManagerFarmer.exitSeedFarmer();
+        ZeeManagerCraft.bugColExit("");
     }
 
     public static void clickOpenBelt() {
@@ -3530,16 +3532,16 @@ public class ZeeConfig {
         return gob==null || gameUI.ui.sess.glob.oc.getgob(gob.id)==null;
     }
 
-    static boolean isCancelClick() {
-        //cancel if clicked right/left button
-        return lastMapViewClickButton != 2;
-    }
-    static void setCancelClick() {
-        //cancel if clicked right/left button
-        lastMapViewClickButton = 1;
-    }
+    // called after gobClick/etc , so that user my cancel tasks by clicking ground
     static void prepareCancelClick() {
         ZeeConfig.lastMapViewClickButton = 2;
+    }
+    //consider task canceled if user clicked ground with right/left button
+    static boolean isCancelClick() {
+        return lastMapViewClickButton != 2;
+    }
+    static void simulateCancelClick() {
+        lastMapViewClickButton = 1;
     }
 
 

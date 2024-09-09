@@ -1125,7 +1125,7 @@ public class ZeeThread  extends Thread{
         return ZeeConfig.isCancelClick();
     }
     static void setCancelClick() {
-        ZeeConfig.setCancelClick();
+        ZeeConfig.simulateCancelClick();
     }
     static void prepareCancelClick() {
         ZeeConfig.prepareCancelClick();
