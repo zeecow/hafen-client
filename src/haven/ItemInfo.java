@@ -337,8 +337,12 @@ public abstract class ItemInfo {
 	}
 	if(l.tips.size() < 1)
 	    return(null);
-	//add help text "[shift]"
-	l.add(new AdHoc(l.tips.get(0).owner,"[shift]"));
+	// add "[shift for help]" to stack shorttip
+	if(l.tips.get(0).owner instanceof GItem) {
+		GItem gitem = (GItem) l.tips.get(0).owner;
+		if (ZeeManagerItemClick.isStackByContent(gitem))
+			l.add(new AdHoc(gitem, "[shift for help]"));
+	}
 	return(l.render());
     }
 

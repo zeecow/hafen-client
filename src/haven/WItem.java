@@ -79,6 +79,8 @@ public class WItem extends Widget implements DTarget {
     private ItemTip shorttip = null, longtip = null;
     private List<ItemInfo> ttinfo = null;
     public Object tooltip(Coord c, Widget prev) {
+	if (this instanceof ItemDrag)//no tooltip for holding item
+		return null;
 	double now = Utils.rtime();
 	if(prev == this) {
 	} else if(prev instanceof WItem) {
@@ -98,7 +100,8 @@ public class WItem extends Widget implements DTarget {
 		shorttip = longtip = null;
 		ttinfo = info;
 	    }
-	    if(!ui.modshift){ //if(now - hoverstart < 1.0) {
+		// shift required for stack longtt, and for skipping shorttip delay
+	    if(!ui.modshift && (ZeeManagerItemClick.isStackByContent(item) || now - hoverstart < 1.0)){
 		if(shorttip == null)
 		    shorttip = new ShortTip(info);
 		return(shorttip);
