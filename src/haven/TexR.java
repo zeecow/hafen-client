@@ -26,14 +26,19 @@
 
 package haven;
 
-import java.util.*;
-import java.awt.Graphics;
-import java.awt.image.*;
-import java.io.*;
-import java.security.*;
-import haven.Defer.Future;
-import haven.render.*;
-import static haven.render.Texture.Filter.*;
+import haven.render.Texture;
+
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.awt.image.Raster;
+import java.awt.image.WritableRaster;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import static haven.render.Texture.Filter.LINEAR;
+import static haven.render.Texture.Filter.NEAREST;
 
 /* XXX: This should be an interface, but changing that would break resource code. */
 public abstract class TexR extends Resource.Layer implements Resource.IDLayer<Integer> {
