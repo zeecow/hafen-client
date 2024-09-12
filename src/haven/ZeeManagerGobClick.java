@@ -2303,13 +2303,13 @@ public class ZeeManagerGobClick extends ZeeThread{
                 opts = new ArrayList<String>();
                 if (isShallowWater)
                     opts.add("dig");
+                if (ZeeManagerItemClick.isCoracleEquipped() && !ZeeConfig.isPlayerMountingHorse()) {
+                    opts.add("embark coracle");
+                }
                 opts.add("fish");
                 if (isShallowWater)
                     opts.add("inspect clay");
                 opts.add("inspect water");
-                if (ZeeManagerItemClick.isCoracleEquipped() && !ZeeConfig.isPlayerMountingHorse()) {
-                    opts.add("embark coracle");
-                }
                 menu = new ZeeFlowerMenu(coordMc, opts.toArray(String[]::new));
             }
             else if(ZeeConfig.getTileResName(coordMc).contains("tiles/beach")) {
@@ -2334,29 +2334,38 @@ public class ZeeManagerGobClick extends ZeeThread{
         }
         else if(gob.tags.contains(Gob.Tag.PLAYER_MAIN)) {
             opts = new ArrayList<String>();
-            opts.add(ZeeFlowerMenu.STRPETAL_SWITCHCHAR);
-            opts.add(ZeeFlowerMenu.STRPETAL_CLEARGOBTEXTSPOINTERS);
             opts.add(ZeeFlowerMenu.STRPETAL_AUTODISCOVERY);
+            opts.add(ZeeFlowerMenu.STRPETAL_CLEARGOBTEXTSPOINTERS);
+            opts.add(ZeeFlowerMenu.STRPETAL_SWITCHCHAR);
             //opts.add(ZeeFlowerMenu.STRPETAL_TASKBUILDER);
             if (ZeeConfig.isCaveTile(ZeeConfig.getPlayerTileName()))
                 opts.add(ZeeFlowerMenu.STRPETAL_TILEMONITOR);
             menu = new ZeeFlowerMenu(gob, opts.toArray(String[]::new));
         }
         else if (isGobTamedAnimalOrAurochEtc(gobName) && !isGobDeadOrKO(gob)) {
-            menu = new ZeeFlowerMenu(gob, ZeeFlowerMenu.STRPETAL_TOGGLE_CATTLEROSTER, ZeeFlowerMenu.STRPETAL_MEMORIZEAREANIMALS);
+            menu = new ZeeFlowerMenu(gob,
+                    ZeeFlowerMenu.STRPETAL_MEMORIZEAREANIMALS,
+                    ZeeFlowerMenu.STRPETAL_TOGGLE_CATTLEROSTER);
         }
         else if (isGobButchable(gobName) && isGobDeadOrKO(gob)) {
-            menu = new ZeeFlowerMenu(gob, ZeeFlowerMenu.STRPETAL_AUTOBUTCH_BIGDEADANIMAL, ZeeFlowerMenu.STRPETAL_LIFTUPGOB);
+            menu = new ZeeFlowerMenu(gob,
+                    ZeeFlowerMenu.STRPETAL_AUTOBUTCH_BIGDEADANIMAL,
+                    ZeeFlowerMenu.STRPETAL_LIFTUPGOB);
         }
         else if(gobName.endsWith("terobjs/oven")){
             menu = new ZeeFlowerMenu(gob, ZeeFlowerMenu.STRPETAL_ADD4BRANCH);
         }
         else if(gobName.endsWith("terobjs/smelter")){
-            menu = new ZeeFlowerMenu(gob,ZeeFlowerMenu.STRPETAL_ADD9COAL, ZeeFlowerMenu.STRPETAL_ADD12COAL);
+            menu = new ZeeFlowerMenu(gob,
+                    ZeeFlowerMenu.STRPETAL_ADD9COAL,
+                    ZeeFlowerMenu.STRPETAL_ADD12COAL);
         }
         // trellis plant
         else if (isGobTrellisPlant(gobName)){
-            menu = new ZeeFlowerMenu(gob,ZeeFlowerMenu.STRPETAL_REMOVEPLANT, ZeeFlowerMenu.STRPETAL_REMOVEALLPLANTS,ZeeFlowerMenu.STRPETAL_CURSORHARVEST);
+            menu = new ZeeFlowerMenu( gob,
+                    ZeeFlowerMenu.STRPETAL_CURSORHARVEST,
+                    ZeeFlowerMenu.STRPETAL_REMOVEPLANT,
+                    ZeeFlowerMenu.STRPETAL_REMOVEALLPLANTS);
         }
         // tree
         else if (isGobTree(gobName)){
@@ -2370,34 +2379,38 @@ public class ZeeManagerGobClick extends ZeeThread{
         // boulder
         else if (isGobBoulder(gobName)){
             opts = new ArrayList<String>();
-            opts.add(ZeeFlowerMenu.STRPETAL_LIFTUPGOB);
             opts.add(ZeeFlowerMenu.STRPETAL_INSPECT);
+            opts.add(ZeeFlowerMenu.STRPETAL_LIFTUPGOB);
             menu = new ZeeFlowerMenu(gob, opts.toArray(String[]::new));
         }
         // harvested pumpkin
         else if(gobName.endsWith("/items/pumpkin")){
-            menu = new ZeeFlowerMenu(gob, "Slice all pumpkins", "Show piler window");
+            menu = new ZeeFlowerMenu(gob,
+                    "Show piler window",
+                    "Slice all pumpkins");
         }
         // crop
         else if (isGobCrop(gobName)) {
             opts = new ArrayList<String>();
-            opts.add(ZeeFlowerMenu.STRPETAL_SEEDFARMER);
-            opts.add(ZeeFlowerMenu.STRPETAL_CURSORHARVEST);
             if (ZeeManagerFarmer.isCropStageHarvestable(gob))
                 opts.add(ZeeFlowerMenu.STRPETAL_FARMAWAY);
+            opts.add(ZeeFlowerMenu.STRPETAL_SEEDFARMER);
             menu = new ZeeFlowerMenu(gob, opts.toArray(String[]::new));
         }
         else if (isBarrelTakeAll(gob)) {
-            menu = new ZeeFlowerMenu(gob,ZeeFlowerMenu.STRPETAL_BARRELTAKEALL, ZeeFlowerMenu.STRPETAL_LIFTUPGOB);
+            menu = new ZeeFlowerMenu( gob,
+                    ZeeFlowerMenu.STRPETAL_LIFTUPGOB,
+                    ZeeFlowerMenu.STRPETAL_BARRELTAKEALL
+            );
         }
         // tree logs
         else if (isGobTreeLog(ZeeManagerGobClick.gobName)) {
             opts = new ArrayList<String>();
-            opts.add(ZeeFlowerMenu.STRPETAL_LIFTUPGOB);
-            opts.add(ZeeFlowerMenu.STRPETAL_TREELOGANIZE);
             if (ZeeManagerItemClick.isItemInHandSlot("bonesaw")) {
                 opts.add(ZeeFlowerMenu.STRPETAL_DESTROY_TREELOGS);
             }
+            opts.add(ZeeFlowerMenu.STRPETAL_LIFTUPGOB);
+            opts.add(ZeeFlowerMenu.STRPETAL_TREELOGANIZE);
             menu = new ZeeFlowerMenu(gob, opts.toArray(String[]::new));
         }
         else if (gobName.endsWith("/well")) {
@@ -2414,10 +2427,9 @@ public class ZeeManagerGobClick extends ZeeThread{
         }
         else if(gobName.endsWith("terobjs/crucible")){
             menu = new ZeeFlowerMenu(gob,
-                "Craft nuggify",
-                "Craft denuggify",
-                "Craft bronzebar"
-            );
+                "Craft bronzebar",
+                    "Craft denuggify",
+                    "Craft nuggify");
         }
         else if (gobName.endsWith("/churn")) {
             menu = new ZeeFlowerMenu( gob,
@@ -2430,9 +2442,8 @@ public class ZeeManagerGobClick extends ZeeThread{
             menu = new ZeeFlowerMenu( gob,"Craft rope" );
         }
         else if (gobName.endsWith("/swheel")) {
-            menu = new ZeeFlowerMenu( gob,
-                    ZeeFlowerMenu.STRPETAL_LIFTUPGOB,
-                    "Craft yarn"
+            menu = new ZeeFlowerMenu( gob, "Craft yarn",
+                    ZeeFlowerMenu.STRPETAL_LIFTUPGOB
             );
         }
         else if (gobName.endsWith("/loom")) {
@@ -2440,6 +2451,7 @@ public class ZeeManagerGobClick extends ZeeThread{
                     ZeeFlowerMenu.STRPETAL_LIFTUPGOB,
                     "Craft hempcloth",
                     "Craft linencloth",
+                    "Craft silkcloth",
                     "Craft woolcloth"
             );
         }

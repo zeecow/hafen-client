@@ -1,9 +1,10 @@
 package haven;
 
 import java.awt.*;
-import java.awt.event.KeyEvent;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class ZeeFishing {
@@ -196,17 +197,14 @@ public class ZeeFishing {
 
         // alert fish name
         wdg = win.add(new Label("Alert on fish: "),0,y);
-        wdg = win.add(textEntryFishAlert= new TextEntry(UI.scale(100),""+ fishNameAlert){
-            public void changed(ReadLine buf) {
-                super.changed(buf);
+        wdg = win.add(textEntryFishAlert= new ZeeWindow.ZeeTextEntry(UI.scale(100),""+ fishNameAlert){
+            void onEnterPressed(String text) {
                 if (buf.empty())
                     fishNameAlert = "";
                 else
                     fishNameAlert = buf.line();
             }
         },ZeeWindow.posRight(wdg,2,y));
-        textEntryFishAlert.setcanfocus(false);
-        textEntryFishAlert.setfocustab(false);
 
 
         // auto fish checkbox
@@ -216,42 +214,19 @@ public class ZeeFishing {
                 autoFish = val;
                 if (textEntryAutoFish!=null) {
                     textEntryAutoFish.show(autoFish);
-                    textEntryAutoFish.setcanfocus(!autoFish);
                 }
             }
         }, ZeeWindow.posRight(wdg,7,y));
         //autofish textentry
-        wdg = win.add(textEntryAutoFish = new TextEntry(UI.scale(50),""+autoFishAbove){
-            public boolean keydown(KeyEvent e) {
-                if(!Character.isDigit(e.getKeyChar()) && !ZeeConfig.isControlKey(e.getKeyCode()))
-                    return false;
-                return super.keydown(e);
-            }
-            public void changed(ReadLine buf) {
-                if (buf.empty()) {
-                    super.changed(buf);
-                    //println("empty");
-                    return;
-                }
+        wdg = win.add(textEntryAutoFish = new ZeeWindow.ZeeTextEntry(UI.scale(50),""+autoFishAbove){
+            void onEnterPressed(String text) {
                 try {
-                    int num = Integer.parseInt(buf.line());
-                    if (num < 0)
-                        this.settext("0");
-                    else if (num > 100)
-                        this.settext("100");
-                    else {
-                        autoFishAbove = num;
-                        //println("autofish set to "+num);
-                        buf.setline(""+num);
-                        super.changed(buf);
-                    }
-                }catch (Exception e){
-                    println("changed exception > "+e.getMessage());
+                    autoFishAbove = Integer.parseInt(buf.line());
+                }catch (Exception ex){
+                    ZeeConfig.msgError("not a number ?"+text);
                 }
             }
         },ZeeWindow.posRight(wdg, 2, y));
-        textEntryAutoFish.setcanfocus(false);
-        textEntryAutoFish.setfocustab(false);
         textEntryAutoFish.show(autoFish);
 
 

@@ -1,6 +1,5 @@
 package haven;
 
-import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -771,18 +770,14 @@ public class ZeeManagerFarmer extends ZeeThread{
 
             // ql sort barrels textEntry
             wdg = windowManager.add(new Label("Ql sorting barrels: "), 0, 30);
-            textEntryQlSortBarrels = new TextEntry(UI.scale(45),""){
-                public boolean keydown(KeyEvent e) {
-                    if(!Character.isDigit(e.getKeyChar()) && !ZeeConfig.isControlKey(e.getKeyCode()))
-                        return false;
-                    return super.keydown(e);
-                }
-                public void changed(ReadLine buf) {
-                    if(!buf.line().isEmpty()) {
+            textEntryQlSortBarrels = new ZeeWindow.ZeeTextEntry(UI.scale(45),""){
+                void onEnterPressed(String text) {
+                    try {
                         farmerTxtQlSortingBarrels = Integer.parseInt(buf.line());
                         Utils.setprefi("farmerTxtQlSortingBarrels", ZeeManagerFarmer.farmerTxtQlSortingBarrels);
+                    }catch (Exception ex){
+                        ZeeConfig.msgError("not a number ?"+text);
                     }
-                    super.changed(buf);
                 }
             };
             wdg = windowManager.add(ZeeManagerFarmer.textEntryQlSortBarrels, 95, 30-5);
@@ -791,18 +786,14 @@ public class ZeeManagerFarmer extends ZeeThread{
 
             // barrel tiles textEntry
             wdg = windowManager.add(new Label("Max tiles to barrel: "), 0, 55);
-            textEntryTilesBarrel = new TextEntry(UI.scale(45),""+(int)(MAX_BARREL_DIST/MCache.tilesz.x)){
-                public boolean keydown(KeyEvent e) {
-                    if(!Character.isDigit(e.getKeyChar()) && !ZeeConfig.isControlKey(e.getKeyCode()))
-                        return false;
-                    return super.keydown(e);
-                }
-                public void changed(ReadLine buf) {
-                    if(!buf.line().isEmpty()) {
+            textEntryTilesBarrel = new ZeeWindow.ZeeTextEntry(UI.scale(45),""+(int)(MAX_BARREL_DIST/MCache.tilesz.x)){
+                void onEnterPressed(String text) {
+                    try {
                         farmerTxtTilesBarrel = Integer.parseInt(buf.line());
                         Utils.setprefi("farmerTxtTilesBarrel", farmerTxtTilesBarrel);
+                    }catch (Exception ex){
+                        ZeeConfig.msgError("not a number ?"+text);
                     }
-                    super.changed(buf);
                 }
             };
             wdg = windowManager.add(textEntryTilesBarrel, 95, 55-5);
@@ -964,7 +955,7 @@ public class ZeeManagerFarmer extends ZeeThread{
                         if (nextCrop==null)
                             break;
                         double dist = ZeeConfig.distanceToPlayer(nextCrop);
-                        if (dist > farmAwayTilesInt)
+                        if (dist > farmAwayTilesInt * TILE_SIZE)
                             break;
                     }while(farmAwayOn && !isCancelClick() && nextCrop!=null);
 
@@ -995,19 +986,22 @@ public class ZeeManagerFarmer extends ZeeThread{
                         else if(farmAwayEquipSacksNonPumpkin && !subprods.isEmpty())
                             ZeeManagerItemClick.equipTwoSacks();
                         //collect subprods
+                        prepareCancelClick();
                         for (String subprod : subprods) {
-                            Gob closestSubprod = ZeeConfig.getClosestGobByNameEnds("gfx/terobjs/items"+subprod);
-                            if (closestSubprod==null)
-                                continue;
-                            // click closest item
-                            ZeeManagerGobClick.gobClick(closestSubprod,3,UI.MOD_SHIFT); // pick all
-                            prepareCancelClick();
-                            // wait first item acquired
-                            waitInvItemOrCancelClick();
-                            if (isCancelClick())
-                                break;
-                            // wait other items
-                            waitPlayerIdleLinMove();
+                            Gob closestSubprod = ZeeConfig.getClosestGobByNameEnds("gfx/terobjs/items" + subprod);
+                            while(closestSubprod!=null && !isCancelClick()) {
+                                // shift+click closest item
+                                ZeeManagerGobClick.gobClick(closestSubprod, 3, UI.MOD_SHIFT);
+                                prepareCancelClick();
+                                // wait first item acquired
+                                waitInvItemOrCancelClick();
+                                if (isCancelClick())
+                                    break;
+                                // wait other items
+                                waitPlayerIdleLinMove();
+                                // check for distant subroducts missed
+                                closestSubprod = ZeeConfig.getClosestGobByNameEnds("gfx/terobjs/items" + subprod);
+                            }
                         }
                     }
                 } catch (Exception e) {

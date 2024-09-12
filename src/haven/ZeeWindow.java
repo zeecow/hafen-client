@@ -32,7 +32,9 @@ public class ZeeWindow extends Window {
     static abstract class ZeeTextEntry extends TextEntry{
         public ZeeTextEntry(int w, String deftext) {
             super(w, deftext, false);
+            this.settip("scroll values, press enter");
         }
+        abstract void onEnterPressed(String text);
         public boolean mouseup(Coord c, int button) {
             hasfocus = true;
             return super.mouseup(c, button);
@@ -49,6 +51,7 @@ public class ZeeWindow extends Window {
                 return false;
             if (e.getKeyCode()==KeyEvent.VK_ENTER) {
                 if (!buf.line().isEmpty()) {
+                    ZeeManagerItemClick.playFeedbackSound();
                     this.onEnterPressed(buf.line());
                 }
                 this.hasfocus = false;
@@ -58,7 +61,29 @@ public class ZeeWindow extends Window {
                 return false;
             return super.keydown(e);
         }
-        abstract void onEnterPressed(String text);
+        public boolean mousewheel(Coord c, int amount) {
+            if (text().chars().allMatch(Character::isDigit) ) {
+                settext(getTextEntryNextScrollNumber(text(), amount, 0, Integer.MAX_VALUE));
+                ZeeManagerItemClick.playFeedbackSound();
+                if (!hasfocus) {
+                    //ZeeConfig.println("set focus");
+                    setfocus(this);
+                }
+            }
+            return true;
+        }
+        static String getTextEntryNextScrollNumber(String text, int amount, int min, int max) {
+            int num = Integer.parseInt(text);
+            if (amount < 0)
+                num++;
+            else if (amount > 0)
+                num--;
+            if (num < min)
+                num = min;
+            else if(num > max)
+                num = max;
+            return String.valueOf(num);
+        }
     }
 
     static class ZeeButton extends Button{

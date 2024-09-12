@@ -16,7 +16,7 @@ import static haven.render.sl.Type.*;
 
 /* >spr: ISmoke */
 /* >rlink: ISmoke */
-@haven.FromResource(name = "gfx/fx/ismoke", version = 108)
+@haven.FromResource(name = "gfx/fx/ismoke", version = 109)
 public class ISmoke extends Sprite implements Rendered, Sprite.CDel, TickList.TickNode, TickList.Ticking {
     static final double agestep = 0.1, maxstep = 0.25;
     static final VertexArray.Layout fmt =
@@ -32,8 +32,8 @@ public class ISmoke extends Sprite implements Rendered, Sprite.CDel, TickList.Ti
     final Color col;
     final float sz, den, fadepow, initzv, life, srad;
     final List<RenderTree.Slot> slots = new ArrayList<>(1);
-    final Gob gob = (owner instanceof Gob) ? (Gob)owner : owner.context(Gob.class);
-    boolean spawn = !ZeeConfig.hideFxSmoke;
+    final Gob gob = (owner instanceof Gob) ? (Gob)owner : owner.fcontext(Gob.class, false);
+    boolean spawn = !ZeeConfig.hideFxSmoke;;
 
     public static Resource ctxres(Owner owner) {
 	Gob gob = owner.context(Gob.class);
@@ -41,7 +41,7 @@ public class ISmoke extends Sprite implements Rendered, Sprite.CDel, TickList.Ti
 	    throw(new RuntimeException("no context resource for owner " + owner));
 	Drawable d = gob.getattr(Drawable.class);
 	if(d == null)
-	    throw(new RuntimeException("no drawable on object " +gob));
+	    throw(new RuntimeException("no drawable on object " + gob));
 	return(d.getres());
     }
 
@@ -66,7 +66,6 @@ public class ISmoke extends Sprite implements Rendered, Sprite.CDel, TickList.Ti
 
     public ISmoke(Owner owner, Resource res, Object... args) {
 	super(owner, res);
-	new Throwable().printStackTrace();
 	int a = 0;
 	String fl = (String)args[a++];
 	mat = ((fl.indexOf('o') >= 0) ? res : Resource.classres(ISmoke.class)).layer(Material.Res.class, (Integer)args[a++]).get();
@@ -86,21 +85,31 @@ public class ISmoke extends Sprite implements Rendered, Sprite.CDel, TickList.Ti
 	ZeeManagerGobClick.checkSmoke(gob,"1");
     }
 
-    float de = 0;
+    /* By Knuth's algorithm */
+    public int prandoom(float mean) {
+	float L = (float)Math.exp(-mean), p = 1.0f;
+	int k = -1;
+	while(p > L) {
+	    k++;
+	    p *= rnd.nextFloat();
+	}
+	return(k);
+    }
+
     public boolean tick(double ddt) {
 	return(!spawn && bollar.isEmpty());
     }
     public void autotick(double ddt) {
 	float dt = (float)Math.min(ddt, maxstep);
-	de += dt;
-	while(spawn && (de > 0.1)) {
-	    de -= 0.1;
-	    int n = (int)((1.0f + (rnd.nextFloat() * 0.5f)) * den);
-	    for(int i = 0; i < n; i++)
+	if(spawn) {
+	    for(int i = 0, n = prandoom(dt * den * 10); i < n; i++)
 		bollar.add(new Boll(Coord3f.o.sadd(0, rnd.nextFloat() * (float)Math.PI * 2, (float)Math.sqrt(rnd.nextFloat()) * srad)));
 	}
-	Coord3f nv = Environ.get(gob.glob).wind().mul(0.4f);
-	nv = nv.rot(Coord3f.zu, (float)gob.a);
+	Coord3f nv = Coord3f.o;
+	if(gob != null) {
+	    nv = Environ.get(gob.glob).wind().mul(0.4f);
+	    nv = nv.rot(Coord3f.zu, (float)gob.a);
+	}
 	for(Iterator<Boll> i = bollar.iterator(); i.hasNext();) {
 	    Boll boll = i.next();
 	    if(boll.tick(dt, nv))
@@ -114,14 +123,14 @@ public class ISmoke extends Sprite implements Rendered, Sprite.CDel, TickList.Ti
     }
 
     class Boll {
-	static final float sr = 0.3f, sv = 0.3f;
+	static final float sv = 0.3f;
 	float x, y, z;
 	float xv, yv, zv;
 	float t = 0;
 
 	Boll(Coord3f pos) {
-	    x = pos.x + (float)(rnd.nextGaussian() * sr);
-	    y = pos.y + (float)(rnd.nextGaussian() * sr);
+	    x = pos.x;
+	    y = pos.y;
 	    z = pos.z;
 	    xv = (float)rnd.nextGaussian() * sv;
 	    yv = (float)rnd.nextGaussian() * sv;
