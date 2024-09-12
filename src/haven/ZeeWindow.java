@@ -1,6 +1,7 @@
 package haven;
 
 import java.awt.*;
+import java.awt.event.KeyEvent;
 
 public class ZeeWindow extends Window {
 
@@ -28,8 +29,39 @@ public class ZeeWindow extends Window {
         }
     }
 
-    static class ZeeButton extends Button{
+    static abstract class ZeeTextEntry extends TextEntry{
+        public ZeeTextEntry(int w, String deftext) {
+            super(w, deftext, false);
+        }
+        public boolean mouseup(Coord c, int button) {
+            hasfocus = true;
+            return super.mouseup(c, button);
+        }
+        public boolean keydown(KeyEvent e) {
+            if(!hasfocus)
+                return false;
+            if (ZeeConfig.isControlKey(e.getKeyCode()))
+                return false;
+            return super.keydown(e);
+        }
+        public boolean keyup(KeyEvent e) {
+            if (!hasfocus)
+                return false;
+            if (e.getKeyCode()==KeyEvent.VK_ENTER) {
+                if (!buf.line().isEmpty()) {
+                    this.onEnterPressed(buf.line());
+                }
+                this.hasfocus = false;
+                return super.keydown(e);
+            }
+            if (!ZeeConfig.isControlKey(e.getKeyCode()))
+                return false;
+            return super.keydown(e);
+        }
+        abstract void onEnterPressed(String text);
+    }
 
+    static class ZeeButton extends Button{
         public static final String TEXT_ORGANIZEWINDOWS = "↔";
         //"◀" "⊲" "◁" "ᐊ"
         public static final String TEXT_AUTOHIDEWINDOW = "ᐊ";
@@ -37,23 +69,19 @@ public class ZeeWindow extends Window {
         public static final String TEXT_CLOSE = "x";
         public static final int BUTTON_SIZE = 20;
         String buttonText;
-
         public ZeeButton(String title) {
             super(10*title.length(),title);
             this.buttonText = title;
         }
-
         public ZeeButton(int width, String title) {
             super(width,title);
             this.buttonText = title;
         }
-
         public ZeeButton(int width, String title, String tooltip) {
             super(width,title);
             this.buttonText = title;
             this.settip(tooltip);
         }
-
         @Override
         public void wdgmsg(String msg, Object... args) {
             String windowName = this.getparent(Window.class).cap;
@@ -104,7 +132,6 @@ public class ZeeWindow extends Window {
                     super.wdgmsg(msg,args);
             }
         }
-
         private void organizeDuplicateWindows(String windowName) {
 
             Window[] wins = ZeeConfig.getWindows(windowName).toArray(new Window[0]);

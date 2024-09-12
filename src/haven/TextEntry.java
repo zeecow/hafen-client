@@ -28,7 +28,6 @@ package haven;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
-import java.awt.image.BufferedImage;
 
 public class TextEntry extends Widget implements ReadLine.Owner {
     public static final Color defcol = new Color(255, 205, 109), dirtycol = new Color(255, 232, 209);
@@ -144,6 +143,12 @@ public class TextEntry extends Widget implements ReadLine.Owner {
 	rsettext(deftext);
 	setcanfocus(true);
     }
+
+	public TextEntry(int w, String deftext, boolean focus) {
+		super(new Coord(w, mext.sz().y));
+		rsettext(deftext);
+		setcanfocus(focus);
+	}
 
     protected void changed() {
 	dirty = true;

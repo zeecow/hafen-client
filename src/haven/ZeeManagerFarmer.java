@@ -1,7 +1,10 @@
 package haven;
 
 import java.awt.event.KeyEvent;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class ZeeManagerFarmer extends ZeeThread{
@@ -851,6 +854,7 @@ public class ZeeManagerFarmer extends ZeeThread{
     private static boolean farmAwayEquipSacksPumpkin = Utils.getprefb("farmAwayEquipSacksPumpkin",true);
     private static boolean farmAwayEquipSacksNonPumpkin = Utils.getprefb("farmAwayEquipSacksNonPumpkin",false);
     private static boolean farmAwayOn = false;
+    private static int farmAwayTilesInt = Utils.getprefi("farmAwayTilesInt",20);
     public static void farmAway(Gob crop) {
 
         //create window
@@ -870,7 +874,22 @@ public class ZeeManagerFarmer extends ZeeThread{
                 }, ZeeConfig.gameUI.sz.div(2)
         );
         int x=0, y=3, padY=2;
-        Widget widget = farmAwayWin.add(new CheckBox("drop"){
+        Widget widget = farmAwayWin.add(new Label("Tiles dist"), x, y);
+        TextEntry textEntryMaxTiles = new ZeeWindow.ZeeTextEntry(UI.scale(45), "" + farmAwayTilesInt) {
+            void onEnterPressed(String text) {
+                try {
+                    farmAwayTilesInt = Integer.parseInt(text);
+                    Utils.setprefi("farmAwayTilesInt", farmAwayTilesInt);
+                }catch (Exception ex){
+                    ZeeConfig.msgError("not a number ? "+text);
+                }
+            }
+        };
+        x += widget.sz.x + 5;
+        widget = farmAwayWin.add(textEntryMaxTiles, x, y);
+        x = 0;
+        y += widget.sz.y + padY;
+        widget = farmAwayWin.add(new CheckBox("drop"){
             {a = farmAwayDrop;}
             public void changed(boolean val) {
                 super.changed(val);
@@ -945,7 +964,7 @@ public class ZeeManagerFarmer extends ZeeThread{
                         if (nextCrop==null)
                             break;
                         double dist = ZeeConfig.distanceToPlayer(nextCrop);
-                        if (dist > TILE_SIZE*7)
+                        if (dist > farmAwayTilesInt)
                             break;
                     }while(farmAwayOn && !isCancelClick() && nextCrop!=null);
 
@@ -978,6 +997,8 @@ public class ZeeManagerFarmer extends ZeeThread{
                         //collect subprods
                         for (String subprod : subprods) {
                             Gob closestSubprod = ZeeConfig.getClosestGobByNameEnds("gfx/terobjs/items"+subprod);
+                            if (closestSubprod==null)
+                                continue;
                             // click closest item
                             ZeeManagerGobClick.gobClick(closestSubprod,3,UI.MOD_SHIFT); // pick all
                             prepareCancelClick();
