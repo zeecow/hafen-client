@@ -988,9 +988,11 @@ public class MapWnd extends Window implements Console.Directory {
 	@Override
 	public void reqclose() {
 		// esc key compacts map instead of closing it
-		if (!compact())
+		if (!compact()) {
 			compact(true);
-		else
+			Utils.setprefb("compact-map", true);
+		}else {
 			super.reqclose();
+		}
 	}
 }
