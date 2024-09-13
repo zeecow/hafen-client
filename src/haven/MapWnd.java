@@ -984,4 +984,13 @@ public class MapWnd extends Window implements Console.Directory {
     public Map<String, Console.Command> findcmds() {
 	return(cmdmap);
     }
+
+	@Override
+	public void reqclose() {
+		// esc key compacts map instead of closing it
+		if (!compact())
+			compact(true);
+		else
+			super.reqclose();
+	}
 }
