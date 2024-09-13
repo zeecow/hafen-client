@@ -666,17 +666,13 @@ public class ZeeManagerMiner extends ZeeThread{
 
             //wishlist search box
             tilemonLabelFindTile = tilemonWindow.add(new Label("Find"),0,33);
-            TextEntry te = tilemonWindow.add(new TextEntry(UI.scale(80),""){
-                public void changed(ReadLine buf) {
-                    if(!buf.line().isEmpty()) {
-                        String names = buf.line();
-                        if (names.isBlank()) {
-                            tilemonSearchNames = new String[]{};
-                        }else {
-                            tilemonSearchNames = names.split(",");
-                        }
+            TextEntry te = tilemonWindow.add(new ZeeWindow.ZeeTextEntry(UI.scale(80),""){
+                void onEnterPressed(String text) {
+                    if (text.isBlank()) {
+                        tilemonSearchNames = new String[]{};
+                    }else {
+                        tilemonSearchNames = text.split(",");
                     }
-                    super.changed(buf);
                 }
             },tilemonLabelFindTile.c.x+tilemonLabelFindTile.sz.x+5,30);
             te.settip("tile name(s), comma separated");
