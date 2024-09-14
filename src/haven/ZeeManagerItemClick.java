@@ -964,15 +964,10 @@ public class ZeeManagerItemClick extends ZeeThread{
     public static boolean sameNameAndQuality(WItem w1, WItem w2) {
         boolean ret = false;
         if (w1.item.getres().name.contentEquals(w2.item.getres().name)){
-            if (getItemQuality(w1) == getItemQuality(w2))
+            if (w1.item.getInfoQuality().doubleValue() == w2.item.getInfoQuality().doubleValue())
                 ret = true;
         }
         return ret;
-    }
-
-
-    public static double getItemQuality(WItem w) {
-        return ZeeConfig.getItemQuality(w);
     }
 
     public static Inventory getItemInventory(WItem wItem) {

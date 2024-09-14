@@ -2848,6 +2848,7 @@ public class ZeeConfig {
         ZeeManagerStockpile.selAreaPile = false;
         ZeeManagerCraft.windowFeasting = null;
         ZeeManagerMiner.tunnelHelperWindow = null;
+        ZeeManagerMiner.tilemonSearchNames = null;
         ZeeManagerGobClick.barterFindText = null;
         ZeeManagerGobClick.barterSearchOpen = false;
         ZeeManagerGobClick.remountClosestHorse = false;
@@ -4153,14 +4154,6 @@ public class ZeeConfig {
             }
             ZeeThread.clickButtonUntilMsgOrHoldingItem(button,"buying");
         }
-    }
-
-    static double getItemQuality(WItem item) {
-       return getItemQuality(item.item);
-    }
-
-    static double getItemQuality(GItem item) {
-        return Inventory.getQuality(item);
     }
 
     static List<String> getPlayerPoses() {

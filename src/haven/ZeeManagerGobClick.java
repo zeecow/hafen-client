@@ -1382,7 +1382,7 @@ public class ZeeManagerGobClick extends ZeeThread{
                     ZeeConfig.clickRemoveCursor();
 
                     //speak ql
-                    int ql = (int) ZeeConfig.getItemQuality(gItem);
+                    int ql = gItem.getInfoQualityInt();
                     ZeeSynth.textToSpeakLinuxFestival("sand "+ql);
 
                     //drop item
@@ -1439,7 +1439,7 @@ public class ZeeManagerGobClick extends ZeeThread{
                     ZeeConfig.clickRemoveCursor();
 
                     //speak ql
-                    int ql = (int) ZeeConfig.getItemQuality(gItem);
+                    int ql = gItem.getInfoQualityInt();
                     ZeeSynth.textToSpeakLinuxFestival("clay "+ql);
 
                     //drop clay
@@ -1520,7 +1520,7 @@ public class ZeeManagerGobClick extends ZeeThread{
                         Inventory inv = ZeeConfig.getMainInventory();
                         ZeeConfig.addGobText(
                             ZeeConfig.lastMapViewClickGob,
-                            Inventory.getQualityInt(ZeeConfig.lastInvGItemCreated).toString()
+                            ""+ZeeConfig.lastInvGItemCreated.getInfoQualityInt()
                         );
                     }
                     else{

@@ -533,7 +533,7 @@ public class ZeeManagerFarmer extends ZeeThread{
                 }
                 ZeeConfig.addGobText(lastBarrel, getSeedNameAndQl());
                 if(!ZeeManagerItemClick.pickUpItem(wItem)){
-                    exitSeedFarmer("couldn't pickup wItem ql "+Inventory.getQualityInt(wItem.item));
+                    exitSeedFarmer("couldn't pickup wItem ql "+wItem.item.getInfoQualityInt());
                     return;
                 }
                 sleep(PING_MS);//lag?
@@ -638,10 +638,10 @@ public class ZeeManagerFarmer extends ZeeThread{
             return -1;
 
         //find highest ql
-        int highestQl = Inventory.getQualityInt(seedItems.get(0).item);
+        int highestQl = seedItems.get(0).item.getInfoQualityInt();
         int q;
         for (WItem seedItem : seedItems) {
-            q = Inventory.getQualityInt(seedItem.item);
+            q = seedItem.item.getInfoQualityInt();
             if ( q > highestQl) {
                 highestQl = q;
             }
@@ -650,7 +650,7 @@ public class ZeeManagerFarmer extends ZeeThread{
         //drop lower qls
         droppedSeeds = 0;
         for (WItem seedItem : seedItems) {
-            if (Inventory.getQualityInt(seedItem.item) < highestQl) {
+            if (seedItem.item.getInfoQualityInt() < highestQl) {
                 seedItem.item.wdgmsg("drop", Coord.z);
                 droppedSeeds++;
             }
@@ -668,7 +668,7 @@ public class ZeeManagerFarmer extends ZeeThread{
         Map<Integer,Integer> mapQlQuantity = new HashMap<>();
         int ql;
         for (int i = 0; i < seedItems.size(); i++) {
-            ql = Inventory.getQualityInt(seedItems.get(i).item);
+            ql = seedItems.get(i).item.getInfoQualityInt();
             if (!mapQlQuantity.containsKey(ql)){
                 mapQlQuantity.put(ql,1);//first item of "ql"
             }else{
@@ -689,7 +689,7 @@ public class ZeeManagerFarmer extends ZeeThread{
         //drop less common ones, keep most common only
         droppedSeeds = 0;
         for (WItem seedItem : seedItems) {
-            if (Inventory.getQualityInt(seedItem.item) != qlKeeper) {
+            if (seedItem.item.getInfoQualityInt() != qlKeeper) {
                 seedItem.item.wdgmsg("drop", Coord.z);
                 droppedSeeds++;
             }
@@ -712,7 +712,7 @@ public class ZeeManagerFarmer extends ZeeThread{
     public static String getSeedNameAndQl() {
         return gItemSeedBasename.replace("seed-","")
                 + " "
-                + Inventory.getQualityInt(gItem);
+                + gItem.getInfoQualityInt();
     }
 
     // gfx/terobjs/barrel-flax

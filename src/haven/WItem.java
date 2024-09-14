@@ -101,7 +101,7 @@ public class WItem extends Widget implements DTarget {
 		ttinfo = info;
 	    }
 		// shift required for stack longtt, and for skipping shorttip delay
-	    if(!ui.modshift && (ZeeManagerItemClick.isStackByContent(item) || now - hoverstart < 1.0)){
+	    if(!ui.modshift && item.isStackByContent() || now - hoverstart < 1.0){
 		if(shorttip == null)
 		    shorttip = new ShortTip(info);
 		return(shorttip);

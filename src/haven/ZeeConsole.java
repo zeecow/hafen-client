@@ -327,11 +327,11 @@ public class ZeeConsole {
                     List<WItem> namedItems = inv.getWItemsByNameEndsWith(name);
                     for (int i = 0; i < namedItems.size()-1; i++) {
                         // skip stacks
-                        if (ZeeManagerItemClick.isStackByContent(namedItems.get(i).item))
+                        if (namedItems.get(i).item.isStackByContent())
                             continue;
                         for (int j = i+1; j < namedItems.size(); j++) {
                             // skip stacks
-                            if (ZeeManagerItemClick.isStackByContent(namedItems.get(j).item))
+                            if (namedItems.get(j).item.isStackByContent())
                                 continue;
                             // pickup item i
                             if (!ZeeManagerItemClick.pickUpItem(namedItems.get(i))) {
@@ -351,11 +351,11 @@ public class ZeeConsole {
                     List<WItem> meatItems = inv.getWItemsByInfoNameContains(meatName);
                     for (int i = 0; i < meatItems.size(); i++) {
                         // skip stacks
-                        if (ZeeManagerItemClick.isStackByContent(meatItems.get(i).item))
+                        if (meatItems.get(i).item.isStackByContent())
                             continue;
                         for (int j = i+1; j < meatItems.size(); j++) {
                             // skip stacks
-                            if (ZeeManagerItemClick.isStackByContent(meatItems.get(j).item))
+                            if (meatItems.get(j).item.isStackByContent())
                                 continue;
                             // pickup item i
                             if (!ZeeManagerItemClick.pickUpItem(meatItems.get(i))) {
@@ -413,11 +413,11 @@ public class ZeeConsole {
                     List<WItem> namedItems = inv.getWItemsByNameEndsWith(name);
                     for (int i = 0; i < namedItems.size()-1; i++) {
                         // skip stacks
-                        if (ZeeManagerItemClick.isStackByContent(namedItems.get(i).item))
+                        if (namedItems.get(i).item.isStackByContent())
                             continue;
                         for (int j = i+1; j < namedItems.size(); j++) {
                             // skip stacks
-                            if (ZeeManagerItemClick.isStackByContent(namedItems.get(j).item))
+                            if (namedItems.get(j).item.isStackByContent())
                                 continue;
                             // pickup item i
                             if (!ZeeManagerItemClick.pickUpItem(namedItems.get(i))) {
@@ -437,11 +437,11 @@ public class ZeeConsole {
                     List<WItem> meatItems = inv.getWItemsByInfoNameEquals(meatName);
                     for (int i = 0; i < meatItems.size(); i++) {
                         // skip stacks
-                        if (ZeeManagerItemClick.isStackByContent(meatItems.get(i).item))
+                        if (meatItems.get(i).item.isStackByContent())
                             continue;
                         for (int j = i+1; j < meatItems.size(); j++) {
                             // skip stacks
-                            if (ZeeManagerItemClick.isStackByContent(meatItems.get(j).item))
+                            if (meatItems.get(j).item.isStackByContent())
                                 continue;
                             // pickup item i
                             if (!ZeeManagerItemClick.pickUpItem(meatItems.get(i))) {

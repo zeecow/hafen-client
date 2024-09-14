@@ -340,7 +340,7 @@ public abstract class ItemInfo {
 	// add "[shift for help]" to stack shorttip
 	if(l.tips.get(0).owner instanceof GItem) {
 		GItem gitem = (GItem) l.tips.get(0).owner;
-		if (ZeeManagerItemClick.isStackByContent(gitem))
+		if (gitem.isStackByContent())
 			l.add(new AdHoc(gitem, "[shift for help]"));
 	}
 	return(l.render());

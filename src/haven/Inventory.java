@@ -43,8 +43,8 @@ public class Inventory extends Widget implements DTarget {
 		public int compare(WItem o1, WItem o2) {
 			double q1=-1, q2=-1;
 			try {
-				q1 = Inventory.getQuality(o1.item);
-				q2 = Inventory.getQuality(o2.item);
+				q1 = o1.item.getInfoQuality();
+				q2 = o2.item.getInfoQuality();
 				return Double.compare(q1, q2);
 			}catch(Exception e){
 				System.out.println("Inventory.ITEM_COMPARATOR_ASC > "+q1+" "+q2);
@@ -202,7 +202,7 @@ public class Inventory extends Widget implements DTarget {
 	private List<WItem> getSame(GItem clickedItem, boolean ascending, boolean sameQl) {
 		List<WItem> items = new ArrayList<>();
 		try {
-			double ql = sameQl ? Inventory.getQuality(clickedItem) : -1;
+			double ql = sameQl ? clickedItem.getInfoQuality() : -1;
 			String clickedName = clickedItem.getres().name;
 			String clickedInfoName = ZeeManagerItemClick.getItemInfoName(clickedItem.info()).replace(", stack of","");
 			boolean isGemstone = clickedName.endsWith("/gemstone");
@@ -223,7 +223,7 @@ public class Inventory extends Widget implements DTarget {
 					if ( wName.contentEquals(clickedName) ) {
 						if (!sameQl)
 							items.add(w);
-						else if (ql == Inventory.getQuality(w.item))
+						else if (ql == w.item.getInfoQuality())
 							items.add(w);
 					}
 				}
@@ -281,8 +281,8 @@ public class Inventory extends Widget implements DTarget {
 				Integer count = map.get(wdgname);
 				if (count==null)
 					count = 1;
-				else if (ZeeManagerItemClick.isStackByAmount(gItem))
-					count += ZeeManagerItemClick.getItemInfoAmount(gItem.info());
+				else if (gItem.isStackByContent() && gItem.getInfoName().contains("stack of"))
+					count += gItem.getInfoAmount();
 				else
 					count++;
 				map.put(wdgname, count);
@@ -505,11 +505,11 @@ public class Inventory extends Widget implements DTarget {
 
 
 	static Double getAvgStackQuality(GItem stackPlaceholder){
-		if (stackPlaceholder.contents==null)//not a stack
-			return getQuality(stackPlaceholder);
+		if (!stackPlaceholder.isStackByContent())
+			return stackPlaceholder.getInfoQuality();
 		List<Double> listQl = new ArrayList<>();
 		for (WItem wItem : stackPlaceholder.contents.children(WItem.class)) {
-			Double ql = ZeeManagerItemClick.getItemInfoQuality(wItem.item.info());
+			Double ql = wItem.item.getInfoQuality();
 			listQl.add(ql);
 		}
 		if (listQl.isEmpty()) {
@@ -517,22 +517,6 @@ public class Inventory extends Widget implements DTarget {
 		}
 		double total = listQl.stream().mapToDouble(aDouble -> aDouble).sum();
 		return total/listQl.size();
-	}
-
-	static Double getQuality(GItem item) {
-		try {
-			if (item.contents!=null){
-				return getAvgStackQuality(item);
-			}
-			return ZeeManagerItemClick.getItemInfoQuality(item.info());
-		} catch (Loading e) {
-			//ZeeConfig.println("Inventory.getQuality > "+e.getMessage());
-		}
-		return (double) -1;
-	}
-
-	public static Integer getQualityInt(GItem item) {
-		return (int) Math.round(getQuality(item));
 	}
 
 	public boolean isMainInv() {

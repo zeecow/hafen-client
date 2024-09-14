@@ -9,7 +9,7 @@ public class ZeeManagerMiner extends ZeeThread{
 
     private static final double MAX_DIST_BOULDER = 25;
 
-    static boolean isBuildAndDrinkBackup, restoreBuildAndDrink;
+    //static boolean isBuildAndDrinkBackup, restoreBuildAndDrink;
     public static long miningAreaSelectedMs = -1;
     static boolean useOreForColumns = false;
     public static long lastDropItemMs = 0;
@@ -151,9 +151,9 @@ public class ZeeManagerMiner extends ZeeThread{
     private static void tunnelHelperShowWindow() {
 
         // backup buildAndDrink
-        restoreBuildAndDrink = true;
-        isBuildAndDrinkBackup = ZeeConfig.isBuildAndDrink;
-        ZeeConfig.isBuildAndDrink = false;
+//        restoreBuildAndDrink = true;
+//        isBuildAndDrinkBackup = ZeeConfig.isBuildAndDrink;
+//        ZeeConfig.isBuildAndDrink = false;
 
         if (tunnelHelperWindow == null) {
             Widget wdg;
@@ -250,7 +250,7 @@ public class ZeeManagerMiner extends ZeeThread{
             case TUNNELHELPER_STAGE5_BUILDCOL:
                 name = "build col"; break;
         }
-        println("stage " +tunnelHelperStage+ " to "+stage+" ("+name+")");
+        //println("stage " +tunnelHelperStage+ " to "+stage+" ("+name+")");
         tunnelHelperStage = stage;
         tunnelHelperLabelStatus.settext("stage "+stage+" - "+name);
         if (stage > TUNNELHELPER_STAGE0_IDLE)
@@ -262,10 +262,10 @@ public class ZeeManagerMiner extends ZeeThread{
         mining = false;
         tunneling = false;
         tunnelHelperEndCoord = tunnelHelperEndCoordPrev = null;
-        if (restoreBuildAndDrink) {
-            ZeeConfig.isBuildAndDrink = isBuildAndDrinkBackup;
-            restoreBuildAndDrink = false;
-        }
+//        if (restoreBuildAndDrink) {
+//            ZeeConfig.isBuildAndDrink = isBuildAndDrinkBackup;
+//            restoreBuildAndDrink = false;
+//        }
         tunnelHelperSetStage(TUNNELHELPER_STAGE0_IDLE);
         ZeeConfig.removePlayerText();
         if (tunnelHelperWindow !=null)
@@ -293,7 +293,7 @@ public class ZeeManagerMiner extends ZeeThread{
         new ZeeThread(){
             public void run() {
                 buildBtn.click();
-                waitNotPlayerPose(ZeeConfig.POSE_PLAYER_BUILD);//waitPlayerPoseNotInList(ZeeConfig.POSE_PLAYER_BUILD);
+                waitPlayerPoseNotInList(ZeeConfig.POSE_PLAYER_BUILD,ZeeConfig.POSE_PLAYER_DRINK);
                 ZeeConfig.removePlayerText();
 
                 //back to saved coord
@@ -363,7 +363,7 @@ public class ZeeManagerMiner extends ZeeThread{
     }
 
 
-    public static boolean pickStones(int wantedStones) throws Exception{
+    public static boolean pickStones(int numStonesWanted) throws Exception{
         List<Gob> terobjs;
         Gob closestStone;
         Inventory inv = ZeeConfig.getMainInventory();
@@ -376,18 +376,22 @@ public class ZeeManagerMiner extends ZeeThread{
 
         //check if inventory stones are enough
         int invStones = pickStonesInvCount();
-        if (invStones >= wantedStones)
+        if (invStones >= numStonesWanted) {
+            println("invStones >= wantedStones");
             return true;
+        }
 
         // if not enough stones, equip sack(s)
-        if(inv.getNumberOfFreeSlots() < wantedStones){
+        int stackSlotsGuess = numStonesWanted/2;
+        int freeSlotsRequired = ZeeConfig.autoStack ? stackSlotsGuess : numStonesWanted;
+        if(inv.getNumberOfFreeSlots() < freeSlotsRequired){
             WItem sack = ZeeManagerItemClick.getSackFromBelt();//1st sack
             if (sack!=null) {
                 Thread t = new ZeeManagerItemClick(sack);
                 t.start();
                 t.join();//wait equip sack
                 sack = ZeeManagerItemClick.getSackFromBelt();//2nd sack
-                if(inv.getNumberOfFreeSlots()<wantedStones && sack!=null){
+                if(inv.getNumberOfFreeSlots()<numStonesWanted && sack!=null){
                     t = new ZeeManagerItemClick(sack);
                     t.start();
                     t.join();//wait equip 2nd sack
@@ -400,7 +404,7 @@ public class ZeeManagerMiner extends ZeeThread{
             ZeeConfig.addPlayerText("Picking stone");
 
         //loop pickup stone types until total reached
-        while (mining  &&  invStones<wantedStones && inv.getNumberOfFreeSlots()!=0) {
+        while (mining  &&  invStones<numStonesWanted && inv.getNumberOfFreeSlots()!=0) {
             terobjs = ZeeConfig.findGobsByNameContains("gfx/terobjs/items/");
             terobjs.removeIf(item -> {//filter column stone types
                 String name = item.getres().basename();
@@ -417,14 +421,23 @@ public class ZeeManagerMiner extends ZeeThread{
                 println("stones too far away");
                 return false;
             }
-            //println("clicking closestStone "+closestStone.getres().basename());
+
+            // start collecting current stone type
+            println("picking "+closestStone.getres().basename());
             ZeeManagerGobClick.gobClick(closestStone,3,UI.MOD_SHIFT);//pick all
-            if(!waitInvIdleMs(500)){
-                return false;
-            }
-            //invStones += inv.countItemsByName(closestStone.getres().basename());
-            invStones = pickStonesInvCount();
-            //println("loop > invStones "+invStones);
+
+            // wait current stone type
+            long invIdleMs = 500;
+            boolean isInvIdle;
+            do{
+                sleep(555);
+                invStones = pickStonesInvCount();
+                if (invStones>=numStonesWanted || inv.getNumberOfFreeSlots()==0)
+                    break;
+                isInvIdle = (now() - ZeeConfig.lastInvGItemCreatedMs) > invIdleMs;
+                if (isInvIdle && !ZeeConfig.isPlayerDrinkingOrLinMoving())
+                    break;
+            }while(mining);
         }
 
         // drop if holding stone
@@ -440,7 +453,7 @@ public class ZeeManagerMiner extends ZeeThread{
             ZeeConfig.removePlayerText();
 
         //println("got "+invStones+" stones ,  enough="+(invStones >= wantedStones) +" , invfull="+ (inv.getNumberOfFreeSlots()==0));
-        return invStones >= wantedStones || inv.getNumberOfFreeSlots()==0;
+        return invStones >= numStonesWanted || inv.getNumberOfFreeSlots()==0;
     }
 
     private static int pickStonesInvCount() {
@@ -455,6 +468,7 @@ public class ZeeManagerMiner extends ZeeThread{
             else if (ZeeConfig.mineablesStone.contains(basename))
                 ret += entry.getValue();
         }
+        //println("pickStonesInvCount > "+ret);
         return ret;
     }
 
@@ -668,8 +682,8 @@ public class ZeeManagerMiner extends ZeeThread{
             tilemonLabelFindTile = tilemonWindow.add(new Label("Find"),0,33);
             TextEntry te = tilemonWindow.add(new ZeeWindow.ZeeTextEntry(UI.scale(80),""){
                 void onEnterPressed(String text) {
-                    if (text.isBlank()) {
-                        tilemonSearchNames = new String[]{};
+                    if (text.strip().isBlank()) {
+                        tilemonSearchNames = null;
                     }else {
                         tilemonSearchNames = text.split(",");
                     }
@@ -734,7 +748,7 @@ public class ZeeManagerMiner extends ZeeThread{
             basename = tileName.replaceAll("gfx/tiles/rocks/","");
             label = new Label(basename+"   "+ mapTileresCount.get(tileName));
             // find list
-            if (tilemonSearchNames.length>0 && List.of(tilemonSearchNames).contains(basename)){
+            if (tilemonSearchNames!=null && tilemonSearchNames.length>0 && List.of(tilemonSearchNames).contains(basename)){
                 label.setcolor(Color.green);
                 label.settext(label.texts + "  (found)");
                 // 5min limit, TODO better way
@@ -877,11 +891,11 @@ public class ZeeManagerMiner extends ZeeThread{
             && !isRegularOre(basename) && !ZeeConfig.mineablesCurios.contains(basename))
             return;
         try {
-            Integer newQl = Inventory.getQualityInt(gItem);
+            Integer newQl = gItem.getInfoQualityInt();
             Integer oldQl = mapMiningLogNameQl.get(basename);
             if (oldQl == null || newQl > oldQl) {
                 mapMiningLogNameQl.put(basename, newQl);
-                println("miningQl(" + mapMiningLogNameQl.size() + ") > " + getSortedMiningLog().toString());
+                //println("miningQl(" + mapMiningLogNameQl.size() + ") > " + getSortedMiningLog().toString());
                 // highest ql
                 if (highestQl < newQl){
                     highestQl = newQl;
