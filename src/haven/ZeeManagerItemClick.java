@@ -1425,7 +1425,7 @@ public class ZeeManagerItemClick extends ZeeThread{
         return isItemButchingTool(wItem.item.getres().name);
     }
     public static boolean isItemButchingTool(String itemName){
-        String endlist = "woodsmansaxe,axe-m,butcherscleaver,tinkersthrowingaxe,stoneaxe,fyrdsword,hirdsword,bronzesword,b12axe,cutblade";
+        String endlist = "woodsmansaxe,axe-m,butcherscleaver,tinkersthrowingaxe,stoneaxe,fyrdsword,hirdsword,bronzesword,b12axe,cutblade,shears";
         String[] arr = endlist.split(",");
         for (int i = 0; i < arr.length; i++) {
             if (itemName.endsWith(arr[i]))
