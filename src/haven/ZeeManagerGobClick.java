@@ -1144,8 +1144,7 @@ public class ZeeManagerGobClick extends ZeeThread{
         MapView.Plob plob = ZeeManagerStockpile.lastPlob;
         String pileName = plob.getres().name;
 
-        if(pileName.endsWith("stockpile-wblock") && ZeeManagerStockpile.lastTreelogChopped!=null)
-        {
+        if(pileName.endsWith("stockpile-wblock") && ZeeManagerStockpile.lastTreelogChopped!=null) {
             Coord2d pileCoord = new Coord2d(plob.rc.x, plob.rc.y);
             ZeeManagerGobClick.gobPlace(plob,0);
             if(waitPlayerIdlePose()) {
@@ -1159,8 +1158,7 @@ public class ZeeManagerGobClick extends ZeeThread{
                 println("place and autopile > failed waiting idle pose?");
             }
         }
-        else if(pileName.endsWith("stockpile-board") && ZeeManagerStockpile.lastTreelogSawed!=null)
-        {
+        else if(pileName.endsWith("stockpile-board") && ZeeManagerStockpile.lastTreelogSawed!=null) {
             Coord2d pileCoord = new Coord2d(plob.rc.x, plob.rc.y);
             ZeeManagerGobClick.gobPlace(plob,0);
             if(waitPlayerIdlePose()) {
@@ -1169,6 +1167,20 @@ public class ZeeManagerGobClick extends ZeeThread{
                     println("place and autopile > new pile undecided");
                 }else {
                     ZeeManagerStockpile.pileBoardsFromTreelog(newPile);
+                }
+            }else{
+                println("place and autopile > failed waiting idle pose?");
+            }
+        }
+        else if(pileName.endsWith("stockpile-stone") && ZeeManagerStockpile.lastBoulderChipped!=null) {
+            Coord2d pileCoord = new Coord2d(plob.rc.x, plob.rc.y);
+            ZeeManagerGobClick.gobPlace(plob,0);
+            if(waitPlayerIdlePose()) {
+                Gob newPile = ZeeConfig.findGobByNameAndCoord("stockpile-stone", pileCoord);
+                if (newPile==null){
+                    println("place and autopile > new pile undecided");
+                }else {
+                    ZeeManagerStockpile.pileStonesFromBoulder(ZeeManagerStockpile.lastBoulderChipped,newPile);
                 }
             }else{
                 println("place and autopile > failed waiting idle pose?");

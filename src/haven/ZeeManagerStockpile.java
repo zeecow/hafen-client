@@ -1440,6 +1440,80 @@ public class ZeeManagerStockpile extends ZeeThread{
         }.start();
     }
 
+    static void pileStonesFromBoulder(Gob gobBoulder, Gob stonePile){
+        new ZeeThread(){
+            public void run() {
+                try {
+                    try {
+                        Inventory inv = ZeeConfig.getMainInventory();
+                        prepareCancelClick();
+                        ZeeConfig.addPlayerText("pilan");
+                        do {
+                            ZeeConfig.stopMovingEscKey();
+                            String stoneName = ZeeConfig.getRegexGroup(gobBoulder.getres().name,"bumlings/(\\D+)\\d$",1);
+                            // pickup inv stone (if player was holding item other method would be called)
+                            if (ZeeManagerItemClick.pickUpInvItem(inv, stoneName)) {
+                                // pile stone
+                                ZeeManagerGobClick.itemActGob(stonePile, UI.MOD_SHIFT);
+                                //wait piling
+                                if (waitNotHoldingItem()) {
+                                    if (gobBoulder == null ) {
+                                        println("pilan stone > boulder null");
+                                        break;
+                                    }
+                                    sleep(500);//wait transfer
+                                    // pile full
+                                    if(inv.countItemsByNameContains(stoneName) > 0){
+                                        println("pilan stone > pile full");
+                                        break;
+                                    }
+                                    // chip stone
+                                    if (!ZeeManagerGobClick.clickGobPetal(gobBoulder, "Chip stone")) {
+                                        println("pilan stone > done");
+                                        break;
+                                    }
+                                    // wait start sawing board
+                                    if (!waitAnyPlayerPoseFromList(ZeeConfig.POSE_PLAYER_CHIPPINGSTONE,ZeeConfig.POSE_PLAYER_PICK)){
+                                        println("pilan stone > couldn't chip stone?");
+                                        break;
+                                    }
+                                    // wait inventory full
+                                    if(waitPlayerIdleOrHoldingItem()){
+                                        // pile holding item
+                                        if (ZeeConfig.isPlayerHoldingItem()){
+                                            ZeeManagerGobClick.itemActGob(stonePile,0);
+                                            waitNotHoldingItem();
+                                        }
+                                    }
+                                }
+                                else{
+                                    println("pilan stone > pile full, player didnt move");
+                                    break;
+                                }
+                            } else {
+                                println("pilan stone > couldnt get stone from inv, trying again");
+                                if (!ZeeManagerGobClick.clickGobPetal(gobBoulder, "Chip stone")) {
+                                    println("pilan stones > done");
+                                    break;
+                                }
+                                GItem item = waitInvItemOrCancelClick();
+                                if (item!=null && (item.getres().name.contentEquals(stoneName) || item.getres().name.endsWith("catgold"))){
+                                    continue;
+                                }
+                                break;
+                            }
+                        }while(!ZeeConfig.isCancelClick());
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
+                    ZeeConfig.removePlayerText();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }.start();
+    }
+
     static void pileBoardsFromTreelog(Gob existingPile) {
         new ZeeThread(){
             public void run() {

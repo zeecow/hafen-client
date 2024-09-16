@@ -310,40 +310,6 @@ public class ZeeThread  extends Thread{
         return waitPlayerPoseNotInList(ZeeConfig.arrayPlayerActivePoses);
     }
 
-    public static boolean waitPlayerPoseNotContains(String ... forbiddenPoseNameContains) {
-        //println(">waitPlayerPoseNotContains");
-        List<String> currentPoses;
-        boolean exit = false;
-        try{
-            prepareCancelClick();
-            do{
-                sleep(PING_MS*2);
-                exit = isCancelClick();
-                if(exit) {
-                    //println("    canceled by click");
-                    break;
-                }
-                currentPoses = ZeeConfig.getPlayerPoses();
-                //println("   "+playerPoses);
-                exit = true;
-                for (int i = 0; i < forbiddenPoseNameContains.length; i++) {
-                    for (String currentPose : currentPoses) {
-                        //println("      "+forbiddenPoseNameContains[i]);
-                        if (currentPose.contains(forbiddenPoseNameContains[i])){//if contains pose...
-                            //println("         break");
-                            exit = false;
-                            break;//... break, loop and sleep again
-                        }
-                    }
-                }
-            }while(!exit);//ZeeConfig.isPlayerMoving() );
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-        //println("waitPlayerPoseNotContains  exit="+exit + "  cancel="+isCancelClick());
-        return exit;
-    }
-
     public static boolean waitPlayerPoseNotInList(String ... forbiddenPoses) {
         //println(">waitPlayerPoseNotInList");
         List<String> currentPoses;
@@ -430,6 +396,22 @@ public class ZeeThread  extends Thread{
         }
         //println("waitNotPlayerPose ret "+(!poses.contains(poseName))+" , "+poseName);
         return !poses.contains(poseName);
+    }
+
+    static boolean waitAnyPlayerPoseFromList(String ... listAnyPose){
+        return waitAnyGobPoseFromList(ZeeConfig.getPlayerGob(),listAnyPose);
+    }
+
+    static boolean waitAnyGobPoseFromList(Gob gob, String ... listAnyPose) {
+        try{
+            prepareCancelClick();
+            do{
+                sleep(PING_MS*2);
+            } while (!ZeeConfig.gobHasAnyPose(gob,listAnyPose) && !ZeeConfig.isCancelClick());
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return ZeeConfig.gobHasAnyPose(gob,listAnyPose);
     }
 
     static boolean waitGobPose(Gob gob, String poseName) {
