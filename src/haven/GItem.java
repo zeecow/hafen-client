@@ -574,13 +574,30 @@ public class GItem extends AWidget implements ItemInfo.SpriteOwner, GSprite.Owne
 		}
 		return "";
 	}
-	Double getInfoQuality() {
+	double getInfoQuality() {
+		if (this.isStackByContent()){
+			return this.getAvgStackQuality();
+		}
 		return ZeeManagerItemClick.getItemInfoQuality(this.info());
 	}
-	Integer getInfoQualityInt() {
+	double getAvgStackQuality(){
+		if (!this.isStackByContent())
+			return this.getInfoQuality();
+		List<Double> listQl = new ArrayList<>();
+		for (WItem wItem : this.contents.children(WItem.class)) {
+			Double ql = wItem.item.getInfoQuality();
+			listQl.add(ql);
+		}
+		if (listQl.isEmpty()) {
+			return -1;
+		}
+		double total = listQl.stream().mapToDouble(aDouble -> aDouble).sum();
+		return total/listQl.size();
+	}
+	int getInfoQualityInt() {
 		return (int) Math.round(this.getInfoQuality());
 	}
-	Integer getInfoAmount() {
+	int getInfoAmount() {
 		return ZeeManagerItemClick.getItemInfoAmount(this.info());
 	}
 	ItemInfo getInfoByClass(Class lass) {

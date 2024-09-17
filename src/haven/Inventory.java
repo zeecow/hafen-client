@@ -38,7 +38,7 @@ public class Inventory extends Widget implements DTarget {
     public Coord isz;
     public boolean[] sqmask = null;
 	Map<GItem, WItem> wmap = new HashMap<GItem, WItem>();
-	public static final Comparator<WItem> ITEM_COMPARATOR_ASC = new Comparator<WItem>() {
+	static final Comparator<WItem> ITEM_COMPARATOR_ASC = new Comparator<WItem>() {
 		@Override
 		public int compare(WItem o1, WItem o2) {
 			double q1=-1, q2=-1;
@@ -52,7 +52,7 @@ public class Inventory extends Widget implements DTarget {
 			return 0;
 		}
 	};
-	public static final Comparator<WItem> ITEM_COMPARATOR_DESC = new Comparator<WItem>() {
+	static final Comparator<WItem> ITEM_COMPARATOR_DESC = new Comparator<WItem>() {
 		@Override
 		public int compare(WItem o1, WItem o2) {
 			return ITEM_COMPARATOR_ASC.compare(o2, o1);
@@ -501,22 +501,6 @@ public class Inventory extends Widget implements DTarget {
 		Coord itemCoord = ZeeManagerItemClick.getWItemCoord(item);
 		// haven.GItem@65523a95 ; drop ; [(28, 28), -1]
 		item.item.wdgmsg("drop",itemCoord,-1);
-	}
-
-
-	static Double getAvgStackQuality(GItem stackPlaceholder){
-		if (!stackPlaceholder.isStackByContent())
-			return stackPlaceholder.getInfoQuality();
-		List<Double> listQl = new ArrayList<>();
-		for (WItem wItem : stackPlaceholder.contents.children(WItem.class)) {
-			Double ql = wItem.item.getInfoQuality();
-			listQl.add(ql);
-		}
-		if (listQl.isEmpty()) {
-			return (double) -1;
-		}
-		double total = listQl.stream().mapToDouble(aDouble -> aDouble).sum();
-		return total/listQl.size();
 	}
 
 	public boolean isMainInv() {
