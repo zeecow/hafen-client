@@ -341,6 +341,13 @@ public class ZeeConsole {
                             // stack all on item j
                             ZeeManagerItemClick.itemAct(namedItems.get(j), UI.MOD_CTRL_SHIFT);
                             Thread.sleep(250);
+                            // item not stackable? return to container
+                            if (ZeeConfig.isPlayerHoldingItem()){
+                                if(!ZeeManagerItemClick.dropHoldingItemToInv(inv)) {
+                                    println("couldnt return non-stackable to inv?");
+                                    return false;
+                                }
+                            }
                             // next item name
                             i = j = namedItems.size() + 1;
                         }

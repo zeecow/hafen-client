@@ -1275,6 +1275,7 @@ public class ZeeManagerItemClick extends ZeeThread{
             return false;
         try{
             String windowTitle = inv.getparent(Window.class).cap;
+            // drop to belt inv
             if (windowTitle.contentEquals("Belt")){
                 List<Coord> freeSlots = inv.getFreeSlots();
                 if (freeSlots.size()==0)
@@ -1283,30 +1284,17 @@ public class ZeeManagerItemClick extends ZeeThread{
                 inv.wdgmsg("drop", c);
                 return waitNotHoldingItem();
             }
-//            else {
-//                List<Coord> freeSlots = inv.getFreeSlots();
-//                if (freeSlots.size()==0)
-//                    return false;//inv full
-//                Coord c = freeSlots.get(0);
-//                inv.wdgmsg("drop", c);
-//                return waitNotHoldingItem();
-//            }
-            else if(windowTitle.contentEquals("Inventory")){
-                //no belt, drop to inv area
-                WItem holdingItem = getHoldingItem();
-                Coord itemSize = holdingItem.sz.div(Inventory.sqsz);
-                Coord topLeftSlot = inv.getFreeSlotAreaSized(itemSize.x,itemSize.y);
-                if (topLeftSlot==null) {
-                    println("dropHoldingItemToInv > topLeftSlot null");
-                    return false;
-                }
-                inv.wdgmsg("drop",topLeftSlot);
-                sleep(PING_MS*4);
-                return !ZeeConfig.isPlayerHoldingItem();//waitHoldingItemChanged();//waitNotHoldingItem();
+            // drop to non belt inv
+            WItem holdingItem = getHoldingItem();
+            Coord itemSize = holdingItem.sz.div(Inventory.sqsz);
+            Coord topLeftSlot = inv.getFreeSlotAreaSized(itemSize.x,itemSize.y);
+            if (topLeftSlot==null) {
+                println("dropHoldingItemToInv > topLeftSlot null");
+                return false;
             }
-            else {
-                ZeeConfig.println("dropHoldingItemToInv > "+windowTitle);
-            }
+            inv.wdgmsg("drop",topLeftSlot);
+            sleep(PING_MS*4);
+            return !ZeeConfig.isPlayerHoldingItem();//waitHoldingItemChanged();//waitNotHoldingItem();
         }catch (Exception e){
             e.printStackTrace();
         }
