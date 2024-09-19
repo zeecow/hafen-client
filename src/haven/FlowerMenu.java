@@ -261,12 +261,15 @@ public class FlowerMenu extends Widget {
 	}
     }
 
+	final Object flag = new Object();
     public void draw(GOut g) {
-	super.draw(g, false);
-		if(autochoose!=null){
-			choose(autochoose);
-			ZeeManagerGobClick.labelHarvestedPlant(autochoose.name);
-			autochoose = null;
+		super.draw(g, false);
+		synchronized (flag){
+			if (autochoose != null) {
+				choose(autochoose);
+				ZeeManagerGobClick.labelHarvestedPlant(autochoose.name);
+				autochoose = null;
+			}
 		}
     }
 
