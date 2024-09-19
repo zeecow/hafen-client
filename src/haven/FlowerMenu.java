@@ -39,7 +39,7 @@ public class FlowerMenu extends Widget {
     public static final int ph = UI.scale(30), ppl = 8;
     public Petal[] opts;
     private UI.Grab mg, kg;
-	private Petal autochoose;
+	Petal autochoose;
 
     @RName("sm")
     public static class $_ implements Factory {

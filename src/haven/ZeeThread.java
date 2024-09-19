@@ -1052,6 +1052,7 @@ public class ZeeThread  extends Thread{
                 return false;
             }
         }
+        println("no petal named "+petalName);
         return false;
     }
 

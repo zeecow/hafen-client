@@ -2178,7 +2178,8 @@ public class ZeeConfig {
 
                     // show char switch window
                     if (ZeeSess.charSwitchKeepWindow)
-                        ZeeSess.charSwitchCreateWindow();
+                        if (ZeeSess.charSwitchCurPlayingChar!=null)//skip char creation zone
+                            ZeeSess.charSwitchCreateWindow();
 
                     // discover autostack checkbox value (1/2)
                     toggleAutostack();//wait checkUiMsg() set checkbox value
