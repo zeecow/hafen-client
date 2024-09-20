@@ -2544,14 +2544,6 @@ public boolean mousedown(Coord c, int button) {
 		// mine selection
 		if (msg.contentEquals("sel"))
 			ZeeManagerMiner.checkMiningSelection();
-
-		// piler
-		if (ZeeConfig.pilerMode) {
-			if (msg.equals("place"))
-				ZeeManagerStockpile.checkWdgmsgPilePlacing();
-			else if (msg.equals("itemact"))
-				ZeeManagerStockpile.checkWdgmsgPileExists();
-		}
 	}
 
 	void inspectTooltip(Coord c) {

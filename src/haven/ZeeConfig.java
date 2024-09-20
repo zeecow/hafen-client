@@ -253,7 +253,6 @@ public class ZeeConfig {
     static boolean noFlavObjs = Utils.getprefb("noFlavObjs", true);
     static boolean scrollTransferItems = Utils.getprefb("scrollTransferItems", true);
     static boolean notifyBuddyOnline = Utils.getprefb("notifyBuddyOnline", false);
-    static boolean pilerMode = false;
     static boolean pickupGobWindowKeepOpen = Utils.getprefb("pickupGobWindowKeepOpen", true);
     static boolean pickupGobWindowAutoRefresh = Utils.getprefb("pickupGobWindowAutoRefresh", false);
     static boolean shapeIcons = Utils.getprefb("shapeIcons", false);
@@ -3017,10 +3016,7 @@ public class ZeeConfig {
         // clicked ground
         else{
             lastMapViewClickGobName = "";
-            if (clickb==1) {
-                ZeeManagerStockpile.checkTileSourcePiling(mc);
-            }
-            else if (clickb==2) {
+            if (clickb==2) {
                 if (isPlayerHoldingItem()) { //move while holding item
                     clickCoord(mc.floor(posres), 1, 0);
                 }else

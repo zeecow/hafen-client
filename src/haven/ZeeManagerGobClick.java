@@ -2026,8 +2026,6 @@ public class ZeeManagerGobClick extends ZeeThread{
             windowTestCoords();
 //        else if(petalName.contentEquals(ZeeFlowerMenu.STRPETAL_TASKBUILDER))
 //            ZeeTaskBuilder.showWindow();
-        else if(petalName.contentEquals(ZeeFlowerMenu.STRPETAL_AUTODISCOVERY))
-            ZeeResearch.autoDiscovery();
         else if(petalName.contentEquals(ZeeFlowerMenu.STRPETAL_CLEARGOBTEXTSPOINTERS))
             ZeeConsole.clearGobsTextsAndPointers();
         else if (petalName.contentEquals(ZeeFlowerMenu.STRPETAL_AUTOBUTCH_BIGDEADANIMAL)){
@@ -2346,7 +2344,6 @@ public class ZeeManagerGobClick extends ZeeThread{
         }
         else if(gob.tags.contains(Gob.Tag.PLAYER_MAIN)) {
             opts = new ArrayList<String>();
-            opts.add(ZeeFlowerMenu.STRPETAL_AUTODISCOVERY);
             opts.add(ZeeFlowerMenu.STRPETAL_CLEARGOBTEXTSPOINTERS);
             opts.add(ZeeFlowerMenu.STRPETAL_SWITCHCHAR);
             //opts.add(ZeeFlowerMenu.STRPETAL_TASKBUILDER);

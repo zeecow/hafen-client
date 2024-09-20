@@ -9,16 +9,11 @@ import static java.util.Map.entry;
 
 public class ZeeManagerStockpile extends ZeeThread{
 
-    static final String TASK_PILE_GROUND_ITEMS = "TASK_PILE_GROUND_ITEMS";
     static final String TASK_PILE_GOB_SOURCE = "TASK_PILE_GOB_SOURCE";
     static final String TASK_PILE_TILE_SOURCE = "TASK_PILE_TILE_SOURCE";
-    static final String STOCKPILE_LEAF = "gfx/terobjs/stockpile-leaf";
     static final String STOCKPILE_BLOCK = "gfx/terobjs/stockpile-wblock";
-    static final String STOCKPILE_BOARD = "gfx/terobjs/stockpile-board";
-    static final String STOCKPILE_COAL = "gfx/terobjs/stockpile-coal";
     static final String STOCKPILE_SAND = "gfx/terobjs/stockpile-sand";
     static final String STOCKPILE_STONE = "gfx/terobjs/stockpile-stone";
-    static final String BASENAME_MULB_LEAF = "leaf-mulberrytree";
 
     static Map<String, String> mapItemPileRegex = Map.ofEntries(
             entry("gfx/(terobjs/items|invobjs)/flaxfibre", "/stockpile-flaxfibre"),
@@ -520,73 +515,6 @@ public class ZeeManagerStockpile extends ZeeThread{
     }
 
 
-    public static void checkWdgmsgPileExists() {
-        new ZeeThread() {
-            public void run() {
-                try {
-                    waitNotHoldingItem(5000);
-                    Gob closestPile = findPile();
-                    if (closestPile!=null) {
-                        checkShowWindow(closestPile.getres().name);
-                    }
-                }catch (Exception e){
-                    e.printStackTrace();
-                }
-            }
-        }.start();
-    }
-
-    public static void checkWdgmsgPilePlacing() {
-        if (lastPlob !=null && lastPlob.getres()!=null && lastPlob.getres().name.contains("/stockpile-")) {
-            String pileGobName = lastPlob.getres().name;
-            checkShowWindow(pileGobName);
-        }
-    }
-
-    private static void checkShowWindow(String pileGobName) {
-
-        boolean show = false;
-        String task = "";
-
-        if ( diggingTileSource && (pileGobName.equals(STOCKPILE_STONE) || pileGobName.equals(STOCKPILE_SAND)) ) {
-            show = true;
-            task = TASK_PILE_TILE_SOURCE;
-        }
-        else if ( lastPetalName == null || gobSource == null ){
-            show = false;
-        }
-        else if (now() - ZeeConfig.lastInvGItemCreatedMs > 3000){ //3s
-            show = false; // time limit to avoid late unwanted window popup
-        }
-        else if (pileGobName.equals(STOCKPILE_LEAF) && ZeeConfig.lastInvGItemCreatedBaseName.contentEquals(BASENAME_MULB_LEAF)){
-            show = true;
-            task = TASK_PILE_GOB_SOURCE;
-        }
-        else if (pileGobName.equals(STOCKPILE_LEAF) && ZeeConfig.lastInvGItemCreatedBaseName.contentEquals("leaf-laurel")){
-            show = true;
-            task = TASK_PILE_GOB_SOURCE;
-        }
-        else if (pileGobName.equals(STOCKPILE_BLOCK) && ZeeConfig.lastInvGItemCreatedBaseName.startsWith("wblock-")){
-            show = true;
-            task = TASK_PILE_GOB_SOURCE;
-        }
-        else if (pileGobName.equals(STOCKPILE_BOARD) && ZeeConfig.lastInvGItemCreatedBaseName.contains("board-")){
-            show = true;
-            task = TASK_PILE_GOB_SOURCE;
-        }
-        else if (pileGobName.equals(STOCKPILE_COAL) && ZeeConfig.lastInvGItemCreatedBaseName.contentEquals("coal")){
-            show = true;
-            task = TASK_PILE_GOB_SOURCE;
-        }
-        else if (pileGobName.equals(STOCKPILE_STONE) && ZeeManagerGobClick.isGobBoulder(gobSource.getres().name)){
-            show = true;
-            task = TASK_PILE_GOB_SOURCE;
-        }
-
-        if(show)
-            showWindow(task);
-    }
-
     public static void checkChoosenPetal(String petalName) {
         lastPetalName = petalName;
         if (petalName.contentEquals("Sleep")) {
@@ -616,31 +544,6 @@ public class ZeeManagerStockpile extends ZeeThread{
         }
     }
 
-    private static void showWindow(String task) {
-        Widget wdg;
-        if(windowManager ==null) {
-            windowManager = new ZeeWindow(new Coord(150, 60), "Stockpile manager") {
-                public void wdgmsg(String msg, Object... args) {
-                    if (msg.equals("close")) {
-                        busy = false;
-                        exitManager();
-                    }else
-                        super.wdgmsg(msg, args);
-                }
-            };
-            wdg = windowManager.add(new ZeeWindow.ZeeButton(UI.scale(75),"auto pile"){
-                public void wdgmsg(String msg, Object... args) {
-                    if(msg.equals("activate")){
-                        new ZeeManagerStockpile(task).start();
-                    }
-                }
-            }, 5,5);
-            ZeeConfig.gameUI.add(windowManager, new Coord(100,100));
-        }else{
-            windowManager.show();
-        }
-    }
-
     private void pileAndExit() throws InterruptedException {
         pileItems();
         exitManager();
@@ -654,8 +557,6 @@ public class ZeeManagerStockpile extends ZeeThread{
     public static void exitManager() {
         busy = false;
         ZeeConfig.stopMovingEscKey();
-        if (ZeeConfig.pilerMode)
-            ZeeInvMainOptionsWdg.cbPiler.set(false);
         ZeeConfig.removePlayerText();
         if (gobPile!=null)
             ZeeConfig.removeGobText(gobPile);
@@ -765,29 +666,6 @@ public class ZeeManagerStockpile extends ZeeThread{
             e.printStackTrace();
         }
         ZeeConfig.removePlayerText();
-    }
-
-    static boolean isGroundTileSource(String tileResName) {
-        String[] list = new String[]{ZeeConfig.TILE_BEACH, ZeeConfig.TILE_SANDCLIFF, ZeeConfig.TILE_MOUNTAIN};
-        //println(tileResName);
-        for (int i = 0; i < list.length; i++) {
-            if (list[i].contentEquals(tileResName))
-                return true;
-        }
-        return false;
-    }
-
-    static void checkTileSourcePiling(Coord2d mc) {
-        if ( ZeeConfig.pilerMode && ZeeConfig.getCursorName().contentEquals(ZeeConfig.CURSOR_DIG) ) {
-            String tileName = ZeeConfig.getTileResName(mc);
-            if(ZeeManagerStockpile.isGroundTileSource(tileName)) {
-                ZeeManagerStockpile.diggingTileSource = true;
-                ZeeManagerStockpile.lastTileStoneSourceCoordMc = mc;
-                ZeeManagerStockpile.lastTileStoneSourceTileName = tileName;
-            } else
-                ZeeManagerStockpile.diggingTileSource = false;
-        } else
-            ZeeManagerStockpile.diggingTileSource = false;
     }
 
     static boolean isGobPileable(Gob gob) {

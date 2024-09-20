@@ -258,10 +258,6 @@ public class ZeeManagerItemClick extends ZeeThread{
             if (inv!=null)
                 inv.dropItemsByNameEndsWith(basename);
         }
-        // drop everglowing ember if piling coal
-        else if (ZeeConfig.pilerMode && ZeeManagerStockpile.lastPetalName!=null && ZeeManagerStockpile.lastPetalName.contentEquals("Collect coal") && basename.contentEquals("everglowingember")){
-            gItem.wdgmsg("drop", Coord.z);
-        }
 
         // update counter
         ZeeConfig.invCounterUpdate(gItem);

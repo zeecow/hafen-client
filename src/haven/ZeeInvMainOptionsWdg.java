@@ -96,22 +96,6 @@ public class ZeeInvMainOptionsWdg extends Widget {
         }, x, 15);
         cbTunnel.settip("tunnel helper");
 
-        x += cbTunnel.sz.x + 5;
-
-        add(cbPiler = new CheckBox("pl") {
-            {
-                a = ZeeConfig.pilerMode;
-            }
-
-            public void set(boolean val) {
-                ZeeConfig.pilerMode = val;
-                a = val;
-            }
-        }, x, 15);
-        cbPiler.settip("pile helper (mouse-click menu required)");
-
-        x += cbPiler.sz.x + 5;
-
         pack();
     }
 

@@ -1037,19 +1037,20 @@ public class ZeeThread  extends Thread{
         return false;
     }
 
+
     public static boolean choosePetal(FlowerMenu menu, String petalName) {
-        for(FlowerMenu.Petal p : menu.opts) {
-            if(p.name.equals(petalName)) {
-                try {
-                    synchronized (menu) {
+        synchronized (menu.flag) {
+            for (FlowerMenu.Petal p : menu.opts) {
+                if (p.name.equals(petalName)) {
+                    try {
                         menu.choose(p);
                         menu.destroy();
                         return true;
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
-                } catch(Exception e) {
-                    e.printStackTrace();
+                    return false;
                 }
-                return false;
             }
         }
         println("no petal named "+petalName);
