@@ -1592,8 +1592,8 @@ public class ZeeManagerGobClick extends ZeeThread{
             }
         }
 
-        // cauldron aux containers
-        if(ZeeConfig.isPlayerFollowingCauldron && ZeeConfig.isGobContainer(gobName)){
+        // refil cauldron aux containers, barrels
+        if(ZeeConfig.isPlayerFollowingCauldron && (ZeeConfig.isGobContainer(gobName) || gobName.endsWith("/barrel"))){
             if (ZeeConfig.listCauldronContainers==null)
                 ZeeConfig.listCauldronContainers = new ArrayList<>();
             List<Gob> list = ZeeConfig.listCauldronContainers;
@@ -2270,6 +2270,7 @@ public class ZeeManagerGobClick extends ZeeThread{
                     }
 
                     if (!isCancelClick()) {
+                        String animalName = deadAnimal.getres().name;
                         // loop butching stages
                         while (!isCancelClick() && gobExistsBecauseFlowermenu(deadAnimal)) {
 
@@ -2284,6 +2285,12 @@ public class ZeeManagerGobClick extends ZeeThread{
                             //wait not butching
                             sleep(500);//pose lag?
                             waitNotPlayerPose(ZeeConfig.POSE_PLAYER_BUTCH);
+                        }
+                        //pickup leftovers
+                        if (animalName.contains("boreworm")){
+                            Gob beak = ZeeConfig.getClosestGobByNameContains("borwormbeak");
+                            if (beak!=null)
+                                pickupAllGobItems(beak);
                         }
                     }
 
@@ -3884,6 +3891,10 @@ public class ZeeManagerGobClick extends ZeeThread{
             return gi != null ? gi.gob : null;
         }
         return null;
+    }
+
+    static void pickupAllGobItems(Gob gobItem) {
+        ZeeManagerGobClick.gobClick(gobItem,3,UI.MOD_SHIFT);
     }
 
     // pattern must match whole gob name

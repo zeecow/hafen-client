@@ -424,7 +424,7 @@ public class ZeeManagerMiner extends ZeeThread{
 
             // start collecting current stone type
             println("picking "+closestStone.getres().basename());
-            ZeeManagerGobClick.gobClick(closestStone,3,UI.MOD_SHIFT);//pick all
+            ZeeManagerGobClick.pickupAllGobItems(closestStone);
 
             // wait current stone type
             long invIdleMs = 500;
