@@ -267,6 +267,18 @@ public class ZeeManagerItemClick extends ZeeThread{
         return ZeeManagerItemClick.isLeftHandEmpty() || ZeeManagerItemClick.isRightHandEmpty();
     }
 
+    static void cancelFlowerMenu() {
+        try {
+            FlowerMenu fm = ZeeConfig.gameUI.ui.root.getchild(FlowerMenu.class);
+            if (fm != null) {
+                fm.choose(null);
+                fm.destroy();
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
     private void init(WItem wItem) {
         try{
             equipory = ZeeConfig.windowEquipment.getchild(Equipory.class);
@@ -1101,7 +1113,8 @@ public class ZeeManagerItemClick extends ZeeThread{
                 itemActCoord(w);
                 FlowerMenu fm = waitFlowerMenu();
                 if(fm!=null){
-                    choosePetal(fm, petalName);
+                    if(!choosePetal(fm, petalName))
+                        break; // no petal found
                     itemsClicked++;
                     sleep(100);//delay
                 }else{

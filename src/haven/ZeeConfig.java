@@ -211,7 +211,7 @@ public class ZeeConfig {
     static String butcherAutoList = Utils.getpref("butcherAutoList", DEF_LIST_BUTCH_AUTO);
     static boolean cattleRosterHeight = Utils.getprefb("cattleRosterHeight", true);
     static double cattleRosterHeightPercentage = Utils.getprefd("cattleRosterHeightPercentage", 1.0);
-    static boolean confirmPetalEatReduceFoodEff = Utils.getprefb("confirmPetalEatReduceFoodEff", true);
+    static boolean confirmPetalEat = Utils.getprefb("confirmPetalEatReduceFoodEff", true);
     static boolean confirmPetal = Utils.getprefb("confirmPetal", true);
     static String confirmPetalList = Utils.getpref("confirmPetalList", DEF_LIST_CONFIRM_PETAL);
     public static boolean confirmThrowingAxeOrSpear = Utils.getprefb("confirmThrowingAxeOrSpear", true);
@@ -2853,6 +2853,8 @@ public class ZeeConfig {
         ZeeManagerGobClick.barterSearchOpen = false;
         ZeeManagerGobClick.remountClosestHorse = false;
         ZeeManagerItemClick.clickingAllItemsPetals = false;
+        ZeeConsole.isGobFindActive = false;
+        ZeeConsole.gobFindRegex = null;
         isPlayerFollowingCauldron = false;
         if (listCauldronContainers!=null)
             listCauldronContainers.clear();
@@ -3862,16 +3864,22 @@ public class ZeeConfig {
                 toggleGardenpot(ob);
             }
 
+            // apply ZeeConsole gobfind
+            if (ZeeConsole.isGobFindActive && !ob.tags.contains(Gob.Tag.PLAYER_MAIN)){
+                for (String regex : ZeeConsole.gobFindRegex) {
+                    Matcher matcher = ZeeConfig.getRegexMatcher(gobName, regex);
+                    if (matcher.find()){
+                        ZeeConsole.gobFindApply(ob);
+                    }
+                }
+            }
 
             // apply settings audio/aggro  (ignore bat if using batcape)
             if (!ob.getres().name.contentEquals("gfx/kritter/bat/bat") || !ZeeManagerItemClick.isItemEquipped("/batcape")) {
-
                 // audio alerts
                 ZeeConfig.applyGobSettingsAudio(ob);
-
                 // aggro radius
                 ZeeConfig.applyGobSettingsAggro(ob);
-
             }
 
             // highlight gob color
@@ -3898,9 +3906,8 @@ public class ZeeConfig {
             //gob health
             GobHealth healf = ob.getattr(GobHealth.class);
             if (healf!=null && healf.hp < 1){
-                Color c = Color.lightGray;
                 String s = String.valueOf(healf.hp).replaceFirst("0.", ".");
-                ZeeConfig.addGobText(ob,s,c);
+                ZeeConfig.addGobText(ob,s,Color.lightGray);
             }
 
             //hitbox
@@ -3973,13 +3980,6 @@ public class ZeeConfig {
         if (ZeeManagerGobClick.isGobTamedAnimalOrAurochEtc(gobName)){
             gob.tags.add(Gob.Tag.TAMED_ANIMAL_OR_AUROCH_ETC);
         }
-    }
-
-    static GAttrib getPlayerAttr(String classSimpleName){
-        return getGobAttr(getPlayerGob(),classSimpleName);
-    }
-    static GAttrib getGobAttr(Gob gob, String classSimpleName){
-        return ZeeManagerGobClick.getGAttrByClassSimpleName(gob,classSimpleName);
     }
 
     static GAttrib getPlayerAttr(Class glass){
@@ -4058,18 +4058,6 @@ public class ZeeConfig {
         if(mainInv==null)
             mainInv = ZeeConfig.getWindow("Inventory").getchild(Inventory.class);
         return mainInv;
-    }
-
-    public static void cancelFlowerMenu() {
-        try {
-            FlowerMenu fm = ZeeConfig.gameUI.ui.root.getchild(FlowerMenu.class);
-            if (fm != null) {
-                fm.choose(null);
-                fm.destroy();
-            }
-        }catch (Exception e){
-            e.printStackTrace();
-        }
     }
 
     public static String getBarrelOverlayBasename(Gob barrel){
@@ -4425,7 +4413,7 @@ public class ZeeConfig {
     static boolean isPetalConfirmed(String name) {
 
         // confirm petal Eat, to preserve Food Efficacy
-        if (confirmPetalEatReduceFoodEff && name.contentEquals("Eat")){
+        if (confirmPetalEat && name.contentEquals("Eat")){
             if (getMeterEnergy() >= 80){
                 if (!gameUI.ui.modctrl) {
                     ZeeConfig.msgError("Ctrl+click to confirm reducing Food Efficacy");
