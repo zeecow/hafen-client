@@ -3079,7 +3079,7 @@ public class ZeeManagerGobClick extends ZeeThread{
                         }
                     }
                     //close menu before returning
-                    ZeeConfig.cancelFlowerMenu();
+                    ZeeManagerItemClick.cancelFlowerMenu();
                     waitNoFlowerMenu();
                 }
             };
@@ -3749,7 +3749,7 @@ public class ZeeManagerGobClick extends ZeeThread{
         FlowerMenu fm = waitFlowerMenu();
         if (fm!=null) {
             // menu opened means gob exist
-            ZeeConfig.cancelFlowerMenu();
+            ZeeManagerItemClick.cancelFlowerMenu();
             waitNoFlowerMenu();
             //println("gobHasFlowermenu > true");
             ret = true;

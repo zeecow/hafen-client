@@ -211,7 +211,7 @@ public class ZeeConfig {
     static String butcherAutoList = Utils.getpref("butcherAutoList", DEF_LIST_BUTCH_AUTO);
     static boolean cattleRosterHeight = Utils.getprefb("cattleRosterHeight", true);
     static double cattleRosterHeightPercentage = Utils.getprefd("cattleRosterHeightPercentage", 1.0);
-    static boolean confirmPetalEatReduceFoodEff = Utils.getprefb("confirmPetalEatReduceFoodEff", true);
+    static boolean confirmPetalEat = Utils.getprefb("confirmPetalEatReduceFoodEff", true);
     static boolean confirmPetal = Utils.getprefb("confirmPetal", true);
     static String confirmPetalList = Utils.getpref("confirmPetalList", DEF_LIST_CONFIRM_PETAL);
     public static boolean confirmThrowingAxeOrSpear = Utils.getprefb("confirmThrowingAxeOrSpear", true);
@@ -4060,18 +4060,6 @@ public class ZeeConfig {
         return mainInv;
     }
 
-    public static void cancelFlowerMenu() {
-        try {
-            FlowerMenu fm = ZeeConfig.gameUI.ui.root.getchild(FlowerMenu.class);
-            if (fm != null) {
-                fm.choose(null);
-                fm.destroy();
-            }
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-    }
-
     public static String getBarrelOverlayBasename(Gob barrel){
         List<String> ols =  ZeeManagerGobClick.getOverlayNames(barrel);
         if(ols.isEmpty())
@@ -4425,7 +4413,7 @@ public class ZeeConfig {
     static boolean isPetalConfirmed(String name) {
 
         // confirm petal Eat, to preserve Food Efficacy
-        if (confirmPetalEatReduceFoodEff && name.contentEquals("Eat")){
+        if (confirmPetalEat && name.contentEquals("Eat")){
             if (getMeterEnergy() >= 80){
                 if (!gameUI.ui.modctrl) {
                     ZeeConfig.msgError("Ctrl+click to confirm reducing Food Efficacy");

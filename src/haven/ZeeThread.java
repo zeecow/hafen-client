@@ -1041,7 +1041,7 @@ public class ZeeThread  extends Thread{
     public static boolean choosePetal(FlowerMenu menu, String petalName) {
         synchronized (menu.flag) {
             for (FlowerMenu.Petal p : menu.opts) {
-                if (p.name.equals(petalName)) {
+                if (p.name.equalsIgnoreCase(petalName)) {
                     try {
                         menu.choose(p);
                         menu.destroy();

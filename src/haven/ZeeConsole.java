@@ -76,15 +76,21 @@ public class ZeeConsole {
             helpLines.add("   clg         clear gobs text/color/pointer");
             helpLines.add("   clg [tpc]   clear gobs [t]ext, [c]olor, [p]ointer");
             helpLines.add("======== win items ========");
-            helpLines.add("   win []      select windows named []");
-            helpLines.add("   itname []   select items which name contains []");
-            helpLines.add("   itres []    select items with resname contains []");
-            helpLines.add("   stack       stack selected windows/items ");
+            helpLines.add("   win []        select windows named []");
+            helpLines.add("   itname []     select items which name contains []");
+            helpLines.add("   itres []      select items with resname contains []");
+            helpLines.add("   stack         stack selected windows/items ");
+            helpLines.add("   clickmenu []  click menu named []");
             helpLines.add("======== misc ========");
             helpLines.add("   count       msg counting last cmd results");
             helpLines.add("   say []      text2speak parameter or last cmd results (requires LinuxFestival)");
             helpLines.add("   reslocal    print local res names to terminal");
             helpLines.add("   resmote     print remote res names to terminal");
+            helpLines.add("======== examples ========");
+            helpLines.add(":zeecow itres cheesetray , clickmenu slice up");
+            helpLines.add("      select cheesetrays , clickmenu \"Slice up\"");
+            helpLines.add(":zeecow win cupboard , stack");
+            helpLines.add("      select cupboard windows , stack similar items ");
         }
     }
 
@@ -209,6 +215,16 @@ public class ZeeConsole {
             ret = stack();
             ZeeConfig.removePlayerText();
         }
+        else if (cmd.contentEquals("clickmenu")){
+            if (arr.length < 2){
+                ZeeConfig.msgError("clickmenu parameter missing");
+                showHelpWindow();
+                return null;
+            }
+            ZeeConfig.addPlayerText("clickin");
+            ret = clickItemPetal(arr);
+            ZeeConfig.removePlayerText();
+        }
         else if (cmd.contentEquals("reslocal")){
             println("=======local cached=======");
             for (Resource res : Resource.local().cached()) {
@@ -275,6 +291,43 @@ public class ZeeConsole {
 
         return ret;
     }
+
+    @SuppressWarnings("unchecked")
+    private static Boolean clickItemPetal(String[] args){
+        if (!(lastCmdResults instanceof List) || (((List) lastCmdResults).isEmpty()) || !(((List<?>) lastCmdResults).get(0) instanceof WItem)){
+            ZeeConfig.msgError("no items selected");
+            println("no items selected");
+            showHelpWindow();
+            return false;
+        }
+        StringBuilder petalName = new StringBuilder();
+        for (int i = 1; i < args.length; i++) {
+            petalName.append(args[i]).append(" ");
+        }
+        //ignore petal confirmation, otherwise player gets stuck in non confirmed petal
+        boolean backupConfirm = ZeeConfig.confirmPetal;
+        boolean backupConfirmEat = ZeeConfig.confirmPetalEat;
+        ZeeConfig.confirmPetal = ZeeConfig.confirmPetalEat = false;
+        try {
+            int clicked = ZeeManagerItemClick.clickAllItemsPetal((List<WItem>) lastCmdResults, petalName.toString().trim());
+            if (clicked==0){
+                ZeeConfig.msgError("no petal named \""+petalName.toString().trim()+"\" ?");
+                ZeeManagerItemClick.cancelFlowerMenu();
+            }else{
+                println("clicked "+clicked+" petals");
+                ZeeConfig.msgLow("clicked "+clicked+" petals");
+            }
+            ZeeConfig.confirmPetal = backupConfirm;
+            ZeeConfig.confirmPetalEat = backupConfirmEat;
+            return true;
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        ZeeConfig.confirmPetal = backupConfirm;
+        ZeeConfig.confirmPetalEat = backupConfirmEat;
+        return false;
+    }
+
 
     private static Boolean stack() {
 
@@ -471,19 +524,32 @@ public class ZeeConsole {
     }
 
     @SuppressWarnings("unchecked")
+    private static List<Window> getWinsSelected() {
+        List<Window> wins;
+        // default to maininv and containers
+        if (!(lastCmdResults instanceof List)){
+            wins = new ArrayList<>();
+            for (Window w : ZeeConfig.getWindowsOpened()) {
+                if (ZeeConfig.isWindowContainer(w) || w.cap.equalsIgnoreCase("inventory"))
+                    wins.add(w);
+            }
+        }
+        // previous selected windows
+        else {
+            wins = (List<Window>) lastCmdResults;
+        }
+        return wins;
+    }
+
+    @SuppressWarnings("unchecked")
     private static List<WItem> selectWindowsItemsResName(String[] arr) {
         try {
-            if (!(lastCmdResults instanceof List) || ((List<?>) lastCmdResults).isEmpty()){
-                ZeeConfig.msgError("no windows selected");
-                showHelpWindow();
-                return null;
-            }
             if (arr.length < 2){
                 ZeeConfig.msgError("item parameter missing");
                 showHelpWindow();
                 return null;
             }
-            List<Window> wins = (List<Window>) lastCmdResults;
+            List<Window> wins = getWinsSelected();
             List<WItem> ret = new ArrayList<>();
             for (Window win : wins) {
                 ret.addAll(ZeeConfig.getWindowsInventory(win).getWItemsByNameContains(arr[1]));
@@ -498,17 +564,12 @@ public class ZeeConsole {
     @SuppressWarnings("unchecked")
     private static List<WItem> selectWindowsItemsInfoName(String[] arr) {
         try {
-            if (!(lastCmdResults instanceof List) || ((List<?>) lastCmdResults).isEmpty()){
-                ZeeConfig.msgError("no windows selected");
-                showHelpWindow();
-                return null;
-            }
             if (arr.length < 2){
                 ZeeConfig.msgError("item parameter missing");
                 showHelpWindow();
                 return null;
             }
-            List<Window> wins = (List<Window>) lastCmdResults;
+            List<Window> wins = getWinsSelected();
             List<WItem> ret = new ArrayList<>();
             for (Window win : wins) {
                 ret.addAll(ZeeConfig.getWindowsInventory(win).getWItemsByInfoNameContains(arr[1]));
