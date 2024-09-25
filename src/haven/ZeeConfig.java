@@ -152,12 +152,6 @@ public class ZeeConfig {
     static final int LOCATION_UNDERGROUND = 3, DEF_LIGHT_UNDERGROUND = 48;
     static int playerLocation = LOCATION_UNDEFINED;
 
-    static Color COLOR_RED = new Color(255,0,0,200);
-    static Color COLOR_ORANGE = new Color(255,128,0,200);
-    static Color COLOR_YELLOW = new Color(255,255,0,200);
-    static Color COLOR_MAGENTA = new Color(255,0,255,200);
-    static Color COLOR_LIGHTBLUE = new Color(0, 255, 255, 200);
-
     static GameUI gameUI;
     private static String cursorName = CURSOR_ARW;
     static Window windowEquipment,windowInvMain, toggleEquipsLastWindowClicked;
@@ -423,33 +417,7 @@ public class ZeeConfig {
             return null;
     }
 
-    public static MixColor getHighlightDrawableColor(Gob gob) {
-        if(gob==null || gob.getres()==null)
-            return null;
-
-        String gobName;
-
-        try{
-            gobName = gob.getres().name;
-        }catch (Resource.Loading loading){
-            loading.printStackTrace();
-            return null;
-        }
-
-        //System.out.printf("gobHighlightDrawable %s ", gobName);
-
-        //if it's a crop
-        if(highlightCropsReady && isGobCrop(gobName)) {
-            //System.out.printf(" CROP \n");
-            if (ZeeManagerFarmer.isCropMaxStage(gob))
-                return new MixColor(COLOR_LIGHTBLUE);
-        }
-        //else System.out.printf(" NOPE \n");
-
-        return null;
-    }
-
-    public static MixColor getHighlightGobColor(Gob gob) {
+    public static Color getSavedGobColor(Gob gob) {
 
         //get Type and name
         String gobName = gob.getres().name;
@@ -458,17 +426,16 @@ public class ZeeConfig {
 
         if(ZeeConfig.mapGobColor.size() > 0   &&   (c = ZeeConfig.mapGobColor.get(gobName)) != null){
             //highlight gob 1st priority
-            return new MixColor(c.getRed(), c.getGreen(), c.getBlue(), c.getAlpha());
+            return c;
         }
         else if((categ = ZeeConfig.mapGobCategory.get(gobName)) != null){
             //highlight category 2nd priority
             c = mapCategoryColor.get(categ);
             if(c==null) {
                 //set default categ color if empty
-                c = ZeeConfig.COLOR_YELLOW;
-                ZeeConfig.mapCategoryColor.put(categ, c);
+                ZeeConfig.mapCategoryColor.put(categ, Color.yellow);
             }
-            return new MixColor(c.getRed(),c.getGreen(),c.getBlue(),c.getAlpha());
+            return c;
         }
 
         return null;
@@ -877,16 +844,6 @@ public class ZeeConfig {
                 return true;
         }
         return false;
-    }
-
-    public static void applyGobSettingsHighlight(Gob gob, MixColor mc) {
-        if(gob==null || mc==null)
-            return;
-        try {
-            gob.setattr(new ZeeGobHighlight(gob, mc));
-        } catch (Resource.Loading e) {
-            e.printStackTrace();
-        }
     }
 
     public static void applyGobSettingsAudio(Gob gob) {
@@ -2019,7 +1976,7 @@ public class ZeeConfig {
         String s = Utils.getpref(MAP_CATEGORY_COLOR,"");
         if (s.isEmpty()) {
             HashMap<String, Color> ret = new HashMap<String, Color>();
-            ret.put(CATEG_AGROCREATURES, COLOR_YELLOW);
+            ret.put(CATEG_AGROCREATURES, Color.yellow);
             return ret;
         }else
             return (HashMap<String, Color>) deserialize(s);
@@ -3882,8 +3839,10 @@ public class ZeeConfig {
                 ZeeConfig.applyGobSettingsAggro(ob);
             }
 
-            // highlight gob color
-            ZeeConfig.applyGobSettingsHighlight(ob, ZeeConfig.getHighlightGobColor(ob));
+            // saved gob color
+            Color c = ZeeConfig.getSavedGobColor(ob);
+            if (c!=null)
+                ob.setattr( new ZeeGobColor( ob, c));
 
             // smoking gob highlight
             if (ob.smokeHighlight){

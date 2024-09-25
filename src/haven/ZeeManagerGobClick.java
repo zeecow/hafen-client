@@ -3060,6 +3060,10 @@ public class ZeeManagerGobClick extends ZeeThread{
         return name.replaceAll("\\d$", "");
     }
 
+    public static void highlightCropsReady(Gob g) {
+        if (isGobCrop(g.getres().name) && ZeeManagerFarmer.isCropMaxStage(g))
+            g.setattr(new ZeeGobColor(g, Color.CYAN));
+    }
 
     private boolean isGobBigDeadAnimal_thread() {
         try{
