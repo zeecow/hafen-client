@@ -48,8 +48,16 @@ public class ZeeConsole {
                                 + (lastCmdResults==null?"null":lastCmdResults.getClass().getSimpleName())
                                 + (lastCmdResults instanceof List && !((List<?>) lastCmdResults).isEmpty()? " ("+((List<?>) lastCmdResults).get(0)+") " : "")
                                 + " , ms = "
-                                +((long)ZeeThread.now() - ms)
+                                +(ZeeThread.now() - ms)
                             );
+                        }
+                        if (lastCmdResults instanceof List){
+                            List<?> list = (List<?>) lastCmdResults;
+                            String msg = "list size "+list.size();
+                            if (!list.isEmpty()){
+                                msg += " ("+list.get(0).getClass().getSimpleName()+")";
+                            }
+                            ZeeConfig.msgLow(msg);
                         }
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -160,28 +168,7 @@ public class ZeeConsole {
             ret = ZeeConfig.findGobsByNameContains(arr[1]);
         }
         else if (cmd.contentEquals("gobfind")){
-            if (arr.length < 2){
-                // missing regex param?
-                if (!isGobFindActive) {
-                    ZeeConfig.msgError("gobfind missing parameter");
-                    showHelpWindow();
-                    return null;
-                }
-                //clear gobs found
-                gobFindClear();
-                return null;
-            }
-            //gobfind active
-            ret = ZeeConfig.findGobsByNameRegexMatch(arr[1]);
-            List<Gob> gobsfound = (List<Gob>) ret;
-            for (Gob gob : gobsfound) {
-                gobFindApply(gob);
-            }
-            isGobFindActive = true;
-            if (gobFindRegex==null)
-                gobFindRegex = new ArrayList<>();
-            if (!gobFindRegex.contains(arr[1]))
-                gobFindRegex.add(arr[1]);
+            ret = gobFind(arr);
         }
         else if (cmd.contentEquals("goblbl")){
             ret = labelGobsBasename();
@@ -306,7 +293,36 @@ public class ZeeConsole {
         return ret;
     }
 
+    private static Object gobFind(String[] arr) {
+        if (arr.length < 2){
+            // missing regex param?
+            if (!isGobFindActive) {
+                ZeeConfig.msgError("gobfind missing parameter");
+                showHelpWindow();
+                return null;
+            }
+            //clear gobs found
+            gobFindClear();
+            return null;
+        }
+        //gobfind active
+        List<Gob> gobs = ZeeConfig.findGobsByNameRegexMatch(arr[1]);
+        for (Gob gob : gobs) {
+            gobFindApply(gob);
+        }
+        isGobFindActive = true;
+        if (gobFindRegex==null)
+            gobFindRegex = new ArrayList<>();
+        if (!gobFindRegex.contains(arr[1]))
+            gobFindRegex.add(arr[1]);
+        return gobs;
+    }
+
     static void gobFindApply(Gob gob) {
+        if (gob.id == ZeeConfig.getPlayerGob().id){
+            println("gobFindApply > ignoring player gob");
+            return;
+        }
         gob.setattr(new ZeeGobFind(gob));
     }
     static void gobFindClear(){
