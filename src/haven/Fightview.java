@@ -27,7 +27,6 @@
 package haven;
 
 import java.util.*;
-import static haven.Utils.uint32;
 
 public class Fightview extends Widget {
     public static final Tex bg = Resource.loadtex("gfx/hud/bosq");
@@ -279,7 +278,7 @@ public class Fightview extends Widget {
 	current = rel;
 	layout();
 	updrel();
-	ZeeConfig.combatStarted();
+	ZeeConfig.combatStartedOrTargetSwitch(this);
     }
     
     public void tick(double dt) {

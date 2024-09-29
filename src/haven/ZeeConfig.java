@@ -4312,8 +4312,15 @@ public class ZeeConfig {
         return playerHasAnyPose(ZeeConfig.POSE_PLAYER_ROWBOAT_IDLE,ZeeConfig.POSE_PLAYER_ROWBOAT_ACTIVE);
     }
 
-    static void combatStarted() {
-        lastMapViewClickButton = 1;//cancel click some tasks
+    static void combatStartedOrTargetSwitch(Fightview fightview) {
+
+        combatTargetHilite(fightview);
+
+        //TODO detect first combat relation to call these once?
+
+        //cancel possible tasks
+        ZeeConfig.simulateCancelClick();
+
         //stop mining
         if(ZeeManagerMiner.mining) {
             ZeeConfig.println(">combat relations, cancel mining");
@@ -4331,6 +4338,29 @@ public class ZeeConfig {
         //equip roundshield
         if (ZeeConfig.equipShieldOnCombat && !ZeeManagerItemClick.isItemEquipped("huntersbow","rangersbow"))
             ZeeManagerItemClick.equipBeltOrInvItem("/roundshield");
+    }
+
+    // TODO remove aggro hilites ?
+    static void combatTargetHilite(Fightview fv) {
+        println("    combatTargetChanged");
+        if (fv==null || fv.lsrel==null || fv.lsrel.isEmpty()) {
+            println("combate ended?");
+            return;
+        }
+        try {
+            // remove last gob hilite
+            for (Fightview.Relation rel : fv.lsrel) {
+                Gob g = ZeeManagerGobClick.findGobById(rel.gobid);
+                if (g!=null)
+                    g.delattr(ZeeGobFind.class);
+            }
+            // hilite current gob
+            Gob g = ZeeManagerGobClick.findGobById(fv.lsrel.get(0).gobid);
+            if (g!=null)
+                g.setattr(new ZeeGobFind(g));
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     static boolean isCombatActive(){

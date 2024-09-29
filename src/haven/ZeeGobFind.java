@@ -4,10 +4,19 @@ import java.awt.*;
 
 public class ZeeGobFind extends GAttrib implements Gob.SetupMod{
 
+    public static final String TRIANGLE = "▼";
+
     public ZeeGobFind(Gob gob) {
+        this( gob,
+            Color.magenta,
+            new ZeeGobText(TRIANGLE, Color.green, Color.black, 5, ZeeConfig.defGobTextFont )
+        );
+    }
+
+    public ZeeGobFind(Gob gob, Color c, ZeeGobText gobText) {
         super(gob);
-        ZeeConfig.addGobColor(gob,Color.magenta);
-        ZeeConfig.addGobText(gob,"▼");
+        ZeeConfig.addGobColor(gob,c);
+        ZeeConfig.addGobText(gob,gobText);
     }
 
     @Override
