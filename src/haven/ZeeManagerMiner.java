@@ -262,10 +262,6 @@ public class ZeeManagerMiner extends ZeeThread{
         mining = false;
         tunneling = false;
         tunnelHelperEndCoord = tunnelHelperEndCoordPrev = null;
-//        if (restoreBuildAndDrink) {
-//            ZeeConfig.isBuildAndDrink = isBuildAndDrinkBackup;
-//            restoreBuildAndDrink = false;
-//        }
         tunnelHelperSetStage(TUNNELHELPER_STAGE0_IDLE);
         ZeeConfig.removePlayerText();
         if (tunnelHelperWindow !=null)
@@ -480,6 +476,7 @@ public class ZeeManagerMiner extends ZeeThread{
                     println("stop mining");
                     ZeeConfig.msgError("stop mining");
                     ZeeConfig.clickRemoveCursor();
+                    setCancelClick();
                     waitCursorName(ZeeConfig.CURSOR_ARW);
                     ZeeConfig.stopMovingEscKey();
                     ZeeThread.staminaMonitorStop();//case stam monitor thread is running
@@ -549,20 +546,6 @@ public class ZeeManagerMiner extends ZeeThread{
         ZeeConfig.removePlayerText();
     }
 
-    // TODO delete if waitPlayerPoseIdle works
-    private static boolean waitBoulderFinish(Gob boulder) {
-        try {
-            ZeeConfig.lastMapViewClickButton = 2;
-            while (!ZeeConfig.isCancelClick() && ZeeManagerGobClick.findGobById(boulder.id) != null) {
-                //println("gob still exist > "+ZeeClickGobManager.findGobById(boulder.id));
-                Thread.sleep(PING_MS);//sleep 1s
-            }
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-        return (ZeeManagerGobClick.findGobById(boulder.id) == null);
-    }
-
 
     public static boolean isCombatActive() {
         try {
@@ -574,16 +557,6 @@ public class ZeeManagerMiner extends ZeeThread{
             e.printStackTrace();
         }
         return false;
-    }
-
-    private static boolean isMining() {
-        long now = System.currentTimeMillis();
-        if(now - lastDropItemMs > 999) {
-            //if last mined item is older than Xms, consider not mining
-            return false;
-        }else{
-            return true;
-        }
     }
 
     public static void checkBoulderGobAdded(Gob boulder) {
@@ -643,7 +616,7 @@ public class ZeeManagerMiner extends ZeeThread{
                     tilemonAutoRefresh = val;
                     a = val;
                     if (tilemonAutoRefresh) {
-                        println("new thread auto refresh");
+                        println("new tilemon thread");
                         tilemonAutoThread = new ZeeThread() {
                             public void run() {
                                 tilemonLastWindowRefreshPlayerTile = tilemonCurPlayerTile = ZeeConfig.getPlayerTile();
