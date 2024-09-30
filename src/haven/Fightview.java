@@ -143,14 +143,23 @@ public class Fightview extends Widget {
 	public final Relation rel;
 	public final Avaview ava;
 	public final GiveButton give;
-	public final Button purs;
+	public final Button purs, switchTarget;
 
 	public Mainrel(Relation rel) {
 	    this.rel = rel;
 	    Widget avaf = add(Frame.with(ava = new Avaview(Avaview.dasz, rel.gobid, "avacam"), false));
 	    ava.canactivate = true;
 	    adda(give = new GiveButton(0), avaf.pos("ul").subs(5, 0), 1.0, 0.0);
-	    adda(purs = new Button(UI.scale(70), "Pursue"), give.pos("br").adds(0, 5), 1.0, 0.0);
+	    adda(purs = new Button(UI.scale(60), "Pursue"), give.pos("br").adds(0, 5), 1.0, 0.0);
+		adda(switchTarget = new Button(UI.scale(60), "Switch"){
+			public void wdgmsg(String msg, Object... args) {
+				if (msg.contentEquals("activate")){
+					if (lsrel.size() > 1)
+						Fightview.this.uimsg("cur",lsrel.getLast().gobid);
+				}
+			}
+		}, give.pos("br").adds(0, 35), 1.0, 0.0);
+		switchTarget.settip("key: "+Fightsess.kb_relcycle.key.keyname);
 	    lpack();
 	}
 

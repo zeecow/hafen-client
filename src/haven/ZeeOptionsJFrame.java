@@ -95,7 +95,7 @@ public class ZeeOptionsJFrame extends JFrame {
         panelTabControls.add(new ZeeOptionJCheckBox("Ctrl confirm throwing axe/spear","confirmThrowingAxeOrSpear"),c);
 
         // confirm petal "Eat" reducing Food Efficacy (energy>80%)
-        panelTabControls.add(new ZeeOptionJCheckBox("Ctrl confirm petal Eat","confirmPetalEatReduceFoodEff"),c);
+        panelTabControls.add(new ZeeOptionJCheckBox("Ctrl confirm petal Eat","confirmPetalEat"),c);
 
         //confirm petal list
         panelTabControls.add(new ZeeOptionJCheckBox( "Ctrl+click confirm petal:", "confirmPetal"),c);

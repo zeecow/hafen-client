@@ -205,7 +205,7 @@ public class ZeeConfig {
     static String butcherAutoList = Utils.getpref("butcherAutoList", DEF_LIST_BUTCH_AUTO);
     static boolean cattleRosterHeight = Utils.getprefb("cattleRosterHeight", true);
     static double cattleRosterHeightPercentage = Utils.getprefd("cattleRosterHeightPercentage", 1.0);
-    static boolean confirmPetalEat = Utils.getprefb("confirmPetalEatReduceFoodEff", true);
+    static boolean confirmPetalEat = Utils.getprefb("confirmPetalEat", true);
     static boolean confirmPetal = Utils.getprefb("confirmPetal", true);
     static String confirmPetalList = Utils.getpref("confirmPetalList", DEF_LIST_CONFIRM_PETAL);
     public static boolean confirmThrowingAxeOrSpear = Utils.getprefb("confirmThrowingAxeOrSpear", true);
@@ -4342,17 +4342,23 @@ public class ZeeConfig {
 
     // TODO remove aggro hilites ?
     static void combatTargetHilite(Fightview fv) {
-        println("    combatTargetChanged");
+        println("combatTargetHilite");
         if (fv==null || fv.lsrel==null || fv.lsrel.isEmpty()) {
             println("combate ended?");
             return;
         }
         try {
-            // remove last gob hilite
+            // clear gob effects
             for (Fightview.Relation rel : fv.lsrel) {
                 Gob g = ZeeManagerGobClick.findGobById(rel.gobid);
-                if (g!=null)
+                if (g!=null) {
+                    //hilite
                     g.delattr(ZeeGobFind.class);
+                    //aggro radius
+                    Gob.Overlay aggrolay = g.findol(ZeeGobRadius.class);
+                    if (aggrolay!=null)
+                        aggrolay.remove();
+                }
             }
             // hilite current gob
             Gob g = ZeeManagerGobClick.findGobById(fv.lsrel.get(0).gobid);
