@@ -3061,7 +3061,8 @@ public class ZeeManagerGobClick extends ZeeThread{
     }
 
     public static void highlightCropsReady(Gob g) {
-        if (isGobCrop(g.getres().name) && ZeeManagerFarmer.isCropMaxStage(g))
+        String name = g.getres().name;
+        if ((isGobCrop(name) || isGobTrellisPlant(name)) && ZeeManagerFarmer.isCropMaxStage(g))
             g.setattr(new ZeeGobColor(g, Color.CYAN));
     }
 
