@@ -26,9 +26,12 @@
 
 package haven;
 
-import java.util.*;
-import haven.render.*;
 import haven.Audio.CS;
+import haven.render.RenderTree;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 public class AudioSprite {
     public static List<Audio.Clip> clips(Resource res, String id) {
@@ -37,8 +40,18 @@ public class AudioSprite {
 
     public static Audio.Clip randoom(Resource res, String id) {
 	List<Audio.Clip> cl = clips(res, id);
-	if(!cl.isEmpty())
-	    return(cl.get((int)(Math.random() * cl.size())));
+	if(!cl.isEmpty()) {
+		int subClip = (int) (Math.random() * cl.size());
+		boolean blockAudio = false;
+		if ( res.name.contentEquals("sfx/chip")
+			|| ( res.name.contentEquals("sfx/items/pickaxe") && (subClip==1||subClip==2) ) )
+		{
+			//ZeeConfig.println("block "+res.name+" clip " + subClip);
+			blockAudio = true;
+		}
+		if (!blockAudio)
+			return (cl.get(subClip));
+	}
 	return(null);
     }
 
@@ -46,8 +59,9 @@ public class AudioSprite {
 	    public Sprite create(Sprite.Owner owner, Resource res, Message sdt) {
 		{
 		    Audio.Clip clip = randoom(res, "cl");
-		    if(clip != null)
-			return(new ClipSprite(owner, res, clip));
+		    if(clip != null) {
+				return (new ClipSprite(owner, res, clip));
+			}
 		}
 		{
 		    List<Audio.Clip> clips = clips(res, "rep");
