@@ -493,7 +493,7 @@ public class ZeeResearch {
     private static void inspectWaterAddQl(Integer ql) {
         try {
             if (inspectWaterSpeakQl && !inspectWaterAuto)
-                ZeeSynth.textToSpeakLinuxFestival(""+ql);
+                ZeeAudio.textToSpeakLinuxFestival(""+ql);
             if (inspectWaterQls.contains(ql))
                 return;
             if (ql <= inspectWaterHighestQl)
@@ -501,7 +501,7 @@ public class ZeeResearch {
             inspectWaterHighestQl = ql;
             inspectWaterQls.add(ql);
             if (inspectWaterSpeakQl && inspectWaterAuto)
-                ZeeSynth.textToSpeakLinuxFestival(""+ql);
+                ZeeAudio.textToSpeakLinuxFestival(""+ql);
             inspectWaterUpdLabels();
         }catch (Exception e){
             e.printStackTrace();

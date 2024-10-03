@@ -728,7 +728,7 @@ public class ZeeManagerMiner extends ZeeThread{
                 if(ZeeThread.now() - msLastTileMsg > 1000*60*5) {
                     msLastTileMsg = ZeeThread.now();
                     ZeeConfig.msg("Found " + basename);
-                    ZeeSynth.textToSpeakLinuxFestival("Tile found");
+                    ZeeAudio.textToSpeakLinuxFestival("Tile found");
                 }
                 //add found tile to the top
                 foundList.add(0,label);
@@ -751,7 +751,7 @@ public class ZeeManagerMiner extends ZeeThread{
                     if(ZeeThread.now() - msLastSilverMsg > 1000*60*5) {
                         msLastSilverMsg = ZeeThread.now();
                         ZeeConfig.msg("Silver ore found");
-                        ZeeSynth.textToSpeakLinuxFestival("Silver ore found");
+                        ZeeAudio.textToSpeakLinuxFestival("Silver ore found");
                     }
                 } else {
                     label.settext(basename + "  (gold)");
@@ -759,7 +759,7 @@ public class ZeeManagerMiner extends ZeeThread{
                     if(ZeeThread.now() - msLastGoldMsg > 1000*60*5) {
                         msLastGoldMsg = ZeeThread.now();
                         ZeeConfig.msg("Gold ore found");
-                        ZeeSynth.textToSpeakLinuxFestival("Gold ore found");
+                        ZeeAudio.textToSpeakLinuxFestival("Gold ore found");
                     }
                 }
                 //add precious ore to the top
@@ -875,7 +875,7 @@ public class ZeeManagerMiner extends ZeeThread{
                     // alert ql if tilemonitor is open
                     if (tilemonWindow!=null) {
                         if (hiQlSpeak)
-                            ZeeSynth.textToSpeakLinuxFestival("" + highestQl);
+                            ZeeAudio.textToSpeakLinuxFestival("" + highestQl);
                         if (hiQlText)
                             ZeeConfig.addPlayerText("q" + highestQl);
                     }

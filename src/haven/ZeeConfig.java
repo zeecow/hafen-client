@@ -861,7 +861,7 @@ public class ZeeConfig {
                 if (audio != null && !audio.isEmpty())
                     playAudioGobId(audio, gobId);
                 else
-                    gameUI.ui.msg("player spotted",Color.yellow,ZeeSynth.msgsfxPlayer);
+                    gameUI.ui.msg("player spotted",Color.yellow, ZeeAudio.msgsfxPlayer);
             }
         }
         //if single gob alert is saved, play alert
@@ -889,7 +889,7 @@ public class ZeeConfig {
         // gob text to speech
         String speech = null;
         if( (speech = mapGobSpeech.get(gobName)) != null){
-            ZeeSynth.textToSpeakLinuxFestival(speech);
+            ZeeAudio.textToSpeakLinuxFestival(speech);
         }
     }
 
@@ -2362,13 +2362,13 @@ public class ZeeConfig {
     public static void playMidi(String[] notes){
         if(playingAudio!=null && playingAudio.contains(notes.toString()))
             return;//avoid duplicate audio
-        new ZeeSynth(notes).start();
+        new ZeeAudio(notes).start();
     }
 
     public static void playMidi(String[] notes, int instr){
         if(playingAudio!=null && playingAudio.contains(notes.toString()))
             return;//avoid duplicate audio
-        new ZeeSynth(notes,instr).start();
+        new ZeeAudio(notes,instr).start();
     }
 
     //"note, duration_ms, volume_from0to127",
@@ -2444,7 +2444,7 @@ public class ZeeConfig {
         double now = Utils.rtime();
         if(now - lasterrsfx > 0.5) {
             lasterrsfx = now;
-            new ZeeSynth(filePath).start();
+            new ZeeAudio(filePath).start();
         }
         //if(playingAudio!=null && playingAudio.contains(filePath))
             //return;//avoid duplicate audio
@@ -3474,7 +3474,7 @@ public class ZeeConfig {
     }
 
     public static void msgLow(String s) {
-        gameUI.ui.msg(s,Color.white,ZeeSynth.msgsfxLow);
+        gameUI.ui.msg(s,Color.white, ZeeAudio.msgsfxLow);
     }
 
     public static void msgError(String msg) {

@@ -1395,7 +1395,7 @@ public class ZeeManagerGobClick extends ZeeThread{
 
                     //speak ql
                     int ql = gItem.getInfoQualityInt();
-                    ZeeSynth.textToSpeakLinuxFestival("sand "+ql);
+                    ZeeAudio.textToSpeakLinuxFestival("sand "+ql);
 
                     //drop item
                     gItem.wdgmsg("drop",Coord.z);
@@ -1452,7 +1452,7 @@ public class ZeeManagerGobClick extends ZeeThread{
 
                     //speak ql
                     int ql = gItem.getInfoQualityInt();
-                    ZeeSynth.textToSpeakLinuxFestival("clay "+ql);
+                    ZeeAudio.textToSpeakLinuxFestival("clay "+ql);
 
                     //drop clay
                     gItem.wdgmsg("drop",Coord.z);
@@ -2024,8 +2024,8 @@ public class ZeeManagerGobClick extends ZeeThread{
             ZeeSess.charSwitchCreateWindow();
         else if(petalName.contentEquals(ZeeFlowerMenu.STRPETAL_TESTCOORDS))
             windowTestCoords();
-//        else if(petalName.contentEquals(ZeeFlowerMenu.STRPETAL_TASKBUILDER))
-//            ZeeTaskBuilder.showWindow();
+        else if(petalName.contentEquals(ZeeFlowerMenu.STRPETAL_AUDIOFILTER))
+            ZeeAudio.windowAudioFilter();
         else if(petalName.contentEquals(ZeeFlowerMenu.STRPETAL_CLEARGOBTEXTSPOINTERS))
             ZeeConsole.clearGobsTextsAndPointers();
         else if (petalName.contentEquals(ZeeFlowerMenu.STRPETAL_AUTOBUTCH_BIGDEADANIMAL)){
@@ -2351,9 +2351,9 @@ public class ZeeManagerGobClick extends ZeeThread{
         }
         else if(gob.tags.contains(Gob.Tag.PLAYER_MAIN)) {
             opts = new ArrayList<String>();
+            opts.add(ZeeFlowerMenu.STRPETAL_AUDIOFILTER);
             opts.add(ZeeFlowerMenu.STRPETAL_CLEARGOBTEXTSPOINTERS);
             opts.add(ZeeFlowerMenu.STRPETAL_SWITCHCHAR);
-            //opts.add(ZeeFlowerMenu.STRPETAL_TASKBUILDER);
             if (ZeeConfig.isCaveTile(ZeeConfig.getPlayerTileName()))
                 opts.add(ZeeFlowerMenu.STRPETAL_TILEMONITOR);
             menu = new ZeeFlowerMenu(gob, opts.toArray(String[]::new));
@@ -2638,7 +2638,7 @@ public class ZeeManagerGobClick extends ZeeThread{
                 gobClick(gob, 1);
                 ZeeConfig.clickRemoveCursor();
                 ZeeConfig.setPlayerSpeed(ZeeConfig.PLAYER_SPEED_SPRINT);
-                ZeeSynth.textToSpeakLinuxFestival("get");
+                ZeeAudio.textToSpeakLinuxFestival("get");
             }
         }catch (Exception e){
             e.printStackTrace();

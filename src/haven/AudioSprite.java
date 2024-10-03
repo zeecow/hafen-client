@@ -49,6 +49,8 @@ public class AudioSprite {
 			//ZeeConfig.println("block "+res.name+" clip " + subClip);
 			blockAudio = true;
 		}
+		if(ZeeAudio.monitorAudioClip)
+			ZeeAudio.checkAudioClip(res.name,subClip);
 		if (!blockAudio)
 			return (cl.get(subClip));
 	}

@@ -393,7 +393,7 @@ public class ZeeFishing {
                         }
                         // text2speak percentage
                         String percChance = lbls.get(lbls.size()-1).texts;
-                        ZeeSynth.textToSpeakLinuxFestival(percChance + " percent");
+                        ZeeAudio.textToSpeakLinuxFestival(percChance + " percent");
                         break;
                     }
                 }

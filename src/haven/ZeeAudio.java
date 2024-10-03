@@ -4,14 +4,14 @@ import javax.sound.midi.MidiChannel;
 import javax.sound.midi.MidiSystem;
 import javax.sound.midi.Synthesizer;
 import javax.sound.sampled.*;
+import java.awt.*;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
+import java.util.*;
 
-public class ZeeSynth extends Thread{
+public class ZeeAudio extends Thread{
 
     public static final Resource errsfx = Resource.local().loadwait("sfx/error");
     public static final Resource msgsfx = Resource.local().loadwait("sfx/msg");
@@ -29,17 +29,17 @@ public class ZeeSynth extends Thread{
     public static float volumeFile = 1.0F;
     private Clip clip;
 
-    public ZeeSynth(String[] notess) {
+    public ZeeAudio(String[] notess) {
         midiInstrument = 0;//piano
         midiPlayNotes = notess;
     }
 
-    public ZeeSynth(String[] midiNotes, int instr) {
+    public ZeeAudio(String[] midiNotes, int instr) {
         midiInstrument = instr;
         midiPlayNotes = midiNotes;
     }
 
-    public ZeeSynth(String filePath) {
+    public ZeeAudio(String filePath) {
         this.filePath = filePath;
     }
 
@@ -206,5 +206,136 @@ public class ZeeSynth extends Thread{
     {
         int octave = Integer.parseInt(note.substring(0, 1));
         return midiNotes.indexOf(note.substring(1)) + 12 * octave + 12;
+    }
+
+
+
+
+    static boolean monitorAudioClip;
+    static HashMap<String,List<Integer>> mapAudioResClip;
+    static ZeeWindow.ZeeButton audioFilterUpdBtn;
+    @SuppressWarnings("unchecked")
+    static void checkAudioClip(String resname, int subClip) {
+
+        if (mapAudioResClip == null)
+            mapAudioResClip = new HashMap();
+
+        List<Integer> subclips = mapAudioResClip.get(resname);
+        if (subclips==null){
+            subclips = new ArrayList();
+            subclips.add(subClip);
+            mapAudioResClip.put(resname, subclips);
+        }
+        else if(!subclips.contains(subClip)){
+            subclips.add(subClip);
+            mapAudioResClip.put(resname, subclips);
+        }
+        if (audioFilterUpdBtn!=null){
+            audioFilterUpdBtn.change("refresh "+mapAudioResClip.size());
+        }
+    }
+    static void windowAudioFilter() {
+
+        // first run requirement
+        monitorAudioClip = true;
+
+        // create window
+        String title = "Audio Filter";
+        Window win = ZeeConfig.getWindow(title);
+        if(win==null) {
+            win = ZeeConfig.gameUI.add(new Window(Coord.of(225, 100), title) {
+                public void wdgmsg(String msg, Object... args) {
+                    if (msg.contentEquals("close")) {
+                        monitorAudioClip = false;
+                        this.reqdestroy();
+                    }
+                }
+            },ZeeConfig.gameUI.sz.div(3));
+            audioFilterUpdBtn = win.add(new ZeeWindow.ZeeButton("refresh " + (mapAudioResClip == null ? 0 : mapAudioResClip.size())) {
+                public void wdgmsg(String msg, Object... args) {
+                    if (msg.contentEquals("activate")) {
+                        updAudioFilterWindow();
+                    }
+                }
+            }, 0, 0);
+            win.add(new Label("leftclick plays, midclick blocks"),0,audioFilterUpdBtn.sz.y);
+        }
+    }
+    private static void updAudioFilterWindow() {
+        String title = "Audio Filter";
+        Window win = ZeeConfig.getWindow(title);
+        if (win==null){
+            ZeeConfig.msgError("no audio filter window");
+            return;
+        }
+        if (mapAudioResClip!=null) {
+            //rem buttons
+            for (ButtonAudioFilter b : win.children(ButtonAudioFilter.class)) {
+                b.reqdestroy();
+            }
+            //add buttons
+            int x = 0, y = audioFilterUpdBtn.sz.y + 25;
+            Widget wdg;
+            for (Map.Entry<String, List<Integer>> ent : mapAudioResClip.entrySet()) {
+                // resname button
+                wdg = win.add(new ButtonAudioFilter(ent.getKey(),ent.getKey()), x, y);
+                wdg.settip("block all variations");
+                x += wdg.sz.x;
+                // subclips buttons
+                List<Integer> subclips = ent.getValue();
+                for (Integer clips : subclips) {
+                    wdg = win.add(new ButtonAudioFilter(clips.toString(),ent.getKey()), x, y);
+                    x += wdg.sz.x;
+                }
+                y += 25;
+                x = 0;
+            }
+            win.pack();
+        }
+    }
+
+    private static class ButtonAudioFilter extends ZeeWindow.ZeeButton {
+        boolean isSubClip;
+        String resname;
+        public ButtonAudioFilter(String buttonText, String resname) {
+            super(buttonText);
+            this.resname = resname;
+            try {
+                isSubClip = true;
+                Integer.parseInt(buttonText);
+            }catch (NumberFormatException e){
+                isSubClip = false;
+            }
+        }
+        // avoid click btn sound
+        protected void unpress() {
+        }
+        protected void depress() {
+        }
+        // ignore rwidget warnings
+        public void wdgmsg(String msg, Object... args) {
+        }
+        public void wdgmsg(Widget sender, String msg, Object... args) {
+        }
+        // play on mouse up
+        public boolean mouseup(Coord c, int button) {
+            if (button==1) {
+                //play audio
+                String id = "cl";
+                List<Audio.Clip> clips = AudioSprite.clips(Loading.waitfor(Resource.remote().load(resname)), id);
+                if (isSubClip) {
+                    int i = Integer.parseInt(buttonText);
+                    Audio.play(clips.get(i).stream());
+                }else {
+                    Audio.play(clips.get(0).stream());
+                }
+            }else if (button==2){
+                // toggle filter audio
+                // set button text to red?
+                ZeeConfig.msgLow(this.buttonText);
+                this.change(buttonText, Color.red);
+            }
+            return super.mouseup(c,button);
+        }
     }
 }

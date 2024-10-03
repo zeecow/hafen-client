@@ -95,15 +95,15 @@ public class ZeeWindow extends Window {
         public static final int BUTTON_SIZE = 20;
         String buttonText;
         public ZeeButton(String title) {
-            super(10*title.length(),title);
+            super(((15*title.length())-20*(title.length()/3)),title);
             this.buttonText = title;
         }
         public ZeeButton(int width, String title) {
-            super(width,title);
+            super(UI.scale(width),title);
             this.buttonText = title;
         }
         public ZeeButton(int width, String title, String tooltip) {
-            super(width,title);
+            super(UI.scale(width),title);
             this.buttonText = title;
             this.settip(tooltip);
         }

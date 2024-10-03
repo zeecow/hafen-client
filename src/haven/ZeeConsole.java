@@ -274,12 +274,12 @@ public class ZeeConsole {
                         text = "list size "+((List<?>) lastCmdResults).size();
                     else
                         text = String.valueOf(lastCmdResults);
-                    ZeeSynth.textToSpeakLinuxFestival(text);
+                    ZeeAudio.textToSpeakLinuxFestival(text);
                 }
             }
             // say parameter(arr[1]) has priority over lastCmdResults
             else{
-                ZeeSynth.textToSpeakLinuxFestival(arr[1]);
+                ZeeAudio.textToSpeakLinuxFestival(arr[1]);
             }
         }
 

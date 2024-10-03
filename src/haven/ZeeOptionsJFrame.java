@@ -1239,7 +1239,7 @@ public class ZeeOptionsJFrame extends JFrame {
             JOptionPane.showMessageDialog(this,"speech text is blank");
         }else{
             try{
-                ZeeSynth.textToSpeakLinuxFestival(speech);
+                ZeeAudio.textToSpeakLinuxFestival(speech);
             }catch (Exception e){
                 JOptionPane.showMessageDialog(this,e.getMessage());
             }
