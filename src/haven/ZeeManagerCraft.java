@@ -138,7 +138,7 @@ public class ZeeManagerCraft extends ZeeThread{
                         for (Gob gobContainer : bugColContainers) {
 
                             //open container
-                            ZeeManagerGobClick.gobClick(gobContainer, 3);
+                            ZeeManagerGobs.gobClick(gobContainer, 3);
                             prepareCancelClick();
                             waitWindowOpened(gobContainer.getres().basename());//TODO more containers
                             sleep(333);
@@ -157,7 +157,7 @@ public class ZeeManagerCraft extends ZeeThread{
                                 do {
                                     sleep(PING_MS);
                                     try {
-                                        bugsFound.removeIf(wItem1 -> ZeeManagerItemClick.isStackByAmount(wItem1.item));
+                                        bugsFound.removeIf(wItem1 -> ZeeManagerItems.isStackByAmount(wItem1.item));
                                     } catch (Loading loading) {
                                         waitSprite = true;
                                         continue;
@@ -194,7 +194,7 @@ public class ZeeManagerCraft extends ZeeThread{
                         }
 
                         //open wood pile
-                        ZeeManagerGobClick.gobClick(bugColWoodPile, 3);
+                        ZeeManagerGobs.gobClick(bugColWoodPile, 3);
                         prepareCancelClick();
                         waitWindowOpened("Stockpile");
 
@@ -218,7 +218,7 @@ public class ZeeManagerCraft extends ZeeThread{
     }
     public static void bugColGobClicked(Gob gob) {
         // bug container
-        if (ZeeManagerGobClick.isGobCraftingContainer(gob.getres().name)){
+        if (ZeeManagerGobs.isGobCraftingContainer(gob.getres().name)){
             ZeeConfig.addGobText(gob,"bugs");
             if (bugColContainers==null)
                 bugColContainers = new ArrayList<>();
@@ -350,13 +350,13 @@ public class ZeeManagerCraft extends ZeeThread{
                                 return;
                             }
                             //pickup fibres from stockpile
-                            ZeeManagerGobClick.gobClick(closestPile,3,UI.MOD_SHIFT);
+                            ZeeManagerGobs.gobClick(closestPile,3,UI.MOD_SHIFT);
                             if(!waitPlayerIdleFor(1)){
                                 clothExit("couldn't reach stockpile");
                                 return;
                             }
                             //return to loom
-                            ZeeManagerGobClick.gobClick(loom,3);
+                            ZeeManagerGobs.gobClick(loom,3);
                             if (!waitPlayerPose(ZeeConfig.POSE_PLAYER_LOOM_IDLE)){
                                 clothExit("couldnt return to loom");
                                 return;
@@ -499,9 +499,9 @@ public class ZeeManagerCraft extends ZeeThread{
         try {
             ZeeConfig.addPlayerText("get strings");
             Gob ropewalk = ZeeConfig.getClosestGobByNameContains("gfx/terobjs/ropewalk");
-            ZeeManagerGobClick.gobClick(stringPile,3,UI.MOD_SHIFT);
+            ZeeManagerGobs.gobClick(stringPile,3,UI.MOD_SHIFT);
             waitPlayerIdlePose();
-            ZeeManagerGobClick.gobClick(ropewalk,3);
+            ZeeManagerGobs.gobClick(ropewalk,3);
             waitPlayerIdlePose();
             if (ZeeConfig.getMainInventory().getItemsSelectedForCrafting().size() < 10){
                 ZeeConfig.removePlayerText();

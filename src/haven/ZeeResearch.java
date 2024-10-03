@@ -61,7 +61,7 @@ public class ZeeResearch {
                     for (WItem wItem : hsItemsUsed) {
                         String name = wItem.item.getres().basename();
                         //ZeeConfig.println(name);
-                        if (!name.contentEquals("jar") && !name.startsWith("jar-") && !ZeeManagerItemClick.isItemDrinkingVessel(name)) {
+                        if (!name.contentEquals("jar") && !name.startsWith("jar-") && !ZeeManagerItems.isItemDrinkingVessel(name)) {
                             strIngredients += "," + name;
                         }
                     }
@@ -443,7 +443,7 @@ public class ZeeResearch {
                             return;
                         }
                         WItem cup = cups.get(0);
-                        ZeeManagerItemClick.pickUpItem(cup);
+                        ZeeManagerItems.pickUpItem(cup);
 
                         // collect tile water, calc next coord
                         ZeeConfig.itemActTile(inspectWaterNextCoord.floor(posres));
@@ -457,18 +457,18 @@ public class ZeeResearch {
                         inspectWaterNextCoord = coordNow.add(coordNow.sub(inspectWaterCoordBefore));
 
                         // read cup contents, register water quality
-                        String msg = ZeeManagerItemClick.getHoldingItemContentsNameQl();
+                        String msg = ZeeManagerItems.getHoldingItemContentsNameQl();
                         ZeeConfig.msgLow(msg);
                         Integer ql = Integer.valueOf(msg.replaceAll("\\D", ""));
                         inspectWaterAddQl(ql);
 
                         //return cup, empty cup
-                        Coord cupSlot = ZeeManagerItemClick.dropHoldingItemToInvAndRetCoord(inv);
+                        Coord cupSlot = ZeeManagerItems.dropHoldingItemToInvAndRetCoord(inv);
                         if (cupSlot != null) {
                             cup = inv.getItemBySlotCoord(cupSlot);
                             boolean confirmPetalBackup = ZeeConfig.confirmPetal;
                             ZeeConfig.confirmPetal = false;//temp disable confirm petal
-                            boolean emptied = ZeeManagerItemClick.clickItemPetal(cup, "Empty");
+                            boolean emptied = ZeeManagerItems.clickItemPetal(cup, "Empty");
                             ZeeConfig.confirmPetal = confirmPetalBackup;
                             if (!emptied){
                                 println("couldnt empty cup?");

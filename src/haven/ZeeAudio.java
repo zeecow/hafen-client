@@ -13,8 +13,6 @@ import java.util.*;
 
 public class ZeeAudio extends Thread{
 
-    public static final Resource errsfx = Resource.local().loadwait("sfx/error");
-    public static final Resource msgsfx = Resource.local().loadwait("sfx/msg");
     public static final Audio.Clip msgsfxLow = Audio.resclip(Resource.local().loadwait("sfx/hud/mmap/wood4"));
     public static final Audio.Clip msgsfxPlayer = Audio.resclip(Resource.local().loadwait("sfx/hud/mmap/bell1"));
 
@@ -212,38 +210,37 @@ public class ZeeAudio extends Thread{
 
 
     static boolean monitorAudioClip;
-    static HashMap<String,List<Integer>> mapAudioResClip;
-    static ZeeWindow.ZeeButton audioFilterUpdBtn;
+    static HashMap<String,List<Integer>> mapButtonsResClip;
+    static ZeeWindow.ZeeButton audioBlockerUpdBtn;
+    static final String AUDIO_BLOCKER_WIN_TITLE = "Audio Blocker";
     @SuppressWarnings("unchecked")
-    static void checkAudioClip(String resname, int subClip) {
+    static void checkAudioBlock(String resname, int subClip) {
 
-        if (mapAudioResClip == null)
-            mapAudioResClip = new HashMap();
-
-        List<Integer> subclips = mapAudioResClip.get(resname);
+        if (mapButtonsResClip == null)
+            mapButtonsResClip = new HashMap();
+        List<Integer> subclips = mapButtonsResClip.get(resname);
         if (subclips==null){
             subclips = new ArrayList();
             subclips.add(subClip);
-            mapAudioResClip.put(resname, subclips);
+            mapButtonsResClip.put(resname, subclips);
         }
         else if(!subclips.contains(subClip)){
             subclips.add(subClip);
-            mapAudioResClip.put(resname, subclips);
+            mapButtonsResClip.put(resname, subclips);
         }
-        if (audioFilterUpdBtn!=null){
-            audioFilterUpdBtn.change("refresh "+mapAudioResClip.size());
+        if (audioBlockerUpdBtn !=null){
+            audioBlockerUpdBtn.change("refresh "+audioBlockerWinClipsCount());
         }
     }
-    static void windowAudioFilter() {
+    static void windowAudioBlocker() {
 
         // first run requirement
         monitorAudioClip = true;
 
         // create window
-        String title = "Audio Filter";
-        Window win = ZeeConfig.getWindow(title);
+        Window win = ZeeConfig.getWindow(AUDIO_BLOCKER_WIN_TITLE);
         if(win==null) {
-            win = ZeeConfig.gameUI.add(new Window(Coord.of(225, 100), title) {
+            win = ZeeConfig.gameUI.add(new Window(Coord.of(225, 100), AUDIO_BLOCKER_WIN_TITLE) {
                 public void wdgmsg(String msg, Object... args) {
                     if (msg.contentEquals("close")) {
                         monitorAudioClip = false;
@@ -251,32 +248,42 @@ public class ZeeAudio extends Thread{
                     }
                 }
             },ZeeConfig.gameUI.sz.div(3));
-            audioFilterUpdBtn = win.add(new ZeeWindow.ZeeButton("refresh " + (mapAudioResClip == null ? 0 : mapAudioResClip.size())) {
+            audioBlockerUpdBtn = win.add(new ZeeWindow.ZeeButton("refresh " + (mapButtonsResClip == null ? 0 : audioBlockerWinClipsCount().toString())) {
                 public void wdgmsg(String msg, Object... args) {
                     if (msg.contentEquals("activate")) {
-                        updAudioFilterWindow();
+                        updAudioBlockerWindow();
                     }
                 }
             }, 0, 0);
-            win.add(new Label("leftclick plays, midclick blocks"),0,audioFilterUpdBtn.sz.y);
+            win.add(new Label("leftclick plays, midclick blocks"),0, audioBlockerUpdBtn.sz.y);
         }
     }
-    private static void updAudioFilterWindow() {
-        String title = "Audio Filter";
-        Window win = ZeeConfig.getWindow(title);
+    private static Integer audioBlockerWinClipsCount() {
+        int ret = mapButtonsResClip.size();
+        for (Map.Entry<String, List<Integer>> ent : mapButtonsResClip.entrySet()) {
+            if (ent.getValue()!=null){
+                ret += ent.getValue().size();
+                if (ent.getValue().contains(0))
+                    ret--;//resname button counts as clip 0
+            }
+        }
+        return ret;
+    }
+    private static void updAudioBlockerWindow() {
+        Window win = ZeeConfig.getWindow(AUDIO_BLOCKER_WIN_TITLE);
         if (win==null){
-            ZeeConfig.msgError("no audio filter window");
+            ZeeConfig.msgError("no audio blocker window");
             return;
         }
-        if (mapAudioResClip!=null) {
+        if (mapButtonsResClip !=null) {
             //rem buttons
             for (ButtonAudioFilter b : win.children(ButtonAudioFilter.class)) {
                 b.reqdestroy();
             }
             //add buttons
-            int x = 0, y = audioFilterUpdBtn.sz.y + 25;
+            int x = 0, y = audioBlockerUpdBtn.sz.y + 25;
             Widget wdg;
-            for (Map.Entry<String, List<Integer>> ent : mapAudioResClip.entrySet()) {
+            for (Map.Entry<String, List<Integer>> ent : mapButtonsResClip.entrySet()) {
                 // resname button
                 wdg = win.add(new ButtonAudioFilter(ent.getKey(),ent.getKey()), x, y);
                 wdg.settip("block all variations");
@@ -295,47 +302,111 @@ public class ZeeAudio extends Thread{
     }
 
     private static class ButtonAudioFilter extends ZeeWindow.ZeeButton {
-        boolean isSubClip;
+        boolean isBlocking;
         String resname;
+        Integer subClip;
+        final Color colorBlocked = Color.decode("#8c1000");
         public ButtonAudioFilter(String buttonText, String resname) {
             super(buttonText);
             this.resname = resname;
             try {
-                isSubClip = true;
-                Integer.parseInt(buttonText);
+                subClip = Integer.parseInt(buttonText);
             }catch (NumberFormatException e){
-                isSubClip = false;
+                subClip = null;
             }
+            isBlocking = false;
+            if (ZeeConfig.mapAudioBlocker.containsKey(resname)){
+                List<Integer> savedClips = ZeeConfig.mapAudioBlocker.get(resname);
+                if (savedClips==null || savedClips.contains(subClip)){//null means block all subclips
+                    isBlocking = true;
+                }
+            }
+            if (isBlocking)
+                this.change(buttonText, colorBlocked);
+            else
+                this.change(buttonText);
         }
         // avoid click btn sound
-        protected void unpress() {
-        }
-        protected void depress() {
-        }
+        protected void unpress(){}
+        protected void depress(){}
         // ignore rwidget warnings
-        public void wdgmsg(String msg, Object... args) {
-        }
-        public void wdgmsg(Widget sender, String msg, Object... args) {
-        }
+        public void wdgmsg(String msg, Object... args){}
+        public void wdgmsg(Widget sender, String msg, Object... args){}
         // play on mouse up
         public boolean mouseup(Coord c, int button) {
-            if (button==1) {
+            try {
                 //play audio
-                String id = "cl";
-                List<Audio.Clip> clips = AudioSprite.clips(Loading.waitfor(Resource.remote().load(resname)), id);
-                if (isSubClip) {
-                    int i = Integer.parseInt(buttonText);
-                    Audio.play(clips.get(i).stream());
-                }else {
-                    Audio.play(clips.get(0).stream());
+                if (button == 1) {
+                    String id = "cl";// TODO add others?
+                    List<Audio.Clip> clips = AudioSprite.clips(Resource.remote().loadwait(resname), id);
+                    if (subClip !=null) {
+                        int i = Integer.parseInt(buttonText);
+                        Audio.play(clips.get(i).stream());
+                    } else {
+                        Audio.play(clips.get(0).stream());
+                    }
                 }
-            }else if (button==2){
                 // toggle filter audio
-                // set button text to red?
-                ZeeConfig.msgLow(this.buttonText);
-                this.change(buttonText, Color.red);
+                else if (button == 2) {
+                    isBlocking = !isBlocking;
+                    // update buttons colors
+                    if (isBlocking)
+                        this.change(buttonText, colorBlocked);
+                    else
+                        this.change(buttonText);
+                    //update map
+                    HashMap<String, List<Integer>> map = ZeeConfig.mapAudioBlocker;
+                    if (isBlocking){
+                        // add to map
+                        if (!map.containsKey(resname)){
+                            // new resname
+                            List<Integer> savedSubClips = null;
+                            if (subClip!=null) {
+                                savedSubClips = new ArrayList<>();
+                                savedSubClips.add(subClip);
+                            }
+                            map.put(resname,savedSubClips);
+                        }else{
+                            // resname already present
+                            List<Integer> savedSubClips = map.get(resname);
+                            if (subClip==null) {
+                                //block all subclips from resname
+                                savedSubClips = null;
+                            }else{
+                                // block specific clip
+                                if (savedSubClips==null)
+                                    savedSubClips = new ArrayList<>();
+                                if (!savedSubClips.contains(subClip))
+                                    savedSubClips.add(subClip);
+                            }
+                            map.put(resname,savedSubClips);
+                        }
+                    }else{
+                        // remove from map
+                        if (map.containsKey(resname)){
+                            List<Integer> savedSubClips = map.get(resname);
+                            if (savedSubClips!=null)
+                                savedSubClips.remove(subClip);
+                            if (savedSubClips==null || savedSubClips.isEmpty())
+                                savedSubClips = null;
+                            if (savedSubClips!=null)
+                                map.put(resname,savedSubClips);
+                            else
+                                map.remove(resname);
+                        }
+                    }
+                    //save map to prefs
+                    //Utils.setpref(ZeeConfig.MAP_AUDIO_BLOCKER,ZeeConfig.serialize(ZeeConfig.mapAudioBlocker));
+                    println(ZeeConfig.mapAudioBlocker.toString());
+                }
+            }catch (Exception e){
+                e.printStackTrace();
             }
             return super.mouseup(c,button);
+        }
+
+        private void println(String s) {
+            ZeeConfig.println(s);
         }
     }
 }

@@ -255,7 +255,7 @@ public class Button extends SIWidget {
 						try {
 							sleep(PING_MS);
 							if (ZeeConfig.playerHasAnyPose(ZeeConfig.POSE_PLAYER_BUILD)) {
-								ZeeManagerItemClick.drinkFromBeltHandsInv();
+								ZeeManagerItems.drinkFromBeltHandsInv();
 							}
 						} catch (Exception e) {
 							e.printStackTrace();

@@ -138,7 +138,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 	}
 
 	protected void removed() {
-		ZeeManagerGobClick.checkOverlayRemoved(gob,spr);
+		ZeeManagerGobs.checkOverlayRemoved(gob,spr);
 	}
 
 	public boolean tick(double dt) {
@@ -1014,7 +1014,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 			String gobName = this.getres().name;
 
 			if( !ZeeConfig.isTree(gobName) &&
-				!ZeeManagerGobClick.isGobWall(gobName)  &&
+				!ZeeManagerGobs.isGobWall(gobName)  &&
 				!ZeeConfig.isGobCrop(gobName)
 				//todo uncomment if fix concurrent exception
 //				!ZeeManagerGobClick.isGobHouse(gobName) &&
@@ -1028,7 +1028,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 			Drawable d = this.getattr(Drawable.class);
 
 			//hide gob
-			if (ZeeManagerGobClick.isHideGob(this)) {
+			if (ZeeManagerGobs.isHideGob(this)) {
 				if (d != null && d.slots != null) {
 					ArrayList<RenderTree.Slot> tmpSlots = new ArrayList<>(d.slots);
 					ZeeConfig.gameUI.ui.sess.glob.loader.defer(() -> {

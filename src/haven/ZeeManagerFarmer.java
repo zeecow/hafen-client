@@ -117,7 +117,7 @@ public class ZeeManagerFarmer extends ZeeThread{
 
             //tag barrels in tile range
             if(allBarrels  ||  ZeeConfig.distanceToPlayer(gob) <= farmerTxtTilesBarrel * TILE_SIZE) {
-                if (!ZeeManagerGobClick.isBarrelEmpty(gob)) {
+                if (!ZeeManagerGobs.isBarrelEmpty(gob)) {
                     ZeeConfig.addGobText(gob, ZeeConfig.getBarrelOverlayBasename(gob));
                 }
                 ZeeConfig.addGobColor(gob, 0, 153, 0, 255);
@@ -147,7 +147,7 @@ public class ZeeManagerFarmer extends ZeeThread{
                     do {
 
                         //pick ground pumpkins
-                        ZeeManagerGobClick.gobClick(nextPump[0], 3, UI.MOD_SHIFT);
+                        ZeeManagerGobs.gobClick(nextPump[0], 3, UI.MOD_SHIFT);
                         waitPlayerIdleLinMove();
                         if (!waitInvIdleMs(777)) {//waitInvIdle
                             println("error waiting picking pumpkins");
@@ -170,7 +170,7 @@ public class ZeeManagerFarmer extends ZeeThread{
                         }
 
                         //slice inv pumps
-                        int slicedPumps = ZeeManagerItemClick.clickAllItemsPetal(invPumps,"Slice");
+                        int slicedPumps = ZeeManagerItems.clickAllItemsPetal(invPumps,"Slice");
                         if (slicedPumps==0)
                             println("no sliced pumpkins?");
                         ZeeConfig.addPlayerText("pumpking");//restore text
@@ -240,7 +240,7 @@ public class ZeeManagerFarmer extends ZeeThread{
                     println("planting abort: cant find highest ql barrel");
                 }else {
                     isPlantingDone = false;
-                    ZeeManagerItemClick.equipTwoSacks();
+                    ZeeManagerItems.equipTwoSacks();
                 }
                 while (busy && !isPlantingDone) {
                     println("> planting loop");
@@ -289,7 +289,7 @@ public class ZeeManagerFarmer extends ZeeThread{
                 piling stage
             */
             if (farmerCbPile){
-                ZeeManagerItemClick.equipTwoSacks();
+                ZeeManagerItems.equipTwoSacks();
                 ZeeManagerStockpile.selAreaPile = true;
                 ZeeManagerStockpile.selAreaPileGobItem = getPileGroundItemGob();
                 ZeeThread t = ZeeManagerStockpile.areaPileAroundStart();
@@ -354,7 +354,7 @@ public class ZeeManagerFarmer extends ZeeThread{
     }
 
     public static boolean tryAccessingBarrel(Gob barrel) {
-        ZeeManagerGobClick.gobClick(barrel, 3);
+        ZeeManagerGobs.gobClick(barrel, 3);
         return waitPlayerDistToGob(barrel,15);//waitPlayerIdleFor(2);
     }
 
@@ -370,11 +370,11 @@ public class ZeeManagerFarmer extends ZeeThread{
         }
 
         //take all barrel seeds
-        ZeeManagerGobClick.barrelTakeAllSeeds(barrel);
+        ZeeManagerGobs.barrelTakeAllSeeds(barrel);
 
         //store remaining holding item
         if(waitHoldingItem()) {
-            ZeeManagerGobClick.itemActGob(barrel, 0);
+            ZeeManagerGobs.itemActGob(barrel, 0);
             Thread.sleep(1000);
         }
 
@@ -442,7 +442,7 @@ public class ZeeManagerFarmer extends ZeeThread{
         }
         Gob g = ZeeConfig.getClosestGobToPlayer(plants);
         if(g!=null) {
-            return ZeeManagerGobClick.activateHarvestGob(g);
+            return ZeeManagerGobs.activateHarvestGob(g);
         }else {
             //println("no gobs to shift+click");
             return false;
@@ -452,7 +452,7 @@ public class ZeeManagerFarmer extends ZeeThread{
     public static boolean activateCursorPlantGItem(GItem gi) {
         //haven.GItem@3a68ee9c ; iact ; [(23, 16), 1]
         //println("activateCursorPlantGItem > "+gi+", seeds = "+getSeedsAmount(gi));
-        ZeeManagerItemClick.gItemActCoord(gi, UI.MOD_SHIFT);
+        ZeeManagerItems.gItemActCoord(gi, UI.MOD_SHIFT);
         return waitCursorName(ZeeConfig.CURSOR_HARVEST);
     }
 
@@ -532,18 +532,18 @@ public class ZeeManagerFarmer extends ZeeThread{
                     return;
                 }
                 ZeeConfig.addGobText(lastBarrel, getSeedNameAndQl());
-                if(!ZeeManagerItemClick.pickUpItem(wItem)){
+                if(!ZeeManagerItems.pickUpItem(wItem)){
                     exitSeedFarmer("couldn't pickup wItem ql "+wItem.item.getInfoQualityInt());
                     return;
                 }
                 sleep(PING_MS);//lag?
-                ZeeManagerGobClick.itemActGob(lastBarrel, UI.MOD_SHIFT);//store first seeds
+                ZeeManagerGobs.itemActGob(lastBarrel, UI.MOD_SHIFT);//store first seeds
                 sleep(PING_MS);//lag?
                 waitPlayerDistToGob(lastBarrel,15);//wait reaching barrel
                 sleep(1000);//waitHoldingItemChanged();//wait 1st seed transfer
                 if (ZeeConfig.isPlayerHoldingItem()) {//2nd seed transfer?
                     // store all seeds (ctrl+shift)
-                    ZeeManagerGobClick.itemActGob(lastBarrel, 3);//3==ctrl+shift
+                    ZeeManagerGobs.itemActGob(lastBarrel, 3);//3==ctrl+shift
                     if(waitNotHoldingItem()) {
                         //all seeds stored
                         ZeeConfig.addGobText(lastBarrel, getSeedNameAndQl());
@@ -571,7 +571,7 @@ public class ZeeManagerFarmer extends ZeeThread{
                 Gob seedPile = ZeeConfig.getClosestGobByNameContains("/seeds");
                 if (seedPile!=null && ZeeConfig.distanceToPlayer(seedPile) < farmerTxtTilesBarrel * TILE_SIZE) {
                     //pickup seed piles until idle
-                    ZeeManagerGobClick.gobClick(seedPile,3,UI.MOD_SHIFT);
+                    ZeeManagerGobs.gobClick(seedPile,3,UI.MOD_SHIFT);
                     waitInvIdleMs(777);
                     //drop if holding item
                     if (ZeeConfig.isPlayerHoldingItem()){
@@ -706,7 +706,7 @@ public class ZeeManagerFarmer extends ZeeThread{
     }
 
     public static boolean isBarrelEmpty(Gob b) {
-        return ZeeManagerGobClick.isBarrelEmpty(b);
+        return ZeeManagerGobs.isBarrelEmpty(b);
     }
 
     public static String getSeedNameAndQl() {
@@ -719,7 +719,7 @@ public class ZeeManagerFarmer extends ZeeThread{
     // gfx/invobjs/seed-flax
     public static boolean isBarrelSameSeeds(Gob barrel, String seedName) {
         String seed = seedName.replace("seed-","");
-        if(ZeeManagerGobClick.getOverlayNames(barrel).contains("gfx/terobjs/barrel-" + seed)) {
+        if(ZeeManagerGobs.getOverlayNames(barrel).contains("gfx/terobjs/barrel-" + seed)) {
             //println("same seeds , gfx/terobjs/barrel-" + seed);
             return true;
         }else {
@@ -944,7 +944,7 @@ public class ZeeManagerFarmer extends ZeeThread{
                     // farm
                     ZeeConfig.addPlayerText("farm");
                     do{
-                        ZeeManagerGobClick.gobClick(nextCrop,3);
+                        ZeeManagerGobs.gobClick(nextCrop,3);
                         prepareCancelClick();
                         sleep(PING_MS);
                         waitPlayerIdleLinMove();
@@ -982,16 +982,16 @@ public class ZeeManagerFarmer extends ZeeThread{
                             ZeeConfig.addPlayerText("collect");
                         //equip sacks
                         if (farmAwayEquipSacksPumpkin && subprods.contains("/pumpkin"))
-                            ZeeManagerItemClick.equipTwoSacks();
+                            ZeeManagerItems.equipTwoSacks();
                         else if(farmAwayEquipSacksNonPumpkin && !subprods.isEmpty())
-                            ZeeManagerItemClick.equipTwoSacks();
+                            ZeeManagerItems.equipTwoSacks();
                         //collect subprods
                         prepareCancelClick();
                         for (String subprod : subprods) {
                             Gob closestSubprod = ZeeConfig.getClosestGobByNameEnds("gfx/terobjs/items" + subprod);
                             while(closestSubprod!=null && !isCancelClick()) {
                                 // shift+click closest item
-                                ZeeManagerGobClick.gobClick(closestSubprod, 3, UI.MOD_SHIFT);
+                                ZeeManagerGobs.gobClick(closestSubprod, 3, UI.MOD_SHIFT);
                                 prepareCancelClick();
                                 // wait first item acquired
                                 waitInvItemOrCancelClick();

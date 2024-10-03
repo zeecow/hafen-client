@@ -111,10 +111,10 @@ public class Following extends Moving {
 		String xfname = msg.string();
 		Following f;
 		g.setattr(f=new Following(g, oid, xfres, xfname));
-		ZeeManagerGobClick.checkAttrSetFollowing(f);
+		ZeeManagerGobs.checkAttrSetFollowing(f);
 	    } else {
 		g.delattr(Following.class);
-		ZeeManagerGobClick.checkAttrDelFollowing(g);
+		ZeeManagerGobs.checkAttrDelFollowing(g);
 	    }
 	}
     }

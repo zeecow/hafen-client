@@ -44,6 +44,8 @@ public class ZeeConfig {
     static final String MAP_ACTION_USES = "mapActionUses2";
     static final String MAP_GOB_COLOR = "mapGobSettings2";
     static final String MAP_WND_POS = "mapWindowPos3";
+    static final String MAP_AUDIO_BLOCKER = "mapAudioBlocker";
+
     static final String WINDOW_NAME_CRAFT = "Makewindow";
     static final String WINDOW_NAME_XPEVT = "XpEvtWindow";
 
@@ -291,10 +293,10 @@ public class ZeeConfig {
     static Runnable playMidiRadioRunnable = () -> ZeeMidiRadio.toggleRadio();
 
     static boolean hideGobs = Utils.getprefb("hideGobs",false);
-    static Runnable hideGobsRunnable = () -> ZeeManagerGobClick.toggleModelsAllGobs();
+    static Runnable hideGobsRunnable = () -> ZeeManagerGobs.toggleModelsAllGobs();
 
     public static boolean showGrowingTreeScale = Utils.getprefb("showGrowingTreeScale", true);
-    static Runnable showGrowingTreeScaleRunnable = () -> ZeeManagerGobClick.toggleAllTreeGrowthTexts();
+    static Runnable showGrowingTreeScaleRunnable = () -> ZeeManagerGobs.toggleAllTreeGrowthTexts();
 
     public final static Set<String> mineablesStone = new HashSet<String>(Arrays.asList(
             "stone","gneiss","basalt","dolomite","feldspar","flint",
@@ -385,6 +387,7 @@ public class ZeeConfig {
     static HashMap<String, Color> mapGobColor = initMapGobColor();
     static HashMap<String,Color> mapCategoryColor = initMapCategoryColor();
     static HashMap<String,Coord> mapWindowPos = initMapWindowPos();
+    static HashMap<String,List<Integer>> mapAudioBlocker = initMapAudioBlocker();
 
 
     private static boolean isSpriteKind(Gob gob, String... kind) {
@@ -473,7 +476,7 @@ public class ZeeConfig {
     }
 
     public static boolean isTree(String gobName) {
-        return ZeeManagerGobClick.isGobTree(gobName);
+        return ZeeManagerGobs.isGobTree(gobName);
     }
 
     public static boolean isBush(String gobName) {
@@ -722,14 +725,14 @@ public class ZeeConfig {
                 "gfx/kritter/stoat/stoat"
         );
         for (String kri : listKO) {
-            if (resname.contentEquals(kri) && !ZeeManagerGobClick.isGobDeadOrKO(kritter)){
+            if (resname.contentEquals(kri) && !ZeeManagerGobs.isGobDeadOrKO(kritter)){
                 return true;
             }
         }
 
         // giant toad questgivers not pickable
         if ( resname.endsWith("/toad") ) {
-            if (ZeeManagerGobClick.getGAttrNames(kritter).contains("ObScale"))
+            if (ZeeManagerGobs.getGAttrNames(kritter).contains("ObScale"))
                 return true;
         }
 
@@ -856,7 +859,7 @@ public class ZeeConfig {
             if (autoHearthOnStranger && !playerHasAnyPose(POSE_PLAYER_TRAVELHOMEPOINT, POSE_PLAYER_TRAVELHOMESHRUG)) {
                 autoHearth();
             }
-            if (alertOnPlayers && !ZeeManagerGobClick.isGobDeadOrKO(gob)) {
+            if (alertOnPlayers && !ZeeManagerGobs.isGobDeadOrKO(gob)) {
                 String audio = mapCategoryAudio.get(CATEG_PVPANDSIEGE);
                 if (audio != null && !audio.isEmpty())
                     playAudioGobId(audio, gobId);
@@ -877,7 +880,7 @@ public class ZeeConfig {
                 //...check if gob is in category
                 if(mapCategoryGobs.get(categ).contains(gobName)){
                     // skip aggressive audio if gob dead of KO
-                    if (categ.contentEquals(CATEG_AGROCREATURES) && ZeeManagerGobClick.isGobDeadOrKO(gob))
+                    if (categ.contentEquals(CATEG_AGROCREATURES) && ZeeManagerGobs.isGobDeadOrKO(gob))
                         continue;
                     //play audio for category
                     path = mapCategoryAudio.get(categ);
@@ -1141,25 +1144,25 @@ public class ZeeConfig {
         }
         //cheesetray
         else if(windowTitle.contentEquals("Rack")) {
-            ZeeManagerItemClick.checkCheeseTray(window);
+            ZeeManagerItems.checkCheeseTray(window);
         }
         //belt
         else if (windowTitle.contentEquals("Belt")) {
-            ZeeManagerItemClick.invBelt = null;
-            ZeeManagerItemClick.getInvBelt();
+            ZeeManagerItems.invBelt = null;
+            ZeeManagerItems.getInvBelt();
         }
         //tamed animals manager
         else if (windowTitle.contentEquals("Cattle Roster")) {
             windowModCattleRoster(window);
         }
         // autolabel contents
-        else if(ZeeManagerGobClick.autoLabelWincapContainers.contains(windowTitle) || ZeeManagerGobClick.autoLabelWincapVmeters.contains(windowTitle) ) {
+        else if(ZeeManagerGobs.autoLabelWincapContainers.contains(windowTitle) || ZeeManagerGobs.autoLabelWincapVmeters.contains(windowTitle) ) {
             // add window fuel UI
             if (List.of("Oven", "Kiln", "Ore Smelter").contains(windowTitle)) {
                 windowAddFuelGUI(window, windowTitle);
             }
             // label gob
-            ZeeManagerGobClick.labelGobByContents(window);
+            ZeeManagerGobs.labelGobByContents(window);
         }
         //equips
         else if(windowTitle.contentEquals("Equipment")) {
@@ -1186,7 +1189,7 @@ public class ZeeConfig {
                 window.add(new Button(UI.scale(60), "auto") {
                     public void wdgmsg(String msg, Object... args) {
                         if (msg.contentEquals("activate")) {
-                            ZeeManagerGobClick.autoPressWine(window);
+                            ZeeManagerGobs.autoPressWine(window);
                         }
                     }
                 }, btnPress.c.x + btnPress.sz.x + 5 , btnPress.c.y);
@@ -1209,7 +1212,7 @@ public class ZeeConfig {
 
             // cheese tray
             if(windowTitle.contentEquals("Cheese Tray")){
-                ZeeManagerItemClick.cheeseTrayMakeWindow(window);
+                ZeeManagerItems.cheeseTrayMakeWindow(window);
             }
             // bug collection
             else if(windowTitle.contentEquals("Bug Collection")) {
@@ -1323,9 +1326,9 @@ public class ZeeConfig {
                     // add checkbox if tools icons were present
                     if (addCheckbox){
                         Widget wdg = window.add(new CheckBox("get irrlight"){
-                            {a = ZeeManagerGobClick.autoPickIrrlight;}
+                            {a = ZeeManagerGobs.autoPickIrrlight;}
                             public void changed(boolean val) {
-                                ZeeManagerGobClick.autoPickIrrlight = val;
+                                ZeeManagerGobs.autoPickIrrlight = val;
                                 super.changed(val);
                             }
                         },360,45);
@@ -1333,7 +1336,7 @@ public class ZeeConfig {
                     }
                     // disable autopick if no tools icons
                     else{
-                        ZeeManagerGobClick.autoPickIrrlightExit();
+                        ZeeManagerGobs.autoPickIrrlightExit();
                     }
 
                 } catch (Exception e) {
@@ -1559,10 +1562,10 @@ public class ZeeConfig {
             //get all fuel items
             List<WItem> items = getMainInventory().getWItemsByNameContains(fuelName);
             //ignore stack placeholder
-            items.removeIf(wItem -> ZeeManagerItemClick.isStackByAmount(wItem.item));
+            items.removeIf(wItem -> ZeeManagerItems.isStackByAmount(wItem.item));
             //add items
             //TODO get items from stack
-            ZeeManagerGobClick.addItemsToGob(items,num,g);
+            ZeeManagerGobs.addItemsToGob(items,num,g);
         }catch (NumberFormatException e){
             ZeeConfig.msg(e.getMessage());
         }
@@ -1667,7 +1670,7 @@ public class ZeeConfig {
                 new ZeeThread(){
                     public void run() {
                         try {
-                            ZeeManagerGobClick.gobClick(woodenChest, 3);
+                            ZeeManagerGobs.gobClick(woodenChest, 3);
                             if (!waitWindowOpenedNameEndsWith("Chest")){
                                 msgError("timeout waiting window opened");
                                 return;
@@ -1960,6 +1963,15 @@ public class ZeeConfig {
             ret = (HashMap<String, Set<String>>) deserialize(s);
         }
         return ret;
+    }
+
+    @SuppressWarnings("unchecked")
+    public static HashMap<String, List<Integer>> initMapAudioBlocker() {
+        String s = Utils.getpref(MAP_AUDIO_BLOCKER,"");
+        if (s.isEmpty())
+            return new HashMap<String,List<Integer>> ();
+        else
+            return (HashMap<String, List<Integer>>) deserialize(s);
     }
 
     @SuppressWarnings("unchecked")
@@ -2267,7 +2279,7 @@ public class ZeeConfig {
     }
     static void toggleCheeserack(Gob cheeserack){
         if (highlightCheeserack){
-            List<String> ols = ZeeManagerGobClick.getOverlayNames(cheeserack);
+            List<String> ols = ZeeManagerGobs.getOverlayNames(cheeserack);
             int trays = 0;
             for (String ol : ols) {
                 if (ol.contains("gfx/fx/eq")) {
@@ -2299,7 +2311,7 @@ public class ZeeConfig {
     }
     static void toggleGardenpot(Gob pot){
         if (highlightGardenpot){
-            List<String> ols = ZeeManagerGobClick.getOverlayNames(pot);
+            List<String> ols = ZeeManagerGobs.getOverlayNames(pot);
             int plants = 0;
             for (String ol : ols) {
                 if (ol.contains("gfx/fx/eq")) {
@@ -2528,11 +2540,11 @@ public class ZeeConfig {
 
         //brightness
         if (ev.getKeyCode()==KeyEvent.VK_RIGHT) {
-            return ZeeManagerGobClick.brightnessUp();
+            return ZeeManagerGobs.brightnessUp();
         }else if(ev.getKeyCode()==KeyEvent.VK_LEFT) {
-            return ZeeManagerGobClick.brightnessDown();
+            return ZeeManagerGobs.brightnessDown();
         }else if(ev.getKeyCode()==KeyEvent.VK_HOME) {
-            return ZeeManagerGobClick.brightnessDefault();
+            return ZeeManagerGobs.brightnessDefault();
         }
         // fast zoom
         else if (ev.getKeyCode()==KeyEvent.VK_PAGE_DOWN) {
@@ -2548,19 +2560,19 @@ public class ZeeConfig {
         else if (ev.getKeyCode()==81) {
             // Ctrl+q shows window pickup gob
             if(ev.isControlDown()){
-                ZeeManagerGobClick.toggleWindowPickupGob();
+                ZeeManagerGobs.toggleWindowPickupGob();
                 return true;
             }
             // simple q press pickup closest gob, if no combat
             else if(!isCombatActive()) {
-                ZeeManagerGobClick.pickupClosestGob(ev);
+                ZeeManagerGobs.pickupClosestGob(ev);
                 return true;
             }
             return false;
         }
         // key drink (')
         else if (ZeeConfig.drinkKey && ev.getKeyCode()==222){
-            ZeeManagerItemClick.drinkFromBeltHandsInv();
+            ZeeManagerItems.drinkFromBeltHandsInv();
             return true;
         }
         // volume up (arrow)
@@ -2603,13 +2615,13 @@ public class ZeeConfig {
             if(ev.isControlDown()) {
                 // variable toggled outside function because QuickOptions runnable
                 ZeeConfig.hideGobs = !ZeeConfig.hideGobs;
-                ZeeManagerGobClick.toggleModelsAllGobs();
+                ZeeManagerGobs.toggleModelsAllGobs();
                 return true;
             }
             // toggle hitboxes
             else if (ev.isShiftDown()){
                 showHitbox = !showHitbox;
-                ZeeManagerGobClick.toggleHitbox();
+                ZeeManagerGobs.toggleHitbox();
                 return true;
             }
         }
@@ -2799,29 +2811,29 @@ public class ZeeConfig {
     public static void initCharacterVariables() {
         println("initCharacterVariables ");
         mainInv = null;
-        ZeeManagerItemClick.invBelt = null;
-        ZeeManagerItemClick.equipory = null;
+        ZeeManagerItems.invBelt = null;
+        ZeeManagerItems.equipory = null;
         ZeeManagerStockpile.windowManager = null;
         ZeeManagerStockpile.selAreaPile = false;
         ZeeManagerCraft.windowFeasting = null;
         ZeeManagerMiner.tunnelHelperWindow = null;
         ZeeManagerMiner.tilemonSearchNames = null;
-        ZeeManagerGobClick.barterFindText = null;
-        ZeeManagerGobClick.barterSearchOpen = false;
-        ZeeManagerGobClick.remountClosestHorse = false;
-        ZeeManagerItemClick.clickingAllItemsPetals = false;
+        ZeeManagerGobs.barterFindText = null;
+        ZeeManagerGobs.barterSearchOpen = false;
+        ZeeManagerGobs.remountClosestHorse = false;
+        ZeeManagerItems.clickingAllItemsPetals = false;
         ZeeConsole.isGobFindActive = false;
         ZeeConsole.gobFindRegex = null;
         isPlayerFollowingCauldron = false;
         if (listCauldronContainers!=null)
             listCauldronContainers.clear();
-        ZeeManagerGobClick.autoPickIrrlightExit();
+        ZeeManagerGobs.autoPickIrrlightExit();
         makeWindow = null;
         ZeeManagerMiner.tilesMonitorCleanup();
         ZeeHistWdg.clearHistory();
-        ZeeManagerGobClick.plowQueueReset();
+        ZeeManagerGobs.plowQueueReset();
         ZeeManagerTrees.chopTreeReset();
-        ZeeManagerGobClick.chipStoneReset();
+        ZeeManagerGobs.chipStoneReset();
         ZeeFishing.exit();
         ZeeManagerTrees.treeloganizerExit("");
         ZeeResearch.inspectWaterClear();
@@ -2829,10 +2841,10 @@ public class ZeeConfig {
         ZeeCupboardLabeler.reset();
         ZeeCupboardLabeler.isActive = false;
 
-        if (ZeeManagerGobClick.winHideGobs!=null){
+        if (ZeeManagerGobs.winHideGobs!=null){
             try{
-                ZeeManagerGobClick.winHideGobs.reqdestroy();
-                ZeeManagerGobClick.winHideGobs = null;
+                ZeeManagerGobs.winHideGobs.reqdestroy();
+                ZeeManagerGobs.winHideGobs = null;
             }catch (Exception e){
                 e.printStackTrace();
             }
@@ -2843,10 +2855,10 @@ public class ZeeConfig {
     }
 
     public static void clickOpenBelt() {
-        WItem belt = ZeeManagerItemClick.getEquippedItemNameEndsWith("belt");
+        WItem belt = ZeeManagerItems.getEquippedItemNameEndsWith("belt");
         if (belt != null) {
             belt.mousedown(Coord.z, 3);
-            ZeeManagerItemClick.invBelt = null;
+            ZeeManagerItems.invBelt = null;
         }
     }
 
@@ -2964,12 +2976,12 @@ public class ZeeConfig {
                 ZeeManagerTrees.treeloganizerCheckLift();
             }
             if(clickb == 2) {
-                ZeeManagerGobClick.startMidClick(pc, mc, clickGob, lastMapViewClickGobName);
+                ZeeManagerGobs.startMidClick(pc, mc, clickGob, lastMapViewClickGobName);
             } else if (clickb==3 && gameUI.ui.modflags()==0){
                 //reset inspect tooltip
                 showInspectTooltip = false;
                 gameUI.map.ttip = null;
-                ZeeManagerGobClick.checkRightClickGob(pc, mc, clickGob, lastMapViewClickGobName);
+                ZeeManagerGobs.checkRightClickGob(pc, mc, clickGob, lastMapViewClickGobName);
             }
         }
         // clicked ground
@@ -2979,7 +2991,7 @@ public class ZeeConfig {
                 if (isPlayerHoldingItem()) { //move while holding item
                     clickCoord(mc.floor(posres), 1, 0);
                 }else
-                    ZeeManagerGobClick.startMidClick(pc,mc,null,"");
+                    ZeeManagerGobs.startMidClick(pc,mc,null,"");
             }
         }
     }
@@ -3778,11 +3790,11 @@ public class ZeeConfig {
                             sleep(500);
 
                             // location based settings
-                            ZeeManagerGobClick.initPlayerLocation();
+                            ZeeManagerGobs.initPlayerLocation();
 
                             // remount closest horse
-                            if (ZeeManagerGobClick.remountClosestHorse) {
-                                ZeeManagerGobClick.remountHorse();
+                            if (ZeeManagerGobs.remountClosestHorse) {
+                                ZeeManagerGobs.remountHorse();
                             }
 
                             // gob radar (broken)
@@ -3832,7 +3844,7 @@ public class ZeeConfig {
             }
 
             // apply settings audio/aggro  (ignore bat if using batcape)
-            if (!ob.getres().name.contentEquals("gfx/kritter/bat/bat") || !ZeeManagerItemClick.isItemEquipped("/batcape")) {
+            if (!ob.getres().name.contentEquals("gfx/kritter/bat/bat") || !ZeeManagerItems.isItemEquipped("/batcape")) {
                 // audio alerts
                 ZeeConfig.applyGobSettingsAudio(ob);
                 // aggro radius
@@ -3846,20 +3858,20 @@ public class ZeeConfig {
 
             // smoking gob highlight
             if (ob.smokeHighlight){
-                ZeeManagerGobClick.highlightGobSmoking(ob);
+                ZeeManagerGobs.highlightGobSmoking(ob);
             }
 
             // auto boulder option (maybe remove)
-            if (ZeeConfig.autoChipMinedBoulder && ZeeManagerMiner.isCursorMining() && ZeeManagerGobClick.isGobBoulder(gobName)) {
+            if (ZeeConfig.autoChipMinedBoulder && ZeeManagerMiner.isCursorMining() && ZeeManagerGobs.isGobBoulder(gobName)) {
                 ZeeManagerMiner.checkBoulderGobAdded(ob);
             }
             // barter stand item search labels
-            else if (ZeeManagerGobClick.barterSearchOpen && gobName.endsWith("/barterstand")) {
-                ZeeManagerGobClick.addTextBarterStand(ob);
+            else if (ZeeManagerGobs.barterSearchOpen && gobName.endsWith("/barterstand")) {
+                ZeeManagerGobs.addTextBarterStand(ob);
             }
             // auto pick irrlight
-            else if (ZeeManagerGobClick.autoPickIrrlight && gobName.endsWith("/irrbloss")) {
-                ZeeManagerGobClick.autoPickIrrlight();
+            else if (ZeeManagerGobs.autoPickIrrlight && gobName.endsWith("/irrbloss")) {
+                ZeeManagerGobs.autoPickIrrlight();
             }
 
             //gob health
@@ -3908,19 +3920,19 @@ public class ZeeConfig {
         if (isAggressive(gobName)){
             gob.tags.add(Gob.Tag.AGGRESSIVE);
         }
-        if(ZeeManagerGobClick.isGobWall(gobName)){
+        if(ZeeManagerGobs.isGobWall(gobName)){
             gob.tags.add(Gob.Tag.WALL);
         }
-        if (ZeeManagerGobClick.isGobHouse(gobName)){
+        if (ZeeManagerGobs.isGobHouse(gobName)){
             gob.tags.add(Gob.Tag.HOUSE);
         }
-        if (ZeeManagerGobClick.isGobSmokeProducer(gobName)){
+        if (ZeeManagerGobs.isGobSmokeProducer(gobName)){
             gob.tags.add(Gob.Tag.SMOKE_PRODUCER);
         }
-        if(ZeeManagerGobClick.isGobIdol(gobName)){
+        if(ZeeManagerGobs.isGobIdol(gobName)){
             gob.tags.add(Gob.Tag.IDOL);
         }
-        if(ZeeManagerGobClick.isGobMineSupport(gobName) || gobName.endsWith("/ladder")){
+        if(ZeeManagerGobs.isGobMineSupport(gobName) || gobName.endsWith("/ladder")){
             gob.tags.add(Gob.Tag.MINE_SUPPORT);
         }
     }
@@ -3936,7 +3948,7 @@ public class ZeeConfig {
                 gob.tags.add(Gob.Tag.PLAYER_OTHER);
         }
         //tamed animals
-        if (ZeeManagerGobClick.isGobTamedAnimalOrAurochEtc(gobName)){
+        if (ZeeManagerGobs.isGobTamedAnimalOrAurochEtc(gobName)){
             gob.tags.add(Gob.Tag.TAMED_ANIMAL_OR_AUROCH_ETC);
         }
     }
@@ -3945,11 +3957,11 @@ public class ZeeConfig {
         return getGobAttr(getPlayerGob(),glass);
     }
     static GAttrib getGobAttr(Gob gob, Class glass){
-        return ZeeManagerGobClick.getGAttrByClassSimpleName(gob,glass.getSimpleName());
+        return ZeeManagerGobs.getGAttrByClassSimpleName(gob,glass.getSimpleName());
     }
 
     static boolean gobHasAttr(Gob gob, String ... gAttrClassNames) {
-        List<String> gobAttrs = ZeeManagerGobClick.getGAttrNames(gob);
+        List<String> gobAttrs = ZeeManagerGobs.getGAttrNames(gob);
         for (String attrName : gAttrClassNames) {
             if(gobAttrs.contains(attrName))
                 return true;
@@ -3957,19 +3969,19 @@ public class ZeeConfig {
         return false;
     }
     static boolean gobHasOverlay(Gob gob, String overlayResName) {
-        return ZeeManagerGobClick.getOverlayNames(gob).contains(overlayResName);
+        return ZeeManagerGobs.getOverlayNames(gob).contains(overlayResName);
     }
 
     static boolean playerHasAttr(String gAttrClassName) {
-        return ZeeManagerGobClick.getGAttrNames(getPlayerGob()).contains(gAttrClassName);
+        return ZeeManagerGobs.getGAttrNames(getPlayerGob()).contains(gAttrClassName);
     }
     static boolean playerHasOverlay(String overlayResName) {
-        return ZeeManagerGobClick.getOverlayNames(getPlayerGob()).contains(overlayResName);
+        return ZeeManagerGobs.getOverlayNames(getPlayerGob()).contains(overlayResName);
     }
 
     private static void applyGobSettingsAggro(Gob gob) {
         // aggro categ radius
-        if( mapCategoryGobs.get(CATEG_AGROCREATURES).contains(gob.getres().name) && !ZeeManagerGobClick.isGobDeadOrKO(gob)) {
+        if( mapCategoryGobs.get(CATEG_AGROCREATURES).contains(gob.getres().name) && !ZeeManagerGobs.isGobDeadOrKO(gob)) {
             if (ZeeConfig.aggroRadiusTiles > 0) {
                 gob.addol(new Gob.Overlay(gob, new ZeeGobRadius(gob, null, ZeeConfig.aggroRadiusTiles * MCache.tilesz2.y)));
             }
@@ -4020,7 +4032,7 @@ public class ZeeConfig {
     }
 
     public static String getBarrelOverlayBasename(Gob barrel){
-        List<String> ols =  ZeeManagerGobClick.getOverlayNames(barrel);
+        List<String> ols =  ZeeManagerGobs.getOverlayNames(barrel);
         if(ols.isEmpty())
             return "";
         return ols.get(0).replace("gfx/terobjs/barrel-","");
@@ -4269,7 +4281,7 @@ public class ZeeConfig {
 
 
         // fishing window
-        if(curs.contentEquals(CURSOR_FISH) && ZeeManagerItemClick.isItemEquipped("/primrod")){
+        if(curs.contentEquals(CURSOR_FISH) && ZeeManagerItems.isItemEquipped("/primrod")){
             ZeeFishing.buildWindow();
         }
     }
@@ -4336,8 +4348,8 @@ public class ZeeConfig {
             ZeeManagerStockpile.exitManager();
         }
         //equip roundshield
-        if (ZeeConfig.equipShieldOnCombat && !ZeeManagerItemClick.isItemEquipped("huntersbow","rangersbow"))
-            ZeeManagerItemClick.equipBeltOrInvItem("/roundshield");
+        if (ZeeConfig.equipShieldOnCombat && !ZeeManagerItems.isItemEquipped("huntersbow","rangersbow"))
+            ZeeManagerItems.equipBeltOrInvItem("/roundshield");
     }
 
     // TODO remove aggro hilites ?
@@ -4350,7 +4362,7 @@ public class ZeeConfig {
         try {
             // clear gob effects
             for (Fightview.Relation rel : fv.lsrel) {
-                Gob g = ZeeManagerGobClick.findGobById(rel.gobid);
+                Gob g = ZeeManagerGobs.findGobById(rel.gobid);
                 if (g!=null) {
                     //hilite
                     g.delattr(ZeeGobFind.class);
@@ -4361,7 +4373,7 @@ public class ZeeConfig {
                 }
             }
             // hilite current gob
-            Gob g = ZeeManagerGobClick.findGobById(fv.lsrel.get(0).gobid);
+            Gob g = ZeeManagerGobs.findGobById(fv.lsrel.get(0).gobid);
             if (g!=null)
                 g.setattr(new ZeeGobFind(g));
         }catch (Exception e){
@@ -4461,12 +4473,12 @@ public class ZeeConfig {
             try {
                 new ZeeThread() {
                     public void run() {
-                        ZeeManagerGobClick.disembarkVehicle(Coord2d.z);
+                        ZeeManagerGobs.disembarkVehicle(Coord2d.z);
                         //if disembark then liftup kicksled
                         if(waitPlayerPoseNotInListTimeout(1000,POSE_PLAYER_KICKSLED_IDLE, POSE_PLAYER_KICKSLED_ACTIVE)){
                             try {
                                 sleep(100);//lagalagalaga
-                                ZeeManagerGobClick.liftGob(getClosestGobByNameContains("vehicle/spark"));
+                                ZeeManagerGobs.liftGob(getClosestGobByNameContains("vehicle/spark"));
                             } catch (InterruptedException e) {
                                 e.printStackTrace();
                             }
@@ -4499,7 +4511,7 @@ public class ZeeConfig {
                 Gob finalVehicle = vehicle;//thanks, IntelliJ
                 new ZeeThread() {
                     public void run() {
-                        ZeeManagerGobClick.disembarkVehicle(Coord2d.z);
+                        ZeeManagerGobs.disembarkVehicle(Coord2d.z);
                         boolean playerDisembarked = waitPlayerPoseNotInListTimeout(1500,
                                 POSE_PLAYER_DUGOUT_ACTIVE, POSE_PLAYER_DUGOUT_IDLE,
                                 POSE_PLAYER_ROWBOAT_ACTIVE, POSE_PLAYER_ROWBOAT_IDLE,
@@ -4509,7 +4521,7 @@ public class ZeeConfig {
                         if(playerDisembarked) {
                             try {
                                 sleep(100);//lagalagalaga
-                                ZeeManagerGobClick.liftGob(finalVehicle);
+                                ZeeManagerGobs.liftGob(finalVehicle);
                             } catch (InterruptedException e) {
                                 e.printStackTrace();
                             }
@@ -4964,11 +4976,11 @@ public class ZeeConfig {
         return Arrays.toString(args);
     }
 
-    public static void println(int num) {
+    static void println(int num) {
         System.out.println(""+num);
     }
 
-    public static void println(String s) {
+    static void println(String s) {
         System.out.println(s);
     }
 }

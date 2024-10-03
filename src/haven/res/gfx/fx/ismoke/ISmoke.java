@@ -61,7 +61,7 @@ public class ISmoke extends Sprite implements Rendered, Sprite.CDel, TickList.Ti
 	int h = sdt.uint8();
 	initzv = h / life;
 	srad = sdt.uint8() / 10.0f;
-	ZeeManagerGobClick.checkSmoke(gob,"1");
+	ZeeManagerGobs.checkSmoke(gob,"1");
     }
 
     public ISmoke(Owner owner, Resource res, Object... args) {
@@ -82,7 +82,7 @@ public class ISmoke extends Sprite implements Rendered, Sprite.CDel, TickList.Ti
 	float h = ((Number)args[a++]).floatValue();
 	initzv = h / life;
 	srad = ((Number)args[a++]).floatValue();
-	ZeeManagerGobClick.checkSmoke(gob,"1");
+	ZeeManagerGobs.checkSmoke(gob,"1");
     }
 
     /* By Knuth's algorithm */

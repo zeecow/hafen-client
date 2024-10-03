@@ -158,7 +158,7 @@ public class Makewindow extends Widget {
 	public void wdgmsg(Widget sender, String msg, Object... args) {
 
 		if(msg.contentEquals("mkWindowFindInputs")){
-    		String nextInputName = ZeeManagerItemClick.getItemInfoName(inputs.get(inputCount).spec.info());
+    		String nextInputName = ZeeManagerItems.getItemInfoName(inputs.get(inputCount).spec.info());
 			ZeeConfig.searchNextInputMakeWnd(nextInputName);
 			inputCount++;
 			if(inputCount >= inputs.size())
@@ -167,7 +167,7 @@ public class Makewindow extends Widget {
 		}
 		else if(msg.contentEquals("close")) {
 			ZeeManagerCraft.craftWindowClosed();
-			ZeeManagerGobClick.autoPickIrrlightExit();
+			ZeeManagerGobs.autoPickIrrlightExit();
 			super.wdgmsg(sender, msg, args);
 		}
 		else {

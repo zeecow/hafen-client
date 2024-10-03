@@ -83,14 +83,14 @@ public class FlowerMenu extends Widget {
 
 	public boolean mousedown(Coord c, int button) {
 		mouseDownButton = button;
-		if (button==2 && ZeeManagerItemClick.isFlowerMenuFromWItem()){
-			ZeeManagerItemClick.showWindowClickAllItemPetals(this.name);
+		if (button==2 && ZeeManagerItems.isFlowerMenuFromWItem()){
+			ZeeManagerItems.showWindowClickAllItemPetals(this.name);
 			return false;
 		}
 	    choose(this);
 		ZeeManagerStockpile.checkChoosenPetal(this.name);
 		ZeeQuickOptionsWindow.updatePetalWidget(this.name);
-		ZeeManagerGobClick.labelHarvestedPlant(this.name);
+		ZeeManagerGobs.labelHarvestedPlant(this.name);
 	    return(true);
 	}
 
@@ -242,7 +242,7 @@ public class FlowerMenu extends Widget {
 		// activate menu on mouseup
 		if (button==3) {
 			// avoid clicking during menu animation
-			if (ZeeThread.now() - ZeeManagerGobClick.lastClickMouseDownMs > 500) { //500ms
+			if (ZeeThread.now() - ZeeManagerGobs.lastClickMouseDownMs > 500) { //500ms
 				return mousedown(c, button);
 			}
 		}
@@ -267,7 +267,7 @@ public class FlowerMenu extends Widget {
 		synchronized (flag){
 			if (autochoose != null) {
 				choose(autochoose);
-				ZeeManagerGobClick.labelHarvestedPlant(autochoose.name);
+				ZeeManagerGobs.labelHarvestedPlant(autochoose.name);
 				autochoose = null;
 			}
 		}
@@ -333,7 +333,7 @@ public class FlowerMenu extends Widget {
 				}
 			}
 		}
-    	if(ZeeConfig.autoClickMenuOption && ZeeManagerGobClick.isMouseUp()) {
+    	if(ZeeConfig.autoClickMenuOption && ZeeManagerGobs.isMouseUp()) {
 			String[] list = ZeeConfig.autoClickMenuOptionList.split(",");
 			for (int i = 0; i < opts.length; i++) {// for each menu option
 				for (int j = 0; j < list.length; j++) {// compare each name in saved list

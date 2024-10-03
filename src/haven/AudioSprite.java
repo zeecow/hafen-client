@@ -41,18 +41,19 @@ public class AudioSprite {
     public static Audio.Clip randoom(Resource res, String id) {
 	List<Audio.Clip> cl = clips(res, id);
 	if(!cl.isEmpty()) {
-		int subClip = (int) (Math.random() * cl.size());
+		int choosenSubClip = (int) (Math.random() * cl.size());
 		boolean blockAudio = false;
-		if ( res.name.contentEquals("sfx/chip")
-			|| ( res.name.contentEquals("sfx/items/pickaxe") && (subClip==1||subClip==2) ) )
-		{
-			//ZeeConfig.println("block "+res.name+" clip " + subClip);
-			blockAudio = true;
+		if (ZeeConfig.mapAudioBlocker.containsKey(res.name)) {
+			List<Integer> savedClips = ZeeConfig.mapAudioBlocker.get(res.name);
+			// block if savedClips is null or contains clip index
+			if (savedClips==null || savedClips.contains(choosenSubClip))
+				blockAudio = true;
 		}
-		if(ZeeAudio.monitorAudioClip)
-			ZeeAudio.checkAudioClip(res.name,subClip);
+		//update audio blocker window
+		if (ZeeAudio.monitorAudioClip)
+			ZeeAudio.checkAudioBlock(res.name, choosenSubClip);
 		if (!blockAudio)
-			return (cl.get(subClip));
+			return (cl.get(choosenSubClip));
 	}
 	return(null);
     }

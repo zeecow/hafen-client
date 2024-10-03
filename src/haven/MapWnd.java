@@ -323,7 +323,7 @@ public class MapWnd extends Window implements Console.Directory {
 	    if(!press && !domark) {
 		mvclick(mv, null, loc, icon.gob, button);
 		if(button==2 || button==3)
-			ZeeManagerGobClick.clickedMinimapGobicon(icon.gob,button);
+			ZeeManagerGobs.clickedMinimapGobicon(icon.gob,button);
 		return(true);
 	    }
 	    return(false);

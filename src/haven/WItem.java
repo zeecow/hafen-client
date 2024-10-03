@@ -214,14 +214,14 @@ public class WItem extends Widget implements DTarget {
 	public boolean mouseup(Coord c, int btn) {
 		boolean isReallyWItem = this.getClass().getSimpleName().contentEquals("WItem");
 		if (isReallyWItem){
-			ZeeManagerItemClick.lastItemClickedMs = ZeeThread.now();
-			ZeeManagerItemClick.lastItemClicked = this;
-			ZeeManagerItemClick.lastItemClickedButton = btn;
+			ZeeManagerItems.lastItemClickedMs = ZeeThread.now();
+			ZeeManagerItems.lastItemClicked = this;
+			ZeeManagerItems.lastItemClickedButton = btn;
 		}
 		// ignore calls by other classes other than WItem
 		if (btn == 2 && isReallyWItem) {
-			ZeeManagerItemClick.clickEndMs = System.currentTimeMillis();
-			new ZeeManagerItemClick(this,c).start();
+			ZeeManagerItems.clickEndMs = System.currentTimeMillis();
+			new ZeeManagerItems(this,c).start();
 			return false;
 		}
 		if (btn==3 && ui.modshift && ZeeConfig.farmerMode) {
@@ -234,7 +234,7 @@ public class WItem extends Widget implements DTarget {
 
 		// middle-click item starts equipManager
 		if(btn == 2) {
-			ZeeManagerItemClick.clickStartMs = System.currentTimeMillis();
+			ZeeManagerItems.clickStartMs = System.currentTimeMillis();
 			return false;
 		}
 

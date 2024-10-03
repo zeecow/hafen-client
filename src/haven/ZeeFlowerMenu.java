@@ -28,8 +28,7 @@ public class ZeeFlowerMenu extends FlowerMenu{
     static final String STRPETAL_SWITCHCHAR = "Switch char";
     static final String STRPETAL_TESTCOORDS = "Test coords";
     static final String STRPETAL_TILEMONITOR = "Tile monitor";
-    static final String STRPETAL_AUDIOFILTER = "Audio filter";
-    //static final String STRPETAL_TASKBUILDER = "Task builder";
+    static final String STRPETAL_AUDIOBLOCKER = "Audio blocker";
     static final String STRPETAL_TOGGLE_CATTLEROSTER = "Toggle roster";
     static final String STRPETAL_MEMORIZEAREANIMALS = "Memorize area";
     static final String STRPETAL_BINDWATER = "Bind water items";
@@ -68,13 +67,13 @@ public class ZeeFlowerMenu extends FlowerMenu{
                 public void run() {
                     try{
                         if (gob != null) {
-                            ZeeManagerGobClick.gobZeeMenuClicked(gob, petalName);
+                            ZeeManagerGobs.gobZeeMenuClicked(gob, petalName);
                         }
                         else if (wItem != null) {
-                            ZeeManagerItemClick.itemZeeMenuClicked(wItem, petalName);
+                            ZeeManagerItems.itemZeeMenuClicked(wItem, petalName);
                         }
                         else {
-                            ZeeManagerGobClick.groundZeeMenuClicked(coordMc, petalName);
+                            ZeeManagerGobs.groundZeeMenuClicked(coordMc, petalName);
                         }
                     }catch(Exception e){
                         e.printStackTrace();

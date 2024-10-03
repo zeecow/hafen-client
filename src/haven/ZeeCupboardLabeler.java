@@ -153,7 +153,7 @@ public class ZeeCupboardLabeler {
         String houseName = null;
         if (g!=null)
             houseName = g.getres().name;
-        if(g!=null && ZeeManagerGobClick.isGobHouse(houseName) && !houseName.endsWith("windmill") && !houseName.endsWith("stonetower")){
+        if(g!=null && ZeeManagerGobs.isGobHouse(houseName) && !houseName.endsWith("windmill") && !houseName.endsWith("stonetower")){
             //TODO cabin levels for windmill, stonetower
             lastHouseId = generateHouseId(g);
             lastCabinLevel = 1;

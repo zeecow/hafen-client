@@ -346,7 +346,7 @@ public class ZeeManagerMiner extends ZeeThread{
 
     static List<Gob> getBoulders(){
         List<Gob> boulders = ZeeConfig.findGobsByNameStartsWith("gfx/terobjs/bumlings/");
-        boulders.removeIf(gob -> !ZeeManagerGobClick.isGobBoulder(gob.getres().name));//remove cave in boulders
+        boulders.removeIf(gob -> !ZeeManagerGobs.isGobBoulder(gob.getres().name));//remove cave in boulders
         return boulders;
     }
 
@@ -381,14 +381,14 @@ public class ZeeManagerMiner extends ZeeThread{
         int stackSlotsGuess = numStonesWanted/2;
         int freeSlotsRequired = ZeeConfig.autoStack ? stackSlotsGuess : numStonesWanted;
         if(inv.getNumberOfFreeSlots() < freeSlotsRequired){
-            WItem sack = ZeeManagerItemClick.getSackFromBelt();//1st sack
+            WItem sack = ZeeManagerItems.getSackFromBelt();//1st sack
             if (sack!=null) {
-                Thread t = new ZeeManagerItemClick(sack);
+                Thread t = new ZeeManagerItems(sack);
                 t.start();
                 t.join();//wait equip sack
-                sack = ZeeManagerItemClick.getSackFromBelt();//2nd sack
+                sack = ZeeManagerItems.getSackFromBelt();//2nd sack
                 if(inv.getNumberOfFreeSlots()<numStonesWanted && sack!=null){
-                    t = new ZeeManagerItemClick(sack);
+                    t = new ZeeManagerItems(sack);
                     t.start();
                     t.join();//wait equip 2nd sack
                 }
@@ -420,7 +420,7 @@ public class ZeeManagerMiner extends ZeeThread{
 
             // start collecting current stone type
             println("picking "+closestStone.getres().basename());
-            ZeeManagerGobClick.pickupAllGobItems(closestStone);
+            ZeeManagerGobs.pickupAllGobItems(closestStone);
 
             // wait current stone type
             long invIdleMs = 500;
@@ -529,7 +529,7 @@ public class ZeeManagerMiner extends ZeeThread{
             }
 
             //chip boulder
-            ZeeManagerGobClick.clickGobPetal(boulder, "Chip stone");
+            ZeeManagerGobs.clickGobPetal(boulder, "Chip stone");
             waitNoFlowerMenu();
 
             //restore mining icon for autodrop

@@ -17,7 +17,7 @@ public class Equed extends Sprite {
 	super(owner, res);
 	this.espr = espr;
 	this.eqd = RUtils.StateTickNode.from(this.espr, bo.from(owner.fcontext(EquipTarget.class, false)));
-	ZeeManagerGobClick.checkOverlayEquedAdded(owner,res);
+	ZeeManagerGobs.checkOverlayEquedAdded(owner,res);
     }
 
     public static Resource ctxres(Owner owner) {

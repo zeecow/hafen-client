@@ -115,7 +115,7 @@ public class Inventory extends Widget implements DTarget {
 				wdgmsg("invxf", minv.wdgid(), 1);
 			else if(amount > 0)
 				minv.wdgmsg("invxf", this.wdgid(), 1);
-			ZeeManagerItemClick.playFeedbackSound();
+			ZeeManagerItems.playFeedbackSound();
 	    }
 	}
 	return(true);
@@ -204,7 +204,7 @@ public class Inventory extends Widget implements DTarget {
 		try {
 			double ql = sameQl ? clickedItem.getInfoQuality() : -1;
 			String clickedName = clickedItem.getres().name;
-			String clickedInfoName = ZeeManagerItemClick.getItemInfoName(clickedItem.info()).replace(", stack of","");
+			String clickedInfoName = ZeeManagerItems.getItemInfoName(clickedItem.info()).replace(", stack of","");
 			boolean isGemstone = clickedName.endsWith("/gemstone");
 			if (isGemstone)
 				clickedInfoName = clickedInfoName.replaceAll("^(\\S+\\s+){2}","");//simple gemstone name
@@ -216,7 +216,7 @@ public class Inventory extends Widget implements DTarget {
 					WItem w = (WItem) wdg;
 					String wName = w.item.getres().name;
 					if(useInfoName) {
-						wName = ZeeManagerItemClick.getItemInfoName(w.item.info()).replace(", stack of", "");
+						wName = ZeeManagerItems.getItemInfoName(w.item.info()).replace(", stack of", "");
 						if (isGemstone && w.item.getres().name.endsWith("/gemstone"))
 							wName = wName.replaceAll("^(\\S+\\s+){2}","");//simple gemstone name
 					}
@@ -243,8 +243,8 @@ public class Inventory extends Widget implements DTarget {
 				gItem = ((WItem) wdg).item;
 				String wdgname = gItem.res.get().name;
 				if (wdgname.contains(nameContains)) {
-					if (ZeeManagerItemClick.isStackByAmount(gItem))
-						count += ZeeManagerItemClick.getItemInfoAmount(gItem.info());
+					if (ZeeManagerItems.isStackByAmount(gItem))
+						count += ZeeManagerItems.getItemInfoAmount(gItem.info());
 					else
 						count++;
 				}
@@ -261,8 +261,8 @@ public class Inventory extends Widget implements DTarget {
 				gItem = ((WItem) wdg).item;
 				String wdgname = gItem.res.get().name;
 				if (wdgname.endsWith(nameEndsWith)) {
-					if (ZeeManagerItemClick.isStackByAmount(gItem))
-						count += ZeeManagerItemClick.getItemInfoAmount(gItem.info());
+					if (ZeeManagerItems.isStackByAmount(gItem))
+						count += ZeeManagerItems.getItemInfoAmount(gItem.info());
 					else
 						count++;
 				}
@@ -299,8 +299,8 @@ public class Inventory extends Widget implements DTarget {
 				gItem = ((WItem) wdg).item;
 				String wdgname = gItem.res.get().name;
 				if (wdgname.contentEquals(nameEquals)) {
-					if (ZeeManagerItemClick.isStackByAmount(gItem))
-						count += ZeeManagerItemClick.getItemInfoAmount(gItem.info());
+					if (ZeeManagerItems.isStackByAmount(gItem))
+						count += ZeeManagerItems.getItemInfoAmount(gItem.info());
 					else
 						count++;
 				}
@@ -336,13 +336,13 @@ public class Inventory extends Widget implements DTarget {
 	public List<WItem> getWItemsByInfoNameContains(String nameContains) {
 		return this.children(WItem.class)
 				.stream()
-				.filter( wItem -> ZeeManagerItemClick.getItemInfoName(wItem.item.info()).toLowerCase().contains(nameContains.toLowerCase()))
+				.filter( wItem -> ZeeManagerItems.getItemInfoName(wItem.item.info()).toLowerCase().contains(nameContains.toLowerCase()))
 				.collect(Collectors.toList());
 	}
 	public List<WItem> getWItemsByInfoNameEquals(String nameEquals) {
 		return this.children(WItem.class)
 				.stream()
-				.filter( wItem -> ZeeManagerItemClick.getItemInfoName(wItem.item.info()).toLowerCase().contentEquals(nameEquals.toLowerCase()))
+				.filter( wItem -> ZeeManagerItems.getItemInfoName(wItem.item.info()).toLowerCase().contentEquals(nameEquals.toLowerCase()))
 				.collect(Collectors.toList());
 	}
 
@@ -421,7 +421,7 @@ public class Inventory extends Widget implements DTarget {
 			}
 		}
 		ZeeConfig.println("=======");
-		ZeeConfig.println("itemsz("+w+","+h+")  "+((ZeeConfig.gameUI!=null&&ZeeConfig.gameUI.vhand!=null&&ZeeConfig.gameUI.vhand.item!=null)?ZeeManagerItemClick.getHoldingItem().item.getres().basename():""));
+		ZeeConfig.println("itemsz("+w+","+h+")  "+((ZeeConfig.gameUI!=null&&ZeeConfig.gameUI.vhand!=null&&ZeeConfig.gameUI.vhand.item!=null)? ZeeManagerItems.getHoldingItem().item.getres().basename():""));
 		printMatrix(inv);
 		//search free area sized (w,h)
 		boolean blocked;
@@ -498,7 +498,7 @@ public class Inventory extends Widget implements DTarget {
 			return;
 		}
 		WItem item = items.get(0);
-		Coord itemCoord = ZeeManagerItemClick.getWItemCoord(item);
+		Coord itemCoord = ZeeManagerItems.getWItemCoord(item);
 		// haven.GItem@65523a95 ; drop ; [(28, 28), -1]
 		item.item.wdgmsg("drop",itemCoord,-1);
 	}
@@ -516,7 +516,7 @@ public class Inventory extends Widget implements DTarget {
 
 	public WItem getItemBySlotCoord(Coord c) {
 		for (WItem item : this.children(WItem.class)) {
-			if (c.compareTo(ZeeManagerItemClick.getWItemCoord(item)) == 0) {
+			if (c.compareTo(ZeeManagerItems.getWItemCoord(item)) == 0) {
 				return item;
 			}
 		}

@@ -327,7 +327,7 @@ public class ZeeConsole {
     }
     static void gobFindClear(){
         List<Gob> gobsfound = ZeeConfig.getAllGobs();
-        gobsfound.removeIf(g1 -> ZeeManagerGobClick.getGAttrByClassSimpleName(g1, "ZeeGobFind") == null);
+        gobsfound.removeIf(g1 -> ZeeManagerGobs.getGAttrByClassSimpleName(g1, "ZeeGobFind") == null);
         for (Gob g2 : gobsfound) {
             g2.delattr(ZeeGobFind.class);
         }
@@ -354,10 +354,10 @@ public class ZeeConsole {
         boolean backupConfirmEat = ZeeConfig.confirmPetalEat;
         ZeeConfig.confirmPetal = ZeeConfig.confirmPetalEat = false;
         try {
-            int clicked = ZeeManagerItemClick.clickAllItemsPetal((List<WItem>) lastCmdResults, petalName.toString().trim());
+            int clicked = ZeeManagerItems.clickAllItemsPetal((List<WItem>) lastCmdResults, petalName.toString().trim());
             if (clicked==0){
                 ZeeConfig.msgError("no petal named \""+petalName.toString().trim()+"\" ?");
-                ZeeManagerItemClick.cancelFlowerMenu();
+                ZeeManagerItems.cancelFlowerMenu();
             }else{
                 println("clicked "+clicked+" petals");
                 ZeeConfig.msgLow("clicked "+clicked+" petals");
@@ -410,7 +410,7 @@ public class ZeeConsole {
                     String itemName = item.item.getres().name;
                     // special case for meat items
                     if (itemName.endsWith("/meat")){
-                        String meatName = ZeeManagerItemClick.getItemInfoName(item.item.info());
+                        String meatName = ZeeManagerItems.getItemInfoName(item.item.info());
                         if (!meatNames.contains(meatName))
                             meatNames.add(meatName);
                         continue;
@@ -432,16 +432,16 @@ public class ZeeConsole {
                             if (namedItems.get(j).item.isStackByContent())
                                 continue;
                             // pickup item i
-                            if (!ZeeManagerItemClick.pickUpItem(namedItems.get(i))) {
+                            if (!ZeeManagerItems.pickUpItem(namedItems.get(i))) {
                                 println("couldnt pickup namedItem");
                                 return false;
                             }
                             // stack all on item j
-                            ZeeManagerItemClick.itemAct(namedItems.get(j), UI.MOD_CTRL_SHIFT);
+                            ZeeManagerItems.itemAct(namedItems.get(j), UI.MOD_CTRL_SHIFT);
                             Thread.sleep(250);
                             // item not stackable? return to container
                             if (ZeeConfig.isPlayerHoldingItem()){
-                                if(!ZeeManagerItemClick.dropHoldingItemToInv(inv)) {
+                                if(!ZeeManagerItems.dropHoldingItemToInv(inv)) {
                                     println("couldnt return non-stackable to inv?");
                                     return false;
                                 }
@@ -463,12 +463,12 @@ public class ZeeConsole {
                             if (meatItems.get(j).item.isStackByContent())
                                 continue;
                             // pickup item i
-                            if (!ZeeManagerItemClick.pickUpItem(meatItems.get(i))) {
+                            if (!ZeeManagerItems.pickUpItem(meatItems.get(i))) {
                                 println("couldnt pickup meatItem");
                                 return false;
                             }
                             // stack all on item j
-                            ZeeManagerItemClick.itemAct(meatItems.get(j), UI.MOD_CTRL_SHIFT);
+                            ZeeManagerItems.itemAct(meatItems.get(j), UI.MOD_CTRL_SHIFT);
                             Thread.sleep(250);
                             // next item name
                             i = j = meatItems.size() + 1;
@@ -500,7 +500,7 @@ public class ZeeConsole {
                 String itemName = item.item.getres().name;
                 // save meat names
                 if (itemName.endsWith("/meat")){
-                    String meatName = ZeeManagerItemClick.getItemInfoName(item.item.info());
+                    String meatName = ZeeManagerItems.getItemInfoName(item.item.info());
                     if (!meatNames.contains(meatName))
                         meatNames.add(meatName);
                     continue;
@@ -525,12 +525,12 @@ public class ZeeConsole {
                             if (namedItems.get(j).item.isStackByContent())
                                 continue;
                             // pickup item i
-                            if (!ZeeManagerItemClick.pickUpItem(namedItems.get(i))) {
+                            if (!ZeeManagerItems.pickUpItem(namedItems.get(i))) {
                                 println("couldnt pickup namedItem");
                                 return false;
                             }
                             // stack all on item j
-                            ZeeManagerItemClick.itemAct(namedItems.get(j), UI.MOD_CTRL_SHIFT);
+                            ZeeManagerItems.itemAct(namedItems.get(j), UI.MOD_CTRL_SHIFT);
                             Thread.sleep(250);
                             // next item name
                             i = j = namedItems.size() + 1;
@@ -549,12 +549,12 @@ public class ZeeConsole {
                             if (meatItems.get(j).item.isStackByContent())
                                 continue;
                             // pickup item i
-                            if (!ZeeManagerItemClick.pickUpItem(meatItems.get(i))) {
+                            if (!ZeeManagerItems.pickUpItem(meatItems.get(i))) {
                                 println("couldnt pickup meatItem");
                                 return false;
                             }
                             // stack all on item j
-                            ZeeManagerItemClick.itemAct(meatItems.get(j), UI.MOD_CTRL_SHIFT);
+                            ZeeManagerItems.itemAct(meatItems.get(j), UI.MOD_CTRL_SHIFT);
                             Thread.sleep(250);
                             // next item name
                             i = j = meatItems.size() + 1;

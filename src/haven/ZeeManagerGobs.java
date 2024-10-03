@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 
 import static haven.OCache.posres;
 
-public class ZeeManagerGobClick extends ZeeThread{
+public class ZeeManagerGobs extends ZeeThread{
 
     static final int OVERLAY_ID_AGGRO = 1341;
 
@@ -69,7 +69,7 @@ public class ZeeManagerGobClick extends ZeeThread{
 
             // place all pile items
             if(ZeeManagerStockpile.lastPlob != null) {
-                ZeeManagerGobClick.gobPlace(ZeeManagerStockpile.lastPlob,UI.MOD_SHIFT);
+                ZeeManagerGobs.gobPlace(ZeeManagerStockpile.lastPlob,UI.MOD_SHIFT);
             }
             // dig ballclay if cursor dig
             else if(ZeeConfig.isCursorName(ZeeConfig.CURSOR_DIG) && ZeeConfig.isTileNamed(coordMc, ZeeConfig.TILE_WATER_FRESH_SHALLOW,ZeeConfig.TILE_WATER_OCEAN_SHALLOW)){
@@ -97,11 +97,11 @@ public class ZeeManagerGobClick extends ZeeThread{
         }
         //queue chop tree/bush by animation
         else if(!ZeeManagerTrees.isRemovingTreesAndStumps && ZeeConfig.playerHasAnyPose(ZeeConfig.POSE_PLAYER_CHOPTREE) && (isGobTree(gobName) || isGobBush(gobName)) ){
-            ZeeManagerGobClick.queueChopTreeBush(gob);
+            ZeeManagerGobs.queueChopTreeBush(gob);
         }
         //queue chip stone by animation
         else if(ZeeConfig.playerHasAnyPose(ZeeConfig.POSE_PLAYER_CHIPPINGSTONE,ZeeConfig.POSE_PLAYER_PICK) && isGobBoulder(gobName)){
-            ZeeManagerGobClick.queueChipStone(gob);
+            ZeeManagerGobs.queueChipStone(gob);
         }
         //queue remove stump by animation
         else if(ZeeConfig.playerHasAnyPose(ZeeConfig.POSE_PLAYER_DIGSHOVEL) && isGobTreeStump(gobName)){
@@ -113,7 +113,7 @@ public class ZeeManagerGobClick extends ZeeThread{
         }
         // pick quicksilver from smelter
         else if (gobName.endsWith("/smelter") && ZeeConfig.isPlayerHoldingItem()){
-            ZeeManagerItemClick.getQuicksilverFromSmelter(gob);
+            ZeeManagerItems.getQuicksilverFromSmelter(gob);
         }
         //barterstand
         else if (gobName.endsWith("barterstand")){
@@ -217,18 +217,18 @@ public class ZeeManagerGobClick extends ZeeThread{
                 gobPlace(plob, ZeeConfig.tileToCoord(ZeeConfig.coordToTile(gob.rc)), UI.MOD_SHIFT);
             }
             // equip ground bucket if no belt(noob char?)
-            else if (gobName.contains("/bucket") && ZeeManagerItemClick.getInvBelt()==null && !ZeeConfig.isPlayerHoldingItem()){
+            else if (gobName.contains("/bucket") && ZeeManagerItems.getInvBelt()==null && !ZeeConfig.isPlayerHoldingItem()){
                 new ZeeThread(){
                     public void run() {
                         try {
                             gobClick(gob,3);
                             waitHoldingItem();
-                            if(ZeeManagerItemClick.isAnyHandEmpty()) {
-                                ZeeManagerItemClick.equipEmptyHand();
+                            if(ZeeManagerItems.isAnyHandEmpty()) {
+                                ZeeManagerItems.equipEmptyHand();
                             }else {
-                                ZeeManagerItemClick.equipLeftOccupiedHand();
+                                ZeeManagerItems.equipLeftOccupiedHand();
                                 sleep(PING_MS);
-                                ZeeManagerItemClick.dropHoldingItemToInv(ZeeConfig.getMainInventory());
+                                ZeeManagerItems.dropHoldingItemToInv(ZeeConfig.getMainInventory());
                             }
                         } catch (Exception e) {
                             e.printStackTrace();
@@ -321,7 +321,7 @@ public class ZeeManagerGobClick extends ZeeThread{
             // unmount horse
             if (ZeeConfig.isPlayerMountingHorse() && !isGobInListEndsWith(gobName,"/ladder,/minehole") && ZeeConfig.getMainInventory().countItemsByNameContains("/rope") > 0)
             {
-                ZeeManagerGobClick.remountClosestHorse = true;
+                ZeeManagerGobs.remountClosestHorse = true;
                 ZeeConfig.addPlayerText("remount");
                 dismountHorseAndClickGob(coordMc);
             }
@@ -340,7 +340,7 @@ public class ZeeManagerGobClick extends ZeeThread{
         if ( isGobAmbientPassage(gob) &&
                 !ZeeConfig.playerHasAnyPose(ZeeConfig.POSE_PLAYER_LIFTING) &&
                 ZeeConfig.isPlayerMountingHorse() &&
-                !ZeeManagerGobClick.isGobInListEndsWith(gobName,"/ladder,/minehole") &&
+                !ZeeManagerGobs.isGobInListEndsWith(gobName,"/ladder,/minehole") &&
                 ZeeConfig.getMainInventory().countItemsByNameContains("/rope") > 0)
         {
             return true;
@@ -534,7 +534,7 @@ public class ZeeManagerGobClick extends ZeeThread{
                 }
 
                 //wait build and chop more
-                ZeeManagerGobClick.waitPlayerPoseNotInList(ZeeConfig.POSE_PLAYER_BUILD,ZeeConfig.POSE_PLAYER_DRINK);
+                ZeeManagerGobs.waitPlayerPoseNotInList(ZeeConfig.POSE_PLAYER_BUILD,ZeeConfig.POSE_PLAYER_DRINK);
                 clickGobPetal(treeLog,"Chop into blocks");
             }
         }.start();
@@ -573,7 +573,7 @@ public class ZeeManagerGobClick extends ZeeThread{
                 }
 
                 //wait build and saw more
-                ZeeManagerGobClick.waitPlayerPoseNotInList(ZeeConfig.POSE_PLAYER_BUILD,ZeeConfig.POSE_PLAYER_DRINK);
+                ZeeManagerGobs.waitPlayerPoseNotInList(ZeeConfig.POSE_PLAYER_BUILD,ZeeConfig.POSE_PLAYER_DRINK);
                 clickGobPetal(treeLog,"Make boards");
             }
         }.start();
@@ -600,7 +600,7 @@ public class ZeeManagerGobClick extends ZeeThread{
             return;
         }
         plowQueueCoords.add(coordMc);
-        ZeeManagerItemClick.playFeedbackSound();
+        ZeeManagerItems.playFeedbackSound();
         ZeeConfig.addPlayerText("plow q "+ plowQueueCoords.size());
 
         //starts thread
@@ -632,7 +632,7 @@ public class ZeeManagerGobClick extends ZeeThread{
                                 prepareCancelClick();
                                 //drink
                                 if (ZeeConfig.getMeterStamina() < 100) {
-                                    ZeeManagerItemClick.drinkFromBeltHandsInv();
+                                    ZeeManagerItems.drinkFromBeltHandsInv();
                                 }
                                 ZeeConfig.addPlayerText("plow q "+ plowQueueCoords.size());
                             }
@@ -852,14 +852,14 @@ public class ZeeManagerGobClick extends ZeeThread{
 
     private static boolean checkCloverFeeding(Gob animal) {
 
-        if (ZeeManagerItemClick.getHoldingItem()==null) {
+        if (ZeeManagerItems.getHoldingItem()==null) {
             //println("checkCloverFeeding > holding item null");
             return false;
         }
 
-        GItem holditem = ZeeManagerItemClick.getHoldingItem().item;
+        GItem holditem = ZeeManagerItems.getHoldingItem().item;
 
-        if (ZeeManagerItemClick.isStackByKeyPagina(holditem)) {
+        if (ZeeManagerItems.isStackByKeyPagina(holditem)) {
             //println("checkCloverFeeding > holding stack");
             return false;
         }
@@ -1014,7 +1014,7 @@ public class ZeeManagerGobClick extends ZeeThread{
                 //pickup all pile items
                 else {
                     gobClick(gob,3, UI.MOD_SHIFT);
-                    ZeeManagerItemClick.playFeedbackSound();
+                    ZeeManagerItems.playFeedbackSound();
                 }
             }
             // pickup all items: dframe
@@ -1146,7 +1146,7 @@ public class ZeeManagerGobClick extends ZeeThread{
 
         if(pileName.endsWith("stockpile-wblock") && ZeeManagerStockpile.lastTreelogChopped!=null) {
             Coord2d pileCoord = new Coord2d(plob.rc.x, plob.rc.y);
-            ZeeManagerGobClick.gobPlace(plob,0);
+            ZeeManagerGobs.gobPlace(plob,0);
             if(waitPlayerIdlePose()) {
                 Gob newPile = ZeeConfig.findGobByNameAndCoord("stockpile-wblock", pileCoord);
                 if (newPile==null){
@@ -1160,7 +1160,7 @@ public class ZeeManagerGobClick extends ZeeThread{
         }
         else if(pileName.endsWith("stockpile-board") && ZeeManagerStockpile.lastTreelogSawed!=null) {
             Coord2d pileCoord = new Coord2d(plob.rc.x, plob.rc.y);
-            ZeeManagerGobClick.gobPlace(plob,0);
+            ZeeManagerGobs.gobPlace(plob,0);
             if(waitPlayerIdlePose()) {
                 Gob newPile = ZeeConfig.findGobByNameAndCoord("stockpile-board", pileCoord);
                 if (newPile==null){
@@ -1174,7 +1174,7 @@ public class ZeeManagerGobClick extends ZeeThread{
         }
         else if(pileName.endsWith("stockpile-stone") && ZeeManagerStockpile.lastBoulderChipped!=null) {
             Coord2d pileCoord = new Coord2d(plob.rc.x, plob.rc.y);
-            ZeeManagerGobClick.gobPlace(plob,0);
+            ZeeManagerGobs.gobPlace(plob,0);
             if(waitPlayerIdlePose()) {
                 Gob newPile = ZeeConfig.findGobByNameAndCoord("stockpile-stone", pileCoord);
                 if (newPile==null){
@@ -1205,7 +1205,7 @@ public class ZeeManagerGobClick extends ZeeThread{
                     // dismount horse/kicksled
                     if (ZeeConfig.isPlayerMountingHorse() || ZeeConfig.isPlayerDrivingingKicksled()) {
                         Coord cauldronCoord = ZeeConfig.lastMapViewClickMc.floor(posres);
-                        ZeeManagerGobClick.disembarkVehicle(cauldronCoord);
+                        ZeeManagerGobs.disembarkVehicle(cauldronCoord);
                         sleep(777);
                     }
                     // open cauldron
@@ -1223,7 +1223,7 @@ public class ZeeManagerGobClick extends ZeeThread{
             // dismount horse/kicksled
             if (ZeeConfig.isPlayerMountingHorse() || ZeeConfig.isPlayerDrivingingKicksled()) {
                 Coord cauldronCoord = ZeeConfig.lastMapViewClickMc.floor(posres);
-                ZeeManagerGobClick.disembarkVehicle(cauldronCoord);
+                ZeeManagerGobs.disembarkVehicle(cauldronCoord);
                 sleep(777);
             }
             // "put out" cauldron
@@ -1303,7 +1303,7 @@ public class ZeeManagerGobClick extends ZeeThread{
             }
 
             //drop coracle at shalow water or terrain
-            ZeeManagerItemClick.getEquipory().dropItemByNameContains("gfx/invobjs/small/coracle");
+            ZeeManagerItems.getEquipory().dropItemByNameContains("gfx/invobjs/small/coracle");
             ZeeConfig.stopMovingEscKey();
             waitNotPlayerPose(ZeeConfig.POSE_PLAYER_CORACLE_CAPE);
 
@@ -1522,7 +1522,7 @@ public class ZeeManagerGobClick extends ZeeThread{
                             return;
                         }
                         // scythe not allowed
-                        if (ZeeManagerItemClick.isItemEquipped("/scythe")){
+                        if (ZeeManagerItems.isItemEquipped("/scythe")){
                             println("labelHarvestedPlant > cancel labeling due to scythe equipped");
                             clickedPlantGobForLabelingQl = false;
                             ZeeConfig.removePlayerText();
@@ -1582,11 +1582,11 @@ public class ZeeManagerGobClick extends ZeeThread{
         // label harvested plant ql
         clickedPlantGobForLabelingQl = gobName.endsWith("plants/wine") || gobName.endsWith("plants/hops") || gobName.endsWith("plants/pepper");
         if(clickedPlantGobForLabelingQl) {
-            if (ZeeManagerItemClick.isItemInHandSlot("/scythe")) {
+            if (ZeeManagerItems.isItemInHandSlot("/scythe")) {
                 //println("cancel labeling plant > scythe already equipped");
                 clickedPlantGobForLabelingQl = false;
             }
-            else if(ZeeManagerItemClick.isTwoHandedItemEquippable("/scythe")){
+            else if(ZeeManagerItems.isTwoHandedItemEquippable("/scythe")){
                 //println("cancel labeling plant > scythe equippable");
                 clickedPlantGobForLabelingQl = false;
             }
@@ -1687,7 +1687,7 @@ public class ZeeManagerGobClick extends ZeeThread{
         // gob requires unmounting horse/kicksled (if not lifting gob itself)
         else if (isGobRequireDisembarkVehicle(gob) && !ZeeConfig.isPlayerLiftingGob(gob)){
             // unmount horse
-            if (ZeeConfig.isPlayerMountingHorse() && !ZeeManagerGobClick.isGobInListEndsWith(gobName,"/ladder,/minehole") && ZeeConfig.getMainInventory().countItemsByNameContains("/rope") > 0) {
+            if (ZeeConfig.isPlayerMountingHorse() && !ZeeManagerGobs.isGobInListEndsWith(gobName,"/ladder,/minehole") && ZeeConfig.getMainInventory().countItemsByNameContains("/rope") > 0) {
                 dismountHorseAndClickGob(mc);
             }
             // disembark kicksled
@@ -1971,11 +1971,11 @@ public class ZeeManagerGobClick extends ZeeThread{
     }
 
     public static boolean pickupTorch() {
-        if (ZeeManagerItemClick.pickupBeltItem("/torch")) {
+        if (ZeeManagerItems.pickupBeltItem("/torch")) {
             return true;
-        }else if(ZeeManagerItemClick.pickupHandItem("/torch")){
+        }else if(ZeeManagerItems.pickupHandItem("/torch")){
             return true;
-        }else if (ZeeManagerItemClick.pickUpInvItem(ZeeConfig.getMainInventory(),"/torch")){
+        }else if (ZeeManagerItems.pickUpInvItem(ZeeConfig.getMainInventory(),"/torch")){
             return true;
         }
         return false;
@@ -2024,8 +2024,8 @@ public class ZeeManagerGobClick extends ZeeThread{
             ZeeSess.charSwitchCreateWindow();
         else if(petalName.contentEquals(ZeeFlowerMenu.STRPETAL_TESTCOORDS))
             windowTestCoords();
-        else if(petalName.contentEquals(ZeeFlowerMenu.STRPETAL_AUDIOFILTER))
-            ZeeAudio.windowAudioFilter();
+        else if(petalName.contentEquals(ZeeFlowerMenu.STRPETAL_AUDIOBLOCKER))
+            ZeeAudio.windowAudioBlocker();
         else if(petalName.contentEquals(ZeeFlowerMenu.STRPETAL_CLEARGOBTEXTSPOINTERS))
             ZeeConsole.clearGobsTextsAndPointers();
         else if (petalName.contentEquals(ZeeFlowerMenu.STRPETAL_AUTOBUTCH_BIGDEADANIMAL)){
@@ -2320,7 +2320,7 @@ public class ZeeManagerGobClick extends ZeeThread{
                 opts = new ArrayList<String>();
                 if (isShallowWater)
                     opts.add("dig");
-                if (ZeeManagerItemClick.isCoracleEquipped() && !ZeeConfig.isPlayerMountingHorse()) {
+                if (ZeeManagerItems.isCoracleEquipped() && !ZeeConfig.isPlayerMountingHorse()) {
                     opts.add("embark coracle");
                 }
                 opts.add("fish");
@@ -2351,7 +2351,7 @@ public class ZeeManagerGobClick extends ZeeThread{
         }
         else if(gob.tags.contains(Gob.Tag.PLAYER_MAIN)) {
             opts = new ArrayList<String>();
-            opts.add(ZeeFlowerMenu.STRPETAL_AUDIOFILTER);
+            opts.add(ZeeFlowerMenu.STRPETAL_AUDIOBLOCKER);
             opts.add(ZeeFlowerMenu.STRPETAL_CLEARGOBTEXTSPOINTERS);
             opts.add(ZeeFlowerMenu.STRPETAL_SWITCHCHAR);
             if (ZeeConfig.isCaveTile(ZeeConfig.getPlayerTileName()))
@@ -2420,9 +2420,9 @@ public class ZeeManagerGobClick extends ZeeThread{
             );
         }
         // tree logs
-        else if (isGobTreeLog(ZeeManagerGobClick.gobName)) {
+        else if (isGobTreeLog(ZeeManagerGobs.gobName)) {
             opts = new ArrayList<String>();
-            if (ZeeManagerItemClick.isItemInHandSlot("bonesaw")) {
+            if (ZeeManagerItems.isItemInHandSlot("bonesaw")) {
                 opts.add(ZeeFlowerMenu.STRPETAL_DESTROY_TREELOGS);
             }
             opts.add(ZeeFlowerMenu.STRPETAL_LIFTUPGOB);
@@ -2539,7 +2539,7 @@ public class ZeeManagerGobClick extends ZeeThread{
                             // fuel units: branches, coal, etc
                             if (mapWincapMaxfuel.keySet().contains(window.cap)){
                                 Map<String,Integer> mapWincapMaxfuel = new HashMap<>();
-                                int currentFuel=0, maxFuel = ZeeManagerGobClick.mapWincapMaxfuel.get(window.cap);
+                                int currentFuel=0, maxFuel = ZeeManagerGobs.mapWincapMaxfuel.get(window.cap);
                                 for (VMeter vm : vmeter) {
                                     LayerMeter.Meter meter = vm.meters.get(0);
                                     currentFuel = (int) Math.round(meter.a * maxFuel);
@@ -2585,7 +2585,7 @@ public class ZeeManagerGobClick extends ZeeThread{
                                         List<ItemInfo> info = (List<ItemInfo>) w2.getClass().getDeclaredField("info").get(w2);
 
                                         // get name
-                                        String name = ZeeManagerItemClick.getItemInfoName(info);
+                                        String name = ZeeManagerItems.getItemInfoName(info);
                                         if(name==null || name.isBlank()) {
                                             // empty gob, remove text
                                             ZeeConfig.removeGobText(ZeeConfig.lastMapViewClickGob);
@@ -2603,7 +2603,7 @@ public class ZeeManagerGobClick extends ZeeThread{
                                         String gobText = quantity + metric + " " + substance;
 
                                         // get quality
-                                        Double ql = ZeeManagerItemClick.getItemInfoQuality(info);
+                                        Double ql = ZeeManagerItems.getItemInfoQuality(info);
                                         if(ql > 0) {
                                             gobText += ql.intValue();
                                         }
@@ -2646,7 +2646,7 @@ public class ZeeManagerGobClick extends ZeeThread{
     }
 
     static void remountHorse() {
-        ZeeManagerGobClick.remountClosestHorse = false;
+        ZeeManagerGobs.remountClosestHorse = false;
         new ZeeThread(){
             public void run() {
                 int countNotReady = 0;
@@ -2667,7 +2667,7 @@ public class ZeeManagerGobClick extends ZeeThread{
                     Audio.setvolume(0);
 
                     //mount horse
-                    ZeeManagerGobClick.clickGobPetal(closestHorse, "Giddyup!");
+                    ZeeManagerGobs.clickGobPetal(closestHorse, "Giddyup!");
                     countNotReady = 0;//exit success?
 
                     // wait player mounting pose
@@ -2779,7 +2779,7 @@ public class ZeeManagerGobClick extends ZeeThread{
                         sleep(PING_MS);
                         ZeeConfig.getButtonNamed((Window) ZeeConfig.makeWindow.parent,"Craft All").click();
                         //drink while crafting
-                        ZeeManagerItemClick.drinkFromBeltHandsInv();
+                        ZeeManagerItems.drinkFromBeltHandsInv();
                     }
 
                 } catch (Exception e) {
@@ -2878,7 +2878,7 @@ public class ZeeManagerGobClick extends ZeeThread{
                             queueChipStoneUpdLabels();
 
                             if (ZeeConfig.isPlayerHoldingItem()){
-                                ZeeManagerItemClick.getHoldingItem().item.wdgmsg("drop", Coord.z);
+                                ZeeManagerItems.getHoldingItem().item.wdgmsg("drop", Coord.z);
                                 waitNotHoldingItem();
                             }
                             clickGobPetal(nextBoulder,"Chip stone");
@@ -3084,7 +3084,7 @@ public class ZeeManagerGobClick extends ZeeThread{
                         }
                     }
                     //close menu before returning
-                    ZeeManagerItemClick.cancelFlowerMenu();
+                    ZeeManagerItems.cancelFlowerMenu();
                     waitNoFlowerMenu();
                 }
             };
@@ -3230,7 +3230,7 @@ public class ZeeManagerGobClick extends ZeeThread{
 
     // barrel is empty if has no overlays ("gfx/terobjs/barrel-flax")
     public static boolean isBarrelEmpty(Gob barrel){
-        return ZeeManagerGobClick.getOverlayNames(barrel).isEmpty();
+        return ZeeManagerGobs.getOverlayNames(barrel).isEmpty();
     }
 
     private static void removeAllTrellisPlants(Gob firstPlant) {
@@ -3280,7 +3280,7 @@ public class ZeeManagerGobClick extends ZeeThread{
                             && added < num
                             && invItens.size() > 0)
                     {
-                        if(ZeeManagerItemClick.pickUpItem(invItens.get(0))){
+                        if(ZeeManagerItems.pickUpItem(invItens.get(0))){
                             itemActGob(gob,0);
                             if(waitNotHoldingItem()){
                                 invItens.remove(0);
@@ -3317,7 +3317,7 @@ public class ZeeManagerGobClick extends ZeeThread{
            boolean exit = false;
            int added = 0;
            while(!exit && added<4 && branches.size() > 0){
-               if(ZeeManagerItemClick.pickUpItem(branches.get(0))){
+               if(ZeeManagerItems.pickUpItem(branches.get(0))){
                    itemActGob(gob,0);
                    if(waitNotHoldingItem()){
                        branches.remove(0);
@@ -3349,7 +3349,7 @@ public class ZeeManagerGobClick extends ZeeThread{
             boolean exit = false;
             int added = 0;
             while(!exit && added<numCoal && coal.size() > 0){
-                if(ZeeManagerItemClick.pickUpItem(coal.get(0))){
+                if(ZeeManagerItems.pickUpItem(coal.get(0))){
                     itemActGob(gob,0);
                     if(waitNotHoldingItem()){
                         coal.remove(0);
@@ -3376,12 +3376,12 @@ public class ZeeManagerGobClick extends ZeeThread{
 
     private static void harvestOneTrellisWithoutScythe(Gob gob) {
         //hold scythe for user unequip it
-        if(ZeeManagerItemClick.pickupBeltItem("scythe")){
+        if(ZeeManagerItems.pickupBeltItem("scythe")){
 
         }
         //hold scythe for user unequip it
-        else if(ZeeManagerItemClick.getLeftHandName().endsWith("scythe")){
-            ZeeManagerItemClick.unequipLeftItem();
+        else if(ZeeManagerItems.getLeftHandName().endsWith("scythe")){
+            ZeeManagerItems.unequipLeftItem();
         }
         //no scythe, just harvest
         // TODO test harvest while holding scythe in vhand
@@ -3567,7 +3567,7 @@ public class ZeeManagerGobClick extends ZeeThread{
     }
 
     public static void barrelTakeAllSeeds(Gob gob){
-        ZeeManagerGobClick.gobClick(gob, 3, UI.MOD_CTRL_SHIFT);
+        ZeeManagerGobs.gobClick(gob, 3, UI.MOD_CTRL_SHIFT);
     }
 
     private void barrelTakeAllSeeds() {
@@ -3588,7 +3588,7 @@ public class ZeeManagerGobClick extends ZeeThread{
 
     public static boolean liftGob(Gob gob) {
         if(isGobBush(gob.getres().name)) {
-            ZeeManagerItemClick.equipBeltOrInvItem("shovel");
+            ZeeManagerItems.equipBeltOrInvItem("shovel");
             waitItemInHand("shovel");
         }
         ZeeConfig.gameUI.menu.wdgmsg("act", "carry","0");
@@ -3754,7 +3754,7 @@ public class ZeeManagerGobClick extends ZeeThread{
         FlowerMenu fm = waitFlowerMenu();
         if (fm!=null) {
             // menu opened means gob exist
-            ZeeManagerItemClick.cancelFlowerMenu();
+            ZeeManagerItems.cancelFlowerMenu();
             waitNoFlowerMenu();
             //println("gobHasFlowermenu > true");
             ret = true;
@@ -3899,7 +3899,7 @@ public class ZeeManagerGobClick extends ZeeThread{
     }
 
     static void pickupAllGobItems(Gob gobItem) {
-        ZeeManagerGobClick.gobClick(gobItem,3,UI.MOD_SHIFT);
+        ZeeManagerGobs.gobClick(gobItem,3,UI.MOD_SHIFT);
     }
 
     // pattern must match whole gob name
@@ -4433,7 +4433,7 @@ public class ZeeManagerGobClick extends ZeeThread{
             public void set(boolean a) {
                 super.set(a);
                 ZeeManagerTrees.hideGobTrees = a;
-                ZeeManagerGobClick.winHideGobLastInteractionMs = now();
+                ZeeManagerGobs.winHideGobLastInteractionMs = now();
                 toggleModelsInList(getGobsByTags(Gob.Tag.TREE));
             }
         }, wdg.c.x+wdg.sz.x+xpad,0);
@@ -4497,7 +4497,7 @@ public class ZeeManagerGobClick extends ZeeThread{
                         winHideGobLabelClosing.settext("autoclose " + (timeoutMs - idleMs) / 1000 + "s");
                         do {
                             sleep(1000);
-                            idleMs = now() - ZeeManagerGobClick.winHideGobLastInteractionMs;
+                            idleMs = now() - ZeeManagerGobs.winHideGobLastInteractionMs;
                             if (idleMs < timeoutMs) {
                                 winHideGobLabelClosing.settext("autoclose " + (timeoutMs - idleMs) / 1000 + "s");
                             } else {

@@ -51,7 +51,7 @@ public class ZeeWindow extends Window {
                 return false;
             if (e.getKeyCode()==KeyEvent.VK_ENTER) {
                 if (!buf.line().isEmpty()) {
-                    ZeeManagerItemClick.playFeedbackSound();
+                    ZeeManagerItems.playFeedbackSound();
                     this.onEnterPressed(buf.line());
                 }
                 this.hasfocus = false;
@@ -64,7 +64,7 @@ public class ZeeWindow extends Window {
         public boolean mousewheel(Coord c, int amount) {
             if (text().chars().allMatch(Character::isDigit) ) {
                 settext(getTextEntryNextScrollNumber(text(), amount, 0, Integer.MAX_VALUE));
-                ZeeManagerItemClick.playFeedbackSound();
+                ZeeManagerItems.playFeedbackSound();
                 if (!hasfocus) {
                     //ZeeConfig.println("set focus");
                     setfocus(this);

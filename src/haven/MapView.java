@@ -1928,7 +1928,7 @@ public class MapView extends PView implements DTarget, Console.Directory {
 	} else if(msg == "unplace") {
 	    Loader.Future<Plob> placing = this.placing;
 	    if(placing != null) {
-		ZeeManagerGobClick.checkPlobUnplaced();
+		ZeeManagerGobs.checkPlobUnplaced();
 		if(!placing.cancel()) {
 		    Plob ob = placing.get();
 		    synchronized(ob) {
@@ -2081,28 +2081,28 @@ public class MapView extends PView implements DTarget, Console.Directory {
 public boolean mousedown(Coord c, int button) {
 	parent.setfocus(this);
 	Loader.Future<Plob> placing_l = this.placing;
-	ZeeManagerGobClick.lastClickMouseUpMs = 0;
-	ZeeManagerGobClick.lastClickMouseDownMs = System.currentTimeMillis();
-	ZeeManagerGobClick.lastClickMouseButton = button;
+	ZeeManagerGobs.lastClickMouseUpMs = 0;
+	ZeeManagerGobs.lastClickMouseDownMs = System.currentTimeMillis();
+	ZeeManagerGobs.lastClickMouseButton = button;
 	leftClickDragging = false;
 	if(button == 2) {
 	    if(((Camera)camera).click(c)) {
 		camdrag = ui.grabmouse(this);
-		ZeeManagerGobClick.camAngleStart = camera.angle();
+		ZeeManagerGobs.camAngleStart = camera.angle();
 		new ZeeThread(){
 			public void run() {
-				long timeout = ZeeManagerGobClick.LONG_CLICK_MS;
+				long timeout = ZeeManagerGobs.LONG_CLICK_MS;
 				while(timeout>0){
 					try {
 						timeout -= 33;
 						sleep(33);
 						// camera dragged, cancel click
-						if (camera.angle() - ZeeManagerGobClick.camAngleStart != 0) {
+						if (camera.angle() - ZeeManagerGobs.camAngleStart != 0) {
 							//ZeeConfig.println("camera dragged");
 							return;
 						}
 						// short click
-						if (ZeeManagerGobClick.lastClickMouseUpMs > ZeeManagerGobClick.lastClickMouseDownMs) {
+						if (ZeeManagerGobs.lastClickMouseUpMs > ZeeManagerGobs.lastClickMouseDownMs) {
 							//ZeeConfig.println("short click ");
 							new Click(c, button).run();
 							return;
@@ -2120,7 +2120,7 @@ public boolean mousedown(Coord c, int button) {
 						camdrag.remove();
 						camdrag = null;
 					}
-					ZeeManagerGobClick.lastClickMouseUpMs = ZeeThread.now();
+					ZeeManagerGobs.lastClickMouseUpMs = ZeeThread.now();
 					//start midclick gob manager at Click.hit()
 					new Click(c, button).run();
 				}
@@ -2152,14 +2152,14 @@ public boolean mousedown(Coord c, int button) {
 
 	static boolean leftClickDragging = false;
     public void mousemove(Coord c) {
-	if (ZeeManagerGobClick.isRightClickZooming){
-		ZeeManagerGobClick.rightClickZoom(c);
+	if (ZeeManagerGobs.isRightClickZooming){
+		ZeeManagerGobs.rightClickZoom(c);
 	}
 	if(grab != null)
 	    grab.mmousemove(c);
 	Loader.Future<Plob> placing_l = this.placing;
 	if( camdrag != null ) {
-		if ( ZeeManagerGobClick.lastClickMouseButton == 2 ) {
+		if ( ZeeManagerGobs.lastClickMouseButton == 2 ) {
 			((Camera) camera).drag(c);
 		}
 		// already left-click dragging
@@ -2167,8 +2167,8 @@ public boolean mousedown(Coord c, int button) {
 			((Camera) camera).drag(c);
 		}
 		// start left-click dragging if enough time elapsed
-		else if (ZeeManagerGobClick.lastClickMouseDownMs > ZeeManagerGobClick.lastClickMouseUpMs &&
-				System.currentTimeMillis() - ZeeManagerGobClick.lastClickMouseDownMs > 200)
+		else if (ZeeManagerGobs.lastClickMouseDownMs > ZeeManagerGobs.lastClickMouseUpMs &&
+				System.currentTimeMillis() - ZeeManagerGobs.lastClickMouseDownMs > 200)
 		{
 			leftClickDragging = true;//save some calcs
 			((Camera) camera).drag(c);
@@ -2185,10 +2185,10 @@ public boolean mousedown(Coord c, int button) {
     }
     
     public boolean mouseup(Coord c, int button) {
-	ZeeManagerGobClick.lastClickMouseUpMs = System.currentTimeMillis();
-	ZeeManagerGobClick.lastClickMouseButton = button;
+	ZeeManagerGobs.lastClickMouseUpMs = System.currentTimeMillis();
+	ZeeManagerGobs.lastClickMouseButton = button;
 	if (button == 3)
-		ZeeManagerGobClick.isRightClickZooming = false;
+		ZeeManagerGobs.isRightClickZooming = false;
 	// stop left-click camera drag
 	if (button==1){
 		leftClickDragging = false;
@@ -2547,14 +2547,14 @@ public boolean mousedown(Coord c, int button) {
 	}
 
 	void inspectTooltip(Coord c) {
-		if(ZeeConfig.showInspectTooltip && !ZeeManagerGobClick.isMidclickInspecting && ZeeConfig.getPlayerGob()!=null) {
+		if(ZeeConfig.showInspectTooltip && !ZeeManagerGobs.isMidclickInspecting && ZeeConfig.getPlayerGob()!=null) {
 			new Hittest(c) {
 				@Override
 				protected void hit(Coord pc, Coord2d mc, ClickData inf) {
 					//ttip = null;
 					if(inf != null) {
 						//ZeeConfig.println("inspect Gob "+c);
-						Gob gob = ZeeManagerGobClick.getGobFromClickable(inf.ci);
+						Gob gob = ZeeManagerGobs.getGobFromClickable(inf.ci);
 						if(gob != null  &&  gob.id != ttipGobId) {
 							ttipGobId = gob.id;
 							StringBuilder sb = new StringBuilder();
@@ -2585,7 +2585,7 @@ public boolean mousedown(Coord c, int button) {
 							// gob overlays
 							if (!gob.ols.isEmpty()) {
 								sb.append("\nOverlays:");
-								for (String ol : ZeeManagerGobClick.getOverlayNames(gob)) {
+								for (String ol : ZeeManagerGobs.getOverlayNames(gob)) {
 									sb.append("\n   "+ol);
 								}
 							}

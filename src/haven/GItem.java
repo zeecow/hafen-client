@@ -176,7 +176,7 @@ public class GItem extends AWidget implements ItemInfo.SpriteOwner, GSprite.Owne
 				spr = this.spr = GSprite.create(this, res.get(), sdt.clone());
 				if (!itemChecked) {
 					itemChecked = true;
-					ZeeManagerItemClick.checkGItem(this);
+					ZeeManagerItems.checkGItem(this);
 				}
 			} catch (Loading l) {
 			}
@@ -568,7 +568,7 @@ public class GItem extends AWidget implements ItemInfo.SpriteOwner, GSprite.Owne
 
 	String getInfoName() {
 		try {
-			return ZeeManagerItemClick.getItemInfoName(this.info());
+			return ZeeManagerItems.getItemInfoName(this.info());
 		}catch (Loading l){
 			ZeeConfig.println("getInfoName > loading > "+l.getMessage());
 		}
@@ -578,7 +578,7 @@ public class GItem extends AWidget implements ItemInfo.SpriteOwner, GSprite.Owne
 		if (this.isStackByContent()){
 			return this.getAvgStackQuality();
 		}
-		return ZeeManagerItemClick.getItemInfoQuality(this.info());
+		return ZeeManagerItems.getItemInfoQuality(this.info());
 	}
 	double getAvgStackQuality(){
 		if (!this.isStackByContent())
@@ -598,27 +598,27 @@ public class GItem extends AWidget implements ItemInfo.SpriteOwner, GSprite.Owne
 		return (int) Math.round(this.getInfoQuality());
 	}
 	int getInfoAmount() {
-		return ZeeManagerItemClick.getItemInfoAmount(this.info());
+		return ZeeManagerItems.getItemInfoAmount(this.info());
 	}
 	ItemInfo getInfoByClass(Class lass) {
-		return ZeeManagerItemClick.getItemInfoByClass(this.info(), lass);
+		return ZeeManagerItems.getItemInfoByClass(this.info(), lass);
 	}
 	ItemInfo getItemInfoByClassSimpleName(String classSimpleName) {
-		return ZeeManagerItemClick.getItemInfoByClassSimpleName(this.info(), classSimpleName);
+		return ZeeManagerItems.getItemInfoByClassSimpleName(this.info(), classSimpleName);
 	}
 	List<String> getItemInfoClasses(String classSimpleName) {
-		return ZeeManagerItemClick.getItemInfoClasses(this.info());
+		return ZeeManagerItems.getItemInfoClasses(this.info());
 	}
 	ItemInfo getItemInfoContents(String classSimpleName) {
-		return ZeeManagerItemClick.getItemInfoContents(this.info());
+		return ZeeManagerItems.getItemInfoContents(this.info());
 	}
 	boolean isStackByContent() {
-		return ZeeManagerItemClick.isStackByContent(this);
+		return ZeeManagerItems.isStackByContent(this);
 	}
 	boolean isStackByAmount() {
-		return ZeeManagerItemClick.isStackByAmount(this);
+		return ZeeManagerItems.isStackByAmount(this);
 	}
 	boolean isStackByKeyPagina() {
-		return ZeeManagerItemClick.isStackByKeyPagina(this);
+		return ZeeManagerItems.isStackByKeyPagina(this);
 	}
 }

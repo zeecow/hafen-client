@@ -44,13 +44,13 @@ public class ZeeFishing {
 
             // equip lure on primrod
             if (itemName.contains("lure-")){
-                if(ZeeManagerItemClick.getLeftHandName().contains("/primrod") || ZeeManagerItemClick.getRightHandName().contains("/primrod")){
-                    if(ZeeManagerItemClick.pickUpItem(wItem)){
-                        ZeeManagerItemClick.equiporyItemAct("/primrod");//equip holding item
-                        ZeeManagerItemClick.playFeedbackSound();
+                if(ZeeManagerItems.getLeftHandName().contains("/primrod") || ZeeManagerItems.getRightHandName().contains("/primrod")){
+                    if(ZeeManagerItems.pickUpItem(wItem)){
+                        ZeeManagerItems.equiporyItemAct("/primrod");//equip holding item
+                        ZeeManagerItems.playFeedbackSound();
                         Thread.sleep(500);
                         invCreelOrMain.wdgmsg("drop", wItem.c.div(33));//return switched item
-                        ZeeManagerItemClick.playFeedbackSound();
+                        ZeeManagerItems.playFeedbackSound();
                     }
                 } else {
                     ZeeConfig.gameUI.error("no fish rod equipped");
@@ -61,21 +61,21 @@ public class ZeeFishing {
             //equip hook or line
             else {
                 String rodName = "";
-                if(ZeeManagerItemClick.getLeftHandName().contains("/primrod") || ZeeManagerItemClick.getRightHandName().contains("/primrod")) {
+                if(ZeeManagerItems.getLeftHandName().contains("/primrod") || ZeeManagerItems.getRightHandName().contains("/primrod")) {
                     rodName = "/primrod";
-                } else if(ZeeManagerItemClick.getLeftHandName().contains("/bushpole") || ZeeManagerItemClick.getRightHandName().contains("/bushpole")){
+                } else if(ZeeManagerItems.getLeftHandName().contains("/bushpole") || ZeeManagerItems.getRightHandName().contains("/bushpole")){
                     rodName = "/bushpole";
                 } else {
                     ZeeConfig.gameUI.error("no fish pole equipped");
                     ZeeConfig.removePlayerText();
                     return;
                 }
-                if(ZeeManagerItemClick.pickUpItem(wItem)){
-                    ZeeManagerItemClick.equiporyItemAct(rodName);//equip holding item
-                    ZeeManagerItemClick.playFeedbackSound();
+                if(ZeeManagerItems.pickUpItem(wItem)){
+                    ZeeManagerItems.equiporyItemAct(rodName);//equip holding item
+                    ZeeManagerItems.playFeedbackSound();
                     Thread.sleep(500);
                     invCreelOrMain.wdgmsg("drop", wItem.c.div(33));//return switched item
-                    ZeeManagerItemClick.playFeedbackSound();
+                    ZeeManagerItems.playFeedbackSound();
                 }
             }
 

@@ -35,7 +35,7 @@ public class ZeeManagerTrees {
                     //println(liftedTreelog.rc +" "+liftedTreelog.a+"  ,  "+treeLogGround.rc+" "+treeLogGround.a);
 
                     // right click lifted treelog to create plob
-                    ZeeManagerGobClick.gobClick(liftedTreelog,3);
+                    ZeeManagerGobs.gobClick(liftedTreelog,3);
                     sleep(500);
 
                     // adjust plob angle, postition and place it
@@ -62,7 +62,7 @@ public class ZeeManagerTrees {
                     ZeeManagerStockpile.lastPlob.move(newrc, treeLogGround.a);
 
                     // place treelog and wait
-                    ZeeManagerGobClick.gobPlace(ZeeManagerStockpile.lastPlob,0);
+                    ZeeManagerGobs.gobPlace(ZeeManagerStockpile.lastPlob,0);
                     ZeeThread.waitNotPlayerPose(ZeeConfig.POSE_PLAYER_LIFTING);
 
                 }catch (Exception e){
@@ -105,7 +105,7 @@ public class ZeeManagerTrees {
     private static ArrayList<Gob> treelogsDestroyQueue;
     static boolean isDestroyingTreelogs;
     static void destroyTreelogs(Gob firstTreelog) {
-        if (!ZeeManagerItemClick.isItemInHandSlot("/bonesaw") || ZeeManagerItemClick.isItemInHandSlot("/saw-m")){
+        if (!ZeeManagerItems.isItemInHandSlot("/bonesaw") || ZeeManagerItems.isItemInHandSlot("/saw-m")){
             ZeeConfig.msg("need bone saw equipped, no metal saw");
             return;
         }
@@ -120,7 +120,7 @@ public class ZeeManagerTrees {
             while ( treelog!=null && !ZeeConfig.isCancelClick() ) {
 
                 // click menu make boards
-                if (!ZeeManagerGobClick.clickGobPetal(treelog,"Make boards")){
+                if (!ZeeManagerGobs.clickGobPetal(treelog,"Make boards")){
                     ZeeThread.println("can't click treelog");
                     break;
                 }
@@ -191,7 +191,7 @@ public class ZeeManagerTrees {
     }
     public static Gob getClosestTreeLog(Gob ref) {
         List<Gob> list = ZeeConfig.findGobsByNameContains("/trees/");
-        list.removeIf(gob1 -> !ZeeManagerGobClick.isGobTreeLog(gob1.getres().name));
+        list.removeIf(gob1 -> !ZeeManagerGobs.isGobTreeLog(gob1.getres().name));
         return ZeeConfig.getClosestGob(ref,list);
     }
 
@@ -308,12 +308,12 @@ public class ZeeManagerTrees {
                 exitRemoveAllTrees();
                 return;
             }
-            ZeeManagerItemClick.equipAxeChopTree();
+            ZeeManagerItems.equipAxeChopTree();
             Coord2d treeCoord;
             while (tree!=null && !ZeeConfig.isCancelClick()) {
                 Thread.sleep(500);//safe wait
                 //start chopping
-                if(!ZeeManagerGobClick.clickGobPetal(tree, "Chop")){
+                if(!ZeeManagerGobs.clickGobPetal(tree, "Chop")){
                     ZeeThread.println("remtree > couldnt click tree petal \"Chop\"");
                     break;
                 }
@@ -382,25 +382,25 @@ public class ZeeManagerTrees {
         boolean droppedBucket = false;
 
         //move closer to stump
-        ZeeManagerGobClick.gobClick(stump,1);
+        ZeeManagerGobs.gobClick(stump,1);
         if(!ZeeThread.waitPlayerDistToGob(stump,25)){
             ZeeThread.println("couldn't get close to stump?");
             return false;
         }
 
         //drop bucket if present
-        if (ZeeManagerItemClick.isItemEquipped("bucket")) {
+        if (ZeeManagerItems.isItemEquipped("bucket")) {
             if (ZeeConfig.getMeterStamina() < 100) {
-                ZeeManagerItemClick.drinkFromBeltHandsInv();
+                ZeeManagerItems.drinkFromBeltHandsInv();
                 Thread.sleep(ZeeThread.PING_MS*2);
                 ZeeThread.waitNotPlayerPose(ZeeConfig.POSE_PLAYER_DRINK);
             }
-            ZeeManagerItemClick.getEquipory().dropItemByNameContains("/bucket");
+            ZeeManagerItems.getEquipory().dropItemByNameContains("/bucket");
             droppedBucket = true;
         }
 
         //equip shovel
-        ZeeManagerItemClick.equipBeltOrInvItem("shovel");
+        ZeeManagerItems.equipBeltOrInvItem("shovel");
         if (!ZeeThread.waitItemInHand("shovel")){
             ZeeThread.println("couldnt equip shovel ?");
             return false;
@@ -408,22 +408,22 @@ public class ZeeManagerTrees {
         ZeeThread.waitNotHoldingItem();//wait possible switched item go to belt?
 
         //remove stump
-        ZeeManagerGobClick.destroyGob(stump);
+        ZeeManagerGobs.destroyGob(stump);
 
         //reequip bucket if dropped
         if (droppedBucket){
             ZeeThread.waitPlayerPose(ZeeConfig.POSE_PLAYER_IDLE);
             Gob bucket = ZeeConfig.getClosestGobByNameContains("/bucket");
             if (bucket!=null){
-                if (ZeeManagerItemClick.pickupHandItem("shovel")) {
-                    if(ZeeManagerItemClick.dropHoldingItemToBeltOrInv()) {
+                if (ZeeManagerItems.pickupHandItem("shovel")) {
+                    if(ZeeManagerItems.dropHoldingItemToBeltOrInv()) {
                         Thread.sleep(ZeeThread.PING_MS);
                         ZeeConfig.clickRemoveCursor();
                         ZeeThread.waitCursorName(ZeeConfig.CURSOR_ARW);
                         Thread.sleep(ZeeThread.PING_MS);
-                        ZeeManagerGobClick.gobClick(bucket, 3);
+                        ZeeManagerGobs.gobClick(bucket, 3);
                         if (ZeeThread.waitHoldingItem())
-                            ZeeManagerItemClick.equipEmptyHand();
+                            ZeeManagerItems.equipEmptyHand();
                         else
                             ZeeThread.println("couldnt pickup da bucket");
                     }
@@ -446,7 +446,7 @@ public class ZeeManagerTrees {
     //      canceled by disabling mainInv "tl" checkbox
     static boolean treeloganizerWorking = false;
     static void treeloganizerCheckLift() {
-        if (!ZeeManagerGobClick.isGobTreeLog(ZeeConfig.lastMapViewClickGobName)) {
+        if (!ZeeManagerGobs.isGobTreeLog(ZeeConfig.lastMapViewClickGobName)) {
             return;
         }
         new ZeeThread() {
@@ -503,7 +503,7 @@ public class ZeeManagerTrees {
                             treelogNext = null;
                         }
                         //lift log
-                        if(!ZeeManagerGobClick.liftGob(treelogBoutToBeLifted)){
+                        if(!ZeeManagerGobs.liftGob(treelogBoutToBeLifted)){
                             treeloganizerExit("couldnt lift treelog? 2");
                             return;
                         }

@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
     Mid-click auto-equips items from belt/hands.
     Drinks from vessels: waterskin, bucket.
  */
-public class ZeeManagerItemClick extends ZeeThread{
+public class ZeeManagerItems extends ZeeThread{
 
     private final WItem wItem;
     private Coord coord;
@@ -31,14 +31,14 @@ public class ZeeManagerItemClick extends ZeeThread{
 
     static boolean droppedBucket;
 
-    public ZeeManagerItemClick(WItem wItem, Coord c) {
+    public ZeeManagerItems(WItem wItem, Coord c) {
         clickDiffMs = clickEndMs - clickStartMs;
         this.wItem = wItem;
         this.coord = c;
         init(wItem);
     }
 
-    public ZeeManagerItemClick(WItem wItem) {
+    public ZeeManagerItems(WItem wItem) {
         clickDiffMs = clickEndMs - clickStartMs;
         this.wItem = wItem;
         init(wItem);
@@ -47,7 +47,7 @@ public class ZeeManagerItemClick extends ZeeThread{
     //called on midclick smelter holding a bucket
     static void getQuicksilverFromSmelter(Gob smelter) {
 
-        WItem bucket = ZeeManagerItemClick.getHoldingItem();
+        WItem bucket = ZeeManagerItems.getHoldingItem();
 
         if (bucket==null){
             println("holding item null");
@@ -57,7 +57,7 @@ public class ZeeManagerItemClick extends ZeeThread{
         if (bucket.item.getres().name.contains("/bucket")){
 
             // check bucket contents
-            String contents = ZeeManagerItemClick.getItemContentsName(bucket);
+            String contents = ZeeManagerItems.getItemContentsName(bucket);
             if ( contents.contains("10.00 l of Quicksilver") ||
                     (!contents.isBlank() && !contents.contains("Quicksilver")) )
             {
@@ -83,7 +83,7 @@ public class ZeeManagerItemClick extends ZeeThread{
                         }
 
                         // ctrl + rclick smelter
-                        ZeeManagerGobClick.gobClick(smelter,3,0);
+                        ZeeManagerGobs.gobClick(smelter,3,0);
 
                         if (!waitPlayerDistToGob(smelter,35)){
                             println("failed approaching smelter");
@@ -108,7 +108,7 @@ public class ZeeManagerItemClick extends ZeeThread{
                         List<WItem> list = inv.getWItemsByNameEndsWith("/mercury");
                         if (list.size() > 0) {
                             for (WItem quicksilver : list) {
-                                ZeeManagerItemClick.itemAct(quicksilver,0);
+                                ZeeManagerItems.itemAct(quicksilver,0);
                                 sleep(PING_MS);
                             }
                         }
@@ -127,7 +127,7 @@ public class ZeeManagerItemClick extends ZeeThread{
 
     public static void showWindowClickAllItemPetals(String petalName) {
 
-        WItem itemClickAll = ZeeManagerItemClick.lastItemClicked;
+        WItem itemClickAll = ZeeManagerItems.lastItemClicked;
         if (itemClickAll==null){
             println("checkClickAllItems > item null");
             return;
@@ -194,7 +194,7 @@ public class ZeeManagerItemClick extends ZeeThread{
     }
 
     static boolean isFlowerMenuFromWItem() {
-        return (ZeeManagerItemClick.lastItemClickedMs > ZeeConfig.lastMapViewClickMs);
+        return (ZeeManagerItems.lastItemClickedMs > ZeeConfig.lastMapViewClickMs);
     }
 
     static void checkGItem(GItem gItem) {
@@ -264,7 +264,7 @@ public class ZeeManagerItemClick extends ZeeThread{
     }
 
     static boolean isAnyHandEmpty() {
-        return ZeeManagerItemClick.isLeftHandEmpty() || ZeeManagerItemClick.isRightHandEmpty();
+        return ZeeManagerItems.isLeftHandEmpty() || ZeeManagerItems.isRightHandEmpty();
     }
 
     static void cancelFlowerMenu() {
@@ -1274,7 +1274,7 @@ public class ZeeManagerItemClick extends ZeeThread{
             //return false;
             inv = ZeeConfig.getMainInventory(); // TODO fix fitting item to inventory
         }else{
-            inv = ZeeManagerItemClick.getInvBelt();
+            inv = ZeeManagerItems.getInvBelt();
         }
         return dropHoldingItemToInv(inv);
     }
@@ -1649,14 +1649,14 @@ public class ZeeManagerItemClick extends ZeeThread{
     }
 
     public static void equipBeltOrInvItem(String name) {
-        if(ZeeManagerItemClick.isItemInHandSlot(name)) {
+        if(ZeeManagerItems.isItemInHandSlot(name)) {
             return;
         }
-        WItem item = ZeeManagerItemClick.getBeltOrInvWItem(name);
+        WItem item = ZeeManagerItems.getBeltOrInvWItem(name);
         if (item!=null) {
             try {
                 //use equipManager logic
-                Thread t = new ZeeManagerItemClick(item);
+                Thread t = new ZeeManagerItems(item);
                 t.start();
                 t.join();
             } catch (InterruptedException e) {
@@ -1899,7 +1899,7 @@ public class ZeeManagerItemClick extends ZeeThread{
     }
 
     public static boolean isCoracleEquipped() {
-        return ZeeManagerItemClick.isItemEquipped("gfx/invobjs/small/coracle");
+        return ZeeManagerItems.isItemEquipped("gfx/invobjs/small/coracle");
     }
 
     public static boolean isStackByContent(GItem item) {
@@ -2114,8 +2114,8 @@ public class ZeeManagerItemClick extends ZeeThread{
         }.start();
     }
     static void cheeseTrayMakeWindow(Window window){
-        if (!ZeeManagerItemClick.cheeseProgressList.isEmpty()){
-            List<String> allCheese = ZeeManagerItemClick.cheeseProgressList;
+        if (!ZeeManagerItems.cheeseProgressList.isEmpty()){
+            List<String> allCheese = ZeeManagerItems.cheeseProgressList;
             int buttonsX = 0 , buttonsY = 0;
             Label lbl;
             for (int i = 0; i < allCheese.size(); i++) {
@@ -2139,8 +2139,8 @@ public class ZeeManagerItemClick extends ZeeThread{
                             }
                             //remove cheese
                             String cheeseNameToRemove = ((KeyboundTip)this.tooltip).base.replace("remove ","");
-                            if(ZeeManagerItemClick.cheeseProgressList.removeIf(s -> s.startsWith(cheeseNameToRemove))) {
-                                Utils.setprefsl("cheeseProgressList", ZeeManagerItemClick.cheeseProgressList);
+                            if(ZeeManagerItems.cheeseProgressList.removeIf(s -> s.startsWith(cheeseNameToRemove))) {
+                                Utils.setprefsl("cheeseProgressList", ZeeManagerItems.cheeseProgressList);
                                 ZeeConfig.gameUI.menu.wdgmsg("act","craft","cheesetray",0);
                             }else{
                                 println("couldnt remove cheese "+cheeseNameToRemove);

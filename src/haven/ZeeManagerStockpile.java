@@ -99,13 +99,13 @@ public class ZeeManagerStockpile extends ZeeThread{
                     Inventory inv = ZeeConfig.getMainInventory();
                     ZeeConfig.stopMovingEscKey();
                     // pickup inv board (if player was holding item other method would be called)
-                    if (ZeeManagerItemClick.pickUpInvItem(inv, "/board-")) {
+                    if (ZeeManagerItems.pickUpInvItem(inv, "/board-")) {
                         // pile board
-                        ZeeManagerGobClick.itemActGob(existingPile, UI.MOD_SHIFT);
+                        ZeeManagerGobs.itemActGob(existingPile, UI.MOD_SHIFT);
                         //wait piling
                         if (waitNotHoldingItem()) {
                             //make board again
-                            ZeeManagerGobClick.clickGobPetal(lastTreelogSawed, "Make boards");
+                            ZeeManagerGobs.clickGobPetal(lastTreelogSawed, "Make boards");
                         }
                     }
                 }catch (Exception e){
@@ -122,13 +122,13 @@ public class ZeeManagerStockpile extends ZeeThread{
                     Inventory inv = ZeeConfig.getMainInventory();
                     ZeeConfig.stopMovingEscKey();
                     // pickup inv block (if player was holding item other method would be called)
-                    if (ZeeManagerItemClick.pickUpInvItem(inv, "/wblock-")) {
+                    if (ZeeManagerItems.pickUpInvItem(inv, "/wblock-")) {
                         // pile block
-                        ZeeManagerGobClick.itemActGob(existingPile, UI.MOD_SHIFT);
+                        ZeeManagerGobs.itemActGob(existingPile, UI.MOD_SHIFT);
                         //wait piling
                         if (waitNotHoldingItem()) {
                             //make blocks again
-                            ZeeManagerGobClick.clickGobPetal(lastTreelogChopped, "Chop into blocks");
+                            ZeeManagerGobs.clickGobPetal(lastTreelogChopped, "Chop into blocks");
                         }
                     }
                 }catch (Exception e){
@@ -145,9 +145,9 @@ public class ZeeManagerStockpile extends ZeeThread{
                     Inventory inv = ZeeConfig.getMainInventory();
                     ZeeConfig.stopMovingEscKey();
                     // pickup inv sand (if player was holding item other method would be called)
-                    if (ZeeManagerItemClick.pickUpInvItem(inv, "/sand")) {
+                    if (ZeeManagerItems.pickUpInvItem(inv, "/sand")) {
                         // pile sand
-                        ZeeManagerGobClick.itemActGob(existingPile, UI.MOD_SHIFT);
+                        ZeeManagerGobs.itemActGob(existingPile, UI.MOD_SHIFT);
                         //wait piling
                         if (waitNotHoldingItem()) {
                             //dig sand again
@@ -196,7 +196,7 @@ public class ZeeManagerStockpile extends ZeeThread{
         ZeeConfig.addGobText(gobSource,"source");
 
         //start collection from source
-        if( gobSource==null || !ZeeManagerGobClick.clickGobPetal(gobSource, lastPetalName) ){
+        if( gobSource==null || !ZeeManagerGobs.clickGobPetal(gobSource, lastPetalName) ){
             println("no more source? gobSource0 = "+gobSource);
             pileAndExit();
             return;
@@ -205,7 +205,7 @@ public class ZeeManagerStockpile extends ZeeThread{
         // adjust timeout if chipping stone without pickaxe
         int timeout = 3000;
         if (lastPetalName.contentEquals("Chip stone")){
-            if (ZeeManagerItemClick.isItemEquipped("/pickaxe"))
+            if (ZeeManagerItems.isItemEquipped("/pickaxe"))
                 timeout = 2000;
             else
                 timeout = 5000;
@@ -238,7 +238,7 @@ public class ZeeManagerStockpile extends ZeeThread{
                     //no inventory items, try getting more from source
                     if(!busy)
                         continue;
-                    if( gobSource==null || !ZeeManagerGobClick.clickGobPetal(gobSource, lastPetalName) ){
+                    if( gobSource==null || !ZeeManagerGobs.clickGobPetal(gobSource, lastPetalName) ){
                         println("no more source? gobSource1 = "+gobSource);
                         pileAndExit();
                     }
@@ -249,19 +249,19 @@ public class ZeeManagerStockpile extends ZeeThread{
                 WItem wItem = invItems.get(0);
                 String itemName = wItem.item.getres().name;
                 //pickup inv item
-                if (ZeeManagerItemClick.pickUpItem(wItem)) {
+                if (ZeeManagerItems.pickUpItem(wItem)) {
                     //right click stockpile
-                    ZeeManagerGobClick.itemActGob(gobPile, UI.MOD_SHIFT);
+                    ZeeManagerGobs.itemActGob(gobPile, UI.MOD_SHIFT);
                     if (waitNotHoldingItem()) {//piling successfull
                         sleep(1000);//wait inv transfer to stockpile
                         if (mainInv.getWItemsByNameContains(itemName).size() > 0) {
                             // coal pile full, try creating 2nd pile
                             if (lastPetalName.contentEquals("Collect coal")){
-                                ZeeManagerGobClick.gobClick(gobSource,1);//move towards tar kiln
+                                ZeeManagerGobs.gobClick(gobSource,1);//move towards tar kiln
                                 waitPlayerIdleVelocityMs(800);//wait idle
                                 //pickup coal from inv
                                 if (!ZeeConfig.isPlayerHoldingItem()){
-                                    if (ZeeManagerItemClick.pickUpInvItem(ZeeConfig.getMainInventory(),"/coal")) {
+                                    if (ZeeManagerItems.pickUpInvItem(ZeeConfig.getMainInventory(),"/coal")) {
                                         // right click to create virtual pile(lastPlob)
                                         Coord newPileCoord = ZeeConfig.getNextTileTowards(ZeeConfig.getGobTile(gobPile),ZeeConfig.getPlayerTile());
                                         ZeeConfig.gameUI.map.wdgmsg("itemact", newPileCoord, ZeeConfig.tileToCoord(newPileCoord), 0);
@@ -270,7 +270,7 @@ public class ZeeManagerStockpile extends ZeeThread{
                                         //try placing new pile
                                         Coord playerTile = ZeeConfig.getPlayerTile();
                                         Coord c = ZeeConfig.tileToCoord(newPileCoord);
-                                        ZeeManagerGobClick.gobPlace(lastPlob,c,UI.MOD_SHIFT);
+                                        ZeeManagerGobs.gobPlace(lastPlob,c,UI.MOD_SHIFT);
                                         waitPlayerIdleFor(1);
 
                                         // player didnt move = couldnt place new coal pile?
@@ -294,7 +294,7 @@ public class ZeeManagerStockpile extends ZeeThread{
                         if(!busy)//thread cancelled
                             continue;
                         //try getting more from source
-                        if( gobSource==null || !ZeeManagerGobClick.clickGobPetal(gobSource, lastPetalName) ){
+                        if( gobSource==null || !ZeeManagerGobs.clickGobPetal(gobSource, lastPetalName) ){
                             println("gob source consumed = "+gobSource);
                             pileAndExit();
                         }
@@ -312,7 +312,7 @@ public class ZeeManagerStockpile extends ZeeThread{
                 if(!busy)
                     continue;
                 String itemName = ZeeConfig.gameUI.vhand.item.getres().name;
-                ZeeManagerGobClick.itemActGob(gobPile, UI.MOD_SHIFT);//right click stockpile
+                ZeeManagerGobs.itemActGob(gobPile, UI.MOD_SHIFT);//right click stockpile
                 if(waitNotHoldingItem()) {
                     sleep(1000);
                     //check if pile full
@@ -321,7 +321,7 @@ public class ZeeManagerStockpile extends ZeeThread{
                     if (!busy)
                         continue;
                     //check if tree still have leafs
-                    if (gobSource == null || !ZeeManagerGobClick.clickGobPetal(gobSource, lastPetalName)) {
+                    if (gobSource == null || !ZeeManagerGobs.clickGobPetal(gobSource, lastPetalName)) {
                         println("no more source? gobSource3 = " + gobSource);
                         pileAndExit();
                         return;
@@ -369,8 +369,8 @@ public class ZeeManagerStockpile extends ZeeThread{
 
             //check for pickaxe
             if (tileSourceName.contentEquals(ZeeConfig.TILE_MOUNTAIN)){
-                if (!ZeeManagerItemClick.isItemEquipped("/pickaxe")){
-                    if (ZeeManagerItemClick.getBeltOrInvWItem("/pickaxe")==null){
+                if (!ZeeManagerItems.isItemEquipped("/pickaxe")){
+                    if (ZeeManagerItems.getBeltOrInvWItem("/pickaxe")==null){
                         ZeeConfig.msgError("pickaxe required");
                         return;
                     }
@@ -431,7 +431,7 @@ public class ZeeManagerStockpile extends ZeeThread{
 
         // add to existing pile
         if (tileSourceGobPile!=null){
-            ZeeManagerGobClick.itemActGob(tileSourceGobPile, UI.MOD_SHIFT);
+            ZeeManagerGobs.itemActGob(tileSourceGobPile, UI.MOD_SHIFT);
             waitPlayerIdlePose();
         }
         // create new pile
@@ -444,7 +444,7 @@ public class ZeeManagerStockpile extends ZeeThread{
             sleep(500);
 
             //try placing pile
-            ZeeManagerGobClick.gobPlace(lastPlob, ZeeConfig.tileToCoord(further), UI.MOD_SHIFT);
+            ZeeManagerGobs.gobPlace(lastPlob, ZeeConfig.tileToCoord(further), UI.MOD_SHIFT);
             waitPlayerIdleFor(1);
         }
 
@@ -573,7 +573,7 @@ public class ZeeManagerStockpile extends ZeeThread{
 
 
     private static void pileItems() throws InterruptedException {
-        ZeeManagerItemClick.cancelFlowerMenu();
+        ZeeManagerItems.cancelFlowerMenu();
         waitNoFlowerMenu();
         // if not holding item, pickup from inventory
         if (!ZeeConfig.isPlayerHoldingItem()) {
@@ -582,8 +582,8 @@ public class ZeeManagerStockpile extends ZeeThread{
                 return;//inv has no more items
             }
             WItem wItem = invItems.get(0);
-            if (ZeeManagerItemClick.pickUpItem(wItem)) { //pickup source item
-                ZeeManagerGobClick.itemActGob(gobPile, UI.MOD_SHIFT);//shift+right click stockpile
+            if (ZeeManagerItems.pickUpItem(wItem)) { //pickup source item
+                ZeeManagerGobs.itemActGob(gobPile, UI.MOD_SHIFT);//shift+right click stockpile
                 if (!waitNotHoldingItem()) {
                     exitManager("pileItems > pile full?");
                 }
@@ -593,7 +593,7 @@ public class ZeeManagerStockpile extends ZeeThread{
         }
         // holding item
         else if (gobPile!=null){
-            ZeeManagerGobClick.itemActGob(gobPile, UI.MOD_SHIFT);//shift+right click stockpile
+            ZeeManagerGobs.itemActGob(gobPile, UI.MOD_SHIFT);//shift+right click stockpile
             if (!waitNotHoldingItem()) {
                 exitManager("pileItems > pile full? 2");
             }
@@ -613,7 +613,7 @@ public class ZeeManagerStockpile extends ZeeThread{
                     waitPlayerDistToGob(gobStockpile,90);
                 }
                 //disembark/unmount
-                ZeeManagerGobClick.disembarkVehicle(stockpileCoord);
+                ZeeManagerGobs.disembarkVehicle(stockpileCoord);
                 sleep(999);
             }
             Coord pc = ZeeConfig.getPlayerCoord();
@@ -627,10 +627,10 @@ public class ZeeManagerStockpile extends ZeeThread{
             if (!ZeeConfig.isPlayerCarryingWheelbarrow()){
                 Gob wb = ZeeConfig.getClosestGobByNameContains("gfx/terobjs/vehicle/wheelbarrow");
                 //activate wheelbarrow
-                ZeeManagerGobClick.gobClick(wb, 3);
+                ZeeManagerGobs.gobClick(wb, 3);
                 sleep(PING_MS);
                 //use wheelbarrow on stockpile
-                ZeeManagerGobClick.gobClick(gobStockpile, 3);
+                ZeeManagerGobs.gobClick(gobStockpile, 3);
                 waitPlayerIdleVelocity();
             }else
                 ZeeConfig.msg("couldn't drop wheelbarrow");
@@ -655,7 +655,7 @@ public class ZeeManagerStockpile extends ZeeThread{
             if (!ZeeConfig.isPlayerCarryingWheelbarrow()) {
                 Gob wb = ZeeConfig.getClosestGobByNameContains("gfx/terobjs/vehicle/wheelbarrow");
                 //activate wheelbarrow
-                ZeeManagerGobClick.gobClick(wb, 3);
+                ZeeManagerGobs.gobClick(wb, 3);
                 sleep(PING_MS);
                 //use wheelbarrow at stockpile
                 ZeeConfig.clickCoord(mcFloorPosres, 3);
@@ -802,7 +802,7 @@ public class ZeeManagerStockpile extends ZeeThread{
                             Gob closestItem = ZeeConfig.getClosestGobByNameContains(itemGobName);
                             if (closestItem != null) {
                                 //click closest item
-                                ZeeManagerGobClick.gobClick(closestItem, 3, UI.MOD_SHIFT);
+                                ZeeManagerGobs.gobClick(closestItem, 3, UI.MOD_SHIFT);
                                 //pickup itemns until inventory idle
                                 waitInvIdleMs(1000);
                                 //check if user closed piler window
@@ -819,7 +819,7 @@ public class ZeeManagerStockpile extends ZeeThread{
                                     return;
                                 }
                                 //pickup item from inv
-                                if (!ZeeManagerItemClick.pickUpItem(items.get(0))){
+                                if (!ZeeManagerItems.pickUpItem(items.get(0))){
                                     println("couldnt pickup item ..... 123");
                                     continue;
                                 }
@@ -837,7 +837,7 @@ public class ZeeManagerStockpile extends ZeeThread{
                                 println("no more inventory items to pile 2");
                                 continue;
                             }
-                            if (!ZeeManagerItemClick.pickUpItem(items.get(0))){
+                            if (!ZeeManagerItems.pickUpItem(items.get(0))){
                                 println("couldnt pickup item ..... 123");
                                 continue;
                             }
@@ -846,7 +846,7 @@ public class ZeeManagerStockpile extends ZeeThread{
                         // use latest pile
                         //latestPile = null;//TODO remove test line
                         if (latestPile!=null && !selAreaTestOneItemPile){
-                            ZeeManagerGobClick.itemActGob(latestPile,UI.MOD_SHIFT);
+                            ZeeManagerGobs.itemActGob(latestPile,UI.MOD_SHIFT);
                             waitPlayerIdleVelocity();//wait approach pile
                             sleep(500);//wait transf items
                             List<WItem> invItems = ZeeConfig.getMainInventory().getWItemsByNameContains(itemInvName);
@@ -873,7 +873,7 @@ public class ZeeManagerStockpile extends ZeeThread{
 
                             //try placing pile
                             Coord playerTile = ZeeConfig.getPlayerTile();
-                            ZeeManagerGobClick.gobPlace(lastPlob, ZeeConfig.tileToCoord(furtherTile), selAreaTestOneItemPile ? 0 : UI.MOD_SHIFT);
+                            ZeeManagerGobs.gobPlace(lastPlob, ZeeConfig.tileToCoord(furtherTile), selAreaTestOneItemPile ? 0 : UI.MOD_SHIFT);
                             waitPlayerIdleFor(1);
 
 
@@ -954,7 +954,7 @@ public class ZeeManagerStockpile extends ZeeThread{
                                 }
                                 else{
                                     //click closest item
-                                    ZeeManagerGobClick.gobClick(closestItem, 3, UI.MOD_SHIFT);
+                                    ZeeManagerGobs.gobClick(closestItem, 3, UI.MOD_SHIFT);
                                     //pickup itemns until inventory idle
                                     waitInvIdleMs(1000);
                                     //check if user closed piler window
@@ -977,7 +977,7 @@ public class ZeeManagerStockpile extends ZeeThread{
                                 println("no more inventory items to pile 3");
                                 continue;
                             }
-                            if (!ZeeManagerItemClick.pickUpItem(items.get(0))){
+                            if (!ZeeManagerItems.pickUpItem(items.get(0))){
                                 println("couldnt pickup item ..... 123");
                                 continue;
                             }
@@ -985,7 +985,7 @@ public class ZeeManagerStockpile extends ZeeThread{
 
                         // use latest pile
                         if (latestPile!=null && !selAreaTestOneItemPile){
-                            ZeeManagerGobClick.itemActGob(latestPile,UI.MOD_SHIFT);
+                            ZeeManagerGobs.itemActGob(latestPile,UI.MOD_SHIFT);
                             waitPlayerIdleVelocity();//wait approach pile
                             sleep(500);//wait transf items
                             List<WItem> invItems = ZeeConfig.getMainInventory().getWItemsByNameContains(itemInvName);
@@ -1022,7 +1022,7 @@ public class ZeeManagerStockpile extends ZeeThread{
                         println("pile remaining inv items");
                         ZeeConfig.moveToAreaCenter(ZeeConfig.lastSavedOverlay.a);
                         waitPlayerIdleVelocity();
-                        ZeeManagerItemClick.pickUpItem(items.get(0));
+                        ZeeManagerItems.pickUpItem(items.get(0));
                         areaPilerCreateNewPile(borderTiles,itemGobName,minX,minY);
                     }
 
@@ -1093,7 +1093,7 @@ public class ZeeManagerStockpile extends ZeeThread{
 
             //try placing pile
             Coord playerTile = ZeeConfig.getPlayerTile();
-            ZeeManagerGobClick.gobPlace(lastPlob, ZeeConfig.tileToCoord(coordNewPile), selAreaTestOneItemPile ? 0 : UI.MOD_SHIFT);
+            ZeeManagerGobs.gobPlace(lastPlob, ZeeConfig.tileToCoord(coordNewPile), selAreaTestOneItemPile ? 0 : UI.MOD_SHIFT);
             waitPlayerIdleFor(1);
 
             //player didnt move? tile occupied, terrain not flat...
@@ -1141,13 +1141,13 @@ public class ZeeManagerStockpile extends ZeeThread{
                 try {
                     Inventory inv = ZeeConfig.getMainInventory();
                     // pickup inv stone (if player was holding item a generic method would already been called)
-                    if (ZeeManagerItemClick.pickUpInvItem(inv, "coal")) {
+                    if (ZeeManagerItems.pickUpInvItem(inv, "coal")) {
                         // pile coal
-                        ZeeManagerGobClick.itemActGob(existingPile,UI.MOD_SHIFT);
+                        ZeeManagerGobs.itemActGob(existingPile,UI.MOD_SHIFT);
                         //wait piling
                         if(waitNotHoldingItem()){
                             // try collecting more
-                            ZeeManagerGobClick.clickGobPetal(lastTarkilnCollected,"Collect coal");
+                            ZeeManagerGobs.clickGobPetal(lastTarkilnCollected,"Collect coal");
                         }
                     } else {
                         println("pile inv coal > couldnt get coal from inv");
@@ -1165,14 +1165,14 @@ public class ZeeManagerStockpile extends ZeeThread{
                 try {
                     Inventory inv = ZeeConfig.getMainInventory();
                     // pickup inv stone (if player was holding item a generic method would already been called)
-                    if (ZeeManagerItemClick.pickUpInvItem(inv, lastBoulderChippedStoneName)) {
+                    if (ZeeManagerItems.pickUpInvItem(inv, lastBoulderChippedStoneName)) {
                         // pile stone
-                        ZeeManagerGobClick.itemActGob(existingPile,UI.MOD_SHIFT);
+                        ZeeManagerGobs.itemActGob(existingPile,UI.MOD_SHIFT);
                         //wait piling
                         if(waitNotHoldingItem()){
                             // try make stone
                             if (lastBoulderChipped!=null)
-                                ZeeManagerGobClick.clickGobPetal(lastBoulderChipped,"Chip stone");
+                                ZeeManagerGobs.clickGobPetal(lastBoulderChipped,"Chip stone");
                         }
                     } else {
                         println("pile all stones > couldnt get stone from inv");
@@ -1194,9 +1194,9 @@ public class ZeeManagerStockpile extends ZeeThread{
                     do {
                         ZeeConfig.stopMovingEscKey();
                         // pickup inv block (if player was holding item other method would be called)
-                        if (ZeeManagerItemClick.pickUpInvItem(inv, "/wblock-")) {
+                        if (ZeeManagerItems.pickUpInvItem(inv, "/wblock-")) {
                             // pile block
-                            ZeeManagerGobClick.itemActGob(existingPile, UI.MOD_SHIFT);
+                            ZeeManagerGobs.itemActGob(existingPile, UI.MOD_SHIFT);
                             //wait piling
                             if (waitNotHoldingItem()) {
                                 if (lastTreelogChopped == null ) {
@@ -1210,7 +1210,7 @@ public class ZeeManagerStockpile extends ZeeThread{
                                     break;
                                 }
                                 // chop blocks
-                                if (!ZeeManagerGobClick.clickGobPetal(lastTreelogChopped, "Chop into blocks")) {
+                                if (!ZeeManagerGobs.clickGobPetal(lastTreelogChopped, "Chop into blocks")) {
                                     println("pilan blocks > done");
                                     break;
                                 }
@@ -1223,7 +1223,7 @@ public class ZeeManagerStockpile extends ZeeThread{
                                 if(waitPlayerIdleOrHoldingItem()){
                                     // pile holding item
                                     if (ZeeConfig.isPlayerHoldingItem()){
-                                        ZeeManagerGobClick.itemActGob(existingPile,0);
+                                        ZeeManagerGobs.itemActGob(existingPile,0);
                                         waitNotHoldingItem();
                                     }
                                 }
@@ -1236,7 +1236,7 @@ public class ZeeManagerStockpile extends ZeeThread{
                         else {
                             println("pilan blocks > couldnt get block from inv, trying again");
                             // chop blocks
-                            if (!ZeeManagerGobClick.clickGobPetal(lastTreelogChopped, "Chop into blocks")) {
+                            if (!ZeeManagerGobs.clickGobPetal(lastTreelogChopped, "Chop into blocks")) {
                                 println("pilan blocks > done");
                                 break;
                             }
@@ -1265,9 +1265,9 @@ public class ZeeManagerStockpile extends ZeeThread{
                     do {
                         ZeeConfig.stopMovingEscKey();
                         // pickup inv sand (if player was holding item other method would be called)
-                        if (ZeeManagerItemClick.pickUpInvItem(inv, "/sand")) {
+                        if (ZeeManagerItems.pickUpInvItem(inv, "/sand")) {
                             // pile sand
-                            ZeeManagerGobClick.itemActGob(existingPile, UI.MOD_SHIFT);
+                            ZeeManagerGobs.itemActGob(existingPile, UI.MOD_SHIFT);
                             sleep(500);
                             waitPlayerIdlePose();
                             //wait piling
@@ -1296,7 +1296,7 @@ public class ZeeManagerStockpile extends ZeeThread{
                                 if(waitInvFull(inv,4)){
                                     // pile holding item
                                     if (ZeeConfig.isPlayerHoldingItem()){
-                                        ZeeManagerGobClick.itemActGob(existingPile,0);
+                                        ZeeManagerGobs.itemActGob(existingPile,0);
                                         waitNotHoldingItem();
                                     }
                                 }
@@ -1330,9 +1330,9 @@ public class ZeeManagerStockpile extends ZeeThread{
                             ZeeConfig.stopMovingEscKey();
                             String stoneName = ZeeConfig.getRegexGroup(gobBoulder.getres().name,"bumlings/(\\D+)\\d$",1);
                             // pickup inv stone (if player was holding item other method would be called)
-                            if (ZeeManagerItemClick.pickUpInvItem(inv, stoneName)) {
+                            if (ZeeManagerItems.pickUpInvItem(inv, stoneName)) {
                                 // pile stone
-                                ZeeManagerGobClick.itemActGob(stonePile, UI.MOD_SHIFT);
+                                ZeeManagerGobs.itemActGob(stonePile, UI.MOD_SHIFT);
                                 //wait piling
                                 if (waitNotHoldingItem()) {
                                     if (gobBoulder == null ) {
@@ -1346,7 +1346,7 @@ public class ZeeManagerStockpile extends ZeeThread{
                                         break;
                                     }
                                     // chip stone
-                                    if (!ZeeManagerGobClick.clickGobPetal(gobBoulder, "Chip stone")) {
+                                    if (!ZeeManagerGobs.clickGobPetal(gobBoulder, "Chip stone")) {
                                         println("pilan stone > done");
                                         break;
                                     }
@@ -1359,7 +1359,7 @@ public class ZeeManagerStockpile extends ZeeThread{
                                     if(waitPlayerIdleOrHoldingItem()){
                                         // pile holding item
                                         if (ZeeConfig.isPlayerHoldingItem()){
-                                            ZeeManagerGobClick.itemActGob(stonePile,0);
+                                            ZeeManagerGobs.itemActGob(stonePile,0);
                                             waitNotHoldingItem();
                                         }
                                     }
@@ -1370,7 +1370,7 @@ public class ZeeManagerStockpile extends ZeeThread{
                                 }
                             } else {
                                 println("pilan stone > couldnt get stone from inv, trying again");
-                                if (!ZeeManagerGobClick.clickGobPetal(gobBoulder, "Chip stone")) {
+                                if (!ZeeManagerGobs.clickGobPetal(gobBoulder, "Chip stone")) {
                                     println("pilan stones > done");
                                     break;
                                 }
@@ -1402,9 +1402,9 @@ public class ZeeManagerStockpile extends ZeeThread{
                     do {
                         ZeeConfig.stopMovingEscKey();
                         // pickup inv board (if player was holding item other method would be called)
-                        if (ZeeManagerItemClick.pickUpInvItem(inv, "/board-")) {
+                        if (ZeeManagerItems.pickUpInvItem(inv, "/board-")) {
                             // pile board
-                            ZeeManagerGobClick.itemActGob(existingPile, UI.MOD_SHIFT);
+                            ZeeManagerGobs.itemActGob(existingPile, UI.MOD_SHIFT);
                             //wait piling
                             if (waitNotHoldingItem()) {
                                 if (lastTreelogSawed == null ) {
@@ -1418,7 +1418,7 @@ public class ZeeManagerStockpile extends ZeeThread{
                                     break;
                                 }
                                 // make board
-                                if (!ZeeManagerGobClick.clickGobPetal(lastTreelogSawed, "Make boards")) {
+                                if (!ZeeManagerGobs.clickGobPetal(lastTreelogSawed, "Make boards")) {
                                     println("pilan board > done");
                                     break;
                                 }
@@ -1431,7 +1431,7 @@ public class ZeeManagerStockpile extends ZeeThread{
                                 if(waitPlayerIdleOrHoldingItem()){
                                     // pile holding item
                                     if (ZeeConfig.isPlayerHoldingItem()){
-                                        ZeeManagerGobClick.itemActGob(existingPile,0);
+                                        ZeeManagerGobs.itemActGob(existingPile,0);
                                         waitNotHoldingItem();
                                     }
                                 }
@@ -1442,7 +1442,7 @@ public class ZeeManagerStockpile extends ZeeThread{
                             }
                         } else {
                             println("pilan board > couldnt get board from inv, trying again");
-                            if (!ZeeManagerGobClick.clickGobPetal(lastTreelogSawed, "Make boards")) {
+                            if (!ZeeManagerGobs.clickGobPetal(lastTreelogSawed, "Make boards")) {
                                 println("pilan boards > done");
                                 break;
                             }
@@ -1467,9 +1467,9 @@ public class ZeeManagerStockpile extends ZeeThread{
                 try {
                     Inventory inv = ZeeConfig.getMainInventory();
                     // pickup inv clay (if player was holding item a generic method would already been called)
-                    if (ZeeManagerItemClick.pickUpInvItem(inv, "/clay-ball","/clay-acre")) {
+                    if (ZeeManagerItems.pickUpInvItem(inv, "/clay-ball","/clay-acre")) {
                         // pile clay
-                        ZeeManagerGobClick.itemActGob(existingPile,UI.MOD_SHIFT);
+                        ZeeManagerGobs.itemActGob(existingPile,UI.MOD_SHIFT);
                     } else {
                         println("pile all clay > couldnt get clay from inv");
                     }
