@@ -46,14 +46,16 @@ public class AudioSprite {
 		if (ZeeConfig.mapAudioBlocker.containsKey(res.name)) {
 			List<Integer> savedClips = ZeeConfig.mapAudioBlocker.get(res.name);
 			// block if savedClips is null or contains clip index
-			if (savedClips==null || savedClips.contains(choosenSubClip))
+			if (savedClips==null || savedClips.contains(choosenSubClip)) {
 				blockAudio = true;
+			}
 		}
-		//update audio blocker window
-		if (ZeeAudio.monitorAudioClip)
-			ZeeAudio.checkAudioBlock(res.name, choosenSubClip);
-		if (!blockAudio)
+		if (!blockAudio) {
+			//update map buttons
+			if (ZeeAudio.aBlockMonitor)
+				ZeeAudio.aBlockCheck(res.name, choosenSubClip);
 			return (cl.get(choosenSubClip));
+		}
 	}
 	return(null);
     }

@@ -2025,7 +2025,7 @@ public class ZeeManagerGobs extends ZeeThread{
         else if(petalName.contentEquals(ZeeFlowerMenu.STRPETAL_TESTCOORDS))
             windowTestCoords();
         else if(petalName.contentEquals(ZeeFlowerMenu.STRPETAL_AUDIOBLOCKER))
-            ZeeAudio.windowAudioBlocker();
+            ZeeAudio.aBlockWin();
         else if(petalName.contentEquals(ZeeFlowerMenu.STRPETAL_CLEARGOBTEXTSPOINTERS))
             ZeeConsole.clearGobsTextsAndPointers();
         else if (petalName.contentEquals(ZeeFlowerMenu.STRPETAL_AUTOBUTCH_BIGDEADANIMAL)){
