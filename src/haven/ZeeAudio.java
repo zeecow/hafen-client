@@ -235,6 +235,14 @@ public class ZeeAudio extends Thread{
     }
     private static void aBlockButtonBlink(String resname, int subClip) {
         //TODO blink button when sound is played
+        Window win = ZeeConfig.getWindow(AUDIO_BLOCKER_WIN_TITLE);
+        if (win==null)
+            return;
+        for (ButtonAudioFilter b : win.children(ButtonAudioFilter.class)) {
+            if (b.buttonText.contentEquals(resname)){
+                b.shake();
+            }
+        }
     }
     private static void aBlockAddSavedPrefsToWindow() {
         println("aBlockAddSavedPrefsToWindow > ");
@@ -254,6 +262,9 @@ public class ZeeAudio extends Thread{
                             btnsClips.add(clip);
                     }
                     mapButtonsResClip.put(ent.getKey(), btnsClips);
+                }else{
+                    // null subclips means all are blocked
+                    mapButtonsResClip.put(ent.getKey(), null);
                 }
             }
             aBlockWinUpd();
@@ -443,6 +454,27 @@ public class ZeeAudio extends Thread{
                 e.printStackTrace();
             }
             return super.mouseup(c,button);
+        }
+        public void shake() {
+            new ShakeAnim(0.25);
+        }
+        private class ShakeAnim extends NormAnim{
+            int y;
+            public ShakeAnim(double s) {
+                super(s);
+                y = c.y;
+            }
+            public void ntick(double a) {
+                //todo fix final location when multiple buttons
+                if(a>=1) {
+                    c.y = y;
+                    return;
+                }
+                if (c.y == y)
+                    c.y -= 5;
+                else
+                    c.y = y;
+            }
         }
     }
 
