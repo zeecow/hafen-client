@@ -229,7 +229,9 @@ public class ZeeAudio extends Thread{
             mapButtonsResClip.put(resname, subclips);
         }
         if (aBlockUpdBtn !=null){
-            aBlockUpdBtn.change("refresh "+ aBlockCountWinClips());
+            synchronized (aBlockUpdBtn) {
+                aBlockUpdBtn.change("refresh " + aBlockCountWinClips());
+            }
         }
         aBlockButtonBlink(resname,subClip);
     }
@@ -456,16 +458,16 @@ public class ZeeAudio extends Thread{
             return super.mouseup(c,button);
         }
         public void shake() {
-            new ShakeAnim(0.25);
+            if (this.anims.isEmpty())
+                new ShakeAnim(0.25,c.y);
         }
         private class ShakeAnim extends NormAnim{
-            int y;
-            public ShakeAnim(double s) {
+            final int y;
+            public ShakeAnim(double s,int y) {
                 super(s);
-                y = c.y;
+                this.y = y;
             }
             public void ntick(double a) {
-                //todo fix final location when multiple buttons
                 if(a>=1) {
                     c.y = y;
                     return;
