@@ -1862,6 +1862,10 @@ public class MapView extends PView implements DTarget, Console.Directory {
 		lastmc = pc;
 	    }
 	}
+
+	public String toString() {
+	    return("#<plob>");
+	}
     }
 
     private Collection<String> olflash = null;
