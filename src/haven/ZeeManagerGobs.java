@@ -31,6 +31,7 @@ public class ZeeManagerGobs extends ZeeThread{
     static int lastClickMouseButton;
     static boolean barrelLabelOn = false;
     static boolean remountClosestHorse;
+    static Object[] lastMenuGridActArgs = null;
 
     public static void startMidClick(Coord pc, Coord2d mc, Gob gobClicked, String gName) {
 
@@ -83,6 +84,10 @@ public class ZeeManagerGobs extends ZeeThread{
         /*
             gob clicks
          */
+        // queue menugrid act
+        else if (ZeeManagerGobs.lastMenuGridActArgs!=null && ZeeConfig.isPlayerActivePose()){
+            ZeeManagerGobs.queueMenuGridAct(gob);
+        }
         // queue remove tree and stump
         else if (ZeeManagerTrees.isRemovingTreesAndStumps && isGobTree(gobName)) {
             ZeeManagerTrees.scheduleRemoveTree(gob);
@@ -3036,6 +3041,101 @@ public class ZeeManagerGobs extends ZeeThread{
             ZeeConfig.addPlayerText("queue " + listQueuedButch.size());
         }
     }
+
+
+
+
+
+
+    static List<Gob> listQueuedMenuGridActTargets = null;
+    static boolean queueMenuGridActBusy = false;
+    static void queueMenuGridAct(Gob target) {
+        if (target==null){
+            println("queueMenuGridAct > target null");
+            return;
+        }
+        if (listQueuedMenuGridActTargets==null) {
+            listQueuedMenuGridActTargets = new ArrayList<>();
+        }
+        // add or remove target
+        else if (listQueuedMenuGridActTargets.contains(target)){
+            listQueuedMenuGridActTargets.remove(target);
+            ZeeConfig.removeGobText(target);
+            queueMenuGridActUpdLabels();
+            return;
+        }
+        listQueuedMenuGridActTargets.add(target);
+        queueMenuGridActUpdLabels();
+
+
+        // start thread once
+        if (!queueMenuGridActBusy){
+            queueMenuGridActBusy = true;
+            new ZeeThread(){
+                public void run() {
+                    println("queueMenuGridAct > thread start");
+                    try {
+                        if (listQueuedMenuGridActTargets!=null){
+                            if (isCancelClick()){
+                                println("queueMenuGridAct > cancel click");
+                                queueMenuGridActReset();
+                                return;
+                            }
+                            prepareCancelClick();
+                            waitPlayerNonActivePose();//wait first work
+                            while (!isCancelClick() && !listQueuedMenuGridActTargets.isEmpty()){
+                                Gob nextGob = listQueuedMenuGridActTargets.remove(0);
+                                ZeeConfig.removeGobText(nextGob);
+                                queueMenuGridActUpdLabels();
+                                //change cursor
+                                ZeeConfig.gameUI.menu.wdgmsg("act", lastMenuGridActArgs);
+                                sleep(555);
+                                //click next gob
+                                gobClick(nextGob,1);
+                                //wait approach gob
+                                if(!waitPlayerIdleLinMove() || isCancelClick()) {
+                                    println("couldnt wait player idle linmove (or cancel click)");
+                                    break;
+                                }
+                                //wait player work done
+                                if(!waitPlayerNonActivePose() || isCancelClick()) {
+                                    println("couldnt wait non active pose (or cancel click)");
+                                    break;
+                                }
+                            }
+
+                            println("queueMenuGridAct > done");
+                            queueMenuGridActReset();
+
+                        }else{
+                            println("queueMenuGridAct > list null");
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            }.start();
+        }
+    }
+    static void queueMenuGridActReset(){
+        if (listQueuedMenuGridActTargets!=null && !listQueuedMenuGridActTargets.isEmpty()){
+            ZeeConfig.removeGobText((ArrayList<Gob>) listQueuedMenuGridActTargets);
+        }
+        ZeeConfig.removePlayerText();
+        lastMenuGridActArgs = null;
+        listQueuedMenuGridActTargets = null;
+        queueMenuGridActBusy = false;
+    }
+    static void queueMenuGridActUpdLabels(){
+        List<Gob> queue = listQueuedMenuGridActTargets;
+        if(queue!=null && !queue.isEmpty()) {
+            for (int i = 0; i < queue.size(); i++) {
+                ZeeConfig.addGobText(queue.get(i), "" + (i+1));
+            }
+            ZeeConfig.addPlayerText(lastMenuGridActArgs[0]+ " " + (queue.size()+1));
+        }
+    }
+
 
 
 

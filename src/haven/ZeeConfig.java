@@ -2972,9 +2972,11 @@ public class ZeeConfig {
         // clicked gob object
         if(clickGob!=null) {
             lastMapViewClickGobName = clickGob.getres().name;
+
             if(treeloganize && clickb==1 && !ZeeManagerTrees.treeloganizerWorking) {
                 ZeeManagerTrees.treeloganizerCheckLift();
             }
+
             if(clickb == 2) {
                 ZeeManagerGobs.startMidClick(pc, mc, clickGob, lastMapViewClickGobName);
             } else if (clickb==3 && gameUI.ui.modflags()==0){

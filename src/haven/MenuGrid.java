@@ -735,6 +735,17 @@ public class MenuGrid extends Widget implements KeyBinding.Bindable {
 				}
 			}
 
+			// MenuGrid act queue (midclick)
+			if (ZeeManagerGobs.lastMenuGridActArgs==null) {
+				final List<String> argsAllowed = List.of("swrk", "destroy", "repair");
+				if (args != null && args.length > 0 && argsAllowed.contains(args[0].toString())) {
+					ZeeManagerGobs.lastMenuGridActArgs = args;
+					ZeeConfig.println("set lastMenuGridActArgs > " + msg + " , " + ZeeConfig.strArgs(args));
+				}
+			}
+		}else{
+			// MenuGrid act queue (midclick)
+			ZeeManagerGobs.lastMenuGridActArgs = null;
 		}
 
 		// let Menu.use() add to history
