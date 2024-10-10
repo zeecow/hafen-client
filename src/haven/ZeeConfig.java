@@ -4974,6 +4974,26 @@ public class ZeeConfig {
         return null;
     }
 
+    static boolean nameInListContains(String name, String listCommaSeparated) {
+        String[] names = listCommaSeparated.split(",");
+        for (int i = 0; i < names.length; i++) {
+            if (name.contains(names[i])){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    static boolean nameInListEndsWith(String name, String listCommaSeparated) {
+        String[] names = listCommaSeparated.split(",");
+        for (int i = 0; i < names.length; i++) {
+            if (name.endsWith(names[i])){
+                return true;
+            }
+        }
+        return false;
+    }
+
     public static String strArgs(Object... args){
         return Arrays.toString(args);
     }

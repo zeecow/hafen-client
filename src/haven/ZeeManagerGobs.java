@@ -324,7 +324,7 @@ public class ZeeManagerGobs extends ZeeThread{
         // schedule auto remount if midclick gob passage
         else if ( isGobAmbientPassage(gob) && !ZeeConfig.isPlayerLiftingGob(gob)){
             // unmount horse
-            if (ZeeConfig.isPlayerMountingHorse() && !isGobInListEndsWith(gobName,"/ladder,/minehole") && ZeeConfig.getMainInventory().countItemsByNameContains("/rope") > 0)
+            if (ZeeConfig.isPlayerMountingHorse() && !ZeeConfig.nameInListEndsWith(gobName,"/ladder,/minehole") && ZeeConfig.getMainInventory().countItemsByNameContains("/rope") > 0)
             {
                 ZeeManagerGobs.remountClosestHorse = true;
                 ZeeConfig.addPlayerText("remount");
@@ -334,6 +334,13 @@ public class ZeeManagerGobs extends ZeeThread{
         // midclick cellar stairs on a horse (simulate click for convenience)
         else if(gobName.endsWith("/cellarstairs") && ZeeConfig.isPlayerMountingHorse()){
             gobClick(gob,3);
+        }
+        // add all fuel from inventory
+        if (ZeeConfig.isPlayerHoldingItem() && ZeeConfig.nameInListEndsWith(gobName,"brazier,bonfire,smelter,fireplace,oven,crucible")){
+            String holdingItem = ZeeManagerItems.getHoldingItem().item.getres().name;
+            if(ZeeConfig.nameInListContains(holdingItem,"/coal,/blackcoal,/branch,/wblock-")){
+                itemActGob(gob,UI.MOD_CTRL_SHIFT);
+            }
         }
         // inspect gob
         else {
@@ -345,7 +352,7 @@ public class ZeeManagerGobs extends ZeeThread{
         if ( isGobAmbientPassage(gob) &&
                 !ZeeConfig.playerHasAnyPose(ZeeConfig.POSE_PLAYER_LIFTING) &&
                 ZeeConfig.isPlayerMountingHorse() &&
-                !ZeeManagerGobs.isGobInListEndsWith(gobName,"/ladder,/minehole") &&
+                !ZeeConfig.nameInListEndsWith(gobName,"/ladder,/minehole") &&
                 ZeeConfig.getMainInventory().countItemsByNameContains("/rope") > 0)
         {
             return true;
@@ -1667,7 +1674,7 @@ public class ZeeManagerGobs extends ZeeThread{
         }
         // while driving wheelbarrow: lift and click
         else if (ZeeConfig.isPlayerDrivingWheelbarrow() &&
-                ( isGobInListEndsWith(gobName,"/cart,/rowboat,/snekkja,/knarr,/wagon,/spark,/gardenshed,/upstairs,/downstairs,/cellardoor,/cellarstairs,/minehole,/ladder,/cavein,/caveout,/burrow,/igloo,gate")
+                ( ZeeConfig.nameInListEndsWith(gobName,"/cart,/rowboat,/snekkja,/knarr,/wagon,/spark,/gardenshed,/upstairs,/downstairs,/cellardoor,/cellarstairs,/minehole,/ladder,/cavein,/caveout,/burrow,/igloo,gate")
                   || isGobHouse(gobName) || isGobHouseInnerDoor(gobName)))
         {
             String finalGobName = gobName;
@@ -1692,7 +1699,7 @@ public class ZeeManagerGobs extends ZeeThread{
         // gob requires unmounting horse/kicksled (if not lifting gob itself)
         else if (isGobRequireDisembarkVehicle(gob) && !ZeeConfig.isPlayerLiftingGob(gob)){
             // unmount horse
-            if (ZeeConfig.isPlayerMountingHorse() && !ZeeManagerGobs.isGobInListEndsWith(gobName,"/ladder,/minehole") && ZeeConfig.getMainInventory().countItemsByNameContains("/rope") > 0) {
+            if (ZeeConfig.isPlayerMountingHorse() && !ZeeConfig.nameInListEndsWith(gobName,"/ladder,/minehole") && ZeeConfig.getMainInventory().countItemsByNameContains("/rope") > 0) {
                 dismountHorseAndClickGob(mc);
             }
             // disembark kicksled
@@ -1740,7 +1747,7 @@ public class ZeeManagerGobs extends ZeeThread{
             }.start();
         }
         // rclick tree tries collecting sap with lifted barrel
-        else if (ZeeConfig.isPlayerLiftingGobNamecontains("gfx/terobjs/barrel")!=null && isGobInListEndsWith(gobName,"/trees/birch,/trees/maple,/trees/terebinth")){
+        else if (ZeeConfig.isPlayerLiftingGobNamecontains("gfx/terobjs/barrel")!=null && ZeeConfig.nameInListEndsWith(gobName,"/trees/birch,/trees/maple,/trees/terebinth")){
             collectTreeSapUsingBarrel(gob);
         }
     }
@@ -1812,7 +1819,7 @@ public class ZeeManagerGobs extends ZeeThread{
         String gobName = gob.getres().name;
         if( isGobHouseInnerDoor(gobName) ||
             isGobHouse(gobName) ||
-            isGobInListEndsWith(gobName,"/upstairs,/downstairs,/minehole,"+
+            ZeeConfig.nameInListEndsWith(gobName,"/upstairs,/downstairs,/minehole,"+
                     "/ladder,/cavein,/caveout,/burrow,/igloo,/cellardoor") )
         {
             return true;
@@ -1837,7 +1844,7 @@ public class ZeeManagerGobs extends ZeeThread{
             return true;
         }
 
-        if(isGobInListEndsWith(gobName,"/wheelbarrow,/loom,/churn,/swheel,/ropewalk,/meatgrinder,/potterswheel,/quern,/plow,/winepress,/hookah")){
+        if(ZeeConfig.nameInListEndsWith(gobName,"/wheelbarrow,/loom,/churn,/swheel,/ropewalk,/meatgrinder,/potterswheel,/quern,/plow,/winepress,/hookah")){
             return true;
         }
 
@@ -1851,7 +1858,7 @@ public class ZeeManagerGobs extends ZeeThread{
 
     static boolean isGobSittingFurniture(String gobName) {
         if ( gobName.contains("/furn/") &&
-            isGobInListContains(gobName,"throne,chair,sofa,stool,bench") )
+            ZeeConfig.nameInListContains(gobName,"throne,chair,sofa,stool,bench") )
             return true;
         if ( gobName.contains("rockinghorse") )
             return true;
@@ -1864,12 +1871,12 @@ public class ZeeManagerGobs extends ZeeThread{
 
     public static boolean isGobHouse(String gobName) {
         final String list = "/logcabin,/timberhouse,/stonestead,/stonemansion,/stonetower,/greathall,/windmill,/greenhouse,/igloo,/primitivetent,/waterwheelhouse";
-        return isGobInListEndsWith(gobName,list);
+        return ZeeConfig.nameInListEndsWith(gobName,list);
     }
 
     public static boolean isGobWall(String gobName) {
         final String walls = "/palisadeseg,/palisadecp,/drystonewallseg,/drystonewallcp,/poleseg,/polecp,/brickwallseg,/brickwallcp";
-        return isGobInListEndsWith(gobName,walls);
+        return ZeeConfig.nameInListEndsWith(gobName,walls);
     }
 
 
@@ -3608,7 +3615,7 @@ public class ZeeManagerGobs extends ZeeThread{
 
     public static boolean isGobMineSupport(String gobName) {
         String list = "/minebeam,/column,/minesupport,/naturalminesupport,/towercap";
-        return isGobInListEndsWith(gobName, list);
+        return ZeeConfig.nameInListEndsWith(gobName, list);
     }
 
 
@@ -3622,7 +3629,7 @@ public class ZeeManagerGobs extends ZeeThread{
                 +"/cupboard,/studydesk,/demijohn,/quern,/wreckingball-fold,/loom,/swheel,"
                 +"/ttub,/cheeserack,/archerytarget,/dreca,/glasspaneframe,/runestone,"
                 +"woodbox,casket,basket,crate,chest";
-        return isGobInListEndsWith(gobName,endList);
+        return ZeeConfig.nameInListEndsWith(gobName,endList);
     }
 
     public static boolean isGobBoulder(String gobName) {
@@ -3726,11 +3733,11 @@ public class ZeeManagerGobs extends ZeeThread{
     }
 
     public static boolean isGobTrellisPlant(String gobName) {
-        return isGobInListEndsWith(gobName, "plants/wine,plants/hops,plants/pepper,plants/peas,plants/cucumber");
+        return ZeeConfig.nameInListEndsWith(gobName, "plants/wine,plants/hops,plants/pepper,plants/peas,plants/cucumber");
     }
 
     public static boolean isGobCrop(String gobName){
-        return isGobInListEndsWith(gobName,
+        return ZeeConfig.nameInListEndsWith(gobName,
                 "plants/carrot,plants/beet,plants/yellowonion,plants/redonion,"
                 +"plants/leek,plants/lettuce,plants/pipeweed,plants/hemp,plants/flax,"
                 +"plants/turnip,plants/millet,plants/barley,plants/wheat,plants/poppy,"
@@ -3744,29 +3751,9 @@ public class ZeeManagerGobs extends ZeeThread{
 
     public static boolean isGobCraftingContainer(String gobName) {
         String containers ="cupboard,chest,crate,basket,box,coffer,cabinet";
-        return isGobInListEndsWith(gobName,containers);
+        return ZeeConfig.nameInListEndsWith(gobName,containers);
     }
 
-
-    private static boolean isGobInListContains(String gobName, String list) {
-        String[] names = list.split(",");
-        for (int i = 0; i < names.length; i++) {
-            if (gobName.contains(names[i])){
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private static boolean isGobInListEndsWith(String gobName, String list) {
-        String[] names = list.split(",");
-        for (int i = 0; i < names.length; i++) {
-            if (gobName.endsWith(names[i])){
-                return true;
-            }
-        }
-        return false;
-    }
 
     private boolean isGobInListStartsWith(String gobName, String list) {
         String[] names = list.split(",");
@@ -3871,14 +3858,14 @@ public class ZeeManagerGobs extends ZeeThread{
     }
 
     static boolean isGobTamedAnimalOrAurochEtc(String gobName){
-        return isGobInListEndsWith(
+        return ZeeConfig.nameInListEndsWith(
                 gobName,
                 "/stallion,/mare,/foal,/hog,/sow,/piglet,/billy,/nanny,/kid,/sheep,/lamb,/cattle,/calf,/teimdeercow,/teimdeerbull,/teimdeerkid"
         );
     }
 
     static boolean isGobButchable(String gobName){
-        return isGobInListEndsWith(
+        return ZeeConfig.nameInListEndsWith(
             gobName,
             "/stallion,/mare,/foal,/hog,/sow,/piglet,/teimdeercow,/teimdeerbull,/teimdeerkid,"
             +"/billy,/nanny,/kid,/sheep,/lamb,/cattle,/calf,"
@@ -3892,12 +3879,12 @@ public class ZeeManagerGobs extends ZeeThread{
     }
 
     static boolean isGobHorse(String gobName) {
-        return isGobInListEndsWith(gobName, "stallion,mare,horse");
+        return ZeeConfig.nameInListEndsWith(gobName, "stallion,mare,horse");
     }
 
     static boolean isGobFireSource(Gob gob) {
         String gobName = gob.getres().name;
-        if ( isGobInListEndsWith(gobName,"/brazier,/snowlantern,/pow,/bonfire") )
+        if ( ZeeConfig.nameInListEndsWith(gobName,"/brazier,/snowlantern,/pow,/bonfire") )
             if (getOverlayNames(gob).contains("gfx/fx/flight"))
                 return true;
         return false;
@@ -3905,7 +3892,7 @@ public class ZeeManagerGobs extends ZeeThread{
 
     static boolean isGobFireTarget(Gob gob) {
         String gobName = gob.getres().name;
-        if ( isGobInListEndsWith(gobName,"/brazier,/snowlantern,/pow,/bonfire,/bpyre") )
+        if ( ZeeConfig.nameInListEndsWith(gobName,"/brazier,/snowlantern,/pow,/bonfire,/bpyre") )
             if (!getOverlayNames(gob).contains("gfx/fx/flight"))
                 return true;
         return false;
