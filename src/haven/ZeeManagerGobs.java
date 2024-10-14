@@ -336,7 +336,7 @@ public class ZeeManagerGobs extends ZeeThread{
             gobClick(gob,3);
         }
         // add all fuel from inventory
-        if (ZeeConfig.isPlayerHoldingItem() && ZeeConfig.nameInListEndsWith(gobName,"brazier,bonfire,smelter,fireplace,oven,crucible")){
+        else if (ZeeConfig.isPlayerHoldingItem() && ZeeConfig.nameInListEndsWith(gobName,"brazier,bonfire,smelter,fireplace,oven,crucible")){
             String holdingItem = ZeeManagerItems.getHoldingItem().item.getres().name;
             if(ZeeConfig.nameInListContains(holdingItem,"/coal,/blackcoal,/branch,/wblock-")){
                 itemActGob(gob,UI.MOD_CTRL_SHIFT);
