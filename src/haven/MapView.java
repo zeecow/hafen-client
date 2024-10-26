@@ -26,22 +26,19 @@
 
 package haven;
 
-import haven.MCache.OverlayInfo;
-import haven.render.*;
-import haven.render.sl.Type;
-import haven.render.sl.Uniform;
-
-import java.awt.*;
-import java.awt.event.KeyEvent;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.util.*;
-import java.util.List;
-import java.util.function.Consumer;
-import java.util.function.Supplier;
-
+import static haven.MCache.cmaps;
 import static haven.MCache.tilesz;
 import static haven.OCache.posres;
+import java.awt.Color;
+import java.awt.event.KeyEvent;
+import java.util.*;
+import java.util.function.*;
+import java.lang.ref.*;
+import java.lang.reflect.*;
+import haven.render.*;
+import haven.MCache.OverlayInfo;
+import haven.render.sl.Uniform;
+import haven.render.sl.Type;
 
 public class MapView extends PView implements DTarget, Console.Directory {
     public static boolean clickdb = false;
@@ -1971,8 +1968,6 @@ public class MapView extends PView implements DTarget, Console.Directory {
 	}
     }
 
-    private UI.Grab camdrag = null;
-    
     public abstract class Maptest {
 	private final Coord pc;
 
@@ -2081,8 +2076,10 @@ public class MapView extends PView implements DTarget, Console.Directory {
 	if(this.grab == grab)
 	    this.grab = null;
     }
+    
+    private UI.Grab camdrag = null;
 
-public boolean mousedown(Coord c, int button) {
+    public boolean mousedown(Coord c, int button) {
 	parent.setfocus(this);
 	Loader.Future<Plob> placing_l = this.placing;
 	ZeeManagerGobs.lastClickMouseUpMs = 0;
@@ -2090,7 +2087,7 @@ public boolean mousedown(Coord c, int button) {
 	ZeeManagerGobs.lastClickMouseButton = button;
 	leftClickDragging = false;
 	if(button == 2) {
-	    if(((Camera)camera).click(c)) {
+	    if((camdrag == null) && ((Camera)camera).click(c)) {
 		camdrag = ui.grabmouse(this);
 		ZeeManagerGobs.camAngleStart = camera.angle();
 		new ZeeThread(){
@@ -2131,13 +2128,11 @@ public boolean mousedown(Coord c, int button) {
 			}
 		}.start();
 	    }
-	}
-	else if((placing_l != null) && placing_l.done()) {
+	} else if((placing_l != null) && placing_l.done()) {
 	    Plob placing = placing_l.get();
 	    if(placing.lastmc != null)
 		wdgmsg("place", placing.rc.floor(posres), (int)Math.round(placing.a * 32768 / Math.PI), button, ui.modflags());
-	}
-	else if((grab != null) && grab.mmousedown(c, button)) {
+	} else if((grab != null) && grab.mmousedown(c, button)) {
 	}
 	// left-click drags camera until mouseup()
 	else if(button==1) {
@@ -2212,8 +2207,7 @@ public boolean mousedown(Coord c, int button) {
 		camdrag.remove();
 		camdrag = null;
 	    }
-	}
-	else if(grab != null) {
+	} else if(grab != null) {
 	    grab.mmouseup(c, button);
 	}
 	return(true);
