@@ -94,6 +94,7 @@ public class ZeeConsole {
             helpLines.add("   clickmenu []  click menu named []");
             helpLines.add("======== misc ========");
             helpLines.add("   count       msg counting last cmd results");
+            helpLines.add("   disc        toggle discovery helper on/off");
             helpLines.add("   say []      text2speak parameter or last cmd results (requires LinuxFestival)");
             helpLines.add("   reslocal    print local res names to terminal");
             helpLines.add("   resmote     print remote res names to terminal");
@@ -258,6 +259,10 @@ public class ZeeConsole {
                 ZeeConfig.msgError(text);
             }
             ret = text;
+        }
+        else if (cmd.contentEquals("disc")){
+            // toggle discovery help  on-off
+            ZeeManagerGobs.discoveryHelperToggle();
         }
         else if (cmd.contentEquals("say")){
             // say without parameter

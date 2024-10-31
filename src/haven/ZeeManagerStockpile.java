@@ -517,20 +517,27 @@ public class ZeeManagerStockpile extends ZeeThread{
 
     public static void checkChoosenPetal(String petalName) {
         lastPetalName = petalName;
+
+        ZeeManagerGobs.discHelpCheckPetalClicked(petalName);
+
         if (petalName.contentEquals("Sleep")) {
             ZeeSess.charSwitchCancelAutologin("char slept");
-        }else if (petalName.equals("Pick leaf")) {
+        }
+        else if (petalName.equals("Pick leaf")) {
             if (ZeeConfig.lastMapViewClickGobName.equals("gfx/terobjs/trees/mulberry")
                 || ZeeConfig.lastMapViewClickGobName.equals("gfx/terobjs/trees/laurel")) {
                 gobSource = ZeeConfig.lastMapViewClickGob;
             }
-        }else if(petalName.equals("Chop into blocks")){
+        }
+        else if(petalName.equals("Chop into blocks")){
             gobSource = ZeeConfig.lastMapViewClickGob;
             lastTreelogChopped = ZeeConfig.lastMapViewClickGob;
-        }else if(petalName.equals("Make boards")){
+        }
+        else if(petalName.equals("Make boards")){
             gobSource = ZeeConfig.lastMapViewClickGob;
             lastTreelogSawed = ZeeConfig.lastMapViewClickGob;
-        }else if(petalName.equals("Chip stone")){
+        }
+        else if(petalName.equals("Chip stone")){
             try {
                 gobSource = ZeeConfig.lastMapViewClickGob;
                 lastBoulderChipped = ZeeConfig.lastMapViewClickGob;
@@ -538,7 +545,8 @@ public class ZeeManagerStockpile extends ZeeThread{
             }catch (Exception e){
                 e.printStackTrace();//auto-chip while lifting object?
             }
-        }else if(petalName.equals("Collect coal")){
+        }
+        else if(petalName.equals("Collect coal")){
             gobSource = ZeeConfig.lastMapViewClickGob;
             lastTarkilnCollected = ZeeConfig.lastMapViewClickGob;
         }

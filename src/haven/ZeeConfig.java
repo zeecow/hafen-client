@@ -2837,6 +2837,7 @@ public class ZeeConfig {
         ZeeFishing.exit();
         ZeeManagerTrees.treeloganizerExit("");
         ZeeResearch.inspectWaterClear();
+        ZeeManagerGobs.discHelpCharSwitch();
 
         ZeeCupboardLabeler.reset();
         ZeeCupboardLabeler.isActive = false;
@@ -3383,6 +3384,22 @@ public class ZeeConfig {
             gob.delattr(ZeeGobColor.class);
         }}, null);
     }
+    public static void removeGobColor(ArrayList<Gob> gobs) {
+        if(gobs==null || gobs.size()==0)
+            return;
+        try{
+            gameUI.ui.sess.glob.loader.defer(() -> {
+                for (Gob gob : gobs) {
+                    synchronized(gob) {
+                        gob.delattr(ZeeGobColor.class);
+                    }
+                }
+                gobs.clear();
+            }, null);
+        }catch (Exception e){
+            System.out.println("removeGobColor > "+e.getMessage());
+        }
+    }
 
     public static ZeeGobColor getGobColor(Gob gob) {
         if(gob==null)
@@ -3881,6 +3898,11 @@ public class ZeeConfig {
             if (healf!=null && healf.hp < 1){
                 String s = String.valueOf(healf.hp).replaceFirst("0.", ".");
                 ZeeConfig.addGobText(ob,s,Color.lightGray);
+            }
+
+            // discovery helper
+            if (ZeeManagerGobs.discHelpOn){
+                ZeeManagerGobs.discHelpCheckGob(ob);
             }
 
             //hitbox

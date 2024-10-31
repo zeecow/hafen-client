@@ -91,4 +91,14 @@ public class ZeeFlowerMenu extends FlowerMenu{
             return super.mousedown(c, button);
         return false;
     }
+
+    private static long lastRightClickMs = ZeeThread.now();
+    static Object lastRightClickedGobOrItem;
+    public static void guessMenuSource(Object source) {
+        long ts = ZeeThread.now();
+        if (ts > lastRightClickMs){
+            lastRightClickMs = ts;
+            lastRightClickedGobOrItem = source;
+        }
+    }
 }

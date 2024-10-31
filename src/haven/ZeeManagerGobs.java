@@ -1577,6 +1577,8 @@ public class ZeeManagerGobs extends ZeeThread{
         gob = gobClicked;
         gobName = name;
 
+        ZeeFlowerMenu.guessMenuSource(gob);
+
         //gob to be labeled when window contents open
         if (autoLabelGobsBasename.contains(gob.getres().basename()))
             gobAutoLabel = gob;
@@ -4702,4 +4704,76 @@ public class ZeeManagerGobs extends ZeeThread{
             //println("del player following attr ");
         }
     }
+
+    static boolean discHelpOn = false;
+    static List<String> discHelpListGobs;
+    static void discoveryHelperToggle() {
+        discHelpOn = !discHelpOn;
+        // disc help on
+        if (discHelpOn) {
+            if(discHelpListGobs==null)
+                discHelpListGobs = new ArrayList<>();
+            ZeeConfig.addPlayerText("dischelp "+discHelpListGobs.size());
+            // show trees
+            ZeeManagerTrees.hideGobTrees = false;
+            toggleModelsInList(getGobsByTags(Gob.Tag.TREE));
+            //hilite trees and bushes
+            for (Gob g : ZeeConfig.getAllGobs()) {
+                String name = g.getres().name;
+                if (discHelpListGobs.contains(name))
+                    continue;
+                if (!ZeeManagerGobs.isGobTree(name) && !ZeeManagerGobs.isGobBush(name))
+                    continue;
+                ZeeConfig.addGobColor(g,Color.cyan);
+            }
+        }
+        // disc help off
+        else{
+            ZeeConfig.removePlayerText();
+            //remove hilites
+            for (Gob g : ZeeConfig.getAllGobs()) {
+                String name = g.getres().name;
+                if (!ZeeManagerGobs.isGobTree(name) && !ZeeManagerGobs.isGobBush(name))
+                    continue;
+                ZeeConfig.removeGobColor(g);
+            }
+        }
+    }
+    static void discHelpCheckGob(Gob gob){
+        if (discHelpGobTreeBush(gob) && !discHelpListGobs.contains(gob.getres().name)){
+            // hilite gob
+            ZeeConfig.addGobColor(gob, Color.CYAN);
+        }
+    }
+    static void discHelpCheckPetalClicked(String petalName){
+        if (!ZeeManagerGobs.discHelpOn)
+            return;
+        if (ZeeFlowerMenu.lastRightClickedGobOrItem instanceof Gob){
+            petalName = petalName.toLowerCase();
+            if (!petalName.contains("branch") && !petalName.contains("bark") && !petalName.contains("chop")){
+                discHelpGobDone((Gob) ZeeFlowerMenu.lastRightClickedGobOrItem);
+            }
+        }
+    }
+    private static void discHelpGobDone(Gob gob) {
+        String name = gob.getres().name;
+        if(!discHelpListGobs.contains(name))
+            discHelpListGobs.add(name);
+        ZeeConfig.addPlayerText("dischelp "+discHelpListGobs.size());
+        //ZeeConfig.println("gobs disc "+discHelpListGobs.toString());
+        ArrayList<Gob> list = (ArrayList<Gob>) ZeeConfig.findGobsByNameEquals(name);
+        ZeeConfig.removeGobColor(list);
+    }
+    private static boolean discHelpGobTreeBush(Gob gob) {
+        String name = gob.getres().name;
+        return ZeeManagerGobs.isGobTree(name) ||
+                ZeeManagerGobs.isGobBush(name);
+    }
+    static void discHelpCharSwitch(){
+        if(discHelpListGobs != null)
+            discHelpListGobs.clear();
+        ZeeFlowerMenu.lastRightClickedGobOrItem = null;
+        discHelpOn = false;
+    }
+    
 }
