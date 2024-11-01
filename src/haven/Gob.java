@@ -1008,7 +1008,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 		return 0;
 	}
 
-	void toggleModel(){
+	void toggleModelMaybe(){
 		synchronized (this){
 
 			String gobName = this.getres().name;
@@ -1016,50 +1016,18 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 			if( !ZeeConfig.isTree(gobName) &&
 				!ZeeManagerGobs.isGobWall(gobName)  &&
 				!ZeeConfig.isGobCrop(gobName)
-				//todo uncomment if fix concurrent exception
-//				!ZeeManagerGobClick.isGobHouse(gobName) &&
-//				!ZeeManagerGobClick.isGobSmokeProducer(gobName) &&
-//				!ZeeManagerGobClick.isGobTamedAnimalOrAurochEtc(gobName) &&
-//				!ZeeManagerGobClick.isGobIdol(gobName)
 			){
 				return;
 			}
 
-			Drawable d = this.getattr(Drawable.class);
-
 			//hide gob
 			if (ZeeManagerGobs.isHideGob(this)) {
-				if (d != null && d.slots != null) {
-					ArrayList<RenderTree.Slot> tmpSlots = new ArrayList<>(d.slots);
-					ZeeConfig.gameUI.ui.sess.glob.loader.defer(() -> {
-						try{
-							RUtils.multirem(tmpSlots);
-						} catch (Defer.NotDoneException | RenderTree.SlotRemoved ignored) {
-						} catch (Exception e){
-							ZeeConfig.println("toggleModel hide > "+e.getClass().getName()+" , "+e.getMessage());
-						}
-					}, null);
-				}
-				//always show hitbox when hiding model
-				showHitBox();
+				ZeeManagerGobs.hideModel(this);
 			}
 			//show gob
 			else {
-				ArrayList<RenderTree.Slot> tmpSlots = new ArrayList<>(this.slots);
-				ZeeConfig.gameUI.ui.sess.glob.loader.defer(() -> {
-					try{
-						RUtils.multiadd(tmpSlots,d);
-					}
-					catch (Defer.NotDoneException  | RenderTree.SlotRemoved ignored) {	}
-					catch (Exception e){
-						ZeeConfig.println("toggleModel show > "+e.getClass().getName()+" , "+e.getMessage());
-					}
-				}, null);
-				// hide hitbox if setting permits
-				if (!ZeeConfig.showHitbox)
-					hideHitBox();
+				ZeeManagerGobs.showModel(this);
 			}
-
 		}
 	}
 

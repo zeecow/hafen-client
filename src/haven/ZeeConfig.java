@@ -333,7 +333,8 @@ public class ZeeConfig {
             "gfx/terobjs/fairystone",
             "gfx/terobjs/lilypadlotus",
             "gfx/terobjs/algaeblob",
-            "gfx/terobjs/watervortex"
+            "gfx/terobjs/watervortex",
+            "gfx/terobjs/wonders/burrowerbean"
     ));
     public final static Set<String> rareForageables = new HashSet<String>(Arrays.asList(
         "gfx/terobjs/herbs/flotsam",
@@ -620,8 +621,9 @@ public class ZeeConfig {
                 "rockdove","quail","/hen","/rooster","magpie",
                 "mallard","seagull","ptarmigan","grouse",
                 "/rat/rat","/squirrel","/hedgehog","/bogturtle",
-                "/rabbit-buck","rabbit-doe","/crab","/jellyfish",
+                "/rabbit-buck","rabbit-doe",
                 "/frog","/forestlizard","snail",
+                "/crab","/jellyfish", "bayshrimp",
                 "/adder"
         };
         for (int i = 0; i < containsList.length; i++) {
@@ -3900,14 +3902,14 @@ public class ZeeConfig {
                 ZeeConfig.addGobText(ob,s,Color.lightGray);
             }
 
+            //hitbox
+            ob.toggleHitbox();
+            ob.toggleModelMaybe();
+
             // discovery helper
             if (ZeeManagerGobs.discHelpOn){
                 ZeeManagerGobs.discHelpCheckGob(ob);
             }
-
-            //hitbox
-            ob.toggleHitbox();
-            ob.toggleModel();
 
             // save gob name
             if (gobName!=null && !gobName.isBlank() && !listGobsSession.contains(gobName)) {

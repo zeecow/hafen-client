@@ -1,6 +1,7 @@
 package haven;
 
 
+import haven.render.RenderTree;
 import haven.resutil.WaterTile;
 
 import java.awt.*;
@@ -3175,6 +3176,40 @@ public class ZeeManagerGobs extends ZeeThread{
             g.setattr(new ZeeGobColor(g, Color.CYAN));
     }
 
+    static void hideModel(Gob gob) {
+        Drawable d = gob.getattr(Drawable.class);
+        if (d != null && d.slots != null) {
+            ArrayList<RenderTree.Slot> tmpSlots = new ArrayList<>(d.slots);
+            ZeeConfig.gameUI.ui.sess.glob.loader.defer(() -> {
+                try{
+                    RUtils.multirem(tmpSlots);
+                } catch (Defer.NotDoneException | RenderTree.SlotRemoved ignored) {
+                } catch (Exception e){
+                    ZeeConfig.println("toggleModel hide > "+e.getClass().getName()+" , "+e.getMessage());
+                }
+            }, null);
+        }
+        //always show hitbox when hiding model
+        gob.showHitBox();
+    }
+
+    static void showModel(Gob gob){
+        Drawable d = gob.getattr(Drawable.class);
+        ArrayList<RenderTree.Slot> tmpSlots = new ArrayList<>(gob.slots);
+        ZeeConfig.gameUI.ui.sess.glob.loader.defer(() -> {
+            try{
+                RUtils.multiadd(tmpSlots,d);
+            }
+            catch (Defer.NotDoneException  | RenderTree.SlotRemoved ignored) {	}
+            catch (Exception e){
+                ZeeConfig.println("toggleModel show > "+e.getClass().getName()+" , "+e.getMessage());
+            }
+        }, null);
+        // hide hitbox if setting permits
+        if (!ZeeConfig.showHitbox)
+            gob.hideHitBox();
+    }
+
     private boolean isGobBigDeadAnimal_thread() {
         try{
             ZeeThread zt = new ZeeThread() {
@@ -4459,7 +4494,7 @@ public class ZeeManagerGobs extends ZeeThread{
 
     private static void toggleModelsInList(List<Gob> listGobs) {
         for (Gob gob : listGobs) {
-            gob.toggleModel();
+            gob.toggleModelMaybe();
         }
     }
 
@@ -4628,15 +4663,6 @@ public class ZeeManagerGobs extends ZeeThread{
                 return true;
             if (gob.tags.contains(Gob.Tag.CROP) && hideGobCrops)
                 return true;
-            //todo uncomment if fix concurrent exception
-//            if (gob.tags.contains(Gob.Tag.HOUSE) && hideGobHouses)
-//                return true;
-//            if (gob.tags.contains(Gob.Tag.TAMED_ANIMAL_OR_AUROCH_ETC) && hideGobTamedAnimals)
-//                return true;
-//            if (gob.tags.contains(Gob.Tag.IDOL) && hideGobIdols)
-//                return true;
-//            if (gob.tags.contains(Gob.Tag.SMOKE_PRODUCER) && hideGobSmokeProducers)
-//                return true;
         }
         return false;
     }
@@ -4713,35 +4739,48 @@ public class ZeeManagerGobs extends ZeeThread{
         if (discHelpOn) {
             if(discHelpListGobs==null)
                 discHelpListGobs = new ArrayList<>();
-            ZeeConfig.addPlayerText("dischelp "+discHelpListGobs.size());
-            // show trees
-            ZeeManagerTrees.hideGobTrees = false;
-            toggleModelsInList(getGobsByTags(Gob.Tag.TREE));
-            //hilite trees and bushes
+            ZeeConfig.addPlayerText("disc "+discHelpListGobs.size());
+            //trees and bushes
             for (Gob g : ZeeConfig.getAllGobs()) {
                 String name = g.getres().name;
                 if (discHelpListGobs.contains(name))
                     continue;
                 if (!ZeeManagerGobs.isGobTree(name) && !ZeeManagerGobs.isGobBush(name))
                     continue;
+                //show tree
+                if (ZeeConfig.hideGobs && ZeeManagerTrees.hideGobTrees && ZeeManagerGobs.isGobTree(name))
+                    showModel(g);
+                //add color
                 ZeeConfig.addGobColor(g,Color.cyan);
             }
+            //caches
+            ZeeConsole.runCmdZeecow(new String[]{":zeecow","gobfind","cache"});
         }
         // disc help off
         else{
             ZeeConfig.removePlayerText();
-            //remove hilites
+            //trees and bushes
             for (Gob g : ZeeConfig.getAllGobs()) {
                 String name = g.getres().name;
                 if (!ZeeManagerGobs.isGobTree(name) && !ZeeManagerGobs.isGobBush(name))
                     continue;
+                //remove color
                 ZeeConfig.removeGobColor(g);
+                //hide tree
+                if (ZeeConfig.hideGobs && ZeeManagerTrees.hideGobTrees && ZeeManagerGobs.isGobTree(name))
+                    hideModel(g);
             }
+            //caches
+            ZeeConsole.runCmdZeecow(new String[]{":zeecow","gobfind"});
         }
     }
     static void discHelpCheckGob(Gob gob){
-        if (discHelpGobTreeBush(gob) && !discHelpListGobs.contains(gob.getres().name)){
-            // hilite gob
+        String name = gob.getres().name;
+        if (discHelpGobTreeBush(gob) && !discHelpListGobs.contains(name)){
+            // show tree
+            if (ZeeConfig.hideGobs && ZeeManagerTrees.hideGobTrees && ZeeManagerGobs.isGobTree(name))
+                showModel(gob);
+            // add color
             ZeeConfig.addGobColor(gob, Color.CYAN);
         }
     }
@@ -4759,10 +4798,17 @@ public class ZeeManagerGobs extends ZeeThread{
         String name = gob.getres().name;
         if(!discHelpListGobs.contains(name))
             discHelpListGobs.add(name);
-        ZeeConfig.addPlayerText("dischelp "+discHelpListGobs.size());
-        //ZeeConfig.println("gobs disc "+discHelpListGobs.toString());
-        ArrayList<Gob> list = (ArrayList<Gob>) ZeeConfig.findGobsByNameEquals(name);
-        ZeeConfig.removeGobColor(list);
+        ZeeConfig.addPlayerText("disc "+discHelpListGobs.size());
+        ArrayList<Gob> gobs = (ArrayList<Gob>) ZeeConfig.findGobsByNameEquals(name);
+        boolean isTree = ZeeManagerGobs.isGobTree(name);
+        boolean isBirch = name.endsWith("birch");
+        for (Gob treeOrBush : gobs) {
+            // remove color
+            ZeeConfig.removeGobColor(treeOrBush);
+            // hide trees
+            if (isTree && !isBirch && ZeeConfig.hideGobs && ZeeManagerTrees.hideGobTrees)
+                hideModel(treeOrBush);
+        }
     }
     private static boolean discHelpGobTreeBush(Gob gob) {
         String name = gob.getres().name;
