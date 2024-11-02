@@ -16,7 +16,7 @@ import static haven.render.sl.Type.*;
 
 /* >spr: ISmoke */
 /* >rlink: ISmoke */
-@haven.FromResource(name = "gfx/fx/ismoke", version = 109)
+@haven.FromResource(name = "gfx/fx/ismoke", version = 110)
 public class ISmoke extends Sprite implements Rendered, Sprite.CDel, TickList.TickNode, TickList.Ticking {
     static final double agestep = 0.1, maxstep = 0.25;
     static final VertexArray.Layout fmt =
@@ -33,7 +33,7 @@ public class ISmoke extends Sprite implements Rendered, Sprite.CDel, TickList.Ti
     final float sz, den, fadepow, initzv, life, srad;
     final List<RenderTree.Slot> slots = new ArrayList<>(1);
     final Gob gob = (owner instanceof Gob) ? (Gob)owner : owner.fcontext(Gob.class, false);
-    boolean spawn = !ZeeConfig.hideFxSmoke;;
+    boolean spawn = !ZeeConfig.hideFxSmoke;
 
     public static Resource ctxres(Owner owner) {
 	Gob gob = owner.context(Gob.class);
@@ -74,7 +74,7 @@ public class ISmoke extends Sprite implements Rendered, Sprite.CDel, TickList.Ti
 	if(locn.equals(""))
 	    loc = null;
 	else
-	    loc = res.layer(Skeleton.BoneOffset.class, locn).from(null).get();
+	    loc = res.layer(Skeleton.BoneOffset.class, locn).from(owner.fcontext(EquipTarget.class, false)).get();
 	col = (Color)args[a++];
 	den = ((Number)args[a++]).floatValue();
 	fadepow = ((Number)args[a++]).floatValue();
