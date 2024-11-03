@@ -85,6 +85,10 @@ public class ZeeManagerGobs extends ZeeThread{
         /*
             gob clicks
          */
+        // hilite gob by name (:zeecow gobfind)
+        else if(ZeeConfig.gameUI.ui.modshift){
+            ZeeConsole.runCmdZeecow(new String[]{":zeecow","gobfind",gob.getres().basename()});
+        }
         // queue menugrid act
         else if (ZeeManagerGobs.lastMenuGridActArgs!=null && ZeeConfig.isPlayerActivePose()){
             ZeeManagerGobs.queueMenuGridAct(gob);

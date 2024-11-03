@@ -310,17 +310,24 @@ public class ZeeConsole {
             gobFindClear();
             return null;
         }
-        //gobfind active
-        List<Gob> gobs = ZeeConfig.findGobsByNameRegexMatch(arr[1]);
-        for (Gob gob : gobs) {
-            gobFindApply(gob);
-        }
-        isGobFindActive = true;
         if (gobFindRegex==null)
             gobFindRegex = new ArrayList<>();
-        if (!gobFindRegex.contains(arr[1]))
-            gobFindRegex.add(arr[1]);
-        return gobs;
+        // remove gob
+        if (gobFindRegex.contains(arr[1])) {
+            gobFindClear(arr[1]);
+            return null;
+        }
+        //add gob
+        else {
+            isGobFindActive = true;
+            if (!gobFindRegex.contains(arr[1]))
+                gobFindRegex.add(arr[1]);
+            List<Gob> gobs = ZeeConfig.findGobsByNameRegexMatch(arr[1]);
+            for (Gob gob : gobs) {
+                gobFindApply(gob);
+            }
+            return gobs;
+        }
     }
 
     static void gobFindApply(Gob gob) {
@@ -340,6 +347,18 @@ public class ZeeConsole {
         gobFindRegex = null;
         ZeeConfig.msgLow("gobfind reset");
         println("gobfind reset");
+    }
+    static void gobFindClear(String basename){
+        List<Gob> gobsfound = ZeeConfig.findGobsByNameEndsWith("/"+basename);
+        for (Gob g2 : gobsfound) {
+            g2.delattr(ZeeGobFind.class);
+        }
+        gobFindRegex.remove(basename);
+        if (gobFindRegex.isEmpty()) {
+            isGobFindActive = false;
+        }
+        ZeeConfig.msgLow("gobfind list "+gobFindRegex.size());
+        println("gobfind list "+gobFindRegex.size());
     }
 
     @SuppressWarnings("unchecked")
