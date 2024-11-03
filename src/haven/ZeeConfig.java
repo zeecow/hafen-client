@@ -523,7 +523,7 @@ public class ZeeConfig {
     public static boolean isBug(String resName){
         final List<String> l = List.of(
             "/silkmoth", "/grasshopper", "/ladybug", "/dragonfly",
-            "/waterstrider", "/firefly", "/sandflea",
+            "/waterstrider", "/firefly", "/sandflea", "/tick",
             "/cavemoth", "/stagbeetle", "/cavecentipede", "/moonmoth",
             "/monarchbutterfly", "/grub","/springbumblebee"
         );

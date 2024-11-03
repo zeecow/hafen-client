@@ -518,6 +518,9 @@ public class ZeeManagerStockpile extends ZeeThread{
     public static void checkChoosenPetal(String petalName) {
         lastPetalName = petalName;
 
+        // cancel act queue
+        ZeeManagerGobs.lastMenuGridActArgs = null;
+
         ZeeManagerGobs.discHelpCheckPetalClicked(petalName);
 
         if (petalName.contentEquals("Sleep")) {

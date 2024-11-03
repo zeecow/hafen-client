@@ -1178,7 +1178,7 @@ public class ZeeManagerItems extends ZeeThread{
 
     static boolean isStackTransferable(GItem item){
         // check if trasnfer window is open, except quiver, creel, ...
-        return isTransferWindowOpened(List.of("Quiver","Creel","Basket"));
+        return isTransferWindowOpened(List.of("Quiver","Creel","Wicker Picker"));
     }
 
     private void drinkFrom() {
