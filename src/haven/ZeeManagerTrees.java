@@ -379,6 +379,7 @@ public class ZeeManagerTrees {
     }
 
     public static boolean removeStumpMaybe(Gob stump) throws InterruptedException {
+
         boolean droppedBucket = false;
 
         //move closer to stump

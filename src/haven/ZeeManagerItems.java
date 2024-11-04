@@ -471,12 +471,26 @@ public class ZeeManagerItems extends ZeeThread{
                     }
                     //switch 2handed item for 2 separate items
                     else if(!isLeftHandEmpty() && !isRightHandEmpty()){
+                        // switch using belt
                         if (invBelt!=null && invBelt.getNumberOfFreeSlots() > 0) {
                             unequipLeftItem();//unequip 1st item
                             if(dropHoldingItemToBeltOrInv()){
                                 pickUpItem();
                                 equipRightOccupiedHand();//switch for 2nd item
                                 dropHoldingItemToBeltOrInv();
+                            }
+                        }
+                        // switch using main inv
+                        else if(invBelt==null && isItemWindowName("Inventory")){
+                            unequipLeftItem();//unequip 1st item
+                            if(dropHoldingItemToBeltOrInv()){
+                                if (ZeeConfig.isPlayerHoldingItem()){
+                                    println("still holding item > drop to inv switched items?");
+                                } else {
+                                    pickUpItem();
+                                    equipRightOccupiedHand();//switch for 2nd item
+                                    dropHoldingItemToBeltOrInv();
+                                }
                             }
                         }
                     }
@@ -1570,6 +1584,7 @@ public class ZeeManagerItems extends ZeeThread{
             witem = getMainInv().getWItemsByNameContains(nameContains).get(0);
             return witem;
         }catch (Exception e){
+            println("getBeltOrInvWItem > "+e.getMessage());
             return null;
         }
     }
