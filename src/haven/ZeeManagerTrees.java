@@ -424,20 +424,25 @@ public class ZeeManagerTrees {
             ZeeThread.waitPlayerPose(ZeeConfig.POSE_PLAYER_IDLE);
             Gob bucket = ZeeConfig.getClosestGobByNameContains("/bucket");
             if (bucket!=null){
-                if (ZeeManagerItems.pickupHandItem("shovel")) {
+                // pickup ground bucket
+                ZeeManagerGobs.gobClick(bucket, 3);
+                // try equip bucket
+                if (ZeeThread.waitHoldingItem()) {
+                    if(ZeeManagerItems.isAnyHandEmpty())
+                        ZeeManagerItems.equipEmptyHand();
+                    else
+                        ZeeManagerItems.equipLeftOccupiedHand();
+                }else{
+                    ZeeThread.println("couldnt pickup da bucket");
+                }
+                // drop holding item to inv or belt
+                if (ZeeConfig.isPlayerHoldingItem()) {
                     if(ZeeManagerItems.dropHoldingItemToBeltOrInv()) {
                         Thread.sleep(ZeeThread.PING_MS);
                         ZeeConfig.clickRemoveCursor();
                         ZeeThread.waitCursorName(ZeeConfig.CURSOR_ARW);
                         Thread.sleep(ZeeThread.PING_MS);
-                        ZeeManagerGobs.gobClick(bucket, 3);
-                        if (ZeeThread.waitHoldingItem())
-                            ZeeManagerItems.equipEmptyHand();
-                        else
-                            ZeeThread.println("couldnt pickup da bucket");
                     }
-                }else {
-                    ZeeThread.println("couldnt return shovel to belt?");
                 }
             }else{
                 ZeeThread.println("bucket gob not found");

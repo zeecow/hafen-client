@@ -86,7 +86,7 @@ public class ZeeManagerGobs extends ZeeThread{
             gob clicks
          */
         // hilite gob by name (:zeecow gobfind)
-        else if(ZeeConfig.gameUI.ui.modshift){
+        else if(ZeeConfig.gameUI.ui.modshift && ZeeConfig.getCursorName().contentEquals(ZeeConfig.CURSOR_ARW)){
             ZeeConsole.runCmdZeecow(new String[]{":zeecow","gobfind",gob.getres().basename()});
         }
         // queue menugrid act
@@ -3061,35 +3061,42 @@ public class ZeeManagerGobs extends ZeeThread{
 
 
 
-    static List<Gob> listQueuedMenuGridActTargets = null;
-    static boolean queueMenuGridActBusy = false;
+    static List<Gob> listQueuedActTargets = null;
+    static boolean queueActBusy=false , isQueueActAllGobs=false;
     static void queueMenuGridAct(Gob target) {
+
         if (target==null){
             println("queueMenuGridAct > target null");
             return;
         }
-        if (listQueuedMenuGridActTargets==null) {
-            listQueuedMenuGridActTargets = new ArrayList<>();
+
+        // keep adding closest gob to queue
+        isQueueActAllGobs = ZeeConfig.gameUI.ui.modshift;
+
+        // init queue
+        if (listQueuedActTargets ==null) {
+            listQueuedActTargets = new ArrayList<>();
         }
-        // add or remove target
-        else if (listQueuedMenuGridActTargets.contains(target)){
-            listQueuedMenuGridActTargets.remove(target);
+        // remove from queue and return
+        else if (listQueuedActTargets.contains(target)){
+            listQueuedActTargets.remove(target);
             ZeeConfig.removeGobText(target);
-            queueMenuGridActUpdLabels();
+            queueActUpdLabels();
             return;
         }
-        listQueuedMenuGridActTargets.add(target);
-        queueMenuGridActUpdLabels();
+        // add clicked gob to queue
+        listQueuedActTargets.add(target);
 
+        queueActUpdLabels();
 
         // start thread once
-        if (!queueMenuGridActBusy){
-            queueMenuGridActBusy = true;
+        if (!queueActBusy){
+            queueActBusy = true;
             new ZeeThread(){
                 public void run() {
                     println("queueMenuGridAct > thread start");
                     try {
-                        if (listQueuedMenuGridActTargets!=null){
+                        if (listQueuedActTargets !=null){
                             if (isCancelClick()){
                                 println("queueMenuGridAct > cancel click");
                                 queueMenuGridActReset();
@@ -3097,15 +3104,22 @@ public class ZeeManagerGobs extends ZeeThread{
                             }
                             prepareCancelClick();
                             waitPlayerNonActivePose();//wait first work
-                            while (!isCancelClick() && !listQueuedMenuGridActTargets.isEmpty()){
-                                Gob nextGob = listQueuedMenuGridActTargets.remove(0);
-                                ZeeConfig.removeGobText(nextGob);
-                                queueMenuGridActUpdLabels();
+                            while (!isCancelClick() && !listQueuedActTargets.isEmpty()){
+                                // select gob to act
+                                Gob curGob = listQueuedActTargets.remove(0);
+                                ZeeConfig.removeGobText(curGob);
+                                // define next if act on all gobs
+                                if (isQueueActAllGobs){
+                                    Gob nextGob = ZeeConfig.getClosestGob( curGob, ZeeConfig.findGobsByNameEquals(curGob.getres().name));
+                                    if (nextGob!=null)
+                                        listQueuedActTargets.add(nextGob);
+                                }
+                                queueActUpdLabels();
                                 //change cursor
                                 ZeeConfig.gameUI.menu.wdgmsg("act", lastMenuGridActArgs);
                                 sleep(555);
                                 //click next gob
-                                gobClick(nextGob,1);
+                                gobClick(curGob,1);
                                 //wait approach gob
                                 if(!waitPlayerIdleLinMove() || isCancelClick()) {
                                     println("couldnt wait player idle linmove (or cancel click)");
@@ -3132,21 +3146,25 @@ public class ZeeManagerGobs extends ZeeThread{
         }
     }
     static void queueMenuGridActReset(){
-        if (listQueuedMenuGridActTargets!=null && !listQueuedMenuGridActTargets.isEmpty()){
-            ZeeConfig.removeGobText((ArrayList<Gob>) listQueuedMenuGridActTargets);
+        if (listQueuedActTargets !=null && !listQueuedActTargets.isEmpty()){
+            ZeeConfig.removeGobText((ArrayList<Gob>) listQueuedActTargets);
         }
         ZeeConfig.removePlayerText();
         lastMenuGridActArgs = null;
-        listQueuedMenuGridActTargets = null;
-        queueMenuGridActBusy = false;
+        listQueuedActTargets = null;
+        queueActBusy = false;
+        isQueueActAllGobs = false;
     }
-    static void queueMenuGridActUpdLabels(){
-        List<Gob> queue = listQueuedMenuGridActTargets;
+    static void queueActUpdLabels(){
+        List<Gob> queue = listQueuedActTargets;
         if(queue!=null && !queue.isEmpty()) {
+            // label player
+            String lbl = isQueueActAllGobs ? "all" : String.valueOf(queue.size()+1);
+            ZeeConfig.addPlayerText(lastMenuGridActArgs[0]+ " " + lbl);
+            // label queue gobs
             for (int i = 0; i < queue.size(); i++) {
-                ZeeConfig.addGobText(queue.get(i), "" + (i+1));
+                ZeeConfig.addGobText(queue.get(i), "queue" + (i+1));
             }
-            ZeeConfig.addPlayerText(lastMenuGridActArgs[0]+ " " + (queue.size()+1));
         }
     }
 
@@ -4824,6 +4842,20 @@ public class ZeeManagerGobs extends ZeeThread{
             discHelpListGobs.clear();
         ZeeFlowerMenu.lastRightClickedGobOrItem = null;
         discHelpOn = false;
+    }
+
+
+    //TODO test
+    static void sortGobsByClosestToPlayer(List<Gob> gobs) {
+        gobs.sort((gob1, gob2) -> {
+            double d1 = ZeeConfig.distanceToPlayer(gob1);
+            double d2 = ZeeConfig.distanceToPlayer(gob2);
+            if ( d1 > d2 )
+                return 1;
+            if ( d1 < d2 )
+                return -1;
+            return 0;
+        });
     }
     
 }

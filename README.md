@@ -4,6 +4,7 @@ Client focusing on small helper tasks, many using mouse middle button, and other
 
 Controls
 --------
+- left click ground cancel tasks whenever possible
 - gob flowermenu also works on mouse up
 - minimap drags with button 3
 - keys up/down controls volume
@@ -33,9 +34,12 @@ Controls
   - left-click-hold search button shows Actions window, and select item on mouse up 
   - right-click-hold search button to start a hover menu
 - mid-click item menu to start auto click window
-- mid-click tree/bush/boulder/log/stump/animal queue for next chop/chip/destroy/butch (not all cases)
+- mid-click tree/bush/boulder/log/stump/animal queue for next chop/chip/destroyLog/butch (not all cases)
+- midclick obj to queue actions ("swrk", "destroy", "repair")
+  - shift midclick obj to act on all objs
 - hold shift for long tooltips  
-- shift midclick object toggle highlight 
+- midclick obj while working will queue 
+- shift midclick object toggle highlight
 - type ":zeecow" for small interactive commands 
 
 
@@ -45,6 +49,7 @@ Midclick interactions (incomplete/outdated)
 -------------------------------------------
 
 Midclick Ground
+- cancel tasks whenever possible
 - while holding item will move to location (simulates ctrl+click)
 - while inspecting icon active, will msg tile name
 - place stockpile and all items
@@ -85,7 +90,9 @@ Midclick Ground Object
 - midclick construction obj while chopping/sawing will build and get more mats
 - midclick cart try picking first slot
 - gob placer: midclick gob while lifting gob of same name will try to place next to it and save distance per gob name (temp window to clear distance)
-- queue tree/bush/boulder/log/stump/animal for repeating chop/chip/destroy/butch
+- queue tree/bush/boulder/log/stump/animal for repeating actions like chop/chip/butch/destroyLog
+- midclick obj to queue actions ("swrk", "destroy", "repair")
+  - shift midclick obj to act on all objs
 
 Long Midclick Ground Object
 - show context menu for various objs (details below)
