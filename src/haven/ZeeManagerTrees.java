@@ -411,6 +411,14 @@ public class ZeeManagerTrees {
         //remove stump
         ZeeManagerGobs.destroyGob(stump);
 
+        ZeeThread.waitPlayerIdlePose();
+
+        // reequip some inventory axe if no belt
+        if(ZeeManagerItems.getInvBelt()==null) {
+            ZeeManagerItems.equipBeltOrInvItem("axe");
+            ZeeThread.waitNotHoldingItem();
+        }
+
         //reequip bucket if dropped
         if (droppedBucket){
             ZeeThread.waitPlayerPose(ZeeConfig.POSE_PLAYER_IDLE);
