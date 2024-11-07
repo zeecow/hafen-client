@@ -111,7 +111,7 @@ public class Tree extends Sprite {
 		}
 
 		//show tree growth if less than 100%
-		if (fscale != 1.0f) {
+		if (fscale < 1.0f) {
 			gob.treeGrowthText = String.valueOf(fscale).replaceAll("0.", ".");
 			if (ZeeConfig.showGrowingTreeScale) {
 				ZeeConfig.addGobText(gob, gob.treeGrowthText);
