@@ -34,7 +34,7 @@ public class Equipory extends Widget implements DTarget {
     private static final Resource.Image bgi = Resource.loadrimg("gfx/hud/equip/bg");
     private static final int yo = Inventory.sqsz.y, sh = 10;
     private static final Tex bg = new TexI(PUtils.uiscale(bgi.img, Coord.of((sh * yo * bgi.sz.x) / bgi.sz.y, sh * yo)));
-    private static final int rx = invsq.sz().x + bg.sz().x;
+    private static final int rx = invsq.sz().x + (ZeeConfig.equiporyCompact ? invsq.sz().x : bg.sz().x);
     public static final Coord bgc = new Coord(invsq.sz().x, 0);
     public static final Coord ecoords[] = {
 	new Coord( 0, 0 * yo),
@@ -99,6 +99,8 @@ public class Equipory extends Widget implements DTarget {
     protected void added() {
 	if(ava.avagob == -2)
 	    ava.avagob = getparent(GameUI.class).plid;
+	if(ZeeConfig.equiporyCompact)
+		ava.hide();
 	super.added();
     }
 

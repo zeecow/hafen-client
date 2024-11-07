@@ -26,13 +26,15 @@
 
 package haven;
 
-import java.awt.image.BufferedImage;
-import java.util.*;
-import java.util.function.*;
-import java.awt.Color;
-import java.awt.event.KeyEvent;
-import java.awt.image.WritableRaster;
 import haven.render.Location;
+
+import java.awt.*;
+import java.awt.event.KeyEvent;
+import java.awt.image.BufferedImage;
+import java.awt.image.WritableRaster;
+import java.util.List;
+import java.util.*;
+
 import static haven.Inventory.invsq;
 
 public class GameUI extends ConsoleHost implements Console.Directory, UI.MessageWidget {
@@ -1621,7 +1623,7 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Message
 	lastmsg = RootWidget.msgfoundry.render(msg.message(), msg.color());
 	syslog.append(logged);
 	ui.sfxrl(msg.sfx());
-	ZeeConfig.checkUiMsg(msg);
+	ZeeConfig.checkUiMsg(msg.message());
     }
 
     public void error(String msg) {
