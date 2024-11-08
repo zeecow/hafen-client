@@ -816,7 +816,8 @@ public class ZeeConfig {
     public static boolean isTreeBough(String name){
         final String[] list = {
                 "trees/linden","trees/alder","trees/yew","trees/spruce",
-                "trees/elm","trees/fir","trees/sweetgum","trees/grayalder"
+                "trees/elm","trees/fir","trees/sweetgum","trees/grayalder",
+                "trees/poplar", "trees/beech"
         };
         for (int i = 0; i < list.length; i++) {
             if(name.contains(list[i]))
