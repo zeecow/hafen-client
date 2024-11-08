@@ -828,6 +828,7 @@ public class Widget {
 		}
 	    }
 	}
+	ZeeWindow.checkCloseWinDFStyle(this,button);
 	return(false);
     }
 	

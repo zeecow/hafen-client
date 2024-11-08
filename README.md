@@ -5,6 +5,7 @@ Client focusing on small helper tasks, many using mouse middle button, and other
 Controls
 --------
 - left click ground cancel tasks whenever possible
+- right click windows to close (DF style, minimap ignored for now)
 - gob flowermenu also works on mouse up
 - minimap drags with button 3
 - keys up/down controls volume

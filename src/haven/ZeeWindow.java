@@ -21,6 +21,19 @@ public class ZeeWindow extends Window {
         return Coord.of(wdg.c.x + wdg.sz.x + padX, y);
     }
 
+    public static void checkCloseWinDFStyle(Widget widget, int button) {
+        if( button==3 ){
+            if (widget instanceof Window.DefaultDeco) {
+                Window win = (Window) widget.parent;
+                //minimap ignored for now, due to dragging map and stuff
+                if (!(win instanceof MapWnd)) {
+                    ZeeConfig.println("hiding " + win.cap);
+                    win.reqclose();
+                }
+            }
+        }
+    }
+
     @Override
     public void wdgmsg(String msg, Object... args) {
         //ZeeConfig.println(this.getClass().getSimpleName()+" > "+msg);
