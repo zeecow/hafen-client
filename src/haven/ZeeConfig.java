@@ -491,7 +491,8 @@ public class ZeeConfig {
     public static boolean isGobContainer(String gobName){
         final List<String> l = List.of(
             "woodbox","cupboard","chest","crate","basket","casket",
-            "box","coffer","steelbox","metalcabinet","urn","pot","strongbox"
+            "box","coffer","steelbox","metalcabinet","urn","pot","strongbox",
+            "thatchbasket", "birchbasket", "leatherbasket", "bonechest"
         );
         for (String s : l) {
             if(gobName.endsWith("/"+s)) {
