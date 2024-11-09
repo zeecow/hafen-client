@@ -3687,7 +3687,7 @@ public class ZeeManagerGobs extends ZeeThread{
                 +"/trough,curdingtub,/plow,/barrel,/still,log,/oldtrunk,chest,/anvil,"
                 +"/cupboard,/studydesk,/demijohn,/quern,/wreckingball-fold,/loom,/swheel,"
                 +"/ttub,/cheeserack,/archerytarget,/dreca,/glasspaneframe,/runestone,"
-                +"woodbox,casket,basket,crate,chest";
+                +"woodbox,casket,basket,crate,chest,stonekist";
         return ZeeConfig.nameInListEndsWith(gobName,endList);
     }
 

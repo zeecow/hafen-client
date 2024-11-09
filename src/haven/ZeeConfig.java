@@ -492,7 +492,7 @@ public class ZeeConfig {
         final List<String> l = List.of(
             "woodbox","cupboard","chest","crate","basket","casket",
             "box","coffer","steelbox","metalcabinet","urn","pot","strongbox",
-            "thatchbasket", "birchbasket", "leatherbasket", "bonechest"
+            "thatchbasket", "birchbasket", "leatherbasket", "bonechest", "stonekist"
         );
         for (String s : l) {
             if(gobName.endsWith("/"+s)) {
@@ -2674,7 +2674,7 @@ public class ZeeConfig {
         final String[] containers = (
                 //boxes
                 "Woodbox,Cupboard,Chest,Crate,Basket,Casket,Box,Coffer,Steelbox,Metal Cabinet,"
-                +"Urn,Pot,Strongbox,"
+                +"Urn,Pot,Strongbox,Stonekist,"
                 //misc
                 +"Knarr,Snekkja,Wagon,Table,Saddlebags,"
                 +"Furnace,Smelter,Desk,Trunk,Shed,Packrack,"
@@ -4473,7 +4473,7 @@ public class ZeeConfig {
     }
 
 
-    static boolean isMsgAudioMuted(String msg) {
+    private static boolean isMsgAudioMuted(String msg) {
         String[] arr = blockAudioMsgList.split(";");
         for (int i = 0; i < arr.length; i++) {
             if (msg.strip().contains(arr[i].strip()))

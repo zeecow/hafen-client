@@ -1622,7 +1622,8 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Message
 	msgtime = Utils.rtime();
 	lastmsg = RootWidget.msgfoundry.render(msg.message(), msg.color());
 	syslog.append(logged);
-	ui.sfxrl(msg.sfx());
+	if (!ZeeConfig.muteAudioMsg(msg.message()))
+		ui.sfxrl(msg.sfx());
 	ZeeConfig.checkUiMsg(msg.message());
     }
 
