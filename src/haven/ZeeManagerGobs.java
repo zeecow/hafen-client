@@ -3185,7 +3185,7 @@ public class ZeeManagerGobs extends ZeeThread{
     public static void highlightGobSmoking(Gob gob){
         if (gob.getres().name.endsWith("villageidol"))
             return;
-        ZeeConfig.addGobColor(gob,0,255,0,180);
+        ZeeConfig.addGobColor(gob,ZeeGobColor.COLOR_DARK_GREEN);
     }
 
     public static String getBoulderNameNoSize(String name) {
