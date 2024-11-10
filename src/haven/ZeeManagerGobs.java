@@ -2515,9 +2515,9 @@ public class ZeeManagerGobs extends ZeeThread{
 
     private static boolean isGobDeadAnimal;
 
-    static final List<String> autoLabelGobsBasename = List.of("barrel","cistern","demijohn","trough","oven","cauldron","fineryforge","smelter","steelcrucible","smokeshed","rabbithutch","chickencoop","kiln","curdingtub");
+    static final List<String> autoLabelGobsBasename = List.of("barrel","cistern","demijohn","trough","oven","cauldron","fineryforge","smelter","primsmelter","steelcrucible","smokeshed","rabbithutch","chickencoop","kiln","curdingtub");
     static final List<String> autoLabelWincapContainers = List.of("Barrel","Cistern","Demijohn","Food trough");
-    static final List<String> autoLabelWincapVmeters = List.of("Cauldron","Oven","Ore Smelter","Smith's Smelter","Finery Forge","Steelbox","Smoke shed","Rabbit Hutch","Chicken Coop","Kiln","Curding Tub");
+    static final List<String> autoLabelWincapVmeters = List.of("Cauldron","Oven","Ore Smelter","Smith's Smelter","Stack furnace","Finery Forge","Steelbox","Smoke shed","Rabbit Hutch","Chicken Coop","Kiln","Curding Tub");
     static final Map<String,Integer> mapWincapMaxfuel = Map.of(
         "Oven",30,
         "Ore Smelter",30,
@@ -2525,7 +2525,7 @@ public class ZeeManagerGobs extends ZeeThread{
         "Finery Forge",15,
         "Smoke shed",10,
         "Kiln",30,
-        "Stack Furnace",30,
+        "Stack furnace",30,
         "Steelbox",18
     );
     @SuppressWarnings("unchecked")
@@ -2564,7 +2564,7 @@ public class ZeeManagerGobs extends ZeeThread{
                                     currentFuel = (int) Math.round(meter.a * maxFuel);
                                     lblText += currentFuel + "/" + maxFuel;
                                 }
-                                Color color = Color.green;
+                                Color color = ZeeGobColor.COLOR_DARK_GREEN;
                                 if (currentFuel == 0)
                                     color = Color.red;
                                 else if (currentFuel < maxFuel)
@@ -2573,7 +2573,7 @@ public class ZeeManagerGobs extends ZeeThread{
                             }
                             // perc% water, swill, etc
                             else {
-                                Color c = Color.green;
+                                Color c = ZeeGobColor.COLOR_DARK_GREEN;
                                 double lowestVmeter = -1;
                                 for (VMeter vm : vmeter) {
                                     LayerMeter.Meter meter = vm.meters.get(0);
@@ -4700,7 +4700,7 @@ public class ZeeManagerGobs extends ZeeThread{
                 // cheeseracks
                 if (gob1.getres().name.endsWith("terobjs/cheeserack")){
                     if (gob1.equedOverlays == 3)
-                        ZeeConfig.addGobColor(gob1, Color.green.darker());
+                        ZeeConfig.addGobColor(gob1, ZeeGobColor.COLOR_DARK_GREEN);
                     else
                         ZeeConfig.addGobColor(gob1, Color.orange);
                 }

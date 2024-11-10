@@ -2294,7 +2294,7 @@ public class ZeeConfig {
             if (trays==0)
                 return;
             if (trays==3)
-                ZeeConfig.addGobColor(cheeserack, Color.green.darker());
+                ZeeConfig.addGobColor(cheeserack, ZeeGobColor.COLOR_DARK_GREEN);
             else
                 ZeeConfig.addGobColor(cheeserack, Color.orange);
         }else {
@@ -2325,7 +2325,7 @@ public class ZeeConfig {
             pot.equedOverlays = plants;
             if (plants < 2)
                 return;
-            ZeeConfig.addGobColor(pot, Color.green.darker());
+            ZeeConfig.addGobColor(pot, ZeeGobColor.COLOR_DARK_GREEN);
         }else {
             ZeeConfig.removeGobColor(pot);
         }
