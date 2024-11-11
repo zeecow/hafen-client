@@ -620,8 +620,8 @@ public class ZeeConfig {
         }
         final String[] containsList = {
                 "rockdove","quail","/hen","/rooster","magpie",
-                "mallard","seagull","ptarmigan","grouse",
-                "/rat/rat","/squirrel","/hedgehog","/bogturtle",
+                "mallard","seagull","ptarmigan","woodgrouse",
+                "/rat/rat","/squirrel/","/hedgehog","/bogturtle",
                 "/rabbit-buck","rabbit-doe",
                 "/frog","/forestlizard","snail",
                 "/crab","/jellyfish", "bayshrimp",
@@ -744,8 +744,9 @@ public class ZeeConfig {
 
     static boolean isBird(String name){
         final String[] list = {
-            "rockdove","quail","eagle","owl","magpie",
-            "mallard","pelican","seagull","swan","ptarmigan","grouse","bullfinch"
+            "rockdove","goldeneagle","magpie",
+            "mallard","pelican","seagull","ptarmigan","bullfinch",
+            "eagleowl","woodgrouse","/quail","/swan"
         };
         for (int i = 0; i < list.length; i++) {
             if(name.contains(list[i]))
