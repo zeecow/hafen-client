@@ -9,6 +9,8 @@ import haven.*;
 import haven.render.*;
 import haven.res.lib.leaves.*;
 import haven.res.lib.svaj.*;
+
+import java.awt.*;
 import java.util.*;
 
 @haven.FromResource(name = "lib/tree", version = 15)
@@ -110,16 +112,15 @@ public class Tree extends Sprite {
 			gob.setattr(new TreeScale(gob, fscale));
 		}
 
-		//show tree growth if less than 100%
-		if (fscale < 1.0f) {
-			gob.treeGrowthText = String.valueOf(fscale).replaceAll("0.", ".");
-			if (ZeeConfig.showGrowingTreeScale) {
-				ZeeConfig.addGobText(gob, gob.treeGrowthText);
+		//show tree growth
+		gob.treeGrowth = fscale;
+		if (ZeeConfig.showGrowingTreeScale) {
+			if (ZeeConfig.showAllTreesGrowth || fscale < 1f) {
+				ZeeConfig.addGobText(gob,
+						gob.treeGrowth.toString(),
+						gob.treeGrowth < 1f ? Color.green : Color.lightGray
+				);
 			}
-		}
-		// hide tree growth if 100%
-		else{
-			gob.treeGrowthText = null;
 		}
 	}
 	parts = mkparts(res, s, fl);
