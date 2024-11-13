@@ -9,7 +9,7 @@ public class ZeeGobFind extends GAttrib implements Gob.SetupMod{
     public ZeeGobFind(Gob gob) {
         this( gob,
             Color.magenta,
-            new ZeeGobText(TRIANGLE, Color.green, Color.black, 5, ZeeConfig.defGobTextFont )
+            new ZeeGobText(TRIANGLE, Color.green, Color.black, 5, ZeeFont.TXTFND_GOB_TEXT)
         );
     }
 

@@ -1065,9 +1065,8 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Message
 	private TexI curi;
 	private String tip;
 	private Coord labelCoord;
-	public static final Text.Foundry fnd = new Text.Foundry(Text.sans.deriveFont(Font.BOLD, UI.scale(15f))).aa(false);
 
-	public Progress(double prog) {
+		public Progress(double prog) {
 	    super(progt.f[0][0].ssz);
 	    set(prog);
 	}
@@ -1087,13 +1086,13 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Message
 	    this.tip = String.format("%." + dec + "f%%", prog * 100);
 	    this.prog = prog;
 
-		this.labelCoord = curi.sz().div(2).sub(fnd.strsize(this.tip).div(2));
+		this.labelCoord = curi.sz().div(2).sub(ZeeFont.TXTFND_PROGRESS_WIDGET.strsize(this.tip).div(2));
 	}
 
 	public void draw(GOut g) {
 	    g.image(curi, Coord.z);
 		//show %
-		g.image(fnd.renderstroked(this.tip,Color.white,Color.black).img,this.labelCoord);
+		g.image(ZeeFont.TXTFND_PROGRESS_WIDGET.renderstroked(this.tip,Color.white,Color.black).img,this.labelCoord);
 	}
 
 	public boolean checkhit(Coord c) {

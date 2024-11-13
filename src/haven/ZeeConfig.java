@@ -3262,10 +3262,9 @@ public class ZeeConfig {
         addGobText(g,s,0,255,0,255,height);
     }
 
-    static final Text.Foundry defGobTextFont = new Text.Foundry(Text.sans.deriveFont(Font.PLAIN, UI.scale(11))).aa(false);
     public static void addGobText(Gob gob, String text, int r, int g, int b, int a, int height) {
         addGobText( gob,
-            new ZeeGobText(text, new Color(r, g, b, a), Color.black, height, defGobTextFont)
+            new ZeeGobText(text, new Color(r, g, b, a), Color.black, height, ZeeFont.TXTFND_GOB_TEXT)
         );
     }
 
