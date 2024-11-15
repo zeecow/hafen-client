@@ -215,20 +215,21 @@ public class ZeeHoverMenu {
             super.draw(g);
         }
 
-        public boolean mousehover(Coord c, boolean hovering) {
+        public void mousemove(MouseMoveEvent ev) {
             int y = this.i * this.btnHeight;
-            if(c.y > y   &&  c.y < (y + this.btnHeight)
-                && c.x > this.c.x && c.x < this.c.x+this.sz.x)
+            Coord evc = ev.c;
+            if(evc.y > y   &&  evc.y < (y + this.btnHeight)
+                && evc.x > this.c.x && evc.x < this.c.x+this.sz.x)
             {
                 //println(this.pagina.button().name() + "" + c.toString());
                 menuWidget.lineSelected = this;
                 //open submenu buttons only
                 if (isButtonNotSubmenu(this.pagina.button())) {
-                    return true;
+                    return;
                 }
                 //menu already opened
                 if (latestMenu!=null && latestMenuLine!=null && latestMenuLine.equals(this)) {
-                    return true;
+                    return;
                 }
                 // first mousemove
                 if (msHoverLine==-1) {
@@ -242,12 +243,12 @@ public class ZeeHoverMenu {
                     ZeeHoverMenu.latestMenuLine = MenuLineWidget.this;
                     menuGrid.use(pagina.button(), new MenuGrid.Interaction(), false);
                 }
-                return true;
+                return;
             }
-            return false;
+            return;
         }
 
-        public boolean mouseup(Coord c, int button) {
+        public boolean mouseup(MouseUpEvent ev) {
             if(this.equals(menuWidget.lineSelected) && isButtonNotSubmenu(pagina.button())) {
                 // ignore next gridMenu due to reset
                 ZeeHoverMenu.ignoreNextGridMenu = true;
@@ -260,7 +261,7 @@ public class ZeeHoverMenu {
             return false;
         }
 
-        public boolean mousedown(Coord c, int button) {
+        public boolean mousedown(MouseDownEvent ev) {
             return true;//grabs click?
         }
     }

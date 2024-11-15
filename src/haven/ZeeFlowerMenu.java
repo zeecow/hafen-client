@@ -85,12 +85,12 @@ public class ZeeFlowerMenu extends FlowerMenu{
             uimsg("cancel");
     }
 
-    @Override
+    /*@Override
     public boolean mouseup(Coord c, int button) {
         if (button==2)
             return super.mousedown(c, button);
         return false;
-    }
+    }*/
 
     private static long lastRightClickMs = ZeeThread.now();
     static Object lastRightClickedGobOrItem;

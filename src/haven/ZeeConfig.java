@@ -131,7 +131,7 @@ public class ZeeConfig {
     static final String TILE_MOUNTAIN = "gfx/tiles/mountain";
 
     static final String DEF_LIST_MUTE_AUDIO = "Leashed horse.;Tracking is now turned;Stacking is now turned;must be empty to be unequipped";
-    static final String DEF_LIST_CONFIRM_PETAL = "Empty,Swill,Clean out,Slaughter,Castrate,Unmoor,Declaim,Take possession,Renounce Lawspeaker,Become Lawspeaker,Pull hair,Disassemble,Claim,Set home dock";
+    static final String DEF_LIST_CONFIRM_PETAL = "Empty,Swill,Clean out,Slaughter,Castrate,Unmoor,Declaim,Take possession,Renounce Lawspeaker,Become Lawspeaker,Pull hair,Disassemble,Claim,Set home dock,Crack & Soften";
     static final List<String> DEF_LIST_CONFIRM_BUTTON = List.of("Empty","Empty out","Abandon quest","Abandon credo","Resign");
     static final String DEF_LIST_WINDOWS_ADD_HIDE_BUTTON = "Inventory,Character Sheet,Basket,Creel,Cattle Roster,Quiver,Pickup Gobs,Switch Char";
     static final String DEF_LIST_BUTCH_AUTO = "Break,Scale,Wring neck,Kill,Skin,Flay,Pluck,Clean,Butcher,Collect bones";
@@ -1006,9 +1006,9 @@ public class ZeeConfig {
 
             // button horizontal
             Button button = wdgMapResizeBtns.add(new Button(20,"↔"){
-                public boolean mousedown(Coord c, int button) {
+                public boolean mousedown(MouseDownEvent ev) {
                     int change=25;
-                    if (button==3)
+                    if (ev.b==3)
                         change *= -1;
                     minimapPrevSize = Coord.of(gameUI.mapfile.viewf.sz);
                     gameUI.mapfile.resize(minimapPrevSize.add(change,0));
@@ -1016,7 +1016,7 @@ public class ZeeConfig {
                     minimapCompactReposition();
                     return true;
                 }
-                public boolean mouseup(Coord c, int button) {
+                public boolean mouseup(MouseUpEvent ev) {
                     return false;
                 }
             },Coord.z);
@@ -1024,9 +1024,9 @@ public class ZeeConfig {
 
             // button vertical
             button = wdgMapResizeBtns.add(new Button(20,"↕"){
-                public boolean mousedown(Coord c, int button) {
+                public boolean mousedown(MouseDownEvent ev) {
                     int change=25;
-                    if (button==3)
+                    if (ev.b==3)
                         change *= -1;
                     minimapPrevSize = Coord.of(gameUI.mapfile.viewf.sz);
                     gameUI.mapfile.resize(minimapPrevSize.add(0,change));
@@ -1034,7 +1034,7 @@ public class ZeeConfig {
                     minimapCompactReposition();
                     return true;
                 }
-                public boolean mouseup(Coord c, int button) {
+                public boolean mouseup(MouseUpEvent ev) {
                     return false;
                 }
             },Coord.z.add(20,0));

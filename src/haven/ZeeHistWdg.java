@@ -59,14 +59,14 @@ public class ZeeHistWdg extends Widget{
     }
 
     @Override
-    public boolean mousedown(Coord c, int button) {
+    public boolean mousedown(MouseDownEvent ev) {
         return true;
     }
 
-    public boolean mouseup(Coord c, int button) {
-        if (button != 1)
+    public boolean mouseup(MouseUpEvent ev) {
+        if (ev.b != 1)
             return false;
-        int ibtn = buttonIndex(c);
+        int ibtn = buttonIndex(ev.c);
         if (ibtn < 0) {
             return false;
         }

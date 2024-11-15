@@ -328,23 +328,23 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
 		public void click() {
 			toggleSearchWindow();
 		}
-		public boolean mousedown(Coord c, int button) {
+		public boolean mousedown(MouseDownEvent ev) {
 			ZeeHoverMenu.exitIfMenuExists();
-			if (button==3){
+			if (ev.b==3){
 				ZeeHoverMenu.menuStart();
 				return true;
 			}
-			if (button==1){
+			if (ev.b==1){
 				toggleSearchWindow();
 				return true;
 			}
-			return super.mousedown(c, button);
+			return super.mousedown(ev);
 		}
-		public boolean mouseup(Coord c, int button) {
-			if (button==3) {
+		public boolean mouseup(MouseUpEvent ev) {
+			if (ev.b==3) {
 				return true;
 			}
-			return super.mouseup(c, button);
+			return super.mouseup(ev);
 		}
 	    }, bg.c);
     }
