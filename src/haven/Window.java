@@ -502,7 +502,7 @@ public class Window extends Widget {
 	    move(this.c.add(ev.c.sub(doff)));
 	else {
 		if (this.isAutoHideOn && ZeeConfig.autoHideWindows && !(this.deco instanceof GItem.HoverDeco)) {
-			if (checkhit(c)){
+			if (checkhit(ev.c)){
 				if (this.isAutoHidden)
 					autoHideToggleWinPos();//show window
 			}else{

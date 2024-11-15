@@ -21,9 +21,10 @@ public class ZeeWindow extends Window {
         return Coord.of(wdg.c.x + wdg.sz.x + padX, y);
     }
 
+    static boolean isLastWidgetWItem;//TODO better way?
     public static void checkCloseWinDFStyle(Widget widget, int button) {
         if( button==3 ){
-            if (widget instanceof Window.DefaultDeco) {
+            if (widget instanceof Window.DefaultDeco && !isLastWidgetWItem) {
                 Window win = (Window) widget.parent;
                 //minimap ignored for now, due to dragging map and stuff
                 if (!(win instanceof MapWnd)) {
@@ -31,6 +32,7 @@ public class ZeeWindow extends Window {
                     win.reqclose();
                 }
             }
+            isLastWidgetWItem = widget instanceof WItem;
         }
     }
 

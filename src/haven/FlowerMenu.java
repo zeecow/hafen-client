@@ -94,6 +94,21 @@ public class FlowerMenu extends Widget {
 	    return(true);
 	}
 
+		@Override
+		public boolean mouseup(MouseUpEvent ev) {
+			// TODO fix
+			// activate menu on mouseup
+			if (ev.b==3) {
+				// avoid clicking during menu animation
+				if (ZeeThread.now() - ZeeManagerGobs.lastClickMouseDownMs > 500) { //500ms
+					ZeeConfig.println("menu mouseup");
+					choose(this);
+					return true;
+				}
+			}
+			return false;
+		}
+
 	public Area ta(Coord tc) {
 	    return(Area.sized(tc.sub(sz.div(2)), sz));
 	}
@@ -236,19 +251,6 @@ public class FlowerMenu extends Widget {
 	    choose(null);
 	return(true);
     }
-
-	@Override
-	public boolean mouseup(MouseUpEvent ev) {
-		// TODO fix
-		// activate menu on mouseup
-		if (ev.b==3) {
-			// avoid clicking during menu animation
-			if (ZeeThread.now() - ZeeManagerGobs.lastClickMouseDownMs > 500) { //500ms
-				return mousedown(new MouseDownEvent(ev.c,ev.b));
-			}
-		}
-		return false;
-	}
 
 	public void uimsg(String msg, Object... args) {
 	if(msg == "cancel") {

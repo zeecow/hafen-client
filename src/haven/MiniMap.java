@@ -910,12 +910,12 @@ public class MiniMap extends Widget {
 	    drag.remove();
 	    drag = null;
 	}
-	if(dsicon != iconat(c)){ //TODO remove if?
+	if(dsicon != iconat(ev.c)){ //TODO remove if?
 		dsloc = null;
 		dsicon = null;
 		dsmark = null;
 		dragging = false;
-		return(super.mouseup(c, ev.b));
+		return(super.mouseup(ev));
 	}
 	release: if(!dragging && (dsloc != null)) {
 	    if((dsicon != null) && clickicon(dsicon, dsloc, ev.b, false))
