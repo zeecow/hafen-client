@@ -1877,7 +1877,7 @@ public class ZeeManagerGobs extends ZeeThread{
     }
 
     public static boolean isGobHouse(String gobName) {
-        final String list = "/logcabin,/timberhouse,/stonestead,/stonemansion,/stonetower,/greathall,/windmill,/greenhouse,/igloo,/primitivetent,/waterwheelhouse";
+        final String list = "/logcabin,/timberhouse,/stonestead,/stonemansion,/stonetower,/greathall,/windmill,/greenhouse,/igloo,/primitivetent,/waterwheelhouse,/stonehut";
         return ZeeConfig.nameInListEndsWith(gobName,list);
     }
 

@@ -23,17 +23,19 @@ public class ZeeWindow extends Window {
 
     static boolean isLastWidgetWItem;//TODO better way?
     public static void checkCloseWinDFStyle(Widget widget, int button) {
-        if( button==3 ){
-            if (widget instanceof Window.DefaultDeco && !isLastWidgetWItem) {
-                Window win = (Window) widget.parent;
-                //minimap ignored for now, due to dragging map and stuff
-                if (!(win instanceof MapWnd)) {
-                    ZeeConfig.println("hiding " + win.cap);
-                    win.reqclose();
-                }
+        if (ZeeConfig.gameUI.ui.modmeta) // avoid alt clicks (transfers)
+            return;
+        if (button!=3)
+            return;
+        if (widget instanceof Window.DefaultDeco && !isLastWidgetWItem) {
+            Window win = (Window) widget.parent;
+            //minimap ignored for now, due to dragging map and stuff
+            if (!(win instanceof MapWnd)) {
+                ZeeConfig.println("hiding " + win.cap);
+                win.reqclose();
             }
-            isLastWidgetWItem = widget instanceof WItem;
         }
+        isLastWidgetWItem = widget instanceof WItem;
     }
 
     @Override

@@ -306,7 +306,7 @@ public class ZeeConfig {
             "gabbro","corund","kyanite","mica","microlite","orthoclase","soapstone",
             "sodalite","olivine","alabaster","breccia","diabase","arkose",
             "diorite","slate","arkose","eclogite","jasper","greenschist","pegmatite",
-            "rhyolite","pumice","chert","graywacke","serpentine","sunstone"
+            "rhyolite","pumice","chert","graywacke","serpentine","sunstone","halite"
     ));
     public final static Set<String> mineablesOre = new HashSet<String>(Arrays.asList(
             "cassiterite","chalcopyrite","malachite","ilmenite","cinnabar",
@@ -646,8 +646,8 @@ public class ZeeConfig {
         final String[] list = {
             "kvann", "chives", "dill","thyme","sage",
             "laurel","juniper",
-            "ambergris",
-            "truffle"
+            "ambergris", "truffle",
+            "/halite", "saltbasin"
         };
         for (int i = 0; i < list.length; i++) {
             if(name.contains(list[i]))

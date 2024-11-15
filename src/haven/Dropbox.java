@@ -55,12 +55,12 @@ public abstract class Dropbox<T> extends ListWidget<T> {
 	protected int listitems() {return(Dropbox.this.listitems());}
 	protected void drawitem(GOut g, T item, int idx) {Dropbox.this.drawitem(g, item, idx);}
 
-	public boolean mousedown(Coord c, int btn) {
-	    if(!c.isect(Coord.z, sz)) {
+	public boolean mousedown(MouseDownEvent ev) {
+	    if(!ev.c.isect(Coord.z, sz)) {
 		reqdestroy();
-		return(true);
+		return(false);
 	    }
-	    return(super.mousedown(c, btn));
+	    return(super.mousedown(ev));
 	}
 
 	public void destroy() {
@@ -85,13 +85,13 @@ public abstract class Dropbox<T> extends ListWidget<T> {
 	super.draw(g);
     }
 
-    public boolean mousedown(Coord c, int btn) {
-	if(super.mousedown(c, btn))
+    public boolean mousedown(MouseDownEvent ev) {
+	if(super.mousedown(ev))
 	    return(true);
-	if((dl == null) && (btn == 1)) {
+	if((dl == null) && (ev.b == 1)) {
 	    dl = new Droplist();
 	    return(true);
 	}
-	return(true);
+	return(super.mousedown(ev));
     }
 }
