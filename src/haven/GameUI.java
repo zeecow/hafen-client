@@ -1064,7 +1064,8 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
 	public double prog;
 	private TexI curi;
 	private String tip;
-	private Coord labelCoord;
+	private Coord percCoord;
+	private BufferedImage perc;
 
 	public Progress(double prog) {
 	    super(progt.f[0][0].ssz);
@@ -1086,13 +1087,14 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
 	    this.tooltip = String.format("%." + dec + "f%%", prog * 100);
 	    this.prog = prog;
 
-		this.labelCoord = curi.sz().div(2).sub(ZeeFont.TXTFND_PROGRESS_WIDGET.strsize(this.tip).div(2));
+		this.perc = ZeeFont.TXTFND_PROGRESS_WIDGET.renderstroked(tooltip.toString(),Color.white,Color.black).img;
+		this.percCoord = curi.sz().div(2).sub(ZeeFont.TXTFND_PROGRESS_WIDGET.strsize(tooltip.toString()).div(2));
 	}
 
 	public void draw(GOut g) {
 	    g.image(curi, Coord.z);
 		//show %
-		g.image(ZeeFont.TXTFND_PROGRESS_WIDGET.renderstroked(this.tip,Color.white,Color.black).img,this.labelCoord);
+		g.image(perc, percCoord);
 	}
 
 	public boolean checkhit(Coord c) {
@@ -1978,12 +1980,12 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
 			super.draw(g);
 		}
 
-		public boolean globtype(char key, KeyEvent ev) {
-			int c = ev.getKeyCode();
+		public boolean globtype(GlobKeyEvent ev) {
+			int c = ev.awt.getKeyCode();
 			if((c < KeyEvent.VK_0) || (c > KeyEvent.VK_9))
 				return(false);
 			int i = Utils.floormod(c - KeyEvent.VK_0 - 1, 10);
-			boolean M = (ev.getModifiersEx() & (KeyEvent.META_DOWN_MASK | KeyEvent.ALT_DOWN_MASK)) != 0;
+			boolean M = (ev.awt.getModifiersEx() & (KeyEvent.META_DOWN_MASK | KeyEvent.ALT_DOWN_MASK)) != 0;
 			if(M) {
 				curbelt = i;
 				this.lblCurBelt.settext(i+"/9");

@@ -789,7 +789,7 @@ public class GobIcon extends GAttrib {
 		if(ev.code == ev.awt.VK_SPACE) {
 		    if(sel != null) {
 				// shift+space toggles notify checkbox
-				if (ev.isShiftDown())
+				if (ev.awt.isShiftDown())
 					sel.conf.notify = !sel.conf.notify;
 				// space toggles display checkbox
 				else

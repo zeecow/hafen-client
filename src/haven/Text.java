@@ -29,8 +29,8 @@ package haven;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
-import java.util.*;
-import java.util.function.*;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 public class Text implements Disposable {
     public static final Font serif = new Font("Serif", Font.PLAIN, 10);

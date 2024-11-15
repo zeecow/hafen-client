@@ -26,8 +26,8 @@
 
 package haven;
 
-import java.awt.Color;
-import java.awt.Font;
+import java.awt.*;
+
 import static java.lang.Math.PI;
 
 public class FlowerMenu extends Widget {
@@ -81,9 +81,9 @@ public class FlowerMenu extends Widget {
 	    g.image(text.tex(), sz.div(2).sub(text.sz().div(2)));
 	}
 
-	public boolean mousedown(Coord c, int button) {
-		mouseDownButton = button;
-		if (button==2 && ZeeManagerItems.isFlowerMenuFromWItem()){
+	public boolean mousedown(MouseDownEvent ev) {
+		mouseDownButton = ev.b;
+		if (ev.b==2 && ZeeManagerItems.isFlowerMenuFromWItem()){
 			ZeeManagerItems.showWindowClickAllItemPetals(this.name);
 			return false;
 		}
@@ -238,12 +238,13 @@ public class FlowerMenu extends Widget {
     }
 
 	@Override
-	public boolean mouseup(Coord c, int button) {
+	public boolean mouseup(MouseUpEvent ev) {
+		// TODO fix
 		// activate menu on mouseup
-		if (button==3) {
+		if (ev.b==3) {
 			// avoid clicking during menu animation
 			if (ZeeThread.now() - ZeeManagerGobs.lastClickMouseDownMs > 500) { //500ms
-				return mousedown(c, button);
+				return mousedown(new MouseDownEvent(ev.c,ev.b));
 			}
 		}
 		return false;
