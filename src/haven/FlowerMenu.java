@@ -27,7 +27,7 @@
 package haven;
 
 import java.awt.Color;
-
+import java.awt.Font;
 import static java.lang.Math.PI;
 
 public class FlowerMenu extends Widget {
@@ -229,10 +229,10 @@ public class FlowerMenu extends Widget {
 	new Opening().ntick(0);
     }
 
-    public boolean mousedown(Coord c, int button) {
+    public boolean mousedown(MouseDownEvent ev) {
 	if(!anims.isEmpty())
 	    return(true);
-	if(!super.mousedown(c, button))
+	if(!ev.propagate(this))
 	    choose(null);
 	return(true);
     }
@@ -273,10 +273,9 @@ public class FlowerMenu extends Widget {
 		}
     }
 
-    public boolean keydown(java.awt.event.KeyEvent ev) {
-	char key = ev.getKeyChar();
-	if((key >= '0') && (key <= '9')) {
-	    int opt = (key == '0')?10:(key - '1');
+    public boolean keydown(KeyDownEvent ev) {
+	if((ev.c >= '0') && (ev.c <= '9')) {
+	    int opt = (ev.c == '0') ? 9 : (ev.c - '1');
 	    if(opt < opts.length) {
 		choose(opts[opt]);
 		ZeeManagerStockpile.checkChoosenPetal(opts[opt].name);
@@ -288,7 +287,7 @@ public class FlowerMenu extends Widget {
 	    kg.remove();
 	    return(true);
 	}
-	return(false);
+	return(super.keydown(ev));
     }
 
     public void choose(Petal option) {

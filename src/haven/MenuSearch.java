@@ -22,7 +22,7 @@ public class MenuSearch extends Window {
 	private Result(PagButton btn) {
 	    this.btn = btn;
 	}
-	}
+    }
 
     private static final Text.Foundry elf = CharWnd.attrf;
     private static final int elh = elf.height() + UI.scale(2);
@@ -44,26 +44,26 @@ public class MenuSearch extends Window {
 			    }, Coord.z);
 		    }
 
-			public boolean mouseup(Coord c, int button) {
-				super.mouseup(c, button);
+			/*private double lastcl = 0;
+			@Override public boolean mousedown(MouseDownEvent ev) {
+				boolean psel = sel == item;
+				super.mousedown(ev);
+				double now = Utils.rtime();
+				if(psel) {
+					if(now - lastcl < 0.5)
+						menu.use(item.btn, new MenuGrid.Interaction(1, ui.modflags()), false);
+				}
+				lastcl = now;
+				return(true);
+			}*/
+
+			@Override public boolean mouseup(MouseUpEvent ev) {
+				super.mouseup(ev);
 				//list.change(item);
 				menu.use(item.btn, new MenuGrid.Interaction(1, ui.modflags()), false);
 				MenuSearch.this.wdgmsg("close");
 				return(true);
 			}
-
-//		    private double lastcl = 0;
-//		    public boolean mousedown(Coord c, int button) {
-//			boolean psel = sel == item;
-//			super.mousedown(c, button);
-//			double now = Utils.rtime();
-//			if(psel) {
-//			    if(now - lastcl < 0.5)
-//				menu.use(item.btn, new MenuGrid.Interaction(1, ui.modflags()), false);
-//			}
-//			lastcl = now;
-//			return(true);
-//		    }
 		});
 	}
     }
@@ -167,8 +167,8 @@ public class MenuSearch extends Window {
 	super.tick(dt);
     }
 
-    public boolean keydown(KeyEvent ev) {
-	if(ev.getKeyCode() == KeyEvent.VK_DOWN) {
+    public boolean keydown(KeyDownEvent ev) {
+	if(ev.code == ev.awt.VK_DOWN) {
 	    int idx = filtered.indexOf(rls.sel);
 	    if((idx >= 0) && (idx < filtered.size() - 1)) {
 		idx++;
@@ -176,7 +176,7 @@ public class MenuSearch extends Window {
 		rls.display(idx);
 	    }
 	    return(true);
-	} else if(ev.getKeyCode() == KeyEvent.VK_UP) {
+	} else if(ev.code == ev.awt.VK_UP) {
 	    int idx = filtered.indexOf(rls.sel);
 	    if(idx > 0) {
 		idx--;

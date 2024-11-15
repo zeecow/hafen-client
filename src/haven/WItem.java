@@ -210,64 +210,61 @@ public class WItem extends Widget implements DTarget {
 	}
     }
 
-	@Override
-	public boolean mouseup(Coord c, int btn) {
-		boolean isReallyWItem = this.getClass().getSimpleName().contentEquals("WItem");
-		if (isReallyWItem){
-			ZeeManagerItems.lastItemClickedMs = ZeeThread.now();
-			ZeeManagerItems.lastItemClicked = this;
-			ZeeManagerItems.lastItemClickedButton = btn;
-		}
-		// ignore calls by other classes other than WItem
-		if (btn == 2 && isReallyWItem) {
-			ZeeManagerItems.clickEndMs = System.currentTimeMillis();
-			new ZeeManagerItems(this,c).start();
-			return false;
-		}
-		if (btn==3 && ui.modshift && ZeeConfig.farmerMode) {
-			ZeeConfig.println("> disabling farmer mode, start with harvesting instead of planting");
-		}
-		return super.mouseup(c, btn);
+    public boolean mousedown(MouseDownEvent ev) {
+	// middle-click item starts equipManager
+	if(ev.b == 2) {
+		ZeeManagerItems.clickStartMs = System.currentTimeMillis();
+		return false;
 	}
-
-    public boolean mousedown(Coord c, int btn) {
-
-		// middle-click item starts equipManager
-		if(btn == 2) {
-			ZeeManagerItems.clickStartMs = System.currentTimeMillis();
+	// sort transfer
+	if(ui.modmeta && !ui.modshift && !ui.modctrl && !item.res.get().basename().contains("gemstone")){
+		if(ev.b==1) {
+			wdgmsg("transfer-sort", item, false);
+		}else if(ev.b==3) {
+			wdgmsg("transfer-sort", item, true);
+		}else {
 			return false;
 		}
-
-		// sort transfer
-		if(ui.modmeta && !ui.modshift && !ui.modctrl && !item.res.get().basename().contains("gemstone")){
-			if(btn==1) {
-				wdgmsg("transfer-sort", item, false);
-			}else if(btn==3) {
-				wdgmsg("transfer-sort", item, true);
-			}else {
-				return false;
-			}
-			return true;
-		}
-
-		if(btn == 1) {
-			if(ui.modshift) {
+		return true;
+	}
+	// default
+	if(ev.b == 1) {
+		if(ui.modshift) {
 			int n = ui.modctrl ? -1 : 1;
-			item.wdgmsg("transfer", c, n);
-			} else if(ui.modctrl) {
+			item.wdgmsg("transfer", ev.c, n);
+		} else if(ui.modctrl) {
 			int n = ui.modmeta ? -1 : 1;
-			item.wdgmsg("drop", c, n);
-			} else {
-			item.wdgmsg("take", c);
-			}
-			return(true);
-		} else if(btn == 3) {
-			item.wdgmsg("iact", c, ui.modflags());
-			return(true);
+			item.wdgmsg("drop", ev.c, n);
+		} else {
+			item.wdgmsg("take", ev.c);
 		}
-
-		return(false);
+		return(true);
+	} else if(ev.b == 3) {
+		item.wdgmsg("iact", ev.c, ui.modflags());
+		return(true);
+	}
+	return(super.mousedown(ev));
     }
+
+	@Override
+	public boolean mouseup(MouseUpEvent ev) {
+	boolean isReallyWItem = this.getClass().getSimpleName().contentEquals("WItem");
+	if (isReallyWItem){
+		ZeeManagerItems.lastItemClickedMs = ZeeThread.now();
+		ZeeManagerItems.lastItemClicked = this;
+		ZeeManagerItems.lastItemClickedButton = ev.b;
+	}
+	// ignore calls by other classes other than WItem
+	if (ev.b == 2 && isReallyWItem) {
+		ZeeManagerItems.clickEndMs = System.currentTimeMillis();
+		new ZeeManagerItems(this,c).start();
+		return false;
+	}
+	if (ev.b==3 && ui.modshift && ZeeConfig.farmerMode) {
+		ZeeConfig.println("> disabling farmer mode, start with harvesting instead of planting");
+	}
+	return super.mouseup(ev);
+	}
 
     public boolean drop(Coord cc, Coord ul) {
 	return(false);
@@ -278,16 +275,15 @@ public class WItem extends Widget implements DTarget {
 	return(true);
     }
 
-	public boolean mousehover(Coord c, boolean on) {
-		boolean ret = super.mousehover(c, on);
-		if(on && (item.contents != null)) {
-			item.hovering(this);
-			return(true);
-		}
-		return(ret);
+    public boolean mousehover(MouseHoverEvent ev, boolean on) {
+	if(on && (item.contents != null)) {
+	    item.hovering(this);
+	    return(true);
 	}
+	return(super.mousehover(ev, on));
+    }
 
 	public Coord getInvSlotCoord() {
-		return c.div(33);
+	return c.div(33);
 	}
 }

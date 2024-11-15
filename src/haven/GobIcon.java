@@ -785,8 +785,8 @@ public class GobIcon extends GAttrib {
 		}
 		}
 
-	    public boolean keydown(java.awt.event.KeyEvent ev) {
-		if(ev.getKeyCode() == java.awt.event.KeyEvent.VK_SPACE) {
+	    public boolean keydown(KeyDownEvent ev) {
+		if(ev.code == ev.awt.VK_SPACE) {
 		    if(sel != null) {
 				// shift+space toggles notify checkbox
 				if (ev.isShiftDown())

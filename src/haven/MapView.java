@@ -79,7 +79,7 @@ public class MapView extends PView implements DTarget, Console.Directory {
 	    resized();
 	}
 
-	public boolean keydown(KeyEvent ev) {
+	public boolean keydown(KeyDownEvent ev) {
 	    return(false);
 	}
 
@@ -508,26 +508,25 @@ public class MapView extends PView implements DTarget, Console.Directory {
 	    return(true);
 	}
 
-	public boolean keydown(KeyEvent ev) {
+	public boolean keydown(KeyDownEvent ev) {
 		// disable arrow keys for use in ZeeConfig.checkKeyPressed()
-//	    if(kb_camleft.key().match(ev)) {
-//		tangl = (float)(Math.PI * 0.5 * (Math.floor((tangl / (Math.PI * 0.5)) - 0.51) + 0.5));
-//		return(true);
-//	    } else if(kb_camright.key().match(ev)) {
-//		tangl = (float)(Math.PI * 0.5 * (Math.floor((tangl / (Math.PI * 0.5)) + 0.51) + 0.5));
-//		return(true);
-//	    } else if(kb_camin.key().match(ev)) {
-//		chfield(tfield - 50);
-//		return(false);
-//	    } else if(kb_camout.key().match(ev)) {
-//		chfield(tfield + 50);
-//		return(false);
-//	    } else
-//		if(kb_camreset.key().match(ev)) {
-//		tangl = angl + (float)Utils.cangle(-(float)Math.PI * 0.25f - angl);
-//		chfield((float)(100 * Math.sqrt(2)));
-//		return(true);
-//	    }
+	    /*if(kb_camleft.key().match(ev)) {
+		tangl = (float)(Math.PI * 0.5 * (Math.floor((tangl / (Math.PI * 0.5)) - 0.51) + 0.5));
+		return(true);
+	    } else if(kb_camright.key().match(ev)) {
+		tangl = (float)(Math.PI * 0.5 * (Math.floor((tangl / (Math.PI * 0.5)) + 0.51) + 0.5));
+		return(true);
+	    } else if(kb_camin.key().match(ev)) {
+		chfield(tfield - 50);
+		return(true);
+	    } else if(kb_camout.key().match(ev)) {
+		chfield(tfield + 50);
+		return(true);
+	    } else if(kb_camreset.key().match(ev)) {
+		tangl = angl + (float)Utils.cangle(-(float)Math.PI * 0.25f - angl);
+		chfield((float)(100 * Math.sqrt(2)));
+		return(true);
+	    }*/
 	    return(false);
 	}
     }
@@ -2079,15 +2078,15 @@ public class MapView extends PView implements DTarget, Console.Directory {
     
     private UI.Grab camdrag = null;
 
-    public boolean mousedown(Coord c, int button) {
+    public boolean mousedown(MouseDownEvent ev) {
 	parent.setfocus(this);
 	Loader.Future<Plob> placing_l = this.placing;
 	ZeeManagerGobs.lastClickMouseUpMs = 0;
 	ZeeManagerGobs.lastClickMouseDownMs = System.currentTimeMillis();
-	ZeeManagerGobs.lastClickMouseButton = button;
+	ZeeManagerGobs.lastClickMouseButton = ev.b;
 	leftClickDragging = false;
-	if(button == 2) {
-	    if((camdrag == null) && ((Camera)camera).click(c)) {
+	if(ev.b == 2) {
+	    if((camdrag == null) && camera.click(ev.c)) {
 		camdrag = ui.grabmouse(this);
 		ZeeManagerGobs.camAngleStart = camera.angle();
 		new ZeeThread(){
@@ -2105,7 +2104,7 @@ public class MapView extends PView implements DTarget, Console.Directory {
 						// short click
 						if (ZeeManagerGobs.lastClickMouseUpMs > ZeeManagerGobs.lastClickMouseDownMs) {
 							//ZeeConfig.println("short click ");
-							new Click(c, button).run();
+							new Click(ev.c, ev.b).run();
 							return;
 						}
 					} catch (InterruptedException e) {
@@ -2123,7 +2122,7 @@ public class MapView extends PView implements DTarget, Console.Directory {
 					}
 					ZeeManagerGobs.lastClickMouseUpMs = ZeeThread.now();
 					//start midclick gob manager at Click.hit()
-					new Click(c, button).run();
+					new Click(ev.c, ev.b).run();
 				}
 			}
 		}.start();
@@ -2131,51 +2130,51 @@ public class MapView extends PView implements DTarget, Console.Directory {
 	} else if((placing_l != null) && placing_l.done()) {
 	    Plob placing = placing_l.get();
 	    if(placing.lastmc != null)
-		wdgmsg("place", placing.rc.floor(posres), (int)Math.round(placing.a * 32768 / Math.PI), button, ui.modflags());
-	} else if((grab != null) && grab.mmousedown(c, button)) {
+		wdgmsg("place", placing.rc.floor(posres), (int)Math.round(placing.a * 32768 / Math.PI), ev.b, ui.modflags());
+	} else if((grab != null) && grab.mmousedown(ev.c, ev.b)) {
 	}
 	// left-click drags camera until mouseup()
-	else if(button==1) {
+	else if(ev.b==1) {
 		if(((Camera)camera).click(c)) {
-			new Click(c, button).run();//Click.hit()
+			new Click(ev.c, ev.b).run();//Click.hit()
 			// lclick starts dragging camera
 			camdrag = ui.grabmouse(MapView.this);
 			//ZeeConfig.println("mousedown >  grabmouse btn1");
 		}
 	}
 	else {
-	    new Click(c, button).run();
+	    new Click(ev.c, ev.b).run();
 	}
 	return(true);
     }
 
 	static boolean leftClickDragging = false;
-    public void mousemove(Coord c) {
+    public void mousemove(MouseMoveEvent ev) {
 	if (ZeeManagerGobs.isRightClickZooming){
 		ZeeManagerGobs.rightClickZoom(c);
 	}
 	if(grab != null)
-	    grab.mmousemove(c);
+	    grab.mmousemove(ev.c);
 	Loader.Future<Plob> placing_l = this.placing;
-	if( camdrag != null ) {
+	if(camdrag != null) {
 		if ( ZeeManagerGobs.lastClickMouseButton == 2 ) {
-			((Camera) camera).drag(c);
+			((Camera) camera).drag(ev.c);
 		}
 		// already left-click dragging
 		else if ( leftClickDragging ) {
-			((Camera) camera).drag(c);
+			((Camera) camera).drag(ev.c);
 		}
 		// start left-click dragging if enough time elapsed
 		else if (ZeeManagerGobs.lastClickMouseDownMs > ZeeManagerGobs.lastClickMouseUpMs &&
 				System.currentTimeMillis() - ZeeManagerGobs.lastClickMouseDownMs > 200)
 		{
 			leftClickDragging = true;//save some calcs
-			((Camera) camera).drag(c);
+			((Camera) camera).drag(ev.c);
 		}
 	} else if((placing_l != null) && placing_l.done()) {
 	    Plob placing = placing_l.get();
-	    if((placing.lastmc == null) || !placing.lastmc.equals(c)) {
-		placing.new Adjust(c, ui.modflags()).run();
+	    if((placing.lastmc == null) || !placing.lastmc.equals(ev.c)) {
+		placing.new Adjust(ev.c, ui.modflags()).run();
 	    }
 	}
 	if (ZeeConfig.showInspectTooltip){
@@ -2183,13 +2182,13 @@ public class MapView extends PView implements DTarget, Console.Directory {
 	}
     }
     
-    public boolean mouseup(Coord c, int button) {
+    public boolean mouseup(MouseUpEvent ev) {
 	ZeeManagerGobs.lastClickMouseUpMs = System.currentTimeMillis();
-	ZeeManagerGobs.lastClickMouseButton = button;
-	if (button == 3)
+	ZeeManagerGobs.lastClickMouseButton = ev.b;
+	if (ev.b == 3)
 		ZeeManagerGobs.isRightClickZooming = false;
 	// stop left-click camera drag
-	if (button==1){
+	if (ev.b == 1){
 		leftClickDragging = false;
 		if (camdrag!=null) {
 			camera.release();
@@ -2198,31 +2197,31 @@ public class MapView extends PView implements DTarget, Console.Directory {
 			//ZeeConfig.println("mouseup btn1 release");
 		}
 		else if(grab != null) {
-			grab.mmouseup(c, button);
+			grab.mmouseup(ev.c, ev.b);
 		}
 	}
-	else if(button == 2) {
+	else if(ev.b == 2) {
 	    if(camdrag != null) {
 		camera.release();
 		camdrag.remove();
 		camdrag = null;
 	    }
 	} else if(grab != null) {
-	    grab.mmouseup(c, button);
+	    grab.mmouseup(ev.c, ev.b);
 	}
 	return(true);
     }
 
-    public boolean mousewheel(Coord c, int amount) {
+    public boolean mousewheel(MouseWheelEvent ev) {
 	Loader.Future<Plob> placing_l = this.placing;
-	if((grab != null) && grab.mmousewheel(c, amount))
+	if((grab != null) && grab.mmousewheel(ev.c, ev.a))
 	    return(true);
 	if((placing_l != null) && placing_l.done()) {
 	    Plob placing = placing_l.get();
-	    if(placing.adjust.rotate(placing, amount, ui.modflags()))
+	    if(placing.adjust.rotate(placing, ev.a, ui.modflags()))
 		return(true);
 	}
-	return(((Camera)camera).wheel(c, amount));
+	return(camera.wheel(ev.c, ev.a));
     }
     
     public boolean drop(final Coord cc, Coord ul) {
@@ -2248,13 +2247,13 @@ public class MapView extends PView implements DTarget, Console.Directory {
 	return(true);
     }
 
-    public boolean keydown(KeyEvent ev) {
+    public boolean keydown(KeyDownEvent ev) {
 	Loader.Future<Plob> placing_l = this.placing;
 	if((placing_l != null) && placing_l.done()) {
 	    Plob placing = placing_l.get();
-	    if((ev.getKeyCode() == KeyEvent.VK_LEFT) && placing.adjust.rotate(placing, -1, ui.modflags()))
+	    if((ev.code == KeyEvent.VK_LEFT) && placing.adjust.rotate(placing, -1, ui.modflags()))
 		return(true);
-	    if((ev.getKeyCode() == KeyEvent.VK_RIGHT) && placing.adjust.rotate(placing, 1, ui.modflags()))
+	    if((ev.code == KeyEvent.VK_RIGHT) && placing.adjust.rotate(placing, 1, ui.modflags()))
 		return(true);
 	}
 	if(camera.keydown(ev))
@@ -2263,12 +2262,12 @@ public class MapView extends PView implements DTarget, Console.Directory {
     }
 
     public static final KeyBinding kb_grid = KeyBinding.get("grid", KeyMatch.forchar('G', KeyMatch.C));
-    public boolean globtype(char c, KeyEvent ev) {
+    public boolean globtype(GlobKeyEvent ev) {
 	if(kb_grid.key().match(ev)) {
 	    showgrid(gridlines == null);
 	    return(true);
 	}
-	return(false);
+	return(super.globtype(ev));
     }
 
     public Object tooltip(Coord c, Widget prev) {
