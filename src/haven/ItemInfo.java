@@ -49,6 +49,7 @@ public abstract class ItemInfo {
     }
 
     public static class Raw {
+	public static final Raw nil = new Raw(new Object[0], 0);
 	public final Object[] data;
 	public final double time;
 
@@ -103,23 +104,38 @@ public abstract class ItemInfo {
     }
 
     public static class Layout {
-	private final List<Tip> tips = new ArrayList<Tip>();
-	private final Map<ID, Tip> itab = new HashMap<ID, Tip>();
+	public final Owner owner;
 	public final CompImage cmp = new CompImage();
 	public int width = 0;
+	private final List<Tip> tips = new ArrayList<>();
+	private final Map<TipID, Tip> itab = new HashMap<>();
 
-	public interface ID<T extends Tip> {
+	public Layout(Owner owner) {
+	    this.owner = owner;
+	}
+
+	public interface TipID<T extends Tip> {
+	    public T make(Owner owner);
+	}
+
+	@Deprecated
+	public interface ID<T extends Tip> extends TipID<T> {
 	    public T make();
+	    public default T make(Owner owner) {return(make());}
 	}
 
 	@SuppressWarnings("unchecked")
-	public <T extends Tip> T intern(ID<T> id) {
+	public <T extends Tip> T intern(TipID<T> id) {
 	    T ret = (T)itab.get(id);
 	    if(ret == null) {
-		itab.put(id, ret = id.make());
+		itab.put(id, ret = id.make(owner));
 		add(ret);
 	    }
 	    return(ret);
+	}
+
+	public <T extends Tip> T intern(ID<T> id) {
+	    return(intern((TipID<T>)id));
 	}
 
 	public void add(Tip tip) {
@@ -314,25 +330,13 @@ public abstract class ItemInfo {
     }
 
     public static BufferedImage longtip(List<ItemInfo> info) {
-	Layout l = new Layout();
+	if(info.isEmpty())
+	    return(null);
+	Layout l = new Layout(info.get(0).owner);
 	for(ItemInfo ii : info) {
 	    if(ii instanceof Tip) {
 		Tip tip = (Tip)ii;
 		l.add(tip);
-	    }
-	}
-	if(l.tips.size() < 1)
-	    return(null);
-	return(l.render());
-    }
-
-    public static BufferedImage shorttip(List<ItemInfo> info) {
-	Layout l = new Layout();
-	for(ItemInfo ii : info) {
-	    if(ii instanceof Tip) {
-		Tip tip = ((Tip)ii).shortvar();
-		if(tip != null)
-		    l.add(tip);
 	    }
 	}
 	if(l.tips.size() < 1)
@@ -344,6 +348,18 @@ public abstract class ItemInfo {
 			l.add(new AdHoc(gitem, "[shift for help]"));
 	}
 	return(l.render());
+    }
+
+    public static BufferedImage shorttip(List<ItemInfo> info) {
+	List<ItemInfo> sinfo = new ArrayList<>();
+	for(ItemInfo ii : info) {
+	    if(ii instanceof Tip) {
+		Tip tip = ((Tip)ii).shortvar();
+		if(tip != null)
+		    sinfo.add(tip);
+	    }
+	}
+	return(longtip(sinfo));
     }
 
     public static <T> T find(Class<T> cl, List<ItemInfo> il) {
