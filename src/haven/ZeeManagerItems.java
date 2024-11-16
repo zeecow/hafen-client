@@ -1624,6 +1624,20 @@ public class ZeeManagerItems extends ZeeThread{
         return null;
     }
 
+    public static List<WItem> getEquippedItemsNameEndsWith(String ... nameEndsWith) {
+        WItem[] items = getEquipory().children(WItem.class).toArray(new WItem[]{});
+        List<WItem> ret = new ArrayList<>();
+        for (int i = 0; i < items.length; i++) {
+            for (String name : nameEndsWith) {
+                if (items[i].item.getres().name.endsWith(name)){
+                    ret.add(items[i]);
+                    break;
+                }
+            }
+        }
+        return ret;
+    }
+
     public static boolean isItemInHandSlot(String nameContains){
         try {
             /*
@@ -1849,14 +1863,10 @@ public class ZeeManagerItems extends ZeeThread{
                         WItem invItems[] = inv.children(WItem.class).toArray(WItem[]::new);
                         for (int i = 0; i < invItems.length; i++) {
                             String name = invItems[i].item.getres().basename();
-                            String contents;
                             if (isItemDrinkingVessel(name)) {
-                                // "3.00 l of Water"
-                                contents = getItemContentsName(invItems[i]);
+                                String contents = getItemContentsName(invItems[i]);// "3.00 l of Water"
                                 if (contents.contains("Water")) {
-                                    //println("drink inv " + contents);
                                     if (clickItemPetal(invItems[i], "Drink")) {
-                                        //ZeeManagerItemClick.waitPlayerPoseNotInList(ZeeConfig.POSE_PLAYER_DRINK);
                                         drank = true;
                                         break;
                                     }
@@ -1865,21 +1875,18 @@ public class ZeeManagerItems extends ZeeThread{
                         }
                     }
 
-                    // drink form hands (bucket?)
+                    // drink from equips
                     if (!drank) {
-                        WItem w = null;
-                        if (getLeftHandName().contains("bucket-water") || getLeftHandName().contains("bucket-tea"))
-                            w = getLeftHand();
-                        else if (getRightHandName().contains("bucket-water") || getRightHandName().contains("bucket-tea"))
-                            w = getRightHand();
-                        if (w != null) {
-                            //println("drink bucket " + getItemContentsName(w));
-                            if (clickItemPetal(w, "Drink")) {
-                                //ZeeManagerItemClick.waitPlayerPoseNotInList(ZeeConfig.POSE_PLAYER_DRINK);
-                                drank = true;
+                        List<WItem> items = getEquippedItemsNameEndsWith("bucket-water", "bucket-tea", "waterskin");
+                        for (WItem item : items) {
+                            String contents = getItemContentsName(item);// "3.00 l of Water"
+                            if (contents.contains("of Water")) {
+                                if (clickItemPetal(item, "Drink")) {
+                                    drank = true;
+                                    break;
+                                }
                             }
-                        }else
-                            println("bucket hand null");
+                        }
                     }
 
                     // if shift down drink 1 gulp and click target coord again

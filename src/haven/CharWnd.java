@@ -29,6 +29,7 @@ package haven;
 import java.awt.*;
 import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.List;
 
 import static haven.PUtils.BlurFurn;
 import static haven.PUtils.TexFurn;
