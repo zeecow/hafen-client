@@ -286,6 +286,7 @@ public class ZeeConfig {
     public static boolean showGobRadar = Utils.getprefb("showGobRadar",false);
     static boolean autocloseXpWindow = Utils.getprefb("autocloseXpWindow",true);
     static boolean isBuildAndDrink = Utils.getprefb("isBuildAndDrink",true);
+    static boolean leftClickDragCamera = Utils.getprefb("leftClickDragCamera",false);
     static boolean isPlayerFollowingCauldron = false;
     static List<Gob> listCauldronContainers = null;
 

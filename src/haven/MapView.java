@@ -2137,7 +2137,7 @@ public class MapView extends PView implements DTarget, Console.Directory {
 	} else if((grab != null) && grab.mmousedown(ev.c, ev.b)) {
 	}
 	// left-click drags camera until mouseup()
-	else if(ev.b==1) {
+	else if(ZeeConfig.leftClickDragCamera && ev.b==1) {
 		if(camera.click(ev.c)) {
 			new Click(ev.c, ev.b).run();//Click.hit()
 			// lclick starts dragging camera

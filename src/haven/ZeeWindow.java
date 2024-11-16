@@ -27,9 +27,10 @@ public class ZeeWindow extends Window {
             return;
         if (ZeeConfig.gameUI==null || ZeeConfig.gameUI.ui==null)
             return;
-        if (ZeeThread.getFlowerMenu() != null) // mousedown witem, mouseup inv
+        // avoid transfers and stacking operations
+        if(ZeeConfig.gameUI.ui.modmeta || ZeeConfig.gameUI.ui.modshift || ZeeConfig.gameUI.ui.modctrl)
             return;
-        if(ZeeConfig.gameUI.ui.modmeta) // avoid alt clicks (transfers)
+        if (ZeeThread.getFlowerMenu() != null) // mousedown witem, mouseup inv
             return;
         if (widget instanceof Window.DefaultDeco && !isLastWidgetWItem) {
             Window win = (Window) widget.parent;

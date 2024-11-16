@@ -97,6 +97,8 @@ public class ZeeOptionsJFrame extends JFrame {
         // confirm petal "Eat" reducing Food Efficacy (energy>80%)
         panelTabControls.add(new ZeeOptionJCheckBox("Ctrl confirm petal Eat","confirmPetalEat"),c);
 
+        panelTabControls.add(new ZeeOptionJCheckBox("Left click drag camera","leftClickDragCamera"),c);
+
         //confirm petal list
         panelTabControls.add(new ZeeOptionJCheckBox( "Ctrl+click confirm petal:", "confirmPetal"),c);
         panelTabControls.add(tfConfirmPetal= new JTextField("",5), c);
@@ -705,6 +707,7 @@ public class ZeeOptionsJFrame extends JFrame {
 
         //subtab gobs session list
         if(ZeeConfig.listGobsSession.size() > 0) {
+            Collections.sort(ZeeConfig.listGobsSession);
             listGobsTemp = new JList<String>( ZeeConfig.listGobsSession.toArray(new String[0]));
         }else {
             listGobsTemp = new JList<String>();
