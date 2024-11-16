@@ -1342,7 +1342,7 @@ public class Widget {
 
     public boolean mousedown(MouseDownEvent ev) {return(false);}
     public boolean mouseup(MouseUpEvent ev) {
-		ZeeWindow.checkCloseWinDFStyle(this,ev.b);
+		ZeeWindow.checkCloseWinDFStyle(this,ev);
 		return(false);
 	}
     public boolean mousewheel(MouseWheelEvent ev) {return(false);}

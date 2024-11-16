@@ -22,10 +22,14 @@ public class ZeeWindow extends Window {
     }
 
     static boolean isLastWidgetWItem;//TODO better way?
-    public static void checkCloseWinDFStyle(Widget widget, int button) {
-        if (ZeeConfig.gameUI.ui.modmeta) // avoid alt clicks (transfers)
+    public static void checkCloseWinDFStyle(Widget widget, MouseUpEvent ev) {
+        if (ev.b != 3)
             return;
-        if (button!=3)
+        if (ZeeConfig.gameUI==null || ZeeConfig.gameUI.ui==null)
+            return;
+        if (ZeeThread.getFlowerMenu() != null) // mousedown witem, mouseup inv
+            return;
+        if(ZeeConfig.gameUI.ui.modmeta) // avoid alt clicks (transfers)
             return;
         if (widget instanceof Window.DefaultDeco && !isLastWidgetWItem) {
             Window win = (Window) widget.parent;
@@ -52,35 +56,35 @@ public class ZeeWindow extends Window {
             this.settip("scroll values, press enter");
         }
         abstract void onEnterPressed(String text);
-        public boolean mouseup(Coord c, int button) {
+        public boolean mouseup(MouseUpEvent ev) {
             hasfocus = true;
-            return super.mouseup(c, button);
+            return super.mouseup(ev);
         }
-        public boolean keydown(KeyEvent e) {
+        public boolean keydown(KeyDownEvent ev) {
             if(!hasfocus)
                 return false;
-            if (ZeeConfig.isControlKey(e.getKeyCode()))
+            if (ZeeConfig.isControlKey(ev.awt.getKeyCode()))
                 return false;
-            return super.keydown(e);
+            return super.keydown(ev);
         }
-        public boolean keyup(KeyEvent e) {
+        public boolean keyup(KeyUpEvent ev) {
             if (!hasfocus)
                 return false;
-            if (e.getKeyCode()==KeyEvent.VK_ENTER) {
+            if (ev.awt.getKeyCode()==KeyEvent.VK_ENTER) {
                 if (!buf.line().isEmpty()) {
                     ZeeManagerItems.playFeedbackSound();
                     this.onEnterPressed(buf.line());
                 }
                 this.hasfocus = false;
-                return super.keydown(e);
+                return super.keyup(ev);
             }
-            if (!ZeeConfig.isControlKey(e.getKeyCode()))
+            if (!ZeeConfig.isControlKey(ev.awt.getKeyCode()))
                 return false;
-            return super.keydown(e);
+            return super.keyup(ev);
         }
-        public boolean mousewheel(Coord c, int amount) {
+        public boolean mousewheel(MouseWheelEvent ev) {
             if (text().chars().allMatch(Character::isDigit) ) {
-                settext(getTextEntryNextScrollNumber(text(), amount, 0, Integer.MAX_VALUE));
+                settext(getTextEntryNextScrollNumber(text(), ev.a, 0, Integer.MAX_VALUE));
                 ZeeManagerItems.playFeedbackSound();
                 if (!hasfocus) {
                     //ZeeConfig.println("set focus");

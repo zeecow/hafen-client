@@ -1590,8 +1590,9 @@ public class ZeeManagerGobs extends ZeeThread{
         else
             gobAutoLabel = null;
 
+        //TODO remove?
         // zoom if player gob
-        startRightClickZooming(gob, pc);
+        // startRightClickZooming(gob, pc);
 
         // bugCollectionAuto label bug containers and wood pile
         if (ZeeManagerCraft.bugColRecipeOpen && !ZeeManagerCraft.bugColBusy){

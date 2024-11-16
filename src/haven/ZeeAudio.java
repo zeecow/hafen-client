@@ -383,10 +383,10 @@ public class ZeeAudio extends Thread{
         public void wdgmsg(String msg, Object... args){}
         public void wdgmsg(Widget sender, String msg, Object... args){}
         // play on mouse up
-        public boolean mouseup(Coord c, int button) {
+        public boolean mouseup(MouseUpEvent ev) {
             try {
                 //play audio
-                if (button == 1) {
+                if (ev.b == 1) {
                     String id = "cl";// TODO add others?
                     List<Audio.Clip> clips = AudioSprite.clips(Resource.remote().loadwait(resname), id);
                     if (subClip !=null) {
@@ -397,7 +397,7 @@ public class ZeeAudio extends Thread{
                     }
                 }
                 // toggle filter audio
-                else if (button == 2) {
+                else if (ev.b == 2) {
                     isBlocking = !isBlocking;
                     // update buttons colors
                     if (isBlocking)
@@ -455,7 +455,7 @@ public class ZeeAudio extends Thread{
             }catch (Exception e){
                 e.printStackTrace();
             }
-            return super.mouseup(c,button);
+            return super.mouseup(ev);
         }
         public void shake() {
             if (this.anims.isEmpty())

@@ -57,7 +57,6 @@ public class FlowerMenu extends Widget {
 	public int num;
 	private Text text;
 	private double a = 1;
-	int mouseDownButton = -1;
 
 	public Petal(String name) {
 	    super(Coord.z);
@@ -81,8 +80,7 @@ public class FlowerMenu extends Widget {
 	    g.image(text.tex(), sz.div(2).sub(text.sz().div(2)));
 	}
 
-	public boolean mousedown(MouseDownEvent ev) {
-		mouseDownButton = ev.b;
+	/*public boolean mousedown(MouseDownEvent ev) {
 		if (ev.b==2 && ZeeManagerItems.isFlowerMenuFromWItem()){
 			ZeeManagerItems.showWindowClickAllItemPetals(this.name);
 			return false;
@@ -92,20 +90,25 @@ public class FlowerMenu extends Widget {
 		ZeeQuickOptionsWindow.updatePetalWidget(this.name);
 		ZeeManagerGobs.labelHarvestedPlant(this.name);
 	    return(true);
+	}*/
+
+	@Override
+	public boolean mousedown(MouseDownEvent ev) {
+		return true;
 	}
 
-		@Override
-		public boolean mouseup(MouseUpEvent ev) {
-			// activate menu on mouseup
-			if (ev.b==3 || ev.b==2) {
-				// avoid clicking during menu animation
-				if (ZeeThread.now() - ZeeManagerGobs.lastClickMouseDownMs > 500) { //500ms
-					choose(this);
-					return true;
-				}
-			}
-			return false;
+	@Override
+	public boolean mouseup(MouseUpEvent ev) {
+		// avoid clicking during menu animation
+		if (ZeeThread.now() - ZeeManagerGobs.lastClickMouseDownMs > 500) { //500ms
+			choose(this);
+			ZeeManagerStockpile.checkChoosenPetal(this.name);
+			ZeeQuickOptionsWindow.updatePetalWidget(this.name);
+			ZeeManagerGobs.labelHarvestedPlant(this.name);
+			return true;
 		}
+		return super.mouseup(ev);
+	}
 
 	public Area ta(Coord tc) {
 	    return(Area.sized(tc.sub(sz.div(2)), sz));
@@ -242,13 +245,26 @@ public class FlowerMenu extends Widget {
 	new Opening().ntick(0);
     }
 
-    public boolean mousedown(MouseDownEvent ev) {
+    /*public boolean mousedown(MouseDownEvent ev) {
 	if(!anims.isEmpty())
 	    return(true);
 	if(!ev.propagate(this))
 	    choose(null);
 	return(true);
-    }
+    }*/
+
+	@Override
+	public boolean mousedown(MouseDownEvent ev) {
+		return true;
+	}
+
+	public boolean mouseup(MouseUpEvent ev) {
+		if(!anims.isEmpty())
+			return(true);
+		if(!ev.propagate(this))
+			choose(null);
+		return(super.mouseup(ev));
+	}
 
 	public void uimsg(String msg, Object... args) {
 	if(msg == "cancel") {

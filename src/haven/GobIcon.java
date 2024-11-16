@@ -732,9 +732,9 @@ public class GobIcon extends GAttrib {
 		    Widget prev;
 		    prev = adda(new CheckBox(""){
 						@Override
-						public boolean mouseup(Coord c, int button) {
-							if (button!=1)
-								return super.mouseup(c, button);
+						public boolean mouseup(MouseUpEvent ev) {
+							if (ev.b!=1)
+								return super.mouseup(ev);
 							if (this.state()){
 								if (icon.conf.resns==null) {
 									// default "Bell 2"
@@ -743,7 +743,7 @@ public class GobIcon extends GAttrib {
 								}
 								list.change(icon);//select icon line
 							}
-							return super.mouseup(c, button);
+							return super.mouseup(ev);
 						}
 					}.state(() -> icon.conf.notify).set(andsave(val -> icon.conf.notify = val)).settip("Notify"),
 				sz.x - UI.scale(2) - (sz.y / 2), sz.y / 2, 0.5, 0.5);
