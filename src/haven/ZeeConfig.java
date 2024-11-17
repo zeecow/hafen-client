@@ -1488,8 +1488,8 @@ public class ZeeConfig {
 
         if (windowTitle.contentEquals("Oven")) {
             window.add(te=new TextEntry(txtsz,"4"){
-                public boolean mousewheel(Coord c, int amount) {
-                    settext(ZeeConfig.getTextEntryNextScrollNumber(text(),amount));
+                public boolean mousewheel(MouseWheelEvent ev) {
+                    settext(ZeeConfig.getTextEntryNextScrollNumber(text(),ev.a));
                     return true;
                 }
             }, 0, y);
@@ -1508,8 +1508,8 @@ public class ZeeConfig {
         }
         else if (windowTitle.contentEquals("Kiln")) {
             window.add(te=new TextEntry(txtsz,"1"){
-                public boolean mousewheel(Coord c, int amount) {
-                    settext(ZeeConfig.getTextEntryNextScrollNumber(text(),amount));
+                public boolean mousewheel(MouseWheelEvent ev) {
+                    settext(ZeeConfig.getTextEntryNextScrollNumber(text(),ev.a));
                     return true;
                 }
             }, 0, y);
@@ -1528,8 +1528,8 @@ public class ZeeConfig {
         }
         else if ( windowTitle.contains("Smelter") ){
             window.add(te=new TextEntry(txtsz,"9"){
-                public boolean mousewheel(Coord c, int amount) {
-                    settext(ZeeConfig.getTextEntryNextScrollNumber(text(),amount));
+                public boolean mousewheel(MouseWheelEvent ev) {
+                    settext(ZeeConfig.getTextEntryNextScrollNumber(text(),ev.a));
                     return true;
                 }
             }, 0, y);
