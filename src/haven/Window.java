@@ -349,7 +349,12 @@ public class Window extends Widget {
 
 	public boolean checkhit(Coord c) {
 	    Coord cpc = c.sub(cptl);
-	    return(ca.contains(c) || (c.isect(cptl, cpsz) && (cm.back.getRaster().getSample(cpc.x % cm.back.getWidth(), cpc.y, 3) >= 128)));
+		try {
+			return (ca.contains(c) || (c.isect(cptl, cpsz) && (cm.back.getRaster().getSample(cpc.x % cm.back.getWidth(), cpc.y, 3) >= 128)));
+		}catch (Exception e){
+			e.printStackTrace();
+		}
+		return false;
 	}
     }
 
