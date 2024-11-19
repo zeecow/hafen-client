@@ -2155,15 +2155,10 @@ public class ZeeManagerGobs extends ZeeThread{
 
     static void toggleAllTreeGrowthTexts() {
         try {
-
-            if (!ZeeConfig.showGrowingTreeScale) {
-                ZeeConfig.msgLow("hide trees growth ");
+            if (ZeeConfig.showGrowingTreeScale) {
+                ZeeConfig.msgLow("show trees growth ");
             } else {
-                ZeeConfig.showAllTreesGrowth = !ZeeConfig.showAllTreesGrowth;
-                if (ZeeConfig.showAllTreesGrowth)
-                    ZeeConfig.msgLow("show growth all trees");
-                else
-                    ZeeConfig.msgLow("show growing trees only");
+                ZeeConfig.msgLow("hide trees growth ");
             }
 
             // find trees and bushes
@@ -2182,12 +2177,7 @@ public class ZeeManagerGobs extends ZeeThread{
             // toggle on
             else {
                 for (Gob g : gobs) {
-                    if (ZeeConfig.showAllTreesGrowth || g.treeGrowth < 1f) {
-                        ZeeConfig.addGobText(g,
-                                g.treeGrowth.toString(),
-                                g.treeGrowth < 1f ? Color.green : Color.lightGray
-                        );
-                    }
+                    ZeeManagerTrees.labelTreeGrowth(g);
                 }
             }
 

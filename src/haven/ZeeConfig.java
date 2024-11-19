@@ -298,7 +298,6 @@ public class ZeeConfig {
 
     public static boolean showGrowingTreeScale = Utils.getprefb("showGrowingTreeScale", true);
     static Runnable showGrowingTreeScaleRunnable = () -> ZeeManagerGobs.toggleAllTreeGrowthTexts();
-    public static boolean showAllTreesGrowth = false;//show all trees growth or just growing ones
 
     public final static Set<String> mineablesStone = new HashSet<String>(Arrays.asList(
             "stone","gneiss","basalt","dolomite","feldspar","flint",

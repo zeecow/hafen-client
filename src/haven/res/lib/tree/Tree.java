@@ -6,12 +6,15 @@
 package haven.res.lib.tree;
 
 import haven.*;
-import haven.render.*;
-import haven.res.lib.leaves.*;
-import haven.res.lib.svaj.*;
+import haven.render.Homo3D;
+import haven.render.Location;
+import haven.render.RenderTree;
+import haven.res.lib.leaves.FallingLeaves;
+import haven.res.lib.svaj.GobSvaj;
 
-import java.awt.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Random;
 
 @haven.FromResource(name = "lib/tree", version = 15)
 public class Tree extends Sprite {
@@ -115,12 +118,7 @@ public class Tree extends Sprite {
 		//show tree growth
 		gob.treeGrowth = fscale;
 		if (ZeeConfig.showGrowingTreeScale) {
-			if (ZeeConfig.showAllTreesGrowth || fscale < 1f) {
-				ZeeConfig.addGobText(gob,
-						gob.treeGrowth.toString(),
-						gob.treeGrowth < 1f ? Color.green : Color.lightGray
-				);
-			}
+			ZeeManagerTrees.labelTreeGrowth(gob);
 		}
 	}
 	parts = mkparts(res, s, fl);

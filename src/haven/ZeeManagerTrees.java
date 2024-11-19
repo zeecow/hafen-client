@@ -1,5 +1,6 @@
 package haven;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -557,5 +558,16 @@ public class ZeeManagerTrees {
 
     static void println(String msg){
         ZeeConfig.println(msg);
+    }
+
+    public static void labelTreeGrowth(Gob tree) {
+        if (tree.treeGrowth==null || tree.treeGrowth >= 1.0f)
+            return;
+        Color color = ZeeGobColor.COLOR_DARK_GREEN.brighter();
+        String text = tree.treeGrowth.toString();
+        text = text.replaceAll("0.", ".");
+        if (text.length() == 3)//remove last digit
+            text = text.substring(0, 2);
+        ZeeConfig.addGobText(tree,text,color);
     }
 }
