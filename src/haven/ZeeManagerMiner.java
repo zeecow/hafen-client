@@ -828,7 +828,7 @@ public class ZeeManagerMiner extends ZeeThread{
     }
 
     static void tilesMonitorCleanup() {
-        //println("tilemonCleanup");
+        println("tile monitor stop");
         try {
             tilemonAutoRefresh = false;
             tilemonLastWindowRefreshPlayerTile = tilemonCurPlayerTile = tilemonLastPreciousCoord = null;

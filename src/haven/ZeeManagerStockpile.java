@@ -1478,7 +1478,7 @@ public class ZeeManagerStockpile extends ZeeThread{
                 try {
                     Inventory inv = ZeeConfig.getMainInventory();
                     // pickup inv clay (if player was holding item a generic method would already been called)
-                    if (ZeeManagerItems.pickUpInvItem(inv, "/clay-ball","/clay-acre")) {
+                    if (ZeeManagerItems.pickUpInvItem(inv, "/clay-ball","/clay-acre","/clay-sea")) {
                         // pile clay
                         ZeeManagerGobs.itemActGob(existingPile,UI.MOD_SHIFT);
                     } else {

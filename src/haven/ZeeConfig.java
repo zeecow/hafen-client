@@ -2998,6 +2998,7 @@ public class ZeeConfig {
             lastMapViewClickGobName = "";
             if (clickb==2) {
                 if (isPlayerHoldingItem()) { //move while holding item
+                    // TODO remove due to leftclick doing the job?
                     clickCoord(mc.floor(posres), 1, 0);
                 }else
                     ZeeManagerGobs.startMidClick(pc,mc,null,"");
@@ -3969,9 +3970,9 @@ public class ZeeConfig {
     static void addGobTagsAdvanced(Gob gob) {
         String gobName = gob.getres().name;
         // players
-        if(isPlayer(gob) && gameUI!=null && gameUI.map.player()!=null) {
+        if(isPlayer(gob) && gameUI!=null) {
             gob.tags.add(Gob.Tag.PLAYER);
-            if (gameUI.map.player().id == gob.id)
+            if (gameUI.plid == gob.id)
                 gob.tags.add(Gob.Tag.PLAYER_MAIN);
             else
                 gob.tags.add(Gob.Tag.PLAYER_OTHER);
