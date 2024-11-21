@@ -3156,6 +3156,10 @@ public class ZeeManagerGobs extends ZeeThread{
         isQueueActAllGobs = false;
     }
     static void queueActUpdLabels(){
+        if (lastMenuGridActArgs==null || lastMenuGridActArgs.length==0) {
+            println("queueActUpdLabels > no args");
+            return;
+        }
         List<Gob> queue = listQueuedActTargets;
         if(queue!=null && !queue.isEmpty()) {
             // label player
@@ -4354,8 +4358,8 @@ public class ZeeManagerGobs extends ZeeThread{
         // save player location
         if (glob.blightamb.getRed() == ZeeConfig.DEF_LIGHT_CELLAR)
             ZeeConfig.playerLocation = ZeeConfig.LOCATION_CELLAR;
-            // cabins incompatible with blightamb detection? use gobs isntead
-        else if(!ZeeConfig.findGobsByNameEndsWith("/downstairs","/upstairs","/logcabin-door","/timberhouse-door").isEmpty())
+        // cabins incompatible with blightamb detection? use gobs isntead
+        else if(!ZeeConfig.findGobsByNameEndsWith("/downstairs","/upstairs","-door").isEmpty())
             ZeeConfig.playerLocation = ZeeConfig.LOCATION_CABIN;
         else if (glob.blightamb.getRed() == ZeeConfig.DEF_LIGHT_UNDERGROUND)
             ZeeConfig.playerLocation = ZeeConfig.LOCATION_UNDERGROUND;
