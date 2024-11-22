@@ -196,7 +196,7 @@ public class ZeeManagerTrees {
         return ZeeConfig.getClosestGob(ref,list);
     }
 
-    static void chopTreeReset(){
+    static void queueChopTreeReset(){
         if (listQueuedTreeChop!=null && !listQueuedTreeChop.isEmpty()){
             ZeeConfig.removeGobText((ArrayList<Gob>) listQueuedTreeChop);
             //listQueuedTreeChop.clear();
@@ -204,7 +204,9 @@ public class ZeeManagerTrees {
         listQueuedTreeChop = null;
         threadChopTree = null;
     }
-
+    static boolean queueChopTreeIsActive(){
+        return listQueuedTreeChop!=null && !listQueuedTreeChop.isEmpty();
+    }
     static void queueChopTreeUpdLabels(){
         if(listQueuedTreeChop!=null && !listQueuedTreeChop.isEmpty()) {
             for (int i = 0; i < listQueuedTreeChop.size(); i++) {
@@ -212,6 +214,14 @@ public class ZeeManagerTrees {
             }
             ZeeConfig.addPlayerText("queue " + listQueuedTreeChop.size());
         }
+    }
+    static boolean queueChopTreeBushIsPossible(String gobName) {
+        if (isRemovingTreesAndStumps)
+            return false;
+        if ( !ZeeManagerGobs.isGobTree(gobName) && !ZeeManagerGobs.isGobBush(gobName))
+            return false;
+        return ZeeConfig.playerHasAnyPose(ZeeConfig.POSE_PLAYER_CHOPTREE)
+                || queueChopTreeIsActive();
     }
 
     static void queueShovelStump(Gob stump) {

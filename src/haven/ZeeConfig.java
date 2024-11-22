@@ -2838,7 +2838,7 @@ public class ZeeConfig {
         ZeeManagerMiner.tilesMonitorCleanup();
         ZeeHistWdg.clearHistory();
         ZeeManagerGobs.plowQueueReset();
-        ZeeManagerTrees.chopTreeReset();
+        ZeeManagerTrees.queueChopTreeReset();
         ZeeManagerGobs.chipStoneReset();
         ZeeFishing.exit();
         ZeeManagerTrees.treeloganizerExit("");

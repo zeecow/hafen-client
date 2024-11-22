@@ -106,7 +106,7 @@ public class ZeeManagerGobs extends ZeeThread{
             queueButchAnimal(gob);
         }
         //queue chop tree/bush by animation
-        else if(!ZeeManagerTrees.isRemovingTreesAndStumps && ZeeConfig.playerHasAnyPose(ZeeConfig.POSE_PLAYER_CHOPTREE) && (isGobTree(gobName) || isGobBush(gobName)) ){
+        else if( ZeeManagerTrees.queueChopTreeBushIsPossible(gobName) ){
             ZeeManagerGobs.queueChopTreeBush(gob);
         }
         //queue chip stone by animation
@@ -2993,7 +2993,7 @@ public class ZeeManagerGobs extends ZeeThread{
                     }
                     ZeeConfig.removePlayerText();
                     println("chop thread end");
-                    ZeeManagerTrees.chopTreeReset();
+                    ZeeManagerTrees.queueChopTreeReset();
                 }
             };
             if (ZeeManagerTrees.threadChopTree!=null)
