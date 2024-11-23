@@ -101,21 +101,41 @@ public class WItem extends Widget implements DTarget {
 		ttinfo = info;
 	    }
 		// shift required for stack longtt, and for skipping shorttip delay
-	    if(!ui.modshift && item.isStackByContent() || now - hoverstart < 1.0){
+	    if(!ui.modshift && item.isStackByContent() || now - hoverstart < 1.0 ){
 		if(shorttip == null)
 		    shorttip = new ShortTip(info);
 		return(shorttip);
 	    } else {
 		if(longtip == null) {
-			// blank line
-			info.add(new ItemInfo.AdHoc(this.item, ""));
-			// res name
-			info.add(new ItemInfo.AdHoc(this.item, this.item.resource().name));
-			// meter %
-			Double meter = (item.meter > 0) ? Double.valueOf(item.meter / 100.0) : itemmeter.get();
-			if((meter != null) && (meter > 0)) {
-				info.add(new ItemInfo.AdHoc(this.item, (int) (meter * 100) +"% done"));
+
+			// collect current iteminfo class names
+			List<String> infoClasses = new ArrayList<>();
+			for (ItemInfo itemInfo : new ArrayList<>(info)) {
+				if (infoClasses.contains(itemInfo.getClass().getName()))
+					continue;//unique class names
+				infoClasses.add(itemInfo.getClass().getName());
 			}
+
+			// add blank line
+			info.add(new ItemInfo.AdHoc(this.item, ""));
+
+			// add res name
+			info.add(new ItemInfo.AdHoc(this.item, this.item.resource().name));
+
+			// add meter % maybe
+			Double meter = (item.meter > 0) ? Double.valueOf(item.meter / 100.0) : itemmeter.get();
+			if ((meter != null) && (meter > 0)) {
+				info.add(new ItemInfo.AdHoc(this.item, (int) (meter * 100) + "% done"));
+			}
+
+			// add collected info class names
+			if (!infoClasses.isEmpty()){
+				info.add(new ItemInfo.AdHoc(this.item, "ItemInfo"));
+				for (String infoClass : infoClasses) {
+					info.add(new ItemInfo.AdHoc(this.item, "    "+infoClass));
+				}
+			}
+
 			longtip = new LongTip(info);
 		}
 		return(longtip);
