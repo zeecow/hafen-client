@@ -113,10 +113,6 @@ public class ZeeManagerGobs extends ZeeThread{
         else if(ZeeConfig.playerHasAnyPose(ZeeConfig.POSE_PLAYER_CHIPPINGSTONE,ZeeConfig.POSE_PLAYER_PICK) && isGobBoulder(gobName)){
             ZeeManagerGobs.queueChipStone(gob);
         }
-        //queue remove stump by animation
-        else if(ZeeConfig.playerHasAnyPose(ZeeConfig.POSE_PLAYER_DIGSHOVEL) && isGobTreeStump(gobName)){
-            ZeeManagerTrees.queueShovelStump(gob);
-        }
         // feed clover to wild animal
         else if (checkCloverFeeding(gob)) {
             feedClover(gob);
@@ -3157,22 +3153,20 @@ public class ZeeManagerGobs extends ZeeThread{
     }
     static void queueActUpdLabels(){
         if (lastMenuGridActArgs==null || lastMenuGridActArgs.length==0) {
-            println("queueActUpdLabels > no args");
+            println("queueActUpdLabels > no args, reseting maybe");
+            queueMenuGridActReset();
             return;
         }
-        List<Gob> queue = listQueuedActTargets;
-        if(queue!=null && !queue.isEmpty()) {
+        if(listQueuedActTargets!=null && !listQueuedActTargets.isEmpty()) {
             // label player
-            String lbl = isQueueActAllGobs ? "all" : String.valueOf(queue.size()+1);
+            String lbl = isQueueActAllGobs ? "all" : String.valueOf(listQueuedActTargets.size()+1);
             ZeeConfig.addPlayerText(lastMenuGridActArgs[0]+ " " + lbl);
             // label queue gobs
-            for (int i = 0; i < queue.size(); i++) {
-                ZeeConfig.addGobText(queue.get(i), "queue" + (i+1));
+            for (int i = 0; i < listQueuedActTargets.size(); i++) {
+                ZeeConfig.addGobText(listQueuedActTargets.get(i), "queue" + (i+1));
             }
         }
     }
-
-
 
 
     public static void checkSmoke(Gob gob, String i) {
