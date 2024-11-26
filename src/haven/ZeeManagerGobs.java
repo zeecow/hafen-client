@@ -81,8 +81,8 @@ public class ZeeManagerGobs extends ZeeThread{
             else if(ZeeConfig.isPlayerDrivingPlow()){
                 plowQueueAddCoord(coordMc,coordPc);
             }
-            // toggle crops by clicking farm tile
-            else if (ZeeConfig.getTileResName(coordMc).contentEquals("gfx/tiles/field")){
+            // toggle crops by clicking farm tile, woodchip underground
+            else if (ZeeConfig.getTileResName(coordMc).contentEquals("gfx/tiles/field") || (ZeeConfig.playerLocation==ZeeConfig.LOCATION_UNDERGROUND && ZeeConfig.getTileResName(coordMc).contains("/paving/woodchip"))){
                 Utils.setprefb("hideGobCrops", (hideGobCrops = !hideGobCrops));
                 toggleModelsInList(getGobsByTags(Gob.Tag.CROP));
             }

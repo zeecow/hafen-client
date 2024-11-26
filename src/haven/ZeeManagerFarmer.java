@@ -1060,10 +1060,16 @@ public class ZeeManagerFarmer extends ZeeThread{
             Map.entry("gfx/terobjs/plants/barley",3),
             Map.entry("gfx/terobjs/plants/wheat",3),
             Map.entry("gfx/terobjs/plants/millet",3),
-            Map.entry("gfx/terobjs/plants/pipeweed",4)
+            Map.entry("gfx/terobjs/plants/pipeweed",4),
+            Map.entry("gfx/terobjs/plants/peas",4),
+            Map.entry("gfx/terobjs/plants/cucumber",4),
+            Map.entry("gfx/terobjs/plants/champignon",4)
     );
     public static boolean isCropStageHarvestable(Gob crop) {
         boolean ret = false;
+        Integer minHarvestage = mapCropMinStageHarvest.get(crop.getres().name);
+        if (minHarvestage==null)
+            return ret;
         int maxStage = 0;
         for (FastMesh.MeshRes layer : crop.getres().layers(FastMesh.MeshRes.class)) {
             if(layer.id / 10 > maxStage) {
@@ -1075,7 +1081,7 @@ public class ZeeManagerFarmer extends ZeeThread{
             int stage = data.uint8();
             if(stage > maxStage)
                 stage = maxStage;
-            if(stage >= mapCropMinStageHarvest.get(crop.getres().name))
+            if(stage >= minHarvestage)
                 ret = true;
             //println(crop.getres().name+" stage "+stage);
         }

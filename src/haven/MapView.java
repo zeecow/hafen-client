@@ -2608,6 +2608,10 @@ public class MapView extends PView implements DTarget, Console.Directory {
 									sb.append("   "+tag);
 								}
 							}
+							//tag specifics
+							if (gob.tags.contains(Gob.Tag.CROP)){
+								sb.append("\ncrop stage: "+ZeeConfig.getPlantStage(gob)+" / "+ZeeManagerFarmer.mapCropMinStageHarvest.get(gob.getres().name));
+							}
 							ttip = sb.toString();
 						}
 					} else {

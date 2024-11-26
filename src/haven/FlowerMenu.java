@@ -255,7 +255,9 @@ public class FlowerMenu extends Widget {
 
 	@Override
 	public boolean mousedown(MouseDownEvent ev) {
-		return true;
+		if(anims.isEmpty())
+			return(true);
+		return false;
 	}
 
 	public boolean mouseup(MouseUpEvent ev) {
