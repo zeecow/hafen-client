@@ -1090,12 +1090,7 @@ public class ZeeManagerFarmer extends ZeeThread{
 
     public static boolean isCropMaxStage(Gob crop) {
         boolean ret = false;
-        int maxStage = 0;
-        for (FastMesh.MeshRes layer : crop.getres().layers(FastMesh.MeshRes.class)) {
-            if(layer.id / 10 > maxStage) {
-                maxStage = layer.id / 10;
-            }
-        }
+        int maxStage = getCropMaxStage(crop);
         Message data = ZeeConfig.getDrawableData(crop);
         if(data != null) {
             int stage = data.uint8();
@@ -1105,5 +1100,15 @@ public class ZeeManagerFarmer extends ZeeThread{
                 ret = true;
         }
         return ret;
+    }
+
+    public static int getCropMaxStage(Gob crop){
+        int maxStage = 0;
+        for (FastMesh.MeshRes layer : crop.getres().layers(FastMesh.MeshRes.class)) {
+            if(layer.id / 10 > maxStage) {
+                maxStage = layer.id / 10;
+            }
+        }
+        return maxStage;
     }
 }

@@ -2610,7 +2610,7 @@ public class MapView extends PView implements DTarget, Console.Directory {
 							}
 							//tag specifics
 							if (gob.tags.contains(Gob.Tag.CROP)){
-								sb.append("\ncrop stage: "+ZeeConfig.getPlantStage(gob)+" / "+ZeeManagerFarmer.mapCropMinStageHarvest.get(gob.getres().name));
+								sb.append("\ncrop stage: "+ZeeConfig.getPlantStage(gob)+" / "+ZeeManagerFarmer.getCropMaxStage(gob));
 							}
 							ttip = sb.toString();
 						}
