@@ -935,6 +935,7 @@ public class ZeeManagerFarmer extends ZeeThread{
         new ZeeThread(){
             public void run() {
                 try {
+                    println("farmaway thread start");
                     farmAwayOn = true;
                     Gob nextCrop = crop;
                     int minCropStage = ZeeConfig.getPlantStage(nextCrop);
@@ -944,6 +945,7 @@ public class ZeeManagerFarmer extends ZeeThread{
                     // farm
                     ZeeConfig.addPlayerText("farm");
                     do{
+                        waitPlayerPoseNotInList(ZeeConfig.POSE_PLAYER_DRINK);
                         ZeeManagerGobs.gobClick(nextCrop,3);
                         prepareCancelClick();
                         sleep(PING_MS);
@@ -1009,6 +1011,7 @@ public class ZeeManagerFarmer extends ZeeThread{
                 }
                 farmAwayOn = false;
                 ZeeConfig.removePlayerText();
+                println("farmaway thread stop");
             }
         }.start();
     }

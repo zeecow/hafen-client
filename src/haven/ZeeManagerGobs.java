@@ -81,6 +81,11 @@ public class ZeeManagerGobs extends ZeeThread{
             else if(ZeeConfig.isPlayerDrivingPlow()){
                 plowQueueAddCoord(coordMc,coordPc);
             }
+            // toggle crops by clicking farm tile
+            else if (ZeeConfig.getTileResName(coordMc).contentEquals("gfx/tiles/field")){
+                Utils.setprefb("hideGobCrops", (hideGobCrops = !hideGobCrops));
+                toggleModelsInList(getGobsByTags(Gob.Tag.CROP));
+            }
         }
         /*
             gob clicks
@@ -88,10 +93,6 @@ public class ZeeManagerGobs extends ZeeThread{
         // hilite gob by name (:zeecow gobfind)
         else if(ZeeConfig.gameUI.ui.modshift && ZeeConfig.getCursorName().contentEquals(ZeeConfig.CURSOR_ARW)){
             ZeeConsole.runCmdZeecow(new String[]{":zeecow","gobfind",gob.getres().basename()});
-        }
-        // queue menugrid act
-        else if (ZeeManagerGobs.lastMenuGridActArgs!=null && ZeeConfig.isPlayerActivePose()){
-            ZeeManagerGobs.queueMenuGridAct(gob);
         }
         // queue remove tree and stump
         else if (ZeeManagerTrees.isRemovingTreesAndStumps && isGobTree(gobName)) {
@@ -112,6 +113,10 @@ public class ZeeManagerGobs extends ZeeThread{
         //queue chip stone by animation
         else if(ZeeConfig.playerHasAnyPose(ZeeConfig.POSE_PLAYER_CHIPPINGSTONE,ZeeConfig.POSE_PLAYER_PICK) && isGobBoulder(gobName)){
             ZeeManagerGobs.queueChipStone(gob);
+        }
+        // queue menugrid act (after specific queues)
+        else if (ZeeManagerGobs.lastMenuGridActArgs!=null && ZeeConfig.isPlayerActivePose()){
+            ZeeManagerGobs.queueMenuGridAct(gob);
         }
         // feed clover to wild animal
         else if (checkCloverFeeding(gob)) {
@@ -212,7 +217,7 @@ public class ZeeManagerGobs extends ZeeThread{
             }.start();
         }
         // activate harvest area if non-trellis crop
-        else if (isGobCrop(gobName)){
+        else if (isGobCrop(gobName) && ZeeManagerFarmer.isCropStageHarvestable(gob)){
             if (!ZeeConfig.getCursorName().equals(ZeeConfig.CURSOR_HARVEST))
                 gobClick(gob, 3, UI.MOD_SHIFT);
         }
@@ -342,6 +347,20 @@ public class ZeeManagerGobs extends ZeeThread{
             if(ZeeConfig.nameInListContains(holdingItem,"/coal,/blackcoal,/branch,/wblock-")){
                 itemActGob(gob,UI.MOD_CTRL_SHIFT);
             }
+        }
+        //quick toggle visibility for tree, wall, crop
+        else if (isGobTree(gobName)) {
+            Utils.setprefb("hideGobTrees", ( ZeeManagerTrees.hideGobTrees = !ZeeManagerTrees.hideGobTrees));
+            toggleModelsInList(getGobsByTags(Gob.Tag.TREE));
+        }
+        else if (isGobWall(gobName)) {
+            Utils.setprefb("hideGobWalls", (hideGobWalls = !hideGobWalls));
+            toggleModelsInList(getGobsByTags(Gob.Tag.WALL));
+        }
+        else if (isGobCrop(gobName) || gobName.endsWith("/trellis")) {
+            //also toggled by midclick farm soil
+            Utils.setprefb("hideGobCrops", (hideGobCrops = !hideGobCrops));
+            toggleModelsInList(getGobsByTags(Gob.Tag.CROP));
         }
         // inspect gob
         else {

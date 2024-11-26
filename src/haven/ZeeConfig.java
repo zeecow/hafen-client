@@ -2208,27 +2208,6 @@ public class ZeeConfig {
                 e.printStackTrace();
             }
         }
-
-
-        List<Gob> ladders = findGobsByNameEndsWith("terobjs/ladder");
-        if (!ladders.isEmpty()) {
-            for (Gob ladder : ladders) {
-                toggleMineLadderRadius(ladder);
-            }
-        }
-    }
-
-    static void toggleMineLadderRadius(Gob ladder) {
-        //remove ladder radius
-        if (!showMineSupport){
-            Gob.Overlay radius = ladder.findol(ZeeGobRadius.class);
-            if (radius!=null)
-                radius.remove();
-        }
-        //add ladder radius
-        else {
-            ladder.addol(new Gob.Overlay(ladder, new ZeeGobRadius(ladder, null, ZeeGobRadius.RADIUS_MINE_LADDER_SUPPORT,new Color(139, 139, 185, 48))));
-        }
     }
 
     static boolean showRadiusBeeskep = false;
@@ -3837,10 +3816,6 @@ public class ZeeConfig {
 
                 return;
             }
-            // radius ladder
-            else if(showMineSupport && gobName.endsWith("/terobjs/ladder")) {
-                toggleMineLadderRadius(ob);
-            }
             // radius beeskep
             else if(showRadiusBeeskep && gobName.endsWith("/terobjs/beehive")) {
                 toggleRadiusBeeskep(ob);
@@ -4394,12 +4369,21 @@ public class ZeeConfig {
             for (Fightview.Relation rel : fv.lsrel) {
                 Gob g = ZeeManagerGobs.findGobById(rel.gobid);
                 if (g!=null) {
-                    //hilite
-                    g.delattr(ZeeGobFind.class);
-                    //aggro radius
-                    Gob.Overlay aggrolay = g.findol(ZeeGobRadius.class);
-                    if (aggrolay!=null)
-                        aggrolay.remove();
+                    synchronized (g) {
+                        //hilite
+                        g.delattr(ZeeGobFind.class);
+                        //aggro radius
+                        Gob.Overlay aggrolay = g.findol(ZeeGobRadius.class);
+                        if (aggrolay != null)
+                            aggrolay.remove();
+                        // gob pointer
+                        if (g.hasPointer) {
+                            Gob.Overlay ol = g.findol(ZeeGobPointer.class);
+                            if (ol != null) {
+                                ol.remove(false);
+                            }
+                        }
+                    }
                 }
             }
             // hilite current gob

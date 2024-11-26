@@ -14,7 +14,8 @@ Controls
 - camera drag also works by holding left-click (move player + drag camera)   
 - shift+c alternates cams ortho/free
 - shift+h toggle hitboxes
-- ctrl+h toggle trees/palisegs/crops
+- ctrl+h toggle all trees/palisegs/crops (shows opt win)
+  - midclick quick toggle tree/wall/non-ready-crop(farmtile,trellis) 
 - mousewheel scroll transfer items directly (no shift required)
 - Ctrl+click to confirm actions (Empty, Swill, Slaughter, etc)
 - Ctrl confirm throwing axe/spear
