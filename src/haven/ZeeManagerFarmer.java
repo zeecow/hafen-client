@@ -945,7 +945,8 @@ public class ZeeManagerFarmer extends ZeeThread{
                     // farm
                     ZeeConfig.addPlayerText("farm");
                     do{
-                        waitPlayerPoseNotInList(ZeeConfig.POSE_PLAYER_DRINK);
+                        if (ZeeConfig.isPlayerDrinkingPose())
+                            waitPlayerPoseNotInList(ZeeConfig.POSE_PLAYER_DRINK);
                         ZeeManagerGobs.gobClick(nextCrop,3);
                         prepareCancelClick();
                         sleep(PING_MS);
@@ -990,6 +991,7 @@ public class ZeeManagerFarmer extends ZeeThread{
                         //collect subprods
                         prepareCancelClick();
                         for (String subprod : subprods) {
+                            ZeeConfig.addPlayerText("collect "+subprod);
                             Gob closestSubprod = ZeeConfig.getClosestGobByNameEnds("gfx/terobjs/items" + subprod);
                             while(closestSubprod!=null && !isCancelClick()) {
                                 // shift+click closest item

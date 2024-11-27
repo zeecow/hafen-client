@@ -869,7 +869,7 @@ public class ZeeConfig {
                 String audio = mapCategoryAudio.get(CATEG_PVPANDSIEGE);
                 if (audio != null && !audio.isEmpty())
                     playAudioGobId(audio, gobId);
-                else
+                else if(!gobHasAttr(gob,"Vilmate"))
                     gameUI.ui.msg("player spotted",Color.yellow, ZeeAudio.msgsfxPlayer);
             }
         }
