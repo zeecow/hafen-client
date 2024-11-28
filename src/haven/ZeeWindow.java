@@ -2,6 +2,8 @@ package haven;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ZeeWindow extends Window {
 
@@ -21,26 +23,74 @@ public class ZeeWindow extends Window {
         return Coord.of(wdg.c.x + wdg.sz.x + padX, y);
     }
 
-    static boolean isLastWidgetWItem;//TODO better way?
+    static List<String> uiClassesClicked = new ArrayList<String>();
     public static void checkCloseWinDFStyle(Widget widget, MouseUpEvent ev) {
+
         if (ev.b != 3)
             return;
-        if (ZeeConfig.gameUI==null || ZeeConfig.gameUI.ui==null)
+
+        String className = widget.getClass().getName();
+        //ZeeConfig.println(uiClassesClicked.size()+" classes "+className);
+
+        // login screen win options
+        if ( ZeeConfig.gameUI==null || ZeeConfig.gameUI.ui==null){
+            uiClassesClicked.clear();
+            if ((widget instanceof Window.DefaultDeco) ) {
+                ((Window) widget.parent).reqclose();
+                return;
+            }
+            //ZeeConfig.println("no gameui > "+className);
             return;
-        // avoid transfers and stacking operations
-        if(ZeeConfig.gameUI.ui.modmeta || ZeeConfig.gameUI.ui.modshift || ZeeConfig.gameUI.ui.modctrl)
+        }
+
+        // skip holding item
+        if (ZeeConfig.isPlayerHoldingItem()){
+            //ZeeConfig.println("skip holding item > "+className);
+            uiClassesClicked.clear();
             return;
-        if (ZeeThread.getFlowerMenu() != null) // mousedown witem, mouseup inv
+        }
+
+        // mousedown witem, mouseup inv
+        if (ZeeThread.getFlowerMenu() != null) {
+            //ZeeConfig.println("skip flowermenu > "+className);
+            uiClassesClicked.clear();
             return;
-        if (widget instanceof Window.DefaultDeco && !isLastWidgetWItem) {
+        }
+
+        // skip right click WItem
+        if (uiClassesClicked.contains("haven.WItem")) {
+            //ZeeConfig.println("skip witem > "+className);
+            uiClassesClicked.clear();
+            return;
+        }
+
+        // clear classes clicked
+        if (className.startsWith("haven.RootWidget")){
+            //ZeeConfig.println("clear list > "+ className);
+            uiClassesClicked.clear();
+            return;
+        }
+
+        // add class clicked
+        uiClassesClicked.add(className);
+
+        if (widget instanceof Window.DefaultDeco) {
+            if (uiClassesClicked.contains("haven.MapWnd$View")) {
+                uiClassesClicked.clear();
+                //ZeeConfig.println("map return");
+                return;
+            }
             Window win = (Window) widget.parent;
-            //minimap ignored for now, due to dragging map and stuff
-            if (!(win instanceof MapWnd)) {
-                ZeeConfig.println("hiding " + win.cap);
+            if (uiClassesClicked.contains("haven.MapWnd")) {
+                //ZeeConfig.println("compacting " + win.cap);
+                ZeeConfig.gameUI.mapfile.compact(true);
+                Utils.setprefb("compact-map", true);
+            }else{
+                //ZeeConfig.println("hiding " + win.cap);
                 win.reqclose();
             }
+            uiClassesClicked.clear();
         }
-        isLastWidgetWItem = widget instanceof WItem;
     }
 
     @Override
