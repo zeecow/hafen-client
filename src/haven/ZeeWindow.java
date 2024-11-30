@@ -23,79 +23,69 @@ public class ZeeWindow extends Window {
         return Coord.of(wdg.c.x + wdg.sz.x + padX, y);
     }
 
-    static List<String> uiClassesClicked = new ArrayList<String>();
-    public static void checkCloseWinDFStyle(Widget widget, MouseUpEvent ev) {
+    static List<String> uiClassesMouseUp = new ArrayList<String>();
+    static String lastClassMouseDown = "";
+    public static void checkCloseWinDFStyle(Widget widget, MouseButtonEvent ev) {
 
-        if (ev.b != 3)
+        // works on right click
+        if (ev.b!=3)
             return;
 
-        String className = widget.getClass().getName();
-        //ZeeConfig.println(uiClassesClicked.size()+" classes "+className);
-
-        // login screen win options
+        // skip login screen
         if ( ZeeConfig.gameUI==null || ZeeConfig.gameUI.ui==null){
-            uiClassesClicked.clear();
-            if ((widget instanceof Window.DefaultDeco) ) {
-                ((Window) widget.parent).reqclose();
-                return;
-            }
-            //ZeeConfig.println("no gameui > "+className);
+            return;
+        }
+
+        // skip transfers
+        if ( ZeeConfig.gameUI.ui.modmeta || ZeeConfig.gameUI.ui.modshift){
+            return;
+        }
+
+        String className = widget.getClass().getName();
+
+        // save mousedown class and return
+        if (ev instanceof MouseDownEvent){
+            lastClassMouseDown = className;
+            return;
+        }
+
+        // reset classes mouseup on RootWidget
+        if (className.startsWith("haven.RootWidget")){
+            uiClassesMouseUp.clear();
+            return;
+        }
+
+        // skip mousedown WItem
+        if (lastClassMouseDown.contentEquals("haven.WItem")){
             return;
         }
 
         // skip holding item
         if (ZeeConfig.isPlayerHoldingItem()){
-            //ZeeConfig.println("skip holding item > "+className);
-            uiClassesClicked.clear();
             return;
         }
 
-        // mousedown witem, mouseup inv
-        if (ZeeThread.getFlowerMenu() != null) {
-            //ZeeConfig.println("skip flowermenu > "+className);
-            uiClassesClicked.clear();
-            return;
-        }
-
-        // skip right click WItem
-        if (uiClassesClicked.contains("haven.WItem")) {
-            //ZeeConfig.println("skip witem > "+className);
-            uiClassesClicked.clear();
-            return;
-        }
-
-        // clear classes clicked
-        if (className.startsWith("haven.RootWidget")){
-            //ZeeConfig.println("clear list > "+ className);
-            uiClassesClicked.clear();
-            return;
-        }
-
-        // add class clicked
-        uiClassesClicked.add(className);
+        // add class mouseup
+        uiClassesMouseUp.add(className);
 
         if (widget instanceof Window.DefaultDeco) {
-            if (uiClassesClicked.contains("haven.MapWnd$View")) {
-                uiClassesClicked.clear();
-                //ZeeConfig.println("map return");
+            ZeeConfig.println("uiClassesMouseUp > "+uiClassesMouseUp.toString());
+            if (uiClassesMouseUp.contains("haven.MapWnd$View")) {
                 return;
             }
             Window win = (Window) widget.parent;
-            if (uiClassesClicked.contains("haven.MapWnd")) {
-                //ZeeConfig.println("compacting " + win.cap);
+            if (uiClassesMouseUp.contains("haven.MapWnd")) {
                 ZeeConfig.gameUI.mapfile.compact(true);
                 Utils.setprefb("compact-map", true);
             }else{
-                //ZeeConfig.println("hiding " + win.cap);
                 win.reqclose();
             }
-            uiClassesClicked.clear();
+            uiClassesMouseUp.clear();
         }
     }
 
     @Override
     public void wdgmsg(String msg, Object... args) {
-        //ZeeConfig.println(this.getClass().getSimpleName()+" > "+msg);
         if(msg.equals("close")){
             reqdestroy();
         }

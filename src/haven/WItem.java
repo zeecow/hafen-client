@@ -261,6 +261,7 @@ public class WItem extends Widget implements DTarget {
 		return(true);
 	} else if(ev.b == 3) {
 		item.wdgmsg("iact", ev.c, ui.modflags());
+		ZeeWindow.checkCloseWinDFStyle(this,ev);
 		return(true);
 	}
 	return(super.mousedown(ev));
