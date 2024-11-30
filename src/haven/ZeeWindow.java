@@ -55,8 +55,8 @@ public class ZeeWindow extends Window {
             return;
         }
 
-        // skip mousedown WItem
-        if (lastClassMouseDown.contentEquals("haven.WItem")){
+        // skip WItem clicks
+        if (lastClassMouseDown.contentEquals("haven.WItem") || uiClassesMouseUp.contains("haven.WItem")){
             return;
         }
 
