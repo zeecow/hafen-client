@@ -334,7 +334,7 @@ public class ZeeOptionsJFrame extends JFrame {
 
         panelTabMisc.add(new ZeeOptionJCheckBox( "Hide tile transitions", "hideTileTransitions"),c);
 
-        panelTabMisc.add(new ZeeOptionJCheckBox( "Hide flavor objects(restart)", "noFlavObjs"),c);
+        panelTabMisc.add(new ZeeOptionJCheckBox( "Hide flavor objects", "noFlavObjs"),c);
 
         panelTabMisc.add(new ZeeOptionJCheckBox( "Simple herbs", "simpleHerbs"),c);
 

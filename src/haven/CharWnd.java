@@ -27,9 +27,10 @@
 package haven;
 
 import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.util.List;
 import java.util.function.Function;
 import java.util.function.Supplier;
-import java.util.List;
 
 import static haven.PUtils.BlurFurn;
 import static haven.PUtils.TexFurn;

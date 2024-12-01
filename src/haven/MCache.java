@@ -514,6 +514,11 @@ public class MCache implements MapSource {
 		Tileset set = trn.tileset(ids[i]);
 		int o = 0;
 		for(Indir<Tileset.Flavor> flp : set.flavors) {
+			if (ZeeConfig.noFlavObjs) {
+				// always show thicket and ridge edge
+				if (!set.getres().name.contains("/thicket") && !flp.get().toString().contains("RidgeEdge"))
+					continue;
+			}
 		    rnd.setSeed(buf.seed ^ (ids[i] << 16) ^ o);
 		    flp.get().flavor(buf, trn, rnd);
 		    o++;
@@ -580,8 +585,6 @@ public class MCache implements MapSource {
 	}
 
 	public void tick(double dt) {
-		if (ZeeConfig.noFlavObjs)
-			return;
 	    for(Cut cut : cuts) {
 		Flavobjs fo = cut.fo.cur();
 		if(fo != null)
@@ -590,8 +593,6 @@ public class MCache implements MapSource {
 	}
 	
 	public void gtick(Render g) {
-		if (ZeeConfig.noFlavObjs)
-			return;
 	    for(Cut cut : cuts) {
 		Flavobjs fo = cut.fo.cur();
 		if(fo != null)

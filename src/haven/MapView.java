@@ -806,15 +806,13 @@ public class MapView extends PView implements DTarget, Console.Directory {
 	    super.tick();
 	    if(area != null) {
 		main.tick();
-		if (!ZeeConfig.noFlavObjs)
-			flavobjs.tick();
-	    }
+		flavobjs.tick();
+		}
 	}
 
 	public void added(RenderTree.Slot slot) {
 	    slot.add(main);
-		if (!ZeeConfig.noFlavObjs)
-	    	slot.add(flavobjs);
+		slot.add(flavobjs);
 	    super.added(slot);
 	}
 
@@ -824,8 +822,8 @@ public class MapView extends PView implements DTarget, Console.Directory {
 		return(ret);
 	    if((ret = main.lastload) != null)
 		return(ret);
-	    if(!ZeeConfig.noFlavObjs && (ret = flavobjs.lastload) != null)
-			return(ret);
+	    if((ret = flavobjs.lastload) != null)
+		return(ret);
 	    return(null);
 	}
     }
