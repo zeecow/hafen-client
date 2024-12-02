@@ -470,11 +470,7 @@ public class ZeeConfig {
         return gob.getres().name.startsWith("gfx/borka/body") && !isMannequim;
     }
     static boolean isPlayerMain(Gob gob) {
-        Gob pl = gameUI.map.player();
-        if (pl == null){
-            return false;
-        }
-        return pl.id == gob.id;
+        return gameUI.plid == gob.id;
     }
 
     public static boolean isTree(String gobName) {
@@ -644,7 +640,7 @@ public class ZeeConfig {
 
     public static boolean isSpice(String name){
         final String[] list = {
-            "kvann", "chives", "dill","thyme","sage",
+            "kvann", "chives", "dill","thyme","/salvia",
             "laurel","juniper",
             "ambergris", "truffle",
             "/halite", "saltbasin"
@@ -771,7 +767,7 @@ public class ZeeConfig {
         final String[] list = {
             "bloodstern","camomile","cavebulb","chimingbluebell","clover","coltsfoot","dandelion",
             "edelweiss","frogscrown","heartsease","marshmallow","stingingnettle","thornythistle",
-            "yarrow","snapdragon","wintergreen"
+            "yarrow","snapdragon","wintergreen","tansy"
         };
         for (int i = 0; i < list.length; i++) {
             if(name.contains(list[i]))
@@ -3805,6 +3801,7 @@ public class ZeeConfig {
                             if (ZeeConfig.showGobRadar) {
                                 ob.addol(ZeeGobPointer.gobRadar = new ZeeGobRadar(ob, Coord3f.of(10, 10, 5), new Color(240, 0, 253, 90)));
                             }
+
                         } catch (Exception e) {
                             e.printStackTrace();
                         }

@@ -204,7 +204,11 @@ public class ZeeConsole {
                 showHelpWindow();
                 return null;
             }
-            ret = ZeeConfig.getWindows(arr[1]);
+            String windowName = arr[1];
+            for (int i = 2; i < arr.length; i++) {
+                windowName += " " + arr[i];
+            }
+            ret = ZeeConfig.getWindows(windowName);
         }
         else if (cmd.contentEquals("itname")){
             ret = selectWindowsItemsInfoName(arr);
