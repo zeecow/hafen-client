@@ -4751,6 +4751,10 @@ public class ZeeManagerGobs extends ZeeThread{
             return;
         if (ZeeConfig.isPlayerMain(f.gob)){
             Gob target = ZeeConfig.getGobFollowTarget(f.gob);
+            if (target==null || target.getres()==null || target.getres().name==null){
+                println("checkAttrSetFollowing > target not ready? "+target);
+                return;
+            }
             if (target.getres().name.contains("cauldron")) {
                 ZeeConfig.isPlayerFollowingCauldron = true;
                 //println("player following " + target.getres().name);
