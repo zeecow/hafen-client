@@ -169,7 +169,6 @@ public class ZeeConfig {
     static boolean keepMapViewOverlay;
 
     static String playingAudio = null;
-    static String lastUiMsg, uiMsgTextQuality, uiMsgTextBuffer;
     static long now, lastUiQualityMsgMs=0, lastUIMsgMs, lastHafenWarningMs=0;
     static Object[] lastMapViewClickArgs;
     static Gob lastMapViewClickGob;
@@ -2715,6 +2714,7 @@ public class ZeeConfig {
         - compile multi-line messages into single-line
         - show text ql above gob
      */
+    static String lastUiMsg, uiMsgTextQuality="", uiMsgQlExtraInfo ="";
     public static void checkUiMsg(String text) {
         lastUIMsgMs = now = System.currentTimeMillis();
         lastUiMsg = text;
@@ -2723,7 +2723,7 @@ public class ZeeConfig {
         if(now - lastUiQualityMsgMs > 555) { //new message
             lastUiQualityMsgMs = now;
             uiMsgTextQuality = "";
-            uiMsgTextBuffer = "";
+            uiMsgQlExtraInfo = "";
         }
 
         // add gob text ql
@@ -2732,12 +2732,25 @@ public class ZeeConfig {
             String ql = uiMsgTextQuality.replaceAll("Quality: ","");
             if (ql.contains("grown"))
                 ql = ql.replaceAll(",","q").replaceAll(" grown","");
-            ZeeConfig.addGobText(ZeeConfig.lastMapViewClickGob, ql, 0,255,0,255,0);
+            else
+                ql += "q";
+            ZeeConfig.addGobText(ZeeConfig.lastMapViewClickGob, ql + uiMsgQlExtraInfo, 0,255,0,255,0);
         }
-        // show two line ql msg in one single line
-        else if(uiMsgTextQuality!=null && !uiMsgTextQuality.isEmpty() && !text.contains("Memories")){
-            uiMsgTextBuffer += ", " + text;
-            gameUI.ui.msg(uiMsgTextQuality + uiMsgTextBuffer);
+
+        // store extra info to next Quality msg
+        if(uiMsgTextQuality!=null && uiMsgTextQuality.isEmpty()){
+            //treelog "x% taken"
+            if (text.contains("taken")) {
+                Matcher m = ZeeConfig.getRegexMatcher(text, "\\d+");
+                if (m!=null && m.find()) {
+                    int percTaken = Integer.parseInt(m.group());
+                    uiMsgQlExtraInfo = "  " + (100-percTaken) + "%";
+                }
+            }
+            else {
+                uiMsgQlExtraInfo += " " + text.replaceAll(" taken", "");
+                //gameUI.ui.msg(uiMsgTextQuality + uiMsgTextBuffer);//TODO make sure no recursion
+            }
         }
 
         // feasting msg
