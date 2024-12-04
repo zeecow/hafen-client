@@ -2738,6 +2738,7 @@ public class ZeeConfig {
         }
 
         // store extra info to next Quality msg
+        // TODO make work for any msg order
         if(uiMsgTextQuality!=null && uiMsgTextQuality.isEmpty()){
             //treelog "x% taken"
             if (text.contains("taken")) {
@@ -2746,10 +2747,6 @@ public class ZeeConfig {
                     int percTaken = Integer.parseInt(m.group());
                     uiMsgQlExtraInfo = "  " + (100-percTaken) + "%";
                 }
-            }
-            else {
-                uiMsgQlExtraInfo += " " + text.replaceAll(" taken", "");
-                //gameUI.ui.msg(uiMsgTextQuality + uiMsgTextBuffer);//TODO make sure no recursion
             }
         }
 
