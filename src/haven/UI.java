@@ -710,7 +710,7 @@ public class UI {
 	    }
 	}
 
-	@Resource.PublishedCode(name = "msg")
+	@Resource.PublishedCode(name = "msg", instancer = FactMaker.class)
 	public static interface Factory {
 	    public Notice format(OwnerContext owner, Object... args);
 	}
