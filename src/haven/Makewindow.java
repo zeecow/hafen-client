@@ -384,13 +384,18 @@ public class Makewindow extends Widget {
 		    x += t.sz().x + UI.scale(1);
 
 			// add stat label
+			if(qm.get()==null)
+				continue;
+			String statName = qm.get().name;
+			Integer stat = qmodMapNameStat.get(statName);
+			if (stat==null)
+				continue;
 			int pad1=3, pad2=7;
 			x += pad1;
-			int stat = qmodMapNameStat.get(qm.get().name);
 			int statSzX = ZeeConfig.drawText(""+stat, g, new Coord(x,qmy+5));
 			statSzX += UI.scale(1);
 			x += statSzX;
-			qmodMapNameSzX.put(qm.get().name, statSzX + pad1 + pad2);
+			qmodMapNameSzX.put(statName, statSzX + pad1 + pad2);
 			x += pad2;
 
 			product = product * stat;
