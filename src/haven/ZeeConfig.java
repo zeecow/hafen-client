@@ -3503,10 +3503,6 @@ public class ZeeConfig {
         gameUI.error(msg);
     }
 
-    public static boolean isControlKey(int keyCode) {
-        return keyCode==KeyEvent.VK_RIGHT || keyCode==KeyEvent.VK_LEFT || keyCode==KeyEvent.VK_BACK_SPACE || keyCode==KeyEvent.VK_DELETE || keyCode==KeyEvent.VK_HOME || keyCode==KeyEvent.VK_END || keyCode==KeyEvent.VK_SPACE;
-    }
-
     public static boolean isGobRemoved(Gob gob) {
         return gob==null || gameUI.ui.sess.glob.oc.getgob(gob.id)==null;
     }

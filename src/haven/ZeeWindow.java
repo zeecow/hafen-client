@@ -96,6 +96,9 @@ public class ZeeWindow extends Window {
             super(w, deftext, false);
             this.settip("scroll values, press enter");
         }
+        public static boolean isControlKey(int keyCode) {
+            return keyCode==KeyEvent.VK_RIGHT || keyCode==KeyEvent.VK_LEFT || keyCode==KeyEvent.VK_BACK_SPACE || keyCode==KeyEvent.VK_DELETE || keyCode==KeyEvent.VK_HOME || keyCode==KeyEvent.VK_END || keyCode==KeyEvent.VK_SPACE;
+        }
         abstract void onEnterPressed(String text);
         public boolean mouseup(MouseUpEvent ev) {
             hasfocus = true;
@@ -103,8 +106,6 @@ public class ZeeWindow extends Window {
         }
         public boolean keydown(KeyDownEvent ev) {
             if(!hasfocus)
-                return false;
-            if (ZeeConfig.isControlKey(ev.awt.getKeyCode()))
                 return false;
             return super.keydown(ev);
         }
@@ -119,7 +120,7 @@ public class ZeeWindow extends Window {
                 this.hasfocus = false;
                 return super.keyup(ev);
             }
-            if (!ZeeConfig.isControlKey(ev.awt.getKeyCode()))
+            if (!isControlKey(ev.awt.getKeyCode()))
                 return false;
             return super.keyup(ev);
         }

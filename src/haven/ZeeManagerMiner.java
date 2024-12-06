@@ -679,152 +679,163 @@ public class ZeeManagerMiner extends ZeeThread{
 
     static long msLastTileMsg=0, msLastSilverMsg=0, msLastGoldMsg=0;
     private static void tilesWindowRefresh() {
-        Glob g = ZeeConfig.gameUI.map.glob;
-        Gob player = ZeeConfig.gameUI.map.player();
-        if (player == null)
-            return;
-        Coord pltc = new Coord((int) player.getc().x / 11, (int) player.getc().y / 11);
-        HashMap<String,Integer> mapTileresCount= new HashMap<>();
-        for (int x = -44; x < 44; x++) {
-            for (int y = -44; y < 44; y++) {
-                int t = g.map.gettile(pltc.sub(x, y));
-                Resource res = g.map.tilesetr(t);
-                if (res == null)
-                    continue;
-                String name = res.name;
-                if (!name.contains("/rocks/")) //ignore non mineable tiles
-                    continue;
-                Integer count = mapTileresCount.get(name);
-                if (count==null)
-                    count = 1;
-                else
-                    count++;
-                //count tiles
-                mapTileresCount.put(name,count);
-            }
-        }
-        //remove old labels
-        for (Label l : tilemonWindow.children(Label.class)) {
-            if (!l.equals(tilemonLabelFindTile))
-                l.destroy();
-        }
-        //sorted list
-        SortedSet<String> tiles = new TreeSet<String>(mapTileresCount.keySet());
-        //create new labels
-        Label label;
-        String basename;
-        List<String> silverList = List.of("galena","argentite","hornsilver");
-        List<Label> foundList = new ArrayList<>();
-        List<Label> oreList = new ArrayList<>();
-        List<Label> tilesList = new ArrayList<>();
-        for (String tileName : tiles) {
-            basename = tileName.replaceAll("gfx/tiles/rocks/","");
-            label = new Label(basename+"   "+ mapTileresCount.get(tileName));
-            // find list
-            if (tilemonSearchNames!=null && tilemonSearchNames.length>0 && List.of(tilemonSearchNames).contains(basename)){
-                label.setcolor(Color.green);
-                label.settext(label.texts + "  (found)");
-                // 5min limit, TODO better way
-                if(ZeeThread.now() - msLastTileMsg > 1000*60*5) {
-                    msLastTileMsg = ZeeThread.now();
-                    ZeeConfig.msg("Found " + basename);
-                    ZeeAudio.textToSpeakLinuxFestival("Tile found");
+        try {
+            Glob g = ZeeConfig.gameUI.map.glob;
+            Gob player = ZeeConfig.gameUI.map.player();
+            if (player == null)
+                return;
+            Coord pltc = new Coord((int) player.getc().x / 11, (int) player.getc().y / 11);
+            HashMap<String, Integer> mapTileresCount = new HashMap<>();
+            for (int x = -44; x < 44; x++) {
+                for (int y = -44; y < 44; y++) {
+                    int t = g.map.gettile(pltc.sub(x, y));
+                    Resource res = g.map.tilesetr(t);
+                    if (res == null)
+                        continue;
+                    String name = res.name;
+                    if (!name.contains("/rocks/")) //ignore non mineable tiles
+                        continue;
+                    Integer count = mapTileresCount.get(name);
+                    if (count == null)
+                        count = 1;
+                    else
+                        count++;
+                    //count tiles
+                    mapTileresCount.put(name, count);
                 }
-                //add found tile to the top
-                foundList.add(0,label);
             }
-            // label ore
-            else if (isRegularOre(basename)) {
-                label.setcolor(Color.yellow);
-                label.settext(label.texts+"  (ore)");
-                //add ore tile to the top
-                oreList.add(0,label);
+            //remove old labels
+            for (Label l : tilemonWindow.children(Label.class)) {
+                if (!l.equals(tilemonLabelFindTile))
+                    l.destroy();
             }
-            // label silver/gold
-            else if (isPreciousOre(basename)) {
-                // label color
-                label.setcolor(Color.red);
-                // label text
-                if (silverList.contains(basename)) {
-                    label.settext(basename + "  (silver)");
-                    // 5min limit, TODO find better way
-                    if(ZeeThread.now() - msLastSilverMsg > 1000*60*5) {
-                        msLastSilverMsg = ZeeThread.now();
-                        ZeeConfig.msg("Silver ore found");
-                        ZeeAudio.textToSpeakLinuxFestival("Silver ore found");
-                    }
-                } else {
-                    label.settext(basename + "  (gold)");
+            //sorted list
+            SortedSet<String> tiles = new TreeSet<String>(mapTileresCount.keySet());
+            //create new labels
+            Label label;
+            String basename;
+            List<String> silverList = List.of("galena", "argentite", "hornsilver");
+            List<Label> foundList = new ArrayList<>();
+            List<Label> oreList = new ArrayList<>();
+            List<Label> tilesList = new ArrayList<>();
+            for (String tileName : tiles) {
+                basename = tileName.replaceAll("gfx/tiles/rocks/", "");
+                label = new Label(basename + "   " + mapTileresCount.get(tileName));
+                // find list
+                if (tilemonSearchNames != null && tilemonSearchNames.length > 0 && List.of(tilemonSearchNames).contains(basename)) {
+                    label.setcolor(Color.green);
+                    label.settext(label.texts + "  (found)");
                     // 5min limit, TODO better way
-                    if(ZeeThread.now() - msLastGoldMsg > 1000*60*5) {
-                        msLastGoldMsg = ZeeThread.now();
-                        ZeeConfig.msg("Gold ore found");
-                        ZeeAudio.textToSpeakLinuxFestival("Gold ore found");
+                    if (ZeeThread.now() - msLastTileMsg > 1000 * 60 * 5) {
+                        msLastTileMsg = ZeeThread.now();
+                        ZeeConfig.msg("Found " + basename);
+                        ZeeAudio.textToSpeakLinuxFestival("Tile found");
                     }
+                    //add found tile to the top
+                    foundList.add(0, label);
                 }
-                //add precious ore to the top
-                oreList.add(0,label);
+                // label ore
+                else if (isRegularOre(basename)) {
+                    label.setcolor(Color.yellow);
+                    label.settext(label.texts + "  (ore)");
+                    //add ore tile to the top
+                    oreList.add(0, label);
+                }
+                // label silver/gold
+                else if (isPreciousOre(basename)) {
+                    // label color
+                    label.setcolor(Color.red);
+                    // label text
+                    if (silverList.contains(basename)) {
+                        label.settext(basename + "  (silver)");
+                        // 5min limit, TODO find better way
+                        if (ZeeThread.now() - msLastSilverMsg > 1000 * 60 * 5) {
+                            msLastSilverMsg = ZeeThread.now();
+                            ZeeConfig.msg("Silver ore found");
+                            ZeeAudio.textToSpeakLinuxFestival("Silver ore found");
+                        }
+                    } else {
+                        label.settext(basename + "  (gold)");
+                        // 5min limit, TODO better way
+                        if (ZeeThread.now() - msLastGoldMsg > 1000 * 60 * 5) {
+                            msLastGoldMsg = ZeeThread.now();
+                            ZeeConfig.msg("Gold ore found");
+                            ZeeAudio.textToSpeakLinuxFestival("Gold ore found");
+                        }
+                    }
+                    //add precious ore to the top
+                    oreList.add(0, label);
+                } else {
+                    //add regular tile to the end
+                    tilesList.add(label);
+                }
             }
-            else{
-                //add regular tile to the end
-                tilesList.add(label);
-            }
-        }
 
 
-        // add ordered labels
-        int y = 0;
-        for (Label lbl : foundList) {
-            tilemonScrollport.cont.add(lbl,0,y);
-            y += 13;
-        }
-        oreList.sort(Comparator.comparing(label2 -> label2.texts));
-        for (Label lbl : oreList) {
-            tilemonScrollport.cont.add(lbl,0,y);
-            y += 13;
-        }
-        for (Label lbl : tilesList) {
-            tilemonScrollport.cont.add(lbl,0,y);
-            y += 13;
-        }
+            // add ordered labels
+            int y = 0;
+            for (Label lbl : foundList) {
+                tilemonScrollport.cont.add(lbl, 0, y);
+                y += 13;
+            }
+            oreList.sort(Comparator.comparing(label2 -> label2.texts));
+            for (Label lbl : oreList) {
+                tilemonScrollport.cont.add(lbl, 0, y);
+                y += 13;
+            }
+            for (Label lbl : tilesList) {
+                tilemonScrollport.cont.add(lbl, 0, y);
+                y += 13;
+            }
 
 
         /*
             append mining ql log
          */
-        y = tilemonScrollport.c.y + tilemonScrollport.sz.y + 5;
-        label = new Label("==== top 10 ql ====");
-        label.setcolor(Color.green);
-        tilemonWindow.add(label,0,y);
-        y += 13;
-        tilemonWindow.add((new CheckBox("spk"){
-            {a = hiQlSpeak;}
-            public void set(boolean val) {
-                Utils.setprefb("hiQlSpeak", val);
-                hiQlSpeak = val;
-                a = val;
-            }
-        }).settip("speak highest ql"),0,y);
-        tilemonWindow.add((new CheckBox("txt"){
-            {a = hiQlText;}
-            public void set(boolean val) {
-                Utils.setprefb("hiQlText", val);
-                hiQlText = val;
-                a = val;
-            }
-        }).settip("text highest ql"),40,y);
-        y += 3;
-        List<Map.Entry<String,Integer>> miningLog = getSortedMiningLog();
-        for (int i = 0; i < miningLog.size(); i++) {
-            if (i < 10) {//limit list size
-                y += 13;
-                label = new Label(miningLog.get(i).getKey()+" q"+miningLog.get(i).getValue());
-                tilemonWindow.add(label,0,y);
-            }else
-                break;
-        }
+            y = tilemonScrollport.c.y + tilemonScrollport.sz.y + 5;
+            label = new Label("==== top 10 ql ====");
+            label.setcolor(Color.green);
+            tilemonWindow.add(label, 0, y);
+            y += 13;
+            tilemonWindow.add((new CheckBox("spk") {
+                {
+                    a = hiQlSpeak;
+                }
 
-        tilemonWindow.pack();
+                public void set(boolean val) {
+                    Utils.setprefb("hiQlSpeak", val);
+                    hiQlSpeak = val;
+                    a = val;
+                }
+            }).settip("speak highest ql"), 0, y);
+            tilemonWindow.add((new CheckBox("txt") {
+                {
+                    a = hiQlText;
+                }
+
+                public void set(boolean val) {
+                    Utils.setprefb("hiQlText", val);
+                    hiQlText = val;
+                    a = val;
+                }
+            }).settip("text highest ql"), 40, y);
+            y += 3;
+            List<Map.Entry<String, Integer>> miningLog = getSortedMiningLog();
+            for (int i = 0; i < miningLog.size(); i++) {
+                if (i < 10) {//limit list size
+                    y += 13;
+                    label = new Label(miningLog.get(i).getKey() + " q" + miningLog.get(i).getValue());
+                    tilemonWindow.add(label, 0, y);
+                } else
+                    break;
+            }
+
+            tilemonWindow.pack();
+        }catch(MCache.LoadingMap l) {
+            ZeeConfig.println("tileWindowRefresh > "+l.getMessage());
+        }catch(Exception e){
+            e.printStackTrace();
+        }
     }
 
     static void tilesMonitorCleanup() {
