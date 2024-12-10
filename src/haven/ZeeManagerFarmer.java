@@ -1065,7 +1065,8 @@ public class ZeeManagerFarmer extends ZeeThread{
             Map.entry("gfx/terobjs/plants/pipeweed",4),
             Map.entry("gfx/terobjs/plants/peas",4),
             Map.entry("gfx/terobjs/plants/cucumber",4),
-            Map.entry("gfx/terobjs/plants/champignon",4)
+            Map.entry("gfx/terobjs/plants/champignon",4),
+            Map.entry("gfx/terobjs/plants/garlic",4)
     );
     public static boolean isCropStageHarvestable(Gob crop) {
         boolean ret = false;
