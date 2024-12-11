@@ -2509,7 +2509,7 @@ public class ZeeManagerGobs extends ZeeThread{
             menu = new ZeeFlowerMenu( gob,
                     ZeeFlowerMenu.STRPETAL_LIFTUPGOB,
                     "Craft flour",
-                    "Craft girst"
+                    "Craft grist"
             );
         }
         else{
