@@ -79,7 +79,7 @@ public class Fightsess extends Widget {
 
     public void presize() {
 	resize(parent.sz);
-	pcc = sz.div(2);
+	pcc = Coord.of(sz.x/2, sz.y/7);
     }
 
     private void updatepos() {
@@ -90,8 +90,8 @@ public class Fightsess extends Widget {
 	Coord3f raw = pl.placed.getc();
 	if(raw == null)
 	    return;
-	pcc = map.screenxf(raw).round2();
-	pho = (int)(map.screenxf(raw.add(0, 0, UI.scale(20))).round2().sub(pcc).y) - UI.scale(20);
+	pcc = Coord.of(sz.x/2, sz.y/7);//pcc = map.screenxf(raw).round2();
+	pho = 1;//pho = (int)(map.screenxf(raw.add(0, 0, UI.scale(20))).round2().sub(pcc).y) - UI.scale(20);
     }
 
     private static class Effect implements RenderTree.Node {
