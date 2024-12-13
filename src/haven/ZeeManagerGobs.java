@@ -4501,6 +4501,11 @@ public class ZeeManagerGobs extends ZeeThread{
         return ZeeConfig.gobHasAnyPoseContains(gob,"/dead","/knock","-knock","/waterdead");
     }
 
+    static boolean isGobPoseAggro(Gob gob) {
+        //TODO add more aggro pose names
+        return ZeeConfig.gobHasAnyPoseContains(gob,"/fgt");
+    }
+
     static void toggleHitbox() {
         if (ZeeConfig.showHitbox)
             ZeeConfig.msgLow("show hitbox");

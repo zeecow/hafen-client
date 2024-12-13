@@ -30,17 +30,8 @@ public class ZeeFont {
 
     private static String getFleeHpInfo(Gob gob) {
         String ret = "";
-        /*
-        "/stallion,/mare,/foal,/hog,/sow,/piglet,/teimdeercow,/teimdeerbull,/teimdeerkid,"
-            +"/billy,/nanny,/kid,/sheep,/lamb,/cattle,/calf,"
-            +"/wildhorse,/aurochs,/mouflon,/wildgoat,"
-            +"/adder,/badger,/bear,/boar,/beaver,/fox,"
-            +"/reindeer,/reddeer,/roedeer,"
-            +"/greyseal,/otter,"
-            +"/lynx,/mammoth,/moose,/troll,/walrus,/wolf,/wolverine,"
-            +"/caveangler,/boreworm,/caverat,/cavelouse"
-         */
         final Map<String,java.util.List<Integer>> mapGobFleeMax = Map.ofEntries(
+            Map.entry("ants",java.util.List.of(50,50)),
             Map.entry("adder",java.util.List.of(30,70)),
             Map.entry("aurochs",java.util.List.of(250,350)),
             Map.entry("badger",java.util.List.of(150,250)),
@@ -54,6 +45,7 @@ public class ZeeFont {
             Map.entry("caverat",java.util.List.of(75,120)),
             Map.entry("eagleowl",java.util.List.of(100,180)),
             Map.entry("fox",java.util.List.of(75,110)),
+            Map.entry("garefowl",java.util.List.of(40,85)),
             Map.entry("goldeneagle",java.util.List.of(80,250)),
             Map.entry("greyseal",java.util.List.of(240,320)),
             Map.entry("lynx",java.util.List.of(150,400)),
@@ -61,14 +53,18 @@ public class ZeeFont {
             Map.entry("mouflon",java.util.List.of(120,200)),
             Map.entry("moose",java.util.List.of(800,800)),
             Map.entry("otter",java.util.List.of(60,100)),
+            Map.entry("ooze",java.util.List.of(40,100)), //TODO check name
+            Map.entry("pelican",java.util.List.of(80,130)),
             Map.entry("reindeer",java.util.List.of(110,200)),
             Map.entry("reddeer",java.util.List.of(150,200)),
             Map.entry("roedeer",java.util.List.of(80,150)),
+            Map.entry("swan",java.util.List.of(80,150)),
             Map.entry("walrus",java.util.List.of(600,900)),
             Map.entry("wildgoat",java.util.List.of(200,300)),
             Map.entry("wildhorse",java.util.List.of(200,320)),
             Map.entry("wolf",java.util.List.of(400,500)),
-            Map.entry("wolverine",java.util.List.of(200,300))
+            Map.entry("wolverine",java.util.List.of(200,300)),
+            Map.entry("woodgrouse",java.util.List.of(100,120)) //TODO check male name
         );
         try {
             String basename = gob.getres().basename();

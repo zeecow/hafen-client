@@ -26,12 +26,17 @@
 
 package haven;
 
-import java.util.*;
-import java.util.function.*;
-import java.lang.reflect.*;
-import haven.render.*;
-import haven.Skeleton.Pose;
 import haven.Skeleton.PoseMod;
+import haven.render.Pipe;
+import haven.render.Render;
+import haven.render.RenderTree;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.function.Supplier;
+
 import static haven.Composited.ED;
 import static haven.Composited.MD;
 
@@ -110,6 +115,8 @@ public class Composite extends Drawable implements EquipTarget {
 		Composited.Poses np = comp.new Poses(loadposes(nposes, comp.skel, nposesold));
 		np.set(nposesold?0:ipollen);
 		prevposes = nposes;
+		if(gob.hasPointer)
+			ZeeGobPointer.checkPoseAggroDed(gob);
 		nposes = null;
 		updequ();
 	    } catch(Loading e) {}

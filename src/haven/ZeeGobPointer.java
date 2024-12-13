@@ -10,8 +10,10 @@ import java.util.HashMap;
 public class ZeeGobPointer extends Sprite implements RenderTree.Node, PView.Render2D {
 
     static final HashMap<String, Tex> mapGobPointer = new HashMap<>();
-    static final TexI bgTexTriangle = new TexI(ZeeManagerIcons.imgTriangleDown(10, Color.CYAN,false,false,true));
-    static final TexI bgTexCircle = new TexI(ZeeManagerIcons.imgSquare(20, Color.CYAN,false,false,true));
+    static final TexI BG_TEX_TRIANGLE = new TexI(ZeeManagerIcons.imgTriangleDown(10, Color.CYAN,false,false,true));
+    static final TexI BG_TEX_SQUARE = new TexI(ZeeManagerIcons.imgSquare(20, Color.CYAN,false,false,true));
+    static final TexI BG_TEX_SQUARE_AGGRO = new TexI(ZeeManagerIcons.imgSquare(20, Color.RED,false,false,true));
+    static final TexI BG_TEX_SQUARE_DED = new TexI(ZeeManagerIcons.imgSquare(20, Color.LIGHT_GRAY,false,false,true));
     static ZeeGobRadar gobRadar;
     private boolean rawIcon;
     Coord2d tc;
@@ -45,9 +47,14 @@ public class ZeeGobPointer extends Sprite implements RenderTree.Node, PView.Rend
             if (rawIcon) {
                 g.image(iconTex, sc);
             } else {
-                g.aimage(bgTexTriangle, sc, -0.5, -1.5);
-                g.image(bgTexCircle, sc);
-                g.image(iconTex, sc, bgTexCircle.sz);
+                g.aimage(BG_TEX_TRIANGLE, sc, -0.5, -1.5);
+                if (gob.isPoseDedKO)
+                    g.image(BG_TEX_SQUARE_DED, sc);
+                else if (gob.isPoseAggro)
+                    g.image(BG_TEX_SQUARE_AGGRO, sc);
+                else
+                    g.image(BG_TEX_SQUARE, sc);
+                g.image(iconTex, sc, BG_TEX_SQUARE.sz);
             }
         } catch(Loading l) {
             ZeeConfig.println("ZeePointer.draw > "+l.getMessage());
@@ -57,6 +64,17 @@ public class ZeeGobPointer extends Sprite implements RenderTree.Node, PView.Rend
     public void update(Coord2d tc, long gobid) {
         this.tc = tc;
         this.gobid = gobid;
+    }
+
+
+    // set flags for changing pointer bg color when gob pose aggro/ded
+    public static void checkPoseAggroDed(Gob gob) {
+        if (!gob.isPoseDedKO && ZeeManagerGobs.isGobDeadOrKO(gob))
+            gob.isPoseDedKO = true;
+        else if (!gob.isPoseAggro && ZeeManagerGobs.isGobPoseAggro(gob))
+            gob.isPoseAggro = true;
+        else
+            gob.isPoseAggro = false;//isPoseDedKO not necessary to set false?
     }
 
 //    @Override
