@@ -53,7 +53,7 @@ public class ZeeFont {
             Map.entry("mouflon",java.util.List.of(120,200)),
             Map.entry("moose",java.util.List.of(800,800)),
             Map.entry("otter",java.util.List.of(60,100)),
-            Map.entry("ooze",java.util.List.of(40,100)), //TODO check name
+            Map.entry("greenooze",java.util.List.of(40,100)), //TODO check name
             Map.entry("pelican",java.util.List.of(80,130)),
             Map.entry("reindeer",java.util.List.of(110,200)),
             Map.entry("reddeer",java.util.List.of(150,200)),
