@@ -3893,6 +3893,9 @@ public class ZeeConfig {
                 ZeeManagerGobs.discHelpCheckGob(ob);
             }
 
+            // gob pointer color
+            ZeeGobPointer.checkPoseAggroDed(ob);
+
             // save gob name
             if (gobName!=null && !gobName.isBlank() && !listGobsSession.contains(gobName)) {
                 listGobsSession.add(gobName);
