@@ -157,6 +157,8 @@ public class RootWidget extends ConsoleHost implements UI.Notice.Handler, Widget
     }
 
     public boolean msg(UI.Notice msg) {
+	if(msg.handler(this))
+	    return(true);
 	msg(msg.message(), msg.color());
 	if(ZeeConfig.muteAudioMsg(msg.message()))
 		return(true);
