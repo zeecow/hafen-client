@@ -166,6 +166,7 @@ public class Makewindow extends Widget {
 			ZeeConfig.btnMkWndSearchInput.change("Search "+(inputCount+1)+"/"+inputs.size());
 		}
 		else if(msg.contentEquals("close")) {
+			ZeeConfig.clickedCraftAll = false;
 			ZeeManagerCraft.craftWindowClosed();
 			ZeeManagerGobs.autoPickIrrlightExit();
 			super.wdgmsg(sender, msg, args);
@@ -173,7 +174,8 @@ public class Makewindow extends Widget {
 		else {
 			if (msg.contentEquals("make")) {
 				// 0 = craft ,  1 = craft all
-				if(String.valueOf(args[0]).contentEquals("0")) {
+				ZeeConfig.clickedCraftAll = String.valueOf(args[0]).contentEquals("1");
+				if(!ZeeConfig.clickedCraftAll) {
 					ZeeResearch.checkResearch(this.rcpnm);
 					ZeeManagerCraft.bugColCraftBtnClicked();
 				}

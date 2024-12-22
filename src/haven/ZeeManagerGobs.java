@@ -2776,8 +2776,7 @@ public class ZeeManagerGobs extends ZeeThread{
         win.pack();
     }
 
-    static boolean autoPickIrrlight = false;
-    static boolean alreadyPickingIrrlight = false;
+    static boolean autoPickIrrlight = false, alreadyPickingIrrlight = false;
     public static void autoPickIrrlight() {
         if (alreadyPickingIrrlight) {
             // avoid being called multiple times by gob consumer
@@ -2811,8 +2810,10 @@ public class ZeeManagerGobs extends ZeeThread{
                         gobClick(workingStation,3);
                         waitPlayerIdlePose();
                         sleep(PING_MS);
-                        ZeeConfig.getButtonNamed((Window) ZeeConfig.makeWindow.parent,"Craft All").click();
-                        //drink while crafting
+                        if(ZeeConfig.clickedCraftAll) {
+                            ZeeConfig.getButtonNamed((Window) ZeeConfig.makeWindow.parent, "Craft All").click();
+                        }
+                        //drink after running
                         ZeeManagerItems.drinkFromBeltHandsInv();
                     }
 

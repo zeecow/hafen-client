@@ -288,6 +288,7 @@ public class ZeeConfig {
     static boolean leftClickDragCamera = Utils.getprefb("leftClickDragCamera",false);
     static boolean isPlayerFollowingCauldron = false;
     static List<Gob> listCauldronContainers = null;
+    public static boolean clickedCraftAll = false;
 
     public static boolean playMidiRadio = Utils.getprefb("playMidiRadio",false);
     static Runnable playMidiRadioRunnable = () -> ZeeMidiRadio.toggleRadio();
@@ -2815,6 +2816,7 @@ public class ZeeConfig {
         ZeeManagerItems.clickingAllItemsPetals = false;
         ZeeConsole.isGobFindActive = false;
         ZeeConsole.gobFindRegex = null;
+        ZeeConfig.clickedCraftAll = false;
         isPlayerFollowingCauldron = false;
         if (listCauldronContainers!=null)
             listCauldronContainers.clear();
