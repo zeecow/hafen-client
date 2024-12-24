@@ -327,7 +327,7 @@ public class ZeeManagerTrees {
         }
 
         //equip shovel
-        ZeeManagerItems.equipBeltOrInvItem("shovel");
+        ZeeManagerItems.equipBeltOrInvItemThreadJoin("shovel");
         if (!ZeeThread.waitItemInHand("shovel")){
             ZeeThread.println("couldnt equip shovel ?");
             return false;
@@ -341,7 +341,7 @@ public class ZeeManagerTrees {
 
         // reequip some inventory axe if no belt
         if(ZeeManagerItems.getInvBelt()==null) {
-            ZeeManagerItems.equipBeltOrInvItem("axe");
+            ZeeManagerItems.equipBeltOrInvItemThreadJoin("axe");
             ZeeThread.waitNotHoldingItem();
         }
 

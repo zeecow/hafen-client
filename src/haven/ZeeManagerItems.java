@@ -709,7 +709,7 @@ public class ZeeManagerItems extends ZeeThread{
                 return;
             WItem axe = getBeltOrInvWItem(axeName[i]);
             if (axe!=null){
-                equipBeltOrInvItem(axeName[i]);
+                equipBeltOrInvItemThreadJoin(axeName[i]);
                 waitItemInHand(axeName[i]);
                 return;
             }
@@ -1678,7 +1678,7 @@ public class ZeeManagerItems extends ZeeThread{
             return getEquipory().rightHand.item.getres().name;
     }
 
-    public static void equipBeltOrInvItem(String name) {
+    public static void equipBeltOrInvItemThreadJoin(String name) {
         if(ZeeManagerItems.isItemInHandSlot(name)) {
             return;
         }

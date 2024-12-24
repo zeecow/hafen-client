@@ -4361,8 +4361,18 @@ public class ZeeConfig {
             ZeeManagerStockpile.exitManager();
         }
         //equip roundshield
-        if (ZeeConfig.equipShieldOnCombat && !ZeeManagerItems.isItemEquipped("huntersbow","rangersbow"))
-            ZeeManagerItems.equipBeltOrInvItem("/roundshield");
+        if (ZeeConfig.equipShieldOnCombat && !ZeeManagerItems.isItemEquipped("huntersbow","rangersbow","roundshield")) {
+            println("auto equipping shield");
+            new ZeeThread(){
+                public void run() {
+                    try {
+                        ZeeManagerItems.equipBeltOrInvItemThreadJoin("/roundshield");
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            }.start();
+        }
     }
 
     // TODO remove aggro hilites ?

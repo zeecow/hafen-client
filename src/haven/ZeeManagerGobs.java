@@ -3772,7 +3772,7 @@ public class ZeeManagerGobs extends ZeeThread{
 
     public static boolean liftGob(Gob gob) {
         if(isGobBush(gob.getres().name)) {
-            ZeeManagerItems.equipBeltOrInvItem("shovel");
+            ZeeManagerItems.equipBeltOrInvItemThreadJoin("shovel");
             waitItemInHand("shovel");
         }
         ZeeConfig.gameUI.menu.wdgmsg("act", "carry","0");
