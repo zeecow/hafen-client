@@ -2067,6 +2067,45 @@ public class ZeeManagerItems extends ZeeThread{
         return free;
     }
 
+
+    public static boolean craftIngrRequiresConfirmation() {
+
+        final List<String> nameListEndsWith = List.of(
+                "silkcloth","goldencloth","erminecloth","ratcloth","/felt",
+                "-silver","-gold","-steel","-rosegold",
+                "clay-cave","clay-soap","clay-pit","clay-bone",
+                "stargem",
+                "beetweird","-crying",
+                "yarn-goat","yarn-sheep" // used as string
+        );
+
+        // main inv
+        List<WItem> items = getMainInv().getItemsSelectedForCrafting();
+        for (WItem item : items) {
+            for (String s : nameListEndsWith) {
+                if (item.item.getres().name.endsWith(s))
+                    return true;
+            }
+        }
+
+        // open containers invs
+        List<Window> openWins = ZeeConfig.getContainersWindows(false);
+        for (Window win : openWins) {
+            Inventory inv = win.getchild(Inventory.class);
+            if (inv==null)
+                continue;
+            List<WItem> itemsConts = inv.getItemsSelectedForCrafting();
+            for (WItem item : itemsConts) {
+                for (String s : nameListEndsWith) {
+                    if (item.item.getres().name.endsWith(s))
+                        return true;
+                }
+            }
+        }
+        return false;
+    }
+
+
     static List<String> cheeseProgressList = new ArrayList<>(Utils.getprefsl("cheeseProgressList",new String[]{}));
     public static void checkCheeseTray(Window window) {
         new ZeeThread(){

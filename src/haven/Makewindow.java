@@ -173,6 +173,10 @@ public class Makewindow extends Widget {
 		}
 		else {
 			if (msg.contentEquals("make")) {
+				if(!ui.modctrl && ZeeManagerItems.craftIngrRequiresConfirmation()){
+					ZeeConfig.msgError("control confirm crafting ingredient");
+					return;
+				}
 				// 0 = craft ,  1 = craft all
 				ZeeConfig.clickedCraftAll = String.valueOf(args[0]).contentEquals("1");
 				if(!ZeeConfig.clickedCraftAll) {
