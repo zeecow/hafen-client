@@ -249,14 +249,10 @@ public class ZeeManagerItems extends ZeeThread{
             gItem.wdgmsg("drop", Coord.z);
         }
         //drop seeds
-        else if( ZeeConfig.dropSeeds && basename.startsWith("seed-") && gItem.parent instanceof Inventory){
-            if (inv!=null && inv.isMainInv() && inv.getNumberOfFreeSlots() < 6)
+        else if( ZeeConfig.dropCrops && ZeeConfig.isItemCrop(basename) && gItem.parent instanceof Inventory){
+            if (inv!=null && inv.isMainInv() && inv.getNumberOfFreeSlots() < inv.getNumberOfSlots()/2) {
                 inv.dropItemsByNameEndsWith(basename);
-        }
-        //drop soil
-        else if( ZeeConfig.dropSoil && basename.startsWith("soil") && gItem.parent instanceof Inventory) {
-            if (inv!=null)
-                inv.dropItemsByNameEndsWith(basename);
+            }
         }
 
         // update counter

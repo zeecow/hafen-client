@@ -218,8 +218,7 @@ public class ZeeConfig {
     static boolean dropMinedOre = Utils.getprefb("dropMinedOre", true);
     static boolean dropMinedOrePrecious = Utils.getprefb("dropMinedOrePrecious", true);
     static boolean dropMinedStones = Utils.getprefb("dropMinedStones", true);
-    static boolean dropSeeds = false;
-    static boolean dropSoil = false;
+    static boolean dropCrops = false;
     static boolean treeloganize = false;
     static boolean equiporyCompact = Utils.getprefb("equiporyCompact", false);
     static boolean equipShieldOnCombat = Utils.getprefb("equipShieldOnCombat", false);
@@ -512,9 +511,7 @@ public class ZeeConfig {
 
     //  gfx/invobjs/turnip , gfx/invobjs/seed-turnip
     public static boolean isItemCrop(String basename) {
-        final String crops = "beetroot,seed-turnip,turnip,seed-carrot,carrot,seed-flax,seed-hemp,seed-leek,leek,seed-poppy,"
-            +"seed-pipeweed,seed-cucumber,seed-barley,seed-wheat,seed-millet,seed-lettuce,"
-            +"seed-pumpkin";
+        final List<String> crops = List.of("beetroot","seed-turnip","turnip","seed-carrot","carrot","seed-flax","seed-hemp","seed-leek","leek","seed-poppy","seed-pipeweed","seed-cucumber","seed-barley","seed-wheat","seed-millet","seed-lettuce","seed-pumpkin","pumpkin","yellowonion","redonion","garlic","seeds-greenkale");
         return crops.contains(basename);
     }
 

@@ -370,7 +370,7 @@ public class Inventory extends Widget implements DTarget {
 		return items;
 	}
 
-	public int getNumberOfFreeSlots() {
+	int getNumberOfSlots(){
 		int invSlots = isz.x * isz.y;
 		if (sqmask!=null){
 			for(int i = 0; i < isz.x * isz.y; i++) {
@@ -378,6 +378,10 @@ public class Inventory extends Widget implements DTarget {
 					invSlots--;
 			}
 		}
+		return invSlots;
+	}
+	int getNumberOfFreeSlots() {
+		int invSlots = getNumberOfSlots();
 		for (Widget wdg = child; wdg != null; wdg = wdg.next) {
 			if (wdg instanceof WItem) {
 				//ZeeConfig.println(invSlots+" -  "+((WItem) wdg).item.getres().name);
@@ -387,11 +391,6 @@ public class Inventory extends Widget implements DTarget {
 		}
 		return invSlots;
 	}
-
-	public static int getNumberOfFreeSlots(Inventory inv) {
-		return inv.getNumberOfFreeSlots();
-	}
-
 
 	//returns topleft from free slot area (w,h)
 	public Coord getFreeSlotAreaSized(int w, int h) {

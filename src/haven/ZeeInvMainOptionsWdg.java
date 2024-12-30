@@ -56,33 +56,19 @@ public class ZeeInvMainOptionsWdg extends Widget {
 
         x = 0;
 
-        add(cbSeeds = new CheckBox("sd") {
+        add(cbSeeds = new CheckBox("dc") {
             {
-                a = ZeeConfig.dropSeeds;
+                a = ZeeConfig.dropCrops;
             }
 
             public void set(boolean val) {
-                ZeeConfig.dropSeeds = val;
+                ZeeConfig.dropCrops = val;
                 a = val;
             }
         }, x, 15);
-        cbSeeds.settip("drop seeds");
+        cbSeeds.settip("drop crops");
 
         x += cbSeeds.sz.x + 5;
-
-//        add(cbSoil = new CheckBox("sl") {
-//            {
-//                a = ZeeConfig.dropSoil;
-//            }
-//
-//            public void set(boolean val) {
-//                ZeeConfig.dropSoil = val;
-//                a = val;
-//            }
-//        }, x, 15);
-//        cbSoil.settip("drop soil");
-//
-//        x += cbSoil.sz.x + 5;
 
         add(cbTunnel = new CheckBox("tn") {
             {
