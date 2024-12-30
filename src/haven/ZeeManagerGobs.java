@@ -106,17 +106,17 @@ public class ZeeManagerGobs extends ZeeThread{
         else if(isAutoButchingBigAnimal && isGobDeadOrKO(gob)){
             queueButchAnimal(gob);
         }
-        //queue chop tree/bush by animation
+        //queue chop tree/bush
         else if( ZeeManagerTrees.queueChopTreeBushIsPossible(gobName) ){
-            ZeeManagerGobs.queueChopTreeBush(gob);
+            queueChopTreeBush(gob);
         }
-        //queue chip stone by animation
-        else if(ZeeConfig.playerHasAnyPose(ZeeConfig.POSE_PLAYER_CHIPPINGSTONE,ZeeConfig.POSE_PLAYER_PICK) && isGobBoulder(gobName)){
-            ZeeManagerGobs.queueChipStone(gob);
+        //queue chip stone
+        else if(isGobBoulder(gobName) && (queueChipStoneIsActive() || ZeeConfig.playerHasAnyPose(ZeeConfig.POSE_PLAYER_CHIPPINGSTONE,ZeeConfig.POSE_PLAYER_PICK))){
+            queueChipStone(gob);
         }
         // queue menugrid act (after specific queues)
         else if (ZeeManagerGobs.lastMenuGridActArgs!=null && ZeeConfig.isPlayerActivePose()){
-            ZeeManagerGobs.queueMenuGridAct(gob);
+            queueMenuGridAct(gob);
         }
         // feed clover to wild animal
         else if (checkCloverFeeding(gob)) {
@@ -2945,6 +2945,9 @@ public class ZeeManagerGobs extends ZeeThread{
             }
             ZeeConfig.addPlayerText("queue " + listQueuedChipStone.size());
         }
+    }
+    static boolean queueChipStoneIsActive(){
+        return listQueuedChipStone!=null && !listQueuedChipStone.isEmpty();
     }
 
 
