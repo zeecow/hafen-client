@@ -603,9 +603,10 @@ public class ZeeManagerIcons {
     public static BufferedImage getSolidColorTile(BufferedImage tileImg) {
         Color color = getAverageColorFromImage(tileImg,0,0,tileImg.getWidth(),tileImg.getHeight());
         BufferedImage ret = new BufferedImage(tileImg.getWidth(),tileImg.getHeight(),BufferedImage.TYPE_INT_ARGB);
-        Graphics2D graphics = ret.createGraphics();
-        graphics.setColor ( color );
-        graphics.fillRect ( 0, 0, ret.getWidth(), ret.getHeight() );
+        Graphics2D g = ret.createGraphics();
+        g.setColor ( color );
+        g.fillRect ( 0, 0, ret.getWidth(), ret.getHeight() );
+        g.dispose();
         return ret;
     }
     static Color getAverageColorFromImage(BufferedImage image, int upperLeftX, int upperLeftY, int width,

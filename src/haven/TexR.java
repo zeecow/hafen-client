@@ -141,7 +141,7 @@ public abstract class TexR extends Resource.Layer implements Resource.IDLayer<In
 	    try {
 		BufferedImage ret = Resource.readimage(new ByteArrayInputStream(data));
 		String tileName = getres().name;
-		if (!tileName.contains("/lava") && tileName.startsWith("gfx/tiles/")) {
+		if (tileName.startsWith("gfx/tiles/") && !tileName.contains("/thicket") && !tileName.contains("/lava")) {
 			//ZeeConfig.println(tileName);
 			if (ZeeConfig.pavingSolidColor) {
 				Matcher m = Pattern.compile("gfx/tiles/paving/[^-]+-tex$").matcher(tileName);
