@@ -3087,12 +3087,14 @@ public class ZeeConfig {
     }
 
     public static double distanceToPlayer(Gob gob) {
-        return ZeeConfig.getPlayerGob().getc().dist(gob.getc());
+        final Coord3f xy = Coord3f.of(1,1,0);
+        return ZeeConfig.getPlayerGob().getc().mul(xy).dist(gob.getc().mul(xy));
     }
 
     public static Float distanceBetweenGobs(Gob gob1, Gob gob2) {
         try {
-            return gob1.getc().dist(gob2.getc());
+            final Coord3f xy = Coord3f.of(1,1,0);
+            return gob1.getc().mul(xy).dist(gob2.getc().mul(xy));
         }catch (Defer.NotDoneException e){
             return null;
         }
