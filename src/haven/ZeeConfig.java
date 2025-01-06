@@ -2615,6 +2615,8 @@ public class ZeeConfig {
     }
 
     public static Window getWindow(String name) {
+        if (gameUI==null)
+            return null;
         Set<Window> windows = gameUI.children(Window.class);
         for(Window w : windows) {
             if(w.cap.equalsIgnoreCase(name)){

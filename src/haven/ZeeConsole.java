@@ -3,6 +3,7 @@ package haven;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public class ZeeConsole {
@@ -13,6 +14,8 @@ public class ZeeConsole {
     static List<String> gobFindRegex;
 
     public static void runCmdZeecow(String[] args) {
+        if (ZeeConfig.gameUI==null)
+            return;
         initHelp();
         try{
             String cmd = "";
@@ -23,19 +26,14 @@ public class ZeeConsole {
             cmd.trim();
             println("zeecow > ("+cmd+" )");
             if (cmd.isBlank() || cmd.endsWith("-h") || cmd.endsWith("--help")){
-                //print help in terminal
-                for (String line : helpLines) {
-                    println(line);
-                }
                 //show window help
                 showHelpWindow();
                 return;
             }
 
-            cmd = cmd.replaceAll("^zeecow\\s+","");
-
-            String[] arrPipes = cmd.split(",");
+            String[] arrPipes = cmd.replaceAll("^zeecow\\s+","").split(",");
             println("arrPipes = "+arrPipes.length);
+            String finalCmd = cmd;
             new ZeeThread(){
                 public void run() {
                     try {
@@ -59,11 +57,44 @@ public class ZeeConsole {
                             }
                             ZeeConfig.msgLow(msg);
                         }
+
+                        // save cmd hist
+                        updateCmdHist(finalCmd);
+                        // udpate hist btns
+                        showHelpWindow();
+
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
                 }
             }.start();
+
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    static List<String> listCmdHist = new ArrayList<>(Utils.getprefsl("listCmdHist",new String[]{}));
+    private static void updateCmdHist(String cmd) {
+        cmd = cmd.strip();
+        println("saveCmdHist > \"" + cmd + "\"");
+        final int MAX_SIZE = 5;
+        try {
+            int i = listCmdHist.indexOf(cmd);
+            // new cmd
+            if (i < 0)
+                // list full, replace least used cmd
+                if(listCmdHist.size() >= MAX_SIZE)
+                    listCmdHist.add(MAX_SIZE-1,cmd);
+                // append cmd
+                else
+                    listCmdHist.add(cmd);
+            // bump existing cmd position
+            else if (i > 0)
+                Collections.swap(listCmdHist, i, i-1);
+
+            // save pref
+            Utils.setprefsl("listCmdHist",listCmdHist);
 
         }catch (Exception e){
             e.printStackTrace();
@@ -109,6 +140,8 @@ public class ZeeConsole {
     }
 
     private static void showHelpWindow() {
+        if (ZeeConfig.gameUI==null)
+            return;
         String winName = ":zeecow cmds";
         Window win = ZeeConfig.getWindow(winName);
         if (win!=null){
@@ -125,8 +158,23 @@ public class ZeeConsole {
             ZeeConfig.gameUI.sz.div(3)
         );
         int y=0;
+        Widget wdg = null;
+        // help text
         for (String lines : helpLines) {
-            win.add(new Label(lines),0,15*y++);
+            wdg = win.add(new Label(lines),0,15*y++);
+        }
+        // cmd history
+        wdg = win.add(new Label("CMD HISTORY ("+listCmdHist.size()+")"),0,wdg.c.y + wdg.sz.y + 15);
+        for (String cmd : listCmdHist) {
+            wdg = win.add(new ZeeWindow.ZeeButton(cmd){
+                public void wdgmsg(String msg, Object... args) {
+                    if (msg.contentEquals("activate")){
+                        String runcmd = this.buttonText.strip();
+                        println("run history cmd \""+runcmd+"\"");
+                        ZeeConsole.runCmdZeecow(new String[]{":zeecow",runcmd});
+                    }
+                }
+            }, 0, wdg.c.y + wdg.sz.y);
         }
         win.pack();
     }
@@ -497,7 +545,7 @@ public class ZeeConsole {
                             }
                             // stack all on item j
                             ZeeManagerItems.itemAct(meatItems.get(j), UI.MOD_CTRL_SHIFT);
-                            Thread.sleep(250);
+                            Thread.sleep(400);
                             // next item name
                             i = j = meatItems.size() + 1;
                         }
