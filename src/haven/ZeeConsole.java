@@ -58,10 +58,12 @@ public class ZeeConsole {
                             ZeeConfig.msgLow(msg);
                         }
 
-                        // save cmd hist
-                        updateCmdHist(finalCmd);
-                        // udpate hist btns
-                        showHelpWindow();
+                        if (lastCmdResults != null) {
+                            // save cmd hist
+                            updateCmdHist(finalCmd);
+                            // udpate hist btns
+                            showHelpWindow();
+                        }
 
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -85,7 +87,7 @@ public class ZeeConsole {
             if (i < 0)
                 // list full, replace least used cmd
                 if(listCmdHist.size() >= MAX_SIZE)
-                    listCmdHist.add(MAX_SIZE-1,cmd);
+                    listCmdHist.set(MAX_SIZE-1,cmd);
                 // append cmd
                 else
                     listCmdHist.add(cmd);
@@ -104,8 +106,14 @@ public class ZeeConsole {
     private static void initHelp() {
         if (helpLines==null){
             helpLines = new ArrayList<>();
-            helpLines.add(":zeecow  cmd1 , cmd2 , ... ");
-            helpLines.add("======== gob ========");
+            helpLines.add("======== examples ========");
+            helpLines.add(":zeecow gobfind borka");
+            helpLines.add("      highlight players");
+            helpLines.add(":zeecow win cupboard , stack");
+            helpLines.add("      select cupboard windows , stack similar items ");
+            helpLines.add(":zeecow itres cheesetray , clickmenu slice up");
+            helpLines.add("      select cheesetrays , clickmenu \"Slice up\"");
+            helpLines.add("======== gob cmds ========");
             helpLines.add("   goball      select all gobs");
             helpLines.add("   gobne []    select gobs which name ends with []");
             helpLines.add("   gobns []    select gobs which name starts with []");
@@ -117,25 +125,19 @@ public class ZeeConsole {
             helpLines.add("   addc []     add hexcolor[] to all/sel gobs");
             helpLines.add("   clg         clear gobs text/color/pointer");
             helpLines.add("   clg [tpc]   clear gobs [t]ext, [c]olor, [p]ointer");
-            helpLines.add("======== win items ========");
+            helpLines.add("======== items cmds ========");
             helpLines.add("   win []        select windows named []");
             helpLines.add("   itname []     select items which name contains []");
             helpLines.add("   itres []      select items with resname contains []");
             helpLines.add("   stack         stack selected windows/items ");
             helpLines.add("   clickmenu []  click menu named []");
-            helpLines.add("======== misc ========");
+            helpLines.add("======== misc cmds ========");
             helpLines.add("   count       msg counting last cmd results");
             helpLines.add("   disc        toggle discovery helper on/off");
-            helpLines.add("   say []      text2speak parameter or last cmd results (requires LinuxFestival)");
+            helpLines.add("   say []      text2speak parameter or last cmd results");
+            helpLines.add("                 (requires LinuxFestival)");
             helpLines.add("   reslocal    print local res names to terminal");
             helpLines.add("   resmote     print remote res names to terminal");
-            helpLines.add("======== examples ========");
-            helpLines.add(":zeecow itres cheesetray , clickmenu slice up");
-            helpLines.add("      select cheesetrays , clickmenu \"Slice up\"");
-            helpLines.add(":zeecow win cupboard , stack");
-            helpLines.add("      select cupboard windows , stack similar items ");
-            helpLines.add(":zeecow gobfind borka");
-            helpLines.add("      highlight players");
         }
     }
 
@@ -147,8 +149,9 @@ public class ZeeConsole {
         if (win!=null){
             win.reqdestroy();
         }
+        Coord winsize = Coord.of(390,220);
         win = ZeeConfig.gameUI.add(
-            new Window(Coord.of(200,200),winName){
+            new Window(winsize,winName){
                 public void wdgmsg(String msg, Object... args) {
                     if (msg.contentEquals("close")){
                         this.reqdestroy();
@@ -157,14 +160,17 @@ public class ZeeConsole {
             },
             ZeeConfig.gameUI.sz.div(3)
         );
-        int y=0;
         Widget wdg = null;
         // help text
+        wdg = win.add(new Label(":zeecow cmd1 , cmd2 , ..."),0,0);
+        int y=0;
+        Scrollport scroll = win.add(new Scrollport(new Coord(winsize.x-25, 170)), 15, y+15);
         for (String lines : helpLines) {
-            wdg = win.add(new Label(lines),0,15*y++);
+            scroll.cont.add(new Label(lines),0,15*y++);
         }
         // cmd history
-        wdg = win.add(new Label("CMD HISTORY ("+listCmdHist.size()+")"),0,wdg.c.y + wdg.sz.y + 15);
+        wdg = scroll.cont;
+        wdg = win.add(new Label("CMD HIST ("+listCmdHist.size()+")"),0,wdg.c.y + wdg.sz.y+25);
         for (String cmd : listCmdHist) {
             wdg = win.add(new ZeeWindow.ZeeButton(cmd){
                 public void wdgmsg(String msg, Object... args) {
@@ -174,7 +180,7 @@ public class ZeeConsole {
                         ZeeConsole.runCmdZeecow(new String[]{":zeecow",runcmd});
                     }
                 }
-            }, 0, wdg.c.y + wdg.sz.y);
+            }, 15, wdg.c.y + wdg.sz.y);
         }
         win.pack();
     }
@@ -345,6 +351,7 @@ public class ZeeConsole {
             ZeeConfig.msgError("unknown \""+cmd+"\"");
             println("cmd unknown \""+cmd+"\"");
             showHelpWindow();
+            return null;
         }
 
         return ret;
