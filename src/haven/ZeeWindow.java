@@ -216,8 +216,6 @@ public class ZeeWindow extends Window {
                     Utils.setprefsl("listAutoHideWindowsActive",ZeeConfig.listAutoHideWindowsActive);
                     Utils.setprefsl("listAutoHideWindowsActiveFast",ZeeConfig.listAutoHideWindowsActiveFast);
                 }
-                else
-                    super.wdgmsg(msg,args);
             }
         }
         private void organizeDuplicateWindows(String windowName) {

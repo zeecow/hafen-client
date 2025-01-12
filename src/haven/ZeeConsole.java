@@ -160,7 +160,9 @@ public class ZeeConsole {
             },
             ZeeConfig.gameUI.sz.div(3)
         );
+
         Widget wdg = null;
+
         // help text
         wdg = win.add(new Label(":zeecow cmd1 , cmd2 , ..."),0,0);
         int y=0;
@@ -168,17 +170,24 @@ public class ZeeConsole {
         for (String lines : helpLines) {
             scroll.cont.add(new Label(lines),0,15*y++);
         }
+
         // cmd history
         wdg = scroll.cont;
-        wdg = win.add(new Label("CMD HIST ("+listCmdHist.size()+")"),0,wdg.c.y + wdg.sz.y+25);
+        wdg = win.add(new Label("CMD HIST ("+listCmdHist.size()+")  (leftclick to run, midclick to delete) "),0,wdg.c.y + wdg.sz.y+25);
         for (String cmd : listCmdHist) {
             wdg = win.add(new ZeeWindow.ZeeButton(cmd){
-                public void wdgmsg(String msg, Object... args) {
-                    if (msg.contentEquals("activate")){
-                        String runcmd = this.buttonText.strip();
-                        println("run history cmd \""+runcmd+"\"");
+                public boolean mousedown(MouseDownEvent ev) {
+                    return super.mousedown(ev);
+                }
+                public boolean mouseup(MouseUpEvent ev) {
+                    String runcmd = this.buttonText.strip();
+                    if ( ev.b == 1 ) {
                         ZeeConsole.runCmdZeecow(new String[]{":zeecow",runcmd});
+                    }else if( ev.b == 2 ) {
+                        listCmdHist.remove(runcmd);
+                        showHelpWindow();
                     }
+                    return super.mouseup(ev);
                 }
             }, 15, wdg.c.y + wdg.sz.y);
         }
@@ -437,9 +446,9 @@ public class ZeeConsole {
         boolean backupConfirmEat = ZeeConfig.confirmPetalEat;
         ZeeConfig.confirmPetal = ZeeConfig.confirmPetalEat = false;
         try {
-            int clicked = ZeeManagerItems.clickAllItemsPetal((List<WItem>) lastCmdResults, petalName.toString().trim());
+            int clicked = ZeeManagerItems.clickAllItemsPetal((List<WItem>) lastCmdResults, petalName.toString().strip());
             if (clicked==0){
-                ZeeConfig.msgError("no petal named \""+petalName.toString().trim()+"\" ?");
+                ZeeConfig.msgError("no petal named \""+petalName.toString().strip()+"\" ?");
                 ZeeManagerItems.cancelFlowerMenu();
             }else{
                 println("clicked "+clicked+" petals");
