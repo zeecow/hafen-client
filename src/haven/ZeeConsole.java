@@ -27,7 +27,7 @@ public class ZeeConsole {
             println("zeecow > ("+cmd+" )");
             if (cmd.isBlank() || cmd.endsWith("-h") || cmd.endsWith("--help")){
                 //show window help
-                showHelpWindow();
+                showWindow();
                 return;
             }
 
@@ -62,7 +62,7 @@ public class ZeeConsole {
                             // save cmd hist
                             updateCmdHist(finalCmd);
                             // udpate hist btns
-                            showHelpWindow();
+                            showWindow();
                         }
 
                     } catch (Exception e) {
@@ -141,9 +141,10 @@ public class ZeeConsole {
         }
     }
 
-    private static void showHelpWindow() {
+    static void showWindow() {
         if (ZeeConfig.gameUI==null)
             return;
+        initHelp();
         String winName = ":zeecow cmds";
         Window win = ZeeConfig.getWindow(winName);
         if (win!=null){
@@ -185,7 +186,7 @@ public class ZeeConsole {
                         ZeeConsole.runCmdZeecow(new String[]{":zeecow",runcmd});
                     }else if( ev.b == 2 ) {
                         listCmdHist.remove(runcmd);
-                        showHelpWindow();
+                        showWindow();
                     }
                     return super.mouseup(ev);
                 }
@@ -210,7 +211,7 @@ public class ZeeConsole {
         else if (cmd.contentEquals("gobne")){
             if (arr.length < 2){
                 ZeeConfig.msgError("gobne missing parameter");
-                showHelpWindow();
+                showWindow();
                 return null;
             }
             ret = ZeeConfig.findGobsByNameEndsWith(arr[1]);
@@ -218,7 +219,7 @@ public class ZeeConsole {
         else if (cmd.contentEquals("gobns")){
             if (arr.length < 2){
                 ZeeConfig.msgError("gobns missing parameter");
-                showHelpWindow();
+                showWindow();
                 return null;
             }
             ret = ZeeConfig.findGobsByNameStartsWith(arr[1]);
@@ -226,7 +227,7 @@ public class ZeeConsole {
         else if (cmd.contentEquals("gobnc")){
             if (arr.length < 2){
                 ZeeConfig.msgError("gobnc missing parameter");
-                showHelpWindow();
+                showWindow();
                 return null;
             }
             ret = ZeeConfig.findGobsByNameContains(arr[1]);
@@ -264,7 +265,7 @@ public class ZeeConsole {
         else if (cmd.contentEquals("win")){
             if (arr.length < 2){
                 ZeeConfig.msgError("win parameter missing");
-                showHelpWindow();
+                showWindow();
                 return null;
             }
             String windowName = arr[1];
@@ -287,7 +288,7 @@ public class ZeeConsole {
         else if (cmd.contentEquals("clickmenu")){
             if (arr.length < 2){
                 ZeeConfig.msgError("clickmenu parameter missing");
-                showHelpWindow();
+                showWindow();
                 return null;
             }
             ZeeConfig.addPlayerText("clickin");
@@ -337,7 +338,7 @@ public class ZeeConsole {
                 // requires lastCmdResults, show help
                 if (lastCmdResults==null){
                     ZeeConfig.msgError("\"say\" is missing parameter");
-                    showHelpWindow();
+                    showWindow();
                 }
                 // say lastCmdResults
                 else {
@@ -359,7 +360,7 @@ public class ZeeConsole {
         else {
             ZeeConfig.msgError("unknown \""+cmd+"\"");
             println("cmd unknown \""+cmd+"\"");
-            showHelpWindow();
+            showWindow();
             return null;
         }
 
@@ -371,7 +372,7 @@ public class ZeeConsole {
             // missing regex param?
             if (!isGobFindActive) {
                 ZeeConfig.msgError("gobfind missing parameter");
-                showHelpWindow();
+                showWindow();
                 return null;
             }
             //clear gobs found
@@ -434,7 +435,7 @@ public class ZeeConsole {
         if (!(lastCmdResults instanceof List) || (((List) lastCmdResults).isEmpty()) || !(((List<?>) lastCmdResults).get(0) instanceof WItem)){
             ZeeConfig.msgError("no items selected");
             println("no items selected");
-            showHelpWindow();
+            showWindow();
             return false;
         }
         StringBuilder petalName = new StringBuilder();
@@ -471,7 +472,7 @@ public class ZeeConsole {
         if (!(lastCmdResults instanceof List) || (((List) lastCmdResults).isEmpty())){
             ZeeConfig.msgError("no items selected");
             println("no items selected");
-            showHelpWindow();
+            showWindow();
             return false;
         }
 
@@ -683,7 +684,7 @@ public class ZeeConsole {
         try {
             if (arr.length < 2){
                 ZeeConfig.msgError("item parameter missing");
-                showHelpWindow();
+                showWindow();
                 return null;
             }
             List<Window> wins = getWinsSelected();
@@ -703,7 +704,7 @@ public class ZeeConsole {
         try {
             if (arr.length < 2){
                 ZeeConfig.msgError("item parameter missing");
-                showHelpWindow();
+                showWindow();
                 return null;
             }
             List<Window> wins = getWinsSelected();

@@ -965,8 +965,8 @@ public class ZeeManagerGobs extends ZeeThread{
                 if(ZeeConfig.isPlobActive()){
                     placePileAndAuto();
                 }
-                //dismount horse
-                else if (ZeeConfig.isPlayerMountingHorse()) {
+                //dismount horse unless using shovel
+                else if (ZeeConfig.isPlayerMountingHorse() && !(ZeeManagerItems.isItemEquipped("shovel") && !ZeeConfig.isPlayerLiftingPose())) {
                     dismountHorse(coordMc);
                 }
                 //clicked water
@@ -2061,8 +2061,8 @@ public class ZeeManagerGobs extends ZeeThread{
             windowTestCoords();
         else if(petalName.contentEquals(ZeeFlowerMenu.STRPETAL_AUDIOBLOCKER))
             ZeeAudio.aBlockWin();
-        else if(petalName.contentEquals(ZeeFlowerMenu.STRPETAL_CLEARGOBTEXTSPOINTERS))
-            ZeeConsole.clearGobsTextsAndPointers();
+        else if(petalName.contentEquals(ZeeFlowerMenu.STRPETAL_ZEECOW_CMDS))
+            ZeeConsole.showWindow();
         else if (petalName.contentEquals(ZeeFlowerMenu.STRPETAL_AUTOBUTCH_BIGDEADANIMAL)){
             autoButchBigDeadAnimal(gob);
         }
@@ -2386,7 +2386,7 @@ public class ZeeManagerGobs extends ZeeThread{
         else if(gob.tags.contains(Gob.Tag.PLAYER_MAIN)) {
             opts = new ArrayList<String>();
             opts.add(ZeeFlowerMenu.STRPETAL_AUDIOBLOCKER);
-            opts.add(ZeeFlowerMenu.STRPETAL_CLEARGOBTEXTSPOINTERS);
+            opts.add(ZeeFlowerMenu.STRPETAL_ZEECOW_CMDS);
             opts.add(ZeeFlowerMenu.STRPETAL_SWITCHCHAR);
             if (ZeeConfig.isCaveTile(ZeeConfig.getPlayerTileName()))
                 opts.add(ZeeFlowerMenu.STRPETAL_TILEMONITOR);
