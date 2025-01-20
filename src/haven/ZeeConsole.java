@@ -1,6 +1,10 @@
 package haven;
 
 import java.awt.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -136,8 +140,8 @@ public class ZeeConsole {
             helpLines.add("   disc        toggle discovery helper on/off");
             helpLines.add("   say []      text2speak parameter or last cmd results");
             helpLines.add("                 (requires LinuxFestival)");
-            helpLines.add("   reslocal    print local res names to terminal");
-            helpLines.add("   resmote     print remote res names to terminal");
+            helpLines.add("   reslocal    print local res names reslocal.txt");
+            helpLines.add("   resmote     print remote res names to resmote.txt");
         }
     }
 
@@ -296,18 +300,65 @@ public class ZeeConsole {
             ZeeConfig.removePlayerText();
         }
         else if (cmd.contentEquals("reslocal")){
-            println("=======local cached=======");
-            for (Resource res : Resource.local().cached()) {
-                println(res.name);
+            PrintWriter printWriter = null;
+            String fileName = "reslocal.txt";
+            String path = System.getProperty("user.home").concat(System.getProperty("file.separator")).concat(fileName);
+            File file = new File(path);
+            try {
+                if (!file.exists()) {
+                    if (!file.createNewFile()) {
+                        println("couldn't create file " + fileName);
+                        ret = false;
+                        throw new IOException("Couldn't create file " + fileName);
+                    }
+                }
+                printWriter = new PrintWriter(new FileOutputStream(path, false));
+                int lines = 0;
+                for (Resource resource : Resource.local().cached()) {
+                    printWriter.write(System.getProperty("line.separator") + resource.name);
+                    lines++;
+                }
+                println("wrote " + lines + " lines to " + fileName);
+                ret = true;
+            } catch (IOException ioex) {
+                ioex.printStackTrace();
+            } finally {
+                if (printWriter != null) {
+                    printWriter.flush();
+                    printWriter.close();
+                }
             }
-            ret = true;
+
         }
         else if (cmd.contentEquals("resmote")){
-            println("=======remote cached=======");
-            for (Resource res : Resource.remote().cached()) {
-                println(res.name);
+            PrintWriter printWriter = null;
+            String fileName = "resmote.txt";
+            String path = System.getProperty("user.home").concat(System.getProperty("file.separator")).concat(fileName);
+            File file = new File(path);
+            try {
+                if (!file.exists()) {
+                    if (!file.createNewFile()) {
+                        println("couldn't create file " + fileName);
+                        ret = false;
+                        throw new IOException("Couldn't create file " + fileName);
+                    }
+                }
+                printWriter = new PrintWriter(new FileOutputStream(path, false));
+                int lines = 0;
+                for (Resource resource : Resource.remote().cached()) {
+                    printWriter.write(System.getProperty("line.separator") + resource.name);
+                    lines++;
+                }
+                println("wrote " + lines + " lines to " + fileName);
+                ret = true;
+            } catch (IOException ioex) {
+                ioex.printStackTrace();
+            } finally {
+                if (printWriter != null) {
+                    printWriter.flush();
+                    printWriter.close();
+                }
             }
-            ret = true;
         }
 
         /*
@@ -352,7 +403,11 @@ public class ZeeConsole {
             }
             // say parameter(arr[1]) has priority over lastCmdResults
             else{
-                ZeeAudio.textToSpeakLinuxFestival(arr[1]);
+                StringBuilder text = new StringBuilder(arr[1]);
+                for (int i = 2; i < arr.length; i++) {
+                    text.append(" ").append(arr[i]);
+                }
+                ZeeAudio.textToSpeakLinuxFestival(text.toString());
             }
         }
 
