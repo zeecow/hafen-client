@@ -181,6 +181,7 @@ public class ZeeManagerMiner extends ZeeThread{
                                 public void run() {
                                     try {
                                         mining = true;
+                                        // pick stones
                                         if (pickStones(30)){
                                             //move to player mining end coord
                                             if (tunnelHelperEndCoordPrev!=null)
@@ -188,11 +189,18 @@ public class ZeeManagerMiner extends ZeeThread{
                                             else
                                                 ZeeConfig.clickCoord(tunnelHelperEndCoord,1);
                                             waitPlayerIdlePose();
+                                            // check window closed
+                                            if (!tunneling){
+                                                tunnelHelperExit();
+                                                return;
+                                            }
                                             tunnelHelperSetStage(TUNNELHELPER_STAGE5_BUILDCOL);
                                             // select menu item for stone column
                                             ZeeConfig.gameUI.menu.wdgmsg("act","bp","column","0");
                                             //ZeeConfig.addPlayerText("wait place col");
-                                        }else{
+                                        }
+                                        //failed pick stones
+                                        else{
                                             int invStones = pickStonesInvCount();
                                             ZeeConfig.msgError("missing "+(30-invStones)+" stones");
                                             ZeeConfig.println("missing "+(30-invStones)+" stones");

@@ -1119,11 +1119,13 @@ public class ZeeConfig {
             return;
 
         if (isBuildWindow(window)) {
-            //tunnel helper
-            if (ZeeManagerMiner.tunnelHelperStage == ZeeManagerMiner.TUNNELHELPER_STAGE5_BUILDCOL && windowTitle.contentEquals("Stone Column")){
+
+            // tunnel helper
+            if (ZeeManagerMiner.tunneling && ZeeManagerMiner.tunnelHelperStage == ZeeManagerMiner.TUNNELHELPER_STAGE5_BUILDCOL && windowTitle.contentEquals("Stone Column")){
                 ZeeManagerMiner.tunnelHelperBuildColumn(window);
             }
-            // build and drink checkbox
+
+            // add build and drink checkbox
             Button btn = getButtonNamed(window, "Build");
             CheckBox cb = window.add(new CheckBox("and drink"){
                 {a = isBuildAndDrink;}
@@ -2657,7 +2659,7 @@ public class ZeeConfig {
                 +"Tub,Compost Bin,Extraction Press,Rack,Herbalist Table,Frame,"
                 +"Chicken Coop,Rabbit Hutch,Archery Target,Oven,Steel crucible,"
                 +"Cauldron,Pane mold,Kiln,Old Trunk,Old Stump,Smoke shed,Finery Forge,"
-                +"Tidepool,Fireplace,Quiver,Creel,Cache,Hidden Hollow"
+                +"Tidepool,Fireplace,Quiver,Creel,Cache,Hidden Hollow,Spawning bed"
         ).split(",");
         for (String contName: containers) {
             if ( !isMakewindow(window) && window.cap.contains(contName) ) {
