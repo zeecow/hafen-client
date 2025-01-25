@@ -777,7 +777,7 @@ public class ZeeConfig {
         final String[] list = {
             "bolete","truffle","trumpet","cavelantern","chantrelle","/lorchel","fairy","blewit",
             "puffball","indigo","parasol","snowtop","yellowfoot", "herbs/stalagoom",
-            "oystermushroom", "/champignon-"
+            "oystermushroom", "/champignon-","libertycap"
         };
         for (int i = 0; i < list.length; i++) {
             if(name.contains(list[i]))

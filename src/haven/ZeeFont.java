@@ -63,7 +63,7 @@ public class ZeeFont {
             Map.entry("wildgoat",java.util.List.of(200,300)),
             Map.entry("wildhorse",java.util.List.of(200,320)),
             Map.entry("wolf",java.util.List.of(400,500)),
-            Map.entry("wolverine",java.util.List.of(200,300)),
+            Map.entry("wolverine",java.util.List.of(150,300)),
             Map.entry("woodgrouse",java.util.List.of(100,120)) //TODO check male name
         );
         try {
