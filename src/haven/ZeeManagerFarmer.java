@@ -975,6 +975,8 @@ public class ZeeManagerFarmer extends ZeeThread{
                             subprods.add("/beetleaves");
                         else if (cropName.endsWith("/lettuce"))
                             subprods.add("/lettucehead");
+                        else if (cropName.endsWith("/greenkale"))
+                            subprods.add("/greenkale");
                         else if (cropName.endsWith("/pipeweed"))
                             subprods.add("/tobacco-fresh");
                         else if (cropName.endsWith("/pumpkin"))
@@ -1066,7 +1068,8 @@ public class ZeeManagerFarmer extends ZeeThread{
             Map.entry("gfx/terobjs/plants/peas",4),
             Map.entry("gfx/terobjs/plants/cucumber",4),
             Map.entry("gfx/terobjs/plants/champignon",4),
-            Map.entry("gfx/terobjs/plants/garlic",4)
+            Map.entry("gfx/terobjs/plants/garlic",4),
+            Map.entry("gfx/terobjs/plants/greenkale",4)
     );
     public static boolean isCropStageHarvestable(Gob crop) {
         boolean ret = false;
