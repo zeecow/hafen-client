@@ -2069,12 +2069,6 @@ public class ZeeManagerGobs extends ZeeThread{
         else if (petalName.contentEquals(ZeeFlowerMenu.STRPETAL_LIFTUPGOB)){
             liftGob(gob);
         }
-        else if(gobName.endsWith("terobjs/oven")) {
-            addFuelGobMenu(gob,petalName);
-        }
-        else if(gobName.endsWith("terobjs/smelter")){
-            addFuelGobMenu(gob,petalName);
-        }
         else if (isGobTrellisPlant(gobName)){
             if(petalName.contentEquals(ZeeFlowerMenu.STRPETAL_REMOVEPLANT)) {
                 destroyGob(gob);
@@ -3481,84 +3475,13 @@ public class ZeeManagerGobs extends ZeeThread{
                             exit = true;
                         }
                     }
-                    ZeeConfig.addGobTextTempMs(gob,"Added "+added+" item(s)",3000);
+                    gobClick(gob,3);//label gob
                 }catch (Exception e){
                     e.printStackTrace();
                 }
                 ZeeConfig.removePlayerText();
             }
         }.start();
-    }
-
-    public static void addFuelGobMenu(Gob gob, String petalName) {
-        String gobName = gob.getres().name;
-        if(gobName.endsWith("oven") && petalName.equals(ZeeFlowerMenu.STRPETAL_ADD4BRANCH)){
-            /*
-                fuel oven with 4 branches
-             */
-           List<WItem> branches = ZeeConfig.getMainInventory().getWItemsByNameContains("branch");
-           if(branches.size() < 4){
-               ZeeConfig.gameUI.ui.msg("Need 4 branches to fuel oven");
-               return;
-           }
-           boolean exit = false;
-           int added = 0;
-           while(!exit && added<4 && branches.size() > 0){
-               if(ZeeManagerItems.pickUpItem(branches.get(0))){
-                   itemActGob(gob,0);
-                   if(waitNotHoldingItem()){
-                       branches.remove(0);
-                       added++;
-                   }else{
-                       ZeeConfig.gameUI.ui.msg("Couldn't right click oven");
-                       exit = true;
-                   }
-               }else {
-                   ZeeConfig.gameUI.ui.msg("Couldn't pickup branch");
-                   exit = true;
-               }
-           }
-           ZeeConfig.gameUI.ui.msg("Added "+added+" branches");
-        }
-        else if(gobName.endsWith("smelter")){
-            /*
-                fuel smelter with 9 or 12 coal
-             */
-            int num = 12;
-            if (petalName.equals(ZeeFlowerMenu.STRPETAL_ADD9COAL))
-                num = 9;
-            final int numCoal = num;
-            List<WItem> coal = ZeeConfig.getMainInventory().getWItemsByNameContains("coal");
-            if(coal.size() < numCoal){
-                ZeeConfig.gameUI.ui.msg("Need "+numCoal+" coal to fuel smelter");
-                return;
-            }
-            boolean exit = false;
-            int added = 0;
-            while(!exit && added<numCoal && coal.size() > 0){
-                if(ZeeManagerItems.pickUpItem(coal.get(0))){
-                    itemActGob(gob,0);
-                    if(waitNotHoldingItem()){
-                        coal.remove(0);
-                        added++;
-                    }else{
-                        ZeeConfig.gameUI.ui.msg("Couldn't right click smelter");
-                        exit = true;
-                    }
-                }else {
-                    ZeeConfig.gameUI.ui.msg("Couldn't pickup coal");
-                    exit = true;
-                }
-            }
-            ZeeConfig.gameUI.ui.msg("Added "+added+" coal");
-        }
-    }
-
-    private boolean isFuelAction(String gobName) {
-        if (gobName.endsWith("oven") || gobName.endsWith("smelter")){
-            return true;
-        }
-        return false;
     }
 
     private static void harvestOneTrellisWithoutScythe(Gob gob) {
