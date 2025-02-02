@@ -1874,7 +1874,7 @@ public class ZeeManagerItems extends ZeeThread{
 
                     // drink from equips
                     if (!drank) {
-                        List<WItem> items = getEquippedItemsNameEndsWith("bucket-water", "bucket-tea", "waterskin");
+                        List<WItem> items = getEquippedItemsNameEndsWith("bucket-water", "bucket-tea", "waterskin", "glassjug-full");
                         for (WItem item : items) {
                             String contents = getItemContentsName(item);// "3.00 l of Water"
                             if (contents.contains("of Water")) {
