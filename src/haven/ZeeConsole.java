@@ -84,7 +84,7 @@ public class ZeeConsole {
     private static void updateCmdHist(String cmd) {
         cmd = cmd.strip();
         println("saveCmdHist > \"" + cmd + "\"");
-        final int MAX_SIZE = 5;
+        final int MAX_SIZE = 10;
         try {
             int i = listCmdHist.indexOf(cmd);
             // new cmd
@@ -171,16 +171,18 @@ public class ZeeConsole {
         // help text
         wdg = win.add(new Label(":zeecow cmd1 , cmd2 , ..."),0,0);
         int y=0;
-        Scrollport scroll = win.add(new Scrollport(new Coord(winsize.x-25, 170)), 15, y+15);
+        Scrollport scrollhelp = win.add(new Scrollport(new Coord(winsize.x-25, 170)), 15, y+15);
         for (String lines : helpLines) {
-            scroll.cont.add(new Label(lines),0,15*y++);
+            scrollhelp.cont.add(new Label(lines),0,15*y++);
         }
 
         // cmd history
-        wdg = scroll.cont;
+        wdg = scrollhelp.cont;
         wdg = win.add(new Label("CMD HIST ("+listCmdHist.size()+")  (leftclick to run, midclick to delete) "),0,wdg.c.y + wdg.sz.y+25);
+        Scrollport scrollhist = win.add(new Scrollport(new Coord(winsize.x-25, 170)), 15, wdg.c.y + wdg.sz.y+25);
+        y = 0;
         for (String cmd : listCmdHist) {
-            wdg = win.add(new ZeeWindow.ZeeButton(cmd){
+            wdg = scrollhist.cont.add(new ZeeWindow.ZeeButton(cmd){
                 public boolean mousedown(MouseDownEvent ev) {
                     return super.mousedown(ev);
                 }
@@ -194,7 +196,8 @@ public class ZeeConsole {
                     }
                     return super.mouseup(ev);
                 }
-            }, 15, wdg.c.y + wdg.sz.y);
+            }, 15, y);
+            y += wdg.sz.y;
         }
         win.pack();
     }
