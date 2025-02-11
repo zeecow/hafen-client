@@ -263,18 +263,6 @@ public class ZeeManagerItems extends ZeeThread{
         return ZeeManagerItems.isLeftHandEmpty() || ZeeManagerItems.isRightHandEmpty();
     }
 
-    static void cancelFlowerMenu() {
-        try {
-            FlowerMenu fm = ZeeConfig.gameUI.ui.root.getchild(FlowerMenu.class);
-            if (fm != null) {
-                fm.choose(null);
-                fm.destroy();
-            }
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-    }
-
     private void init(WItem wItem) {
         try{
             equipory = ZeeConfig.windowEquipment.getchild(Equipory.class);

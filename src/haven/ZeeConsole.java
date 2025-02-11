@@ -508,7 +508,7 @@ public class ZeeConsole {
             int clicked = ZeeManagerItems.clickAllItemsPetal((List<WItem>) lastCmdResults, petalName.toString().strip());
             if (clicked==0){
                 ZeeConfig.msgError("no petal named \""+petalName.toString().strip()+"\" ?");
-                ZeeManagerItems.cancelFlowerMenu();
+                ZeeFlowerMenu.cancelFlowerMenu();
             }else{
                 println("clicked "+clicked+" petals");
                 ZeeConfig.msgLow("clicked "+clicked+" petals");

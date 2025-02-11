@@ -584,7 +584,7 @@ public class ZeeManagerStockpile extends ZeeThread{
 
 
     private static void pileItems() throws InterruptedException {
-        ZeeManagerItems.cancelFlowerMenu();
+        ZeeFlowerMenu.cancelFlowerMenu();
         waitNoFlowerMenu();
         // if not holding item, pickup from inventory
         if (!ZeeConfig.isPlayerHoldingItem()) {

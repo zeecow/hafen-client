@@ -88,6 +88,7 @@ public class ZeeConfig {
     static final String POSE_PLAYER_BUILD = "gfx/borka/buildan";
     static final String POSE_PLAYER_SAWING = "gfx/borka/sawing";
     static final String POSE_PLAYER_STIR = "gfx/borka/stirran";
+    static final String POSE_PLAYER_SHEARING = "gfx/borka/carving";
     static final String POSE_PLAYER_CHIPPINGSTONE = "gfx/borka/chipping";//no pickaxe
     static final String POSE_PLAYER_CHOPBLOCK = "gfx/borka/choppan";
     static final String POSE_PLAYER_CHOPTREE = "gfx/borka/treechop";

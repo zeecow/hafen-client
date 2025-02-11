@@ -2051,6 +2051,8 @@ public class ZeeManagerGobs extends ZeeThread{
 
         if (petalName.contentEquals(ZeeFlowerMenu.STRPETAL_TOGGLE_CATTLEROSTER))
             ZeeConfig.getMenuButton("croster").use(new MenuGrid.Interaction(1, ZeeConfig.gameUI.ui.modflags()));
+        else if(petalName.contentEquals(ZeeFlowerMenu.STRPETAL_AUTO_SHEAR))
+            autoShear(gob);
         else if (petalName.contentEquals(ZeeFlowerMenu.STRPETAL_MEMORIZEAREANIMALS))
             ZeeConfig.gameUI.menu.wdgmsg("act","croster","a");
         else if (petalName.contentEquals(ZeeFlowerMenu.STRPETAL_TILEMONITOR))
@@ -2277,6 +2279,56 @@ public class ZeeManagerGobs extends ZeeThread{
         }.start();
     }
 
+    static void autoShear(Gob first){
+        new ZeeThread(){
+            public void run() {
+                try {
+                    List<Gob> animals = ZeeConfig.findGobsByNameContains("/sheep/", "/goat/");
+                    for (Gob a : animals) {
+                        ZeeConfig.addGobColor(a, Color.CYAN);
+                    }
+                    int cont = animals.size();
+                    ZeeConfig.addPlayerText("autoshear "+cont);
+                    Gob latest = null;
+                    prepareCancelClick();
+                    while(!animals.isEmpty() && !isCancelClick()) {
+                        Gob animal = ZeeConfig.getClosestGobToPlayer(animals);
+                        // click shear wool
+                        if(clickGobPetal(animal,"Shear wool")){
+
+                            // wait shearing start
+                            do {
+                                sleep(500);
+                                if (ZeeConfig.playerHasAnyPose(ZeeConfig.POSE_PLAYER_SHEARING))
+                                    break;
+                                if (!ZeeConfig.isPlayerMovingByAttrLinMove())
+                                    throw new Exception("autoshear player stuck?");
+                            } while(!isCancelClick());
+
+                            // wait finish shearing
+                            if (waitPlayerPoseNotInList(ZeeConfig.POSE_PLAYER_SHEARING)){
+                                animals.remove(animal);
+                                ZeeConfig.removeGobColor(animal);
+                            }
+                        }
+                        // animal has no wool
+                        else{
+                            ZeeFlowerMenu.cancelFlowerMenu();
+                            waitNoFlowerMenu();
+                            animals.remove(animal);
+                            ZeeConfig.removeGobColor(animal);
+                        }
+                        ZeeConfig.addPlayerText("autoshear " + (--cont));
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                ZeeConfig.removePlayerText();
+                ZeeConfig.removeGobColor((ArrayList<Gob>) ZeeConfig.findGobsByNameContains("/sheep/", "/goat/"));
+            }
+        }.start();
+    }
+
     static boolean isAutoButchingBigAnimal = false;
     public static void autoButchBigDeadAnimal(Gob deadAnimal) {
         new ZeeThread() {
@@ -2387,9 +2439,12 @@ public class ZeeManagerGobs extends ZeeThread{
             menu = new ZeeFlowerMenu(gob, opts.toArray(String[]::new));
         }
         else if (isGobTamedAnimalOrAurochEtc(gobName) && !isGobDeadOrKO(gob)) {
-            menu = new ZeeFlowerMenu(gob,
-                    ZeeFlowerMenu.STRPETAL_MEMORIZEAREANIMALS,
-                    ZeeFlowerMenu.STRPETAL_TOGGLE_CATTLEROSTER);
+            opts = new ArrayList<String>();
+            opts.add(ZeeFlowerMenu.STRPETAL_MEMORIZEAREANIMALS);
+            opts.add(ZeeFlowerMenu.STRPETAL_TOGGLE_CATTLEROSTER);
+            if(gobName.contains("/sheep/") || gobName.contains("/goat/"))
+                opts.add(ZeeFlowerMenu.STRPETAL_AUTO_SHEAR);
+            menu = new ZeeFlowerMenu(gob, opts.toArray(String[]::new));
         }
         else if (isGobButchable(gobName) && isGobDeadOrKO(gob)) {
             menu = new ZeeFlowerMenu(gob,
@@ -3265,7 +3320,7 @@ public class ZeeManagerGobs extends ZeeThread{
                         }
                     }
                     //close menu before returning
-                    ZeeManagerItems.cancelFlowerMenu();
+                    ZeeFlowerMenu.cancelFlowerMenu();
                     waitNoFlowerMenu();
                 }
             };
@@ -3845,7 +3900,7 @@ public class ZeeManagerGobs extends ZeeThread{
         FlowerMenu fm = waitFlowerMenu();
         if (fm!=null) {
             // menu opened means gob exist
-            ZeeManagerItems.cancelFlowerMenu();
+            ZeeFlowerMenu.cancelFlowerMenu();
             waitNoFlowerMenu();
             //println("gobHasFlowermenu > true");
             ret = true;

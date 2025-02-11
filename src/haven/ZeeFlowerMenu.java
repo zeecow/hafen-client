@@ -31,6 +31,7 @@ public class ZeeFlowerMenu extends FlowerMenu{
     static final String STRPETAL_AUDIOBLOCKER = "Audio blocker";
     static final String STRPETAL_TOGGLE_CATTLEROSTER = "Toggle roster";
     static final String STRPETAL_MEMORIZEAREANIMALS = "Memorize area";
+    static final String STRPETAL_AUTO_SHEAR = "Auto shear";
     static final String STRPETAL_BINDWATER = "Bind water items";
 
     private final Gob gob;
@@ -99,6 +100,18 @@ public class ZeeFlowerMenu extends FlowerMenu{
         if (ts > lastRightClickMs){
             lastRightClickMs = ts;
             lastRightClickedGobOrItem = source;
+        }
+    }
+
+    static void cancelFlowerMenu() {
+        try {
+            FlowerMenu fm = ZeeConfig.gameUI.ui.root.getchild(FlowerMenu.class);
+            if (fm != null) {
+                fm.choose(null);
+                fm.destroy();
+            }
+        }catch (Exception e){
+            e.printStackTrace();
         }
     }
 }
