@@ -2282,6 +2282,7 @@ public class ZeeManagerGobs extends ZeeThread{
     static void autoShear(Gob first){
         new ZeeThread(){
             public void run() {
+                println("autoshear thread start");
                 try {
                     List<Gob> animals = ZeeConfig.findGobsByNameContains("/sheep/", "/goat/");
                     for (Gob a : animals) {
@@ -2290,20 +2291,19 @@ public class ZeeManagerGobs extends ZeeThread{
                     int cont = animals.size();
                     ZeeConfig.addPlayerText("autoshear "+cont);
                     Gob latest = null;
-                    prepareCancelClick();
                     while(!animals.isEmpty() && !isCancelClick()) {
                         Gob animal = ZeeConfig.getClosestGobToPlayer(animals);
                         // click shear wool
                         if(clickGobPetal(animal,"Shear wool")){
 
                             // wait shearing start
+                            prepareCancelClick();
+                            sleep(PING_MS);
                             do {
-                                sleep(500);
-                                if (ZeeConfig.playerHasAnyPose(ZeeConfig.POSE_PLAYER_SHEARING))
-                                    break;
-                                if (!ZeeConfig.isPlayerMovingByAttrLinMove())
-                                    throw new Exception("autoshear player stuck?");
-                            } while(!isCancelClick());
+                                sleep(100);
+                            } while(!isCancelClick() &&
+                                    (!ZeeConfig.playerHasAnyPose(ZeeConfig.POSE_PLAYER_SHEARING) || ZeeConfig.isPlayerMovingByAttrLinMove())
+                            );
 
                             // wait finish shearing
                             if (waitPlayerPoseNotInList(ZeeConfig.POSE_PLAYER_SHEARING)){
@@ -2313,18 +2313,20 @@ public class ZeeManagerGobs extends ZeeThread{
                         }
                         // animal has no wool
                         else{
-                            ZeeFlowerMenu.cancelFlowerMenu();
+                            cancelFlowerMenu();//TODO cancel menu faster
                             waitNoFlowerMenu();
                             animals.remove(animal);
                             ZeeConfig.removeGobColor(animal);
                         }
-                        ZeeConfig.addPlayerText("autoshear " + (--cont));
+                        if(--cont > 0)
+                            ZeeConfig.addPlayerText("autoshear " + cont);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
                 ZeeConfig.removePlayerText();
                 ZeeConfig.removeGobColor((ArrayList<Gob>) ZeeConfig.findGobsByNameContains("/sheep/", "/goat/"));
+                println("autoshear thread stop");
             }
         }.start();
     }
@@ -3864,7 +3866,7 @@ public class ZeeManagerGobs extends ZeeThread{
         gobClick(gob,3);
         //click petal
         FlowerMenu fm = waitFlowerMenu();
-        if(fm!=null){
+        if(fm!=null && fm.hasPetal(petalName)){
             choosePetal(fm, petalName);
             return waitNoFlowerMenu();
         }else{

@@ -114,4 +114,8 @@ public class ZeeFlowerMenu extends FlowerMenu{
             e.printStackTrace();
         }
     }
+
+    static FlowerMenu getFlowerMenu(){
+        return ZeeConfig.gameUI.ui.root.getchild(FlowerMenu.class);
+    }
 }

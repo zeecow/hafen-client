@@ -363,4 +363,14 @@ public class FlowerMenu extends Widget {
 			}
 		}
 	}
+
+	boolean hasPetal(String name){
+		if (opts==null || opts.length==0)
+			return false;
+		for (Petal petal : opts) {
+			if (petal.name.contentEquals(name))
+				return true;
+		}
+		return false;
+	}
 }

@@ -1021,7 +1021,10 @@ public class ZeeThread  extends Thread{
     }
 
     public static FlowerMenu getFlowerMenu() {
-        return ZeeConfig.gameUI.ui.root.getchild(FlowerMenu.class);
+        return ZeeFlowerMenu.getFlowerMenu();
+    }
+    public static void cancelFlowerMenu(){
+        ZeeFlowerMenu.cancelFlowerMenu();
     }
 
     public static boolean choosePetal(FlowerMenu menu, int petalIndex) {
