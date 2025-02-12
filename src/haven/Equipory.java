@@ -34,32 +34,10 @@ public class Equipory extends Widget implements DTarget {
     private static final Resource.Image bgi = Resource.loadrimg("gfx/hud/equip/bg");
     private static final int yo = Inventory.sqsz.y, sh = 10;
     private static final Tex bg = new TexI(PUtils.uiscale(bgi.img, Coord.of((sh * yo * bgi.sz.x) / bgi.sz.y, sh * yo)));
-    private static final int rx = invsq.sz().x + (ZeeConfig.equiporyCompact ? invsq.sz().x : bg.sz().x);
-    public static final Coord bgc = new Coord(invsq.sz().x, 0);
-    public static final Coord ecoords[] = {
-	new Coord( 0, 0 * yo),
-	new Coord( 0, 1 * yo),
-	new Coord( 0, 2 * yo),
-	new Coord(rx, 2 * yo),
-	new Coord( 0, 3 * yo),
-	new Coord(rx, 3 * yo),
-	new Coord( 0, 4 * yo),
-	new Coord(rx, 4 * yo),
-	new Coord( 0, 5 * yo),
-	new Coord(rx, 5 * yo),
-	new Coord( 0, 6 * yo),
-	new Coord(rx, 6 * yo),
-	new Coord( 0, 8 * yo),
-	new Coord(rx, 8 * yo),
-	new Coord( 0, 9 * yo),
-	new Coord(rx, 9 * yo),
-	new Coord(invsq.sz().x, 0 * yo),
-	new Coord(rx, 0 * yo),
-	new Coord(rx, 1 * yo),
-	new Coord( 0, 7 * yo),
-	new Coord(rx, 7 * yo),
-    };
-    public static final Tex[] ebgs = new Tex[ecoords.length];
+    private static int rx = getRx();
+	public static final Coord bgc = new Coord(invsq.sz().x, 0);
+    public static Coord ecoords[] = getEcoords();
+	public static final Tex[] ebgs = new Tex[ecoords.length];
     public static final Text[] etts = new Text[ecoords.length];
     static Coord isz;
     static {
@@ -102,6 +80,13 @@ public class Equipory extends Widget implements DTarget {
 	if(ZeeConfig.equiporyCompact)
 		ava.hide();
 	super.added();
+	// btn toggel size
+	Window win = (Window) parent;
+	Window.DefaultDeco deco = (Window.DefaultDeco) win.deco;
+	deco.add(
+		new ZeeWindow.ZeeButton(15, ZeeWindow.ZeeButton.TEXT_TOGGLE_EQUIPORY_SIZE,"compact/expand"),
+		5,	28
+	);
     }
 
     public Equipory(long gobid) {
@@ -245,5 +230,74 @@ public class Equipory extends Widget implements DTarget {
 				equips[i].item.wdgmsg("drop", Coord.z);
 			}
 		}
+	}
+
+	private static int getRx() {
+		return invsq.sz().x + (ZeeConfig.equiporyCompact ? invsq.sz().x : bg.sz().x);
+	}
+
+	private static Coord[] getEcoords() {
+		return new Coord[]{
+				new Coord( 0, 0 * yo),
+				new Coord( 0, 1 * yo),
+				new Coord( 0, 2 * yo),
+				new Coord(rx, 2 * yo),
+				new Coord( 0, 3 * yo),
+				new Coord(rx, 3 * yo),
+				new Coord( 0, 4 * yo),
+				new Coord(rx, 4 * yo),
+				new Coord( 0, 5 * yo),
+				new Coord(rx, 5 * yo),
+				new Coord( 0, 6 * yo),
+				new Coord(rx, 6 * yo),
+				new Coord( 0, 8 * yo),
+				new Coord(rx, 8 * yo),
+				new Coord( 0, 9 * yo),
+				new Coord(rx, 9 * yo),
+				new Coord(invsq.sz().x, 0 * yo),
+				new Coord(rx, 0 * yo),
+				new Coord(rx, 1 * yo),
+				new Coord( 0, 7 * yo),
+				new Coord(rx, 7 * yo),
+		};
+	}
+
+	public void toggleSize() {
+		ZeeConfig.equiporyCompact = !ZeeConfig.equiporyCompact;
+		Utils.setprefb("equiporyCompact",ZeeConfig.equiporyCompact);
+		// hide
+		if (ZeeConfig.equiporyCompact){
+			ava.hide();
+			resizew(sz.x - bg.sz().x + invsq.sz().x);
+			//adjust right side item's pos
+			for (Map.Entry<GItem, Collection<WItem>> col : wmap.entrySet()) {
+				for (WItem wItem : col.getValue()) {
+					if (wItem.c.x > bg.sz().x)
+						wItem.c.x -= bg.sz().x - invsq.sz().x;
+				}
+			}
+		}
+		// show
+		else{
+			ava.show();
+			resizew(sz.x + bg.sz().x - invsq.sz().x);
+			//adjust right side item's pos
+			for (Map.Entry<GItem, Collection<WItem>> col : wmap.entrySet()) {
+				for (WItem wItem : col.getValue()) {
+					if (wItem.c.x != 1)
+						wItem.c.x += bg.sz().x - invsq.sz().x;
+				}
+			}
+		}
+		Equipory.rx = getRx();
+		Equipory.ecoords = getEcoords();
+		isz = new Coord();
+		for(Coord ec : ecoords) {
+			if(ec.x + invsq.sz().x > isz.x)
+				isz.x = ec.x + invsq.sz().x;
+			if(ec.y + invsq.sz().y > isz.y)
+				isz.y = ec.y + invsq.sz().y;
+		}
+		parent.pack();
 	}
 }

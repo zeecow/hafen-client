@@ -155,6 +155,7 @@ public class ZeeWindow extends Window {
         public static final String TEXT_AUTOHIDEWINDOW = "ᐊ";
         public static final String TEXT_AUTOHIDEWINDOW_FAST = "◀";
         public static final String TEXT_CLOSE = "x";
+        public static final String TEXT_TOGGLE_EQUIPORY_SIZE = "*";
         public static final int BUTTON_SIZE = 20;
         String buttonText;
         public ZeeButton(String title) {
@@ -175,8 +176,11 @@ public class ZeeWindow extends Window {
             String windowName = this.getparent(Window.class).cap;
             //ZeeConfig.println(windowName+" > "+ buttonText +" > "+msg);
             if(msg.equals("activate")){
+                if (buttonText.equals(TEXT_TOGGLE_EQUIPORY_SIZE)) {
+                    ZeeManagerItems.getEquipory().toggleSize();
+                }
                 //organize duplicate windows
-                if(buttonText.equals(TEXT_ORGANIZEWINDOWS)){
+                else if(buttonText.equals(TEXT_ORGANIZEWINDOWS)){
                     organizeDuplicateWindows(windowName);
                 }
                 //auto hide window
