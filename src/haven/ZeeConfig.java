@@ -248,7 +248,6 @@ public class ZeeConfig {
     static boolean noFlavObjs = Utils.getprefb("noFlavObjs", true);
     static boolean scrollTransferItems = Utils.getprefb("scrollTransferItems", true);
     static boolean notifyBuddyOnline = Utils.getprefb("notifyBuddyOnline", false);
-    static boolean pickupGobWindowKeepOpen = Utils.getprefb("pickupGobWindowKeepOpen", true);
     static boolean pickupGobWindowAutoRefresh = Utils.getprefb("pickupGobWindowAutoRefresh", false);
     static boolean shapeIcons = Utils.getprefb("shapeIcons", false);
     static String shapeIconsList = Utils.getpref("shapeIconsList", DEF_LIST_SHAPEICON);
@@ -765,7 +764,7 @@ public class ZeeConfig {
         final String[] list = {
             "bloodstern","camomile","cavebulb","chimingbluebell","clover","coltsfoot","dandelion",
             "edelweiss","frogscrown","heartsease","marshmallow","stingingnettle","thornythistle",
-            "yarrow","snapdragon","wintergreen","tansy"
+            "yarrow","snapdragon","wintergreen","tansy","sleighbell"
         };
         for (int i = 0; i < list.length; i++) {
             if(name.contains(list[i]))

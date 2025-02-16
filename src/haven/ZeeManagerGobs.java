@@ -6,6 +6,7 @@ import haven.resutil.WaterTile;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
+import java.awt.image.BufferedImage;
 import java.lang.reflect.Field;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -4159,18 +4160,6 @@ public class ZeeManagerGobs extends ZeeThread{
         //create window
         winPickupGob = new ZeeWindow(Coord.of(200,300),"Pickup Gobs");
 
-        //checkbox keep window open
-        wdg = winPickupGob.add( new CheckBox("keep window open"){
-            {
-                a = ZeeConfig.pickupGobWindowKeepOpen;
-            }
-            public void set(boolean val) {
-                ZeeConfig.pickupGobWindowKeepOpen = val;
-                a = val;
-            }
-        }, 0, 0 );
-
-
         //button refresh
         wdg = winPickupGob.add(new ZeeWindow.ZeeButton(60,"refresh"){
             public void wdgmsg(String msg, Object... args) {
@@ -4223,8 +4212,6 @@ public class ZeeManagerGobs extends ZeeThread{
                             if (closest!=null) {
                                 gobClick(closest, 3);
                             }
-                            if (!ZeeConfig.pickupGobWindowKeepOpen)
-                                winPickupGob.wdgmsg("close");
                         }
                     }
                 },
@@ -4241,8 +4228,6 @@ public class ZeeManagerGobs extends ZeeThread{
                                 if (closest!=null) {
                                     gobClick(closest, 3, UI.MOD_SHIFT);
                                 }
-                                if (!ZeeConfig.pickupGobWindowKeepOpen)
-                                    winPickupGob.wdgmsg("close");
                             }
                         }
                     },
@@ -4253,10 +4238,28 @@ public class ZeeManagerGobs extends ZeeThread{
                 ((Button)wdg).disable(true);
             }
 
-            // add label gob name
-            wdg = scrollport.cont.add(new Label(basename), wdg.c.x+wdg.sz.x+3, y + 5);
+            // add gob icon or name
+            GobIcon gobIcon = gobs.get(i).getattr(GobIcon.class);
+            if (gobIcon != null) {
+                BufferedImage img = Resource.remote().loadwait(gobIcon.res.get().name).flayer(Resource.Image.class).img;
+                //println(basename+" , "+img.getWidth()+" , "+img.getHeight());
+                img = ZeeManagerIcons.resizeBufferedImage(img,24,24);
+                wdg = scrollport.cont.add(new IButton(img,img){
+                    public void wdgmsg(String msg, Object... args) {
+                        if (msg.contentEquals("activate")) {
+                            //pickup closest matching
+                            Gob closest = ZeeConfig.getClosestGobByNameContains("/"+basename);
+                            if (closest!=null) {
+                                gobClick(closest, 3, UI.MOD_SHIFT);
+                            }
+                        }
+                    }
+                }, wdg.c.x + wdg.sz.x + 3, y);
+            }else {
+                wdg = scrollport.cont.add(new Label(basename), wdg.c.x + wdg.sz.x + 3, y + 5);
+            }
 
-            y += 23;
+            y += 27;
         }
 
         winPickupGob.pack();
