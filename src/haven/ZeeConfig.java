@@ -637,10 +637,11 @@ public class ZeeConfig {
 
     public static boolean isSpice(String name){
         final String[] list = {
-            "kvann", "chives", "dill","thyme","/salvia",
+            "kvann", "chives", "dill","thyme","/salvia","/tansy",
             "laurel","juniper",
             "ambergris", "truffle",
-            "/halite", "saltbasin"
+            "/halite", "saltbasin", // salt
+            "/beehive" // propolis from bee dungeon
         };
         for (int i = 0; i < list.length; i++) {
             if(name.contains(list[i]))
@@ -788,7 +789,34 @@ public class ZeeConfig {
 
     public static boolean isTreeLeaf(String name){
         final String[] list = {
-                "trees/maple","trees/conkertree","trees/mulberry","trees/fig"
+                "trees/maple","trees/conkertree","trees/mulberry","trees/fig",
+                "/woodheart"
+        };
+        for (int i = 0; i < list.length; i++) {
+            if(name.contains(list[i]))
+                return true;
+        }
+        return false;
+    }
+
+    public static boolean isLeaf(String name){
+        if (isTreeLeaf(name))
+            return true;
+        final String[] list = {
+                "bushes/teabush","bushes/swamplily","/perfectautumnleaf",
+                "/duskfern","/greenkelp"
+        };
+        for (int i = 0; i < list.length; i++) {
+            if(name.contains(list[i]))
+                return true;
+        }
+        return false;
+    }
+
+    public static boolean isSaladGreens(String name){
+        final String[] list = {
+                "/duskfern","/greenkelp","brownkelp","driftkelp","marshmallow",
+                "stingingnettle","/woodheart"
         };
         for (int i = 0; i < list.length; i++) {
             if(name.contains(list[i]))
@@ -822,11 +850,24 @@ public class ZeeConfig {
         return false;
     }
 
+    public static boolean isTreeCone(String name){
+        final String[] list = {
+                "trees/blackpine","trees/cedar","trees/dwarfpine",
+                "trees/fir","trees/larch","trees/pine",
+                "trees/silverfir","trees/spruce","trees/yew"
+        };
+        for (int i = 0; i < list.length; i++) {
+            if(name.contains(list[i]))
+                return true;
+        }
+        return false;
+    }
+
     public static boolean isTreeFruit(String name){
         final String[] list = {
             "trees/cherrie","trees/fig","trees/lemon","trees/medlar","trees/mulberry",
             "trees/pear","trees/persimmon","trees/plum","trees/quince","trees/apple",
-            "trees/sorb"
+            "trees/sorb","trees/orange"
         };
         for (int i = 0; i < list.length; i++) {
             if(name.contains(list[i]))
@@ -3550,8 +3591,10 @@ public class ZeeConfig {
                     add(space+"flowers");
                     add(space+"herbs");
                     add(space+"kritters");
+                    add(space+"leaves");
                     add(space+"locres and map");
                     add(space+"mushrooms");
+                    add(space+"salad greens");
                     add(space+"small animals");
                     add(space+"scents");
                     add(space+"spices");
@@ -3559,9 +3602,10 @@ public class ZeeConfig {
                     add(space+"trees");
                     add(space+space+"bark");
                     add(space+space+"bough");
+                    add(space+space+"cone");
                     add(space+space+"fruit");
-                    add(space+space+"leaves");
-                    add(space+space+"nuts");
+                    add(space+space+"leaf");
+                    add(space+space+"nut");
                 }};
                 protected String listitem(int idx) {
                     return(filters.get(idx));
@@ -3672,8 +3716,12 @@ public class ZeeConfig {
             filteredList.removeIf(entry -> !ZeeConfig.isFlower(entry.conf.res.name));
         else if(filter.equals("herbs"))
             filteredList.removeIf(entry -> !ZeeConfig.isHerb(entry.conf.res.name));
+        else if(filter.equals("leaves"))
+            filteredList.removeIf(entry -> !ZeeConfig.isLeaf(entry.conf.res.name));
         else if(filter.equals("mushrooms"))
             filteredList.removeIf(entry -> !ZeeConfig.isMushroom(entry.conf.res.name));
+        else if(filter.equals("salad greens"))
+            filteredList.removeIf(entry -> !ZeeConfig.isSaladGreens(entry.conf.res.name));
         else if(filter.equals("scents"))
             filteredList.removeIf(entry -> !ZeeConfig.isScent(entry.conf.res.name));
         else if(filter.equals("spices"))
@@ -3688,11 +3736,13 @@ public class ZeeConfig {
             filteredList.removeIf(entry -> !ZeeConfig.isTreeToughBark(entry.conf.res.name));
         else if(filter.equals("bough"))
             filteredList.removeIf(entry -> !ZeeConfig.isTreeBough(entry.conf.res.name));
+        else if(filter.equals("cone"))
+            filteredList.removeIf(entry -> !ZeeConfig.isTreeCone(entry.conf.res.name));
         else if(filter.equals("fruit"))
             filteredList.removeIf(entry -> !ZeeConfig.isTreeFruit(entry.conf.res.name));
-        else if(filter.equals("leaves"))
+        else if(filter.equals("leaf"))
             filteredList.removeIf(entry -> !ZeeConfig.isTreeLeaf(entry.conf.res.name));
-        else if(filter.equals("nuts"))
+        else if(filter.equals("nut"))
             filteredList.removeIf(entry -> !ZeeConfig.isTreeNuts(entry.conf.res.name));
         else if(filter.equals("small animals"))
             filteredList.removeIf(entry -> !ZeeConfig.isSmallAnimal(entry.conf.res.name));

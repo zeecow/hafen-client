@@ -3933,7 +3933,7 @@ public class ZeeManagerGobs extends ZeeThread{
             +"/wildhorse,/aurochs,/mouflon,/wildgoat,"
             +"/adder,/badger,/bear,/boar,/beaver,/fox,"
             +"/reindeer,/reddeer,/roedeer,"
-            +"/greyseal,/otter,"
+            +"/greyseal,/otter,/garefowl,"
             +"/lynx,/mammoth,/moose,/troll,/walrus,/wolf,/wolverine,"
             +"/caveangler,/boreworm,/caverat,/cavelouse"
         );
@@ -4167,7 +4167,7 @@ public class ZeeManagerGobs extends ZeeThread{
                     toggleWindowPickupGob();
                 }
             }
-        }, 0, wdg.c.y + wdg.sz.y + 5);
+        }, 0, 0);
         wdg = winPickupGob.add(new Label("(ctrl+q)"), wdg.c.x + wdg.sz.x + 5 , wdg.c.y + 5);
 
         //scroll port
@@ -4242,8 +4242,8 @@ public class ZeeManagerGobs extends ZeeThread{
             GobIcon gobIcon = gobs.get(i).getattr(GobIcon.class);
             if (gobIcon != null) {
                 BufferedImage img = Resource.remote().loadwait(gobIcon.res.get().name).flayer(Resource.Image.class).img;
-                //println(basename+" , "+img.getWidth()+" , "+img.getHeight());
-                img = ZeeManagerIcons.resizeBufferedImage(img,24,24);
+                if (img.getWidth() > 24 || img.getHeight() > 24)
+                    img = ZeeManagerIcons.resizeBufferedImage(img,24,24);
                 wdg = scrollport.cont.add(new IButton(img,img){
                     public void wdgmsg(String msg, Object... args) {
                         if (msg.contentEquals("activate")) {
