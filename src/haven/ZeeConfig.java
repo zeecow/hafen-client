@@ -701,6 +701,7 @@ public class ZeeConfig {
             "gfx/kritter/mammoth",
             "/spermwhale",
             "/orca",
+            "/garefowl",
             //tamed
             "gfx/kritter/horse/",
             "gfx/kritter/goat/",
