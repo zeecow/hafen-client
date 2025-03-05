@@ -1,8 +1,11 @@
 /* Preprocessed source code */
 import haven.*;
 import haven.res.ui.tt.attrmod.AttrMod;
+import haven.res.ui.tt.attrmod.Entry;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /* >tt: Elixir */
 @haven.FromResource(name = "ui/tt/alch/elixir", version = 6)
@@ -67,8 +70,9 @@ public class Elixir extends ItemInfo.Tip {
 		for(ItemInfo eff : effs){
 			if (eff instanceof AttrMod) {
 				AttrMod am = ((AttrMod) eff);
-				for (AttrMod.Mod mod : am.mods) {
-					ret += ";attr,"+mod.attr.basename()+","+mod.mod;
+				for (Entry entry : am.tab) {
+					//TODO test new attrmod format
+					ret += ";attr,"+entry.attr.name()+","+entry.fmtvalue();
 				}
 			}
 			else if (eff instanceof HealWound){

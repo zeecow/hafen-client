@@ -75,7 +75,9 @@ public class ZeeResearch {
                             ZeeConfig.println("elixir null (missing ingredients or jar is full)");
                         }else {
                             hsElixirStr = strIngredients+hsElixirStr;
-                            herbalSwillSaveEntry(hsElixirStr);
+                            //TODO test new attrmod format before removing comment
+                            //herbalSwillSaveEntry(hsElixirStr);
+                            println(" elixir not saved > "+hsElixirStr);
                         }
                     }else{
                         ZeeConfig.println("ignore old tooltips");
