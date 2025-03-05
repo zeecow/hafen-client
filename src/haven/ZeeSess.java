@@ -127,4 +127,21 @@ public class ZeeSess {
         charSwitchNamesList.remove(charName);
         charSwitchNamesList.add(0,charName);
     }
+
+    public static void newCharList() {
+        println("new char list");
+
+        /*
+            fix for:
+            Exception in thread "Thread-1" java.lang.NullPointerException
+    	        at haven.ZeeConfig$34.run(ZeeConfig.java:3797)
+         */
+        try{
+            ZeeConfig.gobsWaiting.clear();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
+        ZeeMidiRadio.stopPlayingMidi("charlist");
+    }
 }

@@ -58,7 +58,7 @@ public class Charlist extends Widget {
 	    .action(() -> scroll(1));
 	sau.hide(); sad.hide();
 	resize(new Coord(bsz.x, sad.c.y + sad.sz.y));
-	ZeeMidiRadio.stopPlayingMidi("charlist");
+	ZeeSess.newCharList();
     }
 
     public static class Char {
