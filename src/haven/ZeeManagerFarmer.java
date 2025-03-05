@@ -840,7 +840,6 @@ public class ZeeManagerFarmer extends ZeeThread{
 
 
     private static Window farmAwayWin;
-    private static boolean farmAwayDrop = Utils.getprefb("farmAwayDrop",false);
     private static boolean farmAwayCollect = Utils.getprefb("farmAwayCollect",true);
     private static boolean farmAwayEquipSacksPumpkin = Utils.getprefb("farmAwayEquipSacksPumpkin",true);
     private static boolean farmAwayEquipSacksNonPumpkin = Utils.getprefb("farmAwayEquipSacksNonPumpkin",false);
@@ -881,11 +880,11 @@ public class ZeeManagerFarmer extends ZeeThread{
         x = 0;
         y += widget.sz.y + padY;
         widget = farmAwayWin.add(new CheckBox("drop"){
-            {a = farmAwayDrop;}
+            {a = ZeeConfig.dropCrops;}
             public void changed(boolean val) {
                 super.changed(val);
-                farmAwayDrop = val;
-                Utils.setprefb("farmAwayDrop",farmAwayDrop);
+                if (val != ZeeConfig.dropCrops)
+                    ZeeInvMainOptionsWdg.cbDropCrops.click();
             }
         },x,y);
         y += widget.sz.y + padY;
@@ -951,9 +950,6 @@ public class ZeeManagerFarmer extends ZeeThread{
                         prepareCancelClick();
                         sleep(PING_MS);
                         waitPlayerIdleLinMove();
-                        //drop
-                        if(farmAwayDrop)
-                            inv.dropItemsByNameEndsWith(ZeeConfig.lastInvGItemCreatedName);
                         nextCrop = getClosestCropAboveMinStage(cropName,minCropStage);
                         if (nextCrop==null)
                             break;

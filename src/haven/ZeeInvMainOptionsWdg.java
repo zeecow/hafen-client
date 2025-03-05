@@ -2,7 +2,7 @@ package haven;
 
 public class ZeeInvMainOptionsWdg extends Widget {
 
-    public static CheckBox cbSeeds, cbButcher, cbAutoStack, cbPiler, cbAutomenu, cbTunnel;
+    public static CheckBox cbDropCrops, cbButcher, cbAutoStack, cbPiler, cbAutomenu, cbTunnel;
     Widget invSlots;
 
     public ZeeInvMainOptionsWdg(String windowCap) {
@@ -56,7 +56,7 @@ public class ZeeInvMainOptionsWdg extends Widget {
 
         x = 0;
 
-        add(cbSeeds = new CheckBox("dc") {
+        add(cbDropCrops = new CheckBox("dc") {
             {
                 a = ZeeConfig.dropCrops;
             }
@@ -66,9 +66,9 @@ public class ZeeInvMainOptionsWdg extends Widget {
                 a = val;
             }
         }, x, 15);
-        cbSeeds.settip("drop crops");
+        cbDropCrops.settip("drop crops");
 
-        x += cbSeeds.sz.x + 5;
+        x += cbDropCrops.sz.x + 5;
 
         add(cbTunnel = new CheckBox("tn") {
             {
