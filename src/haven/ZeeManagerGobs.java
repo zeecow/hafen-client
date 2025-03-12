@@ -2371,7 +2371,7 @@ public class ZeeManagerGobs extends ZeeThread{
                         }
                         //pickup leftovers
                         if (animalName.contains("boreworm")){
-                            Gob beak = ZeeConfig.getClosestGobByNameContains("borwormbeak");
+                            Gob beak = ZeeConfig.getClosestGobByNameContains("borewormbeak");
                             if (beak!=null)
                                 pickupAllGobItems(beak);
                         }
@@ -3930,7 +3930,7 @@ public class ZeeManagerGobs extends ZeeThread{
             gobName,
             "/stallion,/mare,/foal,/hog,/sow,/piglet,/teimdeercow,/teimdeerbull,/teimdeerkid,"
             +"/billy,/nanny,/kid,/sheep,/lamb,/cattle,/calf,"
-            +"/wildhorse,/aurochs,/mouflon,/wildgoat,"
+            +"/horse,/aurochs,/mouflon,/wildgoat,"
             +"/adder,/badger,/bear,/boar,/beaver,/fox,"
             +"/reindeer,/reddeer,/roedeer,"
             +"/greyseal,/otter,/garefowl,"

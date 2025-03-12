@@ -171,15 +171,15 @@ public class ZeeConsole {
         // help text
         wdg = win.add(new Label(":zeecow cmd1 , cmd2 , ..."),0,0);
         int y=0;
-        Scrollport scrollhelp = win.add(new Scrollport(new Coord(winsize.x-25, 170)), 15, y+15);
+        Scrollport scrollhelp = win.add(new Scrollport(new Coord(winsize.x-25, 120)), 15, y+15);
         for (String lines : helpLines) {
             scrollhelp.cont.add(new Label(lines),0,15*y++);
         }
 
         // cmd history
         wdg = scrollhelp.cont;
-        wdg = win.add(new Label("CMD HIST ("+listCmdHist.size()+")  (leftclick to run, midclick to delete) "),0,wdg.c.y + wdg.sz.y+25);
-        Scrollport scrollhist = win.add(new Scrollport(new Coord(winsize.x-25, 170)), 15, wdg.c.y + wdg.sz.y+25);
+        wdg = win.add(new Label("CMD HIST ("+listCmdHist.size()+")  (leftclick to run, midclick to delete) "),0,wdg.c.y + wdg.sz.y+35);
+        Scrollport scrollhist = win.add(new Scrollport(new Coord(winsize.x-25, 120)), 15, wdg.c.y + wdg.sz.y+10);
         y = 0;
         for (String cmd : listCmdHist) {
             wdg = scrollhist.cont.add(new ZeeWindow.ZeeButton(cmd){

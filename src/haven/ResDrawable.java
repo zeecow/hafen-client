@@ -30,6 +30,7 @@ import haven.render.Pipe;
 import haven.render.Render;
 import haven.render.RenderTree;
 
+import java.util.Random;
 import java.util.function.Supplier;
 
 import static haven.Sprite.decnum;
