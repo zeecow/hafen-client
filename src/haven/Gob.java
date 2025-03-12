@@ -26,6 +26,8 @@
 
 package haven;
 
+import java.util.*;
+import java.util.function.*;
 import haven.render.*;
 
 import java.util.*;
@@ -60,7 +62,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 	boolean smokeHighlight;
 	int equedOverlays = 0;
 
-    public static class Overlay implements RenderTree.Node {
+	public static class Overlay implements RenderTree.Node, Sprite.Owner {
 	public final int id;
 	public final Gob gob;
 	public final Sprite.Mill<?> sm;
@@ -93,7 +95,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 
 	private void init() {
 	    if(spr == null) {
-		spr = sm.create(gob);
+		spr = sm.create(this);
 		if(old)
 		    spr.age();
 		if(added && (spr instanceof SetupMod))
@@ -158,6 +160,13 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 	    if(slots != null)
 		slots.remove(slot);
 	}
+
+	private static final ClassResolver<Overlay> ctxr = new ClassResolver<Overlay>()
+	    .add(Overlay.class, o -> o);
+	public <T> T context(Class<T> cl) {return(OwnerContext.orparent(cl, ctxr.context(cl, this, false), gob));}
+	public Random mkrandoom() {return(gob.mkrandoom());}
+	@Deprecated
+	public Resource getres() {return(gob.getres());}
     }
 
     public static interface SetupMod {
@@ -1010,9 +1019,9 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
     }
     public final Placed placed = new Placed();
 
-	public String toString() {
-		return(String.format("#<ob %d %s>", id, getattr(Drawable.class)));
-	}
+    public String toString() {
+	return(String.format("#<ob %d %s>", id, getattr(Drawable.class)));
+    }
 
 	//Useful for getting stage information or model type
 	public int sdt() {
@@ -1030,8 +1039,8 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 			String gobName = this.getres().name;
 
 			if( !ZeeConfig.isTree(gobName) &&
-				!ZeeManagerGobs.isGobWall(gobName)  &&
-				!ZeeConfig.isGobCrop(gobName)
+					!ZeeManagerGobs.isGobWall(gobName)  &&
+					!ZeeConfig.isGobCrop(gobName)
 			){
 				return;
 			}
