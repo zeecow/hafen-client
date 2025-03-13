@@ -12,14 +12,14 @@ public class ZeeFont {
     public static final Text.Foundry TXTFND_GOB_TEXT = new Text.Foundry(Text.sans.deriveFont(Font.PLAIN, UI.scale(11))).aa(false);
 
     public static void checkDmgHpMaybe(Sprite.Owner owner, Resource res, String str, Color col) {
-        if (!(owner instanceof Gob))
+        if (!(owner instanceof Gob.Overlay))
             return;
         if (!ZeeConfig.isNumbersOnly(str))
             return;
         if (col==null || !col.equals(Color.red))
             return;
         try {
-            Gob gob = (Gob) owner;
+            Gob gob = ((Gob.Overlay) owner).gob;
             gob.totalDmgHp += Integer.parseInt(str);
             String txt = gob.totalDmgHp + getFleeHpInfo(gob);
             ZeeGobText zeeGobText = new ZeeGobText(txt,Color.yellow,Color.black,5, TXTFND_TOTAL_DAMAGE);
