@@ -60,6 +60,7 @@ public class QBuff extends ItemInfo.Tip {
 	}
     }
 
+	@SuppressWarnings("deprecation")
     public static final Layout.ID<Table> lid = new Layout.ID<Table>() {
 	public Table make() {return(new Table());}
     };
@@ -80,6 +81,7 @@ public class QBuff extends ItemInfo.Tip {
 	}
     }
 
+	@SuppressWarnings("deprecation")
     public static final Layout.ID<Summary> sid = new Layout.ID<Summary>() {
 	public Summary make() {return(new Summary());}
     };

@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+@SuppressWarnings("deprecation")
 public class ZeeCupboardLabeler {
 
     public static final int CABIN_LEVEL_UNKOWN = -1;

@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.*;
 import java.util.stream.Collectors;
 
+@SuppressWarnings("deprecation")
 public class ZeeManagerMiner extends ZeeThread{
 
     private static final double MAX_DIST_BOULDER = 25;

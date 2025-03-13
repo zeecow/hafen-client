@@ -4,6 +4,7 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
+@SuppressWarnings("deprecation")
 public class ZeeManagerTrees {
 
     static boolean isRemovingTreesAndStumps;

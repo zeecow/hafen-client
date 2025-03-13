@@ -4,6 +4,7 @@ import java.awt.*;
 import java.util.List;
 import java.util.Map;
 
+@SuppressWarnings("deprecation")
 public class ZeeFont {
 
     public static final Text.Foundry TXTFND_PROGRESS_WIDGET = new Text.Foundry(Text.sans.deriveFont(Font.BOLD, UI.scale(15f))).aa(false);

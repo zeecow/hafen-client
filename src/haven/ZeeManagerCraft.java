@@ -5,9 +5,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@SuppressWarnings("deprecation")
 public class ZeeManagerCraft extends ZeeThread{
-
-
 
     /*
         FEASTING LOG WINDOW

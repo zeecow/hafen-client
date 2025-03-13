@@ -10,6 +10,7 @@ import java.util.function.*;
   >rlink: Equed
 */
 @haven.FromResource(name = "gfx/fx/eq", version = 20)
+@SuppressWarnings("deprecation")
 public class Equed extends Sprite {
     private final Sprite espr;
     private final RenderTree.Node eqd;

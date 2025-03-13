@@ -3,6 +3,7 @@ package haven;
 import java.util.ArrayList;
 import java.util.List;
 
+@SuppressWarnings("deprecation")
 public class ZeeThread  extends Thread{
 
     static final long SLEEP_MS = 50;

@@ -2543,6 +2543,7 @@ public class MapView extends PView implements DTarget, Console.Directory {
 			ZeeManagerMiner.checkMiningSelection();
 	}
 
+	@SuppressWarnings("deprecation")
 	void inspectTooltip(Coord c) {
 		if(ZeeConfig.showInspectTooltip && !ZeeManagerGobs.isMidclickInspecting && ZeeConfig.getPlayerGob()!=null) {
 			new Hittest(c) {

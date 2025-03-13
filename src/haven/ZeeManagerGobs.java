@@ -18,6 +18,7 @@ import java.util.stream.Collectors;
 
 import static haven.OCache.posres;
 
+@SuppressWarnings("deprecation")
 public class ZeeManagerGobs extends ZeeThread{
 
     static final int OVERLAY_ID_AGGRO = 1341;
@@ -794,9 +795,9 @@ public class ZeeManagerGobs extends ZeeThread{
                 // update barterstand labels
                 barterSearchUpdateGobs();
             }
-            public boolean keyup(KeyEvent ev) {
+            public boolean keyup(KeyUpEvent ev) {
                 barterFindText = this.text();
-                return true;
+                return super.keyup(ev);
             }
         },0,wdg.c.y+wdg.sz.y);
 
@@ -2803,9 +2804,9 @@ public class ZeeManagerGobs extends ZeeThread{
                 // update barterstand labels
                 barterSearchUpdateGobs();
             }
-            public boolean keyup(KeyEvent ev) {
+            public boolean keyup(KeyUpEvent ev) {
                 gobVisNames = this.text();
-                return true;
+                return super.keyup(ev);
             }
         },0,wdg.c.y+wdg.sz.y);
 

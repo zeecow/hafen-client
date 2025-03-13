@@ -269,6 +269,7 @@ public class MiniMap extends Widget {
 	private Consumer<UI> snotify;
 	private boolean markchecked;
 
+	@SuppressWarnings("deprecation")
 	public DisplayIcon(GobIcon attr, GobIcon.Setting conf) {
 	    this.attr = attr;
 	    this.gob = attr.gob;
@@ -743,6 +744,7 @@ public class MiniMap extends Widget {
 	return(null);
     }
 
+	@SuppressWarnings("deprecation")
 	public DisplayIcon iconByGobName(String name) {
 		for(ListIterator<DisplayIcon> it = icons.listIterator(icons.size()); it.hasPrevious();) {
 			DisplayIcon disp = it.previous();

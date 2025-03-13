@@ -6,7 +6,7 @@ import haven.render.*;
 import java.awt.*;
 import java.util.HashMap;
 
-
+@SuppressWarnings("deprecation")
 public class ZeeGobPointer extends Sprite implements RenderTree.Node, PView.Render2D {
 
     static final HashMap<String, Tex> mapGobPointer = new HashMap<>();

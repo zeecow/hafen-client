@@ -5,6 +5,7 @@ import haven.render.Pipe;
 
 import java.awt.*;
 
+@SuppressWarnings("deprecation")
 public class ZeeGobColor extends GAttrib implements Gob.SetupMod {
     public static final Color COLOR_DARK_GREEN = new Color(30, 101, 0);
     public Color color;

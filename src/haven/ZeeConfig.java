@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
 
 import static haven.OCache.posres;
 
-
+@SuppressWarnings("deprecation")
 public class ZeeConfig {
     static final String CATEG_PVPANDSIEGE = "PVP and siege";
     static final String CATEG_AGROCREATURES = "Agressive creatures";

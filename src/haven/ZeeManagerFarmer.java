@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+@SuppressWarnings("deprecation")
 public class ZeeManagerFarmer extends ZeeThread{
 
     public static final int MIN_ACCESSIBLE_DIST = 15;//TODO: isPlayerMountingHorse()

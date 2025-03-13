@@ -11,6 +11,7 @@ import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 
+@SuppressWarnings("deprecation")
 public class ZeeManagerIcons {
 
     static List<Gob> gobs = new ArrayList<>();

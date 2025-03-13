@@ -7,6 +7,7 @@ import java.util.Map;
 import static haven.OCache.posres;
 import static java.util.Map.entry;
 
+@SuppressWarnings("deprecation")
 public class ZeeManagerStockpile extends ZeeThread{
 
     static final String TASK_PILE_GOB_SOURCE = "TASK_PILE_GOB_SOURCE";
