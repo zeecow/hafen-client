@@ -71,6 +71,8 @@ public class ZeeManagerCraft extends ZeeThread{
     static Button bugColAutoBtn;
     static Gob bugColWoodPile;
     static List<Gob> bugColContainers;
+    static java.util.List<String> bugColBugNames;
+    static Label bugColLabel;
     static void bugColRecipeOpened(Window window) {
         bugColRecipeOpen = true;
         bugColAutoBtn = new ZeeWindow.ZeeButton(UI.scale(85),"auto"){
@@ -86,7 +88,7 @@ public class ZeeManagerCraft extends ZeeThread{
                         ZeeConfig.msgError("no bug containers found");
                         return;
                     }
-
+                    bugColLabelUpdate();
                     bugColStart();
                 }
             }
@@ -94,7 +96,18 @@ public class ZeeManagerCraft extends ZeeThread{
         bugColAutoBtn.disable(true);
         bugColAutoBtn.settip("craft using woodpile and bug containers");
         window.add(bugColAutoBtn,360,45);
+        bugColLabelUpdate();
+        window.add(bugColLabel, 360, 30);
         //autoBtn.disable(!bugCollectionReady());
+    }
+    static void bugColLabelUpdate(){
+        int bugs = bugColBugNames!=null ? bugColBugNames.size() : 0;
+        int containers = bugColContainers!=null ? bugColContainers.size() : 0;
+        String msg = "bug "+bugs+" , cont "+containers;
+        if (bugColLabel==null)
+            bugColLabel = new Label(msg);
+        else
+            bugColLabel.settext(msg);
     }
     public static void bugColCraftBtnClicked() {
         if (!bugColRecipeOpen || bugColBusy)
@@ -111,7 +124,6 @@ public class ZeeManagerCraft extends ZeeThread{
         // enable auto btn after "Craft" was clicked; TODO check if craft was successful?
         bugColAutoBtn.disable(false);
     }
-    static java.util.List<String> bugColBugNames;
     private static void bugColStart() {
 
         new Thread(){
@@ -229,27 +241,28 @@ public class ZeeManagerCraft extends ZeeThread{
             ZeeConfig.addGobText(gob,"wood");
             bugColWoodPile = gob;
         }
+        bugColLabelUpdate();
     }
     public static void bugColRecipeClosed() {
         bugColRecipeOpen = false;
-        if (bugColBusy)
-            bugColExit("recipe closed");
+        bugColExit("bugcol recipe closed");
     }
     static void bugColExit(String msg){
-        if (bugColBusy) {
-            bugColBusy = false;
-            if (!msg.isEmpty()) {
-                println("bugCol > " + msg);
-                ZeeConfig.msgLow(msg);
-            }
-            ZeeConfig.removePlayerText();
-            if (bugColContainers != null) {
-                bugColContainers.forEach(ZeeConfig::removeGobText);
-                bugColContainers.clear();
-            }
-            ZeeConfig.removeGobText(bugColWoodPile);
-            bugColWoodPile = null;
+        bugColBusy = false;
+        if (!msg.isEmpty()) {
+            println("bugCol > " + msg);
+            ZeeConfig.msgLow(msg);
         }
+        ZeeConfig.removePlayerText();
+        if (bugColContainers != null) {
+            bugColContainers.forEach(ZeeConfig::removeGobText);
+            bugColContainers.clear();
+        }
+        if (bugColBugNames != null) {
+            bugColBugNames.clear();
+        }
+        ZeeConfig.removeGobText(bugColWoodPile);
+        bugColWoodPile = null;
     }
 
 
