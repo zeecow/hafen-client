@@ -46,8 +46,13 @@ public class ZeeManagerMiner extends ZeeThread{
             tileMonitorWindow();
         }
 
-        // if tunnel mining, show Helper Window
-        if (tunnelCheckbox && !tunneling && isTunnel(ZeeConfig.lastSavedOverlay.a.sz())){
+        // show tunnel helper window if checkbox or holding shift
+        if ( (tunnelCheckbox || ZeeConfig.gameUI.ui.modshift)
+                && !tunneling && isTunnel(ZeeConfig.lastSavedOverlay.a.sz()))
+        {
+            // shift+mine activates checkbox
+            if (!tunnelCheckbox)
+                ZeeInvMainOptionsWdg.cbTunnel.click();
             tunneling = true;
             tunnelHelperShowWindow();
             tunnelHelperButtonAct.disable(true);

@@ -80,7 +80,7 @@ public class ZeeInvMainOptionsWdg extends Widget {
                 a = val;
             }
         }, x, 15);
-        cbTunnel.settip("tunnel helper");
+        cbTunnel.settip("tunnel helper (shift + area mine)");
 
         pack();
     }

@@ -41,7 +41,8 @@ Controls
   - shift midclick obj to act on all objs
 - hold shift for long tooltips  
 - midclick obj while working will queue 
-- shift midclick object toggle highlight
+- shift midclick object toggle highlight object
+- shift + area mine starts tunnel helper if area matches
 - type ":zeecow" for small interactive commands 
 
 
