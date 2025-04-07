@@ -10,7 +10,7 @@ import java.util.Collection;
 import static haven.PUtils.convolvedown;
 
 @Resource.PublishedCode(name = "attrmod")
-@haven.FromResource(name = "ui/tt/attrmod", version = 11)
+@haven.FromResource(name = "ui/tt/attrmod", version = 12)
 public class AttrMod extends ItemInfo.Tip {
     public final Collection<Entry> tab;
 
