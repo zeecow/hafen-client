@@ -78,6 +78,9 @@
 
 
   <target name="hafen-client" depends="build-env, extlib/jogl, extlib/lwjgl-gl, extlib/steamworks">
+    <condition property="explicit-annotations" value="-proc:full" else="">
+      <javaversion atleast="21" />
+    </condition>
     <javac srcdir="src" destdir="build/classes" debug="on"
 	   source="1.8" target="1.8" includeantruntime="no"
 	   bootclasspath="${boot-classpath}">
@@ -90,6 +93,7 @@
 	<pathelement path="lib/ext/steamworks/steamworks4j.jar" />
 	<pathelement path="lib/jglob.jar" />
       </classpath>
+      <compilerarg line="${explicit-annotations}" />
       <compilerarg value="-Xlint:unchecked" />
       <compilerarg value="-Xlint:deprecation" />
       <compilerarg value="-Xlint:-options" />
@@ -172,7 +176,21 @@
   <target name="deftgt" depends="jars, bin" />
 
   <target name="run" depends="bin">
-    <java jar="bin/hafen.jar" fork="true" />
+    <condition property="jogl-exports"
+	       value="--add-exports=java.base/java.lang=ALL-UNNAMED --add-exports=java.desktop/sun.awt=ALL-UNNAMED --add-exports=java.desktop/sun.java2d=ALL-UNNAMED"
+	       else="">
+      <javaversion atleast="16" />
+    </condition>
+    <condition property="jogl-access" value="--enable-native-access=ALL-UNNAMED" else="">
+      <javaversion atleast="24" />
+    </condition>
+    <java jar="bin/hafen.jar" fork="true">
+      <sysproperty key="sun.java2d.uiScale.enabled" value="false" />
+      <sysproperty key="java.net.preferIPv6Addresses" value="system" />
+      <jvmarg line="${jogl-exports}" />
+      <jvmarg line="${jogl-access}" />
+      <!-- <sysproperty key="haven.renderer" value="lwjgl" /> -->
+    </java>
   </target>
 
   <target name="clean">
