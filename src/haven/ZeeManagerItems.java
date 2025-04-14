@@ -488,8 +488,8 @@ public class ZeeManagerItems extends ZeeThread{
                 }
 
             }
-            else if (isItemAxeChopTree()) { // try switch axe for axe (1handed)
-
+            // try switch axe for axe (1handed)
+            else if (isItemAxeChopTree()) {
                 if (isItemAxeChopTree(leftHandItemName) && isItemAxeChopTree(rightHandItemName)) {
                     // unequip 1 of 2 axes, before next steps
                     if (unequipLeftItem()) {
@@ -499,14 +499,25 @@ public class ZeeManagerItems extends ZeeThread{
                     }
                 }
                 pickUpItem();
+                // if hand item is only sack, try replacing other hand
                 if (isItemSack(leftHandItemName) && !isItemSack(rightHandItemName)) {
                     equipRightOccupiedHand();
                 }else if (!isItemSack(leftHandItemName) && isItemSack(rightHandItemName)) {
                     equipLeftOccupiedHand();
-                }else if (isItemAxeChopTree(getLeftHandName())) {
-                    equipLeftOccupiedHand(); //switch left hand axe
-                }else if (isItemAxeChopTree(getRightHandName())) {
-                    equipRightOccupiedHand(); // switch right hand axe
+                }
+                // if hand item is shield, try replacing other hand
+                else if (isShield(leftHandItemName)) {
+                    equipRightOccupiedHand();
+                }else if (!isShield(leftHandItemName)) {
+                    equipLeftOccupiedHand();
+                }
+                // replace left hand axe
+                else if (isItemAxeChopTree(getLeftHandName())) {
+                    equipLeftOccupiedHand();
+                }
+                // replace right hand axe
+                else if (isItemAxeChopTree(getRightHandName())) {
+                    equipRightOccupiedHand();
                 }else if (isLeftHandEmpty() || isRightHandEmpty()) {
                     equipEmptyHand();
                 }else if (getLeftHandName().contains("/bucket")){
@@ -1413,7 +1424,7 @@ public class ZeeManagerItems extends ZeeThread{
         return isItemAxeChopTree(itemName);
     }
     public static boolean isItemAxeChopTree(String name) {
-        return name.endsWith("woodsmansaxe") || name.endsWith("axe-m") || name.endsWith("butcherscleaver") || name.endsWith("tinkersthrowingaxe") || name.endsWith("stoneaxe");
+        return name.endsWith("woodsmansaxe") || name.endsWith("axe-m") || name.endsWith("butcherscleaver") || name.endsWith("tinkersthrowingaxe") || name.endsWith("stoneaxe") || name.endsWith("shears");
     }
 
     public static boolean isItemButchingTool(WItem wItem){
