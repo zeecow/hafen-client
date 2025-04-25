@@ -266,8 +266,7 @@ public class ZeeManagerItems extends ZeeThread{
     private void init(WItem wItem) {
         try{
             equipory = ZeeConfig.windowEquipment.getchild(Equipory.class);
-            leftHandItemName = (getEquipory().leftHand==null ? "" : getEquipory().leftHand.item.getres().name);
-            rightHandItemName = (getEquipory().rightHand==null ? "" : getEquipory().rightHand.item.getres().name);
+            updateHandItemNames();
             itemName = wItem.item.getres().name;//clicked item, started manager
             itemBasename = wItem.item.getres().basename();
         }catch (Exception e){
@@ -276,6 +275,11 @@ public class ZeeManagerItems extends ZeeThread{
         }
         //println(itemName +"  "+ getWItemCoord(wItem));//+"  "+ZeeConfig.getCursorName());
         //wItem.item.info().forEach(itemInfo -> println("    "+itemInfo.getClass().getSimpleName()));
+    }
+
+    private void updateHandItemNames() {
+        leftHandItemName = (getEquipory().leftHand==null ? "" : getEquipory().leftHand.item.getres().name);
+        rightHandItemName = (getEquipory().rightHand==null ? "" : getEquipory().rightHand.item.getres().name);
     }
 
 
@@ -490,46 +494,52 @@ public class ZeeManagerItems extends ZeeThread{
             }
             // try switch axe for axe (1handed)
             else if (isItemAxeChopTree()) {
+                // if 2 axes equipped, unnequip one before next steps
                 if (isItemAxeChopTree(leftHandItemName) && isItemAxeChopTree(rightHandItemName)) {
-                    // unequip 1 of 2 axes, before next steps
                     if (unequipLeftItem()) {
                         if(!dropHoldingItemToBeltOrInv()) {
                             equipEmptyHand(); // fall back
                         }
                     }
+                    updateHandItemNames();
                 }
                 pickUpItem();
                 // if hand item is only sack, try replacing other hand
                 if (isItemSack(leftHandItemName) && !isItemSack(rightHandItemName)) {
                     equipRightOccupiedHand();
-                }else if (!isItemSack(leftHandItemName) && isItemSack(rightHandItemName)) {
+                } else if (!isItemSack(leftHandItemName) && isItemSack(rightHandItemName)) {
                     equipLeftOccupiedHand();
                 }
                 // if hand item is shield, try replacing other hand
                 else if (isShield(leftHandItemName)) {
                     equipRightOccupiedHand();
-                }else if (!isShield(leftHandItemName)) {
+                }else if (isShield(rightHandItemName)) {
                     equipLeftOccupiedHand();
                 }
-                // replace left hand axe
-                else if (isItemAxeChopTree(getLeftHandName())) {
+                // replace axe for axe
+                else if (isItemAxeChopTree(leftHandItemName)) {
                     equipLeftOccupiedHand();
                 }
-                // replace right hand axe
-                else if (isItemAxeChopTree(getRightHandName())) {
+                else if (isItemAxeChopTree(rightHandItemName)) {
                     equipRightOccupiedHand();
-                }else if (isLeftHandEmpty() || isRightHandEmpty()) {
+                }
+                // replace empty hand
+                else if (isLeftHandEmpty() || isRightHandEmpty()) {
                     equipEmptyHand();
-                }else if (getLeftHandName().contains("/bucket")){
+                }
+                // equip non-bucket hand
+                else if (leftHandItemName.contains("/bucket")){
                     equipRightOccupiedHand();
-                }else if (getRightHandName().contains("/bucket")){
+                }else if (rightHandItemName.contains("/bucket")){
                     equipLeftOccupiedHand();
-                }else {
-                    equipLeftOccupiedHand();//all hands occupied, equip left
+                }
+                else {
+                    equipLeftOccupiedHand();//all hands occupied, try equip left
                 }
                 dropHoldingItemToBeltOrInv();
             }
-            else{// 1handed item
+            // non-axe 1-handed items
+            else{
 
                 if(!isItemWindowEquips()) { // send to equipory
                     if(isLeftHandEmpty() || isRightHandEmpty()) {//1 item equipped
