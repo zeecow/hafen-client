@@ -193,6 +193,7 @@ public class ZeeConfig {
     static boolean barterStandMidclickAutoBuy = false;
     static boolean barterAutoDisableStacking = Utils.getprefb("barterStandStackingOff",true);
     static boolean clickIconStoatAggro = Utils.getprefb("clickIconStoatAggro", true);
+    static boolean animateUiMessages = Utils.getprefb("animateUiMessages", true);
     static boolean autoChipMinedBoulder = Utils.getprefb("autoChipMinedBoulder", true);
     static boolean autoClickMenuOption = Utils.getprefb("autoClickMenuOption", true);
     static String autoClickMenuOptionList = Utils.getpref("autoClickMenuOptionList", DEF_LIST_AUTO_CLICK_MENU);

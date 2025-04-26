@@ -1,6 +1,8 @@
 package haven;
 
 import java.awt.*;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -82,4 +84,36 @@ public class ZeeFont {
         return ret;
     }
 
+
+
+    static HashMap<Text, Double> mapMsgTime = new HashMap<Text, Double>();
+    public static void animateUimsgDraw(GOut g) {
+        for (Iterator<Map.Entry<Text, Double>> it = mapMsgTime.entrySet().iterator(); it.hasNext();) {
+            Map.Entry<Text, Double> entry = it.next();
+            double dt = (Utils.rtime() - entry.getValue());
+            if (dt > 3.0) {
+                it.remove();
+                if(mapMsgTime.isEmpty())
+                    println("anim ui msg = "+mapMsgTime.size());
+            } else {
+                Text lastmsg = entry.getKey();
+                Coord szhalf = ZeeConfig.gameUI.sz.div(2);
+                g.chcolor(0, 0, 0, 192);
+                g.frect(new Coord(szhalf.x + UI.scale(8), szhalf.y - UI.scale(22 + ((int) (dt * (77))))), lastmsg.sz().add(UI.scale(4), UI.scale(4)));
+                g.chcolor();
+                g.image(lastmsg.tex(), new Coord(szhalf.x + UI.scale(10), szhalf.y -= UI.scale(20 + ((int) (dt * 77)))));
+            }
+        }
+    }
+    public static void animateUimsgAdd(Text lastmsg, double msgtime) {
+        mapMsgTime.putIfAbsent(lastmsg,msgtime);
+    }
+
+
+
+
+
+    private static void println(String s) {
+        ZeeConfig.println(s);
+    }
 }

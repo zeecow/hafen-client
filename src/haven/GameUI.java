@@ -1123,6 +1123,9 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
 		g.image(lastmsg.tex(), new Coord(blpw + UI.scale(10), by -= UI.scale(20)));
 	    }
 	}
+	if (ZeeConfig.animateUiMessages){
+		ZeeFont.animateUimsgDraw(g);
+	}
 	if(!chat.visible()) {
 	    chat.drawsmall(g, new Coord(blpw + UI.scale(10), by), UI.scale(100));
 	}
@@ -1615,6 +1618,9 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
 	    logged = new ChatUI.Channel.SimpleMessage(msg.message(), msg.color());
 	msgtime = Utils.rtime();
 	lastmsg = RootWidget.msgfoundry.render(msg.message(), msg.color());
+	if (ZeeConfig.animateUiMessages){
+		ZeeFont.animateUimsgAdd(lastmsg,msgtime);
+	}
 	syslog.append(logged);
 	if (!ZeeConfig.muteAudioMsg(msg.message()))
 		ui.sfxrl(msg.sfx());

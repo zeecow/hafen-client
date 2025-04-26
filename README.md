@@ -167,6 +167,7 @@ LongMidClick Flowermenu for Window Items
 
 Random Features
 ---------------
+- opt Animated UI messages, roll msgs at screen center
 - option midi radio folder for playing when cellar/cabin    
 - solid colors option: minimap, terrain
 - search actions works globally, instead of current menu

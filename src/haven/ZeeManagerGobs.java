@@ -4296,7 +4296,6 @@ public class ZeeManagerGobs extends ZeeThread{
         Glob glob = ZeeConfig.gameUI.ui.sess.glob;
         glob.blightamb = glob.lightamb;
         Utils.setprefi(getLightPrefName(), 1);
-        ZeeConfig.msgLow("amblight default "+glob.blightamb.getRed());
         brightnessMsg(true);
         return true;
     }
