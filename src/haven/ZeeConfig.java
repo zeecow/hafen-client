@@ -4534,7 +4534,7 @@ public class ZeeConfig {
     }
 
 
-    private static boolean isMsgAudioMuted(String msg) {
+    private static boolean isMsgTxtMuted(String msg) {
         String[] arr = blockAudioMsgList.split(";");
         for (int i = 0; i < arr.length; i++) {
             if (msg.strip().contains(arr[i].strip()))
@@ -4876,7 +4876,7 @@ public class ZeeConfig {
     }
 
     public static boolean muteAudioMsg(String msg) {
-        if (ZeeConfig.blockAudioMsg && ZeeConfig.isMsgAudioMuted(msg))
+        if (ZeeConfig.blockAudioMsg && isMsgTxtMuted(msg))
             return true;
         if ( ZeeManagerStockpile.selAreaPile &&
                 (msg.contains("stockpile is already full") || msg.contains("site is occupied")) )

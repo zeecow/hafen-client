@@ -1618,7 +1618,7 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
 	    logged = new ChatUI.Channel.SimpleMessage(msg.message(), msg.color());
 	msgtime = Utils.rtime();
 	lastmsg = RootWidget.msgfoundry.render(msg.message(), msg.color());
-	if (ZeeConfig.animateUiMessages){
+	if (ZeeConfig.animateUiMessages && !ZeeConfig.muteAudioMsg(msg.message())){
 		ZeeFont.animateUimsgAdd(lastmsg,msgtime);
 	}
 	syslog.append(logged);

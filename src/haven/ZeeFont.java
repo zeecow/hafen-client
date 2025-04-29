@@ -93,8 +93,6 @@ public class ZeeFont {
             double dt = (Utils.rtime() - entry.getValue());
             if (dt > 3.0) {
                 it.remove();
-                if(mapMsgTime.isEmpty())
-                    println("anim ui msg = "+mapMsgTime.size());
             } else {
                 Text lastmsg = entry.getKey();
                 Coord szhalf = ZeeConfig.gameUI.sz.div(2);
