@@ -2151,15 +2151,13 @@ public class ZeeConfig {
 
     static void saveWindowPos(Window window) {
 
-        println("saveWindowPos > "+window.cap);
-
         if(!rememberWindowsPos || window==null || isBuildWindow(window))
             return;
 
         String name = window.cap;
 
         //igonore cases
-        if( name==null || name.isEmpty() )
+        if( name==null || name.isEmpty() || name.contentEquals("Stack"))
             return;
 
         // set craft window unique name

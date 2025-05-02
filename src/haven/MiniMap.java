@@ -686,9 +686,12 @@ public class MiniMap extends Widget {
 	void drawplayerpath(GOut g){
 		if(ZeeManagerIcons.lastMinimapClick == null)
 			return;
-		Coord playac = p2c(ZeeConfig.gameUI.map.player().rc);
+		Gob pl = ZeeConfig.gameUI.map.player();
+		if (pl==null)
+			return;
+		Coord plc = p2c(pl.rc);
 		g.chcolor(Color.WHITE);
-		g.line( playac, p2c(ZeeManagerIcons.lastMinimapClick), 1);
+		g.line( plc, p2c(ZeeManagerIcons.lastMinimapClick), 1);
 		g.chcolor();
 	}
 
