@@ -75,29 +75,6 @@ public class ZeeHitbox extends ZeeSlottedNode implements Rendered {
         return false;
     }
 
-    private boolean passable() {
-        try {
-            String name = gob.getres().name;//gob.resid();
-            ResDrawable rd = (gob.drawable instanceof ResDrawable) ? (ResDrawable) gob.drawable : null;
-
-            if(rd != null) {
-                int state = gob.sdt();
-                if(name.endsWith("gate") && name.startsWith("gfx/terobjs/arch")) {//gates
-                    if(state == 1) { // gate is open
-                        return true;
-                    }
-                } else if(name.endsWith("/dng/antdoor")) {
-                    return state == 1 || state == 13;
-                } else if(name.endsWith("/pow[hearth]")) {//hearth fire
-                    return true;
-                } else if(name.equals("gfx/terobjs/arch/cellardoor") || name.equals("gfx/terobjs/fishingnet")) {
-                    return true;
-                }
-            }
-        } catch (Loading ignored) {}
-        return false;
-    }
-
     private static Model getModel(Gob gob) {
         Model model;
         Resource res = getResource(gob);

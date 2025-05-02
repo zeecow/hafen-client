@@ -683,6 +683,15 @@ public class MiniMap extends Widget {
 	}
     }
 
+	void drawplayerpath(GOut g){
+		if(ZeeManagerIcons.lastMinimapClick == null)
+			return;
+		Coord playac = p2c(ZeeConfig.gameUI.map.player().rc);
+		g.chcolor(Color.WHITE);
+		g.line( playac, p2c(ZeeManagerIcons.lastMinimapClick), 1);
+		g.chcolor();
+	}
+
 	boolean playerSegment;
     public void drawparts(GOut g){
 	drawmap(g);
@@ -694,6 +703,7 @@ public class MiniMap extends Widget {
 	drawmarkers(g);
 	if( (ZeeConfig.showIconsZoomOut && dlvl<=2) || dlvl == 0)
 	    drawicons(g);
+	drawplayerpath(g);
 	drawparty(g);
     }
 
@@ -985,6 +995,7 @@ public class MiniMap extends Widget {
 			  (int)gob.id,
 			  gob.rc.floor(posres),
 			  0, -1);
+		ZeeManagerIcons.lastMinimapClick = loc.tc.sub(sessloc.tc).mul(tilesz).add(tilesz.div(2));
 	}
     }
 

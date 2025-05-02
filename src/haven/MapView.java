@@ -2533,8 +2533,12 @@ public class MapView extends PView implements DTarget, Console.Directory {
 	public void wdgmsg(String msg, Object... args) {
 		super.wdgmsg(msg, args);
 
-		// check enter house
 		if (msg.contentEquals("click")){
+			// minimap target coord
+			if (args!=null && args.length>1) {
+				ZeeManagerIcons.lastMinimapClick = null;
+			}
+			// check enter house
 			ZeeCupboardLabeler.checkHouseClick();
 		}
 

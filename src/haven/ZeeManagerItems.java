@@ -950,7 +950,7 @@ public class ZeeManagerItems extends ZeeThread{
                                 else if (firstItemName.endsWith("/hen") || firstItemName.endsWith("/rooster"))
                                     items = inv.getItemsByNameEnd("/hen","/rooster");
                                 else
-                                    items = inv.getWItemsByNameContains(firstItemName);
+                                    items = inv.getWItemsByNameEndsWith(firstItemName);
 
                                 //filter animal hides
                                 items.removeIf(wItem1->ZeeConfig.isAnimalHideTailEtc(wItem1.item.getres().name));
