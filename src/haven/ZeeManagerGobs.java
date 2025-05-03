@@ -2295,12 +2295,13 @@ public class ZeeManagerGobs extends ZeeThread{
                     Gob latest = null;
                     while(!animals.isEmpty() && !isCancelClick()) {
                         Gob animal = ZeeConfig.getClosestGobToPlayer(animals);
+                        animals.remove(animal);
                         // click shear wool
                         if(clickGobPetal(animal,"Shear wool")){
 
                             // wait shearing start
                             prepareCancelClick();
-                            sleep(PING_MS);
+                            sleep(555);
                             do {
                                 sleep(100);
                             } while(!isCancelClick() &&
@@ -2309,7 +2310,6 @@ public class ZeeManagerGobs extends ZeeThread{
 
                             // wait finish shearing
                             if (waitPlayerPoseNotInList(ZeeConfig.POSE_PLAYER_SHEARING)){
-                                animals.remove(animal);
                                 ZeeConfig.removeGobColor(animal);
                             }
                         }
@@ -2317,7 +2317,6 @@ public class ZeeManagerGobs extends ZeeThread{
                         else{
                             cancelFlowerMenu();//TODO cancel menu faster
                             waitNoFlowerMenu();
-                            animals.remove(animal);
                             ZeeConfig.removeGobColor(animal);
                         }
                         if(--cont > 0)
@@ -3872,7 +3871,7 @@ public class ZeeManagerGobs extends ZeeThread{
             choosePetal(fm, petalName);
             return waitNoFlowerMenu();
         }else{
-            //println("clickGobPetal > no flower menu?");
+            println("clickGobPetal > no flower menu?");
             return false;
         }
     }
