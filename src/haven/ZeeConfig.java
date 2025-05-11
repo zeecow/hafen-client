@@ -5090,11 +5090,7 @@ public class ZeeConfig {
         return Arrays.toString(args);
     }
 
-    static void println(int num) {
-        System.out.println(""+num);
-    }
-
-    static void println(String s) {
+    public static void println(String s) {
         System.out.println(s);
     }
 }
