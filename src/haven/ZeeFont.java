@@ -103,8 +103,19 @@ public class ZeeFont {
             }
         }
     }
+    static double lastmsgtime = 0;
     public static void animateUimsgAdd(Text lastmsg, double msgtime) {
-        mapMsgTime.putIfAbsent(lastmsg,msgtime);
+
+        // add delay to space out msgs vertically
+        double t = msgtime - lastmsgtime;
+        if ( t < 0.2 )
+            if ( t < 0 )
+                msgtime = 0.5; // fixed delay for fast msgs with t<0
+            else
+                msgtime += 0.3;
+
+        mapMsgTime.putIfAbsent( lastmsg, msgtime );
+        lastmsgtime = msgtime;
     }
 
 
