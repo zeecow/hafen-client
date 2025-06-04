@@ -1464,7 +1464,7 @@ public class ZeeConfig {
     }
 
     private static void windowModAutoHideButton(Window window, String windowTitle) {
-        if (autoHideWindows || listWindowsAddHideButton.isBlank())
+        if (!autoHideWindows || listWindowsAddHideButton.isBlank())
             return;
         boolean showButton = false;
         for (String cap : ZeeConfig.listWindowsAddHideButton.split(",")) {
@@ -1625,8 +1625,6 @@ public class ZeeConfig {
     }
 
 
-    private static int bstandPriceX = 110; // price x (sprite img)
-    private static int bstandQlX = 155; // quality x (label ql)
     private static void windowModBarterStand(Window window) {
 
         int v = 20;
@@ -2357,31 +2355,8 @@ public class ZeeConfig {
 
     public static void checkClassMod(String name, Class<?> qlass){
         try {
-
-            if(name.equals("haven.res.gfx.fx.bprad.BPRad")){
-                //Change radius color
-                setFinalStatic( qlass.getDeclaredField("smat"),
-                    new BaseColor(new Color(139, 139, 185, 48)) );
-                setFinalStatic( qlass.getDeclaredField("emat"),
-                    Pipe.Op.compose(new Pipe.Op[]{new BaseColor(new Color(139, 139, 185, 48)), new States.LineWidth(1)})  );
-            }
-            else if (name.equals("haven.res.gfx.fx.msrad.MSRad")){
+            if (name.equals("haven.res.gfx.fx.msrad.MSRad")){
                 classMSRad = qlass;
-            }
-            else if(name.equals("haven.res.ui.barterbox.Shopbox")) {
-
-                // pricec = UI.scale(200, 5);
-                setFinalStatic(
-                        qlass.getDeclaredField("pricec"),
-                        UI.scale(bstandPriceX, 5)
-                );
-
-                // qualc = UI.scale(260, 5).add(Inventory.invsq.sz());
-                setFinalStatic(
-                        qlass.getDeclaredField("qualc"),
-                        UI.scale(bstandQlX, 5).add(Inventory.invsq.sz())
-                );
-
             }
         } catch (Exception e) {
             e.printStackTrace();
