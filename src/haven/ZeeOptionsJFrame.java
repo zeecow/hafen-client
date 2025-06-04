@@ -32,7 +32,11 @@ public class ZeeOptionsJFrame extends JFrame {
     public ZeeOptionsJFrame(){
         super.setTitle("Zeecow Haven Options");
         setLocationRelativeTo(null);//center window
-        setDefaultLookAndFeelDecorated(true);
+        try {
+            UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setContents();
         pack();

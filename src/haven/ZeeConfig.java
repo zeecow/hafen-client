@@ -207,7 +207,7 @@ public class ZeeConfig {
     static boolean autoStack = false;//set at checkUiMsg()
     static String butcherAutoList = Utils.getpref("butcherAutoList", DEF_LIST_BUTCH_AUTO);
     static boolean cattleRosterHeight = Utils.getprefb("cattleRosterHeight", true);
-    static double cattleRosterHeightPercentage = Utils.getprefd("cattleRosterHeightPercentage", 1.0);
+    static double cattleRosterHeightPercentage = Utils.getprefd("cattleRosterHeightPercentage", 0.5);
     static boolean confirmPetalEat = Utils.getprefb("confirmPetalEat", true);
     static boolean confirmPetal = Utils.getprefb("confirmPetal", true);
     static String confirmPetalList = Utils.getpref("confirmPetalList", DEF_LIST_CONFIRM_PETAL);
@@ -239,7 +239,7 @@ public class ZeeConfig {
     public static boolean treeAnimation = Utils.getprefb("treeAnimation", false);
     static boolean keyCamSwitchShiftC = Utils.getprefb("keyCamSwitchShiftC", true);
     static boolean keyUpDownAudioControl = Utils.getprefb("keyUpDownAudioControl", true);
-    static boolean autoHideWindows = Utils.getprefb("autoHideWindows", false);
+    static boolean autoHideWindows = Utils.getprefb("autoHideWindows", true);
     static String listWindowsAddHideButton = Utils.getpref("listWindowsAddHideButton", DEF_WINS_HIDE_BUTTON);
     static List<String> listAutoHideWindowsActive = new ArrayList<>(Utils.getprefsl("listAutoHideWindowsActive",new String[]{}));
     static List<String> listAutoHideWindowsActiveFast = new ArrayList<>(Utils.getprefsl("listAutoHideWindowsActiveFast",new String[]{}));
@@ -1464,7 +1464,7 @@ public class ZeeConfig {
     }
 
     private static void windowModAutoHideButton(Window window, String windowTitle) {
-        if (listWindowsAddHideButton.isBlank())
+        if (autoHideWindows || listWindowsAddHideButton.isBlank())
             return;
         boolean showButton = false;
         for (String cap : ZeeConfig.listWindowsAddHideButton.split(",")) {
