@@ -376,7 +376,8 @@ public class CharWnd extends Window {
 		}
 	    }
 
-	    this.addhl(new Coord(tabs.c.x, tabs.c.y + tabs.sz.y + UI.scale(10) - 30), tabs.sz.x,
+		int buttonsPad = -15;
+	    this.addhl(new Coord(tabs.c.x, tabs.c.y + tabs.sz.y + UI.scale(10) + buttonsPad), tabs.sz.x,
 		new TB("battr", battrtab, "Base Attributes"),
 		new TB("sattr", sattrtab, "Abilities"),
 		new TB("skill", skilltab, "Lore & Skills"),
