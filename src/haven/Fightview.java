@@ -159,7 +159,11 @@ public class Fightview extends Widget {
 				}
 			}
 		}, give.pos("br").adds(0, 35), 1.0, 0.0);
-		switchTarget.settip("key: "+Fightsess.kb_relcycle.key.keyname);
+		try {
+			switchTarget.settip("key: " + Fightsess.kb_relcycle.key.keyname);
+		}catch (Exception e){
+			switchTarget.settip("key: undefined");
+		}
 	    lpack();
 	}
 
