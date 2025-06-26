@@ -4208,7 +4208,7 @@ public class ZeeManagerGobs extends ZeeThread{
                     public void wdgmsg(String msg, Object... args) {
                         if (msg.contentEquals("activate")){
                             //pickup closest matching
-                            Gob closest = ZeeConfig.getClosestGobByNameContains("/"+basename);
+                            Gob closest = ZeeConfig.getClosestGobByNameEnds(resname);
                             if (closest!=null) {
                                 gobClick(closest, 3);
                             }
@@ -4224,7 +4224,7 @@ public class ZeeManagerGobs extends ZeeThread{
                         public void wdgmsg(String msg, Object... args) {
                             if (msg.contentEquals("activate")) {
                                 //pickup closest matching
-                                Gob closest = ZeeConfig.getClosestGobByNameContains("/"+basename);
+                                Gob closest = ZeeConfig.getClosestGobByNameEnds(resname);
                                 if (closest!=null) {
                                     gobClick(closest, 3, UI.MOD_SHIFT);
                                 }
@@ -4248,7 +4248,7 @@ public class ZeeManagerGobs extends ZeeThread{
                     public void wdgmsg(String msg, Object... args) {
                         if (msg.contentEquals("activate")) {
                             //pickup closest matching
-                            Gob closest = ZeeConfig.getClosestGobByNameContains("/"+basename);
+                            Gob closest = ZeeConfig.getClosestGobByNameEnds(resname);
                             if (closest!=null) {
                                 gobClick(closest, 3, UI.MOD_SHIFT);
                             }

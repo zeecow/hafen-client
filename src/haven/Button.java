@@ -174,7 +174,10 @@ public class Button extends SIWidget {
 
     public void click() {
 	if(action != null)
-	    action.run();
+		if (!ui.modctrl && ZeeConfig.DEF_LIST_CONFIRM_BUTTON.contains(this.text.text))
+			ZeeConfig.msgError("Ctrl + click to confirm button");
+		else
+	    	action.run();
     }
 
     public boolean gkeytype(GlobKeyEvent ev) {

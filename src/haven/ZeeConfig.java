@@ -133,7 +133,7 @@ public class ZeeConfig {
 
     static final String DEF_LIST_MUTE_AUDIO = "Leashed horse.;Tracking is now turned;Stacking is now turned;must be empty to be unequipped";
     static final String DEF_LIST_CONFIRM_PETAL = "Empty,Swill,Clean out,Slaughter,Castrate,Unmoor,Declaim,Take possession,Renounce Lawspeaker,Become Lawspeaker,Pull hair,Disassemble,Claim,Set home dock,Crack & Soften,Snort,Extend one";
-    static final List<String> DEF_LIST_CONFIRM_BUTTON = List.of("Empty","Empty out","Abandon quest","Abandon credo","Resign");
+    static final List<String> DEF_LIST_CONFIRM_BUTTON = List.of("Empty","Empty out","Abandon quest","Abandon credo","Resign","Forget me");
     static final String DEF_WINS_HIDE_BUTTON = "Inventory,Character Sheet,Basket,Creel,Cattle Roster,Quiver,Pickup Gobs,Switch Char,:zeecow cmds";
     static final String DEF_LIST_BUTCH_AUTO = "Break,Scale,Wring neck,Kill,Skin,Flay,Pluck,Clean,Butcher,Collect bones";
     static final String DEF_LIST_AUTO_CLICK_MENU = "Pick,Harvest wax";
@@ -3521,16 +3521,25 @@ public class ZeeConfig {
         return ZeeConfig.gameUI.map.sz.div(2);
     }
 
-    public static void msg(String s) {
-        gameUI.ui.msg(s);
+    public static void msg(String msg) {
+        if (gameUI==null)
+            println("msg > "+msg);
+        else
+            gameUI.ui.msg(msg);
     }
 
-    public static void msgLow(String s) {
-        gameUI.ui.msg(s,Color.white, ZeeAudio.msgsfxLow);
+    public static void msgLow(String msg) {
+        if (gameUI==null)
+            println("msgLow > "+msg);
+        else
+            gameUI.ui.msg(msg,Color.white, ZeeAudio.msgsfxLow);
     }
 
     public static void msgError(String msg) {
-        gameUI.error(msg);
+        if (gameUI==null)
+            println("msgError > "+msg);
+        else
+            gameUI.error(msg);
     }
 
     public static boolean isGobRemoved(Gob gob) {
