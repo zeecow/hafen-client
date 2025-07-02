@@ -1607,10 +1607,6 @@ public class ZeeManagerGobs extends ZeeThread{
         else
             gobAutoLabel = null;
 
-        //TODO remove?
-        // zoom if player gob
-        // startRightClickZooming(gob, pc);
-
         // bugCollectionAuto label bug containers and wood pile
         if (ZeeManagerCraft.bugColRecipeOpen && !ZeeManagerCraft.bugColBusy){
             ZeeManagerCraft.bugColGobClicked(gob);
@@ -1628,9 +1624,8 @@ public class ZeeManagerGobs extends ZeeThread{
                 clickedPlantGobForLabelingQl = false;
             }
         }
-
         // refil cauldron aux containers, barrels
-        if(ZeeConfig.isPlayerFollowingCauldron && (ZeeConfig.isGobContainer(gobName) || gobName.endsWith("/barrel"))){
+        else if(ZeeConfig.isPlayerFollowingCauldron && (ZeeConfig.isGobContainer(gobName) || gobName.endsWith("/barrel"))){
             if (ZeeConfig.listCauldronContainers==null)
                 ZeeConfig.listCauldronContainers = new ArrayList<>();
             List<Gob> list = ZeeConfig.listCauldronContainers;
@@ -1775,6 +1770,40 @@ public class ZeeManagerGobs extends ZeeThread{
         else if (ZeeConfig.isPlayerLiftingGobNamecontains("gfx/terobjs/barrel")!=null && ZeeConfig.nameInListEndsWith(gobName,"/trees/birch,/trees/maple,/trees/terebinth")){
             collectTreeSapUsingBarrel(gob);
         }
+    }
+
+    static boolean pickingKritter = false;
+    static void pickupKritterDismountHorse(Gob kritter) {
+
+        if (pickingKritter)
+            return;
+
+        if (!ZeeConfig.isPlayerMountingHorse())
+            return;
+
+        String kritName = kritter.getres().name;
+        if( !kritName.endsWith("/grasshopper") && !kritName.endsWith("/rat"))
+            return;
+
+        new ZeeThread(){
+            @Override
+            public void run() {
+                pickingKritter = true;
+                try {
+                    ZeeConfig.addPlayerText("pickup");
+                    if(waitPlayerDistToGobOrCancelClick(kritter,50)){
+                        if(dismountHorse(kritter.rc))
+                            gobClick(kritter,3);
+                        else
+                            ZeeConfig.msgError("dismount horse failed");
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                pickingKritter = false;
+                ZeeConfig.removePlayerText();
+            }
+        }.start();
     }
 
     private static void collectTreeSapUsingBarrel(Gob tree) {
@@ -4102,6 +4131,9 @@ public class ZeeManagerGobs extends ZeeThread{
                     gobClick(closestGob, 3, UI.MOD_SHIFT);
                 else
                     gobClick(closestGob, 3);
+
+                // pickup kritter on horse may require dismounting
+                ZeeManagerGobs.pickupKritterDismountHorse(closestGob);
             }
             // select "Pick" menu option
             else {
@@ -4211,6 +4243,8 @@ public class ZeeManagerGobs extends ZeeThread{
                             Gob closest = ZeeConfig.getClosestGobByNameEnds(resname);
                             if (closest!=null) {
                                 gobClick(closest, 3);
+                                // pickup kritter on horse may require dismounting
+                                ZeeManagerGobs.pickupKritterDismountHorse(closest);
                             }
                         }
                     }

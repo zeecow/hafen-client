@@ -525,6 +525,20 @@ public class ZeeThread  extends Thread{
     }
 
 
+    public static boolean waitPlayerDistToGobOrCancelClick(Gob gob, int dist) {
+        if (ZeeConfig.distanceToPlayer(gob) > dist) {
+            prepareCancelClick();
+            try {
+                while (!isCancelClick() && ZeeConfig.distanceToPlayer(gob) > dist) {
+                    Thread.sleep(SLEEP_MS);
+                }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+        return !isCancelClick();
+    }
+
     public static boolean waitPlayerDistToGob(Gob gob, int dist) {
         //println("waitPlayerDistToGob "+dist);
         if (ZeeConfig.distanceToPlayer(gob) > dist) {

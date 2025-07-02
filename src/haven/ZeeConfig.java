@@ -2842,6 +2842,7 @@ public class ZeeConfig {
         ZeeConfig.clickedCraftAll = false;
         ZeeManagerIcons.lastMinimapClick = null;
         isPlayerFollowingCauldron = false;
+        ZeeManagerGobs.pickingKritter = false;
         if (listCauldronContainers!=null)
             listCauldronContainers.clear();
         ZeeManagerGobs.autoPickIrrlightExit();
@@ -3002,6 +3003,8 @@ public class ZeeConfig {
                 showInspectTooltip = false;
                 gameUI.map.ttip = null;
                 ZeeManagerGobs.checkRightClickGob(pc, mc, clickGob, lastMapViewClickGobName);
+                // pickup kritter on horse may require dismounting
+                ZeeManagerGobs.pickupKritterDismountHorse(lastMapViewClickGob);
             }
         }
         // clicked ground
