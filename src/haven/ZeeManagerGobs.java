@@ -2090,6 +2090,8 @@ public class ZeeManagerGobs extends ZeeThread{
             ZeeManagerMiner.tileMonitorWindow();
         else if(petalName.contentEquals(ZeeFlowerMenu.STRPETAL_SWITCHCHAR))
             ZeeSess.charSwitchCreateWindow();
+        else if(petalName.contentEquals(ZeeQuickOptionsWindow.WIN_TITLE))
+            ZeeQuickOptionsWindow.initWindow();
         else if(petalName.contentEquals(ZeeFlowerMenu.STRPETAL_TESTCOORDS))
             windowTestCoords();
         else if(petalName.contentEquals(ZeeFlowerMenu.STRPETAL_AUDIOBLOCKER))
@@ -2468,6 +2470,8 @@ public class ZeeManagerGobs extends ZeeThread{
             opts.add(ZeeFlowerMenu.STRPETAL_SWITCHCHAR);
             if (ZeeConfig.isCaveTile(ZeeConfig.getPlayerTileName()))
                 opts.add(ZeeFlowerMenu.STRPETAL_TILEMONITOR);
+            if (ZeeConfig.getWindow(ZeeQuickOptionsWindow.WIN_TITLE) == null)
+                opts.add(ZeeQuickOptionsWindow.WIN_TITLE);
             menu = new ZeeFlowerMenu(gob, opts.toArray(String[]::new));
         }
         else if (isGobTamedAnimalOrAurochEtc(gobName) && !isGobDeadOrKO(gob)) {

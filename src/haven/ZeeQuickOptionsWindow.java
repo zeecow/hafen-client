@@ -7,6 +7,7 @@ import java.util.List;
 
 public class ZeeQuickOptionsWindow {
 
+    public static final String WIN_TITLE = "Quick options";
     private static ZeeWindow window;
     private static Scrollport scrollport;
     private static List<String[]> listConfigLabel = new ArrayList<>();
@@ -17,7 +18,7 @@ public class ZeeQuickOptionsWindow {
 
     static ZeeWindow getWindow() {
         if (window == null){
-            window = new ZeeWindow(Coord.of(170,80),"Quick options");
+            window = new ZeeWindow(Coord.of(170,80), WIN_TITLE);
             scrollport = window.add(new Scrollport(Coord.of(155,65)),0,21);
             ZeeConfig.gameUI.add(window,Coord.of(ZeeConfig.gameUI.sz.x/2,0));
         }

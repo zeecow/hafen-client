@@ -599,7 +599,7 @@ public class ZeeConfig {
             return false;
         final String[] endlist = {
             "rockdove","quail","/hen","/rooster","magpie", // "/crab"
-            "mallard","seagull","ptarmigan","grouse",
+            "mallard","seagull","ptarmigan","grouse","bullfinch",
             "/squirrel","/hedgehog","/bogturtle",
             "/rabbit-buck","-doe","/adder","/mole",
             "-dead","-plucked","-cleaned","-clean"
