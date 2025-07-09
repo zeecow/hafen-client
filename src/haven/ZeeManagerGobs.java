@@ -1772,10 +1772,10 @@ public class ZeeManagerGobs extends ZeeThread{
         }
     }
 
-    static boolean pickingKritter = false;
+    static boolean isPickingKritterDismountHorse = false;
     static void pickupKritterDismountHorse(Gob kritter) {
 
-        if (pickingKritter)
+        if (isPickingKritterDismountHorse)
             return;
 
         if (!ZeeConfig.isPlayerMountingHorse())
@@ -1788,7 +1788,7 @@ public class ZeeManagerGobs extends ZeeThread{
         new ZeeThread(){
             @Override
             public void run() {
-                pickingKritter = true;
+                isPickingKritterDismountHorse = true;
                 try {
                     ZeeConfig.addPlayerText("pickup");
                     if(waitPlayerDistToGobOrCancelClick(kritter,50)){
@@ -1800,7 +1800,7 @@ public class ZeeManagerGobs extends ZeeThread{
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-                pickingKritter = false;
+                isPickingKritterDismountHorse = false;
                 ZeeConfig.removePlayerText();
             }
         }.start();
@@ -2090,6 +2090,8 @@ public class ZeeManagerGobs extends ZeeThread{
             ZeeManagerMiner.tileMonitorWindow();
         else if(petalName.contentEquals(ZeeFlowerMenu.STRPETAL_SWITCHCHAR))
             ZeeSess.charSwitchCreateWindow();
+        else if(petalName.contentEquals(ZeeFlowerMenu.STRPETAL_PICKUP_GOBS))
+            ZeeManagerGobs.showWindowPickupGob();
         else if(petalName.contentEquals(ZeeQuickOptionsWindow.WIN_TITLE))
             ZeeQuickOptionsWindow.initWindow();
         else if(petalName.contentEquals(ZeeFlowerMenu.STRPETAL_TESTCOORDS))
@@ -2404,7 +2406,7 @@ public class ZeeManagerGobs extends ZeeThread{
                         if (animalName.contains("boreworm")){
                             Gob beak = ZeeConfig.getClosestGobByNameContains("borewormbeak");
                             if (beak!=null)
-                                pickupAllGobItems(beak);
+                                pickupAllGobItemsServerSide(beak);
                         }
                     }
 
@@ -2465,9 +2467,10 @@ public class ZeeManagerGobs extends ZeeThread{
         }
         else if(gob.tags.contains(Gob.Tag.PLAYER_MAIN)) {
             opts = new ArrayList<String>();
-            opts.add(ZeeFlowerMenu.STRPETAL_AUDIOBLOCKER);
             opts.add(ZeeFlowerMenu.STRPETAL_ZEECOW_CMDS);
+            opts.add(ZeeFlowerMenu.STRPETAL_PICKUP_GOBS);
             opts.add(ZeeFlowerMenu.STRPETAL_SWITCHCHAR);
+            opts.add(ZeeFlowerMenu.STRPETAL_AUDIOBLOCKER);
             if (ZeeConfig.isCaveTile(ZeeConfig.getPlayerTileName()))
                 opts.add(ZeeFlowerMenu.STRPETAL_TILEMONITOR);
             if (ZeeConfig.getWindow(ZeeQuickOptionsWindow.WIN_TITLE) == null)
@@ -4080,8 +4083,38 @@ public class ZeeManagerGobs extends ZeeThread{
         return null;
     }
 
-    static void pickupAllGobItems(Gob gobItem) {
+    static void pickupAllGobItemsServerSide(Gob gobItem) {
+        //TODO special cases: gray clay, kelp, etc?
         ZeeManagerGobs.gobClick(gobItem,3,UI.MOD_SHIFT);
+    }
+
+    static boolean isPickingAllGobsClientSide = false;
+    static void pickupAllGobsClientSide(String resname){
+        if (isPickingAllGobsClientSide)
+            return;
+        new ZeeThread(){
+            public void run() {
+                int cont = 0;
+                isPickingAllGobsClientSide = true;
+                try {
+                    do{
+                        ZeeConfig.addPlayerText("picks "+cont);
+                        Gob closest = ZeeConfig.getClosestGobByNameEnds(resname);
+                        if (closest == null)
+                            break;
+                        ZeeManagerGobs.gobClick(closest,3);
+                        prepareCancelClick();
+                        waitPlayerIdlePose();
+                        cont++;
+                    }while(!isCancelClick() && !ZeeConfig.isPlayerHoldingItem());
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+                isPickingAllGobsClientSide = false;
+                ZeeConfig.removePlayerText();
+                ZeeConfig.msgLow("picks "+cont);
+            }
+        }.start();
     }
 
     // pattern must match whole gob name
@@ -4178,7 +4211,7 @@ public class ZeeManagerGobs extends ZeeThread{
     }
 
     static ZeeWindow winPickupGob;
-    static void toggleWindowPickupGob() {
+    static void showWindowPickupGob() {
 
         // find eligible gobs
         List<Gob> gobs = findPickupGobs();
@@ -4194,13 +4227,13 @@ public class ZeeManagerGobs extends ZeeThread{
         }
 
         //create window
-        winPickupGob = new ZeeWindow(Coord.of(200,300),"Pickup Gobs");
+        winPickupGob = new ZeeWindow(Coord.of(230,300),ZeeFlowerMenu.STRPETAL_PICKUP_GOBS);
 
         //button refresh
         wdg = winPickupGob.add(new ZeeWindow.ZeeButton(60,"refresh"){
             public void wdgmsg(String msg, Object... args) {
                 if (msg.contentEquals("activate")){
-                    toggleWindowPickupGob();
+                    showWindowPickupGob();
                 }
             }
         }, 0, 0);
@@ -4255,6 +4288,7 @@ public class ZeeManagerGobs extends ZeeThread{
                 },
                 0,y
             );
+            wdg.settip("pick one item");
 
             // add button pick "all"
             wdg = scrollport.cont.add(
@@ -4264,17 +4298,33 @@ public class ZeeManagerGobs extends ZeeThread{
                                 //pickup closest matching
                                 Gob closest = ZeeConfig.getClosestGobByNameEnds(resname);
                                 if (closest!=null) {
-                                    gobClick(closest, 3, UI.MOD_SHIFT);
+                                    pickupAllGobItemsServerSide(closest);
                                 }
                             }
                         }
                     },
                     wdg.c.x + wdg.sz.x, y
             );
+            // disable button all if not a terobj
             if (!resname.contains("/terobjs/")) {
-                // disable button all if not a terobj
                 ((Button)wdg).disable(true);
             }
+            wdg.settip("pick all items (inconsistent)");
+
+
+            // pickup gobs in sequence
+            wdg = scrollport.cont.add(
+                    new ZeeWindow.ZeeButton(30, "seq") {
+                        public void wdgmsg(String msg, Object... args) {
+                            if (msg.contentEquals("activate")) {
+                                pickupAllGobsClientSide(resname);
+                            }
+                        }
+                    },
+                    wdg.c.x + wdg.sz.x, y
+            );
+            wdg.settip("pick sequentially");
+
 
             // add gob icon or name
             GobIcon gobIcon = gobs.get(i).getattr(GobIcon.class);

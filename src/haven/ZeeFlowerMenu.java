@@ -33,6 +33,7 @@ public class ZeeFlowerMenu extends FlowerMenu{
     static final String STRPETAL_MEMORIZEAREANIMALS = "Memorize area";
     static final String STRPETAL_AUTO_SHEAR = "Auto shear";
     static final String STRPETAL_BINDWATER = "Bind water items";
+    static final String STRPETAL_PICKUP_GOBS = "Pickup Gobs";
 
     private final Gob gob;
     private final WItem wItem;

@@ -2562,7 +2562,7 @@ public class ZeeConfig {
         else if (ev.getKeyCode()==81) {
             // Ctrl+q shows window pickup gob
             if(ev.isControlDown()){
-                ZeeManagerGobs.toggleWindowPickupGob();
+                ZeeManagerGobs.showWindowPickupGob();
                 return true;
             }
             // simple q press pickup closest gob, if no combat
@@ -2842,7 +2842,8 @@ public class ZeeConfig {
         ZeeConfig.clickedCraftAll = false;
         ZeeManagerIcons.lastMinimapClick = null;
         isPlayerFollowingCauldron = false;
-        ZeeManagerGobs.pickingKritter = false;
+        ZeeManagerGobs.isPickingKritterDismountHorse = false;
+        ZeeManagerGobs.isPickingAllGobsClientSide = false;
         if (listCauldronContainers!=null)
             listCauldronContainers.clear();
         ZeeManagerGobs.autoPickIrrlightExit();
