@@ -345,7 +345,7 @@ public abstract class ItemInfo {
 	if(l.tips.get(0).owner instanceof GItem) {
 		GItem gitem = (GItem) l.tips.get(0).owner;
 		if (gitem.isStackByContent())
-			l.add(new AdHoc(gitem, "[shift for help]"));
+			l.add(new AdHoc(gitem, "[shift expand info]"));
 	}
 	return(l.render());
     }

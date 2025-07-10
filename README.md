@@ -10,7 +10,7 @@ Controls
 - minimap drags with button 3
 - keys up/down controls volume
 - keys left/right controls ambient light (home key resets light)
-- quick zoom with PageUp/PageDown, or Rclick player and drag
+- quick zoom with PageUp/PageDown
 - camera drag also works by holding left-click (move player + drag camera)   
 - shift+c alternates cams ortho/free
 - shift+h toggle hitboxes
@@ -30,19 +30,17 @@ Controls
   - dismount horse if rope in inventory
   - schedule remount if mclick instead of rclick
 - rclick tree tries collecting sap with lifted barrel
-- rclick workstations to auto dismount (if inventory rope)
+- rclick workstations to auto dismount (req inventory rope)
 - Icon Settings: shift+space toggles notify checkbox
 - Search Actions single click 
   - left-click-hold search button shows Actions window, and select item on mouse up 
   - right-click-hold search button to start a hover menu
-- mid-click item menu to start auto click window
 - mid-click tree/bush/boulder/log/stump/animal queue for next chop/chip/destroyLog/butch (not all cases)
 - midclick obj to queue actions ("swrk", "destroy", "repair")
   - shift midclick obj to act on all objs
-- hold shift for long tooltips  
-- midclick obj while working will queue 
-- shift midclick object toggle highlight object
+- shift midclick object toggle highlight object (:zeecow cmd)
 - shift + area mine starts tunnel helper if area matches
+- cancel auto clicking menu petal by holding special key (ctrl,shift,alt,super) 
 - type ":zeecow" for small interactive commands 
 
 

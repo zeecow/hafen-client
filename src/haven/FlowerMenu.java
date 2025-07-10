@@ -351,7 +351,7 @@ public class FlowerMenu extends Widget {
 				}
 			}
 		}
-    	if(ZeeConfig.autoClickMenuOption && ZeeManagerGobs.isMouseUp()) {
+    	if(ZeeConfig.autoClickMenuOption && !ZeeConfig.isHoldingSpecialKey() && ZeeManagerGobs.isMouseUp()) {
 			String[] list = ZeeConfig.autoClickMenuOptionList.split(",");
 			for (int i = 0; i < opts.length; i++) {// for each menu option
 				for (int j = 0; j < list.length; j++) {// compare each name in saved list

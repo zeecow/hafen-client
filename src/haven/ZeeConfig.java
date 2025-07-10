@@ -1254,6 +1254,11 @@ public class ZeeConfig {
             modXpEventWindow(window);
             return;
         }
+        // "Land survey" turn grid on
+        else if (windowTitle.contentEquals("Land survey")){
+            if (ZeeConfig.autoToggleGridLines)
+                ZeeConfig.gameUI.map.showgrid(true);
+        }
 
         // Craft window
         if(isMakewindow(window)) {
@@ -5080,5 +5085,11 @@ public class ZeeConfig {
 
     public static void println(String s) {
         System.out.println(s);
+    }
+
+    public static boolean isHoldingSpecialKey() {
+        if (gameUI==null || gameUI.ui==null)
+            return false;
+        return gameUI.ui.modflags() != 0;
     }
 }
