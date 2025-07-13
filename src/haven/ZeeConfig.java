@@ -2849,6 +2849,7 @@ public class ZeeConfig {
         isPlayerFollowingCauldron = false;
         ZeeManagerGobs.isPickingKritterDismountHorse = false;
         ZeeManagerGobs.isPickingAllGobsClientSide = false;
+        ZeeManagerGobs.isPickingUpClosestGob = false;
         if (listCauldronContainers!=null)
             listCauldronContainers.clear();
         ZeeManagerGobs.autoPickIrrlightExit();

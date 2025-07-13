@@ -4119,71 +4119,73 @@ public class ZeeManagerGobs extends ZeeThread{
 
     // pattern must match whole gob name
     static boolean pickupGobIsShiftDown;
-    static boolean picking = false;
+    static boolean isPickingUpClosestGob = false;
     public static void pickupClosestGob(KeyEvent ev) {
-
-        picking = true;
-
+        if (isPickingUpClosestGob)
+            return;
+        isPickingUpClosestGob = true;
         pickupGobIsShiftDown = ev.isShiftDown();
 
-        // find eligible gobs
-        List<Gob> gobs = findPickupGobs();
+        try {
 
-        if (gobs==null || gobs.size()==0) {
-            picking = false;
-            return;
-        }
-
-        // calculate closest gob
-        double minDist=99999, dist;
-        Gob closestGob=null;
-        String name;
-        for (int i = 0; i < gobs.size(); i++) {
-            Gob g = gobs.get(i);
-            dist = ZeeConfig.distanceToPlayer(g);
-            name = g.getres().name;
-            if ( closestGob == null ){
-                minDist = dist;
-                closestGob = g;
+            // find eligible gobs
+            List<Gob> gobs = findPickupGobs();
+            if (gobs == null || gobs.size() == 0) {
+                isPickingUpClosestGob = false;
+                return;
             }
-            else if( (g.pickupPriority = (( ZeeConfig.isBug(name) || name.contains("/kritter/")) && dist < 88)) || dist < minDist)
-            {
-                // prev closest gob had priority
-                if (closestGob.pickupPriority && !g.pickupPriority){
-                    continue;
-                }
-                minDist = dist;
-                closestGob = g;
-            }
-        }
 
-        // pickup closest gob
-        if (closestGob!=null) {
-            // right click gob
-            if ( ZeeConfig.isBug(closestGob.getres().name)
-                || closestGob.getres().name.contains("/kritter/")
-                || closestGob.getres().name.contains("/terobjs/items/"))
-            {
-                if (pickupGobIsShiftDown)
-                    gobClick(closestGob, 3, UI.MOD_SHIFT);
-                else
-                    gobClick(closestGob, 3);
-
-                // pickup kritter on horse may require dismounting
-                ZeeManagerGobs.pickupKritterDismountHorse(closestGob);
-            }
-            // select "Pick" menu option
-            else {
-                Gob finalClosestGob = closestGob;
-                new ZeeThread(){
-                    public void run() {
-                        clickGobPetal(finalClosestGob,"Pick");
+            // calculate closest gob
+            double minDist = 99999, dist;
+            Gob closestGob = null;
+            String name;
+            for (int i = 0; i < gobs.size(); i++) {
+                Gob g = gobs.get(i);
+                dist = ZeeConfig.distanceToPlayer(g);
+                name = g.getres().name;
+                if (closestGob == null) {
+                    minDist = dist;
+                    closestGob = g;
+                } else if ((g.pickupPriority = ((ZeeConfig.isBug(name) || name.contains("/kritter/")) && dist < 88)) || dist < minDist) {
+                    // prev closest gob had priority
+                    if (closestGob.pickupPriority && !g.pickupPriority) {
+                        continue;
                     }
-                }.start();
+                    minDist = dist;
+                    closestGob = g;
+                }
             }
+
+            // pickup closest gob
+            if (closestGob != null) {
+                // right click gob
+                if (ZeeConfig.isBug(closestGob.getres().name)
+                        || closestGob.getres().name.contains("/kritter/")
+                        || closestGob.getres().name.contains("/terobjs/items/")) {
+                    if (pickupGobIsShiftDown)
+                        pickupAllGobItemsServerSide(closestGob);
+                    else
+                        gobClick(closestGob, 3);
+
+                    // pickup kritter on horse may require dismounting
+                    ZeeManagerGobs.pickupKritterDismountHorse(closestGob);
+                }
+                // select "Pick" menu option
+                else {
+                    Gob finalClosestGob = closestGob;
+                    new ZeeThread() {
+                        public void run() {
+                            clickGobPetal(finalClosestGob, "Pick");
+                        }
+                    }.start();
+                }
+            }
+
+        }catch (Exception e){
+            e.printStackTrace();
         }
 
-        picking = false;
+        isPickingUpClosestGob = false;
     }
 
     private static List<Gob> findPickupGobs() {
