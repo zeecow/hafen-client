@@ -4096,9 +4096,12 @@ public class ZeeManagerGobs extends ZeeThread{
             public void run() {
                 int cont = 0;
                 isPickingAllGobsClientSide = true;
+                String basename = ZeeConfig.getResBasename(resname);
+                if (basename.isBlank())
+                    return;
                 try {
                     do{
-                        ZeeConfig.addPlayerText("picks "+cont);
+                        ZeeConfig.addPlayerText(basename+" "+cont);
                         Gob closest = ZeeConfig.getClosestGobByNameEnds(resname);
                         if (closest == null)
                             break;
@@ -4112,19 +4115,20 @@ public class ZeeManagerGobs extends ZeeThread{
                 }
                 isPickingAllGobsClientSide = false;
                 ZeeConfig.removePlayerText();
-                ZeeConfig.msgLow("picks "+cont);
+                ZeeConfig.msgLow(basename+" "+cont);
             }
         }.start();
     }
 
     // pattern must match whole gob name
-    static boolean pickupGobIsShiftDown;
+    static boolean pickupGobShift, pickupGobCtrl;
     static boolean isPickingUpClosestGob = false;
-    public static void pickupClosestGob(KeyEvent ev) {
+    public static void pickupClosestGob(boolean shift, boolean ctrl) {
         if (isPickingUpClosestGob)
             return;
         isPickingUpClosestGob = true;
-        pickupGobIsShiftDown = ev.isShiftDown();
+        pickupGobShift = shift;
+        pickupGobCtrl = ctrl;
 
         try {
 
@@ -4162,10 +4166,16 @@ public class ZeeManagerGobs extends ZeeThread{
                 if (ZeeConfig.isBug(closestGob.getres().name)
                         || closestGob.getres().name.contains("/kritter/")
                         || closestGob.getres().name.contains("/terobjs/items/")) {
-                    if (pickupGobIsShiftDown)
+                    // ctrl+shift+q picks sequentially
+                    if (pickupGobCtrl && pickupGobShift)
+                        pickupAllGobsClientSide(closestGob.getres().name);
+                    // shift+q pick all serverside (sim shift+rclick)
+                    if (pickupGobShift)
                         pickupAllGobItemsServerSide(closestGob);
+                    // key q pick closest item
                     else
                         gobClick(closestGob, 3);
+
 
                     // pickup kritter on horse may require dismounting
                     ZeeManagerGobs.pickupKritterDismountHorse(closestGob);
@@ -4243,7 +4253,7 @@ public class ZeeManagerGobs extends ZeeThread{
 
         //scroll port
         int y = wdg.c.y + wdg.sz.y + 15;
-        Scrollport scrollport = winPickupGob.add(new Scrollport(new Coord(130, 200)), 0, y);
+        Scrollport scrollport = winPickupGob.add(new Scrollport(new Coord(150, 200)), 0, y);
 
 
         // add window, exit if no gobs
@@ -4275,7 +4285,7 @@ public class ZeeManagerGobs extends ZeeThread{
 
             // add button "pick" single gob
             wdg = scrollport.cont.add(
-                new ZeeWindow.ZeeButton(30, "one"){
+                new ZeeWindow.ZeeButton(30, "1"){
                     public void wdgmsg(String msg, Object... args) {
                         if (msg.contentEquals("activate")){
                             //pickup closest matching
@@ -4290,7 +4300,8 @@ public class ZeeManagerGobs extends ZeeThread{
                 },
                 0,y
             );
-            wdg.settip("pick one item");
+            wdg.settip("pick one (key: q)");
+
 
             // add button pick "all"
             wdg = scrollport.cont.add(
@@ -4311,7 +4322,7 @@ public class ZeeManagerGobs extends ZeeThread{
             if (!resname.contains("/terobjs/")) {
                 ((Button)wdg).disable(true);
             }
-            wdg.settip("pick all items (inconsistent)");
+            wdg.settip("pick all (Shift+q)");
 
 
             // pickup gobs in sequence
@@ -4325,7 +4336,7 @@ public class ZeeManagerGobs extends ZeeThread{
                     },
                     wdg.c.x + wdg.sz.x, y
             );
-            wdg.settip("pick sequentially");
+            wdg.settip("pick sequentially (Ctrl+Shift+q)");
 
 
             // add gob icon or name

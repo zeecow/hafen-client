@@ -2572,7 +2572,7 @@ public class ZeeConfig {
             }
             // simple q press pickup closest gob, if no combat
             else if(!isCombatActive()) {
-                ZeeManagerGobs.pickupClosestGob(ev);
+                ZeeManagerGobs.pickupClosestGob(ev.isShiftDown(),ev.isControlDown());
                 return true;
             }
             return false;
@@ -5000,6 +5000,10 @@ public class ZeeConfig {
             println("getRegexMatcher > "+e.getMessage());
         }
         return null;
+    }
+
+    static String getResBasename(String fullResname){
+        return getRegexGroup(fullResname,"/([^/]+)$", 1);
     }
 
     public static Inventory getUniqueWindowsInventory(String uniqueWindowName) {

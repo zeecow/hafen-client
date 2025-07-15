@@ -23,7 +23,10 @@ Controls
 - Alt+click to drop holding item
 - shift+tab toggles between belt, creel and basket (probably outdated)
 - rclick Stoat's icon to aggro on max speed (option available)
-- pickup key "q", shift+q pickup all, ctrl+q pickup window
+- pickup key "q" 
+  - ctrl+q show pickup window
+  - shift+q pickup all server side (sim shift+rclick)
+  - ctrl+shift+q pickup all client side (sequentially) 
 - drink key '
   - shift drink will drink 1 gulp and click ground again (missing gob/minimap clicks)
 - click building/passage gob to enter it
