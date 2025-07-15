@@ -2565,12 +2565,12 @@ public class ZeeConfig {
         }
         // pickup closest gob (q)
         else if (ev.getKeyCode()==81) {
-            // Ctrl+q shows window pickup gob
-            if(ev.isControlDown()){
+            // Ctrl+q (no shift) shows window pickup gob
+            if(ev.isControlDown() && !ev.isShiftDown()){
                 ZeeManagerGobs.showWindowPickupGob();
                 return true;
             }
-            // simple q press pickup closest gob, if no combat
+            // pickup closest gob
             else if(!isCombatActive()) {
                 ZeeManagerGobs.pickupClosestGob(ev.isShiftDown(),ev.isControlDown());
                 return true;

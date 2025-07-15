@@ -4130,6 +4130,8 @@ public class ZeeManagerGobs extends ZeeThread{
         pickupGobShift = shift;
         pickupGobCtrl = ctrl;
 
+        println(pickupGobCtrl+" , "+pickupGobShift);
+
         try {
 
             // find eligible gobs
@@ -4165,20 +4167,23 @@ public class ZeeManagerGobs extends ZeeThread{
                 // right click gob
                 if (ZeeConfig.isBug(closestGob.getres().name)
                         || closestGob.getres().name.contains("/kritter/")
-                        || closestGob.getres().name.contains("/terobjs/items/")) {
+                        || closestGob.getres().name.contains("/terobjs/items/"))
+                {
                     // ctrl+shift+q picks sequentially
-                    if (pickupGobCtrl && pickupGobShift)
+                    if (pickupGobCtrl && pickupGobShift) {
+                        //TODO include herbs in findPickupGobs()? (ex. lampstalk)
                         pickupAllGobsClientSide(closestGob.getres().name);
-                    // shift+q pick all serverside (sim shift+rclick)
-                    if (pickupGobShift)
+                        // shift+q pick all serverside (sim shift+rclick)
+                    } else if (pickupGobShift) {
                         pickupAllGobItemsServerSide(closestGob);
-                    // key q pick closest item
-                    else
+                        // key q pick closest item
+                    } else{
                         gobClick(closestGob, 3);
+                    }
 
-
+                    // TODO remove?
                     // pickup kritter on horse may require dismounting
-                    ZeeManagerGobs.pickupKritterDismountHorse(closestGob);
+                    //ZeeManagerGobs.pickupKritterDismountHorse(closestGob);
                 }
                 // select "Pick" menu option
                 else {
