@@ -2571,7 +2571,7 @@ public class ZeeConfig {
                 return true;
             }
             // pickup closest gob
-            else if(!isCombatActive()) {
+            if(!isCombatActive()) {
                 ZeeManagerGobs.pickupClosestGob(ev.isShiftDown(),ev.isControlDown());
                 return true;
             }

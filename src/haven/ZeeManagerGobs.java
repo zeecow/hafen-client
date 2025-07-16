@@ -4084,8 +4084,7 @@ public class ZeeManagerGobs extends ZeeThread{
     }
 
     static void pickupAllGobItemsServerSide(Gob gobItem) {
-        //TODO special cases: gray clay, kelp, etc?
-        ZeeManagerGobs.gobClick(gobItem,3,UI.MOD_SHIFT);
+        gobClick(gobItem,3,UI.MOD_SHIFT);
     }
 
     static boolean isPickingAllGobsClientSide = false;
@@ -4105,7 +4104,8 @@ public class ZeeManagerGobs extends ZeeThread{
                         Gob closest = ZeeConfig.getClosestGobByNameEnds(resname);
                         if (closest == null)
                             break;
-                        ZeeManagerGobs.gobClick(closest,3);
+                        // pick all serverside until player idle
+                        ZeeManagerGobs.pickupAllGobItemsServerSide(closest);
                         prepareCancelClick();
                         waitPlayerIdlePose();
                         cont++;
@@ -4129,8 +4129,6 @@ public class ZeeManagerGobs extends ZeeThread{
         isPickingUpClosestGob = true;
         pickupGobShift = shift;
         pickupGobCtrl = ctrl;
-
-        println(pickupGobCtrl+" , "+pickupGobShift);
 
         try {
 
@@ -4162,37 +4160,18 @@ public class ZeeManagerGobs extends ZeeThread{
                 }
             }
 
-            // pickup closest gob
             if (closestGob != null) {
-                // right click gob
-                if (ZeeConfig.isBug(closestGob.getres().name)
-                        || closestGob.getres().name.contains("/kritter/")
-                        || closestGob.getres().name.contains("/terobjs/items/"))
-                {
-                    // ctrl+shift+q picks sequentially
-                    if (pickupGobCtrl && pickupGobShift) {
-                        //TODO include herbs in findPickupGobs()? (ex. lampstalk)
-                        pickupAllGobsClientSide(closestGob.getres().name);
-                        // shift+q pick all serverside (sim shift+rclick)
-                    } else if (pickupGobShift) {
-                        pickupAllGobItemsServerSide(closestGob);
-                        // key q pick closest item
-                    } else{
-                        gobClick(closestGob, 3);
-                    }
-
-                    // TODO remove?
-                    // pickup kritter on horse may require dismounting
-                    //ZeeManagerGobs.pickupKritterDismountHorse(closestGob);
+                // pick all clientside
+                if (pickupGobCtrl && pickupGobShift) {
+                    pickupAllGobsClientSide(closestGob.getres().name);
                 }
-                // select "Pick" menu option
-                else {
-                    Gob finalClosestGob = closestGob;
-                    new ZeeThread() {
-                        public void run() {
-                            clickGobPetal(finalClosestGob, "Pick");
-                        }
-                    }.start();
+                // pick all serverside
+                else if (pickupGobShift) {
+                    pickupAllGobItemsServerSide(closestGob);
+                }
+                // pick one item
+                else{
+                    pickupGobItem(closestGob);
                 }
             }
 
@@ -4201,6 +4180,28 @@ public class ZeeManagerGobs extends ZeeThread{
         }
 
         isPickingUpClosestGob = false;
+    }
+
+    static void pickupGobItem(Gob gobItem) {
+        if ( ! gobItemHasPickMenu(gobItem) ) {
+            gobClick(gobItem, 3);
+        } else {
+            new ZeeThread() {
+                public void run() {
+                    clickGobPetal(gobItem, "Pick");
+                }
+            }.start();
+        }
+    }
+
+    static boolean gobItemHasPickMenu(Gob gobItem) {
+        if ( ZeeConfig.isBug(gobItem.getres().name)
+                || gobItem.getres().name.contains("/kritter/")
+                || gobItem.getres().name.contains("/terobjs/items/") )
+        {
+            return false;
+        }
+        return true;
     }
 
     private static List<Gob> findPickupGobs() {
