@@ -5,7 +5,6 @@ import haven.render.RenderTree;
 import haven.resutil.WaterTile;
 
 import java.awt.*;
-import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 import java.lang.reflect.Field;
 import java.math.BigDecimal;
@@ -1773,7 +1772,7 @@ public class ZeeManagerGobs extends ZeeThread{
     }
 
     static boolean isPickingKritterDismountHorse = false;
-    static void pickupKritterDismountHorse(Gob kritter) {
+    static void waitKritDistThenDismountHorseAndPickup(Gob kritter,boolean shift) {
 
         if (isPickingKritterDismountHorse)
             return;
@@ -1790,10 +1789,10 @@ public class ZeeManagerGobs extends ZeeThread{
             public void run() {
                 isPickingKritterDismountHorse = true;
                 try {
-                    ZeeConfig.addPlayerText("pickup");
+                    ZeeConfig.addPlayerText("dismounting");
                     if(waitPlayerDistToGobOrCancelClick(kritter,50)){
                         if(dismountHorse(kritter.rc))
-                            gobClick(kritter,3);
+                            gobClick(kritter,3); //kritters have no pick menu?
                         else
                             ZeeConfig.msgError("dismount horse failed");
                     }
@@ -4085,6 +4084,7 @@ public class ZeeManagerGobs extends ZeeThread{
 
     static void pickupAllGobItemsServerSide(Gob gobItem) {
         gobClick(gobItem,3,UI.MOD_SHIFT);
+        ZeeManagerGobs.waitKritDistThenDismountHorseAndPickup(gobItem,true);
     }
 
     static boolean isPickingAllGobsClientSide = false;
@@ -4185,6 +4185,7 @@ public class ZeeManagerGobs extends ZeeThread{
     static void pickupGobItem(Gob gobItem) {
         if ( ! gobItemHasPickMenu(gobItem) ) {
             gobClick(gobItem, 3);
+            ZeeManagerGobs.waitKritDistThenDismountHorseAndPickup(gobItem,false);
         } else {
             new ZeeThread() {
                 public void run() {
@@ -4297,9 +4298,7 @@ public class ZeeManagerGobs extends ZeeThread{
                             //pickup closest matching
                             Gob closest = ZeeConfig.getClosestGobByNameEnds(resname);
                             if (closest!=null) {
-                                gobClick(closest, 3);
-                                // pickup kritter on horse may require dismounting
-                                ZeeManagerGobs.pickupKritterDismountHorse(closest);
+                                pickupGobItem(closest);
                             }
                         }
                     }

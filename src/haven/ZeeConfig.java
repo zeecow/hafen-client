@@ -3010,8 +3010,7 @@ public class ZeeConfig {
                 showInspectTooltip = false;
                 gameUI.map.ttip = null;
                 ZeeManagerGobs.checkRightClickGob(pc, mc, clickGob, lastMapViewClickGobName);
-                // pickup kritter on horse may require dismounting
-                ZeeManagerGobs.pickupKritterDismountHorse(lastMapViewClickGob);
+                ZeeManagerGobs.waitKritDistThenDismountHorseAndPickup(lastMapViewClickGob,false);
             }
         }
         // clicked ground
