@@ -213,6 +213,7 @@ public class ZeeConfig {
     static String confirmPetalList = Utils.getpref("confirmPetalList", DEF_LIST_CONFIRM_PETAL);
     public static boolean confirmThrowingAxeOrSpear = Utils.getprefb("confirmThrowingAxeOrSpear", true);
     static boolean debugWidgetMsgs = false;//disabled by default
+    static boolean debugUiMsgs = false;//disabled by default
     static boolean debugCodeRes = Utils.getprefb("debugCodeRes", false);
     static boolean drinkKey = Utils.getprefb("drinkKey", true);
     static boolean dropHoldingItemAltKey = Utils.getprefb("dropHoldingItemAltKey", true);
@@ -1166,7 +1167,6 @@ public class ZeeConfig {
             return;
 
         if (isBuildWindow(window)) {
-
             // tunnel helper
             if (ZeeManagerMiner.tunneling && ZeeManagerMiner.tunnelHelperStage == ZeeManagerMiner.TUNNELHELPER_STAGE5_BUILDCOL && windowTitle.contentEquals("Stone Column")){
                 ZeeManagerMiner.tunnelHelperBuildColumn(window);
@@ -1186,8 +1186,45 @@ public class ZeeConfig {
             return;
         }
 
+        // Craft window
+        if(isMakewindow(window)) {
+
+            // cheese tray
+            if(windowTitle.contentEquals("Cheese Tray")){
+                ZeeManagerItems.cheeseTrayMakeWindow(window);
+            }
+            // bug collection
+            else if(windowTitle.contentEquals("Bug Collection")) {
+                if (!ZeeManagerCraft.bugColRecipeOpen && !ZeeManagerCraft.bugColBusy)
+                    ZeeManagerCraft.bugColRecipeOpened(window);
+            }
+            // cloths
+            else if( List.of("Linen Cloth","Hemp Cloth").contains(windowTitle) ) {
+                if (!ZeeManagerCraft.clothRecipeOpen)
+                    ZeeManagerCraft.clothRecipeOpened(window);
+            }
+            // rope
+            else if (windowTitle.contentEquals("Rope")) {
+                if (!ZeeManagerCraft.ropeRecipeOpen)
+                    ZeeManagerCraft.ropeRecipeOpened(window);
+            }
+            else{
+                if (ZeeManagerCraft.bugColRecipeOpen)
+                    ZeeManagerCraft.bugColRecipeClosed();
+                else if (ZeeManagerCraft.clothRecipeOpen)
+                    ZeeManagerCraft.clothWindowClosed();
+                else if (ZeeManagerCraft.ropeRecipeOpen)
+                    ZeeManagerCraft.ropeWindowClosed();
+            }
+
+            // checkbox auto pick irrlight
+            makeWindowAddIrrlightCheckbox(window);
+
+            // use same widow title for all craft windows
+            windowTitle = WINDOW_NAME_CRAFT;
+        }
         //cupboard
-        if (ZeeCupboardLabeler.isActive && windowTitle.contentEquals("Cupboard")){
+        else if (ZeeCupboardLabeler.isActive && windowTitle.contentEquals("Cupboard")){
             ZeeCupboardLabeler.checkCupboardContents(window);
         }
         //cheesetray
@@ -1258,44 +1295,6 @@ public class ZeeConfig {
         else if (windowTitle.contentEquals("Land survey")){
             if (ZeeConfig.autoToggleGridLines)
                 ZeeConfig.gameUI.map.showgrid(true);
-        }
-
-        // Craft window
-        if(isMakewindow(window)) {
-
-            // cheese tray
-            if(windowTitle.contentEquals("Cheese Tray")){
-                ZeeManagerItems.cheeseTrayMakeWindow(window);
-            }
-            // bug collection
-            else if(windowTitle.contentEquals("Bug Collection")) {
-                if (!ZeeManagerCraft.bugColRecipeOpen && !ZeeManagerCraft.bugColBusy)
-                    ZeeManagerCraft.bugColRecipeOpened(window);
-            }
-            // cloths
-            else if( List.of("Linen Cloth","Hemp Cloth").contains(windowTitle) ) {
-                if (!ZeeManagerCraft.clothRecipeOpen)
-                    ZeeManagerCraft.clothRecipeOpened(window);
-            }
-            // rope
-            else if (windowTitle.contentEquals("Rope")) {
-                if (!ZeeManagerCraft.ropeRecipeOpen)
-                    ZeeManagerCraft.ropeRecipeOpened(window);
-            }
-            else{
-                if (ZeeManagerCraft.bugColRecipeOpen)
-                    ZeeManagerCraft.bugColRecipeClosed();
-                else if (ZeeManagerCraft.clothRecipeOpen)
-                    ZeeManagerCraft.clothWindowClosed();
-                else if (ZeeManagerCraft.ropeRecipeOpen)
-                    ZeeManagerCraft.ropeWindowClosed();
-            }
-
-            // checkbox auto pick irrlight
-            makeWindowAddIrrlightCheckbox(window);
-
-            // use same widow title for all craft windows
-            windowTitle = WINDOW_NAME_CRAFT;
         }
 
         if (gameUI!=null && !gameUI.sz.equals(0,0)){

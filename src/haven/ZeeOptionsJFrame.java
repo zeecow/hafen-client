@@ -19,7 +19,7 @@ public class ZeeOptionsJFrame extends JFrame {
     public GridBagConstraints c;
     public JTabbedPane tabbedPane, tabbedPaneGobs;
     public JPanel panelTabAuto, panelTabMisc, panelTabInterface, panelTabAudio, panelTabGobs, panelTabControls, panelTabMinimap, panelDetailsBottom, panelTabCateg, panelShapeIcons, panelShapeIconsSaveCancel;
-    public JCheckBox cbSimpleWindowBorder, cbSimpleWindows, cbShapeIcons, cbDebugWdgMsg, cbDebugCodeRes, cbCattleRosterHeight,cbMidiRadio;
+    public JCheckBox cbSimpleWindowBorder, cbSimpleWindows, cbShapeIcons, cbDebugWdgMsg, cbDebugUiMsg, cbDebugCodeRes, cbCattleRosterHeight,cbMidiRadio;
     public JTextField tfAutoHideWindows, tfAutoHideWindowDelayMs, tfConfirmPetal, tfBlockAudioMsgs, tfAutoClickMenu, tfAggroRadiusTiles, tfButchermode, tfGobName, tfGobSpeech, tfAudioPath, tfCategName, tfAudioPathCateg, tfGobMaxRequeues;
     public JComboBox<String> cmbCattleRoster, cmbGobCategory, cmbMiniTreeSize, cmbRainLimitPerc, comboShapeIcons;
     public JList<String> listGobsTemp, listGobsSaved, listGobsCategories;
@@ -427,6 +427,14 @@ public class ZeeOptionsJFrame extends JFrame {
             }
         });
 
+
+        // debug uimsg
+        panelTabMisc.add(cbDebugUiMsg= new JCheckBox("Debug ui msgs"), c);
+        cbDebugUiMsg.setSelected(ZeeConfig.debugUiMsgs);
+        cbDebugUiMsg.addActionListener(actionEvent -> {
+            JCheckBox cb = (JCheckBox) actionEvent.getSource();
+            ZeeConfig.debugUiMsgs = cb.isSelected();
+        });
 
         // debug wdgmsg
         panelTabMisc.add(cbDebugWdgMsg= new JCheckBox("Debug widget msgs"), c);

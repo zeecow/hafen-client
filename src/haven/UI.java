@@ -644,7 +644,7 @@ public class UI {
 	
     public void wdgmsg(Widget sender, String msg, Object... args) {
 	if(ZeeConfig.debugWidgetMsgs)
-		System.out.println(sender +" ; "+ msg +" ; "+ Arrays.toString(args));
+		System.out.println("[wdgmsg] "+sender +" ; "+ msg +" ; "+ Arrays.toString(args));
 	int id = widgetid(sender);
 	if(id < 0) {
 	    new Warning("wdgmsg sender (%s) is not in rwidgets, message is %s", sender.getClass().getName(), msg).issue();
@@ -685,6 +685,8 @@ public class UI {
     }
 
     public void uimsg(int id, String msg, Object... args) {
+	if(ZeeConfig.debugUiMsgs)
+		System.out.println("[uimsg] "+id +" ; "+ msg +" ; "+ Arrays.toString(args));
 	submitcmd(new Command(new UiMessage(id, msg, args)).dep(id, true));
     }
 
