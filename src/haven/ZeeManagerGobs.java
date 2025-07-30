@@ -1414,7 +1414,7 @@ public class ZeeManagerGobs extends ZeeThread{
                     ZeeConfig.clickCoord(cmc.floor(posres), 1);
                     sleep(PING_MS);
 
-                    // wait inv clay
+                    // wait inv sand
                     GItem gItem = waitInvItemOrCancelClick();
                     if (gItem==null)
                         throw  new Exception("wait inv item: cancel click?");
@@ -1426,8 +1426,9 @@ public class ZeeManagerGobs extends ZeeThread{
                     ZeeConfig.stopMovingEscKey();
                     ZeeConfig.clickRemoveCursor();
 
-                    //speak ql
+                    // notify ql
                     int ql = gItem.getInfoQualityInt();
+                    ZeeConfig.msgLow("sand "+ql);
                     ZeeAudio.textToSpeakLinuxFestival("sand "+ql);
 
                     //drop item
@@ -1475,16 +1476,17 @@ public class ZeeManagerGobs extends ZeeThread{
                     GItem gItem = waitInvItemOrCancelClick();
                     if (gItem==null)
                         throw  new Exception("wait inv item: cancel click?");
-                    String itemName = gItem.getres().name;
-                    if (!itemName.contains("/clay-"))
+                    String basename = ZeeConfig.getResBasename(gItem.getres().name);
+                    if (!basename.startsWith("clay-"))
                         throw  new Exception("inv item is not clay");
 
                     // stop digging, remove cursor
                     ZeeConfig.stopMovingEscKey();
                     ZeeConfig.clickRemoveCursor();
 
-                    //speak ql
+                    // notify ql
                     int ql = gItem.getInfoQualityInt();
+                    ZeeConfig.msgLow(basename+" "+ql);
                     ZeeAudio.textToSpeakLinuxFestival("clay "+ql);
 
                     //drop clay
