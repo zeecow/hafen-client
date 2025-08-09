@@ -290,6 +290,7 @@ public class ZeeConfig {
     static boolean isPlayerFollowingCauldron = false;
     static List<Gob> listCauldronContainers = null;
     public static boolean clickedCraftAll = false;
+    static boolean menuFastAnim = Utils.getprefb("menuFastAnim",true);
 
     public static boolean playMidiRadio = Utils.getprefb("playMidiRadio",false);
     static Runnable playMidiRadioRunnable = () -> ZeeMidiRadio.toggleRadio();

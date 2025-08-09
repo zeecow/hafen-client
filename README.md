@@ -156,6 +156,7 @@ LongMidClick Flowermenu for Ground Objects
 - lightable objects shows craft firebrand, pyrite spark
 - crucible smelt nuggets, bar
 - get xp from well
+- auto-shear animals (currently require fast menu option)
 
 LongMidClick Flowermenu for Window Items
 - auto butch dead animal items

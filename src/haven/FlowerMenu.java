@@ -124,7 +124,7 @@ public class FlowerMenu extends Widget {
     }
 
     public class Opening extends NormAnim {
-	Opening() {super(0.25);}
+	Opening() {super(ZeeConfig.menuFastAnim ? 0.05 : 0.25);}
 	
 	public void ntick(double s) {
 	    double ival = 0.8;
@@ -175,7 +175,7 @@ public class FlowerMenu extends Widget {
     }
 
     public class Cancel extends NormAnim {
-	Cancel() {super(0.25);}
+	Cancel() {super(ZeeConfig.menuFastAnim ? 0.05 : 0.25);}
 
 	public void ntick(double s) {
 	    double ival = 0.8;
