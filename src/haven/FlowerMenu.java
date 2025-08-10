@@ -239,10 +239,11 @@ public class FlowerMenu extends Widget {
     protected void added() {
 	if(c.equals(-1, -1))
 	    c = parent.ui.lcc;
-	mg = ui.grabmouse(this);
-	kg = ui.grabkeys(this);
 	organize(opts);
 	new Opening().ntick(0);
+	//grab later to avoid unwanted clicks?
+	mg = ui.grabmouse(this);
+	kg = ui.grabkeys(this);
     }
 
     /*public boolean mousedown(MouseDownEvent ev) {
