@@ -16,7 +16,9 @@ Controls
 - shift+h toggle hitboxes
 - ctrl+h toggle all trees/palisegs/crops (shows opt win)
   - midclick quick toggle tree/wall/non-ready-crop(farmtile,trellis) 
-- mousewheel scroll transfer items directly (no shift required)
+- mousewheel scroll transfer items between inventories 
+  - holding shift or ctrl transfers 5 items at once
+  - holding both shift and ctrl transfers 10 items at once
 - Ctrl+click to confirm actions (Empty, Swill, Slaughter, etc)
 - Ctrl confirm throwing axe/spear
 - Ctrl+Rclick confirm remove shortcut
