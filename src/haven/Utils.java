@@ -514,8 +514,15 @@ public class Utils {
 
     public static Indir<Resource> irv(Object arg) {
 	Indir s = ArgumentFormatException.check(arg, Indir.class);
+	return(() -> (Resource)s.get());
+    }
+
+    public static Resource resv(Object arg) {
+	if(arg instanceof Resource)
+	    return((Resource)arg);
+	Indir s = ArgumentFormatException.check(arg, Indir.class);
 	Resource ret = ArgumentFormatException.check(s.get(), Resource.class);
-	return(() -> ret);
+	return(ret);
     }
 
     /* Nested format: [[KEY, VALUE], [KEY, VALUE], ...] */
@@ -1675,6 +1682,12 @@ public class Utils {
 	T ret = i.next();
 	i.remove();
 	return(ret);
+    }
+
+    public static <K, V> V pop(Map<K, V> map, K key, V def) {
+	if(!map.containsKey(key))
+	    return(def);
+	return(map.remove(key));
     }
 
     public static <T> List<T> reversed(List<T> ls) {
