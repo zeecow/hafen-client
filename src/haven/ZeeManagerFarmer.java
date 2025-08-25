@@ -22,6 +22,7 @@ public class ZeeManagerFarmer extends ZeeThread{
     public static ZeeManagerFarmer manager;
 
     public static boolean farmerCbReplant = Utils.getprefb("farmerCbPlant",false);
+    public static boolean farmerCbReplantResizeArea = Utils.getprefb("farmerCbReplantResizeArea",false);
     public static boolean farmerCbPile = Utils.getprefb("farmerCbPile",false);
     public static int farmerTxtTilesBarrel = Utils.getprefi("farmerTxtTilesBarrel",27);
     public static int farmerTxtQlSortingBarrels = Utils.getprefi("farmerTxtQlSortingBarrels",4);
@@ -393,7 +394,13 @@ public class ZeeManagerFarmer extends ZeeThread{
     private boolean plantSeeds() {
         ZeeConfig.addPlayerText("planting");
         if(updateSeedPileReference() && activateCursorPlantGItem(gItem)) {
-            ZeeConfig.gameUI.map.wdgmsg("sel", ZeeConfig.lastSavedOverlayStartCoord, ZeeConfig.lastSavedOverlayEndCoord, ZeeConfig.lastSavedOverlayModflags);
+            // increase area when planting, since scythe may harvest beyond area
+            Area area = ZeeConfig.lastSavedOverlay.a;
+            if (farmerCbReplantResizeArea) {
+                area = area.margin(1);
+                ZeeConfig.lastSavedOverlay.update(area);
+            }
+            ZeeConfig.gameUI.map.wdgmsg("sel", area.br, area.ul, ZeeConfig.lastSavedOverlayModflags);
             return true;
         }else{
             println("could not plant seed (small seedpiles?)");
@@ -748,7 +755,7 @@ public class ZeeManagerFarmer extends ZeeThread{
 
 
             //checkbox replant
-            wdg = windowManager.add(new CheckBox("replant highest ql") {
+            wdg = windowManager.add(new CheckBox("replant") {
                 { a = ZeeManagerFarmer.farmerCbReplant;  }
                 public void set(boolean val) {
                     ZeeManagerFarmer.farmerCbReplant = val;
@@ -756,10 +763,23 @@ public class ZeeManagerFarmer extends ZeeThread{
                     Utils.setprefb("farmerCbPlant",val);
                 }
             }, 0, 7);
+            wdg.settip("replant highest ql");
+
+
+            //checkbox increase area
+            wdg = windowManager.add(new CheckBox("rsz area") {
+                { a = ZeeManagerFarmer.farmerCbReplantResizeArea;  }
+                public void set(boolean val) {
+                    ZeeManagerFarmer.farmerCbReplantResizeArea = val;
+                    a = val;
+                    Utils.setprefb("farmerCbReplantResizeArea",val);
+                }
+            }, wdg.c.x+wdg.sz.x+7, 7);
+            wdg.settip("resize replant area (case scythe harvest outside area)");
 
 
             //checkbox create piles
-            wdg = windowManager.add(new CheckBox("pile around selection") {
+            wdg = windowManager.add(new CheckBox("make piles") {
                 { a = ZeeManagerFarmer.farmerCbPile;  }
                 public void set(boolean val) {
                     ZeeManagerFarmer.farmerCbPile = val;
@@ -767,6 +787,7 @@ public class ZeeManagerFarmer extends ZeeThread{
                     Utils.setprefb("farmerCbPile",val);
                 }
             }, wdg.c.x+wdg.sz.x+17, 7);
+            wdg.settip("pile around selection");
 
 
             // ql sort barrels textEntry
