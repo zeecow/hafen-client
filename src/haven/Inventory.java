@@ -587,12 +587,12 @@ public class Inventory extends Widget implements DTarget {
 	public void repositionLabelCount() {
 		if (labelCount==null)
 			return;
-		Window win = this.getparent(Window.class);
 		Coord br = this.area().br;
 		labelCount.c = new Coord(
 				br.x - labelCount.sz.x,
 				br.y - 3
 		);
-		//win.pack();
+        if(mainInv)//workaround main inv area.br broken by pockets?
+		    this.getparent(Window.class).pack();
 	}
 }
