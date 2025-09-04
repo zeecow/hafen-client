@@ -3025,7 +3025,10 @@ public class ZeeConfig {
             }
             ZeeManagerIcons.lastMinimapClick = mc;
             if (getTileResName(mc).contains("tiles/beach")) {
-                ZeeManagerStockpile.lastSandTileClicked = new Coord2d(mc.x, mc.y);
+                if(getCursorName().contentEquals(CURSOR_DIG))
+                    ZeeManagerStockpile.lastSandTileClicked = new Coord2d(mc.x, mc.y);
+                else
+                    ZeeManagerStockpile.lastSandTileClicked = null;
             }
         }
     }

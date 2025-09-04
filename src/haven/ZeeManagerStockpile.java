@@ -139,7 +139,7 @@ public class ZeeManagerStockpile extends ZeeThread{
         }.start();
     }
 
-    static Coord2d lastSandTileClicked;
+    static Coord2d lastSandTileClicked=null;
     public static void pileInvSandAndDigMore(Gob existingPile) {
         new ZeeThread(){
             public void run() {
@@ -151,7 +151,7 @@ public class ZeeManagerStockpile extends ZeeThread{
                         // pile sand
                         ZeeManagerGobs.itemActGob(existingPile, UI.MOD_SHIFT);
                         //wait piling
-                        if (waitNotHoldingItem()) {
+                        if (lastSandTileClicked!=null && waitNotHoldingItem()) {
                             //dig sand again
                             ZeeConfig.clickCoord(lastSandTileClicked.floor(posres), 1);
                         }
