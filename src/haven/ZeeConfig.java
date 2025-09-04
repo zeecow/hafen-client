@@ -3023,8 +3023,10 @@ public class ZeeConfig {
                 }else
                     ZeeManagerGobs.startMidClick(pc,mc,null,"");
             }
-
             ZeeManagerIcons.lastMinimapClick = mc;
+            if (getTileResName(mc).contains("tiles/beach")) {
+                ZeeManagerStockpile.lastSandTileClicked = new Coord2d(mc.x, mc.y);
+            }
         }
     }
 
