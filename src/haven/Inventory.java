@@ -31,7 +31,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class Inventory extends Widget implements DTarget {
-	public Boolean mainInv = null;
+	private Boolean mainInv = null;
     public static final Coord sqsz = UI.scale(new Coord(32, 32)).add(1, 1);
     public static final Tex invsq;
     public boolean dropul = true;
@@ -592,7 +592,11 @@ public class Inventory extends Widget implements DTarget {
 				br.x - labelCount.sz.x,
 				br.y - 3
 		);
-        if(mainInv)//workaround main inv area.br broken by pockets?
-		    this.getparent(Window.class).pack();
+        if(isMainInv()) {//workaround main inv area.br broken by pockets?
+            //ZeeConfig.println("repos maininv");
+            Window  win = this.getparent(Window.class);
+            if (win!=null)
+                win.pack();
+        }
 	}
 }
