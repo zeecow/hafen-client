@@ -217,7 +217,11 @@ public class ZeeManagerItems extends ZeeThread{
             if (ZeeConfig.dropMinedStones && ZeeManagerMiner.isStoneNotOre(basename) ||
                     ZeeConfig.dropMinedOre && ZeeManagerMiner.isRegularOre(basename) ||
                     ZeeConfig.dropMinedOrePrecious && ZeeManagerMiner.isPreciousOre(basename) ||
-                    ZeeConfig.dropMinedCurios && ZeeConfig.mineablesCurios.contains(basename) )
+                    ZeeConfig.dropMinedPShell && basename.contentEquals("petrifiedshell") ||
+                    ZeeConfig.dropMinedQuarryartz && basename.contentEquals("quarryquartz") ||
+                    ZeeConfig.dropMinedCatgold && basename.contentEquals("catgold") ||
+                    ZeeConfig.dropMinedSCrystal && basename.contentEquals("strangecrystal") ||
+                    ZeeConfig.dropMinedGems && basename.contentEquals("gemstone") )
             {
                 ZeeManagerMiner.lastDropItemMs = System.currentTimeMillis();
                 gItem.wdgmsg("drop", Coord.z);

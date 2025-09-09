@@ -622,7 +622,7 @@ public class ZeeManagerMiner extends ZeeThread{
                         tilesWindowRefresh();
                     }
                 }
-            });
+            },0,0);
 
             //checkbox auto refresh
             tilemonAutoCheckbox = tilemonWindow.add(new CheckBox("auto"){
@@ -663,8 +663,6 @@ public class ZeeManagerMiner extends ZeeThread{
                 }
             },63,6);
 
-
-
             //wishlist search box
             tilemonLabelFindTile = tilemonWindow.add(new Label("Find"),0,33);
             TextEntry te = tilemonWindow.add(new ZeeWindow.ZeeTextEntry(UI.scale(80),""){
@@ -680,6 +678,52 @@ public class ZeeManagerMiner extends ZeeThread{
 
             // scrollport for tiles
             tilemonScrollport = tilemonWindow.add(new Scrollport(new Coord(120, 110)), 0, 55);
+
+            // drop opts
+            Widget wdg;
+            int x=0,y=165;
+            tilemonWindow.add(wdg = new Label("==== autodrop ===="),x,y);
+            ((Label)wdg).setcolor(Color.green);
+            y+=15;
+            tilemonWindow.add(wdg = new CheckBox("sto") {
+                { a = ZeeConfig.dropMinedStones; }
+                public void set(boolean val) {Utils.setprefb("dropMinedStones",a=ZeeConfig.dropMinedStones=val);}
+            }, x, y); wdg.settip("drop regular stones");
+            x+=40;
+            tilemonWindow.add(wdg = new CheckBox("ore") {
+                { a = ZeeConfig.dropMinedOre; }
+                public void set(boolean val) {Utils.setprefb("dropMinedOre",a=ZeeConfig.dropMinedOre=val);}
+            }, x, y); wdg.settip("drop ore");
+            x+=40;
+            tilemonWindow.add(wdg = new CheckBox("pre") {
+                { a = ZeeConfig.dropMinedOrePrecious; }
+                public void set(boolean val) {Utils.setprefb("dropMinedOrePrecious",a=ZeeConfig.dropMinedOrePrecious=val);}
+            }, x, y); wdg.settip("drop precious ore");
+            x=0; y+=17;
+            tilemonWindow.add(wdg = new CheckBox("psh") {
+                { a = ZeeConfig.dropMinedPShell; }
+                public void set(boolean val) {Utils.setprefb("dropMinedPShell",a=ZeeConfig.dropMinedPShell=val);}
+            }, x, y); wdg.settip("drop petrified shell");
+            x+=40;
+            tilemonWindow.add(wdg = new CheckBox("qrz") {
+                { a = ZeeConfig.dropMinedQuarryartz; }
+                public void set(boolean val) {Utils.setprefb("dropMinedQuarryartz",a=ZeeConfig.dropMinedQuarryartz=val);}
+            }, x, y); wdg.settip("drop quarryartz");
+            x+=40;
+            tilemonWindow.add(wdg = new CheckBox("ctg") {
+                { a = ZeeConfig.dropMinedCatgold; }
+                public void set(boolean val) {Utils.setprefb("dropMinedCatgold",a=ZeeConfig.dropMinedCatgold=val);}
+            }, x, y); wdg.settip("drop catgold");
+            x=0; y+=17;
+            tilemonWindow.add(wdg = new CheckBox("stc") {
+                { a = ZeeConfig.dropMinedSCrystal; }
+                public void set(boolean val) {Utils.setprefb("dropMinedSCrystal",a=ZeeConfig.dropMinedSCrystal=val);}
+            }, x, y); wdg.settip("drop strangecrystal");
+            x+=40;
+            tilemonWindow.add(wdg = new CheckBox("gem") {
+                { a = ZeeConfig.dropMinedGems; }
+                public void set(boolean val) {Utils.setprefb("dropMinedGems",a=ZeeConfig.dropMinedGems=val);}
+            }, x, y); wdg.settip("drop gems");
 
             // set auto refresh on
             tilemonAutoCheckbox.click();
@@ -720,8 +764,9 @@ public class ZeeManagerMiner extends ZeeThread{
             }
             //remove old labels
             for (Label l : tilemonWindow.children(Label.class)) {
-                if (!l.equals(tilemonLabelFindTile))
-                    l.destroy();
+                if (l.equals(tilemonLabelFindTile) || l.texts.contains("autodrop"))
+                    continue;
+                l.destroy();
             }
             //sorted list
             SortedSet<String> tiles = new TreeSet<String>(mapTileresCount.keySet());
@@ -806,11 +851,11 @@ public class ZeeManagerMiner extends ZeeThread{
         /*
             append mining ql log
          */
-            y = tilemonScrollport.c.y + tilemonScrollport.sz.y + 5;
+            y = tilemonScrollport.c.y + tilemonScrollport.sz.y + 70;
             label = new Label("==== top 10 ql ====");
             label.setcolor(Color.green);
             tilemonWindow.add(label, 0, y);
-            y += 13;
+            y += 15;
             tilemonWindow.add((new CheckBox("spk") {
                 {
                     a = hiQlSpeak;
@@ -845,6 +890,7 @@ public class ZeeManagerMiner extends ZeeThread{
             }
 
             tilemonWindow.pack();
+
         }catch(MCache.LoadingMap l) {
             ZeeConfig.println("tileWindowRefresh > "+l.getMessage());
         }catch(Exception e){

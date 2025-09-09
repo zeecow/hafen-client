@@ -113,10 +113,10 @@ public class ZeeWindow extends Window {
             if (!hasfocus)
                 return false;
             if (ev.awt.getKeyCode()==KeyEvent.VK_ENTER) {
-                if (!buf.line().isEmpty()) {
+                //if (!buf.line().isEmpty()) {
                     ZeeManagerItems.playFeedbackSound();
                     this.onEnterPressed(buf.line());
-                }
+                //}
                 this.hasfocus = false;
                 return super.keyup(ev);
             }

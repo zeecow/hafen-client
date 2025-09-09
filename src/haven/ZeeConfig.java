@@ -217,9 +217,13 @@ public class ZeeConfig {
     static boolean debugCodeRes = Utils.getprefb("debugCodeRes", false);
     static boolean drinkKey = Utils.getprefb("drinkKey", true);
     static boolean dropHoldingItemAltKey = Utils.getprefb("dropHoldingItemAltKey", true);
-    static boolean dropMinedCurios = Utils.getprefb("dropMinedCurios", true);
+    static boolean dropMinedPShell = Utils.getprefb("dropMinedPShell", true);
+    static boolean dropMinedQuarryartz = Utils.getprefb("dropMinedQuarryartz", true);
+    static boolean dropMinedCatgold = Utils.getprefb("dropMinedCatgold", true);
+    static boolean dropMinedSCrystal = Utils.getprefb("dropMinedSCrystal", false);
+    static boolean dropMinedGems = Utils.getprefb("dropMinedGems", false);
     static boolean dropMinedOre = Utils.getprefb("dropMinedOre", true);
-    static boolean dropMinedOrePrecious = Utils.getprefb("dropMinedOrePrecious", true);
+    static boolean dropMinedOrePrecious = Utils.getprefb("dropMinedOrePrecious", false);
     static boolean dropMinedStones = Utils.getprefb("dropMinedStones", true);
     static boolean dropCrops = false;
     static boolean treeloganize = false;
@@ -758,8 +762,8 @@ public class ZeeConfig {
         final String[] listEnds = {
             "/chick","/hen","/rooster"
         };
-        for (int i = 0; i < list.length; i++) {
-            if(name.endsWith(list[i]))
+        for (int i = 0; i < listEnds.length; i++) {
+            if(name.endsWith(listEnds[i]))
                 return true;
         }
         return false;
