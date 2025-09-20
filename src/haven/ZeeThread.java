@@ -146,32 +146,8 @@ public class ZeeThread  extends Thread{
         return ZeeManagerItems.isItemInHandSlot(name);
     }
 
-    public static boolean waitPlayerMove() {
-        //println("wait player move");
-        int max = (int) TIMEOUT_MS;
-        try {
-            while(max>0 && !ZeeConfig.isPlayerMoving()) {
-                max -= SLEEP_MS;
-                Thread.sleep(SLEEP_MS);
-            }
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        return ZeeConfig.isPlayerMoving();
-    }
-
-    public static boolean waitPlayerStop() {
-        //println("wait player stop");
-        int max = (int) TIMEOUT_MS;
-        try {
-            while(max>0 && ZeeConfig.isPlayerMoving()) {
-                max -= SLEEP_MS;
-                Thread.sleep(SLEEP_MS);
-            }
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        return !ZeeConfig.isPlayerMoving();
+    public static boolean waitGobFollowedIdle(Gob follower){
+        return waitPlayerIdleLinMove();
     }
 
     public static boolean waitGobIdleVelocity(Gob gob) {
@@ -276,35 +252,29 @@ public class ZeeThread  extends Thread{
         try {
             do {
                 sleep(555);
-            }while (ZeeConfig.isPlayerMovingByAttrLinMove());
+            }while (ZeeConfig.isPlayerMovingOrFollowingByAttrLinMove());
         }catch (Exception e){
             e.printStackTrace();
         }
-        return !ZeeConfig.isPlayerMovingByAttrLinMove();
+        return !ZeeConfig.isPlayerMovingOrFollowingByAttrLinMove();
     }
 
-    public static boolean waitPlayerIdlePose(){
-        // player mounting horse or kicksled
+    public static boolean waitPlayerIdlePoseOrVehicleIdle(){
+        // player horse idle
         if (ZeeConfig.isPlayerMountingHorse()) {
             //wait horse idle and player non active
             return waitGobPose(ZeeConfig.getPlayerMountedHorse(), ZeeConfig.POSE_HORSE_IDLE) &&
                     waitPlayerNonActivePose();
-        }else if (ZeeConfig.isPlayerDrivingingKicksled()){
-            return waitPlayerIdleOnKicksled();
         }
-        // player on foot?
+        // player vehicle idle
+        Gob gobFollow = ZeeConfig.getPlayerFollowTarget();
+        if (gobFollow!=null){
+            return waitGobFollowedIdle(ZeeConfig.getPlayerGob());
+        }
+        // player idle on foot
         else {
             return waitPlayerPose(ZeeConfig.POSE_PLAYER_IDLE);
         }
-    }
-
-    public static boolean waitPlayerIdleOnKicksled() {
-        Gob k = ZeeConfig.getClosestGobByNameContains("vehicle/spark");
-        if (k==null){
-            println("no kicksled found");
-            return false;
-        }
-        return waitGobIdleVelocity(k);
     }
 
     public static boolean waitPlayerNonActivePose(){

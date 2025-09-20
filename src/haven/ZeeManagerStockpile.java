@@ -408,7 +408,7 @@ public class ZeeManagerStockpile extends ZeeThread{
                         ZeeConfig.clickCoord(tileSourceCoord.floor(posres), 1);
                         sleep(PING_MS);
                         // wait idle pose
-                        if (!waitPlayerIdlePose()) {
+                        if (!waitPlayerIdlePoseOrVehicleIdle()) {
                             tileSourceExit("cancel click?");
                             return;
                         }
@@ -434,7 +434,7 @@ public class ZeeManagerStockpile extends ZeeThread{
         // add to existing pile
         if (tileSourceGobPile!=null){
             ZeeManagerGobs.itemActGob(tileSourceGobPile, UI.MOD_SHIFT);
-            waitPlayerIdlePose();
+            waitPlayerIdlePoseOrVehicleIdle();
         }
         // create new pile
         else {
@@ -1282,7 +1282,7 @@ public class ZeeManagerStockpile extends ZeeThread{
                             // pile sand
                             ZeeManagerGobs.itemActGob(existingPile, UI.MOD_SHIFT);
                             sleep(500);
-                            waitPlayerIdlePose();
+                            waitPlayerIdlePoseOrVehicleIdle();
                             //wait piling
                             if (waitNotHoldingItem()) {
                                 sleep(500);//wait transfer

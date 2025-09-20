@@ -512,9 +512,9 @@ public class ZeeManagerCraft extends ZeeThread{
             ZeeConfig.addPlayerText("get strings");
             Gob ropewalk = ZeeConfig.getClosestGobByNameContains("gfx/terobjs/ropewalk");
             ZeeManagerGobs.gobClick(stringPile,3,UI.MOD_SHIFT);
-            waitPlayerIdlePose();
+            waitPlayerIdlePoseOrVehicleIdle();
             ZeeManagerGobs.gobClick(ropewalk,3);
-            waitPlayerIdlePose();
+            waitPlayerIdlePoseOrVehicleIdle();
             if (ZeeConfig.getMainInventory().getItemsSelectedForCrafting().size() < 10){
                 ZeeConfig.removePlayerText();
                 return false;

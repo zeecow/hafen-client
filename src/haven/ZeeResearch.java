@@ -67,7 +67,7 @@ public class ZeeResearch {
                     }
 
                     // wait crafting finish, then check hsElixirStr
-                    waitPlayerIdlePose();
+                    waitPlayerIdlePoseOrVehicleIdle();
                     long craftedMs = System.currentTimeMillis();
                     sleep(1000); //wait tooltip creation?
                     if (hsElixirStrMs - craftedMs < 1500){

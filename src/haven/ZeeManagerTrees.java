@@ -252,7 +252,7 @@ public class ZeeManagerTrees {
                 currentRemovingTree = tree;
                 treeCoord = new Coord2d(tree.rc.x, tree.rc.y);
                 //wait idle
-                if (!ZeeConfig.isCancelClick() && ZeeThread.waitPlayerIdlePose()) {
+                if (!ZeeConfig.isCancelClick() && ZeeThread.waitPlayerIdlePoseOrVehicleIdle()) {
                     //wait new stump loading
                     Thread.sleep(2000);
                     //check task canceled
@@ -269,7 +269,7 @@ public class ZeeManagerTrees {
                         }
                         ZeeConfig.addGobText(stump, "stump");
                         removeStumpMaybe(stump);
-                        ZeeThread.waitPlayerIdlePose();
+                        ZeeThread.waitPlayerIdlePoseOrVehicleIdle();
                     } else {
                         ZeeThread.println("remtree > stump is null");
                     }
@@ -338,7 +338,7 @@ public class ZeeManagerTrees {
         //remove stump
         ZeeManagerGobs.destroyGob(stump);
 
-        ZeeThread.waitPlayerIdlePose();
+        ZeeThread.waitPlayerIdlePoseOrVehicleIdle();
 
         // reequip some inventory axe if no belt
         if(ZeeManagerItems.getInvBelt()==null) {

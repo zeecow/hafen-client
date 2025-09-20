@@ -94,7 +94,7 @@ public class ZeeManagerMiner extends ZeeThread{
                             if (boulder!=null && ZeeConfig.distanceToPlayer(boulder) < TILE_SIZE*2){
                                 chipBoulder(boulder);
                                 ZeeConfig.clickCoord(tunnelHelperEndCoord,1);
-                                waitPlayerIdlePose();
+                                waitPlayerIdlePoseOrVehicleIdle();
                             }
 
                             //pick stone
@@ -194,7 +194,7 @@ public class ZeeManagerMiner extends ZeeThread{
                                                 ZeeConfig.clickCoord(tunnelHelperEndCoordPrev,1);
                                             else
                                                 ZeeConfig.clickCoord(tunnelHelperEndCoord,1);
-                                            waitPlayerIdlePose();
+                                            waitPlayerIdlePoseOrVehicleIdle();
                                             // check window closed
                                             if (!tunneling){
                                                 tunnelHelperExit();
@@ -308,7 +308,7 @@ public class ZeeManagerMiner extends ZeeThread{
 
                 //back to saved coord
                 ZeeConfig.clickCoord(tunnelHelperEndCoord,1);
-                waitPlayerIdlePose();
+                waitPlayerIdlePoseOrVehicleIdle();
 
                 //drop remaining inv stones
                 ZeeConfig.getMainInventory().children(WItem.class).forEach(wItem -> {
@@ -352,7 +352,7 @@ public class ZeeManagerMiner extends ZeeThread{
         waitCursorName(ZeeConfig.CURSOR_MINE);
         ZeeConfig.gameUI.map.wdgmsg("sel", c1, c2, 0);
         //waitPlayerIdleFor(2);//minimum 2 sec
-        waitPlayerIdlePose();
+        waitPlayerIdlePoseOrVehicleIdle();
         ZeeConfig.clickRemoveCursor();
         waitCursorName(ZeeConfig.CURSOR_ARW);
     }
@@ -550,7 +550,7 @@ public class ZeeManagerMiner extends ZeeThread{
             ZeeConfig.cursorChange(ZeeConfig.ACT_MINE);
 
             //wait chipping
-            waitPlayerIdlePose();
+            waitPlayerIdlePoseOrVehicleIdle();
 
         }catch (Exception e){
             e.printStackTrace();

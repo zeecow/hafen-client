@@ -548,14 +548,18 @@ public class Inventory extends Widget implements DTarget {
 
 	public List<WItem> getItemsSelectedForCrafting() {
 		List<WItem> ret = new ArrayList<>();
-		for (WItem wItem : this.children(WItem.class)) {
-			for(ItemInfo inf : wItem.item.info()) {
-				if(inf.getClass().getSimpleName().contentEquals("CraftPrep")) {
-					ret.add(wItem);
-					break;//add wItem once
-				}
-			}
-		}
+        try {
+            for (WItem wItem : this.children(WItem.class)) {
+                for (ItemInfo inf : wItem.item.info()) {
+                    if (inf.getClass().getSimpleName().contentEquals("CraftPrep")) {
+                        ret.add(wItem);
+                        break;//add wItem once
+                    }
+                }
+            }
+        }catch (Loading l){
+            ZeeConfig.println("getItemsSelectedForCrafting > "+l.getMessage());
+        }
 		return ret;
 	}
 

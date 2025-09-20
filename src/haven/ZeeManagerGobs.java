@@ -1180,7 +1180,7 @@ public class ZeeManagerGobs extends ZeeThread{
         if(pileName.endsWith("stockpile-wblock") && ZeeManagerStockpile.lastTreelogChopped!=null) {
             Coord2d pileCoord = new Coord2d(plob.rc.x, plob.rc.y);
             ZeeManagerGobs.gobPlace(plob,0);
-            if(waitPlayerIdlePose()) {
+            if(waitPlayerIdlePoseOrVehicleIdle()) {
                 Gob newPile = ZeeConfig.findGobByNameAndCoord("stockpile-wblock", pileCoord);
                 if (newPile==null){
                     println("place and autopile > new pile undecided");
@@ -1194,7 +1194,7 @@ public class ZeeManagerGobs extends ZeeThread{
         else if(pileName.endsWith("stockpile-board") && ZeeManagerStockpile.lastTreelogSawed!=null) {
             Coord2d pileCoord = new Coord2d(plob.rc.x, plob.rc.y);
             ZeeManagerGobs.gobPlace(plob,0);
-            if(waitPlayerIdlePose()) {
+            if(waitPlayerIdlePoseOrVehicleIdle()) {
                 Gob newPile = ZeeConfig.findGobByNameAndCoord("stockpile-board", pileCoord);
                 if (newPile==null){
                     println("place and autopile > new pile undecided");
@@ -1208,7 +1208,7 @@ public class ZeeManagerGobs extends ZeeThread{
         else if(pileName.endsWith("stockpile-stone") && ZeeManagerStockpile.lastBoulderChipped!=null) {
             Coord2d pileCoord = new Coord2d(plob.rc.x, plob.rc.y);
             ZeeManagerGobs.gobPlace(plob,0);
-            if(waitPlayerIdlePose()) {
+            if(waitPlayerIdlePoseOrVehicleIdle()) {
                 Gob newPile = ZeeConfig.findGobByNameAndCoord("stockpile-stone", pileCoord);
                 if (newPile==null){
                     println("place and autopile > new pile undecided");
@@ -1360,7 +1360,7 @@ public class ZeeManagerGobs extends ZeeThread{
                 }
                 // place coracle at water tile
                 ZeeConfig.clickTile(ZeeConfig.coordToTile(waterMc),3);
-                waitPlayerIdlePose();
+                waitPlayerIdlePoseOrVehicleIdle();
                 if (ZeeConfig.distanceToPlayer(coracle)==0){
                     // player blocked by deep water tile
                     Coord pc = ZeeConfig.getPlayerCoord();
@@ -1543,7 +1543,7 @@ public class ZeeManagerGobs extends ZeeThread{
                     ZeeConfig.addPlayerText("inspect ql");
                     long t1 = ZeeThread.now();
                     //wait approaching plant
-                    if(waitPlayerIdlePose()) {
+                    if(waitPlayerIdlePoseOrVehicleIdle()) {
                         //wait inventory harvested item
                         ZeeConfig.lastMapViewClickButton = 2; // prepare cancel click
                         while(ZeeConfig.lastInvGItemCreatedMs < t1 && !ZeeConfig.isCancelClick()){
@@ -1820,7 +1820,7 @@ public class ZeeManagerGobs extends ZeeThread{
                     Gob.Overlay ol = saps.get(0);
                     gobClickOverlay(tree,3,0,ol.id);
                     prepareCancelClick();
-                    if (!waitPlayerIdlePose()){
+                    if (!waitPlayerIdlePoseOrVehicleIdle()){
                         println("couldn't wait saptap?");
                     }
                 } catch (Exception e) {
@@ -2276,7 +2276,7 @@ public class ZeeManagerGobs extends ZeeThread{
                     if(liftGob(barrel)){
                         // click well
                         gobClick(well,3);
-                        if(waitPlayerIdlePose() && waitNoHourglass()) {
+                        if(waitPlayerIdlePoseOrVehicleIdle() && waitNoHourglass()) {
                             //return barrel
                             ZeeConfig.clickCoord(barrelCoord, 3);
                             if (waitPlayerPoseNotInList(ZeeConfig.POSE_PLAYER_LIFTING)){
@@ -2339,7 +2339,7 @@ public class ZeeManagerGobs extends ZeeThread{
                             do {
                                 sleep(100);
                             } while(!isCancelClick() &&
-                                    (!ZeeConfig.playerHasAnyPose(ZeeConfig.POSE_PLAYER_SHEARING) || ZeeConfig.isPlayerMovingByAttrLinMove())
+                                    (!ZeeConfig.playerHasAnyPose(ZeeConfig.POSE_PLAYER_SHEARING) || ZeeConfig.isPlayerMovingOrFollowingByAttrLinMove())
                             );
 
                             // wait finish shearing
@@ -2891,13 +2891,13 @@ public class ZeeManagerGobs extends ZeeThread{
                             break;
                         }
                         gobClick(irrlight,3);
-                        waitPlayerIdlePose();
+                        waitPlayerIdlePoseOrVehicleIdle();
                     }
 
                     //try crafting again
                     if (workingStation!=null && !ZeeConfig.isCancelClick()){
                         gobClick(workingStation,3);
-                        waitPlayerIdlePose();
+                        waitPlayerIdlePoseOrVehicleIdle();
                         sleep(PING_MS);
                         if(ZeeConfig.clickedCraftAll) {
                             ZeeConfig.getButtonNamed((Window) ZeeConfig.makeWindow.parent, "Craft All").click();
@@ -2984,7 +2984,7 @@ public class ZeeManagerGobs extends ZeeThread{
                             if (ZeeConfig.playerHasAnyPose(ZeeConfig.POSE_PLAYER_DRINK, ZeeConfig.POSE_PLAYER_CHIPPINGSTONE,ZeeConfig.POSE_PLAYER_PICK)) {
                                 continue;
                             }
-                            if (ZeeConfig.isPlayerMovingByAttrLinMove()){
+                            if (ZeeConfig.isPlayerMovingOrFollowingByAttrLinMove()){
                                 continue;
                             }
                             if (listQueuedChipStone.isEmpty()) {
@@ -3076,7 +3076,7 @@ public class ZeeManagerGobs extends ZeeThread{
                             if (ZeeConfig.playerHasAnyPose(ZeeConfig.POSE_PLAYER_DRINK, ZeeConfig.POSE_PLAYER_CHOPTREE)) {
                                 continue;
                             }
-                            if (ZeeConfig.isPlayerMovingByAttrLinMove()){
+                            if (ZeeConfig.isPlayerMovingOrFollowingByAttrLinMove()){
                                 continue;
                             }
                             if (ZeeManagerTrees.listQueuedTreeChop.isEmpty()) {
@@ -4109,7 +4109,7 @@ public class ZeeManagerGobs extends ZeeThread{
                         // pick all serverside until player idle
                         ZeeManagerGobs.pickupAllGobItemsServerSide(closest);
                         prepareCancelClick();
-                        waitPlayerIdlePose();
+                        waitPlayerIdlePoseOrVehicleIdle();
                         cont++;
                     }while(!isCancelClick() && !ZeeConfig.isPlayerHoldingItem());
                 } catch (Exception e) {
@@ -4577,7 +4577,7 @@ public class ZeeManagerGobs extends ZeeThread{
                     }
                     println("    moveTo "+c2);
                     ZeeConfig.moveToTile(c2);
-                    waitPlayerIdlePose();
+                    waitPlayerIdlePoseOrVehicleIdle();
                     println("    final "+ZeeConfig.getPlayerTile());
                 } catch (Exception e) {
                     e.printStackTrace();

@@ -2683,7 +2683,7 @@ public class ZeeConfig {
         final String[] containers = (
                 //boxes
                 "Woodbox,Cupboard,Chest,Crate,Basket,Casket,Box,Coffer,Steelbox,Metal Cabinet,"
-                +"Urn,Pot,Strongbox,Stonekist,Notice Board,"
+                +"Urn,Pot,Strongbox,Stonekist,Notice Board,Shelf,"
                 //misc
                 +"Knarr,Snekkja,Wagon,Table,Saddlebags,"
                 +"Furnace,Smelter,Desk,Trunk,Shed,Packrack,"
@@ -3194,14 +3194,17 @@ public class ZeeConfig {
     static boolean isPlayerDrinkingOrLinMoving(){
         if (isPlayerDrinkingPose())
             return true;
-        return isPlayerMovingByAttrLinMove();
+        return isPlayerMovingOrFollowingByAttrLinMove();
     }
 
-    static boolean isPlayerMovingByAttrLinMove(){
-        // TODO add other vehicles
-        if (isPlayerMountingHorse()){
-            return gobHasAttr(getPlayerMountedHorse(),"LinMove");
-        }else{
+    static boolean isPlayerMovingOrFollowingByAttrLinMove(){
+        Gob followed = getPlayerFollowTarget();
+        // player following vehicle
+        if (followed != null){
+            return gobHasAttr(followed,"LinMove");
+        }
+        // player on foot
+        else{
             return gobHasAttr(getPlayerGob(),"LinMove");
         }
     }
