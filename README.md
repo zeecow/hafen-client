@@ -214,7 +214,7 @@ Random Features
   - use closest fibre pile until inv full
 - auto press wine from inventtory
   - switch seeds and press until it stops
-- (unfinished) Lag Camera (:cam lag)
+- Camera Spacebar only moves when spacebar pressed (:cam spacebar)  
 - autodrop mined items, seeds, soil
 - auto click menu options
 - auto drink

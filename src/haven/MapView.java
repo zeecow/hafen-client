@@ -314,27 +314,27 @@ public class MapView extends PView implements DTarget, Console.Directory {
     }
     static {camtypes.put("bad", FreeCam.class);}
 
-	public class LagCam extends Camera {
-		private float dist = 50.0f;
-		private float distprev = 50.0f;
-		private float elev = (float)Math.PI / 4.0f;
+	public class CamSpacebar extends Camera {
+		private float dist = 450.0f;
+		private float distprev = 1.5f;
+		private float elev = 1.5f;
 		private float angl = 0.0f;
 		private float anglprev = 0.0f;
 		private Coord dragorig = null;
 		private float elevorig, anglorig;
 		private Coord3f cc, ccprev = getcc();
-		private float ccdiff = 16;
+        private boolean spacedown = true;
 
 		public void tick(double dt) {
 			cc = getcc();
 			cc.y = -cc.y;
-			ccdiff = cc.dist(ccprev);
 			//ZeeConfig.println("ccdiff "+ccdiff+" , dist "+dist);
-			if (angl!=anglprev || dist!=distprev || ccdiff > 15f + (dist/7)) {
+			if (angl!=anglprev || dist!=distprev || spacedown) {
 				view = haven.render.Camera.pointed(cc.add(0.0f, 0.0f, 15f), dist, elev, angl);
 				ccprev = cc;
 				distprev = dist;
 				anglprev = angl;
+                spacedown = false;
 			}
 		}
 
@@ -364,8 +364,15 @@ public class MapView extends PView implements DTarget, Console.Directory {
 			dist = d;
 			return(true);
 		}
-	}
-	static {camtypes.put("lag", LagCam.class);}
+
+        @Override
+        public boolean keydown(KeyDownEvent ev) {
+            if (ev.code == KeyEvent.VK_SPACE)
+                spacedown = true;
+            return super.keydown(ev);
+        }
+    }
+	static {camtypes.put("spacebar", CamSpacebar.class);}
 
     public class OrthoCam extends Camera {
 	public boolean exact = true;
