@@ -116,7 +116,9 @@
 	   debug="on" includeantruntime="no">
       <classpath>
 	<pathelement path="build/classes" />
+	<pathelement path="lib/jglob.jar" />
       </classpath>
+      <compilerarg value="-proc:full" />
       <compilerarg value="-Xlint:unchecked" />
       <compilerarg value="-Xlint:deprecation" />
     </javac>
