@@ -2080,11 +2080,12 @@ public class ZeeManagerItems extends ZeeThread{
     public static boolean craftIngrRequiresConfirmation() {
 
         final List<String> nameListEndsWith = List.of(
-                "silkcloth","goldencloth","erminecloth","ratcloth","/felt",
+                "silkcloth","goldencloth","erminecloth","stoathide-winter","ratcloth","/felt","trollhide",
                 "-silver","-gold","-steel","-rosegold",
                 "clay-cave","clay-soap","clay-pit","clay-bone",
-                "stargem",
-                "beetweird","-crying",
+                "leaf-heartwood","rockcrystal","strangecrystal","ambergris",
+                "beetweird","-crying","fourleafclover","animalscratchbark",
+                "stargem","ants-queen","chimingbluebell",
                 "yarn-goat","yarn-sheep" // used as string
         );
 

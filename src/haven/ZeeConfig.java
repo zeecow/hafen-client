@@ -47,7 +47,6 @@ public class ZeeConfig {
     static final String MAP_AUDIO_BLOCKER = "mapAudioBlocker";
 
     static final String WINDOW_NAME_CRAFT = "Makewindow";
-    static final String WINDOW_NAME_XPEVT = "XpEvtWindow";
 
     static final String CURSOR_ARW = "gfx/hud/curs/arw";//cursor
     static final String CURSOR_ATK = "gfx/hud/curs/atk";
@@ -1171,40 +1170,50 @@ public class ZeeConfig {
         if (windowTitle.contentEquals("Stack"))
             return;
 
+        // build window
         if (isBuildWindow(window)) {
             // tunnel helper
-            if (ZeeManagerMiner.tunneling && ZeeManagerMiner.tunnelHelperStage == ZeeManagerMiner.TUNNELHELPER_STAGE5_BUILDCOL && windowTitle.contentEquals("Stone Column")){
+            if (ZeeManagerMiner.tunneling && ZeeManagerMiner.tunnelHelperStage == ZeeManagerMiner.TUNNELHELPER_STAGE5_BUILDCOL && windowTitle.contentEquals("Stone Column")) {
                 ZeeManagerMiner.tunnelHelperBuildColumn(window);
             }
 
             // add build and drink checkbox
             Button btn = getButtonNamed(window, "Build");
-            CheckBox cb = window.add(new CheckBox("and drink"){
-                {a = isBuildAndDrink;}
+            CheckBox cb = window.add(new CheckBox("and drink") {
+                {
+                    a = isBuildAndDrink;
+                }
+
                 public void changed(boolean val) {
                     super.changed(val);
                     isBuildAndDrink = val;
-                    Utils.setprefb("isBuildAndDrink",isBuildAndDrink);
+                    Utils.setprefb("isBuildAndDrink", isBuildAndDrink);
                 }
-            }, btn.sz.x+5, btn.c.y+5);
+            }, btn.sz.x + 5, btn.c.y + 5);
             cb.settip("build and drink if stamina low enough");
             return;
         }
 
+        // xp window
+        if (isWindowXpEvent(window)) {
+            modXpEventWindow(window);
+            return;
+        }
+
         // Craft window
-        if(isMakewindow(window)) {
+        if (isMakewindow(window)) {
 
             // cheese tray
-            if(windowTitle.contentEquals("Cheese Tray")){
+            if (windowTitle.contentEquals("Cheese Tray")) {
                 ZeeManagerItems.cheeseTrayMakeWindow(window);
             }
             // bug collection
-            else if(windowTitle.contentEquals("Bug Collection")) {
+            else if (windowTitle.contentEquals("Bug Collection")) {
                 if (!ZeeManagerCraft.bugColRecipeOpen && !ZeeManagerCraft.bugColBusy)
                     ZeeManagerCraft.bugColRecipeOpened(window);
             }
             // cloths
-            else if( List.of("Linen Cloth","Hemp Cloth").contains(windowTitle) ) {
+            else if (List.of("Linen Cloth", "Hemp Cloth").contains(windowTitle)) {
                 if (!ZeeManagerCraft.clothRecipeOpen)
                     ZeeManagerCraft.clothRecipeOpened(window);
             }
@@ -1212,8 +1221,7 @@ public class ZeeConfig {
             else if (windowTitle.contentEquals("Rope")) {
                 if (!ZeeManagerCraft.ropeRecipeOpen)
                     ZeeManagerCraft.ropeRecipeOpened(window);
-            }
-            else{
+            } else {
                 if (ZeeManagerCraft.bugColRecipeOpen)
                     ZeeManagerCraft.bugColRecipeClosed();
                 else if (ZeeManagerCraft.clothRecipeOpen)
@@ -1229,11 +1237,11 @@ public class ZeeConfig {
             windowTitle = WINDOW_NAME_CRAFT;
         }
         //cupboard
-        else if (ZeeCupboardLabeler.isActive && windowTitle.contentEquals("Cupboard")){
+        else if (ZeeCupboardLabeler.isActive && windowTitle.contentEquals("Cupboard")) {
             ZeeCupboardLabeler.checkCupboardContents(window);
         }
         //cheesetray
-        else if(windowTitle.contentEquals("Rack")) {
+        else if (windowTitle.contentEquals("Rack")) {
             ZeeManagerItems.checkCheeseTray(window);
         }
         //belt
@@ -1246,7 +1254,7 @@ public class ZeeConfig {
             windowModCattleRoster(window);
         }
         // autolabel contents
-        else if(ZeeManagerGobs.autoLabelWincapContainers.contains(windowTitle) || ZeeManagerGobs.autoLabelWincapVmeters.contains(windowTitle) ) {
+        else if (ZeeManagerGobs.autoLabelWincapContainers.contains(windowTitle) || ZeeManagerGobs.autoLabelWincapVmeters.contains(windowTitle)) {
             // add window fuel UI
             if (List.of("Oven", "Kiln", "Ore Smelter").contains(windowTitle)) {
                 windowAddFuelGUI(window, windowTitle);
@@ -1255,25 +1263,25 @@ public class ZeeConfig {
             ZeeManagerGobs.labelGobByContents(window);
         }
         //equips
-        else if(windowTitle.contentEquals("Equipment")) {
+        else if (windowTitle.contentEquals("Equipment")) {
             windowEquipment = window;
         }
         //main inventory
-        else if(windowTitle.contentEquals("Inventory")) {
+        else if (windowTitle.contentEquals("Inventory")) {
             windowInvMain = window;
         }
         //barter stand
-        else if(windowTitle.contentEquals("Barter Stand")){
+        else if (windowTitle.contentEquals("Barter Stand")) {
             windowModBarterStand(window);
         }
         //mod tamed animal window
-        else if(isWindowAnimalStats(windowTitle)){
+        else if (isWindowAnimalStats(windowTitle)) {
             windowModAnimalStats(window, windowTitle);
         }
         // auto press
-        else if(windowTitle.contentEquals("Extraction Press")) {
-            Button btnPress = getButtonNamed(window,"Press");
-            if (btnPress==null){
+        else if (windowTitle.contentEquals("Extraction Press")) {
+            Button btnPress = getButtonNamed(window, "Press");
+            if (btnPress == null) {
                 println("addWindow > winepress button not found");
             } else {
                 window.add(new Button(UI.scale(60), "auto") {
@@ -1282,22 +1290,15 @@ public class ZeeConfig {
                             ZeeManagerGobs.autoPressWine(window);
                         }
                     }
-                }, btnPress.c.x + btnPress.sz.x + 5 , btnPress.c.y);
+                }, btnPress.c.x + btnPress.sz.x + 5, btnPress.c.y);
             }
         }
         //fishing
-        else if(windowTitle.contains("This is bait")){
+        else if (windowTitle.contains("This is bait")) {
             ZeeFishing.checkFishWindow(window);
         }
-        // xp window
-        else if (isWindowXpEvent(window)){
-            // use same widow title for all xpevt windows
-            windowTitle = WINDOW_NAME_XPEVT;
-            modXpEventWindow(window);
-            return;
-        }
         // "Land survey" turn grid on
-        else if (windowTitle.contentEquals("Land survey")){
+        else if (windowTitle.contentEquals("Land survey")) {
             if (ZeeConfig.autoToggleGridLines)
                 ZeeConfig.gameUI.map.showgrid(true);
         }
@@ -1818,6 +1819,9 @@ public class ZeeConfig {
     private static void windowApplySavedPosition(Window window, String windowTitle) {
         Coord c;
         if(rememberWindowsPos && !(window instanceof MapWnd) ){
+            //distinguish tables by sz.x only, due to feast button
+            if (windowTitle.contentEquals("Table"))
+                windowTitle = "Table_"+window.sz.x;
             //use saved position window
             if (mapWindowPos!=null && (c = mapWindowPos.get(windowTitle)) != null) {
                 window.c = c;
@@ -2171,7 +2175,13 @@ public class ZeeConfig {
         if(isMakewindow(window))
             name = WINDOW_NAME_CRAFT;
 
+        // //distinguish tables by sz.x only, due to feast button
+        if(window.cap.contentEquals("Table")){
+            name = "Table_"+window.sz.x;
+        }
+
         //save window pos
+
         mapWindowPos.put(name, new Coord(window.c));
         Utils.setpref(MAP_WND_POS, serialize(mapWindowPos));
     }
