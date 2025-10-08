@@ -2,6 +2,7 @@ package haven;
 
 import haven.res.ui.stackinv.ItemStack;
 
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -1594,7 +1595,7 @@ public class ZeeManagerItems extends ZeeThread{
             witem = getMainInv().getWItemsByNameContains(nameContains).get(0);
             return witem;
         }catch (Exception e){
-            println("getBeltOrInvWItem > "+e.getMessage());
+            //println("getBeltOrInvWItem > "+e.getMessage());
             return null;
         }
     }
@@ -2113,6 +2114,52 @@ public class ZeeManagerItems extends ZeeThread{
             }
         }
         return false;
+    }
+
+    public static void windowCombatEquip() {
+
+        Window win = ZeeConfig.getWindow("Combat Equip");
+        if (win!=null) {
+            println("combat equip win already open");
+            return;
+        }
+
+        int x=0, y=0;
+
+        // add weapons buttons
+        List<String> weapons = List.of("roundshield","fyrdsword","hirdsword","bronzesword","b12axe","boarspear","cutblade","rangersbow","huntersbow");
+        WItem item;
+        for (String wpname : weapons) {
+            item = getBeltOrInvWItem(wpname);
+            if (item==null)
+                item = getEquippedItemNameEndsWith("/"+wpname);
+            if (item != null){
+                //create window on demand
+                if (win==null){
+                    win = ZeeConfig.gameUI.add(
+                            new Window(Coord.of(150,60),"Combat Equip"){
+                                public void wdgmsg(String msg, Object... args) {
+                                    if (msg.contentEquals("close")){
+                                        this.reqdestroy();
+                                    }
+                                }
+                            },
+                            ZeeConfig.gameUI.sz.div(2)
+                    );
+                    win.add(new Label("Click to equip:"));
+                    y += 20;
+                }
+                BufferedImage img = item.item.getres().flayer(Resource.imgc).img;
+                win.add(new IButton(img,img){
+                    public void wdgmsg(String msg, Object... args) {
+                        if (msg.contentEquals("activate")){
+                            new ZeeManagerItems(getBeltOrInvWItem(wpname)).start();
+                        }
+                    }
+                },x,y);
+                x += img.getWidth();
+            }
+        }
     }
 
 

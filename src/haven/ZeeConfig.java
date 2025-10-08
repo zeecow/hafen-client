@@ -227,7 +227,6 @@ public class ZeeConfig {
     static boolean dropCrops = false;
     static boolean treeloganize = false;
     static boolean equiporyCompact = Utils.getprefb("equiporyCompact", false);
-    static boolean equipShieldOnCombat = Utils.getprefb("equipShieldOnCombat", false);
     static boolean farmerMode = false;
     static boolean freeGobPlacement = Utils.getprefb("freeGobPlacement", true);
     static boolean fishMoonXpAlert = Utils.getprefb("fishMoonXpAlert", true);
@@ -4414,11 +4413,14 @@ public class ZeeConfig {
         return playerHasAnyPose(ZeeConfig.POSE_PLAYER_ROWBOAT_IDLE,ZeeConfig.POSE_PLAYER_ROWBOAT_ACTIVE);
     }
 
-    static void combatStartedOrTargetSwitch(Fightview fightview) {
+    static void combatStartedOrTargetSwitch(Fightview fv) {
 
-        combatTargetHilite(fightview);
+        combatTargetHilite(fv);
 
-        //TODO detect first combat relation to call these once?
+        // return if combat already started
+        if (fv!=null && fv.lsrel!=null && fv.lsrel.size()!=1){
+            return;
+        }
 
         //cancel possible tasks
         ZeeConfig.simulateCancelClick();
@@ -4428,27 +4430,28 @@ public class ZeeConfig {
             ZeeConfig.println(">combat relations, cancel mining");
             ZeeManagerMiner.stopMining();
         }
+
         //stop farming
         if (ZeeManagerFarmer.busy){
             ZeeConfig.println(">combat relations, cancel farming");
             ZeeManagerFarmer.exitSeedFarmer();
         }
+
         //stop piler
         if(ZeeManagerStockpile.busy){
             ZeeManagerStockpile.exitManager();
         }
-        //equip roundshield
-        if (ZeeConfig.equipShieldOnCombat && !ZeeManagerItems.isItemEquipped("huntersbow","rangersbow","roundshield")) {
-            println("auto equipping shield");
-            new ZeeThread(){
-                public void run() {
-                    try {
-                        ZeeManagerItems.equipBeltOrInvItemThreadJoin("/roundshield");
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-            }.start();
+
+        //fast equip window
+        ZeeManagerItems.windowCombatEquip();
+    }
+
+    static void combatEnded(){
+        println("combat ended?");
+        // combat equip window
+        Window win = ZeeConfig.getWindow("Combat Equip");
+        if (win!=null) {
+            win.reqdestroy();
         }
     }
 
@@ -4456,7 +4459,7 @@ public class ZeeConfig {
     static void combatTargetHilite(Fightview fv) {
         println("combatTargetHilite");
         if (fv==null || fv.lsrel==null || fv.lsrel.isEmpty()) {
-            println("combate ended?");
+            combatEnded();
             return;
         }
         try {

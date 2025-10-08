@@ -267,8 +267,6 @@ public class ZeeOptionsJFrame extends JFrame {
 
         panelTabAuto.add(new ZeeOptionJCheckBox("Travel hearth on player sight","autoHearthOnStranger"), c);
 
-        panelTabAuto.add(new ZeeOptionJCheckBox("Equip shield on combat","equipShieldOnCombat"), c);
-
         panelTabAuto.add(new ZeeOptionJCheckBox("Lift vehicle before travel hearth","liftVehicleBeforeTravelHearth"), c);
 
 
