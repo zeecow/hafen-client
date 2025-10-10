@@ -557,7 +557,10 @@ public class ZeeConsole {
                 WItem[] invItems = inv.children(WItem.class).toArray(new WItem[0]);
                 List<String> names = new ArrayList<>();
                 List<String> meatNames = new ArrayList<>();
-                // collect items names
+
+                /*
+                 collect items names
+                 */
                 for (WItem item : invItems) {
                     String itemName = item.item.getres().name;
                     // special case for meat items
@@ -572,7 +575,10 @@ public class ZeeConsole {
                         continue;
                     names.add(itemName);
                 }
-                // stack regular items by name
+
+                /*
+                 stack regular items by res name
+                 */
                 for (String name : names) {
                     List<WItem> namedItems = inv.getWItemsByNameEndsWith(name);
                     for (int i = 0; i < namedItems.size()-1; i++) {
@@ -603,7 +609,10 @@ public class ZeeConsole {
                         }
                     }
                 }
-                //stack meat items
+
+                /*
+                 stack meat items by ItemInfo.Name
+                 */
                 for (String meatName : meatNames) {
                     List<WItem> meatItems = inv.getWItemsByInfoNameContains(meatName);
                     for (int i = 0; i < meatItems.size(); i++) {
@@ -627,12 +636,98 @@ public class ZeeConsole {
                         }
                     }
                 }
+
+                // optimize stacks
+                if(!optimizeStacks(inv, names))
+                    return false;
+
             }
             return true;
         } catch (Exception e) {
             e.printStackTrace();
         }
         return false;
+    }
+
+    private static Boolean optimizeStacks(Inventory inv, List<String> names){
+        println("optimizeStacks() > "+names.size()+" names");
+        try{
+            boolean isResName = names.get(0).startsWith("gfx/invobjs/");
+            /*
+             join stacks when no remainder
+             */
+            for (String name : names) {
+                int maxStack = 2;
+                List<WItem> wItems;
+                if(isResName)
+                    wItems = inv.getWItemsByNameEndsWith(name);
+                else
+                    wItems = inv.getWItemsByInfoNameContains(name);
+
+                // guess max stack size  //TODO: if equals 2, try joining once and recalc
+                for (WItem w1 : wItems) {
+                    if (!w1.item.isStackByContent())
+                        continue;
+                    int amount = ZeeManagerItems.getItemInfoAmount(w1.item.info());
+                    if (maxStack < amount)
+                        maxStack = amount;
+                }
+                println("    "+name+" , maxStack "+maxStack);
+                println("    "+wItems.size()+" items from "+(isResName?" res":" ItemInfo"));
+
+                // add single items to stacks with 1 space
+                List<WItem> singleItems = inv.getWItemsByNameEndsWith(name).stream().filter(wItem -> !wItem.item.isStackByContent()).toList();
+                int finalMaxStack = maxStack;
+                List<WItem> oneSpaceStacks = inv.getWItemsByNameEndsWith(name).stream().filter(wItem -> wItem.item.isStackByContent() && (ZeeManagerItems.getItemInfoAmount(wItem.item.info())==finalMaxStack-1)).toList();
+                for (int i = 0; i < singleItems.size(); i++) {
+                    if (oneSpaceStacks.isEmpty() || oneSpaceStacks.get(i)==null) {
+                        println("    not enough oneSpaceStacks , i = "+i);
+                        break;
+                    }
+                    // pickup single item
+                    if (!ZeeManagerItems.pickUpItem(singleItems.get(i))) {
+                        println("    couldnt pickup single item");
+                        return false;
+                    }
+                    // click one space stack
+                    ZeeManagerItems.itemAct(oneSpaceStacks.get(i));
+                    Thread.sleep(400);//wait item upd
+                    if (ZeeConfig.isPlayerHoldingItem()) {
+                        println("    shouldnt be holding item?");
+                        return false;
+                    }
+                    println("    joined singleItem "+i+" to stack "+i);
+                }
+
+                // join incomplete stacks, smaller than maxSize
+                List<WItem> incompleteStacks = inv.getWItemsByNameEndsWith(name).stream().filter(wItem ->
+                        wItem.item.isStackByContent() && finalMaxStack > 3
+                                && ZeeManagerItems.getItemInfoAmount(wItem.item.info()) <= (finalMaxStack-2) ).toList();
+                if (incompleteStacks.size() < 2){
+                    println("    not enough incompleteStacks "+incompleteStacks.size());
+                    return false;
+                }
+                println("    incompleteStacks = "+incompleteStacks.size());
+                for (int i = 0; i < incompleteStacks.size()-1; i+=2) {
+                    // pickup stack
+                    if (!ZeeManagerItems.pickUpItem(incompleteStacks.get(i))) {
+                        println("    couldnt pickup incompleteStack");
+                        return false;
+                    }
+                    // click other stack
+                    ZeeManagerItems.itemAct(incompleteStacks.get(i+1));
+                    Thread.sleep(400);//wait item upd
+                    if (ZeeConfig.isPlayerHoldingItem()) {
+                        println("    shouldnt be holding incompleteStack?");
+                        return false;
+                    }
+                    println("    joined incompleteStack "+i+" to "+(i+1));
+                }
+            }
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     @SuppressWarnings("unchecked")
