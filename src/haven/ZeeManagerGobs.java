@@ -1782,8 +1782,9 @@ public class ZeeManagerGobs extends ZeeThread{
         if (!ZeeConfig.isPlayerMountingHorse())
             return;
 
+        // return if kritter doesnt require dismounting
         String kritName = kritter.getres().name;
-        if( !kritName.endsWith("/grasshopper") && !kritName.endsWith("/rat"))
+        if (!ZeeConfig.nameInListEndsWith(kritName,"/grasshopper,/rat,/toad,/frog,/crab,/lobster,/rabbit-doe,/rabbit,/bunny,/hen,/rooster,/chick,/bogturtle"))
             return;
 
         new ZeeThread(){
@@ -1792,7 +1793,7 @@ public class ZeeManagerGobs extends ZeeThread{
                 isPickingKritterDismountHorse = true;
                 try {
                     ZeeConfig.addPlayerText("dismounting");
-                    if(waitPlayerDistToGobOrCancelClick(kritter,50)){
+                    if(waitPlayerDistToGobOrCancelClick(kritter,60)){
                         if(dismountHorse(kritter.rc))
                             gobClick(kritter,3); //kritters have no pick menu?
                         else
