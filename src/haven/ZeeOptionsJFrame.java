@@ -354,6 +354,8 @@ public class ZeeOptionsJFrame extends JFrame {
 
         panelTabMisc.add(new ZeeOptionJCheckBox( "Show tree animation", "treeAnimation"),c);
 
+        panelTabMisc.add(new ZeeOptionJCheckBox( "Show gob health number", "showGobHealthNumber"),c);
+
         //mini trees
         pan = new JPanel(new FlowLayout(FlowLayout.LEFT));
         panelTabMisc.add(pan,c);

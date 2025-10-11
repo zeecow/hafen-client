@@ -2201,6 +2201,47 @@ public class ZeeManagerGobs extends ZeeThread{
         }
     }
 
+    static void toggleAllGobsHealthNum() {
+        try {
+            if (ZeeConfig.showGobHealthNumber) {
+                ZeeConfig.msgLow("show gob health num");
+            } else {
+                ZeeConfig.msgLow("hide gob health num");
+            }
+
+            // find trees and bushes
+            List<Gob> gobs = ZeeConfig.getAllGobs();
+            gobs.removeIf(gob1 -> {
+                String name = gob1.getres().name;
+                if (ZeeConfig.getGobAttr(gob1, GobHealth.class) == null)
+                    return true;
+                return false;
+            });
+
+            // toggle off
+            if (!ZeeConfig.showGobHealthNumber) {
+                ZeeConfig.removeGobText((ArrayList<Gob>) gobs);
+            }
+            // toggle on
+            else {
+                for (Gob g : gobs) {
+                    GobHealth gh = (GobHealth) ZeeConfig.getGobAttr(g, GobHealth.class);
+                    if (gh!=null && gh.hp < 1){
+                        gh.showGobHealthNum();
+                    }
+                }
+            }
+
+            Utils.setprefb("showGobHealthNumber",ZeeConfig.showGobHealthNumber);
+
+            // quick options window
+            ZeeQuickOptionsWindow.updateCheckboxNoBump("showGobHealthNumber",ZeeConfig.showGobHealthNumber);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     static void toggleAllTreeGrowthTexts() {
         try {
             if (ZeeConfig.showGrowingTreeScale) {

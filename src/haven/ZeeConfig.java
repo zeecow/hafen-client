@@ -303,6 +303,9 @@ public class ZeeConfig {
     public static boolean showGrowingTreeScale = Utils.getprefb("showGrowingTreeScale", true);
     static Runnable showGrowingTreeScaleRunnable = () -> ZeeManagerGobs.toggleAllTreeGrowthTexts();
 
+    static boolean showGobHealthNumber = Utils.getprefb("showGobHealthNumber",true);
+    static Runnable showGobHealthNumberRunnable = () -> ZeeManagerGobs.toggleAllGobsHealthNum();
+
     public final static Set<String> mineablesStone = new HashSet<String>(Arrays.asList(
             "stone","gneiss","basalt","dolomite","feldspar","flint",
             "granite","hornblende","limestone","marble","porphyry","quartz",

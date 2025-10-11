@@ -55,9 +55,9 @@ public class GobHealth extends GAttrib implements Gob.SetupMod {
 		if ( g.settingsApplied ) {
 			// add gob label
 			if (hp < 1) {
-				Color c = Color.lightGray;
-				String s = String.valueOf(hp).replaceFirst("0.", ".");
-				ZeeConfig.addGobText(g, s, c);
+                if(ZeeConfig.showGobHealthNumber) {
+                    this.showGobHealthNum();
+                }
 			}
 			// remove gob label
 			else {
@@ -66,7 +66,13 @@ public class GobHealth extends GAttrib implements Gob.SetupMod {
 		}
 	}
     }
-    
+
+    void showGobHealthNum() {
+        Color c = Color.lightGray;
+        String s = String.valueOf(hp).replaceFirst("0.", ".");
+        ZeeConfig.addGobText(gob, s, c);
+    }
+
     public Pipe.Op gobstate() {
 	return(fx);
     }
