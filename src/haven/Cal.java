@@ -27,8 +27,6 @@
 package haven;
 
 import static java.lang.Math.PI;
-import java.awt.Graphics;
-import java.awt.image.BufferedImage;
 
 public class Cal extends Widget {
     public static final double hbr = UI.scale(20.0);
@@ -97,17 +95,20 @@ public class Cal extends Widget {
 		int mp = (int)Math.round(a.mp * (double)moon.f.length) % moon.f.length;
 		String cal = String.format("%s day of the %s month of the %s year", ord((int)Math.floor(a.md) + 1), ord((int)Math.floor(a.ym) + 1), ord((int)Math.floor(a.years) + 1));
 		String season = String.format("Season: %s, day %d of %d", a.season(), a.scday + 1, a.season().length);
-		String forageables = "Forage: ";
+		StringBuilder forageables = new StringBuilder("Forage: ");
 		if (a.season().name().contains("Spring"))
-			forageables += "Camomile, Chiming Bluebell, Coltsfoot, Marsh-Mallow";
+			forageables.append("Camomile, Chiming Bluebell, Coltsfoot, Marsh-Mallow");
 		else if (a.season().name().contains("Summer"))
-			forageables += "Strawberry";
+            forageables.append("Strawberry");
 		else if (a.season().name().contains("Autumn"))
-			forageables += "B.Trumpets, L.Caps, Morels, Parasol, Aut.Leaf, RubyBol.";
+            forageables.append("B.Trumpets, L.Caps, Morels, Parasol, Aut.Leaf, RubyBol.");
 		else if (a.season().name().contains("Winter"))
-			forageables += "Sleighbell, Snowtop, Snowflakes, Wintergreen";
+            forageables.append("Sleighbell, Snowtop, Snowflakes, Wintergreen");
 		String moon = String.format("Moon: %s",Astronomy.moonPhases[mp]);
-		return(RichText.render(season + "\n" + forageables + "\n" + moon + "\n" + cal, UI.scale(250)));
+        double gt = ZeeConfig.gameUI.ui.sess.glob.gtime;
+        boolean dawn = gt > 4.45 && gt < 7.15;
+        String gameTime = String.format("Game time: %s %s", (dawn?"(dawn)":""), gt);
+		return(RichText.render(season + "\n" + forageables + "\n" + moon + "\n" + cal + "\n" +gameTime, UI.scale(250)));
 	}
 	return(super.tooltip(c, prev));
     }

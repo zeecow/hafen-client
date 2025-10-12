@@ -24,7 +24,7 @@ public class ZeeTimer {
         long elapsedLocal = ZeeThread.now() - local;
         server = newTime;
         local = ZeeThread.now();
-        //println("elapsed  server = "+elapsedServer+" , local = "+elapsedLocal);
+        println("elapsed  server = "+elapsedServer+" , local = "+elapsedLocal);
         //checkTimers();
     }
 
