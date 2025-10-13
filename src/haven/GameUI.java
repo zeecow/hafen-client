@@ -1268,7 +1268,6 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
 	if(msg == "err") {
 	    String err = (String)args[0];
 	    ui.error(err);
-		ZeeConfig.checkUiErr(err);
 	} else if(msg == "msg") {
 	    String text = (String)args[0];
 	    ui.msg(text);

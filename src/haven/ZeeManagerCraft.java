@@ -62,211 +62,6 @@ public class ZeeManagerCraft extends ZeeThread{
 
 
 
-
-
-    /*
-        BUG COLLECTION
-     */
-    static boolean bugColRecipeOpen, bugColBusy;
-    static Button bugColAutoBtn;
-    static Gob bugColWoodPile;
-    static List<Gob> bugColContainers;
-    static java.util.List<String> bugColBugNames;
-    static Label bugColLabel;
-    static void bugColRecipeOpened(Window window) {
-        bugColRecipeOpen = true;
-        bugColAutoBtn = new ZeeWindow.ZeeButton(UI.scale(85),"auto"){
-            public void wdgmsg(String msg, Object... args) {
-                if (msg.equals("activate")){
-                    if (bugColBusy)
-                        return;
-                    if (bugColWoodPile==null){
-                        ZeeConfig.msgError("no wood pile found");
-                        return;
-                    }
-                    if (bugColContainers==null || bugColContainers.size()==0){
-                        ZeeConfig.msgError("no bug containers found");
-                        return;
-                    }
-                    bugColLabelUpdate();
-                    bugColStart();
-                }
-            }
-        };
-        bugColAutoBtn.disable(true);
-        bugColAutoBtn.settip("craft using woodpile and bug containers");
-        window.add(bugColAutoBtn,360,45);
-        bugColLabelUpdate();
-        window.add(bugColLabel, 360, 30);
-        //autoBtn.disable(!bugCollectionReady());
-    }
-    static void bugColLabelUpdate(){
-        int bugs = bugColBugNames!=null ? bugColBugNames.size() : 0;
-        int containers = bugColContainers!=null ? bugColContainers.size() : 0;
-        String msg = "bug "+bugs+" , cont "+containers;
-        if (bugColLabel==null)
-            bugColLabel = new Label(msg);
-        else
-            bugColLabel.settext(msg);
-    }
-    public static void bugColCraftBtnClicked() {
-        if (!bugColRecipeOpen || bugColBusy)
-            return;
-
-        // save bug names for auto craft
-        java.util.List<WItem> bugs = ZeeConfig.getMainInventory().getItemsSelectedForCrafting();
-        if (bugs.size() < 6){
-            bugColExit("requires 6 inventory bugs");
-            return;
-        }
-        bugColBugNames = bugs.stream().map(wItem1 -> wItem1.item.getres().name).collect(Collectors.toList());
-
-        // enable auto btn after "Craft" was clicked; TODO check if craft was successful?
-        bugColAutoBtn.disable(false);
-    }
-    private static void bugColStart() {
-
-        new Thread(){
-            public void run() {
-                try{
-                    bugColBusy = true;
-                    ZeeConfig.addPlayerText("debug");
-
-                    //close any containers to use only inventory bugs
-                    List<Window> openContainerWindows = ZeeConfig.getContainersWindows(false);
-                    println("closing containers = "+openContainerWindows.size());
-                    openContainerWindows.forEach(window -> {
-                        window.reqdestroy();
-                        waitWindowClosed(window.cap);
-                    });
-                    openContainerWindows.clear();
-                    sleep(PING_MS);
-
-                    do {
-                        prepareCancelClick();
-                        //get 6 bugs from containers
-                        int bugsAcquired = 0;
-                        for (Gob gobContainer : bugColContainers) {
-
-                            //open container
-                            ZeeManagerGobs.gobClick(gobContainer, 3);
-                            prepareCancelClick();
-                            waitWindowOpened(gobContainer.getres().basename());//TODO more containers
-                            sleep(333);
-
-                            //search container bugs
-                            openContainerWindows = ZeeConfig.getContainersWindows(false);
-                            if (openContainerWindows.isEmpty()) {
-                                bugColExit("open containers not found");
-                                return;
-                            }
-                            Inventory invCont = openContainerWindows.get(0).getchild(Inventory.class);
-                            for (int i = bugsAcquired; i < bugColBugNames.size(); i++) {
-                                String bugName = bugColBugNames.get(i);
-                                List<WItem> bugsFound = invCont.getWItemsByNameContains(bugName);
-                                boolean waitSprite = false;
-                                do {
-                                    sleep(PING_MS);
-                                    try {
-                                        bugsFound.removeIf(wItem1 -> ZeeManagerItems.isStackByAmount(wItem1.item));
-                                    } catch (Loading loading) {
-                                        waitSprite = true;
-                                        continue;
-                                    }
-                                    waitSprite = false;
-                                } while (waitSprite);
-                                if (bugsFound.size() > 0) {
-                                    //transfer 1 bug to main inv and search next bugName
-                                    bugsFound.get(0).item.wdgmsg("transfer", Coord.z, UI.MOD_SHIFT);
-                                    sleep(PING_MS);
-                                    bugsAcquired++;
-                                }
-                            }
-
-                            //6 bugs found, stop searching containers
-                            if (bugsAcquired == 6) {
-                                break;
-                            }
-
-                            //close container(s)
-                            openContainerWindows = ZeeConfig.getContainersWindows(false);
-                            openContainerWindows.forEach(window -> {
-                                window.reqdestroy();
-                                waitWindowClosed(window.cap);
-                            });
-                            openContainerWindows.clear();
-                            sleep(333);
-                        }
-
-                        // searched all containers && not enough bugs
-                        if (bugsAcquired < 6) {
-                            bugColExit("not enough bugs");
-                            return;
-                        }
-
-                        //open wood pile
-                        ZeeManagerGobs.gobClick(bugColWoodPile, 3);
-                        prepareCancelClick();
-                        waitWindowOpened("Stockpile");
-
-                        // click Craft btn
-                        ZeeConfig.getButtonNamed(ZeeConfig.getWindow("Bug Collection"), "Craft").click();
-                        sleep(150);
-                        if (!waitPlayerPoseNotInList(ZeeConfig.POSE_PLAYER_CRAFT)) {
-                            bugColExit("couldn't wait bug craft animation?");
-                            return;
-                        }
-
-                    }while(bugColBusy && !isCancelClick());
-
-                }catch (Exception e){
-                    e.printStackTrace();
-                }
-
-                bugColExit("");
-            }
-        }.start();
-    }
-    public static void bugColGobClicked(Gob gob) {
-        // bug container
-        if (ZeeManagerGobs.isGobCraftingContainer(gob.getres().name)){
-            ZeeConfig.addGobText(gob,"bugs");
-            if (bugColContainers==null)
-                bugColContainers = new ArrayList<>();
-            if (!bugColContainers.contains(gob))
-                bugColContainers.add(gob);
-        }
-        // wood pile
-        else if (gob.getres().name.contentEquals(ZeeManagerStockpile.STOCKPILE_BLOCK)){
-            ZeeConfig.addGobText(gob,"wood");
-            bugColWoodPile = gob;
-        }
-        bugColLabelUpdate();
-    }
-    public static void bugColRecipeClosed() {
-        bugColRecipeOpen = false;
-        bugColExit("bugcol recipe closed");
-    }
-    static void bugColExit(String msg){
-        bugColBusy = false;
-        if (!msg.isEmpty()) {
-            println("bugCol > " + msg);
-            ZeeConfig.msgLow(msg);
-        }
-        ZeeConfig.removePlayerText();
-        if (bugColContainers != null) {
-            bugColContainers.forEach(ZeeConfig::removeGobText);
-            bugColContainers.clear();
-        }
-        if (bugColBugNames != null) {
-            bugColBugNames.clear();
-        }
-        ZeeConfig.removeGobText(bugColWoodPile);
-        bugColWoodPile = null;
-    }
-
-
-
     /*
         CLOTH: linen, hemp
      */
@@ -531,11 +326,8 @@ public class ZeeManagerCraft extends ZeeThread{
     }
 
 
-
     static void craftWindowClosed() {
         ZeeConfig.makeWindow = null;
-        if(bugColRecipeOpen)
-            bugColRecipeClosed();
         if(clothRecipeOpen)
             clothWindowClosed();
         if(ropeRecipeOpen)
@@ -543,7 +335,223 @@ public class ZeeManagerCraft extends ZeeThread{
     }
 
 
+
+
+    static boolean isCraftRecording =false, craftRecPlaying=false;
+    static Window winCraftRec = null;
+    static List<CraftRecStep> craftRecSteps;
+    static void windowCraftRecorder() {
+        String winTitle = "Craft recorder";
+        winCraftRec = ZeeConfig.getWindow(winTitle);
+        if (winCraftRec!=null)
+            return;
+        isCraftRecording = true;
+        //window
+        winCraftRec = ZeeConfig.gameUI.add(new Window(Coord.of(230, 170), winTitle) {
+            public void wdgmsg(String msg, Object... args) {
+                if (msg.contentEquals("close")) {
+                    craftRecExit();
+                    this.reqdestroy();
+                }
+            }
+        }, ZeeConfig.gameUI.sz.div(3));
+        winCraftRec.add(new Label("select mats from containers, click start "),0,0);
+        // btn start
+        Widget wdg = winCraftRec.add(new ZeeWindow.ZeeButton("start"){
+            @Override
+            public void wdgmsg(String msg, Object... args) {
+                if (msg.contentEquals("activate")){
+                    craftRecStart();
+                }
+            }
+        },0,15);
+        // btn reset
+        winCraftRec.add(new ZeeWindow.ZeeButton("clear"){
+            @Override
+            public void wdgmsg(String msg, Object... args) {
+                if (msg.contentEquals("activate")){
+                    if (craftRecPlaying) // let player cancel click instead
+                        return;
+                    if (craftRecSteps==null)
+                        return;
+                    for (CraftRecStep step : craftRecSteps) {
+                        ZeeConfig.removeGobText(step.gob);
+                    }
+                    craftRecSteps.clear();
+                    craftRecWinUpdate();
+                }
+            }
+        },wdg.c.x+wdg.sz.x+3,15);
+        // scrollport steps
+        winCraftRec.add(new Scrollport(Coord.of(225, 125)), 0, 40);
+    }
+    static void craftRecGobClicked(Gob gob) {
+        if (craftRecPlaying)
+            return;
+        String name = gob.getres().name;
+        if (ZeeManagerGobs.isGobCraftingContainer(name) || ZeeManagerGobs.isGobStockpile(name)){
+            if (craftRecSteps == null)
+                craftRecSteps = new ArrayList<>();
+            if (craftRecGet(gob)==null)
+                craftRecSteps.add(new CraftRecStep(gob));
+        }
+        craftRecWinUpdate();
+    }
+    static void craftRecItemAdd(GItem i) {
+        if (craftRecPlaying)
+            return;
+        if(craftRecSteps.isEmpty())
+            return;
+        craftRecSteps.get(craftRecSteps.size()-1).itemsMainInv.add(i.getres().name);
+        craftRecWinUpdate();
+    }
+    static void craftRecWinUpdate() {
+        Scrollport scrollport = winCraftRec.getchild(Scrollport.class);
+        if (scrollport==null){
+            println("no scrollport?");
+            return;
+        }
+        // clear scrollport items
+        for (Widget w : scrollport.cont.children(Widget.class)) {
+            w.remove();
+        }
+        int x=0, y=20;
+        for (int i = 0; i < craftRecSteps.size(); i++) {
+            CraftRecStep step = craftRecSteps.get(i);
+            String basename = step.gob.getres().basename();
+            scrollport.cont.add(new Label(basename + " " + i),x,y);
+            ZeeConfig.addGobText(step.gob,basename +" "+ i);
+            y += 15;
+            for (String item : step.itemsMainInv) {
+                scrollport.cont.add(new Label(item),x+15,y);
+                y += 15;
+            }
+        }
+    }
+    static void craftRecStart() {
+        if(craftRecPlaying)
+            return;
+        if(craftRecSteps==null || craftRecSteps.isEmpty()){
+            ZeeConfig.msgError("no crafting steps recorded");
+            return;
+        }
+        List<Button> btns = ZeeConfig.makeWindow.children(Button.class).stream().filter(button -> button.text.text.contentEquals("Craft")).toList();
+        if (btns.isEmpty()){
+            println("craftRecStart > craft button not found");
+            return;
+        }
+        new ZeeThread(){
+            public void run() {
+                try {
+                    craftRecPlaying = true;
+                    ZeeConfig.addPlayerText("craftrec");
+                    Button craftButton = btns.get(0);
+                    do {
+                        // craft item
+                        craftButton.click();
+                        sleep(100);
+                        waitPlayerPoseNotInList(ZeeConfig.POSE_PLAYER_DRINK,ZeeConfig.POSE_PLAYER_CRAFT);
+                        // out of mats
+                        if (ZeeConfig.lastUiMsg.contains("You do not have all the ingredients")){
+                            if ( now() - ZeeConfig.lastUIMsgMs < 1000 ){
+                                break;
+                            }
+                        }
+                        //ZeeConfig.lastUiMsg
+                        if (isCancelClick())
+                            break;
+                        // prepare for next craft
+                        for (int i = 0; i < craftRecSteps.size(); i++) {
+                            CraftRecStep step = craftRecSteps.get(i);
+                            // right click container
+                            ZeeManagerGobs.gobClick(step.gob,3);
+                            prepareCancelClick();
+                            // wait window open
+                            Window winOpen = waitWindowOpened();
+                            sleep(PING_MS);//wait sel upd?
+                            if (isCancelClick())
+                                break;
+                            if(winOpen == null ){
+                                println("couldnt wait window opened?");
+                                craftRecExit();
+                                return;
+                            }
+                            // select item(s) from window
+                            for (String itemName : step.itemsMainInv) {
+                                List<WItem> itemsAvailable = winOpen.getchild(Inventory.class).getWItemsByNameEndsWith(itemName);
+                                if (itemsAvailable==null || itemsAvailable.isEmpty()){
+                                    ZeeConfig.msgLow("window had no item: "+itemName);
+                                    craftRecExit();
+                                    return;
+                                }
+                                // transfer item to inv, close window
+                                itemsAvailable.get(itemsAvailable.size()-1).item.wdgmsg("transfer", Coord.z);
+                                sleep(PING_MS);
+                                if (isCancelClick())
+                                    break;
+                            }
+                            if (isCancelClick())
+                                break;
+                            // keep last window open...
+                            boolean craftWithOpenWindow = step.itemsMainInv.isEmpty() && (i == craftRecSteps.size() - 1);
+                            if (craftWithOpenWindow) {
+                                //println("craft with open window from container or stockpile");
+                                continue;
+                            }
+                            // ... or close window before crafting
+                            lastWindowOpened = null;
+                            winOpen.reqdestroy();
+                            sleep(PING_MS);
+                            ZeeConfig.clickCoord(ZeeConfig.getPlayerCoord(),1);//really close window
+                            prepareCancelClick();
+                            sleep(PING_MS);
+                            if (isCancelClick())
+                                break;
+                        }
+                    }while(!isCancelClick());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                craftRecPlaying = false;
+                ZeeConfig.removePlayerText();
+            }
+        }.start();
+    }
+    static void craftRecExit() {
+        isCraftRecording = false;
+        craftRecPlaying = false;
+        if (winCraftRec!=null)
+            winCraftRec.reqdestroy();
+        winCraftRec = null;
+        if (craftRecSteps!=null)
+            for (CraftRecStep step : craftRecSteps) {
+                ZeeConfig.removeGobText(step.gob);
+            }
+        craftRecSteps = null;
+    }
+    static CraftRecStep craftRecGet(Gob gob1){
+        if (craftRecSteps==null || craftRecSteps.isEmpty())
+            return null;
+        for (CraftRecStep step : craftRecSteps) {
+            if (step.gob.equals(gob1))
+                return step;
+        }
+        return null;
+    }
+    private static class CraftRecStep {
+        Gob gob;
+        List<String> itemsMainInv;
+        boolean isPile;
+        public CraftRecStep(Gob g) {
+            this.gob = g;
+            isPile = ZeeManagerGobs.isGobStockpile(g.getres().name);
+            itemsMainInv = new ArrayList<>();
+        }
+    }
+
+
     public static void println(String s) {
         System.out.println(s);
     }
+
 }

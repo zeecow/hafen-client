@@ -133,6 +133,8 @@ public class Inventory extends Widget implements DTarget {
 	if(child instanceof GItem) {
 	    GItem i = (GItem)child;
 	    wmap.put(i, add(new WItem(i), c.mul(sqsz).add(1, 1)));
+        if (isMainInv() && ZeeManagerCraft.isCraftRecording)
+            ZeeManagerCraft.craftRecItemAdd(i);
 	}
     }
     

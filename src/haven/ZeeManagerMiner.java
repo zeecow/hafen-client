@@ -490,7 +490,7 @@ public class ZeeManagerMiner extends ZeeThread{
                     println("stop mining");
                     ZeeConfig.msgError("stop mining");
                     ZeeConfig.clickRemoveCursor();
-                    setCancelClick();
+                    doCancelClick();
                     waitCursorName(ZeeConfig.CURSOR_ARW);
                     ZeeConfig.stopMovingEscKey();
                     ZeeThread.staminaMonitorStop();//case stam monitor thread is running

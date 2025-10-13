@@ -1172,6 +1172,9 @@ public class ZeeConfig {
         if (windowTitle.contentEquals("Stack"))
             return;
 
+        // notify waitWindowOpen
+        ZeeManagerCraft.lastWindowOpened = window;
+
         // build window
         if (isBuildWindow(window)) {
             // tunnel helper
@@ -1205,14 +1208,21 @@ public class ZeeConfig {
         // Craft window
         if (isMakewindow(window)) {
 
+            // crafting rec button
+            Button craftButton = getButtonNamed(window,"Craft");
+            if (craftButton!=null) {
+                Widget wdg = window.add(new ZeeWindow.ZeeButton("rec") {
+                    public void wdgmsg(String msg, Object... args) {
+                        if (msg.contentEquals("activate"))
+                            ZeeManagerCraft.windowCraftRecorder();
+                    }
+                }, craftButton.c.add(-30, 0));
+                wdg.settip("crafting recorder");
+            }
+
             // cheese tray
             if (windowTitle.contentEquals("Cheese Tray")) {
                 ZeeManagerItems.cheeseTrayMakeWindow(window);
-            }
-            // bug collection
-            else if (windowTitle.contentEquals("Bug Collection")) {
-                if (!ZeeManagerCraft.bugColRecipeOpen && !ZeeManagerCraft.bugColBusy)
-                    ZeeManagerCraft.bugColRecipeOpened(window);
             }
             // cloths
             else if (List.of("Linen Cloth", "Hemp Cloth").contains(windowTitle)) {
@@ -1224,9 +1234,7 @@ public class ZeeConfig {
                 if (!ZeeManagerCraft.ropeRecipeOpen)
                     ZeeManagerCraft.ropeRecipeOpened(window);
             } else {
-                if (ZeeManagerCraft.bugColRecipeOpen)
-                    ZeeManagerCraft.bugColRecipeClosed();
-                else if (ZeeManagerCraft.clothRecipeOpen)
+                if (ZeeManagerCraft.clothRecipeOpen)
                     ZeeManagerCraft.clothWindowClosed();
                 else if (ZeeManagerCraft.ropeRecipeOpen)
                     ZeeManagerCraft.ropeWindowClosed();
@@ -2812,7 +2820,10 @@ public class ZeeConfig {
     }
 
     public static void checkUiErr(String text){
-        lastUIMsgMs = System.currentTimeMillis();
+        //lastUIMsgMs = System.currentTimeMillis();
+
+        println("checkUiErr > "+lastUIMsgMs);
+        println("     "+text);
 
         if (ZeeManagerStockpile.busy && text.contains("That stockpile is already full."))
             ZeeManagerStockpile.exitManager("checkUiErr() > pile is full");
@@ -2866,6 +2877,8 @@ public class ZeeConfig {
         ZeeManagerGobs.isPickingKritterDismountHorse = false;
         ZeeManagerGobs.isPickingAllGobsClientSide = false;
         ZeeManagerGobs.isPickingUpClosestGob = false;
+        ZeeManagerCraft.lastWindowOpened = null;
+        ZeeManagerCraft.craftRecExit();
         if (listCauldronContainers!=null)
             listCauldronContainers.clear();
         ZeeManagerGobs.autoPickIrrlightExit();
@@ -2893,7 +2906,6 @@ public class ZeeConfig {
         }
 
         ZeeManagerFarmer.exitSeedFarmer();
-        ZeeManagerCraft.bugColExit("");
     }
 
     public static void clickOpenBelt() {

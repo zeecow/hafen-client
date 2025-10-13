@@ -210,7 +210,9 @@ Random Features
 - Scroll text entry fuel for kiln, oven, smelter
 - hover menu on search actions button (hold right-click)
 - auto-label gob Barrel/Cistern/Demijohn when it's window is opened
-- auto craft helper: cloth linen/hemp, rope, bug collection
+- crafting recorder: repeats selecting and crafting to avoid using wrong mats
+  - needs testing: avoid stacks, prefer select from containers, use stockpile as the last step      
+- auto craft helper: cloth linen/hemp, rope
   - use closest fibre pile until inv full
 - auto press wine from inventtory
   - switch seeds and press until it stops

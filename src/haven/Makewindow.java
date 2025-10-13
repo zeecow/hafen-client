@@ -181,7 +181,6 @@ public class Makewindow extends Widget {
 				ZeeConfig.clickedCraftAll = String.valueOf(args[0]).contentEquals("1");
 				if(!ZeeConfig.clickedCraftAll) {
 					ZeeResearch.checkResearch(this.rcpnm);
-					ZeeManagerCraft.bugColCraftBtnClicked();
 				}
 			}
 			super.wdgmsg(sender, msg, args);

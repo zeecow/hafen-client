@@ -347,7 +347,7 @@ public class ZeeThread  extends Thread{
         }catch (Exception e){
             e.printStackTrace();
         }
-        //println("waitPlayerPoseNotInListTimeout ret "+!poseInList);
+        println("waitPlayerPoseNotInListTimeout ret "+!poseInList);
         return !poseInList;
     }
 
@@ -943,6 +943,23 @@ public class ZeeThread  extends Thread{
         return ret;
     }
 
+    static Window lastWindowOpened = null;
+    static Window waitWindowOpened(){
+        Window ret;
+        lastWindowOpened = null;
+        try{
+            prepareCancelClick();
+            while(!isCancelClick() && lastWindowOpened==null){
+                Thread.sleep(100);
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        ret = lastWindowOpened;
+        lastWindowOpened = null;
+        return ret;
+    }
+
     static boolean waitWindowOpened(String windowName){
         if (ZeeConfig.getWindow(windowName)!=null) {
             //println("waitWindowOpened > already opened");
@@ -1096,7 +1113,7 @@ public class ZeeThread  extends Thread{
     static boolean isCancelClick() {
         return ZeeConfig.isCancelClick();
     }
-    static void setCancelClick() {
+    static void doCancelClick() {
         ZeeConfig.simulateCancelClick();
     }
     static void prepareCancelClick() {

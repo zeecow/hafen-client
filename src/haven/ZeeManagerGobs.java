@@ -1608,10 +1608,9 @@ public class ZeeManagerGobs extends ZeeThread{
         else
             gobAutoLabel = null;
 
-        // bugCollectionAuto label bug containers and wood pile
-        if (ZeeManagerCraft.bugColRecipeOpen && !ZeeManagerCraft.bugColBusy){
-            ZeeManagerCraft.bugColGobClicked(gob);
-        }
+        // crafting rec
+        if (ZeeManagerCraft.isCraftRecording)
+            ZeeManagerCraft.craftRecGobClicked(gob);
 
         // label harvested plant ql
         clickedPlantGobForLabelingQl = gobName.endsWith("plants/wine") || gobName.endsWith("plants/hops") || gobName.endsWith("plants/pepper");
