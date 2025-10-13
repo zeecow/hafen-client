@@ -105,10 +105,10 @@ public class Cal extends Widget {
 		else if (a.season().name().contains("Winter"))
             forageables.append("Sleighbell, Snowtop, Snowflakes, Wintergreen");
 		String moon = String.format("Moon: %s",Astronomy.moonPhases[mp]);
-        double gt = ZeeConfig.gameUI.ui.sess.glob.gtime;
-        boolean dawn = gt > 4.45 && gt < 7.15;
-        String gameTime = String.format("Game time: %s %s", (dawn?"(dawn)":""), gt);
-		return(RichText.render(season + "\n" + forageables + "\n" + moon + "\n" + cal + "\n" +gameTime, UI.scale(250)));
+        //double gt = ZeeConfig.gameUI.ui.sess.glob.gtime;
+        //boolean dawn = gt > 4.45 && gt < 7.15;
+        //String gameTime = String.format("Game time: %s %s", (dawn?"(dawn)":""), gt);
+		return(RichText.render(season + "\n" + forageables + "\n" + moon + "\n" + cal + "\n", UI.scale(250)));
 	}
 	return(super.tooltip(c, prev));
     }
