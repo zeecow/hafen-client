@@ -26,6 +26,8 @@
 
 package haven;
 
+import java.math.BigDecimal;
+
 import static java.lang.Math.PI;
 
 public class Cal extends Widget {
@@ -94,8 +96,8 @@ public class Cal extends Widget {
 	    Astronomy a = ui.sess.glob.ast;
 		int mp = (int)Math.round(a.mp * (double)moon.f.length) % moon.f.length;
 		String cal = String.format("%s day of the %s month of the %s year", ord((int)Math.floor(a.md) + 1), ord((int)Math.floor(a.ym) + 1), ord((int)Math.floor(a.years) + 1));
-		String season = String.format("Season: %s, day %d of %d", a.season(), a.scday + 1, a.season().length);
-		StringBuilder forageables = new StringBuilder("Forage: ");
+		String season = String.format("Season :  %s, day %d of %d", a.season(), a.scday + 1, a.season().length);
+		StringBuilder forageables = new StringBuilder("Forage :  ");
 		if (a.season().name().contains("Spring"))
 			forageables.append("Camomile, Chiming Bluebell, Coltsfoot, Marsh-Mallow");
 		else if (a.season().name().contains("Summer"))
@@ -104,12 +106,34 @@ public class Cal extends Widget {
             forageables.append("B.Trumpets, L.Caps, Morels, Parasol, Aut.Leaf, RubyBol.");
 		else if (a.season().name().contains("Winter"))
             forageables.append("Sleighbell, Snowtop, Snowflakes, Wintergreen");
-		String moon = String.format("Moon: %s",Astronomy.moonPhases[mp]);
-        //double gt = ZeeConfig.gameUI.ui.sess.glob.gtime;
-        //boolean dawn = gt > 4.45 && gt < 7.15;
-        //String gameTime = String.format("Game time: %s %s", (dawn?"(dawn)":""), gt);
-		return(RichText.render(season + "\n" + forageables + "\n" + moon + "\n" + cal + "\n", UI.scale(250)));
+		String moon = String.format("Moon :  %s",Astronomy.moonPhases[mp]);
+        double gtime = ZeeConfig.gameUI.ui.sess.glob.gtime;
+        double gt = extractGameTimeString(gtime);
+        boolean dawn = gt > 4.45 && gt < 7.15;
+        String strtime = "Game Time :  "+ gt + (dawn?"  (dawn)": "  (dawn @ 4.45)");
+		return(RichText.render(season + "\n" + forageables + "\n" + moon + "\n" + cal + "\n" + strtime, UI.scale(250)));
 	}
 	return(super.tooltip(c, prev));
     }
+
+    public static double extractGameTimeString(double x) {
+        if (x == 0.0) return 0.0;
+        // get absolute value and integer string without scientific notation
+        BigDecimal bd = new BigDecimal(Double.toString(Math.abs(x))).stripTrailingZeros();
+        // Get plain string in integer form if possible; if there is fractional part, scale to integer
+        int scale = bd.scale();
+        BigDecimal intBd = bd;
+        if (scale > 0) {
+            // make integer by removing decimal point: multiply by 10^scale
+            intBd = bd.movePointRight(scale);
+        }
+        String digits = intBd.toPlainString(); // now an integer string without decimal point
+        String remaining = digits.substring(3); // remove first 3 digits
+        // take up to first 3 digits of remaining, pad with zeros if needed
+        String take = (remaining + "000").substring(0, 3);
+        // build result like d.dd: first digit, decimal, next two digits
+        String outStr = take.charAt(0) + "." + take.substring(1);
+        return Double.parseDouble(outStr);
+    }
+
 }
