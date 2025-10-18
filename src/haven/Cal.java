@@ -109,8 +109,14 @@ public class Cal extends Widget {
 		String moon = String.format("Moon :  %s",Astronomy.moonPhases[mp]);
         double gtime = ZeeConfig.gameUI.ui.sess.glob.gtime;
         double gt = extractGameTimeString(gtime);
-        boolean dawn = gt > 4.45 && gt < 7.15;
-        String strtime = "Game Time :  "+ gt + (dawn?"  (dawn)": "  (dawn @ 4.45)");
+        boolean dawn = a.night && gt > 4.45 && gt < 7.15;
+        String strtime = "Game Time :  "+ gt;
+        if (a.night)
+            strtime += "  (night)";//todo remove?
+        if (dawn)
+            strtime += "  (dawn)";
+        else if (a.night)
+            strtime += "  (dawn @ 4.45)";
 		return(RichText.render(season + "\n" + forageables + "\n" + moon + "\n" + cal + "\n" + strtime, UI.scale(250)));
 	}
 	return(super.tooltip(c, prev));
