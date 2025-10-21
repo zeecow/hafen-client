@@ -107,22 +107,12 @@ public class Cal extends Widget {
 		else if (a.season().name().contains("Winter"))
             forageables.append("Sleighbell, Snowtop, Snowflakes, Wintergreen");
 		String moon = String.format("Moon :  %s",Astronomy.moonPhases[mp]);
-        double gtime = ZeeConfig.gameUI.ui.sess.glob.gtime;
-        double gt = extractGameTimeString(gtime);
-        boolean dawn = a.night && gt > 4.45 && gt < 7.15;
-        String strtime = "Game Time :  "+ gt;
-        if (a.night)
-            strtime += "  (night)";//todo remove?
-        if (dawn)
-            strtime += "  (dawn)";
-        else if (a.night)
-            strtime += "  (dawn @ 4.45)";
-		return(RichText.render(season + "\n" + forageables + "\n" + moon + "\n" + cal + "\n" + strtime, UI.scale(250)));
+		return(RichText.render(season + "\n" + forageables + "\n" + moon + "\n" + cal, UI.scale(250)));
 	}
 	return(super.tooltip(c, prev));
     }
 
-    public static double extractGameTimeString(double x) {
+    public static double extractDouble(double x, int i) {
         if (x == 0.0) return 0.0;
         // get absolute value and integer string without scientific notation
         BigDecimal bd = new BigDecimal(Double.toString(Math.abs(x))).stripTrailingZeros();
@@ -134,9 +124,9 @@ public class Cal extends Widget {
             intBd = bd.movePointRight(scale);
         }
         String digits = intBd.toPlainString(); // now an integer string without decimal point
-        String remaining = digits.substring(3); // remove first 3 digits
-        // take up to first 3 digits of remaining, pad with zeros if needed
-        String take = (remaining + "000").substring(0, 3);
+        String remaining = digits.substring(i); // remove first 3 digits
+        // take up to first i digits of remaining, pad with zeros if needed
+        String take = (remaining + "000").substring(0, i);
         // build result like d.dd: first digit, decimal, next two digits
         String outStr = take.charAt(0) + "." + take.substring(1);
         return Double.parseDouble(outStr);

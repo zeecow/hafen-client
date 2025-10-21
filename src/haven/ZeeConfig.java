@@ -293,6 +293,7 @@ public class ZeeConfig {
     static List<Gob> listCauldronContainers = null;
     public static boolean clickedCraftAll = false;
     static boolean menuFastAnim = Utils.getprefb("menuFastAnim",true);
+    static boolean clickOpiumDragon = Utils.getprefb("clickOpiumDragon",false);
 
     public static boolean playMidiRadio = Utils.getprefb("playMidiRadio",false);
     static Runnable playMidiRadioRunnable = () -> ZeeMidiRadio.toggleRadio();
@@ -3968,6 +3969,10 @@ public class ZeeConfig {
             // auto pick irrlight
             else if (ZeeManagerGobs.autoPickIrrlight && gobName.endsWith("/irrbloss")) {
                 ZeeManagerGobs.autoPickIrrlight();
+            }
+            // click opiumdragon
+            else if (ZeeConfig.clickOpiumDragon && gobName.endsWith("/opiumdragon")){
+                ZeeManagerGobs.gobClick(ob,3);
             }
 
             //gob health

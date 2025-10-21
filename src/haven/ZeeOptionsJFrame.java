@@ -274,6 +274,8 @@ public class ZeeOptionsJFrame extends JFrame {
 
         panelTabAuto.add(new ZeeOptionJCheckBox( "Menu fast animation", "menuFastAnim"),c);
 
+        panelTabAuto.add(new ZeeOptionJCheckBox( "Click opiumdragon", "clickOpiumDragon"),c);
+
         //auto click menu list
         panelTabAuto.add(new JLabel("Automenu list:"), c);
         panelTabAuto.add(tfAutoClickMenu = new JTextField("",5), c);
