@@ -128,9 +128,6 @@ public class ResDrawable extends Drawable implements Sprite.Owner, EquipTarget {
 	    } else if((d == null) || (d.res != res) || !d.sdt.equals(sdt)) {
 		g.setattr(new ResDrawable(g, res, sdt, msg.old));
 	    }
-		ZeeConfig.addGobTagsByResName(g);
-		if (ZeeConfig.highlightCropsReady)
-			ZeeManagerGobs.highlightCropsReady(g);
 	}
     }
 

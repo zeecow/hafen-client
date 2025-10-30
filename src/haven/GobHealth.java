@@ -52,7 +52,7 @@ public class GobHealth extends GAttrib implements Gob.SetupMod {
 	    this.fx = null;
 	}
 	synchronized (g){
-		if ( g.settingsApplied ) {
+		if ( g.firstSettingsApplied) {
 			// add gob label
 			if (hp < 1) {
                 if(ZeeConfig.showGobHealthNumber) {

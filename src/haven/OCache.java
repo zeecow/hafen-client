@@ -87,8 +87,9 @@ public class OCache implements Iterable<Gob> {
 	    synchronized(this) {
 		cbs = new ArrayList<>(this.cbs);
 		objs.put(ob.id, ob);
-        if (!ob.settingsApplied && !ob.isGobWaitingSettings)
+        if (!ob.firstSettingsApplied && !ob.isGobWaitingSettings) {
             ob.isGobWaitingSettings = true;
+        }
 	    }
 	    for(ChangeCallback cb : cbs)
 		cb.added(ob);

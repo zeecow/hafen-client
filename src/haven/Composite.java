@@ -114,12 +114,6 @@ public class Composite extends Drawable implements EquipTarget {
 		Composited.Poses np = comp.new Poses(loadposes(nposes, comp.skel, nposesold));
 		np.set(nposesold?0:ipollen);
 		prevposes = nposes;
-        if (gob.settingsApplied && !gob.poseSettingsApplied) {
-            gob.poseSettingsApplied = true;
-            ZeeConfig.queueGobSettings(gob);
-        }
-		if(gob.hasPointer)
-			ZeeGobPointer.checkPoseAggroDed(gob);
 		nposes = null;
 		updequ();
 	    } catch(Loading e) {}
@@ -140,6 +134,16 @@ public class Composite extends Drawable implements EquipTarget {
 	} else if(!retainequ) {
 	    updequ();
 	}
+    if (!gob.poseSettingsApplied && !gob.poseReady && gob.firstSettingsApplied) {
+        synchronized (gob) {
+            if (ZeeConfig.gobSettingsRequirePose(gob)) {
+                gob.poseReady = true;
+                ZeeConfig.queueGobSettings(gob);
+            }else{
+                gob.poseSettingsApplied = true;
+            }
+        }
+    }
 	comp.tick(dt);
     }
 

@@ -3326,7 +3326,7 @@ public class ZeeManagerGobs extends ZeeThread{
         if (ZeeConfig.hideFxSmoke){
             gob.smokeHighlight = true;
             //highlight already loaded gob (ugly)
-            if (gob.settingsApplied){
+            if (gob.firstSettingsApplied){
                 highlightGobSmoking(gob);
             }
         }else{
@@ -4851,7 +4851,7 @@ public class ZeeManagerGobs extends ZeeThread{
             return;
         }
         Gob gob1 = (Gob) owner;
-        if (!gob1.removed && gob1.settingsApplied) {
+        if (!gob1.removed && gob1.firstSettingsApplied) {
             synchronized (gob1) {
                 gob1.equedOverlays++;
                 // cheeseracks
@@ -4866,7 +4866,7 @@ public class ZeeManagerGobs extends ZeeThread{
     }
 
     public static void checkOverlayRemoved(Gob gob, Sprite spr) {
-        if (!gob.removed && gob.settingsApplied) {
+        if (!gob.removed && gob.firstSettingsApplied) {
             if (spr!=null && spr.res!=null && spr.res.name.contentEquals("gfx/fx/eq")) {
                 synchronized (gob) {
                     gob.equedOverlays--;

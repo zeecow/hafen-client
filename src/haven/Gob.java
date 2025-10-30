@@ -51,8 +51,8 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 	public int totalDmgHp = 0;
 	long requeued = 0;
 	boolean isGobWaitingSettings = false;
-	boolean settingsApplied = false;
-    boolean poseSettingsApplied = false;
+	boolean firstSettingsApplied = false;
+    boolean poseReady =false, poseSettingsApplied=false;
 	boolean pickupPriority = false;
 	Drawable drawable;
 	ZeeHidingGobSprite<ZeeHitbox> hitbox;

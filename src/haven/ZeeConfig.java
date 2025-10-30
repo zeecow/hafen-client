@@ -581,7 +581,7 @@ public class ZeeConfig {
         final List<String> listContains = List.of(
                "/adder","/sandflea","/boar/","/badger/","/bear/","/bat/","/boreworm/",
                 "/ooze/","/cavelouse/","/caveangler/","orca","/goldeneagle/","/lynx/",
-                "/mammoth/","/moose/","/troll/","/walrus/","/goat/","/wolf/","/wolverine/",
+                "/mammoth/","/moose/","/troll/","/walrus/","/goat/wildgoat","/wolf/","/wolverine/",
                 "spermwhale"
         );
         for (String listName : listContains) {
@@ -2837,11 +2837,10 @@ public class ZeeConfig {
     }
 
     public static String getCursorName() {
-        //return cursorName;//too slow for quick farming selection
+        if (gameUI==null || gameUI.map==null)
+            return "";
         try {
-            synchronized(gameUI.map.ui) {
-                return gameUI.map.ui.getcurs(Coord.z).name;
-            }
+            return gameUI.map.ui.getcurs(Coord.z).name;
         } catch(Exception e) {
             println("getCursorName > "+e.getMessage());
         }
@@ -3876,14 +3875,40 @@ public class ZeeConfig {
 
         try {
 
+            //TODO remove?
             if (ob.requeued > maxReqs) {
                 maxReqs = ob.requeued;
                 maxReqstr = ob.getres().name;
             }
 
+            String resName = ob.getres().name;
+
+            if (!ob.firstSettingsApplied)
+                addGobTagsByResName(ob,resName);
+
+            if (!gobSettingsRequirePose(ob) || ob.poseReady) { // TODO simplify if possible, probably not tho
+                // ignore bat if using batcape
+                if (!resName.contentEquals("gfx/kritter/bat/bat") || !ZeeManagerItems.isItemEquipped("/batcape")) {
+                    if (ob.poseReady)
+                        println("poseReady > " + resName);
+                    //else println("no pose required > "+resName);
+                    // audio alerts
+                    ZeeConfig.applyGobSettingsAudio(ob);
+                    // aggro radius
+                    ZeeConfig.applyGobSettingsAggro(ob);
+                }
+                if (ob.poseReady) {
+                    // gob pointer color
+                    ZeeGobPointer.checkPoseAggroDed(ob);
+                    ob.poseSettingsApplied = true;
+                    return;
+                }
+            }
+
             addGobTagsAdvanced(ob);
 
-            String resName = ob.getres().name;;
+            if (ZeeConfig.highlightCropsReady)
+                ZeeManagerGobs.highlightCropsReady(ob);
 
             // main player settings
             if(ob.tags.contains(Gob.Tag.PLAYER_MAIN)) {
@@ -3904,15 +3929,15 @@ public class ZeeConfig {
                             }
 
                             // gob radar (broken)
-                            if (ZeeConfig.showGobRadar) {
-                                ob.addol(ZeeGobPointer.gobRadar = new ZeeGobRadar(ob, Coord3f.of(10, 10, 5), new Color(240, 0, 253, 90)));
-                            }
+                            //if (ZeeConfig.showGobRadar) {
+                            //    ob.addol(ZeeGobPointer.gobRadar = new ZeeGobRadar(ob, Coord3f.of(10, 10, 5), new Color(240, 0, 253, 90)));
+                            //}
 
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
 
-                        ob.settingsApplied = true;
+                        ob.firstSettingsApplied = true;
 
                     }
                 }.start();
@@ -3943,16 +3968,6 @@ public class ZeeConfig {
                     if (matcher.find()){
                         ZeeConsole.gobFindApply(ob);
                     }
-                }
-            }
-
-            // apply settings audio/aggro  (ignore bat if using batcape)
-            if (!resName.contentEquals("gfx/kritter/bat/bat") || !ZeeManagerItems.isItemEquipped("/batcape")) {
-                if (ob.poseSettingsApplied) {
-                    // audio alerts
-                    ZeeConfig.applyGobSettingsAudio(ob);
-                    // aggro radius
-                    ZeeConfig.applyGobSettingsAggro(ob);
                 }
             }
 
@@ -3999,9 +4014,6 @@ public class ZeeConfig {
                 ZeeManagerGobs.discHelpCheckGob(ob);
             }
 
-            // gob pointer color
-            ZeeGobPointer.checkPoseAggroDed(ob);
-
             // save gob name
             if (resName!=null && !resName.isBlank() && !listGobsSession.contains(resName)) {
                 listGobsSession.add(resName);
@@ -4011,45 +4023,54 @@ public class ZeeConfig {
             e.printStackTrace();
         }
 
-        ob.settingsApplied = true;
+        ob.firstSettingsApplied = true;
+        if(ob.poseReady)
+            ob.poseSettingsApplied = true;
+
+    }
+    static boolean gobSettingsRequirePose(Gob gob){
+        if (gob.tags.contains(Gob.Tag.AGGRESSIVE))
+            return true;
+        if (gob.tags.contains(Gob.Tag.PLAYER_OTHER))
+            return true;
+        return false;
     }
 
-    static void addGobTagsByResName(Gob gob) {
-        String gobName = gob.getres().name;
-        if (isTree(gobName)) {
+    static void addGobTagsByResName(Gob gob, String resName) {
+        if (isTree(resName)) {
             gob.tags.add(Gob.Tag.TREE);
         }
-        if (isBush(gobName)){
+        if (isBush(resName)){
             gob.tags.add(Gob.Tag.BUSH);
         }
-        if (isGobCrop(gobName)){
+        if (isGobCrop(resName)){
             gob.tags.add(Gob.Tag.CROP);
         }
-        if (isBug(gobName)){
+        if (isBug(resName)){
             gob.tags.add(Gob.Tag.BUG);
         }
-        if (isBird(gobName)){
+        if (isBird(resName)){
             gob.tags.add(Gob.Tag.BIRD);
         }
-        if (isSmallAnimal(gobName)){
+        if (isSmallAnimal(resName)){
             gob.tags.add(Gob.Tag.SMALL_ANIMAL);
         }
-        if (isAggressive(gobName)){
+        if (isAggressive(resName)){
             gob.tags.add(Gob.Tag.AGGRESSIVE);
         }
-        if(ZeeManagerGobs.isGobWall(gobName)){
+        if(ZeeManagerGobs.isGobWall(resName)){
             gob.tags.add(Gob.Tag.WALL);
         }
-        if (ZeeManagerGobs.isGobHouse(gobName)){
+        if (ZeeManagerGobs.isGobHouse(resName)){
             gob.tags.add(Gob.Tag.HOUSE);
         }
-        if (ZeeManagerGobs.isGobSmokeProducer(gobName)){
+        if (ZeeManagerGobs.isGobSmokeProducer(resName)){
             gob.tags.add(Gob.Tag.SMOKE_PRODUCER);
         }
-        if(ZeeManagerGobs.isGobIdol(gobName)){
+        if(ZeeManagerGobs.isGobIdol(resName)){
             gob.tags.add(Gob.Tag.IDOL);
         }
-        if(ZeeManagerGobs.isGobMineSupport(gobName) || gobName.endsWith("/ladder")){
+        if(ZeeManagerGobs.isGobMineSupport(resName) || resName.endsWith("/ladder")){
             gob.tags.add(Gob.Tag.MINE_SUPPORT);
         }
     }
