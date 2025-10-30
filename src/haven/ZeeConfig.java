@@ -3883,7 +3883,7 @@ public class ZeeConfig {
 
             addGobTagsAdvanced(ob);
 
-            String gobName = ob.getres().name;;
+            String resName = ob.getres().name;;
 
             // main player settings
             if(ob.tags.contains(Gob.Tag.PLAYER_MAIN)) {
@@ -3920,26 +3920,26 @@ public class ZeeConfig {
                 return;
             }
             // radius beeskep
-            else if(showRadiusBeeskep && gobName.endsWith("/terobjs/beehive")) {
+            else if(showRadiusBeeskep && resName.endsWith("/terobjs/beehive")) {
                 toggleRadiusBeeskep(ob);
             }
             // radius trough
-            else if(showRadiusFoodtrough && gobName.endsWith("/terobjs/trough")) {
+            else if(showRadiusFoodtrough && resName.endsWith("/terobjs/trough")) {
                 toggleRadiusFoodtrough(ob);
             }
             // cheeserack color
-            else if(highlightCheeserack && gobName.endsWith("/terobjs/cheeserack")){
+            else if(highlightCheeserack && resName.endsWith("/terobjs/cheeserack")){
                 toggleCheeserack(ob);
             }
             // gardenpot color
-            else if(highlightGardenpot && gobName.endsWith("/terobjs/gardenpot")){
+            else if(highlightGardenpot && resName.endsWith("/terobjs/gardenpot")){
                 toggleGardenpot(ob);
             }
 
             // apply ZeeConsole gobfind
             if (ZeeConsole.isGobFindActive && !ob.tags.contains(Gob.Tag.PLAYER_MAIN)){
                 for (String regex : ZeeConsole.gobFindRegex) {
-                    Matcher matcher = ZeeConfig.getRegexMatcher(gobName, regex);
+                    Matcher matcher = ZeeConfig.getRegexMatcher(resName, regex);
                     if (matcher.find()){
                         ZeeConsole.gobFindApply(ob);
                     }
@@ -3947,11 +3947,13 @@ public class ZeeConfig {
             }
 
             // apply settings audio/aggro  (ignore bat if using batcape)
-            if (!ob.getres().name.contentEquals("gfx/kritter/bat/bat") || !ZeeManagerItems.isItemEquipped("/batcape")) {
-                // audio alerts
-                ZeeConfig.applyGobSettingsAudio(ob);
-                // aggro radius
-                ZeeConfig.applyGobSettingsAggro(ob);
+            if (!resName.contentEquals("gfx/kritter/bat/bat") || !ZeeManagerItems.isItemEquipped("/batcape")) {
+                if (ob.poseSettingsApplied) {
+                    // audio alerts
+                    ZeeConfig.applyGobSettingsAudio(ob);
+                    // aggro radius
+                    ZeeConfig.applyGobSettingsAggro(ob);
+                }
             }
 
             // saved gob color
@@ -3965,19 +3967,19 @@ public class ZeeConfig {
             }
 
             // auto boulder option (maybe remove)
-            if (ZeeConfig.autoChipMinedBoulder && ZeeManagerMiner.isCursorMining() && ZeeManagerGobs.isGobBoulder(gobName)) {
+            if (ZeeConfig.autoChipMinedBoulder && ZeeManagerMiner.isCursorMining() && ZeeManagerGobs.isGobBoulder(resName)) {
                 ZeeManagerMiner.checkBoulderGobAdded(ob);
             }
             // barter stand item search labels
-            else if (ZeeManagerGobs.barterSearchOpen && gobName.endsWith("/barterstand")) {
+            else if (ZeeManagerGobs.barterSearchOpen && resName.endsWith("/barterstand")) {
                 ZeeManagerGobs.addTextBarterStand(ob);
             }
             // auto pick irrlight
-            else if (ZeeManagerGobs.autoPickIrrlight && gobName.endsWith("/irrbloss")) {
+            else if (ZeeManagerGobs.autoPickIrrlight && resName.endsWith("/irrbloss")) {
                 ZeeManagerGobs.autoPickIrrlight();
             }
             // click opiumdragon
-            else if (ZeeConfig.clickOpiumDragon && gobName.endsWith("/opiumdragon")){
+            else if (ZeeConfig.clickOpiumDragon && resName.endsWith("/opiumdragon")){
                 ZeeManagerGobs.gobClick(ob,3);
             }
 
@@ -4001,8 +4003,8 @@ public class ZeeConfig {
             ZeeGobPointer.checkPoseAggroDed(ob);
 
             // save gob name
-            if (gobName!=null && !gobName.isBlank() && !listGobsSession.contains(gobName)) {
-                listGobsSession.add(gobName);
+            if (resName!=null && !resName.isBlank() && !listGobsSession.contains(resName)) {
+                listGobsSession.add(resName);
             }
 
         }catch (Exception e){

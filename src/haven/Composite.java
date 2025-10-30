@@ -114,6 +114,10 @@ public class Composite extends Drawable implements EquipTarget {
 		Composited.Poses np = comp.new Poses(loadposes(nposes, comp.skel, nposesold));
 		np.set(nposesold?0:ipollen);
 		prevposes = nposes;
+        if (gob.settingsApplied && !gob.poseSettingsApplied) {
+            gob.poseSettingsApplied = true;
+            ZeeConfig.queueGobSettings(gob);
+        }
 		if(gob.hasPointer)
 			ZeeGobPointer.checkPoseAggroDed(gob);
 		nposes = null;
