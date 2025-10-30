@@ -1277,6 +1277,12 @@ public class ZeeConfig {
         else if (windowTitle.contentEquals("Equipment")) {
             windowEquipment = window;
         }
+        // wardrobe diff
+        else if(windowTitle.contentEquals("Wardrobe")){
+            if (getButtonNamed(window,"Dress from") == null){
+                windowTitle = "Wardrobe selection";
+            }
+        }
         //main inventory
         else if (windowTitle.contentEquals("Inventory")) {
             windowInvMain = window;
@@ -2859,6 +2865,7 @@ public class ZeeConfig {
     public static void initCharacterVariables() {
         println("initCharacterVariables ");
         mainInv = null;
+        makeWindow = null;
         ZeeManagerItems.invBelt = null;
         ZeeManagerItems.equipory = null;
         ZeeManagerStockpile.windowManager = null;
@@ -2883,7 +2890,6 @@ public class ZeeConfig {
         if (listCauldronContainers!=null)
             listCauldronContainers.clear();
         ZeeManagerGobs.autoPickIrrlightExit();
-        makeWindow = null;
         ZeeManagerMiner.tilesMonitorCleanup();
         ZeeHistWdg.clearHistory();
         ZeeManagerGobs.plowQueueReset();
@@ -4963,11 +4969,11 @@ public class ZeeConfig {
         // char stats for softcap calculation
         for (Indir<Resource> qm : ZeeConfig.makeWindow.qmod) {
             Glob.CAttr stat = ZeeConfig.gameUI.chrwdg.findattr(qm.get().basename());
-            if (stat==null){
+            if (stat == null) {
                 println("updMakewindowStats > stat null");
                 return;
             }
-            ZeeConfig.makeWindow.qmodMapNameStat.put( qm.get().name, stat.comp );
+            ZeeConfig.makeWindow.qmodMapNameStat.put(qm.get().name, stat.comp);
         }
     }
 

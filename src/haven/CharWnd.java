@@ -453,7 +453,7 @@ public class CharWnd extends Window {
 				}
 			}
 		}catch(Exception e){
-			e.printStackTrace();
+			ZeeConfig.println("CharWnd findattr null");
 		}
 		return null;
 	}
