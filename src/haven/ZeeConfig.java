@@ -546,7 +546,8 @@ public class ZeeConfig {
     public static boolean isDungeonIconName(String iconName){
         //todo: ant dungeon
         final List<String> listContains = List.of(
-                "/batcave","/beaverdam","/badgerden","/wolfslair","/beehive","/foxhole"
+            "/batcave","/beaverdam","/badgerden","/wolfslair",
+                "/beehive","/foxhole","/borewormhole"
         );
         for (String listName : listContains) {
             if (iconName.endsWith(listName))

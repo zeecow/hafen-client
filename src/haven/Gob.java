@@ -460,7 +460,14 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 	this(glob, c, -1);
     }
 
+    private Map<Class<? extends GAttrib>, GAttrib> cloneAttr() {
+        synchronized (this.attr) {
+            return new HashMap<>(this.attr);
+        }
+    }
+
     public void ctick(double dt) {
+    Map<Class<? extends GAttrib>, GAttrib> attr = cloneAttr();
 	for(GAttrib a : attr.values())
 	    a.ctick(dt);
 	for(Iterator<Overlay> i = ols.iterator(); i.hasNext();) {
@@ -585,6 +592,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 	}
 
     public void dispose() {
+    Map<Class<? extends GAttrib>, GAttrib> attr = cloneAttr();
 	for(GAttrib a : attr.values())
 	    a.dispose();
     }
@@ -784,6 +792,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 	    if(ol.slots != null)
 		slot.add(ol);
 	}
+    Map<Class<? extends GAttrib>, GAttrib> attr = cloneAttr();
 	for(GAttrib a : attr.values()) {
 	    if(a instanceof RenderTree.Node)
 		slot.add((RenderTree.Node)a);
