@@ -147,7 +147,8 @@ public class ZeeThread  extends Thread{
     }
 
     public static boolean waitGobFollowedIdle(Gob follower){
-        return waitPlayerIdleLinMove();
+        Gob followed = ZeeConfig.getGobFollowTarget(follower);
+        return waitGobIdleVelocity(followed);//LinMove causes multiple calls
     }
 
     public static boolean waitGobIdleVelocity(Gob gob) {
@@ -248,6 +249,17 @@ public class ZeeThread  extends Thread{
     }
 
 
+    public static boolean waitGobIdleLinMove(Gob gob){
+        try {
+            do {
+                sleep(555);
+            }while (ZeeConfig.isGobMovingByAttrLinMove(gob));
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return !ZeeConfig.isGobMovingByAttrLinMove(gob);
+    }
+
     public static boolean waitPlayerIdleLinMove(){
         try {
             do {
@@ -269,10 +281,12 @@ public class ZeeThread  extends Thread{
         // player vehicle idle
         Gob gobFollow = ZeeConfig.getPlayerFollowTarget();
         if (gobFollow!=null){
-            return waitGobFollowedIdle(ZeeConfig.getPlayerGob());
+            //println("gobFollow > "+gobFollow.getres().name);
+            return waitGobFollowedIdle(ZeeConfig.getPlayerGob());//LinMove causes multiple calls
         }
         // player idle on foot
         else {
+            //println("gobFollow null");
             return waitPlayerPose(ZeeConfig.POSE_PLAYER_IDLE);
         }
     }

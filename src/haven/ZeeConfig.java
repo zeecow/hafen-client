@@ -3228,6 +3228,10 @@ public class ZeeConfig {
         return isPlayerMovingOrFollowingByAttrLinMove();
     }
 
+    static boolean isGobMovingByAttrLinMove(Gob gob){
+        return gobHasAttr(gob,"LinMove");
+    }
+
     static boolean isPlayerMovingOrFollowingByAttrLinMove(){
         Gob followed = getPlayerFollowTarget();
         // player following vehicle
