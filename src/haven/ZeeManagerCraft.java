@@ -389,7 +389,10 @@ public class ZeeManagerCraft extends ZeeThread{
         if (craftRecPlaying)
             return;
         String name = gob.getres().name;
-        if (ZeeManagerGobs.isGobCraftingContainer(name) || ZeeManagerGobs.isGobStockpile(name)){
+        if (ZeeManagerGobs.isGobCraftingContainer(name) || ZeeManagerGobs.isGobStockpile(name)
+                || name.contains("/cauldron") || name.endsWith("/crucible")
+                || ZeeManagerGobs.isGobFireSource(gob) )
+        {
             if (craftRecSteps == null)
                 craftRecSteps = new ArrayList<>();
             if (craftRecGet(gob)==null)
@@ -449,10 +452,20 @@ public class ZeeManagerCraft extends ZeeThread{
                     do {
                         // craft item
                         craftButton.click();
-                        sleep(100);
-                        waitPlayerPoseNotInList(ZeeConfig.POSE_PLAYER_DRINK,ZeeConfig.POSE_PLAYER_CRAFT);
-                        // out of mats
-                        if (ZeeConfig.lastUiMsg.contains("You do not have all the ingredients")){
+                        sleep(PING_MS);
+                        if(!waitPlayerPoseNotInList(ZeeConfig.POSE_PLAYER_DRINK,
+                                ZeeConfig.POSE_PLAYER_CRAFT,
+                                ZeeConfig.POSE_PLAYER_CAULDRON_STIR,
+                                ZeeConfig.POSE_PLAYER_PAN_FRYING))
+                        {
+                            println("couldnt wait crafting pose");
+                            craftRecExit();
+                            return;
+                        }
+                        // craft error
+                        if (ZeeConfig.lastUiMsg.contains("You do not have all the ingredients")
+                            || ZeeConfig.lastUiMsg.contains("need to be using"))
+                        {
                             if ( now() - ZeeConfig.lastUIMsgMs < 1000 ){
                                 break;
                             }
@@ -463,50 +476,66 @@ public class ZeeManagerCraft extends ZeeThread{
                         // prepare for next craft
                         for (int i = 0; i < craftRecSteps.size(); i++) {
                             CraftRecStep step = craftRecSteps.get(i);
-                            // right click container
-                            ZeeManagerGobs.gobClick(step.gob,3);
-                            prepareCancelClick();
-                            // wait window open
-                            Window winOpen = waitWindowOpened();
-                            sleep(PING_MS);//wait sel upd?
-                            if (isCancelClick())
-                                break;
-                            if(winOpen == null ){
-                                println("couldnt wait window opened?");
-                                craftRecExit();
-                                return;
-                            }
-                            // select item(s) from window
-                            for (String itemName : step.itemsMainInv) {
-                                List<WItem> itemsAvailable = winOpen.getchild(Inventory.class).getWItemsByNameEndsWith(itemName);
-                                if (itemsAvailable==null || itemsAvailable.isEmpty()){
-                                    ZeeConfig.msgLow("window had no item: "+itemName);
+                            String resName = step.gob.getres().name;
+                            boolean isLastStep = (i == craftRecSteps.size() - 1);
+                            boolean isWorkstation = resName.contains("terobjs/cauldron")
+                                    || resName.endsWith("/brazier")
+                                    || resName.endsWith("/bonfire");
+                            if (isLastStep && isWorkstation){
+                                // open cauldron,brazier,bonfire
+                                if(!ZeeManagerGobs.clickGobPetal(step.gob,0)){
+                                    println("couldnt click petal for gob "+resName);
                                     craftRecExit();
                                     return;
                                 }
-                                // transfer item to inv, close window
-                                itemsAvailable.get(itemsAvailable.size()-1).item.wdgmsg("transfer", Coord.z);
+                                waitWindowOpened();
+                            }
+                            else {
+                                // right click container
+                                ZeeManagerGobs.gobClick(step.gob, 3);
+                                prepareCancelClick();
+                                // wait window open
+                                Window winOpen = waitWindowOpened();
+                                sleep(PING_MS);//wait sel upd?
+                                if (isCancelClick())
+                                    break;
+                                if (winOpen == null) {
+                                    println("couldnt wait window opened?");
+                                    craftRecExit();
+                                    return;
+                                }
+                                // select item(s) from window
+                                for (String itemName : step.itemsMainInv) {
+                                    List<WItem> itemsAvailable = winOpen.getchild(Inventory.class).getWItemsByNameEndsWith(itemName);
+                                    if (itemsAvailable == null || itemsAvailable.isEmpty()) {
+                                        ZeeConfig.msgLow("window had no item: " + itemName);
+                                        craftRecExit();
+                                        return;
+                                    }
+                                    // transfer item to inv, close window
+                                    itemsAvailable.get(itemsAvailable.size() - 1).item.wdgmsg("transfer", Coord.z);
+                                    sleep(PING_MS);
+                                    if (isCancelClick())
+                                        break;
+                                }
+                                if (isCancelClick())
+                                    break;
+                                // keep last window open...
+                                boolean craftWithOpenWindow = step.itemsMainInv.isEmpty() && isLastStep;
+                                if (craftWithOpenWindow) {
+                                    //println("craft with open window from container or stockpile");
+                                    continue;
+                                }
+                                // ... or close window before crafting
+                                lastWindowOpened = null;
+                                winOpen.reqdestroy();
+                                sleep(PING_MS);
+                                ZeeConfig.clickCoord(ZeeConfig.getPlayerCoord(), 1);//really close window
+                                prepareCancelClick();
                                 sleep(PING_MS);
                                 if (isCancelClick())
                                     break;
                             }
-                            if (isCancelClick())
-                                break;
-                            // keep last window open...
-                            boolean craftWithOpenWindow = step.itemsMainInv.isEmpty() && (i == craftRecSteps.size() - 1);
-                            if (craftWithOpenWindow) {
-                                //println("craft with open window from container or stockpile");
-                                continue;
-                            }
-                            // ... or close window before crafting
-                            lastWindowOpened = null;
-                            winOpen.reqdestroy();
-                            sleep(PING_MS);
-                            ZeeConfig.clickCoord(ZeeConfig.getPlayerCoord(),1);//really close window
-                            prepareCancelClick();
-                            sleep(PING_MS);
-                            if (isCancelClick())
-                                break;
                         }
                     }while(!isCancelClick());
                 } catch (Exception e) {
@@ -541,10 +570,8 @@ public class ZeeManagerCraft extends ZeeThread{
     private static class CraftRecStep {
         Gob gob;
         List<String> itemsMainInv;
-        boolean isPile;
         public CraftRecStep(Gob g) {
             this.gob = g;
-            isPile = ZeeManagerGobs.isGobStockpile(g.getres().name);
             itemsMainInv = new ArrayList<>();
         }
     }
