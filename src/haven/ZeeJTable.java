@@ -10,6 +10,7 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Comparator;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -66,13 +67,13 @@ public class ZeeJTable extends JFrame {
     }
 
 
-    // file line format "name;ql;[ingreds;][events;]"
+    // file line format "name;ql;totfep;[ingreds;][events;]"
     // ingreds format: "igr,[name],[perc];"
     private void buildTableFood() {
 
         //table headers
         DefaultTableModel tableModel = new DefaultTableModel();
-        String[] cols = {"name","ql","ingr","evts"};
+        String[] cols = {"name","ql","ingrs","FEP","FEP details"};
         tableModel.setColumnIdentifiers(cols);
 
 
@@ -123,6 +124,10 @@ public class ZeeJTable extends JFrame {
             else{ // no ingreds, empty col
                 lineRow += ";";
             }
+
+
+            //totfep
+            lineRow += arrLine[2] + ";";
 
 
             /*
@@ -203,6 +208,8 @@ public class ZeeJTable extends JFrame {
 
         // add jtable filter
         tableRowSorter = new TableRowSorter<DefaultTableModel>(tableModel);
+        tableRowSorter.setComparator(1, Comparator.comparingInt(o -> Integer.parseInt(o.toString())));//ql
+        tableRowSorter.setComparator(3, Comparator.comparingInt(o ->  Integer.parseInt(o.toString())));//totfep
         table.setRowSorter(tableRowSorter);
         tfFilter = new JTextField();
         this.add(tfFilter, BorderLayout.NORTH);
@@ -227,9 +234,11 @@ public class ZeeJTable extends JFrame {
         });
         // table columns
         TableColumnModel tcm = table.getColumnModel();
-        TableColumn tc = tcm.getColumn(0);
+        TableColumn tc = tcm.getColumn(0);//col name
         tc.setMaxWidth(200);
-        tc = tcm.getColumn(1);
+        tc = tcm.getColumn(1);//col ql
+        tc.setMaxWidth(50);
+        tc = tcm.getColumn(3);//col total feps
         tc.setMaxWidth(50);
         //add table
         JScrollPane scrollPane = new JScrollPane(table);

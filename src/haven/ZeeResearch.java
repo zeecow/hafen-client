@@ -128,8 +128,7 @@ public class ZeeResearch {
     public static void checkFoodTip(List<ItemInfo> info) {
 
         String line = "";
-        String name="", ql="", ingreds="", events="";
-        int ingredsFound = 0;
+        String name="", ql="", ingreds="", totfep="" , events="";
 
         for(ItemInfo ii : info) {
             // food name
@@ -138,11 +137,10 @@ public class ZeeResearch {
             }
             // food quality
             else if(ii instanceof Quality){
-                ql = String.valueOf(ZeeConfig.doubleRound2(((Quality)ii).q)) + ";";
+                ql = (int) ((Quality) ii).q + ";";
             }
             // food ingredient and smoke
             else if (ii.getClass().getSimpleName().contentEquals("Ingredient") || ii.getClass().getSimpleName().contentEquals("Smoke")){
-                ingredsFound++;
                 try {
                     String ingrName = (String) ii.getClass().getDeclaredField("name").get(ii);
                     double ingrVal = ZeeConfig.doubleRound2((Double) ii.getClass().getDeclaredField("val").get(ii));
@@ -151,9 +149,11 @@ public class ZeeResearch {
                     e.printStackTrace();
                 }
             }
-            // food events
             else if (ii instanceof FoodInfo){
                 FoodInfo fi = (FoodInfo) ii;
+                //total fep
+                totfep = ((int)fi.sev) + ";";
+                // food events
                 for (int i = 0; i < fi.evs.length; i++) {
                     events += "evt,"+getShortEventName(fi.evs[i].ev.nm) + "," + ZeeConfig.doubleRound2(fi.evs[i].a) + ";";
                 }
@@ -162,7 +162,7 @@ public class ZeeResearch {
 
         //save line
         if (!name.isBlank() && !ql.isBlank()) {
-            line = name + ql + ingreds + events;
+            line = name + ql + totfep + ingreds + events;
             foodSaveEntry(line);
         }
         //else println("research > checkFoodTip > name or ql is blank");
@@ -175,7 +175,6 @@ public class ZeeResearch {
     }
 
     private static void foodSaveEntry(String entry) {
-        // entry format "name;ql;ingreds;events;"
         if (foodEntryExists(entry)){
             return;
         }
@@ -184,7 +183,7 @@ public class ZeeResearch {
     }
 
 
-    // full entry format "name;ql;ingreds;events;"
+    // full entry format "name;ql;fep;ingreds;fepdetails;"
     // key forming fields: "name;ingreds;" (defines unique value)
     // ingreds format: "igr,[name],[perc];"
     private static boolean foodEntryExists(String entry) {
@@ -222,7 +221,7 @@ public class ZeeResearch {
         // foodId format: "foodName[,igrName]"
         String foodId = "";
 
-        // entry format "name;ql;ingreds;events;"
+        // entry format "name;ql;ingreds;feps;fepdetails;"
         String[] arr0 = line.split(";");
 
         for (int i = 0; i < arr0.length; i++) {
