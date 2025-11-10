@@ -2,14 +2,11 @@
 package haven.res.ui.stackinv;
 
 import haven.*;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import static haven.Inventory.*;
 
 /* >wdg: ItemStack */
-@haven.FromResource(name = "ui/stackinv", version = 1)
+@haven.FromResource(name = "ui/stackinv", version = 2)
 public class ItemStack extends Widget implements DTarget {
     public final List<GItem> order = new ArrayList<>();
     public final Map<GItem, WItem> wmap = new HashMap<>();

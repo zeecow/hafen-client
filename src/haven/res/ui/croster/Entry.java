@@ -2,13 +2,14 @@
 package haven.res.ui.croster;
 
 import haven.*;
+import haven.render.*;
+import java.util.*;
+import java.util.function.*;
+import haven.MenuGrid.Pagina;
+import java.awt.Color;
+import java.awt.image.BufferedImage;
 
-import java.awt.*;
-import java.util.Arrays;
-import java.util.function.Function;
-import java.util.function.Predicate;
-
-@haven.FromResource(name = "ui/croster", version = 75)
+@haven.FromResource(name = "ui/croster", version = 76)
 public class Entry extends Widget {
     public static final int WIDTH = CattleRoster.WIDTH;
     public static final int HEIGHT = UI.scale(20);
@@ -89,7 +90,7 @@ public class Entry extends Widget {
     }
 
     public boolean mousedown(MouseDownEvent ev) {
-	if(super.mousedown(ev))
+	if(ev.propagate(this) || super.mousedown(ev))
 	    return(true);
 	getparent(CattleRoster.class).wdgmsg("click", id, ev.b, ui.modflags(), ui.mc);
 	return(true);

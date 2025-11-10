@@ -2,13 +2,14 @@
 package haven.res.ui.croster;
 
 import haven.*;
-import haven.render.Homo3D;
-import haven.render.Pipe;
-import haven.render.RenderTree;
+import haven.render.*;
+import java.util.*;
+import java.util.function.*;
+import haven.MenuGrid.Pagina;
+import java.awt.Color;
+import java.awt.image.BufferedImage;
 
-import java.awt.*;
-
-@haven.FromResource(name = "ui/croster", version = 75)
+@haven.FromResource(name = "ui/croster", version = 76)
 public class CattleId extends GAttrib implements RenderTree.Node, PView.Render2D {
     public final UID id;
 

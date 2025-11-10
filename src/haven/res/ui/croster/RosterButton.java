@@ -1,12 +1,15 @@
 /* Preprocessed source code */
 package haven.res.ui.croster;
 
-import haven.Coord2d;
-import haven.GameUI;
-import haven.MenuGrid;
+import haven.*;
+import haven.render.*;
+import java.util.*;
+import java.util.function.*;
 import haven.MenuGrid.Pagina;
+import java.awt.Color;
+import java.awt.image.BufferedImage;
 
-@haven.FromResource(name = "ui/croster", version = 75)
+@haven.FromResource(name = "ui/croster", version = 76)
 public class RosterButton extends MenuGrid.PagButton {
     public final GameUI gui;
     public RosterWindow wnd;

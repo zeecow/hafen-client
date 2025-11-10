@@ -2,13 +2,14 @@
 package haven.res.ui.croster;
 
 import haven.*;
+import haven.render.*;
+import java.util.*;
+import java.util.function.*;
+import haven.MenuGrid.Pagina;
+import java.awt.Color;
+import java.awt.image.BufferedImage;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-@haven.FromResource(name = "ui/croster", version = 75)
+@haven.FromResource(name = "ui/croster", version = 76)
 public class RosterWindow extends Window {
     public static final Map<Glob, RosterWindow> rosters = new HashMap<>();
     public static int rmseq = 0;

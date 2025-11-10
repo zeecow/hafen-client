@@ -3,13 +3,13 @@ package haven.res.ui.tt.q.quality;
 
 /* $use: ui/tt/q/qbuff */
 import haven.*;
-import haven.res.ui.tt.q.qbuff.QBuff;
-
-import java.awt.*;
+import haven.res.ui.tt.q.qbuff.*;
+import java.awt.Color;
 import java.awt.image.BufferedImage;
+import haven.MenuGrid.Pagina;
 
 /* >tt: Quality */
-@haven.FromResource(name = "ui/tt/q/quality", version = 26)
+@haven.FromResource(name = "ui/tt/q/quality", version = 27)
 public class Quality extends QBuff implements GItem.OverlayInfo<Tex> {
     public static boolean show = Utils.getprefb("qtoggle", true);
     static final BufferedImage fakeicon = ZeeManagerIcons.imgDiamond(5,Color.cyan,false,false,false);
