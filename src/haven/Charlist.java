@@ -200,7 +200,7 @@ public class Charlist extends Widget {
     public void uimsg(String msg, Object... args) {
 	if(msg == "add") {
 	    Char c = new Char((String)args[0]);
-		ZeeSess.charSwitchAddName(c.name, ui.sess.username);
+		ZeeSess.charSwitchAddName(c.name, ui.sess.user.name);
 	    if(args.length > 1) {
 		Object[] rawdesc = (Object[])args[1];
 		Collection<ResData> poses = new ArrayList<>();

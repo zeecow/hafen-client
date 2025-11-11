@@ -46,7 +46,7 @@ public interface MapSource {
 	    if(ir == null)
 		return(null);
 		if (ZeeConfig.minimapSolidColor)
-			img = ZeeManagerIcons.getSolidColorTile(ir.img);//minimap zommed out
+			img = ZeeManagerIcons.getSolidColorTile(ir.img,true);//minimap zommed out
 		else
 			img = ir.img;
 	    texes[t] = img;

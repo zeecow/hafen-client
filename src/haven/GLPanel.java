@@ -226,6 +226,12 @@ public interface GLPanel extends UIPanel, UI.Context {
 	    }
 	    if(curs instanceof Resource) {
 		Resource res = (Resource)curs;
+        // use system arrow pointer
+        if(curs!=lastcursor && res.name.contentEquals(ZeeConfig.CURSOR_ARW)) {
+            lastcursor = null;
+            p.setCursor(Cursor.getDefaultCursor());
+            return;
+        }
 		if(cursmode == "awt") {
 		    if(curs != lastcursor) {
 			try {

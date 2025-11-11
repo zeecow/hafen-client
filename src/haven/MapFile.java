@@ -457,7 +457,7 @@ public class MapFile {
 		    Resource.Image ir = r.layer(Resource.imgc);
 		    if(ir != null) {
 				if (ZeeConfig.minimapSolidColor)
-					texes[t] = ZeeManagerIcons.getSolidColorTile(ir.img);
+					texes[t] = ZeeManagerIcons.getSolidColorTile(ir.img,true);
 				else
 					texes[t] = ir.img;
 		    }

@@ -698,7 +698,7 @@ public class MiniMap extends Widget {
 	boolean playerSegment;
     public void drawparts(GOut g){
 	drawmap(g);
-	if (scale > 1) {
+	if (scale > 1 || dlvl==0) {
 		playerSegment = (sessloc != null) && ((curloc == null) || (sessloc.seg == curloc.seg));
 		if (playerSegment)
 			drawview(g);
@@ -1041,7 +1041,7 @@ public class MiniMap extends Widget {
 	public static final Color VIEW_BG_COLOR = new Color(255, 255, 255, 40);
 
 	void drawview(GOut g) {
-		int zmult = 1 << zoomlevel;
+		int zmult = 1 << zoomlevel; // 2^zoomlevel ?
 		Coord2d sgridsz = new Coord2d(MCache.sgridsz);
 		Gob player = ZeeConfig.getPlayerGob();
 		if(player != null) {

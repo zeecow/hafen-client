@@ -582,8 +582,12 @@ public class ZeeManagerIcons {
     }
 
 
-    public static BufferedImage getSolidColorTile(BufferedImage tileImg) {
-        Color color = getAverageColorFromImage(tileImg,0,0,tileImg.getWidth(),tileImg.getHeight());
+    public static BufferedImage getSolidColorTile(BufferedImage tileImg, boolean desaturate) {
+        Color color;
+        if (desaturate)
+            color = getAverageDesaturatedGrayFromImage(tileImg,0,0,tileImg.getWidth(),tileImg.getHeight(),0.7);
+        else
+            color = getAverageColorFromImage(tileImg,0,0,tileImg.getWidth(),tileImg.getHeight());
         BufferedImage ret = new BufferedImage(tileImg.getWidth(),tileImg.getHeight(),BufferedImage.TYPE_INT_ARGB);
         Graphics2D g = ret.createGraphics();
         g.setColor ( color );
@@ -591,8 +595,7 @@ public class ZeeManagerIcons {
         g.dispose();
         return ret;
     }
-    static Color getAverageColorFromImage(BufferedImage image, int upperLeftX, int upperLeftY, int width,
-                                          int height) {
+    static Color getAverageColorFromImage(BufferedImage image, int upperLeftX, int upperLeftY, int width, int height) {
         int x1 = upperLeftX + width;
         int y1 = upperLeftY + height;
         long sumr = 0, sumg = 0, sumb = 0;
@@ -606,6 +609,47 @@ public class ZeeManagerIcons {
         }
         int num = width * height;
         return new Color( (int) (sumr / num), (int) (sumg / num), (int) (sumb / num));
+    }
+    static Color getAverageDesaturatedGrayFromImage(BufferedImage image, int upperLeftX, int upperLeftY, int width, int height, double desatFactor) {
+        int x1 = upperLeftX + width;
+        int y1 = upperLeftY + height;
+
+        long sumr = 0, sumg = 0, sumb = 0;
+        for (int x = upperLeftX; x < x1; x++) {
+            for (int y = upperLeftY; y < y1; y++) {
+                int rgb = image.getRGB(x, y);
+                sumr += (rgb >> 16) & 0xFF;
+                sumg += (rgb >> 8) & 0xFF;
+                sumb += rgb & 0xFF;
+            }
+        }
+
+        int num = width * height;
+        if (num <= 0) return new Color(0, 0, 0);
+
+        int avgR = (int) (sumr / num);
+        int avgG = (int) (sumg / num);
+        int avgB = (int) (sumb / num);
+
+        // clamp factor
+        desatFactor = Math.max(0.0, Math.min(1.0, desatFactor));
+
+        // perceptual luminance (rec. 709)
+        double lum = 0.2126 * avgR + 0.7152 * avgG + 0.0722 * avgB;
+
+        int rr = (int) Math.round(avgR + desatFactor * (lum - avgR));
+        int gg = (int) Math.round(avgG + desatFactor * (lum - avgG));
+        int bb = (int) Math.round(avgB + desatFactor * (lum - avgB));
+
+        rr = clamp(rr, 0, 255);
+        gg = clamp(gg, 0, 255);
+        bb = clamp(bb, 0, 255);
+
+        return new Color(rr, gg, bb);
+    }
+
+    static int clamp(int v, int min, int max) {
+        return v < min ? min : (v > max ? max : v);
     }
 
 

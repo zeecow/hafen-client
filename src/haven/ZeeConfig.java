@@ -2839,14 +2839,16 @@ public class ZeeConfig {
     }
 
     public static String getCursorName() {
-        if (gameUI==null || gameUI.map==null)
-            return "";
-        try {
-            return gameUI.map.ui.getcurs(Coord.z).name;
-        } catch(Exception e) {
-            println("getCursorName > "+e.getMessage());
+        String ret = "";
+        if (gameUI!=null && gameUI.map!=null) {
+            try {
+                ret = ((Resource)gameUI.map.ui.getcurs(Coord.z)).name;
+            } catch (Exception e) {
+                println("getCursorName > " + e.getMessage());
+            }
+            //println("getCursorName() = "+ret);
         }
-        return "";
+        return ret;
     }
 
     /**

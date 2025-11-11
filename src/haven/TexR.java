@@ -146,13 +146,13 @@ public abstract class TexR extends Resource.Layer implements Resource.IDLayer<In
 			if (ZeeConfig.pavingSolidColor) {
 				Matcher m = Pattern.compile("gfx/tiles/paving/[^-]+-tex$").matcher(tileName);
 				if (m.find()) {
-					return ZeeManagerIcons.getSolidColorTile(ret);
+					return ZeeManagerIcons.getSolidColorTile(ret,false);
 				}
 			}
 			if (ZeeConfig.terrainSolidColor) {
 				Matcher m = Pattern.compile("gfx/tiles/[^/-]+-tex$").matcher(tileName);
 				if (m.find()) {
-					return ZeeManagerIcons.getSolidColorTile(ret);
+					return ZeeManagerIcons.getSolidColorTile(ret,false);
 				}
 			}
 		}
