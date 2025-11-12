@@ -169,6 +169,11 @@ public abstract class CattleRoster <T extends Entry> extends Widget {
     }
 
     public void addentry(T entry) {
+    try {
+        entry.isDead = (Boolean) entry.getClass().getField("dead").get(entry);
+    } catch (Exception e){
+        ZeeConfig.println("entry > "+e.getMessage());
+    }
 	entries.put(entry.id, entry);
 	entrycont.add(entry, Coord.z);
 	dirty = true;
