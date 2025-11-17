@@ -2889,6 +2889,7 @@ public class ZeeConfig {
         ZeeManagerGobs.isPickingAllGobsClientSide = false;
         ZeeManagerGobs.isPickingUpClosestGob = false;
         ZeeManagerCraft.lastWindowOpened = null;
+        ZeeManagerItems.isHoldingFirebrand = false;
         ZeeManagerCraft.craftRecExit();
         if (listCauldronContainers!=null)
             listCauldronContainers.clear();
@@ -3897,9 +3898,6 @@ public class ZeeConfig {
             if (!gobSettingsRequirePose(ob) || ob.poseReady) { // TODO simplify if possible, probably not tho
                 // ignore bat if using batcape
                 if (!resName.contentEquals("gfx/kritter/bat/bat") || !ZeeManagerItems.isItemEquipped("/batcape")) {
-                    if (ob.poseReady)
-                        println("poseReady > " + resName);
-                    //else println("no pose required > "+resName);
                     // audio alerts
                     ZeeConfig.applyGobSettingsAudio(ob);
                     // aggro radius

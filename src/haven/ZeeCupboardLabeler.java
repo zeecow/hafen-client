@@ -1,5 +1,7 @@
 package haven;
 
+import haven.res.lib.vmat.AttrMats;
+
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -34,6 +36,7 @@ public class ZeeCupboardLabeler {
                 houseId += ",";
             houseId += mats.get(i);
         }
+        //println("houseId > "+houseId);
         return houseId;
     }
 
@@ -113,19 +116,16 @@ public class ZeeCupboardLabeler {
     private static List<String> getHouseMatsBasenames(Gob house) {
         List<String> basenames = new ArrayList<>();
         try {
-            GAttrib attr = null;
-            for (GAttrib a : house.attr.values()) {
-                if (a.getClass().getSimpleName().contentEquals("Materials")){
-                    attr = a;
-                    break;
-                }
+            AttrMats attr = (AttrMats) ZeeConfig.getGobAttr(house, AttrMats.class);
+            if (attr==null){
+                println("getHouseMatsBasenames > attr null");
+                return basenames;
             }
             if (attr!=null){
-                Field f = attr.getClass().getDeclaredField("mats");
-                @SuppressWarnings("unchecked")
-                Map<Integer, Material> mats = (Map<Integer, Material>) f.get(attr);
+                Map<Integer, Material> mats = attr.mats;
                 for (Material m : mats.values()) {
                     //println(m.states.toString());
+                    //match mats basenames
                     Pattern pattern = Pattern.compile("\\/([a-z\\-]+)\\(");
                     Matcher matcher = pattern.matcher(m.states.toString());
                     matcher.find();
@@ -134,8 +134,6 @@ public class ZeeCupboardLabeler {
                         basenames.add(basename);
                 }
             }
-        } catch (NoSuchFieldException | IllegalAccessException e) {
-            e.printStackTrace();
         } catch (IllegalStateException e){
             println("getHouseMatsBasenames > "+e.getMessage());
             return new ArrayList<>();

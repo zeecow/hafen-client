@@ -268,6 +268,62 @@ public class ZeeManagerItems extends ZeeThread{
         return ZeeManagerItems.isLeftHandEmpty() || ZeeManagerItems.isRightHandEmpty();
     }
 
+    static boolean isHoldingFirebrand = false;
+    public static void holdingItemChanged() {
+
+        // not holding item
+        if (ZeeConfig.gameUI.vhand == null){
+            isHoldingFirebrand = false;
+            return;
+        }
+
+        // wait holding item res name
+        boolean resLoading = true;
+        String resName = "";
+        int count = 0;
+        do {
+            try {
+                resName = ZeeConfig.gameUI.vhand.item.getres().name;
+                resLoading = false;
+            } catch (Resource.Loading e) {
+                count ++;
+            } catch (Exception e) {
+                e.printStackTrace();
+                return;
+            }
+        }while (resLoading);
+
+        // firebrand xp counting
+        if (resName.contentEquals("gfx/invobjs/firebrand")) {
+            isHoldingFirebrand = true;
+            countXpEvtFirebrand();
+        }
+        //println(count+" > "+resName);
+    }
+    static  boolean isCountingXpEvtFirebrand = false;
+    private static void countXpEvtFirebrand() {
+        if (isCountingXpEvtFirebrand){
+            println("already counting down firebrand");
+            return;
+        }
+        new ZeeThread(){
+            public void run() {
+                try {
+                    int count = 20;
+                    prepareCancelClick();
+                    while (!isCancelClick() && isHoldingFirebrand && count > 0){
+                        ZeeConfig.addPlayerText("xp in "+count+"s");
+                        sleep(1000);
+                        count--;
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                ZeeConfig.removePlayerText();
+            }
+        }.start();
+    }
+
     private void init(WItem wItem) {
         try{
             equipory = ZeeConfig.windowEquipment.getchild(Equipory.class);
