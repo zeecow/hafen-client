@@ -134,6 +134,8 @@ public class ZeeOptionsJFrame extends JFrame {
 
         panelTabMinimap.add(new ZeeOptionJCheckBox( "Show icons while zoomed out", "showIconsZoomOut"),c);
 
+        panelTabMinimap.add(new ZeeOptionJCheckBox( "Right-click aggro stoat", "clickIconStoatAggro"),c);
+
 
         // checkbox shape icons
         panelTabMinimap.add(cbShapeIcons = new ZeeOptionJCheckBox( "Show basic shape icons", "shapeIcons"),c);
@@ -242,8 +244,6 @@ public class ZeeOptionsJFrame extends JFrame {
         panelTabAuto = new JPanel(new GridBagLayout());
 
         tabbedPane.addTab("Auto", panelTabAuto);
-
-        panelTabAuto.add(new ZeeOptionJCheckBox( "Right-click aggro stoat", "clickIconStoatAggro"),c);
 
         panelTabAuto.add(new ZeeOptionJCheckBox( "Auto chip mined boulder", "autoChipMinedBoulder"),c);
 

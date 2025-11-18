@@ -264,6 +264,14 @@ public class ZeeCupboardLabeler {
     }
 
     public static void checkCupboardContents(Window window) {
+        if (lastCupboardClicked==null){
+            println("lastCupboardClicked null");
+            return;
+        }
+        if (lastCupboardClicked.rc==null){
+            println("lastCupboardClicked.rc null");
+            return;
+        }
         if (window==null){
             println("cupboard window null");
             return;
