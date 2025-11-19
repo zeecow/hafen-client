@@ -288,11 +288,15 @@ public class ZeeManagerGobs extends ZeeThread{
         }
         //toggle beeskep radius
         else if (gobName.endsWith("/beehive")) {
-            ZeeConfig.toggleRadiusBeeskep();
+            ZeeConfig.toggleRadiusBeeskeps();
         }
         //toggle foodtrough radius
         else if (gobName.endsWith("/trough")) {
-            ZeeConfig.toggleRadiusFoodtrough();
+            ZeeConfig.toggleRadiusFoodtroughs();
+        }
+        //toggle mound radius
+        else if (gobName.endsWith("/moundbed")) {
+            ZeeConfig.toggleRadiusMoundbeds();
         }
         // toggle aggressive gob radius
         else if(ZeeConfig.isAggressive(gobName)){
@@ -1899,7 +1903,7 @@ public class ZeeManagerGobs extends ZeeThread{
             return true;
         }
 
-        if(ZeeConfig.nameInListEndsWith(gobName,"/wheelbarrow,/loom,/churn,/swheel,/ropewalk,/meatgrinder,/potterswheel,/quern,/plow,/winepress,/hookah")){
+        if(ZeeConfig.nameInListEndsWith(gobName,"/wheelbarrow,/loom,/churn,/swheel,/ropewalk,/meatgrinder,/potterswheel,/quern,/plow,/winepress,/hookah,/gemwheel")){
             return true;
         }
 

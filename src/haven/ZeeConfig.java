@@ -132,7 +132,7 @@ public class ZeeConfig {
     static final String TILE_MOUNTAIN = "gfx/tiles/mountain";
 
     static final String DEF_LIST_MUTE_AUDIO = "Leashed horse.;Tracking is now turned;Stacking is now turned;must be empty to be unequipped";
-    static final String DEF_LIST_CONFIRM_PETAL = "Empty,Swill,Clean out,Slaughter,Castrate,Unmoor,Declaim,Take possession,Renounce Lawspeaker,Become Lawspeaker,Pull hair,Disassemble,Claim,Set home dock,Crack & Soften,Snort,Extend one";
+    static final String DEF_LIST_CONFIRM_PETAL = "Empty,Swill,Clean out,Slaughter,Castrate,Unmoor,Declaim,Take possession,Renounce Lawspeaker,Become Lawspeaker,Pull hair,Disassemble,Claim,Set home dock,Crack & Soften,Snort,Extend one,Hold up proudly";
     static final List<String> DEF_LIST_CONFIRM_BUTTON = List.of("Empty","Empty out","Abandon quest","Abandon credo","Resign","Forget me");
     static final String DEF_WINS_HIDE_BUTTON = "Inventory,Character Sheet,Basket,Creel,Cattle Roster,Quiver,Pickup Gobs,Switch Char,:zeecow cmds";
     static final String DEF_LIST_BUTCH_AUTO = "Break,Scale,Wring neck,Kill,Skin,Flay,Pluck,Clean,Butcher,Collect bones";
@@ -2288,8 +2288,11 @@ public class ZeeConfig {
         }
     }
 
+    /*
+        radius beeskep
+     */
     static boolean showRadiusBeeskep = false;
-    static void toggleRadiusBeeskep(){
+    static void toggleRadiusBeeskeps(){
         showRadiusBeeskep = ! showRadiusBeeskep;
         List<Gob> beeskeps = findGobsByNameEndsWith("/beehive");
         if (!beeskeps.isEmpty()){
@@ -2298,19 +2301,21 @@ public class ZeeConfig {
             }
         }
     }
-
     static void toggleRadiusBeeskep(Gob skep) {
         if (!showRadiusBeeskep){
             Gob.Overlay radius = skep.findol(ZeeGobRadius.class);
             if (radius!=null)
                 radius.remove();
         }else{
-            skep.addol(new Gob.Overlay(skep, new ZeeGobRadius(skep, null, ZeeGobRadius.RADIUS_BEESKEP,new Color(139, 139, 185, 48))));
+            skep.addol(new Gob.Overlay(skep, new ZeeGobRadius(skep, null, ZeeGobRadius.RADIUS_BEESKEP, ZeeGobRadius.COLOR_RADIUS)));
         }
     }
 
+    /*
+        radius food trough
+     */
     static boolean showRadiusFoodtrough = false;
-    static void toggleRadiusFoodtrough(){
+    static void toggleRadiusFoodtroughs(){
         showRadiusFoodtrough = ! showRadiusFoodtrough;
         List<Gob> foodtroughs = findGobsByNameEndsWith("/trough");
         if (!foodtroughs.isEmpty()){
@@ -2325,7 +2330,30 @@ public class ZeeConfig {
             if (radius!=null)
                 radius.remove();
         }else{
-            trough.addol(new Gob.Overlay(trough, new ZeeGobRadius(trough, null, ZeeGobRadius.RADIUS_FOOD_THROUGH,new Color(139, 139, 185, 48))));
+            trough.addol(new Gob.Overlay(trough, new ZeeGobRadius(trough, null, ZeeGobRadius.RADIUS_FOOD_THROUGH, ZeeGobRadius.COLOR_RADIUS)));
+        }
+    }
+
+    /*
+        radius mound bed
+     */
+    static boolean showRadiusMoundBed = false;
+    static void toggleRadiusMoundbeds(){
+        showRadiusMoundBed = ! showRadiusMoundBed;
+        List<Gob> moundbeds = findGobsByNameEndsWith("/moundbed");
+        if (!moundbeds.isEmpty()){
+            for (Gob t : moundbeds) {
+                toggleRadiusMoundbed(t);
+            }
+        }
+    }
+    static void toggleRadiusMoundbed(Gob trough) {
+        if (!showRadiusMoundBed){
+            Gob.Overlay radius = trough.findol(ZeeGobRadius.class);
+            if (radius!=null)
+                radius.remove();
+        }else{
+            trough.addol(new Gob.Overlay(trough, new ZeeGobRadius(trough, null, ZeeGobRadius.RADIUS_MOUND_BED, ZeeGobRadius.COLOR_RADIUS)));
         }
     }
 
@@ -4005,10 +4033,11 @@ public class ZeeConfig {
             }
 
             //gob health
-            GobHealth healf = ob.getattr(GobHealth.class);
-            if (healf!=null && healf.hp < 1){
-                String s = String.valueOf(healf.hp).replaceFirst("0.", ".");
-                ZeeConfig.addGobText(ob,s,Color.lightGray);
+            if (showGobHealthNumber) {
+                GobHealth healf = ob.getattr(GobHealth.class);
+                if (healf != null && healf.hp < 1) {
+                    healf.showGobHealthNum();
+                }
             }
 
             //hitbox
