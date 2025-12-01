@@ -4424,7 +4424,15 @@ public class ZeeConfig {
         );
     }
 
-    static void checkNewCursorName(String curs) {
+    static void checkNewCursorName(Indir<Resource> res) {
+        if (gameUI==null)
+            return;
+
+        String curs = ZeeConfig.CURSOR_ARW;
+        if (res!=null)
+            curs = res.get().name;
+
+        println("checkNewCursorName = "+curs);
 
         ZeeConfig.cursorName = curs;
 

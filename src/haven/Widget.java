@@ -699,6 +699,7 @@ public class Widget {
 		cursor = Resource.remote().load((String)args[0], Utils.iv(args[1]));
 	    else
 		cursor = ui.sess.getresv(args[0]);
+        ZeeConfig.checkNewCursorName(cursor);
 	} else if(msg == "tip") {
 	    int a = 0;
 	    Object tt = args[a++];

@@ -679,9 +679,6 @@ public class UI {
 	    if(wdg != null) {
 		synchronized(UI.this) {
 		    dispatch(wdg, new Widget.MessageEvent(msg, args));
-			if(msg.contentEquals("curs") && args!=null && args.length>0) {
-				ZeeConfig.checkNewCursorName((String) args[0]);
-			}
 		}
 	    } else {
 		throw(new UIException("Uimsg to non-existent widget " + id, msg, args));

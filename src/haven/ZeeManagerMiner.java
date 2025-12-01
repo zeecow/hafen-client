@@ -68,6 +68,7 @@ public class ZeeManagerMiner extends ZeeThread{
                         if (isCombatActive())
                             return;
 
+                        // mining tunnel or newColTile
                         if (tunnelHelperStage == TUNNELHELPER_STAGE0_IDLE) {
                             tunnelHelperSetStage(TUNNELHELPER_STAGE1_MINETUNNEL);
                         }
@@ -80,14 +81,16 @@ public class ZeeManagerMiner extends ZeeThread{
                         if (!tunneling || isCombatActive())
                             return;
 
-                        // save player coord after mining new col tile
+                        // finished mining new col tile
                         if (tunnelHelperStage == TUNNELHELPER_STAGE3_MINECOL) {
 
+                            // save player coord
                             println("save end coord ");
                             if (tunnelHelperEndCoord != null)
                                 tunnelHelperEndCoordPrev = Coord.of(tunnelHelperEndCoord);
                             tunnelHelperEndCoord = ZeeConfig.getPlayerCoord();
 
+                            // check for boulder on new col tile
                             println("wait mined tile boulder");
                             sleep(1000);
                             Gob boulder = ZeeConfig.getClosestGobToPlayer(getBoulders());
@@ -97,7 +100,31 @@ public class ZeeManagerMiner extends ZeeThread{
                                 waitPlayerIdlePoseOrVehicleIdle();
                             }
 
-                            //pick stone
+                            // remove cave dust close to new col tile
+                            List<Gob> dustList = ZeeConfig.findGobsByNameEndsWith("/cavedust");
+                            dustList.removeIf(gob -> ZeeConfig.distanceToPlayer(gob) > TILE_SIZE*2);
+                            if (!dustList.isEmpty()){
+                                println("dust list  = "+dustList.size());
+                                for (Gob dust : dustList) {
+                                    if (!ZeeConfig.getCursorName().equals(ZeeConfig.CURSOR_ARW)) {
+                                        println("set cursor arrow");
+                                        ZeeConfig.clickRemoveCursor();
+                                        waitCursorName(ZeeConfig.CURSOR_ARW);
+                                    }
+                                    ZeeManagerGobs.gobClick(dust, 3);
+                                    prepareCancelClick();
+                                    //println("wait dust item");
+                                    waitInvItemOrCancelClick();
+                                }
+                                //return to end coord and drop dust
+                                ZeeConfig.clickCoord(tunnelHelperEndCoord,1);
+                                waitPlayerIdlePoseOrVehicleIdle();
+                                ZeeConfig.getMainInventory().dropItemsByNameEndsWith("/cavedust");
+                            }else{
+                                println("cave dust list empty");
+                            }
+
+                            // pick stones
                             tunnelHelperSetStage(TUNNELHELPER_STAGE4_PICKSTONE);
                             tunnelHelperButtonAct.disable(false);
                             ZeeConfig.clickRemoveCursor();
@@ -272,6 +299,7 @@ public class ZeeManagerMiner extends ZeeThread{
     }
 
     public static int tunnelHelperExit() {
+        println("> tunnelHelperExit");
         int ret = tunnelHelperStage;
         mining = false;
         tunneling = false;
