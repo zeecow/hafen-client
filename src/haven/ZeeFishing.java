@@ -1,11 +1,11 @@
 package haven;
 
 import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 public class ZeeFishing {
 
@@ -50,7 +50,7 @@ public class ZeeFishing {
                         ZeeManagerItems.playFeedbackSound();
                         Thread.sleep(500);
                         invCreelOrMain.wdgmsg("drop", wItem.c.div(33));//return switched item
-                        ZeeManagerItems.playFeedbackSound();
+                        //ZeeManagerItems.playFeedbackSound();
                     }
                 } else {
                     ZeeConfig.gameUI.error("no fish rod equipped");
@@ -71,11 +71,16 @@ public class ZeeFishing {
                     return;
                 }
                 if(ZeeManagerItems.pickUpItem(wItem)){
-                    ZeeManagerItems.equiporyItemAct(rodName);//equip holding item
+                    //equip holding item
+                    ZeeManagerItems.equiporyItemAct(rodName);
                     ZeeManagerItems.playFeedbackSound();
                     Thread.sleep(500);
-                    invCreelOrMain.wdgmsg("drop", wItem.c.div(33));//return switched item
+                    //return switched item
+                    invCreelOrMain.wdgmsg("drop", wItem.c.div(33));
                     ZeeManagerItems.playFeedbackSound();
+                    //rebuild icons
+                    Thread.sleep(777);
+                    updateFishingButtons();
                 }
             }
 
@@ -92,6 +97,133 @@ public class ZeeFishing {
         ZeeConfig.removePlayerText();
     }
 
+    private static List<Widget> listUpdWdg = new ArrayList<>();
+    private static List<String> listItemNamesUnique = new ArrayList<>();
+    private static Widget updateFishingButtons(){
+
+        Window win = ZeeConfig.getWindow("Fishing helper");
+        if (win==null) {
+            println("no fishing window found");
+            return null;
+        }
+
+        //println("updatng fish buttons");
+
+        //clear old buttons
+        for (Widget w : listUpdWdg) {
+            w.remove();
+        }
+        listUpdWdg.clear();
+
+        // get fish items
+        List<WItem> fishItems = getFishItemsAvailable();
+        listItemNamesUnique.clear();
+
+        int y=0;
+        Widget wdg = null;
+
+        //add lure buttons
+        wdg = win.add(new Label("Lures: "),0,y);
+        listUpdWdg.add(wdg);
+        for (WItem fitem : fishItems) {
+            // no duplicate buttons
+            if (listItemNamesUnique.contains(fitem.item.getres().name))
+                continue;
+            if (fitem.item.getres().name.contains("/lure-")) {
+                BufferedImage img = fitem.item.getres().flayer(Resource.imgc).scaled();
+                wdg = win.add(new IButton(img,img){
+                    public void wdgmsg(String msg, Object... args) {
+                        if (msg.contentEquals("activate")){
+                            buttonChangeItem(fitem.item.getres().basename(),this);
+                        }
+                    }
+                    public boolean checkhit(Coord c) {
+                        if(!c.isect(Coord.z, Coord.of(img.getWidth(),img.getHeight())))
+                            return(false);
+                        return true;
+                    }
+                },ZeeWindow.posRight(wdg, 2, y));
+                listUpdWdg.add(wdg);
+                listItemNamesUnique.add(fitem.item.getres().name);
+                //highlight prev selected buttons
+                /*Button newBtn = (Button) wdg;
+                if (prevLure.contentEquals(newBtn.text.text)) {
+                    btnLure = newBtn;
+                    highlightButton(newBtn);
+                }*/
+            }
+        }
+
+        y += wdg.sz.y + 3;
+
+        //add line buttons
+        wdg = win.add(new Label("Lines: "),0,y);
+        listUpdWdg.add(wdg);
+        for (WItem fitem : fishItems) {
+            // no duplicate buttons
+            if (listItemNamesUnique.contains(fitem.item.getres().name))
+                continue;
+            if (fitem.item.getres().name.contains("/fline-")) {
+                BufferedImage img = fitem.item.getres().flayer(Resource.imgc).scaled();
+                wdg = win.add(new IButton(img,img){
+                    public void wdgmsg(String msg, Object... args) {
+                        if (msg.contentEquals("activate")){
+                            buttonChangeItem(fitem.item.getres().basename(),this);
+                        }
+                    }
+                    public boolean checkhit(Coord c) {
+                        if(!c.isect(Coord.z, Coord.of(img.getWidth(),img.getHeight())))
+                            return(false);
+                        return true;
+                    }
+                },ZeeWindow.posRight(wdg, 2, y));
+                listUpdWdg.add(wdg);
+                listItemNamesUnique.add(fitem.item.getres().name);
+                //highlight prev selected buttons
+                /*Button newBtn = (Button) wdg;
+                if (prevLine.contentEquals(newBtn.text.text)) {
+                    btnLine = newBtn;
+                    highlightButton(newBtn);
+                }*/
+            }
+        }
+
+        y += wdg.sz.y + 3;
+
+        //add hook btns
+        wdg = win.add(new Label("Hooks: "),0,y);
+        listUpdWdg.add(wdg);
+        for (WItem fitem : fishItems) {
+            // no duplicate buttons
+            if (listItemNamesUnique.contains(fitem.item.getres().name))
+                continue;
+            if (fitem.item.getres().name.contains("/hook-") || fitem.item.getres().name.contains("/chitinhook")) {
+                BufferedImage img = fitem.item.getres().flayer(Resource.imgc).scaled();
+                wdg = win.add(new IButton(img,img){
+                    public void wdgmsg(String msg, Object... args) {
+                        if (msg.contentEquals("activate")){
+                            buttonChangeItem(fitem.item.getres().basename(),this);
+                        }
+                    }
+                    public boolean checkhit(Coord c) {
+                        if(!c.isect(Coord.z, Coord.of(img.getWidth(),img.getHeight())))
+                            return(false);
+                        return true;
+                    }
+                },ZeeWindow.posRight(wdg, 2, y));
+                listUpdWdg.add(wdg);
+                listItemNamesUnique.add(fitem.item.getres().name);
+                //highlight prev selected buttons
+                /*Button newBtn = (Button) wdg;
+                if (prevHook.contentEquals(newBtn.text.text)) {
+                    btnHook = newBtn;
+                    highlightButton(newBtn);
+                }*/
+            }
+        }
+
+        return wdg;
+    }
 
     static TextEntry textEntryAutoFish, textEntryFishAlert;
     public static void buildWindow() {
@@ -101,8 +233,9 @@ public class ZeeFishing {
         Window win = ZeeConfig.getWindow(winName);
 
         if (win!=null) {
-            win.reqdestroy();
-            win = null;
+            //win.reqdestroy();
+            //win = null;
+            return;// TODO remove when updateFishingButtons
         }
 
         win = ZeeConfig.gameUI.add(
@@ -115,85 +248,11 @@ public class ZeeFishing {
                 }
         ,ZeeConfig.gameUI.sz.div(2));
 
-        Widget wdg = null;
+        Widget wdg = updateFishingButtons();
 
-        List<String> fishItems = getFishItemsAvailable();
-
-        int y=0;
-        int letterW = 10;
-
-        //lure buttons
-        wdg = win.add(new Label("Lures: "),0,y);
-        for (String fitem : fishItems) {
-            if (fitem.startsWith("lure-")) {
-                String finalFitem = fitem;
-                fitem = fitem.replaceAll("lure-","");
-                wdg = win.add(new Button((int) (fitem.length()*letterW*.9), fitem) {
-                    public void wdgmsg(String msg, Object... args) {
-                        if (msg.contentEquals("activate")) {
-                            buttonChangeItem(finalFitem,this);
-                        }
-                    }
-                }, ZeeWindow.posRight(wdg, 2, y));
-                //highlight prev selected buttons
-                Button newBtn = (Button) wdg;
-                if (prevLure.contentEquals(newBtn.text.text)) {
-                    btnLure = newBtn;
-                    highlightButton(newBtn);
-                }
-            }
-        }
-
-        y += wdg.sz.y + 3;
-
-        //line buttons
-        wdg = win.add(new Label("Lines: "),0,y);
-        for (String fitem : fishItems) {
-            if (fitem.startsWith("fline-")) {
-                String finalFitem = fitem;
-                fitem = fitem.replaceAll("fline-","");
-                wdg = win.add(new Button((int) (fitem.length()*letterW*.9), fitem) {
-                    public void wdgmsg(String msg, Object... args) {
-                        if (msg.contentEquals("activate")) {
-                            buttonChangeItem(finalFitem,this);
-                        }
-                    }
-                }, ZeeWindow.posRight(wdg, 2, y));
-                //highlight prev selected buttons
-                Button newBtn = (Button) wdg;
-                if (prevLine.contentEquals(newBtn.text.text)) {
-                    btnLine = newBtn;
-                    highlightButton(newBtn);
-                }
-            }
-        }
-
-        y += wdg.sz.y + 3;
-
-        //hooks
-        wdg = win.add(new Label("Hooks: "),0,y);
-        for (String fitem : fishItems) {
-            if (fitem.startsWith("hook-") || fitem.startsWith("chitinhook")) {
-                String finalFitem = fitem;
-                fitem = fitem.replaceAll("hook-","");
-                wdg = win.add(new Button((int) (fitem.length()*letterW*.9), fitem) {
-                    public void wdgmsg(String msg, Object... args) {
-                        if (msg.contentEquals("activate")) {
-                            buttonChangeItem(finalFitem,this);
-                        }
-                    }
-                }, ZeeWindow.posRight(wdg, 2, y));
-                //highlight prev selected buttons
-                Button newBtn = (Button) wdg;
-                if (prevHook.contentEquals(newBtn.text.text)) {
-                    btnHook = newBtn;
-                    highlightButton(newBtn);
-                }
-            }
-        }
-
-        y += wdg.sz.y + 3;
-
+        int y = 0;
+        if(wdg != null)
+            y = wdg.c.y + wdg.sz.y + 3;
 
         // alert fish name
         wdg = win.add(new Label("Alert on fish: "),0,y);
@@ -204,8 +263,7 @@ public class ZeeFishing {
                 else
                     fishNameAlert = buf.line();
             }
-        },ZeeWindow.posRight(wdg,2,y));
-
+        },0,y);
 
         // auto fish checkbox
         wdg = win.add(new CheckBox("Auto fish above %"){
@@ -263,10 +321,10 @@ public class ZeeFishing {
 
     static Button btnLure, btnLine, btnHook;
     static String prevLure="", prevLine="", prevHook="";
-    private static void buttonChangeItem(String fishItemName, Button btn) {
+    private static void buttonChangeItem(String fishItemName, IButton btn) {
 
         // disable buttons to indicate used items
-        if (fishItemName.startsWith("lure-")) {
+        /*if (fishItemName.startsWith("lure-")) {
             if (btnLure!=null)
                 restoreButton(btnLure);
             btnLure = btn;
@@ -286,7 +344,7 @@ public class ZeeFishing {
             btnHook = btn;
             highlightButton(btnHook);
             prevHook = btnHook.text.text;
-        }
+        }*/
 
         // switch fish item
         new ZeeThread(){
@@ -319,7 +377,7 @@ public class ZeeFishing {
         btn.change(btn.text.text);
     }
 
-    static List<String> getFishItemsAvailable() {
+    static List<WItem> getFishItemsAvailable() {
 
         List<WItem> ret = ZeeConfig.getMainInventory().getWItemsByNameContains("fline-", "hook-", "lure-", "chitinhook");
 
@@ -334,7 +392,7 @@ public class ZeeFishing {
         if (ret.isEmpty())
             return new ArrayList<>();
 
-        return ret.stream().map(wItem -> wItem.item.getres().basename()).distinct().collect(Collectors.toList());
+        return ret;
     }
 
     static void println(String msg){

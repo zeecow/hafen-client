@@ -4432,7 +4432,7 @@ public class ZeeConfig {
         if (res!=null)
             curs = res.get().name;
 
-        println("checkNewCursorName = "+curs);
+        //println("checkNewCursorName = "+curs);
 
         ZeeConfig.cursorName = curs;
 
@@ -4462,7 +4462,7 @@ public class ZeeConfig {
 
 
         // fishing window
-        if(curs.contentEquals(CURSOR_FISH) && ZeeManagerItems.isItemEquipped("/primrod")){
+        if(curs.contentEquals(CURSOR_FISH) && ZeeManagerItems.isItemEquipped("/primrod","/bushpole")){
             ZeeFishing.buildWindow();
         }
     }
