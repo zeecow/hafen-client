@@ -430,7 +430,7 @@ public class CharWnd extends Window {
 		    info = new ItemInfo.Raw((Object[])args[a++]);
 		ui.sess.glob.cattr(attr, base, comp, info);
 	    }
-		ZeeConfig.checkCharWndAttrs(args);
+		ZeeConfig.checkCharWndAttrs();
 	} else if(nm == "exp") {
 	    exp = Utils.iv(args[0]);
 	} else if(nm == "enc") {

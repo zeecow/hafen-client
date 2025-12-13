@@ -295,6 +295,7 @@ public class ZeeConfig {
     public static boolean clickedCraftAll = false;
     static boolean menuFastAnim = Utils.getprefb("menuFastAnim",true);
     static boolean clickOpiumDragon = Utils.getprefb("clickOpiumDragon",false);
+    static boolean showMsgAttrChanges = Utils.getprefb("showMsgAttrChanges",true);
 
     public static boolean playMidiRadio = Utils.getprefb("playMidiRadio",false);
     static Runnable playMidiRadioRunnable = () -> ZeeMidiRadio.toggleRadio();
@@ -5024,7 +5025,7 @@ public class ZeeConfig {
         }
     }
 
-    static void checkCharWndAttrs(Object ... args){
+    static void checkCharWndAttrs(){
         //println(strArgs(args));
         updMakewindowStats();
     }

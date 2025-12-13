@@ -3,10 +3,7 @@ package haven;
 import haven.res.ui.stackinv.ItemStack;
 
 import java.awt.image.BufferedImage;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -322,6 +319,18 @@ public class ZeeManagerItems extends ZeeThread{
                 ZeeConfig.removePlayerText();
             }
         }.start();
+    }
+
+    public static void checkAttrUpd(String nm, int prevbase, int prevcomp, int newbase, int newcomp) {
+
+        if (prevcomp==0){
+            //println("init  "+nm+"  "+newcomp);
+            return;
+        }
+        if (newcomp > prevcomp) // increased
+            ZeeConfig.msgLow(nm + "  " + newcomp + "  (+"+(newcomp-prevcomp)+")");
+        else if (newcomp < prevcomp) // decreased
+            ZeeConfig.msgLow(nm + "  " + newcomp + "  (-"+(prevcomp-newcomp)+")");
     }
 
     private void init(WItem wItem) {

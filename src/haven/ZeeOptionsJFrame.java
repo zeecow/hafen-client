@@ -474,6 +474,8 @@ public class ZeeOptionsJFrame extends JFrame {
 
         panelTabInterface.add(new ZeeOptionJCheckBox( "Animate UI messages", "animateUiMessages"),c);
 
+        panelTabInterface.add(new ZeeOptionJCheckBox( "Show msg Attr changes", "showMsgAttrChanges"),c);
+
         panelTabInterface.add(new ZeeOptionJCheckBox( "Fish Moon Xp alert", "fishMoonXpAlert"),c);
 
         panelTabInterface.add(new ZeeOptionJCheckBox( "Show kin names (hearthfire)", "showKinNames"),c);

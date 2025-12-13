@@ -97,10 +97,11 @@ public class ZeeFont {
                 } else {
                     Text lastmsg = entry.getKey();
                     Coord szhalf = ZeeConfig.gameUI.sz.div(2);
+                    int ypad = UI.scale(22 + ((int) (dt * (77))));
                     g.chcolor(0, 0, 0, 192);
-                    g.frect(new Coord(szhalf.x + UI.scale(8), szhalf.y - UI.scale(22 + ((int) (dt * (77))))), lastmsg.sz().add(UI.scale(4), UI.scale(4)));
+                    g.frect(new Coord(szhalf.x + UI.scale(8), szhalf.y - ypad), lastmsg.sz().add(UI.scale(4), UI.scale(4)));
                     g.chcolor();
-                    g.image(lastmsg.tex(), new Coord(szhalf.x + UI.scale(10), szhalf.y -= UI.scale(20 + ((int) (dt * 77)))));
+                    g.image(lastmsg.tex(), new Coord(szhalf.x + UI.scale(10), szhalf.y -= ypad));
                 }
             }
         } catch(Exception e){
@@ -113,6 +114,11 @@ public class ZeeFont {
 
         // add delay to space out msgs vertically
         double t = msgtime - lastmsgtime;
+
+        //TODO fix multiple attrs overlapping (msgs too fast?)
+        if (ZeeConfig.showMsgAttrChanges)
+            println(lastmsg.text+" ,  msgtime "+msgtime+"  ,  "+t);
+
         if ( t < 0.2 )
             if ( t < 0 )
                 msgtime = 0.5; // fixed delay for fast msgs with t<0

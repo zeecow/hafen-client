@@ -106,6 +106,8 @@ public class Glob {
 	}
 	
 	public void update(int base, int comp, ItemInfo.Raw info) {
+        if (ZeeConfig.showMsgAttrChanges)
+            ZeeManagerItems.checkAttrUpd(this.nm,this.base,this.comp,base,comp);
 	    this.base = base;
 	    this.comp = comp;
 	    this.info = info;
