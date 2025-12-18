@@ -582,9 +582,9 @@ public class ZeeManagerIcons {
     }
 
 
-    public static BufferedImage getSolidColorTile(BufferedImage tileImg, boolean desaturate) {
+    public static BufferedImage getSolidColorTile(BufferedImage tileImg, boolean minimapTile) {
         Color color;
-        if (desaturate)
+        if (minimapTile && ZeeConfig.desaturateMinimap)
             color = getAverageDesaturatedGrayFromImage(tileImg,0,0,tileImg.getWidth(),tileImg.getHeight(),0.7);
         else
             color = getAverageColorFromImage(tileImg,0,0,tileImg.getWidth(),tileImg.getHeight());

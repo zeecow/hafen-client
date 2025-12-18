@@ -130,6 +130,8 @@ public class ZeeOptionsJFrame extends JFrame {
 
         panelTabMinimap.add(new ZeeOptionJCheckBox( "Solid colors map", "minimapSolidColor"),c);
 
+        panelTabMinimap.add(new ZeeOptionJCheckBox( "Desaturate minimap tiles", "desaturateMinimap"),c);
+
         panelTabMinimap.add(new ZeeOptionJCheckBox( "Slower map", "slowMiniMap"),c);
 
         panelTabMinimap.add(new ZeeOptionJCheckBox( "Show icons while zoomed out", "showIconsZoomOut"),c);

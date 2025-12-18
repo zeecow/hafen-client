@@ -296,6 +296,7 @@ public class ZeeConfig {
     static boolean menuFastAnim = Utils.getprefb("menuFastAnim",true);
     static boolean clickOpiumDragon = Utils.getprefb("clickOpiumDragon",false);
     static boolean showMsgAttrChanges = Utils.getprefb("showMsgAttrChanges",true);
+    static boolean desaturateMinimap = Utils.getprefb("desaturateMinimap",true);;
 
     public static boolean playMidiRadio = Utils.getprefb("playMidiRadio",false);
     static Runnable playMidiRadioRunnable = () -> ZeeMidiRadio.toggleRadio();
