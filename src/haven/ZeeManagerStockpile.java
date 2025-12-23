@@ -1228,7 +1228,7 @@ public class ZeeManagerStockpile extends ZeeThread{
                                     break;
                                 }
                                 // wait start chopping
-                                if (!waitPlayerPose(ZeeConfig.POSE_PLAYER_CHOPBLOCK)){
+                                if (!waitPlayerPose(ZeeConfig.POSE_PLAYER_CHOP_BLOCK_WALL)){
                                     println("pilan blocks > couldn't chop blocks?");
                                     break;
                                 }

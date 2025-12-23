@@ -90,7 +90,7 @@ public class ZeeConfig {
     static final String POSE_PLAYER_PAN_FRYING = "gfx/borka/frying";
     static final String POSE_PLAYER_SHEARING = "gfx/borka/carving";
     static final String POSE_PLAYER_CHIPPINGSTONE = "gfx/borka/chipping";//no pickaxe
-    static final String POSE_PLAYER_CHOPBLOCK = "gfx/borka/choppan";
+    static final String POSE_PLAYER_CHOP_BLOCK_WALL = "gfx/borka/choppan";
     static final String POSE_PLAYER_CHOPTREE = "gfx/borka/treechop";
     static final String POSE_PLAYER_CRAFT = "gfx/borka/craftan";
     static final String POSE_PLAYER_DIGSHOVEL = "gfx/borka/shoveldig";
@@ -956,7 +956,7 @@ public class ZeeConfig {
 
     static void autoHearth() {
         // cancel click some tasks, hopefully
-        lastMapViewClickButton = 1;
+        simulateCancelClick();
 
         // unmount
         if (isPlayerMountingHorse() && getMainInventory().countItemsByNameContains("/rope") > 0) {
@@ -1821,7 +1821,7 @@ public class ZeeConfig {
     static public String[] arrayPlayerActivePoses = new String[]{
             ZeeConfig.POSE_PLAYER_DRINK,
             ZeeConfig.POSE_PLAYER_CHOPTREE,
-            ZeeConfig.POSE_PLAYER_CHOPBLOCK,
+            ZeeConfig.POSE_PLAYER_CHOP_BLOCK_WALL,
             ZeeConfig.POSE_PLAYER_DIGSHOVEL,
             ZeeConfig.POSE_PLAYER_PICK,
             ZeeConfig.POSE_PLAYER_SAWING,
@@ -2920,6 +2920,7 @@ public class ZeeConfig {
         ZeeManagerGobs.isPickingUpClosestGob = false;
         ZeeManagerCraft.lastWindowOpened = null;
         ZeeManagerItems.isHoldingFirebrand = false;
+        ZeeManagerMiner.isSingleTileMining = false;
         ZeeManagerCraft.craftRecExit();
         if (listCauldronContainers!=null)
             listCauldronContainers.clear();
@@ -4017,7 +4018,7 @@ public class ZeeConfig {
                 ZeeManagerGobs.highlightGobSmoking(ob);
             }
 
-            // auto boulder option (maybe remove)
+            // auto boulder option
             if (ZeeConfig.autoChipMinedBoulder && ZeeManagerMiner.isCursorMining() && ZeeManagerGobs.isGobBoulder(resName)) {
                 ZeeManagerMiner.checkBoulderGobAdded(ob);
             }
@@ -4109,6 +4110,9 @@ public class ZeeConfig {
         }
         if(ZeeManagerGobs.isGobMineSupport(resName) || resName.endsWith("/ladder")){
             gob.tags.add(Gob.Tag.MINE_SUPPORT);
+        }
+        if (resName.endsWith("/cavedust")){
+            ZeeManagerMiner.lastCavedustMs = ZeeThread.now();
         }
     }
 

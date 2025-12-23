@@ -166,7 +166,7 @@ public class ZeeManagerGobs extends ZeeThread{
         }
         // build obj and get more blocks/boards
         else if (gobName.contentEquals("gfx/terobjs/consobj")) {
-            if (ZeeConfig.playerHasAnyPose(ZeeConfig.POSE_PLAYER_CHOPBLOCK)){
+            if (ZeeConfig.playerHasAnyPose(ZeeConfig.POSE_PLAYER_CHOP_BLOCK_WALL)){
                 buildObjAndChopMoreBlocks(gob,ZeeManagerStockpile.lastTreelogChopped);
             }
             else if (ZeeConfig.playerHasAnyPose(ZeeConfig.POSE_PLAYER_SAWING)){
@@ -178,7 +178,7 @@ public class ZeeManagerGobs extends ZeeThread{
             ZeeManagerStockpile.pileInvBoardsAndMakeMore(gob);
         }
         // pile blocks once and chop more
-        else if (gobName.endsWith("/stockpile-wblock") && ZeeConfig.playerHasAnyPose(ZeeConfig.POSE_PLAYER_CHOPBLOCK)) {
+        else if (gobName.endsWith("/stockpile-wblock") && ZeeConfig.playerHasAnyPose(ZeeConfig.POSE_PLAYER_CHOP_BLOCK_WALL)) {
             ZeeManagerStockpile.pileInvBlocksAndMakeMore(gob);
         }
         // pile sand once and dig more
@@ -1016,7 +1016,7 @@ public class ZeeManagerGobs extends ZeeThread{
                 ZeeManagerStockpile.pileBoardsFromTreelog(gob);
             }
             // pile blocks from treelog
-            else if (gobName.endsWith("/stockpile-wblock") && ZeeConfig.playerHasAnyPose(ZeeConfig.POSE_PLAYER_CHOPBLOCK)) {
+            else if (gobName.endsWith("/stockpile-wblock") && ZeeConfig.playerHasAnyPose(ZeeConfig.POSE_PLAYER_CHOP_BLOCK_WALL)) {
                 ZeeManagerStockpile.pileBlocksFromTreelog(gob);
             }
             // pile sand from tile

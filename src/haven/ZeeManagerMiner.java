@@ -26,6 +26,14 @@ public class ZeeManagerMiner extends ZeeThread{
             return;
         }
 
+        // single tile mine helper
+        if (ZeeConfig.gameUI.ui.modshift && ZeeConfig.lastSavedOverlay.a.sz().equals(1,1)){
+            startSingleTileMiner();
+            if (tilemonWindow==null)
+                tileMonitorWindow();
+            return;
+        }
+
         // selection is not mining
         if (!isCursorMining()){
             miningAreaSelectedMs = -1;
@@ -161,6 +169,66 @@ public class ZeeManagerMiner extends ZeeThread{
                     }
                 }
             }.start();
+    }
+
+    static boolean isSingleTileMining = false;
+    static long lastCavedustMs;
+    private static void startSingleTileMiner() {
+        if (isSingleTileMining) {
+            println("already single tile mining");
+            return;
+        }
+        isSingleTileMining = true;
+        lastCavedustMs = now();
+        new ZeeThread(){
+            public void run() {
+                println("tiling > start");
+                try {
+                    ZeeConfig.addPlayerText("tiling "+ZeeConfig.lastSavedOverlayStartCoord);
+                    prepareCancelClick();
+                    long startMs = now();
+                    while(!isCancelClick()) {
+                        println("    wait approach");
+                        waitPlayerIdleLinMove();//approach
+//                        if (isChippingBoulder) {
+//                            println("    wait boulder");
+//                            waitPlayerPoseNotInList(ZeeConfig.POSE_PLAYER_CHIPPINGSTONE, ZeeConfig.POSE_PLAYER_PICK);
+//                        }
+                        println("    wait mining ");
+                        waitPlayerPoseNotInList(ZeeConfig.POSE_PLAYER_DRINK, ZeeConfig.POSE_PLAYER_PICK,
+                                ZeeConfig.POSE_PLAYER_CHOP_BLOCK_WALL,ZeeConfig.POSE_PLAYER_CHIPPINGSTONE);
+                        sleep(500);//wait cavedust
+                        if (lastCavedustMs > startMs){
+                            println("    new cave dust ");
+                            ZeeConfig.msgLow("new cave dust");
+                            break;
+                        }
+                        Coord pc = ZeeConfig.getPlayerTile();
+                        Coord curTile = ZeeConfig.lastSavedOverlayStartCoord;
+                        int directionX = curTile.x - pc.x;
+                        int directionY = curTile.y - pc.y;
+                        Coord nextTile = Coord.of(curTile.x+directionX, curTile.y+directionY);
+                        println("    player "+pc+" , next "+nextTile);
+                        if (isCancelClick()){
+                            println(" tiling cancel click, combat, etc");
+                            break;
+                        }
+                        ZeeConfig.gameUI.map.wdgmsg("sel",nextTile,nextTile,0);
+                        ZeeConfig.lastSavedOverlayStartCoord = ZeeConfig.lastSavedOverlayEndCoord = nextTile;
+                        ZeeConfig.lastSavedOverlayModflags = 0;
+                        if (!waitAnyPlayerPoseFromList(ZeeConfig.POSE_PLAYER_PICK,ZeeConfig.POSE_PLAYER_CHOP_BLOCK_WALL)){
+                            println("tiling > couldnt wait mining pose");
+                            break;
+                        }
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                isSingleTileMining = false;
+                ZeeConfig.removePlayerText();
+                println("tiling > ended");
+            }
+        }.start();
     }
 
     static boolean isCursorMining() {

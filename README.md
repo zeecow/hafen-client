@@ -45,6 +45,7 @@ Controls
   - shift midclick obj to act on all objs
 - shift midclick object toggle highlight object (:zeecow cmd)
 - shift + area mine starts tunnel helper if area matches
+- shift + mint single tile to keep mining until cavedust spawns
 - cancel auto clicking menu petal by holding special key (ctrl,shift,alt,super) 
 - type ":zeecow" for small interactive commands 
 
