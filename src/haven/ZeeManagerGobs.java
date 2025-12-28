@@ -1879,7 +1879,7 @@ public class ZeeManagerGobs extends ZeeThread{
         if( isGobHouseInnerDoor(gobName) ||
             isGobHouse(gobName) ||
             ZeeConfig.nameInListEndsWith(gobName,"/upstairs,/downstairs,/minehole,"+
-                    "/ladder,/cavein,/caveout,/burrow,/igloo,/cellardoor") )
+                    "/ladder,/cavein,/cavein2,/caveout,/burrow,/igloo,/cellardoor") )
         {
             return true;
         }
