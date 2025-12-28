@@ -215,6 +215,8 @@ public class ZeeAudio extends Thread{
     static final String AUDIO_BLOCKER_WIN_TITLE = "Audio Blocker";
     @SuppressWarnings("unchecked")
     static void aBlockCheck(String resname, int subClip) {
+        if (resname.contains("/ambient/"))
+            return; // ignore ambient for now because Exceptions
         if (mapButtonsResClip == null) {
             mapButtonsResClip = new HashMap<>();
         }
