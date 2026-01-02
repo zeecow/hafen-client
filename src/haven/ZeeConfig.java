@@ -757,7 +757,7 @@ public class ZeeConfig {
 
     static boolean isBird(String name){
         final String[] list = {
-            "rockdove","goldeneagle","magpie",
+            "rockdove","goldeneagle","magpie","goshawk",
             "mallard","pelican","seagull","ptarmigan","bullfinch",
             "eagleowl","woodgrouse","/quail","/swan"
         };
