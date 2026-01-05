@@ -137,7 +137,7 @@ public class ZeeConfig {
     static final String DEF_WINS_HIDE_BUTTON = "Inventory,Character Sheet,Basket,Creel,Cattle Roster,Quiver,Pickup Gobs,Switch Char,:zeecow cmds";
     static final String DEF_LIST_BUTCH_AUTO = "Break,Scale,Wring neck,Kill,Skin,Flay,Pluck,Clean,Butcher,Collect bones";
     static final String DEF_LIST_AUTO_CLICK_MENU = "Pick,Harvest wax";
-    static final String DEF_LIST_SHAPEICON = "stalagoomba 1,diamond 7 1 0 0,255 255 0;/amberwash 2,diamond 7 0 1 1,255 102 0;/cavepuddle 2,diamond 7 0 1 1,0 204 102;/ladder 2,triangleUp 5 0 1 1,0 204 102;/minehole 2,triangleDown 5 0 1 1,0 204 102;/burrow 2,triangleDown 6 0 1 1,204 0 255;/spark 2,square 4 0 1 0,102 102 255;/snekkja 2,square 4 0 1 0,255 255 102;/dugout 2,square 4 0 1 0,255 255 102;/wheelbarrow 2,square 4 0 1 0,0 255 255;/cart 2,square 4 0 1 0,0 153 255;/knarr 2,square 4 0 1 0,255 255 102;/rowboat 2,square 4 0 1 0,255 255 102;/horse/ 1,square 4 0 1 0,0 204 0;items/arrow 2,triangleUp 5 0 1 1,102 255 204;milestone-stone-e 2,diamond 4 0 1 1,255 255 255;milestone-wood-e 2,diamond 4 0 1 1,255 255 255;/fishingnet 2,diamond 4 0 1 1,153 153 153;wonders/wellspring 1,diamond 5 0 1 1,0 255 255;/map/starshard 2,diamond 7 0 1 1,255 255 0;naturalminesupport 1,diamond 7 1 0 0,255 255 0;/gemstone 2,diamond 7 0 1 1,255 0 51;/dng/rathole 2,triangleDown 5 0 1 1,255 0 255;";
+    static final String DEF_LIST_SHAPEICON = "stalagoomba 1,diamond 7 1 0 0,255 255 0,0;/amberwash 2,diamond 7 0 1 1,255 102 0,0;/cavepuddle 2,diamond 7 0 1 1,0 204 102,1;/ladder 2,triangleUp 5 0 1 1,0 204 102,0;/minehole 2,triangleDown 5 0 1 1,0 204 102,0;/burrow 2,triangleDown 6 0 1 1,204 0 255,0;/spark 2,square 4 0 1 0,102 102 255,0;/snekkja 2,square 4 0 1 0,255 255 102,0;/dugout 2,square 4 0 1 0,255 255 102,0;/wheelbarrow 2,square 4 0 1 0,0 255 255,0;/cart 2,square 4 0 1 0,0 153 255,0;/knarr 2,square 4 0 1 0,255 255 102,0;/rowboat 2,square 4 0 1 0,255 255 102,0;/horse/ 1,square 4 0 1 0,0 204 0,0;items/arrow 2,triangleUp 5 0 1 1,102 255 204,0;milestone-stone-e 2,diamond 4 0 1 1,255 255 255,0;milestone-wood-e 2,diamond 4 0 1 1,255 255 255,0;/fishingnet 2,diamond 4 0 1 1,153 153 153,0;wonders/wellspring 1,diamond 5 0 1 1,0 255 255,0;/map/starshard 2,diamond 7 0 1 1,255 255 0,0;naturalminesupport 1,diamond 7 1 0 0,255 255 0,0;/gemstone 2,diamond 7 0 1 1,255 0 51,0;/dng/rathole 2,triangleDown 5 0 1 1,255 0 255,0;";
     static final Color DEF_SIMPLE_WINDOW_COLOR = new Color(55, 64, 32, 255);
     static final Color DEF_GRID_COLOR = new Color(204, 204, 255, 45);
     static final int MINIMAP_DRAG_BUTTON = 3;
@@ -3923,8 +3923,19 @@ public class ZeeConfig {
 
             String resName = ob.getres().name;
 
+            // add tags
             if (!ob.firstSettingsApplied)
                 addGobTagsByResName(ob,resName);
+
+            // cavedust ms
+            if (resName.endsWith("/cavedust")) {
+                ZeeManagerMiner.lastCavedustMs = ZeeThread.now();
+            }
+
+            // add shape icon from minimap
+            if (ZeeConfig.shapeIcons){
+                ZeeManagerIcons.addShapeIconToGob(ob);
+            }
 
             if (!gobSettingsRequirePose(ob) || ob.poseReady) { // TODO simplify if possible, probably not tho
                 // ignore bat if using batcape
@@ -4110,9 +4121,6 @@ public class ZeeConfig {
         }
         if(ZeeManagerGobs.isGobMineSupport(resName) || resName.endsWith("/ladder")){
             gob.tags.add(Gob.Tag.MINE_SUPPORT);
-        }
-        if (resName.endsWith("/cavedust")){
-            ZeeManagerMiner.lastCavedustMs = ZeeThread.now();
         }
     }
 

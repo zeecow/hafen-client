@@ -27,7 +27,7 @@ public class ZeeManagerIcons {
         //check all rules for gobName
         for (int i = 0; i < rules.length; i++) {
 
-            // rule example: "/horse/ 1,square 6 0 1,0 255 0;"
+            // rule example: "/horse/ 1,square 6 0 1,0 255 0,0;"
             ruleArr = rules[i].split(",");
 
             // skip gob if name doesnt match rule
@@ -61,7 +61,7 @@ public class ZeeManagerIcons {
         ruleColor = ruleArr[2].split(" ");
         Color c = new Color( Integer.parseInt(ruleColor[0]), Integer.parseInt(ruleColor[1]), Integer.parseInt(ruleColor[2]));
 
-        // generate image ("/horse/ 1,square 6 0 1 0,0 255 0")
+        // generate image ("/horse/ 1,square 6 0 1 0,0 255 0,0")
         ruleShape = ruleArr[1].split(" ");
         int size = Integer.parseInt(ruleShape[1]);
         boolean border = !ruleShape[2].contentEquals("0");
@@ -77,8 +77,6 @@ public class ZeeManagerIcons {
             retImg = imgTriangleDown(size,c,border,shadow,antiAliasing);
         else if (ruleShape[0].contentEquals("diamond"))
             retImg = imgDiamond(size,c,border,shadow,antiAliasing);
-        else if (ruleShape[0].contentEquals("boat"))
-            retImg = imgBoat(size,c,border,shadow,antiAliasing);
         else if (ruleShape[0].contentEquals("star"))
             retImg = imgStar4(size,c,border,shadow,antiAliasing);
 
@@ -282,6 +280,68 @@ public class ZeeManagerIcons {
         return resized;
     }
 
+    static HashMap<String,Object[]> mapGobShapeIcon = new HashMap<>();
+    static void addShapeIconToGob(Gob gob) {
+        try {
+
+            String gobName = gob.getres().name;
+            if (mapGobShapeIcon.containsKey(gobName)){
+                Object[] arr = mapGobShapeIcon.get(gobName);
+                ZeeConfig.addGobText(gob, (String) arr[0], (Color) arr[1]);
+                return;
+            }
+
+            // rule example: "/horse/ 1,square 6 0 1,0 255 0,0;"
+            String[] rules = ZeeConfig.shapeIconsList.split(";");
+
+            // apply first rule matching gob name
+            for (String rule : rules) {
+                String[] arr = rule.split(",");
+
+                //skip rule without "label gob" option
+                if (arr[3].contentEquals("0"))
+                    continue;
+
+                // skip gob if name doesnt match rule
+                String[] ruleName = arr[0].split(" ");
+                if (ruleName[1].contentEquals("0") && !gobName.startsWith(ruleName[0]))
+                    continue;
+                else if (ruleName[1].contentEquals("1") && !gobName.contains(ruleName[0]))
+                    continue;
+                else if (ruleName[1].contentEquals("2") && !gobName.endsWith(ruleName[0]))
+                    continue;
+
+                // color
+                String[] ruleColor = arr[2].split(" ");
+                Color color = new Color( Integer.parseInt(ruleColor[0]), Integer.parseInt(ruleColor[1]), Integer.parseInt(ruleColor[2]));
+
+                String[] ruleShape = arr[1].split(" ");
+                String textIcon = "";
+                if (ruleShape[0].contentEquals("circle"))
+                    textIcon = "●";
+                else if (ruleShape[0].contentEquals("square"))
+                    textIcon = "■";
+                else if (ruleShape[0].contentEquals("triangleUp"))
+                    textIcon = "▲";
+                else if (ruleShape[0].contentEquals("triangleDown"))
+                    textIcon = "▼";
+                else if (ruleShape[0].contentEquals("diamond"))
+                    textIcon = "◆";
+                else if (ruleShape[0].contentEquals("star"))
+                    textIcon = "★";
+                textIcon += gob.getres().basename();
+
+                mapGobShapeIcon.put(gobName,new Object[]{textIcon,color});
+                ZeeConfig.addGobText(gob,textIcon,color);
+
+                break; // applies first matching rule
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     static class ShapeIconsOptPanel extends JPanel{
 
         static JComboBox comboAllRules, nameCombo, shapeCombo;
@@ -289,7 +349,7 @@ public class ZeeManagerIcons {
         static JPanel panelTop, panelCenter, panelBottom;
         static JSpinner jspIconSize;
         static JButton btnGobColor,btnDrawOrderUp,btnDrawOrderDown;
-        static JCheckBox cbBorder, cbShadow, cbAntiAliasing;
+        static JCheckBox cbBorder, cbShadow, cbAntiAliasing, cbLabelGobs;
         static JLabel lblDrawOrder;
 
         public ShapeIconsOptPanel(JComboBox<String> comboAllRules){
@@ -326,7 +386,7 @@ public class ZeeManagerIcons {
             pan = new JPanel(new FlowLayout(FlowLayout.LEFT));
             panelCenter.add(pan,BorderLayout.NORTH);
             pan.add(new JLabel("Icon:"));
-            pan.add(shapeCombo = new JComboBox<>(new String[]{"boat","circle","diamond","square", "star","triangleUp", "triangleDown"}));
+            pan.add(shapeCombo = new JComboBox<>(new String[]{"circle","diamond","square", "star","triangleUp", "triangleDown"}));
             SpinnerNumberModel model = new SpinnerNumberModel(3, 3, 10, 1);
             jspIconSize = new JSpinner(model);
             jspIconSize.setBorder(BorderFactory.createEmptyBorder(2, 5, 2, 5));
@@ -349,6 +409,7 @@ public class ZeeManagerIcons {
                     btnGobColor.setForeground(ZeeConfig.getComplementaryColor(color));
                 }
             });
+            panelBottom.add(cbLabelGobs = new JCheckBox("Label gobs"));
 
             if (comboAllRules.getSelectedIndex() > 0  &&  !comboAllRules.getSelectedItem().toString().isBlank())
                 fillData(comboAllRules.getSelectedItem().toString(), comboAllRules.getSelectedIndex());
@@ -423,11 +484,12 @@ public class ZeeManagerIcons {
         }
 
         private static void fillData(String selectedValue, int selectedIndex){
-            //  "/horse/ 1,square 6 0 1,0 255 0"
+            //  "/horse/ 1,square 6 0 1,0 255 0,0"
             String[] arr = selectedValue.split(",");
             String[] arrGobName = arr[0].split(" ");
             String[] arrShape = arr[1].split(" ");
             String[] arrColor = arr[2].split(" ");
+            boolean labelGob = !arr[3].contentEquals("0");
             lblDrawOrder.setText("Draw order " + (selectedIndex) + "/" + (comboAllRules.getModel().getSize()-1));
             nameCombo.setSelectedIndex(Integer.parseInt(arrGobName[1]));
             nameTF.setText(arrGobName[0]);//gob query
@@ -440,6 +502,7 @@ public class ZeeManagerIcons {
             Color c = new Color(Integer.parseInt(arrColor[0]),Integer.parseInt(arrColor[1]),Integer.parseInt(arrColor[2]));
             btnGobColor.setBackground(c);
             btnGobColor.setForeground(ZeeConfig.getComplementaryColor(c));
+            cbLabelGobs.setSelected(labelGob);
         }
 
         public static String getRule(Component parent){
