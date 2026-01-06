@@ -347,7 +347,6 @@ public class ZeeConfig {
             "gfx/terobjs/algaeblob",
             "gfx/terobjs/watervortex",
             "gfx/terobjs/wonders/burrowerbean",
-
             "gfx/terobjs/dng/rathole" // TODO remove if icon added
     ));
     public final static Set<String> rareForageables = new HashSet<String>(Arrays.asList(
@@ -362,7 +361,8 @@ public class ZeeConfig {
         "gfx/terobjs/map/cavepuddle",
         "gfx/terobjs/herbs/mandrake",
         "gfx/terobjs/herbs/seashell",
-        "gfx/kritter/stalagoomba/stalagoomba"
+        "gfx/kritter/stalagoomba/stalagoomba",
+        "gfx/terobjs/herbs/brownkelp"
     ));
     public final static Set<String> aggressiveGobs = new HashSet<String>(Arrays.asList(
             "gfx/kritter/adder/adder",
@@ -370,6 +370,7 @@ public class ZeeConfig {
             "gfx/kritter/bat/bat",
             "gfx/kritter/bear/bear",
             "gfx/kritter/boar/boar",
+            "gfx/kritter/boreworm/boreworm",
             "gfx/kritter/caveangler/caveangler",
             "gfx/kritter/rat/caverat",
             "gfx/kritter/eagleowl/eagleowl",
