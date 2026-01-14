@@ -173,6 +173,7 @@ public class ZeeManagerMiner extends ZeeThread{
 
     static boolean isSingleTileMining = false;
     static long lastCavedustMs;
+    public static Gob lastCavedust;
     private static void startSingleTileMiner() {
         if (isSingleTileMining) {
             println("already single tile mining");
@@ -188,18 +189,14 @@ public class ZeeManagerMiner extends ZeeThread{
                     prepareCancelClick();
                     long startMs = now();
                     while(!isCancelClick()) {
-                        println("    wait approach");
+                        //println("    wait approach");
                         waitPlayerIdleLinMove();//approach
-//                        if (isChippingBoulder) {
-//                            println("    wait boulder");
-//                            waitPlayerPoseNotInList(ZeeConfig.POSE_PLAYER_CHIPPINGSTONE, ZeeConfig.POSE_PLAYER_PICK);
-//                        }
-                        println("    wait mining ");
+                        //println("    wait mining ");
                         waitPlayerPoseNotInList(ZeeConfig.POSE_PLAYER_DRINK, ZeeConfig.POSE_PLAYER_PICK,
                                 ZeeConfig.POSE_PLAYER_CHOP_BLOCK_WALL,ZeeConfig.POSE_PLAYER_CHIPPINGSTONE);
                         sleep(500);//wait cavedust
                         if (lastCavedustMs > startMs){
-                            println("    new cave dust ");
+                            //println("    new cave dust ");
                             ZeeConfig.msgLow("new cave dust");
                             break;
                         }
@@ -208,16 +205,16 @@ public class ZeeManagerMiner extends ZeeThread{
                         int directionX = curTile.x - pc.x;
                         int directionY = curTile.y - pc.y;
                         Coord nextTile = Coord.of(curTile.x+directionX, curTile.y+directionY);
-                        println("    player "+pc+" , next "+nextTile);
+                        //println("    player "+pc+" , next "+nextTile);
                         if (isCancelClick()){
-                            println(" tiling cancel click, combat, etc");
+                            //println(" tiling cancel click, combat, etc");
                             break;
                         }
                         ZeeConfig.gameUI.map.wdgmsg("sel",nextTile,nextTile,0);
                         ZeeConfig.lastSavedOverlayStartCoord = ZeeConfig.lastSavedOverlayEndCoord = nextTile;
                         ZeeConfig.lastSavedOverlayModflags = 0;
                         if (!waitAnyPlayerPoseFromList(ZeeConfig.POSE_PLAYER_PICK,ZeeConfig.POSE_PLAYER_CHOP_BLOCK_WALL)){
-                            println("tiling > couldnt wait mining pose");
+                            //println("tiling > couldnt wait mining pose");
                             break;
                         }
                     }
@@ -430,6 +427,25 @@ public class ZeeManagerMiner extends ZeeThread{
                     tunneling = false;
                     tunnelHelperSetStage(TUNNELHELPER_STAGE0_IDLE);
                     tunnelHelperEndCoord = tunnelHelperEndCoordPrev = null;
+                }
+            }
+        }.start();
+    }
+
+    public static void checkCaveIn(float str) {
+        if (!isSingleTileMining && !ZeeConfig.labelCavedust)//tiling always label cavedust
+            return;
+        new ZeeThread(){
+            @Override
+            public void run() {
+                try {
+                    sleep(PING_MS*2);
+                    if (lastCavedust != null) {
+                        ZeeConfig.addGobText(ZeeManagerMiner.lastCavedust,((int)str/30)+"",1);
+                    }else
+                        println("last cavedust null");
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
             }
         }.start();

@@ -260,6 +260,7 @@ public class ZeeOptionsJFrame extends JFrame {
         panelTabAuto.add(new ZeeOptionJCheckBox( "Drop mined catgold", "dropMinedCatgold"),c);
         panelTabAuto.add(new ZeeOptionJCheckBox( "Drop mined strangecrystal", "dropMinedSCrystal"),c);
         panelTabAuto.add(new ZeeOptionJCheckBox( "Drop mined gems", "dropMinedGems"),c);
+        panelTabAuto.add(new ZeeOptionJCheckBox( "Label cavedust", "labelCavedust"),c);
 
         panelTabAuto.add(new ZeeOptionJCheckBox( "Auto-run on login", "autoRunLogin"),c);
 

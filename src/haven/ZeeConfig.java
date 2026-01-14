@@ -225,6 +225,7 @@ public class ZeeConfig {
     static boolean dropMinedOre = Utils.getprefb("dropMinedOre", true);
     static boolean dropMinedOrePrecious = Utils.getprefb("dropMinedOrePrecious", false);
     static boolean dropMinedStones = Utils.getprefb("dropMinedStones", true);
+    static boolean labelCavedust = Utils.getprefb("labelCavedust", false);
     static boolean dropCrops = false;
     static boolean treeloganize = false;
     static boolean equiporyCompact = Utils.getprefb("equiporyCompact", false);
@@ -2922,6 +2923,7 @@ public class ZeeConfig {
         ZeeManagerCraft.lastWindowOpened = null;
         ZeeManagerItems.isHoldingFirebrand = false;
         ZeeManagerMiner.isSingleTileMining = false;
+        ZeeManagerMiner.lastCavedust = null;
         ZeeManagerCraft.craftRecExit();
         if (listCauldronContainers!=null)
             listCauldronContainers.clear();
@@ -3930,6 +3932,7 @@ public class ZeeConfig {
 
             // cavedust ms
             if (resName.endsWith("/cavedust")) {
+                ZeeManagerMiner.lastCavedust = ob;
                 ZeeManagerMiner.lastCavedustMs = ZeeThread.now();
             }
 
