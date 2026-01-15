@@ -453,10 +453,6 @@ public class MainFrame extends java.awt.Frame implements Console.Directory {
 
     private static void main2(String[] args) {
 	Config.cmdline(args);
-	if (ZeeConfig.isThinClient){
-		ZeeConfig.runThinClient();
-		return;
-	}
 	status("start");
 	try {
 	    javabughack();

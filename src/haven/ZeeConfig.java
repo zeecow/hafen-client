@@ -237,7 +237,6 @@ public class ZeeConfig {
     public static boolean stopSomeAnimations = Utils.getprefb("stopSomeAnimations", true);
     static boolean hideTileTransitions = Utils.getprefb("hideTileTransitions", true);
     static boolean highlightCropsReady = Utils.getprefb("highlightCropsReady", true);
-    static boolean isThinClient = false;
     static boolean autoTrackScents = Utils.getprefb("autoTrackScents", true);
     public static boolean isRainLimited = Utils.getprefb("isRainLimited", false);
     public static Integer rainLimitPerc = Utils.getprefi("rainLimitPerc", 25);
@@ -761,7 +760,7 @@ public class ZeeConfig {
         final String[] list = {
             "rockdove","goldeneagle","magpie","goshawk",
             "mallard","pelican","seagull","ptarmigan","bullfinch",
-            "eagleowl","woodgrouse","/quail","/swan"
+            "eagleowl","woodgrouse","/quail","/swan","/crane"
         };
         for (int i = 0; i < list.length; i++) {
             if(name.contains(list[i]))
@@ -785,7 +784,7 @@ public class ZeeConfig {
         final String[] list = {
             "bloodstern","camomile","cavebulb","chimingbluebell","clover","coltsfoot","dandelion",
             "edelweiss","frogscrown","heartsease","marshmallow","stingingnettle","thornythistle",
-            "yarrow","snapdragon","wintergreen","tansy","sleighbell"
+            "yarrow","snapdragon","wintergreen","tansy","sleighbell","frostflower"
         };
         for (int i = 0; i < list.length; i++) {
             if(name.contains(list[i]))
@@ -4605,14 +4604,6 @@ public class ZeeConfig {
 
     static boolean isCombatActive(){
         return ZeeConfig.gameUI.fv.current != null;
-    }
-
-    /*
-        run with -t option:
-            "java -jar hafen.jar -t -U http://game.havenandhearth.com/res/ game.havenandhearth.com "
-     */
-    static void runThinClient() {
-        println("run thin client");
     }
 
     static Coord gameUIPrevSz;
