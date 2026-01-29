@@ -1642,9 +1642,9 @@ public class ZeeManagerGobs extends ZeeThread{
         else if(ZeeCupboardLabeler.isActive && gobName.endsWith("/cupboard")){
             ZeeCupboardLabeler.lastCupboardClicked = gob;
         }
-        // entering a house
-        else if (isGobHouse(gobName) && !ZeeConfig.isPlayerMountingHorse()) {
-            gobClick(gob, 3, 0, 16);//gob's door?
+        // click house door, belltower rope
+        else if ( ZeeManagerGobs.gobHasClickableDoorRopeEtc(gobName) && !ZeeConfig.playerHasAttr("Following")) {
+            gobClick(gob, 3, 0, 16);
         }
         // click barrel transfer, label by contents
         else if (gobName.endsWith("/barrel") && ZeeConfig.getPlayerPoses().contains(ZeeConfig.POSE_PLAYER_LIFTING)) {
@@ -1705,11 +1705,11 @@ public class ZeeManagerGobs extends ZeeThread{
             new ZeeThread() {
                 public void run() {
                     Gob wb = ZeeConfig.getClosestGobByNameContains("/wheelbarrow");
-                    if (isGobHouse(finalGobName)) {
+                    if (ZeeManagerGobs.gobHasClickableDoorRopeEtc(finalGobName)) {
                         try {
                             liftGob(wb);
                             sleep(100);
-                            gobClick(gob, 3, 0, 16);//gob's door?
+                            gobClick(gob, 3, 0, 16);
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }
@@ -1735,8 +1735,8 @@ public class ZeeManagerGobs extends ZeeThread{
                             disembarkVehicle(mc);
                             if(waitPlayerPoseNotInListTimeout(1000,ZeeConfig.POSE_PLAYER_KICKSLED_IDLE, ZeeConfig.POSE_PLAYER_KICKSLED_ACTIVE)) {
                                 sleep(100);//lagalagalaga
-                                if (isGobHouse(finalGobName1))
-                                    gobClick(gob, 3, 0, 16);//gob's door?
+                                if (ZeeManagerGobs.gobHasClickableDoorRopeEtc(finalGobName1))
+                                    gobClick(gob, 3, 0, 16);
                                 else
                                     gobClick(gob, 3);
                             }
@@ -1774,6 +1774,10 @@ public class ZeeManagerGobs extends ZeeThread{
         else if (ZeeConfig.isPlayerLiftingGobNamecontains("gfx/terobjs/barrel")!=null && ZeeConfig.nameInListEndsWith(gobName,"/trees/birch,/trees/maple,/trees/terebinth")){
             collectTreeSapUsingBarrel(gob);
         }
+    }
+
+    private static boolean gobHasClickableDoorRopeEtc(String gobName) {
+        return isGobHouse(gobName) || gobName.endsWith("/belltower");
     }
 
     static boolean isPickingKritterDismountHorse = false;
@@ -1839,9 +1843,9 @@ public class ZeeManagerGobs extends ZeeThread{
         new ZeeThread() {
             public void run() {
                 if(dismountHorse(mc)) {
-                    // entering a house
-                    if (isGobHouse(gobName)) {
-                        gobClick(gob, 3, 0, 16);//gob's door?
+                    // house or belltower
+                    if (ZeeManagerGobs.gobHasClickableDoorRopeEtc(gobName)) {
+                        gobClick(gob, 3, 0, 16);
                     }
                     // entering a non-house (cave, cellar, stairs)
                     else {
@@ -1903,7 +1907,7 @@ public class ZeeManagerGobs extends ZeeThread{
             return true;
         }
 
-        if(ZeeConfig.nameInListEndsWith(gobName,"/wheelbarrow,/loom,/churn,/swheel,/ropewalk,/meatgrinder,/potterswheel,/quern,/plow,/winepress,/hookah,/gemwheel")){
+        if(ZeeConfig.nameInListEndsWith(gobName,"/wheelbarrow,/loom,/churn,/swheel,/ropewalk,/meatgrinder,/potterswheel,/quern,/plow,/winepress,/hookah,/gemwheel,/belltower")){
             return true;
         }
 

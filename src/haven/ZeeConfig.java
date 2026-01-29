@@ -537,7 +537,8 @@ public class ZeeConfig {
             "/silkmoth", "/grasshopper", "/ladybug", "/dragonfly",
             "/waterstrider", "/firefly", "/sandflea", "/tick",
             "/cavemoth", "/stagbeetle", "/cavecentipede", "/moonmoth",
-            "/monarchbutterfly", "/grub","/springbumblebee"
+            "/monarchbutterfly", "/grub","/springbumblebee",
+            "dumbledore"//TODO guessing name
         );
         for (String s : l) {
             if(resName.endsWith(s)) {
@@ -784,7 +785,8 @@ public class ZeeConfig {
         final String[] list = {
             "bloodstern","camomile","cavebulb","chimingbluebell","clover","coltsfoot","dandelion",
             "edelweiss","frogscrown","heartsease","marshmallow","stingingnettle","thornythistle",
-            "yarrow","snapdragon","wintergreen","tansy","sleighbell","frostflower"
+            "yarrow","snapdragon","wintergreen","tansy","sleighbell",
+            "frostflower", "blackhenbane" //TODO guessing names
         };
         for (int i = 0; i < list.length; i++) {
             if(name.contains(list[i]))
@@ -914,11 +916,14 @@ public class ZeeConfig {
         String path = "";
 
         // other players
-        if (gob.tags.contains(Gob.Tag.PLAYER_OTHER)) {
-            if (autoHearthOnStranger && !playerHasAnyPose(POSE_PLAYER_TRAVELHOMEPOINT, POSE_PLAYER_TRAVELHOMESHRUG)) {
+        if (gob.tags.contains(Gob.Tag.PLAYER_OTHER) && !ZeeManagerGobs.isGobDeadOrKO(gob)) {
+            if ( autoHearthOnStranger
+                    && autoHearthTimedOut()
+                    && !playerHasAnyPose(POSE_PLAYER_TRAVELHOMEPOINT, POSE_PLAYER_TRAVELHOMESHRUG))
+            {
                 autoHearth();
             }
-            if (alertOnPlayers && !ZeeManagerGobs.isGobDeadOrKO(gob)) {
+            if (alertOnPlayers) {
                 String audio = mapCategoryAudio.get(CATEG_PVPANDSIEGE);
                 if (audio != null && !audio.isEmpty())
                     playAudioGobId(audio, gobId);
@@ -955,6 +960,7 @@ public class ZeeConfig {
         }
     }
 
+    static long lastAutoHearthMs;
     static void autoHearth() {
         // cancel click some tasks, hopefully
         simulateCancelClick();
@@ -976,6 +982,15 @@ public class ZeeConfig {
         else {
             gameUI.act("travel", "hearth");
         }
+    }
+    static boolean autoHearthTimedOut(){
+        boolean ret = false;
+        if(ZeeThread.now() - lastAutoHearthMs > (5*60*1000)) { //5min
+            ret = true;
+        }
+        //reset every check, so must have seen no one for 5min
+        lastAutoHearthMs = ZeeThread.now();
+        return ret;
     }
 
 
@@ -2923,6 +2938,7 @@ public class ZeeConfig {
         ZeeManagerItems.isHoldingFirebrand = false;
         ZeeManagerMiner.isSingleTileMining = false;
         ZeeManagerMiner.lastCavedust = null;
+        lastAutoHearthMs = 0;
         ZeeManagerCraft.craftRecExit();
         if (listCauldronContainers!=null)
             listCauldronContainers.clear();
