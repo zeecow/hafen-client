@@ -264,7 +264,6 @@ public class ZeeConfig {
     static boolean sortActionsByUses = Utils.getprefb("sortActionsByUses", true);
     static boolean rememberWindowsPos = Utils.getprefb("rememberWindowsPos", true);
     static boolean showInspectTooltip = false;
-    static boolean isPlayerFeasting = false;
     static boolean isPlayerCursorMining = false;
     static boolean simpleWindows = Utils.getprefb("simpleWindows", true);
     static int simpleWindowColorInt = Utils.getprefi("simpleWindowColorInt",ZeeConfig.colorToInt(DEF_SIMPLE_WINDOW_COLOR));
@@ -2859,7 +2858,7 @@ public class ZeeConfig {
         }
 
         // feasting msg
-        if (isPlayerFeasting && text.startsWith("You gained ")){
+        if (text.startsWith("You gained ") && (ZeeManagerCraft.windowFeasting!=null || isCursorName(CURSOR_EAT))){
             ZeeManagerCraft.feastingMsgStatGained(text);
         }
         //autostack checkbox on
@@ -4487,11 +4486,6 @@ public class ZeeConfig {
             if (gobBuildPreview!=null && gobBuildPreview.getres()!=null)
                 addGobText(gobBuildPreview,gobBuildPreview.getres().name);
         }
-
-        //feast window
-        isPlayerFeasting = curs.contentEquals(CURSOR_EAT);
-        if(!isPlayerFeasting)
-            ZeeManagerCraft.windowFeasting = null;
 
 
         // fishing window

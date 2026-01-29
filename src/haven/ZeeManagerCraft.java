@@ -2,8 +2,9 @@ package haven;
 
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Map;
 
 @SuppressWarnings("deprecation")
 public class ZeeManagerCraft extends ZeeThread{
@@ -14,10 +15,14 @@ public class ZeeManagerCraft extends ZeeThread{
     static Window windowFeasting;
     public static void feastingMsgStatGained(String msg) {
 
+        int y = 20;
         if (windowFeasting==null){
             windowFeasting = new ZeeWindow(Coord.of(120,100),"Feasting Log");
             ZeeConfig.gameUI.add(windowFeasting,300,300);
-            windowFeasting.add(new Label(" * * * * your noms * * * * "),0,0);
+            if (!mapDrinkCount.isEmpty())
+                feastingDrinkBuffLabelUpd();
+            windowFeasting.add(new Label(" * * * * gains * * * * "),0,y);
+            mapDrinkCount.clear();
         }
 
         //stat name
@@ -29,11 +34,10 @@ public class ZeeManagerCraft extends ZeeThread{
         //println("name: "+newStatName+" , num: "+newStatNum);
 
         //update existing stat label
-        int y = 0;
         boolean labelExists = false;
         for (Label label : windowFeasting.children(Label.class)) {
             y += 17;
-            if (label.texts.contains("your noms"))
+            if (label.texts.contains("gains"))
                 continue;
             // update label color and text
             if (label.texts.startsWith(newStatName)){
@@ -53,13 +57,42 @@ public class ZeeManagerCraft extends ZeeThread{
             Label l = new Label(newStatName+" +"+newStatNum, CharWnd.attrf);
             l.setcolor(Color.green);
             windowFeasting.add(l,0,y);
-            y += 17;
         }
 
         windowFeasting.pack();
     }
 
+    private static HashMap<String,Integer> mapDrinkCount = new HashMap<>();
+    public static void feastingDrinkBuffChanged(String drinkName, int drinkCount){
 
+        if (windowFeasting==null){
+            println("feastingDrinkBuffUpdate > windowFeasting null");
+            return;
+        }
+
+        mapDrinkCount.put(drinkName,drinkCount);
+
+        feastingDrinkBuffLabelUpd();
+    }
+
+    private static void feastingDrinkBuffLabelUpd() {
+        String str = "";
+        for (Map.Entry<String, Integer> entry : mapDrinkCount.entrySet()) {
+            str += entry.getKey() + entry.getValue() + " ";
+        }
+        str = str.strip();
+
+        boolean labelExists  = false;
+        for (Label label : windowFeasting.children(Label.class)) {
+            if (label.c.y == 0){
+                labelExists = true;
+                label.settext(str);
+            }
+        }
+        if (!labelExists){
+            windowFeasting.add(new Label(str),0,0);
+        }
+    }
 
 
     /*
