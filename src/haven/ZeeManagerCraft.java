@@ -10,8 +10,8 @@ import java.util.Map;
 public class ZeeManagerCraft extends ZeeThread{
 
     /*
-        FEASTING LOG WINDOW
-     */
+            FEASTING LOG WINDOW
+         */
     static Window windowFeasting;
     public static void feastingMsgStatGained(String msg) {
 
@@ -36,6 +36,8 @@ public class ZeeManagerCraft extends ZeeThread{
         //update existing stat label
         boolean labelExists = false;
         for (Label label : windowFeasting.children(Label.class)) {
+            if (label.c.y == Y_DRINKS_LBL)//drink buffs
+                continue;
             y += 17;
             if (label.texts.contains("gains"))
                 continue;
@@ -65,16 +67,17 @@ public class ZeeManagerCraft extends ZeeThread{
     private static HashMap<String,Integer> mapDrinkCount = new HashMap<>();
     public static void feastingDrinkBuffChanged(String drinkName, int drinkCount){
 
+        mapDrinkCount.put(drinkName,drinkCount);
+
         if (windowFeasting==null){
             println("feastingDrinkBuffUpdate > windowFeasting null");
             return;
         }
 
-        mapDrinkCount.put(drinkName,drinkCount);
-
         feastingDrinkBuffLabelUpd();
     }
 
+    private static int Y_DRINKS_LBL = 2;
     private static void feastingDrinkBuffLabelUpd() {
         String str = "";
         for (Map.Entry<String, Integer> entry : mapDrinkCount.entrySet()) {
@@ -84,13 +87,14 @@ public class ZeeManagerCraft extends ZeeThread{
 
         boolean labelExists  = false;
         for (Label label : windowFeasting.children(Label.class)) {
-            if (label.c.y == 0){
+            if (label.c.y == Y_DRINKS_LBL){
                 labelExists = true;
                 label.settext(str);
+                break;
             }
         }
         if (!labelExists){
-            windowFeasting.add(new Label(str),0,0);
+            windowFeasting.add(new Label(str),0, Y_DRINKS_LBL);
         }
     }
 
