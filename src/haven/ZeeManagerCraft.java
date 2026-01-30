@@ -17,7 +17,13 @@ public class ZeeManagerCraft extends ZeeThread{
 
         int y = 20;
         if (windowFeasting==null){
-            windowFeasting = new ZeeWindow(Coord.of(120,100),"Feasting Log");
+            windowFeasting = new ZeeWindow(Coord.of(120,100),"Feasting Log"){
+                @Override
+                public void reqclose() {
+                    super.reqclose();
+                    windowFeasting = null;
+                }
+            };
             ZeeConfig.gameUI.add(windowFeasting,300,300);
             if (!mapDrinkCount.isEmpty())
                 feastingDrinkBuffLabelUpd();
