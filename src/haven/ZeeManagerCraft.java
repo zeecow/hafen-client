@@ -70,17 +70,25 @@ public class ZeeManagerCraft extends ZeeThread{
         windowFeasting.pack();
     }
 
-    private static HashMap<String,Integer> mapDrinkCount = new HashMap<>();
+    static HashMap<String,Integer> mapDrinkCount = new HashMap<>();
+    static String lastDrinkCharName ="";
     public static void feastingDrinkBuffChanged(String drinkName, int drinkCount){
 
-        mapDrinkCount.put(drinkName,drinkCount);
-
-        if (windowFeasting==null){
-            println("feastingDrinkBuffUpdate > windowFeasting null");
-            return;
+        // char switch clears drink map
+        if (!lastDrinkCharName.contentEquals(ZeeSess.charSwitchCurPlayingChar)) {
+            mapDrinkCount.clear();
+            lastDrinkCharName = ZeeSess.charSwitchCurPlayingChar;
         }
 
-        feastingDrinkBuffLabelUpd();
+        // count drinks
+        if (drinkCount==0)
+            mapDrinkCount.remove(drinkName);
+        else
+            mapDrinkCount.put(drinkName,drinkCount);
+
+        // update feast window
+        if (windowFeasting!=null)
+            feastingDrinkBuffLabelUpd();
     }
 
     private static int Y_DRINKS_LBL = 2;
