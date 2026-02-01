@@ -513,11 +513,12 @@ public class ZeeManagerIcons {
             String border = cbBorder.isSelected() ? "1" : "0";
             String shadow = cbShadow.isSelected() ? "1" : "0";
             String antiAliasing = cbAntiAliasing.isSelected() ? "1" : "0";
+            String labelGobs = cbLabelGobs.isSelected() ? "1" : "0";
             String rule =  nameTF.getText() +" "+ nameCombo.getSelectedIndex() +","+
                 shapeCombo.getSelectedItem().toString() +" "+ jspIconSize.getValue() +" "+ border +" "+ shadow +" "+ antiAliasing +","+
                 btnGobColor.getBackground().getRed() +" "+
                 btnGobColor.getBackground().getGreen() +" "+
-                btnGobColor.getBackground().getBlue();
+                btnGobColor.getBackground().getBlue() + "," + labelGobs;
             return rule;
         }
     }
