@@ -93,7 +93,11 @@ public class Charlist extends Widget {
 	    Widget avaf = adda(Frame.with(this.ava = new Avaview(Avaview.dasz, -1, "avacam"), false), Coord.of(sz.y / 2), 0.5, 0.5);
 	    name = add(new ILabel(chr.name, nf), avaf.pos("ur").adds(5, 0));
 	    disc = add(new ILabel("", df), name.pos("bl"));
-	    adda(new Button(UI.scale(100), "Play"), pos("cbr").subs(10, 2), 1.0, 1.0).action(() -> Charlist.this.wdgmsg("play", chr.name));
+	    adda(new Button(UI.scale(100), "Play"), pos("cbr").subs(10, 2), 1.0, 1.0)
+            .action(() -> {
+                Charlist.this.wdgmsg("play", chr.name);
+                ZeeSess.charSwitchClicked(chr.name,chr.disc);
+            });
 	}
 
 	public void tick(double dt) {
@@ -183,7 +187,7 @@ public class Charlist extends Widget {
 	    checkdisc();
 	    dirty = false;
 	}
-	if(!ZeeSess.charSwitchNextName.isEmpty())
+	if(!ZeeSess.charSwitchNextNameAndServer.isEmpty())
 		ZeeSess.charSwitchAutoLogin(Charlist.this);
 	super.tick(dt);
     }
@@ -200,7 +204,6 @@ public class Charlist extends Widget {
     public void uimsg(String msg, Object... args) {
 	if(msg == "add") {
 	    Char c = new Char((String)args[0]);
-		ZeeSess.charSwitchAddName(c.name, ui.sess.user.name);
 	    if(args.length > 1) {
 		Object[] rawdesc = (Object[])args[1];
 		Collection<ResData> poses = new ArrayList<>();
@@ -255,6 +258,7 @@ public class Charlist extends Widget {
 		    }
 		}
 	    }
+        ZeeSess.charSwitchAddNameServer( cnm, disc, ui.sess.user.name);
 	} else if(msg == "biggu") {
 	    int id = Utils.iv(args[0]);
 	    if(id < 0) {
@@ -287,12 +291,4 @@ public class Charlist extends Widget {
 	}
 	return(super.keydown(ev));
     }
-
-	@Override
-	public void wdgmsg(String msg, Object... args) {
-		if (msg.contentEquals("play")){
-			ZeeSess.charSwitchStartPlaying((String)args[0]);
-		}
-		super.wdgmsg(msg, args);
-	}
 }

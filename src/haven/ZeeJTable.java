@@ -24,24 +24,24 @@ public class ZeeJTable extends JFrame {
 
     static ZeeJTable getTableFood(){
         if(instanceFood == null) {
-            Path path = Paths.get(System.getProperty("user.home"),ZeeResearch.FILE_NAME_FOOD);
+            Path path = Paths.get(System.getProperty("user.home"),ZeeResearch.fileNameFood);
             if (!path.toFile().exists()){
                 JOptionPane.showMessageDialog(null,"food file not found");
                 return null;
             }
-            instanceFood = new ZeeJTable(ZeeResearch.FILE_NAME_FOOD);
+            instanceFood = new ZeeJTable(ZeeResearch.fileNameFood);
         }
         return instanceFood;
     }
 
     static ZeeJTable getTableSwill(){
         if(instanceSwill == null) {
-            Path path = Paths.get(System.getProperty("user.home"),ZeeResearch.FILE_NAME_HERBALSWILL);
+            Path path = Paths.get(System.getProperty("user.home"),ZeeResearch.fileNameHerbalswill);
             if (!path.toFile().exists()){
                 JOptionPane.showMessageDialog(null,"swill file not found");
                 return null;
             }
-            instanceSwill = new ZeeJTable(ZeeResearch.FILE_NAME_HERBALSWILL);
+            instanceSwill = new ZeeJTable(ZeeResearch.fileNameHerbalswill);
         }
         return instanceSwill;
     }
@@ -59,9 +59,9 @@ public class ZeeJTable extends JFrame {
     }
 
     private void setContents() {
-        if (this.filename.contentEquals(ZeeResearch.FILE_NAME_FOOD)) {
+        if (this.filename.contentEquals(ZeeResearch.fileNameFood)) {
             buildTableFood();
-        }else if (this.filename.contentEquals(ZeeResearch.FILE_NAME_HERBALSWILL)) {
+        }else if (this.filename.contentEquals(ZeeResearch.fileNameHerbalswill)) {
             buildTableSwill();
         }
     }
@@ -78,7 +78,7 @@ public class ZeeJTable extends JFrame {
 
 
         //table lines
-        List<String> lines = ZeeResearch.readAllLinesFromFile(ZeeResearch.FILE_NAME_FOOD);
+        List<String> lines = ZeeResearch.readAllLinesFromFile(ZeeResearch.fileNameFood);
         if (lines==null) {
             println("fillTableFood > couldnt read food file");
             return;
@@ -254,9 +254,9 @@ public class ZeeJTable extends JFrame {
 
     @Override
     public void dispose() {
-        if (this.filename.contentEquals(ZeeResearch.FILE_NAME_FOOD))
+        if (this.filename.contentEquals(ZeeResearch.fileNameFood))
             instanceFood = null;
-        else if (this.filename.contentEquals(ZeeResearch.FILE_NAME_HERBALSWILL))
+        else if (this.filename.contentEquals(ZeeResearch.fileNameHerbalswill))
             instanceSwill = null;
         super.dispose();
     }

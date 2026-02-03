@@ -21,8 +21,8 @@ import static haven.OCache.posres;
 
 public class ZeeResearch {
 
-    static final String FILE_NAME_HERBALSWILL = "haven_research_herbalswill.txt";
-    static final String FILE_NAME_FOOD = "haven_research_food.txt";
+    static String fileNameHerbalswill = "haven_research_herbalswill.txt";
+    static String fileNameFood = "haven_research_food.txt";
     public static String hsElixirStr;
     public static long hsElixirStrMs;
     static List<WItem> hsItemsUsed;
@@ -96,13 +96,13 @@ public class ZeeResearch {
             println("entry already exist > "+entry);
             return;
         }
-        writeLineToFile(entry,FILE_NAME_HERBALSWILL);
-        println("saved "+FILE_NAME_HERBALSWILL+" > "+entry);
+        writeLineToFile(entry, fileNameHerbalswill);
+        println("saved "+ fileNameHerbalswill +" > "+entry);
     }
 
     private static boolean herbalSwillEntryExists(String entry) {
         // entry format "ingr,i1,i2;attr,name,val;heal,name,val;wound,name,val;time,val"
-        List<String> lines = readAllLinesFromFile(FILE_NAME_HERBALSWILL);
+        List<String> lines = readAllLinesFromFile(fileNameHerbalswill);
         if (lines==null)
             return false;
         String[] entryArr = entry.split("&")[0].split(";")[0].split(",");
@@ -178,8 +178,8 @@ public class ZeeResearch {
         if (foodEntryExists(entry)){
             return;
         }
-        writeLineToFile(entry,FILE_NAME_FOOD);
-        println("saved "+FILE_NAME_FOOD+" > "+entry);
+        writeLineToFile(entry, fileNameFood);
+        println("saved "+ fileNameFood +" > "+entry);
     }
 
 
@@ -198,7 +198,7 @@ public class ZeeResearch {
         }
 
         // read lines from file
-        List<String> lines = readAllLinesFromFile(FILE_NAME_FOOD);
+        List<String> lines = readAllLinesFromFile(fileNameFood);
         if (lines==null)
             return false;
         for (int i = 0; i < lines.size(); i++) {
@@ -520,7 +520,17 @@ public class ZeeResearch {
     }
 
 
+    static void setFilenameForServer() {
+        String server = ZeeSess.charSwitchCurPlayingServer.strip().replaceAll("\\s","");
+        fileNameFood = "haven_research_food_"+server+".txt";
+        fileNameHerbalswill = "haven_research_herbalswill_"+server+".txt";
+        println("setFilenameForServer");
+        println("    "+fileNameFood);
+        println("    "+fileNameHerbalswill);
+    }
+
     private static void println(String s) {
         System.out.println(s);
     }
+
 }

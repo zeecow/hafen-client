@@ -9,23 +9,24 @@ public class ZeeSess {
 
     static boolean charSwitchKeepWindow = Utils.getprefb("charSwitchKeepWindow",false);
 
-    static List<String> charSwitchNamesList;
-    static String charSwitchNextName = "";
+    static List<String> charSwitchListNameServer;
+    static String charSwitchNextNameAndServer = "";
     static String charSwitchLastUser = "";
     public static String charSwitchCurPlayingChar;
+    public static String charSwitchCurPlayingServer;
     static long charSwitchLastMs = 0;
 
-    static void charSwitchAddName(String name, String username) {
+    static void charSwitchAddNameServer(String charname, String servername, String username) {
 
         // reset char list if start of session
         if (!username.contentEquals(charSwitchLastUser)){
-            charSwitchNamesList = new ArrayList<>();
+            charSwitchListNameServer = new ArrayList<>();
         }
 
-        // add char name to list
-        if(!charSwitchNamesList.contains(name)) {
-            //println("charSwitchAddName > "+username+" > "+name);
-            charSwitchNamesList.add(name);
+        // add "charname@servername" to list
+        String str = charname+"@"+servername;
+        if(!charSwitchListNameServer.contains(str)) {
+            charSwitchListNameServer.add(str);
         }
 
         charSwitchLastUser = username;
@@ -71,13 +72,17 @@ public class ZeeSess {
         // chars list
         Scrollport scroll = win.add(new Scrollport(new Coord(140, 80)), 0, y);
         y = 0;// inside scrollport
-        for (String charName : charSwitchNamesList) {
+        for (String charAndServer : charSwitchListNameServer) {
+            String[] arr = charAndServer.split("@"); //name@server
+            String charName = arr[0];
+            String serverName = arr[1];
             Button btn = scroll.cont.add(new Button(120,charName){
                 public void wdgmsg(String msg, Object... args) {
                     if (msg.contentEquals("activate")){
-                        charSwitchNextName = charName;
-                        ZeeConfig.gameUI.act("lo", "cs");
+                        ZeeSess.charSwitchClicked(charName,serverName);
+                        charSwitchNextNameAndServer = charAndServer;
                         charSwitchLastMs = ZeeThread.now();
+                        ZeeConfig.gameUI.act("lo", "cs");
                     }
                 }
             },0,y);
@@ -101,31 +106,31 @@ public class ZeeSess {
         }
 
         // auto login
-        else if (!charSwitchNextName.isEmpty() && charlist.ui != null){
-            charlist.wdgmsg("play", charSwitchNextName);
-            charSwitchNextName = "";
+        else if (!charSwitchNextNameAndServer.isEmpty() && charlist.ui != null){
+            charlist.wdgmsg("play", charSwitchNextNameAndServer.split("@")[0]);//char@server
+            charSwitchNextNameAndServer = "";
         }
 
     }
 
     static void charSwitchCancelAutologin(String msg) {
-        if(!charSwitchNextName.isEmpty()) {
+        if(!charSwitchNextNameAndServer.isEmpty()) {
             println("cancel autologin > " + msg);
-            charSwitchNextName = "";
+            charSwitchNextNameAndServer = "";
             charSwitchCurPlayingChar = "";
+            charSwitchCurPlayingServer = "";
             charSwitchKeepWindow = false;
             Utils.setprefb("charSwitchKeepWindow", false);
         }
     }
 
-    static void println(String s) {
-        System.out.println(s);
-    }
-
-    public static void charSwitchStartPlaying(String charName) {
-        charSwitchCurPlayingChar = charName;
-        charSwitchNamesList.remove(charName);
-        charSwitchNamesList.add(0,charName);
+    // called before logout animation, case cancelled
+    public static void charSwitchClicked(String name, String server) {
+        charSwitchCurPlayingChar = name;
+        charSwitchCurPlayingServer = server;
+        String str = name+"@"+server;
+        charSwitchListNameServer.remove(str);
+        charSwitchListNameServer.add(0,str);
     }
 
     public static void newCharList() {
@@ -143,5 +148,9 @@ public class ZeeSess {
         }
 
         ZeeMidiRadio.stopPlayingMidi("charlist");
+    }
+
+    static void println(String s) {
+        System.out.println(s);
     }
 }
