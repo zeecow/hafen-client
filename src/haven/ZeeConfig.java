@@ -155,7 +155,7 @@ public class ZeeConfig {
     static final int LOCATION_UNDERGROUND = 3, DEF_LIGHT_UNDERGROUND = 48;
     static int playerLocation = LOCATION_UNDEFINED;
 
-    static GameUI gameUI;
+    public static GameUI gameUI;
     private static String cursorName = CURSOR_ARW;
     static Window windowEquipment,windowInvMain, toggleEquipsLastWindowClicked;
     static Makewindow makeWindow;
