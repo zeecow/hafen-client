@@ -1405,7 +1405,7 @@ public class ZeeManagerGobs extends ZeeThread{
 
                     //disembark boats
                     gobShip = ZeeConfig.getPlayerFollowTarget();
-                    if (gobShip!=null){
+                    if (gobShip!=null && !gobShip.getres().name.contains("horse")){
                         disembarkBoatAtShore(cmc);
                     }
 
@@ -1427,8 +1427,8 @@ public class ZeeManagerGobs extends ZeeThread{
                         throw  new Exception("inv item is not sand");
 
                     // stop digging, remove cursor
-                    ZeeConfig.stopMovingEscKey();
                     ZeeConfig.clickRemoveCursor();
+                    ZeeConfig.stopMovingEscKey();
 
                     // notify ql
                     int ql = gItem.getInfoQualityInt();
@@ -1485,8 +1485,8 @@ public class ZeeManagerGobs extends ZeeThread{
                         throw  new Exception("inv item is not clay");
 
                     // stop digging, remove cursor
-                    ZeeConfig.stopMovingEscKey();
                     ZeeConfig.clickRemoveCursor();
+                    ZeeConfig.stopMovingEscKey();
 
                     // notify ql
                     int ql = gItem.getInfoQualityInt();
@@ -2502,7 +2502,7 @@ public class ZeeManagerGobs extends ZeeThread{
                 opts.add("inspect sand");
                 menu = new ZeeFlowerMenu(coordMc, opts.toArray(String[]::new));
             }
-            else if(ZeeConfig.getTileResName(coordMc).contains("tiles/dirt")) {
+            else if(ZeeConfig.getTileResName(coordMc).contains("claypit")) {
                 opts = new ArrayList<String>();
                 if (ZeeConfig.isPlayerPoseOnAnyShip())
                     opts.add("disembark");
@@ -3767,15 +3767,15 @@ public class ZeeManagerGobs extends ZeeThread{
 
 
     private static boolean isGobLiftable(String gobName) {
-        if(isGobBoulder(gobName) || isGobSittingFurniture(gobName) || gobName.contains("/table-"))
+        if(isGobBoulder(gobName) || isGobSittingFurniture(gobName) || gobName.contains("/table-") || gobName.contains("studydesk"))
             return true;
         String endList = "/meatgrinder,/potterswheel,/iconsign,/rowboat,/dugout,/wheelbarrow,"
                 +"/compostbin,/gardenpot,/beehive,/htable,/bed-sturdy,/boughbed,/alchemiststable,"
                 +"/gemwheel,/ancestralshrine,/spark,/cauldron,/churn,/wardrobe,"
                 +"/trough,curdingtub,/plow,/barrel,/still,log,/oldtrunk,chest,/anvil,"
-                +"/cupboard,/studydesk,/demijohn,/quern,/wreckingball-fold,/loom,/swheel,"
+                +"/cupboard,demijohn,/quern,/wreckingball-fold,/loom,/swheel,"
                 +"/ttub,/cheeserack,/archerytarget,/dreca,/glasspaneframe,/runestone,"
-                +"woodbox,casket,basket,crate,chest,stonekist";
+                +"woodbox,casket,basket,crate,chest,stonekist,picklingcrock";
         return ZeeConfig.nameInListEndsWith(gobName,endList);
     }
 

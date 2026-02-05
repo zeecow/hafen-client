@@ -293,7 +293,7 @@ public class ZeeConfig {
     static List<Gob> listCauldronContainers = null;
     public static boolean clickedCraftAll = false;
     static boolean menuFastAnim = Utils.getprefb("menuFastAnim",true);
-    static boolean clickOpiumDragon = Utils.getprefb("clickOpiumDragon",false);
+    static boolean clickOpiumDragonSmokeCurios = Utils.getprefb("clickOpiumDragonSmokeCurios",false);
     static boolean showMsgAttrChanges = Utils.getprefb("showMsgAttrChanges",true);
     static boolean desaturateMinimap = Utils.getprefb("desaturateMinimap",true);;
 
@@ -2764,7 +2764,8 @@ public class ZeeConfig {
                 +"Tub,Compost Bin,Extraction Press,Rack,Herbalist Table,Frame,"
                 +"Chicken Coop,Rabbit Hutch,Archery Target,Oven,Steel crucible,"
                 +"Cauldron,Pane mold,Kiln,Old Trunk,Old Stump,Smoke shed,Finery Forge,"
-                +"Tidepool,Fireplace,Quiver,Creel,Cache,Hidden Hollow,Spawning bed"
+                +"Tidepool,Fireplace,Quiver,Creel,Cache,Hidden Hollow,Spawning bed,"
+                +"Pickling crock"
         ).split(",");
         for (String contName: containers) {
             if ( !isMakewindow(window) && window.cap.contains(contName) ) {
@@ -4060,8 +4061,8 @@ public class ZeeConfig {
             else if (ZeeManagerGobs.autoPickIrrlight && resName.endsWith("/irrbloss")) {
                 ZeeManagerGobs.autoPickIrrlight();
             }
-            // click opiumdragon
-            else if (ZeeConfig.clickOpiumDragon && resName.endsWith("/opiumdragon")){
+            // click opiumdragon, smoke curios
+            else if (ZeeConfig.clickOpiumDragonSmokeCurios && nameInListEndsWith(resName,"opiumdragon,smokeship,smokering")){
                 ZeeManagerGobs.gobClick(ob,3);
             }
 
