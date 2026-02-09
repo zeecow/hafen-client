@@ -179,9 +179,9 @@ public class Window extends Widget {
     }
 
     public static class DefaultDeco extends DragDeco {
-	public static final Text.Forge cf =  new PUtils.BlurFurn(new PUtils.TexFurn(new Text.Foundry(Text.fraktur, 15).aa(true), ctex),
+	public static final Text.Forge cf =  new PUtils.BlurFurn(new PUtils.TexFurn(new Text.Foundry(Text.serif, 15).aa(false), ctex),
 								   UI.rscale(0.75), UI.rscale(1.0), new Color(96, 96, 0));
-	public static final Text.Forge ncf = new PUtils.BlurFurn(new PUtils.TexFurn(new Text.Foundry(Text.fraktur, 15).aa(true), ctex),
+	public static final Text.Forge ncf = new PUtils.BlurFurn(new PUtils.TexFurn(new Text.Foundry(Text.serif, 15).aa(false), ctex),
 								   UI.rscale(0.75), UI.rscale(1.0), Color.BLACK);
 	public final boolean lg;
 	public final Button cbtn;
@@ -518,103 +518,6 @@ public class Window extends Widget {
 	return(super.handle(ev));
     }
 
-	boolean isAutoHideOn = false, isAutoHideFast = false, isAutoHidden =false;
-	boolean hasOrganizeButton = false;
-	public ZeeWindow.ZeeButton buttonAutoHide = null;
-	boolean isAutoHideWaiting = false;
-	void autoHideToggleWinPos(){
-		Coord savedWinPos = ZeeConfig.mapWindowPos.get(this.cap);
-		if (savedWinPos==null){
-			ZeeConfig.println("123123 > no saved pos to restore");
-			return;
-		}
-		int halfScreen = ZeeConfig.gameUI.sz.x/2;
-		// restore pos: glue window horizontally
-		if (isAutoHidden) {
-			int newX;
-			if (c.x <= halfScreen)
-				newX = -tlm.x;
-			else
-				newX = ZeeConfig.gameUI.sz.x - sz.x + tlm.x;
-			// use saved y
-			c = Coord.of(newX, savedWinPos.y);
-			isAutoHidden = false;
-			isAutoHideWaiting = false;//cancel possible hide animation
-		}
-		// hide window horizontally
-		else {
-			// hide to the left
-			if (c.x <= halfScreen) {
-				int hiddenWidth = (int) (sz.x - 100);
-				if (hiddenWidth <= sz.x/2)
-					hiddenWidth = (int) (sz.x * 0.7);
-				int newX = - hiddenWidth;
-				// no delay
-				if (!ZeeConfig.autoHideWindowDelay || isAutoHideFast){
-					c.x = newX;
-				}
-				// delay
-				else {
-					isAutoHideWaiting = true;
-					new Thread() {
-						public void run() {
-							long msStart = ZeeThread.now();
-							try {
-								int timeout = ZeeConfig.autoHideWindowDelayMs;
-								int step = timeout/10;
-								while(isAutoHideWaiting && timeout > 0){
-									sleep(step);
-									timeout -= step;
-								}
-							} catch (Exception e) {
-								e.printStackTrace();
-							}
-							//set final pos
-							if (isAutoHideWaiting)
-								c.x = newX;
-							isAutoHideWaiting = false;
-						}
-					}.start();
-				}
-			}
-			// hide to the right
-			else{
-				int visibleWidth = (int) (sz.x - 100);
-				if (visibleWidth >= sz.x/2)
-					visibleWidth = (int) (sz.x * 0.25);
-				int newX = ZeeConfig.gameUI.sz.x - visibleWidth;
-				// no delay
-				if (!ZeeConfig.autoHideWindowDelay || isAutoHideFast){
-					c.x = newX;
-				}
-				// delay
-				else {
-					isAutoHideWaiting = true;
-					new Thread() {
-						public void run() {
-							long msStart = ZeeThread.now();
-							try {
-								int timeout = ZeeConfig.autoHideWindowDelayMs;
-								int step = timeout/10;
-								while(isAutoHideWaiting && timeout > 0){
-									sleep(step);
-									timeout -= step;
-								}
-							} catch (Exception e) {
-								e.printStackTrace();
-							}
-							//set final pos
-							if (isAutoHideWaiting)
-								c.x = newX;
-							isAutoHideWaiting = false;
-						}
-					}.start();
-				}
-			}
-			isAutoHidden = true;
-		}
-	}
-
     public boolean keydown(KeyDownEvent ev) {
 	if(ev.propagate(this))
 	    return(true);
@@ -815,5 +718,102 @@ public class Window extends Widget {
 		    wnd.draw(g);
 		    g.getimage(img -> Debug.dumpimage(img, args[0]));
 	    });
+    }
+
+    boolean isAutoHideOn = false, isAutoHideFast = false, isAutoHidden =false;
+    boolean hasOrganizeButton = false;
+    public ZeeWindow.ZeeButton buttonAutoHide = null;
+    boolean isAutoHideWaiting = false;
+    void autoHideToggleWinPos(){
+        Coord savedWinPos = ZeeConfig.mapWindowPos.get(this.cap);
+        if (savedWinPos==null){
+            ZeeConfig.println("123123 > no saved pos to restore");
+            return;
+        }
+        int halfScreen = ZeeConfig.gameUI.sz.x/2;
+        // restore pos: glue window horizontally
+        if (isAutoHidden) {
+            int newX;
+            if (c.x <= halfScreen)
+                newX = -tlm.x;
+            else
+                newX = ZeeConfig.gameUI.sz.x - sz.x + tlm.x;
+            // use saved y
+            c = Coord.of(newX, savedWinPos.y);
+            isAutoHidden = false;
+            isAutoHideWaiting = false;//cancel possible hide animation
+        }
+        // hide window horizontally
+        else {
+            // hide to the left
+            if (c.x <= halfScreen) {
+                int hiddenWidth = (int) (sz.x - 100);
+                if (hiddenWidth <= sz.x/2)
+                    hiddenWidth = (int) (sz.x * 0.7);
+                int newX = - hiddenWidth;
+                // no delay
+                if (!ZeeConfig.autoHideWindowDelay || isAutoHideFast){
+                    c.x = newX;
+                }
+                // delay
+                else {
+                    isAutoHideWaiting = true;
+                    new Thread() {
+                        public void run() {
+                            long msStart = ZeeThread.now();
+                            try {
+                                int timeout = ZeeConfig.autoHideWindowDelayMs;
+                                int step = timeout/10;
+                                while(isAutoHideWaiting && timeout > 0){
+                                    sleep(step);
+                                    timeout -= step;
+                                }
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                            //set final pos
+                            if (isAutoHideWaiting)
+                                c.x = newX;
+                            isAutoHideWaiting = false;
+                        }
+                    }.start();
+                }
+            }
+            // hide to the right
+            else{
+                int visibleWidth = (int) (sz.x - 100);
+                if (visibleWidth >= sz.x/2)
+                    visibleWidth = (int) (sz.x * 0.25);
+                int newX = ZeeConfig.gameUI.sz.x - visibleWidth;
+                // no delay
+                if (!ZeeConfig.autoHideWindowDelay || isAutoHideFast){
+                    c.x = newX;
+                }
+                // delay
+                else {
+                    isAutoHideWaiting = true;
+                    new Thread() {
+                        public void run() {
+                            long msStart = ZeeThread.now();
+                            try {
+                                int timeout = ZeeConfig.autoHideWindowDelayMs;
+                                int step = timeout/10;
+                                while(isAutoHideWaiting && timeout > 0){
+                                    sleep(step);
+                                    timeout -= step;
+                                }
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                            //set final pos
+                            if (isAutoHideWaiting)
+                                c.x = newX;
+                            isAutoHideWaiting = false;
+                        }
+                    }.start();
+                }
+            }
+            isAutoHidden = true;
+        }
     }
 }
