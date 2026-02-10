@@ -2835,7 +2835,7 @@ public class ZeeConfig {
         }
 
         // add gob text ql
-        if (text.contains("Quality")) {
+        if (text.contains("Quality:")) {
             uiMsgTextQuality = text;
             String ql = uiMsgTextQuality.replaceAll("Quality: ","");
             if (ql.contains("grown"))
