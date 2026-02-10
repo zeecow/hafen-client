@@ -465,10 +465,10 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
     }
 
     public void ctick(double dt) {
-    //Map<Class<? extends GAttrib>, GAttrib> attr = cloneAttr();
-	for(GAttrib a : attr.values())
-	    a.ctick(dt);
     try {
+        //Map<Class<? extends GAttrib>, GAttrib> attr = cloneAttr();
+	    for(GAttrib a : attr.values())
+	        a.ctick(dt);
         for (Iterator<Overlay> i = ols.iterator(); i.hasNext(); ) {
             Overlay ol = i.next();
             if (ol.slots == null) {
