@@ -9,7 +9,7 @@ import java.awt.image.BufferedImage;
 import haven.MenuGrid.Pagina;
 
 /* >tt: Quality */
-@haven.FromResource(name = "ui/tt/q/quality", version = 27)
+@haven.FromResource(name = "ui/tt/q/quality", version = 28)
 public class Quality extends QBuff implements GItem.OverlayInfo<Tex> {
     public static boolean show = Utils.getprefb("qtoggle", true);
     static final BufferedImage fakeicon = ZeeManagerIcons.imgDiamond(5,Color.cyan,false,false,false);
@@ -29,7 +29,12 @@ public class Quality extends QBuff implements GItem.OverlayInfo<Tex> {
     }
 
     public void drawoverlay(GOut g, Tex ol) {
-	if(show)
-	    g.aimage(ol, new Coord(g.sz().x, 0), 1, 0);
+	if(show) {
+	    Coord c = Coord.of(g.sz().x - ol.sz().x, 0);
+	    g.chcolor(0, 0, 0, 128);
+	    g.frect(c, ol.sz());
+	    g.chcolor();
+	    g.image(ol, c);
+	}
     }
 }

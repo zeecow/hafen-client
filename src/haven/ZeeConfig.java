@@ -587,7 +587,7 @@ public class ZeeConfig {
                "/adder","/sandflea","/boar/","/badger/","/bear/","/bat/","/boreworm/",
                 "/ooze/","/cavelouse/","/caveangler/","orca","/goldeneagle/","/lynx/",
                 "/mammoth/","/moose/","/troll/","/walrus/","/goat/wildgoat","/wolf/","/wolverine/",
-                "spermwhale"
+                "spermwhale", "icebear", "narwhal"
         );
         for (String listName : listContains) {
             if (nameContains.contains(listName))
@@ -784,8 +784,8 @@ public class ZeeConfig {
         final String[] list = {
             "bloodstern","camomile","cavebulb","chimingbluebell","clover","coltsfoot","dandelion",
             "edelweiss","frogscrown","heartsease","marshmallow","stingingnettle","thornythistle",
-            "yarrow","snapdragon","wintergreen","tansy","sleighbell",
-            "frostflower", "blackhenbane" //TODO guessing names
+            "yarrow","snapdragon","wintergreen","tansy","sleighbell", "frostflower",
+            "blackhenbane", "crocus" //TODO guessing names
         };
         for (int i = 0; i < list.length; i++) {
             if(name.contains(list[i]))

@@ -565,7 +565,7 @@ public class ZeeManagerCraft extends ZeeThread{
                                     }
                                     // transfer item to inv, close window
                                     itemsAvailable.get(itemsAvailable.size() - 1).item.wdgmsg("transfer", Coord.z);
-                                    sleep(PING_MS);
+                                    sleep(PING_MS*2);
                                     if (isCancelClick())
                                         break;
                                 }
