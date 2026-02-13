@@ -452,9 +452,7 @@ public class ZeeManagerCraft extends ZeeThread{
         craftRecWinUpdate();
     }
     static void craftRecItemAdd(GItem i) {
-        if (craftRecPlaying)
-            return;
-        if(craftRecSteps.isEmpty())
+        if (craftRecPlaying || craftRecSteps==null || craftRecSteps.isEmpty())
             return;
         craftRecSteps.get(craftRecSteps.size()-1).itemsMainInv.add(i.getres().name);
         craftRecWinUpdate();
