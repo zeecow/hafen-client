@@ -136,6 +136,12 @@ public class ZeeSess {
     public static void newCharList() {
         println("new char list");
 
+        if(charSwitchNextNameAndServer==null || charSwitchNextNameAndServer.isEmpty()) {
+            println("   reset charSwitchCurPlayingChar, charSwitchCurPlayingServer ");
+            charSwitchCurPlayingChar = "";
+            charSwitchCurPlayingServer = "";
+        }
+
         /*
             fix for:
             Exception in thread "Thread-1" java.lang.NullPointerException

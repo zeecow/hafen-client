@@ -285,8 +285,10 @@ public class Charlist extends Widget {
 		list.change(chars.get(Math.min(chars.indexOf(list.sel) + 1, chars.size() - 1)));
 	    return(true);
 	} else if(ev.code == ev.awt.VK_ENTER) {
-	    if(list.sel != null)
-		wdgmsg("play", list.sel.name);
+	    if(list.sel != null) {
+            wdgmsg("play", list.sel.name);
+            ZeeSess.charSwitchClicked(list.sel.name,list.sel.disc);
+        }
 	    return(true);
 	}
 	return(super.keydown(ev));

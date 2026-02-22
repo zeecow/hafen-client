@@ -521,7 +521,10 @@ public class ZeeResearch {
 
 
     static void setFilenameForServer() {
-        String server = ZeeSess.charSwitchCurPlayingServer.strip().replaceAll("\\s","");
+        String server = "unknown";//new char, etc
+        if (ZeeSess.charSwitchCurPlayingServer!=null && !ZeeSess.charSwitchCurPlayingServer.isEmpty()){
+            server = ZeeSess.charSwitchCurPlayingServer.strip().replaceAll("\\s","");
+        }
         fileNameFood = "haven_research_food_"+server+".txt";
         fileNameHerbalswill = "haven_research_herbalswill_"+server+".txt";
         println("setFilenameForServer");
