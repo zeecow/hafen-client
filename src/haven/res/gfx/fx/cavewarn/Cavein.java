@@ -78,7 +78,8 @@ public class Cavein extends Sprite implements Sprite.CDel {
 	de += dt * str;
 	if(spawn && (de > 1)) {
 	    de -= 1;
-	    bollar.add(new Boll(off.add(rnd.nextFloat() * sz.x, rnd.nextFloat() * sz.y, rnd.nextFloat() * sz.x), 0.5f + (rnd.nextFloat() * 1.5f)));
+        if(bollar.size() < 6)
+	        bollar.add(new Boll(off.add(rnd.nextFloat() * sz.x, rnd.nextFloat() * sz.y, rnd.nextFloat() * sz.x), 0.5f + (rnd.nextFloat() * 1.5f)));
 	}
 	for(Iterator<Boll> i = bollar.iterator(); i.hasNext();) {
 	    Boll boll = i.next();

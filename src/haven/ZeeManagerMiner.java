@@ -110,9 +110,9 @@ public class ZeeManagerMiner extends ZeeThread{
 
                             // remove cave dust close to new col tile
                             List<Gob> dustList = ZeeConfig.findGobsByNameEndsWith("/cavedust");
-                            dustList.removeIf(gob -> ZeeConfig.distanceToPlayer(gob) > TILE_SIZE*2);
+                            //dustList.removeIf(gob -> ZeeConfig.distanceToPlayer(gob) > TILE_SIZE*2);
+                            dustList.removeIf(dust -> !ZeeConfig.lastSavedOverlay.a.contains(dust.rc.floor(MCache.tilesz)));
                             if (!dustList.isEmpty()){
-                                println("dust list  = "+dustList.size());
                                 for (Gob dust : dustList) {
                                     if (!ZeeConfig.getCursorName().equals(ZeeConfig.CURSOR_ARW)) {
                                         println("set cursor arrow");
@@ -128,8 +128,6 @@ public class ZeeManagerMiner extends ZeeThread{
                                 ZeeConfig.clickCoord(tunnelHelperEndCoord,1);
                                 waitPlayerIdlePoseOrVehicleIdle();
                                 ZeeConfig.getMainInventory().dropItemsByNameEndsWith("/cavedust");
-                            }else{
-                                println("cave dust list empty");
                             }
 
                             // pick stones
@@ -545,7 +543,6 @@ public class ZeeManagerMiner extends ZeeThread{
             }
 
             // start collecting current stone type
-            println("picking "+closestStone.getres().basename());
             ZeeManagerGobs.pickupAllGobItemsServerSide(closestStone);
 
             // wait current stone type
