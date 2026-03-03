@@ -26,22 +26,19 @@
 
 package haven;
 
-import haven.MCache.OverlayInfo;
-import haven.render.*;
-import haven.render.sl.Type;
-import haven.render.sl.Uniform;
-
-import java.awt.*;
-import java.awt.event.KeyEvent;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.util.List;
-import java.util.*;
-import java.util.function.Consumer;
-import java.util.function.Supplier;
-
+import static haven.MCache.cmaps;
 import static haven.MCache.tilesz;
 import static haven.OCache.posres;
+import java.awt.Color;
+import java.awt.event.KeyEvent;
+import java.util.*;
+import java.util.function.*;
+import java.lang.ref.*;
+import java.lang.reflect.*;
+import haven.render.*;
+import haven.MCache.OverlayInfo;
+import haven.render.sl.Uniform;
+import haven.render.sl.Type;
 
 public class MapView extends PView implements DTarget, Console.Directory {
     public static boolean clickdb = false;
@@ -54,7 +51,7 @@ public class MapView extends PView implements DTarget, Console.Directory {
     public Camera camera = restorecam();
     private Loader.Future<Plob> placing = null;
     private Grabber grab;
-    Selector selection;
+    private Selector selection;
     private Coord3f camoff = new Coord3f(Coord3f.o);
     public double shake = 0.0;
     public static double plobpgran = Utils.getprefd("plobpgran", 8);
@@ -815,12 +812,12 @@ public class MapView extends PView implements DTarget, Console.Directory {
 	    if(area != null) {
 		main.tick();
 		flavobjs.tick();
-		}
+	    }
 	}
 
 	public void added(RenderTree.Slot slot) {
 	    slot.add(main);
-		slot.add(flavobjs);
+	    slot.add(flavobjs);
 	    super.added(slot);
 	}
 
@@ -1901,6 +1898,7 @@ public class MapView extends PView implements DTarget, Console.Directory {
 		    Plob ob = placing.get();
 		    synchronized(ob) {
 			ob.slot.remove();
+			ob.removed();
 		    }
 		}
 		this.placing = null;
@@ -1942,6 +1940,7 @@ public class MapView extends PView implements DTarget, Console.Directory {
 		    Plob ob = placing.get();
 		    synchronized(ob) {
 			ob.slot.remove();
+			ob.removed();
 		    }
 		}
 		this.placing = null;
@@ -2155,7 +2154,7 @@ public class MapView extends PView implements DTarget, Console.Directory {
 	else {
 	    new Click(ev.c, ev.b).run();
 	}
-	return(super.mousedown(ev));
+	return(true);
     }
 
 	static boolean leftClickDragging = false;
@@ -2235,8 +2234,8 @@ public class MapView extends PView implements DTarget, Console.Directory {
     }
     
     public boolean drop(final Coord cc, Coord ul) {
-		if(ZeeConfig.dropHoldingItemAltKey && !ui.modmeta)
-			return false;
+    if(ZeeConfig.dropHoldingItemAltKey && !ui.modmeta)
+        return false;
 	new Hittest(cc) {
 	    public void hit(Coord pc, Coord2d mc, ClickData inf) {
 		wdgmsg("drop", pc, mc.floor(posres), ui.modflags());
@@ -2350,7 +2349,7 @@ public class MapView extends PView implements DTarget, Console.Directory {
 	public final Coord max;
 	public Coord sc;
 	public int modflags;
-	private MCache.Overlay ol;
+	private MCache.RectOverlay ol;
 	private UI.Grab mgrab;
 	private Text tt;
 	final GrabXL xl = new GrabXL(this) {
@@ -2377,14 +2376,15 @@ public class MapView extends PView implements DTarget, Console.Directory {
 		if(selection != this)
 		    return(false);
 		if(sc != null) {
-		    ol.destroy();
+		    glob.map.remove(ol);
 		    mgrab.remove();
 		}
 		sc = mc.div(MCache.tilesz2);
 		modflags = ui.modflags();
 		xl.mv = true;
 		mgrab = ui.grabmouse(MapView.this);
-		ol = glob.map.new Overlay(Area.sized(sc, new Coord(1, 1)), selol);
+		ol = glob.map.new RectOverlay(selol, Area.sized(sc, new Coord(1, 1)));
+		glob.map.add(ol);
 		return(true);
 	    }
 	}
@@ -2407,11 +2407,11 @@ public class MapView extends PView implements DTarget, Console.Directory {
 		    tt = null;
 			//if(!ZeeConfig.farmerMode && !ZeeManagerStockpile.selAreaPile){
 			if(!ZeeConfig.farmerMode && !ZeeConfig.keepMapViewOverlay){
-				ol.destroy();
+                glob.map.remove(ol);
 			}else {
 				// farmermode preserve overlay, unless cancel button
 				if(button != 1){
-					ol.destroy();
+                    glob.map.remove(ol);
 				}
 			}
 		    mgrab.remove();
@@ -2451,7 +2451,7 @@ public class MapView extends PView implements DTarget, Console.Directory {
 	public void destroy() {
 	    synchronized(MapView.this) {
 		if(sc != null) {
-		    ol.destroy();
+		    glob.map.remove(ol);
 		    mgrab.remove();
 		}
 		release(xl);
