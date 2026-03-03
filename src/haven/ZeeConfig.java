@@ -181,7 +181,7 @@ public class ZeeConfig {
     static Coord lastSavedOverlayStartCoord, lastSavedOverlayEndCoord;
     static int lastSavedOverlayModflags;
     static long lastSavedOverlayMs;
-    static MCache.Overlay lastSavedOverlay;
+    static MCache.RectOverlay lastSavedOverlay;
     static GItem lastInvGItemCreated;
     static String lastInvGItemCreatedBaseName, lastInvGItemCreatedName;
     static long lastInvGItemCreatedMs;
@@ -2977,7 +2977,7 @@ public class ZeeConfig {
         }
     }
 
-    public static void saveTileSelection(Coord sc, Coord ec, int modflags, MCache.Overlay ol) {
+    public static void saveTileSelection(Coord sc, Coord ec, int modflags, MCache.RectOverlay ol) {
         lastSavedOverlayStartCoord = sc;
         lastSavedOverlayEndCoord = ec;
         lastSavedOverlayModflags = modflags;
@@ -2989,8 +2989,13 @@ public class ZeeConfig {
         lastSavedOverlayStartCoord = null;
         lastSavedOverlayEndCoord = null;
         lastSavedOverlayModflags = -1;
-        if(lastSavedOverlay !=null)
-            lastSavedOverlay.destroy();
+        try {
+            if (lastSavedOverlay != null)
+                glob.map.remove(lastSavedOverlay);
+        } catch (Exception e) {
+            e.printStackTrace();
+            lastSavedOverlay = null;
+        }
         lastSavedOverlayMs = 0;
         ZeeConfig.keepMapViewOverlay = false;
     }
