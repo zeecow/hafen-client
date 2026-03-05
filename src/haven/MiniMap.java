@@ -27,6 +27,8 @@
 package haven;
 
 import haven.render.*;
+
+import java.awt.image.BufferedImage;
 import java.util.*;
 import java.util.function.*;
 import java.awt.Color;
