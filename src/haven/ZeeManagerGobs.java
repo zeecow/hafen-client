@@ -283,8 +283,8 @@ public class ZeeManagerGobs extends ZeeThread{
             pickAllDreamsCloseBy(gob);
         }
         //toggle mine support radius
-        else if (isGobMineSupport(gobName) || gobName.endsWith("/ladder")) {
-            ZeeConfig.toggleMineSupport();
+        else if (isGobMineSupport(gobName)) {
+            ZeeConfig.toggleMineSupports();
         }
         //toggle beeskep radius
         else if (gobName.endsWith("/beehive")) {
@@ -3761,7 +3761,7 @@ public class ZeeManagerGobs extends ZeeThread{
 
 
     public static boolean isGobMineSupport(String gobName) {
-        String list = "/minebeam,/column,/minesupport,/naturalminesupport,/towercap";
+        String list = "/minebeam,/column,/minesupport,/naturalminesupport,/towercap,/ladder";
         return ZeeConfig.nameInListEndsWith(gobName, list);
     }
 

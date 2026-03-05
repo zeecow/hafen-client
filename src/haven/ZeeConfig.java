@@ -9,7 +9,6 @@ import java.awt.image.BufferedImage;
 import java.awt.image.RenderedImage;
 import java.io.*;
 import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -186,7 +185,6 @@ public class ZeeConfig {
     static String lastInvGItemCreatedBaseName, lastInvGItemCreatedName;
     static long lastInvGItemCreatedMs;
     static Coord lastUiClickCoord;
-    static Class<?> classMSRad;
 
     static int aggroRadiusTiles = Utils.getprefi("aggroRadiusTiles", 11);
     static boolean alertOnPlayers = Utils.getprefb("alertOnPlayers", true);
@@ -1112,7 +1110,6 @@ public class ZeeConfig {
     }
 
 
-    static Coord autoToggleEquipsBackupCoord;
     public static void checkAutoOpenEquips(boolean done) {
         if(!ZeeConfig.autoToggleEquips)
             return;
@@ -2285,25 +2282,36 @@ public class ZeeConfig {
     }
 
 
+    /*
+        radius minesup
+     */
     static boolean showMineSupport = false;
-    public static void toggleMineSupport() {
-
+    public static void toggleMineSupports() {
         showMineSupport = !showMineSupport;
-
-        // toggle mine support radius
-        // TODO replace with wdgmsg
-        if (classMSRad!=null) {
-            try {
-                Field field = classMSRad.getDeclaredField("show");
-                Method method = classMSRad.getMethod("show", boolean.class);
-                //field.setBoolean(classMSRad, !field.getBoolean(classMSRad));
-                //method.invoke(classMSRad, !field.getBoolean(classMSRad));
-                method.invoke(classMSRad, showMineSupport);
-            } catch (Exception e) {
-                e.printStackTrace();
+        List<Gob> sups = findGobsByNameEndsWith("/minebeam","/column","/minesupport","/naturalminesupport","/towercap","/ladder");
+        if (!sups.isEmpty()){
+            for (Gob sup : sups) {
+                toggleMineSupport(sup);
             }
         }
     }
+    static void toggleMineSupport(Gob support) {
+        if (!showMineSupport){
+            Gob.Overlay radius = support.findol(ZeeGobRadius.class);
+            if (radius!=null)
+                radius.remove();
+        }else{
+            String resname = support.getres().name;
+            //  "/minesupport"  "/naturalminesupport"  "/towercap"
+            int size = ZeeGobRadius.RADIUS_MINESUPPORT_STAIRS;
+            if (resname.endsWith("/minebeam"))
+                size = ZeeGobRadius.RADIUS_BEESKEP_MINEBEAM;
+            else if (resname.endsWith("/column"))
+                size = ZeeGobRadius.RADIUS_STONECOLUMN;
+            support.addol(new Gob.Overlay(support, new ZeeGobRadius(support, null, size, ZeeGobRadius.COLOR_RADIUS)));
+        }
+    }
+
 
     /*
         radius beeskep
@@ -2324,9 +2332,10 @@ public class ZeeConfig {
             if (radius!=null)
                 radius.remove();
         }else{
-            skep.addol(new Gob.Overlay(skep, new ZeeGobRadius(skep, null, ZeeGobRadius.RADIUS_BEESKEP, ZeeGobRadius.COLOR_RADIUS)));
+            skep.addol(new Gob.Overlay(skep, new ZeeGobRadius(skep, null, ZeeGobRadius.RADIUS_BEESKEP_MINEBEAM, ZeeGobRadius.COLOR_RADIUS)));
         }
     }
+
 
     /*
         radius food trough
@@ -2437,13 +2446,13 @@ public class ZeeConfig {
 
 
     public static void checkClassMod(String name, Class<?> qlass){
-        try {
+       /* try {
             if (name.equals("haven.res.gfx.fx.msrad.MSRad")){
                 classMSRad = qlass;
             }
         } catch (Exception e) {
             e.printStackTrace();
-        }
+        }*/
     }
 
 
@@ -4017,6 +4026,10 @@ public class ZeeConfig {
 
                 return;
             }
+            // radius minesup
+            else if(showMineSupport && ob.tags.contains(Gob.Tag.MINE_SUPPORT)) {
+                toggleMineSupport(ob);
+            }
             // radius beeskep
             else if(showRadiusBeeskep && resName.endsWith("/terobjs/beehive")) {
                 toggleRadiusBeeskep(ob);
@@ -4144,7 +4157,7 @@ public class ZeeConfig {
         if(ZeeManagerGobs.isGobIdol(resName)){
             gob.tags.add(Gob.Tag.IDOL);
         }
-        if(ZeeManagerGobs.isGobMineSupport(resName) || resName.endsWith("/ladder")){
+        if(ZeeManagerGobs.isGobMineSupport(resName)){
             gob.tags.add(Gob.Tag.MINE_SUPPORT);
         }
     }
