@@ -2368,18 +2368,18 @@ public class ZeeConfig {
         showRadiusMoundBed = ! showRadiusMoundBed;
         List<Gob> moundbeds = findGobsByNameEndsWith("/moundbed");
         if (!moundbeds.isEmpty()){
-            for (Gob t : moundbeds) {
-                toggleRadiusMoundbed(t);
+            for (Gob m : moundbeds) {
+                toggleRadiusMoundbed(m);
             }
         }
     }
-    static void toggleRadiusMoundbed(Gob trough) {
+    static void toggleRadiusMoundbed(Gob moundbed) {
         if (!showRadiusMoundBed){
-            Gob.Overlay radius = trough.findol(ZeeGobRadius.class);
+            Gob.Overlay radius = moundbed.findol(ZeeGobRadius.class);
             if (radius!=null)
                 radius.remove();
         }else{
-            trough.addol(new Gob.Overlay(trough, new ZeeGobRadius(trough, null, ZeeGobRadius.RADIUS_MOUND_BED, ZeeGobRadius.COLOR_RADIUS)));
+            moundbed.addol(new Gob.Overlay(moundbed, new ZeeGobRadius(moundbed, null, ZeeGobRadius.RADIUS_MOUND_BED, ZeeGobRadius.COLOR_RADIUS)));
         }
     }
 
@@ -4037,6 +4037,10 @@ public class ZeeConfig {
             // radius trough
             else if(showRadiusFoodtrough && resName.endsWith("/terobjs/trough")) {
                 toggleRadiusFoodtrough(ob);
+            }
+            // radius moundbed
+            else if(showRadiusMoundBed && resName.endsWith("/terobjs/moundbed")) {
+                toggleRadiusMoundbed(ob);
             }
             // cheeserack color
             else if(highlightCheeserack && resName.endsWith("/terobjs/cheeserack")){
