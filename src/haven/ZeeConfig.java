@@ -1,6 +1,7 @@
 package haven;
 
 import haven.render.*;
+import haven.res.gfx.fx.mscover.ShowCover;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -2287,11 +2288,34 @@ public class ZeeConfig {
      */
     static boolean showMineSupport = false;
     public static void toggleMineSupports() {
-        showMineSupport = !showMineSupport;
-        List<Gob> sups = findGobsByNameEndsWith("/minebeam","/column","/minesupport","/naturalminesupport","/towercap","/ladder");
-        if (!sups.isEmpty()){
-            for (Gob sup : sups) {
-                toggleMineSupport(sup);
+        // no radius, no cover = add cover
+        if (!showMineSupport && !ShowCover.show) {
+            gameUI.map.enol("mscover");
+            ShowCover.show = true;
+        }
+        // no radius, cover = add radius
+        else if(!showMineSupport){
+            showMineSupport = true;
+            List<Gob> sups = findGobsByNameEndsWith("/minebeam", "/column", "/minesupport", "/naturalminesupport", "/towercap", "/ladder");
+            if (!sups.isEmpty()) {
+                for (Gob sup : sups) {
+                    toggleMineSupport(sup);
+                }
+            }
+        }
+        // radius, cover = rem cover
+        else if(ShowCover.show){
+            gameUI.map.disol("mscover");
+            ShowCover.show = false;
+        }
+        // radius, no cover = rem radius
+        else{
+            showMineSupport = false;
+            List<Gob> sups = findGobsByNameEndsWith("/minebeam", "/column", "/minesupport", "/naturalminesupport", "/towercap", "/ladder");
+            if (!sups.isEmpty()) {
+                for (Gob sup : sups) {
+                    toggleMineSupport(sup);
+                }
             }
         }
     }
