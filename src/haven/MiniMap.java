@@ -34,7 +34,6 @@ import java.util.function.*;
 import java.awt.Color;
 import haven.MapFile.Segment;
 import haven.MapFile.DataGrid;
-import haven.MapFile.Grid;
 import haven.MapFile.GridInfo;
 import haven.MapFile.Marker;
 import haven.MapFile.PMarker;
@@ -708,7 +707,7 @@ public class MiniMap extends Widget {
 	if (scale > 1 || dlvl==0) {
 		playerSegment = (sessloc != null) && ((curloc == null) || (sessloc.seg == curloc.seg));
 		if (playerSegment)
-			drawview(g);
+			drawViewRange(g);
 	}
 	drawmarkers(g);
 	if( (ZeeConfig.showIconsZoomOut && dlvl<=2) || dlvl == 0)
@@ -1094,7 +1093,7 @@ public class MiniMap extends Widget {
 	public static final Coord VIEW_SZ = UI.scale(MCache.sgridsz.mul(9).div(tilesz.floor()));// view radius is 9x9 "server" grids
 	public static final Color VIEW_BG_COLOR = new Color(255, 255, 255, 40);
 
-	void drawview(GOut g) {
+	void drawViewRange(GOut g) {
 		int zmult = 1 << zoomlevel; // 2^zoomlevel ?
 		Coord2d sgridsz = new Coord2d(MCache.sgridsz);
 		Gob player = ZeeConfig.getPlayerGob();
