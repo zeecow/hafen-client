@@ -256,7 +256,7 @@ public class ZeeManagerIcons {
             img = getIconImage(gob);
             if (img==null || gob.rc==null)
                 continue;
-            sc = UI.scale(gob.rc.floor(MCache.tilesz).add(sessloc.tc).sub(dloc.tc).div(1 << dlvl)).mul(MiniMap.scale).add(sz.div(2));
+            sc = UI.scale(gob.rc.floor(MCache.tilesz).add(sessloc.tc).sub(dloc.tc).div(1 << dlvl)).mul(MiniMap.minimapScale).add(sz.div(2));
             g.image(img, sc.sub(Coord.of(img.getWidth()/2)));
         }
     }

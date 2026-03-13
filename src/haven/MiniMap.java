@@ -61,7 +61,7 @@ public class MiniMap extends Widget {
     protected int dlvl, dmag;
     protected Location dloc;
 	private String biome, ttip;
-	static int scale = ZeeConfig.minimapScale;
+	static int minimapScale = ZeeConfig.minimapScale;
 
 
     public MiniMap(Coord sz, MapFile file) {
@@ -705,7 +705,7 @@ public class MiniMap extends Widget {
 	boolean playerSegment;
     public void drawparts(GOut g){
 	drawmap(g);
-	if (scale > 1 || dlvl==0) {
+	if (minimapScale > 1 || dlvl==0) {
 		playerSegment = (sessloc != null) && ((curloc == null) || (sessloc.seg == curloc.seg));
 		if (playerSegment)
 			drawViewRange(g);
@@ -952,12 +952,17 @@ public class MiniMap extends Widget {
     }
 
     public boolean mousewheel(MouseWheelEvent ev) {
+    /*
+        maglevel = zoom in
+        zoomlevel = zoom out
+        scale - map window size ( 1 = original size, 2-4 = bigger window&map)
+     */
 	if(ev.a > 0) {
-        if(scale > 1) {
-            scale--;
-            ZeeConfig.minimapScale = scale;
-            Utils.setprefi("minimapScale",scale);
-            ZeeConfig.minimapCompactZoomChanged(scale);
+        if(minimapScale > 1) {
+            minimapScale--;
+            ZeeConfig.minimapScale = minimapScale;
+            Utils.setprefi("minimapScale", minimapScale);
+            ZeeConfig.minimapCompactZoomChanged(minimapScale);
         }
 	    if(maglevel > 1) {
 		maglevel >>= 1;
@@ -966,11 +971,11 @@ public class MiniMap extends Widget {
 		    zoomlevel = Math.min(zoomlevel + 1, dlvl + 1);
 	    }
 	} else {
-        if(zoomlevel == 0 && scale < 3) {
-            scale++;
-            ZeeConfig.minimapScale = scale;
-            Utils.setprefi("minimapScale",scale);
-            ZeeConfig.minimapCompactZoomChanged(scale);
+        if(zoomlevel == 0 && minimapScale <= 3) {
+            minimapScale++;
+            ZeeConfig.minimapScale = minimapScale;
+            Utils.setprefi("minimapScale", minimapScale);
+            ZeeConfig.minimapCompactZoomChanged(minimapScale);
         }
 	    if(zoomlevel > 0) {
 		zoomlevel--;
@@ -978,6 +983,11 @@ public class MiniMap extends Widget {
 		maglevel = Math.min(maglevel << 1, 8);
 	    }
 	}
+    //    scale 1 , maglevel 1 , dmag = 2 , zoomlevel = 0 , dlvl = 0
+    //    scale 2 , maglevel 2 , dmag = 1 , zoomlevel = 0 , dlvl = 0
+    //    scale 3 , maglevel 4 , dmag = 2 , zoomlevel = 0 , dlvl = 0
+    //    scale 3 , maglevel 8 , dmag = 4 , zoomlevel = 0 , dlvl = 0
+    //ZeeConfig.println("scale "+minimapScale+" , maglevel "+maglevel+" , dmag = "+dmag+" , zoomlevel = "+zoomlevel+" , dlvl = "+dlvl);
 	return(true);
     }
 
@@ -1100,7 +1110,7 @@ public class MiniMap extends Widget {
 		Gob player = ZeeConfig.getPlayerGob();
 		if(player != null) {
 			Coord rc = p2c(player.rc.floor(sgridsz).sub(4, 4).mul(sgridsz));
-			Coord viewsz = VIEW_SZ.div(zmult).mul(scale);
+			Coord viewsz = VIEW_SZ.div(zmult).mul(dmag);
 			g.chcolor(VIEW_BG_COLOR);
 			g.frect(rc, viewsz);
 			g.chcolor();

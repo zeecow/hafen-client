@@ -27,10 +27,9 @@
 package haven;
 
 import haven.render.*;
-import java.util.function.*;
+
 import java.awt.Color;
 import java.awt.image.BufferedImage;
-import static haven.PUtils.*;
 
 public class Window extends Widget {
     public static final Pipe.Op bgblend = FragColor.blend.nil;
@@ -725,7 +724,7 @@ public class Window extends Widget {
     public ZeeWindow.ZeeButton buttonAutoHide = null;
     boolean isAutoHideWaiting = false;
     void autoHideToggleWinPos(){
-        Coord savedWinPos = ZeeConfig.mapWindowPos.get(this.cap);
+        Coord savedWinPos = ZeeConfig.hashmapWindowPos.get(this.cap);
         if (savedWinPos==null){
             ZeeConfig.println("123123 > no saved pos to restore");
             return;

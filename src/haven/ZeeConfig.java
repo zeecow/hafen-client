@@ -402,7 +402,7 @@ public class ZeeConfig {
     static HashMap<String,Integer> mapActionUses = initMapActionUses();
     static HashMap<String, Color> mapGobColor = initMapGobColor();
     static HashMap<String,Color> mapCategoryColor = initMapCategoryColor();
-    static HashMap<String,Coord> mapWindowPos = initMapWindowPos();
+    static HashMap<String,Coord> hashmapWindowPos = initMapWindowPos();
     static HashMap<String,List<Integer>> mapAudioBlocker = initMapAudioBlocker();
 
 
@@ -994,9 +994,9 @@ public class ZeeConfig {
 
 
     // make expanded map window fit screen
-    static Coord mapWndLastPos, mapWndLastSz;
+    static Coord mapWndLastPos;
     static int mapWndMinHeightBackup=350, mapWndMinHeight=350;
-    public static void windowMapCompact(MapWnd mapWnd, boolean compact) {
+    public static void minimapCompactedOrExpanded(MapWnd mapWnd, boolean compact) {
 
         if(gameUI==null || gameUI.mapfile==null) {
             //println("windowMapCompact > gameUI "+gameUI+" , mapfile "+gameUI.mapfile);
@@ -1028,18 +1028,21 @@ public class ZeeConfig {
 
         // window compacted
         else{
-            if(MiniMap.scale==1){
+            if(MiniMap.minimapScale ==1){
                 gameUI.mapfile.resize(compactMapSizeScale1);
-            }else if(MiniMap.scale==2){
+            }else if(MiniMap.minimapScale==2){
                 gameUI.mapfile.resize(compactMapSizeScale2);
-            }else if(MiniMap.scale==3){
+            }else if(MiniMap.minimapScale==3){
                 gameUI.mapfile.resize(compactMapSizeScale3);
+            }else if(MiniMap.minimapScale==4){
+                gameUI.mapfile.resize(compactMapSizeScale4);
             }
-            //from minimapCompactReposition();
-            MapWnd map = gameUI.mapfile;
-            // adjust x pos if out of screen, or if on the right side of screen
-            if ( map.c.x + map.viewf.sz.x > gameUI.sz.x  ||  map.c.x > gameUI.sz.x/2)
-                map.c.x = gameUI.sz.x - map.viewf.sz.x ;
+            minimapCompactReposition();
+//            //from minimapCompactReposition();
+//            MapWnd map = gameUI.mapfile;
+//            // adjust x pos if out of screen, or if on the right side of screen
+//            if ( map.c.x + map.viewf.sz.x > gameUI.sz.x  ||  map.c.x > gameUI.sz.x/2)
+//                map.c.x = gameUI.sz.x - map.viewf.sz.x ;
 
             //recenter player when map compacts
             mapWnd.recenter();
@@ -1180,12 +1183,13 @@ public class ZeeConfig {
 
 
     public static void windowAdded(Window window, String test) {
-        //println(test+" > "+windowTitle);
-        //println("    deco "+window.deco);
 
         window.zeeWinAdded = true;
 
         String windowTitle = window.cap.strip();
+
+        if (window instanceof MapWnd)
+            windowTitle = ZeeWindow.getMinimapWindowTitle();
 
         if (windowTitle.contentEquals("Stack"))
             return;
@@ -1852,14 +1856,18 @@ public class ZeeConfig {
 
     private static void windowApplySavedPosition(Window window, String windowTitle) {
         Coord c;
-        if(rememberWindowsPos && !(window instanceof MapWnd) ){
+        if(rememberWindowsPos){
+
             //distinguish tables by sz.x only, due to feast button
             if (windowTitle.contentEquals("Table"))
                 windowTitle = "Table_"+window.sz.x;
+
             //use saved position window
-            if (mapWindowPos!=null && (c = mapWindowPos.get(windowTitle)) != null) {
+            if (hashmapWindowPos !=null && (c = hashmapWindowPos.get(windowTitle)) != null) {
                 window.c = c;
             }
+
+            //println("windowApplySavedPosition "+windowTitle+"  "+window.c);
         }
     }
 
@@ -2214,10 +2222,14 @@ public class ZeeConfig {
             name = "Table_"+window.sz.x;
         }
 
-        //save window pos
+        if (window instanceof MapWnd)
+            name = ZeeWindow.getMinimapWindowTitle();
 
-        mapWindowPos.put(name, new Coord(window.c));
-        Utils.setpref(MAP_WND_POS, serialize(mapWindowPos));
+        //println("saveWindowPos  "+name+"  "+window.c);
+
+        //save window pos
+        hashmapWindowPos.put(name, new Coord(window.c));
+        Utils.setpref(MAP_WND_POS, serialize(hashmapWindowPos));
     }
 
     public static boolean isMakewindow(Window window) {
@@ -4964,23 +4976,28 @@ public class ZeeConfig {
         compactMapSizeScale1 = Utils.getprefc("compactMapSizeScale1",Coord.of(150,150)),
         compactMapSizeScale2 = Utils.getprefc("compactMapSizeScale2",Coord.of(200,200)),
         compactMapSizeScale3 = Utils.getprefc("compactMapSizeScale3",Coord.of(250,250)),
+        compactMapSizeScale4 = Utils.getprefc("compactMapSizeScale4",Coord.of(300,300)),
         minimapPrevSize;
     static void minimapCompactResizedMouseup() {
         if (!isMiniMapCompacted())
             return;
         reposMapResizeBtns();
         Coord sz = gameUI.mapfile.sz;
-        if (MiniMap.scale==1 && gameUI.mapfile.view.zoomlevel==0){
+        if (MiniMap.minimapScale==1 && gameUI.mapfile.view.zoomlevel==0){
             compactMapSizeScale1 = sz;
             Utils.setprefc("compactMapSizeScale1",sz);
         }
-        else if (MiniMap.scale==2){
+        else if (MiniMap.minimapScale==2){
             compactMapSizeScale2 = sz;
             Utils.setprefc("compactMapSizeScale2",sz);
         }
-        else if (MiniMap.scale==3){
+        else if (MiniMap.minimapScale==3){
             compactMapSizeScale3 = sz;
             Utils.setprefc("compactMapSizeScale3",sz);
+        }
+        else if (MiniMap.minimapScale==4){
+            compactMapSizeScale4 = sz;
+            Utils.setprefc("compactMapSizeScale4",sz);
         }
     }
     static int prevScale=-1;
@@ -5005,16 +5022,26 @@ public class ZeeConfig {
             prevScale = scale;
             minimapCompactReposition();
         }
+        else if (scale==4 && compactMapSizeScale4!=null){
+            minimapPrevSize = Coord.of(gameUI.mapfile.viewf.sz);
+            gameUI.mapfile.resize(compactMapSizeScale4);
+            prevScale = scale;
+            minimapCompactReposition();
+        }
     }
     static void minimapCompactReposition() {
         MapWnd map = gameUI.mapfile;
 
+        // apply saved win first
+        windowApplySavedPosition(gameUI.mapfile,ZeeWindow.getMinimapWindowTitle());
+
+        //TODO consider scale 4 special case
         // adjust x pos if out of screen, or if on the right side of screen
         if ( map.c.x + map.viewf.sz.x > gameUI.sz.x  ||  map.c.x > gameUI.sz.x/2)
             map.c.x = gameUI.sz.x - map.viewf.sz.x ;
 
         // adjust y pos only if map is bellow limit
-        if (minimapPrevSize!=null && map.c.y > gameUI.sz.y/3)
+        if (minimapPrevSize!=null)// && map.c.y > gameUI.sz.y/3)
             map.c.y -= map.viewf.sz.y - minimapPrevSize.y;
 
         // minimap resize buttons
@@ -5267,6 +5294,12 @@ public class ZeeConfig {
         return false;
     }
 
+    public static boolean isHoldingSpecialKey() {
+        if (gameUI==null || gameUI.ui==null)
+            return false;
+        return gameUI.ui.modflags() != 0;
+    }
+
     public static String strArgs(Object... args){
         return Arrays.toString(args);
     }
@@ -5275,9 +5308,4 @@ public class ZeeConfig {
         System.out.println(s);
     }
 
-    public static boolean isHoldingSpecialKey() {
-        if (gameUI==null || gameUI.ui==null)
-            return false;
-        return gameUI.ui.modflags() != 0;
-    }
 }

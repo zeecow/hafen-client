@@ -532,7 +532,7 @@ public class ZeeOptionsJFrame extends JFrame {
 
         panelTabInterface.add(new ZeeOptionJCheckBox( "Remember windows pos", "rememberWindowsPos"),c);
 
-        panelTabInterface.add(btnResetWindowsPos = new JButton("reset windows pos ("+ZeeConfig.mapWindowPos.size()+")"), c);
+        panelTabInterface.add(btnResetWindowsPos = new JButton("reset windows pos ("+ZeeConfig.hashmapWindowPos.size()+")"), c);
         btnResetWindowsPos.addActionListener(evt -> {
             resetWindowsPos();
         });
@@ -821,8 +821,8 @@ public class ZeeOptionsJFrame extends JFrame {
             return;
         }
         Utils.setpref(ZeeConfig.MAP_WND_POS,"");
-        ZeeConfig.mapWindowPos = ZeeConfig.initMapWindowPos();
-        btnResetWindowsPos.setText("reset windows pos ("+ZeeConfig.mapWindowPos.size()+")");
+        ZeeConfig.hashmapWindowPos = ZeeConfig.initMapWindowPos();
+        btnResetWindowsPos.setText("reset windows pos ("+ZeeConfig.hashmapWindowPos.size()+")");
     }
 
     private JList<String> fillUpListGobsSaved() {

@@ -7,6 +7,12 @@ import java.util.List;
 
 public class ZeeWindow extends Window {
 
+    public static final String NAME_WIN_MAP_COMPACT_SCALE1 = "NAME_WIN_MAP_COMPACT_SCALE1";
+    public static final String NAME_WIN_MAP_COMPACT_SCALE2 = "NAME_WIN_MAP_COMPACT_SCALE2";
+    public static final String NAME_WIN_MAP_COMPACT_SCALE3 = "NAME_WIN_MAP_COMPACT_SCALE3";
+    public static final String NAME_WIN_MAP_COMPACT_SCALE4 = "NAME_WIN_MAP_COMPACT_SCALE4";
+    public static final String NAME_WIN_MAP_EXPANDED = "NAME_WIN_MAP_EXPANDED";
+
     public ZeeWindow(Coord size, String title) {
         super(size, title);
     }
@@ -82,6 +88,20 @@ public class ZeeWindow extends Window {
             }
             uiClassesMouseUp.clear();
         }
+    }
+
+    public static String getMinimapWindowTitle() {
+        if(ZeeConfig.isMiniMapCompacted()){
+            if (ZeeConfig.minimapScale==1)
+                return ZeeWindow.NAME_WIN_MAP_COMPACT_SCALE1;
+            if (ZeeConfig.minimapScale==2)
+                return ZeeWindow.NAME_WIN_MAP_COMPACT_SCALE2;
+            if (ZeeConfig.minimapScale==3)
+                return ZeeWindow.NAME_WIN_MAP_COMPACT_SCALE3;
+            if (ZeeConfig.minimapScale==4)
+                return ZeeWindow.NAME_WIN_MAP_COMPACT_SCALE4;
+        }
+        return ZeeWindow.NAME_WIN_MAP_EXPANDED;
     }
 
     @Override
