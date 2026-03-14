@@ -5035,14 +5035,13 @@ public class ZeeConfig {
         // apply saved win first
         windowApplySavedPosition(gameUI.mapfile,ZeeWindow.getMinimapWindowTitle());
 
-        //TODO consider scale 4 special case
         // adjust x pos if out of screen, or if on the right side of screen
         if ( map.c.x + map.viewf.sz.x > gameUI.sz.x  ||  map.c.x > gameUI.sz.x/2)
             map.c.x = gameUI.sz.x - map.viewf.sz.x ;
 
         // adjust y pos only if map is bellow limit
-        if (minimapPrevSize!=null)// && map.c.y > gameUI.sz.y/3)
-            map.c.y -= map.viewf.sz.y - minimapPrevSize.y;
+        //if (minimapPrevSize!=null)// && map.c.y > gameUI.sz.y/3)
+            //map.c.y -= map.viewf.sz.y - minimapPrevSize.y;
 
         // minimap resize buttons
         reposMapResizeBtns();
