@@ -1050,7 +1050,7 @@ public class ZeeConfig {
 
 
         // show/hide minimap resize btns
-        toggleMinimapResizeButtons(mapWnd,compact);
+        toggleMinimapOptionsButton(mapWnd,compact);
 
     }
 
@@ -1059,7 +1059,7 @@ public class ZeeConfig {
         if (wdgMapResizeBtns!=null)
             wdgMapResizeBtns.c = Coord.of(0,gameUI.mapfile.sz.y-23);
     }
-    private static void toggleMinimapResizeButtons(MapWnd mapWnd, boolean compact) {
+    private static void toggleMinimapOptionsButton(MapWnd mapWnd, boolean compact) {
 
         // hide map resize buttons
         if (!compact && wdgMapResizeBtns!=null){
@@ -1073,44 +1073,109 @@ public class ZeeConfig {
             wdgMapResizeBtns = mapWnd.add(new Widget(Coord.z),0,0);
             reposMapResizeBtns();
 
-            // button horizontal
-            Button button = wdgMapResizeBtns.add(new Button(20,"↔"){
-                public boolean mousedown(MouseDownEvent ev) {
-                    int change=25;
-                    if (ev.b==3)
-                        change *= -1;
-                    minimapPrevSize = Coord.of(gameUI.mapfile.viewf.sz);
-                    gameUI.mapfile.resize(minimapPrevSize.add(change,0));
-                    minimapCompactResizedMouseup();
-                    minimapCompactReposition();
-                    return true;
-                }
-                public boolean mouseup(MouseUpEvent ev) {
-                    return false;
+            // config button
+            Button button = wdgMapResizeBtns.add(new Button(20,new String(Character.toChars(0x1F6E0))){
+                public void wdgmsg(String msg, Object... args) {
+                    if (msg.contentEquals("activate")){
+                        String wincap = "map opts";
+                        Window win = getWindow(wincap);
+                        if (win!=null){
+                            win.reqdestroy();
+                            win = null;
+                        }
+                        win = gameUI.add(new ZeeWindow(Coord.of(100,200),wincap));
+
+                        // position config window
+                        Coord clickPos = Coord.of(ui.mc);
+                        MapWnd map = gameUI.mapfile;
+                        if (clickPos.x > gameUI.sz.div(2).x) // map on right side
+                            win.c.x = clickPos.x - win.sz.x -15;
+                        else // map on left side
+                            win.c.x = clickPos.x + 25;
+                        if (clickPos.y < gameUI.sz.div(2).y) // map on top half
+                            win.c.y = clickPos.y;
+                        else // map bottom half
+                            win.c.y = clickPos.y - win.sz.div(2).y;
+
+                        // add resize buttons
+                        int y = 1;
+                        win.add(new Label("L-click increases"),0,y);
+                        y+=12;
+                        win.add(new Label("R-click decreases"),0,y);
+                        y+=50;
+                        win.add(new Button(25,"◀"){
+                            public boolean mousedown(MouseDownEvent ev) {
+                                minimapResize("left",ev.b);
+                                return false;
+                            }
+                            public boolean mouseup(MouseUpEvent ev) {
+                                return false;
+                            }
+                        },0,y-12);
+                        win.add(new Button(25,"▲"){
+                            public boolean mousedown(MouseDownEvent ev) {
+                                minimapResize("up",ev.b);
+                                return false;
+                            }
+                            public boolean mouseup(MouseUpEvent ev) {
+                                return false;
+                            }
+                        },25,y-25);
+                        win.add(new Button(25,"▼"){
+                            public boolean mousedown(MouseDownEvent ev) {
+                                minimapResize("down",ev.b);
+                                return false;
+                            }
+                            public boolean mouseup(MouseUpEvent ev) {
+                                return false;
+                            }
+                        },25,y);
+                        win.add(new Button(25,"▶"){
+                            public boolean mousedown(MouseDownEvent ev) {
+                                minimapResize("right",ev.b);
+                                return false;
+                            }
+                            public boolean mouseup(MouseUpEvent ev) {
+                                return false;
+                            }
+                        },50,y-12);
+                    }
                 }
             },Coord.z);
-            button.settip("left/right click");
-
-            // button vertical
-            button = wdgMapResizeBtns.add(new Button(20,"↕"){
-                public boolean mousedown(MouseDownEvent ev) {
-                    int change=25;
-                    if (ev.b==3)
-                        change *= -1;
-                    minimapPrevSize = Coord.of(gameUI.mapfile.viewf.sz);
-                    gameUI.mapfile.resize(minimapPrevSize.add(0,change));
-                    minimapCompactResizedMouseup();
-                    minimapCompactReposition();
-                    return true;
-                }
-                public boolean mouseup(MouseUpEvent ev) {
-                    return false;
-                }
-            },Coord.z.add(20,0));
-            button.settip("left/right click");
+            button.settip("map opts");
 
             wdgMapResizeBtns.pack();
         }
+    }
+    private static void minimapResize(String dir, int btn){
+        int change = 25;
+        if (btn==3)
+            change *= -1;
+        MapWnd map = gameUI.mapfile;
+        if (dir.contentEquals("left")){
+            minimapPrevSize = Coord.of(map.viewf.sz);
+            map.resize(minimapPrevSize.add(change,0));
+            if (map.sz.x != minimapPrevSize.x) { // check minimum size
+                // left changes win pos
+                map.c.x -= change;
+                saveWindowPos(map);
+            }
+        } else if (dir.contentEquals("up")) {
+            minimapPrevSize = Coord.of(map.viewf.sz);
+            map.resize(minimapPrevSize.add(0,change));
+            if (map.sz.y != minimapPrevSize.y) { // check minimum size
+                // up changes win pos
+                map.c.y -= change;
+                saveWindowPos(map);
+            }
+        } else if (dir.contentEquals("down")) {
+            minimapPrevSize = Coord.of(map.viewf.sz);
+            map.resize(minimapPrevSize.add(0,change));
+        } else if (dir.contentEquals("right")) {
+            minimapPrevSize = Coord.of(map.viewf.sz);
+            map.resize(minimapPrevSize.add(change,0));
+        }
+        minimapCompactResizedMouseup();
     }
 
 
@@ -2253,7 +2318,7 @@ public class ZeeConfig {
                     println("init toggles > "+ZeeSess.charSwitchCurPlayingChar);
 
                     // add minimap resize buttons
-                    toggleMinimapResizeButtons(gameUI.mapfile,isMiniMapCompacted());
+                    toggleMinimapOptionsButton(gameUI.mapfile,isMiniMapCompacted());
 
                     // show char switch window
                     if (ZeeSess.charSwitchKeepWindow)

@@ -80,6 +80,8 @@ public class ZeeWindow extends Window {
                 return;
             }
             Window win = (Window) widget.parent;
+            if (win.cap.contentEquals("map opts"))
+                return;
             if (uiClassesMouseUp.contains("haven.MapWnd")) {
                 ZeeConfig.gameUI.mapfile.compact(true);
                 Utils.setprefb("compact-map", true);
