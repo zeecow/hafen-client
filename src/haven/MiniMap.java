@@ -371,8 +371,10 @@ public class MiniMap extends Widget {
 			// replace minimap mark for something smaller
 			this.hit = Area.sized(minimapMarkImgCc.inv(), UI.scale(Coord.of(minimapMarkImg.getWidth())));
 			//this.hit = Area.sized(flagcc.inv(), UI.scale(flagbg.sz));
-		}
-	}
+		} else if (marker instanceof SMarker) {
+            ZeeConfig.minimapOptsAddMark((SMarker) marker);
+        }
+    }
 
 	// minimap mark replacement
 	static BufferedImage minimapMarkImg = ZeeManagerIcons.imgStar4(7,Color.white,false,false,false);
@@ -388,11 +390,11 @@ public class MiniMap extends Widget {
 		g.chcolor(((PMarker)m).color);
 		g.image(minimapMarkImg,ul);
 		g.chcolor();
-//		g.chcolor(((PMarker)m).color);
-//		g.image(flagfg, ul);
-//		g.chcolor();
-//		g.image(flagbg, ul);
-	    } else if(m instanceof SMarker) {
+        //g.chcolor(((PMarker)m).color);
+        //g.image(flagfg, ul);
+        //g.chcolor();
+        //g.image(flagbg, ul);
+	    } else if(m instanceof SMarker && !m.mapOptsHide) {
 		SMarker sm = (SMarker)m;
 		try {
 		    if(cc == null) {

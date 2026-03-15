@@ -277,11 +277,12 @@ public class MapFile {
 	public long seg;
 	public Coord tc;
 	public String nm;
-
-	public Marker(long seg, Coord tc, String nm) {
+    public boolean mapOptsHide;
+    public Marker(long seg, Coord tc, String nm) {
 	    this.seg = seg;
 	    this.tc = tc;
 	    this.nm = nm;
+        this.mapOptsHide = false;
 	}
     }
 
