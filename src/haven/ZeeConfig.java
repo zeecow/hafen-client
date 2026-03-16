@@ -1152,28 +1152,25 @@ public class ZeeConfig {
         },50,y-12);
 
 
-        // add marks list
-        y += 20;
+        /*
+            add marks list
+        */
+        y += 30;
+        mapOptsMarksButtonsCreated = 0;
         Scrollport sp = win.add(new Scrollport(Coord.of(100,120)),0,y);
         for (int i = 0; i < mapOptsMarksResnames.size(); i++) {
             String resname = mapOptsMarksResnames.get(i);
-            Widget cont = sp.cont;
             BufferedImage img = Loading.waitfor(Resource.remote().load(resname)).flayer(Resource.imgc).scaled();
-            cont.add(new IButton(img,img){
-                @Override
-                public void wdgmsg(String msg, Object... args) {
-                    if (msg.contentEquals("activate")){
-                        for (MapFile.Marker marker : gameUI.mapfile.file.markers) {
-                            if (marker instanceof MapFile.SMarker){
-                                if (((MapFile.SMarker) marker).res.name.contentEquals(resname)){
-                                    marker.mapOptsHide = !marker.mapOptsHide;
-                                }
-                            }
-                        }
-                        ZeeConfig.msgLow( "toggle "+resname);
+            for (MapFile.Marker marker : gameUI.mapfile.file.markers) {
+                if (marker instanceof MapFile.SMarker){
+                    MapFile.SMarker smark = (MapFile.SMarker) marker;
+                    if (smark.res.name.contentEquals(resname)){
+                        minimapOptCreateMarkButton(sp.cont, smark);
+                        //println("creating mark button "+ markOptsMarksButtonsCreated+"  "+resname);
+                        break;
                     }
                 }
-            },0, i * img.getHeight());
+            }
         }
 
     }
@@ -1198,23 +1195,67 @@ public class ZeeConfig {
             return;
         }
 
-        Widget cont = sp.cont;
-        BufferedImage img = marker.res.get().flayer(Resource.imgc).scaled();
+        // create mark button
+        minimapOptCreateMarkButton(sp.cont,marker);
+    }
+    static int mapOptsMarksButtonsCreated = 0;
+    static boolean mapOptsMarksShowOnlyIsOn = false;
+    private static void minimapOptCreateMarkButton(Widget cont, MapFile.SMarker sMarker){
+        BufferedImage img = sMarker.res.get().flayer(Resource.imgc).scaled();
+        String resname = sMarker.res.name;
+        String basename = sMarker.res.get().basename();
+        Coord pos;
+        // position buttons in two columns
+        if (mapOptsMarksButtonsCreated % 2 == 0){
+            //left col
+            pos = Coord.of(0,(mapOptsMarksButtonsCreated * img.getHeight())/2);
+        }else{
+            //right col
+            pos = Coord.of(img.getWidth(),((mapOptsMarksButtonsCreated -1) * img.getHeight())/2);
+        }
         cont.add(new IButton(img,img){
-            @Override
-            public void wdgmsg(String msg, Object... args) {
-                if (msg.contentEquals("activate")){
-                    for (MapFile.Marker marker : gameUI.mapfile.file.markers) {
-                        if (marker instanceof MapFile.SMarker){
-                            if (((MapFile.SMarker) marker).res.name.contentEquals(resname)){
-                                marker.mapOptsHide = !marker.mapOptsHide;
+            public boolean mouseup(MouseUpEvent ev) {
+                // left click hide mark
+                if (ev.b == 1) {
+                    for (MapFile.Marker m1 : gameUI.mapfile.file.markers) {
+                        if (m1 instanceof MapFile.SMarker) {
+                            if (((MapFile.SMarker) m1).res.name.contentEquals(resname)) {
+                                m1.mapOptsHide = !m1.mapOptsHide;
                             }
                         }
                     }
-                    ZeeConfig.msgLow( "toggle "+resname);
+                    ZeeConfig.msgLow("toggle hide " + basename);
                 }
+                // right click show only mark
+                else if(ev.b == 3){
+                    mapOptsMarksShowOnlyIsOn = !mapOptsMarksShowOnlyIsOn;
+                    for (MapFile.Marker m1 : gameUI.mapfile.file.markers) {
+                        if (m1 instanceof MapFile.SMarker) {
+                            if (mapOptsMarksShowOnlyIsOn) {
+                                //show clicked mark
+                                if (((MapFile.SMarker) m1).res.name.contentEquals(resname)) {
+                                    m1.mapOptsHide = !mapOptsMarksShowOnlyIsOn;
+                                }
+                                //hide other marks
+                                else {
+                                    m1.mapOptsHide = mapOptsMarksShowOnlyIsOn;
+                                }
+                            }else{
+                                //show all marks
+                                m1.mapOptsHide = false;
+                            }
+
+                        }
+                    }
+                    ZeeConfig.msgLow("toggle show only " + basename);
+                }
+                return true;
             }
-        },0, mapOptsMarksResnames.size()*img.getHeight());
+            public boolean mousedown(MouseDownEvent ev) {
+                return true;
+            }
+        },pos.x,pos.y).settip(basename);
+        mapOptsMarksButtonsCreated++;
     }
 
     private static void minimapResize(String dir, int btn){
@@ -3126,6 +3167,7 @@ public class ZeeConfig {
         lastAutoHearthMs = 0;
         if (mapOptsMarksResnames!=null)
             mapOptsMarksResnames.clear();
+        mapOptsMarksButtonsCreated = 0;
         ZeeResearch.setFilenameForServer();
         ZeeManagerCraft.craftRecExit();
         if (listCauldronContainers!=null)
