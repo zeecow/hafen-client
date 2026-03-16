@@ -1180,13 +1180,13 @@ public class ZeeConfig {
     static List<String> mapOptsMarksResnames = new ArrayList<>();
     static void minimapOptsAddMark(MapFile.SMarker marker){
 
-        String name = Loading.waitfor(marker.res).name;
+        String resname = Loading.waitfor(marker.res).name;
 
-        if (mapOptsMarksResnames.contains(name)){
+        if (mapOptsMarksResnames.contains(resname)){
             return;
         }
-        mapOptsMarksResnames.add(name);
-        println("mapOptsMarks "+ mapOptsMarksResnames.size()+"  "+name);
+        mapOptsMarksResnames.add(resname);
+        println("mapOptsMarks "+ mapOptsMarksResnames.size()+"  "+resname);
 
         Window win = getWindow("map opts");
         if (win==null) {
@@ -1200,7 +1200,21 @@ public class ZeeConfig {
 
         Widget cont = sp.cont;
         BufferedImage img = marker.res.get().flayer(Resource.imgc).scaled();
-        cont.add(new IButton(img,img),0, mapOptsMarksResnames.size()*img.getHeight());
+        cont.add(new IButton(img,img){
+            @Override
+            public void wdgmsg(String msg, Object... args) {
+                if (msg.contentEquals("activate")){
+                    for (MapFile.Marker marker : gameUI.mapfile.file.markers) {
+                        if (marker instanceof MapFile.SMarker){
+                            if (((MapFile.SMarker) marker).res.name.contentEquals(resname)){
+                                marker.mapOptsHide = !marker.mapOptsHide;
+                            }
+                        }
+                    }
+                    ZeeConfig.msgLow( "toggle "+resname);
+                }
+            }
+        },0, mapOptsMarksResnames.size()*img.getHeight());
     }
 
     private static void minimapResize(String dir, int btn){
