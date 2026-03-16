@@ -3124,6 +3124,8 @@ public class ZeeConfig {
         ZeeManagerMiner.isSingleTileMining = false;
         ZeeManagerMiner.lastCavedust = null;
         lastAutoHearthMs = 0;
+        if (mapOptsMarksResnames!=null)
+            mapOptsMarksResnames.clear();
         ZeeResearch.setFilenameForServer();
         ZeeManagerCraft.craftRecExit();
         if (listCauldronContainers!=null)
