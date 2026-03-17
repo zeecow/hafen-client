@@ -4017,7 +4017,7 @@ public class ZeeManagerGobs extends ZeeThread{
             "/stallion,/mare,/foal,/hog,/sow,/piglet,/teimdeercow,/teimdeerbull,/teimdeerkid,"
             +"/billy,/nanny,/kid,/sheep,/lamb,/cattle,/calf,"
             +"/horse,/aurochs,/mouflon,/wildgoat,"
-            +"/adder,/badger,/bear,/boar,/beaver,/fox,"
+            +"/adder,/badger,/bear,/polarbear,/boar,/beaver,/fox,"
             +"/reindeer,/reddeer,/roedeer,"
             +"/greyseal,/otter,/garefowl,"
             +"/lynx,/mammoth,/moose,/troll,/walrus,/wolf,/wolverine,"

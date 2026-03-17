@@ -367,6 +367,7 @@ public class ZeeConfig {
             "gfx/kritter/badger/badger",
             "gfx/kritter/bat/bat",
             "gfx/kritter/bear/bear",
+            "gfx/kritter/bear/polarbear",
             "gfx/kritter/boar/boar",
             "gfx/kritter/boreworm/boreworm",
             "gfx/kritter/caveangler/caveangler",
@@ -581,15 +582,21 @@ public class ZeeConfig {
         return false;
     }
 
-    public static boolean isAggressive(String nameContains){
+    public static boolean isAggressive(String gobOrIconResName){
+        // gob name starts with
+        for (String agro : aggressiveGobs) {
+            if(agro.startsWith(gobOrIconResName))
+                return true;
+        }
+        // icon name contains
         final List<String> listContains = List.of(
-               "/adder","/sandflea","/boar/","/badger/","/bear/","/bat/","/boreworm/",
+               "/adder","/boar/","/badger/","/bear/","/bat/","/boreworm/",
                 "/ooze/","/cavelouse/","/caveangler/","orca","/goldeneagle/","/lynx/",
                 "/mammoth/","/moose/","/troll/","/walrus/","/goat/wildgoat","/wolf/","/wolverine/",
-                "spermwhale", "icebear", "narwhal"
+                "spermwhale", "polarbear", "narwhal"
         );
         for (String listName : listContains) {
-            if (nameContains.contains(listName))
+            if (gobOrIconResName.contains(listName))
                 return true;
         }
         return false;
@@ -692,7 +699,7 @@ public class ZeeConfig {
         final String[] list = {
             //wild
             "gfx/kritter/badger/badger",
-            "gfx/kritter/bear/bear",
+            "gfx/kritter/bear/",
             "gfx/kritter/boar/boar",
             "gfx/kritter/caveangler/caveangler",
             "gfx/kritter/lynx/lynx",
