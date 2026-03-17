@@ -380,6 +380,8 @@ public class MiniMap extends Widget {
 	static BufferedImage minimapMarkImg = ZeeManagerIcons.imgStar4(7,Color.white,false,false,false);
 	static Coord minimapMarkImgCc = UI.scale(Coord.of(minimapMarkImg.getWidth()));
 	public void draw(GOut g, Coord c) {
+        if (m.mapOptsHide)
+            return;
 	    if(m instanceof PMarker) {
 		//Coord ul = c.sub(flagcc);
 		Coord ul = c.sub(minimapMarkImgCc);
@@ -394,7 +396,7 @@ public class MiniMap extends Widget {
         //g.image(flagfg, ul);
         //g.chcolor();
         //g.image(flagbg, ul);
-	    } else if(m instanceof SMarker && !m.mapOptsHide) {
+	    } else if(m instanceof SMarker) {
 		SMarker sm = (SMarker)m;
 		try {
 		    if(cc == null) {

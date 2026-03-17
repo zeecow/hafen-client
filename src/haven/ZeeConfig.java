@@ -1045,11 +1045,6 @@ public class ZeeConfig {
                 gameUI.mapfile.resize(compactMapSizeScale4);
             }
             minimapCompactReposition();
-//            //from minimapCompactReposition();
-//            MapWnd map = gameUI.mapfile;
-//            // adjust x pos if out of screen, or if on the right side of screen
-//            if ( map.c.x + map.viewf.sz.x > gameUI.sz.x  ||  map.c.x > gameUI.sz.x/2)
-//                map.c.x = gameUI.sz.x - map.viewf.sz.x ;
 
             //recenter player when map compacts
             mapWnd.recenter();
@@ -1095,17 +1090,18 @@ public class ZeeConfig {
     }
 
     private static void windowMinimapOpts() {
+
         String wincap = "map opts";
         Window win = getWindow(wincap);
         if (win!=null){
             win.reqdestroy();
             win = null;
         }
-        win = gameUI.add(new ZeeWindow(Coord.of(100,200),wincap));
+        win = gameUI.add(new ZeeWindow(Coord.of(105,220),wincap));
+
 
         // position config window
         Coord clickPos = Coord.of(gameUI.ui.mc);
-        MapWnd map = gameUI.mapfile;
         if (clickPos.x > gameUI.sz.div(2).x) // map on right side
             win.c.x = clickPos.x - win.sz.x -15;
         else // map on left side
@@ -1115,12 +1111,12 @@ public class ZeeConfig {
         else // map bottom half
             win.c.y = clickPos.y - win.sz.div(2).y;
 
+
         // add resize buttons
         int y = 1;
-        win.add(new Label("L-click increases"),0,y);
-        y+=12;
-        win.add(new Label("R-click decreases"),0,y);
-        y+=45;
+        String infoSymbol = new String(Character.toChars(0x1F6C8));
+        win.add(new Label("Map size "+infoSymbol),0,y).settip("left-click increase, right-click decrease");
+        y += 40;
         win.add(new Button(25,"◀"){
             public boolean mousedown(MouseDownEvent ev) {
                 minimapResize("left",ev.b);
@@ -1159,15 +1155,32 @@ public class ZeeConfig {
         },50,y-12);
 
 
-        /*
-            add marks list
-        */
-        y += 30;
-        mapOptsMarksButtonsCreated = 0;
-        Scrollport sp = win.add(new Scrollport(Coord.of(100,120)),0,y);
+        // add checkbox hide player marks
+        y += 35;
+        win.add(new CheckBox("hide placed marks"){
+            {a = false;}//default show markers
+            public void set(boolean a) {
+                super.set(a);
+                int cont = 0;
+                for (MapFile.Marker marker : gameUI.mapfile.file.markers) {
+                    if (marker instanceof MapFile.PMarker) {
+                        marker.mapOptsHide = a;
+                        cont++;
+                    }
+                }
+                ZeeConfig.msgLow((a?"hide":"show")+" placed marks");
+            }
+        },0,y);
+
+
+        // add marks list
+        y += 25;
+        win.add(new Label("Natural marks "+infoSymbol),0,y).settip("left-click hide , right-click show only");
+        y += 20;
+        mapOptsMarksRow = mapOptsMarksCol = 0; // reset 3 col button grid
+        Scrollport sp = win.add(new Scrollport(Coord.of(110,100)),0,y);
         for (int i = 0; i < mapOptsMarksResnames.size(); i++) {
             String resname = mapOptsMarksResnames.get(i);
-            BufferedImage img = Loading.waitfor(Resource.remote().load(resname)).flayer(Resource.imgc).scaled();
             for (MapFile.Marker marker : gameUI.mapfile.file.markers) {
                 if (marker instanceof MapFile.SMarker){
                     MapFile.SMarker smark = (MapFile.SMarker) marker;
@@ -1205,21 +1218,24 @@ public class ZeeConfig {
         // create mark button
         minimapOptCreateMarkButton(sp.cont,marker);
     }
-    static int mapOptsMarksButtonsCreated = 0;
     static boolean mapOptsMarksShowOnlyIsOn = false;
+    private static int mapOptsMarksRow = 0, mapOptsMarksCol = 0;
     private static void minimapOptCreateMarkButton(Widget cont, MapFile.SMarker sMarker){
+
         BufferedImage img = sMarker.res.get().flayer(Resource.imgc).scaled();
         String resname = sMarker.res.name;
         String basename = sMarker.res.get().basename();
-        Coord pos;
-        // position buttons in two columns
-        if (mapOptsMarksButtonsCreated % 2 == 0){
-            //left col
-            pos = Coord.of(0,(mapOptsMarksButtonsCreated * img.getHeight())/2);
-        }else{
-            //right col
-            pos = Coord.of(img.getWidth(),((mapOptsMarksButtonsCreated -1) * img.getHeight())/2);
+
+        // set button coord in 3 columns grid
+        Coord pos = Coord.of(mapOptsMarksCol * img.getWidth(), mapOptsMarksRow * img.getHeight());
+        // calc next coord
+        if (mapOptsMarksCol == 2) {
+            mapOptsMarksCol = 0;
+            mapOptsMarksRow++;
+        } else {
+            mapOptsMarksCol++;
         }
+
         cont.add(new IButton(img,img){
             public boolean mouseup(MouseUpEvent ev) {
                 // left click hide mark
@@ -1262,7 +1278,6 @@ public class ZeeConfig {
                 return true;
             }
         },pos.x,pos.y).settip(basename);
-        mapOptsMarksButtonsCreated++;
     }
 
     private static void minimapResize(String dir, int btn){
@@ -3174,7 +3189,7 @@ public class ZeeConfig {
         lastAutoHearthMs = 0;
         if (mapOptsMarksResnames!=null)
             mapOptsMarksResnames.clear();
-        mapOptsMarksButtonsCreated = 0;
+        mapOptsMarksRow = mapOptsMarksCol = 0;
         ZeeResearch.setFilenameForServer();
         ZeeManagerCraft.craftRecExit();
         if (listCauldronContainers!=null)
