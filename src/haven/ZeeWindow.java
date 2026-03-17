@@ -93,7 +93,7 @@ public class ZeeWindow extends Window {
     }
 
     public static String getMinimapWindowTitle() {
-        if(ZeeConfig.isMiniMapCompacted()){
+        if(ZeeConfig.isMinimapCompacted()){
             if (ZeeConfig.minimapScale==1)
                 return ZeeWindow.NAME_WIN_MAP_COMPACT_SCALE1;
             if (ZeeConfig.minimapScale==2)

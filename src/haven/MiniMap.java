@@ -372,7 +372,7 @@ public class MiniMap extends Widget {
 			this.hit = Area.sized(minimapMarkImgCc.inv(), UI.scale(Coord.of(minimapMarkImg.getWidth())));
 			//this.hit = Area.sized(flagcc.inv(), UI.scale(flagbg.sz));
 		} else if (marker instanceof SMarker) {
-            ZeeConfig.minimapOptsAddMark((SMarker) marker);
+            ZeeManagerMinimap.minimapOptsAddMark((SMarker) marker);
         }
     }
 
@@ -966,7 +966,7 @@ public class MiniMap extends Widget {
             minimapScale--;
             ZeeConfig.minimapScale = minimapScale;
             Utils.setprefi("minimapScale", minimapScale);
-            ZeeConfig.minimapCompactZoomChanged(minimapScale);
+            ZeeManagerMinimap.minimapCompactZoomChanged(minimapScale);
         }
 	    if(maglevel > 1) {
 		maglevel >>= 1;
@@ -979,7 +979,7 @@ public class MiniMap extends Widget {
             minimapScale++;
             ZeeConfig.minimapScale = minimapScale;
             Utils.setprefi("minimapScale", minimapScale);
-            ZeeConfig.minimapCompactZoomChanged(minimapScale);
+            ZeeManagerMinimap.minimapCompactZoomChanged(minimapScale);
         }
 	    if(zoomlevel > 0) {
 		zoomlevel--;

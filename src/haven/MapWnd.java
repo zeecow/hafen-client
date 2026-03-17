@@ -194,8 +194,8 @@ public class MapWnd extends Window implements Console.Directory {
 	    if((ev.b == 1) && (drag != null)) {
 		drag.remove();
 		drag = null;
-		ZeeConfig.mapWndMinHeightBackup = -1;
-		ZeeConfig.minimapCompactResizedMouseup();
+        ZeeManagerMinimap.mapWndMinHeightBackup = -1;
+        ZeeManagerMinimap.minimapCompactResizedMouseup();
 		return(true);
 	    }
 	    return(super.mouseup(ev));
@@ -755,7 +755,7 @@ public class MapWnd extends Window implements Console.Directory {
 	    newfocusable(tool);
 	chdeco(a ? null : makedeco());
 	pack();
-	ZeeConfig.minimapCompactedOrExpanded(this,a);
+    ZeeManagerMinimap.minimapCompactedOrExpanded(this,a);
     }
 
     public void recenter() {
