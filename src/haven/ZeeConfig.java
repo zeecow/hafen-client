@@ -1460,6 +1460,7 @@ public class ZeeConfig {
 
         windowFuelTargetGob = lastMapViewClickGob;
 
+        // oven
         if (windowTitle.contentEquals("Oven")) {
             window.add(te=new TextEntry(txtsz,"4"){
                 public boolean mousewheel(MouseWheelEvent ev) {
@@ -1480,6 +1481,8 @@ public class ZeeConfig {
                 }
             },x+btn.sz.x,y);
         }
+
+        // kiln
         else if (windowTitle.contentEquals("Kiln")) {
             window.add(te=new TextEntry(txtsz,"1"){
                 public boolean mousewheel(MouseWheelEvent ev) {
@@ -1499,7 +1502,11 @@ public class ZeeConfig {
                         windowAddFuel(te.text(),this.text.text,windowFuelTargetGob);
                 }
             },x+btn.sz.x,y);
+            window.add(new Label(ZeeManagerIcons.INFO_SYMBOL),btn.c.x+btn.sz.x+7,y).settip(ZeeFont.getToolipInfoKiln());
+            //.settip(String.format("Fields: %,d\nContours: %.2f", fields, outline), true);;
         }
+
+        // smelter
         else if ( windowTitle.contains("Smelter") ){
             window.add(te=new TextEntry(txtsz,"9"){
                 public boolean mousewheel(MouseWheelEvent ev) {

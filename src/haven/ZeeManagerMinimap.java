@@ -120,8 +120,7 @@ public class ZeeManagerMinimap {
 
         // add resize buttons
         int y = 1;
-        String infoSymbol = new String(Character.toChars(0x1F6C8));
-        win.add(new Label("Map size "+infoSymbol),0,y).settip("left-click increase, right-click decrease");
+        win.add(new Label("Map size "+ZeeManagerIcons.INFO_SYMBOL),0,y).settip("left-click increase, right-click decrease");
         y += 40;
         win.add(new Button(25,"◀"){
             public boolean mousedown(MouseDownEvent ev) {
@@ -181,7 +180,7 @@ public class ZeeManagerMinimap {
 
         // add marks list
         y += 25;
-        win.add(new Label("Natural marks "+infoSymbol),0,y).settip("left-click hide , right-click show only");
+        win.add(new Label("Natural marks "+ZeeManagerIcons.INFO_SYMBOL),0,y).settip("left-click hide , right-click show only");
         y += 20;
         mapOptsMarksRow = mapOptsMarksCol = 0; // reset 3 col button grid
         Scrollport sp = win.add(new Scrollport(Coord.of(110,100)),0,y);

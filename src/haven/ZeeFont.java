@@ -129,11 +129,46 @@ public class ZeeFont {
         lastmsgtime = msgtime;
     }
 
+    public static String getToolipInfoKiln() {
+        Object[][] items = {
+                {"Ashes from boards", 3},
+                {"Ashes from blocks", 8},
+                {"Ashes from branches", 8},
+                {"Ashes from barks", 8},
+                {"Ashes from pitbakes", 12},
+                {"Bone Ash", 6},
+                {"Branding Iron warm up", 1},
+                {"Brick", 2},
+                {"Brick from coadeclay", 23},
+                {"Ceramic Knife", 12},
+                {"Clay Jar", 12},
+                {"Clay Pipe", 5},
+                {"Earthenware Platter", 8},
+                {"Food items", 4},
+                {"Garden Pot", 23},
+                {"Hand Impression", 5},
+                {"Malted Barley", 1},
+                {"Malted Wheat", 1},
+                {"Mug", 12},
+                {"Pot", 23},
+                {"Porcelain Plate", 8},
+                {"Stoneware Vase", 8},
+                {"Teapot", 12},
+                {"Toy Chariot", 5},
+                {"Treeplanter's Pot", 8},
+                {"Urn", 23}
+        };
 
-
-
+        StringBuilder sb = new StringBuilder();
+        sb.append("2 branch == 1 coal\n\nItem   # fuel branches\n============\n");
+        for (Object[] item : items) {
+            sb.append(String.format("%s  %d\n", item[0], (int)item[1]));
+        }
+        return sb.toString();
+    }
 
     private static void println(String s) {
         ZeeConfig.println(s);
     }
+
 }

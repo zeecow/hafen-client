@@ -10,6 +10,7 @@ import java.util.List;
 @SuppressWarnings("deprecation")
 public class ZeeManagerIcons {
 
+    public static final String INFO_SYMBOL = new String(Character.toChars(0x1F6C8));
     public static Coord2d lastMinimapClick;
     static List<Gob> gobs = new ArrayList<>();
     static HashMap<String,BufferedImage> mapRuleImg = new HashMap<String,BufferedImage>();
