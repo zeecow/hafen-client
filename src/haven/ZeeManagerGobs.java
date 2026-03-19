@@ -3885,10 +3885,12 @@ public class ZeeManagerGobs extends ZeeThread{
 
     public static boolean isGobCrop(String gobName){
         return ZeeConfig.nameInListEndsWith(gobName,
-                "plants/carrot,plants/beet,plants/yellowonion,plants/redonion,plants/garlic,plants/greenkale,"
+                "plants/carrot,plants/beet,plants/yellowonion,"
+                +"plants/redonion,plants/garlic,plants/greenkale,"
                 +"plants/leek,plants/lettuce,plants/pipeweed,plants/hemp,plants/flax,"
                 +"plants/turnip,plants/millet,plants/barley,plants/wheat,plants/poppy,"
-                +"plants/pumpkin,plants/fallowplant,plants/champignon"
+                +"plants/pumpkin,plants/watermelon,"
+                +"plants/fallowplant,plants/champignon"
         );
     }
 

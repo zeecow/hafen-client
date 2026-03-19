@@ -527,7 +527,11 @@ public class ZeeConfig {
 
     //  gfx/invobjs/turnip , gfx/invobjs/seed-turnip
     public static boolean isItemCrop(String basename) {
-        final List<String> crops = List.of("beetroot","seed-turnip","turnip","seed-carrot","carrot","seed-flax","seed-hemp","seed-leek","leek","seed-poppy","seed-pipeweed","seed-cucumber","seed-barley","seed-wheat","seed-millet","seed-lettuce","seed-pumpkin","pumpkin","yellowonion","redonion","garlic","seeds-greenkale");
+        final List<String> crops = List.of("beetroot","seed-turnip","turnip",
+                "seed-carrot","carrot","seed-flax","seed-hemp","seed-leek","leek",
+                "seed-poppy","seed-pipeweed","seed-cucumber","seed-barley","seed-wheat",
+                "seed-millet","seed-lettuce","seed-pumpkin","pumpkin","yellowonion",
+                "redonion","garlic","seeds-greenkale","seeds-watermelon");
         return crops.contains(basename);
     }
 
