@@ -761,7 +761,7 @@ public class UI {
     }
 
     public static class ErrorMessage extends SimpleMessage {
-	public static final Color color = new Color(192, 0, 0);
+	public static final Color color = new Color(236, 77, 77);
 	public static final Audio.Clip sfx = Audio.resclip(Resource.local().loadwait("sfx/error"));
 
 	public ErrorMessage(String msg) {super(msg);}

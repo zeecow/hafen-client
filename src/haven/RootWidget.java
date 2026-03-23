@@ -30,7 +30,7 @@ import java.util.*;
 import java.awt.Color;
 
 public class RootWidget extends ConsoleHost implements UI.Notice.Handler, Widget.CursorQuery.Handler, Console.Directory {
-    public static final Text.Foundry msgfoundry = new Text.Foundry(Text.dfont, 14);
+    public static final Text.Foundry msgfoundry = new Text.Foundry(Text.dfont, 16);
     public boolean modtip = false;
     Profile guprof, grprof, ggprof;
     private Text lastmsg;
