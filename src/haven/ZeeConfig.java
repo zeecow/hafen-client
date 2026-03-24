@@ -531,7 +531,7 @@ public class ZeeConfig {
                 "seed-carrot","carrot","seed-flax","seed-hemp","seed-leek","leek",
                 "seed-poppy","seed-pipeweed","seed-cucumber","seed-barley","seed-wheat",
                 "seed-millet","seed-lettuce","seed-pumpkin","pumpkin","yellowonion",
-                "redonion","garlic","seeds-greenkale","seeds-watermelon");
+                "redonion","garlic","seeds-greenkale","seed-watermelon","radish");
         return crops.contains(basename);
     }
 

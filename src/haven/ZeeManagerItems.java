@@ -1532,7 +1532,7 @@ public class ZeeManagerItems extends ZeeThread{
                 +"seed-grape,seed-greenkale,seed-hemp,seed-leek,leek,seed-lettuce,seed-millet,"
                 +"seed-pipeweed,seed-poppy,seed-pumpkin,seed-wheat,seed-turnip,turnip,"
                 +"seed-wheat,seed-barley,beetroot,yellowonion,redonion,garlic,"
-                +"peapod,peppercorn,hopcones";
+                +"peapod,peppercorn,hopcones,seed-watermelon,radish";
         name = name.replace("gfx/invobjs/","");
         return list.contains(name);
     }
