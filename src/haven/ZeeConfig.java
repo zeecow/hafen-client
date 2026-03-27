@@ -700,46 +700,18 @@ public class ZeeConfig {
     static boolean isKritterNotPickable(Gob kritter) {
         String resname = kritter.getres().name;
 
-        final String[] list = {
+        final String[] list =  {
             //wild
-            "gfx/kritter/badger/badger",
-            "gfx/kritter/bear/",
-            "gfx/kritter/boar/boar",
-            "gfx/kritter/caveangler/caveangler",
-            "gfx/kritter/lynx/lynx",
-            "gfx/kritter/mammoth/mammoth",
-            "gfx/kritter/moose/moose",
-            "gfx/kritter/rat/caverat",
-            "gfx/kritter/troll/troll",
-            "gfx/kritter/walrus/walrus",
-            "gfx/kritter/goat/wildgoat",
-            "gfx/kritter/wolf/wolf",
-            "gfx/kritter/wolverine/wolverine",
-            "gfx/kritter/cattle/aurochs/",
-            "gfx/kritter/sheep/mouflon",
-            "gfx/kritter/reindeer/",
-            "gfx/kritter/reddeer/",
-            "gfx/kritter/roedeer/",
-            "gfx/kritter/fox/",
-            "gfx/kritter/beaver",
-            "gfx/kritter/boreworm",
-            "gfx/kritter/cavelouse",
-            "gfx/kritter/ooze",
-            "gfx/kritter/otter",
-            "gfx/kritter/mammoth",
-            "/spermwhale",
-            "/orca",
-            "/garefowl",
+            "/badger", "/bear", "/boar", "/caveangler", "/lynx",
+            "/mammoth", "/moose", "/caverat", "/troll", "/walrus",
+            "/wildgoat", "/wolf", "/wolverine", "/aurochs", "/mouflon",
+            "/reindeer", "/reddeer", "/roedeer", "/fox", "/beaver",
+            "/boreworm", "/cavelouse", "/ooze", "/otter", "/mammoth",
+            "/spermwhale", "/orca", "/narwhal", "/garefowl", "/greyseal",
             //tamed
-            "gfx/kritter/horse/",
-            "gfx/kritter/goat/",
-            "gfx/kritter/sheep/",
-            "gfx/kritter/cattle/",
-            "gfx/kritter/pig/",
+            "/horse", "/goat", "/sheep", "/cattle", "/pig/",
             //misc
-            "gfx/kritter/midgeswarm/",
-            "gfx/kritter/ants/",
-            "gfx/kritter/wildbees/"
+            "/midgeswarm", "/ants", "/wildbees"
         };
         for (int i = 0; i < list.length; i++) {
             if(resname.contains(list[i]))
