@@ -2857,8 +2857,9 @@ public class ZeeConfig {
         ZeeManagerMiner.isSingleTileMining = false;
         ZeeManagerMiner.lastCavedust = null;
         lastAutoHearthMs = 0;
-        if (ZeeManagerMinimap.mapOptsMarksResnames!=null)
-            ZeeManagerMinimap.mapOptsMarksResnames.clear();
+        ZeeManagerMinimap.mapOptsHidePMarks = ZeeManagerMinimap.mapOptsMarksShowOnlyIsOn = false;
+        if (ZeeManagerMinimap.minimapOptsMarksResnameHidden !=null)
+            ZeeManagerMinimap.minimapOptsMarksResnameHidden.clear();
         ZeeManagerMinimap.mapOptsMarksRow = ZeeManagerMinimap.mapOptsMarksCol = 0;
         ZeeResearch.setFilenameForServer();
         ZeeManagerCraft.craftRecExit();

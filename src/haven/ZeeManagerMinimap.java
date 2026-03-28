@@ -1,8 +1,8 @@
 package haven;
 
 import java.awt.image.BufferedImage;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 public class ZeeManagerMinimap {
 
@@ -163,14 +163,13 @@ public class ZeeManagerMinimap {
         // add checkbox hide player marks
         y += 35;
         win.add(new CheckBox("hide placed marks"){
-            {a = false;}//default show markers
+            {a = mapOptsHidePMarks;}
             public void set(boolean a) {
                 super.set(a);
-                int cont = 0;
+                mapOptsHidePMarks = a;
                 for (MapFile.Marker marker : ZeeConfig.gameUI.mapfile.file.markers) {
                     if (marker instanceof MapFile.PMarker) {
                         marker.mapOptsHide = a;
-                        cont++;
                     }
                 }
                 ZeeConfig.msgLow((a?"hide":"show")+" placed marks");
@@ -184,8 +183,9 @@ public class ZeeManagerMinimap {
         y += 20;
         mapOptsMarksRow = mapOptsMarksCol = 0; // reset 3 col button grid
         Scrollport sp = win.add(new Scrollport(Coord.of(110,100)),0,y);
-        for (int i = 0; i < mapOptsMarksResnames.size(); i++) {
-            String resname = mapOptsMarksResnames.get(i);
+
+        for (Map.Entry<String, Boolean> entry : minimapOptsMarksResnameHidden.entrySet()) {
+            String resname = entry.getKey();
             for (MapFile.Marker marker : ZeeConfig.gameUI.mapfile.file.markers) {
                 if (marker instanceof MapFile.SMarker){
                     MapFile.SMarker smark = (MapFile.SMarker) marker;
@@ -197,18 +197,17 @@ public class ZeeManagerMinimap {
                 }
             }
         }
-
     }
-    static List<String> mapOptsMarksResnames = new ArrayList<>();
+    static HashMap<String,Boolean> minimapOptsMarksResnameHidden = new HashMap<>();
     static void minimapOptsAddMark(MapFile.SMarker marker){
 
         String resname = Loading.waitfor(marker.res).name;
 
-        if (mapOptsMarksResnames.contains(resname)){
+        if (minimapOptsMarksResnameHidden.containsKey(resname)){
             return;
         }
-        mapOptsMarksResnames.add(resname);
-        println("mapOptsMarks "+ mapOptsMarksResnames.size()+"  "+resname);
+        minimapOptsMarksResnameHidden.put(resname,false);
+        println("mapOptsMarks "+ minimapOptsMarksResnameHidden.size()+"  "+resname);
 
         Window win = ZeeConfig.getWindow("map opts");
         if (win==null) {
@@ -223,6 +222,7 @@ public class ZeeManagerMinimap {
         // create mark button
         minimapOptCreateMarkButton(sp.cont,marker);
     }
+    static boolean mapOptsHidePMarks = false;
     static boolean mapOptsMarksShowOnlyIsOn = false;
     static int mapOptsMarksRow = 0;
     static int mapOptsMarksCol = 0;
@@ -250,6 +250,7 @@ public class ZeeManagerMinimap {
                         if (m1 instanceof MapFile.SMarker) {
                             if (((MapFile.SMarker) m1).res.name.contentEquals(resname)) {
                                 m1.mapOptsHide = !m1.mapOptsHide;
+                                minimapOptsMarksResnameHidden.put(resname, m1.mapOptsHide);
                             }
                         }
                     }
@@ -273,7 +274,7 @@ public class ZeeManagerMinimap {
                                 //show all marks
                                 m1.mapOptsHide = false;
                             }
-
+                            minimapOptsMarksResnameHidden.put(resname, m1.mapOptsHide);
                         }
                     }
                     ZeeConfig.msgLow("toggle show only " + basename);
