@@ -401,4 +401,25 @@ public class ZeeManagerMinimap {
     static void println(String msg){
         ZeeConfig.println(msg);
     }
+
+    public static void waitSMarkResname(MapFile.Marker marker) {
+        new ZeeThread(){
+            public void run() {
+                long waitMs = 4000;
+                while(waitMs > 0) {
+                    try {
+                        ZeeConfig.println("> waiting SMark resname " + marker.nm);
+                        sleep(1000);
+                        waitMs -= 1000;
+                        //possible exception?
+                        String resname = Loading.waitfor(((MapFile.SMarker) marker).res).name;
+                        marker.mapOptsHide = ZeeManagerMinimap.minimapOptsMarksResnameHidden.get(resname);
+                        println("      got resname "+resname);
+                    } catch (Exception ex) {
+                        println("      trying again");
+                    }
+                }
+            }
+        }.start();
+    }
 }
