@@ -119,28 +119,102 @@ public class Utils {
     }
 
     public static SocketChannel connect(String host, int port) throws IOException {
-	IOException lerr = null;
-	for(InetAddress haddr : InetAddress.getAllByName(host)) {
-	    SocketChannel sk = null;
-	    boolean fin = false;
-	    try {
-		sk = SocketChannel.open();
-		sk.socket().setSoTimeout(5000);
-		sk.connect(new InetSocketAddress(haddr, port));
-		fin = true;
-		return(sk);
-	    } catch(IOException e) {
-		if(lerr != null)
-		    e.addSuppressed(lerr);
-		lerr = e;
-	    } finally {
-		if(!fin && (sk != null))
-		    sk.close();
+	double DELAY = 0.25, TIMEOUT = 5;
+	InetAddress[] haddrs = InetAddress.getAllByName(host);
+	if(haddrs.length == 0)
+	    throw(new UnknownHostException(host + " has no address"));
+	int na = haddrs.length;
+	SocketChannel[] cur = new SocketChannel[na];
+	SelectionKey[] keys = new SelectionKey[na];
+	IOException[] errors = new IOException[na];
+	double[] started = new double[na];
+	int[] act = new int[na];
+	int ca = 0, nc = 0;
+	double last = 0, first = Double.POSITIVE_INFINITY, now = rtime();
+	SocketChannel ret = null;
+	try(Selector sel = Selector.open()) {
+	    outer: while(true) {
+		if((ca == na) && (nc == 0)) {
+		    IOException err = null;
+		    for(int i = 0; i < na; i++) {
+			if(errors[i] != null) {
+			    if(err == null)
+				err = errors[i];
+			    else
+				err.addSuppressed(errors[i]);
+			}
+		    }
+		    throw((err != null) ? err : new IOException("?!"));
+		}
+		if((ca < na) && ((nc == 0) || (now - last > DELAY))) {
+		    int a = ca++;
+		    try {
+			cur[a] = SocketChannel.open();
+			cur[a].configureBlocking(false);
+			if(cur[a].connect(new InetSocketAddress(haddrs[a], port))) {
+			    ret = cur[a];
+			    break outer;
+			}
+			keys[a] = cur[a].register(sel, SelectionKey.OP_CONNECT, a);
+		    } catch(IOException e) {
+			errors[a] = e;
+			continue;
+		    }
+		    started[a] = last = now;
+		    first = Math.min(first, now);
+		    act[nc++] = a;
+		}
+		double next = first + TIMEOUT;
+		if(ca < na)
+		    next = Math.min(next, last + DELAY);
+		sel.selectedKeys().clear();
+		sel.select(Math.max((long)Math.ceil((next - now) * 1000), 1l));
+		now = Utils.rtime();
+		first = Double.POSITIVE_INFINITY;
+		for(int i = 0; i < nc; i++) {
+		    int a = act[i];
+		    if(keys[a].isConnectable()) {
+			try {
+			    if(cur[a].finishConnect()) {
+				ret = cur[a];
+				break outer;
+			    }
+			} catch(IOException e) {
+			    keys[a].cancel();
+			    errors[a] = e;
+			    act[i--] = act[--nc];
+			    continue;
+			}
+		    }
+		    if(now - started[a] > TIMEOUT) {
+			try {
+			    keys[a].cancel();
+			    cur[a].close();
+			    errors[a] = new SocketTimeoutException("Connection timed out");
+			} catch(IOException e) {
+			    errors[a] = e;
+			}
+			act[i--] = act[--nc];
+			continue;
+		    }
+		    first = Math.min(first, started[a]);
+		}
+		if(Thread.currentThread().isInterrupted())
+		    throw(new ClosedByInterruptException());
+	    }
+	} finally {
+	    for(int a = 0; a < na; a++) {
+		if((cur[a] != null) && (cur[a] != ret))
+		    cur[a].close();
 	    }
 	}
-	if(lerr != null)
-	    throw(lerr);
-	throw(new UnknownHostException(host));
+	ret.configureBlocking(true);
+	ret.socket().setSoTimeout(5000);
+	return(ret);
+    }
+
+    public static SocketChannel connect(NamedSocketAddress addr) throws IOException {
+	return(connect(addr.host, addr.port));
     }
 
     public static int drawtext(Graphics g, String text, Coord c) {
@@ -456,81 +530,44 @@ public class Utils {
 	}
     }
 
-    public static class ArgumentFormatException extends RuntimeException {
-	public final String expected;
-	public final Object got;
-
-	public ArgumentFormatException(String expected, Object got) {
-	    this.expected = expected;
-	    this.got = got;
-	}
-
-	public String getMessage() {
-	    String got;
-	    try {
-		got = String.valueOf(this.got);
-	    } catch(Throwable t) {
-		got = "!formatting error (" + t + ")";
-	    }
-	    return(String.format("expected %s, got %s", expected, got));
-	}
-
-	public static <T> T check(Object x, Class<T> expected, String fname) {
-	    if(!expected.isInstance(x))
-		throw(new ArgumentFormatException(fname, x));
-	    return(expected.cast(x));
-	}
-
-	public static <T> T check(Object x, Class<T> expected) {
-	    return(check(x, expected, expected.getSimpleName()));
-	}
-    }
-
     public static String sv(Object arg) {
-	return(ArgumentFormatException.check(arg, String.class));
+	return(PType.STR.of(arg));
     }
 
     public static List<?> olv(Object arg) {
-	if(arg instanceof Object[])
-	    return(Arrays.asList((Object[])arg));
-	if(arg instanceof List)
-	    return((List<?>)arg);
-	throw(new ArgumentFormatException("object-list", arg));
+	return(PType.LIST.of(arg));
+    }
+
+    public static Object[] oav(Object arg) {
+	return(PType.OBJS.of(arg));
     }
 
     public static int iv(Object arg) {
-	return(ArgumentFormatException.check(arg, Number.class, "int").intValue());
+	return(PType.INT.of(arg));
     }
 
     public static long uiv(Object arg) {
-	return(uint32(iv(arg)));
+	return(PType.UINT.of(arg));
     }
 
     public static float fv(Object arg) {
-	return(ArgumentFormatException.check(arg, Number.class, "float").floatValue());
+	return(PType.FLOAT.of(arg));
     }
 
     public static double dv(Object arg) {
-	return(ArgumentFormatException.check(arg, Number.class, "double").doubleValue());
+	return(PType.DOUBLE.of(arg));
     }
 
     public static boolean bv(Object arg) {
-	if(arg instanceof Boolean)
-	    return((Boolean)arg);
-	return(ArgumentFormatException.check(arg, Number.class, "bool").intValue() != 0);
+	return(PType.BOOL.of(arg));
     }
 
     public static Indir<Resource> irv(Object arg) {
-	Indir s = ArgumentFormatException.check(arg, Indir.class);
-	return(() -> (Resource)s.get());
+	return(PType.IRES.of(arg));
     }
 
     public static Resource resv(Object arg) {
-	if(arg instanceof Resource)
-	    return((Resource)arg);
-	Indir s = ArgumentFormatException.check(arg, Indir.class);
-	Resource ret = ArgumentFormatException.check(s.get(), Resource.class);
-	return(ret);
+	return(PType.RES.of(arg));
     }
 
     /* Nested format: [[KEY, VALUE], [KEY, VALUE], ...] */
@@ -577,6 +614,10 @@ public class Utils {
 
     public static int sb(int n, int b) {
 	return((n << (32 - b)) >> (32 - b));
+    }
+
+    public static long sb(long n, int b) {
+	return((n << (64 - b)) >> (64 - b));
     }
 
     public static int ub(byte b) {
@@ -762,11 +803,11 @@ public class Utils {
 	public byte[] dec(String data);
     }
 
-    public static char num2hex(int num) {
+    public static char num2hex(int num, boolean upper) {
 	if(num < 10)
 	    return((char)('0' + num));
 	else
-	    return((char)('A' + num - 10));
+	    return((char)((upper ? 'A' : 'a') + num - 10));
     }
 
     public static int hex2num(char hex) {
@@ -784,8 +825,8 @@ public class Utils {
 	    public String enc(byte[] in) {
 		StringBuilder buf = new StringBuilder();
 		for(byte b : in) {
-		    buf.append(num2hex((b & 0xf0) >> 4));
-		    buf.append(num2hex(b & 0x0f));
+		    buf.append(num2hex((b & 0xf0) >> 4, true));
+		    buf.append(num2hex(b & 0x0f, true));
 		}
 		return(buf.toString());
 	    }
@@ -797,6 +838,43 @@ public class Utils {
 		for(int i = 0, o = 0; i < hex.length(); i += 2, o++)
 		    ret[o] = (byte)((hex2num(hex.charAt(i)) << 4) | hex2num(hex.charAt(i + 1)));
 		return(ret);
+	    }
+	};
+
+    public static final BinAscii bprint = new BinAscii() {
+	    public String enc(byte[] in) {
+		StringBuilder buf = new StringBuilder();
+		for(byte b : in) {
+		    if((char)b == '\\') {
+			buf.append("\\\\");
+		    } else if((b >= 33) && (b < 127)) {
+			buf.append((char)b);
+		    } else {
+			buf.append('\\');
+			buf.append(num2hex((b & 0xf0) >> 4, false));
+			buf.append(num2hex(b & 0x0f, false));
+		    }
+		}
+		return(buf.toString());
+	    }
+
+	    public byte[] dec(String in) {
+		byte[] buf = new byte[in.length()];
+		int n = 0;
+		for(int i = 0; i < in.length();) {
+		    char c = in.charAt(i++);
+		    if(c == '\\') {
+			if(in.charAt(i) == '\\') {
+			    buf[n++] = '\\';
+			    i++;
+			} else {
+			    buf[n++] = (byte)((hex2num(in.charAt(i++)) << 4) | hex2num(in.charAt(i++)));
+			}
+		    } else {
+			buf[n++] = (byte)c;
+		    }
+		}
+		return(Utils.splice(buf, 0, n));
 	    }
 	};
 
@@ -869,11 +947,6 @@ public class Utils {
     public static final Base64 b64 = new Base64("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/", '=');
     public static final Base64 b64np = new Base64(b64.set, '\0');
     public static final Base64 ub64 = new Base64("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_", '\0');
-
-    @Deprecated public static String byte2hex(byte[] in) {return(hex.enc(in));}
-    @Deprecated public static byte[] hex2byte(String in) {return(hex.dec(in));}
-    @Deprecated public static String base64enc(byte[] in) {return(b64.enc(in));}
-    @Deprecated public static byte[] base64dec(String in) {return(b64.dec(in));}
 
     public static String[] splitwords(String text) {
 	ArrayList<String> words = new ArrayList<String>();
@@ -1197,6 +1270,19 @@ public class Utils {
 
     public static String titlecase(String str) {
 	return(Character.toTitleCase(str.charAt(0)) + str.substring(1));
+    }
+
+    public static final Color[] vgapal;
+    static {
+	vgapal = new Color[16];
+	for(int i = 0; i < 16; i++) {
+	    int lo = ((i & 8) == 0) ? 0x00 : 0x55;
+	    int hi = ((i & 8) == 0) ? 0xaa : 0xff;
+	    int r =  ((i & 4) != 0) ? hi : lo;
+	    int g =  ((i & 2) != 0) ? hi : lo;
+	    int b =  ((i & 1) != 0) ? hi : lo;
+	    vgapal[i] = new Color(r, g, b);
+	}
     }
 
     public static Color contrast(Color col) {
@@ -1875,7 +1961,7 @@ public class Utils {
 	       ((c >= '0') && (c <= '9')) || (c == '.')) {
 		buf.append((char)c);
 	    } else {
-		buf.append("%" + Utils.num2hex((c & 0xf0) >> 4) + Utils.num2hex(c & 0x0f));
+		buf.append("%" + Utils.num2hex((c & 0xf0) >> 4, true) + Utils.num2hex(c & 0x0f, true));
 	    }
 	}
 	return(buf.toString());
@@ -2130,10 +2216,18 @@ public class Utils {
 	return(0);
     }
 
-    public static final Object formatter(String fmt, Object... args) {
+    public static Object formatter(String fmt, Object... args) {
 	return(new Object() {
 		public String toString() {
 		    return(String.format(fmt, args));
+		}
+	    });
+    }
+
+    public static Object formatter(Supplier<String> str) {
+	return(new Object() {
+		public String toString() {
+		    return(str.get());
 		}
 	    });
     }

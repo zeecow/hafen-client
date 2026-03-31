@@ -117,12 +117,6 @@ public abstract class ItemInfo {
 	    public T make(Owner owner);
 	}
 
-	@Deprecated
-	public interface ID<T extends Tip> extends TipID<T> {
-	    public T make();
-	    public default T make(Owner owner) {return(make());}
-	}
-
 	@SuppressWarnings("unchecked")
 	public <T extends Tip> T intern(TipID<T> id) {
 	    T ret = (T)itab.get(id);
@@ -131,10 +125,6 @@ public abstract class ItemInfo {
 		add(ret);
 	    }
 	    return(ret);
-	}
-
-	public <T extends Tip> T intern(ID<T> id) {
-	    return(intern((TipID<T>)id));
 	}
 
 	public void add(Tip tip) {
@@ -238,15 +228,18 @@ public abstract class ItemInfo {
     }
 
     public static class Pagina extends Tip {
-	public final String str;
+	public final RichText.Document doc;
 
-	public Pagina(Owner owner, String str) {
+	public Pagina(Owner owner, RichText.Document doc) {
 	    super(owner);
-	    this.str = str;
+	    this.doc = doc;
+	}
+	public Pagina(Owner owner, String str) {
+	    this(owner, new RichText.Document(str));
 	}
 
 	public BufferedImage tipimg(int w) {
-	    return(RichText.render(str, w).img);
+	    return(RichText.render(doc, w).img);
 	}
 
 	public void layout(Layout l) {

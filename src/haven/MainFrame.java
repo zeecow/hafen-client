@@ -32,6 +32,7 @@ import java.io.*;
 import java.nio.file.*;
 import java.util.*;
 import java.lang.reflect.*;
+import java.util.List;
 
 public class MainFrame extends java.awt.Frame implements Console.Directory {
     public static final Config.Variable<Boolean> initfullscreen = Config.Variable.propb("haven.fullscreen", false);
@@ -274,30 +275,37 @@ public class MainFrame extends java.awt.Frame implements Console.Directory {
     }
 
     public static Session connect(Object[] args) {
-	String username;
+	Session.User acct;
 	byte[] cookie;
+	NamedSocketAddress gameserv = (Bootstrap.gameserv.get() != null) ?
+	    Bootstrap.gameserv.get() :
+	    new NamedSocketAddress(Bootstrap.authserv.get().host, Bootstrap.gameport.get());
 	if((Bootstrap.authuser.get() != null) && (Bootstrap.authck.get() != null)) {
-	    username = Bootstrap.authuser.get();
+	    acct = new Session.User(Bootstrap.authuser.get());
 	    cookie = Bootstrap.authck.get();
 	} else {
+	    String username;
 	    if(Bootstrap.authuser.get() != null) {
 		username = Bootstrap.authuser.get();
 	    } else {
-		if((username = Utils.getpref("tokenname@" + Bootstrap.defserv.get(), null)) == null)
-		    throw(new ConnectionError("no explicit or saved username for host: " + Bootstrap.defserv.get()));
+		if((username = Utils.getpref("tokenname@" + Bootstrap.authserv.get().host, null)) == null)
+		    throw(new ConnectionError("no explicit or saved username for host: " + Bootstrap.authserv.get().host));
 	    }
-	    String token = Utils.getpref("savedtoken-" + username + "@" + Bootstrap.defserv.get(), null);
+	    String token = Utils.getpref("savedtoken-" + username + "@" + Bootstrap.authserv.get().host, null);
 	    if(token == null)
 		throw(new ConnectionError("no saved token for user: " + username));
 	    try {
-		AuthClient cl = new AuthClient((Bootstrap.authserv.get() == null) ? Bootstrap.defserv.get() : Bootstrap.authserv.get(), Bootstrap.authport.get());
+		AuthClient cl = new AuthClient(Bootstrap.authserv.get());
 		try {
 		    try {
-			username = new AuthClient.TokenCred(username, Utils.hex.dec(token)).tryauth(cl);
+			acct = new Session.User(new AuthClient.TokenCred(username, Utils.hex.dec(token)).tryauth(cl));
 		    } catch(AuthClient.Credentials.AuthException e) {
 			throw(new ConnectionError("authentication with saved token failed"));
 		    }
 		    cookie = cl.getcookie();
+		    List<NamedSocketAddress> hosts = cl.gethosts(gameserv);
+		    if(!hosts.isEmpty())
+			gameserv = hosts.get(0);
 		} finally {
 		    cl.close();
 		}
@@ -306,7 +314,7 @@ public class MainFrame extends java.awt.Frame implements Console.Directory {
 	    }
 	}
 	try {
-	    return(new Session(new java.net.InetSocketAddress(java.net.InetAddress.getByName(Bootstrap.defserv.get()), Bootstrap.mainport.get()), username, cookie, args));
+	    return(Session.connect(new java.net.InetSocketAddress(java.net.InetAddress.getByName(gameserv.host), gameserv.port), acct, Connection.encrypt.get(), cookie, args));
 	} catch(Connection.SessionError e) {
 	    throw(new ConnectionError(e.getMessage()));
 	} catch(InterruptedException exc) {
@@ -452,7 +460,16 @@ public class MainFrame extends java.awt.Frame implements Console.Directory {
 	}
 	setupres();
 	UI.Runner fun = null;
-	if(Bootstrap.servargs.get() != null) {
+	if(Bootstrap.replay.get() != null) {
+	    try {
+		Transport.Playback player = new Transport.Playback(Files.newBufferedReader(Bootstrap.replay.get(), Utils.utf8));
+		fun = new RemoteUI(new Session(player, new Session.User("Playback")));
+		player.start();
+	    } catch(IOException e) {
+		System.err.println("hafen: " + e.getMessage());
+		System.exit(1);
+	    }
+	} else if(Bootstrap.servargs.get() != null) {
 	    try {
 		fun = new RemoteUI(connect(Bootstrap.servargs.get()));
 	    } catch(ConnectionError e) {

@@ -85,10 +85,9 @@ public class DynresWindow extends Window {
 
     public static String auth(Session sess) {
 	return("Haven " +
-	       Utils.b64.enc(Utils.concat(sess.username.getBytes(Utils.utf8),
+	       Utils.b64.enc(Utils.concat(sess.user.reauth().getBytes(Utils.utf8),
 					  new byte[] {0},
-					  Digest.hash(Digest.HMAC.of(Digest.SHA256, sess.sesskey),
-						      "dynres".getBytes(Utils.ascii)))));
+					  sess.sesskey.sign("dynres".getBytes(Utils.ascii)))));
     }
 
     public BufferedImage process(BufferedImage in) {
@@ -537,7 +536,7 @@ public class DynresWindow extends Window {
 	}
 
 	public static Indir<Resource> consres(TexL tex) {
-	    Resource.Virtual cons = new Resource.Virtual("dyn/" + key, 1);
+	    Resource.Virtual cons = new Resource.Virtual(Resource.remote(), "dyn/" + key, 1);
 	    cons.add(new TexR.Image(cons, tex));
 	    return(() -> cons);
 	}
@@ -630,7 +629,6 @@ public class DynresWindow extends Window {
 		}
 
 		public Random mkrandoom() {return(bk.mkrandoom());}
-		@SuppressWarnings("deprecation") public Resource getres() {return(bk.getres());}
 	    }
 
 	    public Sprite create(Sprite.Owner owner, Indir<Resource> vres) {

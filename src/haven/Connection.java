@@ -31,12 +31,16 @@ import java.io.*;
 import java.net.*;
 import java.nio.*;
 import java.nio.channels.*;
+import java.security.*;
+import javax.crypto.*;
+import javax.crypto.spec.*;
 
-public class Connection {
+public class Connection implements Transport {
+    public static final Config.Variable<Boolean> encrypt = Config.Variable.propb("haven.hcrypt", false);
     private static final double ACK_HOLD = 0.030;
     private static final double OBJACK_HOLD = 0.08, OBJACK_HOLD_MAX = 0.5;
     public final SocketAddress server;
-    public final String username;
+    public final Stats stats = new Stats();
     private final Collection<Callback> cbs = new ArrayList<>();
     private final DatagramChannel sk;
     private final Selector sel;
@@ -44,10 +48,10 @@ public class Connection {
     private Worker worker;
     private int tseq;
     private boolean alive = true;
+    private Crypto crypt;
 
-    public Connection(SocketAddress server, String username) {
+    public Connection(SocketAddress server) {
 	this.server = server;
-	this.username = username;
 	try {
 	    this.sk = DatagramChannel.open();
 	    try {
@@ -66,26 +70,163 @@ public class Connection {
 	}
     }
 
-    public static interface Callback {
-	public default void closed() {};
-	public default void handle(PMessage msg) {};
-	public default void handle(OCache.ObjDelta delta) {};
-	public default void mapdata(Message msg) {};
-
-	public static final Callback dump = new Callback() {
-		public void closed() {
-		    System.err.println("closed");
-		}
-		public void handle(PMessage msg) {
-		    System.err.println(msg.type);
-		    Utils.hexdump(msg.bytes(), System.err, -1);
-		}
-	    };
-    }
-
     public Connection add(Callback cb) {
 	cbs.add(cb);
 	return(this);
+    }
+
+    public static class DecryptException extends Exception {
+	public DecryptException(String msg, Throwable cause) {super(msg, cause);}
+	public DecryptException(String msg) {super(msg);}
+    }
+
+    private static boolean supported() {
+	try {
+	    Cipher.getInstance("AES/GCM/NoPadding");
+	    return(true);
+	} catch(Exception e) {
+	    return(false);
+	}
+    }
+
+    private class Crypto {
+	private final Cipher cipher;
+	private final Key tkey, rkey;
+	private final NavigableSet<Long> rseqs = new TreeSet<>();
+	private long tseq;
+
+	private Crypto(byte[] cookie, byte[] salt) {
+	    try {
+		this.cipher = Cipher.getInstance("AES/GCM/NoPadding");
+	    } catch(Exception e) {
+		throw(new UnsupportedOperationException(e));
+	    }
+	    rseqs.add(-1L);
+	    tkey = new SecretKeySpec(Digest.hkdf(Digest.SHA256, salt, cookie, "client".getBytes(Utils.ascii), 16), "AES");
+	    rkey = new SecretKeySpec(Digest.hkdf(Digest.SHA256, salt, cookie, "server".getBytes(Utils.ascii), 16), "AES");
+	}
+
+	public synchronized byte[] encrypt(byte[] msg) {
+	    long seq = tseq++;
+	    byte[] iv = new byte[8];
+	    Utils.int64e(seq, iv, 0);
+	    try {
+		cipher.init(Cipher.ENCRYPT_MODE, tkey, new GCMParameterSpec(128, iv));
+	    } catch(InvalidKeyException | InvalidAlgorithmParameterException e) {
+		throw(new AssertionError(e));
+	    }
+	    byte[] ct;
+	    try {
+		ct = cipher.doFinal(msg);
+	    } catch(IllegalBlockSizeException | BadPaddingException e) {
+		throw(new AssertionError(e));
+	    }
+	    byte[] ret = new byte[ct.length + 3];
+	    System.arraycopy(ct, 0, ret, 3, ct.length);
+	    ret[0] = (byte)((seq >>  0) & 0xff);
+	    ret[1] = (byte)((seq >>  8) & 0xff);
+	    ret[2] = (byte)((seq >> 16) & 0xff);
+	    return(ret);
+	}
+
+	public synchronized byte[] decrypt(byte[] msg) throws DecryptException {
+	    long mseq = rseqs.last();
+	    long loseq = (msg[0] & 0xff) | ((msg[1] & 0xff) << 8) | ((msg[2] & 0xff) << 16);
+	    long seq = (mseq & ~0xffffffL) | loseq;
+	    if((Utils.sb(seq - mseq, 24) > 0) && (seq < mseq))
+		seq += 0x1000000L;
+	    else if((Utils.sb(loseq - mseq, 24) < 0) && (seq > mseq))
+		seq -= 0x1000000L;
+	    if(seq <= rseqs.first())
+		throw(new DecryptException("duplicated packet"));
+	    byte[] iv = new byte[8];
+	    Utils.int64e(seq, iv, 0);
+	    try {
+		cipher.init(Cipher.DECRYPT_MODE, rkey, new GCMParameterSpec(128, iv));
+	    } catch(InvalidKeyException | InvalidAlgorithmParameterException e) {
+		throw(new AssertionError(e));
+	    }
+	    byte[] ret;
+	    try {
+		ret = cipher.doFinal(msg, 3, msg.length - 3);
+	    } catch(IllegalBlockSizeException e) {
+		throw(new AssertionError(e));
+	    } catch(BadPaddingException e) {
+		throw(new DecryptException("decryption failed", e));
+	    }
+	    if(!rseqs.add(seq))
+		throw(new DecryptException("duplicated packet"));
+	    while(rseqs.size() > 128)
+		rseqs.pollFirst();
+	    return(ret);
+	}
+
+	public PMessage encrypt(PMessage msg) {
+	    byte[] buf = new byte[1 + msg.size()];
+	    buf[0] = (byte)msg.type;
+	    msg.fin(buf, 1);
+	    PMessage ret = new PMessage(Session.MSG_CRYPT);
+	    ret.addbytes(encrypt(buf));
+	    return(ret);
+	}
+
+	public PMessage decrypt(MessageBuf msg) throws DecryptException {
+	    byte[] dec = decrypt(msg.bytes());
+	    return(new PMessage(dec[0], dec, 1, dec.length - 1));
+	}
+    }
+
+    public static class Stats {
+	private final double[] rpltimes = new double[32];
+	private long ptx, prx, pretx;
+	private long btx, brx, prerx, prorx;
+	private int rplhead = 0, nrpls = 0;
+	private double srtt, rttv;
+
+	private void addreply(double time) {
+	    rpltimes[rplhead] = time;
+	    rplhead = (rplhead + 1) % rpltimes.length;
+	    if(nrpls < rpltimes.length)
+		nrpls++;
+	    {
+		double s = 0;
+		for(int i = 0; i < nrpls; i++)
+		    s += rpltimes[i];
+		srtt = s / nrpls;
+	    }
+	    {
+		double v = 0;
+		for(int i = 0; i < nrpls; i++) {
+		    double d = rpltimes[i] - srtt;
+		    v += d * d;
+		}
+		rttv = Math.sqrt(v / nrpls);
+	    }
+	}
+
+	private static final String[] apfx = {"", "k", "M", "G", "T"};
+	private String abbr(String fmt, double n) {
+	    int pi = 0;
+	    while((n >= 1000) && (pi < apfx.length - 1)) {
+		n /= 1000;
+		pi++;
+	    }
+	    return(String.format(fmt, n, apfx[pi]));
+	}
+
+	public String toString() {
+	    StringBuilder buf = new StringBuilder();
+	    buf.append(String.format("RTT %.2f\u00b1%.2f ms", srtt * 1000, rttv * 1000));
+	    buf.append(String.format(", RX %s/%s", abbr("%.0f %sB", brx), abbr("%.0f %sP", prx)));
+	    if((prerx > 0) || (prorx > 0)) {
+		buf.append(String.format(" (R %s, O %s)", abbr("%.0f%s", prerx), abbr("%.0f%s", prorx)));
+	    }
+	    buf.append(String.format(", TX %s/%s", abbr("%.0f %sB", btx), abbr("%.0f %sP", ptx)));
+	    if(pretx > 0) {
+		buf.append(String.format(" (R %s)", abbr("%.0f%s", pretx)));
+	    }
+	    return(buf.toString());
+	}
     }
 
     private class Worker extends HackThread {
@@ -151,13 +292,18 @@ public class Connection {
 	    byte type = recvbuf.get();
 	    byte[] buf = new byte[recvbuf.remaining()];
 	    recvbuf.get(buf);
+	    stats.prx++;
+	    stats.brx += buf.length;
 	    return(new PMessage(type, buf));
 	}
     }
 
     public void send(ByteBuffer msg) {
 	try {
+	    long sz = msg.remaining();
 	    sk.write(msg);
+	    stats.ptx++;
+	    stats.btx += sz;
 	} catch(IOException e) {
 	    /* Generally assume errors are transient and treat them as
 	     * packet loss, but are there perhaps errors that
@@ -166,6 +312,8 @@ public class Connection {
     }
 
     public void send(PMessage msg) {
+	if((crypt != null) && (msg.type != Session.MSG_CRYPT))
+	    msg = crypt.encrypt(msg);
 	ByteBuffer buf = ByteBuffer.allocate(msg.size() + 1);
 	buf.put((byte)msg.type);
 	msg.fin(buf);
@@ -196,19 +344,37 @@ public class Connection {
 	private int result = -1;
 	private Throwable cause;
 	private String message;
+	private Crypto crypt;
 
-	private Connect(byte[] cookie, Object... args) {
+	private Connect(String username, boolean encrypt, byte[] cookie, Object... args) {
 	    msg = new PMessage(Session.MSG_SESS);
-	    msg.adduint16(2);
 	    String protocol = "Hafen";
 	    if(!Config.confid.equals(""))
 		protocol += "/" + Config.confid;
-	    msg.addstring(protocol);
-	    msg.adduint16(Session.PVER);
-	    msg.addstring(username);
-	    msg.adduint16(cookie.length);
-	    msg.addbytes(cookie);
-	    msg.addlist(args);
+	    if(!encrypt) {
+		msg.adduint16(2);
+		msg.addstring(protocol);
+		msg.adduint16(Session.PVER);
+		msg.addstring(username);
+		msg.adduint16(cookie.length);
+		msg.addbytes(cookie);
+		msg.addlist(args);
+	    } else {
+		byte[] salt = new byte[16];
+		new SecureRandom().nextBytes(salt);
+		msg.adduint16(2);
+		msg.addstring("HCrypt");
+		msg.adduint16(1);
+		msg.addstring(username);
+		msg.adduint8(salt.length);
+		msg.addbytes(salt);
+		MessageBuf enc = new MessageBuf();
+		enc.addstring(protocol);
+		enc.adduint16(Session.PVER);
+		enc.addlist(args);
+		crypt = new Crypto(cookie, salt);
+		msg.addbytes(crypt.encrypt(enc.fin()));
+	    }
 	}
 
 	public Task run() {
@@ -228,11 +394,20 @@ public class Connection {
 		    try {
 			if(select(Math.max(0.0, last + 2 - now))) {
 			    PMessage msg = recv();
+			    boolean cr = false;
+			    if((msg != null) && (msg.type == Session.MSG_CRYPT) && (crypt != null)) {
+				msg = crypt.decrypt(msg);
+				cr = true;
+			    }
 			    if((msg != null) && (msg.type == Session.MSG_SESS)) {
 				int error = msg.uint8();
 				if(error == 0) {
-				    result = 0;
-				    return(new Main());
+				    if((crypt == null) || cr) {
+					result = 0;
+					Connection.this.crypt = crypt;
+					stats.addreply(Utils.rtime() - last);
+					return(new Main());
+				    }
 				} else {
 				    this.result = error;
 				    if(error == Session.SESSERR_MESG)
@@ -243,6 +418,8 @@ public class Connection {
 			}
 		    } catch(ClosedByInterruptException | CancelledKeyException e) {
 			return(null);
+		    } catch(DecryptException e) {
+			new Warning(e).ctrace(false).issue();
 		    } catch(IOException e) {
 			result = Session.SESSERR_CONN;
 			cause = e;
@@ -306,8 +483,10 @@ public class Connection {
 		    }
 		}
 	    } else {
-		for(Callback cb : cbs)
-		    cb.handle(msg);
+		for(Iterator<Callback> i = cbs.iterator(); i.hasNext();) {
+		    Callback cb = i.next();
+		    cb.handle(i.hasNext() ? msg.clone() : msg);
+		}
 	    }
 	}
 
@@ -322,7 +501,12 @@ public class Connection {
 		} while(msg != null);
 		sendack(lastack);
 	    } else if(sd > 0) {
-		waiting.put((short)msg.seq, msg);
+		if(waiting.put((short)msg.seq, msg) == null)
+		    stats.prorx++;
+		else
+		    stats.prerx++;
+	    } else {
+		stats.prerx++;
 	    }
 	}
 
@@ -337,17 +521,21 @@ public class Connection {
 		for(Iterator<RMessage> i = pending.iterator(); i.hasNext();) {
 		    RMessage msg = i.next();
 		    short sd = (short)(msg.seq - seq);
-		    if(sd <= 0)
+		    if(sd <= 0) {
+			stats.addreply(now - msg.first);
 			i.remove();
-		    else
+		    } else {
 			break;
+		    }
 		}
 	    }
 	}
 
-	private void gotmapdata(Message msg) {
-	    for(Callback cb : cbs)
-		cb.mapdata(msg);
+	private void gotmapdata(MessageBuf msg) {
+	    for(Iterator<Callback> i = cbs.iterator(); i.hasNext();) {
+		Callback cb = i.next();
+		cb.mapdata(i.hasNext() ? msg.clone() : msg);
+	    }
 	}
 
 	private void gotobjdata(Message msg) {
@@ -385,8 +573,10 @@ public class Connection {
 			delta.attrs.add(attr);
 		    }
 		}
-		for(Callback cb : cbs)
-		    cb.handle(delta);
+		for(Iterator<Callback> i = cbs.iterator(); i.hasNext();) {
+		    Callback cb = i.next();
+		    cb.handle(i.hasNext() ? delta.clone() : delta);
+		}
 		ObjAck ack = objacks.get(id);
 		if(ack == null) {
 		    objacks.put(id, ack = new ObjAck(id, fr, now));
@@ -459,6 +649,10 @@ public class Connection {
 			rmsg.adduint16(msg.seq).adduint8(msg.type).addbytes(msg.fin());
 			send(rmsg);
 			msg.last = now;
+			if(msg.retx == 0)
+			    msg.first = now;
+			else
+			    stats.pretx++;
 			msg.retx++;
 			lasttx = now;
 		    } else {
@@ -513,6 +707,11 @@ public class Connection {
 		    if(readable) {
 			PMessage msg;
 			while((msg = recv()) != null) {
+			    if(crypt != null) {
+				if(msg.type != Session.MSG_CRYPT)
+				    continue;
+				msg = crypt.decrypt(msg);
+			    }
 			    if(msg.type == Session.MSG_CLOSE)
 				return(new Close(true));
 			    handlemsg(msg);
@@ -522,6 +721,8 @@ public class Connection {
 		    return(new Close(false));
 		} catch(PortUnreachableException e) {
 		    return(null);
+		} catch(DecryptException e) {
+		    new Warning(e).ctrace(false).issue();
 		} catch(IOException e) {
 		    new Warning(e, "connection error").issue();
 		    return(null);
@@ -562,8 +763,12 @@ public class Connection {
 		try {
 		    if(select(Math.max(0.0, last + 0.5 - now))) {
 			PMessage msg = recv();
-			if((msg != null) && (msg.type == Session.MSG_CLOSE))
-			    sawclose = true;
+			if(msg != null) {
+			    if((msg.type == Session.MSG_CRYPT) && (crypt != null))
+				msg = crypt.decrypt(msg);
+			    if(msg.type == Session.MSG_CLOSE)
+				sawclose = true;
+			}
 		    }
 		} catch(ClosedByInterruptException | CancelledKeyException e) {
 		    /* XXX: I'm not really sure what causes
@@ -574,6 +779,8 @@ public class Connection {
 		     * non-blocking, and interrupting a selecting
 		     * thread shouldn't cause any channel closure. */
 		    return(null);
+		} catch(DecryptException e) {
+		    new Warning(e).ctrace(false).issue();
 		} catch(IOException e) {
 		    return(null);
 		}
@@ -591,6 +798,10 @@ public class Connection {
 	    pending.add(msg);
 	}
 	wake();
+    }
+
+    public boolean encrypted() {
+	return(crypt != null);
     }
 
     public static class SessionError extends RuntimeException {
@@ -621,8 +832,8 @@ public class Connection {
 	public SessionExprError() {super(Session.SESSERR_EXPR, "Authentication token expired");}
     }
 
-    public void connect(byte[] cookie, Object... args) throws InterruptedException {
-	Connect init = new Connect(cookie, args);
+    public void connect(String username, boolean encrypt, byte[] cookie, Object... args) throws InterruptedException {
+	Connect init = new Connect(username, encrypt, cookie, args);
 	start(init);
 	try {
 	    synchronized(init) {
