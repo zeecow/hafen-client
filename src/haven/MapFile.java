@@ -284,14 +284,8 @@ public class MapFile {
 	    this.nm = nm;
         this.mapOptsHide = false;
         if (ZeeConfig.gameUI.mapfile != null) {
-            if (this instanceof SMarker) {
-                try {
-                    String resname = Loading.waitfor(((SMarker) this).res).name;
-                    this.mapOptsHide = ZeeManagerMinimap.minimapOptsMarksResnameHidden.get(resname);
-                }catch (NullPointerException e){
-                    ZeeManagerMinimap.waitSMarkResname(this);
-                }
-            } else if (this instanceof PMarker) {
+            // SMarker may not be ready yet
+            if (this instanceof PMarker) {
                 this.mapOptsHide = ZeeManagerMinimap.mapOptsHidePMarks;
             }
         }
