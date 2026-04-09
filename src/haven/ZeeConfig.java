@@ -2760,7 +2760,7 @@ public class ZeeConfig {
                 ql = ql.replaceAll(",","q").replaceAll(" grown","");
             else
                 ql += "q";
-            ZeeConfig.addGobText(ZeeConfig.lastMapViewClickGob, ql + uiMsgQlExtraInfo, 0,255,0,255,0);
+            ZeeConfig.addGobText(ZeeConfig.lastMapViewClickGob, ql + uiMsgQlExtraInfo, new Color(0,255,0,255),0);
         }
 
         // store extra info to next Quality msg
@@ -3264,11 +3264,11 @@ public class ZeeConfig {
     }
 
     public static void addPlayerText(String s) {
-        addGobText(getPlayerGob(),s,0,255,0,255,10);
+        addGobText(getPlayerGob(),s,new Color(0,255,0,255),10);
     }
 
     public static void addPlayerText(String s, int r, int g, int b, int a, int h) {
-        addGobText(getPlayerGob(),s,r,g,b,a,h);
+        addGobText(getPlayerGob(),s,new Color(r,g,b,a),h);
     }
 
     public static void removePlayerText() {
@@ -3304,20 +3304,20 @@ public class ZeeConfig {
     }
 
     public static void addGobText(Gob g, String s){
-        addGobText(g,s,0,255,0,255,5);
+        addGobText(g,s,new Color(0,255,0,255),5);
     }
 
-    public static void addGobText(Gob g, String s, Color c){
-        addGobText(g,s,c.getRed(),c.getGreen(),c.getBlue(),c.getAlpha(),5);
+    public static void addGobText(Gob g, String s, Color text){
+        addGobText(g,s,new Color(text.getRed(),text.getGreen(),text.getBlue(),text.getAlpha()),5);
     }
 
     public static void addGobText(Gob g, String s, int height){
-        addGobText(g,s,0,255,0,255,height);
+        addGobText(g,s,new Color(0,255,0,255),height);
     }
 
-    public static void addGobText(Gob gob, String text, int r, int g, int b, int a, int height) {
+    public static void addGobText(Gob gob, String text, Color colorText, int height) {
         addGobText( gob,
-            new ZeeGobText(text, new Color(r, g, b, a), Color.black, height, ZeeFont.TXTFND_GOB_TEXT)
+            new ZeeGobText(text, colorText, Color.black, height, ZeeFont.TXTFND_GOB_TEXT)
         );
     }
 

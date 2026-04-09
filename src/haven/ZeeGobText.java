@@ -63,26 +63,27 @@ public class ZeeGobText extends Sprite implements RenderTree.Node, PView.Render2
     public final String text;
     private Tex tex;
     private int zOfs;
-    private Color col, colBorder;
+    private Color col, colBg;
 
-    public ZeeGobText( String text, Color colText, Color colBorder, int zOfs, Text.Foundry font) {
+    public ZeeGobText( String text, Color colText, Color colbg, int zOfs, Text.Foundry font) {
         super(null, null);
         this.font = font;
         this.text = text;
-        if (colBorder==null) {
-            this.colBorder = null;
+        if (colbg==null) {
+            this.colBg = null;
             this.tex = font.render(text, colText).tex();
         } else {
-            this.colBorder = colBorder;
-            this.tex = font.renderstroked(text, colText, colBorder).tex();
+            this.colBg = new Color(colbg.getRed(),colbg.getGreen(),colbg.getBlue(),128);
+            this.tex = font.render(" "+text+" ", colText).tex();
+            //this.tex = font.renderstroked(text, colText, colBorder).tex();
         }
         this.zOfs = zOfs;
         this.col = colText;
         CachedTexKey key;
-        if(colBorder==null)
+        if(colbg==null)
             key = new CachedTexKey(text, colText);
         else
-            key = new CachedTexKey(text, colText, colBorder);
+            key = new CachedTexKey(text, colText, colbg);
         CachedTexVal ctv = texts.get(key);
         if(ctv != null) {
             ctv.cnt++;
@@ -94,16 +95,20 @@ public class ZeeGobText extends Sprite implements RenderTree.Node, PView.Render2
 
     public void draw(GOut g, Pipe state) {
         Coord sc = Homo3D.obj2view(new Coord3f(0, 0, 6 + zOfs), state, Area.sized(g.sz())).round2();
-        g.aimage(tex, sc, 0.5, 0.5);
+        Coord sc2 = sc.sub(tex.sz().div(2));
+        g.chcolor(colBg);
+        g.frect(sc2, tex.sz());
+        g.chcolor();
+        g.image(tex, sc2);
     }
 
     @Override
     public void removed(RenderTree.Slot slot) {
         CachedTexKey key;
-        if(colBorder==null)
+        if(colBg ==null)
             key = new CachedTexKey(text, col);
         else
-            key = new CachedTexKey(text, col, colBorder);
+            key = new CachedTexKey(text, col, colBg);
         CachedTexVal ctv = texts.get(key);
         if(ctv != null && --ctv.cnt == 0) {
             texts.remove(key);

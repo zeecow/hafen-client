@@ -48,6 +48,8 @@ public class GobHealth extends GAttrib implements Gob.SetupMod {
 						   Coord3f.of((rnd.nextFloat() * 2) - 1, (rnd.nextFloat() * 2) - 1, (rnd.nextFloat() * 2) - 1).norm(),
 						   rnd.nextFloat() * (float)Math.PI * 2),
 				      new MixColor(255, 0, 0, 64 - (Math.round(hp * 64))));
+        if (ZeeManagerGobs.isGobMineSupport(gob.getres().name))
+            ZeeConfig.addGobText(gob,String.valueOf(hp),Color.pink);
 	} else {
 	    this.fx = null;
 	}
