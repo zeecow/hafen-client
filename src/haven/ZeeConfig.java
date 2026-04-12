@@ -530,7 +530,7 @@ public class ZeeConfig {
         final List<String> crops = List.of("beetroot","seed-turnip","turnip",
                 "seed-carrot","carrot","seed-flax","seed-hemp","seed-leek","leek",
                 "seed-poppy","seed-pipeweed","seed-cucumber","seed-barley","seed-wheat",
-                "seed-millet","seed-lettuce","seed-pumpkin","pumpkin","yellowonion",
+                "seed-millet","seed-lettuce","seed-pumpkin","pumpkin","yellowonion","whiteonion",
                 "redonion","garlic","seeds-greenkale","seed-watermelon","radish");
         return crops.contains(basename);
     }

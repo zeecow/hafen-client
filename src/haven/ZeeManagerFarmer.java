@@ -1076,6 +1076,7 @@ public class ZeeManagerFarmer extends ZeeThread{
             Map.entry("gfx/terobjs/plants/pumpkin",4),
             Map.entry("gfx/terobjs/plants/redonion",3),
             Map.entry("gfx/terobjs/plants/yellowonion",3),
+            Map.entry("gfx/terobjs/plants/whiteonion",3),
             Map.entry("gfx/terobjs/plants/leek",2),
             Map.entry("gfx/terobjs/plants/hemp",3),
             Map.entry("gfx/terobjs/plants/flax",3),
