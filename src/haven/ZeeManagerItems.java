@@ -1528,13 +1528,9 @@ public class ZeeManagerItems extends ZeeThread{
     }
 
     public static boolean isItemPlantable(String name){
-        String list = "seed-barley,seed-carrot,carrot,seed-cucumber,seed-flax,"
-                +"seed-grape,seed-greenkale,seed-hemp,seed-leek,leek,seed-lettuce,seed-millet,"
-                +"seed-pipeweed,seed-poppy,seed-pumpkin,seed-wheat,seed-turnip,turnip,"
-                +"seed-wheat,seed-barley,beetroot,yellowonion,redonion,garlic,whiteonion,"
-                +"peapod,peppercorn,hopcones,seed-watermelon,radish";
         name = name.replace("gfx/invobjs/","");
-        return list.contains(name);
+        name = name.replace("seed-","");
+        return ZeeManagerFarmer.ZeeCrop.getByItemName(name) != null;
     }
 
     public boolean isItemHandEquipable() {

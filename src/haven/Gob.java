@@ -1048,7 +1048,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 
 			if( !ZeeConfig.isTree(gobName) &&
 					!ZeeManagerGobs.isGobWall(gobName)  &&
-					!ZeeConfig.isGobCrop(gobName)
+					!ZeeConfig.isGobCropNoTrellisNoWild(gobName)
 			){
 				return;
 			}
@@ -1080,7 +1080,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 	}
 
 	void showHitBox() {
-		if (ZeeConfig.isGobCrop(getres().name)){
+		if (ZeeConfig.isGobCropNoTrellisNoWild(getres().name)){
 			return;
 		}
 		//show hitbox

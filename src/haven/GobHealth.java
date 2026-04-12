@@ -48,10 +48,12 @@ public class GobHealth extends GAttrib implements Gob.SetupMod {
 						   Coord3f.of((rnd.nextFloat() * 2) - 1, (rnd.nextFloat() * 2) - 1, (rnd.nextFloat() * 2) - 1).norm(),
 						   rnd.nextFloat() * (float)Math.PI * 2),
 				      new MixColor(255, 0, 0, 64 - (Math.round(hp * 64))));
-        if (ZeeManagerGobs.isGobMineSupport(gob.getres().name))
+        if (ZeeConfig.showGobHealthNumber || ZeeManagerGobs.isGobMineSupport(gob.getres().name))
             ZeeConfig.addGobText(gob,String.valueOf(hp),Color.pink);
 	} else {
 	    this.fx = null;
+        if (gob!=null && haven.ZeeConfig.gameUI!=null)
+            ZeeConfig.removeGobText(gob);
 	}
     }
 
@@ -68,7 +70,7 @@ public class GobHealth extends GAttrib implements Gob.SetupMod {
     }
 
     void showGobHealthNum() {
-        Color c = Color.lightGray;
+        Color c = Color.pink;
         String s = String.valueOf(hp).replaceFirst("0.", ".");
         ZeeConfig.addGobText(gob, s, c);
     }

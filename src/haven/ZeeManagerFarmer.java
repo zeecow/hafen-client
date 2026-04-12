@@ -1,9 +1,6 @@
 package haven;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @SuppressWarnings("deprecation")
@@ -28,6 +25,32 @@ public class ZeeManagerFarmer extends ZeeThread{
     public static int farmerTxtQlSortingBarrels = Utils.getprefi("farmerTxtQlSortingBarrels",4);
     public static TextEntry textEntryTilesBarrel, textEntryQlSortBarrels;
     public static Gob farmerGobCrop;
+
+
+    static List<ZeeCrop> crops = Arrays.asList(
+            new ZeeCrop("beetroot","beet", List.of("beetleaves"), 3),
+            new ZeeCrop("carrot","carrot", null, 1),
+            new ZeeCrop("turnip","turnip", null, 1),
+            new ZeeCrop("poppy","poppy", List.of("flower-poppy","poppypod"), 4),
+            new ZeeCrop("lettuce","lettuce", List.of("lettucehead"), 4),
+            new ZeeCrop("pumpkin","pumpkin", List.of("pumpkin"), 4),
+            new ZeeCrop("redonion","redonion", null, 3),
+            new ZeeCrop("yellowonion","yellowonion", null, 3),
+            new ZeeCrop("whiteonion","whiteonion", null, 3),
+            new ZeeCrop("leek","leek", null, 2),
+            new ZeeCrop("garlic","garlic", null, 4),
+            new ZeeCrop("hemp","hemp", List.of("hempfibre"), 3),
+            new ZeeCrop("flax","flax", List.of("flaxfibre"), 3),
+            new ZeeCrop("barley","barley", List.of("straw"), 3),
+            new ZeeCrop("wheat","wheat", List.of("straw"), 3),
+            new ZeeCrop("millet","millet", List.of("straw"), 3),
+            new ZeeCrop("pipeweed","pipeweed", List.of("tobacco-fresh"), 4),
+            new ZeeCrop("peas","peas", null, 4),
+            new ZeeCrop("cucumber","cucumber", null, 4),
+            new ZeeCrop("champignon","champignon", null, 4),
+            new ZeeCrop("greenkale","greenkale", List.of("greenkale"), 4),
+            new ZeeCrop("watermelon","watermelon", List.of("watermelon"), 4)
+    );
 
 
     public ZeeManagerFarmer(GItem g, String nameSeed) {
@@ -982,51 +1005,39 @@ public class ZeeManagerFarmer extends ZeeThread{
 
                     //collect subproducts
                     if (farmAwayOn && !isCancelClick()){
-                        List<String> subprods = new ArrayList<>();
-                        if (cropName.endsWith("/poppy"))
-                            subprods.addAll(List.of("/flower-poppy","/poppypod"));
-                        else if (cropName.endsWith("/flax"))
-                            subprods.add("/flaxfibre");
-                        else if (cropName.endsWith("/hemp"))
-                            subprods.add("/hempfibre");
-                        else if (cropName.endsWith("/beet"))
-                            subprods.add("/beetleaves");
-                        else if (cropName.endsWith("/lettuce"))
-                            subprods.add("/lettucehead");
-                        else if (cropName.endsWith("/greenkale"))
-                            subprods.add("/greenkale");
-                        else if (cropName.endsWith("/pipeweed"))
-                            subprods.add("/tobacco-fresh");
-                        else if (cropName.endsWith("/pumpkin"))
-                            subprods.add("/pumpkin");
-                        else if (cropName.endsWith("/barley") || cropName.endsWith("/wheat") || cropName.endsWith("/millet"))
-                            subprods.add("/straw");
-                        if (!subprods.isEmpty())
-                            ZeeConfig.addPlayerText("collect");
-                        //equip sacks
-                        if (farmAwayEquipSacksPumpkin && subprods.contains("/pumpkin"))
-                            ZeeManagerItems.equipTwoSacks();
-                        else if(farmAwayEquipSacksNonPumpkin && !subprods.isEmpty())
-                            ZeeManagerItems.equipTwoSacks();
-                        //collect subprods
-                        prepareCancelClick();
-                        for (String subprod : subprods) {
-                            ZeeConfig.addPlayerText("collect "+subprod);
-                            Gob closestSubprod = ZeeConfig.getClosestGobByNameEnds("gfx/terobjs/items" + subprod);
-                            while(closestSubprod!=null && !isCancelClick()) {
-                                // shift+click closest item
-                                ZeeManagerGobs.gobClick(closestSubprod, 3, UI.MOD_SHIFT);
+                        ZeeCrop crop = ZeeCrop.getByGobBasename(ZeeConfig.getResBasename(cropName));
+                        if (crop!=null) {
+                            List<String> subprods = crop.subprods;
+                            if (subprods!=null && !subprods.isEmpty()) {
+                                ZeeConfig.addPlayerText("collect");
+                                //equip sacks
+                                if (farmAwayEquipSacksPumpkin && subprods.contains("/pumpkin"))
+                                    ZeeManagerItems.equipTwoSacks();
+                                else if (farmAwayEquipSacksNonPumpkin && !subprods.isEmpty())
+                                    ZeeManagerItems.equipTwoSacks();
+                                //collect subprods
                                 prepareCancelClick();
-                                // wait first item acquired
-                                waitInvItemOrCancelClick();
-                                if (isCancelClick())
-                                    break;
-                                // wait other items
-                                waitPlayerIdleLinMove();
-                                // check for distant subroducts missed
-                                closestSubprod = ZeeConfig.getClosestGobByNameEnds("gfx/terobjs/items" + subprod);
-                            }
-                        }
+                                for (String subprod : subprods) {
+                                    ZeeConfig.addPlayerText("collect " + subprod);
+                                    Gob closestSubprod = ZeeConfig.getClosestGobByNameEnds("gfx/terobjs/items/" + subprod);
+                                    while (closestSubprod != null && !isCancelClick()) {
+                                        // shift+click closest item
+                                        ZeeManagerGobs.gobClick(closestSubprod, 3, UI.MOD_SHIFT);
+                                        prepareCancelClick();
+                                        // wait first item acquired
+                                        waitInvItemOrCancelClick();
+                                        if (isCancelClick())
+                                            break;
+                                        // wait other items
+                                        waitPlayerIdleLinMove();
+                                        // check for distant subroducts missed
+                                        closestSubprod = ZeeConfig.getClosestGobByNameEnds("gfx/terobjs/items/" + subprod);
+                                    }
+                                }
+                            }else
+                                println("   subprods is null or empty");
+                        }else
+                            println("   zeecrop is null");
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -1067,42 +1078,19 @@ public class ZeeManagerFarmer extends ZeeThread{
         return closestGob;
     }
 
-    static final Map<String,Integer> mapCropMinStageHarvest = Map.ofEntries(
-            Map.entry("gfx/terobjs/plants/turnip",1),
-            Map.entry("gfx/terobjs/plants/carrot",1),
-            Map.entry("gfx/terobjs/plants/beet",3),
-            Map.entry("gfx/terobjs/plants/poppy",4),
-            Map.entry("gfx/terobjs/plants/lettuce",4),
-            Map.entry("gfx/terobjs/plants/pumpkin",4),
-            Map.entry("gfx/terobjs/plants/redonion",3),
-            Map.entry("gfx/terobjs/plants/yellowonion",3),
-            Map.entry("gfx/terobjs/plants/whiteonion",3),
-            Map.entry("gfx/terobjs/plants/leek",2),
-            Map.entry("gfx/terobjs/plants/hemp",3),
-            Map.entry("gfx/terobjs/plants/flax",3),
-            Map.entry("gfx/terobjs/plants/barley",3),
-            Map.entry("gfx/terobjs/plants/wheat",3),
-            Map.entry("gfx/terobjs/plants/millet",3),
-            Map.entry("gfx/terobjs/plants/pipeweed",4),
-            Map.entry("gfx/terobjs/plants/peas",4),
-            Map.entry("gfx/terobjs/plants/cucumber",4),
-            Map.entry("gfx/terobjs/plants/champignon",4),
-            Map.entry("gfx/terobjs/plants/garlic",4),
-            Map.entry("gfx/terobjs/plants/greenkale",4),
-            Map.entry("gfx/terobjs/plants/watermelon",4)
-    );
-    public static boolean isCropStageHarvestable(Gob crop) {
+    public static boolean isCropStageHarvestable(Gob gobCrop) {
         boolean ret = false;
-        Integer minHarvestage = mapCropMinStageHarvest.get(crop.getres().name);
-        if (minHarvestage==null)
+        ZeeCrop crop = ZeeCrop.getByGobBasename(gobCrop.getres().basename());
+        if(crop==null)
             return ret;
+        Integer minHarvestage = crop.minHarvStage;
         int maxStage = 0;
-        for (FastMesh.MeshRes layer : crop.getres().layers(FastMesh.MeshRes.class)) {
+        for (FastMesh.MeshRes layer : gobCrop.getres().layers(FastMesh.MeshRes.class)) {
             if(layer.id / 10 > maxStage) {
                 maxStage = layer.id / 10;
             }
         }
-        Message data = ZeeConfig.getDrawableData(crop);
+        Message data = ZeeConfig.getDrawableData(gobCrop);
         if(data != null) {
             int stage = data.uint8();
             if(stage > maxStage)
@@ -1136,5 +1124,34 @@ public class ZeeManagerFarmer extends ZeeThread{
             }
         }
         return maxStage;
+    }
+
+    static class ZeeCrop {
+        String itemNameEndsWith;
+        String gobNameEndsWith;
+        String seedName;
+        List<String> subprods;
+        int minHarvStage;
+        ZeeCrop(String itemNameEndsWith, String gobNameEndsWith, List<String> subprodsNameEnds, int minHarvStage){
+            this.itemNameEndsWith = itemNameEndsWith;
+            this.gobNameEndsWith = gobNameEndsWith;
+            this.subprods = subprodsNameEnds;
+            this.seedName = "seed-"+itemNameEndsWith;
+            this.minHarvStage = minHarvStage;
+        }
+        static ZeeCrop getByItemName(String itemName) {
+            for (ZeeCrop z : crops) {
+                if (itemName.equals(z.itemNameEndsWith))
+                    return z;
+            }
+            return null;
+        }
+        static ZeeCrop getByGobBasename(String gobBasename) {
+            for (ZeeCrop z : crops) {
+                if (gobBasename.equals(z.gobNameEndsWith))
+                    return z;
+            }
+            return null;
+        }
     }
 }

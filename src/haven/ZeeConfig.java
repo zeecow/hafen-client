@@ -496,7 +496,7 @@ public class ZeeConfig {
         return gobName.contains("/bushes/");
     }
 
-    public static boolean isGobCrop(String gobName) {
+    public static boolean isGobCropNoTrellisNoWild(String gobName) {
         return gobName.startsWith("gfx/terobjs/plants/") && !gobName.endsWith("trellis") && !isGobWildCrop(gobName);
     }
 
@@ -527,12 +527,7 @@ public class ZeeConfig {
 
     //  gfx/invobjs/turnip , gfx/invobjs/seed-turnip
     public static boolean isItemCrop(String basename) {
-        final List<String> crops = List.of("beetroot","seed-turnip","turnip",
-                "seed-carrot","carrot","seed-flax","seed-hemp","seed-leek","leek",
-                "seed-poppy","seed-pipeweed","seed-cucumber","seed-barley","seed-wheat",
-                "seed-millet","seed-lettuce","seed-pumpkin","pumpkin","yellowonion","whiteonion",
-                "redonion","garlic","seeds-greenkale","seed-watermelon","radish");
-        return crops.contains(basename);
+        return ZeeManagerFarmer.ZeeCrop.getByItemName(basename) != null;
     }
 
     public static boolean isBug(String resName){
@@ -4047,7 +4042,7 @@ public class ZeeConfig {
         if (isBush(resName)){
             gob.tags.add(Gob.Tag.BUSH);
         }
-        if (isGobCrop(resName)){
+        if (isGobCropNoTrellisNoWild(resName)){
             gob.tags.add(Gob.Tag.CROP);
         }
         if (isBug(resName)){
