@@ -1142,7 +1142,8 @@ public class ZeeConfig {
             windowModCattleRoster(window);
         }
         // autolabel contents
-        else if (ZeeManagerGobs.autoLabelWincapContainers.contains(windowTitle) || ZeeManagerGobs.autoLabelWincapVmeters.contains(windowTitle)) {
+        else if (ZeeManagerGobs.autoLabelWincapContainers.contains(windowTitle)
+                || ZeeManagerGobs.autoLabelWincapVmeters.contains(windowTitle)) {
             // add window fuel UI
             if (List.of("Oven", "Kiln", "Ore Smelter").contains(windowTitle)) {
                 windowAddFuelGUI(window, windowTitle);
@@ -2755,7 +2756,7 @@ public class ZeeConfig {
                 ql = ql.replaceAll(",","q").replaceAll(" grown","");
             else
                 ql += "q";
-            ZeeConfig.addGobText(ZeeConfig.lastMapViewClickGob, ql + uiMsgQlExtraInfo, new Color(0,255,0,255),0);
+            ZeeConfig.addGobText(ZeeConfig.lastMapViewClickGob, ql + uiMsgQlExtraInfo, ZeeGobColor.COLOR_WHITE_GREEN,0);
         }
 
         // store extra info to next Quality msg
@@ -3259,7 +3260,7 @@ public class ZeeConfig {
     }
 
     public static void addPlayerText(String s) {
-        addGobText(getPlayerGob(),s,new Color(0,255,0,255),10);
+        addGobText(getPlayerGob(),s,ZeeGobColor.COLOR_WHITE_GREEN,10);
     }
 
     public static void addPlayerText(String s, int r, int g, int b, int a, int h) {
@@ -3299,7 +3300,7 @@ public class ZeeConfig {
     }
 
     public static void addGobText(Gob g, String s){
-        addGobText(g,s,new Color(0,255,0,255),5);
+        addGobText(g,s,ZeeGobColor.COLOR_WHITE_GREEN,5);
     }
 
     public static void addGobText(Gob g, String s, Color text){
@@ -3307,7 +3308,7 @@ public class ZeeConfig {
     }
 
     public static void addGobText(Gob g, String s, int height){
-        addGobText(g,s,new Color(0,255,0,255),height);
+        addGobText(g,s,ZeeGobColor.COLOR_WHITE_GREEN,height);
     }
 
     public static void addGobText(Gob gob, String text, Color colorText, int height) {

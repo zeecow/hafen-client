@@ -28,7 +28,7 @@ public class ZeeManagerFarmer extends ZeeThread{
 
 
     static List<ZeeCrop> crops = Arrays.asList(
-            new ZeeCrop("beetroot","beet", List.of("beetleaves"), 3),
+            new ZeeCrop("beet","beet", List.of("beetleaves"), 3),
             new ZeeCrop("carrot","carrot", null, 1),
             new ZeeCrop("turnip","turnip", null, 1),
             new ZeeCrop("poppy","poppy", List.of("flower-poppy","poppypod"), 4),

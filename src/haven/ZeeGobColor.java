@@ -8,6 +8,7 @@ import java.awt.*;
 @SuppressWarnings("deprecation")
 public class ZeeGobColor extends GAttrib implements Gob.SetupMod {
     public static final Color COLOR_DARK_GREEN = new Color(30, 101, 0);
+    public static final Color COLOR_WHITE_GREEN = new Color(164, 255, 127);
     public Color color;
 
     public ZeeGobColor(Gob g, Color color) {

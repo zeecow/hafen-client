@@ -2717,16 +2717,16 @@ public class ZeeManagerGobs extends ZeeThread{
                                     currentFuel = (int) Math.round(meter.a * maxFuel);
                                     lblText += currentFuel + "/" + maxFuel;
                                 }
-                                Color color = ZeeGobColor.COLOR_DARK_GREEN;
+                                Color color = ZeeGobColor.COLOR_WHITE_GREEN;
                                 if (currentFuel == 0)
-                                    color = Color.red;
+                                    color = Color.pink;
                                 else if (currentFuel < maxFuel)
                                     color = Color.orange;
                                 ZeeConfig.addGobText(gobAutoLabel, lblText,color);
                             }
                             // perc% water, swill, etc
                             else {
-                                Color c = ZeeGobColor.COLOR_DARK_GREEN;
+                                Color c = ZeeGobColor.COLOR_WHITE_GREEN;
                                 double lowestVmeter = -1;
                                 for (VMeter vm : vmeter) {
                                     LayerMeter.Meter meter = vm.meters.get(0);
@@ -2736,7 +2736,7 @@ public class ZeeManagerGobs extends ZeeThread{
                                     lblText += twoDecimals + "   ";
                                 }
                                 if (lowestVmeter < .3)
-                                    c = Color.red;
+                                    c = Color.pink;
                                 else if (lowestVmeter < .8)
                                     c = Color.yellow;
                                 lblText = lblText.strip().replaceAll("0\\.",".");
