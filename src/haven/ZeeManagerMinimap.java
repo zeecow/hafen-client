@@ -228,7 +228,7 @@ public class ZeeManagerMinimap {
     static int mapOptsMarksCol = 0;
     private static void minimapOptCreateMarkButton(Widget cont, MapFile.SMarker sMarker){
 
-        BufferedImage img = sMarker.res.get().flayer(Resource.imgc).scaled();
+        BufferedImage img = sMarker.res.get().flayer(Resource.imgc).img;
         String resname = sMarker.res.name;
         String basename = sMarker.res.get().basename();
 

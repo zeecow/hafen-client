@@ -397,6 +397,9 @@ public class MiniMap extends Widget {
 	public DisplayMarker(Widget wdg, Marker marker) {
 	    this.wdg = wdg;
 	    this.m = marker;
+        if (marker instanceof SMarker) {
+            ZeeManagerMinimap.minimapOptsAddMark((SMarker) marker);
+        }
 	}
 
 	private static final ClassResolver<DisplayMarker> ctxr = new ClassResolver<DisplayMarker>()

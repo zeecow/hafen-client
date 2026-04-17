@@ -535,62 +535,6 @@ public class ZeeManagerIcons {
         return newImage;
     }
 
-    static BufferedImage[] testcircle, testtriangleup, testtriangledown, testdiamond, testboat;
-    public static void testIconsLoginScreen(GOut g) {
-        if (testcircle ==null) {
-            testcircle = new BufferedImage[5];
-            for (int i = 0; i < 5; i++) {
-                testcircle[i] = ZeeManagerIcons.imgCirle(10-i, Color.BLUE, false, true,false);
-            }
-        }
-        for (int i = 0; i < testcircle.length; i++) {
-            g.image(testcircle[i],Coord.of(50+(i*20), 50));
-        }
-
-        if (testtriangleup ==null) {
-            testtriangleup = new BufferedImage[5];
-            for (int i = 0; i < 5; i++) {
-                testtriangleup[i] = ZeeManagerIcons.imgTriangleUp(10-i, Color.BLUE, false, true,false);
-            }
-        }
-        for (int i = 0; i < testtriangleup.length; i++) {
-            g.image(testtriangleup[i],Coord.of(50+(i*20), 100));
-        }
-
-
-        if (testtriangledown ==null) {
-            testtriangledown = new BufferedImage[5];
-            for (int i = 0; i < 5; i++) {
-                testtriangledown[i] = ZeeManagerIcons.imgTriangleDown(10-i, Color.BLUE, false, true,false);
-            }
-        }
-        for (int i = 0; i < testtriangledown.length; i++) {
-            g.image(testtriangledown[i],Coord.of(50+(i*20), 150));
-        }
-
-
-        if (testdiamond ==null) {
-            testdiamond = new BufferedImage[5];
-            for (int i = 0; i < 5; i++) {
-                testdiamond[i] = ZeeManagerIcons.imgDiamond(10-i, Color.BLUE, false, true,false);
-            }
-        }
-        for (int i = 0; i < testdiamond.length; i++) {
-            g.image(testdiamond[i],Coord.of(50+(i*20), 200));
-        }
-
-
-        if (testboat ==null) {
-            testboat = new BufferedImage[5];
-            for (int i = 0; i < 5; i++) {
-                testboat[i] = ZeeManagerIcons.imgBoat(10-i, Color.BLUE, false, true,false);
-            }
-        }
-        for (int i = 0; i < testboat.length; i++) {
-            g.image(testboat[i],Coord.of(50+(i*30), 250));
-        }
-    }
-
 
     static MiniMap.DisplayMarker latestMidclickMark;
     public static void checkMarkClicked(MiniMap.DisplayMarker mark, int button, boolean mapCompact) {
