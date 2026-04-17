@@ -4747,48 +4747,6 @@ public class ZeeManagerGobs extends ZeeThread{
             }
         }, wdg.c.x+wdg.sz.x+xpad,0);
 
-        // todo uncomment when fix
-        // houses
-//        wdg = winHideGobs.add(new CheckBox("houses"){
-//            { a = hideGobHouses;}
-//            public void set(boolean a) {
-//                super.set(a);
-//                Utils.setprefb("hideGobHouses", (hideGobHouses = a));
-//                winHideGobLastInteractionMs = now();
-//                toggleModelsInList(getGobsByTags(Gob.Tag.HOUSE));
-//            }
-//        },0,wdg.c.y+wdg.sz.y+ypad);
-//        // idols
-//        wdg = winHideGobs.add(new CheckBox("idols"){
-//            { a = hideGobIdols;}
-//            public void set(boolean a) {
-//                super.set(a);
-//                Utils.setprefb("hideGobIdols", (hideGobIdols = a));
-//                winHideGobLastInteractionMs = now();
-//                toggleModelsInList(getGobsByTags(Gob.Tag.IDOL));
-//            }
-//        },wdg.c.x+wdg.sz.x+xpad,wdg.c.y);
-//        // tamed animals
-//        wdg = winHideGobs.add(new CheckBox("tamed"){
-//            { a = hideGobTamedAnimals;}
-//            public void set(boolean a) {
-//                super.set(a);
-//                Utils.setprefb("hideGobTamedAnimals", (hideGobTamedAnimals = a));
-//                winHideGobLastInteractionMs = now();
-//                toggleModelsInList(getGobsByTags(Gob.Tag.TAMED_ANIMAL_OR_AUROCH_ETC));
-//            }
-//        },wdg.c.x+wdg.sz.x+xpad,wdg.c.y);
-//        // smokers
-//        wdg = winHideGobs.add(new CheckBox("smokers"){
-//            { a = hideGobSmokeProducers;}
-//            public void set(boolean a) {
-//                super.set(a);
-//                Utils.setprefb("hideGobSmokers", (hideGobSmokeProducers = a));
-//                winHideGobLastInteractionMs = now();
-//                toggleModelsInList(getGobsByTags(Gob.Tag.SMOKE_PRODUCER));
-//            }
-//        },wdg.c.x+wdg.sz.x+xpad,wdg.c.y);
-
         // label countdown auto close
         winHideGobLabelClosing = winHideGobs.add(new Label(""),0,wdg.c.y+wdg.sz.y+ypad);
 

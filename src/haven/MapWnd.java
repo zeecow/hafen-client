@@ -840,7 +840,7 @@ public class MapWnd extends Window implements Console.Directory {
 
     public void recenter() {
 	view.follow(player);
-	if (ZeeManagerIcons.latestMidclickMark !=null){
+	if (ZeeManagerIcons.latestMidclickMark != null){
 		ZeeManagerIcons.latestMidclickMark.isListFocused = false;
 	}
     }

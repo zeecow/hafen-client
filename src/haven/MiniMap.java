@@ -35,7 +35,6 @@ import java.awt.image.*;
 import java.awt.Color;
 import haven.MapFile.Segment;
 import haven.MapFile.DataGrid;
-import haven.MapFile.Grid;
 import haven.MapFile.GridInfo;
 import haven.MapFile.Marker;
 import haven.MapFile.PMarker;
@@ -149,7 +148,7 @@ public class MiniMap extends Widget {
 	public MapLocator(MapView mv) {this.mv = mv;}
 
 	public Location locate(MapFile file) {
-	    Coord mc = new Coord2d(mv.getcc()).floor(MCache.tilesz);
+	    Coord mc = new Coord2d(mv.getcc()).floor(tilesz);
 	    if(mc == null)
 		throw(new Loading("Waiting for initial location"));
 	    MCache.Grid plg = mv.ui.sess.glob.map.getgrid(mc.div(cmaps));
@@ -400,7 +399,7 @@ public class MiniMap extends Widget {
 	    this.m = marker;
 	}
 
-	private static final OwnerContext.ClassResolver<DisplayMarker> ctxr = new OwnerContext.ClassResolver<DisplayMarker>()
+	private static final ClassResolver<DisplayMarker> ctxr = new ClassResolver<DisplayMarker>()
 	    .add(Marker.class, m -> m.m)
 	    .add(Widget.class, m -> m.wdg)
 	    .add(UI.class, m -> m.wdg.ui)
@@ -414,7 +413,8 @@ public class MiniMap extends Widget {
 	public GobIcon.Icon icon() {
 	    if(icon == null) {
 		if(m instanceof PMarker) {
-		    icon = new Flag(this, ((PMarker)m).color, m.nm);
+		    icon = new ZeeManagerIcons.ZeeFlag(this, ((PMarker)m).color, m.nm);
+            //icon = new Flag(this, ((PMarker)m).color, m.nm);
 		} else {
 		    SMarker sm = (SMarker)m;
 		    Resource res = sm.res.get();
@@ -424,22 +424,11 @@ public class MiniMap extends Widget {
 	    return(icon);
 	}
 
-    static BufferedImage minimapMarkImg = ZeeManagerIcons.imgStar4(7,Color.white,false,false,false);
-    static Coord minimapMarkImgCc = UI.scale(Coord.of(minimapMarkImg.getWidth()));
 	public void draw(GOut g, Coord c) {
         if (m.mapOptsHide)
             return;
 	    try {
-        Coord ul = c.sub(minimapMarkImgCc);
-        if (isListFocused){
-            g.image(ZeeManagerIcons.latestFocusedMarkBgImg,ul.sub(1,1));
-            g.chcolor();
-        }
-        g.chcolor(((PMarker)m).color);
-        g.image(minimapMarkImg,ul);
-        g.chcolor();
-        //TODO uncomment and fix
-		//icon().draw(g, c);
+		icon().draw(g, c);
 	    } catch(Loading l) {}
 	}
 
@@ -477,7 +466,8 @@ public class MiniMap extends Widget {
 	private Tex img = null;
 	private Defer.Future<Tex> nextimg = null;
 
-	public DisplayGrid(Segment seg, Coord sc, int lvl, Indir<? extends DataGrid> gref) {
+	public DisplayGrid(Widget wdg, Segment seg, Coord sc, int lvl, Indir<? extends DataGrid> gref) {
+	    this.wdg = wdg;
 	    this.file = seg.file();
 	    this.seg = seg;
 	    this.sc = sc;
@@ -871,7 +861,7 @@ public class MiniMap extends Widget {
 		    continue;
 		SMarker mid = null;
 		try {
-		    MapFile.GridInfo info = file.gridinfo.get(obg.id);
+		    GridInfo info = file.gridinfo.get(obg.id);
 		    if(info == null)
 			continue;
 		    Coord sc = tc.add(info.sc.sub(obg.gc).mul(cmaps));

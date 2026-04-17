@@ -593,7 +593,6 @@ public class ZeeManagerIcons {
 
 
     static MiniMap.DisplayMarker latestMidclickMark;
-    static BufferedImage latestFocusedMarkBgImg = ZeeManagerIcons.imgCirle(MiniMap.DisplayMarker.minimapMarkImg.getWidth()+1,Color.black,false,false,false);
     public static void checkMarkClicked(MiniMap.DisplayMarker mark, int button, boolean mapCompact) {
 
         if (button==3)
@@ -627,7 +626,10 @@ public class ZeeManagerIcons {
                     if (ZeeManagerIcons.latestMidclickMark != null){
                         ZeeManagerIcons.latestMidclickMark.isListFocused = false;
                     }
-                    mark.isListFocused = true;
+
+                    if (mark.m instanceof MapFile.PMarker)
+                        ((ZeeFlag)mark.icon()).isListFocused = true;
+
                     latestMidclickMark = mark;
 
                 } catch (Exception e) {
@@ -718,7 +720,51 @@ public class ZeeManagerIcons {
     }
 
 
+    public static class ZeeFlag extends GobIcon.Icon {
+        public static final Resource res = Resource.local().loadwait("gfx/hud/mmap/flag");
+        static BufferedImage mark = ZeeManagerIcons.imgStar4(7,Color.white,false,false,false);
+        static Coord cc = UI.scale(Coord.of(mark.getWidth()));
+        static BufferedImage bgfocus = ZeeManagerIcons.imgCirle(mark.getWidth()+1,Color.black,false,false,false);
+        public final Color col;
+        public final String name;
+        public boolean isListFocused = false;
+
+        public ZeeFlag(OwnerContext owner, Color col, String name) {
+            super(owner,res);
+            this.col = col;
+            this.name = name;
+        }
+
+        public String name() {
+            return(name);
+        }
+
+        public BufferedImage image() {
+            return mark;
+        }
+
+        public void draw(GOut g, Coord c) {
+            Coord ul = c.sub(cc);
+            if (isListFocused){
+                g.image(bgfocus,ul.sub(1,1));
+                g.chcolor();
+            }
+            g.chcolor(col);
+            g.image(mark, ul);
+            g.chcolor();
+        }
+
+        public boolean checkhit(Coord c) {
+            return(c.isect(cc.inv(), Coord.of(bgfocus.getWidth())));
+        }
+
+        public Object[] id() {
+            return(new Object[] {col});
+        }
+    }
+
     private static void println(String s) {
         ZeeConfig.println(s);
     }
+
 }
