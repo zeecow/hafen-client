@@ -530,28 +530,19 @@ public class ZeeManagerFarmer extends ZeeThread{
 
             }
             else {
-                /*
-                    find barrel and store seeds
-                 */
-                barrels.removeIf(b -> {
-                    ZeeGobColor c = b.getattr(ZeeGobColor.class);
-                    if(c!=null && c.color.getBlue()==1) {
-                        return true;//remove possible marked full(blue) barrels
+                int qlSeeds = -1;
+                // 0 barrels means no sorting (TODO test on poppy)
+                if (farmerTxtQlSortingBarrels != 0) {
+                    //drop lowest ql seeds, keep highest
+                    qlSeeds = dropLowestQlSeeds();
+                    if (qlSeeds < 0) {
+                        println("all seeds stored?");
+                        //resetInitialState();
+                        return;
                     }
-                    if (!isBarrelEmpty(b) && !isBarrelSameSeeds(b, gItemSeedBasename)){
-                        return true;//remove non-empty, non-matching seed barrels
-                    }
-                    return false;
-                });
-                //drop lowest ql seeds, keep highest
-                int qlSeeds = dropLowestQlSeeds();
-                if (qlSeeds < 0){
-                    println("all seeds stored?");
-                    //resetInitialState();
-                    return;
                 }
                 //get barrel for current seed ql
-                lastBarrel = getBarrelBySeedQl(qlSeeds,barrels);//ZeeConfig.getClosestGob(barrels);
+                lastBarrel = getBarrelBySeedQl(qlSeeds);//ZeeConfig.getClosestGob(barrels);
                 if(lastBarrel==null){
                     exitSeedFarmer("cant decide ql barrel");
                     return;
@@ -628,11 +619,19 @@ public class ZeeManagerFarmer extends ZeeThread{
     }
 
     static Map<Integer,Gob> mapSeedqlBarrel;
-    private static Gob getBarrelBySeedQl(int qlSeeds, List<Gob> barrels) {
+    private static Gob getBarrelBySeedQl(int qlSeeds) {
         println("qlSeeds "+qlSeeds+" , mapQlBarrel "+mapSeedqlBarrel.size()+" = "+ mapSeedqlBarrel.keySet());
         Gob barrel = null;
+        // option no ql sorting barrels
+        if (farmerTxtQlSortingBarrels==0){//TODO test on poppy field
+            println("no ql sorting (barrels set to 0)");
+            if (lastBarrel != null && !isBarrelMarkedInaccessible(lastBarrel))
+                barrel = lastBarrel;
+            else
+                barrel = getClosestEmptyBarrel();
+        }
         // first barrel, get closest empty one
-        if (mapSeedqlBarrel.size()==0) {
+        else if (mapSeedqlBarrel.size()==0) {
             barrel = getClosestEmptyBarrel();
         }
         // ql barrel not found
@@ -809,7 +808,7 @@ public class ZeeManagerFarmer extends ZeeThread{
                     a = val;
                     Utils.setprefb("farmerCbPile",val);
                 }
-            }, wdg.c.x+wdg.sz.x+17, 7);
+            }, wdg.c.x+wdg.sz.x+7, 7);
             wdg.settip("pile around selection");
 
 
@@ -827,6 +826,7 @@ public class ZeeManagerFarmer extends ZeeThread{
             };
             wdg = windowManager.add(ZeeManagerFarmer.textEntryQlSortBarrels, 95, 30-5);
             textEntryQlSortBarrels.settext(""+ farmerTxtQlSortingBarrels);
+            wdg = windowManager.add(new Label("( 0 for no sorting )"), wdg.c.x+wdg.sz.x+5, 30);
 
 
             // barrel tiles textEntry
