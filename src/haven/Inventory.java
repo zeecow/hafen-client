@@ -427,9 +427,9 @@ public class Inventory extends Widget implements DTarget {
 				}
 			}
 		}
-		ZeeConfig.println("=======");
-		ZeeConfig.println("itemsz("+w+","+h+")  "+((ZeeConfig.gameUI!=null&&ZeeConfig.gameUI.vhand!=null&&ZeeConfig.gameUI.vhand.item!=null)? ZeeManagerItems.getHoldingItem().item.getres().basename():""));
-		printMatrix(inv);
+		//ZeeConfig.println("=======");
+		//ZeeConfig.println("itemsz("+w+","+h+")  "+((ZeeConfig.gameUI!=null&&ZeeConfig.gameUI.vhand!=null&&ZeeConfig.gameUI.vhand.item!=null)? ZeeManagerItems.getHoldingItem().item.getres().basename():""));
+		//printMatrix(inv);
 		//search free area sized (w,h)
 		boolean blocked;
 		for (int i = 0; i < (inv.length); i++) {
@@ -452,12 +452,12 @@ public class Inventory extends Widget implements DTarget {
 				}
 				if (!blocked) {
 					Coord ret = new Coord(j,i);
-					ZeeConfig.println("free slots topleft "+ret+"  itemsz("+w+","+h+")");
+					//ZeeConfig.println("free slots topleft "+ret+"  itemsz("+w+","+h+")");
 					return ret;
 				}
 			}
 		}
-		ZeeConfig.println("no free slots for itemsz("+w+","+h+")");
+		//ZeeConfig.println("no free slots for itemsz("+w+","+h+")");
 		return null;
 	}
 

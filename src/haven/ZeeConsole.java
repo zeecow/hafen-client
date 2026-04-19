@@ -879,7 +879,10 @@ public class ZeeConsole {
                 // add single items to stacks with 1 space
                 List<WItem> singleItems = wItems.stream().filter(wItem -> !wItem.item.isStackByContent()).toList();
                 int finalMaxStack = maxStack;
-                List<WItem> oneSpaceStacks = wItems.stream().filter(wItem -> wItem.item.isStackByContent() && (ZeeManagerItems.getItemInfoAmount(wItem.item.info())==finalMaxStack-1)).toList();
+                List<WItem> oneSpaceStacks = wItems.stream().filter(
+                    wItem -> wItem.item.isStackByContent()
+                    && (ZeeManagerItems.getItemInfoAmount(wItem.item.info())==finalMaxStack-1)
+                ).toList();
                 for (int i = 0; i < singleItems.size(); i++) {
                     if (oneSpaceStacks.isEmpty() || oneSpaceStacks.get(i)==null) {
                         println("        not enough oneSpaceStacks , i = "+i);
@@ -900,34 +903,56 @@ public class ZeeConsole {
                     println("        joined singleItem "+i+" to stack "+i);
                 }
 
-                // join incomplete stacks, smaller than maxSize
-                List<WItem> incompleteStacks = wItems.stream().filter(wItem ->
-                        wItem.item.isStackByContent() && finalMaxStack > 3
-                                && ZeeManagerItems.getItemInfoAmount(wItem.item.info()) <= (finalMaxStack-2) ).toList();
-                if (incompleteStacks.size() < 2){
-                    println("        not enough incompleteStacks "+incompleteStacks.size());
-                }
-                else {
+                // join incomplete stacks
+                ZeeThread.prepareCancelClick();
+                do {
+                    // update items info
+                    if(isResName)
+                        wItems = inv.getWItemsByNameEndsWith(name);
+                    else
+                        wItems = inv.getWItemsByInfoNameContains(name);
+                    if (wItems==null || wItems.isEmpty()){
+                        println("optimizeStacks() > current inv has no item 2");
+                        return true;
+                    }
+                    List<WItem> incompleteStacks = wItems.stream().filter(wItem ->
+                            wItem.item.isStackByContent()
+                            && ZeeManagerItems.getItemInfoAmount(wItem.item.info()) < (finalMaxStack)
+                    ).toList();
+
+                    // out of incomplete stacks
+                    if (incompleteStacks.size() < 2) { //TODO test 3 ?
+                        println("        not enough incompleteStacks " + incompleteStacks.size());
+                        break;
+                    }
                     println("        incompleteStacks = " + incompleteStacks.size());
-                    for (int i = 0; i < incompleteStacks.size() - 1; i += 2) {
-                        // pickup stack
-                        if (!ZeeManagerItems.pickUpItem(incompleteStacks.get(i))) {
-                            println("        couldnt pickup incompleteStack");
+
+                    // pickup stack
+                    if (!ZeeManagerItems.pickUpItem(incompleteStacks.get(0))) {
+                        println("        couldnt pickup incompleteStack");
+                        break;
+                    }
+
+                    // click other incomplete stacks until not holding item
+                    int i = 1;
+                    while(ZeeConfig.isPlayerHoldingItem()) {
+                        ZeeManagerItems.itemAct(incompleteStacks.get(i));
+                        i++;
+                        Thread.sleep(500);//wait item upd
+                        if (incompleteStacks.size() <= i) {
+                            println("        no incompleteStacks to click ");
                             break;
                         }
-                        // click other stack
-                        ZeeManagerItems.itemAct(incompleteStacks.get(i + 1));
-                        Thread.sleep(400);//wait item upd
-                        if (ZeeConfig.isPlayerHoldingItem()) {
-                            println("        shouldnt be holding incompleteStack?");
-                            return false;
-                        }
-                        println("        joined incompleteStack " + i + " to " + (i + 1));
                     }
+                } while(!ZeeThread.isCancelClick());
+                if (ZeeConfig.isPlayerHoldingItem() &&  !ZeeThread.isCancelClick()){
+                    println("        drop holding item to inv");
+                    ZeeManagerItems.dropHoldingItemToInv(inv);
                 }
             }
             return true;
         } catch (Exception e) {
+            e.printStackTrace();
             return false;
         }
     }
