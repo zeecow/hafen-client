@@ -86,7 +86,7 @@ public class MapView extends PView implements DTarget, Console.Directory {
 	}
 	public void drag(Coord sc) {}
 	public void release() {}
-	public boolean wheel(Coord sc, int amount) {
+	public boolean wheel(MouseWheelEvent ev) {
 	    return(false);
 	}
 	
@@ -194,9 +194,9 @@ public class MapView extends PView implements DTarget, Console.Directory {
 	
 	private static final float maxang = (float)(Math.PI / 2 - 0.1);
 	private static final float mindist = 50.0f;
-	public boolean wheel(Coord c, int amount) {
+	public boolean wheel(MouseWheelEvent ev) {
 	    float fe = telev;
-	    telev += amount * telev * 0.02f;
+	    telev += ev.s * telev * 0.02f;
 	    if(telev > maxang)
 		telev = maxang;
 	    if(dist(telev) < mindist)
@@ -241,8 +241,8 @@ public class MapView extends PView implements DTarget, Console.Directory {
 	    angl = angl % ((float)Math.PI * 2.0f);
 	}
 
-	public boolean wheel(Coord c, int amount) {
-	    float d = dist + (amount * 25);
+	public boolean wheel(MouseWheelEvent ev) {
+	    float d = dist + (float)(ev.s * 25);
 	    if(d < 5)
 		d = 5;
 	    dist = d;
@@ -299,8 +299,8 @@ public class MapView extends PView implements DTarget, Console.Directory {
 	    tangl = anglorig + ((float)(c.x - dragorig.x) / 100.0f);
 	}
 
-	public boolean wheel(Coord c, int amount) {
-	    float d = tdist + (amount * 25);
+	public boolean wheel(MouseWheelEvent ev) {
+	    float d = tdist + (float)(ev.s * 25);
 	    if(d < 5)
 		d = 5;
 	    tdist = d;
@@ -448,8 +448,8 @@ public class MapView extends PView implements DTarget, Console.Directory {
 		release();
 	}
 
-	public boolean wheel(Coord c, int amount) {
-	    chfield(tfield + amount * 10);
+	public boolean wheel(MouseWheelEvent ev) {
+	    chfield(tfield + (float)ev.s * 10);
 	    return(true);
 	}
 
@@ -2053,7 +2053,7 @@ public class MapView extends PView implements DTarget, Console.Directory {
 	    if(placing.adjust.rotate(placing, ev.a, ui.modflags()))
 		return(true);
 	}
-	return(camera.wheel(ev.c, ev.a));
+	return(camera.wheel(ev));
     }
     
     public boolean drop(final Coord cc, Coord ul) {
