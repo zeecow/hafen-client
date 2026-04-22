@@ -289,7 +289,7 @@ public class ZeeConfig {
     static boolean isBuildAndDrink = Utils.getprefb("isBuildAndDrink",true);
     static boolean leftClickDragCamera = Utils.getprefb("leftClickDragCamera",false);
     static boolean isPlayerFollowingCauldron = false;
-    static List<Gob> listCauldronContainers = null;
+    static List<Gob> listCauldronAuxGobs = null;
     public static boolean clickedCraftAll = false;
     static boolean menuFastAnim = Utils.getprefb("menuFastAnim",true);
     static boolean clickOpiumDragonSmokeCurios = Utils.getprefb("clickOpiumDragonSmokeCurios",false);
@@ -2859,8 +2859,8 @@ public class ZeeConfig {
         ZeeManagerMinimap.mapOptsMarksRow = ZeeManagerMinimap.mapOptsMarksCol = 0;
         ZeeResearch.setFilenameForServer();
         ZeeManagerCraft.craftRecExit();
-        if (listCauldronContainers!=null)
-            listCauldronContainers.clear();
+        if (listCauldronAuxGobs !=null)
+            listCauldronAuxGobs.clear();
         ZeeManagerGobs.autoPickIrrlightExit();
         ZeeManagerMiner.tilesMonitorCleanup();
         ZeeHistWdg.clearHistory();

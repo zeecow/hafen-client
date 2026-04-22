@@ -1129,7 +1129,7 @@ public class ZeeManagerGobs extends ZeeThread{
                     Coord barrelCoord = ZeeConfig.getGobCoord(barrel);
                     //backup aux containers before checkAttrDelFollowing()
                     List<Gob> backupConts = null;
-                    List<Gob> tmp = ZeeConfig.listCauldronContainers;
+                    List<Gob> tmp = ZeeConfig.listCauldronAuxGobs;
                     if (tmp!=null && !tmp.isEmpty())
                         backupConts = new ArrayList<>(tmp);
                     //lift barrel
@@ -1147,14 +1147,27 @@ public class ZeeManagerGobs extends ZeeThread{
                                     if (waitWindowOpened("Cauldron")) {
                                         //reopen aux containers
                                         if (backupConts!=null){
+                                            List<Gob> gobsToRemove = new ArrayList<>();
                                             for (Gob cont : backupConts) {
+                                                if (cont==null || cont.removed){//pile gob removed?
+                                                    if (cont!=null) {
+                                                        println("removing cauldron aux gob " + cont.getres().name);
+                                                        gobsToRemove.add(cont);
+                                                    }
+                                                    continue;
+                                                }
                                                 gobClick(cont,3);
                                                 sleep(PING_MS);
                                             }
+                                            // clear removed gobs
+                                            if (!gobsToRemove.isEmpty()) {
+                                                println("    " + gobsToRemove.size() + " aux gobs removed");
+                                                backupConts.removeAll(gobsToRemove);
+                                            }
                                             //restore containers removed by checkAttrDelFollowing()
                                             if (backupConts!=null && !backupConts.isEmpty()) {
-                                                ZeeConfig.listCauldronContainers = new ArrayList<>(backupConts);
-                                                ZeeConfig.addPlayerText("conts "+ZeeConfig.listCauldronContainers.size());
+                                                ZeeConfig.listCauldronAuxGobs = new ArrayList<>(backupConts);
+                                                ZeeConfig.addPlayerText("conts "+ZeeConfig.listCauldronAuxGobs.size());
                                             }
                                         }
                                         //click "craft all" button
@@ -1169,7 +1182,7 @@ public class ZeeManagerGobs extends ZeeThread{
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-                if (ZeeConfig.listCauldronContainers==null || ZeeConfig.listCauldronContainers.isEmpty() ) {
+                if (ZeeConfig.listCauldronAuxGobs ==null || ZeeConfig.listCauldronAuxGobs.isEmpty() ) {
                     ZeeConfig.removePlayerText();
                 }
             }
@@ -1628,11 +1641,11 @@ public class ZeeManagerGobs extends ZeeThread{
                 clickedPlantGobForLabelingQl = false;
             }
         }
-        // refil cauldron aux containers, barrels
-        else if(ZeeConfig.isPlayerFollowingCauldron && (ZeeConfig.isGobContainer(gobName) || gobName.endsWith("/barrel"))){
-            if (ZeeConfig.listCauldronContainers==null)
-                ZeeConfig.listCauldronContainers = new ArrayList<>();
-            List<Gob> list = ZeeConfig.listCauldronContainers;
+        // refil cauldron aux containers, barrels, piles
+        else if(ZeeConfig.isPlayerFollowingCauldron && (ZeeConfig.isGobContainer(gobName) || gobName.endsWith("/barrel") || isGobStockpile(gobName))){
+            if (ZeeConfig.listCauldronAuxGobs ==null)
+                ZeeConfig.listCauldronAuxGobs = new ArrayList<>();
+            List<Gob> list = ZeeConfig.listCauldronAuxGobs;
             if (!list.contains(gob)) {
                 list.add(gob);
                 ZeeConfig.addPlayerText("conts "+list.size());
@@ -4869,8 +4882,8 @@ public class ZeeManagerGobs extends ZeeThread{
             return;
         if (ZeeConfig.isPlayerFollowingCauldron && ZeeConfig.isPlayerMain(g)){
             ZeeConfig.isPlayerFollowingCauldron = false;
-            if (ZeeConfig.listCauldronContainers!=null) {
-                ZeeConfig.listCauldronContainers.clear();
+            if (ZeeConfig.listCauldronAuxGobs !=null) {
+                ZeeConfig.listCauldronAuxGobs.clear();
             }
             ZeeConfig.removePlayerText();
             //println("del player following attr ");
