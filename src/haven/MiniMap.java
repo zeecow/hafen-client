@@ -27,14 +27,13 @@
 package haven;
 
 import haven.render.*;
-
-import java.awt.image.BufferedImage;
 import java.util.*;
 import java.util.function.*;
 import java.awt.image.*;
 import java.awt.Color;
 import haven.MapFile.Segment;
 import haven.MapFile.DataGrid;
+import haven.MapFile.Grid;
 import haven.MapFile.GridInfo;
 import haven.MapFile.Marker;
 import haven.MapFile.PMarker;
@@ -148,7 +147,7 @@ public class MiniMap extends Widget {
 	public MapLocator(MapView mv) {this.mv = mv;}
 
 	public Location locate(MapFile file) {
-	    Coord mc = new Coord2d(mv.getcc()).floor(tilesz);
+	    Coord mc = new Coord2d(mv.getcc()).floor(MCache.tilesz);
 	    if(mc == null)
 		throw(new Loading("Waiting for initial location"));
 	    MCache.Grid plg = mv.ui.sess.glob.map.getgrid(mc.div(cmaps));
@@ -402,7 +401,7 @@ public class MiniMap extends Widget {
         }
 	}
 
-	private static final ClassResolver<DisplayMarker> ctxr = new ClassResolver<DisplayMarker>()
+	private static final OwnerContext.ClassResolver<DisplayMarker> ctxr = new OwnerContext.ClassResolver<DisplayMarker>()
 	    .add(Marker.class, m -> m.m)
 	    .add(Widget.class, m -> m.wdg)
 	    .add(UI.class, m -> m.wdg.ui)
@@ -465,7 +464,6 @@ public class MiniMap extends Widget {
 	public final Area mapext;
 	public final Indir<? extends DataGrid> gref;
 	public Coord dc;
-	private DataGrid cgrid = null;
 	private Tex img = null;
 	private Defer.Future<Tex> nextimg = null;
 
@@ -864,7 +862,7 @@ public class MiniMap extends Widget {
 		    continue;
 		SMarker mid = null;
 		try {
-		    GridInfo info = file.gridinfo.get(obg.id);
+		    MapFile.GridInfo info = file.gridinfo.get(obg.id);
 		    if(info == null)
 			continue;
 		    Coord sc = tc.add(info.sc.sub(obg.gc).mul(cmaps));
@@ -1023,7 +1021,7 @@ public class MiniMap extends Widget {
 		if(allowzoomout())
 		    zoomlevel = Math.min(zoomlevel + 1, dlvl + 1);
 	    }
-	} else {
+	} else if(ev.a < 0) {
         if(zoomlevel == 0 && minimapScale <= 3) {
             minimapScale++;
             ZeeConfig.minimapScale = minimapScale;
