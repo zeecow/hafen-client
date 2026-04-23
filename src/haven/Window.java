@@ -726,7 +726,7 @@ public class Window extends Widget {
     void autoHideToggleWinPos(){
         Coord savedWinPos = ZeeConfig.hashmapWindowPos.get(this.cap);
         if (savedWinPos==null){
-            ZeeConfig.println("123123 > no saved pos to restore");
+            ZeeConfig.println("no saved pos to restore window "+this.cap);
             return;
         }
         int halfScreen = ZeeConfig.gameUI.sz.x/2;
