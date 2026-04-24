@@ -38,6 +38,7 @@ public class Fightview extends Widget {
     public static final Coord cgivec = new Coord(cavac.x - UI.scale(35), cavac.y);
     public static final Coord cpursc = new Coord(cavac.x - UI.scale(75), cgivec.y + UI.scale(35));
     public final LinkedList<Relation> lsrel = new LinkedList<Relation>();
+    public final LinkedList<Relation> lsrelHidden = new LinkedList<Relation>();
     public final Bufflist buffs = add(new Bufflist()); {buffs.hide();}
     public final Map<Long, Widget> obinfo = new HashMap<>();
     public final Rellist lsdisp;
@@ -317,61 +318,89 @@ public class Fightview extends Widget {
             if(rel.gobid == gobid)
                 return(rel);
         }
+        if (lsrel.isEmpty()) {
+            ZeeConfig.println("getrel empty?  lsrel" + lsrel.size() + " and lsrelHidden" + lsrelHidden.size());
+        } else {
+            for (Relation rel : lsrelHidden) {
+                if (rel.gobid == gobid) {
+                    synchronized (lsrel) {
+                        //switch rel from lists
+                        ZeeConfig.println("getrel switch >  lsrel" + lsrel.size() + " and lsrelHidden" + lsrelHidden.size());
+                        Relation switchRel = lsrel.remove();
+                        lsrelHidden.addFirst(switchRel);
+                        lsrel.addFirst(rel);
+                        lsrelHidden.remove(rel);
+                        ZeeConfig.println("          lsrel" + lsrel.size() + " and lsrelHidden" + lsrelHidden.size());
+                        return (rel);
+                    }
+                }
+            }
+        }
         throw(new Notfound(gobid));
     }
 
     public void uimsg(String msg, Object... args) {
-        if(msg == "new") {
+        if (msg == "new") {
             Relation rel = new Relation(Utils.uiv(args[0]));
-	    rel.give(Utils.iv(args[1]));
-	    rel.ip = Utils.iv(args[2]);
-	    rel.oip = Utils.iv(args[3]);
-            lsrel.addFirst(rel);
-	    updrel();
+            rel.give(Utils.iv(args[1]));
+            rel.ip = Utils.iv(args[2]);
+            rel.oip = Utils.iv(args[3]);
+            // avoid more than 7 visible relations
+            if (lsrel.size() < 6){
+                lsrel.addFirst(rel);
+            }else{
+                lsrelHidden.addFirst(rel);
+            }
+            updrel();
             return;
-        } else if(msg == "del") {
+        } else if (msg == "del") {
             Relation rel = getrel(Utils.uiv(args[0]));
-	    rel.remove();
+            rel.remove();
             lsrel.remove(rel);
-	    if(rel == current)
-		setcur(null);
-	    updrel();
+            if (!lsrelHidden.isEmpty()){ // not sure why is possible but...
+                ZeeConfig.println("uimsg del  before >  lsrel" + lsrel.size() + " and lsrelHidden" + lsrelHidden.size());
+                lsrel.add(lsrelHidden.remove());
+                ZeeConfig.println("uimsg del  after >  lsrel" + lsrel.size() + " and lsrelHidden" + lsrelHidden.size());
+            }
+            else if (rel == current)
+                setcur(null);
+            updrel();
             return;
-        } else if(msg == "upd") {
+        } else if (msg == "upd") {
             Relation rel = getrel(Utils.uiv(args[0]));
-	    rel.give(Utils.iv(args[1]));
-	    rel.ip = Utils.iv(args[2]);
-	    rel.oip = Utils.iv(args[3]);
+            rel.give(Utils.iv(args[1]));
+            rel.ip = Utils.iv(args[2]);
+            rel.oip = Utils.iv(args[3]);
             return;
-	} else if(msg == "used") {
-	    use((args[0] == null) ? null : ui.sess.getresv(args[0]));
-	    return;
-	} else if(msg == "ruse") {
-	    Relation rel = getrel(Utils.uiv(args[0]));
-	    rel.use((args[1] == null) ? null : ui.sess.getresv(args[1]));
-	    return;
-        } else if(msg == "cur") {
+        } else if (msg == "used") {
+            use((args[0] == null) ? null : ui.sess.getresv(args[0]));
+            return;
+        } else if (msg == "ruse") {
+            Relation rel = getrel(Utils.uiv(args[0]));
+            rel.use((args[1] == null) ? null : ui.sess.getresv(args[1]));
+            return;
+        } else if (msg == "cur") {
             try {
                 Relation rel = getrel(Utils.uiv(args[0]));
                 lsrel.remove(rel);
                 lsrel.addFirst(rel);
-		setcur(rel);
-            } catch(Notfound e) {
-		setcur(null);
-	    }
+                setcur(rel);
+            } catch (Notfound e) {
+                setcur(null);
+            }
             return;
-	} else if(msg == "atkc") {
-	    atkcs = Utils.rtime();
-	    atkct = atkcs + (Utils.dv(args[0]) * 0.06);
-	    return;
-	} else if(msg == "blk") {
-	    blk = ui.sess.getresv(args[0]);
-	    return;
-	} else if(msg == "atk") {
-	    batk = ui.sess.getresv(args[0]);
-	    iatk = ui.sess.getresv(args[1]);
-	    return;
-	}
+        } else if (msg == "atkc") {
+            atkcs = Utils.rtime();
+            atkct = atkcs + (Utils.dv(args[0]) * 0.06);
+            return;
+        } else if (msg == "blk") {
+            blk = ui.sess.getresv(args[0]);
+            return;
+        } else if (msg == "atk") {
+            batk = ui.sess.getresv(args[0]);
+            iatk = ui.sess.getresv(args[1]);
+            return;
+        }
         super.uimsg(msg, args);
     }
 }
