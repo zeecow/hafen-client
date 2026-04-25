@@ -90,20 +90,31 @@ public interface Toolkit {
 class Found {
     private static Map<String, Toolkit.Factory> find() {
 	Map<String, Toolkit.Factory> ret = new HashMap<>();
-	for(Class<?> cl : dolda.jglob.Loader.get(Toolkit.Available.class).classes()) {
-	    String nm = cl.getAnnotation(Toolkit.Available.class).name();
-	    Toolkit.Factory fac;
+	ClassLoader loader = Toolkit.Available.class.getClassLoader();
+	for(String clnm : dolda.jglob.Loader.get(Toolkit.Available.class).names()) {
 	    try {
-		fac = (Toolkit.Factory)Utils.invoke(cl.getDeclaredMethod("get"), null);
-	    } catch(NoSuchMethodException e) {
-		throw(new AssertionError(e));
-	    } catch(Unavailable e) {
-		fac = new Toolkit.Factory() {
-		    public Toolkit open(String... args) {throw(e);}
-		    public int priority() {return(-1000);}
-		};
+		Class<?> cl;
+		try {
+		    cl = loader.loadClass(clnm);
+		} catch(ClassNotFoundException e) {
+		    continue;
+		}
+		String nm = cl.getAnnotation(Toolkit.Available.class).name();
+		Toolkit.Factory fac;
+		try {
+		    fac = (Toolkit.Factory)Utils.invoke(cl.getDeclaredMethod("get"), null);
+		} catch(NoSuchMethodException e) {
+		    throw(new AssertionError(e));
+		} catch(Unavailable e) {
+		    fac = new Toolkit.Factory() {
+			    public Toolkit open(String... args) {throw(e);}
+			    public int priority() {return(-1000);}
+			};
+		}
+		ret.put(nm, fac);
+	    } catch(UnsupportedClassVersionError e) {
+		continue;
 	    }
-	    ret.put(nm, fac);
 	}
 	return(ret);
     }
