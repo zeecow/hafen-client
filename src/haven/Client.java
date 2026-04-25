@@ -32,7 +32,7 @@ import haven.render.*;
 import haven.iosys.tk.*;
 import java.awt.image.BufferedImage;
 
-public class Client {
+public class Client implements Console.Directory {
     public static final Config.Variable<String> toolkit = Config.Variable.prop("haven.toolkit", null);
     public final Toolkit tk;
     public final Windeye wnd;
@@ -207,6 +207,7 @@ public class Client {
 	public UI newui(UI.Runner fun) {
 	    UI prevui, newui = new UI(this, new Coord(wnd.size()), fun);
 	    newui.env = this.env;
+	    newui.cons.add(Client.this);
 	    synchronized(uilock) {
 		prevui = this.ui;
 		this.ui = newui;
@@ -474,6 +475,28 @@ public class Client {
 
     public void dispose() {
 	wnd.dispose();
+    }
+
+    private Windeye.State prevfsstate = Windeye.State.NORMAL;
+    private Map<String, Console.Command> cmdmap = new TreeMap<String, Console.Command>();
+    {
+	cmdmap.put("fs", new Console.Command() {
+		public void run(Console cons, String[] args) {
+		    if(args.length > 1) {
+			if(Utils.parsebool(args[1])) {
+			    if(wnd.state() != Windeye.State.EXCLUSIVE) {
+				prevfsstate = wnd.state();
+				wnd.state(Windeye.State.EXCLUSIVE);
+			    }
+			} else {
+			    wnd.state(prevfsstate);
+			}
+		    }
+		}
+	    });
+    }
+    public Map<String, Console.Command> findcmds() {
+	return(cmdmap);
     }
 
     private static Toolkit toolkit() {
