@@ -147,6 +147,8 @@ public abstract class XLib {
     public static final int AllocNone = 0;
     public static final int AllocAll = 1;
 
+    public static final int PropertyNewValue = 0;
+    public static final int PropertyDelete = 1;
     public static final int PropModeReplace = 0;
     public static final int PropModePrepend = 1;
     public static final int PropModeAppend = 2;
@@ -400,6 +402,7 @@ public abstract class XLib {
 
 	public abstract XKeyEvent xkey();
 	public abstract XExposeEvent xexpose();
+	public abstract XPropertyEvent xproperty();
 	public abstract XConfigureEvent xconfigure();
 	public abstract XClientMessageEvent xclient();
 	public abstract XGenericEvent xgeneric();
@@ -445,6 +448,16 @@ public abstract class XLib {
 	public abstract int width();
 	public abstract int height();
 	public abstract int count();
+    }
+
+    public static abstract class XPropertyEvent extends StructInstance {
+	protected XPropertyEvent(MemorySegment mem) {
+	    super(mem);
+	}
+
+	MemorySegment mem() {return(mem);}
+	public abstract Atom atom();
+	public abstract int state();
     }
 
     public static abstract class XClientMessageEvent extends StructInstance {
@@ -551,6 +564,61 @@ public abstract class XLib {
 	MemorySegment mem() {return(mem);}
     }
 
+    public static class XProperty {
+	public final Atom name, type;
+	public final int format;
+	public final int len;
+	private final Display dpy;
+	private final MemorySegment data;
+
+	public XProperty(Display dpy, Atom name, Atom type, int format, int len, MemorySegment data) {
+	    this.dpy = dpy;
+	    this.name = name;
+	    this.type = type;
+	    this.format = format;
+	    this.len = len;
+	    this.data = data;
+	}
+
+	public byte b(int i) {
+	    return(data.get(ValueLayout.JAVA_BYTE, i * ValueLayout.JAVA_BYTE.byteSize()));
+	}
+
+	public short s(int i) {
+	    return(data.get(ValueLayout.JAVA_SHORT, i * ValueLayout.JAVA_SHORT.byteSize()));
+	}
+
+	public long l(int i) {
+	    return(data.get(ValueLayout.JAVA_LONG, i * ValueLayout.JAVA_LONG.byteSize()));
+	}
+
+	public Atom a(int i) {
+	    return(Atom.of(l(i)));
+	}
+
+	public XID x(int i) {
+	    return(XID.of(l(i)));
+	}
+
+	public String toString() {
+	    if(dpy.closed) throw(new IllegalStateException());
+	    StringBuilder buf = new StringBuilder();
+	    if(len * format < 512) {
+		if(format == 8) {
+		    for(int i = 0; i < len; i++)
+			buf.append(String.format(" %02x", b(i) & 0xff));
+		} else if(format == 16) {
+		    for(int i = 0; i < len; i++)
+			buf.append(String.format(" %04x", s(i) & 0xff));
+		} else if(format == 32) {
+		    for(int i = 0; i < len; i++)
+			buf.append(String.format(" %08x", s(i) & 0xff));
+		}
+	    }
+	    return(String.format("#<x-property %s %s %d %d%s>", dpy.lib.XGetAtomName(dpy, name), dpy.lib.XGetAtomName(dpy, type), format, len, buf));
+	}
+    }
+
     public static class XSizeHints {
 	public long flags;
 	public int x, y;
@@ -619,6 +687,7 @@ public abstract class XLib {
     public abstract int XMapWindow(Display dpy, XID w);
     public abstract int XMapRaised(Display dpy, XID w);
     public abstract int XConfigureWindow(XLib.Display dpy, XID w, int valuemask, XWindowChanges values);
+    public abstract XProperty XGetWindowProperty(XLib.Display dpy, XID w, Atom property, boolean delete, Atom reg_type);
     public abstract int XChangeProperty(XLib.Display dpy, XID w, Atom property, Atom type, int mode, byte[] data);
     public abstract int XChangeProperty(XLib.Display dpy, XID w, Atom property, Atom type, int mode, short[] data);
     public abstract int XChangeProperty(XLib.Display dpy, XID w, Atom property, Atom type, int mode, long[] data);
@@ -906,6 +975,7 @@ public abstract class XLib {
 
 	    public XKeyEvent xkey() {return(new XKeyEvent(xlib, mem));}
 	    public XExposeEvent xexpose() {return(new XExposeEvent(mem));}
+	    public XPropertyEvent xproperty() {return(new XPropertyEvent(mem));}
 	    public XConfigureEvent xconfigure() {return(new XConfigureEvent(mem));}
 	    public XClientMessageEvent xclient() {return(new XClientMessageEvent(mem));}
 	    public XGenericEvent xgeneric() {return(new XGenericEvent(xlib, mem));}
@@ -1031,6 +1101,29 @@ public abstract class XLib {
 	    public int height() {return((int)height.get(mem, 0));}
 	    private static final VarHandle count = _XExposeEvent.varHandle(PathElement.groupElement("count"));
 	    public int count() {return((int)count.get(mem, 0));}
+	}
+
+	static final StructLayout _XPropertyEvent = struct(new MemoryLayout[] {
+		C_INT.withName("type"),
+		C_LONG.withName("serial"),
+		C_XBool.withName("send_event"),
+		ADDRESS.withName("display"),
+		C_XID.withName("window"),
+		C_Atom.withName("atom"),
+		C_Time.withName("time"),
+		C_INT.withName("state"),
+	    });
+	public static class XPropertyEvent extends XLib.XPropertyEvent {
+	    XPropertyEvent(MemorySegment mem) {
+		super(mem);
+	    }
+
+	    protected StructLayout $layout() {return(_XPropertyEvent);}
+
+	    private static final VarHandle atom = _XPropertyEvent.varHandle(PathElement.groupElement("atom"));
+	    public Atom atom() {return(Atom.of((long)atom.get(mem, 0)));}
+	    private static final VarHandle state = _XPropertyEvent.varHandle(PathElement.groupElement("state"));
+	    public int state() {return((int)state.get(mem, 0));}
 	}
 
 	static final StructLayout _XClientMessageEvent = struct(new MemoryLayout[] {
@@ -1754,6 +1847,43 @@ public abstract class XLib {
 		checkerror();
 	    }
 	}	
+
+	private final MethodHandle XGetWindowProperty = ld.downcallHandle(xlib.find("XGetWindowProperty").get(), FunctionDescriptor.of(C_INT, ADDRESS, C_XID, C_Atom, C_LONG, C_LONG, C_XBool, C_Atom, ADDRESS, ADDRESS, ADDRESS, ADDRESS, ADDRESS));
+	public XProperty XGetWindowProperty(XLib.Display dpy, XID w, Atom property, boolean delete, Atom reg_type) {
+	    try(Arena st = Arena.ofConfined()) {
+		MemorySegment tbuf = st.allocate(C_Atom), fbuf = st.allocate(C_INT), nbuf = st.allocate(C_LONG), rbuf = st.allocate(C_LONG), dbuf = st.allocate(ADDRESS);
+		int stat;
+		try {
+		    if(C_XID instanceof ValueLayout.OfLong)
+			stat = (int)XGetWindowProperty.invoke(dpy.mem(), (long)w.bits, (long)property.bits, 0, 8192, delete ? 1 : 0, (long)reg_type.bits, tbuf, fbuf, nbuf, rbuf, dbuf);
+		    else
+			stat = (int)XGetWindowProperty.invoke(dpy.mem(), (int)w.bits, (int)property.bits, 0, 8192, delete ? 1 : 0, (int)reg_type.bits, tbuf, fbuf, nbuf, rbuf, dbuf);
+		} catch(Throwable e) {
+		    throw(new RuntimeException(e));
+		} finally {
+		    checkerror();
+		}
+		if(stat != Success)
+		    return(null);
+		MemorySegment data = dbuf.get(ADDRESS, 0);
+		if(getint(rbuf, 0, C_LONG, false) != 0) {
+		    XFree(data);
+		    throw(new XLibException("huge properties are not supported yet"));
+		}
+		int format = (int)getint(fbuf, 0, C_INT, true);
+		int len = (int)getint(nbuf, 0, C_LONG, false);
+		if(format == 8)
+		    data = data.reinterpret(len);
+		else if(format == 16)
+		    data = data.reinterpret(len * 2);
+		else if(format == 32)
+		    data = data.reinterpret(len * 4);
+		XProperty ret = new XProperty(dpy, property, Atom.of(getint(tbuf, 0, C_Atom, false)), format, len, data);
+		MemorySegment jpbarda = data;
+		Finalizer.finalize(ret, () -> XFree(jpbarda));
+		return(ret);
+	    }
+	}
 
 	private final MethodHandle XChangeProperty = ld.downcallHandle(xlib.find("XChangeProperty").get(), FunctionDescriptor.of(C_INT, ADDRESS, C_XID, C_Atom, C_Atom, C_INT, C_INT, ADDRESS, C_INT));
 	public int XChangeProperty(XLib.Display dpy, XID w, Atom property, Atom type, int mode, byte[] data) {

@@ -39,14 +39,16 @@ public interface Windeye {
     public Windeye icon(BufferedImage icon);
     public Windeye cursor(Cursor cursor);
     public Windeye sizing(Sizing sizing);
+    public Windeye state(State state);
 
     public Coord size();
+    public State state();
 
     public Environment env();
     public void swapbuffers(Render g);
 
     public static enum State {
-	NORMAL, MAXIMIZED, BORDERLESS, EXCLUSIVE
+	NORMAL, MAXIMIZED, EXCLUSIVE
     }
 
     public static class Sizing {

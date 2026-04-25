@@ -493,9 +493,28 @@ public class JOGLToolkit implements Toolkit {
 	    return(this);
 	}
 
+	public JOGLWindow state(State st) {
+	    /* XXX: Implement fullscreen mode */
+	    switch(st) {
+	    case NORMAL:
+		frame.setExtendedState(java.awt.Frame.NORMAL);
+		break;
+	    case MAXIMIZED:
+		frame.setExtendedState(frame.getExtendedState() | java.awt.Frame.MAXIMIZED_BOTH);
+		break;
+	    }
+	    return(this);
+	}
+
 	public Coord size() {
 	    java.awt.Dimension d = panel.getSize();
 	    return(Coord.of(d.width, d.height));
+	}
+
+	public State state() {
+	    if((frame.getExtendedState() & java.awt.Frame.MAXIMIZED_BOTH) != 0)
+		return(State.MAXIMIZED);
+	    return(State.NORMAL);
 	}
 
 	public void dispose() {

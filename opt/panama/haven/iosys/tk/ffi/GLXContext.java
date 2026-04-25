@@ -139,6 +139,10 @@ public class GLXContext implements Toolkit.Factory {
 	public final Atomic WM_DELETE_WINDOW = new Atomic("WM_DELETE_WINDOW");
 	public final Atomic _NET_WM_NAME = new Atomic("_NET_WM_NAME");
 	public final Atomic _NET_WM_ICON = new Atomic("_NET_WM_ICON");
+	public final Atomic _NET_WM_STATE = new Atomic("_NET_WM_STATE");
+	public final Atomic _NET_WM_STATE_MAXIMIZED_VERT = new Atomic("_NET_WM_STATE_MAXIMIZED_VERT");
+	public final Atomic _NET_WM_STATE_MAXIMIZED_HORZ = new Atomic("_NET_WM_STATE_MAXIMIZED_HORZ");
+	public final Atomic _NET_WM_STATE_FULLSCREEN = new Atomic("_NET_WM_STATE_FULLSCREEN");
 	public final Atomic _NET_WM_PID = new Atomic("_NET_WM_PID");
 	public final Atomic _NET_WM_PING = new Atomic("_NET_WM_PING");
 	private boolean closed = false;
@@ -377,7 +381,10 @@ public class GLXContext implements Toolkit.Factory {
 
 		prepare(ATOM, CARDINAL, UTF8_STRING,
 			WM_NAME, WM_PROTOCOLS, WM_DELETE_WINDOW,
-			_NET_WM_NAME, _NET_WM_ICON, _NET_WM_PID, _NET_WM_PING);
+			_NET_WM_NAME, _NET_WM_ICON, _NET_WM_PID, _NET_WM_PING,
+			_NET_WM_STATE, _NET_WM_STATE_MAXIMIZED_VERT, _NET_WM_STATE_MAXIMIZED_HORZ,
+			_NET_WM_STATE_FULLSCREEN
+			);
 		done = true;
 	    } finally {
 		if(!done)
@@ -618,10 +625,10 @@ public class GLXContext implements Toolkit.Factory {
 	    public final XIC ic;
 	    private final Collection<Consumer<XEvent>> listeners = new ArrayList<>();
 	    private final Collection<EventListener> callbacks = new java.util.concurrent.CopyOnWriteArrayList<>();
-	    private boolean mapped = false;
+	    private boolean showing = false;
+	    private boolean mapped, focused;
 	    private GLXEnvironment renv;
 	    private Coord size = Coord.z;
-	    private boolean focused;
 
 	    public class GLXEnvironment extends FFIEnvironment {
 		private GLXEnvironment() {
@@ -641,7 +648,8 @@ public class GLXContext implements Toolkit.Factory {
 		    XSetWindowAttributes attrs = xlib.XSetWindowAttributes();
 		    long values = XLib.CWColormap | XLib.CWEventMask;
 		    attrs.colormap(colormap);
-		    long evmask = XLib.StructureNotifyMask | XLib.FocusChangeMask | XLib.ExposureMask | XLib.KeyPressMask | XLib.KeyReleaseMask;
+		    long evmask = XLib.StructureNotifyMask | XLib.FocusChangeMask | XLib.PropertyChangeMask;
+		    evmask |= XLib.ExposureMask | XLib.KeyPressMask | XLib.KeyReleaseMask;
 		    try(Aliveness _ = new Aliveness()) {
 			id = xrun(() -> xlib.XCreateWindow(dpy, screen.root(), 0, 0, 1, 1, 0, vis.depth(), XLib.InputOutput, vis.visual(), values, attrs));
 			register(this);
@@ -659,8 +667,6 @@ public class GLXContext implements Toolkit.Factory {
 		    } else {
 			ic = null;
 		    }
-		    long barda = evmask;
-		    xrun(() -> xlib.XSelectInput(dpy, id, barda));
 
 		    {
 			XIEventMask mask = new XIEventMask(XInput.XIAllMasterDevices);
@@ -672,6 +678,8 @@ public class GLXContext implements Toolkit.Factory {
 			xlib.XChangeProperty(dpy, id, _NET_WM_PID.id, CARDINAL.id, XLib.PropModeReplace, new long[] {libc.getpid()});
 			xlib.XChangeProperty(dpy, id, WM_PROTOCOLS.id, ATOM.id, XLib.PropModeReplace, new Atom[] {WM_DELETE_WINDOW.id, _NET_WM_PING.id});
 		    });
+		    long barda = evmask;
+		    xrun(() -> xlib.XSelectInput(dpy, id, barda));
 
 		    done = true;
 		} finally {
@@ -694,11 +702,13 @@ public class GLXContext implements Toolkit.Factory {
 	    }
 
 	    public GLXWindow show(boolean show) {
-		if(show && !mapped) {
+		if(show && !showing) {
 		    xrun(() -> xlib.XMapWindow(dpy, id));
+		    showing = true;
 		    waitfor(ev -> ev.type() == XLib.MapNotify);
-		} else if(!show && mapped) {
+		} else if(!show && showing) {
 		    xrun(() -> xlib.XUnmapWindow(dpy, id));
+		    showing = false;
 		    waitfor(ev -> ev.type() == XLib.UnmapNotify);
 		}
 		return(this);
@@ -796,8 +806,64 @@ public class GLXContext implements Toolkit.Factory {
 		return(this);
 	    }
 
+	    private Set<Atom> curstate = Collections.emptySet();
+	    private void wmstate(Atom[] st) {
+		xrun(() -> {
+		    if(mapped) {
+			Collection<Atom> p = curstate, n = Arrays.asList(st);
+			boolean mhcons = false, mvcons = false;
+			for(Atom s : p) {
+			    if(!n.contains(s)) {
+				if((s.equals(_NET_WM_STATE_MAXIMIZED_VERT.id) && mvcons) || (s.equals(_NET_WM_STATE_MAXIMIZED_HORZ.id) && mhcons))
+				    continue;
+				XEvent msg = xlib.XEvent().type(XLib.ClientMessage).window(id);
+				msg.xclient().message_type(_NET_WM_STATE.id).format(32).l(0, 0).a(1, _NET_WM_STATE_FULLSCREEN.id).a(2, Atom.nil).l(3, 1);
+				if(s.equals(_NET_WM_STATE_MAXIMIZED_VERT.id) && p.contains(_NET_WM_STATE_MAXIMIZED_HORZ.id)) {
+				    msg.xclient().a(2, _NET_WM_STATE_MAXIMIZED_HORZ.id);
+				    mhcons = true;
+				} else if(s.equals(_NET_WM_STATE_MAXIMIZED_HORZ.id) && p.contains(_NET_WM_STATE_MAXIMIZED_VERT.id)) {
+				    msg.xclient().a(2, _NET_WM_STATE_MAXIMIZED_VERT.id);
+				    mvcons = true;
+				}
+				xlib.XSendEvent(dpy, screen.root(), false, XLib.SubstructureNotifyMask | XLib.SubstructureRedirectMask, msg);
+			    }
+			}
+			for(Atom s : n) {
+			    if(!p.contains(s)) {
+				XEvent msg = xlib.XEvent().type(XLib.ClientMessage).window(id);
+				msg.xclient().message_type(_NET_WM_STATE.id).format(32).l(0, 1).a(1, _NET_WM_STATE_FULLSCREEN.id).a(2, Atom.nil).l(3, 1);
+				xlib.XSendEvent(dpy, screen.root(), false, XLib.SubstructureNotifyMask | XLib.SubstructureRedirectMask, msg);
+			    }
+			}
+		    } else {
+			xlib.XChangeProperty(dpy, id, _NET_WM_STATE.id, ATOM.id, XLib.PropModeReplace,
+					     new Atom[] {});
+		    }
+		    curstate = (st.length == 0) ? Collections.emptySet() : new HashSet<>(Arrays.asList(st));
+		});
+	    }
+
+	    public GLXWindow state(State st) {
+		xrun(() -> {
+		    switch(st) {
+		    case NORMAL:     wmstate(new Atom[] {}); break;
+		    case MAXIMIZED:  wmstate(new Atom[] {_NET_WM_STATE_MAXIMIZED_VERT.id, _NET_WM_STATE_MAXIMIZED_HORZ.id}); break;
+		    case EXCLUSIVE:  wmstate(new Atom[] {_NET_WM_STATE_FULLSCREEN.id}); break;
+		    }
+		});
+		return(this);
+	    }
+
 	    public Coord size() {
 		return(size);
+	    }
+
+	    public State state() {
+		if(curstate.contains(_NET_WM_STATE_FULLSCREEN.id))
+		    return(State.EXCLUSIVE);
+		else if(curstate.contains(_NET_WM_STATE_MAXIMIZED_VERT.id) && curstate.contains(_NET_WM_STATE_MAXIMIZED_HORZ.id))
+		    return(State.MAXIMIZED);
+		return(State.NORMAL);
 	    }
 
 	    public void dispose() {
@@ -874,6 +940,18 @@ public class GLXContext implements Toolkit.Factory {
 		size = Coord.of(ev.width(), ev.height());
 	    }
 
+	    private void propertynotify(XPropertyEvent ev) {
+		if(ev.atom().equals(_NET_WM_STATE.id)) {
+		    XProperty val = xlib.XGetWindowProperty(dpy, id, ev.atom(), false, Atom.nil);
+		    Set<Atom> nst = new HashSet<>();
+		    for(int i = 0; i < val.len; i++)
+			nst.add(val.a(i));
+		    if(!nst.equals(curstate)) {
+			curstate = nst.isEmpty() ? Collections.emptySet() : nst;
+		    }
+		}
+	    }
+
 	    private final XComposeStatus compose = xlib.XComposeStatus();
 	    private boolean keylookup(GLXKeyEvent out, XKeyEvent data, boolean doim) {
 		byte[] cbuf = new byte[128];
@@ -944,8 +1022,10 @@ public class GLXContext implements Toolkit.Factory {
 		    cb.accept(ev);
 		switch(ev.type()) {
 		case XLib.MapNotify:
+		    mapped = true;
 		    break;
 		case XLib.UnmapNotify:
+		    mapped = false;
 		    break;
 		case XLib.ReparentNotify:
 		    break;
@@ -957,6 +1037,10 @@ public class GLXContext implements Toolkit.Factory {
 		    break;
 		case XLib.FocusOut:
 		    focused = false;
+		    break;
+		case XLib.PropertyNotify:
+		    if(ev.window().equals(id))
+			propertynotify(ev.xproperty());
 		    break;
 		case XLib.Expose:
 		    break;

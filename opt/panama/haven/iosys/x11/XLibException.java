@@ -27,4 +27,6 @@
 package haven.iosys.x11;
 
 public class XLibException extends RuntimeException {
+    public XLibException() {}
+    public XLibException(String message) {super(message);}
 }
