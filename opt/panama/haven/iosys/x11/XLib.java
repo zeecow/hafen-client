@@ -1873,11 +1873,11 @@ public abstract class XLib {
 		int format = (int)getint(fbuf, 0, C_INT, true);
 		int len = (int)getint(nbuf, 0, C_LONG, false);
 		if(format == 8)
-		    data = data.reinterpret(len);
+		    data = data.reinterpret(len * C_CHAR.byteSize());
 		else if(format == 16)
-		    data = data.reinterpret(len * 2);
+		    data = data.reinterpret(len * C_SHORT.byteSize());
 		else if(format == 32)
-		    data = data.reinterpret(len * 4);
+		    data = data.reinterpret(len * C_LONG.byteSize());
 		XProperty ret = new XProperty(dpy, property, Atom.of(getint(tbuf, 0, C_Atom, false)), format, len, data);
 		MemorySegment jpbarda = data;
 		Finalizer.finalize(ret, () -> XFree(jpbarda));
