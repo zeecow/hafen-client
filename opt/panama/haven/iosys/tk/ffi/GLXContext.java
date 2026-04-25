@@ -751,6 +751,51 @@ public class GLXContext implements Toolkit.Factory {
 		return(this);
 	    }
 
+	    public GLXWindow sizing(Sizing info) {
+		XLib.XSizeHints hints = new XLib.XSizeHints();
+		Coord nsz = null;
+		if(info.fixsize == null) {
+		    if(info.normsize != null) {
+			nsz = info.normsize;
+			hints.width  = info.normsize.x;
+			hints.height = info.normsize.y;
+			hints.base_width  = info.normsize.x;
+			hints.base_height = info.normsize.y;
+			hints.flags |= XLib.PSize | XLib.PBaseSize;
+		    }
+		    if(info.minsize != null) {
+			hints.min_width  = info.minsize.x;
+			hints.min_height = info.minsize.y;
+			hints.flags |= XLib.PMinSize;
+		    }
+		    if(info.maxsize != null) {
+			hints.max_width  = info.maxsize.x;
+			hints.max_height = info.maxsize.y;
+			hints.flags |= XLib.PMaxSize;
+		    }
+		} else {
+		    nsz = info.fixsize;
+		    hints.width  = info.fixsize.x;
+		    hints.height = info.fixsize.y;
+		    hints.base_width  = info.fixsize.x;
+		    hints.base_height = info.fixsize.y;
+		    hints.min_width  = info.fixsize.x;
+		    hints.min_height = info.fixsize.y;
+		    hints.max_width  = info.fixsize.x;
+		    hints.max_height = info.fixsize.y;
+		    hints.flags |= XLib.PSize | XLib.PBaseSize | XLib.PMinSize | XLib.PMaxSize;
+		}
+		if(hints.flags != 0) {
+		    Coord nsz2 = nsz;
+		    xrun(() -> {
+			if(nsz2 != null)
+			    xlib.XResizeWindow(dpy, id, nsz2.x, nsz2.y);
+			xlib.XSetWMNormalHints(dpy, id, hints);
+		    });
+		}
+		return(this);
+	    }
+
 	    public Coord size() {
 		return(size);
 	    }

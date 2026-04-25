@@ -213,6 +213,17 @@ public abstract class XLib {
     public static final int XkbMajorVersion = 1;
     public static final int XkbMinorVersion = 0;
 
+    public static final long USPosition = (1L << 0);
+    public static final long USSize = (1L << 1);
+    public static final long PPosition = (1L << 2);
+    public static final long PSize = (1L << 3);
+    public static final long PMinSize = (1L << 4);
+    public static final long PMaxSize = (1L << 5);
+    public static final long PResizeInc = (1L << 6);
+    public static final long PAspect = (1L << 7);
+    public static final long PBaseSize = (1L << 8);
+    public static final long PWinGravity = (1L << 9);
+
     public static class XID {
 	public static final XID None = new XID(0);
 	final long bits;
@@ -239,6 +250,10 @@ public abstract class XLib {
 	public String toString() {
 	    return("#" + Long.toUnsignedString(bits, 16));
 	}
+
+	/* Pre-allocated atoms */
+	public static final Atom WM_NORMAL_HINTS = Atom.of(40);
+	public static final Atom WM_SIZE_HINTS = Atom.of(41);
     }
 
     public static class VisualID {
@@ -536,6 +551,19 @@ public abstract class XLib {
 	MemorySegment mem() {return(mem);}
     }
 
+    public static class XSizeHints {
+	public long flags;
+	public int x, y;
+	public int width, height;
+	public int min_width, min_height;
+	public int max_width, max_height;
+	public int width_inc, height_inc;
+	public int min_aspect_x, min_aspect_y;
+	public int max_aspect_x, max_aspect_y;
+	public int base_width, base_height;
+	public int win_gravity;
+    }
+
     public static class XkbExtensionInfo {
 	public final int opcode, event, error, major, minor;
 
@@ -641,6 +669,21 @@ public abstract class XLib {
 
     public int XResizeWindow(XLib.Display dpy, XID window, int w, int h) {
 	return(XConfigureWindow(dpy, window, null, null, w, h, null, null, null));
+    }
+
+    public void XSetWMNormalHints(Display dpy, XID w, XSizeHints hints) {
+	long[] v = new long[18];
+	v[0] = hints.flags;
+	v[1] = hints.x; v[2] = hints.y;
+	v[3] = hints.width; v[4] = hints.height;
+	v[5] = hints.min_width; v[6] = hints.min_height;
+	v[7] = hints.max_width; v[8] = hints.max_height;
+	v[9] = hints.width_inc; v[10] = hints.height_inc;
+	v[11] = hints.min_aspect_x; v[12] = hints.min_aspect_y;
+	v[13] = hints.max_aspect_x; v[14] = hints.max_aspect_y;
+	v[15] = hints.base_width; v[16] = hints.base_height;
+	v[17] = hints.win_gravity;
+	XChangeProperty(dpy, w, Atom.WM_NORMAL_HINTS, Atom.WM_SIZE_HINTS, PropModeReplace, v);
     }
 
     /* Macros */

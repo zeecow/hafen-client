@@ -38,9 +38,31 @@ public interface Windeye {
     public Windeye title(String title);
     public Windeye icon(BufferedImage icon);
     public Windeye cursor(Cursor cursor);
+    public Windeye sizing(Sizing sizing);
 
     public Coord size();
 
     public Environment env();
     public void swapbuffers(Render g);
+
+    public static enum State {
+	NORMAL, MAXIMIZED, BORDERLESS, EXCLUSIVE
+    }
+
+    public static class Sizing {
+	public Coord fixsize = null, normsize = null, minsize = null, maxsize = null;
+
+	public Sizing() {}
+	public Sizing(Sizing from) {
+	    this.fixsize = from.fixsize;
+	    this.normsize = from.normsize;
+	    this.minsize = from.minsize;
+	    this.maxsize = from.maxsize;
+	}
+
+	public Sizing fixsize(Coord v) {fixsize = v; return(this);}
+	public Sizing normsize(Coord v) {normsize = v; return(this);}
+	public Sizing minsize(Coord v)  {minsize = v;  return(this);}
+	public Sizing maxsize(Coord v)  {maxsize = v;  return(this);}
+    }
 }

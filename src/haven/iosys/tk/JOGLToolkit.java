@@ -475,6 +475,24 @@ public class JOGLToolkit implements Toolkit {
 	    return(this);
 	}
 
+	public JOGLWindow sizing(Sizing info) {
+	    awtrun(() -> {
+		if(info.fixsize == null) {
+		    frame.setResizable(true);
+		    if(info.normsize != null)
+			frame.setSize(info.normsize.x, info.normsize.y);
+		    frame.setMinimumSize((info.minsize == null) ? null : new java.awt.Dimension(info.minsize.x, info.minsize.y));
+		    frame.setMaximumSize((info.maxsize == null) ? null : new java.awt.Dimension(info.maxsize.x, info.maxsize.y));
+		} else {
+		    frame.setResizable(false);
+		    frame.setSize(info.fixsize.x, info.fixsize.y);
+		    frame.setMinimumSize(null);
+		    frame.setMaximumSize(null);
+		}
+	    });
+	    return(this);
+	}
+
 	public Coord size() {
 	    java.awt.Dimension d = panel.getSize();
 	    return(Coord.of(d.width, d.height));
