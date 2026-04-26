@@ -44,6 +44,13 @@ public class Client implements Console.Directory {
 	this.tk = tk;
 	this.wnd = tk.window();
 	wnd.title("Haven & Hearth");
+	Coord fsz = Utils.getprefc("mainwnd/locksize", null);
+	if(fsz == null)
+	    wnd.sizing(new Windeye.Sizing().minsize(UI.scale(800, 600)).normsize(Utils.getprefc("mainwnd/size", UI.scale(1024, 768))));
+	else
+	    wnd.sizing(new Windeye.Sizing().fixsize(fsz));
+	if(Utils.getprefb("mainwnd/max", false))
+	    wnd.state(Windeye.State.MAXIMIZED);
 	try(InputStream icon = Client.class.getResourceAsStream("icon.png")) {
 	    wnd.icon(javax.imageio.ImageIO.read(icon));
 	} catch(IOException e) {
@@ -454,6 +461,18 @@ public class Client implements Console.Directory {
 	}
     }
 
+    private void savewndstate() {
+	switch(wnd.state()) {
+	case MAXIMIZED:
+	    Utils.setprefb("mainwnd/max", true);
+	    break;
+	case NORMAL:
+	    Utils.setprefc("mainwnd/size", wnd.size());
+	    Utils.setprefb("mainwnd/max", false);
+	    break;
+	}
+    }
+
     public void run(UI.Runner task) {
 	if(mt != null) throw(new IllegalStateException());
 	mt = Thread.currentThread();
@@ -466,6 +485,7 @@ public class Client implements Console.Directory {
 	    } finally {
 		newui(null);
 	    }
+	    savewndstate();
 	} finally {
 	    loop.dispose();
 	    this.loop = null;
@@ -482,7 +502,7 @@ public class Client implements Console.Directory {
     {
 	cmdmap.put("fs", new Console.Command() {
 		public void run(Console cons, String[] args) {
-		    if(args.length > 1) {
+		    if(args.length >= 2) {
 			if(Utils.parsebool(args[1])) {
 			    if(wnd.state() != Windeye.State.EXCLUSIVE) {
 				prevfsstate = wnd.state();
@@ -490,6 +510,21 @@ public class Client implements Console.Directory {
 			    }
 			} else {
 			    wnd.state(prevfsstate);
+			}
+		    }
+		}
+	    });
+	cmdmap.put("sz", new Console.Command() {
+		public void run(Console cons, String[] args) {
+		    if(args.length >= 3) {
+			Coord sz = Coord.of(Integer.parseInt(args[1]),
+					    Integer.parseInt(args[2]));
+			if((args.length >= 4) && args[3].equals("lock")) {
+			    Utils.setprefc("mainwnd/locksize", sz);
+			    wnd.sizing(new Windeye.Sizing().fixsize(sz));
+			} else {
+			    Utils.setprefc("mainwnd/locksize", null);
+			    wnd.sizing(new Windeye.Sizing().minsize(UI.scale(800, 600)).normsize(sz));
 			}
 		    }
 		}
