@@ -360,7 +360,6 @@ public class GLXContext implements Toolkit.Factory {
 		    if(xcr.XcursorSupportsARGB(dpy)) {
 			Coord maxcursor = xlib.XQueryBestCursor(dpy, screen.root(), Coord.of(512, 512));
 			ccaps = new Cursor.Caps(Math.min(maxcursor.x, maxcursor.y), xcr.XcursorGetDefaultSize(dpy));
-			
 		    } else {
 			ccaps = null;
 		    }
