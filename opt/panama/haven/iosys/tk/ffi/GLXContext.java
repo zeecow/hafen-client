@@ -263,6 +263,15 @@ public class GLXContext implements Toolkit.Factory {
 		this.nscreen = nscreen;
 		this.screen = xlib.ScreenOfDisplay(dpy, nscreen);
 
+		/* Atoms */
+		prepare(ATOM, CARDINAL, UTF8_STRING,
+			WM_NAME, WM_PROTOCOLS, WM_DELETE_WINDOW,
+			_NET_WM_NAME, _NET_WM_ICON, _NET_WM_PID, _NET_WM_PING,
+			_NET_WM_STATE, _NET_WM_STATE_MAXIMIZED_VERT, _NET_WM_STATE_MAXIMIZED_HORZ,
+			_NET_WM_STATE_FULLSCREEN
+			);
+
+		/* Keyboard input */
 		{
 		    if((ext_xkb = xlib.XkbQueryExtension(dpy, XLib.XkbMajorVersion, XLib.XkbMinorVersion)) == null)
 			throw(new Unavailable("XKB is not supported"));
@@ -328,10 +337,9 @@ public class GLXContext implements Toolkit.Factory {
 		    this.mod_alt = mod_alt; this.mod_meta = mod_meta; this.mod_altgr = mod_altgr; this.mod_super = mod_super;
 		}
 
+		/* XInput2 */
 		if((ext_xi = xlib.XQueryExtension(dpy, "XInputExtension")) == null)
 		    throw(new Unavailable("XInputExtension is not supported"));
-		if((ext_glx = xlib.XQueryExtension(dpy, "GLX")) == null)
-		    throw(new Unavailable("GLX is not supported"));
 
 		{
 		    int ver[] = {2, 2};
@@ -356,6 +364,7 @@ public class GLXContext implements Toolkit.Factory {
 		    }
 		}
 
+		/* Xcursor */
 		{
 		    if(xcr.XcursorSupportsARGB(dpy)) {
 			Coord maxcursor = xlib.XQueryBestCursor(dpy, screen.root(), Coord.of(512, 512));
@@ -366,6 +375,9 @@ public class GLXContext implements Toolkit.Factory {
 		    emptycurs = makecursor(PUtils.rasterimg(PUtils.imgraster(Coord.of(1, 1))), Coord.z);
 		}
 
+		/* GLX */
+		if((ext_glx = xlib.XQueryExtension(dpy, "GLX")) == null)
+		    throw(new Unavailable("GLX is not supported"));
 		exts = Arrays.asList(glx.glXQueryExtensionsString(dpy, nscreen).split(" "));
 		if(!exts.contains("GLX_ARB_create_context_profile"))
 		    throw(new Unavailable("GLX_ARB_create_context_profile not supported"));
@@ -378,12 +390,6 @@ public class GLXContext implements Toolkit.Factory {
 		colormap = xlib.XCreateColormap(dpy, screen.root(), vis.visual(), XLib.AllocNone);
 		this.ctx = createctx();
 
-		prepare(ATOM, CARDINAL, UTF8_STRING,
-			WM_NAME, WM_PROTOCOLS, WM_DELETE_WINDOW,
-			_NET_WM_NAME, _NET_WM_ICON, _NET_WM_PID, _NET_WM_PING,
-			_NET_WM_STATE, _NET_WM_STATE_MAXIMIZED_VERT, _NET_WM_STATE_MAXIMIZED_HORZ,
-			_NET_WM_STATE_FULLSCREEN
-			);
 		done = true;
 	    } finally {
 		if(!done)
