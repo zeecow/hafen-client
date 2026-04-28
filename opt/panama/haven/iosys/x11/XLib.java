@@ -147,6 +147,10 @@ public abstract class XLib {
     public static final int AllocNone = 0;
     public static final int AllocAll = 1;
 
+    public static final int VisibilityUnobscured = 0;
+    public static final int VisibilityPartiallyObscured = 1;
+    public static final int VisibilityFullyObscured = 2;
+
     public static final int PropertyNewValue = 0;
     public static final int PropertyDelete = 1;
     public static final int PropModeReplace = 0;
@@ -402,6 +406,7 @@ public abstract class XLib {
 
 	public abstract XKeyEvent xkey();
 	public abstract XExposeEvent xexpose();
+	public abstract XVisibilityEvent xvisibility();
 	public abstract XPropertyEvent xproperty();
 	public abstract XConfigureEvent xconfigure();
 	public abstract XClientMessageEvent xclient();
@@ -448,6 +453,15 @@ public abstract class XLib {
 	public abstract int width();
 	public abstract int height();
 	public abstract int count();
+    }
+
+    public static abstract class XVisibilityEvent extends StructInstance {
+	protected XVisibilityEvent(MemorySegment mem) {
+	    super(mem);
+	}
+
+	MemorySegment mem() {return(mem);}
+	public abstract int state();
     }
 
     public static abstract class XPropertyEvent extends StructInstance {
@@ -975,6 +989,7 @@ public abstract class XLib {
 
 	    public XKeyEvent xkey() {return(new XKeyEvent(xlib, mem));}
 	    public XExposeEvent xexpose() {return(new XExposeEvent(mem));}
+	    public XVisibilityEvent xvisibility() {return(new XVisibilityEvent(mem));}
 	    public XPropertyEvent xproperty() {return(new XPropertyEvent(mem));}
 	    public XConfigureEvent xconfigure() {return(new XConfigureEvent(mem));}
 	    public XClientMessageEvent xclient() {return(new XClientMessageEvent(mem));}
@@ -1101,6 +1116,25 @@ public abstract class XLib {
 	    public int height() {return((int)height.get(mem, 0));}
 	    private static final VarHandle count = _XExposeEvent.varHandle(PathElement.groupElement("count"));
 	    public int count() {return((int)count.get(mem, 0));}
+	}
+
+	static final StructLayout _XVisibilityEvent = struct(new MemoryLayout[] {
+		C_INT.withName("type"),
+		C_LONG.withName("serial"),
+		C_XBool.withName("send_event"),
+		ADDRESS.withName("display"),
+		C_XID.withName("window"),
+		C_INT.withName("state"),
+	    });
+	public static class XVisibilityEvent extends XLib.XVisibilityEvent {
+	    XVisibilityEvent(MemorySegment mem) {
+		super(mem);
+	    }
+
+	    protected StructLayout $layout() {return(_XVisibilityEvent);}
+
+	    private static final VarHandle state = _XVisibilityEvent.varHandle(PathElement.groupElement("state"));
+	    public int state() {return((int)state.get(mem, 0));}
 	}
 
 	static final StructLayout _XPropertyEvent = struct(new MemoryLayout[] {

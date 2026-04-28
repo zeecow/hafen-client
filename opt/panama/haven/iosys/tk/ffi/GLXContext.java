@@ -629,6 +629,7 @@ public class GLXContext implements Toolkit.Factory {
 	    private boolean mapped, focused;
 	    private GLXEnvironment renv;
 	    private Coord size = Coord.z;
+	    private int visibility = 0;
 
 	    public class GLXEnvironment extends FFIEnvironment {
 		private GLXEnvironment() {
@@ -649,7 +650,7 @@ public class GLXContext implements Toolkit.Factory {
 		    long values = XLib.CWColormap | XLib.CWEventMask;
 		    attrs.colormap(colormap);
 		    long evmask = XLib.StructureNotifyMask | XLib.FocusChangeMask | XLib.PropertyChangeMask;
-		    evmask |= XLib.KeyPressMask | XLib.KeyReleaseMask;
+		    evmask |= XLib.VisibilityChangeMask | XLib.KeyPressMask | XLib.KeyReleaseMask;
 		    try(Aliveness _ = new Aliveness()) {
 			id = xrun(() -> xlib.XCreateWindow(dpy, screen.root(), 0, 0, 1, 1, 0, vis.depth(), XLib.InputOutput, vis.visual(), values, attrs));
 			register(this);
@@ -1041,6 +1042,9 @@ public class GLXContext implements Toolkit.Factory {
 		case XLib.PropertyNotify:
 		    if(ev.window().equals(id))
 			propertynotify(ev.xproperty());
+		    break;
+		case XLib.VisibilityNotify:
+		    visibility = ev.xvisibility().state();
 		    break;
 		case XLib.ClientMessage:
 		    clientmsg(ev.xclient());
