@@ -649,7 +649,7 @@ public class GLXContext implements Toolkit.Factory {
 		    long values = XLib.CWColormap | XLib.CWEventMask;
 		    attrs.colormap(colormap);
 		    long evmask = XLib.StructureNotifyMask | XLib.FocusChangeMask | XLib.PropertyChangeMask;
-		    evmask |= XLib.ExposureMask | XLib.KeyPressMask | XLib.KeyReleaseMask;
+		    evmask |= XLib.KeyPressMask | XLib.KeyReleaseMask;
 		    try(Aliveness _ = new Aliveness()) {
 			id = xrun(() -> xlib.XCreateWindow(dpy, screen.root(), 0, 0, 1, 1, 0, vis.depth(), XLib.InputOutput, vis.visual(), values, attrs));
 			register(this);
@@ -1041,8 +1041,6 @@ public class GLXContext implements Toolkit.Factory {
 		case XLib.PropertyNotify:
 		    if(ev.window().equals(id))
 			propertynotify(ev.xproperty());
-		    break;
-		case XLib.Expose:
 		    break;
 		case XLib.ClientMessage:
 		    clientmsg(ev.xclient());
