@@ -19,6 +19,7 @@ public class ZeeManagerMiner extends ZeeThread{
     static ZeeWindow tunnelHelperWindow;
     static String listOreColumn = "leadglance,cassiterite,chalcopyrite,cinnabar,malachite";
 
+    // start here
     public static void checkMiningSelection() {
 
         if (isChippingBoulder) {
@@ -45,7 +46,7 @@ public class ZeeManagerMiner extends ZeeThread{
 
         // skip if mining on horse
         if (ZeeConfig.isPlayerMountingHorse()){
-            ZeeConfig.msgError("TROLL RISK: mining on horse");
+            ZeeConfig.msgLow("horse makes trolls attack instantly");
             return;
         }
 
@@ -63,7 +64,6 @@ public class ZeeManagerMiner extends ZeeThread{
                 ZeeInvMainOptionsWdg.cbTunnel.click();
             tunneling = true;
             tunnelHelperShowWindow();
-            tunnelHelperButtonAct.disable(true);
         }
 
         if(!tunneling)
@@ -89,7 +89,7 @@ public class ZeeManagerMiner extends ZeeThread{
                         if (!tunneling || isCombatActive())
                             return;
 
-                        // finished mining new col tile
+                        // finished mining tiles for col/arch
                         if (tunnelHelperStage == TUNNELHELPER_STAGE3_MINECOL) {
 
                             // save player coord
@@ -109,37 +109,37 @@ public class ZeeManagerMiner extends ZeeThread{
                             }
 
                             // remove cave dust close to new col tile
-                            List<Gob> dustList = ZeeConfig.findGobsByNameEndsWith("/cavedust");
-                            //dustList.removeIf(gob -> ZeeConfig.distanceToPlayer(gob) > TILE_SIZE*2);
-                            dustList.removeIf(dust -> !ZeeConfig.lastSavedOverlay.a.contains(dust.rc.floor(MCache.tilesz)));
-                            if (!dustList.isEmpty()){
-                                for (Gob dust : dustList) {
-                                    if (!ZeeConfig.getCursorName().equals(ZeeConfig.CURSOR_ARW)) {
-                                        println("set cursor arrow");
-                                        ZeeConfig.clickRemoveCursor();
-                                        waitCursorName(ZeeConfig.CURSOR_ARW);
+                            if (!tunnelHelperStoneArch) {
+                                List<Gob> dustList = ZeeConfig.findGobsByNameEndsWith("/cavedust");
+                                //dustList.removeIf(gob -> ZeeConfig.distanceToPlayer(gob) > TILE_SIZE*2);
+                                dustList.removeIf(dust -> !ZeeConfig.lastSavedOverlay.a.contains(dust.rc.floor(MCache.tilesz)));
+                                if (!dustList.isEmpty()) {
+                                    for (Gob dust : dustList) {
+                                        if (!ZeeConfig.getCursorName().equals(ZeeConfig.CURSOR_ARW)) {
+                                            println("set cursor arrow");
+                                            ZeeConfig.clickRemoveCursor();
+                                            waitCursorName(ZeeConfig.CURSOR_ARW);
+                                        }
+                                        ZeeManagerGobs.gobClick(dust, 3);
+                                        prepareCancelClick();
+                                        //println("wait dust item");
+                                        waitInvItemOrCancelClick();
                                     }
-                                    ZeeManagerGobs.gobClick(dust, 3);
-                                    prepareCancelClick();
-                                    //println("wait dust item");
-                                    waitInvItemOrCancelClick();
+                                    //return to end coord and drop dust
+                                    ZeeConfig.clickCoord(tunnelHelperEndCoord, 1);
+                                    waitPlayerIdlePoseOrVehicleIdle();
+                                    ZeeConfig.getMainInventory().dropItemsByNameEndsWith("/cavedust");
                                 }
-                                //return to end coord and drop dust
-                                ZeeConfig.clickCoord(tunnelHelperEndCoord,1);
-                                waitPlayerIdlePoseOrVehicleIdle();
-                                ZeeConfig.getMainInventory().dropItemsByNameEndsWith("/cavedust");
                             }
 
                             // pick stones
                             tunnelHelperSetStage(TUNNELHELPER_STAGE4_PICKSTONE);
-                            tunnelHelperButtonAct.disable(false);
                             ZeeConfig.clickRemoveCursor();
                             waitCursorName(ZeeConfig.CURSOR_ARW);
-                            if (!tunnelHelperPickStonesManualClick) {
-                                tunnelHelperButtonAct.click();
-                                tunnelHelperButtonAct.disable(true);
-                            }
+                            tunnerHelperGetStone();
+
                         } else {
+
                             // finished mining tunnel
                             if (tunnelHelperStage == TUNNELHELPER_STAGE1_MINETUNNEL) {
                                 tunnelHelperSetStage(TUNNELHELPER_STAGE2_WAITNEWCOLTILE);
@@ -151,13 +151,9 @@ public class ZeeManagerMiner extends ZeeThread{
                                 //pick stone
                                 tunnelHelperSetStage(TUNNELHELPER_STAGE4_PICKSTONE);
                                 //ZeeConfig.removePlayerText();
-                                tunnelHelperButtonAct.disable(false);
                                 ZeeConfig.clickRemoveCursor();
                                 waitCursorName(ZeeConfig.CURSOR_ARW);
-                                if (!tunnelHelperPickStonesManualClick) {
-                                    tunnelHelperButtonAct.click();
-                                    tunnelHelperButtonAct.disable(true);
-                                }
+                                tunnerHelperGetStone();
                             }
                         }
 
@@ -234,9 +230,8 @@ public class ZeeManagerMiner extends ZeeThread{
     static boolean tunneling = false;
     static Coord tunnelHelperEndCoord, tunnelHelperEndCoordPrev;
     static Label tunnelHelperLabelStatus;
-    static Button tunnelHelperButtonAct;
     static int tunnelHelperStage = 0;
-    static boolean tunnelHelperPickStonesManualClick = false;
+    static boolean tunnelHelperStoneArch = false;
     static final int TUNNELHELPER_STAGE_FAIL = -1;
     static final int TUNNELHELPER_STAGE0_IDLE = 0;
     static final int TUNNELHELPER_STAGE1_MINETUNNEL = 1;
@@ -245,11 +240,6 @@ public class ZeeManagerMiner extends ZeeThread{
     static final int TUNNELHELPER_STAGE4_PICKSTONE = 4;
     static final int TUNNELHELPER_STAGE5_BUILDCOL = 5;
     private static void tunnelHelperShowWindow() {
-
-        // backup buildAndDrink
-//        restoreBuildAndDrink = true;
-//        isBuildAndDrinkBackup = ZeeConfig.isBuildAndDrink;
-//        ZeeConfig.isBuildAndDrink = false;
 
         if (tunnelHelperWindow == null) {
             Widget wdg;
@@ -266,67 +256,19 @@ public class ZeeManagerMiner extends ZeeThread{
             wdg = tunnelHelperWindow.add( tunnelHelperLabelStatus = new Label("idle"));
             tunnelHelperSetStage(TUNNELHELPER_STAGE0_IDLE);
 
-            wdg = tunnelHelperWindow.add( tunnelHelperButtonAct = new Button(UI.scale(85),"Pick stones"){
-                public void wdgmsg(String msg, Object... args) {
-                    if (msg.equals("activate")) {
-                        // action pick stones
-                        if (this.text.text.contentEquals("Pick stones")) {
-                            //disable button before picking stones
-                            this.disable(true);
-                            new ZeeThread(){
-                                public void run() {
-                                    try {
-                                        mining = true;
-                                        // pick stones
-                                        if (pickStones(30)){
-                                            //move to player mining end coord
-                                            if (tunnelHelperEndCoordPrev!=null)
-                                                ZeeConfig.clickCoord(tunnelHelperEndCoordPrev,1);
-                                            else
-                                                ZeeConfig.clickCoord(tunnelHelperEndCoord,1);
-                                            waitPlayerIdlePoseOrVehicleIdle();
-                                            // check window closed
-                                            if (!tunneling){
-                                                tunnelHelperExit();
-                                                return;
-                                            }
-                                            tunnelHelperSetStage(TUNNELHELPER_STAGE5_BUILDCOL);
-                                            // select menu item for stone column
-                                            ZeeConfig.gameUI.menu.wdgmsg("act","bp","column","0");
-                                            //ZeeConfig.addPlayerText("wait place col");
-                                        }
-                                        //failed pick stones
-                                        else{
-                                            int invStones = pickStonesInvCount();
-                                            ZeeConfig.msgError("missing "+(30-invStones)+" stones");
-                                            ZeeConfig.println("missing "+(30-invStones)+" stones");
-                                            tunnelHelperExit();
-                                        }
-                                    } catch (Exception e) {
-                                        e.printStackTrace();
-                                    }
-                                    mining = false;
-                                }
-                            }.start();
-                        }
-                    }
-                }
-            },0,wdg.c.y+wdg.sz.y+3);
-
-            //checkbox auto click button pick stones
-            tunnelHelperWindow.add(new CheckBox("manual click"){
+            //checkbox stone arch
+            wdg = tunnelHelperWindow.add(new CheckBox("stone arch"){
                 public void changed(boolean val) {
-                    tunnelHelperPickStonesManualClick = val;
-                    tunnelHelperButtonAct.disable(!val);
+                    tunnelHelperStoneArch = val;
                 }
-            },wdg.c.x+wdg.sz.x+3 , wdg.c.y+3);
+            },5 , wdg.c.y+wdg.sz.y+5);
 
             //checkbox ore column
             wdg = tunnelHelperWindow.add(new CheckBox("ore col: lead, cass, chalco, cinna, mala"){
                 public void changed(boolean val) {
                     useOreForColumns = val;
                 }
-            },0,wdg.c.y+wdg.sz.y+3);
+            },5,wdg.c.y+wdg.sz.y+3);
 
             //add window
             ZeeConfig.gameUI.add(tunnelHelperWindow, new Coord(100,100));
@@ -346,9 +288,13 @@ public class ZeeManagerMiner extends ZeeThread{
             case TUNNELHELPER_STAGE1_MINETUNNEL:
                 name = "mine tunnel"; break;
             case TUNNELHELPER_STAGE2_WAITNEWCOLTILE:
-                name = "wait new col tile"; break;
+                if (tunnelHelperStoneArch)
+                    name = "select arch tiles (3x3?)";
+                else
+                    name = "select col tile";
+                break;
             case TUNNELHELPER_STAGE3_MINECOL:
-                name = "mine tile"; break;
+                name = "mine tile";break;
             case TUNNELHELPER_STAGE4_PICKSTONE:
                 name = "pick stone"; break;
             case TUNNELHELPER_STAGE5_BUILDCOL:
@@ -359,6 +305,44 @@ public class ZeeManagerMiner extends ZeeThread{
         tunnelHelperLabelStatus.settext("stage "+stage+" - "+name);
         if (stage > TUNNELHELPER_STAGE0_IDLE)
             ZeeConfig.addPlayerText("("+stage+"/5) "+name);
+    }
+
+    public static void tunnerHelperGetStone() {
+        try {
+            mining = true;
+            // pick stones
+            if ((tunnelHelperStoneArch && pickStones(50)) || pickStones(30)) {
+                //move to player mining end coord
+                if (tunnelHelperEndCoordPrev != null)
+                    ZeeConfig.clickCoord(tunnelHelperEndCoordPrev, 1);
+                else
+                    ZeeConfig.clickCoord(tunnelHelperEndCoord, 1);
+                waitPlayerIdlePoseOrVehicleIdle();
+                // check window closed
+                if (!tunneling) {
+                    tunnelHelperExit();
+                    return;
+                }
+                tunnelHelperSetStage(TUNNELHELPER_STAGE5_BUILDCOL);
+                // select menu item for stone column
+                if (tunnelHelperStoneArch)
+                    ZeeConfig.gameUI.menu.wdgmsg("act", "bp", "stonearchtunnel", "0");
+                else
+                    ZeeConfig.gameUI.menu.wdgmsg("act", "bp", "column", "0");
+                //ZeeConfig.addPlayerText("wait place col");
+            }
+            //failed pick stones
+            else {
+                int invStones = pickStonesInvCount();
+                int missing = tunnelHelperStoneArch ? 50 - invStones : 30 - invStones;
+                ZeeConfig.msgError("missing " + missing + " stones");
+                ZeeConfig.println("missing " + missing + " stones");
+                tunnelHelperExit();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        mining = false;
     }
 
     public static int tunnelHelperExit() {
@@ -378,9 +362,9 @@ public class ZeeManagerMiner extends ZeeThread{
 
     public static boolean isTunnel(Coord sz) {
         int minSize = 9;
-        if ( (sz.x==1 || sz.x==2) && sz.y>=minSize)
+        if ( (sz.x >= 1  &&  sz.x <= 3)  &&  sz.y >= minSize)
             return true;
-        if ((sz.y==1 || sz.y==2) && sz.x>=minSize)
+        if ((sz.y >= 1  &&  sz.y <= 3)  &&  sz.x >= minSize)
             return true;
         return false;
     }

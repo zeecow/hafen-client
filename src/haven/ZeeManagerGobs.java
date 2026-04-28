@@ -3776,7 +3776,7 @@ public class ZeeManagerGobs extends ZeeThread{
 
 
     public static boolean isGobMineSupport(String gobName) {
-        String list = "/minebeam,/column,/minesupport,/naturalminesupport,/towercap,/ladder,/monumentalcolumn,/timbertunnel";
+        String list = "/minebeam,/column,/minesupport,/naturalminesupport,/towercap,/ladder,/monumentalcolumn,/timbertunnel,/stonearchtunnel";
         return ZeeConfig.nameInListEndsWith(gobName, list);
     }
 

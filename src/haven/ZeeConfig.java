@@ -1056,7 +1056,9 @@ public class ZeeConfig {
         // build window
         if (isBuildWindow(window)) {
             // tunnel helper
-            if (ZeeManagerMiner.tunneling && ZeeManagerMiner.tunnelHelperStage == ZeeManagerMiner.TUNNELHELPER_STAGE5_BUILDCOL && windowTitle.contentEquals("Stone Column")) {
+            if (ZeeManagerMiner.tunneling && ZeeManagerMiner.tunnelHelperStage == ZeeManagerMiner.TUNNELHELPER_STAGE5_BUILDCOL
+                    && (windowTitle.contentEquals("Stone Column") || windowTitle.contains("Stone Arch")) )
+            {
                 ZeeManagerMiner.tunnelHelperBuildColumn(window);
             }
 
@@ -2177,7 +2179,7 @@ public class ZeeConfig {
         // no radius, cover = add radius
         else if(!showMineSupport){
             showMineSupport = true;
-            List<Gob> sups = findGobsByNameEndsWith("/minebeam", "/column", "/minesupport", "/naturalminesupport", "/towercap", "/ladder","/monumentalcolumn");
+            List<Gob> sups = findGobsByNameEndsWith("/minebeam", "/column", "/minesupport", "/naturalminesupport", "/towercap", "/ladder","/monumentalcolumn","/stonearchtunnel");
             if (!sups.isEmpty()) {
                 for (Gob sup : sups) {
                     toggleMineSupport(sup);
@@ -2192,7 +2194,7 @@ public class ZeeConfig {
         // radius, no cover = rem radius
         else{
             showMineSupport = false;
-            List<Gob> sups = findGobsByNameEndsWith("/minebeam", "/column", "/minesupport", "/naturalminesupport", "/towercap", "/ladder","/monumentalcolumn");
+            List<Gob> sups = findGobsByNameEndsWith("/minebeam", "/column", "/minesupport", "/naturalminesupport", "/towercap", "/ladder","/monumentalcolumn","/stonearchtunnel");
             if (!sups.isEmpty()) {
                 for (Gob sup : sups) {
                     toggleMineSupport(sup);
