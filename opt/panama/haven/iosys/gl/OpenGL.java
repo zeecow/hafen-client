@@ -36,7 +36,7 @@ import static haven.ffi.FUtils.*;
 import static java.lang.foreign.ValueLayout.ADDRESS;
 
 public abstract class OpenGL implements haven.render.gl.GL {
-    static class libGL_so_1 extends OpenGL {
+    public static abstract class Base extends OpenGL {
 	private static final ValueLayout.OfInt    GLenum     = ValueLayout.JAVA_INT;
 	private static final ValueLayout.OfByte   GLboolean  = ValueLayout.JAVA_BYTE;
 	private static final ValueLayout.OfInt    GLbitfield = ValueLayout.JAVA_INT;
@@ -57,7 +57,6 @@ public abstract class OpenGL implements haven.render.gl.GL {
 	private static final MemoryLayout GLsync = PTRINT_T;
 	private static final MemoryLayout GLsizeiptr = SIZE_T;
 	private static final MemoryLayout GLintptr = SIZE_T;
-	private final GLX glx = GLX.get();
 
 	private static byte b(boolean v) {
 	    return((byte)(v ? 1 : 0));
@@ -112,12 +111,7 @@ public abstract class OpenGL implements haven.render.gl.GL {
 	    return((buf == null) ? MemorySegment.NULL : MemorySegment.ofBuffer(buf));
 	}
 
-	private MethodHandle lookup(String name, FunctionDescriptor sig) {
-	    MemorySegment addr = glx.glXGetProcAddress(name);
-	    if(nullp(addr))
-		return(null);
-	    return(ld.downcallHandle(addr, sig));
-	}
+	protected abstract MethodHandle lookup(String name, FunctionDescriptor sig);
 
 	private final MethodHandle glActiveTexture = lookup("glActiveTexture", FunctionDescriptor.ofVoid(GLenum));
 	public void glActiveTexture(int texture) {
@@ -1022,6 +1016,15 @@ public abstract class OpenGL implements haven.render.gl.GL {
 	    try {
 		glViewport.invoke(x, y, w, h);
 	    } catch(Throwable e) {throw(new RuntimeException(e));}
+	}
+    }
+
+    static class libGL_so_1 extends Base {
+	protected MethodHandle lookup(String name, FunctionDescriptor sig) {
+	    MemorySegment addr = GLX.get().glXGetProcAddress(name);
+	    if(nullp(addr))
+		return(null);
+	    return(ld.downcallHandle(addr, sig));
 	}
     }
 
