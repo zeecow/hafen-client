@@ -2784,6 +2784,10 @@ public class ZeeManagerGobs extends ZeeThread{
                                         String quantity = String.format("%.0f",Math.rint(Double.parseDouble(matcher.group(1))));
                                         String metric = matcher.group(2);
                                         String substance = matcher.group(3).replaceAll("\\s+","");
+                                        if (metric.contentEquals("seeds"))
+                                            metric = "";
+                                        if (Integer.parseInt(quantity) >= 1000)// 8500 = 8k
+                                            quantity =  Integer.parseInt(quantity)/1000 + "k";
 
                                         String gobText = quantity + metric + " " + substance;
 
