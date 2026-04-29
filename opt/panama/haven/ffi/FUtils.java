@@ -28,6 +28,7 @@ package haven.ffi;
 
 import haven.*;
 import java.nio.*;
+import java.lang.invoke.*;
 import java.lang.foreign.*;
 import java.util.*;
 import java.util.function.*;
@@ -68,6 +69,22 @@ public class FUtils {
 	    }
 	}
 	return(ret);
+    }
+
+    public static MethodHandle slookup(MethodHandles.Lookup lookup, Class<?> cl, String name, Class<?> rtype, Class<?>... atypes) {
+	try {
+	    return(lookup.findStatic(cl, name, MethodType.methodType(rtype, atypes)));
+	} catch(NoSuchMethodException | IllegalAccessException e) {
+	    throw(new RuntimeException(e));
+	}
+    }
+
+    public static MethodHandle vlookup(MethodHandles.Lookup lookup, Class<?> cl, String name, Class<?> rtype, Class<?>... atypes) {
+	try {
+	    return(lookup.findVirtual(cl, name, MethodType.methodType(rtype, atypes)));
+	} catch(NoSuchMethodException | IllegalAccessException e) {
+	    throw(new RuntimeException(e));
+	}
     }
 
     public static String fmtstruct(String name, MemorySegment mem, StructLayout desc) {
