@@ -1523,12 +1523,7 @@ public abstract class XLib {
 	private MemorySegment handlerp;
 	public void XSetErrorHandler() {
 	    {
-		MethodHandle handler;
-		try {
-		    handler = MethodHandles.lookup().findStatic(XLib.class, "handleerror", MethodType.methodType(Integer.TYPE, XLib.class, MemorySegment.class, MemorySegment.class));
-		} catch(NoSuchMethodException | IllegalAccessException e) {
-		    throw(new RuntimeException(e));
-		}
+		MethodHandle handler = slookup(MethodHandles.lookup(), XLib.class, "handleerror", Integer.TYPE, XLib.class, MemorySegment.class, MemorySegment.class);
 		handler = MethodHandles.insertArguments(handler, 0, this);
 		handlerp = ld.upcallStub(handler, FunctionDescriptor.of(C_INT, ADDRESS, ADDRESS), Arena.ofAuto());
 		XSetErrorHandler(handlerp);
