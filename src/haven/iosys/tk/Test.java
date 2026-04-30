@@ -42,5 +42,6 @@ public class Test {
 	env.submit(cmd);
 	Thread.sleep(5000);
 	wnd.dispose();
+	tk.dispose();
     }
 }
