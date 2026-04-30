@@ -142,6 +142,7 @@ public abstract class Win32 {
     public abstract int GetCurrentThreadId();
     public abstract Handle GetModuleHandle(String lpModuleName);
     public abstract int RegisterClassEx(WndClassEx cls);
+    public abstract void UnregisterClass(String lpClassName, Handle hInstance);
     public abstract Handle CreateWindowEx(int dwExStyle, String lpClassName, String lpWindowName, int dwStyle, Coord pos, Coord size, Handle hWndParent, Handle hMenu, Handle hInstance);
     public abstract int DestroyWindow(Handle hWnd);
     public abstract boolean GetMessage(MSG lpMsg, Handle hWnd, int wMsgFilterMin, int wMsgFilterMax);
@@ -312,6 +313,20 @@ public abstract class Win32 {
 		if(rv == 0)
 		    throw(lasterror());
 		return(rv);
+	    }
+	}
+
+	private final MethodHandle UnregisterClassW = ld.downcallHandle(user32.find("UnregisterClassW").get(), FunctionDescriptor.of(BOOL, LPCWSTR, HINSTANCE));
+	public void UnregisterClass(String lpClassName, Handle hInstance) {
+	    try(Arena st = Arena.ofConfined()) {
+		int rv;
+		try {
+		    rv = (int)UnregisterClassW.invoke(wstr(st, lpClassName), hInstance.bits);
+		} catch(Throwable e) {
+		    throw(new RuntimeException(e));
+		}
+		if(rv == 0)
+		    throw(lasterror());
 	    }
 	}
 
