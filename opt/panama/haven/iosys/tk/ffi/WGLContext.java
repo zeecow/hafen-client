@@ -72,7 +72,8 @@ public class WGLContext implements Toolkit.Factory {
     }
 
     public class WGLToolkit implements Toolkit {
-	private static final String WCLASSNAME = "haven-window";
+	private static int serial = 0;
+	private final String wclassname = "haven-window-" + serial;
 	private final Handle hInstance;
 	private final WndClassEx wndclass;
 	private WGL.Ext text;
@@ -85,7 +86,7 @@ public class WGLContext implements Toolkit.Factory {
 	private WGLToolkit() {
 	    hInstance = win.GetModuleHandle(null);
 	    wndclass = win.WndClassEx();
-	    wndclass.hInstance(hInstance).lpszClassName(WCLASSNAME).lpfnWndProc(this::wndproc).style(Win32.CS_OWNDC);
+	    wndclass.hInstance(hInstance).lpszClassName(wclassname).lpfnWndProc(this::wndproc).style(Win32.CS_OWNDC);
 	    win.RegisterClassEx(wndclass);
 	    createctx();
 	}
@@ -93,7 +94,7 @@ public class WGLContext implements Toolkit.Factory {
 	private void createctx() {
 	    Handle hwnd = null, hdc = null, temp = null;
 	    try {
-		hwnd = win.CreateWindowEx(0, WCLASSNAME, null, 0, null, null, null, null, hInstance);
+		hwnd = win.CreateWindowEx(0, wclassname, null, 0, null, null, null, null, hInstance);
 		hdc = win.GetDC(hwnd);
 		pfd = win.PIXELFORMATDESCRIPTOR();
 		pfd.nVersion(1);
@@ -302,7 +303,7 @@ public class WGLContext implements Toolkit.Factory {
 	    private WGLEnvironment renv;
 
 	    private WGLWindow() {
-		hwnd = msgrun(() -> win.CreateWindowEx(0, WCLASSNAME, null, Win32.WS_OVERLAPPEDWINDOW,
+		hwnd = msgrun(() -> win.CreateWindowEx(0, wclassname, null, Win32.WS_OVERLAPPEDWINDOW,
 						       null, null, null, null, hInstance));
 		register(this);
 		msgrun(() -> {
@@ -416,6 +417,8 @@ public class WGLContext implements Toolkit.Factory {
 	}
 
 	public void dispose() {
+	    wgl.wglDeleteContext(ctx);
+	    win.UnregisterClass(wclassname, hInstance);
 	}
     }
 }
