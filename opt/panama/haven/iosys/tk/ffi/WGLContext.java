@@ -136,6 +136,14 @@ public class WGLContext implements Toolkit.Factory {
 	    }
 	}
 
+	public Cursor.Caps cursorcaps() {
+	    return(null);
+	}
+
+	public Cursor makecursor(BufferedImage image, Coord hotspot) {
+	    return(null);
+	}
+
 	private long wndproc(Handle hwnd, int umsg, long wparam, long lparam) {
 	    WGLWindow wnd;
 	    synchronized(mtmon) {
@@ -148,19 +156,11 @@ public class WGLContext implements Toolkit.Factory {
 	    return(wnd.message(hwnd, umsg, wparam, lparam));
 	}
 
-	public Cursor.Caps cursorcaps() {
-	    return(null);
-	}
-
-	public Cursor makecursor(BufferedImage image, Coord hotspot) {
-	    return(null);
-	}
-
 	private final Object mtmon = new Object();
 	private Thread msgthread = null;
 	private volatile int msgthreadid = 0;
 	private final Map<Handle, WGLWindow> windows = new HashMap<>();
-	private final Collection<Runnable> mtasks = new ArrayList<>();
+	private final Queue<Runnable> mtasks = new LinkedList<>();
 	private void handlemsgs() {
 	    try {
 		MSG msg = win.MSG();
@@ -170,19 +170,22 @@ public class WGLContext implements Toolkit.Factory {
 		    mtmon.notifyAll();
 		}
 		while(true) {
-		    Collection<Runnable> tasks;
+		    Runnable task;
 		    synchronized(mtmon) {
-			tasks = new ArrayList<>(mtasks);
-			mtasks.clear();
-			if(tasks.isEmpty() && windows.isEmpty()) {
+			task = mtasks.poll();
+			if((task == null) && windows.isEmpty()) {
 			    msgthread = null;
 			    return;
 			}
 		    }
-		    for(Runnable task : tasks)
+		    if(task != null)
 			task.run();
-		    if(win.GetMessage(msg, null, 0, 0))
+		    while(win.PeekMessage(msg, null, 0, 0, Win32.PM_REMOVE))
 			win.DispatchMessage(msg);
+		    if(task == null) {
+			if(win.GetMessage(msg, null, 0, 0))
+			    win.DispatchMessage(msg);
+		    }
 		}
 	    } finally {
 		synchronized(mtmon) {
