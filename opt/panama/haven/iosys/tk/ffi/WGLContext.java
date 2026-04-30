@@ -74,6 +74,7 @@ public class WGLContext implements Toolkit.Factory {
     public class WGLToolkit implements Toolkit {
 	private static final String WCLASSNAME = "haven-window";
 	private final Handle hInstance;
+	private final WndClassEx wndclass;
 	private WGL.Ext text;
 	private Handle ctx;
 	private OpenGL gl;
@@ -83,9 +84,9 @@ public class WGLContext implements Toolkit.Factory {
 
 	private WGLToolkit() {
 	    hInstance = win.GetModuleHandle(null);
-	    WndClassEx wc = win.WndClassEx();
-	    wc.hInstance(hInstance).lpszClassName(WCLASSNAME).lpfnWndProc(this::wndproc).style(Win32.CS_OWNDC);
-	    win.RegisterClassEx(wc);
+	    wndclass = win.WndClassEx();
+	    wndclass.hInstance(hInstance).lpszClassName(WCLASSNAME).lpfnWndProc(this::wndproc).style(Win32.CS_OWNDC);
+	    win.RegisterClassEx(wndclass);
 	    createctx();
 	}
 
@@ -340,7 +341,6 @@ public class WGLContext implements Toolkit.Factory {
 		case Win32.WM_SIZE:
 		    size = Coord.of((int)((lparam & 0x0000ffff) >> 0),
 				    (int)((lparam & 0xffff0000) >> 16));
-		    Debug.dump(size);
 		    return(0);
 		default:
 		    return(win.DefWindowProc(hwnd, umsg, wparam, lparam));

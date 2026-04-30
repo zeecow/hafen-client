@@ -278,18 +278,20 @@ public abstract class Win32 {
 	    private static final VarHandle cbSize = _WndClassExW.varHandle(PathElement.groupElement("cbSize"));
 	    private static final VarHandle style = _WndClassExW.varHandle(PathElement.groupElement("style"));
 	    public WndClassExW style(int value) {style.set(mem, 0, value); return(this);}
-	    private static final VarHandle lpfnWndProc = _WndClassExW.varHandle(PathElement.groupElement("lpfnWndProc"));
-	    public WndClassExW lpfnWndProc(WndProc value) {
-		MethodHandle handler = MethodHandles.insertArguments(handle, 0, value);
-		MemorySegment handlerp = ld.upcallStub(handler, FunctionDescriptor.of(LRESULT, ADDRESS, UINT, WPARAM, LPARAM), alloc);
-		lpfnWndProc.set(mem, 0, handlerp);
-		return(this);
-	    }
 	    private static final VarHandle hInstance = _WndClassExW.varHandle(PathElement.groupElement("hInstance"));
 	    public WndClassExW hInstance(Handle value) {hInstance.set(mem, 0, nhandle(value)); return(this);}
 	    private static final VarHandle lpszClassName = _WndClassExW.varHandle(PathElement.groupElement("lpszClassName"));
 	    public WndClassExW lpszClassName(String value) {
 		lpszClassName.set(mem, 0, wstr(alloc, value));
+		return(this);
+	    }
+
+	    private static final VarHandle lpfnWndProc = _WndClassExW.varHandle(PathElement.groupElement("lpfnWndProc"));
+	    private MemorySegment handlerp;
+	    public WndClassExW lpfnWndProc(WndProc value) {
+		MethodHandle handler = MethodHandles.insertArguments(handle, 0, value);
+		handlerp = ld.upcallStub(handler, FunctionDescriptor.of(LRESULT, ADDRESS, UINT, WPARAM, LPARAM), alloc);
+		lpfnWndProc.set(mem, 0, handlerp);
 		return(this);
 	    }
 	}
