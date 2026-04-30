@@ -202,7 +202,7 @@ public class MiniMap extends Widget {
 
 	private GobIcon.Icon create() {
 	    if(m instanceof PMarker) {
-		return(new Flag(this, ((PMarker)m).color, m.nm));
+		return(new ZeeManagerIcons.ZeeFlag(this, ((PMarker)m).color, m.nm));
 	    } else {
 		SMarker sm = (SMarker)m;
 		Resource res = sm.res.get();
