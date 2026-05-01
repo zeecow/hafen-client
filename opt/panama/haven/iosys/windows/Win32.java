@@ -69,8 +69,16 @@ public abstract class Win32 {
     public static final int SW_SHOWDEFAULT = 10;
     public static final int SW_FORCEMINIMIZE = 11;
 
-    public static final int WM_SIZE = 0x0005;
-    public static final int WM_USER = 0x0400;
+    public static final int WM_SIZE       = 0x0005;
+    public static final int WM_CLOSE      = 0x0010;
+    public static final int WM_KEYDOWN    = 0x0100;
+    public static final int WM_KEYUP      = 0x0101;
+    public static final int WM_SYSKEYDOWN = 0x0104;
+    public static final int WM_SYSKEYUP   = 0x0105;
+    public static final int WM_SYSCOMMAND = 0x0112;
+    public static final int WM_USER       = 0x0400;
+
+    public static final int SC_KEYMENU = 0xf100;
 
     public static final int PFD_DOUBLEBUFFER   = 0x00000001;
     public static final int PFD_DRAW_TO_WINDOW = 0x00000004;
@@ -118,6 +126,23 @@ public abstract class Win32 {
     }
     public abstract MSG MSG();
 
+    public static class KeyboardState {
+	final MemorySegment keys;
+
+	public KeyboardState() {
+	    keys = Arena.ofAuto().allocate(256);
+	}
+
+	public int get(int vk) {
+	    return(keys.get(ValueLayout.JAVA_BYTE, vk) & 0xff);
+	}
+
+	public KeyboardState set(int vk, int val) {
+	    keys.set(ValueLayout.JAVA_BYTE, vk, (byte)val);
+	    return(this);
+	}
+    }
+
     public static abstract class PIXELFORMATDESCRIPTOR extends StructInstance {
 	protected PIXELFORMATDESCRIPTOR(MemorySegment mem) {
 	    super(mem);
@@ -155,6 +180,11 @@ public abstract class Win32 {
     public abstract void SetWindowText(Handle hWnd, String lpString);
     public abstract Handle GetDC(Handle hWnd);
     public abstract boolean ReleaseDC(Handle hWnd, Handle hDC);
+    public abstract int GetKeyState(int nVirtKey);
+    public abstract void GetKeyboardState(KeyboardState buf);
+    public abstract Handle GetKeyboardLayout(int idThread);
+    public abstract char[] ToUnicodeEx(int wVirtKey, int wScanCode, KeyboardState lpKeyState, int wFlags, Handle dwhkl);
+    public abstract String GetKeyNameText(long lParam);
     public abstract int ChoosePixelFormat(Handle hDC, PIXELFORMATDESCRIPTOR ppfd);
     public abstract void SetPixelFormat(Handle hDC, int format, Win32.PIXELFORMATDESCRIPTOR ppfd);
     public abstract int DescribePixelFormat(Handle hDC, int iPixelFormat, Win32.PIXELFORMATDESCRIPTOR ppfd);
@@ -175,6 +205,7 @@ public abstract class Win32 {
 	static final MemoryLayout WCHAR = ValueLayout.JAVA_SHORT;
 	static final MemoryLayout BOOL = C_INT;
 	static final MemoryLayout BYTE = C_CHAR;
+	static final MemoryLayout SHORT = C_SHORT;
 	static final MemoryLayout UINT = C_INT;
 	static final MemoryLayout LONG = C_LONG;
 	static final MemoryLayout WORD = C_SHORT;
@@ -191,10 +222,12 @@ public abstract class Win32 {
 	static final MemoryLayout HDC = HANDLE;
 	static final MemoryLayout HICON = HANDLE;
 	static final MemoryLayout HINSTANCE = HANDLE;
+	static final MemoryLayout HKL = HANDLE;
 	static final MemoryLayout HMENU = HANDLE;
 	static final MemoryLayout HWND = HANDLE;
 	static final MemoryLayout ATOM = WORD;
 	static final MemoryLayout WNDPROC = HANDLE;
+	static final MemoryLayout LPWSTR = ADDRESS;
 	static final MemoryLayout LPCWSTR = ADDRESS;
 	static final MemoryLayout LRESULT = LONG_PTR;
 	static final MemoryLayout WPARAM = UINT_PTR;
@@ -495,6 +528,76 @@ public abstract class Win32 {
 		return((int)ReleaseDC.invoke(hWnd.bits, hDC.bits) != 0);
 	    } catch(Throwable e) {
 		throw(new RuntimeException(e));
+	    }
+	}
+
+	private final MethodHandle GetKeyState = ld.downcallHandle(user32.find("GetKeyState").get(), FunctionDescriptor.of(SHORT, C_INT));
+	public int GetKeyState(int nVirtKey) {
+	    try {
+		return((int)GetKeyState.invoke(nVirtKey));
+	    } catch(Throwable e) {
+		throw(new RuntimeException(e));
+	    }
+	}
+
+	private final MethodHandle GetKeyboardState = ld.downcallHandle(user32.find("GetKeyboardState").get(), FunctionDescriptor.of(BOOL, ADDRESS));
+	public void GetKeyboardState(KeyboardState buf) {
+	    int rv;
+	    try {
+		rv = (int)GetKeyboardState.invoke(buf.keys);
+	    } catch(Throwable e) {
+		throw(new RuntimeException(e));
+	    }
+	    if(rv == 0)
+		throw(lasterror());
+	}
+
+	private final MethodHandle GetKeyboardLayout = ld.downcallHandle(user32.find("GetKeyboardLayout").get(), FunctionDescriptor.of(HKL, DWORD));
+	public Handle GetKeyboardLayout(int idThread) {
+	    MemorySegment rv;
+	    try {
+		rv = (MemorySegment)GetKeyboardLayout.invoke(idThread);
+	    } catch(Throwable e) {
+		throw(new RuntimeException(e));
+	    }
+	    return(Handle.of(rv));
+	}
+
+	private final MethodHandle ToUnicodeEx = ld.downcallHandle(user32.find("ToUnicodeEx").get(), FunctionDescriptor.of(C_INT, UINT, UINT, ADDRESS, LPWSTR, C_INT, UINT, HKL));
+	public char[] ToUnicodeEx(int wVirtKey, int wScanCode, KeyboardState lpKeyState, int wFlags, Handle dwhkl) {
+	    try(Arena st = Arena.ofConfined()) {
+		MemorySegment buf = st.allocate(WCHAR.byteSize() * 128);
+		int rv;
+		try {
+		    rv = (int)ToUnicodeEx.invoke(wVirtKey, wScanCode, lpKeyState.keys, buf, 128, wFlags, dwhkl.bits);
+		} catch(Throwable e) {
+		    throw(new RuntimeException(e));
+		}
+		if(rv < 0)
+		    return(null);
+		char[] ret = new char[rv];
+		for(int i = 0; i < rv; i++)
+		    ret[i] = (char)getint(buf, WCHAR.byteSize() * i, WCHAR, false);
+		return(ret);
+	    }
+	}
+
+	private final MethodHandle GetKeyNameTextW = ld.downcallHandle(user32.find("GetKeyNameTextW").get(), FunctionDescriptor.of(C_INT, LONG, LPWSTR, C_INT));
+	public String GetKeyNameText(long lParam) {
+	    try(Arena st = Arena.ofConfined()) {
+		MemorySegment buf = st.allocate(WCHAR.byteSize() * 128);
+		int rv;
+		try {
+		    rv = (int)GetKeyNameTextW.invoke((int)lParam, buf, 128);
+		} catch(Throwable e) {
+		    throw(new RuntimeException(e));
+		}
+		if(rv <= 0)
+		    return(null);
+		char[] ret = new char[rv];
+		for(int i = 0; i < rv; i++)
+		    ret[i] = (char)getint(buf, WCHAR.byteSize() * i, WCHAR, false);
+		return(new String(ret));
 	    }
 	}
 

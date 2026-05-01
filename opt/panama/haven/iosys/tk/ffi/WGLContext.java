@@ -37,6 +37,7 @@ import haven.iosys.windows.*;
 import haven.iosys.gl.*;
 import java.awt.image.BufferedImage;
 import haven.iosys.windows.Win32.*;
+import static haven.iosys.tk.Key.Std.*;
 
 @Toolkit.Available(name = "wgl")
 public class WGLContext implements Toolkit.Factory {
@@ -76,6 +77,7 @@ public class WGLContext implements Toolkit.Factory {
 	private final String wclassname = "haven-window-" + serial;
 	private final Handle hInstance;
 	private final WndClassEx wndclass;
+	private final KeyboardState kb = new KeyboardState();
 	private WGL.Ext text;
 	private Handle ctx;
 	private OpenGL gl;
@@ -341,11 +343,31 @@ public class WGLContext implements Toolkit.Factory {
 	    }
 
 	    private long message(Handle hwnd, int umsg, long wparam, long lparam) {
+		// System.err.printf("%x %x %x\n", umsg, wparam, lparam);
 		switch(umsg) {
+		case Win32.WM_CLOSE:
+		    callback(new CloseRequest() {});
+		    return(0);
+		case Win32.WM_KEYDOWN:
+		    callback(new W32KeyDownEvent(wparam, lparam));
+		    return(0);
+		case Win32.WM_SYSKEYDOWN:
+		    callback(new W32KeyDownEvent(wparam, lparam));
+		    return(win.DefWindowProc(hwnd, umsg, wparam, lparam));
+		case Win32.WM_KEYUP:
+		    callback(new W32KeyUpEvent(wparam, lparam));
+		    return(0);
+		case Win32.WM_SYSKEYUP:
+		    callback(new W32KeyUpEvent(wparam, lparam));
+		    return(win.DefWindowProc(hwnd, umsg, wparam, lparam));
 		case Win32.WM_SIZE:
 		    size = Coord.of((int)((lparam & 0x0000ffff) >> 0),
 				    (int)((lparam & 0xffff0000) >> 16));
 		    return(0);
+		case Win32.WM_SYSCOMMAND:
+		    if((wparam & 0xfff0) == Win32.SC_KEYMENU)
+			return(0);
+		    return(win.DefWindowProc(hwnd, umsg, wparam, lparam));
 		default:
 		    return(win.DefWindowProc(hwnd, umsg, wparam, lparam));
 		}
@@ -423,5 +445,148 @@ public class WGLContext implements Toolkit.Factory {
 	    wgl.wglDeleteContext(ctx);
 	    win.UnregisterClass(wclassname, hInstance);
 	}
+
+	public Set<Key.Mod> xlmods(KeyboardState kb) {
+	    Set<Key.Mod> ret = EnumSet.noneOf(Key.Mod.class);
+	    if((kb.get(0x10) & 0xf0) != 0)
+		ret.add(Key.Mod.SHIFT);
+	    if((kb.get(0x11) & 0xf0) != 0)
+		ret.add(Key.Mod.CONTROL);
+	    if((kb.get(0x12) & 0xf0) != 0)
+		ret.add(Key.Mod.ALT);
+	    if((kb.get(0xa5) & 0xf0) != 0)
+		ret.add(Key.Mod.ALTGR);
+	    if(((kb.get(0x5b) & 0xf0) != 0) || ((kb.get(0x5c) & 0xf0) != 0))
+		ret.add(Key.Mod.SUPER);
+	    return(ret);
+	}
+
+	public class W32KeyEvent {
+	    public int code, repeat, scancode;
+	    public boolean ext, ctx, pstate, tstate;
+	    public Key key;
+	    public Set<Key.Mod> mods;
+
+	    public W32KeyEvent(long wparam, long lparam) {
+		code     = (int)wparam;
+		repeat   = (int)((lparam & 0x0000ffff) >> 0);
+		scancode = (int)((lparam & 0x00ff0000) >> 16);
+		ext      =       (lparam & 0x01000000) != 0;
+		ctx      =       (lparam & 0x20000000) != 0;
+		pstate   =       (lparam & 0x40000000) != 0;
+		tstate   =       (lparam & 0x80000000) != 0;
+
+		win.GetKeyboardState(kb);
+		if((key = stdkeys.get(code)) == null) {
+		    synchronized(ukeys) {
+			W32Key ukey = new W32Key(win, code, scancode, ext);
+			if((key = ukeys.get(ukey)) == null) {
+			    ukeys.put(ukey, ukey);
+			    key = ukey;
+			}
+		    }
+		}
+		mods = xlmods(kb);
+	    }
+
+	    public String string() {return(null);}
+	    public Key key() {return(key);}
+	    public Set<Key.Mod> mods() {return(mods);}
+	}
+	public class W32KeyDownEvent extends W32KeyEvent implements KeyDownEvent {
+	    public String string;
+
+	    public W32KeyDownEvent(long wparam, long lparam) {
+		super(wparam, lparam);
+		int pst = kb.get(code);
+		kb.set(code, pst | 0x80);
+		char[] chars = win.ToUnicodeEx(code, scancode, kb, 0, win.GetKeyboardLayout(0));
+		kb.set(code, pst);
+		string = ((chars == null) || (chars.length == 0)) ? null : new String(chars);
+	    }
+
+	    public String string() {return(string);}
+	}
+	public class W32KeyUpEvent extends W32KeyEvent implements KeyUpEvent {
+	    public W32KeyUpEvent(long wparam, long lparam) {super(wparam, lparam);}
+	}
     }
+
+    private static final Map<W32Key, W32Key> ukeys = new HashMap<>();
+    public static class W32Key implements Key {
+	public final int vk, sc;
+	public final boolean ext;
+	public final String nm, id;
+
+	public W32Key(Win32 win, int vk, int sc, boolean ext) {
+	    this.vk = vk;
+	    this.sc = sc;
+	    this.ext = ext;
+	    this.nm = win.GetKeyNameText((sc << 16) | (ext ? (1 << 24) : 0));
+	    this.id = String.format("w32:%s", nm).intern();
+	}
+
+	public String id() {return(id);}
+	public String nm() {return(nm);}
+
+	public int hashCode() {return(Objects.hash(vk, sc));}
+	public boolean equals(W32Key that) {return((this.vk == that.vk) && (this.sc == that.sc) && (this.ext == that.ext));}
+	public boolean equals(Object x) {return((x instanceof W32Key) && equals((W32Key)x));}
+
+	public String toString() {
+	    return(String.format("#<win32-key %s%d %d (%s)>", ext ? "ext:" : "", sc, vk, nm));
+	}
+    }
+
+    public static final Map<Integer, Key> stdkeys = Utils.<Integer, Key>map()
+	.put(0x0d, ENTER)         .put(0x08, BACKSPACE)     .put(0x09, TAB)
+	.put(0x03, CANCEL)        .put(0x0c, CLEAR)         .put(0x10, SHIFT)
+	.put(0x11, CONTROL)       .put(0x12, ALT)           .put(0x13, PAUSE)
+	.put(0x14, CAPSLOCK)      .put(0x1b, ESCAPE)        .put(0x20, SPACE)
+	.put(0x21, PAGEUP)        .put(0x22, PAGEDOWN)      .put(0x23, END)
+	.put(0x24, HOME)          .put(0x25, LEFT)          .put(0x26, UP)
+	.put(0x27, RIGHT)         .put(0x28, DOWN)          .put(0xbc, COMMA)
+	.put(0xbd, MINUS)         .put(0xbe, PERIOD)        .put(0xbf, SLASH)
+	.put(0xba, SEMICOLON)     .put(0xbb, EQUALS)        .put(0xdb, LEFTBRACKET)
+	.put(0xdd, RIGHTBRACKET)  .put(0xdc, BACKSLASH)     .put(0x2e, DELETE)
+	.put(0x90, NUMLOCK)       .put(0x91, SCROLLLOCK)    .put(0x2c, PRINTSCREEN)
+	.put(0x2d, INSERT)        .put(0x2f, HELP)          .put(0xc0, BACKQUOTE)
+	.put(0xde, QUOTE)
+
+	.put(0x5b, WINDOWS)       .put(0x5c, WINDOWS)       .put(0x5d, MENU)
+	.put(0x18, FINAL)         .put(0x1c, CONVERT)       .put(0x1d, NONCONVERT)
+	.put(0x1e, ACCEPT)        .put(0x1f, MODECHANGE)    .put(0x15, KANA)
+	.put(0x19, KANJI)
+
+	.put(0x30, N0)            .put(0x31, N1)            .put(0x32, N2)
+	.put(0x33, N3)            .put(0x34, N4)            .put(0x35, N5)
+	.put(0x36, N6)            .put(0x37, N7)            .put(0x38, N8)
+	.put(0x39, N9)
+
+	.put(0x41, A)             .put(0x42, B)             .put(0x43, C)
+	.put(0x44, D)             .put(0x45, E)             .put(0x46, F)
+	.put(0x47, G)             .put(0x48, H)             .put(0x49, I)
+	.put(0x4a, J)             .put(0x4b, K)             .put(0x4c, L)
+	.put(0x4d, M)             .put(0x4e, N)             .put(0x4f, O)
+	.put(0x50, P)             .put(0x51, Q)             .put(0x52, R)
+	.put(0x53, S)             .put(0x54, T)             .put(0x55, U)
+	.put(0x56, V)             .put(0x57, W)             .put(0x58, X)
+	.put(0x59, Y)             .put(0x5a, Z)
+
+	.put(0x70, F1)            .put(0x71, F2)            .put(0x72, F3)
+	.put(0x73, F4)            .put(0x74, F5)            .put(0x75, F6)
+	.put(0x76, F7)            .put(0x77, F8)            .put(0x78, F9)
+	.put(0x79, F10)           .put(0x7a, F11)           .put(0x7b, F12)
+	.put(0x7c, F13)           .put(0x7d, F14)           .put(0x7e, F15)
+	.put(0x7f, F16)           .put(0x80, F17)           .put(0x81, F18)
+	.put(0x82, F19)           .put(0x83, F20)           .put(0x84, F21)
+	.put(0x85, F22)           .put(0x86, F23)           .put(0x87, F24)
+
+	.put(0x60, NP0)           .put(0x61, NP1)           .put(0x62, NP2)
+	.put(0x63, NP3)           .put(0x64, NP4)           .put(0x65, NP5)
+	.put(0x66, NP6)           .put(0x67, NP7)           .put(0x68, NP8)
+	.put(0x69, NP9)           .put(0x6f, NP_DIV)        .put(0x6a, NP_MUL)
+	.put(0x6d, NP_SUB)        .put(0x6b, NP_ADD)        .put(0x6c, NP_SEP)
+	.put(0x6e, NP_DEC)
+	.map();
 }
