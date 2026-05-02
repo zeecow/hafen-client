@@ -982,7 +982,10 @@ public class ZeeManagerGobs extends ZeeThread{
                 else if (ZeeConfig.isPlayerOnCoracle()) {
                     disembarkEquipCoracle(coordMc);
                 }
-                else if(ZeeConfig.gobHasAnyPoseContains(ZeeConfig.getPlayerGob(),"/coracle","/dugout","borka/row","/snekkja","/knarr")) {
+                else if(ZeeConfig.gobHasAnyPoseContains(ZeeConfig.getPlayerGob(),
+                        ZeeConfig.POSE_PLAYER_CORACLE_IDLE,ZeeConfig.POSE_PLAYER_CORACLE_ACTIVE,
+                        "/dugout","borka/row","/snekkja","/knarr"))
+                {
                     disembarkBoatAtShore(coordMc);
                 }
                 //disembark kicksled
