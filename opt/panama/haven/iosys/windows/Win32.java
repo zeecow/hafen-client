@@ -69,16 +69,35 @@ public abstract class Win32 {
     public static final int SW_SHOWDEFAULT = 10;
     public static final int SW_FORCEMINIMIZE = 11;
 
-    public static final int WM_SIZE       = 0x0005;
-    public static final int WM_CLOSE      = 0x0010;
-    public static final int WM_KEYDOWN    = 0x0100;
-    public static final int WM_KEYUP      = 0x0101;
-    public static final int WM_SYSKEYDOWN = 0x0104;
-    public static final int WM_SYSKEYUP   = 0x0105;
-    public static final int WM_SYSCOMMAND = 0x0112;
-    public static final int WM_USER       = 0x0400;
+    public static final int WM_SIZE        = 0x0005;
+    public static final int WM_CLOSE       = 0x0010;
+    public static final int WM_KEYDOWN     = 0x0100;
+    public static final int WM_KEYUP       = 0x0101;
+    public static final int WM_SYSKEYDOWN  = 0x0104;
+    public static final int WM_SYSKEYUP    = 0x0105;
+    public static final int WM_SYSCOMMAND  = 0x0112;
+    public static final int WM_MOUSEMOVE   = 0x0200;
+    public static final int WM_LBUTTONDOWN = 0x0201;
+    public static final int WM_LBUTTONUP   = 0x0202;
+    public static final int WM_RBUTTONDOWN = 0x0204;
+    public static final int WM_RBUTTONUP   = 0x0205;
+    public static final int WM_MBUTTONDOWN = 0x0207;
+    public static final int WM_MBUTTONUP   = 0x0208;
+    public static final int WM_MOUSEWHEEL  = 0x020a;
+    public static final int WM_XBUTTONDOWN = 0x020b;
+    public static final int WM_XBUTTONUP   = 0x020c;
+    public static final int WM_HMOUSEWHEEL = 0x020e;
+    public static final int WM_USER        = 0x0400;
 
     public static final int SC_KEYMENU = 0xf100;
+
+    public static final int MK_LBUTTON  = 0x0001;
+    public static final int MK_RBUTTON  = 0x0002;
+    public static final int MK_SHIFT    = 0x0004;
+    public static final int MK_CONTROL  = 0x0008;
+    public static final int MK_MBUTTON  = 0x0010;
+    public static final int MK_XBUTTON1 = 0x0020;
+    public static final int MK_XBUTTON2 = 0x0040;
 
     public static final int PFD_DOUBLEBUFFER   = 0x00000001;
     public static final int PFD_DRAW_TO_WINDOW = 0x00000004;
@@ -178,6 +197,7 @@ public abstract class Win32 {
     public abstract long DefWindowProc(Handle hWnd, int Msg, long wParam, long lParam);
     public abstract boolean ShowWindow(Handle hWnd, int nCmdShow);
     public abstract void SetWindowText(Handle hWnd, String lpString);
+    public abstract Coord ScreenToClient(Handle hWnd, Coord point);
     public abstract Handle GetDC(Handle hWnd);
     public abstract boolean ReleaseDC(Handle hWnd, Handle hDC);
     public abstract int GetKeyState(int nVirtKey);
@@ -507,6 +527,25 @@ public abstract class Win32 {
 	    }
 	    if(rv == 0)
 		throw(lasterror());
+	}
+
+	private final MethodHandle ScreenToClient = ld.downcallHandle(user32.find("ScreenToClient").get(), FunctionDescriptor.of(BOOL, HWND, ADDRESS));
+	public Coord ScreenToClient(Handle hWnd, Coord point) {
+	    int rv;
+	    try(Arena st = Arena.ofConfined()) {
+		MemorySegment buf = st.allocate(LONG, 2);
+		setint(buf, LONG.byteSize() * 0, LONG, point.x);
+		setint(buf, LONG.byteSize() * 1, LONG, point.y);
+		try {
+		    rv = (int)ScreenToClient.invoke(hWnd.bits, buf);
+		} catch(Throwable e) {
+		    throw(new RuntimeException(e));
+		}
+		if(rv == 0)
+		    throw(lasterror());
+		return(Coord.of((int)getint(buf, LONG.byteSize() * 0, LONG, true),
+				(int)getint(buf, LONG.byteSize() * 1, LONG, true)));
+	    }
 	}
 
 	private final MethodHandle GetDC = ld.downcallHandle(user32.find("GetDC").get(), FunctionDescriptor.of(HDC, HWND));

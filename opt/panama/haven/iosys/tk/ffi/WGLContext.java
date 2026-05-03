@@ -306,6 +306,7 @@ public class WGLContext implements Toolkit.Factory {
 	    private final Collection<EventListener> callbacks = new java.util.concurrent.CopyOnWriteArrayList<>();
 	    private Coord size = Coord.z;
 	    private WGLEnvironment renv;
+	    private int wheelacc = 0;
 
 	    private WGLWindow() {
 		hwnd = msgrun(() -> win.CreateWindowEx(0, wclassname, null, Win32.WS_OVERLAPPEDWINDOW,
@@ -348,6 +349,11 @@ public class WGLContext implements Toolkit.Factory {
 		case Win32.WM_CLOSE:
 		    callback(new CloseRequest() {});
 		    return(0);
+		case Win32.WM_SIZE:
+		    size = Coord.of((int)((lparam & 0x0000ffff) >> 0),
+				    (int)((lparam & 0xffff0000) >> 16));
+		    return(0);
+
 		case Win32.WM_KEYDOWN:
 		    callback(new W32KeyDownEvent(wparam, lparam));
 		    return(0);
@@ -360,14 +366,42 @@ public class WGLContext implements Toolkit.Factory {
 		case Win32.WM_SYSKEYUP:
 		    callback(new W32KeyUpEvent(wparam, lparam));
 		    return(win.DefWindowProc(hwnd, umsg, wparam, lparam));
-		case Win32.WM_SIZE:
-		    size = Coord.of((int)((lparam & 0x0000ffff) >> 0),
-				    (int)((lparam & 0xffff0000) >> 16));
-		    return(0);
 		case Win32.WM_SYSCOMMAND:
 		    if((wparam & 0xfff0) == Win32.SC_KEYMENU)
 			return(0);
 		    return(win.DefWindowProc(hwnd, umsg, wparam, lparam));
+
+		case Win32.WM_MOUSEMOVE:
+		    callback(new W32MouseMoveEvent(wparam, lparam));
+		    return(0);
+		case Win32.WM_LBUTTONDOWN:
+		    callback(new W32MouseDownEvent(1, wparam, lparam));
+		    return(0);
+		case Win32.WM_LBUTTONUP:
+		    callback(new W32MouseUpEvent(1, wparam, lparam));
+		    return(0);
+		case Win32.WM_MBUTTONDOWN:
+		    callback(new W32MouseDownEvent(2, wparam, lparam));
+		    return(0);
+		case Win32.WM_MBUTTONUP:
+		    callback(new W32MouseUpEvent(2, wparam, lparam));
+		    return(0);
+		case Win32.WM_RBUTTONDOWN:
+		    callback(new W32MouseDownEvent(3, wparam, lparam));
+		    return(0);
+		case Win32.WM_RBUTTONUP:
+		    callback(new W32MouseUpEvent(3, wparam, lparam));
+		    return(0);
+		case Win32.WM_MOUSEWHEEL: {
+		    int raw = (short)((wparam & 0xffff0000) >> 16);
+		    wheelacc += raw;
+		    int amount = wheelacc / 120;
+		    if(amount != 0) {
+			wheelacc -= amount * 120;
+			callback(new W32MouseWheelEvent(amount, wparam, lparam));
+		    }
+		    return(0);
+		}
 		default:
 		    return(win.DefWindowProc(hwnd, umsg, wparam, lparam));
 		}
@@ -435,6 +469,110 @@ public class WGLContext implements Toolkit.Factory {
 		unregister(this);
 		msgrun(() -> win.DestroyWindow(hwnd));
 	    }
+
+	    public class W32KeyEvent {
+		public int code, repeat, scancode;
+		public boolean ext, ctx, pstate, tstate;
+		public Key key;
+		public Set<Key.Mod> mods;
+
+		public W32KeyEvent(long wparam, long lparam) {
+		    code     = (int)wparam;
+		    repeat   = (int)((lparam & 0x0000ffff) >> 0);
+		    scancode = (int)((lparam & 0x00ff0000) >> 16);
+		    ext      =       (lparam & 0x01000000) != 0;
+		    ctx      =       (lparam & 0x20000000) != 0;
+		    pstate   =       (lparam & 0x40000000) != 0;
+		    tstate   =       (lparam & 0x80000000) != 0;
+
+		    win.GetKeyboardState(kb);
+		    if((key = stdkeys.get(code)) == null) {
+			synchronized(ukeys) {
+			    W32Key ukey = new W32Key(win, code, scancode, ext);
+			    if((key = ukeys.get(ukey)) == null) {
+				ukeys.put(ukey, ukey);
+				key = ukey;
+			    }
+			}
+		    }
+		    mods = xlmods(kb);
+		}
+
+		public String string() {return(null);}
+		public Key key() {return(key);}
+		public Set<Key.Mod> mods() {return(mods);}
+	    }
+	    public class W32KeyDownEvent extends W32KeyEvent implements KeyDownEvent {
+		public String string;
+
+		public W32KeyDownEvent(long wparam, long lparam) {
+		    super(wparam, lparam);
+		    int pst = kb.get(code);
+		    kb.set(code, pst | 0x80);
+		    char[] chars = win.ToUnicodeEx(code, scancode, kb, 0, win.GetKeyboardLayout(0));
+		    kb.set(code, pst);
+		    string = ((chars == null) || (chars.length == 0)) ? null : new String(chars);
+		}
+
+		public String string() {return(string);}
+	    }
+	    public class W32KeyUpEvent extends W32KeyEvent implements KeyUpEvent {
+		public W32KeyUpEvent(long wparam, long lparam) {super(wparam, lparam);}
+	    }
+
+	    public class W32MouseEvent {
+		public final Coord wndc;
+		public final Collection<Integer> held = new HashSet<>();
+		public final Set<Key.Mod> mods;
+
+		public W32MouseEvent(long wparam, long lparam, boolean screen) {
+		    Coord c = Coord.of((short)((lparam & 0x0000ffff) >> 0),
+				       (short)((lparam & 0xffff0000) >> 16));
+		    if(screen)
+			wndc = win.ScreenToClient(hwnd, c);
+		    else
+			wndc = c;
+		    if((wparam & Win32.MK_LBUTTON) != 0) held.add(1);
+		    if((wparam & Win32.MK_MBUTTON) != 0) held.add(2);
+		    if((wparam & Win32.MK_RBUTTON) != 0) held.add(3);
+		    win.GetKeyboardState(kb);
+		    mods = xlmods(kb);
+		}
+
+		public Coord wndc() {return(wndc);}
+		public Collection<Integer> held() {return(held);}
+		public Set<Key.Mod> mods() {return(mods);}
+	    }
+	    public class W32MouseMoveEvent extends W32MouseEvent implements MouseMoveEvent {
+		public W32MouseMoveEvent(long wparam, long lparam) {super(wparam, lparam, false);}
+	    }
+	    public class W32MouseButtonEvent extends W32MouseEvent {
+		public final int btn;
+
+		public W32MouseButtonEvent(int btn, long wparam, long lparam) {
+		    super(wparam, lparam, false);
+		    this.btn = btn;
+		}
+
+		public int button() {return(btn);}
+	    }
+	    public class W32MouseDownEvent extends W32MouseButtonEvent implements MouseDownEvent {
+		public W32MouseDownEvent(int btn, long wparam, long lparam) {super(btn, wparam, lparam);}
+	    }
+	    public class W32MouseUpEvent extends W32MouseButtonEvent implements MouseUpEvent {
+		public W32MouseUpEvent(int btn, long wparam, long lparam) {super(btn, wparam, lparam);}
+	    }
+
+	    public class W32MouseWheelEvent extends W32MouseEvent implements MouseWheelEvent {
+		public final int amount;
+
+		public W32MouseWheelEvent(int amount, long wparam, long lparam) {
+		    super(wparam, lparam, true);
+		    this.amount = amount;
+		}
+
+		public int amount() {return(amount);}
+	    }
 	}
 
 	public Windeye window() {
@@ -459,56 +597,6 @@ public class WGLContext implements Toolkit.Factory {
 	    if(((kb.get(0x5b) & 0xf0) != 0) || ((kb.get(0x5c) & 0xf0) != 0))
 		ret.add(Key.Mod.SUPER);
 	    return(ret);
-	}
-
-	public class W32KeyEvent {
-	    public int code, repeat, scancode;
-	    public boolean ext, ctx, pstate, tstate;
-	    public Key key;
-	    public Set<Key.Mod> mods;
-
-	    public W32KeyEvent(long wparam, long lparam) {
-		code     = (int)wparam;
-		repeat   = (int)((lparam & 0x0000ffff) >> 0);
-		scancode = (int)((lparam & 0x00ff0000) >> 16);
-		ext      =       (lparam & 0x01000000) != 0;
-		ctx      =       (lparam & 0x20000000) != 0;
-		pstate   =       (lparam & 0x40000000) != 0;
-		tstate   =       (lparam & 0x80000000) != 0;
-
-		win.GetKeyboardState(kb);
-		if((key = stdkeys.get(code)) == null) {
-		    synchronized(ukeys) {
-			W32Key ukey = new W32Key(win, code, scancode, ext);
-			if((key = ukeys.get(ukey)) == null) {
-			    ukeys.put(ukey, ukey);
-			    key = ukey;
-			}
-		    }
-		}
-		mods = xlmods(kb);
-	    }
-
-	    public String string() {return(null);}
-	    public Key key() {return(key);}
-	    public Set<Key.Mod> mods() {return(mods);}
-	}
-	public class W32KeyDownEvent extends W32KeyEvent implements KeyDownEvent {
-	    public String string;
-
-	    public W32KeyDownEvent(long wparam, long lparam) {
-		super(wparam, lparam);
-		int pst = kb.get(code);
-		kb.set(code, pst | 0x80);
-		char[] chars = win.ToUnicodeEx(code, scancode, kb, 0, win.GetKeyboardLayout(0));
-		kb.set(code, pst);
-		string = ((chars == null) || (chars.length == 0)) ? null : new String(chars);
-	    }
-
-	    public String string() {return(string);}
-	}
-	public class W32KeyUpEvent extends W32KeyEvent implements KeyUpEvent {
-	    public W32KeyUpEvent(long wparam, long lparam) {super(wparam, lparam);}
 	}
     }
 
