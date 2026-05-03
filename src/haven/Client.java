@@ -31,6 +31,7 @@ import java.io.*;
 import haven.render.*;
 import haven.iosys.tk.*;
 import java.awt.image.BufferedImage;
+import haven.iosys.tk.Button;
 
 public class Client implements Console.Directory {
     public static final Config.Variable<String> toolkit = Config.Variable.prop("haven.toolkit", null);
@@ -85,6 +86,16 @@ public class Client implements Console.Directory {
 	    }
 	}
 
+	private static int buttonid(Button btn) {
+	    if(btn == Button.Std.LEFT)
+		return(1);
+	    else if(btn == Button.Std.MIDDLE)
+		return(2);
+	    else if(btn == Button.Std.RIGHT)
+		return(3);
+	    return(0);
+	}
+
 	public void dispatch(UI ui) {
 	    List<Toolkit.Event> evs;
 	    Toolkit.MouseMoveEvent mousemv;
@@ -100,10 +111,14 @@ public class Client implements Console.Directory {
 	    for(Toolkit.Event ev : evs) {
 		if(ev instanceof Toolkit.MouseDownEvent) {
 		    Toolkit.MouseDownEvent e = (Toolkit.MouseDownEvent)ev;
-		    ui.mousedown(mkawt(e), e.wndc(), e.button());
+		    int btn = buttonid(e.button());
+		    if(btn > 0)
+			ui.mousedown(mkawt(e), e.wndc(), btn);
 		} else if(ev instanceof Toolkit.MouseUpEvent) {
 		    Toolkit.MouseUpEvent e = (Toolkit.MouseUpEvent)ev;
-		    ui.mouseup(mkawt(e), e.wndc(), e.button());
+		    int btn = buttonid(e.button());
+		    if(btn > 0)
+			ui.mouseup(mkawt(e), e.wndc(), btn);
 		} else if(ev instanceof Toolkit.MouseWheelEvent) {
 		    Toolkit.MouseWheelEvent e = (Toolkit.MouseWheelEvent)ev;
 		    ui.mousewheel(mkawt(e), e.wndc(), e.amount());
@@ -167,7 +182,7 @@ public class Client implements Console.Directory {
 		id = java.awt.event.MouseEvent.MOUSE_RELEASED;
 	    return(new java.awt.event.MouseEvent(awtdummy, id, System.currentTimeMillis(), awtmods(ev.mods()),
 						 ev.wndc().x, ev.wndc().y, 0, false,
-						 (ev instanceof Toolkit.MouseButtonEvent) ? ((Toolkit.MouseButtonEvent)ev).button() : java.awt.event.MouseEvent.NOBUTTON));
+						 (ev instanceof Toolkit.MouseButtonEvent) ? buttonid(((Toolkit.MouseButtonEvent)ev).button()) : java.awt.event.MouseEvent.NOBUTTON));
 	}
     }
 

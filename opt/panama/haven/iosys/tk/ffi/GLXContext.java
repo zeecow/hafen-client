@@ -39,6 +39,7 @@ import haven.iosys.gl.*;
 import java.awt.image.*;
 import haven.iosys.x11.XLib.*;
 import haven.iosys.x11.XInput.*;
+import haven.iosys.tk.Button;
 import static haven.iosys.x11.XKeysym.*;
 import static haven.iosys.tk.Key.Std.*;
 
@@ -1274,22 +1275,35 @@ public class GLXContext implements Toolkit.Factory {
 	GLXKeyReleaseEvent(GLXToolkit.GLXWindow wnd, XKeyEvent ev) {super(wnd, ev);}
     }
 
+    private static Button buttonid(int xi) {
+	switch(xi) {
+	case 1: return(Button.Std.LEFT);
+	case 2: return(Button.Std.MIDDLE);
+	case 3: return(Button.Std.RIGHT);
+	}
+	return(new Button() {
+	    public String id() {return(("x11:" + xi).intern());}
+	    public String nm() {return("Button " + xi);}
+	});
+    }
+
     public static abstract class GLXMouseEvent {
 	public final GLXToolkit.GLXWindow wnd;
 	public final Coord wndc, rootc;
-	public final Collection<Integer> held;
+	public final Set<Button> held;
 	public final Set<Key.Mod> mods;
 
 	public GLXMouseEvent(GLXToolkit.GLXWindow wnd, XIDeviceEvent ev) {
 	    this.wnd = wnd;
 	    this.wndc = Coord.of((int)ev.event_x(), (int)ev.event_y());
 	    this.rootc = Coord.of((int)ev.root_x(), (int)ev.root_y());
-	    this.held = new ArrayList<>(ev.buttons());
+	    this.held = new HashSet<>();
+	    ev.buttons().forEach(b -> held.add(buttonid(b)));
 	    this.mods = wnd.toolkit().mods(ev.mods().effective());
 	}
 
 	public Coord wndc() {return(wndc);}
-	public Collection<Integer> held() {return(held);}
+	public Set<Button> held() {return(held);}
 	public Set<Key.Mod> mods() {return(mods);}
 
 	public String toString() {
@@ -1297,14 +1311,14 @@ public class GLXContext implements Toolkit.Factory {
 	}
     }
     public static abstract class GLXMouseButtonEvent extends GLXMouseEvent {
-	public final int button;
+	public final Button button;
 
 	public GLXMouseButtonEvent(GLXToolkit.GLXWindow wnd, XIDeviceEvent ev) {
 	    super(wnd, ev);
-	    this.button = ev.detail();
+	    this.button = buttonid(ev.detail());
 	}
 
-	public int button() {return(button);}
+	public Button button() {return(button);}
 
 	public String toString() {
 	    return(String.format("#<%s wnd=%s root=%s btn=%d held=%s mods=%s>", getClass().getSimpleName(), wndc, rootc, button, held, mods));

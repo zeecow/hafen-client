@@ -69,11 +69,11 @@ public interface Toolkit {
 
     public static interface MouseEvent extends Event {
 	public Coord wndc();
-	public Collection<Integer> held();
+	public Set<Button> held();
 	public Set<Key.Mod> mods();
     }
     public static interface MouseButtonEvent extends MouseEvent {
-	public int button();
+	public Button button();
     }
     public static interface MouseDownEvent extends MouseButtonEvent {}
     public static interface MouseUpEvent extends MouseButtonEvent {}
