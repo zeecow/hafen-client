@@ -1307,8 +1307,8 @@ public class GLXContext implements Toolkit.Factory {
 	case 8: return(Button.Std.BACK);
 	case 9: return(Button.Std.FORWARD);
 	}
-	if((xi < ptr.buttons.length) && (ptr.buttons[xi] != null)) {
-	    String nm = ptr.buttons[xi];
+	if((xi <= ptr.buttons.length) && (ptr.buttons[xi - 1] != null)) {
+	    String nm = ptr.buttons[xi - 1];
 	    return(new Button() {
 		public String id() {return(("x11:" + nm).intern());}
 		public String nm() {return(nm);}
