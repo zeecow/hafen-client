@@ -219,10 +219,23 @@ public class GLXContext implements Toolkit.Factory {
 		    if(cl.type() == XInput.XIButtonClass) {
 			XIButtonClassInfo bi = cl.button();
 			Atom[] labels = bi.labels();
+			for(int i = 0; i < labels.length; i++) {
+			    if(labels[i] == null)
+				continue;
+			    Atom lbl = labels[i];
+			    check: for(int o = 0; o < i; o++) {
+				if(lbl.equals(labels[o])) {
+				    for(int u = 0; u < labels.length; u++) {
+					if(lbl.equals(labels[u]))
+					    labels[u] = null;
+				    }
+				    break check;
+				}
+			    }
+			}
 			buttons = new String[labels.length];
 			for(int i = 0; i < labels.length; i++) {
-			    if((buttons[i] = xlib.XGetAtomName(dpy, labels[i])).equals("Button Unknown"))
-				buttons[i] = null;
+			    buttons[i] = (labels[i] == null) ? null : xlib.XGetAtomName(dpy, labels[i]);
 			}
 		    } else if(cl.type() == XInput.XIValuatorClass) {
 			XIValuatorClassInfo vi = cl.valuator();
