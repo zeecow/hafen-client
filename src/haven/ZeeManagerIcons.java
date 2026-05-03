@@ -297,6 +297,7 @@ public class ZeeManagerIcons {
 
             // apply first rule matching gob name
             for (String rule : rules) {
+
                 String[] arr = rule.split(",");
 
                 //skip rule without "label gob" option
@@ -319,17 +320,17 @@ public class ZeeManagerIcons {
                 String[] ruleShape = arr[1].split(" ");
                 String textIcon = "";
                 if (ruleShape[0].contentEquals("circle"))
-                    textIcon = "●";
+                    textIcon = "● ";
                 else if (ruleShape[0].contentEquals("square"))
-                    textIcon = "■";
+                    textIcon = "■ ";
                 else if (ruleShape[0].contentEquals("triangleUp"))
-                    textIcon = "▲";
+                    textIcon = "▲ ";
                 else if (ruleShape[0].contentEquals("triangleDown"))
-                    textIcon = "▼";
+                    textIcon = "▼ ";
                 else if (ruleShape[0].contentEquals("diamond"))
-                    textIcon = "◆";
+                    textIcon = "◆ ";
                 else if (ruleShape[0].contentEquals("star"))
-                    textIcon = "★";
+                    textIcon = "★ ";
                 textIcon += gob.getres().basename();
 
                 mapGobShapeIcon.put(gobName,new Object[]{textIcon,color});
