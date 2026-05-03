@@ -393,6 +393,22 @@ public class WGLContext implements Toolkit.Factory {
 		case Win32.WM_RBUTTONUP:
 		    callback(new W32MouseUpEvent(Button.Std.RIGHT, wparam, lparam));
 		    return(0);
+		case Win32.WM_XBUTTONDOWN: {
+		    long btn = (wparam & 0xffff0000) >> 16;
+		    if(btn == 1)
+			callback(new W32MouseDownEvent(Button.Std.BACK, wparam, lparam));
+		    else if(btn == 2)
+			callback(new W32MouseDownEvent(Button.Std.FORWARD, wparam, lparam));
+		    return(0);
+		}
+		case Win32.WM_XBUTTONUP: {
+		    long btn = (wparam & 0xffff0000) >> 16;
+		    if(btn == 1)
+			callback(new W32MouseUpEvent(Button.Std.BACK, wparam, lparam));
+		    else if(btn == 2)
+			callback(new W32MouseUpEvent(Button.Std.FORWARD, wparam, lparam));
+		    return(0);
+		}
 		case Win32.WM_MOUSEWHEEL: {
 		    int raw = (short)((wparam & 0xffff0000) >> 16);
 		    wheelacc += raw;
@@ -536,6 +552,8 @@ public class WGLContext implements Toolkit.Factory {
 		    if((wparam & Win32.MK_LBUTTON) != 0) held.add(Button.Std.LEFT);
 		    if((wparam & Win32.MK_MBUTTON) != 0) held.add(Button.Std.MIDDLE);
 		    if((wparam & Win32.MK_RBUTTON) != 0) held.add(Button.Std.RIGHT);
+		    if((wparam & Win32.MK_XBUTTON1) != 0) held.add(Button.Std.BACK);
+		    if((wparam & Win32.MK_XBUTTON2) != 0) held.add(Button.Std.FORWARD);
 		    win.GetKeyboardState(kb);
 		    mods = xlmods(kb);
 		}

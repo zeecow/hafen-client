@@ -258,6 +258,8 @@ public class JOGLToolkit implements Toolkit {
 	}
 	public Button button() {
 	    int id = awt.getButton();
+	    /* XXX: Back/forward buttons? I'm not sure they're even
+	     * standardized in AWT... */
 	    if(id == java.awt.event.MouseEvent.BUTTON1)
 		return(Button.Std.LEFT);
 	    else if(id == java.awt.event.MouseEvent.BUTTON2)

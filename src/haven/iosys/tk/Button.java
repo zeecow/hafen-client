@@ -33,7 +33,9 @@ public interface Button {
     public static enum Std implements Button {
 	LEFT("lmb", "Left"),
 	MIDDLE("mmb", "Middle"),
-	RIGHT("rmb", "Right");
+	RIGHT("rmb", "Right"),
+	BACK("back", "Back"),
+	FORWARD("fwd", "Forward");
 
         public final String id, nm;
  
