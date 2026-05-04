@@ -840,7 +840,7 @@ public class GLXContext implements Toolkit.Factory {
 	    private Set<Atom> curstate = Collections.emptySet();
 	    private void wmstate(Atom[] st) {
 		xrun(() -> {
-		    if(mapped) {
+		    if(showing) {
 			Collection<Atom> p = curstate, n = Arrays.asList(st);
 			boolean mhcons = false, mvcons = false;
 			for(Atom s : p) {
