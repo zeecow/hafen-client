@@ -4540,8 +4540,11 @@ public class ZeeConfig {
             }
             // hilite current gob
             Gob g = ZeeManagerGobs.findGobById(fv.lsrel.get(0).gobid);
-            if (g!=null)
-                g.setattr(new ZeeGobFind(g));
+            if (g != null) {
+                synchronized (g) {
+                    g.setattr(new ZeeGobFind(g));
+                }
+            }
         }catch (Exception e){
             e.printStackTrace();
         }
