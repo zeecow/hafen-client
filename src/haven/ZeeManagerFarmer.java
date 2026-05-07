@@ -49,7 +49,8 @@ public class ZeeManagerFarmer extends ZeeThread{
             new ZeeCrop("cucumber","cucumber", null, 4),
             new ZeeCrop("champignon","champignon", null, 4),
             new ZeeCrop("greenkale","greenkale", List.of("greenkale"), 4),
-            new ZeeCrop("watermelon","watermelon", List.of("watermelon"), 4)
+            new ZeeCrop("watermelon","watermelon", List.of("watermelon"), 4),
+            new ZeeCrop("radish","radish", List.of("radish"), 4)
     );
 
 
