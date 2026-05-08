@@ -39,6 +39,7 @@ import haven.iosys.gl.*;
 import java.awt.image.*;
 import haven.iosys.x11.XLib.*;
 import haven.iosys.x11.XInput.*;
+import haven.iosys.tk.Button;
 import static haven.iosys.x11.XKeysym.*;
 import static haven.iosys.tk.Key.Std.*;
 
@@ -196,6 +197,7 @@ public class GLXContext implements Toolkit.Factory {
 	}
 
 	public class XIPointerInfo {
+	    public final String[] buttons;
 	    public final Map<Integer, Scroll> scroll = new HashMap<>();
 
 	    public class Scroll {
@@ -211,9 +213,31 @@ public class GLXContext implements Toolkit.Factory {
 	    }
 
 	    private XIPointerInfo(XIDeviceInfo dev, Map<Integer, XIDeviceInfo> devs) {
+		String[] buttons = new String[0];
 		Map<Integer, XIValuatorClassInfo> vals = new IntMap<>();
 		for(XIAnyClassInfo cl : dev.classes()) {
-		    if(cl.type() == XInput.XIValuatorClass) {
+		    if(cl.type() == XInput.XIButtonClass) {
+			XIButtonClassInfo bi = cl.button();
+			Atom[] labels = bi.labels();
+			for(int i = 0; i < labels.length; i++) {
+			    if(labels[i] == null)
+				continue;
+			    Atom lbl = labels[i];
+			    check: for(int o = 0; o < i; o++) {
+				if(lbl.equals(labels[o])) {
+				    for(int u = 0; u < labels.length; u++) {
+					if(lbl.equals(labels[u]))
+					    labels[u] = null;
+				    }
+				    break check;
+				}
+			    }
+			}
+			buttons = new String[labels.length];
+			for(int i = 0; i < labels.length; i++) {
+			    buttons[i] = (labels[i] == null) ? null : xlib.XGetAtomName(dpy, labels[i]);
+			}
+		    } else if(cl.type() == XInput.XIValuatorClass) {
 			XIValuatorClassInfo vi = cl.valuator();
 			/* Apparently, master pointer valuators can
 			 * sometimes be invalid from XIQueryDevice,
@@ -241,6 +265,7 @@ public class GLXContext implements Toolkit.Factory {
 			}
 		    }
 		}
+		this.buttons = buttons;
 	    }
 	}
 
@@ -815,7 +840,7 @@ public class GLXContext implements Toolkit.Factory {
 	    private Set<Atom> curstate = Collections.emptySet();
 	    private void wmstate(Atom[] st) {
 		xrun(() -> {
-		    if(mapped) {
+		    if(showing) {
 			Collection<Atom> p = curstate, n = Arrays.asList(st);
 			boolean mhcons = false, mvcons = false;
 			for(Atom s : p) {
@@ -1066,30 +1091,30 @@ public class GLXContext implements Toolkit.Factory {
 	    }
 
 	    private void event(XIDeviceEvent ev) {
-		switch(ev.evtype()) {
-		case XInput.XI_ButtonPress:
-		    if((ev.flags() & XInput.XIPointerEmulated) == 0) {
-			int btn = ev.detail();
-			if((btn == 4) || (btn == 5)) {
-			    callback(new GLXMouseWheelEvent(this, ev, (btn == 4) ? -1 : 1));
-			} else if((btn == 6) || (btn == 7)) {
-			    /* Horizontal scrolling */
-			} else {
-			    callback(new GLXMouseDownEvent(this, ev));
+		XIPointerInfo ptr;
+		synchronized(pointers) {
+		    ptr = pointers.get(ev.deviceid());
+		}
+		if(ptr != null) {
+		    switch(ev.evtype()) {
+		    case XInput.XI_ButtonPress:
+			if((ev.flags() & XInput.XIPointerEmulated) == 0) {
+			    int btn = ev.detail();
+			    if((btn == 4) || (btn == 5)) {
+				callback(new GLXMouseWheelEvent(this, ptr, ev, (btn == 4) ? -1 : 1));
+			    } else if((btn == 6) || (btn == 7)) {
+				/* Horizontal scrolling */
+			    } else {
+				callback(new GLXMouseDownEvent(this, ptr, ev));
+			    }
 			}
-		    }
-		    break;
-		case XInput.XI_ButtonRelease:
-		    if((ev.flags() & XInput.XIPointerEmulated) == 0)
-			callback(new GLXMouseUpEvent(this, ev));
-		    break;
-		case XInput.XI_Motion: {
-		    Map<Integer, Double> vals = ev.valuators();
-		    XIPointerInfo ptr;
-		    synchronized(pointers) {
-			ptr = pointers.get(ev.deviceid());
-		    }
-		    if(ptr != null) {
+			break;
+		    case XInput.XI_ButtonRelease:
+			if((ev.flags() & XInput.XIPointerEmulated) == 0)
+			    callback(new GLXMouseUpEvent(this, ptr, ev));
+			break;
+		    case XInput.XI_Motion: {
+			Map<Integer, Double> vals = ev.valuators();
 			for(Integer v : ev.valuators().keySet()) {
 			    XIPointerInfo.Scroll scr = ptr.scroll.get(v);
 			    if(scr != null) {
@@ -1099,17 +1124,17 @@ public class GLXContext implements Toolkit.Factory {
 				int idelta = (int)(nvi - lvi);
 				scr.lastval = nv;
 				if(idelta != 0)
-				    callback(new GLXMouseWheelEvent(this, ev, idelta));
+				    callback(new GLXMouseWheelEvent(this, ptr, ev, idelta));
 			    }
 			}
+			if((ev.flags() & XInput.XIPointerEmulated) == 0)
+			    callback(new GLXMouseMoveEvent(this, ptr, ev));
+			break;
 		    }
-		    if((ev.flags() & XInput.XIPointerEmulated) == 0)
-			callback(new GLXMouseMoveEvent(this, ev));
-		    break;
-		}
-		default:
-		    Warning.warn(String.format("unexpected XInput event received for window %s: %d",  ev.evtype()));
-		    break;
+		    default:
+			Warning.warn(String.format("unexpected XInput event received for window %s: %d",  ev.evtype()));
+			break;
+		    }
 		}
 	    }
 
@@ -1274,22 +1299,47 @@ public class GLXContext implements Toolkit.Factory {
 	GLXKeyReleaseEvent(GLXToolkit.GLXWindow wnd, XKeyEvent ev) {super(wnd, ev);}
     }
 
+    private static Button buttonid(GLXToolkit.XIPointerInfo ptr, int xi) {
+	switch(xi) {
+	case 1: return(Button.Std.LEFT);
+	case 2: return(Button.Std.MIDDLE);
+	case 3: return(Button.Std.RIGHT);
+	case 8: return(Button.Std.BACK);
+	case 9: return(Button.Std.FORWARD);
+	}
+	if((xi <= ptr.buttons.length) && (ptr.buttons[xi - 1] != null)) {
+	    String nm = ptr.buttons[xi - 1];
+	    return(new Button() {
+		public String id() {return(("x11:" + nm).intern());}
+		public String nm() {return(nm);}
+	    });
+	} else {
+	    return(new Button() {
+		public String id() {return(("x11:" + xi).intern());}
+		public String nm() {return("Button " + xi);}
+	    });
+	}
+    }
+
     public static abstract class GLXMouseEvent {
 	public final GLXToolkit.GLXWindow wnd;
+	public final GLXToolkit.XIPointerInfo ptr;
 	public final Coord wndc, rootc;
-	public final Collection<Integer> held;
+	public final Set<Button> held;
 	public final Set<Key.Mod> mods;
 
-	public GLXMouseEvent(GLXToolkit.GLXWindow wnd, XIDeviceEvent ev) {
+	public GLXMouseEvent(GLXToolkit.GLXWindow wnd, GLXToolkit.XIPointerInfo ptr, XIDeviceEvent ev) {
 	    this.wnd = wnd;
+	    this.ptr = ptr;
 	    this.wndc = Coord.of((int)ev.event_x(), (int)ev.event_y());
 	    this.rootc = Coord.of((int)ev.root_x(), (int)ev.root_y());
-	    this.held = new ArrayList<>(ev.buttons());
+	    this.held = new HashSet<>();
+	    ev.buttons().forEach(b -> held.add(buttonid(ptr, b)));
 	    this.mods = wnd.toolkit().mods(ev.mods().effective());
 	}
 
 	public Coord wndc() {return(wndc);}
-	public Collection<Integer> held() {return(held);}
+	public Set<Button> held() {return(held);}
 	public Set<Key.Mod> mods() {return(mods);}
 
 	public String toString() {
@@ -1297,33 +1347,33 @@ public class GLXContext implements Toolkit.Factory {
 	}
     }
     public static abstract class GLXMouseButtonEvent extends GLXMouseEvent {
-	public final int button;
+	public final Button button;
 
-	public GLXMouseButtonEvent(GLXToolkit.GLXWindow wnd, XIDeviceEvent ev) {
-	    super(wnd, ev);
-	    this.button = ev.detail();
+	public GLXMouseButtonEvent(GLXToolkit.GLXWindow wnd, GLXToolkit.XIPointerInfo ptr, XIDeviceEvent ev) {
+	    super(wnd, ptr, ev);
+	    this.button = buttonid(ptr, ev.detail());
 	}
 
-	public int button() {return(button);}
+	public Button button() {return(button);}
 
 	public String toString() {
 	    return(String.format("#<%s wnd=%s root=%s btn=%d held=%s mods=%s>", getClass().getSimpleName(), wndc, rootc, button, held, mods));
 	}
     }
     public static class GLXMouseDownEvent extends GLXMouseButtonEvent implements Toolkit.MouseDownEvent {
-	GLXMouseDownEvent(GLXToolkit.GLXWindow wnd, XIDeviceEvent ev) {super(wnd, ev);}
+	GLXMouseDownEvent(GLXToolkit.GLXWindow wnd, GLXToolkit.XIPointerInfo ptr, XIDeviceEvent ev) {super(wnd, ptr, ev);}
     }
     public static class GLXMouseUpEvent extends GLXMouseButtonEvent implements Toolkit.MouseUpEvent {
-	GLXMouseUpEvent(GLXToolkit.GLXWindow wnd, XIDeviceEvent ev) {super(wnd, ev);}
+	GLXMouseUpEvent(GLXToolkit.GLXWindow wnd, GLXToolkit.XIPointerInfo ptr, XIDeviceEvent ev) {super(wnd, ptr, ev);}
     }
     public static class GLXMouseMoveEvent extends GLXMouseEvent implements Toolkit.MouseMoveEvent {
-	GLXMouseMoveEvent(GLXToolkit.GLXWindow wnd, XIDeviceEvent ev) {super(wnd, ev);}
+	GLXMouseMoveEvent(GLXToolkit.GLXWindow wnd, GLXToolkit.XIPointerInfo ptr, XIDeviceEvent ev) {super(wnd, ptr, ev);}
     }
     public static class GLXMouseWheelEvent extends GLXMouseEvent implements Toolkit.MouseWheelEvent {
 	public final int amount;
 
-	GLXMouseWheelEvent(GLXToolkit.GLXWindow wnd, XIDeviceEvent ev, int amount) {
-	    super(wnd, ev);
+	GLXMouseWheelEvent(GLXToolkit.GLXWindow wnd, GLXToolkit.XIPointerInfo ptr, XIDeviceEvent ev, int amount) {
+	    super(wnd, ptr, ev);
 	    this.amount = amount;
 	}
 

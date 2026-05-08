@@ -234,20 +234,20 @@ public class JOGLToolkit implements Toolkit {
     public static class AWTMouseEvent {
 	public final java.awt.event.MouseEvent awt;
 	private Set<Key.Mod> mods = null;
-	private Collection<Integer> held = null;
+	private Set<Button> held = null;
 
 	public AWTMouseEvent(java.awt.event.MouseEvent awt) {
 	    this.awt = awt;
 	}
 
 	public Coord wndc() {return(Coord.of(awt.getX(), awt.getY()));}
-	public Collection<Integer> held() {
+	public Set<Button> held() {
 	    if(held == null) {
 		int mod = awt.getModifiersEx();
-		held = new ArrayList<>();
-		if((mod & InputEvent.BUTTON1_DOWN_MASK) != 0) held.add(1);
-		if((mod & InputEvent.BUTTON2_DOWN_MASK) != 0) held.add(2);
-		if((mod & InputEvent.BUTTON3_DOWN_MASK) != 0) held.add(3);
+		held = new HashSet<>();
+		if((mod & InputEvent.BUTTON1_DOWN_MASK) != 0) held.add(Button.Std.LEFT);
+		if((mod & InputEvent.BUTTON2_DOWN_MASK) != 0) held.add(Button.Std.MIDDLE);
+		if((mod & InputEvent.BUTTON3_DOWN_MASK) != 0) held.add(Button.Std.RIGHT);
 	    }
 	    return(held);
 	}
@@ -256,7 +256,21 @@ public class JOGLToolkit implements Toolkit {
 		mods = awtmods(awt.getModifiersEx());
 	    return(mods);
 	}
-	public int button() {return(awt.getButton());}
+	public Button button() {
+	    int id = awt.getButton();
+	    /* XXX: Back/forward buttons? I'm not sure they're even
+	     * standardized in AWT... */
+	    if(id == java.awt.event.MouseEvent.BUTTON1)
+		return(Button.Std.LEFT);
+	    else if(id == java.awt.event.MouseEvent.BUTTON2)
+		return(Button.Std.MIDDLE);
+	    else if(id == java.awt.event.MouseEvent.BUTTON3)
+		return(Button.Std.RIGHT);
+	    return(new Button() {
+		public String id() {return("awt:" + id);}
+		public String nm() {return("Button " + id);}
+	    });
+	}
     }
     public static class AWTMouseDownEvent extends AWTMouseEvent implements MouseDownEvent {
 	public AWTMouseDownEvent(java.awt.event.MouseEvent awt) {super(awt);}

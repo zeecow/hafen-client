@@ -109,8 +109,22 @@ public abstract class XInput {
 	public abstract int type();
 	public abstract int sourceid();
 
+	public abstract XIButtonClassInfo button();
 	public abstract XIValuatorClassInfo valuator();
 	public abstract XIScrollClassInfo scroll();
+    }
+
+    public abstract static class XIButtonClassInfo extends StructInstance {
+	private XIButtonClassInfo(MemorySegment mem) {
+	    super(mem);
+	}
+
+	MemorySegment mem() {return(mem);}
+
+	public abstract int type();
+	public abstract int sourceid();
+	public abstract Atom[] labels();
+	public abstract Collection<? extends Integer> state();
     }
 
     public abstract static class XIValuatorClassInfo extends StructInstance {
@@ -284,6 +298,31 @@ public abstract class XInput {
 	    }
 	}
 
+	private static final StructLayout _XIButtonState = struct(new MemoryLayout[] {
+		C_INT.withName("mask_len"),
+		ADDRESS.withName("mask"),
+	    });
+	public static class XIButtonState extends StructInstance {
+	    private XIButtonState(MemorySegment mem) {super(mem);}
+	    protected StructLayout $layout() {return(_XIButtonState);}
+
+	    private static final VarHandle mask_len = _XIButtonState.varHandle(PathElement.groupElement("mask_len"));
+	    private static final VarHandle mask = _XIButtonState.varHandle(PathElement.groupElement("mask"));
+	    public Collection<? extends Integer> buttons() {
+		int ln = (int)mask_len.get(mem, 0);
+		MemorySegment m = ((MemorySegment)mask.get(mem, 0)).reinterpret(ln);
+		Collection<Integer> ret = new ArrayList<>();
+		for(int i = 0; i < ln; i++) {
+		    int b = m.get(ValueLayout.JAVA_BYTE, i) & 0xff;
+		    for(int o = 0; o < 8; o++) {
+			if((b & (1 << o)) != 0)
+			    ret.add((i * 8) + o);
+		    }
+		}
+		return(ret);
+	    }
+	}
+
 	private static final StructLayout _XIAnyClassInfo = struct(new MemoryLayout[] {
 		C_INT.withName("type"),
 		C_INT.withName("sourceid"),
@@ -303,8 +342,45 @@ public abstract class XInput {
 	    private static final VarHandle sourceid = _XIAnyClassInfo.varHandle(PathElement.groupElement("sourceid"));
 	    public int sourceid() {return((int)sourceid.get(mem, 0));}
 
+	    public XIButtonClassInfo button() {return(new XIButtonClassInfo(dev, mem));}
 	    public XIValuatorClassInfo valuator() {return(new XIValuatorClassInfo(dev, mem));}
 	    public XIScrollClassInfo scroll() {return(new XIScrollClassInfo(dev, mem));}
+	}
+
+	private static final StructLayout _XIButtonClassInfo = struct(new MemoryLayout[] {
+		C_INT.withName("type"),
+		C_INT.withName("sourceid"),
+		C_INT.withName("num_buttons"),
+		ADDRESS.withName("labels"),
+		_XIButtonState.withName("state"),
+	    });
+	public static class XIButtonClassInfo extends XInput.XIButtonClassInfo {
+	    public final XIDeviceInfo dev;
+
+	    private XIButtonClassInfo(XIDeviceInfo dev, MemorySegment mem) {
+		super(mem);
+		this.dev = dev;
+	    }
+
+	    protected StructLayout $layout() {return(_XIButtonClassInfo);}
+
+	    private static final VarHandle type = _XIButtonClassInfo.varHandle(PathElement.groupElement("type"));
+	    public int type() {return((int)type.get(mem, 0));}
+	    private static final VarHandle sourceid = _XIButtonClassInfo.varHandle(PathElement.groupElement("sourceid"));
+	    public int sourceid() {return((int)sourceid.get(mem, 0));}
+	    private static final VarHandle num_buttons = _XIButtonClassInfo.varHandle(PathElement.groupElement("num_buttons"));
+	    private static final VarHandle labels = _XIButtonClassInfo.varHandle(PathElement.groupElement("labels"));
+	    public Atom[] labels() {
+		Atom[] ret = new Atom[(int)num_buttons.get(mem, 0)];
+		MemorySegment l = ((MemorySegment)labels.get(mem, 0)).reinterpret(C_Atom.byteSize() * ret.length);
+		for(int i = 0; i < ret.length; i++)
+		    ret[i] = Atom.of(getint(l, C_Atom.byteSize() * i, C_Atom, false));
+		return(ret);
+	    }
+	    private static final long state = _XIButtonClassInfo.byteOffset(PathElement.groupElement("state"));
+	    public Collection<? extends Integer> state() {
+		return(new XIButtonState(mem.asSlice(state, 0)).buttons());
+	    }
 	}
 
 	private static final StructLayout _XIValuatorClassInfo = struct(new MemoryLayout[] {
@@ -515,30 +591,6 @@ public abstract class XInput {
 	    }
 	}
 
-	private static final StructLayout _XIButtonState = struct(new MemoryLayout[] {
-		C_INT.withName("mask_len"),
-		ADDRESS.withName("mask"),
-	    });
-	public static class XIButtonState extends StructInstance {
-	    private XIButtonState(MemorySegment mem) {super(mem);}
-	    protected StructLayout $layout() {return(_XIButtonState);}
-
-	    private static final VarHandle mask_len = _XIButtonState.varHandle(PathElement.groupElement("mask_len"));
-	    private static final VarHandle mask = _XIButtonState.varHandle(PathElement.groupElement("mask"));
-	    public Collection<? extends Integer> buttons() {
-		int ln = (int)mask_len.get(mem, 0);
-		MemorySegment m = ((MemorySegment)mask.get(mem, 0)).reinterpret(ln);
-		Collection<Integer> ret = new ArrayList<>();
-		for(int i = 0; i < ln; i++) {
-		    int b = m.get(ValueLayout.JAVA_BYTE, i) & 0xff;
-		    for(int o = 0; o < 8; o++) {
-			if((b & (1 << o)) != 0)
-			    ret.add((i * 8) + o);
-		    }
-		}
-		return(ret);
-	    }
-	}
 	private static final StructLayout _XIValuatorState = struct(new MemoryLayout[] {
 		C_INT.withName("mask_len"),
 		ADDRESS.withName("mask"),
