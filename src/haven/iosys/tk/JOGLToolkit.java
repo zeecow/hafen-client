@@ -510,6 +510,9 @@ public class JOGLToolkit implements Toolkit {
 	public JOGLWindow state(State st) {
 	    /* XXX: Implement fullscreen mode */
 	    switch(st) {
+	    case MINIMIZED:
+		frame.setExtendedState(java.awt.Frame.ICONIFIED);
+		break;
 	    case NORMAL:
 		frame.setExtendedState(java.awt.Frame.NORMAL);
 		break;
@@ -526,6 +529,8 @@ public class JOGLToolkit implements Toolkit {
 	}
 
 	public State state() {
+	    if((frame.getExtendedState() & java.awt.Frame.ICONIFIED) != 0)
+		return(State.MINIMIZED);
 	    if((frame.getExtendedState() & java.awt.Frame.MAXIMIZED_BOTH) != 0)
 		return(State.MAXIMIZED);
 	    return(State.NORMAL);
