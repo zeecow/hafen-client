@@ -139,7 +139,7 @@
       <fileset dir="build/classes" />
       <fileset dir="build/classes-lib" />
       <manifest>
-	<attribute name="Main-Class" value="haven.MainFrame" />
+	<attribute name="Main-Class" value="haven.Client" />
 	<attribute name="Class-Path" value="hafen-panama.jar jogl-all.jar gluegen-rt.jar lwjgl-fat.jar lwjgl-awt.jar lwjgl-opengl-fat.jar steamworks4j.jar builtin-res.jar hafen-res.jar" />
 	<attribute name="Enable-Native-Access" value="ALL-UNNAMED" />
       </manifest>
