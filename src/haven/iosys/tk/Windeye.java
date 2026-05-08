@@ -48,7 +48,7 @@ public interface Windeye {
     public void swapbuffers(Render g);
 
     public static enum State {
-	NORMAL, MAXIMIZED, EXCLUSIVE
+	MINIMIZED, NORMAL, MAXIMIZED, EXCLUSIVE
     }
 
     public static class Sizing {

@@ -305,11 +305,16 @@ public class WGLContext implements Toolkit.Factory {
 	    public final Handle hwnd;
 	    private final Collection<EventListener> callbacks = new java.util.concurrent.CopyOnWriteArrayList<>();
 	    private Coord size = Coord.z;
+	    private boolean showing = false;
+	    private State curstate = State.NORMAL;
 	    private WGLEnvironment renv;
 	    private int wheelacc = 0;
+	    private Coord fixsize = null, minsize = null, maxsize = null;
+	    private String wndstyle = "normal";
+	    private Area preexcl = null;
 
 	    private WGLWindow() {
-		hwnd = msgrun(() -> win.CreateWindowEx(0, wclassname, null, Win32.WS_OVERLAPPEDWINDOW,
+		hwnd = msgrun(() -> win.CreateWindowEx(0, wclassname, null, STYLE_NORMAL,
 						       null, null, null, null, hInstance));
 		register(this);
 		msgrun(() -> {
@@ -343,15 +348,35 @@ public class WGLContext implements Toolkit.Factory {
 		    l.event(ev);
 	    }
 
+	    private void minmaxinfo(long wparam, long lparam) {
+		Win32.MINMAXINFO inf = win.MINMAXINFO(lparam);
+		if(minsize != null)
+		    inf.ptMinTrackSize(minsize);
+		if(maxsize != null)
+		    inf.ptMaxTrackSize(minsize);
+	    }
+
 	    private long message(Handle hwnd, int umsg, long wparam, long lparam) {
 		// System.err.printf("%x %x %x\n", umsg, wparam, lparam);
 		switch(umsg) {
 		case Win32.WM_CLOSE:
 		    callback(new CloseRequest() {});
 		    return(0);
+		case Win32.WM_SHOWWINDOW:
+		    showing = wparam != 0;
+		    return(0);
 		case Win32.WM_SIZE:
+		    if(wparam == Win32.SIZE_RESTORED)
+			curstate = State.NORMAL;
+		    else if(wparam == Win32.SIZE_MINIMIZED)
+			curstate = State.MINIMIZED;
+		    else if(wparam == Win32.SIZE_MAXIMIZED)
+			curstate = State.MAXIMIZED;
 		    size = Coord.of((int)((lparam & 0x0000ffff) >> 0),
 				    (int)((lparam & 0xffff0000) >> 16));
+		    return(0);
+		case Win32.WM_GETMINMAXINFO:
+		    minmaxinfo(wparam, lparam);
 		    return(0);
 
 		case Win32.WM_KEYDOWN:
@@ -407,8 +432,75 @@ public class WGLContext implements Toolkit.Factory {
 		}
 	    }
 
+	    private static final int STYLE_NORMAL    = Win32.WS_OVERLAPPEDWINDOW;
+	    private static final int STYLE_FIXED     = Win32.WS_OVERLAPPED | Win32.WS_CAPTION | Win32.WS_SYSMENU | Win32.WS_MINIMIZEBOX;
+	    private static final int STYLE_EXCLUSIVE = Win32.WS_POPUP | Win32.WS_MINIMIZEBOX;
+	    private static final int STYLE_MASK      = STYLE_NORMAL | STYLE_FIXED | STYLE_EXCLUSIVE;
+	    private void setstate(State st) {
+		if(st == State.EXCLUSIVE) {
+		    if(wndstyle != "popup") {
+			Win32.MONITORINFO inf = win.MONITORINFO();
+			win.GetMonitorInfo(win.MonitorFromWindow(hwnd, Win32.MONITOR_DEFAULTTOPRIMARY), inf);
+			Area fs = inf.rcMonitor();
+			preexcl = win.GetWindowRect(hwnd);
+			win.SetWindowLongPtr(hwnd, Win32.GWL_STYLE, (win.GetWindowLongPtr(hwnd, Win32.GWL_STYLE) & ~STYLE_MASK) | STYLE_EXCLUSIVE);
+			win.SetWindowPos(hwnd, null, fs.ul, fs.sz(), Win32.SWP_FRAMECHANGED);
+			wndstyle = "popup";
+		    }
+		} else {
+		    if(fixsize != null) {
+			if(wndstyle != "fixed") {
+			    win.SetWindowLongPtr(hwnd, Win32.GWL_STYLE, Win32.WS_CAPTION | Win32.WS_SYSMENU);
+			    win.SetWindowPos(hwnd, null, null, fixsize, Win32.SWP_FRAMECHANGED);
+			    wndstyle = "fixed";
+			}
+		    } else {
+			if(wndstyle != "normal") {
+			    win.SetWindowLongPtr(hwnd, Win32.GWL_STYLE, Win32.WS_OVERLAPPEDWINDOW);
+			    if(preexcl != null) {
+				win.SetWindowPos(hwnd, null, preexcl.ul, preexcl.sz(), Win32.SWP_FRAMECHANGED);
+				preexcl = null;
+			    } else {
+				win.SetWindowPos(hwnd, null, null, null, Win32.SWP_FRAMECHANGED);
+			    }
+			    wndstyle = "normal";
+			}
+		    }
+		    switch(st) {
+		    case MINIMIZED: win.ShowWindow(hwnd, Win32.SW_MINIMIZE); break;
+		    case NORMAL:    win.ShowWindow(hwnd, Win32.SW_NORMAL); break;
+		    case MAXIMIZED: win.ShowWindow(hwnd, Win32.SW_MAXIMIZE); break;
+		    }
+		}
+	    }
+
 	    public WGLWindow show(boolean vis) {
-		boolean rv = msgrun(() -> win.ShowWindow(hwnd, vis ? Win32.SW_NORMAL : Win32.SW_HIDE));
+		if(vis) {
+		    boolean rv = msgrun(() -> {setstate(curstate); return(true);});
+		} else {
+		    boolean rv = msgrun(() -> win.ShowWindow(hwnd, Win32.SW_HIDE));
+		}
+		return(this);
+	    }
+
+	    public WGLWindow sizing(Sizing info) {
+		msgrun(() -> {
+		    if((info.normsize != null) && (curstate == State.NORMAL))
+			win.SetWindowPos(hwnd, null, null, fixsize(info.normsize), 0);
+		    fixsize = fixsize(info.fixsize);
+		    minsize = fixsize(info.minsize);
+		    maxsize = fixsize(info.maxsize);
+		    setstate(curstate);
+		});
+		return(this);
+	    }
+
+	    public WGLWindow state(State st) {
+		msgrun(() -> {
+		    if(showing)
+			setstate(st);
+		    curstate = st;
+		});
 		return(this);
 	    }
 
@@ -425,12 +517,10 @@ public class WGLContext implements Toolkit.Factory {
 		return(this);
 	    }
 
-	    public WGLWindow sizing(Sizing info) {
-		return(this);
-	    }
-
-	    public WGLWindow state(State st) {
-		return(this);
+	    private Coord fixsize(Coord sz) {
+		if(sz == null)
+		    return(null);
+		return(win.AdjustWindowRectEx(Area.sized(sz), Win32.WS_OVERLAPPEDWINDOW, false, 0).sz());
 	    }
 
 	    public Coord size() {
@@ -438,7 +528,7 @@ public class WGLContext implements Toolkit.Factory {
 	    }
 
 	    public State state() {
-		return(State.NORMAL);
+		return(curstate);
 	    }
 
 	    public Environment env() {

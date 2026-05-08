@@ -41,14 +41,26 @@ import static java.lang.foreign.ValueLayout.ADDRESS;
 
 public abstract class Win32 {
     public static final int WS_OVERLAPPED = 0x00000000;
-    public static final int WS_CAPTION = 0x00C00000;
-    public static final int WS_SYSMENU = 0x00080000;
-    public static final int WS_THICKFRAME = 0x00040000;
-    public static final int WS_MINIMIZEBOX = 0x00020000;
     public static final int WS_MAXIMIZEBOX = 0x00010000;
+    public static final int WS_MINIMIZEBOX = 0x00020000;
+    public static final int WS_THICKFRAME = 0x00040000;
+    public static final int WS_SYSMENU = 0x00080000;
+    public static final int WS_BORDER = 0x00800000;
+    public static final int WS_CAPTION = 0x00C00000;
+    public static final int WS_POPUP = 0x80000000;
     public static final int WS_OVERLAPPEDWINDOW = WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME | WS_MINIMIZEBOX | WS_MAXIMIZEBOX;
+    public static final int WS_POPUPWINDOW = WS_POPUP | WS_BORDER | WS_SYSMENU;
+    public static final int WS_EX_APPWINDOW = 0x00040000;
 
     public static final int CW_USEDEFAULT = 0x80000000;
+
+    public static final int GWL_WNDPROC = -4;
+    public static final int GWL_HINSTANCE = -6;
+    public static final int GWL_HWNDPARENT = -8;
+    public static final int GWL_ID = -12;
+    public static final int GWL_STYLE = -16;
+    public static final int GWL_EXSTYLE = -20;
+    public static final int GWL_USERDATA = -21;
 
     public static final int PM_NOREMOVE = 0x0000;
     public static final int PM_REMOVE = 0x0001;
@@ -69,27 +81,50 @@ public abstract class Win32 {
     public static final int SW_SHOWDEFAULT = 10;
     public static final int SW_FORCEMINIMIZE = 11;
 
-    public static final int WM_SIZE        = 0x0005;
-    public static final int WM_CLOSE       = 0x0010;
-    public static final int WM_KEYDOWN     = 0x0100;
-    public static final int WM_KEYUP       = 0x0101;
-    public static final int WM_SYSKEYDOWN  = 0x0104;
-    public static final int WM_SYSKEYUP    = 0x0105;
-    public static final int WM_SYSCOMMAND  = 0x0112;
-    public static final int WM_MOUSEMOVE   = 0x0200;
-    public static final int WM_LBUTTONDOWN = 0x0201;
-    public static final int WM_LBUTTONUP   = 0x0202;
-    public static final int WM_RBUTTONDOWN = 0x0204;
-    public static final int WM_RBUTTONUP   = 0x0205;
-    public static final int WM_MBUTTONDOWN = 0x0207;
-    public static final int WM_MBUTTONUP   = 0x0208;
-    public static final int WM_MOUSEWHEEL  = 0x020a;
-    public static final int WM_XBUTTONDOWN = 0x020b;
-    public static final int WM_XBUTTONUP   = 0x020c;
-    public static final int WM_HMOUSEWHEEL = 0x020e;
-    public static final int WM_USER        = 0x0400;
+    public static final int SWP_NOSIZE         = 0x0001;
+    public static final int SWP_NOMOVE         = 0x0002;
+    public static final int SWP_NOZORDER       = 0x0004;
+    public static final int SWP_NOREDRAW       = 0x0008;
+    public static final int SWP_NOACTIVATE     = 0x0010;
+    public static final int SWP_DRAWFRAME      = 0x0020;
+    public static final int SWP_FRAMECHANGED   = 0x0020;
+    public static final int SWP_SHOWWINDOW     = 0x0040;
+    public static final int SWP_HIDEWINDOW     = 0x0080;
+    public static final int SWP_NOCOPYBITS     = 0x0100;
+    public static final int SWP_NOREPOSITION   = 0x0200;
+    public static final int SWP_NOSENDCHANGING = 0x0400;
+    public static final int SWP_DEFERERASE     = 0x2000;
+    public static final int SWP_ASYNCWINDOWPOS = 0x4000;
+
+    public static final int WM_SIZE          = 0x0005;
+    public static final int WM_CLOSE         = 0x0010;
+    public static final int WM_SHOWWINDOW    = 0x0018;
+    public static final int WM_GETMINMAXINFO = 0x0024;
+    public static final int WM_KEYDOWN       = 0x0100;
+    public static final int WM_KEYUP         = 0x0101;
+    public static final int WM_SYSKEYDOWN    = 0x0104;
+    public static final int WM_SYSKEYUP      = 0x0105;
+    public static final int WM_SYSCOMMAND    = 0x0112;
+    public static final int WM_MOUSEMOVE     = 0x0200;
+    public static final int WM_LBUTTONDOWN   = 0x0201;
+    public static final int WM_LBUTTONUP     = 0x0202;
+    public static final int WM_RBUTTONDOWN   = 0x0204;
+    public static final int WM_RBUTTONUP     = 0x0205;
+    public static final int WM_MBUTTONDOWN   = 0x0207;
+    public static final int WM_MBUTTONUP     = 0x0208;
+    public static final int WM_MOUSEWHEEL    = 0x020a;
+    public static final int WM_XBUTTONDOWN   = 0x020b;
+    public static final int WM_XBUTTONUP     = 0x020c;
+    public static final int WM_HMOUSEWHEEL   = 0x020e;
+    public static final int WM_USER          = 0x0400;
 
     public static final int SC_KEYMENU = 0xf100;
+
+    public static final int SIZE_RESTORED = 0;
+    public static final int SIZE_MINIMIZED = 1;
+    public static final int SIZE_MAXIMIZED = 2;
+    public static final int SIZE_MAXSHOW = 3;
+    public static final int SIZE_MAXHIDE = 4;
 
     public static final int MK_LBUTTON  = 0x0001;
     public static final int MK_RBUTTON  = 0x0002;
@@ -103,6 +138,10 @@ public abstract class Win32 {
     public static final int PFD_DRAW_TO_WINDOW = 0x00000004;
     public static final int PFD_SUPPORT_OPENGL = 0x00000020;
     public static final int PFD_TYPE_RGBA = 0;
+
+    public static final int MONITOR_DEFAULTTONULL = 0;
+    public static final int MONITOR_DEFAULTTOPRIMARY = 1;
+    public static final int MONITOR_DEFAULTTONEAREST = 2;
 
     public static class Handle {
 	public static final Handle nil = new Handle(MemorySegment.NULL);
@@ -145,6 +184,24 @@ public abstract class Win32 {
     }
     public abstract MSG MSG();
 
+    public static abstract class MINMAXINFO extends StructInstance {
+	protected MINMAXINFO(MemorySegment mem) {
+	    super(mem);
+	}
+
+	MemorySegment mem() {return(mem);}
+
+	public abstract Coord ptMaxSize();
+	public abstract MINMAXINFO ptMaxSize(Coord v);
+	public abstract Coord ptMaxPosition();
+	public abstract MINMAXINFO ptMaxPosition(Coord v);
+	public abstract Coord ptMinTrackSize();
+	public abstract MINMAXINFO ptMinTrackSize(Coord v);
+	public abstract Coord ptMaxTrackSize();
+	public abstract MINMAXINFO ptMaxTrackSize(Coord v);
+    }
+    public abstract MINMAXINFO MINMAXINFO(long lparam);
+
     public static class KeyboardState {
 	final MemorySegment keys;
 
@@ -161,6 +218,19 @@ public abstract class Win32 {
 	    return(this);
 	}
     }
+
+    public static abstract class MONITORINFO extends StructInstance {
+	protected MONITORINFO(MemorySegment mem) {
+	    super(mem);
+	}
+
+	MemorySegment mem() {return(mem);}
+
+	public abstract Area rcMonitor();
+	public abstract Area rcWork();
+	public abstract int dwFlags();
+    }
+    public abstract MONITORINFO MONITORINFO();
 
     public static abstract class PIXELFORMATDESCRIPTOR extends StructInstance {
 	protected PIXELFORMATDESCRIPTOR(MemorySegment mem) {
@@ -196,8 +266,15 @@ public abstract class Win32 {
     public abstract void PostThreadMessage(int idThread, int Msg, long wParam, long lParam);
     public abstract long DefWindowProc(Handle hWnd, int Msg, long wParam, long lParam);
     public abstract boolean ShowWindow(Handle hWnd, int nCmdShow);
+    public abstract long GetWindowLongPtr(Handle hWnd, int nIndex);
+    public abstract long SetWindowLongPtr(Handle hWnd, int nIndex, long dwNewLong);
+    public abstract Area GetWindowRect(Handle hWnd);
+    public abstract void SetWindowPos(Handle hWnd, Handle hWndInsertAfter, Coord pos, Coord size, int uFlags);
+    public abstract Area AdjustWindowRectEx(Area rect, int dwStyle, boolean bMenu, int dwExStyle);
     public abstract void SetWindowText(Handle hWnd, String lpString);
     public abstract Coord ScreenToClient(Handle hWnd, Coord point);
+    public abstract Handle MonitorFromWindow(Handle hWnd, int dwFlags);
+    public abstract void GetMonitorInfo(Handle hMonitor, MONITORINFO lpmi);
     public abstract Handle GetDC(Handle hWnd);
     public abstract boolean ReleaseDC(Handle hWnd, Handle hDC);
     public abstract int GetKeyState(int nVirtKey);
@@ -244,6 +321,7 @@ public abstract class Win32 {
 	static final MemoryLayout HINSTANCE = HANDLE;
 	static final MemoryLayout HKL = HANDLE;
 	static final MemoryLayout HMENU = HANDLE;
+	static final MemoryLayout HMONITOR = HANDLE;
 	static final MemoryLayout HWND = HANDLE;
 	static final MemoryLayout ATOM = WORD;
 	static final MemoryLayout WNDPROC = HANDLE;
@@ -324,7 +402,16 @@ public abstract class Win32 {
 	    protected StructLayout $layout() {return(_WndClassExW);}
 
 	    static long handle(WndProc wndproc, MemorySegment hwnd, int umsg, long wparam, long lparam) {
-		return(wndproc.handle(Handle.of(hwnd), umsg, wparam, lparam));
+		try {
+		    return(wndproc.handle(Handle.of(hwnd), umsg, wparam, lparam));
+		} catch(Throwable t) {
+		    Thread.UncaughtExceptionHandler h = Thread.currentThread().getUncaughtExceptionHandler();
+		    if(h == null)
+			new Warning(t, "Uncaught exception in wndproc").issue();
+		    else
+			h.uncaughtException(Thread.currentThread(), t);
+		    return(0);
+		}
 	    }
 	    static final MethodHandle handle = slookup(MethodHandles.lookup(), WndClassExW.class, "handle", Long.TYPE,
 						       WndProc.class, MemorySegment.class, Integer.TYPE, Long.TYPE, Long.TYPE);
@@ -418,6 +505,12 @@ public abstract class Win32 {
 		LONG.withName("x"),
 		LONG.withName("y"),
 	    });
+	static final StructLayout RECT = struct(new MemoryLayout[] {
+		LONG.withName("left"),
+		LONG.withName("top"),
+		LONG.withName("right"),
+		LONG.withName("bottom"),
+	    });
 	static final StructLayout _MSG = struct(new MemoryLayout[] {
 		HWND.withName("hwnd"),
 		UINT.withName("message"),
@@ -440,6 +533,42 @@ public abstract class Win32 {
 
 	public MSG MSG() {
 	    return(new MSG());
+	}
+
+	static final StructLayout _MINMAXINFO = struct(new MemoryLayout[] {
+		POINT.withName("ptReserved"),
+		POINT.withName("ptMaxSize"),
+		POINT.withName("ptMaxPosition"),
+		POINT.withName("ptMinTrackSize"),
+		POINT.withName("ptMaxTrackSize"),
+	    });
+	public static class MINMAXINFO extends Win32.MINMAXINFO {
+	    private MINMAXINFO(MemorySegment mem) {
+		super(mem);
+	    }
+
+	    protected StructLayout $layout() {return(_MINMAXINFO);}
+
+	    private static final VarHandle ptMaxSize_x = _MINMAXINFO.varHandle(PathElement.groupElement("ptMaxSize"), PathElement.groupElement("x"));
+	    private static final VarHandle ptMaxSize_y = _MINMAXINFO.varHandle(PathElement.groupElement("ptMaxSize"), PathElement.groupElement("y"));
+	    public Coord ptMaxSize() {return(Coord.of((int)ptMaxSize_x.get(mem, 0), (int)ptMaxSize_y.get(mem, 0)));}
+	    public MINMAXINFO ptMaxSize(Coord v) {ptMaxSize_x.set(mem, 0, v.x); ptMaxSize_y.set(mem, 0, v.y); return(this);}
+	    private static final VarHandle ptMaxPosition_x = _MINMAXINFO.varHandle(PathElement.groupElement("ptMaxPosition"), PathElement.groupElement("x"));
+	    private static final VarHandle ptMaxPosition_y = _MINMAXINFO.varHandle(PathElement.groupElement("ptMaxPosition"), PathElement.groupElement("y"));
+	    public Coord ptMaxPosition() {return(Coord.of((int)ptMaxPosition_x.get(mem, 0), (int)ptMaxPosition_y.get(mem, 0)));}
+	    public MINMAXINFO ptMaxPosition(Coord v) {ptMaxPosition_x.set(mem, 0, v.x); ptMaxPosition_y.set(mem, 0, v.y); return(this);}
+	    private static final VarHandle ptMinTrackSize_x = _MINMAXINFO.varHandle(PathElement.groupElement("ptMinTrackSize"), PathElement.groupElement("x"));
+	    private static final VarHandle ptMinTrackSize_y = _MINMAXINFO.varHandle(PathElement.groupElement("ptMinTrackSize"), PathElement.groupElement("y"));
+	    public Coord ptMinTrackSize() {return(Coord.of((int)ptMinTrackSize_x.get(mem, 0), (int)ptMinTrackSize_y.get(mem, 0)));}
+	    public MINMAXINFO ptMinTrackSize(Coord v) {ptMinTrackSize_x.set(mem, 0, v.x); ptMinTrackSize_y.set(mem, 0, v.y); return(this);}
+	    private static final VarHandle ptMaxTrackSize_x = _MINMAXINFO.varHandle(PathElement.groupElement("ptMaxTrackSize"), PathElement.groupElement("x"));
+	    private static final VarHandle ptMaxTrackSize_y = _MINMAXINFO.varHandle(PathElement.groupElement("ptMaxTrackSize"), PathElement.groupElement("y"));
+	    public Coord ptMaxTrackSize() {return(Coord.of((int)ptMaxTrackSize_x.get(mem, 0), (int)ptMaxTrackSize_y.get(mem, 0)));}
+	    public MINMAXINFO ptMaxTrackSize(Coord v) {ptMaxTrackSize_x.set(mem, 0, v.x); ptMaxTrackSize_y.set(mem, 0, v.y); return(this);}
+	}
+
+	public MINMAXINFO MINMAXINFO(long lparam) {
+	    return(new MINMAXINFO(MemorySegment.ofAddress(lparam).reinterpret(_MINMAXINFO.byteSize())));
 	}
 
 	private final MethodHandle GetMessageW = ld.downcallHandle(user32.find("GetMessageW").get(), FunctionDescriptor.of(BOOL, ADDRESS, HWND, UINT, UINT));
@@ -517,6 +646,81 @@ public abstract class Win32 {
 	    }
 	}
 
+	private final MethodHandle GetWindowLongPtrW = ld.downcallHandle(user32.find("GetWindowLongPtrW").get(), FunctionDescriptor.of(LONG_PTR, HWND, C_INT));
+	public long GetWindowLongPtr(Handle hWnd, int nIndex) {
+	    try {
+		return((long)GetWindowLongPtrW.invoke(hWnd.bits, nIndex));
+	    } catch(Throwable e) {
+		throw(new RuntimeException(e));
+	    }
+	}
+
+	private final MethodHandle SetWindowLongPtrW = ld.downcallHandle(user32.find("SetWindowLongPtrW").get(), FunctionDescriptor.of(LONG_PTR, HWND, C_INT, LONG_PTR));
+	public long SetWindowLongPtr(Handle hWnd, int nIndex, long dwNewLong) {
+	    try {
+		return((long)SetWindowLongPtrW.invoke(hWnd.bits, nIndex, dwNewLong));
+	    } catch(Throwable e) {
+		throw(new RuntimeException(e));
+	    }
+	}
+
+	private final MethodHandle GetWindowRect = ld.downcallHandle(user32.find("GetWindowRect").get(), FunctionDescriptor.of(BOOL, HWND, ADDRESS));
+	public Area GetWindowRect(Handle hWnd) {
+	    try(Arena st = Arena.ofConfined()) {
+		MemorySegment buf = st.allocate(LONG, 4);
+		int rv;
+		try {
+		    rv = (int)GetWindowRect.invoke(hWnd.bits, buf);
+		} catch(Throwable e) {
+		    throw(new RuntimeException(e));
+		}
+		if(rv == 0)
+		    throw(lasterror());
+		return(Area.corn(Coord.of((int)getint(buf, LONG.byteSize() * 0, LONG, true),
+					  (int)getint(buf, LONG.byteSize() * 1, LONG, true)),
+				 Coord.of((int)getint(buf, LONG.byteSize() * 2, LONG, true),
+					  (int)getint(buf, LONG.byteSize() * 3, LONG, true))));
+	    }
+	}
+
+	private final MethodHandle SetWindowPos = ld.downcallHandle(user32.find("SetWindowPos").get(), FunctionDescriptor.of(BOOL, HWND, HWND, C_INT, C_INT, C_INT, C_INT, UINT));
+	public void SetWindowPos(Handle hWnd, Handle hWndInsertAfter, Coord pos, Coord size, int uFlags) {
+	    if(hWndInsertAfter == null) uFlags |= SWP_NOZORDER;
+	    if(pos == null) {uFlags |= SWP_NOMOVE; pos = Coord.z;}
+	    if(size == null) {uFlags |= SWP_NOSIZE;; size = Coord.z;}
+	    int rv;
+	    try {
+		rv = (int)SetWindowPos.invoke(hWnd.bits, nhandle(hWndInsertAfter), pos.x, pos.y, size.x, size.y, uFlags);
+	    } catch(Throwable e) {
+		throw(new RuntimeException(e));
+	    }
+	    if(rv == 0)
+		throw(lasterror());
+	}
+
+	private final MethodHandle AdjustWindowRectEx = ld.downcallHandle(user32.find("AdjustWindowRectEx").get(), FunctionDescriptor.of(BOOL, ADDRESS, DWORD, BOOL, DWORD));
+	public Area AdjustWindowRectEx(Area rect, int dwStyle, boolean bMenu, int dwExStyle) {
+	    try(Arena st = Arena.ofConfined()) {
+		MemorySegment buf = st.allocate(LONG.byteSize() * 4);
+		setint(buf, LONG.byteSize() * 0, LONG, rect.ul.x);
+		setint(buf, LONG.byteSize() * 1, LONG, rect.ul.y);
+		setint(buf, LONG.byteSize() * 2, LONG, rect.br.x);
+		setint(buf, LONG.byteSize() * 3, LONG, rect.br.y);
+		int rv;
+		try {
+		    rv = (int)AdjustWindowRectEx.invoke(buf, dwStyle, bMenu ? 1 : 0, dwExStyle);
+		} catch(Throwable e) {
+		    throw(new RuntimeException(e));
+		}
+		if(rv == 0)
+		    throw(lasterror());
+		return(Area.corn(Coord.of((int)getint(buf, LONG.byteSize() * 0, LONG, true),
+					  (int)getint(buf, LONG.byteSize() * 1, LONG, true)),
+				 Coord.of((int)getint(buf, LONG.byteSize() * 2, LONG, true),
+					  (int)getint(buf, LONG.byteSize() * 3, LONG, true))));
+	    }
+	}
+
 	private final MethodHandle SetWindowTextW = ld.downcallHandle(user32.find("SetWindowTextW").get(), FunctionDescriptor.of(BOOL, HWND, LPCWSTR));
 	public void SetWindowText(Handle hWnd, String lpString) {
 	    int rv;
@@ -546,6 +750,68 @@ public abstract class Win32 {
 		return(Coord.of((int)getint(buf, LONG.byteSize() * 0, LONG, true),
 				(int)getint(buf, LONG.byteSize() * 1, LONG, true)));
 	    }
+	}
+
+	private final MethodHandle MonitorFromWindow = ld.downcallHandle(user32.find("MonitorFromWindow").get(), FunctionDescriptor.of(HMONITOR, HWND, DWORD));
+	public Handle MonitorFromWindow(Handle hWnd, int dwFlags) {
+	    MemorySegment rv;
+	    try {
+		rv = (MemorySegment)MonitorFromWindow.invoke(hWnd.bits, dwFlags);
+	    } catch(Throwable e) {
+		throw(new RuntimeException(e));
+	    }
+	    return(nullp(rv) ? null : Handle.of(rv));
+	}
+
+	static final StructLayout _MONITORINFO = struct(new MemoryLayout[] {
+		DWORD.withName("cbSize"),
+		RECT.withName("rcMonitor"),
+		RECT.withName("rcWork"),
+		DWORD.withName("dwFlags"),
+	    });
+	public static class MONITORINFO extends Win32.MONITORINFO {
+	    private MONITORINFO(Arena alloc) {
+		super(alloc.allocate(_MONITORINFO.byteSize()));
+		cbSize.set(mem, 0, (int)_MONITORINFO.byteSize());
+	    }
+	    protected MONITORINFO() {
+		this(Arena.ofAuto());
+	    }
+
+	    protected StructLayout $layout() {return(_MONITORINFO);}
+
+	    private static final VarHandle cbSize = _MONITORINFO.varHandle(PathElement.groupElement("cbSize"));
+	    private static final VarHandle rcMonitor_left = _MONITORINFO.varHandle(PathElement.groupElement("rcMonitor"), PathElement.groupElement("left"));
+	    private static final VarHandle rcMonitor_top = _MONITORINFO.varHandle(PathElement.groupElement("rcMonitor"), PathElement.groupElement("top"));
+	    private static final VarHandle rcMonitor_right = _MONITORINFO.varHandle(PathElement.groupElement("rcMonitor"), PathElement.groupElement("right"));
+	    private static final VarHandle rcMonitor_bottom = _MONITORINFO.varHandle(PathElement.groupElement("rcMonitor"), PathElement.groupElement("bottom"));
+	    public Area rcMonitor() {
+		return(Area.corn(Coord.of((int)rcMonitor_left.get(mem, 0), (int)rcMonitor_top.get(mem, 0)),
+				 Coord.of((int)rcMonitor_right.get(mem, 0), (int)rcMonitor_bottom.get(mem, 0))));
+	    }
+	    private static final VarHandle rcWork_left = _MONITORINFO.varHandle(PathElement.groupElement("rcWork"), PathElement.groupElement("left"));
+	    private static final VarHandle rcWork_top = _MONITORINFO.varHandle(PathElement.groupElement("rcWork"), PathElement.groupElement("top"));
+	    private static final VarHandle rcWork_right = _MONITORINFO.varHandle(PathElement.groupElement("rcWork"), PathElement.groupElement("right"));
+	    private static final VarHandle rcWork_bottom = _MONITORINFO.varHandle(PathElement.groupElement("rcWork"), PathElement.groupElement("bottom"));
+	    public Area rcWork() {
+		return(Area.corn(Coord.of((int)rcWork_left.get(mem, 0), (int)rcWork_top.get(mem, 0)),
+				 Coord.of((int)rcWork_right.get(mem, 0), (int)rcWork_bottom.get(mem, 0))));
+	    }
+	    private static final VarHandle dwFlags = _MONITORINFO.varHandle(PathElement.groupElement("dwFlags"));
+	    public int dwFlags() {return((int)dwFlags.get(mem, 0));}
+	}
+	public MONITORINFO MONITORINFO() {return(new MONITORINFO());}
+
+	private final MethodHandle GetMonitorInfoW = ld.downcallHandle(user32.find("GetMonitorInfoW").get(), FunctionDescriptor.of(BOOL, HMONITOR, ADDRESS));
+	public void GetMonitorInfo(Handle hMonitor, Win32.MONITORINFO lpmi) {
+	    int rv;
+	    try {
+		rv = (int)GetMonitorInfoW.invoke(hMonitor.bits, lpmi.mem());
+	    } catch(Throwable e) {
+		throw(new RuntimeException(e));
+	    }
+	    if(rv == 0)
+		throw(lasterror());
 	}
 
 	private final MethodHandle GetDC = ld.downcallHandle(user32.find("GetDC").get(), FunctionDescriptor.of(HDC, HWND));
