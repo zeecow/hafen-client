@@ -79,6 +79,11 @@ public interface Toolkit {
     public static interface MouseUpEvent extends MouseButtonEvent {}
     public static interface MouseMoveEvent extends MouseEvent {}
     public static interface MouseWheelEvent extends MouseEvent {
+	public static enum Axis {
+	    VERT, HORIZ;
+	}
+
+	public Axis axis();
 	public int amount();
 	public double subamount();
     }

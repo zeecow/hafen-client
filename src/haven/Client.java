@@ -121,7 +121,8 @@ public class Client implements Console.Directory {
 			ui.mouseup(mkawt(e), e.wndc(), btn);
 		} else if(ev instanceof Toolkit.MouseWheelEvent) {
 		    Toolkit.MouseWheelEvent e = (Toolkit.MouseWheelEvent)ev;
-		    ui.mousewheel(mkawt(e), e.wndc(), e.amount(), e.subamount());
+		    if(e.axis() == Toolkit.MouseWheelEvent.Axis.VERT)
+			ui.mousewheel(mkawt(e), e.wndc(), e.amount(), e.subamount());
 		} else if(ev instanceof Toolkit.KeyDownEvent) {
 		    ui.keydown(mkawt((Toolkit.KeyEvent)ev));
 		} else if(ev instanceof Toolkit.KeyUpEvent) {

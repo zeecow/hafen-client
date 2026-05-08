@@ -289,6 +289,7 @@ public class JOGLToolkit implements Toolkit {
 	    this.wev = awt;
 	}
 
+	public Axis axis() {return(Axis.VERT);}
 	public int amount() {return(wev.getWheelRotation());}
 	public double subamount() {return(wev.getPreciseWheelRotation());}
     }

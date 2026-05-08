@@ -1105,9 +1105,9 @@ public class GLXContext implements Toolkit.Factory {
 			if((ev.flags() & XInput.XIPointerEmulated) == 0) {
 			    int btn = ev.detail();
 			    if((btn == 4) || (btn == 5)) {
-				callback(new GLXMouseWheelEvent(this, ptr, ev, (btn == 4) ? -1 : 1));
+				callback(new GLXMouseWheelEvent(this, ptr, ev, MouseWheelEvent.Axis.VERT, (btn == 4) ? -1 : 1));
 			    } else if((btn == 6) || (btn == 7)) {
-				/* Horizontal scrolling */
+				callback(new GLXMouseWheelEvent(this, ptr, ev, MouseWheelEvent.Axis.HORIZ, (btn == 6) ? -1 : 1));
 			    } else {
 				callback(new GLXMouseDownEvent(this, ptr, ev));
 			    }
@@ -1127,7 +1127,13 @@ public class GLXContext implements Toolkit.Factory {
 				double delta = nvn - lvn;
 				int idelta = (int)(nvi - lvi);
 				scr.lastval = nv;
-				callback(new GLXMouseWheelEvent(this, ptr, ev, idelta, delta));
+				MouseWheelEvent.Axis axis = null;
+				if(scr.type == XInput.XIScrollTypeVertical)
+				    axis = MouseWheelEvent.Axis.VERT;
+				else if(scr.type == XInput.XIScrollTypeHorizontal)
+				    axis = MouseWheelEvent.Axis.HORIZ;
+				if(axis != null)
+				    callback(new GLXMouseWheelEvent(this, ptr, ev, axis, idelta, delta));
 			    }
 			}
 			if((ev.flags() & XInput.XIPointerEmulated) == 0)
@@ -1373,18 +1379,21 @@ public class GLXContext implements Toolkit.Factory {
 	GLXMouseMoveEvent(GLXToolkit.GLXWindow wnd, GLXToolkit.XIPointerInfo ptr, XIDeviceEvent ev) {super(wnd, ptr, ev);}
     }
     public static class GLXMouseWheelEvent extends GLXMouseEvent implements Toolkit.MouseWheelEvent {
+	public final Axis axis;
 	public final int amount;
 	public final double sub;
 
-	GLXMouseWheelEvent(GLXToolkit.GLXWindow wnd, GLXToolkit.XIPointerInfo ptr, XIDeviceEvent ev, int amount, double sub) {
+	GLXMouseWheelEvent(GLXToolkit.GLXWindow wnd, GLXToolkit.XIPointerInfo ptr, XIDeviceEvent ev, Axis axis, int amount, double sub) {
 	    super(wnd, ptr, ev);
+	    this.axis = axis;
 	    this.amount = amount;
 	    this.sub = sub;
 	}
-	GLXMouseWheelEvent(GLXToolkit.GLXWindow wnd, GLXToolkit.XIPointerInfo ptr, XIDeviceEvent ev, int amount) {
-	    this(wnd, ptr, ev, amount, amount);
+	GLXMouseWheelEvent(GLXToolkit.GLXWindow wnd, GLXToolkit.XIPointerInfo ptr, XIDeviceEvent ev, Axis axis, int amount) {
+	    this(wnd, ptr, ev, axis, amount, amount);
 	}
 
+	public Axis axis() {return(axis);}
 	public int amount() {return(amount);}
 	public double subamount() {return(sub);}
     }

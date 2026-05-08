@@ -309,7 +309,7 @@ public class WGLContext implements Toolkit.Factory {
 	    private boolean showing = false;
 	    private State curstate = State.NORMAL;
 	    private WGLEnvironment renv;
-	    private int wheelacc = 0;
+	    private int vwheelacc = 0, hwheelacc = 0;
 	    private Coord fixsize = null, minsize = null, maxsize = null;
 	    private String wndstyle = "normal";
 	    private Area preexcl = null;
@@ -436,10 +436,18 @@ public class WGLContext implements Toolkit.Factory {
 		}
 		case Win32.WM_MOUSEWHEEL: {
 		    int raw = (short)((wparam & 0xffff0000) >> 16);
-		    wheelacc += raw;
-		    int amount = wheelacc / 120;
-		    wheelacc -= amount * 120;
-		    callback(new W32MouseWheelEvent(amount, raw / 120.0, wparam, lparam));
+		    vwheelacc += raw;
+		    int amount = vwheelacc / 120;
+		    vwheelacc -= amount * 120;
+		    callback(new W32MouseWheelEvent(MouseWheelEvent.Axis.VERT, amount, raw / 120.0, wparam, lparam));
+		    return(0);
+		}
+		case Win32.WM_HMOUSEWHEEL: {
+		    int raw = (short)((wparam & 0xffff0000) >> 16);
+		    hwheelacc += raw;
+		    int amount = hwheelacc / 120;
+		    hwheelacc -= amount * 120;
+		    callback(new W32MouseWheelEvent(MouseWheelEvent.Axis.HORIZ, amount, raw / 120.0, wparam, lparam));
 		    return(0);
 		}
 		default:
@@ -671,15 +679,18 @@ public class WGLContext implements Toolkit.Factory {
 	    }
 
 	    public class W32MouseWheelEvent extends W32MouseEvent implements MouseWheelEvent {
+		public final Axis axis;
 		public final int amount;
 		public final double sub;
 
-		public W32MouseWheelEvent(int amount, double sub, long wparam, long lparam) {
+		public W32MouseWheelEvent(Axis axis, int amount, double sub, long wparam, long lparam) {
 		    super(wparam, lparam, true);
+		    this.axis = axis;
 		    this.amount = amount;
 		    this.sub = sub;
 		}
 
+		public Axis axis() {return(axis);}
 		public int amount() {return(amount);}
 		public double subamount() {return(sub);}
 	    }
