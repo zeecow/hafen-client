@@ -294,8 +294,9 @@ public class MeshAnim extends State {
 	}
 
 	public boolean tick(float dt) {
-		if (freeze)
-			return false;
+        if ( freeze ) {
+            return false;
+        }
 	    boolean rv = false;
 	    ftm += dt;
 	    while(true) {
@@ -340,8 +341,9 @@ public class MeshAnim extends State {
 	}
 
 	public boolean tick(float dt) {
-		if (freeze)
-			return false;
+        if ( freeze ) {
+            return false;
+        }
 	    fp += dt;
 	    if(fp >= fl) {
 		fp -= fl;
@@ -475,10 +477,11 @@ public class MeshAnim extends State {
 		}
 		a = new MeshAnim(frames.toArray(new Frame[0]), len);
 
-		if (ZeeConfig.stopSomeAnimations && ZeeConfig.stopResAnimation(res))
-			a.freeze = true;
-		else
-			a.freeze = false;
+		if (ZeeConfig.stopSomeAnimations && ZeeConfig.stopAnimByRes(res,"MeshAnim")) {
+            a.freeze = true;
+        }else {
+            a.freeze = false;
+        }
 
 	    } else {
 		throw(new Resource.UnknownFormatException(res, "meshanim format version", ver));

@@ -4372,13 +4372,15 @@ public class ZeeConfig {
             ((Window.DefaultDeco)w.deco).bgImgSimpleWindow = null;
     }
 
-    static boolean stopResAnimation(Resource res) {
-        final String blocklist = "/chimingbluebell,/saptap,/brazierflame,/stockpile-trash,/beehive,/cigar,/dreca,/boostspeed,/visflag,/villageidol,/pow";
+    static boolean stopAnimByRes(Resource res, String source) {
+        // TODO freeze hearthfire "/pow" anims without disapearance
+        final String blocklist = "/chimingbluebell,/saptap,/brazierflame,/stockpile-trash,"
+                +"/beehive,/cigar,/dreca,/boostspeed,/visflag,/villageidol,/mineout";
         if (res!=null && blocklist.contains(res.basename())) {
-            //ZeeConfig.println("hide " + res.name);
+            //ZeeConfig.println("hide "+ source + " " + res.name);
             return true;
         }
-        //ZeeConfig.println("show " + (res!=null?res.name:"null"));
+        //ZeeConfig.println("show " + source + " " + (res!=null?res.name:"null"));
         return false;
     }
 
