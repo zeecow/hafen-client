@@ -1124,11 +1124,10 @@ public class GLXContext implements Toolkit.Factory {
 			    if(scr != null) {
 				double nv = vals.get(v), nvn = nv / scr.inc, lvn = scr.lastval / scr.inc;
 				long nvi = (long)Math.floor(nvn), lvi = (long)Math.floor(lvn);
-				double delta = nvi - lvi;
+				double delta = nvn - lvn;
 				int idelta = (int)(nvi - lvi);
 				scr.lastval = nv;
-				if(idelta != 0)
-				    callback(new GLXMouseWheelEvent(this, ptr, ev, idelta));
+				callback(new GLXMouseWheelEvent(this, ptr, ev, idelta, delta));
 			    }
 			}
 			if((ev.flags() & XInput.XIPointerEmulated) == 0)
@@ -1375,13 +1374,19 @@ public class GLXContext implements Toolkit.Factory {
     }
     public static class GLXMouseWheelEvent extends GLXMouseEvent implements Toolkit.MouseWheelEvent {
 	public final int amount;
+	public final double sub;
 
-	GLXMouseWheelEvent(GLXToolkit.GLXWindow wnd, GLXToolkit.XIPointerInfo ptr, XIDeviceEvent ev, int amount) {
+	GLXMouseWheelEvent(GLXToolkit.GLXWindow wnd, GLXToolkit.XIPointerInfo ptr, XIDeviceEvent ev, int amount, double sub) {
 	    super(wnd, ptr, ev);
 	    this.amount = amount;
+	    this.sub = sub;
+	}
+	GLXMouseWheelEvent(GLXToolkit.GLXWindow wnd, GLXToolkit.XIPointerInfo ptr, XIDeviceEvent ev, int amount) {
+	    this(wnd, ptr, ev, amount, amount);
 	}
 
 	public int amount() {return(amount);}
+	public double subamount() {return(sub);}
     }
 
     public static class XKey implements Key {

@@ -438,10 +438,8 @@ public class WGLContext implements Toolkit.Factory {
 		    int raw = (short)((wparam & 0xffff0000) >> 16);
 		    wheelacc += raw;
 		    int amount = wheelacc / 120;
-		    if(amount != 0) {
-			wheelacc -= amount * 120;
-			callback(new W32MouseWheelEvent(amount, wparam, lparam));
-		    }
+		    wheelacc -= amount * 120;
+		    callback(new W32MouseWheelEvent(amount, raw / 120.0, wparam, lparam));
 		    return(0);
 		}
 		default:
@@ -674,13 +672,16 @@ public class WGLContext implements Toolkit.Factory {
 
 	    public class W32MouseWheelEvent extends W32MouseEvent implements MouseWheelEvent {
 		public final int amount;
+		public final double sub;
 
-		public W32MouseWheelEvent(int amount, long wparam, long lparam) {
+		public W32MouseWheelEvent(int amount, double sub, long wparam, long lparam) {
 		    super(wparam, lparam, true);
 		    this.amount = amount;
+		    this.sub = sub;
 		}
 
 		public int amount() {return(amount);}
+		public double subamount() {return(sub);}
 	    }
 	}
 

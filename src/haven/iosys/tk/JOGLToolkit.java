@@ -290,6 +290,7 @@ public class JOGLToolkit implements Toolkit {
 	}
 
 	public int amount() {return(wev.getWheelRotation());}
+	public double subamount() {return(wev.getPreciseWheelRotation());}
     }
 
     public static final java.awt.Cursor emptycurs = java.awt.Toolkit.getDefaultToolkit().createCustomCursor(TexI.mkbuf(new Coord(1, 1)), new java.awt.Point(), "");

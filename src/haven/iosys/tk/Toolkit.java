@@ -80,6 +80,7 @@ public interface Toolkit {
     public static interface MouseMoveEvent extends MouseEvent {}
     public static interface MouseWheelEvent extends MouseEvent {
 	public int amount();
+	public double subamount();
     }
 
     public static interface EventListener {
