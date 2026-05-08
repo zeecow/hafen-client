@@ -141,6 +141,7 @@ public class GLXContext implements Toolkit.Factory {
 	public final Atomic _NET_WM_NAME = new Atomic("_NET_WM_NAME");
 	public final Atomic _NET_WM_ICON = new Atomic("_NET_WM_ICON");
 	public final Atomic _NET_WM_STATE = new Atomic("_NET_WM_STATE");
+	public final Atomic _NET_WM_STATE_HIDDEN = new Atomic("_NET_WM_STATE_HIDDEN");
 	public final Atomic _NET_WM_STATE_MAXIMIZED_VERT = new Atomic("_NET_WM_STATE_MAXIMIZED_VERT");
 	public final Atomic _NET_WM_STATE_MAXIMIZED_HORZ = new Atomic("_NET_WM_STATE_MAXIMIZED_HORZ");
 	public final Atomic _NET_WM_STATE_FULLSCREEN = new Atomic("_NET_WM_STATE_FULLSCREEN");
@@ -293,7 +294,7 @@ public class GLXContext implements Toolkit.Factory {
 			WM_NAME, WM_PROTOCOLS, WM_DELETE_WINDOW,
 			_NET_WM_NAME, _NET_WM_ICON, _NET_WM_PID, _NET_WM_PING,
 			_NET_WM_STATE, _NET_WM_STATE_MAXIMIZED_VERT, _NET_WM_STATE_MAXIMIZED_HORZ,
-			_NET_WM_STATE_FULLSCREEN
+			_NET_WM_STATE_HIDDEN, _NET_WM_STATE_FULLSCREEN
 			);
 
 		/* Keyboard input */
@@ -877,6 +878,7 @@ public class GLXContext implements Toolkit.Factory {
 	    public GLXWindow state(State st) {
 		xrun(() -> {
 		    switch(st) {
+		    case MINIMIZED:  xlib.XIconifyWindow(dpy, id, nscreen); break;
 		    case NORMAL:     wmstate(new Atom[] {}); break;
 		    case MAXIMIZED:  wmstate(new Atom[] {_NET_WM_STATE_MAXIMIZED_VERT.id, _NET_WM_STATE_MAXIMIZED_HORZ.id}); break;
 		    case EXCLUSIVE:  wmstate(new Atom[] {_NET_WM_STATE_FULLSCREEN.id}); break;
@@ -890,6 +892,8 @@ public class GLXContext implements Toolkit.Factory {
 	    }
 
 	    public State state() {
+		if(curstate.contains(_NET_WM_STATE_HIDDEN.id))
+		    return(State.MINIMIZED);
 		if(curstate.contains(_NET_WM_STATE_FULLSCREEN.id))
 		    return(State.EXCLUSIVE);
 		else if(curstate.contains(_NET_WM_STATE_MAXIMIZED_VERT.id) && curstate.contains(_NET_WM_STATE_MAXIMIZED_HORZ.id))

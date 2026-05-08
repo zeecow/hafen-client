@@ -706,6 +706,7 @@ public abstract class XLib {
     public abstract int XChangeProperty(XLib.Display dpy, XID w, Atom property, Atom type, int mode, short[] data);
     public abstract int XChangeProperty(XLib.Display dpy, XID w, Atom property, Atom type, int mode, long[] data);
     public abstract int XStoreName(XLib.Display dpy, XID w, String window_name);
+    public abstract int XIconifyWindow(XLib.Display dpy, XID w, int screen_number);
     public abstract int XNextEvent(XLib.Display dpy, XEvent event_return);
     public abstract int XPending(XLib.Display dpy);
     public abstract int XSendEvent(XLib.Display dpy, XID w, boolean propagate, long event_mask, XLib.XEvent event_send);
@@ -1977,6 +1978,20 @@ public abstract class XLib {
 		} finally {
 		    checkerror();
 		}
+	    }
+	}
+
+	private final MethodHandle XIconifyWindow = ld.downcallHandle(xlib.find("XIconifyWindow").get(), FunctionDescriptor.of(C_Status, ADDRESS, C_XID, C_INT));
+	public int XIconifyWindow(XLib.Display dpy, XID w, int screen_number) {
+	    try {
+		if(C_XID instanceof ValueLayout.OfLong)
+		    return((int)XIconifyWindow.invoke(dpy.mem(), (long)w.bits, screen_number));
+		else
+		    return((int)XIconifyWindow.invoke(dpy.mem(), (int)w.bits, screen_number));
+	    } catch(Throwable e) {
+		throw(new RuntimeException(e));
+	    } finally {
+		checkerror();
 	    }
 	}
 
