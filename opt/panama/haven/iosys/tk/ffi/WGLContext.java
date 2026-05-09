@@ -141,11 +141,49 @@ public class WGLContext implements Toolkit.Factory {
 	}
 
 	public Cursor.Caps cursorcaps() {
-	    return(null);
+	    return(new Cursor.Caps(256, Math.min(win.GetSystemMetrics(Win32.SM_CXCURSOR), win.GetSystemMetrics(Win32.SM_CYCURSOR))));
 	}
 
+	public class HCursor implements Cursor {
+	    public final Handle id;
+	    private final Runnable clean;
+
+	    public HCursor(Handle id, boolean shared) {
+		this.id = id;
+		Win32 win = WGLContext.this.win;
+		if(shared)
+		    clean = null;
+		else
+		    clean = Finalizer.finalize(this, () -> win.DestroyIcon(id));
+	    }
+
+	    public void dispose() {
+		clean.run();
+	    }
+	}
+	public final HCursor defcurs = new HCursor(win.LoadCursor(null, Win32.IDC_ARROW), true);
+	public final HCursor nocursor = new HCursor(Handle.nil, true);
+	public final Map<Cursor.Std, HCursor> stdcursors = Utils.<Cursor.Std, HCursor>map()
+	    .put(Cursor.Std.DEFAULT,   defcurs)
+	    .put(Cursor.Std.NONE,      nocursor)
+	    .put(Cursor.Std.POINTER,   new HCursor(win.LoadCursor(null, Win32.IDC_ARROW), true))
+	    .put(Cursor.Std.WAIT,      new HCursor(win.LoadCursor(null, Win32.IDC_WAIT), true))
+	    .put(Cursor.Std.HAND,      new HCursor(win.LoadCursor(null, Win32.IDC_HAND), true))
+	    .put(Cursor.Std.MOVE,      new HCursor(win.LoadCursor(null, Win32.IDC_SIZEALL), true))
+	    .put(Cursor.Std.CARET,     new HCursor(win.LoadCursor(null, Win32.IDC_IBEAM), true))
+	    .put(Cursor.Std.CROSSHAIR, new HCursor(win.LoadCursor(null, Win32.IDC_CROSS), true))
+	    .put(Cursor.Std.SIZE_N,    new HCursor(win.LoadCursor(null, Win32.IDC_SIZENS), true))
+	    .put(Cursor.Std.SIZE_NE,   new HCursor(win.LoadCursor(null, Win32.IDC_SIZENESW), true))
+	    .put(Cursor.Std.SIZE_E,    new HCursor(win.LoadCursor(null, Win32.IDC_SIZEWE), true))
+	    .put(Cursor.Std.SIZE_SE,   new HCursor(win.LoadCursor(null, Win32.IDC_SIZENWSE), true))
+	    .put(Cursor.Std.SIZE_S,    new HCursor(win.LoadCursor(null, Win32.IDC_SIZENS), true))
+	    .put(Cursor.Std.SIZE_SW,   new HCursor(win.LoadCursor(null, Win32.IDC_SIZENESW), true))
+	    .put(Cursor.Std.SIZE_W,    new HCursor(win.LoadCursor(null, Win32.IDC_SIZEWE), true))
+	    .put(Cursor.Std.SIZE_NW,   new HCursor(win.LoadCursor(null, Win32.IDC_SIZENWSE), true))
+	    .map();
+
 	public Cursor makecursor(BufferedImage image, Coord hotspot) {
-	    return(null);
+	    return(new HCursor(makeicon(image, hotspot), false));
 	}
 
 	private long wndproc(Handle hwnd, int umsg, long wparam, long lparam) {
@@ -314,7 +352,7 @@ public class WGLContext implements Toolkit.Factory {
 	    private Coord fixsize = null, minsize = null, maxsize = null;
 	    private String wndstyle = "normal";
 	    private Area preexcl = null;
-	    private Handle icon = null;
+	    private Handle icon = null, cursor = null;
 
 	    private WGLWindow() {
 		hwnd = msgrun(() -> win.CreateWindowEx(0, wclassname, null, STYLE_NORMAL,
@@ -381,6 +419,12 @@ public class WGLContext implements Toolkit.Factory {
 		case Win32.WM_GETMINMAXINFO:
 		    minmaxinfo(wparam, lparam);
 		    return(0);
+		case Win32.WM_SETCURSOR:
+		    if(((lparam & 0x0000ffff) == Win32.HTCLIENT) && (cursor != null)) {
+			win.SetCursor(cursor);
+			return(0);
+		    }
+		    return(win.DefWindowProc(hwnd, umsg, wparam, lparam));
 
 		case Win32.WM_KEYDOWN:
 		    callback(new W32KeyDownEvent(wparam, lparam));
@@ -545,6 +589,16 @@ public class WGLContext implements Toolkit.Factory {
 	    }
 
 	    public WGLWindow cursor(Cursor cursor) {
+		HCursor hc;
+		if(cursor instanceof Cursor.Std) {
+		    hc = stdcursors.getOrDefault(cursor, defcurs);
+		} else {
+		    hc = (HCursor)cursor;
+		}
+		msgrun(() -> {
+		    win.SetCursor(hc.id);
+		    this.cursor = hc.id;
+		});
 		return(this);
 	    }
 

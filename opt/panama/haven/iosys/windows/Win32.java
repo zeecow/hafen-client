@@ -99,6 +99,7 @@ public abstract class Win32 {
     public static final int WM_SIZE          = 0x0005;
     public static final int WM_CLOSE         = 0x0010;
     public static final int WM_SHOWWINDOW    = 0x0018;
+    public static final int WM_SETCURSOR     = 0x0020;
     public static final int WM_GETMINMAXINFO = 0x0024;
     public static final int WM_SETICON       = 0x0080;
     public static final int WM_KEYDOWN       = 0x0100;
@@ -122,6 +123,24 @@ public abstract class Win32 {
     public static final int SC_KEYMENU = 0xf100;
     public static final int ICON_SMALL = 0;
     public static final int ICON_BIG = 1;
+    public static final int HTCLIENT = 1;
+
+    public static final int IDC_ARROW = 32512;
+    public static final int IDC_IBEAM = 32513;
+    public static final int IDC_WAIT = 32514;
+    public static final int IDC_CROSS = 32515;
+    public static final int IDC_UPARROW = 32516;
+    public static final int IDC_SIZENWSE = 32642;
+    public static final int IDC_SIZENESW = 32643;
+    public static final int IDC_SIZEWE = 32644;
+    public static final int IDC_SIZENS = 32645;
+    public static final int IDC_SIZEALL = 32646;
+    public static final int IDC_NO = 32648;
+    public static final int IDC_HAND = 32649;
+    public static final int IDC_APPSTARTING = 32650;
+    public static final int IDC_HELP = 32651;
+    public static final int IDC_PIN = 32671;
+    public static final int IDC_PERSON = 32672;
 
     public static final int SIZE_RESTORED = 0;
     public static final int SIZE_MINIMIZED = 1;
@@ -336,6 +355,8 @@ public abstract class Win32 {
     public abstract Handle CreateDIBSection(Handle hDC, BITMAPV5HEADER pbmi, int usage, ByteBuffer[] ppvBits, Handle hSection, int offset);
     public abstract Handle CreateBitmap(int nWidth, int nHeight, int nPlanes, int nBitCount, ByteBuffer lpBits);
     public abstract Handle CreateIconIndirect(ICONINFO piconinfo);
+    public abstract Handle SetCursor(Handle hCursor);
+    public abstract Handle LoadCursor(Handle hInstance, int cursor);
     public abstract void DestroyIcon(Handle ho);
     public abstract void DeleteObject(Handle ho);
     public abstract int ChoosePixelFormat(Handle hDC, PIXELFORMATDESCRIPTOR ppfd);
@@ -1126,6 +1147,30 @@ public abstract class Win32 {
 	    MemorySegment rv;
 	    try {
 		rv = (MemorySegment)CreateIconIndirect.invoke(piconinfo.mem());
+	    } catch(Throwable e) {
+		throw(new RuntimeException(e));
+	    }
+	    if(nullp(rv))
+		throw(lasterror());
+	    return(Handle.of(rv));
+	}
+
+	private final MethodHandle SetCursor = ld.downcallHandle(user32.find("SetCursor").get(), FunctionDescriptor.of(HCURSOR, HCURSOR));
+	public Handle SetCursor(Handle hCursor) {
+	    MemorySegment rv;
+	    try {
+		rv = (MemorySegment)SetCursor.invoke(nhandle(hCursor));
+	    } catch(Throwable e) {
+		throw(new RuntimeException(e));
+	    }
+	    return(nullp(rv) ? null : Handle.of(rv));
+	}
+
+	private final MethodHandle LoadCursorW = ld.downcallHandle(user32.find("LoadCursorW").get(), FunctionDescriptor.of(HCURSOR, HINSTANCE, ADDRESS));
+	public Handle LoadCursor(Handle hInstance, int cursor) {
+	    MemorySegment rv;
+	    try {
+		rv = (MemorySegment)LoadCursorW.invoke(nhandle(hInstance), MemorySegment.ofAddress(cursor & 0xffff));
 	    } catch(Throwable e) {
 		throw(new RuntimeException(e));
 	    }
