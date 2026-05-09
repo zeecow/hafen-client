@@ -28,6 +28,8 @@ package haven.iosys.tk.ffi;
 
 import java.util.*;
 import java.util.function.*;
+import java.awt.image.*;
+import java.nio.*;
 import haven.*;
 import haven.ffi.*;
 import haven.render.*;
@@ -35,9 +37,8 @@ import haven.render.gl.*;
 import haven.iosys.tk.*;
 import haven.iosys.windows.*;
 import haven.iosys.gl.*;
-import java.awt.image.BufferedImage;
-import haven.iosys.tk.Button;
 import haven.iosys.windows.Win32.*;
+import haven.iosys.tk.Button;
 import static haven.iosys.tk.Key.Std.*;
 
 @Toolkit.Available(name = "wgl")
@@ -313,6 +314,7 @@ public class WGLContext implements Toolkit.Factory {
 	    private Coord fixsize = null, minsize = null, maxsize = null;
 	    private String wndstyle = "normal";
 	    private Area preexcl = null;
+	    private Handle icon = null;
 
 	    private WGLWindow() {
 		hwnd = msgrun(() -> win.CreateWindowEx(0, wclassname, null, STYLE_NORMAL,
@@ -533,6 +535,12 @@ public class WGLContext implements Toolkit.Factory {
 	    }
 
 	    public WGLWindow icon(BufferedImage icon) {
+		Handle nicon = makeicon(icon, null);
+		win.SendMessage(hwnd, Win32.WM_SETICON, Win32.ICON_SMALL, nicon);
+		win.SendMessage(hwnd, Win32.WM_SETICON, Win32.ICON_BIG, nicon);
+		if(this.icon != null)
+		    win.DestroyIcon(this.icon);
+		this.icon = nicon;
 		return(this);
 	    }
 
@@ -698,6 +706,46 @@ public class WGLContext implements Toolkit.Factory {
 
 	public Windeye window() {
 	    return(new WGLWindow());
+	}
+
+	private Handle makeicon(BufferedImage img, Coord hotspot) {
+	    img = PUtils.coercergba(img, false);
+	    Handle dc = null, dib = null, mask = null;
+	    try {
+		BITMAPV5HEADER bmp = win.BITMAPV5HEADER();
+		bmp.bV5Width(img.getWidth()).bV5Height(-img.getHeight());
+		bmp.bV5Planes(1).bV5BitCount(32).bV5Compression(Win32.BI_BITFIELDS);
+		bmp.bV5RedMask(0x00ff0000).bV5GreenMask(0x0000ff00).bV5BlueMask(0x000000ff).bV5AlphaMask(0xff000000);
+		dc = win.GetDC(null);
+		ByteBuffer[] bitsp = {null};
+		dib = win.CreateDIBSection(dc, bmp, Win32.DIB_RGB_COLORS, bitsp, null, 0);
+		ByteBuffer bits = bitsp[0];
+		bits.order(ByteOrder.nativeOrder());
+		Raster idat = img.getRaster();
+		for(int y = 0, o = 0; y < img.getHeight(); y++) {
+		    for(int x = 0; x < img.getWidth(); x++, o += 4) {
+			bits.putInt(o, (idat.getSample(x, y, 0) << 16) | (idat.getSample(x, y, 1) <<  8) |
+				       (idat.getSample(x, y, 2) <<  0) | (idat.getSample(x, y, 3) << 24));
+		    }
+		}
+		mask = win.CreateBitmap(img.getWidth(), img.getHeight(), 1, 1, null);
+		ICONINFO info = win.ICONINFO();
+		if(hotspot == null) {
+		    info.fIcon(1);
+		} else {
+		    info.fIcon(0);
+		    info.xHotspot(hotspot.x).yHotspot(hotspot.y);
+		}
+		info.hbmMask(mask).hbmColor(dib);
+		return(win.CreateIconIndirect(info));
+	    } finally {
+		if(mask != null)
+		    win.DeleteObject(mask);
+		if(dib != null)
+		    win.DeleteObject(dib);
+		if(dc != null)
+		    win.ReleaseDC(null, dc);
+	    }
 	}
 
 	public void dispose() {

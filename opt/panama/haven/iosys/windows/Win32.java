@@ -100,6 +100,7 @@ public abstract class Win32 {
     public static final int WM_CLOSE         = 0x0010;
     public static final int WM_SHOWWINDOW    = 0x0018;
     public static final int WM_GETMINMAXINFO = 0x0024;
+    public static final int WM_SETICON       = 0x0080;
     public static final int WM_KEYDOWN       = 0x0100;
     public static final int WM_KEYUP         = 0x0101;
     public static final int WM_SYSKEYDOWN    = 0x0104;
@@ -119,6 +120,8 @@ public abstract class Win32 {
     public static final int WM_USER          = 0x0400;
 
     public static final int SC_KEYMENU = 0xf100;
+    public static final int ICON_SMALL = 0;
+    public static final int ICON_BIG = 1;
 
     public static final int SIZE_RESTORED = 0;
     public static final int SIZE_MINIMIZED = 1;
@@ -142,6 +145,14 @@ public abstract class Win32 {
     public static final int MONITOR_DEFAULTTONULL = 0;
     public static final int MONITOR_DEFAULTTOPRIMARY = 1;
     public static final int MONITOR_DEFAULTTONEAREST = 2;
+
+    public static final int SM_CXCURSOR = 13;
+    public static final int SM_CYCURSOR = 14;
+
+    public static final int BI_BITFIELDS = 3;
+    public static final int DIB_RGB_COLORS = 0;
+    public static final int DIB_PAL_COLORS = 1;
+    public static final int DIB_PAL_INDICES = 2;
 
     public static class Handle {
 	public static final Handle nil = new Handle(MemorySegment.NULL);
@@ -232,6 +243,44 @@ public abstract class Win32 {
     }
     public abstract MONITORINFO MONITORINFO();
 
+    public static abstract class BITMAPV5HEADER extends StructInstance {
+	protected BITMAPV5HEADER(MemorySegment mem) {
+	    super(mem);
+	}
+
+	MemorySegment mem() {return(mem);}
+
+	public abstract int bV5Width();
+	public abstract int bV5Height();
+	public abstract int bV5BitCount();
+
+	public abstract BITMAPV5HEADER bV5Width(int v);
+	public abstract BITMAPV5HEADER bV5Height(int v);
+	public abstract BITMAPV5HEADER bV5Planes(int v);
+	public abstract BITMAPV5HEADER bV5BitCount(int v);
+	public abstract BITMAPV5HEADER bV5Compression(int v);
+	public abstract BITMAPV5HEADER bV5RedMask(int v);
+	public abstract BITMAPV5HEADER bV5GreenMask(int v);
+	public abstract BITMAPV5HEADER bV5BlueMask(int v);
+	public abstract BITMAPV5HEADER bV5AlphaMask(int v);
+    }
+    public abstract BITMAPV5HEADER BITMAPV5HEADER();
+
+    public static abstract class ICONINFO extends StructInstance {
+	protected ICONINFO(MemorySegment mem) {
+	    super(mem);
+	}
+
+	MemorySegment mem() {return(mem);}
+
+	public abstract ICONINFO fIcon(int v);
+	public abstract ICONINFO xHotspot(int v);
+	public abstract ICONINFO yHotspot(int v);
+	public abstract ICONINFO hbmMask(Handle v);
+	public abstract ICONINFO hbmColor(Handle v);
+    }
+    public abstract ICONINFO ICONINFO();
+
     public static abstract class PIXELFORMATDESCRIPTOR extends StructInstance {
 	protected PIXELFORMATDESCRIPTOR(MemorySegment mem) {
 	    super(mem);
@@ -263,6 +312,7 @@ public abstract class Win32 {
     public abstract boolean PeekMessage(Win32.MSG lpMsg, Handle hWnd, int wMsgFilterMin, int wMsgFilterMax, int wRemoveMsg);
     public abstract long DispatchMessage(Win32.MSG lpMsg);
     public abstract void PostMessage(Handle hWnd, int Msg, long wParam, long lParam);
+    public abstract int SendMessage(Handle hWnd, int Msg, long wParam, long lParam);
     public abstract void PostThreadMessage(int idThread, int Msg, long wParam, long lParam);
     public abstract long DefWindowProc(Handle hWnd, int Msg, long wParam, long lParam);
     public abstract boolean ShowWindow(Handle hWnd, int nCmdShow);
@@ -277,15 +327,23 @@ public abstract class Win32 {
     public abstract void GetMonitorInfo(Handle hMonitor, MONITORINFO lpmi);
     public abstract Handle GetDC(Handle hWnd);
     public abstract boolean ReleaseDC(Handle hWnd, Handle hDC);
+    public abstract int GetSystemMetrics(int nIndex);
     public abstract int GetKeyState(int nVirtKey);
     public abstract void GetKeyboardState(KeyboardState buf);
     public abstract Handle GetKeyboardLayout(int idThread);
     public abstract char[] ToUnicodeEx(int wVirtKey, int wScanCode, KeyboardState lpKeyState, int wFlags, Handle dwhkl);
     public abstract String GetKeyNameText(long lParam);
+    public abstract Handle CreateDIBSection(Handle hDC, BITMAPV5HEADER pbmi, int usage, ByteBuffer[] ppvBits, Handle hSection, int offset);
+    public abstract Handle CreateBitmap(int nWidth, int nHeight, int nPlanes, int nBitCount, ByteBuffer lpBits);
+    public abstract Handle CreateIconIndirect(ICONINFO piconinfo);
+    public abstract void DestroyIcon(Handle ho);
+    public abstract void DeleteObject(Handle ho);
     public abstract int ChoosePixelFormat(Handle hDC, PIXELFORMATDESCRIPTOR ppfd);
     public abstract void SetPixelFormat(Handle hDC, int format, Win32.PIXELFORMATDESCRIPTOR ppfd);
     public abstract int DescribePixelFormat(Handle hDC, int iPixelFormat, Win32.PIXELFORMATDESCRIPTOR ppfd);
     public abstract void SwapBuffers(Handle hDC);
+
+    public int SendMessage(Handle hWnd, int Msg, long wParam, Handle lParam) {return(SendMessage(hWnd, Msg, wParam, nhandle(lParam).address()));}
 
     public RuntimeException lasterror() {
 	return(new StdError(GetLastError()));
@@ -314,9 +372,11 @@ public abstract class Win32 {
 	static final MemoryLayout ULONG_PTR = PTRINT_T;
 	static final MemoryLayout UINT_PTR = PTRINT_T;
 	static final MemoryLayout HANDLE = PVOID;
+	static final MemoryLayout HBITMAP = HANDLE;
 	static final MemoryLayout HBRUSH = HANDLE;
 	static final MemoryLayout HCURSOR = HANDLE;
 	static final MemoryLayout HDC = HANDLE;
+	static final MemoryLayout HGDIOBJ = HANDLE;
 	static final MemoryLayout HICON = HANDLE;
 	static final MemoryLayout HINSTANCE = HANDLE;
 	static final MemoryLayout HKL = HANDLE;
@@ -616,6 +676,15 @@ public abstract class Win32 {
 		throw(lasterror());
 	}
 
+	private final MethodHandle SendMessageW = ld.downcallHandle(user32.find("SendMessageW").get(), FunctionDescriptor.of(BOOL, HWND, UINT, WPARAM, LPARAM));
+	public int SendMessage(Handle hWnd, int Msg, long wParam, long lParam) {
+	    try {
+		return((int)SendMessageW.invoke(nhandle(hWnd), Msg, wParam, lParam));
+	    } catch(Throwable e) {
+		throw(new RuntimeException(e));
+	    }
+	}
+
 	private final MethodHandle PostThreadMessageW = ld.downcallHandle(user32.find("PostThreadMessageW").get(), FunctionDescriptor.of(BOOL, DWORD, UINT, WPARAM, LPARAM));
 	public void PostThreadMessage(int idThread, int Msg, long wParam, long lParam) {
 	    int rv;
@@ -818,7 +887,7 @@ public abstract class Win32 {
 	public Handle GetDC(Handle hWnd) {
 	    MemorySegment rv;
 	    try {
-		rv = (MemorySegment)GetDC.invoke(hWnd.bits);
+		rv = (MemorySegment)GetDC.invoke(nhandle(hWnd));
 	    } catch(Throwable e) {
 		throw(new RuntimeException(e));
 	    }
@@ -830,7 +899,16 @@ public abstract class Win32 {
 	private final MethodHandle ReleaseDC = ld.downcallHandle(user32.find("ReleaseDC").get(), FunctionDescriptor.of(C_INT, HDC, HWND));
 	public boolean ReleaseDC(Handle hWnd, Handle hDC) {
 	    try {
-		return((int)ReleaseDC.invoke(hWnd.bits, hDC.bits) != 0);
+		return((int)ReleaseDC.invoke(nhandle(hWnd), hDC.bits) != 0);
+	    } catch(Throwable e) {
+		throw(new RuntimeException(e));
+	    }
+	}
+
+	private final MethodHandle GetSystemMetrics = ld.downcallHandle(user32.find("GetSystemMetrics").get(), FunctionDescriptor.of(C_INT, C_INT));
+	public int GetSystemMetrics(int nIndex) {
+	    try {
+		return((int)GetSystemMetrics.invoke(nIndex));
 	    } catch(Throwable e) {
 		throw(new RuntimeException(e));
 	    }
@@ -904,6 +982,180 @@ public abstract class Win32 {
 		    ret[i] = (char)getint(buf, WCHAR.byteSize() * i, WCHAR, false);
 		return(new String(ret));
 	    }
+	}
+
+	static final MemoryLayout FXPT2DOT30 = LONG;
+	static final StructLayout CIEXYZ = struct(new MemoryLayout[] {
+		FXPT2DOT30.withName("ciexyzX"),
+		FXPT2DOT30.withName("ciexyzY"),
+		FXPT2DOT30.withName("ciexyzZ"),
+	    });
+	static final StructLayout CIEXYZTRIPLE = struct(new MemoryLayout[] {
+		CIEXYZ.withName("ciexyzRed"),
+		CIEXYZ.withName("ciexyzGreen"),
+		CIEXYZ.withName("ciexyzBlue"),
+	    });
+	static final StructLayout _BITMAPV5HEADER = struct(new MemoryLayout[] {
+		DWORD.withName("bV5Size"),
+		LONG.withName("bV5Width"),
+		LONG.withName("bV5Height"),
+		WORD.withName("bV5Planes"),
+		WORD.withName("bV5BitCount"),
+		DWORD.withName("bV5Compression"),
+		DWORD.withName("bV5SizeImage"),
+		LONG.withName("bV5XPelsPerMeter"),
+		LONG.withName("bV5YPelsPerMeter"),
+		DWORD.withName("bV5ClrUsed"),
+		DWORD.withName("bV5ClrImportant"),
+		DWORD.withName("bV5RedMask"),
+		DWORD.withName("bV5GreenMask"),
+		DWORD.withName("bV5BlueMask"),
+		DWORD.withName("bV5AlphaMask"),
+		DWORD.withName("bV5CSType"),
+		CIEXYZTRIPLE.withName("bV5Endpoints"),
+		DWORD.withName("bV5GammaRed"),
+		DWORD.withName("bV5GammaGreen"),
+		DWORD.withName("bV5GammaBlue"),
+		DWORD.withName("bV5Intent"),
+		DWORD.withName("bV5ProfileData"),
+		DWORD.withName("bV5ProfileSize"),
+		DWORD.withName("bV5Reserved"),
+	    });
+	public static class BITMAPV5HEADER extends Win32.BITMAPV5HEADER {
+	    private BITMAPV5HEADER(Arena alloc) {
+		super(alloc.allocate(_BITMAPV5HEADER.byteSize()));
+		bV5Size.set(mem, 0, (int)_BITMAPV5HEADER.byteSize());
+	    }
+	    protected BITMAPV5HEADER() {
+		this(Arena.ofAuto());
+	    }
+
+	    protected StructLayout $layout() {return(_BITMAPV5HEADER);}
+
+	    private static final VarHandle bV5Size = _BITMAPV5HEADER.varHandle(PathElement.groupElement("bV5Size"));
+	    private static final VarHandle bV5Width = _BITMAPV5HEADER.varHandle(PathElement.groupElement("bV5Width"));
+	    public BITMAPV5HEADER bV5Width(int v) {bV5Width.set(mem, 0, v); return(this);}
+	    public int bV5Width() {return((int)bV5Width.get(mem, 0));}
+	    private static final VarHandle bV5Height = _BITMAPV5HEADER.varHandle(PathElement.groupElement("bV5Height"));
+	    public BITMAPV5HEADER bV5Height(int v) {bV5Height.set(mem, 0, v); return(this);}
+	    public int bV5Height() {return((int)bV5Height.get(mem, 0));}
+	    private static final VarHandle bV5Planes = _BITMAPV5HEADER.varHandle(PathElement.groupElement("bV5Planes"));
+	    public BITMAPV5HEADER bV5Planes(int v) {bV5Planes.set(mem, 0, (short)v); return(this);}
+	    private static final VarHandle bV5BitCount = _BITMAPV5HEADER.varHandle(PathElement.groupElement("bV5BitCount"));
+	    public BITMAPV5HEADER bV5BitCount(int v) {bV5BitCount.set(mem, 0, (short)v); return(this);}
+	    public int bV5BitCount() {return((short)bV5BitCount.get(mem, 0));}
+	    private static final VarHandle bV5Compression = _BITMAPV5HEADER.varHandle(PathElement.groupElement("bV5Compression"));
+	    public BITMAPV5HEADER bV5Compression(int v) {bV5Compression.set(mem, 0, v); return(this);}
+	    private static final VarHandle bV5RedMask = _BITMAPV5HEADER.varHandle(PathElement.groupElement("bV5RedMask"));
+	    public BITMAPV5HEADER bV5RedMask(int v) {bV5RedMask.set(mem, 0, v); return(this);}
+	    private static final VarHandle bV5GreenMask = _BITMAPV5HEADER.varHandle(PathElement.groupElement("bV5GreenMask"));
+	    public BITMAPV5HEADER bV5GreenMask(int v) {bV5GreenMask.set(mem, 0, v); return(this);}
+	    private static final VarHandle bV5BlueMask = _BITMAPV5HEADER.varHandle(PathElement.groupElement("bV5BlueMask"));
+	    public BITMAPV5HEADER bV5BlueMask(int v) {bV5BlueMask.set(mem, 0, v); return(this);}
+	    private static final VarHandle bV5AlphaMask = _BITMAPV5HEADER.varHandle(PathElement.groupElement("bV5AlphaMask"));
+	    public BITMAPV5HEADER bV5AlphaMask(int v) {bV5AlphaMask.set(mem, 0, v); return(this);}
+	}
+	public BITMAPV5HEADER BITMAPV5HEADER() {return(new BITMAPV5HEADER());}
+
+	static final StructLayout _ICONINFO = struct(new MemoryLayout[] {
+		BOOL.withName("fIcon"),
+		DWORD.withName("xHotspot"),
+		DWORD.withName("yHotspot"),
+		HBITMAP.withName("hbmMask"),
+		HBITMAP.withName("hbmColor"),
+	    });
+	public static class ICONINFO extends Win32.ICONINFO {
+	    private ICONINFO(Arena alloc) {
+		super(alloc.allocate(_ICONINFO.byteSize()));
+	    }
+	    protected ICONINFO() {
+		this(Arena.ofAuto());
+	    }
+
+	    protected StructLayout $layout() {return(_ICONINFO);}
+
+	    private static final VarHandle fIcon = _ICONINFO.varHandle(PathElement.groupElement("fIcon"));
+	    public ICONINFO fIcon(int v) {fIcon.set(mem, 0, v); return(this);}
+	    private static final VarHandle xHotspot = _ICONINFO.varHandle(PathElement.groupElement("xHotspot"));
+	    public ICONINFO xHotspot(int v) {xHotspot.set(mem, 0, v); return(this);}
+	    private static final VarHandle yHotspot = _ICONINFO.varHandle(PathElement.groupElement("yHotspot"));
+	    public ICONINFO yHotspot(int v) {xHotspot.set(mem, 0, v); return(this);}
+	    private static final VarHandle hbmMask = _ICONINFO.varHandle(PathElement.groupElement("hbmMask"));
+	    public ICONINFO hbmMask(Handle v) {hbmMask.set(mem, 0, nhandle(v)); return(this);}
+	    private static final VarHandle hbmColor = _ICONINFO.varHandle(PathElement.groupElement("hbmColor"));
+	    public ICONINFO hbmColor(Handle v) {hbmColor.set(mem, 0, nhandle(v)); return(this);}
+	}
+	public ICONINFO ICONINFO() {return(new ICONINFO());}
+
+	private final MethodHandle CreateDIBSection = ld.downcallHandle(gdi32.find("CreateDIBSection").get(), FunctionDescriptor.of(HBITMAP, HDC, ADDRESS, UINT, ADDRESS, HANDLE, DWORD));
+	public Handle CreateDIBSection(Handle hDC, Win32.BITMAPV5HEADER pbmi, int usage, ByteBuffer[] ppvBits, Handle hSection, int offset) {
+	    try(Arena st = Arena.ofConfined()) {
+		MemorySegment bitsbuf = st.allocate(ADDRESS);
+		MemorySegment rv;
+		try {
+		    rv = (MemorySegment)CreateDIBSection.invoke(hDC.bits, pbmi.mem(), usage, bitsbuf, nhandle(hSection), offset);
+		} catch(Throwable e) {
+		    throw(new RuntimeException(e));
+		}
+		if(nullp(rv))
+		    throw(lasterror());
+		if(ppvBits != null)
+		    ppvBits[0] = bitsbuf.get(ADDRESS, 0).reinterpret(pbmi.bV5Width() * Math.abs(pbmi.bV5Height()) * pbmi.bV5BitCount() / 8).asByteBuffer();
+		return(Handle.of(rv));
+	    }
+	}
+
+	private final MethodHandle CreateBitmap = ld.downcallHandle(gdi32.find("CreateBitmap").get(), FunctionDescriptor.of(HBITMAP, C_INT, C_INT, UINT, UINT, ADDRESS));
+	public Handle CreateBitmap(int nWidth, int nHeight, int nPlanes, int nBitCount, ByteBuffer lpBits) {
+	    try(Arena st = Arena.ofConfined()) {
+		MemorySegment bits = bufcpy(st, lpBits, nWidth * nHeight * nBitCount / 8);
+		MemorySegment rv;
+		try {
+		    rv = (MemorySegment)CreateBitmap.invoke(nWidth, nHeight, nPlanes, nBitCount, bits);
+		} catch(Throwable e) {
+		    throw(new RuntimeException(e));
+		}
+		if(nullp(rv))
+		    throw(lasterror());
+		return(Handle.of(rv));
+	    }
+	}
+
+	private final MethodHandle CreateIconIndirect = ld.downcallHandle(user32.find("CreateIconIndirect").get(), FunctionDescriptor.of(HICON, ADDRESS));
+	public Handle CreateIconIndirect(Win32.ICONINFO piconinfo) {
+	    MemorySegment rv;
+	    try {
+		rv = (MemorySegment)CreateIconIndirect.invoke(piconinfo.mem());
+	    } catch(Throwable e) {
+		throw(new RuntimeException(e));
+	    }
+	    if(nullp(rv))
+		throw(lasterror());
+	    return(Handle.of(rv));
+	}
+
+	private final MethodHandle DestroyIcon = ld.downcallHandle(user32.find("DestroyIcon").get(), FunctionDescriptor.of(BOOL, HICON));
+	public void DestroyIcon(Handle ho) {
+	    int rv;
+	    try {
+		rv = (int)DestroyIcon.invoke(ho.bits);
+	    } catch(Throwable e) {
+		throw(new RuntimeException(e));
+	    }
+	    if(rv == 0)
+		throw(lasterror());
+	}
+
+	private final MethodHandle DeleteObject = ld.downcallHandle(gdi32.find("DeleteObject").get(), FunctionDescriptor.of(BOOL, HGDIOBJ));
+	public void DeleteObject(Handle ho) {
+	    int rv;
+	    try {
+		rv = (int)DeleteObject.invoke(ho.bits);
+	    } catch(Throwable e) {
+		throw(new RuntimeException(e));
+	    }
+	    if(rv == 0)
+		throw(lasterror());
 	}
 
 	static final StructLayout _PIXELFORMATDESCRIPTOR = struct(new MemoryLayout[] {
