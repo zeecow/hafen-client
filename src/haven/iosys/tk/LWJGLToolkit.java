@@ -42,10 +42,18 @@ import static java.awt.event.KeyEvent.*;
 public class LWJGLToolkit extends AWTToolkit {
     private LWJGLToolkit() {}
 
-    private static LWJGLToolkit instance = new LWJGLToolkit();
     private static Factory factory = new Factory() {
-	public Toolkit open(String... args) {return(instance);}
-	public int priority() {return(-10);}
+	private LWJGLToolkit instance = null;
+
+	public Toolkit open(String... args) {
+	    synchronized(this) {
+		if(instance == null)
+		    instance = new LWJGLToolkit();
+	    }
+	    return(instance);
+	}
+
+	public int priority() {return(-11);}
     };
     public static Factory get() {
 	return(factory);

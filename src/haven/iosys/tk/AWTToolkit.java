@@ -32,6 +32,7 @@ import haven.*;
 import haven.render.*;
 import haven.render.gl.*;
 import java.awt.EventQueue;
+import java.awt.HeadlessException;
 import java.awt.Component;
 import java.awt.image.BufferedImage;
 import static java.awt.event.KeyEvent.*;
@@ -42,6 +43,14 @@ public abstract class AWTToolkit implements Toolkit {
 	    System.setProperty("sun.java2d.uiScale.enabled", "false");
 	} catch(Exception e) {
 	    new Warning(e, "AWT initialization failed").issue();
+	}
+    }
+
+    protected AWTToolkit() {
+	try {
+	    emptycurs = java.awt.Toolkit.getDefaultToolkit().createCustomCursor(TexI.mkbuf(new Coord(1, 1)), new java.awt.Point(), "");
+	} catch(HeadlessException e) {
+	    throw(new Unavailable("AWT is running headlessly", e));
 	}
     }
 
@@ -169,8 +178,8 @@ public abstract class AWTToolkit implements Toolkit {
 	public double subamount() {return(wev.getPreciseWheelRotation());}
     }
 
-    public static final java.awt.Cursor emptycurs = java.awt.Toolkit.getDefaultToolkit().createCustomCursor(TexI.mkbuf(new Coord(1, 1)), new java.awt.Point(), "");
-    public static java.awt.Cursor getsyscurs(Cursor.Std id) {
+    public final java.awt.Cursor emptycurs;
+    public java.awt.Cursor getsyscurs(Cursor.Std id) {
 	switch(id) {
 	case DEFAULT:   return(null);
 	case NONE:      return(emptycurs);

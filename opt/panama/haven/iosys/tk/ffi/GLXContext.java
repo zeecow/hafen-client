@@ -281,7 +281,8 @@ public class GLXContext implements Toolkit.Factory {
 	    try {
 		if(!xlib.XkbLibraryVersion(new int[] {XLib.XkbMajorVersion, XLib.XkbMinorVersion}))
 		    throw(new Unavailable("XKB client support unavailable"));
-		this.dpy = xlib.XOpenDisplay(display);
+		if((this.dpy = xlib.XOpenDisplay(display)) == null)
+		    throw(new Unavailable("Cannot open X11 display"));
 		if(nscreen < 0)
 		    nscreen = xlib.DefaultScreen(dpy);
 		else if(nscreen >= xlib.ScreenCount(dpy))

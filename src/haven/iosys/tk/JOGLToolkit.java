@@ -43,9 +43,17 @@ import static java.awt.event.KeyEvent.*;
 public class JOGLToolkit extends AWTToolkit {
     private JOGLToolkit() {}
 
-    private static JOGLToolkit instance = new JOGLToolkit();
     private static Factory factory = new Factory() {
-	public Toolkit open(String... args) {return(instance);}
+	private JOGLToolkit instance = null;
+
+	public Toolkit open(String... args) {
+	    synchronized(this) {
+		if(instance == null)
+		    instance = new JOGLToolkit();
+	    }
+	    return(instance);
+	}
+
 	public int priority() {return(-10);}
     };
     public static Factory get() {
