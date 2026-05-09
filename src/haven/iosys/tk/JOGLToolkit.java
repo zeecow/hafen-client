@@ -41,6 +41,10 @@ import static java.awt.event.KeyEvent.*;
 
 @Toolkit.Available(name = "jogl")
 public class JOGLToolkit implements Toolkit {
+    static {
+	System.setProperty("sun.java2d.uiScale.enabled", "false");
+    }
+
     private JOGLToolkit() {
     }
 
