@@ -347,7 +347,7 @@ public class NEWTContext implements Toolkit.Factory {
 		    bk.setSize(inf.fixsize.x, inf.fixsize.y);
 		} else {
 		    bk.setResizable(true);
-		    if(inf.normsize != null)
+		    if((inf.normsize != null) && !(bk.isMaximizedVert() || bk.isMaximizedHorz()))
 			bk.setSize(inf.normsize.x, inf.normsize.y);
 		}
 		return(this);
