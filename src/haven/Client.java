@@ -559,8 +559,6 @@ public class Client implements Console.Directory {
 	}
 	List<Toolkit.Factory> tks = new ArrayList<>(Toolkit.toolkits().values());
 	Collections.sort(tks, Comparator.comparing(Toolkit.Factory::priority).reversed());
-	for(Toolkit.Factory f : tks)
-	    Debug.dump(f, f.priority());
 	Collection<Throwable> errors = new ArrayList<>();
 	Toolkit tk = null;
 	for(Toolkit.Factory tkt : tks) {
