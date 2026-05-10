@@ -39,7 +39,7 @@ public interface Toolkit {
 
     public static interface Factory {
 	public Toolkit open(String... args);
-	public default int order() {return(0);}
+	public default int priority() {return(0);}
     }
 
     @dolda.jglob.Discoverable
