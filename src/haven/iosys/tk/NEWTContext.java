@@ -79,26 +79,35 @@ public class NEWTContext implements Toolkit.Factory {
 	public final GLCapabilities caps;
 
 	public NEWTToolkit() {
-	    dpy = NewtFactory.createDisplay(null);
-	    screen = NewtFactory.createScreen(dpy, 0);
-	    GLProfile prof;
+	    boolean done = false;
 	    try {
-		prof = GLProfile.getMaxProgrammableCore(true);
-	    } catch(com.jogamp.opengl.GLException e) {
+		dpy = NewtFactory.createDisplay(null);
+		dpy.createNative();
+		screen = NewtFactory.createScreen(dpy, 0);
+		screen.createNative();
+		GLProfile prof;
 		try {
-		    /* If not core, let GLEnvironment handle that. */
-		    prof = GLProfile.getDefault();
-		} catch(com.jogamp.opengl.GLException e2) {
-		    e2.addSuppressed(e);
-		    throw(new ProfileException(e2));
+		    prof = GLProfile.getMaxProgrammableCore(true);
+		} catch(com.jogamp.opengl.GLException e) {
+		    try {
+			/* If not core, let GLEnvironment handle that. */
+			prof = GLProfile.getDefault();
+		    } catch(com.jogamp.opengl.GLException e2) {
+			e2.addSuppressed(e);
+			throw(new ProfileException(e2));
+		    }
 		}
+		caps = new GLCapabilities(prof);
+		caps.setDoubleBuffered(true);
+		caps.setAlphaBits(8);
+		caps.setRedBits(8);
+		caps.setGreenBits(8);
+		caps.setBlueBits(8);
+		done = true;
+	    } finally {
+		if(!done)
+		    dispose();
 	    }
-	    caps = new GLCapabilities(prof);
-	    caps.setDoubleBuffered(true);
-	    caps.setAlphaBits(8);
-	    caps.setRedBits(8);
-	    caps.setGreenBits(8);
-	    caps.setBlueBits(8);
 	}
 
 	public static Set<Key.Mod> xlmods(InputEvent ev) {
@@ -478,7 +487,8 @@ public class NEWTContext implements Toolkit.Factory {
 	}
 
 	public void dispose() {
-	    dpy.destroy();
+	    if(dpy != null)
+		dpy.destroy();
 	}
     }
 
