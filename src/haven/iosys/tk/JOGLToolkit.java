@@ -41,7 +41,15 @@ import static java.awt.event.KeyEvent.*;
 
 @Toolkit.Available(name = "jogl")
 public class JOGLToolkit extends AWTToolkit {
-    private JOGLToolkit() {}
+    private final GLCapabilities caps;
+
+    private JOGLToolkit() {
+	try {
+	    this.caps = mkcaps();
+	} catch(ProfileException e) {
+	    throw(new Unavailable(e));
+	}
+    }
 
     private static Factory factory = new Factory() {
 	private JOGLToolkit instance = null;
@@ -102,7 +110,7 @@ public class JOGLToolkit extends AWTToolkit {
 	public JOGLEnvironment env;
 
 	public JOGLPanel() {
-	    super(mkcaps(), null, null);
+	    super(caps, null, null);
 	    addGLEventListener(new GLEventListener() {
 		public void display(GLAutoDrawable d) {
 		    redraw(d.getGL());
