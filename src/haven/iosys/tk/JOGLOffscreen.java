@@ -59,7 +59,11 @@ public class JOGLOffscreen implements Acephal {
 		public void dispose(GLAutoDrawable d) {
 		}
 	    });
-	buf.display();
+	try {
+	    buf.display();
+	} catch(com.jogamp.opengl.GLException e) {
+	    throw(new Unavailable("cuold not initialize JOGL", e));
+	}
 	if(benv == null)
 	    throw(new AssertionError("offscreen display call was not honored"));
 	penv = new ProxyEnv();
