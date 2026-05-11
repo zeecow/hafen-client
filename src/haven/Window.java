@@ -669,7 +669,7 @@ public class Window extends Widget {
 
     public static void main(String[] args) {
 	Window wnd = new Window(new Coord(300, 200), "Inventory", true);
-	new haven.rs.DrawBuffer(haven.rs.Context.getdefault().env(), new Coord(512, 512))
+	new haven.rs.DrawBuffer(haven.iosys.tk.Acephal.instance().env(), new Coord(512, 512))
 	    .draw(g -> {
 		    wnd.draw(g);
 		    g.getimage(img -> Debug.dumpimage(img, args[0]));
