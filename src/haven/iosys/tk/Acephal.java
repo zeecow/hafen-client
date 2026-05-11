@@ -73,9 +73,9 @@ public interface Acephal {
 			fac = (Factory)Utils.invoke(cl.getDeclaredMethod("get"), null);
 		    } catch(NoSuchMethodException e) {
 			throw(new AssertionError(e));
-		    } catch(Unavailable e) {
+		    } catch(Unavailable | LinkageError e) {
 			fac = new Factory() {
-				public Acephal open(String... args) {throw(e);}
+				public Acephal open(String... args) {throw(new Unavailable(e));}
 				public int priority() {return(-1000);}
 			    };
 		    }

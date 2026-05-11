@@ -40,7 +40,13 @@ import static java.awt.event.KeyEvent.*;
 
 @Toolkit.Available(name = "lwjgl")
 public class LWJGLToolkit extends AWTToolkit {
-    private LWJGLToolkit() {}
+    private LWJGLToolkit() {
+	try {
+	    new LWJGLPanel();
+	} catch(LinkageError e) {
+	    throw(new Unavailable("LWJGL libraries not available", e));
+	}
+    }
 
     private static Factory factory = new Factory() {
 	private LWJGLToolkit instance = null;

@@ -110,9 +110,9 @@ public interface Toolkit {
 			fac = (Factory)Utils.invoke(cl.getDeclaredMethod("get"), null);
 		    } catch(NoSuchMethodException e) {
 			throw(new AssertionError(e));
-		    } catch(Unavailable e) {
+		    } catch(Unavailable | LinkageError e) {
 			fac = new Factory() {
-				public Toolkit open(String... args) {throw(e);}
+				public Toolkit open(String... args) {throw(new Unavailable(e));}
 				public int priority() {return(-1000);}
 			    };
 		    }

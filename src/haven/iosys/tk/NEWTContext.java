@@ -47,7 +47,11 @@ import static com.jogamp.newt.event.KeyEvent.*;
 @Toolkit.Available(name = "newt")
 public class NEWTContext implements Toolkit.Factory {
     public NEWTToolkit open(String... args) {
-	return(new NEWTToolkit());
+	try {
+	    return(new NEWTToolkit());
+	} catch(LinkageError e) {
+	    throw(new Unavailable("JOGL libraries not available", e));
+	}
     }
 
     public int priority() {
