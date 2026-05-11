@@ -37,26 +37,26 @@ import static java.lang.foreign.ValueLayout.ADDRESS;
 
 public abstract class OpenGL implements haven.render.gl.GL {
     public static abstract class Base extends OpenGL {
-	private static final ValueLayout.OfInt    GLenum     = ValueLayout.JAVA_INT;
-	private static final ValueLayout.OfByte   GLboolean  = ValueLayout.JAVA_BYTE;
-	private static final ValueLayout.OfInt    GLbitfield = ValueLayout.JAVA_INT;
-	private static final ValueLayout.OfByte   GLbyte     = ValueLayout.JAVA_BYTE;
-	private static final ValueLayout.OfByte   GLchar     = ValueLayout.JAVA_BYTE;
-	private static final ValueLayout.OfShort  GLshort    = ValueLayout.JAVA_SHORT;
-	private static final ValueLayout.OfInt    GLint      = ValueLayout.JAVA_INT;
-	private static final ValueLayout.OfByte   GLubyte    = ValueLayout.JAVA_BYTE;
-	private static final ValueLayout.OfShort  GLushort   = ValueLayout.JAVA_SHORT;
-	private static final ValueLayout.OfInt    GLuint     = ValueLayout.JAVA_INT;
-	private static final ValueLayout.OfLong   GLint64    = ValueLayout.JAVA_LONG;
-	private static final ValueLayout.OfLong   GLyint64   = ValueLayout.JAVA_LONG;
-	private static final ValueLayout.OfInt    GLsizei    = ValueLayout.JAVA_INT;
-	private static final ValueLayout.OfFloat  GLfloat    = ValueLayout.JAVA_FLOAT;
-	private static final ValueLayout.OfFloat  GLclampf   = ValueLayout.JAVA_FLOAT;
-	private static final ValueLayout.OfDouble GLdouble   = ValueLayout.JAVA_DOUBLE;
-	private static final ValueLayout.OfDouble GLclampd   = ValueLayout.JAVA_DOUBLE;
-	private static final MemoryLayout GLsync = PTRINT_T;
-	private static final MemoryLayout GLsizeiptr = SIZE_T;
-	private static final MemoryLayout GLintptr = SIZE_T;
+	static final ValueLayout.OfInt    GLenum     = ValueLayout.JAVA_INT;
+	static final ValueLayout.OfByte   GLboolean  = ValueLayout.JAVA_BYTE;
+	static final ValueLayout.OfInt    GLbitfield = ValueLayout.JAVA_INT;
+	static final ValueLayout.OfByte   GLbyte     = ValueLayout.JAVA_BYTE;
+	static final ValueLayout.OfByte   GLchar     = ValueLayout.JAVA_BYTE;
+	static final ValueLayout.OfShort  GLshort    = ValueLayout.JAVA_SHORT;
+	static final ValueLayout.OfInt    GLint      = ValueLayout.JAVA_INT;
+	static final ValueLayout.OfByte   GLubyte    = ValueLayout.JAVA_BYTE;
+	static final ValueLayout.OfShort  GLushort   = ValueLayout.JAVA_SHORT;
+	static final ValueLayout.OfInt    GLuint     = ValueLayout.JAVA_INT;
+	static final ValueLayout.OfLong   GLint64    = ValueLayout.JAVA_LONG;
+	static final ValueLayout.OfLong   GLyint64   = ValueLayout.JAVA_LONG;
+	static final ValueLayout.OfInt    GLsizei    = ValueLayout.JAVA_INT;
+	static final ValueLayout.OfFloat  GLfloat    = ValueLayout.JAVA_FLOAT;
+	static final ValueLayout.OfFloat  GLclampf   = ValueLayout.JAVA_FLOAT;
+	static final ValueLayout.OfDouble GLdouble   = ValueLayout.JAVA_DOUBLE;
+	static final ValueLayout.OfDouble GLclampd   = ValueLayout.JAVA_DOUBLE;
+	static final MemoryLayout GLsync = PTRINT_T;
+	static final MemoryLayout GLsizeiptr = SIZE_T;
+	static final MemoryLayout GLintptr = SIZE_T;
 
 	private static byte b(boolean v) {
 	    return((byte)(v ? 1 : 0));
