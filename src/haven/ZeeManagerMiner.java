@@ -1055,6 +1055,64 @@ public class ZeeManagerMiner extends ZeeThread{
                 .collect(Collectors.toList());
     }
 
+    public static boolean straightLineCheck(Coord2d target) {
+        Coord2d plrc = ZeeConfig.getPlayerGob().rc;
+        if ( Math.abs(plrc.x) - Math.abs(target.x) < 11 ){
+            return true;
+        } else if ( Math.abs(plrc.y) - Math.abs(target.y) < 11 ){
+            return true;
+        }
+        //println("pl1"+pl1+" , pl2"+pl2+" , targetc"+targetc+" , targetc2"+targetc2);
+        return false;
+    }
+    static void straightLineMove(Coord2d target){
+        Coord2d plrc = ZeeConfig.getPlayerGob().rc;
+        boolean keepSameX;
+        if ( Math.abs(plrc.x) - Math.abs(target.x) < 11 ){
+            keepSameX = true;
+        } else if ( Math.abs(plrc.y) - Math.abs(target.y) < 11 ){
+            keepSameX = false;
+        } else{
+            ZeeConfig.msgLow("cant find x direction");
+            return;
+        }
+        new ZeeThread(){
+            public void run() {
+                try {
+                    int clicks = 1;
+                    ZeeConfig.addPlayerText("linemove");
+                    double moveDist;
+                    if(keepSameX){
+                        moveDist = target.y - plrc.y;
+                    }else{
+                        moveDist = target.x - plrc.x;
+                    }
+                    ZeeConfig.clickCoord(target.floor(OCache.posres),1);
+                    prepareCancelClick();
+                    do {
+                        sleep(500);
+                        if (isCancelClick())
+                            break;
+                        if (!ZeeConfig.isPlayerMovingOrFollowingByAttrLinMove()){
+                            clicks++;
+                            ZeeConfig.addPlayerText("linemove "+clicks);
+                            if (keepSameX) {
+                                double playerpos = ZeeConfig.getPlayerGob().rc.y;
+                                ZeeConfig.clickCoord(Coord2d.of(target.x, playerpos + moveDist).floor(OCache.posres), 1);
+                            }else {
+                                double playerpos = ZeeConfig.getPlayerGob().rc.x;
+                                ZeeConfig.clickCoord(Coord2d.of(playerpos + moveDist, target.y).floor(OCache.posres), 1);
+                            }
+                        }
+                    }while(!isCancelClick());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                ZeeConfig.removePlayerText();
+            }
+        }.start();
+    }
+
     public static void println(String s) {
         System.out.println(s);
     }

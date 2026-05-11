@@ -4,7 +4,7 @@ Client focusing on small helper tasks, many using mouse middle button, and other
 
 Controls
 --------
-- left click ground cancel tasks whenever possible
+- left/right click ground cancels tasks whenever possible
 - right click windows to close (DF style, minimap ignored for now)
 - gob flowermenu also works on mouse up
 - minimap drags with button 3
@@ -62,6 +62,7 @@ Midclick Ground
 - place stockpile and all items
 - dig multiple ballclay if cursor dig
 - while driving plow will queue coords 
+- while underground will try to keep moving in straight line until cancel click
 
 Long Midclick Ground (LMC)
 - while mounting horse will try to dismount

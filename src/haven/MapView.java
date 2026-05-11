@@ -2560,7 +2560,7 @@ public class MapView extends PView implements DTarget, Console.Directory {
 
 		if (msg.contentEquals("click")){
 
-			// minimap target coord
+			// resets minimap target coord
 			if (args!=null && args.length>1) {
 				ZeeManagerIcons.lastMinimapClick = null;
 			}
