@@ -91,49 +91,49 @@ public interface Toolkit {
     public static interface EventListener {
 	public void event(Event ev);
     }
-}
 
-class Found {
-    private static Map<String, Toolkit.Factory> find() {
-	Map<String, Toolkit.Factory> ret = new HashMap<>();
-	ClassLoader loader = Toolkit.Available.class.getClassLoader();
-	for(String clnm : dolda.jglob.Loader.get(Toolkit.Available.class).names()) {
-	    try {
-		Class<?> cl;
+    class Found {
+	private static Map<String, Factory> find() {
+	    Map<String, Factory> ret = new HashMap<>();
+	    ClassLoader loader = Available.class.getClassLoader();
+	    for(String clnm : dolda.jglob.Loader.get(Available.class).names()) {
 		try {
-		    cl = loader.loadClass(clnm);
-		} catch(ClassNotFoundException e) {
+		    Class<?> cl;
+		    try {
+			cl = loader.loadClass(clnm);
+		    } catch(ClassNotFoundException e) {
+			continue;
+		    }
+		    String nm = cl.getAnnotation(Available.class).name();
+		    Factory fac;
+		    try {
+			fac = (Factory)Utils.invoke(cl.getDeclaredMethod("get"), null);
+		    } catch(NoSuchMethodException e) {
+			throw(new AssertionError(e));
+		    } catch(Unavailable e) {
+			fac = new Factory() {
+				public Toolkit open(String... args) {throw(e);}
+				public int priority() {return(-1000);}
+			    };
+		    }
+		    ret.put(nm, fac);
+		} catch(UnsupportedClassVersionError e) {
 		    continue;
 		}
-		String nm = cl.getAnnotation(Toolkit.Available.class).name();
-		Toolkit.Factory fac;
-		try {
-		    fac = (Toolkit.Factory)Utils.invoke(cl.getDeclaredMethod("get"), null);
-		} catch(NoSuchMethodException e) {
-		    throw(new AssertionError(e));
-		} catch(Unavailable e) {
-		    fac = new Toolkit.Factory() {
-			    public Toolkit open(String... args) {throw(e);}
-			    public int priority() {return(-1000);}
-			};
-		}
-		ret.put(nm, fac);
-	    } catch(UnsupportedClassVersionError e) {
-		continue;
 	    }
+	    return(ret);
 	}
-	return(ret);
-    }
 
-    private static Map<String, Toolkit.Factory> toolkits;
-    static Map<String, Toolkit.Factory> toolkits() {
-	if(toolkits == null) {
-	    synchronized(Found.class) {
-		if(toolkits == null) {
-		    toolkits = find();
+	private static Map<String, Factory> toolkits;
+	static Map<String, Factory> toolkits() {
+	    if(toolkits == null) {
+		synchronized(Found.class) {
+		    if(toolkits == null) {
+			toolkits = find();
+		    }
 		}
 	    }
+	    return(toolkits);
 	}
-	return(toolkits);
     }
 }
