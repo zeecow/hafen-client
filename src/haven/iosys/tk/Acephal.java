@@ -117,7 +117,7 @@ public interface Acephal {
 			    }
 			}
 			if(first == null) {
-			    RuntimeException exc = new RuntimeException("could find no working headless renderer");
+			    Unavailable exc = new Unavailable("could find no working headless renderer");
 			    errors.forEach(exc::addSuppressed);
 			    throw(exc);
 			}
