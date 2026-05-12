@@ -32,6 +32,7 @@ import java.util.*;
 import java.awt.image.BufferedImage;
 
 public interface Toolkit {
+    public static final Config.Variable<String> toolkit = Config.Variable.prop("haven.toolkit", null);
     public Cursor.Caps cursorcaps();
     public Cursor makecursor(BufferedImage img, Coord hotspot);
     public Windeye window();
@@ -47,10 +48,6 @@ public interface Toolkit {
     @Retention(RetentionPolicy.RUNTIME)
     public static @interface Available {
 	String name();
-    }
-
-    public static Map<String, Toolkit.Factory> toolkits() {
-	return(Found.toolkits());
     }
 
     public static interface Event {
@@ -90,6 +87,14 @@ public interface Toolkit {
 
     public static interface EventListener {
 	public void event(Event ev);
+    }
+
+    public static Map<String, Toolkit.Factory> toolkits() {
+	return(Found.toolkits());
+    }
+
+    public static Toolkit instance() {
+	return(Found.instance());
     }
 
     class Found {
@@ -134,6 +139,42 @@ public interface Toolkit {
 		}
 	    }
 	    return(toolkits);
+	}
+
+	private static Toolkit instance = null;
+	public static Toolkit instance() {
+	    if(instance == null) {
+		synchronized(Found.class) {
+		    if(instance == null) {
+			if(toolkit.get() != null) {
+			    Factory f = toolkits().get(toolkit.get());
+			    if(f == null)
+				throw(new Unavailable("no such headless name: " + toolkit.get()));
+			    instance = f.open();
+			} else {
+			    List<Factory> toolkits = new ArrayList<>(toolkits().values());
+			    Collections.sort(toolkits, Comparator.comparing(Factory::priority).reversed());
+			    Collection<Throwable> errors = new ArrayList<>();
+			    Toolkit first = null;
+			    for(Factory type : toolkits) {
+				try {
+				    first = type.open();
+				    break;
+				} catch(Unavailable e) {
+				    errors.add(e);
+				}
+			    }
+			    if(first == null) {
+				Unavailable exc = new Unavailable("could find no working headless renderer");
+				errors.forEach(exc::addSuppressed);
+				throw(exc);
+			    }
+			    instance = first;
+			}
+		    }
+		}
+	    }
+	    return(instance);
 	}
     }
 }

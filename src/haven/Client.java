@@ -34,7 +34,6 @@ import java.awt.image.BufferedImage;
 import haven.iosys.tk.Button;
 
 public class Client implements Console.Directory {
-    public static final Config.Variable<String> toolkit = Config.Variable.prop("haven.toolkit", null);
     public final Toolkit tk;
     public final Windeye wnd;
     private final EventQueue queue = new EventQueue(this);
@@ -299,31 +298,8 @@ public class Client implements Console.Directory {
 	return(cmdmap);
     }
 
-    private static Toolkit toolkit() {
-	if(toolkit.get() != null) {
-	    Toolkit.Factory f = Toolkit.toolkits().get(toolkit.get());
-	    if(f == null)
-		throw(new RuntimeException("no such toolkit: " + toolkit.get()));
-	    return(f.open());
-	}
-	List<Toolkit.Factory> tks = new ArrayList<>(Toolkit.toolkits().values());
-	Collections.sort(tks, Comparator.comparing(Toolkit.Factory::priority).reversed());
-	Collection<Throwable> errors = new ArrayList<>();
-	Toolkit tk = null;
-	for(Toolkit.Factory tkt : tks) {
-	    try {
-		return(tkt.open());
-	    } catch(Unavailable e) {
-		errors.add(e);
-	    }
-	}
-	RuntimeException exc = new RuntimeException("could find no working windowing system");
-	errors.forEach(exc::addSuppressed);
-	throw(exc);
-    }
-
     private static void main2(String[] args) {
-	Client cl = new Client(toolkit());
+	Client cl = new Client(Toolkit.instance());
 	try {
 	    cl.run(cl.new Main());
 	} finally {
