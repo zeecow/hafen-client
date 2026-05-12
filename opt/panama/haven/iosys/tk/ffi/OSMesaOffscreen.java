@@ -122,7 +122,7 @@ public class OSMesaOffscreen implements Acephal {
 	    return(new OSMesaOffscreen());
 	}
 
-	public int priority() {return(0);}
+	public int priority() {return(-5);}
     };
     public static Factory get() {
 	return(factory);
