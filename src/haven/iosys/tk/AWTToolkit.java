@@ -211,6 +211,10 @@ public abstract class AWTToolkit implements Toolkit {
 
 	protected abstract Component panel();
 
+	public AWTToolkit toolkit() {
+	    return(AWTToolkit.this);
+	}
+
 	public void add(EventListener l) {
 	    callbacks.add(l);
 	}

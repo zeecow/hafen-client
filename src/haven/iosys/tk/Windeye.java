@@ -31,6 +31,8 @@ import haven.render.*;
 import java.awt.image.BufferedImage;
 
 public interface Windeye {
+    public Toolkit toolkit();
+
     public void add(Toolkit.EventListener l);
     public void dispose();
 

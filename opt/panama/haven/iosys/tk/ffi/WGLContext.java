@@ -380,6 +380,10 @@ public class WGLContext implements Toolkit.Factory {
 		}
 	    }
 
+	    public WGLToolkit toolkit() {
+		return(WGLToolkit.this);
+	    }
+
 	    public void add(EventListener l) {
 		callbacks.add(l);
 	    }

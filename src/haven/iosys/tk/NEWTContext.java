@@ -225,6 +225,10 @@ public class NEWTContext implements Toolkit.Factory {
 		bk.addKeyListener(ev);
 	    }
 
+	    public NEWTToolkit toolkit() {
+		return(NEWTToolkit.this);
+	    }
+
 	    public void add(EventListener l) {
 		callbacks.add(l);
 	    }
