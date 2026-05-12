@@ -212,4 +212,37 @@ public class FUtils {
 	    return(memcpy(st.allocate(count), buf, 0, buf.position(), (int)count));
 	}
     }
+
+    public static String constname(Class<?> cl, long val) {
+	String ret = null;
+	for(java.lang.reflect.Field f : cl.getFields()) {
+	    if(((f.getModifiers() & java.lang.reflect.Modifier.STATIC) != 0) &&
+	       ((f.getModifiers() & java.lang.reflect.Modifier.PUBLIC) != 0)) {
+		long v;
+		try {
+		    if(f.getType() == Byte.TYPE)
+			v = f.getByte(null);
+		    else if(f.getType() == Short.TYPE)
+			v = f.getShort(null);
+		    else if(f.getType() == Integer.TYPE)
+			v = f.getInt(null);
+		    else if(f.getType() == Long.TYPE)
+			v = f.getLong(null);
+		    else
+			continue;
+		} catch(IllegalAccessException e) {
+		    continue;
+		}
+		if(v == val) {
+		    if(ret == null)
+			ret = f.getName();
+		    else
+			ret = ret + " or " + f.getName();
+		}
+	    }
+	}
+	if(ret == null)
+	    return(Long.toUnsignedString(val, 16));
+	return(ret);
+    }
 }
