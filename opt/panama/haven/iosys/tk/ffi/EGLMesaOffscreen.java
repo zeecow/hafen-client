@@ -78,9 +78,10 @@ public class EGLMesaOffscreen implements Acephal {
 		    try {
 			ctx = egl.eglCreateContext(dpy, cfg[0], null, new int[] {
 			    EGL.EGL_CONTEXT_MAJOR_VERSION, ver[0],
-			    EGL.EGL_CONTEXT_MINOR_VERSION, ver[0],
+			    EGL.EGL_CONTEXT_MINOR_VERSION, ver[1],
 			});
-			break;
+			if(ctx != null)
+			    break;
 		    } catch(EGLException e) {
 			continue;
 		    }
