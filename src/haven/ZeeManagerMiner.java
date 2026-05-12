@@ -1066,43 +1066,36 @@ public class ZeeManagerMiner extends ZeeThread{
         return false;
     }
     static void straightLineMove(Coord2d target){
-        Coord2d plrc = ZeeConfig.getPlayerGob().rc;
-        boolean keepSameX;
-        if ( Math.abs(plrc.x) - Math.abs(target.x) < 11 ){
-            keepSameX = true;
-        } else if ( Math.abs(plrc.y) - Math.abs(target.y) < 11 ){
-            keepSameX = false;
-        } else{
-            ZeeConfig.msgLow("cant find x direction");
-            return;
-        }
         new ZeeThread(){
             public void run() {
                 try {
                     int clicks = 1;
+                    Gob player = ZeeConfig.getPlayerGob();
+                    Coord2d coordNow;
+                    Coord2d nextCoord = new Coord2d(target.x, target.y);
+                    Coord2d prevCoord = new Coord2d(player.rc.x, player.rc.y);
+                    double xdiff = Math.abs(nextCoord.x) - Math.abs(prevCoord.x);
+                    double ydiff = Math.abs(nextCoord.y) - Math.abs(prevCoord.y);
+                    boolean isMovinX = Math.abs(xdiff) < Math.abs(ydiff); // TODO test coords with opposing signs
+                    double fixedCoord = isMovinX ? target.x : target.y;
                     ZeeConfig.addPlayerText("linemove");
-                    double moveDist;
-                    if(keepSameX){
-                        moveDist = target.y - plrc.y;
-                    }else{
-                        moveDist = target.x - plrc.x;
-                    }
-                    ZeeConfig.clickCoord(target.floor(OCache.posres),1);
+                    ZeeConfig.clickCoord(nextCoord.floor(OCache.posres),1);
                     prepareCancelClick();
                     do {
-                        sleep(500);
+                        sleep(1000);
                         if (isCancelClick())
                             break;
                         if (!ZeeConfig.isPlayerMovingOrFollowingByAttrLinMove()){
                             clicks++;
                             ZeeConfig.addPlayerText("linemove "+clicks);
-                            if (keepSameX) {
-                                double playerpos = ZeeConfig.getPlayerGob().rc.y;
-                                ZeeConfig.clickCoord(Coord2d.of(target.x, playerpos + moveDist).floor(OCache.posres), 1);
-                            }else {
-                                double playerpos = ZeeConfig.getPlayerGob().rc.x;
-                                ZeeConfig.clickCoord(Coord2d.of(playerpos + moveDist, target.y).floor(OCache.posres), 1);
-                            }
+                            coordNow = Coord2d.of(player.rc.x, player.rc.y);
+                            nextCoord = coordNow.add(coordNow.sub(prevCoord));
+                            if (isMovinX)
+                                nextCoord.x = fixedCoord;
+                            else
+                                nextCoord.y = fixedCoord;
+                            ZeeConfig.clickCoord(nextCoord.floor(OCache.posres),1);
+                            prevCoord = new Coord2d(coordNow.x, coordNow.y);
                         }
                     }while(!isCancelClick());
                 } catch (Exception e) {
