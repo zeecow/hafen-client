@@ -32,6 +32,7 @@ import java.util.*;
 import java.lang.annotation.*;
 
 public interface Acephal {
+    public static final Config.Variable<String> deftype = Config.Variable.prop("haven.acephal", null);
     public Environment env();
     public void dispose();
 
@@ -104,24 +105,33 @@ public interface Acephal {
 	    if(instance == null) {
 		synchronized(Found.class) {
 		    if(instance == null) {
-			List<Factory> types = new ArrayList<>(found().values());
-			Collections.sort(types, Comparator.comparing(Factory::priority).reversed());
-			Collection<Throwable> errors = new ArrayList<>();
-			Acephal first = null;
-			for(Factory type : types) {
-			    try {
-				first = type.open();
-				break;
-			    } catch(Unavailable e) {
-				errors.add(e);
+			if(deftype.get() != null) {
+			    Factory f = types().get(deftype.get());
+			    if(f == null)
+				throw(new Unavailable("no such headless name: " + deftype.get()));
+			    instance = f.open();
+			} else {
+			    List<Factory> types = new ArrayList<>(found().values());
+			    Collections.sort(types, Comparator.comparing(Factory::priority).reversed());
+			    for(Factory f : types)
+				Debug.dump(f.priority(), f);
+			    Collection<Throwable> errors = new ArrayList<>();
+			    Acephal first = null;
+			    for(Factory type : types) {
+				try {
+				    first = type.open();
+				    break;
+				} catch(Unavailable e) {
+				    errors.add(e);
+				}
 			    }
+			    if(first == null) {
+				Unavailable exc = new Unavailable("could find no working headless renderer");
+				errors.forEach(exc::addSuppressed);
+				throw(exc);
+			    }
+			    instance = first;
 			}
-			if(first == null) {
-			    Unavailable exc = new Unavailable("could find no working headless renderer");
-			    errors.forEach(exc::addSuppressed);
-			    throw(exc);
-			}
-			instance = first;
 		    }
 		}
 	    }
