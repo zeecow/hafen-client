@@ -113,8 +113,6 @@ public interface Acephal {
 			} else {
 			    List<Factory> types = new ArrayList<>(found().values());
 			    Collections.sort(types, Comparator.comparing(Factory::priority).reversed());
-			    for(Factory f : types)
-				Debug.dump(f.priority(), f);
 			    Collection<Throwable> errors = new ArrayList<>();
 			    Acephal first = null;
 			    for(Factory type : types) {
