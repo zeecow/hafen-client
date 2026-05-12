@@ -76,6 +76,22 @@ public abstract class EGL {
     public static final int EGL_PLATFORM_GBM_MESA = 0x31D7;
     public static final int EGL_PLATFORM_SURFACELESS_MESA = 0x31DD;
 
+    public static final int EGL_SUCCESS = 0x3000;
+    public static final int EGL_NOT_INITIALIZED = 0x3001;
+    public static final int EGL_BAD_ACCESS = 0x3002;
+    public static final int EGL_BAD_ALLOC = 0x3003;
+    public static final int EGL_BAD_ATTRIBUTE = 0x3004;
+    public static final int EGL_BAD_CONFIG = 0x3005;
+    public static final int EGL_BAD_CONTEXT = 0x3006;
+    public static final int EGL_BAD_CURRENT_SURFACE = 0x3007;
+    public static final int EGL_BAD_DISPLAY = 0x3008;
+    public static final int EGL_BAD_MATCH = 0x3009;
+    public static final int EGL_BAD_NATIVE_PIXMAP = 0x300A;
+    public static final int EGL_BAD_NATIVE_WINDOW = 0x300B;
+    public static final int EGL_BAD_PARAMETER = 0x300C;
+    public static final int EGL_BAD_SURFACE = 0x300D;
+    public static final int EGL_CONTEXT_LOST = 0x300E;
+
     public static class EGLDisplay {
 	protected final MemorySegment mem;
 

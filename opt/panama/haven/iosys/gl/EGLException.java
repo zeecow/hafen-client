@@ -26,6 +26,8 @@
 
 package haven.iosys.gl;
 
+import haven.ffi.*;
+
 public class EGLException extends RuntimeException {
     public final int code;
 
@@ -34,6 +36,6 @@ public class EGLException extends RuntimeException {
     }
 
     public String getMessage() {
-	return("EGL error " + code);
+	return("EGL error " + FUtils.constname(EGL.class, code));
     }
 }
