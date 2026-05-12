@@ -1018,25 +1018,4 @@ public abstract class OpenGL implements haven.render.gl.GL {
 	    } catch(Throwable e) {throw(new RuntimeException(e));}
 	}
     }
-
-    static class libGL_so_1 extends Base {
-	protected MethodHandle lookup(String name, FunctionDescriptor sig) {
-	    MemorySegment addr = GLX.get().glXGetProcAddress(name);
-	    if(nullp(addr))
-		return(null);
-	    return(ld.downcallHandle(addr, sig));
-	}
-    }
-
-    private static OpenGL instance = null;
-    public static OpenGL get() {
-	if(instance == null) {
-	    synchronized(OpenGL.class) {
-		if(instance == null) {
-		    instance = new libGL_so_1();
-		}
-	    }
-	}
-	return(instance);
-    }
 }

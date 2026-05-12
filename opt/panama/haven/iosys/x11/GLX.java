@@ -27,6 +27,7 @@
 package haven.iosys.x11;
 
 import haven.ffi.*;
+import haven.iosys.gl.*;
 import java.lang.invoke.*;
 import java.lang.foreign.*;
 import static haven.ffi.ABI.*;
@@ -359,6 +360,19 @@ public abstract class GLX {
 		checkerror();
 	    }
 	}
+    }
+
+    class Resolved extends OpenGL.Base {
+	protected MethodHandle lookup(String name, FunctionDescriptor sig) {
+	    MemorySegment addr = glXGetProcAddress(name);
+	    if(nullp(addr))
+		return(null);
+	    return(ld.downcallHandle(addr, sig));
+	}
+    }
+
+    public OpenGL gl() {
+	return(new Resolved());
     }
 
     private static GLX instance = null;

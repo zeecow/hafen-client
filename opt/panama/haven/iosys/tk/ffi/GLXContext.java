@@ -58,7 +58,7 @@ public class GLXContext implements Toolkit.Factory {
 	    this.xlib = XLib.get();
 	    this.xi = XInput.get();
 	    this.glx = GLX.get();
-	    this.gl = OpenGL.get();
+	    this.gl = glx.gl();
 	    this.xcr = Xcursor.get();
 	} catch(RuntimeException e) {
 	    throw(new Unavailable("X11 libraries not available", e));
@@ -665,7 +665,7 @@ public class GLXContext implements Toolkit.Factory {
 
 	    public class GLXEnvironment extends FFIEnvironment {
 		private GLXEnvironment() {
-		    super(Area.sized(size));
+		    super(gl, Area.sized(size));
 		}
 
 		public void submit(Render cmd) {

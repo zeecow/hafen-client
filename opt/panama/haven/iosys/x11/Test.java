@@ -36,7 +36,7 @@ public class Test {
     public static void main(String[] args) {
 	XLib xlib = XLib.get();
 	GLX glx = GLX.get();
-	OpenGL gl = OpenGL.get();
+	OpenGL gl = glx.gl();
 
 	XLib.Display dpy = xlib.XOpenDisplay(null);
 	xlib.XSetErrorHandler();

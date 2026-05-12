@@ -36,10 +36,6 @@ public class FFIEnvironment extends GLEnvironment {
 	super(gl, wnd);
     }
 
-    public FFIEnvironment(Area wnd) {
-	this(OpenGL.get(), wnd);
-    }
-
     public static class FFIBuffer extends GLObject implements SysBuffer {
 	public static final boolean LEAK_CHECK = false;
 	private final Arena arena;
