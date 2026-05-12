@@ -219,9 +219,9 @@ public abstract class WGL {
 	public abstract void wglSwapIntervalEXT(int interval);
     }
 
-    static class Resolved extends OpenGL.Base {
+    class Resolved extends OpenGL.Base {
 	protected MethodHandle lookup(String name, FunctionDescriptor sig) {
-	    MemorySegment addr = WGL.get().wglGetProcAddress(name);
+	    MemorySegment addr = wglGetProcAddress(name);
 	    if(nullp(addr))
 		return(null);
 	    return(ld.downcallHandle(addr, sig));
