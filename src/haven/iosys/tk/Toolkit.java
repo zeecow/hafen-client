@@ -149,7 +149,7 @@ public interface Toolkit {
 			if(toolkit.get() != null) {
 			    Factory f = toolkits().get(toolkit.get());
 			    if(f == null)
-				throw(new Unavailable("no such headless name: " + toolkit.get()));
+				throw(new Unavailable("no such toolkit: " + toolkit.get()));
 			    instance = f.open();
 			} else {
 			    List<Factory> toolkits = new ArrayList<>(toolkits().values());
@@ -165,7 +165,7 @@ public interface Toolkit {
 				}
 			    }
 			    if(first == null) {
-				Unavailable exc = new Unavailable("could find no working headless renderer");
+				Unavailable exc = new Unavailable("could find no working toolkit");
 				errors.forEach(exc::addSuppressed);
 				throw(exc);
 			    }
