@@ -187,273 +187,22 @@ public class Client implements Console.Directory {
 	}
     }
 
-    public static class Fence implements Runnable, Abortable {
-	private int state = 0;
+    public static class ClientLoop extends UILoop {
+	public final Client cl;
 
-	public void run() {
-	    synchronized(this) {
-		state = 1;
-		notifyAll();
-	    }
-	}
-
-	public void abort() {
-	    synchronized(this) {
-		state = 2;
-		notifyAll();
-	    }
-	}
-
-	public boolean waitfor() throws InterruptedException {
-	    synchronized(this) {
-		while(state == 0)
-		    wait();
-		return(state == 1);
-	    }
-	}
-    }
-
-    public class UILoop implements UI.Context {
-	public final Thread th;
-	public Environment env;
-	public UI ui;
-	private final Object uilock = new Object();
-	private UI lockedui;
-
-	public UILoop() {
-	    this.env = wnd.env();
-	    newui(null);
-	    this.th = new HackThread(this::run, "Haven UI thread");
-	    this.th.start();
+	private ClientLoop(Client cl) {
+	    super(cl.wnd);
+	    this.cl = cl;
 	}
 
 	public UI newui(UI.Runner fun) {
-	    UI prevui, newui = new UI(this, new Coord(wnd.size()), fun);
-	    newui.env = this.env;
-	    newui.cons.add(Client.this);
-	    synchronized(uilock) {
-		prevui = this.ui;
-		this.ui = newui;
-		while((this.lockedui != null) && (this.lockedui == prevui)) {
-		    try {
-			uilock.wait();
-		    } catch(InterruptedException e) {
-			Thread.currentThread().interrupt();
-			break;
-		    }
-		}
-	    }
-	    if(prevui != null) {
-		synchronized(prevui) {
-		    prevui.destroy();
-		}
-	    }
-	    return(newui);
+	    UI ui = super.newui(fun);
+	    ui.cons.add(cl);
+	    return(ui);
 	}
 
-	public void setmousepos(Coord c) {
-	    /* XXX */
-	}
-
-	/* XXX: Move to UI? */
-	private Object prevtooltip = null;
-	private Indir<Tex> prevtooltex = null;
-	private Disposable freetooltex = null;
-	private void drawtooltip(UI ui, GOut g) {
-	    Object tooltip;
-	    synchronized(ui) {
-		tooltip = ui.tooltip(ui.mc);
-	    }
-	    Indir<Tex> tt = null;
-	    if(Utils.eq(tooltip, prevtooltip)) {
-		tt = prevtooltex;
-	    } else {
-		if(freetooltex != null) {
-		    freetooltex.dispose();
-		    freetooltex = null;
-		}
-		prevtooltip = null;
-		prevtooltex = null;
-		Disposable free = null;
-		if(tooltip != null) {
-		    if(tooltip instanceof Text) {
-			Tex t = ((Text)tooltip).tex();
-			tt = () -> t;
-		    } else if(tooltip instanceof Tex) {
-			Tex t = (Tex)tooltip;
-			tt = () -> t;
-		    } else if(tooltip instanceof Indir<?>) {
-			@SuppressWarnings("unchecked")
-			    Indir<Tex> c = (Indir<Tex>)tooltip;
-			tt = c;
-		    } else if(tooltip instanceof String) {
-			if(((String)tooltip).length() > 0) {
-			    Tex r = new TexI(Text.render((String)tooltip).img, false);
-			    tt = () -> r;
-			    free = r;
-			}
-		    }
-		}
-		prevtooltip = tooltip;
-		prevtooltex = tt;
-		freetooltex = free;
-	    }
-	    Tex tex = (tt == null) ? null : tt.get();
-	    if(tex != null) {
-		Coord sz = tex.sz();
-		Coord pos = ui.mc.sub(sz).sub(curshotspot);
-		if(pos.x < 0)
-		    pos.x = 0;
-		if(pos.y < 0)
-		    pos.y = 0;
-		Coord br = pos.add(sz);
-		Coord m = UI.scale(2, 2);
-		g.chcolor(244, 247, 21, 192);
-		g.rect2(pos.sub(m).sub(1, 1), br.add(m));
-		g.chcolor(35, 35, 35, 192);
-		g.frect2(pos.sub(m), br.add(m));
-		g.chcolor();
-		g.image(tex, pos);
-	    }
-	    ui.lasttip = tooltip;
-	}
-
-	private final Map<Resource, Cursor> cursors = new WeakHashMap<>();
-	private final Map<Cursor, Coord> curshotspots = new WeakHashMap<>();
-	private final Cursor.Caps curscaps = tk.cursorcaps();
-	private Object lastcursor = null;
-	private Coord curshotspot = Coord.z;
-	private void drawcursor(UI ui, GOut g) {
-	    Object curs;
-	    synchronized(ui) {
-		curs = ui.getcurs(ui.mc);
-	    }
-	    if(curs instanceof Resource) {
-		Resource res = (Resource)curs;
-		if(curscaps == null) {
-		    if(!(lastcursor instanceof Resource))
-			wnd.cursor(Cursor.Std.NONE);
-		    curshotspot = UI.scale(res.flayer(Resource.negc).cc);
-		    Coord dc = ui.mc.sub(curshotspot);
-		    g.image(res.flayer(Resource.imgc), dc);
-		} else {
-		    if(curs != lastcursor) {
-			Cursor tkc = cursors.get(res);
-			if(tkc == null) {
-			    Coord hotspot = res.flayer(Resource.negc).cc;
-			    BufferedImage img = res.flayer(Resource.imgc).img;
-			    Coord sz = PUtils.imgsz(img);
-			    Coord tsz;
-			    if(curscaps.pref != 0) {
-				tsz = sz.mul(curscaps.pref).div(sz.max());
-			    } else {
-				tsz = UI.scale(sz);
-				if((tsz.x > curscaps.max) || (tsz.y > curscaps.max))
-				    tsz = tsz.mul(curscaps.max).div(tsz.max());
-			    }
-			    if(!Utils.eq(tsz, sz)) {
-				img = PUtils.uiscale(img, tsz);
-				hotspot = hotspot.mul(tsz).div(sz);
-			    }
-			    cursors.put(res, tkc = tk.makecursor(img, hotspot));
-			    curshotspots.put(tkc, hotspot);
-			}
-			curshotspot = curshotspots.get(tkc);
-			wnd.cursor(tkc);
-		    }
-		}
-	    } else if(curs instanceof Cursor.Std) {
-		if(curs != lastcursor)
-		    wnd.cursor((Cursor.Std)curs);
-	    } else {
-		if(curs != lastcursor)
-		    Warning.warn("unexpected cursor specification: %s", curs);
-	    }
-	    lastcursor = curs;
-	}
-
-	private void display(UI ui, Render buf) {
-	    Pipe base = new BufPipe();
-	    base.prep(new FragColor<>(FragColor.defcolor)).prep(new DepthBuffer<>(DepthBuffer.defdepth));
-	    base.prep(FragColor.blend(new BlendMode()));
-	    Area wnd = Area.sized(ui.root.sz);
-	    base.prep(new States.Viewport(wnd)).prep(new Ortho2D(wnd));
-	    base.prep(new FrameInfo());
-	    buf.clear(base, FragColor.fragcol, FColor.BLACK);
-	    GOut g = new GOut(buf, base, wnd.sz());
-	    synchronized(ui) {
-		ui.draw(g);
-	    }
-	    drawtooltip(ui, g);
-	    drawcursor(ui, g);
-	}
-
-	private void run() {
-	    Render buf = null;
-	    try {
-		Fence prevframe = null;
-		while(true) {
-		    Environment env = wnd.env();
-		    if(env != this.env) {
-			this.env = env;
-			if(ui != null)
-			    ui.env = env;
-		    }
-		    buf = env.render();
-		    UI ui;
-		    synchronized(uilock) {
-			this.lockedui = ui = this.ui;
-			uilock.notifyAll();
-		    }
-
-		    Fence curframe = new Fence();
-		    buf.fence(curframe);
-		    if(prevframe != null) {
-			prevframe.waitfor();
-			prevframe = null;
-		    }
-
-		    synchronized(ui) {
-			queue.dispatch(ui);
-			ui.mousehover(ui.mc);
-			if(ui.sess != null) {
-			    ui.sess.glob.ctick();
-			    ui.sess.glob.gtick(buf);
-			}
-			ui.tick();
-			ui.gtick(buf);
-			Coord sz = wnd.size();
-			if(!ui.root.sz.equals(sz))
-			    ui.root.resize(sz);
-		    }
-
-		    display(ui, buf);
-
-		    wnd.swapbuffers(buf);
-		    env.submit(buf);
-		    buf = null;
-		    prevframe = curframe;
-		}
-	    } catch(InterruptedException e) {
-	    } finally {
-		synchronized(uilock) {
-		    lockedui = null;
-		    uilock.notifyAll();
-		}
-		if(buf != null)
-		    buf.dispose();
-	    }
-	}
-
-	public void dispose() {
-	    th.interrupt();
-	    try {
-		th.join(5000);
-	    } catch(InterruptedException e) {
-		Thread.currentThread().interrupt();
-	    }
-	    if(th.isAlive())
-		Warning.warn("ui thread failed to terminate");
+	protected void dispatch(UI ui) {
+	    cl.queue.dispatch(ui);
 	}
     }
 
@@ -492,7 +241,7 @@ public class Client implements Console.Directory {
     public void run(UI.Runner task) {
 	if(mt != null) throw(new IllegalStateException());
 	mt = Thread.currentThread();
-	UILoop loop = this.loop = new UILoop();
+	UILoop loop = this.loop = new ClientLoop(this);
 	try {
 	    try {
 		while(task != null)
