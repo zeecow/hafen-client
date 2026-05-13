@@ -1056,6 +1056,16 @@ public class ZeeManagerMiner extends ZeeThread{
     }
 
     public static boolean straightLineCheck(Coord2d target) {
+
+        // only underground
+        if (ZeeConfig.playerLocation != ZeeConfig.LOCATION_UNDERGROUND)
+            return false;
+
+        // min target distance
+        double distToTarget = ZeeConfig.getPlayerGob().rc.dist(target);
+        if (distToTarget < TILE_SIZE * 7)
+            return false;
+
         Coord2d plrc = ZeeConfig.getPlayerGob().rc;
         if ( Math.abs(plrc.x) - Math.abs(target.x) < 11 ){
             return true;
@@ -1065,9 +1075,15 @@ public class ZeeManagerMiner extends ZeeThread{
         //println("pl1"+pl1+" , pl2"+pl2+" , targetc"+targetc+" , targetc2"+targetc2);
         return false;
     }
+
+    static boolean isMovingStraightLine;
     static void straightLineMove(Coord2d target){
+        if (isMovingStraightLine){
+            return;
+        }
         new ZeeThread(){
             public void run() {
+                isMovingStraightLine = true;
                 try {
                     int clicks = 1;
                     Gob player = ZeeConfig.getPlayerGob();
@@ -1101,6 +1117,7 @@ public class ZeeManagerMiner extends ZeeThread{
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
+                isMovingStraightLine = false;
                 ZeeConfig.removePlayerText();
             }
         }.start();

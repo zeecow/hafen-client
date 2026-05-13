@@ -88,7 +88,7 @@ public class ZeeManagerGobs extends ZeeThread{
                 toggleModelsInList(getGobsByTags(Gob.Tag.CROP));
             }
             // walk straight line in mines
-            else if (ZeeConfig.playerLocation == ZeeConfig.LOCATION_UNDERGROUND && ZeeManagerMiner.straightLineCheck(coordMc)) {
+            else if (ZeeManagerMiner.straightLineCheck(coordMc)) {
                 ZeeManagerMiner.straightLineMove(coordMc);
             }
         }

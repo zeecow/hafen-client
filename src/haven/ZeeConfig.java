@@ -2854,6 +2854,7 @@ public class ZeeConfig {
         ZeeManagerMiner.lastCavedust = null;
         lastAutoHearthMs = 0;
         ZeeManagerMinimap.mapOptsHidePMarks = ZeeManagerMinimap.mapOptsMarksShowOnlyIsOn = false;
+        ZeeManagerMiner.isMovingStraightLine = false;
         if (ZeeManagerMinimap.minimapOptsMarksResnameHidden !=null)
             ZeeManagerMinimap.minimapOptsMarksResnameHidden.clear();
         ZeeManagerMinimap.mapOptsMarksRow = ZeeManagerMinimap.mapOptsMarksCol = 0;
