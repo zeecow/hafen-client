@@ -616,7 +616,7 @@ public class ZeeConfig {
         if (isAnimalHideTailEtc(nameContains))
             return false;
         final String[] endlist = {
-            "rockdove","quail","/hen","/rooster","magpie", // "/crab"
+            "rockdove","quail","/hen","/rooster","magpie","/duckdrake","/duckhen",
             "mallard","seagull","ptarmigan","grouse","bullfinch",
             "/squirrel","/hedgehog","/bogturtle",
             "/rabbit-buck","-doe","/adder","/mole",
@@ -636,13 +636,11 @@ public class ZeeConfig {
                 return true;
         }
         final String[] containsList = {
-                "rockdove","quail","/hen","/rooster","magpie",
+                "rockdove","quail","/hen","/rooster","magpie","duckdrake","duckhen",
                 "mallard","seagull","ptarmigan","woodgrouse",
                 "/rat/rat","/squirrel/","/hedgehog","/bogturtle",
-                "/rabbit-buck","rabbit-doe",
-                "/frog","/forestlizard","snail",
-                "/crab","/jellyfish", "bayshrimp",
-                "/adder"
+                "/rabbit-buck","rabbit-doe","/frog","/forestlizard","snail",
+                "/crab","/jellyfish", "bayshrimp","/adder"
         };
         for (int i = 0; i < containsList.length; i++) {
             if(nameFull.contains(containsList[i]))
