@@ -298,7 +298,37 @@ public class Client implements Console.Directory {
 	return(cmdmap);
     }
 
+    public static void setupres() {
+	if(ResCache.global != null)
+	    Resource.setcache(ResCache.global);
+	if(Resource.resurl.get() != null)
+	    Resource.addurl(Resource.resurl.get());
+	if(ResCache.global != null) {
+	    /*
+	    try {
+		Resource.loadlist(Resource.remote(), ResCache.global.fetch("tmp/allused"), -10);
+	    } catch(IOException e) {}
+	    */
+	}
+	if(!MainFrame.nopreload.get()) {
+	    try {
+		InputStream pls;
+		pls = Resource.class.getResourceAsStream("res-preload");
+		if(pls != null)
+		    Resource.loadlist(Resource.remote(), pls, -5);
+		pls = Resource.class.getResourceAsStream("res-bgload");
+		if(pls != null)
+		    Resource.loadlist(Resource.remote(), pls, -10);
+	    } catch(IOException e) {
+		throw(new Error(e));
+	    }
+	}
+    }
+
     private static void main2(String[] args) {
+	Utils.initlocale();
+	Config.cmdline(args);
+	setupres();
 	Client cl = new Client(Toolkit.instance());
 	try {
 	    cl.run(cl.new Main());

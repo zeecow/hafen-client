@@ -38,12 +38,18 @@ import java.awt.image.BufferedImage;
 import static java.awt.event.KeyEvent.*;
 
 public abstract class AWTToolkit implements Toolkit {
-    static {
+    public static void initawt() {
 	try {
 	    System.setProperty("sun.java2d.uiScale.enabled", "false");
+	    System.setProperty("apple.awt.application.name", "Haven & Hearth");
+	    javax.swing.UIManager.setLookAndFeel(javax.swing.UIManager.getSystemLookAndFeelClassName());
 	} catch(Exception e) {
 	    new Warning(e, "AWT initialization failed").issue();
 	}
+    }
+
+    static {
+	initawt();
     }
 
     protected AWTToolkit() {

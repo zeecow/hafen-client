@@ -48,6 +48,21 @@ public class Utils {
     public static final java.awt.image.ColorModel rgbm = java.awt.image.ColorModel.getRGBdefault();
     private static Preferences prefs = null;
 
+    public static void initlocale() {
+	try {
+	    /* XXX? Localization is nice and all, but the game as a
+	     * whole currently isn't internationalized, so using the
+	     * local settings for things like number formatting just
+	     * leads to inconsistency.
+	     *
+	     * The locale still seems to influence AWT default font
+	     * selection, though. This should be investigated. */
+	    Locale.setDefault(Locale.US);
+	} catch(Exception e) {
+	    new Warning(e, "locale initialization failed").issue();
+	}
+    }
+
     static Coord imgsz(BufferedImage img) {
 	return(new Coord(img.getWidth(), img.getHeight()));
     }
