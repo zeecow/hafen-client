@@ -54,10 +54,9 @@ public class NEWTContext implements Toolkit.Factory {
 	}
     }
 
-    public int priority() {
-	/* Deprioritize heavily since there's so much unimplemented. */
-	return(-100);
-    }
+    /* Deprioritize heavily since there's so much unimplemented. */
+    public int priority() {return(-100);}
+    public boolean autouse() {return(false);}
 
     private static final NEWTContext instance = new NEWTContext();
     public static Toolkit.Factory get() {return(instance);}

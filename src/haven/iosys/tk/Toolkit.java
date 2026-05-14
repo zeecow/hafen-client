@@ -41,6 +41,7 @@ public interface Toolkit {
     public static interface Factory {
 	public Toolkit open(String... args);
 	public default int priority() {return(0);}
+	public default boolean autouse() {return(true);}
     }
 
     @dolda.jglob.Discoverable
@@ -157,6 +158,8 @@ public interface Toolkit {
 			    Collection<Throwable> errors = new ArrayList<>();
 			    Toolkit first = null;
 			    for(Factory type : toolkits) {
+				if(!type.autouse())
+				    continue;
 				try {
 				    first = type.open();
 				    break;
