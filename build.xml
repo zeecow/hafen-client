@@ -9,6 +9,9 @@
     <mkdir dir="build/classes" />
     <available property="has-res-jar" file="bin/builtin-res.jar" />
     <available property="unpacked-lib" file="build/classes-lib" />
+    <condition property="has-panama">
+      <javaversion atleast="22" />
+    </condition>
   </target>
 
   <target name="make-buildinfo" depends="build-env">
@@ -110,7 +113,7 @@
     <copy file="local-boot.properties" tofile="build/classes/haven/boot-props" failonerror="false" quiet="true" />
   </target>
 
-  <target name="opt/panama" depends="build-env, hafen-client">
+  <target name="opt/panama" if="has-panama" depends="build-env, hafen-client">
     <mkdir dir="build/opt/panama" />
     <javac srcdir="opt/panama" destdir="build/opt/panama" release="22"
 	   debug="on" includeantruntime="no">
@@ -188,11 +191,16 @@
       <fileset dir="lib/ext/lwjgl"><include name="*.jar" /></fileset>
       <fileset dir="lib/ext/steamworks"><include name="*.jar" /></fileset>
     </copy>
+    <copy todir="bin" failonerror="false" quiet="true">
+      <fileset dir="build">
+	<include name="hafen-panama.jar" />
+      </fileset>
+    </copy>
     <copy file="etc/ansgar-config.properties" tofile="bin/haven-config.properties" />
     <chmod file="bin/hafen.jar" perm="a+x" />
   </target>
 
-  <target name="deftgt" depends="jars, bin" />
+  <target name="deftgt" depends="jars, opt/panama, bin" />
 
   <target name="run" depends="bin">
     <condition property="jogl-exports">
