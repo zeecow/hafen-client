@@ -2,6 +2,7 @@ package haven;
 
 
 import haven.render.RenderTree;
+import haven.res.lib.vmat.AttrMats;
 import haven.resutil.WaterTile;
 
 import java.awt.*;
@@ -3415,6 +3416,34 @@ public class ZeeManagerGobs extends ZeeThread{
         // hide hitbox if setting permits
         if (!ZeeConfig.showHitbox)
             gob.hideHitBox();
+    }
+
+    static List<String> getGobMatsBasenames(Gob gob1) {
+        List<String> basenames = new ArrayList<>();
+        try {
+            AttrMats attr = (AttrMats) ZeeConfig.getGobAttr(gob1, AttrMats.class);
+            if (attr==null){
+                ZeeCupboardLabeler.println("getGobMatsBasenames > attr null");
+                return basenames;
+            }
+            if (attr!=null){
+                Map<Integer, Material> mats = attr.mats;
+                for (Material m : mats.values()) {
+                    //println(m.states.toString());
+                    //match mats basenames
+                    Pattern pattern = Pattern.compile("\\/([a-z\\-]+)\\(");
+                    Matcher matcher = pattern.matcher(m.states.toString());
+                    matcher.find();
+                    String basename = matcher.group(1);
+                    if (!basenames.contains(basename))
+                        basenames.add(basename);
+                }
+            }
+        } catch (IllegalStateException e){
+            ZeeCupboardLabeler.println("getGobMatsBasenames > "+e.getMessage());
+            return new ArrayList<>();
+        }
+        return basenames;
     }
 
     private boolean isGobBigDeadAnimal_thread() {

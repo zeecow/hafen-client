@@ -39,6 +39,7 @@ import haven.render.*;
 import haven.MCache.OverlayInfo;
 import haven.render.sl.Uniform;
 import haven.render.sl.Type;
+import haven.res.lib.vmat.AttrMats;
 
 public class MapView extends PView implements DTarget, Console.Directory {
     public static boolean clickdb = false;
@@ -2623,6 +2624,12 @@ public class MapView extends PView implements DTarget, Console.Directory {
 								sb.append("\nAttrs:");
 								for (GAttrib a : gob.attr.values()) {
 									sb.append("\n   "+a.getClass().getSimpleName());
+                                    if (a instanceof AttrMats){
+                                        List<String> mats = ZeeManagerGobs.getGobMatsBasenames(gob);
+                                        for (String m : mats) {
+                                            sb.append("\n        "+m);
+                                        }
+                                    }
 								}
 							}
 							// gob tags

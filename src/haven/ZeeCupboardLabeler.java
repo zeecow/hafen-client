@@ -1,14 +1,9 @@
 package haven;
 
-import haven.res.lib.vmat.AttrMats;
-
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 @SuppressWarnings("deprecation")
 public class ZeeCupboardLabeler {
@@ -25,7 +20,7 @@ public class ZeeCupboardLabeler {
     static int lastCabinLevel = CABIN_LEVEL_UNKOWN;
 
     static String generateHouseId(Gob house){
-        List<String> mats = getHouseMatsBasenames(house);
+        List<String> mats = ZeeManagerGobs.getGobMatsBasenames(house);
         if (mats.isEmpty()){
             println("mats empty");
             return"";
@@ -111,34 +106,6 @@ public class ZeeCupboardLabeler {
         if (win!=null)
             win.reqdestroy();
         win = null;
-    }
-
-    private static List<String> getHouseMatsBasenames(Gob house) {
-        List<String> basenames = new ArrayList<>();
-        try {
-            AttrMats attr = (AttrMats) ZeeConfig.getGobAttr(house, AttrMats.class);
-            if (attr==null){
-                println("getHouseMatsBasenames > attr null");
-                return basenames;
-            }
-            if (attr!=null){
-                Map<Integer, Material> mats = attr.mats;
-                for (Material m : mats.values()) {
-                    //println(m.states.toString());
-                    //match mats basenames
-                    Pattern pattern = Pattern.compile("\\/([a-z\\-]+)\\(");
-                    Matcher matcher = pattern.matcher(m.states.toString());
-                    matcher.find();
-                    String basename = matcher.group(1);
-                    if (!basenames.contains(basename))
-                        basenames.add(basename);
-                }
-            }
-        } catch (IllegalStateException e){
-            println("getHouseMatsBasenames > "+e.getMessage());
-            return new ArrayList<>();
-        }
-        return basenames;
     }
 
     static void checkHouseClick() {
