@@ -45,7 +45,7 @@ public abstract class TableBox<I> extends Widget {
 	    for(Column col : cols) {
 		Widget head = col.spec.heading(Coord.of(col.w, h));
 		if(head != null)
-		    col.head = adda(head, Coord.of(col.x + (int)Math.round(col.w * col.spec.halign()), h), col.spec.halign(), 1.0);
+		    col.head = adda(head, Coord.of(col.x + (int)Math.round(col.w * col.spec.halign()), h / 2), col.spec.halign(), 0.5);
 	    }
 	}
 	main = add(makelist(sz.sub(0, h)), Coord.of(0, h));
