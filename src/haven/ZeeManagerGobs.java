@@ -3977,17 +3977,30 @@ public class ZeeManagerGobs extends ZeeThread{
                 return false;
             }
         }
+        //wait no previous menu
+        if (getFlowerMenu()!=null){
+            println("clickGobPetal > rem prev menu");
+            getFlowerMenu().reqdestroy();
+            waitNoFlowerMenu();
+        }
         //click gob
         gobClick(gob,3);
         //click petal
         FlowerMenu fm = waitFlowerMenu();
-        if(fm!=null && fm.hasPetal(petalName)){
-            choosePetal(fm, petalName);
-            return waitNoFlowerMenu();
+        if(fm!=null){
+            if (fm.hasPetal(petalName)) {
+                choosePetal(fm, petalName);
+                return waitNoFlowerMenu();
+            }
+            println("clickGobPetal > no petal \""+petalName
+                    +"\" for gob "+gob.getres().basename()
+                    +" ( "+Arrays.stream(fm.opts)
+                    .map(petal -> petal.name)
+                    .collect(Collectors.joining(", "))+" )");
         }else{
-            println("clickGobPetal > no flower menu?");
-            return false;
+            println("clickGobPetal > fm null");
         }
+        return false;
     }
 
     // if gob has flowermenu returns true
