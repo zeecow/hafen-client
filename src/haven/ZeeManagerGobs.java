@@ -1877,28 +1877,6 @@ public class ZeeManagerGobs extends ZeeThread{
         }.start();
     }
 
-    static boolean isRightClickZooming = false;
-    static int rClickZoomLastY;
-    private static void startRightClickZooming(Gob g, Coord pc) {
-        rClickZoomLastY = pc.y;
-        // start watching if clicked center box of 50x50
-        //if ( Math.abs(rcguisz.x - pc.x) < 50  &&  Math.abs(rcguisz.y - pc.y) < 50){
-        if(g.id == ZeeConfig.gameUI.plid){//clicked player?
-            isRightClickZooming = true;
-        }else{
-            isRightClickZooming = false;
-        }
-    }
-    static void rightClickZoom(Coord pc){
-        if(pc.y < rClickZoomLastY){
-            ZeeConfig.gameUI.map.camera.wheel(pc,-2);
-        }
-        else if(pc.y > rClickZoomLastY){
-            ZeeConfig.gameUI.map.camera.wheel(pc,2);
-        }
-        rClickZoomLastY = pc.y;
-    }
-
     static boolean isGobAmbientPassage(Gob gob){
         String gobName = gob.getres().name;
         if( isGobHouseInnerDoor(gobName) ||

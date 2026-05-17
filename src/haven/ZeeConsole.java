@@ -760,6 +760,7 @@ public class ZeeConsole {
 
     private static Boolean stack2WindowsContents() {
         try {
+            @SuppressWarnings("unchecked")
             List<Window> windows = (List<Window>) lastCmdResults;
             for (Window window : windows) {
                 Inventory inv = ZeeConfig.getWindowsInventory(window);
@@ -802,6 +803,7 @@ public class ZeeConsole {
 
     private static Boolean stack2ItemsSelected() {
         try {
+            @SuppressWarnings("unchecked")
             List<WItem> selectedItems = (List<WItem>) lastCmdResults;
             List<String> names = new ArrayList<>();
             List<String> meatNames = new ArrayList<>();

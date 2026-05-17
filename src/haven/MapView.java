@@ -2161,9 +2161,6 @@ public class MapView extends PView implements DTarget, Console.Directory {
 
 	static boolean leftClickDragging = false;
     public void mousemove(MouseMoveEvent ev) {
-	if (ZeeManagerGobs.isRightClickZooming){
-		ZeeManagerGobs.rightClickZoom(c);
-	}
 	if(grab != null)
 	    grab.mmousemove(ev.c);
 	Loader.Future<Plob> placing_l = this.placing;
@@ -2196,8 +2193,6 @@ public class MapView extends PView implements DTarget, Console.Directory {
     public boolean mouseup(MouseUpEvent ev) {
 	ZeeManagerGobs.lastClickMouseUpMs = System.currentTimeMillis();
 	ZeeManagerGobs.lastClickMouseButton = ev.b;
-	if (ev.b == 3)
-		ZeeManagerGobs.isRightClickZooming = false;
 	// stop left-click camera drag
 	if (ev.b == 1){
 		leftClickDragging = false;
