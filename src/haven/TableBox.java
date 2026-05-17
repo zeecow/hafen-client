@@ -131,6 +131,14 @@ public abstract class TableBox<I> extends Widget {
 	public Row makeitem(I item, int idx, Coord sz) {
 	    return(TableBox.this.makeitem(item, idx, sz));
 	}
+
+	protected boolean unselect(int button) {
+	    return(TableBox.this.unselect(button));
+	}
+    }
+
+    protected boolean unselect(int button) {
+	return(false);
     }
 
     private void widths() {
