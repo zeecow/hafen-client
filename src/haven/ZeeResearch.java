@@ -30,7 +30,8 @@ public class ZeeResearch {
 
     public static void checkResearch(String recipe) {
         if(recipe.contentEquals("Herbal Swill")) {
-            herbalSwillBuildEntry();
+            // TODO other way
+            //herbalSwillBuildEntry();
         }
     }
 

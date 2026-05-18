@@ -134,7 +134,7 @@ public class ZeeConfig {
     static final String DEF_LIST_MUTE_AUDIO = "Leashed horse.;Tracking is now turned;Stacking is now turned;must be empty to be unequipped";
     static final String DEF_LIST_CONFIRM_PETAL = "Empty,Swill,Clean out,Slaughter,Castrate,Unmoor,Declaim,Take possession,Renounce Lawspeaker,Become Lawspeaker,Pull hair,Disassemble,Claim,Set home dock,Crack & Soften,Snort,Extend one,Hold up proudly";
     static final List<String> DEF_LIST_CONFIRM_BUTTON = List.of("Empty","Empty out","Abandon quest","Abandon credo","Resign","Forget me");
-    static final String DEF_WINS_HIDE_BUTTON = "Inventory,Character Sheet,Basket,Creel,Cattle Roster,Quiver,Pickup Gobs,Switch Char,:zeecow cmds";
+    static final String DEF_WINS_HIDE_BUTTON = "Inventory,Character Sheet,Basket,Creel,Cattle Roster,Quiver,Pickup Gobs,Switch Char,:zeecow cmds,Alchemy Book";
     static final String DEF_LIST_BUTCH_AUTO = "Break,Scale,Wring neck,Kill,Skin,Flay,Pluck,Clean,Butcher,Collect bones";
     static final String DEF_LIST_AUTO_CLICK_MENU = "Pick,Harvest wax";
     static final String DEF_LIST_SHAPEICON = "stalagoomba 1,diamond 7 1 0 0,255 255 0,1;/amberwash 2,diamond 7 0 1 1,255 102 0,0;/cavepuddle 2,diamond 7 0 1 1,0 204 102,1;/ladder 2,triangleUp 5 0 1 1,0 204 102,0;/minehole 2,triangleDown 5 0 1 1,0 204 102,0;/burrow 2,triangleDown 6 0 1 1,204 0 255,0;/spark 2,square 4 0 1 0,102 102 255,0;/snekkja 2,square 4 0 1 0,255 255 102,0;/dugout 2,square 4 0 1 0,255 255 102,0;/wheelbarrow 2,square 4 0 1 0,0 255 255,0;/cart 2,square 4 0 1 0,0 153 255,0;/knarr 2,square 4 0 1 0,255 255 102,0;/rowboat 2,square 4 0 1 0,255 255 102,0;/horse/ 1,square 4 0 1 0,0 204 0,0;items/arrow 2,triangleUp 5 0 1 0,102 255 204,0;milestone-stone-e 2,diamond 4 0 1 1,255 255 255,0;milestone-wood-e 2,diamond 4 0 1 1,255 255 255,0;/fishingnet 2,diamond 4 0 1 1,153 153 153,0;wonders/wellspring 1,diamond 5 0 1 1,0 255 255,0;/map/starshard 2,diamond 7 0 1 1,255 255 0,0;naturalminesupport 1,diamond 7 1 0 0,255 255 0,0;/gemstone 2,diamond 7 0 1 1,255 0 51,1;/dng/rathole 2,triangleDown 5 0 1 1,255 0 255,1";
@@ -4933,6 +4933,7 @@ public class ZeeConfig {
         synchronized (gameUI.menu.paginae) {
             for (MenuGrid.Pagina pagina : gameUI.menu.paginae) {
                 String buttonName = pagina.res().basename();
+                //ZeeConfig.println(buttonName);
                 if (buttonName.contentEquals(wdgmsgArgName)) {
                     //ZeeConfig.println("found button for " + recipeName);
                     return pagina.button();

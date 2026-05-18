@@ -981,7 +981,7 @@ public class ZeeManagerGobs extends ZeeThread{
                 }
                 //clicked water
                 else if (isTileInspectQl(coordMc)) {
-                    showGobFlowerMenu();
+                    showGobMenu();
                 }
                 //disembark water vehicles
                 else if (ZeeConfig.isPlayerOnCoracle()) {
@@ -1009,7 +1009,7 @@ public class ZeeManagerGobs extends ZeeThread{
                     ZeeConfig.clickCoord(coordMc.floor(posres),3,UI.MOD_SHIFT);
                 }
                 else{
-                    showGobFlowerMenu();
+                    showGobMenu();
                 }
             }
             /*
@@ -1036,7 +1036,7 @@ public class ZeeManagerGobs extends ZeeThread{
                 cauldronPutOut();
             }
             // show ZeeFlowerMenu
-            else if (!isGroundClick && !ZeeConfig.isPlayerHoldingItem() && showGobFlowerMenu()) {
+            else if (!isGroundClick && !ZeeConfig.isPlayerHoldingItem() && showGobMenu()) {
 
             }
             // activate cursor harvest
@@ -2202,6 +2202,9 @@ public class ZeeManagerGobs extends ZeeThread{
             else
                 ZeeConfig.gameUI.menu.wdgmsg("act","craft",arr[1],0);
         }
+        else if (petalName.contentEquals("Open Alchemy Book")){
+            ZeeConfig.getMenuButton("alchbook").use(new MenuGrid.Interaction(1, ZeeConfig.gameUI.ui.modflags()));
+        }
         else{
             println("chooseGobFlowerMenu > unkown case");
         }
@@ -2473,7 +2476,7 @@ public class ZeeManagerGobs extends ZeeThread{
         }.start();
     }
 
-    private static boolean showGobFlowerMenu(){
+    private static boolean showGobMenu(){
 
         boolean showMenu = true;
         ZeeFlowerMenu menu = null;
@@ -2647,6 +2650,12 @@ public class ZeeManagerGobs extends ZeeThread{
                     ZeeFlowerMenu.STRPETAL_LIFTUPGOB,
                     "Craft flour",
                     "Craft grist"
+            );
+        }
+        else if (gobName.endsWith("/alchemiststable")) {
+            menu = new ZeeFlowerMenu( gob,
+                    ZeeFlowerMenu.STRPETAL_LIFTUPGOB,
+                    "Open Alchemy Book"
             );
         }
         else{
