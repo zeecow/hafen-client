@@ -28,12 +28,15 @@ package haven.iosys.tk;
 
 import java.util.*;
 import java.awt.event.*;
+import java.io.*;
+import java.nio.file.*;
 import haven.*;
 import haven.render.*;
 import haven.render.gl.*;
+import java.awt.AWTEvent;
+import java.awt.Component;
 import java.awt.EventQueue;
 import java.awt.HeadlessException;
-import java.awt.Component;
 import java.awt.image.BufferedImage;
 import static java.awt.event.KeyEvent.*;
 
@@ -43,6 +46,7 @@ public abstract class AWTToolkit implements Toolkit {
 	    System.setProperty("sun.java2d.uiScale.enabled", "false");
 	    System.setProperty("apple.awt.application.name", "Haven & Hearth");
 	    javax.swing.UIManager.setLookAndFeel(javax.swing.UIManager.getSystemLookAndFeelClassName());
+	    // java.awt.Toolkit.getDefaultToolkit().getSystemEventQueue().push(new DebugEventQueue());
 	} catch(Exception e) {
 	    new Warning(e, "AWT initialization failed").issue();
 	}
@@ -668,4 +672,52 @@ public abstract class AWTToolkit implements Toolkit {
 	.put(VK_KP_LEFT, Key.Std.NP_LEFT)
 	.put(VK_KP_RIGHT, Key.Std.NP_RIGHT)
 	.map();
+}
+
+class DebugEventQueue extends EventQueue {
+    public final Map<AWTEvent, Record> posted = new IdentityHashMap<>();
+    public final PrintStream out;
+
+    public static final class Record {
+	public static int nextseq = 0;
+	public final int seq;
+	public final double st;
+
+	public Record() {
+	    synchronized(Record.class) {
+		seq = nextseq++;
+		st = Utils.rtime();
+	    }
+	}
+    }
+
+    public DebugEventQueue() {
+	try {
+	    out = new PrintStream(Files.newOutputStream(Utils.path("edt-dump")));
+	} catch(IOException e) {
+	    throw(new RuntimeException(e));
+	}
+    }
+
+    protected void dispatchEvent(AWTEvent ev) {
+	Record rec = posted.remove(ev);
+	double st = Utils.rtime();
+	super.dispatchEvent(ev);
+	double et = Utils.rtime();
+	long el = (ev instanceof InputEvent) ? (System.currentTimeMillis() - ((InputEvent)ev).getWhen()) : -1;
+	if(rec != null)
+	    out.printf("%8.2f: dispatch %8d (%5d, %8.2f + %.2f ms): %s\n", st, rec.seq, el, (et - st) * 1000, (st - rec.st) * 1000, ev);
+	else
+	    out.printf("%8.2f: dispatch      N/A (%5d, %8.2f ms): %s\n", st, el, (et - st) * 1000, ev);
+    }
+
+    public void postEvent(AWTEvent ev) {
+	Record rec = new Record();
+	synchronized(posted) {
+	    posted.put(ev, rec);
+	}
+	super.postEvent(ev);
+	long el = (ev instanceof InputEvent) ? (System.currentTimeMillis() - ((InputEvent)ev).getWhen()) : -1;
+	out.printf("%8.2f: posted   %8d (%5d ms): %s\n", Utils.rtime(), rec.seq, el, ev);
+    }
 }
