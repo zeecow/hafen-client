@@ -124,8 +124,10 @@ public class Client implements Console.Directory {
 			ui.mousewheel(mkawt(e), e.wndc(), e.amount(), e.subamount());
 		} else if(ev instanceof Toolkit.KeyDownEvent) {
 		    ui.keydown(mkawt((Toolkit.KeyEvent)ev));
+		    Debug.keyevent(mkawt((Toolkit.KeyEvent)ev));
 		} else if(ev instanceof Toolkit.KeyUpEvent) {
 		    ui.keyup(mkawt((Toolkit.KeyEvent)ev));
+		    Debug.keyevent(mkawt((Toolkit.KeyEvent)ev));
 		}
 	    }
 	}

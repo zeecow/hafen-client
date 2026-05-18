@@ -308,6 +308,9 @@ public abstract class UILoop implements UI.Context {
 			this.lockedui = ui = this.ui;
 			uilock.notifyAll();
 		    }
+		    Debug.cycle(ui.modflags());
+		    if(Debug.ff)
+			Debug.dump(1);
 
 		    Frame curframe = frame(ui, buf, prevframe);
 		    prevframe = null;
