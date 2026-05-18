@@ -236,10 +236,64 @@ public abstract class UILoop implements UI.Context {
 
     protected abstract void dispatch(UI ui);
 
+    public static class Frame {
+	public final UILoop loop;
+	public final UI ui;
+	public final Render out;
+	public final Frame prev;
+	public final Fence sync = new Fence();
+
+	public Frame(UILoop loop, UI ui, Render out, Frame prev) {
+	    this.loop = loop;
+	    this.ui = ui;
+	    this.out = out;
+	    this.prev = prev;
+	}
+
+	protected void tick() {
+	    synchronized(ui) {
+		loop.dispatch(ui);
+		ui.mousehover(ui.mc);
+		if(ui.sess != null) {
+		    ui.sess.glob.ctick();
+		    ui.sess.glob.gtick(out);
+		}
+		ui.tick();
+		ui.gtick(out);
+		Coord sz = loop.wnd.size();
+		if(!ui.root.sz.equals(sz))
+		    ui.root.resize(sz);
+	    }
+	}
+
+	protected void display() {
+	    loop.display(ui, out);
+	}
+
+	protected void swapbuffers() {
+	    loop.wnd.swapbuffers(out);
+	}
+
+	public void run() throws InterruptedException {
+	    out.fence(sync);
+	    if(prev != null) {
+		prev.sync.waitfor();
+	    }
+
+	    tick();
+	    display();
+	    swapbuffers();
+	}
+    }
+
+    protected Frame frame(UI ui, Render out, Frame prev) {
+	return(new Frame(this, ui, out, prev));
+    }
+
     private void run() {
 	Render buf = null;
 	try {
-	    Fence prevframe = null;
+	    Frame prevframe = null;
 	    while(true) {
 		Environment env = wnd.env();
 		if(env != this.env) {
@@ -248,39 +302,23 @@ public abstract class UILoop implements UI.Context {
 			ui.env = env;
 		}
 		buf = env.render();
-		UI ui;
-		synchronized(uilock) {
-		    this.lockedui = ui = this.ui;
-		    uilock.notifyAll();
-		}
-
-		Fence curframe = new Fence();
-		buf.fence(curframe);
-		if(prevframe != null) {
-		    prevframe.waitfor();
-		    prevframe = null;
-		}
-
-		synchronized(ui) {
-		    dispatch(ui);
-		    ui.mousehover(ui.mc);
-		    if(ui.sess != null) {
-			ui.sess.glob.ctick();
-			ui.sess.glob.gtick(buf);
+		try {
+		    UI ui;
+		    synchronized(uilock) {
+			this.lockedui = ui = this.ui;
+			uilock.notifyAll();
 		    }
-		    ui.tick();
-		    ui.gtick(buf);
-		    Coord sz = wnd.size();
-		    if(!ui.root.sz.equals(sz))
-			ui.root.resize(sz);
+
+		    Frame curframe = frame(ui, buf, prevframe);
+		    prevframe = null;
+		    curframe.run();
+		    env.submit(buf);
+		    buf = null;
+		    prevframe = curframe;
+		} finally {
+		    if(buf != null)
+			buf.dispose();
 		}
-
-		display(ui, buf);
-
-		wnd.swapbuffers(buf);
-		env.submit(buf);
-		buf = null;
-		prevframe = curframe;
 	    }
 	} catch(InterruptedException e) {
 	} finally {
@@ -288,8 +326,6 @@ public abstract class UILoop implements UI.Context {
 		lockedui = null;
 		uilock.notifyAll();
 	    }
-	    if(buf != null)
-		buf.dispose();
 	}
     }
 
