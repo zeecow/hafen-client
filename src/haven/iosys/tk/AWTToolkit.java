@@ -675,8 +675,8 @@ public abstract class AWTToolkit implements Toolkit {
 }
 
 class DebugEventQueue extends EventQueue {
-    public final Map<AWTEvent, Record> posted = new IdentityHashMap<>();
-    public final PrintStream out;
+    private final Map<AWTEvent, Record> posted = new IdentityHashMap<>();
+    private StringBuilder buf = new StringBuilder();
 
     public static final class Record {
 	public static int nextseq = 0;
@@ -692,10 +692,36 @@ class DebugEventQueue extends EventQueue {
     }
 
     public DebugEventQueue() {
+	Thread th = new Thread(this::ioloop, "DebugEventQueue flusher");
+	th.setDaemon(true);
+	th.start();
+    }
+
+    private void ioloop() {
 	try {
-	    out = new PrintStream(Files.newOutputStream(Utils.path("edt-dump")));
+	    try(Writer out = Files.newBufferedWriter(Utils.path("edt-dump"))) {
+		while(true) {
+		    StringBuilder buf;
+		    synchronized(this) {
+			while(this.buf.length() == 0)
+			    wait();
+			buf = this.buf;
+			this.buf = new StringBuilder();
+		    }
+		    out.write(buf.toString());
+		    out.flush();
+		}
+	    }
+	} catch(InterruptedException e) {
 	} catch(IOException e) {
 	    throw(new RuntimeException(e));
+	}
+    }
+
+    private void printf(String fmt, Object... args) {
+	synchronized(this) {
+	    buf.append(String.format(fmt, args));
+	    notifyAll();
 	}
     }
 
@@ -706,9 +732,9 @@ class DebugEventQueue extends EventQueue {
 	double et = Utils.rtime();
 	long el = (ev instanceof InputEvent) ? (System.currentTimeMillis() - ((InputEvent)ev).getWhen()) : -1;
 	if(rec != null)
-	    out.printf("%8.2f: dispatch %8d (%5d, %8.2f + %.2f ms): %s\n", st, rec.seq, el, (et - st) * 1000, (st - rec.st) * 1000, ev);
+	    printf("%8.2f: dispatch %8d (%5d, %8.2f + %.2f ms): %s\n", st, rec.seq, el, (et - st) * 1000, (st - rec.st) * 1000, ev);
 	else
-	    out.printf("%8.2f: dispatch      N/A (%5d, %8.2f ms): %s\n", st, el, (et - st) * 1000, ev);
+	    printf("%8.2f: dispatch      N/A (%5d, %8.2f ms): %s\n", st, el, (et - st) * 1000, ev);
     }
 
     public void postEvent(AWTEvent ev) {
@@ -718,6 +744,6 @@ class DebugEventQueue extends EventQueue {
 	}
 	super.postEvent(ev);
 	long el = (ev instanceof InputEvent) ? (System.currentTimeMillis() - ((InputEvent)ev).getWhen()) : -1;
-	out.printf("%8.2f: posted   %8d (%5d ms): %s\n", Utils.rtime(), rec.seq, el, ev);
+	printf("%8.2f: posted   %8d (%5d ms): %s\n", Utils.rtime(), rec.seq, el, ev);
     }
 }
