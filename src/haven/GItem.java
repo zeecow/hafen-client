@@ -27,6 +27,7 @@
 package haven;
 
 import java.util.*;
+import java.util.function.*;
 import haven.render.*;
 import java.awt.Color;
 import java.awt.Graphics;
@@ -59,6 +60,25 @@ public class GItem extends AWidget implements ItemInfo.SpriteOwner, GSprite.Owne
 
     public interface RStateInfo {
 	public Pipe.Op rstate();
+
+	public static final Function<List<ItemInfo>, Supplier<Pipe.Op>> combine = info -> {
+	    ArrayList<GItem.RStateInfo> ols = new ArrayList<>();
+	    for(ItemInfo inf : info) {
+		if(inf instanceof GItem.RStateInfo)
+		    ols.add((GItem.RStateInfo)inf);
+	    }
+	    if(ols.size() == 0)
+		return(() -> null);
+	    if(ols.size() == 1) {
+		Pipe.Op op = ols.get(0).rstate();
+		return(() -> op);
+	    }
+	    Pipe.Op[] ops = new Pipe.Op[ols.size()];
+	    for(int i = 0; i < ops.length; i++)
+		ops[i] = ols.get(0).rstate();
+	    Pipe.Op cmp = Pipe.Op.compose(ops);
+	    return(() -> cmp);
+	};
     }
 
     public interface ColorInfo extends RStateInfo {
