@@ -1019,6 +1019,8 @@ public class ZeeManagerItems extends ZeeThread{
                                     items = inv.getWItemsByNameContains("gfx/invobjs/rabbit-");
                                 else if (firstItemName.endsWith("/hen") || firstItemName.endsWith("/rooster"))
                                     items = inv.getItemsByNameEnd("/hen","/rooster");
+                                else if (firstItemName.endsWith("/duckdrake") || firstItemName.endsWith("/duckhen"))
+                                    items = inv.getItemsByNameEnd("/duckdrake","/duckhen");
                                 else
                                     items = inv.getWItemsByNameEndsWith(firstItemName);
 
