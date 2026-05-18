@@ -31,7 +31,7 @@ import haven.render.*;
 import haven.render.gl.*;
 import java.awt.Cursor;
 import java.awt.Toolkit;
-import haven.JOGLPanel.SyncMode;
+import haven.GSettings.SyncMode;
 
 public interface GLPanel extends UIPanel, UI.Context {
     public GLEnvironment env();
