@@ -39,6 +39,7 @@ public abstract class UILoop implements UI.Context {
     private final Cursor.Caps curscaps;
     private final Object uilock = new Object();
     private UI lockedui;
+    private long frameno = 0;
 
     public UILoop(Windeye wnd) {
 	this.wnd = wnd;
@@ -192,6 +193,11 @@ public abstract class UILoop implements UI.Context {
 	lastcursor = curs;
     }
 
+    private void drawstats(UI ui, GOut g, Render buf) {
+	int y = g.sz().y - UI.scale(190), dy = FastText.h;
+	FastText.aprintf(g, new Coord(10, y -= dy), 0, 1, "FPS: %d (%d%% idle)", fps, (int)(uidle * 100.0));
+    }
+
     private void display(UI ui, Render buf) {
 	Pipe base = new BufPipe();
 	base.prep(new FragColor<>(FragColor.defcolor)).prep(new DepthBuffer<>(DepthBuffer.defdepth));
@@ -204,6 +210,8 @@ public abstract class UILoop implements UI.Context {
 	synchronized(ui) {
 	    ui.draw(g);
 	}
+	if(UIPanel.dbtext.get())
+	    drawstats(ui, g, buf);
 	drawtooltip(ui, g);
 	drawcursor(ui, g);
     }
@@ -236,18 +244,43 @@ public abstract class UILoop implements UI.Context {
 
     protected abstract void dispatch(UI ui);
 
+    private final double[] frames = new double[128], waited = new double[frames.length];
+    private int fps;
+    private double uidle;
+    protected void updstats(Frame f) {
+	int fi = (int)(f.frameno % frames.length);
+	frames[fi] = f.ftime;
+	waited[fi] = f.wtime;
+	double twait = 0;
+	int i = 0, ckf = fi;
+	for(; i < frames.length - 1; i++) {
+	    twait += waited[ckf];
+	    if(f.ftime - frames[ckf] > 1)
+		break;
+	    ckf = (ckf - 1 + frames.length) % frames.length;
+	}
+	if(f.ftime > frames[ckf]) {
+	    fps = (int)Math.round(i / (f.ftime - frames[ckf]));
+	    uidle = twait / (f.ftime - frames[ckf]);
+	}
+    }
+
     public static class Frame {
 	public final UILoop loop;
+	public final long frameno;
 	public final UI ui;
 	public final Render out;
-	public final Frame prev;
 	public final Fence sync = new Fence();
+	public Frame prev;
+	public double stime, ftime, wtime;
 
 	public Frame(UILoop loop, UI ui, Render out, Frame prev) {
 	    this.loop = loop;
+	    this.frameno = loop.frameno++;
 	    this.ui = ui;
 	    this.out = out;
 	    this.prev = prev;
+	    this.stime = Utils.rtime();
 	}
 
 	protected void tick() {
@@ -274,15 +307,22 @@ public abstract class UILoop implements UI.Context {
 	    loop.wnd.swapbuffers(out);
 	}
 
+	protected void fin() {
+	    ftime = Utils.rtime();
+	}
+
 	public void run() throws InterruptedException {
 	    out.fence(sync);
 	    if(prev != null) {
+		double then = Utils.rtime();
 		prev.sync.waitfor();
+		wtime += Utils.rtime() - then;
 	    }
 
 	    tick();
 	    display();
 	    swapbuffers();
+	    fin();
 	}
     }
 
@@ -316,8 +356,10 @@ public abstract class UILoop implements UI.Context {
 		    prevframe = null;
 		    curframe.run();
 		    env.submit(buf);
+
 		    buf = null;
-		    prevframe = curframe;
+		    updstats(curframe);
+		    (prevframe = curframe).prev = null;
 		} finally {
 		    if(buf != null)
 			buf.dispose();
