@@ -245,16 +245,6 @@ public class GItem extends AWidget implements ItemInfo.SpriteOwner, GSprite.Owne
 	public void propagate(List<ItemInfo> buf, ItemInfo.Owner outer);
     }
 
-    /* XXX: Please remove me some time, some day, when custom clients
-     * can be expected to have merged ContentsInfo. */
-    private static void propagate(ItemInfo inf, List<ItemInfo> buf, ItemInfo.Owner outer) {
-	try {
-	    java.lang.reflect.Method mth = inf.getClass().getMethod("propagate", List.class, ItemInfo.Owner.class);
-	    Utils.invoke(mth, inf, buf, outer);
-	} catch(NoSuchMethodException e) {
-	}
-    }
-
     private int lastcontseq;
     private List<Pair<GItem, Integer>> lastcontinfo = null;
     private void updcontinfo() {
@@ -299,8 +289,6 @@ public class GItem extends AWidget implements ItemInfo.SpriteOwner, GSprite.Owne
 		    for(ItemInfo inf : ((GItem)ch).info()) {
 			if(inf instanceof ContentsInfo)
 			    ((ContentsInfo)inf).propagate(buf, this);
-			else
-			    propagate(inf, buf, this);
 		    }
 		}
 	    }
