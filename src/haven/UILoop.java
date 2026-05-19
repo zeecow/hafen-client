@@ -366,8 +366,17 @@ public abstract class UILoop implements UI.Context {
 	    out.fence(() -> loop.framelag = Utils.rtime() - ttime);
 	}
 
-	protected void fin() {
-	    ftime = Utils.rtime();
+	protected void fin() throws InterruptedException {
+	    double now = Utils.rtime();
+	    double fd = loop.framedur();
+	    if((prev != null) && (prev.ftime + fd > now)) {
+		this.ftime = prev.ftime + fd;
+		long nanos = (long)((this.ftime - now) * 1e9);
+		Thread.sleep(nanos / 1000000, (int)(nanos % 1000000));
+		waited += this.ftime - now;
+	    } else {
+		this.ftime = now;
+	    }
 	}
 
 	protected void syncwait() throws InterruptedException {
@@ -391,7 +400,6 @@ public abstract class UILoop implements UI.Context {
 	    display();
 	    swapbuffers();
 	    if(swapsync) out.fence(sync);
-	    fin();
 	}
     }
 
@@ -440,20 +448,9 @@ public abstract class UILoop implements UI.Context {
 		    Frame curframe = frame(ui, buf, prevframe);
 		    prevframe = null;
 		    curframe.run();
-		    env.submit(buf);
+		    env.submit(buf); buf = null;
+		    curframe.fin();
 
-		    double now = Utils.rtime();
-		    double fd = framedur();
-		    if(then + fd > now) {
-			then += fd;
-			long nanos = (long)((then - now) * 1e9);
-			Thread.sleep(nanos / 1000000, (int)(nanos % 1000000));
-			curframe.waited += then - now;
-		    } else {
-			then = now;
-		    }
-
-		    buf = null;
 		    framedone(curframe);
 		    (prevframe = curframe).prev = null;
 		} finally {
