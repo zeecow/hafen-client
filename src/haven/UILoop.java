@@ -30,6 +30,7 @@ import java.util.*;
 import haven.render.*;
 import haven.iosys.tk.*;
 import java.awt.image.BufferedImage;
+import haven.render.gl.GLEnvironment;
 
 public abstract class UILoop implements UI.Context {
     public final Windeye wnd;
@@ -193,9 +194,45 @@ public abstract class UILoop implements UI.Context {
 	lastcursor = curs;
     }
 
+    private long prevfree = 0, framealloc = 0;
+    protected void statlines(Collection<String> buf, UI ui) {
+	buf.add(String.format("FPS: %d (%d%% idle)", fps, (int)(uidle * 100.0)));
+	Runtime rt = Runtime.getRuntime();
+	long free = rt.freeMemory(), total = rt.totalMemory();
+	if(free < prevfree)
+	    framealloc = ((prevfree - free) + (framealloc * 19)) / 20;
+	prevfree = free;
+	buf.add(String.format("Mem: %,011d/%,011d/%,011d/%,011d (%,d)", free, total - free, total, rt.maxMemory(), framealloc));
+	buf.add(String.format("State slots: %d", State.Slot.numslots()));
+	Environment env = ui.getenv();
+	if(env instanceof GLEnvironment) {
+	    GLEnvironment gl = (GLEnvironment)env;
+	    buf.add(String.format("GL progs: %d", gl.numprogs()));
+	    buf.add(String.format("V-Mem: %s", gl.memstats()));
+	}
+	@SuppressWarnings("deprecation") MapView map = ui.root.findchild(MapView.class);
+	if((map != null) && (map.back != null)) {
+	    buf.add(String.format("Camera: %s", map.camstats()));
+	    buf.add(String.format("Mapview: %s", map.stats()));
+	    // buf.add(String.format("Click: Map: %s, Obj: %s", map.clmaplist.stats(), map.clobjlist.stats()));
+	}
+	if((ui.sess != null) && (ui.sess.conn instanceof Connection))
+	    buf.add(String.format("Connection: %s", ((Connection)ui.sess.conn).stats));
+	buf.add(String.format("Async: L %s, D %s", ui.loader.stats(), Defer.gstats()));
+	int rqd = Resource.local().qdepth() + Resource.remote().qdepth();
+	if(rqd > 0)
+	    buf.add(String.format("RQ depth: %d (%d)", rqd, Resource.local().numloaded() + Resource.remote().numloaded()));
+    }
+
     private void drawstats(UI ui, GOut g, Render buf) {
+	Collection<String> lines = new ArrayList<>();
+	statlines(lines, ui);
+	synchronized(Debug.framestats) {
+	    Debug.framestats.forEach(s -> lines.add(String.valueOf(s)));
+	}
 	int y = g.sz().y - UI.scale(190), dy = FastText.h;
-	FastText.aprintf(g, new Coord(10, y -= dy), 0, 1, "FPS: %d (%d%% idle)", fps, (int)(uidle * 100.0));
+	for(String ln : lines)
+	    FastText.aprint(g, new Coord(10, y -= dy), 0, 1, ln);
     }
 
     private void display(UI ui, Render buf) {
