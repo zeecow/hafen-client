@@ -45,6 +45,7 @@ public interface Windeye {
 
     public Coord size();
     public State state();
+    public boolean focused();
 
     public Environment env();
     public void swapbuffers(Render g, Object mode);

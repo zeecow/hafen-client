@@ -97,6 +97,8 @@ public abstract class Win32 {
     public static final int SWP_ASYNCWINDOWPOS = 0x4000;
 
     public static final int WM_SIZE          = 0x0005;
+    public static final int WM_SETFOCUS      = 0x0007;
+    public static final int WM_KILLFOCUS     = 0x0008;
     public static final int WM_CLOSE         = 0x0010;
     public static final int WM_SHOWWINDOW    = 0x0018;
     public static final int WM_SETCURSOR     = 0x0020;

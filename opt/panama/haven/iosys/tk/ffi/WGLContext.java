@@ -354,6 +354,7 @@ public class WGLContext implements Toolkit.Factory {
 	    private Area preexcl = null;
 	    private Handle icon = null, cursor = null;
 	    private int cursi = -1;
+	    private boolean focused;
 
 	    private WGLWindow() {
 		hwnd = msgrun(() -> win.CreateWindowEx(0, wclassname, null, STYLE_NORMAL,
@@ -410,6 +411,12 @@ public class WGLContext implements Toolkit.Factory {
 		    return(0);
 		case Win32.WM_SHOWWINDOW:
 		    showing = wparam != 0;
+		    return(0);
+		case Win32.WM_SETFOCUS:
+		    focused = true;
+		    return(0);
+		case Win32.WM_KILLFOCUS:
+		    focused = false;
 		    return(0);
 		case Win32.WM_SIZE:
 		    if(wparam == Win32.SIZE_RESTORED)
@@ -619,6 +626,10 @@ public class WGLContext implements Toolkit.Factory {
 
 	    public State state() {
 		return(curstate);
+	    }
+
+	    public boolean focused() {
+		return(focused);
 	    }
 
 	    public Environment env() {

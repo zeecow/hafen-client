@@ -214,6 +214,7 @@ public abstract class AWTToolkit implements Toolkit {
     public abstract class AWTWindow implements Windeye {
 	public final java.awt.Frame frame;
 	private final Collection<EventListener> callbacks = new java.util.concurrent.CopyOnWriteArrayList<>();
+	private boolean focused;
 
 	public AWTWindow() {
 	    frame = new java.awt.Frame();
@@ -263,8 +264,10 @@ public abstract class AWTToolkit implements Toolkit {
 		callback(new CloseRequest() {});
 	    }
 	    public void windowActivated(WindowEvent e) {
+		focused = true;
 	    }
 	    public void windowDeactivated(WindowEvent e) {
+		focused = false;
 	    }
 	    public void windowOpened(WindowEvent e) {}
 	    public void windowClosed(WindowEvent e) {}
@@ -429,6 +432,10 @@ public abstract class AWTToolkit implements Toolkit {
 	    if((frame.getExtendedState() & java.awt.Frame.MAXIMIZED_BOTH) != 0)
 		return(State.MAXIMIZED);
 	    return(State.NORMAL);
+	}
+
+	public boolean focused() {
+	    return(focused);
 	}
 
 	public void dispose() {

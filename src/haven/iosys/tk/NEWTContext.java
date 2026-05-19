@@ -215,6 +215,7 @@ public class NEWTContext implements Toolkit.Factory {
 	    private Coord size = Coord.z;
 	    private JOGLEnvironment env;
 	    private int cursi;
+	    private boolean focused;
 
 	    public NEWTWindow() {
 		bk = GLWindow.create(screen, caps);
@@ -263,8 +264,8 @@ public class NEWTContext implements Toolkit.Factory {
 		public void windowResized(WindowEvent ev) {}
 		public void windowMoved(WindowEvent ev) {}
 		public void windowDestroyed(WindowEvent ev) {}
-		public void windowGainedFocus(WindowEvent ev) {}
-		public void windowLostFocus(WindowEvent ev) {}
+		public void windowGainedFocus(WindowEvent ev) {focused = true;}
+		public void windowLostFocus(WindowEvent ev) {focused = false;}
 		public void windowRepaint(WindowUpdateEvent ev) {}
 
 		public void mouseClicked(com.jogamp.newt.event.MouseEvent ev) {}
@@ -315,6 +316,10 @@ public class NEWTContext implements Toolkit.Factory {
 		if(bk.isMaximizedVert() || bk.isMaximizedHorz())
 		    return(State.MAXIMIZED);
 		return(State.NORMAL);
+	    }
+
+	    public boolean focused() {
+		return(focused);
 	    }
 
 	    public NEWTWindow show(boolean show) {

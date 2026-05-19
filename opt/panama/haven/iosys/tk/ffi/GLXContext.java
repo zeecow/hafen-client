@@ -905,6 +905,10 @@ public class GLXContext implements Toolkit.Factory {
 		return(State.NORMAL);
 	    }
 
+	    public boolean focused() {
+		return(focused);
+	    }
+
 	    public void dispose() {
 		try(Aliveness _ = new Aliveness()) {
 		    unregister(this);
