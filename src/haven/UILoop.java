@@ -32,6 +32,7 @@ import haven.iosys.tk.*;
 import java.awt.image.BufferedImage;
 import haven.GSettings.SyncMode;
 import haven.render.gl.GLEnvironment;
+import haven.render.gl.GLRender;
 
 public abstract class UILoop implements UI.Context {
     public final Windeye wnd;
@@ -374,7 +375,24 @@ public abstract class UILoop implements UI.Context {
 	}
     }
 
+    public static class GLFrame extends Frame {
+	public final GLRender gl;
+
+	public GLFrame(UILoop loop, UI ui, GLRender out, Frame prev) {
+	    super(loop, ui, out, prev);
+	    this.gl = out;
+	}
+
+	protected void swapbuffers() {
+	    super.swapbuffers();
+	    if(ui.gprefs.syncmode.val == SyncMode.FINISH)
+		gl.finish();
+	}
+    }
+
     protected Frame frame(UI ui, Render out, Frame prev) {
+	if(out instanceof GLRender)
+	    return(new GLFrame(this, ui, (GLRender)out, prev));
 	return(new Frame(this, ui, out, prev));
     }
 
