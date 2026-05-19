@@ -909,6 +909,15 @@ public class GLXContext implements Toolkit.Factory {
 		return(focused);
 	    }
 
+	    public Visibility visible() {
+		switch(visibility) {
+		case XLib.VisibilityUnobscured:        return(Visibility.FULL);
+		case XLib.VisibilityPartiallyObscured: return(Visibility.PARTIAL);
+		case XLib.VisibilityFullyObscured:     return(Visibility.NONE);
+		default:                               return(Visibility.UNKNOWN);
+		}
+	    }
+
 	    public void dispose() {
 		try(Aliveness _ = new Aliveness()) {
 		    unregister(this);

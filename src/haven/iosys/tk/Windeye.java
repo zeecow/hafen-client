@@ -46,12 +46,17 @@ public interface Windeye {
     public Coord size();
     public State state();
     public boolean focused();
+    public default Visibility visible() {return(Visibility.UNKNOWN);}
 
     public Environment env();
     public void swapbuffers(Render g, Object mode);
 
     public static enum State {
 	MINIMIZED, NORMAL, MAXIMIZED, EXCLUSIVE
+    }
+
+    public static enum Visibility {
+	UNKNOWN, FULL, PARTIAL, NONE
     }
 
     public static class Sizing {
