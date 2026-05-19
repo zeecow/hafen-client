@@ -30,6 +30,7 @@ import java.util.*;
 import haven.render.*;
 import haven.iosys.tk.*;
 import java.awt.image.BufferedImage;
+import haven.GSettings.SyncMode;
 import haven.render.gl.GLEnvironment;
 
 public abstract class UILoop implements UI.Context {
@@ -196,7 +197,7 @@ public abstract class UILoop implements UI.Context {
 
     private long prevfree = 0, framealloc = 0;
     protected void statlines(Collection<String> buf, UI ui) {
-	buf.add(String.format("FPS: %d (%d%% idle, latency %d)", fps, (int)(uidle * 100.0), framelag));
+	buf.add(String.format("FPS: %d (%d%% idle, latency %.2f ms)", fps, (int)(uidle * 100.0), framelag * 1000));
 	Runtime rt = Runtime.getRuntime();
 	long free = rt.freeMemory(), total = rt.totalMemory();
 	if(free < prevfree)
@@ -282,8 +283,8 @@ public abstract class UILoop implements UI.Context {
     protected abstract void dispatch(UI ui);
 
     private final double[] frames = new double[128], waited = new double[frames.length];
-    private int fps, framelag;
-    private double uidle;
+    private int fps;
+    private double framelag, uidle;
     protected void updstats(Frame f) {
 	int fi = (int)(f.frameno % frames.length);
 	frames[fi] = f.ftime;
@@ -309,7 +310,7 @@ public abstract class UILoop implements UI.Context {
 	public final Render out;
 	public final Fence sync = new Fence();
 	public Frame prev;
-	public double stime, ftime, wtime;
+	public double ttime, ftime, wtime;
 
 	public Frame(UILoop loop, UI ui, Render out, Frame prev) {
 	    this.loop = loop;
@@ -317,7 +318,6 @@ public abstract class UILoop implements UI.Context {
 	    this.ui = ui;
 	    this.out = out;
 	    this.prev = prev;
-	    this.stime = Utils.rtime();
 	}
 
 	protected void tick() {
@@ -342,24 +342,34 @@ public abstract class UILoop implements UI.Context {
 
 	protected void swapbuffers() {
 	    loop.wnd.swapbuffers(out);
-	    out.fence(() -> loop.framelag = (int)(loop.frameno - frameno));
+	    out.fence(() -> loop.framelag = Utils.rtime() - ttime);
 	}
 
 	protected void fin() {
 	    ftime = Utils.rtime();
 	}
 
-	public void run() throws InterruptedException {
-	    out.fence(sync);
+	protected void syncwait() throws InterruptedException {
 	    if(prev != null) {
 		double then = Utils.rtime();
 		prev.sync.waitfor();
 		wtime += Utils.rtime() - then;
 	    }
+	}
 
+	public void run() throws InterruptedException {
+	    SyncMode syncmode = ui.gprefs.syncmode.val;
+	    boolean swapsync = (syncmode != SyncMode.FRAME);
+	    boolean tickwait = (syncmode == SyncMode.FRAME) || (syncmode == SyncMode.TICK);
+
+	    if(!swapsync) out.fence(sync);
+	    if(!tickwait) syncwait();
+	    ttime = Utils.rtime();
 	    tick();
+	    if(tickwait) syncwait();
 	    display();
 	    swapbuffers();
+	    if(swapsync) out.fence(sync);
 	    fin();
 	}
     }
