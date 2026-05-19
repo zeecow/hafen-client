@@ -26,6 +26,7 @@
 
 package haven;
 
+import haven.render.*;
 import java.util.*;
 import java.awt.Font;
 import java.awt.Color;
@@ -70,7 +71,7 @@ public class Makewindow extends Widget {
 		this.num = new TexI(Utils.outline2(Text.render(Integer.toString(num), Color.WHITE).img, Utils.contrast(Color.WHITE)));
 	    else
 		this.num = null;
-	    this.rawinfo = info;
+	    this.rawinfo = (info.length > 0) ? info : new Object[][] {{new ItemInfo.Name.Default()}};
 	}
 
 	public GSprite sprite() {
@@ -94,31 +95,32 @@ public class Makewindow extends Widget {
 	    return(opt == 1);
 	}
 
-	public BufferedImage shorttip() {
-	    List<ItemInfo> info = info();
-	    if(info.isEmpty()) {
-		Resource.Tooltip tt = res.get().layer(Resource.tooltip);
-		if(tt == null)
-		    return(null);
-		return(Text.render(tt.t).img);
+	public class SpecTip implements Indir<Tex>, ItemInfo.InfoTip {
+	    private final List<ItemInfo> info;
+	    private final TexI tex;
+
+	    public SpecTip(List<ItemInfo> info, BufferedImage img) {
+		this.info = info;
+		if(img == null)
+		    throw(new Loading());
+		tex = new TexI(img);
 	    }
-	    return(ItemInfo.shorttip(info()));
+
+	    public List<ItemInfo> info() {return(info);}
+	    public Tex get() {return(tex);}
 	}
-	public BufferedImage longtip() {
+
+	public SpecTip shorttip() {
 	    List<ItemInfo> info = info();
-	    BufferedImage img;
-	    if(info.isEmpty()) {
-		Resource.Tooltip tt = res.get().layer(Resource.tooltip);
-		if(tt == null)
-		    return(null);
-		img = Text.render(tt.t).img;
-	    } else {
-		img = ItemInfo.longtip(info);
-	    }
+	    return(new SpecTip(info, ItemInfo.shorttip(info())));
+	}
+	public SpecTip longtip() {
+	    List<ItemInfo> info = info();
+	    BufferedImage img = ItemInfo.longtip(info);
 	    Resource.Pagina pg = res.get().layer(Resource.pagina);
 	    if(pg != null)
 		img = ItemInfo.catimgs(0, img, RichText.render("\n" + pg.text, 200).img);
-	    return(img);
+	    return(new SpecTip(info, img));
 	}
 
 	private Random rnd = null;
@@ -248,6 +250,9 @@ public class Makewindow extends Widget {
 	    opt = spec.opt();
 	}
 
+	public List<ItemInfo> info() {return(spec.info());}
+
+	public final ItemInfo.AttrCache<Pipe.Op> rstate = new ItemInfo.AttrCache<>(this::info, GItem.RStateInfo.combine);
 	public void draw(GOut g) {
 	    if(opt) {
 		g.chcolor(0, 255, 0, 255);
@@ -256,11 +261,14 @@ public class Makewindow extends Widget {
 	    } else {
 		g.image(invsq, Coord.z);
 	    }
+	    if(rstate.get() != null)
+		g.usestate(rstate.get());
 	    spec.draw(g);
+	    g.defstate();
 	}
 
 	private double hoverstart;
-	Indir<Object> stip, ltip;
+	Object stip, ltip;
 	public Object tooltip(Coord c, Widget prev) {
 	    double now = Utils.rtime();
 	    if(prev == this) {
@@ -271,18 +279,12 @@ public class Makewindow extends Widget {
 		hoverstart = now;
 	    }
 	    if(now - hoverstart < 1.0) {
-		if(stip == null) {
-		    BufferedImage tip = spec.shorttip();
-		    Tex tt = (tip == null) ? null : new TexI(tip);
-		    stip = () -> tt;
-		}
+		if(stip == null)
+		    stip = spec.shorttip();
 		return(stip);
 	    } else {
-		if(ltip == null) {
-		    BufferedImage tip = spec.longtip();
-		    Tex tt = (tip == null) ? null : new TexI(tip);
-		    ltip = () -> tt;
-		}
+		if(ltip == null)
+		    ltip = spec.longtip();
 		return(ltip);
 	    }
 	}
@@ -403,21 +405,5 @@ public class Makewindow extends Widget {
 	}
 
 	public Tip shortvar() {return(this);}
-    }
-
-    public static class MakePrep extends ItemInfo implements GItem.ColorInfo, GItem.ContentsInfo {
-	private final static Color olcol = new Color(0, 255, 0, 64);
-	public MakePrep(Owner owner) {
-	    super(owner);
-	}
-
-	public Color olcol() {
-	    return(olcol);
-	}
-
-	public void propagate(List<ItemInfo> buf, Owner outer) {
-	    if(ItemInfo.find(MakePrep.class, buf) == null)
-		buf.add(new MakePrep(outer));
-	}
     }
 }
