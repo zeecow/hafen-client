@@ -320,6 +320,10 @@ public abstract class UILoop implements UI.Context {
 	}
     }
 
+    protected void framedone(Frame f) {
+	updstats(f);
+    }
+
     public static class Frame {
 	public final UILoop loop;
 	public final long frameno;
@@ -450,7 +454,7 @@ public abstract class UILoop implements UI.Context {
 		    }
 
 		    buf = null;
-		    updstats(curframe);
+		    framedone(curframe);
 		    (prevframe = curframe).prev = null;
 		} finally {
 		    if(buf != null)
