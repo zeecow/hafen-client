@@ -130,6 +130,7 @@ public class GLXContext implements Toolkit.Factory {
 	public final XIM im;
 	public final long imstyle;
 	public final int mod_alt, mod_meta, mod_altgr, mod_super;
+	public final Map<Integer, Integer> rmodmap = new HashMap<>();
 	public final Map<Integer, XIPointerInfo> pointers = new HashMap<>();
 	public final Cursor.Caps ccaps;
 	public final Atomic ATOM = new Atomic("ATOM");
@@ -336,8 +337,9 @@ public class GLXContext implements Toolkit.Factory {
 		{
 		    int[][] modmap = xlib.XGetModifierMapping(dpy).mapping();
 		    int min = Integer.MAX_VALUE, max = Integer.MIN_VALUE;
-		    for(int i = 3; i < 8; i++) {
+		    for(int i = 0; i < 8; i++) {
 			for(int key : modmap[i]) {
+			    rmodmap.put(key, i);
 			    min = Math.min(min, key);
 			    max = Math.max(max, key);
 			}
@@ -1231,7 +1233,16 @@ public class GLXContext implements Toolkit.Factory {
 	    return(new XCursor(dpy, xrun(() -> xcr.XcursorImageLoadCursor(dpy, xcr.XcursorImageCreate(sz, hotspot, pixels)))));
 	}
 
-	private Set<Key.Mod> mods(int state) {
+	private Set<Key.Mod> mods(int state, int key, boolean include) {
+	    if(key != 0) {
+		Integer mod = rmodmap.get(key);
+		if(mod != null) {
+		    if(include)
+			state |= 1 << mod;
+		    else
+			state &= ~(1 << mod);
+		}
+	    }
 	    Set<Key.Mod> ret = EnumSet.noneOf(Key.Mod.class);
 	    if((state & XLib.ShiftMask) != 0)
 		ret.add(Key.Mod.SHIFT);
@@ -1287,11 +1298,11 @@ public class GLXContext implements Toolkit.Factory {
 	public Key key;
 	public String str;
 
-	public GLXKeyEvent(GLXToolkit.GLXWindow wnd, XKeyEvent ev) {
+	public GLXKeyEvent(GLXToolkit.GLXWindow wnd, XKeyEvent ev, boolean include) {
 	    this.wnd = wnd;
 	    this.code = ev.keycode();
 	    this.state = ev.state();
-	    this.mods = wnd.toolkit().mods(ev.state());
+	    this.mods = wnd.toolkit().mods(ev.state(), ev.keycode(), include);
 	}
 
 	public String string() {return(str);}
@@ -1303,10 +1314,10 @@ public class GLXContext implements Toolkit.Factory {
 	}
     }
     public static class GLXKeyPressEvent extends GLXKeyEvent implements Toolkit.KeyDownEvent {
-	GLXKeyPressEvent(GLXToolkit.GLXWindow wnd, XKeyEvent ev) {super(wnd, ev);}
+	GLXKeyPressEvent(GLXToolkit.GLXWindow wnd, XKeyEvent ev) {super(wnd, ev, true);}
     }
     public static class GLXKeyReleaseEvent extends GLXKeyEvent implements Toolkit.KeyUpEvent {
-	GLXKeyReleaseEvent(GLXToolkit.GLXWindow wnd, XKeyEvent ev) {super(wnd, ev);}
+	GLXKeyReleaseEvent(GLXToolkit.GLXWindow wnd, XKeyEvent ev) {super(wnd, ev, false);}
     }
 
     private static Button buttonid(GLXToolkit.XIPointerInfo ptr, int xi) {
@@ -1345,7 +1356,7 @@ public class GLXContext implements Toolkit.Factory {
 	    this.rootc = Coord.of((int)ev.root_x(), (int)ev.root_y());
 	    this.held = new HashSet<>();
 	    ev.buttons().forEach(b -> held.add(buttonid(ptr, b)));
-	    this.mods = wnd.toolkit().mods(ev.mods().effective());
+	    this.mods = wnd.toolkit().mods(ev.mods().effective(), 0, true);
 	}
 
 	public Coord wndc() {return(wndc);}
@@ -1359,9 +1370,13 @@ public class GLXContext implements Toolkit.Factory {
     public static abstract class GLXMouseButtonEvent extends GLXMouseEvent {
 	public final Button button;
 
-	public GLXMouseButtonEvent(GLXToolkit.GLXWindow wnd, GLXToolkit.XIPointerInfo ptr, XIDeviceEvent ev) {
+	public GLXMouseButtonEvent(GLXToolkit.GLXWindow wnd, GLXToolkit.XIPointerInfo ptr, XIDeviceEvent ev, boolean include) {
 	    super(wnd, ptr, ev);
 	    this.button = buttonid(ptr, ev.detail());
+	    if(include)
+		held.add(button);
+	    else
+		held.remove(button);
 	}
 
 	public Button button() {return(button);}
@@ -1371,10 +1386,10 @@ public class GLXContext implements Toolkit.Factory {
 	}
     }
     public static class GLXMouseDownEvent extends GLXMouseButtonEvent implements Toolkit.MouseDownEvent {
-	GLXMouseDownEvent(GLXToolkit.GLXWindow wnd, GLXToolkit.XIPointerInfo ptr, XIDeviceEvent ev) {super(wnd, ptr, ev);}
+	GLXMouseDownEvent(GLXToolkit.GLXWindow wnd, GLXToolkit.XIPointerInfo ptr, XIDeviceEvent ev) {super(wnd, ptr, ev, true);}
     }
     public static class GLXMouseUpEvent extends GLXMouseButtonEvent implements Toolkit.MouseUpEvent {
-	GLXMouseUpEvent(GLXToolkit.GLXWindow wnd, GLXToolkit.XIPointerInfo ptr, XIDeviceEvent ev) {super(wnd, ptr, ev);}
+	GLXMouseUpEvent(GLXToolkit.GLXWindow wnd, GLXToolkit.XIPointerInfo ptr, XIDeviceEvent ev) {super(wnd, ptr, ev, false);}
     }
     public static class GLXMouseMoveEvent extends GLXMouseEvent implements Toolkit.MouseMoveEvent {
 	GLXMouseMoveEvent(GLXToolkit.GLXWindow wnd, GLXToolkit.XIPointerInfo ptr, XIDeviceEvent ev) {super(wnd, ptr, ev);}
