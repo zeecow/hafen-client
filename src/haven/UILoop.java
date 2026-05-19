@@ -196,7 +196,7 @@ public abstract class UILoop implements UI.Context {
 
     private long prevfree = 0, framealloc = 0;
     protected void statlines(Collection<String> buf, UI ui) {
-	buf.add(String.format("FPS: %d (%d%% idle)", fps, (int)(uidle * 100.0)));
+	buf.add(String.format("FPS: %d (%d%% idle, latency %d)", fps, (int)(uidle * 100.0), framelag));
 	Runtime rt = Runtime.getRuntime();
 	long free = rt.freeMemory(), total = rt.totalMemory();
 	if(free < prevfree)
@@ -282,7 +282,7 @@ public abstract class UILoop implements UI.Context {
     protected abstract void dispatch(UI ui);
 
     private final double[] frames = new double[128], waited = new double[frames.length];
-    private int fps;
+    private int fps, framelag;
     private double uidle;
     protected void updstats(Frame f) {
 	int fi = (int)(f.frameno % frames.length);
@@ -342,6 +342,7 @@ public abstract class UILoop implements UI.Context {
 
 	protected void swapbuffers() {
 	    loop.wnd.swapbuffers(out);
+	    out.fence(() -> loop.framelag = (int)(loop.frameno - frameno));
 	}
 
 	protected void fin() {
