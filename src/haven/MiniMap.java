@@ -33,7 +33,6 @@ import java.awt.image.*;
 import java.awt.Color;
 import haven.MapFile.Segment;
 import haven.MapFile.DataGrid;
-import haven.MapFile.Grid;
 import haven.MapFile.GridInfo;
 import haven.MapFile.Marker;
 import haven.MapFile.PMarker;
@@ -561,7 +560,7 @@ public class MiniMap extends Widget {
 	    this.mm = mm;
 	    this.m = marker;
         if (marker instanceof SMarker) {
-            ZeeManagerMinimap.minimapOptsAddMark((SMarker) marker);
+            ZeeManagerMinimap.mapOptsAddMark((SMarker) marker);
         }
 	}
 

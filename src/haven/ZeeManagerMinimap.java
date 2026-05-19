@@ -103,7 +103,7 @@ public class ZeeManagerMinimap {
             win.reqdestroy();
             win = null;
         }
-        win = ZeeConfig.gameUI.add(new ZeeWindow(Coord.of(105,220),wincap));
+        win = ZeeConfig.gameUI.add(new ZeeWindow(Coord.of(105,235),wincap));
 
 
         // position config window
@@ -183,23 +183,39 @@ public class ZeeManagerMinimap {
         y += 20;
         mapOptsMarksRow = mapOptsMarksCol = 0; // reset 3 col button grid
         Scrollport sp = win.add(new Scrollport(Coord.of(110,100)),0,y);
-
         for (Map.Entry<String, Boolean> entry : minimapOptsMarksResnameHidden.entrySet()) {
             String resname = entry.getKey();
             for (MapFile.Marker marker : ZeeConfig.gameUI.mapfile.file.markers) {
                 if (marker instanceof MapFile.SMarker){
                     MapFile.SMarker smark = (MapFile.SMarker) marker;
                     if (smark.res.name.contentEquals(resname)){
-                        minimapOptCreateMarkButton(sp.cont, smark);
+                        mapOptsCreateMarkButton(sp.cont, smark);
                         //println("creating mark button "+ markOptsMarksButtonsCreated+"  "+resname);
                         break;
                     }
                 }
             }
         }
+
+        // add button reset icons
+        y += 90;
+        win.add(new ZeeWindow.ZeeButton("reset icons"){
+            public void wdgmsg(String msg, Object... args) {
+                if (msg.contentEquals("activate")){
+                    mapOptsMarksShowOnlyIsOn = false;
+                    for (MapFile.Marker m1 : ZeeConfig.gameUI.mapfile.file.markers) {
+                        if (m1 instanceof MapFile.SMarker) {
+                            m1.mapOptsHide = false;
+                        }
+                    }
+                    minimapOptsMarksResnameHidden.clear();
+                    ZeeConfig.msgLow("icons reset");
+                }
+            }
+        },0,y);
     }
     static HashMap<String,Boolean> minimapOptsMarksResnameHidden = new HashMap<>();
-    static void minimapOptsAddMark(MapFile.SMarker marker){
+    static void mapOptsAddMark(MapFile.SMarker marker){
 
         String resname = Loading.waitfor(marker.res).name;
 
@@ -220,13 +236,13 @@ public class ZeeManagerMinimap {
         }
 
         // create mark button
-        minimapOptCreateMarkButton(sp.cont,marker);
+        mapOptsCreateMarkButton(sp.cont,marker);
     }
     static boolean mapOptsHidePMarks = false;
     static boolean mapOptsMarksShowOnlyIsOn = false;
     static int mapOptsMarksRow = 0;
     static int mapOptsMarksCol = 0;
-    private static void minimapOptCreateMarkButton(Widget cont, MapFile.SMarker sMarker){
+    private static void mapOptsCreateMarkButton(Widget cont, MapFile.SMarker sMarker){
 
         BufferedImage img = sMarker.res.get().flayer(Resource.imgc).scaled();
         String resname = sMarker.res.name;
