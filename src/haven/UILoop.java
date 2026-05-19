@@ -283,13 +283,29 @@ public abstract class UILoop implements UI.Context {
 
     protected abstract void dispatch(UI ui);
 
+    protected boolean bgmode() {
+	return(false);
+    }
+
+    protected double framedur() {
+	GSettings gp = this.ui.gprefs;
+	double hz = gp.hz.val, bghz = gp.bghz.val;
+	if(bgmode()) {
+	    if(bghz != Double.POSITIVE_INFINITY)
+		return(1.0 / bghz);
+	}
+	if(hz == Double.POSITIVE_INFINITY)
+	    return(0.0);
+	return(1.0 / hz);
+    }
+
     private final double[] frames = new double[128], waited = new double[frames.length];
     private int fps;
     private double framelag, uidle;
     protected void updstats(Frame f) {
 	int fi = (int)(f.frameno % frames.length);
 	frames[fi] = f.ftime;
-	waited[fi] = f.wtime;
+	waited[fi] = f.waited;
 	double twait = 0;
 	int i = 0, ckf = fi;
 	for(; i < frames.length - 1; i++) {
@@ -311,7 +327,7 @@ public abstract class UILoop implements UI.Context {
 	public final Render out;
 	public final Fence sync = new Fence();
 	public Frame prev;
-	public double ttime, ftime, wtime;
+	public double ttime, ftime, waited;
 
 	public Frame(UILoop loop, UI ui, Render out, Frame prev) {
 	    this.loop = loop;
@@ -354,7 +370,7 @@ public abstract class UILoop implements UI.Context {
 	    if(prev != null) {
 		double then = Utils.rtime();
 		prev.sync.waitfor();
-		wtime += Utils.rtime() - then;
+		waited += Utils.rtime() - then;
 	    }
 	}
 
@@ -400,6 +416,7 @@ public abstract class UILoop implements UI.Context {
 	Render buf = null;
 	try {
 	    Frame prevframe = null;
+	    double then = Utils.rtime();
 	    while(true) {
 		Environment env = wnd.env();
 		if(env != this.env) {
@@ -420,6 +437,17 @@ public abstract class UILoop implements UI.Context {
 		    prevframe = null;
 		    curframe.run();
 		    env.submit(buf);
+
+		    double now = Utils.rtime();
+		    double fd = framedur();
+		    if(then + fd > now) {
+			then += fd;
+			long nanos = (long)((then - now) * 1e9);
+			Thread.sleep(nanos / 1000000, (int)(nanos % 1000000));
+			curframe.waited += then - now;
+		    } else {
+			then = now;
+		    }
 
 		    buf = null;
 		    updstats(curframe);
