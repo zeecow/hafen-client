@@ -205,6 +205,13 @@ public class Client implements Console.Directory {
 	protected void dispatch(UI ui) {
 	    cl.queue.dispatch(ui);
 	}
+
+	protected boolean bgmode() {
+	    Windeye.Visibility v = wnd.visible();
+	    if(v == Windeye.Visibility.UNKNOWN)
+		return(!wnd.focused());
+	    return(v == Windeye.Visibility.NONE);
+	}
     }
 
     private UI newui(UI.Runner fun) {
