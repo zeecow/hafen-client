@@ -71,6 +71,7 @@ public class LWJGLToolkit extends AWTToolkit {
     };
     public class LWJGLPanel extends AWTGLCanvas {
 	public LWJGLEnvironment env;
+	private int cursi;
 
 	public LWJGLPanel() {
 	    super();
@@ -100,14 +101,16 @@ public class LWJGLToolkit extends AWTToolkit {
 	    awtrun(() -> runInContext(task));
 	}
 
-	private void glswap(haven.render.gl.GL gl) {
+	private void glswap(haven.render.gl.GL gl, int ival) {
 	    GLException.checkfor(gl, null);
+	    if(ival != cursi)
+		setSwapInterval(cursi = ival);
 	    swapBuffers();
 	    GLException.checkfor(gl, null);
 	}
 
 	private void initgl() {
-	    setSwapInterval(1);
+	    setSwapInterval(cursi = 1);
 	}
 
 	private void process() {
@@ -163,11 +166,13 @@ public class LWJGLToolkit extends AWTToolkit {
 	    return(panel.env());
 	}
 
-	public void swapbuffers(Render buf) {
+	public void swapbuffers(Render buf, Object mode) {
 	    GLRender gbuf = (GLRender)buf;
 	    if(gbuf.env != panel.env)
 		throw(new IllegalArgumentException());
-	    gbuf.submit(panel::glswap);
+	    if(!(mode instanceof Boolean))
+		throw(new IllegalArgumentException());
+	    gbuf.submit(gl -> panel.glswap(gl, ((Boolean)mode) ? 1 : 0));
 	    java.awt.EventQueue.invokeLater(dsp::process);
 	}
     }

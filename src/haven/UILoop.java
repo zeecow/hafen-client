@@ -342,7 +342,7 @@ public abstract class UILoop implements UI.Context {
 	}
 
 	protected void swapbuffers() {
-	    loop.wnd.swapbuffers(out);
+	    loop.wnd.swapbuffers(out, ui.gprefs.vsync.val);
 	    out.fence(() -> loop.framelag = Utils.rtime() - ttime);
 	}
 

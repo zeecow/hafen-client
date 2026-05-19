@@ -38,7 +38,7 @@ public class Test {
 	Environment env = wnd.env();
 	Render cmd = env.render();
 	cmd.clear(new BufPipe().prep(new FragColor<>(FragColor.defcolor)).prep(new DepthBuffer<>(DepthBuffer.defdepth)), FragColor.fragcol, new FColor(1.0f, 0.0f, 0.5f));
-	wnd.swapbuffers(cmd);
+	wnd.swapbuffers(cmd, true);
 	env.submit(cmd);
 	Thread.sleep(5000);
 	wnd.dispose();

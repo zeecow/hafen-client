@@ -47,7 +47,7 @@ public interface Windeye {
     public State state();
 
     public Environment env();
-    public void swapbuffers(Render g);
+    public void swapbuffers(Render g, Object mode);
 
     public static enum State {
 	MINIMIZED, NORMAL, MAXIMIZED, EXCLUSIVE

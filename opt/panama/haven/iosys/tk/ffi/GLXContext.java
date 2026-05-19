@@ -664,6 +664,7 @@ public class GLXContext implements Toolkit.Factory {
 	    private GLXEnvironment renv;
 	    private Coord size = Coord.z;
 	    private int visibility = 0;
+	    private int cursi = -1;
 
 	    public class GLXEnvironment extends FFIEnvironment {
 		private GLXEnvironment() {
@@ -926,18 +927,21 @@ public class GLXContext implements Toolkit.Factory {
 		return(renv);
 	    }
 
-	    private void glswap(GL gl) {
+	    private void glswap(GL gl, int ival) {
 		GLException.checkfor(gl, null);
-		glx.glXSwapIntervalEXT(dpy, id, 1);
+		if(ival != cursi)
+		    glx.glXSwapIntervalEXT(dpy, id, cursi = ival);
 		glx.glXSwapBuffers(dpy, id);
 		GLException.checkfor(gl, null);
 	    }
 
-	    public void swapbuffers(Render buf) {
+	    public void swapbuffers(Render buf, Object mode) {
 		GLRender gbuf = (GLRender)buf;
 		if(gbuf.env != renv)
 		    throw(new IllegalArgumentException());
-		gbuf.submit(this::glswap);
+		if(!(mode instanceof Boolean))
+		    throw(new IllegalArgumentException());
+		gbuf.submit(gl-> this.glswap(gl, ((Boolean)mode) ? 1 : 0));
 	    }
 
 	    private XEvent waitfor(Predicate<XEvent> test) {

@@ -214,6 +214,7 @@ public class NEWTContext implements Toolkit.Factory {
 	    private final Collection<EventListener> callbacks = new java.util.concurrent.CopyOnWriteArrayList<>();
 	    private Coord size = Coord.z;
 	    private JOGLEnvironment env;
+	    private int cursi;
 
 	    public NEWTWindow() {
 		bk = GLWindow.create(screen, caps);
@@ -374,7 +375,7 @@ public class NEWTContext implements Toolkit.Factory {
 	    private void initgl(GL gl) {
 		Collection<String> exts = Arrays.asList(gl.glGetString(GL.GL_EXTENSIONS).split(" "));
 		GLCapabilitiesImmutable caps = bk.getChosenGLCapabilities();
-		gl.setSwapInterval(1);
+		gl.setSwapInterval(cursi = 1);
 		if(exts.contains("GL_ARB_multisample") && caps.getSampleBuffers()) {
 		    /* Apparently, having sample buffers in the config enables
 		     * multisampling by default on some systems. */
@@ -439,18 +440,21 @@ public class NEWTContext implements Toolkit.Factory {
 		return(this.env);
 	    }
 
-	    private void glswap(haven.render.gl.GL gl) {
+	    private void glswap(haven.render.gl.GL gl, int ival) {
 		haven.render.gl.GLException.checkfor(gl, null);
+		if(ival != cursi)
+		    ((WrappedJOGL)gl).getGL().setSwapInterval(cursi = ival);
 		bk.swapBuffers();
 		haven.render.gl.GLException.checkfor(gl, null);
 	    }
 
-	    public void swapbuffers(Render buf) {
+	    public void swapbuffers(Render buf, Object mode) {
 		GLRender gbuf = (GLRender)buf;
 		if(gbuf.env != this.env)
 		    throw(new IllegalArgumentException());
-		gbuf.submit(this::glswap);
-		// java.awt.EventQueue.invokeLater(dsp::process);
+		if(!(mode instanceof Boolean))
+		    throw(new IllegalArgumentException());
+		gbuf.submit(gl -> this.glswap(gl, ((Boolean)mode) ? 1 : 0));
 	    }
 
 	    public void dispose() {

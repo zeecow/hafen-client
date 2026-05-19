@@ -108,6 +108,7 @@ public class JOGLToolkit extends AWTToolkit {
     public class JOGLPanel extends GLCanvas {
 	public Area shape = Area.sized(Coord.z);
 	public JOGLEnvironment env;
+	private int cursi;
 
 	public JOGLPanel() {
 	    super(caps, null, null);
@@ -139,7 +140,7 @@ public class JOGLToolkit extends AWTToolkit {
 	private void initgl(GL gl) {
 	    Collection<String> exts = Arrays.asList(gl.glGetString(GL.GL_EXTENSIONS).split(" "));
 	    GLCapabilitiesImmutable caps = getChosenGLCapabilities();
-	    gl.setSwapInterval(1);
+	    gl.setSwapInterval(cursi = 1);
 	    if(exts.contains("GL_ARB_multisample") && caps.getSampleBuffers()) {
 		/* Apparently, having sample buffers in the config enables
 		 * multisampling by default on some systems. */
@@ -178,8 +179,10 @@ public class JOGLToolkit extends AWTToolkit {
 	    env.process(new JOGLWrap(gl3));
 	}
 
-	private void glswap(haven.render.gl.GL gl) {
+	private void glswap(haven.render.gl.GL gl, int ival) {
 	    haven.render.gl.GLException.checkfor(gl, null);
+	    if(ival != cursi)
+		((WrappedJOGL)gl).getGL().setSwapInterval(cursi = ival);
 	    swapBuffers();
 	    haven.render.gl.GLException.checkfor(gl, null);
 	}
@@ -219,11 +222,13 @@ public class JOGLToolkit extends AWTToolkit {
 	    return(panel.env);
 	}
 
-	public void swapbuffers(Render buf) {
+	public void swapbuffers(Render buf, Object mode) {
 	    GLRender gbuf = (GLRender)buf;
 	    if(gbuf.env != panel.env)
 		throw(new IllegalArgumentException());
-	    gbuf.submit(panel::glswap);
+	    if(!(mode instanceof Boolean))
+		throw(new IllegalArgumentException());
+	    gbuf.submit(gl -> panel.glswap(gl, ((Boolean)mode) ? 1 : 0));
 	    java.awt.EventQueue.invokeLater(dsp::process);
 	}
     }

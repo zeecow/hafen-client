@@ -353,6 +353,7 @@ public class WGLContext implements Toolkit.Factory {
 	    private String wndstyle = "normal";
 	    private Area preexcl = null;
 	    private Handle icon = null, cursor = null;
+	    private int cursi = -1;
 
 	    private WGLWindow() {
 		hwnd = msgrun(() -> win.CreateWindowEx(0, wclassname, null, STYLE_NORMAL,
@@ -630,18 +631,19 @@ public class WGLContext implements Toolkit.Factory {
 		return(renv);
 	    }
 
-	    private void glswap(GL gl) {
+	    private void glswap(GL gl, int ival) {
 		GLException.checkfor(gl, null);
-		text.wglSwapIntervalEXT(1);
+		if(ival != cursi)
+		    text.wglSwapIntervalEXT(cursi = ival);
 		win.SwapBuffers(wgl.wglGetCurrentDC());
 		GLException.checkfor(gl, null);
 	    }
 
-	    public void swapbuffers(Render g) {
+	    public void swapbuffers(Render g, Object mode) {
 		GLRender gbuf = (GLRender)g;
 		if(gbuf.env != renv)
 		    throw(new IllegalArgumentException());
-		gbuf.submit(this::glswap);
+		gbuf.submit(gl -> this.glswap(gl, ((Boolean)mode) ? 1 : 0));
 	    }
 
 	    public void dispose() {
