@@ -333,7 +333,7 @@ public interface GLPanel extends UIPanel, UI.Context {
 		    GSettings prefs = ui.gprefs;
 		    SyncMode syncmode = prefs.syncmode.val;
 		    CPUProfile.Current curf = profile.get() ?  CPUProfile.set(uprof.new Frame()) : null;
-		    GPUProfile.Frame curgf = profilegpu.get() ? gprof.new Frame(buf) : null;
+		    GPUProfile.Frame curgf = profile.get() ? gprof.new Frame(buf) : null;
 		    rprofc = profile.get() ? new ProfileCycle(rprof, rprofc, buf) : null;
 		    BufferBGL.Profile frameprof = false ? new BufferBGL.Profile() : null;
 		    if(frameprof != null) buf.submit(frameprof.start);
@@ -517,17 +517,7 @@ public interface GLPanel extends UIPanel, UI.Context {
 		});
 	    Console.setscmd("profile", new Console.Command() {
 		    public void run(Console cons, String[] args) {
-			if(args[1].equals("none") || args[1].equals("off")) {
-			    profile.set(false);
-			    profilegpu.set(false);
-			} else if(args[1].equals("cpu")) {
-			    profile.set(true);
-			} else if(args[1].equals("gpu")) {
-			    profilegpu.set(true);
-			} else if(args[1].equals("all")) {
-			    profile.set(true);
-			    profilegpu.set(true);
-			}
+			profile.set(Utils.parsebool(args[1]));
 		    }
 		});
 	}

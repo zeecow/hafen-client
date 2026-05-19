@@ -63,8 +63,6 @@ public class RootWidget extends ConsoleHost implements UI.Notice.Handler, Widget
 		   if((gi != null) && (gi.map != null))
 		   add(new Profwnd(gi.map.prof, "Map profile"), UI.scale(100, 250));
 		*/
-	    }
-	    if(UIPanel.profilegpu.get()) {
 		add(new Profwnd(ggprof, "GPU profile"), UI.scale(500, 250));
 	    }
 	    return(true);
