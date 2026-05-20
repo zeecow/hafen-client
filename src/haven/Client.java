@@ -273,6 +273,11 @@ public class Client implements Console.Directory {
     private Windeye.State prevfsstate = Windeye.State.NORMAL;
     private Map<String, Console.Command> cmdmap = new TreeMap<String, Console.Command>();
     {
+	cmdmap.put("q", new Console.Command() {
+		public void run(Console cons, String[] args) {
+		    mt.interrupt();
+		}
+	    });
 	cmdmap.put("fs", new Console.Command() {
 		public void run(Console cons, String[] args) {
 		    if(args.length >= 2) {
