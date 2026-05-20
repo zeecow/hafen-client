@@ -27,6 +27,7 @@
 package haven.iosys.gl;
 
 import haven.*;
+import haven.ffi.*;
 import haven.render.gl.*;
 import java.nio.*;
 import java.lang.foreign.*;
@@ -38,29 +39,26 @@ public class FFIEnvironment extends GLEnvironment {
 
     public static class FFIBuffer extends GLObject implements SysBuffer {
 	public static final boolean LEAK_CHECK = false;
-	private final Arena arena;
-	private final MemorySegment chunk;
+	private final SharedArena.Block chunk;
 	private final ByteBuffer buf;
 	private final Cleanup clean;
 	private boolean deleted = false;
 
 	private static class Cleanup implements Finalizer.Cleaner, Disposable {
 	    private final Throwable init = LEAK_CHECK ? new Throwable() : null;
-	    private final Arena arena;
-	    private final MemorySegment chunk;
+	    private final SharedArena.Block chunk;
 	    private final Runnable fin;
 	    private boolean clean;
 
 	    Cleanup(FFIBuffer ob) {
-		this.arena = ob.arena;
 		this.chunk = ob.chunk;
 		fin = Finalizer.finalize(ob, this);
 	    }
 
 	    public void clean() {
-		if(LEAK_CHECK && !clean)
-		    new Warning(init , "Native buffer leaked (" + chunk.byteSize() + " bytes)").issue();
-		arena.close();
+		if(!clean)
+		    new Warning(init , "Native buffer leaked (" + chunk.size() + " bytes)").issue();
+		chunk.dispose();
 	    }
 
 	    public void dispose() {
@@ -71,9 +69,8 @@ public class FFIEnvironment extends GLEnvironment {
 
 	public FFIBuffer(FFIEnvironment env, int sz) {
 	    super(env);
-	    arena = Arena.ofShared();
-	    chunk = arena.allocate(sz);
-	    buf = chunk.asByteBuffer().order(ByteOrder.nativeOrder());
+	    chunk = SharedArena.get().malloc(sz);
+	    buf = chunk.mem().asByteBuffer().order(ByteOrder.nativeOrder());
 	    clean = new Cleanup(this);
 	}
 
@@ -91,8 +88,6 @@ public class FFIEnvironment extends GLEnvironment {
 	    deleted = true;
 	    clean.dispose();
 	}
-
-	protected boolean leakcheck() {return(false);}
     }
 
     public static class FFICaps extends Caps {
