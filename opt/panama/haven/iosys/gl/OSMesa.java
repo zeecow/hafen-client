@@ -126,11 +126,11 @@ public abstract class OSMesa {
     }
 
     class Resolved extends OpenGL.Base {
-	protected MethodHandle lookup(String name, FunctionDescriptor sig) {
+	protected MethodHandle lookup(String name, FunctionDescriptor sig, Linker.Option... options) {
 	    MemorySegment addr = OSMesaGetProcAddress(name);
 	    if(nullp(addr))
 		return(null);
-	    return(ld.downcallHandle(addr, sig));
+	    return(ld.downcallHandle(addr, sig, options));
 	}
     }
 
