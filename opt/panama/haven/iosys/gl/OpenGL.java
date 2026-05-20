@@ -414,13 +414,6 @@ public abstract class OpenGL implements haven.render.gl.GL {
 	    } catch(Throwable e) {throw(new RuntimeException(e));}
 	}
 
-	private final MethodHandle glDisableClientState = lookup("glDisableClientState", FunctionDescriptor.ofVoid(C_INT));
-	public void glDisableClientState(int cap) {
-	    try {
-		glDisableClientState.invoke(cap);
-	    } catch(Throwable e) {throw(new RuntimeException(e));}
-	}
-
 	private final MethodHandle glDisableVertexAttribArray = lookup("glDisableVertexAttribArray", FunctionDescriptor.ofVoid(GLuint));
 	public void glDisableVertexAttribArray(int location) {
 	    try {
@@ -488,13 +481,6 @@ public abstract class OpenGL implements haven.render.gl.GL {
 	public void glEnablei(int cap, int index) {
 	    try {
 		glEnablei.invoke(cap, index);
-	    } catch(Throwable e) {throw(new RuntimeException(e));}
-	}
-
-	private final MethodHandle glEnableClientState = lookup("glEnableClientState", FunctionDescriptor.ofVoid(C_INT));
-	public void glEnableClientState(int cap) {
-	    try {
-		glEnableClientState.invoke(cap);
 	    } catch(Throwable e) {throw(new RuntimeException(e));}
 	}
 
