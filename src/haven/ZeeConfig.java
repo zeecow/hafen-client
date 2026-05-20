@@ -1035,6 +1035,27 @@ public class ZeeConfig {
         }
     }
 
+    static String getWindowNameAdjusted(Window win, String name){
+
+        // remove countdown from temp ZeeWindow
+        if (win instanceof ZeeWindow)
+            name = name.replaceAll(" \\d{1,2}s$", "").strip();
+
+        // minimap name based on size, zoom, etc
+        else if (win instanceof MapWnd)
+            name = ZeeWindow.getMinimapWindowTitle();
+
+        // craft window unique name
+        else if(isMakewindow(win))
+            name = WINDOW_NAME_CRAFT;
+
+        // distinguish homonymous tables by sz.x only , due to feast button
+        else if(win.cap.contentEquals("Table")){
+            name = "Table_"+win.sz.x;
+        }
+
+        return name;
+    }
 
     public static void windowAdded(Window window, String test) {
 
@@ -1042,11 +1063,10 @@ public class ZeeConfig {
 
         String windowTitle = window.cap.strip();
 
-        if (window instanceof MapWnd)
-            windowTitle = ZeeWindow.getMinimapWindowTitle();
-
         if (windowTitle.contentEquals("Stack"))
             return;
+
+        windowTitle = getWindowNameAdjusted(window,windowTitle);
 
         // notify waitWindowOpen
         ZeeManagerCraft.lastWindowOpened = window;
@@ -2077,21 +2097,14 @@ public class ZeeConfig {
         if( name==null || name.isEmpty() || name.contentEquals("Stack"))
             return;
 
-        // set craft window unique name
-        if(isMakewindow(window))
-            name = WINDOW_NAME_CRAFT;
-
-        // //distinguish tables by sz.x only, due to feast button
-        if(window.cap.contentEquals("Table")){
-            name = "Table_"+window.sz.x;
-        }
+        name = getWindowNameAdjusted(window,name);
 
         // save minimap
         if (window instanceof MapWnd) {
             if ( isMinimapCompacted() && gameUI.mapfile.view.zoomlevel > 0) {
                 return;//dont save compact map zoomed out
             }
-            name = ZeeWindow.getMinimapWindowTitle();
+            //name = ZeeWindow.getMinimapWindowTitle();
         }
 
         //println("saveWindowPos  "+name+"  "+window.c);
@@ -2855,6 +2868,8 @@ public class ZeeConfig {
         lastAutoHearthMs = 0;
         ZeeManagerMinimap.mapOptsHidePMarks = ZeeManagerMinimap.mapOptsMarksShowOnlyIsOn = false;
         ZeeManagerMiner.isMovingStraightLine = false;
+        ZeeManagerGobs.isPickingupLifepile = false;
+        ZeeManagerGobs.winLeafpile = null;
         if (ZeeManagerMinimap.minimapOptsMarksResnameHidden !=null)
             ZeeManagerMinimap.minimapOptsMarksResnameHidden.clear();
         ZeeManagerMinimap.mapOptsMarksRow = ZeeManagerMinimap.mapOptsMarksCol = 0;

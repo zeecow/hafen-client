@@ -19,16 +19,16 @@ public class ZeeWindow extends Window {
 
     // window auto closes if idle after given ms
     static long winHideGobLastInteractionMs = -1;
-    public ZeeWindow(Coord size, String title, long autoCloseAfterIdleMs) {
+    public ZeeWindow(Coord size, String title, long autoCloseAfterIdleMsMax99s) {
         super(size, title);
         winHideGobLastInteractionMs = ZeeThread.now();
         String originalCap = cap;
         new ZeeThread(){
             public void run() {
-                println("ZeeWindow auto-close start");
+                //println("ZeeWindow auto-close start");
                 try {
                     synchronized (this) {
-                        final long timeoutMs = autoCloseAfterIdleMs;
+                        final long timeoutMs = autoCloseAfterIdleMsMax99s > 99000 ? 99000 : autoCloseAfterIdleMsMax99s;
                         long idleMs = 0;
                         winHideGobLastInteractionMs = now();
                         //winHideGobLabelClosing.settext("autoclose " + (timeoutMs - idleMs) / 1000 + "s");
@@ -42,13 +42,13 @@ public class ZeeWindow extends Window {
                             }
                         } while (visible);
                         ZeeWindow.this.reqdestroy();
-                        println("    ZeeWindow reqdestroy()");
+                        //println("    ZeeWindow reqdestroy()");
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
                 ZeeWindow.this.chcap(originalCap);//restore cap just in case
-                println("ZeeWindow auto-close end");
+                //println("ZeeWindow auto-close end");
             }
         }.start();
     }
@@ -56,7 +56,6 @@ public class ZeeWindow extends Window {
     @Override
     public boolean mouseup(MouseUpEvent ev) {
         winHideGobLastInteractionMs = ZeeThread.now();
-        ZeeConfig.println("ZeeWindow mouseup "+winHideGobLastInteractionMs);
         return super.mouseup(ev);
     }
 

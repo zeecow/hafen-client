@@ -3433,50 +3433,105 @@ public class ZeeManagerGobs extends ZeeThread{
         return basenames;
     }
 
-    private boolean isGobBigDeadAnimal_thread() {
-        try{
-            ZeeThread zt = new ZeeThread() {
-                public void run() {
-                    gobClick(gob, 3);
-                    FlowerMenu fm = waitFlowerMenu();
-                    if (fm==null) {//no menu detected
-                        isGobDeadAnimal = false;
-                        return;
-                    }
-                    for (int i = 0; i < fm.opts.length; i++) {
-                        //if animal gob has butch menu, means is dead
-                        if (ZeeConfig.DEF_LIST_BUTCH_AUTO.contains(fm.opts[i].name)){
-                            isGobDeadAnimal = true;
-                            break;
+
+
+    static ZeeWindow winLeafpile;
+    static boolean pickLeafpileGrub = Utils.getprefb("pickLeafpileGrub",true);
+    static boolean pickLeafpileBeetle = Utils.getprefb("pickLeafpileBeetle",true);
+    static boolean pickLeafpileLeaves = Utils.getprefb("pickLeafpileLeaves",true);
+    static boolean pickLeafpileSnail = Utils.getprefb("pickLeafpileSnail",false);
+    static boolean pickLeafpileLizard = Utils.getprefb("pickLeafpileLizard",false);
+    static boolean isPickingupLifepile;
+    public static void pickupLeafpile() {
+        if (isPickingupLifepile){
+            println("pickupLeafpile > already picking");
+            return;
+        }
+        isPickingupLifepile = true;
+        new ZeeThread(){
+            public void run() {
+                ZeeConfig.addPlayerText("pickan");
+                try {
+                    sleep(500);//wait spawn
+                    List<String> names = new ArrayList<>();
+                    if (pickLeafpileGrub) names.add("/grub");
+                    if (pickLeafpileBeetle) names.add("/stagbeetle");
+                    if (pickLeafpileLeaves) names.add("/perfectautumnleaf");
+                    if (pickLeafpileSnail) names.add("/forestsnail");
+                    if (pickLeafpileLizard) names.add("/forestlizard");
+                    for (String name : names) {
+                        Gob closest = ZeeConfig.getClosestGobByNameEnds(name);
+                        if (closest!=null) {
+                            pickupAllGobsClientSide(closest.getres().name, 3);
+                            do{
+                                sleep(PING_MS);
+                            } while (isPickingAllGobsClientSide);
                         }
                     }
-                    //close menu before returning
-                    ZeeFlowerMenu.cancelFlowerMenu();
-                    waitNoFlowerMenu();
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
-            };
+                isPickingupLifepile = false;
+                ZeeConfig.removePlayerText();
+            }
+        }.start();
 
-            //disable automenu settings before thread clicks gob
-            ZeeConfig.autoClickMenuOption = false;
-            boolean butchBackup = ZeeConfig.butcherMode;
-            ZeeConfig.butcherMode = false;
-
-            //start thread and wait it finish
-            isGobDeadAnimal = false;
-            zt.start();
-            zt.join();//wait thread
-
-            //restore automenu settings
-            ZeeConfig.autoClickMenuOption = Utils.getprefb("autoClickMenuOption", true);
-            ZeeConfig.butcherMode = butchBackup;
-
-            return isGobDeadAnimal;
-
-        }catch (Exception e){
-            e.printStackTrace();
+        // add temp window
+        if (winLeafpile != null) {
+            //println("winLeafpile already open");
+            return;
         }
-        return false;
+        winLeafpile = ZeeConfig.gameUI.add(
+                new ZeeWindow(Coord.of(150,75),"Leafpile pick",7000){
+                    @Override
+                    public void destroy() {
+                        super.destroy();
+                        winLeafpile = null;
+                    }
+                },
+                ZeeConfig.gameUI.sz.div(1.5)
+        );
+        Widget wdg;
+        int xpad = 5, y = 10;
+        wdg = winLeafpile.add(new CheckBox("grub"){
+            { a = pickLeafpileGrub;}
+            public void set(boolean a) {
+                super.set(a);
+                Utils.setprefb("pickLeafpileGrub", (pickLeafpileGrub = a));
+            }
+        }, 0, y);
+        wdg = winLeafpile.add(new CheckBox("beetle"){
+            { a = pickLeafpileBeetle;}
+            public void set(boolean a) {
+                super.set(a);
+                Utils.setprefb("pickLeafpileBeetle", (pickLeafpileBeetle = a));
+            }
+        }, wdg.c.x+wdg.sz.x+xpad, y);
+        wdg = winLeafpile.add(new CheckBox("leaf"){
+            { a = pickLeafpileLeaves;}
+            public void set(boolean a) {
+                super.set(a);
+                Utils.setprefb("pickLeafpileLeaves", (pickLeafpileLeaves = a));
+            }
+        }, wdg.c.x+wdg.sz.x+xpad, y);
+        y += 25;
+        wdg = winLeafpile.add(new CheckBox("snail"){
+            { a = pickLeafpileSnail;}
+            public void set(boolean a) {
+                super.set(a);
+                Utils.setprefb("pickLeafpileSnail", (pickLeafpileSnail = a));
+            }
+        }, 0,y);
+        wdg = winLeafpile.add(new CheckBox("lizard"){
+            { a = pickLeafpileLizard;}
+            public void set(boolean a) {
+                super.set(a);
+                Utils.setprefb("pickLeafpileLizard", (pickLeafpileLizard = a));
+            }
+        }, wdg.c.x+wdg.sz.x+xpad,y);
+        winLeafpile.pack();
     }
+
 
     private static void mountHorseDrivingWheelbarrow(Gob gob){
         Gob horse = gob;
@@ -4189,6 +4244,11 @@ public class ZeeManagerGobs extends ZeeThread{
     }
 
     static boolean isPickingAllGobsClientSide = false;
+    static int pickAllMaxTiles = -1;
+    static void pickupAllGobsClientSide(String resname, int maxDistInTiles) {
+        pickAllMaxTiles = maxDistInTiles;
+        pickupAllGobsClientSide(resname);
+    }
     static void pickupAllGobsClientSide(String resname){
         if (isPickingAllGobsClientSide)
             return;
@@ -4203,18 +4263,26 @@ public class ZeeManagerGobs extends ZeeThread{
                     do{
                         ZeeConfig.addPlayerText(basename+" "+cont);
                         Gob closest = ZeeConfig.getClosestGobByNameEnds(resname);
+                        // gob not found
                         if (closest == null)
                             break;
+                        // gob too distant
+                        if (pickAllMaxTiles > 0 && ZeeConfig.distanceToPlayer(closest) > TILE_SIZE * pickAllMaxTiles) {
+                            //println("gob too distant 123");
+                            break;
+                        }
                         // pick all serverside until player idle
                         ZeeManagerGobs.pickupAllGobItemsServerSide(closest);
                         prepareCancelClick();
-                        waitPlayerIdlePoseOrVehicleIdle();
+                        //waitPlayerIdlePoseOrVehicleIdle();
+                        waitPlayerIdleLinMove();
                         cont++;
                     }while(!isCancelClick() && !ZeeConfig.isPlayerHoldingItem());
                 } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
                 isPickingAllGobsClientSide = false;
+                pickAllMaxTiles = -1;
                 ZeeConfig.removePlayerText();
                 ZeeConfig.msgLow(basename+" "+cont);
             }
