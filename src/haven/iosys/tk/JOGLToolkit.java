@@ -48,6 +48,8 @@ public class JOGLToolkit extends AWTToolkit {
 	    this.caps = mkcaps();
 	} catch(ProfileException e) {
 	    throw(new Unavailable(e));
+	} catch(LinkageError e) {
+	    throw(new Unavailable("JOGL libraries not available", e));
 	}
     }
 
