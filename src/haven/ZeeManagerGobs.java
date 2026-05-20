@@ -4738,36 +4738,27 @@ public class ZeeManagerGobs extends ZeeThread{
     static Window winHideGobs = null;
     static boolean hideGobWalls = Utils.getprefb("hideGobWalls",true);
     static boolean hideGobCrops = Utils.getprefb("hideGobCrops",true);
-    // todo uncomment when fix
-//    static boolean hideGobHouses = Utils.getprefb("hideGobHouses",false);
-//    static boolean hideGobIdols = Utils.getprefb("hideGobIdols",false);
-//    static boolean hideGobTamedAnimals = Utils.getprefb("hideGobTamedAnimals",false);
-//    static boolean hideGobSmokeProducers = Utils.getprefb("hideGobSmokers",false);
-    static long winHideGobLastInteractionMs;
-    private static Label winHideGobLabelClosing;
     private static void showWinHideGobs() {
 
         if (winHideGobs != null) {
-            //println("win toggle models already open");
-            winHideGobLastInteractionMs = now();
+            println("showWinHideGobs() > window already open");
             return;
         }
 
         // window
         winHideGobs = ZeeConfig.gameUI.add(
-            new Window(Coord.of(150,75),"Hide Gobs"){
-                public void wdgmsg(String msg, Object... args) {
-                    if (msg.contentEquals("close")){
-                        winHideGobs = null;
-                        this.reqdestroy();
-                    }
+            new ZeeWindow(Coord.of(150,75),"Hide Gobs",5000){
+                @Override
+                public void destroy() {
+                    super.destroy();
+                    winHideGobs = null;
                 }
             },
             ZeeConfig.gameUI.sz.div(2)
         );
 
         Widget wdg;
-        int xpad = 5, ypad = 2;
+        int xpad = 5, y = 10;
 
         // walls
         wdg = winHideGobs.add(new CheckBox("walls"){
@@ -4775,67 +4766,29 @@ public class ZeeManagerGobs extends ZeeThread{
             public void set(boolean a) {
                 super.set(a);
                 Utils.setprefb("hideGobWalls", (hideGobWalls = a));
-                winHideGobLastInteractionMs = now();
                 toggleModelsInList(getGobsByTags(Gob.Tag.WALL));
             }
-        }, 0,0);
+        }, 0,y);
         // crops
         wdg = winHideGobs.add(new CheckBox("crops"){
             { a = hideGobCrops;}
             public void set(boolean a) {
                 super.set(a);
                 Utils.setprefb("hideGobCrops", (hideGobCrops = a));
-                winHideGobLastInteractionMs = now();
                 toggleModelsInList(getGobsByTags(Gob.Tag.CROP));
             }
-        }, wdg.c.x+wdg.sz.x+xpad,0);
+        }, wdg.c.x+wdg.sz.x+xpad,y);
         // trees
         wdg = winHideGobs.add(new CheckBox("trees"){
             { a = ZeeManagerTrees.hideGobTrees;}
             public void set(boolean a) {
                 super.set(a);
                 ZeeManagerTrees.hideGobTrees = a;
-                ZeeManagerGobs.winHideGobLastInteractionMs = now();
                 toggleModelsInList(getGobsByTags(Gob.Tag.TREE));
             }
-        }, wdg.c.x+wdg.sz.x+xpad,0);
-
-        // label countdown auto close
-        winHideGobLabelClosing = winHideGobs.add(new Label(""),0,wdg.c.y+wdg.sz.y+ypad);
+        }, wdg.c.x+wdg.sz.x+xpad,y);
 
         winHideGobs.pack();
-
-        // auto-close after timeout
-        new ZeeThread(){
-            public void run() {
-                //println("winHideGobs auto-close start");
-                try {
-                    synchronized (winHideGobs) {
-                        final int timeoutMs = 5000;
-                        long idleMs = 0;
-                        winHideGobLastInteractionMs = now();
-                        winHideGobLabelClosing.settext("autoclose " + (timeoutMs - idleMs) / 1000 + "s");
-                        do {
-                            sleep(1000);
-                            idleMs = now() - ZeeManagerGobs.winHideGobLastInteractionMs;
-                            if (idleMs < timeoutMs) {
-                                winHideGobLabelClosing.settext("autoclose " + (timeoutMs - idleMs) / 1000 + "s");
-                            } else {
-                                break;
-                            }
-                        } while (winHideGobs != null);
-                        if (winHideGobs != null) {
-                            winHideGobs.reqdestroy();
-                            winHideGobs = null;
-                        }
-                        //println("    window destroyed");
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-                //println("winHideGobs auto-close end");
-            }
-        }.start();
     }
 
     private static List<Gob> getGobsByTags(Gob.Tag ... tags) {

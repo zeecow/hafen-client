@@ -17,6 +17,49 @@ public class ZeeWindow extends Window {
         super(size, title);
     }
 
+    // window auto closes if idle after given ms
+    static long winHideGobLastInteractionMs = -1;
+    public ZeeWindow(Coord size, String title, long autoCloseAfterIdleMs) {
+        super(size, title);
+        winHideGobLastInteractionMs = ZeeThread.now();
+        String originalCap = cap;
+        new ZeeThread(){
+            public void run() {
+                println("ZeeWindow auto-close start");
+                try {
+                    synchronized (this) {
+                        final long timeoutMs = autoCloseAfterIdleMs;
+                        long idleMs = 0;
+                        winHideGobLastInteractionMs = now();
+                        //winHideGobLabelClosing.settext("autoclose " + (timeoutMs - idleMs) / 1000 + "s");
+                        do {
+                            sleep(1000);
+                            idleMs = now() - winHideGobLastInteractionMs;
+                            if (idleMs < timeoutMs) {
+                                ZeeWindow.this.chcap(originalCap+" " + (timeoutMs - idleMs) / 1000 + "s");
+                            } else {
+                                break;
+                            }
+                        } while (visible);
+                        ZeeWindow.this.reqdestroy();
+                        println("    ZeeWindow reqdestroy()");
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                ZeeWindow.this.chcap(originalCap);//restore cap just in case
+                println("ZeeWindow auto-close end");
+            }
+        }.start();
+    }
+
+    @Override
+    public boolean mouseup(MouseUpEvent ev) {
+        winHideGobLastInteractionMs = ZeeThread.now();
+        ZeeConfig.println("ZeeWindow mouseup "+winHideGobLastInteractionMs);
+        return super.mouseup(ev);
+    }
+
     public static Coord posBelow(Widget wdg, int padX, int padY) {
         if (wdg==null)
             return Coord.z;
