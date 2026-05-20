@@ -90,6 +90,21 @@ public class FFIEnvironment extends GLEnvironment {
 	}
     }
 
+    public static class HeapBuffer implements SysBuffer {
+	public final ByteBuffer data;
+
+	public HeapBuffer(int sz) {
+	    this.data = ByteBuffer.allocate(sz).order(ByteOrder.nativeOrder());
+	}
+
+	public HeapBuffer(ByteBuffer data) {
+	    this.data = data;
+	}
+
+	public ByteBuffer data() {return(data);}
+	public void dispose() {}
+    }
+
     public static class FFICaps extends Caps {
 	public final boolean coreprof;
 
@@ -113,12 +128,18 @@ public class FFIEnvironment extends GLEnvironment {
     }
 
     public SysBuffer malloc(int sz) {
-	return(new FFIBuffer(this, sz));
+	return(new HeapBuffer(sz));
     }
 
     public SysBuffer subsume(ByteBuffer data, int sz) {
-	SysBuffer ret = new FFIBuffer(this, sz);
-	ret.data().put(data).rewind();
+	if(data.remaining() < sz) {
+	    String msg = data.remaining() + " < " + sz;
+	    throw(new BufferUnderflowException() {
+		    public String getMessage() {return(msg);}
+		});
+	}
+	SysBuffer ret = new HeapBuffer(data.duplicate());
+	data.position(data.position() + sz);
 	return(ret);
     }
 }

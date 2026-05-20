@@ -58,6 +58,7 @@ public abstract class OpenGL implements haven.render.gl.GL {
 	static final MemoryLayout GLsizeiptr = SIZE_T;
 	static final MemoryLayout GLintptr = SIZE_T;
 	private static final Linker.Option critical = Linker.Option.critical(false);
+	private static final Linker.Option heapdata = Linker.Option.critical(true);
 
 	private static byte b(boolean v) {
 	    return((byte)(v ? 1 : 0));
@@ -212,17 +213,17 @@ public abstract class OpenGL implements haven.render.gl.GL {
 	    } catch(Throwable e) {throw(new RuntimeException(e));}
 	}
 
-	private final MethodHandle glBufferData = lookup("glBufferData", FunctionDescriptor.ofVoid(GLenum, GLsizeiptr, ADDRESS, GLenum), critical);
+	private final MethodHandle glBufferData = lookup("glBufferData", FunctionDescriptor.ofVoid(GLenum, GLsizeiptr, ADDRESS, GLenum), heapdata);
 	public void glBufferData(int target, long size, ByteBuffer data, int usage) {
-	    try(Arena st = Arena.ofConfined()) {
-		glBufferData.invoke(target, size, bufcpy(st, data, size), usage);
+	    try {
+		glBufferData.invoke(target, size, bufmem(data), usage);
 	    } catch(Throwable e) {throw(new RuntimeException(e));}
 	}
 
-	private final MethodHandle glBufferSubData = lookup("glBufferSubData", FunctionDescriptor.ofVoid(GLenum, GLintptr, GLsizeiptr, ADDRESS), critical);
+	private final MethodHandle glBufferSubData = lookup("glBufferSubData", FunctionDescriptor.ofVoid(GLenum, GLintptr, GLsizeiptr, ADDRESS), heapdata);
 	public void glBufferSubData(int target, long offset, long size, ByteBuffer data) {
-	    try(Arena st = Arena.ofConfined()) {
-		glBufferSubData.invoke(target, offset, size, bufcpy(st, data, size));
+	    try {
+		glBufferSubData.invoke(target, offset, size, bufmem(data));
 	    } catch(Throwable e) {throw(new RuntimeException(e));}
 	}
 
@@ -565,7 +566,7 @@ public abstract class OpenGL implements haven.render.gl.GL {
 	    } catch(Throwable e) {throw(new RuntimeException(e));}
 	}
 
-	private final MethodHandle glGetBufferSubData = lookup("glGetBufferSubData", FunctionDescriptor.ofVoid(GLenum, GLintptr, GLsizeiptr, ADDRESS), critical);
+	private final MethodHandle glGetBufferSubData = lookup("glGetBufferSubData", FunctionDescriptor.ofVoid(GLenum, GLintptr, GLsizeiptr, ADDRESS), heapdata);
 	public void glGetBufferSubData(int target, int offset, int size, ByteBuffer data) {
 	    try {
 		glGetBufferSubData.invoke(target, offset, size, bufmem(data));
@@ -688,7 +689,7 @@ public abstract class OpenGL implements haven.render.gl.GL {
 	    } catch(Throwable e) {throw(new RuntimeException(e));}
 	}
 
-	private final MethodHandle glGetTexImage = lookup("glGetTexImage", FunctionDescriptor.ofVoid(GLenum, GLint, GLenum, GLenum, ADDRESS), critical);
+	private final MethodHandle glGetTexImage = lookup("glGetTexImage", FunctionDescriptor.ofVoid(GLenum, GLint, GLenum, GLenum, ADDRESS), heapdata);
 	public void glGetTexImage(int target, int level, int format, int type, ByteBuffer pixels) {
 	    try {
 		glGetTexImage.invoke(target, level, format, type, bufmem(pixels));
@@ -772,7 +773,7 @@ public abstract class OpenGL implements haven.render.gl.GL {
 	    } catch(Throwable e) {throw(new RuntimeException(e));}
 	}
 
-	private final MethodHandle glReadPixels = lookup("glReadPixels", FunctionDescriptor.ofVoid(GLint, GLint, GLsizei, GLsizei, GLenum, GLenum, ADDRESS), critical);
+	private final MethodHandle glReadPixels = lookup("glReadPixels", FunctionDescriptor.ofVoid(GLint, GLint, GLsizei, GLsizei, GLenum, GLenum, ADDRESS), heapdata);
 	public void glReadPixels(int x, int y, int width, int height, int format, int type, ByteBuffer data) {
 	    try {
 		glReadPixels.invoke(x, y, width, height, format, type, bufmem(data));
@@ -830,14 +831,14 @@ public abstract class OpenGL implements haven.render.gl.GL {
 	    } catch(Throwable e) {throw(new RuntimeException(e));}
 	}
 
-	private final MethodHandle glTexImage2D = lookup("glTexImage2D", FunctionDescriptor.ofVoid(GLenum, GLint, GLint, GLsizei, GLsizei, GLint, GLenum, GLenum, ADDRESS), critical);
+	private final MethodHandle glTexImage2D = lookup("glTexImage2D", FunctionDescriptor.ofVoid(GLenum, GLint, GLint, GLsizei, GLsizei, GLint, GLenum, GLenum, ADDRESS), heapdata);
 	public void glTexImage2D(int target, int level, int internalformat, int width, int height, int border, int format, int type, ByteBuffer data) {
 	    try {
 		glTexImage2D.invoke(target, level, internalformat, width, height, border, format, type, bufmem(data));
 	    } catch(Throwable e) {throw(new RuntimeException(e));}
 	}
 
-	private final MethodHandle glTexSubImage2D = lookup("glTexSubImage2D", FunctionDescriptor.ofVoid(GLenum, GLint, GLint, GLint, GLsizei, GLsizei, GLenum, GLenum, ADDRESS), critical);
+	private final MethodHandle glTexSubImage2D = lookup("glTexSubImage2D", FunctionDescriptor.ofVoid(GLenum, GLint, GLint, GLint, GLsizei, GLsizei, GLenum, GLenum, ADDRESS), heapdata);
 	public void glTexSubImage2D(int target, int level, int xoff, int yoff, int width, int height, int format, int type, ByteBuffer data) {
 	    try {
 		glTexSubImage2D.invoke(target, level, xoff, yoff, width, height, format, type, bufmem(data));
@@ -851,14 +852,14 @@ public abstract class OpenGL implements haven.render.gl.GL {
 	    } catch(Throwable e) {throw(new RuntimeException(e));}
 	}
 
-	private final MethodHandle glTexImage3D = lookup("glTexImage3D", FunctionDescriptor.ofVoid(GLenum, GLint, GLint, GLsizei, GLsizei, GLsizei, GLint, GLenum, GLenum, ADDRESS), critical);
+	private final MethodHandle glTexImage3D = lookup("glTexImage3D", FunctionDescriptor.ofVoid(GLenum, GLint, GLint, GLsizei, GLsizei, GLsizei, GLint, GLenum, GLenum, ADDRESS), heapdata);
 	public void glTexImage3D(int target, int level, int internalformat, int width, int height, int depth, int border, int format, int type, ByteBuffer data) {
 	    try {
 		glTexImage3D.invoke(target, level, internalformat, width, height, depth, border, format, type, bufmem(data));
 	    } catch(Throwable e) {throw(new RuntimeException(e));}
 	}
 
-	private final MethodHandle glTexSubImage3D = lookup("glTexSubImage3D", FunctionDescriptor.ofVoid(GLenum, GLint, GLint, GLint, GLint, GLsizei, GLsizei, GLsizei, GLenum, GLenum, ADDRESS), critical);
+	private final MethodHandle glTexSubImage3D = lookup("glTexSubImage3D", FunctionDescriptor.ofVoid(GLenum, GLint, GLint, GLint, GLint, GLsizei, GLsizei, GLsizei, GLenum, GLenum, ADDRESS), heapdata);
 	public void glTexSubImage3D(int target, int level, int xoff, int yoff, int zoff, int width, int height, int depth, int format, int type, ByteBuffer data) {
 	    try {
 		glTexSubImage3D.invoke(target, level, xoff, yoff, zoff, width, height, depth, format, type, bufmem(data));
