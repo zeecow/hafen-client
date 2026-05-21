@@ -34,7 +34,7 @@ import haven.GSettings.SyncMode;
 import haven.render.gl.GLEnvironment;
 import haven.render.gl.GLRender;
 
-public abstract class UILoop implements UI.Context {
+public abstract class UILoop implements UI.Context, Console.Directory {
     public final Windeye wnd;
     public final Thread th;
     public Environment env;
@@ -56,6 +56,7 @@ public abstract class UILoop implements UI.Context {
     public UI newui(UI.Runner fun) {
 	UI prevui, newui = new UI(this, new Coord(wnd.size()), fun);
 	newui.env = this.env;
+	newui.cons.add(this);
 	synchronized(uilock) {
 	    prevui = this.ui;
 	    this.ui = newui;
@@ -476,5 +477,18 @@ public abstract class UILoop implements UI.Context {
 	}
 	if(th.isAlive())
 	    Warning.warn("ui thread failed to terminate");
+    }
+
+    private Map<String, Console.Command> cmdmap = new TreeMap<String, Console.Command>();
+    {
+	cmdmap.put("stats", (cons, args) -> {
+	    UIPanel.dbtext.set(Utils.parsebool(args[1]));
+	});
+	cmdmap.put("profile", (cons, args) -> {
+	    UIPanel.profile.set(Utils.parsebool(args[1]));
+	});
+    }
+    public Map<String, Console.Command> findcmds() {
+	return(cmdmap);
     }
 }
