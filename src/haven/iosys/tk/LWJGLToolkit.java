@@ -71,7 +71,7 @@ public class LWJGLToolkit extends AWTToolkit {
     };
     public class LWJGLPanel extends AWTGLCanvas {
 	public LWJGLEnvironment env;
-	private int cursi;
+	private int cursi, pstate;
 
 	public LWJGLPanel() {
 	    super();
@@ -119,9 +119,17 @@ public class LWJGLToolkit extends AWTToolkit {
 	    if(!env.shape().equals(shape)) {
 		env.reshape(shape);
 	    }
+	    synchronized(this) {
+		pstate = 2;
+	    }
 	    runInContext(() -> {
 		env.process(LWJGLWrap.instance);
 	    });
+	    synchronized(this) {
+		if((pstate & 1) != 0)
+		    EventQueue.invokeLater(this::process);
+		pstate &= ~2;
+	    }
 	}
 
 	private LWJGLEnvironment env() {
@@ -134,7 +142,11 @@ public class LWJGLToolkit extends AWTToolkit {
 			    this.env = new LWJGLEnvironment(shape) {
 				public void submit(Render cmd) {
 				    super.submit(cmd);
-				    EventQueue.invokeLater(LWJGLPanel.this::process);
+				    synchronized(LWJGLPanel.this) {
+					if(pstate == 0)
+					    EventQueue.invokeLater(LWJGLPanel.this::process);
+					pstate |= 1;
+				    }
 				}
 			    };
 			    initgl();

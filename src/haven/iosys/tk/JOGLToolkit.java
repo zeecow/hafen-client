@@ -110,7 +110,7 @@ public class JOGLToolkit extends AWTToolkit {
     public class JOGLPanel extends GLCanvas {
 	public Area shape = Area.sized(Coord.z);
 	public JOGLEnvironment env;
-	private int cursi;
+	private int cursi, pstate = 0;
 
 	public JOGLPanel() {
 	    super(caps, null, null);
@@ -160,7 +160,11 @@ public class JOGLToolkit extends AWTToolkit {
 		    this.env = new JOGLEnvironment(gl, ctx, shape) {
 			public void submit(Render cmd) {
 			    super.submit(cmd);
-			    EventQueue.invokeLater(JOGLPanel.this::display);
+			    synchronized(JOGLPanel.this) {
+				if(pstate == 0)
+				    EventQueue.invokeLater(JOGLPanel.this::display);
+				pstate |= 1;
+			    }
 			}
 		    };
 		    notifyAll();
@@ -178,7 +182,15 @@ public class JOGLToolkit extends AWTToolkit {
 	    if(false) {
 		gl3 = new DebugGL3(gl3);
 	    }
+	    synchronized(this) {
+		pstate = 2;
+	    }
 	    env.process(new JOGLWrap(gl3));
+	    synchronized(this) {
+		if((pstate & 1) != 0)
+		    EventQueue.invokeLater(this::display);
+		pstate &= ~2;
+	    }
 	}
 
 	private void glswap(haven.render.gl.GL gl, int ival) {
