@@ -371,14 +371,33 @@ public class WGLContext implements Toolkit.Factory {
 	    }
 
 	    public class WGLEnvironment extends FFIEnvironment {
+		private int qstate;
+
 		private WGLEnvironment() {
 		    super(gl, Area.sized(size));
 		}
 
+		private void process() {
+		    synchronized(this) {
+			qstate = 2;
+		    }
+		    process(gl);
+		    synchronized(this) {
+			if((qstate & 1) != 0)
+			    glrun(hwnd, (Runnable)this::process);
+			qstate &= ~2;
+		    }
+		}
+
 		public void submit(Render cmd) {
 		    super.submit(cmd);
-		    if(renv == this)
-			glrun(hwnd, () -> process(gl));
+		    synchronized(this) {
+			if(renv == this) {
+			    if(qstate == 0)
+				glrun(hwnd, (Runnable)this::process);
+			    qstate |= 1;
+			}
+		    }
 		}
 	    }
 
