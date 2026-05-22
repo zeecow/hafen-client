@@ -48,11 +48,26 @@ public abstract class UILoop implements UI.Context, Console.Directory {
 
     public UILoop(Windeye wnd) {
 	this.wnd = wnd;
-	this.env = wnd.env();
+	setenv(wnd.env());
 	this.curscaps = wnd.toolkit().cursorcaps();
 	newui(null);
 	this.th = new HackThread(this::run, "Haven UI thread");
 	this.th.start();
+    }
+
+    private void setenv(Environment env) {
+	this.env = env;
+	if(ui != null)
+	    ui.env = env;
+	haven.error.ErrorHandler errh = haven.error.ErrorHandler.find();
+	if(errh != null) {
+	    Environment.Caps caps = env.caps();
+	    errh.lsetprop("tk.desc", wnd.toolkit().description());
+	    errh.lsetprop("gl.vendor", caps.vendor());
+	    errh.lsetprop("gl.version", caps.driver());
+	    errh.lsetprop("gl.renderer", caps.device());
+	    errh.lsetprop("render.caps", caps);
+	}
     }
 
     public UI newui(UI.Runner fun) {
@@ -505,11 +520,8 @@ public abstract class UILoop implements UI.Context, Console.Directory {
 	    double then = Utils.rtime();
 	    while(true) {
 		Environment env = wnd.env();
-		if(env != this.env) {
-		    this.env = env;
-		    if(ui != null)
-			ui.env = env;
-		}
+		if(env != this.env)
+		    setenv(env);
 		buf = env.render();
 		try {
 		    UI ui;
