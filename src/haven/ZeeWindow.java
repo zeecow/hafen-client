@@ -53,8 +53,6 @@ public class ZeeWindow extends Window {
     }
 
     public void restartAutocloseCountdown(){
-        if (winHideGobLastInteractionMs == -1)
-            return;
         winHideGobLastInteractionMs = ZeeThread.now();
     }
 
