@@ -28,6 +28,7 @@ package haven;
 
 import java.util.*;
 import java.io.*;
+import java.nio.file.*;
 import haven.render.*;
 import haven.iosys.tk.*;
 import java.awt.image.BufferedImage;
@@ -339,13 +340,89 @@ public class Client implements Console.Directory {
 	}
     }
 
+    public static class ConnectionError extends RuntimeException {
+	public ConnectionError(String mesg) {
+	    super(mesg);
+	}
+    }
+
+    public static Session connect(Object[] args) {
+	Session.User acct;
+	byte[] cookie;
+	NamedSocketAddress gameserv = (Bootstrap.gameserv.get() != null) ?
+	    Bootstrap.gameserv.get() :
+	    new NamedSocketAddress(Bootstrap.authserv.get().host, Bootstrap.gameport.get());
+	if((Bootstrap.authuser.get() != null) && (Bootstrap.authck.get() != null)) {
+	    acct = new Session.User(Bootstrap.authuser.get());
+	    cookie = Bootstrap.authck.get();
+	} else {
+	    String username;
+	    if(Bootstrap.authuser.get() != null) {
+		username = Bootstrap.authuser.get();
+	    } else {
+		if((username = Utils.getpref("tokenname@" + Bootstrap.authserv.get().host, null)) == null)
+		    throw(new ConnectionError("no explicit or saved username for host: " + Bootstrap.authserv.get().host));
+	    }
+	    String token = Utils.getpref("savedtoken-" + username + "@" + Bootstrap.authserv.get().host, null);
+	    if(token == null)
+		throw(new ConnectionError("no saved token for user: " + username));
+	    try {
+		AuthClient cl = new AuthClient(Bootstrap.authserv.get());
+		try {
+		    try {
+			acct = new Session.User(new AuthClient.TokenCred(username, Utils.hex.dec(token)).tryauth(cl));
+		    } catch(AuthClient.Credentials.AuthException e) {
+			throw(new ConnectionError("authentication with saved token failed"));
+		    }
+		    cookie = cl.getcookie();
+		    List<NamedSocketAddress> hosts = cl.gethosts(gameserv);
+		    if(!hosts.isEmpty())
+			gameserv = hosts.get(0);
+		} finally {
+		    cl.close();
+		}
+	    } catch(IOException e) {
+		throw(new RuntimeException(e));
+	    }
+	}
+	try {
+	    return(Session.connect(new java.net.InetSocketAddress(java.net.InetAddress.getByName(gameserv.host), gameserv.port), acct, Connection.encrypt.get(), cookie, args));
+	} catch(Connection.SessionError e) {
+	    throw(new ConnectionError(e.getMessage()));
+	} catch(InterruptedException exc) {
+	    throw(new RuntimeException(exc));
+	} catch(IOException e) {
+	    throw(new RuntimeException(e));
+	}
+    }
+
     private static void main2(String[] args) {
 	Utils.initlocale();
 	Config.cmdline(args);
 	setupres();
 	Client cl = new Client(Toolkit.instance());
 	try {
-	    cl.run(cl.new Main());
+	    UI.Runner main = null;
+	    if(Bootstrap.replay.get() != null) {
+		try {
+		    Transport.Playback player = new Transport.Playback(Files.newBufferedReader(Bootstrap.replay.get(), Utils.utf8));
+		    main = new RemoteUI(new Session(player, new Session.User("Playback")));
+		    player.start();
+		} catch(IOException e) {
+		    System.err.println("hafen: " + e.getMessage());
+		    System.exit(1);
+		}
+	    } else if(Bootstrap.servargs.get() != null) {
+		try {
+		    main = new RemoteUI(connect(Bootstrap.servargs.get()));
+		} catch(ConnectionError e) {
+		    System.err.println("hafen: " + e.getMessage());
+		    System.exit(1);
+		}
+	    } else {
+		main = cl.new Main();
+	    }
+	    cl.run(main);
 	} finally {
 	    cl.dispose();
 	}
