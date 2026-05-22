@@ -57,13 +57,13 @@ public class RootWidget extends ConsoleHost implements UI.Notice.Handler, Widget
 	if(ev.c == '`') {
 	    if(UIPanel.profile.get()) {
 		add(new Profwnd(guprof, "UI profile"), UI.scale(100, 100));
-		add(new Profwnd(grprof, "GL profile"), UI.scale(500, 100));
+		// add(new Profwnd(grprof, "GL profile"), UI.scale(500, 100));
 		/* XXXRENDER
 		   GameUI gi = findchild(GameUI.class);
 		   if((gi != null) && (gi.map != null))
 		   add(new Profwnd(gi.map.prof, "Map profile"), UI.scale(100, 250));
 		*/
-		add(new Profwnd(ggprof, "GPU profile"), UI.scale(500, 250));
+		// add(new Profwnd(ggprof, "GPU profile"), UI.scale(500, 250));
 	    }
 	    return(true);
 	} else if(ev.c == ':') {

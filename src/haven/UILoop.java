@@ -37,6 +37,7 @@ import haven.render.gl.GLRender;
 public abstract class UILoop implements UI.Context, Console.Directory {
     public final Windeye wnd;
     public final Thread th;
+    public final CPUProfile uprof = new CPUProfile(300);
     public Environment env;
     public UI ui;
     private final Cursor.Caps curscaps;
@@ -60,6 +61,7 @@ public abstract class UILoop implements UI.Context, Console.Directory {
 	synchronized(uilock) {
 	    prevui = this.ui;
 	    this.ui = newui;
+	    ui.root.guprof = uprof;
 	    while((this.lockedui != null) && (this.lockedui == prevui)) {
 		try {
 		    uilock.wait();
@@ -332,6 +334,7 @@ public abstract class UILoop implements UI.Context, Console.Directory {
 	public final Render out;
 	public final Fence sync = new Fence();
 	public Frame prev;
+	public CPUProfile.Current prof = null;
 	public double ttime, ftime, waited;
 
 	public Frame(UILoop loop, UI ui, Render out, Frame prev) {
@@ -344,12 +347,15 @@ public abstract class UILoop implements UI.Context, Console.Directory {
 
 	protected void tick() {
 	    synchronized(ui) {
+		CPUProfile.phase(prof, "dwait");
 		loop.dispatch(ui);
 		ui.mousehover(ui.mc);
+		CPUProfile.phase(prof, "stick");
 		if(ui.sess != null) {
 		    ui.sess.glob.ctick();
 		    ui.sess.glob.gtick(out);
 		}
+		CPUProfile.phase(prof, "utick");
 		ui.tick();
 		ui.gtick(out);
 		Coord sz = loop.wnd.size();
@@ -359,6 +365,7 @@ public abstract class UILoop implements UI.Context, Console.Directory {
 	}
 
 	protected void display() {
+	    CPUProfile.phase(prof, "draw");
 	    loop.display(ui, out);
 	}
 
@@ -368,6 +375,7 @@ public abstract class UILoop implements UI.Context, Console.Directory {
 	}
 
 	protected void fin() throws InterruptedException {
+	    CPUProfile.phase(prof, "wait");
 	    double now = Utils.rtime();
 	    double fd = loop.framedur();
 	    if((prev != null) && (prev.ftime + fd > now)) {
@@ -378,9 +386,11 @@ public abstract class UILoop implements UI.Context, Console.Directory {
 	    } else {
 		this.ftime = now;
 	    }
+	    CPUProfile.end(prof);
 	}
 
 	protected void syncwait() throws InterruptedException {
+	    CPUProfile.phase(prof, "dwait");
 	    if(prev != null) {
 		double then = Utils.rtime();
 		prev.sync.waitfor();
@@ -389,6 +399,7 @@ public abstract class UILoop implements UI.Context, Console.Directory {
 	}
 
 	public void run() throws InterruptedException {
+	    this.prof = UIPanel.profile.get() ? CPUProfile.set(loop.uprof.new Frame()) : null;
 	    SyncMode syncmode = ui.gprefs.syncmode.val;
 	    boolean swapsync = (syncmode != SyncMode.FRAME);
 	    boolean tickwait = (syncmode == SyncMode.FRAME) || (syncmode == SyncMode.TICK);
@@ -399,6 +410,7 @@ public abstract class UILoop implements UI.Context, Console.Directory {
 	    tick();
 	    if(tickwait) syncwait();
 	    display();
+	    CPUProfile.phase(prof, "aux");
 	    swapbuffers();
 	    if(swapsync) out.fence(sync);
 	}
