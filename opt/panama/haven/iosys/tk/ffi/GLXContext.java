@@ -687,14 +687,33 @@ public class GLXContext implements Toolkit.Factory {
 	    private int cursi = -1;
 
 	    public class GLXEnvironment extends FFIEnvironment {
+		private int qstate;
+
 		private GLXEnvironment() {
 		    super(gl, Area.sized(size));
 		}
 
+		private void process() {
+		    synchronized(this) {
+			qstate = 2;
+		    }
+		    process(gl);
+		    synchronized(this) {
+			if((qstate & 1) != 0)
+			    glrun(id, (Runnable)this::process);
+			qstate &= ~2;
+		    }
+		}
+
 		public void submit(Render cmd) {
 		    super.submit(cmd);
-		    if(renv == this)
-			glrun(id, () -> process(gl));
+		    synchronized(this) {
+			if(renv == this) {
+			    if(qstate == 0)
+				glrun(id, (Runnable)this::process);
+			    qstate |= 1;
+			}
+		    }
 		}
 	    }
 
