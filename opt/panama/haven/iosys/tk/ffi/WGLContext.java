@@ -824,6 +824,10 @@ public class WGLContext implements Toolkit.Factory {
 	    win.UnregisterClass(wclassname, hInstance);
 	}
 
+	public String description() {
+	    return("Win32/WGL");
+	}
+
 	public Set<Key.Mod> xlmods(KeyboardState kb) {
 	    Set<Key.Mod> ret = EnumSet.noneOf(Key.Mod.class);
 	    if((kb.get(0x10) & 0xf0) != 0)

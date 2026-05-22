@@ -238,4 +238,8 @@ public class JOGLToolkit extends AWTToolkit {
     public Windeye window() {
 	return(new JOGLWindow());
     }
+
+    public String description() {
+	return(String.format("AWT/JOGL, Java %s, JOGL %s", System.getProperty("java.version", ""), JoglVersion.getInstance().getImplementationVersion()));
+    }
 }

@@ -597,6 +597,12 @@ public abstract class XLib {
 	public byte b(int i) {
 	    return(data.get(ValueLayout.JAVA_BYTE, i * ValueLayout.JAVA_BYTE.byteSize()));
 	}
+	public byte[] b() {
+	    byte[] ret = new byte[len];
+	    for(int i = 0; i < len; i++)
+		ret[i] = data.get(ValueLayout.JAVA_BYTE, i * ValueLayout.JAVA_BYTE.byteSize());
+	    return(ret);
+	}
 
 	public short s(int i) {
 	    return(data.get(ValueLayout.JAVA_SHORT, i * ValueLayout.JAVA_SHORT.byteSize()));
@@ -623,10 +629,10 @@ public abstract class XLib {
 			buf.append(String.format(" %02x", b(i) & 0xff));
 		} else if(format == 16) {
 		    for(int i = 0; i < len; i++)
-			buf.append(String.format(" %04x", s(i) & 0xff));
+			buf.append(String.format(" %04x", s(i) & 0xffff));
 		} else if(format == 32) {
 		    for(int i = 0; i < len; i++)
-			buf.append(String.format(" %08x", s(i) & 0xff));
+			buf.append(String.format(" %08x", l(i) & 0xffffffffl));
 		}
 	    }
 	    return(String.format("#<x-property %s %s %d %d%s>", dpy.lib.XGetAtomName(dpy, name), dpy.lib.XGetAtomName(dpy, type), format, len, buf));
@@ -686,6 +692,8 @@ public abstract class XLib {
     public abstract Atom[] XInternAtoms(XLib.Display dpy, String[] names, boolean only_if_exists);
     public abstract int XFree(MemorySegment mem);
     public abstract String XGetAtomName(XLib.Display dpy, Atom atom);
+    public abstract String XServerVendor(XLib.Display dpy);
+    public abstract int XVendorRelease(XLib.Display dpy);
     public abstract ExtensionInfo XQueryExtension(XLib.Display dpy, String name);
     public abstract XID XCreateColormap(XLib.Display dpy, XID w, Visual visual, int alloc);
     public abstract Coord XQueryBestCursor(XLib.Display dpy, XID d, Coord size);
@@ -1630,6 +1638,31 @@ public abstract class XLib {
 	    String ret = name.reinterpret(Long.MAX_VALUE).getString(0, C_CHARSET);
 	    XFree(name);
 	    return(ret);
+	}
+
+	private final MethodHandle XServerVendor = ld.downcallHandle(xlib.find("XServerVendor").get(), FunctionDescriptor.of(ADDRESS, ADDRESS));
+	public String XServerVendor(XLib.Display dpy) {
+	    MemorySegment name;
+	    try {
+		name = (MemorySegment)XServerVendor.invoke(dpy.mem());
+	    } catch(Throwable e) {
+		throw(new RuntimeException(e));
+	    } finally {
+		checkerror();
+	    }
+	    String ret = name.reinterpret(Long.MAX_VALUE).getString(0, C_CHARSET);
+	    return(ret);
+	}
+
+	private final MethodHandle XVendorRelease = ld.downcallHandle(xlib.find("XVendorRelease").get(), FunctionDescriptor.of(C_INT, ADDRESS));
+	public int XVendorRelease(XLib.Display dpy) {
+	    try {
+		return((int)XVendorRelease.invoke(dpy.mem()));
+	    } catch(Throwable e) {
+		throw(new RuntimeException(e));
+	    } finally {
+		checkerror();
+	    }
 	}
 
 	private final MethodHandle XQueryExtension = ld.downcallHandle(xlib.find("XQueryExtension").get(), FunctionDescriptor.of(C_XBool, ADDRESS, ADDRESS, ADDRESS, ADDRESS, ADDRESS));

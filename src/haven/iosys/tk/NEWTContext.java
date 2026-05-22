@@ -506,6 +506,10 @@ public class NEWTContext implements Toolkit.Factory {
 	    if(dpy != null)
 		dpy.destroy();
 	}
+
+	public String description() {
+	    return(String.format("NEWT/JOGL, JOGL %s", JoglVersion.getInstance().getImplementationVersion()));
+	}
     }
 
     public static final Map<Short, Key> stdkeys = Utils.<Short, Key>map()

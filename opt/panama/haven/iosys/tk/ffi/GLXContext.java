@@ -135,6 +135,7 @@ public class GLXContext implements Toolkit.Factory {
 	public final Cursor.Caps ccaps;
 	public final Atomic ATOM = new Atomic("ATOM");
 	public final Atomic CARDINAL = new Atomic("CARDINAL");
+	public final Atomic WINDOW = new Atomic("WINDOW");
 	public final Atomic UTF8_STRING = new Atomic("UTF8_STRING");
 	public final Atomic WM_NAME = new Atomic("WM_NAME");
 	public final Atomic WM_PROTOCOLS = new Atomic("WM_PROTOCOLS");
@@ -148,6 +149,9 @@ public class GLXContext implements Toolkit.Factory {
 	public final Atomic _NET_WM_STATE_FULLSCREEN = new Atomic("_NET_WM_STATE_FULLSCREEN");
 	public final Atomic _NET_WM_PID = new Atomic("_NET_WM_PID");
 	public final Atomic _NET_WM_PING = new Atomic("_NET_WM_PING");
+	public final Atomic _NET_SUPPORTING_WM_CHECK = new Atomic("_NET_SUPPORTING_WM_CHECK");
+	public final String srvvendor, wmname;
+	public final int srvrelease;
 	private boolean closed = false;
 
 	public class Atomic {
@@ -290,13 +294,16 @@ public class GLXContext implements Toolkit.Factory {
 		    throw(new IllegalArgumentException("no such screen: " + nscreen));
 		this.nscreen = nscreen;
 		this.screen = xlib.ScreenOfDisplay(dpy, nscreen);
+		srvvendor = xlib.XServerVendor(dpy);
+		srvrelease = xlib.XVendorRelease(dpy);
 
 		/* Atoms */
-		prepare(ATOM, CARDINAL, UTF8_STRING,
+		prepare(ATOM, CARDINAL, WINDOW, UTF8_STRING,
 			WM_NAME, WM_PROTOCOLS, WM_DELETE_WINDOW,
 			_NET_WM_NAME, _NET_WM_ICON, _NET_WM_PID, _NET_WM_PING,
 			_NET_WM_STATE, _NET_WM_STATE_MAXIMIZED_VERT, _NET_WM_STATE_MAXIMIZED_HORZ,
-			_NET_WM_STATE_HIDDEN, _NET_WM_STATE_FULLSCREEN
+			_NET_WM_STATE_HIDDEN, _NET_WM_STATE_FULLSCREEN,
+			_NET_SUPPORTING_WM_CHECK
 			);
 
 		/* Keyboard input */
@@ -418,6 +425,19 @@ public class GLXContext implements Toolkit.Factory {
 		vis = glx.glXGetVisualFromFBConfig(dpy, fb);
 		colormap = xlib.XCreateColormap(dpy, screen.root(), vis.visual(), XLib.AllocNone);
 		this.ctx = createctx();
+
+		/* WM info */
+		{
+		    String wmname = "Unknown";
+		    XProperty wmw = xlib.XGetWindowProperty(dpy, screen.root(), _NET_SUPPORTING_WM_CHECK.id, false, Atom.nil);
+		    if((wmw.format == 32) && wmw.type.equals(WINDOW.id)) {
+			XProperty nm = xlib.XGetWindowProperty(dpy, wmw.x(0), _NET_WM_NAME.id, false, Atom.nil);
+			if(nm.format == 8) {
+			    wmname = new String(nm.b(), ABI.C_CHARSET);
+			}
+		    }
+		    this.wmname = wmname;
+		}
 
 		done = true;
 	    } finally {
@@ -1290,6 +1310,10 @@ public class GLXContext implements Toolkit.Factory {
 		    closed = true;
 		}
 	    }
+	}
+
+	public String description() {
+	    return(String.format("X11/GLX, %s/%d %s", srvvendor, srvrelease, wmname));
 	}
     }
 

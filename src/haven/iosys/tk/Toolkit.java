@@ -37,6 +37,7 @@ public interface Toolkit {
     public Cursor makecursor(BufferedImage img, Coord hotspot);
     public Windeye window();
     public void dispose();
+    public String description();
 
     public static interface Factory {
 	public Toolkit open(String... args);

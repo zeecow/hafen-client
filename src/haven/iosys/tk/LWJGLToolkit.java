@@ -180,4 +180,8 @@ public class LWJGLToolkit extends AWTToolkit {
     public Windeye window() {
 	return(new LWJGLWindow());
     }
+
+    public String description() {
+	return(String.format("AWT/LWJGL, Java %s, LWJGL %s", System.getProperty("java.version", ""), org.lwjgl.Version.getVersion()));
+    }
 }
