@@ -37,7 +37,7 @@ import haven.render.gl.GLRender;
 public abstract class UILoop implements UI.Context, Console.Directory {
     public final Windeye wnd;
     public final Thread th;
-    public final CPUProfile uprof = new CPUProfile(300);
+    public final CPUProfile uprof = new CPUProfile(300), rprof = new CPUProfile(300);
     public Environment env;
     public UI ui;
     private final Cursor.Caps curscaps;
@@ -62,6 +62,7 @@ public abstract class UILoop implements UI.Context, Console.Directory {
 	    prevui = this.ui;
 	    this.ui = newui;
 	    ui.root.guprof = uprof;
+	    ui.root.grprof = rprof;
 	    while((this.lockedui != null) && (this.lockedui == prevui)) {
 		try {
 		    uilock.wait();
@@ -284,6 +285,45 @@ public abstract class UILoop implements UI.Context, Console.Directory {
 	}
     }
 
+    public static class RenderProfile implements Runnable {
+	private final CPUProfile prof;
+	private RenderProfile prev;
+	private CPUProfile.Frame frame;
+
+	public RenderProfile(CPUProfile prof, RenderProfile prev, Render out) {
+	    this.prof = prof;
+	    this.prev = prev;
+	    out.fence(this);
+	}
+
+	public void run() {
+	    if(prev != null) {
+		if(prev.frame != null) {
+		    /* The reason frame would be null is if the
+		     * environment has become invalid and the previous
+		     * cycle never ran. */
+		    prev.frame.fin();
+		}
+		prev = null;
+	    }
+	    frame = prof.new Frame();
+	}
+
+	public class Part implements Runnable {
+	    private final String label;
+
+	    public Part(String label, Render out) {
+		this.label = label;
+		out.fence(this);
+	    }
+
+	    public void run() {
+		if(frame != null)
+		    frame.part(label);
+	    }
+	}
+    }
+
     protected abstract void dispatch(UI ui);
 
     protected boolean bgmode() {
@@ -335,6 +375,7 @@ public abstract class UILoop implements UI.Context, Console.Directory {
 	public final Fence sync = new Fence();
 	public Frame prev;
 	public CPUProfile.Current prof = null;
+	public RenderProfile rprofc = null;
 	public double ttime, ftime, waited;
 
 	public Frame(UILoop loop, UI ui, Render out, Frame prev) {
@@ -348,6 +389,7 @@ public abstract class UILoop implements UI.Context, Console.Directory {
 	protected void tick() {
 	    synchronized(ui) {
 		CPUProfile.phase(prof, "dwait");
+		if(rprofc != null) rprofc.new Part("tick", out);
 		loop.dispatch(ui);
 		ui.mousehover(ui.mc);
 		CPUProfile.phase(prof, "stick");
@@ -366,10 +408,12 @@ public abstract class UILoop implements UI.Context, Console.Directory {
 
 	protected void display() {
 	    CPUProfile.phase(prof, "draw");
+	    if(rprofc != null) rprofc.new Part("draw", out);
 	    loop.display(ui, out);
 	}
 
 	protected void swapbuffers() {
+	    if(rprofc != null) rprofc.new Part("swap", out);
 	    loop.wnd.swapbuffers(out, ui.gprefs.vsync.val);
 	    out.fence(() -> loop.framelag = Utils.rtime() - ttime);
 	}
@@ -399,7 +443,8 @@ public abstract class UILoop implements UI.Context, Console.Directory {
 	}
 
 	public void run() throws InterruptedException {
-	    this.prof = UIPanel.profile.get() ? CPUProfile.set(loop.uprof.new Frame()) : null;
+	    this.prof   = UIPanel.profile.get() ? CPUProfile.set(loop.uprof.new Frame()) : null;
+	    this.rprofc = UIPanel.profile.get() ? new RenderProfile(loop.rprof, prev.rprofc, out) : null;
 	    SyncMode syncmode = ui.gprefs.syncmode.val;
 	    boolean swapsync = (syncmode != SyncMode.FRAME);
 	    boolean tickwait = (syncmode == SyncMode.FRAME) || (syncmode == SyncMode.TICK);
@@ -426,8 +471,10 @@ public abstract class UILoop implements UI.Context, Console.Directory {
 
 	protected void swapbuffers() {
 	    super.swapbuffers();
-	    if(ui.gprefs.syncmode.val == SyncMode.FINISH)
+	    if(ui.gprefs.syncmode.val == SyncMode.FINISH) {
+		if(rprofc != null) rprofc.new Part("finish", out);
 		gl.finish();
+	    }
 	}
     }
 
