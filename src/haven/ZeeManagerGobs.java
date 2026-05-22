@@ -3479,6 +3479,7 @@ public class ZeeManagerGobs extends ZeeThread{
         // add temp window
         if (winLeafpile != null) {
             //println("winLeafpile already open");
+            winLeafpile.restartAutocloseCountdown();
             return;
         }
         winLeafpile = ZeeConfig.gameUI.add(

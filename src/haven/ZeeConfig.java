@@ -2560,9 +2560,9 @@ public class ZeeConfig {
         }
         // fast zoom
         else if (ev.getKeyCode()==KeyEvent.VK_PAGE_DOWN) {
-            return gameUI.map.camera.wheel(new Widget.MouseWheelEvent(Coord.z,1,1));
+            return gameUI.map.camera.wheel(new Widget.MouseWheelEvent(Coord.z,1,10));
         }else if (ev.getKeyCode()==KeyEvent.VK_PAGE_UP) {
-            return gameUI.map.camera.wheel(new Widget.MouseWheelEvent(Coord.z,-1,-1));
+            return gameUI.map.camera.wheel(new Widget.MouseWheelEvent(Coord.z,-1,-10));
         }
         //exit actions hovermenu (esc)
         else if(ZeeHoverMenu.checkExitEsc(ev)) {

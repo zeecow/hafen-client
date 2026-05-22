@@ -18,10 +18,9 @@ public class ZeeWindow extends Window {
     }
 
     // window auto closes if idle after given ms
-    static long winHideGobLastInteractionMs = -1;
+    private long winHideGobLastInteractionMs = -1;
     public ZeeWindow(Coord size, String title, long autoCloseAfterIdleMsMax99s) {
         super(size, title);
-        winHideGobLastInteractionMs = ZeeThread.now();
         String originalCap = cap;
         new ZeeThread(){
             public void run() {
@@ -30,7 +29,7 @@ public class ZeeWindow extends Window {
                     synchronized (this) {
                         final long timeoutMs = autoCloseAfterIdleMsMax99s > 99000 ? 99000 : autoCloseAfterIdleMsMax99s;
                         long idleMs = 0;
-                        winHideGobLastInteractionMs = now();
+                        restartAutocloseCountdown();
                         //winHideGobLabelClosing.settext("autoclose " + (timeoutMs - idleMs) / 1000 + "s");
                         do {
                             sleep(1000);
@@ -53,9 +52,15 @@ public class ZeeWindow extends Window {
         }.start();
     }
 
+    public void restartAutocloseCountdown(){
+        if (winHideGobLastInteractionMs == -1)
+            return;
+        winHideGobLastInteractionMs = ZeeThread.now();
+    }
+
     @Override
     public boolean mouseup(MouseUpEvent ev) {
-        winHideGobLastInteractionMs = ZeeThread.now();
+        restartAutocloseCountdown();
         return super.mouseup(ev);
     }
 
