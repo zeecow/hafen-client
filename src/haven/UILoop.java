@@ -230,6 +230,7 @@ public abstract class UILoop implements UI.Context, Console.Directory {
 	int rqd = Resource.local().qdepth() + Resource.remote().qdepth();
 	if(rqd > 0)
 	    buf.add(String.format("RQ depth: %d (%d)", rqd, Resource.local().numloaded() + Resource.remote().numloaded()));
+	wnd.stats(buf);
     }
 
     private void drawstats(UI ui, GOut g, Render buf) {

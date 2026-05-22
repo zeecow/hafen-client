@@ -28,6 +28,7 @@ package haven.iosys.tk;
 
 import haven.*;
 import haven.render.*;
+import java.util.*;
 import java.awt.image.BufferedImage;
 
 public interface Windeye {
@@ -50,6 +51,8 @@ public interface Windeye {
 
     public Environment env();
     public void swapbuffers(Render g, Object mode);
+
+    public default void stats(Collection<String> buf) {}
 
     public static enum State {
 	MINIMIZED, NORMAL, MAXIMIZED, EXCLUSIVE
