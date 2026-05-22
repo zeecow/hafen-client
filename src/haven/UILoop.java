@@ -471,10 +471,12 @@ public abstract class UILoop implements UI.Context, Console.Directory {
 
     public static class GLFrame extends Frame {
 	public final GLRender gl;
+	private final haven.render.gl.BufferBGL.Profile frameprof = false ? new haven.render.gl.BufferBGL.Profile() : null;
 
 	public GLFrame(UILoop loop, UI ui, GLRender out, Frame prev) {
 	    super(loop, ui, out, prev);
 	    this.gl = out;
+	    if(frameprof != null) gl.submit(frameprof.start);
 	}
 
 	protected void swapbuffers() {
@@ -482,6 +484,10 @@ public abstract class UILoop implements UI.Context, Console.Directory {
 	    if(ui.gprefs.syncmode.val == SyncMode.FINISH) {
 		if(rprofc != null) rprofc.new Part("finish", out);
 		gl.finish();
+	    }
+	    if(frameprof != null) {
+		gl.submit(frameprof.stop);
+		gl.submit(frameprof.dump(Utils.path("frameprof")));
 	    }
 	}
     }
