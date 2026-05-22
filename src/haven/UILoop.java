@@ -38,6 +38,7 @@ public abstract class UILoop implements UI.Context, Console.Directory {
     public final Windeye wnd;
     public final Thread th;
     public final CPUProfile uprof = new CPUProfile(300), rprof = new CPUProfile(300);
+    public final GPUProfile gprof = new GPUProfile(300);
     public Environment env;
     public UI ui;
     private final Cursor.Caps curscaps;
@@ -63,6 +64,7 @@ public abstract class UILoop implements UI.Context, Console.Directory {
 	    this.ui = newui;
 	    ui.root.guprof = uprof;
 	    ui.root.grprof = rprof;
+	    ui.root.ggprof = gprof;
 	    while((this.lockedui != null) && (this.lockedui == prevui)) {
 		try {
 		    uilock.wait();
@@ -375,6 +377,7 @@ public abstract class UILoop implements UI.Context, Console.Directory {
 	public final Fence sync = new Fence();
 	public Frame prev;
 	public CPUProfile.Current prof = null;
+	public GPUProfile.Frame gprof = null;
 	public RenderProfile rprofc = null;
 	public double ttime, ftime, waited;
 
@@ -390,6 +393,7 @@ public abstract class UILoop implements UI.Context, Console.Directory {
 	    synchronized(ui) {
 		CPUProfile.phase(prof, "dwait");
 		if(rprofc != null) rprofc.new Part("tick", out);
+		if(gprof  != null) gprof.part(out, "tick");
 		loop.dispatch(ui);
 		ui.mousehover(ui.mc);
 		CPUProfile.phase(prof, "stick");
@@ -409,13 +413,16 @@ public abstract class UILoop implements UI.Context, Console.Directory {
 	protected void display() {
 	    CPUProfile.phase(prof, "draw");
 	    if(rprofc != null) rprofc.new Part("draw", out);
+	    if(gprof  != null) gprof.part(out, "draw");
 	    loop.display(ui, out);
 	}
 
 	protected void swapbuffers() {
 	    if(rprofc != null) rprofc.new Part("swap", out);
+	    if(gprof  != null) gprof.part(out, "swap");
 	    loop.wnd.swapbuffers(out, ui.gprefs.vsync.val);
 	    out.fence(() -> loop.framelag = Utils.rtime() - ttime);
+	    if(gprof  != null) gprof.fin(out);
 	}
 
 	protected void fin() throws InterruptedException {
@@ -444,6 +451,7 @@ public abstract class UILoop implements UI.Context, Console.Directory {
 
 	public void run() throws InterruptedException {
 	    this.prof   = UIPanel.profile.get() ? CPUProfile.set(loop.uprof.new Frame()) : null;
+	    this.gprof  = UIPanel.profile.get() ? loop.gprof.new Frame(out) : null;
 	    this.rprofc = UIPanel.profile.get() ? new RenderProfile(loop.rprof, prev.rprofc, out) : null;
 	    SyncMode syncmode = ui.gprefs.syncmode.val;
 	    boolean swapsync = (syncmode != SyncMode.FRAME);
