@@ -30,6 +30,7 @@ import java.util.*;
 import java.util.function.*;
 import java.util.concurrent.*;
 import haven.Widget.*;
+import haven.iosys.tk.*;
 import java.awt.Font;
 import java.awt.GraphicsEnvironment;
 import java.awt.GraphicsDevice;
@@ -46,6 +47,7 @@ import haven.render.Render;
 
 public class UI {
     public static int MOD_SHIFT = KeyMatch.S, MOD_CTRL = KeyMatch.C, MOD_META = KeyMatch.M, MOD_SUPER = KeyMatch.SUPER;
+    public final Windeye wnd;
     public RootWidget root;
     private final List<Grab> grabs = new CopyOnWriteArrayList<Grab>();
     private final Map<Integer, Widget> widgets = new TreeMap<Integer, Widget>();
@@ -60,7 +62,6 @@ public class UI {
     public Widget mouseon;
     public Console cons = new WidgetConsole();
     private Collection<AfterDraw> afterdraws = new LinkedList<AfterDraw>();
-    private final Context uictx;
     public GSettings gprefs = GSettings.load(true);
     private boolean gprefsdirty = false;
     public final ActAudio.Root audio = new ActAudio.Root();
@@ -92,10 +93,6 @@ public class UI {
 	    public void init(UI ui) {back.init(ui);}
 	    public String title() {return(back.title());}
 	}
-    }
-
-    public interface Context {
-	void setmousepos(Coord c);
     }
 
     public interface AfterDraw {
@@ -179,8 +176,8 @@ public class UI {
 	}
     }
 
-    public UI(Context uictx, Coord sz, Runner fun) {
-	this.uictx = uictx;
+    public UI(Windeye wnd, Coord sz, Runner fun) {
+	this.wnd = wnd;
 	root = new RootWidget(this, sz);
 	widgets.put(0, root);
 	rwidgets.put(root, 0);
@@ -853,10 +850,6 @@ public class UI {
 
     public void mousehover(Coord c) {
 	dispatch(root, new Widget.MouseHoverEvent(c));
-    }
-
-    public void setmousepos(Coord c) {
-	uictx.setmousepos(c);
     }
 	
     public void mousewheel(MouseEvent ev, Coord c, int ia, double sa) {

@@ -34,7 +34,7 @@ import haven.GSettings.SyncMode;
 import haven.render.gl.GLEnvironment;
 import haven.render.gl.GLRender;
 
-public abstract class UILoop implements UI.Context, Console.Directory {
+public abstract class UILoop implements Console.Directory {
     public static final Config.Variable<Boolean> dbtext = Config.Variable.propb("haven.dbtext", false);
     public static final Config.Variable<Boolean> profile = Config.Variable.propb("haven.profile", false);
     public final Windeye wnd;
@@ -73,7 +73,7 @@ public abstract class UILoop implements UI.Context, Console.Directory {
     }
 
     public UI newui(UI.Runner fun) {
-	UI prevui, newui = new UI(this, new Coord(wnd.size()), fun);
+	UI prevui, newui = new UI(wnd, new Coord(wnd.size()), fun);
 	newui.env = this.env;
 	newui.cons.add(this);
 	synchronized(uilock) {
