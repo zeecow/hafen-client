@@ -660,11 +660,11 @@ public class ChatUI extends Widget {
 		URI uri = (URI)inf.getAttribute(ChatAttribute.HYPERLINK);
 		if(uri != null) {
 		    try {
-			WebBrowser.sshow(uri.toURL());
+			ui.wnd.toolkit().browse(uri);
 		    } catch(java.net.MalformedURLException e) {
 			getparent(GameUI.class).error("Could not follow link.");
-		    } catch(WebBrowser.BrowserException e) {
-			getparent(GameUI.class).error("Could not launch web browser.");
+		    } catch(IOException e) {
+			getparent(GameUI.class).error("Could not launch web browser: " + e.getMessage());
 		    }
 		}
 		return(true);

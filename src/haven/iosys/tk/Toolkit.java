@@ -29,6 +29,7 @@ package haven.iosys.tk;
 import haven.*;
 import java.lang.annotation.*;
 import java.util.*;
+import java.io.*;
 import java.awt.image.BufferedImage;
 
 public interface Toolkit {
@@ -38,6 +39,10 @@ public interface Toolkit {
     public Windeye window();
     public void dispose();
     public String description();
+
+    public default void browse(java.net.URI location) throws IOException {
+	throw(new IOException("No web browser available."));
+    }
 
     public static interface Factory {
 	public Toolkit open(String... args);

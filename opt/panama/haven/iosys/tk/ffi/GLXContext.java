@@ -28,6 +28,7 @@ package haven.iosys.tk.ffi;
 
 import java.util.*;
 import java.util.function.*;
+import java.awt.image.*;
 import haven.*;
 import haven.render.*;
 import haven.render.gl.*;
@@ -36,10 +37,10 @@ import haven.iosys.tk.*;
 import haven.iosys.posix.*;
 import haven.iosys.x11.*;
 import haven.iosys.gl.*;
-import java.awt.image.*;
 import haven.iosys.x11.XLib.*;
 import haven.iosys.x11.XInput.*;
 import haven.iosys.tk.Button;
+import java.io.IOException;
 import static haven.iosys.x11.XKeysym.*;
 import static haven.iosys.tk.Key.Std.*;
 
@@ -1313,6 +1314,20 @@ public class GLXContext implements Toolkit.Factory {
 	    if((mod_altgr > 0) && ((state & (1 << mod_altgr)) != 0))
 		ret.add(Key.Mod.ALTGR);
 	    return(ret);
+	}
+
+	public void browse(java.net.URI location) throws IOException {
+	    ProcessBuilder spec = new ProcessBuilder(Arrays.asList("xdg-open", location.toString()));
+	    spec.inheritIO();
+	    Process proc = spec.start();
+	    try {
+		int st = proc.waitFor();
+		if(st != 0)
+		    throw(new IOException("xdg-open failed."));
+	    } catch(InterruptedException e) {
+		Thread.currentThread().interrupt();
+		throw(new IOException("interrupted"));
+	    }
 	}
 
 	public void dispose() {

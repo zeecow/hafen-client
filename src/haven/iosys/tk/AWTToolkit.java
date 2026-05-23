@@ -35,6 +35,7 @@ import haven.render.*;
 import haven.render.gl.*;
 import java.awt.AWTEvent;
 import java.awt.Component;
+import java.awt.Desktop;
 import java.awt.EventQueue;
 import java.awt.HeadlessException;
 import java.awt.image.BufferedImage;
@@ -441,6 +442,15 @@ public abstract class AWTToolkit implements Toolkit {
 	public void dispose() {
 	    frame.dispose();
 	}
+    }
+
+    public void browse(java.net.URI location) throws IOException {
+	if(!Desktop.isDesktopSupported())
+	    throw(new IOException("Java Desktop interface is unavailable."));
+	Desktop dt = Desktop.getDesktop();
+	if(!dt.isSupported(Desktop.Action.BROWSE))
+	    throw(new IOException("Web browser is unsupported."));
+	dt.browse(location);
     }
 
     public void dispose() {
