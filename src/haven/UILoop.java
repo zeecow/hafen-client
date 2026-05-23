@@ -475,7 +475,7 @@ public abstract class UILoop implements UI.Context, Console.Directory {
 	public void run() throws InterruptedException {
 	    this.prof   = profile.get() ? CPUProfile.set(loop.uprof.new Frame()) : null;
 	    this.gprof  = profile.get() ? loop.gprof.new Frame(out) : null;
-	    this.rprofc = profile.get() ? new RenderProfile(loop.rprof, prev.rprofc, out) : null;
+	    this.rprofc = profile.get() ? new RenderProfile(loop.rprof, (prev == null) ? null : prev.rprofc, out) : null;
 	    SyncMode syncmode = ui.gprefs.syncmode.val;
 	    boolean swapsync = (syncmode != SyncMode.FRAME);
 	    boolean tickwait = (syncmode == SyncMode.FRAME) || (syncmode == SyncMode.TICK);
