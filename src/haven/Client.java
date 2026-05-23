@@ -139,7 +139,7 @@ public class Client implements Console.Directory {
 	/* XXX: All the following are for backward compatibility, to be removed. */
 	private static final Map<Key, Integer> revawt = new HashMap<>();
 	static {
-	    for(Map.Entry<Integer, Key> k : JOGLToolkit.stdkeys.entrySet())
+	    for(Map.Entry<Integer, Key> k : AWTToolkit.stdkeys.entrySet())
 		revawt.put(k.getValue(),k.getKey());
 	}
 
