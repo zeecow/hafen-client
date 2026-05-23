@@ -29,6 +29,7 @@ package haven.iosys.tk.ffi;
 import java.util.*;
 import java.util.function.*;
 import java.awt.image.*;
+import java.io.*;
 import java.nio.*;
 import haven.*;
 import haven.ffi.*;
@@ -841,6 +842,17 @@ public class WGLContext implements Toolkit.Factory {
 	public void dispose() {
 	    wgl.wglDeleteContext(ctx);
 	    win.UnregisterClass(wclassname, hInstance);
+	}
+
+	public void browse(java.net.URI location) throws IOException {
+	    SHELLEXECUTEINFO info = win.SHELLEXECUTEINFO();
+	    info.lpVerb("open");
+	    info.lpFile(location.toString());
+	    try {
+		win.ShellExecuteEx(info);
+	    } catch(StdError e) {
+		throw(new IOException("Browser execution failed: " + e.getMessage()));
+	    }
 	}
 
 	public String description() {

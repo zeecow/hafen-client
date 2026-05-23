@@ -302,6 +302,21 @@ public abstract class Win32 {
     }
     public abstract ICONINFO ICONINFO();
 
+    public static abstract class SHELLEXECUTEINFO extends StructInstance {
+	protected SHELLEXECUTEINFO(MemorySegment mem) {
+	    super(mem);
+	}
+
+	MemorySegment mem() {return(mem);}
+
+	public abstract SHELLEXECUTEINFO lpVerb(String value);
+	public abstract SHELLEXECUTEINFO lpFile(String value);
+	public abstract SHELLEXECUTEINFO lpParameters(String value);
+	public abstract SHELLEXECUTEINFO lpDirectory(String value);
+	public abstract SHELLEXECUTEINFO nShow(int value);
+    }
+    public abstract SHELLEXECUTEINFO SHELLEXECUTEINFO();
+
     public static abstract class PIXELFORMATDESCRIPTOR extends StructInstance {
 	protected PIXELFORMATDESCRIPTOR(MemorySegment mem) {
 	    super(mem);
@@ -361,6 +376,7 @@ public abstract class Win32 {
     public abstract Handle LoadCursor(Handle hInstance, int cursor);
     public abstract void DestroyIcon(Handle ho);
     public abstract void DeleteObject(Handle ho);
+    public abstract void ShellExecuteEx(Win32.SHELLEXECUTEINFO pExecInfo);
     public abstract int ChoosePixelFormat(Handle hDC, PIXELFORMATDESCRIPTOR ppfd);
     public abstract void SetPixelFormat(Handle hDC, int format, Win32.PIXELFORMATDESCRIPTOR ppfd);
     public abstract int DescribePixelFormat(Handle hDC, int iPixelFormat, Win32.PIXELFORMATDESCRIPTOR ppfd);
@@ -386,6 +402,7 @@ public abstract class Win32 {
 	static final MemoryLayout SHORT = C_SHORT;
 	static final MemoryLayout UINT = C_INT;
 	static final MemoryLayout LONG = C_LONG;
+	static final MemoryLayout ULONG = C_LONG;
 	static final MemoryLayout WORD = C_SHORT;
 	static final MemoryLayout DWORD = C_LONG;
 	static final MemoryLayout PVOID = ADDRESS;
@@ -402,6 +419,7 @@ public abstract class Win32 {
 	static final MemoryLayout HGDIOBJ = HANDLE;
 	static final MemoryLayout HICON = HANDLE;
 	static final MemoryLayout HINSTANCE = HANDLE;
+	static final MemoryLayout HKEY = HANDLE;
 	static final MemoryLayout HKL = HANDLE;
 	static final MemoryLayout HMENU = HANDLE;
 	static final MemoryLayout HMONITOR = HANDLE;
@@ -416,6 +434,7 @@ public abstract class Win32 {
 	private final SymbolLookup kernel32 = SymbolLookup.libraryLookup("KERNEL32.DLL", Arena.global());
 	private final SymbolLookup user32 = SymbolLookup.libraryLookup("USER32.DLL", Arena.global());
 	private final SymbolLookup gdi32 = SymbolLookup.libraryLookup("GDI32.DLL", Arena.global());
+	private final SymbolLookup shell32 = SymbolLookup.libraryLookup("SHELL32.DLL", Arena.global());
 
 	static MemorySegment wstr(Arena st, String str) {
 	    if(str == null)
@@ -1198,6 +1217,78 @@ public abstract class Win32 {
 	    int rv;
 	    try {
 		rv = (int)DeleteObject.invoke(ho.bits);
+	    } catch(Throwable e) {
+		throw(new RuntimeException(e));
+	    }
+	    if(rv == 0)
+		throw(lasterror());
+	}
+
+	static final StructLayout _SHELLEXECUTEINFOW = struct(new MemoryLayout[] {
+		DWORD.withName("cbSize"),
+		ULONG.withName("fMask"),
+		HWND.withName("hWnd"),
+		LPCWSTR.withName("lpVerb"),
+		LPCWSTR.withName("lpFile"),
+		LPCWSTR.withName("lpParameters"),
+		LPCWSTR.withName("lpDirectory"),
+		C_INT.withName("nShow"),
+		HINSTANCE.withName("hInstApp"),
+		ADDRESS.withName("lpIDList"),
+		LPCWSTR.withName("lpClass"),
+		HKEY.withName("hkeyClass"),
+		DWORD.withName("dwHotKey"),
+		HANDLE.withName("hIcon"),
+		HANDLE.withName("hProcess"),
+	    });
+	public static class SHELLEXECUTEINFOW extends Win32.SHELLEXECUTEINFO {
+	    private final Arena alloc;
+
+	    private SHELLEXECUTEINFOW(Arena alloc) {
+		super(alloc.allocate(_SHELLEXECUTEINFOW.byteSize()));
+		this.alloc = alloc;
+		cbSize.set(mem, 0, (int)_SHELLEXECUTEINFOW.byteSize());
+	    }
+	    protected SHELLEXECUTEINFOW() {
+		this(Arena.ofAuto());
+	    }
+
+	    protected StructLayout $layout() {return(_SHELLEXECUTEINFOW);}
+
+	    private static final VarHandle cbSize = _SHELLEXECUTEINFOW.varHandle(PathElement.groupElement("cbSize"));
+	    private static final VarHandle lpVerb = _SHELLEXECUTEINFOW.varHandle(PathElement.groupElement("lpVerb"));
+	    public SHELLEXECUTEINFOW lpVerb(String value) {
+		lpVerb.set(mem, 0, wstr(alloc, value));
+		return(this);
+	    }
+	    private static final VarHandle lpFile = _SHELLEXECUTEINFOW.varHandle(PathElement.groupElement("lpFile"));
+	    public SHELLEXECUTEINFOW lpFile(String value) {
+		lpFile.set(mem, 0, wstr(alloc, value));
+		return(this);
+	    }
+	    private static final VarHandle lpParameters = _SHELLEXECUTEINFOW.varHandle(PathElement.groupElement("lpParameters"));
+	    public SHELLEXECUTEINFOW lpParameters(String value) {
+		lpParameters.set(mem, 0, wstr(alloc, value));
+		return(this);
+	    }
+	    private static final VarHandle lpDirectory = _SHELLEXECUTEINFOW.varHandle(PathElement.groupElement("lpDirectory"));
+	    public SHELLEXECUTEINFOW lpDirectory(String value) {
+		lpDirectory.set(mem, 0, wstr(alloc, value));
+		return(this);
+	    }
+	    private static final VarHandle nShow = _SHELLEXECUTEINFOW.varHandle(PathElement.groupElement("nShow"));
+	    public SHELLEXECUTEINFOW nShow(int value) {
+		nShow.set(mem, 0, value);
+		return(this);
+	    }
+	}
+	public SHELLEXECUTEINFOW SHELLEXECUTEINFO() {return(new SHELLEXECUTEINFOW());}
+
+	private final MethodHandle ShellExecuteExW = ld.downcallHandle(shell32.find("ShellExecuteExW").get(), FunctionDescriptor.of(BOOL, ADDRESS));
+	public void ShellExecuteEx(Win32.SHELLEXECUTEINFO pExecInfo) {
+	    int rv;
+	    try {
+		rv = (int)ShellExecuteExW.invoke(pExecInfo.mem());
 	    } catch(Throwable e) {
 		throw(new RuntimeException(e));
 	    }
