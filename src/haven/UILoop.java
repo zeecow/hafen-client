@@ -168,7 +168,7 @@ public abstract class UILoop implements UI.Context, Console.Directory {
     private final Map<Cursor, Coord> curshotspots = new WeakHashMap<>();
     private Object lastcursor = null;
     private Coord curshotspot = Coord.z;
-    private void drawcursor(UI ui, GOut g) {
+    protected void drawcursor(UI ui, GOut g) {
 	Object curs;
 	synchronized(ui) {
 	    curs = ui.getcurs(ui.mc);
@@ -259,9 +259,14 @@ public abstract class UILoop implements UI.Context, Console.Directory {
 	    FastText.aprint(g, new Coord(10, y -= dy), 0, 1, ln);
     }
 
-    private void display(UI ui, Render buf) {
+    protected Pipe basestate() {
 	Pipe base = new BufPipe();
 	base.prep(new FragColor<>(FragColor.defcolor)).prep(new DepthBuffer<>(DepthBuffer.defdepth));
+	return(base);
+    }
+
+    private void display(UI ui, Render buf) {
+	Pipe base = basestate();
 	base.prep(FragColor.blend(new BlendMode()));
 	Area wnd = Area.sized(ui.root.sz);
 	base.prep(new States.Viewport(wnd)).prep(new Ortho2D(wnd));
