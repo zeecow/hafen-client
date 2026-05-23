@@ -262,13 +262,13 @@ public class Config {
 		System.exit(0);
 		break;
 	    case 'd':
-		UIPanel.dbtext.set(true);
+		UILoop.dbtext.set(true);
 		break;
 	    case 'P':
-		UIPanel.profile.set(true);
+		UILoop.profile.set(true);
 		break;
 	    case 'f':
-		MainFrame.initfullscreen.set(true);
+		Client.initfullscreen.set(true);
 		break;
 	    case 'r':
 		Resource.resdir.set(Utils.path(opt.arg));

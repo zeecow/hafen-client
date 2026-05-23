@@ -35,6 +35,8 @@ import haven.render.gl.GLEnvironment;
 import haven.render.gl.GLRender;
 
 public abstract class UILoop implements UI.Context, Console.Directory {
+    public static final Config.Variable<Boolean> dbtext = Config.Variable.propb("haven.dbtext", false);
+    public static final Config.Variable<Boolean> profile = Config.Variable.propb("haven.profile", false);
     public final Windeye wnd;
     public final Thread th;
     public final CPUProfile uprof = new CPUProfile(300), rprof = new CPUProfile(300);
@@ -276,7 +278,7 @@ public abstract class UILoop implements UI.Context, Console.Directory {
 	synchronized(ui) {
 	    ui.draw(g);
 	}
-	if(UIPanel.dbtext.get())
+	if(dbtext.get())
 	    drawstats(ui, g, buf);
 	drawtooltip(ui, g);
 	drawcursor(ui, g);
@@ -471,9 +473,9 @@ public abstract class UILoop implements UI.Context, Console.Directory {
 	}
 
 	public void run() throws InterruptedException {
-	    this.prof   = UIPanel.profile.get() ? CPUProfile.set(loop.uprof.new Frame()) : null;
-	    this.gprof  = UIPanel.profile.get() ? loop.gprof.new Frame(out) : null;
-	    this.rprofc = UIPanel.profile.get() ? new RenderProfile(loop.rprof, prev.rprofc, out) : null;
+	    this.prof   = profile.get() ? CPUProfile.set(loop.uprof.new Frame()) : null;
+	    this.gprof  = profile.get() ? loop.gprof.new Frame(out) : null;
+	    this.rprofc = profile.get() ? new RenderProfile(loop.rprof, prev.rprofc, out) : null;
 	    SyncMode syncmode = ui.gprefs.syncmode.val;
 	    boolean swapsync = (syncmode != SyncMode.FRAME);
 	    boolean tickwait = (syncmode == SyncMode.FRAME) || (syncmode == SyncMode.TICK);
@@ -573,10 +575,10 @@ public abstract class UILoop implements UI.Context, Console.Directory {
     private Map<String, Console.Command> cmdmap = new TreeMap<String, Console.Command>();
     {
 	cmdmap.put("stats", (cons, args) -> {
-	    UIPanel.dbtext.set(Utils.parsebool(args[1]));
+	    dbtext.set(Utils.parsebool(args[1]));
 	});
 	cmdmap.put("profile", (cons, args) -> {
-	    UIPanel.profile.set(Utils.parsebool(args[1]));
+	    profile.set(Utils.parsebool(args[1]));
 	});
 	cmdmap.put("renderer", new Console.Command() {
 	    public void run(Console cons, String[] args) {

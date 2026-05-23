@@ -35,6 +35,7 @@ import java.awt.image.BufferedImage;
 import haven.iosys.tk.Button;
 
 public class Client implements Console.Directory {
+    public static final Config.Variable<Boolean> initfullscreen = Config.Variable.propb("haven.fullscreen", false);
     public final Toolkit tk;
     public final Windeye wnd;
     private final EventQueue queue = new EventQueue(this);
@@ -50,7 +51,9 @@ public class Client implements Console.Directory {
 	    wnd.sizing(new Windeye.Sizing().minsize(UI.scale(800, 600)).normsize(Utils.getprefc("mainwnd/size", UI.scale(1024, 768))));
 	else
 	    wnd.sizing(new Windeye.Sizing().fixsize(fsz));
-	if(Utils.getprefb("mainwnd/max", false))
+	if(initfullscreen.get())
+	    wnd.state(Windeye.State.EXCLUSIVE);
+	else if(Utils.getprefb("mainwnd/max", false))
 	    wnd.state(Windeye.State.MAXIMIZED);
 	try(InputStream icon = Client.class.getResourceAsStream("icon.png")) {
 	    wnd.icon(javax.imageio.ImageIO.read(icon));
@@ -313,6 +316,7 @@ public class Client implements Console.Directory {
 	return(cmdmap);
     }
 
+    public static final Config.Variable<Boolean> nopreload = Config.Variable.propb("haven.nopreload", false);
     public static void setupres() {
 	if(ResCache.global != null)
 	    Resource.setcache(ResCache.global);
@@ -325,7 +329,7 @@ public class Client implements Console.Directory {
 	    } catch(IOException e) {}
 	    */
 	}
-	if(!MainFrame.nopreload.get()) {
+	if(!nopreload.get()) {
 	    try {
 		InputStream pls;
 		pls = Resource.class.getResourceAsStream("res-preload");
