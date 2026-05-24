@@ -35,8 +35,8 @@ import java.awt.image.BufferedImage;
 public interface Clipboard {
     public void put(Contents c);
     public void get(Consumer<? super Contents> cb);
-    public default Contents get() {
-	return(Utils.waitfor(this::get));
+    public default Contents fetch() {
+	return(Utils.waitfor(cb -> get(cb)));
     }
 
     public static class Contents implements Iterable<Item<?>> {
