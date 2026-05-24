@@ -90,6 +90,10 @@ public interface Clipboard {
 	    return((Item<F>)this);
 	}
 
+	public void get(Consumer<? super T> cb) {
+	    item.accept(cb);
+	}
+
 	public T fetch() {
 	    return(Utils.waitfor(item));
 	}
@@ -98,4 +102,11 @@ public interface Clipboard {
     public static enum Std {
 	PRIMARY, CLIPBOARD;
     }
+
+    public static final Clipboard empty = new Clipboard() {
+	public void put(Contents c) {}
+	public void get(Consumer<? super Contents> cb) {
+	    cb.accept(new Contents(Collections.emptyList()));
+	}
+    };
 }
