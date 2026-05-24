@@ -52,6 +52,8 @@ public interface Windeye {
     public Environment env();
     public void swapbuffers(Render g, Object mode);
 
+    public default Clipboard clipboard(Object id) {return(null);}
+
     public default void stats(Collection<String> buf) {}
 
     public static enum State {

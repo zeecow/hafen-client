@@ -39,6 +39,7 @@ import java.awt.Desktop;
 import java.awt.EventQueue;
 import java.awt.HeadlessException;
 import java.awt.image.BufferedImage;
+import java.awt.datatransfer.*;
 import static java.awt.event.KeyEvent.*;
 
 public abstract class AWTToolkit implements Toolkit {
@@ -209,6 +210,109 @@ public abstract class AWTToolkit implements Toolkit {
 	case SIZE_W:    return(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.W_RESIZE_CURSOR));
 	case SIZE_NW:   return(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.NW_RESIZE_CURSOR));
 	default: return(null);
+	}
+    }
+
+    public static class AWTClipboard implements Clipboard {
+	public final java.awt.datatransfer.Clipboard bk;
+
+	public AWTClipboard(java.awt.datatransfer.Clipboard bk) {
+	    this.bk = bk;
+	}
+
+	public void put(Contents c) {
+	    try {
+		bk.setContents(new Transferable() {
+		    public Object getTransferData(DataFlavor flavor) throws UnsupportedFlavorException {
+			if(flavor.equals(DataFlavor.stringFlavor)) {
+			    Item<CharSequence> item = c.find(Clipboard.Format.TEXT);
+			    if(item != null)
+				return(item.fetch().toString());
+			}
+			if(flavor.equals(DataFlavor.imageFlavor)) {
+			    Item<BufferedImage> item = c.find(Clipboard.Format.IMAGE);
+			    if(item != null)
+				return(item.fetch());
+			}
+			if(flavor.equals(DataFlavor.imageFlavor)) {
+			    Item<Collection<Path>> item = c.find(Clipboard.Format.PATHS);
+			    if(item != null) {
+				List<File> ret = new ArrayList<>();
+				item.fetch().forEach(path -> ret.add(path.toFile()));
+				return(ret);
+			    }
+			}
+			throw(new UnsupportedFlavorException(flavor));
+		    }
+
+		    public boolean isDataFlavorSupported(DataFlavor flavor) {
+			if(flavor.equals(DataFlavor.stringFlavor))
+			    return(c.find(Clipboard.Format.TEXT) != null);
+			if(flavor.equals(DataFlavor.imageFlavor))
+			    return(c.find(Clipboard.Format.IMAGE) != null);
+			if(flavor.equals(DataFlavor.javaFileListFlavor))
+			    return(c.find(Clipboard.Format.PATHS) != null);
+			return(false);
+		    }
+
+		    public DataFlavor[] getTransferDataFlavors() {
+			DataFlavor[] buf = new DataFlavor[3];
+			int n = 0;
+			if(c.find(Clipboard.Format.TEXT) != null)
+			    buf[n++] = DataFlavor.stringFlavor;
+			if(c.find(Clipboard.Format.IMAGE) != null)
+			    buf[n++] = DataFlavor.imageFlavor;
+			if(c.find(Clipboard.Format.PATHS) != null)
+			    buf[n++] = DataFlavor.javaFileListFlavor;
+			return(Utils.splice(buf, 0, n));
+		    }
+		}, new ClipboardOwner() {
+		    public void lostOwnership(java.awt.datatransfer.Clipboard cb, Transferable cnt) {
+		    }
+		});
+	    } catch(IllegalStateException e) {}
+	}
+
+	public Contents get() {
+	    Transferable xf;
+	    try {
+		xf = bk.getContents(null);
+	    } catch(IllegalStateException e) {
+		return(new Contents(Collections.emptyList()));
+	    }
+	    Collection<Item<?>> ret = new ArrayList<>();
+	    if(xf.isDataFlavorSupported(DataFlavor.stringFlavor)) {
+		ret.add(new Item<CharSequence>(Format.TEXT, cb -> {
+		    try {
+			cb.accept((String)xf.getTransferData(DataFlavor.stringFlavor));
+		    } catch(UnsupportedFlavorException | IOException e) {
+			throw(new RuntimeException(e));
+		    }
+		}));
+	    }
+	    if(xf.isDataFlavorSupported(DataFlavor.imageFlavor)) {
+		ret.add(new Item<BufferedImage>(Format.IMAGE, cb -> {
+		    try {
+			cb.accept((BufferedImage)xf.getTransferData(DataFlavor.imageFlavor));
+		    } catch(UnsupportedFlavorException | IOException e) {
+			throw(new RuntimeException(e));
+		    }
+		}));
+	    }
+	    if(xf.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
+		ret.add(new Item<Collection<Path>>(Format.PATHS, cb -> {
+		    Collection<?> files;
+		    try {
+			files = (Collection)xf.getTransferData(DataFlavor.javaFileListFlavor);
+		    } catch(UnsupportedFlavorException | IOException e) {
+			throw(new RuntimeException(e));
+		    }
+		    Collection<Path> paths = new ArrayList<>();
+		    files.forEach(file -> paths.add(((File)file).toPath()));
+		    cb.accept(paths);
+		}));
+	    }
+	    return(new Contents(ret));
 	}
     }
 
@@ -437,6 +541,18 @@ public abstract class AWTToolkit implements Toolkit {
 
 	public boolean focused() {
 	    return(focused);
+	}
+
+	public Clipboard clipboard(Object id) {
+	    if(id == Clipboard.Std.PRIMARY) {
+		java.awt.datatransfer.Clipboard c = java.awt.Toolkit.getDefaultToolkit().getSystemSelection();
+		return((c != null) ? new AWTClipboard(c) : null);
+	    }
+	    if(id == Clipboard.Std.CLIPBOARD) {
+		java.awt.datatransfer.Clipboard c = java.awt.Toolkit.getDefaultToolkit().getSystemClipboard();
+		return((c != null) ? new AWTClipboard(c) : null);
+	    }
+	    return(null);
 	}
 
 	public void dispose() {
