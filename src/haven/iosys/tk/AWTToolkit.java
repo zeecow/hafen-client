@@ -27,6 +27,7 @@
 package haven.iosys.tk;
 
 import java.util.*;
+import java.util.function.*;
 import java.awt.event.*;
 import java.io.*;
 import java.nio.file.*;
@@ -273,12 +274,13 @@ public abstract class AWTToolkit implements Toolkit {
 	    } catch(IllegalStateException e) {}
 	}
 
-	public Contents get() {
+	public void get(Consumer<? super Contents> ccb) {
 	    Transferable xf;
 	    try {
 		xf = bk.getContents(null);
 	    } catch(IllegalStateException e) {
-		return(new Contents(Collections.emptyList()));
+		ccb.accept(new Contents(Collections.emptyList()));
+		return;
 	    }
 	    Collection<Item<?>> ret = new ArrayList<>();
 	    if(xf.isDataFlavorSupported(DataFlavor.stringFlavor)) {
@@ -312,7 +314,7 @@ public abstract class AWTToolkit implements Toolkit {
 		    cb.accept(paths);
 		}));
 	    }
-	    return(new Contents(ret));
+	    ccb.accept(new Contents(ret));
 	}
     }
 

@@ -26,6 +26,7 @@
 
 package haven.iosys.tk;
 
+import haven.*;
 import java.util.*;
 import java.util.function.*;
 import java.nio.file.Path;
@@ -33,7 +34,10 @@ import java.awt.image.BufferedImage;
 
 public interface Clipboard {
     public void put(Contents c);
-    public Contents get();
+    public void get(Consumer<? super Contents> cb);
+    public default Contents get() {
+	return(Utils.waitfor(this::get));
+    }
 
     public static class Contents implements Iterable<Item<?>> {
 	public final Collection<Item<?>> items;
@@ -86,29 +90,8 @@ public interface Clipboard {
 	    return((Item<F>)this);
 	}
 
-	@SuppressWarnings("unchecked")
 	public T fetch() {
-	    Object[] buf = {null, null};
-	    item.accept(value -> {
-		synchronized(buf) {
-		    buf[0] = value;
-		    buf[1] = true;
-		    buf.notifyAll();
-		}
-	    });
-	    synchronized(buf) {
-		boolean irq = false;
-		while(buf[1] == null) {
-		    try {
-			buf.wait();
-		    } catch(InterruptedException e) {
-			irq = true;
-		    }
-		}
-		if(irq)
-		    Thread.currentThread().interrupt();
-		return((T)buf[0]);
-	    }
+	    return(Utils.waitfor(item));
 	}
     }
 

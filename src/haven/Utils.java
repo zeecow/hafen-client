@@ -1935,6 +1935,31 @@ public class Utils {
 	c.clear();
     }
 
+    @SuppressWarnings("unchecked")
+    public static <T> T waitfor(Consumer<Consumer<? super T>> promise) {
+	Object[] buf = {null, null};
+	promise.accept(value -> {
+	    synchronized(buf) {
+		buf[0] = value;
+		buf[1] = true;
+		buf.notifyAll();
+	    }
+	});
+	synchronized(buf) {
+	    boolean irq = false;
+	    while(buf[1] == null) {
+		try {
+		    buf.wait();
+		} catch(InterruptedException e) {
+		    irq = true;
+		}
+	    }
+	    if(irq)
+		Thread.currentThread().interrupt();
+	    return((T)buf[0]);
+	}
+    }
+
     public static <T> T construct(Constructor<T> cons, Object... args) {
 	try {
 	    return(cons.newInstance(args));
