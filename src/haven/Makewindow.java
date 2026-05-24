@@ -308,6 +308,9 @@ public class Makewindow extends Widget {
 
 	public boolean mousedown(MouseDownEvent ev) {
 	    if(ev.b == 1) {
+		Makewindow.this.wdgmsg("choose", idx);
+		return(true);
+	    } else if(ev.b == 3) {
 		if(rpag == null)
 		    Makewindow.this.wdgmsg("findrcps", idx);
 		this.cc = ev.c;
