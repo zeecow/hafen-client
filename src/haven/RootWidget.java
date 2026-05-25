@@ -129,7 +129,7 @@ public class RootWidget extends ConsoleHost implements UI.Notice.Handler, Widget
 			clip = new Audio.Resampler(clip).sp(spd);
 		    if(vol != 1.0)
 			clip = new Audio.VolAdjust(clip, vol);
-		    Audio.play(clip);
+		    ui.sfx(clip);
 		}, null);
 	} else if(msg == "bgm") {
 	    int a = 0;
