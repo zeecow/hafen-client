@@ -28,6 +28,7 @@ package haven;
 
 import java.util.*;
 import haven.render.*;
+import haven.iosys.audio.*;
 import haven.iosys.tk.*;
 import java.awt.image.BufferedImage;
 import haven.GSettings.SyncMode;
@@ -73,7 +74,7 @@ public abstract class UILoop implements Console.Directory {
     }
 
     public UI newui(UI.Runner fun) {
-	UI prevui, newui = new UI(wnd, new Coord(wnd.size()), fun);
+	UI prevui, newui = new UI(wnd, new Audio.Root(audiosink()), new Coord(wnd.size()), fun);
 	newui.env = this.env;
 	newui.cons.add(this);
 	synchronized(uilock) {
@@ -97,10 +98,6 @@ public abstract class UILoop implements Console.Directory {
 	    }
 	}
 	return(newui);
-    }
-
-    public void setmousepos(Coord c) {
-	/* XXX */
     }
 
     /* XXX: Move to UI? */
@@ -350,6 +347,10 @@ public abstract class UILoop implements Console.Directory {
     }
 
     protected abstract void dispatch(UI ui);
+
+    protected AudioSystem.SinkLine audiosink() {
+	return(AudioSystem.instance().sinkline(Audio.defspec()));
+    }
 
     protected boolean bgmode() {
 	return(false);

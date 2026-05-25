@@ -83,7 +83,7 @@ public class TestClient implements Runnable {
 
     public class TestUI extends UI {
 	public TestUI(Coord sz, Session sess) {
-	    super(null, sz, null);
+	    super(null, new Audio.Root(haven.iosys.audio.AudioSystem.DummySink.instance), sz, null);
 	    this.sess = sess;
 	}
 	

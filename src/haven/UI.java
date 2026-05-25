@@ -64,7 +64,7 @@ public class UI {
     private Collection<AfterDraw> afterdraws = new LinkedList<AfterDraw>();
     public GSettings gprefs = GSettings.load(true);
     private boolean gprefsdirty = false;
-    public final ActAudio.Root audio = new ActAudio.Root();
+    public final ActAudio.Root audio;
     public final Loader loader;
     public final CommandQueue queue = new CommandQueue();
     private static final double scalef;
@@ -176,9 +176,11 @@ public class UI {
 	}
     }
 
-    public UI(Windeye wnd, Coord sz, Runner fun) {
+    public UI(Windeye wnd, Audio.Root audio, Coord sz, Runner fun) {
 	this.wnd = wnd;
 	root = new RootWidget(this, sz);
+	this.audio = new ActAudio.Root(audio);
+	cons.add(audio);
 	widgets.put(0, root);
 	rwidgets.put(root, 0);
 	if(fun != null)
