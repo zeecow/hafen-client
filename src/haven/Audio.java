@@ -602,7 +602,7 @@ public class Audio {
 		player = line.open(adj, bufsize);
 	    } catch(haven.iosys.Unavailable e) {
 		new Warning(e, "could not open audio output").issue();
-		player = new AudioSystem.DummyPlayer(mixer);
+		player = new DummyAudio.DummyPlayer(mixer);
 	    }
 	}
 

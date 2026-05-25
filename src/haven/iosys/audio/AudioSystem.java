@@ -84,54 +84,6 @@ public interface AudioSystem {
 	String name();
     }
 
-    public static class DummyPlayer extends HackThread implements Player {
-	public final CS stream;
-	private boolean stop = false;
-
-	public DummyPlayer(CS stream) {
-	    super("Dummy audio player");
-	    this.stream = stream;
-	    setDaemon(true);
-	    start();
-	}
-
-	public void run() {
-	    double then = Utils.rtime();
-	    try {
-		double[][] buf = new double[2][1024];
-		while(!stop) {
-		    Thread.sleep((1000 * Audio.SAMPLE_RATE) / 1024);
-		    if(stream.get(buf, 1024) <= 0)
-			return;
-		}
-	    } catch(InterruptedException e) {
-	    }
-	}
-
-	public void stop(boolean async) {
-	    try {
-		synchronized(this) {
-		    stop = true;
-		    while(!async && isAlive())
-			this.join();
-		}
-	    } catch(InterruptedException e) {
-		Thread.currentThread().interrupt();
-	    }
-	}
-    }
-
-    public static class DummySink implements SinkLine {
-	public static final SinkLine instance = new DummySink();
-
-	public Player open(CS stream) {
-	    return(new DummyPlayer(stream));
-	}
-	public Player open(CS stream, int bufsize) {
-	    return(open(stream));
-	}
-    }
-
     public static Map<String, Factory> types() {
 	return(Found.found());
     }
