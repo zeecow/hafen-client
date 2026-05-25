@@ -226,6 +226,8 @@ public interface ReadLine {
 	}
 
 	private void paste(CharSequence text) {
+	    if(text == null)
+		return;
 	    synchronized(owner.ui()) {
 		rmsel();
 		int l = 0;
