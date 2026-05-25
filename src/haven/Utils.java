@@ -1576,6 +1576,14 @@ public class Utils {
 	return((a == b) || ((a != null) && a.equals(b)));
     }
 
+    public static <T> T ifnull(T value, T orelse) {
+	return((value != null) ? value : orelse);
+    }
+
+    public static <T> T ifnull(T value, Supplier<? extends T> orelse) {
+	return((value != null) ? value : orelse.get());
+    }
+
     public static boolean parsebool(String s, boolean def) {
 	try {
 	    return(parsebool(s));
