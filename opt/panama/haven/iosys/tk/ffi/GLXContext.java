@@ -151,6 +151,9 @@ public class GLXContext implements Toolkit.Factory {
 	public final Atomic _NET_WM_PID = new Atomic("_NET_WM_PID");
 	public final Atomic _NET_WM_PING = new Atomic("_NET_WM_PING");
 	public final Atomic _NET_SUPPORTING_WM_CHECK = new Atomic("_NET_SUPPORTING_WM_CHECK");
+	public final Atomic PRIMARY = new Atomic("PRIMARY");
+	public final Atomic CLIPBOARD = new Atomic("CLIPBOARD");
+	public final Atomic TARGETS = new Atomic("TARGETS");
 	public final String srvvendor, wmname;
 	public final int srvrelease;
 	private boolean closed = false;
@@ -304,7 +307,8 @@ public class GLXContext implements Toolkit.Factory {
 			_NET_WM_NAME, _NET_WM_ICON, _NET_WM_PID, _NET_WM_PING,
 			_NET_WM_STATE, _NET_WM_STATE_MAXIMIZED_VERT, _NET_WM_STATE_MAXIMIZED_HORZ,
 			_NET_WM_STATE_HIDDEN, _NET_WM_STATE_FULLSCREEN,
-			_NET_SUPPORTING_WM_CHECK
+			_NET_SUPPORTING_WM_CHECK,
+			PRIMARY, CLIPBOARD, TARGETS
 			);
 
 		/* Keyboard input */
@@ -1112,6 +1116,24 @@ public class GLXContext implements Toolkit.Factory {
 		}
 	    }
 
+	    private GLXClipboard getclipboard(Atom id) {
+		synchronized(clipboards) {
+		    return(clipboards.get(id));
+		}
+	    }
+	    private void selectionclear(XSelectionClearEvent ev) {
+		GLXClipboard c = getclipboard(ev.selection());
+		if(c != null) c.clear(ev);
+	    }
+	    private void selectionrequest(XSelectionRequestEvent ev) {
+		GLXClipboard c = getclipboard(ev.selection());
+		if(c != null) c.request(ev);
+	    }
+	    private void selectionnotify(XSelectionEvent ev) {
+		GLXClipboard c = getclipboard(ev.selection());
+		if(c != null) c.notify(ev);
+	    }
+
 	    private void event(XEvent ev) {
 		for(Consumer<XEvent> cb : listeners)
 		    cb.accept(ev);
@@ -1148,6 +1170,15 @@ public class GLXContext implements Toolkit.Factory {
 		    break;
 		case XLib.KeyRelease:
 		    keyrelease(ev.xkey());
+		    break;
+		case XLib.SelectionClear:
+		    selectionclear(ev.xselectionclear());
+		    break;
+		case XLib.SelectionRequest:
+		    selectionrequest(ev.xselectionrequest());
+		    break;
+		case XLib.SelectionNotify:
+		    selectionnotify(ev.xselection());
 		    break;
 		default:
 		    Warning.warn(String.format("unexpected event received for window %s: %d", id, ev.type()));
@@ -1223,6 +1254,139 @@ public class GLXContext implements Toolkit.Factory {
 		default:
 		    Warning.warn(String.format("unexpected XInput event received for window %s: %d",  ev.evtype()));
 		    break;
+		}
+	    }
+
+	    public class GLXClipboard implements Clipboard {
+		public final Atom selection;
+		private Map<Atom, Request> requests = new HashMap<>();
+
+		class Request {
+		    final XID owner;
+		    final double time;
+		    final int id;
+		    final Atom prop;
+		    final Promise<Request> promise;
+		    XSelectionEvent ev;
+
+		    Request(XID owner, Promise<Request> promise) {
+			this.owner = owner;
+			this.promise = promise;
+			synchronized(requests) {
+			    Set<Integer> ids = new HashSet<>();
+			    requests.values().forEach(req -> ids.add(req.id));
+			    for(int id = 0; true; id++) {
+				if(!ids.contains(id)) {
+				    this.id = id;
+				    break;
+				}
+			    }
+			    this.prop = xlib.XInternAtom(dpy, "SELECTION_DATA_" + id, false);
+			    requests.put(prop, this);
+			}
+			this.time = Utils.rtime();
+		    }
+
+		    void handle(XSelectionEvent ev) {
+			this.ev = ev;
+			synchronized(requests) {
+			    requests.remove(prop);
+			}
+			promise.resolve(this);
+		    }
+		}
+
+		public static class ByteData {
+		    final Atom type;
+		    final byte[] data;
+
+		    ByteData(Atom type, byte[] data) {
+			this.type = type;
+			this.data = data;
+		    }
+		}
+
+		public GLXClipboard(Atom selection) {
+		    this.selection = selection;
+		}
+
+		private <T> Promise<T> etpromise(Supplier<T> task) {
+		    return(Promise.deferred(task, GLXToolkit.this::xrun));
+		}
+
+		public void put(Contents cnt, Runnable expire) {
+		}
+
+		public Promise<XProperty> fetchprop(XID owner, Atom target, long time) {
+		    Promise<Request> data = new Promise<>();
+		    xrun(() -> {
+			Request req = new Request(owner, data);
+			xlib.XConvertSelection(dpy, selection, target, req.prop, id, time);
+		    });
+		    return(data.then(req -> etpromise(() -> xlib.XGetWindowProperty(dpy, id, req.prop, true, Atom.nil))));
+		}
+
+		public Promise<Contents> get() {
+		    Promise<Request> targets = new Promise<>();
+		    xrun(() -> {
+			XID owner = xlib.XGetSelectionOwner(dpy, selection);
+			if(owner.equals(XID.None))
+			    targets.resolve(null);
+			Request req = new Request(owner, targets);
+			xlib.XConvertSelection(dpy, selection, TARGETS.id, req.prop, id, XLib.CurrentTime);
+		    });
+		    return(targets.then(req -> etpromise(() -> {
+			if(req == null)
+			    return(new Contents(Collections.emptyList()));
+			XProperty res = xlib.XGetWindowProperty(dpy, id, req.prop, true, Atom.nil);
+			if((res == null) || (res.format != 32) || !ATOM.is(res.type))
+			    throw(new RuntimeException("Selection property fetch failed"));
+			Set<Atom> tgts = new HashSet<>(Arrays.asList(res.a()));
+			List<Item<?>> ret = new ArrayList<>();
+			if(tgts.contains(UTF8_STRING.id)) {
+			    ret.add(new Clipboard.Item<CharSequence>(Clipboard.Format.TEXT,
+							 () -> fetchprop(req.owner, UTF8_STRING.id, req.ev.time()).map(prop -> {
+							     Debug.dump(prop);
+							     return(new String(prop.b(), Utils.utf8));
+							 })));
+			}
+			return(new Contents(ret));
+		    })));
+		}
+
+		void clear(XSelectionClearEvent ev) {
+		    
+		}
+
+		void request(XSelectionRequestEvent ev) {
+		}
+
+		void notify(XSelectionEvent ev) {
+		    Request req;
+		    synchronized(requests) {
+			req = requests.get(ev.property());
+		    }
+		    if(req == null) {
+			Warning.warn("X11 selection event arrived for non-pending request: " + ev.property());
+			return;
+		    }
+		    req.handle(ev);
+		}
+	    }
+
+	    private final Map<Atom, GLXClipboard> clipboards = new HashMap<>();
+	    public Clipboard clipboard(Object id) {
+		Atom name;
+		if(id == Clipboard.Std.PRIMARY)
+		    name = PRIMARY.id;
+		else if(id == Clipboard.Std.CLIPBOARD)
+		    name = CLIPBOARD.id;
+		else if(id instanceof String)
+		    name = xrun(() -> xlib.XInternAtom(dpy, (String)id, false));
+		else
+		    return(null);
+		synchronized(clipboards) {
+		    return(clipboards.computeIfAbsent(name, GLXClipboard::new));
 		}
 	    }
 	}

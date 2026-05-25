@@ -40,6 +40,7 @@ import static java.lang.foreign.ValueLayout.ADDRESS;
 public abstract class XLib {
     public static final int None = 0;
     public static final int Success = 0;
+    public static final int CurrentTime = 0;
 
     public static final long NoEventMask = 0L;
     public static final long KeyPressMask = (1L<<0);
@@ -409,6 +410,9 @@ public abstract class XLib {
 	public abstract XVisibilityEvent xvisibility();
 	public abstract XPropertyEvent xproperty();
 	public abstract XConfigureEvent xconfigure();
+	public abstract XSelectionClearEvent xselectionclear();
+	public abstract XSelectionRequestEvent xselectionrequest();
+	public abstract XSelectionEvent xselection();
 	public abstract XClientMessageEvent xclient();
 	public abstract XGenericEvent xgeneric();
     }
@@ -547,6 +551,47 @@ public abstract class XLib {
 	public abstract boolean override_redirect();
     }
 
+    public static abstract class XSelectionClearEvent extends StructInstance {
+	protected XSelectionClearEvent(MemorySegment mem) {
+	    super(mem);
+	}
+
+	MemorySegment mem() {return(mem);}
+
+	public abstract XID window();
+	public abstract Atom selection();
+	public abstract long time();
+    }
+
+    public static abstract class XSelectionRequestEvent extends StructInstance {
+	protected XSelectionRequestEvent(MemorySegment mem) {
+	    super(mem);
+	}
+
+	MemorySegment mem() {return(mem);}
+
+	public abstract XID owner();
+	public abstract XID requestor();
+	public abstract Atom selection();
+	public abstract Atom target();
+	public abstract Atom property();
+	public abstract long time();
+    }
+
+    public static abstract class XSelectionEvent extends StructInstance {
+	protected XSelectionEvent(MemorySegment mem) {
+	    super(mem);
+	}
+
+	MemorySegment mem() {return(mem);}
+
+	public abstract XID requestor();
+	public abstract Atom selection();
+	public abstract Atom target();
+	public abstract Atom property();
+	public abstract long time();
+    }
+
     public static abstract class XGenericEvent extends StructInstance {
 	protected XGenericEvent(MemorySegment mem) {
 	    super(mem);
@@ -607,17 +652,41 @@ public abstract class XLib {
 	public short s(int i) {
 	    return(data.get(ValueLayout.JAVA_SHORT, i * ValueLayout.JAVA_SHORT.byteSize()));
 	}
+	public short[] s() {
+	    short[] ret = new short[len];
+	    for(int i = 0; i < len; i++)
+		ret[i] = data.get(ValueLayout.JAVA_SHORT, i * ValueLayout.JAVA_SHORT.byteSize());
+	    return(ret);
+	}
 
 	public long l(int i) {
 	    return(data.get(ValueLayout.JAVA_LONG, i * ValueLayout.JAVA_LONG.byteSize()));
+	}
+	public long[] l() {
+	    long[] ret = new long[len];
+	    for(int i = 0; i < len; i++)
+		ret[i] = getint(data, C_LONG.byteSize() * i, C_LONG, true);
+	    return(ret);
 	}
 
 	public Atom a(int i) {
 	    return(Atom.of(l(i)));
 	}
+	public Atom[] a() {
+	    long[] l = l();
+	    Atom[] r = new Atom[l.length];
+	    for(int i = 0; i < l.length; r[i] = Atom.of(l[i]), i++);
+	    return(r);
+	}
 
 	public XID x(int i) {
 	    return(XID.of(l(i)));
+	}
+	public XID[] x() {
+	    long[] l = l();
+	    XID[] r = new XID[l.length];
+	    for(int i = 0; i < l.length; r[i] = XID.of(l[i]), i++);
+	    return(r);
 	}
 
 	public String toString() {
@@ -733,6 +802,10 @@ public abstract class XLib {
     public abstract XEvent XEvent();
     public abstract XComposeStatus XComposeStatus();
     abstract XErrorEvent XErrorEvent(MemorySegment mem);
+
+    public abstract XID XGetSelectionOwner(XLib.Display dpy, Atom selection);
+    public abstract int XSetSelectionOwner(XLib.Display dpy, Atom selection, XID owner, long time);
+    public abstract int XConvertSelection(XLib.Display dpy, Atom selection, Atom target, Atom property, XID requestor, long time);
 
     public abstract boolean XkbLibraryVersion(int[] version);
     public abstract XkbExtensionInfo XkbQueryExtension(Display dpy, int major, int minor);
@@ -1001,6 +1074,9 @@ public abstract class XLib {
 	    public XVisibilityEvent xvisibility() {return(new XVisibilityEvent(mem));}
 	    public XPropertyEvent xproperty() {return(new XPropertyEvent(mem));}
 	    public XConfigureEvent xconfigure() {return(new XConfigureEvent(mem));}
+	    public XSelectionClearEvent xselectionclear() {return(new XSelectionClearEvent(mem));}
+	    public XSelectionRequestEvent xselectionrequest() {return(new XSelectionRequestEvent(mem));}
+	    public XSelectionEvent xselection() {return(new XSelectionEvent(mem));}
 	    public XClientMessageEvent xclient() {return(new XClientMessageEvent(mem));}
 	    public XGenericEvent xgeneric() {return(new XGenericEvent(xlib, mem));}
 	}
@@ -1294,6 +1370,93 @@ public abstract class XLib {
 	    public XID above() {return(XID.of((long)above.get(mem, 0)));}
 	    private static final VarHandle override_redirect = _XConfigureEvent.varHandle(PathElement.groupElement("override_redirect"));
 	    public boolean override_redirect() {return(((int)override_redirect.get(mem, 0)) != 0);}
+	}
+
+	static final StructLayout _XSelectionClearEvent = struct(new MemoryLayout[] {
+		C_INT.withName("type"),
+		C_LONG.withName("serial"),
+		C_XBool.withName("send_event"),
+		ADDRESS.withName("display"),
+		C_XID.withName("window"),
+		C_Atom.withName("selection"),
+		C_Time.withName("time"),
+	    });
+	public static class XSelectionClearEvent extends XLib.XSelectionClearEvent {
+	    XSelectionClearEvent(MemorySegment mem) {
+		super(mem);
+	    }
+
+	    protected StructLayout $layout() {return(_XSelectionClearEvent);}
+
+	    private static final VarHandle window = _XSelectionEvent.varHandle(PathElement.groupElement("window"));
+	    public XID window() {return(XID.of((long)window.get(mem, 0)));}
+	    private static final VarHandle selection = _XSelectionEvent.varHandle(PathElement.groupElement("selection"));
+	    public Atom selection() {return(Atom.of((long)selection.get(mem, 0)));}
+	    private static final VarHandle time = _XSelectionEvent.varHandle(PathElement.groupElement("time"));
+	    public long time() {return((long)time.get(mem, 0));}
+	}
+
+	static final StructLayout _XSelectionRequestEvent = struct(new MemoryLayout[] {
+		C_INT.withName("type"),
+		C_LONG.withName("serial"),
+		C_XBool.withName("send_event"),
+		ADDRESS.withName("display"),
+		C_XID.withName("owner"),
+		C_XID.withName("requestor"),
+		C_Atom.withName("selection"),
+		C_Atom.withName("target"),
+		C_Atom.withName("property"),
+		C_Time.withName("time"),
+	    });
+	public static class XSelectionRequestEvent extends XLib.XSelectionRequestEvent {
+	    XSelectionRequestEvent(MemorySegment mem) {
+		super(mem);
+	    }
+
+	    protected StructLayout $layout() {return(_XSelectionRequestEvent);}
+
+	    private static final VarHandle owner = _XSelectionRequestEvent.varHandle(PathElement.groupElement("owner"));
+	    public XID owner() {return(XID.of((long)owner.get(mem, 0)));}
+	    private static final VarHandle requestor = _XSelectionRequestEvent.varHandle(PathElement.groupElement("requestor"));
+	    public XID requestor() {return(XID.of((long)requestor.get(mem, 0)));}
+	    private static final VarHandle selection = _XSelectionRequestEvent.varHandle(PathElement.groupElement("selection"));
+	    public Atom selection() {return(Atom.of((long)selection.get(mem, 0)));}
+	    private static final VarHandle target = _XSelectionRequestEvent.varHandle(PathElement.groupElement("target"));
+	    public Atom target() {return(Atom.of((long)target.get(mem, 0)));}
+	    private static final VarHandle property = _XSelectionRequestEvent.varHandle(PathElement.groupElement("property"));
+	    public Atom property() {return(Atom.of((long)property.get(mem, 0)));}
+	    private static final VarHandle time = _XSelectionRequestEvent.varHandle(PathElement.groupElement("time"));
+	    public long time() {return((long)time.get(mem, 0));}
+	}
+
+	static final StructLayout _XSelectionEvent = struct(new MemoryLayout[] {
+		C_INT.withName("type"),
+		C_LONG.withName("serial"),
+		C_XBool.withName("send_event"),
+		ADDRESS.withName("display"),
+		C_XID.withName("requestor"),
+		C_Atom.withName("selection"),
+		C_Atom.withName("target"),
+		C_Atom.withName("property"),
+		C_Time.withName("time"),
+	    });
+	public static class XSelectionEvent extends XLib.XSelectionEvent {
+	    XSelectionEvent(MemorySegment mem) {
+		super(mem);
+	    }
+
+	    protected StructLayout $layout() {return(_XSelectionEvent);}
+
+	    private static final VarHandle requestor = _XSelectionEvent.varHandle(PathElement.groupElement("requestor"));
+	    public XID requestor() {return(XID.of((long)requestor.get(mem, 0)));}
+	    private static final VarHandle selection = _XSelectionEvent.varHandle(PathElement.groupElement("selection"));
+	    public Atom selection() {return(Atom.of((long)selection.get(mem, 0)));}
+	    private static final VarHandle target = _XSelectionEvent.varHandle(PathElement.groupElement("target"));
+	    public Atom target() {return(Atom.of((long)target.get(mem, 0)));}
+	    private static final VarHandle property = _XSelectionEvent.varHandle(PathElement.groupElement("property"));
+	    public Atom property() {return(Atom.of((long)property.get(mem, 0)));}
+	    private static final VarHandle time = _XSelectionEvent.varHandle(PathElement.groupElement("time"));
+	    public long time() {return((long)time.get(mem, 0));}
 	}
 
 	static final StructLayout _XGenericEventCookie = struct(new MemoryLayout[] {
@@ -2308,6 +2471,48 @@ public abstract class XLib {
 	public void XFreeEventData(MemorySegment dpy, MemorySegment cookie) {
 	    try {
 		XFreeEventData.invoke(dpy, cookie);
+	    } catch(Throwable e) {
+		throw(new RuntimeException(e));
+	    } finally {
+		checkerror();
+	    }
+	}
+
+	private final MethodHandle XGetSelectionOwner = ld.downcallHandle(xlib.find("XGetSelectionOwner").get(), FunctionDescriptor.of(C_XID, ADDRESS, C_Atom));
+	public XID XGetSelectionOwner(XLib.Display dpy, Atom selection) {
+	    try {
+		if(C_Atom instanceof ValueLayout.OfLong)
+		    return(XID.of((long)XGetSelectionOwner.invoke(dpy.mem(), (long)selection.bits)));
+		else
+		    return(XID.of((long)XGetSelectionOwner.invoke(dpy.mem(), (int)selection.bits)));
+	    } catch(Throwable e) {
+		throw(new RuntimeException(e));
+	    } finally {
+		checkerror();
+	    }
+	}
+
+	private final MethodHandle XSetSelectionOwner = ld.downcallHandle(xlib.find("XSetSelectionOwner").get(), FunctionDescriptor.of(C_INT, ADDRESS, C_Atom, C_XID, C_Time));
+	public int XSetSelectionOwner(XLib.Display dpy, Atom selection, XID owner, long time) {
+	    try {
+		if(C_Atom instanceof ValueLayout.OfLong)
+		    return((int)XSetSelectionOwner.invoke(dpy.mem(), (long)selection.bits, (long)owner.bits, (long)time));
+		else
+		    return((int)XSetSelectionOwner.invoke(dpy.mem(), (int)selection.bits, (int)owner.bits, (int)time));
+	    } catch(Throwable e) {
+		throw(new RuntimeException(e));
+	    } finally {
+		checkerror();
+	    }
+	}
+
+	private final MethodHandle XConvertSelection = ld.downcallHandle(xlib.find("XConvertSelection").get(), FunctionDescriptor.of(C_INT, ADDRESS, C_Atom, C_Atom, C_Atom, C_XID, C_Time));
+	public int XConvertSelection(XLib.Display dpy, Atom selection, Atom target, Atom property, XID requestor, long time) {
+	    try {
+		if(C_Atom instanceof ValueLayout.OfLong)
+		    return((int)XConvertSelection.invoke(dpy.mem(), (long)selection.bits, (long)target.bits, (long)property.bits, (long)requestor.bits, (long)time));
+		else
+		    return((int)XConvertSelection.invoke(dpy.mem(), (int)selection.bits, (int)target.bits, (int)property.bits, (int)requestor.bits, (int)time));
 	    } catch(Throwable e) {
 		throw(new RuntimeException(e));
 	    } finally {
