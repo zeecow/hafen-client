@@ -30,6 +30,7 @@ import java.util.*;
 import java.awt.image.*;
 import java.nio.*;
 import haven.*;
+import haven.iosys.*;
 import haven.render.*;
 import haven.render.gl.*;
 import haven.render.jogl.*;

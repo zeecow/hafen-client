@@ -32,6 +32,7 @@ import java.awt.event.*;
 import java.io.*;
 import java.nio.file.*;
 import haven.*;
+import haven.iosys.*;
 import haven.render.*;
 import haven.render.gl.*;
 import java.awt.AWTEvent;

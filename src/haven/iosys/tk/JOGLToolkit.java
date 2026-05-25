@@ -31,6 +31,7 @@ import java.awt.event.*;
 import com.jogamp.opengl.*;
 import com.jogamp.opengl.awt.*;
 import haven.*;
+import haven.iosys.*;
 import haven.render.*;
 import haven.render.gl.*;
 import haven.render.jogl.*;

@@ -33,6 +33,7 @@ import java.io.*;
 import java.nio.*;
 import haven.*;
 import haven.ffi.*;
+import haven.iosys.*;
 import haven.render.*;
 import haven.render.gl.*;
 import haven.iosys.tk.*;

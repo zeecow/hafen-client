@@ -24,7 +24,7 @@
  *  Boston, MA 02111-1307 USA
  */
 
-package haven.iosys.tk;
+package haven.iosys;
 
 public class Unavailable extends RuntimeException {
     public Unavailable() {super();}

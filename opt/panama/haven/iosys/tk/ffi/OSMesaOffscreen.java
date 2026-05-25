@@ -27,6 +27,7 @@
 package haven.iosys.tk.ffi;
 
 import haven.*;
+import haven.iosys.*;
 import haven.iosys.tk.*;
 import haven.render.*;
 import haven.render.gl.*;

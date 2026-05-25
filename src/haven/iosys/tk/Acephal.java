@@ -27,6 +27,7 @@
 package haven.iosys.tk;
 
 import haven.*;
+import haven.iosys.*;
 import haven.render.*;
 import java.util.*;
 import java.lang.annotation.*;
