@@ -221,7 +221,7 @@ public abstract class AWTToolkit implements Toolkit {
 	    this.bk = bk;
 	}
 
-	public void put(Contents c) {
+	public void put(Contents c, Runnable expire) {
 	    try {
 		bk.setContents(new Transferable() {
 		    public Object getTransferData(DataFlavor flavor) throws UnsupportedFlavorException {
@@ -269,6 +269,8 @@ public abstract class AWTToolkit implements Toolkit {
 		    }
 		}, new ClipboardOwner() {
 		    public void lostOwnership(java.awt.datatransfer.Clipboard cb, Transferable cnt) {
+			if(expire != null)
+			    expire.run();
 		    }
 		});
 	    } catch(IllegalStateException e) {}

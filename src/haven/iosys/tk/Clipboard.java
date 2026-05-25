@@ -33,7 +33,8 @@ import java.nio.file.Path;
 import java.awt.image.BufferedImage;
 
 public interface Clipboard {
-    public void put(Contents c);
+    public void put(Contents c, Runnable expire);
+    public default void put(Contents c) {put(c, null);}
     public Promise<Contents> get();
     public default Contents fetch() {
 	return(get().waitfor());
@@ -101,7 +102,12 @@ public interface Clipboard {
     }
 
     public static final Clipboard empty = new Clipboard() {
-	public void put(Contents c) {}
+	private Runnable last = null;
+	public synchronized void put(Contents c, Runnable expire) {
+	    if(last != null)
+		last.run();
+	    last = expire;
+	}
 	public Promise<Contents> get() {
 	    return(new Promise<Contents>().resolve(new Contents(Collections.emptyList())));
 	}
