@@ -34,9 +34,9 @@ import java.awt.image.BufferedImage;
 
 public interface Clipboard {
     public void put(Contents c);
-    public void get(Consumer<? super Contents> cb);
+    public Promise<Contents> get();
     public default Contents fetch() {
-	return(Utils.waitfor(cb -> get(cb)));
+	return(get().waitfor());
     }
 
     public static class Contents implements Iterable<Item<?>> {
@@ -70,17 +70,14 @@ public interface Clipboard {
 
     public static class Item<T> {
 	public final Format<T> fmt;
-	public final Consumer<Consumer<? super T>> item;
+	public final Supplier<Promise<T>> item;
 
-	public Item(Format<T> fmt, Consumer<Consumer<? super T>> item) {
+	public Item(Format<T> fmt, Supplier<Promise<T>> item) {
 	    this.fmt = fmt;
 	    this.item = item;
 	}
-	public Item(Format<T> fmt, Supplier<? extends T> item) {
-	    this(fmt, cb -> cb.accept(item.get()));
-	}
 	public Item(Format<T> fmt, T item) {
-	    this(fmt, cb -> cb.accept(item));
+	    this(fmt, () -> new Promise<T>().resolve(item));
 	}
 
 	@SuppressWarnings("unchecked")
@@ -90,12 +87,12 @@ public interface Clipboard {
 	    return((Item<F>)this);
 	}
 
-	public void get(Consumer<? super T> cb) {
-	    item.accept(cb);
+	public Promise<T> get() {
+	    return(item.get());
 	}
 
 	public T fetch() {
-	    return(Utils.waitfor(item));
+	    return(get().waitfor());
 	}
     }
 
@@ -105,8 +102,8 @@ public interface Clipboard {
 
     public static final Clipboard empty = new Clipboard() {
 	public void put(Contents c) {}
-	public void get(Consumer<? super Contents> cb) {
-	    cb.accept(new Contents(Collections.emptyList()));
+	public Promise<Contents> get() {
+	    return(new Promise<Contents>().resolve(new Contents(Collections.emptyList())));
 	}
     };
 }

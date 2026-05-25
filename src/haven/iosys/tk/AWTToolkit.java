@@ -274,47 +274,36 @@ public abstract class AWTToolkit implements Toolkit {
 	    } catch(IllegalStateException e) {}
 	}
 
-	public void get(Consumer<? super Contents> ccb) {
-	    Transferable xf;
-	    try {
-		xf = bk.getContents(null);
-	    } catch(IllegalStateException e) {
-		ccb.accept(new Contents(Collections.emptyList()));
-		return;
-	    }
-	    Collection<Item<?>> ret = new ArrayList<>();
-	    if(xf.isDataFlavorSupported(DataFlavor.stringFlavor)) {
-		ret.add(new Item<CharSequence>(Format.TEXT, cb -> {
-		    try {
-			cb.accept((String)xf.getTransferData(DataFlavor.stringFlavor));
-		    } catch(UnsupportedFlavorException | IOException e) {
-			throw(new RuntimeException(e));
-		    }
-		}));
-	    }
-	    if(xf.isDataFlavorSupported(DataFlavor.imageFlavor)) {
-		ret.add(new Item<BufferedImage>(Format.IMAGE, cb -> {
-		    try {
-			cb.accept((BufferedImage)xf.getTransferData(DataFlavor.imageFlavor));
-		    } catch(UnsupportedFlavorException | IOException e) {
-			throw(new RuntimeException(e));
-		    }
-		}));
-	    }
-	    if(xf.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
-		ret.add(new Item<Collection<Path>>(Format.PATHS, cb -> {
-		    Collection<?> files;
-		    try {
-			files = (Collection)xf.getTransferData(DataFlavor.javaFileListFlavor);
-		    } catch(UnsupportedFlavorException | IOException e) {
-			throw(new RuntimeException(e));
-		    }
-		    Collection<Path> paths = new ArrayList<>();
-		    files.forEach(file -> paths.add(((File)file).toPath()));
-		    cb.accept(paths);
-		}));
-	    }
-	    ccb.accept(new Contents(ret));
+	public static <T> Promise<T> awtpromise(Supplier<T> task) {
+	    return(Promise.deferred(task, EventQueue::invokeLater));
+	}
+
+	public static <T> Promise<T> xfpromise(Class<T> typ, Transferable xf, DataFlavor flavor) {
+	    return(awtpromise(() -> {
+		try {
+		    return(typ.cast(xf.getTransferData(flavor)));
+		} catch(UnsupportedFlavorException | IOException e) {
+		    throw(new RuntimeException(e));
+		}
+	    }));
+	}
+
+	public Promise<Contents> get() {
+	    return(awtpromise(() -> bk.getContents(null)).map(xf -> {
+		Collection<Item<?>> ret = new ArrayList<>();
+		if(xf.isDataFlavorSupported(DataFlavor.stringFlavor))
+		    ret.add(new Item<CharSequence>(Format.TEXT, () -> xfpromise(CharSequence.class, xf, DataFlavor.stringFlavor)));
+		if(xf.isDataFlavorSupported(DataFlavor.imageFlavor))
+		    ret.add(new Item<BufferedImage>(Format.IMAGE, () -> xfpromise(BufferedImage.class, xf, DataFlavor.imageFlavor)));
+		if(xf.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
+		    ret.add(new Item<Collection<Path>>(Format.PATHS, () -> xfpromise(List.class, xf, DataFlavor.javaFileListFlavor).map(files -> {
+			Collection<Path> paths = new ArrayList<>();
+			((List<?>)files).forEach(file -> paths.add(((File)file).toPath()));
+			return(paths);
+		    })));
+		}
+		return(new Contents(ret));
+	    }));
 	}
     }
 
