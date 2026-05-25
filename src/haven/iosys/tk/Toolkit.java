@@ -154,7 +154,13 @@ public interface Toolkit {
 	    if(instance == null) {
 		synchronized(Found.class) {
 		    if(instance == null) {
-			if(toolkit.get() != null) {
+			if(Utils.eq(toolkit.get(), "help")) {
+			    List<Map.Entry<String, Factory>> toolkits = new ArrayList<>(toolkits().entrySet());
+			    Collections.sort(toolkits, Comparator.comparing(Map.Entry<String, Factory>::getValue, Comparator.comparing(Factory::priority)).reversed());
+			    for(Map.Entry<String, Factory> ent : toolkits)
+				System.out.printf("name: %-19s priority: %5d%s\n", ent.getKey(), ent.getValue().priority(), ent.getValue().autouse() ? "" : " (manual only)");
+			    System.exit(0);
+			} else if(toolkit.get() != null) {
 			    Factory f = toolkits().get(toolkit.get());
 			    if(f == null)
 				throw(new Unavailable("no such toolkit: " + toolkit.get()));

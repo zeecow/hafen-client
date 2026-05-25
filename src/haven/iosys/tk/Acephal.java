@@ -106,7 +106,13 @@ public interface Acephal {
 	    if(instance == null) {
 		synchronized(Found.class) {
 		    if(instance == null) {
-			if(deftype.get() != null) {
+			if(Utils.eq(deftype.get(), "help")) {
+			    List<Map.Entry<String, Factory>> types = new ArrayList<>(found().entrySet());
+			    Collections.sort(types, Comparator.comparing(Map.Entry<String, Factory>::getValue, Comparator.comparing(Factory::priority)).reversed());
+			    for(Map.Entry<String, Factory> ent : types)
+				System.out.printf("name: %-19s priority: %5d\n", ent.getKey(), ent.getValue().priority());
+			    System.exit(0);
+			} else if(deftype.get() != null) {
 			    Factory f = types().get(deftype.get());
 			    if(f == null)
 				throw(new Unavailable("no such headless name: " + deftype.get()));
