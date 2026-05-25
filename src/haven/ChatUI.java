@@ -1563,6 +1563,8 @@ public class ChatUI extends Widget {
 	    qgrab.remove();
 	}
 	
+	public UI ui() {return(ui);}
+
 	public void done(ReadLine buf) {
 	    if(!buf.empty())
 		chan.send(buf.line());
