@@ -169,10 +169,6 @@ public class Promise<T> {
 	return(then(res, null));
     }
 
-    public <N> Promise<N> then(Consumer<? super T> res) {
-	return(then(val -> {res.accept(val); return(null);}));
-    }
-
     /*
     private <V> void rejecting(Function<V, ? extends T> raw, V val) {
 	try {
