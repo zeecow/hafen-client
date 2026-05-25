@@ -31,6 +31,7 @@ import java.io.*;
 import java.nio.file.*;
 import haven.render.*;
 import haven.iosys.tk.*;
+import haven.iosys.audio.*;
 import java.awt.image.BufferedImage;
 
 public class Streamer implements Console.Directory {
@@ -113,6 +114,10 @@ public class Streamer implements Console.Directory {
 	    UI ui = super.newui(fun);
 	    ui.cons.add(Streamer.this);
 	    return(ui);
+	}
+
+	protected AudioSystem.SinkLine audiosink() {
+	    return(DummyAudio.DummySink.instance);
 	}
 
 	protected void drawcursor(UI ui, GOut g) {
