@@ -35,8 +35,7 @@ import haven.render.*;
 import haven.render.Pipe;
 
 public class StreamOut {
-    public static final Config.Variable<Path> path = Config.Variable.propp("haven.streamout", "");
-    public static final Config.Variable<Double> rate = Config.Variable.propf("haven.streamrate", null);
+    public static final Config.Variable<Double> rate = Config.Variable.propf("haven.streamrate", 30.0);
     public final NutPipe out;
     public final Coord sz;
     private final Queue<ByteBuffer> free = new LinkedList<>();
@@ -46,7 +45,7 @@ public class StreamOut {
 
     public StreamOut(Coord sz, WritableByteChannel out) throws IOException {
 	this.sz = sz;
-	this.out = new NutPipe(out, sz, 30, 44100, 2);
+	this.out = new NutPipe(out, sz, rate.get().intValue(), Audio.SAMPLE_RATE, 2);
     }
 
     public StreamOut(Coord sz, Path out) throws IOException {
@@ -65,35 +64,6 @@ public class StreamOut {
 	} catch(IOException e) {
 	    running = false;
 	    throw(new RuntimeException(e));
-	}
-    }
-
-    private void uoutput() {
-	double last = Utils.rtime();
-	main: while(running) {
-	    ByteBuffer data;
-	    synchronized(this) {
-		while(obuf == null) {
-		    try {
-			double now = Utils.rtime();
-			if(now - last > 5) {
-			    ot = null;
-			    return;
-			}
-			this.wait((int)(1000 * (last + 5 - now)));
-		    } catch(InterruptedException e) {
-			continue main;
-		    }
-		}
-		data = obuf;
-		obuf = null;
-	    }
-	    writeframe(data);
-	    synchronized(this) {
-		data.clear();
-		free.add(data);
-	    }
-	    last = Utils.rtime();
 	}
     }
 
@@ -135,10 +105,7 @@ public class StreamOut {
 
     private void output() {
 	try {
-	    if(rate.get() != null)
-		routput(rate.get());
-	    else
-		uoutput();
+	    routput(rate.get());
 	    try {
 		out.close();
 	    } catch(IOException e) {
@@ -206,6 +173,7 @@ public class StreamOut {
 	private static long NI = 0x4e4911405bf2f9dbl;
 	private static long NK = 0x4e4be4adeeca4569l;
 	public final Coord vdim;
+	/* XXX: Rates should not be limited to ints. */
 	public final int vrate, arate, achan;
 	private final FrameCode[] fcs = new FrameCode[256];
 	private final StreamInfo[] streams = new StreamInfo[2];
