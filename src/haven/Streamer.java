@@ -44,7 +44,6 @@ public class Streamer implements Console.Directory {
 
     public Streamer() {
 	env = Acephal.instance().env();
-	Debug.dump(Acephal.instance());
 	try {
 	    output = new StreamOut(size, outpath);
 	} catch(IOException e) {
