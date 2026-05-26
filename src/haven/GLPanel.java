@@ -358,7 +358,6 @@ public interface GLPanel extends UIPanel, UI.Context {
 		    synchronized(ui) {
 			CPUProfile.phase(curf, "dsp");
 			ed.dispatch(ui);
-			ui.mousehover(ui.mc);
 
 			CPUProfile.phase(curf, "stick");
 			if(ui.sess != null) {
@@ -368,6 +367,7 @@ public interface GLPanel extends UIPanel, UI.Context {
 			CPUProfile.phase(curf, "tick");
 			ui.tick();
 			ui.gtick(buf);
+			ui.mousehover(ui.mc);
 			Area shape = p.shape();
 			if((ui.root.sz.x != (shape.br.x - shape.ul.x)) || (ui.root.sz.y != (shape.br.y - shape.ul.y)))
 			    ui.root.resize(new Coord(shape.br.x - shape.ul.x, shape.br.y - shape.ul.y));
