@@ -1217,6 +1217,16 @@ public class ZeeConfig {
             if (ZeeConfig.autoToggleGridLines)
                 ZeeConfig.gameUI.map.showgrid(true);
         }
+        // Milestone labels
+        else if (windowTitle.contentEquals("Milestone") && ZeeConfig.getButtonNamed(window,"Follow") != null) {
+            for (Widget child : window.children()) {
+                if (child instanceof Label){
+                    Label roadName = (Label) child;
+                    ZeeConfig.addGobText(lastMapViewClickGob, roadName.texts);
+                    break;
+                }
+            }
+        }
 
         if (gameUI!=null && !gameUI.sz.equals(0,0)){
             windowApplySavedPosition(window, windowTitle);
