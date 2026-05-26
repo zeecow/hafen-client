@@ -384,6 +384,11 @@ public class MiniMap extends Widget {
 	    }
 	}
 	icons = findicons(icons);
+	if(tvisible()) {
+	    Location loc = this.curloc;
+	    if(loc != null)
+		redisplay(loc);
+	}
     }
 
     public void center(Locator loc) {
@@ -859,10 +864,8 @@ public class MiniMap extends Widget {
     }
 
     public void draw(GOut g) {
-	Location loc = this.curloc;
-	if(loc == null)
+	if(dloc == null)
 	    return;
-	redisplay(loc);
 	remparty();
 	drawparts(g);
     }
