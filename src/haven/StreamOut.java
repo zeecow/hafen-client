@@ -561,6 +561,7 @@ public class StreamOut {
 		    data[o++] = (byte)(pc >>> 8);
 		}
 	    }
+	    frame(1, true, pts, data);
 	}
     }
 
