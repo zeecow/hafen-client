@@ -39,15 +39,46 @@ public class Streamer implements Console.Directory {
     private static Path outpath;
     private final Environment env;
     private final StreamOut output;
+    private final AudioPipe audio = new AudioPipe();
     private Thread mt;
     private UILoop loop;
 
     public Streamer() {
 	env = Acephal.instance().env();
 	try {
-	    output = new StreamOut(size, outpath);
+	    output = new StreamOut(size, audio, outpath);
 	} catch(IOException e) {
 	    throw(new RuntimeException(e));
+	}
+    }
+
+    public static class AudioPipe implements Audio.CS, AudioSystem.SinkLine {
+	public PipePlayer current = null;
+
+	public class PipePlayer implements AudioSystem.Player {
+	    private final Audio.CS stream;
+
+	    private PipePlayer(Audio.CS stream) {
+		this.stream = stream;
+	    }
+
+	    public void stop(boolean async) {
+		current = null;
+	    }
+	}
+
+	public AudioSystem.Player open(Audio.CS stream) {
+	    return(current = new PipePlayer(stream));
+	}
+
+	public AudioSystem.Player open(Audio.CS stream, int bufsize) {
+	    return(open(stream));
+	}
+
+	public int get(double[][] buf, int len) {
+	    if(current == null)
+		return(len);
+	    return(current.stream.get(buf, len));
 	}
     }
 
@@ -116,7 +147,7 @@ public class Streamer implements Console.Directory {
 	}
 
 	protected AudioSystem.SinkLine audiosink() {
-	    return(DummyAudio.DummySink.instance);
+	    return(audio);
 	}
 
 	protected void drawcursor(UI ui, GOut g) {

@@ -38,33 +38,49 @@ public class StreamOut {
     public static final Config.Variable<Double> rate = Config.Variable.propf("haven.streamrate", 30.0);
     public final NutPipe out;
     public final Coord sz;
+    public final Audio.CS audio;
     private final Queue<ByteBuffer> free = new LinkedList<>();
     private ByteBuffer obuf = null;
     private Thread ot = null;
     private boolean running = true;
 
-    public StreamOut(Coord sz, WritableByteChannel out) throws IOException {
+    public StreamOut(Coord sz, Audio.CS audio, WritableByteChannel out) throws IOException {
 	this.sz = sz;
+	this.audio = audio;
 	this.out = new NutPipe(out, sz, rate.get().intValue(), Audio.SAMPLE_RATE, 2);
     }
 
-    public StreamOut(Coord sz, Path out) throws IOException {
-	this(sz, Files.newByteChannel(out, StandardOpenOption.WRITE));
+    public StreamOut(Coord sz, Audio.CS audio, Path out) throws IOException {
+	this(sz, audio, Files.newByteChannel(out, StandardOpenOption.WRITE));
     }
 
-    private void writeframe(ByteBuffer data) {
-	try {
-	    byte[] buf = new byte[sz.x * sz.y * 3];
-	    for(int y = sz.y - 1, oy = 0; y >= 0; y--, oy++) {
-		data.limit((y + 1) * sz.x * 3).position(y * sz.x * 3);
-		data.get(buf, oy * sz.x * 3, sz.x * 3);
+    private double vabspos = 0;
+    private long aabspos = 0;
+    private void writeaudio(double vadv) throws IOException {
+	vabspos += vadv;
+	long apos = Math.round(vabspos * Audio.SAMPLE_RATE);
+	int delta = (int)(apos - aabspos);
+	aabspos = apos;
+	while(delta > 0) {
+	    double[][] buf = new double[2][delta];
+	    int rv = audio.get(buf, delta);
+	    if(rv < 0) {
+		out.audioframe(buf, 0, delta);
+		break;
+	    } else if(rv > 0) {
+		out.audioframe(buf, 0, rv);
+		delta -= rv;
 	    }
-	    out.videoframe(buf);
-	    out.audioframe(new double[2][1470]);
-	} catch(IOException e) {
-	    running = false;
-	    throw(new RuntimeException(e));
 	}
+    }
+
+    private void writeframe(ByteBuffer data) throws IOException {
+	byte[] buf = new byte[sz.x * sz.y * 3];
+	for(int y = sz.y - 1, oy = 0; y >= 0; y--, oy++) {
+	    data.limit((y + 1) * sz.x * 3).position(y * sz.x * 3);
+	    data.get(buf, oy * sz.x * 3, sz.x * 3);
+	}
+	out.videoframe(buf);
     }
 
     private void routput(double rate) {
@@ -99,7 +115,13 @@ public class StreamOut {
 		    continue main;
 		}
 	    }
-	    writeframe(data);
+	    try {
+		writeframe(data);
+		writeaudio(dur);
+	    } catch(IOException e) {
+		running = false;
+		throw(new RuntimeException(e));
+	    }
 	}
     }
 
