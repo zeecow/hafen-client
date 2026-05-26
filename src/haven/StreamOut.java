@@ -550,13 +550,13 @@ public class StreamOut {
 	    frame(0, true, pts, pixels);
 	}
 
-	public void audioframe(long pts, double[][] samples) throws IOException {
+	public void audioframe(long pts, double[][] samples, int off, int len) throws IOException {
 	    if(samples.length != achan)
 		throw(new IllegalArgumentException());
-	    byte[] data = new byte[samples[0].length * achan * 2];
-	    for(int i = 0, o = 0; i < samples[0].length; i++) {
+	    byte[] data = new byte[len * achan * 2];
+	    for(int i = 0, o = 0; i < len; i++) {
 		for(int c = 0; c < achan; c++) {
-		    int pc = (int)Math.round(Utils.clip(samples[c][i], -1.0, 1.0) * 32767);
+		    int pc = (int)Math.round(Utils.clip(samples[c][i + off], -1.0, 1.0) * 32767);
 		    data[o++] = (byte)(pc >>> 0);
 		    data[o++] = (byte)(pc >>> 8);
 		}
@@ -575,11 +575,11 @@ public class StreamOut {
 	    videoframe(vpts++, pixels);
 	}
 
-	public void audioframe(double[][] samples) throws IOException {
-	    if(samples[0].length > 4096)
+	public void audioframe(double[][] samples, int off, int len) throws IOException {
+	    if(len > 4096)
 		throw(new IOException("audio-frame splitting not yet supported"));
-	    audioframe(apts, samples);
-	    apts += samples[0].length;
+	    audioframe(apts, samples, off, len);
+	    apts += len;
 	}
     }
 }
