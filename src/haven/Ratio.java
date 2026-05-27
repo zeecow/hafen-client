@@ -119,6 +119,11 @@ public class Ratio extends Number implements Comparable<Ratio>{
 	return(compareTo(b.p, b.q));
     }
 
+    public boolean lt(Ratio b) {return(compareTo(b) <  0);}
+    public boolean le(Ratio b) {return(compareTo(b) <= 0);}
+    public boolean gt(Ratio b) {return(compareTo(b) >  0);}
+    public boolean ge(Ratio b) {return(compareTo(b) >= 0);}
+
     public Ratio inv() {
 	return(of(-p, q));
     }
