@@ -26,20 +26,23 @@
 
 package haven;
 
-import haven.Widget.Event;
+import java.util.*;
+import java.util.function.*;
+import java.util.concurrent.*;
 import haven.Widget.*;
-import haven.render.Environment;
-import haven.render.Render;
-
-import java.awt.*;
-import java.awt.event.InputEvent;
+import java.awt.Font;
+import java.awt.GraphicsEnvironment;
+import java.awt.GraphicsDevice;
+import java.awt.DisplayMode;
+import java.awt.Color;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
+import java.awt.event.InputEvent;
+import java.awt.image.BufferedImage;
 import java.io.Serializable;
-import java.util.List;
-import java.util.*;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.function.Predicate;
+import static haven.Utils.el;
+import haven.render.Environment;
+import haven.render.Render;
 
 public class UI {
     public static int MOD_SHIFT = KeyMatch.S, MOD_CTRL = KeyMatch.C, MOD_META = KeyMatch.M, MOD_SUPER = KeyMatch.SUPER, MOD_CTRL_SHIFT = 3;
@@ -110,12 +113,6 @@ public class UI {
 
     private class WidgetConsole extends Console {
 	{
-	    setcmd("q", new Command() {
-		    public void run(Console cons, String[] args) {
-			ZeeSess.charSwitchCancelAutologin("cmd q");
-			HackThread.tg().interrupt();
-		    }
-		});
 	    setcmd("lo", new Command() {
 		    public void run(Console cons, String[] args) {
 			sess.close();
