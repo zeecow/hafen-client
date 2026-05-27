@@ -201,6 +201,13 @@ public class Ratio extends Number implements Comparable<Ratio>{
     public int intValue() {return((int)longValue());}
     public float floatValue() {return((float)doubleValue());}
 
+    public static Ratio parse(String s) {
+	int p = s.indexOf('/');
+	if(p < 0)
+	    return(of(Long.parseLong(s)));
+	return(of(Long.parseLong(s.substring(0, p)), Long.parseLong(s.substring(p + 1))));
+    }
+
     public String toString() {
 	return(p + "/" + q);
     }
