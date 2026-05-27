@@ -69,6 +69,10 @@ public class Ratio extends Number implements Comparable<Ratio>{
 	    return(of(m, 1l << -e));
     }
 
+    private static long M(long a, long b) {return(Math.multiplyExact(a, b));}
+    private static long A(long a, long b) {return(Math.addExact(a, b));}
+    private static long S(long a, long b) {return(Math.subtractExact(a, b));}
+
     private byte simplep = 0;
     public boolean simplep() {
 	if(simplep == 0)
@@ -107,13 +111,13 @@ public class Ratio extends Number implements Comparable<Ratio>{
 	    return(longcmp(p, P));
 	if(q > Q) {
 	    if((q % Q) == 0)
-		return(longcmp(p, (P * (q / Q))));
+		return(longcmp(p, M(P, (q / Q))));
 	} else {
 	    if((Q % q) == 0)
-		return(longcmp((p * (Q / q)), P));
+		return(longcmp(M(p, (Q / q)), P));
 	}
 	long m = lcm(q, Q);
-	return(longcmp(p * (m / q), P * (m / Q)));
+	return(longcmp(M(p, (m / q)), M(P, (m / Q))));
     }
     public int compareTo(Ratio b) {
 	return(compareTo(b.p, b.q));
@@ -136,19 +140,19 @@ public class Ratio extends Number implements Comparable<Ratio>{
     }
 
     public Ratio add(long n) {
-	return(of(p + (n * q), q));
+	return(of(A(p, M(n, q)), q));
     }
     public Ratio add(long P, long Q) {
 	if(q == Q)
-	    return(of(p + P, q));
+	    return(of(A(p, P), q));
 	long d = lcm(q, Q);
-	return(of((p * (d / q)) + (P * (d / Q)), d));
+	return(of(A(M(p, (d / q)), M(P, (d / Q))), d));
     }
     public Ratio add(Ratio b) {
 	return(add(b.p, b.q));
     }
     public Ratio sub(long n) {
-	return(of(p - (n * q), q));
+	return(of(S(p, M(n, q)), q));
     }
     public Ratio sub(long P, long Q) {
 	return(add(-P, Q));
@@ -159,7 +163,7 @@ public class Ratio extends Number implements Comparable<Ratio>{
 
     public Ratio mul(long P, long Q) {
 	long d = gcd(p, Q), D = gcd(P, q);
-	return(of((p / d) * (P / D), (q / D) * (Q / d)));
+	return(of(M((p / d), (P / D)), M((q / D), (Q / d))));
     }
     public Ratio mul(Ratio b) {
 	return(mul(b.p, b.q));
@@ -190,10 +194,10 @@ public class Ratio extends Number implements Comparable<Ratio>{
 	return(Utils.floordiv(p, q));
     }
     public long round() {
-	return(of(p + (q / 2), q).floor());
+	return(of(A(p, (q / 2)), q).floor());
     }
     public long ceil() {
-	return(of(p + (q - 1), q).floor());
+	return(of(A(p, (q - 1)), q).floor());
     }
 
     public long longValue() {
