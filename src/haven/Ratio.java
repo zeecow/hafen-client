@@ -152,13 +152,6 @@ public class Ratio extends Number implements Comparable<Ratio>{
 	return(sub(b.p, b.q));
     }
 
-    public Ratio mul(long f) {
-	return(of(p * f, q));
-    }
-    public Ratio div(long f) {
-	return(of(p, q * f));
-    }
-
     public Ratio mul(long P, long Q) {
 	long d = gcd(p, Q), D = gcd(P, q);
 	return(of((p / d) * (P / D), (q / D) * (Q / d)));
@@ -177,6 +170,12 @@ public class Ratio extends Number implements Comparable<Ratio>{
     }
     public Ratio mod(long P, long Q) {
 	return(mod(of(P, Q)));
+    }
+    public Ratio mul(long f) {
+	return(mul(f, 1));
+    }
+    public Ratio div(long f) {
+	return(div(f, 1));
     }
 
     public long trunc() {
