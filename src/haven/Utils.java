@@ -1474,6 +1474,20 @@ public class Utils {
     public static <E extends Comparable<? super E>> E max(Collection<E> from) {return(max(from, Function.identity()));}
     public static <E extends Comparable<? super E>> E min(Collection<E> from) {return(min(from, Function.identity()));}
 
+    public static long gcd(long a, long b) {
+	a = Math.abs(a); b = Math.abs(b);
+	while(b != 0) {
+	    long t = b;
+	    b = a % b;
+	    a = t;
+	}
+	return(a);
+    }
+
+    public static long lcm(long a, long b) {
+	return(Math.abs(a * b) / gcd(a, b));
+    }
+
     public static float gcd(float x, float y, float E) {
 	float a = Math.max(x, y), b = Math.min(x, y);
 	while(b > E) {
