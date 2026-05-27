@@ -1385,7 +1385,7 @@ public class GLXContext implements Toolkit.Factory {
 		else if(id instanceof String)
 		    name = xrun(() -> xlib.XInternAtom(dpy, (String)id, false));
 		else
-		    return(null);
+		    return(Clipboard.nil);
 		synchronized(clipboards) {
 		    return(clipboards.computeIfAbsent(name, GLXClipboard::new));
 		}

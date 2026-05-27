@@ -52,7 +52,8 @@ public interface Windeye {
     public Environment env();
     public void swapbuffers(Render g, Object mode);
 
-    public default Clipboard clipboard(Object id) {return(null);}
+    public default Clipboard clipboard(Object id) {return(Clipboard.nil);}
+    public default Windeye drophandler(DropHandler h) {return(this);}
 
     public default void stats(Collection<String> buf) {}
 

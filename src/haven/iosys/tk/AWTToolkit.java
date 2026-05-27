@@ -546,7 +546,7 @@ public abstract class AWTToolkit implements Toolkit {
 		java.awt.datatransfer.Clipboard c = java.awt.Toolkit.getDefaultToolkit().getSystemClipboard();
 		return((c != null) ? new AWTClipboard(c) : null);
 	    }
-	    return(null);
+	    return(Clipboard.nil);
 	}
 
 	public void dispose() {

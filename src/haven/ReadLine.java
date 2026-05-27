@@ -201,10 +201,8 @@ public interface ReadLine {
 	}
 
 	public void clipset(Clipboard c) {
-	    if(c != null) {
-		String text = line(Math.min(mark, point), Math.abs(point - mark));
-		c.put(new Clipboard.Contents(Arrays.asList(new Clipboard.Item<CharSequence>(Clipboard.Format.TEXT, text))));
-	    }
+	    String text = line(Math.min(mark, point), Math.abs(point - mark));
+	    c.put(new Clipboard.Contents(Arrays.asList(new Clipboard.Item<CharSequence>(Clipboard.Format.TEXT, text))));
 	}
 
 	public static Promise<CharSequence> cliptext(Clipboard c) {
@@ -217,11 +215,11 @@ public interface ReadLine {
 	}
 
 	public Promise<CharSequence> cliptext() {
-	    return(cliptext(Utils.ifnull(owner.ui().wnd.clipboard(Clipboard.Std.PRIMARY), Clipboard.empty))
+	    return(cliptext(owner.ui().wnd.clipboard(Clipboard.Std.PRIMARY))
 		   .then(val -> {
 		       if(val != null)
 			   return(new Promise<CharSequence>().resolve(val));
-		       return(cliptext(Utils.ifnull(owner.ui().wnd.clipboard(Clipboard.Std.CLIPBOARD), Clipboard.empty)));
+		       return(cliptext(owner.ui().wnd.clipboard(Clipboard.Std.CLIPBOARD)));
 		   }));
 	}
 
@@ -391,8 +389,6 @@ public interface ReadLine {
 	}
 
 	private String cliptext(Clipboard c) {
-	    if(c == null)
-		return("");
 	    Clipboard.Item<CharSequence> item = c.fetch().find(Clipboard.Format.TEXT);
 	    if(item != null)
 		return(item.fetch().toString());

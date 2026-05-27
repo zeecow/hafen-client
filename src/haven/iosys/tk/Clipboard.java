@@ -101,7 +101,7 @@ public interface Clipboard {
 	PRIMARY, CLIPBOARD;
     }
 
-    public static final Clipboard empty = new Clipboard() {
+    public static final Clipboard nil = new Clipboard() {
 	private Runnable last = null;
 	public synchronized void put(Contents c, Runnable expire) {
 	    if(last != null)
