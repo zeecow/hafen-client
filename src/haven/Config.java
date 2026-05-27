@@ -155,6 +155,9 @@ public class Config {
 	public static Variable<Double> propf(String name, Double defval) {
 	    return(prop(name, Double::parseDouble, () -> defval));
 	}
+	public static Variable<Ratio> propr(String name, Ratio defval) {
+	    return(prop(name, Ratio::parse, () -> defval));
+	}
 	public static Variable<byte[]> propb(String name, byte[] defval) {
 	    return(prop(name, Utils.hex::dec, () -> defval));
 	}

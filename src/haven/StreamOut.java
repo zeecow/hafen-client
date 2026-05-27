@@ -35,7 +35,7 @@ import haven.render.*;
 import haven.render.Pipe;
 
 public class StreamOut {
-    public static final Config.Variable<Double> rate = Config.Variable.propf("haven.streamrate", 30.0);
+    public static final Config.Variable<Ratio> rate = Config.Variable.propr("haven.streamrate", Ratio.of(30));
     public final NutPipe out;
     public final Coord sz;
     public final Audio.CS audio;
@@ -47,18 +47,18 @@ public class StreamOut {
     public StreamOut(Coord sz, Audio.CS audio, WritableByteChannel out) throws IOException {
 	this.sz = sz;
 	this.audio = audio;
-	this.out = new NutPipe(out, sz, rate.get().intValue(), Audio.SAMPLE_RATE, 2);
+	this.out = new NutPipe(out, sz, rate.get(), Ratio.of(Audio.SAMPLE_RATE), 2);
     }
 
     public StreamOut(Coord sz, Audio.CS audio, Path out) throws IOException {
 	this(sz, audio, Files.newByteChannel(out, StandardOpenOption.WRITE));
     }
 
-    private double vabspos = 0;
+    private Ratio vabspos = Ratio.z;
     private long aabspos = 0;
-    private void writeaudio(double vadv) throws IOException {
-	vabspos += vadv;
-	long apos = Math.round(vabspos * Audio.SAMPLE_RATE);
+    private void writeaudio(Ratio vadv) throws IOException {
+	vabspos = vabspos.add(vadv);
+	long apos = vabspos.mul(Audio.SAMPLE_RATE).floor();
 	int delta = (int)(apos - aabspos);
 	aabspos = apos;
 	while(delta > 0) {
@@ -83,9 +83,9 @@ public class StreamOut {
 	out.videoframe(buf);
     }
 
-    private void routput(double rate) {
-	double dur = 1.0 / rate;
-	double last = Utils.rtime();
+    private void routput(Ratio rate) {
+	Ratio dur = rate.rcp();
+	Ratio last = Ratio.rtime();
 	ByteBuffer data = null;
 	main: while(running) {
 	    synchronized(this) {
@@ -99,17 +99,17 @@ public class StreamOut {
 		}
 	    }
 	    while(true) {
-		double now = Utils.rtime();
-		if(now > last + 5) {
+		Ratio now = Ratio.rtime();
+		if(now.sub(last).ceil() > 5) {
 		    Warning.warn("streamout frame timing reset");
 		    last = now;
 		    break;
-		} else if(now > last + dur) {
-		    last += dur;
+		} else if(now.gt(last.add(dur))) {
+		    last = last.add(dur);
 		    break;
 		}
 		try {
-		    long nanos = (long)((last + dur - now) * 1e9);
+		    long nanos = last.add(dur).sub(now).mul(1000000000).ceil();
 		    Thread.sleep(nanos / 1000000, (int)(nanos % 1000000));
 		} catch(InterruptedException e) {
 		    continue main;
@@ -195,8 +195,8 @@ public class StreamOut {
 	private static long NI = 0x4e4911405bf2f9dbl;
 	private static long NK = 0x4e4be4adeeca4569l;
 	public final Coord vdim;
-	/* XXX: Rates should not be limited to ints. */
-	public final int vrate, arate, achan;
+	public final Ratio vrate, arate;
+	public final int achan;
 	private final FrameCode[] fcs = new FrameCode[256];
 	private final StreamInfo[] streams = new StreamInfo[2];
 	private final Encoder out;
@@ -377,7 +377,7 @@ public class StreamOut {
 	    }
 	}
 
-	public NutEncoder(WritableByteChannel fp, Coord vdim, int vrate, int arate, int achan) throws IOException {
+	public NutEncoder(WritableByteChannel fp, Coord vdim, Ratio vrate, Ratio arate, int achan) throws IOException {
 	    this.vdim = vdim;
 	    this.vrate = vrate;
 	    this.arate = arate;
@@ -386,8 +386,8 @@ public class StreamOut {
 	    for(int i = 0; i < 256; i++)
 		fcs[i] = new FrameCode(FrameCode.INVALID, 0, 1, 0, 0, 0, 0);
 	    fcs[1] = new FrameCode(FrameCode.CODED_FLAGS, 0, 1, 0, 0, 0, 0);
-	    streams[0] = new StreamInfo((vrate >= 1000) ? 14 : 7);
-	    streams[1] = new StreamInfo((arate >= 1000) ? 14 : 7);
+	    streams[0] = new StreamInfo((vrate.floor() >= 1000) ? 14 : 7);
+	    streams[1] = new StreamInfo((arate.floor() >= 1000) ? 14 : 7);
 	    headers();
 	}
 
@@ -401,8 +401,8 @@ public class StreamOut {
 	    buf.v(2);		// stream_count
 	    buf.v(MAX_DISTANCE);
 	    buf.v(2);		// time_base_count
-	    buf.v(1).v(vrate);
-	    buf.v(1).v(arate);
+	    buf.v(vrate.q).v(vrate.p);
+	    buf.v(arate.q).v(arate.p);
 
 	    int runpts = 0, runmul = 1, runsid = 0, runhdi = 0;
 	    long runmatch = 1 - (1l << 62);
@@ -463,7 +463,7 @@ public class StreamOut {
 	    buf.vb("RGB\u0018");	// fourcc
 	    buf.v(0);			// time_base_id
 	    buf.v(streams[sid].ptsshift);
-	    buf.v(vrate);		// max_pts_distance
+	    buf.v(vrate.floor());	// max_pts_distance
 	    buf.v(0);			// decode_delay
 	    buf.v(0);			// stream_flags
 	    buf.vb(new byte[0]);	// codec_specific_data
@@ -482,12 +482,12 @@ public class StreamOut {
 	    buf.vb("PSD\u0010");	// fourcc
 	    buf.v(1);			// time_base_id
 	    buf.v(streams[sid].ptsshift);
-	    buf.v(arate);		// max_pts_distance
+	    buf.v(arate.floor()); 	// max_pts_distance
 	    buf.v(0);			// decode_delay
 	    buf.v(0);			// stream_flags
 	    buf.vb(new byte[0]);	// codec_specific_data
 
-	    buf.v(arate).v(1);
+	    buf.v(arate.p).v(arate.q);
 	    buf.v(achan);		// channel_count
 
 	    out.packet(NS, buf.close());
@@ -590,7 +590,7 @@ public class StreamOut {
     public static class NutPipe extends NutEncoder {
 	public long vpts = 0, apts = 0;
 
-	public NutPipe(WritableByteChannel fp, Coord vdim, int vrate, int arate, int achan) throws IOException {
+	public NutPipe(WritableByteChannel fp, Coord vdim, Ratio vrate, Ratio arate, int achan) throws IOException {
 	    super(fp, vdim, vrate, arate, achan);
 	}
 
