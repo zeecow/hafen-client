@@ -50,6 +50,24 @@ public class Ratio extends Number implements Comparable<Ratio>{
     public static Ratio of(long n) {
 	return(of(n, 1));
     }
+    public static Ratio of(double v) {
+	long b = Double.doubleToLongBits(v);
+	long m = (b & 0x000fffffffffffffl) | 0x0010000000000000l;
+	long e = (b >>> 52) & 0x7ff;
+	boolean s = (b >>> 63) != 0;
+	if(e == 0) {
+	    return(z);
+	} else if(e == 2047) {
+	    return(null);
+	}
+	e = e - 1023 - 52;
+	int z = Long.numberOfTrailingZeros(m);
+	m >>>= z; e += z;
+	if(e >= 0)
+	    return(of(m << e, 1));
+	else
+	    return(of(m, 1l << -e));
+    }
 
     private byte simplep = 0;
     public boolean simplep() {
