@@ -201,6 +201,11 @@ public class Ratio extends Number implements Comparable<Ratio>{
     public int intValue() {return((int)longValue());}
     public float floatValue() {return((float)doubleValue());}
 
+    private static final long rtimeoff = System.nanoTime();
+    public static Ratio rtime() {
+	return(of(System.nanoTime() - rtimeoff, 1000000000));
+    }
+
     public static Ratio parse(String s) {
 	int p = s.indexOf('/');
 	if(p < 0)
