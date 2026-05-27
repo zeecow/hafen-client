@@ -2095,6 +2095,54 @@ public class Utils {
 	return((System.nanoTime() - rtimeoff) / 1e9);
     }
 
+    public static interface CheckedSupplier<T> {
+	public T get() throws Exception;
+    }
+
+    public static <T> Supplier<T> uncheck(CheckedSupplier<T> ch) {
+	return(() -> {
+	    try {
+		return(ch.get());
+	    } catch(Exception t) {
+		if(t instanceof RuntimeException)
+		    throw((RuntimeException)t);
+		throw(new RuntimeException(t));
+	    }
+	});
+    }
+
+    public static interface CheckedConsumer<T> {
+	public void accept(T val) throws Exception;
+    }
+
+    public static <T> Consumer<T> uncheck(CheckedConsumer<T> ch) {
+	return(val -> {
+	    try {
+		ch.accept(val);
+	    } catch(Exception t) {
+		if(t instanceof RuntimeException)
+		    throw((RuntimeException)t);
+		throw(new RuntimeException(t));
+	    }
+	});
+    }
+
+    public static interface CheckedFunction<P, R> {
+	public R apply(P par) throws Exception;
+    }
+
+    public static <P, R> Function<P, R> uncheck(CheckedFunction<P, R> ch) {
+	return(par -> {
+	    try {
+		return(ch.apply(par));
+	    } catch(Exception t) {
+		if(t instanceof RuntimeException)
+		    throw((RuntimeException)t);
+		throw(new RuntimeException(t));
+	    }
+	});
+    }
+
     public static class MapBuilder<K, V> {
 	private final Map<K, V> bk;
 
