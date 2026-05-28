@@ -204,6 +204,7 @@ public class Promise<T> {
     */
 
     public static <V, N> Function<V, Promise<N>> mapper(Function<? super V, ? extends N> raw) {
+	if(raw == null) return(null);
 	return(val -> new Promise<N>().resolve(raw.apply(val)));
     }
 
