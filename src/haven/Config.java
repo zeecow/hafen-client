@@ -38,6 +38,7 @@ public class Config {
     public static final Properties jarprops = getjarprops();
     public static final String confid = jarprops.getProperty("config.client-id", "unknown");
     public static final Variable<Boolean> par = Variable.def(() -> true);
+    public static final Config.Variable<Boolean> exp = Config.Variable.propb("haven.experimental", false);
     public final Properties localprops = getlocalprops();
 
     private static Config global = null;
