@@ -35,12 +35,17 @@ import java.awt.image.BufferedImage;
 
 public interface Toolkit {
     public static final Config.Variable<String> toolkit = Config.Variable.prop("haven.toolkit", null);
+
     public Cursor.Caps cursorcaps();
     public Cursor makecursor(BufferedImage img, Coord hotspot);
     public Windeye window();
+
     public void dispose();
     public String description();
 
+    public default FilePicker.Factory picker() {
+	throw(new Unavailable("No file picker available on this platform."));
+    }
     public default void browse(java.net.URI location) throws IOException {
 	throw(new IOException("No web browser available."));
     }
