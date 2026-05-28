@@ -1066,6 +1066,8 @@ public class ZeeConfig {
         if (windowTitle.contentEquals("Stack"))
             return;
 
+        // adjusted cap for window position (Makewindow has multiple caps)
+        String originalTitle = windowTitle;
         windowTitle = getWindowNameAdjusted(window,windowTitle);
 
         // notify waitWindowOpen
@@ -1118,17 +1120,18 @@ public class ZeeConfig {
                 wdg.settip("crafting recorder");
             }
 
+
             // cheese tray
-            if (windowTitle.contentEquals("Cheese Tray")) {
+            if (originalTitle.contentEquals("Cheese Tray")) {
                 ZeeManagerItems.cheeseTrayMakeWindow(window);
             }
             // cloths
-            else if (List.of("Linen Cloth", "Hemp Cloth").contains(windowTitle)) {
+            else if (List.of("Linen Cloth", "Hemp Cloth").contains(originalTitle)) {
                 if (!ZeeManagerCraft.clothRecipeOpen)
                     ZeeManagerCraft.clothRecipeOpened(window);
             }
             // rope
-            else if (windowTitle.contentEquals("Rope")) {
+            else if (originalTitle.contentEquals("Rope")) {
                 if (!ZeeManagerCraft.ropeRecipeOpen)
                     ZeeManagerCraft.ropeRecipeOpened(window);
             } else {
