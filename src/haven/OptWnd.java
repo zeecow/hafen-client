@@ -461,7 +461,7 @@ public class OptWnd extends Window {
 		final double smin = 1, smax = Math.floor(UI.maxscale() / gran) * gran;
 		final int steps = (int)Math.round((smax - smin) / gran);
 		addhlp(prev.pos("bl").adds(0, 2), UI.scale(5),
-		       prev = new HSlider(UI.scale(160), 0, steps, (int)Math.round(steps * (Utils.getprefd("uiscale", 1.0) - smin) / (smax - smin))) {
+		       prev = new HSlider(UI.scale(160), 0, steps, (int)Math.round(steps * (UI.scale(1.0) - smin) / (smax - smin))) {
 			       protected void added() {
 				   dpy();
 			       }

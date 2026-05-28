@@ -986,10 +986,12 @@ public class UI {
     }
 
     private static double maxscale = -1;
+    private static double defscale;
     private static void initscale() {
 	synchronized(UI.class) {
 	    if(maxscale < 0) {
 		double fscale = 1.25;
+		double sscale = 1.00;
 		try {
 		    /* XXX: This ain't right, but arguably so isn't
 		     * scaling being static to begin with...? */
@@ -998,14 +1000,20 @@ public class UI {
 			Coord res = dev.resolution();
 			double scale = Math.min(res.x / 800.0, res.y / 600.0);
 			fscale = Math.max(fscale, scale);
+			sscale = Math.max(sscale, Math.rint(dev.density() / 5.0) * 0.05);
 		    }
 		} catch(Exception exc) {
 		    new Warning(exc, "could not determine maximum scaling factor").issue();
 		}
 		maxscale = fscale;
+		defscale = Math.min(sscale, fscale);
 	    }
-	    return(maxscale);
 	}
+    }
+
+    public static double maxscale() {
+	initscale();
+	return(maxscale);
     }
 
     public static final Config.Variable<Double> uiscale = Config.Variable.propf("haven.uiscale", null);
@@ -1013,7 +1021,7 @@ public class UI {
 	if(uiscale.get() != null)
 	    return(uiscale.get());
 	initscale();
-	double scale = Utils.getprefd("uiscale", 1.0);
+	double scale = Utils.getprefd("uiscale", defscale);
 	scale = Math.max(Math.min(scale, maxscale), 1.0);
 	return(scale);
     }
