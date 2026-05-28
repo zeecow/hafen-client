@@ -35,13 +35,14 @@ import haven.*;
 import haven.iosys.*;
 import haven.render.*;
 import haven.render.gl.*;
+import java.awt.datatransfer.*;
+import java.awt.dnd.*;
 import java.awt.AWTEvent;
 import java.awt.Component;
 import java.awt.Desktop;
 import java.awt.EventQueue;
 import java.awt.HeadlessException;
 import java.awt.image.BufferedImage;
-import java.awt.datatransfer.*;
 import static java.awt.event.KeyEvent.*;
 
 public abstract class AWTToolkit implements Toolkit {
@@ -222,6 +223,12 @@ public abstract class AWTToolkit implements Toolkit {
 	    this.bk = bk;
 	}
 
+	private static Collection<Path> fl2pc(List files) {
+	    Collection<Path> paths = new ArrayList<>();
+	    ((List<?>)files).forEach(file -> paths.add(((File)file).toPath()));
+	    return(paths);
+	}
+
 	public void put(Contents c, Runnable expire) {
 	    try {
 		bk.setContents(new Transferable() {
@@ -236,7 +243,7 @@ public abstract class AWTToolkit implements Toolkit {
 			    if(item != null)
 				return(item.fetch());
 			}
-			if(flavor.equals(DataFlavor.imageFlavor)) {
+			if(flavor.equals(DataFlavor.javaFileListFlavor)) {
 			    Item<Collection<Path>> item = c.find(Clipboard.Format.PATHS);
 			    if(item != null) {
 				List<File> ret = new ArrayList<>();
@@ -299,14 +306,42 @@ public abstract class AWTToolkit implements Toolkit {
 		if(xf.isDataFlavorSupported(DataFlavor.imageFlavor))
 		    ret.add(new Item<BufferedImage>(Format.IMAGE, () -> xfpromise(BufferedImage.class, xf, DataFlavor.imageFlavor)));
 		if(xf.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
-		    ret.add(new Item<Collection<Path>>(Format.PATHS, () -> xfpromise(List.class, xf, DataFlavor.javaFileListFlavor).map(files -> {
-			Collection<Path> paths = new ArrayList<>();
-			((List<?>)files).forEach(file -> paths.add(((File)file).toPath()));
-			return(paths);
-		    })));
+		    ret.add(new Item<Collection<Path>>(Format.PATHS, () -> xfpromise(List.class, xf, DataFlavor.javaFileListFlavor).map(AWTClipboard::fl2pc)));
 		}
 		return(new Contents(ret));
 	    }));
+	}
+
+	public static  abstract class AWTDropEvent {
+	    public static final BMap<DropHandler.Action, Integer> actmap =
+		new HashBMap<>(Utils.<DropHandler.Action, Integer>map()
+			       .put(DropHandler.Action.COPY, DnDConstants.ACTION_COPY)
+			       .put(DropHandler.Action.MOVE, DnDConstants.ACTION_MOVE)
+			       .put(DropHandler.Action.LINK, DnDConstants.ACTION_LINK)
+			       .map());
+	    public abstract Coord wndc();
+	    protected abstract boolean supported(DataFlavor flavor);
+	    protected abstract int awtactions();
+	    protected abstract <T> Promise<T> xfpromise(Class<T> typ, DataFlavor flavor);
+
+	    public Set<DropHandler.Action> actions() {
+		Set<DropHandler.Action> ret = EnumSet.noneOf(DropHandler.Action.class);
+		int a = awtactions();
+		for(Map.Entry<DropHandler.Action, Integer> ent : actmap.entrySet())
+		    if((a & ent.getValue()) != 0) ret.add(ent.getKey());
+		return(ret);
+	    }
+
+	    protected Clipboard.Contents mkcontents() {
+		Collection<Clipboard.Item<?>> ret = new ArrayList<>();
+		if(supported(DataFlavor.stringFlavor))
+		    ret.add(new Clipboard.Item<CharSequence>(Clipboard.Format.TEXT, () -> xfpromise(CharSequence.class, DataFlavor.stringFlavor)));
+		if(supported(DataFlavor.imageFlavor))
+		    ret.add(new Clipboard.Item<BufferedImage>(Clipboard.Format.IMAGE, () -> xfpromise(BufferedImage.class, DataFlavor.imageFlavor)));
+		if(supported(DataFlavor.javaFileListFlavor))
+		    ret.add(new Clipboard.Item<Collection<Path>>(Clipboard.Format.PATHS, () -> xfpromise(List.class, DataFlavor.javaFileListFlavor).map(AWTClipboard::fl2pc)));
+		return(new Clipboard.Contents(ret));
+	    }
 	}
     }
 
@@ -314,6 +349,7 @@ public abstract class AWTToolkit implements Toolkit {
 	public final java.awt.Frame frame;
 	private final Collection<EventListener> callbacks = new java.util.concurrent.CopyOnWriteArrayList<>();
 	private boolean focused;
+	private DropHandler drop = null;
 
 	public AWTWindow() {
 	    frame = new java.awt.Frame();
@@ -355,7 +391,7 @@ public abstract class AWTToolkit implements Toolkit {
 	    return(this);
 	}
 
-	class EventQueue implements WindowListener, KeyListener, MouseListener, MouseWheelListener, MouseMotionListener {
+	class EventQueue implements WindowListener, KeyListener, MouseListener, MouseWheelListener, MouseMotionListener, DropTargetListener {
 	    private final List<InputEvent> events = new ArrayList<>();
 	    private java.awt.event.MouseEvent mousemv;
 
@@ -402,12 +438,84 @@ public abstract class AWTToolkit implements Toolkit {
 		mousemv = e;
 	    }
 
+	    /* Xrad-and-drop events must be handled synchronously. */
+	    private void drophover(DropTargetDragEvent ev) {
+		if(drop == null) {
+		    ev.rejectDrag();
+		    return;
+		}
+		Coord c = Coord.of(ev.getLocation().x, ev.getLocation().y);
+		class Event extends AWTClipboard.AWTDropEvent implements DropHandler.DropHoverEvent {
+		    public Coord wndc() {return(c);}
+		    protected int awtactions() {return(ev.getSourceActions());}
+		    protected boolean supported(DataFlavor flavor) {return(ev.isDataFlavorSupported(flavor));}
+		    public Clipboard.Contents contents() {return(mkcontents());}
+
+		    protected <T> Promise<T> xfpromise(Class<T> typ, DataFlavor flavor) {
+			throw(new IllegalStateException("Cannot transfer data before accepting drag."));
+		    }
+		}
+		Set<DropHandler.Action> act = drop.drophover(new Event());
+		if((act == null) || act.isEmpty()) {
+		    ev.rejectDrag();
+		} else {
+		    int awt = 0;
+		    for(Map.Entry<DropHandler.Action, Integer> ent : AWTClipboard.AWTDropEvent.actmap.entrySet())
+			if(act.contains(ent.getKey())) awt |= ent.getValue();
+		    ev.acceptDrag(awt);
+		}
+	    }
+
+	    private void dropped(DropTargetDropEvent ev) {
+		if(drop == null) {
+		    ev.rejectDrop();
+		    return;
+		}
+		Coord c = Coord.of(ev.getLocation().x, ev.getLocation().y);
+		class Event extends AWTClipboard.AWTDropEvent implements DropHandler.DroppedEvent {
+		    DropHandler.Action act = null;
+
+		    public Coord wndc() {return(c);}
+		    protected int awtactions() {return(ev.getSourceActions());}
+		    protected boolean supported(DataFlavor flavor) {return(ev.isDataFlavorSupported(flavor));}
+		    public Clipboard.Contents contents() {return(mkcontents());}
+
+		    protected <T> Promise<T> xfpromise(Class<T> typ, DataFlavor flavor) {
+			return(Promise.of(ev::getTransferable)
+			       .map(Utils.uncheck(xf -> {return(xf.getTransferData(flavor));}))
+			       .map(typ::cast));
+		    }
+
+		    public void accept(DropHandler.Action act) {
+			ev.acceptDrop(AWTClipboard.AWTDropEvent.actmap.get(act));
+			this.act = act;
+		    }
+		}
+		Event de = new Event();
+		boolean acc = drop.dropped(de);
+		if(acc) {
+		    ev.dropComplete(true);
+		} else {
+		    if(de.act != null)
+			ev.dropComplete(false);
+		    else
+			ev.rejectDrop();
+		}
+	    }
+
+	    public void dragEnter(DropTargetDragEvent ev) {drophover(ev);}
+	    public void dragOver(DropTargetDragEvent ev) {drophover(ev);}
+	    public void dropActionChanged(DropTargetDragEvent ev) {drophover(ev);}
+	    public void dragExit(DropTargetEvent ev) {}
+	    public void drop(DropTargetDropEvent ev) {dropped(ev);}
+
 	    void register() {
 		frame.addWindowListener(this);
 		panel().addKeyListener(this);
 		panel().addMouseListener(this);
 		panel().addMouseWheelListener(this);
 		panel().addMouseMotionListener(this);
+		new java.awt.dnd.DropTarget(panel(), this);
 	    }
 
 	    private java.awt.event.KeyEvent lastpress = null;
@@ -547,6 +655,11 @@ public abstract class AWTToolkit implements Toolkit {
 		return((c != null) ? new AWTClipboard(c) : null);
 	    }
 	    return(Clipboard.nil);
+	}
+
+	public AWTWindow drophandler(DropHandler drop) {
+	    this.drop = drop;
+	    return(this);
 	}
 
 	public void dispose() {
