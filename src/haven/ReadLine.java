@@ -202,7 +202,7 @@ public interface ReadLine {
 
 	public void clipset(Clipboard c) {
 	    String text = line(Math.min(mark, point), Math.abs(point - mark));
-	    c.put(new Clipboard.Contents(Arrays.asList(new Clipboard.Item<CharSequence>(Clipboard.Format.TEXT, text))));
+	    c.put(new Clipboard.Contents(new Clipboard.Item<CharSequence>(Clipboard.Format.TEXT, text)));
 	}
 
 	public static Promise<CharSequence> cliptext(Clipboard c) {

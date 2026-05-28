@@ -46,6 +46,9 @@ public interface Clipboard {
 	public Contents(Collection<Item<?>> items) {
 	    this.items = items;
 	}
+	public Contents(Item<?>... items) {
+	    this.items = Arrays.asList(items);
+	}
 
 	public Iterator<Item<?>> iterator() {
 	    return(items.iterator());
