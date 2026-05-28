@@ -431,7 +431,6 @@ public abstract class UILoop implements Console.Directory {
 		if(rprofc != null) rprofc.new Part("tick", out);
 		if(gprof  != null) gprof.part(out, "tick");
 		loop.dispatch(ui);
-		ui.mousehover(ui.mc);
 		CPUProfile.phase(prof, "stick");
 		if(ui.sess != null) {
 		    ui.sess.glob.ctick();
@@ -440,6 +439,7 @@ public abstract class UILoop implements Console.Directory {
 		CPUProfile.phase(prof, "utick");
 		ui.tick();
 		ui.gtick(out);
+		ui.mousehover(ui.mc);
 		Coord sz = loop.wnd.size();
 		if(!ui.root.sz.equals(sz))
 		    ui.root.resize(sz);

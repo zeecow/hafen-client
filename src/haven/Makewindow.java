@@ -266,7 +266,8 @@ public class Makewindow extends Widget {
 		g.usestate(rstate.get());
 	    spec.draw(g);
 	    g.defstate();
-	    g.aimage(num, Inventory.sqsz, 1.0, 1.0);
+	    if(num != null)
+		g.aimage(num, Inventory.sqsz, 1.0, 1.0);
 	}
 
 	public void draw(GOut g) {
