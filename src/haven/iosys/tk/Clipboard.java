@@ -61,6 +61,27 @@ public interface Clipboard {
 	    }
 	    return(null);
 	}
+
+	public <F> Item<F> or(Format<F> fmt, F defval) {
+	    Item<F> item = find(fmt);
+	    if(item != null)
+		return(item);
+	    return(new Item<>(fmt, defval));
+	}
+
+	public <F> Item<F> or2(Format<F> fmt, Supplier<F> defval) {
+	    Item<F> item = find(fmt);
+	    if(item != null)
+		return(item);
+	    return(new Item<F>(fmt, () -> Promise.of(defval)));
+	}
+
+	public <F> Item<F> or3(Format<F> fmt, Supplier<Promise<F>> defval) {
+	    Item<F> item = find(fmt);
+	    if(item != null)
+		return(item);
+	    return(new Item<>(fmt, defval));
+	}
     }
 
     public static class Format<T> {

@@ -206,12 +206,7 @@ public interface ReadLine {
 	}
 
 	public static Promise<CharSequence> cliptext(Clipboard c) {
-	    return(c.get().then(cnt -> {
-	        Clipboard.Item<CharSequence> item = cnt.find(Clipboard.Format.TEXT);
-		if(item != null)
-		    return(item.get());
-		return(null);
-	    }));
+	    return(c.get().then(cnt -> cnt.or(Clipboard.Format.TEXT, null).get()));
 	}
 
 	public Promise<CharSequence> cliptext() {
