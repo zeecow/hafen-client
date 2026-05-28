@@ -34,11 +34,9 @@ import java.io.*;
 import java.nio.file.*;
 import java.net.*;
 import java.awt.event.*;
-import javax.swing.filechooser.*;
 import javax.imageio.*;
 import java.awt.Color;
 import java.awt.image.*;
-import javax.swing.JFileChooser;
 import static haven.PUtils.*;
 import static haven.render.Texture.Filter.*;
 
@@ -254,10 +252,10 @@ public class DynresWindow extends Window {
 	    }
 	}
 
-	private void open(File file) {
+	private void open(Path path) {
 	    create(() -> {
 		    try {
-			BufferedImage img = ImageIO.read(file);
+			BufferedImage img = ImageIO.read(path.toFile());
 			if(img == null)
 			    throw(new IOException("File format not recognized."));
 			return(img);
@@ -268,13 +266,13 @@ public class DynresWindow extends Window {
 	}
 
 	private void open() {
-	    java.awt.EventQueue.invokeLater(() -> {
-		    JFileChooser fc = new JFileChooser();
-		    fc.setFileFilter(new FileNameExtensionFilter("Image file", "png", "jpg", "jpeg", "bmp"));
-		    if(fc.showOpenDialog(null) != JFileChooser.APPROVE_OPTION)
-			return;
-		    open(fc.getSelectedFile());
-		});
+	    FilePicker dialog = ui.wnd.toolkit().picker().make(FilePicker.Mode.OPEN, ui.wnd);
+	    dialog.filter("Image file", "png", "jpg", "jpeg", "bmp");
+	    dialog.show(() -> {
+		if(dialog.result() == null)
+		    return;
+		open(dialog.result());
+	    });
 	}
 
 	private void paste(Clipboard c) {
@@ -340,7 +338,7 @@ public class DynresWindow extends Window {
 		} else if(cc.find(Clipboard.Format.PATHS) != null) {
 		    cc.find(Clipboard.Format.PATHS).get().map(files -> {
 			for(Path p : files)
-			    open(p.toFile());
+			    open(p);
 		    }).report(ui, "Clipboard error");
 		    return(true);
 		}

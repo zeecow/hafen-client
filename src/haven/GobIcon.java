@@ -31,9 +31,8 @@ import java.util.function.*;
 import java.io.*;
 import java.nio.file.*;
 import java.awt.image.*;
+import haven.iosys.tk.*;
 import java.awt.Color;
-import javax.swing.JFileChooser;
-import javax.swing.filechooser.*;
 
 public class GobIcon extends GAttrib {
     private static final int size = UI.scale(20);
@@ -843,20 +842,20 @@ public class GobIcon extends GAttrib {
 		protected Widget makeitem(NotificationSetting item, int idx, Coord sz) {return(SListWidget.TextItem.of(sz, Text.std, () -> item.name));}
 
 		private void selectwav() {
-		    java.awt.EventQueue.invokeLater(() -> {
-			    JFileChooser fc = new JFileChooser();
-			    fc.setFileFilter(new FileNameExtensionFilter("PCM wave file", "wav"));
-			    if(fc.showOpenDialog(null) != JFileChooser.APPROVE_OPTION)
-				return;
-			    for(Iterator<NotificationSetting> i = items.iterator(); i.hasNext();) {
-				NotificationSetting item = i.next();
-				if(item.wav != null)
-				    i.remove();
-			    }
-			    NotificationSetting ws = new NotificationSetting(fc.getSelectedFile().toPath());
-			    items.add(items.indexOf(NotificationSetting.other), ws);
-			    change(ws);
-			});
+		    FilePicker dialog = ui.wnd.toolkit().picker().make(FilePicker.Mode.OPEN, ui.wnd);
+		    dialog.filter("PCM wave file", "wav");
+		    dialog.show(() -> {
+			if(dialog.result() == null)
+			    return;
+			for(Iterator<NotificationSetting> i = items.iterator(); i.hasNext();) {
+			    NotificationSetting item = i.next();
+			    if(item.wav != null)
+				i.remove();
+			}
+			NotificationSetting ws = new NotificationSetting(dialog.result());
+			items.add(items.indexOf(NotificationSetting.other), ws);
+			change(ws);
+		    });
 		}
 
 		public void change(NotificationSetting item) {
