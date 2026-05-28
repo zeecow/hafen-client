@@ -27,17 +27,17 @@
 package haven;
 
 import java.util.*;
+import java.text.*;
+import java.util.regex.*;
+import haven.iosys.tk.*;
+import java.io.IOException;
+import java.net.URI;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.font.TextAttribute;
 import java.awt.font.TextHitInfo;
 import java.awt.image.BufferedImage;
-import java.text.*;
 import java.text.AttributedCharacterIterator.Attribute;
-import java.net.URI;
-import java.util.regex.*;
-import java.io.IOException;
-import java.awt.datatransfer.*;
 
 public class ChatUI extends Widget {
     public static final RichText.Foundry fnd = new RichText.Foundry(new ChatParser(TextAttribute.FONT, Text.dfont.deriveFont(UI.scale(12f)), TextAttribute.FOREGROUND, Color.BLACK)).aa(true);
@@ -638,19 +638,18 @@ public class ChatUI extends Widget {
 			buf.append('\n');
 		}
 	    }
-	    Clipboard cl;
-	    if((cl = java.awt.Toolkit.getDefaultToolkit().getSystemSelection()) == null)
-		cl = java.awt.Toolkit.getDefaultToolkit().getSystemClipboard();
-	    try {
-		final CharPos ownsel = selstart;
-		cl.setContents(new StringSelection(buf.toString()),
-			       new ClipboardOwner() {
-			public void lostOwnership(Clipboard cl, Transferable tr) {
-			    if(selstart == ownsel)
-				selstart = selend = null;
-			}
-		    });
-	    } catch(IllegalStateException e) {}
+	    CharPos ownsel = selstart;
+	    Clipboard.Item<CharSequence> item = new Clipboard.Item<>(Clipboard.Format.TEXT, buf);
+	    Runnable lost = ()-> {
+		if(selstart == ownsel)
+		    selstart = selend = null;
+	    };
+	    /* XXX: Putting on CLIPBOARD should be from eg. C-c, but
+	     * that requires Channel as a whole to accept keyobard
+	     * focus... */
+	    for(Object id : new Object[] {Clipboard.Std.PRIMARY, Clipboard.Std.CLIPBOARD}) {
+		ui.wnd.clipboard(id).put(new Clipboard.Contents(item), lost);
+	    }
 	}
 
 	protected boolean clicked(CharPos pos, int btn) {
