@@ -51,6 +51,7 @@ public abstract class UILoop implements Console.Directory {
 
     public UILoop(Windeye wnd) {
 	this.wnd = wnd;
+	wnd.drophandler(new Dropper());
 	setenv(wnd.env());
 	this.curscaps = wnd.toolkit().cursorcaps();
 	newui(null);
@@ -343,6 +344,17 @@ public abstract class UILoop implements Console.Directory {
 		if(frame != null)
 		    frame.part(label);
 	    }
+	}
+    }
+
+    protected class Dropper implements DropHandler {
+	public Set<Action> drophover(DropHoverEvent ev) {
+	    if(DropTarget.drophover(ui.root, ev.wndc(), SystemDrop.of(ev)))
+		return(EnumSet.of(DropHandler.Action.COPY));
+	    return(null);
+	}
+	public boolean dropped(DroppedEvent ev) {
+	    return(DropTarget.dropthing(ui.root, ev.wndc(), SystemDrop.of(ev)));
 	}
     }
 
