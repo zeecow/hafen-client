@@ -119,6 +119,16 @@ public class Promise<T> {
 	return(this);
     }
 
+    public static <T> Promise<T> of(Supplier<T> from) {
+	T val;
+	try {
+	    val = from.get();
+	} catch(Throwable t) {
+	    return(new Promise<T>().reject(t));
+	}
+	return(new Promise<T>().resolve(val));
+    }
+
     public void callback(Callback<T> callback) {
 	boolean done;;
 	synchronized(this) {
