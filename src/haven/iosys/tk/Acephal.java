@@ -40,6 +40,8 @@ public interface Acephal {
     public static interface Factory {
 	public Acephal open(String... args);
 	public default int priority() {return(0);}
+	public default boolean experimental() {return(false);}
+	public default boolean autouse() {return(true);}
     }
 
     @dolda.jglob.Discoverable
@@ -123,6 +125,8 @@ public interface Acephal {
 			    Collection<Throwable> errors = new ArrayList<>();
 			    Acephal first = null;
 			    for(Factory type : types) {
+				if(!type.autouse() || (type.experimental() && !Config.exp.get()))
+				    continue;
 				try {
 				    first = type.open();
 				    break;

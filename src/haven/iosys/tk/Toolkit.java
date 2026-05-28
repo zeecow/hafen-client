@@ -54,6 +54,7 @@ public interface Toolkit {
     public static interface Factory {
 	public Toolkit open(String... args);
 	public default int priority() {return(0);}
+	public default boolean experimental() {return(false);}
 	public default boolean autouse() {return(true);}
     }
 
@@ -177,7 +178,7 @@ public interface Toolkit {
 			    Collection<Throwable> errors = new ArrayList<>();
 			    Toolkit first = null;
 			    for(Factory type : toolkits) {
-				if(!type.autouse())
+				if(!type.autouse() || (type.experimental() && !Config.exp.get()))
 				    continue;
 				try {
 				    first = type.open();
