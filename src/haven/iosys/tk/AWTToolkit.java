@@ -37,12 +37,14 @@ import haven.render.*;
 import haven.render.gl.*;
 import java.awt.datatransfer.*;
 import java.awt.dnd.*;
+import javax.swing.filechooser.*;
 import java.awt.AWTEvent;
 import java.awt.Component;
 import java.awt.Desktop;
 import java.awt.EventQueue;
 import java.awt.HeadlessException;
 import java.awt.image.BufferedImage;
+import javax.swing.JFileChooser;
 import static java.awt.event.KeyEvent.*;
 
 public abstract class AWTToolkit implements Toolkit {
@@ -665,6 +667,59 @@ public abstract class AWTToolkit implements Toolkit {
 	public void dispose() {
 	    frame.dispose();
 	}
+    }
+
+    public static class AWTPicker implements FilePicker {
+	public final Mode mode;
+	public final Component parent;
+	private javax.swing.filechooser.FileFilter filter = null;
+	private int state = 0;
+	private Path result;
+
+	public AWTPicker(Mode mode, Component parent) {
+	    this.mode = mode;
+	    this.parent = parent;
+	}
+
+	public void filter(String desc, String... exts) {
+	    if(state != 0)
+		throw(new IllegalStateException());
+	    filter = new FileNameExtensionFilter(desc, exts);
+	}
+
+	public void show(Runnable cb) {
+	    if(state != 0)
+		throw(new IllegalStateException());
+	    EventQueue.invokeLater(() -> {
+		JFileChooser dialog = new JFileChooser();
+		if(filter != null)
+		    dialog.setFileFilter(filter);
+		int res;
+		if(mode == Mode.OPEN)
+		    res = dialog.showOpenDialog(parent);
+		else
+		    res = dialog.showSaveDialog(parent);
+		if(res == JFileChooser.APPROVE_OPTION)
+		    result = dialog.getSelectedFile().toPath();
+		state = 2;
+		cb.run();
+	    });
+	}
+
+	public Path result() {
+	    if(state != 2)
+		throw(new IllegalStateException());
+	    return(result);
+	}
+    }
+
+    public FilePicker.Factory picker() {
+	return((mode, wnd) -> {
+	    Component parent = null;
+	    if(wnd != null)
+		parent = ((AWTWindow)wnd).frame;
+	    return(new AWTPicker(mode, parent));
+	});
     }
 
     public void browse(java.net.URI location) throws IOException {
