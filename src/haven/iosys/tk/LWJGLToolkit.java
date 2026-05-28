@@ -76,6 +76,7 @@ public class LWJGLToolkit extends AWTToolkit {
 
 	public LWJGLPanel() {
 	    super();
+	    setFocusTraversalKeysEnabled(false);
 	}
 
 	public void initGL() {}

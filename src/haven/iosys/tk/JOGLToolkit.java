@@ -115,6 +115,7 @@ public class JOGLToolkit extends AWTToolkit {
 
 	public JOGLPanel() {
 	    super(caps, null, null);
+	    setFocusTraversalKeysEnabled(false);
 	    addGLEventListener(new GLEventListener() {
 		public void display(GLAutoDrawable d) {
 		    redraw(d.getGL());
