@@ -40,7 +40,6 @@ import haven.iosys.x11.*;
 import haven.iosys.gl.*;
 import haven.iosys.x11.XLib.*;
 import haven.iosys.x11.XInput.*;
-import haven.iosys.tk.Button;
 import java.io.IOException;
 import static haven.iosys.x11.XKeysym.*;
 import static haven.iosys.tk.Key.Std.*;
@@ -1561,22 +1560,22 @@ public class GLXContext implements Toolkit.Factory {
 	GLXKeyReleaseEvent(GLXToolkit.GLXWindow wnd, XKeyEvent ev) {super(wnd, ev, false);}
     }
 
-    private static Button buttonid(GLXToolkit.XIPointerInfo ptr, int xi) {
+    private static MouseBtn buttonid(GLXToolkit.XIPointerInfo ptr, int xi) {
 	switch(xi) {
-	case 1: return(Button.Std.LEFT);
-	case 2: return(Button.Std.MIDDLE);
-	case 3: return(Button.Std.RIGHT);
-	case 8: return(Button.Std.BACK);
-	case 9: return(Button.Std.FORWARD);
+	case 1: return(MouseBtn.Std.LEFT);
+	case 2: return(MouseBtn.Std.MIDDLE);
+	case 3: return(MouseBtn.Std.RIGHT);
+	case 8: return(MouseBtn.Std.BACK);
+	case 9: return(MouseBtn.Std.FORWARD);
 	}
 	if((xi <= ptr.buttons.length) && (ptr.buttons[xi - 1] != null)) {
 	    String nm = ptr.buttons[xi - 1];
-	    return(new Button() {
+	    return(new MouseBtn() {
 		public String id() {return(("x11:" + nm).intern());}
 		public String nm() {return(nm);}
 	    });
 	} else {
-	    return(new Button() {
+	    return(new MouseBtn() {
 		public String id() {return(("x11:" + xi).intern());}
 		public String nm() {return("Button " + xi);}
 	    });
@@ -1587,7 +1586,7 @@ public class GLXContext implements Toolkit.Factory {
 	public final GLXToolkit.GLXWindow wnd;
 	public final GLXToolkit.XIPointerInfo ptr;
 	public final Coord wndc, rootc;
-	public final Set<Button> held;
+	public final Set<MouseBtn> held;
 	public final Set<Key.Mod> mods;
 
 	public GLXMouseEvent(GLXToolkit.GLXWindow wnd, GLXToolkit.XIPointerInfo ptr, XIDeviceEvent ev) {
@@ -1601,7 +1600,7 @@ public class GLXContext implements Toolkit.Factory {
 	}
 
 	public Coord wndc() {return(wndc);}
-	public Set<Button> held() {return(held);}
+	public Set<MouseBtn> held() {return(held);}
 	public Set<Key.Mod> mods() {return(mods);}
 
 	public String toString() {
@@ -1609,7 +1608,7 @@ public class GLXContext implements Toolkit.Factory {
 	}
     }
     public static abstract class GLXMouseButtonEvent extends GLXMouseEvent {
-	public final Button button;
+	public final MouseBtn button;
 
 	public GLXMouseButtonEvent(GLXToolkit.GLXWindow wnd, GLXToolkit.XIPointerInfo ptr, XIDeviceEvent ev, boolean include) {
 	    super(wnd, ptr, ev);
@@ -1620,7 +1619,7 @@ public class GLXContext implements Toolkit.Factory {
 		held.remove(button);
 	}
 
-	public Button button() {return(button);}
+	public MouseBtn button() {return(button);}
 
 	public String toString() {
 	    return(String.format("#<%s wnd=%s root=%s btn=%d held=%s mods=%s>", getClass().getSimpleName(), wndc, rootc, button, held, mods));

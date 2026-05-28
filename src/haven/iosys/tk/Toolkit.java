@@ -81,11 +81,11 @@ public interface Toolkit {
 
     public static interface MouseEvent extends Event {
 	public Coord wndc();
-	public Set<Button> held();
+	public Set<MouseBtn> held();
 	public Set<Key.Mod> mods();
     }
     public static interface MouseButtonEvent extends MouseEvent {
-	public Button button();
+	public MouseBtn button();
     }
     public static interface MouseDownEvent extends MouseButtonEvent {}
     public static interface MouseUpEvent extends MouseButtonEvent {}

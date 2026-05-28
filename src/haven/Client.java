@@ -32,7 +32,6 @@ import java.nio.file.*;
 import haven.render.*;
 import haven.iosys.tk.*;
 import java.awt.image.BufferedImage;
-import haven.iosys.tk.Button;
 
 public class Client implements Console.Directory {
     public static final Config.Variable<Boolean> initfullscreen = Config.Variable.propb("haven.fullscreen", false);
@@ -89,12 +88,12 @@ public class Client implements Console.Directory {
 	    }
 	}
 
-	private static int buttonid(Button btn) {
-	    if(btn == Button.Std.LEFT)
+	private static int buttonid(MouseBtn btn) {
+	    if(btn == MouseBtn.Std.LEFT)
 		return(1);
-	    else if(btn == Button.Std.MIDDLE)
+	    else if(btn == MouseBtn.Std.MIDDLE)
 		return(2);
-	    else if(btn == Button.Std.RIGHT)
+	    else if(btn == MouseBtn.Std.RIGHT)
 		return(3);
 	    return(0);
 	}

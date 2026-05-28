@@ -40,7 +40,6 @@ import haven.iosys.tk.*;
 import haven.iosys.windows.*;
 import haven.iosys.gl.*;
 import haven.iosys.windows.Win32.*;
-import haven.iosys.tk.Button;
 import static haven.iosys.tk.Key.Std.*;
 
 @Toolkit.Available(name = "wgl")
@@ -481,37 +480,37 @@ public class WGLContext implements Toolkit.Factory {
 		    callback(new W32MouseMoveEvent(wparam, lparam));
 		    return(0);
 		case Win32.WM_LBUTTONDOWN:
-		    callback(new W32MouseDownEvent(Button.Std.LEFT, wparam, lparam));
+		    callback(new W32MouseDownEvent(MouseBtn.Std.LEFT, wparam, lparam));
 		    return(0);
 		case Win32.WM_LBUTTONUP:
-		    callback(new W32MouseUpEvent(Button.Std.LEFT, wparam, lparam));
+		    callback(new W32MouseUpEvent(MouseBtn.Std.LEFT, wparam, lparam));
 		    return(0);
 		case Win32.WM_MBUTTONDOWN:
-		    callback(new W32MouseDownEvent(Button.Std.MIDDLE, wparam, lparam));
+		    callback(new W32MouseDownEvent(MouseBtn.Std.MIDDLE, wparam, lparam));
 		    return(0);
 		case Win32.WM_MBUTTONUP:
-		    callback(new W32MouseUpEvent(Button.Std.MIDDLE, wparam, lparam));
+		    callback(new W32MouseUpEvent(MouseBtn.Std.MIDDLE, wparam, lparam));
 		    return(0);
 		case Win32.WM_RBUTTONDOWN:
-		    callback(new W32MouseDownEvent(Button.Std.RIGHT, wparam, lparam));
+		    callback(new W32MouseDownEvent(MouseBtn.Std.RIGHT, wparam, lparam));
 		    return(0);
 		case Win32.WM_RBUTTONUP:
-		    callback(new W32MouseUpEvent(Button.Std.RIGHT, wparam, lparam));
+		    callback(new W32MouseUpEvent(MouseBtn.Std.RIGHT, wparam, lparam));
 		    return(0);
 		case Win32.WM_XBUTTONDOWN: {
 		    long btn = (wparam & 0xffff0000) >> 16;
 		    if(btn == 1)
-			callback(new W32MouseDownEvent(Button.Std.BACK, wparam, lparam));
+			callback(new W32MouseDownEvent(MouseBtn.Std.BACK, wparam, lparam));
 		    else if(btn == 2)
-			callback(new W32MouseDownEvent(Button.Std.FORWARD, wparam, lparam));
+			callback(new W32MouseDownEvent(MouseBtn.Std.FORWARD, wparam, lparam));
 		    return(0);
 		}
 		case Win32.WM_XBUTTONUP: {
 		    long btn = (wparam & 0xffff0000) >> 16;
 		    if(btn == 1)
-			callback(new W32MouseUpEvent(Button.Std.BACK, wparam, lparam));
+			callback(new W32MouseUpEvent(MouseBtn.Std.BACK, wparam, lparam));
 		    else if(btn == 2)
-			callback(new W32MouseUpEvent(Button.Std.FORWARD, wparam, lparam));
+			callback(new W32MouseUpEvent(MouseBtn.Std.FORWARD, wparam, lparam));
 		    return(0);
 		}
 		case Win32.WM_MOUSEWHEEL: {
@@ -736,7 +735,7 @@ public class WGLContext implements Toolkit.Factory {
 
 	    public class W32MouseEvent {
 		public final Coord wndc;
-		public final Set<Button> held = new HashSet<>();
+		public final Set<MouseBtn> held = new HashSet<>();
 		public final Set<Key.Mod> mods;
 
 		public W32MouseEvent(long wparam, long lparam, boolean screen) {
@@ -746,37 +745,37 @@ public class WGLContext implements Toolkit.Factory {
 			wndc = win.ScreenToClient(hwnd, c);
 		    else
 			wndc = c;
-		    if((wparam & Win32.MK_LBUTTON) != 0) held.add(Button.Std.LEFT);
-		    if((wparam & Win32.MK_MBUTTON) != 0) held.add(Button.Std.MIDDLE);
-		    if((wparam & Win32.MK_RBUTTON) != 0) held.add(Button.Std.RIGHT);
-		    if((wparam & Win32.MK_XBUTTON1) != 0) held.add(Button.Std.BACK);
-		    if((wparam & Win32.MK_XBUTTON2) != 0) held.add(Button.Std.FORWARD);
+		    if((wparam & Win32.MK_LBUTTON) != 0) held.add(MouseBtn.Std.LEFT);
+		    if((wparam & Win32.MK_MBUTTON) != 0) held.add(MouseBtn.Std.MIDDLE);
+		    if((wparam & Win32.MK_RBUTTON) != 0) held.add(MouseBtn.Std.RIGHT);
+		    if((wparam & Win32.MK_XBUTTON1) != 0) held.add(MouseBtn.Std.BACK);
+		    if((wparam & Win32.MK_XBUTTON2) != 0) held.add(MouseBtn.Std.FORWARD);
 		    win.GetKeyboardState(kb);
 		    mods = xlmods(kb);
 		}
 
 		public Coord wndc() {return(wndc);}
-		public Set<Button> held() {return(held);}
+		public Set<MouseBtn> held() {return(held);}
 		public Set<Key.Mod> mods() {return(mods);}
 	    }
 	    public class W32MouseMoveEvent extends W32MouseEvent implements MouseMoveEvent {
 		public W32MouseMoveEvent(long wparam, long lparam) {super(wparam, lparam, false);}
 	    }
 	    public class W32MouseButtonEvent extends W32MouseEvent {
-		public final Button btn;
+		public final MouseBtn btn;
 
-		public W32MouseButtonEvent(Button btn, long wparam, long lparam) {
+		public W32MouseButtonEvent(MouseBtn btn, long wparam, long lparam) {
 		    super(wparam, lparam, false);
 		    this.btn = btn;
 		}
 
-		public Button button() {return(btn);}
+		public MouseBtn button() {return(btn);}
 	    }
 	    public class W32MouseDownEvent extends W32MouseButtonEvent implements MouseDownEvent {
-		public W32MouseDownEvent(Button btn, long wparam, long lparam) {super(btn, wparam, lparam);}
+		public W32MouseDownEvent(MouseBtn btn, long wparam, long lparam) {super(btn, wparam, lparam);}
 	    }
 	    public class W32MouseUpEvent extends W32MouseButtonEvent implements MouseUpEvent {
-		public W32MouseUpEvent(Button btn, long wparam, long lparam) {super(btn, wparam, lparam);}
+		public W32MouseUpEvent(MouseBtn btn, long wparam, long lparam) {super(btn, wparam, lparam);}
 	    }
 
 	    public class W32MouseWheelEvent extends W32MouseEvent implements MouseWheelEvent {

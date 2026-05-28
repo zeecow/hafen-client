@@ -138,20 +138,20 @@ public abstract class AWTToolkit implements Toolkit {
     public static class AWTMouseEvent {
 	public final java.awt.event.MouseEvent awt;
 	private Set<Key.Mod> mods = null;
-	private Set<Button> held = null;
+	private Set<MouseBtn> held = null;
 
 	public AWTMouseEvent(java.awt.event.MouseEvent awt) {
 	    this.awt = awt;
 	}
 
 	public Coord wndc() {return(Coord.of(awt.getX(), awt.getY()));}
-	public Set<Button> held() {
+	public Set<MouseBtn> held() {
 	    if(held == null) {
 		int mod = awt.getModifiersEx();
 		held = new HashSet<>();
-		if((mod & InputEvent.BUTTON1_DOWN_MASK) != 0) held.add(Button.Std.LEFT);
-		if((mod & InputEvent.BUTTON2_DOWN_MASK) != 0) held.add(Button.Std.MIDDLE);
-		if((mod & InputEvent.BUTTON3_DOWN_MASK) != 0) held.add(Button.Std.RIGHT);
+		if((mod & InputEvent.BUTTON1_DOWN_MASK) != 0) held.add(MouseBtn.Std.LEFT);
+		if((mod & InputEvent.BUTTON2_DOWN_MASK) != 0) held.add(MouseBtn.Std.MIDDLE);
+		if((mod & InputEvent.BUTTON3_DOWN_MASK) != 0) held.add(MouseBtn.Std.RIGHT);
 	    }
 	    return(held);
 	}
@@ -160,17 +160,17 @@ public abstract class AWTToolkit implements Toolkit {
 		mods = awtmods(awt.getModifiersEx());
 	    return(mods);
 	}
-	public Button button() {
+	public MouseBtn button() {
 	    int id = awt.getButton();
 	    /* XXX: Back/forward buttons? I'm not sure they're even
 	     * standardized in AWT... */
 	    if(id == java.awt.event.MouseEvent.BUTTON1)
-		return(Button.Std.LEFT);
+		return(MouseBtn.Std.LEFT);
 	    else if(id == java.awt.event.MouseEvent.BUTTON2)
-		return(Button.Std.MIDDLE);
+		return(MouseBtn.Std.MIDDLE);
 	    else if(id == java.awt.event.MouseEvent.BUTTON3)
-		return(Button.Std.RIGHT);
-	    return(new Button() {
+		return(MouseBtn.Std.RIGHT);
+	    return(new MouseBtn() {
 		public String id() {return("awt:" + id);}
 		public String nm() {return("Button " + id);}
 	    });

@@ -133,13 +133,13 @@ public class NEWTContext implements Toolkit.Factory {
 	    }
 
 	    public Coord wndc() {return(Coord.of(newt.getX(), newt.getY()));}
-	    public Set<Button> held() {return(Collections.emptySet());}
+	    public Set<MouseBtn> held() {return(Collections.emptySet());}
 	    public Set<Key.Mod> mods() {return(xlmods(newt));}
-	    public Button button() {
+	    public MouseBtn button() {
 		switch(newt.getButton()) {
-		case 1: return(Button.Std.LEFT);
-		case 2: return(Button.Std.MIDDLE);
-		case 3: return(Button.Std.RIGHT);
+		case 1: return(MouseBtn.Std.LEFT);
+		case 2: return(MouseBtn.Std.MIDDLE);
+		case 3: return(MouseBtn.Std.RIGHT);
 		}
 		return(null);
 	    }

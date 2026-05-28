@@ -26,11 +26,11 @@
 
 package haven.iosys.tk;
 
-public interface Button {
+public interface MouseBtn {
     public String id();
     public String nm();
 
-    public static enum Std implements Button {
+    public static enum Std implements MouseBtn {
 	LEFT("lmb", "Left"),
 	MIDDLE("mmb", "Middle"),
 	RIGHT("rmb", "Right"),
