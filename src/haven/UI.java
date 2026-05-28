@@ -32,9 +32,6 @@ import java.util.concurrent.*;
 import haven.Widget.*;
 import haven.iosys.tk.*;
 import java.awt.Font;
-import java.awt.GraphicsEnvironment;
-import java.awt.GraphicsDevice;
-import java.awt.DisplayMode;
 import java.awt.Color;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
@@ -989,15 +986,17 @@ public class UI {
     }
 
     private static double maxscale = -1;
-    public static double maxscale() {
+    private static void initscale() {
 	synchronized(UI.class) {
 	    if(maxscale < 0) {
 		double fscale = 1.25;
 		try {
-		    GraphicsEnvironment env = GraphicsEnvironment.getLocalGraphicsEnvironment();
-		    for(GraphicsDevice dev : env.getScreenDevices()) {
-			DisplayMode mode = dev.getDisplayMode();
-			double scale = Math.min(mode.getWidth() / 800.0, mode.getHeight() / 600.0);
+		    /* XXX: This ain't right, but arguably so isn't
+		     * scaling being static to begin with...? */
+		    Toolkit tk = Toolkit.instance();
+		    for(Monitor dev : tk.monitors()) {
+			Coord res = dev.resolution();
+			double scale = Math.min(res.x / 800.0, res.y / 600.0);
 			fscale = Math.max(fscale, scale);
 		    }
 		} catch(Exception exc) {
@@ -1013,8 +1012,9 @@ public class UI {
     private static double loadscale() {
 	if(uiscale.get() != null)
 	    return(uiscale.get());
+	initscale();
 	double scale = Utils.getprefd("uiscale", 1.0);
-	scale = Math.max(Math.min(scale, maxscale()), 1.0);
+	scale = Math.max(Math.min(scale, maxscale), 1.0);
 	return(scale);
     }
 

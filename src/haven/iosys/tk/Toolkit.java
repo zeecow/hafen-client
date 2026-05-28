@@ -36,6 +36,7 @@ import java.awt.image.BufferedImage;
 public interface Toolkit {
     public static final Config.Variable<String> toolkit = Config.Variable.prop("haven.toolkit", null);
 
+    public default Collection<Monitor> monitors() {return(Collections.emptyList());}
     public Cursor.Caps cursorcaps();
     public Cursor makecursor(BufferedImage img, Coord hotspot);
     public Windeye window();

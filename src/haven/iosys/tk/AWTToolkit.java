@@ -41,7 +41,10 @@ import javax.swing.filechooser.*;
 import java.awt.AWTEvent;
 import java.awt.Component;
 import java.awt.Desktop;
+import java.awt.DisplayMode;
 import java.awt.EventQueue;
+import java.awt.GraphicsDevice;
+import java.awt.GraphicsEnvironment;
 import java.awt.HeadlessException;
 import java.awt.image.BufferedImage;
 import javax.swing.JFileChooser;
@@ -732,6 +735,38 @@ public abstract class AWTToolkit implements Toolkit {
     }
 
     public void dispose() {
+    }
+
+    public static class AWTMonitor implements Monitor {
+	public final GraphicsDevice dev;
+
+	public AWTMonitor(GraphicsDevice dev) {
+	    this.dev = dev;
+	}
+
+	public Coord resolution() {
+	    DisplayMode mode = dev.getDisplayMode();
+	    return(Coord.of(mode.getWidth(), mode.getHeight()));
+	}
+
+	public int refresh() {
+	    return(dev.getDisplayMode().getRefreshRate());
+	}
+
+	public double density() {
+	    return(java.awt.Toolkit.getDefaultToolkit().getScreenResolution());
+	}
+
+	public String toString() {
+	    return(dev.toString());
+	}
+    }
+
+    public Collection<Monitor> monitors() {
+	Collection<Monitor> ret = new ArrayList<>();
+	for(GraphicsDevice dev : GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices())
+	    ret.add(new AWTMonitor(dev));
+	return(ret);
     }
 
     public static class AWTCursor implements Cursor {
