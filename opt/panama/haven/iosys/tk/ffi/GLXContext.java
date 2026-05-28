@@ -87,6 +87,7 @@ public class GLXContext implements Toolkit.Factory {
     public int priority() {
 	return(System.getProperty("os.name", "").equals("Linux") ? 100 : 0);
     }
+    public boolean experimental() {return(true);}
 
     public static class XCursor implements Cursor {
 	public static final XCursor inherit = new XCursor(null, XID.None);

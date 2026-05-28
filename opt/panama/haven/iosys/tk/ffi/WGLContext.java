@@ -75,6 +75,7 @@ public class WGLContext implements Toolkit.Factory {
     public int priority() {
 	return(System.getProperty("os.name", "").startsWith("Windows ") ? 100 : 0);
     }
+    public boolean experimental() {return(true);}
 
     public class WGLToolkit implements Toolkit {
 	private static int serial = 0;
