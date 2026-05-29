@@ -34,6 +34,8 @@ import dolda.xiphutil.*;
 
 public class Audio {
     public static final int SAMPLE_RATE = 44100;
+    @Deprecated public static final javax.sound.sampled.AudioFormat fmt =
+	new javax.sound.sampled.AudioFormat(SAMPLE_RATE, 16, 2, true, false);
     public static final Config.Variable<String> outname = Config.Variable.prop("haven.audio-output", null);
     public static boolean enabled = true;
 
