@@ -28,6 +28,7 @@ package haven.ffi;
 
 import haven.*;
 import java.nio.*;
+import java.nio.charset.*;
 import java.lang.invoke.*;
 import java.lang.foreign.*;
 import java.util.*;
@@ -157,6 +158,10 @@ public class FUtils {
 	for(int i = 0; i < len; i++)
 	    dst[doff + i] = (byte)src.get(ValueLayout.JAVA_BYTE, soff + i);
 	return(dst);
+    }
+
+    public static String nstring(MemorySegment src, long off, int len, Charset charset) {
+	return(new String(memcpy(new byte[len], src.reinterpret(off + len), 0, off, len), charset));
     }
 
     public static MemorySegment memcpy(MemorySegment dst, ByteBuffer src, long doff, int soff, int len) {

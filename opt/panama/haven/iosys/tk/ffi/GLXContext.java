@@ -52,6 +52,7 @@ public class GLXContext implements Toolkit.Factory {
     private final GLX glx;
     private final OpenGL gl;
     private final Xcursor xcr;
+    private final Xrandr xrr;
 
     private GLXContext() {
 	try {
@@ -61,6 +62,7 @@ public class GLXContext implements Toolkit.Factory {
 	    this.glx = GLX.get();
 	    this.gl = glx.gl();
 	    this.xcr = Xcursor.get();
+	    this.xrr = Xrandr.get();
 	} catch(RuntimeException e) {
 	    throw(new Unavailable("X11 libraries not available", e));
 	}
@@ -135,6 +137,7 @@ public class GLXContext implements Toolkit.Factory {
 	public final Map<Integer, Integer> rmodmap = new HashMap<>();
 	public final Map<Integer, XIPointerInfo> pointers = new HashMap<>();
 	public final Cursor.Caps ccaps;
+	public final Xrandr.XRRExtensionInfo xrrinfo;
 	public final Atomic ATOM = new Atomic("ATOM");
 	public final Atomic CARDINAL = new Atomic("CARDINAL");
 	public final Atomic WINDOW = new Atomic("WINDOW");
@@ -415,6 +418,12 @@ public class GLXContext implements Toolkit.Factory {
 			ccaps = null;
 		    }
 		    emptycurs = makecursor(PUtils.rasterimg(PUtils.imgraster(Coord.of(1, 1))), Coord.z);
+		}
+
+		/* Xrandr */
+		{
+		    if((xrrinfo = xrr.XRRQueryExtension(dpy)) == null)
+			Warning.warn("Xrandr is not supported on display");
 		}
 
 		/* GLX */
@@ -1394,6 +1403,56 @@ public class GLXContext implements Toolkit.Factory {
 
 	public Windeye window() {
 	    return(new GLXWindow());
+	}
+
+	public static class XRRMonitor implements Monitor {
+	    public final Xrandr.XRROutputInfo out;
+	    public final Xrandr.XRRCrtcInfo ctl;
+
+	    public XRRMonitor(Xrandr.XRROutputInfo out, Xrandr.XRRCrtcInfo ctl) {
+		this.out = out;
+		this.ctl = ctl;
+	    }
+
+	    public Coord resolution() {
+		return(ctl.size());
+	    }
+
+	    public int refresh() {
+		return(0);
+	    }
+
+	    public Coord size() {
+		Coord sz = out.mm_size();
+		if((ctl.rotation() & (Xrandr.RR_Rotate_90 | Xrandr.RR_Rotate_270)) != 0)
+		    sz = Coord.of(sz.y, sz.x);
+		return(sz);
+	    }
+
+	    public double density() {
+		Coord r = resolution(), sz = size();
+		return((((double)r.x / sz.x) + ((double)r.y / sz.y)) * 25.4 / 2);
+	    }
+
+	    public String toString() {
+		return(String.format("#<x11-monitor %s %spx %smm %.1fdpi>", out.name(), resolution(), size(), density()));
+	    }
+	}
+
+	public Collection<Monitor> monitors() {
+	    if(xrrinfo == null)
+		return(Collections.emptyList());
+	    Collection<Monitor> ret = new ArrayList<>();
+	    Xrandr.XRRScreenResources sres = xrr.XRRGetScreenResources(dpy, screen.root());
+	    for(XID oid : sres.outputs()) {
+		Xrandr.XRROutputInfo out = xrr.XRRGetOutputInfo(dpy, sres, oid);
+		if(out.connection() == Xrandr.RR_Connected) {
+		    Xrandr.XRRCrtcInfo ctl = xrr.XRRGetCrtcInfo(dpy, sres, out.crtc());
+		    ret.add(new XRRMonitor(out, ctl));
+		}
+	    }
+	    Debug.dump(ret);
+	    return(ret);
 	}
 
 	public Cursor.Caps cursorcaps() {
