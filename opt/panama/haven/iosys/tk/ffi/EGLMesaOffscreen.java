@@ -31,10 +31,10 @@ import haven.iosys.*;
 import haven.iosys.tk.*;
 import haven.render.*;
 import haven.render.gl.*;
-import haven.iosys.gl.*;
+import haven.ffi.gl.*;
 import java.nio.*;
 import java.util.function.*;
-import haven.iosys.gl.EGL.*;
+import haven.ffi.gl.EGL.*;
 
 @Acephal.Available(name = "egl-mesa")
 public class EGLMesaOffscreen implements Acephal {

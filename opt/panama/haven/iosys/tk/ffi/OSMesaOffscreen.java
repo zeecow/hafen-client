@@ -31,10 +31,10 @@ import haven.iosys.*;
 import haven.iosys.tk.*;
 import haven.render.*;
 import haven.render.gl.*;
-import haven.iosys.gl.*;
+import haven.ffi.gl.*;
 import java.nio.*;
 import java.util.function.*;
-import haven.iosys.gl.OSMesa.*;
+import haven.ffi.gl.OSMesa.*;
 
 @Acephal.Available(name = "osmesa")
 public class OSMesaOffscreen implements Acephal {

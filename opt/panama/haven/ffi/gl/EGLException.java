@@ -24,9 +24,18 @@
  *  Boston, MA 02111-1307 USA
  */
 
-package haven.iosys.x11;
+package haven.ffi.gl;
 
-public class XLibException extends RuntimeException {
-    public XLibException() {}
-    public XLibException(String message) {super(message);}
+import haven.ffi.*;
+
+public class EGLException extends RuntimeException {
+    public final int code;
+
+    public EGLException(int code) {
+	this.code = code;
+    }
+
+    public String getMessage() {
+	return("EGL error " + FUtils.constname(EGL.class, code));
+    }
 }

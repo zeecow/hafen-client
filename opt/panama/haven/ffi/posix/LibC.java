@@ -24,7 +24,7 @@
  *  Boston, MA 02111-1307 USA
  */
 
-package haven.iosys.posix;
+package haven.ffi.posix;
 
 import haven.ffi.*;
 import java.nio.*;

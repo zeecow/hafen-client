@@ -24,18 +24,18 @@
  *  Boston, MA 02111-1307 USA
  */
 
-package haven.iosys.x11;
+package haven.ffi.x11;
 
 import haven.*;
 import haven.ffi.*;
-import haven.iosys.x11.XLib.*;
+import haven.ffi.x11.XLib.*;
 import java.util.*;
 import java.lang.invoke.*;
 import java.lang.foreign.*;
 import java.lang.foreign.MemoryLayout.PathElement;
 import static haven.ffi.ABI.*;
 import static haven.ffi.FUtils.*;
-import static haven.iosys.x11.XLib.checkerror;
+import static haven.ffi.x11.XLib.checkerror;
 import static java.lang.foreign.ValueLayout.ADDRESS;
 
 public abstract class XInput {

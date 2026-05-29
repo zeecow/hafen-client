@@ -33,15 +33,15 @@ import haven.*;
 import haven.iosys.*;
 import haven.render.*;
 import haven.render.gl.*;
-import haven.ffi.*;
 import haven.iosys.tk.*;
-import haven.iosys.posix.*;
-import haven.iosys.x11.*;
-import haven.iosys.gl.*;
-import haven.iosys.x11.XLib.*;
-import haven.iosys.x11.XInput.*;
+import haven.ffi.*;
+import haven.ffi.posix.*;
+import haven.ffi.x11.*;
+import haven.ffi.gl.*;
+import haven.ffi.x11.XLib.*;
+import haven.ffi.x11.XInput.*;
 import java.io.IOException;
-import static haven.iosys.x11.XKeysym.*;
+import static haven.ffi.x11.XKeysym.*;
 import static haven.iosys.tk.Key.Std.*;
 
 @Toolkit.Available(name = "glx")

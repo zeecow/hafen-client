@@ -24,7 +24,7 @@
  *  Boston, MA 02111-1307 USA
  */
 
-package haven.iosys.windows;
+package haven.ffi.windows;
 
 import haven.*;
 import haven.ffi.*;
@@ -34,7 +34,7 @@ import java.lang.foreign.*;
 import static haven.ffi.ABI.*;
 import static haven.ffi.FUtils.*;
 import static java.lang.foreign.ValueLayout.ADDRESS;
-import static haven.iosys.windows.Win32.*;
+import static haven.ffi.windows.Win32.*;
 
 public abstract class SHCore {
     public static final int MDT_EFFECTIVE_DPI = 0;

@@ -24,28 +24,28 @@
  *  Boston, MA 02111-1307 USA
  */
 
-package haven.iosys.posix;
+package haven.ffi.x11;
 
-import haven.*;
+import haven.ffi.x11.XLib.*;
 
-public class FileDescriptor {
-    public final int fileno;
-    private final Runnable clean;
+public class XException extends XLibException {
+    public final int type;
+    public final long serial;
+    public final int error_code;
+    public final int request_code;
+    public final int minor_code;
+    public final XID resourceid;
 
-    private FileDescriptor(int fileno) {
-	this.fileno = fileno;
-	clean = Finalizer.finalize(this, () -> LibC.get().close(fileno));
+    public XException(XErrorEvent from) {
+	this.type = from.type();
+	this.serial = from.serial();
+	this.error_code = from.error_code();
+	this.request_code = from.request_code();
+	this.minor_code = from.minor_code();
+	this.resourceid = from.resourceid();
     }
-    public static FileDescriptor of(int fileno) {return(new FileDescriptor(fileno));}
 
-    public void close() {
-	clean.run();
-    }
-
-    public int hashCode() {return(Integer.hashCode(fileno));}
-    public boolean equals(Object that) {return((that instanceof FileDescriptor) && (this.fileno == ((FileDescriptor)that).fileno));}
-
-    public String toString() {
-	return("fd " + fileno);
+    public String getMessage() {
+	return(String.format("X Error: %d, request %d:%d, serial %d", error_code, request_code, minor_code, serial));
     }
 }

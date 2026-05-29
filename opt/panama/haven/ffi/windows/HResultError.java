@@ -24,16 +24,16 @@
  *  Boston, MA 02111-1307 USA
  */
 
-package haven.iosys.posix;
+package haven.ffi.windows;
 
-public class StdError extends RuntimeException {
-    public final int errno;
+public class HResultError extends RuntimeException {
+    public final int hresult;
 
-    public StdError(int errno) {
-	this.errno = errno;
+    public HResultError(int hresult) {
+	this.hresult = hresult;
     }
 
     public String getMessage() {
-	return(LibC.get().strerror(errno));
+	return(String.valueOf(hresult));
     }
 }

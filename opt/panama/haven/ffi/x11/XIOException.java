@@ -24,16 +24,10 @@
  *  Boston, MA 02111-1307 USA
  */
 
-package haven.iosys.windows;
+package haven.ffi.x11;
 
-public class StdError extends RuntimeException {
-    public final int code;
-
-    public StdError(int code) {
-	this.code = code;
-    }
-
+public class XIOException extends XLibException {
     public String getMessage() {
-	return(String.valueOf(code));
+	return("Fatal X error");
     }
 }

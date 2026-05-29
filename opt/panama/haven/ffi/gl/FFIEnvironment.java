@@ -24,7 +24,7 @@
  *  Boston, MA 02111-1307 USA
  */
 
-package haven.iosys.gl;
+package haven.ffi.gl;
 
 import haven.*;
 import haven.ffi.*;

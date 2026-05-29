@@ -24,16 +24,16 @@
  *  Boston, MA 02111-1307 USA
  */
 
-package haven.iosys.windows;
+package haven.ffi.windows;
 
-public class HResultError extends RuntimeException {
-    public final int hresult;
+public class StdError extends RuntimeException {
+    public final int code;
 
-    public HResultError(int hresult) {
-	this.hresult = hresult;
+    public StdError(int code) {
+	this.code = code;
     }
 
     public String getMessage() {
-	return(String.valueOf(hresult));
+	return(String.valueOf(code));
     }
 }

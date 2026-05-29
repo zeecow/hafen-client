@@ -24,13 +24,13 @@
  *  Boston, MA 02111-1307 USA
  */
 
-package haven.iosys.gl;
+package haven.ffi.gl;
 
 import haven.ffi.*;
 import java.nio.*;
 import java.lang.invoke.*;
 import java.lang.foreign.*;
-import haven.iosys.x11.GLX;
+import haven.ffi.x11.GLX;
 import static haven.ffi.ABI.*;
 import static haven.ffi.FUtils.*;
 import static java.lang.foreign.ValueLayout.ADDRESS;

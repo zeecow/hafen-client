@@ -24,18 +24,18 @@
  *  Boston, MA 02111-1307 USA
  */
 
-package haven.iosys.windows;
+package haven.ffi.windows;
 
 import haven.*;
 import haven.ffi.*;
-import haven.iosys.gl.*;
+import haven.ffi.gl.*;
 import java.nio.*;
 import java.lang.invoke.*;
 import java.lang.foreign.*;
 import static haven.ffi.ABI.*;
 import static haven.ffi.FUtils.*;
 import static java.lang.foreign.ValueLayout.ADDRESS;
-import static haven.iosys.windows.Win32.*;
+import static haven.ffi.windows.Win32.*;
 
 public abstract class WGL {
     public static final int WGL_CONTEXT_MAJOR_VERSION_ARB = 0x2091;

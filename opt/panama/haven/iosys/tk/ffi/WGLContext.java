@@ -32,14 +32,14 @@ import java.awt.image.*;
 import java.io.*;
 import java.nio.*;
 import haven.*;
-import haven.ffi.*;
 import haven.iosys.*;
 import haven.render.*;
 import haven.render.gl.*;
 import haven.iosys.tk.*;
-import haven.iosys.windows.*;
-import haven.iosys.gl.*;
-import haven.iosys.windows.Win32.*;
+import haven.ffi.*;
+import haven.ffi.windows.*;
+import haven.ffi.gl.*;
+import haven.ffi.windows.Win32.*;
 import static haven.iosys.tk.Key.Std.*;
 
 @Toolkit.Available(name = "wgl")

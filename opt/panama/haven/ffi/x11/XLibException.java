@@ -24,10 +24,9 @@
  *  Boston, MA 02111-1307 USA
  */
 
-package haven.iosys.x11;
+package haven.ffi.x11;
 
-public class XIOException extends XLibException {
-    public String getMessage() {
-	return("Fatal X error");
-    }
+public class XLibException extends RuntimeException {
+    public XLibException() {}
+    public XLibException(String message) {super(message);}
 }

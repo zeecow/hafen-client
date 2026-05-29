@@ -24,18 +24,16 @@
  *  Boston, MA 02111-1307 USA
  */
 
-package haven.iosys.gl;
+package haven.ffi.posix;
 
-import haven.ffi.*;
+public class StdError extends RuntimeException {
+    public final int errno;
 
-public class EGLException extends RuntimeException {
-    public final int code;
-
-    public EGLException(int code) {
-	this.code = code;
+    public StdError(int errno) {
+	this.errno = errno;
     }
 
     public String getMessage() {
-	return("EGL error " + FUtils.constname(EGL.class, code));
+	return(LibC.get().strerror(errno));
     }
 }
