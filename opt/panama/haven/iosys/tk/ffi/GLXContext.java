@@ -1451,7 +1451,6 @@ public class GLXContext implements Toolkit.Factory {
 		    ret.add(new XRRMonitor(out, ctl));
 		}
 	    }
-	    Debug.dump(ret);
 	    return(ret);
 	}
 
