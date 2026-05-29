@@ -651,15 +651,12 @@ public abstract class AWTToolkit implements Toolkit {
 	}
 
 	public Clipboard clipboard(Object id) {
-	    if(id == Clipboard.Std.PRIMARY) {
-		java.awt.datatransfer.Clipboard c = java.awt.Toolkit.getDefaultToolkit().getSystemSelection();
-		return((c != null) ? new AWTClipboard(c) : null);
-	    }
-	    if(id == Clipboard.Std.CLIPBOARD) {
-		java.awt.datatransfer.Clipboard c = java.awt.Toolkit.getDefaultToolkit().getSystemClipboard();
-		return((c != null) ? new AWTClipboard(c) : null);
-	    }
-	    return(Clipboard.nil);
+	    java.awt.datatransfer.Clipboard c = null;
+	    if(id == Clipboard.Std.PRIMARY)
+		c = java.awt.Toolkit.getDefaultToolkit().getSystemSelection();
+	    else if(id == Clipboard.Std.CLIPBOARD)
+		c = java.awt.Toolkit.getDefaultToolkit().getSystemClipboard();
+	    return((c != null) ? new AWTClipboard(c) : Clipboard.nil);
 	}
 
 	public AWTWindow drophandler(DropHandler drop) {
