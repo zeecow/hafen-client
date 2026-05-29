@@ -40,6 +40,8 @@ import static haven.ffi.FUtils.*;
 import static java.lang.foreign.ValueLayout.ADDRESS;
 
 public abstract class Win32 {
+    public static final int S_OK = 0;
+
     public static final int WS_OVERLAPPED = 0x00000000;
     public static final int WS_MAXIMIZEBOX = 0x00010000;
     public static final int WS_MINIMIZEBOX = 0x00020000;
@@ -166,6 +168,13 @@ public abstract class Win32 {
     public static final int MONITOR_DEFAULTTONULL = 0;
     public static final int MONITOR_DEFAULTTOPRIMARY = 1;
     public static final int MONITOR_DEFAULTTONEAREST = 2;
+
+    public static final int HORZSIZE   = 4;
+    public static final int VERTSIZE   = 6;
+    public static final int HORZRES    = 8;
+    public static final int VERTRES    = 10;
+    public static final int LOGPIXELSX = 88;
+    public static final int LOGPIXELSY = 90;
 
     public static final int SM_CXCURSOR = 13;
     public static final int SM_CYCURSOR = 14;
@@ -359,10 +368,12 @@ public abstract class Win32 {
     public abstract Area AdjustWindowRectEx(Area rect, int dwStyle, boolean bMenu, int dwExStyle);
     public abstract void SetWindowText(Handle hWnd, String lpString);
     public abstract Coord ScreenToClient(Handle hWnd, Coord point);
+    public abstract List<Handle> EnumDisplayMonitors();
     public abstract Handle MonitorFromWindow(Handle hWnd, int dwFlags);
     public abstract void GetMonitorInfo(Handle hMonitor, MONITORINFO lpmi);
     public abstract Handle GetDC(Handle hWnd);
     public abstract boolean ReleaseDC(Handle hWnd, Handle hDC);
+    public abstract int GetDeviceCaps(Handle hdc, int index);
     public abstract int GetSystemMetrics(int nIndex);
     public abstract int GetKeyState(int nVirtKey);
     public abstract void GetKeyboardState(KeyboardState buf);
@@ -423,6 +434,7 @@ public abstract class Win32 {
 	static final MemoryLayout HKL = HANDLE;
 	static final MemoryLayout HMENU = HANDLE;
 	static final MemoryLayout HMONITOR = HANDLE;
+	static final MemoryLayout HRESULT = LONG;
 	static final MemoryLayout HWND = HANDLE;
 	static final MemoryLayout ATOM = WORD;
 	static final MemoryLayout WNDPROC = HANDLE;
@@ -863,6 +875,31 @@ public abstract class Win32 {
 	    }
 	}
 
+	private static int EnumDisplayMonitors(List<Handle> buf, MemorySegment hMonitor, MemorySegment hdcMonitor, MemorySegment lprcMonitor, long dwData) {
+	    buf.add(Handle.of(hMonitor));
+	    return(1);
+	}
+	static final MethodHandle _EnumDisplayMonitors = slookup(MethodHandles.lookup(), Win64Unicode.class, "EnumDisplayMonitors", Integer.TYPE,
+								 List.class, MemorySegment.class, MemorySegment.class, MemorySegment.class, Long.TYPE);
+
+	private final MethodHandle EnumDisplayMonitors = ld.downcallHandle(user32.find("EnumDisplayMonitors").get(), FunctionDescriptor.of(BOOL, HDC, ADDRESS, ADDRESS, LPARAM));
+	public List<Handle> EnumDisplayMonitors() {
+	    try(Arena st = Arena.ofConfined()) {
+		List<Handle> buf = new ArrayList<>();
+		MethodHandle proc = MethodHandles.insertArguments(_EnumDisplayMonitors, 0, buf);
+		MemorySegment stub = ld.upcallStub(proc, FunctionDescriptor.of(BOOL, HMONITOR, HDC, ADDRESS, LPARAM), st);
+		int rv;
+		try {
+		    rv = (int)EnumDisplayMonitors.invoke(MemorySegment.NULL, MemorySegment.NULL, stub, 0);
+		} catch(Throwable e) {
+		    throw(new RuntimeException(e));
+		}
+		if(rv == 0)
+		    throw(lasterror());
+		return(buf);
+	    }
+	}
+
 	private final MethodHandle MonitorFromWindow = ld.downcallHandle(user32.find("MonitorFromWindow").get(), FunctionDescriptor.of(HMONITOR, HWND, DWORD));
 	public Handle MonitorFromWindow(Handle hWnd, int dwFlags) {
 	    MemorySegment rv;
@@ -942,6 +979,15 @@ public abstract class Win32 {
 	public boolean ReleaseDC(Handle hWnd, Handle hDC) {
 	    try {
 		return((int)ReleaseDC.invoke(nhandle(hWnd), hDC.bits) != 0);
+	    } catch(Throwable e) {
+		throw(new RuntimeException(e));
+	    }
+	}
+
+	private final MethodHandle GetDeviceCaps = ld.downcallHandle(gdi32.find("GetDeviceCaps").get(), FunctionDescriptor.of(C_INT, HDC, C_INT));
+	public int GetDeviceCaps(Handle hdc, int index) {
+	    try {
+		return((int)GetDeviceCaps.invoke(hdc.bits, index));
 	    } catch(Throwable e) {
 		throw(new RuntimeException(e));
 	    }

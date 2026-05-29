@@ -46,6 +46,7 @@ import static haven.iosys.tk.Key.Std.*;
 public class WGLContext implements Toolkit.Factory {
     private final Win32 win;
     private final WGL wgl;
+    private final SHCore shcore;
 
     private WGLContext() {
 	try {
@@ -54,6 +55,11 @@ public class WGLContext implements Toolkit.Factory {
 	} catch(RuntimeException e) {
 	    throw(new Unavailable("Win32 environment not available", e));
 	}
+	SHCore shcore = null;
+	try {
+	    shcore = SHCore.get();
+	} catch(RuntimeException e) {}
+	this.shcore = shcore;
     }
 
     private static WGLContext instance = null;
@@ -140,6 +146,53 @@ public class WGLContext implements Toolkit.Factory {
 		if(hwnd != null)
 		    win.DestroyWindow(hwnd);
 	    }
+	}
+
+	public class W32Monitor implements Monitor {
+	    public final MONITORINFO minf;
+	    public final int mdpi, gdpi;
+
+	    public W32Monitor(Handle hm, int gdpi) {
+		this.minf = win.MONITORINFO();
+		win.GetMonitorInfo(hm, minf);
+		this.gdpi = gdpi;
+		if(shcore != null) {
+		    Coord mdpi = shcore.GetDpiForMonitor(hm, SHCore.MDT_EFFECTIVE_DPI);
+		    this.mdpi = (mdpi.x + mdpi.y) / 2;
+		} else {
+		    this.mdpi = 0;
+		}
+	    }
+
+	    public Coord resolution() {
+		return(minf.rcMonitor().sz());
+	    }
+
+	    public int refresh() {
+		return(0);
+	    }
+
+	    public double density() {
+		return((mdpi == 0) ? gdpi : mdpi);
+	    }
+
+	    public String toString() {
+		return(String.format("#<w32-monitor %s m%ddpi g%ddpi>", minf.rcMonitor(), mdpi, gdpi));
+	    }
+	}
+
+	public Collection<Monitor> monitors() {
+	    Collection<Monitor> ret = new ArrayList<>();
+	    int gdpi;
+	    Handle hdc = win.GetDC(null);
+	    try {
+		gdpi = (win.GetDeviceCaps(hdc, Win32.LOGPIXELSX) + win.GetDeviceCaps(hdc, Win32.LOGPIXELSY)) / 2;
+	    } finally {
+		win.ReleaseDC(null, hdc);
+	    }
+	    for(Handle monitor : win.EnumDisplayMonitors())
+		ret.add(new W32Monitor(monitor, gdpi));
+	    return(ret);
 	}
 
 	public Cursor.Caps cursorcaps() {

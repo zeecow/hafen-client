@@ -42,6 +42,7 @@ public class ABI {
     public static final MemoryLayout C_FLOAT = systypes.get("float");
     public static final MemoryLayout C_DOUBLE = systypes.get("double");
     public static final MemoryLayout SIZE_T = systypes.get("size_t");
+    public static final MemoryLayout C_ENUM = C_INT;
     public static final MemoryLayout PTRINT_T = (ValueLayout.ADDRESS.byteSize() == 8) ? ValueLayout.JAVA_LONG : ValueLayout.JAVA_INT;
 
     private static final Linker ld() {
