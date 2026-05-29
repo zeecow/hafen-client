@@ -151,6 +151,7 @@ public class WGLContext implements Toolkit.Factory {
 	public class W32Monitor implements Monitor {
 	    public final MONITORINFO minf;
 	    public final int mdpi, gdpi;
+	    public final int fac;
 
 	    public W32Monitor(Handle hm, int gdpi) {
 		this.minf = win.MONITORINFO();
@@ -159,8 +160,10 @@ public class WGLContext implements Toolkit.Factory {
 		if(shcore != null) {
 		    Coord mdpi = shcore.GetDpiForMonitor(hm, SHCore.MDT_EFFECTIVE_DPI);
 		    this.mdpi = (mdpi.x + mdpi.y) / 2;
+		    this.fac = shcore.GetScaleFactorForMonitor(hm);
 		} else {
 		    this.mdpi = 0;
+		    this.fac = 0;
 		}
 	    }
 
@@ -177,7 +180,7 @@ public class WGLContext implements Toolkit.Factory {
 	    }
 
 	    public String toString() {
-		return(String.format("#<w32-monitor %s m%ddpi g%ddpi>", minf.rcMonitor(), mdpi, gdpi));
+		return(String.format("#<w32-monitor %s m%ddpi g%ddpi %d%%>", minf.rcMonitor(), mdpi, gdpi, fac));
 	    }
 	}
 

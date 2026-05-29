@@ -42,6 +42,7 @@ public abstract class SHCore {
     public static final int MDT_RAW_DPI = 2;
 
     public abstract Coord GetDpiForMonitor(Handle hmonitor, int dpiType);
+    public abstract int GetScaleFactorForMonitor(Handle hmonitor);
 
     static class Win64Unicode extends SHCore {
 	private static final MemoryLayout HRESULT = Win32.Win64Unicode.HRESULT;
@@ -63,6 +64,22 @@ public abstract class SHCore {
 		if(rv != Win32.S_OK)
 		    throw(new HResultError(rv));
 		return(Coord.of((int)getint(xbuf, 0, UINT, false), (int)getint(ybuf, 0, UINT, false)));
+	    }
+	}
+
+	private final MethodHandle GetScaleFactorForMonitor = ld.downcallHandle(shcore.find("GetScaleFactorForMonitor").get(), FunctionDescriptor.of(HRESULT, HMONITOR, ADDRESS));
+	public int GetScaleFactorForMonitor(Handle hmonitor) {
+	    try(Arena st = Arena.ofConfined()) {
+		MemorySegment buf = st.allocate(C_ENUM);
+		int rv;
+		try {
+		    rv = (int)GetScaleFactorForMonitor.invoke(hmonitor.bits, buf);
+		} catch(Throwable e) {
+		    throw(new RuntimeException(e));
+		}
+		if(rv != Win32.S_OK)
+		    throw(new HResultError(rv));
+		return((int)getint(buf, 0, C_ENUM, true));
 	    }
 	}
     }
