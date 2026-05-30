@@ -43,7 +43,11 @@ public class JOGLOffscreen implements Acephal {
     private final Environment penv;
 
     public JOGLOffscreen() {
-	prof = GLProfile.getMaxProgrammableCore(true);
+	try {
+	    prof = GLProfile.getMaxProgrammableCore(true);
+	} catch(Throwable e) {
+	    throw(new Unavailable("could not initialize JOGL", e));
+	}
 	GLDrawableFactory df = GLDrawableFactory.getFactory(prof);
 	this.buf = df.createOffscreenAutoDrawable(null, caps(prof), null, 1, 1);
 	buf.addGLEventListener(new GLEventListener() {
@@ -63,7 +67,7 @@ public class JOGLOffscreen implements Acephal {
 	try {
 	    buf.display();
 	} catch(com.jogamp.opengl.GLException e) {
-	    throw(new Unavailable("cuold not initialize JOGL", e));
+	    throw(new Unavailable("could not initialize JOGL", e));
 	}
 	if(benv == null)
 	    throw(new AssertionError("offscreen display call was not honored"));
