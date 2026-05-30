@@ -429,6 +429,7 @@ public class Client implements Console.Directory {
 	} finally {
 	    cl.dispose();
 	}
+	System.exit(0);
     }
 
     public static void main(String[] args) {
