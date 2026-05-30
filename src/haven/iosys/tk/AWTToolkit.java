@@ -57,7 +57,7 @@ public abstract class AWTToolkit implements Toolkit {
 	    System.setProperty("apple.awt.application.name", "Haven & Hearth");
 	    javax.swing.UIManager.setLookAndFeel(javax.swing.UIManager.getSystemLookAndFeelClassName());
 	    // java.awt.Toolkit.getDefaultToolkit().getSystemEventQueue().push(new DebugEventQueue());
-	} catch(Exception e) {
+	} catch(Throwable e) {
 	    new Warning(e, "AWT initialization failed").issue();
 	}
     }
@@ -71,6 +71,8 @@ public abstract class AWTToolkit implements Toolkit {
 	    emptycurs = java.awt.Toolkit.getDefaultToolkit().createCustomCursor(TexI.mkbuf(new Coord(1, 1)), new java.awt.Point(), "");
 	} catch(HeadlessException e) {
 	    throw(new Unavailable("AWT is running headlessly", e));
+	} catch(Throwable e) {
+	    throw(new Unavailable("AWT failed to initialize", e));
 	}
     }
 
