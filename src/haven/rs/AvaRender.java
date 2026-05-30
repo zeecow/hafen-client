@@ -104,7 +104,7 @@ public class AvaRender {
 
     public static final Server.Command call = new Server.Command() {
 	    public Object[] run(Server.Client cl, Object... args) throws InterruptedException {
-		Coord sz = UI.scale((Coord)args[0]);
+		Coord sz = (Coord)args[0];
 		Resource.Resolver rr = new ServerRes(Resource.remote());
 		Composited.Desc desc = Composited.Desc.decode(rr, Utils.oav(args[1]));
 		Resource.Resolver map = new Resource.Resolver.ResourceMap(rr, Utils.oav(args[2]));
