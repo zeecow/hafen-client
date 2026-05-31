@@ -244,7 +244,7 @@ public class JavaSound implements haven.iosys.audio.AudioSystem {
 	try {
 	    /* Basic availability test */
 	    line = (SourceDataLine)mixer.getLine(new DataLine.Info(SourceDataLine.class, fmt));
-	} catch(LineUnavailableException e) {
+	} catch(LineUnavailableException | IllegalArgumentException e) {
 	    throw(new Unavailable(e));
 	}
 	line.close();
