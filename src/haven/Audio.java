@@ -33,6 +33,9 @@ import java.nio.file.*;
 import dolda.xiphutil.*;
 
 public class Audio {
+    /* XXX: Surprisingly, 44.1 kHz seems to not be so universally
+     * supported as I thought it was. The audio system should probably
+     * support dynamic sample rates. */
     public static final int SAMPLE_RATE = 44100;
     @Deprecated public static final javax.sound.sampled.AudioFormat fmt =
 	new javax.sound.sampled.AudioFormat(SAMPLE_RATE, 16, 2, true, false);
