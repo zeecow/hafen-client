@@ -322,7 +322,6 @@ public class UI {
 	public void drain() {
 	    boolean irq = false;
 	    synchronized(this) {
-		Debug.dump(inflight);
 		while(inflight > 0) {
 		    double st = Utils.rtime();
 		    try {
@@ -330,7 +329,6 @@ public class UI {
 		    } catch(InterruptedException e) {
 			irq = true;
 		    }
-		    Debug.dump(Utils.rtime() - st);
 		}
 	    }
 	    if(irq)
