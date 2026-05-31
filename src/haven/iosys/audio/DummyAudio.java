@@ -97,6 +97,7 @@ public class DummyAudio implements AudioSystem {
 	}
 
 	public int priority() {return(-999);}
+	public boolean autouse() {return(false);}
     };
     public static Factory get() {
 	return(factory);
