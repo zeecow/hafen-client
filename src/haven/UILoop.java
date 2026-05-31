@@ -56,6 +56,9 @@ public abstract class UILoop implements Console.Directory {
 	this.curscaps = wnd.toolkit().cursorcaps();
 	newui(null);
 	this.th = new HackThread(this::run, "Haven UI thread");
+    }
+
+    public void start() {
 	this.th.start();
     }
 

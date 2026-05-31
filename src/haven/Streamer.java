@@ -165,6 +165,7 @@ public class Streamer implements Console.Directory {
 	if(mt != null) throw(new IllegalStateException());
 	mt = Thread.currentThread();
 	UILoop loop = this.loop = new StreamerLoop();
+	loop.start();
 	try {
 	    try {
 		while(task != null)

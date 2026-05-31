@@ -268,6 +268,7 @@ public class Client implements Console.Directory {
 	if(mt != null) throw(new IllegalStateException());
 	mt = Thread.currentThread();
 	UILoop loop = this.loop = new ClientLoop(this);
+	loop.start();
 	try {
 	    try {
 		while(task != null)
