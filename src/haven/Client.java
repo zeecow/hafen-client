@@ -30,7 +30,9 @@ import java.util.*;
 import java.io.*;
 import java.nio.file.*;
 import haven.render.*;
+import haven.iosys.*;
 import haven.iosys.tk.*;
+import haven.iosys.audio.*;
 import java.awt.image.BufferedImage;
 
 public class Client implements Console.Directory {
@@ -203,6 +205,19 @@ public class Client implements Console.Directory {
 	    UI ui = super.newui(fun);
 	    ui.cons.add(cl);
 	    return(ui);
+	}
+
+	private AudioSystem.SinkLine audiosink = null;
+	protected AudioSystem.SinkLine audiosink() {
+	    if(audiosink == null) {
+		try {
+		    audiosink = AudioSystem.instance().sinkline(Audio.defspec());
+		} catch(Unavailable a) {
+		    new Warning(a, "could not open an audio sink line").issue();
+		    audiosink = DummyAudio.DummySink.instance;
+		}
+	    }
+	    return(audiosink);
 	}
 
 	protected void dispatch(UI ui) {

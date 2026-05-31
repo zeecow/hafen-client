@@ -74,8 +74,11 @@ public abstract class UILoop implements Console.Directory {
 	}
     }
 
+    private Audio.Root audio = null;
     public UI newui(UI.Runner fun) {
-	UI prevui, newui = new UI(wnd, new Audio.Root(audiosink()), new Coord(wnd.size()), fun);
+	if(audio == null)
+	    audio = new Audio.Root(audiosink());
+	UI prevui, newui = new UI(wnd, audio, new Coord(wnd.size()), fun);
 	newui.env = this.env;
 	newui.cons.add(this);
 	synchronized(uilock) {
@@ -361,7 +364,8 @@ public abstract class UILoop implements Console.Directory {
     protected abstract void dispatch(UI ui);
 
     protected AudioSystem.SinkLine audiosink() {
-	return(AudioSystem.instance().sinkline(Audio.defspec()));
+	return(DummyAudio.DummySink.instance);
+	// return(AudioSystem.instance().sinkline(Audio.defspec()));
     }
 
     protected boolean bgmode() {
