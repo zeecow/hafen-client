@@ -82,54 +82,12 @@ public class Streamer implements Console.Directory {
 	}
     }
 
-    public static class DummyToolkit implements Toolkit {
-	public static final DummyToolkit instance = new DummyToolkit();
-
-	public Cursor.Caps cursorcaps() {return(new Cursor.Caps(Integer.MAX_VALUE, 0));}
-	public Cursor makecursor(BufferedImage img, Coord hotspot) {throw(new UnsupportedOperationException());}
-	public Windeye window() {throw(new UnsupportedOperationException());}
-	public void dispose() {}
-	public String description() {return("Dummy toolkit");}
-    }
-
-    public class DummyWindow implements Windeye {
-	public final Coord size;
-
-	public DummyWindow(Coord size) {
-	    this.size = size;
-	}
-
-	public Toolkit toolkit() {return(DummyToolkit.instance);}
-
-	public void add(Toolkit.EventListener l) {}
-	public Windeye show(boolean vis) {return(this);}
-	public Windeye title(String title) {return(this);}
-	public Windeye icon(BufferedImage img) {return(this);}
-	public Windeye cursor(Cursor c) {return(this);}
-	public Windeye sizing(Sizing infox) {return(this);}
-	public Windeye state(State st) {return(this);}
-
-	public Coord size() {return(size);}
-	public State state() {return(State.NORMAL);}
-	public boolean focused() {return(true);}
-
-	public Environment env() {
-	    return(env);
-	}
-
-	public void swapbuffers(Render buf, Object mode) {
-	    output.accept(buf, loop.basestate());
-	}
-
-	public void dispose() {}
-    }
-
     public class StreamerLoop extends UILoop {
 	private final FragColor<Texture.Image<Texture2D>> col;
 	private final DepthBuffer<Texture.Image<Texture2D>> dpt;
 
 	private StreamerLoop() {
-	    super(new DummyWindow(size));
+	    super(DummyToolkit.DummyWindow.of(size, Streamer.this.env, buf -> output.accept(buf, Streamer.this.loop.basestate())));
 	    col = new FragColor<>(new Texture2D(size, DataBuffer.Usage.STATIC, new VectorFormat(4, NumberFormat.UNORM8), null).image(0));
 	    dpt = new DepthBuffer<>(new Texture2D(size, DataBuffer.Usage.STATIC, Texture.DEPTH, new VectorFormat(1, NumberFormat.FLOAT32), null).image(0));
 	}
