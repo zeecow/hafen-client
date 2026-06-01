@@ -179,8 +179,6 @@ public class StreamOut {
 		} catch(IOException e) {
 		    new Warning(e, "could not close stream-out channel").issue();
 		}
-	    } else {
-		ot.interrupt();
 	    }
 	}
     }
