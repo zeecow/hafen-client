@@ -473,9 +473,7 @@ public interface GLPanel extends UIPanel, UI.Context {
 		}
 	    }
 	    if(prevui != null) {
-		synchronized(prevui) {
-		    prevui.destroy();
-		}
+		prevui.destroy();
 	    }
 	    return(newui);
 	}

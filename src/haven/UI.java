@@ -924,8 +924,10 @@ public class UI {
 
     public void destroy() {
 	queue.drain();
-	root.destroy();
-	audio.clear();
+	synchronized(this) {
+	    root.destroy();
+	    audio.clear();
+	}
     }
 
     public void sfx(Audio.CS clip) {
