@@ -140,7 +140,6 @@ public class StreamOut {
 		    ot.start();
 		}
 	    }
-	    Utils.defer(() -> System.exit(127));
 	}
     }
 
