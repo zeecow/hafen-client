@@ -100,9 +100,7 @@ public abstract class UILoop implements Console.Directory {
 	    }
 	}
 	if(prevui != null) {
-	    synchronized(prevui) {
-		prevui.destroy();
-	    }
+	    prevui.destroy();
 	}
 	return(newui);
     }
