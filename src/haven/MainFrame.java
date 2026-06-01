@@ -457,6 +457,7 @@ public class MainFrame extends java.awt.Frame implements Console.Directory {
 
     private static void main2(String[] args) {
 	Config.cmdline(args);
+	haven.error.ErrorHandler.setprop("jar.config", Config.confid);
 	status("start");
 	try {
 	    javabughack();
