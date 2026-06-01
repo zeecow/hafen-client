@@ -32,7 +32,8 @@ import haven.render.*;
 import haven.iosys.tk.*;
 import haven.iosys.audio.*;
 
-public class HeadlessClient implements Console.Directory {
+public class HeadlessClient implements Console.Directory, Console.Host {
+    private static final PrintWriter stdout = new PrintWriter(System.out);
     private static Coord size = Coord.of(1920,1080);
     private final Environment env;
     private Thread mt;
@@ -60,7 +61,12 @@ public class HeadlessClient implements Console.Directory {
 
 	public UI newui(UI.Runner fun) {
 	    UI ui = super.newui(fun);
+	    ui.cons.out = stdout;
 	    ui.cons.add(HeadlessClient.this);
+	    ui.grab(new Widget(), UI.NoticeEvent.class, ev -> {
+		stdout.println(ev.msg.message());
+		return(false);
+	    });
 	    return(ui);
 	}
 
@@ -82,6 +88,8 @@ public class HeadlessClient implements Console.Directory {
     public void run(UI.Runner task) {
 	if(mt != null) throw(new IllegalStateException());
 	mt = Thread.currentThread();
+	Thread stdio = new HackThread(this::stdin, "stdio reader");
+	stdio.start();
 	UILoop loop = this.loop = new HeadlessLoop();
 	loop.start();
 	try {
@@ -94,8 +102,49 @@ public class HeadlessClient implements Console.Directory {
 	    }
 	} finally {
 	    loop.dispose();
+	    stdio.interrupt();
 	    this.loop = null;
 	    mt = null;
+	}
+    }
+
+    private void stdin() {
+	StringBuilder readbuf = new StringBuilder();
+	stdout.print("> "); stdout.flush();
+	try {
+	    while(true) {
+		try {
+		    while(System.in.available() == 0)
+			Thread.sleep(100);
+		    int c = System.in.read();
+		    if(c == '\n') {
+			UI ui = loop.ui;
+			synchronized(ui) {
+			    String cmd = readbuf.toString();
+			    readbuf.setLength(0);
+			    if((cmd.length() > 0) && (cmd.charAt(0) == ':')) {
+				try {
+				    loop.ui.cons.run(this, cmd.substring(1));
+				    stdout.flush();
+				} catch(Exception e) {
+				    String msg = e.getMessage();
+				    if(msg == null)
+					msg = e.toString();
+				    stdout.println(msg);
+				}
+			    } else {
+				loop.ui.root.wdgmsg("cmd", cmd);
+			    }
+			}
+			stdout.print("> "); stdout.flush();
+		    } else if(c > 0) {
+			readbuf.append((char)c);
+		    }
+		} catch(IOException e) {
+		    e.printStackTrace();
+		}
+	    }
+	} catch(InterruptedException e) {
 	}
     }
 
@@ -123,7 +172,7 @@ public class HeadlessClient implements Console.Directory {
 
     private static void parseargs(String[] args) {
 	PosixArgs opt = PosixArgs.getopt(args, "hs:u:C:p:");
-	if((opt == null) || (opt.rest.length < 1)) {
+	if(opt == null) {
 	    usage(System.err);
 	    System.exit(1);
 	}
