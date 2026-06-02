@@ -223,7 +223,7 @@ public class ZeeManagerGobs extends ZeeThread{
             }.start();
         }
         // activate harvest area if non-trellis crop
-        else if (isGobCrop(gobName) && ZeeManagerFarmer.isCropStageHarvestable(gob)){
+        else if (gobName.endsWith("fallowplant") || (isGobCrop(gobName) && ZeeManagerFarmer.isCropStageHarvestable(gob))){
             if (!ZeeConfig.getCursorName().equals(ZeeConfig.CURSOR_HARVEST))
                 gobClick(gob, 3, UI.MOD_SHIFT);
         }
