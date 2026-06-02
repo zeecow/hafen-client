@@ -1355,7 +1355,6 @@ public class GLXContext implements Toolkit.Factory {
 			    try {
 				ret.add(Paths.get(Utils.uri(ln)));
 			    } catch(IllegalArgumentException e) {
-				e.printStackTrace();
 			    }
 			}
 			return(ret);
