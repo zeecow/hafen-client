@@ -29,6 +29,7 @@ package haven.iosys.tk.ffi;
 import java.util.*;
 import java.util.function.*;
 import java.awt.image.*;
+import java.nio.file.*;
 import haven.*;
 import haven.iosys.*;
 import haven.render.*;
@@ -142,6 +143,7 @@ public class GLXContext implements Toolkit.Factory {
 	public final Atomic ATOM = new Atomic("ATOM");
 	public final Atomic CARDINAL = new Atomic("CARDINAL");
 	public final Atomic WINDOW = new Atomic("WINDOW");
+	public final Atomic STRING = new Atomic("STRING");
 	public final Atomic UTF8_STRING = new Atomic("UTF8_STRING");
 	public final Atomic WM_NAME = new Atomic("WM_NAME");
 	public final Atomic WM_PROTOCOLS = new Atomic("WM_PROTOCOLS");
@@ -163,6 +165,9 @@ public class GLXContext implements Toolkit.Factory {
 	public final Atomic SELECTED_DATA = new Atomic("SELECTED_DATA");
 	public final Atomic IMAGE_PNG = new Atomic("image/png");
 	public final Atomic IMAGE_JPEG = new Atomic("image/jpeg");
+	public final Atomic TEXT_PLAIN = new Atomic("text/plain");
+	public final Atomic TEXT_PLAIN_UTF8 = new Atomic("text/plain;charset=utf8");
+	public final Atomic TEXT_URILIST = new Atomic("text/uri-list");
 	public final String srvvendor, wmname;
 	public final int srvrelease;
 	private boolean closed = false;
@@ -311,14 +316,14 @@ public class GLXContext implements Toolkit.Factory {
 		srvrelease = xlib.XVendorRelease(dpy);
 
 		/* Atoms */
-		prepare(ATOM, CARDINAL, WINDOW, UTF8_STRING,
+		prepare(ATOM, CARDINAL, WINDOW, STRING, UTF8_STRING,
 			WM_NAME, WM_PROTOCOLS, WM_DELETE_WINDOW,
 			_NET_WM_NAME, _NET_WM_ICON, _NET_WM_PID, _NET_WM_PING,
 			_NET_WM_STATE, _NET_WM_STATE_MAXIMIZED_VERT, _NET_WM_STATE_MAXIMIZED_HORZ,
 			_NET_WM_STATE_HIDDEN, _NET_WM_STATE_FULLSCREEN,
 			_NET_SUPPORTING_WM_CHECK,
 			PRIMARY, CLIPBOARD, TARGETS, INCR, SELECTED_DATA,
-			IMAGE_PNG, IMAGE_JPEG
+			IMAGE_PNG, IMAGE_JPEG, TEXT_PLAIN, TEXT_PLAIN_UTF8, TEXT_URILIST
 			);
 
 		/* Keyboard input */
@@ -1317,6 +1322,8 @@ public class GLXContext implements Toolkit.Factory {
 			throw(new RuntimeException("unexpected selection format for text: " + req.resp.format));
 		    if(UTF8_STRING.is(req.resp.type))
 			return(new String(req.resp.b(), Utils.utf8));
+		    if(STRING.is(req.resp.type))
+			return(new String(req.resp.b(), java.nio.charset.Charset.forName("ISO-8859-1")));
 		    throw(new RuntimeException("unexpected selection type for text: " + xlib.XGetAtomName(dpy, req.resp.type)));
 		}
 
@@ -1336,6 +1343,26 @@ public class GLXContext implements Toolkit.Factory {
 		    throw(new RuntimeException("unexpected selection type for image: " + xlib.XGetAtomName(dpy, req.resp.type)));
 		}
 
+		private Collection<Path> cvt_paths(SelectionRequest req) {
+		    if(req.resp.format != 8)
+			throw(new RuntimeException("unexpected selection format for paths: " + req.resp.format));
+		    if(TEXT_URILIST.is(req.resp.type)) {
+			Collection<Path> ret = new ArrayList<>();
+			for(String ln : new String(req.resp.b(), Utils.utf8).split("\n")) {
+			    ln = ln.trim();
+			    if((ln.length() == 0) || (ln.charAt(0) == '#'))
+				continue;
+			    try {
+				ret.add(Paths.get(Utils.uri(ln)));
+			    } catch(IllegalArgumentException e) {
+				e.printStackTrace();
+			    }
+			}
+			return(ret);
+		    }
+		    throw(new RuntimeException("unexpected selection type for paths: " + xlib.XGetAtomName(dpy, req.resp.type)));
+		}
+
 		private <T> Clipboard.Item<T> mkitem(SelectionRequest treq, Clipboard.Format<T> fmt, Atom target, Function<SelectionRequest, ? extends T> cvt) {
 		    return(new Clipboard.Item<T>(fmt, () -> convert(treq.owner, target, treq.time).map(cvt)));
 		}
@@ -1349,10 +1376,14 @@ public class GLXContext implements Toolkit.Factory {
 			List<Item<?>> items = new ArrayList<>();
 			if(tgts.contains(UTF8_STRING.id))
 			    items.add(mkitem(treq, Clipboard.Format.TEXT, UTF8_STRING.id, this::cvt_text));
+			else if(tgts.contains(STRING.id))
+			    items.add(mkitem(treq, Clipboard.Format.TEXT, STRING.id, this::cvt_text));
 			if(tgts.contains(IMAGE_JPEG.id))
 			    items.add(mkitem(treq, Clipboard.Format.IMAGE, IMAGE_JPEG.id, this::cvt_image));
 			else if(tgts.contains(IMAGE_PNG.id))
 			    items.add(mkitem(treq, Clipboard.Format.IMAGE, IMAGE_PNG.id, this::cvt_image));
+			if(tgts.contains(TEXT_URILIST.id))
+			    items.add(mkitem(treq, Clipboard.Format.PATHS, TEXT_URILIST.id, this::cvt_paths));
 			return(new Contents(items));
 		    });
 		    return(ret);
