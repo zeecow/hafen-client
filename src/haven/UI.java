@@ -249,6 +249,7 @@ public class UI {
     private static final boolean cmddump = false;
     public class CommandQueue {
 	private final Map<Integer, Command> score = new HashMap<>();
+	private int inflight = 0;
 
 	private CommandQueue() {}
 
@@ -296,6 +297,7 @@ public class UI {
 			wait.add(p.id);
 		    System.err.printf("wait: %s on %s\n", cmd, wait);
 		}
+		inflight++;
 	    }
 	    if(ready)
 		execute(cmd);
@@ -315,9 +317,27 @@ public class UI {
 		    if(score.get(bar) == cmd)
 			score.remove(bar);
 		}
+		if(--inflight == 0)
+		    notifyAll();
 	    }
 	    for(Command next : ready)
 		execute(next);
+	}
+
+	public void drain() {
+	    boolean irq = false;
+	    synchronized(this) {
+		while(inflight > 0) {
+		    double st = Utils.rtime();
+		    try {
+			wait();
+		    } catch(InterruptedException e) {
+			irq = true;
+		    }
+		}
+	    }
+	    if(irq)
+		Thread.currentThread().interrupt();
 	}
     }
 
@@ -913,8 +933,11 @@ public class UI {
     }
 
     public void destroy() {
-	root.destroy();
-	audio.clear();
+	queue.drain();
+	synchronized(this) {
+	    root.destroy();
+	    audio.clear();
+	}
     }
 
     public void sfx(Audio.CS clip) {
