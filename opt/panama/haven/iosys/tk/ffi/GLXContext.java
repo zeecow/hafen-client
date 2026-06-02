@@ -40,6 +40,7 @@ import haven.ffi.x11.*;
 import haven.ffi.gl.*;
 import haven.ffi.x11.XLib.*;
 import haven.ffi.x11.XInput.*;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import static haven.ffi.x11.XKeysym.*;
 import static haven.iosys.tk.Key.Std.*;
@@ -158,6 +159,10 @@ public class GLXContext implements Toolkit.Factory {
 	public final Atomic PRIMARY = new Atomic("PRIMARY");
 	public final Atomic CLIPBOARD = new Atomic("CLIPBOARD");
 	public final Atomic TARGETS = new Atomic("TARGETS");
+	public final Atomic INCR = new Atomic("INCR");
+	public final Atomic SELECTED_DATA = new Atomic("SELECTED_DATA");
+	public final Atomic IMAGE_PNG = new Atomic("image/png");
+	public final Atomic IMAGE_JPEG = new Atomic("image/jpeg");
 	public final String srvvendor, wmname;
 	public final int srvrelease;
 	private boolean closed = false;
@@ -312,7 +317,8 @@ public class GLXContext implements Toolkit.Factory {
 			_NET_WM_STATE, _NET_WM_STATE_MAXIMIZED_VERT, _NET_WM_STATE_MAXIMIZED_HORZ,
 			_NET_WM_STATE_HIDDEN, _NET_WM_STATE_FULLSCREEN,
 			_NET_SUPPORTING_WM_CHECK,
-			PRIMARY, CLIPBOARD, TARGETS
+			PRIMARY, CLIPBOARD, TARGETS, INCR, SELECTED_DATA,
+			IMAGE_PNG, IMAGE_JPEG
 			);
 
 		/* Keyboard input */
@@ -478,10 +484,21 @@ public class GLXContext implements Toolkit.Factory {
 	    }
 	}
 
+	public static interface EventWindow {
+	    public XID windowid();
+	    public void event(XEvent ev);
+	    public default void event(XIDeviceEvent ev) {
+		Warning.warn("unexpected XIDeviceEvent received for %s: %d", this, ev.evtype());
+	    }
+	    public default void event(XIFocusEvent ev) {
+		Warning.warn("unexpected XIFocusEvent received for %s: %d", this, ev.evtype());
+	    }
+	}
+
 	private void dispatch(XIDeviceEvent ev) {
 	    XID id;
 	    id = ev.event();
-	    GLXWindow wnd;
+	    EventWindow wnd;
 	    synchronized(etmon) {
 		wnd = windows.get(id);
 	    }
@@ -495,7 +512,7 @@ public class GLXContext implements Toolkit.Factory {
 	private void dispatch(XIFocusEvent ev) {
 	    XID id;
 	    id = ev.event();
-	    GLXWindow wnd;
+	    EventWindow wnd;
 	    synchronized(etmon) {
 		wnd = windows.get(id);
 	    }
@@ -531,7 +548,7 @@ public class GLXContext implements Toolkit.Factory {
 		}
 	    } else {
 		XID id = ev.window();
-		GLXWindow wnd;
+		EventWindow wnd;
 		synchronized(etmon) {
 		    wnd = windows.get(id);
 		}
@@ -546,7 +563,7 @@ public class GLXContext implements Toolkit.Factory {
 	private final Object etmon = new Object();
 	private Thread evthread = null;
 	private int etref = 0;
-	private final Map<XID, GLXWindow> windows = new HashMap<>();
+	private final Map<XID, EventWindow> windows = new HashMap<>();
 	private final Queue<Runnable> xtasks = new LinkedList<>();
 	private void handleevents() {
 	    try {
@@ -676,20 +693,20 @@ public class GLXContext implements Toolkit.Factory {
 	    }));
 	}
 
-	private void register(GLXWindow wnd) {
+	private void register(EventWindow wnd) {
 	    synchronized(etmon) {
-		windows.put(wnd.id, wnd);
+		windows.put(wnd.windowid(), wnd);
 		ckevthread();
 	    }
 	}
 
-	private void unregister(GLXWindow wnd) {
+	private void unregister(EventWindow wnd) {
 	    synchronized(etmon) {
-		windows.remove(wnd.id);
+		windows.remove(wnd.windowid());
 	    }
 	}
 
-	public class GLXWindow implements Windeye {
+	public class GLXWindow implements Windeye, EventWindow {
 	    public final XID id;
 	    public final XIC ic;
 	    private final Collection<Consumer<XEvent>> listeners = new ArrayList<>();
@@ -777,6 +794,8 @@ public class GLXContext implements Toolkit.Factory {
 			dispose();
 		}
 	    }
+
+	    public XID windowid() {return(id);}
 
 	    public void add(EventListener l) {
 		callbacks.add(l);
@@ -1126,6 +1145,7 @@ public class GLXContext implements Toolkit.Factory {
 		}
 	    }
 
+	    /*
 	    private GLXClipboard getclipboard(Atom id) {
 		synchronized(clipboards) {
 		    return(clipboards.get(id));
@@ -1143,8 +1163,9 @@ public class GLXContext implements Toolkit.Factory {
 		GLXClipboard c = getclipboard(ev.selection());
 		if(c != null) c.notify(ev);
 	    }
+	    */
 
-	    private void event(XEvent ev) {
+	    public void event(XEvent ev) {
 		for(Consumer<XEvent> cb : listeners)
 		    cb.accept(ev);
 		switch(ev.type()) {
@@ -1181,6 +1202,7 @@ public class GLXContext implements Toolkit.Factory {
 		case XLib.KeyRelease:
 		    keyrelease(ev.xkey());
 		    break;
+		    /*
 		case XLib.SelectionClear:
 		    selectionclear(ev.xselectionclear());
 		    break;
@@ -1190,12 +1212,13 @@ public class GLXContext implements Toolkit.Factory {
 		case XLib.SelectionNotify:
 		    selectionnotify(ev.xselection());
 		    break;
+		    */
 		default:
 		    Warning.warn(String.format("unexpected event received for window %s: %d", id, ev.type()));
 		}
 	    }
 
-	    private void event(XIDeviceEvent ev) {
+	    public void event(XIDeviceEvent ev) {
 		XIPointerInfo ptr;
 		synchronized(pointers) {
 		    ptr = pointers.get(ev.deviceid());
@@ -1248,7 +1271,7 @@ public class GLXContext implements Toolkit.Factory {
 		}
 	    }
 
-	    private void event(XIFocusEvent ev) {
+	    public void event(XIFocusEvent ev) {
 		switch(ev.evtype()) {
 		case XInput.XI_Enter:
 		    xrun(() -> {
@@ -1269,52 +1292,6 @@ public class GLXContext implements Toolkit.Factory {
 
 	    public class GLXClipboard implements Clipboard {
 		public final Atom selection;
-		private Map<Atom, Request> requests = new HashMap<>();
-
-		class Request {
-		    final XID owner;
-		    final double time;
-		    final int id;
-		    final Atom prop;
-		    final Promise<Request> promise;
-		    XSelectionEvent ev;
-
-		    Request(XID owner, Promise<Request> promise) {
-			this.owner = owner;
-			this.promise = promise;
-			synchronized(requests) {
-			    Set<Integer> ids = new HashSet<>();
-			    requests.values().forEach(req -> ids.add(req.id));
-			    for(int id = 0; true; id++) {
-				if(!ids.contains(id)) {
-				    this.id = id;
-				    break;
-				}
-			    }
-			    this.prop = xlib.XInternAtom(dpy, "SELECTION_DATA_" + id, false);
-			    requests.put(prop, this);
-			}
-			this.time = Utils.rtime();
-		    }
-
-		    void handle(XSelectionEvent ev) {
-			this.ev = ev;
-			synchronized(requests) {
-			    requests.remove(prop);
-			}
-			promise.resolve(this);
-		    }
-		}
-
-		public static class ByteData {
-		    final Atom type;
-		    final byte[] data;
-
-		    ByteData(Atom type, byte[] data) {
-			this.type = type;
-			this.data = data;
-		    }
-		}
 
 		public GLXClipboard(Atom selection) {
 		    this.selection = selection;
@@ -1327,82 +1304,200 @@ public class GLXContext implements Toolkit.Factory {
 		public void put(Contents cnt, Runnable expire) {
 		}
 
-		public Promise<XProperty> fetchprop(XID owner, Atom target, long time) {
-		    Promise<Request> data = new Promise<>();
-		    xrun(() -> {
-			Request req = new Request(owner, data);
-			xlib.XConvertSelection(dpy, selection, target, req.prop, id, time);
-		    });
-		    return(data.then(req -> etpromise(() -> xlib.XGetWindowProperty(dpy, id, req.prop, true, Atom.nil))));
+		private Promise<SelectionRequest> convert(XID owner, Atom target, long time) {
+		    return(etpromise(() -> {
+			return(new SelectionRequest(selection, owner, target, time));
+		    }).then(req -> {
+			return(req.promise);
+		    }));
+		}
+
+		private String cvt_text(SelectionRequest req) {
+		    if(req.resp.format != 8)
+			throw(new RuntimeException("unexpected selection format for text: " + req.resp.format));
+		    if(UTF8_STRING.is(req.resp.type))
+			return(new String(req.resp.b(), Utils.utf8));
+		    throw(new RuntimeException("unexpected selection type for text: " + xlib.XGetAtomName(dpy, req.resp.type)));
+		}
+
+		private BufferedImage cvt_image(SelectionRequest req) {
+		    if(req.resp.format != 8)
+			throw(new RuntimeException("unexpected selection format for image: " + req.resp.format));
+		    if(Arrays.asList(IMAGE_PNG.id, IMAGE_JPEG.id).contains(req.resp.type))
+			try {
+			    Debug.dump(req.resp);
+			    BufferedImage ret = javax.imageio.ImageIO.read(new ByteArrayInputStream(req.resp.b()));
+			    if(ret == null)
+				throw(new RuntimeException("could not decode clipboard image"));
+			    return(ret);
+			} catch(IOException e) {
+			    throw(new RuntimeException(e.getMessage(), e));
+			}
+		    throw(new RuntimeException("unexpected selection type for image: " + xlib.XGetAtomName(dpy, req.resp.type)));
+		}
+
+		private <T> Clipboard.Item<T> mkitem(SelectionRequest treq, Clipboard.Format<T> fmt, Atom target, Function<SelectionRequest, ? extends T> cvt) {
+		    return(new Clipboard.Item<T>(fmt, () -> convert(treq.owner, target, treq.time).map(cvt)));
 		}
 
 		public Promise<Contents> get() {
-		    Promise<Request> targets = new Promise<>();
-		    xrun(() -> {
-			XID owner = xlib.XGetSelectionOwner(dpy, selection);
-			if(owner.equals(XID.None))
-			    targets.resolve(null);
-			Request req = new Request(owner, targets);
-			xlib.XConvertSelection(dpy, selection, TARGETS.id, req.prop, id, XLib.CurrentTime);
+		    Promise<Contents> ret = convert(null, TARGETS.id, XLib.CurrentTime).map(treq -> {
+			XProperty data = treq.resp;
+			if((data == null) || (data.format != 32) || !ATOM.is(data.type))
+			    throw(new RuntimeException("selection target fetch failed"));
+			Set<Atom> tgts = new HashSet<>(Arrays.asList(data.a()));
+			List<Item<?>> items = new ArrayList<>();
+			if(tgts.contains(UTF8_STRING.id))
+			    items.add(mkitem(treq, Clipboard.Format.TEXT, UTF8_STRING.id, this::cvt_text));
+			if(tgts.contains(IMAGE_JPEG.id))
+			    items.add(mkitem(treq, Clipboard.Format.IMAGE, IMAGE_JPEG.id, this::cvt_image));
+			else if(tgts.contains(IMAGE_PNG.id))
+			    items.add(mkitem(treq, Clipboard.Format.IMAGE, IMAGE_PNG.id, this::cvt_image));
+			return(new Contents(items));
 		    });
-		    return(targets.then(req -> etpromise(() -> {
-			if(req == null)
-			    return(new Contents(Collections.emptyList()));
-			XProperty res = xlib.XGetWindowProperty(dpy, id, req.prop, true, Atom.nil);
-			if((res == null) || (res.format != 32) || !ATOM.is(res.type))
-			    throw(new RuntimeException("Selection property fetch failed"));
-			Set<Atom> tgts = new HashSet<>(Arrays.asList(res.a()));
-			List<Item<?>> ret = new ArrayList<>();
-			if(tgts.contains(UTF8_STRING.id)) {
-			    ret.add(new Clipboard.Item<CharSequence>(Clipboard.Format.TEXT,
-							 () -> fetchprop(req.owner, UTF8_STRING.id, req.ev.time()).map(prop -> {
-							     Debug.dump(prop);
-							     return(new String(prop.b(), Utils.utf8));
-							 })));
-			}
-			return(new Contents(ret));
-		    })));
-		}
-
-		void clear(XSelectionClearEvent ev) {
-		    
-		}
-
-		void request(XSelectionRequestEvent ev) {
-		}
-
-		void notify(XSelectionEvent ev) {
-		    Request req;
-		    synchronized(requests) {
-			req = requests.get(ev.property());
-		    }
-		    if(req == null) {
-			Warning.warn("X11 selection event arrived for non-pending request: " + ev.property());
-			return;
-		    }
-		    req.handle(ev);
+		    return(ret);
 		}
 	    }
 
 	    private final Map<Atom, GLXClipboard> clipboards = new HashMap<>();
+	    public GLXClipboard clipboard(Atom name, boolean create) {
+		synchronized(clipboards) {
+		    if(create)
+			return(clipboards.computeIfAbsent(name, GLXClipboard::new));
+		    return(clipboards.get(name));
+		}
+	    }
+
 	    public Clipboard clipboard(Object id) {
 		Atom name;
 		if(id == Clipboard.Std.PRIMARY)
 		    name = PRIMARY.id;
 		else if(id == Clipboard.Std.CLIPBOARD)
 		    name = CLIPBOARD.id;
+		else if(id instanceof Atom)
+		    name = (Atom)id;
 		else if(id instanceof String)
 		    name = xrun(() -> xlib.XInternAtom(dpy, (String)id, false));
 		else
 		    return(Clipboard.nil);
-		synchronized(clipboards) {
-		    return(clipboards.computeIfAbsent(name, GLXClipboard::new));
-		}
+		return(clipboard(name, true));
 	    }
 	}
 
 	public Windeye window() {
 	    return(new GLXWindow());
+	}
+
+	public class SelectionRequest implements EventWindow {
+	    public final Atom selection, target;
+	    public final Promise<SelectionRequest> promise = new Promise<>();
+	    private final XID owner, twnd;
+	    private long time;
+	    private Timeout.Future<?> timeout;
+	    public XProperty resp = null;
+	    private byte[] incrbuf = null;
+	    private int incroff = 0;
+	    private boolean done = false;
+
+	    private SelectionRequest(Atom selection, XID owner, Atom target, long time) {
+		this.selection = selection;
+		this.owner = (owner == null) ? xlib.XGetSelectionOwner(dpy, selection) : owner;
+		this.target = target;
+		this.time = time;
+		XSetWindowAttributes attr = xlib.XSetWindowAttributes();
+		attr.event_mask(XLib.PropertyChangeMask);
+		this.twnd = xlib.XCreateWindow(dpy, screen.root(), 0, 0, 1, 1, 0, 0, XLib.InputOnly, vis.visual(), XLib.CWEventMask, attr);
+		register(this);
+		xlib.XConvertSelection(dpy, selection, target, SELECTED_DATA.id, twnd, time);
+		this.timeout = Timeout.later(Utils.rtime() + 5, () -> xrun(this::timeout), null);
+	    }
+
+	    private SelectionRequest(Atom selection, Atom target, long time) {
+		this(selection, null, target, time);
+	    }
+
+	    public XID windowid() {
+		return(twnd);
+	    }
+
+	    public void dispose() {
+		if(!done) {
+		    xlib.XDestroyWindow(dpy, twnd);
+		    done = true;
+		}
+	    }
+
+	    private void handle(XSelectionEvent ev) {
+		synchronized(this) {
+		    if(done)
+			return;
+		    boolean dispose = true;
+		    try {
+			if(time == XLib.CurrentTime)
+			    time = ev.time();
+			if(Atom.nil.equals(ev.property())) {
+			    promise.reject(new IOException("selection conversion failed"));
+			} else {
+			    XProperty resp = xlib.XGetWindowProperty(dpy, twnd, SELECTED_DATA.id, true, Atom.nil);
+			    // Debug.dump(xlib.XGetAtomName(dpy, selection), xlib.XGetAtomName(dpy, target), resp);
+			    if(INCR.is(resp.type)) {
+				incrbuf = new byte[(int)resp.l(0)];
+				dispose = false;
+			    } else {
+				this.resp = resp;
+				timeout.cancel();
+				promise.resolve(this);
+			    }
+			}
+		    } finally {
+			if(dispose)
+			    dispose();
+		    }
+		}
+	    }
+
+	    private void handle(XPropertyEvent ev) {
+		if((incrbuf != null) && SELECTED_DATA.is(ev.atom()) && (ev.state() == XLib.PropertyNewValue)) {
+		    synchronized(this) {
+			if(done)
+			    return;
+			XProperty part = xlib.XGetWindowProperty(dpy, twnd, SELECTED_DATA.id, true, Atom.nil);
+			if(part.len == 0) {
+			    this.resp = new XProperty(dpy, part.name, part.type, part.format, incroff,
+						      java.lang.foreign.MemorySegment.ofArray(Arrays.copyOf(incrbuf, incroff)));
+			    incrbuf = null;
+			    timeout.cancel();
+			    promise.resolve(this);
+			    dispose();
+			} else {
+			    if(incroff + part.len > incrbuf.length)
+				incrbuf = Arrays.copyOf(incrbuf, Math.max(incrbuf.length * 2, incroff + part.len));
+			    part.copy(incrbuf, incroff, 0, part.len);
+			    incroff += part.len;
+			}
+		    }
+		}
+	    }
+
+	    public void event(XEvent ev) {
+		switch(ev.type()) {
+		case XLib.SelectionNotify:
+		    handle(ev.xselection());
+		    break;
+		case XLib.PropertyNotify:
+		    handle(ev.xproperty());
+		    break;
+		}
+	    }
+
+	    private void timeout() {
+		synchronized(this) {
+		    if(resp == null) {
+			promise.reject(new IOException("selection conversion timed out"));
+			dispose();
+		    }
+		}
+	    }
 	}
 
 	public static class XRRMonitor implements Monitor {

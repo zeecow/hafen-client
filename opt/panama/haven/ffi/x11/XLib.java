@@ -642,11 +642,13 @@ public abstract class XLib {
 	public byte b(int i) {
 	    return(data.get(ValueLayout.JAVA_BYTE, i * ValueLayout.JAVA_BYTE.byteSize()));
 	}
-	public byte[] b() {
-	    byte[] ret = new byte[len];
+	public byte[] copy(byte[] dst, int doff, int soff, int len) {
 	    for(int i = 0; i < len; i++)
-		ret[i] = data.get(ValueLayout.JAVA_BYTE, i * ValueLayout.JAVA_BYTE.byteSize());
-	    return(ret);
+		dst[i + doff] = data.get(ValueLayout.JAVA_BYTE, (i + soff) * ValueLayout.JAVA_BYTE.byteSize());
+	    return(dst);
+	}
+	public byte[] b() {
+	    return(copy(new byte[len], 0, 0, len));
 	}
 
 	public short s(int i) {
@@ -2082,9 +2084,9 @@ public abstract class XLib {
 		int stat;
 		try {
 		    if(C_XID instanceof ValueLayout.OfLong)
-			stat = (int)XGetWindowProperty.invoke(dpy.mem(), (long)w.bits, (long)property.bits, 0, 8192, delete ? 1 : 0, (long)reg_type.bits, tbuf, fbuf, nbuf, rbuf, dbuf);
+			stat = (int)XGetWindowProperty.invoke(dpy.mem(), (long)w.bits, (long)property.bits, 0, 1 << 24, delete ? 1 : 0, (long)reg_type.bits, tbuf, fbuf, nbuf, rbuf, dbuf);
 		    else
-			stat = (int)XGetWindowProperty.invoke(dpy.mem(), (int)w.bits, (int)property.bits, 0, 8192, delete ? 1 : 0, (int)reg_type.bits, tbuf, fbuf, nbuf, rbuf, dbuf);
+			stat = (int)XGetWindowProperty.invoke(dpy.mem(), (int)w.bits, (int)property.bits, 0, 1 << 24, delete ? 1 : 0, (int)reg_type.bits, tbuf, fbuf, nbuf, rbuf, dbuf);
 		} catch(Throwable e) {
 		    throw(new RuntimeException(e));
 		} finally {
