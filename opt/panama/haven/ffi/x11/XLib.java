@@ -786,6 +786,7 @@ public abstract class XLib {
     public abstract int XIconifyWindow(XLib.Display dpy, XID w, int screen_number);
     public abstract int XNextEvent(XLib.Display dpy, XEvent event_return);
     public abstract int XPending(XLib.Display dpy);
+    public abstract int XSync(XLib.Display dpy, boolean discard);
     public abstract int XSendEvent(XLib.Display dpy, XID w, boolean propagate, long event_mask, XLib.XEvent event_send);
     public abstract String XKeysymToString(XID keysym);
     public abstract XIM XOpenIM(Display dpy, String res_name, String res_class);
@@ -2206,6 +2207,17 @@ public abstract class XLib {
 	public int XPending(XLib.Display dpy) {
 	    try {
 		return((int)XPending.invoke(dpy.mem()));
+	    } catch(Throwable e) {
+		throw(new RuntimeException(e));
+	    } finally {
+		checkerror();
+	    }
+	}
+
+	private final MethodHandle XSync = ld.downcallHandle(xlib.find("XSync").get(), FunctionDescriptor.of(C_INT, ADDRESS, C_XBool));
+	public int XSync(XLib.Display dpy, boolean discard) {
+	    try {
+		return((int)XSync.invoke(dpy.mem(), discard ? 1 : 0));
 	    } catch(Throwable e) {
 		throw(new RuntimeException(e));
 	    } finally {
