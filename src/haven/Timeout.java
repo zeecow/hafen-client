@@ -66,7 +66,7 @@ public class Timeout {
 	public final Supplier<T> task;
 	private final Waitable.Queue wq = new Waitable.Queue();
 	private T val;
-	private boolean done;
+	private String st = "";
 
 	private Future(double time, Supplier<T> task) {
 	    this.time = time;
@@ -76,23 +76,40 @@ public class Timeout {
 	private void run() {
 	    T val = task.get();
 	    synchronized(this) {
-		this.val = val;
-		this.done = true;
-		wq.wnotify();
+		if(this.st == "") {
+		    this.val = val;
+		    this.st = "done";
+		    wq.wnotify();
+		}
 	    }
 	}
 
 	public T get() {
 	    synchronized(this) {
-		if(!done)
+		if(st == "done")
+		    return(val);
+		else if(st == "")
 		    throw(new NotYetException(this));
-		return(val);
+		else
+		    throw(new IllegalStateException(st));
 	    }
 	}
 
 	public boolean done() {
 	    synchronized(this) {
-		return(done);
+		return(st == "done");
+	    }
+	}
+
+	public void cancel() {
+	    synchronized(scheduled) {
+		scheduled.remove(this);
+	    }
+	    synchronized(this) {
+		if(st != "done") {
+		    st = "cancelled";
+		    wq.wnotify();
+		}
 	    }
 	}
     }
