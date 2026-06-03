@@ -29,6 +29,7 @@ package haven.iosys.tk.ffi;
 import java.util.*;
 import java.util.function.*;
 import java.awt.image.*;
+import java.io.*;
 import java.nio.*;
 import java.nio.file.*;
 import haven.*;
@@ -42,9 +43,7 @@ import haven.ffi.x11.*;
 import haven.ffi.gl.*;
 import haven.ffi.x11.XLib.*;
 import haven.ffi.x11.XInput.*;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
+import haven.ffi.posix.FileDescriptor;
 import static haven.ffi.x11.XKeysym.*;
 import static haven.iosys.tk.Key.Std.*;
 
@@ -1339,6 +1338,8 @@ public class GLXContext implements Toolkit.Factory {
 				items.put(TEXT_PLAIN_UTF8.id, () -> cvt_text(item));
 			    } else if(item.fmt == Format.IMAGE) {
 				items.put(IMAGE_PNG.id, () -> cvt_image(item));
+			    } else if(item.fmt == Format.PATHS) {
+				items.put(TEXT_URILIST.id, () -> cvt_paths(item));
 			    }
 			}
 		    }
@@ -1362,6 +1363,21 @@ public class GLXContext implements Toolkit.Factory {
 			    }
 			    return(new Conversion(IMAGE_PNG.id, buf.toByteArray()));
 			}, t -> Defer.later(t, null))));
+		    }
+
+		    private Promise<Conversion> cvt_paths(Item<?> ritem) {
+			Promise<Collection<Path>> data = ritem.check(Format.PATHS).get();
+			return(data.map(paths -> {
+			    ByteArrayOutputStream buf = new ByteArrayOutputStream();
+			    try(Writer f = new OutputStreamWriter(buf, Utils.utf8)) {
+				for(Path p : paths) {
+				    f.write(p.toUri().toString());
+				}
+			    } catch(IOException e) {
+				throw(new RuntimeException(e));
+			    }
+			    return(new Conversion(UTF8_STRING.id, buf.toByteArray()));
+			}));
 		    }
 		}
 
