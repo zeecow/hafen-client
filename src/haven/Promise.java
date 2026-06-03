@@ -205,7 +205,15 @@ public class Promise<T> {
 
     public static <V, N> Function<V, Promise<N>> mapper(Function<? super V, ? extends N> raw) {
 	if(raw == null) return(null);
-	return(val -> new Promise<N>().resolve(raw.apply(val)));
+	return(rval -> {
+	    N nval;
+	    try {
+		nval = raw.apply(rval);
+	    } catch(Throwable t) {
+		return(new Promise<N>().reject(t));
+	    }
+	    return(new Promise<N>().resolve(nval));
+	});
     }
 
     public static <V, R> Function<V, R> nonnull(Function<V, R> raw) {
