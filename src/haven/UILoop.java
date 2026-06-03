@@ -352,9 +352,9 @@ public abstract class UILoop implements Console.Directory {
     }
 
     protected class Dropper implements DropHandler {
-	public Set<Action> drophover(DropHoverEvent ev) {
+	public Action drophover(DropHoverEvent ev) {
 	    if(DropTarget.drophover(ui.root, ev.wndc(), SystemDrop.of(ev)))
-		return(EnumSet.of(DropHandler.Action.COPY));
+		return(DropHandler.Action.COPY);
 	    return(null);
 	}
 	public boolean dropped(DroppedEvent ev) {

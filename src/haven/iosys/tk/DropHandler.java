@@ -47,6 +47,6 @@ public interface DropHandler {
 	public void accept(Action act);
     }
 
-    public Set<Action> drophover(DropHoverEvent ev);
+    public Action drophover(DropHoverEvent ev);
     public boolean dropped(DroppedEvent ev);
 }

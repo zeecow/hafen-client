@@ -462,14 +462,15 @@ public abstract class AWTToolkit implements Toolkit {
 			throw(new IllegalStateException("Cannot transfer data before accepting drag."));
 		    }
 		}
-		Set<DropHandler.Action> act = drop.drophover(new Event());
-		if((act == null) || act.isEmpty()) {
+		DropHandler.Action act = drop.drophover(new Event());
+		if(act == null) {
 		    ev.rejectDrag();
 		} else {
-		    int awt = 0;
-		    for(Map.Entry<DropHandler.Action, Integer> ent : AWTClipboard.AWTDropEvent.actmap.entrySet())
-			if(act.contains(ent.getKey())) awt |= ent.getValue();
-		    ev.acceptDrag(awt);
+		    Integer awt = AWTClipboard.AWTDropEvent.actmap.get(act);
+		    if(awt == null)
+			ev.rejectDrag();
+		    else
+			ev.acceptDrag(awt);
 		}
 	    }
 
