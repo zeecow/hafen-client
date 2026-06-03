@@ -795,10 +795,12 @@ public abstract class XLib {
     public abstract int XMapWindow(Display dpy, XID w);
     public abstract int XMapRaised(Display dpy, XID w);
     public abstract int XConfigureWindow(XLib.Display dpy, XID w, int valuemask, XWindowChanges values);
+    public abstract Coord XTranslateCoordinates(XLib.Display dpy, XID src_w, XID dest_w, Coord src);
     public abstract XProperty XGetWindowProperty(XLib.Display dpy, XID w, Atom property, boolean delete, Atom reg_type);
     public abstract int XChangeProperty(XLib.Display dpy, XID w, Atom property, Atom type, int mode, byte[] data);
     public abstract int XChangeProperty(XLib.Display dpy, XID w, Atom property, Atom type, int mode, short[] data);
     public abstract int XChangeProperty(XLib.Display dpy, XID w, Atom property, Atom type, int mode, long[] data);
+    public abstract int XDeleteProperty(XLib.Display dpy, XID w, Atom property);
     public abstract int XStoreName(XLib.Display dpy, XID w, String window_name);
     public abstract int XIconifyWindow(XLib.Display dpy, XID w, int screen_number);
     public abstract int XNextEvent(XLib.Display dpy, XEvent event_return);
@@ -2118,6 +2120,27 @@ public abstract class XLib {
 	    }
 	}	
 
+	private final MethodHandle XTranslateCoordinates = ld.downcallHandle(xlib.find("XTranslateCoordinates").get(), FunctionDescriptor.of(C_INT, ADDRESS, C_XID, C_XID, C_INT, C_INT, ADDRESS, ADDRESS, ADDRESS));
+	public Coord XTranslateCoordinates(XLib.Display dpy, XID src_w, XID dest_w, Coord src) {
+	    try(Arena st = Arena.ofConfined()) {
+		MemorySegment xbuf = st.allocate(C_INT), ybuf = st.allocate(C_INT), wbuf = st.allocate(C_XID);
+		int rv;
+		try {
+		    if(C_XID instanceof ValueLayout.OfLong)
+			rv = (int)XTranslateCoordinates.invoke(dpy.mem(), (long)src_w.bits, (long)dest_w.bits, src.x, src.y, xbuf, ybuf, wbuf);
+		    else
+			rv = (int)XTranslateCoordinates.invoke(dpy.mem(), (int)src_w.bits, (int)dest_w.bits, src.x, src.y, xbuf, ybuf, wbuf);
+		} catch(Throwable e) {
+		    throw(new RuntimeException(e));
+		} finally {
+		    checkerror();
+		}
+		if(rv == 0)
+		    return(null);
+		return(Coord.of((int)getint(xbuf, 0, C_INT, true), (int)getint(ybuf, 0, C_INT, true)));
+	    }
+	}
+
 	private final MethodHandle XGetWindowProperty = ld.downcallHandle(xlib.find("XGetWindowProperty").get(), FunctionDescriptor.of(C_INT, ADDRESS, C_XID, C_Atom, C_LONG, C_LONG, C_XBool, C_Atom, ADDRESS, ADDRESS, ADDRESS, ADDRESS, ADDRESS));
 	public XProperty XGetWindowProperty(XLib.Display dpy, XID w, Atom property, boolean delete, Atom reg_type) {
 	    try(Arena st = Arena.ofConfined()) {
@@ -2201,6 +2224,20 @@ public abstract class XLib {
 		} finally {
 		    checkerror();
 		}
+	    }
+	}
+
+	private final MethodHandle XDeleteProperty = ld.downcallHandle(xlib.find("XDeleteProperty").get(), FunctionDescriptor.of(C_INT, ADDRESS, C_XID, C_Atom));
+	public int XDeleteProperty(XLib.Display dpy, XID w, Atom property) {
+	    try {
+		if(C_XID instanceof ValueLayout.OfLong)
+		    return((int)XDeleteProperty.invoke(dpy.mem(), (long)w.bits, (long)property.bits));
+		else
+		    return((int)XDeleteProperty.invoke(dpy.mem(), (int)w.bits, (int)property.bits));
+	    } catch(Throwable e) {
+		throw(new RuntimeException(e));
+	    } finally {
+		checkerror();
 	    }
 	}
 

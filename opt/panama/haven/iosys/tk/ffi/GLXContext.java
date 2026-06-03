@@ -169,6 +169,20 @@ public class GLXContext implements Toolkit.Factory {
 	public final Atomic TEXT_PLAIN = new Atomic("text/plain");
 	public final Atomic TEXT_PLAIN_UTF8 = new Atomic("text/plain;charset=utf8");
 	public final Atomic TEXT_URILIST = new Atomic("text/uri-list");
+	public final Atomic XdndAware = new Atomic("XdndAware");
+	public final Atomic XdndSelection = new Atomic("XdndSelection");
+	public final Atomic XdndTypeList = new Atomic("XdndTypeList");
+	public final Atomic XdndActionList = new Atomic("XdndActionList");
+	public final Atomic XdndActionDescription = new Atomic("XdndActionDescription");
+	public final Atomic XdndEnter = new Atomic("XdndEnter");
+	public final Atomic XdndLeave = new Atomic("XdndLeave");
+	public final Atomic XdndPosition = new Atomic("XdndPosition");
+	public final Atomic XdndStatus = new Atomic("XdndStatus");
+	public final Atomic XdndDrop = new Atomic("XdndDrop");
+	public final Atomic XdndFinished = new Atomic("XdndFinished");
+	public final Atomic XdndActionCopy = new Atomic("XdndActionCopy");
+	public final Atomic XdndActionMove = new Atomic("XdndActionMove");
+	public final Atomic XdndActionLink = new Atomic("XdndActionLink");
 	public final String srvvendor, wmname;
 	public final int srvrelease;
 	private boolean closed = false;
@@ -324,7 +338,10 @@ public class GLXContext implements Toolkit.Factory {
 			_NET_WM_STATE_HIDDEN, _NET_WM_STATE_FULLSCREEN,
 			_NET_SUPPORTING_WM_CHECK,
 			PRIMARY, CLIPBOARD, TARGETS, INCR, SELECTED_DATA,
-			IMAGE_PNG, IMAGE_JPEG, TEXT_PLAIN, TEXT_PLAIN_UTF8, TEXT_URILIST
+			IMAGE_PNG, IMAGE_JPEG, TEXT_PLAIN, TEXT_PLAIN_UTF8, TEXT_URILIST,
+			XdndAware, XdndSelection, XdndTypeList, XdndActionList,
+			XdndEnter, XdndLeave, XdndPosition, XdndStatus, XdndDrop, XdndFinished,
+			XdndActionCopy, XdndActionMove, XdndActionLink
 			);
 
 		/* Keyboard input */
@@ -723,6 +740,8 @@ public class GLXContext implements Toolkit.Factory {
 	    private Coord size = Coord.z;
 	    private int visibility = 0;
 	    private int cursi = -1;
+	    private DropHandler drop = null;
+	    private Xdnd dropping = null;
 
 	    public class GLXEnvironment extends FFIEnvironment {
 		private int qstate;
@@ -1146,6 +1165,37 @@ public class GLXContext implements Toolkit.Factory {
 		    } else {
 			Debug.dump("unknown window-manager message received: " + xlib.XGetAtomName(dpy, ev.a()[0]));
 		    }
+		} else if(XdndEnter.is(ev.message_type()) && (ev.format() == 32)) {
+		    XID src = ev.x()[0];
+		    Set<Atom> types = new HashSet<>();
+		    long[] l = ev.l();
+		    if((l[1] & 1) != 0) {
+			XProperty val = xlib.XGetWindowProperty(dpy, src, XdndTypeList.id, false, Atom.nil);
+			types.addAll(Arrays.asList(val.a()));
+		    } else {
+			Atom[] a = ev.a();
+			for(int i = 2; i < 5; i++) {
+			    if(!Utils.eq(a[i], Atom.nil))
+				types.add(a[i]);
+			}
+		    }
+		    dropping = new Xdnd((int)(l[1] & 0xff000000) >>> 24, src, types);
+		} else if(XdndLeave.is(ev.message_type())) {
+		    dropping = null;
+		} else if(XdndPosition.is(ev.message_type())) {
+		    Xdnd d = this.dropping;
+		    XID src = ev.x()[0];
+		    if((d == null) || !Utils.eq(src, d.src))
+			return;
+		    long[] l = ev.l();
+		    Coord rpos = Coord.of((short)(l[2] >>> 16), (short)l[2]);
+		    d.hover(rpos, ev.a()[4], l[3]);
+		} else if(XdndDrop.is(ev.message_type())) {
+		    Xdnd d = this.dropping;
+		    XID src = ev.x()[0];
+		    if((d == null) || !Utils.eq(src, d.src))
+			return;
+		    d.dropped(ev.l()[2]);
 		} else {
 		    Debug.dump("unknown client message received: " + xlib.XGetAtomName(dpy, ev.message_type()));
 		}
@@ -1545,7 +1595,6 @@ public class GLXContext implements Toolkit.Factory {
 			throw(new RuntimeException("unexpected selection format for image: " + req.resp.format));
 		    if(Arrays.asList(IMAGE_PNG.id, IMAGE_JPEG.id).contains(req.resp.type))
 			try {
-			    Debug.dump(req.resp);
 			    BufferedImage ret = javax.imageio.ImageIO.read(new ByteArrayInputStream(req.resp.b()));
 			    if(ret == null)
 				throw(new RuntimeException("could not decode clipboard image"));
@@ -1576,8 +1625,23 @@ public class GLXContext implements Toolkit.Factory {
 		    throw(new RuntimeException("unexpected selection type for paths: " + xlib.XGetAtomName(dpy, req.resp.type)));
 		}
 
-		private <T> Clipboard.Item<T> mkitem(SelectionRequest treq, Clipboard.Format<T> fmt, Atom target, Function<SelectionRequest, ? extends T> cvt) {
-		    return(new Clipboard.Item<T>(fmt, () -> convert(treq.owner, target, treq.time).map(cvt)));
+		private <T> Item<T> mkitem(XID owner, long time, Format<T> fmt, Atom target, Function<SelectionRequest, ? extends T> cvt) {
+		    return(new Item<T>(fmt, () -> convert(owner, target, time).map(cvt)));
+		}
+
+		Contents mkcontents(Set<Atom> tgts, XID owner, long time) {
+		    List<Item<?>> items = new ArrayList<>();
+		    if(tgts.contains(UTF8_STRING.id))
+			items.add(mkitem(owner, time, Format.TEXT, UTF8_STRING.id, this::cvt_text));
+		    else if(tgts.contains(STRING.id))
+			items.add(mkitem(owner, time, Format.TEXT, STRING.id, this::cvt_text));
+		    if(tgts.contains(IMAGE_JPEG.id))
+			items.add(mkitem(owner, time, Format.IMAGE, IMAGE_JPEG.id, this::cvt_image));
+		    else if(tgts.contains(IMAGE_PNG.id))
+			items.add(mkitem(owner, time, Format.IMAGE, IMAGE_PNG.id, this::cvt_image));
+		    if(tgts.contains(TEXT_URILIST.id))
+			items.add(mkitem(owner, time, Format.PATHS, TEXT_URILIST.id, this::cvt_paths));
+		    return(new Contents(items));
 		}
 
 		public Promise<Contents> get() {
@@ -1590,18 +1654,7 @@ public class GLXContext implements Toolkit.Factory {
 			if((data == null) || (data.format != 32) || !ATOM.is(data.type))
 			    throw(new RuntimeException("selection target fetch failed"));
 			Set<Atom> tgts = new HashSet<>(Arrays.asList(data.a()));
-			List<Item<?>> items = new ArrayList<>();
-			if(tgts.contains(UTF8_STRING.id))
-			    items.add(mkitem(treq, Clipboard.Format.TEXT, UTF8_STRING.id, this::cvt_text));
-			else if(tgts.contains(STRING.id))
-			    items.add(mkitem(treq, Clipboard.Format.TEXT, STRING.id, this::cvt_text));
-			if(tgts.contains(IMAGE_JPEG.id))
-			    items.add(mkitem(treq, Clipboard.Format.IMAGE, IMAGE_JPEG.id, this::cvt_image));
-			else if(tgts.contains(IMAGE_PNG.id))
-			    items.add(mkitem(treq, Clipboard.Format.IMAGE, IMAGE_PNG.id, this::cvt_image));
-			if(tgts.contains(TEXT_URILIST.id))
-			    items.add(mkitem(treq, Clipboard.Format.PATHS, TEXT_URILIST.id, this::cvt_paths));
-			return(new Contents(items));
+			return(mkcontents(tgts, treq.owner, treq.time));
 		    });
 		    return(ret);
 		}
@@ -1629,6 +1682,123 @@ public class GLXContext implements Toolkit.Factory {
 		else
 		    return(Clipboard.nil);
 		return(clipboard(name, true));
+	    }
+
+	    public class Xdnd {
+		public final BMap<DropHandler.Action, Atom> actmap =
+		    new HashBMap<>(Utils.<DropHandler.Action, Atom>map()
+				   .put(DropHandler.Action.COPY, XdndActionCopy.id)
+				   .put(DropHandler.Action.MOVE, XdndActionMove.id)
+				   .put(DropHandler.Action.LINK, XdndActionLink.id)
+				   .map());
+		public final GLXClipboard sel = clipboard(XdndSelection.id, true);
+		public final int ver;
+		public final XID src;
+		public final Set<Atom> types;
+		public final Coord rpos;
+		private Clipboard.Contents cc = null;
+		private Coord lastpos;
+		private Atom lastact;
+		private long lasttime;
+
+		public Xdnd(int ver, XID src, Set<Atom> types) {
+		    this.ver = ver;
+		    this.src = src;
+		    this.types = types;
+		    this.rpos = xlib.XTranslateCoordinates(dpy, id, screen.root(), Coord.z);
+		}
+
+		void hover(Coord rpos, Atom act, long time) {
+		    if(cc == null)
+			cc = sel.mkcontents(new HashSet<>(types), src, time);
+		    Coord wpos = rpos.sub(this.rpos);
+		    lastpos = wpos;
+		    lastact = act;
+		    lasttime = time;
+		    class Event implements DropHandler.DropHoverEvent {
+			public Coord wndc() {return(wpos);}
+			public Set<DropHandler.Action> actions() {
+			    Set<DropHandler.Action> ret = EnumSet.of(DropHandler.Action.COPY);
+			    DropHandler.Action dact = actmap.reverse().get(act);
+			    if(dact != null)
+				ret.add(dact);
+			    return(ret);
+			}
+			public Clipboard.Contents contents() {return(cc);}
+		    }
+		    Atom ract = (drop == null) ? null : actmap.get(drop.drophover(new Event()));
+		    XEvent msg = xlib.XEvent().type(XLib.ClientMessage).window(src);
+		    msg.xclient().message_type(XdndStatus.id).format(32).x(0, id)
+			.l(1, (ract == null) ? 0 : 1).l(2, 0).l(3, 0)
+			.a(4, (ract == null) ? Atom.nil : ract);
+		    xlib.XSendEvent(dpy, src, false, 0, msg);
+		}
+
+		private void finish(DropHandler.Action act) {
+		    Atom ract = actmap.getOrDefault(act, XdndActionCopy.id);
+		    XEvent msg = xlib.XEvent().type(XLib.ClientMessage).window(src);
+		    msg.xclient().message_type(XdndFinished.id).format(32).x(0, id)
+			.l(1, (ract == null) ? 0 : 1)
+			.a(2, (ract == null) ? Atom.nil : ract);
+		    xlib.XSendEvent(dpy, src, false, 0, msg);
+		}
+
+		void dropped(long time) {
+		    if(cc == null)
+			return;
+		    class Event implements DropHandler.DroppedEvent {
+			DropHandler.Action act = null;
+			Clipboard.Contents wrapped = wrapcontents(cc);
+			boolean fetched = false;
+			boolean accepted = false;
+
+			public Coord wndc() {return(lastpos);}
+			public Set<DropHandler.Action> actions() {
+			    Set<DropHandler.Action> ret = EnumSet.of(DropHandler.Action.COPY);
+			    DropHandler.Action dact = actmap.reverse().get(lastact);
+			    if(dact != null)
+				ret.add(dact);
+			    return(ret);
+			}
+			public Clipboard.Contents contents() {return(wrapped);}
+			public void accept(DropHandler.Action act) {
+			    this.act = act;
+			}
+
+			private <T> Clipboard.Item<T> wrapitem(Clipboard.Item<T> item) {
+			    return(new Clipboard.Item<T>(item.fmt, () -> {
+				fetched = true;
+				return(item.get().map(data -> data, null, () -> {
+				    finish(act);
+				}));
+			    }));
+			}
+
+			private Clipboard.Contents wrapcontents(Clipboard.Contents rc) {
+			    Collection<Clipboard.Item<?>> items = new ArrayList<>(rc.items.size());
+			    for(Clipboard.Item<?> ritem : rc)
+				items.add(wrapitem(ritem));
+			    return(new Clipboard.Contents(items));
+			}
+		    }
+		    Event de = new Event();
+		    Atom ract = null;
+		    if(drop != null)
+			de.accepted = drop.dropped(de);
+		    if(!de.fetched)
+			finish(de.act);
+		}
+	    }
+
+	    public GLXWindow drophandler(DropHandler drop) {
+		xrun(() -> {
+		    if((this.drop == null) && (drop != null))
+			xlib.XChangeProperty(dpy, id, XdndAware.id, ATOM.id, XLib.PropModeReplace, new long[] {5});
+		    else if((this.drop != null) && (drop == null))
+			xlib.XDeleteProperty(dpy, id, XdndAware.id);
+		    this.drop = drop;
+		});
+		return(this);
 	    }
 	}
 
@@ -1689,6 +1859,7 @@ public class GLXContext implements Toolkit.Factory {
 			    time = ev.time();
 			if(Atom.nil.equals(ev.property())) {
 			    promise.reject(new IOException("selection conversion failed"));
+			    resp = new XProperty(dpy, SELECTED_DATA.id, Atom.nil, 0, 0, new byte[0]);
 			} else {
 			    XProperty resp = xlib.XGetWindowProperty(dpy, twnd, SELECTED_DATA.id, true, Atom.nil);
 			    // Debug.dump(xlib.XGetAtomName(dpy, selection), xlib.XGetAtomName(dpy, target), resp);
