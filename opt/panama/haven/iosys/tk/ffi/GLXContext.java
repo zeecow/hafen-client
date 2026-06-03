@@ -29,6 +29,7 @@ package haven.iosys.tk.ffi;
 import java.util.*;
 import java.util.function.*;
 import java.awt.image.*;
+import java.nio.*;
 import java.nio.file.*;
 import haven.*;
 import haven.iosys.*;
@@ -1150,25 +1151,14 @@ public class GLXContext implements Toolkit.Factory {
 		}
 	    }
 
-	    /*
-	    private GLXClipboard getclipboard(Atom id) {
-		synchronized(clipboards) {
-		    return(clipboards.get(id));
-		}
-	    }
 	    private void selectionclear(XSelectionClearEvent ev) {
-		GLXClipboard c = getclipboard(ev.selection());
+		GLXClipboard c = clipboard(ev.selection(), false);
 		if(c != null) c.clear(ev);
 	    }
 	    private void selectionrequest(XSelectionRequestEvent ev) {
-		GLXClipboard c = getclipboard(ev.selection());
+		GLXClipboard c = clipboard(ev.selection(), false);
 		if(c != null) c.request(ev);
 	    }
-	    private void selectionnotify(XSelectionEvent ev) {
-		GLXClipboard c = getclipboard(ev.selection());
-		if(c != null) c.notify(ev);
-	    }
-	    */
 
 	    public void event(XEvent ev) {
 		for(Consumer<XEvent> cb : listeners)
@@ -1207,17 +1197,12 @@ public class GLXContext implements Toolkit.Factory {
 		case XLib.KeyRelease:
 		    keyrelease(ev.xkey());
 		    break;
-		    /*
 		case XLib.SelectionClear:
 		    selectionclear(ev.xselectionclear());
 		    break;
 		case XLib.SelectionRequest:
 		    selectionrequest(ev.xselectionrequest());
 		    break;
-		case XLib.SelectionNotify:
-		    selectionnotify(ev.xselection());
-		    break;
-		    */
 		default:
 		    Warning.warn(String.format("unexpected event received for window %s: %d", id, ev.type()));
 		}
@@ -1297,6 +1282,10 @@ public class GLXContext implements Toolkit.Factory {
 
 	    public class GLXClipboard implements Clipboard {
 		public final Atom selection;
+		private final Map<XID, ConvRequest> scoreboard = new HashMap<>();
+		private boolean owned = false;
+		private XContents contents = null;
+		private Runnable expire = null;
 
 		public GLXClipboard(Atom selection) {
 		    this.selection = selection;
@@ -1306,7 +1295,151 @@ public class GLXContext implements Toolkit.Factory {
 		    return(Promise.deferred(task, GLXToolkit.this::xrun));
 		}
 
-		public void put(Contents cnt, Runnable expire) {
+		void clear(XSelectionClearEvent ev) {
+		    Runnable exp = null;
+		    synchronized(this) {
+			if(owned) {
+			    exp = expire;
+			    owned = false;
+			    contents = null;
+			    expire = null;
+			}
+		    }
+		    if(exp != null)
+			exp.run();
+		}
+
+		public class Conversion {
+		    public final Atom type;
+		    public final byte[] data;
+
+		    public Conversion(Atom type, byte[] data) {
+			this.type = type;
+			this.data = data;
+		    }
+
+		    public Conversion(Atom type, ByteBuffer data) {
+			this.type = type;
+			this.data = new byte[data.remaining()];
+			data.get(this.data);
+		    }
+		}
+
+		public class XContents {
+		    public final Contents cont;
+		    public final Map<Atom, Supplier<Promise<Conversion>>> items = new HashMap<>();
+
+		    public XContents(Contents cont) {
+			this.cont = cont;
+			for(Item<?> item : cont.items) {
+			    if(item.fmt == Format.TEXT) {
+				items.put(UTF8_STRING.id, () -> cvt_text(item));
+				items.put(TEXT_PLAIN.id, () -> cvt_text(item));
+				items.put(TEXT_PLAIN_UTF8.id, () -> cvt_text(item));
+			    }
+			}
+		    }
+
+		    private Promise<Conversion> cvt_text(Item<?> ritem) {
+			Promise<CharSequence> data = ritem.check(Format.TEXT).get();
+			return(data.map(text -> {
+			    ByteBuffer bdat = Utils.utf8.encode(CharBuffer.wrap(text));
+			    return(new Conversion(UTF8_STRING.id, bdat));
+			}));
+		    }
+		}
+
+		public class ConvRequest {
+		    public static final int MAXSIZE = 16000;
+		    public final XID requestor;
+		    public final Atom target, prop;
+		    public final long time;
+		    public final XContents cont;
+		    ConvRequest next = null;
+
+		    private ConvRequest(XID requestor, Atom target, Atom prop, long time, XContents cont) {
+			this.requestor = requestor;
+			this.target = target;
+			this.prop = prop;
+			this.time = time;
+			this.cont = cont;
+		    }
+
+		    private void done() {
+			synchronized(GLXClipboard.this) {
+			    if(scoreboard.get(requestor) == this)
+				scoreboard.remove(requestor);
+			    else
+				xrun((Runnable)next::respond);
+			}
+		    }
+
+		    private void notify(Atom property) {
+			XEvent msg = xlib.XEvent().type(XLib.SelectionNotify);
+			msg.xselection().requestor(requestor).selection(selection).target(target).property(property);
+			xlib.XSendEvent(dpy, requestor, false, 0, msg);
+		    }
+
+		    private void respond(Conversion conv) {
+			if(conv.data.length > MAXSIZE)
+			    throw(new RuntimeException("INCR transfers not yet supported"));
+			xlib.XChangeProperty(dpy, requestor, prop, conv.type, XLib.PropModeReplace, conv.data);
+			notify(prop);
+			done();
+		    }
+
+		    void respond() {
+			if(cont == null) {
+			    notify(Atom.nil);
+			    done();
+			    return;
+			}
+			if(TARGETS.is(target)) {
+			    List<Atom> resp = new ArrayList<>();
+			    resp.add(TARGETS.id);
+			    resp.addAll(contents.items.keySet());
+			    xlib.XChangeProperty(dpy, requestor, prop, ATOM.id, XLib.PropModeReplace, resp.toArray(new Atom[0]));
+			    notify(prop);
+			    done();
+			} else if(cont.items.containsKey(target)) {
+			    cont.items.get(target).get().map((Consumer<Conversion>)this::respond);
+			} else {
+			    notify(Atom.nil);
+			    done();
+			}
+		    }
+		}
+
+		void request(XSelectionRequestEvent ev) {
+		    XID rqor = ev.requestor();
+		    ConvRequest req;
+		    boolean respond = true;
+		    synchronized(this) {
+			req = new ConvRequest(rqor, ev.target(), ev.property(), ev.time(), contents);
+			ConvRequest last = scoreboard.get(rqor);
+			if(last != null) {
+			    last.next = req;
+			    respond = false;
+			}
+			scoreboard.put(rqor, req);
+		    }
+		    if(respond)
+			req.respond();
+		}
+
+		public void put(Contents cnt, Runnable exp) {
+		    xrun(() -> {
+			synchronized(this) {
+			    if(!owned) {
+				xlib.XSetSelectionOwner(dpy, selection, id, xlib.CurrentTime);
+				owned = true;
+			    } else {
+				expire.run();
+			    }
+			    this.contents = new XContents(cnt);
+			    this.expire = exp;
+			}
+		    });
 		}
 
 		private Promise<SelectionRequest> convert(XID owner, Atom target, long time) {
@@ -1493,8 +1626,7 @@ public class GLXContext implements Toolkit.Factory {
 			    return;
 			XProperty part = xlib.XGetWindowProperty(dpy, twnd, SELECTED_DATA.id, true, Atom.nil);
 			if(part.len == 0) {
-			    this.resp = new XProperty(dpy, part.name, part.type, part.format, incroff,
-						      java.lang.foreign.MemorySegment.ofArray(Arrays.copyOf(incrbuf, incroff)));
+			    this.resp = new XProperty(dpy, part.name, part.type, part.format, incroff, Arrays.copyOf(incrbuf, incroff));
 			    incrbuf = null;
 			    timeout.cancel();
 			    promise.resolve(this);

@@ -30,6 +30,7 @@ import haven.*;
 import haven.ffi.*;
 import java.lang.invoke.*;
 import java.lang.foreign.*;
+import java.nio.*;
 import java.util.*;
 import java.util.function.*;
 import java.lang.foreign.MemoryLayout.PathElement;
@@ -590,6 +591,12 @@ public abstract class XLib {
 	public abstract Atom target();
 	public abstract Atom property();
 	public abstract long time();
+
+	public abstract XSelectionEvent requestor(XID value);
+	public abstract XSelectionEvent selection(Atom value);
+	public abstract XSelectionEvent target(Atom value);
+	public abstract XSelectionEvent property(Atom value);
+	public abstract XSelectionEvent time(long value);
     }
 
     public static abstract class XGenericEvent extends StructInstance {
@@ -637,6 +644,14 @@ public abstract class XLib {
 	    this.format = format;
 	    this.len = len;
 	    this.data = data;
+	}
+
+	public XProperty(Display dpy, Atom name, Atom type, int format, int len, ByteBuffer data) {
+	    this(dpy, name, type, format, len, MemorySegment.ofBuffer(data));
+	}
+
+	public XProperty(Display dpy, Atom name, Atom type, int format, int len, byte[] data) {
+	    this(dpy, name, type, format, len, MemorySegment.ofArray(data));
 	}
 
 	public byte b(int i) {
@@ -872,6 +887,27 @@ public abstract class XLib {
 	static final MemoryLayout C_XIMStyle = C_LONG;
 	static final MemoryLayout C_KeyCode = C_CHAR;
 	private final SymbolLookup xlib = SymbolLookup.libraryLookup("libX11.so.6", Arena.global());
+
+	private static void set(MemorySegment mem, VarHandle var, long offset, XID value) {
+	    if(C_XID instanceof ValueLayout.OfLong)
+		var.set(mem, offset, (long)value.bits);
+	    else
+		var.set(mem, offset, (int)value.bits);
+	}
+
+	private static void set(MemorySegment mem, VarHandle var, long offset, Atom value) {
+	    if(C_Atom instanceof ValueLayout.OfLong)
+		var.set(mem, offset, (long)value.bits);
+	    else
+		var.set(mem, offset, (int)value.bits);
+	}
+
+	private static void settime(MemorySegment mem, VarHandle var, long offset, long value) {
+	    if(C_Time instanceof ValueLayout.OfLong)
+		var.set(mem, offset, (long)value);
+	    else
+		var.set(mem, offset, (int)value);
+	}
 
 	static final StructLayout _Visual = struct(new MemoryLayout[] {
 		ADDRESS.withName("ext_data"),
@@ -1391,11 +1427,11 @@ public abstract class XLib {
 
 	    protected StructLayout $layout() {return(_XSelectionClearEvent);}
 
-	    private static final VarHandle window = _XSelectionEvent.varHandle(PathElement.groupElement("window"));
+	    private static final VarHandle window = _XSelectionClearEvent.varHandle(PathElement.groupElement("window"));
 	    public XID window() {return(XID.of((long)window.get(mem, 0)));}
-	    private static final VarHandle selection = _XSelectionEvent.varHandle(PathElement.groupElement("selection"));
+	    private static final VarHandle selection = _XSelectionClearEvent.varHandle(PathElement.groupElement("selection"));
 	    public Atom selection() {return(Atom.of((long)selection.get(mem, 0)));}
-	    private static final VarHandle time = _XSelectionEvent.varHandle(PathElement.groupElement("time"));
+	    private static final VarHandle time = _XSelectionClearEvent.varHandle(PathElement.groupElement("time"));
 	    public long time() {return((long)time.get(mem, 0));}
 	}
 
@@ -1452,14 +1488,19 @@ public abstract class XLib {
 
 	    private static final VarHandle requestor = _XSelectionEvent.varHandle(PathElement.groupElement("requestor"));
 	    public XID requestor() {return(XID.of((long)requestor.get(mem, 0)));}
+	    public XSelectionEvent requestor(XID value) {set(mem, requestor, 0, value); return(this);}
 	    private static final VarHandle selection = _XSelectionEvent.varHandle(PathElement.groupElement("selection"));
 	    public Atom selection() {return(Atom.of((long)selection.get(mem, 0)));}
+	    public XSelectionEvent selection(Atom value) {set(mem, selection, 0, value); return(this);}
 	    private static final VarHandle target = _XSelectionEvent.varHandle(PathElement.groupElement("target"));
 	    public Atom target() {return(Atom.of((long)target.get(mem, 0)));}
+	    public XSelectionEvent target(Atom value) {set(mem, target, 0, value); return(this);}
 	    private static final VarHandle property = _XSelectionEvent.varHandle(PathElement.groupElement("property"));
 	    public Atom property() {return(Atom.of((long)property.get(mem, 0)));}
+	    public XSelectionEvent property(Atom value) {set(mem, property, 0, value); return(this);}
 	    private static final VarHandle time = _XSelectionEvent.varHandle(PathElement.groupElement("time"));
 	    public long time() {return((long)time.get(mem, 0));}
+	    public XSelectionEvent time(long value) {settime(mem, time, 0, value); return(this);}
 	}
 
 	static final StructLayout _XGenericEventCookie = struct(new MemoryLayout[] {
