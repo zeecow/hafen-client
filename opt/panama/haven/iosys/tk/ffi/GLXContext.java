@@ -2057,113 +2057,178 @@ public class GLXContext implements Toolkit.Factory {
 	}
 
 	private FilePicker curpicker = null;
-	public class ZenityPicker implements FilePicker.Factory {
+	public abstract class ExternalPicker implements FilePicker.Factory {
 	    public final Path exec;
 
-	    public ZenityPicker() {
+	    public ExternalPicker(String name) {
 		Path exec = null;
 		for(String dnm : System.getenv("PATH").split(":")) {
-		    Path file = Paths.get(dnm).resolve("zenity");
+		    Path file = Paths.get(dnm).resolve(name);
 		    if(Files.isRegularFile(file) && Files.isExecutable(file)) {
 			exec = file;
 			break;
 		    }
 		}
 		if(exec == null)
-		    throw(new Unavailable("Zenity not found"));
+		    throw(new Unavailable(name + " not found"));
 		this.exec = exec;
 	    }
 
-	    public FilePicker make(FilePicker.Mode mode, Windeye wnd) {
-		return(new FilePicker() {
-		    final List<String> args = new ArrayList<>();
-		    Process proc;
-		    Path result = null;
+	    public abstract class Instance implements FilePicker {
+		protected final List<String> args = new ArrayList<>();
+		protected Process proc;
+		protected Path result = null;
 
-		    {
-			args.add(exec.toFile().toString());
-			args.add("--file-selection");
-			if(mode == Mode.SAVE)
-			    args.add("--save");
-		    }
+		public Instance() {
+		    args.add(exec.toFile().toString());
+		}
 
-		    public void filter(String desc, String... exts) {
-			if(desc.indexOf('|') >= 0)
-			    throw(new IllegalArgumentException(desc));
-			StringBuilder arg = new StringBuilder();
-			arg.append("--file-filter=");
-			arg.append(desc);
-			arg.append('|');
-			boolean first = true;
-			for(String ext : exts) {
-			    if(!first)
-				arg.append(' ');
-			    if(ext.indexOf(' ') >= 0)
-				throw(new IllegalArgumentException(ext));
-			    arg.append("*."); arg.append(ext);
-			    first = false;
-			}
-			args.add(arg.toString());
-		    }
-
-		    private void monitor(Process proc, Runnable cb) {
+		private void monitor(Process proc, Runnable cb) {
+		    try {
+			BufferedReader in = new BufferedReader(new InputStreamReader(proc.getInputStream()));
+			String result;
 			try {
-			    BufferedReader in = new BufferedReader(new InputStreamReader(proc.getInputStream()));
-			    String result;
-			    try {
-				result = in.readLine();
-				if(proc.waitFor() != 0)
-				    result = null;
-			    } catch(IOException e) {
-				throw(new RuntimeException());
-			    } catch(InterruptedException e) {
+			    result = in.readLine();
+			    if(proc.waitFor() != 0)
 				result = null;
-				Thread.currentThread().interrupt();
-			    }
-			    if((result != null) && (result.length() > 0))
-				this.result = Paths.get(result);
-			    cb.run();
-			} finally {
-			    synchronized(GLXToolkit.this) {
-				if(curpicker == this)
-				    curpicker = null;
-			    }
+			} catch(IOException e) {
+			    throw(new RuntimeException());
+			} catch(InterruptedException e) {
+			    result = null;
+			    Thread.currentThread().interrupt();
 			}
-		    }
-
-		    public void show(Runnable cb) {
+			if((result != null) && (result.length() > 0))
+			    this.result = Paths.get(result);
+			cb.run();
+		    } finally {
 			synchronized(GLXToolkit.this) {
-			    if(proc != null)
-				throw(new IllegalStateException());
-			    if(curpicker != null)
-				throw(new IllegalStateException("file picker already active"));
-			    ProcessBuilder spec = new ProcessBuilder(args);
-			    spec.inheritIO();
-			    spec.redirectOutput(ProcessBuilder.Redirect.PIPE);
-			    try {
-				proc = spec.start();
-			    } catch(IOException e) {
-				throw(new RuntimeException(e));
-			    }
-			    Thread mon = new HackThread(() -> monitor(proc, cb), "Zenity monitor");
-			    mon.setDaemon(true);
-			    mon.start();
-			    curpicker = this;
+			    if(curpicker == this)
+				curpicker = null;
 			}
 		    }
+		}
 
-		    public Path result() {
-			if((proc == null) || proc.isAlive())
+		public void show(Runnable cb) {
+		    synchronized(GLXToolkit.this) {
+			if(proc != null)
 			    throw(new IllegalStateException());
-			return(result);
+			if(curpicker != null)
+			    throw(new IllegalStateException("file picker already active"));
+			ProcessBuilder spec = new ProcessBuilder(args);
+			spec.inheritIO();
+			spec.redirectOutput(ProcessBuilder.Redirect.PIPE);
+			try {
+			    proc = spec.start();
+			} catch(IOException e) {
+			    throw(new RuntimeException(e));
+			}
+			Thread mon = new HackThread(() -> monitor(proc, cb), "Zenity monitor");
+			mon.setDaemon(true);
+			mon.start();
+			curpicker = this;
 		    }
-		});
+		}
+
+		public Path result() {
+		    if((proc == null) || proc.isAlive())
+			throw(new IllegalStateException());
+		    return(result);
+		}
+	    }
+	}
+
+	public class ZenityPicker extends ExternalPicker {
+	    public ZenityPicker() {
+		super("zenity");
+	    }
+
+	    public class Instance extends ExternalPicker.Instance {
+		public Instance(Mode mode) {
+		    args.add("--file-selection");
+		    if(mode == Mode.SAVE)
+			args.add("--save");
+		}
+
+		public void filter(String desc, String... exts) {
+		    if(desc.indexOf('|') >= 0)
+			throw(new IllegalArgumentException(desc));
+		    StringBuilder arg = new StringBuilder();
+		    arg.append("--file-filter=");
+		    arg.append(desc);
+		    arg.append('|');
+		    boolean first = true;
+		    for(String ext : exts) {
+			if(!first)
+			    arg.append(' ');
+			if(ext.indexOf(' ') >= 0)
+			    throw(new IllegalArgumentException(ext));
+			arg.append("*."); arg.append(ext);
+			first = false;
+		    }
+		    args.add(arg.toString());
+		}
+	    }
+
+	    public FilePicker make(FilePicker.Mode mode, Windeye parent) {
+		return(new Instance(mode));
+	    }
+	}
+
+	public class KDialogPicker extends ExternalPicker {
+	    public KDialogPicker() {
+		super("kdialog");
+	    }
+
+	    public class Instance extends ExternalPicker.Instance {
+		private StringBuilder filter = new StringBuilder();
+
+		public Instance(Mode mode) {
+		    if(mode == Mode.SAVE)
+			args.add("--getsavefilename");
+		    else
+			args.add("--getopenfilename");
+		    args.add("--title");
+		    args.add("Files");
+		    args.add(".");
+		}
+
+		public void filter(String desc, String... exts) {
+		    if(desc.indexOf('|') >= 0)
+			throw(new IllegalArgumentException(desc));
+		    if(filter.length() > 0)
+			filter.append(" | ");
+		    filter.append(desc);
+		    filter.append(" (");
+		    boolean first = true;
+		    for(String ext : exts) {
+			if(!first)
+			    filter.append(' ');
+			if(ext.indexOf(' ') >= 0)
+			    throw(new IllegalArgumentException(ext));
+			filter.append("*."); filter.append(ext);
+			first = false;
+		    }
+		    filter.append(")");
+		}
+
+		public void show(Runnable cb) {
+		    if(filter.length() > 0)
+			args.add(filter.toString());
+		    super.show(cb);
+		}
+	    }
+
+	    public FilePicker make(FilePicker.Mode mode, Windeye parent) {
+		return(new Instance(mode));
 	    }
 	}
 
 	public FilePicker.Factory picker() {
 	    try {
 		return(new ZenityPicker());
+	    } catch(Unavailable e) {}
+	    try {
+		return(new KDialogPicker());
 	    } catch(Unavailable e) {}
 	    throw(new Unavailable("No system filepicker available"));
 	}
