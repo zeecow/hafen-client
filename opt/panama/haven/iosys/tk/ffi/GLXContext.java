@@ -43,6 +43,7 @@ import haven.ffi.gl.*;
 import haven.ffi.x11.XLib.*;
 import haven.ffi.x11.XInput.*;
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import static haven.ffi.x11.XKeysym.*;
 import static haven.iosys.tk.Key.Std.*;
@@ -1336,6 +1337,8 @@ public class GLXContext implements Toolkit.Factory {
 				items.put(UTF8_STRING.id, () -> cvt_text(item));
 				items.put(TEXT_PLAIN.id, () -> cvt_text(item));
 				items.put(TEXT_PLAIN_UTF8.id, () -> cvt_text(item));
+			    } else if(item.fmt == Format.IMAGE) {
+				items.put(IMAGE_PNG.id, () -> cvt_image(item));
 			    }
 			}
 		    }
@@ -1347,6 +1350,19 @@ public class GLXContext implements Toolkit.Factory {
 			    return(new Conversion(UTF8_STRING.id, bdat));
 			}));
 		    }
+
+		    private Promise<Conversion> cvt_image(Item<?> ritem) {
+			Promise<BufferedImage> data = ritem.check(Format.IMAGE).get();
+			return(data.then(img -> Promise.deferred(() -> {
+			    ByteArrayOutputStream buf = new ByteArrayOutputStream();
+			    try {
+				javax.imageio.ImageIO.write(img, "PNG", buf);
+			    } catch(IOException e) {
+				throw(new RuntimeException(e));
+			    }
+			    return(new Conversion(IMAGE_PNG.id, buf.toByteArray()));
+			}, t -> Defer.later(t, null))));
+		    }
 		}
 
 		public class ConvRequest {
@@ -1356,6 +1372,11 @@ public class GLXContext implements Toolkit.Factory {
 		    public final long time;
 		    public final XContents cont;
 		    ConvRequest next = null;
+		    private boolean done = false;
+		    private EventWindow listener;
+		    private Timeout.Future<?> timeout;
+		    private Conversion incr;
+		    private int incroff = 0;
 
 		    private ConvRequest(XID requestor, Atom target, Atom prop, long time, XContents cont) {
 			this.requestor = requestor;
@@ -1366,6 +1387,15 @@ public class GLXContext implements Toolkit.Factory {
 		    }
 
 		    private void done() {
+			synchronized(this) {
+			    if(done)
+				return;
+			    done = true;
+			}
+			if(listener != null) {
+			    xlib.XSelectInput(dpy, requestor, 0);
+			    unregister(listener);
+			}
 			synchronized(GLXClipboard.this) {
 			    if(scoreboard.get(requestor) == this)
 				scoreboard.remove(requestor);
@@ -1380,12 +1410,45 @@ public class GLXContext implements Toolkit.Factory {
 			xlib.XSendEvent(dpy, requestor, false, 0, msg);
 		    }
 
-		    private void respond(Conversion conv) {
-			if(conv.data.length > MAXSIZE)
-			    throw(new RuntimeException("INCR transfers not yet supported"));
-			xlib.XChangeProperty(dpy, requestor, prop, conv.type, XLib.PropModeReplace, conv.data);
-			notify(prop);
+		    private void handle(XPropertyEvent ev) {
+			if(Utils.eq(ev.atom(), prop) && (ev.state() == XLib.PropertyDelete)) {
+			    int len = Math.min(incr.data.length - incroff, MAXSIZE);
+			    if(len > 0) {
+				xlib.XChangeProperty(dpy, requestor, prop, incr.type, XLib.PropModeReplace, Utils.splice(incr.data, incroff, len));
+				incroff += len;
+			    } else {
+				xlib.XChangeProperty(dpy, requestor, prop, incr.type, XLib.PropModeReplace, new byte[0]);
+				done();
+			    }
+			}
+		    }
+
+		    private void timeout() {
+			Warning.warn("selection transfer timed out");
 			done();
+		    }
+
+		    private void respond(Conversion conv) {
+			if(conv.data.length > MAXSIZE) {
+			    timeout = Timeout.later(Utils.rtime() + 5, this::timeout, null);
+			    incr = conv;
+			    xlib.XChangeProperty(dpy, requestor, prop, INCR.id, XLib.PropModeReplace, new long[] {conv.data.length});
+			    listener = new EventWindow() {
+				public XID windowid() {return(requestor);}
+				public void event(XEvent ev) {
+				    if(ev.type() == XLib.PropertyNotify) {
+					handle(ev.xproperty());
+				    }
+				}
+			    };
+			    xlib.XSelectInput(dpy, requestor, XLib.PropertyChangeMask);
+			    register(listener);
+			    notify(prop);
+			} else {
+			    xlib.XChangeProperty(dpy, requestor, prop, conv.type, XLib.PropModeReplace, conv.data);
+			    notify(prop);
+			    done();
+			}
 		    }
 
 		    void respond() {
@@ -1402,7 +1465,7 @@ public class GLXContext implements Toolkit.Factory {
 			    notify(prop);
 			    done();
 			} else if(cont.items.containsKey(target)) {
-			    cont.items.get(target).get().map((Consumer<Conversion>)this::respond);
+			    cont.items.get(target).get().then(conv -> etpromise(() -> {respond(conv); return(null);})).warn("clipboard error");
 			} else {
 			    notify(Atom.nil);
 			    done();
@@ -1434,7 +1497,8 @@ public class GLXContext implements Toolkit.Factory {
 				xlib.XSetSelectionOwner(dpy, selection, id, xlib.CurrentTime);
 				owned = true;
 			    } else {
-				expire.run();
+				if(expire != null)
+				    expire.run();
 			    }
 			    this.contents = new XContents(cnt);
 			    this.expire = exp;
@@ -1488,6 +1552,7 @@ public class GLXContext implements Toolkit.Factory {
 			    try {
 				ret.add(Paths.get(Utils.uri(ln)));
 			    } catch(IllegalArgumentException e) {
+				e.printStackTrace();
 			    }
 			}
 			return(ret);
@@ -1500,6 +1565,10 @@ public class GLXContext implements Toolkit.Factory {
 		}
 
 		public Promise<Contents> get() {
+		    synchronized(this) {
+			if(owned)
+			    return(Promise.of(() -> contents.cont));
+		    }
 		    Promise<Contents> ret = convert(null, TARGETS.id, XLib.CurrentTime).map(treq -> {
 			XProperty data = treq.resp;
 			if((data == null) || (data.format != 32) || !ATOM.is(data.type))
@@ -1567,6 +1636,10 @@ public class GLXContext implements Toolkit.Factory {
 		this.owner = (owner == null) ? xlib.XGetSelectionOwner(dpy, selection) : owner;
 		this.target = target;
 		this.time = time;
+		synchronized(etmon) {
+		    if(windows.containsKey(owner))
+			throw(new RuntimeException("selection requested for own window"));
+		}
 		XSetWindowAttributes attr = xlib.XSetWindowAttributes();
 		attr.event_mask(XLib.PropertyChangeMask);
 		this.twnd = xlib.XCreateWindow(dpy, screen.root(), 0, 0, 1, 1, 0, 0, XLib.InputOnly, vis.visual(), XLib.CWEventMask, attr);
