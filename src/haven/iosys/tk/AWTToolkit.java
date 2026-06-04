@@ -92,6 +92,10 @@ public abstract class AWTToolkit implements Toolkit {
 	}
     }
 
+    public static <T> Promise<T> awtpromise(Supplier<T> task) {
+	return(Promise.deferred(task, EventQueue::invokeLater));
+    }
+
     private static Set<Key.Mod> awtmods(int awt) {
 	Set<Key.Mod> ret = EnumSet.noneOf(Key.Mod.class);
 	if((awt & InputEvent.SHIFT_DOWN_MASK) != 0) ret.add(Key.Mod.SHIFT);
@@ -293,10 +297,6 @@ public abstract class AWTToolkit implements Toolkit {
 		    }
 		});
 	    } catch(IllegalStateException e) {}
-	}
-
-	public static <T> Promise<T> awtpromise(Supplier<T> task) {
-	    return(Promise.deferred(task, EventQueue::invokeLater));
 	}
 
 	public static <T> Promise<T> xfpromise(Class<T> typ, Transferable xf, DataFlavor flavor) {
@@ -722,7 +722,7 @@ public abstract class AWTToolkit implements Toolkit {
 	public final Mode mode;
 	public final Component parent;
 	private javax.swing.filechooser.FileFilter filter = null;
-	private int state = 0;
+	private boolean shown = false;
 	private Path result;
 
 	public AWTPicker(Mode mode, Component parent) {
@@ -731,15 +731,15 @@ public abstract class AWTToolkit implements Toolkit {
 	}
 
 	public void filter(String desc, String... exts) {
-	    if(state != 0)
+	    if(shown)
 		throw(new IllegalStateException());
 	    filter = new FileNameExtensionFilter(desc, exts);
 	}
 
-	public void show(Runnable cb) {
-	    if(state != 0)
+	public Promise<Path> show() {
+	    if(shown)
 		throw(new IllegalStateException());
-	    EventQueue.invokeLater(() -> {
+	    return(awtpromise(() -> {
 		JFileChooser dialog = new JFileChooser();
 		if(filter != null)
 		    dialog.setFileFilter(filter);
@@ -749,16 +749,9 @@ public abstract class AWTToolkit implements Toolkit {
 		else
 		    res = dialog.showSaveDialog(parent);
 		if(res == JFileChooser.APPROVE_OPTION)
-		    result = dialog.getSelectedFile().toPath();
-		state = 2;
-		cb.run();
-	    });
-	}
-
-	public Path result() {
-	    if(state != 2)
-		throw(new IllegalStateException());
-	    return(result);
+		    return(dialog.getSelectedFile().toPath());
+		return(null);
+	    }));
 	}
     }
 

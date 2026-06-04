@@ -2081,29 +2081,21 @@ public class GLXContext implements Toolkit.Factory {
 	    public abstract class Instance implements FilePicker {
 		protected final List<String> args = new ArrayList<>();
 		protected Process proc;
-		protected Path result = null;
 
 		public Instance() {
 		    args.add(exec.toFile().toString());
 		}
 
-		private void monitor(Process proc, Runnable cb) {
+		private void monitor(Process proc, Promise<Path> cb) {
 		    try {
 			BufferedReader in = new BufferedReader(new InputStreamReader(proc.getInputStream()));
 			String result;
-			try {
-			    result = in.readLine();
-			    if(proc.waitFor() != 0)
-				result = null;
-			} catch(IOException e) {
-			    throw(new RuntimeException());
-			} catch(InterruptedException e) {
+			result = in.readLine();
+			if(proc.waitFor() != 0)
 			    result = null;
-			    Thread.currentThread().interrupt();
-			}
-			if((result != null) && (result.length() > 0))
-			    this.result = Paths.get(result);
-			cb.run();
+			cb.resolve(((result != null) && (result.length() > 0)) ? Paths.get(result) : null);
+		    } catch(Throwable t) {
+			cb.reject(t);
 		    } finally {
 			synchronized(GLXToolkit.this) {
 			    if(curpicker == this)
@@ -2112,31 +2104,27 @@ public class GLXContext implements Toolkit.Factory {
 		    }
 		}
 
-		public void show(Runnable cb) {
+		public Promise<Path> show() {
 		    synchronized(GLXToolkit.this) {
 			if(proc != null)
 			    throw(new IllegalStateException());
 			if(curpicker != null)
-			    throw(new IllegalStateException("file picker already active"));
+			    return(new Promise<Path>().reject(new IllegalStateException("file picker already active")));
 			ProcessBuilder spec = new ProcessBuilder(args);
 			spec.inheritIO();
 			spec.redirectOutput(ProcessBuilder.Redirect.PIPE);
 			try {
 			    proc = spec.start();
 			} catch(IOException e) {
-			    throw(new RuntimeException(e));
+			    return(new Promise<Path>().reject(new RuntimeException(e)));
 			}
-			Thread mon = new HackThread(() -> monitor(proc, cb), "Zenity monitor");
+			Promise<Path> ret = new Promise<>();
+			Thread mon = new HackThread(() -> monitor(proc, ret), "Zenity monitor");
 			mon.setDaemon(true);
 			mon.start();
 			curpicker = this;
+			return(ret);
 		    }
-		}
-
-		public Path result() {
-		    if((proc == null) || proc.isAlive())
-			throw(new IllegalStateException());
-		    return(result);
 		}
 	    }
 	}
@@ -2215,10 +2203,10 @@ public class GLXContext implements Toolkit.Factory {
 		    filter.append(")");
 		}
 
-		public void show(Runnable cb) {
+		public Promise<Path> show(Runnable cb) {
 		    if(filter.length() > 0)
 			args.add(filter.toString());
-		    super.show(cb);
+		    return(super.show());
 		}
 	    }
 

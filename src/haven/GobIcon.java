@@ -844,18 +844,16 @@ public class GobIcon extends GAttrib {
 		private void selectwav() {
 		    FilePicker dialog = ui.wnd.toolkit().picker().make(FilePicker.Mode.OPEN, ui.wnd);
 		    dialog.filter("PCM wave file", "wav");
-		    dialog.show(() -> {
-			if(dialog.result() == null)
-			    return;
+		    dialog.show().map(Promise.cnonnull(path -> {
 			for(Iterator<NotificationSetting> i = items.iterator(); i.hasNext();) {
 			    NotificationSetting item = i.next();
 			    if(item.wav != null)
 				i.remove();
 			}
-			NotificationSetting ws = new NotificationSetting(dialog.result());
+			NotificationSetting ws = new NotificationSetting(path);
 			items.add(items.indexOf(NotificationSetting.other), ws);
 			change(ws);
-		    });
+		    })).report(ui);
 		}
 
 		public void change(NotificationSetting item) {

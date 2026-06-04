@@ -26,6 +26,8 @@
 
 package haven.iosys.tk;
 
+import haven.*;
+import haven.iosys.*;
 import java.util.*;
 import java.nio.file.*;
 
@@ -35,10 +37,18 @@ public interface FilePicker {
     }
 
     public void filter(String desc, String... exts);
-    public void show(Runnable cb);
-    public Path result();
+    public Promise<Path> show();
 
     public static interface Factory {
 	public FilePicker make(Mode mode, Windeye parent);
     }
+
+    public static Factory nil = (mode, parent) -> {
+	return(new FilePicker() {
+	    public void filter(String desc, String... exts) {}
+	    public Promise<Path> show() {
+		return(new Promise<Path>().reject(new Unavailable("No file picker available on this platform.")));
+	    }
+	});
+    };
 }
