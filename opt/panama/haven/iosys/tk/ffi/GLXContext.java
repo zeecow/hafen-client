@@ -772,6 +772,10 @@ public class GLXContext implements Toolkit.Factory {
 			}
 		    }
 		}
+
+		public GLXWindow wnd() {
+		    return(GLXWindow.this);
+		}
 	    }
 
 	    public GLXWindow() {
@@ -1048,7 +1052,7 @@ public class GLXContext implements Toolkit.Factory {
 
 	    public void swapbuffers(Render buf, Object mode) {
 		GLRender gbuf = (GLRender)buf;
-		if(gbuf.env != renv)
+		if(((GLXEnvironment)gbuf.env).wnd() != this)
 		    throw(new IllegalArgumentException());
 		if(!(mode instanceof Boolean))
 		    throw(new IllegalArgumentException());

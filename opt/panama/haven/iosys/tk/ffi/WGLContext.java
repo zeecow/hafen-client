@@ -457,6 +457,10 @@ public class WGLContext implements Toolkit.Factory {
 			}
 		    }
 		}
+
+		public WGLWindow wnd() {
+		    return(WGLWindow.this);
+		}
 	    }
 
 	    public WGLToolkit toolkit() {
@@ -729,7 +733,7 @@ public class WGLContext implements Toolkit.Factory {
 
 	    public void swapbuffers(Render g, Object mode) {
 		GLRender gbuf = (GLRender)g;
-		if(gbuf.env != renv)
+		if(((WGLEnvironment)gbuf.env).wnd() != this)
 		    throw(new IllegalArgumentException());
 		gbuf.submit(gl -> this.glswap(gl, ((Boolean)mode) ? 1 : 0));
 	    }
