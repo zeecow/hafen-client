@@ -294,10 +294,14 @@ public class Promise<T> {
     }
 
     public void report(UI ui, String prefix) {
-	if(prefix == null)
-	    except(err -> {ui.error(err.getMessage());});
-	else
-	    except(err -> {ui.error(prefix + ": " + err.getMessage());});
+	except(err -> {
+	    String msg = err.getMessage();
+	    if(prefix != null)
+		msg = prefix + ": " + msg;
+	    synchronized(ui) {
+		ui.error(msg);
+	    }
+	});
     }
 
     public void report(UI ui) {
