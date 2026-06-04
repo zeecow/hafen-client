@@ -77,14 +77,18 @@ public abstract class AWTToolkit implements Toolkit {
     }
 
     protected void awtrun(Runnable task) {
-	try {
-	    EventQueue.invokeAndWait(task);
-	} catch(InterruptedException e) {
-	    Thread.currentThread().interrupt();
-	} catch(java.lang.reflect.InvocationTargetException e) {
-	    if(e.getCause() instanceof RuntimeException)
-		throw((RuntimeException)e.getCause());
-	    throw(new RuntimeException(e));
+	if(EventQueue.isDispatchThread()) {
+	    task.run();
+	} else {
+	    try {
+		EventQueue.invokeAndWait(task);
+	    } catch(InterruptedException e) {
+		Thread.currentThread().interrupt();
+	    } catch(java.lang.reflect.InvocationTargetException e) {
+		if(e.getCause() instanceof RuntimeException)
+		    throw((RuntimeException)e.getCause());
+		throw(new RuntimeException(e));
+	    }
 	}
     }
 
@@ -355,8 +359,10 @@ public abstract class AWTToolkit implements Toolkit {
     public abstract class AWTWindow implements Windeye {
 	public final java.awt.Frame frame;
 	private final Collection<EventListener> callbacks = new java.util.concurrent.CopyOnWriteArrayList<>();
+	private boolean excl = false;
 	private boolean focused;
 	private DropHandler drop = null;
+	private Sizing sizing = null;
 
 	public AWTWindow() {
 	    frame = new java.awt.Frame();
@@ -617,19 +623,57 @@ public abstract class AWTToolkit implements Toolkit {
 		    frame.setMaximumSize(null);
 		}
 	    });
+	    sizing = info;
 	    return(this);
 	}
 
+	private void setfs() {
+	    if(excl)
+		return;
+	    awtrun(() -> {
+		GraphicsDevice dev = frame.getGraphicsConfiguration().getDevice();
+		frame.setVisible(false);
+		frame.dispose();
+		frame.setUndecorated(true);
+		frame.setVisible(true);
+		dev.setFullScreenWindow(frame);
+		frame.pack();
+	    });
+	    excl = true;
+	}
+
+	private void setwnd() {
+	    if(!excl)
+		return;
+	    awtrun(() -> {
+		GraphicsDevice dev = frame.getGraphicsConfiguration().getDevice();
+		dev.setFullScreenWindow(null);
+		frame.setVisible(false);
+		frame.dispose();
+		frame.setUndecorated(false);
+		frame.setVisible(true);
+		if(sizing != null)
+		    sizing(sizing);
+		frame.pack();
+	    });
+	    excl = false;
+	}
+
 	public AWTWindow state(State st) {
-	    /* XXX: Implement fullscreen mode */
 	    switch(st) {
+	    case EXCLUSIVE:
+		setfs();
+		break;
 	    case MINIMIZED:
+		setwnd();
 		frame.setExtendedState(java.awt.Frame.ICONIFIED);
 		break;
 	    case NORMAL:
+		setwnd();
 		frame.setExtendedState(java.awt.Frame.NORMAL);
 		break;
 	    case MAXIMIZED:
+		setwnd();
 		frame.setExtendedState(frame.getExtendedState() | java.awt.Frame.MAXIMIZED_BOTH);
 		break;
 	    }
@@ -642,6 +686,8 @@ public abstract class AWTToolkit implements Toolkit {
 	}
 
 	public State state() {
+	    if(excl)
+		return(State.EXCLUSIVE);
 	    if((frame.getExtendedState() & java.awt.Frame.ICONIFIED) != 0)
 		return(State.MINIMIZED);
 	    if((frame.getExtendedState() & java.awt.Frame.MAXIMIZED_BOTH) != 0)
