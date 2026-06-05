@@ -1807,9 +1807,9 @@ public class MapView extends PView implements DTarget, Console.Directory {
 	}
 
 	public boolean rotate(Plob plob, MouseWheelEvent data, int modflags) {
-	    if((modflags & (UI.MOD_CTRL | UI.MOD_SHIFT)) == 0)
+	    if(!ZeeConfig.freeGobPlacement && (modflags & (UI.MOD_CTRL | UI.MOD_SHIFT)) == 0)
 		return(false);
-	    freerot = true;
+	    freerot = ZeeConfig.freeGobPlacement;//true;
 	    double na;
 	    if((modflags & UI.MOD_SHIFT) == 0)
 		na = (Math.PI / 4) * (Math.round(plob.a / (Math.PI / 4)) + data.a);

@@ -1014,15 +1014,7 @@ public class ZeeManagerItems extends ZeeThread{
                                 sleep(sleepMs);
 
                                 //get next dead/live animal for butching
-                                List<WItem> items;
-                                if (firstItemName.contains("/rabbit-"))
-                                    items = inv.getWItemsByNameContains("gfx/invobjs/rabbit-");
-                                else if (firstItemName.endsWith("/hen") || firstItemName.endsWith("/rooster"))
-                                    items = inv.getItemsByNameEnd("/hen","/rooster");
-                                else if (firstItemName.endsWith("/duckdrake") || firstItemName.endsWith("/duckhen"))
-                                    items = inv.getItemsByNameEnd("/duckdrake","/duckhen");
-                                else
-                                    items = inv.getWItemsByNameEndsWith(firstItemName);
+                                List<WItem> items = getAutoButchGroupOfItems(inv,firstItemName);
 
                                 //filter animal hides
                                 items.removeIf(wItem1->ZeeConfig.isAnimalHideTailEtc(wItem1.item.getres().name));
@@ -1057,6 +1049,19 @@ public class ZeeManagerItems extends ZeeThread{
                 autoButchExit("done");
             }
         }.start();
+    }
+
+    static List<WItem> getAutoButchGroupOfItems(Inventory inv, String firstItemName) {
+        List<WItem> items = new ArrayList<>();
+        if (firstItemName.contains("/rabbit-"))
+            items = inv.getWItemsByNameContains("gfx/invobjs/rabbit-");
+        else if (firstItemName.endsWith("/hen") || firstItemName.endsWith("/rooster"))
+            items = inv.getItemsByNameEnd("/hen","/rooster");
+        else if (firstItemName.endsWith("/duckdrake") || firstItemName.endsWith("/duckhen"))
+            items = inv.getItemsByNameEnd("/duckdrake","/duckhen");
+        else
+            items = inv.getWItemsByNameEndsWith(firstItemName);
+        return items;
     }
 
 
@@ -1105,7 +1110,7 @@ public class ZeeManagerItems extends ZeeThread{
         if (isItemDrinkingVessel(itemName)){
             menu = new ZeeFlowerMenu(wItem, ZeeFlowerMenu.STRPETAL_BINDWATER);
         }
-        // todo fish fix
+        // fish , todo fish fix
         else if (ZeeConfig.isFish(itemName)) {
             if (inv.countItemsByNameContains("/fish-") > 1){
                 opts.add(ZeeFlowerMenu.STRPETAL_AUTO_BUTCH_ALL);
@@ -1119,19 +1124,14 @@ public class ZeeManagerItems extends ZeeThread{
             else
                 menu = new ZeeFlowerMenu(wItem, opts.toArray(String[]::new));
         }
+        // small animals
         else if (ZeeConfig.isButchableSmallAnimal(itemName)) {
 
             opts.add(ZeeFlowerMenu.STRPETAL_AUTO_BUTCH);
 
-            int items;
-            if (itemName.endsWith("/hen") || itemName.endsWith("/rooster"))
-                items = inv.getItemsByNameEnd("/hen","/rooster").size();
-            else if ((itemName.endsWith("/rabbit-buck") || itemName.endsWith("/rabbit-doe")))
-                items = inv.getItemsByNameEnd("/rabbit-buck","/rabbit-doe").size();
-            else
-                items = inv.countItemsByNameContains(itemName);
+            List<WItem> items = getAutoButchGroupOfItems(inv, itemName);
 
-            if (items > 1){
+            if (items.size() > 1){
                 opts.add(ZeeFlowerMenu.STRPETAL_AUTO_BUTCH_ALL);
             }
             if (isTransferWindowOpened()) {

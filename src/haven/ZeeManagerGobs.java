@@ -2759,7 +2759,6 @@ public class ZeeManagerGobs extends ZeeThread{
                         if (w1.getClass().getSimpleName().contentEquals("RelCont")){
                             w1.children().forEach(w2 -> {
                                 if (w2.getClass().getSimpleName().contentEquals("TipLabel")){
-
                                     try {
                                         // get window info
                                         List<ItemInfo> info = (List<ItemInfo>) w2.getClass().getDeclaredField("info").get(w2);
@@ -2770,6 +2769,13 @@ public class ZeeManagerGobs extends ZeeThread{
                                             // empty gob, remove text
                                             ZeeConfig.removeGobText(ZeeConfig.lastMapViewClickGob);
                                             return;
+                                        }
+
+                                        // progress %
+                                        haven.res.ui.tt.substprog.Progress infoProg = (haven.res.ui.tt.substprog.Progress) ZeeManagerItems.getItemInfoByClass(info,haven.res.ui.tt.substprog.Progress.class);
+                                        int progressPercentage = -1;
+                                        if (infoProg != null){
+                                            progressPercentage = (int)Math.floor(infoProg.done * 100);
                                         }
 
                                         // (15.45) (l) of (Cave Slime)
@@ -2792,9 +2798,11 @@ public class ZeeManagerGobs extends ZeeThread{
                                             gobText += ql.intValue();
                                         }
 
-                                        // label gob "name q"
-                                        // TODO create variable lastClickedBarrelCIstern to avoid rare mislabeling
-                                        ZeeConfig.addGobText(gobAutoLabel, gobText);
+                                        // label gob
+                                        if (progressPercentage != -1)
+                                            ZeeConfig.addGobText(gobAutoLabel, substance + " " + progressPercentage + "%");
+                                        else
+                                            ZeeConfig.addGobText(gobAutoLabel, gobText);
 
                                     } catch (IllegalAccessException e) {
                                         e.printStackTrace();
