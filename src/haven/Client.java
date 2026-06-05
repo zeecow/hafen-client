@@ -110,86 +110,31 @@ public class Client implements Console.Directory {
 		pending.clear();
 	    }
 	    if(mousemv != null) {
-		ui.mousemove(mkawt(mousemv), mousemv.wndc());
+		ui.mousemove(AWTCompat.mkawt(mousemv), mousemv.wndc());
 	    }
 	    for(Toolkit.Event ev : evs) {
 		if(ev instanceof Toolkit.MouseDownEvent) {
 		    Toolkit.MouseDownEvent e = (Toolkit.MouseDownEvent)ev;
 		    int btn = buttonid(e.button());
 		    if(btn > 0)
-			ui.mousedown(mkawt(e), e.wndc(), btn);
+			ui.mousedown(AWTCompat.mkawt(e), e.wndc(), btn);
 		} else if(ev instanceof Toolkit.MouseUpEvent) {
 		    Toolkit.MouseUpEvent e = (Toolkit.MouseUpEvent)ev;
 		    int btn = buttonid(e.button());
 		    if(btn > 0)
-			ui.mouseup(mkawt(e), e.wndc(), btn);
+			ui.mouseup(AWTCompat.mkawt(e), e.wndc(), btn);
 		} else if(ev instanceof Toolkit.MouseWheelEvent) {
 		    Toolkit.MouseWheelEvent e = (Toolkit.MouseWheelEvent)ev;
 		    if(e.axis() == Toolkit.MouseWheelEvent.Axis.VERT)
-			ui.mousewheel(mkawt(e), e.wndc(), e.amount(), e.subamount());
+			ui.mousewheel(AWTCompat.mkawt(e), e.wndc(), e.amount(), e.subamount());
 		} else if(ev instanceof Toolkit.KeyDownEvent) {
-		    ui.keydown(mkawt((Toolkit.KeyEvent)ev));
-		    Debug.keyevent(mkawt((Toolkit.KeyEvent)ev));
+		    ui.keydown(AWTCompat.mkawt((Toolkit.KeyEvent)ev));
+		    Debug.keyevent(AWTCompat.mkawt((Toolkit.KeyEvent)ev));
 		} else if(ev instanceof Toolkit.KeyUpEvent) {
-		    ui.keyup(mkawt((Toolkit.KeyEvent)ev));
-		    Debug.keyevent(mkawt((Toolkit.KeyEvent)ev));
+		    ui.keyup(AWTCompat.mkawt((Toolkit.KeyEvent)ev));
+		    Debug.keyevent(AWTCompat.mkawt((Toolkit.KeyEvent)ev));
 		}
 	    }
-	}
-
-	/* XXX: All the following are for backward compatibility, to be removed. */
-	private static final Map<Key, Integer> revawt = new HashMap<>();
-	static {
-	    for(Map.Entry<Integer, Key> k : AWTToolkit.stdkeys.entrySet())
-		revawt.put(k.getValue(),k.getKey());
-	}
-
-	private static final java.awt.Component awtdummy = new java.awt.Component() {};
-
-	private static int awtmods(Collection<Key.Mod> mods) {
-	    int ret = 0;
-	    for(Key.Mod mod : mods) {
-		switch(mod) {
-		case SHIFT: ret |= java.awt.event.InputEvent.SHIFT_DOWN_MASK; break;
-		case CONTROL: ret |= java.awt.event.InputEvent.CTRL_DOWN_MASK; break;
-		case META: ret |= java.awt.event.InputEvent.META_DOWN_MASK; break;
-		case ALT: ret |= java.awt.event.InputEvent.ALT_DOWN_MASK; break;
-		}
-	    }
-	    return(ret);
-	}
-
-	private static class ExtKeyEvent extends java.awt.event.KeyEvent {
-	    private ExtKeyEvent(int id, long time, int mods, int code, char chr, int location) {
-		super(awtdummy, id, time, mods, code, chr, location);
-	    }
-
-	    public int getExtendedKeyCode() {return(getKeyCode());}
-	}
-
-	private static java.awt.event.KeyEvent mkawt(Toolkit.KeyEvent ev) {
-	    int id = 0;
-	    if(ev instanceof Toolkit.KeyDownEvent)
-		id = java.awt.event.KeyEvent.KEY_PRESSED;
-	    else if(ev instanceof Toolkit.KeyUpEvent)
-		id = java.awt.event.KeyEvent.KEY_RELEASED;
-	    char c = java.awt.event.KeyEvent.CHAR_UNDEFINED;
-	    if(ev.string() != null)
-		c = ev.string().charAt(0);
-	    return(new ExtKeyEvent(id, System.currentTimeMillis(), awtmods(ev.mods()),
-				   revawt.getOrDefault(ev.key(), java.awt.event.KeyEvent.VK_UNDEFINED),
-				   c, java.awt.event.KeyEvent.KEY_LOCATION_UNKNOWN));
-	}
-
-	private static java.awt.event.MouseEvent mkawt(Toolkit.MouseEvent ev) {
-	    int id = 0;
-	    if(ev instanceof Toolkit.MouseDownEvent)
-		id = java.awt.event.MouseEvent.MOUSE_PRESSED;
-	    else if(ev instanceof Toolkit.MouseUpEvent)
-		id = java.awt.event.MouseEvent.MOUSE_RELEASED;
-	    return(new java.awt.event.MouseEvent(awtdummy, id, System.currentTimeMillis(), awtmods(ev.mods()),
-						 ev.wndc().x, ev.wndc().y, 0, false,
-						 (ev instanceof Toolkit.MouseButtonEvent) ? buttonid(((Toolkit.MouseButtonEvent)ev).button()) : java.awt.event.MouseEvent.NOBUTTON));
 	}
     }
 
