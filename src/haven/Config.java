@@ -38,7 +38,7 @@ public class Config {
     public static final Properties jarprops = getjarprops();
     public static final String confid = jarprops.getProperty("config.client-id", "unknown");
     public static final Variable<Boolean> par = Variable.def(() -> true);
-    public final Properties localprops = getlocalprops();
+    public final Properties localprops = getlocalprops(), userprops = getuserprops();
 
     private static Config global = null;
     public static Config get() {
@@ -135,11 +135,30 @@ public class Config {
 	return(ret);
     }
 
+    private static Properties getuserprops() {
+	Properties ret = new Properties();
+	try {
+	    Path base = localdir();
+	    if(base != null) {
+		try(InputStream fp = Files.newInputStream(Utils.pj(base, "haven-config.properties"))) {
+		    ret.load(fp);
+		} catch(NoSuchFileException exc) {
+		    /* That's quite alright. */
+		}
+	    }
+	} catch(Exception exc) {
+	    new Warning(exc, "unexpected error occurred when loading user properties").issue();
+	}
+	return(ret);
+    }
+
     public String getprop(String name, String def) {
 	String ret;
 	if((ret = Utils.getprop(name, null)) != null)
 	    return(ret);
 	if((ret = localprops.getProperty(name)) != null)
+	    return(ret);
+	if((ret = userprops.getProperty(name)) != null)
 	    return(ret);
 	if((ret = jarprops.getProperty(name)) != null)
 	    return(ret);
