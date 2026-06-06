@@ -152,6 +152,12 @@ public abstract class Win32 {
     public static final int SIZE_MAXSHOW = 3;
     public static final int SIZE_MAXHIDE = 4;
 
+    public static final int MAPVK_VK_TO_VSC    = 0;
+    public static final int MAPVK_VSC_TO_VK    = 1;
+    public static final int MAPVK_VK_TO_CHAR   = 2;
+    public static final int MAPVK_VSC_TO_VK_EX = 3;
+    public static final int MAPVK_VK_TO_VSC_EX = 4;
+
     public static final int MK_LBUTTON  = 0x0001;
     public static final int MK_RBUTTON  = 0x0002;
     public static final int MK_SHIFT    = 0x0004;
@@ -378,6 +384,9 @@ public abstract class Win32 {
     public abstract int GetKeyState(int nVirtKey);
     public abstract void GetKeyboardState(KeyboardState buf);
     public abstract Handle GetKeyboardLayout(int idThread);
+    public abstract Handle[] GetKeyboardLayoutList();
+    public abstract int MapVirtualKeyEx(int uCode, int uMapType, Handle dwhkl);
+    public abstract int VkKeyScanEx(int ch, Handle dwhkl);
     public abstract char[] ToUnicodeEx(int wVirtKey, int wScanCode, KeyboardState lpKeyState, int wFlags, Handle dwhkl);
     public abstract String GetKeyNameText(long lParam);
     public abstract Handle CreateDIBSection(Handle hDC, BITMAPV5HEADER pbmi, int usage, ByteBuffer[] ppvBits, Handle hSection, int offset);
@@ -1032,6 +1041,48 @@ public abstract class Win32 {
 		throw(new RuntimeException(e));
 	    }
 	    return(Handle.of(rv));
+	}
+
+	private final MethodHandle GetKeyboardLayoutList = ld.downcallHandle(user32.find("GetKeyboardLayoutList").get(), FunctionDescriptor.of(C_INT, C_INT, ADDRESS));
+	public Handle[] GetKeyboardLayoutList() {
+	    for(int n = 16; n < (1 << 30); n <<= 1) {
+		try(Arena st = Arena.ofConfined()) {
+		    MemorySegment buf = st.allocate(HKL, n);
+		    int rv;
+		    try {
+			rv = (int)GetKeyboardLayoutList.invoke(n, buf);
+		    } catch(Throwable e) {
+			throw(new RuntimeException(e));
+		    }
+		    if(rv == 0)
+			throw(lasterror());
+		    if(rv < n) {
+			Handle[] ret = new Handle[rv];
+			for(int i = 0; i < rv; i++)
+			    ret[i] = Handle.of(buf.get(ADDRESS, i * HKL.byteSize()));
+			return(ret);
+		    }
+		}
+	    }
+	    throw(new RuntimeException());
+	}
+
+	private final MethodHandle MapVirtualKeyExW = ld.downcallHandle(user32.find("MapVirtualKeyExW").get(), FunctionDescriptor.of(UINT, UINT, UINT, HKL));
+	public int MapVirtualKeyEx(int uCode, int uMapType, Handle dwhkl) {
+	    try {
+		return((int)MapVirtualKeyExW.invoke(uCode, uMapType, dwhkl.bits));
+	    } catch(Throwable e) {
+		throw(new RuntimeException(e));
+	    }
+	}
+
+	private final MethodHandle VkKeyScanExW = ld.downcallHandle(user32.find("VkKeyScanExW").get(), FunctionDescriptor.of(SHORT, WCHAR, HKL));
+	public int VkKeyScanEx(int ch, Handle dwhkl) {
+	    try {
+		return((int)VkKeyScanExW.invoke((short)ch, dwhkl.bits));
+	    } catch(Throwable e) {
+		throw(new RuntimeException(e));
+	    }
 	}
 
 	private final MethodHandle ToUnicodeEx = ld.downcallHandle(user32.find("ToUnicodeEx").get(), FunctionDescriptor.of(C_INT, UINT, UINT, ADDRESS, LPWSTR, C_INT, UINT, HKL));

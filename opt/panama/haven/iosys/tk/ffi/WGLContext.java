@@ -258,6 +258,7 @@ public class WGLContext implements Toolkit.Factory {
 
 	private final Object mtmon = new Object();
 	private Thread msgthread = null;
+	private boolean msgrunning = true;
 	private volatile int msgthreadid = 0;
 	private final Map<Handle, WGLWindow> windows = new HashMap<>();
 	private final Queue<Runnable> mtasks = new LinkedList<>();
@@ -273,7 +274,7 @@ public class WGLContext implements Toolkit.Factory {
 		    Runnable task;
 		    synchronized(mtmon) {
 			task = mtasks.poll();
-			if((task == null) && windows.isEmpty()) {
+			if((task == null) && windows.isEmpty() && !msgrunning) {
 			    msgthread = null;
 			    return;
 			}
@@ -901,6 +902,10 @@ public class WGLContext implements Toolkit.Factory {
 	}
 
 	public void dispose() {
+	    synchronized(mtmon) {
+		if(msgthread != null)
+		    msgrun(() -> {msgrunning = false;});
+	    }
 	    wgl.wglDeleteContext(ctx);
 	    win.UnregisterClass(wclassname, hInstance);
 	}
