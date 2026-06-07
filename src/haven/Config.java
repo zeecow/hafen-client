@@ -38,6 +38,7 @@ public class Config {
     public static final Properties jarprops = getjarprops();
     public static final String confid = jarprops.getProperty("config.client-id", "unknown");
     public static final Variable<Boolean> par = Variable.def(() -> true);
+    public static final Variable<Boolean> exp = Variable.propb("haven.experimental", false);
     public final Properties localprops = getlocalprops(), userprops = getuserprops();
 
     private static Config global = null;
@@ -228,6 +229,9 @@ public class Config {
 	public static Variable<Double> propf(String name, Double defval) {
 	    return(prop(name, Double::parseDouble, () -> defval));
 	}
+	public static Variable<Ratio> propr(String name, Ratio defval) {
+	    return(prop(name, Ratio::parse, () -> defval));
+	}
 	public static Variable<byte[]> propb(String name, byte[] defval) {
 	    return(prop(name, Utils.hex::dec, () -> defval));
 	}
@@ -335,13 +339,13 @@ public class Config {
 		System.exit(0);
 		break;
 	    case 'd':
-		UIPanel.dbtext.set(true);
+		UILoop.dbtext.set(true);
 		break;
 	    case 'P':
-		UIPanel.profile.set(true);
+		UILoop.profile.set(true);
 		break;
 	    case 'f':
-		MainFrame.initfullscreen.set(true);
+		Client.initfullscreen.set(true);
 		break;
 	    case 'r':
 		Resource.resdir.set(Utils.path(opt.arg));
