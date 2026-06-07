@@ -31,7 +31,7 @@ import java.util.*;
 import java.awt.Font;
 import java.awt.Color;
 import java.awt.image.BufferedImage;
-
+import static haven.PType.*;
 import static haven.Inventory.invsq;
 
 public class Makewindow extends Widget {
@@ -146,17 +146,26 @@ public class Makewindow extends Widget {
 	this.rcpnm = rcpnm;
     }
 
+    private Spec parsespec(Object[] desc) {
+	int a = 0;
+	Indir<Resource> res = ui.sess.getresv(desc[a++]);
+	Message sdt = BYTES.is(desc, a) ? new MessageBuf(BYTES.of(desc, a++)) : MessageBuf.nil;
+	int num = INT.of(desc, a++);
+	Object[] info = OBJS.is(desc, a) ? OBJS.of(desc, a) : new Object[0];
+	return(new Spec(res, sdt, num, info));
+    }
+
     public void uimsg(String msg, Object... args) {
 	if(msg == "inpop") {
-	    List<Spec> inputs = new ArrayList<>();
-	    for(int i = 0; i < args.length;) {
-		Indir<Resource> res = ui.sess.getresv(args[i++]);
-		Message sdt = (args[i] instanceof byte[]) ? new MessageBuf((byte[])args[i++]) : MessageBuf.nil;
-		int num = Utils.iv(args[i++]);
-		Object[] info = {};
-		if((i < args.length) && (args[i] instanceof Object[]))
-		    info = (Object[])args[i++];
-		inputs.add(new Spec(res, sdt, num, info));
+	    List<Spec> inputs;
+	    if(INT.is(args, 0)) {
+		inputs = Arrays.asList(this.inputs.stream().map(w -> w.spec).toArray(Spec[]::new));
+		for(int i = 0; i < args.length; i += 2)
+		    inputs.set(INT.of(args, i), parsespec(OBJS.of(args, i + 1)));
+	    } else {
+		inputs = new ArrayList<>();
+		for(int i = 0; i < args.length; i++)
+		    inputs.add(parsespec(OBJS.of(args[i])));
 	    }
 	    List<Input> wdgs = new ArrayList<>();
 	    int idx = 0;
@@ -177,15 +186,15 @@ public class Makewindow extends Widget {
 		this.inputs = wdgs;
 	    }
 	} else if(msg == "opop") {
-	    List<Spec> outputs = new ArrayList<Spec>();
-	    for(int i = 0; i < args.length;) {
-		Indir<Resource> res = ui.sess.getresv(args[i++]);
-		Message sdt = (args[i] instanceof byte[]) ? new MessageBuf((byte[])args[i++]) : MessageBuf.nil;
-		int num = Utils.iv(args[i++]);
-		Object[] info = {};
-		if((i < args.length) && (args[i] instanceof Object[]))
-		    info = (Object[])args[i++];
-		outputs.add(new Spec(res, sdt, num, info));
+	    List<Spec> outputs;
+	    if(INT.is(args, 0)) {
+		outputs = Arrays.asList(this.outputs.stream().map(w -> w.spec).toArray(Spec[]::new));
+		for(int i = 0; i < args.length; i += 2)
+		    outputs.set(INT.of(args, i), parsespec(OBJS.of(args, i + 1)));
+	    } else {
+		outputs = new ArrayList<>();
+		for(int i = 0; i < args.length; i++)
+		    outputs.add(parsespec(OBJS.of(args[i])));
 	    }
 	    List<SpecWidget> wdgs = new ArrayList<>();
 	    for(Spec spec : outputs)
@@ -212,9 +221,9 @@ public class Makewindow extends Widget {
 	} else if(msg == "tool") {
 	    tools.add(ui.sess.getresv(args[0]));
 	} else if(msg == "use") {
-	    inputs.get(Utils.iv(args[0])).using(Utils.iv(args[1]));
+	    inputs.get(INT.of(args[0])).using(INT.of(args[1]));
 	} else if(msg == "inprcps") {
-	    int idx = Utils.iv(args[0]);
+	    int idx = INT.of(args[0]);
 	    List<MenuGrid.Pagina> rcps = new ArrayList<>();
 	    GameUI gui = getparent(GameUI.class);
 	    if((gui != null) && (gui.menu != null)) {
@@ -326,7 +335,7 @@ public class Makewindow extends Widget {
 
 	public boolean mousedown(MouseDownEvent ev) {
 	    if(ev.b == 1) {
-		Makewindow.this.wdgmsg("choose", idx);
+		Makewindow.this.wdgmsg("choose", idx, ui.modflags());
 		return(true);
 	    } else if(ev.b == 3) {
 		if(rpag == null)
