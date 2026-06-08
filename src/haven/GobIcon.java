@@ -26,18 +26,13 @@
 
 package haven;
 
-import javax.swing.*;
-import javax.swing.filechooser.FileNameExtensionFilter;
-import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.io.*;
-import java.nio.file.FileSystemException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.List;
-import java.util.Queue;
 import java.util.*;
-import java.util.function.Consumer;
+import java.util.function.*;
+import java.io.*;
+import java.nio.file.*;
+import java.awt.image.*;
+import haven.iosys.tk.*;
+import java.awt.Color;
 
 public class GobIcon extends GAttrib {
     private static final int size = UI.scale(20);
@@ -872,20 +867,18 @@ public class GobIcon extends GAttrib {
 		protected Widget makeitem(NotificationSetting item, int idx, Coord sz) {return(SListWidget.TextItem.of(sz, Text.std, () -> item.name));}
 
 		private void selectwav() {
-		    java.awt.EventQueue.invokeLater(() -> {
-			    JFileChooser fc = new JFileChooser();
-			    fc.setFileFilter(new FileNameExtensionFilter("PCM wave file", "wav"));
-			    if(fc.showOpenDialog(null) != JFileChooser.APPROVE_OPTION)
-				return;
-			    for(Iterator<NotificationSetting> i = items.iterator(); i.hasNext();) {
-				NotificationSetting item = i.next();
-				if(item.wav != null)
-				    i.remove();
-			    }
-			    NotificationSetting ws = new NotificationSetting(fc.getSelectedFile().toPath());
-			    items.add(items.indexOf(NotificationSetting.other), ws);
-			    change(ws);
-			});
+		    FilePicker dialog = ui.wnd.toolkit().picker().make(FilePicker.Mode.OPEN, ui.wnd);
+		    dialog.filter("PCM wave file", "wav");
+		    dialog.show().map(Promise.cnonnull(path -> {
+			for(Iterator<NotificationSetting> i = items.iterator(); i.hasNext();) {
+			    NotificationSetting item = i.next();
+			    if(item.wav != null)
+				i.remove();
+			}
+			NotificationSetting ws = new NotificationSetting(path);
+			items.add(items.indexOf(NotificationSetting.other), ws);
+			change(ws);
+		    })).report(ui);
 		}
 
 		public void change(NotificationSetting item) {
