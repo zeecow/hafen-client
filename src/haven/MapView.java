@@ -2553,6 +2553,11 @@ public class MapView extends PView implements DTarget, Console.Directory {
 		    clickdb = Utils.parsebool(args[1], false);
 		}
 	    });
+    Console.setscmd("zeecow", new Console.Command() {
+            public void run(Console cons, String[] args) {
+                ZeeConsole.runCmdZeecow(args);
+            }
+        });
     }
 
 	@Override
