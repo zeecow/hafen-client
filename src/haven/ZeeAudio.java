@@ -216,8 +216,10 @@ public class ZeeAudio extends Thread{
     static final String AUDIO_BLOCKER_WIN_TITLE = "Audio Blocker";
     @SuppressWarnings("unchecked")
     static void aBlockCheck(String resname, int subClip) {
-        if (resname.contains("/ambient/"))
-            return; // ignore ambient for now because Exceptions
+        // ignore incompatible sounds for now
+        if (resname.contains("/ambient/") || resname.contains("/belltower") || resname.contains("/gong")) {
+            return;
+        }
         if (mapButtonsResClip == null) {
             mapButtonsResClip = new HashMap<>();
         }
@@ -236,7 +238,8 @@ public class ZeeAudio extends Thread{
                 aBlockUpdBtn.change("refresh " + aBlockCountWinClips());
             }
         }
-        aBlockButtonBlink(resname,subClip);
+        // TODO test other methods if really needed, test gong and belltower
+        //aBlockButtonBlink(resname,subClip);
     }
     private static void aBlockButtonBlink(String resname, int subClip) {
         //TODO blink button when sound is played

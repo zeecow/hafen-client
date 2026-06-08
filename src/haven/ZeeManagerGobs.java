@@ -2239,7 +2239,10 @@ public class ZeeManagerGobs extends ZeeThread{
                         gobClick(roadsign,3);
                         if (waitWindowOpened("Milestone")) {
                             Window roadWin = ZeeConfig.getWindow("Milestone");
-                            labelRoadsign(roadsign,roadWin);
+                            sleep(100);//buttons?
+                            if (ZeeConfig.getButtonNamed(roadWin,"Follow") != null) {
+                                labelRoadsign(roadsign, roadWin);
+                            }
                             roadWin.reqdestroy();
                             waitWindowClosed("Milestone");
                         }else{
