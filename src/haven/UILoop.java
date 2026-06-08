@@ -179,6 +179,12 @@ public abstract class UILoop implements Console.Directory {
 	}
 	if(curs instanceof Resource) {
 	    Resource res = (Resource)curs;
+        // use system cursor TODO test
+        if(curs!=lastcursor && res.name.contentEquals(ZeeConfig.CURSOR_ARW)) {
+            lastcursor = null;
+            wnd.cursor(Cursor.Std.DEFAULT);
+            return;
+        }
 	    if(curscaps == null) {
 		if(!(lastcursor instanceof Resource))
 		    wnd.cursor(Cursor.Std.NONE);

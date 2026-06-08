@@ -2596,22 +2596,22 @@ public class ZeeConfig {
         }
         // volume up (arrow)
         else if (ZeeConfig.keyUpDownAudioControl && ev.getKeyCode()==KeyEvent.VK_UP){
-            double vol = Audio.volume;
+            double vol = gameUI.ui.audio.sys.volume();
             if (vol < 0.9)
-                Audio.setvolume(Double.parseDouble(String.format("%.1f", vol)) + 0.1d);
+                gameUI.ui.audio.sys.volume(Double.parseDouble(String.format("%.1f", vol)) + 0.1d);
             else if (vol < 1)
-                Audio.setvolume(1); // max 1
-            msgLow("volume "+String.format("%.1f", Audio.volume));
+                gameUI.ui.audio.sys.volume(1); // max 1
+            msgLow("volume "+String.format("%.1f", gameUI.ui.audio.sys.volume()));
             return true;
         }
         // volume down (arrow)
         else if (ZeeConfig.keyUpDownAudioControl && ev.getKeyCode()==KeyEvent.VK_DOWN){
-            double vol = Audio.volume;
+            double vol = gameUI.ui.audio.sys.volume();
             if (vol > 0.1)
-                Audio.setvolume(Double.parseDouble(String.format("%.1f", vol)) - 0.1d);
+                gameUI.ui.audio.sys.volume(Double.parseDouble(String.format("%.1f", vol)) - 0.1d);
             else if (vol > 0)
-                Audio.setvolume(0); // min 0
-            msgLow("volume "+String.format("%.1f", Audio.volume));
+                gameUI.ui.audio.sys.volume(0); // min 0
+            msgLow("volume "+String.format("%.1f", gameUI.ui.audio.sys.volume()));
             return true;
         }
         // alternate cams bad/ortho (Shift+c)

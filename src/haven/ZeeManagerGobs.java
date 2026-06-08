@@ -2903,7 +2903,7 @@ public class ZeeManagerGobs extends ZeeThread{
         new ZeeThread(){
             public void run() {
                 int countNotReady = 0;
-                double backupAudio = Audio.volume;
+                double backupAudio = ZeeConfig.gameUI.ui.audio.sys.volume();
                 ZeeConfig.addPlayerText("mounting");
                 try {
 
@@ -2917,7 +2917,7 @@ public class ZeeManagerGobs extends ZeeThread{
                     }
 
                     //mute volume (msg method doesnt work)
-                    Audio.setvolume(0);
+                    ZeeConfig.gameUI.ui.audio.sys.volume(0);
 
                     //mount horse
                     ZeeManagerGobs.clickGobPetal(closestHorse, "Giddyup!");
@@ -2931,7 +2931,7 @@ public class ZeeManagerGobs extends ZeeThread{
                     e.printStackTrace();
                 }
                 //restore volume (msg method doesnt work)
-                Audio.setvolume(backupAudio);
+                ZeeConfig.gameUI.ui.audio.sys.volume(backupAudio);
                 ZeeConfig.removePlayerText();
             }
         }.start();

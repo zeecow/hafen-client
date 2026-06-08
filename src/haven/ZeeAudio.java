@@ -394,9 +394,9 @@ public class ZeeAudio extends Thread{
                     List<Audio.Clip> clips = AudioSprite.clips(Resource.remote().loadwait(resname), id);
                     if (subClip !=null) {
                         int i = Integer.parseInt(buttonText);
-                        Audio.play(clips.get(i).stream());
+                        ui.sfx(clips.get(i).stream());
                     } else {
-                        Audio.play(clips.get(0).stream());
+                        ui.sfx(clips.get(0).stream());
                     }
                 }
                 // toggle filter audio
