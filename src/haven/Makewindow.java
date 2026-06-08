@@ -159,7 +159,6 @@ public class Makewindow extends Widget {
 	Spec ret = new Spec(new ResData(res, sdt), num, info);
 	while(a < desc.length) {
 	    Object[] arg = OBJS.of(desc[a++]);
-	    Debug.dump((Object)arg);
 	    switch(STR.of(arg[0])) {
 	    case "constraint":
 		ret.constraint = new ResData(ui.sess.getresv(arg[1]), Message.nil);
