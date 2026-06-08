@@ -57,23 +57,27 @@ public class Makewindow extends Widget {
 	.add(Glob.class, wdg -> wdg.ui.sess.glob)
 	.add(Session.class, wdg -> wdg.ui.sess);
     public class Spec implements GSprite.Owner, ItemInfo.SpriteOwner, RandomSource {
-	public Indir<Resource> res;
-	public MessageBuf sdt;
+	public ResData item, constraint;
 	public int num;
 	private GSprite spr;
 	private Object[] rawinfo;
 	private List<ItemInfo> info;
 
-	public Spec(Indir<Resource> res, Message sdt, int num, Object[] info) {
-	    this.res = res;
-	    this.sdt = new MessageBuf(sdt);
+	public Spec(ResData item, int num, Object[] info) {
+	    this.item = item;
 	    this.num = num;
 	    this.rawinfo = (info.length > 0) ? info : new Object[][] {{new ItemInfo.Name.Default()}};
 	}
 
+	private ResData display() {
+	    if(constraint != null)
+		return(constraint);
+	    return(item);
+	}
+
 	public GSprite sprite() {
 	    if(spr == null)
-		spr = GSprite.create(this, res.get(), sdt.clone());;
+		spr = GSprite.create(this, display().res.get(), display().sdt.clone());;
 	    return(spr);
 	}
 
@@ -112,7 +116,7 @@ public class Makewindow extends Widget {
 	public SpecTip longtip() {
 	    List<ItemInfo> info = info();
 	    BufferedImage img = ItemInfo.longtip(info);
-	    Resource.Pagina pg = res.get().layer(Resource.pagina);
+	    Resource.Pagina pg = item.res.get().layer(Resource.pagina);
 	    if(pg != null)
 		img = ItemInfo.catimgs(0, img, RichText.render("\n" + pg.text, 200).img);
 	    return(new SpecTip(info, img));
@@ -124,7 +128,7 @@ public class Makewindow extends Widget {
 		rnd = new Random();
 	    return(rnd);
 	}
-	public Resource getres() {return(res.get());}
+	public Resource getres() {return(display().res.get());}
 	public <T> T context(Class<T> cl) {return(ctxr.context(cl, Makewindow.this));}
 
 	public List<ItemInfo> info() {
@@ -132,7 +136,7 @@ public class Makewindow extends Widget {
 		info = ItemInfo.buildinfo(this, rawinfo);
 	    return(info);
 	}
-	public Resource resource() {return(res.get());}
+	public Resource resource() {return(item.res.get());}
     }
 
     public static final KeyBinding kb_make = KeyBinding.get("make/one", KeyMatch.forcode(java.awt.event.KeyEvent.VK_ENTER, 0));
@@ -151,8 +155,20 @@ public class Makewindow extends Widget {
 	Indir<Resource> res = ui.sess.getresv(desc[a++]);
 	Message sdt = BYTES.is(desc, a) ? new MessageBuf(BYTES.of(desc, a++)) : MessageBuf.nil;
 	int num = INT.of(desc, a++);
-	Object[] info = OBJS.is(desc, a) ? OBJS.of(desc, a) : new Object[0];
-	return(new Spec(res, sdt, num, info));
+	Object[] info = OBJS.is(desc, a) ? OBJS.of(desc, a++) : new Object[0];
+	Spec ret = new Spec(new ResData(res, sdt), num, info);
+	while(a < desc.length) {
+	    Object[] arg = OBJS.of(desc[a++]);
+	    Debug.dump((Object)arg);
+	    switch(STR.of(arg[0])) {
+	    case "constraint":
+		ret.constraint = new ResData(ui.sess.getresv(arg[1]), Message.nil);
+		if(BYTES.is(arg, 2))
+		    ret.constraint.sdt = new MessageBuf(BYTES.of(arg, 2));
+		break;
+	    }
+	}
+	return(ret);
     }
 
     public void uimsg(String msg, Object... args) {
