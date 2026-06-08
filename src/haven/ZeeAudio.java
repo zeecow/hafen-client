@@ -15,6 +15,7 @@ public class ZeeAudio extends Thread{
 
     public static final Audio.Clip msgsfxLow = Audio.resclip(Resource.local().loadwait("sfx/hud/mmap/wood4"));
     public static final Audio.Clip msgsfxPlayer = Audio.resclip(Resource.local().loadwait("sfx/hud/mmap/bell1"));
+    public static final Resource resSoundWood2 = Resource.local().loadwait("sfx/hud/mmap/wood2");
 
     private static List<String> midiNotes = Arrays.asList("C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B");
     private static MidiChannel[] midiChannels;
@@ -480,6 +481,10 @@ public class ZeeAudio extends Thread{
                     c.y = y;
             }
         }
+    }
+
+    public static void playFeedbackSound() {
+        ZeeConfig.gameUI.ui.sfx(resSoundWood2);
     }
 
     private static void println(String s) {

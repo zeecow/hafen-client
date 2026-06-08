@@ -642,7 +642,7 @@ public class ZeeManagerGobs extends ZeeThread{
             return;
         }
         plowQueueCoords.add(coordMc);
-        ZeeManagerItems.playFeedbackSound();
+        ZeeAudio.playFeedbackSound();
         ZeeConfig.addPlayerText("plow q "+ plowQueueCoords.size());
 
         //starts thread
@@ -1059,7 +1059,7 @@ public class ZeeManagerGobs extends ZeeThread{
                 //pickup all pile items
                 else {
                     gobClick(gob,3, UI.MOD_SHIFT);
-                    ZeeManagerItems.playFeedbackSound();
+                    ZeeAudio.playFeedbackSound();
                 }
             }
             // pickup all items: dframe
@@ -2202,11 +2202,67 @@ public class ZeeManagerGobs extends ZeeThread{
             else
                 ZeeConfig.gameUI.menu.wdgmsg("act","craft",arr[1],0);
         }
+        // alchemy book
         else if (petalName.contentEquals("Open Alchemy Book")){
             ZeeConfig.getMenuButton("alchbook").use(new MenuGrid.Interaction(1, ZeeConfig.gameUI.ui.modflags()));
         }
+        // label roads
+        else if (petalName.contentEquals("Label all roadsigns")) {
+            labelAllRoadsigns();
+        }
         else{
             println("chooseGobFlowerMenu > unkown case");
+        }
+    }
+
+    static boolean isLabelingAllRoadsigns = false;
+    private static void labelAllRoadsigns() {
+        if (isLabelingAllRoadsigns) {
+            println("labelAllRoadsigns > already working");
+            return;
+        }
+        isLabelingAllRoadsigns = true;
+        new ZeeThread(){
+            public void run() {
+                try {
+                    //close any open milestone window
+                    Window win = ZeeConfig.getWindow("Milestone");
+                    if (win!=null) {
+                        win.reqdestroy();
+                        waitWindowClosed("Milestone");
+                    }
+                    // get all roadsigns, click n wait each window
+                    List<Gob> roadsigns = ZeeConfig.findGobsByNameContains("gfx/terobjs/road/milestone");
+                    ZeeConfig.addPlayerText("roadsigns "+roadsigns.size());
+                    int notfound = 0;
+                    for (Gob roadsign : roadsigns) {
+                        gobClick(roadsign,3);
+                        if (waitWindowOpened("Milestone")) {
+                            Window roadWin = ZeeConfig.getWindow("Milestone");
+                            labelRoadsign(roadsign,roadWin);
+                            roadWin.reqdestroy();
+                            waitWindowClosed("Milestone");
+                        }else{
+                            notfound++;
+                        }
+                    }
+                    int found = roadsigns.size() - notfound;
+                    ZeeConfig.msgLow("labeled "+found+"/"+roadsigns.size()+" roads");
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                isLabelingAllRoadsigns = false;
+                ZeeConfig.removePlayerText();
+            }
+        }.start();
+    }
+    static void labelRoadsign(Gob roadGob, Window roadWindow){
+        for (Widget child : roadWindow.children()) {
+            if (child instanceof Label){
+                Label roadName = (Label) child;
+                ZeeConfig.addGobText(roadGob, roadName.texts);
+                break;
+            }
         }
     }
 
@@ -2656,6 +2712,11 @@ public class ZeeManagerGobs extends ZeeThread{
             menu = new ZeeFlowerMenu( gob,
                     ZeeFlowerMenu.STRPETAL_LIFTUPGOB,
                     "Open Alchemy Book"
+            );
+        }
+        else if (gobName.startsWith("gfx/terobjs/road/milestone")) {
+            menu = new ZeeFlowerMenu( gob,
+                    "Label all roadsigns"
             );
         }
         else{

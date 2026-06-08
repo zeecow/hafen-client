@@ -1221,14 +1221,8 @@ public class ZeeConfig {
                 ZeeConfig.gameUI.map.showgrid(true);
         }
         // Milestone labels
-        else if (windowTitle.contentEquals("Milestone") && ZeeConfig.getButtonNamed(window,"Follow") != null) {
-            for (Widget child : window.children()) {
-                if (child instanceof Label){
-                    Label roadName = (Label) child;
-                    ZeeConfig.addGobText(lastMapViewClickGob, roadName.texts);
-                    break;
-                }
-            }
+        else if (!ZeeManagerGobs.isLabelingAllRoadsigns && windowTitle.contentEquals("Milestone") && ZeeConfig.getButtonNamed(window,"Follow") != null) {
+            ZeeManagerGobs.labelRoadsign(lastMapViewClickGob,window);
         }
 
         if (gameUI!=null && !gameUI.sz.equals(0,0)){
@@ -2883,6 +2877,7 @@ public class ZeeConfig {
         ZeeManagerMiner.isMovingStraightLine = false;
         ZeeManagerGobs.isPickingupLifepile = false;
         ZeeManagerGobs.winLeafpile = null;
+        ZeeManagerGobs.isLabelingAllRoadsigns = false;
         if (ZeeManagerMinimap.minimapOptsMarksResnameHidden !=null)
             ZeeManagerMinimap.minimapOptsMarksResnameHidden.clear();
         ZeeManagerMinimap.mapOptsMarksRow = ZeeManagerMinimap.mapOptsMarksCol = 0;

@@ -122,7 +122,7 @@ public class Inventory extends Widget implements DTarget {
 		    minv.wdgmsg("invxf", this.wdgid(), amount);
 	    }
 		if (ev.a != 0)
-			ZeeManagerItems.playFeedbackSound();
+			ZeeAudio.playFeedbackSound();
 	}
 	return(true);
     }

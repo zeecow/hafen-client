@@ -371,13 +371,13 @@ public class ZeeManagerItems extends ZeeThread{
                     // create one stack
                     else
                         gItemAct(wItem.item,UI.MOD_SHIFT);
-                    playFeedbackSound();
+                    ZeeAudio.playFeedbackSound();
                     return;
                 }
             }
 
             // show item context menu
-            if(showMenuLongClick()){
+            if(showItemMenuLongClick()){
                 return;
             }
             // cancel if holding item and no item context menu
@@ -424,7 +424,7 @@ public class ZeeManagerItems extends ZeeThread{
                     // ...sort transfer des
                     else
                         wItem.wdgmsg("transfer-sort", wItem.item, false);
-                    playFeedbackSound();
+                    ZeeAudio.playFeedbackSound();
                     return;
                 }
             }
@@ -707,7 +707,7 @@ public class ZeeManagerItems extends ZeeThread{
 
                         // add holding curd to tray until filled or no more curds
                         freeTrays.get(0).item.wdgmsg("itemact",UI.MOD_CTRL_SHIFT);
-                        playFeedbackSound();
+                        ZeeAudio.playFeedbackSound();
 
                         // wait transfers
                         sleep(555);
@@ -1092,7 +1092,7 @@ public class ZeeManagerItems extends ZeeThread{
     }
 
 
-    public boolean showMenuLongClick(){
+    public boolean showItemMenuLongClick(){
 
         if (!isLongClick())
             return false;
@@ -2032,7 +2032,7 @@ public class ZeeManagerItems extends ZeeThread{
     public static void undoStack(GItem i) {
         try {
             gItemActCoord(i,3);
-            playFeedbackSound();
+            ZeeAudio.playFeedbackSound();
         }catch (Exception e){
             //e.printStackTrace();
         }
@@ -2359,8 +2359,4 @@ public class ZeeManagerItems extends ZeeThread{
             return res.toString();
     }
 
-    public static final Resource resSoundWood2 = Resource.local().loadwait("sfx/hud/mmap/wood2");
-    public static void playFeedbackSound() {
-        ZeeConfig.gameUI.ui.sfx(resSoundWood2);
-    }
 }

@@ -47,7 +47,7 @@ public class ZeeFishing {
                 if(ZeeManagerItems.getLeftHandName().contains("/primrod") || ZeeManagerItems.getRightHandName().contains("/primrod")){
                     if(ZeeManagerItems.pickUpItem(wItem)){
                         ZeeManagerItems.equiporyItemAct("/primrod");//equip holding item
-                        ZeeManagerItems.playFeedbackSound();
+                        ZeeAudio.playFeedbackSound();
                         Thread.sleep(500);
                         invCreelOrMain.wdgmsg("drop", wItem.c.div(33));//return switched item
                         //ZeeManagerItems.playFeedbackSound();
@@ -73,11 +73,11 @@ public class ZeeFishing {
                 if(ZeeManagerItems.pickUpItem(wItem)){
                     //equip holding item
                     ZeeManagerItems.equiporyItemAct(rodName);
-                    ZeeManagerItems.playFeedbackSound();
+                    ZeeAudio.playFeedbackSound();
                     Thread.sleep(500);
                     //return switched item
                     invCreelOrMain.wdgmsg("drop", wItem.c.div(33));
-                    ZeeManagerItems.playFeedbackSound();
+                    ZeeAudio.playFeedbackSound();
                     //rebuild icons
                     Thread.sleep(777);
                     updateFishingButtons();
