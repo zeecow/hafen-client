@@ -328,7 +328,7 @@ public class Makewindow extends Widget {
 	}
     }
 
-    public class Input extends SpecWidget {
+    public class Input extends SpecWidget implements DTarget {
 	public final int idx;
 	public int using = 0;
 	private List<MenuGrid.Pagina> rpag = null;
@@ -372,6 +372,16 @@ public class Makewindow extends Widget {
 		}
 		cc = null;
 	    }
+	}
+
+	public boolean drop(Coord cc, Coord ul) {
+	    Makewindow.this.wdgmsg("itemact", idx, ui.modflags());
+	    return(true);
+	}
+
+	public boolean iteminteract(Coord cc, Coord ul) {
+	    Makewindow.this.wdgmsg("itemact", idx, ui.modflags());
+	    return(true);
 	}
 
 	public void recipes(List<MenuGrid.Pagina> pag) {
