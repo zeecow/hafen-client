@@ -43,6 +43,13 @@ public class HashDirCache implements ResCache {
 	if(home == null)
 	    throw(new UnsupportedOperationException("Found no reasonable place to store local files"));
 	this.base = pj(home, "data");
+	if(!Files.exists(this.base)) {
+	    try {
+		Files.createDirectories(this.base);
+	    } catch(IOException e) {
+		throw(new UnsupportedOperationException("Could not create cache directory", e));
+	    }
+	}
 	this.id = id;
 	this.idhash = namehash(0, id.toString());
     }
