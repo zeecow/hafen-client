@@ -14,13 +14,15 @@ public class Shopbox extends Widget implements ItemInfo.SpriteOwner, GSprite.Own
     public static final Text qlbl = Text.render("Quality:");
     public static final Text any = Text.render("Any");
     public static final Tex bg = Resource.classres(Shopbox.class).layer(Resource.imgc, 0).tex();
-    public static final Coord itemc = UI.scale(5, 5),
-	buyc = UI.scale(5, 66),
-	pricec = UI.scale(110, 5),
-	qualc = UI.scale(155, 5).add(invsq.sz()),
-	cbtnc = UI.scale(220, 66),
-	spipec = UI.scale(85, 66),
-	bpipec = UI.scale(300, 66);
+    static final Tex bg2 = new TexI(ZeeManagerIcons.imgRect(bg.sz().x-135, bg.sz().y-20,
+            ZeeConfig.DEF_SIMPLE_WINDOW_COLOR.darker(),false,0,false));
+    public static final Coord itemc = UI.scale(5, 5), //product icon
+	buyc = UI.scale(5, 66 - 20), //buy btn
+	pricec = UI.scale(110, 5), //price icon
+	qualc = UI.scale(155, 5).add(invsq.sz()), //ql label, txtentry
+	cbtnc = UI.scale(175, 66), //btn change price
+	spipec = UI.scale(40, 66), //btn connect product
+	bpipec = UI.scale(210, 66); //btn connect price
     public ResData res;
     public ItemSpec price;
     public Text num;
@@ -32,21 +34,27 @@ public class Shopbox extends Widget implements ItemInfo.SpriteOwner, GSprite.Own
     private TextEntry pnume, pqe;
     public final boolean admin;
 
+    int v = 20;
+    //int winmidx = window.sz.x / 2;
+
     public static Widget mkwidget(UI ui, Object... args) {
 	boolean adm = (Integer)args[0] != 0;
 	return(new Shopbox(adm));
     }
 
     public Shopbox(boolean admin) {
-	super(bg.sz());
+	super(bg2.sz());
 	if(this.admin = admin) {
-	    spipe = add(new Button(UI.scale(75), "Connect"), spipec);
-	    bpipe = add(new Button(UI.scale(75), "Connect"), bpipec);
-	    cbtn = add(new Button(UI.scale(75), "Change"), cbtnc);
-	    pnume = adda(new TextEntry(UI.scale(50), ""), pricec.add(invsq.sz()).add(UI.scale(5, 0)), 0.0, 1.0);
+	    spipe = add(new Button(UI.scale(35), "Con"), spipec.addy(-20));
+        spipe.settip("connect product");
+	    bpipe = add(new Button(UI.scale(35), "Con"), bpipec.addy(-20));
+        bpipe.settip("connect price");
+	    cbtn = add(new Button(UI.scale(35), "Cha"), cbtnc.addy(-20));
+        cbtn.settip("change price");
+	    pnume = adda(new TextEntry(UI.scale(35), ""), pricec.add(invsq.sz()).add(UI.scale(5, 0)), 0.0, 1.0);
 	    pnume.canactivate = true; pnume.dshow = true;
-	    adda(new Label("Quality:"), qualc.add(0, 0), 0.0, 1.0);
-	    pqe = adda(new TextEntry(UI.scale(40), ""), qualc.add(UI.scale(40, 0)), 0.0, 1.0);
+	    adda(new Label("Ql:"), qualc.add(0, 0), 0.0, 1.0);
+	    pqe = adda(new TextEntry(UI.scale(35), ""), qualc.add(UI.scale(20, 0)), 0.0, 1.0);
 	    pqe.canactivate = true; pqe.dshow = true;
 	}
     }
@@ -80,7 +88,7 @@ public class Shopbox extends Widget implements ItemInfo.SpriteOwner, GSprite.Own
     };
 
     public void draw(GOut g) {
-	g.image(bg, Coord.z);
+	g.image(bg2, Coord.z);
 	sprite: {
 	    ResData res = this.res;
 	    if(res != null) {
@@ -233,7 +241,7 @@ public class Shopbox extends Widget implements ItemInfo.SpriteOwner, GSprite.Own
     private void updbtn() {
 	boolean canbuy = (res != null) && (price != null) && (pnum > 0);
 	if(canbuy && (bbtn == null)) {
-	    bbtn = add(new Button(UI.scale(75), "Buy"), buyc);
+	    bbtn = add(new Button(UI.scale(35), "Buy"), buyc);
 	} else if(!canbuy && (bbtn != null)) {
 	    bbtn.reqdestroy();
 	    bbtn = null;

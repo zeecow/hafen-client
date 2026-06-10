@@ -138,7 +138,7 @@ public class ZeeConfig {
     static final String DEF_LIST_BUTCH_AUTO = "Break,Scale,Wring neck,Kill,Skin,Flay,Pluck,Clean,Butcher,Collect bones";
     static final String DEF_LIST_AUTO_CLICK_MENU = "Pick,Harvest wax";
     static final String DEF_LIST_SHAPEICON = "stalagoomba 1,diamond 7 1 0 0,255 255 0,1;/amberwash 2,diamond 7 0 1 1,255 102 0,0;/cavepuddle 2,diamond 7 0 1 1,0 204 102,1;/ladder 2,triangleUp 5 0 1 1,0 204 102,0;/minehole 2,triangleDown 5 0 1 1,0 204 102,0;/burrow 2,triangleDown 6 0 1 1,204 0 255,0;/spark 2,square 4 0 1 0,102 102 255,0;/snekkja 2,square 4 0 1 0,255 255 102,0;/dugout 2,square 4 0 1 0,255 255 102,0;/wheelbarrow 2,square 4 0 1 0,0 255 255,0;/cart 2,square 4 0 1 0,0 153 255,0;/knarr 2,square 4 0 1 0,255 255 102,0;/rowboat 2,square 4 0 1 0,255 255 102,0;/horse/ 1,square 4 0 1 0,0 204 0,0;items/arrow 2,triangleUp 5 0 1 0,102 255 204,0;milestone-stone-e 2,diamond 4 0 1 1,255 255 255,0;milestone-wood-e 2,diamond 4 0 1 1,255 255 255,0;/fishingnet 2,diamond 4 0 1 1,153 153 153,0;wonders/wellspring 1,diamond 5 0 1 1,0 255 255,0;/map/starshard 2,diamond 7 0 1 1,255 255 0,0;naturalminesupport 1,diamond 7 1 0 0,255 255 0,0;/gemstone 2,diamond 7 0 1 1,255 0 51,1;/dng/rathole 2,triangleDown 5 0 1 1,255 0 255,1";
-    static final Color DEF_SIMPLE_WINDOW_COLOR = new Color(55, 64, 32, 255);
+    public static final Color DEF_SIMPLE_WINDOW_COLOR = new Color(55, 64, 32, 255);
     static final Color DEF_GRID_COLOR = new Color(204, 204, 255, 45);
     static final int MINIMAP_DRAG_BUTTON = 3;
     static final int DEF_GOB_MAX_REQUEUE = 500000;
@@ -1566,9 +1566,6 @@ public class ZeeConfig {
 
     private static void windowModBarterStand(Window window) {
 
-        int v = 20;
-        int winmidx = window.sz.x / 2;
-
         // change buttons
         window.children(Button.class).forEach(button -> {
             String buttonName = button.text.text;
@@ -1578,37 +1575,9 @@ public class ZeeConfig {
             // resign button
             if(buttonName.contains("Resign")) {
                 button.resize(button.sz.x/2, button.sz.y);
-                button.c = button.c.add(-50, -(v * 5));
-                button.change("Resign");
-            }
-            // buttons change, buy, connect
-            else {
-                int btnmidx = button.sz.x / 2;
-                int btnaddx = 0;
-                button.c = button.c.addy(-v);
-                button.resize(btnmidx, button.sz.y);
-                if (!buttonName.contains("Buy") && !buttonName.contains("Change"))
-                    btnaddx -= btnmidx;
-                if (button.c.x >= winmidx)
-                    btnaddx -= 110;
-                button.c = button.c.add(btnaddx,0);
-                button.change(buttonName.substring(0,3));
-            }
-        });
-
-        // change shopboxes and textentries
-        AtomicInteger i = new AtomicInteger(0);
-        window.children().forEach(el -> {
-            //shopbox
-            if (el.getClass().getSimpleName().equals("Shopbox")){
-                // change size x and y
-                el.sz = el.sz.add(-115, - v);
-                // change y, except first one
-                if ( i.get() > 0 )
-                    el.c = el.c.addy( - (v * i.get()) );
-                // half textentry
-                el.children(TextEntry.class).forEach(te -> te.resize(UI.scale(35)));
-                i.getAndIncrement();
+                button.c = button.c.add(70, 30);
+                button.change("Resign"); //set smaller text
+                button.settip("resign ownership");
             }
         });
 
@@ -1673,7 +1642,8 @@ public class ZeeConfig {
         btn.settip("return branches to closest wooden chest");
 
 
-        window.resize(260,btn.c.y+btn.sz.y);
+        //resize barter stand window
+        window.resize(245,btn.c.y+btn.sz.y);
     }
 
     private static boolean barterAutoDisRunning = false;
