@@ -2740,9 +2740,13 @@ public class ZeeManagerGobs extends ZeeThread{
 
     private static boolean isGobDeadAnimal;
 
-    static final List<String> autoLabelGobsBasename = List.of("barrel","cistern","demijohn","trough","oven","cauldron","fineryforge","smelter","primsmelter","steelcrucible","smokeshed","rabbithutch","chickencoop","kiln","curdingtub");
+    static final List<String> autoLabelGobsBasename = List.of("barrel","cistern","demijohn","trough",
+            "oven","cauldron","fineryforge","smelter","primsmelter","steelcrucible","smokeshed",
+            "rabbithutch","chickencoop","kiln","curdingtub","ttub");
     static final List<String> autoLabelWincapContainers = List.of("Barrel","Cistern","Demijohn","Food trough");
-    static final List<String> autoLabelWincapVmeters = List.of("Cauldron","Oven","Ore Smelter","Smith's Smelter","Stack furnace","Finery Forge","Steelbox","Smoke shed","Rabbit Hutch","Chicken Coop","Kiln","Curding Tub");
+    static final List<String> autoLabelWincapVmeters = List.of("Cauldron","Oven","Ore Smelter",
+            "Smith's Smelter","Stack furnace","Finery Forge","Steelbox","Smoke shed","Rabbit Hutch",
+            "Chicken Coop","Kiln", "Tub");
     static final Map<String,Integer> mapWincapMaxfuel = Map.of(
         "Oven",30,
         "Ore Smelter",30,
