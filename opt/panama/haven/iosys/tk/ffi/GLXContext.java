@@ -41,6 +41,7 @@ import haven.ffi.*;
 import haven.ffi.posix.*;
 import haven.ffi.x11.*;
 import haven.ffi.gl.*;
+import haven.ffi.dbus.*;
 import haven.ffi.x11.XLib.*;
 import haven.ffi.x11.XInput.*;
 import haven.ffi.posix.FileDescriptor;
@@ -2060,6 +2061,25 @@ public class GLXContext implements Toolkit.Factory {
 	    return(ret);
 	}
 
+	public class DesktopPicker implements FilePicker.Factory {
+	    public final DesktopPortal.FileChooser iface;
+
+	    public DesktopPicker() {
+		try {
+		    iface = DesktopPortal.get().FileChooser();
+		} catch(DBusError e) {
+		    throw(new Unavailable("Desktop portal not available", e));
+		}
+	    }
+
+	    public FilePicker make(FilePicker.Mode mode, Windeye parent) {
+		String wndid = null;
+		if(parent != null)
+		    wndid = "x11:" + Long.toUnsignedString(((GLXWindow)parent).id.bits(), 16);
+		return(iface.make(mode, wndid));
+	    }
+	}
+
 	private FilePicker curpicker = null;
 	public abstract class ExternalPicker implements FilePicker.Factory {
 	    public final Path exec;
@@ -2119,7 +2139,7 @@ public class GLXContext implements Toolkit.Factory {
 			    return(new Promise<Path>().reject(new RuntimeException(e)));
 			}
 			Promise<Path> ret = new Promise<>();
-			Thread mon = new HackThread(() -> monitor(proc, ret), "Zenity monitor");
+			Thread mon = new HackThread(() -> monitor(proc, ret), "Filepicker monitor");
 			mon.setDaemon(true);
 			mon.start();
 			curpicker = this;
@@ -2216,6 +2236,9 @@ public class GLXContext implements Toolkit.Factory {
 	}
 
 	public FilePicker.Factory picker() {
+	    try {
+		return(new DesktopPicker());
+	    } catch(Unavailable e) {}
 	    try {
 		return(new ZenityPicker());
 	    } catch(Unavailable e) {}
