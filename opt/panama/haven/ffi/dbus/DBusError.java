@@ -24,31 +24,13 @@
  *  Boston, MA 02111-1307 USA
  */
 
-package haven.iosys.tk;
+package haven.ffi.dbus;
 
-import haven.*;
-import haven.iosys.*;
-import java.util.*;
-import java.nio.file.*;
+public class DBusError extends RuntimeException {
+    public final String name;
 
-public interface FilePicker {
-    public static enum Mode {
-	OPEN, SAVE
+    public DBusError(String name, String message) {
+	super(message);
+	this.name = name;
     }
-
-    public void filter(String desc, String... exts);
-    public Promise<Path> show();
-
-    public static interface Factory {
-	public FilePicker make(Mode mode, Windeye parent);
-    }
-
-    public static Factory nil = (mode, parent) -> {
-	return(new FilePicker() {
-	    public void filter(String desc, String... exts) {}
-	    public Promise<Path> show() {
-		return(new Promise<Path>().reject(new Unavailable("No file picker available on this platform.")));
-	    }
-	});
-    };
 }

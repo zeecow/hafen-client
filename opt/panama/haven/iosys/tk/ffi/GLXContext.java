@@ -41,6 +41,7 @@ import haven.ffi.*;
 import haven.ffi.posix.*;
 import haven.ffi.x11.*;
 import haven.ffi.gl.*;
+import haven.ffi.dbus.*;
 import haven.ffi.x11.XLib.*;
 import haven.ffi.x11.XInput.*;
 import haven.ffi.posix.FileDescriptor;
@@ -772,6 +773,10 @@ public class GLXContext implements Toolkit.Factory {
 			}
 		    }
 		}
+
+		public GLXWindow wnd() {
+		    return(GLXWindow.this);
+		}
 	    }
 
 	    public GLXWindow() {
@@ -1048,7 +1053,7 @@ public class GLXContext implements Toolkit.Factory {
 
 	    public void swapbuffers(Render buf, Object mode) {
 		GLRender gbuf = (GLRender)buf;
-		if(gbuf.env != renv)
+		if(((GLXEnvironment)gbuf.env).wnd() != this)
 		    throw(new IllegalArgumentException());
 		if(!(mode instanceof Boolean))
 		    throw(new IllegalArgumentException());
@@ -2056,6 +2061,25 @@ public class GLXContext implements Toolkit.Factory {
 	    return(ret);
 	}
 
+	public class DesktopPicker implements FilePicker.Factory {
+	    public final DesktopPortal.FileChooser iface;
+
+	    public DesktopPicker() {
+		try {
+		    iface = DesktopPortal.get().FileChooser();
+		} catch(DBusError e) {
+		    throw(new Unavailable("Desktop portal not available", e));
+		}
+	    }
+
+	    public FilePicker make(FilePicker.Mode mode, Windeye parent) {
+		String wndid = null;
+		if(parent != null)
+		    wndid = "x11:" + Long.toUnsignedString(((GLXWindow)parent).id.bits(), 16);
+		return(iface.make(mode, wndid));
+	    }
+	}
+
 	private FilePicker curpicker = null;
 	public abstract class ExternalPicker implements FilePicker.Factory {
 	    public final Path exec;
@@ -2077,29 +2101,21 @@ public class GLXContext implements Toolkit.Factory {
 	    public abstract class Instance implements FilePicker {
 		protected final List<String> args = new ArrayList<>();
 		protected Process proc;
-		protected Path result = null;
 
 		public Instance() {
 		    args.add(exec.toFile().toString());
 		}
 
-		private void monitor(Process proc, Runnable cb) {
+		private void monitor(Process proc, Promise<Path> cb) {
 		    try {
 			BufferedReader in = new BufferedReader(new InputStreamReader(proc.getInputStream()));
 			String result;
-			try {
-			    result = in.readLine();
-			    if(proc.waitFor() != 0)
-				result = null;
-			} catch(IOException e) {
-			    throw(new RuntimeException());
-			} catch(InterruptedException e) {
+			result = in.readLine();
+			if(proc.waitFor() != 0)
 			    result = null;
-			    Thread.currentThread().interrupt();
-			}
-			if((result != null) && (result.length() > 0))
-			    this.result = Paths.get(result);
-			cb.run();
+			cb.resolve(((result != null) && (result.length() > 0)) ? Paths.get(result) : null);
+		    } catch(Throwable t) {
+			cb.reject(t);
 		    } finally {
 			synchronized(GLXToolkit.this) {
 			    if(curpicker == this)
@@ -2108,31 +2124,27 @@ public class GLXContext implements Toolkit.Factory {
 		    }
 		}
 
-		public void show(Runnable cb) {
+		public Promise<Path> show() {
 		    synchronized(GLXToolkit.this) {
 			if(proc != null)
 			    throw(new IllegalStateException());
 			if(curpicker != null)
-			    throw(new IllegalStateException("file picker already active"));
+			    return(new Promise<Path>().reject(new IllegalStateException("file picker already active")));
 			ProcessBuilder spec = new ProcessBuilder(args);
 			spec.inheritIO();
 			spec.redirectOutput(ProcessBuilder.Redirect.PIPE);
 			try {
 			    proc = spec.start();
 			} catch(IOException e) {
-			    throw(new RuntimeException(e));
+			    return(new Promise<Path>().reject(new RuntimeException(e)));
 			}
-			Thread mon = new HackThread(() -> monitor(proc, cb), "Zenity monitor");
+			Promise<Path> ret = new Promise<>();
+			Thread mon = new HackThread(() -> monitor(proc, ret), "Filepicker monitor");
 			mon.setDaemon(true);
 			mon.start();
 			curpicker = this;
+			return(ret);
 		    }
-		}
-
-		public Path result() {
-		    if((proc == null) || proc.isAlive())
-			throw(new IllegalStateException());
-		    return(result);
 		}
 	    }
 	}
@@ -2211,10 +2223,10 @@ public class GLXContext implements Toolkit.Factory {
 		    filter.append(")");
 		}
 
-		public void show(Runnable cb) {
+		public Promise<Path> show(Runnable cb) {
 		    if(filter.length() > 0)
 			args.add(filter.toString());
-		    super.show(cb);
+		    return(super.show());
 		}
 	    }
 
@@ -2225,6 +2237,9 @@ public class GLXContext implements Toolkit.Factory {
 
 	public FilePicker.Factory picker() {
 	    try {
+		return(new DesktopPicker());
+	    } catch(Unavailable e) {}
+	    try {
 		return(new ZenityPicker());
 	    } catch(Unavailable e) {}
 	    try {
@@ -2234,6 +2249,12 @@ public class GLXContext implements Toolkit.Factory {
 	}
 
 	public void browse(java.net.URI location) throws IOException {
+	    try {
+		DesktopPortal.OpenURI xdg = DesktopPortal.get().OpenURI();
+		xdg.OpenURI(location);
+		return;
+	    } catch(DBusError e) {
+	    }
 	    ProcessBuilder spec = new ProcessBuilder(Arrays.asList("xdg-open", location.toString()));
 	    spec.inheritIO();
 	    Process proc = spec.start();

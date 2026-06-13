@@ -110,7 +110,7 @@ public class JOGLToolkit extends AWTToolkit {
 
     public class JOGLPanel extends GLCanvas {
 	public Area shape = Area.sized(Coord.z);
-	public JOGLEnvironment env;
+	public PanelEnvironment env;
 	private int cursi, pstate = 0;
 
 	public JOGLPanel() {
@@ -152,6 +152,25 @@ public class JOGLToolkit extends AWTToolkit {
 	    }
 	}
 
+	public class PanelEnvironment extends JOGLEnvironment {
+	    public PanelEnvironment(GL initgl, GLContext ctx, Area shaoe) {
+		super(initgl, ctx, shape);
+	    }
+
+	    public void submit(Render cmd) {
+		super.submit(cmd);
+		synchronized(JOGLPanel.this) {
+		    if(pstate == 0)
+			EventQueue.invokeLater(JOGLPanel.this::display);
+		    pstate |= 1;
+		}
+	    }
+
+	    public JOGLPanel panel() {
+		return(JOGLPanel.this);
+	    }
+	}
+
 	private void redraw(GL gl) {
 	    GLContext ctx = gl.getContext();
 	    GLEnvironment env;
@@ -159,16 +178,7 @@ public class JOGLToolkit extends AWTToolkit {
 		if((this.env == null) || (this.env.ctx != ctx)) {
 		    if(this.env != null)
 			this.env.dispose();
-		    this.env = new JOGLEnvironment(gl, ctx, shape) {
-			public void submit(Render cmd) {
-			    super.submit(cmd);
-			    synchronized(JOGLPanel.this) {
-				if(pstate == 0)
-				    EventQueue.invokeLater(JOGLPanel.this::display);
-				pstate |= 1;
-			    }
-			}
-		    };
+		    this.env = new PanelEnvironment(gl, ctx, shape);
 		    notifyAll();
 		    initgl(gl);
 		}
@@ -240,7 +250,7 @@ public class JOGLToolkit extends AWTToolkit {
 
 	public void swapbuffers(Render buf, Object mode) {
 	    GLRender gbuf = (GLRender)buf;
-	    if(gbuf.env != panel.env)
+	    if(((JOGLPanel.PanelEnvironment)gbuf.env).panel() != panel)
 		throw(new IllegalArgumentException());
 	    if(!(mode instanceof Boolean))
 		throw(new IllegalArgumentException());

@@ -24,31 +24,36 @@
  *  Boston, MA 02111-1307 USA
  */
 
-package haven.iosys.tk;
+package haven.ffi.dbus;
 
-import haven.*;
-import haven.iosys.*;
 import java.util.*;
-import java.nio.file.*;
+import haven.*;
+import haven.ffi.dbus.DBus.*;
+import static haven.PType.*;
 
-public interface FilePicker {
-    public static enum Mode {
-	OPEN, SAVE
+public class ObjectProxy {
+    public static final String IF_PROPS = "org.freedesktop.DBus.Properties";
+    public static final String IF_INTROSPECT = "org.freedesktop.DBus.Introspectable";
+    public final DBus bus;
+    public final String name, path;
+
+    public ObjectProxy(DBus bus, String name, String path) {
+	this.bus = bus;
+	this.name = name;
+	this.path = path;
     }
 
-    public void filter(String desc, String... exts);
-    public Promise<Path> show();
-
-    public static interface Factory {
-	public FilePicker make(Mode mode, Windeye parent);
+    public Promise<List<Object>> call(List<Type> sig, String iface, String member, Object... args) {
+	return(bus.call(sig, name, path, iface, member, args));
     }
 
-    public static Factory nil = (mode, parent) -> {
-	return(new FilePicker() {
-	    public void filter(String desc, String... exts) {}
-	    public Promise<Path> show() {
-		return(new Promise<Path>().reject(new Unavailable("No file picker available on this platform.")));
-	    }
-	});
-    };
+    private Introspec spec = null;
+    public Introspec introspect() {
+	if(spec == null) {
+	    Promise<List<Object>> call = call(Collections.emptyList(), IF_INTROSPECT, "Introspect");
+	    String desc = STR.of(LIST.of(call.waitfor()).get(0));
+	    spec = new Introspec(desc);
+	}
+	return(spec);
+    }
 }

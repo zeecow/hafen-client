@@ -216,16 +216,28 @@ public class Promise<T> {
 	});
     }
 
-    public static <V, R> Function<V, R> nonnull(Function<V, R> raw) {
+    public static <V, R> Function<V, R> fnonnull(Function<V, R> raw) {
 	return(val -> (val == null) ? null : raw.apply(val));
     }
 
-    public static <V, R> Function<V, R> nonnull(Function<V, R> raw, V def) {
+    public static <V, R> Function<V, R> fnonnull(Function<V, R> raw, V def) {
 	return(val -> raw.apply((val == null) ? def : val));
     }
 
-    public static <V, R> Function<V, R> nonnull(Function<V, R> raw, Supplier<V> def) {
+    public static <V, R> Function<V, R> fnonnull(Function<V, R> raw, Supplier<V> def) {
 	return(val -> raw.apply((val == null) ? def.get() : val));
+    }
+
+    public static <V> Consumer<V> cnonnull(Consumer<V> raw) {
+	return(val -> {if(val != null) raw.accept(val);});
+    }
+
+    public static <V> Consumer<V> cnonnull(Consumer<V> raw, V def) {
+	return(val -> raw.accept((val == null) ? def : val));
+    }
+
+    public static <V> Consumer<V> cnonnull(Consumer<V> raw, Supplier<V> def) {
+	return(val -> raw.accept((val == null) ? def.get() : val));
     }
 
     public <N> Promise<N> map(Function<? super T, ? extends N> res, Function<? super Throwable, ? extends N> rej, Runnable fin) {
@@ -294,10 +306,14 @@ public class Promise<T> {
     }
 
     public void report(UI ui, String prefix) {
-	if(prefix == null)
-	    except(err -> {ui.error(err.getMessage());});
-	else
-	    except(err -> {ui.error(prefix + ": " + err.getMessage());});
+	except(err -> {
+	    String msg = err.getMessage();
+	    if(prefix != null)
+		msg = prefix + ": " + msg;
+	    synchronized(ui) {
+		ui.error(msg);
+	    }
+	});
     }
 
     public void report(UI ui) {

@@ -1112,24 +1112,17 @@ public class MapWnd extends Window implements Console.Directory {
     public void exportmap() {
 	FilePicker dialog = ui.wnd.toolkit().picker().make(FilePicker.Mode.SAVE, ui.wnd);
 	dialog.filter("Exported Haven map data", "hmap");
-	dialog.show(() -> {
-	    Path path = dialog.result();
-	    if(path == null)
-		return;
+	dialog.show().map(Promise.cnonnull(path -> {
 	    if(path.getFileName().toString().indexOf('.') < 0)
 		path = path.resolveSibling(path.getFileName() + ".hmap");
 	    exportmap(path);
-	});
+	})).report(ui);
     }
 
     public void importmap() {
 	FilePicker dialog = ui.wnd.toolkit().picker().make(FilePicker.Mode.OPEN, ui.wnd);
 	dialog.filter("Exported Haven map data", "hmap");
-	dialog.show(() -> {
-	    if(dialog.result() == null)
-		return;
-	    exportmap(dialog.result());
-	});
+	dialog.show().map(Promise.cnonnull(this::exportmap)).report(ui);
     }
 
     private Map<String, Console.Command> cmdmap = new TreeMap<String, Console.Command>();

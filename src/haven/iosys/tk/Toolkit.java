@@ -45,7 +45,7 @@ public interface Toolkit {
     public String description();
 
     public default FilePicker.Factory picker() {
-	throw(new Unavailable("No file picker available on this platform."));
+	return(FilePicker.nil);
     }
     public default void browse(java.net.URI location) throws IOException {
 	throw(new IOException("No web browser available."));

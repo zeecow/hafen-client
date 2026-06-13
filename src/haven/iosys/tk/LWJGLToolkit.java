@@ -71,7 +71,7 @@ public class LWJGLToolkit extends AWTToolkit {
 	{3, 3}, {3, 2},
     };
     public class LWJGLPanel extends AWTGLCanvas {
-	public LWJGLEnvironment env;
+	public PanelEnvironment env;
 	private int cursi, pstate;
 
 	public LWJGLPanel() {
@@ -116,7 +116,7 @@ public class LWJGLToolkit extends AWTToolkit {
 	}
 
 	private void process() {
-	    LWJGLEnvironment env = this.env;
+	    PanelEnvironment env = this.env;
 	    Area shape = Area.sized(Coord.of(getWidth(), getHeight()));
 	    if(!env.shape().equals(shape)) {
 		env.reshape(shape);
@@ -134,23 +134,33 @@ public class LWJGLToolkit extends AWTToolkit {
 	    }
 	}
 
-	private LWJGLEnvironment env() {
+	public class PanelEnvironment extends LWJGLEnvironment {
+	    public PanelEnvironment(Area shape) {
+		super(shape);
+	    }
+
+	    public void submit(Render cmd) {
+		super.submit(cmd);
+		synchronized(LWJGLPanel.this) {
+		    if(pstate == 0)
+			EventQueue.invokeLater(LWJGLPanel.this::process);
+		    pstate |= 1;
+		}
+	    }
+
+	    public LWJGLPanel panel() {
+		return(LWJGLPanel.this);
+	    }
+	}
+
+	private PanelEnvironment env() {
 	    if(env == null) {
 		glrun(() -> {
 		    synchronized(this) {
 			if(env == null) {
 			    org.lwjgl.opengl.GL.createCapabilities();
 			    Area shape = Area.sized(Coord.of(getWidth(), getHeight()));
-			    this.env = new LWJGLEnvironment(shape) {
-				public void submit(Render cmd) {
-				    super.submit(cmd);
-				    synchronized(LWJGLPanel.this) {
-					if(pstate == 0)
-					    EventQueue.invokeLater(LWJGLPanel.this::process);
-					pstate |= 1;
-				    }
-				}
-			    };
+			    this.env = new PanelEnvironment(shape);
 			    initgl();
 			}
 		    }
@@ -182,7 +192,7 @@ public class LWJGLToolkit extends AWTToolkit {
 
 	public void swapbuffers(Render buf, Object mode) {
 	    GLRender gbuf = (GLRender)buf;
-	    if(gbuf.env != panel.env)
+	    if(((LWJGLPanel.PanelEnvironment)gbuf.env).panel() != panel)
 		throw(new IllegalArgumentException());
 	    if(!(mode instanceof Boolean))
 		throw(new IllegalArgumentException());

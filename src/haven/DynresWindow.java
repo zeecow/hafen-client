@@ -268,11 +268,7 @@ public class DynresWindow extends Window {
 	private void open() {
 	    FilePicker dialog = ui.wnd.toolkit().picker().make(FilePicker.Mode.OPEN, ui.wnd);
 	    dialog.filter("Image file", "png", "jpg", "jpeg", "bmp");
-	    dialog.show(() -> {
-		if(dialog.result() == null)
-		    return;
-		open(dialog.result());
-	    });
+	    dialog.show().map(Promise.cnonnull(this::open)).report(ui);
 	}
 
 	private void paste(Clipboard c) {

@@ -5,25 +5,24 @@ import java.awt.image.BufferedImage;
 import haven.MenuGrid.Pagina;
 import haven.MenuGrid.PagButton;
 
-public class MenuSearch extends Window {
+public abstract class MenuSearch extends Window {
     public final MenuGrid menu;
     public final Results rls;
     public final TextEntry sbox;
-    private Pagina root;
-    private List<Result> cur = Collections.emptyList();
-    private List<Result> filtered = Collections.emptyList();
-    private boolean recons = false;
+    protected List<Result> cur = Collections.emptyList();
+    protected List<Result> filtered = Collections.emptyList();
+    private boolean recons = true;
 
     public class Result {
 	public final PagButton btn;
 
-	private Result(PagButton btn) {
+	protected Result(PagButton btn) {
 	    this.btn = btn;
 	}
     }
 
-    private static final Text.Foundry elf = CharWnd.attrf;
-    private static final int elh = elf.height() + UI.scale(2);
+    public static final Text.Foundry elf = CharWnd.attrf;
+    public static final int elh = elf.height() + UI.scale(2);
     public class Results extends SListBox<Result, Widget> {
 	private Results(Coord sz) {
 	    super(sz, elh);
@@ -43,7 +42,7 @@ public class MenuSearch extends Window {
 		    }
 
 		    private double lastcl = 0;
-		    @Override public boolean mousedown(MouseDownEvent ev) {
+		    public boolean mousedown(MouseDownEvent ev) {
 			boolean psel = sel == item;
 			super.mousedown(ev);
 			double now = Utils.rtime();
@@ -58,8 +57,8 @@ public class MenuSearch extends Window {
 	}
     }
 
-    public MenuSearch(MenuGrid menu) {
-	super(Coord.z, "Action search");
+    public MenuSearch(String title, MenuGrid menu) {
+	super(Coord.z, title);
 	this.menu = menu;
 	rls = add(new Results(UI.scale(250, 500)), Coord.z);
 	sbox = add(new TextEntry(UI.scale(250), "") {
@@ -75,10 +74,13 @@ public class MenuSearch extends Window {
 		}
 	    }, 0, rls.sz.y);
 	pack();
-	setroot(null);
     }
 
-    private void refilter() {
+    public MenuSearch(MenuGrid menu) {
+	this("Action search", menu);
+    }
+
+    protected void refilter() {
 	List<Result> found = new ArrayList<>();
 	String needle = sbox.text().toLowerCase();
 	for(Result res : this.cur) {
@@ -97,38 +99,18 @@ public class MenuSearch extends Window {
 	}
     }
 
-    private void updlist() {
+    protected abstract boolean generate(List<PagButton> buf);
+
+    protected void updlist() {
 	recons = false;
-	Pagina root = this.root;
-	List<PagButton> found = new ArrayList<>();
-	{
-	    Collection<Pagina> leaves = new ArrayList<>();
-	    synchronized(menu.paginae) {
-		leaves.addAll(menu.paginae);
-	    }
-	    for(Pagina pag : leaves) {
-		try {
-		    if(root == null) {
-			found.add(pag.button());
-		    } else {
-			for(Pagina parent = pag; parent != null; parent = parent.parent()) {
-			    if(parent == root) {
-				found.add(pag.button());
-				break;
-			    }
-			}
-		    }
-		} catch(Loading l) {
-		    recons = true;
-		}
-	    }
-	}
-	Collections.sort(found, Comparator.comparing(PagButton::name));
+	List<PagButton> buf = new ArrayList<>();
+	if(generate(buf))
+	    recons = true;
 	Map<PagButton, Result> prev = new HashMap<>();
 	for(Result pr : this.cur)
 	    prev.put(pr.btn, pr);
 	List<Result> results = new ArrayList<>();
-	for(PagButton btn : found) {
+	for(PagButton btn : buf) {
 	    Result pr = prev.get(btn);
 	    if(pr != null)
 		results.add(pr);
@@ -139,15 +121,11 @@ public class MenuSearch extends Window {
 	refilter();
     }
 
-    public void setroot(Pagina nr) {
-	root = nr;
-	updlist();
-	rls.sb.val = 0;
+    protected void recons() {
+	recons = true;
     }
 
     public void tick(double dt) {
-	if(menu.cur != root)
-	    setroot(menu.cur);
 	if(recons)
 	    updlist();
 	super.tick(dt);
@@ -172,6 +150,54 @@ public class MenuSearch extends Window {
 	    return(true);
 	} else {
 	    return(super.keydown(ev));
+	}
+    }
+
+    public static class Main extends MenuSearch {
+	private Pagina root;
+
+	public Main(MenuGrid menu) {
+	    super(menu);
+	    setroot(null);
+	}
+
+	protected boolean generate(List<PagButton> buf) {
+	    boolean recons = false;
+	    Pagina root = this.root;
+	    Collection<Pagina> leaves = new ArrayList<>();
+	    synchronized(menu.paginae) {
+		leaves.addAll(menu.paginae);
+	    }
+	    for(Pagina pag : leaves) {
+		try {
+		    if(root == null) {
+			buf.add(pag.button());
+		    } else {
+			for(Pagina parent = pag; parent != null; parent = parent.parent()) {
+			    if(parent == root) {
+				buf.add(pag.button());
+				break;
+			    }
+			}
+		    }
+		} catch(Loading l) {
+		    recons = true;
+		}
+	    }
+	    Collections.sort(buf, Comparator.comparing(PagButton::name));
+	    return(recons);
+	}
+
+	public void setroot(Pagina nr) {
+	    root = nr;
+	    recons();
+	    rls.sb.val = 0;
+	}
+
+	public void tick(double dt) {
+	    if(menu.cur != root)
+		setroot(menu.cur);
+	    super.tick(dt);
 	}
     }
 }

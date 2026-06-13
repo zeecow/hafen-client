@@ -24,31 +24,29 @@
  *  Boston, MA 02111-1307 USA
  */
 
-package haven.iosys.tk;
+package haven.ffi.dbus;
 
-import haven.*;
-import haven.iosys.*;
 import java.util.*;
-import java.nio.file.*;
+import haven.*;
+import haven.ffi.dbus.DBus.*;
+import static haven.ffi.dbus.ObjectProxy.*;
 
-public interface FilePicker {
-    public static enum Mode {
-	OPEN, SAVE
+public class IfaceProxy {
+    public final ObjectProxy obj;
+    public final String iface;
+
+    public IfaceProxy(ObjectProxy obj, String iface) {
+	this.obj = obj;
+	this.iface = iface;
     }
 
-    public void filter(String desc, String... exts);
-    public Promise<Path> show();
-
-    public static interface Factory {
-	public FilePicker make(Mode mode, Windeye parent);
+    public Promise<List<Object>> call(List<Type> sig, String member, Object... args) {
+	return(obj.call(sig, iface, member, args));
     }
 
-    public static Factory nil = (mode, parent) -> {
-	return(new FilePicker() {
-	    public void filter(String desc, String... exts) {}
-	    public Promise<Path> show() {
-		return(new Promise<Path>().reject(new Unavailable("No file picker available on this platform.")));
-	    }
-	});
-    };
+    private static final List<Type> sig_getprop = Arrays.asList(Type.STRING, Type.STRING);
+    public Object property(String name) {
+	Variant rv = (Variant)obj.call(sig_getprop, IF_PROPS, "Get", iface, name).waitfor().get(0);
+	return(rv.value);
+    }
 }

@@ -321,7 +321,7 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
 		    if(menu == null)
 			return;
 		    if(srchwnd == null) {
-			srchwnd = new MenuSearch(menu);
+			srchwnd = new MenuSearch.Main(menu);
 			fitwdg(GameUI.this.add(srchwnd, Utils.getprefc("wndc-srch", new Coord(200, 200))));
 		    } else {
 			if(!srchwnd.hasfocus) {
