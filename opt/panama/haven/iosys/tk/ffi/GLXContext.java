@@ -2249,6 +2249,12 @@ public class GLXContext implements Toolkit.Factory {
 	}
 
 	public void browse(java.net.URI location) throws IOException {
+	    try {
+		DesktopPortal.OpenURI xdg = DesktopPortal.get().OpenURI();
+		xdg.OpenURI(location);
+		return;
+	    } catch(DBusError e) {
+	    }
 	    ProcessBuilder spec = new ProcessBuilder(Arrays.asList("xdg-open", location.toString()));
 	    spec.inheritIO();
 	    Process proc = spec.start();
