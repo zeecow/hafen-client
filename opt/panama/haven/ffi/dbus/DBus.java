@@ -336,8 +336,8 @@ public class DBus {
 	}
     }
 
-    public static class Array extends ArrayList<Object> {
-	public Array(Collection<Object> from) {
+    public static class ArrayValue extends ArrayList<Object> {
+	public ArrayValue(Collection<Object> from) {
 	    super(from);
 	}
 
@@ -356,8 +356,8 @@ public class DBus {
 	}
     }
 
-    public static class Dict extends HashMap<Object, Object> {
-	public Dict(Collection<Object> from) {
+    public static class DictValue extends HashMap<Object, Object> {
+	public DictValue(Collection<Object> from) {
 	    for(Object obj : from)
 		put(((Entry)obj).getKey(), ((Entry)obj).getValue());
 	}
@@ -379,14 +379,14 @@ public class DBus {
 	}
     }
 
-    public static class Struct extends ArrayList<Object> {
-	public Struct(Collection<Object> from) {
+    public static class StructValue extends ArrayList<Object> {
+	public StructValue(Collection<Object> from) {
 	    super(from);
 	}
 
 	public String toString() {
 	    StringBuilder buf = new StringBuilder();
-	    buf.append('{');
+	    buf.append('(');
 	    boolean f = true;
 	    for(Object val : this) {
 		if(!f)
@@ -394,7 +394,7 @@ public class DBus {
 		buf.append(String.valueOf(val));
 		f = false;
 	    }
-	    buf.append('}');
+	    buf.append(')');
 	    return(buf.toString());
 	}
     }
@@ -427,11 +427,11 @@ public class DBus {
 	case DBUS_TYPE_ARRAY: {
 	    List<Object> sub = decodeall(recurse(iter));
 	    if(lib.dbus_message_iter_get_element_type(iter) == DBUS_TYPE_DICT_ENTRY)
-		return(new Dict(sub));
-	    return(new Array(sub));
+		return(new DictValue(sub));
+	    return(new ArrayValue(sub));
 	}
 	case DBUS_TYPE_STRUCT:
-	    return(new Struct(decodeall(recurse(iter))));
+	    return(new StructValue(decodeall(recurse(iter))));
 	case DBUS_TYPE_DICT_ENTRY: {
 	    List<Object> sub = decodeall(recurse(iter));
 	    return(new Entry(sub.get(0), sub.get(1)));
@@ -463,7 +463,7 @@ public class DBus {
 	} catch(IllegalArgumentException e) {
 	    return(Collections.emptyList());
 	}
-	return(new Struct(decodeall(iter)));
+	return(new StructValue(decodeall(iter)));
     }
 
     public class Container implements AutoCloseable {
