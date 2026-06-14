@@ -367,7 +367,7 @@ public class GLXContext implements Toolkit.Factory {
 			else
 			    cst = 0;
 		    } else {
-			Warning.warn("could not open keyboard X11 input method");
+			Warning.warn("could not open X11 keyboard input method");
 		    }
 		    if((im != null) && (cst != 0)) {
 			this.im = im;
