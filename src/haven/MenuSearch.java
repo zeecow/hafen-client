@@ -95,8 +95,11 @@ public abstract class MenuSearch extends Window {
 		public void activate(String text) {
 		    if(rls.sel != null)
 			menu.use(rls.sel.btn, new MenuGrid.Interaction(1, ui.modflags()), false);
-		    if(!ui.modctrl)
+		    if(!ui.modctrl) {
 			reqclose();
+			settext("");
+			refilter();
+		    }
 		}
 	    }, 0, rls.sz.y);
 	pack();
