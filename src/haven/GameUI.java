@@ -318,21 +318,12 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
     private void menubuttons(Widget bg) {
 	brpanel.add(new MenuButton("csearch", kb_srch, "Search actions...") {
 		public void click() {
-		    if(menu == null)
+		    if(srchwnd == null)
 			return;
-		    if(srchwnd == null) {
-			srchwnd = new MenuSearch.Main(menu);
-			fitwdg(GameUI.this.add(srchwnd, Utils.getprefc("wndc-srch", UI.scale(200, 200))).reqclose(() -> {
-			    if(srchwnd != null)
-				srchwnd.reqdestroy();
-			    srchwnd = null;
-			}));
-		    } else {
-			if(!srchwnd.hasfocus)
-			    this.setfocus(srchwnd);
-			else
-			    srchwnd.reqclose();
-		    }
+		    if(srchwnd.visible() && !srchwnd.hasfocus)
+			this.setfocus(srchwnd);
+		    else
+			togglewnd(srchwnd);
 		}
 	    }, bg.c);
     }
@@ -815,6 +806,8 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
 	    }
 	} else if(place == "menu") {
 	    menu = (MenuGrid)brpanel.add(child, menugridc);
+	    fitwdg(srchwnd = GameUI.this.add(new MenuSearch.Main(menu), Utils.getprefc("wndc-srch", UI.scale(200, 200))));
+	    srchwnd.reqclose(srchwnd::hide).hide();
 	} else if(place == "fight") {
 	    fv = urpanel.add((Fightview)child, 0, 0);
 	} else if(place == "fsess") {
