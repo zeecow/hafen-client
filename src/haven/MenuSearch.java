@@ -181,6 +181,7 @@ public abstract class MenuSearch extends Window {
 
     public static class Main extends MenuSearch {
 	private Pagina root;
+	private int pagseq;
 
 	public static final KeyBinding kb_itemcraft = KeyBinding.get("scm-itemcraft", KeyMatch.nil);
 	public Main(MenuGrid menu) {
@@ -188,6 +189,7 @@ public abstract class MenuSearch extends Window {
 	    setroot(null);
 	    add(new Button(sbox.sz.x, "Search by ingredient", false).action(() -> menu.wdgmsg("act", "itemcraft")),
 		sbox.pos("bl").adds(0, 5)).setgkey(kb_itemcraft);
+	    pagseq = menu.pagseq;
 	    pack();
 	}
 
@@ -225,8 +227,14 @@ public abstract class MenuSearch extends Window {
 	}
 
 	public void tick(double dt) {
-	    if(tvisible() && (menu.cur != root))
-		setroot(menu.cur);
+	    if(tvisible()) {
+		if(menu.cur != root)
+		    setroot(menu.cur);
+		if(pagseq != menu.pagseq) {
+		    recons();
+		    pagseq = menu.pagseq;
+		}
+	    }
 	    super.tick(dt);
 	}
     }
