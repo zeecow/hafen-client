@@ -322,14 +322,16 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
 			return;
 		    if(srchwnd == null) {
 			srchwnd = new MenuSearch.Main(menu);
-			fitwdg(GameUI.this.add(srchwnd, Utils.getprefc("wndc-srch", new Coord(200, 200))));
-		    } else {
-			if(!srchwnd.hasfocus) {
-			    this.setfocus(srchwnd);
-			} else {
-			    ui.destroy(srchwnd);
+			fitwdg(GameUI.this.add(srchwnd, Utils.getprefc("wndc-srch", UI.scale(200, 200))).reqclose(() -> {
+			    if(srchwnd != null)
+				srchwnd.reqdestroy();
 			    srchwnd = null;
-			}
+			}));
+		    } else {
+			if(!srchwnd.hasfocus)
+			    this.setfocus(srchwnd);
+			else
+			    srchwnd.reqclose();
 		    }
 		}
 	    }, bg.c);
@@ -581,12 +583,8 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
 	    super(sz, cap);
 	}
 
-	public void wdgmsg(Widget sender, String msg, Object... args) {
-	    if((sender == this) && msg.equals("close")) {
-		this.hide();
-		return;
-	    }
-	    super.wdgmsg(sender, msg, args);
+	public void reqclose() {
+	    hide();
 	}
     }
 
@@ -808,6 +806,10 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
 		mmap = blpanel.add(new CornerMap(UI.scale(new Coord(133, 133)), file), minimapc);
 		mmap.lower();
 		mapfile = new MapWnd(file, map, Utils.getprefc("wndsz-map", UI.scale(new Coord(700, 500))), "Map");
+		mapfile.reqclose(() -> {
+		    Utils.setprefb("wndvis-map", false);
+		    mapfile.hide();
+		});
 		mapfile.show(Utils.getprefb("wndvis-map", false));
 		add(mapfile, Utils.getprefc("wndc-map", new Coord(50, 50)));
 	    }
@@ -840,7 +842,7 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
 	    updhand();
 	} else if(place == "chr") {
 	    chrwdg = add((CharWnd)child, Utils.getprefc("wndc-chr", new Coord(300, 50)));
-	    chrwdg.hide();
+	    chrwdg.reqclose(chrwdg::hide).hide();
 	} else if(place == "craft") {
 	    String cap = "";
 	    Widget mkwdg = child;
@@ -1296,10 +1298,15 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
 	    polowners.put(id, o);
 	} else if(msg == "showhelp") {
 	    Indir<Resource> res = ui.sess.getresv(args[0]);
-	    if(help == null)
-		help = adda(new HelpWnd(res), 0.5, 0.25);
-	    else
+	    if(help == null) {
+		(help = adda(new HelpWnd(res), 0.5, 0.25)).reqclose(() -> {
+		    if(help != null)
+		        help.reqdestroy();
+		    help = null;
+		});
+	    } else {
 		help.set(res);
+	    }
 	} else if(msg == "map-mark") {
 	    long gobid = UINT.of(args[0]);
 	    UID oid = UNIQID.of(args[1]);
@@ -1320,30 +1327,6 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
 	} else {
 	    super.uimsg(msg, args);
 	}
-    }
-
-    public void wdgmsg(Widget sender, String msg, Object... args) {
-	if((sender == chrwdg) && (msg == "close")) {
-	    chrwdg.hide();
-	    return;
-	} else if((sender == mapfile) && (msg == "close")) {
-	    mapfile.hide();
-	    Utils.setprefb("wndvis-map", false);
-	    return;
-	} else if((sender == help) && (msg == "close")) {
-	    ui.destroy(help);
-	    help = null;
-	    return;
-	} else if((sender == srchwnd) && (msg == "close")) {
-	    ui.destroy(srchwnd);
-	    srchwnd = null;
-	    return;
-	} else if((sender == iconwnd) && (msg == "close")) {
-	    ui.destroy(iconwnd);
-	    iconwnd = null;
-	    return;
-	}
-	super.wdgmsg(sender, msg, args);
     }
 
     private static final int fitmarg = UI.scale(100);
@@ -1444,11 +1427,14 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
 		    if(iconconf == null)
 			return;
 		    if(iconwnd == null) {
-			iconwnd = new GobIcon.SettingsWindow(iconconf);
+			iconwnd = new GobIcon.SettingsWindow(iconconf).reqclose(() -> {
+			    if(iconwnd != null)
+				iconwnd.reqdestroy();
+			    iconwnd = null;
+			});
 			fitwdg(GameUI.this.add(iconwnd, Utils.getprefc("wndc-icon", new Coord(200, 200))));
 		    } else {
-			ui.destroy(iconwnd);
-			iconwnd = null;
+			iconwnd.reqclose();
 		    }
 		});
 	}
