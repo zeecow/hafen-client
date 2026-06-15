@@ -84,7 +84,10 @@ public abstract class MenuSearch extends Window {
                 super.mouseup(ev);
                 //list.change(item);
                 menu.use(item.btn, new MenuGrid.Interaction(1, ui.modflags()), false);
-                MenuSearch.this.wdgmsg("close");
+                Main main = (Main) ZeeConfig.gameUI.srchwnd;
+                main.hide();
+                main.sbox.settext("");
+                main.refilter();
                 return(true);
             }
 		});
