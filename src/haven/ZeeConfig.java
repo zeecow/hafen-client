@@ -1046,13 +1046,17 @@ public class ZeeConfig {
             name = ZeeWindow.getMinimapWindowTitle();
 
         // craft window unique name
-        else if(isMakewindow(win))
+        else if( isMakewindow(win) )
             name = WINDOW_NAME_CRAFT;
 
         // distinguish homonymous tables by sz.x only , due to feast button
-        else if(win.cap.contentEquals("Table")){
+        else if ( win.cap.contentEquals("Table") )
             name = "Table_"+win.sz.x;
-        }
+
+        // action search ingred popup
+        else if ( name.contentEquals("Action search" )
+                && ZeeConfig.getButtonNamed( win,"Search by ingredient") == null )
+            name = "Action search popup";
 
         return name;
     }
@@ -2648,6 +2652,9 @@ public class ZeeConfig {
     }
 
     public static Button getButtonNamed(Window win, String name) {
+        if (win==null){
+            println("getButtonNamed > win null for button "+name);
+        }
         Set<Button> buttons = win.children(Button.class);
         for(Button b : buttons) {
             if(b.text.text.equalsIgnoreCase(name)){

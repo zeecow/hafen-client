@@ -80,14 +80,16 @@ public abstract class MenuSearch extends Window {
 			return(true);
 		    }*/
 
+            // mouseup is for clicking on button and releasing on result line
             @Override public boolean mouseup(MouseUpEvent ev) {
                 super.mouseup(ev);
-                //list.change(item);
                 menu.use(item.btn, new MenuGrid.Interaction(1, ui.modflags()), false);
-                Main main = (Main) ZeeConfig.gameUI.srchwnd;
-                main.hide();
-                main.sbox.settext("");
-                main.refilter();
+                // hide and reset if is main search, not ingred popup
+                if (ZeeConfig.getButtonNamed(getparent(Window.class),"Search by ingredient") != null) {
+                    Main main = (Main) ZeeConfig.gameUI.srchwnd;
+                    main.hide();
+                    main.resetSearch();
+                }
                 return(true);
             }
 		});
@@ -143,7 +145,6 @@ public abstract class MenuSearch extends Window {
 
     protected void updlist() {
 	recons = false;
-    //Pagina root = null;//search global
 	List<PagButton> buf = new ArrayList<>();
 	if(generate(buf))
 	    recons = true;
@@ -203,14 +204,15 @@ public abstract class MenuSearch extends Window {
 	    super(menu);
 	    setroot(null);
 	    add(new Button(sbox.sz.x, "Search by ingredient", false).action(() -> menu.wdgmsg("act", "itemcraft")),
-		sbox.pos("bl").adds(0, 5)).setgkey(kb_itemcraft);
+		sbox.pos("bl").adds(0, 5)).setgkey(kb_itemcraft).settip("click button then click an item");
 	    pagseq = menu.pagseq;
 	    pack();
 	}
 
 	protected boolean generate(List<PagButton> buf) {
 	    boolean recons = false;
-	    Pagina root = this.root;
+        // null for searching all items
+	    Pagina root = null;//this.root;
 	    Collection<Pagina> leaves = new ArrayList<>();
 	    synchronized(menu.paginae) {
 		leaves.addAll(menu.paginae);
@@ -252,5 +254,18 @@ public abstract class MenuSearch extends Window {
 	    }
 	    super.tick(dt);
 	}
+
+    @Override
+    public void hide() {
+        super.hide();
+        resetSearch();
+    }
+
+    public void resetSearch(){
+        sbox.settext("");
+        refilter();
+        rls.display(0);
+        rls.sel = null;
+    }
     }
 }
