@@ -154,7 +154,7 @@ public class JavaSound implements haven.iosys.audio.AudioSystem {
 	    SourceDataLine line;
 	    try {
 		line = (SourceDataLine)mixer.getLine(new DataLine.Info(SourceDataLine.class, fmt));
-		line.open(fmt, bufsize);
+		line.open(fmt, bufsize * fmt.getFrameSize());
 	    } catch(LineUnavailableException e) {
 		throw(new Unavailable(e));
 	    }
@@ -194,7 +194,7 @@ public class JavaSound implements haven.iosys.audio.AudioSystem {
 	int ch = intspec(spec, SPEC_CHANNELS, 2);
 	int buf = intspec(spec, SPEC_BUFSIZE, 1024);
 	AudioFormat fmt = new AudioFormat(rate, 16, ch, true, false);
-	int bufsize = buf * ch * 2;
+	int bufsize = buf;
 	Object outspec = spec.get(SPEC_SINKDEV);
 	Mixer mixer;
 	if(outspec == null) {
