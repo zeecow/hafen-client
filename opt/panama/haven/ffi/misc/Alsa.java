@@ -101,12 +101,21 @@ public abstract class Alsa {
 
     public static interface SwParams {
 	public SwParams copy();
-	public SwParams current(Alsa.Pcm pcm);
+	public SwParams current(Pcm pcm);
 
 	public long avail_min();
 
-	public SwParams avail_min(Alsa.Pcm pcm, int val);
-	public SwParams start_threshold(Alsa.Pcm pcm, int val);
+	public SwParams avail_min(Pcm pcm, int val);
+	public SwParams start_threshold(Pcm pcm, int val);
+    }
+
+    public static interface PcmInfo {
+	public int device();
+	public int subdevice();
+	public int card();
+	public String id();
+	public String name();
+	public String subdevice_name();
     }
 
     public static class AlsaException extends RuntimeException {
@@ -119,15 +128,17 @@ public abstract class Alsa {
     }
 
     public abstract Pcm snd_pcm_open(String name, int stream, int mode);
-    public abstract void snd_pcm_prepare(Alsa.Pcm pcm);
-    public abstract long snd_pcm_avail_update(Alsa.Pcm pcm);
-    public abstract boolean snd_pcm_wait(Alsa.Pcm pcm, int timeout);
-    public abstract int snd_pcm_writei(Alsa.Pcm pcm, ByteBuffer buffer, int samples);
+    public abstract void snd_pcm_prepare(Pcm pcm);
+    public abstract String snd_pcm_name(Pcm pcm);
+    public abstract long snd_pcm_avail_update(Pcm pcm);
+    public abstract boolean snd_pcm_wait(Pcm pcm, int timeout);
+    public abstract int snd_pcm_writei(Pcm pcm, ByteBuffer buffer, int samples);
     public abstract HwParams snd_pcm_hw_params();
     public abstract void snd_pcm_hw_params_any(Pcm pcm, HwParams params);
     public abstract void snd_pcm_hw_params(Pcm pcm, HwParams params);
     public abstract SwParams snd_pcm_sw_params();
     public abstract void snd_pcm_sw_params(Pcm pcm, SwParams params);
+    public abstract PcmInfo snd_pcm_info(Pcm pcm);
     public abstract int snd_card_next(int card);
     public abstract DeviceHints snd_device_name_hint(int card, String iface);
 
@@ -252,6 +263,28 @@ public abstract class Alsa {
 	    public SwParams start_threshold(Alsa.Pcm pcm, int val) {lib.snd_pcm_sw_params_set_start_threshold(pcm, this, val); return(this);}
 	}
 
+	public static class PcmInfo implements Alsa.PcmInfo {
+	    public final libasound_so_2 lib;
+	    final MemorySegment mem;
+
+	    PcmInfo(libasound_so_2 lib, MemorySegment mem) {
+		this.lib = lib;
+		this.mem = mem;
+	    }
+	    PcmInfo(libasound_so_2 lib) {
+		this(lib, Arena.ofAuto().allocate(lib.snd_pcm_info_sizeof()));
+	    }
+
+	    MemorySegment mem() {return(mem);}
+
+	    public int device() {return(lib.snd_pcm_info_get_device(this));}
+	    public int subdevice() {return(lib.snd_pcm_info_get_subdevice(this));}
+	    public int card() {return(lib.snd_pcm_info_get_card(this));}
+	    public String id() {return(lib.snd_pcm_info_get_id(this));}
+	    public String name() {return(lib.snd_pcm_info_get_name(this));}
+	    public String subdevice_name() {return(lib.snd_pcm_info_get_subdevice_name(this));}
+	}
+
 	private final MethodHandle snd_strerror = ld.downcallHandle(asound.find("snd_strerror").get(), FunctionDescriptor.of(ADDRESS, C_INT));
 	public String snd_strerror(int errnum) {
 	    MemorySegment rv;
@@ -305,6 +338,17 @@ public abstract class Alsa {
 	    }
 	    if(rv < 0)
 		throw(new AlsaException(snd_strerror(rv), rv));
+	}
+
+	private final MethodHandle snd_pcm_name = ld.downcallHandle(asound.find("snd_pcm_name").get(), FunctionDescriptor.of(ADDRESS, ADDRESS));
+	public String snd_pcm_name(Alsa.Pcm pcm) {
+	    MemorySegment rv;
+	    try {
+		rv = (MemorySegment)snd_pcm_name.invoke(((Pcm)pcm).mem());
+	    } catch(Throwable e) {
+		throw(new RuntimeException(e));
+	    }
+	    return(nullp(rv) ? null : rv.reinterpret(Long.MAX_VALUE).getString(0, C_CHARSET));
 	}
 
 	private final MethodHandle snd_pcm_avail_update = ld.downcallHandle(asound.find("snd_pcm_avail_update").get(), FunctionDescriptor.of(SFRAMES_T, ADDRESS));
@@ -374,6 +418,15 @@ public abstract class Alsa {
 
 	public SwParams snd_pcm_sw_params() {
 	    return(new SwParams(this));
+	}
+
+	private final MethodHandle snd_pcm_info_sizeof = ld.downcallHandle(asound.find("snd_pcm_info_sizeof").get(), FunctionDescriptor.of(SIZE_T));
+	long snd_pcm_info_sizeof() {
+	    try {
+		return((long)snd_pcm_info_sizeof.invoke());
+	    } catch(Throwable e) {
+		throw(new RuntimeException(e));
+	    }
 	}
 
 	private final MethodHandle snd_pcm_hw_params_copy = ld.downcallHandle(asound.find("snd_pcm_hw_params_copy").get(), FunctionDescriptor.ofVoid(ADDRESS, ADDRESS));
@@ -797,6 +850,80 @@ public abstract class Alsa {
 	    }
 	    if(rv < 0)
 		throw(new AlsaException(snd_strerror(rv), rv));
+	}
+
+	private final MethodHandle snd_pcm_info = ld.downcallHandle(asound.find("snd_pcm_info").get(), FunctionDescriptor.of(C_INT, ADDRESS, ADDRESS));
+	public PcmInfo snd_pcm_info(Alsa.Pcm pcm) {
+	    PcmInfo ret = new PcmInfo(this);
+	    int rv;
+	    try {
+		rv = (int)snd_pcm_info.invoke(((Pcm)pcm).mem(), ret.mem());
+	    } catch(Throwable e) {
+		throw(new RuntimeException(e));
+	    }
+	    if(rv < 0)
+		throw(new AlsaException(snd_strerror(rv), rv));
+	    return(ret);
+	}
+
+	private final MethodHandle snd_pcm_info_get_device = ld.downcallHandle(asound.find("snd_pcm_info_get_device").get(), FunctionDescriptor.of(C_INT, ADDRESS));
+	public int snd_pcm_info_get_device(Alsa.PcmInfo info) {
+	    try {
+		return((int)snd_pcm_info_get_device.invoke(((PcmInfo)info).mem()));
+	    } catch(Throwable e) {
+		throw(new RuntimeException(e));
+	    }
+	}
+
+	private final MethodHandle snd_pcm_info_get_subdevice = ld.downcallHandle(asound.find("snd_pcm_info_get_subdevice").get(), FunctionDescriptor.of(C_INT, ADDRESS));
+	public int snd_pcm_info_get_subdevice(Alsa.PcmInfo info) {
+	    try {
+		return((int)snd_pcm_info_get_subdevice.invoke(((PcmInfo)info).mem()));
+	    } catch(Throwable e) {
+		throw(new RuntimeException(e));
+	    }
+	}
+
+	private final MethodHandle snd_pcm_info_get_card = ld.downcallHandle(asound.find("snd_pcm_info_get_card").get(), FunctionDescriptor.of(C_INT, ADDRESS));
+	public int snd_pcm_info_get_card(Alsa.PcmInfo info) {
+	    try {
+		return((int)snd_pcm_info_get_card.invoke(((PcmInfo)info).mem()));
+	    } catch(Throwable e) {
+		throw(new RuntimeException(e));
+	    }
+	}
+
+	private final MethodHandle snd_pcm_info_get_id = ld.downcallHandle(asound.find("snd_pcm_info_get_id").get(), FunctionDescriptor.of(ADDRESS, ADDRESS));
+	public String snd_pcm_info_get_id(Alsa.PcmInfo info) {
+	    MemorySegment rv;
+	    try {
+		rv = (MemorySegment)snd_pcm_info_get_id.invoke(((PcmInfo)info).mem());
+	    } catch(Throwable e) {
+		throw(new RuntimeException(e));
+	    }
+	    return(rv.reinterpret(Long.MAX_VALUE).getString(0, C_CHARSET));
+	}
+
+	private final MethodHandle snd_pcm_info_get_name = ld.downcallHandle(asound.find("snd_pcm_info_get_name").get(), FunctionDescriptor.of(ADDRESS, ADDRESS));
+	public String snd_pcm_info_get_name(Alsa.PcmInfo info) {
+	    MemorySegment rv;
+	    try {
+		rv = (MemorySegment)snd_pcm_info_get_name.invoke(((PcmInfo)info).mem());
+	    } catch(Throwable e) {
+		throw(new RuntimeException(e));
+	    }
+	    return(rv.reinterpret(Long.MAX_VALUE).getString(0, C_CHARSET));
+	}
+
+	private final MethodHandle snd_pcm_info_get_subdevice_name = ld.downcallHandle(asound.find("snd_pcm_info_get_subdevice_name").get(), FunctionDescriptor.of(ADDRESS, ADDRESS));
+	public String snd_pcm_info_get_subdevice_name(Alsa.PcmInfo info) {
+	    MemorySegment rv;
+	    try {
+		rv = (MemorySegment)snd_pcm_info_get_subdevice_name.invoke(((PcmInfo)info).mem());
+	    } catch(Throwable e) {
+		throw(new RuntimeException(e));
+	    }
+	    return(rv.reinterpret(Long.MAX_VALUE).getString(0, C_CHARSET));
 	}
 
 	private final MethodHandle snd_card_next = ld.downcallHandle(asound.find("snd_card_next").get(), FunctionDescriptor.of(C_INT, ADDRESS));
