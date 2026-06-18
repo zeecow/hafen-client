@@ -127,6 +127,7 @@ public class ASound implements AudioSystem {
 				buf.position(buf.position() + (wf * fsz));
 			    }
 			}
+			alsa.snd_pcm_wait(pcm, 100);
 		    } catch(AlsaException e) {
 			if(e.code != -LibC.EPIPE)
 			    throw(e);
@@ -135,7 +136,6 @@ public class ASound implements AudioSystem {
 			    fxrun = Utils.rtime();
 			xruns++;
 		    }
-		    alsa.snd_pcm_wait(pcm, 100);
 		    if(stop)
 			break;
 		    if((fxrun >= 0) && (Utils.rtime() - fxrun > 2)) {
