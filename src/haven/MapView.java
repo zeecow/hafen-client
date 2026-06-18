@@ -2635,7 +2635,7 @@ public class MapView extends PView implements DTarget, Console.Directory {
                                             sb.append("\n        "+m);
                                         }
                                     }
-								}
+                                }
 							}
 							// gob tags
 							if (!gob.tags.isEmpty()){

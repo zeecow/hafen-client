@@ -1080,10 +1080,11 @@ public class ZeeManagerFarmer extends ZeeThread{
     }
 
     public static boolean isCropStageHarvestable(Gob gobCrop) {
-        boolean ret = false;
+        if (gobCrop.getres().name.contains("/items/"))
+            return false;
         ZeeCrop crop = ZeeCrop.getByGobBasename(gobCrop.getres().basename());
         if(crop==null)
-            return ret;
+            return false;
         Integer minHarvestage = crop.minHarvStage;
         int maxStage = 0;
         for (FastMesh.MeshRes layer : gobCrop.getres().layers(FastMesh.MeshRes.class)) {
@@ -1097,10 +1098,9 @@ public class ZeeManagerFarmer extends ZeeThread{
             if(stage > maxStage)
                 stage = maxStage;
             if(stage >= minHarvestage)
-                ret = true;
-            //println(crop.getres().name+" stage "+stage);
+                return true;
         }
-        return ret;
+        return false;
     }
 
     public static boolean isCropMaxStage(Gob crop) {
