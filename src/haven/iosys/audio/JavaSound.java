@@ -61,14 +61,16 @@ public class JavaSound implements haven.iosys.audio.AudioSystem {
     }
 
     private static class Player extends HackThread implements haven.iosys.audio.AudioSystem.Player {
+	private final Mixer mixer;
 	private final SourceDataLine line;
 	private final AudioFormat fmt;
 	private final CS stream;
 	private final int nch;
 	private volatile boolean stop = false;
 
-	Player(SourceDataLine line, AudioFormat fmt, CS stream) {
+	Player(Mixer mixer, SourceDataLine line, AudioFormat fmt, CS stream) {
 	    super("Haven audio player");
+	    this.mixer = mixer;
 	    this.line = line;
 	    this.fmt = fmt;
 	    this.stream = stream;
@@ -137,6 +139,10 @@ public class JavaSound implements haven.iosys.audio.AudioSystem {
 		Thread.currentThread().interrupt();
 	    }
 	}
+
+	public String toString() {
+	    return(String.format("JavaSound, \"%s\", %s, buffer %d B", mixer.getMixerInfo().getName(), fmt, line.getBufferSize()));
+	}
     }
 
     public static class JavaSink implements SinkLine {
@@ -159,7 +165,7 @@ public class JavaSound implements haven.iosys.audio.AudioSystem {
 		throw(new Unavailable(e));
 	    }
 	    line.start();
-	    return(new Player(line, fmt, stream));
+	    return(new Player(mixer, line, fmt, stream));
 	}
 
 	public Player open(CS stream) {

@@ -71,6 +71,7 @@ public class ASound implements AudioSystem {
     public class AlsaPlayer extends HackThread implements Player {
 	private final Pcm pcm;
 	private final CS stream;
+	private final Ratio rate;
 	private final int fsz, nch, period, bufsz;
 	private volatile boolean stop = false;
 
@@ -78,6 +79,7 @@ public class ASound implements AudioSystem {
 	    super("ALSA audio player");
 	    this.pcm = pcm;
 	    this.stream = stream;
+	    this.rate = hwc.rate_numden();
 	    this.nch = hwc.channels();
 	    this.fsz = this.nch * 2;
 	    this.period = (int)hwc.period_size();
@@ -159,6 +161,13 @@ public class ASound implements AudioSystem {
 	    } catch(InterruptedException e) {
 		Thread.currentThread().interrupt();
 	    }
+	}
+
+	public String toString() {
+	    PcmInfo info = alsa.snd_pcm_info(pcm);
+	    return(String.format("ALSA player, \"%s\" (%d,%d), %s Hz, %d ch, buffer %d/%d",
+				 alsa.snd_pcm_name(pcm), info.device(), info.subdevice(),
+				 rate, nch, bufsz, period));
 	}
     }
 

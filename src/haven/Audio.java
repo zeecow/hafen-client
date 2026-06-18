@@ -645,6 +645,11 @@ public class Audio {
 		    throw(new Exception("Rejecting buffer longer than 1 second"));
 		bufsize(nsz);
 	    });
+	    cmdmap.put("audio", new Console.Command() {
+		    public void run(Console cons, String[] args) {
+			cons.out.printf("Audio: %s\n", player);
+		    }
+		});
 	}
 	public Map<String, Console.Command> findcmds() {
 	    return(cmdmap);
