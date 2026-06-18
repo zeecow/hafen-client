@@ -61,11 +61,11 @@ public class ASound implements AudioSystem {
     public ASound() {
 	try {
 	    alsa = Alsa.get();
+	    /* Basic availability test */
+	    sinkline(Utils.map().put(SPEC_RATE, 44100).map());
 	} catch(Exception e) {
 	    throw(new Unavailable("ALSA library not avilable", e));
 	}
-	if(sinkdevs().isEmpty())
-	    throw(new Unavailable("No ALSA PCM outputs available"));
     }
 
     public class AlsaPlayer extends HackThread implements Player {
