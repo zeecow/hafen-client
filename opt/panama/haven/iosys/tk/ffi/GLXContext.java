@@ -2504,6 +2504,7 @@ public class GLXContext implements Toolkit.Factory {
 	.put(XK_bracketright, RIGHTBRACKET).put(XK_backslash, BACKSLASH)    .put(XK_Delete, DELETE)
 	.put(XK_Num_Lock, NUMLOCK)         .put(XK_Scroll_Lock, SCROLLLOCK) .put(XK_Print, PRINTSCREEN)
 	.put(XK_Insert, INSERT)            .put(XK_Help, HELP)              .put(XK_grave, BACKQUOTE)
+	.put(XK_apostrophe, QUOTE)         .put(XK_bar, BAR)
 
 	.put(XK_Shift_L, SHIFT)            .put(XK_Shift_R, SHIFT)          .put(XK_Control_L, CONTROL)
 	.put(XK_Control_R, CONTROL)        .put(XK_Alt_L, ALT)              .put(XK_Alt_R, ALT)
