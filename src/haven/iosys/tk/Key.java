@@ -69,6 +69,7 @@ public interface Key {
         LEFTBRACKET("[", "Left Bracket", '['),
         RIGHTBRACKET("]", "Right Bracket", ']'),
         BACKSLASH("bkslash", "Backslash", '\\'),
+	BAR("bar", "Bar", '|'),
         DELETE("del", "Delete"),
         NUMLOCK("numlock", "Num Lock"),
         SCROLLLOCK("scrlock", "Scroll Lock"),
