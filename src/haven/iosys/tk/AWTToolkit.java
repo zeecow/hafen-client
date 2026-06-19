@@ -122,6 +122,10 @@ public abstract class AWTToolkit implements Toolkit {
 	public boolean equals(AWTSym that) {return(this.code == that.code);}
 	public boolean equals(Object x) {return((x instanceof AWTSym) && equals((AWTSym)x));}
 	public int hashCode() {return(code);}
+
+	public String toString() {
+	    return(String.format("#<awt-sym %x(%s)>", code, nm));
+	}
     }
 
     public static class AWTKey implements Key {
@@ -166,6 +170,10 @@ public abstract class AWTToolkit implements Toolkit {
 		return(stdsym);
 	    return(null);
 	}
+
+	public String toString() {
+	    return(String.format("#<awt-key pc=%x ec=%x std=%s ext=%s>", pc, ec, stdsym, extsym));
+	}
     }
 
     public static class AWTKeyEvent {
@@ -190,6 +198,10 @@ public abstract class AWTToolkit implements Toolkit {
 	    return((c == java.awt.event.KeyEvent.CHAR_UNDEFINED) ? null : Character.toString(c));
 	}
 	public Set<Key.Mod> mods() {return(mods);}
+
+	public String toString() {
+	    return(String.format("#<%s %s str=\"%s\" %s>", getClass().getSimpleName(), key, (string() == null) ? "" : Utils.bprint.enc(string().getBytes(Utils.utf8)), awt));
+	}
     }
     public static class AWTKeyDownEvent extends AWTKeyEvent implements KeyDownEvent {
 	public AWTKeyDownEvent(java.awt.event.KeyEvent awt) {super(awt);}
