@@ -51,7 +51,7 @@ public interface Key {
         PAUSE("pause", "Pause"),
         CAPSLOCK("capslock", "Caps Lock"),
         ESCAPE("esc", "Escape", '\u001b'),
-        SPACE("sp", "Space", 'b'),
+        SPACE("sp", "Space", ' '),
         PAGEUP("pgup", "Page Up"),
         PAGEDOWN("pgdn", "Page Down"),
         END("end", "End"),
