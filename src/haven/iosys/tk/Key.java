@@ -31,9 +31,15 @@ import java.util.*;
 
 public interface Key {
     public String id();
-    public String nm();
+    public Sym primary();
+    public Sym primary(Collection<? extends Sym> of);
 
-    public static enum Std implements Key {
+    public static interface Sym {
+	public String id();
+	public String nm();
+    }
+
+    public static enum Std implements Sym {
         ENTER("ret", "Enter"),
         BACKSPACE("bksp", "Backspace"),
         TAB("tab", "Tab"),
@@ -234,11 +240,12 @@ public interface Key {
         public String id() {return(id);}
 	public String nm() {return(nm);}
  
-        public final static List<Std> NUMKEYS = new EnumInterval<Std>(N0, N9);
-        public final static List<Std> NUMPADKEYS = new EnumInterval<Std>(NP0, NP9);
+        public final static List<Std> NUMBERS = new EnumInterval<Std>(N0, N9);
+        public final static List<Std> PADNUMBERS = new EnumInterval<Std>(NP0, NP9);
         public final static List<Std> FKEYS = new EnumInterval<Std>(F1, F24);
-        public final static List<Std> ALPHAKEYS = new EnumInterval<Std>(A, Z);
+        public final static List<Std> LATIN = new EnumInterval<Std>(A, Z);
         public final static Set<Std> MODKEYS = EnumSet.of(SHIFT, CONTROL, META, ALT, ALTGR, WINDOWS);
+	public final static Set<Std> ALL = new HashSet<Std>(Arrays.asList(Std.values()));
     }
 
     public static enum Mod {

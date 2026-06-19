@@ -74,6 +74,7 @@ public interface Toolkit {
     public static interface KeyEvent extends Event {
 	public String string();
 	public Key key();
+	public Key.Sym sym();
 	public Set<Key.Mod> mods();
     }
     public static interface KeyDownEvent extends KeyEvent {}
