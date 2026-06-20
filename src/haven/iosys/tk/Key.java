@@ -33,6 +33,9 @@ public interface Key {
     public String id();
     public Sym primary();
     public Sym primary(Collection<? extends Sym> of);
+    public default boolean is(Sym sym) {
+	return(primary() == sym);
+    }
 
     public static interface Sym {
 	public String id();
