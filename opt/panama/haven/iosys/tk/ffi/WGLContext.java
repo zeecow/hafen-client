@@ -938,9 +938,9 @@ public class WGLContext implements Toolkit.Factory {
 		    char[] chars = win.ToUnicodeEx(code, scancode, kb, 0, win.GetKeyboardLayout(0));
 		    kb.set(code, pst);
 		    string = ((chars == null) || (chars.length == 0)) ? "" : new String(chars);
-		    if(string.length() > 0) {
+		    if(string.length() == 1) {
 			for(Key.Sym sym : key.syms()) {
-			    if((sym instanceof Key.Std) && (((Key.Std)sym).ch == string.charAt(0))) {
+			    if((sym instanceof Key.Std) && (((Key.Std)sym).ch == Character.toUpperCase(string.charAt(0)))) {
 				this.sym = sym;
 				break;
 			    } else if((sym instanceof CharSym) && (((CharSym)sym).ch == string.charAt(0))) {
