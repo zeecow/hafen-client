@@ -195,7 +195,7 @@ public abstract class AWTToolkit implements Toolkit {
 	}
 	public String string() {
 	    char c = awt.getKeyChar();
-	    return((c == java.awt.event.KeyEvent.CHAR_UNDEFINED) ? null : Character.toString(c));
+	    return((c == java.awt.event.KeyEvent.CHAR_UNDEFINED) ? "" : Character.toString(c));
 	}
 	public Set<Key.Mod> mods() {return(mods);}
 

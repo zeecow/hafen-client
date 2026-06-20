@@ -65,7 +65,7 @@ public class AWTCompat {
 	else if(ev instanceof Toolkit.KeyUpEvent)
 	    id = java.awt.event.KeyEvent.KEY_RELEASED;
 	char c = java.awt.event.KeyEvent.CHAR_UNDEFINED;
-	if(ev.string() != null)
+	if(ev.string() != "")
 	    c = ev.string().charAt(0);
 	return(new ExtKeyEvent(id, System.currentTimeMillis(), awtmods(ev.mods()),
 			       revawt.getOrDefault(ev.key().primary(revawt.keySet()), java.awt.event.KeyEvent.VK_UNDEFINED),

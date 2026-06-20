@@ -2373,7 +2373,7 @@ public class GLXContext implements Toolkit.Factory {
 	public XID rawsym;
 	public Key.Sym sym;
 	public X11Key key;
-	public String str;
+	public String str = "";
 
 	public GLXKeyEvent(GLXToolkit.GLXWindow wnd, XKeyEvent ev, boolean include) {
 	    this.wnd = wnd;

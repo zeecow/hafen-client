@@ -235,7 +235,7 @@ public class NEWTContext implements Toolkit.Factory {
 
 	    public String string() {
 		char c = newt.getKeyChar();
-		return((c == 0) ? null : Character.toString(c));
+		return((c == 0) ? "" : Character.toString(c));
 	    }
 	    public Key key() {
 		return(key);}

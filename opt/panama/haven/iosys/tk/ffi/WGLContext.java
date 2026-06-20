@@ -923,7 +923,7 @@ public class WGLContext implements Toolkit.Factory {
 		    mods = xlmods(kb);
 		}
 
-		public String string() {return(null);}
+		public String string() {return("");}
 		public Key key() {return(key);}
 		public Set<Key.Mod> mods() {return(mods);}
 	    }
@@ -937,8 +937,8 @@ public class WGLContext implements Toolkit.Factory {
 		    kb.set(code, pst | 0x80);
 		    char[] chars = win.ToUnicodeEx(code, scancode, kb, 0, win.GetKeyboardLayout(0));
 		    kb.set(code, pst);
-		    string = ((chars == null) || (chars.length == 0)) ? null : new String(chars);
-		    if(string != null) {
+		    string = ((chars == null) || (chars.length == 0)) ? "" : new String(chars);
+		    if(string.length() > 0) {
 			for(Key.Sym sym : key.syms()) {
 			    if((sym instanceof Key.Std) && (((Key.Std)sym).ch == string.charAt(0))) {
 				this.sym = sym;
