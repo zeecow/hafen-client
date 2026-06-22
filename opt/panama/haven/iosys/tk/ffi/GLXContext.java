@@ -50,6 +50,7 @@ import static haven.iosys.tk.Key.Std.*;
 
 @Toolkit.Available(name = "glx")
 public class GLXContext implements Toolkit.Factory {
+    public static final boolean DEBUG = false;
     private final LibC libc;
     private final XLib xlib;
     private final XInput xi;
@@ -577,7 +578,8 @@ public class GLXContext implements Toolkit.Factory {
 		    wnd = windows.get(id);
 		}
 		if(wnd == null) {
-		    Warning.warn(String.format("event received for non-registered window %s: %d", id, ev.type()));
+		    if(DEBUG)
+			Debug.dump(String.format("event received for non-registered window %s: %d", id, ev.type()));
 		    return;
 		}
 		wnd.event(ev);
@@ -1168,7 +1170,8 @@ public class GLXContext implements Toolkit.Factory {
 			msg.xclient().message_type(WM_PROTOCOLS.id).format(32).a(0, _NET_WM_PING.id).l(1, ev.l()[1]).x(2, id);
 			xlib.XSendEvent(dpy, screen.root(), false, XLib.SubstructureNotifyMask | XLib.SubstructureRedirectMask, msg);
 		    } else {
-			Debug.dump("unknown window-manager message received: " + xlib.XGetAtomName(dpy, ev.a()[0]));
+			if(DEBUG)
+			    Debug.dump("unknown window-manager message received: " + xlib.XGetAtomName(dpy, ev.a()[0]));
 		    }
 		} else if(XdndEnter.is(ev.message_type()) && (ev.format() == 32)) {
 		    XID src = ev.x()[0];
@@ -1202,7 +1205,8 @@ public class GLXContext implements Toolkit.Factory {
 			return;
 		    d.dropped(ev.l()[2]);
 		} else {
-		    Debug.dump("unknown client message received: " + xlib.XGetAtomName(dpy, ev.message_type()));
+		    if(DEBUG)
+			Debug.dump("unknown client message received: " + xlib.XGetAtomName(dpy, ev.message_type()));
 		}
 	    }
 
