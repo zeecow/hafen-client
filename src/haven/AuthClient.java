@@ -318,7 +318,7 @@ public class AuthClient implements Closeable {
     }
     
     public static abstract class Credentials {
-	public abstract String tryauth(AuthClient cl) throws IOException;
+	public abstract Session.User tryauth(AuthClient cl) throws IOException;
 	public abstract String authname();
 	public void discard() {}
 	
@@ -462,12 +462,12 @@ public class AuthClient implements Closeable {
 	    }
 	}
 
-	public String tryauth(AuthClient cl) throws IOException {
+	public Session.User tryauth(AuthClient cl) throws IOException {
 	    Message rpl = cl.cmd("pw", username, hashpw(cl));
 	    String stat = rpl.string();
 	    if(stat.equals("ok")) {
 		String acct = rpl.string();
-		return(acct);
+		return(new Session.User(acct));
 	    } else if(stat.equals("no")) {
 		String err = rpl.string();
 		throw(new AuthException(err));
@@ -497,12 +497,12 @@ public class AuthClient implements Closeable {
 	    return(acctname);
 	}
 	
-	public String tryauth(AuthClient cl) throws IOException {
+	public Session.User tryauth(AuthClient cl) throws IOException {
 	    Message rpl = cl.cmd("token", acctname, token);
 	    String stat = rpl.string();
 	    if(stat.equals("ok")) {
 		String acct = rpl.string();
-		return(acct);
+		return(new Session.User(acct));
 	    } else if(stat.equals("no")) {
 		String err = rpl.string();
 		throw(new AuthException(err));
@@ -522,12 +522,12 @@ public class AuthClient implements Closeable {
 		    try {
 			AuthClient test = new AuthClient(new NamedSocketAddress("localhost", DEFPORT));
 			try {
-			    String acct = new NativeCred(args[0], args[1]).tryauth(test);
+			    Session.User acct = new NativeCred(args[0], args[1]).tryauth(test);
 			    if(acct == null) {
 				System.err.println("failed");
 				return;
 			    }
-			    System.out.println(acct);
+			    System.out.println(acct.name);
 			    System.out.println(Utils.hex.enc(test.getcookie()));
 			} finally {
 			    test.close();

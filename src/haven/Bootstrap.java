@@ -185,14 +185,14 @@ public class Bootstrap implements UI.Receiver, UI.Runner {
 		    authaddr = auth.address();
 		    if(!Arrays.equals(inittoken, getprefb("lasttoken-" + mangleuser(inituser), confname, null, false))) {
 			AuthClient.Credentials creds = new AuthClient.TokenCred(inituser, inittoken);
-			String authed = null;
+			Session.User authed = null;
 			try {
 			    authed = creds.tryauth(auth);
 			} catch(AuthClient.Credentials.AuthException e) {
 			}
 			setpref("lasttoken-" + mangleuser(inituser), Utils.hex.enc(inittoken));
 			if(authed != null) {
-			    acct = new Session.User(authed);
+			    acct = authed;
 			    cookie = auth.getcookie();
 			    if(Connection.encrypt.get())
 				acct.alias(auth.getalias());
@@ -204,8 +204,7 @@ public class Bootstrap implements UI.Receiver, UI.Runner {
 		    if((token = gettoken(inituser, confname)) != null) {
 			AuthClient.Credentials creds = new AuthClient.TokenCred(inituser, token);
 			try {
-			    String authed = creds.tryauth(auth);
-			    acct = new Session.User(authed);
+			    acct = creds.tryauth(auth);
 			    cookie = auth.getcookie();
 			    if(Connection.encrypt.get())
 				acct.alias(auth.getalias());
@@ -239,7 +238,7 @@ public class Bootstrap implements UI.Receiver, UI.Runner {
 		try(AuthClient auth = new AuthClient(server)) {
 		    authaddr = auth.address();
 		    try {
-			acct = new Session.User(creds.tryauth(auth));
+			acct = creds.tryauth(auth);
 		    } catch(AuthClient.Credentials.AuthException e) {
 			settoken(creds.authname(), confname, null);
 			ui.uimsg(1, "error", e.getMessage());
