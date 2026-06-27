@@ -319,7 +319,7 @@ public class AuthClient implements Closeable {
     
     public static abstract class Credentials {
 	public abstract String tryauth(AuthClient cl) throws IOException;
-	public abstract String name();
+	public abstract String authname();
 	public void discard() {}
 	
 	public static class AuthException extends RuntimeException {
@@ -421,7 +421,7 @@ public class AuthClient implements Closeable {
 	    this(username, pw.getBytes(Utils.utf8));
 	}
 	
-	public String name() {
+	public String authname() {
 	    return(username);
 	}
 
@@ -493,7 +493,7 @@ public class AuthClient implements Closeable {
 	    clean = Finalizer.finalize(this, () -> Arrays.fill(token, (byte)0));
 	}
 	
-	public String name() {
+	public String authname() {
 	    return(acctname);
 	}
 	

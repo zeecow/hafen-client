@@ -39,7 +39,7 @@ public class SteamCreds extends AuthClient.Credentials {
 	name = api.displayname();
     }
 
-    public String name() {return(name);}
+    public String authname() {return(null);}
 
     public String tryauth(AuthClient cl) throws IOException {
 	try(Steam.WebTicket tkt = api.webticket()) {
