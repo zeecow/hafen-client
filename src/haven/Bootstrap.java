@@ -131,7 +131,7 @@ public class Bootstrap implements UI.Receiver, UI.Runner {
 	if(user == null)
 	    return;
 	String prefnm = user;
-	Utils.setpref("savedtoken-" + mangleuser(user) + "@" + confname, (token == null) ? "" : Utils.hex.enc(token));
+	Utils.setpref("savedtoken-" + mangleuser(user) + "@" + confname, (token == null) ? null : Utils.hex.enc(token));
 	rottokens(user, confname, token != null, true);
     }
 
