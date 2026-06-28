@@ -229,7 +229,6 @@ public class Bootstrap implements UI.Receiver, UI.Runner {
 			if(msg.name == "login") {
 			    creds = (AuthClient.Credentials)msg.args[0];
 			    savepw = (Boolean)msg.args[1];
-			    loginname = creds.authname();
 			    break;
 			}
 		    }
@@ -247,6 +246,7 @@ public class Bootstrap implements UI.Receiver, UI.Runner {
 		    cookie = auth.getcookie();
 		    if(Connection.encrypt.get())
 			acct.alias(auth.getalias());
+		    loginname = creds.authname();
 		    if(savepw) {
 			byte[] ntoken = (creds instanceof AuthClient.TokenCred) ? ((AuthClient.TokenCred)creds).token : auth.gettoken();
 			settoken(creds.authname(), confname, ntoken);

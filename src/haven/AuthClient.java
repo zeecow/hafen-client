@@ -410,9 +410,10 @@ public class AuthClient implements Closeable {
 	public final String username;
 	private final byte[] pw;
 	private final Runnable clean;
+	private String authname;
 	
 	public NativeCred(String username, byte[] pw) {
-	    this.username = username;
+	    this.username = this.authname = username;
 	    this.pw = pw;
 	    clean = Finalizer.finalize(this, () -> Arrays.fill(pw, (byte)0));
 	}
@@ -422,7 +423,7 @@ public class AuthClient implements Closeable {
 	}
 	
 	public String authname() {
-	    return(username);
+	    return(authname);
 	}
 
 	public static byte[] prehash(byte[] pw, Object[] spec) {
@@ -467,6 +468,7 @@ public class AuthClient implements Closeable {
 	    String stat = rpl.string();
 	    if(stat.equals("ok")) {
 		String acct = rpl.string();
+		authname = acct;
 		return(new Session.User(acct));
 	    } else if(stat.equals("no")) {
 		String err = rpl.string();
@@ -485,16 +487,17 @@ public class AuthClient implements Closeable {
 	public final String acctname;
 	public final byte[] token;
 	private final Runnable clean;
+	private String authname;
 	
 	public TokenCred(String acctname, byte[] token) {
-	    this.acctname = acctname;
+	    this.acctname = this.authname = acctname;
 	    if((this.token = token).length != 32)
 		throw(new IllegalArgumentException("Token must be 32 bytes"));
 	    clean = Finalizer.finalize(this, () -> Arrays.fill(token, (byte)0));
 	}
 	
 	public String authname() {
-	    return(acctname);
+	    return(authname);
 	}
 	
 	public Session.User tryauth(AuthClient cl) throws IOException {
@@ -502,6 +505,7 @@ public class AuthClient implements Closeable {
 	    String stat = rpl.string();
 	    if(stat.equals("ok")) {
 		String acct = rpl.string();
+		authname = acct;
 		return(new Session.User(acct));
 	    } else if(stat.equals("no")) {
 		String err = rpl.string();
