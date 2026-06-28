@@ -1815,6 +1815,10 @@ public class ZeeManagerGobs extends ZeeThread{
         if (!ZeeConfig.nameInListEndsWith(kritName,"/grasshopper,/rat,/toad,/frog,/crab,/lobster,/rabbit-doe,/rabbit,/bunny,/hen,/rooster,/chick,/bogturtle"))
             return;
 
+        // ignore toad if is quest giver
+        if (kritName.endsWith("/toad") && ZeeConfig.gobHasAttr(kritter,"ObScale"))
+            return;
+
         new ZeeThread(){
             @Override
             public void run() {
@@ -3519,6 +3523,8 @@ public class ZeeManagerGobs extends ZeeThread{
     static boolean pickLeafpileLizard = Utils.getprefb("pickLeafpileLizard",false);
     static boolean isPickingupLifepile;
     public static void pickupLeafpile() {
+        if (ZeeConfig.isPlayerLiftingPose() || ZeeConfig.isCombatActive())
+            return;
         if (isPickingupLifepile){
             println("pickupLeafpile > already picking");
             return;

@@ -42,7 +42,7 @@ public class AudioSprite {
 	List<Audio.Clip> cl = clips(res, id);
 	if(!cl.isEmpty()) {
 		int choosenSubClip = (int) (Math.random() * cl.size());
-        if (res.name.contentEquals("sfx/terobjs/leafpile") && !ZeeConfig.isPlayerLiftingPose())
+        if (res.name.contentEquals("sfx/terobjs/leafpile"))
             ZeeManagerGobs.pickupLeafpile();
 		boolean blockAudio = false;
 		if (ZeeConfig.mapAudioBlocker.containsKey(res.name)) {
