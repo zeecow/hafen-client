@@ -131,12 +131,12 @@ public class ZeeConsole {
             helpLines.add("   clg         clear gobs text/color/pointer");
             helpLines.add("   clg [tpc]   clear gobs [t]ext, [c]olor, [p]ointer");
             helpLines.add("======== items cmds ========");
-            helpLines.add("   win []        select windows named []");
-            helpLines.add("   itname []     select items which name contains []");
-            helpLines.add("   itres []      select items with resname contains []");
-            helpLines.add("   stack         stack unstacked items from sel win/items ");
-            helpLines.add("   stack2        optimize stacks with free space ");
-            helpLines.add("   clickmenu []  click menu named []");
+            helpLines.add("   win []           select windows named []");
+            helpLines.add("   itname []        select items which name contains []");
+            helpLines.add("   itres []         select items with resname contains []");
+            helpLines.add("   stack [delayMs]  stack unstacked items from sel win/items ");
+            helpLines.add("   stack2 [delayMs] optimize stacks with free space ");
+            helpLines.add("   clickmenu []     click menu named []");
             helpLines.add("======== misc cmds ========");
             helpLines.add("   count       msg counting last cmd results");
             helpLines.add("   disc        toggle discovery helper on/off");
@@ -291,12 +291,12 @@ public class ZeeConsole {
         }
         else if (cmd.contentEquals("stack")){
             ZeeConfig.addPlayerText("stack");
-            ret = stack();
+            ret = stack(arr);
             ZeeConfig.removePlayerText();
         }
         else if (cmd.contentEquals("stack2")){
             ZeeConfig.addPlayerText("stack2");
-            ret = stack2();
+            ret = stack2(arr);
             ZeeConfig.removePlayerText();
         }
         else if (cmd.contentEquals("clickmenu")){
@@ -532,7 +532,7 @@ public class ZeeConsole {
     }
 
 
-    private static Boolean stack() {
+    private static Boolean stack(String[] args) {
 
         if (!(lastCmdResults instanceof List) || (((List) lastCmdResults).isEmpty())){
             ZeeConfig.msgError("no items selected");
@@ -541,12 +541,18 @@ public class ZeeConsole {
             return false;
         }
 
+        int delayMs = 250;
+        try {
+            delayMs = Integer.parseInt(args[args.length-1]);
+        } catch (NumberFormatException e) {
+        }
+
         Object first  = ((List<?>) lastCmdResults).get(0);
         if (first instanceof Window) {
-            return stackWindowsContents();
+            return stackWindowsContents(delayMs);
         }
         else if (first instanceof WItem) {
-            return stackItemsSelected();
+            return stackItemsSelected(delayMs);
         }
         else {
             println("stack > unknown selection");
@@ -554,7 +560,7 @@ public class ZeeConsole {
         }
     }
 
-    private static Boolean stack2() {
+    private static Boolean stack2(String[] args) {
 
         if (!(lastCmdResults instanceof List) || (((List) lastCmdResults).isEmpty())){
             ZeeConfig.msgError("no items selected");
@@ -563,12 +569,18 @@ public class ZeeConsole {
             return false;
         }
 
+        int delayMs = 400;
+        try {
+            delayMs = Integer.parseInt(args[args.length-1]);
+        } catch (NumberFormatException e) {
+        }
+
         Object first  = ((List<?>) lastCmdResults).get(0);
         if (first instanceof Window) {
-            return stack2WindowsContents();
+            return stack2WindowsContents(delayMs);
         }
         else if (first instanceof WItem) {
-            return stack2ItemsSelected();
+            return stack2ItemsSelected(delayMs);
         }
         else {
             println("stack2 > unknown selection");
@@ -577,7 +589,7 @@ public class ZeeConsole {
     }
 
     @SuppressWarnings("unchecked")
-    private static Boolean stackWindowsContents() {
+    private static Boolean stackWindowsContents(int delayMs) {
         try {
             List<Window> windows = (List<Window>) lastCmdResults;
             for (Window window : windows) {
@@ -624,7 +636,7 @@ public class ZeeConsole {
                             }
                             // stack all on item j
                             ZeeManagerItems.itemAct(namedItems.get(j), UI.MOD_CTRL_SHIFT);
-                            Thread.sleep(250);
+                            Thread.sleep(delayMs);
                             // item not stackable? return to container
                             if (ZeeConfig.isPlayerHoldingItem()){
                                 if(!ZeeManagerItems.dropHoldingItemToInv(inv)) {
@@ -658,7 +670,7 @@ public class ZeeConsole {
                             }
                             // stack all on item j
                             ZeeManagerItems.itemAct(meatItems.get(j), UI.MOD_CTRL_SHIFT);
-                            Thread.sleep(400);
+                            Thread.sleep(delayMs);
                             // next item name
                             i = j = meatItems.size() + 1;
                         }
@@ -674,7 +686,7 @@ public class ZeeConsole {
     }
 
     @SuppressWarnings("unchecked")
-    private static Boolean stackItemsSelected() {
+    private static Boolean stackItemsSelected(int delayMs) {
         try {
             List<WItem> selectedItems = (List<WItem>) lastCmdResults;
             List<String> names = new ArrayList<>();
@@ -721,7 +733,7 @@ public class ZeeConsole {
                             }
                             // stack all on item j
                             ZeeManagerItems.itemAct(namedItems.get(j), UI.MOD_CTRL_SHIFT);
-                            Thread.sleep(250);
+                            Thread.sleep(delayMs);
                             // next item name
                             i = j = namedItems.size() + 1;
                         }
@@ -745,7 +757,7 @@ public class ZeeConsole {
                             }
                             // stack all on item j
                             ZeeManagerItems.itemAct(meatItems.get(j), UI.MOD_CTRL_SHIFT);
-                            Thread.sleep(250);
+                            Thread.sleep(delayMs);
                             // next item name
                             i = j = meatItems.size() + 1;
                         }
@@ -758,7 +770,7 @@ public class ZeeConsole {
         return false;
     }
 
-    private static Boolean stack2WindowsContents() {
+    private static Boolean stack2WindowsContents(int delayMs) {
         try {
             @SuppressWarnings("unchecked")
             List<Window> windows = (List<Window>) lastCmdResults;
@@ -788,10 +800,10 @@ public class ZeeConsole {
 
                 // optimize stacks
                 if (!names.isEmpty())
-                    if(!optimizeStacks(inv, names))
+                    if(!optimizeStacks(inv, names, delayMs))
                         return false;
                 if (!meatNames.isEmpty())
-                    if(!optimizeStacks(inv, meatNames))
+                    if(!optimizeStacks(inv, meatNames, delayMs))
                         return false;
             }
             return true;
@@ -801,7 +813,7 @@ public class ZeeConsole {
         return false;
     }
 
-    private static Boolean stack2ItemsSelected() {
+    private static Boolean stack2ItemsSelected(int delayMs) {
         try {
             @SuppressWarnings("unchecked")
             List<WItem> selectedItems = (List<WItem>) lastCmdResults;
@@ -833,9 +845,9 @@ public class ZeeConsole {
                 Inventory inv = ZeeConfig.getWindowsInventory(window);
                 // optimize stacks
                 if (!names.isEmpty())
-                    optimizeStacks(inv, names);
+                    optimizeStacks(inv, names, delayMs);
                 if (!meatNames.isEmpty())
-                    optimizeStacks(inv, meatNames);
+                    optimizeStacks(inv, meatNames, delayMs);
             }
 
             return true;
@@ -846,7 +858,7 @@ public class ZeeConsole {
         return false;
     }
 
-    private static Boolean optimizeStacks(Inventory inv, List<String> names){
+    private static Boolean optimizeStacks(Inventory inv, List<String> names, int delayMs){
         println("optimizeStacks() > "+names.size()+" names");
         try{
             boolean isResName = names.get(0).startsWith("gfx/invobjs/");
@@ -897,7 +909,7 @@ public class ZeeConsole {
                     }
                     // click one space stack
                     ZeeManagerItems.itemAct(oneSpaceStacks.get(i));
-                    Thread.sleep(400);//wait item upd
+                    Thread.sleep(delayMs);//wait item upd
                     if (ZeeConfig.isPlayerHoldingItem()) {
                         println("        shouldnt be holding item?");
                         return false;
@@ -940,7 +952,7 @@ public class ZeeConsole {
                     while(ZeeConfig.isPlayerHoldingItem()) {
                         ZeeManagerItems.itemAct(incompleteStacks.get(i));
                         i++;
-                        Thread.sleep(500);//wait item upd
+                        Thread.sleep(delayMs);//wait item upd
                         if (incompleteStacks.size() <= i) {
                             println("        no incompleteStacks to click ");
                             break;
