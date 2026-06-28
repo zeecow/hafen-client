@@ -224,12 +224,12 @@ public class AuthClient implements Closeable {
 	public TokenInfo id(byte[] id) {this.id = id; return(this);}
 	public TokenInfo desc(String desc) {this.desc = desc; return(this);}
 
-	public Object[] encode() {
-	    Object[] ret = {};
+	public Map<String, Object> encode() {
+	    Map<String, Object> ret = new HashMap<>();
 	    if(this.id.length > 0)
-		ret = Utils.extend(ret, new Object[] {new Object[] {"id", this.id}});
+		ret.put("id", this.id);
 	    if(this.desc.length() > 0)
-		ret = Utils.extend(ret, new Object[] {new Object[] {"desc", this.desc}});
+		ret.put("desc", this.desc);
 	    return(ret);
 	}
 
@@ -278,17 +278,22 @@ public class AuthClient implements Closeable {
 	skout.write(buf);
     }
     
-    private void esendmsg(Object... args) throws IOException {
+    private void esendmsg(String cmd, Object... args) throws IOException {
 	MessageBuf buf = new MessageBuf();
-	for(Object arg : args) {
-	    if(arg instanceof String) {
-		buf.addstring((String)arg);
-	    } else if(arg instanceof byte[]) {
-		buf.addbytes((byte[])arg);
-	    } else if(arg instanceof Object[]) {
-		buf.addlist((Object[])arg);
+	buf.addstring(cmd + "*");
+	int a = 0;
+	while(a < args.length) {
+	    Object k = args[a++];
+	    if(k instanceof String) {
+		buf.addstring((String)k);
+		buf.addtto(args[a++]);
+	    } else if(k instanceof Map) {
+		for(Map.Entry<?, ?> ent : ((Map<?, ?>)k).entrySet()) {
+		    buf.addstring((String)ent.getKey());
+		    buf.addtto(ent.getValue());
+		}
 	    } else {
-		throw(new RuntimeException("Illegal argument to esendmsg: " + arg.getClass()));
+		throw(new RuntimeException("Illegal argument to esendmsg: " + k.getClass()));
 	    }
 	}
 	sendmsg(buf);
@@ -312,8 +317,8 @@ public class AuthClient implements Closeable {
 	return(new MessageBuf(buf));
     }
     
-    public Message cmd(Object... args) throws IOException {
-	esendmsg(args);
+    public Message cmd(String cmd, Object... args) throws IOException {
+	esendmsg(cmd, args);
 	return(recvmsg());
     }
     
@@ -441,7 +446,7 @@ public class AuthClient implements Closeable {
 	}
 	
 	private byte[] hashpw(AuthClient cl) throws IOException {
-	    Message rpl = cl.cmd("pwdata", username);
+	    Message rpl = cl.cmd("pwdata", "user", username);
 	    String stat = rpl.string();
 	    if(stat.equals("no"))
 		throw(new AuthException(rpl.string()));
@@ -464,7 +469,7 @@ public class AuthClient implements Closeable {
 	}
 
 	public Session.User tryauth(AuthClient cl) throws IOException {
-	    Message rpl = cl.cmd("pw", username, hashpw(cl));
+	    Message rpl = cl.cmd("pw", "user", username, "phash", hashpw(cl));
 	    String stat = rpl.string();
 	    if(stat.equals("ok")) {
 		String acct = rpl.string();
@@ -501,7 +506,7 @@ public class AuthClient implements Closeable {
 	}
 	
 	public Session.User tryauth(AuthClient cl) throws IOException {
-	    Message rpl = cl.cmd("token", acctname, token);
+	    Message rpl = cl.cmd("token", "user", acctname, "token", token);
 	    String stat = rpl.string();
 	    if(stat.equals("ok")) {
 		String acct = rpl.string();
