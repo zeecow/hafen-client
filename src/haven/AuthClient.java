@@ -318,8 +318,8 @@ public class AuthClient implements Closeable {
     }
     
     public static abstract class Credentials {
-	public abstract String tryauth(AuthClient cl) throws IOException;
-	public abstract String name();
+	public abstract Session.User tryauth(AuthClient cl) throws IOException;
+	public abstract String authname();
 	public void discard() {}
 	
 	public static class AuthException extends RuntimeException {
@@ -410,9 +410,10 @@ public class AuthClient implements Closeable {
 	public final String username;
 	private final byte[] pw;
 	private final Runnable clean;
+	private String authname;
 	
 	public NativeCred(String username, byte[] pw) {
-	    this.username = username;
+	    this.username = this.authname = username;
 	    this.pw = pw;
 	    clean = Finalizer.finalize(this, () -> Arrays.fill(pw, (byte)0));
 	}
@@ -421,8 +422,8 @@ public class AuthClient implements Closeable {
 	    this(username, pw.getBytes(Utils.utf8));
 	}
 	
-	public String name() {
-	    return(username);
+	public String authname() {
+	    return(authname);
 	}
 
 	public static byte[] prehash(byte[] pw, Object[] spec) {
@@ -462,12 +463,13 @@ public class AuthClient implements Closeable {
 	    }
 	}
 
-	public String tryauth(AuthClient cl) throws IOException {
+	public Session.User tryauth(AuthClient cl) throws IOException {
 	    Message rpl = cl.cmd("pw", username, hashpw(cl));
 	    String stat = rpl.string();
 	    if(stat.equals("ok")) {
 		String acct = rpl.string();
-		return(acct);
+		authname = acct;
+		return(new Session.User(acct));
 	    } else if(stat.equals("no")) {
 		String err = rpl.string();
 		throw(new AuthException(err));
@@ -485,24 +487,26 @@ public class AuthClient implements Closeable {
 	public final String acctname;
 	public final byte[] token;
 	private final Runnable clean;
+	private String authname;
 	
 	public TokenCred(String acctname, byte[] token) {
-	    this.acctname = acctname;
+	    this.acctname = this.authname = acctname;
 	    if((this.token = token).length != 32)
 		throw(new IllegalArgumentException("Token must be 32 bytes"));
 	    clean = Finalizer.finalize(this, () -> Arrays.fill(token, (byte)0));
 	}
 	
-	public String name() {
-	    return(acctname);
+	public String authname() {
+	    return(authname);
 	}
 	
-	public String tryauth(AuthClient cl) throws IOException {
+	public Session.User tryauth(AuthClient cl) throws IOException {
 	    Message rpl = cl.cmd("token", acctname, token);
 	    String stat = rpl.string();
 	    if(stat.equals("ok")) {
 		String acct = rpl.string();
-		return(acct);
+		authname = acct;
+		return(new Session.User(acct));
 	    } else if(stat.equals("no")) {
 		String err = rpl.string();
 		throw(new AuthException(err));
@@ -522,12 +526,12 @@ public class AuthClient implements Closeable {
 		    try {
 			AuthClient test = new AuthClient(new NamedSocketAddress("localhost", DEFPORT));
 			try {
-			    String acct = new NativeCred(args[0], args[1]).tryauth(test);
+			    Session.User acct = new NativeCred(args[0], args[1]).tryauth(test);
 			    if(acct == null) {
 				System.err.println("failed");
 				return;
 			    }
-			    System.out.println(acct);
+			    System.out.println(acct.name);
 			    System.out.println(Utils.hex.enc(test.getcookie()));
 			} finally {
 			    test.close();
