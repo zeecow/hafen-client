@@ -35,7 +35,7 @@ import haven.render.sl.*;
 import static haven.render.DataBuffer.Usage.*;
 
 public abstract class GLEnvironment implements Environment {
-    public static final boolean debuglog = false, labels = false;
+    public static final boolean debuglog = Utils.nonconst(false), labels = Utils.nonconst(false);
     public final Caps caps;
     public int nilfbo_id = 0, nilfbo_db = 0;
     final Object drawmon = new Object();
