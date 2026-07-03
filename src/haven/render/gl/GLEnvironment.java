@@ -308,6 +308,8 @@ public abstract class GLEnvironment implements Environment {
     private void checkdebuglog(GL gl) {
 	boolean f = false;
 	for(DebugMessage msg : getdebuglog(gl)) {
+	    if(msg.src == GL.GL_DEBUG_SOURCE_APPLICATION)
+		continue;
 	    System.err.printf("%d %d %d %d -- %s\n", msg.src, msg.type, msg.id, msg.sev, msg.msg);
 	    f = true;
 	}
