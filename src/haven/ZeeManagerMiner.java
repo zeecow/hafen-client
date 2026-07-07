@@ -1057,6 +1057,9 @@ public class ZeeManagerMiner extends ZeeThread{
 
     public static boolean straightLineCheck(Coord2d target) {
 
+        if (ZeeConfig.isPlayerDrivingPlow()) // avoid plowing queue
+            return false;
+
         // min target distance
         double distToTarget = ZeeConfig.getPlayerGob().rc.dist(target);
         if (distToTarget < TILE_SIZE * 7)
