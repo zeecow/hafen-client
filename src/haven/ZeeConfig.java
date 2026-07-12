@@ -536,7 +536,7 @@ public class ZeeConfig {
             "/waterstrider", "/firefly", "/sandflea", "/tick",
             "/cavemoth", "/stagbeetle", "/cavecentipede", "/moonmoth",
             "/monarchbutterfly", "/grub","/springbumblebee",
-            "dumbledore"//TODO guessing name
+            "dumbledore", "/woodworm"
         );
         for (String s : l) {
             if(resName.endsWith(s)) {
