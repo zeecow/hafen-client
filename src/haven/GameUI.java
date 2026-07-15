@@ -57,7 +57,6 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
     private Widget qqview;
     public BuddyWnd buddies;
     private final Zergwnd zerg;
-    public final Collection<Polity> polities = new ArrayList<Polity>();
     public HelpWnd help;
     public OptWnd opts;
     public Collection<DraggedItem> hand = new LinkedList<DraggedItem>();
@@ -626,22 +625,24 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
 	    this.pack();
 	}
 
-	Tabs.Tab ntab(Widget ch, TButton btn) {
+	Tabs.Tab ntab(Widget ch, TButton tb) {
 	    Tabs.Tab tab = add(tabs.new Tab() {
+		    public void cdestroy(Widget w) {
+			if(w == ch) {
+			    destroy();
+			    tb.tab = null;
+			    repack();
+			}
+		    }
+
 		    public void cresize(Widget ch) {
 			repack();
 		    }
 		}, tabs.c);
 	    tab.add(ch, Coord.z);
-	    btn.tab = tab;
+	    tb.tab = tab;
 	    repack();
 	    return(tab);
-	}
-
-	void dtab(TButton btn) {
-	    btn.tab.destroy();
-	    btn.tab = null;
-	    repack();
 	}
 
 	void addpol(Polity p) {
@@ -868,9 +869,7 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
 	} else if(place == "buddy") {
 	    zerg.ntab(buddies = (BuddyWnd)child, zerg.kin);
 	} else if(place == "pol") {
-	    Polity p = (Polity)child;
-	    polities.add(p);
-	    zerg.addpol(p);
+	    zerg.addpol((Polity)child);
 	} else if(place == "chat") {
 	    chat.addchild(child);
 	} else if(place == "party") {
@@ -1009,9 +1008,6 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
 		    updhand();
 		}
 	    }
-	} else if(polities.contains(w)) {
-	    polities.remove(w);
-	    zerg.dtab(zerg.pol);
 	} else if(w == chrwdg) {
 	    chrwdg = null;
 	}
