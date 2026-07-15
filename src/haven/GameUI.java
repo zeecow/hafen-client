@@ -607,6 +607,14 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
 		    repack();
 		}
 	    }
+
+	    protected void depress() {
+		ui.sfx(Button.clbtdown.stream());
+	    }
+
+	    protected void unpress() {
+		ui.sfx(Button.clbtup.stream());
+	    }
 	}
 
 	Zergwnd() {
