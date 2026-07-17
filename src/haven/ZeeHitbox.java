@@ -111,15 +111,16 @@ public class ZeeHitbox extends ZeeSlottedNode implements Rendered {
                 if(!polygons.isEmpty()) {
                     List<Float> vertices = new LinkedList<>();
 
-                    //ZeeConfig.println(res.name);
-                    //ZeeConfig.println("   polygons.get(0) size "+polygons.get(0).size());
-                    addTriangles(vertices, polygons.get(0));
+                    //addTriangles(vertices, polygons.get(0));
+                    for (List<Coord3f> polygon : polygons) {
+                        addBorders(vertices, polygon);
+                    }
 
                     float[] data = convert(vertices);
                     VertexArray.Buffer vbo = new VertexArray.Buffer(data.length * 4, DataBuffer.Usage.STATIC, DataBuffer.Filler.of(data));
                     VertexArray va = new VertexArray(LAYOUT, vbo);
 
-                    model = new Model(Model.Mode.TRIANGLE_STRIP, va, null);
+                    model = new Model(Model.Mode.LINES, va, null);
 
                     MODEL_CACHE.put(res, model);
                 }
@@ -156,6 +157,22 @@ public class ZeeHitbox extends ZeeSlottedNode implements Rendered {
             i++;
         }while(i < n-2);
         //ZeeConfig.println("      triangles = "+triangles);
+    }
+
+    private static void addBorders(List<Float> vertices, List<Coord3f> polygon){
+        for (int i = 0; i < polygon.size(); i++) {
+            Coord3f current = polygon.get(i);
+            Coord3f next = polygon.get((i + 1) % polygon.size()); // Loop back to first point
+
+            // Add line from current to next vertex
+            vertices.add(current.x);
+            vertices.add(current.y);
+            vertices.add(current.z);
+
+            vertices.add(next.x);
+            vertices.add(next.y);
+            vertices.add(next.z);
+        }
     }
 
     private static Resource getResource(Gob gob) {

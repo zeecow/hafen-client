@@ -1046,10 +1046,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 
 			String gobName = this.getres().name;
 
-			if( !ZeeConfig.isTree(gobName) &&
-					!ZeeManagerGobs.isGobWall(gobName)  &&
-					!ZeeConfig.isGobCropNoTrellisNoWild(gobName)
-			){
+			if( !ZeeConfig.isTree(gobName) && !ZeeManagerGobs.isGobWall(gobName) && !ZeeConfig.isGobCropNoTrellisNoWild(gobName)) {
 				return;
 			}
 
