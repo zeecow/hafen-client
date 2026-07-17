@@ -1276,8 +1276,13 @@ public class ZeeConfig {
                             sleep(1000);
                             timeout -= 1000;
                         } while (timeout > 0);
-                        if (autocloseXpWindow)//may be unchecked since thread start
-                            getButtonNamed(window, "Okay!").click();
+                        if (autocloseXpWindow) {//may be unchecked since thread start
+                            Button btnOkay = getButtonNamed(window, "Okay!");
+                            if (btnOkay!=null)
+                                btnOkay.click();
+                            else
+                                println("modXpEventWindow > btnOkay null");
+                        }
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -3167,6 +3172,8 @@ public class ZeeConfig {
     }
 
     public static Gob getPlayerGob() {
+        if (gameUI==null || gameUI.map==null)
+            return null;
         return gameUI.map.player();
     }
 
