@@ -1,6 +1,7 @@
 package haven;
 
 import haven.render.*;
+import haven.res.lib.tree.TreeScale;
 
 import java.awt.*;
 import java.util.*;
@@ -78,6 +79,7 @@ public class ZeeHitbox extends ZeeSlottedNode implements Rendered {
     private static Model getModel(Gob gob) {
         Model model;
         Resource res = getResource(gob);
+        boolean isTree = gob.tags.contains(Gob.Tag.TREE);
         synchronized (MODEL_CACHE) {
             model = MODEL_CACHE.get(res);
             if(model == null) {
@@ -111,18 +113,30 @@ public class ZeeHitbox extends ZeeSlottedNode implements Rendered {
                 if(!polygons.isEmpty()) {
                     List<Float> vertices = new LinkedList<>();
 
-                    //addTriangles(vertices, polygons.get(0));
-                    for (List<Coord3f> polygon : polygons) {
-                        addBorders(vertices, polygon);
+                    if (isTree) {
+                        float treefscale = 1;
+                        //TODO scaled tree hitbox if worthy
+                        //TreeScale treeScale = gob.getattr(TreeScale.class);
+                        //if (treeScale!=null)
+                        //    treefscale = treeScale.scale;
+                        addTriangles(vertices, polygons.get(0), treefscale);
+                    } else {
+                        for (List<Coord3f> polygon : polygons) {
+                            addBorders(vertices, polygon);
+                        }
                     }
 
                     float[] data = convert(vertices);
                     VertexArray.Buffer vbo = new VertexArray.Buffer(data.length * 4, DataBuffer.Usage.STATIC, DataBuffer.Filler.of(data));
                     VertexArray va = new VertexArray(LAYOUT, vbo);
 
-                    model = new Model(Model.Mode.LINES, va, null);
+                    if (isTree)
+                        model = new Model(Model.Mode.TRIANGLE_STRIP, va, null);
+                    else
+                        model = new Model(Model.Mode.LINES, va, null);
 
                     MODEL_CACHE.put(res, model);
+                    ZeeConfig.println("modelcache "+MODEL_CACHE.size()+" "+res.name);
                 }
             }
         }
@@ -138,7 +152,10 @@ public class ZeeHitbox extends ZeeSlottedNode implements Rendered {
         return ret;
     }
 
-    private static void addTriangles(List<Float> target, List<Coord3f> vertices) {
+    private static void addTriangles(List<Float> target, List<Coord3f> vertices, float treefscale) {
+        if (treefscale == 0) {
+            treefscale = 1;
+        }
         int n = vertices.size();
         Coord3f a, b, c;
         //int triangles = 0;
@@ -150,9 +167,9 @@ public class ZeeHitbox extends ZeeSlottedNode implements Rendered {
         do{
             b = vertices.get(i + 1);
             c = vertices.get(i + 2);
-            Collections.addAll(target, a.x, a.y, a.z);
-            Collections.addAll(target, b.x, b.y, b.z);
-            Collections.addAll(target, c.x, c.y, c.z);
+            Collections.addAll(target, a.x / treefscale, a.y / treefscale, a.z );
+            Collections.addAll(target, b.x / treefscale, b.y / treefscale, b.z );
+            Collections.addAll(target, c.x / treefscale, c.y / treefscale, c.z );
             //triangles++;
             i++;
         }while(i < n-2);
