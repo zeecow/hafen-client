@@ -136,7 +136,7 @@ public class ZeeHitbox extends ZeeSlottedNode implements Rendered {
                         model = new Model(Model.Mode.LINES, va, null);
 
                     MODEL_CACHE.put(res, model);
-                    ZeeConfig.println("modelcache "+MODEL_CACHE.size()+" "+res.name);
+                    //ZeeConfig.println("modelcache "+MODEL_CACHE.size()+" "+res.name);
                 }
             }
         }
