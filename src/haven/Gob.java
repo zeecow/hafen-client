@@ -1065,7 +1065,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 		synchronized (this){
 			if(ZeeConfig.showHitbox)
 				showHitBox();
-			else
+			else if (!ZeeManagerGobs.isHideGob(this))// gob wall/tree already hidden
 				hideHitBox();
 		}
 	}
