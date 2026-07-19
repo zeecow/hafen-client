@@ -38,7 +38,7 @@ import java.util.function.*;
 import haven.ffi.gl.EGL.*;
 
 @Acephal.Available(name = "egl")
-public class EGLOffscreenContext implements Acephal.Factory {
+public class EGLOffscreenContext implements Providers.Factory<EGLOffscreenContext.EGLOffscreen> {
     private final EGL egl;
     private final Collection<String> clexts;
 

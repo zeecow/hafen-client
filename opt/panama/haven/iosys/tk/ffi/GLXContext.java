@@ -49,7 +49,7 @@ import static haven.ffi.x11.XKeysym.*;
 import static haven.iosys.tk.Key.Std.*;
 
 @Toolkit.Available(name = "glx")
-public class GLXContext implements Toolkit.Factory {
+public class GLXContext implements Providers.Factory<Toolkit> {
     public static final boolean DEBUG = false;
     private final LibC libc;
     private final XLib xlib;
