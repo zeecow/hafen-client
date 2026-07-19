@@ -13,7 +13,7 @@ public class ZeeHitbox extends ZeeSlottedNode implements Rendered {
     private static final VertexArray.Layout LAYOUT = new VertexArray.Layout(new VertexArray.Layout.Input(Homo3D.vertex, new VectorFormat(3, NumberFormat.FLOAT32), 0, 0, 12));
     private Model model;
     private final Gob gob;
-    private static final Map<Resource, Model> MODEL_CACHE = new HashMap<>();
+    private static final Map<String, Model> MODEL_CACHE = new HashMap<>();
     private static final float Z = 0.1f;
     static Color DEF_HITBOX_COLOR = new Color(0, 153, 153, 255);
     static Color hitBoxColor = ZeeConfig.intToColor(Utils.getprefi("hitBoxColor",ZeeConfig.colorToInt(DEF_HITBOX_COLOR)));
@@ -30,7 +30,8 @@ public class ZeeHitbox extends ZeeSlottedNode implements Rendered {
 
     public static ZeeHitbox forGob(Gob gob) {
         try {
-            return new ZeeHitbox(gob);
+            if (!gob.tags.contains(Gob.Tag.TREE) || gob.treeGrowth != null )
+                return new ZeeHitbox(gob);
         } catch (Loading ignored) { }
         return null;
     }
@@ -77,11 +78,13 @@ public class ZeeHitbox extends ZeeSlottedNode implements Rendered {
     }
 
     private static Model getModel(Gob gob) {
-        Model model;
+        Model model = null;
         Resource res = getResource(gob);
+        String resName = gob.getres().name;
         boolean isTree = gob.tags.contains(Gob.Tag.TREE);
         synchronized (MODEL_CACHE) {
-            model = MODEL_CACHE.get(res);
+            if (!gob.tags.contains(Gob.Tag.TREE) || gob.treeGrowth != 1f)
+                model = MODEL_CACHE.get(resName);
             if(model == null) {
                 List<List<Coord3f>> polygons = new LinkedList<>();
 
@@ -116,9 +119,9 @@ public class ZeeHitbox extends ZeeSlottedNode implements Rendered {
                     if (isTree) {
                         float treefscale = 1;
                         //TODO scaled tree hitbox if worthy
-                        //TreeScale treeScale = gob.getattr(TreeScale.class);
-                        //if (treeScale!=null)
-                        //    treefscale = treeScale.scale;
+                        TreeScale treeScale = gob.getattr(TreeScale.class);
+                        if (treeScale!=null)
+                            treefscale = treeScale.scale;
                         addTriangles(vertices, polygons.get(0), treefscale);
                     } else {
                         for (List<Coord3f> polygon : polygons) {
@@ -135,8 +138,10 @@ public class ZeeHitbox extends ZeeSlottedNode implements Rendered {
                     else
                         model = new Model(Model.Mode.LINES, va, null);
 
-                    MODEL_CACHE.put(res, model);
-                    //ZeeConfig.println("modelcache "+MODEL_CACHE.size()+" "+res.name);
+                    if (!gob.tags.contains(Gob.Tag.TREE) || gob.treeGrowth != 1f){
+                        MODEL_CACHE.put(resName, model);
+                        //ZeeConfig.println("modelcache "+MODEL_CACHE.size()+" "+resName);
+                    }
                 }
             }
         }
