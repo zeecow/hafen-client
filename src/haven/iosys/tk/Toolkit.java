@@ -170,10 +170,13 @@ public interface Toolkit {
 				System.out.printf("name: %-19s priority: %5d%s\n", ent.getKey(), ent.getValue().priority(), ent.getValue().autouse() ? "" : " (manual only)");
 			    System.exit(0);
 			} else if(toolkit.get() != null) {
-			    Factory f = toolkits().get(toolkit.get());
+			    String spec = toolkit.get();
+			    int p = spec.indexOf(':');
+			    String fnm = (p < 0) ? spec : spec.substring(0, p);
+			    Factory f = toolkits().get(fnm);
 			    if(f == null)
-				throw(new Unavailable("no such toolkit: " + toolkit.get()));
-			    instance = f.open();
+				throw(new Unavailable("no such toolkit: " + fnm));
+			    instance = (p < 0) ? f.open() : f.open(spec.substring(p + 1));
 			} else {
 			    List<Factory> toolkits = new ArrayList<>(toolkits().values());
 			    Collections.sort(toolkits, Comparator.comparing(Factory::priority).reversed());

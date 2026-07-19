@@ -150,10 +150,13 @@ public interface AudioSystem {
 				System.out.printf("name: %-19s priority: %5d\n", ent.getKey(), ent.getValue().priority());
 			    System.exit(0);
 			} else if(audiosystem.get() != null) {
-			    Factory f = types().get(audiosystem.get());
+			    String spec = audiosystem.get();
+			    int p = spec.indexOf(':');
+			    String fnm = (p < 0) ? spec : spec.substring(0, p);
+			    Factory f = types().get(fnm);
 			    if(f == null)
-				throw(new Unavailable("no such audio-system name: " + audiosystem.get()));
-			    instance = f.open();
+				throw(new Unavailable("no such audio-system name: " + fnm));
+			    instance = (p < 0) ? f.open() : f.open(spec.substring(p + 1));
 			} else {
 			    List<Factory> types = new ArrayList<>(found().values());
 			    Collections.sort(types, Comparator.comparing(Factory::priority).reversed());

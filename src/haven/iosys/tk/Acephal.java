@@ -117,9 +117,10 @@ public interface Acephal {
 			} else if(deftype.get() != null) {
 			    String spec = deftype.get();
 			    int p = spec.indexOf(':');
-			    Factory f = types().get((p < 0) ? spec : spec.substring(0, p));
+			    String fnm = (p < 0) ? spec : spec.substring(0, p);
+			    Factory f = types().get(fnm);
 			    if(f == null)
-				throw(new Unavailable("no such headless name: " + deftype.get()));
+				throw(new Unavailable("no such headless name: " + fnm));
 			    instance = (p < 0) ? f.open() : f.open(spec.substring(p + 1));;
 			} else {
 			    List<Factory> types = new ArrayList<>(found().values());
