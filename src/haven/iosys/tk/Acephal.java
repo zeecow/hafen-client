@@ -115,10 +115,12 @@ public interface Acephal {
 				System.out.printf("name: %-19s priority: %5d\n", ent.getKey(), ent.getValue().priority());
 			    System.exit(0);
 			} else if(deftype.get() != null) {
-			    Factory f = types().get(deftype.get());
+			    String spec = deftype.get();
+			    int p = spec.indexOf(':');
+			    Factory f = types().get((p < 0) ? spec : spec.substring(0, p));
 			    if(f == null)
 				throw(new Unavailable("no such headless name: " + deftype.get()));
-			    instance = f.open();
+			    instance = (p < 0) ? f.open() : f.open(spec.substring(p + 1));;
 			} else {
 			    List<Factory> types = new ArrayList<>(found().values());
 			    Collections.sort(types, Comparator.comparing(Factory::priority).reversed());
