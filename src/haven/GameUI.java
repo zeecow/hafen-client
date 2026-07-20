@@ -660,6 +660,13 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
 		    updsel();
 		    if(pols.isEmpty()) {
 			destroy();
+		    } else {
+			if(w.visible) {
+			    if(pols.size() > 1)
+				((Selector)sel).change(pols.get(0));
+			    else
+				pols.get(0).show(true);
+			}
 		    }
 		}
 	    }
@@ -678,8 +685,12 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
 	    public void cdestroy(Widget w) {
 		if(w == main) {
 		    destroy();
-		    tb.tab = null;
+		    tb.destroy();
 		    repack();
+		    if(tabs.curtab == this) {
+			tabs.showtab(kin.tab);
+			repack();
+		    }
 		}
 	    }
 
