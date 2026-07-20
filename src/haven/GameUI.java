@@ -581,15 +581,17 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
     public static class Zergwnd extends Hidewnd {
 	public final Tabs tabs = new Tabs(Coord.z, Coord.z, this);
 	public final TButton kin;
-	public final Map<String, PTab<Category>> types = new HashMap<>();
+	public final Collection<PTab<Category>> types = new ArrayList<>();
 
 	public static class Category extends Widget {
+	    public final String id;
 	    public final List<Polity> pols = new ArrayList<>();
 	    public final Widget cap;
 	    public Widget sel = null;
 	    private Coord polc = Coord.z;
 
-	    public Category(String name) {
+	    public Category(String id, String name) {
+		this.id = id;
 		cap = add(new Img(CharWnd.catf.render(name).tex()));
 	    }
 
@@ -686,6 +688,7 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
 		if(w == main) {
 		    destroy();
 		    tb.destroy();
+		    Zergwnd.this.types.remove(this);
 		    repack();
 		    if(tabs.curtab == this) {
 			tabs.showtab(kin.tab);
@@ -767,13 +770,19 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
 	}
 
 	private PTab<Category> getptab(String name) {
-	    PTab<Category> ret = types.get(name);
-	    if(ret == null) {
-		TButton tb = add(new TButton(name));
-		ret = ntab(new Category(tb.upimg.getres().flayer(Resource.tooltip).t), tb);
-		types.put(name, ret);
+	    PTab<Category> tab = null;
+	    for(PTab<Category> cur : types) {
+		if(Utils.eq(cur.main.id, name)) {
+		    tab = cur;
+		    break;
+		}
 	    }
-	    return(ret);
+	    if(tab == null) {
+		TButton tb = add(new TButton(name));
+		tab = ntab(new Category(name, tb.upimg.getres().flayer(Resource.tooltip).t), tb);
+		types.add(tab);
+	    }
+	    return(tab);
 	}
 
 	public void addpol(Polity p) {
