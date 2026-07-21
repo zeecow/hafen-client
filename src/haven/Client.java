@@ -26,14 +26,18 @@
 
 package haven;
 
+import java.awt.*;
 import java.util.*;
 import java.io.*;
 import java.nio.file.*;
+
+import haven.iosys.tk.Toolkit;
 import haven.render.*;
 import haven.iosys.*;
 import haven.iosys.tk.*;
 import haven.iosys.audio.*;
 import java.awt.image.BufferedImage;
+import java.util.List;
 
 public class Client implements Console.Directory {
     public static final Config.Variable<Boolean> initfullscreen = Config.Variable.propb("haven.fullscreen", false);
@@ -203,7 +207,10 @@ public class Client implements Console.Directory {
 	    Utils.setprefb("mainwnd/max", true);
 	    break;
 	case NORMAL:
-	    Utils.setprefc("mainwnd/size", wnd.size());
+        //tempfix window size decreasing
+        Dimension frameSize = ((AWTToolkit.AWTWindow)wnd).frame.getSize();
+        Utils.setprefc("mainwnd/size", Coord.of(frameSize.width,frameSize.height));
+	    //Utils.setprefc("mainwnd/size", wnd.size());
 	    Utils.setprefb("mainwnd/max", false);
 	    break;
 	}
