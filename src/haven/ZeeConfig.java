@@ -1746,25 +1746,36 @@ public class ZeeConfig {
         show organize button for duplicate windows
      */
     private static void windowModOrganizeButton(Window window, String windowTitle) {
-        final String singleWindows = "Craft,Inventory,Character Sheet,Options,Kith & Kin,Equipment,Map";
-        if(!singleWindows.contains(windowTitle)) { // avoid searching multiple Windows
-            List<Window> wins = getWindows(windowTitle);
-            wins.removeIf(w -> isMakewindow(w));
-            if (wins.size() <= 1)
+
+        final String singleWindows = "Craft,Inventory,Character Sheet,Options," +
+                "Kith & Kin,Equipment,Map,Stack,Action search";
+        for (String s : singleWindows.split(",")) {
+            if (s.contentEquals(windowTitle))
                 return;
-            Window.DefaultDeco deco = ((Window.DefaultDeco)window.deco);
-            if (deco==null){
-                println("no deco "+windowTitle);
-                return;
-            }
-            int pad = ZeeWindow.ZeeButton.BUTTON_SIZE;
-            deco.add(
-                    new ZeeWindow.ZeeButton(pad,ZeeWindow.ZeeButton.TEXT_ORGANIZEWINDOWS,"organize duplicates"),
-                    deco.cbtn.c.x - pad,
-                    deco.cbtn.c.y
-            );
-            window.hasOrganizeButton = true;
         }
+
+        if (windowTitle.startsWith("NAME_WIN_MAP"))
+            return;
+
+        List<Window> wins = getWindows(windowTitle);
+        wins.removeIf(w -> isMakewindow(w));
+        if (wins.size() <= 1)
+            return;
+
+        Window.DefaultDeco deco = ((Window.DefaultDeco)window.deco);
+        if (deco==null){
+            println("no deco "+windowTitle);
+            return;
+        }
+
+        int pad = ZeeWindow.ZeeButton.BUTTON_SIZE;
+        deco.add(
+                new ZeeWindow.ZeeButton(pad,ZeeWindow.ZeeButton.TEXT_ORGANIZEWINDOWS,"organize duplicates"),
+                deco.cbtn.c.x - pad,
+                deco.cbtn.c.y
+        );
+        window.hasOrganizeButton = true;
+        //ZeeConfig.println("organize btn > "+windowTitle);
     }
 
     private static void windowModAnimalStats(Window window, String windowTitle) {
