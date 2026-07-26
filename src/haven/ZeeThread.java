@@ -678,10 +678,10 @@ public class ZeeThread  extends Thread{
     }
 
 
-    static int invFreeSlots, lastInvFreeSlots;
     public static boolean waitInvFull(Inventory inv) {
         //println("wait inv full");
         int timer = (int) TIMEOUT_MS;
+        int invFreeSlots, lastInvFreeSlots;
         try {
             lastInvFreeSlots = invFreeSlots = inv.getNumberOfFreeSlots();
             while( timer > 0  &&  (invFreeSlots = inv.getNumberOfFreeSlots()) > 0 ) {
@@ -701,22 +701,15 @@ public class ZeeThread  extends Thread{
     }
     public static boolean waitInvFull(Inventory inv, int freeSlots) {
         //println("wait inv full");
-        int timer = (int) TIMEOUT_MS;
         try {
-            lastInvFreeSlots = invFreeSlots = inv.getNumberOfFreeSlots();
-            while( timer > 0  &&  (invFreeSlots = inv.getNumberOfFreeSlots()) > freeSlots ) {
-                if(lastInvFreeSlots != invFreeSlots) {
-                    // reset timer if free slots changed
-                    timer = (int) TIMEOUT_MS;
-                    lastInvFreeSlots = invFreeSlots;
-                }else {
-                    timer -= SLEEP_MS;
-                }
-                Thread.sleep(SLEEP_MS);
+            prepareCancelClick();
+            while( !isCancelClick()  &&  inv.getNumberOfFreeSlots() > freeSlots ) {
+                Thread.sleep(333);
             }
-        } catch (InterruptedException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
+        //println("     "+inv.getNumberOfFreeSlots()+" <= "+freeSlots);
         return inv.getNumberOfFreeSlots() <= freeSlots;
     }
 
@@ -730,6 +723,7 @@ public class ZeeThread  extends Thread{
 
     public static boolean waitInvFreeSlotsIdleSec(Inventory inv, int idleSec) {
         long timerMs = idleSec*1000;
+        int invFreeSlots, lastInvFreeSlots;
         //println("waitInvFreeSlotsIdleSec "+timerMs+"ms");
         try {
             lastInvFreeSlots = inv.getNumberOfFreeSlots();
@@ -777,6 +771,7 @@ public class ZeeThread  extends Thread{
         if(ZeeConfig.isPlayerHoldingItem())
             return true;
         int timer = timeOutMs;
+        int invFreeSlots, lastInvFreeSlots;
         try {
             lastInvFreeSlots = invFreeSlots = inv.getNumberOfFreeSlots();
             while( timer > 0 && !ZeeConfig.isPlayerHoldingItem()  &&  (invFreeSlots = inv.getNumberOfFreeSlots()) > 0 ) {
@@ -829,18 +824,17 @@ public class ZeeThread  extends Thread{
         return (fm == null);
     }
 
-    public static boolean waitMapClick(){
-        boolean ret;
+    public static Coord2d waitGroundClick(){
         long lastClick = now();
         while ( ZeeConfig.lastMapViewClickMs < lastClick ) {
             try {
                 sleep(500);
             } catch (Exception e) {
                 e.printStackTrace();
-                return false;
+                return null;
             }
         }
-        return true;
+        return ZeeConfig.lastMapViewClickMc;
     }
 
     //  parameters combination may vary depending on player task

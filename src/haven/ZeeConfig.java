@@ -1221,8 +1221,25 @@ public class ZeeConfig {
         }
         // "Land survey" turn grid on
         else if (windowTitle.contentEquals("Land survey")) {
+            //gridlines
             if (ZeeConfig.autoToggleGridLines)
                 ZeeConfig.gameUI.map.showgrid(true);
+            //btn drop soil at
+            window.add(new ZeeWindow.ZeeButton("Drop soil at"){
+                public void wdgmsg(String msg, Object... args) {
+                    if (msg.equals("activate")) {
+                        ZeeManagerMiner.landSurvDropSoilAt();
+                    }
+                }
+            },160,50);
+            window.add(new CheckBox("worms"){
+                { a = ZeeManagerMiner.landSurvDropWorm;  }
+                public void set(boolean val) { ZeeManagerMiner.landSurvDropWorm = a = val;}
+            }, 163, 80);
+            window.add(new CheckBox("tubers"){
+                { a = ZeeManagerMiner.landSurvDropOddtuber;  }
+                public void set(boolean val) { ZeeManagerMiner.landSurvDropOddtuber = a = val;}
+            }, 220, 80);
         }
         // Milestone labels
         else if (!ZeeManagerGobs.isLabelingAllRoadsigns && windowTitle.contentEquals("Milestone") && ZeeConfig.getButtonNamed(window,"Follow") != null) {

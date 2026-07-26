@@ -504,7 +504,14 @@ public class Inventory extends Widget implements DTarget {
 			ZeeConfig.println("Inventory > dropItemsByName > no item found with name = "+nameEndsWith);
 			return;
 		}
+        // priorize dropping stacks over single items
 		WItem item = items.get(0);
+        for (WItem w1 : items) {
+            if(w1.item.isStackByContent()){
+                item = w1;
+                break;
+            }
+        }
 		Coord itemCoord = ZeeManagerItems.getWItemCoord(item);
 		// haven.GItem@65523a95 ; drop ; [(28, 28), -1]
 		item.item.wdgmsg("drop",itemCoord,-1);

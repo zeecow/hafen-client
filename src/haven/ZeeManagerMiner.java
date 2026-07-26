@@ -1122,6 +1122,82 @@ public class ZeeManagerMiner extends ZeeThread{
         }.start();
     }
 
+
+    static boolean landSurvDropWorm = true;
+    static boolean landSurvDropOddtuber = false;
+    public static void landSurvDropSoilAt() {
+        new ZeeThread(){
+            public void run() {
+                try {
+                    Gob flag = ZeeConfig.getClosestGobByNameEnds("/survobj");
+                    if (flag != null) {
+                        ZeeConfig.addPlayerText("click drop location");
+                        Coord2d locTarget = waitGroundClick();
+                        if (locTarget != null) {
+                            do {
+                                ZeeConfig.addPlayerText("digsoil");
+
+                                // wait reaching drop location
+                                prepareCancelClick();
+                                ZeeManagerMiner.waitPlayerIdleLinMove();
+                                if (isCancelClick())
+                                    break;
+                                if (ZeeConfig.getPlayerGob().rc.dist(locTarget) > TILE_SIZE){
+                                    ZeeConfig.msgLow("couldnt reach location "+locTarget);
+                                    ZeeConfig.println("couldnt reach location "+locTarget);
+                                    break;
+                                }
+
+                                //drop stuff
+                                Inventory inv = ZeeConfig.getMainInventory();
+                                if (inv.countItemsByNameEndsWith("/soil") > 0) {
+                                    inv.dropItemsByNameEndsWith("/soil");
+                                    sleep(50);
+                                }
+                                if (landSurvDropWorm && inv.countItemsByNameEndsWith("/earthworm") > 0) {
+                                    inv.dropItemsByNameEndsWith("/earthworm");
+                                    sleep(50);
+                                }
+                                if (landSurvDropOddtuber && inv.countItemsByNameEndsWith("/oddtuber") > 0) {
+                                    inv.dropItemsByNameEndsWith("/oddtuber");
+                                    sleep(50);
+                                }
+
+                                // rclick flag and wait window
+                                ZeeManagerGobs.gobClick(flag,3);
+                                if(!waitWindowOpened("Land survey")){
+                                    ZeeConfig.msgLow("cant find survey window ?");
+                                    break;
+                                }
+                                if (isCancelClick())
+                                    break;
+
+                                //click dig button
+                                Button digButton = ZeeConfig.getButtonNamed(ZeeConfig.getWindow("Land survey"),"Dig");
+                                digButton.click();
+
+                                //wait inventory almost full
+                                waitInvFull(inv,10);
+                                if (isCancelClick())
+                                    break;
+
+                                // click drop location
+                                ZeeConfig.clickCoord(locTarget.floor(OCache.posres),1);
+                                //prepareCancelClick();
+
+                            } while (!isCancelClick());
+                        }
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                ZeeConfig.removePlayerText();
+            }
+        }.start();
+    }
+
+
+
     public static void println(String s) {
         System.out.println(s);
     }
