@@ -429,8 +429,7 @@ public class ZeeManagerItems extends ZeeThread{
                 }
             }
             //activate farming area cursor
-            else if(isItemWindowName("Inventory") && isItemPlantable())
-            {
+            else if(isItemWindowName("Inventory") && isItemPlantable()) {
                 itemActCoord(wItem,UI.MOD_SHIFT);
                 return;
             }
@@ -444,15 +443,10 @@ public class ZeeManagerItems extends ZeeThread{
             }
             else if (!isItemHandEquipable()) {
                 // cancel manager and do nothing
+                println("isItemHandEquipable()  false");
                 return;
             }
 
-
-            //check for windows belt/equips ?
-//            if(ZeeConfig.getWindow("Belt")==null){
-//                ZeeConfig.gameUI.error("no belt window");
-//                return;
-//            }
             if(ZeeConfig.getWindow("Equipment")==null){
                 ZeeConfig.gameUI.error("no equips window");
                 return;
@@ -1536,24 +1530,25 @@ public class ZeeManagerItems extends ZeeThread{
     }
 
     public boolean isItemHandEquipable() {
-        String[] items = {
-            // weapons tools
-            "b12axe","boarspear","cutblade","fyrdsword","hirdsword","bronzesword","sling",
-            "sledgehammer","huntersbow","rangersbow","roundshield",
-            "axe-m","woodsmansaxe","stoneaxe","butcherscleaver","tinkersthrowingaxe",
-            // tools equips
-            "bonesaw","saw-m","scythe","pickaxe","shovel","smithshammer","shears",
+
+        String[] equipableTools = {
+            "bonesaw","saw-m","scythe","shovel","smithshammer","shears",
             "travellerssack","bindle","bushpole","primrod","glassrod","dowsingrod",
             "fryingpan","lantern","torch","mortarandpestle","bucket","volvawand",
-            "diversweight",
-            // instruments
-            "flute","harmonica","bagpipe","drum"
+            "diversweight","roundshield"
         };
-        for (int i = 0; i < items.length; i++) {
-            if (itemName.contains(items[i])){
+        for (int i = 0; i < equipableTools.length; i++) {
+            if (itemName.contains(equipableTools[i])){
                 return true;
             }
         }
+
+        if (isWeapon(wItem))
+            return true;
+
+        if (isMusicalInstrument(itemName))
+            return true;
+
         return false;
     }
 
@@ -1565,7 +1560,7 @@ public class ZeeManagerItems extends ZeeThread{
     }
     public static boolean isTwoHandedItem(String name) {
         String basename = name.replaceAll("[^/]+/","");
-        String[] items = {"scythe","pickaxe","shovel","b12axe",
+        String[] items = {"scythe","pickaxe","shovel","b12axe","narwhaltusk","giantneedle",
                 "boarspear","cutblade","sledgehammer", "mortarandpestle",
                 "huntersbow","rangersbow","dowsingrod", "glassrod", "diversweight"};
         for (int i = 0; i < items.length; i++) {
@@ -1573,6 +1568,41 @@ public class ZeeManagerItems extends ZeeThread{
                 return true;
             }
         }
+        if (isMusicalInstrument(name))
+            return true;
+        return false;
+    }
+
+    static boolean isMusicalInstrument(String resName) {
+        //TODO check names
+        List<String> instruments = List.of("bagpipe","cuckoo","drum",
+                "fiddle","/flute","/harmonica","/lute","wildgoatlur");
+        for (String i : instruments) {
+            if (resName.contains(i))
+                return true;
+        }
+        return false;
+    }
+
+    static boolean isWeapon(WItem w1) {
+        if (w1==null || w1.item==null)
+            return false;
+        List<String> classes = w1.item.getItemInfoClasses();
+        for (String c : classes) {
+            if (c.contentEquals("Damage") && !w1.item.getres().name.contains("arrow"))
+                return true;
+        }
+        /*List<String> weapons = List.of("b12axe","boarspear","cutblade",
+            "fyrdsword","hirdsword","bronzesword","sling",
+            "sledgehammer","huntersbow","rangersbow","roundshield",
+            "axe-m","woodsmansaxe","stoneaxe","butcherscleaver","tinkersthrowingaxe",
+            "narwhaltusk","giantneedle","knife","dagger","pickaxe",
+            "claw" //TODO verify
+        );
+        for (String i : weapons) {
+            if (resName.contains(i))
+                return true;
+        }*/
         return false;
     }
 

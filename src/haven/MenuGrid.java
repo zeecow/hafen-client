@@ -722,15 +722,20 @@ public class MenuGrid extends Widget implements KeyBinding.Bindable {
 			// confirm shooting axe, spear
 			if (ZeeConfig.confirmThrowingAxeOrSpear) {
 				if (strArgs.startsWith("[shoot")) {
+                    String weapons[] = {
+                        "tinkersthrowingaxe","boarspear",
+                        "narwhaltusk", "giantneedle"
+                    };
 					//check belt before item is equipped
-					if (ZeeManagerItems.getInvBelt()!=null && ZeeManagerItems.getInvBelt().getItemsByNameEnd("tinkersthrowingaxe", "spear").size() > 0){
+					if (ZeeManagerItems.getInvBelt()!=null &&
+                            !ZeeManagerItems.getInvBelt().getItemsByNameEnd(weapons).isEmpty()){
 						if (!ui.modctrl) {
 							ZeeConfig.msgError("Ctrl shoot to confirm throw, or disable option");
 							return;
 						}
 					}
 					//check hands items
-					if (ZeeManagerItems.isItemEquipped("tinkersthrowingaxe", "spear")) {
+					if (ZeeManagerItems.isItemEquipped(weapons)) {
 						if (!ui.modctrl) {
 							ZeeConfig.msgError("Ctrl shoot to confirm throw, or disable option");
 							return;

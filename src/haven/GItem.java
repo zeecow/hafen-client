@@ -588,25 +588,10 @@ public class GItem extends AWidget implements ItemInfo.SpriteOwner, GSprite.Owne
 	int getInfoAmount() {
 		return ZeeManagerItems.getItemInfoAmount(this.info());
 	}
-	ItemInfo getInfoByClass(Class lass) {
-		return ZeeManagerItems.getItemInfoByClass(this.info(), lass);
-	}
-	ItemInfo getItemInfoByClassSimpleName(String classSimpleName) {
-		return ZeeManagerItems.getItemInfoByClassSimpleName(this.info(), classSimpleName);
-	}
-	java.util.List<String> getItemInfoClasses(String classSimpleName) {
+	java.util.List<String> getItemInfoClasses() {
 		return ZeeManagerItems.getItemInfoClasses(this.info());
-	}
-	ItemInfo getItemInfoContents(String classSimpleName) {
-		return ZeeManagerItems.getItemInfoContents(this.info());
 	}
 	boolean isStackByContent() {
 		return ZeeManagerItems.isStackByContent(this);
-	}
-	boolean isStackByAmount() {
-		return ZeeManagerItems.isStackByAmount(this);
-	}
-	boolean isStackByKeyPagina() {
-		return ZeeManagerItems.isStackByKeyPagina(this);
 	}
 }
