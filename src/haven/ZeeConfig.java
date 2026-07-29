@@ -1762,26 +1762,38 @@ public class ZeeConfig {
     /*
         show organize button for duplicate windows
      */
-    private static void windowModOrganizeButton(Window window, String windowTitle) {
+    private static void windowModOrganizeButton(Window window, String winCapModified) {
+
+        String winCapOriginal = window.cap;
 
         final String singleWindows = "Craft,Inventory,Character Sheet,Options," +
-                "Kith & Kin,Equipment,Map,Stack,Action search";
+                "Kith & Kin,Equipment,Map,Stack,Action search,Belt";
         for (String s : singleWindows.split(",")) {
-            if (s.contentEquals(windowTitle))
+            if (s.contentEquals(winCapOriginal))
                 return;
         }
 
-        if (windowTitle.startsWith("NAME_WIN_MAP"))
+        // ignore ZeeWindows
+        if(window instanceof ZeeWindow) {
+            //ZeeConfig.println("organize btn > ignore ZeeWindow "+winCapOriginal);
+            return;
+        }
+
+        // ignore map
+        if (winCapModified.startsWith("NAME_WIN_MAP"))
             return;
 
-        List<Window> wins = getWindows(windowTitle);
+        // ignore non duplicates
+        List<Window> wins = getWindows(winCapOriginal);
         wins.removeIf(w -> isMakewindow(w));
-        if (wins.size() <= 1)
+        if (wins.size() <= 1) {
+            //ZeeConfig.println("organize btn > no enough windows for "+winCapOriginal);
             return;
+        }
 
         Window.DefaultDeco deco = ((Window.DefaultDeco)window.deco);
         if (deco==null){
-            println("no deco "+windowTitle);
+            //println("no deco "+winCapOriginal);
             return;
         }
 
@@ -1792,7 +1804,7 @@ public class ZeeConfig {
                 deco.cbtn.c.y
         );
         window.hasOrganizeButton = true;
-        //ZeeConfig.println("organize btn > "+windowTitle);
+        //ZeeConfig.println("organize btn added > "+winCapOriginal);
     }
 
     private static void windowModAnimalStats(Window window, String windowTitle) {
