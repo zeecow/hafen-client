@@ -2654,6 +2654,9 @@ public class MapView extends PView implements DTarget, Console.Directory {
 							if (gob.tags.contains(Gob.Tag.CROP)){
 								sb.append("\ncrop stage: "+ZeeConfig.getPlantStage(gob)+" / "+ZeeManagerFarmer.getCropMaxStage(gob));
 							}
+                            if (gob.tags.contains(Gob.Tag.TREE)){
+                                sb.append("\ntree growth: "+gob.treeGrowth);
+                            }
 							ttip = sb.toString();
 						}
 					} else {

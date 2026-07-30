@@ -83,7 +83,7 @@ public class ZeeHitbox extends ZeeSlottedNode implements Rendered {
         String resName = gob.getres().name;
         boolean isTree = gob.tags.contains(Gob.Tag.TREE);
         synchronized (MODEL_CACHE) {
-            if (!gob.tags.contains(Gob.Tag.TREE) || gob.treeGrowth != 1f)
+            if (!gob.tags.contains(Gob.Tag.TREE) || gob.treeGrowth == 1f)
                 model = MODEL_CACHE.get(resName);
             if(model == null) {
                 List<List<Coord3f>> polygons = new LinkedList<>();
@@ -122,6 +122,7 @@ public class ZeeHitbox extends ZeeSlottedNode implements Rendered {
                         TreeScale treeScale = gob.getattr(TreeScale.class);
                         if (treeScale!=null)
                             treefscale = treeScale.scale;
+                        //ZeeConfig.println(resName+" "+treefscale);
                         addTriangles(vertices, polygons.get(0), treefscale);
                     } else {
                         for (List<Coord3f> polygon : polygons) {
@@ -138,7 +139,7 @@ public class ZeeHitbox extends ZeeSlottedNode implements Rendered {
                     else
                         model = new Model(Model.Mode.LINES, va, null);
 
-                    if (!gob.tags.contains(Gob.Tag.TREE) || gob.treeGrowth != 1f){
+                    if (!gob.tags.contains(Gob.Tag.TREE) || gob.treeGrowth == 1f){
                         MODEL_CACHE.put(resName, model);
                         //ZeeConfig.println("modelcache "+MODEL_CACHE.size()+" "+resName);
                     }
