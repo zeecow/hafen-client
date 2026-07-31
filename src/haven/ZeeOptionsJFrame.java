@@ -23,7 +23,7 @@ public class ZeeOptionsJFrame extends JFrame {
     public JTextField tfAutoHideWindows, tfAutoHideWindowDelayMs, tfConfirmPetal, tfBlockAudioMsgs, tfAutoClickMenu, tfAggroRadiusTiles, tfButchermode, tfGobName, tfGobSpeech, tfAudioPath, tfCategName, tfAudioPathCateg, tfGobMaxRequeues;
     public JComboBox<String> cmbCattleRoster, cmbGobCategory, cmbMiniTreeSize, cmbRainLimitPerc, comboShapeIcons;
     public JList<String> listGobsTemp, listGobsSaved, listGobsCategories;
-    public JButton btnRefresh, btnPrintState, btnResetGobs, btnAudioSave, btnAudioClear, btnAudioTest, btnRemGobFromCateg, btnGobColorAdd, btnCategoryColorAdd, btnGobColorRemove, btnCategoryColorRemove, btnResetCateg, btnAddCateg, btnRemoveCateg, btnResetWindowsPos, btnResetActionUses, btnSapeIconPreview, btnShapeIconSave, btnShapeIconDelete, btnSolidColorWindow, btnGridColor, btnHitboxColor, btnSelMidiFolder;
+    public JButton btnRefresh, btnPrintState, btnResetGobs, btnAudioSave, btnAudioClear, btnAudioTest, btnRemGobFromCateg, btnGobColorAdd, btnCategoryColorAdd, btnGobColorRemove, btnCategoryColorRemove, btnResetCateg, btnAddCateg, btnRemoveCateg, btnResetWindowsPos, btnResetActionUses, btnSapeIconPreview, btnShapeIconSave, btnShapeIconDelete, btnSolidColorWindow, btnGridColor, btnHitboxColor, btnHitboxColorTrees, btnSelMidiFolder;
     public JTextArea txtAreaDebug;
     public static int TABGOB_SESSION = 0;
     public static int TABGOB_SAVED = 1;
@@ -470,7 +470,7 @@ public class ZeeOptionsJFrame extends JFrame {
 
     private void buildTabInterface() {
 
-        JPanel pan;
+        JPanel panelTemp;
 
         panelTabInterface = new JPanel(new GridBagLayout());
         tabbedPane.addTab("UI", panelTabInterface);
@@ -497,9 +497,9 @@ public class ZeeOptionsJFrame extends JFrame {
         });
 
         // simple window color
-        pan = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        panelTabInterface.add(pan,c);
-        pan.add(btnSolidColorWindow = new JButton("color"));
+        panelTemp = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        panelTabInterface.add(panelTemp,c);
+        panelTemp.add(btnSolidColorWindow = new JButton("color"));
         Color colBtn = ZeeConfig.intToColor(ZeeConfig.simpleWindowColorInt);
         btnSolidColorWindow.setEnabled(ZeeConfig.gameUI!=null);
         btnSolidColorWindow.setBackground(colBtn);
@@ -514,7 +514,7 @@ public class ZeeOptionsJFrame extends JFrame {
             Utils.setprefi("simpleWindowColorInt",ZeeConfig.simpleWindowColorInt);
             ZeeConfig.simpleWindowsUpdateAll();
         });
-        pan.add(cbSimpleWindowBorder = new JCheckBox("auto-color border"));
+        panelTemp.add(cbSimpleWindowBorder = new JCheckBox("auto-color border"));
         cbSimpleWindowBorder.setEnabled(ZeeConfig.gameUI!=null);
         cbSimpleWindowBorder.setSelected(ZeeConfig.simpleWindowBorder);
         cbSimpleWindowBorder.addActionListener(actionEvent -> {
@@ -567,9 +567,9 @@ public class ZeeOptionsJFrame extends JFrame {
         panelTabInterface.add(new ZeeOptionJCheckBox( "Auto-toggle grid lines", "autoToggleGridLines"),c);
 
         // grid lines color
-        pan = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        panelTabInterface.add(pan,c);
-        pan.add(btnGridColor = new JButton("grid color"));
+        panelTemp = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        panelTabInterface.add(panelTemp,c);
+        panelTemp.add(btnGridColor = new JButton("grid color"));
         colBtn = ZeeConfig.intToColor(ZeeConfig.gridColorInt);
         btnGridColor.setBackground(colBtn);
         btnGridColor.setForeground(ZeeConfig.getComplementaryColor(colBtn));
@@ -584,8 +584,27 @@ public class ZeeOptionsJFrame extends JFrame {
             ZeeConfig.newGridColor(color);
         });
 
-        // hitbox color
-        pan.add(btnHitboxColor= new JButton("hitbox color"));
+        // hitbox colors
+        panelTabInterface.add(new JLabel("Hitbox colors:"),c);
+        //trees
+        panelTemp = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        panelTabInterface.add(panelTemp,c);
+        panelTemp.add(btnHitboxColorTrees= new JButton("trees"));
+        colBtn = ZeeHitbox.hitBoxColorTrees;
+        btnHitboxColorTrees.setBackground(colBtn);
+        btnHitboxColorTrees.setForeground(ZeeConfig.getComplementaryColor(colBtn));
+        btnHitboxColorTrees.addActionListener(evt->{
+            Color color = JColorChooser.showDialog(panelTabMisc, "Pick Color", ZeeHitbox.hitBoxColorTrees, true);
+            if (color==null)
+                color = ZeeHitbox.DEF_HITBOX_COLOR_TREES;
+            btnHitboxColorTrees.setBackground(color);
+            btnHitboxColorTrees.setForeground(ZeeConfig.getComplementaryColor(color));
+            ZeeHitbox.hitBoxColorTrees = color;
+            Utils.setprefi("hitBoxColorTrees",ZeeConfig.colorToInt(ZeeHitbox.hitBoxColorTrees));
+            ZeeHitbox.updateHitboxColor(true);
+        });
+        //non-tree
+        panelTemp.add(btnHitboxColor= new JButton("non-trees"));
         colBtn = ZeeHitbox.hitBoxColor;
         btnHitboxColor.setBackground(colBtn);
         btnHitboxColor.setForeground(ZeeConfig.getComplementaryColor(colBtn));
@@ -597,7 +616,7 @@ public class ZeeOptionsJFrame extends JFrame {
             btnHitboxColor.setForeground(ZeeConfig.getComplementaryColor(color));
             ZeeHitbox.hitBoxColor = color;
             Utils.setprefi("hitBoxColor",ZeeConfig.colorToInt(ZeeHitbox.hitBoxColor));
-            ZeeHitbox.updateHitboxColor();
+            ZeeHitbox.updateHitboxColor(false);
         });
 
         //auto hide windows list

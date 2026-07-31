@@ -15,16 +15,22 @@ public class ZeeHitbox extends ZeeSlottedNode implements Rendered {
     private final Gob gob;
     private static final Map<String, Model> MODEL_CACHE = new HashMap<>();
     private static final float Z = 0.1f;
-    static Color DEF_HITBOX_COLOR = new Color(0, 153, 153, 255);
+    static Color DEF_HITBOX_COLOR = Color.magenta;
     static Color hitBoxColor = ZeeConfig.intToColor(Utils.getprefi("hitBoxColor",ZeeConfig.colorToInt(DEF_HITBOX_COLOR)));
+    static Color DEF_HITBOX_COLOR_TREES = new Color(0, 153, 153, 255);
+    static Color hitBoxColorTrees = ZeeConfig.intToColor(Utils.getprefi("hitBoxColorTrees",ZeeConfig.colorToInt(DEF_HITBOX_COLOR_TREES)));
     private static final Pipe.Op TOP = Pipe.Op.compose(Rendered.last, States.Depthtest.none, States.maskdepth);
     private static Pipe.Op SOLID = Pipe.Op.compose(new BaseColor(hitBoxColor));
     private static final Pipe.Op SOLID_VISIBLE = Pipe.Op.compose(SOLID, TOP);
+    private static Pipe.Op SOLID_TREE = Pipe.Op.compose(new BaseColor(hitBoxColorTrees));
+    private static final Pipe.Op SOLID_VISIBLE_TREE = Pipe.Op.compose(SOLID_TREE, TOP);
     private Pipe.Op state = SOLID;
+    private boolean isTree = false;
 
     private ZeeHitbox(Gob gob) {
         model = getModel(gob);
         this.gob = gob;
+        isTree = gob.tags.contains(Gob.Tag.TREE);
         updateState();
     }
 
@@ -52,7 +58,11 @@ public class ZeeHitbox extends ZeeSlottedNode implements Rendered {
 
     public void updateState() {
         if(model != null && slots != null) {
-            Pipe.Op newState = forceHitboxVisibility() ? SOLID_VISIBLE : SOLID;
+            Pipe.Op newState;
+            if(forceHitboxVisibility())
+                newState = isTree ? SOLID_VISIBLE_TREE : SOLID_VISIBLE;
+            else
+                newState = isTree ? SOLID_TREE : SOLID;
             try {
                 Model m = getModel(gob);
                 if(m != null && m != model) {
@@ -211,10 +221,13 @@ public class ZeeHitbox extends ZeeSlottedNode implements Rendered {
         return res;
     }
 
-    public static void updateHitboxColor() {
-        SOLID = Pipe.Op.compose(new BaseColor(hitBoxColor));
+    public static void updateHitboxColor(boolean isTreeUpd) {
+        //change color for trees or non-trees
+        SOLID = Pipe.Op.compose(new BaseColor(isTreeUpd ? hitBoxColorTrees : hitBoxColor));
         if (ZeeConfig.hideGobs || ZeeConfig.showHitbox){
             List<Gob> gobs = ZeeConfig.getAllGobs();
+            //remove trees or non-trees from list to be updated
+            gobs.removeIf(gob1 -> (isTreeUpd != gob1.tags.contains(Gob.Tag.TREE)));
             for (Gob gob : gobs) {
                 if (gob.hitbox!=null)
                     gob.hitbox.fx.updateState();
