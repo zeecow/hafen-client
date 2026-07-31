@@ -4463,13 +4463,7 @@ public class ZeeConfig {
         if (!showInspectTooltip) {
             //disable tooltips
             gameUI.map.ttip = null;
-        }else{
-            // label gob build preview
-            Gob gobBuildPreview = ZeeManagerStockpile.lastPlob;
-            if (gobBuildPreview!=null && gobBuildPreview.getres()!=null)
-                addGobText(gobBuildPreview,gobBuildPreview.getres().name);
         }
-
 
         // fishing window
         if(curs.contentEquals(CURSOR_FISH) && ZeeManagerItems.isItemEquipped("/primrod","/bushpole")){

@@ -145,7 +145,6 @@ public class ZeeManagerGobs extends ZeeThread{
         else if(!ZeeConfig.isPlayerLiftingGob(gob) && (ZeeConfig.isPlayerLiftingGobNamecontains(gobName)!=null  || ZeeConfig.isPlayerLiftingGobNamecontains("gfx/terobjs/bumlings/")!=null))
         {
             Gob liftedGob = ZeeConfig.isPlayerLiftingGobNamecontains(gobName);
-            Gob groundGob = gob;
             String groundGobName = gobName;
             // check if lifting any boulder
             if (liftedGob==null){
