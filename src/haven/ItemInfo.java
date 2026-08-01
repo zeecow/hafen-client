@@ -168,7 +168,7 @@ public abstract class ItemInfo {
 	public AdHoc(Owner owner, String str) {
 	    super(owner);
 	    this.str = Text.render(str);
-        ZeeManagerItems.labelTreepot(this,owner,str);
+        ZeeManagerItems.labelTreepot(this,owner,str,null);
 	}
 
 	public BufferedImage tipimg() {

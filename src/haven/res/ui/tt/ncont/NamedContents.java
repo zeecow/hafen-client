@@ -16,7 +16,7 @@ public class NamedContents extends ItemInfo.Tip {
 	super(owner);
 	ch = Text.render(name + ":");
 	this.sub = sub;
-    ZeeManagerItems.labelTreepot(this,owner,name);
+    ZeeManagerItems.labelTreepot(this,owner,name,sub);
     }
 
     public static ItemInfo mkinfo(Owner owner, Object... args) {

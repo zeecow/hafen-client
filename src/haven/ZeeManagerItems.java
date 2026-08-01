@@ -2,6 +2,7 @@ package haven;
 
 import haven.res.ui.stackinv.ItemStack;
 import haven.res.ui.tt.ncont.NamedContents;
+import haven.res.ui.tt.q.quality.Quality;
 
 import java.awt.image.BufferedImage;
 import java.util.*;
@@ -2391,13 +2392,17 @@ public class ZeeManagerItems extends ZeeThread{
     }
 
 
-    public static void labelTreepot(ItemInfo.Tip tip, ItemInfo.Owner owner, String str) {
+    public static void labelTreepot(ItemInfo.Tip tip, ItemInfo.Owner owner, String str, List<ItemInfo> subInfo) {
         // sprouted
         if (tip instanceof NamedContents) {
             if (owner instanceof GItem) {
                 GItem gItem = (GItem) owner;
                 if (gItem.getres().name.endsWith("/treepot-t")) {
-                    String name = str.trim().replaceAll("Sprouted\\s+", "");
+                    String name = str.trim().replaceAll("Sprouted\\s+", "")
+                            .replaceAll("\\s+tree", "");
+                    int treeQl = ZeeManagerItems.getItemInfoQuality(subInfo).intValue();
+                    if (treeQl > -1)
+                        name += " " + treeQl;
                     if (gItem.parent instanceof Inventory) {
                         WItem w = ((Inventory) gItem.parent).getWItemByGItem(gItem);
                         w.treepotPlant = name;
