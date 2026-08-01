@@ -1,6 +1,7 @@
 package haven;
 
 import haven.res.ui.stackinv.ItemStack;
+import haven.res.ui.tt.ncont.NamedContents;
 
 import java.awt.image.BufferedImage;
 import java.util.*;
@@ -2387,6 +2388,37 @@ public class ZeeManagerItems extends ZeeThread{
             return "0 secs ago";
         else
             return res.toString();
+    }
+
+
+    public static void labelTreepot(ItemInfo.Tip tip, ItemInfo.Owner owner, String str) {
+        // sprouted
+        if (tip instanceof NamedContents) {
+            if (owner instanceof GItem) {
+                GItem gItem = (GItem) owner;
+                if (gItem.getres().name.endsWith("/treepot-t")) {
+                    String name = str.trim().replaceAll("Sprouted\\s+", "");
+                    if (gItem.parent instanceof Inventory) {
+                        WItem w = ((Inventory) gItem.parent).getWItemByGItem(gItem);
+                        w.treepotPlant = name;
+                    }
+                }
+            }
+        }
+        // planted
+        else if (tip instanceof ItemInfo.AdHoc){
+            if (owner instanceof GItem && str.startsWith("Planted")){//"Planted Apple tree"
+                GItem gItem = (GItem) owner;
+                if(gItem.getres().name.endsWith("/treepot-s")) {
+                    String name = str.trim().replaceAll("Planted\\s+", "")
+                            .replaceAll("\\s+tree", "");
+                    if (gItem.parent instanceof Inventory){
+                        WItem w = ((Inventory)gItem.parent).getWItemByGItem(gItem);
+                        w.treepotPlant = name;
+                    }
+                }
+            }
+        }
     }
 
 }

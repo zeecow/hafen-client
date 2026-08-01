@@ -28,6 +28,7 @@ package haven;
 
 import haven.ItemInfo.AttrCache;
 import haven.render.Pipe;
+import haven.res.ui.tt.ncont.NamedContents;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -41,6 +42,7 @@ public class WItem extends Widget implements DTarget {
     public final GItem item;
     private Resource cspr = null;
     private Message csdt = Message.nil;
+    public String treepotPlant = "";
 
     public WItem(GItem item) {
 	super(sqsz);
@@ -194,17 +196,22 @@ public class WItem extends Widget implements DTarget {
 		    ol.draw(g);
 	    }
 	    Double meter = (item.meter > 0) ? Double.valueOf(item.meter / 100.0) : itemmeter.get();
-	    if((meter != null) && (meter > 0)) {
-		g.chcolor(255, 255, 255, 64);
-		Coord half = sz.div(2);
-		g.prect(half, half.inv(), half, meter * Math.PI * 2);
-		g.chcolor();
-		// witem percentage
-		g.image(
-			GItem.NumberInfo.font.render((int) (meter * 100) +"%",Color.lightGray).tex(),
-			Coord.of(-1,half.y+6)
-		);
+        if((meter != null) && (meter > 0)) {
+            g.chcolor(255, 255, 255, 64);
+            Coord half = sz.div(2);
+            g.prect(half, half.inv(), half, meter * Math.PI * 2);
+            g.chcolor();
+            // witem percentage
+            g.image(
+                GItem.NumberInfo.font.render((int) (meter * 100) +"%",Color.blue).tex(),
+                Coord.z
+            );
 	    }
+        //treepot plant name
+        if(!treepotPlant.isBlank()){
+            g.image(GItem.NumberInfo.font.render(treepotPlant).tex(),
+                    Coord.of(0,sz.y - GItem.NumberInfo.font.height()));
+        }
 	} else {
 	    g.image(missing.layer(Resource.imgc).tex(), Coord.z, sz);
 	}
