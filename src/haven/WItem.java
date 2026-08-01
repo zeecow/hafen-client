@@ -201,11 +201,6 @@ public class WItem extends Widget implements DTarget {
             Coord half = sz.div(2);
             g.prect(half, half.inv(), half, meter * Math.PI * 2);
             g.chcolor();
-            // witem percentage
-            g.image(
-                GItem.NumberInfo.font.render((int) (meter * 100) +"%",Color.blue).tex(),
-                Coord.z
-            );
 	    }
         //treepot plant name
         if(!treepotPlant.isBlank()){
