@@ -3525,7 +3525,7 @@ public class ZeeManagerGobs extends ZeeThread{
         if (ZeeConfig.isPlayerLiftingPose() || ZeeConfig.isCombatActive())
             return;
         if (isPickingupLifepile){
-            println("pickupLeafpile > already picking");
+            //println("pickupLeafpile > already picking");
             return;
         }
         isPickingupLifepile = true;

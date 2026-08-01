@@ -12,6 +12,7 @@ public class ZeeWindow extends Window {
     public static final String NAME_WIN_MAP_COMPACT_SCALE3 = "NAME_WIN_MAP_COMPACT_SCALE3";
     public static final String NAME_WIN_MAP_COMPACT_SCALE4 = "NAME_WIN_MAP_COMPACT_SCALE4";
     public static final String NAME_WIN_MAP_EXPANDED = "NAME_WIN_MAP_EXPANDED";
+    boolean isTempWindow = false;
 
     public ZeeWindow(Coord size, String title) {
         super(size, title);
@@ -22,6 +23,7 @@ public class ZeeWindow extends Window {
     public ZeeWindow(Coord size, String title, long autoCloseAfterIdleMsMax99s) {
         super(size, title);
         String originalCap = cap;
+        isTempWindow = true;
         new ZeeThread(){
             public void run() {
                 //println("ZeeWindow auto-close start");

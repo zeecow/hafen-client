@@ -1038,8 +1038,8 @@ public class ZeeConfig {
     static String getWindowNameAdjusted(Window win, String name){
 
         // remove countdown from temp ZeeWindow
-        if (win instanceof ZeeWindow)
-            name = name.replaceAll(" \\d{1,2}s$", "").strip();
+        if (win instanceof ZeeWindow && ((ZeeWindow)win).isTempWindow)
+            name = name.replaceAll("\\s+\\d{1,2}s$", "").strip();
 
         // minimap name based on size, zoom, etc
         else if (win instanceof MapWnd)
@@ -1058,21 +1058,21 @@ public class ZeeConfig {
                 && ZeeConfig.getButtonNamed( win,"Search by ingredient") == null )
             name = "Action search popup";
 
+        //println("win name adjusted > "+name);
         return name;
     }
 
-    public static void windowAdded(Window window, String test) {
+    public static void windowAdded(Window window) {
 
         window.zeeWinAdded = true;
 
-        String windowTitle = window.cap.strip();
+        String winCapOriginal = window.cap.strip();
 
-        if (windowTitle.contentEquals("Stack"))
+        if (winCapOriginal.contentEquals("Stack"))
             return;
 
         // adjusted cap for window position (Makewindow has multiple caps)
-        String originalTitle = windowTitle;
-        windowTitle = getWindowNameAdjusted(window,windowTitle);
+        String winCapAdjusted = getWindowNameAdjusted(window, winCapOriginal);
 
         // notify waitWindowOpen
         ZeeManagerCraft.lastWindowOpened = window;
@@ -1081,7 +1081,7 @@ public class ZeeConfig {
         if (isBuildWindow(window)) {
             // tunnel helper
             if (ZeeManagerMiner.tunneling && ZeeManagerMiner.tunnelHelperStage == ZeeManagerMiner.TUNNELHELPER_STAGE5_BUILDCOL
-                    && (windowTitle.contentEquals("Stone Column") || windowTitle.contains("Stone Arch")) )
+                    && (winCapAdjusted.contentEquals("Stone Column") || winCapAdjusted.contains("Stone Arch")) )
             {
                 ZeeManagerMiner.tunnelHelperBuildColumn(window);
             }
@@ -1126,16 +1126,16 @@ public class ZeeConfig {
 
 
             // cheese tray
-            if (originalTitle.contentEquals("Cheese Tray")) {
+            if (winCapOriginal.contentEquals("Cheese Tray")) {
                 ZeeManagerItems.cheeseTrayMakeWindow(window);
             }
             // cloths
-            else if (List.of("Linen Cloth", "Hemp Cloth").contains(originalTitle)) {
+            else if (List.of("Linen Cloth", "Hemp Cloth").contains(winCapOriginal)) {
                 if (!ZeeManagerCraft.clothRecipeOpen)
                     ZeeManagerCraft.clothRecipeOpened(window);
             }
             // rope
-            else if (originalTitle.contentEquals("Rope")) {
+            else if (winCapOriginal.contentEquals("Rope")) {
                 if (!ZeeManagerCraft.ropeRecipeOpen)
                     ZeeManagerCraft.ropeRecipeOpened(window);
             } else {
@@ -1149,59 +1149,59 @@ public class ZeeConfig {
             makeWindowAddIrrlightCheckbox(window);
 
             // use same widow title for all craft windows
-            windowTitle = WINDOW_NAME_CRAFT;
+            winCapAdjusted = WINDOW_NAME_CRAFT;
         }
         //cupboard
-        else if (ZeeCupboardLabeler.isActive && windowTitle.contentEquals("Cupboard")) {
+        else if (ZeeCupboardLabeler.isActive && winCapAdjusted.contentEquals("Cupboard")) {
             ZeeCupboardLabeler.checkCupboardContents(window);
         }
         //cheesetray
-        else if (windowTitle.contentEquals("Rack")) {
+        else if (winCapAdjusted.contentEquals("Rack")) {
             ZeeManagerItems.checkCheeseTray(window);
         }
         //belt
-        else if (windowTitle.contentEquals("Belt")) {
+        else if (winCapAdjusted.contentEquals("Belt")) {
             ZeeManagerItems.invBelt = null;
             ZeeManagerItems.getInvBelt();
         }
         //tamed animals manager
-        else if (windowTitle.contentEquals("Cattle Roster")) {
+        else if (winCapAdjusted.contentEquals("Cattle Roster")) {
             windowModCattleRoster(window);
         }
         // autolabel contents
-        else if (ZeeManagerGobs.autoLabelWincapContainers.contains(windowTitle)
-                || ZeeManagerGobs.autoLabelWincapVmeters.contains(windowTitle)) {
+        else if (ZeeManagerGobs.autoLabelWincapContainers.contains(winCapAdjusted)
+                || ZeeManagerGobs.autoLabelWincapVmeters.contains(winCapAdjusted)) {
             // add window fuel UI
-            if (List.of("Oven", "Kiln", "Ore Smelter").contains(windowTitle)) {
-                windowAddFuelGUI(window, windowTitle);
+            if (List.of("Oven", "Kiln", "Ore Smelter").contains(winCapAdjusted)) {
+                windowAddFuelGUI(window, winCapAdjusted);
             }
             // label gob
             ZeeManagerGobs.labelGobByContents(window);
         }
         //equips
-        else if (windowTitle.contentEquals("Equipment")) {
+        else if (winCapAdjusted.contentEquals("Equipment")) {
             windowEquipment = window;
         }
         // wardrobe diff
-        else if(windowTitle.contentEquals("Wardrobe")){
+        else if(winCapAdjusted.contentEquals("Wardrobe")){
             if (getButtonNamed(window,"Dress from") == null){
-                windowTitle = "Wardrobe selection";
+                winCapAdjusted = "Wardrobe selection";
             }
         }
         //main inventory
-        else if (windowTitle.contentEquals("Inventory")) {
+        else if (winCapAdjusted.contentEquals("Inventory")) {
             windowInvMain = window;
         }
         //barter stand
-        else if (windowTitle.contentEquals("Barter Stand")) {
+        else if (winCapAdjusted.contentEquals("Barter Stand")) {
             windowModBarterStand(window);
         }
         //mod tamed animal window
-        else if (isWindowAnimalStats(windowTitle)) {
-            windowModAnimalStats(window, windowTitle);
+        else if (isWindowAnimalStats(winCapAdjusted)) {
+            windowModAnimalStats(window, winCapAdjusted);
         }
         // auto press
-        else if (windowTitle.contentEquals("Extraction Press")) {
+        else if (winCapAdjusted.contentEquals("Extraction Press")) {
             Button btnPress = getButtonNamed(window, "Press");
             if (btnPress == null) {
                 println("addWindow > winepress button not found");
@@ -1216,11 +1216,11 @@ public class ZeeConfig {
             }
         }
         //fishing
-        else if (windowTitle.contains("This is bait")) {
+        else if (winCapAdjusted.contains("This is bait")) {
             ZeeFishing.checkFishWindow(window);
         }
         // "Land survey" turn grid on
-        else if (windowTitle.contentEquals("Land survey")) {
+        else if (winCapAdjusted.contentEquals("Land survey")) {
             //gridlines
             if (ZeeConfig.autoToggleGridLines)
                 ZeeConfig.gameUI.map.showgrid(true);
@@ -1242,18 +1242,18 @@ public class ZeeConfig {
             }, 220, 80);
         }
         // Milestone labels
-        else if (!ZeeManagerGobs.isLabelingAllRoadsigns && windowTitle.contentEquals("Milestone") && ZeeConfig.getButtonNamed(window,"Follow") != null) {
+        else if (!ZeeManagerGobs.isLabelingAllRoadsigns && winCapAdjusted.contentEquals("Milestone") && ZeeConfig.getButtonNamed(window,"Follow") != null) {
             ZeeManagerGobs.labelRoadsign(lastMapViewClickGob,window);
         }
 
         if (gameUI!=null && !gameUI.sz.equals(0,0)){
-            windowApplySavedPosition(window, windowTitle);
+            windowApplySavedPosition(window, winCapAdjusted);
             windowFitView(window);
         }
 
         //order of call is important due to window.hasOrganizeButton
-        windowModOrganizeButton(window, windowTitle);
-        windowModAutoHideButton(window,windowTitle);
+        windowModOrganizeButton(window, winCapAdjusted);
+        windowModAutoHideButton(window,winCapAdjusted);
     }
 
     private static void modXpEventWindow(Window window) {

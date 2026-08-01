@@ -122,7 +122,7 @@ public class Window extends Widget {
 	if(visible())
 	    parent.setfocus(this);
 	initanim();
-	ZeeConfig.windowAdded(this,"added()");
+	ZeeConfig.windowAdded(this);
     }
 
     public void chcap(String cap) {
@@ -149,7 +149,7 @@ public class Window extends Widget {
 	if(dm != null)
 	    this.doff = this.doff.sub(coff);
 	if (zeeWinAdded && this.deco!=null && (this.deco instanceof DefaultDeco))
-		ZeeConfig.windowAdded(this,"chdeco()");
+		ZeeConfig.windowAdded(this);
     }
 
     public static abstract class Deco extends Widget {
