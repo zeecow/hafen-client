@@ -1181,6 +1181,13 @@ public class ZeeManagerMiner extends ZeeThread{
                                 if (isCancelClick())
                                     break;
 
+                                //may be holding item case waitInvFull is not enough
+                                if (ZeeConfig.isPlayerHoldingItem()){
+                                    ZeeConfig.stopMovingEscKey();
+                                    ZeeConfig.msgLow("cancel digging because holding item");
+                                    break;
+                                }
+
                                 // click drop location
                                 ZeeConfig.clickCoord(locTarget.floor(OCache.posres),1);
                                 //prepareCancelClick();
