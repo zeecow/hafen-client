@@ -223,7 +223,7 @@ public class ZeeManagerMinimap {
             return;
         }
         minimapOptsMarksResnameHidden.put(resname,false);
-        println("mapOptsMarks "+ minimapOptsMarksResnameHidden.size()+"  "+resname);
+        //println("mapOptsMarks "+ minimapOptsMarksResnameHidden.size()+"  "+resname);
 
         Window win = ZeeConfig.getWindow("map opts");
         if (win==null) {

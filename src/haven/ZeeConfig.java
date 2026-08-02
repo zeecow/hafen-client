@@ -1456,8 +1456,9 @@ public class ZeeConfig {
     }
 
     static void windowFitView(Window window) {
-        if (window.c.x + window.sz.x > gameUI.sz.x)
+        if (window.c.x + window.sz.x > gameUI.sz.x) {
             window.c.x = gameUI.sz.x - window.sz.x;
+        }
         // TODO fit vertical when Window sz y is more precise
     }
 

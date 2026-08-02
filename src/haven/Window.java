@@ -148,8 +148,6 @@ public class Window extends Widget {
 	this.c = this.c.add(coff);
 	if(dm != null)
 	    this.doff = this.doff.sub(coff);
-	if (zeeWinAdded && this.deco!=null && (this.deco instanceof DefaultDeco))
-		ZeeConfig.windowAdded(this);
     }
 
     public static abstract class Deco extends Widget {
