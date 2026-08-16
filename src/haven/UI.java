@@ -65,7 +65,6 @@ public class UI {
     public final ActAudio.Root audio;
     public final Loader loader;
     public final CommandQueue queue = new CommandQueue();
-    private static final double scalef;
     
     {
 	lastevent = lasttick = Utils.rtime();
@@ -966,12 +965,24 @@ public class UI {
 	return(Resource.remote());
     }
 
+    private static double scalef = 0;
+    private static double scalef() {
+	if(scalef == 0) {
+	    synchronized(UI.class) {
+		if(scalef == 0) {
+		    scalef = loadscale();
+		}
+	    }
+	}
+	return(scalef);
+    }
+
     public static double scale(double v) {
-	return(v * scalef);
+	return(v * scalef());
     }
 
     public static float scale(float v) {
-	return(v * (float)scalef);
+	return(v * (float)scalef());
     }
 
     public static int scale(int v) {
@@ -979,11 +990,11 @@ public class UI {
     }
 
     public static int rscale(double v) {
-	return((int)Math.round(v * scalef));
+	return((int)Math.round(v * scalef()));
     }
 
     public static Coord scale(Coord v) {
-	return(v.mul(scalef));
+	return(v.mul(scalef()));
     }
 
     public static Coord scale(int x, int y) {
@@ -995,7 +1006,7 @@ public class UI {
     }
 
     public static Coord2d scale(Coord2d v) {
-	return(v.mul(scalef));
+	return(v.mul(scalef()));
     }
 
     static public Font scale(Font f, float size) {
@@ -1011,11 +1022,11 @@ public class UI {
     }
 
     public static double unscale(double v) {
-	return(v / scalef);
+	return(v / scalef());
     }
 
     public static float unscale(float v) {
-	return(v / (float)scalef);
+	return(v / (float)scalef());
     }
 
     public static int unscale(int v) {
@@ -1023,7 +1034,7 @@ public class UI {
     }
 
     public static Coord unscale(Coord v) {
-	return(v.div(scalef));
+	return(v.div(scalef()));
     }
 
     private static double maxscale = -1;
@@ -1039,9 +1050,11 @@ public class UI {
 		    Toolkit tk = Toolkit.instance();
 		    for(Monitor dev : tk.monitors()) {
 			Coord res = dev.resolution();
-			double scale = Math.min(res.x / 800.0, res.y / 600.0);
-			fscale = Math.max(fscale, scale);
-			sscale = Math.max(sscale, Math.rint(dev.density() / 5.0) * 0.05);
+			fscale = Math.max(fscale, Math.min(res.x / 800.0, res.y / 600.0));
+			double prefscale = dev.scaling();
+			if(prefscale == 0) prefscale = (dev.userdpi() / 96.0);
+			if(prefscale == 0) prefscale = (dev.density() / 100.0);
+			sscale = Math.max(sscale, Math.rint(prefscale / 0.05) * 0.05);
 		    }
 		} catch(Exception exc) {
 		    new Warning(exc, "could not determine maximum scaling factor").issue();
@@ -1065,9 +1078,5 @@ public class UI {
 	double scale = Utils.getprefd("uiscale", defscale);
 	scale = Math.max(Math.min(scale, maxscale), 1.0);
 	return(scale);
-    }
-
-    static {
-	scalef = loadscale();
     }
 }
