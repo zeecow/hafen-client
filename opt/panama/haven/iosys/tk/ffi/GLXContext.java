@@ -87,7 +87,7 @@ public class GLXContext implements Providers.Factory<Toolkit> {
     }
 
     public Toolkit open(String... args) {
-	return(new GLXToolkit(null, -1));
+	return(new GLXToolkit((args.length == 0) ? null : args[0], -1));
     }
 
     public int priority() {
@@ -982,8 +982,7 @@ public class GLXContext implements Providers.Factory<Toolkit> {
 			    }
 			}
 		    } else {
-			xlib.XChangeProperty(dpy, id, _NET_WM_STATE.id, ATOM.id, XLib.PropModeReplace,
-					     new Atom[] {});
+			xlib.XChangeProperty(dpy, id, _NET_WM_STATE.id, ATOM.id, XLib.PropModeReplace, st);
 		    }
 		    curstate = (st.length == 0) ? Collections.emptySet() : new HashSet<>(Arrays.asList(st));
 		});
@@ -1048,6 +1047,12 @@ public class GLXContext implements Providers.Factory<Toolkit> {
 		    }
 		}
 		return(renv);
+	    }
+
+	    private static final Pipe.Op glfb = Pipe.Op.compose(new FragColor<>(FragColor.defcolor),
+								new DepthBuffer<>(DepthBuffer.defdepth));
+	    public Pipe.Op fbstate() {
+		return(glfb);
 	    }
 
 	    private void glswap(GL gl, int ival) {
@@ -1826,12 +1831,18 @@ public class GLXContext implements Providers.Factory<Toolkit> {
 		    if(windows.containsKey(owner))
 			throw(new RuntimeException("selection requested for own window"));
 		}
-		XSetWindowAttributes attr = xlib.XSetWindowAttributes();
-		attr.event_mask(XLib.PropertyChangeMask);
-		this.twnd = xlib.XCreateWindow(dpy, screen.root(), 0, 0, 1, 1, 0, 0, XLib.InputOnly, vis.visual(), XLib.CWEventMask, attr);
-		register(this);
-		xlib.XConvertSelection(dpy, selection, target, SELECTED_DATA.id, twnd, time);
-		this.timeout = Timeout.later(Utils.rtime() + 5, () -> xrun(this::timeout), null);
+		if(this.owner.equals(XID.None)) {
+		    this.twnd = null;
+		    this.resp = new XProperty(dpy, SELECTED_DATA.id, ATOM.id, 32, 0, new byte[0]);
+		    promise.resolve(this);
+		} else {
+		    XSetWindowAttributes attr = xlib.XSetWindowAttributes();
+		    attr.event_mask(XLib.PropertyChangeMask);
+		    this.twnd = xlib.XCreateWindow(dpy, screen.root(), 0, 0, 1, 1, 0, 0, XLib.InputOnly, vis.visual(), XLib.CWEventMask, attr);
+		    register(this);
+		    xlib.XConvertSelection(dpy, selection, target, SELECTED_DATA.id, twnd, time);
+		    this.timeout = Timeout.later(Utils.rtime() + 5, () -> xrun(this::timeout), null);
+		}
 	    }
 
 	    private SelectionRequest(Atom selection, Atom target, long time) {
@@ -1844,7 +1855,8 @@ public class GLXContext implements Providers.Factory<Toolkit> {
 
 	    public void dispose() {
 		if(!done) {
-		    xlib.XDestroyWindow(dpy, twnd);
+		    if(twnd != null)
+			xlib.XDestroyWindow(dpy, twnd);
 		    done = true;
 		}
 	    }

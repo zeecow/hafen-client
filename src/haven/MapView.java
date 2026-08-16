@@ -2094,6 +2094,7 @@ public class MapView extends PView implements DTarget, Console.Directory {
     
     private UI.Grab camdrag = null;
 
+    static boolean leftClickDragging = false;
     public boolean mousedown(MouseDownEvent ev) {
 	parent.setfocus(this);
 	Loader.Future<Plob> placing_l = this.placing;
@@ -2163,7 +2164,6 @@ public class MapView extends PView implements DTarget, Console.Directory {
 	return(true);
     }
 
-	static boolean leftClickDragging = false;
     public void mousemove(MouseMoveEvent ev) {
 	if(grab != null)
 	    grab.mmousemove(ev.c);
@@ -2499,183 +2499,52 @@ public class MapView extends PView implements DTarget, Console.Directory {
 
     private Map<String, Console.Command> cmdmap = new TreeMap<String, Console.Command>();
     {
-	cmdmap.put("cam", new Console.Command() {
-		public void run(Console cons, String[] args) throws Exception {
-		    if(args.length >= 2) {
-			Class<? extends Camera> ct = camtypes.get(args[1]);
-			String[] cargs = Utils.splice(args, 2);
-			if(ct != null) {
-				camera = makecam(ct, cargs);
-				Utils.setpref("defcam", args[1]);
-				Utils.setprefb("camargs", Utils.serialize(cargs));
-			} else {
-			    throw(new Exception("no such camera: " + args[1]));
-			}
-		    }
+	cmdmap.put("cam", (cons, args) -> {
+	    if(args.length >= 2) {
+		Class<? extends Camera> ct = camtypes.get(args[1]);
+		String[] cargs = Utils.splice(args, 2);
+		if(ct != null) {
+		    camera = makecam(ct, cargs);
+		    Utils.setpref("defcam", args[1]);
+		    Utils.setprefb("camargs", Utils.serialize(cargs));
+		} else {
+		    throw(new Exception("no such camera: " + args[1]));
 		}
-	    });
-	cmdmap.put("whyload", new Console.Command() {
-		public void run(Console cons, String[] args) throws Exception {
-		    Loading l = lastload;
-		    if(l == null)
-			throw(new Exception("Not loading"));
-		    l.printStackTrace(cons.out);
-		}
-	    });
+	    }
+	});
+	cmdmap.put("whyload", (cons, args) -> {
+	    Loading l = lastload;
+	    if(l == null)
+		throw(new Exception("Not loading"));
+	    l.printStackTrace(cons.out);
+	});
     }
     public Map<String, Console.Command> findcmds() {
 	return(cmdmap);
     }
 
     static {
-	Console.setscmd("placegrid", new Console.Command() {
-		public void run(Console cons, String[] args) {
-		    if((plobpgran = Double.parseDouble(args[1])) < 0)
-			plobpgran = 0;
-		    Utils.setprefd("plobpgran", plobpgran);
-		}
-	    });
-	Console.setscmd("placeangle", new Console.Command() {
-		public void run(Console cons, String[] args) {
-		    if((plobagran = Double.parseDouble(args[1])) < 2)
-			plobagran = 2;
-		    Utils.setprefd("plobagran", plobagran);
-		}
-	    });
-	Console.setscmd("clickfuzz", new Console.Command() {
-		public void run(Console cons, String[] args) {
-		    if((gobclfuzz = Integer.parseInt(args[1])) < 0)
-			gobclfuzz = 0;
-		}
-	    });
-	Console.setscmd("clickdb", new Console.Command() {
-		public void run(Console cons, String[] args) {
-		    clickdb = Utils.parsebool(args[1], false);
-		}
-	    });
+	Console.setscmd("placegrid", (cons, args) -> {
+	    if((plobpgran = Double.parseDouble(args[1])) < 0)
+		plobpgran = 0;
+	    Utils.setprefd("plobpgran", plobpgran);
+	});
+	Console.setscmd("placeangle", (cons, args) -> {
+	    if((plobagran = Double.parseDouble(args[1])) < 2)
+		plobagran = 2;
+	    Utils.setprefd("plobagran", plobagran);
+	});
+	Console.setscmd("clickfuzz", (cons, args) -> {
+	    if((gobclfuzz = Integer.parseInt(args[1])) < 0)
+		gobclfuzz = 0;
+	});
+	Console.setscmd("clickdb", (cons, args) -> {
+	    clickdb = Utils.parsebool(args[1], false);
+	});
     Console.setscmd("zeecow", new Console.Command() {
-            public void run(Console cons, String[] args) {
-                ZeeConsole.runCmdZeecow(args);
-            }
-        });
+        public void run(Console cons, String[] args) {
+            ZeeConsole.runCmdZeecow(args);
+        }
+    });
     }
-
-	@Override
-	public void wdgmsg(String msg, Object... args) {
-		super.wdgmsg(msg, args);
-
-		if (msg.contentEquals("click")){
-
-			// resets minimap target coord
-			if (args!=null && args.length>1) {
-				ZeeManagerIcons.lastMinimapClick = null;
-			}
-
-			// check enter house
-			ZeeCupboardLabeler.checkHouseClick();
-		}
-
-		// mine selection
-		if (msg.contentEquals("sel"))
-			ZeeManagerMiner.checkMiningSelection();
-	}
-
-	@SuppressWarnings("deprecation")
-	void inspectTooltip(Coord c) {
-		if(ZeeConfig.showInspectTooltip && !ZeeManagerGobs.isMidclickInspecting && ZeeConfig.getPlayerGob()!=null) {
-			new Hittest(c) {
-				@Override
-				protected void hit(Coord pc, Coord2d mc, ClickData inf) {
-					//ttip = null;
-					if(inf != null) {
-						//ZeeConfig.println("inspect Gob "+c);
-						Gob gob = ZeeManagerGobs.getGobFromClickable(inf.ci);
-						if(gob != null  &&  gob.id != ttipGobId) {
-							ttipGobId = gob.id;
-							StringBuilder sb = new StringBuilder();
-							// res name
-							sb.append(gob.getres().name).append("    ");
-							// gob id
-							sb.append("\nId: ").append(ttipGobId).append("    ");
-							// gob place
-							sb.append("\na: ").append(gob.a).append("    ");
-							Coord3f c3f = gob.getrc();
-							sb.append("\ngetrc: (")
-								.append(Float.toString(c3f.x)).append(", ")
-								.append(Float.toString(c3f.y)).append(", ")
-								.append(Float.toString(c3f.z)).append(")    ");
-							sb.append("\ndist: ")
-								.append(gob.rc.dist(ZeeConfig.getPlayerGob().rc)).append("    ");
-							sb.append("\ntile: ")
-								.append("\n    target: "+ZeeConfig.getGobTile(gob)).append("    ")
-								.append("\n    player: "+ZeeConfig.getPlayerTile()).append("    ");
-							// gob poses
-							List<String> poses = ZeeConfig.getGobPoses(gob);
-							if (!poses.isEmpty()){
-								sb.append("\nPoses:");
-								for (String p : poses) {
-									sb.append("\n   "+p);
-								}
-							}
-							// gob overlays
-							if (!gob.ols.isEmpty()) {
-								sb.append("\nOverlays:");
-								for (String ol : ZeeManagerGobs.getOverlayNames(gob)) {
-									sb.append("\n   "+ol);
-								}
-							}
-							//gob attrs
-							if (!gob.attr.isEmpty()) {
-								sb.append("\nAttrs:");
-								for (GAttrib a : gob.attr.values()) {
-									sb.append("\n   "+a.getClass().getSimpleName());
-                                    if (a instanceof AttrMats){
-                                        List<String> mats = ZeeManagerGobs.getGobMatsBasenames(gob);
-                                        for (String m : mats) {
-                                            sb.append("\n        "+m);
-                                        }
-                                    }
-                                }
-							}
-							// gob tags
-							if (!gob.tags.isEmpty()){
-								sb.append("\nTags:\n");
-								int cont = 0;
-								for (Gob.Tag tag : gob.tags) {
-									cont++;
-									if (cont==3){
-										sb.append("\n   ");
-										cont = 0;
-									}
-									sb.append("   "+tag);
-								}
-							}
-							//tag specifics
-							if (gob.tags.contains(Gob.Tag.CROP)){
-								sb.append("\ncrop stage: "+ZeeConfig.getPlantStage(gob)+" / "+ZeeManagerFarmer.getCropMaxStage(gob));
-							}
-                            if (gob.tags.contains(Gob.Tag.TREE)){
-                                sb.append("\ntree growth: "+gob.treeGrowth);
-                            }
-							ttip = sb.toString();
-						}
-					} else {
-						ttipGobId = -1;
-						//ZeeConfig.println("inspect Tile "+c);
-						MCache mCache = ui.sess.glob.map;
-						int tile = mCache.gettile(mc.div(tilesz).floor());
-						Resource res = mCache.tilesetr(tile);
-						if(res != null && ZeeConfig.showInspectTooltip) {
-							ttip = res.name;
-						}
-					}
-				}
-
-				@Override
-				protected void nohit(Coord pc) {
-					ttip = null;
-				}
-			}.run();
-		}
-	}
 }
