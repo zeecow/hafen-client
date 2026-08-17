@@ -1806,7 +1806,9 @@ public class ZeeManagerGobs extends ZeeThread{
         if (isPickingKritterDismountHorse)
             return;
 
-        if (!ZeeConfig.isPlayerMountingHorse())
+        // cancel if mounting wild horse or no horse
+        Gob horse = ZeeConfig.getPlayerMountedHorse();
+        if (horse==null || horse.getres().name.endsWith("/horse"))
             return;
 
         // return if kritter doesnt require dismounting
