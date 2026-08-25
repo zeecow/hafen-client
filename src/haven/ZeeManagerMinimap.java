@@ -445,6 +445,8 @@ public class ZeeManagerMinimap {
                 bigMapPrevMaglevel = ZeeConfig.gameUI.mapfile.view.maglevel;
                 ZeeConfig.gameUI.mapfile.view.zoomlevel = bigMapZoomlevel;
                 ZeeConfig.gameUI.mapfile.view.maglevel = bigMapMaglevel;
+                map.setcanfocus(true);
+                map.z(100);
             }
             // hide big map
             else {
@@ -453,8 +455,7 @@ public class ZeeManagerMinimap {
                 map.c = bigMapPrevPos;
                 ZeeConfig.gameUI.mapfile.view.zoomlevel = bigMapPrevZoomlevel;
                 ZeeConfig.gameUI.mapfile.view.maglevel = bigMapPrevMaglevel;
-                //TODO resizing client breaks reposition
-                //minimapCompactReposition();
+                map.z(0);
             }
 
         } catch (Exception e) {
