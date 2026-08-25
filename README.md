@@ -4,6 +4,7 @@ Client focusing on small helper tasks, many using mouse middle button, and other
 
 Controls
 --------
+- spacebar toggles big map (except cabin/cellar)
 - left/right click ground cancels tasks whenever possible
 - right click windows to close (DF style, minimap ignored for now)
 - gob flowermenu also works on mouse up

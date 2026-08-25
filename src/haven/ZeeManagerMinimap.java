@@ -414,6 +414,54 @@ public class ZeeManagerMinimap {
         return !ZeeConfig.gameUI.mapfile.tool.visible();
     }
 
+    static boolean isBigMapOn = false;
+    static Coord bigMapPrevSize, bigMapPrevPos;
+    static int bigMapZoomlevel=0, bigMapMaglevel=1;
+    static int bigMapPrevZoomlevel, bigMapPrevMaglevel;
+    public static void toggleBigMap() {
+
+        if (ZeeConfig.gameUI==null || ZeeConfig.playerLocation==ZeeConfig.LOCATION_CABIN || ZeeConfig.playerLocation==ZeeConfig.LOCATION_CELLAR){
+            return;
+        }
+
+        try {
+
+            MapWnd map = ZeeConfig.gameUI.mapfile;
+            if (!map.compact())
+                return;
+
+            isBigMapOn = !isBigMapOn;
+
+            // show big map
+            if (isBigMapOn) {
+                //println("BIGMAP ON");
+                GameUI ui = ZeeConfig.gameUI;
+                int side = (int) (ui.sz.min() * .8);
+                bigMapPrevSize = Coord.of(map.sz);
+                map.resize(Coord.of(side));
+                bigMapPrevPos = Coord.of(map.c);
+                map.c = ui.sz.div(2).sub(Coord.of(side/2));
+                bigMapPrevZoomlevel = ZeeConfig.gameUI.mapfile.view.zoomlevel;
+                bigMapPrevMaglevel = ZeeConfig.gameUI.mapfile.view.maglevel;
+                ZeeConfig.gameUI.mapfile.view.zoomlevel = bigMapZoomlevel;
+                ZeeConfig.gameUI.mapfile.view.maglevel = bigMapMaglevel;
+            }
+            // hide big map
+            else {
+                //println("BIGMAP OFF");
+                map.resize(bigMapPrevSize);
+                map.c = bigMapPrevPos;
+                ZeeConfig.gameUI.mapfile.view.zoomlevel = bigMapPrevZoomlevel;
+                ZeeConfig.gameUI.mapfile.view.maglevel = bigMapPrevMaglevel;
+                //TODO resizing client breaks reposition
+                //minimapCompactReposition();
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     static void println(String msg){
         ZeeConfig.println(msg);
     }

@@ -2577,8 +2577,12 @@ public class ZeeConfig {
 
         //println(ev.getKeyCode()+"  "+ev.getKeyChar());
 
+        //space bar big map
+        if (ev.getKeyCode()==KeyEvent.VK_SPACE && !ev.isControlDown() && !ev.isAltDown() && !ev.isShiftDown()) {
+            ZeeManagerMinimap.toggleBigMap();
+        }
         //brightness
-        if (ev.getKeyCode()==KeyEvent.VK_RIGHT) {
+        else if (ev.getKeyCode()==KeyEvent.VK_RIGHT) {
             return ZeeManagerGobs.brightnessUp();
         }else if(ev.getKeyCode()==KeyEvent.VK_LEFT) {
             return ZeeManagerGobs.brightnessDown();
@@ -2897,6 +2901,9 @@ public class ZeeConfig {
         ZeeManagerMiner.lastCavedust = null;
         lastAutoHearthMs = 0;
         ZeeManagerMinimap.mapOptsHidePMarks = ZeeManagerMinimap.mapOptsMarksShowOnlyIsOn = false;
+        ZeeManagerMinimap.isBigMapOn = false;
+        ZeeManagerMinimap.bigMapZoomlevel = 0;
+        ZeeManagerMinimap.bigMapMaglevel = 1;
         ZeeManagerMiner.isMovingStraightLine = false;
         ZeeManagerGobs.isPickingupLifepile = false;
         ZeeManagerGobs.winLeafpile = null;

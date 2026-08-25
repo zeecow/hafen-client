@@ -1158,7 +1158,7 @@ public class MiniMap extends Widget {
         scale - map window size ( 1 = original size, 2-4 = bigger window&map)
      */
 	if(ev.a > 0) {
-        if(minimapScale > 1) {
+        if(!ZeeManagerMinimap.isBigMapOn && minimapScale > 1) {
             minimapScale--;
             ZeeConfig.minimapScale = minimapScale;
             Utils.setprefi("minimapScale", minimapScale);
@@ -1171,7 +1171,7 @@ public class MiniMap extends Widget {
 		    zoomlevel = Math.min(zoomlevel + 1, dlvl + 1);
 	    }
 	} else if(ev.a < 0) {
-        if(zoomlevel == 0 && minimapScale <= 3) {
+        if(!ZeeManagerMinimap.isBigMapOn && zoomlevel == 0 && minimapScale <= 3) {
             minimapScale++;
             ZeeConfig.minimapScale = minimapScale;
             Utils.setprefi("minimapScale", minimapScale);
@@ -1183,6 +1183,10 @@ public class MiniMap extends Widget {
 		maglevel = Math.min(maglevel << 1, 8);
 	    }
 	}
+    if (ZeeManagerMinimap.isBigMapOn){
+        ZeeManagerMinimap.bigMapZoomlevel = zoomlevel;
+        ZeeManagerMinimap.bigMapMaglevel = maglevel;
+    }
 	return(true);
     }
 
