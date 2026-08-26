@@ -456,6 +456,7 @@ public class ZeeManagerMinimap {
                 ZeeConfig.gameUI.mapfile.view.zoomlevel = bigMapPrevZoomlevel;
                 ZeeConfig.gameUI.mapfile.view.maglevel = bigMapPrevMaglevel;
                 map.z(0);
+                map.recenter();
             }
 
         } catch (Exception e) {
