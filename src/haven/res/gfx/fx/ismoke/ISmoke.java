@@ -16,7 +16,7 @@ import static haven.render.sl.Type.*;
 
 /* >spr: ISmoke */
 /* >rlink: ISmoke */
-@haven.FromResource(name = "gfx/fx/ismoke", version = 110)
+@haven.FromResource(name = "gfx/fx/ismoke", version = 111)
 public class ISmoke extends Sprite implements Rendered, Sprite.CDel, TickList.TickNode, TickList.Ticking {
     static final double agestep = 0.1, maxstep = 0.25;
     static final VertexArray.Layout fmt =
