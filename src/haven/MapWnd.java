@@ -1170,11 +1170,16 @@ public class MapWnd extends Window implements Console.Directory {
 
 	@Override
 	public void reqclose() {
-		// esc key compacts map instead of closing it
+		// esc compacts map instead of closing it
 		if (!compact()) {
 			compact(true);
 			Utils.setprefb("compact-map", true);
-		}else {
+		}
+        // esc toggles bigmap off
+        else if(ZeeManagerMinimap.isBigMapOn) {
+            ZeeManagerMinimap.toggleBigMap();
+        }
+        else {
 			super.reqclose();
 		}
 	}

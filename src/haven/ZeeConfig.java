@@ -2577,9 +2577,9 @@ public class ZeeConfig {
 
         //println(ev.getKeyCode()+"  "+ev.getKeyChar());
 
-        //space bar big map
+        // big map keys
         if (ev.getKeyCode()==KeyEvent.VK_SPACE && !ev.isControlDown() && !ev.isAltDown() && !ev.isShiftDown()) {
-            ZeeManagerMinimap.toggleBigMap();
+            ZeeManagerMinimap.toggleBigMap();//space bigmap on
         }
         //brightness
         else if (ev.getKeyCode()==KeyEvent.VK_RIGHT) {

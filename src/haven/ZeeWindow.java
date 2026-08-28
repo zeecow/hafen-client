@@ -323,4 +323,13 @@ public class ZeeWindow extends Window {
             }
         }
     }
+
+
+    public static void focusWindow(Window win) {
+        try {
+            win.parent.setfocus(win);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 }
