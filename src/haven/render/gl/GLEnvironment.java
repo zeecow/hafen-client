@@ -172,7 +172,7 @@ public abstract class GLEnvironment implements Environment {
 
     protected abstract Caps mkcaps(GL initgl);
 
-    public GLEnvironment(GL initgl, Area wnd) {
+    public GLEnvironment(GL initgl) {
 	this.caps = mkcaps(initgl);
 	this.caps.checkreq();
 	initialize(initgl);

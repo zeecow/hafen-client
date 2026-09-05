@@ -617,7 +617,7 @@ public class WGLContext implements Providers.Factory<Toolkit> {
 		private int qstate;
 
 		private WGLEnvironment() {
-		    super(gl, Area.sized(size));
+		    super(gl);
 		}
 
 		private void process() {

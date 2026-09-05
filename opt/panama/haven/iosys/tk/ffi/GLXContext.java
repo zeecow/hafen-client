@@ -801,7 +801,7 @@ public class GLXContext implements Providers.Factory<Toolkit> {
 		private int qstate;
 
 		private GLXEnvironment() {
-		    super(gl, Area.sized(size));
+		    super(gl);
 		}
 
 		private void process() {

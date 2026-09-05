@@ -131,8 +131,7 @@ public class LWJGLToolkit extends AWTToolkit {
 	}
 
 	public class PanelEnvironment extends LWJGLEnvironment {
-	    public PanelEnvironment(Area shape) {
-		super(shape);
+	    public PanelEnvironment() {
 	    }
 
 	    public void submit(Render cmd) {
@@ -155,8 +154,7 @@ public class LWJGLToolkit extends AWTToolkit {
 		    synchronized(this) {
 			if(env == null) {
 			    org.lwjgl.opengl.GL.createCapabilities();
-			    Area shape = Area.sized(Coord.of(getWidth(), getHeight()));
-			    this.env = new PanelEnvironment(shape);
+			    this.env = new PanelEnvironment();
 			    initgl();
 			}
 		    }

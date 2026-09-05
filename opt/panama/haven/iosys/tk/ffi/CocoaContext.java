@@ -648,7 +648,7 @@ public class CocoaContext implements Providers.Factory<Toolkit> {
 		private int qstate;
 
 		private CGLEnvironment() {
-		    super(gl, Area.sized(Coord.of(1, 1)));
+		    super(gl);
 		}
 
 		private void process() {
