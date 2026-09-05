@@ -196,8 +196,6 @@ public class Test implements GLEventListener, KeyListener {
 		env = new JOGLEnvironment(gl, wnd.getContext(), shape);
 		gl.setSwapInterval(1);
 	    }
-	    if(!env.shape().equals(shape))
-		env.reshape(shape);
 	    GLRender g = env.render();
 	    display(g);
 	    env.submit(g);

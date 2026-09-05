@@ -45,7 +45,6 @@ public abstract class GLEnvironment implements Environment {
     final Queue<Runnable> callbacks = new LinkedList<>();
     Thread cbthread = null;
     final Queue<GLRender> submitted = new LinkedList<>();
-    Area wnd;
     private GLRender prep = null;
     private Applier curstate = new Applier(this);
     private boolean invalid = false;
@@ -174,7 +173,6 @@ public abstract class GLEnvironment implements Environment {
     protected abstract Caps mkcaps(GL initgl);
 
     public GLEnvironment(GL initgl, Area wnd) {
-	this.wnd = wnd;
 	this.caps = mkcaps(initgl);
 	this.caps.checkreq();
 	initialize(initgl);
@@ -195,14 +193,6 @@ public abstract class GLEnvironment implements Environment {
 
     public GLDrawList drawlist() {
 	return(new GLDrawList(this));
-    }
-
-    public void reshape(Area wnd) {
-	this.wnd = wnd;
-    }
-
-    public Area shape() {
-	return(wnd);
     }
 
     private void ckcbt() {

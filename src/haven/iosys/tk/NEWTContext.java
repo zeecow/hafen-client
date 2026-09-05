@@ -471,8 +471,6 @@ public class NEWTContext implements Providers.Factory<Toolkit> {
 			initgl(gl);
 		    }
 		    env = this.env;
-		    if(!env.shape().equals(shape))
-			env.reshape(shape);
 		}
 		GL3 gl3 = gl.getGL3();
 		if(false) {

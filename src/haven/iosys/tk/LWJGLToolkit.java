@@ -117,10 +117,6 @@ public class LWJGLToolkit extends AWTToolkit {
 
 	private void process() {
 	    PanelEnvironment env = this.env;
-	    Area shape = Area.sized(Coord.of(getWidth(), getHeight()));
-	    if(!env.shape().equals(shape)) {
-		env.reshape(shape);
-	    }
 	    synchronized(this) {
 		pstate = 2;
 	    }
