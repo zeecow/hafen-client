@@ -2222,8 +2222,11 @@ public class ZeeManagerItems extends ZeeThread{
         int x=0, y=0;
 
         // add weapons buttons
-        List<String> weapons = List.of("roundshield","fyrdsword","hirdsword","bronzesword","b12axe","boarspear","cutblade","rangersbow","huntersbow");
+        List<String> weapons = List.of("roundshield","fyrdsword","hirdsword"
+                ,"bronzesword","b12axe","boarspear","cutblade"
+                ,"rangersbow","huntersbow","sling");
         WItem item;
+        int buttons = 0;
         for (String wpname : weapons) {
             item = getBeltOrInvWItem(wpname);
             if (item==null)
@@ -2244,6 +2247,7 @@ public class ZeeManagerItems extends ZeeThread{
                     win.add(new Label("Click to equip:"));
                     y += 20;
                 }
+                //add weapon button
                 BufferedImage img = item.item.getres().flayer(Resource.imgc).img;
                 win.add(new IButton(img,img){
                     public void wdgmsg(String msg, Object... args) {
@@ -2253,7 +2257,13 @@ public class ZeeManagerItems extends ZeeThread{
                     }
                 },x,y);
                 x += img.getWidth();
+                buttons++;
             }
+        }
+
+        // close win if 1 weapon only (easier for now)
+        if (win!=null && buttons<=1){
+            win.reqdestroy();
         }
     }
 
