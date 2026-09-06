@@ -32,7 +32,6 @@ import haven.iosys.audio.*;
 import haven.iosys.tk.*;
 import java.awt.image.BufferedImage;
 import haven.GSettings.SyncMode;
-import haven.render.gl.GLEnvironment;
 import haven.render.gl.GLRender;
 
 public abstract class UILoop implements Console.Directory {
