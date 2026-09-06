@@ -308,54 +308,64 @@ public abstract class GLEnvironment implements Environment {
 	    System.err.println();
     }
 
+    protected void process(GL gl, GLRender ctx, Consumer<GL> cmd) {
+	cmd.accept(gl);
+    }
+
     public void process(GL gl) {
 	GLRender prep;
 	Collection<GLRender> copy;
 	synchronized(submitted) {
 	    /* It is important to fetch the submitted renders before
-	     * prep, so that additional once aren't submitted during
+	     * prep, so that additional ones aren't submitted during
 	     * processing that haven't been prepared. */
 	    copy = new ArrayList<>(submitted);
 	    submitted.clear();
 	}
+	if(copy.isEmpty())
+	    return;
 	synchronized(prepmon) {
 	    prep = this.prep;
 	    this.prep = null;
 	}
 	try {
 	    synchronized(drawmon) {
-		checkqueries(gl);
-		if((prep != null) && (prep.gl != null)) {
-		    BufferBGL xf = new BufferBGL(16);
-		    this.curstate.apply(xf, prep.init);
-		    xf.run(gl);
-		    prep.gl.run(gl);
-		    this.curstate = prep.state;
-		    try {
-			GLException.checkfor(gl, this);
-		    } catch(Exception exc) {
-			throw(new BGL.BGLException(prep.gl, null, exc));
-		    }
-		    prep.dispose();
-		}
+		GLRender last = null;
 		for(GLRender cmd : copy) {
+		    if(last == null) {
+			process(gl, cmd, this::checkqueries);
+			if((prep != null) && (prep.gl != null)) {
+			    BufferBGL xf = new BufferBGL(16);
+			    this.curstate.apply(xf, prep.init);
+			    process(gl, cmd, xf::run);
+			    process(gl, cmd, prep.gl::run);
+			    this.curstate = prep.state;
+			    try {
+				process(gl, cmd, x -> GLException.checkfor(x, this));
+			    } catch(Exception exc) {
+				throw(new BGL.BGLException(prep.gl, null, exc));
+			    }
+			    prep.dispose();
+			}
+		    }
+		    last = cmd;
 		    BufferBGL xf = new BufferBGL(16);
 		    this.curstate.apply(xf, cmd.init);
-		    xf.run(gl);
-		    cmd.gl.run(gl);
+		    process(gl, cmd, xf::run);
+		    process(gl, cmd, cmd.gl::run);
 		    this.curstate = cmd.state;
 		    try {
-			GLException.checkfor(gl, this);
+			process(gl, cmd, x -> GLException.checkfor(x, this));
 		    } catch(Exception exc) {
 			throw(new BGL.BGLException(cmd.gl, null, exc));
 		    }
 		    cmd.dispose();
 		}
-		checkqueries(gl);
-		disposeall().run(gl);
+		process(gl, last, this::checkqueries);
+		process(gl, last, disposeall()::run);
 		clean();
 		if(debuglog)
-		    checkdebuglog(gl);
+		    process(gl, last, this::checkdebuglog);
 	    }
 	} catch(Exception e) {
 	    for(Throwable c = e; c != null; c = c.getCause()) {
