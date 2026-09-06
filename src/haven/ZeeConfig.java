@@ -2253,7 +2253,10 @@ public class ZeeConfig {
                 size = ZeeGobRadius.RADIUS_BEESKEP_MINEBEAM;
             else if (resname.endsWith("/column"))
                 size = ZeeGobRadius.RADIUS_STONECOLUMN;
-            support.addol(new Gob.Overlay(support, new ZeeGobRadius(support, null, size, ZeeGobRadius.COLOR_RADIUS)));
+            //add ZeeRadius if circular support
+            String circleSupp = "/minebeam,/column,/minesupport,/naturalminesupport,/towercap,/ladder,/monumentalcolumn";
+            if (ZeeConfig.nameInListEndsWith(resname,circleSupp))
+                support.addol(new Gob.Overlay(support, new ZeeGobRadius(support, null, size, ZeeGobRadius.COLOR_RADIUS)));
         }
     }
 

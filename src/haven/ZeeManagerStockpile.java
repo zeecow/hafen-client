@@ -88,9 +88,9 @@ public class ZeeManagerStockpile extends ZeeThread{
     public static void checkPlob(MapView.Plob plob) {
         lastPlobMs = ZeeThread.now();
         lastPlob = plob;
-        // show gob preview res name if cursor inspecting
-        if (plob!=null && plob.getres()!=null && ZeeConfig.isCursorName(ZeeConfig.CURSOR_INSPECT))
-            ZeeConfig.addGobText(plob,plob.getres().name);
+        // plob mine support radius
+        if (ZeeManagerGobs.isGobMineSupport(plob.getres().name))
+            ZeeConfig.toggleMineSupport(plob);
     }
 
     public static void pileInvBoardsAndMakeMore(Gob existingPile) {
