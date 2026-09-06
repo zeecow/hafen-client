@@ -165,7 +165,8 @@ public abstract class GLEnvironment implements Environment {
     }
 
     static enum MemStats {
-	INDICES, VERTICES, TEXTURES, VAOS, FBOS
+	INDICES, VERTICES, TEXTURES,
+	VAOS, FBOS, SHADERS, PROGRAMS
     }
     final int[] stats_obj = new int[MemStats.values().length];
     final long[] stats_mem = new long[MemStats.values().length];
@@ -1002,8 +1003,32 @@ public abstract class GLEnvironment implements Environment {
 	}
     }
 
-    public int numprogs() {return(nprog);}
     public Caps caps() {return(caps);}
+
+    public void stats(Collection<String> dst) {
+	StringBuilder buf = new StringBuilder();
+	MemStats[] sta = MemStats.values();
+	for(int i = 0; i < sta.length; i++) {
+	    if(stats_obj[i] > 0) {
+		if(buf.length() > 0)
+		    buf.append(" / ");
+		buf.append(String.format("%c %,d", sta[i].name().charAt(0), stats_obj[i]));
+	    }
+	}
+	if(buf.length() > 0)
+	    dst.add("V-Obj: " + buf.toString());
+
+	buf = new StringBuilder();
+	for(int i = 0; i < sta.length; i++) {
+	    if(stats_mem[i] > 0) {
+		if(buf.length() > 0)
+		    buf.append(" / ");
+		buf.append(String.format("%c %,d", sta[i].name().charAt(0), stats_mem[i]));
+	    }
+	}
+	if(buf.length() > 0)
+	    dst.add("V-Mem: " + buf.toString());
+    }
 
     public String memstats() {
 	StringBuilder buf = new StringBuilder();
