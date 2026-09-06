@@ -191,6 +191,7 @@ public class GLXContext implements Providers.Factory<Toolkit> {
 	public final Atomic XdndActionLink = new Atomic("XdndActionLink");
 	public final String srvvendor, wmname;
 	public final int srvrelease;
+	private GLXEnvironment glenv;
 	private boolean closed = false;
 
 	public class Atomic {
@@ -783,6 +784,64 @@ public class GLXContext implements Providers.Factory<Toolkit> {
 	    }
 	}
 
+	public class GLXEnvironment extends FFIEnvironment {
+	    private XID current = null;
+	    private int qstate;
+
+	    public class ProxyEnv extends GLProxy {
+		public final XID drawable;
+
+		public ProxyEnv(XID drawable) {
+		    super(GLXEnvironment.this);
+		    this.drawable = drawable;
+		}
+	    }
+
+	    public GLXEnvironment() {
+		super(gl);
+	    }
+
+	    public GLRender render() {
+		throw(new RuntimeException("raw render-buffers not available in shared environments"));
+	    }
+
+	    protected void process(GL gl, GLRender ctx, Consumer<GL> cmd) {
+		XID d = ((ProxyEnv)ctx.env()).drawable;
+		if(!Utils.eq(d, current)) {
+		    glx.glXMakeCurrent(dpy, d, GLXToolkit.this.ctx);
+		    current = d;
+		}
+		cmd.accept(gl);
+	    }
+
+	    private void process() {
+		synchronized(this) {
+		    qstate = 2;
+		}
+		process(gl);
+		synchronized(this) {
+		    if((qstate & 1) != 0)
+			xrun((Runnable)this::process);
+		    qstate &= ~2;
+		}
+	    }
+
+	    public void submit(Render cmd) {
+		super.submit(cmd);
+		synchronized(this) {
+		    if(glenv == this) {
+			if(qstate == 0)
+			    xrun((Runnable)this::process);
+			qstate |= 1;
+		    }
+		}
+	    }
+	}
+
+	 public boolean sharedenvs() {
+	     return(true);
+	 }
+
 	public class GLXWindow implements Windeye, EventWindow {
 	    public final XID id;
 	    public final XIC ic;
@@ -790,47 +849,12 @@ public class GLXContext implements Providers.Factory<Toolkit> {
 	    private final Collection<EventListener> callbacks = new java.util.concurrent.CopyOnWriteArrayList<>();
 	    private boolean showing = false;
 	    private boolean mapped, focused;
-	    private GLXEnvironment renv;
+	    private Environment wenv;
 	    private Coord size = Coord.z;
 	    private int visibility = 0;
 	    private int cursi = -1;
 	    private DropHandler drop = null;
 	    private Xdnd dropping = null;
-
-	    public class GLXEnvironment extends FFIEnvironment {
-		private int qstate;
-
-		private GLXEnvironment() {
-		    super(gl);
-		}
-
-		private void process() {
-		    synchronized(this) {
-			qstate = 2;
-		    }
-		    process(gl);
-		    synchronized(this) {
-			if((qstate & 1) != 0)
-			    glrun(id, (Runnable)this::process);
-			qstate &= ~2;
-		    }
-		}
-
-		public void submit(Render cmd) {
-		    super.submit(cmd);
-		    synchronized(this) {
-			if(renv == this) {
-			    if(qstate == 0)
-				glrun(id, (Runnable)this::process);
-			    qstate |= 1;
-			}
-		    }
-		}
-
-		public GLXWindow wnd() {
-		    return(GLXWindow.this);
-		}
-	    }
 
 	    public GLXWindow() {
 		boolean done = false;
@@ -1082,14 +1106,20 @@ public class GLXContext implements Providers.Factory<Toolkit> {
 	    }
 
 	    public Environment env() {
-		if(renv == null) {
+		if(glenv == null) {
+		    synchronized(GLXToolkit.this) {
+			if(glenv == null)
+			    glenv = glrun(id, GLXEnvironment::new);
+		    }
+		}
+		if(wenv == null) {
 		    synchronized(this) {
-			if(renv == null) {
-			    renv = glrun(id, () -> new GLXEnvironment());
+			if(wenv == null) {
+			    wenv = glenv.new ProxyEnv(id);
 			}
 		    }
 		}
-		return(renv);
+		return(wenv);
 	    }
 
 	    private static final Pipe.Op glfb = Pipe.Op.compose(new FragColor<>(FragColor.defcolor),
@@ -1108,7 +1138,7 @@ public class GLXContext implements Providers.Factory<Toolkit> {
 
 	    public void swapbuffers(Render buf, Object mode) {
 		GLRender gbuf = (GLRender)buf;
-		if(((GLXEnvironment)gbuf.env).wnd() != this)
+		if(!Utils.eq(((GLXEnvironment.ProxyEnv)gbuf.env()).drawable, id))
 		    throw(new IllegalArgumentException());
 		if(!(mode instanceof Boolean))
 		    throw(new IllegalArgumentException());
