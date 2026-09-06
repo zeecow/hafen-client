@@ -26,6 +26,7 @@
 
 package haven.ffi.x11;
 
+import haven.*;
 import haven.ffi.*;
 import haven.ffi.gl.*;
 import java.lang.invoke.*;
@@ -150,6 +151,20 @@ public abstract class GLX {
 	public abstract long scb();
     }
 
+    public static class SyncValues {
+	public final long ust, msc, bsc;
+
+	public SyncValues(long ust, long msc, long bsc) {
+	    this.ust = ust;
+	    this.msc = msc;
+	    this.bsc = bsc;
+	}
+
+	public String toString() {
+	    return(String.format("#<sync %,d %,d %,d>", ust, msc, bsc));
+	}
+    }
+
     public abstract MemorySegment glXGetProcAddress(String name);
     public abstract String glXQueryExtensionsString(Display dpy, int screen);
     public abstract XVisualInfo glXChooseVisual(Display dpy, int screen, int[] attriblist);
@@ -166,11 +181,17 @@ public abstract class GLX {
     public abstract void glXSelectEvent(Display dpy, XID drawable, int mask);
     public abstract int glXGetSelectedEvent(Display dpy, XID drawable);
     public abstract GLXBufferSwapEventINTEL GLXBufferSwapEventINTEL(XEvent ev);
+    public abstract SyncValues glXGetSyncValuesOML(Display dpy, XID drawable);
+    public abstract Ratio glXGetMscRateOML(Display dpy, XID drawable);
+    public abstract long glXSwapBuffersMscOML(Display dpy, XID drawable, long target_msc, long divisor, long remainder);
+    public abstract SyncValues glXWaitForMscOML(Display dpy, XID drawable, long target_msc, long divisor, long remainder);
+    public abstract SyncValues glXWaitForBscOML(Display dpy, XID drawable, long target_bsc);
 
     static class libGLX_so_0 extends GLX {
 	private static final MemoryLayout C_XBool = libX11_so_6.C_XBool;
 	private static final MemoryLayout C_XID = libX11_so_6.C_XID;
 	private static final MemoryLayout CARD64 = ValueLayout.JAVA_LONG;
+	private static final ValueLayout.OfLong INT64_T = ValueLayout.JAVA_LONG;
 	private static final VarHandle attribary = C_INT.arrayElementVarHandle();
 	private final XLib xlib = XLib.get();
 	private final SymbolLookup glx = SymbolLookup.libraryLookup("libGLX.so.0", Arena.global());
@@ -447,6 +468,99 @@ public abstract class GLX {
 
 	public GLXBufferSwapEventINTEL GLXBufferSwapEventINTEL(XEvent ev) {
 	    return(new GLXBufferSwapEventINTEL(ev.mem()));
+	}
+
+	private final MethodHandle glXGetSyncValuesOML = ld.downcallHandle(glXGetProcAddress("glXGetSyncValuesOML"), FunctionDescriptor.of(C_XBool, ADDRESS, C_XID, ADDRESS, ADDRESS, ADDRESS));
+	public SyncValues glXGetSyncValuesOML(Display dpy, XID drawable) {
+	    try(Arena st = Arena.ofConfined()) {
+		MemorySegment ust = st.allocate(ValueLayout.JAVA_LONG);
+		MemorySegment msc = st.allocate(ValueLayout.JAVA_LONG);
+		MemorySegment bsc = st.allocate(ValueLayout.JAVA_LONG);
+		try {
+		    if(C_XID instanceof ValueLayout.OfLong)
+			glXGetSyncValuesOML.invoke(dpy.mem(), (long)drawable.bits, ust, msc, bsc);
+		    else
+			glXGetSyncValuesOML.invoke(dpy.mem(), (int)drawable.bits, ust, msc, bsc);
+		} catch(Throwable e) {
+		    throw(new RuntimeException(e));
+		} finally {
+		    checkerror();
+		}
+		return(new SyncValues(ust.get(ValueLayout.JAVA_LONG, 0), msc.get(ValueLayout.JAVA_LONG, 0), bsc.get(ValueLayout.JAVA_LONG, 0)));
+	    }
+	}
+
+	private final MethodHandle glXGetMscRateOML = ld.downcallHandle(glXGetProcAddress("glXGetMscRateOML"), FunctionDescriptor.of(C_XBool, ADDRESS, C_XID, ADDRESS, ADDRESS));
+	public Ratio glXGetMscRateOML(Display dpy, XID drawable) {
+	    try(Arena st = Arena.ofConfined()) {
+		MemorySegment num = st.allocate(ValueLayout.JAVA_INT);
+		MemorySegment den = st.allocate(ValueLayout.JAVA_INT);
+		try {
+		    if(C_XID instanceof ValueLayout.OfLong)
+			glXGetMscRateOML.invoke(dpy.mem(), (long)drawable.bits, num, den);
+		    else
+			glXGetMscRateOML.invoke(dpy.mem(), (int)drawable.bits, num, den);
+		} catch(Throwable e) {
+		    throw(new RuntimeException(e));
+		} finally {
+		    checkerror();
+		}
+		return(Ratio.of(num.get(ValueLayout.JAVA_INT, 0), den.get(ValueLayout.JAVA_INT, 0)));
+	    }
+	}
+
+	private final MethodHandle glXSwapBuffersMscOML = ld.downcallHandle(glXGetProcAddress("glXSwapBuffersMscOML"), FunctionDescriptor.of(INT64_T, ADDRESS, C_XID, INT64_T, INT64_T, INT64_T));
+	public long glXSwapBuffersMscOML(Display dpy, XID drawable, long target_msc, long divisor, long remainder) {
+	    try {
+		if(C_XID instanceof ValueLayout.OfLong)
+		    return((long)glXSwapBuffersMscOML.invoke(dpy.mem(), (long)drawable.bits, target_msc, divisor, remainder));
+		else
+		    return((long)glXSwapBuffersMscOML.invoke(dpy.mem(), (int)drawable.bits, target_msc, divisor, remainder));
+	    } catch(Throwable e) {
+		throw(new RuntimeException(e));
+	    } finally {
+		checkerror();
+	    }
+	}
+
+	private final MethodHandle glXWaitForMscOML = ld.downcallHandle(glXGetProcAddress("glXWaitForMscOML"), FunctionDescriptor.of(C_XBool, ADDRESS, C_XID, INT64_T, INT64_T, INT64_T, ADDRESS, ADDRESS, ADDRESS));
+	public SyncValues glXWaitForMscOML(Display dpy, XID drawable, long target_msc, long divisor, long remainder) {
+	    try(Arena st = Arena.ofConfined()) {
+		MemorySegment ust = st.allocate(ValueLayout.JAVA_LONG);
+		MemorySegment msc = st.allocate(ValueLayout.JAVA_LONG);
+		MemorySegment bsc = st.allocate(ValueLayout.JAVA_LONG);
+		try {
+		    if(C_XID instanceof ValueLayout.OfLong)
+			glXWaitForMscOML.invoke(dpy.mem(), (long)drawable.bits, target_msc, divisor, remainder, ust, msc, bsc);
+		    else
+			glXWaitForMscOML.invoke(dpy.mem(), (int)drawable.bits, target_msc, divisor, remainder, ust, msc, bsc);
+		} catch(Throwable e) {
+		    throw(new RuntimeException(e));
+		} finally {
+		    checkerror();
+		}
+		return(new SyncValues(ust.get(ValueLayout.JAVA_LONG, 0), msc.get(ValueLayout.JAVA_LONG, 0), bsc.get(ValueLayout.JAVA_LONG, 0)));
+	    }
+	}
+
+	private final MethodHandle glXWaitForBscOML = ld.downcallHandle(glXGetProcAddress("glXWaitForBscOML"), FunctionDescriptor.of(C_XBool, ADDRESS, C_XID, INT64_T, ADDRESS, ADDRESS, ADDRESS));
+	public SyncValues glXWaitForBscOML(Display dpy, XID drawable, long target_bsc) {
+	    try(Arena st = Arena.ofConfined()) {
+		MemorySegment ust = st.allocate(ValueLayout.JAVA_LONG);
+		MemorySegment msc = st.allocate(ValueLayout.JAVA_LONG);
+		MemorySegment bsc = st.allocate(ValueLayout.JAVA_LONG);
+		try {
+		    if(C_XID instanceof ValueLayout.OfLong)
+			glXWaitForBscOML.invoke(dpy.mem(), (long)drawable.bits, target_bsc, ust, msc, bsc);
+		    else
+			glXWaitForBscOML.invoke(dpy.mem(), (int)drawable.bits, target_bsc, ust, msc, bsc);
+		} catch(Throwable e) {
+		    throw(new RuntimeException(e));
+		} finally {
+		    checkerror();
+		}
+		return(new SyncValues(ust.get(ValueLayout.JAVA_LONG, 0), msc.get(ValueLayout.JAVA_LONG, 0), bsc.get(ValueLayout.JAVA_LONG, 0)));
+	    }
 	}
     }
 
