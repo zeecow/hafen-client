@@ -580,7 +580,8 @@ public class GLXContext implements Providers.Factory<Toolkit> {
 		wnd = windows.get(id);
 	    }
 	    if(wnd == null) {
-		Warning.warn(String.format("XInput event received for non-registered window %s: %d", id, ev.evtype()));
+		if(DEBUG)
+		    Debug.dump(String.format("XInput event received for non-registered window %s: %d", id, ev.evtype()));
 		return;
 	    }
 	    wnd.event(ev);
@@ -594,7 +595,8 @@ public class GLXContext implements Providers.Factory<Toolkit> {
 		wnd = windows.get(id);
 	    }
 	    if(wnd == null) {
-		Warning.warn(String.format("XInput event received for non-registered window %s: %d", id, ev.evtype()));
+		if(DEBUG)
+		    Debug.dump(String.format("XInput event received for non-registered window %s: %d", id, ev.evtype()));
 		return;
 	    }
 	    wnd.event(ev);
@@ -1330,6 +1332,8 @@ public class GLXContext implements Providers.Factory<Toolkit> {
 		    break;
 		case XLib.SelectionRequest:
 		    selectionrequest(ev.xselectionrequest());
+		    break;
+		case XLib.EnterNotify: case XLib.LeaveNotify:
 		    break;
 		default:
 		    Warning.warn(String.format("unexpected event received for window %s: %d", id, ev.type()));
