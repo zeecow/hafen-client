@@ -328,6 +328,10 @@ public abstract class XLib {
 	    this.event = event;
 	    this.error = error;
 	}
+
+	public String toString() {
+	    return(String.format("#<x11-ext %s op=%s ev=%s err=%s>", name, opcode, event, error));
+	}
     }
 
     public static class XIM {

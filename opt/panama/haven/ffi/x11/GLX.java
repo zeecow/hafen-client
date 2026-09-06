@@ -30,6 +30,7 @@ import haven.ffi.*;
 import haven.ffi.gl.*;
 import java.lang.invoke.*;
 import java.lang.foreign.*;
+import java.lang.foreign.MemoryLayout.PathElement;
 import static haven.ffi.ABI.*;
 import static haven.ffi.FUtils.*;
 import static haven.ffi.x11.XLib.*;
@@ -97,6 +98,11 @@ public abstract class GLX {
     public static final int GLX_CONTEXT_DEBUG_BIT_ARB = 0x00000001;
     public static final int GLX_CONTEXT_FORWARD_COMPATIBLE_BIT_ARB = 0x00000002;
 
+    public static final int GLX_BUFFER_SWAP_COMPLETE_INTEL_MASK = 0x04000000;
+    public static final int GLX_EXCHANGE_COMPLETE_INTEL = 0x8180;
+    public static final int GLX_COPY_COMPLETE_INTEL     = 0x8181;
+    public static final int GLX_FLIP_COMPLETE_INTEL     = 0x8182;
+
     public static class GLXContext {
 	protected final MemorySegment mem;
 
@@ -130,6 +136,20 @@ public abstract class GLX {
 	}
     }
 
+    public static abstract class GLXBufferSwapEventINTEL extends StructInstance {
+	protected GLXBufferSwapEventINTEL(MemorySegment mem) {
+	    super(mem);
+	}
+
+	MemorySegment mem() {return(mem);}
+
+	public abstract int type();
+	public abstract XID drawable();
+	public abstract long ust();
+	public abstract long msc();
+	public abstract long scb();
+    }
+
     public abstract MemorySegment glXGetProcAddress(String name);
     public abstract String glXQueryExtensionsString(Display dpy, int screen);
     public abstract XVisualInfo glXChooseVisual(Display dpy, int screen, int[] attriblist);
@@ -143,10 +163,14 @@ public abstract class GLX {
     public abstract void glXDestroyContext(Display dpy, GLXContext ctx);
     public abstract boolean glXMakeCurrent(Display dpy, XID drawable, GLXContext ctx);
     public abstract void glXSwapBuffers(Display dpy, XID drawable);
+    public abstract void glXSelectEvent(Display dpy, XID drawable, int mask);
+    public abstract int glXGetSelectedEvent(Display dpy, XID drawable);
+    public abstract GLXBufferSwapEventINTEL GLXBufferSwapEventINTEL(XEvent ev);
 
     static class libGLX_so_0 extends GLX {
 	private static final MemoryLayout C_XBool = libX11_so_6.C_XBool;
 	private static final MemoryLayout C_XID = libX11_so_6.C_XID;
+	private static final MemoryLayout CARD64 = ValueLayout.JAVA_LONG;
 	private static final VarHandle attribary = C_INT.arrayElementVarHandle();
 	private final XLib xlib = XLib.get();
 	private final SymbolLookup glx = SymbolLookup.libraryLookup("libGLX.so.0", Arena.global());
@@ -358,6 +382,71 @@ public abstract class GLX {
 	    } finally {
 		checkerror();
 	    }
+	}
+
+	private final MethodHandle glXSelectEvent = ld.downcallHandle(glx.find("glXSelectEvent").get(), FunctionDescriptor.ofVoid(ADDRESS, C_XID, C_LONG));
+	public void glXSelectEvent(Display dpy, XID drawable, int mask) {
+	    try {
+		if(C_XID instanceof ValueLayout.OfLong)
+		    glXSelectEvent.invoke(dpy.mem(), (long)drawable.bits, mask);
+		else
+		    glXSelectEvent.invoke(dpy.mem(), (int)drawable.bits, mask);
+	    } catch(Throwable e) {
+		throw(new RuntimeException(e));
+	    } finally {
+		checkerror();
+	    }
+	}
+
+	private final MethodHandle glXGetSelectedEvent = ld.downcallHandle(glx.find("glXGetSelectedEvent").get(), FunctionDescriptor.ofVoid(ADDRESS, C_XID, ADDRESS));
+	public int glXGetSelectedEvent(Display dpy, XID drawable) {
+	    try(Arena st = Arena.ofConfined()) {
+		MemorySegment buf = st.allocate(C_LONG);
+		try {
+		    if(C_XID instanceof ValueLayout.OfLong)
+			glXGetSelectedEvent.invoke(dpy.mem(), (long)drawable.bits, buf);
+		    else
+			glXGetSelectedEvent.invoke(dpy.mem(), (int)drawable.bits, buf);
+		} catch(Throwable e) {
+		    throw(new RuntimeException(e));
+		} finally {
+		    checkerror();
+		}
+		return((int)getint(buf, 0, C_LONG, false));
+	    }
+	}
+
+	static final StructLayout _GLXBufferSwapEventINTEL = struct(new MemoryLayout[] {
+		C_INT.withName("type"),
+		C_LONG.withName("serial"),
+		C_XBool.withName("send_event"),
+		ADDRESS.withName("display"),
+		C_XID.withName("drawable"),
+		CARD64.withName("ust"),
+		CARD64.withName("msc"),
+		CARD64.withName("sbc"),
+	    });
+	public static class GLXBufferSwapEventINTEL extends GLX.GLXBufferSwapEventINTEL {
+	    GLXBufferSwapEventINTEL(MemorySegment mem) {
+		super(mem);
+	    }
+
+	    protected StructLayout $layout() {return(_GLXBufferSwapEventINTEL);}
+
+	    private static final VarHandle type = _GLXBufferSwapEventINTEL.varHandle(PathElement.groupElement("type"));
+	    public int type() {return((int)type.get(mem, 0));}
+	    private static final VarHandle drawable = _GLXBufferSwapEventINTEL.varHandle(PathElement.groupElement("drawable"));
+	    public XID drawable() {return(XID.of((long)drawable.get(mem, 0)));}
+	    private static final VarHandle ust = _GLXBufferSwapEventINTEL.varHandle(PathElement.groupElement("ust"));
+	    public long ust() {return((long)ust.get(mem, 0));}
+	    private static final VarHandle msc = _GLXBufferSwapEventINTEL.varHandle(PathElement.groupElement("msc"));
+	    public long msc() {return((long)msc.get(mem, 0));}
+	    private static final VarHandle scb = _GLXBufferSwapEventINTEL.varHandle(PathElement.groupElement("scb"));
+	    public long scb() {return((long)scb.get(mem, 0));}
+	}
+
+	public GLXBufferSwapEventINTEL GLXBufferSwapEventINTEL(XEvent ev) {
+	    return(new GLXBufferSwapEventINTEL(ev.mem()));
 	}
     }
 
