@@ -692,6 +692,7 @@ public class CocoaContext implements Providers.Factory<Toolkit> {
 		view.setWantsBestResolutionOpenGLSurface(true);
 		view.registerForDraggedTypes("public.tiff", "public.file-url", "public.utf8-plain-text");
 		nsw.setContentView(view);
+		nsw.setReleasedWhenClosed(true);
 	    }
 
 	    class WindowDelegate implements AppKit.WindowDelegate {
@@ -1184,6 +1185,7 @@ public class CocoaContext implements Providers.Factory<Toolkit> {
 	    }
 
 	    public void dispose() {
+		nsw.close();
 	    }
 	}
 

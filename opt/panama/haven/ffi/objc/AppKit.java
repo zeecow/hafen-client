@@ -210,6 +210,8 @@ public abstract class AppKit {
 	public void toggleFullScreen();
 	public boolean isKeyWindow();
 	public int occlusionState();
+	public void close();
+	public void setReleasedWhenClosed(boolean value);
     }
 
     public interface WindowDelegate {
@@ -742,6 +744,8 @@ public abstract class AppKit {
 	private final SEL sel_toggleFullScreen = rt.sel_registerName("toggleFullScreen:");
 	private final SEL sel_isKeyWindow = rt.sel_registerName("isKeyWindow");
 	private final SEL sel_occlusionState = rt.sel_registerName("occlusionState");
+	private final SEL sel_close = rt.sel_registerName("close");
+	private final SEL sel_setReleasedWhenClosed = rt.sel_registerName("setReleasedWhenClosed:");
 	class NSWindow implements AppKit.NSWindow {
 	    public final ID id;
 
@@ -832,6 +836,12 @@ public abstract class AppKit {
 	    }
 	    public int occlusionState() {
 		return(rt.objc_msgSend_NSUInt(id, sel_occlusionState));
+	    }
+	    public void close() {
+		rt.objc_msgSend_void(id, sel_close);
+	    }
+	    public void setReleasedWhenClosed(boolean value) {
+		rt.objc_msgSend_void(id, sel_setReleasedWhenClosed, value);
 	    }
 	}
 	private final SEL sel_initWithContentRect_styleMask_backing_defer = rt.sel_registerName("initWithContentRect:styleMask:backing:defer:");
