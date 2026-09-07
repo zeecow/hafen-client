@@ -188,6 +188,8 @@ public class CocoaContext implements Providers.Factory<Toolkit> {
 	public final Map<String, LayoutMap> layouts = new IdentityHashMap<>();
 	public final int kbdtype;
 	public final NSCursor nocursor = ak.NSCursor(ak.NSImage(cg.CGSize(Coord.of(1, 1))), cg.CGPoint(Coord.z));
+	private CGLEnvironment glenv;
+	private NSView curglview = null;
 
 	private CocoaToolkit() {
 	    kbdtype = carb.LMGetKbdType();
@@ -276,16 +278,22 @@ public class CocoaContext implements Providers.Factory<Toolkit> {
 	    return(new CocoaCursor(cg.CGImageCreate(img), hs));
 	}
 
-	private <T> T glrun0(NSView view, Supplier<T> task) {
-	    ctx.setView(view);
-	    ctx.makeCurrentContext();
-	    try {
-		ctx.update();
-		return(task.get());
-	    } finally {
+	private void setglview(NSView view) {
+	    if(view != curglview) {
 		ctx.clearCurrentContext();
 		// ctx.clearDrawable();
+		if(view != null) {
+		    ctx.setView(view);
+		    ctx.makeCurrentContext();
+		    ctx.update();
+		}
+		view = curglview;
 	    }
+	}
+
+	private <T> T glrun0(NSView view, Supplier<T> task) {
+	    setglview(view);
+	    return(task.get());
 	}
 
 	<T> T glrun(NSView view, Supplier<T> task) {
@@ -632,6 +640,59 @@ public class CocoaContext implements Providers.Factory<Toolkit> {
 	}
 	private final Supplier<Pasteboard> pb_general = lazymainrun(() -> new Pasteboard(ak.NSPasteboard_generalPasteboard()));
 
+	public class CGLEnvironment extends FFIEnvironment {
+	    private int qstate;
+
+	    public class ProxyEnv extends GLProxy {
+		public final NSView view;
+
+		public ProxyEnv(NSView view) {
+		    super(CGLEnvironment.this);
+		    this.view = view;
+		}
+	    }
+
+	    private CGLEnvironment() {
+		super(gl);
+	    }
+
+	    public GLRender render() {
+		throw(new RuntimeException("raw render-buffers not available in shared environments"));
+	    }
+
+	    protected void process(GL gl, GLRender ctx, Consumer<GL> cmd) {
+		setglview(((ProxyEnv)ctx.env()).view);
+		cmd.accept(gl);
+	    }
+
+	    private void process() {
+		synchronized(this) {
+		    qstate = 2;
+		}
+		process(gl);
+		synchronized(this) {
+		    if((qstate & 1) != 0)
+			mainrun((Runnable)this::process);
+		    qstate &= ~2;
+		}
+	    }
+
+	    public void submit(Render cmd) {
+		super.submit(cmd);
+		synchronized(this) {
+		    if(glenv == this) {
+			if(qstate == 0)
+			    mainrun((Runnable)this::process);
+			qstate |= 1;
+		    }
+		}
+	    }
+	}
+
+	public boolean sharedenvs() {
+	    return(true);
+	}
+
 	public class CocoaWindow implements Windeye {
 	    public final NSWindow nsw;
 	    public final NSView view;
@@ -639,43 +700,10 @@ public class CocoaContext implements Providers.Factory<Toolkit> {
 	    private boolean shown = false;
 	    private Sizing sizeinfo = new Sizing().normsize(Coord.of(800, 600));
 	    private State showstate = null;
-	    private CGLEnvironment renv;
+	    private Environment wenv;
 	    private Coord size = Coord.z;
 	    private NSCursor cursor = null;
 	    private DropHandler drophandler = null;
-
-	    public class CGLEnvironment extends FFIEnvironment {
-		private int qstate;
-
-		private CGLEnvironment() {
-		    super(gl);
-		}
-
-		private void process() {
-		    synchronized(this) {
-			qstate = 2;
-		    }
-		    process(gl);
-		    synchronized(this) {
-			if((qstate & 1) != 0)
-			    glrun(view, (Runnable)this::process);
-			qstate &= ~2;
-		    }
-		}
-
-		public void submit(Render cmd) {
-		    super.submit(cmd);
-		    synchronized(this) {
-			if(renv == this) {
-			    if(qstate == 0)
-				glrun(view, (Runnable)this::process);
-			    qstate |= 1;
-			}
-		    }
-		}
-
-		public CocoaWindow wnd() {return(CocoaWindow.this);}
-	    }
 
 	    private CocoaWindow() {
 		nsw = ak.NSWindow(cg.CGRect(Area.sized(Coord.of(1, 1))), 
@@ -1140,13 +1168,19 @@ public class CocoaContext implements Providers.Factory<Toolkit> {
 	    }
 
 	    public Environment env() {
-		if(renv == null) {
-		    synchronized(this) {
-			if(renv == null)
-			    renv = glrun(view, CGLEnvironment::new);
+		if(glenv == null) {
+		    synchronized(CocoaToolkit.this) {
+			if(glenv == null)
+			    glenv = glrun(view, CGLEnvironment::new);
 		    }
 		}
-		return(renv);
+		if(wenv == null) {
+		    synchronized(this) {
+			if(wenv == null)
+			    wenv = glenv.new ProxyEnv(view);
+		    }
+		}
+		return(wenv);
 	    }
 
 	    private static final Pipe.Op glfb = Pipe.Op.compose(new FragColor<>(FragColor.defcolor),
@@ -1166,7 +1200,7 @@ public class CocoaContext implements Providers.Factory<Toolkit> {
 
 	    public void swapbuffers(Render buf, Object mode) {
 		GLRender gbuf = (GLRender)buf;
-		if(((CGLEnvironment)gbuf.env).wnd() != this)
+		if(((CGLEnvironment.ProxyEnv)gbuf.env()).view != view)
 		    throw(new IllegalArgumentException());
 		if(!(mode instanceof Boolean))
 		    throw(new IllegalArgumentException());
