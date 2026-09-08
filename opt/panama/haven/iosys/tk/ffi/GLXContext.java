@@ -2534,7 +2534,7 @@ public class GLXContext implements Providers.Factory<Toolkit> {
 	public Set<Key.Mod> mods() {return(mods);}
 
 	public String toString() {
-	    return(String.format("#<%s %s state=%x sym=%s str=\"%s\">", getClass().getSimpleName(), key, state, rawsym, (str == null) ? "" : Utils.bprint.enc(str.getBytes(Utils.utf8))));
+	    return(String.format("#<%s %s state=%x sym=%s str=\"%s\">", getClass().getSimpleName(), key, state, rawsym, (str == null) ? "" : Utils.strsafe(str)));
 	}
     }
     public static class GLXKeyPressEvent extends GLXKeyEvent implements Toolkit.KeyDownEvent {
