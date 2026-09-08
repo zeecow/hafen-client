@@ -100,6 +100,85 @@ public abstract class LibPulse {
     public static final int PA_STREAM_RELATIVE_VOLUME           = 0x40000;
     public static final int PA_STREAM_PASSTHROUGH               = 0x80000;
 
+    public static final String PA_PROP_MEDIA_NAME = "media.name";
+    public static final String PA_PROP_MEDIA_TITLE = "media.title";
+    public static final String PA_PROP_MEDIA_ARTIST = "media.artist";
+    public static final String PA_PROP_MEDIA_COPYRIGHT = "media.copyright";
+    public static final String PA_PROP_MEDIA_SOFTWARE = "media.software";
+    public static final String PA_PROP_MEDIA_LANGUAGE = "media.language";
+    public static final String PA_PROP_MEDIA_FILENAME = "media.filename";
+    public static final String PA_PROP_MEDIA_ICON = "media.icon";
+    public static final String PA_PROP_MEDIA_ICON_NAME = "media.icon_name";
+    public static final String PA_PROP_MEDIA_ROLE = "media.role";
+    public static final String PA_PROP_FILTER_WANT = "filter.want";
+    public static final String PA_PROP_FILTER_APPLY = "filter.apply";
+    public static final String PA_PROP_FILTER_SUPPRESS = "filter.suppress";
+    public static final String PA_PROP_EVENT_ID = "event.id";
+    public static final String PA_PROP_EVENT_DESCRIPTION = "event.description";
+    public static final String PA_PROP_EVENT_MOUSE_X = "event.mouse.x";
+    public static final String PA_PROP_EVENT_MOUSE_Y = "event.mouse.y";
+    public static final String PA_PROP_EVENT_MOUSE_HPOS = "event.mouse.hpos";
+    public static final String PA_PROP_EVENT_MOUSE_VPOS = "event.mouse.vpos";
+    public static final String PA_PROP_EVENT_MOUSE_BUTTON = "event.mouse.button";
+    public static final String PA_PROP_WINDOW_NAME = "window.name";
+    public static final String PA_PROP_WINDOW_ID = "window.id";
+    public static final String PA_PROP_WINDOW_ICON = "window.icon";
+    public static final String PA_PROP_WINDOW_ICON_NAME = "window.icon_name";
+    public static final String PA_PROP_WINDOW_X = "window.x";
+    public static final String PA_PROP_WINDOW_Y = "window.y";
+    public static final String PA_PROP_WINDOW_WIDTH = "window.width";
+    public static final String PA_PROP_WINDOW_HEIGHT = "window.height";
+    public static final String PA_PROP_WINDOW_HPOS = "window.hpos";
+    public static final String PA_PROP_WINDOW_VPOS = "window.vpos";
+    public static final String PA_PROP_WINDOW_DESKTOP = "window.desktop";
+    public static final String PA_PROP_WINDOW_X11_DISPLAY = "window.x11.display";
+    public static final String PA_PROP_WINDOW_X11_SCREEN = "window.x11.screen";
+    public static final String PA_PROP_WINDOW_X11_MONITOR = "window.x11.monitor";
+    public static final String PA_PROP_WINDOW_X11_XID = "window.x11.xid";
+    public static final String PA_PROP_APPLICATION_NAME = "application.name";
+    public static final String PA_PROP_APPLICATION_ID = "application.id";
+    public static final String PA_PROP_APPLICATION_VERSION = "application.version";
+    public static final String PA_PROP_APPLICATION_ICON = "application.icon";
+    public static final String PA_PROP_APPLICATION_ICON_NAME = "application.icon_name";
+    public static final String PA_PROP_APPLICATION_LANGUAGE = "application.language";
+    public static final String PA_PROP_APPLICATION_PROCESS_ID = "application.process.id";
+    public static final String PA_PROP_APPLICATION_PROCESS_BINARY = "application.process.binary";
+    public static final String PA_PROP_APPLICATION_PROCESS_USER = "application.process.user";
+    public static final String PA_PROP_APPLICATION_PROCESS_HOST = "application.process.host";
+    public static final String PA_PROP_APPLICATION_PROCESS_MACHINE_ID = "application.process.machine_id";
+    public static final String PA_PROP_APPLICATION_PROCESS_SESSION_ID = "application.process.session_id";
+    public static final String PA_PROP_DEVICE_STRING = "device.string";
+    public static final String PA_PROP_DEVICE_API = "device.api";
+    public static final String PA_PROP_DEVICE_DESCRIPTION = "device.description";
+    public static final String PA_PROP_DEVICE_BUS_PATH = "device.bus_path";
+    public static final String PA_PROP_DEVICE_SERIAL = "device.serial";
+    public static final String PA_PROP_DEVICE_VENDOR_ID = "device.vendor.id";
+    public static final String PA_PROP_DEVICE_VENDOR_NAME = "device.vendor.name";
+    public static final String PA_PROP_DEVICE_PRODUCT_ID = "device.product.id";
+    public static final String PA_PROP_DEVICE_PRODUCT_NAME = "device.product.name";
+    public static final String PA_PROP_DEVICE_CLASS = "device.class";
+    public static final String PA_PROP_DEVICE_FORM_FACTOR = "device.form_factor";
+    public static final String PA_PROP_DEVICE_BUS = "device.bus";
+    public static final String PA_PROP_DEVICE_ICON = "device.icon";
+    public static final String PA_PROP_DEVICE_ICON_NAME = "device.icon_name";
+    public static final String PA_PROP_DEVICE_ACCESS_MODE = "device.access_mode";
+    public static final String PA_PROP_DEVICE_MASTER_DEVICE = "device.master_device";
+    public static final String PA_PROP_DEVICE_BUFFERING_BUFFER_SIZE = "device.buffering.buffer_size";
+    public static final String PA_PROP_DEVICE_BUFFERING_FRAGMENT_SIZE = "device.buffering.fragment_size";
+    public static final String PA_PROP_DEVICE_PROFILE_NAME = "device.profile.name";
+    public static final String PA_PROP_DEVICE_INTENDED_ROLES = "device.intended_roles";
+    public static final String PA_PROP_DEVICE_PROFILE_DESCRIPTION = "device.profile.description";
+    public static final String PA_PROP_MODULE_AUTHOR = "module.author";
+    public static final String PA_PROP_MODULE_DESCRIPTION = "module.description";
+    public static final String PA_PROP_MODULE_USAGE = "module.usage";
+    public static final String PA_PROP_MODULE_VERSION = "module.version";
+    public static final String PA_PROP_FORMAT_SAMPLE_FORMAT = "format.sample_format";
+    public static final String PA_PROP_FORMAT_RATE = "format.rate";
+    public static final String PA_PROP_FORMAT_CHANNELS = "format.channels";
+    public static final String PA_PROP_FORMAT_CHANNEL_MAP = "format.channel_map";
+    public static final String PA_PROP_CONTEXT_FORCE_DISABLE_SHM = "context.force.disable.shm";
+    public static final String PA_PROP_BLUETOOTH_CODEC = "bluetooth.codec";
+
     public static interface pa_threaded_mainloop {
 	public LibPulse lib();
 
@@ -139,6 +218,8 @@ public abstract class LibPulse {
 
     public static interface pa_proplist {
 	public LibPulse lib();
+	public default void set(String key, byte[] data) {lib().pa_proplist_set(this, key, data);}
+	public default void sets(String key, String val) {lib().pa_proplist_sets(this, key, val);}
     }
 
     public static interface pa_stream {
@@ -191,15 +272,20 @@ public abstract class LibPulse {
     public abstract void pa_threaded_mainloop_start(LibPulse.pa_threaded_mainloop m);
     public abstract void pa_threaded_mainloop_stop(LibPulse.pa_threaded_mainloop m);
     public abstract pa_context pa_context_new(LibPulse.pa_mainloop_api mainloop, String name);
+    public abstract pa_context pa_context_new_with_proplist(LibPulse.pa_mainloop_api mainloop, String name, LibPulse.pa_proplist props);
     public abstract int pa_context_errno(LibPulse.pa_context c);
     public abstract int pa_context_get_state(LibPulse.pa_context c);
     public abstract void pa_context_connect(LibPulse.pa_context c, String server, int flags);
     public abstract void pa_context_disconnect(LibPulse.pa_context c);
     public abstract void pa_context_set_state_callback(LibPulse.pa_context gc, Runnable cb);
     public abstract void pa_context_set_event_callback(LibPulse.pa_context gc, BiConsumer<? super String, ? super LibPulse.pa_proplist> cb);
+    public abstract pa_proplist pa_proplist_new();
+    public abstract void pa_proplist_set(LibPulse.pa_proplist p, String key, byte[] data);
+    public abstract void pa_proplist_sets(LibPulse.pa_proplist p, String key, String val);
     public abstract pa_sample_spec pa_sample_spec();
     public abstract long pa_usec_to_bytes(long t, LibPulse.pa_sample_spec spec);
     public abstract pa_stream pa_stream_new(LibPulse.pa_context c, String name, LibPulse.pa_sample_spec ss);
+    public abstract pa_stream pa_stream_new_with_proplist(LibPulse.pa_context c, String name, LibPulse.pa_sample_spec ss, LibPulse.pa_proplist props);
     public abstract void pa_stream_set_state_callback(LibPulse.pa_stream gs, Runnable cb);
     public abstract void pa_stream_set_write_callback(LibPulse.pa_stream gs, LongConsumer cb);
     public abstract pa_buffer_attr pa_buffer_attr();
@@ -355,6 +441,17 @@ public abstract class LibPulse {
 	    return(nullp(rv) ? null : new pa_context(rv, mainloop));
 	}
 
+	private final MethodHandle pa_context_new_with_proplist = ld.downcallHandle(libpulse.find("pa_context_new_with_proplist").get(), FunctionDescriptor.of(ADDRESS, ADDRESS, ADDRESS, ADDRESS));
+	public pa_context pa_context_new_with_proplist(LibPulse.pa_mainloop_api mainloop, String name, LibPulse.pa_proplist props) {
+	    MemorySegment rv;
+	    try(Arena st = Arena.ofConfined()) {
+		rv = (MemorySegment)pa_context_new_with_proplist.invoke(((pa_mainloop_api)mainloop).mem, st.allocateFrom(name, C_CHARSET), ((pa_proplist)props).mem);
+	    } catch(Throwable e) {
+		throw(new RuntimeException(e));
+	    }
+	    return(nullp(rv) ? null : new pa_context(rv, mainloop));
+	}
+
 	private final MethodHandle pa_context_errno = ld.downcallHandle(libpulse.find("pa_context_errno").get(), FunctionDescriptor.of(C_INT, ADDRESS));
 	public int pa_context_errno(LibPulse.pa_context c) {
 	    try {
@@ -450,6 +547,53 @@ public abstract class LibPulse {
 	    public libpulse_so_0 lib() {return(libpulse_so_0.this);}
 	}
 
+	private final MethodHandle pa_proplist_free = ld.downcallHandle(libpulse.find("pa_proplist_free").get(), FunctionDescriptor.ofVoid(ADDRESS));
+	void pa_proplist_free(MemorySegment mem) {
+	    try {
+		pa_proplist_free.invoke(mem);
+	    } catch(Throwable e) {
+		throw(new RuntimeException(e));
+	    }
+	}
+
+	private final MethodHandle pa_proplist_new = ld.downcallHandle(libpulse.find("pa_proplist_new").get(), FunctionDescriptor.of(ADDRESS));
+	public pa_proplist pa_proplist_new() {
+	    MemorySegment rv;
+	    try {
+		rv = (MemorySegment)pa_proplist_new.invoke();
+	    } catch(Throwable e) {
+		throw(new RuntimeException(e));
+	    }
+	    pa_proplist ret = new pa_proplist(rv);
+	    Finalizer.finalize(ret, () -> pa_proplist_free(rv));
+	    return(ret);
+	}
+
+	private final MethodHandle pa_proplist_set = ld.downcallHandle(libpulse.find("pa_proplist_set").get(), FunctionDescriptor.of(C_INT, ADDRESS, ADDRESS, ADDRESS, SIZE_T),
+								       Linker.Option.critical(true));
+	public void pa_proplist_set(LibPulse.pa_proplist p, String key, byte[] data) {
+	    int rv;
+	    try(Arena st = Arena.ofConfined()) {
+		rv = (int)pa_proplist_set.invoke(((pa_proplist)p).mem, st.allocateFrom(key, Utils.utf8), MemorySegment.ofArray(data), data.length);
+	    } catch(Throwable e) {
+		throw(new RuntimeException(e));
+	    }
+	    if(rv != 0)
+		throw(new PulseException("pa_proplist_set: " + rv));
+	}
+
+	private final MethodHandle pa_proplist_sets = ld.downcallHandle(libpulse.find("pa_proplist_sets").get(), FunctionDescriptor.of(C_INT, ADDRESS, ADDRESS, ADDRESS));
+	public void pa_proplist_sets(LibPulse.pa_proplist p, String key, String val) {
+	    int rv;
+	    try(Arena st = Arena.ofConfined()) {
+		rv = (int)pa_proplist_sets.invoke(((pa_proplist)p).mem, st.allocateFrom(key, Utils.utf8), st.allocateFrom(val, Utils.utf8));
+	    } catch(Throwable e) {
+		throw(new RuntimeException(e));
+	    }
+	    if(rv != 0)
+		throw(new PulseException("pa_proplist_sets: " + rv));
+	}
+
 	static final StructLayout _pa_sample_spec = struct(new MemoryLayout[] {
 	    C_ENUM.withName("format"),
 	    ValueLayout.JAVA_INT.withName("rate"),
@@ -539,6 +683,17 @@ public abstract class LibPulse {
 	    MemorySegment rv;
 	    try(Arena st = Arena.ofConfined()) {
 		rv = (MemorySegment)pa_stream_new.invoke(((pa_context)c).mem, st.allocateFrom(name, C_CHARSET), ((pa_sample_spec)ss).mem(), MemorySegment.NULL);
+	    } catch(Throwable e) {
+		throw(new RuntimeException(e));
+	    }
+	    return(nullp(rv) ? null : new pa_stream(rv, c));
+	}
+
+	private final MethodHandle pa_stream_new_with_proplist = ld.downcallHandle(libpulse.find("pa_stream_new_with_proplist").get(), FunctionDescriptor.of(ADDRESS, ADDRESS, ADDRESS, ADDRESS, ADDRESS, ADDRESS));
+	public pa_stream pa_stream_new_with_proplist(LibPulse.pa_context c, String name, LibPulse.pa_sample_spec ss, LibPulse.pa_proplist props) {
+	    MemorySegment rv;
+	    try(Arena st = Arena.ofConfined()) {
+		rv = (MemorySegment)pa_stream_new_with_proplist.invoke(((pa_context)c).mem, st.allocateFrom(name, C_CHARSET), ((pa_sample_spec)ss).mem(), MemorySegment.NULL, ((pa_proplist)props).mem);
 	    } catch(Throwable e) {
 		throw(new RuntimeException(e));
 	    }

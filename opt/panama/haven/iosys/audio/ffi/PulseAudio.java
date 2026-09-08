@@ -27,6 +27,7 @@
 package haven.iosys.audio.ffi;
 
 import java.util.*;
+import java.io.*;
 import java.nio.*;
 import haven.*;
 import haven.iosys.*;
@@ -79,7 +80,16 @@ public class PulseAudio implements AudioSystem {
 	    pulse = LibPulse.get();
 	    loop = pulse.pa_threaded_mainloop_new();
 	    try(var _lk = loop.lock()) {
-		ctx = pulse.pa_context_new(loop.get_api(), NAME);
+		pa_proplist props = pulse.pa_proplist_new();
+		props.sets(PA_PROP_APPLICATION_ID, "se.seatribe.hafen");
+		/*
+		try(InputStream icon = Client.class.getResourceAsStream("icon.png")) {
+		    props.set(PA_PROP_APPLICATION_ICON, Utils.readall(icon));
+		} catch(IOException e) {
+		    new Warning(e, "could not read pulse-audio icon").issue();
+		}
+		*/
+		ctx = pulse.pa_context_new_with_proplist(loop.get_api(), NAME, props);
 		ctx.set_state_callback(this::ctxstate);
 		ctx.set_event_callback(this::ctxevent);
 		loop.start();
@@ -94,8 +104,6 @@ public class PulseAudio implements AudioSystem {
 		    ctx.wait();
 		}
 	    }
-	    /* Basic availability test */
-	    sinkline(Utils.map().put(SPEC_RATE, 44100).map());
 	    done = true;
 	} catch(Exception e) {
 	    throw(new Unavailable("PulseAudio library not avilable", e));
@@ -153,7 +161,9 @@ public class PulseAudio implements AudioSystem {
 		boolean clean = false;
 		try {
 		    try(var _lk = loop.lock()) {
-			this.ps = ps = pulse.pa_stream_new(ctx, "Audio output", spec);
+			pa_proplist props = pulse.pa_proplist_new();
+			props.sets(PA_PROP_MEDIA_ROLE, "game");
+			this.ps = ps = pulse.pa_stream_new_with_proplist(ctx, "Audio output", spec, props);
 			ps.set_state_callback(this::state);
 			ps.set_write_callback(this::fill);
 			pa_buffer_attr attr = pulse.pa_buffer_attr();
