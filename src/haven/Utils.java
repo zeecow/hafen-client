@@ -967,6 +967,43 @@ public class Utils {
     public static final Base64 b64np = new Base64(b64.set, '\0');
     public static final Base64 ub64 = new Base64("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_", '\0');
 
+    public static String strsafe(CharSequence text, boolean space) {
+	StringBuilder buf = new StringBuilder();
+	for(int i = 0; i < text.length(); i++) {
+	    char c = text.charAt(i);
+	    switch(c) {
+	    case ' ':
+		if(space)
+		    buf.append(' ');
+		else
+		    buf.append("\\u0020");
+		break;
+	    case '\n': buf.append("\\n"); break;
+	    case '\r': buf.append("\\r"); break;
+	    case '\"': buf.append("\\\""); break;
+	    case '\'': buf.append("\\\'"); break;
+	    default:
+		switch(Character.getType(c)) {
+		case Character.CONTROL: case Character.FORMAT:
+		case Character.SURROGATE: case Character.PRIVATE_USE:
+		case Character.UNASSIGNED: case Character.SPACE_SEPARATOR:
+		case Character.LINE_SEPARATOR: case Character.PARAGRAPH_SEPARATOR:
+		case Character.COMBINING_SPACING_MARK: case Character.NON_SPACING_MARK:
+		case Character.ENCLOSING_MARK:
+		    buf.append(String.format("\\u%04x", (int)c));
+		    break;
+		default:
+		    buf.append(c);
+		}
+	    }
+	}
+	return(buf.toString());
+    }
+
+    public static String strsafe(CharSequence text) {
+	return(strsafe(text, true));
+    }
+
     public static String[] splitwords(String text) {
 	ArrayList<String> words = new ArrayList<String>();
 	StringBuilder buf = new StringBuilder();
