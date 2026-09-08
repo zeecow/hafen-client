@@ -150,6 +150,7 @@ public abstract class LibPulse {
 	public default void connect_playback(String dev, LibPulse.pa_buffer_attr attr, int flags) {lib().pa_stream_connect_playback(this, dev, attr, flags);}
 	public default ByteBuffer begin_write(long wanted) {return(lib().pa_stream_begin_write(this, wanted));}
 	public default void write(ByteBuffer data, long offset, int seek) {lib().pa_stream_write(this, data, offset, seek);}
+	public default void cancel_write() {lib().pa_stream_cancel_write(this);}
 	public default void disconnect() {lib().pa_stream_disconnect(this);}
     }
 
@@ -206,6 +207,7 @@ public abstract class LibPulse {
     public abstract int pa_stream_get_state(LibPulse.pa_stream c);
     public abstract ByteBuffer pa_stream_begin_write(LibPulse.pa_stream s, long wanted);
     public abstract void pa_stream_write(LibPulse.pa_stream s, ByteBuffer data, long offset, int seek);
+    public abstract void pa_stream_cancel_write(LibPulse.pa_stream s);
     public abstract void pa_stream_disconnect(LibPulse.pa_stream c);
 
     public boolean PA_CONTEXT_IS_GOOD(int x) {
@@ -631,6 +633,18 @@ public abstract class LibPulse {
 	    }
 	    if(rv != 0)
 		throw(new PulseException("pa_stream_begin_write: " + rv));
+	}
+
+	private final MethodHandle pa_stream_cancel_write = ld.downcallHandle(libpulse.find("pa_stream_cancel_write").get(), FunctionDescriptor.of(C_INT, ADDRESS));
+	public void pa_stream_cancel_write(LibPulse.pa_stream s) {
+	    int rv;
+	    try {
+		rv = (int)pa_stream_cancel_write.invoke(((pa_stream)s).mem);
+	    } catch(Throwable e) {
+		throw(new RuntimeException(e));
+	    }
+	    if(rv != 0)
+		throw(new PulseException("pa_stream_begin_cancel_write: " + rv));
 	}
 
 	private final MethodHandle pa_stream_disconnect = ld.downcallHandle(libpulse.find("pa_stream_disconnect").get(), FunctionDescriptor.of(C_INT, ADDRESS));

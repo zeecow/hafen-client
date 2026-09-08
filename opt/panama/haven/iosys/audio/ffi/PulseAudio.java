@@ -133,6 +133,12 @@ public class PulseAudio implements AudioSystem {
 		int nf = buf.remaining() / (nch * 4);
 		double[][] val = new double[nch][nf];
 		int ret = stream.get(val, nf);
+		if(ret <= 0) {
+		    ps.cancel_write();
+		    ps.disconnect();
+		    Debug.dump(1);
+		    return;
+		}
 		for(int f = 0; f < nf; f++) {
 		    for(int c = 0; c < nch; c++)
 			buf.putFloat((float)val[c][f]);
