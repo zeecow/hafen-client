@@ -905,6 +905,10 @@ public class CocoaContext implements Providers.Factory<Toolkit> {
 		public String string() {return("");}
 		public Key key() {return(key);}
 		public Set<Key.Mod> mods() {return(mods);}
+
+		public String toString() {
+		    return(String.format("#<%s %s %s>", getClass().getSimpleName(), key, mods));
+		}
 	    }
 
 	    public class CocoaKeyDownEvent extends CocoaKeyEvent implements KeyDownEvent {
@@ -938,6 +942,10 @@ public class CocoaContext implements Providers.Factory<Toolkit> {
 
 		public Key.Sym sym() {return(sym);}
 		public String string() {return(text);}
+
+		public String toString() {
+		    return(String.format("#<%s %s %s sym=%s str='|%s\">", getClass().getSimpleName(), key, mods, sym, Utils.strsafe(text)));
+		}
 	    }
 	    public class CocoaKeyUpEvent extends CocoaKeyEvent implements KeyUpEvent {
 		public CocoaKeyUpEvent(NSEvent event) {super(event);}
