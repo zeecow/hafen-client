@@ -352,7 +352,7 @@ public class CocoaContext implements Providers.Factory<Toolkit> {
 	    public boolean equals(NamedSym that) {return(this.nm.equals(that.nm));}
 	    public boolean equals(Object x) {return((x instanceof NamedSym) && equals((NamedSym)x));}
 
-	    public String toString() {return("{" + nm + "}");}
+	    public String toString() {return("{" + Utils.strsafe(nm) + "}");}
 	}
 
 	public class CodeSym implements Key.Sym {
@@ -376,15 +376,8 @@ public class CocoaContext implements Providers.Factory<Toolkit> {
 	}
 
 	public class LayoutMap {
-	    public static final int[] states = {
-		0,
-		Carbon.shiftKey,
-		Carbon.optionKey,
-		Carbon.optionKey | Carbon.shiftKey,
-		Carbon.alphaLock,
-		Carbon.alphaLock | Carbon.shiftKey,
-		Carbon.alphaLock | Carbon.optionKey,
-		Carbon.alphaLock | Carbon.optionKey | Carbon.shiftKey,
+	    public static final int[] modorder = {
+		shiftKey, alphaLock, optionKey, controlKey, cmdKey,
 	    };
 	    public final String id;
 	    public final Carbon.UCKeyboardLayout layout;
@@ -399,9 +392,15 @@ public class CocoaContext implements Providers.Factory<Toolkit> {
 		Key.Sym[] ret = names.get(code);
 		if(ret == null) {
 		    List<Key.Sym> buf = new ArrayList<>();
-		    for(int state : states) {
-			String name = carb.UCKeyTranslate(layout, code, Carbon.kUCKeyActionDown, (state >> 8) & 0xff, kbdtype, Carbon.kUCKeyTranslateNoDeadKeysMask);
-			if((name == null) || (name.length() == 0))
+		    for(int mods = 0; mods < (1 << modorder.length); mods++) {
+			int modmask = 0;
+			for(int i = 0; i < modorder.length; i++) {
+			    if((mods & (1 << i)) != 0)
+				modmask |= modorder[i];
+			}
+			String name = carb.UCKeyTranslate(layout, code, Carbon.kUCKeyActionDown, (modmask >> 8) & 0xff, kbdtype,
+							  Carbon.kUCKeyTranslateNoDeadKeysMask);
+			if((name == null) || (name.length() == 0) || (name.charAt(0) < 32))
 			    continue;
 			Key.Sym sym = null;
 			if(name.length() == 1) {
@@ -409,9 +408,9 @@ public class CocoaContext implements Providers.Factory<Toolkit> {
 			    if((sym = stdcsyms.get(name.charAt(0))) == null)
 				sym = stdcsyms.get(Character.toUpperCase(name.charAt(0)));
 			}
-			if((sym == null) && (name.charAt(0) >= 32))
+			if(sym == null)
 			    sym = new NamedSym(name);
-			if(sym != null && !buf.contains(sym))
+			if((sym != null) && !buf.contains(sym))
 			    buf.add(sym);
 		    }
 		    names.put(code, ret = buf.toArray(new Key.Sym[0]));
