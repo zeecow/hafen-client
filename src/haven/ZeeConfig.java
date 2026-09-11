@@ -1599,12 +1599,17 @@ public class ZeeConfig {
             // skip close button
             if (buttonName.equalsIgnoreCase("x"))
                 return;
-            // resign button
+            // small ownership button
             if(buttonName.contains("Resign")) {
+                button.change("Resign");
+                button.settip("resign ownership");
                 button.resize(button.sz.x/2, button.sz.y);
                 button.c = button.c.add(70, 30);
-                button.change("Resign"); //set smaller text
-                button.settip("resign ownership");
+            } else if (buttonName.contains("Break")) {
+                button.change("Claim");
+                button.settip("break ownership");
+                button.resize(button.sz.x/2, button.sz.y);
+                button.c = button.c.add(70, 30);
             }
         });
 
