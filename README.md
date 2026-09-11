@@ -63,7 +63,7 @@ Midclick Ground
 - place stockpile and all items
 - dig multiple ballclay if cursor dig
 - while driving plow will queue coords 
-- while underground will try to keep moving in straight line until cancel click
+- shift midclick move in straight line until cancel click
 
 Long Midclick Ground (LMC)
 - while mounting horse will try to dismount

@@ -88,8 +88,8 @@ public class ZeeManagerGobs extends ZeeThread{
                 Utils.setprefb("hideGobCrops", (hideGobCrops = !hideGobCrops));
                 toggleModelsInList(getGobsByTags(Gob.Tag.CROP));
             }
-            // walk straight line in mines
-            else if (ZeeManagerMiner.straightLineCheck(coordMc)) {
+            // walk straight row/col of tiles
+            else if (ZeeConfig.gameUI.ui.modshift && ZeeManagerMiner.straightLineCheck(coordMc)) {
                 ZeeManagerMiner.straightLineMove(coordMc);
             }
         }
