@@ -259,6 +259,12 @@ public class ZeeManagerItems extends ZeeThread{
             }
         }
 
+        // fishing display icon acquired
+        if (ZeeConfig.playerPosesNameContains("fish") || ZeeConfig.playerPosesNameContains("napp")){
+            ZeeConfig.msgLow(basename);
+            //TODO icon img floating
+        }
+
         // update counter
         ZeeConfig.invCounterUpdate(gItem);
     }
