@@ -86,22 +86,25 @@ public class ZeeFont {
 
 
 
-    static HashMap<Text, Double> mapMsgTime = new HashMap<Text, Double>();
+    static HashMap<Tex, Double> mapMsgTime = new HashMap<Tex, Double>();
     public static void animateUimsgDraw(GOut g) {
         try {
-            for (Iterator<Map.Entry<Text, Double>> it = mapMsgTime.entrySet().iterator(); it.hasNext(); ) {
-                Map.Entry<Text, Double> entry = it.next();
+            for (Iterator<Map.Entry<Tex, Double>> it = mapMsgTime.entrySet().iterator(); it.hasNext(); ) {
+                Map.Entry<Tex, Double> entry = it.next();
                 double dt = (Utils.rtime() - entry.getValue());
                 if (dt > 3.0) {
                     it.remove();
                 } else {
-                    Text lastmsg = entry.getKey();
+                    Tex lastmsg = entry.getKey();
                     Coord szhalf = ZeeConfig.gameUI.sz.div(2);
                     int ypad = UI.scale(22 + ((int) (dt * (77))));
-                    g.chcolor(0, 0, 0, 192);
-                    g.frect(new Coord(szhalf.x + UI.scale(8), szhalf.y - ypad), lastmsg.sz().add(UI.scale(4), UI.scale(4)));
-                    g.chcolor();
-                    g.image(lastmsg.tex(), new Coord(szhalf.x + UI.scale(10), szhalf.y -= ypad));
+                    // draws bg for text msg (long sz), skips if icon msg from fishing
+                    if (lastmsg.sz().x > lastmsg.sz().y * 3) {
+                        g.chcolor(0, 0, 0, 192);
+                        g.frect(new Coord(szhalf.x + UI.scale(8), szhalf.y - ypad), lastmsg.sz().add(UI.scale(4), UI.scale(4)));
+                        g.chcolor();
+                    }
+                    g.image(lastmsg, new Coord(szhalf.x + UI.scale(10), szhalf.y -= ypad));
                 }
             }
         } catch(Exception e){
@@ -119,13 +122,22 @@ public class ZeeFont {
         if (ZeeConfig.showMsgAttrChanges)
             println(lastmsg.text+" ,  msgtime "+msgtime+"  ,  "+t);
 
+
         if ( t < 0.2 )
             if ( t < 0 )
                 msgtime = 0.5; // fixed delay for fast msgs with t<0
             else
                 msgtime += 0.3;
 
-        mapMsgTime.putIfAbsent( lastmsg, msgtime );
+        // show icon if text is res path
+        if (lastmsg.text.strip().matches("gfx/invobjs(/[\\w-]+)+")) {
+            Resource res = Loading.waitfor(Resource.remote().load(lastmsg.text.strip()));
+            mapMsgTime.putIfAbsent(new TexI(res.flayer(Resource.imgc).scaled()), msgtime);
+        }
+        // show text
+        else {
+            mapMsgTime.putIfAbsent(lastmsg.tex(), msgtime);
+        }
         lastmsgtime = msgtime;
     }
 

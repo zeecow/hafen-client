@@ -202,11 +202,12 @@ public class ZeeManagerItems extends ZeeThread{
         if (gItem.contents!=null)
             return;
 
+        String resname = gItem.getres().name;
         String basename = gItem.getres().basename();
         Inventory inv = gItem.getparent(Inventory.class);
         if(inv!=null && inv.isMainInv()) {
             ZeeConfig.lastInvGItemCreated = gItem;
-            ZeeConfig.lastInvGItemCreatedName = gItem.getres().name;
+            ZeeConfig.lastInvGItemCreatedName = resname;
             ZeeConfig.lastInvGItemCreatedBaseName = basename;
             ZeeConfig.lastInvGItemCreatedMs = ZeeThread.now();
         }
@@ -259,10 +260,10 @@ public class ZeeManagerItems extends ZeeThread{
             }
         }
 
-        // fishing display icon acquired
+        // display new items icons while fishing
         if (ZeeConfig.playerPosesNameContains("fish") || ZeeConfig.playerPosesNameContains("napp")){
-            ZeeConfig.msgLow(basename);
-            //TODO icon img floating
+            if (gItem.parent instanceof Inventory)
+                ZeeConfig.msgLow(resname);//resname will be converted to icon
         }
 
         // update counter
