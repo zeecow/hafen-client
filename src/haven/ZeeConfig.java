@@ -133,7 +133,7 @@ public class ZeeConfig {
 
     static final String DEF_LIST_MUTE_AUDIO = "Leashed horse.;Tracking is now turned;Stacking is now turned;must be empty to be unequipped";
     static final String DEF_LIST_CONFIRM_PETAL = "Empty,Swill,Clean out,Slaughter,Castrate,Unmoor,Declaim,Take possession,Renounce Lawspeaker,Become Lawspeaker,Pull hair,Disassemble,Claim,Set home dock,Crack & Soften,Snort,Extend one,Hold up proudly";
-    static final List<String> DEF_LIST_CONFIRM_BUTTON = List.of("Empty","Empty out","Abandon quest","Abandon credo","Resign","Forget me");
+    static final List<String> DEF_LIST_CONFIRM_BUTTON = List.of("Empty","Empty out","Abandon quest","Abandon credo","Resign","Forget me","Break","Claim");
     static final String DEF_WINS_HIDE_BUTTON = "Inventory,Character Sheet,Basket,Creel,Cattle Roster,Quiver,Pickup Gobs,Switch Char,:zeecow cmds,Alchemy Book";
     static final String DEF_LIST_BUTCH_AUTO = "Break,Scale,Wring neck,Kill,Skin,Flay,Pluck,Clean,Butcher,Collect bones";
     static final String DEF_LIST_AUTO_CLICK_MENU = "Pick,Harvest wax";
