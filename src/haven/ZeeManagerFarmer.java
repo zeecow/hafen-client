@@ -229,9 +229,11 @@ public class ZeeManagerFarmer extends ZeeThread{
         }.start();
     }
 
+    static String harvestingPlantName;
     private void startSeedFarming() {
         ZeeConfig.autoHearthOnStranger = false;
         mapSeedqlBarrel = new HashMap<>();
+        harvestingPlantName = ZeeConfig.lastMapViewClickGobName;
         try{
 
             /*
@@ -463,20 +465,20 @@ public class ZeeManagerFarmer extends ZeeThread{
     }
 
     public static boolean activateCursorHarvestGob() {
-        List<Gob> plants = ZeeConfig.findGobsByNameContains(ZeeConfig.lastMapViewClickGobName);
+        List<Gob> plants = ZeeConfig.findGobsByNameContains(harvestingPlantName);
         if (plants.size()==0) {
             return false;
         }
         plants.removeIf(plt -> ZeeConfig.getPlantStage(plt) == 0  &&  !ZeeConfig.lastMapViewClickGobName.contains("/fallowplant"));
         if (plants.size()==0) {
-            //println("no plants to click");
+            println("no ready plants to click > "+harvestingPlantName);
             return false;
         }
         Gob g = ZeeConfig.getClosestGobToPlayer(plants);
         if(g!=null) {
             return ZeeManagerGobs.activateHarvestGob(g);
         }else {
-            //println("no gobs to shift+click");
+            println("no gobs to shift+click > "+harvestingPlantName);
             return false;
         }
     }
