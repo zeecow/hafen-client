@@ -2727,6 +2727,12 @@ public class ZeeManagerGobs extends ZeeThread{
                     "Label all roadsigns"
             );
         }
+        else if (isGobMineSupport(gobName)) {
+            menu = new ZeeFlowerMenu( gob,
+                    "Build column",
+                    "Build stonearchtunnel"
+            );
+        }
         else{
             showMenu = false;
             //println("showGobFlowerMenu() > unkown case");
@@ -3942,7 +3948,9 @@ public class ZeeManagerGobs extends ZeeThread{
 
 
     public static boolean isGobMineSupport(String gobName) {
-        String list = "/minebeam,/column,/minesupport,/naturalminesupport,/towercap,/ladder,/monumentalcolumn,/timbertunnel,/stonearchtunnel";
+        String list = "/minebeam,/column,/minesupport,/naturalminesupport," +
+                "/towercap,/ladder,/monumentalcolumn," +
+                "/timbertunnel,/reinforcedtunnel,/stonearchtunnel";
         return ZeeConfig.nameInListEndsWith(gobName, list);
     }
 

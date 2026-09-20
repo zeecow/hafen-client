@@ -2222,7 +2222,9 @@ public class ZeeConfig {
         // no radius, cover = add radius
         else if(!showMineSupport){
             showMineSupport = true;
-            List<Gob> sups = findGobsByNameEndsWith("/minebeam", "/column", "/minesupport", "/naturalminesupport", "/towercap", "/ladder","/monumentalcolumn","/stonearchtunnel");
+            List<Gob> sups = findGobsByNameEndsWith("/minebeam", "/column", "/minesupport",
+                    "/naturalminesupport", "/towercap", "/ladder","/monumentalcolumn",
+                    "/stonearchtunnel","/reinforcedtunnel","/timbertunnel");
             if (!sups.isEmpty()) {
                 for (Gob sup : sups) {
                     toggleMineSupport(sup);
@@ -2237,7 +2239,9 @@ public class ZeeConfig {
         // radius, no cover = rem radius
         else{
             showMineSupport = false;
-            List<Gob> sups = findGobsByNameEndsWith("/minebeam", "/column", "/minesupport", "/naturalminesupport", "/towercap", "/ladder","/monumentalcolumn","/stonearchtunnel");
+            List<Gob> sups = findGobsByNameEndsWith("/minebeam", "/column", "/minesupport",
+                    "/naturalminesupport", "/towercap", "/ladder","/monumentalcolumn",
+                    "/stonearchtunnel","/reinforcedtunnel","/timbertunnel");
             if (!sups.isEmpty()) {
                 for (Gob sup : sups) {
                     toggleMineSupport(sup);
