@@ -944,7 +944,7 @@ public class CocoaContext implements Providers.Factory<Toolkit> {
 		public String string() {return(text);}
 
 		public String toString() {
-		    return(String.format("#<%s %s %s sym=%s str='|%s\">", getClass().getSimpleName(), key, mods, sym, Utils.strsafe(text)));
+		    return(String.format("#<%s %s %s sym=%s str=\"%s\">", getClass().getSimpleName(), key, mods, sym, Utils.strsafe(text)));
 		}
 	    }
 	    public class CocoaKeyUpEvent extends CocoaKeyEvent implements KeyUpEvent {
