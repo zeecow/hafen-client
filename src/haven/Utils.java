@@ -984,16 +984,20 @@ public class Utils {
 	    case '\'': buf.append("\\\'"); break;
 	    default:
 		switch(Character.getType(c)) {
-		case Character.CONTROL: case Character.FORMAT:
-		case Character.SURROGATE: case Character.PRIVATE_USE:
-		case Character.UNASSIGNED: case Character.SPACE_SEPARATOR:
-		case Character.LINE_SEPARATOR: case Character.PARAGRAPH_SEPARATOR:
-		case Character.COMBINING_SPACING_MARK: case Character.NON_SPACING_MARK:
-		case Character.ENCLOSING_MARK:
-		    buf.append(String.format("\\u%04x", (int)c));
+		case Character.UPPERCASE_LETTER: case Character.TITLECASE_LETTER:
+		case Character.START_PUNCTUATION: case Character.OTHER_SYMBOL:
+		case Character.OTHER_PUNCTUATION: case Character.OTHER_NUMBER:
+		case Character.OTHER_LETTER: case Character.MODIFIER_SYMBOL:
+		case Character.MATH_SYMBOL: case Character.LOWERCASE_LETTER:
+		case Character.LETTER_NUMBER: case Character.INITIAL_QUOTE_PUNCTUATION:
+		case Character.FINAL_QUOTE_PUNCTUATION: case Character.END_PUNCTUATION:
+		case Character.DASH_PUNCTUATION: case Character.CURRENCY_SYMBOL:
+		case Character.CONNECTOR_PUNCTUATION:
+		    buf.append(c);
 		    break;
 		default:
-		    buf.append(c);
+		    buf.append(String.format("\\u%04x", (int)c));
+		    break;
 		}
 	    }
 	}
