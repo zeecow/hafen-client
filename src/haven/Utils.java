@@ -984,15 +984,11 @@ public class Utils {
 	    case '\'': buf.append("\\\'"); break;
 	    default:
 		switch(Character.getType(c)) {
-		case Character.UPPERCASE_LETTER: case Character.TITLECASE_LETTER:
-		case Character.START_PUNCTUATION: case Character.OTHER_SYMBOL:
-		case Character.OTHER_PUNCTUATION: case Character.OTHER_NUMBER:
-		case Character.OTHER_LETTER: case Character.MODIFIER_SYMBOL:
-		case Character.MATH_SYMBOL: case Character.LOWERCASE_LETTER:
-		case Character.LETTER_NUMBER: case Character.INITIAL_QUOTE_PUNCTUATION:
-		case Character.FINAL_QUOTE_PUNCTUATION: case Character.END_PUNCTUATION:
-		case Character.DASH_PUNCTUATION: case Character.CURRENCY_SYMBOL:
-		case Character.CONNECTOR_PUNCTUATION:
+		case Character.LOWERCASE_LETTER:     case Character.OTHER_LETTER:    case Character.TITLECASE_LETTER: case Character.UPPERCASE_LETTER:
+		case Character.DECIMAL_DIGIT_NUMBER: case Character.LETTER_NUMBER:   case Character.OTHER_NUMBER:
+		case Character.OTHER_SYMBOL:         case Character.MODIFIER_SYMBOL: case Character.MATH_SYMBOL:      case Character.CURRENCY_SYMBOL:
+		case Character.CONNECTOR_PUNCTUATION:   case Character.DASH_PUNCTUATION:          case Character.END_PUNCTUATION:
+		case Character.FINAL_QUOTE_PUNCTUATION: case Character.INITIAL_QUOTE_PUNCTUATION: case Character.OTHER_PUNCTUATION: case Character.START_PUNCTUATION:
 		    buf.append(c);
 		    break;
 		default:
