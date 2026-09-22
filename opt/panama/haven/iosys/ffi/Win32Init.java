@@ -34,11 +34,11 @@ import haven.ffi.windows.*;
 public class Win32Init {
     public static void sysinit() {
 	try {
-	    Object barda = Win32.get().RegGetValue(Win32.HKEY_LOCAL_MACHINE,
-						   "HARDWARE\\DESCRIPTION\\System\\CentralProcessor\\0",
-						   "ProcessorNameString",
-						   Win32.RRF_RT_ANY);
-	    Utils.useragent.put("cpu.name", barda);
+	    String value = (String)Win32.get().RegGetValue(Win32.HKEY_LOCAL_MACHINE,
+							   "HARDWARE\\DESCRIPTION\\System\\CentralProcessor\\0",
+							   "ProcessorNameString",
+							   Win32.RRF_RT_ANY);
+	    Utils.useragent.put("cpu.name", value.trim());
 	} catch(Unavailable | StdError e) {
 	} catch(RuntimeException e) {
 	    new Warning(e).issue();
