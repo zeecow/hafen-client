@@ -73,7 +73,7 @@ public abstract class WGL {
 	    try(Arena st = Arena.ofConfined()) {
 		rv = (MemorySegment)wglGetProcAddress.invoke(st.allocateFrom(name, Utils.ascii));
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	    if(nullp(rv))
 		return(null);
@@ -93,7 +93,7 @@ public abstract class WGL {
 	    try {
 		rv = (MemorySegment)wglCreateContext.invoke(hDC.bits);
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	    if(nullp(rv))
 		throw(win.lasterror());
@@ -106,7 +106,7 @@ public abstract class WGL {
 	    try {
 		rv = (int)wglDeleteContext.invoke(hGLRC.bits);
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	    if(rv == 0)
 		throw(win.lasterror());
@@ -118,7 +118,7 @@ public abstract class WGL {
 	    try {
 		rv = (int)wglMakeCurrent.invoke(hDC.bits, nhandle(hGLRC));
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	    if(rv == 0)
 		throw(win.lasterror());
@@ -130,7 +130,7 @@ public abstract class WGL {
 	    try {
 		rv = (MemorySegment)wglGetCurrentDC.invoke();
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	    if(nullp(rv))
 		throw(null);
@@ -146,7 +146,7 @@ public abstract class WGL {
 		try {
 		    rv = (MemorySegment)wglGetExtensionsStringARB.invoke(hDC.bits);
 		} catch(Throwable e) {
-		    throw(new RuntimeException(e));
+		    throw(new InvocationException(e));
 		}
 		if(nullp(rv))
 		    return(null);
@@ -161,7 +161,7 @@ public abstract class WGL {
 		try {
 		    rv = (MemorySegment)wglGetExtensionsStringEXT.invoke();
 		} catch(Throwable e) {
-		    throw(new RuntimeException(e));
+		    throw(new InvocationException(e));
 		}
 		if(nullp(rv))
 		    return(null);
@@ -184,7 +184,7 @@ public abstract class WGL {
 		    try {
 			rv = (MemorySegment)wglCreateContextAttribsARB.invoke(hDC.bits, nhandle(hshareContext), acopy);
 		    } catch(Throwable e) {
-			throw(new RuntimeException(e));
+			throw(new InvocationException(e));
 		    }
 		    if(nullp(rv))
 			throw(win.lasterror());
@@ -200,7 +200,7 @@ public abstract class WGL {
 		try {
 		    rv = (int)wglSwapIntervalEXT.invoke(interval);
 		} catch(Throwable e) {
-		    throw(new RuntimeException(e));
+		    throw(new InvocationException(e));
 		}
 		if(rv == 0)
 		    throw(win.lasterror());

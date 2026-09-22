@@ -644,13 +644,13 @@ public abstract class AppKit {
 	public int objc_msgSend_NSUInt(Runtime.ID self, Runtime.SEL sel) {
 	    try {
 		return((int)(long)objc_msgSend_NSUInt.invoke(self.mem(), sel.mem()));
-	    } catch(Throwable e) {throw(new RuntimeException(e));}
+	    } catch(Throwable e) {throw(new InvocationException(e));}
 	}
 	private final MethodHandle objc_msgSend_void_NSUInt = rt.msgtype(null, NSUInteger);
 	public void objc_msgSend_void_NSUInt(Runtime.ID self, Runtime.SEL sel, int arg1) {
 	    try {
 		objc_msgSend_void_NSUInt.invoke(self.mem(), sel.mem(), arg1);
-	    } catch(Throwable e) {throw(new RuntimeException(e));}
+	    } catch(Throwable e) {throw(new InvocationException(e));}
 	}
 
 	private final Runtime.Class cls_NSScreen = rt.objc_getClass("NSScreen");
@@ -853,7 +853,7 @@ public abstract class AppKit {
 										sel_initWithContentRect_styleMask_backing_defer.mem(),
 										contentRect.mem(), style, backingStoreType, defer ? (byte)1 : (byte)0));
 	    } catch(Throwable t) {
-		throw(new RuntimeException(t));
+		throw(new InvocationException(t));
 	    }
 	    return(new NSWindow(id));
 	}
@@ -1108,7 +1108,7 @@ public abstract class AppKit {
 	    try {
 		sendmsg_id_CGRect.invoke(view.id.mem(), sel_initWithFrame.mem(), frameRect.mem());
 	    } catch(Throwable t) {
-		throw(new RuntimeException(t));
+		throw(new InvocationException(t));
 	    }
 	    return(view);
 	}

@@ -91,7 +91,7 @@ public abstract class OSMesa {
 		try {
 		    ret = (MemorySegment)OSMesaCreateContextAttribs.invoke(acopy, ornull(sharelist, OSMesaContext::mem));
 		} catch(Throwable e) {
-		    throw(new RuntimeException(e));
+		    throw(new InvocationException(e));
 		}
 	    }
 	    return(nullp(ret) ? null : new OSMesaContext(ret));
@@ -102,7 +102,7 @@ public abstract class OSMesa {
 	    try {
 		OSMesaDestroyContext.invoke(ctx.mem());
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	}
 
@@ -111,7 +111,7 @@ public abstract class OSMesa {
 	    try {
 		return((int)OSMesaMakeCurrent.invoke(ornull(ctx, OSMesaContext::mem), ornull(buffer, MemorySegment::ofBuffer), type, width, height) != 0);
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	}
 
@@ -120,7 +120,7 @@ public abstract class OSMesa {
 	    try(Arena st = Arena.ofConfined()) {
 		return((MemorySegment)OSMesaGetProcAddress.invoke(st.allocateFrom(funcName, C_CHARSET)));
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	}
     }

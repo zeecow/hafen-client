@@ -497,7 +497,7 @@ public abstract class Win32 {
 	    try {
 		return((int)GetCurrentThreadId.invoke());
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	}
 
@@ -506,7 +506,7 @@ public abstract class Win32 {
 	    try {
 		return((int)GetLastError.invoke());
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	}
 
@@ -517,7 +517,7 @@ public abstract class Win32 {
 		try {
 		    rv = (MemorySegment)GetModuleHandleW.invoke(wstr(st, lpModuleName));
 		} catch(Throwable e) {
-		    throw(new RuntimeException(e));
+		    throw(new InvocationException(e));
 		}
 		if(nullp(rv))
 		    throw(lasterror());
@@ -600,7 +600,7 @@ public abstract class Win32 {
 		try {
 		    rv = (short)RegisterClassExW.invoke(cls.mem()) & 0xffff;
 		} catch(Throwable e) {
-		    throw(new RuntimeException(e));
+		    throw(new InvocationException(e));
 		}
 		if(rv == 0)
 		    throw(lasterror());
@@ -615,7 +615,7 @@ public abstract class Win32 {
 		try {
 		    rv = (int)UnregisterClassW.invoke(wstr(st, lpClassName), hInstance.bits);
 		} catch(Throwable e) {
-		    throw(new RuntimeException(e));
+		    throw(new InvocationException(e));
 		}
 		if(rv == 0)
 		    throw(lasterror());
@@ -632,7 +632,7 @@ public abstract class Win32 {
 							       (size == null) ? CW_USEDEFAULT : size.x, (size == null) ? CW_USEDEFAULT : size.y,
 							       nhandle(hWndParent), nhandle(hMenu), nhandle(hInstance), MemorySegment.NULL);
 		} catch(Throwable e) {
-		    throw(new RuntimeException(e));
+		    throw(new InvocationException(e));
 		}
 		if(nullp(rv))
 		    throw(lasterror());
@@ -646,7 +646,7 @@ public abstract class Win32 {
 	    try {
 		rv = (int)DestroyWindow.invoke(hWnd.bits);
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	    if(rv == 0)
 		throw(lasterror());
@@ -729,7 +729,7 @@ public abstract class Win32 {
 	    try {
 		rv = (int)GetMessageW.invoke(lpMsg.mem(), nhandle(hWnd), wMsgFilterMin, wMsgFilterMax);
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	    if(rv == -1)
 		throw(lasterror());
@@ -742,7 +742,7 @@ public abstract class Win32 {
 	    try {
 		rv = (int)PeekMessageW.invoke(lpMsg.mem(), nhandle(hWnd), wMsgFilterMin, wMsgFilterMax, wRemoveMsg);
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	    return(rv != 0);
 	}
@@ -752,7 +752,7 @@ public abstract class Win32 {
 	    try {
 		return((long)DispatchMessageW.invoke(lpMsg.mem()));
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	}
 
@@ -762,7 +762,7 @@ public abstract class Win32 {
 	    try {
 		rv = (int)PostMessageW.invoke(nhandle(hWnd), Msg, wParam, lParam);
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	    if(rv == 0)
 		throw(lasterror());
@@ -773,7 +773,7 @@ public abstract class Win32 {
 	    try {
 		return((int)SendMessageW.invoke(nhandle(hWnd), Msg, wParam, lParam));
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	}
 
@@ -783,7 +783,7 @@ public abstract class Win32 {
 	    try {
 		rv = (int)PostThreadMessageW.invoke(idThread, Msg, wParam, lParam);
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	    if(rv == 0)
 		throw(lasterror());
@@ -794,7 +794,7 @@ public abstract class Win32 {
 	    try {
 		return((long)DefWindowProcW.invoke(nhandle(hWnd), Msg, wParam, lParam));
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	}
 
@@ -803,7 +803,7 @@ public abstract class Win32 {
 	    try {
 		return((int)ShowWindow.invoke(hWnd.bits, nCmdShow) != 0);
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	}
 
@@ -812,7 +812,7 @@ public abstract class Win32 {
 	    try {
 		return((long)GetWindowLongPtrW.invoke(hWnd.bits, nIndex));
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	}
 
@@ -821,7 +821,7 @@ public abstract class Win32 {
 	    try {
 		return((long)SetWindowLongPtrW.invoke(hWnd.bits, nIndex, dwNewLong));
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	}
 
@@ -833,7 +833,7 @@ public abstract class Win32 {
 		try {
 		    rv = (int)GetWindowRect.invoke(hWnd.bits, buf);
 		} catch(Throwable e) {
-		    throw(new RuntimeException(e));
+		    throw(new InvocationException(e));
 		}
 		if(rv == 0)
 		    throw(lasterror());
@@ -853,7 +853,7 @@ public abstract class Win32 {
 	    try {
 		rv = (int)SetWindowPos.invoke(hWnd.bits, nhandle(hWndInsertAfter), pos.x, pos.y, size.x, size.y, uFlags);
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	    if(rv == 0)
 		throw(lasterror());
@@ -871,7 +871,7 @@ public abstract class Win32 {
 		try {
 		    rv = (int)AdjustWindowRectEx.invoke(buf, dwStyle, bMenu ? 1 : 0, dwExStyle);
 		} catch(Throwable e) {
-		    throw(new RuntimeException(e));
+		    throw(new InvocationException(e));
 		}
 		if(rv == 0)
 		    throw(lasterror());
@@ -888,7 +888,7 @@ public abstract class Win32 {
 	    try(Arena st = Arena.ofConfined()) {
 		rv = (int)SetWindowTextW.invoke(hWnd.bits, wstr(st, lpString));
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	    if(rv == 0)
 		throw(lasterror());
@@ -904,7 +904,7 @@ public abstract class Win32 {
 		try {
 		    rv = (int)ScreenToClient.invoke(hWnd.bits, buf);
 		} catch(Throwable e) {
-		    throw(new RuntimeException(e));
+		    throw(new InvocationException(e));
 		}
 		if(rv == 0)
 		    throw(lasterror());
@@ -930,7 +930,7 @@ public abstract class Win32 {
 		try {
 		    rv = (int)EnumDisplayMonitors.invoke(MemorySegment.NULL, MemorySegment.NULL, stub, 0);
 		} catch(Throwable e) {
-		    throw(new RuntimeException(e));
+		    throw(new InvocationException(e));
 		}
 		if(rv == 0)
 		    throw(lasterror());
@@ -944,7 +944,7 @@ public abstract class Win32 {
 	    try {
 		rv = (MemorySegment)MonitorFromWindow.invoke(hWnd.bits, dwFlags);
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	    return(nullp(rv) ? null : Handle.of(rv));
 	}
@@ -994,7 +994,7 @@ public abstract class Win32 {
 	    try {
 		rv = (int)GetMonitorInfoW.invoke(hMonitor.bits, lpmi.mem());
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	    if(rv == 0)
 		throw(lasterror());
@@ -1006,7 +1006,7 @@ public abstract class Win32 {
 	    try {
 		rv = (MemorySegment)GetDC.invoke(nhandle(hWnd));
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	    if(nullp(rv))
 		throw(lasterror());
@@ -1018,7 +1018,7 @@ public abstract class Win32 {
 	    try {
 		return((int)ReleaseDC.invoke(nhandle(hWnd), hDC.bits) != 0);
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	}
 
@@ -1027,7 +1027,7 @@ public abstract class Win32 {
 	    try {
 		return((int)GetDeviceCaps.invoke(hdc.bits, index));
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	}
 
@@ -1036,7 +1036,7 @@ public abstract class Win32 {
 	    try {
 		return((int)GetSystemMetrics.invoke(nIndex));
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	}
 
@@ -1045,7 +1045,7 @@ public abstract class Win32 {
 	    try {
 		return((int)GetKeyState.invoke(nVirtKey));
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	}
 
@@ -1055,7 +1055,7 @@ public abstract class Win32 {
 	    try {
 		rv = (int)GetKeyboardState.invoke(buf.keys);
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	    if(rv == 0)
 		throw(lasterror());
@@ -1067,7 +1067,7 @@ public abstract class Win32 {
 	    try {
 		rv = (MemorySegment)GetKeyboardLayout.invoke(idThread);
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	    return(Handle.of(rv));
 	}
@@ -1081,7 +1081,7 @@ public abstract class Win32 {
 		    try {
 			rv = (int)GetKeyboardLayoutList.invoke(n, buf);
 		    } catch(Throwable e) {
-			throw(new RuntimeException(e));
+			throw(new InvocationException(e));
 		    }
 		    if(rv == 0)
 			throw(lasterror());
@@ -1101,7 +1101,7 @@ public abstract class Win32 {
 	    try {
 		return((int)MapVirtualKeyExW.invoke(uCode, uMapType, dwhkl.bits));
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	}
 
@@ -1110,7 +1110,7 @@ public abstract class Win32 {
 	    try {
 		return((short)VkKeyScanExW.invoke((short)ch, dwhkl.bits) & 0xffff);
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	}
 
@@ -1122,7 +1122,7 @@ public abstract class Win32 {
 		try {
 		    rv = (int)ToUnicodeEx.invoke(wVirtKey, wScanCode, lpKeyState.keys, buf, 128, wFlags, dwhkl.bits);
 		} catch(Throwable e) {
-		    throw(new RuntimeException(e));
+		    throw(new InvocationException(e));
 		}
 		if(rv < 0)
 		    return(null);
@@ -1141,7 +1141,7 @@ public abstract class Win32 {
 		try {
 		    rv = (int)GetKeyNameTextW.invoke((int)lParam, buf, 128);
 		} catch(Throwable e) {
-		    throw(new RuntimeException(e));
+		    throw(new InvocationException(e));
 		}
 		if(rv <= 0)
 		    return(null);
@@ -1263,7 +1263,7 @@ public abstract class Win32 {
 		try {
 		    rv = (MemorySegment)CreateDIBSection.invoke(hDC.bits, pbmi.mem(), usage, bitsbuf, nhandle(hSection), offset);
 		} catch(Throwable e) {
-		    throw(new RuntimeException(e));
+		    throw(new InvocationException(e));
 		}
 		if(nullp(rv))
 		    throw(lasterror());
@@ -1281,7 +1281,7 @@ public abstract class Win32 {
 		try {
 		    rv = (MemorySegment)CreateBitmap.invoke(nWidth, nHeight, nPlanes, nBitCount, bits);
 		} catch(Throwable e) {
-		    throw(new RuntimeException(e));
+		    throw(new InvocationException(e));
 		}
 		if(nullp(rv))
 		    throw(lasterror());
@@ -1295,7 +1295,7 @@ public abstract class Win32 {
 	    try {
 		rv = (MemorySegment)CreateIconIndirect.invoke(piconinfo.mem());
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	    if(nullp(rv))
 		throw(lasterror());
@@ -1308,7 +1308,7 @@ public abstract class Win32 {
 	    try {
 		rv = (MemorySegment)SetCursor.invoke(nhandle(hCursor));
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	    return(nullp(rv) ? null : Handle.of(rv));
 	}
@@ -1319,7 +1319,7 @@ public abstract class Win32 {
 	    try {
 		rv = (MemorySegment)LoadCursorW.invoke(nhandle(hInstance), MemorySegment.ofAddress(cursor & 0xffff));
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	    if(nullp(rv))
 		throw(lasterror());
@@ -1332,7 +1332,7 @@ public abstract class Win32 {
 	    try {
 		rv = (int)DestroyIcon.invoke(ho.bits);
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	    if(rv == 0)
 		throw(lasterror());
@@ -1350,14 +1350,14 @@ public abstract class Win32 {
 		try {
 		    rv = (int)(long)RegGetValueW.invoke(hKey.bits, st.allocateFrom(lpSubKey, C_WCHARSET), st.allocateFrom(lpValue, C_WCHARSET),
 							dwFlags, tbuf, dbuf, lbuf);
-		} catch(Throwable e) {throw(new RuntimeException(e));}
+		} catch(Throwable e) {throw(new InvocationException(e));}
 		if(rv == ERROR_MORE_DATA) {
 		    try {
 			dbuf = st.allocate(getint(lbuf, 0, DWORD, true));
 			setint(lbuf, 0, DWORD, dbuf.byteSize());
 			rv = (int)(long)RegGetValueW.invoke(hKey.bits, st.allocateFrom(lpSubKey, C_WCHARSET), st.allocateFrom(lpValue, C_WCHARSET),
 							    dwFlags, tbuf, dbuf, lbuf);
-		    } catch(Throwable e) {throw(new RuntimeException(e));}
+		    } catch(Throwable e) {throw(new InvocationException(e));}
 		}
 		if(rv != ERROR_SUCCESS)
 		    throw(new StdError(rv));
@@ -1378,7 +1378,7 @@ public abstract class Win32 {
 	    try {
 		rv = (int)DeleteObject.invoke(ho.bits);
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	    if(rv == 0)
 		throw(lasterror());
@@ -1450,7 +1450,7 @@ public abstract class Win32 {
 	    try {
 		rv = (int)ShellExecuteExW.invoke(pExecInfo.mem());
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	    if(rv == 0)
 		throw(lasterror());
@@ -1528,7 +1528,7 @@ public abstract class Win32 {
 	    try {
 		rv = (int)ChoosePixelFormat.invoke(hDC.bits, ppfd.mem());
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	    if(rv == 0)
 		throw(lasterror());
@@ -1541,7 +1541,7 @@ public abstract class Win32 {
 	    try {
 		rv = (int)SetPixelFormat.invoke(hDC.bits, format, ppfd.mem());
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	    if(rv == 0)
 		throw(lasterror());
@@ -1553,7 +1553,7 @@ public abstract class Win32 {
 	    try {
 		rv = (int)DescribePixelFormat.invoke(hDC.bits, iPixelFormat, (int)ppfd.mem().byteSize(), ppfd.mem());
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	    if(rv == 0)
 		throw(lasterror());
@@ -1566,7 +1566,7 @@ public abstract class Win32 {
 	    try {
 		rv = (int)SwapBuffers.invoke(hDC.bits);
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	    if(rv == 0)
 		throw(lasterror());

@@ -203,7 +203,7 @@ public abstract class GLX {
 		try {
 		    return((MemorySegment)glXGetProcAddress.invoke(stname));
 		} catch(Throwable e) {
-		    throw(new RuntimeException(e));
+		    throw(new InvocationException(e));
 		} finally {
 		    checkerror();
 		}
@@ -216,7 +216,7 @@ public abstract class GLX {
 	    try {
 		retp = (MemorySegment)glXQueryExtensionsString.invoke(dpy.mem(), screen);
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    } finally {
 		checkerror();
 	    }
@@ -235,7 +235,7 @@ public abstract class GLX {
 		try {
 		    ret = (MemorySegment)glXChooseVisual.invoke(dpy.mem(), screen, acopy);
 		} catch(Throwable e) {
-		    throw(new RuntimeException(e));
+		    throw(new InvocationException(e));
 		} finally {
 		    checkerror();
 		}
@@ -258,7 +258,7 @@ public abstract class GLX {
 		try {
 		    retp = (MemorySegment)glXChooseFBConfig.invoke(dpy.mem(), screen, acopy, nelements);
 		} catch(Throwable e) {
-		    throw(new RuntimeException(e));
+		    throw(new InvocationException(e));
 		} finally {
 		    checkerror();
 		}
@@ -279,7 +279,7 @@ public abstract class GLX {
 	    try {
 		ret = (MemorySegment)glXGetVisualFromFBConfig.invoke(dpy.mem(), config.mem());
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    } finally {
 		checkerror();
 	    }
@@ -294,7 +294,7 @@ public abstract class GLX {
 		try {
 		    rv = (int)glXGetFBConfigAttrib.invoke(dpy.mem(), config.mem(), attrib, buf);
 		} catch(Throwable e) {
-		    throw(new RuntimeException(e));
+		    throw(new InvocationException(e));
 		} finally {
 		    checkerror();
 		}
@@ -310,7 +310,7 @@ public abstract class GLX {
 	    try {
 		ret = (MemorySegment)glXCreateContext.invoke(dpy.mem(), vis.mem(), ornull(sharelist, GLXContext::mem), direct ? 1 : 0);
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    } finally {
 		checkerror();
 	    }
@@ -323,7 +323,7 @@ public abstract class GLX {
 	    try {
 		ret = (MemorySegment)glXCreateNewContext.invoke(dpy.mem(), config.mem(), type, ornull(sharelist, GLXContext::mem), direct ? 1 : 0);
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    } finally {
 		checkerror();
 	    }
@@ -344,7 +344,7 @@ public abstract class GLX {
 		try {
 		    ret = (MemorySegment)glXCreateContextAttribsARB.invoke(dpy.mem(), config.mem(), ornull(sharelist, GLXContext::mem), direct ? 1 : 0, acopy);
 		} catch(Throwable e) {
-		    throw(new RuntimeException(e));
+		    throw(new InvocationException(e));
 		} finally {
 		    checkerror();
 		}
@@ -360,7 +360,7 @@ public abstract class GLX {
 		else
 		    glXSwapIntervalEXT.invoke(dpy.mem(), (int)drawable.bits, interval);
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    } finally {
 		checkerror();
 	    }
@@ -371,7 +371,7 @@ public abstract class GLX {
 	    try {
 		glXDestroyContext.invoke(dpy.mem(), ctx.mem());
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    } finally {
 		checkerror();
 	    }
@@ -385,7 +385,7 @@ public abstract class GLX {
 		else
 		    return(((int)glXMakeCurrent.invoke(dpy.mem(), (int)drawable.bits, ornull(ctx, GLXContext::mem))) != 0);
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    } finally {
 		checkerror();
 	    }
@@ -399,7 +399,7 @@ public abstract class GLX {
 		else
 		    glXSwapBuffers.invoke(dpy.mem(), (int)drawable.bits);
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    } finally {
 		checkerror();
 	    }
@@ -413,7 +413,7 @@ public abstract class GLX {
 		else
 		    glXSelectEvent.invoke(dpy.mem(), (int)drawable.bits, mask);
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    } finally {
 		checkerror();
 	    }
@@ -429,7 +429,7 @@ public abstract class GLX {
 		    else
 			glXGetSelectedEvent.invoke(dpy.mem(), (int)drawable.bits, buf);
 		} catch(Throwable e) {
-		    throw(new RuntimeException(e));
+		    throw(new InvocationException(e));
 		} finally {
 		    checkerror();
 		}
@@ -482,7 +482,7 @@ public abstract class GLX {
 		    else
 			glXGetSyncValuesOML.invoke(dpy.mem(), (int)drawable.bits, ust, msc, bsc);
 		} catch(Throwable e) {
-		    throw(new RuntimeException(e));
+		    throw(new InvocationException(e));
 		} finally {
 		    checkerror();
 		}
@@ -501,7 +501,7 @@ public abstract class GLX {
 		    else
 			glXGetMscRateOML.invoke(dpy.mem(), (int)drawable.bits, num, den);
 		} catch(Throwable e) {
-		    throw(new RuntimeException(e));
+		    throw(new InvocationException(e));
 		} finally {
 		    checkerror();
 		}
@@ -517,7 +517,7 @@ public abstract class GLX {
 		else
 		    return((long)glXSwapBuffersMscOML.invoke(dpy.mem(), (int)drawable.bits, target_msc, divisor, remainder));
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    } finally {
 		checkerror();
 	    }
@@ -535,7 +535,7 @@ public abstract class GLX {
 		    else
 			glXWaitForMscOML.invoke(dpy.mem(), (int)drawable.bits, target_msc, divisor, remainder, ust, msc, bsc);
 		} catch(Throwable e) {
-		    throw(new RuntimeException(e));
+		    throw(new InvocationException(e));
 		} finally {
 		    checkerror();
 		}
@@ -555,7 +555,7 @@ public abstract class GLX {
 		    else
 			glXWaitForBscOML.invoke(dpy.mem(), (int)drawable.bits, target_bsc, ust, msc, bsc);
 		} catch(Throwable e) {
-		    throw(new RuntimeException(e));
+		    throw(new InvocationException(e));
 		} finally {
 		    checkerror();
 		}

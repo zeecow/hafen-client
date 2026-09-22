@@ -1839,7 +1839,7 @@ public abstract class XLib {
 	    try {
 		return((int)XInitThreads.invoke());
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    } finally {
 		checkerror();
 	    }
@@ -1850,7 +1850,7 @@ public abstract class XLib {
 	    try {
 		return((MemorySegment)XSetErrorHandler.invoke(handler));
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    } finally {
 		checkerror();
 	    }
@@ -1861,7 +1861,7 @@ public abstract class XLib {
 	    try {
 		return((MemorySegment)XSetIOErrorHandler.invoke(handler));
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    } finally {
 		checkerror();
 	    }
@@ -1872,7 +1872,7 @@ public abstract class XLib {
 	    try {
 		return((MemorySegment)XSetIOErrorExitHandler.invoke(dpy.mem(), handler, userdata));
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    } finally {
 		checkerror();
 	    }
@@ -1900,7 +1900,7 @@ public abstract class XLib {
 		    }
 		}
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    } finally {
 		checkerror();
 	    }
@@ -1913,7 +1913,7 @@ public abstract class XLib {
 		dpy.closed = true;
 		return((int)XCloseDisplay.invoke(dpy.mem()));
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    } finally {
 		checkerror();
 	    }
@@ -1929,7 +1929,7 @@ public abstract class XLib {
 		    else
 			return(Atom.of((int)XInternAtom.invoke(dpy.mem(), stname, only_if_exists ? 1 : 0)));
 		} catch(Throwable e) {
-		    throw(new RuntimeException(e));
+		    throw(new InvocationException(e));
 		} finally {
 		    checkerror();
 		}
@@ -1947,7 +1947,7 @@ public abstract class XLib {
 		    if((int)XInternAtoms.invoke(dpy.mem(), nary, names.length, only_if_exists ? 1 : 0, rary) == 0)
 			return(null);
 		} catch(Throwable e) {
-		    throw(new RuntimeException(e));
+		    throw(new InvocationException(e));
 		} finally {
 		    checkerror();
 		}
@@ -1963,7 +1963,7 @@ public abstract class XLib {
 	    try {
 		return((int)XFree.invoke(mem));
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    } finally {
 		checkerror();
 	    }
@@ -1980,7 +1980,7 @@ public abstract class XLib {
 		else
 		    name = (MemorySegment)XGetAtomName.invoke(dpy.mem(), (int)atom.bits);
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    } finally {
 		checkerror();
 	    }
@@ -1995,7 +1995,7 @@ public abstract class XLib {
 	    try {
 		name = (MemorySegment)XServerVendor.invoke(dpy.mem());
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    } finally {
 		checkerror();
 	    }
@@ -2008,7 +2008,7 @@ public abstract class XLib {
 	    try {
 		return((int)XVendorRelease.invoke(dpy.mem()));
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    } finally {
 		checkerror();
 	    }
@@ -2023,7 +2023,7 @@ public abstract class XLib {
 		try {
 		    rv = (int)XQueryExtension.invoke(dpy.mem(), nnm, opcode, event, error);
 		} catch(Throwable e) {
-		    throw(new RuntimeException(e));
+		    throw(new InvocationException(e));
 		} finally {
 		    checkerror();
 		}
@@ -2041,7 +2041,7 @@ public abstract class XLib {
 		else
 		    return(XID.of((int)XCreateColormap.invoke(dpy.mem(), (int)w.bits, visual.mem(), alloc)));
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    } finally {
 		checkerror();
 	    }
@@ -2057,7 +2057,7 @@ public abstract class XLib {
 		    else
 			XQueryBestCursor.invoke(dpy.mem(), (int)d.bits, size.x, size.y, x, y);
 		} catch(Throwable e) {
-		    throw(new RuntimeException(e));
+		    throw(new InvocationException(e));
 		} finally {
 		    checkerror();
 		}
@@ -2073,7 +2073,7 @@ public abstract class XLib {
 		else
 		    XDefineCursor.invoke(dpy.mem(), (int)w.bits, (int)cursor.bits);
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    } finally {
 		checkerror();
 	    }
@@ -2087,7 +2087,7 @@ public abstract class XLib {
 		else
 		    XFreeCursor.invoke(dpy.mem(), (int)cursor.bits);
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    } finally {
 		checkerror();
 	    }
@@ -2101,7 +2101,7 @@ public abstract class XLib {
 		else
 		    return(XID.of((int)XCreateWindow.invoke(dpy.mem(), (int)parent.bits, x, y, width, height, border_width, depth, cl, visual.mem(), valuemask, attributes.mem())));
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    } finally {
 		checkerror();
 	    }
@@ -2115,7 +2115,7 @@ public abstract class XLib {
 		else
 		    return((int)XDestroyWindow.invoke(dpy.mem(), (int)w.bits));
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    } finally {
 		checkerror();
 	    }
@@ -2128,7 +2128,7 @@ public abstract class XLib {
 		try {
 		    XDisplayKeycodes.invoke(dpy.mem(), minbuf, maxbuf);
 		} catch(Throwable e) {
-		    throw(new RuntimeException(e));
+		    throw(new InvocationException(e));
 		} finally {
 		    checkerror();
 		}
@@ -2143,7 +2143,7 @@ public abstract class XLib {
 		try {
 		    ret = (MemorySegment)XGetKeyboardMapping.invoke(dpy.mem(), (byte)first_keycode, keycode_count, nbuf);
 		} catch(Throwable e) {
-		    throw(new RuntimeException(e));
+		    throw(new InvocationException(e));
 		} finally {
 		    checkerror();
 		}
@@ -2173,7 +2173,7 @@ public abstract class XLib {
 	    try {
 		ret = (MemorySegment)XGetModifierMapping.invoke(dpy.mem());
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    } finally {
 		checkerror();
 	    }
@@ -2185,7 +2185,7 @@ public abstract class XLib {
 	    try {
 		return((int)XFreeModifiermap.invoke(mem));
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    } finally {
 		checkerror();
 	    }
@@ -2199,7 +2199,7 @@ public abstract class XLib {
 		else
 		    return((int)XSelectInput.invoke(dpy.mem(), (int)w.bits, event_mask));
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    } finally {
 		checkerror();
 	    }
@@ -2213,7 +2213,7 @@ public abstract class XLib {
 		else
 		    return((int)XFilterEvent.invoke(ev.mem(), (int)w.bits) != 0);
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    } finally {
 		checkerror();
 	    }
@@ -2227,7 +2227,7 @@ public abstract class XLib {
 		else
 		    return((int)XUnmapWindow.invoke(dpy.mem(), (int)w.bits));
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    } finally {
 		checkerror();
 	    }
@@ -2241,7 +2241,7 @@ public abstract class XLib {
 		else
 		    return((int)XMapWindow.invoke(dpy.mem(), (int)w.bits));
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    } finally {
 		checkerror();
 	    }
@@ -2255,7 +2255,7 @@ public abstract class XLib {
 		else
 		    return((int)XMapRaised.invoke(dpy.mem(), (int)w.bits));
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    } finally {
 		checkerror();
 	    }
@@ -2269,7 +2269,7 @@ public abstract class XLib {
 		else
 		    return((int)XConfigureWindow.invoke(dpy.mem(), (int)w.bits, valuemask, values.mem()));
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    } finally {
 		checkerror();
 	    }
@@ -2286,7 +2286,7 @@ public abstract class XLib {
 		    else
 			rv = (int)XTranslateCoordinates.invoke(dpy.mem(), (int)src_w.bits, (int)dest_w.bits, src.x, src.y, xbuf, ybuf, wbuf);
 		} catch(Throwable e) {
-		    throw(new RuntimeException(e));
+		    throw(new InvocationException(e));
 		} finally {
 		    checkerror();
 		}
@@ -2307,7 +2307,7 @@ public abstract class XLib {
 		    else
 			stat = (int)XGetWindowProperty.invoke(dpy.mem(), (int)w.bits, (int)property.bits, 0, 1 << 24, delete ? 1 : 0, (int)reg_type.bits, tbuf, fbuf, nbuf, rbuf, dbuf);
 		} catch(Throwable e) {
-		    throw(new RuntimeException(e));
+		    throw(new InvocationException(e));
 		} finally {
 		    checkerror();
 		}
@@ -2343,7 +2343,7 @@ public abstract class XLib {
 		    else
 			return((int)XChangeProperty.invoke(dpy.mem(), (int)w.bits, (int)property.bits, (int)type.bits, 8, mode, buf, data.length));
 		} catch(Throwable e) {
-		    throw(new RuntimeException(e));
+		    throw(new InvocationException(e));
 		} finally {
 		    checkerror();
 		}
@@ -2359,7 +2359,7 @@ public abstract class XLib {
 		    else
 			return((int)XChangeProperty.invoke(dpy.mem(), (int)w.bits, (int)property.bits, (int)type.bits, 16, mode, buf, data.length));
 		} catch(Throwable e) {
-		    throw(new RuntimeException(e));
+		    throw(new InvocationException(e));
 		} finally {
 		    checkerror();
 		}
@@ -2375,7 +2375,7 @@ public abstract class XLib {
 		    else
 			return((int)XChangeProperty.invoke(dpy.mem(), (int)w.bits, (int)property.bits, (int)type.bits, 32, mode, buf, data.length));
 		} catch(Throwable e) {
-		    throw(new RuntimeException(e));
+		    throw(new InvocationException(e));
 		} finally {
 		    checkerror();
 		}
@@ -2390,7 +2390,7 @@ public abstract class XLib {
 		else
 		    return((int)XDeleteProperty.invoke(dpy.mem(), (int)w.bits, (int)property.bits));
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    } finally {
 		checkerror();
 	    }
@@ -2406,7 +2406,7 @@ public abstract class XLib {
 		    else
 			return((int)XStoreName.invoke(dpy.mem(), (int)w.bits, name));
 		} catch(Throwable e) {
-		    throw(new RuntimeException(e));
+		    throw(new InvocationException(e));
 		} finally {
 		    checkerror();
 		}
@@ -2421,7 +2421,7 @@ public abstract class XLib {
 		else
 		    return((int)XIconifyWindow.invoke(dpy.mem(), (int)w.bits, screen_number));
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    } finally {
 		checkerror();
 	    }
@@ -2432,7 +2432,7 @@ public abstract class XLib {
 	    try {
 		return((int)XNextEvent.invoke(dpy.mem(), event_return.mem()));
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    } finally {
 		checkerror();
 	    }
@@ -2443,7 +2443,7 @@ public abstract class XLib {
 	    try {
 		return((int)XPending.invoke(dpy.mem()));
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    } finally {
 		checkerror();
 	    }
@@ -2454,7 +2454,7 @@ public abstract class XLib {
 	    try {
 		return((int)XSync.invoke(dpy.mem(), discard ? 1 : 0));
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    } finally {
 		checkerror();
 	    }
@@ -2468,7 +2468,7 @@ public abstract class XLib {
 		else
 		    return((int)XSendEvent.invoke(dpy.mem(), (int)w.bits, propagate ? 1 : 0, event_mask, event_send.mem()));
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    } finally {
 		checkerror();
 	    }
@@ -2483,7 +2483,7 @@ public abstract class XLib {
 		else
 		    name = (MemorySegment)XKeysymToString.invoke((int)keysym.bits);
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    } finally {
 		checkerror();
 	    }
@@ -2495,7 +2495,7 @@ public abstract class XLib {
 	    try {
 		return((int)XLookupString.invoke(ev, cbuf, (int)cbuf.byteSize(), sbuf, compose));
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    } finally {
 		checkerror();
 	    }
@@ -2506,7 +2506,7 @@ public abstract class XLib {
 	    try {
 		return((int)Xutf8LookupString.invoke(xic.mem, ev, cbuf, (int)cbuf.byteSize(), sbuf, status));
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    } finally {
 		checkerror();
 	    }
@@ -2518,7 +2518,7 @@ public abstract class XLib {
 	    try(Arena st = Arena.ofConfined()) {
 		ret = (MemorySegment)XOpenIM.invoke(dpy.mem(), MemorySegment.NULL, (res_name == null) ? MemorySegment.NULL : st.allocateFrom(res_name), (res_class == null) ? MemorySegment.NULL : st.allocateFrom(res_class));
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    } finally {
 		checkerror();
 	    }
@@ -2530,7 +2530,7 @@ public abstract class XLib {
 	    try {
 		return((int)XCloseIM.invoke(xim.mem));
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    } finally {
 		checkerror();
 	    }
@@ -2622,7 +2622,7 @@ public abstract class XLib {
 		try {
 		    ret = (MemorySegment)XGetIMValues.invoke(xim.mem, st.allocateFrom(XNVaNestedList), valbuf, MemorySegment.NULL);
 		} catch(Throwable e) {
-		    throw(new RuntimeException(e));
+		    throw(new InvocationException(e));
 		} finally {
 		    checkerror();
 		}
@@ -2642,7 +2642,7 @@ public abstract class XLib {
 		try {
 		    ret = (MemorySegment)XCreateIC.invoke(xim.mem, st.allocateFrom(XNVaNestedList), valbuf, MemorySegment.NULL);
 		} catch(Throwable e) {
-		    throw(new RuntimeException(e));
+		    throw(new InvocationException(e));
 		} finally {
 		    checkerror();
 		}
@@ -2655,7 +2655,7 @@ public abstract class XLib {
 	    try {
 		XDestroyIC.invoke(xic.mem);
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    } finally {
 		checkerror();
 	    }
@@ -2666,7 +2666,7 @@ public abstract class XLib {
 	    try {
 		XSetICFocus.invoke(xic.mem);
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    } finally {
 		checkerror();
 	    }
@@ -2677,7 +2677,7 @@ public abstract class XLib {
 	    try {
 		XUnsetICFocus.invoke(xic.mem);
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    } finally {
 		checkerror();
 	    }
@@ -2690,7 +2690,7 @@ public abstract class XLib {
 		try {
 		    ret = (MemorySegment)XGetICValues.invoke(xic.mem, st.allocateFrom(XNVaNestedList), valbuf, MemorySegment.NULL);
 		} catch(Throwable e) {
-		    throw(new RuntimeException(e));
+		    throw(new InvocationException(e));
 		} finally {
 		    checkerror();
 		}
@@ -2707,7 +2707,7 @@ public abstract class XLib {
 	    try {
 		return(((int)XGetEventData.invoke(dpy, cookie)) != 0);
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    } finally {
 		checkerror();
 	    }
@@ -2718,7 +2718,7 @@ public abstract class XLib {
 	    try {
 		XFreeEventData.invoke(dpy, cookie);
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    } finally {
 		checkerror();
 	    }
@@ -2732,7 +2732,7 @@ public abstract class XLib {
 		else
 		    return(XID.of((long)XGetSelectionOwner.invoke(dpy.mem(), (int)selection.bits)));
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    } finally {
 		checkerror();
 	    }
@@ -2746,7 +2746,7 @@ public abstract class XLib {
 		else
 		    return((int)XSetSelectionOwner.invoke(dpy.mem(), (int)selection.bits, (int)owner.bits, (int)time));
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    } finally {
 		checkerror();
 	    }
@@ -2760,7 +2760,7 @@ public abstract class XLib {
 		else
 		    return((int)XConvertSelection.invoke(dpy.mem(), (int)selection.bits, (int)target.bits, (int)property.bits, (int)requestor.bits, (int)time));
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    } finally {
 		checkerror();
 	    }
@@ -2791,7 +2791,7 @@ public abstract class XLib {
 	    try {
 		XrmDestroyDatabase.invoke(mem);
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	}
 
@@ -2801,7 +2801,7 @@ public abstract class XLib {
 	    try {
 		rv = (MemorySegment)XResourceManagerString.invoke(((Display)dpy).mem());
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	    return(nullp(rv) ? null : (rv.reinterpret(Long.MAX_VALUE).getString(0, C_CHARSET)));
 	}
@@ -2812,7 +2812,7 @@ public abstract class XLib {
 	    try {
 		rv = (MemorySegment)XScreenResourceString.invoke(((Screen)screen).mem());
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	    String ret = null;
 	    if(!nullp(rv)) {
@@ -2827,7 +2827,7 @@ public abstract class XLib {
 	    try {
 		XrmInitialize.invoke();
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	}
 
@@ -2840,7 +2840,7 @@ public abstract class XLib {
 		try {
 		    rv = (MemorySegment)XrmGetStringDatabase.invoke(st.allocateFrom(data, C_CHARSET));
 		} catch(Throwable e) {
-		    throw(new RuntimeException(e));
+		    throw(new InvocationException(e));
 		}
 		return(nullp(rv) ? null : new XrmDatabase(this, rv));
 	    }
@@ -2853,7 +2853,7 @@ public abstract class XLib {
 		try {
 		    rv = (MemorySegment)XrmGetFileDatabase.invoke(st.allocateFrom(filename, C_CHARSET));
 		} catch(Throwable e) {
-		    throw(new RuntimeException(e));
+		    throw(new InvocationException(e));
 		}
 		return(nullp(rv) ? null : new XrmDatabase(this, rv));
 	    }
@@ -2868,7 +2868,7 @@ public abstract class XLib {
 		try {
 		    XrmMergeDatabases.invoke(((XrmDatabase)source).mem(), tbuf);
 		} catch(Throwable e) {
-		    throw(new RuntimeException(e));
+		    throw(new InvocationException(e));
 		}
 		((XrmDatabase)source).invalid();
 		if(target != null)
@@ -2895,7 +2895,7 @@ public abstract class XLib {
 		try {
 		    rv = (int)XrmGetResource.invoke(((XrmDatabase)database).mem(), st.allocateFrom(name, C_CHARSET), st.allocateFrom(cls, C_CHARSET), rtbuf, rvbuf);
 		} catch(Throwable e) {
-		    throw(new RuntimeException(e));
+		    throw(new InvocationException(e));
 		}
 		if(rv == 0)
 		    return(null);
@@ -2918,7 +2918,7 @@ public abstract class XLib {
 		try {
 		    ret = (int)XkbLibraryVersion.invoke(major, minor);
 		} catch(Throwable e) {
-		    throw(new RuntimeException(e));
+		    throw(new InvocationException(e));
 		} finally {
 		    checkerror();
 		}
@@ -2939,7 +2939,7 @@ public abstract class XLib {
 		try {
 		    ret = (int)XkbQueryExtension.invoke(dpy.mem(), opbuf, evbuf, erbuf, Vbuf, vbuf);
 		} catch(Throwable e) {
-		    throw(new RuntimeException(e));
+		    throw(new InvocationException(e));
 		} finally {
 		    checkerror();
 		}
@@ -2958,7 +2958,7 @@ public abstract class XLib {
 		try {
 		    ret = (int)XkbSetDetectableAutoRepeat.invoke(dpy.mem(), detectable ? 1 : 0, sbuf);
 		} catch(Throwable e) {
-		    throw(new RuntimeException(e));
+		    throw(new InvocationException(e));
 		} finally {
 		    checkerror();
 		}
@@ -3158,7 +3158,7 @@ public abstract class XLib {
 	    try {
 		XkbFreeKeyboard.invoke(xkb.mem(), which, free_all ? 1 : 0);
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    } finally {
 		checkerror();
 	    }
@@ -3170,7 +3170,7 @@ public abstract class XLib {
 	    try {
 		rv = (MemorySegment)XkbGetKeyboard.invoke(dpy.mem(), which, device_spec);
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    } finally {
 		checkerror();
 	    }
@@ -3187,7 +3187,7 @@ public abstract class XLib {
 	    try {
 		rv = (MemorySegment)XkbGetMap.invoke(dpy.mem(), which, device_spec);
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    } finally {
 		checkerror();
 	    }
@@ -3204,7 +3204,7 @@ public abstract class XLib {
 	    try {
 		rv = (int)XkbGetNames.invoke(dpy.mem(), which, xkb.mem());
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    } finally {
 		checkerror();
 	    }

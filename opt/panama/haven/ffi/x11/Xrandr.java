@@ -137,7 +137,7 @@ public abstract class Xrandr {
 			return(null);
 		    XRRQueryVersion.invoke(dpy.mem(), mabuf, mibuf);
 		} catch(Throwable e) {
-		    throw(new RuntimeException(e));
+		    throw(new InvocationException(e));
 		} finally {
 		    checkerror();
 		}
@@ -184,7 +184,7 @@ public abstract class Xrandr {
 		else
 		    p = (MemorySegment)XRRGetScreenResources.invoke(dpy.mem(), (int)window.bits);
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    } finally {
 		checkerror();
 	    }
@@ -198,7 +198,7 @@ public abstract class Xrandr {
 	    try {
 		XRRFreeScreenResources.invoke(p);
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    } finally {
 		checkerror();
 	    }
@@ -259,7 +259,7 @@ public abstract class Xrandr {
 		else
 		    p = (MemorySegment)XRRGetOutputInfo.invoke(dpy.mem(), resources.mem(), (int)output.bits);
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    } finally {
 		checkerror();
 	    }
@@ -273,7 +273,7 @@ public abstract class Xrandr {
 	    try {
 		XRRFreeOutputInfo.invoke(p);
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    } finally {
 		checkerror();
 	    }
@@ -329,7 +329,7 @@ public abstract class Xrandr {
 		else
 		    p = (MemorySegment)XRRGetCrtcInfo.invoke(dpy.mem(), resources.mem(), (int)output.bits);
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    } finally {
 		checkerror();
 	    }
@@ -343,7 +343,7 @@ public abstract class Xrandr {
 	    try {
 		XRRFreeCrtcInfo.invoke(p);
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    } finally {
 		checkerror();
 	    }

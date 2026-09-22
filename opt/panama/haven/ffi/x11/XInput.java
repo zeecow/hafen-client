@@ -288,7 +288,7 @@ public abstract class XInput {
 		try {
 		    ret = (int)XIQueryVersion.invoke(dpy.mem(), major, minor);
 		} catch(Throwable e) {
-		    throw(new RuntimeException(e));
+		    throw(new InvocationException(e));
 		} finally {
 		    checkerror();
 		}
@@ -502,7 +502,7 @@ public abstract class XInput {
 	    try {
 		XIFreeDeviceInfo.invoke(info);
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    } finally {
 		checkerror();
 	    }
@@ -516,7 +516,7 @@ public abstract class XInput {
 		try {
 		    mem = (MemorySegment)XIQueryDevice.invoke(dpy.mem(), deviceid, ndev);
 		} catch(Throwable e) {
-		    throw(new RuntimeException(e));
+		    throw(new InvocationException(e));
 		} finally {
 		    checkerror();
 		}
@@ -584,7 +584,7 @@ public abstract class XInput {
 		    else
 			return((int)XISelectEvents.invoke(dpy.mem(), (int)win.bits, evmem, n));
 		} catch(Throwable e) {
-		    throw(new RuntimeException(e));
+		    throw(new InvocationException(e));
 		} finally {
 		    checkerror();
 		}

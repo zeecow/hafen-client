@@ -64,7 +64,7 @@ public abstract class Xcursor {
 	    try {
 		return(((long)XcursorSupportsARGB.invoke(dpy.mem())) != 0);
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    } finally {
 		checkerror();
 	    }
@@ -75,7 +75,7 @@ public abstract class Xcursor {
 	    try {
 		return((int)XcursorGetDefaultSize.invoke(dpy.mem()));
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    } finally {
 		checkerror();
 	    }
@@ -117,7 +117,7 @@ public abstract class Xcursor {
 		img = new XcursorImage(mem);
 		Finalizer.finalize(img, () -> XcursorImageDestroy(mem));
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    } finally {
 		checkerror();
 	    }
@@ -133,7 +133,7 @@ public abstract class Xcursor {
 	    try {
 		XcursorImageDestroy.invoke(img);
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    } finally {
 		checkerror();
 	    }
@@ -144,7 +144,7 @@ public abstract class Xcursor {
 	    try {
 		return(XID.of((long)XcursorImageLoadCursor.invoke(dpy.mem(), img.mem())));
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    } finally {
 		checkerror();
 	    }
@@ -155,7 +155,7 @@ public abstract class Xcursor {
 	    try(Arena st = Arena.ofConfined()) {
 		return(XID.of((long)XcursorLibraryLoadCursor.invoke(dpy.mem(), st.allocateFrom(name, C_CHARSET))));
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    } finally {
 		checkerror();
 	    }

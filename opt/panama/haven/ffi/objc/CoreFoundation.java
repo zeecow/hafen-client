@@ -62,14 +62,14 @@ public abstract class CoreFoundation {
 	void CFRelease(MemorySegment object) {
 	    try {
 		CFRelease.invoke(object);
-	    } catch(Throwable e) {throw(new RuntimeException(e));}
+	    } catch(Throwable e) {throw(new InvocationException(e));}
 	}
 
 	private final MethodHandle CFRetain = ld.downcallHandle(dylib.find("CFRetain").get(), FunctionDescriptor.of(CFTypeRef, CFTypeRef));
 	MemorySegment CFRetain(MemorySegment object) {
 	    try {
 		return((MemorySegment)CFRetain.invoke(object));
-	    } catch(Throwable e) {throw(new RuntimeException(e));}
+	    } catch(Throwable e) {throw(new InvocationException(e));}
 	}
 
 	void gcrelease(Object obj, MemorySegment object) {
@@ -93,7 +93,7 @@ public abstract class CoreFoundation {
 	    public MemorySegment getBytePtr() {
 		try {
 		    return((MemorySegment)CFDataGetBytePtr.invoke(ref));
-		} catch(Throwable e) {throw(new RuntimeException(e));}
+		} catch(Throwable e) {throw(new InvocationException(e));}
 	    }
 	}
 

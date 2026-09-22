@@ -59,7 +59,7 @@ public abstract class SHCore {
 		try {
 		    rv = (int)GetDpiForMonitor.invoke(hmonitor.bits, dpiType, xbuf, ybuf);
 		} catch(Throwable e) {
-		    throw(new RuntimeException(e));
+		    throw(new InvocationException(e));
 		}
 		if(rv != Win32.S_OK)
 		    throw(new HResultError(rv));
@@ -75,7 +75,7 @@ public abstract class SHCore {
 		try {
 		    rv = (int)GetScaleFactorForMonitor.invoke(hmonitor.bits, buf);
 		} catch(Throwable e) {
-		    throw(new RuntimeException(e));
+		    throw(new InvocationException(e));
 		}
 		if(rv != Win32.S_OK)
 		    throw(new HResultError(rv));

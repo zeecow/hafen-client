@@ -329,7 +329,7 @@ public abstract class LibPulse {
 	    try {
 		pa_threaded_mainloop_free.invoke(m);
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	}
 
@@ -339,7 +339,7 @@ public abstract class LibPulse {
 	    try {
 		rv = (MemorySegment)pa_threaded_mainloop_new.invoke();
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	    return(nullp(rv) ? null : new pa_threaded_mainloop(rv));
 	}
@@ -349,7 +349,7 @@ public abstract class LibPulse {
 	    try {
 		pa_threaded_mainloop_lock.invoke(((pa_threaded_mainloop)m).mem);
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	}
 
@@ -358,7 +358,7 @@ public abstract class LibPulse {
 	    try {
 		pa_threaded_mainloop_unlock.invoke(((pa_threaded_mainloop)m).mem);
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	}
 
@@ -368,7 +368,7 @@ public abstract class LibPulse {
 	    try {
 		rv = (int)pa_threaded_mainloop_start.invoke(((pa_threaded_mainloop)m).mem);
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	    if(rv < 0)
 		throw(new PulseException("pa_threaded_mainloop_start: " + rv));
@@ -379,7 +379,7 @@ public abstract class LibPulse {
 	    try {
 		pa_threaded_mainloop_start.invoke(((pa_threaded_mainloop)m).mem);
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	}
 
@@ -401,7 +401,7 @@ public abstract class LibPulse {
 	    try {
 		rv = (MemorySegment)pa_threaded_mainloop_get_api.invoke(((pa_threaded_mainloop)m).mem);
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	    return(nullp(rv) ? null : new pa_mainloop_api(rv, m));
 	}
@@ -426,7 +426,7 @@ public abstract class LibPulse {
 	    try {
 		pa_context_unref.invoke(m);
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	}
 
@@ -436,7 +436,7 @@ public abstract class LibPulse {
 	    try(Arena st = Arena.ofConfined()) {
 		rv = (MemorySegment)pa_context_new.invoke(((pa_mainloop_api)mainloop).mem, st.allocateFrom(name, C_CHARSET));
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	    return(nullp(rv) ? null : new pa_context(rv, mainloop));
 	}
@@ -447,7 +447,7 @@ public abstract class LibPulse {
 	    try(Arena st = Arena.ofConfined()) {
 		rv = (MemorySegment)pa_context_new_with_proplist.invoke(((pa_mainloop_api)mainloop).mem, st.allocateFrom(name, C_CHARSET), ((pa_proplist)props).mem);
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	    return(nullp(rv) ? null : new pa_context(rv, mainloop));
 	}
@@ -457,7 +457,7 @@ public abstract class LibPulse {
 	    try {
 		return((int)pa_context_errno.invoke(((pa_context)c).mem));
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	}
 
@@ -466,7 +466,7 @@ public abstract class LibPulse {
 	    try {
 		return((int)pa_context_get_state.invoke(((pa_context)c).mem));
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	}
 
@@ -476,7 +476,7 @@ public abstract class LibPulse {
 	    try(Arena st = Arena.ofConfined()) {
 		rv = (int)pa_context_connect.invoke(((pa_context)c).mem, server == null ? MemorySegment.NULL : st.allocateFrom(server, C_CHARSET), flags, MemorySegment.NULL);
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	    if(rv < 0)
 		throw(new ContextException("pa_context_connect", pa_context_errno(c)));
@@ -487,7 +487,7 @@ public abstract class LibPulse {
 	    try {
 		pa_context_disconnect.invoke(((pa_context)c).mem);
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	}
 
@@ -505,7 +505,7 @@ public abstract class LibPulse {
 	    try {
 		pa_context_set_state_callback.invoke(c.mem, cbt, MemorySegment.NULL);
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	    c.state_cb = cbt;
 	}
@@ -532,7 +532,7 @@ public abstract class LibPulse {
 	    try {
 		pa_context_set_event_callback.invoke(c.mem, cbt, MemorySegment.NULL);
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	    c.event_cb = cbt;
 	}
@@ -552,7 +552,7 @@ public abstract class LibPulse {
 	    try {
 		pa_proplist_free.invoke(mem);
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	}
 
@@ -562,7 +562,7 @@ public abstract class LibPulse {
 	    try {
 		rv = (MemorySegment)pa_proplist_new.invoke();
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	    pa_proplist ret = new pa_proplist(rv);
 	    Finalizer.finalize(ret, () -> pa_proplist_free(rv));
@@ -576,7 +576,7 @@ public abstract class LibPulse {
 	    try(Arena st = Arena.ofConfined()) {
 		rv = (int)pa_proplist_set.invoke(((pa_proplist)p).mem, st.allocateFrom(key, Utils.utf8), MemorySegment.ofArray(data), data.length);
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	    if(rv != 0)
 		throw(new PulseException("pa_proplist_set: " + rv));
@@ -588,7 +588,7 @@ public abstract class LibPulse {
 	    try(Arena st = Arena.ofConfined()) {
 		rv = (int)pa_proplist_sets.invoke(((pa_proplist)p).mem, st.allocateFrom(key, Utils.utf8), st.allocateFrom(val, Utils.utf8));
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	    if(rv != 0)
 		throw(new PulseException("pa_proplist_sets: " + rv));
@@ -622,7 +622,7 @@ public abstract class LibPulse {
 	    try {
 		return((long)pa_usec_to_bytes.invoke(t, ((pa_sample_spec)spec).mem()));
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	}
 
@@ -674,7 +674,7 @@ public abstract class LibPulse {
 	    try {
 		pa_stream_unref.invoke(m);
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	}
 
@@ -684,7 +684,7 @@ public abstract class LibPulse {
 	    try(Arena st = Arena.ofConfined()) {
 		rv = (MemorySegment)pa_stream_new.invoke(((pa_context)c).mem, st.allocateFrom(name, C_CHARSET), ((pa_sample_spec)ss).mem(), MemorySegment.NULL);
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	    return(nullp(rv) ? null : new pa_stream(rv, c));
 	}
@@ -695,7 +695,7 @@ public abstract class LibPulse {
 	    try(Arena st = Arena.ofConfined()) {
 		rv = (MemorySegment)pa_stream_new_with_proplist.invoke(((pa_context)c).mem, st.allocateFrom(name, C_CHARSET), ((pa_sample_spec)ss).mem(), MemorySegment.NULL, ((pa_proplist)props).mem);
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	    return(nullp(rv) ? null : new pa_stream(rv, c));
 	}
@@ -714,7 +714,7 @@ public abstract class LibPulse {
 	    try {
 		pa_stream_set_state_callback.invoke(s.mem, cbt, MemorySegment.NULL);
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	    s.state_cb = cbt;
 	}
@@ -733,7 +733,7 @@ public abstract class LibPulse {
 	    try {
 		pa_stream_set_write_callback.invoke(s.mem, cbt, MemorySegment.NULL);
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	    s.write_cb = cbt;
 	}
@@ -743,7 +743,7 @@ public abstract class LibPulse {
 	    try(Arena st = Arena.ofConfined()) {
 		rv = (int)pa_stream_connect_playback.invoke(((pa_stream)s).mem, (dev == null) ? MemorySegment.NULL : st.allocateFrom(dev, C_CHARSET), ((pa_buffer_attr)attr).mem(), flags, MemorySegment.NULL, MemorySegment.NULL);
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	    if(rv != 0)
 		throw(new PulseException("pa_stream_connect_playback: " + rv));
@@ -754,7 +754,7 @@ public abstract class LibPulse {
 	    try {
 		return((int)pa_stream_get_state.invoke(((pa_stream)s).mem));
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	}
 
@@ -767,7 +767,7 @@ public abstract class LibPulse {
 		try {
 		    rv = (int)pa_stream_begin_write.invoke(((pa_stream)s).mem, datap, nbytesp);
 		} catch(Throwable e) {
-		    throw(new RuntimeException(e));
+		    throw(new InvocationException(e));
 		}
 		if(rv != 0)
 		    throw(new PulseException("pa_stream_begin_write: " + rv));
@@ -784,7 +784,7 @@ public abstract class LibPulse {
 	    try {
 		rv = (int)pa_stream_write.invoke(((pa_stream)s).mem, MemorySegment.ofBuffer(data), data.remaining(), MemorySegment.NULL, offset, seek);
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	    if(rv != 0)
 		throw(new PulseException("pa_stream_begin_write: " + rv));
@@ -796,7 +796,7 @@ public abstract class LibPulse {
 	    try {
 		rv = (int)pa_stream_cancel_write.invoke(((pa_stream)s).mem);
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	    if(rv != 0)
 		throw(new PulseException("pa_stream_begin_cancel_write: " + rv));
@@ -808,7 +808,7 @@ public abstract class LibPulse {
 	    try {
 		rv = (int)pa_stream_disconnect.invoke(((pa_stream)s).mem);
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	    if(rv != 0)
 		throw(new PulseException("pa_stream_disconnect: " + rv));
