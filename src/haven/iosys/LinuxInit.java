@@ -46,6 +46,7 @@ public class LinuxInit {
 		     }
 		}
 	    }
+	} catch(NoSuchFileException e) {
 	} catch(IOException e) {
 	    new Warning(e).issue();
 	}
