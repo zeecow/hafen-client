@@ -1028,7 +1028,7 @@ public abstract class XLib {
 	static final MemoryLayout C_XPointer = ADDRESS;
 	static final MemoryLayout C_XIMStyle = C_LONG;
 	static final MemoryLayout C_KeyCode = C_CHAR;
-	private final SymbolLookup xlib = SymbolLookup.libraryLookup("libX11.so.6", Arena.global());
+	private final SymbolLookup xlib = loadlib("libX11.so.6", Arena.global());
 
 	private static void set(MemorySegment mem, VarHandle var, long offset, XID value) {
 	    if(C_XID instanceof ValueLayout.OfLong)
@@ -3223,9 +3223,8 @@ public abstract class XLib {
     public static XLib get() {
 	if(instance == null) {
 	    synchronized(XLib.class) {
-		if(instance == null) {
-		    instance = new libX11_so_6();
-		}
+		if(instance == null)
+		    instance = tryload("libX11", libX11_so_6::new);
 	    }
 	}
 	return(instance);

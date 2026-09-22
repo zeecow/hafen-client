@@ -191,7 +191,7 @@ public abstract class EGL {
 	static final ValueLayout EGLint = ValueLayout.JAVA_INT;
 	static final MemoryLayout EGLAttrib = PTRINT_T;
 	static final ValueLayout EGLNativeDisplayType = ADDRESS;
-	private final SymbolLookup egl = SymbolLookup.libraryLookup("libEGL.so.1", Arena.global());
+	private final SymbolLookup egl = loadlib("libEGL.so.1", Arena.global());
 
 	private final MethodHandle eglGetProcAddress = ld.downcallHandle(egl.find("eglGetProcAddress").get(), FunctionDescriptor.of(ADDRESS, ADDRESS));
 	MemorySegment eglGetProcAddress(String funcName) {
@@ -487,9 +487,8 @@ public abstract class EGL {
     public static EGL get() {
 	if(instance == null) {
 	    synchronized(EGL.class) {
-		if(instance == null) {
-		    instance = new libEGL_so_1();
-		}
+		if(instance == null)
+		    instance = tryload("egl", libEGL_so_1::new);
 	    }
 	}
 	return(instance);

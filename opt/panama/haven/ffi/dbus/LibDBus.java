@@ -252,7 +252,7 @@ public abstract class LibDBus {
     static class libdbus_1_so_3 extends LibDBus {
 	static final ValueLayout DBUS_UINT32_T = ValueLayout.JAVA_INT;
 	static final ValueLayout DBUS_BOOL_T = DBUS_UINT32_T;
-	private final SymbolLookup dbus = SymbolLookup.libraryLookup("libdbus-1.so.3", Arena.global());
+	private final SymbolLookup dbus = loadlib("libdbus-1.so.3", Arena.global());
 
 	static final StructLayout _Error = struct(new MemoryLayout[] {
 		ADDRESS.withName("name"),
@@ -870,9 +870,8 @@ public abstract class LibDBus {
     public static LibDBus get() {
 	if(instance == null) {
 	    synchronized(LibDBus.class) {
-		if(instance == null) {
-		    instance = new libdbus_1_so_3();
-		}
+		if(instance == null)
+		    instance = tryload("dbus", libdbus_1_so_3::new);
 	    }
 	}
 	return(instance);

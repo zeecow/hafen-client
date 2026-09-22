@@ -238,7 +238,7 @@ public abstract class Runtime {
 	static final MemoryLayout OC_BOOL = C_CHAR;
 	static final MemoryLayout NSInteger = C_LONG;
 	static final MemoryLayout NSUInteger = C_LONG;
-	private final SymbolLookup rt = SymbolLookup.libraryLookup("libobjc.A.dylib", Arena.global());
+	private final SymbolLookup rt = loadlib("libobjc.A.dylib", Arena.global());
 
 	objc4() {
 	    /* x86-64 support would require eg. snd_msgSend_stret and such */
@@ -799,9 +799,8 @@ public abstract class Runtime {
     public static Runtime get() {
 	if(instance == null) {
 	    synchronized(Runtime.class) {
-		if(instance == null) {
-		    instance = new objc4();
-		}
+		if(instance == null)
+		    instance = tryload("obj-c runtime", objc4::new);
 	    }
 	}
 	return(instance);

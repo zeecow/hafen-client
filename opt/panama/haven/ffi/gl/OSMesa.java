@@ -77,7 +77,7 @@ public abstract class OSMesa {
 	static final ValueLayout GLboolean = OpenGL.Base.GLboolean;
 	static final ValueLayout GLenum = OpenGL.Base.GLenum;
 	static final ValueLayout GLsizei = OpenGL.Base.GLsizei;
-	private final SymbolLookup mesa = SymbolLookup.libraryLookup("libOSMesa.so.8", Arena.global());
+	private final SymbolLookup mesa = loadlib("libOSMesa.so.8", Arena.global());
 
 	private final MethodHandle OSMesaCreateContextAttribs = ld.downcallHandle(mesa.find("OSMesaCreateContextAttribs").get(), FunctionDescriptor.of(C_OSMesaContext, ADDRESS, C_OSMesaContext));
 	public OSMesaContext OSMesaCreateContextAttribs(int[] attriblist, OSMesaContext sharelist) {
@@ -142,9 +142,8 @@ public abstract class OSMesa {
     public static OSMesa get() {
 	if(instance == null) {
 	    synchronized(OSMesa.class) {
-		if(instance == null) {
-		    instance = new libOSMesa_so_8();
-		}
+		if(instance == null)
+		    instance = tryload("osmesa", libOSMesa_so_8::new);
 	    }
 	}
 	return(instance);

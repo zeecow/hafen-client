@@ -208,7 +208,7 @@ public abstract class Carbon {
     public abstract String UCKeyTranslate(Carbon.UCKeyboardLayout layout, int virtualKeyCode, int keyAction, int modifierKeyState, int keyboardType, int keyTranslateOptions);
 
     static class VersionA extends Carbon {
-	private final SymbolLookup dylib = SymbolLookup.libraryLookup("/System/Library/Frameworks/Carbon.framework/Carbon", Arena.global());
+	private final SymbolLookup dylib = loadlib("/System/Library/Frameworks/Carbon.framework/Carbon", Arena.global());
 	private final CoreFoundation cf = CoreFoundation.get();
 	private static final Charset C_UNICHARSET = Charset.forName(ByteOrder.nativeOrder() == ByteOrder.LITTLE_ENDIAN ? "UTF-16LE" : "UTF-16BE");
 	private static final MemoryLayout CFTypeRef = CoreFoundation.VersionA.CFTypeRef;
@@ -326,9 +326,8 @@ public abstract class Carbon {
     public static Carbon get() {
 	if(instance == null) {
 	    synchronized(Carbon.class) {
-		if(instance == null) {
-		    instance = new VersionA();
-		}
+		if(instance == null)
+		    instance = tryload("Carbon", VersionA::new);
 	    }
 	}
 	return(instance);

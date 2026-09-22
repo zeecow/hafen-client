@@ -318,7 +318,7 @@ public abstract class AppKit {
 	private static final MemoryLayout OC_BOOL = Runtime.objc4.OC_BOOL;
 	private static final MemoryLayout NSUInteger = Runtime.objc4.NSUInteger;
 	private static final MemoryLayout NSInteger = Runtime.objc4.NSInteger;
-	private final SymbolLookup dylib = SymbolLookup.libraryLookup("/System/Library/Frameworks/AppKit.framework/AppKit", Arena.global());
+	private final SymbolLookup dylib = loadlib("/System/Library/Frameworks/AppKit.framework/AppKit", Arena.global());
 	private final Arena localarena = Arena.ofAuto();
 	final Runtime rt = Runtime.get();
 	final CoreGraphics cg = CoreGraphics.get();
@@ -1283,9 +1283,8 @@ public abstract class AppKit {
     public static AppKit get() {
 	if(instance == null) {
 	    synchronized(AppKit.class) {
-		if(instance == null) {
-		    instance = new VersionC();
-		}
+		if(instance == null)
+		    instance = tryload("AppKit", VersionC::new);
 	    }
 	}
 	return(instance);

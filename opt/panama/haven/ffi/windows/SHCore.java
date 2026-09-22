@@ -48,7 +48,7 @@ public abstract class SHCore {
 	private static final MemoryLayout HRESULT = Win32.Win64Unicode.HRESULT;
 	private static final MemoryLayout HMONITOR = Win32.Win64Unicode.HMONITOR;
 	private static final MemoryLayout UINT = Win32.Win64Unicode.UINT;
-	private final SymbolLookup shcore = SymbolLookup.libraryLookup("SHCORE.DLL", Arena.global());
+	private final SymbolLookup shcore = loadlib("SHCORE.DLL", Arena.global());
 	private final Win32 win = Win32.get();
 
 	private final MethodHandle GetDpiForMonitor = ld.downcallHandle(shcore.find("GetDpiForMonitor").get(), FunctionDescriptor.of(HRESULT, HMONITOR, C_ENUM, ADDRESS, ADDRESS));
@@ -88,9 +88,8 @@ public abstract class SHCore {
     public static SHCore get() {
 	if(instance == null) {
 	    synchronized(SHCore.class) {
-		if(instance == null) {
-		    instance = new Win64Unicode();
-		}
+		if(instance == null)
+		    instance = tryload("SHCore", Win64Unicode::new);
 	    }
 	}
 	return(instance);

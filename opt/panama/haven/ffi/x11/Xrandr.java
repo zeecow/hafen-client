@@ -124,7 +124,7 @@ public abstract class Xrandr {
 	private static final MemoryLayout C_Time = libX11_so_6.C_Time;
 	private static final MemoryLayout C_XID = libX11_so_6.C_XID;
 	private static final MemoryLayout C_XRREnum = C_SHORT;
-	private final SymbolLookup Xrandr = SymbolLookup.libraryLookup("libXrandr.so.2", Arena.global());
+	private final SymbolLookup Xrandr = loadlib("libXrandr.so.2", Arena.global());
 
 	private final MethodHandle XRRQueryExtension = ld.downcallHandle(Xrandr.find("XRRQueryExtension").get(), FunctionDescriptor.of(C_XBool, ADDRESS, ADDRESS, ADDRESS));
 	private final MethodHandle XRRQueryVersion = ld.downcallHandle(Xrandr.find("XRRQueryVersion").get(), FunctionDescriptor.of(C_Status, ADDRESS, ADDRESS, ADDRESS));
@@ -354,9 +354,8 @@ public abstract class Xrandr {
     public static Xrandr get() {
 	if(instance == null) {
 	    synchronized(Xrandr.class) {
-		if(instance == null) {
-		    instance = new libXrandr_so_2();
-		}
+		if(instance == null)
+		    instance = tryload("libXrandr", libXrandr_so_2::new);
 	    }
 	}
 	return(instance);

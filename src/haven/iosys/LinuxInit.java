@@ -48,7 +48,7 @@ public class LinuxInit {
 	    }
 	} catch(NoSuchFileException e) {
 	} catch(IOException e) {
-	    new Warning(e).issue();
+	    new Warning(e, "unexpected error in linux-init").issue();
 	}
     }
 }

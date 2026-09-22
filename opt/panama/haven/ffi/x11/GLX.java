@@ -194,7 +194,7 @@ public abstract class GLX {
 	private static final ValueLayout.OfLong INT64_T = ValueLayout.JAVA_LONG;
 	private static final VarHandle attribary = C_INT.arrayElementVarHandle();
 	private final XLib xlib = XLib.get();
-	private final SymbolLookup glx = SymbolLookup.libraryLookup("libGLX.so.0", Arena.global());
+	private final SymbolLookup glx = loadlib("libGLX.so.0", Arena.global());
 
 	private final MethodHandle glXGetProcAddress = ld.downcallHandle(glx.find("glXGetProcAddress").get(), FunctionDescriptor.of(ADDRESS, ADDRESS));
 	public MemorySegment glXGetProcAddress(String name) {
@@ -581,9 +581,8 @@ public abstract class GLX {
     public static GLX get() {
 	if(instance == null) {
 	    synchronized(GLX.class) {
-		if(instance == null) {
-		    instance = new libGLX_so_0();
-		}
+		if(instance == null)
+		    instance = tryload("GLX", libGLX_so_0::new);
 	    }
 	}
 	return(instance);

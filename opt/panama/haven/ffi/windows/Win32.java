@@ -480,11 +480,11 @@ public abstract class Win32 {
 	static final MemoryLayout LSTATUS = LONG;
 	static final MemoryLayout WPARAM = UINT_PTR;
 	static final MemoryLayout LPARAM = LONG_PTR;
-	private final SymbolLookup kernel32 = SymbolLookup.libraryLookup("KERNEL32.DLL", Arena.global());
-	private final SymbolLookup user32 = SymbolLookup.libraryLookup("USER32.DLL", Arena.global());
-	private final SymbolLookup gdi32 = SymbolLookup.libraryLookup("GDI32.DLL", Arena.global());
-	private final SymbolLookup shell32 = SymbolLookup.libraryLookup("SHELL32.DLL", Arena.global());
-	private final SymbolLookup advapi32 = SymbolLookup.libraryLookup("ADVAPI32.DLL", Arena.global());
+	private final SymbolLookup kernel32 = loadlib("KERNEL32.DLL", Arena.global());
+	private final SymbolLookup user32 = loadlib("USER32.DLL", Arena.global());
+	private final SymbolLookup gdi32 = loadlib("GDI32.DLL", Arena.global());
+	private final SymbolLookup shell32 = loadlib("SHELL32.DLL", Arena.global());
+	private final SymbolLookup advapi32 = loadlib("ADVAPI32.DLL", Arena.global());
 
 	static MemorySegment wstr(Arena st, String str) {
 	    if(str == null)
@@ -1577,15 +1577,8 @@ public abstract class Win32 {
     public static Win32 get() {
 	if(instance == null) {
 	    synchronized(Win32.class) {
-		if(instance == null) {
-		    try {
-			instance = new Win64Unicode();
-		    } catch(RuntimeException e) {
-			if(Utils.getprop("os.name", "").startsWith("Windows"))
-			    new Warning(e, "Win32 environment unexpectedly unavailable on Windows").issue();
-			throw(new haven.iosys.Unavailable("Win32 environment not available", e));
-		    }
-		}
+		if(instance == null)
+		    instance = tryload("Win32", Win64Unicode::new);
 	    }
 	}
 	return(instance);

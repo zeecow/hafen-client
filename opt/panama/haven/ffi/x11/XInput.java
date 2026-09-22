@@ -275,7 +275,7 @@ public abstract class XInput {
 	private static final MemoryLayout C_XID = XLib.libX11_so_6.C_XID;
 	private static final MemoryLayout C_Atom = XLib.libX11_so_6.C_Atom;
 	private static final MemoryLayout C_Time = XLib.libX11_so_6.C_Time;
-	private final SymbolLookup xi = SymbolLookup.libraryLookup("libXi.so.6", Arena.global());
+	private final SymbolLookup xi = loadlib("libXi.so.6", Arena.global());
 
 	private final MethodHandle XIQueryVersion = ld.downcallHandle(xi.find("XIQueryVersion").get(), FunctionDescriptor.of(C_Status, ADDRESS, ADDRESS, ADDRESS));
 	public int XIQueryVersion(Display dpy, int[] version) {
@@ -789,9 +789,8 @@ public abstract class XInput {
     public static XInput get() {
 	if(instance == null) {
 	    synchronized(XInput.class) {
-		if(instance == null) {
-		    instance = new libXi_so_6();
-		}
+		if(instance == null)
+		    instance = tryload("libXi", libXi_so_6::new);
 	    }
 	}
 	return(instance);

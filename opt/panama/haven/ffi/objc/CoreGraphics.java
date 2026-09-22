@@ -187,7 +187,7 @@ public abstract class CoreGraphics {
 	static final MemoryLayout CGFloat = C_DOUBLE;
 	static final MemoryLayout CGDirectDisplayID = ValueLayout.JAVA_INT;
 	static final MemoryLayout CGEventField = ValueLayout.JAVA_INT;
-	private final SymbolLookup dylib = SymbolLookup.libraryLookup("/System/Library/Frameworks/CoreGraphics.framework/CoreGraphics", Arena.global());
+	private final SymbolLookup dylib = loadlib("/System/Library/Frameworks/CoreGraphics.framework/CoreGraphics", Arena.global());
 	private final Runtime rt = Runtime.get();
 	private final CoreFoundation cf = CoreFoundation.get();
 
@@ -530,9 +530,8 @@ public abstract class CoreGraphics {
     public static CoreGraphics get() {
 	if(instance == null) {
 	    synchronized(CoreGraphics.class) {
-		if(instance == null) {
-		    instance = new VersionA();
-		}
+		if(instance == null)
+		    instance = tryload("CoreGraphics", VersionA::new);
 	    }
 	}
 	return(instance);

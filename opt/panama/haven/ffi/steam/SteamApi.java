@@ -483,7 +483,7 @@ public abstract class SteamApi {
 	private SymbolLookup lib = null;
 	protected MethodHandle lookup(String name, FunctionDescriptor sig, Linker.Option... options) {
 	    if(lib == null)
-		lib = loadlib("libsteam_api.so", Arena.global());
+		lib = jloadlib("libsteam_api.so", Arena.global());
 	    MemorySegment addr = lib.find(name).get();
 	    if(nullp(addr))
 		throw(new MissingFunction("name"));
@@ -496,7 +496,7 @@ public abstract class SteamApi {
 	if(instance == null) {
 	    synchronized(SteamApi.class) {
 		if(instance == null) {
-		    instance = new libsteam_api_so();
+		    instance = tryload("steam api", libsteam_api_so::new);
 		    instance.Init();
 		}
 	    }

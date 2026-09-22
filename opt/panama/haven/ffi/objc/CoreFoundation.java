@@ -55,7 +55,7 @@ public abstract class CoreFoundation {
     abstract CFData CFData(MemorySegment ref, boolean release, Object keep);
 
     static class VersionA extends CoreFoundation {
-	private final SymbolLookup dylib = SymbolLookup.libraryLookup("/System/Library/Frameworks/CoreFoundation.framework/CoreFoundation", Arena.global());
+	private final SymbolLookup dylib = loadlib("/System/Library/Frameworks/CoreFoundation.framework/CoreFoundation", Arena.global());
 	static final MemoryLayout CFTypeRef = ADDRESS;
 
 	private final MethodHandle CFRelease = ld.downcallHandle(dylib.find("CFRelease").get(), FunctionDescriptor.ofVoid(CFTypeRef));
@@ -106,9 +106,8 @@ public abstract class CoreFoundation {
     public static CoreFoundation get() {
 	if(instance == null) {
 	    synchronized(CoreFoundation.class) {
-		if(instance == null) {
-		    instance = new VersionA();
-		}
+		if(instance == null)
+		    instance = tryload("CoreFoundation", VersionA::new);
 	    }
 	}
 	return(instance);

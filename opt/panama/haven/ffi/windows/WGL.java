@@ -64,7 +64,7 @@ public abstract class WGL {
 	private static final MemoryLayout HDC = Win32.Win64Unicode.HDC;
 	private static final MemoryLayout LPCSTR = ADDRESS;
 	static final MemoryLayout HGLRC = HANDLE;
-	private final SymbolLookup opengl32 = SymbolLookup.libraryLookup("OPENGL32.DLL", Arena.global());
+	private final SymbolLookup opengl32 = loadlib("OPENGL32.DLL", Arena.global());
 	private final Win32 win = Win32.get();
 
 	private final MethodHandle wglGetProcAddress = ld.downcallHandle(opengl32.find("wglGetProcAddress").get(), FunctionDescriptor.of(ADDRESS, LPCSTR));
@@ -236,9 +236,8 @@ public abstract class WGL {
     public static WGL get() {
 	if(instance == null) {
 	    synchronized(WGL.class) {
-		if(instance == null) {
-		    instance = new Opengl32_dll();
-		}
+		if(instance == null)
+		    instance = tryload("WGL", Opengl32_dll::new);
 	    }
 	}
 	return(instance);

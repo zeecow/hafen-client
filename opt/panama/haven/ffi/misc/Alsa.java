@@ -145,7 +145,7 @@ public abstract class Alsa {
     public static class libasound_so_2 extends Alsa {
 	static final MemoryLayout SFRAMES_T = C_LONG;
 	static final MemoryLayout UFRAMES_T = C_LONG;
-	private final SymbolLookup asound = SymbolLookup.libraryLookup("libasound.so.2", Arena.global());
+	private final SymbolLookup asound = loadlib("libasound.so.2", Arena.global());
 
 	public static class Pcm implements Alsa.Pcm {
 	    final MemorySegment mem;
@@ -992,9 +992,8 @@ public abstract class Alsa {
     public static Alsa get() {
 	if(instance == null) {
 	    synchronized(Alsa.class) {
-		if(instance == null) {
-		    instance = new libasound_so_2();
-		}
+		if(instance == null)
+		    instance = tryload("libasound", libasound_so_2::new);
 	    }
 	}
 	return(instance);

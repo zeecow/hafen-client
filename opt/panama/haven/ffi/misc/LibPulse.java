@@ -310,7 +310,7 @@ public abstract class LibPulse {
 
     public static class libpulse_so_0 extends LibPulse {
 	private static final MemoryLayout PA_USEC_T = ValueLayout.JAVA_LONG;
-	private final SymbolLookup libpulse = SymbolLookup.libraryLookup("libpulse.so.0", Arena.global());
+	private final SymbolLookup libpulse = loadlib("libpulse.so.0", Arena.global());
 
 	class pa_threaded_mainloop implements LibPulse.pa_threaded_mainloop {
 	    final MemorySegment mem;
@@ -819,9 +819,8 @@ public abstract class LibPulse {
     public static LibPulse get() {
 	if(instance == null) {
 	    synchronized(LibPulse.class) {
-		if(instance == null) {
-		    instance = new libpulse_so_0();
-		}
+		if(instance == null)
+		    instance = tryload("libpulse", libpulse_so_0::new);
 	    }
 	}
 	return(instance);

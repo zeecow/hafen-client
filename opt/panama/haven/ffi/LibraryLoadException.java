@@ -24,25 +24,13 @@
  *  Boston, MA 02111-1307 USA
  */
 
-package haven.iosys.ffi;
+package haven.ffi;
 
-import haven.*;
-import haven.iosys.*;
-import haven.ffi.*;
-import haven.ffi.windows.*;
-
-@Init
-public class Win32Init {
-    public static void sysinit() {
-	try {
-	    String value = (String)Win32.get().RegGetValue(Win32.HKEY_LOCAL_MACHINE,
-							   "HARDWARE\\DESCRIPTION\\System\\CentralProcessor\\0",
-							   "ProcessorNameString",
-							   Win32.RRF_RT_ANY);
-	    Utils.useragent.put("cpu.name", value.trim());
-	} catch(LibraryLoadException e) {
-	} catch(RuntimeException e) {
-	    new Warning(e, "unexpected error in win32-init").issue();
-	}
+public class LibraryLoadException extends RuntimeException {
+    public LibraryLoadException(String msg, Throwable cause) {
+	super(msg, cause);
+    }
+    public LibraryLoadException(String msg) {
+	super(msg);
     }
 }
