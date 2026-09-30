@@ -497,7 +497,7 @@ public class ZeeConfig {
     }
 
     public static boolean isGobCropNoTrellisNoWild(String gobName) {
-        return gobName.startsWith("gfx/terobjs/plants/") && !gobName.endsWith("trellis") && !isGobWildCrop(gobName);
+        return gobName.startsWith("gfx/terobjs/plants/") && !gobName.endsWith("trellis") && !isGobWildCrop(gobName) && !gobName.endsWith("/giantturnip");
     }
 
     public static boolean isGobContainer(String gobName){
@@ -3102,12 +3102,7 @@ public class ZeeConfig {
                     ZeeManagerGobs.startMidClick(pc,mc,null,"");
             }
             ZeeManagerIcons.lastMinimapClick = mc;
-            if (getTileResName(mc).contains("tiles/beach")) {
-                if(getCursorName().contentEquals(CURSOR_DIG))
-                    ZeeManagerStockpile.lastSandTileClicked = new Coord2d(mc.x, mc.y);
-                else
-                    ZeeManagerStockpile.lastSandTileClicked = null;
-            }
+            ZeeManagerStockpile.checkSandClick(mc);
         }
     }
 

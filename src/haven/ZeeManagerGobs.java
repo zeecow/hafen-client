@@ -3956,8 +3956,11 @@ public class ZeeManagerGobs extends ZeeThread{
 
 
     private static boolean isGobLiftable(String gobName) {
-        if(isGobBoulder(gobName) || isGobSittingFurniture(gobName) || gobName.contains("/table-") || gobName.contains("studydesk"))
+        if ( isGobBoulder(gobName) || isGobSittingFurniture(gobName) || gobName.contains("/table-")
+                || gobName.contains("studydesk") || gobName.contains("/producesack-") )
+        {
             return true;
+        }
         String endList = "/meatgrinder,/potterswheel,/iconsign,/rowboat,/dugout,/wheelbarrow,"
                 +"/compostbin,/gardenpot,/beehive,/htable,/bed-sturdy,/boughbed,/alchemiststable,"
                 +"/gemwheel,/ancestralshrine,/spark,/cauldron,/churn,/wardrobe,"

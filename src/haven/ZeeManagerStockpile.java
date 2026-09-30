@@ -163,6 +163,16 @@ public class ZeeManagerStockpile extends ZeeThread{
         }.start();
     }
 
+    public static void checkSandClick(Coord2d mc) {
+        String tileName = ZeeConfig.getTileResName(mc);
+        if (tileName.contains("tiles/beach") || tileName.contains("tiles/rockbeach")) {
+            if(ZeeConfig.getCursorName().contentEquals(ZeeConfig.CURSOR_DIG))
+                lastSandTileClicked = new Coord2d(mc.x, mc.y);
+            else
+                lastSandTileClicked = null;
+        }
+    }
+
     @Override
     public void run() {
         try{
