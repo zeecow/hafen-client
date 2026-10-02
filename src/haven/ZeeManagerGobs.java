@@ -1927,7 +1927,7 @@ public class ZeeManagerGobs extends ZeeThread{
         if ( gobName.contains("/furn/") &&
             ZeeConfig.nameInListContains(gobName,"throne,chair,sofa,stool,bench") )
             return true;
-        if ( gobName.contains("rockinghorse") )
+        if ( ZeeConfig.nameInListContains(gobName,"rockinghorse,giantturnip") )
             return true;
         return false;
     }

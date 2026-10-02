@@ -2256,10 +2256,11 @@ public class ZeeConfig {
                 radius.remove();
         }else{
             String resname = support.getres().name;
-            //  "/minesupport"  "/naturalminesupport"  "/towercap"
             int size = ZeeGobRadius.RADIUS_MINESUPPORT_STAIRS;
             if (resname.endsWith("/minebeam"))
                 size = ZeeGobRadius.RADIUS_BEESKEP_MINEBEAM;
+            else if (resname.endsWith("/monumentalcolumn"))
+                size = ZeeGobRadius.RADIUS_MONUMENTALCOLUMN;
             else if (resname.endsWith("/column"))
                 size = ZeeGobRadius.RADIUS_STONECOLUMN;
             //add ZeeRadius if circular support

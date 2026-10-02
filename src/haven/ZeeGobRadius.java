@@ -14,6 +14,7 @@ public class ZeeGobRadius extends Sprite {
     static final int RADIUS_FOOD_THROUGH = 18 * MCache.tilesz2.y;
     static final int RADIUS_MOUND_BED = 20 * MCache.tilesz2.y;
     static final int RADIUS_STONECOLUMN = 11 * MCache.tilesz2.y;
+    static final int RADIUS_MONUMENTALCOLUMN = 30 * MCache.tilesz2.y;
     static final int RADIUS_MINESUPPORT_STAIRS = 9 * MCache.tilesz2.y;
     public static final Color COLOR_RADIUS = new Color(139, 139, 185, 48);
 
