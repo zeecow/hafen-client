@@ -232,7 +232,7 @@ public class ZeeManagerFarmer extends ZeeThread{
     static String harvestingPlantName;
     private void startSeedFarming() {
         ZeeConfig.autoHearthOnStranger = false;
-        mapSeedqlBarrel = new HashMap<>();
+        mapSeedqlBarrel = new LinkedHashMap<>();
         harvestingPlantName = ZeeConfig.lastMapViewClickGobName;
         try{
 
@@ -262,8 +262,8 @@ public class ZeeManagerFarmer extends ZeeThread{
                 planting stage
              */
             if(farmerCbReplant) {
-                Gob highestBarrel = getHighestQlBarrel();
-                if (highestBarrel == null) {
+                Gob nextSeedBarrel = getNextPlantingBarrel();
+                if (nextSeedBarrel == null) {
                     isPlantingDone = true;
                     println("planting abort: cant find highest ql barrel");
                 }else {
@@ -275,7 +275,8 @@ public class ZeeManagerFarmer extends ZeeThread{
                     if (getInvTotalSeedAmount() < 5) {
                         println("total seeds < 5, get from barrels");
                         centerFarmingArea();//center before getting barrel seeds
-                        if(!getSeedsFromBarrel(highestBarrel)){//if (!getSeedsFromMultipleBarrels(gItemSeedBasename)) {
+                        //TODO get seeds from multiple barrels
+                        if(!getSeedsFromBarrel(nextSeedBarrel)){//if (!getSeedsFromMultipleBarrels(gItemSeedBasename)) {
                             println("planting done, out of seeds");
                             isPlantingDone = true;
                             break;
@@ -332,14 +333,21 @@ public class ZeeManagerFarmer extends ZeeThread{
         exitSeedFarmer("done");
     }
 
-    private Gob getHighestQlBarrel() {
-        if (mapSeedqlBarrel.size()==0)
+    private Gob getNextPlantingBarrel() {
+
+        if (mapSeedqlBarrel.isEmpty())
             return null;
+
+        // no ql sorting , return first barrel, case its fuller
+        if (farmerTxtQlSortingBarrels == 0)
+            return mapSeedqlBarrel.values().iterator().next();
+
         Map.Entry<Integer, Gob> highest = mapSeedqlBarrel.entrySet().iterator().next();
         for (Map.Entry<Integer, Gob> entry : mapSeedqlBarrel.entrySet()) {
             if (entry.getKey() > highest.getKey())
                 highest = entry;
         }
+
         return highest.getValue();
     }
 
