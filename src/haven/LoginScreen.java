@@ -42,6 +42,7 @@ public class LoginScreen extends Widget {
     public final Widget login;
     public final String confname;
     private Text error, progress;
+    private Widget cancel;
     private Button optbtn;
     private OptWnd opts;
 
@@ -69,6 +70,11 @@ public class LoginScreen extends Widget {
 	    throw(new RuntimeException("Unknown authmech: " + authmech.get()));
 	}
 	adda(login, bgc.adds(0, 10), 0.5, 0.0).hide();
+	cancel = adda(new Button(UI.scale(100), "Cancel")
+		      .action(() -> wdgmsg("cancel"))
+		      .setgkey(key_esc),
+		      bgc.adds(0, 75), 0.5, 0.0);
+	cancel.hide();
 	ZeeMidiRadio.stopPlayingMidi("login");
     }
 
@@ -250,7 +256,6 @@ public class LoginScreen extends Widget {
 
     private static boolean steam_autologin = true;
     public class Steambox extends Widget {
-
 	private Steambox() {
 	    super(UI.scale(200, 150));
 	    Widget prev = adda(new Label("Logging in with Steam", textf), sz.x / 2, 0, 0.5, 0);
@@ -347,10 +352,14 @@ public class LoginScreen extends Widget {
     }
 
     private void progress(String p) {
-	if(progress != null)
+	if(progress != null) {
 	    progress = null;
-	if(p != null)
+	    cancel.hide();
+	}
+	if(p != null) {
 	    progress = textf.render(p, java.awt.Color.WHITE);
+	    cancel.show();
+	}
     }
 
     private void clear() {
@@ -414,6 +423,5 @@ public class LoginScreen extends Widget {
 	    g.aimage(error.tex(), bgc.adds(0, 150), 0.5, 0.0);
 	if(progress != null)
 	    g.aimage(progress.tex(), bgc.adds(0, 50), 0.5, 0.0);
-	//ZeeManagerIcons.testIconsLoginScreen(g);
     }
 }
