@@ -233,6 +233,7 @@ public class ZeeManagerFarmer extends ZeeThread{
     private void startSeedFarming() {
         ZeeConfig.autoHearthOnStranger = false;
         mapSeedqlBarrel = new LinkedHashMap<>();
+        listAllSeedBarrels = new ArrayList<>();
         harvestingPlantName = ZeeConfig.lastMapViewClickGobName;
         try{
 
@@ -262,6 +263,7 @@ public class ZeeManagerFarmer extends ZeeThread{
                 planting stage
              */
             if(farmerCbReplant) {
+                boolean ignoreQl = (farmerTxtQlSortingBarrels==0);
                 Gob nextSeedBarrel = getNextPlantingBarrel();
                 if (nextSeedBarrel == null) {
                     isPlantingDone = true;
@@ -273,13 +275,24 @@ public class ZeeManagerFarmer extends ZeeThread{
                 while (busy && !isPlantingDone) {
                     println("> planting loop");
                     if (getInvTotalSeedAmount() < 5) {
-                        println("total seeds < 5, get from barrels");
+                        println("total seeds < 5, get from barrels (map size "+mapSeedqlBarrel.size()+")");
                         centerFarmingArea();//center before getting barrel seeds
-                        //TODO get seeds from multiple barrels
-                        if(!getSeedsFromBarrel(nextSeedBarrel)){//if (!getSeedsFromMultipleBarrels(gItemSeedBasename)) {
-                            println("planting done, out of seeds");
-                            isPlantingDone = true;
-                            break;
+
+                        // Try current barrel, if empty move to next
+                        if(!getSeedsFromBarrel(nextSeedBarrel)) {
+                            if (ignoreQl) {
+                                nextSeedBarrel = getNextPlantingBarrel();
+                                println("Switched to next barrel");
+                                if (nextSeedBarrel==null || !getSeedsFromBarrel(nextSeedBarrel)) {
+                                    println("planting done, out of seeds in all barrels");
+                                    isPlantingDone = true;
+                                    break;
+                                }
+                            } else {
+                                println("planting done, out of seeds");
+                                isPlantingDone = true;
+                                break;
+                            }
                         }
                     }
                     plantSeeds();
@@ -335,12 +348,19 @@ public class ZeeManagerFarmer extends ZeeThread{
 
     private Gob getNextPlantingBarrel() {
 
-        if (mapSeedqlBarrel.isEmpty())
-            return null;
+        // no ql sorting , return first barrel, because its fuller
+        if (farmerTxtQlSortingBarrels == 0) {
+            if (listAllSeedBarrels.isEmpty()) {
+                println("!!!DEBUG!!! > getNextPlantingBarrel > listAllSeedBarrels empty");
+                return null;
+            }
+            return listAllSeedBarrels.get(0);
+        }
 
-        // no ql sorting , return first barrel, case its fuller
-        if (farmerTxtQlSortingBarrels == 0)
-            return mapSeedqlBarrel.values().iterator().next();
+        if (mapSeedqlBarrel.isEmpty()) {
+            println("!!!DEBUG!!! > getNextPlantingBarrel > mapSeedqlBarrel empty");
+            return null;
+        }
 
         Map.Entry<Integer, Gob> highest = mapSeedqlBarrel.entrySet().iterator().next();
         for (Map.Entry<Integer, Gob> entry : mapSeedqlBarrel.entrySet()) {
@@ -396,10 +416,19 @@ public class ZeeManagerFarmer extends ZeeThread{
 
     public static boolean getSeedsFromBarrel(Gob barrel) throws InterruptedException {
 
+        if (barrel==null){
+            println("getSeedsFromBarrel >  gob barrel null");
+            return false;
+        }
+
         ZeeConfig.addPlayerText("get barrel seeds");
 
         //move to barrel, if not acessible then mark it so and return
+        //TODO use waitWindowOpen and count seeds
         if(!tryAccessingBarrel(barrel)){
+            println(" !DEBUG! > getSeedsFromBarrel > tryAccessingBarrel");
+            println("       dist to barrel = "+ZeeConfig.distanceToPlayer(barrel));
+            println("       holding item = "+ZeeConfig.isPlayerHoldingItem());
             markBarrelInaccessible(barrel);
             ZeeConfig.removePlayerText();
             return false;
@@ -412,6 +441,10 @@ public class ZeeManagerFarmer extends ZeeThread{
         if(waitHoldingItem()) {
             ZeeManagerGobs.itemActGob(barrel, 0);
             Thread.sleep(1000);
+        }else{
+            // barrel probably empty
+            println("!!!DEBUG!!! > getSeedsFromBarrel > remove empty barrel");
+            listAllSeedBarrels.remove(barrel);
         }
 
         ZeeConfig.removePlayerText();
@@ -553,7 +586,7 @@ public class ZeeManagerFarmer extends ZeeThread{
                     }
                 }
                 //get barrel for current seed ql
-                lastBarrel = getBarrelBySeedQl(qlSeeds);//ZeeConfig.getClosestGob(barrels);
+                lastBarrel = getBarrelForStoring(qlSeeds);//ZeeConfig.getClosestGob(barrels);
                 if(lastBarrel==null){
                     exitSeedFarmer("cant decide ql barrel");
                     return;
@@ -573,7 +606,7 @@ public class ZeeManagerFarmer extends ZeeThread{
                 ZeeManagerGobs.itemActGob(lastBarrel, UI.MOD_SHIFT);//store first seeds
                 sleep(PING_MS);//lag?
                 waitPlayerDistToGob(lastBarrel,15);//wait reaching barrel
-                sleep(1000);//waitHoldingItemChanged();//wait 1st seed transfer
+                sleep(1000);//wait 1st seed transfer
                 if (ZeeConfig.isPlayerHoldingItem()) {//2nd seed transfer?
                     // store all seeds (ctrl+shift)
                     ZeeManagerGobs.itemActGob(lastBarrel, 3);//3==ctrl+shift
@@ -581,6 +614,8 @@ public class ZeeManagerFarmer extends ZeeThread{
                         //all seeds stored
                         ZeeConfig.addGobText(lastBarrel, getSeedNameAndQl());
                         mapSeedqlBarrel.put(qlSeeds,lastBarrel);
+                        if (!listAllSeedBarrels.contains(lastBarrel))
+                            listAllSeedBarrels.add(lastBarrel);
                     } else {
                         //still holding item?
                         if(ZeeConfig.distanceToPlayer(lastBarrel) > MIN_ACCESSIBLE_DIST){
@@ -596,6 +631,8 @@ public class ZeeManagerFarmer extends ZeeThread{
                     // all seeds stored
                     ZeeConfig.addGobText(lastBarrel, getSeedNameAndQl());
                     mapSeedqlBarrel.put(qlSeeds,lastBarrel);
+                    if (!listAllSeedBarrels.contains(lastBarrel))
+                        listAllSeedBarrels.add(lastBarrel);
                 }
             }
 
@@ -630,12 +667,15 @@ public class ZeeManagerFarmer extends ZeeThread{
     }
 
     static Map<Integer,Gob> mapSeedqlBarrel;
-    private static Gob getBarrelBySeedQl(int qlSeeds) {
-        println("qlSeeds "+qlSeeds+" , mapQlBarrel "+mapSeedqlBarrel.size()+" = "+ mapSeedqlBarrel.keySet());
+    static List<Gob> listAllSeedBarrels;
+    private static Gob getBarrelForStoring(int qlSeeds) {
+
+        boolean ignoreQl = (farmerTxtQlSortingBarrels==0);
+        if (!ignoreQl)
+            println("qlSeeds "+qlSeeds+" , mapQlBarrel "+mapSeedqlBarrel.size()+" = "+ mapSeedqlBarrel.keySet());
         Gob barrel = null;
         // option no ql sorting barrels
-        if (farmerTxtQlSortingBarrels==0){//TODO test on poppy field
-            println("no ql sorting (barrels set to 0)");
+        if (ignoreQl){//TODO test on poppy field
             if (lastBarrel != null && !isBarrelMarkedInaccessible(lastBarrel))
                 barrel = lastBarrel;
             else
