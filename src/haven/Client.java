@@ -32,11 +32,10 @@ import java.io.*;
 import java.nio.file.*;
 
 import haven.iosys.tk.Toolkit;
-import haven.render.*;
 import haven.iosys.*;
 import haven.iosys.tk.*;
 import haven.iosys.audio.*;
-import java.awt.image.BufferedImage;
+
 import java.util.List;
 
 public class Client implements Console.Directory {
@@ -190,10 +189,9 @@ public class Client implements Console.Directory {
 	    Utils.setprefb("mainwnd/max", true);
 	    break;
 	case NORMAL:
-        //tempfix window size decreasing
-        Dimension frameSize = ((AWTToolkit.AWTWindow)wnd).frame.getSize();
-        Utils.setprefc("mainwnd/size", Coord.of(frameSize.width,frameSize.height));
-	    //Utils.setprefc("mainwnd/size", wnd.size());
+        //tempfix client changing size on xfce
+        Coord clientSizeUndo = Coord.of(-6,0);
+        Utils.setprefc("mainwnd/size", wnd.size().add(clientSizeUndo));
 	    Utils.setprefb("mainwnd/max", false);
 	    break;
 	}
