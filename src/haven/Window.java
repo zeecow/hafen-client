@@ -339,17 +339,13 @@ public class Window extends Widget {
     }
 
     public Coord contentsz() {
-	Coord max = new Coord(0, 0);
+	Coord max = Coord.z;
 	for(Widget wdg = child; wdg != null; wdg = wdg.next) {
 	    if(wdg == deco)
 		continue;
 	    if(!wdg.visible)
 		continue;
-	    Coord br = wdg.c.add(wdg.sz);
-	    if(br.x > max.x)
-		max.x = br.x;
-	    if(br.y > max.y)
-		max.y = br.y;
+	    max = max.max(wdg.c.add(wdg.sz));
 	}
 	return(max);
     }
