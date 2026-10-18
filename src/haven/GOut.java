@@ -137,25 +137,27 @@ public class GOut {
 	tex.crender(this, c.add(this.tx), sz, ul, br);
     }
 
-    public void rimagev(Tex tex, Coord c, int h) {
-	Coord br = c.add(tex.sz().x, h);
-	for(int y = c.y; y < c.y + h; y += tex.sz().y)
+    public void rimagev2(Tex tex, Coord c, int b) {
+	Coord br = Coord.of(c.x + tex.sz().x, b);
+	for(int y = c.y; y < b; y += tex.sz().y)
 	    image(tex, Coord.of(c.x, y), c, br);
     }
+    public void rimagev(Tex tex, Coord c, int h) {rimagev2(tex, c, c.y + h);}
 
-    public void rimageh(Tex tex, Coord c, int w) {
-	Coord br = c.add(w, tex.sz().y);
-	for(int x = c.x; x < c.x + w; x += tex.sz().x)
+    public void rimageh2(Tex tex, Coord c, int r) {
+	Coord br = Coord.of(r, c.y + tex.sz().y);
+	for(int x = c.x; x < r; x += tex.sz().x)
 	    image(tex, Coord.of(x, c.y), c, br);
     }
+    public void rimageh(Tex tex, Coord c, int w) {rimageh2(tex, c, c.x + w);}
 
-    public void rimage(Tex tex, Coord c, Coord sz) {
-	Coord br = c.add(sz);
-	for(int y = c.y; y < c.y + sz.y; y += tex.sz().y) {
-	    for(int x = c.x; x < c.x + sz.x; x += tex.sz().x)
-		image(tex, Coord.of(x, y), c, br);
+    public void rimage2(Tex tex, Coord ul, Coord br) {
+	for(int y = ul.y; y < br.y; y += tex.sz().y) {
+	    for(int x = ul.x; x < br.x; x += tex.sz().x)
+		image(tex, Coord.of(x, y), ul, br);
 	}
     }
+    public void rimage(Tex tex, Coord c, Coord sz) {rimage2(tex, c, c.add(sz));}
 
     public void rotimage(Tex tex, Coord c, Coord rcc, double a) {
 	/* XXXRENDER: I do believe the rendering system should treat
