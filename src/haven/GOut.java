@@ -124,55 +124,36 @@ public class GOut {
     public void image(Tex tex, Coord c, Coord ul, Coord br) {
 	if(tex == null)
 	    return;
-	ul = ul.add(this.tx);
-	br = br.add(this.tx);
-	if(ul.x < this.ul.x)
-	    ul.x = this.ul.x;
-	if(ul.y < this.ul.y)
-	    ul.y = this.ul.y;
-	if(br.x > this.br.x)
-	    br.x = this.br.x;
-	if(br.y > this.br.y)
-	    br.y = this.br.y;
+	ul = ul.add(this.tx).max(this.ul);
+	br = br.add(this.tx).min(this.br);
 	tex.crender(this, c.add(this.tx), ul, br);
     }
 
     public void image(Tex tex, Coord c, Coord ul, Coord br, Coord sz) {
 	if(tex == null)
 	    return;
-	ul = ul.add(this.tx);
-	br = br.add(this.tx);
-	if(ul.x < this.ul.x)
-	    ul.x = this.ul.x;
-	if(ul.y < this.ul.y)
-	    ul.y = this.ul.y;
-	if(br.x > this.br.x)
-	    br.x = this.br.x;
-	if(br.y > this.br.y)
-	    br.y = this.br.y;
+	ul = ul.add(this.tx).max(this.ul);
+	br = br.add(this.tx).min(this.br);
 	tex.crender(this, c.add(this.tx), sz, ul, br);
     }
 
     public void rimagev(Tex tex, Coord c, int h) {
-	Coord cc = new Coord(c);
 	Coord br = c.add(tex.sz().x, h);
-	for(; cc.y < c.y + h; cc.y += tex.sz().y)
-	    image(tex, cc, c, br);
+	for(int y = c.y; y < c.y + h; y += tex.sz().y)
+	    image(tex, Coord.of(c.x, y), c, br);
     }
 
     public void rimageh(Tex tex, Coord c, int w) {
-	Coord cc = new Coord(c);
 	Coord br = c.add(w, tex.sz().y);
-	for(; cc.x < c.x + w; cc.x += tex.sz().x)
-	    image(tex, cc, c, br);
+	for(int x = c.x; x < c.x + w; x += tex.sz().x)
+	    image(tex, Coord.of(x, c.y), c, br);
     }
 
     public void rimage(Tex tex, Coord c, Coord sz) {
-	Coord cc = new Coord();
 	Coord br = c.add(sz);
-	for(cc.y = c.y; cc.y < c.y + sz.y; cc.y += tex.sz().y) {
-	    for(cc.x = c.x; cc.x < c.x + sz.x; cc.x += tex.sz().x)
-		image(tex, cc, c, br);
+	for(int y = c.y; y < c.y + sz.y; y += tex.sz().y) {
+	    for(int x = c.x; x < c.x + sz.x; x += tex.sz().x)
+		image(tex, Coord.of(x, y), c, br);
 	}
     }
 
