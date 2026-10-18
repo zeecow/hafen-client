@@ -1,6 +1,7 @@
 package haven;
 
 import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -474,9 +475,18 @@ public class ZeeManagerCraft extends ZeeThread{
             scrollport.cont.add(new Label(basename + " " + i),x,y);
             ZeeConfig.addGobText(step.gob,basename +" "+ i);
             y += 15;
-            for (String item : step.itemsMainInv) {
-                scrollport.cont.add(new Label(item),x+15,y);
-                y += 15;
+            for (int i1 = 0; i1 < step.itemsMainInv.size(); i1++) {
+                String itemResName = step.itemsMainInv.get(i1);
+                // if item name, add icon
+                if (itemResName.contains("/invobjs/")) {
+                    BufferedImage img = Loading.waitfor(Resource.remote().load(itemResName)).flayer(Resource.imgc).scaled();
+                    scrollport.cont.add(new IButton(img,img), x + 15 + (i1 * img.getWidth()), y);
+                    if (i1 == step.itemsMainInv.size() - 1) // last item padding
+                        y += img.getHeight();
+                }else {
+                    scrollport.cont.add(new Label(itemResName), x + 15, y);
+                    y += 15;
+                }
             }
         }
     }
