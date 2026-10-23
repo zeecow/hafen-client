@@ -1095,6 +1095,13 @@ public class ZeeThread  extends Thread{
                 Window w = button.getparent(Window.class);
                 int windowId = w.wdgid();
                 try {
+
+                    //close makewindow to avoid crash // TODO remove when fixed
+                    if(ZeeConfig.makeWindow != null){
+                        ZeeConfig.makeWindow.reqdestroy();
+                        sleep(PING_MS);
+                    }
+
                     ZeeConfig.addPlayerText(playerText);
                     ZeeConfig.lastHafenWarningMs = ZeeConfig.lastUIMsgMs = 0;
                     diffWarningMs = diffUiMsgMs = now() - ZeeConfig.lastUIMsgMs;

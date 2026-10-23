@@ -545,4 +545,13 @@ public class Makewindow extends Widget {
 
 	public Tip shortvar() {return(this);}
     }
+
+    @Override
+    public void destroy() {
+        super.destroy();
+        ZeeConfig.makeWindow = null;
+        qmod.clear();
+        qmodMapNameStat.clear();
+        qmodMapNameSzX.clear();
+    }
 }
