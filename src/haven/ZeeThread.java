@@ -1098,8 +1098,9 @@ public class ZeeThread  extends Thread{
 
                     //close makewindow to avoid crash // TODO remove when fixed
                     if(ZeeConfig.makeWindow != null){
-                        ZeeConfig.makeWindow.reqdestroy();
+                        ZeeConfig.makeWindow.wdgmsg("close");
                         sleep(PING_MS);
+                        ZeeConfig.makeWindow = null;
                     }
 
                     ZeeConfig.addPlayerText(playerText);
