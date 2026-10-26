@@ -192,7 +192,7 @@ public abstract class WinRT {
 		}
 		int len = (int)getint(lbuf, 0, UINT32, false);
 		char[] copy = new char[len];
-		MemorySegment.copy(rv, 0, MemorySegment.ofArray(copy), 0, len * 2);
+		MemorySegment.copy(rv.reinterpret(len * 2), 0, MemorySegment.ofArray(copy), 0, len * 2);
 		return(new String(copy));
 	    }
 	}
