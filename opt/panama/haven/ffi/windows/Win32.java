@@ -601,6 +601,8 @@ public abstract class Win32 {
 	static final MemoryLayout SHORT = C_SHORT;
 	static final MemoryLayout UINT = C_INT;
 	static final MemoryLayout LONG = C_LONG;
+	static final MemoryLayout INT32 = ValueLayout.JAVA_INT;
+	static final MemoryLayout UINT32 = ValueLayout.JAVA_INT;
 	static final MemoryLayout ULONG = C_LONG;
 	static final MemoryLayout WORD = C_SHORT;
 	static final MemoryLayout DWORD = C_LONG;

@@ -139,14 +139,17 @@ public abstract class COM {
     public abstract MemoryLayout C_STGMEDIUM();
     public abstract STGMEDIUM STGMEDIUM();
 
-    static MemorySegment memguid(UUID uuid) {
-	MemorySegment ret = Arena.ofAuto().allocate(16);
-	ret.set(ValueLayout.JAVA_INT, 0, (int)(uuid.getMostSignificantBits() >>> 32));
-	ret.set(ValueLayout.JAVA_SHORT, 4, (short)(uuid.getMostSignificantBits() >>> 16));
-	ret.set(ValueLayout.JAVA_SHORT, 6, (short)(uuid.getMostSignificantBits() >>> 0));
+    public static MemorySegment memguid(MemorySegment buf, UUID uuid) {
+	buf.set(ValueLayout.JAVA_INT_UNALIGNED, 0, (int)(uuid.getMostSignificantBits() >>> 32));
+	buf.set(ValueLayout.JAVA_SHORT_UNALIGNED, 4, (short)(uuid.getMostSignificantBits() >>> 16));
+	buf.set(ValueLayout.JAVA_SHORT_UNALIGNED, 6, (short)(uuid.getMostSignificantBits() >>> 0));
 	for(int i = 0; i < 8; i++)
-	    ret.set(ValueLayout.JAVA_BYTE, 15 - i, (byte)(uuid.getLeastSignificantBits() >>> (i * 8)));
-	return(ret);
+	    buf.set(ValueLayout.JAVA_BYTE, 15 - i, (byte)(uuid.getLeastSignificantBits() >>> (i * 8)));
+	return(buf);
+    }
+
+    public static MemorySegment memguid(UUID uuid) {
+	return(memguid(Arena.ofAuto().allocate(16), uuid));
     }
 
     public static class CLSID {
@@ -178,19 +181,34 @@ public abstract class COM {
 	    this(iface, new UUID(msb, lsb));
 	}
 
-	public static <I extends IUnknown> IID<I> get(Class<I> cl) {
-	    try {
-		Field f = cl.getDeclaredField("IID");
-		IID<?> iid = (IID<?>)f.get(null);
-		if(iid.iface != cl)
-		    throw(new RuntimeException(cl.toString()));
-		@SuppressWarnings("unchecked") IID<I> checked = (IID<I>)iid;
-		return(checked);
-	    } catch(NoSuchFieldException e) {
-		throw(new ClassCastException("not a declared COM interface: " + cl));
-	    } catch(IllegalAccessException e) {
-		throw(new RuntimeException(e));
+	public <I extends IUnknown> IID<I> cast(Class<I> cl) {
+	    if(!cl.isAssignableFrom(iface))
+		throw(new ClassCastException(iface + " -> " + cl));
+	    @SuppressWarnings("unchecked") IID<I> checked = (IID<I>)this;
+	    return(checked);
+	}
+
+	public static IID<? extends IUnknown> get(Type t) {
+	    if(t instanceof Class) {
+		Class<?> cl = (Class)t;
+		try {
+		    Field f = cl.getDeclaredField("IID");
+		    IID<?> iid = (IID<?>)f.get(null);
+		    if(iid.iface != cl)
+			throw(new RuntimeException(cl.toString()));
+		    return(iid);
+		} catch(NoSuchFieldException e) {
+		    throw(new ClassCastException("not a declared COM interface: " + cl));
+		} catch(IllegalAccessException e) {
+		    throw(new RuntimeException(e));
+		}
+	    } else if(t instanceof ParameterizedType) {
+		ParameterizedType pt = (ParameterizedType)t;
+		if((pt.getRawType() instanceof Class) && IUnknown.class.isAssignableFrom((Class<?>)pt.getRawType()))
+		    return(WinRT.ipiid(((Class<?>)pt.getRawType()).asSubclass(IUnknown.class),
+				       pt.getActualTypeArguments()));
 	    }
+	    throw(new IllegalArgumentException(String.valueOf(t)));
 	}
     }
 
@@ -266,13 +284,14 @@ public abstract class COM {
 	    this.vindex = desc.vindex;
 	    this.outtype = desc.outtype;
 	    Class<?>[] pars = mth.getParameterTypes();
+	    Type[] gpars = mth.getGenericParameterTypes();
 	    MemoryLayout[] args = desc.sig.argumentLayouts().toArray(new MemoryLayout[0]);
 	    if(pars.length != args.length - ((outtype == null) ? 1 : 2))
 		throw(new IllegalArgumentException(mth + ": " + Arrays.asList(pars) + " does not match " + Arrays.asList(args)));
 	    argxf = new Arg[pars.length];
 	    fun = ld.downcallHandle(desc.sig);
 	    for(int i = 0; i < pars.length; i++) {
-		Class<?> p = pars[i]; MemoryLayout a = args[i + 1];
+		Class<?> p = pars[i]; Type gp = gpars[i]; MemoryLayout a = args[i + 1];
 		Arg xf;
 		ValueConversion valxf = valxf(a, p);
 		if((valxf != null) && (valxf.darg != null)) {
@@ -321,7 +340,8 @@ public abstract class COM {
 		    } else if(p == String.class) {
 			xf = (st, v) -> (v == null) ? MemorySegment.NULL : st.allocateFrom((String)v, win.C_WCHARSET());
 		    } else if(IUnknown.class.isAssignableFrom(p)) {
-			xf = (st, v) -> reg.addrforobj((IUnknown)v, IID.get(p.asSubclass(IUnknown.class)));
+			IID<?> iid = IID.get(gp);
+			xf = (st, v) -> reg.addrforobj2((IUnknown)v, iid);
 		    } else if(StructInstance.class.isAssignableFrom(p)) {
 			xf = (st, v) -> StructInstance.extract((StructInstance)v);
 		    } else {
@@ -515,7 +535,8 @@ public abstract class COM {
 			    }
 			};
 		    } else if(IUnknown.class.isAssignableFrom(rtype)) {
-			outxf = (v, buf) -> buf.set(ADDRESS, 0, reg.addrforobj((IUnknown)v, IID.get(rtype.asSubclass(IUnknown.class))));
+			IID<?> iid = IID.get(mth.getGenericReturnType());
+			outxf = (v, buf) -> buf.set(ADDRESS, 0, reg.addrforobj2((IUnknown)v, iid));
 		    } else {
 			throw(new IllegalArgumentException(rtype + " -> "  + outtype));
 		    }
@@ -713,7 +734,7 @@ public abstract class COM {
 		this.obj = obj;
 		this.iface = iface;
 		mem = Arena.ofAuto().allocate(ADDRESS);
-		mem.set(ADDRESS, 0, vtable(iface.iface).vtbl);
+		mem.set(ADDRESS, 0, vtable(iface).vtbl);
 	    }
 
 	    Registry reg() {return(Registry.this);}
@@ -850,6 +871,10 @@ public abstract class COM {
 	    }
 	    throw(new IllegalArgumentException(String.valueOf(obj)));
 	}
+
+	public <I extends IUnknown> MemorySegment addrforobj2(IUnknown obj, IID<I> iface) {
+	    return(addrforobj(iface.iface.cast(obj), iface));
+	}
     }
     final Registry reg = new Registry();
 
@@ -874,9 +899,9 @@ public abstract class COM {
 	private static final MemoryLayout HBITMAP    = Win32.Win64Unicode.HBITMAP;
 	private static final MemoryLayout HGLOBAL    = Win32.Win64Unicode.HGLOBAL;
 	private static final MemoryLayout HWND       = Win32.Win64Unicode.HWND;
-	private static final MemoryLayout LPOLESTR   = ADDRESS;
-	private static final MemoryLayout REFCLSID   = ADDRESS;
-	private static final MemoryLayout REFIID     = ADDRESS;
+	static final MemoryLayout LPOLESTR = ADDRESS;
+	static final MemoryLayout REFCLSID = ADDRESS;
+	static final MemoryLayout REFIID   = ADDRESS;
 	private final SymbolLookup ole32 = loadlib("OLE32.DLL", Arena.global());
 
 	public MemoryLayout DWORD()   {return(DWORD);}
@@ -1091,6 +1116,9 @@ public abstract class COM {
 				      (v, buf) -> {
 					  MemorySegment.copy(((STGMEDIUM)v).mem(), 0, buf, 0, _STGMEDIUM.byteSize());
 				      }));
+	    valxf(new ValueConversion(ADDRESS, IID.class,
+				      (st, v) -> ((IID)v).mem,
+				      null, null, null));
 	}
     }
 

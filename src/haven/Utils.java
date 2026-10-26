@@ -161,6 +161,9 @@ public class Utils {
 	dig[8] = (byte)((dig[8] & 0x3f) | 0x80);
 	return(byteuuid(dig));
     }
+    public static UUID uuid5(UUID ns, String data) {
+	return(uuid5(ns, data.getBytes(utf8)));
+    }
 
     public static SocketChannel connect(String host, int port) throws IOException {
 	double DELAY = 0.25, TIMEOUT = 5;
