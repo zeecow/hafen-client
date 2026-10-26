@@ -270,7 +270,7 @@ public abstract class WinRT {
 		}
 		if(!SUCCEEDED(rv))
 		    throw(new HResultError(rv));
-		return(com.reg.objforaddr(buf.get(ADDRESS, 0), iid.iface, false));
+		return(com.reg.objforaddr(buf.get(ADDRESS, 0), iid, false));
 	    }
 	}
 

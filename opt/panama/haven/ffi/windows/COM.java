@@ -227,12 +227,42 @@ public abstract class COM {
 	}
     }
 
+    public static class AdapterData {
+	public final COM com;
+	public final IID<?> iid;
+	public final Descriptor desc;
+	public final Method mth;
+
+	public AdapterData(COM com, IID<?> iid, Descriptor desc, Method mth) {
+	    this.com = com;
+	    this.iid = iid;
+	    this.desc = desc;
+	    this.mth = mth;
+	}
+    }
+
     public static interface DowncallAdapter {
 	public Object call(MemorySegment obj, Object[] args);
 
 	public static interface Arg {
 	    public Object convert(Arena st, Object val);
 	}
+
+	public static interface Constructor {
+	    public DowncallAdapter make(AdapterData data);
+
+	    public static final Constructor std = d -> {
+		Method handler = smethod(d.mth.getDeclaringClass(), "downcall_" + d.mth.getName());
+		if(handler != null)
+		    return(new CustomDowncall(d.desc, d.mth, handler));
+		else
+		    return(d.com.new StandardDowncall(d.desc, d.mth));
+	    };
+	}
+
+	public static final DowncallAdapter nil = (self, args) -> {
+	    throw(new RuntimeException("no downcall defined"));
+	};
     }
 
     public static interface UpcallAdapter {
@@ -241,6 +271,14 @@ public abstract class COM {
 	public static final UpcallAdapter nil = (self, args) -> {
 	    throw(new RuntimeException("no upcall defined"));
 	};
+
+	public static interface Constructor {
+	    public UpcallAdapter make(AdapterData data);
+
+	    public static final Constructor std = d -> {
+		return(d.com.new StandardUpcall(d.desc, d.mth));
+	    };
+	}
     }
 
     public static class ValueConversion {
@@ -380,7 +418,8 @@ public abstract class COM {
 		    }
 		} else if(IUnknown.class.isAssignableFrom(rtype)) {
 		    if(outtype == ADDRESS) {
-			outxf = buf -> reg.objforaddr(buf.get(ADDRESS, 0), rtype.asSubclass(IUnknown.class), false);
+			IID<?> iid = IID.get(mth.getGenericReturnType());
+			outxf = buf -> reg.objforaddr(buf.get(ADDRESS, 0), iid, false);
 		    } else {
 			throw(new IllegalArgumentException(outtype + " -> " + rtype));
 		    }
@@ -450,12 +489,13 @@ public abstract class COM {
 	    this.method = mth;
 	    outtype = desc.outtype;
 	    Class<?>[] pars = mth.getParameterTypes();
+	    Type[] gpars = mth.getGenericParameterTypes();
 	    MemoryLayout[] args = desc.sig.argumentLayouts().toArray(new MemoryLayout[0]);
 	    argxf = new Function[pars.length];
 	    if(pars.length != args.length - ((outtype == null) ? 1 : 2))
 		throw(new IllegalArgumentException());
 	    for(int i = 0; i < pars.length; i++) {
-		Class<?> p = pars[i]; MemoryLayout a = args[i + 1];
+		Class<?> p = pars[i]; Type gp = gpars[i]; MemoryLayout a = args[i + 1];
 		Function<Object, Object> xf;
 		ValueConversion valxf = valxf(a, p);
 		if((valxf != null) && (valxf.uarg != null)) {
@@ -480,7 +520,8 @@ public abstract class COM {
 		    } else if(p == Handle.class) {
 			xf = v -> Handle.of((MemorySegment)v);
 		    } else if(IUnknown.class.isAssignableFrom(p)) {
-			xf = v -> reg.objforaddr((MemorySegment)v, p.asSubclass(IUnknown.class), true);
+			IID<?> iid = IID.get(gp);
+			xf = v -> reg.objforaddr((MemorySegment)v, iid, true);
 		    } else if(StructInstance.class.isAssignableFrom(p)) {
 			try {
 			    Method cons = p.getDeclaredMethod("fromcom", MemorySegment.class);
@@ -567,8 +608,8 @@ public abstract class COM {
 	public final int vindex;
 	public final FunctionDescriptor sig;
 	public final MemoryLayout outtype;
-	DowncallAdapter da = null;
-	UpcallAdapter ua = null;
+	DowncallAdapter.Constructor mda = DowncallAdapter.Constructor.std;
+	UpcallAdapter.Constructor mua = UpcallAdapter.Constructor.std;
 
 	public Descriptor(int vindex, FunctionDescriptor sig, MemoryLayout outtype) {
 	    this.vindex = vindex;
@@ -580,39 +621,35 @@ public abstract class COM {
 	    this(vindex, sig, null);
 	}
 
+	public Descriptor downcall(DowncallAdapter.Constructor mda) {
+	    this.mda = mda; return(this);
+	}
 	public Descriptor downcall(DowncallAdapter da) {
-	    this.da = da; return(this);
+	    return(downcall(data -> da));
+	}
+	public Descriptor upcall(UpcallAdapter.Constructor mua) {
+	    this.mua = mua; return(this);
 	}
 	public Descriptor upcall(UpcallAdapter ua) {
-	    this.ua = ua; return(this);
+	    return(upcall(data -> ua));
 	}
 
-	private static final Map<Method, Descriptor> cache = new ConcurrentHashMap<>();
+	private static final Map<Method, Descriptor> cache = new HashMap<>();
 	public static Descriptor get(Method method) {
-	    Descriptor ret = cache.get(method);
-	    if(ret != null)
-		return(ret);
-	    try {
-		Field f = method.getDeclaringClass().getDeclaredField("sig_" + method.getName());
-		if(!Modifier.isStatic(f.getModifiers()))
+	    synchronized(cache) {
+		Descriptor ret = cache.get(method);
+		if(ret != null)
+		    return(ret);
+		try {
+		    Field f = method.getDeclaringClass().getDeclaredField("sig_" + method.getName());
+		    if(!Modifier.isStatic(f.getModifiers()))
+			return(null);
+		    ret = (Descriptor)f.get(null);
+		    cache.put(method, ret);
+		    return(ret);
+		} catch(ReflectiveOperationException e) {
 		    return(null);
-		ret = (Descriptor)f.get(null);
-		synchronized(ret) {
-		    if(ret.da == null) {
-			Method handler = smethod(method.getDeclaringClass(), "downcall_" + method.getName());
-			if(handler != null)
-			    ret.da = new CustomDowncall(ret, method, handler);
-			else
-			    ret.da = COM.get().new StandardDowncall(ret, method);
-		    }
-		    if(ret.ua == null) {
-			ret.ua = COM.get().new StandardUpcall(ret, method);
-		    }
 		}
-		cache.put(method, ret);
-		return(ret);
-	    } catch(ReflectiveOperationException e) {
-		return(null);
 	    }
 	}
     }
@@ -643,7 +680,7 @@ public abstract class COM {
 		throw(new IllegalArgumentException(String.valueOf(type)));
 	    }
 
-	    Callback(Arena alloc, Method mth, Descriptor desc) {
+	    Callback(Arena alloc, IID<?> iid, Method mth, Descriptor desc) {
 		MemoryLayout[] args = desc.sig.argumentLayouts().toArray(new MemoryLayout[0]);
 		Class<?>[] pars = new Class<?>[args.length];
 		for(int i = 0; i < args.length; i++)
@@ -655,7 +692,7 @@ public abstract class COM {
 		handler = handler.asType(type);
 		this.stub = ld.upcallStub(handler, desc.sig, alloc);
 		this.method = mth;
-		this.ua = desc.ua;
+		this.ua = desc.mua.make(new AdapterData(COM.this, iid, desc, mth));
 	    }
 
 	    private static final MethodHandle callback = vlookup(MethodHandles.lookup(), Callback.class, "callback", Integer.TYPE,
@@ -679,11 +716,12 @@ public abstract class COM {
 	    }
 	}
 
-	public class VTable {
+	public class VTable<I extends IUnknown> {
 	    public final MemorySegment vtbl;
 	    private final Callback[] retain;
 
-	    VTable(Class<? extends IUnknown> iface) {
+	    VTable(IID<I> iid) {
+		Class<I> iface = iid.iface;
 		Arena alloc = Arena.ofAuto();
 		Callback[] table = new Callback[3];
 		table[0] = stub_QueryInterface;
@@ -697,7 +735,7 @@ public abstract class COM {
 			continue;
 		    if(desc.vindex >= table.length)
 			table = Arrays.copyOf(table, desc.vindex + 1);
-		    table[desc.vindex] = new Callback(alloc, mth, desc);
+		    table[desc.vindex] = new Callback(alloc, iid, mth, desc);
 		}
 		vtbl = alloc.allocate(ADDRESS, table.length);
 		for(int i = 0; i < table.length; i++) {
@@ -707,21 +745,22 @@ public abstract class COM {
 		retain = table;
 	    }
 	}
-	private final Map<Class<? extends IUnknown>, VTable> vtables = new WeakHashMap<>();
-	public VTable vtable(Class<? extends IUnknown> iface) {
+	private final Map<IID<? extends IUnknown>, VTable<? extends IUnknown>> vtables = new WeakHashMap<>();
+	public <I extends IUnknown> VTable<I> vtable(IID<I> iid) {
 	    synchronized(vtables) {
-		return(vtables.computeIfAbsent(iface, VTable::new));
+		@SuppressWarnings("unchecked") VTable<I> ret = (VTable<I>)vtables.computeIfAbsent(iid, k -> new VTable<>(k));
+		return(ret);
 	    }
 	}
 
 	private final Callback stub_QueryInterface, stub_AddRef, stub_Release;
 	{
 	    Arena alloc = Arena.ofAuto();
-	    stub_QueryInterface = new Callback(alloc, null, new Descriptor(0, FunctionDescriptor.of(HRESULT(), ADDRESS, REFIID(), LPVOID()), ADDRESS)
+	    stub_QueryInterface = new Callback(alloc, IUnknown.IID, null, new Descriptor(0, FunctionDescriptor.of(HRESULT(), ADDRESS, REFIID(), LPVOID()), ADDRESS)
 					       .upcall(LocalStub::QueryInterface));
-	    stub_AddRef = new Callback(alloc, null, new Descriptor(0, FunctionDescriptor.of(UINT(), ADDRESS))
+	    stub_AddRef = new Callback(alloc, IUnknown.IID, null, new Descriptor(0, FunctionDescriptor.of(UINT(), ADDRESS))
 				       .upcall(LocalStub::AddRef));
-	    stub_Release = new Callback(alloc, null, new Descriptor(0, FunctionDescriptor.of(UINT(), ADDRESS))
+	    stub_Release = new Callback(alloc, IUnknown.IID, null, new Descriptor(0, FunctionDescriptor.of(UINT(), ADDRESS))
 				       .upcall(LocalStub::Release));
 	}
 	public class LocalStub<I extends IUnknown> {
@@ -763,25 +802,34 @@ public abstract class COM {
 	    }
 	}
 
+	private final Map<Pair<IID<?>, Method>, DowncallAdapter> dcache = new ConcurrentHashMap<>();
 	public class Foreign implements InvocationHandler {
 	    private static final Method mth_toString = vmethod(Object.class, "toString");
-	    public final Class<? extends IUnknown> iface;
+	    public final IID<?> iid;
 	    final MemorySegment mem;
 	    Object proxy = null;
 
-	    Foreign(MemorySegment mem, Class<? extends IUnknown> iface) {
-		this.iface = iface;
+	    Foreign(MemorySegment mem, IID<?> iid) {
+		this.iid = iid;
 		this.mem = mem;
 	    }
 
 	    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
 		if(method.equals(mth_toString))
-		    return("#<com-proxy " + iface + ">");
+		    return("#<com-proxy " + iid.iface + ">");
 		if(args == null)
 		    args = new Object[0];
-		Descriptor desc = Descriptor.get(method);
-		if(desc != null)
-		    return(desc.da.call(mem, args));
+		DowncallAdapter da = dcache.get(new Pair<>(iid, method));
+		if(da == null) {
+		    Descriptor desc = Descriptor.get(method);
+		    if(desc != null)
+			da = desc.mda.make(new AdapterData(COM.this, iid, desc, method));
+		    else
+			da = DowncallAdapter.nil;
+		    dcache.put(new Pair<>(iid, method), da);
+		}
+		if(da != DowncallAdapter.nil)
+		    return(da.call(mem, args));
 		if(method.isDefault())
 		    return(InvocationHandler.invokeDefault(proxy, method, args));
 		throw(new RuntimeException("no downcall implementation for " + method));
@@ -810,14 +858,14 @@ public abstract class COM {
 	    }
 	}
 
-	public <I extends IUnknown> I objforaddr(MemorySegment mem, Class<I> iface, boolean borrowed) {
+	public <I extends IUnknown> I objforaddr(MemorySegment mem, IID<I> iid, boolean borrowed) {
 	    synchronized(this) {
 		{
 		    LocalStub stub = stubsbyaddr.get(mem.address());
 		    if(stub != null) {
 			if(!borrowed)
 			    stub.rc.decrementAndGet();
-			return(iface.cast(stub));
+			return(iid.iface.cast(stub));
 		    }
 		}
 		{
@@ -826,8 +874,8 @@ public abstract class COM {
 		    if(obj == null) {
 			if(borrowed)
 			    addref(mem);
-			obj = new Foreign(mem, iface);
-			obj.proxy = Proxy.newProxyInstance(iface.getClassLoader(), new Class<?>[] {iface}, obj);
+			obj = new Foreign(mem, iid);
+			obj.proxy = Proxy.newProxyInstance(iid.iface.getClassLoader(), new Class<?>[] {iid.iface}, obj);
 			Reference<Foreign> nref = new WeakReference<>(obj);
 			Finalizer.finalize(obj, () -> {
 			    if(foreign.remove(mem.address()) != nref)
@@ -839,12 +887,12 @@ public abstract class COM {
 			if(!borrowed)
 			    release(mem);
 		    }
-		    return(iface.cast(obj.proxy));
+		    return(iid.iface.cast(obj.proxy));
 		}
 	    }
 	}
 
-	public <I extends IUnknown> MemorySegment addrforobj(I obj, IID<I> iface) {
+	public <I extends IUnknown> MemorySegment addrforobj(I obj, IID<I> iid) {
 	    if(obj == null)
 		return(MemorySegment.NULL);
 	    InvocationHandler h = null;
@@ -854,17 +902,17 @@ public abstract class COM {
 	    }
 	    if(h instanceof Foreign) {
 		Foreign f = (Foreign)h;
-		if(!iface.iface.isInstance(obj))
-		    throw(new ClassCastException("foreign instance is " + f.iface + ", not " + iface.iface));
+		if(!iid.iface.isInstance(obj))
+		    throw(new ClassCastException("foreign instance is " + f.iid.iface + ", not " + iid.iface));
 		return(f.mem);
 	    }
 	    if(obj instanceof IUnknown) {
 		synchronized(this) {
-		    LocalStub<?> stub = stubsbyobj.get(new Pair<>(obj, iface));
+		    LocalStub<?> stub = stubsbyobj.get(new Pair<>(obj, iid));
 		    if(stub != null)
 			return(stub.mem);
-		    stub = new LocalStub<I>(obj, iface);
-		    stubsbyobj.put(new Pair<>(obj, iface), stub);
+		    stub = new LocalStub<I>(obj, iid);
+		    stubsbyobj.put(new Pair<>(obj, iid), stub);
 		    stubsbyaddr.put(stub.mem.address(), stub);
 		    return(stub.mem);
 		}
@@ -967,7 +1015,7 @@ public abstract class COM {
 		}
 		if(!SUCCEEDED(rv))
 		    throw(new HResultError(rv));
-		return(reg.objforaddr(buf.get(ADDRESS, 0), iid.iface, false));
+		return(reg.objforaddr(buf.get(ADDRESS, 0), iid, false));
 	    }
 	}
 
