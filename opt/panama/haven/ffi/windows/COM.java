@@ -707,9 +707,108 @@ public abstract class COM {
 	}
     }
 
+    private static IID<?>[] getiids(Class<?> fcl, Collection<WinRT.IPIID<?>> hints) {
+	class Buffer {
+	    final Map<Class<?>, WinRT.IPIID> ihints = new HashMap<>();
+	    final Collection<IID<?>> iids = new ArrayList<>();
+
+	    Buffer() {
+		for(WinRT.IPIID<?> hint : hints)
+		    ihints.put(hint.iface, hint);
+		addclass(fcl, new Type[fcl.getTypeParameters().length]);
+	    }
+
+	    void addclass(Class<?> cl, Type[] tpars) {
+		TypeVariable<?>[] vars = cl.getTypeParameters();
+		WinRT.IPIID hint = ihints.get(cl);
+		if(hint != null) {
+		    for(int i = 0; i < vars.length; i++) {
+			if(tpars[i] == null)
+			    tpars[i] = hint.ptypes[i];
+			else if(!tpars[i].equals(hint.ptypes[i]))
+			    throw(new IllegalArgumentException(cl + ": " + tpars[i] + " != " + hint.ptypes[i]));
+		    }
+		}
+
+		addiid(cl, tpars);
+
+		addsuper(cl, cl.getGenericSuperclass(), vars, tpars);
+		for(Type iface : cl.getGenericInterfaces())
+		    addsuper(cl, iface, vars, tpars);
+	    }
+
+	    void addiid(Class<?> cl, Type[] tpars) {
+		if(IUnknown.class.isAssignableFrom(cl)) {
+		    try {
+			if(tpars.length == 0) {
+			    iids.add(IID.get(cl));
+			} else {
+			    for(int i = 0; i < tpars.length; i++) {
+				if(tpars[i] == null)
+				    return;
+			    }
+			    iids.add(IID.get(new SimpleParameterizedType(null, cl, tpars)));
+			}
+		    } catch(NoIIDException e) {
+		    }
+		}
+	    }
+
+	    Type actualize(Type type, Class<?> vcl, TypeVariable<?>[] vars, Type[] tpars) {
+		if(type instanceof Class)
+		    return(type);
+		if(type instanceof ParameterizedType) {
+		    ParameterizedType pt = (ParameterizedType)type;
+		    if(pt.getOwnerType() == null) {
+			boolean ch = false;
+			Type raw = pt.getRawType();
+			Type araw = actualize(raw, vcl, vars, tpars);
+			ch |= araw != raw;
+			Type[] args = pt.getActualTypeArguments();
+			Type[] aargs = new Type[args.length];
+			for(int i = 0; i < args.length; i++)
+			    ch |= (aargs[i] = actualize(args[i], vcl, vars, tpars)) != args[i];
+			if(!ch)
+			    return(type);
+			return(new SimpleParameterizedType(null, araw, aargs));
+		    }
+		}
+		if(type instanceof TypeVariable) {
+		    TypeVariable<?> tv = (TypeVariable<?>)type;
+		    if(tv.getGenericDeclaration() == vcl) {
+			for(int i = 0; i < vars.length; i++) {
+			    if(type.equals(vars[i]))
+				return((tpars[i] != null) ? tpars[i] : type);
+			}
+			throw(new IllegalArgumentException(type + " not in type variables of " + vcl));
+		    }
+		}
+		return(type);
+	    }
+
+	    void addsuper(Class<?> ccl, Type st, TypeVariable<?>[] vars, Type[] tpars) {
+		if(st instanceof Class) {
+		    Class<?> scl = (Class<?>)st;
+		    /* Apparently, lambda objects of parameterized classes don't declare
+		     * themselves as parameterized types. That's what the IID hint is
+		     * basically for. */
+		    addclass(scl, new Type[scl.getTypeParameters().length]);
+		} else if(st instanceof ParameterizedType) {
+		    ParameterizedType pt = (ParameterizedType)st;
+		    Class<?> scl = (Class<?>)pt.getRawType();
+		    Type[] apars = pt.getActualTypeArguments();
+		    Type[] stpars = new Type[apars.length];
+		    for(int i = 0; i < stpars.length; i++)
+			stpars[i] = actualize(apars[i], ccl, vars, tpars);
+		}
+	    }
+	}
+	return(new Buffer().iids.toArray(new IID<?>[0]));
+    }
+
     public class Registry {
-	private final Map<Pair<IUnknown, IID>, LocalStub<?>> stubsbyobj = new HashMap<>();
-	private final Map<Long, LocalStub> stubsbyaddr = new HashMap<>();
+	private final Map<IUnknown, LocalStub> stubsbyobj = new HashMap<>();
+	private final Map<Long, LocalStub.Iface> stubsbyaddr = new HashMap<>();
 	private final Map<Long, Reference<Foreign>> foreign = new HashMap<>();
 
 	public class Callback {
@@ -752,14 +851,15 @@ public abstract class COM {
 								 MemorySegment.class, Object[].class);
 	    private int callback(MemorySegment self, Object[] args) {
 		return(upcallwrap(() -> {
-		    LocalStub<?> stub;
+		    LocalStub.Iface ip;
 		    synchronized(Registry.this) {
-			stub = stubsbyaddr.get(self.address());
+			ip = stubsbyaddr.get(self.address());
 		    }
-		    if(stub == null) {
+		    if(ip == null) {
 			Warning.warn("call to " + method + " on unregistered stub $" + Long.toUnsignedString(self.address(), 16));
 			return(HResultError.E_FAIL);
 		    }
+		    LocalStub stub = ip.stub();
 		    if((method != null) && !method.getDeclaringClass().isInstance(stub.obj)) {
 			Warning.warn("call to " + method + " on non-matching " + stub.obj);
 			return(HResultError.E_FAIL);
@@ -815,38 +915,85 @@ public abstract class COM {
 	private final Descriptor desc_Release =
 	    new Descriptor(0, FunctionDescriptor.of(UINT(), ADDRESS))
 	    .upcall(LocalStub::Release);
-	public class LocalStub<I extends IUnknown> {
-	    private final AtomicInteger rc = new AtomicInteger(1);
-	    private final I obj;
-	    private final IID<I> iid;
-	    private final MemorySegment mem;
+	public class LocalStub {
+	    final Arena alloc = Arena.ofAuto();;
+	    final AtomicInteger rc = new AtomicInteger(1);
+	    final IUnknown obj;
+	    final Map<IID<?>, Iface> ifaces = new HashMap<>();
 
-	    LocalStub(I obj, IID<I> iid) {
+	    LocalStub(IUnknown obj) {
 		this.obj = obj;
-		this.iid = iid;
-		mem = Arena.ofAuto().allocate(ADDRESS);
-		mem.set(ADDRESS, 0, vtable(iid).vtbl);
+	    }
+
+	    public class Iface<I extends IUnknown> {
+		final IID<I> iid;
+		final MemorySegment mem;
+
+		Iface(IID<I> iid) {
+		    this.iid = iid;
+		    mem = alloc.allocate(ADDRESS);
+		    mem.set(ADDRESS, 0, vtable(iid).vtbl);
+		}
+
+		LocalStub stub() {return(LocalStub.this);}
+
+		public String toString() {
+		    return(String.format("#<com-iface @ %x for %s, %s>", mem.address(), iid, obj));
+		}
+	    }
+
+	    <I extends IUnknown> Iface<I> iface(IID<I> iid) {
+		synchronized(ifaces) {
+		    @SuppressWarnings("unchecked") Iface<I> ip = (Iface<I>)ifaces.get(iid);
+		    if(ip == null) {
+			synchronized(Registry.this) {
+			    ifaces.put(iid, ip = new Iface<>(iid));
+			    stubsbyaddr.put(ip.mem.address(), ip);
+			}
+		    }
+		    return(ip);
+		}
 	    }
 
 	    Registry reg() {return(Registry.this);}
 
+	    private IID<?>[] iids = null;
 	    static int QueryInterface(LocalStub stub, Object[] args) {
-		Warning.warn("QueryInterface called on COM stub");
+		if(stub.iids == null) {
+		    Collection<WinRT.IPIID<?>> hints = new ArrayList<>();
+		    for(IID<?> iid : stub.ifaces.keySet()) {
+			if(iid instanceof WinRT.IPIID)
+			    hints.add((WinRT.IPIID<?>)iid);;
+		    }
+		    stub.iids = getiids(stub.obj.getClass(), hints);
+		}
+		UUID tgtid = guidmem(((MemorySegment)args[0]).reinterpret(16));
+		Debug.dump(tgtid, stub);
+		for(IID<?> iid : stub.iids) {
+		    if(iid.uuid.equals(tgtid)) {
+			((MemorySegment)args[1]).reinterpret(ADDRESS.byteSize()).set(ADDRESS, 0, stub.reg().addrforobj2(stub.obj, iid, true, null));
+			return(0);
+		    }
+		}
 		return(HResultError.E_NOINTERFACE);
 	    }
 
-	    static int AddRef(LocalStub<?> stub, Object[] args) {
+	    static int AddRef(LocalStub stub, Object[] args) {
+		Debug.dump("get", stub.rc.get() + 1, stub);
 		return(stub.rc.incrementAndGet());
 	    }
 
-	    static int Release(LocalStub<?> stub, Object[] args) {
+	    static int Release(LocalStub stub, Object[] args) {
 		int rc = stub.rc.decrementAndGet();
+		Debug.dump("put", rc, stub);
 		if(rc == 0) {
 		    Registry reg = stub.reg();
 		    synchronized(reg) {
-			if(reg.stubsbyaddr.remove(stub.mem.address()) != stub)
-			    throw(new RuntimeException("stub mismatch for " + stub.obj + " when released"));
-			if(reg.stubsbyobj.remove(new Pair<>(stub.obj, stub.iid)) != stub)
+			for(LocalStub.Iface iface : stub.ifaces.values()) {
+			    if(reg.stubsbyaddr.remove(iface.mem.address()) != iface)
+				throw(new RuntimeException("interface-pointer mismatch for " + iface + ", " + stub.obj + " when released"));
+			}
+			if(reg.stubsbyobj.remove(stub.obj) != stub)
 			    throw(new RuntimeException("stub mismatch for " + stub.obj + " when released"));
 		    }
 		}
@@ -854,7 +1001,7 @@ public abstract class COM {
 	    }
 
 	    public String toString() {
-		return(String.format("#<com-stub @ %x for %s, %s>", mem.address(), iid, obj));
+		return(String.format("#<com-stub %s>", obj));
 	    }
 	}
 
@@ -919,11 +1066,12 @@ public abstract class COM {
 		return(null);
 	    synchronized(this) {
 		{
-		    LocalStub stub = stubsbyaddr.get(mem.address());
-		    if(stub != null) {
+		    LocalStub.Iface<?> ip = stubsbyaddr.get(mem.address());
+		    if(ip != null) {
+			LocalStub stub = ip.stub();
 			if(!borrowed)
 			    stub.rc.decrementAndGet();
-			return(iid.iface.cast(stub));
+			return(iid.iface.cast(stub.obj));
 		    }
 		}
 		{
@@ -968,19 +1116,23 @@ public abstract class COM {
 	    }
 	    if(obj instanceof IUnknown) {
 		synchronized(this) {
-		    LocalStub<?> stub = stubsbyobj.get(new Pair<>(obj, iid));
-		    if(stub != null) {
-			if(get)
+		    LocalStub stub = stubsbyobj.get(obj);
+		    if(stub == null) {
+			if(!get && (retainer == null))
+			    throw(new RuntimeException("cannot create new borrowed stubs without a retainer"));
+			LocalStub nstub = new LocalStub(obj);
+			stubsbyobj.put(obj, nstub);
+			if(retainer != null)
+			    Finalizer.finalize(retainer, () -> LocalStub.Release(nstub, new Object[0]));
+			stub = nstub;
+		    } else {
+			if(get) {
+			    Debug.dump("GET", stub.rc.get() + 1, stub);
 			    stub.rc.incrementAndGet();
-			return(stub.mem);
+			}
 		    }
-		    if(!get && (retainer == null))
-			throw(new RuntimeException("cannot create new borrowed stubs without a retainer"));
-		    LocalStub<I> nstub = new LocalStub<I>(obj, iid);
-		    stubsbyobj.put(new Pair<>(obj, iid), nstub);
-		    stubsbyaddr.put(nstub.mem.address(), nstub);
-		    Finalizer.finalize(retainer, () -> LocalStub.Release(nstub, new Object[0]));
-		    return(nstub.mem);
+		    LocalStub.Iface<I> ip = stub.iface(iid);
+		    return(ip.mem);
 		}
 	    }
 	    throw(new IllegalArgumentException(String.valueOf(obj)));
