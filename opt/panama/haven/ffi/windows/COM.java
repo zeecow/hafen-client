@@ -968,7 +968,6 @@ public abstract class COM {
 		    stub.iids = getiids(stub.obj.getClass(), hints);
 		}
 		UUID tgtid = guidmem(((MemorySegment)args[0]).reinterpret(16));
-		Debug.dump(tgtid, stub);
 		for(IID<?> iid : stub.iids) {
 		    if(iid.uuid.equals(tgtid)) {
 			((MemorySegment)args[1]).reinterpret(ADDRESS.byteSize()).set(ADDRESS, 0, stub.reg().addrforobj2(stub.obj, iid, true, null));
@@ -979,13 +978,11 @@ public abstract class COM {
 	    }
 
 	    static int AddRef(LocalStub stub, Object[] args) {
-		Debug.dump("get", stub.rc.get() + 1, stub);
 		return(stub.rc.incrementAndGet());
 	    }
 
 	    static int Release(LocalStub stub, Object[] args) {
 		int rc = stub.rc.decrementAndGet();
-		Debug.dump("put", rc, stub);
 		if(rc == 0) {
 		    Registry reg = stub.reg();
 		    synchronized(reg) {
@@ -1126,10 +1123,8 @@ public abstract class COM {
 			    Finalizer.finalize(retainer, () -> LocalStub.Release(nstub, new Object[0]));
 			stub = nstub;
 		    } else {
-			if(get) {
-			    Debug.dump("GET", stub.rc.get() + 1, stub);
+			if(get)
 			    stub.rc.incrementAndGet();
-			}
 		    }
 		    LocalStub.Iface<I> ip = stub.iface(iid);
 		    return(ip.mem);
