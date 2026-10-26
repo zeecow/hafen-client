@@ -446,7 +446,15 @@ public abstract class COM {
 	    if(outtype == null) {
 		outxf = null;
 	    } else {
-		Class<?> rtype = mth.getReturnType();
+		Type grtype = actualize(mth.getGenericReturnType(), iid);
+		Class<?> rtype;
+		if(grtype instanceof Class) {
+		    rtype = (Class<?>)grtype;
+		} else if(grtype instanceof ParameterizedType) {
+		    rtype = (Class<?>)((ParameterizedType)grtype).getRawType();
+		} else {
+		    throw(new IllegalArgumentException(String.valueOf(grtype)));
+		}
 		ValueConversion valxf = valxf(outtype, rtype);
 		if((valxf != null) && (valxf.dret != null)) {
 		    outxf = valxf.dret;
@@ -471,7 +479,7 @@ public abstract class COM {
 		    }
 		} else if(IUnknown.class.isAssignableFrom(rtype)) {
 		    if(outtype == ADDRESS) {
-			IID<?> outiid = IID.get(actualize(mth.getGenericReturnType(), iid));
+			IID<?> outiid = IID.get(grtype);
 			outxf = buf -> reg.objforaddr(buf.get(ADDRESS, 0), outiid, false);
 		    } else {
 			throw(new IllegalArgumentException(outtype + " -> " + rtype));
