@@ -152,6 +152,16 @@ public abstract class COM {
 	return(memguid(Arena.ofAuto().allocate(16), uuid));
     }
 
+    public static UUID guidmem(MemorySegment buf) {
+	long msb = 0, lsb = 0;
+	msb |= (buf.get(ValueLayout.JAVA_INT_UNALIGNED,   0) & 0xffffffffl) << 32;
+	msb |= (buf.get(ValueLayout.JAVA_SHORT_UNALIGNED, 4) & 0x0000ffffl) << 16;
+	msb |= (buf.get(ValueLayout.JAVA_SHORT_UNALIGNED, 6) & 0x0000ffffl) <<  0;
+	for(int i = 0; i < 8; i++)
+	    lsb |= (buf.get(ValueLayout.JAVA_BYTE, 15 - i) & 0xffl) << (i * 8);
+	return(new UUID(msb, lsb));
+    }
+
     public static class CLSID {
 	public final UUID uuid;
 	final MemorySegment mem;
@@ -163,6 +173,12 @@ public abstract class COM {
 
 	public CLSID(long msb, long lsb) {
 	    this(new UUID(msb, lsb));
+	}
+    }
+
+    public static class NoIIDException extends RuntimeException {
+	public NoIIDException(String msg) {
+	    super(msg);
 	}
     }
 
@@ -198,7 +214,7 @@ public abstract class COM {
 			throw(new RuntimeException(cl.toString()));
 		    return(iid);
 		} catch(NoSuchFieldException e) {
-		    throw(new ClassCastException("not a declared COM interface: " + cl));
+		    throw(new NoIIDException("not a declared COM interface: " + cl));
 		} catch(IllegalAccessException e) {
 		    throw(new RuntimeException(e));
 		}
@@ -208,7 +224,11 @@ public abstract class COM {
 		    return(WinRT.ipiid(((Class<?>)pt.getRawType()).asSubclass(IUnknown.class),
 				       pt.getActualTypeArguments()));
 	    }
-	    throw(new IllegalArgumentException(String.valueOf(t)));
+	    throw(new NoIIDException(String.valueOf(t)));
+	}
+
+	public String toString() {
+	    return(String.format("#<com-iface %s for %s>", uuid, iface));
 	}
     }
 
@@ -254,9 +274,9 @@ public abstract class COM {
 	    public static final Constructor std = d -> {
 		Method handler = smethod(d.mth.getDeclaringClass(), "downcall_" + d.mth.getName());
 		if(handler != null)
-		    return(new CustomDowncall(d.desc, d.mth, handler));
+		    return(new CustomDowncall(d, handler));
 		else
-		    return(d.com.new StandardDowncall(d.desc, d.mth));
+		    return(d.com.new StandardDowncall(d.iid, d.desc, d.mth));
 	    };
 	}
 
@@ -276,7 +296,7 @@ public abstract class COM {
 	    public UpcallAdapter make(AdapterData data);
 
 	    public static final Constructor std = d -> {
-		return(d.com.new StandardUpcall(d.desc, d.mth));
+		return(d.com.new StandardUpcall(d.iid, d.desc, d.mth));
 	    };
 	}
     }
@@ -310,6 +330,39 @@ public abstract class COM {
 	}
     }
 
+    private static Type actualize(Type type, IID<?> iid) {
+	if(type instanceof Class)
+	    return(type);
+	if(type instanceof ParameterizedType) {
+	    ParameterizedType pt = (ParameterizedType)type;
+	    if(pt.getOwnerType() == null) {
+		boolean ch = false;
+		Type raw = pt.getRawType();
+		Type araw = actualize(raw, iid);
+		ch |= araw != raw;
+		Type[] args = pt.getActualTypeArguments();
+		Type[] aargs = new Type[args.length];
+		for(int i = 0; i < args.length; i++)
+		    ch |= (aargs[i] = actualize(args[i], iid)) != args[i];
+		if(!ch)
+		    return(type);
+		return(new SimpleParameterizedType(null, araw, aargs));
+	    }
+	}
+	if(type instanceof TypeVariable) {
+	    TypeVariable<?> tv = (TypeVariable<?>)type;
+	    if(tv.getGenericDeclaration() == iid.iface) {
+		TypeVariable<?>[] vars = iid.iface.getTypeParameters();
+		for(int i = 0; i < vars.length; i++) {
+		    if(type.equals(vars[i]))
+			return(((WinRT.IPIID)iid).ptypes[i]);
+		}
+		throw(new IllegalArgumentException(type + " not in type variables of " + iid.iface));
+	    }
+	}
+	return(type);
+    }
+
     public class StandardDowncall implements DowncallAdapter {
 	private final int vindex;
 	private final MethodHandle fun;
@@ -317,7 +370,7 @@ public abstract class COM {
 	private final MemoryLayout outtype;
 	private final Function<MemorySegment, Object> outxf;
 
-	public StandardDowncall(Descriptor desc, Method mth) {
+	public StandardDowncall(IID<?> iid, Descriptor desc, Method mth) {
 	    Win32 win = Win32.get();
 	    this.vindex = desc.vindex;
 	    this.outtype = desc.outtype;
@@ -378,8 +431,8 @@ public abstract class COM {
 		    } else if(p == String.class) {
 			xf = (st, v) -> (v == null) ? MemorySegment.NULL : st.allocateFrom((String)v, win.C_WCHARSET());
 		    } else if(IUnknown.class.isAssignableFrom(p)) {
-			IID<?> iid = IID.get(gp);
-			xf = (st, v) -> reg.addrforobj2((IUnknown)v, iid);
+			IID<?> pariid = IID.get(actualize(gp, iid));
+			xf = (st, v) -> reg.addrforobj2((IUnknown)v, pariid, false, st);
 		    } else if(StructInstance.class.isAssignableFrom(p)) {
 			xf = (st, v) -> StructInstance.extract((StructInstance)v);
 		    } else {
@@ -418,8 +471,8 @@ public abstract class COM {
 		    }
 		} else if(IUnknown.class.isAssignableFrom(rtype)) {
 		    if(outtype == ADDRESS) {
-			IID<?> iid = IID.get(mth.getGenericReturnType());
-			outxf = buf -> reg.objforaddr(buf.get(ADDRESS, 0), iid, false);
+			IID<?> outiid = IID.get(actualize(mth.getGenericReturnType(), iid));
+			outxf = buf -> reg.objforaddr(buf.get(ADDRESS, 0), outiid, false);
 		    } else {
 			throw(new IllegalArgumentException(outtype + " -> " + rtype));
 		    }
@@ -462,8 +515,8 @@ public abstract class COM {
 	private final Downcall info;
 	private final Method handler;
 
-	public CustomDowncall(Descriptor desc, Method mth, Method handler) {
-	    this.info = new Downcall(COM.get(), ld.downcallHandle(desc.sig));
+	public CustomDowncall(AdapterData d, Method handler) {
+	    this.info = new Downcall(d.com, ld.downcallHandle(d.desc.sig));
 	    this.handler = handler;
 	}
 
@@ -484,7 +537,7 @@ public abstract class COM {
 	private final boolean resret;
 
 	@SuppressWarnings("unchecked")
-	public StandardUpcall(Descriptor desc, Method mth) {
+	public StandardUpcall(IID<?> iid, Descriptor desc, Method mth) {
 	    Win32 win = Win32.get();
 	    this.method = mth;
 	    outtype = desc.outtype;
@@ -493,7 +546,7 @@ public abstract class COM {
 	    MemoryLayout[] args = desc.sig.argumentLayouts().toArray(new MemoryLayout[0]);
 	    argxf = new Function[pars.length];
 	    if(pars.length != args.length - ((outtype == null) ? 1 : 2))
-		throw(new IllegalArgumentException());
+		throw(new IllegalArgumentException(mth + ": " + Arrays.asList(pars) + " does not match " + Arrays.asList(args)));
 	    for(int i = 0; i < pars.length; i++) {
 		Class<?> p = pars[i]; Type gp = gpars[i]; MemoryLayout a = args[i + 1];
 		Function<Object, Object> xf;
@@ -520,8 +573,8 @@ public abstract class COM {
 		    } else if(p == Handle.class) {
 			xf = v -> Handle.of((MemorySegment)v);
 		    } else if(IUnknown.class.isAssignableFrom(p)) {
-			IID<?> iid = IID.get(gp);
-			xf = v -> reg.objforaddr((MemorySegment)v, iid, true);
+			IID<?> pariid = IID.get(actualize(gp, iid));
+			xf = v -> reg.objforaddr((MemorySegment)v, pariid, true);
 		    } else if(StructInstance.class.isAssignableFrom(p)) {
 			try {
 			    Method cons = p.getDeclaredMethod("fromcom", MemorySegment.class);
@@ -576,8 +629,8 @@ public abstract class COM {
 			    }
 			};
 		    } else if(IUnknown.class.isAssignableFrom(rtype)) {
-			IID<?> iid = IID.get(mth.getGenericReturnType());
-			outxf = (v, buf) -> buf.set(ADDRESS, 0, reg.addrforobj2((IUnknown)v, iid));
+			IID<?> outiid = IID.get(actualize(mth.getGenericReturnType(), iid));
+			outxf = (v, buf) -> buf.set(ADDRESS, 0, reg.addrforobj2((IUnknown)v, outiid, true, null));
 		    } else {
 			throw(new IllegalArgumentException(rtype + " -> "  + outtype));
 		    }
@@ -724,9 +777,9 @@ public abstract class COM {
 		Class<I> iface = iid.iface;
 		Arena alloc = Arena.ofAuto();
 		Callback[] table = new Callback[3];
-		table[0] = stub_QueryInterface;
-		table[1] = stub_AddRef;
-		table[2] = stub_Release;
+		table[0] = new Callback(alloc, iid, null, desc_QueryInterface);
+		table[1] = new Callback(alloc, iid, null, desc_AddRef);
+		table[2] = new Callback(alloc, iid, null, desc_Release);
 		for(Method mth : iface.getMethods()) {
 		    if(!IUnknown.class.isAssignableFrom(mth.getDeclaringClass()) || (mth.getDeclaringClass() == IUnknown.class))
 			continue;
@@ -753,27 +806,26 @@ public abstract class COM {
 	    }
 	}
 
-	private final Callback stub_QueryInterface, stub_AddRef, stub_Release;
-	{
-	    Arena alloc = Arena.ofAuto();
-	    stub_QueryInterface = new Callback(alloc, IUnknown.IID, null, new Descriptor(0, FunctionDescriptor.of(HRESULT(), ADDRESS, REFIID(), LPVOID()), ADDRESS)
-					       .upcall(LocalStub::QueryInterface));
-	    stub_AddRef = new Callback(alloc, IUnknown.IID, null, new Descriptor(0, FunctionDescriptor.of(UINT(), ADDRESS))
-				       .upcall(LocalStub::AddRef));
-	    stub_Release = new Callback(alloc, IUnknown.IID, null, new Descriptor(0, FunctionDescriptor.of(UINT(), ADDRESS))
-				       .upcall(LocalStub::Release));
-	}
+	private final Descriptor desc_QueryInterface =
+	    new Descriptor(0, FunctionDescriptor.of(HRESULT(), ADDRESS, REFIID(), LPVOID()), ADDRESS)
+	    .upcall(LocalStub::QueryInterface);
+	private final Descriptor desc_AddRef =
+	    new Descriptor(0, FunctionDescriptor.of(UINT(), ADDRESS))
+	    .upcall(LocalStub::AddRef);
+	private final Descriptor desc_Release =
+	    new Descriptor(0, FunctionDescriptor.of(UINT(), ADDRESS))
+	    .upcall(LocalStub::Release);
 	public class LocalStub<I extends IUnknown> {
 	    private final AtomicInteger rc = new AtomicInteger(1);
 	    private final I obj;
-	    private final IID<I> iface;
+	    private final IID<I> iid;
 	    private final MemorySegment mem;
 
-	    LocalStub(I obj, IID<I> iface) {
+	    LocalStub(I obj, IID<I> iid) {
 		this.obj = obj;
-		this.iface = iface;
+		this.iid = iid;
 		mem = Arena.ofAuto().allocate(ADDRESS);
-		mem.set(ADDRESS, 0, vtable(iface).vtbl);
+		mem.set(ADDRESS, 0, vtable(iid).vtbl);
 	    }
 
 	    Registry reg() {return(Registry.this);}
@@ -783,22 +835,26 @@ public abstract class COM {
 		return(HResultError.E_NOINTERFACE);
 	    }
 
-	    static int AddRef(LocalStub stub, Object[] args) {
+	    static int AddRef(LocalStub<?> stub, Object[] args) {
 		return(stub.rc.incrementAndGet());
 	    }
 
-	    static int Release(LocalStub stub, Object[] args) {
+	    static int Release(LocalStub<?> stub, Object[] args) {
 		int rc = stub.rc.decrementAndGet();
 		if(rc == 0) {
 		    Registry reg = stub.reg();
 		    synchronized(reg) {
-			if(reg.stubsbyaddr.remove(stub.mem) != stub)
+			if(reg.stubsbyaddr.remove(stub.mem.address()) != stub)
 			    throw(new RuntimeException("stub mismatch for " + stub.obj + " when released"));
-			if(reg.stubsbyobj.remove(new Pair<>(stub.obj, stub.iface)) != stub)
+			if(reg.stubsbyobj.remove(new Pair<>(stub.obj, stub.iid)) != stub)
 			    throw(new RuntimeException("stub mismatch for " + stub.obj + " when released"));
 		    }
 		}
 		return(rc);
+	    }
+
+	    public String toString() {
+		return(String.format("#<com-stub @ %x for %s, %s>", mem.address(), iid, obj));
 	    }
 	}
 
@@ -859,6 +915,8 @@ public abstract class COM {
 	}
 
 	public <I extends IUnknown> I objforaddr(MemorySegment mem, IID<I> iid, boolean borrowed) {
+	    if(nullp(mem))
+		return(null);
 	    synchronized(this) {
 		{
 		    LocalStub stub = stubsbyaddr.get(mem.address());
@@ -892,7 +950,7 @@ public abstract class COM {
 	    }
 	}
 
-	public <I extends IUnknown> MemorySegment addrforobj(I obj, IID<I> iid) {
+	public <I extends IUnknown> MemorySegment addrforobj(I obj, IID<I> iid, boolean get, Object retainer) {
 	    if(obj == null)
 		return(MemorySegment.NULL);
 	    InvocationHandler h = null;
@@ -904,24 +962,32 @@ public abstract class COM {
 		Foreign f = (Foreign)h;
 		if(!iid.iface.isInstance(obj))
 		    throw(new ClassCastException("foreign instance is " + f.iid.iface + ", not " + iid.iface));
+		if(get)
+		    addref(f.mem);
 		return(f.mem);
 	    }
 	    if(obj instanceof IUnknown) {
 		synchronized(this) {
 		    LocalStub<?> stub = stubsbyobj.get(new Pair<>(obj, iid));
-		    if(stub != null)
+		    if(stub != null) {
+			if(get)
+			    stub.rc.incrementAndGet();
 			return(stub.mem);
-		    stub = new LocalStub<I>(obj, iid);
-		    stubsbyobj.put(new Pair<>(obj, iid), stub);
-		    stubsbyaddr.put(stub.mem.address(), stub);
-		    return(stub.mem);
+		    }
+		    if(!get && (retainer == null))
+			throw(new RuntimeException("cannot create new borrowed stubs without a retainer"));
+		    LocalStub<I> nstub = new LocalStub<I>(obj, iid);
+		    stubsbyobj.put(new Pair<>(obj, iid), nstub);
+		    stubsbyaddr.put(nstub.mem.address(), nstub);
+		    Finalizer.finalize(retainer, () -> LocalStub.Release(nstub, new Object[0]));
+		    return(nstub.mem);
 		}
 	    }
 	    throw(new IllegalArgumentException(String.valueOf(obj)));
 	}
 
-	public <I extends IUnknown> MemorySegment addrforobj2(IUnknown obj, IID<I> iface) {
-	    return(addrforobj(iface.iface.cast(obj), iface));
+	public <I extends IUnknown> MemorySegment addrforobj2(IUnknown obj, IID<I> iface, boolean get, Object retainer) {
+	    return(addrforobj(iface.iface.cast(obj), iface, get, retainer));
 	}
     }
     final Registry reg = new Registry();
@@ -1006,7 +1072,7 @@ public abstract class COM {
 	public <I extends IUnknown> I CoCreateInstance(CLSID clsid, IUnknown outer, int context, IID<I> iid) {
 	    try(Arena st = Arena.ofConfined()) {
 		MemorySegment buf = st.allocate(LPVOID);
-		MemorySegment outerp = (outer == null) ? MemorySegment.NULL : reg.addrforobj(outer, IUnknown.IID);
+		MemorySegment outerp = (outer == null) ? MemorySegment.NULL : reg.addrforobj(outer, IUnknown.IID, false, st);
 		int rv;
 		try {
 		    rv = (int)CoCreateInstance.invoke(clsid.mem, outerp, context, iid.mem, buf);
@@ -1041,13 +1107,14 @@ public abstract class COM {
 
 	private final MethodHandle RegisterDragDrop = ld.downcallHandle(ole32.find("RegisterDragDrop").get(), FunctionDescriptor.of(HRESULT, HWND, ADDRESS));
 	public void RegisterDragDrop(Handle hwnd, IDropTarget droptarget) {
-	    MemorySegment dt = reg.addrforobj(droptarget, IDropTarget.IID);
+	    MemorySegment dt = reg.addrforobj(droptarget, IDropTarget.IID, true, null);
 	    int rv;
 	    try {
 		rv = (int)RegisterDragDrop.invoke(hwnd.bits, dt);
 	    } catch(Throwable e) {
 		throw(new InvocationException(e));
 	    }
+	    reg.release(dt);
 	    if(!SUCCEEDED(rv))
 		throw(new HResultError(rv));
 	}

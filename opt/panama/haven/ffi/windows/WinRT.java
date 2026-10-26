@@ -74,18 +74,35 @@ public abstract class WinRT {
 	return(RoGetActivationFactory(actnm, iid));
     }
 
+    /* XXX: This is quite heuristic. I don't really know formally when
+     * to use the "runtime class type" vs the raw interface type. */
+    private static String ckrttype(Class<?> base, UUID defiface) {
+	String rtname = null;
+	try {
+	    Field f = base.getDeclaredField("RTNAME");
+	    rtname = (String)f.get(null);
+	} catch(NoSuchFieldException e) {
+	} catch(IllegalAccessException e) {
+	    throw(new RuntimeException(e));
+	}
+	if(rtname == null)
+	    return("{" + defiface + "}");
+	else
+	    return("rc(" + rtname + ";{" + defiface + "})");
+    }
+
     private static String typename(Type type) {
 	if(type instanceof Class) {
 	    Class<?> cl = (Class)type;
 	    if(cl == HString.class)
 		return("string");
 	    if(IUnknown.class.isAssignableFrom(cl))
-		return("{" + COM.IID.get(cl).uuid + "}");
+		return(ckrttype(cl, COM.IID.get(cl).uuid));
 	} else if(type instanceof ParameterizedType) {
 	    ParameterizedType pt = (ParameterizedType)type;
 	    if((pt.getRawType() instanceof Class) && IUnknown.class.isAssignableFrom((Class)pt.getRawType()))
-		return("{" + ipiid(((Class<?>)pt.getRawType()).asSubclass(IUnknown.class),
-				   pt.getActualTypeArguments()).uuid + "}");
+		return(ckrttype((Class<?>)pt.getRawType(), ipiid(((Class<?>)pt.getRawType()).asSubclass(IUnknown.class),
+								 pt.getActualTypeArguments()).uuid));
 	}
 	throw(new IllegalArgumentException(String.valueOf(type)));
     }
@@ -126,6 +143,10 @@ public abstract class WinRT {
 	    super(iface, uuid);
 	    this.ptypes = ptypes;
 	}
+
+	public String toString() {
+	    return(String.format("#<com-iface %s for %s>", uuid, new SimpleParameterizedType(null, iface, ptypes)));
+	}
     }
 
     private static final Map<Object, IPIID<?>> ipiids = new HashMap<>();
@@ -139,7 +160,7 @@ public abstract class WinRT {
 		tnames[0] = "{" + piid.uuid + "}";
 		for(int i = 0; i < ptypes.length; i++)
 		    tnames[i + 1] = typename(ptypes[i]);
-		UUID uuid = Utils.uuid5(TYPE_NS,("pinterface(" + String.join(";", tnames) + ")"));
+		UUID uuid = Utils.uuid5(TYPE_NS, "pinterface(" + String.join(";", tnames) + ")");
 		ipiids.put(key, ret = new IPIID<>(maintype, uuid, ptypes));
 	    }
 	    return(ret);
