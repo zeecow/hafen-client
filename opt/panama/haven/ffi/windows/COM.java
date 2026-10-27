@@ -537,6 +537,12 @@ public abstract class COM {
 	}
     }
 
+    public static class COMReturn extends HResultError {
+	public COMReturn(int hresult) {
+	    super(hresult);
+	}
+    }
+
     public class StandardUpcall implements UpcallAdapter {
 	private final Function<Object, Object>[] argxf;
 	private final BiConsumer<Object, MemorySegment> outxf;
@@ -659,7 +665,7 @@ public abstract class COM {
 		if(resret)
 		    return(((Number)rv).intValue());
 		return(0);
-	    } catch(HResultError e) {
+	    } catch(COMReturn e) {
 		return(e.hresult);
 	    }
 	}
