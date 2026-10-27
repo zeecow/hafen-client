@@ -60,6 +60,7 @@ public class WGLContext implements Providers.Factory<Toolkit> {
     private final WGL wgl;
     private final SHCore shcore;
     private final COM com;
+    private final WinRT ro;
 
     private WGLContext() {
 	try {
@@ -74,6 +75,11 @@ public class WGLContext implements Providers.Factory<Toolkit> {
 	    shcore = SHCore.get();
 	} catch(RuntimeException e) {}
 	this.shcore = shcore;
+	WinRT ro = null;
+	try {
+	    ro = WinRT.get();
+	} catch(RuntimeException e) {}
+	this.ro = ro;
     }
 
     private static WGLContext instance = null;
@@ -327,6 +333,8 @@ public class WGLContext implements Providers.Factory<Toolkit> {
 	private void handlemsgs() {
 	    try {
 		com.OleInitialize();
+		if(ro != null)
+		    ro.RoInitialize(WinRT.RO_INIT_SINGLETHREADED);
 		MSG msg = win.MSG();
 		win.PeekMessage(msg, null, 0, 0, Win32.PM_NOREMOVE);
 		synchronized(mtmon) {
@@ -357,6 +365,8 @@ public class WGLContext implements Providers.Factory<Toolkit> {
 			msgthread = null;
 		}
 		com.OleUninitialize();
+		if(ro != null)
+		    ro.RoUninitialize();
 	    }
 	}
 
@@ -1953,4 +1963,45 @@ public class WGLContext implements Providers.Factory<Toolkit> {
 	.put(592, Key.Loc.Std.RWIN).put(593, Key.Loc.Std.MENU).put(529, Key.Loc.Std.RCTL).put(575, Key.Loc.Std.LEFT).put(580, Key.Loc.Std.DOWN)
 	.put(577, Key.Loc.Std.RGHT).put( 82, Key.Loc.Std.KP0 ).put( 83, Key.Loc.Std.KPDL)
 	.map();
+
+    static {
+	haven.Console.setscmd("authtest", (cons, args) -> {
+	    WGLToolkit.WGLWindow wnd = (WGLToolkit.WGLWindow)((Widget)cons.host()).ui.wnd;
+	    wnd.toolkit().msgrun(() -> {
+		try {
+		    WinRT ro = WinRT.get();
+		    var ms = ro.RoGetActivationFactory(IWebAuthenticationCoreManagerStatics.class);
+		    var async = ms.FindAccountProviderWithAuthorityAsync(ro.HString("https://login.microsoft.com"), ro.HString("consumers"));
+		    Debug.dump(async.GetRuntimeClassName(), async.GetIids());
+		    Debug.dump(async.QueryInterface(IAsyncInfo.IID).get_Id());
+		    async.put_Completed((info, status) -> {
+			if(status != IAsyncOperation.Completed) {
+			    Debug.dump(status);
+			    return;
+			}
+			var req = ro.RoGetActivationFactory(IWebTokenRequestFactory.class)
+			    .Create(info.GetResults(), ro.HString("User.Read"), ro.HString("9745919d-b4aa-4c66-b42f-31213082be0d"));
+			ro.RoGetActivationFactory(IWebAuthenticationCoreManagerInterop.class)
+			    .RequestTokenForWindowAsync2(wnd.hwnd, req)
+			    .put_Completed((rinfo, rstatus) -> {
+				if(rstatus != IAsyncOperation.Completed) {
+				    Debug.dump(status);
+				    return;
+				}
+				var res = rinfo.GetResults();
+				Debug.dump(res.get_ResponseStatus(),
+					   res.get_ResponseError(),
+					   res.get_ResponseError().get_ErrorCode(),
+					   res.get_ResponseError().get_ErrorMessage());
+				var props = res.get_ResponseError().get_Properties();
+				Debug.dump(props.get_Size());
+				Debug.dump(props.GetRuntimeClassName(), props.GetIids());
+			    });
+		    });
+		} catch(Throwable t) {
+		    t.printStackTrace();
+		}
+	    });
+	});
+    }
 }
