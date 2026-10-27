@@ -1030,7 +1030,7 @@ public abstract class COM {
 
 	    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
 		if(method.equals(mth_toString))
-		    return("#<com-proxy " + iid.iface + ">");
+		    return("#<com-proxy " + iid.iface + " @ " + Long.toUnsignedString(mem.address(), 16) + ">");
 		if(args == null)
 		    args = new Object[0];
 		DowncallAdapter da = dcache.get(new Pair<>(iid, method));
@@ -1063,13 +1063,15 @@ public abstract class COM {
 
 	final int VINDEX_RELEASE = 2;
 	final MethodHandle native_Release = ld.downcallHandle(FunctionDescriptor.of(ULONG(), ADDRESS));
-	void release(MemorySegment obj) {
+	int release(MemorySegment obj) {
 	    MemorySegment rfun = getvtab(obj, VINDEX_RELEASE);
+	    int rv;
 	    try {
-		native_Release.invoke(rfun, obj);
+		rv = (int)native_Release.invoke(rfun, obj);
 	    } catch(Throwable t) {
 		throw(new InvocationException(t));
 	    }
+	    return(rv);
 	}
 
 	public <I extends IUnknown> I objforaddr(MemorySegment mem, IID<I> iid, boolean borrowed) {
