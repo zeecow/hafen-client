@@ -458,8 +458,14 @@ public abstract class COM {
 		ValueConversion valxf = valxf(outtype, rtype);
 		if((valxf != null) && (valxf.dret != null)) {
 		    outxf = valxf.dret;
+		} else if(rtype == Boolean.TYPE) {
+		    if((outtype == ValueLayout.JAVA_INT) || (outtype == ValueLayout.JAVA_SHORT) || (outtype == ValueLayout.JAVA_BYTE)) {
+			outxf = buf -> ((int)getint(buf, 0, outtype, true)) != 0;
+		    } else {
+			throw(new IllegalArgumentException(outtype + " -> " + rtype));
+		    }
 		} else if(rtype == Integer.TYPE) {
-		    if((outtype == ValueLayout.JAVA_INT) || (outtype == ValueLayout.JAVA_SHORT) || (outtype == ValueLayout.JAVA_INT)) {
+		    if((outtype == ValueLayout.JAVA_INT) || (outtype == ValueLayout.JAVA_SHORT) || (outtype == ValueLayout.JAVA_BYTE)) {
 			outxf = buf -> (int)getint(buf, 0, outtype, true);
 		    } else {
 			throw(new IllegalArgumentException(outtype + " -> " + rtype));
