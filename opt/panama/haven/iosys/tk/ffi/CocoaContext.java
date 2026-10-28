@@ -1255,10 +1255,12 @@ public class CocoaContext implements Providers.Factory<Toolkit> {
 	    }
 
 	    public void dispose() {
-		synchronized(windows) {
-		    windows.remove(this);
-		}
-		nsw.close();
+		mainrun(() -> {
+		    synchronized(windows) {
+			windows.remove(this);
+		    }
+		    nsw.close();
+		});
 	    }
 	}
 
