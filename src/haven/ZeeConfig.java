@@ -760,7 +760,7 @@ public class ZeeConfig {
             "bloodstern","camomile","cavebulb","chimingbluebell","clover","coltsfoot","dandelion",
             "edelweiss","frogscrown","heartsease","marshmallow","stingingnettle","thornythistle",
             "yarrow","snapdragon","wintergreen","tansy","sleighbell", "frostflower",
-            "blackhenbane", "crocus" //TODO guessing names
+            "henbane", "crocus" //TODO guessing names
         };
         for (int i = 0; i < list.length; i++) {
             if(name.contains(list[i]))
