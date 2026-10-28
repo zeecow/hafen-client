@@ -32,7 +32,7 @@ public class SimpleParameterizedType implements ParameterizedType {
     public final Type owner, raw;
     public final Type[] args;
 
-    public SimpleParameterizedType(Type owner, Type raw, Type[] args) {
+    public SimpleParameterizedType(Type owner, Type raw, Type... args) {
 	this.owner = owner;
 	this.raw = raw;
 	this.args = args;

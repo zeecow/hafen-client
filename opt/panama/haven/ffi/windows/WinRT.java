@@ -100,9 +100,15 @@ public abstract class WinRT {
 		return(ckrttype(cl, COM.IID.get(cl).uuid));
 	} else if(type instanceof ParameterizedType) {
 	    ParameterizedType pt = (ParameterizedType)type;
-	    if((pt.getRawType() instanceof Class) && IUnknown.class.isAssignableFrom((Class)pt.getRawType()))
-		return(ckrttype((Class<?>)pt.getRawType(), ipiid(((Class<?>)pt.getRawType()).asSubclass(IUnknown.class),
-								 pt.getActualTypeArguments()).uuid));
+	    if((pt.getRawType() instanceof Class) && IUnknown.class.isAssignableFrom((Class)pt.getRawType())) {
+		PIID<?> piid = PIID.get(((Class<?>)pt.getRawType()).asSubclass(IUnknown.class));
+		Type[] ptypes = pt.getActualTypeArguments();
+		String[] tnames = new String[ptypes.length + 1];
+		tnames[0] = "{" + piid.uuid + "}";
+		for(int i = 0; i < ptypes.length; i++)
+		    tnames[i + 1] = typename(ptypes[i]);
+		return("pinterface(" + String.join(";", tnames) + ")");
+	    }
 	}
 	throw(new IllegalArgumentException(String.valueOf(type)));
     }
@@ -156,11 +162,8 @@ public abstract class WinRT {
 	synchronized(ipiids) {
 	    @SuppressWarnings("unchecked") IPIID<I> ret = (IPIID<I>)ipiids.get(key);
 	    if(ret == null) {
-		String[] tnames = new String[ptypes.length + 1];
-		tnames[0] = "{" + piid.uuid + "}";
-		for(int i = 0; i < ptypes.length; i++)
-		    tnames[i + 1] = typename(ptypes[i]);
-		UUID uuid = Utils.uuid5(TYPE_NS, "pinterface(" + String.join(";", tnames) + ")");
+		String sig = typename(new SimpleParameterizedType(null, maintype, ptypes));
+		UUID uuid = Utils.uuid5(TYPE_NS, sig);
 		ipiids.put(key, ret = new IPIID<>(maintype, uuid, ptypes));
 	    }
 	    return(ret);

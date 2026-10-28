@@ -458,8 +458,14 @@ public abstract class COM {
 		ValueConversion valxf = valxf(outtype, rtype);
 		if((valxf != null) && (valxf.dret != null)) {
 		    outxf = valxf.dret;
+		} else if(rtype == Boolean.TYPE) {
+		    if((outtype == ValueLayout.JAVA_INT) || (outtype == ValueLayout.JAVA_SHORT) || (outtype == ValueLayout.JAVA_BYTE)) {
+			outxf = buf -> ((int)getint(buf, 0, outtype, true)) != 0;
+		    } else {
+			throw(new IllegalArgumentException(outtype + " -> " + rtype));
+		    }
 		} else if(rtype == Integer.TYPE) {
-		    if((outtype == ValueLayout.JAVA_INT) || (outtype == ValueLayout.JAVA_SHORT) || (outtype == ValueLayout.JAVA_INT)) {
+		    if((outtype == ValueLayout.JAVA_INT) || (outtype == ValueLayout.JAVA_SHORT) || (outtype == ValueLayout.JAVA_BYTE)) {
 			outxf = buf -> (int)getint(buf, 0, outtype, true);
 		    } else {
 			throw(new IllegalArgumentException(outtype + " -> " + rtype));
@@ -534,6 +540,12 @@ public abstract class COM {
 	    args[1] = obj;
 	    System.arraycopy(pars, 0, args, 2, pars.length);
 	    return(Utils.invoke(handler, null, args));
+	}
+    }
+
+    public static class COMReturn extends HResultError {
+	public COMReturn(int hresult) {
+	    super(hresult);
 	}
     }
 
@@ -659,7 +671,7 @@ public abstract class COM {
 		if(resret)
 		    return(((Number)rv).intValue());
 		return(0);
-	    } catch(HResultError e) {
+	    } catch(COMReturn e) {
 		return(e.hresult);
 	    }
 	}
@@ -1024,7 +1036,7 @@ public abstract class COM {
 
 	    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
 		if(method.equals(mth_toString))
-		    return("#<com-proxy " + iid.iface + ">");
+		    return("#<com-proxy " + iid.iface + " @ " + Long.toUnsignedString(mem.address(), 16) + ">");
 		if(args == null)
 		    args = new Object[0];
 		DowncallAdapter da = dcache.get(new Pair<>(iid, method));
@@ -1057,13 +1069,15 @@ public abstract class COM {
 
 	final int VINDEX_RELEASE = 2;
 	final MethodHandle native_Release = ld.downcallHandle(FunctionDescriptor.of(ULONG(), ADDRESS));
-	void release(MemorySegment obj) {
+	int release(MemorySegment obj) {
 	    MemorySegment rfun = getvtab(obj, VINDEX_RELEASE);
+	    int rv;
 	    try {
-		native_Release.invoke(rfun, obj);
+		rv = (int)native_Release.invoke(rfun, obj);
 	    } catch(Throwable t) {
 		throw(new InvocationException(t));
 	    }
+	    return(rv);
 	}
 
 	public <I extends IUnknown> I objforaddr(MemorySegment mem, IID<I> iid, boolean borrowed) {
