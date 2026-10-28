@@ -709,32 +709,17 @@ public class WGLContext implements Providers.Factory<Toolkit> {
 	    }
 
 	    public class WGLEnvironment extends FFIEnvironment {
-		private int qstate;
-
 		private WGLEnvironment() {
 		    super(gl);
 		}
 
-		private void process() {
-		    synchronized(this) {
-			qstate = 2;
-		    }
-		    process(gl);
-		    synchronized(this) {
-			if((qstate & 1) != 0)
-			    glrun(WGLWindow.this, (Runnable)this::process);
-			qstate &= ~2;
-		    }
-		}
-
 		public void submit(Render cmd) {
-		    super.submit(cmd);
-		    synchronized(this) {
-			if(renv == this) {
-			    if(qstate == 0)
-				glrun(WGLWindow.this, (Runnable)this::process);
-			    qstate |= 1;
-			}
+		    Submission task = submission(cmd);
+		    synchronized(WGLWindow.this) {
+			if(renv == this)
+			    glrun(WGLWindow.this, () -> task.accept(gl));
+			else
+			    task.abort();
 		    }
 		}
 
