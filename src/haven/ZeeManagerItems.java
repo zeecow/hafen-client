@@ -2419,7 +2419,7 @@ public class ZeeManagerItems extends ZeeThread{
                             .replaceAll("\\s+tree", "");
                     int treeQl = ZeeManagerItems.getItemInfoQuality(subInfo).intValue();
                     if (treeQl > -1)
-                        name += " " + treeQl;
+                        name = treeQl +" "+ name;
                     if (gItem.parent instanceof Inventory) {
                         WItem w = ((Inventory) gItem.parent).getWItemByGItem(gItem);
                         w.treepotPlant = name;
